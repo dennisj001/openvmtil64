@@ -1,0 +1,338 @@
+
+5
+//bigNumOff
+optimizeOn inlineOn 
+#if 1
+bno //BigNum
+// optimizeOff inlineOff
+// verbosity 2 = 
+Compiler Logic Int C User C
+// : sp stack pause ;
+var: facTest fibTest Dsp ;
+
+#if 1
+// tail recursion from http://c2.com/cgi/wiki?TailCallOptimization
+c_syntaxOn dscOn
+int factorial( n | rec1 )
+{
+    //d: int 
+    rec1 = 1;
+    while ( n >= 2 )
+    {
+        rec1 *= (n--) ; 
+        //rec1 = rec1 * n-- ;
+    }
+    return rec1;
+}
+c_syntaxOff dscOff
+7 factorial p //pause
+#endif
+
+: factorial ( n  | fac -- TOS ) 
+    fac 1 = 
+    { n @ 1 > } { n @ fac @ * fac store n -- } while 
+    fac @ 
+;
+: qexp dup 1 <= if{ }else{ dup -- qexp * }fi ;
+: qexp2 dup 1 <= ?< >:< dup -- qexp2 * >? ;
+
+: bexp ( n ) n @ 1 > if{ n @ dup -- bexp * }else{ 1 }fi ;
+: bexp2 ( n ) { n @ 1 > } { n @ dup -- bexp2 * } { 1 } ifElse ;
+: bexp3 ( n ) { n @ 1 > } { n @ n @ -- bexp3 *  } { 1 } ifElse ;
+7 bexp3 p //pause
+c_syntaxOn
+int
+fac5 ( REG: n  | EAX: facc -- EAX ) 
+{ 
+    facc = 1 ;
+    while ( n > 1 ) 
+    {
+        facc = facc * n -- ;
+    }
+}
+wdiss ( ' fac5 find ) ;  //pause
+fac5 ( 7 ) p //pause
+
+int
+faccs ( REG: n | EAX: rec -- EAX ) 
+{
+    rec = 1 ; 
+    while ( n > 1 )
+    { 
+        rec = rec * n ;  n-- ; 
+    } 
+}
+' faccs find wdiss
+faccs ( 7 ) p 
+
+int
+faccs2 ( REG: n | EAX: rec -- EAX ) 
+{
+    for ( rec = 1 ; n > 1 ; n-- )
+    { 
+        rec = rec * n ; 
+    } 
+}
+' faccs2 find wdiss
+faccs2 ( 7 ) p 
+c_syntaxOff
+
+: fac ( n  | rec1 -- TOS ) 
+    rec1 1 = 
+    { n @ 1 > } { rec1 n @ rec1 @ * = n -- } while 
+    rec1 @ 
+;
+// : bexp2 ( n | rec1 ) { n @ 1 <= } { 1 } { n @ dup -- bexp2 * } ifElse ;
+
+: sdbg ( j ) { stackDepth 20 > } { state regs nl "stackDepth = " ps stackDepth p nl hex { j stackDepth = } { j @ 0 > } { j -- } { p } for quit } if2 ;
+
+User
+: factorial ( REG: n | EAX: rec -- EAX ) rec 1 = { n @ 1 > } { rec @ n @ * rec store n -- } while ;
+: _ifx ( w | j ) 
+    { j 1 = } { j @ 15 <= } { j ++ } 
+    {
+       // j @ w @ wordRun j @ p "." ps p ";" ps
+       j @ w @ wordRun drop // j @ p "." ps p ";" ps
+    }
+    for
+;
+
+: _ifx2 ( w | j k ) 
+    { k 2 = j 1 = } { j @ 30 <= } { j ++ } 
+    {
+       // j @ w @ wordRun j @ p "." ps p ";" ps
+       k @ j @ w @ wordRun drop // j @ p "." ps p ";" ps
+    }
+    for
+;
+
+: iFactorialX ( n w | k ) { k 1 = } { k @ n @ <= } { k ++ } { w @ _ifx } for ; 
+: iFactorialX2 ( n w | k ) { k 1 = } { k @ n @ <= } { k ++ } { w @ _ifx2 } for ; 
+
+: _ffx ( n w | t ) nl 7 w @ wordRun decimal p nl { t 0 = } { t @ n @ < } { t ++ } { 100000 w @ iFactorialX } for ;
+: _ffx2 ( n w | t ) nl 2 16 w @ wordRun decimal p nl { t 0 = } { t @ n @ < } { t ++ } { 100000 w @ iFactorialX2 } for ;
+
+nl "ffx ... " ps nl
+: nlpsnl ( str n ) hex nl str @ ps n @ p nl ;;
+// "ffx" ( w ) { w dup @ find = w @ wdiss 3 w @ nlpsnl ( "w =" w @ ) _ffx } word
+// "ffx" ( w | d ) { d w @ find = d wdiss nlpsnl ( "word =" d @ ) 7 d @ _ffx } word
+: ffx ( w | d ) 1 ti d w @ _find = d @ wdiss 3 d @ _ffx 1 time nl ;
+: ffx2 ( w | d ) 1 ti d w @ _find = d @ wdiss 3 d @ _ffx2 1 time nl ;
+
+User
+"factorial" ffx
+sp
+"cfactorial" ffx
+"cfactorial2" ffx
+User "qexp" ffx
+C "bexp" ffx
+"bexp2" ffx
+"factorial" ffx
+C "qexp" ffx
+C "qexp2" ffx
+"bexp" ffx
+"bexp2" ffx
+"bexp3" ffx
+"fac" ffx
+// "fac5" ffx pause
+User
+"factorial" ffx
+"cfactorial3" ffx
+"cfactorial" ffx
+"cfactorial2" ffx
+"cfactorial3" ffx
+"cfactorial_O3" ffx
+"cfactorial2_O3" ffx
+"cfactorial3_O3" ffx
+using  
+"factorial" ffx
+"faccs" ffx
+"fac5" ffx
+//"fac4" ffx
+
+#if 1
+//verbosity 3 =
+c_syntaxOn
+Root
+//int cpow ( base power | out ) s{ for ( out = 1 ; power ; ( power -= 1 ) ) { out = out * base ; } return out ; }s 
+int cpow ( base power | out ) { for ( out = 1 ; power ; power -= 1 ) { out = out * base ; } return out ; }
+'cpow find wdiss
+c_syntaxOff
+2 30 cpow p
+//s: pow ( base power | out -- TOS ) { out 1 = } { power @ 0 > } { power power @ 1 - = } { out out @ base @ * = } for return out @ ;s
+: pow ( base power | out -- TOS ) { out 1 = } { power @ 0 > } { power power @ 1 - = } { out out @ base @ * = } for return out @ ;
+'pow find wdiss
+2 30 pow p //pause
+#endif
+
+"cpow" ffx2
+"pow" ffx2
+Int
+"**" ffx2
+"pow_03" ffx2
+//pause
+sp
+
+C
+#if 1 // fibTest @ 
+: tt ( | t ) t 6 = t ++ t @ p ;
+' tt dup source find dup wdis code iax
+
+#endif
+
+c_syntaxOn
+int 
+_fibn0 ( n ) 
+{
+    if ( n < 2 ) 
+    {   
+        return ( n ) ;
+    }
+    else 
+    {
+        return (  _fibn0 ( n - 1 ) + _fibn0 ( n - 2 ) ) ;
+    }
+}
+' _fibn0 find wdiss _fibn0 ( 20 ) p //pause
+int
+fibPTC? ( n )
+{
+    int fn, fn1, fn2 ;
+    for ( fn = 0, fn1 = 0, fn2 = 1 ; n ; n -- ) 
+    {   
+        fn1 = fn2 ;
+        fn2 = fn ;
+        fn = fn1 + fn2 ; 
+    }
+    return ( fn ) ;
+}
+' fibPTC? find wdiss
+20 fibPTC? dup p 6765 _assert0 //pause
+c_syntaxOff
+
+: _fibn1 ( n -- TOS ) { n @ 2 < } { n @ } { n -- n @ _fibn1 n -- n @  _fibn1 + } ifElse ;
+' _fibn1 find wdiss 20 _fibn1 p // pause
+: _fib1 ( n ) { n @ 2 < } { n @ } { n @ -- _fib1 n @ 2 - _fib1 + } ifElse ;
+: _fib 
+    dup 2 < 2 
+    if{ 
+    }else{ 
+        dup -- _fib swap 2 - _fib + 
+    }fi 
+;
+
+: _fib2 dup 2 < ?< >:< dup -- _fib2 swap 2 - _fib2 + >; ; 20 _fib2 p
+
+: _fib3 
+    dup 2 < 
+    ?< >:< 
+        dup -- _fib3 swap 2 - _fib3 + 
+    >; 
+;
+' _fib3 find wdiss 
+20 _fib3 p 
+: _fib4 
+    { dup 2 >= }
+    { 
+        dup -- _fib4 swap 2 - _fib4 + 
+    } if2 
+;
+' _fib4 find wdiss
+20 _fib4 p
+20 _fib4 p
+Locals
+"fib1" ( n ) { 1 ti n @ _fib1 p 1 time } word
+C
+'cfib2_O3 find wdiss //pause
+: fib  ( n ) 1 ti n @ _fib  p 1 time ;
+: fib2 ( n ) 1 ti n @ _fib2 p 1 time ;
+: fib3 ( n ) 1 ti n @ _fib3 p 1 time ;
+: fib4 ( n ) 1 ti n @ _fib4 p 1 time ;
+: fibn0 ( n ) 1 ti n @ _fibn0 p 1 time ;
+: Cfib ( n ) 1 ti n @ cfib  p 1 time ;
+: Cfib_O3 ( n ) 1 ti n @ cfib_O3  p 1 time ;
+: tfib ( n )  
+    nl hex dsp p decimal nl "The fibonacci sequence" ps n @ p ":" ps nl 
+    "C -O3 : " ps n @ Cfib_O3 nl 
+    "no locals fib  : " ps n @ fib nl 
+    "locals fibn0 : " ps n @ fibn0 nl 
+    "locals fib1  : " ps n @ fib1 nl 
+    "no locals fib2 : " ps n @ fib2 nl
+    "no locals fib3 : " ps n @ fib3 
+;
+// 15 tfib 30 tfib 40 tfib 45 tfib 
+: tfib1 ( n | m )  
+    nl "The fibonacci sequence:: first :" ps n @ p "..." ps nl 
+    "Cfib_O3        : " ps 1 ti m 1 = { m @ n @ < } { m @ cfib_O3 p m ++ } while 1 time nl nl
+    "Cfib           : " ps 1 ti m 1 = { m @ n @ < } { m @ cfib p m ++ } while 1 time nl nl
+    "Cfib_O3        : " ps 1 ti m 1 = { m @ n @ < } { m @ cfib_O3 p m ++ } while 1 time nl nl
+    "no locals _fib  : " ps 1 ti m 1 = { m @ n @ < } { m @ _fib p m ++ } while 1 time nl nl 
+    "locals   _fibn0 : " ps 1 ti m 1 = { m @ n @ < } { m @ _fibn0 p m ++ } while 1 time nl nl
+    "locals   _fibn1 : " ps 1 ti m 1 = { m @ n @ < } { m @ _fibn1 p m ++ } while 1 time nl nl
+    "locals   _fib1  : " ps 1 ti m 1 = { m @ n @ < } { m @ _fib1 p m ++ } while 1 time nl nl
+    "no locals _fib2 : " ps 1 ti m 1 = { m @ n @ < } { m @ _fib2 p m ++ } while 1 time nl nl
+    "no locals _fib3 : " ps 1 ti m 1 = { m @ n @ < } { m @ _fib3 p m ++ } while 1 time nl nl
+    "no locals _fib4 : " ps 1 ti m 1 = { m @ n @ < } { m @ _fib4 p m ++ } while 1 time nl nl
+    "locals fibPTC? : " ps 1 ti m 1 = { m @ n @ < } { m @ fibPTC? p m ++ } while 1 time nl nl
+;
+: tfib2 ( n | m )  
+    "Cfib_O3        : " ps 1 ti m 1 = { m @ n @ < } { m @ cfib_O3 p m ++ } while 1 time nl nl
+    "no locals _fib4 : " ps 1 ti m 1 = { m @ n @ < } { m @ _fib4 p m ++ } while 1 time nl nl
+    "locals _fibn1   : " ps 1 ti m 1 = { m @ n @ < } { m @ _fibn1 p m ++ } while 1 time nl nl
+    "no locals _fib3 : " ps 1 ti m 1 = { m @ n @ < } { m @ _fib3 p m ++ } while 1 time nl nl
+;
+: tfib3 ( n | m )  
+    "Cfib2_O3       : " ps 1 ti m 1 = { m @ n @ < } { m @ cfib2_O3 p m ++ } while 1 time nl nl
+    "locals fibPTC? : " ps 1 ti m 1 = { m @ n @ < } { m @ fibPTC? p m ++ } while 1 time nl nl
+    //"locals fibPTC2? : " ps 1 ti m 1 = { m @ n @ < } { m @ fibPTC2? m ++ } while 1 time nl nl
+;
+
+30 tfib1
+30 tfib2
+47 tfib3
+: fibx ( n ) { n @ 0 >= } { n @ _fib p n -- } while ;
+: fibx2 ( n | m ) "fibonacci" ps n @ p ":" ps m 0 = { m @ n @ < n @ <= } { m @ n @ < _fib2 p m ++ } while ;
+// : fibx3 ( n | m ) "fibonacci" ps n @ p ":" ps m 0 = { m @ n @ < n @ <= } { m @ n @ < _fib3 p m ++ } while ;
+: fibx3 ( n ) "fibonacci" ps n @ p ":" ps { n @  } { n @ _fib3 p n -- } while ;
+// ' _fib find wdiss
+' _fib2 find wdiss
+// 40 fibx3 
+#if 1
+BigNum
+bnInit ( 0 0 )
+
+: tbn ( | n m ) n 0 = m 3 = n m @ += n m @ += n m @ += n @ p ; tbn // should be 9
+
+s: fibBN ( n | svn fn fn1 fn2 -- TOS ) 
+    { svn n @ = fn 0 = fn1 0 = fn2 1 = } { n @ 0 > } { n 1 -= } 
+    {   
+        fn1 fn2 @ = 
+        fn2 fn @ = 
+        fn fn1 @ fn2 @ + = 
+    }
+    for
+    // nl svn @ fprint ":" ps fn @ fprint 
+    fn @
+;s
+sp
+
+: tfib3 ( n | m )  
+    "locals fibBN : " ps 
+    { m 1 = } { m @ n @ <= } { m 1 +=  } 
+    { m @ dup p " : " _ps fibBN p { n @ m @ > } { "," _ps } if2 } 
+    for
+;
+nl nl 47 tfib3
+nl nl 100 tfib3
+nl 100 dup p fibBN p //pause
+bno
+#endif
+
+
+nl
+// verbosity 1 =
+// namespaceTreeWithWords
+
+2 + 7 assertStkChk // stack checking
+s
+

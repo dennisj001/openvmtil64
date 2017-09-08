@@ -1,0 +1,377 @@
+//mem pause 
+//verbosity 0 = 
+// logOn
+//: mp ; //mem pause ; mp
+"BigNum" notUsing 
+verbosity 1 = 
+5 
+Debug
+: d: _dbgOn ; immediate debugWord // a debugWord has special behavior : doesn't interfere with optimization
+"OptimizeOn" variable
+OptimizeOn 1 = 
+#if OptimizeOn @
+optimizeOn inlineOn
+#else
+optimizeOff inlineOff
+#endif
+Root 
+d: : ' _tick ; immediate
+: find _find ; immediate
+"log" variable 
+"User" namespace 
+
+// aliases 
+// using pause
+Debug
+//"dbg" '_dbg find alias immediate debugWord
+"dbrk" d: '<dbg> find alias debugWord
+"locals" 'localsShow find alias
+"regs" 'cpuStateShow find alias
+'nt 'namespaceTreeWithWords find alias
+'dscOn 'dbgSourceCodeOn find alias
+'dscOff 'dbgSourceCodeOff find alias
+: v4 verbosity 4 = ;
+: v1 verbosity 1 = ;
+
+User
+"const" ' constant find alias
+"_const" ' _constant find alias
+"var" ' variable find alias
+"_var" ' _variable find alias
+"wdis" ' wordDisassemble find alias
+'dbgOnVar var 
+'dbOn 'dbgOnVar find alias
+: dbgOn dbgOnVar 1 = ;
+: dbgOff dbgOnVar 0 = ;
+dbgOff
+#if dbgOnVar @ 
+User
+: mp mem pause ;
+: sp stack pause ;
+#else
+: mp ; //mem pause ;
+: sp ; //stack pause ;
+#endif
+mp
+
+Combinators
+"ix" ' call find alias immediate
+"qEval" ' call find alias immediate
+"ifte" ' tf3 find alias
+"ifElse" ' tf3 find alias
+
+User
+#if 1
+: _SMN_ "StartupMacros" ;                           // _SMN_ : string startup macros namespace 
+"StartupMacros" namespace                           // create a namespace for string macros to be used 
+StartupMacros                                       // switch to that namespace
+: Delimiters "/" ;                                  // set delimiters to be used with string macros
+// "_startDirectory_" variable                      // created and set in CfrTil_ResetAll_Init
+: namespaces _startDirectory_ @ ;                   // this line also works in place of the next line
+                                                    // '_startDirectory_' is a variable created in the function 
+                                                    // CfrTil_ResetAll_Init in the file init.c
+//: namespaces "/usr/local/lib/cfrTil/namespaces" ; // our currently only ?!overloaded!? string macro allowing 
+                                                    // us to parameterize the startup; can be properly started 
+                                                    // in any directory now if it is installed with 'make install' 
+                                                    // in "/usr/local/lib/cfrTil"
+// stringMacrosOn                                   // turn on the macros; doesn't work if not initialized like eg. above initialization
+                                                    // nb. we don't turn it on here until about line 304
+// stringMacrosOff                                  // turn off the macros
+#endif
+Lexer User 
+
+// nb. there is still some (alot of) old junk here and especially in the test files and some of the comments may not apply anymore ...
+// echoOn
+// verbosity 1 = 
+//autoVarOn
+Debug
+"DebugFlag" variable
+DebugFlag 0 =
+
+Compiler 
+// nb : .'"[] : these five characters - dot, tick, quote left bracket, right bracket - .'"[] - are character macros including the brackets they work at the char level in readline
+// set up some traditional Forth words from internal primitives
+// core internal c defined words : begin _end token _tick _immediate definition compile constant variable alias compileModeOn wordInit wordAdd wordFinish
+quote ' quote quote find alias _immediate
+"immediate" ' _immediate find alias _immediate
+"compileWord" ' _compileWord find alias immediate
+"compileCall" ' _compileCall find alias immediate
+"swap" ' _swap find alias immediate
+"{" ' begin find alias immediate keyword
+"end" ' _end find alias immediate
+"}" ' end find alias keyword
+"xt@" { xt @ } word immediate // ' definition alias immediate
+"_semi" create { xt= wordFinish } xt= wordFinish 
+"semi" create { _end _semi } _semi 
+";" ' semi find alias immediate
+":" { compileModeOn sourceCodeInit token create begin } word // immediate // begin is not an immediate word
+#if 1
+d: : word swap create swap _semi ;  //'word wordDisassemble pause
+#else
+//: word ( n b ) n @ create b @ _semi ; 'word wordDisassemble pause // works but it is more code
+#endif
+"xt@" { xt @ } word immediate // ' definition alias immediate
+'tick ' _tick find alias immediate
+'ndrop '_ndrop find alias immediate 
+// : ' token _tick ; immediate
+// : ' token find ; immediate
+//'tick '_tick find alias immediate
+Class
+'_new 'new find alias prefix
+C
+"typedef" ' type find alias
+: ;; semi _prefix ; immediate
+c_syntaxOn //using
+type int64 ; int64.size = 4 ;
+type void ; void.size = 0 ;
+type char ; char.size = 1 ;
+type long ; long.size = 8 ;
+type quad ; quad.size = 16 ;
+c_syntaxOff
+BigNum
+: fprint space _fprint ;
+: eprint space _eprint ;
+// pWidth : "Minimum number of characters to be printed. If the value to be printed is shorter than this number, 
+// the result is padded with blank spaces. The value is not truncated even if the result is larger."
+// pPrecision : this is the number of digits to be printed after the decimal point" 
+: bnInit ( precision width ) precision @ pPrecision width @ pWidth 64 bPrecision ;;
+'p 'fprint find alias
+64 bPrecision 
+bnInit ( 0 0 )
+Root
+: bigNumOff "BigNum" notUsing ;
+'bno 'bigNumOff find alias
+bno
+
+Compiler 
+: var: { token dup ";" strcmp } { _var } while drop ; immediate // nb : no quotation marks around names
+var: DebugFlag classTestRead streamLine doInit1 doDemo doTest doLisp COMBINATOR_TOOKIT doLisp testing testLisp x Zenfone2 ; // _TestDone_ ; 
+: nstrcat: "" { token dup ";" strcmp } { strcat " " strcat } while drop ; immediate // nb : no quotation marks around names
+"mod" 'modulo find alias
+// "Preprocessor" class
+Lisp
+"lambda" "_lambda" find alias // nb! : can't use C/Compiler/Forth ' (tick) in Lisp namespace - it has another meaning there! : this construction also has same meaning
+
+Namespace
+: using: { token dup ";" strcmp } { usingFirst } while drop ; // eg - "using: User Lisp ;"
+: notUsing: { token dup ";" strcmp } { notUsing } while drop ; 
+: usingLast: { token dup ";" strcmp } { usingLast } while drop ; 
+notUsing: C_Combinators C_Syntax Lisp ;
+
+System
+"Black" 0 const
+"Red" 1 const
+"Green" 2 const
+"Yellow" 3 const
+"Blue" 4 const
+"Magenta" 5 const
+"Cyan" 6 const
+"White" 7 const
+"Default" 9 const
+//: netbeans Blue Default setDebugColors ; : nnb Blue Black setDebugColors ; // netbeans // nnb
+
+Root
+"fr" 'fullRestart find alias
+"ri" 'restartInit find alias
+//'q 'quit find alias
+System
+"true" 1 const
+"false" 0 const
+"T" 1 const
+"F" 0 const
+Io
+: _ps printString ; inline
+: ps space _ps ;
+: prints _ps ;
+: pn intPrint ;
+: _p intPrint ;
+: p space intPrint ;
+: hp hex p ;
+: print space intPrint ;
+"nl" ' newline find alias keyword
+: _logWrite "cfrTil.log" logWrite ;
+: _logAppend "cfrTil.log" logAppend ;
+
+Debug
+// make immediate/word immediate - compile time versions of some words
+//: d: _dbgOn ; immediate debugWord // a debugWord has special behavior : doesn't interfere with optimization
+: _s stack ; 
+: s stack ; immediate
+: sinit stackInit ; 
+: dcm decimal ; immediate // a non hex interpreted word
+//: iun using stack namespaceTree ; immediate
+: slp "stack at " ps location stack _pause ;
+C
+: logWrite ( str ) _logWrite nl str @ ps nl ;
+: logAppend ( str ) _logAppend nl str @ ps nl ;
+
+Word 
+: code definition ;
+
+C
+System
+dscOn //verbosity 3 =
+: location filename ps space decimal lineNumber _p "." _ps charNumber _p ;
+: pdl  "-----------------------------" ps ;
+: pel  "=============================" ps ;
+: _source ( addToHistoryFlag  pword )
+    { addToHistoryFlag @ } { pword @ sourceAdd } { pword @ sourceDontAdd } ifElse 
+;;
+: _wdiss ( addToHistoryFlag pword ) 
+    nl pel 
+    nl "::> 'wdiss' is being called at" _ps location "<::" ps
+    _source ( addToHistoryFlag @ pword @ ) nl pdl 
+    pword @ wdis 
+    nl "Word :" _ps hex pword p ":: Compiled at :" ps pword @ definition p 
+    nl pel nl decimal 
+;;
+scOff
+//: wdiss ( pword ) _wdiss ( 1 pword @ ) ; //debugWord    // add wdiss words to history list
+: wdiss ( pword ) _wdiss ( 0 pword @ ) ; //debugWord      // don't add wdiss words to history list
+: wdissl ( pword ) logOn _wdiss ( 0 pword @ ) logOff ; //debugWord      // don't add wdiss words to history list
+"winfo" ' wdiss find alias
+// ' wdiss wdiss
+: sys mem namespaces words stack using in ; 
+'aw 'allWords find alias
+: stk stack ; //debugWord 
+: ti timerInit ;
+: ahalt stop ;
+: vb ( n ) verbosity n @ = ; : vb3 3 vb ; : vb2 2 vb ; : vb1 1 vb ; : vb0 0 vb ;
+: sOff vb1 inlineOff optimizeOff ;
+: sOn vb3 inlineOn optimizeOn ;
+"ahOn" ' addToHistoryOn find alias
+"ahOff" ' addToHistoryOff find alias
+: adps ( s ) alertColors s @ ps defaultColors ;
+: ddps ( s ) debugColors s @ ps defaultColors ;
+//dbgOnVar 1 = 
+#if dbgOnVar @ 
+dscOn //verbosity 3 =
+#endif
+: _assert0 ( n m ) { n @ m @ != } { nl location hex n @ p "!=" ps m @ p "<:" ps "Error!" adps _info _pause } { } ifElse ;
+: _assert ( n m ) nl location "- _assert ::" ps { n @ m @ != } { hex n @ p "!=" ps m @ p "<:" ps "Error!" adps _info _pause } { " ok" ps } ifElse ;
+: _assert1 ( n m str ) { n @ m @ != } { str @ ps "error" ps _info _pause } if ;
+//: assert1 ( n m str ) location { n @ m @ != } { nl str @ ps ":>" ps hex n @ p "!=" ps m @ p "<:" ps "Error!" adps _info _pause } { str @ ps "ok\n" ps } ifElse ;
+: assert1 ( n m str ) location { n @ m @ != } { <dbg> nl str @ ps ":>" ps hex n @ p "!=" ps m @ p "<:" ps "Error!" adps _info _pause } { str @ ps "ok\n" ps } ifElse ;
+: assert1s ( s1 s2 str ) { s1 @ s2 @ strcmp } { nl str @ ps "error" ps _info _pause } if ;
+: _assert2 ( n m str ) { n @ m @ == } { str @ ps "ok" ps nl } { str @ ps "error" ps _info _pause } ifElse ; 
+: assert2 ( n m str ) { n @ m @ == } { nl str @ ps "ok" ps nl } { nl str @ ps "error" ps _info _pause } ifElse ;
+: assert0 ( n m ) { n @ m @ != } { nl "error" ps _info _pause } if ; 
+"assert" ' assert1 find alias
+: _assertStkChk ( n m | str )  
+#if dbgOnVar @
+    //<dbg>
+    _s 
+    { verbosity @ 1 > }
+#else
+    { verbosity @ 1 > }
+#endif
+    {
+        { DebugFlag @ } 
+        { 
+            debugColors
+            str "\n assertStkChk ::" = 
+            { n @ m @  == }
+            { nl location ":" ps str @ ps "ok" ps nl sp } 
+            { tab nl location ":" ps str @ ps alertColors "\n Error!\n" ps hex n @ p "!=" ps m @ p sp nl quit } 
+            ifElse 
+            defaultColors 
+        } 
+#if dbgOnVar @
+        { nl sp n @ m @ "assertStkChk" <dbg> assert _s }
+#else
+        { nl sp n @ m @ "assertStkChk" assert }
+#endif
+        ifElse
+        //mem
+    } if2 //_s //nl location nl //_pause
+; 
+: assertStkChk _assertStkChk ; //stack _pause ; // s ;
+scOff
+//' _assertStkChk winfo //pause
+: TODO ( str ) nl nl pdl nl str @ adps location nl pdl nl nl { dbgOnVar @ } { sp } if2 ;;
+"getESP" ' rsp find alias
+Root
+"User" namespace
+User
+//: pause nl "pausing at :" ddps location nl _pause ;
+: pause nl _pause ;
+//: pause _pause ;
+: opOff optimizeOff inlineOff state ;
+: opOn1 optimizeOn inlineOn { verbosity @ 1 > } { state } if ;
+// ' opOn1 wdiss
+: vck ( n w ) { verbosity @ n @ > } { w @ wordRun drop } if2 ;
+: opOn 
+    optimizeOn inlineOn 
+    1 ' state literal vck  
+;
+// ' opOn @ winfo
+// opOn
+"s" ' stack find alias
+// : s stack location pause ;
+// : s stack dbg ;
+"istring" ' interpretString find alias
+"def" ' word find alias
+Compiler
+">;" ' >? find alias
+
+Root C
+"allot" ' allocateMem find alias
+// : include location s include location s pause ;
+// : include location nl include ;
+
+: include1 dup debugColors "\n'include'" ps ps " :: at :" ps location nl defaultColors sp include  ;
+Debug
+#if ( DebugFlag @ )
+: s stack alertColors location defaultColors ;
+// : s stack alertColors location defaultColors ;
+// : include 1 timerInit info stack include stack 1 time ; 
+// : include include stack ;
+// : include ( f ) vb3 alertColors decimal nl location nl "Entering : " ps f @ ps nl s f @ include defaultColors ;
+: include include1 debugColors "location :" ps location nl defaultColors ;
+vb3
+#endif
+Interpreter
+'_defined '_find find alias
+' defined '_find find alias immediate
+C Compiler Int Lexer
+: ofile ( name | file input result )
+    input 0 =
+    "open/read/print :: " ps name @ ps nl
+    file name @ fopen =
+    nl { result file @ input 1 fread = input @ emit } { result @ 1 == } doWhile 
+    file @ fclose
+; prefix
+Root
+: license ofile ( "./LICENSE" ) ;
+
+OpenVmTil
+: lispOff "Lisp" notUsing ; //lcReset ;
+
+
+c_syntaxOff
+scOff
+
+stringMacrosOn
+System
+//s: assertStkChk <dbg> mem assertStkChk location pause ;s
+: testCfrTil "namespaces/init.cft" include ;
+sp 
+//Zenfone2 1 =
+//mem pause
+: sh _sh ; prefix
+dbgOff
+//dbgOn
+Root 'doScript 0 const
+//Root 'doScript 1 const
+#if dbgOnVar @ 
+testCfrTil
+stringMacrosOff
+//demo
+#endif
+//using pause
+2 + 7 assertStkChk // stack checking
+dbgOff
+#endif
+: argsOrderExample ( a b c d ) a @ p b @ p c @ p d @ p ; "\n 1 2 3 4 argsOrderExample ( a b c d )  => " ps   1 2 3 4 argsOrderExample 
+mp
+

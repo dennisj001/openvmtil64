@@ -1,0 +1,73 @@
+
+5
+#if  1
+C 
+: sp ; //stack pause ;
+#if Zenfone2 @ not
+dlsym: printf /lib32/libc.so.6 ; void_return
+printf ("\n%s\n\t%s","hello world! - parse this!?", "\tand this!")"\tand this!" ps
+// pause
+dlsym: strcmp /lib32/libc.so.6 ; //eax_return
+dlsym: sprintf /lib32/libc.so.6 ; void_return
+dlsym: printf /lib32/libc.so.6 ; void_return
+#endif
+sp
+printf ( "\nHello world! = 0x%08x\n\n" 1234 ) 
+printf ( "\n%s = %d\n\n", "Hello world!", 42 ) 
+printf("\n%s\n\t","hello world! - parse this!?")"\tand this!" ps
+
+C_Syntax
+User
+Compiler
+: vckf ( n w ) 
+    { verbosity @ n @ > } { w @ wordRun } if2 
+;;
+//: dbv ( n ) dbgVerbosity n @ = ; 2 dbv
+: vckf1 ( w ) vckf ( 0 w @ ) ;; //_literal ) ;;
+vckf1 ( ' s find ) 
+//1 dbv
+C
+printf ( "\nHello world! = 0x%08x\n\n" 1234 ) 
+printf ( "\n%s\n\n", "hello world!\nparse this!\n" )"\n and this!\n" ps
+printf ( "\n%s\n\t", "hello world! - parse this!?" )"\t and this!" ps
+printf ( "\nHello world! = 0x%08x\n\n" 1234 ) 
+sp
+#endif
+"xc" var 
+xc 'e' = 
+xc @ dup emit 'e' _assert //pause
+s "x" var x 'e' = x @ emit s //pause
+sp
+Shell
+: hio  if 1 p else 0 p endif ;
+' hio find wdiss
+1 hio 0 hio sp
+"Shell" notUsing
+Root
+: set ( vari val ) vari @ val @ = ;; //'set wdiss
+: get ( vari -- TOS ) vari @ @ ;; //'get wdiss
+"x1" var set ( x1 876543 ) get ( x1 ) dup dup nl p nl 876543 _assert x1 @ _assert //pause
+sp
+#if 1
+String Shell
+s: $$ 
+    ""
+    { token dup ";" strcmp } 
+    { 
+        { dup "." strcmp } { strcat " " strcat } { strcat } if3
+    } 
+    while drop location "$$" ps dup ps _sh return
+;s  // allows more than one shell command on a ';' separated line 
+"streol" 'getStringToEndOfLine find alias
+: $ streol _sh ;  
+//'$$ find wdiss pause
+
+bigNumOff
+#if doScript
+$$ls -al /usr/local ; $$ls -al . ; 
+$./script 
+$./lispScript 
+//pause
+#endif
+
+2 + 7 assertStkChk // stack checking
