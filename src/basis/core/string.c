@@ -753,7 +753,7 @@ String_CheckForAtAdddress ( byte * address )
 {
 #if 1    
     byte *string = 0, buffer [128] ; // use a string buffer instead ??
-    if ( ( address > ( byte* ) 0xf0000000 ) )
+    //if ( ( address > ( byte* ) 0xf00000000000 ) )
     {
         if ( NamedByteArray_CheckAddress ( _Q_->MemorySpace0->StringSpace, address ) || NamedByteArray_CheckAddress ( _Q_->MemorySpace0->CompilerTempObjectSpace, address ) ||
             NamedByteArray_CheckAddress ( _Q_->MemorySpace0->SessionObjectsSpace, address ) ||
@@ -765,8 +765,8 @@ String_CheckForAtAdddress ( byte * address )
                 string = String_New ( buffer, TEMPORARY ) ;
             }
         }
-        return string ;
     }
+    return string ;
 #else
     return IsString ( address ) ;
 #endif    
@@ -963,10 +963,17 @@ _Buffer_NewPermanent ( int64 size )
 }
 
 byte *
+_Buffer_New_pbyte ( int64 size, int64 flag )
+{
+    Buffer *b = _Buffer_New ( size, flag ) ;
+    return Buffer_Data ( b ) ;
+}
+
+byte *
 Buffer_New_pbyte ( int64 size )
 {
-    Buffer *b = Buffer_NewLocked ( size ) ;
-    //Buffer *b = Buffer_New ( size ) ;
+    //Buffer *b = Buffer_NewLocked ( size ) ;
+    Buffer *b = _Buffer_New ( size, B_LOCKED ) ;
     return Buffer_Data ( b ) ;
 }
 

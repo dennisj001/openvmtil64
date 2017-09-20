@@ -51,7 +51,7 @@ void
 getCursor ( int* x, int* y )
 {
     _Printf ( (byte*) "\033[6n" ) ;
-    scanf ( "\033[%d;%dR", x, y ) ;
+    int out = scanf ( "\033[%d;%dR", x, y ) ;
     fflush ( stdin ) ; 
 }
 

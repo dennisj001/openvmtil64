@@ -45,22 +45,32 @@ _CfrTil_ReStart ( CfrTil * cfrTil, int64 restartCondition )
 }
 
 void
+_CfrTil_CpuState_CheckSave ( )
+{
+    if ( ! ( _CfrTil_->cs_Cpu->State ) )
+    {
+        _CfrTil_->SaveCpuState ( ) ;
+        _CfrTil_->cs_Cpu->State = 1 ;
+    }
+}
+
+void
 _CfrTil_CpuState_Show ( )
 {
     _CpuState_Show ( _CfrTil_->cs_Cpu ) ;
 }
 
 void
-CfrTil_CpuState_Show ( )
+CfrTil_CpuState_CheckShow ( )
 {
-    _CfrTil_->SaveCpuState ( ) ;
+    _CfrTil_CpuState_CheckSave ( ) ;
     _CfrTil_CpuState_Show ( ) ;
 }
 
 void
 CfrTil_Debugger_CheckSaveCpuStateShow ( )
 {
-    Debugger_CheckSaveCpuStateShow ( _Debugger_ ) ;
+    Debugger_CpuState_CheckSaveShow ( _Debugger_ ) ;
 }
 
 void
@@ -79,7 +89,13 @@ CfrTil_Debugger_State_CheckSaveShow ( )
 void
 CfrTil_Debugger_SaveCpuState ( )
 {
-    Debugger_CheckSaveCpuState ( _Debugger_ ) ;
+    _Debugger_CpuState_CheckSave ( _Debugger_ ) ;
+}
+
+void
+CfrTil_PrintReturnStackWindow ( )
+{
+    _PrintNStackWindow ( ( int64* ) _CfrTil_->cs_Cpu->Rsp, "CfrTil C ReturnStack (RSP)", "RSP", 4 ) ;
 }
 
 void
@@ -523,9 +539,9 @@ CfrTil_Compile_SaveIncomingCpuState ( CfrTil * cfrtil )
 {
     // save the incoming current C cpu state
 
-    Compile_Call_With32BitDisp ( ( byte* ) cfrtil->SaveCpuState ) ; // save incoming current C cpu state
-    _Compile_MoveReg_To_Mem ( EBP, ( byte * ) & cfrtil->cs_CpuState->Ebp, EBX, CELL ) ; // EBX : scratch reg
-    _Compile_MoveReg_To_Mem ( ESP, ( byte * ) & cfrtil->cs_CpuState->Esp, EBX, CELL ) ;
+    Compile_Call ( ( byte* ) cfrtil->SaveCpuState ) ; // save incoming current C cpu state
+    _Compile_MoveReg_To_Mem ( RBP, ( byte * ) & cfrtil->cs_CpuState->Ebp, R11D, CELL ) ; // EBX : scratch reg
+    _Compile_MoveReg_To_Mem ( RSP, ( byte * ) & cfrtil->cs_CpuState->Esp, R11D, CELL ) ;
 
 }
 
@@ -533,8 +549,8 @@ void
 CfrTil_Compile_RestoreIncomingCpuState ( CfrTil * cfrtil )
 {
     // restore the incoming current C cpu state
-    Compile_Call_With32BitDisp ( ( byte* ) _CfrTil_->RestoreCpuState ) ;
-    _Compile_MoveMem_To_Reg ( EBP, ( byte * ) & cfrtil->cs_CpuState->Ebp, EBX, CELL ) ;
-    _Compile_MoveMem_To_Reg ( ESP, ( byte * ) & cfrtil->cs_CpuState->Esp, EBX, CELL ) ;
+    Compile_Call ( ( byte* ) _CfrTil_->RestoreCpuState ) ;
+    _Compile_MoveMem_To_Reg ( RBP, ( byte * ) & cfrtil->cs_CpuState->Ebp, R11D, CELL ) ;
+    _Compile_MoveMem_To_Reg ( RSP, ( byte * ) & cfrtil->cs_CpuState->Esp, R11D, CELL ) ;
 }
 #endif

@@ -5,18 +5,7 @@ uint64 BlockCallAddress ;
 void
 Byte_PtrCall ( byte * ptr )
 {
-    D1 ( _Debugger_Disassemble ( _Debugger_, ( byte* ) ptr, 32, 1 ) ) ;
-#if 1   
-    ( ( block ) ptr ) ( ) ;
-#else    
-    if ( NamedByteArray_CheckAddress ( _Q_CodeSpace, ptr ) ) ( ( block ) ptr ) ( ) ;
-    else
-    {
-        BlockCallAddress = ( uint64 ) ptr ;
-        d1 ( _Debugger_Disassemble ( _Debugger_, ( byte* ) _CfrTil_->MoveToR8AndCall, 32, 1 ) ) ;
-        _CfrTil_->MoveToR8AndCall ( ) ;
-    }
-#endif    
+    if ( ptr ) ( ( block ) ptr ) ( ) ;
 }
 
 void
@@ -43,7 +32,7 @@ _Block_Copy ( byte * srcAddress, int64 bsize )
             {
                 // ?? unable at present to compile inline with more than one return in the block
                 SetHere ( saveHere ) ;
-                Compile_Call_With32BitDisp ( saveAddress ) ;
+                Compile_Call ( saveAddress ) ;
             }
             break ; // don't include RET
         }
@@ -79,6 +68,12 @@ _Block_Copy ( byte * srcAddress, int64 bsize )
             }
             //else (drop to) _CompileN ( srcAddress, isize )
         }
+#if 0        
+        else if ( ( * address == 0x49 ) && ( * ( address + 1 ) == 0xff ) )
+        {
+            iaddress = ( byte* ) ( * ( ( uint64* ) ( address - CELL ) ) ) ; // 3 : sizeof x64 call insn 
+        }
+#endif        
         _CompileN ( srcAddress, isize ) ; // memcpy ( dstAddress, address, size ) ;
     }
 }
@@ -107,7 +102,7 @@ Block_CopyCompile_WithLogicFlag ( byte * srcAddress, int64 bindex, int64 jccFlag
     {
         if ( ! ( _Q_->OVT_LC && GetState ( _Q_->OVT_LC, ( LC_COMPILE_MODE ) ) ) )
         {
-            if ( bi->LiteralWord )//&& bi->LiteralWord->StackPushRegisterCode ) // leave value in EAX, don't push it
+            if ( bi->LiteralWord )//&& bi->LiteralWord->StackPushRegisterCode ) // leave value in R8, don't push it
             {
                 if ( bi->LiteralWord->W_Value != 0 )
                 {
@@ -119,7 +114,7 @@ Block_CopyCompile_WithLogicFlag ( byte * srcAddress, int64 bindex, int64 jccFlag
         }
         jccFlag2 = Compile_CheckReConfigureLogicInBlock ( bi, 1 ) ;
     }
-    if ( ! GetState ( _CfrTil_, INLINE_ON ) ) Compile_Call_With32BitDisp ( srcAddress ) ;
+    if ( ! GetState ( _CfrTil_, INLINE_ON ) ) Compile_Call ( srcAddress ) ;
     else
     {
         _Block_Copy ( srcAddress, bi->bp_Last - bi->bp_First ) ;
@@ -130,7 +125,9 @@ Block_CopyCompile_WithLogicFlag ( byte * srcAddress, int64 bindex, int64 jccFlag
         _Context_->CurrentlyRunningWord = _Context_->SC_CurrentCombinator ;
         if ( jccFlag2 )
         {
+            //DBI_ON ;
             Compile_JCC ( negFlag ? bi->NegFlag : ! bi->NegFlag, bi->Ttt, 0 ) ;
+            //DBI_OFF ;
         }
         else
         {
@@ -138,7 +135,7 @@ Block_CopyCompile_WithLogicFlag ( byte * srcAddress, int64 bindex, int64 jccFlag
             Compile_JCC ( negFlag, ZERO_TTT, 0 ) ;
         }
         _Context_->CurrentlyRunningWord = svcrw ;
-        _Stack_PointerToJmpOffset_Set ( Here - CELL ) ;
+        _Stack_PointerToJmpOffset_Set ( Here - INT32_SIZE ) ;
     }
     return 1 ;
 }
@@ -152,13 +149,24 @@ Block_CopyCompile ( byte * srcAddress, int64 bindex, int64 jccFlag )
 // 'tttn' is a notation from the intel manuals
 
 void
-BlockInfo_Set_tttn ( BlockInfo * bi, int64 ttt, int64 n, int64 overWriteSize )
+BlockInfo_Set_tttn ( BlockInfo * bi, int8 ttt, int8 n, int8 overWriteSize )
 {
     bi->LogicCode = Here ; // used by combinators
     bi->LogicCodeWord = _Context_->CurrentlyRunningWord ;
     bi->Ttt = ttt ;
     bi->NegFlag = n ;
     bi->OverWriteSize = overWriteSize ;
+}
+
+BlockInfo *
+_BlockInfo_Setup_BI_tttn ( Compiler * compiler, int64 ttt, int64 negFlag, int64 overWriteSize )
+{
+    BlockInfo *bi = ( BlockInfo * ) _Stack_Top ( compiler->CombinatorBlockInfoStack ) ;
+    if ( bi )
+    {
+        BlockInfo_Set_tttn ( bi, ttt, negFlag, overWriteSize ) ;
+    }
+    return bi ;
 }
 
 // a 'block' is merely a notation borrowed from C
@@ -193,6 +201,7 @@ _CfrTil_BeginBlock0 ( )
 {
     Compiler * compiler = _Context_->Compiler0 ;
     BlockInfo *bi = ( BlockInfo * ) Mem_Allocate ( sizeof (BlockInfo ), COMPILER_TEMP ) ;
+    if ( ! compiler->BlockLevel ) compiler->CurrentWordCompiling = compiler->CurrentWord ;
     compiler->BlockLevel ++ ;
     if ( ! CompileMode ) // first block
     {
@@ -200,7 +209,7 @@ _CfrTil_BeginBlock0 ( )
     }
     bi->ActualCodeStart = Here ;
     _Compile_UninitializedJump ( ) ;
-    bi->JumpOffset = Here - CELL_SIZE ; // before CfrTil_CheckCompileLocalFrame after CompileUninitializedJump
+    bi->JumpOffset = Here - INT32_SIZE ; // before CfrTil_CheckCompileLocalFrame after CompileUninitializedJump
     bi->bp_First = Here ; // after the jump for inlining
     return bi ;
 }
@@ -284,12 +293,12 @@ _CfrTil_EndBlock1 ( BlockInfo * bi )
     if ( _Stack_IsEmpty ( compiler->BlockStack ) )
     {
         _CfrTil_InstallGotoCallPoints_Keyed ( bi, GI_RETURN ) ;
-        if ( compiler->NumberOfRegisterVariables ) //&& ( compiler->NumberOfParameterVariables == 1 ) && GetState ( compiler, ( RETURN_TOS | RETURN_EAX ) ) )
+        if ( compiler->NumberOfRegisterVariables ) //&& ( compiler->NumberOfParameterVariables == 1 ) && GetState ( compiler, ( RETURN_TOS | RETURN_R8 ) ) )
         {
             bi->bp_First = bi->Start ;
-            if ( GetState ( compiler, RETURN_EAX ) )
+            if ( GetState ( compiler, RETURN_R8 ) )
             {
-                Compile_Move_EAX_To_TOS ( DSP ) ;
+                Compile_Move_R8_To_TOS ( DSP ) ;
             }
         }
         else if ( _Compiler_IsFrameNecessary ( compiler ) && ( ! GetState ( compiler, DONT_REMOVE_STACK_VARIABLES ) ) )
@@ -313,7 +322,7 @@ _CfrTil_EndBlock2 ( BlockInfo * bi )
 {
     Compiler * compiler = _Context_->Compiler0 ;
     compiler->BlockLevel -- ;
-    byte * bi_bp_First = bi->bp_First ;
+    byte * bp_First = bi->bp_First ;
     if ( _Stack_IsEmpty ( compiler->BlockStack ) )
     {
         _CfrTil_InstallGotoCallPoints_Keyed ( bi, GI_GOTO | GI_RECURSE | GI_CALL_LABEL ) ;
@@ -324,7 +333,7 @@ _CfrTil_EndBlock2 ( BlockInfo * bi )
     {
         _Namespace_RemoveFromUsingListAndClear ( bi->LocalsNamespace ) ; //_Compiler_FreeBlockInfoLocalsNamespace ( bi, compiler ) ;
     }
-    return bi_bp_First ;
+    return bp_First ;
 }
 
 byte *

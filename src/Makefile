@@ -81,7 +81,7 @@ cfrtil-gdb : CFLAGS = $(CFLAGS_CORE) -ggdb
 cfrtil-gdb : include/prototypes.h $(OBJECTS) 
 	$(CC) $(CFLAGS) $(OBJECTS) -o cfrtil-gdb $(LIBS)
 	strip -o cfrtil cfrtil-gdb
-	mv cfrtil ../bin
+	mv cfrtil ../bin/
 
 cfrtilo : $(OBJECTS)
 	$(CC) $(CFLAGS) $(OBJECTS) -o $(OUT) $(LIBS)
@@ -237,17 +237,29 @@ zip :
 	-mv ../backup/nbproject .
 
 tar.xz :	
-	tar -c --xz --exclude=nbproject --exclude=.git --exclude=*.png --exclude=cfrtil-gdb  --exclude=*.o -f cfrtil.tar.xz * .init.cft
+	tar -c --xz --exclude=nbproject --exclude=.git --exclude=*.png --exclude=cfrtil-gdb  --exclude=*.o --exclude *.kdev* -f cfrtil.tar.xz * *.*
+	#tar -c --xz --exclude=nbproject --exclude=.git --exclude=*.png --exclude=cfrtil-gdb  --exclude=*.o -f cfrtil.tar.xz * *.cft #.init.cft
 
 _xz : 
 	-rm core
 	-rm -rf ~/backup/openvmtil/
 	-cp -r ~/openvmtil/ ~/backup/openvmtil/
-	-mv cfrtil cfrtil* ../bin/
+	cd .. && tar -c --xz --exclude=nbproject --exclude=.git --exclude=*.png --exclude=cfrtil-gdb  --exclude=*.o --exclude *.kdev* -f cfrtil.tar.xz * .init.*
 
 xz : 
 	-make default
 	make _xz
+
+copy :
+	cp ../cfrtil.tar.xz ../cfrtil.$1.tar.xz
+	cp ../*.tar.xz ~/backup/archive
+	cp ../*.tar.xz ~/Public
+	cp ../*.tar.xz ~/ubackup 
+	cp ../*.tar.xz ~/Documents/backup/
+	cp ../*.tar.xz ~/Programs/Programs2/forth/cfrtil/backup/
+	cp ../*.tar.xz ~/Programs/Programs2/backup/
+	cp ../*.tar.xz ~/workspace/backup/
+	mv ../*.tar.xz ~/backup/
 
 _all : realClean install
 	make xz
@@ -258,7 +270,7 @@ _install : # we are in openvmtil directory
 	-cp ../.init.cft namespaces
 	-sudo cp ../.init.cft /usr/local/lib/cfrTil
 	-sudo cp -r namespaces /usr/local/lib/cfrTil
-	-sudo cp lib32/lib*.* /usr/lib32
+	-sudo cp lib/lib*.* /usr/lib
 	-sudo cp bin/cfrtil /usr/local/bin/cfrtil
 #	-sudo chown dennisj /usr/local/bin/cfrtil
 	-sudo ldconfig
@@ -269,7 +281,7 @@ _install_1 : # we are in src directory
 	-sudo rm -rf /usr/local/lib/cfrTil/
 	-sudo cp -r ../ /usr/local/lib/cfrTil/
 	-sudo cp -r ../etc /usr/local/
-	-sudo cp ../lib32/lib*.* /usr/lib32
+	-sudo cp ../lib/lib*.* /usr/lib
 #	-sudo rm -r /usr/local/lib/cfrTil/nbproject
 	sudo cp ../bin/* /usr/local/bin
 	-mv ../../backup/.git ..

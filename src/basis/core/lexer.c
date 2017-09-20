@@ -125,7 +125,7 @@ byte *
 _Lexer_NextNonDebugOrCommentTokenWord ( Lexer * lexer, int64 evalFlag )
 {
     byte * token ;
-    do 
+    do
     {
         token = _Lexer_LexNextToken_WithDelimiters ( lexer, 0, evalFlag ? 1 : 0, 0 ) ; // ?? the logic here ??
     }
@@ -266,8 +266,11 @@ Lexer_SetBasicTokenDelimiters ( Lexer * lexer, byte * delimiters, uint64 allocTy
 void
 Lexer_Init ( Lexer * lexer, byte * delimiters, uint64 state, uint64 allocType )
 {
+    //SetBuffersUnused ( 1 ) ;
     lexer->TokenBuffer = _CfrTil_->TokenBuffer ;
     Mem_Clear ( lexer->TokenBuffer, BUFFER_SIZE ) ;
+    //lexer->TokenBuffer = _Buffer_New_pbyte ( BUFFER_SIZE, B_UNLOCKED ) ; //_CfrTil_->TokenBuffer ;
+    //_CfrTil_->TokenBuffer = lexer->TokenBuffer  ;
     lexer->OriginalToken = 0 ;
     lexer->Literal = 0 ;
     Lexer_SetBasicTokenDelimiters ( lexer, ( byte* ) " \n\r\t", allocType ) ;
@@ -741,7 +744,7 @@ CarriageReturn ( Lexer * lexer )
 void
 NewLine ( Lexer * lexer )
 {
-    if ( ( ! IS_INCLUDING_FILES ) || GetState ( _Debugger_, DBG_COMMAND_LINE ) )
+    if ( AtCommandLine( lexer->ReadLiner0 ) ) //( ! IS_INCLUDING_FILES ) || GetState ( _Debugger_, DBG_COMMAND_LINE ) )
     {
         SetState ( lexer, LEXER_DONE | LEXER_END_OF_LINE, true ) ;
         if ( lexer->OurInterpreter ) SetState ( lexer->OurInterpreter, INTERPRETER_DONE | END_OF_LINE, true ) ;

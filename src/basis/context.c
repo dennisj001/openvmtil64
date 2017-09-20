@@ -14,7 +14,7 @@ byte *
 _Context_Location ( Context * cntx )
 {
     byte * buffer = Buffer_Data ( _CfrTil_->StringB ), *str ;
-    sprintf ( ( char* ) buffer, "\n%s : %ld.%ld", ( char* ) cntx->ReadLiner0->Filename ? ( char* ) cntx->ReadLiner0->Filename : "<command line>", cntx->ReadLiner0->LineNumber, cntx->Lexer0->CurrentReadIndex ) ;
+    sprintf ( ( char* ) buffer, "%s : %ld.%ld", ( char* ) cntx->ReadLiner0->Filename ? ( char* ) cntx->ReadLiner0->Filename : "<command line>", cntx->ReadLiner0->LineNumber, cntx->Lexer0->CurrentReadIndex ) ;
     cntx->Location = str = String_New ( buffer, TEMPORARY ) ;
     return str ;
 }

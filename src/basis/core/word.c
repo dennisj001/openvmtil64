@@ -3,9 +3,20 @@
 void
 _Word_Run ( Word * word )
 {
-    word->W_InitialRuntimeDsp = Dsp ;
-    _Context_->CurrentlyRunningWord = word ;
-    _Block_Eval (  word->Definition ) ;
+    if ( word )
+    {
+        word->W_InitialRuntimeDsp = Dsp ;
+        _Context_->CurrentlyRunningWord = word ;
+        if ( DBI )
+        {
+            if ( ! ( word->CProperty & CPRIMITIVE ) )
+            {
+                _Printf ( ( byte* ) "\n_Word_Run :: word = %s", Word_Info ( word ) ) ;
+                _Debugger_Disassemble ( _Debugger_, ( byte* ) word->Definition, 256, 1 ) ;
+            }
+        }
+        _Block_Eval ( word->Definition ) ;
+    }
 }
 
 void
@@ -13,10 +24,13 @@ Word_Run ( Word * word )
 {
     if ( ! sigsetjmp ( _Context_->JmpBuf0, 0 ) )
     {
-        //_Word_Run ( Word * word )
+#if 1        
+        _Word_Run ( word ) ;
+#else        
         word->W_InitialRuntimeDsp = Dsp ;
         _Context_->CurrentlyRunningWord = word ;
-        _Block_Eval (  word->Definition ) ;
+        _Block_Eval ( word->Definition ) ;
+#endif        
     }
     else Dsp = _CfrTil_->SaveDsp ;
 }
@@ -70,8 +84,9 @@ _Word_Eval ( Word * word )
         word->StackPushRegisterCode = 0 ; // nb. used! by the rewriting optInfo
         // keep track in the word itself where the machine code is to go, if this word is compiled or causes compiling code - used for optimization
         word->Coding = Here ;
-        if ( Is_DebugModeOn ) _Word_Eval_Debug ( word ) ; else
-        Word_Eval0 ( word ) ;
+        if ( Is_DebugModeOn ) _Word_Eval_Debug ( word ) ;
+        else
+            Word_Eval0 ( word ) ;
         if ( word->CProperty & DEBUG_WORD ) DefaultColors ; // reset colors after a debug word
         _CfrTil_SetStackPointerFromDsp ( _CfrTil_ ) ;
     }
@@ -147,6 +162,13 @@ _Word_Finish ( Word * word )
     _DObject_Finish ( word ) ;
     CfrTil_FinishSourceCode ( _CfrTil_, word ) ;
     Compiler_Init ( _Context_->Compiler0, 0 ) ; // not really necessary should always be handled by EndBlock ?? but this allows for some syntax errors with a '{' but no '}' ??
+#if 0    
+    if ( DBI )
+    {
+        d1 ( _Printf ( ( byte* ) "\n_Word_Finish :: word = %s :: location : %s :", word->Name, Context_Location ( ) ) ) ;
+        d1 ( _CfrTil_Word_Disassemble ( word ) ) ;
+    }
+#endif    
 }
 
 void
@@ -204,13 +226,19 @@ _Word_New ( byte * name, uint64 ctype, uint64 ltype, uint64 allocType )
 {
     ReadLiner * rl = _Context_->ReadLiner0 ;
     Word * word = _Word_Create ( name, ctype, ltype, allocType ) ; // CFRTIL_WORD : cfrTil compiled words as opposed to C compiled words
+    _Context_->Compiler0->CurrentWord = word ;
     if ( rl->InputStringOriginal )
     {
         word->S_WordData->Filename = rl->Filename ;
         word->S_WordData->LineNumber = rl->LineNumber ;
         word->W_CursorPosition = rl->CursorPosition ;
     }
+    if ( _IsSourceCodeOn )
+    {
+        CfrTil_SourceCode_SetDebugWordList ( word ) ;
+    }
     _CfrTil_->WordCreateCount ++ ;
+    _Word_Add ( word, 1, 0 ) ;
     return word ;
 }
 
@@ -218,12 +246,6 @@ Word *
 Word_New ( byte * name )
 {
     Word * word = _Word_New ( name, CFRTIL_WORD | WORD_CREATE, 0, DICTIONARY ) ;
-    _Context_->Compiler0->CurrentWord = word ;
-    if ( _IsSourceCodeOn )
-    {
-        CfrTil_SourceCode_SetDebugWordList ( word ) ;
-    }
-    _Word_Add ( word, 1, 0 ) ;
     return word ;
 }
 
@@ -268,6 +290,25 @@ void
 Word_PrintName ( Word * word )
 {
     if ( word ) _Printf ( ( byte* ) "%s ", word->Name ) ;
+}
+
+byte*
+Word_Info ( Word * word )
+{
+    byte * buffer = 0 ;
+    if ( word ) //&& word->ContainingNamespace )
+    {
+        buffer = Buffer_New_pbyte ( BUFFER_SIZE ) ;
+        sprintf ( ( char * ) buffer, "%s.%s", ( char* ) word->ContainingNamespace ? ( char* ) word->ContainingNamespace->Name : "<literal>", ( char * ) word->Name ) ;
+    }
+    return buffer ;
+}
+
+void
+Word_Show ( Word * word )
+{
+    //if ( word ) _Printf ( ( byte* ) "\n%s.%s : %s %d.%d", word->ContainingNamespace->Name, word->Name ) ;
+    if ( word ) _Printf ( ( byte* ) "\n%s", Word_Info ( word ) ) ;
 }
 
 void

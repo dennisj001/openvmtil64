@@ -180,10 +180,10 @@ _Class_New ( byte * name, uint64 type, int64 cloneFlag )
         ns = _DObject_New ( name, 0, CPRIMITIVE | CLASS | IMMEDIATE | type, 0, type, ( byte* ) _DataObject_Run, 0, 0, sns, DICTIONARY ) ;
         _Namespace_DoNamespace ( ns, 1 ) ; // before "size", "this"
         Word *ws = _CfrTil_Variable_New ( ( byte* ) "size", size ) ; // start with size of the prototype for clone
-        ws->CProperty |= NAMESPACE_VARIABLE ;
+        //ws->CProperty |= NAMESPACE_VARIABLE ;
         _Context_->Interpreter0->ThisNamespace = ns ;
         Word *wt = _CfrTil_Variable_New ( ( byte* ) "this", size ) ; // start with size of the prototype for clone
-        wt->CProperty |= THIS | NAMESPACE_VARIABLE ;
+        wt->CProperty |= THIS ;
     }
     else
     {
@@ -260,13 +260,12 @@ Literal_New ( Lexer * lexer, uint64 uliteral )
     if ( ! ( lexer->TokenType & ( T_STRING | T_RAW_STRING | T_CHAR | KNOWN_OBJECT ) ) )
     {
         snprintf ( ( char* ) _name, 256, "<unknown object type> : %lx", ( uint64 ) uliteral ) ;
-        name = String_New ( _name, Compiling ? STRING_MEM : COMPILER_TEMP ) ; //STRING_MEM ) ; //TemporaryString_New ( _name ) ;
+        name = String_New ( _name, Compiling ? STRING_MEM : TEMPORARY ) ; 
     }
     else
     {
         if ( lexer->TokenType & ( T_STRING | T_RAW_STRING ) )
         {
-            //uliteral = ( int64 ) String_New ( lexer->LiteralString, Compiling ? OBJECT_MEMORY : TEMPORARY ) ;
             uliteral = ( int64 ) String_New ( lexer->LiteralString, Compiling ? STRING_MEM : TEMPORARY ) ;
         }
         name = lexer->OriginalToken ;

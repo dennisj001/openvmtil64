@@ -41,7 +41,7 @@
 
 // note : intex syntax  : instruction dst, src
 //        att   syntax  : instruction src, dst
-#define x86_emit_byte( x ) Compile_Int8 ( x )
+#define x86_emit_byte( x ) _Compile_Int8 ( x )
 #define x86_emit_word( x ) _Compile_Int16 ( x )
 #define x86_emit_long( x ) _Compile_Int32 ( x )
 
@@ -62,7 +62,7 @@
 #define JCC1 (0x7)
 
 #define CALL_JMP_MOD_RM 0xff
-#define MOD_RM_EAX 0x10
+#define MOD_RM_R8 0x10
 #define MOVI 0xc7
 
 #define JEI8 (0x74 ) // x86 - jcc opcode
@@ -80,7 +80,7 @@
 #define _POPAD (0x61 )// intel x86 pushad instruction
 #define POPFD (0x9d )// intel x86 pushfd instruction
 #define PUSHI32 (0x68 )
-#define POPToEAX (0x58 )
+#define POPToR8 (0x58 )
 #define _LAHF (0x9f )
 #define _SAHF (0x9e )
 
@@ -105,21 +105,29 @@
 #define SCALE_2 1
 #define SCALE_4 2
 #define SCALE_8 3
-#if ABI == 64
+// control flag bits for _Compile_InstructionXxx
+#define MODRM_B     ( 1 << 0 ) // backwards compatibility
+#define SIB_B       ( 1 << 1 ) 
+#define DISP_B      ( 1 << 2 ) 
+#define IMM_B       ( 1 << 3 ) 
+#define REX_B       ( 1 << 4 ) 
+#if X64
 #define SCALE_CELL SCALE_8
 #else
 #define SCALE_CELL SCALE_4
 #endif
 
+#define INT32_SIZE (sizeof (int32))
+#define INT64_SIZE (sizeof (int64))
 // size_w field
-#if ABI == 64
-#define CELL_T 8
+#if X64
+#define CELL_T INT64_T
 #else
-#define CELL_T CELL
+#define CELL_T INT32_T
 #endif
-#define INT32_T (sizeof (int32))
-#define INT64_T (sizeof (int64))
-#define INT INT32_T
+//#define INT INT32_SIZE
+#define DISPLACEMENT_32_SIZE ( sizeof ( int32 ) )
+#define DISP_SIZE DISPLACEMENT_32_SIZE
 
 
 // xx xxx xxx
@@ -141,51 +149,58 @@
 #define R13 ( 0xd )
 #define R14 ( 0xe )
 #define R15 ( 0xf )
-#if ABI == 64
-#define EAX R8
-#define ECX R9
-#define EDX R10
-#define EBX R11
-#define ESP R12
-#define EBP R13
-#define ESI R14
-#define EDI R15
+#if X64
+#define R8D R8
+#define R9D R9 
+#define R10D R10
+#define R11D R11
+#define R12D R12 // RSP
+#define R13D R13 // RBP
+#define R14D R14 //Frame Pointer
+#define R15D R15 //Stack Pointer
+#define SCRATCH_REG R9D
+//#define THRU_REG EBX
+#define THRU_REG R11D
 #else
-#define EAX ( 0x0 )
-#define ECX ( 0x1 )
-#define EDX ( 0x2 )
-#define EBX ( 0x3 )
-#define ESP ( 0x4 )
-#define EBP ( 0x5 )
-#define ESI ( 0x6 )
-#define EDI ( 0x7 )
+#define R8D ( 0x0 )
+#define R9D ( 0x1 )
+#define R10D ( 0x2 )
+#define R11D ( 0x3 )
+#define RSP ( 0x4 )
+#define RBP ( 0x5 )
+#define R14 ( 0x6 )
+#define R15 ( 0x7 )
 #endif
 #define NO_INDEX ( 0x4 ) // for sib byte with no index
-#define SCRATCH_REG_1 EBX // eax/edx are both used sometimes by ops ebx/ecx are not ?
-#define SCRATCH_REG_2 EDX
-#define SCRATCH_REG_3 ECX
-#define OPERAND_1_REG EAX
-#define OPERAND_2_REG ECX
-#define LVALUE_REG    EBX
+#define SCRATCH_REG_1 R11D // eax/edx are both used sometimes by ops ebx/ecx are not ?
+#define SCRATCH_REG_2 R10D
+#define SCRATCH_REG_3 R9D
+#define OPERAND_1_REG R8D
+#define OPERAND_2_REG R9D
+#define LVALUE_REG    R11D
 
-#define SREG1 EBX // eax/edx are both used sometimes by ops ebx/ecx are not ?
-#define SREG2 EDX //
-#define SREG3 ECX //
+#define SREG1 R11D // eax/edx are both used sometimes by ops ebx/ecx are not ?
+#define SREG2 R10D //
+#define SREG3 R9D //
 #define OREG1 OPERAND_1_REG
 #define RREG1 OPERAND_1_REG
 #define OREG2 OPERAND_2_REG
 #define RREG2 OPERAND_2_REG
 #define LREG LVALUE_REG  
 
-#if ABI == 64
-register uint64 *Dsp asm ("r15" ) ;
-//register OpenVmTil *_Q_ asm ("r13" ) ;
-//register int64 *Fp asm ("r14" ) ;
-//register CfrTil *Q asm ("r13" ) ;
-#define DSP R15
-#define FP R14
-#define QP  R13
+#if X64
 #define REX 1
+register uint64 *Dsp asm ("r14" ) ;
+//register int64 *Fp asm ("r15" ) ;
+#define DSP R14
+#define FP  R15
+//#define DSP ESI
+//#define FP EDI
+//register int32 *Fp asm ("edi" ) ;
+//register int32 *Esp asm ("esp" ) ;
+//register OpenVmTil *_Q_ asm ("r13" ) ;
+//register CfrTil *Q asm ("r13" ) ;
+//#define QP  R13
 #else
 register uint64 *Dsp asm ("r14" ) ; // gcc
 //register int64 *Esi asm ("esi" ) ; // gcc
@@ -193,10 +208,10 @@ register uint64 *Dsp asm ("r14" ) ; // gcc
 #if RETURN_STACK
 int64 *Rsp ; 
 #endif
-#define DSP ESI
+#define DSP R14
 //register int64 *Fp asm ("edi" ) ;
 //register int64 *Esp asm ("esp" ) ;
-#define FP EDI
+#define FP R15
 //#define QP  EDI
 #define REX 0
 #endif
@@ -292,5 +307,7 @@ int64 *Rsp ;
 #define LE 7
 #define NG 7
 
-#define RM( addr ) (*( (byte*) addr + 1) & 56 )  // binary : 00111000 
+#define _RM( insnAddr )  (*( (byte*) insnAddr + 1) & 7 )   // binary : 00000111
+#define _REG( insnAddr ) (*( (byte*) insnAddr + 1) & 56 )  // binary : 00111000 
+#define _MOD( insnAddr ) (*( (byte*) insnAddr + 1) & 192 ) // binary : 11000000 
 

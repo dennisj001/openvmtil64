@@ -24,7 +24,7 @@ _dobject_Allocate ( int64 doType, int64 slots, uint64 allocType )
     dobject * dobj = ( dobject * ) _object_Allocate ( size, allocType ) ;
     dobj->do_iData = ( int64* ) ( ( dobject* ) dobj + 1 ) ;
     dobj->do_Slots = ( int16 ) slots ;
-    dobj->do_int32_Size = ( int16 ) size ;
+    dobj->do_int16_Size = size ;
     dobj->do_Type = ( int16 ) doType ;
     return dobj ;
 }
@@ -49,7 +49,7 @@ _dobject_Print ( dobject * dobj )
     _Printf ( ( byte* ) "\n\ndobject  = 0x%08x : word Name = %s", dobj, dobj->do_iData[2] ? ( ( Word* ) dobj->do_iData[2] )->Name : ( byte* ) "" ) ;
     _Printf ( ( byte* ) "\nType     = %d", dobj->do_Type ) ;
     _Printf ( ( byte* ) "\nSlots    = %d", dobj->do_Slots ) ;
-    _Printf ( ( byte* ) "\nSize     = %d", dobj->do_int32_Size ) ;
+    _Printf ( ( byte* ) "\nSize     = %d", dobj->do_int16_Size ) ;
     for ( i = 0 ; i < dobj->do_Slots ; i ++ )
     {
         _Printf ( ( byte* ) "\nSlot [%d] = 0x%08x", i, dobj->do_iData[i] ) ;
@@ -74,7 +74,7 @@ _DObject_C_StartupCompiledWords_DefInit ( byte * function, int64 arg )
 void
 _DObject_ValueDefinition_Init ( Word * word, uint64 value, uint64 funcType, byte * function, int64 arg )
 // using a variable that is a type or a function 
-{    
+{
 
     word->W_PtrToValue = & word->W_Value ;
     word->W_Value = value ;
@@ -85,22 +85,23 @@ _DObject_ValueDefinition_Init ( Word * word, uint64 value, uint64 funcType, byte
         word->Definition = ( block ) ( function ? function : ( byte* ) value ) ; //_OptimizeJumps ( ( byte* ) value ) ; // this comes to play (only(?)) with unoptimized code
         word->CodeStart = ( byte* ) word->Definition ;
         if ( NamedByteArray_CheckAddress ( _Q_CodeSpace, word->CodeStart ) ) word->S_CodeSize = Here - word->CodeStart ;
-        else word->S_CodeSize = 0 ; 
+        else word->S_CodeSize = 0 ;
     }
     else
     {
+        d0 ( _Printf ( ( byte* ) "\n_DObject_ValueDefinition_Init :" ) ) ;
         ByteArray * svcs = _Q_CodeByteArray ;
         int64 sscm = GetState ( _CfrTil_, DEBUG_SOURCE_CODE_MODE ) ;
         SetState ( _CfrTil_, DEBUG_SOURCE_CODE_MODE, false ) ;
-        //Compiler_SetCompilingSpace_MakeSureOfRoom ( "ObjectSpace" ) ; 
+        //if ( Compiling ) 
+        Compiler_SetCompilingSpace_MakeSureOfRoom ( "ObjectSpace" ) ;
         word->Coding = Here ;
         word->CodeStart = Here ;
         word->Definition = ( block ) Here ;
         if ( arg ) _DObject_C_StartupCompiledWords_DefInit ( function, arg ) ;
-        //else Compile_Call_With32BitDisp ( ( byte* ) DataObject_Run ) ;
         else Compile_Call ( ( byte* ) DataObject_Run ) ; //Compile_Call_ToAddressThruReg ( ( byte* ) DataObject_Run, R8 ) ;
         _Compile_Return ( ) ;
-        //d1 ( _Debugger_Disassemble ( _Debugger_, (byte*) word->Definition, 32, 1 ) ) ;
+        d0 ( _Debugger_Disassemble ( _Debugger_, (byte*) word->Definition, 32, 1 ) ) ;
         word->S_CodeSize = Here - word->CodeStart ; // for use by inline
         Set_CompilerSpace ( svcs ) ;
         SetState ( _CfrTil_, DEBUG_SOURCE_CODE_MODE, sscm ) ;
@@ -182,8 +183,8 @@ DObject_SubObjectInit ( DObject * dobject, Word * parent )
         parent->CProperty |= NAMESPACE ;
         _Namespace_AddToNamespacesTail ( parent ) ;
     }
-    if ( parent->S_WAllocType == WORD_COPY_MEM ) parent = Word_Copy ( (Word*) parent, DICTIONARY ) ; // nb! : this allows us to
-    Namespace_DoAddWord ( parent, dobject ) ; 
+    if ( parent->S_WAllocType == WORD_COPY_MEM ) parent = Word_Copy ( ( Word* ) parent, DICTIONARY ) ; // nb! : this allows us to
+    Namespace_DoAddWord ( parent, dobject ) ;
     dobject->CProperty |= parent->CProperty ;
     dobject->Slots = parent->Slots ;
     _Namespace_SetState ( parent, USING ) ;

@@ -27,7 +27,7 @@ byte *
 JumpCallInstructionAddress ( byte * address )
 {
     // calculate jmp or call address
-    int64 offset = * ( int64* ) ( address + 1 ) ; // 1 : 1 byte opCode
+    int32 offset = * ( int32* ) ( address + 1 ) ; // 1 : 1 byte opCode
     byte * jcAddress = address + offset + 5 ; // 5 : sizeof jmp insn - includes 1 byte opcode
     return jcAddress ;
 }
@@ -117,13 +117,13 @@ GetPostfix ( byte * address, byte* postfix, byte * buffer )
 void
 Compile_Debug_GetESP ( ) // where we want the acquired pointer
 {
-    _Compile_PushReg ( EBX ) ;
-    _Compile_Set_CAddress_WithRegValue_ThruReg ( ( byte* ) & _Debugger_->DebugESP, ESP, EBX ) ; // esp 
-    _Compile_Set_CAddress_WithRegValue_ThruReg ( ( byte* ) & _Debugger_->cs_Cpu->Esp, ESP, EBX ) ; // esp 
-    _Compile_Set_CAddress_WithRegValue_ThruReg ( ( byte* ) & _Debugger_->DebugEBP, EBP, EBX ) ; // esp 
-    _Compile_Set_CAddress_WithRegValue_ThruReg ( ( byte* ) & _Debugger_->DebugESI, ESI, EBX ) ; // esi
-    _Compile_Set_CAddress_WithRegValue_ThruReg ( ( byte* ) & _Debugger_->DebugEDI, EDI, EBX ) ; // edi
-    _Compile_PopToReg ( EBX ) ;
+    _Compile_PushReg ( RAX ) ;
+    _Compile_Set_CAddress_WithRegValue_ThruReg ( ( byte* ) & _Debugger_->DebugRSP, RSP, RAX ) ; // esp 
+    //_Compile_Set_CAddress_WithRegValue_ThruReg ( ( byte* ) & _Debugger_->cs_Cpu->Rsp, RSP, R11D ) ; // esp 
+    _Compile_Set_CAddress_WithRegValue_ThruReg ( ( byte* ) & _Debugger_->DebugRBP, RBP, RAX ) ; // esp 
+    //_Compile_Set_CAddress_WithRegValue_ThruReg ( ( byte* ) & _Debugger_->DebugESI, R14, R11D ) ; // esi
+    //_Compile_Set_CAddress_WithRegValue_ThruReg ( ( byte* ) & _Debugger_->DebugEDI, R15, R11D ) ; // edi
+    _Compile_PopToReg ( RAX ) ;
 }
 
 void
@@ -137,7 +137,7 @@ _Compile_DebugRuntimeBreakpoint ( ) // where we want the acquired pointer
     //Compile_Call ( ( byte* ) _Debugger_CpuState_Show ) ;
     //Compile_Call ( ( byte* ) Debugger_PrintReturnStackWindow ) ;
     //Compile_Call ( ( byte* ) CfrTil_Debugger_State_Show ) ;
-    Compile_Call_With32BitDisp ( ( byte* ) CfrTil_DebugRuntimeBreakpoint ) ;
+    Compile_Call ( ( byte* ) CfrTil_DebugRuntimeBreakpoint ) ;
 }
 
 #if 0
@@ -146,8 +146,8 @@ void
 _Compile_Pause ( )
 {
     _Compile_Debug_GetESP ( ( int64* ) & _Debugger_->DebugESP ) ;
-    Compile_Call_With32BitDisp ( ( byte* ) _Debugger_->SaveCpuState ) ;
-    Compile_Call_With32BitDisp ( ( byte* ) _CfrTil_->SaveCpuState ) ;
-    Compile_Call_With32BitDisp ( ( byte* ) OpenVmTil_Pause ) ;
+    Compile_Call ( ( byte* ) _Debugger_->SaveCpuState ) ;
+    Compile_Call ( ( byte* ) _CfrTil_->SaveCpuState ) ;
+    Compile_Call ( ( byte* ) OpenVmTil_Pause ) ;
 }
 #endif

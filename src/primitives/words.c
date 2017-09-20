@@ -134,6 +134,7 @@ Word_Add ( )
     _Word_Add ( word, 1, 0 ) ;
 }
 
+// forth : "create"
 void
 CfrTil_Word_New ( )
 {
@@ -275,12 +276,12 @@ CfrTil_Void_Return ( void )
 }
 
 void
-CfrTil_EAX_Return ( void )
+CfrTil_R8_Return ( void )
 {
     if ( _CfrTil_->LastFinishedWord )
     {
         _CfrTil_->LastFinishedWord->CProperty &= ~ C_RETURN ;
-        _CfrTil_->LastFinishedWord->CProperty2 |= EAX_RETURN ;
+        _CfrTil_->LastFinishedWord->CProperty2 |= R8_RETURN ;
     }
 }
 

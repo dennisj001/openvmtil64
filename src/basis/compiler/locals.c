@@ -33,17 +33,31 @@
 void
 _Compiler_AddLocalFrame ( Compiler * compiler )
 {
+#if 1   
     _Compile_Move_Reg_To_StackN ( DSP, 1, FP ) ; // save pre fp
     _Compile_LEA ( FP, DSP, 0, LocalVarIndex_Disp ( 1 ) ) ; // set new fp
-    Compile_ADDI ( REG, DSP, 0, ( compiler->LocalsFrameSize + 1 ) * CELL, 0 ) ; // 1 : fp - add stack frame -- this value is going to be reset 
-    compiler->FrameSizeCellOffset = ( int64* ) ( Here - CELL ) ; // in case we have to add to the framesize with nested locals
+    Compile_ADDI ( REG, DSP, 0, ( compiler->LocalsFrameSize + 1 ) * CELL, INT32_SIZE ) ; // 1 : fp - add stack frame -- this value is going to be reset 
+#else // either way three insn, but this is more understandable
+    _Compile_Stack_PushReg ( DSP, FP ) ;
+    _Compile_LEA ( FP, DSP, 0, 0 ) ; //LocalVarIndex_Disp ( 1 ) ) ; // set new fp
+#endif    
+    compiler->FrameSizeCellOffset = ( int64* ) ( Here - INT32_SIZE ) ; // in case we have to add to the framesize with nested locals
 }
 
 void
 Compiler_SetLocalsFrameSize_AtItsCellOffset ( Compiler * compiler )
 {
-    compiler->LocalsFrameSize = ( ( compiler->NumberOfLocals + 1 ) * CELL ) ; //+ ( GetState ( compiler, SAVE_ESP ) ? CELL : 0 ) ;
-    *( ( compiler )->FrameSizeCellOffset ) = compiler->LocalsFrameSize ;
+    int64 fsize = compiler->LocalsFrameSize = ( ( compiler->NumberOfLocals ) * CELL ) ; //1 : the frame pointer 
+    if ( fsize ) // _Compiler_AddLocalFrame already accounted for a frame pointer 
+    {
+        //if ( fsize >= 0x100000000 )
+            //*( ( compiler )->FrameSizeCellOffset ) = compiler->LocalsFrameSize ;
+        //else if ( fsize >= 0x100 )
+        *( (int32*) ( compiler )->FrameSizeCellOffset ) = compiler->LocalsFrameSize ;
+        //else if ( fsize )
+            //*( (byte*) ( compiler )->FrameSizeCellOffset ) = compiler->LocalsFrameSize ;
+        //*( (int16*) ( compiler )->FrameSizeCellOffset ) = compiler->LocalsFrameSize ;
+    }
 }
 
 void
@@ -52,24 +66,24 @@ _Compiler_RemoveLocalFrame ( Compiler * compiler )
     int64 parameterVarsSubAmount, returnValueFlag ;
     Compiler_SetLocalsFrameSize_AtItsCellOffset ( compiler ) ;
     parameterVarsSubAmount = ( compiler->NumberOfArgs * CELL ) ;
-    if ( GetState ( _Context_, C_SYNTAX ) && ( compiler->CurrentWord->S_ContainingNamespace ) && ( ! String_Equal ( compiler->CurrentWord->S_ContainingNamespace->Name, "void" ) ) )
+    if ( GetState ( _Context_, C_SYNTAX ) && ( compiler->CurrentWordCompiling->S_ContainingNamespace ) && ( ! String_Equal ( compiler->CurrentWordCompiling->S_ContainingNamespace->Name, "void" ) ) )
     {
         SetState ( compiler, RETURN_TOS, true ) ;
     }
-    returnValueFlag = ( _Context_->CurrentlyRunningWord->CProperty & C_RETURN ) || ( GetState ( compiler, RETURN_TOS | RETURN_EAX ) ) || IsWordRecursive || compiler->ReturnVariableWord ;
+    returnValueFlag = ( _Context_->CurrentlyRunningWord->CProperty & C_RETURN ) || ( GetState ( compiler, RETURN_TOS | RETURN_R8 ) ) || IsWordRecursive || compiler->ReturnVariableWord ;
     Word * word = compiler->ReturnVariableWord ;
     if ( word )
     {
-        _Compile_GetVarLitObj_RValue_To_Reg ( word, EAX ) ; // nb. these variables have no lasting lvalue - they exist on the stack - therefore we can only return there rvalue
+        _Compile_GetVarLitObj_RValue_To_Reg ( word, R8D ) ; // nb. these variables have no lasting lvalue - they exist on the stack - therefore we can only return there rvalue
     }
-        //else if ( compiler->NumberOfParameterVariables && returnValueFlag && ( ! compiler->NumberOfRegisterVariables ) && ( ! GetState ( compiler, RETURN_EAX ) ) )
-    else if ( compiler->NumberOfArgs && returnValueFlag && ( ! GetState ( compiler, RETURN_EAX ) ) )
+        //else if ( compiler->NumberOfParameterVariables && returnValueFlag && ( ! compiler->NumberOfRegisterVariables ) && ( ! GetState ( compiler, RETURN_R8 ) ) )
+    else if ( compiler->NumberOfArgs && returnValueFlag && ( ! GetState ( compiler, RETURN_R8 ) ) )
     {
-        Compile_Move_TOS_To_EAX ( DSP ) ; // save TOS to EAX so we can set return it as TOS below
+        Compile_Move_TOS_To_R8 ( DSP ) ; // save TOS to R8 so we can set return it as TOS below
     }
     else if ( GetState ( compiler, RETURN_TOS ) )
     {
-        Compile_Move_TOS_To_EAX ( DSP ) ;
+        Compile_Move_TOS_To_R8 ( DSP ) ;
     }
     _Compile_LEA ( DSP, FP, 0, - LocalVarIndex_Disp ( 1 ) ) ; // restore sp - release locals stack frame
     _Compile_Move_StackN_To_Reg ( FP, DSP, 1 ) ; // restore the saved pre fp - cf AddLocalsFrame
@@ -77,17 +91,17 @@ _Compiler_RemoveLocalFrame ( Compiler * compiler )
     parameterVarsSubAmount -= returnValueFlag * CELL ; // reduce the subtract amount to make room for the return value
     if ( parameterVarsSubAmount > 0 )
     {
-        Compile_SUBI ( REG, DSP, 0, parameterVarsSubAmount, CELL ) ; // remove stack variables
+        Compile_SUBI ( REG, DSP, 0, parameterVarsSubAmount, 0 ) ; // remove stack variables
     }
     else if ( parameterVarsSubAmount < 0 )
     {
-        Compile_ADDI ( REG, DSP, 0, - parameterVarsSubAmount, CELL ) ; // add a place on the stack for return value
+        Compile_ADDI ( REG, DSP, 0, abs (parameterVarsSubAmount), 0 ) ; // add a place on the stack for return value
     }
-    //if ( rvf && returnValueFlag && ( ! GetState ( compiler, RETURN_EAX ) ) )
-    if ( returnValueFlag && ( ! GetState ( compiler, RETURN_EAX ) ) )
+    //if ( rvf && returnValueFlag && ( ! GetState ( compiler, RETURN_R8 ) ) )
+    if ( returnValueFlag && ( ! GetState ( compiler, RETURN_R8 ) ) )
     {
         // nb : stack was already adjusted accordingly for this above by reducing the SUBI subAmount or adding if there weren't any parameter variables
-        Compile_Move_EAX_To_TOS ( DSP ) ;
+        Compile_Move_R8_To_TOS ( DSP ) ;
     }
 }
 
@@ -95,10 +109,10 @@ void
 _Compile_ESP_Restore ( )
 {
 #if 1    
-    _Compile_Move_Rm_To_Reg ( ESP, EDI, 4 ) ; // 4 : placeholder
+    _Compile_Move_Rm_To_Reg ( RSP, R15, 4 ) ; // 4 : placeholder
     _Context_->Compiler0->EspRestoreOffset = Here - 1 ;
 #else    
-    _Compile_Stack_PopToReg ( DSP, ESP ) ;
+    _Compile_Stack_PopToReg ( DSP, RSP ) ;
 #endif    
 }
 
@@ -106,14 +120,14 @@ void
 _Compile_ESP_Save ( )
 {
 #if 1    
-    _Compile_Move_Reg_To_Rm ( ESI, ESP, 4 ) ; // 4 : placeholder
+    _Compile_Move_Reg_To_Rm ( R14, RSP, 4 ) ; // 4 : placeholder
     _Context_->Compiler0->EspSaveOffset = Here - 1 ; // only takes one byte for _Compile_Move_Reg_To_Rm ( ESI, 4, ESP )
     // TO DO : i think this (below) is what it should be but some adjustments need to be made to make it work 
     //byte * here = Here ;
     //_Compile_Stack_Push_Reg ( DSP, ESP ) ;
     //compiler->EspSaveOffset = here ; // only takes one byte for _Compile_Move_Reg_To_Rm ( ESI, 4, ESP )
 #else    
-    _Compile_Stack_PushReg ( DSP, ESP ) ;
+    _Compile_Stack_PushReg ( DSP, RSP ) ;
 #endif    
 }
 

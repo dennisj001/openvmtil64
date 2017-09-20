@@ -16,7 +16,8 @@
 #define Set_CompilerSpace( byteArray ) (_Q_CodeByteArray = (byteArray))
 #define Get_CompilerSpace( ) _Q_CodeByteArray
 
-#define TOS ( Dsp [ 0 ] )
+#define TOS Dsp[0]
+#define _TOS_ ( Dsp ? Dsp [ 0 ] : CfrTil_Exception ( STACK_ERROR, QUIT ), (uint64)-1 )
 #define DSP_Drop() _DataStack_Drop ( ) //(Dsp --)
 #define DSP_DropN( n ) (Dsp -= (int64) n )
 #define DSP_Push( v ) _DataStack_Push ( (int64) v ) //(*++Dsp = (int64) v )
@@ -25,7 +26,7 @@
 #define DSP_Top( ) TOS 
 #define _DataStack_Top( ) TOS 
 #define _DataStack_GetTop( ) TOS
-#define _DataStack_SetTop( v ) TOS = v 
+#define _DataStack_SetTop( v ) { if ( Dsp ) { Dsp [ 0 ] = v ; } else { CfrTil_Exception ( STACK_ERROR, QUIT ) ; } }
 #define _GetTop( ) TOS
 #define _SetTop( v ) (TOS = v)
 #define Stack() CfrTil_PrintDataStack ( )
@@ -234,6 +235,11 @@
 #define DEBUG_SETUP( word ) if ( word && Is_DebugModeOn) _Debugger_PreSetup ( _Debugger_, word ) ;
 #define _DEBUG_SHOW( word ) _Debugger_PostShow ( _Debugger_, word ) ; //, token, word ) ;
 #define DEBUG_SHOW Debugger_PostShow ( _Debugger_ ) ; //, token, word ) ;
+#define DEBUG_INTRNAL_ON SetState ( _Debugger_, DBG_INTERNAL_ON, true ) 
+#define DEBUG_INTRNAL_OFF SetState ( _Debugger_, DBG_INTERNAL_ON, false ) 
+#define DBI GetState ( _Debugger_, DBG_INTERNAL_ON ) 
+#define DBI_ON DEBUG_INTRNAL_ON
+#define DBI_OFF DEBUG_INTRNAL_OFF
 
 #define Is_LValue( word ) ( GetState ( _Context_->Compiler0, LC_ARG_PARSING ) ? 0 : Interpret_CheckEqualBeforeSemi_LValue ( word ))
 #define IS_INCLUDING_FILES _Context_->System0->IncludeFileStackNumber

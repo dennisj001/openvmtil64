@@ -9,7 +9,7 @@ CfrTil_Here ( )
 void
 CompileCall ( )
 {
-    Compile_Call_With32BitDisp ( ( byte* ) _DataStack_Pop ( ) ) ;
+    Compile_Call ( ( byte* ) _DataStack_Pop ( ) ) ;
 }
 
 void
@@ -180,7 +180,12 @@ CfrTil_Tail ( )
 void
 CfrTil_Literal ( )
 {
-    Word * word = _DataObject_New ( LITERAL, 0, 0, LITERAL, 0, 0, ( uint64 ) _DataStack_Pop ( ), 0 ) ;
+    int64 value = _DataStack_Pop ( ) ;
+    //Word * word = _DataObject_New ( LITERAL, 0, 0, LITERAL, 0, 0, ( uint64 ) _DataStack_Pop ( ), 0 ) ;
+        //ByteArray * svcs = _Q_CodeByteArray ;
+        //Compiler_SetCompilingSpace_MakeSureOfRoom ( "TempObjectSpace" ) ; 
+    Word * word = _DataObject_New ( CONSTANT, 0, "< lit >", LITERAL | CONSTANT, 0, 0, value, 0 ) ;
+        //Set_CompilerSpace ( svcs ) ;
     _Interpreter_DoWord ( _Context_->Interpreter0, word, - 1 ) ;
 }
 

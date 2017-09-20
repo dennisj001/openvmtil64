@@ -5,8 +5,8 @@ void
 Debugger_Menu ( Debugger * debugger )
 {
     _Printf ( ( byte* )
-        "\nDebug Menu at : %s :\n(m)enu, so(U)rce, dum(p), (e)val, (d)is, dis(a)ccum, dis(A)ccum, (r)egisters, (l)ocals, (v)ariables, (I)nfo, (w)dis, s(h)ow"
-        "\n(R)eturnStack, sto(P), (S)tate, (c)ontinue, (s)tep, (o)ver, (i)nto, o(u)t, (t)hru, s(T)ack, auto(z), (V)erbosity, (q)uit, a(B)ort"
+        "\nDebug Menu at : \n%s :\n(m)enu, so(U)rce, dum(p), (e)val, (d)is, dis(a)ccum, dis(A)ccum, (r)egisters, (l)ocals, (v)ariables, (I)nfo, (w)dis, s(h)ow"
+        "\n(R)eturnStack, sto(P), (S)tate, (c)ontinue, (s)tep, (o)ver, (i)nto, o(u)t, t(h)ru, s(t)ack, auto(z), (V)erbosity, (q)uit, a(B)ort"
         "\nusi(N)g, s(H)ow DebugWordList, sh(O)w CompilerWordList"
         "\n'\\n' - escape, , '\\\' - <esc> - escape, ' ' - <space> - continue", c_dd ( Context_Location ( ) ) ) ;
     SetState ( debugger, DBG_MENU, false ) ;
@@ -53,7 +53,7 @@ _Debugger_Locals_ShowALocal ( Debugger * debugger, Word * localsWord, byte * buf
     int64 varOffset ;
     if ( localsWord->CProperty & LOCAL_VARIABLE ) varOffset = LocalVarOffset ( localsWord ) ;
     else if ( localsWord->CProperty & PARAMETER_VARIABLE ) varOffset = ParameterVarOffset ( localsWord ) ;
-    int64 * fp = ( int64* ) debugger->cs_Cpu->Edi ;
+    int64 * fp = ( int64* ) debugger->cs_Cpu->Rdi ;
     byte * address = ( byte* ) fp [ varOffset ] ;
     byte * stringValue = String_CheckForAtAdddress ( address ) ;
     Word * word2 = Word_GetFromCodeAddress ( ( byte* ) ( address ) ) ;
@@ -79,9 +79,9 @@ Debugger_Locals_Show ( Debugger * debugger )
         compiler->NumberOfRegisterVariables = 0 ; //nb. prevent increasing the locals offset by adding in repeated calls to this function
         //Stack_Init ( debugger->LocalsNamespacesStack ) ;
         byte buffer [ 256 ], * sc = scWord->W_SourceCode ; //, * localScString ; // use a debugger buffer instead ??
-        char * registerNames [ 8 ] = { ( char* ) "EAX", ( char* ) "ECX", ( char* ) "EDX", ( char* ) "EBX", ( char* ) "ESP", ( char* ) "EBP", ( char* ) "ESI", ( char* ) "EDI" } ;
+        char * registerNames [ 8 ] = { ( char* ) "R8", ( char* ) "R9", ( char* ) "R10", ( char* ) "R11", ( char* ) "R12", ( char* ) "R13", ( char* ) "R14", ( char* ) "R15" } ;
         // show value of each local var on Locals list
-        int64 * fp = ( int64* ) debugger->cs_Cpu->Edi, * dsp = ( int64* ) debugger->cs_Cpu->Esi ;
+        int64 * fp = ( int64* ) debugger->cs_Cpu->Rdi, * dsp = ( int64* ) debugger->cs_Cpu->R14d ;
         byte * b = Buffer_New_pbyte ( BUFFER_SIZE ) ;
         strcpy ( b, sc ) ;
         sc = b ;
@@ -96,7 +96,7 @@ Debugger_Locals_Show ( Debugger * debugger )
         if ( sc && debugger->LocalsNamespacesStack && ( ( uint64 ) fp > 0xf0000000 ) )
         {
             //_Debugger_CpuState_Show ( ) ; // Debugger_Registers is included in Debugger_CpuState_Show
-            Debugger_CheckSaveCpuStateShow ( debugger ) ;
+            Debugger_CpuState_CheckSaveShow ( debugger ) ;
             _Printf ( ( byte* ) "\n%s.%s.%s : \nFrame Pointer = EDI = <0x%08lx> = 0x%08lx : Stack Pointer = ESI <0x%08lx> = 0x%08lx",
                 c_dd ( scWord->ContainingNamespace->Name ), c_dd ( scWord->Name ), c_dd ( "locals" ),
                 ( uint64 ) fp, fp ? *fp : 0, ( uint64 ) dsp, dsp ? *dsp : 0 ) ;
@@ -143,7 +143,7 @@ Debugger_ShowStackChange ( Debugger * debugger, Word * word, byte * insert, byte
 start:
     b = ( char* ) Buffer_Data_Cleared ( _CfrTil_->DebugB1 ) ;
 
-    if ( GetState ( debugger, DBG_STEPPING ) ) sprintf ( ( char* ) b, "\nStack : %s at %s :> %s <: %s", insert, location, ( char* ) c_dd ( word->Name ), ( char* ) achange ) ;
+    if ( GetState ( debugger, DBG_STEPPING ) ) sprintf ( ( char* ) b, "\nStack : %s at \n%s :> %s <: %s", insert, location, ( char* ) c_dd ( word->Name ), ( char* ) achange ) ;
     else sprintf ( ( char* ) b, "\nStack : %s at %s :> %s <: %s", insert, ( char* ) location, name, ( char* ) achange ) ;
     if ( ( sl = strlen ( ( char* ) b ) ) > Debugger_TerminalLineWidth ( debugger ) )
     {
@@ -164,7 +164,8 @@ void
 _Debugger_ShowEffects ( Debugger * debugger, Word * word, int64 stepFlag )
 {
     debugger->w_Word = word ;
-    //int64 * dsp = DSP ;
+    uint64* dsp = Dsp ;
+    if ( ! dsp ) CfrTil_Exception ( STACK_ERROR, QUIT ) ;
     if ( Is_DebugShowOn && ( debugger->w_Word != debugger->LastEffectsWord ) )
     {
         Word * word = debugger->w_Word ;
@@ -194,10 +195,10 @@ _Debugger_ShowEffects ( Debugger * debugger, Word * word, int64 stepFlag )
                 if ( GetState ( debugger, DBG_STACK_CHANGE ) ) SetState ( debugger, DBG_STACK_CHANGE, false ) ;
                 if ( depthChange > 0 ) sprintf ( ( char* ) pb_change, "%ld %s%s", depthChange, ( depthChange > 1 ) ? "cells" : "cell", " pushed onto to the stack. " ) ;
                 else if ( depthChange ) sprintf ( ( char* ) pb_change, "%ld %s%s", - depthChange, ( depthChange < - 1 ) ? "cells" : "cell", " popped off the stack. " ) ;
-                if ( debugger->SaveTOS != TOS )
+                if ( Dsp && ( debugger->SaveTOS != TOS ) )
                 {
                     sprintf ( ( char* ) c, ( char* ) "0x%lx", ( uint64 ) TOS ) ;
-                    sprintf ( ( char* ) b, ( char* ) "TOS at : <0x%08lx> : changed to %s.", ( uint64 ) Dsp, c_dd ( c ) ) ;
+                    sprintf ( ( char* ) b, ( char* ) "TOS at : <0x%016lx> : changed to %s.", ( uint64 ) Dsp, c_dd ( c ) ) ;
                     strcat ( ( char* ) pb_change, ( char* ) b ) ; // strcat ( (char*) _change, cc ( ( char* ) c, &_Q_->Default ) ) ;
                 }
                 name = word->Name ;
@@ -240,7 +241,6 @@ _Debugger_ShowEffects ( Debugger * debugger, Word * word, int64 stepFlag )
                 }
                 if ( ( change > 1 ) || ( change < - 1 ) || ( _Q_->Verbosity > 1 ) )
                 {
-
                     CfrTil_PrintDataStack ( ) ;
                 }
                 //debugger->LastEffectsWord = word ;
@@ -257,7 +257,6 @@ _Debugger_ShowEffects ( Debugger * debugger, Word * word, int64 stepFlag )
 void
 Debugger_ShowEffects ( Debugger * debugger, int64 stepFlag )
 {
-
     _Debugger_ShowEffects ( debugger, debugger->w_Word, stepFlag ) ;
 }
 
@@ -390,7 +389,7 @@ _CfrTil_ShowInfo ( Debugger * debugger, byte * prompt, int64 signal, int64 force
         byte * token0 = word ? word->Name : debugger->Token, *token1 ;
         if ( ( signal == 11 ) || _Q_->SigAddress )
         {
-            sprintf ( ( char* ) signalAscii, ( char * ) "\nError : signal " INT_FRMT ":: attempting address : " UINT_FRMT_0x08, signal, ( uint64 ) _Q_->SigAddress ) ;
+            sprintf ( ( char* ) signalAscii, ( char * ) "\nError : signal " INT_FRMT ":: attempting address : " UINT_FRMT, signal, ( uint64 ) _Q_->SigAddress ) ;
             debugger->DebugAddress = _Q_->SigAddress ;
             //Debugger_Dis ( debugger ) ;
         }

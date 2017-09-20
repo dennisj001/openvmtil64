@@ -170,7 +170,7 @@ _CfrTil_C_Infix_EqualOp ( Word * opWord )
     int64 scrli = word ? word->W_StartCharRlIndex : 0 ; //, svOOState = GetState ( _CfrTil_, OPTIMIZE_ON ) ;
     byte * svName, * token ;
     SetState ( compiler, C_INFIX_EQUAL, true ) ;
-    _CfrTil_WordLists_PopWord ( 2 ) ;
+    _CfrTil_WordLists_PopWords ( 2 ) ;
     d1 ( if ( Is_DebugModeOn ) Compiler_Show_WordList ( "\nCfrTil_C_Infix_Equal : before interpret until ',' or ';' :" ) ) ;
     if ( GetState ( compiler, C_COMBINATOR_LPAREN ) ) token = _Interpret_Until_Token ( _Context_->Interpreter0, ( byte* ) ")", 0 ) ;
     else token = _Interpret_C_Until_EitherToken ( interp, ( byte* ) ";", ( byte* ) ",", ( byte* ) " \n\r\t" ) ;
@@ -205,7 +205,7 @@ _CfrTil_C_Infix_EqualOp ( Word * opWord )
     if ( GetState ( compiler, C_COMBINATOR_LPAREN ) )
     {
         if ( word->StackPushRegisterCode ) SetHere ( word->StackPushRegisterCode ) ; // this is the usual after '=' in non C syntax; assuming optimizeOn
-        _Compiler_Setup_BI_tttn ( compiler, ZERO_TTT, NZ, 3 ) ; // must set logic flag for Compile_ReConfigureLogicInBlock in Block_Compile_WithLogicFlag
+        _BlockInfo_Setup_BI_tttn ( compiler, ZERO_TTT, NZ, 3 ) ; // must set logic flag for Compile_ReConfigureLogicInBlock in Block_Compile_WithLogicFlag
     }
     List_InterpretLists ( compiler->PostfixLists ) ;
     compiler->LHS_Word = 0 ;

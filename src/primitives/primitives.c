@@ -71,8 +71,8 @@ CPrimitive CPrimitives [] = {
     { "++", CfrTil_PlusPlus, IMMEDIATE | CATEGORY_OP_1_ARG | CATEGORY_PLUS_PLUS_MINUS_MINUS, 0, "C", "Root" },
     { "--", CfrTil_MinusMinus, IMMEDIATE | CATEGORY_OP_1_ARG | CATEGORY_PLUS_PLUS_MINUS_MINUS, 0, "C", "Root" },
     //{ "lReturnTOS", CfrTil_Locals_ReturnTOS, IMMEDIATE, 0, "C", "Root" },
-    //{ "lReturnEAX", CfrTil_Locals_ReturnEAX, IMMEDIATE, 0, "C", "Root" },
-    //{ "cReturnEAX", CfrTil_CReturnEAX, IMMEDIATE, 0, "C", "Root" },
+    //{ "lReturnR8", CfrTil_Locals_ReturnR8, IMMEDIATE, 0, "C", "Root" },
+    //{ "cReturnR8", CfrTil_CReturnR8, IMMEDIATE, 0, "C", "Root" },
     //{ "cstackPush", Compile_DspPop_EspPush, IMMEDIATE, 0, "C", "Root" },
     { "cfib", CFib, 0, 0, "C", "Root" },
     { "cfactorial", CFactorial, 0, 0, "C", "Root" },
@@ -88,7 +88,7 @@ CPrimitive CPrimitives [] = {
     { "c_prefix", CfrTil_C_Prefix, IMMEDIATE, 0, "C", "Root" },
     { "c_return", CfrTil_C_Return, IMMEDIATE, 0, "C", "Root" },
     { "void_return", CfrTil_Void_Return, IMMEDIATE, 0, "C", "Root" },
-    { "eax_return", CfrTil_EAX_Return, IMMEDIATE, 0, "C", "Root" },
+    { "eax_return", CfrTil_R8_Return, IMMEDIATE, 0, "C", "Root" },
 
     { "{", CfrTil_Begin_C_Block, IMMEDIATE | KEYWORD, 0, "C_Syntax", "C" },
     { "}", CfrTil_End_C_Block, IMMEDIATE | KEYWORD, 0, "C_Syntax", "C" },
@@ -373,7 +373,7 @@ CPrimitive CPrimitives [] = {
     { "warmInit", CfrTil_WarmInit, 0, 0, "System", "Root" },
     { "ok", OVT_Ok, 0, 0, "System", "Root" },
     { "console", Console, 0, 0, "System", "Root" },
-    { "cpuStateShow", CfrTil_CpuState_Show, 0, 0, "System", "Root" },
+    { "cpuStateShow", CfrTil_CpuState_CheckShow, 0, 0, "System", "Root" },
     { "location", CfrTil_Location, 0, 0, "System", "Root" },
     { "pause", OpenVmTil_Pause, 0, 0, "System", "Root" },
     { "_pause", OpenVmTil_Pause, 0, 0, "System", "Root" },
@@ -522,19 +522,23 @@ CPrimitive CPrimitives [] = {
     { "new", CfrTil_DObject_New, 0, 0, "DObject", "Root" },
     //{ "object", CfrTil_DObject, 0, 0, "DObject", "Root" },
 
+    // this section can be implemented by lower level calls - internally
     { "word", CfrTil_Word, 0, 0, "Reserved", "Compiler" },
-    //{ "_dlsymWord", CfrTil_DlsymWord, 0, 0, "Reserved", "Compiler" },
-    { "dlsym:", CfrTil_Dlsym, 0, 0, "Reserved", "Compiler" },
     { ":", CfrTil_Colon, IMMEDIATE | KEYWORD, 0, "Reserved", "Compiler" },
+    { "semi", CfrTil_SemiColon, KEYWORD, 0, "Reserved", "Compiler" },
     { ";", CfrTil_SemiColon, IMMEDIATE | KEYWORD, 0, "Reserved", "Compiler" },
     { "}", CfrTil_EndBlock, IMMEDIATE | KEYWORD, 0, "Reserved", "Compiler" }, // moved to init.cft and renamed below
     { "{", ( block ) CfrTil_BeginBlock, IMMEDIATE | KEYWORD, 0, "Reserved", "Compiler" }, // moved to init.cft and renamed below
     { "end", CfrTil_EndBlock, IMMEDIATE | KEYWORD, 0, "Reserved", "Compiler" },
     { "immediate", CfrTil_Immediate, IMMEDIATE | KEYWORD, 0, "Reserved", "Compiler" },
+    
+    //{ "_dlsymWord", CfrTil_DlsymWord, 0, 0, "Reserved", "Compiler" },
+    { "dlsym:", CfrTil_Dlsym, 0, 0, "Reserved", "Compiler" },
     { "keyword", CfrTil_Keyword, IMMEDIATE, 0, "Reserved", "Compiler" },
     { "swap", CfrTil_Swap, IMMEDIATE, 0, "Reserved", "Compiler" },
     { "|}", CfrTil_RightBracket, IMMEDIATE, 0, "Reserved", "Compiler" },
     { "{|", CfrTil_LeftBracket, IMMEDIATE, 0, "Reserved", "Compiler" },
+    
     { "c_syntaxOn", CfrTil_C_Syntax_On, IMMEDIATE, 0, "Compiler", "Root" }, // put this here so Compiler will be in Root namespace and Compiler will close to the top
     { "c_syntaxOff", CfrTil_C_Syntax_Off, IMMEDIATE, 0, "Compiler", "Root" },
     //{ "tail", CfrTil_Tail, IMMEDIATE | CATEGORY_TAIL | CATEGORY_UNMOVEABLE, 0, "Compiler", "Root" },
@@ -600,6 +604,7 @@ CPrimitive CPrimitives [] = {
 MachineCodePrimitive MachineCodePrimitives [] = {
     { "getESP", CPRIMITIVE, 0, ( byte* ) Compile_Debug_GetESP, -1, "System", "Root" },
     { "restoreCpuState", CPRIMITIVE, 0, ( byte* ) Compile_CpuState_Restore, 0, "System", "Root" },
+    { "restoreCpuStateHere", CPRIMITIVE, 0, ( byte* ) Compile_CpuState_RestoreHere, 0, "System", "Root" },
     { "restoreCpuState", CPRIMITIVE, 0, ( byte* ) Compile_CpuState_Restore, 0, "Debug", "Root" },
     { "saveCpuState", CPRIMITIVE, 0, ( byte* ) _Compile_CpuState_Save, 0, "System", "Root" },
     { "saveCpuState", CPRIMITIVE, 0, ( byte* ) _Compile_CpuState_Save, 0, "Debug", "Root" },
@@ -607,7 +612,7 @@ MachineCodePrimitive MachineCodePrimitives [] = {
     { "syncEsiToDsp", CPRIMITIVE, 0, ( byte* ) _Compile_Sync_EsiToDsp, 0, "System", "Root" },
     { "syncDspToEsi", CPRIMITIVE, 0, ( byte* ) _Compile_Sync_DspToEsi, 0, "System", "Root" },
 #endif    
-    { "moveToR8AndCall", CPRIMITIVE, 0, ( byte* ) _Compile_MoveToR8AndCall, 0, "System", "Root" },
+    //{ "moveToR8AndCall", CPRIMITIVE, 0, ( byte* ) _Compile_MoveToR8AndCall, 0, "System", "Root" },
     { "<dbg>", CFRTIL_WORD | DEBUG_WORD | INTERPRET_DBG, 0, ( byte* ) _Compile_DebugRuntimeBreakpoint, - 1, "Debug", "Root" },
     { "rsp", CFRTIL_WORD, 0, ( byte* ) _Compile_Rsp_Get, - 1, "System", "Root" },
     { "rsp@", CFRTIL_WORD, 0, ( byte* ) _Compile_Rsp_Fetch, - 1, "System", "Root" },
@@ -615,7 +620,7 @@ MachineCodePrimitive MachineCodePrimitives [] = {
     { "rsp>", CFRTIL_WORD, 0, ( byte* ) _Compile_Rsp_From, - 1, "System", "Root" },
     { "rdrop", CFRTIL_WORD, 0, ( byte* ) _Compile_Rsp_Drop, - 1, "Debug", "Root" },
     { "rsp!", CFRTIL_WORD, 0, ( byte* ) _Compile_Rsp_Store, - 1, "System", "Root" },
-    { "pushEAX", CFRTIL_WORD, 0, ( byte* ) Compile_DataStack_PushEAX, - 1, "System", "Root" },
+    { "pushR8", CFRTIL_WORD, 0, ( byte* ) Compile_DataStack_PushR8, - 1, "System", "Root" },
     { 0 }
 } ;
 

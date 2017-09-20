@@ -36,6 +36,7 @@ CfrTil_IncDec ( int64 op ) // +
             Interpreter_InterpretNextToken ( cntx->Interpreter0 ) ;
             if ( GetState ( compiler, C_INFIX_EQUAL ) && GetState ( _CfrTil_, OPTIMIZE_ON ) && CompileMode )
             {
+                // ?? couldn't this stuff be done with _Interpret_C_Until_EitherToken ??
                 dllist * postfixList = List_New ( ) ;
                 List_Push_1Value_Node ( postfixList, currentWord, COMPILER_TEMP ) ;
                 List_Push_1Value_Node ( postfixList, one, COMPILER_TEMP ) ;
@@ -58,6 +59,7 @@ CfrTil_IncDec ( int64 op ) // +
             {
                 if ( ! GetState ( compiler, INFIX_LIST_INTERPRET ) )
                 {
+                    // ?? couldn't this stuff be done with _Interpret_C_Until_EitherToken ??
                     dllist * postfixList = List_New ( ) ;
                     List_Push_1Value_Node ( postfixList, currentWord, COMPILER_TEMP ) ;
                     List_Push_1Value_Node ( postfixList, one, COMPILER_TEMP ) ;

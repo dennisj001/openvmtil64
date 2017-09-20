@@ -5,7 +5,7 @@ void
 _Compile_C_Call_1_Arg ( byte* function, int64 arg )
 {
     _Compile_Esp_Push ( arg ) ;
-    Compile_Call_With32BitDisp ( function ) ;
+    Compile_Call ( function ) ;
     _Compile_Rsp_Drop ( ) ;
 }
 

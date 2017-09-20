@@ -147,13 +147,13 @@ CfrTil_MachineCodePrimitive_AddWords ( )
         MachineCodePrimitive p = MachineCodePrimitives [ i ] ;
 
         // initialize some values in MachineCodePrimitives that are variables and have to be calculated at run time
-#if 0        
+#if 1        
         if ( String_Equal ( p.ccp_Name, "getESP" ) )
         {
             functionArg = - 1 ; //0 ; //( int64 ) debugger->DebugESP ;
             callHook = & debugger->GetESP ;
         }
-        //else
+        else
 #endif            
         if ( ( String_Equal ( p.ccp_Name, "restoreCpuState" ) ) && ( String_Equal ( p.NameSpace, "Debug" ) ) )
         {
@@ -172,8 +172,14 @@ CfrTil_MachineCodePrimitive_AddWords ( )
         }
         else if ( ( String_Equal ( p.ccp_Name, "saveCpuState" ) ) && ( String_Equal ( p.NameSpace, "System" ) ) )
         {
-            functionArg = ( int64 ) _CfrTil_->cs_Cpu ;
+            functionArg = ( int64 ) *&_CfrTil_->cs_Cpu ;
+            //functionArg = _CfrTil_ ;
             callHook = & _CfrTil_->SaveCpuState ;
+        }
+        else if ( ( String_Equal ( p.ccp_Name, "restoreCpuStateHere" ) ) && ( String_Equal ( p.NameSpace, "System" ) ) )
+        {
+            functionArg = ( int64 ) _CfrTil_->cs_Cpu ;
+            callHook = & _CfrTil_->RestoreCpuStateHere ;
         }
 #if 0       
         else if ( ( String_Equal ( p.ccp_Name, "syncDspToEsi" ) ) && ( String_Equal ( p.NameSpace, "System" ) ) )

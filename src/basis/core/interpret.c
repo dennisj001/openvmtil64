@@ -146,7 +146,7 @@ _Interpreter_IsWordPrefixing ( Interpreter * interp, Word * word )
 Word *
 _Compiler_CopyDuplicatesAndPush ( Compiler * compiler, Word * word )
 {
-    Word *wordi, * word1 ;
+    Word *wordi, * word0 ;
     int64 i, depth, wrli = word->W_StartCharRlIndex ;
     dllist * list = compiler->WordList ;
     // we sometimes refer to more than one field of the same object, eg. 'this' in a block
@@ -155,8 +155,8 @@ _Compiler_CopyDuplicatesAndPush ( Compiler * compiler, Word * word )
     // 'word' is the 'baseObject' word. If it is already on the Object word Stack certain optimizations can be made.
     // we also need to prevent a null StackPushRegisterCode for operator words used more than once in an optimization
     depth = List_Depth ( list ) ;
-    word1 = word ; // we always push and return word1
-    word1->W_OriginalWord = word1 ;
+    word0 = word ; // we always push and return word1
+    word0->W_OriginalWord = word0 ;
     //word1->S_CProperty &= ( ~RECYCLABLE_COPY ) ;
 
     for ( i = 0 ; i < depth ; i ++ )
@@ -164,26 +164,18 @@ _Compiler_CopyDuplicatesAndPush ( Compiler * compiler, Word * word )
         wordi = ( Word* ) ( Compiler_WordList ( i ) ) ;
         if ( word == wordi )
         {
-            word1 = Word_Copy ( word, DICTIONARY ) ; //COMPILER_TEMP ) ; //WORD_COPY_MEM ) ; // especially for "this" so we can use a different Code & AccumulatedOffsetPointer not the existing 
-            word1->W_OriginalWord = Word_GetOriginalWord ( word ) ;
-            _dlnode_Init ( ( dlnode * ) word1 ) ; // necessary!
-            word1->S_CProperty |= ( uint64 ) RECYCLABLE_COPY ;
-            word1->W_StartCharRlIndex = wrli ;
+            word0 = Word_Copy ( word, DICTIONARY ) ; //COMPILER_TEMP ) ; //WORD_COPY_MEM ) ; // especially for "this" so we can use a different Code & AccumulatedOffsetPointer not the existing 
+            word0->W_OriginalWord = Word_GetOriginalWord ( word ) ;
+            _dlnode_Init ( ( dlnode * ) word0 ) ; // necessary!
+            word0->S_CProperty |= ( uint64 ) RECYCLABLE_COPY ;
+            word0->W_StartCharRlIndex = wrli ;
             break ;
         }
     }
-    _CfrTil_WordLists_PushWord ( word1 ) ;
+    _CfrTil_WordLists_PushWord ( word0 ) ;
+    d0 (Word * sqWord = _CfrTil_WordList_Top ( ) ) ;
+    d0 ( _Printf ((byte*) "\n_Compiler_CopyDuplicatesAndPush : %s", sqWord->Name ) ) ;
 
-    return word1 ;
-}
-
-Word *
-Compiler_CopyDuplicatesAndPush ( Word * word )
-{
-    if ( word && CompileMode && ( ! ( word->CProperty & ( DEBUG_WORD ) ) ) )
-    {
-        word = _Compiler_CopyDuplicatesAndPush ( _Context_->Compiler0, word ) ;
-    }
-    return word ;
+    return word0 ;
 }
 

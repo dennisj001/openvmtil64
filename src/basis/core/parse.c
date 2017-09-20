@@ -89,7 +89,7 @@ Compile_InitRegisterParamenterVariables ( Compiler * compiler )
     int64 regIndex, nRVars = compiler->NumberOfRegisterVariables, nPVars = compiler->NumberOfArgs ;
     for ( regIndex = 0 ; nRVars -- > 0 && nPVars -- > 0 ; regIndex ++ )
     {
-        //if ( GetState ( compiler, RETURN_TOS | RETURN_EAX ) ) 
+        //if ( GetState ( compiler, RETURN_TOS | RETURN_R8 ) ) 
         _Compile_Move_StackN_To_Reg ( compiler->RegOrder [ regIndex ], DSP, regIndex * CELL ) ;
         //else _Compile_Move_StackN_To_Reg ( regOrder [ regIndex ], FP, fpIndex ) ; //
     }
@@ -187,7 +187,7 @@ _CfrTil_Parse_LocalsAndStackVariables ( int64 svf, int64 lispMode, ListObject * 
                 regFlag = true ;
                 continue ;
             }
-            if ( strcmp ( ( char* ) token, "EAX:" ) == 0 )
+            if ( strcmp ( ( char* ) token, "R8:" ) == 0 )
             {
                 regFlag = true ;
                 regToUseIndex = 3 ;
@@ -219,7 +219,7 @@ _CfrTil_Parse_LocalsAndStackVariables ( int64 svf, int64 lispMode, ListObject * 
             if ( getReturnFlag )
             {
                 addWords = 0 ;
-                if ( stricmp ( token, ( byte* ) "EAX" ) == 0 ) getReturn = RETURN_EAX ;
+                if ( stricmp ( token, ( byte* ) "R8" ) == 0 ) getReturn = RETURN_R8 ;
                 else if ( stricmp ( token, ( byte* ) "TOS" ) == 0 ) getReturn = RETURN_TOS ;
                 else if ( stricmp ( token, ( byte* ) "0" ) == 0 ) getReturn = DONT_REMOVE_STACK_VARIABLES ;
                 else returnVariable = token ;
@@ -285,7 +285,7 @@ Lexer_ParseAsAString ( Lexer * lexer )
         lexer->TokenType = ( T_STRING | KNOWN_OBJECT ) ;
         lexer->LiteralString = _String_UnBox ( lexer->OriginalToken ) ;
     }
-    else if ( lexer->OriginalToken [ 0 ] == '\'' )
+    else if ( ( lexer->OriginalToken [ 0 ] == '\'' ) && ( strlen ( lexer->OriginalToken  ) > 1 ) )
     {
         //char buffer [4] ; buffer[0]= '\'' ; buffer[1]= lexer->OriginalToken [ 1 ] ; buffer[2]= '\'' ; buffer[3]= 0 ;
         lexer->TokenType = ( T_CHAR | KNOWN_OBJECT ) ;
@@ -352,16 +352,14 @@ Lexer_ParseBigNum ( Lexer * lexer, byte * token )
 void
 _Lexer_ParseHex ( Lexer * lexer, byte * token )
 {
-#if 0    
-    if ( sscanf ( ( char* ) token, "%llx", ( unsigned long int64* ) &lexer->Literal ) )
+    // use 0d format for decimal numbers with hex NumberBase state
+    if ( sscanf ( ( char* ) token, INT_FRMT_FOR_HEX, ( int64* ) &lexer->Literal ) )
     {
         lexer->TokenType = ( T_INT | KNOWN_OBJECT ) ;
         SetState ( lexer, KNOWN_OBJECT, true ) ;
         Lexer_ParseBigNum ( lexer, token ) ;
     }
-    //else 
-#endif    
-    if ( sscanf ( ( char* ) token, HEX_INT_FRMT, ( uint64* ) &lexer->Literal ) )
+    else if ( sscanf ( ( char* ) token, HEX_INT_FRMT, ( uint64* ) &lexer->Literal ) )
     {
         lexer->TokenType = ( T_INT | KNOWN_OBJECT ) ;
         SetState ( lexer, KNOWN_OBJECT, true ) ;
@@ -386,7 +384,20 @@ void
 _Lexer_ParseDecimal ( Lexer * lexer, byte * token )
 {
     float f ;
-    if ( sscanf ( ( char* ) token, INT_FRMT, ( int64* ) &lexer->Literal ) )
+    // use 0x format for hex numbers with decimal NumberBase state
+    if ( sscanf ( ( char* ) token, HEX_UINT_FRMT, ( uint64* ) &lexer->Literal ) )
+    {
+        lexer->TokenType = ( T_INT | KNOWN_OBJECT ) ;
+        SetState ( lexer, KNOWN_OBJECT, true ) ;
+        Lexer_ParseBigNum ( lexer, token ) ;
+    }
+    else if ( sscanf ( ( char* ) token, INT_FRMT_FOR_HEX, ( int64* ) &lexer->Literal ) )
+    {
+        lexer->TokenType = ( T_INT | KNOWN_OBJECT ) ;
+        SetState ( lexer, KNOWN_OBJECT, true ) ;
+        Lexer_ParseBigNum ( lexer, token ) ;
+    }
+    else if ( sscanf ( ( char* ) token, INT_FRMT, ( int64* ) &lexer->Literal ) )
     {
         lexer->TokenType = ( T_INT | KNOWN_OBJECT ) ;
         SetState ( lexer, KNOWN_OBJECT, true ) ;
@@ -402,7 +413,7 @@ _Lexer_ParseDecimal ( Lexer * lexer, byte * token )
     {
         lexer->TokenType = ( T_FLOAT | KNOWN_OBJECT ) ;
         SetState ( lexer, KNOWN_OBJECT, true ) ;
-        return Lexer_ParseBigNum ( lexer, token ) ;
+        Lexer_ParseBigNum ( lexer, token ) ;
     }
     else Lexer_ParseAsAString ( lexer ) ;
 }

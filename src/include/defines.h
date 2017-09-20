@@ -18,8 +18,7 @@
 #else 
 #define d1( x ) x
 #define d0( x ) 
-#define D( x ) x
-#define D1( x ) d1 ( if ( _Is_DebugOn ) x )
+#define D1( x ) d1 ( if ( _Is_DebugOn ) x ) ;
 #define D0( x ) 
 #endif
 
@@ -58,42 +57,50 @@
 #define eof (byte) EOF
 //#define ABI 32
 #define ABI 64
+#define X64 1
+#define X86 0
 #if 0 //ABI == 64
 #define INT_FRMT "%ld"
 #define INT_FRMT_02 "%02ld"
 #define INT_FRMT_9 "%9ld"
 #define INT_FRMT_3 "%3ld"
-#define UINT_FRMT "%lx" 
+#define _UINT_FRMT "%lx" 
 #define UINT_FRMT_0x "0x%lx"
 #define UINT_FRMT_09 "%09lx"
 #define UINT_FRMT_0x09 "0x%09lx"
 #define UINT_FRMT_0x020 "0x%020lx"
+#define UINT_FRMT UINT_FRMT 
 #else
 #define INT_FRMT "%ld"
 #define INT_FRMT_02 "%02ld" 
 #define INT_FRMT_9 "%9ld"
 #define INT_FRMT_9_LEFT "%-9ld"
 #define INT_FRMT_3 "%3ld"
-#define UINT_FRMT "0x%lx"
-#define HEX_UINT_FRMT "0x%lx"
-#define LISP_HEX_FRMT "#lx%lx"
-#define LISP_DECIMAL_FRMT "#ld%ld"
+#define INT_FRMT_FOR_HEX "0d%ld"
+#define _UINT_FRMT "0x%lx"
 #define HEX_INT_FRMT "%lx"
+#define HEX_UINT_FRMT "0x%lx"
+#define LISP_HEX_FRMT "#x%lx"
+#define LISP_DECIMAL_FRMT "#d%ld"
 #define UINT_FRMT_0x "0lx%lx"
 #define UINT_FRMT_09 "%09lx"
 #define UINT_FRMT_08 "%08lx"
 #define UINT_FRMT_0x08 "0x%08lx"
 #define UINT_FRMT_0x09 "0x%09lx"
+#define UINT_FRMT_0x016 "0x%016lx"
 #define UINT_FRMT_0x020 "0x%020lx"
+#define UINT_FRMT UINT_FRMT_0x016 
 #endif
 #define BYTE_FRMT_0x "%x"
 
 #define INT_SIZE ( sizeof (int32))
-#if ABI == 64
+
+#if X64
 #define CELL_SIZE ( sizeof ( int64 ) )
 #else
 #define CELL_SIZE ( sizeof ( int32 ) )
 #endif
+
 #define SLOT_SIZE CELL_SIZE
 #define CELL CELL_SIZE
 
@@ -275,7 +282,7 @@
 #define CATEGORY_EQUAL     ( (uint64) 1 << 63 )
 
 // CProperty2
-#define EAX_RETURN          ( (uint64) 1 << 0 ) 
+#define R8_RETURN          ( (uint64) 1 << 0 ) 
 #define CATEGORY_SHIFT      ( (uint64) 1 << 1 ) 
 #define SOURCE_CODE_WORD    ( (uint64) 1 << 2 ) 
 
@@ -399,10 +406,10 @@
 #define OPTIMIZE_REG_REG ( 1 << 2 )
 #define OPTIMIZE_REG_MEM ( 1 << 3 )
 #define OPTIMIZE_MEM_REG ( 1 << 4 )
-#define OPTIMIZE_EAX_ECX ( 1 << 5 )
-#define OPTIMIZE_ECX_EAX ( 1 << 6 )
-#define OPTIMIZE_EAX_MEM ( 1 << 7 )
-#define OPTIMIZE_MEM_EAX ( 1 << 8 )
+#define OPTIMIZE_R8_ECX ( 1 << 5 )
+#define OPTIMIZE_ECX_R8 ( 1 << 6 )
+#define OPTIMIZE_R8_MEM ( 1 << 7 )
+#define OPTIMIZE_MEM_R8 ( 1 << 8 )
 #define OPTIMIZE_MEM_ECX ( 1 << 9 )
 #define OPTIMIZE_ECX_MEM ( 1 << 10 )
 #define OPTIMIZE_TO_MEM  ( 1 << 11 )
@@ -435,8 +442,8 @@
 // #define O_BITS 4 // bits needed to encode category codes
 #define O_BITS 4 // experiment with 64 bit encoding 
 
-#define DONT_PUSH_EAX (( byte* ) 1 )
-#define PUSH_EAX (( byte* ) 2 )
+#define DONT_PUSH_R8 (( byte* ) 1 )
+#define PUSH_R8 (( byte* ) 2 )
 
 // Debugger Flags
 //#define DBG_DONE ( 1 << 0 ) 
@@ -473,6 +480,7 @@
 #define DBG_RUNTIME_BREAKPOINT ( (uint64) 1 << 31 )
 #define DBG_EVAL_AUTO_MODE ( (uint64) 1 << 32 )
 #define DBG_CONTINUE_MODE ( (uint64) 1 << 32 )
+#define DBG_INTERNAL_ON ( (uint64) 1 << 33 )
 
 #define SIZEOF_AddressAfterJmpCallStack 16
 // TODO : nb. flags need to be edited !!!!! for right category, overlap, use/non-use, etc.
@@ -553,7 +561,7 @@
 #define SAVE_ESP ( 1 << 3 ) 
 #define RETURN_NONE ( 1 << 5 ) 
 #define RETURN_TOS ( 1 << 6 )
-#define RETURN_EAX ( 1 << 7 ) 
+#define RETURN_R8 ( 1 << 7 ) 
 #define LISP_COMBINATOR_MODE ( 1 << 8 )
 #define LISP_MODE ( 1 << 9 )
 #define INFIX_MODE ( 1 << 10 )

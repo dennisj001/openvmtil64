@@ -54,7 +54,8 @@ CfrTil_BitWise_NOT ( ) // xor
     }
     else
     {
-        TOS = ~ TOS ;
+        //if ( Dsp ) { Dsp [0] = ~ Dsp[0] ; }
+        TOS = ! TOS ;
     }
 }
 
@@ -67,7 +68,7 @@ CfrTil_BitWise_NEG ( ) // xor
     }
     else
     {
-        TOS = - TOS ;
+        TOS = ~ TOS ;
     }
 }
 

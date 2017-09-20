@@ -21,14 +21,14 @@ Debugger_TableSetup ( Debugger * debugger )
     debugger->CharacterTable [ 'o' ] = 1 ;
     debugger->CharacterTable [ 'i' ] = 1 ;
     debugger->CharacterTable [ 'u' ] = 1 ;
-    debugger->CharacterTable [ 't' ] = 1 ;
+    debugger->CharacterTable [ 't' ] = 7 ;
     debugger->CharacterTable [ 'U' ] = 9 ;
     debugger->CharacterTable [ 'f' ] = 14 ;
     debugger->CharacterTable [ '\\'] = 15 ;
     debugger->CharacterTable [ 'G' ] = 16 ;
     debugger->CharacterTable [ 'n' ] = 17 ;
     debugger->CharacterTable [ 'p' ] = 18 ;
-    debugger->CharacterTable [ 'h' ] = 19 ;
+    //debugger->CharacterTable [ 'h' ] = 19 ;
     debugger->CharacterTable [ 'a' ] = 20 ;
     debugger->CharacterTable [ 'z' ] = 21 ;
     debugger->CharacterTable [ 'w' ] = 22 ;
@@ -68,7 +68,7 @@ Debugger_TableSetup ( Debugger * debugger )
     debugger->CharacterFunctionTable [ 16 ] = Debugger_OptimizeToggle ;
     debugger->CharacterFunctionTable [ 17 ] = Debugger_CodePointerUpdate ;
     debugger->CharacterFunctionTable [ 18 ] = Debugger_Dump ;
-    debugger->CharacterFunctionTable [ 19 ] = Debugger_ConsiderAndShowWord ;
+    //debugger->CharacterFunctionTable [ 19 ] = Debugger_ConsiderAndShowWord ; // fix me
     debugger->CharacterFunctionTable [ 20 ] = Debugger_DisassembleAccumulated ;
     debugger->CharacterFunctionTable [ 22 ] = Debugger_WDis ;
     debugger->CharacterFunctionTable [ 23 ] = Debugger_Abort ;
@@ -184,7 +184,7 @@ _Debugger_Off ( Debugger * debugger )
     debugger->cs_Cpu->State = 0 ;
     debugger->w_Word = 0 ;
     SetState ( debugger, DBG_STACK_OLD, true ) ;
-    debugger->ReturnStackCopyPointer = 0 ;
+    debugger->CopyRSP = 0 ;
     SetState ( _Debugger_, DBG_BRK_INIT | DBG_ACTIVE | DBG_STEPPING | DBG_PRE_DONE | DBG_AUTO_MODE | DBG_EVAL_AUTO_MODE, false ) ;
 }
 
@@ -225,13 +225,15 @@ _Debugger_Init ( Debugger * debugger, Word * word, byte * address )
     {
         debugger->DebugAddress = address ;
     }
+#if 0    
     else
     {
         // remember : _Q_->CfrTil->Debugger0->GetESP is called thru _Compile_Debug : <dbg>
-        if ( debugger->DebugESP ) //debugger->GetESP ( ) ;
-        {
-            debugger->DebugAddress = ( byte* ) debugger->cs_Cpu->Esp [0] ; // 0 is <dbg>
-        }
+
+        if ( ! debugger->DebugRSP ) debugger->SaveCpuState ( ) ;
+        d1 ( _PrintNStackWindow ( ( uint64* ) debugger->cs_Cpu->Rsp, "ReturnStack", "ESP", 4 ) ) ; //pushedWindow ) ) ;
+
+        debugger->DebugAddress = ( byte* ) debugger->cs_Cpu->Rsp  ; // 0 is <dbg>
         //next :
         if ( debugger->DebugAddress )
         {
@@ -249,14 +251,15 @@ _Debugger_Init ( Debugger * debugger, Word * word, byte * address )
                 _CfrTil_PrintNReturnStack ( 8 ) ;
                 debugger->w_Word = _Context_->CurrentlyRunningWord ;
                 debugger->DebugAddress = debugger->w_Word->CodeStart ; //Definition ; //CodeAddress ;
-                _Printf ( ( byte* ) "\n\n%s : Can't find a word at this address : 0x%08x : or it offset adress : 0x%08x :  "
-                    "\nUsing _Context_->CurrentlyRunningWord : \'%s\' : address = 0x%08x : debugger->DebugESP [1] = 0x%08x",
-                    Context_Location ( ), da, offsetAddress, debugger->w_Word->Name, debugger->DebugAddress, debugger->DebugESP ? debugger->DebugESP [1] : 0 ) ; //but here is some disassembly at the considered \"EIP address\" : \n" ) ;
+                _Printf ( ( byte* ) "\n\n%s : Can't find a word at this address : 0x%016lx : or it offset adress : 0x%016lx :  "
+                    "\nUsing _Context_->CurrentlyRunningWord : \'%s\' : address = 0x%016lx : debugger->DebugESP [1] = 0x%016lx",
+                    Context_Location ( ), da, offsetAddress, debugger->w_Word->Name, debugger->DebugAddress, debugger->DebugRSP ? debugger->DebugRSP [1] : 0 ) ; //but here is some disassembly at the considered \"EIP address\" : \n" ) ;
                 DebugColors ;
             }
             if ( _Q_->Verbosity > 3 ) _CfrTil_PrintNReturnStack ( 4 ) ;
         }
     }
+#endif    
     if ( debugger->w_Word ) debugger->Token = debugger->w_Word->Name ;
     else
     {
@@ -265,7 +268,7 @@ _Debugger_Init ( Debugger * debugger, Word * word, byte * address )
         if ( _Context_->CurrentlyRunningWord ) debugger->Token = _Context_->CurrentlyRunningWord->Name ;
     }
     //Debugger_InitDebugWordList ( debugger ) ;
-    debugger->ReturnStackCopyPointer = 0 ;
+    debugger->CopyRSP = 0 ;
     SetState ( debugger, ( DBG_STACK_OLD ), true ) ;
     Stack_Init ( debugger->DebugStack ) ;
 }
@@ -424,26 +427,27 @@ _Debugger_CpuState_Show ( )
 }
 
 void
-Debugger_CheckSaveCpuState ( Debugger * debugger )
+_Debugger_CpuState_CheckSave ( Debugger * debugger )
 {
     if ( ! ( debugger->cs_Cpu->State ) )
     {
         debugger->SaveCpuState ( ) ;
-        SetState ( debugger, DBG_REGS_SAVED, true ) ;
+        debugger->cs_Cpu->State = 1 ;
+        //SetState ( debugger, DBG_REGS_SAVED, true ) ;
     }
 }
 
 void
-Debugger_CheckSaveCpuStateShow ( Debugger * debugger )
+Debugger_CpuState_CheckSaveShow ( Debugger * debugger )
 {
-    Debugger_CheckSaveCpuState ( debugger ) ;
+    _Debugger_CpuState_CheckSave ( debugger ) ;
     _Debugger_CpuState_Show ( ) ;
 }
 
 void
 Debugger_Registers ( Debugger * debugger )
 {
-    Debugger_CheckSaveCpuStateShow ( debugger ) ;
+    Debugger_CpuState_CheckSaveShow ( debugger ) ;
     Debugger_UdisOneInstruction ( debugger, debugger->DebugAddress, ( byte* ) "\r\r", ( byte* ) "" ) ; // current insn
 }
 
@@ -491,7 +495,6 @@ Debugger_Abort ( Debugger * debugger )
 void
 Debugger_Stop ( Debugger * debugger )
 {
-
     _Printf ( ( byte* ) "\nDebugger_Stop.\n" ) ;
     Debugger_Off ( debugger, 1 ) ;
     _Throw ( STOP ) ;
@@ -500,15 +503,12 @@ Debugger_Stop ( Debugger * debugger )
 void
 Debugger_InterpretLine_WithStartString ( byte * str )
 {
-
     _CfrTil_Contex_NewRun_1 ( _CfrTil_, ( ContextFunction_1 ) CfrTil_InterpretPromptedLine, str ) ; // can't clone cause we may be in a file and we want input from stdin
 }
 
 void
 Debugger_InterpretLine ( )
 {
-    //_CfrTil_Contex_NewRun_1 ( _CfrTil_, ( ContextFunction_1 ) CfrTil_InterpretPromptedLine, 0 ) ; // can't clone cause we may be in a file and we want input from stdin
-
     Debugger_InterpretLine_WithStartString ( "" ) ;
 }
 
@@ -524,12 +524,14 @@ Debugger_Escape ( Debugger * debugger )
     DebugOff ;
     int64 svcm = Get_CompileMode ( ) ;
     Set_CompileMode ( false ) ;
-
+    byte * lexerTokenBuffer = _Buffer_New_pbyte ( BUFFER_SIZE, B_UNLOCKED ) ;
+    strcpy ( lexerTokenBuffer, _CfrTil_->TokenBuffer ) ;
     _Printf ( "\n" ) ;
+
     Debugger_InterpretLine ( ) ;
 
     if ( _Context_->ReadLiner0->OutputLineCharacterNumber ) _Printf ( "\n" ) ;
-
+    strcpy ( _CfrTil_->TokenBuffer, lexerTokenBuffer ) ;
     Set_CompileMode ( svcm ) ;
     DebugOn ;
     DebugColors ;
@@ -537,7 +539,8 @@ Debugger_Escape ( Debugger * debugger )
     SetState ( _Context_->System0, ADD_READLINE_TO_HISTORY, saveSystemState ) ; // reset state 
     debugger->State = saveDebuggerState ;
     _Context_->System0->State = saveSystemState ;
-    SetState_TrueFalse ( debugger, DBG_ACTIVE | DBG_INFO, DBG_COMMAND_LINE | DBG_ESCAPED ) ;
+    SetState_TrueFalse ( debugger, DBG_ACTIVE | DBG_INFO, DBG_STEPPED | DBG_AUTO_MODE | DBG_AUTO_MODE_ONCE | DBG_INTERPRET_LOOP_DONE | DBG_COMMAND_LINE | DBG_ESCAPED ) ;
+    //Lexer_RestartToken ( _Lexer_ ) ;
 }
 
 void
@@ -589,10 +592,10 @@ Debugger_Dump ( Debugger * debugger )
 {
     if ( ! debugger->w_Word )
     {
-        if ( debugger->DebugAddress ) __CfrTil_Dump ( ( int64 ) debugger->DebugAddress, ( int64 ) ( Here - ( int64 ) debugger->DebugAddress ), 8 ) ;
+        if ( debugger->DebugAddress ) __CfrTil_Dump ( ( byte * ) debugger->DebugAddress, ( uint64 ) ( Here - ( int64 ) debugger->DebugAddress ), 8 ) ;
     }
 
-    else __CfrTil_Dump ( ( int64 ) debugger->w_Word->CodeStart, ( int64 ) debugger->w_Word->S_CodeSize, 8 ) ;
+    else __CfrTil_Dump ( ( byte * ) debugger->w_Word->CodeStart, ( uint64 ) debugger->w_Word->S_CodeSize, 8 ) ;
     SetState ( debugger, DBG_INFO, true ) ;
 }
 
@@ -605,7 +608,6 @@ Debugger_Default ( Debugger * debugger )
     }
     else
     {
-
         _Printf ( ( byte* ) "\ndbg :> <%d> <: is not an assigned key code", debugger->Key ) ;
     }
     //SetState ( debugger, DBG_MENU | DBG_PROMPT | DBG_NEWLINE, true ) ;
@@ -644,26 +646,24 @@ Debugger_Delete ( Debugger * debugger )
 }
 
 void
-CpuState_AdjustEdi ( Cpu * cpu, uint64 * dsp, Word * word )
+CpuState_AdjustRdi ( Cpu * cpu, uint64 * dsp, Word * word )
 {
     if ( cpu->State )
     {
         if ( word ) dsp = word->W_InitialRuntimeDsp ;
-        if ( dsp ) cpu->Esi = dsp ;
-        if ( cpu->Esi )
+        if ( dsp ) cpu->Rsi = dsp ;
+        if ( cpu->Rsi )
         {
-
-            cpu->Edi = cpu->Esi + 1 ;
-            *( cpu->Edi ) = ( uint64 ) cpu->Esi ;
+            cpu->Rdi = cpu->Rsi + 1 ;
+            *( cpu->Rdi ) = ( uint64 ) cpu->Rsi ;
         }
     }
 }
 
 void
-Debugger_AdjustEdi ( Debugger * debugger, uint64* dsp, Word * word )
+Debugger_AdjustRdi ( Debugger * debugger, uint64* dsp, Word * word )
 {
-
-    CpuState_AdjustEdi ( debugger->cs_Cpu, dsp, word ) ;
+    CpuState_AdjustRdi ( debugger->cs_Cpu, dsp, word ) ;
 }
 
 // nb! _Debugger_New needs this distinction for memory accounting 
@@ -682,7 +682,7 @@ _Debugger_New ( uint64 type )
 {
     Debugger * debugger = ( Debugger * ) Mem_Allocate ( sizeof (Debugger ), type ) ;
     debugger->cs_Cpu = CpuState_New ( type ) ;
-    debugger->StepInstructionBA = Debugger_ByteArray_AllocateNew ( 4 * K, type ) ;
+    debugger->StepInstructionBA = Debugger_ByteArray_AllocateNew ( 8 * K, type ) ;
     debugger->DebugStack = Stack_New ( 256, type ) ;
     debugger->LocalsNamespacesStack = Stack_New ( 32, type ) ;
 

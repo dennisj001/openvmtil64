@@ -12,9 +12,9 @@ Compile_Test ( Compiler * compiler )
     }
     else
     {
-        _Compile_Stack_PopToReg ( DSP, EAX ) ;
+        _Compile_Stack_PopToReg ( DSP, R8 ) ;
         _Compile_Stack_PopToReg ( DSP, ECX ) ;
-        _Compile_Test ( REG, EAX, ECX, 0, 0 ) ;
+        _Compile_Test ( REG, R8, ECX, 0, 0 ) ;
     }
    _Compiler_Setup_BI_tttn ( _Context->Compiler0, ZERO, N ) ;
 }
@@ -54,10 +54,10 @@ Compile_X_Group3 ( Compiler * compiler, int64 code )
         {
             //Word *zero = Compiler_WordStack ( 0 ) ; // refers to this current multiply insn word
             Word *zero = Compiler_WordList ( 0 ) ; // refers to this current multiply insn word
-            if ( compiler->optInfo->Optimize_Rm != EAX ) _Compile_Move_Rm_To_Reg ( EAX, compiler->optInfo->Optimize_Rm,
+            if ( compiler->optInfo->Optimize_Rm != R8D ) _Compile_Move_Rm_To_Reg ( R8D, compiler->optInfo->Optimize_Rm,
                     compiler->optInfo->Optimize_Disp ) ;
             zero->StackPushRegisterCode = Here ;
-            _Compile_Stack_Push_Reg ( DSP, EAX ) ;
+            _Compile_Stack_Push_Reg ( DSP, R8D ) ;
         }
     }
     else
@@ -81,16 +81,16 @@ Compile_X_Shift ( Compiler * compiler, int64 op, int64 stackFlag )
         {
             //Word *zero = Compiler_WordStack ( 0 ) ; // refers to this current multiply insn word
             Word *zero = Compiler_WordList ( 0 ) ; // refers to this current multiply insn word
-            if ( compiler->optInfo->Optimize_Rm != EAX ) _Compile_Move_Rm_To_Reg ( EAX, compiler->optInfo->Optimize_Rm,
+            if ( compiler->optInfo->Optimize_Rm != R8D ) _Compile_Move_Rm_To_Reg ( R8D, compiler->optInfo->Optimize_Rm,
                     compiler->optInfo->Optimize_Disp ) ;
             zero->StackPushRegisterCode = Here ;
-            _Compile_Stack_Push_Reg ( DSP, EAX ) ;
+            _Compile_Stack_Push_Reg ( DSP, R8D ) ;
         }
     }
     else
     {
-        _Compile_Move_StackN_To_Reg ( ECX, DSP, 0 ) ;
-        Compile_SUBI ( REG, ESI, 0, CELL, BYTE ) ;
+        _Compile_Move_StackN_To_Reg ( R9D, DSP, 0 ) ;
+        Compile_SUBI ( REG, R14, 0, CELL, BYTE ) ;
         //_Compile_Group2_CL ( int64 mod, int64 regOpCode, int64 rm, int64 sib, cell disp )
         _Compile_Group2_CL ( MEM, op, DSP, 0, 0 ) ;
     }

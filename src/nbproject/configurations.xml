@@ -108,6 +108,8 @@
       <itemPath>../.init.cft</itemPath>
       <itemPath>Makefile</itemPath>
       <itemPath>nbproject/private/launcher.properties</itemPath>
+      <itemPath>../m</itemPath>
+      <itemPath>../mir</itemPath>
       <itemPath>../namespaces</itemPath>
     </logicalFolder>
   </logicalFolder>
@@ -406,10 +408,8 @@
         </cTool>
       </item>
       <item path="basis/core/dataObjectNew.c" ex="false" tool="0" flavor2="3">
-        <cTool flags="2">
+        <cTool flags="0">
           <incDir>
-            <pElem>basis/core</pElem>
-            <pElem>include</pElem>
             <pElem>.</pElem>
           </incDir>
         </cTool>
@@ -451,8 +451,10 @@
         </cTool>
       </item>
       <item path="basis/core/dobject.c" ex="false" tool="0" flavor2="3">
-        <cTool flags="0">
+        <cTool flags="2">
           <incDir>
+            <pElem>basis/core</pElem>
+            <pElem>include</pElem>
             <pElem>.</pElem>
           </incDir>
         </cTool>

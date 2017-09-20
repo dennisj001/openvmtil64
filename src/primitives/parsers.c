@@ -10,7 +10,9 @@ CfrTil_Token ( )
 void
 _CfrTil_SingleQuote ( int64 findWordFlag )
 {
-    if ( _ReadLine_PeekIndexedChar ( _ReadLiner_, 1 ) == '\'' ) // parse a char type, eg. 'c' 
+    Word * sqWord = _CfrTil_WordList_Top ( ) ;
+
+    if ( sqWord && sqWord->Name[0] == '\'' && ( _ReadLine_PeekIndexedChar ( _ReadLiner_, 1 ) == '\'' ) )// parse a char type, eg. 'c' 
     {
         byte c = _ReadLine_GetNextChar ( _ReadLiner_ ) ;
         _ReadLine_GetNextChar ( _ReadLiner_ ) ;

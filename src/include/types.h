@@ -12,7 +12,7 @@ typedef unsigned long uint64 ;
 
 typedef char * CString ;
 typedef byte CharSet ;
-typedef int64 Boolean ;
+typedef int8 Boolean ;
 typedef void (* VoidFunction ) (void) ;
 typedef void (*vFunction_1_Arg ) ( int64 ) ;
 typedef void (*vFunction_1_UArg ) ( uint64 ) ;
@@ -106,7 +106,7 @@ typedef struct _dobject
             int16 do_int16_Size ;
             int16 do_Etc ;
         } ;
-        int64 do_int32_Size ;
+        int32 do_int32_Size ;
     } ;
     union
     {
@@ -126,8 +126,8 @@ typedef struct
         node * n_CurrentNode ;
         struct
         {
-            int16 n_Type ;
-            int16 n_Slots ;
+            int32 n_Type ;
+            int32 n_Slots ;
         } ;
         byte * n_unmap ;
     } ;
@@ -153,8 +153,8 @@ typedef struct
                 node * n_CurrentNode ;
                 struct
                 {
-                    int16 n_Type ;
-                    int16 n_Slots ;
+                    int32 n_Type ;
+                    int32 n_Slots ;
                 } ;
                 byte * n_unmap ;
             } ;
@@ -467,8 +467,8 @@ typedef struct
     byte *LogicCode ;
     byte *CombinatorStartsAt ;
     byte *ActualCodeStart ;
-    int64 Ttt ;
-    int64 NegFlag, OverWriteSize ;
+    int8 Ttt ;
+    int8 NegFlag, OverWriteSize ;
     Word * LogicCodeWord, *LiteralWord ;
     Namespace * LocalsNamespace ;
 } BlockInfo ;
@@ -484,21 +484,27 @@ typedef struct
     {
         struct
         {
-            uint64 * Eax ;
-            uint64 * Ecx ;
-            uint64 * Edx ;
-            uint64 * Ebx ;
-            uint64 * Esp ;
-            uint64 * Ebp ;
-            uint64 * Esi ;
-            uint64 * Edi ;
-            uint64 * EFlags ;
-            uint64 * Eip ;
+            uint64 * Rax ;
+            uint64 * Rcx ;
+            uint64 * Rdx ;
+            uint64 * Rbx ;
+            uint64 * Rsp ;
+            uint64 * Rbp ;
+            uint64 * Rsi ;
+            uint64 * Rdi ;
+            uint64 * R8d ;
+            uint64 * R9d ;
+            uint64 * R10d ;
+            uint64 * R11d ;
+            uint64 * R12d ;
+            uint64 * R13d ;
+            uint64 * R14d ;
+            uint64 * R15d ;
+            uint64 * RFlags ;
+            uint64 * Rip ;
         } ;
-        uint64 * Registers [ 10 ] ;
+        uint64 * Registers [ 18 ] ;
     } ;
-    //uint64 * RegisterStack [12];
-    //uint64 * SaveEsp;
 } Cpu ;
 typedef struct
 {
@@ -633,7 +639,7 @@ typedef struct
     byte * EspSaveOffset ;
     byte * EspRestoreOffset ;
     Word * ReturnVariableWord ;
-    Word * CurrentWord ;
+    Word * CurrentWord, *CurrentWordCompiling ;
     Word * LHS_Word ; //, *OptimizeOffWord;
     Namespace *C_BackgroundNamespace ; //, ** FunctionTypesArray ;
     dllist * GotoList ;
@@ -684,8 +690,8 @@ typedef struct _Debugger
     byte * PreHere, *StartHere, *LastDisStart, *ShowLine, * Filename ;
     Stack *DebugStack ;
     Cpu * cs_Cpu ;
-    byte* DebugAddress, *ReturnStackCopyPointer, *LastSourceCodeAddress ;
-    uint64 * DebugESP, *DebugEBP, *DebugESI, *DebugEDI, * LastEsp ; //, *SavedIncomingESP, *SavedIncomingEBP ; //, SavedRunningESP, SavedRunningEBP;
+    byte* DebugAddress, *CopyRSP, *LastSourceCodeAddress ;
+    uint64 * DebugRSP, *DebugRBP, *DebugRSI, *DebugRDI, * LastRsp ; //, *SavedIncomingESP, *SavedIncomingEBP ; //, SavedRunningESP, SavedRunningEBP;
     int64 LastSourceCodeIndex, TerminalLineWidth ;
     ByteArray * StepInstructionBA ;
     byte CharacterTable [ 128 ] ;
@@ -789,7 +795,7 @@ typedef struct _CfrTil
     int64 LogFlag, WordsAdded, FindWordCount, FindWordMaxCount, WordCreateCount, DObjectCreateCount ;
     uint64 * SaveDsp ;
     Cpu * cs_Cpu ;
-    block SaveCpuState, RestoreCpuState, MoveToR8AndCall ; //, SyncDspToEsi, SyncEsiToDsp ;
+    block SaveCpuState, RestoreCpuState, MoveToR8AndCall, RestoreCpuStateHere ; //, SyncDspToEsi, SyncEsiToDsp ;
     Word * LastFinishedWord, *StoreWord, *PokeWord, *ScoOcCrw, *DebugWordListWord ; //, *DebugWordListWord ;
     byte ReadLine_CharacterTable [ 256 ] ;
     ReadLineFunction ReadLine_FunctionTable [ 24 ] ;

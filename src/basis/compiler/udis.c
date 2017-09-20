@@ -69,21 +69,25 @@ _Udis_Disassemble ( ud_t *ud, byte* iaddress, int64 number, int64 cflag )
     {
         char * iasm ;
         byte * address = 0 ;
-        int64 isize = 0, size = 0 ;
         ud_set_input_buffer ( ud, ( byte* ) iaddress, number ) ;
         ud_set_pc ( ud, ( uint64 ) iaddress ) ;
-        while ( ( number -= isize ) > 0 )
+        int64 isize, size = 0 ;
+        do
         {
             isize = ud_disassemble ( ud ) ;
             iasm = ( char* ) ud_insn_asm ( ud ) ;
             address = ( byte* ) ( uint64 ) ud_insn_off ( ud ) ;
             _Udis_PrintInstruction ( ud, address, ( byte* ) "", ( byte* ) "" ) ;
-            if ( cflag && ( ! ( stricmp ( ( byte* ) "ret", ( byte* ) iasm ) ) ) ) 
+            if ( ( cflag && String_Equal ( ( byte* ) "ret", ( byte* ) iasm ) ) ) //|| String_Equal ( ( byte* ) "invalid", ( byte* ) iasm ) )
             {
                 address ++ ;
-                break ;
+                cflag -- ;
+                if ( cflag <= 0 ) break ;
             }
+            else if ( String_Equal ( ( byte* ) "invalid", ( byte* ) iasm ) ) break ;
+            number -= isize ;
         }
+        while ( ( isize && ( number > 0 ) ) ) ;
         size = address - iaddress ;
         return (( size > 0 ) ? size : 0 ) ;
     }

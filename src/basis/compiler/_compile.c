@@ -1,7 +1,7 @@
 #include "../../include/cfrtil.h"
 
 void
-_Compile_CallEAX ( void )
+_Compile_CallR8 ( void )
 {
     //_Compile_Group5 ( int64 code, int64 mod, int64 rm, int64 sib, int64 disp, int64 size )
     _Compile_Group5 ( CALL, 3, 0, 0, 0, 0 ) ;
@@ -10,7 +10,7 @@ _Compile_CallEAX ( void )
 void
 Compile_DataStack_PopAndCall ( void )
 {
-    Compile_Pop_ToEAX_AndCall ( DSP ) ;
+    Compile_Pop_ToR8_AndCall ( DSP ) ;
 }
 
 // >R - Rsp to
@@ -34,7 +34,7 @@ _Compile_Rsp_Drop ( )
 void
 _Compile_Rsp_Get ( )
 {
-    _Compile_Stack_PushReg ( DSP, ESP ) ;
+    _Compile_Stack_PushReg ( DSP, RSP ) ;
 }
 
 // rsp@
@@ -42,9 +42,9 @@ _Compile_Rsp_Get ( )
 void
 _Compile_Rsp_Fetch ( )
 {
-    _Compile_Move_Reg_To_Reg ( EAX, ESP ) ;
-    _Compile_Move_Rm_To_Reg ( EAX, EAX, 0 * CELL ) ;
-    _Compile_Stack_PushReg ( DSP, EAX ) ;
+    _Compile_Move_Reg_To_Reg ( R8D, RSP ) ;
+    _Compile_Move_Rm_To_Reg ( R8D, R8D, 0 * CELL ) ;
+    _Compile_Stack_PushReg ( DSP, R8D ) ;
 }
 
 // r< - r from
@@ -123,7 +123,7 @@ Do_ObjectOffset ( Word * word, int64 reg )
     Compiler * compiler = _Context_->Compiler0 ;
     int64 offset = word->AccumulatedOffset ;
     if ( GetState ( _CfrTil_, IN_OPTIMIZER ) && ( offset == 0 ) ) return ;
-    Compile_ADDI ( REG, reg, 0, offset, CELL ) ;
+    Compile_ADDI ( REG, reg, 0, offset, 0 ) ;
     compiler->AccumulatedOffsetPointer = ( int64* ) ( Here - CELL ) ; // offset will be calculated as we go along by ClassFields and Array accesses
 }
 

@@ -195,7 +195,7 @@ CfrTil_SourceCode_Begin_C_Block ( )
 {
     SetState ( _CfrTil_, DEBUG_SOURCE_CODE_MODE, true ) ;
     _SC_Global_On ;
-    Word * word = _Context_->Compiler0->CurrentWord ;
+    Word * word = _Context_->Compiler0->CurrentWordCompiling ;
     CfrTil_SourceCode_SetDebugWordList ( word ) ;
 }
 
@@ -273,10 +273,11 @@ _CfrTil_AdjustSourceCodeAddress ( byte * address, byte * newAddress )
 void
 _CfrTil_WordLists_PushWord ( Word * word )
 {
-
     dobject * dobj = 0 ;
     //if ( _IsSourceCodeOn ) dobj = DebugWordList_PushWord ( word ) ;
     CompilerWordList_Push ( word, dobj ) ; // _dllist_Push_M_Slot_Node ( _Compiler_->WordList, WORD, COMPILER_TEMP, 2, ((int64) word), ((int64) dnode) )
+    d0 (Word * sqWord = _CfrTil_WordList_Top ( ) ) ;
+    d0 ( _Printf ((byte*) "\n_Compiler_CopyDuplicatesAndPush : %s", sqWord->Name ) ) ;
 }
 
 void
@@ -309,10 +310,20 @@ CfrTil_DebugWordList_Pop ( )
     }
 }
 
+Word *
+_CfrTil_WordList_Top ( )
+{
+    Word * word = 0 ;
+    node * first = _dllist_First ( _Compiler_->WordList ) ;
+    //return (Word *) first ; 
+    if ( first ) word = ( Word* ) dobject_Get_M_Slot ( first, CWLN_WORD ) ;
+    return word ;
+}
+
 void
 CfrTil_WordList_Pop ( )
 {
-    node * first = _dllist_First ( _Compiler_->WordList ) ;
+    node * first = (node*) _CfrTil_WordList_Top ( ) ;
     if ( first ) dlnode_Remove ( first ) ;
 }
 
@@ -325,7 +336,7 @@ CfrTil_WordList_Pop ( )
  * 
  */
 void
-_CfrTil_WordLists_PopWord ( int64 n )
+_CfrTil_WordLists_PopWords ( int64 n )
 {
     while ( n -- )
     {
@@ -337,7 +348,7 @@ _CfrTil_WordLists_PopWord ( int64 n )
 void
 CfrTil_WordLists_PopWord ( )
 {
-    _CfrTil_WordLists_PopWord ( 1 ) ;
+    _CfrTil_WordLists_PopWords ( 1 ) ;
 }
 
 void

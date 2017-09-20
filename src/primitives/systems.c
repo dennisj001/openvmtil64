@@ -93,8 +93,8 @@ _ShellEscape ( char * str )
     {
         extern char **environ ;
         pid_t pid ;
-        char *argv[] = { (char*) "bash", (char*) "-c", str, NULL } ;
-        d0( _Q_->Verbosity = 2 ) ;
+        char *argv[] = { ( char* ) "bash", ( char* ) "-c", str, NULL } ;
+        d0 ( _Q_->Verbosity = 2 ) ;
         if ( _Q_->Verbosity > 1 ) printf ( "\nposix_spawn :: command = %s\n", str ) ;
         //else printf ("\n") ;
         status = posix_spawn ( &pid, "/bin/bash", NULL, NULL, argv, environ ) ;
@@ -105,7 +105,7 @@ _ShellEscape ( char * str )
             //if ( wait ( &status ) != -1 ) //( waitpid ( pid, &status, 0 ) != - 1 )
             if ( waitpid ( pid, &status, 0 ) != - 1 )
             {
-                if ( _Q_->Verbosity > 1 ) printf ( "\nposix_spawn : child : pid = %d : %s :: exited with status %d\n", pid, (char*) String_ConvertToBackSlash ( (byte*) str ), status ) ;
+                if ( _Q_->Verbosity > 1 ) printf ( "\nposix_spawn : child : pid = %d : %s :: exited with status %d\n", pid, ( char* ) String_ConvertToBackSlash ( ( byte* ) str ), status ) ;
             }
             else
             {
@@ -119,14 +119,14 @@ _ShellEscape ( char * str )
 #endif        
     }
 #endif    
-    if ( _Q_->Verbosity > 1 ) printf ( (char*) c_dd ( "\n_ShellEscape : command = \"%s\" : returned %d.\n" ), str, status ) ;
+    if ( _Q_->Verbosity > 1 ) printf ( ( char* ) c_dd ( "\n_ShellEscape : command = \"%s\" : returned %d.\n" ), str, status ) ;
 }
 
 void
 ShellEscape_Postfix ( )
 {
     byte * str = ( byte* ) _DataStack_Pop ( ) ;
-    _ShellEscape ( (char*) str ) ;
+    _ShellEscape ( ( char* ) str ) ;
     NewLine ( _Context_->Lexer0 ) ;
     SetState ( _Context_->Lexer0, LEXER_DONE, true ) ;
 }
@@ -148,6 +148,7 @@ ShellEscape ( )
 #endif
 
 #if 1 // designed to be parallel to '$' in c_syntax.cft to compare the compiler output
+
 typedef struct
 {
     char buf [ 256 ] ;
@@ -156,29 +157,32 @@ typedef struct
 void
 shell ( )
 {
-    char * atoken, *  buffer ;
-    Buffer0 buffer0 ; 
+    char * atoken, * buffer ;
+    Buffer0 buffer0 ;
     buffer = buffer0.buf ;
-    memset ( buffer, 0, sizeof (Buffer0) ) ;
+    memset ( buffer, 0, sizeof (Buffer0 ) ) ;
     sprintf ( buffer, "%s", "" ) ;
-    while ( atoken = (char*) Lexer_ReadToken ( _Context_->Lexer0 ) )
+    SetState ( _Context_->Lexer0, END_OF_FILE | END_OF_STRING | LEXER_END_OF_LINE, false ) ;
+    do
     {
-        if ( strcmp ( atoken, ";" ) )
+        while ( ( atoken = ( char* ) Lexer_ReadToken ( _Context_->Lexer0 ) ) )
         {
-            strcat ( buffer, atoken ) ;
-            if ( strcmp ( atoken, "." ) )
+            if ( ! String_Equal ( atoken, ";" ) )
             {
-                strcat ( buffer, " " ) ;
+                strcat ( buffer, atoken ) ;
+                if ( strcmp ( atoken, "." ) )
+                {
+                    strcat ( buffer, " " ) ;
+                }
+                //if ( _Q_->Verbosity > 2 ) printf ( "\n\tbuffer = %s\n", buffer ) ; //pause () ;
             }
-            if ( _Q_->Verbosity > 2 ) printf ( "\n\tbuffer = %s\n", buffer ) ; //pause () ;
+            else break ; 
+            if ( GetState ( _Context_->Lexer0, END_OF_FILE | END_OF_STRING | LEXER_END_OF_LINE ) ) break ;
         }
-        else
-        {
-            if ( _Q_->Verbosity > 1 ) printf ( "\n\tbuffer = %s\n", buffer ) ; //pause () ;
-            _ShellEscape ( buffer ) ;
-            break ;
-        }
+        //if ( _Q_->Verbosity > 1 ) printf ( "\n\tbuffer = %s\n", buffer ) ; //pause () ;
+        _ShellEscape ( buffer ) ;
     }
+    while ( ! GetState ( _Context_->Lexer0, END_OF_FILE | END_OF_STRING | LEXER_END_OF_LINE ) ) ;
 }
 #endif
 
@@ -223,7 +227,6 @@ CfrTil_Version ( )
 {
     _CfrTil_Version ( 1 ) ;
 }
-
 
 void
 CfrTil_SystemState_Print ( )
@@ -296,9 +299,9 @@ CfrTil_Decimal ( ) // !
 void
 CfrTil_Dump ( )
 {
-    byte * location = Context_IsInFile ( _Context_ ) ? Context_Location ( ) : (byte*) "" ;
-    _Printf ( ( byte* ) "\nDump at : %s :" , location ) ; 
-    _CfrTil_Dump ( 8 ) ;
+    byte * location = Context_IsInFile ( _Context_ ) ? Context_Location ( ) : ( byte* ) "" ;
+    _Printf ( ( byte* ) "\nDump at : %s :", location ) ;
+    _CfrTil_Dump ( 16 ) ;
     //_Printf ( ( byte* ) "\n" ) ;
 }
 
@@ -378,7 +381,7 @@ void
 CfrTil_FullRestart ( )
 {
     _Q_->Signal = 0 ;
-     _OVT_Throw ( INITIAL_START ) ;
+    _OVT_Throw ( INITIAL_START, 0 ) ;
 }
 
 void
@@ -412,7 +415,7 @@ void foxWindow ( int64 argc, char **argv ) ;
 
 void
 CfrTil_Window ( )
-{   
+{
     int64 argc = 0 ;
     char ** argv = 0 ;
     foxWindow ( argc, argv ) ;

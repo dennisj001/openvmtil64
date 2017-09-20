@@ -81,7 +81,7 @@ _OVT_Pause ( byte * prompt, int64 signalsHandled )
                 byte * msg = ( byte * ) "Quit to interpreter loop from pause?" ;
                 _Printf ( ( byte* ) "\n%s : 'q' to (q)uit : any other key to continue%s", msg, c_dd ( "\n-> " ) ) ;
                 key = Key ( ) ;
-                if ( ( key == 'q' ) || ( key == 'Q' ) ) DefaultColors, _OVT_Throw ( QUIT ) ;
+                if ( ( key == 'q' ) || ( key == 'Q' ) ) DefaultColors, _OVT_Throw ( QUIT, 1 ) ;
             }
             else if ( key == 'd' )
             {
@@ -104,6 +104,7 @@ _OVT_Pause ( byte * prompt, int64 signalsHandled )
                 CfrTil_DoPrompt ( ) ;
                 ReadLine_Init ( _Context_->ReadLiner0, _CfrTil_Key ) ;
                 OpenVmTil_AddStringToHistoryOn ( ) ;
+                SetState ( _Context_, AT_COMMAND_LINE, true ) ;
                 _Interpret_ToEndOfLine ( _Interpreter_ ) ;
                 ReadLine_SetRawInputFunction ( _Context_->ReadLiner0, ReadLine_GetNextCharFromString ) ;
             }
@@ -114,9 +115,9 @@ _OVT_Pause ( byte * prompt, int64 signalsHandled )
                 OpenVmTil_AddStringToHistoryOn ( ) ;
                 SetState ( cntx, AT_COMMAND_LINE, true ) ;
                 Context_DoPrompt ( cntx ) ;
-                if ( key == '\\' ) key = 0 ;
-                else if ( key >= ' ' )
+                if ( key >= ' ' )
                 {
+                    if ( key == '\\' ) key = 0 ;
                     _ReadLine_GetLine ( cntx->ReadLiner0, key ) ;
                     _Interpret_ToEndOfLine ( _Interpreter_ ) ; // just one line in a new context
                 }
@@ -147,23 +148,32 @@ OpenVmTil_Pause ( )
 }
 
 void
-_OVT_Throw ( int64 restartCondition )
+_OVT_Throw ( int64 restartCondition, int8 pauseFlag )
 {
     sigjmp_buf * jb ;
     _Q_->RestartCondition = restartCondition ;
-    if ( ( restartCondition >= QUIT ) || ( ( _Q_->Signal == SIGSEGV ) ) )
+    if ( _Q_->Signal == SIGBUS )
     {
-        if ( _Q_->Signal == SIGSEGV )
+        jb = & _Q_->JmpBuf0 ;
+        _Q_->RestartCondition = INITIAL_START ;
+        siglongjmp ( *jb, 1 ) ;
+    }
+    if ( ( restartCondition > QUIT ) && ( ( _Q_->Signal & ( SIGSEGV | SIGBUS ) ) ) )
+    {
+        if ( _Q_->Signal & ( SIGSEGV | SIGBUS ) )
         {
             sigset_t signal_set ;
             sigemptyset ( &signal_set ) ;
-            sigaddset ( &signal_set, SIGSEGV ) ;
+            sigaddset ( &signal_set, ( SIGSEGV | SIGBUS ) ) ;
             sigprocmask ( SIG_UNBLOCK, &signal_set, NULL ) ;
             if ( ++ _Q_->SigSegvs < 2 )
             {
-                _OpenVmTil_ShowExceptionInfo ( ) ;
-                _Q_->RestartCondition = ABORT ;
                 jb = & _CfrTil_->JmpBuf0 ;
+                if ( _Q_->Signal != SIGBUS )
+                {
+                    _OpenVmTil_ShowExceptionInfo ( ) ;
+                    _Q_->RestartCondition = ABORT ;
+                }
             }
             else _Q_->RestartCondition = INITIAL_START ;
         }
@@ -178,7 +188,7 @@ _OVT_Throw ( int64 restartCondition )
     printf ( "\n%s %s -> ...\n", ( jb == & _CfrTil_->JmpBuf0 ) ? "reseting cfrTil" : "fully restarting", ( _Q_->Signal == SIGSEGV ) ? ": SIGSEGV" : "" ) ;
     fflush ( stdout ) ;
 
-    if ( _Q_->SignalExceptionsHandled < 3 ) _OVT_Pause ( 0, _Q_->SignalExceptionsHandled ) ;
+    if ( ( ! pauseFlag ) && ( _Q_->SignalExceptionsHandled < 3 ) ) _OVT_Pause ( 0, _Q_->SignalExceptionsHandled ) ;
     siglongjmp ( *jb, 1 ) ;
 }
 
@@ -189,7 +199,7 @@ OpenVmTil_Throw ( byte * excptMessage, int64 restartCondition, int64 infoFlag )
     _Q_->Thrown = restartCondition ;
 
     if ( infoFlag ) _OpenVmTil_ShowExceptionInfo ( ) ;
-    _OVT_Throw ( restartCondition ) ;
+    _OVT_Throw ( restartCondition, 0 ) ;
 }
 
 void
@@ -203,20 +213,20 @@ void
 OpenVmTil_SignalAction ( int signal, siginfo_t * si, void * uc )
 {
     d0 ( _Printf ( ( byte* ) "\nOpenVmTil_SignalAction :: signal = %d\n", signal ) ) ;
-    if ( signal >= SIGCHLD )
+    if ( ( signal >= SIGCHLD ) || ( signal == SIGTRAP ) ) //||( signal == SIGBUS ))
     {
         //_DisplaySignal ( _Q_->Signal ) ;
-        if ( ( signal != SIGCHLD ) && ( signal != SIGWINCH ) ) _OpenVmTil_ShowExceptionInfo ( ) ;
+        if ( ( signal != SIGCHLD ) && ( signal != SIGWINCH ) && ( signal != SIGTRAP ) ) _OpenVmTil_ShowExceptionInfo ( ) ;
         _Q_->SigAddress = 0 ; //|| ( signal == SIGWINCH ) ) _Q_->SigAddress = 0 ; // 17 : "CHILD TERMINATED" : ignore; its just back from a shell fork
     }
     else
     {
-
         _Q_->SignalExceptionsHandled ++ ;
         _Q_->Signal = signal ;
         _Q_->SigAddress = si->si_addr ;
-        _Q_->SigLocation = ( ( signal != SIGSEGV ) && _Context_ ) ? ( byte* ) c_dd ( Context_Location ( ) ) : ( byte* ) "" ;
-        _OVT_Throw ( _Q_->RestartCondition ) ;
+        _Q_->SigLocation = ( ( ! ( signal & ( SIGSEGV | SIGBUS ) ) ) && _Context_ ) ? ( byte* ) c_dd ( Context_Location ( ) ) : ( byte* ) "" ;
+        //_Printf ( (byte*) "\nOpenVmTil_SignalAction : address = %lx : %s", _Q_->SigAddress, _Q_->SigLocation ) ;
+        _OVT_Throw ( _Q_->RestartCondition, 0 ) ;
     }
 }
 

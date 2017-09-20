@@ -143,39 +143,39 @@ CfrTil_Dlsym ( )
 void
 CfrTil_system0 ( )
 {
-    _Compile_Stack_PopToReg ( DSP, EAX ) ;
+    _Compile_Stack_PopToReg ( DSP, R8D ) ;
     _Compile_INT80 ( ) ;
-    _Compile_Stack_PushReg ( DSP, EAX ) ;
+    _Compile_Stack_PushReg ( DSP, R8D ) ;
 }
 
 void
 CfrTil_system1 ( )
 {
-    _Compile_Stack_PopToReg ( DSP, EAX ) ;
-    _Compile_Stack_PopToReg ( DSP, EBX ) ;
+    _Compile_Stack_PopToReg ( DSP, R8D ) ;
+    _Compile_Stack_PopToReg ( DSP, R11D ) ;
     _Compile_INT80 ( ) ;
-    _Compile_Stack_PushReg ( DSP, EAX ) ;
+    _Compile_Stack_PushReg ( DSP, R8D ) ;
 }
 
 void
 CfrTil_system2 ( )
 {
-    _Compile_Stack_PopToReg ( DSP, EAX ) ;
-    _Compile_Stack_PopToReg ( DSP, EBX ) ;
-    _Compile_Stack_PopToReg ( DSP, ECX ) ;
+    _Compile_Stack_PopToReg ( DSP, R8D ) ;
+    _Compile_Stack_PopToReg ( DSP, R11D ) ;
+    _Compile_Stack_PopToReg ( DSP, R9D ) ;
     _Compile_INT80 ( ) ;
-    _Compile_Stack_PushReg ( DSP, EAX ) ;
+    _Compile_Stack_PushReg ( DSP, R8D ) ;
 }
 
 void
 CfrTil_system3 ( )
 {
-    _Compile_Stack_PopToReg ( DSP, EAX ) ;
-    _Compile_Stack_PopToReg ( DSP, EBX ) ;
-    _Compile_Stack_PopToReg ( DSP, ECX ) ;
-    _Compile_Stack_PopToReg ( DSP, EDX ) ;
+    _Compile_Stack_PopToReg ( DSP, R8D ) ;
+    _Compile_Stack_PopToReg ( DSP, R11D ) ;
+    _Compile_Stack_PopToReg ( DSP, R9D ) ;
+    _Compile_Stack_PopToReg ( DSP, R10D ) ;
     _Compile_INT80 ( ) ;
-    _Compile_Stack_PushReg ( DSP, EAX ) ;
+    _Compile_Stack_PushReg ( DSP, R8D ) ;
 }
 
 #if 0
@@ -278,7 +278,8 @@ _CfrTil_GetSystemState_String1 ( byte *buf )
     if ( GetState ( _CfrTil_, DEBUG_MODE ) ) strcat ( ( char* ) buf, "on. " ) ;
     else strcat ( ( char* ) buf, "off. " ) ;
     sprintf ( ( char* ) &buf[Strlen ( ( char* ) buf )], "Verbosity = %ld. ", _Q_->Verbosity ) ;
-    sprintf ( ( char* ) &buf[Strlen ( ( char* ) buf )], "Console = %ld.", _Q_->Console ) ;
+    sprintf ( ( char* ) &buf[Strlen ( ( char* ) buf )], "Console = %ld, ", _Q_->Console ) ;
+    sprintf ( ( char* ) &buf[Strlen ( ( char* ) buf )], "NumberBase = %ld.", _Context_->System0->NumberBase ) ;
     return buf ;
 }
 
@@ -296,23 +297,23 @@ _CfrTil_SystemState_Print ( int64 pflag )
 }
 
 void
-__CfrTil_Dump ( int64 address, int64 number, int64 dumpMod )
+__CfrTil_Dump ( byte * address, int64 number, int64 dumpMod )
 {
     if ( address && number )
     {
         byte * nformat ;
         int64 i, n ;
-        if ( _Context_->System0->NumberBase == 16 ) nformat = ( byte* ) "\nDump : Address = " UINT_FRMT_0x08 " : Number = " UINT_FRMT " : (little endian)" ;
-        else nformat = ( byte* ) "\nDump : Address = " UINT_FRMT_0x08 " : Number = " INT_FRMT " - (little endian)" ;
+        if ( _Context_->System0->NumberBase == 16 ) nformat = ( byte* ) "\nDump : Address = " UINT_FRMT " : Number = " UINT_FRMT " : (little endian)" ;
+        else nformat = ( byte* ) "\nDump : Address = " UINT_FRMT " : Number = " INT_FRMT " - (little endian)" ;
         _Printf ( nformat, ( int64 ) address, number ) ;
         for ( i = 0 ; i < number ; )
         {
-            _Printf ( ( byte* ) "\n" UINT_FRMT_0x08 " : ", address + i ) ;
+            _Printf ( ( byte* ) "\n" UINT_FRMT " : ", address + i ) ;
             if ( ! ( i % dumpMod ) )
             {
                 for ( n = 0 ; n < dumpMod ; n += CELL_SIZE )
                 {
-                    _Printf ( ( byte* ) UINT_FRMT_08 " ", *( int64* ) ( address + i + n ) ) ;
+                    _Printf ( ( byte* ) UINT_FRMT " ", *( int64* ) ( address + i + n ) ) ;
                 }
                 _Printf ( ( byte* ) " " ) ;
                 for ( n = 0 ; n < dumpMod ; n += CELL_SIZE )
@@ -419,7 +420,7 @@ void
 _CfrTil_Dump ( int64 dumpMod )
 {
     int64 number = _DataStack_Pop ( ) ;
-    int64 address = _DataStack_Pop ( ) ;
+    byte * address = (byte*) _DataStack_Pop ( ) ;
     __CfrTil_Dump ( address, number, dumpMod ) ;
 }
 

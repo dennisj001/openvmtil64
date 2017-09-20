@@ -277,7 +277,7 @@ _LO_Define ( byte * sname, ListObject * idNode, ListObject * locals )
     Word * word = idNode->Lo_CfrTilWord ;
     word->Definition = 0 ; // reset the definition from LO_Read
     value0 = _LO_Next ( idNode ) ;
-    compiler->CurrentWord = word ;
+    compiler->CurrentWordCompiling = word ;
     word->Lo_CfrTilWord = word ;
     SetState ( _Q_->OVT_LC, ( LC_DEFINE_MODE ), true ) ;
     word->W_SourceCode = String_New ( _CfrTil_->SC_ScratchPad, STRING_MEM ) ;
@@ -368,7 +368,7 @@ _LO_MakeLambda ( ListObject * l0 )
 {
     ListObject *args, *body, *word, *lnew, *body0 ;
     // allow args to be optionally an actual parenthesized list or just vars after the lambda
-    if ( GetState ( _Q_->OVT_LC, LC_DEFINE_MODE ) ) word = _Context_->Compiler0->CurrentWord ;
+    if ( GetState ( _Q_->OVT_LC, LC_DEFINE_MODE ) ) word = _Context_->Compiler0->CurrentWordCompiling ;
         //else word = _Word_New ( ( byte* ) "lambda", WORD_CREATE, 0, DICTIONARY ) ;
     else word = _Word_New ( ( byte* ) "lambda", WORD_CREATE, 0, DICTIONARY ) ;
     args = l0 ;
@@ -1049,7 +1049,7 @@ _LO_Apply_Arg ( ListObject ** pl1, int64 applyRtoL, int64 i )
         if ( CompileMode && ( ! ( l1->CProperty & ( NAMESPACE_TYPE | OBJECT_FIELD | T_NIL ) ) ) ) // research : how does CProperty get set to T_NIL?
         {
             if ( word->StackPushRegisterCode ) SetHere ( word->StackPushRegisterCode ) ;
-            _Compile_PushReg ( EAX ) ;
+            _Compile_PushReg ( R8D ) ;
             i ++ ;
         }
     }
@@ -1095,12 +1095,12 @@ _LO_Apply_Arg ( ListObject ** pl1, int64 applyRtoL, int64 i )
                 if ( ! variableFlag )
                 {
                     SetHere ( svBaseObject->Coding ) ;
-                    _Compile_GetVarLitObj_LValue_To_Reg ( svBaseObject, EAX ) ;
-                    _Word_CompileAndRecord_PushReg ( svBaseObject, EAX ) ;
+                    _Compile_GetVarLitObj_LValue_To_Reg ( svBaseObject, R8D ) ;
+                    _Word_CompileAndRecord_PushReg ( svBaseObject, R8D ) ;
                 }
                 if ( Is_DebugModeOn ) Word_PrintOffset ( word, increment, svBaseObject->AccumulatedOffset ) ;
                 if ( svBaseObject->StackPushRegisterCode ) SetHere ( svBaseObject->StackPushRegisterCode ) ;
-                _Compile_PushReg ( EAX ) ;
+                _Compile_PushReg ( R8D ) ;
             }
             interp->BaseObject = 0 ;
             SetState ( compiler, COMPILE_MODE, saveCompileMode ) ;
@@ -1158,8 +1158,8 @@ _LO_Apply_ArgList ( ListObject * l0, Word * word, int64 applyRtoL )
         word = Compiler_CopyDuplicatesAndPush ( word ) ;
         DEBUG_SETUP ( word ) ;
         cntx->CurrentlyRunningWord = word ;
-        Compile_Call_With32BitDisp ( ( byte* ) word->Definition ) ;
-        if ( i > 0 ) Compile_ADDI ( REG, ESP, 0, i * sizeof (int64 ), 0 ) ;
+        Compile_Call ( ( byte* ) word->Definition ) ;
+        if ( i > 0 ) Compile_ADDI ( REG, RSP, 0, i * sizeof (int64 ), 0 ) ;
         if ( ! svcm )
         {
             DEBUG_SHOW ;
@@ -1179,7 +1179,7 @@ _LO_Apply_ArgList ( ListObject * l0, Word * word, int64 applyRtoL )
         }
         else if ( word->CProperty & C_RETURN )
         {
-            _Word_CompileAndRecord_PushReg ( word, EAX ) ;
+            _Word_CompileAndRecord_PushReg ( word, R8D ) ;
         }
     }
     else
@@ -1362,7 +1362,7 @@ CompileLispBlock ( ListObject *args, ListObject * body )
     Compiler *compiler = _Context_->Compiler0 ;
     block code ;
     byte * here = Here ;
-    Word * word = compiler->CurrentWord ;
+    Word * word = compiler->CurrentWordCompiling ;
     LO_BeginBlock ( ) ; // must have a block before local variables if there are register variables because _CfrTil_Parse_LocalsAndStackVariables will compile something
     Namespace * locals = _CfrTil_Parse_LocalsAndStackVariables ( 1, 1, args, 0, 0 ) ;
     word->CProperty = BLOCK ;

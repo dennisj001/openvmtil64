@@ -33,7 +33,7 @@
 #define _Compile_Move_Reg_To_LocalN( n, reg ) _Compile_Move_Reg_To_StackN ( FP, n, reg )
 #define Compile_LocalStack_Drop( )   _Compile_Stack_Drop ( FP )
 #define Compile_LocalStack_Push( obj ) _Compile_Stack_Push ( FP, obj )
-#define Compile_Move_LocalStackTop_To_EAX( ) _Compile_Move_LocalN_To_Reg ( EAX, 0 )
+#define Compile_Move_LocalStackTop_To_R8( ) _Compile_Move_LocalN_To_Reg ( R8D, 0 )
 
 
 

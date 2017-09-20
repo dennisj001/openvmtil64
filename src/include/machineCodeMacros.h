@@ -83,12 +83,12 @@
 
 #define _Compile_TestImm_0xffffffff( mod, reg, rm, sib, disp ) _Compile_Test ( mod, reg, rm, disp, 0xffffffff )
 #if 0
-#define _Compile_TestImm_0xffffffff_EAX( ) _CompileTest ( REG, 0, EAX, 0, 0xffffffff )
-#define _Compile_TestImm_0_EAX( ) _CompileTest ( REG, 0, EAX, 0, 0 )
+#define _Compile_TestImm_0xffffffff_R8( ) _CompileTest ( REG, 0, R8, 0, 0xffffffff )
+#define _Compile_TestImm_0_R8( ) _CompileTest ( REG, 0, R8, 0, 0 )
 #define _Compile_TestImm_0_Reg( rmReg ) _CompileTest ( REG, 0, rmReg, 0, 0 )
 #define _Compile_TestImm_0_Rm( rm, sib, disp ) _Compile_Test ( MEM, 0, rm, disp, 0 )
 #endif
 #define  PUSH_IMM    0x68      
-#define _Compile_PushEspImm( data ) _Compile_InstructionX86 ( PUSH_IMM, 0, 0, 0, 0, 0, 0, ( int64 ) data, CELL )
+#define _Compile_PushEspImm( data ) _Compile_InstructionX86 (PUSH_IMM, 0, 0, 0, 0, 0, 0, CELL , ( int64 ) data, 0)
 
 

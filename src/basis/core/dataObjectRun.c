@@ -123,7 +123,7 @@ _CfrTil_Do_ClassField ( Word * word )
   Compiler * compiler = cntx->Compiler0 ;
   cntx->Interpreter0->CurrentObjectNamespace = word ; // update this namespace 
   compiler->ArrayEnds = 0 ;
-  uint64 accumulatedAddress ;
+  byte * accumulatedAddress ;
 
   if ( ( CompileMode ) || GetState ( compiler, LC_ARG_PARSING ) )
   {
@@ -135,15 +135,17 @@ _CfrTil_Do_ClassField ( Word * word )
   }
   else
   {
-      accumulatedAddress = _DataStack_Pop ( ) ;
+      accumulatedAddress = TOS ;//_DataStack_Pop ( ) ;
       accumulatedAddress += word->Offset ;
+      //TOS += word->Offset ;
       if ( GetState ( cntx, C_SYNTAX ) && ( !Is_LValue ( word ) ) && ( !GetState ( _Context_, ADDRESS_OF_MODE ) ) )
       {
-          DSP_Push ( * (int64*) accumulatedAddress ) ;
+          DSP_Push ( * (int64*) accumulatedAddress ) ; // C rvalue
       }
       else
       {
-          DSP_Push ( accumulatedAddress ) ;
+          //DSP_Push ( accumulatedAddress ) ;
+          TOS = accumulatedAddress ;
           //SetState ( _Context_, ADDRESS_OF_MODE, false ) ;
       }
   }
@@ -196,8 +198,8 @@ _Do_Literal ( int64 value )
 {
   if ( CompileMode )
   {
-      _Compile_MoveImm_To_Reg ( EAX, value, CELL ) ;
-      _Compiler_CompileAndRecord_PushEAX ( _Context_->Compiler0 ) ; // does word == top of word stack always
+      _Compile_MoveImm_To_Reg ( R8D, value, CELL ) ;
+      _Compiler_CompileAndRecord_PushR8 ( _Context_->Compiler0 ) ; // does word == top of word stack always
   }
   else DSP_Push ( value ) ;
 }
@@ -264,7 +266,7 @@ _Do_Variable ( Word * word )
       if ( Is_LValue ( word ) ) //_Context_->CurrentRunWord ) ) // word ) ) // ?? not sure exactly why this is necessary 
       {
           //word = _Context_->CurrentRunWord ;
-          //if ( GetState ( cntx->Compiler0, DOING_C_TYPE ) ) _Compile_VarLitObj_LValue_To_Reg ( word, EAX ) ;
+          //if ( GetState ( cntx->Compiler0, DOING_C_TYPE ) ) _Compile_VarLitObj_LValue_To_Reg ( word, R8 ) ;
           cntx->Compiler0->LHS_Word = word ;
           word->Coding = Here ;
       }
@@ -272,17 +274,17 @@ _Do_Variable ( Word * word )
       {
           if ( GetState ( _Context_, ADDRESS_OF_MODE ) )
           {
-              _Compile_GetVarLitObj_LValue_To_Reg ( word, EAX ) ;
+              _Compile_GetVarLitObj_LValue_To_Reg ( word, R8D ) ;
               //SetState ( _Context_, ADDRESS_OF_MODE, false ) ; // only good for one variable
           }
-          else _Compile_GetVarLitObj_RValue_To_Reg ( word, EAX ) ;
-          _Word_CompileAndRecord_PushReg ( word, EAX ) ;
+          else _Compile_GetVarLitObj_RValue_To_Reg ( word, R8D ) ;
+          _Word_CompileAndRecord_PushReg ( word, R8D ) ;
       }
   }
   else
   {
-      _Compile_GetVarLitObj_LValue_To_Reg ( word, EAX ) ;
-      _Word_CompileAndRecord_PushReg ( word, EAX ) ;
+      _Compile_GetVarLitObj_LValue_To_Reg ( word, R8D ) ;
+      _Word_CompileAndRecord_PushReg ( word, R8D ) ;
   }
 }
 
@@ -293,13 +295,13 @@ _CfrTil_Do_Literal ( Word * word )
   {
       if ( GetState ( _Context_, C_SYNTAX ) || GetState ( _Compiler_, LC_ARG_PARSING ) ) // for now until we have time to integrate this optimization
       {
-          _Compile_GetVarLitObj_RValue_To_Reg ( word, EAX ) ;
-          _Word_CompileAndRecord_PushReg ( word, EAX ) ;
+          _Compile_GetVarLitObj_RValue_To_Reg ( word, R8D ) ;
+          _Word_CompileAndRecord_PushReg ( word, R8D ) ;
       }
       else
       {
-          Compile_ADDI ( REG, DSP, 0, sizeof (int64 ), BYTE ) ;
-          _Compile_MoveImm_To_Mem ( DSP, ( int64 ) * word->W_PtrToValue, CELL ) ;
+          Compile_ADDI ( REG, DSP, 0, sizeof (int64 ), 0 ) ;
+          _Compile_MoveImm_To_Mem ( DSP, ( int64 ) * word->W_PtrToValue, CELL ) ; // 0 ) ; // remember this works - 0 ) ;
       }
 
   }
@@ -315,8 +317,8 @@ void
 _CfrTil_Do_LispSymbol ( Word * word )
 {
   // rvalue - rhs for stack var
-  _Compile_Move_StackN_To_Reg ( EAX, FP, ParameterVarOffset ( word ) ) ;
-  _Word_CompileAndRecord_PushReg ( word, EAX ) ;
+  _Compile_Move_StackN_To_Reg ( R8D, FP, ParameterVarOffset ( word ) ) ;
+  _Word_CompileAndRecord_PushReg ( word, R8D ) ;
 }
 
 void
@@ -367,7 +369,7 @@ _CfrTil_Do_Variable ( Word * word )
               }
               else DSP_Push ( word->W_PtrToValue + word->AccumulatedOffset ) ;
           }
-          else DSP_Push ( *word->W_PtrToValue ) ;
+          else DSP_Push ( word->W_Value ) ; //*word->W_PtrToValue ) ;
       }
       else if ( word->CProperty & NAMESPACE_VARIABLE )
       {
@@ -406,14 +408,14 @@ _DataObject_Run ( Word * word )
       if ( ( word->CProperty & LOCAL_VARIABLE ) && ( !GetState ( word, W_INITIALIZED ) ) ) // this is a local variable so it is initialed at creation 
       {
           int64 size = _Namespace_VariableValueGet ( word->TypeNamespace, (byte*) "size" ) ;
-          _Compile_MoveImm_To_Reg ( EAX, (int64) size, CELL ) ;
-          _Compile_PushReg ( EAX ) ;
-          _Compile_LEA ( EAX, FP, 0, LocalVarIndex_Disp ( LocalVarOffset ( word ) ) ) ; // 2 : account for saved fp and return slot
-          _Compile_PushReg ( EAX ) ;
-          _Compile_MoveImm_To_Reg ( EAX, (int64) word->TypeNamespace, CELL ) ;
-          _Compile_PushReg ( EAX ) ;
-          Compile_Call_With32BitDisp ( (byte*) _Do_LocalObject_AllocateInit ) ; // we want to only allocate this object once and only at run time; and not at compile time
-          Compile_ADDI ( REG, ESP, 0, 3 * sizeof (int64 ), 0 ) ;
+          _Compile_MoveImm_To_Reg ( R8D, (int64) size, CELL ) ;
+          _Compile_PushReg ( R8D ) ;
+          _Compile_LEA ( R8D, FP, 0, LocalVarIndex_Disp ( LocalVarOffset ( word ) ) ) ; // 2 : account for saved fp and return slot
+          _Compile_PushReg ( R8D ) ;
+          _Compile_MoveImm_To_Reg ( R8D, (int64) word->TypeNamespace, CELL ) ;
+          _Compile_PushReg ( R8D ) ;
+          Compile_Call ( (byte*) _Do_LocalObject_AllocateInit ) ; // we want to only allocate this object once and only at run time; and not at compile time
+          Compile_ADDI ( REG, RSP, 0, 3 * sizeof (int64 ), 0 ) ;
           SetState ( word, W_INITIALIZED, true ) ;
       }
       _CfrTil_Do_Variable ( word ) ;

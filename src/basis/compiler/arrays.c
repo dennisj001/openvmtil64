@@ -18,7 +18,7 @@ _CheckArrayDimensionForVariables_And_UpdateCompilerState ( )
  * This is pretty compilicated so comments are necessary ...
  * What must be dealt with in ArrayBegin :
  * CompileMode or not; Variables in array dimensions or not => 4 combinations
- *      - each dimension produces an offset which is added to any previous AccumulatedOffset (in EAX) which is finally added to the object reference pointer
+ *      - each dimension produces an offset which is added to any previous AccumulatedOffset (in R8) which is finally added to the object reference pointer
  * so ...
  *  varaibleFlag = _CheckArrayDimensionForVariables_And_UpdateCompilerState ( )
  * so ... 
@@ -57,17 +57,17 @@ Compile_ArrayDimensionOffset ( Word * word, int64 dimSize, int64 objSize )
         {
             SetHere ( word->StackPushRegisterCode ) ;
             //_Compile_IMULI ( int64 mod, int64 reg, int64 rm, int64 sib, int64 disp, int64 imm, int64 size )
-            _Compile_IMULI ( REG, EAX, EAX, 0, 0, dimSize * objSize, 0 ) ;
+            _Compile_IMULI ( REG, R8D, R8D, 0, 0, dimSize * objSize, 0 ) ;
             //Compile_ADD( toRegOrMem, mod, reg, rm, sib, disp, isize ) 
-            Compile_ADD ( MEM, MEM, EAX, DSP, 0, 0, CELL ) ;
+            Compile_ADD ( MEM, MEM, R8D, DSP, 0, 0, CELL ) ;
         }
         else
         {
             //_Compile_IMULI ( int64 mod, int64 reg, int64 rm, int64 sib, int64 disp, int64 imm, int64 size )
-            _Compile_IMULI ( MEM, EAX, DSP, 0, 0, dimSize * objSize, 0 ) ;
+            _Compile_IMULI ( MEM, R8D, DSP, 0, 0, dimSize * objSize, 0 ) ;
             _Compile_Stack_DropN ( DSP, 1 ) ; // drop the array index
             //Compile_ADD( toRegOrMem, mod, reg, rm, sib, disp, isize ) 
-            Compile_ADD ( MEM, MEM, EAX, DSP, 0, 0, CELL ) ;
+            Compile_ADD ( MEM, MEM, R8D, DSP, 0, 0, CELL ) ;
         }
     }
     else SetHere ( word->Coding ) ; // is 0 don't compile anything for that word
@@ -181,8 +181,8 @@ CfrTil_ArrayBegin ( void )
                 SetHere ( baseObject->Coding ) ;
                 _Debugger_->StartHere = Here ; // for Debugger_DisassembleAccumulated
                 _Debugger_->EntryWord = baseObject ; // for Debugger_DisassembleAccumulated
-                _Compile_GetVarLitObj_LValue_To_Reg ( baseObject, EAX ) ;
-                _Word_CompileAndRecord_PushReg ( baseObject, EAX ) ;
+                _Compile_GetVarLitObj_LValue_To_Reg ( baseObject, R8D ) ;
+                _Word_CompileAndRecord_PushReg ( baseObject, R8D ) ;
             }
             else SetState ( baseObject, OPTIMIZE_OFF, true ) ;
         }

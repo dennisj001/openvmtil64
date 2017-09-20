@@ -1,6 +1,16 @@
 
 #include "../../include/cfrtil.h"
 
+Word *
+Compiler_CopyDuplicatesAndPush ( Word * word )
+{
+    if ( word && CompileMode && ( ! ( word->CProperty & ( DEBUG_WORD ) ) ) )
+    {
+        word = _Compiler_CopyDuplicatesAndPush ( _Context_->Compiler0, word ) ;
+    }
+    return word ;
+}
+
 void
 Compiler_IncrementCurrentAccumulatedOffset ( Compiler * compiler, int64 increment )
 {
@@ -181,7 +191,7 @@ Compiler_Init ( Compiler * compiler, uint64 state )
     //Compiler_SetCompilingSpace ( ( byte* ) "CodeSpace" ) ;
     //Compiler_SetCompilingSpace_MakeSureOfRoom ( ( byte* ) "CodeSpace" ) ; // 2 * K : should be enough at least for now ??
     //OVT_MemListFree_TempObjects ( ) ;
-    //compiler->RegOrder [4] = { EBX, EDX, ECX, EAX } ;
+    //compiler->RegOrder [4] = { EBX, EDX, ECX, R8 } ;
     SetBuffersUnused ( 1 ) ;
     SetState ( compiler, VARIABLE_FRAME, false ) ;
 }
@@ -201,10 +211,10 @@ Compiler_New ( uint64 type )
     compiler->CombinatorInfoStack = Stack_New ( 64, type ) ;
     compiler->InfixOperatorStack = Stack_New ( 32, type ) ;
     CompileOptInfo_New ( compiler, type ) ;
-    compiler->RegOrder [ 0 ] = EBX ;
-    compiler->RegOrder [ 1 ] = EDX ;
-    compiler->RegOrder [ 2 ] = ECX ;
-    compiler->RegOrder [ 3 ] = EAX ;
+    compiler->RegOrder [ 0 ] = R11D ;
+    compiler->RegOrder [ 1 ] = R10D ;
+    compiler->RegOrder [ 2 ] = R9D ;
+    compiler->RegOrder [ 3 ] = R8D ;
     Compiler_Init ( compiler, 0 ) ;
     return compiler ;
 }
@@ -232,14 +242,14 @@ _Stack_PointerToJmpOffset_Set ( byte * address )
 void
 Stack_PointerToJmpOffset_Set ( )
 {
-    _Stack_PointerToJmpOffset_Set ( Here - CELL_SIZE ) ;
+    _Stack_PointerToJmpOffset_Set ( Here - DISP_SIZE ) ;
 }
 
 void
-_Compiler_CompileAndRecord_PushEAX ( Compiler * compiler )
+_Compiler_CompileAndRecord_PushR8 ( Compiler * compiler )
 {
-    //_Word_CompileAndRecord_PushEAX ( Compiler_WordStack ( 0 ) ) ;
-    _Word_CompileAndRecord_PushReg ( Compiler_WordList ( 0 ), EAX ) ;
+    //_Word_CompileAndRecord_PushR8 ( Compiler_WordStack ( 0 ) ) ;
+    _Word_CompileAndRecord_PushReg ( Compiler_WordList ( 0 ), R8D ) ;
 }
 
 
