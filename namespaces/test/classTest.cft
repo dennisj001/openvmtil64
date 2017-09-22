@@ -13,7 +13,7 @@ sp
 Class // "class" works like "namespace" so here we switch back to namespace 'Class' else following words would be in class 'Pointer'
 "Integer" namespace // Integer.size 4 = doesn't work because a namespace doesn't have 'size' and 'this' variables automatically created
 "int16" class int16 size 2 = // 'size' must be declared else it remains 0; ( see above note )
-Integer "int32" class int32.size 4 = // 'size' must be declared else it remains 0; ( see above note )
+Integer "int64" class int64.size 4 = // 'size' must be declared else it remains 0; ( see above note )
 Integer "int64" class int64 size 8 = // 'size' must be declared else it remains 0; ( see above note )
 decimal
 Integer
@@ -49,7 +49,7 @@ DLLNode.size @ nl "DLLNode size = " prints Io.print nl
 "testNode" DLLNode new 
 testNode.AfterReference 1 =
 testNode.BeforeReference 2 =
-testNode.size @ dump
+testNode.size @ dup p dump
 DLLNode
 
 "DLList" class
@@ -58,44 +58,45 @@ DLLNode
     DLLNode TailNode ;
 };
 
-: init ( )
-    d: this.HeadNode.AfterReference this.TailNode.BeforeReference =
+: init ( this )
+    this.HeadNode.AfterReference this.TailNode.BeforeReference =
     this.TailNode.BeforeReference this.HeadNode.AfterReference =
     this.HeadNode.BeforeReference 1 =
     this.TailNode.AfterReference  2 =
 ;
-' init find wdiss
+' init find wdiss //pause
 sp
-"testList" DLList d: new 
-testList DLList.size @ dump 
+"testList" DLList new 
+testList DLList.size @ dup p dump //pause
 
-//dbgOn 
-#if 0 //dbgOnVar @
-d: this.HeadNode.AfterReference @ this.TailNode.BeforeReference  "class init test : " assert : hi 1 2 3 4 5 + + + + p ; : hey hi hi hi hi hi ; hey // debugger test
+dbgOff 
+#if dbgOnVar @
+d: testList.HeadNode.AfterReference @ testList.TailNode.BeforeReference  "class init test : "  assert  : hi 1 2 3 4 5 + + + + p ; : hey hi hi hi hi hi ; hey : hi 1 2 3 4 5 + + + + p ; : hey hi hi hi hi hi ; hey // debugger test
 #else
-this.HeadNode.AfterReference @ this.TailNode.BeforeReference  "class init test : " assert 
+testList.HeadNode.AfterReference @ testList.TailNode.BeforeReference  "class init test : " assert 
 #endif
 
 DLList
 using
 "DLListClone" clone // clones DLList class
 +:{ // adds to the DLList class structure
-    int32 Category ;
+    int64 Category ;
     Pointer Prototype ;
-    int32 Sum ;
-    int32 Twelve ;
-    int32 Three ;
-    int32 Four ;
-    int32 Accum ;
+    int64 Sum ;
+    int64 Twelve ;
+    int64 Three ;
+    int64 Four ;
+    int64 Accum ;
 }; // add seven elements
 
-dbgOff
+dbgOn
 #if dbgOnVar @
 dscOn
 #endif
+verbosity 3 =
 
 : init ( this ) 
-#if dbgOnVar @
+#if 0 //dbgOnVar @
     <dbg> this.Category 12 =
 #else
     this.Category 12 =
@@ -108,7 +109,7 @@ dscOn
     this.Four 4 = 
     this.Twelve 12 =
     this.Accum this.Sum @ = 
-    this.Sum this.Category @ this.Prototype @ && dup p = 
+    this.Sum this.Category @ this.Prototype @ <dbg> && dup p = 
     this.Accum this.Three @ this.Four @ * this.Three @ / = 
     this.Accum @ 4 "\n DLListClone init : object test1 :" assert //<dbg> assert 
     this.Prototype @ p //pause
@@ -125,7 +126,7 @@ dscOn
 #endif
     this.Sum this.Category @ this.Prototype @ * dup p = // 36
     this.Sum this.Category @ this.Prototype @ - dup p = // 9
-    this.Sum this.Category @ this.Prototype @ && dup p = // 12 && 3 = 1
+    this.Sum this.Category @ this.Prototype @ <dbg> && dup p = // 12 && 3 = 1
     this.Sum this.Category @ this.Prototype @ & dup p = // 12 & 3 = 0
     this.Accum this.Prototype @ =
     this.Sum this.Category @ this.Prototype @ || dup p =
@@ -149,7 +150,7 @@ dscOn
 
 scOff
 ' init find wdiss 
-"testClone" DLListClone new 
+"testClone" DLListClone d: new 
 "\nthis = " ps this hex p 
 "\nthis = " ps this @ hex p //pause
 

@@ -332,6 +332,7 @@ void
 _CfrTil_DebugSourceCodeCompileOn ( )
 {
     SetState ( _CfrTil_, DEBUG_SOURCE_CODE_MODE, true ) ;
+    SetState ( _CfrTil_, GLOBAL_SOURCE_CODE_MODE, true ) ;
 }
 
 void
@@ -540,8 +541,8 @@ CfrTil_Compile_SaveIncomingCpuState ( CfrTil * cfrtil )
     // save the incoming current C cpu state
 
     Compile_Call ( ( byte* ) cfrtil->SaveCpuState ) ; // save incoming current C cpu state
-    _Compile_MoveReg_To_Mem ( RBP, ( byte * ) & cfrtil->cs_CpuState->Ebp, R11D, CELL ) ; // EBX : scratch reg
-    _Compile_MoveReg_To_Mem ( RSP, ( byte * ) & cfrtil->cs_CpuState->Esp, R11D, CELL ) ;
+    _Compile_MoveReg_ToMem ( RBP, ( byte * ) & cfrtil->cs_CpuState->Ebp, R11D, CELL ) ; // EBX : scratch reg
+    _Compile_MoveReg_ToMem ( RSP, ( byte * ) & cfrtil->cs_CpuState->Esp, R11D, CELL ) ;
 
 }
 

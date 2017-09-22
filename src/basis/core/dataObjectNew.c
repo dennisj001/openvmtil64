@@ -107,15 +107,75 @@ _CfrTil_NamelessObjectNew ( int64 size, int64 allocType )
     return obj ;
 }
 
-byte *
-CfrTil_NamelessObjectNew ( int64 size )
+Word *
+_CfrTil_ObjectNew ( int64 size, byte * name, uint64 category, int64 allocType )
 {
-    return _CfrTil_NamelessObjectNew ( size, OBJECT_MEMORY ) ;
+    byte * obj = _CfrTil_NamelessObjectNew ( size, allocType ) ; //OBJECT_MEMORY ) ;
+    Word * word = _DObject_New ( name, ( int64 ) obj, ( OBJECT | IMMEDIATE | category ), 0, OBJECT, ( byte* ) _DataObject_Run, 0, 0, 0, DICTIONARY ) ;
+    word->Size = size ;
+    return word ;
 }
 
 void
-_Class_Object_Init ( byte * obj, Namespace * ns )
+_Class_Object_Init ( Word * word, Namespace * ns )
 {
+    DebugShow_Off ;
+    Stack * nsstack = _Context_->Compiler0->NamespacesStack ;
+    Stack_Init ( nsstack ) ; // !! ?? put this in Compiler ?? !!
+    // init needs to be done by the most super class first successively down to the current class 
+    do
+    {
+        Word * initWord ;
+        if ( ( initWord = Finder_FindWord_InOneNamespace ( _Finder_, ns, ( byte* ) "init" ) ) )
+        {
+            _Stack_Push ( nsstack, ( int64 ) initWord ) ;
+        }
+        ns = ns->ContainingNamespace ;
+    }
+    while ( ns ) ;
+    int64 i ;
+    uint64 * svDsp = Dsp ;
+    SetState ( _Debugger_, DEBUG_SHTL_OFF, true ) ;
+    for ( i = Stack_Depth ( nsstack ) ; i > 0 ; i -- )
+    {
+        Word * initWord = ( Word* ) _Stack_Pop ( nsstack ) ;
+        //Dsp = svDsp ;
+        DSP_Push ( ( int64 ) word->W_Object ) ;
+        //CfrTil_SyncStackPointersFromDsp ( ) ;
+        d1 ( CfrTil_PrintDataStack ( ) ) ;
+        svDsp = Dsp ;
+        _Word_Eval ( initWord ) ;
+        d1 ( CfrTil_PrintDataStack ( ) ) ;
+    }
+    //CfrTil_SyncStackPointersFromDsp ( ) ;
+    //Dsp = svDsp ; // this seems a little too presumptive -- a finer tuned stack adjust maybe be more correct
+    SetState ( _Debugger_, DEBUG_SHTL_OFF, false ) ;
+    DebugShow_On ;
+}
+
+// class object new
+
+Word *
+_Class_Object_New ( byte * name, uint64 category )
+{
+    int64 size ;
+    byte * object ;
+    Word * word ;
+    Namespace * ns = _CfrTil_Namespace_InNamespaceGet ( ) ;
+    size = _Namespace_VariableValueGet ( ns, ( byte* ) "size" ) ;
+    word = _CfrTil_ObjectNew ( size, name, category, OBJECT_MEMORY ) ;
+    _Class_Object_Init ( word, ns ) ;
+    _Namespace_VariableValueSet ( ns, ( byte* ) "this", ( int64 ) object ) ;
+    _Word_Add ( word, 0, ns ) ;
+    return word ;
+}
+
+#if 0
+
+Word_Class_Object_Init ( Word * word, Namespace * ns )
+{
+    //_Class_Object_Init ( ( byte* ) word->W_Value, ns ) ;
+    byte * object = word->W_Value ;
     DebugShow_Off ;
     Stack * nsstack = _Context_->Compiler0->NamespacesStack ;
     Stack_Init ( nsstack ) ; // !! ?? put this in Compiler ?? !!
@@ -136,7 +196,7 @@ _Class_Object_Init ( byte * obj, Namespace * ns )
     SetState ( _Debugger_, DEBUG_SHTL_OFF, true ) ;
     for ( i = Stack_Depth ( nsstack ) ; i > 0 ; i -- )
     {
-        DSP_Push ( ( int64 ) obj ) ;
+        DSP_Push ( ( int64 ) word ) ;
         Word * initWord = ( Word* ) _Stack_Pop ( nsstack ) ;
         _Word_Eval ( initWord ) ;
     }
@@ -145,25 +205,7 @@ _Class_Object_Init ( byte * obj, Namespace * ns )
     //DebugShow_StateRestore ;
     DebugShow_On ;
 }
-
-// class object new
-
-Word *
-_Class_Object_New ( byte * name, uint64 category )
-{
-    int64 size ;
-    byte * object ;
-    Word * word ;
-    Namespace * ns = _CfrTil_Namespace_InNamespaceGet ( ) ;
-    size = _Namespace_VariableValueGet ( ns, ( byte* ) "size" ) ;
-    object = CfrTil_NamelessObjectNew ( size ) ;
-    // _DObject_New ( byte * name, uint64 value, uint64 ctype, uint64 ltype, uint64 ftype, byte * function, int64 arg, int64 addToInNs, Namespace * addToNs, uint64 allocType )
-    word = _DObject_New ( name, ( int64 ) object, ( OBJECT | IMMEDIATE | category ), 0, OBJECT, ( byte* ) _DataObject_Run, 0, 1, 0, DICTIONARY ) ;
-    word->Size = size ;
-    _Class_Object_Init ( ( byte* ) word->W_Value, ns ) ;
-    _Namespace_VariableValueSet ( ns, ( byte* ) "this", ( int64 ) object ) ;
-    return word ;
-}
+#endif
 
 Namespace *
 _Class_New ( byte * name, uint64 type, int64 cloneFlag )
@@ -180,10 +222,10 @@ _Class_New ( byte * name, uint64 type, int64 cloneFlag )
         ns = _DObject_New ( name, 0, CPRIMITIVE | CLASS | IMMEDIATE | type, 0, type, ( byte* ) _DataObject_Run, 0, 0, sns, DICTIONARY ) ;
         _Namespace_DoNamespace ( ns, 1 ) ; // before "size", "this"
         Word *ws = _CfrTil_Variable_New ( ( byte* ) "size", size ) ; // start with size of the prototype for clone
-        //ws->CProperty |= NAMESPACE_VARIABLE ;
+        //ws->CAttribute |= NAMESPACE_VARIABLE ;
         _Context_->Interpreter0->ThisNamespace = ns ;
         Word *wt = _CfrTil_Variable_New ( ( byte* ) "this", size ) ; // start with size of the prototype for clone
-        wt->CProperty |= THIS ;
+        wt->CAttribute |= THIS ;
     }
     else
     {
@@ -260,7 +302,7 @@ Literal_New ( Lexer * lexer, uint64 uliteral )
     if ( ! ( lexer->TokenType & ( T_STRING | T_RAW_STRING | T_CHAR | KNOWN_OBJECT ) ) )
     {
         snprintf ( ( char* ) _name, 256, "<unknown object type> : %lx", ( uint64 ) uliteral ) ;
-        name = String_New ( _name, Compiling ? STRING_MEM : TEMPORARY ) ; 
+        name = String_New ( _name, Compiling ? STRING_MEM : TEMPORARY ) ;
     }
     else
     {

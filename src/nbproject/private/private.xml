@@ -7,23 +7,7 @@
         <activeConfTypeElem>0</activeConfTypeElem>
         <activeConfIndexElem>0</activeConfIndexElem>
     </data>
-    <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="20">
-        <file>
-            <url>basis/compiler/cpu.c</url>
-            <bookmark id="18">
-                <name/>
-                <line>156</line>
-                <key/>
-            </bookmark>
-        </file>
-        <file>
-            <url>basis/compiler/optimize.c</url>
-            <bookmark id="20">
-                <name/>
-                <line>300</line>
-                <key/>
-            </bookmark>
-        </file>
+    <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="26">
         <file>
             <url>basis/compiler/machineCode.c</url>
             <bookmark id="3">
@@ -36,29 +20,60 @@
                 <line>17</line>
                 <key/>
             </bookmark>
+            <bookmark id="26">
+                <name/>
+                <line>208</line>
+                <key/>
+            </bookmark>
             <bookmark id="15">
                 <name/>
                 <line>217</line>
                 <key/>
             </bookmark>
+            <bookmark id="25">
+                <name/>
+                <line>381</line>
+                <key/>
+            </bookmark>
             <bookmark id="19">
                 <name/>
-                <line>649</line>
+                <line>654</line>
                 <key/>
             </bookmark>
             <bookmark id="11">
                 <name/>
-                <line>749</line>
+                <line>754</line>
                 <key/>
             </bookmark>
             <bookmark id="6">
                 <name/>
-                <line>788</line>
+                <line>793</line>
                 <key/>
             </bookmark>
             <bookmark id="7">
                 <name/>
-                <line>836</line>
+                <line>841</line>
+                <key/>
+            </bookmark>
+        </file>
+        <file>
+            <url>basis/core/dataObjectRun.c</url>
+            <bookmark id="21">
+                <name/>
+                <line>127</line>
+                <key/>
+            </bookmark>
+            <bookmark id="22">
+                <name/>
+                <line>410</line>
+                <key/>
+            </bookmark>
+        </file>
+        <file>
+            <url>basis/compiler/cpu.c</url>
+            <bookmark id="18">
+                <name/>
+                <line>146</line>
                 <key/>
             </bookmark>
         </file>
@@ -66,24 +81,43 @@
             <url>basis/debugStepping.c</url>
             <bookmark id="17">
                 <name/>
-                <line>67</line>
+                <line>55</line>
                 <key/>
             </bookmark>
             <bookmark id="16">
                 <name/>
-                <line>374</line>
+                <line>342</line>
+                <key/>
+            </bookmark>
+        </file>
+        <file>
+            <url>basis/compiler/optimize.c</url>
+            <bookmark id="24">
+                <name/>
+                <line>227</line>
+                <key/>
+            </bookmark>
+            <bookmark id="23">
+                <name/>
+                <line>1142</line>
                 <key/>
             </bookmark>
         </file>
     </editor-bookmarks>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/home/dennisj/cfrtil.0.823.300.10/src/basis/compiler/blocks.c</file>
-            <file>file:/home/dennisj/cfrtil.0.823.300.10/src/basis/core/dataObjectNew.c</file>
-            <file>file:/home/dennisj/cfrtil.0.823.300.10/src/basis/exception.c</file>
-            <file>file:/home/dennisj/cfrtil.0.823.300.10/src/primitives/dataObjectNews.c</file>
-            <file>file:/home/dennisj/cfrtil.0.823.300.10/src/basis/core/dataObjectRun.c</file>
+            <file>file:/home/dennisj/cfrtil.0.823.300.10/src/primitives/stacks.c</file>
             <file>file:/home/dennisj/cfrtil.0.823.300.10/src/basis/openVmTil.c</file>
+            <file>file:/home/dennisj/cfrtil.0.823.300.10/src/basis/debugStepping.c</file>
+            <file>file:/home/dennisj/cfrtil.0.823.300.10/src/basis/debugDisassembly.c</file>
+            <file>file:/home/dennisj/cfrtil.0.823.300.10/src/basis/compiler/_bits.c</file>
+            <file>file:/home/dennisj/cfrtil.0.823.300.10/src/basis/core/dataObjectNew.c</file>
+            <file>file:/home/dennisj/cfrtil.0.823.300.10/src/primitives/debuggers.c</file>
+            <file>file:/home/dennisj/cfrtil.0.823.300.10/src/basis/compiler/blocks.c</file>
+            <file>file:/home/dennisj/cfrtil.0.823.300.10/src/basis/debugger.c</file>
+            <file>file:/home/dennisj/cfrtil.0.823.300.10/src/basis/sourceCode.c</file>
+            <file>file:/home/dennisj/cfrtil.0.823.300.10/src/basis/compiler/cpu.c</file>
+            <file>file:/home/dennisj/cfrtil.0.823.300.10/src/basis/_debug.c</file>
         </group>
     </open-files>
 </project-private>

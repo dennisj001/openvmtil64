@@ -7,10 +7,10 @@
  * enumerated           :      enumerated               :      shifted bits
 */
 #define DISTINCT_TYPE_SIZE              6
-#define DISTINCT_PROPERTY_SIZE          6
-#define INTERSECTING_PROPERTY_SIZE      20
-#define DISTINCT_TYPE_SHIFT_SIZE (DISTINCT_PROPERTY_SIZE + INTERSECTING_PROPERTY_SIZE - 1)
-#define DISTINCT_PROPERTY_SHIFT_SIZE (INTERSECTING_PROPERTY_SIZE - 1)
+#define DISTINCT_attribute_SIZE          6
+#define INTERSECTING_attribute_SIZE      20
+#define DISTINCT_TYPE_SHIFT_SIZE (DISTINCT_attribute_SIZE + INTERSECTING_attribute_SIZE - 1)
+#define DISTINCT_attribute_SHIFT_SIZE (INTERSECTING_attribute_SIZE - 1)
 
 // distinct kinds/types - non-intersecting 
 #define THIS ( 1 << 20 )

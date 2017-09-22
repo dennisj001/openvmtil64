@@ -96,7 +96,7 @@ ByteArray_Init ( ByteArray * ba, int64 size, uint64 type )
     // we want to keep track of how much data for each type separate from MemChunk accounting
     ba->BA_DataSize = size ;
     ba->BA_AllocSize = size + sizeof (ByteArray ) ;
-    ba->BA_AProperty = type ;
+    ba->BA_AAttribute = type ;
     Set_BA_Symbol_To_BA ( ba ) ; // nb! : ByteArray has two nodes, a MemChunk and a Symbol, each on different lists 
     _ByteArray_Init ( ba ) ;
     return ba ;
@@ -219,7 +219,7 @@ _NamedByteArray_AddNewByteArray ( NamedByteArray *nba, int64 size )
     }
     nba->MemAllocated += size ;
     nba->MemRemaining += size ;
-    nba->ba_CurrentByteArray = ByteArray_AllocateNew ( size, nba->NBA_AProperty ) ; // the whole ba itself is allocated as a chunk then we can allocate with its specific type
+    nba->ba_CurrentByteArray = ByteArray_AllocateNew ( size, nba->NBA_AAttribute ) ; // the whole ba itself is allocated as a chunk then we can allocate with its specific type
     dllist_AddNodeToHead ( &nba->NBA_BaList, ( dlnode* ) & nba->ba_CurrentByteArray->BA_Symbol ) ; // ByteArrays are linked here in the NBA with their BA_Symbol node. BA_MemChunk is linked in PermanentMemList
     nba->ba_CurrentByteArray->BA_Symbol.S_Value = ( uint64 ) nba->ba_CurrentByteArray ; // for FreeNbaList
     nba->ba_CurrentByteArray->OurNBA = nba ;
@@ -245,7 +245,7 @@ void
 _NamedByteArray_Init ( NamedByteArray * nba, byte * name, int64 size, int64 atype )
 {
     _Symbol_NameInit ( ( Symbol* ) & nba->NBA_Symbol, name ) ;
-    nba->NBA_AProperty = atype ;
+    nba->NBA_AAttribute = atype ;
     dllist_Init ( &nba->NBA_BaList, &nba->NBA_ML_HeadNode, &nba->NBA_ML_TailNode ) ;
     nba->NBA_DataSize = size ;
     nba->MemInitial = size ;
@@ -274,7 +274,7 @@ NamedByteArray_Delete ( NamedByteArray * nba )
 NamedByteArray *
 NamedByteArray_New ( byte * name, int64 size, int64 atype )
 {
-    NamedByteArray * nba = NamedByteArray_Allocate ( ) ; // else the nba would be deleted with MemList_FreeExactType ( nba->NBA_AProperty ) ;
+    NamedByteArray * nba = NamedByteArray_Allocate ( ) ; // else the nba would be deleted with MemList_FreeExactType ( nba->NBA_AAttribute ) ;
     _NamedByteArray_Init ( nba, name, size, atype ) ;
     return nba ;
 }

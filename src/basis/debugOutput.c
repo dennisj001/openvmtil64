@@ -51,16 +51,16 @@ void
 _Debugger_Locals_ShowALocal ( Debugger * debugger, Word * localsWord, byte * buffer ) // use a debugger buffer instead ??
 {
     int64 varOffset ;
-    if ( localsWord->CProperty & LOCAL_VARIABLE ) varOffset = LocalVarOffset ( localsWord ) ;
-    else if ( localsWord->CProperty & PARAMETER_VARIABLE ) varOffset = ParameterVarOffset ( localsWord ) ;
-    int64 * fp = ( int64* ) debugger->cs_Cpu->Rdi ;
+    if ( localsWord->CAttribute & LOCAL_VARIABLE ) varOffset = LocalVarOffset ( localsWord ) ;
+    else if ( localsWord->CAttribute & PARAMETER_VARIABLE ) varOffset = ParameterVarOffset ( localsWord ) ;
+    int64 * fp = ( int64* ) debugger->cs_Cpu->R15d ;
     byte * address = ( byte* ) fp [ varOffset ] ;
     byte * stringValue = String_CheckForAtAdddress ( address ) ;
     Word * word2 = Word_GetFromCodeAddress ( ( byte* ) ( address ) ) ;
 
     if ( word2 ) sprintf ( ( char* ) buffer, "< %s.%s >", word2->ContainingNamespace->Name, word2->Name ) ;
-    _Printf ( ( byte* ) "\n%-018s : index = [edi%s0x%-2x]  : <0x%08x> = 0x%08x : %16s.%-16s : %s",
-        ( localsWord->CProperty & LOCAL_VARIABLE ) ? "LocalVariable" : "Parameter Variable", ( localsWord->CProperty & LOCAL_VARIABLE ) ? "+" : "-",
+    _Printf ( ( byte* ) "\n%-018s : index = [r15%s0x%-2x]  : <0x%016lx> = 0x%016lx : %16s.%-16s : %s",
+        ( localsWord->CAttribute & LOCAL_VARIABLE ) ? "LocalVariable" : "Parameter Variable", ( localsWord->CAttribute & LOCAL_VARIABLE ) ? "+" : "-",
         abs ( varOffset * ( sizeof (int64 ) ) ), fp + varOffset, fp [ varOffset ], localsWord->S_ContainingNamespace->Name, localsWord->Name, word2 ? buffer : stringValue ? stringValue : ( byte* ) "" ) ;
 }
 
@@ -81,7 +81,7 @@ Debugger_Locals_Show ( Debugger * debugger )
         byte buffer [ 256 ], * sc = scWord->W_SourceCode ; //, * localScString ; // use a debugger buffer instead ??
         char * registerNames [ 8 ] = { ( char* ) "R8", ( char* ) "R9", ( char* ) "R10", ( char* ) "R11", ( char* ) "R12", ( char* ) "R13", ( char* ) "R14", ( char* ) "R15" } ;
         // show value of each local var on Locals list
-        int64 * fp = ( int64* ) debugger->cs_Cpu->Rdi, * dsp = ( int64* ) debugger->cs_Cpu->R14d ;
+        int64 * fp = ( int64* ) debugger->cs_Cpu->R15d, * dsp = ( int64* ) debugger->cs_Cpu->R14d ;
         byte * b = Buffer_New_pbyte ( BUFFER_SIZE ) ;
         strcpy ( b, sc ) ;
         sc = b ;
@@ -97,7 +97,7 @@ Debugger_Locals_Show ( Debugger * debugger )
         {
             //_Debugger_CpuState_Show ( ) ; // Debugger_Registers is included in Debugger_CpuState_Show
             Debugger_CpuState_CheckSaveShow ( debugger ) ;
-            _Printf ( ( byte* ) "\n%s.%s.%s : \nFrame Pointer = EDI = <0x%08lx> = 0x%08lx : Stack Pointer = ESI <0x%08lx> = 0x%08lx",
+            _Printf ( ( byte* ) "\n%s.%s.%s : \nFrame Pointer = R15 = <0x%016lx> = 0x%016lx : Stack Pointer = R14 <0x%016lx> = 0x%016lx",
                 c_dd ( scWord->ContainingNamespace->Name ), c_dd ( scWord->Name ), c_dd ( "locals" ),
                 ( uint64 ) fp, fp ? *fp : 0, ( uint64 ) dsp, dsp ? *dsp : 0 ) ;
             for ( i = Stack_Depth ( debugger->LocalsNamespacesStack ) ; i >= 0 ; i -- )
@@ -109,7 +109,7 @@ Debugger_Locals_Show ( Debugger * debugger )
                 {
                     nextNode = dlnode_Previous ( node ) ;
                     scWord = ( Word * ) node ;
-                    if ( scWord->CProperty & REGISTER_VARIABLE ) _Printf ( ( byte* ) "\nReg   Variable : %-12s : %s : 0x%lx", scWord->Name,
+                    if ( scWord->CAttribute & REGISTER_VARIABLE ) _Printf ( ( byte* ) "\nReg   Variable : %-12s : %s : 0x%016lx", scWord->Name,
                         registerNames [ scWord->RegToUse ], _CfrTil_->cs_Cpu->Registers [ scWord->RegToUse ] ) ;
                     else _Debugger_Locals_ShowALocal ( debugger, scWord, buffer ) ;
                 }
@@ -172,7 +172,7 @@ _Debugger_ShowEffects ( Debugger * debugger, Word * word, int64 stepFlag )
         if ( ( stepFlag ) || ( word ) && ( word != debugger->LastEffectsWord ) )
         {
             NoticeColors ;
-            if ( ( word->CProperty & OBJECT_FIELD ) && ( ! ( word->CProperty & DOT ) ) )
+            if ( ( word->CAttribute & OBJECT_FIELD ) && ( ! ( word->CAttribute & DOT ) ) )
             {
                 if ( strcmp ( ( char* ) word->Name, "[" ) && strcmp ( ( char* ) word->Name, "]" ) ) // this block is repeated in arrays.c : make it into a function - TODO
                 {
@@ -262,9 +262,11 @@ Debugger_ShowEffects ( Debugger * debugger, int64 stepFlag )
 
 // the border (aesthetically) surrounds (equally or sliding) on either side of a token, it's string length, in the tvw - available terminal view window space; 
 // token slides in the window which is 2 * border + token length 
-// |ilw...------ inputLine  ----- |--- border ---|---token---|---  border  ---|------ inputLine -----...ilw| -- ilw : inputLine window
-
-byte * // nvw, lef, leftBorder, nts, token0, rightBorder, ref
+// |ilw...------ inputLine  -----|lef|--- leftBorder ---|---token---|---  rightBorder  ---|ref|------ inputLine -----...ilw| -- ilw : inputLine window
+// ref : right ellipsis flag
+// lef : left ellipsis flag
+// dl : diff in length of token and token with highlighting :: dl = slt1 - slt0
+byte * 
 _String_HighlightTokenInputLine ( byte * nvw, int64 lef, int64 leftBorder, int64 tokenStart, byte *token, int64 rightBorder, int64 ref, int64 dl )
 {
     int64 slt = Strlen ( token ) ; //, slilw = Strlen ( nvw ) ;
@@ -286,14 +288,14 @@ _String_HighlightTokenInputLine ( byte * nvw, int64 lef, int64 leftBorder, int64
             if ( leftBorder > 4 ) strncat ( ( char* ) b3, ( char* ) &nvw[4], leftBorder - 4 ) ; // 3 : [0 1 2 3]  0 indexed array
         }
 
-        strcpy ( ( char* ) b2, ( char* ) cc ( b3, &_Q_->Debug ) ) ;
+        //strcpy ( ( char* ) b2, ( char* ) cc ( b3, &_Q_->Debug ) ) ;
+        strncpy ( ( char* ) b2, ( char* ) cc ( b3, &_Q_->Debug ), rightBorder ) ;
         char * ccToken = ( char* ) cc ( token, &_Q_->Notice ) ;
-        strcat ( ( char* ) b2, ccToken ) ;
+        strncat ( ( char* ) b2, ccToken, rightBorder ) ;
 
-        if ( ! ref ) strcpy ( ( char* ) b3, ( char* ) &nvw[tokenStart + slt - dl] ) ; //, BUFFER_SIZE ) ; // 3 : [0 1 2 3]  0 indexed array
+        if ( ! ref ) strncpy ( ( char* ) b3, ( char* ) &nvw[tokenStart + slt - dl], rightBorder ) ; //, BUFFER_SIZE ) ; // 3 : [0 1 2 3]  0 indexed array
         else
         {
-
             if ( rightBorder > 4 ) strncpy ( ( char* ) b3, ( char* ) &nvw[tokenStart + slt - dl], rightBorder - 4 ) ; // 4 : strlen " .. " 
             strcat ( ( char* ) b3, " .. " ) ;
         }
@@ -302,6 +304,7 @@ _String_HighlightTokenInputLine ( byte * nvw, int64 lef, int64 leftBorder, int64
 
         nvw = b2 ;
     }
+    else nvw [ leftBorder + slt + rightBorder ] = 0 ;
     return nvw ;
 }
 
@@ -360,7 +363,7 @@ Debugger_ShowSourceCodeLine ( Debugger * debugger, Word * word, byte * token0, i
         else lef = 1, ref = 0 ; // choose lef as preferable
     }
     else lef = ref = 0 ;
-    byte * cc_line = ( word ? _String_HighlightTokenInputLine ( nvw, lef, leftBorder, nts, token0, rightBorder, ref, 0 ) : ( byte* ) "" ) ; // nts : new token start is a index into b - the nwv buffer
+    byte * cc_line = word ? _String_HighlightTokenInputLine ( nvw, lef, leftBorder, nts, token0, rightBorder, ref, 0 ) : ( byte* ) "" ; // nts : new token start is a index into b - the nwv buffer
 
     return cc_line ;
 }
@@ -412,7 +415,7 @@ next:
             if ( word )
             {
 
-                if ( word->CProperty & CPRIMITIVE )
+                if ( word->CAttribute & CPRIMITIVE )
                 {
                     sprintf ( obuffer, "\n%s%s:: %s : %03ld.%03ld : %s :> %s <: cprimitive :> ", // <:: " INT_FRMT "." INT_FRMT " ",
                         prompt, signal ? ( char* ) signalAscii : " ", cc_location, rl->LineNumber, rl->ReadIndex,
@@ -430,6 +433,7 @@ next:
                 String_RemoveEndWhitespace ( cc_line ) ;
                 Strncat ( obuffer, cc_line, BUFFER_SIZE ) ;
                 _Printf ( ( byte* ) "%s", obuffer ) ;
+
             }
             else
             {
@@ -451,7 +455,6 @@ next:
         DefaultColors ;
         if ( ! String_Equal ( "...", location ) ) debugger->Filename = location ;
     }
-
     else SetState ( _Debugger_, DBG_AUTO_MODE_ONCE, true ) ;
 }
 
@@ -498,7 +501,7 @@ Debugger_ShowState ( Debugger * debugger, byte * prompt )
     int64 cflag = 0 ;
     if ( word )
     {
-        if ( word->CProperty & CONSTANT ) cflag = 1 ;
+        if ( word->CAttribute & CONSTANT ) cflag = 1 ;
     }
     DebugColors ;
     byte * token = debugger->Token ;
@@ -535,7 +538,7 @@ Debugger_ConsiderAndShowWord ( Debugger * debugger )
     if ( word ) // then it wasn't a literal
     {
         byte * name = c_dd ( word->Name ) ;
-        if ( ( word->CProperty & ( CPRIMITIVE | DLSYM_WORD ) ) && ( ! ( CompileMode ) ) )
+        if ( ( word->CAttribute & ( CPRIMITIVE | DLSYM_WORD ) ) && ( ! ( CompileMode ) ) )
         {
             if ( word->ContainingNamespace ) _Printf ( ( byte* ) "\ncprimitive :> %s.%s <:> 0x%08x <: => evaluating ...", word->ContainingNamespace->Name, name, ( uint64 ) word->Definition ) ;
         }
@@ -547,17 +550,17 @@ Debugger_ConsiderAndShowWord ( Debugger * debugger )
                 Debugger_Info ( debugger ) ;
                 //_Printf ( ( byte* ) "\nInternal DebugAddress = :> 0x%08x <: ", ( uint64 ) debugger->DebugAddress ) ;
             }
-            else if ( word->CProperty & NAMESPACE_VARIABLE )
+            else if ( word->CAttribute & NAMESPACE_VARIABLE )
             {
                 _Printf ( ( byte* ) "\nVariable :> %s.%s <: => evaluating ... :> ", word->ContainingNamespace->Name, name ) ;
                 SetState ( debugger, DBG_CAN_STEP, false ) ;
             }
-            else if ( word->CProperty & TEXT_MACRO )
+            else if ( word->CAttribute & TEXT_MACRO )
             {
                 _Printf ( ( byte* ) "\nMacro :> %s.%s <: => evaluating ... :> ", word->ContainingNamespace->Name, name ) ;
                 SetState ( debugger, DBG_CAN_STEP, false ) ;
             }
-            else if ( word->CProperty & IMMEDIATE )
+            else if ( word->CAttribute & IMMEDIATE )
             {
                 _Printf ( ( byte* ) "\nImmediate word :> %s.%s <:> 0x%08x <: => evaluating ...",
                     word->ContainingNamespace->Name, name, ( uint64 ) word->Definition ) ;

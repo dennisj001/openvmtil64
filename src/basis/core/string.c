@@ -879,13 +879,13 @@ _Buffer_New ( int64 size, int64 flag )
     }
     d0 ( Buffer_PrintBuffers ( ) ) ;
     b = ( Buffer * ) Mem_Allocate ( sizeof ( Buffer ) + size + 1, BUFFER ) ;
-    b->B_CProperty = BUFFER ;
+    b->B_CAttribute = BUFFER ;
     b->B_Size = size ;
     b->B_Data = ( byte* ) b + sizeof (Buffer ) ;
     if ( flag & B_PERMANENT ) dllist_AddNodeToTail ( _Q_->MemorySpace0->BufferList, ( dlnode* ) b ) ;
     else dllist_AddNodeToHead ( _Q_->MemorySpace0->BufferList, ( dlnode* ) b ) ;
 done:
-    Mem_Clear ( b->B_Data, size ) ;
+    Mem_Clear ( b->B_Data, b->B_Size ) ;
     b->InUseFlag = flag ;
 
     return b ;

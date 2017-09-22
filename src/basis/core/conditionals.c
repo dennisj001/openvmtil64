@@ -20,7 +20,7 @@ _CfrTil_Case ( uint64 allocType )
     {
         caseBlock = ( block ) TOS ;
         Word * literalWord = WordsBack ( 1 ) ;
-        if ( ! ( literalWord->CProperty & LITERAL ) ) CfrTil_Exception ( CASE_NOT_LITERAL_ERROR, 1 ) ;
+        if ( ! ( literalWord->CAttribute & LITERAL ) ) CfrTil_Exception ( CASE_NOT_LITERAL_ERROR, 1 ) ;
         caseValue = ( int64 ) literalWord->W_Value ;
         SetHere ( literalWord->Coding ) ;
         DSP_DropN ( 1 ) ;

@@ -7,7 +7,7 @@ _dllist_Atom_Intern ( dllist * dllist, byte * name )
     AtomStringNode * asn = ( AtomStringNode * ) Mem_Allocate ( sizeof ( AtomStringNode ), ATOM_MEMORY, 0 ) ;
     name = String_New ( name, ATOM_MEMORY ) ;
     _Symbol_Init ( ( Symbol* ) asn, name ) ;
-    asn->S_Property = STRING ;
+    asn->S_Attribute = STRING ;
     dllist_AddNodeToTail ( dllist, ( dlnode* ) asn ) ;
     return asn ;
 }

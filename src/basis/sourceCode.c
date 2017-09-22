@@ -22,7 +22,7 @@ DWL_Check_SCWI ( dlnode * node, byte * address, int64 scwi, Word * wordn, dlnode
     if ( ! _Debugger_->LastSourceCodeIndex ) _Debugger_->LastSourceCodeIndex = scwi ;
     scwiDiff = abs ( scwi - _Debugger_->LastSourceCodeIndex ) ;
     if ( ( scwiDiff < SCWI_MAX_DIFF ) ) foundNode = node ;
-    else if ( GetState ( _CfrTil_->DebugWordListWord, W_C_SYNTAX ) && ( wordn->CProperty & COMBINATOR ) )
+    else if ( GetState ( _CfrTil_->DebugWordListWord, W_C_SYNTAX ) && ( wordn->CAttribute & COMBINATOR ) )
     {
         foundNode = node ;
     }
@@ -102,7 +102,7 @@ DWL_Find ( Word * word, byte * address, byte* name, int64 fromFirst, int64 takeF
 }
 
 void
-_Debugger_ShowSourceCodeAtAddress ( Debugger * debugger )
+_Debugger_ShowSourceCodeAtAddress ( Debugger * debugger, byte * address )
 {
     // ...source code source code TP source code source code ... EOL
     Word * scWord = debugger->w_Word, *word ;
@@ -111,7 +111,7 @@ _Debugger_ShowSourceCodeAtAddress ( Debugger * debugger )
         int64 scwi, fixed = 0 ;
         dobject * dobj ;
         //if ( _Q_->Verbosity > 2 ) DebugWordList_Show ( ) ;
-        dobj = ( dobject* ) DWL_Find ( 0, debugger->DebugAddress, 0, 0, 0, 0 ) ;
+        dobj = ( dobject* ) DWL_Find ( 0, address, 0, 0, 0, 0 ) ;
         if ( dobj )
         {
             word = ( Word* ) dobject_Get_M_Slot ( dobj, SCN_SC_WORD ) ;
@@ -139,8 +139,8 @@ DebugWordList_PushWord ( Word * word )
     word = Word_GetOriginalWord ( word ) ; // copied words are recycled
     if ( word && IsSourceCodeOn && _CfrTil_->DebugWordList )
     {
-        int64 scindex ;
-        scindex = ( GetState ( _Compiler_, ( LC_ARG_PARSING | DOING_A_PREFIX_WORD ) ) || ( word->CProperty & COMBINATOR ) ) ?
+        int64 scindex ; //index for the end of the word
+        scindex = ( GetState ( _Compiler_, ( LC_ARG_PARSING | DOING_A_PREFIX_WORD ) ) || ( word->CAttribute & COMBINATOR ) ) ?
             ( word->W_SC_ScratchPadIndex ? word->W_SC_ScratchPadIndex : _CfrTil_->SC_ScratchPadIndex ) : _CfrTil_->SC_ScratchPadIndex ;
         dobj = Node_New_ForDebugWordList ( TEMPORARY, scindex, word ) ; // _dobject_New_M_Slot_Node ( TEMPORARY, WORD_LOCATION, 3, 0, scindex, word ) 
         dobject_Set_M_Slot ( ( dobject* ) dobj, SCN_SC_CADDRESS, Here ) ;
@@ -210,7 +210,7 @@ void
 CfrTil_SourceCodeOff ( )
 {
     SetState ( _CfrTil_, DEBUG_SOURCE_CODE_MODE, false ) ;
-    SetState ( _CfrTil_, GLOBAL_SOURCE_CODE_MODE, false ) ;
+    //SetState ( _CfrTil_, GLOBAL_SOURCE_CODE_MODE, false ) ;
     Compiler_WordList_RecycleInit ( _Compiler_ ) ;
 }
 
@@ -219,43 +219,42 @@ CfrTil_SourceCodeOff ( )
 byte *
 PrepareSourceCodeString ( byte * sc, Word * word, int64 scwi0 ) // sc : source code ; scwi : source code word index
 {
-    //byte * cc_line = Debugger_ShowSourceCodeLine ( debugger, word, token0, ( int64 ) Strlen ( obuffer ) ) ;
     byte *nvw, * token0 = word->Name, *token1 ;
-    int64 scwi, i = 0, tp = 34, lef, leftBorder, ts, rightBorder, ref ; // tp : text point - where we want to start source code text to align with disassembly
-start:
+    int64 i, tp = 42, lef, leftBorder, ts, rightBorder, ref ; // tp : text point - where we want to start source code text to align with disassembly
     token1 = String_ConvertToBackSlash ( token0 ) ;
     int64 tw = Debugger_TerminalLineWidth ( _Debugger_ ), slt0 = Strlen ( token0 ), slt1 = Strlen ( token1 ) ; // 3 : 0,1,2,3 ; ts : tokenStart
-    int64 dl = slt1 - slt0, inc = 20 ; //n = slt0 + 20 ;
+    int64 dl = slt1 - slt0 ; 
     dl = dl > 0 ? dl : 0 ;
-    scwi = scwi0 ; // source code word index
-    scwi0 -= slt0 ;
-    byte * scspp2, *scspp ;
-    d1 ( scspp = & sc [ scwi0 ] ) ;
-    scwi = String_FindStrnCmpIndex ( sc, token0, &i, scwi0, slt0, inc ) ;
-    d1 ( scspp2 = & sc [ scwi ] ) ;
-    if ( ( scwi + 3 ) > tp )
+    int64 scwsi0 = scwi0 - slt0, scwsi ; // scwsi : source code word start index : scwi is indexed to after the word
+    scwsi = String_FindStrnCmpIndex ( sc, token0, &i, scwsi0, slt0, 20 ) ; //inc ) ;
+    d0 ( byte * scspp = & sc [ scwsi0 ] ) ;
+    d0 ( byte * scspp2 = & sc [ scwsi ] ) ;
+    int64 slsc = strlen ( sc ) ;
+    nvw = ( char* ) Buffer_New_pbyte ( ( slsc > BUFFER_SIZE ) ? slsc : BUFFER_SIZE ) ;
+    if ( ( scwsi + 4 ) > tp )
     {
-        tp -= 3 ; // 3 : account for lef ellipsis [0,1,2,3]
-        nvw = & sc [scwi - tp] ;
-        leftBorder = ts = tp ; // 3 : 0, 1, 2, 3
-        rightBorder = tw - ( ts + slt0 + dl ) ;
-        lef = 1 ;
-        ref = strlen ( nvw - 4 ) > tw ? 1 : 0 ;
+        lef = 4 ;
+        leftBorder = ts = tp ; 
+        rightBorder = tw - ( ts + slt0 ) ;
+        ref = (slsc - 4 ) > tw ? 4 : 0 ;
+        Strncpy ( nvw, & sc [scwsi - tp], tw - (lef + ref) ) ; 
     }
-    else //if ( (scwi + 3) <= tp ) 
+    else 
     {
-        nvw = ( char* ) Buffer_New_pbyte ( BUFFER_SIZE ) ;
-        tp -= 3 ; // ?? this works, i don't exactly know why yet but i think it's because _String_HighlightTokenInputLine is geared to a left ellipsis
-        int64 pad = tp - scwi ; //=
+        int64 pad = tp - scwsi ; 
+        if ( pad >= 4 ) { lef = 4 ; } else lef = 0 ;
         for ( i = 0 ; i < pad ; i ++ ) strcat ( nvw, " " ) ;
-        strcat ( nvw, sc ) ;
-        leftBorder = ts = tp ; // 3 : 0, 1, 2, 3
-        rightBorder = tw - ( scwi + slt0 + dl ) ;
-        lef = 0 ;
-        ref = strlen ( nvw - 4 ) > tw ? 1 : 0 ; // ref ?? not always
+        leftBorder = ts = tp ; 
+        ref = (slsc - 4) > tw ? 4 : 0 ; 
+        rightBorder = tw - ( tp + slt0 ) - ref ; 
+        Strncat ( nvw, sc, tw - (lef + pad + ref) ) ;  
     }
-    rightBorder = rightBorder > 0 ? rightBorder : 0 ;
+    int64 svState = GetState ( _Debugger_, DEBUG_SHTL_OFF ) ;
+    SetState ( _Debugger_, DEBUG_SHTL_OFF, false ) ;
+    // |ilw...------ inputLine  -----|lef|--- leftBorder ---|---token---|---  rightBorder  ---|ref|------ inputLine -----...ilw| -- ilw : inputLine window
+    // |ilw...------ inputLine  -----|lef|pad?|-------------|tp|---token---|---  rightBorder  ---|ref|------ inputLine -----...ilw| -- ilw : inputLine window
     byte * cc_line = ( word ? _String_HighlightTokenInputLine ( nvw, lef, leftBorder, ts, token1, rightBorder, ref, dl ) : ( byte* ) "" ) ; // nts : new token start is a index into b - the nwv buffer
+    SetState ( _Debugger_, DEBUG_SHTL_OFF, svState ) ;
     return cc_line ;
 }
 
@@ -276,8 +275,8 @@ _CfrTil_WordLists_PushWord ( Word * word )
     dobject * dobj = 0 ;
     //if ( _IsSourceCodeOn ) dobj = DebugWordList_PushWord ( word ) ;
     CompilerWordList_Push ( word, dobj ) ; // _dllist_Push_M_Slot_Node ( _Compiler_->WordList, WORD, COMPILER_TEMP, 2, ((int64) word), ((int64) dnode) )
-    d0 (Word * sqWord = _CfrTil_WordList_Top ( ) ) ;
-    d0 ( _Printf ((byte*) "\n_Compiler_CopyDuplicatesAndPush : %s", sqWord->Name ) ) ;
+    d0 ( Word * sqWord = _CfrTil_WordList_Top ( ) ) ;
+    d0 ( _Printf ( ( byte* ) "\n_Compiler_CopyDuplicatesAndPush : %s", sqWord->Name ) ) ;
 }
 
 void
@@ -285,7 +284,7 @@ _DWL_CheckPush_Word ( Word * word )
 {
     if ( word && IsSourceCodeOn && ( GetState ( _CfrTil_, SC_FORCE_PUSH ) || ( _CfrTil_->ScoOcCrw != word ) ) )
     {
-        if ( ! ( word->LProperty & ( W_COMMENT | W_PREPROCESSOR ) ) )
+        if ( ! ( word->LAttribute & ( W_COMMENT | W_PREPROCESSOR ) ) )
         {
             _CfrTil_->ScoOcCrw = word ;
             DebugWordList_PushWord ( _CfrTil_->ScoOcCrw ) ;
@@ -323,7 +322,7 @@ _CfrTil_WordList_Top ( )
 void
 CfrTil_WordList_Pop ( )
 {
-    node * first = (node*) _CfrTil_WordList_Top ( ) ;
+    node * first = ( node* ) _CfrTil_WordList_Top ( ) ;
     if ( first ) dlnode_Remove ( first ) ;
 }
 
@@ -387,14 +386,6 @@ DebugWordList_Show ( )
     }
 }
 
-#if 0
-
-void
-DWL_CheckPush_Word ( )
-{
-    _DWL_CheckPush_Word ( _Context_->CurrentlyRunningWord ) ;
-}
-#endif
 
 
 

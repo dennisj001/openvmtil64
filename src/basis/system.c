@@ -105,7 +105,7 @@ Dlsym ( byte * sym, byte * lib )
 {
     block b = ( block ) _Dlsym ( sym, lib ) ;
     Word * word = _DataObject_New ( CFRTIL_WORD, 0, sym, DLSYM_WORD | C_PREFIX | C_RETURN | C_PREFIX_RTL_ARGS, 0, 0, ( int64 ) b, 0 ) ;
-    word->WProperty |= WT_C_PREFIX_RTL_ARGS ;
+    word->WAttribute |= WT_C_PREFIX_RTL_ARGS ;
 }
 
 // lib sym | addr
@@ -338,7 +338,7 @@ _CfrTil_Source ( Word *word, int64 addToHistoryFlag )
     if ( word )
     {
         byte * name = c_dd ( word->Name ) ;
-        uint64 category = word->CProperty ;
+        uint64 category = word->CAttribute ;
         if ( word->ContainingNamespace ) _Printf ( ( byte* ) "\n%s.", word->ContainingNamespace->Name ) ;
         if ( category & OBJECT )
         {
@@ -377,7 +377,7 @@ _CfrTil_Source ( Word *word, int64 addToHistoryFlag )
         {
             _Printf ( ( byte* ) "%s <:> %s", name, "C compiled primitive" ) ;
         }
-        else if ( word->LProperty & T_LISP_COMPILED_WORD )
+        else if ( word->LAttribute & T_LISP_COMPILED_WORD )
         {
             _Printf ( ( byte* ) "%s <:> %s", name, "lambdaCalculus compiled word" ) ;
         }
@@ -385,7 +385,7 @@ _CfrTil_Source ( Word *word, int64 addToHistoryFlag )
         {
             _Printf ( ( byte* ) "%s <:> %s", name, "cfrTil compiled word" ) ;
         }
-        else if ( word->LProperty & T_LISP_DEFINE )
+        else if ( word->LAttribute & T_LISP_DEFINE )
         {
             _Printf ( ( byte* ) "%s <:> %s", name, "lambdaCalculus defined word" ) ;
         }
@@ -396,7 +396,7 @@ _CfrTil_Source ( Word *word, int64 addToHistoryFlag )
         // else CfrTil_Exception ( 0, QUIT ) ;
         if ( category & INLINE ) _Printf ( ( byte* ) ", %s", "inline" ) ;
         if ( category & IMMEDIATE ) _Printf ( ( byte* ) ", %s", "immediate" ) ;
-        if ( word->WProperty & WT_PREFIX ) _Printf ( ( byte* ) ", %s", "prefix" ) ;
+        if ( word->WAttribute & WT_PREFIX ) _Printf ( ( byte* ) ", %s", "prefix" ) ;
         if ( category & C_PREFIX ) _Printf ( ( byte* ) ", %s", "c_prefix" ) ;
         if ( category & C_RETURN ) _Printf ( ( byte* ) ", %s", "c_return" ) ;
         if ( category & INFIXABLE ) _Printf ( ( byte* ) ", %s", "infixable" ) ;
@@ -405,7 +405,7 @@ _CfrTil_Source ( Word *word, int64 addToHistoryFlag )
             __Word_ShowSourceCode ( word ) ; // source code has newlines for multiline history
             if ( addToHistoryFlag ) _OpenVmTil_AddStringToHistoryList ( word->W_SourceCode ) ;
             if ( word->S_WordData->Filename ) _Printf ( ( byte* ) "\nSource code file location of %s : \"%s\" : %d.%d :: called at : %s", name, word->S_WordData->Filename, word->S_WordData->LineNumber, word->W_CursorPosition, Context_IsInFile ( _Context_ ) ? Context_Location ( ) : ( byte* ) "" ) ;
-            if ( ( word->LProperty & T_LISP_DEFINE ) && ( ! ( word->LProperty & T_LISP_COMPILED_WORD ) ) ) _Printf ( ( byte* ) "\nLambda Calculus word : interpreted not compiled" ) ; // do nothing here
+            if ( ( word->LAttribute & T_LISP_DEFINE ) && ( ! ( word->LAttribute & T_LISP_COMPILED_WORD ) ) ) _Printf ( ( byte* ) "\nLambda Calculus word : interpreted not compiled" ) ; // do nothing here
             else if ( ! ( category & CPRIMITIVE ) ) _Printf ( ( byte* ) "\nCompiled with : %s%s%s%s", GetState ( word, COMPILED_OPTIMIZED ) ? "optimizeOn" : "optimizeOff", GetState ( word, COMPILED_INLINE ) ? ", inlineOn" : ", inlineOff",
                 GetState ( word, W_C_SYNTAX ) ? ", c_syntaxOn" : "", GetState ( word, W_INFIX_MODE ) ? ", infixOn" : "" ) ;
             if ( GetState ( word, W_SOURCE_CODE_MODE ) ) _Printf ( ( byte* ) "%s", ", sourceCodeOn" ) ;

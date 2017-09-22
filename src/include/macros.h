@@ -54,8 +54,8 @@
 #define Get_CompileMode() ( GetState ( _Context_->Compiler0, COMPILE_MODE ) || ( _Q_->OVT_LC ? GetState ( _Q_->OVT_LC, LC_COMPILE_MODE ) : 0 ) ) 
 #define CompileMode (_Context_ ? ( GetState ( _Context_->Compiler0, COMPILE_MODE ) || ( _Q_->OVT_LC && GetState ( _Q_->OVT_LC, ( LC_COMPILE_MODE ) ) ) ) : 0)
 #define Compiling CompileMode
-#define ImmediateWord( word) (word->CProperty & IMMEDIATE)
-#define CPrimitiveWord( word) (word->CProperty & CPRIMITIVE)
+#define ImmediateWord( word) (word->CAttribute & IMMEDIATE)
+#define CPrimitiveWord( word) (word->CAttribute & CPRIMITIVE)
 
 #define Stack_N( stack, offset ) ((stack)->StackPointer [ (offset) ] )
 #define Stack_OffsetValue( stack, offset ) ((stack)->StackPointer [ (offset) ] )
@@ -82,7 +82,7 @@
 //#define Buffer_AllowReUse( b ) b->InUseFlag = B_FREE 
 #define _Buffer_SetAsFree( b )  b->InUseFlag = B_FREE 
 
-#define Property_FromWord( word ) (( Property * ) (word)->This )
+#define Attribute_FromWord( word ) (( Attribute * ) (word)->This )
 
 // formatting
 //#define AllowNewlines //if (_Q_) SetState ( _Q_->psi_PrintStateInfo, PSI_NEWLINE, false ) 
@@ -203,11 +203,11 @@
 #define NAMESPACE_RELATED_TYPE ( NAMESPACE_TYPE | OBJECT_FIELD )
 #define OBJECT_TYPE ( LITERAL | CONSTANT | NAMESPACE_VARIABLE | LOCAL_VARIABLE | OBJECT | DOBJECT | PARAMETER_VARIABLE )
 #define _NON_MORPHISM_TYPE ( OBJECT_TYPE | NAMESPACE_RELATED_TYPE )
-#define NON_MORPHISM_TYPE(word) (word->CProperty & _NON_MORPHISM_TYPE)
-#define IS_MORPHISM_TYPE( word ) ( ( ( ! ( word->CProperty & ( _NON_MORPHISM_TYPE | OBJECT_OPERATOR ) ) ) && ( ! ( word->LProperty & ADDRESS_OF_OP ) ) ) || ( word->CProperty & ( KEYWORD|BLOCK ) ))
+#define NON_MORPHISM_TYPE(word) (word->CAttribute & _NON_MORPHISM_TYPE)
+#define IS_MORPHISM_TYPE( word ) ( ( ( ! ( word->CAttribute & ( _NON_MORPHISM_TYPE | OBJECT_OPERATOR ) ) ) && ( ! ( word->LAttribute & ADDRESS_OF_OP ) ) ) || ( word->CAttribute & ( KEYWORD|BLOCK ) ))
 
-#define Is_NamespaceType( w ) ( w ? (( ( Namespace* ) w )->CProperty & NAMESPACE_TYPE) : 0 )
-#define Is_ValueType( w ) ( w ? ( ( Namespace* ) w )->CProperty & (_NON_MORPHISM_TYPE (w)) : 0 )
+#define Is_NamespaceType( w ) ( w ? (( ( Namespace* ) w )->CAttribute & NAMESPACE_TYPE) : 0 )
+#define Is_ValueType( w ) ( w ? ( ( Namespace* ) w )->CAttribute & (_NON_MORPHISM_TYPE (w)) : 0 )
 #define String_Init( s ) s[0]=0 ; 
 
 // memory allocation

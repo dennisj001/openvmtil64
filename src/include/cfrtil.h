@@ -41,30 +41,13 @@
 #include <locale.h>
 #include <math.h>
 #include <assert.h>
-//#include <gc/gc.h>
 
-//#include "/usr/local/include/udis86.h"
 #include <udis86.h>
 #include <gmp.h>
 #include <mpfr.h>
 #include "defines.h"
-//#include "bitfields.h"
 #include "types.h"
 #include "macros.h"
-//#include "/usr/local/include/gmp.h"
-
-#if MARU || MARU_2_4 || MARU_NILE
-typedef void (*GC_finaliser_t)(void *ptr, void *data);
-#endif
-
-#if LISP_IO
-#define MAXLEN (2 * M)
-#if SL5
-extern byte * sl_inputBuffer;
-extern int64 sl_inputBufferIndex;
-#endif
-extern int64 Maru_RawReadFlag;
-#endif
 
 extern OpenVmTil * _Q_;
 extern int64 *_Dsp_ ;

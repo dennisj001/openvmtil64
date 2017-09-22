@@ -15,22 +15,22 @@ _Compile_Get_C_Value_ToReg ( int8 reg, int64 value )
 
 // nb. necessary for esp/ebp
 void
-_Compile_Get_FromCAddress_ToReg_ThruReg ( int8 reg, byte * address, int8 thruReg )
+_Compile_Get_FromCAddress_ToReg ( int8 reg, byte * address )
 {
-    _Compile_MoveMem_To_Reg ( reg, (byte*) address, thruReg, CELL_SIZE ) ;    
+    _Compile_MoveMem_To_Reg ( reg, (byte*) address, CELL_SIZE ) ;    
 }
 
 void
-_Compile_Get_FromCAddress_ToReg ( int8 reg, byte * address )
+_Compile_Get_FromCAddress_ToReg_ThruReg ( int8 reg, byte * address, int8 thruReg )
 {
-    _Compile_MoveMem_To_Reg_NoThru ( reg, (byte*) address, CELL_SIZE ) ;    
+    _Compile_MoveMem_ToReg_ThruReg ( reg, address, CELL_SIZE, thruReg ) ;    
 }
 
 // thru reg is a 'scratch' reg
 void
 _Compile_Set_CAddress_WithRegValue_ThruReg ( byte * address, int8 reg, int8 thruReg )
 {
-    _Compile_MoveReg_To_Mem ( reg, address, thruReg, CELL_SIZE ) ;
+    _Compile_MoveReg_ToMem_ThruReg ( reg, address, CELL_SIZE, thruReg ) ;
 }
 
 void
@@ -89,7 +89,7 @@ Compile_Poke ( Compiler * compiler, int8 stackReg ) // =
         {
             // _Compile_MoveImm ( cell direction, cell rm, cell disp, cell imm, cell operandSize )
             _Compile_MoveImm ( compiler->optInfo->Optimize_Dest_RegOrMem,
-                compiler->optInfo->Optimize_Rm, 0, compiler->optInfo->Optimize_Disp, compiler->optInfo->Optimize_Imm, CELL ) ;
+                compiler->optInfo->Optimize_Rm, 0, compiler->optInfo->Optimize_Disp, compiler->optInfo->Optimize_Imm, CELL_SIZE ) ;
         }
         else if ( compiler->optInfo->OptimizeFlag & OPTIMIZE_REGISTER )
         {

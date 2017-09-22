@@ -203,13 +203,13 @@ Word_Namespace ( )
 void
 CfrTil_Keyword ( void )
 {
-    if ( _CfrTil_->LastFinishedWord ) _CfrTil_->LastFinishedWord->CProperty |= KEYWORD ;
+    if ( _CfrTil_->LastFinishedWord ) _CfrTil_->LastFinishedWord->CAttribute |= KEYWORD ;
 }
 
 void
 CfrTil_Immediate ( void )
 {
-    if ( _CfrTil_->LastFinishedWord ) _CfrTil_->LastFinishedWord->CProperty |= IMMEDIATE ;
+    if ( _CfrTil_->LastFinishedWord ) _CfrTil_->LastFinishedWord->CAttribute |= IMMEDIATE ;
 }
 
 void
@@ -217,17 +217,17 @@ CfrTil_IsImmediate ( void )
 {
 #if 0    
     Word * word = ( Word* ) TOS ;
-    TOS = ( word->CProperty & IMMEDIATE ) ;
+    TOS = ( word->CAttribute & IMMEDIATE ) ;
 #else
     Word * word = ( Word* ) _DataStack_Pop ( ) ;
-    _DataStack_Push ( word->CProperty & IMMEDIATE ) ;
+    _DataStack_Push ( word->CAttribute & IMMEDIATE ) ;
 #endif    
 }
 
 void
 CfrTil_Inline ( void )
 {
-    if ( _CfrTil_->LastFinishedWord ) _CfrTil_->LastFinishedWord->CProperty |= INLINE ;
+    if ( _CfrTil_->LastFinishedWord ) _CfrTil_->LastFinishedWord->CAttribute |= INLINE ;
 }
 
 void
@@ -235,8 +235,8 @@ CfrTil_Prefix ( void )
 {
     if ( _CfrTil_->LastFinishedWord )
     {
-        //_CfrTil_->LastFinishedWord->CProperty |= PREFIX ;
-        _CfrTil_->LastFinishedWord->WProperty = WT_PREFIX ;
+        //_CfrTil_->LastFinishedWord->CAttribute |= PREFIX ;
+        _CfrTil_->LastFinishedWord->WAttribute = WT_PREFIX ;
     }
 }
 
@@ -245,8 +245,8 @@ CfrTil_C_Prefix ( void )
 {
     if ( _CfrTil_->LastFinishedWord )
     {
-        _CfrTil_->LastFinishedWord->CProperty |= C_PREFIX | C_PREFIX_RTL_ARGS ;
-        _CfrTil_->LastFinishedWord->WProperty = WT_C_PREFIX_RTL_ARGS ;
+        _CfrTil_->LastFinishedWord->CAttribute |= C_PREFIX | C_PREFIX_RTL_ARGS ;
+        _CfrTil_->LastFinishedWord->WAttribute = WT_C_PREFIX_RTL_ARGS ;
     }
 }
 
@@ -255,8 +255,8 @@ CfrTil_C_Return ( void )
 {
     if ( _CfrTil_->LastFinishedWord )
     {
-        _CfrTil_->LastFinishedWord->CProperty |= C_RETURN | C_PREFIX_RTL_ARGS ;
-        _CfrTil_->LastFinishedWord->WProperty = WT_C_PREFIX_RTL_ARGS ;
+        _CfrTil_->LastFinishedWord->CAttribute |= C_RETURN | C_PREFIX_RTL_ARGS ;
+        _CfrTil_->LastFinishedWord->WAttribute = WT_C_PREFIX_RTL_ARGS ;
     }
 }
 
@@ -265,12 +265,12 @@ CfrTil_Void_Return ( void )
 {
     if ( _CfrTil_->LastFinishedWord )
     {
-        _CfrTil_->LastFinishedWord->CProperty &= ~ C_RETURN ;
-        _CfrTil_->LastFinishedWord->CProperty |= VOID_RETURN ;
+        _CfrTil_->LastFinishedWord->CAttribute &= ~ C_RETURN ;
+        _CfrTil_->LastFinishedWord->CAttribute |= VOID_RETURN ;
         if ( GetState ( _Context_, C_SYNTAX ) )
         {
-            _CfrTil_->LastFinishedWord->CProperty |= C_PREFIX_RTL_ARGS ;
-            _CfrTil_->LastFinishedWord->WProperty = WT_C_PREFIX_RTL_ARGS ;
+            _CfrTil_->LastFinishedWord->CAttribute |= C_PREFIX_RTL_ARGS ;
+            _CfrTil_->LastFinishedWord->WAttribute = WT_C_PREFIX_RTL_ARGS ;
         }
     }
 }
@@ -280,15 +280,15 @@ CfrTil_R8_Return ( void )
 {
     if ( _CfrTil_->LastFinishedWord )
     {
-        _CfrTil_->LastFinishedWord->CProperty &= ~ C_RETURN ;
-        _CfrTil_->LastFinishedWord->CProperty2 |= R8_RETURN ;
+        _CfrTil_->LastFinishedWord->CAttribute &= ~ C_RETURN ;
+        _CfrTil_->LastFinishedWord->CAttribute2 |= R8_RETURN ;
     }
 }
 
 void
 CfrTil_DebugWord ( void )
 {
-    if ( _CfrTil_->LastFinishedWord ) _CfrTil_->LastFinishedWord->CProperty |= DEBUG_WORD ;
+    if ( _CfrTil_->LastFinishedWord ) _CfrTil_->LastFinishedWord->CAttribute |= DEBUG_WORD ;
 }
 
 void
@@ -341,7 +341,7 @@ void
 _PrintVariable ( dlnode * node, int64 * n )
 {
     Word * word = ( Word * ) node ;
-    if ( word->CProperty & NAMESPACE_VARIABLE )
+    if ( word->CAttribute & NAMESPACE_VARIABLE )
     {
         _Variable_Print ( word ) ;
         ( *n ) ++ ;

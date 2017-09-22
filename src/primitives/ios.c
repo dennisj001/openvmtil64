@@ -54,15 +54,13 @@ CfrTil_TAB ( ) // '.'
 }
 
 void
-_Print_Binary ( byte* buffer, int64 n )
+_ConvertToBinary ( uint64 n, byte* buffer, int16 size )
 {
-    int64 i, size = 42 ; // 8 - bits/byte ; 4 - spacing
-    byte * ptr = & buffer [ size - 1 ] ;
-    buffer [ size ] = 0 ;
-    for ( i = 0 ; i < size ; i ++ ) buffer [ i ] = ' ' ;
-    for ( i = 0 ; i < 32 ; ptr -- )
+    uint64 i ; // 8 - bits/byte ; 4 - spacing
+    byte * ptr ;
+    for ( i = 0, ptr = & buffer [ size - 2 ] ; i < ( CELL_SIZE * 8 ) ; ptr -- )
     {
-        if ( n & ( 1 << i ) )
+        if ( n & ( ( ( uint64 ) 1 ) << i ) )
         {
             *ptr = '1' ;
         }
@@ -73,34 +71,44 @@ _Print_Binary ( byte* buffer, int64 n )
         i ++ ;
         if ( ! ( i % 4 ) ) ptr -- ;
         if ( ! ( i % 8 ) ) ptr -- ;
-        //if ( ! ( i % 16 ) ) ptr --;
+        if ( ! ( i % 16 ) ) ptr -- ;
+        if ( ! ( i % 32 ) ) ptr -- ;
     }
 }
 
-void
-Print_Binary ( int64 n, int64 min, int64 max )
+byte *
+_Print_Binary ( uint64 n )
 {
+    byte *ptr ;
     if ( n )
     {
-        int64 chars, modulo, rem, adj, size = 42 ;
-        byte * endOfBuffer, *ptr, buffer [ size ] ; // 8 - bits/byte ; 4 - spacing
-        _Print_Binary ( buffer, n ) ;
-        endOfBuffer = & buffer [ size ] ; // 1 : dont count final null
-        for ( ptr = buffer ; ( * ptr == '0' ) || ( * ptr == ' ' ) ; ptr ++ ) ;
-        chars = endOfBuffer - ptr ;
-        if ( chars < 5 ) modulo = 4 ;
-        else if ( chars < 10 ) modulo = 9 ;
-        else if ( chars < 21 ) modulo = 20 ;
-        else modulo = 42 ;
-        rem = chars % modulo ;
-        if ( rem )
+        int16 i, size = 128 ;
+        byte *buffer = Buffer_New_pbyte ( size ) ; //[ size ] ; // 8 - bits/byte ; 4 - spacing
+        //buffer [ size - 1 ] = 0 ;
+        for ( i = 0 ; i < size ; i ++ ) buffer [ i ] = ' ' ; // fill buffer with spaces
+        _ConvertToBinary ( n, buffer, size ) ;
+        for ( ptr = & buffer[0], i = 0 ; i < size ; ptr ++ )
         {
-            adj = modulo - rem ;
-            ptr -= adj ;
+            if ( ( *ptr == 0 ) ) break ;
+            if ( ( * ptr == '1' ) )
+            {
+                // go back to 8 bit boundary
+                while ( *-- ptr != ' ' ) ;
+                // go back to 16 bit boundary
+                while ( *-- ptr != ' ' ) ;
+                ptr += 2 ;
+                break ;
+            }
         }
-        _Printf ( ptr ) ;
+        return ptr ;
     }
-    else _Printf ( (byte*) "%d", n ) ;
+    else return ( byte* ) "" ;
+}
+
+void
+Print_Binary ( uint64 n )
+{
+    _Printf ( ( byte* ) "\n %s", _Print_Binary ( n ) ) ;
 }
 
 void
@@ -110,10 +118,10 @@ PrintfInt ( int64 n )
     if ( _Context_->System0->NumberBase == 10 ) sprintf ( ( char* ) buffer, INT_FRMT, n ) ;
     else if ( _Context_->System0->NumberBase == 2 )
     {
-        Print_Binary ( n, 4, 46 ) ;
+        Print_Binary ( n ) ; //, 4, 46 ) ;
         return ;
     }
-    else /* if ( _Context->System0->NumberBase == 16 ) */ sprintf ( ( char* ) buffer, UINT_FRMT_0x09, n ) ; // hex
+    else /* if ( _Context->System0->NumberBase == 16 ) */ sprintf ( ( char* ) buffer, UINT_FRMT_0x016, n ) ; // hex
     // ?? any and all other number bases ??
     _Printf ( ( byte* ) buffer ) ;
 }

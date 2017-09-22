@@ -6,23 +6,23 @@
 #if 0
 
 void
-_Compiler_PropertyCheck1 ( Compiler * compiler, uint64 type32 )
+_Compiler_AttributeCheck1 ( Compiler * compiler, uint64 type32 )
 {
     //return ;
     Word * word = ( Word* ) _Stack_Pop ( compiler->TypeStack ) ;
-    if ( ! ( word->S_Category & type32 ) ) Error_Abort ( ( byte* ) "CProperty Error", 1 ) ;
+    if ( ! ( word->S_Category & type32 ) ) Error_Abort ( ( byte* ) "CAttribute Error", 1 ) ;
 }
 
 void
-_Compiler_PropertyCheck2 ( Compiler * compiler, uint64 type0, uint64 type1 )
+_Compiler_AttributeCheck2 ( Compiler * compiler, uint64 type0, uint64 type1 )
 {
     //return ;
     Word * word = ( Word* ) _Stack_Pop ( compiler->TypeStack ) ;
-    if ( ! ( word->S_Category & type0 ) ) Error_Abort ( ( byte* ) "CProperty Error", 1 ) ;
-    if ( ! ( word->S_Category & type1 ) ) Error_Abort ( ( byte* ) "CProperty Error", 1 ) ;
+    if ( ! ( word->S_Category & type0 ) ) Error_Abort ( ( byte* ) "CAttribute Error", 1 ) ;
+    if ( ! ( word->S_Category & type1 ) ) Error_Abort ( ( byte* ) "CAttribute Error", 1 ) ;
 }
 int64
-_PropertyCheck1 ( uint64 zero )
+_AttributeCheck1 ( uint64 zero )
 {
     //if ( GetState( _Context_->Compiler0, BLOCK_MODE ) )
     {
@@ -34,7 +34,7 @@ _PropertyCheck1 ( uint64 zero )
 }
 
 int64
-_PropertyCheck2 ( uint64 zero, uint64 one )
+_AttributeCheck2 ( uint64 zero, uint64 one )
 {
     //if ( GetState( _Context_->Compiler0, BLOCK_MODE ) )
     {

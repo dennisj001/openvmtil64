@@ -93,7 +93,7 @@ OpenVmTil_Print_DataSizeofInfo ( int64 flag )
         _Printf ( ( byte* ) "dobject size : %d bytes, ", sizeof ( dobject ) ) ;
         _Printf ( ( byte* ) "DLNode size : %d bytes, ", sizeof ( DLNode ) ) ;
         _Printf ( ( byte* ) "PropInfo size : %d bytes, ", sizeof (PropInfo ) ) ;
-        //_Printf ( ( byte* ) "\nCProperty0 size : %d bytes, ", sizeof (struct _T_CProperty0 ) ) ;
+        //_Printf ( ( byte* ) "\nCAttribute0 size : %d bytes, ", sizeof (struct _T_CAttribute0 ) ) ;
         _Printf ( ( byte* ) "CfrTil size : %d bytes, ", sizeof (CfrTil ) ) ;
         _Printf ( ( byte* ) "Context size : %d bytes, ", sizeof (Context ) ) ;
         _Printf ( ( byte* ) "System size : %d bytes, ", sizeof (System ) ) ;

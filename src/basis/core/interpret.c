@@ -9,7 +9,7 @@ Interpreter_InterpretAToken ( Interpreter * interp, byte * token, int64 tokenSta
     {
         word = _Interpreter_TokenToWord ( interp, token ) ;
         _Interpreter_DoWord ( interp, word, tokenStartReadLineIndex ) ;
-        //if ( Compiling && ( word->CProperty & ( LITERAL | CONSTANT ) ) && ( !( word->CProperty & ( NAMESPACE_VARIABLE ) ) ) ) Word_Recycle ( word ) ;
+        //if ( Compiling && ( word->CAttribute & ( LITERAL | CONSTANT ) ) && ( !( word->CAttribute & ( NAMESPACE_VARIABLE ) ) ) ) Word_Recycle ( word ) ;
     }
     else SetState ( _Context_->Lexer0, LEXER_END_OF_LINE, true ) ;
     return word ;
@@ -50,25 +50,25 @@ _Interpreter_DoWord ( Interpreter * interp, Word * word, int64 tokenStartReadLin
         word->W_SC_ScratchPadIndex = _CfrTil_->SC_ScratchPadIndex ;
         //DEBUG_SETUP ( word ) ;
         interp->w_Word = word ;
-        if ( ( word->WProperty == WT_INFIXABLE ) && ( GetState ( cntx, INFIX_MODE ) ) ) // nb. Interpreter must be in INFIX_MODE because it is effective for more than one word
+        if ( ( word->WAttribute == WT_INFIXABLE ) && ( GetState ( cntx, INFIX_MODE ) ) ) // nb. Interpreter must be in INFIX_MODE because it is effective for more than one word
         {
             Finder_SetNamedQualifyingNamespace ( cntx->Finder0, ( byte* ) "Infix" ) ;
             Interpreter_InterpretNextToken ( interp ) ;
             // then continue and interpret this 'word' - just one out of lexical order
             _Interpreter_DoWord_Default ( interp, word ) ;
         }
-        else if ( ( word->WProperty == WT_PREFIX ) || _Interpreter_IsWordPrefixing ( interp, word ) ) // with this almost any rpn function can be used prefix with a following '(' :: this checks for that condition
+        else if ( ( word->WAttribute == WT_PREFIX ) || _Interpreter_IsWordPrefixing ( interp, word ) ) // with this almost any rpn function can be used prefix with a following '(' :: this checks for that condition
         {
             SetState ( cntx->Compiler0, DOING_A_PREFIX_WORD, true ) ;
             _Interpret_PrefixFunction_Until_RParen ( interp, word ) ;
             SetState ( cntx->Compiler0, DOING_A_PREFIX_WORD, false ) ;
         }
-        else if ( word->WProperty == WT_C_PREFIX_RTL_ARGS )
+        else if ( word->WAttribute == WT_C_PREFIX_RTL_ARGS )
         {
             LC_CompileRun_C_ArgList ( word ) ;
         }
         else _Interpreter_DoWord_Default ( interp, word ) ; //  case WT_POSTFIX: case WT_INFIXABLE: // cf. also _Interpreter_SetupFor_MorphismWord
-        if ( ! ( word->CProperty & DEBUG_WORD ) ) interp->LastWord = word ;
+        if ( ! ( word->CAttribute & DEBUG_WORD ) ) interp->LastWord = word ;
         //DEBUG_SHOW ;
     }
 }
@@ -135,7 +135,7 @@ _Interpreter_IsWordPrefixing ( Interpreter * interp, Word * word )
     {
         // with this any postfix word that is not a keyword or a c rtl arg word can now be used prefix with parentheses 
         byte c = Lexer_NextNonDelimiterChar ( interp->Lexer0 ) ;
-        if ( ( c == '(' ) && ( ! ( word->CProperty & KEYWORD ) ) && ( ! ( word->WProperty & WT_C_PREFIX_RTL_ARGS ) ) )
+        if ( ( c == '(' ) && ( ! ( word->CAttribute & KEYWORD ) ) && ( ! ( word->WAttribute & WT_C_PREFIX_RTL_ARGS ) ) )
         {
             return true ;
         }
@@ -157,7 +157,7 @@ _Compiler_CopyDuplicatesAndPush ( Compiler * compiler, Word * word )
     depth = List_Depth ( list ) ;
     word0 = word ; // we always push and return word1
     word0->W_OriginalWord = word0 ;
-    //word1->S_CProperty &= ( ~RECYCLABLE_COPY ) ;
+    //word1->S_CAttribute &= ( ~RECYCLABLE_COPY ) ;
 
     for ( i = 0 ; i < depth ; i ++ )
     {
@@ -167,7 +167,7 @@ _Compiler_CopyDuplicatesAndPush ( Compiler * compiler, Word * word )
             word0 = Word_Copy ( word, DICTIONARY ) ; //COMPILER_TEMP ) ; //WORD_COPY_MEM ) ; // especially for "this" so we can use a different Code & AccumulatedOffsetPointer not the existing 
             word0->W_OriginalWord = Word_GetOriginalWord ( word ) ;
             _dlnode_Init ( ( dlnode * ) word0 ) ; // necessary!
-            word0->S_CProperty |= ( uint64 ) RECYCLABLE_COPY ;
+            word0->S_CAttribute |= ( uint64 ) RECYCLABLE_COPY ;
             word0->W_StartCharRlIndex = wrli ;
             break ;
         }

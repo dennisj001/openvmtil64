@@ -76,8 +76,8 @@ _DObject_ValueDefinition_Init ( Word * word, uint64 value, uint64 funcType, byte
 // using a variable that is a type or a function 
 {
 
-    word->W_PtrToValue = & word->W_Value ;
-    word->W_Value = value ;
+    word->W_PtrToValue = & word->W_Value ; // lvalue
+    word->W_Value = value ; // rvalue
     if ( GetState ( _Context_->Compiler0, LC_ARG_PARSING | PREFIX_ARG_PARSING ) ) word->W_StartCharRlIndex = _Context_->Lexer0->TokenStart_ReadLineIndex ;
 
     if ( funcType & BLOCK )
@@ -111,7 +111,7 @@ _DObject_ValueDefinition_Init ( Word * word, uint64 value, uint64 funcType, byte
 void
 _DObject_Finish ( Word * word )
 {
-    uint64 ctype = word->CProperty ;
+    uint64 ctype = word->CAttribute ;
     if ( ! ( ctype & CPRIMITIVE ) )
     {
         if ( GetState ( _CfrTil_, OPTIMIZE_ON ) ) word->State |= COMPILED_OPTIMIZED ;
@@ -120,20 +120,20 @@ _DObject_Finish ( Word * word )
         if ( GetState ( _Context_, C_SYNTAX ) ) word->State |= W_C_SYNTAX ;
         //if ( IsSourceCodeOn ) word->State |= W_SOURCE_CODE_MODE ;
     }
-    if ( GetState ( _Context_, INFIX_MODE ) ) word->CProperty |= INFIX_WORD ;
+    if ( GetState ( _Context_, INFIX_MODE ) ) word->CAttribute |= INFIX_WORD ;
     word->W_NumberOfArgs = _Context_->Compiler0->NumberOfArgs ;
     word->W_NumberOfLocals = _Context_->Compiler0->NumberOfLocals ;
     _CfrTil_->LastFinishedWord = word ;
 }
 
 Word *
-_DObject_Init ( Word * word, uint64 value, uint64 ftype, byte * function, int64 arg, int64 addToInNs, Namespace * addToNs )
+_DObject_Init ( Word * word, uint64 value, uint64 ftype, byte * function, int64 arg )
 {
     // remember : Word = Namespace = DObject : each have an s_Symbol
     _DObject_ValueDefinition_Init ( word, value, ftype, function, arg ) ;
     _DObject_Finish ( word ) ;
     word->RunType = ftype ;
-    _Word_Add ( word, addToInNs, addToNs ) ;
+    //_Word_Add ( word, addToInNs, addToNs ) ;
     return word ;
 }
 
@@ -141,10 +141,10 @@ _DObject_Init ( Word * word, uint64 value, uint64 ftype, byte * function, int64 
 // remember : Word = Namespace = DObject has a s_Symbol
 
 Word *
-_DObject_New ( byte * name, uint64 value, uint64 ctype, uint64 ltype, uint64 ftype, byte * function, int64 arg, int64 addToInNs, Namespace * addToNs, uint64 allocType )
+_DObject_New ( byte * name, uint64 value, uint64 ctype, uint64 ltype, uint64 ftype, byte * function, int64 arg, int8 addToInNs, Namespace * addToNs, uint64 allocType )
 {
-    Word * word = _Word_New ( name, ctype, ltype, allocType ) ; //( addToInNs || addToNs ) ? DICTIONARY : allocType ) ;
-    _DObject_Init ( word, value, ftype, function, arg, addToInNs, addToNs ) ;
+    Word * word = _Word_New ( name, ctype, ltype, addToInNs, addToNs, allocType ) ; //( addToInNs || addToNs ) ? DICTIONARY : allocType ) ;
+    _DObject_Init ( word, value, ftype, function, arg ) ;
     _CfrTil_->DObjectCreateCount ++ ;
     return word ;
 }
@@ -176,16 +176,16 @@ void
 DObject_SubObjectInit ( DObject * dobject, Word * parent )
 {
     if ( ! parent ) parent = _CfrTil_Namespace_InNamespaceGet ( ) ;
-    else if ( ! ( parent->CProperty & NAMESPACE ) )
+    else if ( ! ( parent->CAttribute & NAMESPACE ) )
     {
 
         parent->W_List = dllist_New ( ) ;
-        parent->CProperty |= NAMESPACE ;
+        parent->CAttribute |= NAMESPACE ;
         _Namespace_AddToNamespacesTail ( parent ) ;
     }
     if ( parent->S_WAllocType == WORD_COPY_MEM ) parent = Word_Copy ( ( Word* ) parent, DICTIONARY ) ; // nb! : this allows us to
     Namespace_DoAddWord ( parent, dobject ) ;
-    dobject->CProperty |= parent->CProperty ;
+    dobject->CAttribute |= parent->CAttribute ;
     dobject->Slots = parent->Slots ;
     _Namespace_SetState ( parent, USING ) ;
 }
@@ -205,7 +205,7 @@ void
 CfrTil_SetPropertiesAsDObject ( )
 {
     DObject * o = ( DObject * ) _DataStack_Pop ( ) ;
-    o->CProperty |= DOBJECT ;
+    o->CAttribute |= DOBJECT ;
 }
 
 DObject *
@@ -224,7 +224,7 @@ CfrTil_DObject_Clone ( )
 {
     DObject * proto = ( DObject * ) _DataStack_Pop ( ) ;
     byte * name = ( byte * ) _DataStack_Pop ( ) ;
-    if ( ! ( proto->CProperty & DOBJECT ) ) Error2 ( ( byte* ) "Cloning Error : \'%s\' is not a dynamic object.", proto->Name, 1 ) ;
+    if ( ! ( proto->CAttribute & DOBJECT ) ) Error2 ( ( byte* ) "Cloning Error : \'%s\' is not a dynamic object.", proto->Name, 1 ) ;
     DObject_Sub_New ( proto, name, DOBJECT ) ;
 }
 

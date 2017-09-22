@@ -116,13 +116,13 @@ _CfrTil_InitialAddWordToNamespace ( Word * word, byte * containingNamespaceName,
 void
 _CfrTil_CPrimitiveNewAdd ( const char * name, block b, uint64 ctype, uint64 ltype, const char *nameSpace, const char * superNamespace )
 {
-    Word * word = _Word_New ( ( byte* ) name, CPRIMITIVE | ctype, ltype, EXISTING ) ; //DICTIONARY ) ;
+    Word * word = _Word_New ( ( byte* ) name, CPRIMITIVE | ctype, ltype, 1, 0, EXISTING ) ; //DICTIONARY ) ;
     _DObject_ValueDefinition_Init ( word, ( int64 ) b, BLOCK, 0, 0 ) ;
     _CfrTil_InitialAddWordToNamespace ( word, ( byte* ) nameSpace, ( byte* ) superNamespace ) ;
-    if ( ctype & INFIXABLE ) word->WProperty = WT_INFIXABLE ;
-    else if ( ctype & PREFIX ) word->WProperty = WT_PREFIX ;
-    else if ( ctype & C_PREFIX_RTL_ARGS ) word->WProperty = WT_C_PREFIX_RTL_ARGS ;
-    else word->WProperty = WT_POSTFIX ;
+    if ( ctype & INFIXABLE ) word->WAttribute = WT_INFIXABLE ;
+    else if ( ctype & PREFIX ) word->WAttribute = WT_PREFIX ;
+    else if ( ctype & C_PREFIX_RTL_ARGS ) word->WAttribute = WT_C_PREFIX_RTL_ARGS ;
+    else word->WAttribute = WT_POSTFIX ;
 }
 
 void
@@ -132,7 +132,7 @@ CfrTil_AddCPrimitives ( )
     for ( i = 0 ; CPrimitives [ i ].ccp_Name ; i ++ )
     {
         CPrimitive p = CPrimitives [ i ] ;
-        _CfrTil_CPrimitiveNewAdd ( p.ccp_Name, p.blk_Definition, p.ui64_CProperty, p.ui64_LProperty, ( char* ) p.NameSpace, ( char* ) p.SuperNamespace ) ;
+        _CfrTil_CPrimitiveNewAdd ( p.ccp_Name, p.blk_Definition, p.ui64_CAttribute, p.ui64_LAttribute, ( char* ) p.NameSpace, ( char* ) p.SuperNamespace ) ;
     }
 }
 
@@ -201,7 +201,7 @@ CfrTil_MachineCodePrimitive_AddWords ( )
             functionArg = - 1 ;
             callHook = 0 ;
         }
-        _CfrTil_MachineCodePrimitive_NewAdd ( p.ccp_Name, p.ui64_CProperty, callHook, p.Function, functionArg, p.NameSpace, p.SuperNamespace ) ;
+        _CfrTil_MachineCodePrimitive_NewAdd ( p.ccp_Name, p.ui64_CAttribute, callHook, p.Function, functionArg, p.NameSpace, p.SuperNamespace ) ;
     }
 }
 

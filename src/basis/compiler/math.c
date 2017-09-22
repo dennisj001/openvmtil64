@@ -301,7 +301,7 @@ _CfrTil_Do_IncDec ( int64 op )
     {
         if ( op == INC )
         {
-            if ( ( sd > 1 ) && one->CProperty & ( PARAMETER_VARIABLE | LOCAL_VARIABLE | NAMESPACE_VARIABLE ) )
+            if ( ( sd > 1 ) && one->CAttribute & ( PARAMETER_VARIABLE | LOCAL_VARIABLE | NAMESPACE_VARIABLE ) )
             {
                 *( ( int64* ) ( TOS ) ) += 1 ;
                 DSP_Drop ( ) ;
@@ -310,7 +310,7 @@ _CfrTil_Do_IncDec ( int64 op )
         }
         else
         {
-            if ( ( sd > 1 ) && one->CProperty & ( PARAMETER_VARIABLE | LOCAL_VARIABLE | NAMESPACE_VARIABLE ) )
+            if ( ( sd > 1 ) && one->CAttribute & ( PARAMETER_VARIABLE | LOCAL_VARIABLE | NAMESPACE_VARIABLE ) )
             {
                 *( ( int64* ) ( TOS ) ) -= 1 ;
                 DSP_Drop ( ) ;

@@ -98,8 +98,8 @@ CPrimitive CPrimitives [] = {
     { ",", CfrTil_NoOp, IMMEDIATE | KEYWORD, 0, "C_Syntax", "C" },
     { "!", CfrTil_LogicalNot, IMMEDIATE | CATEGORY_OP_1_ARG | CATEGORY_LOGIC | PREFIX, 0, "C_Syntax", "C" },
     { "c_class", ( block ) CfrTil_C_Class_New, 0, 0, "C_Syntax", "C" },
-    { "type", ( block ) CfrTil_Property_New, 0, 0, "C_Syntax", "C" },
-    { "typedef", CfrTil_Propertydef, 0, 0, "C_Syntax", "C" },
+    { "type", ( block ) CfrTil_Attribute_New, 0, 0, "C_Syntax", "C" },
+    { "typedef", CfrTil_Attributedef, 0, 0, "C_Syntax", "C" },
     { "&", CfrTil_AddressOf, IMMEDIATE, ADDRESS_OF_OP, "C_Syntax", "C" }, // avoid name clash with '&&' and '&' 
     { "=", (block) CfrTil_C_Infix_Equal, IMMEDIATE | CATEGORY_EQUAL | KEYWORD, 0, "C_Syntax", "C" }, //"Infix", "Compiler" },
 
@@ -604,7 +604,7 @@ CPrimitive CPrimitives [] = {
 MachineCodePrimitive MachineCodePrimitives [] = {
     { "getESP", CPRIMITIVE, 0, ( byte* ) Compile_Debug_GetESP, -1, "System", "Root" },
     { "restoreCpuState", CPRIMITIVE, 0, ( byte* ) Compile_CpuState_Restore, 0, "System", "Root" },
-    { "restoreCpuStateHere", CPRIMITIVE, 0, ( byte* ) Compile_CpuState_RestoreHere, 0, "System", "Root" },
+    //{ "restoreCpuStateHere", CPRIMITIVE, 0, ( byte* ) Compile_CpuState_RestoreHere, 0, "System", "Root" },
     { "restoreCpuState", CPRIMITIVE, 0, ( byte* ) Compile_CpuState_Restore, 0, "Debug", "Root" },
     { "saveCpuState", CPRIMITIVE, 0, ( byte* ) _Compile_CpuState_Save, 0, "System", "Root" },
     { "saveCpuState", CPRIMITIVE, 0, ( byte* ) _Compile_CpuState_Save, 0, "Debug", "Root" },

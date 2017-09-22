@@ -20,7 +20,7 @@ Debugger_UdisOneInstruction ( Debugger * debugger, byte * address, byte * prefix
     if ( _CfrTil_->DebugWordList )
     {
         _Printf ( ( byte* ) "%s", prefix ) ;
-        _Debugger_ShowSourceCodeAtAddress ( debugger ) ;
+        _Debugger_ShowSourceCodeAtAddress ( debugger, address ) ;
         prefix = ( byte* ) "" ;
     }
     return _Debugger_Udis_OneInstruction ( debugger, address, prefix, postfix ) ;
@@ -29,7 +29,7 @@ Debugger_UdisOneInstruction ( Debugger * debugger, byte * address, byte * prefix
 int64
 _Debugger_Disassemble ( Debugger * debugger, byte* address, int64 number, int64 cflag )
 {
-    int64 size = _Udis_Disassemble ( Debugger_UdisInit ( debugger ), address, ( ( number > 2 * K ) ? 2 * K : number ), cflag ) ;
+    int64 size = _Udis_Disassemble ( Debugger_UdisInit ( debugger ), address, ( ( number > (3 * K) ) ? (3 * K) : number ), cflag ) ;
     debugger->LastDisStart = address ;
     return size ;
 }
@@ -50,7 +50,7 @@ Debugger_Dis ( Debugger * debugger )
     {
         _Printf ( ( byte* ) "\nDisassembly of : %s.%s", c_ud ( word->ContainingNamespace ? word->ContainingNamespace->Name : ( byte* ) "" ), c_dd ( word->Name ) ) ;
         int64 codeSize = word->S_CodeSize ;
-        _Debugger_Disassemble ( debugger, ( byte* ) word->CodeStart, codeSize ? codeSize : 64, word->CProperty & ( CPRIMITIVE | DLSYM_WORD ) ? 1 : 0 ) ;
+        _Debugger_Disassemble ( debugger, ( byte* ) word->CodeStart, codeSize ? codeSize : 64, word->CAttribute & ( CPRIMITIVE | DLSYM_WORD ) ? 1 : 0 ) ;
         if ( debugger->DebugAddress )
         {
             _Printf ( ( byte* ) "\nNext instruction ..." ) ;
@@ -79,7 +79,7 @@ _Debugger_DisassembleWrittenCode ( Debugger * debugger )
             //ConserveNewlines ;
             byte * csName = ( byte * ) c_dd ( Get_CompilerSpace ( )->OurNBA->NBA_Name ) ;
             _Printf ( ( byte* ) "\nCode compiled to %s for word :> %s <: ...", csName, c_dd ( String_CB ( word->Name ) ) ) ;
-            _Debugger_Disassemble ( debugger, debugger->PreHere, codeSize, word->CProperty & ( CPRIMITIVE | DLSYM_WORD | DEBUG_WORD ) ? 1 : 0 ) ;
+            _Debugger_Disassemble ( debugger, debugger->PreHere, codeSize, word->CAttribute & ( CPRIMITIVE | DLSYM_WORD | DEBUG_WORD ) ? 1 : 0 ) ;
             //debugger->PreHere = Here ;
         }
     }

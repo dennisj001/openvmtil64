@@ -6,19 +6,6 @@ _Debugger_StepOneInstruction ( Debugger * debugger )
 {
     debugger->PreHere = Here ;
     debugger->SaveStackDepth = DataStack_Depth ( ) ;
-#if 0    
-    if ( DBI )
-    {
-        d1 ( Word * currentWord = _Interpreter_->w_Word ) ;
-        d1 ( _Printf ( ( byte* ) "\n_Compile_InstructionX64 :: CurrentWord = %s :: location : %s :", currentWord ? ( currentWord->Name ? currentWord->Name : ( byte* ) "" ) : ( byte* ) "", Context_Location ( ) ) ) ;
-        _Debugger_Disassemble ( _Debugger_, ( byte* ) debugger->StepInstructionBA->BA_Data, 1200, 1 ) ;
-        //__CfrTil_Dump ( debugger->StepInstructionBA->BA_Data, 2 * K, 16 ) ;
-        DBI_OFF ;
-    }
-    d0 ( _PrintNStackWindow ( ( uint64* ) & debugger->cs_Cpu->Rsp[1], "ReturnStack", "RSP", 4 ) ) ; //pushedWindow ) ) ;
-    d0 ( _PrintNStackWindow ( ( int64* ) debugger->CopyRSP, "ReturnStackCopy", "RSCP", 4 ) ) ; //pushedWindow ) ) ;
-    //CfrTil_CpuState_CheckShow ( ) ;
-#endif    
     ( ( VoidFunction ) debugger->StepInstructionBA->BA_Data ) ( ) ;
 }
 
@@ -64,30 +51,12 @@ _Debugger_CompileAndStepOneInstruction ( Debugger * debugger, byte * jcAddress )
 {
     Boolean showExtraFlag = false ;
     byte * svHere = Here ; // save 
+    //debugger->DebugAddress = address ;
     byte * nextInsn = Debugger_CompileOneInstruction ( debugger, jcAddress, showExtraFlag ) ; // compile the insn here
     Debugger_StepOneInstruction ( debugger ) ;
     if ( showExtraFlag && ( _Q_->Verbosity >= 3 ) ) Debug_ExtraShow ( Here - svHere, showExtraFlag ) ;
     DebugColors ;
     debugger->DebugAddress = nextInsn ;
-}
-
-int64
-Debugger_CanWeStep ( Debugger * debugger, Word * word )
-{
-    if ( ( ! word ) || ( ! word->CodeStart ) || ( ! NamedByteArray_CheckAddress ( _Q_CodeSpace, word->CodeStart ) ) )
-    {
-        SetState ( debugger, DBG_CAN_STEP, false ) ; // debugger->State flag = false ;
-        return false ;
-    }
-    else if ( word && ( Compiling || ( word->CProperty & ( CPRIMITIVE | DLSYM_WORD ) ) || ( word->LProperty & T_LISP_DEFINE ) ) ) 
-    {
-        return false ;
-    }
-    else
-    {
-        SetState ( debugger, DBG_CAN_STEP, true ) ;
-        return true ;
-    }
 }
 
 byte *
@@ -136,7 +105,7 @@ start:
         }
         else // step into the the jmp/call insn
         {
-            if ( word->CProperty & ( ALIAS ) ) word = word->W_AliasOf ;
+            if ( word->CAttribute & ( ALIAS ) ) word = word->W_AliasOf ;
             if ( * debugger->DebugAddress == CALLI32 )
             {
                 if ( _Q_->Verbosity > 1 ) _Word_ShowSourceCode ( word ) ;
@@ -154,11 +123,11 @@ start:
         _Printf ( ( byte* ) "\nstepping thru and out of a \"native\" subroutine : %s : .... :>", word ? ( char* ) c_dd ( word->Name ) : "" ) ;
         debugger->Key = 's' ;
         SetState ( debugger, DBG_AUTO_MODE, true ) ;
-        goto doRegular ;
+        goto doDefault ;
     }
     else
     {
-doRegular:
+doDefault:
         newDebugAddress = debugger->DebugAddress + size ;
         if ( ! GetState ( debugger, DBG_JCC_INSN ) )
         {
@@ -213,7 +182,7 @@ start:
             jcAddress = JumpCallInstructionAddress ( debugger->DebugAddress ) ;
             Word * word = Word_GetFromCodeAddress ( jcAddress ) ;
             //debugger->CurrentlyRunningWord = word ;
-            if ( word && ( word->CProperty & ( DEBUG_WORD ) ) ) //&& ( ! GetState ( debugger, (DBG_CONTINUE_MODE|DBG_AUTO_MODE) ) ) )
+            if ( word && ( word->CAttribute & ( DEBUG_WORD ) ) ) //&& ( ! GetState ( debugger, (DBG_CONTINUE_MODE|DBG_AUTO_MODE) ) ) )
             {
                 SetState ( debugger, ( DBG_CONTINUE_MODE | DBG_AUTO_MODE ), false ) ;
                 _Printf ( ( byte* ) "\nskipping over a debug word : %s : at 0x%-8x", word ? ( char* ) c_dd ( word->Name ) : "", debugger->DebugAddress ) ;
@@ -252,7 +221,7 @@ start:
             SetState ( debugger, DBG_JCC_INSN, false ) ;
             goto end ;
         }
-        _Debugger_CompileAndStepOneInstruction ( debugger, jcAddress ) ;
+        _Debugger_CompileAndStepOneInstruction ( debugger, jcAddress ) ;//? jcAddress : debugger->DebugAddress ) ;
 end:
         if ( debugger->DebugAddress )
         {
@@ -354,6 +323,8 @@ _Debugger_SetupStepping ( Debugger * debugger, Word * word, byte * address, byte
         if ( ( ! address ) || ( ! GetState ( debugger, ( DBG_BRK_INIT ) ) ) ) address = ( byte* ) word->Definition ;
     }
     SetState_TrueFalse ( debugger, DBG_STEPPING, DBG_NEWLINE | DBG_PROMPT | DBG_INFO | DBG_MENU ) ;
+    debugger->DebugAddress = address ;
+    debugger->w_Word = word ;
     if ( iflag )
     {
 
@@ -361,8 +332,6 @@ _Debugger_SetupStepping ( Debugger * debugger, Word * word, byte * address, byte
         Debugger_UdisOneInstruction ( debugger, address, ( byte* ) "", ( byte* ) "" ) ;
     }
     //debugger->SaveDsp = Dsp ; // saved before we start stepping
-    debugger->DebugAddress = address ;
-    debugger->w_Word = word ;
 }
 
 void
@@ -427,9 +396,9 @@ Debugger_SetupReturnStackCopy ( Debugger * debugger, int64 showFlag ) // restore
     // restore the running cfrTil esp/ebp : nb! : esp/ebp were not restored by debugger->RestoreCpuState and are being restore here in the proper context
     if ( stackSetupFlag )
     {
-        //_Compile_Get_FromCAddress_ToReg_ThruReg ( RBP, ( byte * ) & debugger->ReturnStackCopyPointer - ( ( ( int64 ) debugger->cs_Cpu->Rbp ) - ( ( int64 ) debugger->cs_Cpu->Rsp ) ), R9D ) ;
-        _Compile_Get_FromCAddress_ToReg_ThruReg ( RBP, ( byte * ) & debugger->CopyRSP - ( ( ( int64 ) debugger->cs_Cpu->Rbp ) - ( ( int64 ) debugger->cs_Cpu->Rsp ) ), R9D ) ;
-        _Compile_Get_FromCAddress_ToReg_ThruReg ( RSP, ( byte * ) & debugger->CopyRSP, R9D ) ;
+        //_Compile_Get_FromCAddress_ToReg_ThruReg ( RBP, ( byte * ) & debugger->ReturnStackCopyPointer - ( ( ( int64 ) debugger->cs_Cpu->Rbp ) - ( ( int64 ) debugger->cs_Cpu->Rsp ) ), R10D ) ;
+        _Compile_Get_FromCAddress_ToReg ( RBP, ( byte * ) & debugger->CopyRSP - ( ( ( int64 ) debugger->cs_Cpu->Rbp ) - ( ( int64 ) debugger->cs_Cpu->Rsp ) ) ) ;
+        _Compile_Get_FromCAddress_ToReg ( RSP, ( byte * ) & debugger->CopyRSP ) ;
         _Compile_Get_FromCAddress_ToReg ( R9D, ( byte * ) & debugger->cs_Cpu->R9d ) ; // restore our scratch reg
     }
     if ( showFlag ) Compile_Call ( ( byte* ) _Debugger_CpuState_Show ) ; // also dis insn
@@ -440,7 +409,7 @@ _Compile_Restore_Debugger_CpuState ( Debugger * debugger, int64 showFlag ) // re
 {
     // restore the 'internal running cfrTil' cpu state which was saved after the last instruction : debugger->cs_CpuState is the 'internal running cfrTil' cpu state
     // we don't have to worry so much about the compiler 'spoiling' our insn with restore 
-    _Compile_CpuState_Restore ( debugger->cs_Cpu, 0, 0 ) ;
+    _Compile_CpuState_Restore ( debugger->cs_Cpu, 0 ) ;
     //Debugger_SetupReturnStackCopy ( debugger, showFlag ) ; // restore the running cfrTil cpu state
     if ( showFlag ) Compile_Call ( ( byte* ) _Debugger_CpuState_Show ) ; // also dis insn
 }
@@ -448,7 +417,7 @@ _Compile_Restore_Debugger_CpuState ( Debugger * debugger, int64 showFlag ) // re
 void
 _Compile_Restore_C_CpuState ( CfrTil * cfrtil, int64 showFlag )
 {
-    _Compile_CpuState_Restore ( cfrtil->cs_Cpu, 0, 0 ) ;
+    _Compile_CpuState_Restore ( cfrtil->cs_Cpu, 0 ) ;
     if ( showFlag ) Compile_Call ( ( byte* ) _CfrTil_CpuState_Show ) ;
 }
 
@@ -564,6 +533,25 @@ Debugger_DoJcc ( Debugger * debugger, int64 numOfBytes )
         }
     }
     return jcAddress ;
+}
+
+int64
+Debugger_CanWeStep ( Debugger * debugger, Word * word )
+{
+    if ( ( ! word ) || ( ! word->CodeStart ) || ( ! NamedByteArray_CheckAddress ( _Q_CodeSpace, word->CodeStart ) ) )
+    {
+        SetState ( debugger, DBG_CAN_STEP, false ) ; // debugger->State flag = false ;
+        return false ;
+    }
+    else if ( word && ( Compiling || ( word->CAttribute & ( CPRIMITIVE | DLSYM_WORD ) ) || ( word->LAttribute & T_LISP_DEFINE ) ) ) 
+    {
+        return false ;
+    }
+    else
+    {
+        SetState ( debugger, DBG_CAN_STEP, true ) ;
+        return true ;
+    }
 }
 
 void

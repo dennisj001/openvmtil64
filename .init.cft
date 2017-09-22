@@ -363,7 +363,7 @@ sp
 //Zenfone2 1 =
 //mem pause
 : sh _sh ; prefix
-//dbgOff
+dbgOff
 dbgOn
 //Root 'doScript 0 const
 Root 'doScript 1 const
@@ -378,4 +378,5 @@ dbgOff
 #endif
 : argsOrderExample ( a b c d ) a @ p b @ p c @ p d @ p ; "\n 1 2 3 4 argsOrderExample ( a b c d )  => " ps   1 2 3 4 argsOrderExample 
 mp
+nl 789654321 9087654321 * dup p binary p
 

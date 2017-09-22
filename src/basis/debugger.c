@@ -225,16 +225,10 @@ _Debugger_Init ( Debugger * debugger, Word * word, byte * address )
     {
         debugger->DebugAddress = address ;
     }
-#if 0    
-    else
+    else if ( debugger->cs_Cpu->Rsp )
     {
-        // remember : _Q_->CfrTil->Debugger0->GetESP is called thru _Compile_Debug : <dbg>
-
-        if ( ! debugger->DebugRSP ) debugger->SaveCpuState ( ) ;
-        d1 ( _PrintNStackWindow ( ( uint64* ) debugger->cs_Cpu->Rsp, "ReturnStack", "ESP", 4 ) ) ; //pushedWindow ) ) ;
-
-        debugger->DebugAddress = ( byte* ) debugger->cs_Cpu->Rsp  ; // 0 is <dbg>
-        //next :
+        // remember : _Compile_CpuState_Save ( _Debugger_->cs_Cpu ) ; is called thru _Compile_Debug : <dbg>
+        debugger->DebugAddress = ( byte* ) debugger->cs_Cpu->Rsp[0] ; // 0 is <dbg>
         if ( debugger->DebugAddress )
         {
             byte * da ;
@@ -259,7 +253,6 @@ _Debugger_Init ( Debugger * debugger, Word * word, byte * address )
             if ( _Q_->Verbosity > 3 ) _CfrTil_PrintNReturnStack ( 4 ) ;
         }
     }
-#endif    
     if ( debugger->w_Word ) debugger->Token = debugger->w_Word->Name ;
     else
     {

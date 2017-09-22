@@ -38,8 +38,8 @@ mmap_AllocMem ( int64 size )
 void
 MemChunk_Show ( MemChunk * mchunk )
 {
-    //_Printf ( ( byte* ) "\naddress : 0x%08x : allocType = %8lu : size = %8d : data = 0x%08x", ( uint64 ) mchunk, ( uint64 ) mchunk->S_AProperty, ( int64 ) mchunk->S_ChunkSize, ( uint64 ) mchunk->S_ChunkData ) ;
-    _Printf ( ( byte* ) "\naddress : 0x%08x : allocType = %8lu : size = %8d", ( uint64 ) mchunk, ( uint64 ) mchunk->S_AProperty, ( int64 ) mchunk->S_ChunkSize ) ;
+    //_Printf ( ( byte* ) "\naddress : 0x%08x : allocType = %8lu : size = %8d : data = 0x%08x", ( uint64 ) mchunk, ( uint64 ) mchunk->S_AAttribute, ( int64 ) mchunk->S_ChunkSize, ( uint64 ) mchunk->S_ChunkData ) ;
+    _Printf ( ( byte* ) "\naddress : 0x%08x : allocType = %8lu : size = %8d", ( uint64 ) mchunk, ( uint64 ) mchunk->S_AAttribute, ( int64 ) mchunk->S_ChunkSize ) ;
 }
 
 void
@@ -47,7 +47,7 @@ _MemChunk_WithSymbol_Show ( MemChunk * mchunk, int64 flag )
 {
     Symbol * sym = ( Symbol * ) ( mchunk + 1 ) ;
     _Printf ( ( byte* ) "\n%s : %s : 0x%lld : %d, ", ( flag == MEM_ALLOC ) ? "Alloc" : "Free",
-        ( ( int64 ) ( sym->S_Name ) > 0x80000000 ) ? ( char* ) sym->S_Name : "(null)", mchunk->S_AProperty, mchunk->S_ChunkSize ) ;
+        ( ( int64 ) ( sym->S_Name ) > 0x80000000 ) ? ( char* ) sym->S_Name : "(null)", mchunk->S_AAttribute, mchunk->S_ChunkSize ) ;
 }
 
 void
@@ -86,7 +86,7 @@ _Mem_ChunkAllocate ( int64 size, uint64 allocType )
     MemChunk * mchunk = ( MemChunk * ) mmap_AllocMem ( asize ) ;
     mchunk->S_unmap = ( byte* ) mchunk ;
     mchunk->S_ChunkSize = asize ; // S_ChunkSize is the total size of the chunk including any prepended accounting structure in that total
-    mchunk->S_AProperty = allocType ;
+    mchunk->S_AAttribute = allocType ;
     //mchunk->S_ChunkData = ( byte* ) ( mchunk + 1 ) ; // nb. ptr arithmetic
     _MemChunk_Account ( ( MemChunk* ) mchunk, MEM_ALLOC ) ;
     dllist_AddNodeToHead ( &_Q_->PermanentMemList, ( dlnode* ) mchunk ) ;
@@ -173,9 +173,9 @@ NBA_FreeChunkType ( Symbol * s, uint64 allocType, int64 exactFlag )
     NamedByteArray * nba = Get_NBA_Symbol_To_NBA ( s ) ;
     if ( exactFlag )
     {
-        if ( nba->NBA_AProperty != allocType ) return ;
+        if ( nba->NBA_AAttribute != allocType ) return ;
     }
-    else if ( ! ( nba->NBA_AProperty & allocType ) ) return ;
+    else if ( ! ( nba->NBA_AAttribute & allocType ) ) return ;
     FreeNba_BaList ( nba ) ;
     nba->MemRemaining = 0 ;
     nba->MemAllocated = 0 ;
@@ -351,7 +351,7 @@ void
 NBA_Show ( NamedByteArray * nba, int64 flag )
 {
     byte * name = nba->NBA_Symbol.S_Name ;
-    if ( _Q_->Verbosity > 2 ) _Printf ( ( byte* ) "\n%-27s type = %8lu Used = " INT_FRMT_9 " : Unused = " INT_FRMT_9, name, ( uint64 ) nba->NBA_AProperty, nba->MemAllocated - nba->MemRemaining, nba->MemRemaining ) ;
+    if ( _Q_->Verbosity > 2 ) _Printf ( ( byte* ) "\n%-27s type = %8lu Used = " INT_FRMT_9 " : Unused = " INT_FRMT_9, name, ( uint64 ) nba->NBA_AAttribute, nba->MemAllocated - nba->MemRemaining, nba->MemRemaining ) ;
     else _Printf ( ( byte* ) "\n%-43s Used = " INT_FRMT_9 " : Unused = " INT_FRMT_9, name, nba->MemAllocated - nba->MemRemaining, nba->MemRemaining ) ;
     if ( flag )
     {
@@ -388,7 +388,7 @@ Word_Recycle ( Word * w )
 void
 _CheckRecycleWord ( Word * w )
 {
-    if ( w && ( w->S_CProperty & RECYCLABLE_COPY ) )
+    if ( w && ( w->S_CAttribute & RECYCLABLE_COPY ) )
     {
         if ( ! ( IsSourceCodeOn && w->State & W_SOURCE_CODE_MODE ) )
         {

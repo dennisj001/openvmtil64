@@ -34,7 +34,7 @@ _OpenVmTil_ShowExceptionInfo ( )
                     if ( word )
                     {
                         _CfrTil_Source ( word, 0 ) ;
-                        //if ( ! CompileMode && ( ! ( word->CProperty & CPRIMITIVE ) ) ) _CfrTil_Word_Disassemble ( word ) ;
+                        //if ( ! CompileMode && ( ! ( word->CAttribute & CPRIMITIVE ) ) ) _CfrTil_Word_Disassemble ( word ) ;
                     }
                 }
             }

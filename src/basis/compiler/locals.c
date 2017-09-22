@@ -70,7 +70,7 @@ _Compiler_RemoveLocalFrame ( Compiler * compiler )
     {
         SetState ( compiler, RETURN_TOS, true ) ;
     }
-    returnValueFlag = ( _Context_->CurrentlyRunningWord->CProperty & C_RETURN ) || ( GetState ( compiler, RETURN_TOS | RETURN_R8 ) ) || IsWordRecursive || compiler->ReturnVariableWord ;
+    returnValueFlag = ( _Context_->CurrentlyRunningWord->CAttribute & C_RETURN ) || ( GetState ( compiler, RETURN_TOS | RETURN_R8 ) ) || IsWordRecursive || compiler->ReturnVariableWord ;
     Word * word = compiler->ReturnVariableWord ;
     if ( word )
     {

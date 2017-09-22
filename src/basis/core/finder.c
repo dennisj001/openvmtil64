@@ -40,7 +40,7 @@ Symbol *
 _Finder_CompareDefinitionAddress_NoAlias ( Symbol * symbol, byte * address )
 {
     Word * word = ( Word * ) symbol ;
-    if ( ( ! ( word->CProperty & ALIAS ) ) ) return _Finder_CompareDefinitionAddress ( symbol, address ) ;
+    if ( ( ! ( word->CAttribute & ALIAS ) ) ) return _Finder_CompareDefinitionAddress ( symbol, address ) ;
 }
 
 Word *
@@ -116,16 +116,16 @@ Finder_FindQualifiedIDWord ( Finder * finder, byte * token )
     Word * word ;
     while ( ( word = Finder_Word_FindUsing ( finder, token, 0 ) ) )
     {
-        if ( word->CProperty & ( NAMESPACE ) )
+        if ( word->CAttribute & ( NAMESPACE ) )
         {
             Namespace * ns = ( Namespace * ) word ;
             Finder_SetQualifyingNamespace ( finder, ns ) ;
         }
-        else if ( word->CProperty & ( OBJECT ) )
+        else if ( word->CAttribute & ( OBJECT ) )
         {
             Finder_SetQualifyingNamespace ( finder, word->ContainingNamespace ) ;
         }
-        else if ( word->CProperty & ( OBJECT_FIELD ) )
+        else if ( word->CAttribute & ( OBJECT_FIELD ) )
         {
             Finder_SetQualifyingNamespace ( finder, word->ClassFieldTypeNamespace ) ;
         }

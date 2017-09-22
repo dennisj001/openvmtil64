@@ -30,7 +30,7 @@ CfrTil_IncDec ( int64 op ) // +
         Word * currentWord = _Context_->CurrentlyRunningWord ;
         Word * nextWord = Finder_Word_FindUsing ( cntx->Interpreter0->Finder0, nextToken, 0 ) ;
         SetState ( _Debugger_, DEBUG_SHTL_OFF, true ) ;
-        if ( nextWord && ( nextWord->CProperty & ( CATEGORY_OP_ORDERED | CATEGORY_OP_UNORDERED | CATEGORY_OP_DIVIDE | CATEGORY_OP_EQUAL ) ) ) // postfix
+        if ( nextWord && ( nextWord->CAttribute & ( CATEGORY_OP_ORDERED | CATEGORY_OP_UNORDERED | CATEGORY_OP_DIVIDE | CATEGORY_OP_EQUAL ) ) ) // postfix
         {
             List_DropN ( compiler->WordList, 1 ) ; // the operator; let higher level see the variable
             Interpreter_InterpretNextToken ( cntx->Interpreter0 ) ;
@@ -53,9 +53,9 @@ CfrTil_IncDec ( int64 op ) // +
                 }
             }
         }
-        if ( one->CProperty & ( PARAMETER_VARIABLE | LOCAL_VARIABLE | NAMESPACE_VARIABLE ) )
+        if ( one->CAttribute & ( PARAMETER_VARIABLE | LOCAL_VARIABLE | NAMESPACE_VARIABLE ) )
         {
-            if ( ( ! ( two->CProperty & ( KEYWORD ) ) ) && GetState ( _Context_, C_SYNTAX ) )
+            if ( ( ! ( two->CAttribute & ( KEYWORD ) ) ) && GetState ( _Context_, C_SYNTAX ) )
             {
                 if ( ! GetState ( compiler, INFIX_LIST_INTERPRET ) )
                 {
@@ -70,7 +70,7 @@ CfrTil_IncDec ( int64 op ) // +
                 }
             }
         }
-        else if ( nextWord && ( nextWord->CProperty & ( PARAMETER_VARIABLE | LOCAL_VARIABLE | NAMESPACE_VARIABLE ) ) ) // prefix
+        else if ( nextWord && ( nextWord->CAttribute & ( PARAMETER_VARIABLE | LOCAL_VARIABLE | NAMESPACE_VARIABLE ) ) ) // prefix
         {
             List_DropN ( compiler->WordList, 1 ) ; // the operator; let higher level see the variable
             _Interpreter_DoWord ( cntx->Interpreter0, nextWord, - 1 ) ;
@@ -84,7 +84,7 @@ CfrTil_IncDec ( int64 op ) // +
                 Word * word ;
                 dllist * postfixList = List_New ( ) ;
                 List_Push_1Value_Node ( postfixList, currentWord, COMPILER_TEMP ) ; // remember : this will be lifo
-                for ( i = 1 ; word = Compiler_WordList ( i ), ( word->CProperty & ( CATEGORY_OP_ORDERED | CATEGORY_OP_UNORDERED | CATEGORY_OP_DIVIDE | CATEGORY_OP_EQUAL ) ) ; i ++ ) ;
+                for ( i = 1 ; word = Compiler_WordList ( i ), ( word->CAttribute & ( CATEGORY_OP_ORDERED | CATEGORY_OP_UNORDERED | CATEGORY_OP_DIVIDE | CATEGORY_OP_EQUAL ) ) ; i ++ ) ;
                 List_Push_1Value_Node ( postfixList, Compiler_WordList ( i ), COMPILER_TEMP ) ;
                 List_Push_1Value_Node ( compiler->PostfixLists, postfixList, COMPILER_TEMP ) ;
                 List_DropN ( compiler->WordList, 1 ) ; // the operator; let higher level see the variable for optimization

@@ -4,7 +4,7 @@
 Word *
 Compiler_CopyDuplicatesAndPush ( Word * word )
 {
-    if ( word && CompileMode && ( ! ( word->CProperty & ( DEBUG_WORD ) ) ) )
+    if ( word && CompileMode && ( ! ( word->CAttribute & ( DEBUG_WORD ) ) ) )
     {
         word = _Compiler_CopyDuplicatesAndPush ( _Context_->Compiler0, word ) ;
     }
@@ -90,7 +90,7 @@ Compiler_PreviousNonDebugWord ( int64 startIndex )
     int64 i ;
     for ( i = startIndex ; ( word = ( Word* ) Compiler_WordList ( i ) ) && i > - 3 ; i -- )
     {
-        if ( ( Symbol* ) word && ( ! ( word->CProperty & DEBUG_WORD ) ) ) break ;
+        if ( ( Symbol* ) word && ( ! ( word->CAttribute & DEBUG_WORD ) ) ) break ;
     }
     return word ;
 }

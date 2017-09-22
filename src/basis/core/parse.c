@@ -71,7 +71,7 @@ gotNextToken:
             {
                 if ( i )
                 {
-                    //arrayBaseObject->CProperty |= VARIABLE ;
+                    //arrayBaseObject->CAttribute |= VARIABLE ;
                     arrayBaseObject->ArrayDimensions = ( int64 * ) Mem_Allocate ( i * sizeof (int64 ), DICTIONARY ) ;
                     memcpy ( arrayBaseObject->ArrayDimensions, arrayDimensions, i * sizeof (int64 ) ) ;
                 }
@@ -99,11 +99,12 @@ void
 Compiler_TypedObjectInit ( Namespace * typeNamespace, Word * word )
 {
     word->TypeNamespace = typeNamespace ;
-    word->CProperty |= typeNamespace->CProperty ;
-    if ( typeNamespace->CProperty & CLASS ) word->CProperty |= OBJECT ;
-    word->LProperty |= LOCAL_OBJECT ;
-    //_DObject_Init ( Word * word, uint64 value, uint64 ftype, byte * function, int64 arg, int64 addToInNs, Namespace * addToNs )
-    _DObject_Init ( word, ( int64 ) 0, LOCAL_OBJECT, ( byte* ) _DataObject_Run, 0, 1, 0 ) ;
+    word->CAttribute |= typeNamespace->CAttribute ;
+    if ( typeNamespace->CAttribute & CLASS ) word->CAttribute |= OBJECT ;
+    word->LAttribute |= LOCAL_OBJECT ;
+    //_DObject_Init ( Word * word, uint64 value, uint64 ftype, byte * function, int64 arg )
+    _DObject_Init ( word, ( int64 ) 0, LOCAL_OBJECT, ( byte* ) _DataObject_Run, 0 ) ;
+    _Word_Add ( word, 1, 0 ) ;
 }
 
 // old docs :
@@ -149,7 +150,7 @@ _CfrTil_Parse_LocalsAndStackVariables ( int64 svf, int64 lispMode, ListObject * 
         if ( lispMode )
         {
             args = _LO_Next ( args ) ;
-            if ( args->LProperty & ( LIST | LIST_NODE ) ) args = _LO_First ( args ) ;
+            if ( args->LAttribute & ( LIST | LIST_NODE ) ) args = _LO_First ( args ) ;
             token = ( byte* ) args->Lo_Name ;
             CfrTil_AddStringToSourceCode ( _CfrTil_, token ) ;
         }
@@ -158,7 +159,7 @@ _CfrTil_Parse_LocalsAndStackVariables ( int64 svf, int64 lispMode, ListObject * 
         {
             if ( String_Equal ( token, "(" ) ) continue ;
             word = Finder_Word_FindUsing ( finder, token, 1 ) ; // ?? find after Literal - eliminate making strings or numbers words ??
-            if ( word && ( word->CProperty & ( NAMESPACE | CLASS ) ) && ( CharTable_IsCharType ( ReadLine_PeekNextChar ( lexer->ReadLiner0 ), CHAR_ALPHA ) ) )
+            if ( word && ( word->CAttribute & ( NAMESPACE | CLASS ) ) && ( CharTable_IsCharType ( ReadLine_PeekNextChar ( lexer->ReadLiner0 ), CHAR_ALPHA ) ) )
             {
                 typeNamespace = word ;
                 continue ;
@@ -256,7 +257,7 @@ _CfrTil_Parse_LocalsAndStackVariables ( int64 svf, int64 lispMode, ListObject * 
                     //SetState ( word, W_INITIALIZED, false ) ; // shouldn't be necessary
                 }
                 typeNamespace = 0 ;
-                if ( String_Equal ( token, "this" ) ) word->CProperty |= THIS ;
+                if ( String_Equal ( token, "this" ) ) word->CAttribute |= THIS ;
             }
         }
         else return 0 ; // Syntax Error or no local or parameter variables

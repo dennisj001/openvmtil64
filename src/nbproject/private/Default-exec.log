@@ -575,8 +575,8 @@ called: gcc
 	-ggdb
 	-c
 	-o
-	basis/property.o
-	basis/property.c
+	basis/attribute.o
+	basis/attribute.c
 
 called: gcc
 	/home/dennisj/cfrtil.0.823.300.10/src
@@ -961,7 +961,7 @@ called: gcc
 	basis/openVmTil.o
 	basis/core/dobject.o
 	basis/core/preprocessor.o
-	basis/property.o
+	basis/attribute.o
 	basis/lists.o
 	basis/debugDisassembly.o
 	basis/linux.o
@@ -1104,7 +1104,7 @@ called: /usr/bin/ld
 	basis/openVmTil.o
 	basis/core/dobject.o
 	basis/core/preprocessor.o
-	basis/property.o
+	basis/attribute.o
 	basis/lists.o
 	basis/debugDisassembly.o
 	basis/linux.o

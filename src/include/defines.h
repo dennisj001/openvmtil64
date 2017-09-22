@@ -18,7 +18,8 @@
 #else 
 #define d1( x ) x
 #define d0( x ) 
-#define D1( x ) d1 ( if ( _Is_DebugOn ) x ) ;
+#define D1( x ) if ( _Is_DebugOn ) DBI_ON, x 
+#define DBI1( x ) if ( DBI ) x 
 #define D0( x ) 
 #endif
 
@@ -205,7 +206,7 @@
 #define PSI_NEWLINE ( 1 << 15 )
 #define PSI_PROMPT  ( 1 << 16 )
 
-// CProperty - LType -shared in common 
+// CAttribute - LType -shared in common 
 #define CPRIMITIVE ( (uint64) 1 << 0 )
 #define CFRTIL_WORD ( (uint64) 1 << 1 )
 #define T_RAW_STRING ( (uint64) 1 << 2 )
@@ -219,7 +220,7 @@
 #define T_TAIL ( (uint64) 1 << 9 )
 #define LITERAL ( (uint64) 1 << 10 )
 
-// CProperty - C forth types
+// CAttribute - C forth types
 #define QUALIFIED_ID    ( (uint64) 1 << 11 ) 
 #define QID QUALIFIED_ID 
 #define IMMEDIATE ( (uint64) 1 << 12 )
@@ -281,12 +282,12 @@
 #define LISP_CFRTIL     ( (uint64) 1 << 62 )
 #define CATEGORY_EQUAL     ( (uint64) 1 << 63 )
 
-// CProperty2
+// CAttribute2
 #define R8_RETURN          ( (uint64) 1 << 0 ) 
 #define CATEGORY_SHIFT      ( (uint64) 1 << 1 ) 
 #define SOURCE_CODE_WORD    ( (uint64) 1 << 2 ) 
 
-// _CProperty for interpreter word types - 4 bits/ 16 possibilities : N_WordProperty bitfield
+// _CAttribute for interpreter word types - 4 bits/ 16 possibilities : N_WordAttribute bitfield
 #define WT_PREFIX                 1
 #define WT_INFIXABLE              2
 #define WT_C_PREFIX_RTL_ARGS      3

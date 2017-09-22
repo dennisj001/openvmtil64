@@ -107,7 +107,7 @@ int64
 _Lexer_ConsiderDebugAndCommentTokens ( byte * token, int64 evalFlag, int64 addFlag )
 {
     Word * word = Finder_Word_FindUsing ( _Finder_, token, 1 ) ;
-    if ( word && ( word->CProperty & DEBUG_WORD ) || ( word && ( word->LProperty & W_COMMENT ) ) )
+    if ( word && ( word->CAttribute & DEBUG_WORD ) || ( word && ( word->LAttribute & W_COMMENT ) ) )
     {
         if ( evalFlag )
         {
@@ -136,10 +136,13 @@ _Lexer_NextNonDebugOrCommentTokenWord ( Lexer * lexer, int64 evalFlag )
 byte *
 Lexer_PeekNextNonDebugTokenWord ( Lexer * lexer, int64 evalFlag )
 {
-    byte * token ;
+    byte * token = 0 ;
     if ( _AtCommandLine ( ) && Lexer_CheckIfDone ( lexer, LEXER_DONE ) ) return 0 ;
-    token = _Lexer_NextNonDebugOrCommentTokenWord ( lexer, evalFlag ) ;
-    _CfrTil_AddTokenToTailOfTokenList ( token ) ; // TODO ; list should instead be a stack
+    else
+    {
+        token = _Lexer_NextNonDebugOrCommentTokenWord ( lexer, evalFlag ) ;
+        _CfrTil_AddTokenToTailOfTokenList ( token ) ; // TODO ; list should instead be a stack
+    }
     return token ;
 }
 
@@ -744,7 +747,7 @@ CarriageReturn ( Lexer * lexer )
 void
 NewLine ( Lexer * lexer )
 {
-    if ( AtCommandLine( lexer->ReadLiner0 ) ) //( ! IS_INCLUDING_FILES ) || GetState ( _Debugger_, DBG_COMMAND_LINE ) )
+    if ( AtCommandLine ( lexer->ReadLiner0 ) ) //( ! IS_INCLUDING_FILES ) || GetState ( _Debugger_, DBG_COMMAND_LINE ) )
     {
         SetState ( lexer, LEXER_DONE | LEXER_END_OF_LINE, true ) ;
         if ( lexer->OurInterpreter ) SetState ( lexer->OurInterpreter, INTERPRETER_DONE | END_OF_LINE, true ) ;

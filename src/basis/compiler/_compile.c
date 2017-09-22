@@ -98,22 +98,23 @@ _Compile_LocalOrStackVar_RValue_To_Reg ( Word * word, int64 reg )
 {
     SC_DWL_Push ( word ) ;
     word->Coding = Here ; // we don't need the word's code if compiling -- this is an optimization though
-    if ( word->CProperty & REGISTER_VARIABLE )
+    if ( word->CAttribute & REGISTER_VARIABLE )
     {
         if ( word->RegToUse == reg ) return ;
         else _Compile_Move_Reg_To_Reg ( reg, word->RegToUse ) ;
     }
-    else if ( word->CProperty & LOCAL_VARIABLE )
+    else if ( word->CAttribute & LOCAL_VARIABLE )
     {
         _Compile_Move_StackN_To_Reg ( reg, FP, LocalVarOffset ( word ) ) ; // 2 : account for saved fp and return slot
     }
-    else if ( word->CProperty & PARAMETER_VARIABLE )
+    else if ( word->CAttribute & PARAMETER_VARIABLE )
     {
         _Compile_Move_StackN_To_Reg ( reg, FP, ParameterVarOffset ( word ) ) ; // account for stored bp and return value
     }
-    else if ( word->CProperty & ( OBJECT | THIS ) )
+    else if ( word->CAttribute & ( OBJECT | THIS ) )
     {
-        _Compile_Move_Literal_Immediate_To_Reg ( reg, ( int64 ) * word->W_PtrToValue ) ;
+        _Compile_Move_Literal_Immediate_To_Reg ( reg, ( int64 ) word->W_PtrToValue ) ;
+        _Compile_Move_Rm_To_Reg ( reg, reg, 0 ) ;
     }
 }
 
@@ -123,8 +124,8 @@ Do_ObjectOffset ( Word * word, int64 reg )
     Compiler * compiler = _Context_->Compiler0 ;
     int64 offset = word->AccumulatedOffset ;
     if ( GetState ( _CfrTil_, IN_OPTIMIZER ) && ( offset == 0 ) ) return ;
-    Compile_ADDI ( REG, reg, 0, offset, 0 ) ;
-    compiler->AccumulatedOffsetPointer = ( int64* ) ( Here - CELL ) ; // offset will be calculated as we go along by ClassFields and Array accesses
+    Compile_ADDI ( REG, reg, 0, offset, INT32_SIZE ) ;
+    compiler->AccumulatedOffsetPointer = ( int32* ) ( Here - INT32_SIZE ) ; // offset will be calculated as we go along by ClassFields and Array accesses
 }
 
 void
@@ -132,34 +133,34 @@ _Compile_GetVarLitObj_RValue_To_Reg ( Word * word, int64 reg )
 {
     SC_DWL_Push ( word ) ;
     word->Coding = Here ; // we don't need the word's code if compiling -- this is an optimization though
-    if ( word->CProperty & REGISTER_VARIABLE )
+    if ( word->CAttribute & REGISTER_VARIABLE )
     {
         return ;
         //if ( word->RegToUse == reg ) return ;
         //else _Compile_Move_Reg_To_Reg ( reg, word->RegToUse ) ;
     }
-    else if ( word->CProperty & LOCAL_VARIABLE )
+    else if ( word->CAttribute & LOCAL_VARIABLE )
     {
         _Compile_Move_StackN_To_Reg ( reg, FP, LocalVarOffset ( word ) ) ; // 2 : account for saved fp and return slot
     }
-    else if ( word->CProperty & PARAMETER_VARIABLE )
+    else if ( word->CAttribute & PARAMETER_VARIABLE )
     {
         _Compile_Move_StackN_To_Reg ( reg, FP, ParameterVarOffset ( word ) ) ; // account for stored bp and return value
     }
-    else if ( word->CProperty & NAMESPACE_VARIABLE )
+    else if ( word->CAttribute & NAMESPACE_VARIABLE )
     {
         _Compile_Move_Literal_Immediate_To_Reg ( reg, ( int64 ) word->W_PtrToValue ) ;
         _Compile_Move_Rm_To_Reg ( reg, reg, 0 ) ;
     }
-    else if ( word->CProperty & ( LITERAL | CONSTANT | OBJECT | THIS ) )
+    else if ( word->CAttribute & ( LITERAL | CONSTANT | OBJECT | THIS ) )
     {
-        _Compile_Move_Literal_Immediate_To_Reg ( reg, ( int64 ) * word->W_PtrToValue ) ;
+        _Compile_Move_Literal_Immediate_To_Reg ( reg, ( int64 ) *word->W_PtrToValue ) ;
     }
     else SyntaxError ( QUIT ) ;
-    if ( word->CProperty & ( OBJECT | THIS ) )
+    if ( word->CAttribute & ( OBJECT | THIS ) )
     {
         Do_ObjectOffset ( word, reg ) ;
-        //if ( ! ( word->LProperty & LOCAL_OBJECT ) ) _Compile_Move_Rm_To_Reg ( reg, reg, 0 ) ; // ?? this for LOCAL_OBJECT seems like we need to better integrate LOCAL_OBJECT
+        //if ( ! ( word->LAttribute & LOCAL_OBJECT ) ) _Compile_Move_Rm_To_Reg ( reg, reg, 0 ) ; // ?? this for LOCAL_OBJECT seems like we need to better integrate LOCAL_OBJECT
         _Compile_Move_Rm_To_Reg ( reg, reg, 0 ) ;
     }
 }
@@ -171,20 +172,20 @@ _Compile_SetVarLitObj_With_Reg ( Word * word, int64 reg, int64 thruReg )
 {
     SC_DWL_Push ( word ) ;
     word->Coding = Here ; // we don't need the word's code if compiling -- this is an optimization though
-    if ( word->CProperty & REGISTER_VARIABLE )
+    if ( word->CAttribute & REGISTER_VARIABLE )
     {
         if ( word->RegToUse == reg ) return ;
         else _Compile_Move_Reg_To_Reg ( word->RegToUse, reg ) ;
     }
-    else if ( word->CProperty & LOCAL_VARIABLE )
+    else if ( word->CAttribute & LOCAL_VARIABLE )
     {
         _Compile_Move_Reg_To_StackN ( FP, LocalVarOffset ( word ), reg ) ;
     }
-    else if ( word->CProperty & PARAMETER_VARIABLE )
+    else if ( word->CAttribute & PARAMETER_VARIABLE )
     {
         _Compile_Move_Reg_To_StackN ( FP, ParameterVarOffset ( word ), reg ) ;
     }
-    else if ( word->CProperty & NAMESPACE_VARIABLE )
+    else if ( word->CAttribute & NAMESPACE_VARIABLE )
     {
         //_Compile_Move_Literal_Immediate_To_Reg ( thruReg, ( int64 ) word->W_PtrToValue ) ;
         //_Compile_Move_Reg_To_Rm ( thruReg, reg, 0 ) ;
@@ -197,35 +198,35 @@ _Compile_GetVarLitObj_LValue_To_Reg ( Word * word, int64 reg )
 {
     SC_DWL_Push ( word ) ;
     word->Coding = Here ;
-    if ( word->CProperty & REGISTER_VARIABLE )
+    if ( word->CAttribute & REGISTER_VARIABLE )
     {
         if ( word->RegToUse == reg ) return ;
         else _Compile_Move_Reg_To_Reg ( reg, word->RegToUse ) ;
     }
-    else if ( word->CProperty & ( OBJECT | THIS ) || ( word->WProperty & WT_QID ) ) //pointers
+    else if ( word->CAttribute & ( OBJECT | THIS ) || ( word->WAttribute & WT_QID ) ) //pointers
     {
         _Compile_LocalOrStackVar_RValue_To_Reg ( word, reg ) ;
     }
-    else if ( word->CProperty & LOCAL_VARIABLE )
+    else if ( word->CAttribute & LOCAL_VARIABLE )
     {
         _Compile_LEA ( reg, FP, 0, LocalVarIndex_Disp ( LocalVarOffset ( word ) ) ) ; // 2 : account for saved fp and return slot
     }
-    else if ( word->CProperty & PARAMETER_VARIABLE )
+    else if ( word->CAttribute & PARAMETER_VARIABLE )
     {
         _Compile_LEA ( reg, FP, 0, LocalVarIndex_Disp ( ParameterVarOffset ( word ) ) ) ;
     }
-    else if ( word->CProperty & NAMESPACE_VARIABLE )
+    else if ( word->CAttribute & NAMESPACE_VARIABLE )
     {
         int64 value ;
         if ( GetState ( _Context_->Compiler0, LC_ARG_PARSING ) || ( GetState ( _Context_, C_SYNTAX ) && ( ! Is_LValue ( word ) ) ) )//GetState ( _Context_, C_RHS ) )
         {
-            value = ( int64 ) * word->W_PtrToValue ;
+            value = ( int64 ) word->W_Value ;
         }
         else value = ( int64 ) word->W_PtrToValue ;
         _Compile_Move_Literal_Immediate_To_Reg ( reg, ( int64 ) value ) ;
     }
     else SyntaxError ( QUIT ) ;
-    if ( word->CProperty & ( OBJECT | THIS ) || ( word->WProperty & WT_QID ) )
+    if ( word->CAttribute & ( OBJECT | THIS ) || ( word->WAttribute & WT_QID ) )
     {
         Do_ObjectOffset ( word, reg ) ;
     }

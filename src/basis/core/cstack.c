@@ -392,20 +392,20 @@ _CfrTil_PrintNReturnStack ( int64 size )
     else if ( debugger->cs_Cpu->Rsp ) //debugger->DebugESP )
     {
         //_PrintNStackWindow ( ( uint64* ) debugger->DebugESP, ( byte * ) "Return Stack", ( byte * ) "DebugEsp", size ) ;
-        _PrintNStackWindow ( ( uint64* ) debugger->cs_Cpu->Rsp, ( byte * ) "Return Stack", ( byte * ) "Esp (ESP)", size ) ;
+        _PrintNStackWindow ( ( uint64* ) debugger->cs_Cpu->Rsp, ( byte * ) "Return Stack", ( byte * ) "Rsp (RSP)", size ) ;
         _Stack_PrintValues ( ( byte* ) "DebugStack ", debugger->DebugStack->StackPointer, Stack_Depth ( debugger->DebugStack ) ) ;
     }
     else
     {
         _CfrTil_WordName_Run ( ( byte* ) "getESP" ) ;
         uint64 * esp = ( uint64 * ) _DataStack_Pop ( ) ;
-        _PrintNStackWindow ( esp, ( byte* ) "Return Stack", ( byte* ) "Esp (ESP)", size ) ;
+        _PrintNStackWindow ( esp, ( byte* ) "Return Stack", ( byte* ) "Rsp (RSP)", size ) ;
     }
 }
 
 void
 _CfrTil_PrintNDataStack ( int64 size )
 {
-    _PrintNStackWindow ( Dsp, ( byte* ) "Data Stack", ( byte* ) "Dsp (DSP)", size ) ;
+    _PrintNStackWindow ( Dsp, ( byte* ) "Data Stack", ( byte* ) "Dsp (DSP:R14)", size ) ;
 }
 

@@ -31,7 +31,7 @@ CfrTil_DObject_New ( )
 }
 
 Namespace *
-CfrTil_Property_New ( )
+CfrTil_Attribute_New ( )
 {
     CfrTil_Token ( ) ;
     byte * name = ( byte* ) _DataStack_Pop ( ) ;
@@ -39,9 +39,9 @@ CfrTil_Property_New ( )
 }
 
 void
-CfrTil_Propertydef ( )
+CfrTil_Attributedef ( )
 {
-    //_CfrTil_Propertydef ( ) ;
+    //_CfrTil_Attributedef ( ) ;
     _DataObject_New ( C_TYPEDEF, 0, 0, 0, 0, 0, 0, 0 ) ;
 }
 

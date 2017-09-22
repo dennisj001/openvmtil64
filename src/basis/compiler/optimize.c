@@ -48,38 +48,38 @@
 void
 _GetRmDispImm ( CompileOptimizeInfo * optInfo, Word * word, int64 suggestedReg )
 {
-    if ( word->CProperty & REGISTER_VARIABLE )
+    if ( word->CAttribute & REGISTER_VARIABLE )
     {
         optInfo->OptimizeFlag |= OPTIMIZE_REGISTER ;
         optInfo->Optimize_Dest_RegOrMem = REG ;
         optInfo->Optimize_Mod = REG ;
         optInfo->Optimize_Rm = optInfo->Optimize_Reg = ( suggestedReg != - 1 ) ? suggestedReg : word->RegToUse ;
     }
-    else if ( word->CProperty & LOCAL_VARIABLE )
+    else if ( word->CAttribute & LOCAL_VARIABLE )
     {
         optInfo->Optimize_Rm = FP ;
         optInfo->Optimize_Disp = LocalVarIndex_Disp ( LocalVarOffset ( word ) ) ;
         optInfo->OptimizeFlag |= OPTIMIZE_RM ;
     }
-    else if ( word->CProperty & PARAMETER_VARIABLE )
+    else if ( word->CAttribute & PARAMETER_VARIABLE )
     {
         optInfo->Optimize_Rm = FP ;
         optInfo->Optimize_Disp = LocalVarIndex_Disp ( ParameterVarOffset ( word ) ) ;
         optInfo->OptimizeFlag |= OPTIMIZE_RM ;
     }
-    else if ( word->CProperty & ( LITERAL | CONSTANT ) )
+    else if ( word->CAttribute & ( LITERAL | CONSTANT ) )
     {
         optInfo->Optimize_Imm = ( int64 ) * word->W_PtrToValue ;
         optInfo->OptimizeFlag |= OPTIMIZE_IMM ;
     }
-    else if ( word->CProperty & ( NAMESPACE_VARIABLE ) )
+    else if ( word->CAttribute & ( NAMESPACE_VARIABLE ) )
     {
         if ( suggestedReg == - 1 ) suggestedReg = R8D ;
         _Compile_Move_Literal_Immediate_To_Reg ( suggestedReg, ( int64 ) word->W_PtrToValue ) ; // ?? should this be here ??
         optInfo->Optimize_Rm = suggestedReg ;
         optInfo->OptimizeFlag |= OPTIMIZE_RM ;
     }
-    else //if ( word->CProperty & CATEGORY_OP_1_ARG )
+    else //if ( word->CAttribute & CATEGORY_OP_1_ARG )
     {
         optInfo->Optimize_Rm = DSP ;
         optInfo->OptimizeFlag |= OPTIMIZE_RM ;
@@ -123,7 +123,7 @@ PeepHole_Optimize ( )
 int64
 _GetWordStackListState ( int64 count )
 {
-    int64 property ;
+    int64 attribute ;
     int64 state = 0, op = 0 ; // , dpth = _Stack_Depth ( compiler->WordStack ) ;
     int64 i, j, objectFieldFlag = 0 ;
     Word * word ;
@@ -137,26 +137,26 @@ _GetWordStackListState ( int64 count )
             SetState ( word, OPTIMIZE_OFF, false ) ;
             continue ;
         }
-        property = word->CProperty ;
-        if ( property & ( DEBUG_WORD ) )
+        attribute = word->CAttribute ;
+        if ( attribute & ( DEBUG_WORD ) )
         {
             i -- ;
             continue ;
         }
-        else if ( property & ( THIS | OBJECT | OBJECT_FIELD ) )
+        else if ( attribute & ( THIS | OBJECT | OBJECT_FIELD ) )
         {
             if ( objectFieldFlag )
             {
                 // this case comes up with arrays
                 -- i ;
-                if ( property & ( THIS | OBJECT ) )
+                if ( attribute & ( THIS | OBJECT ) )
                 {
                     -- count ;
                     objectFieldFlag = false ;
                 }
                 continue ; // don't record an OBJECT_FIELD
             }
-            else if ( property & OBJECT_FIELD )
+            else if ( attribute & OBJECT_FIELD )
             {
                 if ( ! objectFieldFlag ) ++ count ; // only increment/decrement count once per object
                 objectFieldFlag = true ;
@@ -168,21 +168,21 @@ _GetWordStackListState ( int64 count )
         else
         {
             objectFieldFlag = false ;
-            if ( property & ( LITERAL | CONSTANT ) ) op = OP_LC ;
+            if ( attribute & ( LITERAL | CONSTANT ) ) op = OP_LC ;
                 //else if ( category & ( THIS | OBJECT | OBJECT_FIELD ) ) op = OP_OBJECT ;
-            else if ( property & ( LOCAL_VARIABLE | PARAMETER_VARIABLE | NAMESPACE_VARIABLE ) ) op = OP_VAR ;
-            else if ( property & ( CATEGORY_EQUAL ) ) op = OP_EQUAL ;
-            else if ( property & ( CATEGORY_OP_EQUAL ) ) op = OP_OPEQUAL ;
-            else if ( property & ( CATEGORY_OP_1_ARG ) ) op = OP_1_ARG ;
-            else if ( property & ( CATEGORY_LOGIC ) ) op = OP_LOGIC ;
-            else if ( property & ( CATEGORY_OP_UNORDERED ) ) op = OP_UNORDERED ;
-            else if ( property & ( CATEGORY_OP_STORE ) ) op = OP_STORE ;
-            else if ( property & ( CATEGORY_OP_ORDERED ) ) op = OP_ORDERED ;
-            else if ( property & ( CATEGORY_DUP ) ) op = OP_DUP ;
+            else if ( attribute & ( LOCAL_VARIABLE | PARAMETER_VARIABLE | NAMESPACE_VARIABLE ) ) op = OP_VAR ;
+            else if ( attribute & ( CATEGORY_EQUAL ) ) op = OP_EQUAL ;
+            else if ( attribute & ( CATEGORY_OP_EQUAL ) ) op = OP_OPEQUAL ;
+            else if ( attribute & ( CATEGORY_OP_1_ARG ) ) op = OP_1_ARG ;
+            else if ( attribute & ( CATEGORY_LOGIC ) ) op = OP_LOGIC ;
+            else if ( attribute & ( CATEGORY_OP_UNORDERED ) ) op = OP_UNORDERED ;
+            else if ( attribute & ( CATEGORY_OP_STORE ) ) op = OP_STORE ;
+            else if ( attribute & ( CATEGORY_OP_ORDERED ) ) op = OP_ORDERED ;
+            else if ( attribute & ( CATEGORY_DUP ) ) op = OP_DUP ;
                 //else if ( category & ( CATEGORY_RECURSIVE ) ) op = OP_RECURSE ;
-            else if ( property & ( CATEGORY_OP_LOAD ) ) op = OP_FETCH ;
-            else if ( property & ( CATEGORY_OP_DIVIDE ) ) op = OP_DIVIDE ;
-            else if ( property & ( CPRIMITIVE | BLOCK ) ) continue ; //op = OP_CPRIMITIVE ;
+            else if ( attribute & ( CATEGORY_OP_LOAD ) ) op = OP_FETCH ;
+            else if ( attribute & ( CATEGORY_OP_DIVIDE ) ) op = OP_DIVIDE ;
+            else if ( attribute & ( CPRIMITIVE | BLOCK ) ) continue ; //op = OP_CPRIMITIVE ;
                 //else if ( category & ( STACKING ) ) op = OP_STACK ;
             else
             {
@@ -237,7 +237,7 @@ _CheckOptimizeOperands ( Compiler * compiler, int64 maxOperands )
                         SetHere ( optInfo->O_three->Coding ) ;
                         if ( compiler->NumberOfRegisterVariables )
                         {
-                            if ( optInfo->O_zero->CProperty & CATEGORY_OP_DIVIDE )
+                            if ( optInfo->O_zero->CAttribute & CATEGORY_OP_DIVIDE )
                                 return 0 ; // seems untested 
                             _GetRmDispImm ( optInfo, optInfo->O_one, - 1 ) ;
                             _GetRmDispImm ( optInfo, optInfo->O_three, - 1 ) ;
@@ -245,7 +245,7 @@ _CheckOptimizeOperands ( Compiler * compiler, int64 maxOperands )
                         else
                         {
                             _Compile_GetVarLitObj_RValue_To_Reg ( optInfo->O_three, R8D ) ;
-                            if ( optInfo->O_zero->CProperty & CATEGORY_OP_DIVIDE )
+                            if ( optInfo->O_zero->CAttribute & CATEGORY_OP_DIVIDE )
                             {
                                 _Compile_MoveImm_To_Reg ( R9D, ( int64 ) * optInfo->O_one->W_PtrToValue, CELL ) ;
                                 optInfo->Optimize_Mod = REG ;
@@ -295,7 +295,7 @@ _CheckOptimizeOperands ( Compiler * compiler, int64 maxOperands )
                     case ( OP_VAR << ( 4 * O_BITS ) | OP_FETCH << ( 3 * O_BITS ) | OP_VAR << ( 2 * O_BITS ) | OP_FETCH << ( 1 * O_BITS ) | OP_ORDERED ):
                     case ( OP_VAR << ( 4 * O_BITS ) | OP_FETCH << ( 3 * O_BITS ) | OP_VAR << ( 2 * O_BITS ) | OP_FETCH << ( 1 * O_BITS ) | OP_LOGIC ):
                     {
-                        //if ( optInfo->O_zero->CProperty & BIT_SHIFT ) return 0 ;
+                        //if ( optInfo->O_zero->CAttribute & BIT_SHIFT ) return 0 ;
                         //SetHere ( optInfo->O_four->StackPushRegisterCode ) ; // leave optInfo->O_two value in R8 we don't need to push it
                         SetHere ( optInfo->O_four->Coding ) ;
                         if ( compiler->NumberOfRegisterVariables )
@@ -309,7 +309,7 @@ _CheckOptimizeOperands ( Compiler * compiler, int64 maxOperands )
                         else
                         {
                             _Compile_GetVarLitObj_RValue_To_Reg ( optInfo->O_four, R8D ) ;
-                            if ( optInfo->O_two->CProperty & ( THIS | OBJECT ) )
+                            if ( optInfo->O_two->CAttribute & ( THIS | OBJECT ) )
                             {
                                 _Compile_GetVarLitObj_RValue_To_Reg ( optInfo->O_two, R9D ) ;
                                 optInfo->Optimize_Reg = R8D ; // shouldn't need this but some code still references this as the rm ?? fix ??
@@ -334,7 +334,7 @@ _CheckOptimizeOperands ( Compiler * compiler, int64 maxOperands )
                     {
                         SetHere ( optInfo->O_three->Coding ) ;
                         _Compile_GetVarLitObj_RValue_To_Reg ( optInfo->O_three, R8D ) ;
-                        if ( optInfo->O_zero->CProperty & CATEGORY_OP_DIVIDE )
+                        if ( optInfo->O_zero->CAttribute & CATEGORY_OP_DIVIDE )
                         {
                             _Compile_GetVarLitObj_RValue_To_Reg ( optInfo->O_two, R9D ) ;
                             optInfo->Optimize_Rm = R9D ;
@@ -432,7 +432,7 @@ _CheckOptimizeOperands ( Compiler * compiler, int64 maxOperands )
                         if ( optInfo->O_three->StackPushRegisterCode )
                         {
                             SetHere ( optInfo->O_three->StackPushRegisterCode ) ; // leave optInfo->O_two value in R8 we don't need to push it
-                            if ( optInfo->O_two->CProperty & ( THIS | OBJECT ) )
+                            if ( optInfo->O_two->CAttribute & ( THIS | OBJECT ) )
                             {
                                 _Compile_GetVarLitObj_RValue_To_Reg ( optInfo->O_two, R9D ) ;
                                 optInfo->Optimize_Dest_RegOrMem = REG ;
@@ -721,14 +721,14 @@ _CheckOptimizeOperands ( Compiler * compiler, int64 maxOperands )
                     case ( OP_VAR << ( 2 * O_BITS ) | OP_LC << ( 1 * O_BITS ) | OP_EQUAL ):
                     {
                         SetHere ( optInfo->O_two->Coding ) ;
-                        if ( optInfo->O_two->CProperty & REGISTER_VARIABLE ) compiler->optInfo->Optimize_Dest_RegOrMem = REG ;
-                        else if ( ( optInfo->O_two->CProperty & THIS ) ) optInfo->Optimize_Dest_RegOrMem = MEM ;
-                        if ( optInfo->O_two->CProperty & ( THIS | REGISTER_VARIABLE ) )
+                        if ( optInfo->O_two->CAttribute & REGISTER_VARIABLE ) compiler->optInfo->Optimize_Dest_RegOrMem = REG ;
+                        else if ( ( optInfo->O_two->CAttribute & THIS ) ) optInfo->Optimize_Dest_RegOrMem = MEM ;
+                        if ( optInfo->O_two->CAttribute & ( THIS | REGISTER_VARIABLE ) )
                         {
                             Set_SCA ( 2 ) ;
                             _Compile_GetVarLitObj_LValue_To_Reg ( optInfo->O_two, R8D ) ;
                             _GetRmDispImm ( optInfo, optInfo->O_one, - 1 ) ;
-                            optInfo->Optimize_Reg = R8D ; // shouldn't need this but some code still references this as the rm ?? fix ??
+                            optInfo->Optimize_Rm = R8D ; // shouldn't need this but some code still references this as the rm ?? fix ??
                             return ( i | OPTIMIZE_RESET ) ;
                         }
                         else
@@ -743,9 +743,9 @@ _CheckOptimizeOperands ( Compiler * compiler, int64 maxOperands )
                     case ( OP_VAR << ( 3 * O_BITS ) | OP_VAR << ( 2 * O_BITS ) | OP_FETCH << ( 1 * O_BITS ) | OP_EQUAL ):
                     {
                         SetHere ( optInfo->O_three->Coding ) ;
-                        if ( optInfo->O_three->CProperty & REGISTER_VARIABLE ) compiler->optInfo->Optimize_Dest_RegOrMem = REG ;
-                        else if ( ( optInfo->O_two->CProperty & THIS ) ) optInfo->Optimize_Dest_RegOrMem = MEM ;
-                        if ( optInfo->O_three->CProperty & ( THIS | REGISTER_VARIABLE ) )
+                        if ( optInfo->O_three->CAttribute & REGISTER_VARIABLE ) compiler->optInfo->Optimize_Dest_RegOrMem = REG ;
+                        else if ( ( optInfo->O_two->CAttribute & THIS ) ) optInfo->Optimize_Dest_RegOrMem = MEM ;
+                        if ( optInfo->O_three->CAttribute & ( THIS | REGISTER_VARIABLE ) )
                         {
                             Set_SCA ( 3 ) ;
                             _Compile_GetVarLitObj_LValue_To_Reg ( optInfo->O_three, R8D ) ;
@@ -780,7 +780,7 @@ _CheckOptimizeOperands ( Compiler * compiler, int64 maxOperands )
                     case ( OP_VAR << ( 3 * O_BITS ) | OP_VAR << ( 2 * O_BITS ) | OP_FETCH << ( 1 * O_BITS ) | OP_OPEQUAL ):
                     {
                         SetHere ( optInfo->O_three->Coding ) ;
-                        if ( optInfo->O_zero->CProperty & BIT_SHIFT )
+                        if ( optInfo->O_zero->CAttribute & BIT_SHIFT )
                         {
                             _Compile_GetVarLitObj_RValue_To_Reg ( optInfo->O_two, R9D ) ;
                             _GetRmDispImm ( optInfo, optInfo->O_three, - 1 ) ;
@@ -797,7 +797,7 @@ _CheckOptimizeOperands ( Compiler * compiler, int64 maxOperands )
                         if ( GetState ( _Context_, (C_SYNTAX|INFIX_MODE) ) )
                         {
                             SetHere ( optInfo->O_two->Coding ) ;
-                            if ( optInfo->O_zero->CProperty & BIT_SHIFT )
+                            if ( optInfo->O_zero->CAttribute & BIT_SHIFT )
                             {
                                 _Compile_GetVarLitObj_RValue_To_Reg ( optInfo->O_one, R9D ) ;
                                 _GetRmDispImm ( optInfo, optInfo->O_two, - 1 ) ;
@@ -817,7 +817,7 @@ _CheckOptimizeOperands ( Compiler * compiler, int64 maxOperands )
                     case ( OP_VAR << ( 2 * O_BITS ) | OP_LC << ( 1 * O_BITS ) | OP_OPEQUAL ):
                     {
                         SetHere ( optInfo->O_two->Coding ) ;
-                        //if ( optInfo->O_two->CProperty & REGISTER_VARIABLE ) compiler->optInfo->Optimize_Dest_RegOrMem = REG ;
+                        //if ( optInfo->O_two->CAttribute & REGISTER_VARIABLE ) compiler->optInfo->Optimize_Dest_RegOrMem = REG ;
                         //else optInfo->Optimize_Dest_RegOrMem = MEM ;
                         if ( ( optInfo->O_zero->Definition == CfrTil_MultiplyEqual ) || ( optInfo->O_zero->Definition == CfrTil_DivideEqual ) )
                         {
@@ -886,7 +886,7 @@ _CheckOptimizeOperands ( Compiler * compiler, int64 maxOperands )
                     {
                         SetHere ( optInfo->O_two->Coding ) ;
                         _GetRmDispImm ( optInfo, optInfo->O_two, - 1 ) ;
-                        if ( optInfo->O_one->CProperty & REGISTER_VARIABLE )
+                        if ( optInfo->O_one->CAttribute & REGISTER_VARIABLE )
                         {
                             Set_SCA ( 0 ) ;
                             _Compile_MoveImm ( REG, R8D, 0, 0, optInfo->Optimize_Imm, CELL ) ;
@@ -903,7 +903,7 @@ _CheckOptimizeOperands ( Compiler * compiler, int64 maxOperands )
                     case ( OP_DUP << ( 2 * O_BITS ) | OP_VAR << ( 1 * O_BITS ) | OP_STORE ): // "!" - store
                     {
                         SetHere ( optInfo->O_two->Coding ) ;
-                        if ( ! ( optInfo->O_one->CProperty & REGISTER_VARIABLE ) ) //_Compile_MoveImm ( REG, R8, 0, 0, optInfo->Optimize_Imm, CELL ) ;
+                        if ( ! ( optInfo->O_one->CAttribute & REGISTER_VARIABLE ) ) //_Compile_MoveImm ( REG, R8, 0, 0, optInfo->Optimize_Imm, CELL ) ;
                         {
                             _Compile_GetVarLitObj_LValue_To_Reg ( optInfo->O_one, R9D ) ;
                         }
@@ -950,7 +950,7 @@ _CheckOptimizeOperands ( Compiler * compiler, int64 maxOperands )
                         if ( optInfo->O_two->StackPushRegisterCode )
                         {
                             SetHere ( optInfo->O_two->StackPushRegisterCode ) ; // leave optInfo->O_two value in R8 we don't need to push it
-                            if ( ! ( optInfo->O_one->CProperty & REGISTER_VARIABLE ) )// this logic may need to be refined but it works with our C.factorial 
+                            if ( ! ( optInfo->O_one->CAttribute & REGISTER_VARIABLE ) )// this logic may need to be refined but it works with our C.factorial 
                             {
                                 _GetRmDispImm ( optInfo, optInfo->O_one, - 1 ) ;
                                 Set_SCA ( 0 ) ;
@@ -986,7 +986,7 @@ _CheckOptimizeOperands ( Compiler * compiler, int64 maxOperands )
                         }
                         else
                         {
-                            if ( optInfo->O_two->CProperty & REGISTER_VARIABLE ) _GetRmDispImm ( optInfo, optInfo->O_two, - 1 ) ;
+                            if ( optInfo->O_two->CAttribute & REGISTER_VARIABLE ) _GetRmDispImm ( optInfo, optInfo->O_two, - 1 ) ;
                             else
                             {
                                 _Compile_GetVarLitObj_RValue_To_Reg ( optInfo->O_two, R8D ) ;
@@ -1014,7 +1014,7 @@ _CheckOptimizeOperands ( Compiler * compiler, int64 maxOperands )
                         if ( GetState ( _Context_, C_SYNTAX ) )
                         {
                             SetHere ( optInfo->O_two->Coding ) ;
-                            if ( ( optInfo->O_two->CProperty & REGISTER_VARIABLE ) && ( optInfo->O_one->CProperty & REGISTER_VARIABLE ) )
+                            if ( ( optInfo->O_two->CAttribute & REGISTER_VARIABLE ) && ( optInfo->O_one->CAttribute & REGISTER_VARIABLE ) )
                             {
                                 optInfo->Optimize_DstReg = optInfo->O_two->RegToUse ;
                                 optInfo->Optimize_SrcReg = optInfo->O_one->RegToUse ;
@@ -1076,7 +1076,7 @@ _CheckOptimizeOperands ( Compiler * compiler, int64 maxOperands )
                     }
                     case ( OP_VAR << ( 2 * O_BITS ) | OP_FETCH << ( 1 * O_BITS ) | OP_FETCH ):
                     {
-                        if ( ! ( optInfo->O_two->CProperty & REGISTER_VARIABLE ) )
+                        if ( ! ( optInfo->O_two->CAttribute & REGISTER_VARIABLE ) )
                         {
                             SetHere ( optInfo->O_two->Coding ) ;
                             _Compile_GetVarLitObj_RValue_To_Reg ( optInfo->O_two, R8D ) ;
@@ -1089,7 +1089,7 @@ _CheckOptimizeOperands ( Compiler * compiler, int64 maxOperands )
                     }
                     case ( OP_VAR << ( 1 * O_BITS ) | OP_FETCH ):
                     {
-                        if ( ! ( optInfo->O_one->CProperty & REGISTER_VARIABLE ) )
+                        if ( ! ( optInfo->O_one->CAttribute & REGISTER_VARIABLE ) )
                         {
                             SetHere ( optInfo->O_one->Coding ) ;
                             _Compile_GetVarLitObj_RValue_To_Reg ( optInfo->O_one, R8D ) ;
@@ -1139,7 +1139,7 @@ CheckOptimize ( Compiler * compiler, int64 maxOperands )
     if ( GetState ( _CfrTil_, OPTIMIZE_ON ) )
     {
         SetState ( _CfrTil_, IN_OPTIMIZER, true ) ;
-        d1 ( if ( Is_DebugModeOn ) Compiler_Show_WordList ( ( byte* ) "\nCheckOptimize : before optimize :" ) ) ;
+        d0 ( if ( Is_DebugModeOn ) Compiler_Show_WordList ( ( byte* ) "\nCheckOptimize : before optimize :" ) ) ;
         rtrn = _CheckOptimizeOperands ( compiler, maxOperands ) ;
         if ( ! ( rtrn & ( OPTIMIZE_DONE ) ) ) Set_SCA ( 0 ) ;
         if ( ( rtrn & OPTIMIZE_RESET ) )
@@ -1152,7 +1152,7 @@ CheckOptimize ( Compiler * compiler, int64 maxOperands )
             }
             Set_SCA ( 0 ) ;
         }
-        d1 ( if ( Is_DebugModeOn ) Compiler_Show_WordList ( ( byte* ) "\nCheckOptimize : after optimize :" ) ) ;
+        d0 ( if ( Is_DebugModeOn ) Compiler_Show_WordList ( ( byte* ) "\nCheckOptimize : after optimize :" ) ) ;
         SetState ( _CfrTil_, IN_OPTIMIZER, false ) ;
         SetState ( _Context_, ADDRESS_OF_MODE, false ) ;
     }

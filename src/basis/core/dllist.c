@@ -50,7 +50,7 @@ dlnode_InsertThisAfterANode ( dlnode * node, dlnode * anode ) // Insert this Aft
 {
     if ( node && anode )
     {
-        D0 ( if ( anode->N_CProperty & T_TAIL ) Error ( "\nCan't Insert a node after the TailNode!\n", QUIT ) ; ) ;
+        D0 ( if ( anode->N_CAttribute & T_TAIL ) Error ( "\nCan't Insert a node after the TailNode!\n", QUIT ) ; ) ;
         if ( anode->afterWord ) anode->afterWord->beforeWord = node ; // don't overwrite a Head or Tail node 
         node->afterWord = anode->afterWord ;
         anode->afterWord = node ; // after the above statement ! obviously
@@ -63,7 +63,7 @@ dlnode_InsertThisBeforeANode ( dlnode * node, dlnode * anode ) // Insert this Be
 {
     if ( node && anode )
     {
-        D0 ( if ( anode->N_CProperty & T_HEAD ) Error ( "\nCan't Insert a node before the HeadNode!\n", QUIT ) ; ) ;
+        D0 ( if ( anode->N_CAttribute & T_HEAD ) Error ( "\nCan't Insert a node before the HeadNode!\n", QUIT ) ; ) ;
         if ( anode->beforeWord ) anode->beforeWord->afterWord = node ; // don't overwrite a Head or Tail node
         node->beforeWord = anode->beforeWord ;
         anode->beforeWord = node ; // after the above statement ! obviously
@@ -76,7 +76,7 @@ dlnode_Remove ( dlnode * node )
 {
     if ( node )
     {
-        //D1 ( if ( (int64) (((Node)node)->n_Property.T_CProperty) & ( T_HEAD | T_TAIL ) ) Error ( "\nCan't remove the Head or Tail node!\n", QUIT ) ) ;
+        //D1 ( if ( (int64) (((Node)node)->n_Attribute.T_CAttribute) & ( T_HEAD | T_TAIL ) ) Error ( "\nCan't remove the Head or Tail node!\n", QUIT ) ) ;
         if ( node->beforeWord ) node->beforeWord->afterWord = node->afterWord ;
         if ( node->afterWord ) node->afterWord->beforeWord = node->beforeWord ;
         node->afterWord = 0 ;
@@ -91,7 +91,7 @@ dlnode_ReplaceNodeWithANode ( dlnode * node, dlnode * anode )
     if ( node && anode )
     {
         dlnode * afterWord = node->n_After ;
-        D0 ( if ( afterWord->N_Property.T_CProperty & ( T_HEAD | T_TAIL ) ) Error ( "\nCan't remove the Head or Tail node!\n", QUIT ) ) ;
+        D0 ( if ( afterWord->N_Attribute.T_CAttribute & ( T_HEAD | T_TAIL ) ) Error ( "\nCan't remove the Head or Tail node!\n", QUIT ) ) ;
         dlnode_Remove ( node ) ;
         dlnode_InsertThisBeforeANode ( anode, afterWord ) ;
     }
@@ -102,7 +102,7 @@ dlnode_Replace ( dlnode * replacedNode, dlnode * replacingNode )
 {
     if ( replacedNode && replacingNode )
     {
-        D0 ( if ( replacedNode->N_Property.T_CProperty & ( T_HEAD | T_TAIL ) ) Error ( "\nCan't remove the Head or Tail replacedNode!\n", QUIT ) ) ;
+        D0 ( if ( replacedNode->N_Attribute.T_CAttribute & ( T_HEAD | T_TAIL ) ) Error ( "\nCan't remove the Head or Tail replacedNode!\n", QUIT ) ) ;
         if ( replacedNode->beforeWord ) replacedNode->beforeWord->afterWord = replacingNode ;
         if ( replacedNode->afterWord ) replacedNode->afterWord->beforeWord = replacingNode ;
     }
@@ -118,8 +118,8 @@ _dllist_Init ( dllist * list )
         list->head->beforeWord = ( dlnode * ) 0 ;
         list->tail->afterWord = ( dlnode* ) 0 ;
         list->tail->beforeWord = ( dlnode * ) list->head ;
-        //list->Head->N_Property.T_CProperty = T_HEAD ;
-        //list->Tail->N_Property.T_CProperty = T_TAIL ;
+        //list->Head->N_Attribute.T_CAttribute = T_HEAD ;
+        //list->Tail->N_Attribute.T_CAttribute = T_TAIL ;
         list->n_CurrentNode = 0 ;
     }
 }

@@ -375,9 +375,14 @@ _Compile_IMULI ( int64 mod, int8 reg, int8 rm, int8 sib, int64 disp, int64 imm, 
 void
 _Compile_IMUL ( int64 mod, int8 reg, int8 rm, int8 sib, int64 disp )
 {
+    int8 rex = _Calculate_Rex ( reg, rm, 0 ) ;
+    if ( rex ) _Compile_Int8 ( rex ) ;
     _Compile_Int8 ( 0x0f ) ;
+    int8 modRm = CalculateModRmByte ( mod, reg, rm, sib, disp ) ;
     // _Compile_InstructionX86 ( opCode, mod, reg, rm, modRmImmDispFlag, sib, disp, imm, immSize )
-    _Compile_InstructionX86 ( 0xaf, mod, reg, rm, REX_B | MODRM_B, sib, disp, 0, 0, 0 ) ;
+    //_Compile_InstructionX86 ( 0xaf, mod, reg, rm, REX_B | MODRM_B, sib, disp, 0, 0, 0 ) ;
+    //_Compile_InstructionX64 ( int8 rex, int8 opCode, int8 modRm, int64 controlFlag, int8 sib, int64 disp, int8 dispSize, int64 imm, int8 immSize ) ;
+    _Compile_InstructionX64 ( 0, 0xaf, modRm, MODRM_B|DISP_B, sib, disp, 0, 0, 0 ) ;
 }
 
 void
@@ -463,21 +468,21 @@ _Compile_MoveImm_To_Mem ( int8 reg, int64 imm, int8 iSize )
 }
 
 void
-_Compile_MoveMem_To_Reg ( int8 reg, byte * address, int8 thruReg, int8 iSize )
-{
-    _Compile_MoveImm_To_Reg ( thruReg, ( int64 ) address, iSize ) ;
-    _Compile_Move_Rm_To_Reg ( reg, thruReg, 0 ) ;
-}
-
-void
-_Compile_MoveMem_To_Reg_NoThru ( int8 reg, byte * address, int8 iSize )
+_Compile_MoveMem_To_Reg ( int8 reg, byte * address, int8 iSize )
 {
     _Compile_MoveImm_To_Reg ( reg, ( int64 ) address, iSize ) ;
     _Compile_Move_Rm_To_Reg ( reg, reg, 0 ) ;
 }
 
 void
-_Compile_MoveReg_To_Mem ( int8 reg, byte * address, int8 thruReg, int8 iSize )
+_Compile_MoveMem_ToReg_ThruReg ( int8 reg, byte * address, int8 iSize, int8 thruReg )
+{
+    _Compile_MoveImm_To_Reg ( thruReg, ( int64 ) address, iSize ) ;
+    _Compile_Move_Rm_To_Reg ( reg, thruReg, 0 ) ;
+}
+
+void
+_Compile_MoveReg_ToMem_ThruReg ( int8 reg, byte * address, int8 iSize, int8 thruReg )
 {
     _Compile_MoveImm_To_Reg ( thruReg, ( int64 ) address, iSize ) ;
     _Compile_Move_Reg_To_Rm ( thruReg, reg, 0 ) ;
@@ -874,7 +879,7 @@ Compile_X_Group5 ( Compiler * compiler, int64 op )
         }
         _Compile_Group5 ( op, compiler->optInfo->Optimize_Mod, compiler->optInfo->Optimize_Rm, 0, compiler->optInfo->Optimize_Disp, 0 ) ;
     }
-    else if ( one && one->CProperty & ( PARAMETER_VARIABLE | LOCAL_VARIABLE | NAMESPACE_VARIABLE ) ) // *( ( cell* ) ( TOS ) ) += 1 ;
+    else if ( one && one->CAttribute & ( PARAMETER_VARIABLE | LOCAL_VARIABLE | NAMESPACE_VARIABLE ) ) // *( ( cell* ) ( TOS ) ) += 1 ;
     {
         SetHere ( one->Coding ) ;
         _Compile_GetVarLitObj_RValue_To_Reg ( one, R8D ) ;

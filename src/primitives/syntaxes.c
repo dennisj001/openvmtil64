@@ -254,7 +254,7 @@ void
 _CfrTil_TypeDef ( )
 {
     Context * cntx = _Context_ ;
-    Namespace * ns = CfrTil_Property_New ( ) ;
+    Namespace * ns = CfrTil_Attribute_New ( ) ;
     Lexer * lexer = cntx->Lexer0 ;
     Lexer_SetTokenDelimiters ( lexer, ( byte* ) " ,\n\r\t", COMPILER_TEMP ) ;
     do
@@ -265,7 +265,7 @@ _CfrTil_TypeDef ( )
         token = Lexer_ReadToken ( cntx->Lexer0 ) ; //, ( byte* ) " ,\n\r\t" ) ;
         Word * alias = _CfrTil_Alias ( ns, token ) ;
         alias->Lo_List = ns->Lo_List ;
-        alias->CProperty |= IMMEDIATE ;
+        alias->CAttribute |= IMMEDIATE ;
     }
 
     while ( 1 ) ;

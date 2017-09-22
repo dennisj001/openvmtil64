@@ -158,8 +158,9 @@
 #define R13D R13 // RBP
 #define R14D R14 //Frame Pointer
 #define R15D R15 //Stack Pointer
-#define SCRATCH_REG R9D
-//#define THRU_REG EBX
+#define ACCUMULATOR_REG R8D
+#define ACCUM_REG ACCUMULATOR_REG
+#define SCRATCH_REG R10D
 #define THRU_REG R11D
 #else
 #define R8D ( 0x0 )

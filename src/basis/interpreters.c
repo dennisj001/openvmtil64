@@ -95,7 +95,7 @@ _Interpret_PrefixFunction_Until_RParen ( Interpreter * interp, Word * prefixFunc
             {
                 if ( word = Finder_Word_FindUsing ( interp->Finder0, token, 1 ) )
                 {
-                    if ( word->CProperty & DEBUG_WORD )
+                    if ( word->CAttribute & DEBUG_WORD )
                     {
                         continue ;
                     }

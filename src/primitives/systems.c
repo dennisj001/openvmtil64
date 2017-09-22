@@ -302,7 +302,7 @@ CfrTil_Dump ( )
     byte * location = Context_IsInFile ( _Context_ ) ? Context_Location ( ) : ( byte* ) "" ;
     _Printf ( ( byte* ) "\nDump at : %s :", location ) ;
     _CfrTil_Dump ( 16 ) ;
-    //_Printf ( ( byte* ) "\n" ) ;
+    _Printf ( ( byte* ) "\n" ) ;
 }
 
 void

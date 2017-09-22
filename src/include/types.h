@@ -28,12 +28,12 @@ typedef struct
 {
     struct
     {
-        uint64 T_CProperty ;
-        uint64 T_CProperty2 ;
+        uint64 T_CAttribute ;
+        uint64 T_CAttribute2 ;
         union
         {
-            uint64 T_LProperty ;
-            uint64 T_AProperty ;
+            uint64 T_LAttribute ;
+            uint64 T_AAttribute ;
         } ;
     } ;
     union
@@ -43,14 +43,14 @@ typedef struct
         uint64 T_Size ;
         uint64 T_ChunkSize ; // remember MemChunk is prepended at memory allocation time
     } ;
-    uint64 T_WordProperty ;
+    uint64 T_WordAttribute ;
     uint64 T_WAllocationType ;
-} CfrTilPropInfo, PropInfo, PropertyInfo, PI ;
+} CfrTilPropInfo, PropInfo, AttributeInfo, PI ;
 typedef struct
 {
     union
     {
-        PropInfo O_Property ;
+        PropInfo O_Attribute ;
         type O_type ; // for future dynamic types and dynamic objects 
     } ;
     union
@@ -133,7 +133,7 @@ typedef struct
     } ;
     union
     {
-        PropInfo n_Property ;
+        PropInfo n_Attribute ;
         type n_type ; // for future dynamic types and dynamic objects 
     } ;
 } _DLNode, _Node, _listNode, _List ;
@@ -160,7 +160,7 @@ typedef struct
             } ;
             union
             {
-                PropInfo n_Property ;
+                PropInfo n_Attribute ;
                 type n_type ; // for future dynamic types and dynamic objects 
             } ;
 
@@ -211,6 +211,7 @@ typedef struct _Identifier
     {
         uint64 S_Value ;
         byte * S_PtrValue ;
+        byte * S_Object ;
         dllist * S_SymbolList ;
     } ;
     uint64 S_DObjectValue ; // nb! DynamicObject value can not be a union with S_SymbolList
@@ -246,15 +247,15 @@ typedef struct _Identifier
 #define S_After S_Cdr
 #define S_Before S_Car
 #define S_CurrentNode n_CurrentNode
-#define S_AProperty S_Node.n_Property.T_AProperty
-#define S_CProperty S_Node.n_Property.T_CProperty
-#define S_CProperty2 S_Node.n_Property.T_CProperty2
-#define S_CProperty0 S_Node.n_Property.T_CProperty0
-#define S_WProperty S_Node.n_Property.T_WordProperty
-#define S_WAllocType S_Node.n_Property.T_WAllocationType
-#define S_LProperty S_Node.n_Property.T_LProperty
-#define S_Size S_Node.n_Property.T_Size
-#define S_ChunkSize S_Node.n_Property.T_ChunkSize
+#define S_AAttribute S_Node.n_Attribute.T_AAttribute
+#define S_CAttribute S_Node.n_Attribute.T_CAttribute
+#define S_CAttribute2 S_Node.n_Attribute.T_CAttribute2
+#define S_CAttribute0 S_Node.n_Attribute.T_CAttribute0
+#define S_WAttribute S_Node.n_Attribute.T_WordAttribute
+#define S_WAllocType S_Node.n_Attribute.T_WAllocationType
+#define S_LAttribute S_Node.n_Attribute.T_LAttribute
+#define S_Size S_Node.n_Attribute.T_Size
+#define S_ChunkSize S_Node.n_Attribute.T_ChunkSize
 //#define S_Name S_Name 
 #define S_NumberOfSlots S_Size
 #define S_Pointer W_Value
@@ -268,22 +269,22 @@ typedef struct _Identifier
 #define Tail S_Cdr
 #define Size S_Size 
 #define Name S_Name
-#define CProperty S_CProperty
-#define CProperty2 S_CProperty2
-#define LProperty S_LProperty
-#define WProperty S_WProperty
+#define CAttribute S_CAttribute
+#define CAttribute2 S_CAttribute2
+#define LAttribute S_LAttribute
+#define WAttribute S_WAttribute
 #define WAllocType S_WAllocType
-#define CProp S_CProperty
-#define CProp2 S_CProperty2
-#define LProp S_LProperty
-#define WProp S_WProperty
+#define CProp S_CAttribute
+#define CProp2 S_CAttribute2
+#define LProp S_LAttribute
+#define WProp S_WAttribute
 #define Data S_pb_Data2
 #define InUseFlag S_Node.do_InUseFlag
 
-#define Lo_CProperty CProperty
-#define Lo_LProperty LProperty
-#define Lo_CProp CProperty
-#define Lo_LProp LProperty
+#define Lo_CAttribute CAttribute
+#define Lo_LAttribute LAttribute
+#define Lo_CProp CAttribute
+#define Lo_LProp LAttribute
 #define Lo_Name Name
 #define Lo_Car S_Car
 #define Lo_Cdr S_Cdr
@@ -304,6 +305,7 @@ typedef struct _Identifier
 
 #define W_List S_SymbolList 
 #define W_Value S_Value
+#define W_Object S_Object
 #define W_Value2 S_Value2
 #define W_Value3 S_Value3
 #define W_PtrValue S_PtrValue
@@ -311,7 +313,7 @@ typedef struct _Identifier
 #define W_DObjectValue S_DObjectValue
 
 // Buffer
-#define B_CProperty S_CProperty
+#define B_CAttribute S_CAttribute
 #define B_Size S_Size
 #define B_Data S_pb_Data2
 
@@ -407,7 +409,7 @@ typedef struct
 {
     Symbol P_Symbol ;
     slot P_Attributes ;
-} Property ;
+} Attribute ;
 
 struct NamedByteArray ;
 typedef struct
@@ -422,8 +424,8 @@ typedef struct
     byte * BA_Data ;
 } ByteArray ;
 #define BA_AllocSize BA_MemChunk.S_Size
-#define BA_CProperty BA_MemChunk.S_CProperty
-#define BA_AProperty BA_MemChunk.S_AProperty
+#define BA_CAttribute BA_MemChunk.S_CAttribute
+#define BA_AAttribute BA_MemChunk.S_AAttribute
 typedef struct NamedByteArray
 {
     MemChunk NBA_MemChunk ;
@@ -438,7 +440,7 @@ typedef struct NamedByteArray
     dlnode NBA_ML_HeadNode ;
     dlnode NBA_ML_TailNode ;
 } NamedByteArray, NBA ;
-#define NBA_AProperty NBA_Symbol.S_AProperty
+#define NBA_AAttribute NBA_Symbol.S_AAttribute
 #define NBA_Chunk_Size NBA_Symbol.S_ChunkSize
 #define NBA_Name NBA_Symbol.S_Name
 typedef struct
@@ -453,7 +455,7 @@ typedef struct
     byte * pb_LabelName ;
     byte * pb_JmpOffsetPointer ;
 } GotoInfo ;
-#define GI_CProperty GI_Symbol.S_CProperty
+#define GI_CAttribute GI_Symbol.S_CAttribute
 typedef struct
 {
     Symbol BI_Symbol ;
@@ -633,7 +635,8 @@ typedef struct
     int64 ArrayEnds ;
     byte * InitHere ;
     int64 * AccumulatedOptimizeOffsetPointer ;
-    int64 AccumulatedOffsetPointerFlag, * AccumulatedOffsetPointer ;
+    int8 AccumulatedOffsetPointerFlag ;
+    int32 * AccumulatedOffsetPointer ;
     int64 * FrameSizeCellOffset ;
     int64 RegOrder [ 4 ] ; //= { EBX, EDX, ECX, EAX } ;
     byte * EspSaveOffset ;
@@ -938,8 +941,8 @@ typedef struct
 {
     const char * ccp_Name ;
     block blk_Definition ;
-    uint64 ui64_CProperty ;
-    uint64 ui64_LProperty ;
+    uint64 ui64_CAttribute ;
+    uint64 ui64_LAttribute ;
     const char *NameSpace ;
     const char * SuperNamespace ;
 } CPrimitive ;
@@ -949,7 +952,7 @@ typedef struct
 typedef struct
 {
     const char * ccp_Name ;
-    uint64 ui64_CProperty ;
+    uint64 ui64_CAttribute ;
     block blk_CallHook ;
     byte * Function ;
     int64 i32_FunctionArg ;

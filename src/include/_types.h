@@ -7,12 +7,12 @@
  * enumerated           :      enumerated               :      shifted bits
 */
 #define DISTINCT_TYPE_SIZE              6
-#define DISTINCT_PROPERTY_SIZE          6
-#define INTERSECTING_PROPERTY_SIZE      52
-#define DISTINCT_TYPE_SHIFT_SIZE (DISTINCT_PROPERTY_SIZE + INTERSECTING_PROPERTY_SIZE - 1)
-#define DISTINCT_PROPERTY_SHIFT_SIZE (INTERSECTING_PROPERTY_SIZE - 1)
+#define DISTINCT_attribute_SIZE          6
+#define INTERSECTING_attribute_SIZE      52
+#define DISTINCT_TYPE_SHIFT_SIZE (DISTINCT_attribute_SIZE + INTERSECTING_attribute_SIZE - 1)
+#define DISTINCT_attribute_SHIFT_SIZE (INTERSECTING_attribute_SIZE - 1)
 #define dTss DISTINCT_TYPE_SHIFT_SIZE 
-#define dPss DISTINCT_PROPERTY_SHIFT_SIZE 
+#define dPss DISTINCT_attribute_SHIFT_SIZE 
 
 // distinct kinds/types - non-intersecting - not used with other properties or types
 #define CLASS_MEMBER_ACCESS             ( (uint64) 1 << dTss )
