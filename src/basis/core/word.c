@@ -233,7 +233,7 @@ _Word_Create ( byte * name, uint64 ctype, uint64 ltype, uint64 allocType )
 Word *
 _Word_New ( byte * name, uint64 ctype, uint64 ltype, int8 addToInNs, Namespace * addToNs, uint64 allocType )
 {
-    //CheckCodeSpaceForRoom ( ) ;
+    CheckCodeSpaceForRoom ( ) ;
     ReadLiner * rl = _Context_->ReadLiner0 ;
     Word * word = _Word_Create ( name, ctype, ltype, allocType ) ; // CFRTIL_WORD : cfrTil compiled words as opposed to C compiled words
     _Context_->Compiler0->CurrentWord = word ;
