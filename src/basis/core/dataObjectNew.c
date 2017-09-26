@@ -281,6 +281,14 @@ _CfrTil_LocalWord ( byte * name, int64 index, int64 ctype ) // svf : flag - whet
     return word ;
 }
 
+int64
+ParameterVarOffset ( Word * word )
+{
+    int64 offset = ( - ( _Context_->Compiler0->NumberOfArgs - word->Index + 1 ) ) ; //??
+    //int64 offset = ( - ( word->Index ) ) ;
+    return offset ;
+}
+
 Word *
 CfrTil_LocalWord ( byte * name, int64 ctype ) // svf : flag - whether stack variables are in the frame
 {
@@ -288,7 +296,7 @@ CfrTil_LocalWord ( byte * name, int64 ctype ) // svf : flag - whether stack vari
     Finder_SetQualifyingNamespace ( _Finder_, 0 ) ;
     //( ctype & LOCAL_VARIABLE ) ? ++ _Compiler_->NumberOfLocals : +_Compiler_->NumberOfArgs ;
     //Word * word = _DataObject_New ( LOCAL_VARIABLE, 0, name, ( ctype | IMMEDIATE ), ltype, index ? index : ++ _Context_->Compiler0->NumberOfLocals, 0, 0 ) ;
-    Word * word = _CfrTil_LocalWord ( name, ( ctype & LOCAL_VARIABLE ) ? ++ _Compiler_->NumberOfLocals : +_Compiler_->NumberOfArgs, ctype ) ; // svf : flag - whether stack variables are in the frame
+    Word * word = _CfrTil_LocalWord ( name, ( ctype & LOCAL_VARIABLE ) ? ++ _Compiler_->NumberOfLocals : ++ _Compiler_->NumberOfArgs, ctype ) ; // svf : flag - whether stack variables are in the frame
     return word ;
 }
 

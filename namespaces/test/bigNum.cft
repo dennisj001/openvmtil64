@@ -1,9 +1,13 @@
 Int
 5
+: sp stack pause ;
 dbgOff 
 Combinators
 BigNum 
-bnInit ( 0 0 )
+decimal
+64 bPrecision 
+bnInit ( 16 16 )
+sp
 : qexp { dup 1 >= } { dup -- qexp * } { drop 1 } ifElse ;
 // : qexp { dup 1 <= } { drop 1 } { dup -- recurse * } ifElse ;
 "!" ' qexp find alias

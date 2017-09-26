@@ -74,6 +74,7 @@ nl
 ( + ( h + 10 5 ) ( g + 7 ( + 3 (g + 4 5) 5) ) ( g + 7 31 ) ) 
 (define pd +) (pd 1 2 4)
 
+#if 0
 "\n\nstarting BigNum\n" ddps
 BigNum
 bnInit ( 16 16 )
@@ -83,6 +84,7 @@ nl ( h - 4 5 ) ( h - 5 4 ) ( h - 6 4 ) ( h / 9 3 ) ( h / 3 9 )
 "\nending BigNum\n" ddps
 //pause
 bigNumOff
+#endif
 
 Lisp
 
@@ -139,12 +141,17 @@ nl
 ((q2 +) (q2 28) (q2 2)(q3 2) (q4 45))
 //pause
 nl
-( :: : hioo 3 4 + dup p ; : hio 5 6 + dup p ; hio hioo ) 7 _assert0 11 _assert0 s // pause
-( hioo ) ( hio ) 11 _assert0 7 _assert0 hio hioo 7 _assert0 11 _assert0 
+( :: : hioo 3 4 + dup p ; : hio 5 6 + dup p ; hio hioo ) 7 _assert 11 _assert s // pause
+( hioo ) ( hio ) 11 _assert 7 _assert hio hioo 7 _assert 11 _assert 
 tick hioo find wdiss //pause
-( :: C : bexp43 ( n ) { n @ 1 > } { n @ n @ -- bexp43 * } { 1 } ifElse ; )
+
+#if 0
+( :: C : bexp43 ( n ) { n @ 1 > } { n @ n @ d: -- bexp43 * } { 1 } ifElse ; )
+//d: ( :: C : bexp43 ( n ) { n @ 1 > } { n @ n -- @ bexp43 * } { 1 } ifElse ; )
 tick bexp43 find wdiss //pause
 7 C bexp43 dup 5040 nl _assert p nl 
+#endif
+
 s
 lispOff
 : goedel3 (| n -- TOS ) 

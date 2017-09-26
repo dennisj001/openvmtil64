@@ -147,7 +147,8 @@ Word *
 _Compiler_CopyDuplicatesAndPush ( Compiler * compiler, Word * word )
 {
     Word *wordi, * word0 ;
-    int64 i, depth, wrli = word->W_StartCharRlIndex ;
+    int64 i, depth, wrli = word->W_StartCharRlIndex ; //, scwi = word->W_SC_WordIndex ;
+    //byte *coding = word->Coding ;
     dllist * list = compiler->WordList ;
     // we sometimes refer to more than one field of the same object, eg. 'this' in a block
     // each reference may be to a different labeled field each with a different offset so we must 
@@ -169,6 +170,7 @@ _Compiler_CopyDuplicatesAndPush ( Compiler * compiler, Word * word )
             _dlnode_Init ( ( dlnode * ) word0 ) ; // necessary!
             word0->S_CAttribute |= ( uint64 ) RECYCLABLE_COPY ;
             word0->W_StartCharRlIndex = wrli ;
+            word0->StackPushRegisterCode = 0 ;
             break ;
         }
     }

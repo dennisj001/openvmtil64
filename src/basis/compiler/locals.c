@@ -33,31 +33,17 @@
 void
 _Compiler_AddLocalFrame ( Compiler * compiler )
 {
-#if 1   
     _Compile_Move_Reg_To_StackN ( DSP, 1, FP ) ; // save pre fp
     _Compile_LEA ( FP, DSP, 0, LocalVarIndex_Disp ( 1 ) ) ; // set new fp
     Compile_ADDI ( REG, DSP, 0, ( compiler->LocalsFrameSize + 1 ) * CELL, INT32_SIZE ) ; // 1 : fp - add stack frame -- this value is going to be reset 
-#else // either way three insn, but this is more understandable
-    _Compile_Stack_PushReg ( DSP, FP ) ;
-    _Compile_LEA ( FP, DSP, 0, 0 ) ; //LocalVarIndex_Disp ( 1 ) ) ; // set new fp
-#endif    
     compiler->FrameSizeCellOffset = ( int64* ) ( Here - INT32_SIZE ) ; // in case we have to add to the framesize with nested locals
 }
 
 void
 Compiler_SetLocalsFrameSize_AtItsCellOffset ( Compiler * compiler )
 {
-    int64 fsize = compiler->LocalsFrameSize = ( ( compiler->NumberOfLocals ) * CELL ) ; //1 : the frame pointer 
-    if ( fsize ) // _Compiler_AddLocalFrame already accounted for a frame pointer 
-    {
-        //if ( fsize >= 0x100000000 )
-            //*( ( compiler )->FrameSizeCellOffset ) = compiler->LocalsFrameSize ;
-        //else if ( fsize >= 0x100 )
-        *( (int32*) ( compiler )->FrameSizeCellOffset ) = compiler->LocalsFrameSize ;
-        //else if ( fsize )
-            //*( (byte*) ( compiler )->FrameSizeCellOffset ) = compiler->LocalsFrameSize ;
-        //*( (int16*) ( compiler )->FrameSizeCellOffset ) = compiler->LocalsFrameSize ;
-    }
+    int64 fsize = compiler->LocalsFrameSize = ( ( compiler->NumberOfLocals + 1 ) * CELL ) ; //1 : the frame pointer 
+    if ( fsize ) *( (int32*) ( compiler )->FrameSizeCellOffset ) = compiler->LocalsFrameSize ;
 }
 
 void
@@ -106,41 +92,30 @@ _Compiler_RemoveLocalFrame ( Compiler * compiler )
 }
 
 void
-_Compile_ESP_Restore ( )
+_Compile_Rsp_Restore ( )
 {
 #if 1    
     _Compile_Move_Rm_To_Reg ( RSP, R15, 4 ) ; // 4 : placeholder
-    _Context_->Compiler0->EspRestoreOffset = Here - 1 ;
+    _Context_->Compiler0->RspRestoreOffset = Here - 1 ;
 #else    
     _Compile_Stack_PopToReg ( DSP, RSP ) ;
 #endif    
 }
 
 void
-_Compile_ESP_Save ( )
+_Compile_Rsp_Save ( )
 {
 #if 1    
     _Compile_Move_Reg_To_Rm ( R14, RSP, 4 ) ; // 4 : placeholder
-    _Context_->Compiler0->EspSaveOffset = Here - 1 ; // only takes one byte for _Compile_Move_Reg_To_Rm ( ESI, 4, ESP )
+    _Context_->Compiler0->RspSaveOffset = Here - 1 ; // only takes one byte for _Compile_Move_Reg_To_Rm ( ESI, 4, ESP )
     // TO DO : i think this (below) is what it should be but some adjustments need to be made to make it work 
     //byte * here = Here ;
     //_Compile_Stack_Push_Reg ( DSP, ESP ) ;
-    //compiler->EspSaveOffset = here ; // only takes one byte for _Compile_Move_Reg_To_Rm ( ESI, 4, ESP )
+    //compiler->RspSaveOffset = here ; // only takes one byte for _Compile_Move_Reg_To_Rm ( ESI, 4, ESP )
 #else    
     _Compile_Stack_PushReg ( DSP, RSP ) ;
 #endif    
 }
-
-#if 0
-
-void
-_ESP_Setup ( )
-{
-    Compiler * compiler = _Context_->Compiler0 ;
-    if ( compiler->EspSaveOffset ) *( compiler->EspSaveOffset ) = ( compiler->NumberOfLocals + 2 ) * CELL ; // 2 : fp + esp
-    if ( compiler->EspRestoreOffset ) *( compiler->EspRestoreOffset ) = ( compiler->NumberOfLocals + 1 ) * CELL ; // 1 : esp - already based on fp
-}
-#endif
 
 // rvalue
 
@@ -155,7 +130,7 @@ CfrTil_LocalVariablesBegin ( )
 {
     _CfrTil_Parse_LocalsAndStackVariables ( 0, 0, 0, _Compiler_->LocalsNamespacesStack, 0 ) ;
 }
-
+#if 0
 void
 CheckAddLocalFrame ( Compiler * compiler )
 {
@@ -175,3 +150,12 @@ CheckCompileRemoveLocalFrame ( Compiler * compiler )
     }
 }
 
+void
+_Rsp_Setup ( )
+{
+    Compiler * compiler = _Context_->Compiler0 ;
+    if ( compiler->RspSaveOffset ) *( compiler->RspSaveOffset ) = ( compiler->NumberOfLocals + 2 ) * CELL ; // 2 : fp + esp
+    if ( compiler->RspRestoreOffset ) *( compiler->RspRestoreOffset ) = ( compiler->NumberOfLocals + 1 ) * CELL ; // 1 : esp - already based on fp
+}
+
+#endif

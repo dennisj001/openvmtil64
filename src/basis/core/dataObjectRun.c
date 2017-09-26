@@ -125,13 +125,21 @@ _CfrTil_Do_ClassField ( Word * word )
     compiler->ArrayEnds = 0 ;
     byte * accumulatedAddress ;
 
+#if 1    // for debugger in non compile mode    
+    if ( word->Offset )
+    {
+        Compiler_IncrementCurrentAccumulatedOffset ( compiler, word->Offset ) ;
+    }
+#endif        
     if ( ( CompileMode ) || GetState ( compiler, LC_ARG_PARSING ) )
     {
+#if 0        
         if ( word->Offset )
         {
             Compiler_IncrementCurrentAccumulatedOffset ( compiler, word->Offset ) ;
         }
-        if ( CompileMode ) WordList_Pop ( cntx->Compiler0->WordList, 0 ) ;
+#endif        
+        if ( CompileMode ) _WordList_Pop ( cntx->Compiler0->WordList, 0 ) ;
     }
     else
     {
@@ -177,7 +185,7 @@ CfrTil_Dot ( ) // .
             }
         }
     }
-    WordList_Pop ( cntx->Compiler0->WordList, 0 ) ; // nb. first else problems with DataObject_Run ( word ) 
+    _WordList_Pop ( cntx->Compiler0->WordList, 0 ) ; // nb. first else problems with DataObject_Run ( word ) 
 }
 
 // rvalue - rhs value - right hand side of '=' - the actual value, used on the right hand side of C statements
@@ -301,7 +309,7 @@ _CfrTil_Do_Literal ( Word * word )
         else
         {
             Compile_ADDI ( REG, DSP, 0, sizeof (int64 ), 0 ) ;
-            _Compile_MoveImm_To_Mem ( DSP, ( int64 ) * word->W_PtrToValue, CELL ) ; // 0 ) ; // remember this works - 0 ) ;
+            _Compile_MoveImm_To_Mem ( DSP, ( int64 ) word->W_Value, CELL_SIZE ) ; 
         }
 
     }
@@ -371,7 +379,7 @@ _CfrTil_Do_Variable ( Word * word )
                 }
                 else DSP_Push ( word->W_PtrToValue + word->AccumulatedOffset ) ;
             }
-            else DSP_Push ( *word->W_PtrToValue ) ;
+            else DSP_Push ( word->W_Value ) ; //*word->W_PtrToValue ) ;
         }
         else if ( word->CAttribute & NAMESPACE_VARIABLE )
         {
@@ -410,12 +418,12 @@ _DataObject_Run ( Word * word )
         if ( ( word->CAttribute & LOCAL_VARIABLE ) && ( ! GetState ( word, W_INITIALIZED ) ) ) // this is a local variable so it is initialed at creation 
         {
             int64 size = _Namespace_VariableValueGet ( word->TypeNamespace, ( byte* ) "size" ) ;
-            _Compile_MoveImm_To_Reg ( R8D, ( int64 ) size, CELL ) ;
-            _Compile_PushReg ( R8D ) ;
-            _Compile_LEA ( R8D, FP, 0, LocalVarIndex_Disp ( LocalVarOffset ( word ) ) ) ; // 2 : account for saved fp and return slot
-            _Compile_PushReg ( R8D ) ;
-            _Compile_MoveImm_To_Reg ( R8D, ( int64 ) word->TypeNamespace, CELL ) ;
-            _Compile_PushReg ( R8D ) ;
+            _Compile_MoveImm_To_Reg ( RAX, ( int64 ) size, CELL ) ;
+            _Compile_PushReg ( RAX ) ;
+            _Compile_LEA ( RAX, FP, 0, LocalVarIndex_Disp ( LocalVarOffset ( word ) ) ) ; // 2 : account for saved fp and return slot
+            _Compile_PushReg ( RAX ) ;
+            _Compile_MoveImm_To_Reg ( RAX, ( int64 ) word->TypeNamespace, CELL ) ;
+            _Compile_PushReg ( RAX ) ;
             Compile_Call ( ( byte* ) _Do_LocalObject_AllocateInit ) ; // we want to only allocate this object once and only at run time; and not at compile time
             Compile_ADDI ( REG, RSP, 0, 3 * sizeof (int64 ), 0 ) ;
             SetState ( word, W_INITIALIZED, true ) ;

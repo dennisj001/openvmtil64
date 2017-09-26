@@ -119,7 +119,7 @@ _ShellEscape ( char * str )
 #endif        
     }
 #endif    
-    if ( _Q_->Verbosity > 1 ) printf ( ( char* ) c_dd ( "\n_ShellEscape : command = \"%s\" : returned %d.\n" ), str, status ) ;
+    if ( _Q_->Verbosity > 1 ) printf ( ( char* ) c_gd ( "\n_ShellEscape : command = \"%s\" : returned %d.\n" ), str, status ) ;
 }
 
 void

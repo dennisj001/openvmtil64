@@ -10,7 +10,7 @@ RL_TabCompletion_Run ( ReadLiner * rl, Word * rword )
     //do
     {
         //nextWord = TC_Tree_Map_1 ( tci, _CfrTil_->Namespaces->W_List, ( MapFunction ) _TabCompletion_Compare, rword, &tci->StartFlag ) ; // working
-        nextWord = TC_Tree_Map_2 ( _CfrTil_->Namespaces->W_List, ( MapFunction ) _TabCompletion_Compare, rword ) ; // new
+        nextWord = TC_Tree_Map_2 ( tci, _CfrTil_->Namespaces->W_List, ( MapFunction ) _TabCompletion_Compare, rword ) ; // new
         tci->NextWord = nextWord ; // wrap around
     }
     //while ( ( ( tci->WordWrapCount < 4 ) && ( ! tci->FoundCount ) ) ) ; //|| ( ! tci->FoundWrapCount )) ;

@@ -8,7 +8,7 @@
 dlname='libmpfr.so.4'
 
 # Names of this library.
-library_names='libmpfr.so.4.1.5 libmpfr.so.4 libmpfr.so'
+library_names='libmpfr.so.4.1.6 libmpfr.so.4 libmpfr.so'
 
 # The name of the static archive.
 old_library='libmpfr.a'
@@ -25,7 +25,7 @@ weak_library_names=''
 # Version information for libmpfr.
 current=5
 age=1
-revision=5
+revision=6
 
 # Is this an already installed library?
 installed=yes

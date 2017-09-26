@@ -32,8 +32,6 @@
 #define Stack() CfrTil_PrintDataStack ( )
 
 #define Calculate_FrameSize( numberOfLocals )  ( ( numberOfLocals + 1 ) * CELL ) // 1 : space for fp
-#define ParameterVarOffset( word ) ( - ( _Context_->Compiler0->NumberOfArgs - word->Index + 1 ) )
-#define LocalVarOffset( word ) ( word->Index )
 
 #define _GetState( aState, state ) ( (aState) & (state) ) 
 #define GetState( obj, state ) ((obj) && _GetState( (obj)->State, state )) 
@@ -123,8 +121,10 @@
 #define cc( s, c ) (byte*) _String_InsertColors ( (byte*) ( (byte*) s ? (byte*) s : (byte*) "" ), (c) ) 
 #define c_ud( s ) cc ( (byte*) s, (_Q_->Current == &_Q_->User) ? &_Q_->Default : &_Q_->User ) 
 #define c_ad( s ) cc ( (byte*) s, (_Q_->Current == &_Q_->Alert) ? &_Q_->Default : &_Q_->Alert ) 
-#define c_dd( s ) cc ( (byte*) s, (_Q_->Current == &_Q_->Debug) ? &_Q_->Default : &_Q_->Debug ) 
-#define c_du( s ) cc ( (byte*) s, (_Q_->Current == &_Q_->Debug) ? &_Q_->User : &_Q_->Debug ) 
+#define c_da( s ) cc ( (byte*) s, (_Q_->Current == &_Q_->Default) ? &_Q_->Alert : &_Q_->Default ) 
+#define c_gd( s ) cc ( (byte*) s, (_Q_->Current == &_Q_->Debug) ? &_Q_->Default : &_Q_->Debug ) 
+#define c_gu( s ) cc ( (byte*) s, (_Q_->Current == &_Q_->Debug) ? &_Q_->User : &_Q_->Debug ) 
+#define c_ug( s ) cc ( (byte*) s, (_Q_->Current == &_Q_->User) ? &_Q_->Debug : &_Q_->User ) 
 
 #define _Context_ _Q_->OVT_Context
 #define _CfrTil_ _Q_->OVT_CfrTil
@@ -263,7 +263,8 @@
 #define List_Push( list, value, allocType ) List_Push_1Value_Node ( list, value, allocType )
 #define List_PushNode( list, node ) _dllist_AddNodeToHead ( list, ( dlnode* ) node )
 
-#define WordList_Pop( list, m ) dobject_Get_M_Slot ( _dllist_PopNode ( list ), m ) 
+#define _WordList_Pop( list, m ) dobject_Get_M_Slot ( _dllist_PopNode ( list ), m ) 
+#define WordList_Pop( list, m ) if ( ! IsSourceCodeOn ) _WordList_Pop( list, m )
 //#define DebugWordList_PushNewNode( codePtr, scOffset ) _dllist_Push_M_Slot_Node ( _CfrTil_->DebugWordList, WORD_LOCATION, TEMPORARY, 3, ((int64) codePtr), (int64) scOffset )
 #define DebugWordList_Push( dobj ) _dllist_AddNodeToHead ( _CfrTil_->DebugWordList, ( dlnode* ) dobj )
 #define DbgWL_Node_SetCodeAddress( dobj, address ) dobject_Set_M_Slot( dobj, 1, adress ) 
@@ -274,9 +275,10 @@
 #define _IsSourceCodeOn ( GetState ( _CfrTil_, DEBUG_SOURCE_CODE_MODE ) )
 #define IsSourceCodeOn ( _IsSourceCodeOn || IsGlobalsSourceCodeOn )
 #define IsSourceCodeOff (!IsSourceCodeOn) //( GetState ( _CfrTil_, DEBUG_SOURCE_CODE_MODE ) || IsGlobalsSourceCodeOn ))
-#define Set_SCA( index ) SC_DWL_PushCWL_Index ( index )
+//#define Word_Set_SCA( word )  { if ( word ) word->Coding = Here ; }
+#define Set_SCA( index ) Word_Set_SCA (Compiler_WordList ( index )) ;
 //#define SC_Push( word ) DebugWordList_PushWord ( word ) 
-#define SC_DWL_Push( word ) DebugWordList_PushWord ( word ) 
+//#define Word_Set_SCA( word ) //DebugWordList_PushWord ( word ) 
 #define SC_SetForcePush( tf ) SetState ( _CfrTil_, SC_FORCE_PUSH, tf ) 
 #define _SC_Global_On SetState ( _CfrTil_, GLOBAL_SOURCE_CODE_MODE, true )
 #define SC_Global_On if ( GetState ( _CfrTil_, DEBUG_SOURCE_CODE_MODE ) ) { _SC_Global_On ; }

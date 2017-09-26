@@ -4,9 +4,13 @@
 void
 _Debugger_StepOneInstruction ( Debugger * debugger )
 {
+    _Debugger_SyncStackPointersFromCpuState ( debugger ) ;
+    debugger->SaveDsp = Dsp ;
+    debugger->SaveTOS = TOS ;
     debugger->PreHere = Here ;
     debugger->SaveStackDepth = DataStack_Depth ( ) ;
     ( ( VoidFunction ) debugger->StepInstructionBA->BA_Data ) ( ) ;
+    _Debugger_SyncStackPointersFromCpuState ( debugger ) ;
 }
 
 void
@@ -51,10 +55,10 @@ _Debugger_CompileAndStepOneInstruction ( Debugger * debugger, byte * jcAddress )
 {
     Boolean showExtraFlag = false ;
     byte * svHere = Here ; // save 
-    //debugger->DebugAddress = address ;
     byte * nextInsn = Debugger_CompileOneInstruction ( debugger, jcAddress, showExtraFlag ) ; // compile the insn here
     Debugger_StepOneInstruction ( debugger ) ;
     if ( showExtraFlag && ( _Q_->Verbosity >= 3 ) ) Debug_ExtraShow ( Here - svHere, showExtraFlag ) ;
+    _Debugger_ShowEffects ( debugger, debugger->w_Word, 1 ) ;
     DebugColors ;
     debugger->DebugAddress = nextInsn ;
 }
@@ -79,26 +83,26 @@ start:
 
         if ( ( ! word ) || ( ! Debugger_CanWeStep ( debugger, word ) ) )//( jcAddress < ( byte* ) svcs->BA_Data ) || ( jcAddress > ( byte* ) svcs->bp_Last ) )
         {
-            _Printf ( ( byte* ) "\ncalling thru - a subroutine : %s : .... :>", word ? ( char* ) c_dd ( word->Name ) : "" ) ;
+            _Printf ( ( byte* ) "\ncalling thru - a subroutine : %s : .... :>", word ? ( char* ) c_gd ( word->Name ) : "" ) ;
             Compile_Call ( jcAddress ) ; // this will call jcAddress subroutine and return to our code to be compiled next
             // so that newDebugAddress, below, will be our next stepping insn
             newDebugAddress = debugger->DebugAddress + size ;
         }
         else if ( debugger->Key == 'h' ) // step '(t)hru' the native code like a non-native subroutine
         {
-            _Printf ( ( byte* ) "\ncalling t(h)ru - a subroutine : %s : .... :>", word ? ( char* ) c_dd ( word->Name ) : "" ) ;
+            _Printf ( ( byte* ) "\ncalling t(h)ru - a subroutine : %s : .... :>", word ? ( char* ) c_gd ( word->Name ) : "" ) ;
             Compile_Call ( jcAddress ) ;
             newDebugAddress = debugger->DebugAddress + size ;
         }
         else if ( debugger->Key == 'o' ) // step '(o)ver' the native code like a non-native subroutine
         {
-            _Printf ( ( byte* ) "\nstepping '(o)ver' - a subroutine : %s : .... :>", word ? ( char* ) c_dd ( word->Name ) : "" ) ;
+            _Printf ( ( byte* ) "\nstepping '(o)ver' - a subroutine : %s : .... :>", word ? ( char* ) c_gd ( word->Name ) : "" ) ;
             //Compile_Call ( jcAddress ) ;
             newDebugAddress = debugger->DebugAddress + size ;
         }
         else if ( debugger->Key == 'u' ) // step o(u)t of the native code like a non-native subroutine
         {
-            _Printf ( ( byte* ) "\nstepping thru and 'o(u)t' of a \"native\" subroutine : %s : .... :>", word ? ( char* ) c_dd ( word->Name ) : "" ) ;
+            _Printf ( ( byte* ) "\nstepping thru and 'o(u)t' of a \"native\" subroutine : %s : .... :>", word ? ( char* ) c_gd ( word->Name ) : "" ) ;
             Compile_Call ( debugger->DebugAddress ) ;
             if ( Stack_Depth ( debugger->DebugStack ) ) newDebugAddress = ( byte* ) _Stack_Pop ( debugger->DebugStack ) ;
             else newDebugAddress = 0 ;
@@ -109,7 +113,7 @@ start:
             if ( * debugger->DebugAddress == CALLI32 )
             {
                 if ( _Q_->Verbosity > 1 ) _Word_ShowSourceCode ( word ) ;
-                _Printf ( ( byte* ) "\nstepping into a cfrtil compiled function : %s : .... :>", word ? ( char* ) c_dd ( word->Name ) : "" ) ;
+                _Printf ( ( byte* ) "\nstepping into a cfrtil compiled function : %s : .... :>", word ? ( char* ) c_gd ( word->Name ) : "" ) ;
                 _Stack_Push ( debugger->DebugStack, ( int64 ) ( debugger->DebugAddress + size ) ) ; // the return address
                 // push the return address this time around; next time code at newDebugAddress will be processed
                 // when ret is the insn Debugger_StepOneInstruction will handle it 
@@ -120,7 +124,7 @@ start:
     }
     else if ( debugger->Key == 'u' ) // step o(u)t of the native code like a non-native subroutine
     {
-        _Printf ( ( byte* ) "\nstepping thru and out of a \"native\" subroutine : %s : .... :>", word ? ( char* ) c_dd ( word->Name ) : "" ) ;
+        _Printf ( ( byte* ) "\nstepping thru and out of a \"native\" subroutine : %s : .... :>", word ? ( char* ) c_gd ( word->Name ) : "" ) ;
         debugger->Key = 's' ;
         SetState ( debugger, DBG_AUTO_MODE, true ) ;
         goto doDefault ;
@@ -185,7 +189,7 @@ start:
             if ( word && ( word->CAttribute & ( DEBUG_WORD ) ) ) //&& ( ! GetState ( debugger, (DBG_CONTINUE_MODE|DBG_AUTO_MODE) ) ) )
             {
                 SetState ( debugger, ( DBG_CONTINUE_MODE | DBG_AUTO_MODE ), false ) ;
-                _Printf ( ( byte* ) "\nskipping over a debug word : %s : at 0x%-8x", word ? ( char* ) c_dd ( word->Name ) : "", debugger->DebugAddress ) ;
+                _Printf ( ( byte* ) "\nskipping over a debug word : %s : at 0x%-8x", word ? ( char* ) c_gd ( word->Name ) : "", debugger->DebugAddress ) ;
                 debugger->DebugAddress += 5 ; // 5 : sizeof jmp/call insn // debugger->DebugAddress + size ; // skip the call insn to the next after it
                 goto end ;
             }
@@ -221,7 +225,7 @@ start:
             SetState ( debugger, DBG_JCC_INSN, false ) ;
             goto end ;
         }
-        _Debugger_CompileAndStepOneInstruction ( debugger, jcAddress ) ;//? jcAddress : debugger->DebugAddress ) ;
+        _Debugger_CompileAndStepOneInstruction ( debugger, jcAddress ) ; //? jcAddress : debugger->DebugAddress ) ;
 end:
         if ( debugger->DebugAddress )
         {
@@ -254,7 +258,7 @@ Debugger_PreStartStepping ( Debugger * debugger )
             {
                 _Printf ( "\nStepping turned off for this word : %s%s%s%s : debugger->DebugAddress = 0x%08x : (e)valuating",
                     c_ud ( word->S_ContainingNamespace ? word->S_ContainingNamespace->Name : ( byte* ) "<literal> " ),
-                    word->S_ContainingNamespace ? ( byte* ) "." : ( byte* ) "", c_du ( word->Name ),
+                    word->S_ContainingNamespace ? ( byte* ) "." : ( byte* ) "", c_gu ( word->Name ),
                     GetState ( debugger, DBG_AUTO_MODE ) ? " : automode turned off" : "",
                     debugger->DebugAddress ) ;
                 //if ( debugger->DebugAddress ) Debugger_UdisOneInstruction ( debugger, debugger->DebugAddress, ( byte* ) "", ( byte* ) "" ) ; // the next instruction
@@ -295,10 +299,11 @@ Debugger_Step ( Debugger * debugger )
 void
 Debugger_AfterStep ( Debugger * debugger )
 {
-    //if ( ( _Q_->Verbosity > 3 ) && ( debugger->cs_Cpu->Esp != debugger->LastEsp ) ) Debugger_PrintReturnStackWindow ( ) ;
+    //if ( ( _Q_->Verbosity > 3 ) && ( debugger->cs_Cpu->Rsp != debugger->LastRsp ) ) Debugger_PrintReturnStackWindow ( ) ;
     debugger->LastRsp = debugger->cs_Cpu->Rsp ;
 
-    _Debugger_SyncStackPointersFromCpuState ( debugger ) ;
+    //_Debugger_SyncStackPointersFromCpuState ( debugger ) ;
+
     if ( ( int64 ) debugger->DebugAddress ) // set by StepOneInstruction
     {
         debugger->SteppedWord = debugger->w_Word ;
@@ -316,7 +321,7 @@ Debugger_AfterStep ( Debugger * debugger )
 void
 _Debugger_SetupStepping ( Debugger * debugger, Word * word, byte * address, byte *name, int64 iflag )
 {
-    _Printf ( ( byte* ) "\nSetting up stepping : location = %s : debugger->word = \'%s\' : ...", c_dd ( _Context_Location ( _Context_ ) ), word ? word->Name : ( name ? name : ( byte* ) "" ) ) ;
+    _Printf ( ( byte* ) "\nSetting up stepping : location = %s : debugger->word = \'%s\' : ...", c_gd ( _Context_Location ( _Context_ ) ), word ? word->Name : ( name ? name : ( byte* ) "" ) ) ;
     if ( word )
     {
         _CfrTil_Source ( debugger->w_Word, 0 ) ;
@@ -327,7 +332,6 @@ _Debugger_SetupStepping ( Debugger * debugger, Word * word, byte * address, byte
     debugger->w_Word = word ;
     if ( iflag )
     {
-
         _Printf ( "\nNext stepping instruction" ) ; // necessary in some cases
         Debugger_UdisOneInstruction ( debugger, address, ( byte* ) "", ( byte* ) "" ) ;
     }
@@ -351,8 +355,8 @@ int64
 _Debugger_SetupReturnStackCopy ( Debugger * debugger, int64 size )
 {
     if ( _Q_->Verbosity > 3 ) _CfrTil_PrintNReturnStack ( 4 ) ;
-    //uint64 * rsp = ( uint64* ) _CfrTil_->cs_Cpu->Rsp ; //debugger->DebugESP [- 1] ; //debugger->cs_Cpu->Esp [1] ; //debugger->cs_Cpu->Esp ;
-    uint64 * rsp = ( uint64* ) & debugger->cs_Cpu->Rsp [1] ; //debugger->cs_Cpu->Esp ;
+    uint64 * rsp = ( uint64* ) _CfrTil_->cs_Cpu->Rsp ; //debugger->DebugESP [- 1] ; //debugger->cs_Cpu->Rsp [1] ; //debugger->cs_Cpu->Rsp ;
+    //uint64 * rsp = ( uint64* ) & debugger->cs_Cpu->Rsp [1] ; //debugger->cs_Cpu->Rsp ;
     if ( rsp )
     {
         uint64 rsc, rsc0 ;
@@ -366,7 +370,7 @@ _Debugger_SetupReturnStackCopy ( Debugger * debugger, int64 size )
         }
         else rsc = ( uint64 ) ( debugger->CopyRSP - size + pushedWindow ) ;
         memcpy ( ( byte* ) rsc, ( ( byte* ) rsp ) - size + pushedWindow, size ) ; // pushedWindow (32) : account for useful current stack
-        d1 ( _PrintNStackWindow ( ( uint64* ) rsp, "ReturnStack", "ESP", 4 ) ) ; //pushedWindow ) ) ;
+        d1 ( _PrintNStackWindow ( ( uint64* ) rsp, "ReturnStack", "RSP", 4 ) ) ; //pushedWindow ) ) ;
         d1 ( _PrintNStackWindow ( ( int64* ) debugger->CopyRSP, "ReturnStackCopy", "RSCP", 4 ) ) ; //pushedWindow ) ) ;
         SetState ( debugger, DBG_STACK_OLD, false ) ;
         return true ;
@@ -397,9 +401,11 @@ Debugger_SetupReturnStackCopy ( Debugger * debugger, int64 showFlag ) // restore
     if ( stackSetupFlag )
     {
         //_Compile_Get_FromCAddress_ToReg_ThruReg ( RBP, ( byte * ) & debugger->ReturnStackCopyPointer - ( ( ( int64 ) debugger->cs_Cpu->Rbp ) - ( ( int64 ) debugger->cs_Cpu->Rsp ) ), R10D ) ;
-        _Compile_Get_FromCAddress_ToReg ( RBP, ( byte * ) & debugger->CopyRSP - ( ( ( int64 ) debugger->cs_Cpu->Rbp ) - ( ( int64 ) debugger->cs_Cpu->Rsp ) ) ) ;
-        _Compile_Get_FromCAddress_ToReg ( RSP, ( byte * ) & debugger->CopyRSP ) ;
-        _Compile_Get_FromCAddress_ToReg ( R9D, ( byte * ) & debugger->cs_Cpu->R9d ) ; // restore our scratch reg
+        //_Compile_Get_FromCAddress_ToReg ( RBP, ( byte * ) & debugger->CopyRSP - ( ( ( int64 ) debugger->cs_Cpu->Rbp ) - ( ( int64 ) debugger->cs_Cpu->Rsp ) ) ) ;
+        //_Compile_Get_FromCAddress_ToReg ( RSP, ( byte * ) & debugger->CopyRSP ) ;
+        _Compile_Get_FromCAddress_ToReg_ThruReg ( RSP, ( byte * ) & debugger->CopyRSP, R10D ) ;
+        _Compile_Get_FromCAddress_ToReg_ThruReg ( RBP, ( byte * ) & debugger->CopyRSP - ( ( ( int64 ) debugger->cs_Cpu->Rbp ) - ( ( int64 ) debugger->cs_Cpu->Rsp ) ), R10D ) ;
+        _Compile_Get_FromCAddress_ToReg ( R10D, ( byte * ) & debugger->cs_Cpu->R10d ) ; // restore our scratch reg
     }
     if ( showFlag ) Compile_Call ( ( byte* ) _Debugger_CpuState_Show ) ; // also dis insn
 }
@@ -543,7 +549,7 @@ Debugger_CanWeStep ( Debugger * debugger, Word * word )
         SetState ( debugger, DBG_CAN_STEP, false ) ; // debugger->State flag = false ;
         return false ;
     }
-    else if ( word && ( Compiling || ( word->CAttribute & ( CPRIMITIVE | DLSYM_WORD ) ) || ( word->LAttribute & T_LISP_DEFINE ) ) ) 
+    else if ( word && ( Compiling || ( word->CAttribute & ( CPRIMITIVE | DLSYM_WORD ) ) || ( word->LAttribute & T_LISP_DEFINE ) ) )
     {
         return false ;
     }

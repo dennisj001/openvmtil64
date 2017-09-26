@@ -13,7 +13,7 @@ sp
 Class // "class" works like "namespace" so here we switch back to namespace 'Class' else following words would be in class 'Pointer'
 "Integer" namespace // Integer.size 4 = doesn't work because a namespace doesn't have 'size' and 'this' variables automatically created
 "int16" class int16 size 2 = // 'size' must be declared else it remains 0; ( see above note )
-Integer "int64" class int64.size 4 = // 'size' must be declared else it remains 0; ( see above note )
+Integer "int32" class int32.size 4 = // 'size' must be declared else it remains 0; ( see above note )
 Integer "int64" class int64 size 8 = // 'size' must be declared else it remains 0; ( see above note )
 decimal
 Integer
@@ -72,6 +72,7 @@ testList DLList.size @ dup p dump //pause
 dbgOff 
 #if dbgOnVar @
 d: testList.HeadNode.AfterReference @ testList.TailNode.BeforeReference  "class init test : "  assert  : hi 1 2 3 4 5 + + + + p ; : hey hi hi hi hi hi ; hey : hi 1 2 3 4 5 + + + + p ; : hey hi hi hi hi hi ; hey // debugger test
+dbgOff
 #else
 testList.HeadNode.AfterReference @ testList.TailNode.BeforeReference  "class init test : " assert 
 #endif
@@ -89,14 +90,14 @@ using
     int64 Accum ;
 }; // add seven elements
 
-dbgOn
+//dbgOn
 #if dbgOnVar @
 dscOn
 #endif
-verbosity 3 =
+//verbosity 3 =
 
 : init ( this ) 
-#if 0 //dbgOnVar @
+#if dbgOnVar @
     <dbg> this.Category 12 =
 #else
     this.Category 12 =
@@ -109,15 +110,15 @@ verbosity 3 =
     this.Four 4 = 
     this.Twelve 12 =
     this.Accum this.Sum @ = 
-    this.Sum this.Category @ this.Prototype @ <dbg> && dup p = 
+    this.Sum this.Category @ this.Prototype @ && dup p = 
     this.Accum this.Three @ this.Four @ * this.Three @ / = 
-    this.Accum @ 4 "\n DLListClone init : object test1 :" assert //<dbg> assert 
+    this.Accum @ 4 "\n DLListClone init : test1 :" assert 
     this.Prototype @ p //pause
     this.Sum this.Category @ this.Prototype @ * this.Category @ - = // dup 24  "DLListClone init : object test2 :" assert = 
-    this.Sum @ dup hex p 24  "DLListClone init : object test2 :" assert 
+    this.Sum @ dup hex p 24  "DLListClone init : test2 :" assert 
 #if dbgOnVar @ 
-    this this.size @ dump
-    <dbg> this.Category @ dup p 12 _assert // 12
+    <dbg> this this.size @ dump
+    this.Category @ dup p 12 _assert // 12
     //this this.size @ dump
     this.Prototype @ p // 3
 #else
@@ -150,15 +151,15 @@ verbosity 3 =
 
 scOff
 ' init find wdiss 
-"testClone" DLListClone d: new 
+"testClone" DLListClone new 
 "\nthis = " ps this hex p 
 "\nthis = " ps this @ hex p //pause
 
 testClone size @ dump
-decimal nl s "DLListClone size =" ps DLListClone size @ dup p nl 44 "Clone size" assert
+decimal nl s "DLListClone size =" ps DLListClone size @ dup p nl 88 "Clone size" assert
 testClone.TailNode.BeforeReference @ testClone "DLListClone init test : " assert
 // test 'this' to refer to 'this' in current namespace
-this.TailNode.BeforeReference @ this "DLListClone init test2 : " assert
+// d: this.TailNode.BeforeReference @ this "DLListClone init test2 : " assert
 
 "\nthis @ size @ p " ps this @ size @ p drop // sp // pause // for now we have to drop the 'this' pointer. TODO :: 'this' semantics have yet to be solidified
 "\nthis.size = " ps this.size @ p drop // sp //pause
@@ -167,7 +168,7 @@ dbgOff
 #if dbgOnVar @
 "\nprintf output = " ps using printf ( "this.size = %d", this.size ) this @ dup hex p size @ dup decimal p dump //pause // 'this' is a pointer to a pointer 
 #else
-using "\nprintf output = " ps printf ( "this.size = %d", this.size ) this @ dup hex p size @ dup decimal p dump //pause // 'this' is a pointer to a pointer 
+// TODO ( % using C "\nprintf output = " ps d: printf ( "this.size = %d", this.size ) this @ dup hex p size @ dup decimal p dump % ) //pause // 'this' is a pointer to a pointer 
 #endif
 
 TODO ( "'this' semantics have yet to be solidified" ) 
@@ -175,7 +176,7 @@ sp
 testClone size @ dump
 sp
 nl testClone.Category @ 12 "DLListClone init test4 : " assert //pause
-nl this.Category @ 12 "DLListClone init test3 : " assert //pause
+//nl this.Category @ 12 "DLListClone init test3 : " assert //pause
 sp
 #endif
 2 + 7 assertStkChk // stack checking

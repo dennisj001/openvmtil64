@@ -16,7 +16,17 @@ hex
 "EBP" 5 const 
 "ESI" 6 const
 "EDI" 7 const 
-"DSP" ESI const 
+"R8D" 8 const 
+"R9D" 9 const 
+"R10D" 10 const 
+"R11D" 11 const 
+"R12D" 12 const 
+"R13D" 13 const 
+"R14D" 14 const 
+"R15D" 15 const 
+
+"DSP" R14D const 
+"FP" R15D const 
 
 // ttt codes
 "BELOW" 1 const 
@@ -34,7 +44,7 @@ hex
 "SUB" 5 const
 "CMP" 7 const
 "BYTE" 1 const
-"CELL" 4 const
+"CELL" 8 const
 "N" 1 const // used with JCC n/ttt notation
 
 // opCodes

@@ -98,7 +98,7 @@ Namespace_PrettyPrint ( Namespace* ns, int64 indentFlag, int64 indentLevel )
         _Printf ( ( byte* ) "\n" ) ;
         while ( indentLevel -- ) _Printf ( ( byte* ) "\t" ) ;
     }
-    if ( ns->State & NOT_USING ) _Printf ( ( byte* ) " - %s", c_dd ( ns->Name ) ) ;
+    if ( ns->State & NOT_USING ) _Printf ( ( byte* ) " - %s", c_gd ( ns->Name ) ) ;
     else _Printf ( ( byte* ) " - %s", ns->Name ) ;
     _Context_->NsCount ++ ;
 }
@@ -208,7 +208,7 @@ CfrTil_Namespaces_PrettyPrintTree ( )
     _Context_->NsCount = 0 ;
     _Context_->WordCount = 0 ;
     //SetState ( _Q_->psi_PrintStateInfo, PSI_PROMPT, false ) ;
-    _Printf ( ( byte* ) "\nNamespaceTree - All Namespaces : %s%s%s", c_ud ( "using" ), " : ", c_dd ( "not using" ) ) ;
+    _Printf ( ( byte* ) "\nNamespaceTree - All Namespaces : %s%s%s", c_ud ( "using" ), " : ", c_gd ( "not using" ) ) ;
     _Namespace_MapAny_2Args ( ( MapSymbolFunction2 ) Symbol_SetNonTREED, 0, 0 ) ;
     _Namespace_MapAny_2Args ( ( MapSymbolFunction2 ) Symbol_Namespaces_PrintTraverse, ( int64 ) _CfrTil_->Namespaces, 1 ) ;
     _Printf ( ( byte* ) "\nTotal namespaces = %d :: Total words = %d\n", _Context_->NsCount, _Context_->WordCount ) ;
@@ -220,7 +220,7 @@ CfrTil_Namespaces_PrettyPrintTreeWithWords ( )
     _Context_->NsCount = 0 ;
     _Context_->WordCount = 0 ;
     //SetState ( _Q_->psi_PrintStateInfo, PSI_PROMPT, false ) ;
-    _Printf ( ( byte* ) "%s%s%s%s%s%s%s", "\nNamespaceTree - All Namespaces : ", "using", " : ", c_dd ( "not using" ), " :: ", "with", c_ud ( " : words" ) ) ;
+    _Printf ( ( byte* ) "%s%s%s%s%s%s%s", "\nNamespaceTree - All Namespaces : ", "using", " : ", c_gd ( "not using" ), " :: ", "with", c_ud ( " : words" ) ) ;
     _Namespace_MapAny_2Args ( ( MapSymbolFunction2 ) Symbol_SetNonTREED, 0, 0 ) ;
     _Namespace_MapAny_2Args ( ( MapSymbolFunction2 ) Symbol_Namespaces_PrintTraverseWithWords, ( int64 ) _CfrTil_->Namespaces, 1 ) ;
     _Printf ( ( byte* ) "\nTotal namespaces = %d :: Total words = %d\n", _Context_->NsCount, _Context_->WordCount ) ;

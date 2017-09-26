@@ -38,7 +38,9 @@ all: cfrtil cfrtil-gdb #cfrtils
 #CFLAGS_CORE = -m32 -finline-functions #-I/usr/include/x86_64-linux-gnu -I/usr/src/linux -I/usr/src/linux-headers-4.2.0-42-generic/arch/ia64/include -I/usr/include/x86_64-linux-gnu# -O3 -fomit-frame-pointer
 CFLAGS_CORE = -finline-functions #-I/usr/include/x86_64-linux-gnu -I/usr/src/linux -I/usr/src/linux-headers-4.2.0-42-generic/arch/ia64/include -I/usr/include/x86_64-linux-gnu# -O3 -fomit-frame-pointer
 CFLAGS = $(CFLAGS_CORE) -Wall 
-LIBS = -L../lib -L/usr/local/lib -ludis86 -lrt -lc -ldl -lm  -lmpfr -lgmp #-lpython3.7#-lFOX-1.6  -lX11
+//LIBS = -L../lib -L/usr/local/lib -ludis86 -lrt -lc -ldl -lm  -lmpfr -lgmp #-lpython3.7#-lFOX-1.6  -lX11
+LIBS = -L/usr/local/lib -ludis86 -lrt -lc -ldl -lm  -lmpfr -lgmp #-lpython3.7#-lFOX-1.6  -lX11
+//LIBS = -L/usr/lib/x86_64-linux-gnu/ -ludis86 -lrt -lc -ldl -lm  -lmpfr -lgmp #-lpython3.7#-lFOX-1.6  -lX11
 #LIBS = -ludis86 -lgmp -lrt -lc -ldl -lm #-lffi -lgc
 
 oclean : 
@@ -191,9 +193,9 @@ _gmp :
 	sudo ldconfig
 	
 _mpfr :	
-	wget http://www.mpfr.org/mpfr-current/mpfr-3.1.5.tar.xz
-	tar xvf mpfr-3.1.5.tar.xz
-	cd mpfr-3.1.5 && \
+	wget http://www.mpfr.org/mpfr-current/mpfr-3.1.6.tar.xz
+	tar xvf mpfr-3.1.6.tar.xz
+	cd mpfr-3.1.6 && \
 	#./configure CFLAGS=-m32 ABI=32 --enable-shared && \
 	./configure --enable-shared && \
 	make && \
@@ -251,6 +253,7 @@ xz :
 	make _xz
 
 copy :
+	cp ../.init.cft namespaces
 	cp ../cfrtil.tar.xz ../cfrtil.$1.tar.xz
 	cp ../*.tar.xz ~/backup/archive
 	cp ../*.tar.xz ~/Public

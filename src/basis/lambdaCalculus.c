@@ -59,7 +59,7 @@ _LO_Eval ( ListObject * l0, ListObject * locals, int64 applyFlag )
     ListObject *lfunction = 0, *largs, *lfirst ;
     Word * w ;
     SetState ( lc, LC_EVAL, true ) ;
-    d0 ( if ( Is_DebugModeOn ) LO_Debug_ExtraShow ( 0, 2, 0, ( byte* ) "\n_LO_Eval : entering : l0 = %s : locals = %s : applyFlag = %d", c_dd ( _LO_PRINT_TO_STRING ( l0 ) ), locals ? _LO_PRINT_TO_STRING ( locals ) : ( byte* ) "", applyFlag ) ) ;
+    d0 ( if ( Is_DebugModeOn ) LO_Debug_ExtraShow ( 0, 2, 0, ( byte* ) "\n_LO_Eval : entering : l0 = %s : locals = %s : applyFlag = %d", c_gd ( _LO_PRINT_TO_STRING ( l0 ) ), locals ? _LO_PRINT_TO_STRING ( locals ) : ( byte* ) "", applyFlag ) ) ;
 start:
 
     if ( l0 )
@@ -122,9 +122,9 @@ start:
                         l0 = lfirst ;
                         goto done ;
                     }
-                    d0 ( if ( Is_DebugModeOn ) LO_Debug_ExtraShow ( 0, 0, 0, ( byte* ) "\n_LO_Eval : before LO_SpecialFunction : l0 = %s : locals = %s", c_dd ( _LO_PRINT_TO_STRING ( l0 ) ), c_dd ( _LO_PRINT_TO_STRING ( locals ) ) ) ) ;
+                    d0 ( if ( Is_DebugModeOn ) LO_Debug_ExtraShow ( 0, 0, 0, ( byte* ) "\n_LO_Eval : before LO_SpecialFunction : l0 = %s : locals = %s", c_gd ( _LO_PRINT_TO_STRING ( l0 ) ), c_gd ( _LO_PRINT_TO_STRING ( locals ) ) ) ) ;
                     l0 = LO_SpecialFunction ( l0, locals ) ;
-                    d0 ( if ( Is_DebugModeOn ) LO_Debug_ExtraShow ( 0, 0, 0, ( byte* ) "\n_LO_Eval : after LO_SpecialFunction : l0 = %s : locals = %s", c_dd ( _LO_PRINT_TO_STRING ( l0 ) ), c_dd ( _LO_PRINT_TO_STRING ( locals ) ) ) ) ;
+                    d0 ( if ( Is_DebugModeOn ) LO_Debug_ExtraShow ( 0, 0, 0, ( byte* ) "\n_LO_Eval : after LO_SpecialFunction : l0 = %s : locals = %s", c_gd ( _LO_PRINT_TO_STRING ( l0 ) ), c_gd ( _LO_PRINT_TO_STRING ( locals ) ) ) ) ;
                     lc->LispParenLevel -- ;
                     goto done ;
                 }
@@ -163,10 +163,10 @@ start:
                     else if ( ( lfirst->LAttribute & ( T_LISP_SPECIAL ) || lc->CurrentLambdaFunction ) ) // CurrentLambdaFunction : if lambda or T_LISP_SPECIAL returns a list 
                     {
                         d0 ( if ( Is_DebugModeOn ) LO_Debug_ExtraShow ( 0, 0, 0, ( byte* ) "\n_LO_Eval : lfirst->LAttribute & ( T_LISP_SPECIAL ) : before LO_AddToHead : l0 = %s : largs = %s : lfunction = %s",
-                            c_dd ( _LO_PRINT_TO_STRING ( l0 ) ), c_dd ( _LO_PRINT_TO_STRING ( largs ) ), c_dd ( _LO_PRINT_TO_STRING ( lfunction ) ) ) ) ;
+                            c_gd ( _LO_PRINT_TO_STRING ( l0 ) ), c_gd ( _LO_PRINT_TO_STRING ( largs ) ), c_gd ( _LO_PRINT_TO_STRING ( lfunction ) ) ) ) ;
                         LO_AddToHead ( largs, lfunction ) ;
                         d0 ( if ( Is_DebugModeOn ) LO_Debug_ExtraShow ( 0, 0, 0, ( byte* ) "\n_LO_Eval : lfirst->LAttribute & ( T_LISP_SPECIAL ) : after LO_AddToHead : l0 = %s : largs = %s : lfunction = %s",
-                            c_dd ( _LO_PRINT_TO_STRING ( l0 ) ), c_dd ( _LO_PRINT_TO_STRING ( largs ) ), c_dd ( _LO_PRINT_TO_STRING ( lfunction ) ) ) ) ;
+                            c_gd ( _LO_PRINT_TO_STRING ( l0 ) ), c_gd ( _LO_PRINT_TO_STRING ( largs ) ), c_gd ( _LO_PRINT_TO_STRING ( lfunction ) ) ) ) ;
                         l0 = largs ;
                     }
                     SetState ( lc, LC_COMPILE_MODE, false ) ;
@@ -223,9 +223,9 @@ _LO_EvalList ( ListObject * lorig, ListObject * locals, int64 applyFlag )
             lnext = _LO_Next ( lnode ) ;
             // research : why doesn't this work without copy ? copying here wastes time and memory!!
             lce = LO_CopyOne ( _LO_Eval ( lnode, locals, applyFlag ) ) ;
-            d0 ( if ( Is_DebugModeOn ) LO_Debug_ExtraShow ( 0, 0, 0, ( byte* ) "\n_LO_EvalList before LO_AddToTail : lec = %s : lnew = %s", c_dd ( _LO_PRINT_TO_STRING ( lce ) ), c_dd ( _LO_PRINT_TO_STRING ( lnew ) ) ) ) ;
+            d0 ( if ( Is_DebugModeOn ) LO_Debug_ExtraShow ( 0, 0, 0, ( byte* ) "\n_LO_EvalList before LO_AddToTail : lec = %s : lnew = %s", c_gd ( _LO_PRINT_TO_STRING ( lce ) ), c_gd ( _LO_PRINT_TO_STRING ( lnew ) ) ) ) ;
             _LO_AddToTail ( lnew, lce ) ;
-            d0 ( if ( Is_DebugModeOn ) LO_Debug_ExtraShow ( 0, 0, 0, ( byte* ) "\n_LO_EvalList after LO_AddToTail : lec = %s : lnew = %s", c_dd ( _LO_PRINT_TO_STRING ( lce ) ), c_dd ( _LO_PRINT_TO_STRING ( lnew ) ) ) ) ;
+            d0 ( if ( Is_DebugModeOn ) LO_Debug_ExtraShow ( 0, 0, 0, ( byte* ) "\n_LO_EvalList after LO_AddToTail : lec = %s : lnew = %s", c_gd ( _LO_PRINT_TO_STRING ( lce ) ), c_gd ( _LO_PRINT_TO_STRING ( lnew ) ) ) ) ;
         }
     }
     return lnew ;
@@ -243,14 +243,14 @@ LO_SpecialFunction ( ListObject * l0, ListObject * locals )
     {
         while ( lfirst && ( lfirst->LAttribute & T_LISP_MACRO ) )
         {
-            d0 ( if ( Is_DebugModeOn ) LO_Debug_ExtraShow ( 0, 0, 0, ( byte* ) "\nLO_SpecialFunction : macro eval before : l0 = %s : locals = %s", c_dd ( _LO_PRINT_TO_STRING ( l0 ) ), locals ? _LO_PRINT_TO_STRING ( locals ) : ( byte* ) "" ) ) ;
+            d0 ( if ( Is_DebugModeOn ) LO_Debug_ExtraShow ( 0, 0, 0, ( byte* ) "\nLO_SpecialFunction : macro eval before : l0 = %s : locals = %s", c_gd ( _LO_PRINT_TO_STRING ( l0 ) ), locals ? _LO_PRINT_TO_STRING ( locals ) : ( byte* ) "" ) ) ;
             macro = lfirst ;
             macro->LAttribute &= ~ T_LISP_MACRO ; // prevent short recursive loop calling of this function thru LO_Eval below
             l0 = _LO_Eval ( l0, locals, 1 ) ;
             macro->LAttribute |= T_LISP_MACRO ; // restore to its true type
             lfirst = _LO_First ( l0 ) ;
             macro = 0 ;
-            d0 ( if ( Is_DebugModeOn ) LO_Debug_ExtraShow ( 0, 0, 0, ( byte* ) "\nLO_SpecialFunction : macro eval after : l0 = %s : locals = %s", c_dd ( _LO_PRINT_TO_STRING ( l0 ) ), locals ? _LO_PRINT_TO_STRING ( locals ) : ( byte* ) "" ) ) ;
+            d0 ( if ( Is_DebugModeOn ) LO_Debug_ExtraShow ( 0, 0, 0, ( byte* ) "\nLO_SpecialFunction : macro eval after : l0 = %s : locals = %s", c_gd ( _LO_PRINT_TO_STRING ( l0 ) ), locals ? _LO_PRINT_TO_STRING ( locals ) : ( byte* ) "" ) ) ;
         }
         if ( lfirst && lfirst->Lo_CfrTilWord && IS_MORPHISM_TYPE ( lfirst->Lo_CfrTilWord ) ) //->Definition )
         {
@@ -258,9 +258,9 @@ LO_SpecialFunction ( ListObject * l0, ListObject * locals )
         }
         else
         {
-            d0 ( if ( Is_DebugModeOn ) LO_Debug_ExtraShow ( 0, 0, 0, ( byte* ) "\nLO_SpecialFunction : final eval before : l0 = %s : locals = %s", c_dd ( _LO_PRINT_TO_STRING ( l0 ) ), locals ? _LO_PRINT_TO_STRING ( locals ) : ( byte* ) "nil" ) ) ;
+            d0 ( if ( Is_DebugModeOn ) LO_Debug_ExtraShow ( 0, 0, 0, ( byte* ) "\nLO_SpecialFunction : final eval before : l0 = %s : locals = %s", c_gd ( _LO_PRINT_TO_STRING ( l0 ) ), locals ? _LO_PRINT_TO_STRING ( locals ) : ( byte* ) "nil" ) ) ;
             l0 = _LO_Eval ( l0, locals, 1 ) ;
-            d0 ( if ( Is_DebugModeOn ) LO_Debug_ExtraShow ( 0, 0, 0, ( byte* ) "\nLO_SpecialFunction : final eval after : l0 = %s : locals = %s", c_dd ( _LO_PRINT_TO_STRING ( l0 ) ), locals ? _LO_PRINT_TO_STRING ( locals ) : ( byte* ) "nil" ) ) ;
+            d0 ( if ( Is_DebugModeOn ) LO_Debug_ExtraShow ( 0, 0, 0, ( byte* ) "\nLO_SpecialFunction : final eval after : l0 = %s : locals = %s", c_gd ( _LO_PRINT_TO_STRING ( l0 ) ), locals ? _LO_PRINT_TO_STRING ( locals ) : ( byte* ) "nil" ) ) ;
         }
     }
     return l0 ;
@@ -475,7 +475,7 @@ _LO_List ( ListObject * lfirst )
         if ( GetState ( _CfrTil_, DEBUG_MODE ) )
         {
             DebugColors ;
-            _Printf ( ( byte* ) "\n_LO_List : on entering\n\tlfirst = %s", c_dd ( _LO_PRINT_TO_STRING_WITH_VALUE ( lfirst ) ) ) ;
+            _Printf ( ( byte* ) "\n_LO_List : on entering\n\tlfirst = %s", c_gd ( _LO_PRINT_TO_STRING_WITH_VALUE ( lfirst ) ) ) ;
             DefaultColors ;
         }
         for ( l0 = lfirst ; l0 ; l0 = lnext )
@@ -491,14 +491,14 @@ _LO_List ( ListObject * lfirst )
                 if ( GetState ( _CfrTil_, DEBUG_MODE ) )
                 {
                     DebugColors ;
-                    _Printf ( ( byte* ) "\n_LO_List : Before l1 = LO_Eval ( LO_Copy ( l0 ) ) ;\n\tl0 = %s", c_dd ( _LO_PRINT_TO_STRING_WITH_VALUE ( l0 ) ) ) ;
+                    _Printf ( ( byte* ) "\n_LO_List : Before l1 = LO_Eval ( LO_Copy ( l0 ) ) ;\n\tl0 = %s", c_gd ( _LO_PRINT_TO_STRING_WITH_VALUE ( l0 ) ) ) ;
                     DefaultColors ;
                 }
                 l1 = LO_Eval ( LO_Copy ( l0 ) ) ;
                 if ( GetState ( _CfrTil_, DEBUG_MODE ) )
                 {
                     DebugColors ;
-                    _Printf ( ( byte* ) "\n_LO_List : After l1 = LO_Eval ( LO_Copy ( l0 ) ) ;\n\tl1 = %s", c_dd ( _LO_PRINT_TO_STRING_WITH_VALUE ( l1 ) ) ) ;
+                    _Printf ( ( byte* ) "\n_LO_List : After l1 = LO_Eval ( LO_Copy ( l0 ) ) ;\n\tl1 = %s", c_gd ( _LO_PRINT_TO_STRING_WITH_VALUE ( l1 ) ) ) ;
                     DefaultColors ;
                 }
                 if ( l1->LAttribute & ( LIST | LIST_NODE ) ) l1 = LO_New ( LIST_NODE, l1 ) ;
@@ -509,7 +509,7 @@ _LO_List ( ListObject * lfirst )
         {
 
             DebugColors ;
-            _Printf ( ( byte* ) "\n_LO_List : on leaving\n\tlnew = %s", c_dd ( _LO_PRINT_TO_STRING_WITH_VALUE ( lnew ) ) ) ;
+            _Printf ( ( byte* ) "\n_LO_List : on leaving\n\tlnew = %s", c_gd ( _LO_PRINT_TO_STRING_WITH_VALUE ( lnew ) ) ) ;
             DefaultColors ;
         }
     }
@@ -829,7 +829,7 @@ next:
                     if ( ( word->LAttribute & ( T_LISP_READ_MACRO | T_LISP_IMMEDIATE ) ) && ( ! GetState ( _Q_->OVT_LC, LC_READ_MACRO_OFF ) ) )
                     {
                         //word->Definition ( ) ; // scheme read macro preprocessor 
-                        _Block_Eval (  word->Definition ) ;
+                        _Block_Eval ( word->Definition ) ;
                         if ( word->LAttribute & T_LISP_SPECIAL )
                         {
                             l0 = _DataObject_New ( T_LC_NEW, word, 0, word->CAttribute, T_LISP_SYMBOL | word->LAttribute, 0, * word->Lo_PtrToValue, lexer->TokenStart_ReadLineIndex ) ;
@@ -847,7 +847,7 @@ next:
                     else
                     {
                         if ( word->CAttribute & NAMESPACE_TYPE ) _DataObject_Run ( word ) ;
-                        l0 = _DataObject_New ( T_LC_NEW, word, 0, word->CAttribute, T_LISP_SYMBOL | word->LAttribute, 0, * word->Lo_PtrToValue, lexer->TokenStart_ReadLineIndex ) ;
+                        l0 = _DataObject_New ( T_LC_NEW, word, 0, word->CAttribute, T_LISP_SYMBOL | word->LAttribute, 0, word->Lo_Value, lexer->TokenStart_ReadLineIndex ) ;
                     }
                 }
                 else
@@ -1029,11 +1029,11 @@ _LO_Apply_Arg ( ListObject ** pl1, int64 applyRtoL, int64 i )
         DEBUG_SETUP ( l2 ) ;
         if ( ! l2 || ( l2->LAttribute & T_NIL ) )
         {
-            Compile_DspPop_EspPush ( ) ;
+            Compile_DspPop_RspPush ( ) ;
         }
         else
         {
-            _Compile_PushEspImm ( ( int64 ) * l2->Lo_PtrToValue ) ;
+            _Compile_PushRspImm ( ( int64 ) * l2->Lo_PtrToValue ) ;
         }
     }
     else if ( ( l1->CAttribute & _NON_MORPHISM_TYPE ) ) // and literals, etc.
@@ -1048,7 +1048,8 @@ _LO_Apply_Arg ( ListObject ** pl1, int64 applyRtoL, int64 i )
         if ( CompileMode && ( ! ( l1->CAttribute & ( NAMESPACE_TYPE | OBJECT_FIELD | T_NIL ) ) ) ) // research : how does CAttribute get set to T_NIL?
         {
             if ( word->StackPushRegisterCode ) SetHere ( word->StackPushRegisterCode ) ;
-            _Compile_PushReg ( R8D ) ;
+            _Compile_Move_Reg_To_Reg ( RAX, R8D ) ;
+            _Compile_PushReg ( RAX ) ;
             i ++ ;
         }
     }
@@ -1074,7 +1075,7 @@ _LO_Apply_Arg ( ListObject ** pl1, int64 applyRtoL, int64 i )
                 CfrTil_Exception ( OBJECT_SIZE_ERROR, QUIT ) ;
             }
             variableFlag = _CheckArrayDimensionForVariables_And_UpdateCompilerState ( ) ;
-            WordList_Pop ( _Context_->Compiler0->WordList, 0 ) ; // pop the initial '['
+            _WordList_Pop ( _Context_->Compiler0->WordList, 0 ) ; // pop the initial '['
             svBaseObject->AccumulatedOffset = 0 ;
             do
             {
@@ -1099,7 +1100,8 @@ _LO_Apply_Arg ( ListObject ** pl1, int64 applyRtoL, int64 i )
                 }
                 if ( Is_DebugModeOn ) Word_PrintOffset ( word, increment, svBaseObject->AccumulatedOffset ) ;
                 if ( svBaseObject->StackPushRegisterCode ) SetHere ( svBaseObject->StackPushRegisterCode ) ;
-                _Compile_PushReg ( R8D ) ;
+                _Compile_Move_Reg_To_Reg ( RAX, R8D ) ;
+                _Compile_PushReg ( RAX ) ;
             }
             interp->BaseObject = 0 ;
             SetState ( compiler, COMPILE_MODE, saveCompileMode ) ;
@@ -1109,7 +1111,7 @@ _LO_Apply_Arg ( ListObject ** pl1, int64 applyRtoL, int64 i )
     {
         word = Compiler_CopyDuplicatesAndPush ( word ) ;
         DEBUG_SETUP ( word ) ;
-        _Compile_Esp_Push ( _DataStack_Pop ( ) ) ;
+        _Compile_Rsp_Push ( _DataStack_Pop ( ) ) ;
         i ++ ;
     }
 done:
@@ -1261,16 +1263,16 @@ _LO_CompileOrInterpret_One ( ListObject * l0 )
     if ( l0 && ( ! ( l0->LAttribute & ( LIST | LIST_NODE | T_NIL ) ) ) )
     {
         Word * word = l0->Lo_CfrTilWord ;
-        d0 ( if ( Is_DebugModeOn ) LO_Debug_ExtraShow ( 1, 1, 0, ( byte* ) "\n_LO_CompileOrInterpret_One : entering\n\tl0 =%s, l0->Lo_CfrTilWord = %s.%s", c_dd ( _LO_PRINT_TO_STRING_WITH_VALUE ( l0 ) ), ( word && word->S_ContainingNamespace ) ? word->S_ContainingNamespace->Name : ( byte* ) "_", word ? word->Name : ( byte* ) "" ) ) ;
+        d0 ( if ( Is_DebugModeOn ) LO_Debug_ExtraShow ( 1, 1, 0, ( byte* ) "\n_LO_CompileOrInterpret_One : entering\n\tl0 =%s, l0->Lo_CfrTilWord = %s.%s", c_gd ( _LO_PRINT_TO_STRING_WITH_VALUE ( l0 ) ), ( word && word->S_ContainingNamespace ) ? word->S_ContainingNamespace->Name : ( byte* ) "_", word ? word->Name : ( byte* ) "" ) ) ;
         _Interpreter_LC_InterpretWord ( cntx->Interpreter0, l0, word ) ;
-        d0 ( if ( Is_DebugModeOn ) LO_Debug_ExtraShow ( 1, 1, 0, ( byte* ) "\n_LO_CompileOrInterpret_One : leaving\n\tl0 =%s, l0->Lo_CfrTilWord = %s.%s", c_dd ( _LO_PRINT_TO_STRING_WITH_VALUE ( l0 ) ), ( word && word->S_ContainingNamespace ) ? word->S_ContainingNamespace->Name : ( byte* ) "_", word ? word->Name : ( byte* ) "" ) ) ;
+        d0 ( if ( Is_DebugModeOn ) LO_Debug_ExtraShow ( 1, 1, 0, ( byte* ) "\n_LO_CompileOrInterpret_One : leaving\n\tl0 =%s, l0->Lo_CfrTilWord = %s.%s", c_gd ( _LO_PRINT_TO_STRING_WITH_VALUE ( l0 ) ), ( word && word->S_ContainingNamespace ) ? word->S_ContainingNamespace->Name : ( byte* ) "_", word ? word->Name : ( byte* ) "" ) ) ;
     }
 }
 
 void
 _LO_CompileOrInterpret ( ListObject * lfunction, ListObject * ldata )
 {
-    d0 ( if ( Is_DebugModeOn ) LO_Debug_ExtraShow ( 0, 1, 0, ( byte* ) "\n_LO_CompileOrInterpret : \n\tlfunction =%s\n\tldata =%s", c_dd ( _LO_PRINT_TO_STRING_WITH_VALUE ( lfunction ) ), c_dd ( _LO_PRINT_TO_STRING ( ldata ) ) ) ) ;
+    d0 ( if ( Is_DebugModeOn ) LO_Debug_ExtraShow ( 0, 1, 0, ( byte* ) "\n_LO_CompileOrInterpret : \n\tlfunction =%s\n\tldata =%s", c_gd ( _LO_PRINT_TO_STRING_WITH_VALUE ( lfunction ) ), c_gd ( _LO_PRINT_TO_STRING ( ldata ) ) ) ) ;
     ListObject * lfword = lfunction->Lo_CfrTilWord ;
 
     if ( ldata && lfword && ( lfword->CAttribute & ( CATEGORY_OP_ORDERED | CATEGORY_OP_UNORDERED ) ) ) // ?!!? 2 arg op with multi-args : this is not a precise distinction yet : need more types ?!!? 

@@ -27,7 +27,8 @@ Io
 : pn intPrint ;
 : _p intPrint ;
 : p space intPrint ;
-: hp hex p ;
+'_hp 'hexIntPrint find alias
+: hp space _hp ;
 : print space intPrint ;
 "nl" ' newline find alias keyword
 : _logWrite "cfrTil.log" logWrite ;
@@ -107,7 +108,8 @@ Compiler
 // nb : .'"[] : these five characters - dot, tick, quote left bracket, right bracket - .'"[] - are character macros including the brackets they work at the char level in readline
 // set up some traditional Forth words from internal primitives
 // core internal c defined words : begin _end token _tick _immediate definition compile constant variable alias compileModeOn wordInit wordAdd wordFinish
-quote ' quote quote find alias _immediate
+//quote ' quote quote find alias _immediate
+"'" quote quote find alias _immediate
 "immediate" ' _immediate find alias _immediate
 "compileWord" ' _compileWord find alias immediate
 "compileCall" ' _compileCall find alias immediate
@@ -153,7 +155,7 @@ BigNum
 'bnInit find wdis
 'p 'fprint find alias
 64 bPrecision 
-bnInit ( 0 16 )
+bnInit ( 16 16 )
 Root
 : bigNumOff "BigNum" notUsing ;
 'bno 'bigNumOff find alias
@@ -214,7 +216,7 @@ Word
 
 C
 System
-dscOn //verbosity 3 =
+//dscOn //verbosity 3 =
 : location filename ps space decimal lineNumber _p "." _ps charNumber _p ;
 : pdl  "-----------------------------" ps ;
 : pel  "=============================" ps ;
@@ -229,7 +231,7 @@ dscOn //verbosity 3 =
     nl "Word :" _ps hex pword p ":: Compiled at :" ps pword @ definition p 
     nl pel nl decimal 
 ;;
-scOff
+//scOff
 //: wdiss ( pword ) _wdiss ( 1 pword @ ) ; //debugWord    // add wdiss words to history list
 : wdiss ( pword ) _wdiss ( 0 pword @ ) ; //debugWord      // don't add wdiss words to history list
 : wdissl ( pword ) logOn _wdiss ( 0 pword @ ) logOff ; //debugWord      // don't add wdiss words to history list

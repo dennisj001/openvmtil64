@@ -19,7 +19,7 @@ _Compile_Stack_DropN ( int8 stackReg, int64 n )
 // system stack is backward to cfrTil - grows downward
 
 void
-_Compile_DropN_ESP ( int64 n )
+_Compile_DropN_Rsp ( int64 n )
 {
     Compile_ADDI ( REG, RSP, 0, n * sizeof ( int64 ), 0 ) ;
 }
@@ -28,7 +28,7 @@ void
 _Compile_SetStackN_WithObject ( int8 stackReg, int64 n, int64 obj )
 {
     //_Compile_MoveImm ( int64 direction, int64 rm, int64 sib, int64 disp, int64 imm, int64 operandSize )
-    _Compile_MoveImm ( MEM, stackReg, 0, n * CELL, obj, CELL ) ;
+    _Compile_MoveImm (MEM, stackReg, IMM_B | REX_B | MODRM_B | DISP_B, 0, n * CELL, obj, CELL ) ;
 }
 
 void
@@ -117,7 +117,7 @@ Compile_Pop_ToR8_AndCall ( int8 stackReg )
 void
 Compile_MoveImm_To_TOS ( int8 stackReg, int64 imm, int8 size )
 {
-    _Compile_MoveImm ( MEM, stackReg, 0, 0, imm, size ) ;
+    _Compile_MoveImm (MEM, stackReg, IMM_B | REX_B | MODRM_B | DISP_B, 0, 0, imm, size ) ;
 }
 
 #if 0
@@ -161,7 +161,7 @@ void
 _Compile_Stack_Pick ( int8 stackReg ) // pick
 {
     _Compile_Move_Rm_To_Reg ( R8D, stackReg, 0 ) ;
-    Compile_NOT ( REG, R8D, 0, 0 ) ; // negate eax
+    Compile_NOT ( REG, R8D, 0, 0, 0 ) ; // negate eax
     _Compile_Move ( REG, R8D, stackReg, _CalculateSib ( SCALE_CELL, R8D, R14 ), 0 ) ; // move eax, [esi + eax * 4 ] ; but remember eax is now a negative number
     _Compile_Move_Reg_To_Rm ( stackReg, R8D, 0 ) ;
 }
@@ -182,24 +182,24 @@ Compile_DataStack_PushR8 ( )
 }
 
 void
-_Compile_Esp_Push ( int64 value )
+_Compile_Rsp_Push ( int64 value )
 {
-    _Compile_MoveImm_To_Reg ( R8D, value, CELL ) ;
-    _Compile_PushReg ( R8D ) ;
+    _Compile_MoveImm_To_Reg ( RAX, value, CELL ) ;
+    _Compile_PushReg ( RAX ) ;
 }
 
 void
-Compile_DspPop_EspPush ( )
+Compile_DspPop_RspPush ( )
 {
-    _Compile_Stack_PopToReg ( DSP, R8D ) ;
+    _Compile_Stack_PopToReg ( DSP, RAX ) ;
     // _Compile_Stack_Push_Reg ( ESP, ECX ) ; // no such op
-    _Compile_PushReg ( R8D ) ;
+    _Compile_PushReg ( RAX ) ;
 }
 
 #if 0
 
 void
-Compile_EspPop_DspPush ( )
+Compile_RspPop_DspPush ( )
 {
     _Compile_PopToReg ( R8D ) ; // intel pop is pop esp
     Compile_DataStack_PushR8 ( ) ; // no such op

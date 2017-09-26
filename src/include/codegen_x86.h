@@ -144,7 +144,7 @@ enum {
 enum {
   X86_EAX = X86_Reg32_Base,
   X86_ECX,  X86_EDX,  X86_EBX,
-  X86_ESP,  X86_EBP,  X86_ESI,  X86_EDI,
+  X86_Rsp,  X86_EBP,  X86_ESI,  X86_EDI,
   X86_R8D,  X86_R9D,  X86_R10D, X86_R11D,
   X86_R12D, X86_R13D, X86_R14D, X86_R15D
 };
@@ -224,7 +224,7 @@ enum {
 #define _rX(R)		( (_rC(R) == X86_RegXMM_Base)				? _rN(R) : x86_emit_failure0("SSE register required"))
 #endif
 
-#define _rSP()		(X86_TARGET_64BIT ? (int64)X86_RSP : (int64)X86_ESP)
+#define _rSP()		(X86_TARGET_64BIT ? (int64)X86_RSP : (int64)X86_Rsp)
 #define _r1e8lP(R)	(int64(R) >= X86_SPL && int64(R) <= X86_DIL)
 #define _rbpP(R)	(_rR(R) == _rR(X86_RBP))
 #define _rspP(R)	(_rR(R) == _rR(X86_RSP))

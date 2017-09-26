@@ -148,6 +148,7 @@
 #define LABEL_NOT_FOUND_ERROR ( 1 << 21 )
 #define ARRAY_DIMENSION_ERROR ( 1 << 22 )
 #define FIX_ME_ERROR ( 1 << 23 )
+#define OUT_OF_CODE_MEMORY ( 1 << 24 )
 
 #define KB 1024
 #define MB ( KB * KB )
@@ -482,6 +483,7 @@
 #define DBG_EVAL_AUTO_MODE ( (uint64) 1 << 32 )
 #define DBG_CONTINUE_MODE ( (uint64) 1 << 32 )
 #define DBG_INTERNAL_ON ( (uint64) 1 << 33 )
+#define DBG_DISASM_ACC ( (uint64) 1 << 34 )
 
 #define SIZEOF_AddressAfterJmpCallStack 16
 // TODO : nb. flags need to be edited !!!!! for right category, overlap, use/non-use, etc.
@@ -559,7 +561,7 @@
 #define BLOCK_MODE COMPILE_MODE
 #define ADD_FRAME ( 1 << 1 )
 #define LEFT_BRACKET ( 1 << 2 )
-#define SAVE_ESP ( 1 << 3 ) 
+#define SAVE_Rsp ( 1 << 3 ) 
 #define RETURN_NONE ( 1 << 5 ) 
 #define RETURN_TOS ( 1 << 6 )
 #define RETURN_R8 ( 1 << 7 ) 

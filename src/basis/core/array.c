@@ -4,6 +4,8 @@
 ByteArray *
 _ByteArray_AppendSpace_MakeSure ( ByteArray * ba, int64 size ) // size in bytes
 {
+    //if ( ( ba == _Q_CodeByteArray ) && Compiling ) CfrTil_Exception ( OUT_OF_CODE_MEMORY, INITIAL_START ) ;
+
     NamedByteArray * nba = ba->OurNBA ;
     if ( nba )
     {
@@ -66,7 +68,7 @@ _ByteArray_DataClear ( ByteArray * ba )
     Mem_Clear ( ba->BA_Data, ba->BA_DataSize ) ;
 }
 
- void
+void
 _ByteArray_Init ( ByteArray * ba )
 {
     ba->BA_Data = ( byte* ) ( ba + 1 ) ;

@@ -133,6 +133,15 @@ CfrTil_PrintInt ( )
 }
 
 void
+CfrTil_HexPrintInt ( )
+{
+    int64 svb = _Context_->System0->NumberBase ;
+    _Context_->System0->NumberBase = 16 ;
+    PrintfInt ( _DataStack_Pop ( ) ) ;
+    _Context_->System0->NumberBase = svb ;
+}
+
+void
 CfrTil_Emit ( )
 {
     int64 c = _DataStack_Pop ( ) ;

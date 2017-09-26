@@ -58,8 +58,8 @@ _OVT_Pause ( byte * prompt, int64 signalsHandled )
     {
         byte buffer [512], *defaultPrompt =
             ( byte * ) "\n%s%s : at %s :: %s\n'd' (d)ebugger, 't' s(t)ack, c' (c)ontinue, 'q' (q)uit, 'x' e(x)it, 'i' (i)interpret, \\' or other <key> == pause loop starting with <other key>%s" ;
-        snprintf ( ( char* ) buffer, 512, ( char* ) prompt ? prompt : defaultPrompt, _Q_->ExceptionMessage ? _Q_->ExceptionMessage : ( byte* ) "\r", c_dd ( "pause" ),
-            _Context_Location ( _Context_ ), c_dd ( _Debugger_->ShowLine ? _Debugger_->ShowLine : _Context_->ReadLiner0->InputLine ), c_dd ( "\n-> " ) ) ;
+        snprintf ( ( char* ) buffer, 512, ( char* ) prompt ? prompt : defaultPrompt, _Q_->ExceptionMessage ? _Q_->ExceptionMessage : ( byte* ) "\r", c_gd ( "pause" ),
+            _Context_Location ( _Context_ ), c_gd ( _Debugger_->ShowLine ? _Debugger_->ShowLine : _Context_->ReadLiner0->InputLine ), c_gd ( "\n-> " ) ) ;
         DebugColors ;
         int64 tlw = Strlen ( defaultPrompt ) ;
         if ( tlw > _Debugger_->TerminalLineWidth ) _Debugger_->TerminalLineWidth = tlw ;
@@ -72,14 +72,14 @@ _OVT_Pause ( byte * prompt, int64 signalsHandled )
             if ( ( key == 'x' ) || ( key == 'X' ) )
             {
                 byte * msg = ( byte * ) "Exit cfrTil from pause?" ;
-                _Printf ( ( byte* ) "\n%s : 'x' to e(x)it cfrTil : any other <key> to continue%s", msg, c_dd ( "\n-> " ) ) ;
+                _Printf ( ( byte* ) "\n%s : 'x' to e(x)it cfrTil : any other <key> to continue%s", msg, c_gd ( "\n-> " ) ) ;
                 key = Key ( ) ;
                 if ( ( key == 'x' ) || ( key == 'X' ) ) OVT_Exit ( ) ;
             }
             else if ( key == 'q' )
             {
                 byte * msg = ( byte * ) "Quit to interpreter loop from pause?" ;
-                _Printf ( ( byte* ) "\n%s : 'q' to (q)uit : any other key to continue%s", msg, c_dd ( "\n-> " ) ) ;
+                _Printf ( ( byte* ) "\n%s : 'q' to (q)uit : any other key to continue%s", msg, c_gd ( "\n-> " ) ) ;
                 key = Key ( ) ;
                 if ( ( key == 'q' ) || ( key == 'Q' ) ) DefaultColors, _OVT_Throw ( QUIT, 1 ) ;
             }
@@ -158,7 +158,7 @@ _OVT_Throw ( int64 restartCondition, int8 pauseFlag )
         _Q_->RestartCondition = INITIAL_START ;
         siglongjmp ( *jb, 1 ) ;
     }
-    if ( ( restartCondition > QUIT ) && ( ( _Q_->Signal & ( SIGSEGV | SIGBUS ) ) ) )
+    if ( ( restartCondition > QUIT ) && ( ( _Q_->Signal & ( SIGSEGV | SIGBUS | SIGILL ) ) ) )
     {
         if ( _Q_->Signal & ( SIGSEGV | SIGBUS ) )
         {
@@ -184,7 +184,11 @@ _OVT_Throw ( int64 restartCondition, int8 pauseFlag )
         }
         else jb = & _CfrTil_->JmpBuf0 ;
     }
-    else jb = & _CfrTil_->JmpBuf0 ;
+    else 
+    {
+        if ( _Q_->RestartCondition >= INITIAL_START ) jb = & _Q_->JmpBuf0 ;
+        else jb = & _CfrTil_->JmpBuf0 ;
+    }
     printf ( "\n%s %s -> ...\n", ( jb == & _CfrTil_->JmpBuf0 ) ? "reseting cfrTil" : "fully restarting", ( _Q_->Signal == SIGSEGV ) ? ": SIGSEGV" : "" ) ;
     fflush ( stdout ) ;
 
@@ -224,7 +228,7 @@ OpenVmTil_SignalAction ( int signal, siginfo_t * si, void * uc )
         _Q_->SignalExceptionsHandled ++ ;
         _Q_->Signal = signal ;
         _Q_->SigAddress = si->si_addr ;
-        _Q_->SigLocation = ( ( ! ( signal & ( SIGSEGV | SIGBUS ) ) ) && _Context_ ) ? ( byte* ) c_dd ( Context_Location ( ) ) : ( byte* ) "" ;
+        _Q_->SigLocation = ( ( ! ( signal & ( SIGSEGV | SIGBUS ) ) ) && _Context_ ) ? ( byte* ) c_gd ( Context_Location ( ) ) : ( byte* ) "" ;
         //_Printf ( (byte*) "\nOpenVmTil_SignalAction : address = %lx : %s", _Q_->SigAddress, _Q_->SigLocation ) ;
         _OVT_Throw ( _Q_->RestartCondition, 0 ) ;
     }
@@ -342,6 +346,11 @@ CfrTil_Exception ( int64 signal, int64 restartCondition )
         case FIX_ME_ERROR:
         {
             OpenVmTil_Throw ( ( byte* ) "Exception : Fix Me", restartCondition, 1 ) ;
+            break ;
+        }
+        case OUT_OF_CODE_MEMORY :
+        {
+            OpenVmTil_Throw ( ( byte* ) "Exception : Out of Code Memory : Increase Code Memory Size for Startup!!", INITIAL_START, 1 ) ;
             break ;
         }
         default:

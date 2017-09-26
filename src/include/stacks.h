@@ -22,7 +22,12 @@
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~
  */
 
+//#define ParameterVarOffset( word ) ( - ( _Context_->Compiler0->NumberOfArgs - word->Index + 1 ) )
+//#define ParameterVarOffset( word ) ( - ( _Context_->Compiler0->NumberOfArgs - word->Index ) )
+#define LocalVarOffset( word ) ( word->Index )
+#define LocalParameterVarOffset( word ) ( (word->CAttribute & LOCAL_VARIABLE) ? (LocalVarOffset ( word )) : (ParameterVarOffset ( word )) )
 #define LocalVarIndex_Disp( i ) ( ( i ) * CELL)
+#define LocalVarIndex_WordDisp( word ) ( (word->CAttribute & LOCAL_VARIABLE) ? (LocalVarOffset ( word ) * CELL_SIZE) : (ParameterVarOffset ( word ) * CELL_SIZE) )
 //#define IsFrameNecessary( compiler ) ( compiler->NumberOfLocals || compiler->NumberOfStackVariables )
 //#define ReturnSlotOffset( bi ) ( FrameSize (bi) - 1 )
 

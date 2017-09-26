@@ -1,6 +1,7 @@
                    
 5 
-sp
+: sp ; //stack pause ;
+
 #if _TestDone_ @ not // prevent including twice
 dbgOff
 lispOff
@@ -22,6 +23,7 @@ testna.nodes [ 3 ].AfterReference @ 1 _assert
 // mem pause
 // test just using a object but not as a local variable 
 // nb. doesn't work as a local variable yet
+//verbosity 3 =
 : testna5
     testna4.nodes [ 1 ] [ 0 ].AfterReference  1 =
     testna4.nodes [ 1 ] [ 0 ].BeforeReference 2 =
@@ -36,7 +38,8 @@ testna.nodes [ 3 ].AfterReference @ 1 _assert
     testna4.nodes [ 3 ] [ 2 ] 32 dump
 ;
 ' testna5 find wdiss
-testna5 //pause
+
+testna5 
 
 testna4.nodes [ 3 ] [ 2 ].BeforeReference @ 2 _assert
 
@@ -82,7 +85,7 @@ testn4.nodes[2].BeforeReference @ 2 _assert
 
 "testn5" new
 testn5 tna3
-sp
+
 testn5 hp
 testn5 tnarr2
 
@@ -97,83 +100,91 @@ testn5 tnarr2
 "testnx" DLLNodeAlloc new 
 testnx tnax1
 decimal
-"Ar1" class :{ int32 ar [4] };
+"Ar1" class :{ int64 ar [4] };
 "arr1" Ar1 new
 "arr1 : " ps location arr1 size @ dump // should be all zeroes
-arr1.ar [ 3 ] 89 =
+arr1.ar [ 3 ] 0x89 =
 arr1.ar[0] arr1.ar[3] @ = 
-arr1.ar[0] @ 89 _assert
-"arr1 : " ps location arr1 size @ dump // should show 89 = 0x59 in first and last postion
+arr1.ar[0] @ 0x89 _assert
+"arr1 : " ps location arr1 size @ dump // should show 0x89 = 0x59 in first and last postion
 : arr2 ( Ar1 a ) 
     a.ar[1] a.ar[3] @ = 
-    a.ar[1] @ dup hex p 89 _assert 
+    a.ar[1] @ dup decimal p 0x89 _assert 
 ;
 
 ' arr2 find wdiss
-arr1 arr2 // should print hex 0x59
+arr1 arr2 // should print decimal 0x59
 
 "\narr1 : " ps location arr1 size @ dump 
 : a3 ( n Ar1 a ) 
     a.ar [n @ 1 +] a.ar[n @ 2 +] @ = 
-    a.ar[n @ 1 +] @ dup p 89 _assert 
+    a.ar[n @ 1 +] @ dup hp 0x89 _assert 
 ;
 
 ' a3 find wdiss
 1 arr1 a3
-arr1.ar[2] @ 89 _assert
+arr1.ar[2] @ 0x89 _assert
 
-"Ar2" class :{ int32 ar [4][4] };
+"Ar2" class :{ int64 ar [4][4] };
 "a4" Ar2 new
-"a4 : " ps location a4 64 dump
-a4.ar[3][2]  89 =
-"a4 : " ps location a4 64 dump
+"a4 : " ps location a4 size @ dump
+a4.ar[3][2]  0x89 =
+"a4 : " ps location a4 size @ dump
 : a5 ( n m Ar2 a ) 
     a.ar[n @ 1 +][m @] a.ar[n @ 2 +][m @] @ = 
-    nl "a4 : " ps location a 64 dump
-    a.ar[n @ 1 +][m @] @ dup p 89 _assert 
+    nl "a4 : " ps location a.size @ dump
+    a.ar[n @ 1 +][m @] @ dup hp 0x89 _assert 
 ;
 ' a5 find wdiss
-a4.ar[3][2] @ 89 _assert //pause
+a4.ar[3][2] @ 0x89 _assert 
 1 2 a4 a5 s
 // a5 ( 1, 2, a4 )
 "a4 : " ps location a4 64 dump
 
-"Ar3" class :{ int32 ar [3][3][2] };
-"a6" Ar3 new
-"a6 : " ps location a6 size @ dump // 72 dump
-a6.ar[2][2][1]  89 =
-sp
-a6.ar[2][2][1] @ 89 _assert
-"a6 : " ps location a6 72 dump
-sp
-a6.ar[1][2][1] a6.ar[2][2][1] @ = 
-sp
-nl "a6 : " ps location a6 72 dump
-sp
-a6.ar[1][2][1] @ dup p 89 s _assert 
+"Ar3" class :{ int64 ar [3][3][2] };
+"a6" Ar3 s new s
+//"a6 : " ps location a6.size @ dump
+'a6x var 
+a6x a6.ar[2][2][1] =
+a6.ar[2][2][1] dup hp 0x89 =
+a6x @ dup hp @ dup hp 0x89 _assert
 
-sp 
-a6.ar[1][2][1] 0 = 
-a6.ar[1][2][1] @ dup p 0 sp _assert 
-nl "a6 : " ps location a6 72 dump
+a6.ar[2][2][1] dup hp @ dup hp 0x89 _assert 
+"a6 : " ps location a6.size @ dump 
+nl a6x @ @ hp 
+
+a6.ar[2][2][1] dup hp @ dup hp 0x89 _assert  
+nl a6.ar[1][2][1] dup hp a6.ar[2][2][1] s @ = sp
+a6x @ @ hp sp
+a6.ar[2][2][1] dup hp @ dup hp 0x89 _assert sp
+nl "a6 : " ps location a6 size @ dump
+a6.ar[1][2][1] @ dup p 0x89 _assert 
 sp
+a6.ar[2][2][1] dup hp @ dup hp 0x89 _assert
+a6.ar[1][2][1] dup hp @ dup hp 0x89 _assert
+a6.ar[1][2][1] dup hp dup @ hp 0 = 
+sp
+a6.ar[1][2][1] dup hp @ dup hp 0 sp _assert 
+nl "a6 : " ps location a6 size @ dump
+
 : a8 ( Ar3 a ) 
     a.ar[1][2][1] a.ar[2][2][1] @ = 
-    nl "a8.a : " ps location a 72 dump
-    a.ar[1][2][1] @ dup p 89 s _assert 
-    a.ar[2][2][1] @ dup p 89 s _assert 
+    nl "a8.a : " ps location a size @ dump
+    a.ar[1][2][1] dup hp @ dup hp 0x89 _assert 
+    a.ar[2][2][1] dup hp @ dup hp 0x89 _assert 
 ;
 ' a8 find wdiss
-sp
+
+a6.ar[2][2][1] dup p @ dup p 0x89 _assert 
 a6 a8
 : a7 ( n m o Ar3 a ) 
     a.ar[n @ 1 +][m @][o @] a.ar[n @ 2 +][m @][o @] @ = 
-    nl "a7.a : " ps location a 72 dump
-    // a.ar[n @ 2 +][m @][o @] @ dup p 89 s _assert 
-    a.ar[n @ 1 +][m @][o @] @ dup p 89 s _assert 
+    nl "a7.a : " ps location a a.size @ dump
+    // a.ar[n @ 2 +][m @][o @] @ dup p 0x89 s _assert 
+    a.ar[n @ 1 +][m @][o @] @ dup p 0x89 s _assert 
 ;
 ' a7 find wdiss
-a6.ar[2][2][1] @ 89 _assert
+a6.ar[2][2][1] @ 0x89 _assert
 0 2 1 a6 a7
 // a7(0,2,1,a6)
 "a6 : " ps location a6 72 dump

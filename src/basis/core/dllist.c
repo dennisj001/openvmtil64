@@ -489,108 +489,38 @@ Tree_Map_OneNamespace ( Word * word, MapFunction_1 mf, int64 one )
     return 0 ;
 }
 
-#if 1
-
 Word *
 Tree_Map_State_Flag_OneArg_AnyNamespaceWithState ( uint64 state, MapFunction_1 mf, int64 one )
 {
-    d1 ( if (_CfrTil_->Namespaces) )
-    {
-    Word * word, * word2, *nextWord ;
-    _CfrTil_->FindWordCount = 1 ;
-    if ( mf ( ( Symbol* ) _CfrTil_->Namespaces, one ) ) return _CfrTil_->Namespaces ;
-    for ( word = ( Word * ) dllist_First ( ( dllist* ) _CfrTil_->Namespaces->W_List ) ; word ; word = nextWord )
-    {
-        nextWord = ( Word* ) dlnode_Next ( ( node* ) word ) ;
-        _CfrTil_->FindWordCount ++ ;
-        if ( mf ( ( Symbol* ) word, one ) ) return word ;
-        else if ( Is_NamespaceType ( word ) )
-        {
-            if ( ( word->State & state ) )
-            {
-                if ( ( word2 = Tree_Map_OneNamespace ( ( Word* ) dllist_First ( ( dllist* ) word->W_List ), mf, one ) ) ) return word2 ;
-            }
-        }
-    }
-    }
-    return 0 ;
-}
-#else
+    d1 (
 
-Word *
-//TC_Tree_Map_2 ( uint64 state, dllist * list, MapFunction mf, Word * iword )
-Tree_Map_State_Flag_OneArg_AnyNamespaceWithState ( uint64 state, MapFunction_1 mf, int64 one )
-{
-    dllist * list = _CfrTil_->Namespaces->W_List ;
-    Word * word, *nextWord, *oword, *oNextWord, *rword ;
-start:
-    for ( word = ( Word * ) dllist_First ( list ) ; word ; word = nextWord )
-    {
-        nextWord = ( Word* ) dlnode_Next ( ( node* ) word ) ;
-        if ( mf ( ( Symbol* ) word, one ) ) return word ;
-        else if ( Is_NamespaceType ( word ) )
+         if ( _CfrTil_->Namespaces ) )
         {
-            if ( ( word->State & state ) )
+            Word * word, * word2, *nextWord ;
+            _CfrTil_->FindWordCount = 1 ;
+            if ( mf ( ( Symbol* ) _CfrTil_->Namespaces, one ) ) return _CfrTil_->Namespaces ;
+            for ( word = ( Word * ) dllist_First ( ( dllist* ) _CfrTil_->Namespaces->W_List ) ; word ; word = nextWord )
             {
-                oword = ( Word* ) dllist_First ( ( dllist* ) word->W_List ) ;
-                for ( ; oword ; oword = oNextWord )
+                nextWord = ( Word* ) dlnode_Next ( ( node* ) word ) ;
+                _CfrTil_->FindWordCount ++ ;
+                if ( mf ( ( Symbol* ) word, one ) ) return word ;
+                else if ( Is_NamespaceType ( word ) )
                 {
-                    oNextWord = ( Word* ) dlnode_Next ( ( node* ) oword ) ;
-                    if ( mf ( ( Symbol* ) oword, one ) ) return oword ;
+                    if ( ( word->State & state ) )
+                    {
+                        if ( ( word2 = Tree_Map_OneNamespace ( ( Word* ) dllist_First ( ( dllist* ) word->W_List ), mf, one ) ) ) return word2 ;
+                    }
                 }
             }
         }
-    }
-    return word ;
-}
-#endif
-
-// we have to remember that namespace nodes are being moved around on the Namespaces list by namespace functions
-#if 0
-
-Word *
-TC_Tree_Map_1 ( TabCompletionInfo * tci, dllist * list, MapFunction mf, Word * one, int64 * startFlag )
-{
-    dlnode * node, *nextNode ;
-    Word * word, *word2 ;
-    if ( ! one )
-    {
-        ( *startFlag ) = 1 ;
-        tci->SearchNumber = rand ( ) ; // SearchNumber : keeps track of which words we have already found on a search so we don't return them again
-        //tci->FoundMarker = rand () ;
-    }
-    for ( node = dllist_First ( ( dllist* ) list ) ; node ; node = nextNode )
-    {
-        nextNode = dlnode_Next ( node ) ;
-        word = ( Word * ) node ;
-        if ( ( word == one ) && ( word->W_SearchNumber == tci->SearchNumber ) )
-        {
-            ( *startFlag ) = 1 ;
-        }
-        if ( ( *startFlag ) && ( word->W_SearchNumber != tci->SearchNumber ) && mf ( ( Symbol* ) word ) )
-        {
-            d0 ( _Printf ( "\nTC_Tree_Map_1 :: word->Name = %s : word = 0x%08x\n", word->Name, word ) ; )
-            word->W_SearchNumber = tci->SearchNumber ;
-            return ( Word * ) word ;
-        }
-            //else if ( Is_NamespaceType ( word ) && (list == _CfrTil_->Namespaces->W_List ) ) // all namespaces are on this list; cf namespace
-        else if ( Is_NamespaceType ( word ) && ( word->W_SearchNumber != tci->SearchNumber ) && ( list == _CfrTil_->Namespaces->W_List ) ) // all namespaces are on this list; cf namespace
-            //else if ( Is_NamespaceType ( word ) && ( word->W_SearchNumber != tci->SearchNumber ) ) //&& (list == _CfrTil_->Namespaces->W_List ) ) // all namespaces are on this list; cf namespace
-        {
-            if ( word2 = TC_Tree_Map_1 ( tci, word->W_List, mf, one, startFlag ) ) return word2 ;
-            else word->W_SearchNumber = tci->SearchNumber ;
-        }
-    }
     return 0 ;
 }
 
-#else
-
 Word *
-TC_Tree_Map_2 ( dllist * list, MapFunction mf, Word * iword )
+TC_Tree_Map_2 ( TabCompletionInfo * tci, dllist * list, MapFunction mf, Word * iword )
 {
-    Word * word, *nextWord, *oword, *oNextWord, *rword = 0 ; int32 first = 0 ;
-first:
+    Word * word, *nextWord, *oword, *oNextWord, *rword = 0 ;
+start:
     if ( iword )
     {
         if ( mf ( ( Symbol* ) iword ) )
@@ -631,27 +561,87 @@ checkOWord:
                 {
                     rword = oNextWord ? oNextWord : nextWord ;
                     goto doReturn ;
+                    //return rword ;//break ;
                 }
             }
         }
     }
     rword = word ;
 doReturn:
-    if ( iword && ( rword == iword ) ) rword = 0 ;
-#if 1 // prevents from having to hit <tab> more than once in some cases
-    else
+    if ( iword ) 
     {
-        if ( ( ! rword ) && ( ! first ) )
-        {
-            list = _CfrTil_->Namespaces->W_List ;
-            rword = ( Word * ) dllist_First ( list ) ;
-            iword = rword ;
-            first = 1 ;
-            goto first ;
-        }
+        if ( ( rword == iword ) ) rword = 0 ; 
     }
-#endif
+    else { if ( ++ tci->WordWrapCount < 7 ) goto start ; }
     return rword ;
 }
+
+#if 0
+
+Word *
+//TC_Tree_Map_2 ( uint64 state, dllist * list, MapFunction mf, Word * iword )
+Tree_Map_State_Flag_OneArg_AnyNamespaceWithState ( uint64 state, MapFunction_1 mf, int64 one )
+{
+    dllist * list = _CfrTil_->Namespaces->W_List ;
+    Word * word, *nextWord, *oword, *oNextWord, *rword ;
+start:
+    for ( word = ( Word * ) dllist_First ( list ) ; word ; word = nextWord )
+    {
+        nextWord = ( Word* ) dlnode_Next ( ( node* ) word ) ;
+        if ( mf ( ( Symbol* ) word, one ) ) return word ;
+        else if ( Is_NamespaceType ( word ) )
+        {
+            if ( ( word->State & state ) )
+            {
+                oword = ( Word* ) dllist_First ( ( dllist* ) word->W_List ) ;
+                for ( ; oword ; oword = oNextWord )
+                {
+                    oNextWord = ( Word* ) dlnode_Next ( ( node* ) oword ) ;
+                    if ( mf ( ( Symbol* ) oword, one ) ) return oword ;
+                }
+            }
+        }
+    }
+    return word ;
+}
+
+// we have to remember that namespace nodes are being moved around on the Namespaces list by namespace functions
+
+Word *
+TC_Tree_Map_1 ( TabCompletionInfo * tci, dllist * list, MapFunction mf, Word * one, int64 * startFlag )
+{
+    dlnode * node, *nextNode ;
+    Word * word, *word2 ;
+    if ( ! one )
+    {
+        ( *startFlag ) = 1 ;
+        tci->SearchNumber = rand ( ) ; // SearchNumber : keeps track of which words we have already found on a search so we don't return them again
+        //tci->FoundMarker = rand () ;
+    }
+    for ( node = dllist_First ( ( dllist* ) list ) ; node ; node = nextNode )
+    {
+        nextNode = dlnode_Next ( node ) ;
+        word = ( Word * ) node ;
+        if ( ( word == one ) && ( word->W_SearchNumber == tci->SearchNumber ) )
+        {
+            ( *startFlag ) = 1 ;
+        }
+        if ( ( *startFlag ) && ( word->W_SearchNumber != tci->SearchNumber ) && mf ( ( Symbol* ) word ) )
+        {
+            d0 ( _Printf ( "\nTC_Tree_Map_1 :: word->Name = %s : word = 0x%08x\n", word->Name, word ) ; )
+            word->W_SearchNumber = tci->SearchNumber ;
+            return ( Word * ) word ;
+        }
+            //else if ( Is_NamespaceType ( word ) && (list == _CfrTil_->Namespaces->W_List ) ) // all namespaces are on this list; cf namespace
+        else if ( Is_NamespaceType ( word ) && ( word->W_SearchNumber != tci->SearchNumber ) && ( list == _CfrTil_->Namespaces->W_List ) ) // all namespaces are on this list; cf namespace
+            //else if ( Is_NamespaceType ( word ) && ( word->W_SearchNumber != tci->SearchNumber ) ) //&& (list == _CfrTil_->Namespaces->W_List ) ) // all namespaces are on this list; cf namespace
+        {
+            if ( word2 = TC_Tree_Map_1 ( tci, word->W_List, mf, one, startFlag ) ) return word2 ;
+            else word->W_SearchNumber = tci->SearchNumber ;
+        }
+    }
+    return 0 ;
+}
+
 #endif
 

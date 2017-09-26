@@ -3,6 +3,7 @@
 // logOn
 //: mp ; //mem pause ; mp
 "BigNum" notUsing 
+"Lisp" notUsing
 verbosity 1 = 
 5 
 Debug
@@ -19,12 +20,25 @@ Root
 : find _find ; immediate
 "log" variable 
 "User" namespace 
+Io
+: _ps printString ; inline
+: ps space _ps ;
+: prints _ps ;
+: pn intPrint ;
+: _p intPrint ;
+: p space intPrint ;
+'_hp 'hexIntPrint find alias
+: hp space _hp ;
+: print space intPrint ;
+"nl" ' newline find alias keyword
+: _logWrite "cfrTil.log" logWrite ;
+: _logAppend "cfrTil.log" logAppend ;
 
 // aliases 
 // using pause
 Debug
 //"dbg" '_dbg find alias immediate debugWord
-"dbrk" '<dbg> find alias debugWord
+"dbrk" ' <dbg> find alias debugWord
 "locals" 'localsShow find alias
 "regs" 'cpuStateShow find alias
 'nt 'namespaceTreeWithWords find alias
@@ -39,9 +53,11 @@ User
 "var" ' variable find alias
 "_var" ' _variable find alias
 "wdis" ' wordDisassemble find alias
+'s 'stack find alias
+: p space intPrint ;
 'dbgOnVar var 
 'dbOn 'dbgOnVar find alias
-: dbgOn dbgOnVar 1 = ;
+: dbgOn d: dbgOnVar 1 = ;
 : dbgOff dbgOnVar 0 = ;
 dbgOff
 #if dbgOnVar @ 
@@ -92,7 +108,8 @@ Compiler
 // nb : .'"[] : these five characters - dot, tick, quote left bracket, right bracket - .'"[] - are character macros including the brackets they work at the char level in readline
 // set up some traditional Forth words from internal primitives
 // core internal c defined words : begin _end token _tick _immediate definition compile constant variable alias compileModeOn wordInit wordAdd wordFinish
-quote ' quote quote find alias _immediate
+//quote ' quote quote find alias _immediate
+"'" quote quote find alias _immediate
 "immediate" ' _immediate find alias _immediate
 "compileWord" ' _compileWord find alias immediate
 "compileCall" ' _compileCall find alias immediate
@@ -105,11 +122,11 @@ quote ' quote quote find alias _immediate
 "semi" create { _end _semi } _semi 
 ";" ' semi find alias immediate
 ":" { compileModeOn sourceCodeInit token create begin } word // immediate // begin is not an immediate word
-#if 1
-: word swap create swap _semi ;  //'word wordDisassemble pause
-#else
-//: word ( n b ) n @ create b @ _semi ; 'word wordDisassemble pause // works but it is more code
-#endif
+//: word swap create swap _semi ;  //'word wordDisassemble pause
+: word ( name block ) name @ create block @ _semi ;  // works but it is 10 bytes more code
+'word find wdis //pause
+: simple ( a b c ) a @ p b @ p c @ p ; 'simple find wdis 1 2 3 simple //pause
+
 "xt@" { xt @ } word immediate // ' definition alias immediate
 'tick ' _tick find alias immediate
 'ndrop '_ndrop find alias immediate 
@@ -135,9 +152,10 @@ BigNum
 // the result is padded with blank spaces. The value is not truncated even if the result is larger."
 // pPrecision : this is the number of digits to be printed after the decimal point" 
 : bnInit ( precision width ) precision @ pPrecision width @ pWidth 64 bPrecision ;;
+'bnInit find wdis
 'p 'fprint find alias
 64 bPrecision 
-bnInit ( 0 0 )
+bnInit ( 16 16 )
 Root
 : bigNumOff "BigNum" notUsing ;
 'bno 'bigNumOff find alias
@@ -179,18 +197,6 @@ System
 "false" 0 const
 "T" 1 const
 "F" 0 const
-Io
-: _ps printString ; inline
-: ps space _ps ;
-: prints _ps ;
-: pn intPrint ;
-: _p intPrint ;
-: p space intPrint ;
-: hp hex p ;
-: print space intPrint ;
-"nl" ' newline find alias keyword
-: _logWrite "cfrTil.log" logWrite ;
-: _logAppend "cfrTil.log" logAppend ;
 
 Debug
 // make immediate/word immediate - compile time versions of some words
@@ -305,7 +311,7 @@ User
     1 ' state literal vck  
 ;
 // ' opOn @ winfo
-// opOn
+//opOn
 "s" ' stack find alias
 // : s stack location pause ;
 // : s stack dbg ;
@@ -360,18 +366,19 @@ sp
 //mem pause
 : sh _sh ; prefix
 dbgOff
-//dbgOn
-Root 'doScript 0 const
-//Root 'doScript 1 const
+dbgOn
+//Root 'doScript 0 const
+Root 'doScript 1 const
 #if dbgOnVar @ 
 testCfrTil
 stringMacrosOff
 //demo
 #endif
 //using pause
-2 + 7 assertStkChk // stack checking
+2 + 7  assertStkChk // stack checking
 dbgOff
 #endif
 : argsOrderExample ( a b c d ) a @ p b @ p c @ p d @ p ; "\n 1 2 3 4 argsOrderExample ( a b c d )  => " ps   1 2 3 4 argsOrderExample 
 mp
+nl 789654321 9087654321 * dup p binary p
 

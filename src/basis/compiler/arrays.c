@@ -123,7 +123,7 @@ Do_NextArrayWordToken ( Word * word, byte * token, Word * arrayBaseObject, int64
         _Interpreter_DoWord ( interp, word, - 1 ) ;
     }
     else Interpreter_InterpretAToken ( interp, token, - 1 ) ;
-    if ( word && ( ! CompileMode ) ) WordList_Pop ( _Context_->Compiler0->WordList, 0 ) ; // pop all tokens interpreted between '[' and ']'
+    if ( word && ( ! CompileMode ) ) _WordList_Pop ( _Context_->Compiler0->WordList, 0 ) ; // pop all tokens interpreted between '[' and ']'
     Set_CompileMode ( saveCompileMode ) ;
     SetState ( compiler, COMPILE_MODE, saveCompileMode ) ;
     return 0 ;
@@ -161,7 +161,7 @@ CfrTil_ArrayBegin ( void )
         }
 #endif            
         variableFlag = _CheckArrayDimensionForVariables_And_UpdateCompilerState ( ) ;
-        WordList_Pop ( _Context_->Compiler0->WordList, 0 ) ; // pop the initial '['
+        _WordList_Pop ( _Context_->Compiler0->WordList, 0 ) ; // pop the initial '['
         do
         {
             token = Lexer_ReadToken ( lexer ) ;

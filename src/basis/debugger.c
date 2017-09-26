@@ -28,7 +28,7 @@ Debugger_TableSetup ( Debugger * debugger )
     debugger->CharacterTable [ 'G' ] = 16 ;
     debugger->CharacterTable [ 'n' ] = 17 ;
     debugger->CharacterTable [ 'p' ] = 18 ;
-    //debugger->CharacterTable [ 'h' ] = 19 ;
+    debugger->CharacterTable [ 'h' ] = 1 ;
     debugger->CharacterTable [ 'a' ] = 20 ;
     debugger->CharacterTable [ 'z' ] = 21 ;
     debugger->CharacterTable [ 'w' ] = 22 ;
@@ -123,15 +123,16 @@ _Debugger_PreSetup ( Debugger * debugger, Word * word )
                 debugger->TokenStart_ReadLineIndex = word->W_StartCharRlIndex ;
                 debugger->SaveDsp = Dsp ;
                 if ( ! debugger->StartHere ) debugger->StartHere = Here ;
-
                 debugger->WordDsp = Dsp ;
                 debugger->SaveTOS = TOS ;
                 debugger->Token = word->Name ;
                 debugger->PreHere = Here ;
-                if ( debugger->w_Word->DebugWordList )
+#if 0                
+                if ( debugger->w_Word->DebugWordList && debugger->w_Word->W_SourceCode )
                 {
                     Debugger_SetDebugWordList ( debugger ) ;
                 }
+#endif                
                 DebugColors ;
                 _Debugger_InterpreterLoop ( debugger ) ; // core of this function
                 DefaultColors ;
@@ -239,18 +240,21 @@ _Debugger_Init ( Debugger * debugger, Word * word, byte * address )
                 da = debugger->DebugAddress ;
                 debugger->w_Word = word = Word_GetFromCodeAddress ( offsetAddress ) ;
             }
-            if ( ! word )
+            if ( _Q_->Verbosity > 3 )
             {
-                AlertColors ;
-                _CfrTil_PrintNReturnStack ( 8 ) ;
-                debugger->w_Word = _Context_->CurrentlyRunningWord ;
-                debugger->DebugAddress = debugger->w_Word->CodeStart ; //Definition ; //CodeAddress ;
-                _Printf ( ( byte* ) "\n\n%s : Can't find a word at this address : 0x%016lx : or it offset adress : 0x%016lx :  "
-                    "\nUsing _Context_->CurrentlyRunningWord : \'%s\' : address = 0x%016lx : debugger->DebugESP [1] = 0x%016lx",
-                    Context_Location ( ), da, offsetAddress, debugger->w_Word->Name, debugger->DebugAddress, debugger->DebugRSP ? debugger->DebugRSP [1] : 0 ) ; //but here is some disassembly at the considered \"EIP address\" : \n" ) ;
-                DebugColors ;
+                if ( ! word )
+                {
+                    AlertColors ;
+                    _CfrTil_PrintNReturnStack ( 8 ) ;
+                    debugger->w_Word = _Context_->CurrentlyRunningWord ;
+                    debugger->DebugAddress = debugger->w_Word->CodeStart ; //Definition ; //CodeAddress ;
+                    _Printf ( ( byte* ) "\n\n%s : Can't find a word at this address : 0x%016lx : or it offset adress : 0x%016lx :  "
+                        "\nUsing _Context_->CurrentlyRunningWord : \'%s\' : address = 0x%016lx : debugger->DebugESP [1] = 0x%016lx",
+                        Context_Location ( ), da, offsetAddress, debugger->w_Word->Name, debugger->DebugAddress, debugger->DebugRSP ? debugger->DebugRSP [1] : 0 ) ; //but here is some disassembly at the considered \"EIP address\" : \n" ) ;
+                    DebugColors ;
+                }
+                _CfrTil_PrintNReturnStack ( 4 ) ;
             }
-            if ( _Q_->Verbosity > 3 ) _CfrTil_PrintNReturnStack ( 4 ) ;
         }
     }
     if ( debugger->w_Word ) debugger->Token = debugger->w_Word->Name ;

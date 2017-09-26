@@ -22,11 +22,11 @@ CfrTil_IncDec ( int64 op ) // +
 {
     Context * cntx = _Context_ ;
     Compiler * compiler = cntx->Compiler0 ;
-    int64 sd = List_Depth ( compiler->WordList ) ;
-    Word *one = ( Word* ) Compiler_WordList ( 1 ), *two = Compiler_WordList ( 2 ), *three = Compiler_WordList ( 3 ) ; // the operand
-    byte * nextToken = Lexer_PeekNextNonDebugTokenWord ( cntx->Lexer0, 1 ) ;
     if ( ! GetState ( compiler, LC_CFRTIL ) )
     {
+        int64 sd = List_Depth ( compiler->WordList ) ;
+        Word *one = ( Word* ) Compiler_WordList ( 1 ), *two = Compiler_WordList ( 2 ) ; //, *three = Compiler_WordList ( 3 ) ; // the operand
+        byte * nextToken = Lexer_PeekNextNonDebugTokenWord ( cntx->Lexer0, 1 ) ;
         Word * currentWord = _Context_->CurrentlyRunningWord ;
         Word * nextWord = Finder_Word_FindUsing ( cntx->Interpreter0->Finder0, nextToken, 0 ) ;
         SetState ( _Debugger_, DEBUG_SHTL_OFF, true ) ;
@@ -72,9 +72,28 @@ CfrTil_IncDec ( int64 op ) // +
         }
         else if ( nextWord && ( nextWord->CAttribute & ( PARAMETER_VARIABLE | LOCAL_VARIABLE | NAMESPACE_VARIABLE ) ) ) // prefix
         {
-            List_DropN ( compiler->WordList, 1 ) ; // the operator; let higher level see the variable
-            _Interpreter_DoWord ( cntx->Interpreter0, nextWord, - 1 ) ;
-            _Compiler_CopyDuplicatesAndPush ( compiler, currentWord ) ; // the operator
+            //List_DropN ( compiler->WordList, 1 ) ; // the operator; let higher level see the variable
+            //_Interpreter_DoWord ( cntx->Interpreter0, nextWord, - 1 ) ;
+            //_Compiler_CopyDuplicatesAndPush ( compiler, currentWord ) ; // the operator
+            //_Interpreter_DoWord ( cntx->Interpreter0, currentWord, - 1 ) ;
+            //_Compile_GetVarLitObj_RValue_To_Reg ( nextWord, R8D ) ;
+            if ( String_Equal ( currentWord->Name, "++" ) ) op = INC ;
+            else op = DEC ;
+            if ( nextWord->CAttribute & ( PARAMETER_VARIABLE | LOCAL_VARIABLE ) )
+            {
+                _Compile_Group5 ( op, MEM, FP, 0, LocalVarIndex_WordDisp ( nextWord ), 0 ) ;
+            }
+            else // crash ; FIXME!!
+            {
+                //_Compile_GetVarLitObj_RValue_To_Reg ( nextWord, R8D ) ;
+                _Compile_Move_Literal_Immediate_To_Reg ( R11D, ( int64 ) nextWord->W_PtrToValue ) ;
+                _Compile_Move_Rm_To_Reg ( R8D, R11D, 0 ) ;
+                _Compile_Group5 ( op, REG, R8D, 0, 0, 0 ) ;
+                _Compile_Move_Reg_To_Rm ( R11D, R8D, 0 ) ;
+
+            }
+            //_Word_CompileAndRecord_PushReg ( nextWord, R8D ) ;
+            return ;
         }
         else
         {
@@ -88,6 +107,7 @@ CfrTil_IncDec ( int64 op ) // +
                 List_Push_1Value_Node ( postfixList, Compiler_WordList ( i ), COMPILER_TEMP ) ;
                 List_Push_1Value_Node ( compiler->PostfixLists, postfixList, COMPILER_TEMP ) ;
                 List_DropN ( compiler->WordList, 1 ) ; // the operator; let higher level see the variable for optimization
+
                 return ;
             }
         }
@@ -99,12 +119,14 @@ CfrTil_IncDec ( int64 op ) // +
 void
 CfrTil_PlusPlus ( ) // +
 {
+
     CfrTil_IncDec ( INC ) ;
 }
 
 void
 CfrTil_MinusMinus ( ) // --
 {
+
     CfrTil_IncDec ( DEC ) ;
 }
 
@@ -192,6 +214,7 @@ CfrTil_Minus ( )
 
     else
     {
+
         Dsp [ - 1 ] = Dsp [ - 1 ] - Dsp [ 0 ] ;
         Dsp -- ;
     }
@@ -206,6 +229,7 @@ CfrTil_Multiply ( ) // *
     }
     else
     {
+
         Dsp [ - 1 ] = Dsp [ 0 ] * Dsp [ - 1 ] ;
         Dsp -- ;
     }
@@ -251,6 +275,7 @@ int64
 _CFib ( int64 n )
 {
     if ( n < 2 ) return n ;
+
     else return ( _CFib ( n - 1 ) + _CFib ( n - 2 ) ) ;
 }
 
@@ -267,6 +292,7 @@ CfrTil_Power ( ) // **
     int64 pow = Dsp [ 0 ], base = Dsp [ - 1 ], n ;
     for ( n = base ; -- pow ; )
     {
+
         n *= base ;
     }
     Dsp [ - 1 ] = n ;
@@ -298,6 +324,7 @@ _CFactorial ( int64 n )
 void
 CFactorial2 ( )
 {
+
     TOS = ( _CFactorial ( TOS ) ) ;
 }
 
@@ -307,6 +334,7 @@ CFactorial3 ( void )
     int64 rec1 = 1, n = TOS ;
     while ( n > 1 )
     {
+
         rec1 *= n -- ;
     }
     TOS = rec1 ;

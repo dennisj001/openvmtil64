@@ -11,7 +11,7 @@
 //                   rm  4 - b100 => sib instead of ESP
 // -----------------------------------------------------------------------
 //  reg/rm codes :
-//  EAX 0, ECX 1, EDX 2, EBX 3, ESP 4, EBP 5, ESI 6, EDI 7
+//  EAX 0, R9D 1, EDX 2, EBX 3, ESP 4, EBP 5, ESI 6, EDI 7
 // -----------------------------------------------------------------------
 //  bit positions encoding :  ...|7|6|5|4|3|2|1|0|  but nb. intel is little endian
 // -----------------------------------------------------------------------
@@ -40,6 +40,7 @@
 Compiler Compiling C Asm
  
 : :asm compileModeOn sourceCodeInit token create begin ' {| find compileWord sourceCodeOn ; immediate  
+//: :asm compileModeOn sourceCodeInit token create begin ' {| find compileWord ; immediate  
 : asm; ' |} find compileWord semi ; immediate
 ' :asm find winfo //pause
 ' asm; find winfo //pause
@@ -53,7 +54,25 @@ IA32
 hex
 infixOn
 Logic Bits Combinators IA32 
- 
+
+#if 0
+int8 
+_CalculateRex ( int8 reg, int8 rm, int8 sib, int64 operandSize )
+{
+    //  0100    WRXB
+    int8 rex = 0 ;
+    if ( operandSize > INT32_SIZE )
+    {
+        //rex += 8 ; // 1 << 3 ;
+        byte rex = 0x48 ;
+        if ( reg > 0x7 ) rex += 4 ; // (1 << 2) ;
+        if ( sib > 0x7 ) rex += 2 ; // 1 << 1 ;
+        if ( rm > 0x7 ) rex += 1 ;
+    }
+    return rex ;
+}
+#endif
+
 : _Compile_ModRm ( mod reg rm ) ( ( mod @ << 6 ) | ( ( reg @ & 7 ) << 3 ) | ( rm @ & 7 ) ) 1,  ;; 
 //: _Compile_ModRm ( mod reg rm ) ( ( mod @ << 6 ) | ( ( reg @ & 7 ) << 3 ) | ( rm @ & 7 ) ) 1,  ;; 
 //' _Compile_ModRm find wdiss pause
@@ -153,20 +172,20 @@ Logic Bits Combinators IA32
 
 : _Compile_CMP_REG_IMM ( reg, imm, isize ) _Compile_Group1_Immediate ( CMP, REG, reg @, 0, imm @, isize @ ) ;; 
 
-: Compile_Stack_Push_EAX ()
+: Compile_Stack_Push_R8D ()
     _Compile_ADDI_DSP ( CELL ) 
-    _Compile_Move_Reg_ToDataStackN ( 0, EAX ) 
+    _Compile_Move_Reg_ToDataStackN ( 0, R8D ) 
 ;; 
 
-: Compile_Stack_Pop_EAX ()
-    _Compile_Move_DataStackN_ToReg ( EAX, 0 ) 
+: Compile_Stack_Pop_R8D ()
+    _Compile_Move_DataStackN_ToReg ( R8D, 0 ) 
     _Compile_SUBI_DSP ( CELL ) 
 ;; 
 
 Combinators
-:asm iax
-    Compile_Stack_Pop_EAX () 
-    _Compile_CALL_Reg ( EAX ) 
+d: :asm iax
+    Compile_Stack_Pop_R8D ( ) 
+    _Compile_CALL_Reg ( R8D ) 
 asm; 
 
 ' iax find wdiss //pause 
@@ -177,9 +196,9 @@ User
 ' qeval find wdiss // pause
 
 :asm stest
-    _Compile_MoveTOS_ToEAX ( ) 
-    _Compile_Move_DataStackN_ToReg ( EAX, 0 ) 
-    Compile_Stack_Push_EAX ( ) 
+    _Compile_MoveTOS_ToR8D ( ) 
+    _Compile_Move_DataStackN_ToReg ( R8D, 0 ) 
+    Compile_Stack_Push_R8D ( ) 
     _Compile_SUBI_DSP ( CELL ) 
 asm;
 
@@ -195,17 +214,17 @@ nl "ia32 test" ps "ok" dup ' ps find xt@ qeval "ok" "error" assert1s
 
 Stack
 :asm ndup
-    _Compile_MoveTOS_ToEAX ( )
+    _Compile_MoveTOS_ToR8D ( )
     _Compile_SUBI_DSP ( CELL ) 
-    _Compile_Move_DataStackN_ToReg ( ECX, 0 )
+    _Compile_Move_DataStackN_ToReg ( R9D, 0 )
     "start" label 
-    _Compile_Test_Imm ( REG, EAX, 0, -1 )
-    // _Compile_Test ( REG, 0, ECX, 0, -1 )
-    // _Compile_CMP_REG_IMM ( EAX, 0, CELL )  
+    _Compile_Test_Imm ( REG, R8D, 0, -1 )
+    // _Compile_Test ( REG, 0, R9D, 0, -1 )
+    // _Compile_CMP_REG_IMM ( R8D, 0, CELL )  
     "end" 0 EQ jcc
     _Compile_ADDI_DSP ( CELL ) 
-    _Compile_Move_Reg_ToDataStackN ( 0, ECX ) 
-    _Compile_IncDec_Reg ( DEC, EAX ) 
+    _Compile_Move_Reg_ToDataStackN ( 0, R9D ) 
+    _Compile_IncDec_Reg ( DEC, R8D ) 
     "start" goto
     "end" label // above jcc to Here
 asm;

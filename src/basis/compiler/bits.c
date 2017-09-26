@@ -47,8 +47,8 @@ Compile_X_Group3 ( Compiler * compiler, int64 code ) //OP_1_ARG
     else if ( optFlag )
     {
         //_Compile_Group3 ( cell code, cell mod, cell rm, cell sib, cell disp, cell imm, cell size )
-        _Compile_Group3 ( code, compiler->optInfo->Optimize_Mod,
-            compiler->optInfo->Optimize_Rm, 0, compiler->optInfo->Optimize_Disp, compiler->optInfo->Optimize_Imm, 0 ) ;
+        _Compile_Group3 (code, compiler->optInfo->Optimize_Mod,
+            compiler->optInfo->Optimize_Rm, REX_B | MODRM_B, 0, compiler->optInfo->Optimize_Disp, compiler->optInfo->Optimize_Imm, 0 ) ;
         if ( compiler->optInfo->Optimize_Rm != DSP ) // if the result is not already tos
         {
             if ( compiler->optInfo->Optimize_Rm != R8D ) _Compile_Move_Rm_To_Reg ( R8D, compiler->optInfo->Optimize_Rm,
@@ -58,7 +58,7 @@ Compile_X_Group3 ( Compiler * compiler, int64 code ) //OP_1_ARG
     }
     else
     {
-        _Compile_Group3 ( code, MEM, DSP, 0, 0, 0, 0 ) ;
+        _Compile_Group3 (code, MEM, DSP, REX_B | MODRM_B, 0, 0, 0, 0 ) ;
     }
 }
 

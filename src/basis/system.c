@@ -337,7 +337,7 @@ _CfrTil_Source ( Word *word, int64 addToHistoryFlag )
 {
     if ( word )
     {
-        byte * name = c_dd ( word->Name ) ;
+        byte * name = c_gd ( word->Name ) ;
         uint64 category = word->CAttribute ;
         if ( word->ContainingNamespace ) _Printf ( ( byte* ) "\n%s.", word->ContainingNamespace->Name ) ;
         if ( category & OBJECT )
@@ -371,7 +371,7 @@ _CfrTil_Source ( Word *word, int64 addToHistoryFlag )
         else if ( category & ALIAS )
         {
             Word * aword = Word_GetFromCodeAddress ( ( byte* ) ( block ) word->Definition ) ;
-            if ( aword ) _Printf ( ( byte* ) "%s alias for %s", name, ( char* ) c_dd ( aword->Name ) ) ;
+            if ( aword ) _Printf ( ( byte* ) "%s alias for %s", name, ( char* ) c_gd ( aword->Name ) ) ;
         }
         else if ( category & CPRIMITIVE )
         {

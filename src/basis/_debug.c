@@ -7,7 +7,7 @@
 byte *
 JccInstructionAddress_2Byte ( byte * address )
 {
-    int64 offset = * ( int64* ) ( address + 2 ) ; // 2 : 2 byte opCode
+    int32 offset = * ( int32* ) ( address + 2 ) ; // 2 : 2 byte opCode
     byte * jcAddress = address + offset + 6 ; // 6 : sizeof 0f jcc insn - 0x0f8x - includes 2 byte opCode
     return jcAddress ;
 }
@@ -15,7 +15,7 @@ JccInstructionAddress_2Byte ( byte * address )
 byte *
 JccInstructionAddress_1Byte ( byte * address )
 {
-    int64 offset = ( int64 ) * ( byte* ) ( address + 1 ) ; // 1 : 1 byte opCode
+    int32 offset = ( int32 ) * ( byte* ) ( address + 1 ) ; // 1 : 1 byte opCode
     byte * jcAddress = address + offset + 2 ; // 2 : sizeof 0f jcc insn - 0x7x - includes 1 byte opCode
     return jcAddress ;
 }
@@ -88,7 +88,7 @@ GetPostfix ( byte * address, byte* postfix, byte * buffer )
         if ( ! word ) word = Word_GetFromCodeAddress ( iaddress ) ;
         if ( word )
         {
-            byte * name = ( byte* ) c_dd ( word->Name ) ; //, &_Q_->Default ) ;
+            byte * name = ( byte* ) c_gd ( word->Name ) ; //, &_Q_->Default ) ;
             if ( ( byte* ) word->CodeStart == iaddress )
             {
                 snprintf ( ( char* ) buffer, 128, "%s< %s.%s >%s", prePostfix, word->ContainingNamespace->Name, name, postfix ) ;

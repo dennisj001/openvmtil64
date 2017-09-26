@@ -3,9 +3,9 @@
 #define VERSION ((byte*) "0.823.300.600" ) // *.200 series is x86 ; the *.300 series is x64 : *300.600 series is with new x64 compiler
 
 OpenVmTil * _Q_ ; // the only globally used variable except for two extern structures in primitives.c and a couple int64 in memSpace.c and 
-static struct termios SavedTerminalAttributes ;
+static struct termios SavedTerminalAttributes ; 
 
-int64
+int64 
 main ( int64 argc, char * argv [ ] )
 {
   openvmtil ( argc, argv ) ;
@@ -177,7 +177,7 @@ _OpenVmTil_CalculateMemSpaceSizes ( OpenVmTil * ovt, int64 restartCondition, int
   // core memory
   objectsSize = (int64) ( 0.333 * ( (double) coreMemTargetSize ) ) ; // we can easily allocate more object and dictionary space but not code space
   dictionarySize = (int64) ( 0.333 * ( (double) coreMemTargetSize ) ) ;
-  codeSize = (int64) ( 0.333 * ( (double) coreMemTargetSize ) ) ;
+  codeSize = 1 * M ; //(int64) ( 0.333 * ( (double) coreMemTargetSize ) ) ;
   //codeSize = ( codeSize > ( 500 * K ) ) ? codeSize : 100 * K ;
 
   ovt->SignalExceptionsHandled = exceptionsHandled ;
@@ -300,7 +300,7 @@ _OVT_ShowPermanentMemList ( OpenVmTil * ovt, int64 flag )
       int64 diff ;
       dlnode * node, *nodeNext ;
       if ( flag > 1 ) printf ( "\nMemChunk List :: " ) ;
-      if ( flag ) _Printf ( (byte*) c_dd ( "\nformat :: Type Name or Chunk Pointer : Type : Size, ...\n" ) ) ;
+      if ( flag ) _Printf ( (byte*) c_gd ( "\nformat :: Type Name or Chunk Pointer : Type : Size, ...\n" ) ) ;
       for ( size = 0, node = dllist_First ( ( dllist* ) & ovt->PermanentMemList ) ; node ; node = nodeNext )
       {
           nodeNext = dlnode_Next ( node ) ;
@@ -359,7 +359,7 @@ _Calculate_TotalNbaAccountedMemAllocated ( OpenVmTil * ovt, int64 flag )
 void
 _OVT_ShowMemoryAllocated ( OpenVmTil * ovt )
 {
-  if ( ovt->Verbosity <= 1 ) _Printf ( (byte*) c_du ( "Increase the verbosity setting to 2 or more for more info here. ( Eg. : verbosity 2 = )" ) ) ;
+  if ( ovt->Verbosity <= 1 ) _Printf ( (byte*) c_gu ( "Increase the verbosity setting to 2 or more for more info here. ( Eg. : verbosity 2 = )" ) ) ;
   int64 leak = ( mmap_TotalMemAllocated - mmap_TotalMemFreed ) - ( ovt->TotalMemAllocated - ovt->TotalMemFreed ) - ovt->OVT_InitialUnAccountedMemory ;
   _Calculate_TotalNbaAccountedMemAllocated ( ovt, leak || ( ovt->Verbosity > 0 ) ) ;
   _OVT_ShowPermanentMemList ( ovt, 0 ) ;

@@ -135,11 +135,14 @@ Word_Add ( )
 }
 
 // forth : "create"
+
 void
 CfrTil_Word_New ( )
 {
     byte * name = ( byte* ) _DataStack_Pop ( ) ;
-    _DataStack_Push ( ( int64 ) Word_New ( name ) ) ;
+    Word * word =  Word_New ( name ) ;
+    _DataStack_Push ( ( int64 ) word ) ;
+    //CfrTil_SourceCode_SetDebugWordList ( word ) ;
 }
 
 // ( token block -- word )

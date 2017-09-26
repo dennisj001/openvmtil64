@@ -139,7 +139,7 @@ _CalculateRex ( int8 reg, int8 rm, int8 sib, int64 operandSize )
 // SIB : scale, index, base addressing byte
 
 void
-_Compile_ImmDispData ( int64 immDisp, int64 immSize )
+_Compile_ImmDispData ( int64 immDisp, int64 immSize, int8 immFlag )
 {
     // the opcode probably is all that needs to be adjusted for this to not be necessary    
     // to not compile an imm when imm is a parameter, set isize == 0 and imm == 0
@@ -158,7 +158,7 @@ _Compile_ImmDispData ( int64 immDisp, int64 immSize )
             _Compile_Int64 ( immDisp ) ;
         else if ( immDisp >= 0x100 )
             _Compile_Int32 ( immDisp ) ;
-        else if ( immDisp )
+        else if ( immDisp || immFlag )
             _Compile_Int8 ( ( byte ) immDisp ) ;
     }
 }
@@ -190,9 +190,9 @@ Compile_Int8 ( int64 opCode )
 }
 
 int8
-_Calculate_Rex ( int8 reg, int8 rm, int8 flag )
+_Calculate_Rex ( int8 reg, int8 rm, int8 rex_w_flag )
 {
-    int8 rex = ( ( flag ? 8 : 0 ) | ( ( reg > 7 ) ? 4 : 0 ) | ( ( rm > 7 ) ? 1 : 0 ) ) ;
+    int8 rex = ( ( rex_w_flag ? 8 : 0 ) | ( ( reg > 7 ) ? 4 : 0 ) | ( ( rm > 7 ) ? 1 : 0 ) ) ;
     if ( rex ) rex |= 0x40 ;
     return rex ;
 }
@@ -213,16 +213,23 @@ _Compile_InstructionX86 ( int8 opCode, int8 mod, int8 reg, int8 rm, int8 control
 void
 _Compile_InstructionX64 ( int8 rex, int8 opCode, int8 modRm, int64 controlFlag, int8 sib, int64 disp, int8 dispSize, int64 imm, int8 immSize )
 {
+    //Set_SCA (0) ;
 #define dbgON 1   
 #if dbgON     
     d1 ( byte * here = Here ) ;
 #endif    
+    if ( DBI ) _Printf ((byte*)"\nHere = 0x%016lx : rex = 0x%x", Here, rex) ;
     if ( rex ) _Compile_Int8 ( rex ) ;
+    if ( DBI ) _Printf ((byte*)"\nHere = 0x%016lx : opCode = 0x%x", Here, opCode) ;
     _Compile_Int8 ( ( byte ) opCode ) ;
+    if ( DBI ) _Printf ((byte*)"\nHere = 0x%016lx : modRm = 0x%x", Here, modRm) ;
     if ( controlFlag & MODRM_B ) _Compile_Int8 ( modRm ) ;
+    //if ( DBI ) _Printf ((byte*)"\nHere = 0x%016lx : rex = 0x%x", Here, rex) ;
     if ( controlFlag & SIB_B ) _Compile_Int8 ( sib ) ;
-    if ( controlFlag & DISP_B ) _Compile_ImmDispData ( disp, dispSize ) ;
-    if ( controlFlag & IMM_B ) _Compile_ImmDispData ( imm, immSize ) ;
+    if ( DBI ) _Printf ((byte*)"\nHere = 0x%016lx : disp = 0x%016lx : dispSize = %d", Here, disp, dispSize) ;
+    if ( controlFlag & DISP_B ) _Compile_ImmDispData ( disp, dispSize, 0 ) ;
+    if ( DBI ) _Printf ((byte*)"\nHere = 0x%016lx : imm = 0x%016lx : immSize = %d", Here, imm, immSize) ;
+    if ( controlFlag & IMM_B ) _Compile_ImmDispData ( imm, immSize, controlFlag & IMM_B ) ;
     //PeepHole_Optimize ( ) ;
 #if dbgON     
     if ( DBI )
@@ -260,7 +267,7 @@ _Compile_X_Group1 ( int64 code, int64 toRegOrMem, int64 mod, int8 reg, int8 rm, 
     // otherwise it could be optimally deduced but let caller control by keeping operandSize parameter
     // some times we need cell_t where bytes would work
     // _Compile_InstructionX86 ( opCode, mod, reg, rm, modRmImmDispFlag, sib, disp, imm, immSize )
-    _Compile_InstructionX86 ( opCode, mod, reg, rm, DISP_B | REX_B | MODRM_B, sib, disp, 0, 0, 0 ) ;
+    _Compile_InstructionX86 ( opCode, mod, reg, rm, DISP_B | REX_B | MODRM_B, sib, disp, 0, 0, osize ) ;
 }
 
 // opCode group 1 - 0x80-0x83 : ADD OR ADC SBB AND_OPCODE SUB XOR CMP : with immediate data
@@ -290,7 +297,7 @@ _Compile_X_Group1_Immediate ( int64 code, int64 mod, int8 rm, int64 disp, int64 
     // otherwise it could be optimally deduced but let caller control by keeping operandSize parameter
     // some times we need cell_t where bytes would work
     // _Compile_InstructionX86 ( opCode, mod, reg, rm, modRmImmDispFlag, sib, disp, imm, immSize )
-    _Compile_InstructionX86 ( opCode, mod, code, rm, REX_B | MODRM_B | IMM_B, 0, disp, 0, imm, iSize ) ;
+    _Compile_InstructionX86 ( opCode, mod, code, rm, REX_B | MODRM_B | IMM_B | DISP_B, 0, disp, 0, imm, iSize ) ;
     //_Compile_InstructionX86 ( opCode, mod, code, rm, IMM_B, 0, disp, imm, 0, iSize ) ;
 }
 
@@ -339,7 +346,7 @@ void
 _Compile_Group2_CL ( int64 mod, int8 regOpCode, int8 rm, int8 sib, int64 disp )
 {
     // _Compile_InstructionX86 ( opCode, mod, reg, rm, modRmImmDispFlag, sib, disp, imm, immSize )
-    _Compile_InstructionX86 ( 0xd3, mod, regOpCode, rm, REX_B | MODRM_B, sib, disp, 0, 0, 0 ) ;
+    _Compile_InstructionX86 ( 0xd3, mod, regOpCode, rm, REX_B | MODRM_B | (disp ? DISP_B : 0), sib, disp, 0, 0, 0 ) ;
 }
 
 // some Group 3 code is UNTESTED
@@ -351,10 +358,10 @@ _Compile_Group2_CL ( int64 mod, int8 regOpCode, int8 rm, int8 sib, int64 disp )
 // 'size' is operand size
 
 void
-_Compile_Group3 ( int64 code, int64 mod, int8 rm, int8 sib, int64 disp, int64 imm, int64 size )
+_Compile_Group3 ( int64 code, int64 mod, int8 rm, int8 controlFlag, int8 sib, int64 disp, int64 imm, int64 size )
 {
     // _Compile_InstructionX86 ( opCode, mod, reg, rm, modRmImmDispFlag, sib, disp, imm, immSize )
-    _Compile_InstructionX86 ( 0xf7, mod, code, rm, REX_B | MODRM_B, sib, disp, 0, imm, size ) ;
+    _Compile_InstructionX86 ( 0xf7, mod, code, rm, REX_W_B | MODRM_B | controlFlag, sib, disp, 0, imm, size ) ;
 }
 
 // mul reg with imm to rm
@@ -369,7 +376,7 @@ _Compile_IMULI ( int64 mod, int8 reg, int8 rm, int8 sib, int64 disp, int64 imm, 
         size = 0 ;
     }
     // _Compile_InstructionX86 ( opCode, mod, reg, rm, modRmImmDispFlag, sib, disp, imm, immSize )
-    _Compile_InstructionX86 ( opCode, mod, reg, rm, REX_B | MODRM_B, sib, disp, 0, imm, size ) ; //size ) ;
+    _Compile_InstructionX86 ( opCode, mod, reg, rm, REX_B | MODRM_B | IMM_B, sib, disp, 0, imm, size ) ; //size ) ;
 }
 
 void
@@ -382,7 +389,7 @@ _Compile_IMUL ( int64 mod, int8 reg, int8 rm, int8 sib, int64 disp )
     // _Compile_InstructionX86 ( opCode, mod, reg, rm, modRmImmDispFlag, sib, disp, imm, immSize )
     //_Compile_InstructionX86 ( 0xaf, mod, reg, rm, REX_B | MODRM_B, sib, disp, 0, 0, 0 ) ;
     //_Compile_InstructionX64 ( int8 rex, int8 opCode, int8 modRm, int64 controlFlag, int8 sib, int64 disp, int8 dispSize, int64 imm, int8 immSize ) ;
-    _Compile_InstructionX64 ( 0, 0xaf, modRm, MODRM_B|DISP_B, sib, disp, 0, 0, 0 ) ;
+    _Compile_InstructionX64 ( 0, 0xaf, modRm, MODRM_B | DISP_B, sib, disp, 0, 0, 0 ) ;
 }
 
 void
@@ -398,7 +405,7 @@ void
 _Compile_Group5 ( int64 code, int64 mod, int8 rm, int8 sib, int64 disp, int64 size )
 {
     // _Compile_InstructionX86 ( opCode, mod, reg, rm, modRmImmDispFlag, sib, disp, imm, immSize )
-    _Compile_InstructionX86 ( 0xff, mod, code, rm, REX_B | MODRM_B, sib, disp, 0, 0, size ) ;
+    _Compile_InstructionX86 ( 0xff, mod, code, rm, REX_B | MODRM_B | DISP_B, sib, disp, size, 0, 0 ) ;
 }
 
 // intel syntax : opcode dst, src
@@ -416,7 +423,7 @@ _Compile_Move_Reg_To_Reg ( int8 dstReg, int64 srcReg )
 // reg : is address in case of MEMORY else it is the register (reg) value
 
 void
-_Compile_MoveImm ( int8 direction, int8 rm, int8 sib, int64 disp, int64 imm, int8 immSize )
+_Compile_MoveImm ( int8 direction, int8 rm, int8 controlFlag, int8 sib, int64 disp, int64 imm, int8 immSize )
 {
     int8 opCode = 0xc6, reg = 0, mod = direction ;
     if ( ( immSize == 8 ) || ( imm > 0xffffffff ) )
@@ -424,15 +431,13 @@ _Compile_MoveImm ( int8 direction, int8 rm, int8 sib, int64 disp, int64 imm, int
         if ( direction == MEM )
         {
             // there is no x64 instruction to move imm64 to mem directly
-            _Compile_MoveImm_To_Reg ( THRU_REG, imm, immSize ) ;
-            _Compile_Move_Reg_To_Rm ( rm, THRU_REG, 0 ) ;
+            _Compile_MoveImm_To_Reg ( R11D, imm, immSize ) ;
+            _Compile_Move_Reg_To_Rm ( rm, R11D, disp ) ;
         }
         else
         {
             int8 rex = 0x48 + ( rm > 7 ) ; //( ( rm >= 8 ) ? rm - 8 : rm ) ; ;
             int8 opCode = 0xb8 + ( rm & 7 ) ; //( ( rm >= 8 ) ? rm - 8 : rm ) ;
-            //int8 rex = ( 0x48 + (rm > 7) ? 1 : 0 ) ;
-            //int8 opCode = 0xb8 + ( rm & 7 ) ;
             //_Compile_InstructionX64 ( rex, opCode, modRm, controlFlag, sib, disp, imm, operandSize ) ;
             _Compile_InstructionX64 ( rex, opCode, 0, IMM_B, 0, 0, 0, imm, immSize ) ;
         }
@@ -448,7 +453,7 @@ _Compile_MoveImm ( int8 direction, int8 rm, int8 sib, int64 disp, int64 imm, int
             else if ( disp >= 0x100 ) mod = 2 ;
             else mod = 1 ;
         }
-        _Compile_InstructionX86 ( opCode, mod, reg, rm, IMM_B | REX_B | MODRM_B, sib, disp, 0, imm, immSize ) ;
+        _Compile_InstructionX86 ( opCode, mod, reg, rm, controlFlag, sib, disp, 0, imm, immSize ) ;
     }
     //_Compile_InstructionX86 ( opCode, mod, reg, rm, IMM_B | ( ( direction == MEM ) ? MODRM_B : 0 ), sib, disp, imm, operandSize ) ;
 }
@@ -456,7 +461,7 @@ _Compile_MoveImm ( int8 direction, int8 rm, int8 sib, int64 disp, int64 imm, int
 void
 _Compile_MoveImm_To_Reg ( int8 reg, int64 imm, int8 iSize )
 {
-    _Compile_MoveImm ( REG, reg, 0, 0, imm, iSize ) ;
+    _Compile_MoveImm ( REG, reg, IMM_B | REX_B | MODRM_B | DISP_B, 0, 0, imm, iSize ) ;
 }
 
 // _Compile_MoveImm_To_Mem ( int8 reg, int64 imm, int8 iSize )
@@ -464,7 +469,7 @@ _Compile_MoveImm_To_Reg ( int8 reg, int64 imm, int8 iSize )
 void
 _Compile_MoveImm_To_Mem ( int8 reg, int64 imm, int8 iSize )
 {
-    _Compile_MoveImm ( MEM, reg, 0, 0, imm, iSize ) ;
+    _Compile_MoveImm ( MEM, reg, IMM_B | REX_B | MODRM_B | DISP_B, 0, 0, imm, iSize ) ;
 }
 
 void
@@ -507,6 +512,7 @@ _Compile_Move ( int8 mod, int8 reg, int8 rm, int8 sib, int64 disp )
     else if ( disp <= 0xff ) mod = 1 ;
     else if ( disp >= 0x100 ) mod = 2 ;
     _Compile_InstructionX86 ( opCode, mod, reg, rm, REX_B | MODRM_B | ( disp ? DISP_B : 0 ), sib, disp, 0, 0, 0 ) ;
+    //_Compile_InstructionX86 ( opCode, mod, reg, rm, REX_B | MODRM_B | DISP_B, sib, disp, 8, 0, 0 ) ;
 }
 
 // intel syntax : opcode dst, src
@@ -658,8 +664,8 @@ _Compile_JCC ( int64 negFlag, int64 ttt, uint64 disp )
     d1 ( if ( DBI )
     {
         d1 ( _Printf ( ( byte* ) "\n_Compile_JCC :" ) ) ;
-        d1 ( Debugger_UdisOneInstruction ( _Debugger_, here, ( byte* ) "", ( byte* ) "" ) ; ) ;
-    }) ;
+            d1 ( Debugger_UdisOneInstruction ( _Debugger_, here, ( byte* ) "", ( byte* ) "" ) ; ) ;
+    } ) ;
 #endif    
 }
 
@@ -750,8 +756,9 @@ _Compile_PushReg ( int8 reg )
     }
     else
     {
-        _Compile_Int8 ( 0x48 ) ; //+ ( reg > 7 ) ? 1 : 0 ) ;
-        _Compile_Int8 ( 0x50 + reg ) ;
+        CfrTil_Exception ( MACHINE_CODE_ERROR, 1 ) ;
+        //_Compile_Int8 ( 0x40 ) ; //+ ( reg > 7 ) ? 1 : 0 ) ;
+        //_Compile_Int8 ( 0x50 + reg ) ;
         //int8 modRm = CalculateModRmByte ( mod, reg, rm, disp, sib ) ;
     }
 #if dbgON_5     
@@ -785,7 +792,7 @@ _Compile_PopToReg ( int8 reg )
     }
     //int8 modRm = CalculateModRmByte ( mod, reg, rm, disp, sib ) ;
 #if dbgON_7     
-    D1 ( _Printf ( ( byte* ) "\n_Compile_InstructionX86 :" ) ) ;
+    D1 ( _Printf ( ( byte* ) "\n_Compile_PopToReg :" ) ) ;
     D1 ( Debugger_UdisOneInstruction ( _Debugger_, here, ( byte* ) "", ( byte* ) "" ) ; ) ;
 #endif
 #endif    
@@ -846,7 +853,7 @@ _Compile_MOVZX_REG ( int8 reg )
     d1 ( byte * here = Here ) ;
 #endif    
     //Compile_Int8 ( ( byte ) 0x40 ) ;
-    int8 rex = _Calculate_Rex ( reg, reg, 1 ) ;//( immSize == 8 ) || ( controlFlag & REX_B ) ) ;
+    int8 rex = _Calculate_Rex ( reg, reg, 1 ) ; //( immSize == 8 ) || ( controlFlag & REX_B ) ) ;
     _Compile_Int8 ( rex ) ;
     _Compile_Int8 ( ( byte ) 0x0f ) ;
     _Compile_Int8 ( 0xb6 ) ;
@@ -855,8 +862,8 @@ _Compile_MOVZX_REG ( int8 reg )
     d1 ( if ( DBI )
     {
         d1 ( _Printf ( ( byte* ) "\n_Compile_MOVZX_REG :" ) ) ;
-        d1 ( Debugger_UdisOneInstruction ( _Debugger_, here, ( byte* ) "", ( byte* ) "" ) ; ) ;
-    }) ;
+            d1 ( Debugger_UdisOneInstruction ( _Debugger_, here, ( byte* ) "", ( byte* ) "" ) ; ) ;
+    } ) ;
 #endif    
 }
 
@@ -878,22 +885,25 @@ Compile_X_Group5 ( Compiler * compiler, int64 op )
             compiler->optInfo->Optimize_Rm = R8D ;
         }
         _Compile_Group5 ( op, compiler->optInfo->Optimize_Mod, compiler->optInfo->Optimize_Rm, 0, compiler->optInfo->Optimize_Disp, 0 ) ;
+        if ( compiler->optInfo->O_one->StackPushRegisterCode ) _Word_CompileAndRecord_PushReg ( one, R8D ) ;
     }
     else if ( one && one->CAttribute & ( PARAMETER_VARIABLE | LOCAL_VARIABLE | NAMESPACE_VARIABLE ) ) // *( ( cell* ) ( TOS ) ) += 1 ;
     {
         SetHere ( one->Coding ) ;
         _Compile_GetVarLitObj_RValue_To_Reg ( one, R8D ) ;
         //_Compile_Group5 ( int64 code, int64 mod, int8 rm, int8 sib, int64 disp, int64 size )
-        _Compile_Group5 ( op, REG, R8D, 0, 0, 0 ) ;
+        _Compile_Group5 ( op, REG, R8D, 0, 0, CELL_SIZE ) ;
         // ++ == += :: -- == -= so :
         _Compile_SetVarLitObj_With_Reg ( one, R8D, R9D ) ;
     }
     else
     {
         // assume rvalue on stack
+        DBI_ON ;
         _Compile_Group5 ( op, MEM, DSP, 0, 0, 0 ) ;
     }
     _BlockInfo_Setup_BI_tttn ( _Context_->Compiler0, ZERO_TTT, NZ, 3 ) ; // ?? // not less than 0 == greater than 0
+    DBI_OFF ;
 }
 
 // X variable op compile for group 1 opCodes : +/-/and/or/xor - ia32 
@@ -907,14 +917,14 @@ _Compile_optInfo_X_Group1 ( Compiler * compiler, int64 op )
         // Compile_SUBI( mod, operandReg, offset, immediateData, size )
         _Compile_X_Group1_Immediate ( op, compiler->optInfo->Optimize_Mod,
             compiler->optInfo->Optimize_Rm, compiler->optInfo->Optimize_Disp,
-            compiler->optInfo->Optimize_Imm, CELL ) ;
+            compiler->optInfo->Optimize_Imm, 0 ) ;
     }
     else
     {
         // _Compile_Group1 ( int64 code, int64 toRegOrMem, int64 mod, int8 reg, int8 rm, int8 sib, int64 disp, int64 osize )
         _Compile_X_Group1 ( op, compiler->optInfo->Optimize_Dest_RegOrMem, compiler->optInfo->Optimize_Mod,
             compiler->optInfo->Optimize_Reg, compiler->optInfo->Optimize_Rm, 0,
-            compiler->optInfo->Optimize_Disp, CELL ) ;
+            compiler->optInfo->Optimize_Disp, CELL_SIZE ) ;
     }
 }
 
@@ -929,18 +939,22 @@ Compile_X_Group1 ( Compiler * compiler, int64 op, int64 ttt, int64 n )
     if ( optFlag == OPTIMIZE_DONE ) return ;
     else if ( optFlag )
     {
+        //DBI ;
         _Compile_optInfo_X_Group1 ( compiler, op ) ;
         _BlockInfo_Setup_BI_tttn ( _Context_->Compiler0, ttt, n, 3 ) ; // not less than 0 == greater than 0
         if ( compiler->optInfo->Optimize_Rm != DSP ) // if the result is to a reg and not tos
         {
+            //_Compile_Move_Reg_To_StackN ( DSP, 0, compiler->optInfo->Optimize_Reg ) ;
             _Word_CompileAndRecord_PushReg ( Compiler_WordList ( 0 ), compiler->optInfo->Optimize_Reg ) ; //compiler->optInfo->Optimize_Rm ) ; // 0 : ?!? should be the exact variable 
         }
+        //else Compile_SUBI ( REG, DSP, 0, CELL, 0 ) ;
+        //DBI_OFF ;
     }
     else
     {
         Compile_Pop_To_R8 ( DSP ) ;
         //_Compile_X_Group1 ( int64 code, int64 toRegOrMem, int64 mod, int8 reg, int8 rm, int8 sib, int64 disp, int64 osize )
-        _Compile_X_Group1 ( op, MEM, MEM, R8D, DSP, 0, 0, CELL ) ; // result is on TOS
+        _Compile_X_Group1 ( op, MEM, MEM, R8D, DSP, 0, 0, CELL_SIZE ) ; // result is on TOS
         _BlockInfo_Setup_BI_tttn ( _Context_->Compiler0, ttt, n, 3 ) ; // not less than 0 == greater than 0
         //_Word_CompileAndRecord_PushR8 ( Compiler_WordList ( 0 ) ) ;
     }

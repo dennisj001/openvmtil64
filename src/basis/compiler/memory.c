@@ -10,23 +10,25 @@ _Compile_Set_C_LValue_WithImm_ThruReg ( int64 address, int64 value, int8 rm, byt
 void
 _Compile_Get_C_Value_ToReg ( int8 reg, int64 value )
 {
-   _Compile_MoveImm_To_Reg ( reg, ( int64 ) value, CELL_SIZE ) ;
+    _Compile_MoveImm_To_Reg ( reg, ( int64 ) value, CELL_SIZE ) ;
 }
 
 // nb. necessary for esp/ebp
+
 void
 _Compile_Get_FromCAddress_ToReg ( int8 reg, byte * address )
 {
-    _Compile_MoveMem_To_Reg ( reg, (byte*) address, CELL_SIZE ) ;    
+    _Compile_MoveMem_To_Reg ( reg, ( byte* ) address, CELL_SIZE ) ;
 }
 
 void
 _Compile_Get_FromCAddress_ToReg_ThruReg ( int8 reg, byte * address, int8 thruReg )
 {
-    _Compile_MoveMem_ToReg_ThruReg ( reg, address, CELL_SIZE, thruReg ) ;    
+    _Compile_MoveMem_ToReg_ThruReg ( reg, address, CELL_SIZE, thruReg ) ;
 }
 
 // thru reg is a 'scratch' reg
+
 void
 _Compile_Set_CAddress_WithRegValue_ThruReg ( byte * address, int8 reg, int8 thruReg )
 {
@@ -53,8 +55,8 @@ Compile_Store ( Compiler * compiler, int8 stackReg ) // !
     else if ( optFlag )
     {
         // _Compile_MoveImm ( cell direction, cell rm, cell disp, cell imm, cell operandSize )
-        if ( compiler->optInfo->OptimizeFlag & OPTIMIZE_IMM ) _Compile_MoveImm ( compiler->optInfo->Optimize_Dest_RegOrMem,
-            compiler->optInfo->Optimize_Rm, 0, compiler->optInfo->Optimize_Disp, compiler->optInfo->Optimize_Imm, CELL_SIZE ) ;
+        if ( compiler->optInfo->OptimizeFlag & OPTIMIZE_IMM ) _Compile_MoveImm (compiler->optInfo->Optimize_Dest_RegOrMem,
+            compiler->optInfo->Optimize_Rm, IMM_B | REX_B | MODRM_B | DISP_B, 0, compiler->optInfo->Optimize_Disp, compiler->optInfo->Optimize_Imm, CELL_SIZE ) ;
         else if ( compiler->optInfo->OptimizeFlag & OPTIMIZE_REGISTER )
         {
             // allow for one of these to be R8 which is 0
@@ -66,12 +68,15 @@ Compile_Store ( Compiler * compiler, int8 stackReg ) // !
     }
     else
     {
+        //DBI_ON ;
         Word * word ;
-        if ( ( word = ( Word* ) Compiler_WordList ( 0 ) ) && word->StackPushRegisterCode ) SetHere ( word->StackPushRegisterCode ) ;
+        if ( ( word = ( Word* ) Compiler_WordList ( 1 ) ) && word->StackPushRegisterCode ) SetHere ( word->StackPushRegisterCode ) ;
         else _Compile_Move_Rm_To_Reg ( R8D, stackReg, 0 ) ;
         _Compile_Move_Rm_To_Reg ( R9D, stackReg, - CELL_SIZE ) ;
         _Compile_Move_Reg_To_Rm ( R8D, R9D, 0 ) ;
-        Compile_SUBI ( REG, stackReg, 0, ( word && word->StackPushRegisterCode ) ? 4 : 8, BYTE ) ;
+        Compile_SUBI ( REG, stackReg, 0, ( word && word->StackPushRegisterCode ) ? CELL_SIZE : 2 * CELL_SIZE, CELL_SIZE ) ;
+        //Compile_SUBI ( REG, stackReg, 0, 2 * CELL_SIZE, BYTE ) ;
+        //DBI_OFF ;
     }
 }
 
@@ -88,8 +93,8 @@ Compile_Poke ( Compiler * compiler, int8 stackReg ) // =
         if ( compiler->optInfo->OptimizeFlag & OPTIMIZE_IMM )
         {
             // _Compile_MoveImm ( cell direction, cell rm, cell disp, cell imm, cell operandSize )
-            _Compile_MoveImm ( compiler->optInfo->Optimize_Dest_RegOrMem,
-                compiler->optInfo->Optimize_Rm, 0, compiler->optInfo->Optimize_Disp, compiler->optInfo->Optimize_Imm, CELL_SIZE ) ;
+            _Compile_MoveImm (compiler->optInfo->Optimize_Dest_RegOrMem,
+                compiler->optInfo->Optimize_Rm, IMM_B | REX_B | MODRM_B | DISP_B, 0, compiler->optInfo->Optimize_Disp, compiler->optInfo->Optimize_Imm, 0 ) ;
         }
         else if ( compiler->optInfo->OptimizeFlag & OPTIMIZE_REGISTER )
         {
@@ -106,7 +111,7 @@ Compile_Poke ( Compiler * compiler, int8 stackReg ) // =
         _Compile_Move_Rm_To_Reg ( R8D, stackReg, - CELL_SIZE ) ;
         _Compile_Move_Reg_To_Rm ( R8D, R9D, 0 ) ;
         //if ( ! GetState ( _Context_, C_SYNTAX ) ) 
-        Compile_SUBI ( REG, stackReg, 0, 8, BYTE ) ;
+        Compile_SUBI ( REG, stackReg, 0, 2 * CELL_SIZE, BYTE ) ;
     }
 }
 

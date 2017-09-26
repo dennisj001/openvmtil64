@@ -425,8 +425,8 @@ stricmp ( byte * str0, byte * str1 )
 int64
 StrnCmp ( byte * str0, byte * str1, int64 n )
 {
-    int64 i, result = -1 ;
-    for ( i = 0 ; str0 [ i ] && str1 [ i ] && (--n) && ( ! result ) ; i ++ )
+    int64 i, result = 0 ;
+    for ( i = 0 ; str0 [ i ] && str1 [ i ] && n && ( ! result ) ; i ++, n-- )
     {
         result = ( int64 ) str0 [ i ] - ( int64 ) str1 [ i ] ;
     }
@@ -697,11 +697,11 @@ _String_GetStringToEndOfLine ( )
 // this code is also used in PrepareSourceCodeString in cfrtil.c 
 // it makes or attempts to make sure that that tokenStart (ts) is correct for any string
 int64
-String_FindStrnCmpIndex ( byte * sc, byte* name0, int64 * i_ptr, int64 index0, int64 wl0, int64 inc )
+String_FindStrnCmpIndex ( byte * sc, byte* name0, int64 index0, int64 wl0, int64 inc )
 {
     byte * scspp2, *scspp ; 
     d1 ( scspp = & sc [ index0 ] ) ;
-    int64 i = * i_ptr, n, index = index0 ;
+    int64 i, n, index = index0, slsc = Strlen ( sc ) ;
     for ( i = 0, n = wl0 + inc ; i <= n ; i ++ ) // tokens are parsed in different order with parameter and c rtl args, etc. 
     {
         if ( ! StrnCmp ( & sc [ index - i ], name0, wl0 )) //l ) ) //wl0 ) )
@@ -709,7 +709,7 @@ String_FindStrnCmpIndex ( byte * sc, byte* name0, int64 * i_ptr, int64 index0, i
             index -= i ;
             goto done ;
         }
-        if ( ! StrnCmp ( & sc [ index + i ], name0, wl0 )) //l ) ) //wl0 ) )
+        if ( (index + i <= slsc) && ( ! StrnCmp ( & sc [ index + i ], name0, wl0 )) )//l ) ) //wl0 ) )
         {
             index += i ;
             goto done ;
@@ -718,9 +718,55 @@ String_FindStrnCmpIndex ( byte * sc, byte* name0, int64 * i_ptr, int64 index0, i
     }
     index = index0 ;
 done:
-    *i_ptr = i ;
     d1 ( scspp2 = & sc [ index ] ) ;
     return index ;
+}
+
+// the border (aesthetically) surrounds (equally or sliding) on either side of a token, it's string length, in the tvw - available terminal view window space; 
+// token slides in the window which is 2 * border + token length 
+// |ilw...------ inputLine  -----|lef|--- leftBorder ---|---token---|---  rightBorder  ---|ref|------ inputLine -----...ilw| -- ilw : inputLine window
+// ref : right ellipsis flag
+// lef : left ellipsis flag
+// dl : diff in length of token and token with highlighting :: dl = slt1 - slt0
+byte * // nvw, lef, leftBorder, nts, token0, rightBorder, ref
+_String_HighlightTokenInputLine ( byte * nvw, int8 lef, int64 leftBorder, int64 tokenStart, byte *token, int64 rightBorder, int8 ref, int8 dl )
+{
+    int32 slt = Strlen ( token ) ; //, slilw = Strlen ( nvw ) ;
+    if ( ! GetState ( _Debugger_, DEBUG_SHTL_OFF ) )
+    {
+        byte * b2 = Buffer_Data_Cleared ( _CfrTil_->DebugB2 ) ;
+        byte * b3 = Buffer_Data_Cleared ( _CfrTil_->ScratchB3 ) ;
+        // inputLineW is the inputLine line (window) start that we use here
+        // we are building our output in b2
+        // our scratch buffer is b3
+        if ( leftBorder < 0 ) leftBorder = 0 ; // something more precise here with C syntax is needed !?!?
+        if ( ! lef )
+        {
+            strncpy ( ( char* ) b3, ( char* ) nvw, leftBorder ) ;
+        }
+        else
+        {
+            strncpy ( ( char* ) b3, " .. ", 4 ) ;
+            if ( leftBorder > 4 ) strncat ( ( char* ) b3, ( char* ) &nvw[4], leftBorder - 4 ) ; // 3 : [0 1 2 3]  0 indexed array
+        }
+
+        strcpy ( ( char* ) b2, ( char* ) cc ( b3, &_Q_->Debug ) ) ;
+        char * ccToken = ( char* ) cc ( token, &_Q_->Notice ) ;
+        strcat ( ( char* ) b2, ccToken ) ;
+
+        if ( ! ref ) strcpy ( ( char* ) b3, ( char* ) &nvw[tokenStart + slt - dl] ) ; //, BUFFER_SIZE ) ; // 3 : [0 1 2 3]  0 indexed array
+        else
+        {
+
+            if ( rightBorder > 4 ) strncpy ( ( char* ) b3, ( char* ) &nvw[tokenStart + slt - dl], rightBorder - 4 ) ; // 4 : strlen " .. " 
+            strcat ( ( char* ) b3, " .. " ) ;
+        }
+        char * ccR = ( char* ) cc ( b3, &_Q_->Debug ) ;
+        strcat ( ( char* ) b2, ccR ) ;
+
+        nvw = b2 ;
+    }
+    return nvw ;
 }
 
 int64
@@ -761,7 +807,7 @@ String_CheckForAtAdddress ( byte * address )
         {
             if ( IsString ( address ) )
             {
-                snprintf ( ( char* ) buffer, 128, "< string : \'%s\' >", c_dd ( String_ConvertToBackSlash ( address ) ) ) ;
+                snprintf ( ( char* ) buffer, 128, "< string : \'%s\' >", c_gd ( String_ConvertToBackSlash ( address ) ) ) ;
                 string = String_New ( buffer, TEMPORARY ) ;
             }
         }

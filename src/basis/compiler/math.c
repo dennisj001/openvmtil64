@@ -28,13 +28,13 @@ Compile_X_Group3 ( Compiler * compiler, int64 op )
         {
             // IMULI : intel insn can't mult to tos in place must use reg ...
             // _Compile_IMUL ( cell mod, cell reg, cell rm, cell sib, cell disp )
-            _Compile_Group3 ( op, compiler->optInfo->Optimize_Mod, R8D, compiler->optInfo->Optimize_Rm, 0, compiler->optInfo->Optimize_Disp,
-                compiler->optInfo->Optimize_Imm, 0 ) ;
+            _Compile_Group3 ( op, compiler->optInfo->Optimize_Mod, R8D, REX_B | MODRM_B, compiler->optInfo->Optimize_Rm, 0, compiler->optInfo->Optimize_Disp,
+                compiler->optInfo->Optimize_Imm ) ;
         }
         else
         {
             //_Compile_IMUL ( cell mod, cell reg, cell rm, cell sib, cell disp )
-            _Compile_Group3 ( op, compiler->optInfo->Optimize_Mod, R8D, compiler->optInfo->Optimize_Rm, 0,
+            _Compile_Group3 ( op, compiler->optInfo->Optimize_Mod, R8D, REX_B | MODRM_B, compiler->optInfo->Optimize_Rm, 0,
                 compiler->optInfo->Optimize_Disp ) ;
         }
         zero->StackPushRegisterCode = Here ;
@@ -44,7 +44,7 @@ Compile_X_Group3 ( Compiler * compiler, int64 op )
     {
         Compile_Pop_To_R8 ( DSP ) ;
         //Compile_IMUL ( cell mod, cell reg, cell rm, sib, disp, imm, size )
-        _Compile_Group3 ( op, MEM, R8D, DSP, 0, 0 ) ;
+        _Compile_Group3 ( op, MEM, R8D, REX_B | MODRM_B, DSP, 0, 0 ) ;
         //zero->StackPushRegisterCode = Here ;
         Compile_Move_R8_To_TOS ( DSP ) ;
     }
@@ -118,12 +118,15 @@ _Compile_Divide ( Compiler * compiler, uint64 type )
     if ( optFlag & OPTIMIZE_DONE ) return ;
     else if ( optFlag )
     {
-        _Compile_MoveImm ( REG, R10D, 0, 0, 0, CELL ) ;
+        //_Compile_MoveImm ( REG, R10D, 0, 0, 0, CELL ) ;
+        _Compile_MoveImm ( REG, RDX, IMM_B | REX_B | MODRM_B | DISP_B, 0, 0, 0, CELL ) ;
+        _Compile_Move_Reg_To_Reg ( RAX, R8D ) ;
         // for idiv the dividend must be eax:edx, divisor can be reg or rm ; here we use ECX
         // idiv eax by reg or mem
         // Compile_IDIV ( mod, rm, sib, disp, imm, size )
-        Compile_IDIV ( compiler->optInfo->Optimize_Mod, compiler->optInfo->Optimize_Rm, 0,
+        Compile_IDIV ( compiler->optInfo->Optimize_Mod, compiler->optInfo->Optimize_Rm, ( (compiler->optInfo->Optimize_Disp!=0) ? DISP_B : 0 ), 0,
             compiler->optInfo->Optimize_Disp, 0, 0 ) ;
+        _Compile_Move_Reg_To_Reg ( R8D, RAX ) ;
         if ( type == MOD ) _Compile_Move_Reg_To_Reg ( R8D, R10D ) ; // for consistency finally use R8 so optInfo can always count on eax as the pushed reg
         //Word * zero = Compiler_WordStack ( 0 ) ;
         //Word * zero = Compiler_WordList ( 0 ) ;
@@ -137,8 +140,8 @@ _Compile_Divide ( Compiler * compiler, uint64 type )
         // 64 bit dividend EDX:R8 / srcReg
         // EDX holds high order bits
         _Compile_Move_StackN_To_Reg ( R8D, DSP, - 1 ) ;
-        _Compile_MoveImm ( REG, R10D, 0, 0, 0, CELL ) ;
-        Compile_IDIV ( MEM, DSP, 0, 0, 0, 0 ) ;
+        _Compile_MoveImm ( REG, R10D, IMM_B | REX_B | MODRM_B | DISP_B, 0, 0, 0, CELL ) ;
+        Compile_IDIV ( MEM, DSP, 0, 0, 0, 0, 0 ) ;
         _Compile_Stack_DropN ( DSP, 1 ) ;
         if ( type == MOD ) reg = R10D ; //_Compile_Move_Reg_To_Reg ( R8, EDX ) ; // for consistency finally use R8 so optInfo can always count on eax as the pushed reg
         else reg = R8D ; //Compile_Move_R8_To_TOS ( DSP ) ;
@@ -259,27 +262,28 @@ Compile_DivideEqual ( Compiler * compiler )
         {
             // assumes destination address is in EBX
             //_Compile_Move_Reg_To_Reg ( EBX, R8 ) ;
-            _Compile_Move_Reg_To_Reg ( R11D, compiler->optInfo->UseReg ) ;
-            _Compile_Move_Rm_To_Reg ( R8D, R11D, 0 ) ;
-            _Compile_MoveImm ( REG, R10D, 0, 0, 0, CELL ) ;
+            _Compile_Move_Reg_To_Reg ( R11D, RAX ) ; //R8D ) ; //compiler->optInfo->UseReg ) ;
+            _Compile_Move_Rm_To_Reg ( RAX, R11D, 0 ) ;
+            _Compile_MoveImm ( REG, RDX, IMM_B | REX_B | MODRM_B, 0, 0, 0, CELL ) ;
             // Compile_IDIV( mod, rm, sib, disp, imm, size )
             if ( compiler->optInfo->OptimizeFlag & OPTIMIZE_IMM )
             {
-                _Compile_MoveImm ( REG, R9D, 0, 0, compiler->optInfo->Optimize_Imm, CELL ) ;
-                Compile_IDIV ( REG, R9D, 0, 0, 0, 0 ) ;
+                _Compile_MoveImm ( REG, R9D, IMM_B | REX_B | MODRM_B, 0, 0, compiler->optInfo->Optimize_Imm, CELL ) ;
+                //Compile_IDIV ( REG, R9D, 0, 0, 0, 0, 0 ) ;
+                Compile_IDIV ( REG, R9D, 0, 0, 0, 0, 0 ) ;
             }
             else
             {
-                Compile_IDIV ( compiler->optInfo->Optimize_Mod, compiler->optInfo->Optimize_Rm, 0,
-                    compiler->optInfo->Optimize_Disp, compiler->optInfo->Optimize_Imm, 0 ) ;
+                Compile_IDIV ( compiler->optInfo->Optimize_Mod, compiler->optInfo->Optimize_Rm, DISP_B, 0,
+                    compiler->optInfo->Optimize_Disp, 0, 0 ) ;
             }
-            _Compile_Move_Reg_To_Rm ( R11D, R8D, 0 ) ; // move result to destination
+            _Compile_Move_Reg_To_Rm ( R11D, RAX, 0 ) ; // move result to destination
         }
         else
         {
             _Compile_Move_StackNRm_To_Reg ( R8D, DSP, - 1 ) ; // address of dividend is second on stack
-            _Compile_MoveImm ( REG, R10D, 0, 0, 0, CELL ) ;
-            Compile_IDIV ( MEM, DSP, 0, 0, 0, 0 ) ; // divisor is tos
+            _Compile_MoveImm ( REG, R10D, IMM_B | REX_B | MODRM_B | DISP_B, 0, 0, 0, CELL ) ;
+            Compile_IDIV ( MEM, DSP, 0, 0, 0, 0, 0 ) ; // divisor is tos
             _Compile_Stack_Drop ( DSP ) ;
             _Compile_Move_Reg_To_StackNRm_UsingReg ( DSP, 0, R8D, R11D ) ;
         }
@@ -291,14 +295,14 @@ _CfrTil_Do_IncDec ( int64 op )
 {
     Context * cntx = _Context_ ;
     Compiler * compiler = cntx->Compiler0 ;
-    int64 sd = List_Depth ( compiler->WordList ) ;
-    Word *one = ( Word* ) Compiler_WordList ( 1 ) ; // the operand
     if ( CompileMode )
     {
         Compile_X_Group5 ( compiler, op ) ; // ? INC : DEC ) ; //, RVALUE ) ;
     }
     else
     {
+        int64 sd = List_Depth ( compiler->WordList ) ;
+        Word *one = ( Word* ) Compiler_WordList ( 1 ) ; // the operand
         if ( op == INC )
         {
             if ( ( sd > 1 ) && one->CAttribute & ( PARAMETER_VARIABLE | LOCAL_VARIABLE | NAMESPACE_VARIABLE ) )

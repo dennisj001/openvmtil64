@@ -64,16 +64,16 @@
 
 //group 3
 // div eax, src ::=> eax/(src - modRm) quotient in eax remainder in edx
-#define Compile_DIV( mod, rm, sib, disp, imm, size ) _Compile_Group3 ( DIV, mod, rm, sib, disp, imm, size )
-#define Compile_IDIV( mod, rm, sib, disp, imm, size ) _Compile_Group3 ( IDIV, mod, rm, sib, disp, imm, size )
+#define Compile_DIV( mod, rm, controlFlag, sib, disp, imm, size ) _Compile_Group3 (DIV, mod, rm, REX_B | MODRM_B | controlFlag, sib, disp, imm, size )
+#define Compile_IDIV( mod, rm, controlFlag, sib, disp, imm, size ) _Compile_Group3 (IDIV, mod, rm, REX_B | MODRM_B | controlFlag, sib, disp, imm, size )
 // mul eax, src ::=> eax = eax * modRm src
-#define Compile_MUL( mod, rm, sib, disp, imm, size ) _Compile_Group3 ( MUL, mod, rm, sib, disp, imm, size )
+#define Compile_MUL( mod, rm, controlFlag, sib, disp, imm, size ) _Compile_Group3 (MUL, mod, rm, REX_B | MODRM_B | controlFlag, sib, disp, imm, size )
 // two's complement negation
-#define Compile_NEG( mod, rm, sib, disp ) _Compile_Group3 ( NEG, mod, rm, sib, disp, 0, 0 )
+#define Compile_NEG( mod, rm, controlFlag, sib, disp ) _Compile_Group3 (NEG, mod, rm, REX_B | MODRM_B | controlFlag, sib, disp, 0, 0 )
 // one's complement negation
-#define Compile_NOT( mod, rm, sib, disp ) _Compile_Group3 ( NOT, mod, rm, sib, disp, 0, 0 )
+#define Compile_NOT( mod, rm, controlFlag, sib, disp ) _Compile_Group3 (NOT, mod, rm, REX_B | MODRM_B | controlFlag, sib, disp, 0, 0 )
 // logical compare
-#define Compile_TEST( mod, rm, sib, disp, imm, size ) _Compile_Group3 ( TEST, mod, rm, sib, disp, imm, size )
+#define Compile_TEST( mod, rm, controlFlag, sib, disp, imm, size ) _Compile_Group3 (TEST, mod, rm, REX_B | MODRM_B | controlFlag, sib, disp, imm, size )
 
 // group 5
 #define Compile_INC( mod, rm, sib, disp ) _Compile_Group5 ( INC, mod, rm, sib, disp, 0  )
@@ -89,6 +89,6 @@
 #define _Compile_TestImm_0_Rm( rm, sib, disp ) _Compile_Test ( MEM, 0, rm, disp, 0 )
 #endif
 #define  PUSH_IMM    0x68      
-#define _Compile_PushEspImm( data ) _Compile_InstructionX86 (PUSH_IMM, 0, 0, 0, 0, 0, 0, CELL , ( int64 ) data, 0)
+#define _Compile_PushRspImm( data ) _Compile_InstructionX86 (PUSH_IMM, 0, 0, 0, 0, 0, 0, CELL , ( int64 ) data, 0)
 
 

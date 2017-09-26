@@ -31,7 +31,6 @@ sp
         //" after hey" ps 
 ;
 ' hey find wdiss 
-
 1 2 hey sp
 : hey1 ( a b ) a @ b @ hey ; 
 1 2 hey1 sp
@@ -132,6 +131,7 @@ Combinators User
 decimal
 "\n\ntesting nested locals" ps nl
 : goedel { (| n ) n 1 = n @ 6 + dup 7 _assert p } ix { (| m ) m 3 = m @ 4 + dup 7 _assert p } ix ; 
+'goedel find wdiss
 nl "goedel :: " ps goedel sp
 : goedel2 { (| n ) n 2 = n @ 5 + dup 7 _assert p } ix { (| n ) n @ p n 3 = n @ 4 + dup p 7 _assert } ix ;
 nl "goedel2 :: " ps goedel2 sp

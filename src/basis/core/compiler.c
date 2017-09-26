@@ -153,11 +153,8 @@ Compiler_WordList_RecycleInit ( Compiler * compiler )
 {
     if ( ! IsSourceCodeOn )
     {
-        //dllist_Map ( compiler->WordList, ( MapFunction0 ) CheckRecycleWord ) ;
         DLList_RecycleWordList ( compiler->WordList ) ;
         List_Init ( compiler->WordList ) ;
-        _CfrTil_->DebugWordList = 0 ;
-        _CfrTil_->DebugWordListWord = 0 ;
     }
 }
 
@@ -167,7 +164,17 @@ Compiler_Init ( Compiler * compiler, uint64 state )
     compiler->State = state ;
     _dllist_Init ( compiler->GotoList ) ;
     //if ( _ReadLiner_ ) Compiler_Show_WordList ( (byte*) _ReadLiner_->InputLineString ) ;
-    Compiler_WordList_RecycleInit ( compiler ) ;
+    if ( ! IsSourceCodeOn )
+    {
+        DLList_RecycleWordList ( compiler->WordList ) ;
+        List_Init ( compiler->WordList ) ;
+    }
+    else 
+    {
+        _Context_->WordList = compiler->WordList ;
+        compiler->WordList = _dllist_New ( CONTEXT ) ;
+    }
+    //Compiler_WordList_RecycleInit ( compiler ) ;
     CfrTil_InitBlockSystem ( compiler ) ;
     compiler->ContinuePoint = 0 ;
     compiler->BreakPoint = 0 ;

@@ -4,7 +4,7 @@
 void
 _Compile_C_Call_1_Arg ( byte* function, int64 arg )
 {
-    _Compile_Esp_Push ( arg ) ;
+    _Compile_Rsp_Push ( arg ) ;
     Compile_Call ( function ) ;
     _Compile_Rsp_Drop ( ) ;
 }

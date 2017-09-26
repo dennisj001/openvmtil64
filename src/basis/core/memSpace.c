@@ -414,6 +414,13 @@ DLList_RecycleWordList ( dllist * list )
     //else dllist_Map ( list, ( MapFunction0 ) _CheckRecycleWord ) ;
 }
 
+void
+CheckCodeSpaceForRoom ()
+{
+    if ( _Q_CodeByteArray->OurNBA->ba_CurrentByteArray->MemRemaining < ( 8 * K ) )  
+        _Q_CodeByteArray = _ByteArray_AppendSpace_MakeSure ( _Q_CodeByteArray, 4 * K ) ;
+}
+
 #if 0
 
 void

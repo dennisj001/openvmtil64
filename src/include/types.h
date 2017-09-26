@@ -370,6 +370,8 @@ typedef struct _WordData
         ListObject * LambdaArgs ;
         int64 Index ; // used by Variable and LocalWord
     } ;
+    dllist * SourceCodeWordList ;
+    //uint64 SourceCodeWordIndex ;
 } WordData ; // try to put all compiler related data here so in the future we can maybe delete WordData at runtime
 
 // to keep using existing code without rewriting ...
@@ -404,7 +406,9 @@ typedef struct _WordData
 #define W_SearchNumber W_Value2
 #define W_FoundMarker W_Value3
 #define W_OriginalWord S_WordData->OriginalWord
-#define W_SC_ScratchPadIndex S_WordData->SC_ScratchPadIndex // set at Word allocation 
+#define W_SC_ScratchPadIndex S_WordData->SC_ScratchPadIndex 
+#define W_SC_WordList S_WordData->SourceCodeWordList 
+#define W_SC_WordIndex W_SC_ScratchPadIndex 
 typedef struct
 {
     Symbol P_Symbol ;
@@ -461,7 +465,7 @@ typedef struct
     Symbol BI_Symbol ;
     uint64 State ;
     byte *FrameStart ;
-    byte * AfterEspSave ;
+    byte * AfterRspSave ;
     byte *Start ;
     byte *bp_First ;
     byte *bp_Last ;
@@ -639,8 +643,8 @@ typedef struct
     int32 * AccumulatedOffsetPointer ;
     int64 * FrameSizeCellOffset ;
     int64 RegOrder [ 4 ] ; //= { EBX, EDX, ECX, EAX } ;
-    byte * EspSaveOffset ;
-    byte * EspRestoreOffset ;
+    byte * RspSaveOffset ;
+    byte * RspRestoreOffset ;
     Word * ReturnVariableWord ;
     Word * CurrentWord, *CurrentWordCompiling ;
     Word * LHS_Word ; //, *OptimizeOffWord;
@@ -685,7 +689,7 @@ typedef struct _Debugger
     int64 Key ;
     int64 SaveKey ; //Verbosity;
     int64 TokenStart_ReadLineIndex, Esi, Edi ;
-    Word * w_Word, *EntryWord, *LastShowWord, *LastEffectsWord, *LastSetupWord, *SteppedWord, *CurrentlyRunningWord ;
+    Word * w_Word, *EntryWord, *LastShowWord, *LastEffectsWord, *LastSetupWord, *SteppedWord, *CurrentlyRunningWord, *LastSourceCodeWord ;
     byte * Token ;
     block SaveCpuState ;
     block RestoreCpuState ;
@@ -727,6 +731,7 @@ typedef struct
     System * System0 ;
     Stack * ContextDataStack ;
     byte * Location ;
+    dllist * WordList ;
     Word * CurrentlyRunningWord, *NlsWord, *SC_CurrentCombinator ;
     NBA * ContextNba ;
     sigjmp_buf JmpBuf0 ;

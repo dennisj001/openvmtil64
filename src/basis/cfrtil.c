@@ -246,188 +246,6 @@ _CfrTil_New ( CfrTil * cfrTil )
     return cfrTil ;
 }
 
-void
-CfrTil_Lexer_SourceCodeOn ( )
-{
-    Lexer_SourceCodeOn ( _Context_->Lexer0 ) ;
-}
-
-void
-_CfrTil_AddStringToSourceCode ( CfrTil * cfrtil, byte * str )
-{
-    if ( str )
-    {
-        strcat ( ( char* ) cfrtil->SC_ScratchPad, ( char* ) str ) ;
-        strcat ( ( CString ) cfrtil->SC_ScratchPad, ( CString ) " " ) ;
-    }
-}
-
-void
-CfrTil_AddStringToSourceCode ( CfrTil * cfrtil, byte * str )
-{
-    _CfrTil_AddStringToSourceCode ( cfrtil, str ) ;
-    cfrtil->SC_ScratchPadIndex += ( Strlen ( ( char* ) str ) + 1 ) ; // 1 : add " " (above)
-}
-
-void
-_CfrTil_SC_ScratchPadIndex_Init ( CfrTil * cfrtil )
-{
-    cfrtil->SC_ScratchPadIndex = Strlen ( ( char* ) _CfrTil_->SC_ScratchPad ) ;
-}
-
-void
-__CfrTil_SourceCode_Init ( CfrTil * cfrtil )
-{
-    cfrtil->SC_ScratchPad [ 0 ] = 0 ;
-    cfrtil->SC_ScratchPadIndex = 0 ;
-}
-
-void
-_CfrTil_SourceCode_Init ( CfrTil * cfrtil )
-{
-    cfrtil->SC_ScratchPad [ 0 ] = 0 ;
-    cfrtil->SC_ScratchPadIndex = 0 ;
-    SetState ( cfrtil, SOURCE_CODE_INITIALIZED, true ) ;
-}
-
-void
-_CfrTil_InitSourceCode ( CfrTil * cfrtil )
-{
-    //if ( force || ( ! GetState ( _CfrTil_, SOURCE_CODE_INITIALIZED ) ) ) {
-    Lexer_SourceCodeOn ( _Context_->Lexer0 ) ;
-    _CfrTil_SourceCode_Init ( cfrtil ) ;
-}
-
-void
-CfrTil_InitSourceCode ( CfrTil * cfrtil )
-{
-    _CfrTil_InitSourceCode ( cfrtil ) ;
-    _CfrTil_SC_ScratchPadIndex_Init ( cfrtil ) ;
-}
-
-void
-_CfrTil_InitSourceCode_WithName ( CfrTil * cfrtil, byte * name )
-{
-    _CfrTil_InitSourceCode ( cfrtil ) ;
-    _CfrTil_AddStringToSourceCode ( cfrtil, name ) ;
-    _CfrTil_SC_ScratchPadIndex_Init ( cfrtil ) ;
-}
-
-void
-CfrTil_InitSourceCode_WithCurrentInputChar ( CfrTil * cfrtil )
-{
-    Lexer * lexer = _Context_->Lexer0 ;
-    _CfrTil_InitSourceCode ( cfrtil ) ;
-    _Lexer_AppendCharToSourceCode ( lexer, lexer->TokenInputCharacter, 0 ) ;
-}
-
-void
-CfrTil_SourceCode_Init ( )
-{
-    Word * word = _Interpreter_->w_Word ;
-    _CfrTil_InitSourceCode_WithName ( _CfrTil_, word ? word->Name : 0 ) ;
-}
-
-void
-_CfrTil_DebugSourceCodeCompileOn ( )
-{
-    SetState ( _CfrTil_, DEBUG_SOURCE_CODE_MODE, true ) ;
-    SetState ( _CfrTil_, GLOBAL_SOURCE_CODE_MODE, true ) ;
-}
-
-void
-_CfrTil_DebugSourceCodeCompileOff ( )
-{
-    SetState ( _CfrTil_, DEBUG_SOURCE_CODE_MODE, false ) ;
-}
-
-void
-CfrTil_SourceCodeCompileOn ( )
-{
-    _CfrTil_DebugSourceCodeCompileOn ( ) ;
-    CfrTil_SourceCode_Init ( ) ;
-    if ( ! GetState ( _Context_, C_SYNTAX ) ) CfrTil_Colon ( ) ;
-}
-
-byte *
-_CfrTil_FinishSourceCode ( CfrTil * cfrtil )
-{
-    // keep a LambdaCalculus LO_Define0 created SourceCode value
-    //if ( ! word->SourceCode ) word->SourceCode = String_New ( cfrtil->SC_ScratchPad, STRING_MEM ) ;
-    byte *sourceCode = String_New ( cfrtil->SC_ScratchPad, STRING_MEM ) ;
-    Lexer_SourceCodeOff ( _Context_->Lexer0 ) ;
-    __CfrTil_SourceCode_Init ( cfrtil ) ;
-    SetState ( cfrtil, SOURCE_CODE_INITIALIZED, false ) ;
-    return sourceCode ;
-}
-
-void
-CfrTil_FinishSourceCode ( CfrTil * cfrtil, Word * word )
-{
-    // keep a LambdaCalculus LO_Define0 created SourceCode value
-    //if ( ! word->SourceCode ) word->SourceCode = String_New ( cfrtil->SC_ScratchPad, STRING_MEM ) ;
-    //Lexer_SourceCodeOff ( _Context_->Lexer0 ) ;
-    //__CfrTil_SourceCode_Init ( cfrtil ) ;
-    //SetState ( cfrtil, SOURCE_CODE_INITIALIZED, false ) ;
-    word->W_SourceCode = _CfrTil_FinishSourceCode ( cfrtil ) ;
-}
-
-void
-_CfrTil_UnAppendFromSourceCode ( CfrTil * cfrtil, int64 nchars )
-{
-    int64 plen = Strlen ( ( CString ) cfrtil->SC_ScratchPad ) ;
-    if ( plen >= nchars )
-    {
-        cfrtil->SC_ScratchPad [ Strlen ( ( CString ) cfrtil->SC_ScratchPad ) - nchars ] = 0 ;
-    }
-    _CfrTil_SC_ScratchPadIndex_Init ( cfrtil ) ;
-}
-
-void
-_CfrTil_UnAppendTokenFromSourceCode ( CfrTil * cfrtil, byte * tkn )
-{
-    if ( GetState ( _Lexer_, ( ADD_TOKEN_TO_SOURCE | ADD_CHAR_TO_SOURCE ) ) )
-    {
-        _CfrTil_UnAppendFromSourceCode ( cfrtil, Strlen ( ( CString ) tkn ) + 1 ) ;
-    }
-}
-
-void
-_CfrTil_AppendCharToSourceCode ( CfrTil * cfrtil, byte c )
-{
-
-    cfrtil->SC_ScratchPad [ cfrtil->SC_ScratchPadIndex ++ ] = c ;
-    cfrtil->SC_ScratchPad [ cfrtil->SC_ScratchPadIndex ] = 0 ;
-}
-
-void
-CfrTil_AppendCharToSourceCode ( CfrTil * cfrtil, byte c, int64 convertToSpaceFlag )
-{
-    if ( cfrtil->SC_ScratchPadIndex < ( SOURCE_CODE_BUFFER_SIZE - 1 ) )
-    {
-        if ( c == '"' )
-        {
-            if ( cfrtil->SC_QuoteMode ) cfrtil->SC_QuoteMode = 0 ;
-            else cfrtil->SC_QuoteMode = 1 ;
-            _CfrTil_AppendCharToSourceCode ( cfrtil, c ) ;
-        }
-#if 1        
-        else if ( convertToSpaceFlag )
-        {
-            c = String_ConvertEscapeCharToSpace ( c ) ;
-            if ( ! ( ( c == ' ' ) && ( cfrtil->SC_ScratchPad [ cfrtil->SC_ScratchPadIndex - 1 ] == ' ' ) ) )
-            {
-                _CfrTil_AppendCharToSourceCode ( cfrtil, c ) ;
-            }
-        }
-#endif        
-        else
-        {
-            _String_AppendConvertCharToBackSlashAtIndex ( cfrtil->SC_ScratchPad, c, &cfrtil->SC_ScratchPadIndex, cfrtil->SC_QuoteMode ) ;
-        }
-    }
-}
-
 
 //----------------------------------------------------------------------------------------|
 //              get from/ add to head  |              | get from head      add to tail    |      
@@ -542,7 +360,7 @@ CfrTil_Compile_SaveIncomingCpuState ( CfrTil * cfrtil )
 
     Compile_Call ( ( byte* ) cfrtil->SaveCpuState ) ; // save incoming current C cpu state
     _Compile_MoveReg_ToMem ( RBP, ( byte * ) & cfrtil->cs_CpuState->Ebp, R11D, CELL ) ; // EBX : scratch reg
-    _Compile_MoveReg_ToMem ( RSP, ( byte * ) & cfrtil->cs_CpuState->Esp, R11D, CELL ) ;
+    _Compile_MoveReg_ToMem ( RSP, ( byte * ) & cfrtil->cs_CpuState->Rsp, R11D, CELL ) ;
 
 }
 
@@ -552,6 +370,6 @@ CfrTil_Compile_RestoreIncomingCpuState ( CfrTil * cfrtil )
     // restore the incoming current C cpu state
     Compile_Call ( ( byte* ) _CfrTil_->RestoreCpuState ) ;
     _Compile_MoveMem_To_Reg ( RBP, ( byte * ) & cfrtil->cs_CpuState->Ebp, R11D, CELL ) ;
-    _Compile_MoveMem_To_Reg ( RSP, ( byte * ) & cfrtil->cs_CpuState->Esp, R11D, CELL ) ;
+    _Compile_MoveMem_To_Reg ( RSP, ( byte * ) & cfrtil->cs_CpuState->Rsp, R11D, CELL ) ;
 }
 #endif

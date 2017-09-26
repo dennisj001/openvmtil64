@@ -23,7 +23,9 @@ CfrTil_Poke ( ) // =
     }
     else
     {
-        * (int64*) ( Dsp [ -1 ] ) = TOS ;
+        uint64 * tos = (uint64 *) TOS ;
+        uint64 * nos = (uint64*) Dsp [ -1 ] ;
+        * nos = (uint64) tos ;
         Dsp -= 2 ;
     }
 }

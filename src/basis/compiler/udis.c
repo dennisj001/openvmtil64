@@ -16,7 +16,12 @@ _Udis_PrintInstruction ( ud_t * ud, byte * address, byte * prefix, byte * postfi
         format = ( byte* ) c_ud ( format ) ;
         formats = ( byte* ) c_ud ( formats ) ;
     }
-    if ( GetState ( _Debugger_, DBG_STEPPING ) ) _Printf ( formats, prefix, ( int64 ) ud_insn_off ( ud ), ud_insn_hex ( ud ), c_du ( ud_insn_asm ( ud ) ), c_du ( postfix ) ) ;
+    else 
+    {
+        format = ( byte* ) c_gd ( format ) ;
+        formats = ( byte* ) c_gd ( formats ) ;
+    }
+    if ( GetState ( _Debugger_, DBG_STEPPING ) ) _Printf ( formats, prefix, ( int64 ) ud_insn_off ( ud ), ud_insn_hex ( ud ), c_gu ( ud_insn_asm ( ud ) ), c_gu ( postfix ) ) ;
     else _Printf ( format, prefix, ( int64 ) ud_insn_off ( ud ), ud_insn_hex ( ud ), ud_insn_asm ( ud ), postfix ) ;
 }
 
@@ -56,6 +61,7 @@ _Debugger_Udis_OneInstruction ( Debugger * debugger, byte * address, byte * pref
         ud_set_input_buffer ( ud, address, 16 ) ;
         ud_set_pc ( ud, ( int64 ) address ) ;
         isize = ud_disassemble ( ud ) ;
+        if ( Debugger_ShowSourceCodeAtAddress ( debugger, address ) ) ;
         _Udis_PrintInstruction ( ud, address, prefix, postfix ) ; //, debugger->DebugAddress ) ;
         return isize ;
     }
@@ -77,6 +83,7 @@ _Udis_Disassemble ( ud_t *ud, byte* iaddress, int64 number, int64 cflag )
             isize = ud_disassemble ( ud ) ;
             iasm = ( char* ) ud_insn_asm ( ud ) ;
             address = ( byte* ) ( uint64 ) ud_insn_off ( ud ) ;
+            Debugger_ShowSourceCodeAtAddress ( _Debugger_, address ) ;
             _Udis_PrintInstruction ( ud, address, ( byte* ) "", ( byte* ) "" ) ;
             if ( ( cflag && String_Equal ( ( byte* ) "ret", ( byte* ) iasm ) ) ) //|| String_Equal ( ( byte* ) "invalid", ( byte* ) iasm ) )
             {

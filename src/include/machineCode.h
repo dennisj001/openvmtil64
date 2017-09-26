@@ -111,6 +111,7 @@
 #define DISP_B      ( 1 << 2 ) 
 #define IMM_B       ( 1 << 3 ) 
 #define REX_B       ( 1 << 4 ) 
+#define REX_W_B       REX_B
 #if X64
 #define SCALE_CELL SCALE_8
 #else
@@ -198,7 +199,7 @@ register uint64 *Dsp asm ("r14" ) ;
 //#define DSP ESI
 //#define FP EDI
 //register int32 *Fp asm ("edi" ) ;
-//register int32 *Esp asm ("esp" ) ;
+//register int32 *Rsp asm ("esp" ) ;
 //register OpenVmTil *_Q_ asm ("r13" ) ;
 //register CfrTil *Q asm ("r13" ) ;
 //#define QP  R13
@@ -211,7 +212,7 @@ int64 *Rsp ;
 #endif
 #define DSP R14
 //register int64 *Fp asm ("edi" ) ;
-//register int64 *Esp asm ("esp" ) ;
+//register int64 *Rsp asm ("esp" ) ;
 #define FP R15
 //#define QP  EDI
 #define REX 0

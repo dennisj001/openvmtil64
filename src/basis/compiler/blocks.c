@@ -275,6 +275,7 @@ _CfrTil_BeginBlock2 ( BlockInfo * bi )
 void
 CfrTil_BeginBlock ( )
 {
+    //CheckCodeSpaceForRoom ( ) ;
     BlockInfo * bi = _CfrTil_BeginBlock0 ( ) ;
     _CfrTil_BeginBlock1 ( bi ) ;
     _CfrTil_BeginBlock2 ( bi ) ;
@@ -283,7 +284,7 @@ CfrTil_BeginBlock ( )
 Boolean
 _Compiler_IsFrameNecessary ( Compiler * compiler )
 {
-    return ( compiler->NumberOfLocals || compiler->NumberOfArgs ) ; //|| GetState ( compiler, SAVE_ESP ) ) ;
+    return ( compiler->NumberOfLocals || compiler->NumberOfArgs ) ; //|| GetState ( compiler, SAVE_Rsp ) ) ;
 }
 
 void
@@ -304,7 +305,7 @@ _CfrTil_EndBlock1 ( BlockInfo * bi )
         else if ( _Compiler_IsFrameNecessary ( compiler ) && ( ! GetState ( compiler, DONT_REMOVE_STACK_VARIABLES ) ) )
         {
             _Compiler_RemoveLocalFrame ( compiler ) ;
-            bi->bp_First = bi->FrameStart ; // include _Compile_ESP_Save code
+            bi->bp_First = bi->FrameStart ; // include _Compile_Rsp_Save code
         }
         else
         {

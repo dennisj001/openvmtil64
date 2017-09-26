@@ -7,6 +7,7 @@ _Word_Run ( Word * word )
     {
         word->W_InitialRuntimeDsp = Dsp ;
         _Context_->CurrentlyRunningWord = word ;
+#if 0        
         if ( DBI )
         {
             if ( ! ( word->CAttribute & CPRIMITIVE ) )
@@ -15,6 +16,7 @@ _Word_Run ( Word * word )
                 _Debugger_Disassemble ( _Debugger_, ( byte* ) word->Definition, 256, 1 ) ;
             }
         }
+#endif        
         _Block_Eval ( word->Definition ) ;
     }
 }
@@ -68,6 +70,7 @@ _Word_Eval_Debug ( Word * word )
 {
     if ( word )
     {
+        word->Coding = Here ;
         DEBUG_SETUP ( word ) ;
         if ( ! GetState ( word, STEPPED ) ) Word_Eval0 ( word ) ;
         DEBUG_SHOW ;
@@ -84,9 +87,9 @@ _Word_Eval ( Word * word )
         word->StackPushRegisterCode = 0 ; // nb. used! by the rewriting optInfo
         // keep track in the word itself where the machine code is to go, if this word is compiled or causes compiling code - used for optimization
         word->Coding = Here ;
+        word->W_SC_WordIndex = _CfrTil_->SC_ScratchPadIndex ;
         if ( Is_DebugModeOn ) _Word_Eval_Debug ( word ) ;
-        else
-            Word_Eval0 ( word ) ;
+        else Word_Eval0 ( word ) ;
         if ( word->CAttribute & DEBUG_WORD ) DefaultColors ; // reset colors after a debug word
         _CfrTil_SetStackPointerFromDsp ( _CfrTil_ ) ;
     }
@@ -160,7 +163,13 @@ void
 _Word_Finish ( Word * word )
 {
     _DObject_Finish ( word ) ;
-    CfrTil_FinishSourceCode ( _CfrTil_, word ) ;
+    CfrTil_Word_FinishSourceCode ( _CfrTil_, word ) ;
+    //if ( IsSourceCodeOn ) 
+    {
+        word->W_SC_WordList = _Context_->WordList ; //_CfrTil_->DebugWordList ;
+        _Context_->WordList = 0 ;
+        //_CfrTil_->DebugWordList = 0 ;
+    }
     Compiler_Init ( _Context_->Compiler0, 0 ) ; // not really necessary should always be handled by EndBlock ?? but this allows for some syntax errors with a '{' but no '}' ??
 #if 0    
     if ( DBI )
@@ -224,6 +233,7 @@ _Word_Create ( byte * name, uint64 ctype, uint64 ltype, uint64 allocType )
 Word *
 _Word_New ( byte * name, uint64 ctype, uint64 ltype, int8 addToInNs, Namespace * addToNs, uint64 allocType )
 {
+    //CheckCodeSpaceForRoom ( ) ;
     ReadLiner * rl = _Context_->ReadLiner0 ;
     Word * word = _Word_Create ( name, ctype, ltype, allocType ) ; // CFRTIL_WORD : cfrTil compiled words as opposed to C compiled words
     _Context_->Compiler0->CurrentWord = word ;
@@ -233,10 +243,12 @@ _Word_New ( byte * name, uint64 ctype, uint64 ltype, int8 addToInNs, Namespace *
         word->S_WordData->LineNumber = rl->LineNumber ;
         word->W_CursorPosition = rl->CursorPosition ;
     }
-    if ( _IsSourceCodeOn )
+#if 0    
+    if ( _IsSourceCodeOn && ( ! Compiling ) && ( ! GetState ( _Context_->Interpreter0, PREPROCESSOR_MODE ) ) )
     {
         CfrTil_SourceCode_SetDebugWordList ( word ) ;
     }
+#endif    
     _CfrTil_->WordCreateCount ++ ;
     _Word_Add ( word, addToInNs, addToNs ) ;
     return word ;
@@ -326,8 +338,8 @@ __Word_ShowSourceCode ( Word * word )
         Buffer *dstb = Buffer_NewLocked ( BUFFER_SIZE ) ;
         byte * dst = dstb->B_Data ;
         dst = _String_ConvertStringToBackSlash ( dst, word->W_SourceCode ) ;
-        byte * name = c_dd ( word->Name ) ;
-        byte *dest = c_dd ( String_FilterMultipleSpaces ( dst, TEMPORARY ) ) ;
+        byte * name = c_gd ( word->Name ) ;
+        byte *dest = c_gd ( String_FilterMultipleSpaces ( dst, TEMPORARY ) ) ;
         _Printf ( ( byte* ) "\nSourceCode for ""%s"" :> \n%s", name, dest ) ;
         Buffer_Unlock ( dstb ) ;
         Buffer_SetAsFree ( dstb, 0 ) ;

@@ -22,7 +22,7 @@ _Word_Disassemble ( Word * word )
 {
     if ( word )
     {
-        _Printf ( ( byte* ) "\nWord :: %s.%s : definition = 0x%08lx : disassembly at %s :", word->ContainingNamespace ? word->ContainingNamespace->Name : ( byte* ) "", c_dd ( word->Name ), ( uint64 ) word->Definition, Context_Location ( ) ) ;
+        _Printf ( ( byte* ) "\nWord :: %s.%s : definition = 0x%08lx : disassembly at %s :", word->ContainingNamespace ? word->ContainingNamespace->Name : ( byte* ) "", c_gd ( word->Name ), ( uint64 ) word->Definition, Context_Location ( ) ) ;
         _CfrTil_Word_Disassemble ( word ) ;
         //_Printf ( ( byte* ) "\n" ) ;
     }

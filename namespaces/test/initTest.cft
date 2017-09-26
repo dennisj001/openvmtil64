@@ -44,7 +44,12 @@ Int User
 : oldL "namespaces/test/oldLisp.cft" include ;
 : lT lispTest ;
 : testX cST ;
+'doBigNum 0 const
+#if doBigNum
 : basicT cT aT loT bT locT mT oT ia32 cntT lT fT sT sysT interpT ppT stT ;
+#else
+: basicT cT aT loT locT mT oT  cntT lT fT sT sysT interpT ppT stT ;
+#endif
 : _basicT bT mT cntT lT fT sysT  ;
 : testBasic basicT ;
 // : testAll testBasic testX ;
