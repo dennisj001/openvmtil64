@@ -88,7 +88,7 @@ _Dlsym ( byte * sym, byte * lib )
         char buffer [256], *sharedLib = ( char* ) lib ;
         int64 ll ;
         for ( ll = Strlen ( sharedLib ) ; sharedLib [ ll ] != '/' ; ll -- ) ;
-        strcpy ( buffer, "./lib" ) ;
+        strcpy ( buffer, "./lib32" ) ;
         strcat ( buffer, &sharedLib [ll] ) ;
         functionPointer = _dlsym ( sym, ( byte* ) buffer ) ;
         if ( ! functionPointer )

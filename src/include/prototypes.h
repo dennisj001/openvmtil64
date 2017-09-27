@@ -768,6 +768,10 @@ void CfrTil_SyncStackPointersFromDsp(void);
 void _CfrTil_InitDspFromStackPointer(CfrTil *cfrTil);
 void CfrTil_InitDspFromStackPointer(CfrTil *cfrTil);
 void CfrTil_DataStack_InitEssential(CfrTil *cfrTil);
+void _CfrTil_PrintDataStack(void);
+void CfrTil_PrintDataStack(void);
+void CfrTil_CheckInitDataStack(void);
+void CfrTil_DataStack_Size(void);
 /* basis/context.c */
 void _Context_Prompt(int64 control);
 byte *_Context_Location(Context *cntx);
@@ -1256,7 +1260,7 @@ void CfrTil_LocalVariablesBegin(void);
 /* basis/debugger.c */
 void Debugger_TableSetup(Debugger *debugger);
 void _Debugger_InterpreterLoop(Debugger *debugger);
-void _Debugger_PreSetup(Debugger *debugger, Word *word);
+void _Debugger_PreSetup(Debugger *debugger, Word *word, int8 forceFlag);
 void _Debugger_PostShow(Debugger *debugger, Word *word);
 void Debugger_PostShow(Debugger *debugger);
 void Debugger_On(Debugger *debugger);
@@ -1704,10 +1708,6 @@ void CfrTil_PrintNReturnStack(void);
 void CfrTil_PrintNDataStack(void);
 void CfrTil_PrintReturnStack(void);
 void CfrTil_PrintNDataStack_8(void);
-void _CfrTil_PrintDataStack(void);
-void CfrTil_PrintDataStack(void);
-void CfrTil_CheckInitDataStack(void);
-void CfrTil_DataStack_Size(void);
 /* primitives/debuggers.c */
 void CfrTil_Debug_AtAddress(void);
 void CfrTil_LocalsShow(void);

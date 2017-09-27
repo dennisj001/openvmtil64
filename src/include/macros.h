@@ -232,12 +232,14 @@
 #define Is_DebugShowOn ( _CfrTil_ && GetState ( _CfrTil_, _DEBUG_SHOW_ ) ) 
 #define _Is_DebugOn GetState ( _CfrTil_, _DEBUG_SHOW_ )
 #define Is_DebugOn (Is_DebugShowOn && Is_DebugModeOn)
-#define DEBUG_SETUP( word ) if ( word && Is_DebugModeOn) _Debugger_PreSetup ( _Debugger_, word ) ;
+#define _DEBUG_SETUP( word, forceFlag ) if ( word && Is_DebugModeOn) _Debugger_PreSetup ( _Debugger_, word, forceFlag ) ;
+#define DEBUG_SETUP( word ) _DEBUG_SETUP( word, 0 )
 #define _DEBUG_SHOW( word ) _Debugger_PostShow ( _Debugger_, word ) ; //, token, word ) ;
 #define DEBUG_SHOW Debugger_PostShow ( _Debugger_ ) ; //, token, word ) ;
 #define DEBUG_INTRNAL_ON SetState ( _Debugger_, DBG_INTERNAL_ON, true ) 
 #define DEBUG_INTRNAL_OFF SetState ( _Debugger_, DBG_INTERNAL_ON, false ) 
 #define DBI GetState ( _Debugger_, DBG_INTERNAL_ON ) 
+#define DBI_N( n ) (GetState ( _Debugger_, DBG_INTERNAL_ON ) && ( _Q_->Verbosity > 3 ) )
 #define DBI_ON DEBUG_INTRNAL_ON
 #define DBI_OFF DEBUG_INTRNAL_OFF
 

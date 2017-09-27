@@ -7,16 +7,6 @@ _Word_Run ( Word * word )
     {
         word->W_InitialRuntimeDsp = Dsp ;
         _Context_->CurrentlyRunningWord = word ;
-#if 0        
-        if ( DBI )
-        {
-            if ( ! ( word->CAttribute & CPRIMITIVE ) )
-            {
-                _Printf ( ( byte* ) "\n_Word_Run :: word = %s", Word_Info ( word ) ) ;
-                _Debugger_Disassemble ( _Debugger_, ( byte* ) word->Definition, 256, 1 ) ;
-            }
-        }
-#endif        
         _Block_Eval ( word->Definition ) ;
     }
 }
@@ -26,13 +16,7 @@ Word_Run ( Word * word )
 {
     if ( ! sigsetjmp ( _Context_->JmpBuf0, 0 ) )
     {
-#if 1        
         _Word_Run ( word ) ;
-#else        
-        word->W_InitialRuntimeDsp = Dsp ;
-        _Context_->CurrentlyRunningWord = word ;
-        _Block_Eval ( word->Definition ) ;
-#endif        
     }
     else Dsp = _CfrTil_->SaveDsp ;
 }
@@ -45,18 +29,7 @@ Word_Eval0 ( Word * word )
         word->Coding = Here ;
         if ( ( word->CAttribute & IMMEDIATE ) || ( ! CompileMode ) )
         {
-#if 1           
             Word_Run ( word ) ;
-#else            
-            if ( ! sigsetjmp ( _Context_->JmpBuf0, 0 ) )
-            {
-                //_Word_Run ( Word * word )
-                word->W_InitialRuntimeDsp = Dsp ;
-                _Context_->CurrentlyRunningWord = word ;
-                word->Definition ( ) ;
-            }
-            else Dsp = _CfrTil_->SaveDsp ;
-#endif            
         }
         else
         {
@@ -90,7 +63,7 @@ _Word_Eval ( Word * word )
         word->W_SC_WordIndex = _CfrTil_->SC_ScratchPadIndex ;
         if ( Is_DebugModeOn ) _Word_Eval_Debug ( word ) ;
         else Word_Eval0 ( word ) ;
-        if ( word->CAttribute & DEBUG_WORD ) DefaultColors ; // reset colors after a debug word
+        //if ( word->CAttribute & DEBUG_WORD ) DefaultColors ; // reset colors after a debug word //?? have debug word do this - cleanup its own mess !!
         _CfrTil_SetStackPointerFromDsp ( _CfrTil_ ) ;
     }
 }

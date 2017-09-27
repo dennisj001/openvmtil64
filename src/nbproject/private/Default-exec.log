@@ -996,7 +996,6 @@ called: gcc
 	primitives/dataObjectNews.o
 	-o
 	cfrtil-gdb
-	-L../lib
 	-L/usr/local/lib
 	-ludis86
 	-lrt
@@ -1012,7 +1011,7 @@ called: /usr/bin/ld
 	-plugin
 	/usr/lib/gcc/x86_64-linux-gnu/7/liblto_plugin.so
 	-plugin-opt=/usr/lib/gcc/x86_64-linux-gnu/7/lto-wrapper
-	-plugin-opt=-fresolution=/tmp/cc4VSEjh.res
+	-plugin-opt=-fresolution=/tmp/ccCo43KR.res
 	-plugin-opt=-pass-through=-lgcc
 	-plugin-opt=-pass-through=-lgcc_s
 	-plugin-opt=-pass-through=-lc
@@ -1037,7 +1036,6 @@ called: /usr/bin/ld
 	/usr/lib/gcc/x86_64-linux-gnu/7/../../../x86_64-linux-gnu/Scrt1.o
 	/usr/lib/gcc/x86_64-linux-gnu/7/../../../x86_64-linux-gnu/crti.o
 	/usr/lib/gcc/x86_64-linux-gnu/7/crtbeginS.o
-	-L../lib
 	-L/usr/local/lib
 	-L/usr/lib/gcc/x86_64-linux-gnu/7
 	-L/usr/lib/gcc/x86_64-linux-gnu/7/../../../x86_64-linux-gnu

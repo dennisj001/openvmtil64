@@ -106,16 +106,16 @@ _Debugger_InterpreterLoop ( Debugger * debugger )
 }
 
 void
-_Debugger_PreSetup ( Debugger * debugger, Word * word )
+_Debugger_PreSetup ( Debugger * debugger, Word * word, int8 forceFlag )
 {
     if ( Is_DebugModeOn )
     {
-        if ( GetState ( debugger, DBG_EVAL_AUTO_MODE ) || ( ! GetState ( debugger, DBG_AUTO_MODE | DBG_STEPPING ) ) )
+        if ( forceFlag || GetState ( debugger, DBG_EVAL_AUTO_MODE ) || ( ! GetState ( debugger, DBG_AUTO_MODE | DBG_STEPPING ) ) )
         {
             if ( ! word ) word = _Context_->CurrentlyRunningWord ;
             if ( word && ( ! word->W_OriginalWord ) ) word->W_OriginalWord = word ;
             debugger->w_Word = word ;
-            if ( word && word->Name[0] && ( word != debugger->LastSetupWord ) )
+            if ( word && word->Name[0] && ( forceFlag || ( word != debugger->LastSetupWord ) ) )
             {
                 if ( ! word->Name ) word->Name = ( byte* ) "" ;
                 SetState ( debugger, DBG_COMPILE_MODE, CompileMode ) ;

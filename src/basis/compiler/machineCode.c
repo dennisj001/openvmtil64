@@ -213,25 +213,14 @@ _Compile_InstructionX86 ( int8 opCode, int8 mod, int8 reg, int8 rm, int8 control
 void
 _Compile_InstructionX64 ( int8 rex, int8 opCode, int8 modRm, int64 controlFlag, int8 sib, int64 disp, int8 dispSize, int64 imm, int8 immSize )
 {
-    //Set_SCA (0) ;
-#define dbgON 1   
-#if dbgON     
     d1 ( byte * here = Here ) ;
-#endif    
-    if ( DBI ) _Printf ((byte*)"\nHere = 0x%016lx : rex = 0x%x", Here, rex) ;
     if ( rex ) _Compile_Int8 ( rex ) ;
-    if ( DBI ) _Printf ((byte*)"\nHere = 0x%016lx : opCode = 0x%x", Here, opCode) ;
     _Compile_Int8 ( ( byte ) opCode ) ;
-    if ( DBI ) _Printf ((byte*)"\nHere = 0x%016lx : modRm = 0x%x", Here, modRm) ;
     if ( controlFlag & MODRM_B ) _Compile_Int8 ( modRm ) ;
-    //if ( DBI ) _Printf ((byte*)"\nHere = 0x%016lx : rex = 0x%x", Here, rex) ;
     if ( controlFlag & SIB_B ) _Compile_Int8 ( sib ) ;
-    if ( DBI ) _Printf ((byte*)"\nHere = 0x%016lx : disp = 0x%016lx : dispSize = %d", Here, disp, dispSize) ;
     if ( controlFlag & DISP_B ) _Compile_ImmDispData ( disp, dispSize, 0 ) ;
-    if ( DBI ) _Printf ((byte*)"\nHere = 0x%016lx : imm = 0x%016lx : immSize = %d", Here, imm, immSize) ;
     if ( controlFlag & IMM_B ) _Compile_ImmDispData ( imm, immSize, controlFlag & IMM_B ) ;
     //PeepHole_Optimize ( ) ;
-#if dbgON     
     if ( DBI )
     {
         //d1 ( Word * currentWord = Compiling ? _Compiler_->CurrentWord : _Interpreter_->w_Word ) ;
@@ -239,7 +228,6 @@ _Compile_InstructionX64 ( int8 rex, int8 opCode, int8 modRm, int64 controlFlag, 
         d1 ( _Printf ( ( byte* ) "\n_Compile_InstructionX64 :: CurrentWord = %s :: location : %s :", currentWord ? ( currentWord->Name ? currentWord->Name : ( byte* ) "" ) : ( byte* ) "", Context_Location ( ) ) ) ;
         d1 ( Debugger_UdisOneInstruction ( _Debugger_, here, ( byte* ) "", ( byte* ) "" ) ; ) ;
     }
-#endif    
 }
 
 // load reg with effective address of [ mod rm sib disp ]
@@ -346,7 +334,7 @@ void
 _Compile_Group2_CL ( int64 mod, int8 regOpCode, int8 rm, int8 sib, int64 disp )
 {
     // _Compile_InstructionX86 ( opCode, mod, reg, rm, modRmImmDispFlag, sib, disp, imm, immSize )
-    _Compile_InstructionX86 ( 0xd3, mod, regOpCode, rm, REX_B | MODRM_B | (disp ? DISP_B : 0), sib, disp, 0, 0, 0 ) ;
+    _Compile_InstructionX86 ( 0xd3, mod, regOpCode, rm, REX_B | MODRM_B | ( disp ? DISP_B : 0 ), sib, disp, 0, 0, 0 ) ;
 }
 
 // some Group 3 code is UNTESTED

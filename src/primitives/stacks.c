@@ -155,38 +155,3 @@ CfrTil_PrintNDataStack_8 ( )
     _CfrTil_PrintNDataStack ( 8 ) ;
 }
 
-void
-_CfrTil_PrintDataStack ( )
-{
-    _Stack_Print ( _DataStack_, ( byte* ) "DataStack" ) ;
-}
-
-void
-CfrTil_PrintDataStack ( )
-{
-    //CfrTil_SetStackPointerFromDsp ( _CfrTil_ ) ;
-    CfrTil_SyncStackPointersFromDsp ( ) ;
-    _CfrTil_PrintDataStack ( ) ;
-}
-
-void
-CfrTil_CheckInitDataStack ( )
-{
-    CfrTil_SetStackPointerFromDsp ( _CfrTil_ ) ;
-    if ( Stack_Depth ( _DataStack_ ) < 0 )
-    {
-        _Stack_PrintHeader ( _DataStack_, ( byte* ) "DataStack" ) ;
-        _Printf ( ( byte* ) c_ad ( "\n\nError : %s : %s : Stack Underflow!" ), _Context_->CurrentlyRunningWord ? _Context_->CurrentlyRunningWord->Name : ( byte * ) "", _Context_Location ( _Context_ ) ) ;
-        _Printf ( ( byte* ) c_gd ( "\nReseting DataStack.\n" ) ) ;
-        _CfrTil_DataStack_Init ( _CfrTil_ ) ;
-        _Stack_PrintHeader ( _DataStack_, ( byte* ) "DataStack" ) ;
-    }
-    //_Printf ( ( byte* ) "\n" ) ;
-}
-
-void
-CfrTil_DataStack_Size ( )
-{
-    _DataStack_Push ( DataStack_Depth ( ) ) ;
-}
-

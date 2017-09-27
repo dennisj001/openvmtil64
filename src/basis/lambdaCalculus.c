@@ -1157,17 +1157,15 @@ _LO_Apply_ArgList ( ListObject * l0, Word * word, int64 applyRtoL )
         int64 scwi = l0->W_SC_ScratchPadIndex ;
         word->W_SC_ScratchPadIndex = scwi ;
         word = Compiler_CopyDuplicatesAndPush ( word ) ;
-        DEBUG_SETUP ( word ) ;
         cntx->CurrentlyRunningWord = word ;
         Compile_Call ( ( byte* ) word->Definition ) ;
         if ( i > 0 ) Compile_ADDI ( REG, RSP, 0, i * sizeof (int64 ), 0 ) ;
         if ( ! svcm )
         {
-            DEBUG_SHOW ;
-            //_DEBUG_SHOW ( word ) ;
-            DEBUG_SETUP ( word ) ;
             CfrTil_EndBlock ( ) ;
             Set_CompilerSpace ( scs ) ;
+            _DEBUG_SHOW ( word ) ;
+            _DEBUG_SETUP ( word, 1 ) ;
             if ( Is_DebugModeOn )
             {
                 Debugger * debugger = _Debugger_ ;
@@ -1230,12 +1228,14 @@ LC_CompileRun_C_ArgList ( Word * word ) // C protocol : right to left arguments 
         //DebugShow_Off ;
         l0 = _LO_Read ( ) ;
         //DebugShow_On ;
-        Set_CompileMode ( svcm ) ; // we must have the arguments pushed and not compiled for _LO_Apply_C_Rtl_ArgList which will compile them for a C_Rtl function
         SetState ( compiler, LC_ARG_PARSING, true ) ;
+        DBI_ON ;
         _LO_Apply_A_LtoR_ArgList_For_C_RtoL ( l0, word ) ;
+        DBI_OFF ;
         LC_RestoreStackPointer ( lc ) ; // ?!? maybe we should do this stuff differently
         LC_Clear ( 1 ) ;
         SetState ( compiler, LC_ARG_PARSING | LC_C_RTL_ARG_PARSING, false ) ;
+        Set_CompileMode ( svcm ) ; // we must have the arguments pushed and not compiled for _LO_Apply_C_Rtl_ArgList which will compile them for a C_Rtl function
     }
     Lexer_SetTokenDelimiters ( lexer, svDelimiters, COMPILER_TEMP ) ;
 }

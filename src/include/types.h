@@ -464,7 +464,7 @@ typedef struct
 {
     Symbol BI_Symbol ;
     uint64 State ;
-    byte *FrameStart ;
+    byte *FrameStart, *AfterFrame ;
     byte * AfterRspSave ;
     byte *Start ;
     byte *bp_First ;

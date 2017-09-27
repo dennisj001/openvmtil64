@@ -165,7 +165,7 @@ Debugger_ShowStackChange ( Debugger * debugger, Word * word, byte * insert, byte
     b = ( char* ) Buffer_Data_Cleared ( _CfrTil_->DebugB1 ) ;
     if ( stepFlag ) sprintf ( ( char* ) b2, "0x%016lx", ( uint64 ) debugger->DebugAddress ) ;
     location = stepFlag ? ( char* ) c_gd ( b2 ) : ( char* ) Context_Location ( ) ;
-    name = word ? ( char* ) c_gd ( word->Name ) : "" ;
+    name = word ? ( char* ) c_gd ( String_ConvertToBackSlash ( word->Name ) ) : "" ;
 start:
 
     if ( GetState ( debugger, DBG_STEPPING ) ) sprintf ( ( char* ) b, "\nStack : %s at %s :> %s <: %s", insert, location, ( char* ) c_gd ( word->Name ), ( char* ) achange ) ;
@@ -256,7 +256,7 @@ _Debugger_ShowEffects ( Debugger * debugger, Word * word, int64 stepFlag )
                 {
                     if ( Dsp > debugger->SaveDsp )
                     {
-                        _Printf ( ( byte* ) "\nLiteral :> 0x%x <: was pushed onto the stack ...", TOS ) ;
+                        _Printf ( ( byte* ) "\nLiteral :> 0x%016lx <: was pushed onto the stack ...", TOS ) ;
                     }
                     else if ( Dsp < debugger->SaveDsp )
                     {
@@ -279,6 +279,8 @@ _Debugger_ShowEffects ( Debugger * debugger, Word * word, int64 stepFlag )
             DebugColors ;
             debugger->LastEffectsWord = word ;
             debugger->LastShowWord = debugger->w_Word ;
+            uint64 * dsp1 = Dsp ;
+            CfrTil_SetStackPointerFromDsp ( _CfrTil_ ) ;
         }
     }
     debugger->ShowLine = 0 ;

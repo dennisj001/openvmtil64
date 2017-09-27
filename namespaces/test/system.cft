@@ -4,12 +4,12 @@
 C 
 : sp ; //stack pause ;
 #if Zenfone2 @ not
-dlsym: printf /lib32/libc.so.6 ; void_return
+dlsym: printf /lib/x86_64-linux-gnu/libc.so.6 ; d: void_return
 printf ("\n%s\n\t%s","hello world! - parse this!?", "\tand this!")"\tand this!" ps
 // pause
-dlsym: strcmp /lib32/libc.so.6 ; //eax_return
-dlsym: sprintf /lib32/libc.so.6 ; void_return
-dlsym: printf /lib32/libc.so.6 ; void_return
+dlsym: strcmp /lib/x86_64-linux-gnu/libc.so.6 ; //eax_return
+dlsym: sprintf /lib/x86_64-linux-gnu/libc.so.6 ; void_return
+dlsym: printf /lib/x86_64-linux-gnu/libc.so.6 ; void_return
 #endif
 sp
 printf ( "\nHello world! = 0x%08x\n\n" 1234 ) 

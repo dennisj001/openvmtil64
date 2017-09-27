@@ -100,13 +100,13 @@ Debugger_SyncStackPointersFromCpuState ( Debugger * debugger )
         if ( Is_DebugModeOn && ( _Q_->Verbosity > 3 ) )
         {
             pflag = true ;
-            _Printf ( ( byte* ) "\n_Debugger_SetStackPointerFromDebuggerCpuState : stack pointer adjust ::> debugger->cs_CpuState->State = %d : Dsp = 0x%08x != cpu->Esi = 0x%08x",
+            _Printf ( ( byte* ) "\n_Debugger_SetStackPointerFromDebuggerCpuState : stack pointer adjust ::> debugger->cs_CpuState->State = %d : Dsp = 0x%016lx != cpu->R14 = 0x%016lx",
                 debugger->cs_Cpu->State, Dsp, debugger->cs_Cpu->R14d ) ;
         }
         CpuState_SyncStackPointersFromCpuState ( debugger->cs_Cpu ) ;
         if ( pflag )
         {
-            _Printf ( ( byte* ) "\n_Debugger_SetStackPointerFromDebuggerCpuState : stack pointer adjusted ::> cfrTil->DataStack->StackPointer = 0x%08x : Dsp = 0x%08x : cpu->Esi = 0x%08x\n",
+            _Printf ( ( byte* ) "\n_Debugger_SetStackPointerFromDebuggerCpuState : stack pointer adjusted ::> cfrTil->DataStack->StackPointer = 0x%016lx : Dsp = 0x%016lx : cpu->R14 = 0x%016lx\n",
                 _CfrTil_->DataStack->StackPointer, Dsp, debugger->cs_Cpu->R14d ) ;
         }
     }
@@ -116,6 +116,7 @@ Debugger_SyncStackPointersFromCpuState ( Debugger * debugger )
 void
 _CfrTil_SetStackPointerFromDsp ( CfrTil * cfrTil )
 {
+    d1 ( uint64 *dsp = Dsp ) ;
     if ( cfrTil && cfrTil->DataStack ) cfrTil->DataStack->StackPointer = Dsp ;
 }
 
@@ -126,7 +127,7 @@ CfrTil_SetStackPointerFromDsp ( CfrTil * cfrTil )
     {
         if ( ( Is_DebugModeOn || ( _Q_->Verbosity > 3 ) ) && ( cfrTil->DataStack->StackPointer != Dsp ) )
         {
-            _Printf ( ( byte* ) "\nCfrTil_SetStackPointerFromDsp : stack pointers adjust ::> DataStack->StackPointer = 0x%08x != Dsp = 0x%08x\n", cfrTil->DataStack->StackPointer, Dsp ) ;
+            _Printf ( ( byte* ) "\nCfrTil_SetStackPointerFromDsp : stack pointers adjust ::> DataStack->StackPointer = 0x%016lx != Dsp = 0x%016lx\n", cfrTil->DataStack->StackPointer, Dsp ) ;
         }
         _CfrTil_SetStackPointerFromDsp ( cfrTil ) ;
     }
@@ -153,7 +154,7 @@ _CfrTil_InitDspFromStackPointer ( CfrTil * cfrTil )
     {
         if ( Is_DebugModeOn || ( _Q_->Verbosity > 1 ) )
         {
-            _Printf ( ( byte* ) "\n_CfrTil_SetDspFromStackPointer : stack pointers adjust ::> Dsp = 0x%08x != DataStack->StackPointer = 0x%08x\n", Dsp, cfrTil->DataStack->StackPointer ) ;
+            _Printf ( ( byte* ) "\n_CfrTil_SetDspFromStackPointer : stack pointers adjust ::> Dsp = 0x%016lx != DataStack->StackPointer = 0x%016lx\n", Dsp, cfrTil->DataStack->StackPointer ) ;
         }
         Dsp = cfrTil->DataStack->StackPointer ;
     }
@@ -172,5 +173,40 @@ CfrTil_DataStack_InitEssential ( CfrTil * cfrTil )
     _Stack_Init ( stk, _Q_->DataStackSize ) ;
     _CfrTil_InitDspFromStackPointer ( cfrTil ) ;
     cfrTil->SaveDsp = Dsp ;
+}
+
+void
+_CfrTil_PrintDataStack ( )
+{
+    _Stack_Print ( _DataStack_, ( byte* ) "DataStack" ) ;
+}
+
+void
+CfrTil_PrintDataStack ( )
+{
+    //CfrTil_SetStackPointerFromDsp ( _CfrTil_ ) ;
+    CfrTil_SyncStackPointersFromDsp ( ) ;
+    _CfrTil_PrintDataStack ( ) ;
+}
+
+void
+CfrTil_CheckInitDataStack ( )
+{
+    CfrTil_SetStackPointerFromDsp ( _CfrTil_ ) ;
+    if ( Stack_Depth ( _DataStack_ ) < 0 )
+    {
+        _Stack_PrintHeader ( _DataStack_, ( byte* ) "DataStack" ) ;
+        _Printf ( ( byte* ) c_ad ( "\n\nError : %s : %s : Stack Underflow!" ), _Context_->CurrentlyRunningWord ? _Context_->CurrentlyRunningWord->Name : ( byte * ) "", _Context_Location ( _Context_ ) ) ;
+        _Printf ( ( byte* ) c_gd ( "\nReseting DataStack.\n" ) ) ;
+        _CfrTil_DataStack_Init ( _CfrTil_ ) ;
+        _Stack_PrintHeader ( _DataStack_, ( byte* ) "DataStack" ) ;
+    }
+    //_Printf ( ( byte* ) "\n" ) ;
+}
+
+void
+CfrTil_DataStack_Size ( )
+{
+    _DataStack_Push ( DataStack_Depth ( ) ) ;
 }
 

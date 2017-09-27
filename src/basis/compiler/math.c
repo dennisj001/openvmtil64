@@ -113,6 +113,7 @@ Compile_IMultiply ( Compiler * compiler )
 void
 _Compile_Divide ( Compiler * compiler, uint64 type )
 {
+    int8 reg ;
     // dividend in edx:eax, quotient/divisor in eax, remainder in edx
     int64 optFlag = CheckOptimize ( compiler, 5 ) ;
     if ( optFlag & OPTIMIZE_DONE ) return ;
@@ -126,8 +127,10 @@ _Compile_Divide ( Compiler * compiler, uint64 type )
         // Compile_IDIV ( mod, rm, sib, disp, imm, size )
         Compile_IDIV ( compiler->optInfo->Optimize_Mod, compiler->optInfo->Optimize_Rm, ( (compiler->optInfo->Optimize_Disp!=0) ? DISP_B : 0 ), 0,
             compiler->optInfo->Optimize_Disp, 0, 0 ) ;
-        _Compile_Move_Reg_To_Reg ( R8D, RAX ) ;
-        if ( type == MOD ) _Compile_Move_Reg_To_Reg ( R8D, R10D ) ; // for consistency finally use R8 so optInfo can always count on eax as the pushed reg
+        //_Compile_Move_Reg_To_Reg ( R8D, RAX ) ;
+        if ( type == MOD ) reg = RDX ; 
+        else reg = RAX ; 
+        _Compile_Move_Reg_To_Reg ( R8D, reg ) ; // for consistency finally use R8 so optInfo can always count on eax as the pushed reg
         //Word * zero = Compiler_WordStack ( 0 ) ;
         //Word * zero = Compiler_WordList ( 0 ) ;
         //zero->StackPushRegisterCode = Here ;
@@ -136,15 +139,14 @@ _Compile_Divide ( Compiler * compiler, uint64 type )
     }
     else
     {
-        int64 reg ;
         // 64 bit dividend EDX:R8 / srcReg
         // EDX holds high order bits
-        _Compile_Move_StackN_To_Reg ( R8D, DSP, - 1 ) ;
-        _Compile_MoveImm ( REG, R10D, IMM_B | REX_B | MODRM_B | DISP_B, 0, 0, 0, CELL ) ;
+        _Compile_Move_StackN_To_Reg ( RAX, DSP, - 1 ) ;
+        _Compile_MoveImm ( REG, RDX, IMM_B | REX_B | MODRM_B | DISP_B, 0, 0, 0, CELL ) ;
         Compile_IDIV ( MEM, DSP, 0, 0, 0, 0, 0 ) ;
         _Compile_Stack_DropN ( DSP, 1 ) ;
-        if ( type == MOD ) reg = R10D ; //_Compile_Move_Reg_To_Reg ( R8, EDX ) ; // for consistency finally use R8 so optInfo can always count on eax as the pushed reg
-        else reg = R8D ; //Compile_Move_R8_To_TOS ( DSP ) ;
+        if ( type == MOD ) reg = RDX ; //_Compile_Move_Reg_To_Reg ( R8, EDX ) ; // for consistency finally use R8 so optInfo can always count on eax as the pushed reg
+        else reg = RAX ; //Compile_Move_R8_To_TOS ( DSP ) ;
         _Compile_Move_Reg_To_StackN ( DSP, 0, reg ) ;
         return ;
     }

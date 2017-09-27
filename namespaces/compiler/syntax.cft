@@ -9,7 +9,7 @@ hi 14 _assert1
 s
 : hi1 ( a b | x -- x ) x = 2 + ( ( a @ ) / ( b @ ) ) * ( 3 * 4 ) ; 
 ' hi1 find wdiss
-d: 6 3 hi1 dup p 48 _assert1
+6 3 hi1 dup p 48 _assert1
 10 5 hi1 dup p 48 _assert1
 : hi2 ( a b | x -- x ) ( x = ( ( ( ( 2 + ( ( a @ ) / ( b @ ) ) ) * ( ( 3 * 4 ) ) ) ) ) ) ; 
 ' hi2 find wdiss

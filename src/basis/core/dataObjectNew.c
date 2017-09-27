@@ -134,21 +134,15 @@ _Class_Object_Init ( Word * word, Namespace * ns )
     }
     while ( ns ) ;
     int64 i ;
-    uint64 * svDsp = Dsp ;
     SetState ( _Debugger_, DEBUG_SHTL_OFF, true ) ;
     for ( i = Stack_Depth ( nsstack ) ; i > 0 ; i -- )
     {
         Word * initWord = ( Word* ) _Stack_Pop ( nsstack ) ;
-        //Dsp = svDsp ;
         DSP_Push ( ( int64 ) word->W_Object ) ;
-        //CfrTil_SyncStackPointersFromDsp ( ) ;
-        d1 ( CfrTil_PrintDataStack ( ) ) ;
-        svDsp = Dsp ;
+        d0 ( CfrTil_PrintDataStack ( ) ) ;
         _Word_Eval ( initWord ) ;
-        d1 ( CfrTil_PrintDataStack ( ) ) ;
+        d0 ( CfrTil_PrintDataStack ( ) ) ;
     }
-    //CfrTil_SyncStackPointersFromDsp ( ) ;
-    //Dsp = svDsp ; // this seems a little too presumptive -- a finer tuned stack adjust maybe be more correct
     SetState ( _Debugger_, DEBUG_SHTL_OFF, false ) ;
     DebugShow_On ;
 }
@@ -169,43 +163,6 @@ _Class_Object_New ( byte * name, uint64 category )
     _Word_Add ( word, 0, ns ) ;
     return word ;
 }
-
-#if 0
-
-Word_Class_Object_Init ( Word * word, Namespace * ns )
-{
-    //_Class_Object_Init ( ( byte* ) word->W_Value, ns ) ;
-    byte * object = word->W_Value ;
-    DebugShow_Off ;
-    Stack * nsstack = _Context_->Compiler0->NamespacesStack ;
-    Stack_Init ( nsstack ) ; // !! ?? put this in Compiler ?? !!
-    // init needs to be done by the most super class first successively down to the current class 
-    do
-    {
-        Word * initWord ;
-        if ( ( initWord = Finder_FindWord_InOneNamespace ( _Finder_, ns, ( byte* ) "init" ) ) )
-        {
-            _Stack_Push ( nsstack, ( int64 ) initWord ) ;
-        }
-        ns = ns->ContainingNamespace ;
-    }
-    while ( ns ) ;
-    int64 i ;
-    uint64 * svDsp = Dsp ;
-    //DebugShow_Off ;
-    SetState ( _Debugger_, DEBUG_SHTL_OFF, true ) ;
-    for ( i = Stack_Depth ( nsstack ) ; i > 0 ; i -- )
-    {
-        DSP_Push ( ( int64 ) word ) ;
-        Word * initWord = ( Word* ) _Stack_Pop ( nsstack ) ;
-        _Word_Eval ( initWord ) ;
-    }
-    Dsp = svDsp ; // this seems a little too presumptive -- a finer tuned stack adjust maybe be more correct
-    SetState ( _Debugger_, DEBUG_SHTL_OFF, false ) ;
-    //DebugShow_StateRestore ;
-    DebugShow_On ;
-}
-#endif
 
 Namespace *
 _Class_New ( byte * name, uint64 type, int64 cloneFlag )

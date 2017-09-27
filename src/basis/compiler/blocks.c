@@ -258,7 +258,7 @@ _CfrTil_BeginBlock1 ( BlockInfo * bi )
             Compile_InitRegisterParamenterVariables ( compiler ) ; // this function is called twice to deal with words that have locals before the first block and regular colon words
         }
 #endif    
-    bi->Start = Here ; // after _Compiler_AddLocalFrame and Compile_InitRegisterVariables
+    bi->Start = bi->AfterFrame = Here ; // after _Compiler_AddLocalFrame and Compile_InitRegisterVariables
     //SC_Global_On ;
     return bi ;
 }
@@ -309,7 +309,7 @@ _CfrTil_EndBlock1 ( BlockInfo * bi )
         }
         else
         {
-            bi->bp_First = bi->Start ;
+            bi->bp_First = bi->Start ; //bi->AfterFrame ; 
         }
     }
     _Compile_Return ( ) ;
