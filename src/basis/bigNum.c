@@ -14,7 +14,7 @@ _BigNum_New ( byte * token )
         goto retrn ;
     }
 done:
-    mpfr_init_set_si ( *bfr, (long) 0, MPFR_RNDN ) ;
+    mpfr_init_set_si ( *bfr, ( long ) 0, MPFR_RNDN ) ;
 retrn:
     return bfr ;
 }
@@ -153,25 +153,45 @@ BigNum_PopTwoOps_PushFunctionResult ( mpf2andOutFunc func )
 void
 BigNum_Add ( )
 {
-    BigNum_PopTwoOps_PushFunctionResult ( mpfr_add ) ;
+    //BigNum_PopTwoOps_PushFunctionResult ( mpfr_add ) ;
+    mpfr_t *result = _BigNum_New ( 0 ) ;
+    mpfr_t *op1 = ( mpfr_t* ) _DataStack_Pop ( ) ;
+    mpfr_t * op2 = ( mpfr_t* ) _DataStack_Pop ( ) ;
+    mpfr_add ( *result, *op2, *op1, MPFR_RNDN ) ;
+    _DataStack_Push ( ( int64 ) result ) ;
 }
 
 void
 BigNum_Multiply ( )
 {
-    BigNum_PopTwoOps_PushFunctionResult ( mpfr_mul ) ;
+    //BigNum_PopTwoOps_PushFunctionResult ( mpfr_mul ) ;
+    mpfr_t *result = _BigNum_New ( 0 ) ;
+    mpfr_t *op1 = ( mpfr_t* ) _DataStack_Pop ( ) ;
+    mpfr_t * op2 = ( mpfr_t* ) _DataStack_Pop ( ) ;
+    mpfr_mul ( *result, *op2, *op1, MPFR_RNDN ) ;
+    _DataStack_Push ( ( int64 ) result ) ;
 }
 
 void
 BigNum_Divide ( )
 {
-    BigNum_PopTwoOps_PushFunctionResult ( mpfr_div ) ;
+    //BigNum_PopTwoOps_PushFunctionResult ( mpfr_div ) ;
+    mpfr_t *result = _BigNum_New ( 0 ) ;
+    mpfr_t *op1 = ( mpfr_t* ) _DataStack_Pop ( ) ;
+    mpfr_t * op2 = ( mpfr_t* ) _DataStack_Pop ( ) ;
+    mpfr_div ( *result, *op2, *op1, MPFR_RNDN ) ;
+    _DataStack_Push ( ( int64 ) result ) ;
 }
 
 void
 BigNum_Subtract ( )
 {
-    BigNum_PopTwoOps_PushFunctionResult ( mpfr_sub ) ;
+    //BigNum_PopTwoOps_PushFunctionResult ( mpfr_sub ) ;
+    mpfr_t *result = _BigNum_New ( 0 ) ;
+    mpfr_t *op1 = ( mpfr_t* ) _DataStack_Pop ( ) ;
+    mpfr_t * op2 = ( mpfr_t* ) _DataStack_Pop ( ) ;
+    mpfr_sub ( *result, *op2, *op1, MPFR_RNDN ) ;
+    _DataStack_Push ( ( int64 ) result ) ;
 }
 
 void
@@ -195,7 +215,12 @@ BigNum_PlusEqual ( )
 }
 #else
 {
-    _BigNum_OpEqualTemplate ( mpfr_add ) ;
+    //_BigNum_OpEqualTemplate ( mpfr_add ) ;
+    mpfr_t *result = _BigNum_New ( 0 ) ;
+    mpfr_t * op2 = ( mpfr_t* ) _DataStack_Pop ( ) ;
+    mpfr_t **p_op1 = ( mpfr_t** ) _DataStack_Pop ( ) ;
+    mpfr_add ( *result, **p_op1, *op2, MPFR_RNDN ) ;
+    *p_op1 = result ;
 }
 #endif
 
@@ -209,7 +234,12 @@ BigNum_MinusEqual ( )
     *p_op1 = diff ;
 #else
 {
-    _BigNum_OpEqualTemplate ( mpfr_sub ) ;
+    //_BigNum_OpEqualTemplate ( mpfr_sub ) ;
+    mpfr_t *result = _BigNum_New ( 0 ) ;
+    mpfr_t * op2 = ( mpfr_t* ) _DataStack_Pop ( ) ;
+    mpfr_t **p_op1 = ( mpfr_t** ) _DataStack_Pop ( ) ;
+    mpfr_sub ( *result, **p_op1, *op2, MPFR_RNDN ) ;
+    *p_op1 = result ;
 }
 #endif
 
@@ -224,7 +254,12 @@ BigNum_MinusEqual ( )
     }
 #else
     {
-        _BigNum_OpEqualTemplate ( mpfr_mul ) ;
+        //_BigNum_OpEqualTemplate ( mpfr_mul ) ;
+        mpfr_t *result = _BigNum_New ( 0 ) ;
+        mpfr_t * op2 = ( mpfr_t* ) _DataStack_Pop ( ) ;
+        mpfr_t **p_op1 = ( mpfr_t** ) _DataStack_Pop ( ) ;
+        mpfr_mul ( *result, **p_op1, *op2, MPFR_RNDN ) ;
+        *p_op1 = result ;
     }
 #endif
 
@@ -241,7 +276,12 @@ BigNum_MinusEqual ( )
     }
 #else
     {
-        _BigNum_OpEqualTemplate ( mpfr_div ) ;
+        //_BigNum_OpEqualTemplate ( mpfr_div ) ;
+        mpfr_t *result = _BigNum_New ( 0 ) ;
+        mpfr_t * op2 = ( mpfr_t* ) _DataStack_Pop ( ) ;
+        mpfr_t **p_op1 = ( mpfr_t** ) _DataStack_Pop ( ) ;
+        mpfr_div ( *result, **p_op1, *op2, MPFR_RNDN ) ;
+        *p_op1 = result ;
     }
 #endif
 
