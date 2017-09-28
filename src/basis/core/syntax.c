@@ -37,7 +37,7 @@ Interpret_DoParenthesizedRValue ( )
     Compiler * compiler = cntx->Compiler0 ;
     int64 svcm = GetState ( compiler, COMPILE_MODE ) ;
     byte * token ;
-    CfrTil_WordList_Pop ( ) ; // drop the '(' 
+    CfrTil_WordList_PopNode ( ) ; // drop the '(' 
     while ( 1 )
     {
         token = _Lexer_ReadToken ( cntx->Lexer0, 0 ) ;
@@ -170,7 +170,7 @@ _CfrTil_C_Infix_EqualOp ( Word * opWord )
     int64 scrli = word ? word->W_StartCharRlIndex : 0 ; //, svOOState = GetState ( _CfrTil_, OPTIMIZE_ON ) ;
     byte * svName, * token ;
     SetState ( compiler, C_INFIX_EQUAL, true ) ;
-    _CfrTil_WordLists_PopWords ( 2 ) ;
+    _CfrTil_WordList_PopWords ( 2 ) ;
     d1 ( if ( Is_DebugModeOn ) Compiler_Show_WordList ( "\nCfrTil_C_Infix_Equal : before interpret until ',' or ';' :" ) ) ;
     if ( GetState ( compiler, C_COMBINATOR_LPAREN ) ) token = _Interpret_Until_Token ( _Context_->Interpreter0, ( byte* ) ")", 0 ) ;
     else token = _Interpret_C_Until_EitherToken ( interp, ( byte* ) ";", ( byte* ) ",", ( byte* ) " \n\r\t" ) ;
@@ -184,7 +184,7 @@ _CfrTil_C_Infix_EqualOp ( Word * opWord )
         }
         else
         {
-            _CfrTil_WordLists_PushWord ( lhsWord ) ;
+            _CfrTil_WordList_PushWord ( lhsWord ) ;
             d1 ( if ( Is_DebugModeOn ) Compiler_Show_WordList ( "\nCfrTil_C_Infix_Equal : after interpret until ';' :" ) ) ;
         }
         word = _CfrTil_->StoreWord ;

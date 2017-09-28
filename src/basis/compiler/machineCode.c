@@ -63,6 +63,13 @@
 // --------------------------------------
 
 int8
+RegOrder ( int8 n )
+{
+    int8 regOrder [] = { RDI, RSI, RDX, RCX, R8D, R9D } ;
+    return regOrder [n] ;
+}
+
+int8
 CalculateModRegardingDisplacement ( int64 mod, int64 disp )
 {
     // mod reg r/m bits :
@@ -225,7 +232,8 @@ _Compile_InstructionX64 ( int8 rex, int8 opCode, int8 modRm, int64 controlFlag, 
     {
         //d1 ( Word * currentWord = Compiling ? _Compiler_->CurrentWord : _Interpreter_->w_Word ) ;
         d1 ( Word * currentWord = _Interpreter_->w_Word ) ;
-        d1 ( _Printf ( ( byte* ) "\n_Compile_InstructionX64 :: CurrentWord = %s :: location : %s :", currentWord ? ( currentWord->Name ? currentWord->Name : ( byte* ) "" ) : ( byte* ) "", Context_Location ( ) ) ) ;
+        d1 ( _Printf ( ( byte* ) "\n_Compile_InstructionX64 :: CurrentWord = %s :: location : %s :",
+            currentWord ? ( currentWord->Name ? String_ConvertToBackSlash ( currentWord->Name ) : ( byte* ) "" ) : ( byte* ) "", Context_Location ( ) ) ) ;
         d1 ( Debugger_UdisOneInstruction ( _Debugger_, here, ( byte* ) "", ( byte* ) "" ) ; ) ;
     }
 }
@@ -419,8 +427,9 @@ _Compile_MoveImm ( int8 direction, int8 rm, int8 controlFlag, int8 sib, int64 di
         if ( direction == MEM )
         {
             // there is no x64 instruction to move imm64 to mem directly
-            _Compile_MoveImm_To_Reg ( R11D, imm, immSize ) ;
-            _Compile_Move_Reg_To_Rm ( rm, R11D, disp ) ;
+            int8 thruReg = R11D ;
+            _Compile_MoveImm_To_Reg ( thruReg, imm, immSize ) ; // thruReg : R11D : needs to be a parameter
+            _Compile_Move_Reg_To_Rm ( rm, thruReg, disp ) ;
         }
         else
         {
@@ -472,6 +481,13 @@ _Compile_MoveMem_ToReg_ThruReg ( int8 reg, byte * address, int8 iSize, int8 thru
 {
     _Compile_MoveImm_To_Reg ( thruReg, ( int64 ) address, iSize ) ;
     _Compile_Move_Rm_To_Reg ( reg, thruReg, 0 ) ;
+}
+
+void
+_Compile_MoveImm_ToReg_ThruReg ( int8 reg, uint64 value, int8 iSize, int8 thruReg )
+{
+    _Compile_MoveImm_To_Reg ( thruReg, value, iSize ) ;
+    _Compile_Move_Reg_To_Reg ( reg, thruReg ) ;
 }
 
 void
@@ -552,9 +568,8 @@ Calculate_Address_FromOffset_ForCallOrJump ( byte * address )
         offset = * ( ( int32 * ) ( address + 2 ) ) ;
         iaddress = address + offset + 2 + INT32_SIZE ;
     }
-    else if ( ( * address == 0x49 ) && ( * ( address + 1 ) == 0xff ) )
+    else if ( ( ( * address == 0x49 ) || ( * address == 0x48 ) )&& ( * ( address + 1 ) == 0xff ) )
     {
-        //offset = * ( ( int64 * ) ( address - 8 ) ) ;
         iaddress = ( byte* ) ( * ( ( uint64* ) ( address - CELL ) ) ) ; // 3 : sizeof x64 call insn 
     }
     return iaddress ;
@@ -689,18 +704,15 @@ Compile_Call_ToAddressThruReg ( byte * address, int8 reg )
 }
 
 void
+_Compile_Call ( byte * callAddr, int8 reg )
+{
+    Compile_Call_ToAddressThruReg ( callAddr, reg ) ; // x64
+}
+
+void
 Compile_Call ( byte * callAddr )
 {
-#if 0    
-    if ( NamedByteArray_CheckAddress ( _Q_CodeSpace, callAddr ) )
-    {
-        int32 offset = _CalculateOffsetForCallOrJump ( Here + 1, callAddr, INT32_SIZE ) ;
-        //_Compile_InstructionX86 ( int8 opCode, int8 mod, int8 reg, int8 rm, int8 controlFlag, int8 sib, int64 disp, int64 imm, int8 dispSize, int immSize )
-        _Compile_InstructionX86 ( CALLI32, 0, 0, 0, DISP_B, 0, offset, INT32_SIZE, 0, 0 ) ;
-    }
-    //else 
-#endif    
-    Compile_Call_ToAddressThruReg ( callAddr, R8D ) ; // x64
+    _Compile_Call ( callAddr, R8D ) ;
 }
 
 void
@@ -737,7 +749,7 @@ _Compile_PushReg ( int8 reg )
 #if dbgON_5    
     d1 ( byte * here = Here ) ;
 #endif    
-    if ( reg < 8 )
+    if ( reg < 8 ) // can't push R8-R15 ??
     {
         _Compile_Int8 ( 0x40 ) ;
         _Compile_Int8 ( 0x50 + reg ) ;

@@ -163,13 +163,13 @@ CfrTil_Alias ( )
     byte * name = ( byte* ) _DataStack_Pop ( ) ;
     _CfrTil_Alias ( word, name ) ;
 }
-
+#if 0
 void
-CfrTil_Eval_C_Rtl_ArgList ( ) // C protocol : right to left arguments from a list pushed on the stack
+CfrTil_Eval_C_Rtl_ArgList ( ) // C : x86 : ABI = 32 : protocol : right to left arguments from a list pushed on the stack
 {
     LC_CompileRun_C_ArgList ( ( Word * ) _DataStack_Pop ( ) ) ;
 }
-
+#endif
 void
 CfrTil_TextMacro ( )
 {

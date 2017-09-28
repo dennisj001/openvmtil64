@@ -316,7 +316,7 @@ _CfrTil_Do_Literal ( Word * word )
     else
     {
         if ( word->CAttribute & T_STRING | T_RAW_STRING ) DSP_Push ( word->W_PtrValue ) ;
-        else DSP_Push ( * word->W_PtrToValue ) ;
+        else DSP_Push ( word->W_Value ) ;
 
     }
 }

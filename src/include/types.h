@@ -45,12 +45,12 @@ typedef struct
     } ;
     uint64 T_WordAttribute ;
     uint64 T_WAllocationType ;
-} CfrTilPropInfo, PropInfo, AttributeInfo, PI ;
+} CfrTilPropInfo, AttributeInfo, AttributeInfo, PI ;
 typedef struct
 {
     union
     {
-        PropInfo O_Attribute ;
+        AttributeInfo O_Attributes ;
         type O_type ; // for future dynamic types and dynamic objects 
     } ;
     union
@@ -133,7 +133,7 @@ typedef struct
     } ;
     union
     {
-        PropInfo n_Attribute ;
+        AttributeInfo n_Attributes ;
         type n_type ; // for future dynamic types and dynamic objects 
     } ;
 } _DLNode, _Node, _listNode, _List ;
@@ -160,7 +160,7 @@ typedef struct
             } ;
             union
             {
-                PropInfo n_Attribute ;
+                AttributeInfo n_Attributes ;
                 type n_type ; // for future dynamic types and dynamic objects 
             } ;
 
@@ -247,15 +247,15 @@ typedef struct _Identifier
 #define S_After S_Cdr
 #define S_Before S_Car
 #define S_CurrentNode n_CurrentNode
-#define S_AAttribute S_Node.n_Attribute.T_AAttribute
-#define S_CAttribute S_Node.n_Attribute.T_CAttribute
-#define S_CAttribute2 S_Node.n_Attribute.T_CAttribute2
-#define S_CAttribute0 S_Node.n_Attribute.T_CAttribute0
-#define S_WAttribute S_Node.n_Attribute.T_WordAttribute
-#define S_WAllocType S_Node.n_Attribute.T_WAllocationType
-#define S_LAttribute S_Node.n_Attribute.T_LAttribute
-#define S_Size S_Node.n_Attribute.T_Size
-#define S_ChunkSize S_Node.n_Attribute.T_ChunkSize
+#define S_AAttribute S_Node.n_Attributes.T_AAttribute
+#define S_CAttribute S_Node.n_Attributes.T_CAttribute
+#define S_CAttribute2 S_Node.n_Attributes.T_CAttribute2
+#define S_CAttribute0 S_Node.n_Attributes.T_CAttribute0
+#define S_WAttribute S_Node.n_Attributes.T_WordAttribute
+#define S_WAllocType S_Node.n_Attributes.T_WAllocationType
+#define S_LAttribute S_Node.n_Attributes.T_LAttribute
+#define S_Size S_Node.n_Attributes.T_Size
+#define S_ChunkSize S_Node.n_Attributes.T_ChunkSize
 //#define S_Name S_Name 
 #define S_NumberOfSlots S_Size
 #define S_Pointer W_Value
@@ -697,7 +697,7 @@ typedef struct _Debugger
     byte * PreHere, *StartHere, *LastDisStart, *ShowLine, * Filename ;
     Stack *DebugStack ;
     Cpu * cs_Cpu ;
-    byte* DebugAddress, *CopyRSP, *LastSourceCodeAddress ;
+    byte* DebugAddress, *CopyRSP, *CopyRBP, *LastSourceCodeAddress ;
     uint64 * DebugRSP, *DebugRBP, *DebugRSI, *DebugRDI, * LastRsp ; //, *SavedIncomingESP, *SavedIncomingEBP ; //, SavedRunningESP, SavedRunningEBP;
     int64 LastSourceCodeIndex, TerminalLineWidth ;
     ByteArray * StepInstructionBA ;

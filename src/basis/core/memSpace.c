@@ -382,6 +382,7 @@ OVT_CheckRecyclableAllocate ( dllist * list, int64 size )
 void
 Word_Recycle ( Word * w )
 {
+    d0 ( IsIt_C_LeftParen ( w ) ) ;
     if ( w ) dllist_AddNodeToHead ( _Q_->MemorySpace0->RecycledWordList, ( dlnode* ) w ) ;
 }
 
@@ -393,7 +394,7 @@ _CheckRecycleWord ( Word * w )
         if ( ! ( IsSourceCodeOn && w->State & W_SOURCE_CODE_MODE ) )
         {
             d0 ( _Printf ( ( byte* ) "\nrecycling : %s", w->Name ) ) ;
-            d0 ( if ( String_Equal ( w->Name, "power" ) ) _Printf ( "\nRecycle : Got it! : %s\n", w->Name ) ) ;
+            d0 ( if ( String_Equal ( w->Name, "(" ) ) _Printf ( "\nRecycle : Got it! : %s\n", w->Name ) ) ;
             Word_Recycle ( w ) ;
         }
     }
@@ -415,9 +416,9 @@ DLList_RecycleWordList ( dllist * list )
 }
 
 void
-CheckCodeSpaceForRoom ()
+CheckCodeSpaceForRoom ( )
 {
-    if ( _Q_CodeByteArray->OurNBA->ba_CurrentByteArray->MemRemaining < ( 1 * K ) )  
+    if ( _Q_CodeByteArray->OurNBA->ba_CurrentByteArray->MemRemaining < ( 1 * K ) )
         _Q_CodeByteArray = _ByteArray_AppendSpace_MakeSure ( _Q_CodeByteArray, 1 * K ) ;
 }
 

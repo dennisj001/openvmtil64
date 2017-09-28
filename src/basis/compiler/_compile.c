@@ -168,7 +168,7 @@ _Compile_GetVarLitObj_RValue_To_Reg ( Word * word, int64 reg )
     }
     else if ( word->CAttribute & ( LITERAL | CONSTANT | OBJECT | THIS ) )
     {
-        _Compile_Move_Literal_Immediate_To_Reg ( reg, ( int64 ) *word->W_PtrToValue ) ;
+        _Compile_Move_Literal_Immediate_To_Reg ( reg, ( int64 ) word->W_Value ) ;
     }
     else SyntaxError ( QUIT ) ;
     if ( word->CAttribute & ( OBJECT | THIS ) )

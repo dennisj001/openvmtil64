@@ -1,5 +1,52 @@
 #include "../../include/cfrtil.h"
 
+void
+_CfrTil_SingleQuote ( int64 findWordFlag )
+{
+    ReadLiner * rl = _ReadLiner_ ;
+    Word *word, * sqWord = _CfrTil_WordList_TopWord ( ) ;
+    char buffer [5] ;
+    byte c, c0, c2 = 0, c1, c3 ;
+    uint64 charLiteral = 0 ;
+
+    if ( sqWord && sqWord->Name[0] == '\'' && ( ( c2 = _ReadLine_PeekIndexedChar ( rl, 1 ) == '\'' ) || ( c1 = _ReadLine_PeekIndexedChar ( rl, 0 ) == '\\' ) ) )// parse a char type, eg. 'c' 
+    {
+        // notation :: c0 = original ' ; c1 = next char, etc.
+        buffer[0] = '\'' ;
+        buffer[1] = c1 ;
+        c1 = _ReadLine_GetNextChar ( rl ) ;
+        c2 = _ReadLine_GetNextChar ( rl ) ;
+        if ( c1 == '\\' )
+        {
+            c3 = _ReadLine_GetNextChar ( rl ) ; // the closing '\''
+            if ( c2 == 't' ) charLiteral = 0x9 ;
+            else if ( c2 == 'n' ) charLiteral = 0xa ;
+            else if ( c2 == 'r' ) charLiteral = 0xd ;
+            else if ( c2 == 'b' ) charLiteral = 0x8 ;
+            buffer[2] = c2 ;
+            buffer[3] = '\'' ; // c3
+            buffer[4] = 0 ;
+        }
+        else
+        {
+            charLiteral = c1 ;
+            buffer[2] = '\'' ; // c2
+            buffer[3] = 0 ;
+        }
+done:
+        //Word * word0 = _CfrTil_WordList_Top ( ) ;
+        CfrTil_WordLists_PopWord ( ) ; // pop the "'" token
+        word = _DObject_New ( buffer, charLiteral, LITERAL | CONSTANT | IMMEDIATE, 0, LITERAL, ( byte* ) _DataObject_Run, 0, 0, 0, TEMPORARY ) ;
+        _Interpreter_DoWord ( _Interpreter_, word, _Lexer_->TokenStart_ReadLineIndex ) ;
+        //DebugWordList_Show ( ) ;
+    }
+    else
+    {
+        CfrTil_Token ( ) ;
+        _Tick ( _Context_, findWordFlag ) ;
+    }
+}
+
 // assuming we are using "Class" namespace
 // syntax : ':{' ( classId identifer ( '[' integer ']' )* ';' ? )* '};'
 
@@ -286,7 +333,7 @@ Lexer_ParseAsAString ( Lexer * lexer )
         lexer->TokenType = ( T_STRING | KNOWN_OBJECT ) ;
         lexer->LiteralString = _String_UnBox ( lexer->OriginalToken ) ;
     }
-    else if ( ( lexer->OriginalToken [ 0 ] == '\'' ) && ( strlen ( lexer->OriginalToken  ) > 1 ) )
+    else if ( ( lexer->OriginalToken [ 0 ] == '\'' ) && ( strlen ( lexer->OriginalToken ) > 1 ) )
     {
         //char buffer [4] ; buffer[0]= '\'' ; buffer[1]= lexer->OriginalToken [ 1 ] ; buffer[2]= '\'' ; buffer[3]= 0 ;
         lexer->TokenType = ( T_CHAR | KNOWN_OBJECT ) ;
@@ -354,25 +401,25 @@ void
 _Lexer_ParseHex ( Lexer * lexer, byte * token )
 {
     // use 0d format for decimal numbers with hex NumberBase state
-    if ( sscanf ( ( char* ) token, INT_FRMT_FOR_HEX, ( int64* ) &lexer->Literal ) )
+    if ( sscanf ( ( char* ) token, INT_FRMT_FOR_HEX, ( int64* ) & lexer->Literal ) )
     {
         lexer->TokenType = ( T_INT | KNOWN_OBJECT ) ;
         SetState ( lexer, KNOWN_OBJECT, true ) ;
         Lexer_ParseBigNum ( lexer, token ) ;
     }
-    else if ( sscanf ( ( char* ) token, HEX_INT_FRMT, ( uint64* ) &lexer->Literal ) )
+    else if ( sscanf ( ( char* ) token, HEX_INT_FRMT, ( uint64* ) & lexer->Literal ) )
     {
         lexer->TokenType = ( T_INT | KNOWN_OBJECT ) ;
         SetState ( lexer, KNOWN_OBJECT, true ) ;
         Lexer_ParseBigNum ( lexer, token ) ;
     }
-    else if ( sscanf ( ( char* ) token, HEX_UINT_FRMT, ( uint64* ) &lexer->Literal ) )
+    else if ( sscanf ( ( char* ) token, HEX_UINT_FRMT, ( uint64* ) & lexer->Literal ) )
     {
         lexer->TokenType = ( T_INT | KNOWN_OBJECT ) ;
         SetState ( lexer, KNOWN_OBJECT, true ) ;
         Lexer_ParseBigNum ( lexer, token ) ;
     }
-    else if ( sscanf ( ( char* ) token, LISP_HEX_FRMT, ( uint64* ) &lexer->Literal ) )
+    else if ( sscanf ( ( char* ) token, LISP_HEX_FRMT, ( uint64* ) & lexer->Literal ) )
     {
         lexer->TokenType = ( T_INT | KNOWN_OBJECT ) ;
         SetState ( lexer, KNOWN_OBJECT, true ) ;
@@ -386,25 +433,25 @@ _Lexer_ParseDecimal ( Lexer * lexer, byte * token )
 {
     float f ;
     // use 0x format for hex numbers with decimal NumberBase state
-    if ( sscanf ( ( char* ) token, HEX_UINT_FRMT, ( uint64* ) &lexer->Literal ) )
+    if ( sscanf ( ( char* ) token, HEX_UINT_FRMT, ( uint64* ) & lexer->Literal ) )
     {
         lexer->TokenType = ( T_INT | KNOWN_OBJECT ) ;
         SetState ( lexer, KNOWN_OBJECT, true ) ;
         Lexer_ParseBigNum ( lexer, token ) ;
     }
-    else if ( sscanf ( ( char* ) token, INT_FRMT_FOR_HEX, ( int64* ) &lexer->Literal ) )
+    else if ( sscanf ( ( char* ) token, INT_FRMT_FOR_HEX, ( int64* ) & lexer->Literal ) )
     {
         lexer->TokenType = ( T_INT | KNOWN_OBJECT ) ;
         SetState ( lexer, KNOWN_OBJECT, true ) ;
         Lexer_ParseBigNum ( lexer, token ) ;
     }
-    else if ( sscanf ( ( char* ) token, INT_FRMT, ( int64* ) &lexer->Literal ) )
+    else if ( sscanf ( ( char* ) token, INT_FRMT, ( int64* ) & lexer->Literal ) )
     {
         lexer->TokenType = ( T_INT | KNOWN_OBJECT ) ;
         SetState ( lexer, KNOWN_OBJECT, true ) ;
         Lexer_ParseBigNum ( lexer, token ) ;
     }
-    else if ( sscanf ( ( char* ) token, LISP_DECIMAL_FRMT, ( int64* ) &lexer->Literal ) )
+    else if ( sscanf ( ( char* ) token, LISP_DECIMAL_FRMT, ( int64* ) & lexer->Literal ) )
     {
         lexer->TokenType = ( T_INT | KNOWN_OBJECT ) ;
         SetState ( lexer, KNOWN_OBJECT, true ) ;

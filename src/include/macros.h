@@ -232,9 +232,9 @@
 #define Is_DebugShowOn ( _CfrTil_ && GetState ( _CfrTil_, _DEBUG_SHOW_ ) ) 
 #define _Is_DebugOn GetState ( _CfrTil_, _DEBUG_SHOW_ )
 #define Is_DebugOn (Is_DebugShowOn && Is_DebugModeOn)
-#define _DEBUG_SETUP( word, forceFlag ) if ( word && Is_DebugModeOn) _Debugger_PreSetup ( _Debugger_, word, forceFlag ) ;
+#define _DEBUG_SETUP( word, forceFlag ) if ( forceFlag || (word && Is_DebugModeOn)) _Debugger_PreSetup ( _Debugger_, word, forceFlag ) ;
 #define DEBUG_SETUP( word ) _DEBUG_SETUP( word, 0 )
-#define _DEBUG_SHOW( word ) _Debugger_PostShow ( _Debugger_, word ) ; //, token, word ) ;
+#define _DEBUG_SHOW( word, force ) _Debugger_PostShow ( _Debugger_, word, force ) ; //, token, word ) ;
 #define DEBUG_SHOW Debugger_PostShow ( _Debugger_ ) ; //, token, word ) ;
 #define DEBUG_INTRNAL_ON SetState ( _Debugger_, DBG_INTERNAL_ON, true ) 
 #define DEBUG_INTRNAL_OFF SetState ( _Debugger_, DBG_INTERNAL_ON, false ) 
@@ -272,7 +272,7 @@
 #define DbgWL_Node_SetCodeAddress( dobj, address ) dobject_Set_M_Slot( dobj, 1, adress ) 
 #define DbgWL_Push( node ) DebugWordList_Push( node )  
 #define Node_New_ForDebugWordList( allocType, scindex, word ) _dobject_New_M_Slot_Node ( allocType, WORD_LOCATION, 3, 0, scindex, word ) 
-#define CompilerWordList_Push( word, dnode ) _dllist_Push_M_Slot_Node ( _Compiler_->WordList, WORD, TEMPORARY, 2, ((int64) word), ((int64) dnode) )
+#define CompilerWordList_Push( word ) _dllist_Push_M_Slot_Node ( _Compiler_->WordList, WORD, TEMPORARY, 1, ((int64) word) )
 #define IsGlobalsSourceCodeOn ( GetState ( _CfrTil_, GLOBAL_SOURCE_CODE_MODE ))
 #define _IsSourceCodeOn ( GetState ( _CfrTil_, DEBUG_SOURCE_CODE_MODE ) )
 #define IsSourceCodeOn ( _IsSourceCodeOn || IsGlobalsSourceCodeOn )

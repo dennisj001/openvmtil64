@@ -229,32 +229,31 @@ _CfrTil_AdjustSourceCodeAddress ( byte * address, byte * newAddress )
 }
 
 void
-_CfrTil_WordLists_PushWord ( Word * word )
+_CfrTil_WordList_PushWord ( Word * word )
 {
 
     dobject * dobj = 0 ;
     //if ( _IsSourceCodeOn ) dobj = DebugWordList_PushWord ( word ) ;
-    CompilerWordList_Push ( word, dobj ) ; // _dllist_Push_M_Slot_Node ( _Compiler_->WordList, WORD, COMPILER_TEMP, 2, ((int64) word), ((int64) dnode) )
-    d0 ( Word * sqWord = _CfrTil_WordList_Top ( ) ) ;
+    CompilerWordList_Push ( word ) ; // _dllist_Push_M_Slot_Node ( _Compiler_->WordList, WORD, COMPILER_TEMP, 2, ((int64) word), ((int64) dnode) )
+    d0 ( Word * sqWord = _CfrTil_WordList_TopWord ( ) ) ;
     d0 ( _Printf ( ( byte* ) "\n_Compiler_CopyDuplicatesAndPush : %s", sqWord->Name ) ) ;
 }
 
 Word *
-_CfrTil_WordList_Top ( )
+_CfrTil_WordList_TopWord ( )
 {
     Word * word = 0 ;
     node * first = _dllist_First ( _Compiler_->WordList ) ;
-    //return (Word *) first ; 
     if ( first ) word = ( Word* ) dobject_Get_M_Slot ( first, CWLN_WORD ) ;
-
     return word ;
 }
 
-void
-CfrTil_WordList_Pop ( )
+node *
+CfrTil_WordList_PopNode ( )
 {
-    node * first = ( node* ) _CfrTil_WordList_Top ( ) ;
+    node * first = _dllist_First ( _Compiler_->WordList ) ;
     if ( first ) dlnode_Remove ( first ) ;
+    return first ;
 }
 
 /*
@@ -266,12 +265,11 @@ CfrTil_WordList_Pop ( )
  * 
  */
 void
-_CfrTil_WordLists_PopWords ( int64 n )
+_CfrTil_WordList_PopWords ( int64 n )
 {
     while ( n -- )
     {
-
-        CfrTil_WordList_Pop ( ) ;
+        CfrTil_WordList_PopNode ( ) ;
         //CfrTil_DebugWordList_Pop ( ) ;
     }
 }
@@ -279,7 +277,7 @@ _CfrTil_WordLists_PopWords ( int64 n )
 void
 CfrTil_WordLists_PopWord ( )
 {
-    _CfrTil_WordLists_PopWords ( 1 ) ;
+    _CfrTil_WordList_PopWords ( 1 ) ;
 }
 
 void

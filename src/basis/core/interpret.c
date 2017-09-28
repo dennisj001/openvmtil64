@@ -143,6 +143,37 @@ _Interpreter_IsWordPrefixing ( Interpreter * interp, Word * word )
     return false ;
 }
 
+
+#if 0
+void
+IsIt_C_LeftParen ( Word * word )
+{
+    if ( String_Equal ( word->Name, "(" ) && String_Equal ( word->S_ContainingNamespace->Name, "C" ) )
+    {
+        _Printf ( "\nCompiler_CopyDuplicatesAndPush : \'%s.%s\' : %s\n", word->S_ContainingNamespace->Name, word->Name, Context_Location ( ) ) ;
+        Pause ( ) ;
+    }
+}
+void
+Find_C_LeftParen ( )
+{
+    Word * word = Finder_FindWord_InOneNamespace ( _Finder_, Namespace_Find ( "C" ), "(" ) ;
+    if ( word )
+    {
+        //if (String_Equal ( word->Name, "(" ) && String_Equal ( word->S_ContainingNamespace->Name, "C" ) )
+        {
+            //_Printf ( "\nFind_C_LeftParen : \'%s.%s\' : %s\n", word->S_ContainingNamespace->Name, word->Name, Context_Location ( ) ) ;
+            //Pause ( ) ;
+        }
+    }
+    else
+    {
+        _Printf ( "\nFind_C_LeftParen : can't find it at : %s\n", Context_Location ( ) ) ;
+        Pause ( ) ;
+    }
+}
+#endif
+
 Word *
 _Compiler_CopyDuplicatesAndPush ( Compiler * compiler, Word * word )
 {
@@ -158,7 +189,7 @@ _Compiler_CopyDuplicatesAndPush ( Compiler * compiler, Word * word )
     depth = List_Depth ( list ) ;
     word0 = word ; // we always push and return word1
     word0->W_OriginalWord = word0 ;
-    //word1->S_CAttribute &= ( ~RECYCLABLE_COPY ) ;
+    word0->S_CAttribute &= ( ~ RECYCLABLE_COPY ) ;
 
     for ( i = 0 ; i < depth ; i ++ )
     {
@@ -171,12 +202,13 @@ _Compiler_CopyDuplicatesAndPush ( Compiler * compiler, Word * word )
             word0->S_CAttribute |= ( uint64 ) RECYCLABLE_COPY ;
             word0->W_StartCharRlIndex = wrli ;
             word0->StackPushRegisterCode = 0 ;
+            d0( IsIt_C_LeftParen ( word ) ) ;
             break ;
         }
     }
-    _CfrTil_WordLists_PushWord ( word0 ) ;
-    d0 (Word * sqWord = _CfrTil_WordList_Top ( ) ) ;
-    d0 ( _Printf ((byte*) "\n_Compiler_CopyDuplicatesAndPush : %s", sqWord->Name ) ) ;
+    _CfrTil_WordList_PushWord ( word0 ) ;
+    d0 ( Word * sqWord = _CfrTil_WordList_TopWord ( ) ) ;
+    d0 ( _Printf ( ( byte* ) "\n_Compiler_CopyDuplicatesAndPush : %s", sqWord->Name ) ) ;
 
     return word0 ;
 }

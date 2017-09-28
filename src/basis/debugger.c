@@ -108,7 +108,7 @@ _Debugger_InterpreterLoop ( Debugger * debugger )
 void
 _Debugger_PreSetup ( Debugger * debugger, Word * word, int8 forceFlag )
 {
-    if ( Is_DebugModeOn )
+    if ( Is_DebugModeOn || forceFlag )
     {
         if ( forceFlag || GetState ( debugger, DBG_EVAL_AUTO_MODE ) || ( ! GetState ( debugger, DBG_AUTO_MODE | DBG_STEPPING ) ) )
         {
@@ -127,12 +127,6 @@ _Debugger_PreSetup ( Debugger * debugger, Word * word, int8 forceFlag )
                 debugger->SaveTOS = TOS ;
                 debugger->Token = word->Name ;
                 debugger->PreHere = Here ;
-#if 0                
-                if ( debugger->w_Word->DebugWordList && debugger->w_Word->W_SourceCode )
-                {
-                    Debugger_SetDebugWordList ( debugger ) ;
-                }
-#endif                
                 DebugColors ;
                 _Debugger_InterpreterLoop ( debugger ) ; // core of this function
                 DefaultColors ;
@@ -146,23 +140,23 @@ _Debugger_PreSetup ( Debugger * debugger, Word * word, int8 forceFlag )
 }
 
 void
-_Debugger_PostShow ( Debugger * debugger, Word * word )//, byte * token, Word * word )
+_Debugger_PostShow ( Debugger * debugger, Word * word, int8 force )//, byte * token, Word * word )
 {
-    _Debugger_ShowEffects ( debugger, word, 0 ) ;
+    _Debugger_ShowEffects ( debugger, word, 0, force ) ;
     DefaultColors ;
 }
 
 void
 Debugger_PostShow ( Debugger * debugger )
 {
-    _Debugger_PostShow ( debugger, debugger->w_Word ) ;
+    _Debugger_PostShow ( debugger, debugger->w_Word, 0 ) ;
 }
 
 void
 Debugger_On ( Debugger * debugger )
 {
     _Debugger_Init ( debugger, 0, 0 ) ;
-    SetState_TrueFalse ( _Debugger_, DBG_MENU | DBG_INFO, DBG_AUTO_MODE | DBG_PRE_DONE | DBG_INTERPRET_LOOP_DONE ) ;
+    SetState_TrueFalse ( _Debugger_, DBG_MENU | DBG_INFO, DBG_STEPPING | DBG_AUTO_MODE | DBG_PRE_DONE | DBG_INTERPRET_LOOP_DONE ) ;
     debugger->StartHere = Here ;
     debugger->LastSetupWord = 0 ;
     debugger->LastSourceCodeIndex = 0 ;
@@ -267,6 +261,7 @@ _Debugger_Init ( Debugger * debugger, Word * word, byte * address )
     //Debugger_InitDebugWordList ( debugger ) ;
     debugger->CopyRSP = 0 ;
     SetState ( debugger, ( DBG_STACK_OLD ), true ) ;
+    SetState ( debugger, DBG_STEPPING, false ) ;
     Stack_Init ( debugger->DebugStack ) ;
 }
 
@@ -685,6 +680,7 @@ _Debugger_New ( uint64 type )
 
     Debugger_TableSetup ( debugger ) ;
     SetState ( debugger, DBG_INTERPRET_LOOP_DONE, true ) ;
+    SetState ( debugger, DBG_STEPPING, false ) ;
     //debugger->WordList = List_New ( ) ;
     Debugger_UdisInit ( debugger ) ;
     //int64 tw = GetTerminalWidth ( ) ;

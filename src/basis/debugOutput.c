@@ -186,15 +186,15 @@ done:
 }
 
 void
-_Debugger_ShowEffects ( Debugger * debugger, Word * word, int64 stepFlag )
+_Debugger_ShowEffects ( Debugger * debugger, Word * word, int8 stepFlag, int8 force )
 {
     debugger->w_Word = word ;
     uint64* dsp = Dsp ;
     if ( ! dsp ) CfrTil_Exception ( STACK_ERROR, QUIT ) ;
-    if ( Is_DebugShowOn && ( stepFlag || ( debugger->w_Word != debugger->LastEffectsWord ) ) )
+    if ( Is_DebugShowOn && ( force || stepFlag || ( debugger->w_Word != debugger->LastEffectsWord ) ) )
     {
         Word * word = debugger->w_Word ;
-        if ( ( stepFlag ) || ( word ) && ( word != debugger->LastEffectsWord ) )
+        if ( force || (( stepFlag ) || ( word ) && ( word != debugger->LastEffectsWord ) ))
         {
             NoticeColors ;
             if ( ( word->CAttribute & OBJECT_FIELD ) && ( ! ( word->CAttribute & DOT ) ) )
@@ -287,9 +287,9 @@ _Debugger_ShowEffects ( Debugger * debugger, Word * word, int64 stepFlag )
 }
 
 void
-Debugger_ShowEffects ( Debugger * debugger, int64 stepFlag )
+Debugger_ShowEffects ( Debugger * debugger, int8 stepFlag, int8 forceFlag )
 {
-    _Debugger_ShowEffects ( debugger, debugger->w_Word, stepFlag ) ;
+    _Debugger_ShowEffects ( debugger, debugger->w_Word, stepFlag, forceFlag ) ;
 }
 
 byte *
@@ -585,7 +585,7 @@ void
 _Debugger_DoNewlinePrompt ( Debugger * debugger )
 {
 
-    _Printf ( ( byte* ) "\n" ) ; //%s=> ", GetState ( debugger, DBG_RUNTIME ) ? ( byte* ) "<dbg>" : ( byte* ) "dbg" ) ; //, (char*) ReadLine_GetPrompt ( _Context_->ReadLiner0 ) ) ;
+    _Printf ( ( byte* ) "\n%s=> ", GetState ( debugger, DBG_RUNTIME ) ? ( byte* ) "<dbg>" : ( byte* ) "dbg" ) ; //, (char*) ReadLine_GetPrompt ( _Context_->ReadLiner0 ) ) ;
     Debugger_SetNewLine ( debugger, false ) ;
 }
 

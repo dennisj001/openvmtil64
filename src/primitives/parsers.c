@@ -8,27 +8,6 @@ CfrTil_Token ( )
 }
 
 void
-_CfrTil_SingleQuote ( int64 findWordFlag )
-{
-    Word * sqWord = _CfrTil_WordList_Top ( ) ;
-
-    if ( sqWord && sqWord->Name[0] == '\'' && ( _ReadLine_PeekIndexedChar ( _ReadLiner_, 1 ) == '\'' ) )// parse a char type, eg. 'c' 
-    {
-        byte c = _ReadLine_GetNextChar ( _ReadLiner_ ) ;
-        _ReadLine_GetNextChar ( _ReadLiner_ ) ;
-        char buffer [4] ; buffer[0]= '\'' ; buffer[1]= c ; buffer[2]= '\'' ; buffer[3]= 0 ;
-        CfrTil_WordLists_PopWord ( ) ; // pop the "'" token
-        Word * word = _Interpreter_TokenToWord ( _Interpreter_, buffer ) ;
-        _Interpreter_DoWord ( _Interpreter_, word, _Lexer_->TokenStart_ReadLineIndex ) ;
-    }
-    else
-    {
-        CfrTil_Token ( ) ;
-        _Tick ( _Context_, findWordFlag ) ;
-    }
-}
-
-void
 CfrTil_SingleQuote ( )
 {
     _CfrTil_SingleQuote ( 0 ) ;

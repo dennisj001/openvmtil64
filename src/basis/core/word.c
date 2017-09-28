@@ -103,7 +103,7 @@ _Word_Namespace ( Word * word )
 Word *
 _Word_Allocate ( uint64 allocType )
 {
-    Word * word ;
+    Word * word = 0 ;
     if ( allocType & ( COMPILER_TEMP | LISP_TEMP ) ) allocType = TEMPORARY ;
     else allocType = DICTIONARY ;
     word = ( Word* ) OVT_CheckRecyclableAllocate ( _Q_->MemorySpace0->RecycledWordList, sizeof ( Word ) + sizeof ( WordData ) ) ;
@@ -191,13 +191,14 @@ _Word_Add ( Word * word, int64 addToInNs, Namespace * addToNs )
 }
 
 Word *
-_Word_Create ( byte * name, uint64 ctype, uint64 ltype, uint64 allocType )
+_Word_Create (byte * name, uint64 ctype, uint64 ctype2, uint64 ltype, uint64 allocType )
 {
     Word * word = _Word_Allocate ( allocType ? allocType : DICTIONARY ) ;
     if ( allocType & ( EXISTING ) ) _Symbol_NameInit ( ( Symbol * ) word, name ) ;
     else _Symbol_Init_AllocName ( ( Symbol* ) word, name, STRING_MEM ) ;
     word->WAllocType = allocType ;
     word->CAttribute = ctype ;
+    word->CAttribute2 = ctype2 ;
     word->LAttribute = ltype ;
     if ( Is_NamespaceType ( word ) ) word->Lo_List = dllist_New ( ) ;
     return word ;
@@ -208,7 +209,7 @@ _Word_New ( byte * name, uint64 ctype, uint64 ltype, int8 addToInNs, Namespace *
 {
     CheckCodeSpaceForRoom ( ) ;
     ReadLiner * rl = _Context_->ReadLiner0 ;
-    Word * word = _Word_Create ( name, ctype, ltype, allocType ) ; // CFRTIL_WORD : cfrTil compiled words as opposed to C compiled words
+    Word * word = _Word_Create (name, ctype, 0, ltype, allocType ) ; // CFRTIL_WORD : cfrTil compiled words as opposed to C compiled words
     _Context_->Compiler0->CurrentWord = word ;
     if ( rl->InputStringOriginal )
     {

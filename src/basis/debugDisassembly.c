@@ -82,7 +82,8 @@ _Debugger_DisassembleWrittenCode ( Debugger * debugger )
         if ( word && ( codeSize > 0 ) )
         {
             //ConserveNewlines ;
-            byte * csName = ( byte * ) c_gd ( Get_CompilerSpace ( )->OurNBA->NBA_Name ) ;
+            NamedByteArray * nba = Get_CompilerSpace ( )->OurNBA ;
+            byte * csName = nba ? ( byte * ) c_gd ( nba->NBA_Name ) : (byte*) "";
             _Printf ( ( byte* ) "\nCode compiled to %s for word :> %s <: ...", csName, c_gd ( String_CB ( word->Name ) ) ) ;
             _Debugger_Disassemble ( debugger, debugger->PreHere, codeSize, word->CAttribute & ( CPRIMITIVE | DLSYM_WORD | DEBUG_WORD ) ? 1 : 0 ) ;
             //debugger->PreHere = Here ;

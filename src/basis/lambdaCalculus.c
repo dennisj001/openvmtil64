@@ -994,7 +994,7 @@ LO_CheckBeginBlock ( )
 }
 
 int64
-_LO_Apply_Arg ( ListObject ** pl1, int64 applyRtoL, int64 i )
+_LO_Apply_Arg ( ListObject ** pl1, int64 i )
 {
     Context * cntx = _Context_ ;
     ListObject * l0, *l1, * l2 ;
@@ -1002,39 +1002,24 @@ _LO_Apply_Arg ( ListObject ** pl1, int64 applyRtoL, int64 i )
     l1 = * pl1 ;
     Word * word = l1 ;
 
-    //cntx->CurrentlyRunningWord = word ;
-    if ( GetState ( l1, QID ) || ( l1->Name[0] == ']' ) )
-    {
-        // we're compiling right to left but we have a quid which implies the last token  of a quid so find the first token of the quid and then start compiling left to right
-        if ( applyRtoL )
-        {
-            // find the first token of the quid
-            for ( ; l1 ? ( l1->Name[0] != '.' ? GetState ( l1, QID ) || ( l1->Name[0] == '&' ) || ( l1->Name[0] == '[' ) || ( l1->Name[0] == ']' ) : 1 ) : 0 ; l1 = LO_Previous ( l1 ) ) l2 = l1 ;
-            l0 = l1 ;
-            // start compiling left to right
-            for ( l1 = l2 ; l1 ? ( l1->Name[0] != '.' ? GetState ( l1, QID ) || ( l1->Name[0] == '&' ) || ( l1->Name[0] == '[' ) || ( l1->Name[0] == ']' ) : 1 ) : 0 ; l1 = LO_Next ( l1 ) )
-            {
-                i = _LO_Apply_Arg ( &l1, 0, i ) ; // 0 : don't recurse 
-            }
-            *pl1 = LO_Next ( l0 ) ; // when it returns it will need to do LO_Previous so LO_Next adjusts for that
-            goto done ;
-        }
-    }
     if ( l1->LAttribute & ( LIST | LIST_NODE ) )
     {
         // ?needs :: Compiler_CopyDuplicatesAndPush somewhere
         Set_CompileMode ( false ) ;
         l2 = LO_Eval ( l1 ) ;
-        Set_CompileMode ( svcm ) ;
+        //Set_CompileMode ( svcm ) ;
         DEBUG_SETUP ( l2 ) ;
         if ( ! l2 || ( l2->LAttribute & T_NIL ) )
         {
-            Compile_DspPop_RspPush ( ) ;
+            //Compile_DspPop_RspPush ( ) ;
+            _Compile_MoveImm_To_Reg ( RegOrder ( i ++ ), _DataStack_Pop ( ), CELL_SIZE ) ;
         }
         else
         {
-            _Compile_PushRspImm ( ( int64 ) * l2->Lo_PtrToValue ) ;
+            //_Compile_PushRspImm ( ( int64 ) * l2->Lo_PtrToValue ) ;
+            _Compile_MoveImm_To_Reg ( RegOrder ( i ++ ), ( int64 ) * l2->Lo_PtrToValue, CELL_SIZE ) ;
         }
+        _DEBUG_SHOW ( l2, 1 ) ;
     }
     else if ( ( l1->CAttribute & _NON_MORPHISM_TYPE ) ) // and literals, etc.
     {
@@ -1043,14 +1028,13 @@ _LO_Apply_Arg ( ListObject ** pl1, int64 applyRtoL, int64 i )
         word->W_SC_ScratchPadIndex = scwi ;
         word = Compiler_CopyDuplicatesAndPush ( word ) ;
         word->StackPushRegisterCode = 0 ;
-        DEBUG_SETUP ( word ) ;
-        _DataObject_Run ( word ) ;
+        _DEBUG_SETUP ( word, 0 ) ;
+        Word_Eval0 ( word ) ;
         if ( CompileMode && ( ! ( l1->CAttribute & ( NAMESPACE_TYPE | OBJECT_FIELD | T_NIL ) ) ) ) // research : how does CAttribute get set to T_NIL?
         {
             if ( word->StackPushRegisterCode ) SetHere ( word->StackPushRegisterCode ) ;
-            _Compile_Move_Reg_To_Reg ( RAX, R8D ) ;
-            _Compile_PushReg ( RAX ) ;
-            i ++ ;
+            _Compile_Move_Reg_To_Reg ( RegOrder ( i ++ ), R8D ) ;
+            _DEBUG_SHOW ( word, 1 ) ;
         }
     }
     else if ( ( l1->Name [0] == '.' ) || ( l1->Name [0] == '&' ) )
@@ -1083,7 +1067,7 @@ _LO_Apply_Arg ( ListObject ** pl1, int64 applyRtoL, int64 i )
                 byte * token = word->Name ;
                 DEBUG_SETUP ( word ) ;
                 if ( Do_NextArrayWordToken ( word, token, arrayBaseObject, objSize, saveCompileMode, &variableFlag ) ) break ;
-                DEBUG_SHOW ;
+                _DEBUG_SHOW ( word, 1 ) ;
             }
             while ( l1 = LO_Next ( l1 ) ) ;
             *pl1 = l1 ;
@@ -1100,8 +1084,7 @@ _LO_Apply_Arg ( ListObject ** pl1, int64 applyRtoL, int64 i )
                 }
                 if ( Is_DebugModeOn ) Word_PrintOffset ( word, increment, svBaseObject->AccumulatedOffset ) ;
                 if ( svBaseObject->StackPushRegisterCode ) SetHere ( svBaseObject->StackPushRegisterCode ) ;
-                _Compile_Move_Reg_To_Reg ( RAX, R8D ) ;
-                _Compile_PushReg ( RAX ) ;
+                _Compile_Move_Reg_To_Reg ( RegOrder ( i ++ ), R8D ) ;
             }
             interp->BaseObject = 0 ;
             SetState ( compiler, COMPILE_MODE, saveCompileMode ) ;
@@ -1111,10 +1094,11 @@ _LO_Apply_Arg ( ListObject ** pl1, int64 applyRtoL, int64 i )
     {
         word = Compiler_CopyDuplicatesAndPush ( word ) ;
         DEBUG_SETUP ( word ) ;
-        _Compile_Rsp_Push ( _DataStack_Pop ( ) ) ;
-        i ++ ;
+        _Compile_MoveImm_To_Reg ( RegOrder ( i ++ ), _DataStack_Pop ( ), CELL_SIZE ) ;
+        _DEBUG_SHOW ( word, 1 ) ;
     }
 done:
+    //_DEBUG_SHOW ( word, 1 ) ;
     DEBUG_SHOW ;
     return i ;
 }
@@ -1123,86 +1107,93 @@ done:
 // this is a little confusing : the args are LO_Read left to Right for C we want them right to left except qid word which remain left to right
 
 ListObject *
-_LO_Apply_ArgList ( ListObject * l0, Word * word, int64 applyRtoL )
+_LO_Apply_ArgList ( ListObject * l0, Word * word )
 {
     Context * cntx = _Context_ ;
     ListObject *l1 ;
     ByteArray * scs = _Q_CodeByteArray ;
     Compiler * compiler = cntx->Compiler0 ;
     int64 i, svcm = CompileMode ;
+    int8 showFlag = false ;
+    Debugger * debugger = _CfrTil_->Debugger0 ;
     SetState ( compiler, LC_ARG_PARSING, true ) ;
-    Word * word0 = word ;
+    ByteArray * svcs ;
 
     d0 ( if ( Is_DebugModeOn ) LO_Debug_ExtraShow ( 0, 2, 0, ( byte* ) "\nEntering _LO_Apply_ArgList..." ) ) ;
     if ( l0 )
     {
-        if ( ! svcm && applyRtoL )
+        if ( ! svcm )
         {
-            //Compiler_SetCompilingSpace_MakeSureOfRoom ( CompileMode ? ( byte* ) "CodeSpace" : ( byte* ) "SessionCodeSpace" ) ; // 2 * K : should be enough at least for now ??
-            _Debugger_->PreHere = Here ;
-            CfrTil_BeginBlock ( ) ;
-        }
-        if ( applyRtoL )
-        {
-            for ( i = 0, l1 = LO_Last ( l0 ) ; l1 ; l1 = LO_Previous ( l1 ) )
+            Set_CompileMode ( true ) ;
+            if ( Is_DebugModeOn )
             {
-                i = _LO_Apply_Arg ( &l1, applyRtoL, i ) ;
+                _Debugger_->PreHere = Here ;
+                CfrTil_BeginBlock ( ) ;
+            }
+            else
+            {
+                debugger->cs_Cpu->State = 0 ;
+                _CfrTil_->cs_Cpu->State = 0 ;
+                _Debugger_CpuState_CheckSave ( debugger ) ;
+                _CfrTil_CpuState_CheckSave ( ) ;
+                svcs = _Q_CodeByteArray ;
+                _ByteArray_ReInit ( debugger->StepInstructionBA ) ; // we are only compiling one insn here so clear our BA before each use
+                Set_CompilerSpace ( debugger->StepInstructionBA ) ; // now compile to this space
+                _Compile_Restore_Debugger_CpuState ( debugger, showFlag ) ; //&& ( _Q_->Verbosity >= 3 ) ) ; // restore our runtime state before the current insn
+                _Debugger_->PreHere = Here ;
             }
         }
-        else for ( i = 0, l1 = _LO_First ( l0 ) ; l1 ; l1 = LO_Next ( l1 ) ) i = _LO_Apply_Arg ( &l1, applyRtoL, i ) ;
-    }
-    if ( applyRtoL )
-    {
-        Set_CompileMode ( svcm ) ;
+        for ( i = 0, l1 = _LO_First ( l0 ) ; l1 ; l1 = LO_Next ( l1 ) ) i = _LO_Apply_Arg ( &l1, i ) ;
         int64 scwi = l0->W_SC_ScratchPadIndex ;
         word->W_SC_ScratchPadIndex = scwi ;
         word = Compiler_CopyDuplicatesAndPush ( word ) ;
         cntx->CurrentlyRunningWord = word ;
         Compile_Call ( ( byte* ) word->Definition ) ;
-        if ( i > 0 ) Compile_ADDI ( REG, RSP, 0, i * sizeof (int64 ), 0 ) ;
+        _DEBUG_SHOW ( word, 1 ) ;
         if ( ! svcm )
         {
-            CfrTil_EndBlock ( ) ;
-            Set_CompilerSpace ( scs ) ;
-            _DEBUG_SHOW ( word ) ;
-            _DEBUG_SETUP ( word, 1 ) ;
             if ( Is_DebugModeOn )
             {
-                Debugger * debugger = _Debugger_ ;
-                SetState ( debugger, DBG_BRK_INIT, true ) ;
-                _Debugger_SetupStepping ( debugger, word, ( byte* ) TOS, "lambda block", 1 ) ;
-                SetState ( debugger, DBG_INFO | DBG_PROMPT, true ) ;
-                _Debugger_InterpreterLoop ( debugger ) ;
+                CfrTil_EndBlock ( ) ;
+                Set_CompilerSpace ( scs ) ;
             }
-            else CfrTil_BlockRun ( ) ;
+            else
+            {
+                _Compile_Restore_C_CpuState ( _CfrTil_, showFlag ) ; //&& ( _Q_->Verbosity >= 3 ) ) ; // finally restore our c compiler cpu register state
+                _Compile_Return ( ) ;
+                Set_CompilerSpace ( svcs ) ; // restore compiler space pointer before "do it" in case "do it" calls the compiler
+            }
+            if ( ! svcm )
+            {
+                if ( Is_DebugModeOn )
+                {
+                    DEBUG_SETUP ( word ) ;
+                    Debugger * debugger = _Debugger_ ;
+                    SetState ( debugger, DBG_BRK_INIT, true ) ;
+                    _Debugger_SetupStepping ( debugger, word, ( byte* ) _DataStack_Pop ( ), "lambda block", 1 ) ;
+                    SetState ( debugger, DBG_NEWLINE | DBG_PROMPT | DBG_INFO | DBG_AUTO_MODE | DBG_AUTO_MODE_ONCE, false ) ;
+                    _Debugger_InterpreterLoop ( debugger ) ;
+                }
+                else
+                {
+                    //_Debugger_Disassemble ( debugger, debugger->StepInstructionBA->BA_Data, 2 * K, 1 ) ;
+                    ( ( VoidFunction ) debugger->StepInstructionBA->BA_Data ) ( ) ;
+                    debugger->CopyRSP = 0 ; // we need this!! why ??
+                }
+            }
+            DEBUG_SHOW ;
         }
-        else if ( word->CAttribute & C_RETURN )
-        {
-            _Word_CompileAndRecord_PushReg ( word, R8D ) ;
-        }
+        Set_CompileMode ( svcm ) ;
+        d0 ( if ( Is_DebugModeOn ) LO_Debug_ExtraShow ( 0, 2, 0, ( byte* ) "\nLeaving _LO_Apply_ArgList..." ) ) ;
+        SetState ( compiler, LC_ARG_PARSING, false ) ;
     }
-    else
-    {
-        _Interpreter_DoWord ( cntx->Interpreter0, word0, - 1 ) ; // word0 : don't repeat Compiler_CopyDuplicates
-    }
-
-    DEBUG_SHOW ;
-    Set_CompileMode ( svcm ) ;
-    d0 ( if ( Is_DebugModeOn ) LO_Debug_ExtraShow ( 0, 2, 0, ( byte* ) "\nLeaving _LO_Apply_ArgList..." ) ) ;
-    SetState ( compiler, LC_ARG_PARSING, false ) ;
     return nil ;
 }
 
 ListObject *
 _LO_Apply_C_LtoR_ArgList ( ListObject * l0, Word * word )
 {
-    _LO_Apply_ArgList ( l0, word, 0 ) ;
-}
-
-ListObject *
-_LO_Apply_A_LtoR_ArgList_For_C_RtoL ( ListObject * l0, Word * word )
-{
-    _LO_Apply_ArgList ( l0, word, 1 ) ;
+    _LO_Apply_ArgList ( l0, word ) ;
 }
 
 void
@@ -1225,17 +1216,15 @@ LC_CompileRun_C_ArgList ( Word * word ) // C protocol : right to left arguments 
         int64 svcm = CompileMode ;
         Set_CompileMode ( false ) ; // we must have the arguments pushed and not compiled for _LO_Apply_C_Rtl_ArgList which will compile them for a C_Rtl function
         LC_SaveStackPointer ( lc ) ; // ?!? maybe we should do this stuff differently
-        //DebugShow_Off ;
+        DebugShow_Off ;
         l0 = _LO_Read ( ) ;
-        //DebugShow_On ;
+        DebugShow_On ;
         SetState ( compiler, LC_ARG_PARSING, true ) ;
-        DBI_ON ;
-        _LO_Apply_A_LtoR_ArgList_For_C_RtoL ( l0, word ) ;
-        DBI_OFF ;
+        Set_CompileMode ( svcm ) ; // we must have the arguments pushed and not compiled for _LO_Apply_C_Rtl_ArgList which will compile them for a C_Rtl function
+        _LO_Apply_ArgList ( l0, word ) ;
         LC_RestoreStackPointer ( lc ) ; // ?!? maybe we should do this stuff differently
         LC_Clear ( 1 ) ;
         SetState ( compiler, LC_ARG_PARSING | LC_C_RTL_ARG_PARSING, false ) ;
-        Set_CompileMode ( svcm ) ; // we must have the arguments pushed and not compiled for _LO_Apply_C_Rtl_ArgList which will compile them for a C_Rtl function
     }
     Lexer_SetTokenDelimiters ( lexer, svDelimiters, COMPILER_TEMP ) ;
 }

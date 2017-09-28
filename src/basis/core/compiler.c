@@ -2,13 +2,14 @@
 #include "../../include/cfrtil.h"
 
 Word *
-Compiler_CopyDuplicatesAndPush ( Word * word )
+Compiler_CopyDuplicatesAndPush ( Word * word0 )
 {
-    if ( word && CompileMode && ( ! ( word->CAttribute & ( DEBUG_WORD ) ) ) )
+    if ( word0 && CompileMode && ( ! ( word0->CAttribute & ( DEBUG_WORD ) ) ) )
     {
-        word = _Compiler_CopyDuplicatesAndPush ( _Context_->Compiler0, word ) ;
+        word0 = _Compiler_CopyDuplicatesAndPush ( _Context_->Compiler0, word0 ) ;
     }
-    return word ;
+    else _CfrTil_WordList_PushWord ( word0 ) ;
+    return word0 ;
 }
 
 void

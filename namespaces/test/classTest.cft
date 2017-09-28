@@ -127,7 +127,7 @@ dscOn
 #endif
     this.Sum this.Category @ this.Prototype @ * dup p = // 36
     this.Sum this.Category @ this.Prototype @ - dup p = // 9
-    this.Sum this.Category @ this.Prototype @ <dbg> && dup p = // 12 && 3 = 1
+    this.Sum this.Category @ this.Prototype @ && dup p = // 12 && 3 = 1
     this.Sum this.Category @ this.Prototype @ & dup p = // 12 & 3 = 0
     this.Accum this.Prototype @ =
     this.Sum this.Category @ this.Prototype @ || dup p =

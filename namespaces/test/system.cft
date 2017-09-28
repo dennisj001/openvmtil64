@@ -4,18 +4,15 @@
 C 
 : sp ; //stack pause ;
 #if Zenfone2 @ not
-dlsym: printf /lib/x86_64-linux-gnu/libc.so.6 ; d: void_return
-printf ("\n%s\n\t%s","hello world! - parse this!?", "\tand this!")"\tand this!" ps
-// pause
+dlsym: printf /lib/x86_64-linux-gnu/libc.so.6 ; void_return
 dlsym: strcmp /lib/x86_64-linux-gnu/libc.so.6 ; //eax_return
 dlsym: sprintf /lib/x86_64-linux-gnu/libc.so.6 ; void_return
-dlsym: printf /lib/x86_64-linux-gnu/libc.so.6 ; void_return
 #endif
-sp
+printf ("\n%s\n\t%s","hello world! - parse this!?", "\tand this!")"\n\talso this!" ps
 printf ( "\nHello world! = 0x%08x\n\n" 1234 ) 
 printf ( "\n%s = %d\n\n", "Hello world!", 42 ) 
-printf("\n%s\n\t","hello world! - parse this!?")"\tand this!" ps
-
+printf("\n%s\n\t","hello world! - parse this!?")"\n\talso this!" ps
+sp
 C_Syntax
 User
 Compiler
@@ -36,8 +33,9 @@ sp
 "xc" var 
 xc 'e' = 
 xc @ dup emit 'e' _assert //pause
-s "x" var x 'e' = x @ emit s //pause
-sp
+s "x" var x 'e' = '\n' emit '\t' emit x @ emit '\r' emit 'u' emit '\b' emit 'i' emit 
+"\nline above should read... \ni\te" ps
+//pause
 Shell
 : hio  if 1 p else 0 p endif ;
 ' hio find wdiss
@@ -60,7 +58,7 @@ s: $$
 ;s  // allows more than one shell command on a ';' separated line 
 "streol" 'getStringToEndOfLine find alias
 : $ streol _sh ;  
-//'$$ find wdiss pause
+'$$ find wdiss pause
 
 bigNumOff
 #if doScript
