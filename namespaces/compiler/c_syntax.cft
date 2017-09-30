@@ -10,17 +10,17 @@ optimizeOn inlineOn
 System Interpreter Combinators C C_Combinators
 C String
 "Dlsym" namespace Dlsym "libc" namespace libc
-#if Zenfone2 @ not
+#if 0 //Zenfone2 @ not
 //'C notUsing
 "libc" namespace
 libc
-dlsym: strcmp /lib32/libc.so.6 ;
-dlsym: strcat /lib32/libc.so.6 ; void_return
-dlsym: memset /lib32/libc.so.6 ; void_return
-dlsym: sprintf /lib32/libc.so.6 ; void_return
-dlsym: printf /lib32/libc.so.6 ; void_return
-#endif
+dlsym: strcmp /lib/libc.so.6 ;
+dlsym: strcat /lib/libc.so.6 ; void_return
+dlsym: memset /lib/libc.so.6 ; void_return
+dlsym: sprintf /lib/libc.so.6 ; void_return
+dlsym: printf /lib/libc.so.6 ; void_return
 libc.printf ("\nhello\n") //pause
+#endif
 C
 User
 //: sp sl pause ;

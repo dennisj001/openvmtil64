@@ -128,7 +128,7 @@ _Compile_CpuState_Restore ( Cpu * cpu, int8 cStackRegFlag )
 void
 Compile_CpuState_Restore ( Cpu * cpu )
 {
-    _Compile_CpuState_Restore ( cpu, 0 ) ;
+    _Compile_CpuState_Restore ( cpu, 1 ) ;
 }
 
 Cpu *

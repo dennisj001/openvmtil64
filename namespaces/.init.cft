@@ -57,7 +57,7 @@ User
 : p space intPrint ;
 'dbgOnVar var 
 'dbOn 'dbgOnVar find alias
-: dbgOn d: dbgOnVar 1 = ;
+: dbgOn dbgOnVar 1 = ;
 : dbgOff dbgOnVar 0 = ;
 dbgOff
 #if dbgOnVar @ 
@@ -216,7 +216,7 @@ Word
 
 C
 System
-dscOn //verbosity 3 =
+//dscOn //verbosity 3 =
 : location filename ps space decimal lineNumber _p "." _ps charNumber _p ;
 : pdl  "-----------------------------" ps ;
 : pel  "=============================" ps ;
@@ -231,7 +231,7 @@ dscOn //verbosity 3 =
     nl "Word :" _ps hex pword p ":: Compiled at :" ps pword @ definition p 
     nl pel nl decimal 
 ;;
-scOff
+//scOff
 //: wdiss ( pword ) _wdiss ( 1 pword @ ) ; //debugWord    // add wdiss words to history list
 : wdiss ( pword ) _wdiss ( 0 pword @ ) ; //debugWord      // don't add wdiss words to history list
 : wdissl ( pword ) logOn _wdiss ( 0 pword @ ) logOff ; //debugWord      // don't add wdiss words to history list

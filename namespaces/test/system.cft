@@ -3,7 +3,7 @@
 #if  1
 C 
 : sp ; //stack pause ;
-#if Zenfone2 @ not
+#if 0  //Zenfone2 @ not
 dlsym: printf /lib/x86_64-linux-gnu/libc.so.6 ; void_return
 dlsym: strcmp /lib/x86_64-linux-gnu/libc.so.6 ; //eax_return
 dlsym: sprintf /lib/x86_64-linux-gnu/libc.so.6 ; void_return
@@ -28,10 +28,14 @@ printf ( "\nHello world! = 0x%08x\n\n" 1234 )
 printf ( "\n%s\n\n", "hello world!\nparse this!\n" )"\n and this!\n" ps
 printf ( "\n%s\n\t", "hello world! - parse this!?" )"\t and this!" ps
 printf ( "\nHello world! = 0x%08x\n\n" 1234 ) 
+
+#if 0
 d: : tprintf printf ( "\nHello world! = 0x%08x\n\n" 1234 ) ; tprintf
 : tprintf1 ( a b ) d: printf ( a @ b @ ) ; 
 'tprintf find wdiss
 'tprintf2 find wdiss
+#endif
+
 sp
 #endif
 "xc" var 
@@ -62,7 +66,7 @@ s: $$
 ;s  // allows more than one shell command on a ';' separated line 
 "streol" 'getStringToEndOfLine find alias
 : $ streol _sh ;  
-'$$ find wdiss pause
+'$$ find wdiss //pause
 
 bigNumOff
 #if doScript

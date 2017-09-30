@@ -39,6 +39,7 @@ testc1 ( | atoken aword )
 }
 //'testc1 find wdiss //pause 
 testc1 () ; //pause
+#if 0
 void
 interpret2 ( | atoken aword ) 
 {
@@ -48,7 +49,7 @@ interpret2 ( | atoken aword )
     while ( 1 )
     {   
         atoken = token () ; 
-        d: printf ( "\n\ttoken = %s", atoken ) ; 
+        printf ( "\n\ttoken = %s", atoken ) ; 
         //_pause () ;
         if ( ! ( strcmp ( atoken, "i2halt" ) ) ) 
         { 
@@ -67,6 +68,7 @@ interpret2 ( | atoken aword )
 }
 ' interpret2 find wdiss 
 sp
+
 interpret2 
 c_syntaxOff sp
 #if 1
@@ -79,10 +81,8 @@ i2halt
 "C_Combinators" notUsing
 infixOff
 sp
-#if dbOn @
-d: 2 + 7 assertStkChk // stack checking
-#else
-2 + 7 assertStkChk // stack checking
 #endif
+c_syntaxOff sp
 
+2 + 7 assertStkChk // stack checking
 
