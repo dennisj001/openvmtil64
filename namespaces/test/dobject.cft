@@ -1,4 +1,5 @@
 5
+: sp ; //stack pause ;
 "\ndynamic object test\n" ddps
 DObject 
 "DO_Experimental" namespace
@@ -25,6 +26,7 @@ ott 456 "object compile test6 : " assert2
     o1.x.zzx  o1.x.xxy.a @ = 
     o1.x.zzx @  
 ;
-123987 dup ott3 "object compile test8 : " assert2    
+123987 dup ott3 "object compile test8 : " assert2   
+sp 
 "DO_Experimental" notUsing
 2 + 7 assertStkChk // stack checking

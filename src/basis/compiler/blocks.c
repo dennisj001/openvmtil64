@@ -15,6 +15,14 @@ _Block_Eval ( block block )
 }
 
 void
+AdjustGotoPoint ( dlnode * node, int64 address )
+{
+    GotoInfo * gi = (GotoInfo *) node ;
+    if ( gi->pb_JmpOffsetPointer == (byte*) address ) 
+        gi->pb_JmpOffsetPointer = Here + 1 ;
+}
+
+void
 _Block_Copy ( byte * srcAddress, int64 bsize )
 {
     byte * saveHere = Here, * saveAddress = srcAddress ;
@@ -38,9 +46,10 @@ _Block_Copy ( byte * srcAddress, int64 bsize )
         }
         else if ( * srcAddress == CALLI32 )
         {
-            int64 offset = * ( int64* ) ( srcAddress + 1 ) ; // 1 : 1 byte opCode
+            int64 offset = * ( int32* ) ( srcAddress + 1 ) ; // 1 : 1 byte opCode
             if ( ! offset )
             {
+                dllist_Map1 ( _Context_->Compiler0->GotoList, ( MapFunction1 ) AdjustGotoPoint, (int64) (srcAddress + 1) ) ;
                 CfrTil_SetupRecursiveCall ( ) ;
                 continue ;
             }
@@ -59,7 +68,7 @@ _Block_Copy ( byte * srcAddress, int64 bsize )
         }
         else if ( * srcAddress == JMPI32 )
         {
-            int64 offset = * ( int64* ) ( srcAddress + 1 ) ; // 1 : 1 byte opCode
+            int64 offset = * ( int32* ) ( srcAddress + 1 ) ; // 1 : 1 byte opCode
             if ( offset == 0 ) // signature of a goto point
             {
                 _CfrTil_MoveGotoPoint ( ( int64 ) srcAddress + 1, 0, ( int64 ) Here + 1 ) ;
@@ -297,9 +306,9 @@ _CfrTil_EndBlock1 ( BlockInfo * bi )
         if ( compiler->NumberOfRegisterVariables ) //&& ( compiler->NumberOfParameterVariables == 1 ) && GetState ( compiler, ( RETURN_TOS | RETURN_R8 ) ) )
         {
             bi->bp_First = bi->Start ;
-            if ( GetState ( compiler, RETURN_R8 ) )
+            if ( GetState ( compiler, RETURN_ACCUM ) )
             {
-                Compile_Move_R8_To_TOS ( DSP ) ;
+                Compile_Move_ACC_To_TOS ( DSP ) ;
             }
         }
         else if ( _Compiler_IsFrameNecessary ( compiler ) && ( ! GetState ( compiler, DONT_REMOVE_STACK_VARIABLES ) ) )
@@ -326,7 +335,7 @@ _CfrTil_EndBlock2 ( BlockInfo * bi )
     byte * bp_First = bi->bp_First ;
     if ( _Stack_IsEmpty ( compiler->BlockStack ) )
     {
-        _CfrTil_InstallGotoCallPoints_Keyed ( bi, GI_GOTO | GI_RECURSE | GI_CALL_LABEL ) ;
+        _CfrTil_InstallGotoCallPoints_Keyed ( bi, GI_GOTO | GI_CALL_LABEL | GI_RECURSE ) ;
         CfrTil_TurnOffBlockCompiler ( ) ;
         Compiler_Init ( compiler, 0 ) ;
     }

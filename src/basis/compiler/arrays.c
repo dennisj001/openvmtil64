@@ -57,17 +57,17 @@ Compile_ArrayDimensionOffset ( Word * word, int64 dimSize, int64 objSize )
         {
             SetHere ( word->StackPushRegisterCode ) ;
             //_Compile_IMULI ( int64 mod, int64 reg, int64 rm, int64 sib, int64 disp, int64 imm, int64 size )
-            _Compile_IMULI ( REG, R8D, R8D, 0, 0, dimSize * objSize, 0 ) ;
+            _Compile_IMULI ( REG, ACC, ACC, 0, 0, dimSize * objSize, 0 ) ;
             //Compile_ADD( toRegOrMem, mod, reg, rm, sib, disp, isize ) 
-            Compile_ADD ( MEM, MEM, R8D, DSP, 0, 0, CELL ) ;
+            Compile_ADD ( MEM, MEM, ACC, DSP, 0, 0, CELL ) ;
         }
         else
         {
             //_Compile_IMULI ( int64 mod, int64 reg, int64 rm, int64 sib, int64 disp, int64 imm, int64 size )
-            _Compile_IMULI ( MEM, R8D, DSP, 0, 0, dimSize * objSize, 0 ) ;
+            _Compile_IMULI ( MEM, ACC, DSP, 0, 0, dimSize * objSize, 0 ) ;
             _Compile_Stack_DropN ( DSP, 1 ) ; // drop the array index
             //Compile_ADD( toRegOrMem, mod, reg, rm, sib, disp, isize ) 
-            Compile_ADD ( MEM, MEM, R8D, DSP, 0, 0, CELL ) ;
+            Compile_ADD ( MEM, MEM, ACC, DSP, 0, 0, CELL ) ;
         }
     }
     else SetHere ( word->Coding ) ; // is 0 don't compile anything for that word
@@ -181,8 +181,8 @@ CfrTil_ArrayBegin ( void )
                 SetHere ( baseObject->Coding ) ;
                 _Debugger_->StartHere = Here ; // for Debugger_DisassembleAccumulated
                 _Debugger_->EntryWord = baseObject ; // for Debugger_DisassembleAccumulated
-                _Compile_GetVarLitObj_LValue_To_Reg ( baseObject, R8D ) ;
-                _Word_CompileAndRecord_PushReg ( baseObject, R8D ) ;
+                _Compile_GetVarLitObj_LValue_To_Reg ( baseObject, ACC ) ;
+                _Word_CompileAndRecord_PushReg ( baseObject, ACC ) ;
             }
             else SetState ( baseObject, OPTIMIZE_OFF, true ) ;
         }

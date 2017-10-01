@@ -267,7 +267,7 @@ _CfrTil_Parse_LocalsAndStackVariables ( int64 svf, int64 lispMode, ListObject * 
             if ( getReturnFlag )
             {
                 addWords = 0 ;
-                if ( stricmp ( token, ( byte* ) "R8" ) == 0 ) getReturn = RETURN_R8 ;
+                if ( stricmp ( token, ( byte* ) "R8" ) == 0 ) getReturn = RETURN_ACCUM ;
                 else if ( stricmp ( token, ( byte* ) "TOS" ) == 0 ) getReturn = RETURN_TOS ;
                 else if ( stricmp ( token, ( byte* ) "0" ) == 0 ) getReturn = DONT_REMOVE_STACK_VARIABLES ;
                 else returnVariable = token ;

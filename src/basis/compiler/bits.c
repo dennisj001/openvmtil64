@@ -51,9 +51,9 @@ Compile_X_Group3 ( Compiler * compiler, int64 code ) //OP_1_ARG
             compiler->optInfo->Optimize_Rm, REX_B | MODRM_B, 0, compiler->optInfo->Optimize_Disp, compiler->optInfo->Optimize_Imm, 0 ) ;
         if ( compiler->optInfo->Optimize_Rm != DSP ) // if the result is not already tos
         {
-            if ( compiler->optInfo->Optimize_Rm != R8D ) _Compile_Move_Rm_To_Reg ( R8D, compiler->optInfo->Optimize_Rm,
+            if ( compiler->optInfo->Optimize_Rm != ACC ) _Compile_Move_Rm_To_Reg ( ACC, compiler->optInfo->Optimize_Rm,
                 compiler->optInfo->Optimize_Disp ) ;
-            _Compiler_CompileAndRecord_PushR8 ( compiler ) ;
+            _Compiler_CompileAndRecord_PushAccum ( compiler ) ;
         }
     }
     else
@@ -75,21 +75,21 @@ Compile_X_Shift ( Compiler * compiler, int64 op, int64 stackFlag )
             _Compile_Group2 ( compiler->optInfo->Optimize_Mod,
                 op, compiler->optInfo->Optimize_Rm, 0, compiler->optInfo->Optimize_Disp, compiler->optInfo->Optimize_Imm ) ;
         }
-        else //if ( ( compiler->optInfo->Optimize_Imm == 0 ) && ( compiler->optInfo->Optimize_Rm != R8 ) ) // this logic is prototype maybe not precise 
+        else //if ( ( compiler->optInfo->Optimize_Imm == 0 ) && ( compiler->optInfo->Optimize_Rm != ACC ) ) // this logic is prototype maybe not precise 
         {
             _Compile_Group2_CL ( MEM, op, compiler->optInfo->Optimize_Rm, 0, compiler->optInfo->Optimize_Disp ) ;
         }
         if ( stackFlag && ( compiler->optInfo->Optimize_Rm != DSP ) ) // if the result is not already tos
         {
-            if ( compiler->optInfo->Optimize_Rm != R8D ) _Compile_Move_Rm_To_Reg ( R8D, compiler->optInfo->Optimize_Rm,
+            if ( compiler->optInfo->Optimize_Rm != ACC ) _Compile_Move_Rm_To_Reg ( ACC, compiler->optInfo->Optimize_Rm,
                 compiler->optInfo->Optimize_Disp ) ;
-            _Compiler_CompileAndRecord_PushR8 ( compiler ) ;
+            _Compiler_CompileAndRecord_PushAccum ( compiler ) ;
         }
     }
     else
     {
-        _Compile_Move_StackN_To_Reg ( R9D, DSP, 0 ) ;
-        Compile_SUBI ( REG, R14, 0, CELL, BYTE ) ;
+        _Compile_Move_StackN_To_Reg ( OREG, DSP, 0 ) ;
+        Compile_SUBI ( REG, DSP, 0, CELL, BYTE ) ;
         //_Compile_Group2_CL ( int64 mod, int64 regOpCode, int64 rm, int64 sib, cell disp )
         _Compile_Group2_CL ( MEM, op, DSP, 0, 0 ) ;
     }

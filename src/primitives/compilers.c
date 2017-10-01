@@ -84,7 +84,7 @@ _CfrTil_CompileCallGotoPoint ( uint64 type )
     GotoInfo * gotoInfo = ( GotoInfo * ) _GotoInfo_Allocate ( ) ;
     if ( type == GI_RECURSE ) _Compile_UninitializedCall ( ) ;
     else _Compile_UninitializedJump ( ) ;
-    gotoInfo->pb_JmpOffsetPointer = Here - 4 ; // after the call opcode
+    gotoInfo->pb_JmpOffsetPointer = Here - INT32_SIZE ; // after the call opcode
     gotoInfo->GI_CAttribute = type ;
     dllist_AddNodeToHead ( _Context_->Compiler0->GotoList, ( dlnode* ) gotoInfo ) ;
     return gotoInfo ;

@@ -86,32 +86,32 @@ _Compile_Stack_PopToReg ( int8 stackReg, int8 reg )
 void
 Compile_Stack_PushR8 ( int8 stackReg )
 {
-    _Compile_Stack_PushReg ( stackReg, R8D ) ;
+    _Compile_Stack_PushReg ( stackReg, ACC ) ;
 }
 
 void
 Compile_Move_TOS_To_R8 ( int8 stackReg )
 {
-    _Compile_Move_StackN_To_Reg ( R8D, stackReg, 0 ) ;
+    _Compile_Move_StackN_To_Reg ( ACC, stackReg, 0 ) ;
 }
 
 void
-Compile_Move_R8_To_TOS ( int8 stackReg )
+Compile_Move_ACC_To_TOS ( int8 stackReg )
 {
-    _Compile_Move_Reg_To_StackN ( stackReg, 0, R8D ) ;
+    _Compile_Move_Reg_To_StackN ( stackReg, 0, ACC ) ;
 }
 
 void
-Compile_Pop_To_R8 ( int8 stackReg )
+Compile_Pop_To_Acc ( int8 stackReg )
 {
-    _Compile_Stack_PopToReg ( stackReg, R8D ) ;
+    _Compile_Stack_PopToReg ( stackReg, ACC ) ;
 }
 
 void
-Compile_Pop_ToR8_AndCall ( int8 stackReg )
+Compile_Pop_ToAcc_AndCall ( int8 stackReg )
 {
-    _Compile_Stack_PopToReg ( stackReg, R8D ) ;
-    _Compile_CallR8 ( ) ;
+    _Compile_Stack_PopToReg ( stackReg, ACC ) ;
+    _Compile_Call_Acc ( ) ;
 }
 
 void
@@ -126,9 +126,9 @@ Compile_MoveImm_To_TOS ( int8 stackReg, int64 imm, int8 size )
 void
 _Compile_Stack_NDup ( int8 stackReg )
 {
-    _Compile_Move_Rm_To_Reg ( R8D, stackReg, 0 ) ;
+    _Compile_Move_Rm_To_Reg ( ACC, stackReg, 0 ) ;
     Compile_ADDI ( REG, stackReg, 0, sizeof (int64 ), 0 ) ; // 3 bytes long
-    _Compile_Move_Reg_To_Rm ( stackReg, R8D, 0 ) ;
+    _Compile_Move_Reg_To_Rm ( stackReg, ACC, 0 ) ;
 }
 #endif
 
@@ -140,12 +140,12 @@ _Compile_Stack_Dup ( int8 stackReg )
     if ( optFlag & OPTIMIZE_DONE ) return ;
     else
     {
-        _Compile_Move_Rm_To_Reg ( R8D, stackReg, 0 ) ;
+        _Compile_Move_Rm_To_Reg ( ACC, stackReg, 0 ) ;
         //Word *zero = Compiler_WordStack ( 0 ) ; // refers to this current multiply insn word
         Word *zero = Compiler_WordList ( 0 ) ; // refers to this current multiply insn word
         zero->StackPushRegisterCode = Here ;
         Compile_ADDI ( REG, stackReg, 0, sizeof (int64 ), 0 ) ; // 3 bytes long
-        _Compile_Move_Reg_To_Rm ( stackReg, R8D, 0 ) ;
+        _Compile_Move_Reg_To_Rm ( stackReg, ACC, 0 ) ;
     }
 }
 
@@ -160,18 +160,18 @@ _Compile_Stack_Dup ( int8 stackReg )
 void
 _Compile_Stack_Pick ( int8 stackReg ) // pick
 {
-    _Compile_Move_Rm_To_Reg ( R8D, stackReg, 0 ) ;
-    Compile_NOT ( REG, R8D, 0, 0, 0 ) ; // negate eax
-    _Compile_Move ( REG, R8D, stackReg, _CalculateSib ( SCALE_CELL, R8D, R14 ), 0 ) ; // move eax, [esi + eax * 4 ] ; but remember eax is now a negative number
-    _Compile_Move_Reg_To_Rm ( stackReg, R8D, 0 ) ;
+    _Compile_Move_Rm_To_Reg ( ACC, stackReg, 0 ) ;
+    Compile_NOT ( REG, ACC, 0, 0, 0 ) ; // negate eax
+    _Compile_Move ( REG, ACC, stackReg, _CalculateSib ( SCALE_CELL, ACC, DSP ), 0 ) ; // move eax, [esi + eax * 4 ] ; but remember eax is now a negative number
+    _Compile_Move_Reg_To_Rm ( stackReg, ACC, 0 ) ;
 }
 
 void
 _Compile_Stack_Swap ( int8 stackReg )
 {
-    _Compile_Move_Rm_To_Reg ( R9D, stackReg, 0 ) ;
+    _Compile_Move_Rm_To_Reg ( OREG, stackReg, 0 ) ;
     _Compile_Move_Rm_To_Reg ( R11D, stackReg, - CELL ) ;
-    _Compile_Move_Reg_To_Rm ( stackReg, R9D, - CELL ) ;
+    _Compile_Move_Reg_To_Rm ( stackReg, OREG, - CELL ) ;
     _Compile_Move_Reg_To_Rm ( stackReg, R11D, 0 ) ;
 }
 
@@ -184,16 +184,16 @@ Compile_DataStack_PushR8 ( )
 void
 _Compile_Rsp_Push ( int64 value )
 {
-    _Compile_MoveImm_To_Reg ( RAX, value, CELL ) ;
-    _Compile_PushReg ( RAX ) ;
+    _Compile_MoveImm_To_Reg ( ACC, value, CELL ) ;
+    _Compile_PushReg ( ACC ) ;
 }
 
 void
 Compile_DspPop_RspPush ( )
 {
-    _Compile_Stack_PopToReg ( DSP, RAX ) ;
+    _Compile_Stack_PopToReg ( DSP, ACC ) ;
     // _Compile_Stack_Push_Reg ( ESP, ECX ) ; // no such op
-    _Compile_PushReg ( RAX ) ;
+    _Compile_PushReg ( ACC ) ;
 }
 
 #if 0
@@ -201,7 +201,7 @@ Compile_DspPop_RspPush ( )
 void
 Compile_RspPop_DspPush ( )
 {
-    _Compile_PopToReg ( R8D ) ; // intel pop is pop esp
+    _Compile_PopToReg ( ACC ) ; // intel pop is pop esp
     Compile_DataStack_PushR8 ( ) ; // no such op
 }
 #endif

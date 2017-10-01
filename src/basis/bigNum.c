@@ -5,15 +5,28 @@ _BigNum_New ( byte * token )
 {
     mpfr_t *bfr = ( mpfr_t* ) Mem_Allocate ( sizeof ( mpfr_t ), OBJECT_MEMORY ) ;
     double bf ;
-    long bi ;
+    long i, bi ;
     if ( token )
     {
-        if ( sscanf ( ( char* ) token, "%lf", &bf ) ) mpfr_init_set_d ( *bfr, bf, MPFR_RNDN ) ;
-        else if ( sscanf ( ( char* ) token, "%ld", &bi ) ) mpfr_init_set_si ( *bfr, bi, MPFR_RNDN ) ;
-        else goto done ;
+        for ( i = 0 ; token [i] ; i ++ )
+        {
+            if ( token [i] == '.' )
+            {
+                if ( sscanf ( ( char* ) token, "%lf", &bf ) )
+                {
+                    mpfr_init_set_d ( *bfr, bf, MPFR_RNDN ) ;
+                    goto retrn ;
+                }
+                else goto doDefaultZero ;
+            }
+        }
+        if ( sscanf ( ( char* ) token, "%ld", &bi ) ) mpfr_init_set_si ( *bfr, bi, MPFR_RNDN ) ;
+        //if ( sscanf ( ( char* ) token, "%lf", &bf ) ) mpfr_set_d ( *bfr, bf, MPFR_RNDD ) ;
+        //else if ( sscanf ( ( char* ) token, "%ld", &bi ) ) mpfr_init2 ( *bfr, bi) ; //, MPFR_RNDN ) ;
+        else goto doDefaultZero ;
         goto retrn ;
     }
-done:
+doDefaultZero:
     mpfr_init_set_si ( *bfr, ( long ) 0, MPFR_RNDN ) ;
 retrn:
     return bfr ;
@@ -80,8 +93,10 @@ BigNum_SetDefaultBitPrecision ( )
 void
 BigNum_StateShow ( )
 {
+    BigNum_Info ( ) ;
     BigNum_GetAndPrint_BitPrecision ( ) ;
     _Printf ( ( byte * ) "\nBigNum :: Width = %d : Preciosn = %d", _Context_->System0->BigNum_Printf_Width, _Context_->System0->BigNum_Printf_Precision ) ;
+
 }
 #if 0
 
@@ -117,7 +132,6 @@ BigNum_FPrint ( )
 {
     Context * cntx = _Context_ ;
     char * format ;
-    BigNum_Info ( ) ;
     mpfr_t * value = ( mpfr_t* ) _DataStack_Pop ( ) ;
     if ( _Q_->Verbosity )
     {

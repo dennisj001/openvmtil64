@@ -61,13 +61,14 @@
 // mod 3 is for register direct   -- using the direct register value -- not as an address 
 // the reg field of the modr/m byte generally refers to to register to use with the mod modified r/m field -- intel can't address two memory fields in any instruction
 // --------------------------------------
-
+#if 1
 int8
 RegOrder ( int8 n )
 {
-    int8 regOrder [] = { RDI, RSI, RDX, RCX, R8D, R9D } ;
+    int8 regOrder [] = { RDI, RSI, RDX, RCX, ACC, OREG } ;
     return regOrder [n] ;
 }
+#endif
 
 int8
 CalculateModRegardingDisplacement ( int64 mod, int64 disp )
@@ -227,7 +228,7 @@ _Compile_InstructionX64 ( int8 rex, int8 opCode, int8 modRm, int64 controlFlag, 
     if ( controlFlag & SIB_B ) _Compile_Int8 ( sib ) ;
     if ( controlFlag & DISP_B ) _Compile_ImmDispData ( disp, dispSize, 0 ) ;
     if ( controlFlag & IMM_B ) _Compile_ImmDispData ( imm, immSize, controlFlag & IMM_B ) ;
-    //PeepHole_Optimize ( ) ;
+    PeepHole_Optimize ( ) ;
     if ( DBI )
     {
         //d1 ( Word * currentWord = Compiling ? _Compiler_->CurrentWord : _Interpreter_->w_Word ) ;
@@ -427,7 +428,7 @@ _Compile_MoveImm ( int8 direction, int8 rm, int8 controlFlag, int8 sib, int64 di
         if ( direction == MEM )
         {
             // there is no x64 instruction to move imm64 to mem directly
-            int8 thruReg = R11D ;
+            int8 thruReg = THRU_REG ;
             _Compile_MoveImm_To_Reg ( thruReg, imm, immSize ) ; // thruReg : R11D : needs to be a parameter
             _Compile_Move_Reg_To_Rm ( rm, thruReg, disp ) ;
         }
@@ -603,7 +604,7 @@ void
 _Compile_JumpToAddress ( byte * jmpToAddr ) // runtime
 {
 #if 1
-    if ( jmpToAddr != ( Here + 5 ) ) // optimization : don't need to jump to the next instruction
+    if ( jmpToAddr != (Here + 5)  ) // optimization : don't need to jump to the next instruction
     {
         int32 disp = _CalculateOffsetForCallOrJump ( Here + 1, jmpToAddr, INT32_SIZE ) ;
         // _Compile_InstructionX86 ( opCode, mod, reg, rm, modRmImmDispFlag, sib, disp, imm, immSize )
@@ -712,7 +713,7 @@ _Compile_Call ( byte * callAddr, int8 reg )
 void
 Compile_Call ( byte * callAddr )
 {
-    _Compile_Call ( callAddr, R8D ) ;
+    _Compile_Call ( callAddr, ACC ) ;
 }
 
 void
@@ -880,21 +881,21 @@ Compile_X_Group5 ( Compiler * compiler, int64 op )
     {
         if ( compiler->optInfo->OptimizeFlag & OPTIMIZE_IMM )
         {
-            _Compile_MoveImm_To_Reg ( R8D, compiler->optInfo->Optimize_Imm, CELL ) ;
+            _Compile_MoveImm_To_Reg ( ACC, compiler->optInfo->Optimize_Imm, CELL ) ;
             compiler->optInfo->Optimize_Mod = REG ;
-            compiler->optInfo->Optimize_Rm = R8D ;
+            compiler->optInfo->Optimize_Rm = ACC ;
         }
         _Compile_Group5 ( op, compiler->optInfo->Optimize_Mod, compiler->optInfo->Optimize_Rm, 0, compiler->optInfo->Optimize_Disp, 0 ) ;
-        if ( compiler->optInfo->O_one->StackPushRegisterCode ) _Word_CompileAndRecord_PushReg ( one, R8D ) ;
+        if ( compiler->optInfo->O_one->StackPushRegisterCode ) _Word_CompileAndRecord_PushReg ( one, ACC ) ;
     }
     else if ( one && one->CAttribute & ( PARAMETER_VARIABLE | LOCAL_VARIABLE | NAMESPACE_VARIABLE ) ) // *( ( cell* ) ( TOS ) ) += 1 ;
     {
         SetHere ( one->Coding ) ;
-        _Compile_GetVarLitObj_RValue_To_Reg ( one, R8D ) ;
+        _Compile_GetVarLitObj_RValue_To_Reg ( one, ACC ) ;
         //_Compile_Group5 ( int64 code, int64 mod, int8 rm, int8 sib, int64 disp, int64 size )
-        _Compile_Group5 ( op, REG, R8D, 0, 0, CELL_SIZE ) ;
+        _Compile_Group5 ( op, REG, ACC, 0, 0, CELL_SIZE ) ;
         // ++ == += :: -- == -= so :
-        _Compile_SetVarLitObj_With_Reg ( one, R8D, R9D ) ;
+        _Compile_SetVarLitObj_With_Reg ( one, ACC, OREG ) ;
     }
     else
     {
@@ -952,9 +953,9 @@ Compile_X_Group1 ( Compiler * compiler, int64 op, int64 ttt, int64 n )
     }
     else
     {
-        Compile_Pop_To_R8 ( DSP ) ;
+        Compile_Pop_To_Acc ( DSP ) ;
         //_Compile_X_Group1 ( int64 code, int64 toRegOrMem, int64 mod, int8 reg, int8 rm, int8 sib, int64 disp, int64 osize )
-        _Compile_X_Group1 ( op, MEM, MEM, R8D, DSP, 0, 0, CELL_SIZE ) ; // result is on TOS
+        _Compile_X_Group1 ( op, MEM, MEM, ACC, DSP, 0, 0, CELL_SIZE ) ; // result is on TOS
         _BlockInfo_Setup_BI_tttn ( _Context_->Compiler0, ttt, n, 3 ) ; // not less than 0 == greater than 0
         //_Word_CompileAndRecord_PushR8 ( Compiler_WordList ( 0 ) ) ;
     }
@@ -989,8 +990,8 @@ _Compile_Jcc ( int64 bindex, int64 overwriteFlag, int64 nz, int64 ttt )
 void
 _Compile_MoveToR8AndCall ( )
 {
-    _Compile_Get_FromCAddress_ToReg ( R8D, ( byte* ) & BlockCallAddress ) ;
-    _Compile_CallThruReg ( R8D ) ;
+    _Compile_Get_FromCAddress_ToReg ( ACC, ( byte* ) & BlockCallAddress ) ;
+    _Compile_CallThruReg ( ACC ) ;
 }
 
 void
@@ -1063,12 +1064,12 @@ void
 _Compile_JmpCall_Using_RStack ( byte * jmpToAddr )
 {
     // push rstack here + 5 so RET can jmp back 
-    _Compile_MoveImm_To_Reg ( R8D, &Rsp, CELL ) ; // the lvalue of Rsp
-    Compile_ADDI ( MEM, R8D, 0, CELL, BYTE ) ; // add 4 to Rsp
-    Compile_ADDI ( REG, R8D, 0, CELL, BYTE ) ; // 
+    _Compile_MoveImm_To_Reg ( ACC, &Rsp, CELL ) ; // the lvalue of Rsp
+    Compile_ADDI ( MEM, ACC, 0, CELL, BYTE ) ; // add 4 to Rsp
+    Compile_ADDI ( REG, ACC, 0, CELL, BYTE ) ; // 
     //_Compile_Move_Reg_To_Reg ( int8 dstReg, int64 srcReg ) ;
-    _Compile_MoveImm_To_Reg ( R9D, Here + x, CELL ) ; // x : number of bytes to the first byte after the jmp instruction
-    _Compile_Move_Reg_To_Rm ( R8D, R9D, 0 ) ;
+    _Compile_MoveImm_To_Reg ( OREG, Here + x, CELL ) ; // x : number of bytes to the first byte after the jmp instruction
+    _Compile_Move_Reg_To_Rm ( ACC, OREG, 0 ) ;
     _Compile_JumpToAddress ( byte * jmpToAddr ) ;
 }
 
@@ -1100,7 +1101,7 @@ void
 _Compile_Move_FromAtMem_ToMem ( int64 dstAddress, int64 srcAddress ) // thruReg == R8
 {
     _Compile_Move_AddressValue_To_R8 ( srcAddress ) ;
-    _Compile_Move_Rm_To_Reg ( R8D, R8D, 0 ) ;
+    _Compile_Move_Rm_To_Reg ( ACC, ACC, 0 ) ;
     _Compile_Move_R8_To_MemoryAddress ( dstAddress ) ;
 }
 #endif
@@ -1121,7 +1122,7 @@ _Compile_Call_WithOffset ( int64 offset )
         //Compile_Call_With32BitDisp ( address ) ;
         _Compile_InstructionX86 ( CALLI32, 0, 0, 0, 0, 0, 0, DISP_SIZE, offset, 0 ) ;
     else
-        Compile_Call_ToAddressThruReg ( address, R8D ) ;
+        Compile_Call_ToAddressThruReg ( address, ACC ) ;
     //_Compile_InstructionX86 ( CALLI32, 0, 0, 0, 0, 0, 0, offset, CELL ) ;
 #endif    
 }

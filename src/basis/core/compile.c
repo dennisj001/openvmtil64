@@ -54,7 +54,7 @@ _MoveGotoPoint ( dlnode * node, int64 srcAddress, int64 key, int64 dstAddress )
 {
     GotoInfo * gotoInfo = ( GotoInfo* ) node ;
     byte * address = gotoInfo->pb_JmpOffsetPointer ;
-    if ( ( byte* ) srcAddress == address ) 
+    if ( ( byte* ) srcAddress == (byte*) address ) 
     {
         gotoInfo->pb_JmpOffsetPointer = ( byte* ) dstAddress ;
     }
@@ -72,8 +72,8 @@ _InstallGotoPoint_Key ( dlnode * node, int64 bi, int64 key )
 {
     Word * word ;
     GotoInfo * gotoInfo = ( GotoInfo* ) node ;
-    byte * address = gotoInfo->pb_JmpOffsetPointer ;
-    if ( *( int64* ) address == 0 ) // if we move a block its recurse offset remains, check if this looks like at real offset pointer
+    uint64 address = *(int32*) gotoInfo->pb_JmpOffsetPointer ;
+    if ( address == 0 ) // if we move a block its recurse offset remains, check if this looks like at real offset pointer
     {
         if ( ( gotoInfo->GI_CAttribute & ( GI_GOTO | GI_CALL_LABEL ) ) && ( key & ( GI_GOTO | GI_CALL_LABEL ) ) )
         {
@@ -104,7 +104,7 @@ _InstallGotoPoint_Key ( dlnode * node, int64 bi, int64 key )
         }
         else if ( ( gotoInfo->GI_CAttribute & GI_RECURSE ) && ( key & GI_RECURSE ) )
         {
-            _GotoInfo_SetAndDelete ( gotoInfo, ( byte* ) ( ( BlockInfo * ) bi )->bp_First ) ;
+            _GotoInfo_SetAndDelete ( gotoInfo, ( ( BlockInfo * ) bi )->bp_First ) ;
         }
         else if ( ( gotoInfo->GI_CAttribute & GI_TAIL_CALL ) && ( key & GI_TAIL_CALL ) )
         {
@@ -141,7 +141,7 @@ _CfrTil_InstallGotoCallPoints_Keyed ( BlockInfo * bi, int64 key )
 }
 
 int64 
-_CfrTil_MoveGotoPoint ( int64 srcAddress, int64 key, int64 dstAddress )
+_CfrTil_MoveGotoPoint ( int64 srcAddress, int64 key, int32 dstAddress )
 {
     return dllist_Map3 ( _Context_->Compiler0->GotoList, ( MapFunction3 ) _MoveGotoPoint, srcAddress, key, dstAddress ) ;
 }

@@ -143,39 +143,39 @@ CfrTil_Dlsym ( )
 void
 CfrTil_system0 ( )
 {
-    _Compile_Stack_PopToReg ( DSP, R8D ) ;
+    _Compile_Stack_PopToReg ( DSP, ACC ) ;
     _Compile_INT80 ( ) ;
-    _Compile_Stack_PushReg ( DSP, R8D ) ;
+    _Compile_Stack_PushReg ( DSP, ACC ) ;
 }
 
 void
 CfrTil_system1 ( )
 {
-    _Compile_Stack_PopToReg ( DSP, R8D ) ;
+    _Compile_Stack_PopToReg ( DSP, ACC ) ;
     _Compile_Stack_PopToReg ( DSP, R11D ) ;
     _Compile_INT80 ( ) ;
-    _Compile_Stack_PushReg ( DSP, R8D ) ;
+    _Compile_Stack_PushReg ( DSP, ACC ) ;
 }
 
 void
 CfrTil_system2 ( )
 {
-    _Compile_Stack_PopToReg ( DSP, R8D ) ;
+    _Compile_Stack_PopToReg ( DSP, ACC ) ;
     _Compile_Stack_PopToReg ( DSP, R11D ) ;
-    _Compile_Stack_PopToReg ( DSP, R9D ) ;
+    _Compile_Stack_PopToReg ( DSP, OREG ) ;
     _Compile_INT80 ( ) ;
-    _Compile_Stack_PushReg ( DSP, R8D ) ;
+    _Compile_Stack_PushReg ( DSP, ACC ) ;
 }
 
 void
 CfrTil_system3 ( )
 {
-    _Compile_Stack_PopToReg ( DSP, R8D ) ;
+    _Compile_Stack_PopToReg ( DSP, ACC ) ;
     _Compile_Stack_PopToReg ( DSP, R11D ) ;
-    _Compile_Stack_PopToReg ( DSP, R9D ) ;
+    _Compile_Stack_PopToReg ( DSP, OREG ) ;
     _Compile_Stack_PopToReg ( DSP, R10D ) ;
     _Compile_INT80 ( ) ;
-    _Compile_Stack_PushReg ( DSP, R8D ) ;
+    _Compile_Stack_PushReg ( DSP, ACC ) ;
 }
 
 #if 0
@@ -293,7 +293,7 @@ _CfrTil_SystemState_Print ( int64 pflag )
     _Printf ( ( byte* ) buf ) ;
     if ( pflag && ( _Q_->Verbosity > 2 ) ) OpenVmTil_Print_DataSizeofInfo ( pflag ) ;
     _CfrTil_WordAccounting_Print ( ( byte* ) "_CfrTil_SystemState_Print" ) ;
-    BigNum_StateShow () ;
+    BigNum_StateShow ( ) ;
 }
 
 void
@@ -420,7 +420,7 @@ void
 _CfrTil_Dump ( int64 dumpMod )
 {
     int64 number = _DataStack_Pop ( ) ;
-    byte * address = (byte*) _DataStack_Pop ( ) ;
+    byte * address = ( byte* ) _DataStack_Pop ( ) ;
     __CfrTil_Dump ( address, number, dumpMod ) ;
 }
 

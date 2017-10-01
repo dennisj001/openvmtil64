@@ -56,14 +56,14 @@ _Compiler_RemoveLocalFrame ( Compiler * compiler )
     {
         SetState ( compiler, RETURN_TOS, true ) ;
     }
-    returnValueFlag = ( _Context_->CurrentlyRunningWord->CAttribute & C_RETURN ) || ( GetState ( compiler, RETURN_TOS | RETURN_R8 ) ) || IsWordRecursive || compiler->ReturnVariableWord ;
+    returnValueFlag = ( _Context_->CurrentlyRunningWord->CAttribute & C_RETURN ) || ( GetState ( compiler, RETURN_TOS | RETURN_ACCUM ) ) || IsWordRecursive || compiler->ReturnVariableWord ;
     Word * word = compiler->ReturnVariableWord ;
     if ( word )
     {
-        _Compile_GetVarLitObj_RValue_To_Reg ( word, R8D ) ; // nb. these variables have no lasting lvalue - they exist on the stack - therefore we can only return there rvalue
+        _Compile_GetVarLitObj_RValue_To_Reg ( word, ACC ) ; // nb. these variables have no lasting lvalue - they exist on the stack - therefore we can only return there rvalue
     }
         //else if ( compiler->NumberOfParameterVariables && returnValueFlag && ( ! compiler->NumberOfRegisterVariables ) && ( ! GetState ( compiler, RETURN_R8 ) ) )
-    else if ( compiler->NumberOfArgs && returnValueFlag && ( ! GetState ( compiler, RETURN_R8 ) ) )
+    else if ( compiler->NumberOfArgs && returnValueFlag && ( ! GetState ( compiler, RETURN_ACCUM ) ) )
     {
         Compile_Move_TOS_To_R8 ( DSP ) ; // save TOS to R8 so we can set return it as TOS below
     }
@@ -84,10 +84,10 @@ _Compiler_RemoveLocalFrame ( Compiler * compiler )
         Compile_ADDI ( REG, DSP, 0, abs (parameterVarsSubAmount), 0 ) ; // add a place on the stack for return value
     }
     //if ( rvf && returnValueFlag && ( ! GetState ( compiler, RETURN_R8 ) ) )
-    if ( returnValueFlag && ( ! GetState ( compiler, RETURN_R8 ) ) )
+    if ( returnValueFlag && ( ! GetState ( compiler, RETURN_ACCUM ) ) )
     {
         // nb : stack was already adjusted accordingly for this above by reducing the SUBI subAmount or adding if there weren't any parameter variables
-        Compile_Move_R8_To_TOS ( DSP ) ;
+        Compile_Move_ACC_To_TOS ( DSP ) ;
     }
 }
 
@@ -106,7 +106,7 @@ void
 _Compile_Rsp_Save ( )
 {
 #if 1    
-    _Compile_Move_Reg_To_Rm ( R14, RSP, 4 ) ; // 4 : placeholder
+    _Compile_Move_Reg_To_Rm ( DSP, RSP, 4 ) ; // 4 : placeholder
     _Context_->Compiler0->RspSaveOffset = Here - 1 ; // only takes one byte for _Compile_Move_Reg_To_Rm ( ESI, 4, ESP )
     // TO DO : i think this (below) is what it should be but some adjustments need to be made to make it work 
     //byte * here = Here ;

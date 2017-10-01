@@ -47,41 +47,41 @@ _Compile_CpuState_Save ( Cpu * cpu )
     // SoftwareDevelopersManual-253665.pdf, section 6.2
     // registers are pushed in this order ...
     // eax, ecx, edx, ebx, esp, ebp, esi, edi
-    _Compile_PushReg ( RAX ) ; // scratch reg1
-    _Compile_Set_CAddress_WithRegValue_ThruReg ( ( byte* ) & cpu->R10d, R10D, RAX ) ; // save scratch reg r9d thru rax
-    _Compile_PopToReg ( RAX ) ; // restore rax
+    _Compile_PushReg ( ACC ) ; 
+    _Compile_Set_CAddress_WithRegValue_ThruReg ( ( byte* ) & cpu->R9d, OREG, ACC ) ; // save operand reg thru accum
+    _Compile_PopToReg ( ACC ) ; // restore rax
 
-    _Compile_Set_CAddress_WithRegValue_ThruReg ( ( byte* ) & cpu->Rax, RAX, R10D ) ;// eax
-    _Compile_Set_CAddress_WithRegValue_ThruReg ( ( byte* ) & cpu->Rcx, RCX, R10D ) ;// edx
-    _Compile_Set_CAddress_WithRegValue_ThruReg ( ( byte* ) & cpu->Rdx, RDX, R10D ) ;// edx
-    _Compile_Set_CAddress_WithRegValue_ThruReg ( ( byte* ) & cpu->Rbx, RBX, R10D ) ;// edx
-    _Compile_Set_CAddress_WithRegValue_ThruReg ( ( byte* ) & cpu->Rsp, RSP, R10D ) ;// Rsp //this won't be accurate for the runtime because it is called from C 
-    _Compile_Set_CAddress_WithRegValue_ThruReg ( ( byte* ) & cpu->Rbp, RBP, R10D ) ;// edx
-    _Compile_Set_CAddress_WithRegValue_ThruReg ( ( byte* ) & cpu->Rsi, RSI, R10D ) ;// edx
-    _Compile_Set_CAddress_WithRegValue_ThruReg ( ( byte* ) & cpu->Rdi, RDI, R10D ) ;// edx
+    _Compile_Set_CAddress_WithRegValue_ThruReg ( ( byte* ) & cpu->Rax, RAX, OREG ) ;// eax
+    _Compile_Set_CAddress_WithRegValue_ThruReg ( ( byte* ) & cpu->Rcx, RCX, OREG ) ;// edx
+    _Compile_Set_CAddress_WithRegValue_ThruReg ( ( byte* ) & cpu->Rdx, RDX, OREG ) ;// edx
+    _Compile_Set_CAddress_WithRegValue_ThruReg ( ( byte* ) & cpu->Rbx, RBX, OREG ) ;// edx
+    _Compile_Set_CAddress_WithRegValue_ThruReg ( ( byte* ) & cpu->Rsp, RSP, OREG ) ;// Rsp //this won't be accurate for the runtime because it is called from C 
+    _Compile_Set_CAddress_WithRegValue_ThruReg ( ( byte* ) & cpu->Rbp, RBP, OREG ) ;// edx
+    _Compile_Set_CAddress_WithRegValue_ThruReg ( ( byte* ) & cpu->Rsi, RSI, OREG ) ;// edx
+    _Compile_Set_CAddress_WithRegValue_ThruReg ( ( byte* ) & cpu->Rdi, RDI, OREG ) ;// edx
 
-    _Compile_Set_CAddress_WithRegValue_ThruReg ( ( byte* ) & cpu->R8d, R8D, R10D ) ;// edx
-    _Compile_Set_CAddress_WithRegValue_ThruReg ( ( byte* ) & cpu->R9d, R9D, R10D ) ;// edx
-    _Compile_Set_CAddress_WithRegValue_ThruReg ( ( byte* ) & cpu->R10d, R10D, R10D ) ;// edx
-    _Compile_Set_CAddress_WithRegValue_ThruReg ( ( byte* ) & cpu->R11d, R11D, R10D ) ;// ebx
+    _Compile_Set_CAddress_WithRegValue_ThruReg ( ( byte* ) & cpu->R8d, R8D, OREG ) ;// edx
+    _Compile_Set_CAddress_WithRegValue_ThruReg ( ( byte* ) & cpu->R9d, R9D, OREG ) ;// edx
+    _Compile_Set_CAddress_WithRegValue_ThruReg ( ( byte* ) & cpu->R10d, R10D, OREG ) ;// edx
+    _Compile_Set_CAddress_WithRegValue_ThruReg ( ( byte* ) & cpu->R11d, R11D, OREG ) ;// ebx
 
-    _Compile_Set_CAddress_WithRegValue_ThruReg ( ( byte* ) & cpu->R12d, R12D, R10D ) ;// esp //this won't be accurate for the runtime because it is called from C 
-    _Compile_Set_CAddress_WithRegValue_ThruReg ( ( byte* ) & cpu->R13d, R13D, R10D ) ;// ebp
-    _Compile_Set_CAddress_WithRegValue_ThruReg ( ( byte* ) & cpu->R14d, R14D, R10D ) ;// esi
-    _Compile_Set_CAddress_WithRegValue_ThruReg ( ( byte* ) & cpu->R15d, R15D, R10D ) ;// edi
+    _Compile_Set_CAddress_WithRegValue_ThruReg ( ( byte* ) & cpu->R12d, R12D, OREG ) ;// esp //this won't be accurate for the runtime because it is called from C 
+    _Compile_Set_CAddress_WithRegValue_ThruReg ( ( byte* ) & cpu->R13d, R13D, OREG ) ;// ebp
+    _Compile_Set_CAddress_WithRegValue_ThruReg ( ( byte* ) & cpu->R14d, R14D, OREG ) ;// esi
+    _Compile_Set_CAddress_WithRegValue_ThruReg ( ( byte* ) & cpu->R15d, R15D, OREG ) ;// edi
 
     //_Compile_MoveImm_To_Reg ( RAX, 0, CELL_SIZE ) ;
     _Compile_PushFD ( ) ; // save flags
-    _Compile_PopToReg ( RAX ) ; // ebx now has eflags
+    _Compile_PopToReg ( ACC ) ; // ebx now has eflags
     //_Compile_MoveImm_To_Reg ( RBX, 0xfffbffff, 4 ) ; // alignment bit
     //_Compile_Int8 ( 0x40 ) ;
     //Compile_AND ( REG, REG, RAX, RBX, 0, 0, CELL_SIZE ) ;
-    _Compile_Set_CAddress_WithRegValue_ThruReg ( ( byte* ) & cpu->RFlags, RAX, R10D ) ;//flags
-    _Compile_Get_FromCAddress_ToReg ( RAX, ( byte* ) & cpu->Rax ) ; // our scratch reg
+    _Compile_Set_CAddress_WithRegValue_ThruReg ( ( byte* ) & cpu->RFlags, ACC, OREG ) ;//flags
+    _Compile_Get_FromCAddress_ToReg ( ACC, ( byte* ) & cpu->Rax ) ; // our scratch reg
 
     //_Compile_Set_C_LValue_WithImm_ThruReg ( ( int64 ) & cpu->State, CPU_STATE_SAVED, R9D, CELL ) ; // mark this CpuState as having been saved
     // restore our scratch regs so we leave things as we found them
-    _Compile_Get_FromCAddress_ToReg ( R10D, ( byte* ) & cpu->R10d ) ; // our scratch reg
+    _Compile_Get_FromCAddress_ToReg ( OREG, ( byte* ) & cpu->R9d ) ; // our scratch reg
 }
 
 // we have the cpu register state stored in a C struct 
@@ -98,31 +98,31 @@ _Compile_CpuState_Restore ( Cpu * cpu, int8 cStackRegFlag )
 
     if ( cStackRegFlag )
     {
-        _Compile_Get_FromCAddress_ToReg_ThruReg ( RSP, ( byte * ) & cpu->Rsp, R10D ) ; // r12, r13, rsp, rbp : same problem
-        _Compile_Get_FromCAddress_ToReg_ThruReg ( RBP, ( byte * ) & cpu->Rbp, R10D ) ; // r12, r13, rsp, rbp : same problem
+        _Compile_Get_FromCAddress_ToReg_ThruReg ( RSP, ( byte * ) & cpu->Rsp, OREG ) ; // r12, r13, rsp, rbp : same problem
+        _Compile_Get_FromCAddress_ToReg_ThruReg ( RBP, ( byte * ) & cpu->Rbp, OREG ) ; // r12, r13, rsp, rbp : same problem
     }
     
     _Compile_Get_FromCAddress_ToReg ( RSI, ( byte* ) & cpu->Rsi ) ; // rsi
     _Compile_Get_FromCAddress_ToReg ( RDI, ( byte* ) & cpu->Rdi ) ; // rdi
     _Compile_Get_FromCAddress_ToReg ( R8D, ( byte* ) & cpu->R8d ) ; // r8d
     _Compile_Get_FromCAddress_ToReg ( R9D, ( byte* ) & cpu->R9d ) ; // r9d
-    _Compile_Get_FromCAddress_ToReg ( R10D, ( byte* ) & cpu->R10d ) ; // r10d
+    _Compile_Get_FromCAddress_ToReg ( OREG, ( byte* ) & cpu->R10d ) ; // r10d
     _Compile_Get_FromCAddress_ToReg ( R11D, ( byte* ) & cpu->R11d ) ; // r11d
-    _Compile_Get_FromCAddress_ToReg_ThruReg ( R12D, ( byte* ) & cpu->R12d, R10D ) ; // r12, r13, rsp, rbp : same problem
-    _Compile_Get_FromCAddress_ToReg_ThruReg ( R13D, ( byte* ) & cpu->R13d, R10D ) ; // r12, r13, rsp, rbp : same problem
+    _Compile_Get_FromCAddress_ToReg_ThruReg ( R12D, ( byte* ) & cpu->R12d, OREG ) ; // r12, r13, rsp, rbp : same problem
+    _Compile_Get_FromCAddress_ToReg_ThruReg ( R13D, ( byte* ) & cpu->R13d, OREG ) ; // r12, r13, rsp, rbp : same problem
     _Compile_Get_FromCAddress_ToReg ( R14D, ( byte* ) & cpu->R14d ) ; // r14d
     _Compile_Get_FromCAddress_ToReg ( R15D, ( byte* ) & cpu->R15d ) ; // r15d
 
-    _Compile_Get_FromCAddress_ToReg ( RAX, ( byte* ) & cpu->RFlags ) ;
+    _Compile_Get_FromCAddress_ToReg ( ACC, ( byte* ) & cpu->RFlags ) ;
     //_Compile_MoveImm_To_Reg ( RBX, 0x00003ffff, 8 ) ; // turn off alignment bit
     //_Compile_Int8 ( 0x40 ) ;
     //Compile_AND ( REG, REG, RAX, RBX, 0, 0, CELL_SIZE ) ;
-    _Compile_PushReg ( RAX ) ; // the flags
+    _Compile_PushReg ( ACC ) ; // the flags
     _Compile_PopFD ( ) ; // pops the pushed flags in ebx to flags reg           // eflags
     //_Compile_Get_FromCAddress_ToReg ( RBX, ( byte* ) & cpu->Rbx ) ; // restore scratch reg rax
-    _Compile_Get_FromCAddress_ToReg ( RAX, ( byte* ) & cpu->Rax ) ; // restore scratch reg rax
+    _Compile_Get_FromCAddress_ToReg ( ACC, ( byte* ) & cpu->Rax ) ; // restore scratch reg rax
 
-    _Compile_Get_FromCAddress_ToReg ( R10D, ( byte* ) & cpu->R10d ) ; // restore thru - scratch reg
+    _Compile_Get_FromCAddress_ToReg ( OREG, ( byte* ) & cpu->R9d ) ; // restore thru - scratch reg
 }
 
 void

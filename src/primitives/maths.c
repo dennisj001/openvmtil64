@@ -87,9 +87,9 @@ CfrTil_IncDec ( int64 op ) // +
             {
                 //_Compile_GetVarLitObj_RValue_To_Reg ( nextWord, R8D ) ;
                 _Compile_Move_Literal_Immediate_To_Reg ( R11D, ( int64 ) nextWord->W_PtrToValue ) ;
-                _Compile_Move_Rm_To_Reg ( R8D, R11D, 0 ) ;
-                _Compile_Group5 ( op, REG, R8D, 0, 0, 0 ) ;
-                _Compile_Move_Reg_To_Rm ( R11D, R8D, 0 ) ;
+                _Compile_Move_Rm_To_Reg ( ACC, R11D, 0 ) ;
+                _Compile_Group5 ( op, REG, ACC, 0, 0, 0 ) ;
+                _Compile_Move_Reg_To_Rm ( R11D, ACC, 0 ) ;
 
             }
             //_Word_CompileAndRecord_PushReg ( nextWord, R8D ) ;

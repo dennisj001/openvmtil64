@@ -117,13 +117,13 @@ GetPostfix ( byte * address, byte* postfix, byte * buffer )
 void
 Compile_Debug_GetESP ( ) // where we want the acquired pointer
 {
-    _Compile_PushReg ( RAX ) ;
-    _Compile_Set_CAddress_WithRegValue_ThruReg ( ( byte* ) & _Debugger_->DebugRSP, RSP, RAX ) ; // esp 
+    _Compile_PushReg ( ACC ) ;
+    _Compile_Set_CAddress_WithRegValue_ThruReg ( ( byte* ) & _Debugger_->DebugRSP, RSP, ACC ) ; // esp 
     //_Compile_Set_CAddress_WithRegValue_ThruReg ( ( byte* ) & _Debugger_->cs_Cpu->Rsp, RSP, R11D ) ; // esp 
-    _Compile_Set_CAddress_WithRegValue_ThruReg ( ( byte* ) & _Debugger_->DebugRBP, RBP, RAX ) ; // esp 
-    //_Compile_Set_CAddress_WithRegValue_ThruReg ( ( byte* ) & _Debugger_->DebugESI, R14, R11D ) ; // esi
+    _Compile_Set_CAddress_WithRegValue_ThruReg ( ( byte* ) & _Debugger_->DebugRBP, RBP, ACC ) ; // esp 
+    //_Compile_Set_CAddress_WithRegValue_ThruReg ( ( byte* ) & _Debugger_->DebugESI, DSP, R11D ) ; // esi
     //_Compile_Set_CAddress_WithRegValue_ThruReg ( ( byte* ) & _Debugger_->DebugEDI, R15, R11D ) ; // edi
-    _Compile_PopToReg ( RAX ) ;
+    _Compile_PopToReg ( ACC ) ;
 }
 
 void

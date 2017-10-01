@@ -102,8 +102,8 @@ Compile_Cmp_Set_tttn_Logic ( Compiler * compiler, int64 ttt, int64 negateFlag )
 #if 2        
         if ( ( optFlag == 2 ) && ( compiler->optInfo->Optimize_Rm == DSP ) )
         {
-            _Compile_Stack_PopToReg ( DSP, R9D ) ; // assuming optimize always uses R8 first
-            compiler->optInfo->Optimize_Rm = R9D ;
+            _Compile_Stack_PopToReg ( DSP, OREG ) ; // assuming optimize always uses R8 first
+            compiler->optInfo->Optimize_Rm = OREG ;
             compiler->optInfo->Optimize_Mod = REG ;
         }
 #endif        
@@ -113,7 +113,7 @@ Compile_Cmp_Set_tttn_Logic ( Compiler * compiler, int64 ttt, int64 negateFlag )
             if ( ( ttt == EQUAL ) && ( compiler->optInfo->Optimize_Imm == 0 ) ) //Compile_TEST ( compiler->optInfo->Optimize_Mod, compiler->optInfo->Optimize_Rm, 0, compiler->optInfo->Optimize_Disp, compiler->optInfo->Optimize_Imm, CELL ) ;
             {
                 if ( compiler->optInfo->O_two->StackPushRegisterCode ) SetHere ( compiler->optInfo->O_two->StackPushRegisterCode ) ; // leave optInfo->O_two value in R8 we don't need to push it
-                _Compile_TEST_Reg_To_Reg ( R8D, R8D ) ;
+                _Compile_TEST_Reg_To_Reg ( ACC, ACC ) ;
             }
             else
             {
@@ -131,15 +131,15 @@ Compile_Cmp_Set_tttn_Logic ( Compiler * compiler, int64 ttt, int64 negateFlag )
     }
     else
     {
-        _Compile_Move_StackN_To_Reg ( R9D, DSP, 0 ) ;
-        _Compile_Move_StackN_To_Reg ( R8D, DSP, - 1 ) ;
+        _Compile_Move_StackN_To_Reg ( OREG, DSP, 0 ) ;
+        _Compile_Move_StackN_To_Reg ( ACC, DSP, - 1 ) ;
         // must do the DropN before the CMP because CMP sets eflags 
         _Compile_Stack_DropN ( DSP, 2 ) ; // before cmp 
-        Compile_CMP ( REG, REG, R8D, R9D, 0, 0, CELL ) ;
+        Compile_CMP ( REG, REG, ACC, OREG, 0, 0, CELL ) ;
     }
-    _Compile_SET_tttn_REG ( ttt, negateFlag, R8D ) ; // immediately after the 'cmp' insn which changes the flags appropriately
-    _Compile_MOVZX_REG ( R8D ) ;
-    _Compiler_CompileAndRecord_PushR8 ( compiler ) ;
+    _Compile_SET_tttn_REG ( ttt, negateFlag, ACC ) ; // immediately after the 'cmp' insn which changes the flags appropriately
+    _Compile_MOVZX_REG ( ACC ) ;
+    _Compiler_CompileAndRecord_PushAccum ( compiler ) ;
 #if dbgON_13    
     d1 ( //if ( DBI )
     {
@@ -187,9 +187,9 @@ _Compile_SET_tttn_REG ( int8 ttt, int8 negFlag, int8 reg )
 void
 Compile_GetLogicFromTOS ( BlockInfo *bi )
 {
-    Compile_Pop_To_R8 ( DSP ) ;
+    Compile_Pop_To_Acc ( DSP ) ;
     SC_SetForcePush ( true ) ;
-    _Compile_TEST_Reg_To_Reg ( R8D, R8D ) ;
+    _Compile_TEST_Reg_To_Reg ( ACC, ACC ) ;
 }
 
 int64
@@ -235,20 +235,20 @@ void
 _Compile_LogicalAnd ( Compiler * compiler )
 {
 #if 1    
-    _Compile_TEST_Reg_To_Reg ( R9D, R9D ) ;
+    _Compile_TEST_Reg_To_Reg ( OREG, OREG ) ;
     _BlockInfo_Setup_BI_tttn ( _Context_->Compiler0, ZERO_TTT, NZ, 6 ) ; // not less than 0 == greater than 0
     Compile_JCC ( Z, ZERO_TTT, Here + 15 ) ; // if eax is zero return not(R8) == 1 else return 0
-    _Compile_TEST_Reg_To_Reg ( R8D, R8D ) ;
+    _Compile_TEST_Reg_To_Reg ( ACC, ACC ) ;
     _BlockInfo_Setup_BI_tttn ( _Context_->Compiler0, ZERO_TTT, NZ, 6 ) ; // not less than 0 == greater than 0
     Compile_JCC ( NZ, ZERO_TTT, Here + 15 ) ; // if eax is zero return not(R8) == 1 else return 0
-    _Compile_LogicResult ( R8D ) ;
-    _Compiler_CompileAndRecord_PushR8 ( compiler ) ;
+    _Compile_LogicResult ( ACC ) ;
+    _Compiler_CompileAndRecord_PushAccum ( compiler ) ;
 #else // bitwise and
-    _Compile_TEST_Reg_To_Reg ( R8D, R9D ) ;
+    _Compile_TEST_Reg_To_Reg ( ACC, OREG ) ;
     _BlockInfo_Setup_BI_tttn ( _Context_->Compiler0, ZERO_TTT, NZ, 6 ) ; // not less than 0 == greater than 0
     Compile_JCC ( NZ, ZERO_TTT, Here + 15 ) ; // if eax is zero return not(R8) == 1 else return 0
-    _Compile_LogicResult ( R8D ) ;
-    _Compiler_CompileAndRecord_PushR8 ( compiler ) ;
+    _Compile_LogicResult ( ACC ) ;
+    _Compiler_CompileAndRecord_PushAccum ( compiler ) ;
 #endif    
 }
 
@@ -266,8 +266,8 @@ Compile_LogicalAnd ( Compiler * compiler )
         //Word *one = Compiler_WordStack ( - 1 ) ; // assumes two values ( n m ) on the DSP stack 
         Word *one = Compiler_WordList ( 1 ) ; // assumes two values ( n m ) on the DSP stack 
         if ( one->StackPushRegisterCode ) SetHere ( one->StackPushRegisterCode ) ;
-        else _Compile_Stack_PopToReg ( DSP, R8D ) ;
-        _Compile_Stack_PopToReg ( DSP, R9D ) ;
+        else _Compile_Stack_PopToReg ( DSP, ACC ) ;
+        _Compile_Stack_PopToReg ( DSP, OREG ) ;
         _Compile_LogicalAnd ( compiler ) ;
     }
 }
@@ -276,11 +276,11 @@ void
 Compile_LogicalNot ( Compiler * compiler )
 {
     //int64 negFlag = Z ;
-    _Compile_TEST_Reg_To_Reg ( R8D, R8D ) ; // test insn logical and src op and dst op sets zf to result
+    _Compile_TEST_Reg_To_Reg ( ACC, ACC ) ; // test insn logical and src op and dst op sets zf to result
     _BlockInfo_Setup_BI_tttn ( compiler, ZERO_TTT, Z, 6 ) ; // if eax is zero zf will equal 1 which is not(R8) and if eax is not zero zf will equal 0 which is not(R8)
     Compile_JCC ( Z, ZERO_TTT, Here + 15 ) ; // if eax is zero return not(R8) == 1 else return 0
-    _Compile_LogicResult ( R8D ) ;
-    _Compiler_CompileAndRecord_PushR8 ( compiler ) ;
+    _Compile_LogicResult ( ACC ) ;
+    _Compiler_CompileAndRecord_PushAccum ( compiler ) ;
 }
 
 void
@@ -295,23 +295,23 @@ _Compile_LogicalNot ( Compiler * compiler )
     {
         if ( compiler->optInfo->OptimizeFlag & OPTIMIZE_IMM )
         {
-            _Compile_MoveImm_To_Reg ( R8D, compiler->optInfo->Optimize_Imm, CELL ) ;
+            _Compile_MoveImm_To_Reg ( ACC, compiler->optInfo->Optimize_Imm, CELL ) ;
         }
         else if ( compiler->optInfo->Optimize_Rm == DSP )
         {
-            _Compile_Move_StackN_To_Reg ( R8D, DSP, 0 ) ;
+            _Compile_Move_StackN_To_Reg ( ACC, DSP, 0 ) ;
             //_Compile_Stack_PopToReg ( DSP, R8 ) ;
         }
-        else if ( compiler->optInfo->Optimize_Rm != R8D )
+        else if ( compiler->optInfo->Optimize_Rm != ACC )
         {
-            _Compile_GetVarLitObj_RValue_To_Reg ( one, R8D ) ;
+            _Compile_GetVarLitObj_RValue_To_Reg ( one, ACC ) ;
         }
     }
     else
     {
         //if ( ( ! GetState ( _Context_->Compiler0, PREFIX_PARSING ) )  && one->StackPushRegisterCode ) SetHere ( one->StackPushRegisterCode ) ; // PREFIX_PARSING : nb! could be a prefix function 
         if ( one->StackPushRegisterCode ) SetHere ( one->StackPushRegisterCode ) ; // PREFIX_PARSING : nb! could be a prefix function 
-        else _Compile_Stack_PopToReg ( DSP, R8D ) ;
+        else _Compile_Stack_PopToReg ( DSP, ACC ) ;
         //int64 a, b, c= 0, d ; a = 1; b = !a, d= !c ; _Printf ( "a = %d b = %d c =%d ~d = %d", a, b, c, d ) ;
     }
     Compile_LogicalNot ( compiler ) ;
@@ -364,21 +364,21 @@ Compile_Logical_X ( Compiler * compiler, int64 op )
     {
         // TODO : this optimization somehow is *very* little used, why is that ?!? 
         // assumes we have unordered operands in eax, ecx
-        _Compile_X_Group1 ( op, REG, REG, R8D, R9D, 0, 0, CELL ) ;
-        _Compile_TEST_Reg_To_Reg ( R8D, R8D ) ;
+        _Compile_X_Group1 ( op, REG, REG, ACC, OREG, 0, 0, CELL ) ;
+        _Compile_TEST_Reg_To_Reg ( ACC, ACC ) ;
         _BlockInfo_Setup_BI_tttn ( _Context_->Compiler0, ZERO_TTT, NZ, 6 ) ; // not less than 0 == greater than 0
-        _Compiler_CompileAndRecord_PushR8 ( compiler ) ;
+        _Compiler_CompileAndRecord_PushAccum ( compiler ) ;
     }
     else
     {
         // operands are still on the stack
-        _Compile_Move_StackN_To_Reg ( R8D, DSP, 0 ) ;
+        _Compile_Move_StackN_To_Reg ( ACC, DSP, 0 ) ;
         //_Compile_Group1 ( int64 code, int64 toRegOrMem, int64 mod, int64 reg, int64 rm, int64 sib, int64 disp, int64 osize )
-        _Compile_X_Group1 ( op, REG, MEM, R8D, DSP, 0, - 4, CELL ) ;
+        _Compile_X_Group1 ( op, REG, MEM, ACC, DSP, 0, - 4, CELL ) ;
         _Compile_Stack_DropN ( DSP, 2 ) ;
 
-        _Compile_TEST_Reg_To_Reg ( R8D, R8D ) ;
+        _Compile_TEST_Reg_To_Reg ( ACC, ACC ) ;
         _BlockInfo_Setup_BI_tttn ( _Context_->Compiler0, ZERO_TTT, NZ, 6 ) ; // not less than 0 == greater than 0
-        _Compiler_CompileAndRecord_PushR8 ( compiler ) ;
+        _Compiler_CompileAndRecord_PushAccum ( compiler ) ;
     }
 }

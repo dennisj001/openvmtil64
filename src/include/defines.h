@@ -565,7 +565,7 @@
 #define SAVE_Rsp ( 1 << 3 ) 
 #define RETURN_NONE ( 1 << 5 ) 
 #define RETURN_TOS ( 1 << 6 )
-#define RETURN_R8 ( 1 << 7 ) 
+#define RETURN_ACCUM ( 1 << 7 ) 
 #define LISP_COMBINATOR_MODE ( 1 << 8 )
 #define LISP_MODE ( 1 << 9 )
 #define INFIX_MODE ( 1 << 10 )

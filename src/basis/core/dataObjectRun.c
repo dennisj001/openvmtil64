@@ -206,8 +206,8 @@ _Do_Literal ( int64 value )
 {
     if ( CompileMode )
     {
-        _Compile_MoveImm_To_Reg ( R8D, value, CELL ) ;
-        _Compiler_CompileAndRecord_PushR8 ( _Context_->Compiler0 ) ; // does word == top of word stack always
+        _Compile_MoveImm_To_Reg ( ACC, value, CELL ) ;
+        _Compiler_CompileAndRecord_PushAccum ( _Context_->Compiler0 ) ; // does word == top of word stack always
     }
     else DSP_Push ( value ) ;
 }
@@ -282,17 +282,17 @@ _Do_Variable ( Word * word )
         {
             if ( GetState ( _Context_, ADDRESS_OF_MODE ) )
             {
-                _Compile_GetVarLitObj_LValue_To_Reg ( word, R8D ) ;
+                _Compile_GetVarLitObj_LValue_To_Reg ( word, ACC ) ;
                 //SetState ( _Context_, ADDRESS_OF_MODE, false ) ; // only good for one variable
             }
-            else _Compile_GetVarLitObj_RValue_To_Reg ( word, R8D ) ;
-            _Word_CompileAndRecord_PushReg ( word, R8D ) ;
+            else _Compile_GetVarLitObj_RValue_To_Reg ( word, ACC ) ;
+            _Word_CompileAndRecord_PushReg ( word, ACC ) ;
         }
     }
     else
     {
-        _Compile_GetVarLitObj_LValue_To_Reg ( word, R8D ) ;
-        _Word_CompileAndRecord_PushReg ( word, R8D ) ;
+        _Compile_GetVarLitObj_LValue_To_Reg ( word, ACC ) ;
+        _Word_CompileAndRecord_PushReg ( word, ACC ) ;
     }
 }
 
@@ -303,8 +303,8 @@ _CfrTil_Do_Literal ( Word * word )
     {
         if ( GetState ( _Context_, C_SYNTAX ) || GetState ( _Compiler_, LC_ARG_PARSING ) ) // for now until we have time to integrate this optimization
         {
-            _Compile_GetVarLitObj_RValue_To_Reg ( word, R8D ) ;
-            _Word_CompileAndRecord_PushReg ( word, R8D ) ;
+            _Compile_GetVarLitObj_RValue_To_Reg ( word, ACC ) ;
+            _Word_CompileAndRecord_PushReg ( word, ACC ) ;
         }
         else
         {
@@ -325,8 +325,8 @@ void
 _CfrTil_Do_LispSymbol ( Word * word )
 {
     // rvalue - rhs for stack var
-    _Compile_Move_StackN_To_Reg ( R8D, FP, ParameterVarOffset ( word ) ) ;
-    _Word_CompileAndRecord_PushReg ( word, R8D ) ;
+    _Compile_Move_StackN_To_Reg ( ACC, FP, ParameterVarOffset ( word ) ) ;
+    _Word_CompileAndRecord_PushReg ( word, ACC ) ;
 }
 
 void
@@ -418,12 +418,12 @@ _DataObject_Run ( Word * word )
         if ( ( word->CAttribute & LOCAL_VARIABLE ) && ( ! GetState ( word, W_INITIALIZED ) ) ) // this is a local variable so it is initialed at creation 
         {
             int64 size = _Namespace_VariableValueGet ( word->TypeNamespace, ( byte* ) "size" ) ;
-            _Compile_MoveImm_To_Reg ( RAX, ( int64 ) size, CELL ) ;
-            _Compile_PushReg ( RAX ) ;
-            _Compile_LEA ( RAX, FP, 0, LocalVarIndex_Disp ( LocalVarOffset ( word ) ) ) ; // 2 : account for saved fp and return slot
-            _Compile_PushReg ( RAX ) ;
-            _Compile_MoveImm_To_Reg ( RAX, ( int64 ) word->TypeNamespace, CELL ) ;
-            _Compile_PushReg ( RAX ) ;
+            _Compile_MoveImm_To_Reg ( ACC, ( int64 ) size, CELL ) ;
+            _Compile_PushReg ( ACC ) ;
+            _Compile_LEA ( ACC, FP, 0, LocalVarIndex_Disp ( LocalVarOffset ( word ) ) ) ; // 2 : account for saved fp and return slot
+            _Compile_PushReg ( ACC ) ;
+            _Compile_MoveImm_To_Reg ( ACC, ( int64 ) word->TypeNamespace, CELL ) ;
+            _Compile_PushReg ( ACC ) ;
             Compile_Call ( ( byte* ) _Do_LocalObject_AllocateInit ) ; // we want to only allocate this object once and only at run time; and not at compile time
             Compile_ADDI ( REG, RSP, 0, 3 * sizeof (int64 ), 0 ) ;
             SetState ( word, W_INITIALIZED, true ) ;

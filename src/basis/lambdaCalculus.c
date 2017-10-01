@@ -1033,7 +1033,7 @@ _LO_Apply_Arg ( ListObject ** pl1, int64 i )
         if ( CompileMode && ( ! ( l1->CAttribute & ( NAMESPACE_TYPE | OBJECT_FIELD | T_NIL ) ) ) ) // research : how does CAttribute get set to T_NIL?
         {
             if ( word->StackPushRegisterCode ) SetHere ( word->StackPushRegisterCode ) ;
-            _Compile_Move_Reg_To_Reg ( RegOrder ( i ++ ), R8D ) ;
+            _Compile_Move_Reg_To_Reg ( RegOrder ( i ++ ), ACC ) ;
             _DEBUG_SHOW ( word, 1 ) ;
         }
     }
@@ -1079,12 +1079,12 @@ _LO_Apply_Arg ( ListObject ** pl1, int64 i )
                 if ( ! variableFlag )
                 {
                     SetHere ( svBaseObject->Coding ) ;
-                    _Compile_GetVarLitObj_LValue_To_Reg ( svBaseObject, R8D ) ;
-                    _Word_CompileAndRecord_PushReg ( svBaseObject, R8D ) ;
+                    _Compile_GetVarLitObj_LValue_To_Reg ( svBaseObject, ACC ) ;
+                    _Word_CompileAndRecord_PushReg ( svBaseObject, ACC ) ;
                 }
                 if ( Is_DebugModeOn ) Word_PrintOffset ( word, increment, svBaseObject->AccumulatedOffset ) ;
                 if ( svBaseObject->StackPushRegisterCode ) SetHere ( svBaseObject->StackPushRegisterCode ) ;
-                _Compile_Move_Reg_To_Reg ( RegOrder ( i ++ ), R8D ) ;
+                _Compile_Move_Reg_To_Reg ( RegOrder ( i ++ ), ACC ) ;
             }
             interp->BaseObject = 0 ;
             SetState ( compiler, COMPILE_MODE, saveCompileMode ) ;

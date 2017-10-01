@@ -40,9 +40,9 @@ Compile_Peek ( Compiler * compiler, int8 stackReg ) // @
 {
     int64 optFlag = CheckOptimize ( compiler, 3 ) ;
     if ( optFlag & OPTIMIZE_DONE ) return ;
-    _Compile_Move_Rm_To_Reg ( R8D, stackReg, 0 ) ;
-    _Compile_Move_Rm_To_Reg ( R8D, R8D, 0 ) ;
-    _Compile_Move_Reg_To_Rm ( stackReg, R8D, 0 ) ;
+    _Compile_Move_Rm_To_Reg ( ACC, stackReg, 0 ) ;
+    _Compile_Move_Rm_To_Reg ( ACC, ACC, 0 ) ;
+    _Compile_Move_Reg_To_Rm ( stackReg, ACC, 0 ) ;
 }
 
 // '!' ( value address  -- ) // store value at address - dpans94 - address is on top - value was pushed first, leftmost in rpn, then address
@@ -71,10 +71,10 @@ Compile_Store ( Compiler * compiler, int8 stackReg ) // !
         //DBI_ON ;
         Word * word ;
         if ( ( word = ( Word* ) Compiler_WordList ( 1 ) ) && word->StackPushRegisterCode ) SetHere ( word->StackPushRegisterCode ) ;
-        else _Compile_Move_Rm_To_Reg ( R8D, stackReg, 0 ) ;
-        _Compile_Move_Rm_To_Reg ( R9D, stackReg, - CELL_SIZE ) ;
-        _Compile_Move_Reg_To_Rm ( R8D, R9D, 0 ) ;
-        Compile_SUBI ( REG, stackReg, 0, ( word && word->StackPushRegisterCode ) ? CELL_SIZE : 2 * CELL_SIZE, CELL_SIZE ) ;
+        else _Compile_Move_Rm_To_Reg ( ACC, stackReg, 0 ) ;
+        _Compile_Move_Rm_To_Reg ( OREG, stackReg, - CELL_SIZE ) ;
+        _Compile_Move_Reg_To_Rm ( ACC, OREG, 0 ) ;
+        Compile_SUBI ( REG, stackReg, 0, ( word && word->StackPushRegisterCode ) ? CELL_SIZE : 2 * CELL_SIZE, 0 ) ;
         //Compile_SUBI ( REG, stackReg, 0, 2 * CELL_SIZE, BYTE ) ;
         //DBI_OFF ;
     }
@@ -107,9 +107,9 @@ Compile_Poke ( Compiler * compiler, int8 stackReg ) // =
     }
     else
     {
-        _Compile_Move_Rm_To_Reg ( R9D, stackReg, 0 ) ;
-        _Compile_Move_Rm_To_Reg ( R8D, stackReg, - CELL_SIZE ) ;
-        _Compile_Move_Reg_To_Rm ( R8D, R9D, 0 ) ;
+        _Compile_Move_Rm_To_Reg ( OREG, stackReg, 0 ) ;
+        _Compile_Move_Rm_To_Reg ( ACC, stackReg, - CELL_SIZE ) ;
+        _Compile_Move_Reg_To_Rm ( ACC, OREG, 0 ) ;
         //if ( ! GetState ( _Context_, C_SYNTAX ) ) 
         Compile_SUBI ( REG, stackReg, 0, 2 * CELL_SIZE, BYTE ) ;
     }
@@ -122,10 +122,10 @@ Compile_Poke ( Compiler * compiler, int8 stackReg ) // =
 void
 Compile_AtEqual ( int8 stackReg ) // !
 {
-    _Compile_Move_Rm_To_Reg ( R8D, stackReg, 0 ) ;
-    _Compile_Move_Rm_To_Reg ( R8D, R8D, 0 ) ;
-    _Compile_Move_Rm_To_Reg ( R9D, stackReg, - CELL_SIZE ) ;
-    _Compile_Move_Reg_To_Rm ( R9D, R8D, 0 ) ;
+    _Compile_Move_Rm_To_Reg ( ACC, stackReg, 0 ) ;
+    _Compile_Move_Rm_To_Reg ( ACC, ACC, 0 ) ;
+    _Compile_Move_Rm_To_Reg ( OREG, stackReg, - CELL_SIZE ) ;
+    _Compile_Move_Reg_To_Rm ( OREG, ACC, 0 ) ;
     Compile_SUBI ( REG, stackReg, 0, CELL_SIZE * 2, BYTE ) ;
 }
 

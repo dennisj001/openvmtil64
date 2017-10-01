@@ -221,8 +221,8 @@ Compiler_New ( uint64 type )
     CompileOptInfo_New ( compiler, type ) ;
     compiler->RegOrder [ 0 ] = R11D ;
     compiler->RegOrder [ 1 ] = R10D ;
-    compiler->RegOrder [ 2 ] = R9D ;
-    compiler->RegOrder [ 3 ] = R8D ;
+    compiler->RegOrder [ 2 ] = OREG ;
+    compiler->RegOrder [ 3 ] = ACC ;
     Compiler_Init ( compiler, 0 ) ;
     return compiler ;
 }
@@ -254,10 +254,10 @@ Stack_PointerToJmpOffset_Set ( )
 }
 
 void
-_Compiler_CompileAndRecord_PushR8 ( Compiler * compiler )
+_Compiler_CompileAndRecord_PushAccum ( Compiler * compiler )
 {
     //_Word_CompileAndRecord_PushR8 ( Compiler_WordStack ( 0 ) ) ;
-    _Word_CompileAndRecord_PushReg ( Compiler_WordList ( 0 ), R8D ) ;
+    _Word_CompileAndRecord_PushReg ( Compiler_WordList ( 0 ), ACC ) ;
 }
 
 

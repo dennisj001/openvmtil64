@@ -66,7 +66,7 @@ void _Compile_optInfo_X_Group1(Compiler *compiler, int64 op);
 void Compile_X_Group1(Compiler *compiler, int64 op, int64 ttt, int64 n);
 void _Compile_Jcc(int64 bindex, int64 overwriteFlag, int64 nz, int64 ttt);
 /* basis/compiler/_compile.c */
-void _Compile_CallR8(void);
+void _Compile_Call_Acc(void);
 void Compile_DataStack_PopAndCall(void);
 void _Compile_Rsp_To(void);
 void _Compile_Rsp_Drop(void);
@@ -145,9 +145,9 @@ void _Compile_Stack_PushReg(int8 stackReg, int8 reg);
 void _Compile_Stack_PopToReg(int8 stackReg, int8 reg);
 void Compile_Stack_PushR8(int8 stackReg);
 void Compile_Move_TOS_To_R8(int8 stackReg);
-void Compile_Move_R8_To_TOS(int8 stackReg);
-void Compile_Pop_To_R8(int8 stackReg);
-void Compile_Pop_ToR8_AndCall(int8 stackReg);
+void Compile_Move_ACC_To_TOS(int8 stackReg);
+void Compile_Pop_To_Acc(int8 stackReg);
+void Compile_Pop_ToAcc_AndCall(int8 stackReg);
 void Compile_MoveImm_To_TOS(int8 stackReg, int64 imm, int8 size);
 void _Compile_Stack_Dup(int8 stackReg);
 void _Compile_Stack_Pick(int8 stackReg);
@@ -202,6 +202,7 @@ void CfrTil_Switch(void);
 /* basis/compiler/blocks.c */
 void Byte_PtrCall(byte *ptr);
 void _Block_Eval(block block);
+void AdjustGotoPoint(dlnode *node, int64 address);
 void _Block_Copy(byte *srcAddress, int64 bsize);
 void Block_Copy(byte *dst, byte *src, int64 qsize);
 int64 Block_CopyCompile_WithLogicFlag(byte *srcAddress, int64 bindex, int64 jccFlag, int64 negFlag);
@@ -232,7 +233,7 @@ void _InstallGotoPoint_Key(dlnode *node, int64 bi, int64 key);
 void _CheckForGotoPoint(dlnode *node, int64 key, int64 *status);
 void _RemoveGotoPoint(dlnode *node, int64 key, int64 *status);
 void _CfrTil_InstallGotoCallPoints_Keyed(BlockInfo *bi, int64 key);
-int64 _CfrTil_MoveGotoPoint(int64 srcAddress, int64 key, int64 dstAddress);
+int64 _CfrTil_MoveGotoPoint(int64 srcAddress, int64 key, int32 dstAddress);
 int64 CfrTil_CheckForGotoPoints(int64 key);
 int64 CfrTil_RemoveGotoPoints(int64 key);
 /* basis/core/_system.c */
@@ -248,6 +249,7 @@ void System_Init(System *system);
 System *System_New(uint64 type);
 /* basis/compiler/optimize.c */
 void _GetRmDispImm(CompileOptimizeInfo *optInfo, Word *word, int64 suggestedReg);
+void PeepHole_Optimize(void);
 int64 _GetWordStackListState(int64 count);
 int64 _CheckOptimizeOperands(Compiler *compiler, int64 maxOperands);
 int64 CheckOptimize(Compiler *compiler, int64 maxOperands);
@@ -972,7 +974,7 @@ void CfrTil_CalculateAndSetPreviousJmpOffset(byte *jmpToAddress);
 void CfrTil_CalculateAndSetPreviousJmpOffset_ToHere(void);
 void _Stack_PointerToJmpOffset_Set(byte *address);
 void Stack_PointerToJmpOffset_Set(void);
-void _Compiler_CompileAndRecord_PushR8(Compiler *compiler);
+void _Compiler_CompileAndRecord_PushAccum(Compiler *compiler);
 /* basis/core/dllnodes.c */
 /* basis/core/finder.c */
 Symbol *DLList_FindName_InOneNamespaceList(dllist *list, byte *name);

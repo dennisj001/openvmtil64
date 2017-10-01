@@ -157,45 +157,46 @@
 #define R11D R11
 #define R12D R12 // RSP
 #define R13D R13 // RBP
-#define R14D R14 //Frame Pointer
-#define R15D R15 //Stack Pointer
-#define ACCUMULATOR_REG R8D
-#define ACCUM_REG ACCUMULATOR_REG
-#define SCRATCH_REG R10D
-#define THRU_REG R11D
-#else
-#define R8D ( 0x0 )
-#define R9D ( 0x1 )
-#define R10D ( 0x2 )
-#define R11D ( 0x3 )
-#define RSP ( 0x4 )
-#define RBP ( 0x5 )
-#define R14 ( 0x6 )
-#define R15 ( 0x7 )
-#endif
-#define NO_INDEX ( 0x4 ) // for sib byte with no index
-#define SCRATCH_REG_1 R11D // eax/edx are both used sometimes by ops ebx/ecx are not ?
-#define SCRATCH_REG_2 R10D
-#define SCRATCH_REG_3 R9D
-#define OPERAND_1_REG R8D
-#define OPERAND_2_REG R9D
-#define LVALUE_REG    R11D
-
-#define SREG1 R11D // eax/edx are both used sometimes by ops ebx/ecx are not ?
-#define SREG2 R10D //
-#define SREG3 R9D //
-#define OREG1 OPERAND_1_REG
-#define RREG1 OPERAND_1_REG
-#define OREG2 OPERAND_2_REG
-#define RREG2 OPERAND_2_REG
-#define LREG LVALUE_REG  
-
-#if X64
+#define R14D R14 //Stack Pointer
+#define R15D R15 //Frame Pointer
 #define REX 1
 register uint64 *Dsp asm ("r14" ) ;
 //register int64 *Fp asm ("r15" ) ;
-#define DSP R14
-#define FP  R15
+//int8 regOrder [] = { RDI, RSI, RDX, RCX, R8D, R9D } ;
+//#define PARAMETER_REG_ORDER { RDI, RSI, RDX, RCX, R8D, R9D } 
+//#define RegOrder( n ) PARAMETER_REG_ORDER [n]
+// DONT_USE_REGS RBP RBX R12-R15
+#else
+#define RAX ( 0x0 )
+#define RCX ( 0x1 )
+#define RDX ( 0x2 )
+#define RBX ( 0x3 )
+#define RSP ( 0x4 )
+#define RBP ( 0x5 )
+#define RSI ( 0x6 )
+#define RDI ( 0x7 )
+#endif
+#define NO_INDEX ( 0x4 ) // for sib byte with no index
+
+#define STACK_POINTER R14
+#define FRAME_POINTER R15
+#define DSP STACK_POINTER 
+#define FP FRAME_POINTER
+#define ACCUMULATOR_REG RAX
+#define ACC ACCUMULATOR_REG
+#define ACC ACCUMULATOR_REG
+#define RETURN_REG ACC
+#define RETURN_REG_2 RDX
+#define OPERAND_REG R9D
+#define OPERAND_2_REG RDX
+#define OREG OPERAND_REG
+#define DIV_MUL_REG_2 RDX
+#define THRU_REG OPERAND_2_REG
+#define SCRATCH_REG OPERAND_2_REG // eax/edx are both used sometimes by ops ebx/ecx are not ?
+#define SREG SCRATCH_REG
+
+
+#if X64
 //#define DSP ESI
 //#define FP EDI
 //register int32 *Fp asm ("edi" ) ;

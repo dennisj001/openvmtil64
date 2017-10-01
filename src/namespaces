@@ -367,8 +367,7 @@ sp
 : sh _sh ; prefix
 dbgOff
 dbgOn
-//Root 'doScript 0 const
-Root 'doScript 1 const
+Root 'doScript 0 const
 #if dbgOnVar @ 
 testCfrTil
 stringMacrosOff
