@@ -8,6 +8,12 @@ CfrTil_Token ( )
 }
 
 void
+CfrTil_WrapNextWord ( )
+{
+    SetState ( _Context_->Compiler0, COMPILER_WRAP_ON, true ) ;
+}
+
+void
 CfrTil_SingleQuote ( )
 {
     _CfrTil_SingleQuote ( 0 ) ;

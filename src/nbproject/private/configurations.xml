@@ -103,7 +103,67 @@
         <in>udis86.h</in>
       </df>
       <df name="mpfr-3.1.6">
+        <df name="doc">
+        </df>
+        <df name="examples">
+          <in>divworst.c</in>
+          <in>rndo-add.c</in>
+          <in>sample.c</in>
+          <in>version.c</in>
+        </df>
+        <df name="m4">
+        </df>
         <df name="src">
+          <df name=".deps">
+          </df>
+          <df name=".libs">
+          </df>
+          <df name="amd">
+            <df name="amdfam10">
+              <in>mparam.h</in>
+            </df>
+            <df name="athlon">
+              <in>mparam.h</in>
+            </df>
+            <df name="k8">
+              <in>mparam.h</in>
+            </df>
+          </df>
+          <df name="arm">
+            <in>mparam.h</in>
+          </df>
+          <df name="generic">
+            <in>mparam.h</in>
+          </df>
+          <df name="hppa">
+            <in>mparam.h</in>
+          </df>
+          <df name="ia64">
+            <in>mparam.h</in>
+          </df>
+          <df name="powerpc32">
+            <in>mparam.h</in>
+          </df>
+          <df name="powerpc64">
+            <in>mparam.h</in>
+          </df>
+          <df name="sparc64">
+            <in>mparam.h</in>
+          </df>
+          <df name="x86">
+            <df name="core2">
+              <in>mparam.h</in>
+            </df>
+            <in>mparam.h</in>
+          </df>
+          <df name="x86_64">
+            <df name="core2">
+              <in>mparam.h</in>
+            </df>
+            <df name="pentium4">
+              <in>mparam.h</in>
+            </df>
+          </df>
           <in>abort_prec_max.c</in>
           <in>acos.c</in>
           <in>acosh.c</in>
@@ -171,9 +231,11 @@
           <in>extract.c</in>
           <in>factorial.c</in>
           <in>fits_intmax.c</in>
+          <in>fits_s.h</in>
           <in>fits_sint.c</in>
           <in>fits_slong.c</in>
           <in>fits_sshort.c</in>
+          <in>fits_u.h</in>
           <in>fits_uint.c</in>
           <in>fits_uintmax.c</in>
           <in>fits_ulong.c</in>
@@ -185,6 +247,7 @@
           <in>frexp.c</in>
           <in>gamma.c</in>
           <in>gammaonethird.c</in>
+          <in>gen_inverse.h</in>
           <in>get_d.c</in>
           <in>get_d64.c</in>
           <in>get_exp.c</in>
@@ -202,6 +265,7 @@
           <in>gmp_op.c</in>
           <in>grandom.c</in>
           <in>hypot.c</in>
+          <in>ieee_floats.h</in>
           <in>init.c</in>
           <in>init2.c</in>
           <in>inits.c</in>
@@ -216,6 +280,7 @@
           <in>isregular.c</in>
           <in>iszero.c</in>
           <in>jn.c</in>
+          <in>jyn_asympt.c</in>
           <in>li2.c</in>
           <in>lngamma.c</in>
           <in>log.c</in>
@@ -227,7 +292,15 @@
           <in>minmax.c</in>
           <in>modf.c</in>
           <in>mp_clz_tab.c</in>
+          <in>mparam.h</in>
+          <in>mpf2mpfr.h</in>
           <in>mpfr-gmp.c</in>
+          <in>mpfr-gmp.h</in>
+          <in>mpfr-impl.h</in>
+          <in>mpfr-intmax.h</in>
+          <in>mpfr-longlong.h</in>
+          <in>mpfr-thread.h</in>
+          <in>mpfr.h</in>
           <in>mpn_exp.c</in>
           <in>mul.c</in>
           <in>mul_2exp.c</in>
@@ -255,6 +328,7 @@
           <in>round_near_x.c</in>
           <in>round_p.c</in>
           <in>round_prec.c</in>
+          <in>round_raw_generic.c</in>
           <in>scale2.c</in>
           <in>sec.c</in>
           <in>sech.c</in>
@@ -325,9 +399,13 @@
           <in>zeta_ui.c</in>
         </df>
         <df name="tests">
+          <df name=".deps">
+          </df>
           <in>cmp_str.c</in>
           <in>memory.c</in>
           <in>mpf_compat.c</in>
+          <in>mpf_compat.h</in>
+          <in>mpfr-test.h</in>
           <in>mpfr_compat.c</in>
           <in>random2.c</in>
           <in>reuse.c</in>
@@ -393,6 +471,8 @@
           <in>tfrac.c</in>
           <in>tfrexp.c</in>
           <in>tgamma.c</in>
+          <in>tgeneric.c</in>
+          <in>tgeneric_ui.c</in>
           <in>tget_d.c</in>
           <in>tget_d_2exp.c</in>
           <in>tget_f.c</in>
@@ -491,6 +571,15 @@
           <in>tzeta.c</in>
           <in>tzeta_ui.c</in>
         </df>
+        <df name="tools">
+        </df>
+        <df name="tune">
+          <df name=".deps">
+          </df>
+          <in>bidimensional_sample.c</in>
+          <in>speed.c</in>
+          <in>tuneup.c</in>
+        </df>
       </df>
       <df name="primitives">
         <in>bits.c</in>
@@ -576,7 +665,7 @@
         </loadobjs>
       </dbxrtc>
       <nativedebugger version="1">
-        <engine>dbx</engine>
+        <engine>gdb</engine>
       </nativedebugger>
       <runprofile version="9">
         <runcommandpicklist>

@@ -83,7 +83,7 @@ start:
 
         if ( ( ! word ) || ( ! Debugger_CanWeStep ( debugger, word ) ) )//( jcAddress < ( byte* ) svcs->BA_Data ) || ( jcAddress > ( byte* ) svcs->bp_Last ) )
         {
-            _Printf ( ( byte* ) "\ncalling thru - a subroutine : %s : .... :>", word ? ( char* ) c_gd ( word->Name ) : "" ) ;
+            _Printf ( ( byte* ) "\ncalling thru - a non-native (C) subroutine : %s : .... :>", word ? ( char* ) c_gd ( word->Name ) : "" ) ;
             Compile_Call ( jcAddress ) ; // this will call jcAddress subroutine and return to our code to be compiled next
             // so that newDebugAddress, below, will be our next stepping insn
             newDebugAddress = debugger->DebugAddress + size ;
@@ -145,7 +145,8 @@ done:
 void
 Debugger_CompileAndStepOneInstruction ( Debugger * debugger )
 {
-start:
+    uint64 code ;
+    start:
     if ( debugger->DebugAddress )
     {
         byte *jcAddress = 0 ;
@@ -181,9 +182,9 @@ start:
             }
             goto end ;
         }
-        else if ( ( * ( uint16* ) debugger->DebugAddress ) == 0x49ff ) //untested 9-27-17
+        else if ( (code = ( * ( uint16* ) debugger->DebugAddress )) == 0xff48 ) //untested 9-27-17
         {
-            jcAddress = debugger->DebugAddress - CELL_SIZE ;
+            jcAddress = (byte*) *(uint64*)(debugger->DebugAddress - CELL_SIZE) ;
             Word * word = Word_GetFromCodeAddress ( jcAddress ) ;
             //debugger->CurrentlyRunningWord = word ;
             if ( word && ( word->CAttribute & ( DEBUG_WORD ) ) ) //&& ( ! GetState ( debugger, (DBG_CONTINUE_MODE|DBG_AUTO_MODE) ) ) )

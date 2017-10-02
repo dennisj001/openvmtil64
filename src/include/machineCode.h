@@ -160,8 +160,6 @@
 #define R14D R14 //Stack Pointer
 #define R15D R15 //Frame Pointer
 #define REX 1
-register uint64 *Dsp asm ("r14" ) ;
-//register int64 *Fp asm ("r15" ) ;
 //int8 regOrder [] = { RDI, RSI, RDX, RCX, R8D, R9D } ;
 //#define PARAMETER_REG_ORDER { RDI, RSI, RDX, RCX, R8D, R9D } 
 //#define RegOrder( n ) PARAMETER_REG_ORDER [n]
@@ -178,22 +176,27 @@ register uint64 *Dsp asm ("r14" ) ;
 #endif
 #define NO_INDEX ( 0x4 ) // for sib byte with no index
 
-#define STACK_POINTER R14
-#define FRAME_POINTER R15
-#define DSP STACK_POINTER 
-#define FP FRAME_POINTER
+// cfrTil uses RAX, RDX, R8D, R9D, R14, R15
 #define ACCUMULATOR_REG RAX
 #define ACC ACCUMULATOR_REG
-#define ACC ACCUMULATOR_REG
+#define ACCUM ACCUMULATOR_REG
 #define RETURN_REG ACC
 #define RETURN_REG_2 RDX
 #define OPERAND_REG R9D
-#define OPERAND_2_REG RDX
+#define OPERAND_2_REG R8D
 #define OREG OPERAND_REG
 #define DIV_MUL_REG_2 RDX
 #define THRU_REG OPERAND_2_REG
 #define SCRATCH_REG OPERAND_2_REG // eax/edx are both used sometimes by ops ebx/ecx are not ?
 #define SREG SCRATCH_REG
+register uint64 *Dsp asm ("r15" ) ;
+#define STACK_POINTER R15D
+#define CPU_DSP R15d
+//register int64 *Fp asm ("rsi" ) ;
+#define FRAME_POINTER R14D
+#define CPU_FP R14d
+#define DSP STACK_POINTER 
+#define FP FRAME_POINTER
 
 
 #if X64

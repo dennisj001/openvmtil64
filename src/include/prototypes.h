@@ -144,7 +144,7 @@ void _Compile_Move_Reg_To_StackNRm_UsingReg(int8 stackReg, int64 index, int8 reg
 void _Compile_Stack_PushReg(int8 stackReg, int8 reg);
 void _Compile_Stack_PopToReg(int8 stackReg, int8 reg);
 void Compile_Stack_PushR8(int8 stackReg);
-void Compile_Move_TOS_To_R8(int8 stackReg);
+void Compile_Move_TOS_To_ACCUM(int8 stackReg);
 void Compile_Move_ACC_To_TOS(int8 stackReg);
 void Compile_Pop_To_Acc(int8 stackReg);
 void Compile_Pop_ToAcc_AndCall(int8 stackReg);
@@ -809,7 +809,7 @@ void Word_Eval0(Word *word);
 void _Word_Eval_Debug(Word *word);
 void _Word_Eval(Word *word);
 void _Word_Interpret(Word *word);
-void _Word_Compile(Word *word);
+void _Word_Compile(Word *word, int8 wrapFlag);
 Namespace *_Word_Namespace(Word *word);
 Word *_Word_Allocate(uint64 allocType);
 void _Word_Copy(Word *word, Word *word0);
@@ -1517,6 +1517,7 @@ void CfrTil_LogWrite(void);
 void CfrTil_LogOff(void);
 /* primitives/parsers.c */
 void CfrTil_Token(void);
+void CfrTil_WrapNextWord(void);
 void CfrTil_SingleQuote(void);
 void CfrTil_Tick(void);
 void Parse_SkipUntil_Token(byte *end);

@@ -62,14 +62,13 @@ _Compiler_RemoveLocalFrame ( Compiler * compiler )
     {
         _Compile_GetVarLitObj_RValue_To_Reg ( word, ACC ) ; // nb. these variables have no lasting lvalue - they exist on the stack - therefore we can only return there rvalue
     }
-        //else if ( compiler->NumberOfParameterVariables && returnValueFlag && ( ! compiler->NumberOfRegisterVariables ) && ( ! GetState ( compiler, RETURN_R8 ) ) )
     else if ( compiler->NumberOfArgs && returnValueFlag && ( ! GetState ( compiler, RETURN_ACCUM ) ) )
     {
-        Compile_Move_TOS_To_R8 ( DSP ) ; // save TOS to R8 so we can set return it as TOS below
+        Compile_Move_TOS_To_ACCUM ( DSP ) ; // save TOS to ACCUM so we can set return it as TOS below
     }
     else if ( GetState ( compiler, RETURN_TOS ) )
     {
-        Compile_Move_TOS_To_R8 ( DSP ) ;
+        Compile_Move_TOS_To_ACCUM ( DSP ) ;
     }
     _Compile_LEA ( DSP, FP, 0, - LocalVarIndex_Disp ( 1 ) ) ; // restore sp - release locals stack frame
     _Compile_Move_StackN_To_Reg ( FP, DSP, 1 ) ; // restore the saved pre fp - cf AddLocalsFrame
@@ -83,8 +82,7 @@ _Compiler_RemoveLocalFrame ( Compiler * compiler )
     {
         Compile_ADDI ( REG, DSP, 0, abs (parameterVarsSubAmount), 0 ) ; // add a place on the stack for return value
     }
-    //if ( rvf && returnValueFlag && ( ! GetState ( compiler, RETURN_R8 ) ) )
-    if ( returnValueFlag && ( ! GetState ( compiler, RETURN_ACCUM ) ) )
+     if ( returnValueFlag && ( ! GetState ( compiler, RETURN_ACCUM ) ) )
     {
         // nb : stack was already adjusted accordingly for this above by reducing the SUBI subAmount or adding if there weren't any parameter variables
         Compile_Move_ACC_To_TOS ( DSP ) ;

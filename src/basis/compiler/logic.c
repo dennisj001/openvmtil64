@@ -99,11 +99,12 @@ Compile_Cmp_Set_tttn_Logic ( Compiler * compiler, int64 ttt, int64 negateFlag )
     if ( optFlag & OPTIMIZE_DONE ) return ;
     else if ( optFlag )
     {
-#if 2        
+#if 1  // clears the stack     
         if ( ( optFlag == 2 ) && ( compiler->optInfo->Optimize_Rm == DSP ) )
         {
-            _Compile_Stack_PopToReg ( DSP, OREG ) ; // assuming optimize always uses R8 first
-            compiler->optInfo->Optimize_Rm = OREG ;
+            //DBI_ON ;
+            _Compile_Stack_PopToReg ( DSP, ACC ) ; // assuming optimize always uses R8 first
+            compiler->optInfo->Optimize_Rm = ACC ;
             compiler->optInfo->Optimize_Mod = REG ;
         }
 #endif        
@@ -112,7 +113,7 @@ Compile_Cmp_Set_tttn_Logic ( Compiler * compiler, int64 ttt, int64 negateFlag )
         {
             if ( ( ttt == EQUAL ) && ( compiler->optInfo->Optimize_Imm == 0 ) ) //Compile_TEST ( compiler->optInfo->Optimize_Mod, compiler->optInfo->Optimize_Rm, 0, compiler->optInfo->Optimize_Disp, compiler->optInfo->Optimize_Imm, CELL ) ;
             {
-                if ( compiler->optInfo->O_two->StackPushRegisterCode ) SetHere ( compiler->optInfo->O_two->StackPushRegisterCode ) ; // leave optInfo->O_two value in R8 we don't need to push it
+                if ( compiler->optInfo->O_two->StackPushRegisterCode ) SetHere ( compiler->optInfo->O_two->StackPushRegisterCode ) ; // leave optInfo->O_two value in ACCUM we don't need to push it
                 _Compile_TEST_Reg_To_Reg ( ACC, ACC ) ;
             }
             else
@@ -147,7 +148,7 @@ Compile_Cmp_Set_tttn_Logic ( Compiler * compiler, int64 ttt, int64 negateFlag )
         d1 ( _Debugger_Disassemble ( _Debugger_, ( byte* ) here, 12, 0 ) ) ;
     } ) ;
 #endif    
-    //DBI_OFF ;
+    DBI_OFF ;
 }
 
 // SET : 0x0f 0x9tttn mod 000 rm/reg

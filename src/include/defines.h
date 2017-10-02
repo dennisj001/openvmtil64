@@ -584,6 +584,7 @@
 #define C_INFIX_EQUAL ( 1 << 24 )
 #define C_COMBINATOR_PARSING ( 1 << 25 )
 #define INFIX_LIST_INTERPRET ( 1 << 26 )
+#define COMPILER_WRAP_ON ( 1 << 27 )
 //#define C_FIRST_BLOCK ( 1 << 20 )
 //#define MINUS_MINUS_MODE ( 1 << 20 )
 //#define PLUS_PLUS_MODE ( 1 << 21 )

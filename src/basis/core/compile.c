@@ -38,7 +38,7 @@ _CompileFromName ( byte * wordName )
     Word * word = Finder_Word_FindUsing ( _Context_->Finder0, wordName, 0 ) ;
     // ?? Exception : error message here
     if ( ! word ) _Throw ( QUIT ) ;
-    _Word_Compile ( word ) ;
+    _Word_Compile ( word, 0 ) ;
 }
 
 void

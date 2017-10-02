@@ -15,7 +15,7 @@ CompileCall ( )
 void
 CompileACfrTilWord ( )
 {
-    _Word_Compile ( ( Word* ) _DataStack_Pop ( ) ) ;
+    _Word_Compile ( ( Word* ) _DataStack_Pop ( ), 0 ) ;
 }
 
 void

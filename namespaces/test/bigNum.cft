@@ -18,10 +18,15 @@ nl "1000 ! = " ps x @ fprint nl
 ' bexp find wdiss ' bexp0 find wdiss
 
 '!!! '! find alias 
-: !! qexp p nl ;
+: !! qexp <w> p nl ;
+'!! find wdiss
+7 d: !! 8 !! 8 !!  
+sp
 : ! qexp ;
 7 !!! p 8 !!! p
-7 d: !! 8 !!
+'!! 'qexp find alias
+7 !! p 8 !! p p 8 !! p
+sp
 //pause
 1000 ! p 
 

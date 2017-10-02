@@ -62,6 +62,7 @@
 // the reg field of the modr/m byte generally refers to to register to use with the mod modified r/m field -- intel can't address two memory fields in any instruction
 // --------------------------------------
 #if 1
+
 int8
 RegOrder ( int8 n )
 {
@@ -467,7 +468,7 @@ _Compile_MoveImm_To_Reg ( int8 reg, int64 imm, int8 iSize )
 void
 _Compile_MoveImm_To_Mem ( int8 reg, int64 imm, int8 iSize )
 {
-    _Compile_MoveImm ( MEM, reg, IMM_B | REX_B | MODRM_B | DISP_B, 0, 0, imm, iSize ) ;
+    _Compile_MoveImm ( MEM, reg, IMM_B | REX_B | MODRM_B, 0, 0, imm, iSize ) ;
 }
 
 void
@@ -604,7 +605,7 @@ void
 _Compile_JumpToAddress ( byte * jmpToAddr ) // runtime
 {
 #if 1
-    if ( jmpToAddr != (Here + 5)  ) // optimization : don't need to jump to the next instruction
+    if ( jmpToAddr != ( Here + 5 ) ) // optimization : don't need to jump to the next instruction
     {
         int32 disp = _CalculateOffsetForCallOrJump ( Here + 1, jmpToAddr, INT32_SIZE ) ;
         // _Compile_InstructionX86 ( opCode, mod, reg, rm, modRmImmDispFlag, sib, disp, imm, immSize )
@@ -749,19 +750,9 @@ _Compile_PushReg ( int8 reg )
 #define dbgON_5 0
 #if dbgON_5    
     d1 ( byte * here = Here ) ;
-#endif    
-    if ( reg < 8 ) // can't push R8-R15 ??
-    {
-        _Compile_Int8 ( 0x40 ) ;
-        _Compile_Int8 ( 0x50 + reg ) ;
-    }
-    else
-    {
-        CfrTil_Exception ( MACHINE_CODE_ERROR, 1 ) ;
-        //_Compile_Int8 ( 0x40 ) ; //+ ( reg > 7 ) ? 1 : 0 ) ;
-        //_Compile_Int8 ( 0x50 + reg ) ;
-        //int8 modRm = CalculateModRmByte ( mod, reg, rm, disp, sib ) ;
-    }
+#endif   
+    _Compile_Int8 ( 0x40 + ( (reg > 7) ? 1 : 0 ) ) ;
+    _Compile_Int8 ( 0x50 + ( reg & 0x7 ) ) ;
 #if dbgON_5     
     d1 ( _Printf ( ( byte* ) "\n_Compile_PushReg :" ) ) ;
     d1 ( Debugger_UdisOneInstruction ( _Debugger_, here, ( byte* ) "", ( byte* ) "" ) ; ) ;
@@ -780,18 +771,8 @@ _Compile_PopToReg ( int8 reg )
 #if dbgON_7    
     d1 ( byte * here = Here ) ;
 #endif    
-    if ( reg > 7 )
-    {
-        _Compile_Int8 ( 0x40 + ( reg > 7 ) ? 1 : 0 ) ;
-        _Compile_Int8 ( 0x8f ) ;
-        _Compile_Int8 ( 0xc0 + ( reg - 8 ) ) ;
-    }
-    else
-    {
-        _Compile_Int8 ( 0x40 ) ;
-        _Compile_Int8 ( 0x58 + reg ) ;
-    }
-    //int8 modRm = CalculateModRmByte ( mod, reg, rm, disp, sib ) ;
+    _Compile_Int8 ( 0x40 + ( (reg > 7) ? 1 : 0 ) ) ;
+    _Compile_Int8 ( 0x58 + ( reg & 0x7 ) ) ;
 #if dbgON_7     
     D1 ( _Printf ( ( byte* ) "\n_Compile_PopToReg :" ) ) ;
     D1 ( Debugger_UdisOneInstruction ( _Debugger_, here, ( byte* ) "", ( byte* ) "" ) ; ) ;

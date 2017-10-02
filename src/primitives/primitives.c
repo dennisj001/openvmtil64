@@ -589,6 +589,7 @@ CPrimitive CPrimitives [] = {
     { "getStringToEndOfLine", String_GetStringToEndOfLine, 0, 0, "Compiler", "Root" },
     { "sourceCodeInit", CfrTil_SourceCode_Init, 0, 0, "Compiler", "Root" },
     { "sourceCodeOn", CfrTil_Lexer_SourceCodeOn, 0, 0, "Compiler", "Root" },
+    { "<w>", CfrTil_WrapNextWord, IMMEDIATE, 0, "Compiler", "Root" },
     
     { ",", CompileInt32, 0, 0, "Compiling", "Compiler" },
     { "4,", CompileInt32, 0, 0, "Compiling", "Compiler" },

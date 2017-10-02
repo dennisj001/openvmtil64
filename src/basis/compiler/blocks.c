@@ -60,7 +60,7 @@ _Block_Copy ( byte * srcAddress, int64 bsize )
                 if ( word )
                 {
                     //_CfrTil_AdjustSourceCodeAddress ( jcAddress, Here ) ;
-                    _Word_Compile ( word ) ;
+                    _Word_Compile ( word, 0 ) ;
                     continue ;
                 }
                 //else (drop to) _CompileN ( srcAddress, isize )
@@ -111,7 +111,7 @@ Block_CopyCompile_WithLogicFlag ( byte * srcAddress, int64 bindex, int64 jccFlag
     {
         if ( ! ( _Q_->OVT_LC && GetState ( _Q_->OVT_LC, ( LC_COMPILE_MODE ) ) ) )
         {
-            if ( bi->LiteralWord )//&& bi->LiteralWord->StackPushRegisterCode ) // leave value in R8, don't push it
+            if ( bi->LiteralWord )//&& bi->LiteralWord->StackPushRegisterCode ) // leave value in ACCUM, don't push it
             {
                 if ( bi->LiteralWord->W_Value != 0 )
                 {
@@ -303,7 +303,7 @@ _CfrTil_EndBlock1 ( BlockInfo * bi )
     if ( _Stack_IsEmpty ( compiler->BlockStack ) )
     {
         _CfrTil_InstallGotoCallPoints_Keyed ( bi, GI_RETURN ) ;
-        if ( compiler->NumberOfRegisterVariables ) //&& ( compiler->NumberOfParameterVariables == 1 ) && GetState ( compiler, ( RETURN_TOS | RETURN_R8 ) ) )
+        if ( compiler->NumberOfRegisterVariables ) 
         {
             bi->bp_First = bi->Start ;
             if ( GetState ( compiler, RETURN_ACCUM ) )

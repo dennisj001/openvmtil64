@@ -90,7 +90,7 @@ Compile_Stack_PushR8 ( int8 stackReg )
 }
 
 void
-Compile_Move_TOS_To_R8 ( int8 stackReg )
+Compile_Move_TOS_To_ACCUM ( int8 stackReg )
 {
     _Compile_Move_StackN_To_Reg ( ACC, stackReg, 0 ) ;
 }

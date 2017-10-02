@@ -33,7 +33,7 @@ Word_Eval0 ( Word * word )
         }
         else
         {
-            _Word_Compile ( word ) ;
+            _Word_Compile ( word, 0 ) ;
         }
     }
 }
@@ -75,7 +75,7 @@ _Word_Interpret ( Word * word )
 }
 
 void
-_Word_Compile ( Word * word )
+_Word_Compile ( Word * word, int8 wrapFlag )
 {
     if ( ! word->Definition )
     {
@@ -85,12 +85,37 @@ _Word_Compile ( Word * word )
     {
         _Compile_WordInline ( word ) ;
     }
-    else
+#if 0    
+    else if ( wrapFlag || GetState ( _Context_->Compiler0, COMPILER_WRAP_ON ) )
     {
-        //if ( NamedByteArray_CheckAddress ( _Q_CodeSpace, word->CodeStart ) ) Compile_Call_With32BitDisp ( ( byte* ) word->Definition ) ;
-        //else Compile_Call_ToAddressThruReg ( ( byte* ) word->Definition, R8 ) ;
+        ByteArray * svcs ;
+        Debugger * debugger = _Debugger_ ;
+        int8 showFlag = false ;
+        debugger->cs_Cpu->State = 0 ;
+        _CfrTil_->cs_Cpu->State = 0 ;
+        _Debugger_CpuState_CheckSave ( debugger ) ;
+        _CfrTil_CpuState_CheckSave ( ) ;
+        svcs = _Q_CodeByteArray ;
+        _ByteArray_ReInit ( debugger->StepInstructionBA ) ; // we are only compiling one insn here so clear our BA before each use
+        ByteArray_AllocateNew ( debugger->StepInstructionBA->BA_DataSize + sizeof ( ByteArray ), CODE ) ;
+        Set_CompilerSpace ( debugger->StepInstructionBA ) ; // now compile to this space
+        _Compile_Restore_Debugger_CpuState ( debugger, showFlag ) ; //&& ( _Q_->Verbosity >= 3 ) ) ; // restore our runtime state before the current insn
         Compile_Call ( ( byte* ) word->Definition ) ;
+        _Compile_Restore_C_CpuState ( _CfrTil_, showFlag ) ; //&& ( _Q_->Verbosity >= 3 ) ) ; // finally restore our c compiler cpu register state
+        _Compile_Return ( ) ;
+        Set_CompilerSpace ( svcs ) ; // restore compiler space pointer before "do it" in case "do it" calls the compiler
+        _Compile_PushReg ( DSP ) ;
+        _Compile_PushReg ( FP ) ;
+        Compile_Call ( ( byte* ) ( ( VoidFunction ) debugger->StepInstructionBA->BA_Data ) ) ;
+        _Debugger_Disassemble ( debugger, debugger->StepInstructionBA->BA_Data, 2 * K, 1 ) ;
+        _Compile_PopToReg ( FP ) ;
+        _Compile_PopToReg ( DSP ) ;
+        debugger->CopyRSP = 0 ; // we need this!! why ??
+        SetState ( _Context_->Compiler0, COMPILER_WRAP_ON, false ) ;
     }
+#endif    
+    else Compile_Call ( ( byte* ) word->Definition ) ;
+
 }
 
 Namespace *
@@ -191,7 +216,7 @@ _Word_Add ( Word * word, int64 addToInNs, Namespace * addToNs )
 }
 
 Word *
-_Word_Create (byte * name, uint64 ctype, uint64 ctype2, uint64 ltype, uint64 allocType )
+_Word_Create ( byte * name, uint64 ctype, uint64 ctype2, uint64 ltype, uint64 allocType )
 {
     Word * word = _Word_Allocate ( allocType ? allocType : DICTIONARY ) ;
     if ( allocType & ( EXISTING ) ) _Symbol_NameInit ( ( Symbol * ) word, name ) ;
@@ -209,7 +234,7 @@ _Word_New ( byte * name, uint64 ctype, uint64 ltype, int8 addToInNs, Namespace *
 {
     CheckCodeSpaceForRoom ( ) ;
     ReadLiner * rl = _Context_->ReadLiner0 ;
-    Word * word = _Word_Create (name, ctype, 0, ltype, allocType ) ; // CFRTIL_WORD : cfrTil compiled words as opposed to C compiled words
+    Word * word = _Word_Create ( name, ctype, 0, ltype, allocType ) ; // CFRTIL_WORD : cfrTil compiled words as opposed to C compiled words
     _Context_->Compiler0->CurrentWord = word ;
     if ( rl->InputStringOriginal )
     {

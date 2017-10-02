@@ -55,7 +55,7 @@ _Debugger_Locals_ShowALocal ( Debugger * debugger, Word * localsWord, byte * buf
     int64 varOffset ;
     if ( localsWord->CAttribute & LOCAL_VARIABLE ) varOffset = LocalVarOffset ( localsWord ) ;
     else if ( localsWord->CAttribute & PARAMETER_VARIABLE ) varOffset = -(localsWord->Index); //ParameterVarOffset ( localsWord ) ;
-    uint64 * fp = ( int64* ) debugger->cs_Cpu->R15d ;
+    uint64 * fp = ( int64* ) debugger->cs_Cpu->CPU_FP ;
     if ( fp < ( uint64* ) 0x7f000000 ) fp = 0 ;
     byte * address = ( byte* ) ( fp ? fp [ varOffset ] : 0 ) ;
     byte * stringValue = String_CheckForAtAdddress ( address ) ;
@@ -89,7 +89,7 @@ Debugger_Locals_Show ( Debugger * debugger )
     byte *sc = scWord->W_SourceCode ? scWord->W_SourceCode : String_New ( _CfrTil_->SC_ScratchPad, TEMPORARY ) ;
     char * registerNames [ 8 ] = { ( char* ) "R8", ( char* ) "R9", ( char* ) "R10", ( char* ) "R11", ( char* ) "R12", ( char* ) "R13", ( char* ) "R14", ( char* ) "R15" } ;
     // show value of each local var on Locals list
-    int64 * fp = ( int64* ) debugger->cs_Cpu->R15d, * dsp = ( int64* ) debugger->cs_Cpu->R14d ;
+    int64 * fp = ( int64* ) debugger->cs_Cpu->CPU_FP, * dsp = ( int64* ) debugger->cs_Cpu->CPU_DSP ;
     if ( ( ( uint64 ) fp < 0x7f0000000 ) ) fp = 0 ;
     if ( ! Compiling )
     {
