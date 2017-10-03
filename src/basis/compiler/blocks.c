@@ -15,18 +15,11 @@ _Block_Eval ( block block )
 }
 
 void
-AdjustGotoPoint ( dlnode * node, int64 address )
-{
-    GotoInfo * gi = (GotoInfo *) node ;
-    if ( gi->pb_JmpOffsetPointer == (byte*) address ) 
-        gi->pb_JmpOffsetPointer = Here + 1 ;
-}
-
-void
 _Block_Copy ( byte * srcAddress, int64 bsize )
 {
     byte * saveHere = Here, * saveAddress = srcAddress ;
     ud_t * ud = Debugger_UdisInit ( _Debugger_ ) ;
+    Compiler * compiler = _Compiler_ ;
     int64 isize, left ;
 
     for ( left = bsize ; left > 0 ; srcAddress += isize )
@@ -49,7 +42,7 @@ _Block_Copy ( byte * srcAddress, int64 bsize )
             int64 offset = * ( int32* ) ( srcAddress + 1 ) ; // 1 : 1 byte opCode
             if ( ! offset )
             {
-                dllist_Map1 ( _Context_->Compiler0->GotoList, ( MapFunction1 ) AdjustGotoPoint, (int64) (srcAddress + 1) ) ;
+                dllist_Map1 ( _Context_->Compiler0->GotoList, ( MapFunction1 ) AdjustJmpOffsetPointer, ( int64 ) ( srcAddress + 1 ) ) ;
                 CfrTil_SetupRecursiveCall ( ) ;
                 continue ;
             }
@@ -69,13 +62,14 @@ _Block_Copy ( byte * srcAddress, int64 bsize )
         else if ( * srcAddress == JMPI32 )
         {
             int64 offset = * ( int32* ) ( srcAddress + 1 ) ; // 1 : 1 byte opCode
-            if ( offset == 0 ) // signature of a goto point
+            if ( offset != 0 ) // signature of a goto point
             {
-                _CfrTil_MoveGotoPoint ( ( int64 ) srcAddress + 1, 0, ( int64 ) Here + 1 ) ;
-                _CompileN ( srcAddress, isize ) ; // memcpy ( dstAddress, address, size ) ;
-                continue ;
+                dllist_Map1 ( _Context_->Compiler0->GotoList, ( MapFunction1 ) AdjustJmpOffsetPointer, ( int64 ) ( srcAddress + 1 ) ) ;
             }
-            //else (drop to) _CompileN ( srcAddress, isize )
+            else
+            {
+                _CfrTil_AdjustGotoPoint ( ( int64 ) srcAddress ) ;
+            }
         }
 #if 0        
         else if ( ( * address == 0x49 ) && ( * ( address + 1 ) == 0xff ) )
@@ -303,7 +297,7 @@ _CfrTil_EndBlock1 ( BlockInfo * bi )
     if ( _Stack_IsEmpty ( compiler->BlockStack ) )
     {
         _CfrTil_InstallGotoCallPoints_Keyed ( bi, GI_RETURN ) ;
-        if ( compiler->NumberOfRegisterVariables ) 
+        if ( compiler->NumberOfRegisterVariables )
         {
             bi->bp_First = bi->Start ;
             if ( GetState ( compiler, RETURN_ACCUM ) )

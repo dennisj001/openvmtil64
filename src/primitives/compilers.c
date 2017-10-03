@@ -72,36 +72,42 @@ _GotoInfo_Allocate ( )
 }
 
 void
-GotoInfo_Delete ( dlnode * node )
+GotoInfo_Remove ( dlnode * node )
 {
     GotoInfo * gi = ( GotoInfo* ) node ;
     dlnode_Remove ( ( dlnode * ) gi ) ;
 }
 
 GotoInfo *
-_CfrTil_CompileCallGotoPoint ( uint64 type )
+GotoInfo_Init ( GotoInfo * gotoInfo, byte * lname, uint64 type )
 {
-    GotoInfo * gotoInfo = ( GotoInfo * ) _GotoInfo_Allocate ( ) ;
-    if ( type == GI_RECURSE ) _Compile_UninitializedCall ( ) ;
-    else _Compile_UninitializedJump ( ) ;
-    gotoInfo->pb_JmpOffsetPointer = Here - INT32_SIZE ; // after the call opcode
-    gotoInfo->GI_CAttribute = type ;
-    dllist_AddNodeToHead ( _Context_->Compiler0->GotoList, ( dlnode* ) gotoInfo ) ;
-    return gotoInfo ;
-}
-
-GotoInfo *
-GotoInfo_New ( byte * lname )
-{
-    GotoInfo * gotoInfo = _CfrTil_CompileCallGotoPoint ( GI_GOTO ) ;
     gotoInfo->pb_LabelName = lname ;
+    gotoInfo->pb_JmpOffsetPointer = Here - INT32_SIZE ; // after the jmp/call opcode
+    gotoInfo->GI_CAttribute = type ;
+    gotoInfo->CompileAtAddress = Here - 5 ; // 5 : size of jmp/call insn
     return gotoInfo ;
 }
 
 void
-_CfrTil_Goto ( byte * lname )
+GotoInfo_New ( byte * lname, uint64 type )
 {
-    GotoInfo_New ( lname ) ;
+    GotoInfo * gotoInfo = ( GotoInfo * ) _GotoInfo_Allocate ( ) ;
+    GotoInfo_Init ( gotoInfo, lname, type ) ;
+    dllist_AddNodeToHead ( _Context_->Compiler0->GotoList, ( dlnode* ) gotoInfo ) ;
+}
+
+void
+_CfrTil_CompileCallGotoPoint ( byte * name, uint64 type )
+{
+    if ( type == GI_RECURSE ) _Compile_UninitializedCall ( ) ;
+    else _Compile_UninitializedJump ( ) ;
+    GotoInfo_New ( name, type ) ;
+}
+
+void
+_CfrTil_Goto ( byte * name )
+{
+    _CfrTil_CompileCallGotoPoint ( name, GI_GOTO ) ;
 }
 
 void
@@ -136,7 +142,7 @@ CfrTil_Return ( )
     if ( ! _Readline_Is_AtEndOfBlock ( _Context_->ReadLiner0 ) )
     {
         //SetState ( _Context_->Compiler0, SAVE_Rsp, true ) ;
-        _CfrTil_CompileCallGotoPoint ( GI_RETURN ) ;
+        _CfrTil_CompileCallGotoPoint ( 0, GI_RETURN ) ;
         //byte * token = Lexer_PeekNextNonDebugTokenWord ( _Lexer_, 0 ) ;
         //Word * word = Finder_Word_FindUsing ( _Finder_, token, 0 ) ;
         //_Compiler_->ReturnVariableWord = word ;
@@ -151,19 +157,19 @@ CfrTil_Return ( )
 void
 CfrTil_Continue ( )
 {
-    _CfrTil_CompileCallGotoPoint ( GI_CONTINUE ) ;
+    _CfrTil_CompileCallGotoPoint ( 0, GI_CONTINUE ) ;
 }
 
 void
 CfrTil_Break ( )
 {
-    _CfrTil_CompileCallGotoPoint ( GI_BREAK ) ;
+    _CfrTil_CompileCallGotoPoint ( 0, GI_BREAK ) ;
 }
 
 void
 CfrTil_SetupRecursiveCall ( )
 {
-    _CfrTil_CompileCallGotoPoint ( GI_RECURSE ) ;
+    _CfrTil_CompileCallGotoPoint ( 0, GI_RECURSE ) ;
 }
 
 #if 0
@@ -182,10 +188,10 @@ CfrTil_Literal ( )
 {
     int64 value = _DataStack_Pop ( ) ;
     //Word * word = _DataObject_New ( LITERAL, 0, 0, LITERAL, 0, 0, ( uint64 ) _DataStack_Pop ( ), 0 ) ;
-        //ByteArray * svcs = _Q_CodeByteArray ;
-        //Compiler_SetCompilingSpace_MakeSureOfRoom ( "TempObjectSpace" ) ; 
+    //ByteArray * svcs = _Q_CodeByteArray ;
+    //Compiler_SetCompilingSpace_MakeSureOfRoom ( "TempObjectSpace" ) ; 
     Word * word = _DataObject_New ( CONSTANT, 0, "< lit >", LITERAL | CONSTANT, 0, 0, value, 0 ) ;
-        //Set_CompilerSpace ( svcs ) ;
+    //Set_CompilerSpace ( svcs ) ;
     _Interpreter_DoWord ( _Context_->Interpreter0, word, - 1 ) ;
 }
 

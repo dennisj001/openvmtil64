@@ -50,30 +50,38 @@ _CompileFromName_Inline ( byte * wordName )
 }
 
 void
-_MoveGotoPoint ( dlnode * node, int64 srcAddress, int64 key, int64 dstAddress )
+_AdjustGotoInfo ( dlnode * node, int64 originalAddress )
 {
     GotoInfo * gotoInfo = ( GotoInfo* ) node ;
-    byte * address = gotoInfo->pb_JmpOffsetPointer ;
-    if ( ( byte* ) srcAddress == (byte*) address ) 
+    if ( gotoInfo->CompileAtAddress == ( byte* ) originalAddress )
     {
-        gotoInfo->pb_JmpOffsetPointer = ( byte* ) dstAddress ;
+        gotoInfo->CompileAtAddress = Here ;
+        gotoInfo->pb_JmpOffsetPointer = Here + 1 ;
     }
 }
 
 void
-_GotoInfo_SetAndDelete ( GotoInfo * gotoInfo, byte * address )
+AdjustJmpOffsetPointer ( dlnode * node, int64 address )
 {
-    _SetOffsetForCallOrJump ( gotoInfo->pb_JmpOffsetPointer, address ) ;
-    GotoInfo_Delete ( ( dlnode* ) gotoInfo ) ;
+    GotoInfo * gi = ( GotoInfo * ) node ;
+    if ( gi->pb_JmpOffsetPointer == ( byte* ) address ) gi->pb_JmpOffsetPointer = Here + 1 ;
 }
 
 void
-_InstallGotoPoint_Key ( dlnode * node, int64 bi, int64 key )
+_GotoInfo_SetAndRemove ( GotoInfo * gotoInfo, byte * address, int8 removeFlag )
+{
+    _SetOffsetForCallOrJump ( gotoInfo->pb_JmpOffsetPointer, address ) ;
+    if ( removeFlag ) GotoInfo_Remove ( ( dlnode* ) gotoInfo ) ;
+}
+
+void
+_InstallGotoPoint_Key ( dlnode * node, int64 blockInfo, int64 key )
 {
     Word * word ;
     GotoInfo * gotoInfo = ( GotoInfo* ) node ;
-    uint64 address = *(int32*) gotoInfo->pb_JmpOffsetPointer ;
-    if ( address == 0 ) // if we move a block its recurse offset remains, check if this looks like at real offset pointer
+    BlockInfo * bi = (BlockInfo *) blockInfo ;
+    int64 address = * ( int32* ) gotoInfo->pb_JmpOffsetPointer ;
+    if ( ( address == 0 ) || ( key & GI_BREAK ) || ( key & GI_RETURN ) ) // if we move a block its recurse offset remains, check if this looks like at real offset pointer
     {
         if ( ( gotoInfo->GI_CAttribute & ( GI_GOTO | GI_CALL_LABEL ) ) && ( key & ( GI_GOTO | GI_CALL_LABEL ) ) )
         {
@@ -81,34 +89,34 @@ _InstallGotoPoint_Key ( dlnode * node, int64 bi, int64 key )
             Namespace * ns = _Namespace_Find ( ( byte* ) "__labels__", _CfrTil_->Namespaces, 0 ) ;
             if ( ns && ( word = Finder_FindWord_InOneNamespace ( _Finder_, ns, gotoInfo->pb_LabelName ) ) )
             {
-                _GotoInfo_SetAndDelete ( gotoInfo, ( byte* ) word->W_Value ) ;
+                _GotoInfo_SetAndRemove ( gotoInfo, ( byte* ) word->W_Value, 0 ) ;
             }
         }
         else if ( ( gotoInfo->GI_CAttribute & GI_RETURN ) && ( key & GI_RETURN ) )
         {
-            _GotoInfo_SetAndDelete ( gotoInfo, Here ) ;
+            _GotoInfo_SetAndRemove ( gotoInfo, Here, 0 ) ;
         }
         else if ( ( gotoInfo->GI_CAttribute & GI_BREAK ) && ( key & GI_BREAK ) )
         {
             if ( _Context_->Compiler0->BreakPoint )
             {
-                _GotoInfo_SetAndDelete ( gotoInfo, _Context_->Compiler0->BreakPoint ) ;
+                _GotoInfo_SetAndRemove ( gotoInfo, _Context_->Compiler0->BreakPoint, 0 ) ;
             }
         }
         else if ( ( gotoInfo->GI_CAttribute & GI_CONTINUE ) && ( key & GI_CONTINUE ) )
         {
             if ( _Context_->Compiler0->ContinuePoint )
             {
-                _GotoInfo_SetAndDelete ( gotoInfo, _Context_->Compiler0->ContinuePoint ) ;
+                _GotoInfo_SetAndRemove ( gotoInfo, _Context_->Compiler0->ContinuePoint, 0 ) ;
             }
         }
         else if ( ( gotoInfo->GI_CAttribute & GI_RECURSE ) && ( key & GI_RECURSE ) )
         {
-            _GotoInfo_SetAndDelete ( gotoInfo, ( ( BlockInfo * ) bi )->bp_First ) ;
+            _GotoInfo_SetAndRemove ( gotoInfo, bi->bp_First, 0 ) ;
         }
         else if ( ( gotoInfo->GI_CAttribute & GI_TAIL_CALL ) && ( key & GI_TAIL_CALL ) )
         {
-            _GotoInfo_SetAndDelete ( gotoInfo, ( ( BlockInfo * ) bi )->Start ) ; // ( byte* ) _DataStack_GetTop ( ) ) ; // , ( byte* ) bi->bi_FrameStart ) ;
+            _GotoInfo_SetAndRemove ( gotoInfo, bi->Start, 0 ) ;
         }
     }
 }
@@ -140,10 +148,10 @@ _CfrTil_InstallGotoCallPoints_Keyed ( BlockInfo * bi, int64 key )
     dllist_Map2 ( _Context_->Compiler0->GotoList, ( MapFunction2 ) _InstallGotoPoint_Key, ( int64 ) bi, key ) ;
 }
 
-int64 
-_CfrTil_MoveGotoPoint ( int64 srcAddress, int64 key, int32 dstAddress )
+int64
+_CfrTil_AdjustGotoPoint ( int64 originalAddress )
 {
-    return dllist_Map3 ( _Context_->Compiler0->GotoList, ( MapFunction3 ) _MoveGotoPoint, srcAddress, key, dstAddress ) ;
+    dllist_Map1 ( _Context_->Compiler0->GotoList, ( MapFunction1 ) _AdjustGotoInfo, originalAddress ) ;
 }
 
 int64

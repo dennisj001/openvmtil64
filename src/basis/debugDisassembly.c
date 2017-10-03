@@ -39,12 +39,14 @@ _Debugger_Disassemble ( Debugger * debugger, byte* address, int64 number, int64 
     return size ;
 }
 
+#if 0
 void
 Debugger_Disassemble ( Debugger * debugger, byte * format, byte * address, int64 cflag )
 {
     _Printf ( ( byte* ) format, address ) ;
     _Debugger_Disassemble ( debugger, address, Here - address, cflag ) ;
 }
+#endif
 
 void
 Debugger_Dis ( Debugger * debugger )

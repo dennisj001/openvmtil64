@@ -82,10 +82,10 @@ typedef struct _dllist
     } ;
     node * n_CurrentNode ;
 } dllist ;
-#define after n_After
-#define before n_Before
-#define head after
-#define tail before
+#define after_ptr n_After
+#define before_ptr n_Before
+#define head after_ptr
+#define tail before_ptr
 enum types
 {
     BOOL, BYTE, INTEGER, STRING, POINTER, XCODE, WORD, WORD_LOCATION
@@ -457,6 +457,7 @@ typedef struct
 {
     Symbol GI_Symbol ;
     byte * pb_LabelName ;
+    byte * CompileAtAddress ;
     byte * pb_JmpOffsetPointer ;
 } GotoInfo ;
 #define GI_CAttribute GI_Symbol.S_CAttribute

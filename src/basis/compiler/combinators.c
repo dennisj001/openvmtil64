@@ -13,12 +13,13 @@
 // nb : can't fully optimize if there is code between blocks
 // check if there is any code between blocks if so we can't optimize fully
 
-void
+BlockInfo *
 CfrTil_EndCombinator ( int64 quotesUsed, int64 moveFlag )
 {
     Compiler * compiler = _Context_->Compiler0 ;
     BlockInfo *bi = ( BlockInfo * ) _Stack_Pick ( compiler->CombinatorBlockInfoStack, quotesUsed - 1 ) ; // -1 : remember - stack is zero based ; stack[0] is top
-    _CfrTil_InstallGotoCallPoints_Keyed ( ( BlockInfo* ) bi, GI_BREAK | GI_CONTINUE ) ;
+    compiler->BreakPoint = Here ;
+    _CfrTil_InstallGotoCallPoints_Keyed ( ( BlockInfo* ) bi, GI_CONTINUE | GI_BREAK ) ;
     if ( moveFlag && GetState ( _CfrTil_, INLINE_ON ) )
     {
         byte * qCodeStart ;
@@ -32,6 +33,7 @@ CfrTil_EndCombinator ( int64 quotesUsed, int64 moveFlag )
         _Stack_Pop ( compiler->CombinatorInfoStack ) ;
         if ( ! Stack_Depth ( compiler->CombinatorInfoStack ) ) SetState ( compiler, LISP_COMBINATOR_MODE, false ) ;
     }
+    return bi ;
 }
 
 void
@@ -109,8 +111,8 @@ CfrTil_LoopCombinator ( )
         byte * start = Here ;
         compiler->ContinuePoint = start ;
         Block_CopyCompile ( ( byte* ) loopBlock, 0, 0 ) ;
-        _Compile_JumpToAddress ( start ) ; // runtime
-        compiler->BreakPoint = Here ;
+        _Compile_JumpToAddress ( start ) ;
+        d0 ( _Debugger_Disassemble ( _Debugger_, start, 256, 0 ) ) ;
         CfrTil_EndCombinator ( 1, 1 ) ;
     }
     else
@@ -140,7 +142,6 @@ CfrTil_WhileCombinator ( )
         }
         Block_CopyCompile ( ( byte* ) trueBlock, 0, 0 ) ;
         _Compile_JumpToAddress ( start ) ;
-        compiler->BreakPoint = Here ;
         CfrTil_CalculateAndSetPreviousJmpOffset_ToHere ( ) ;
         CfrTil_EndCombinator ( 2, 1 ) ;
     }
@@ -168,14 +169,12 @@ CfrTil_DoWhileCombinator ( )
         byte * start = Here ;
         compiler->ContinuePoint = Here ;
         Block_CopyCompile ( ( byte* ) doBlock, 1, 0 ) ;
-        //_Compile_Block ( ( byte* ) testBlock, 0, 1 ) ;
         if ( ! Block_CopyCompile ( ( byte* ) testBlock, 0, 1 ) )
         {
             SetHere ( start ) ;
             return 0 ;
         }
         _Compile_JumpToAddress ( start ) ;
-        compiler->BreakPoint = Here ;
         CfrTil_CalculateAndSetPreviousJmpOffset_ToHere ( ) ;
         CfrTil_EndCombinator ( 2, 1 ) ;
     }
@@ -337,7 +336,6 @@ CfrTil_DoWhileDoCombinator ( )
 
         Block_CopyCompile ( ( byte* ) doBlock2, 0, 0 ) ;
         _Compile_JumpToAddress ( start ) ; // runtime
-        compiler->BreakPoint = Here ;
         CfrTil_CalculateAndSetPreviousJmpOffset_ToHere ( ) ;
         CfrTil_EndCombinator ( 3, 1 ) ;
     }
@@ -381,7 +379,6 @@ CfrTil_ForCombinator ( )
         Block_CopyCompile ( ( byte* ) doPostBlock, 1, 0 ) ;
         _Compile_JumpToAddress ( start ) ; // runtime
 
-        compiler->BreakPoint = Here ;
         CfrTil_CalculateAndSetPreviousJmpOffset_ToHere ( ) ;
 
         CfrTil_EndCombinator ( 4, 1 ) ;
@@ -394,10 +391,8 @@ CfrTil_ForCombinator ( )
             _Block_Eval ( testBlock ) ;
             if ( ! _DataStack_Pop ( ) )
                 break ;
-            compiler->ContinuePoint = Here ;
             _Block_Eval ( doBlock ) ;
             _Block_Eval ( doPostBlock ) ;
-            compiler->BreakPoint = Here ;
         }
         while ( 1 ) ;
     }
@@ -463,7 +458,7 @@ ilinrec ( block ifBlock, block thenBlock, block else1Block, block else2Block )
     else
     {
         _Block_Eval ( else1Block ) ;
-//        D0 ( CfrTil_PrintDataStack ( ) ) ;
+        //        D0 ( CfrTil_PrintDataStack ( ) ) ;
         ilinrec ( ifBlock, thenBlock, else1Block, else2Block ) ;
         _Block_Eval ( else2Block ) ;
     }

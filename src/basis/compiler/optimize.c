@@ -779,7 +779,7 @@ _CheckOptimizeOperands ( Compiler * compiler, int64 maxOperands )
                         SetHere ( optInfo->O_three->Coding ) ;
                         if ( optInfo->O_zero->CAttribute & BIT_SHIFT )
                         {
-                            _Compile_GetVarLitObj_RValue_To_Reg ( optInfo->O_two, RCX ) ;
+                            _Compile_GetVarLitObj_RValue_To_Reg ( optInfo->O_two, RCX ) ; // bit shift uses RCX - cl
                             _GetRmDispImm ( optInfo, optInfo->O_three, - 1 ) ;
                         }
                         else
@@ -800,7 +800,7 @@ _CheckOptimizeOperands ( Compiler * compiler, int64 maxOperands )
                             SetHere ( optInfo->O_two->Coding ) ;
                             if ( optInfo->O_zero->CAttribute & BIT_SHIFT )
                             {
-                                _Compile_GetVarLitObj_RValue_To_Reg ( optInfo->O_one, RCX ) ;
+                                _Compile_GetVarLitObj_RValue_To_Reg ( optInfo->O_one, RCX ) ; // bit shift uses RCX - cl
                                 _GetRmDispImm ( optInfo, optInfo->O_two, - 1 ) ;
                             }
                             else

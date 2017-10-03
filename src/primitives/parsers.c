@@ -7,11 +7,13 @@ CfrTil_Token ( )
     _DataStack_Push ( ( int64 ) Lexer_ReadToken ( _Context_->Lexer0 ) ) ;
 }
 
+#if 0
 void
 CfrTil_WrapNextWord ( )
 {
     SetState ( _Context_->Compiler0, COMPILER_WRAP_ON, true ) ;
 }
+#endif
 
 void
 CfrTil_SingleQuote ( )

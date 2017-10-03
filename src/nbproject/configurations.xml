@@ -875,7 +875,7 @@
             ex="false"
             tool="0"
             flavor2="3">
-        <cTool flags="1">
+        <cTool flags="0">
         </cTool>
       </item>
       <item path="../../backup/lib/mpfr-3.1.6/src/atanh.c"
@@ -896,7 +896,7 @@
             ex="false"
             tool="0"
             flavor2="3">
-        <cTool flags="1">
+        <cTool flags="0">
         </cTool>
       </item>
       <item path="../../backup/lib/mpfr-3.1.6/src/cache.c"
@@ -1085,7 +1085,7 @@
             ex="false"
             tool="0"
             flavor2="3">
-        <cTool flags="1">
+        <cTool flags="0">
         </cTool>
       </item>
       <item path="../../backup/lib/mpfr-3.1.6/src/digamma.c"
@@ -1183,7 +1183,7 @@
             ex="false"
             tool="0"
             flavor2="3">
-        <cTool flags="1">
+        <cTool flags="0">
         </cTool>
       </item>
       <item path="../../backup/lib/mpfr-3.1.6/src/exp.c"
@@ -1456,7 +1456,7 @@
             ex="false"
             tool="0"
             flavor2="3">
-        <cTool flags="1">
+        <cTool flags="0">
         </cTool>
       </item>
       <item path="../../backup/lib/mpfr-3.1.6/src/hypot.c"
@@ -1512,7 +1512,7 @@
             ex="false"
             tool="0"
             flavor2="3">
-        <cTool flags="1">
+        <cTool flags="0">
         </cTool>
       </item>
       <item path="../../backup/lib/mpfr-3.1.6/src/isinteger.c"
@@ -1851,14 +1851,14 @@
             ex="false"
             tool="0"
             flavor2="3">
-        <cTool flags="1">
+        <cTool flags="0">
         </cTool>
       </item>
       <item path="../../backup/lib/mpfr-3.1.6/src/sec.c"
             ex="false"
             tool="0"
             flavor2="3">
-        <cTool flags="1">
+        <cTool flags="0">
         </cTool>
       </item>
       <item path="../../backup/lib/mpfr-3.1.6/src/sech.c"
@@ -1872,7 +1872,7 @@
             ex="false"
             tool="0"
             flavor2="3">
-        <cTool flags="1">
+        <cTool flags="0">
         </cTool>
       </item>
       <item path="../../backup/lib/mpfr-3.1.6/src/set_d.c"
@@ -1970,7 +1970,7 @@
             ex="false"
             tool="0"
             flavor2="3">
-        <cTool flags="1">
+        <cTool flags="0">
         </cTool>
       </item>
       <item path="../../backup/lib/mpfr-3.1.6/src/set_si_2exp.c"
@@ -1998,7 +1998,7 @@
             ex="false"
             tool="0"
             flavor2="3">
-        <cTool flags="1">
+        <cTool flags="0">
         </cTool>
       </item>
       <item path="../../backup/lib/mpfr-3.1.6/src/set_ui.c"
@@ -2033,7 +2033,7 @@
             ex="false"
             tool="0"
             flavor2="3">
-        <cTool flags="1">
+        <cTool flags="0">
         </cTool>
       </item>
       <item path="../../backup/lib/mpfr-3.1.6/src/set_zero.c"
@@ -2061,7 +2061,7 @@
             ex="false"
             tool="0"
             flavor2="3">
-        <cTool flags="1">
+        <cTool flags="0">
         </cTool>
       </item>
       <item path="../../backup/lib/mpfr-3.1.6/src/sgn.c"

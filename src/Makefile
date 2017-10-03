@@ -239,14 +239,14 @@ zip :
 	-mv ../backup/nbproject .
 
 tar.xz :	
-	tar -c --xz --exclude=nbproject --exclude=.git --exclude=*.png --exclude=cfrtil-gdb  --exclude=*.o --exclude *.kdev* -f cfrtil.tar.xz * *.*
+	tar -c --xz --exclude=nbproject --exclude=mpfr* --exclude=.git --exclude=*.png --exclude=cfrtil-gdb  --exclude=*.o --exclude *.kdev* -f cfrtil.tar.xz * *.*
 	#tar -c --xz --exclude=nbproject --exclude=.git --exclude=*.png --exclude=cfrtil-gdb  --exclude=*.o -f cfrtil.tar.xz * *.cft #.init.cft
 
 _xz : 
 	-rm core
 	-rm -rf ~/backup/openvmtil/
 	-cp -r ~/openvmtil/ ~/backup/openvmtil/
-	cd .. && tar -c --xz --exclude=nbproject --exclude=.git --exclude=*.png --exclude=cfrtil-gdb  --exclude=*.o --exclude *.kdev* -f cfrtil.tar.xz * .init.*
+	cd .. && tar -c --xz --exclude=nbproject --exclude=mpfr* --exclude=.git --exclude=*.png --exclude=cfrtil-gdb  --exclude=*.o --exclude *.kdev* -f cfrtil.tar.xz * .init.*
 
 xz : 
 	-make default
