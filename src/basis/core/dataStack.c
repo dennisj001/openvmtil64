@@ -100,13 +100,13 @@ Debugger_SyncStackPointersFromCpuState ( Debugger * debugger )
         if ( Is_DebugModeOn && ( _Q_->Verbosity > 3 ) )
         {
             pflag = true ;
-            _Printf ( ( byte* ) "\n_Debugger_SetStackPointerFromDebuggerCpuState : stack pointer adjust ::> debugger->cs_CpuState->State = %d : Dsp = 0x%016lx != cpu->R14 = 0x%016lx",
+            _Printf ( ( byte* ) "\n_Debugger_SetStackPointerFromDebuggerCpuState : stack pointer adjust ::> debugger->cs_CpuState->State = %d : Dsp = 0x%016lx != cpu->CPU_DSP = 0x%016lx",
                 debugger->cs_Cpu->State, Dsp, debugger->cs_Cpu->CPU_DSP ) ;
         }
         CpuState_SyncStackPointersFromCpuState ( debugger->cs_Cpu ) ;
         if ( pflag )
         {
-            _Printf ( ( byte* ) "\n_Debugger_SetStackPointerFromDebuggerCpuState : stack pointer adjusted ::> cfrTil->DataStack->StackPointer = 0x%016lx : Dsp = 0x%016lx : cpu->R14 = 0x%016lx\n",
+            _Printf ( ( byte* ) "\n_Debugger_SetStackPointerFromDebuggerCpuState : stack pointer adjusted ::> cfrTil->DataStack->StackPointer = 0x%016lx : Dsp = 0x%016lx : cpu->CPU_DSP = 0x%016lx\n",
                 _CfrTil_->DataStack->StackPointer, Dsp, debugger->cs_Cpu->CPU_DSP ) ;
         }
     }

@@ -20,8 +20,25 @@ nl "1000 ! = " ps x @ fprint nl
 '!!! '! find alias 
 : !! qexp p nl ;
 '!! find wdiss
-7 ! d: p 8 ! p 8 ! p
-7 !! 8 !! 8 !!  
+7 ! p 8 ! p 8 ! p
+bno
+#if 0
+C
+dlsym: printf /lib/x86_64-linux-gnu/libc.so.6 ; void_return
+dlsym: strcmp /lib/x86_64-linux-gnu/libc.so.6 ; //eax_return
+dlsym: sprintf /lib/x86_64-linux-gnu/libc.so.6 ; void_return
+printf ("\n%s\n\t%s","hello world! - parse this!?", "\tand this!")"\n\talso this!" ps
+printf ( "\nHello world! = 0x%08x\n\n" 1234 ) 
+printf ( "\n%s = %d\n\n", "Hello world!", 42 ) 
+printf("\n%s\n\t","hello world! - parse this!?")"\n\talso this!" ps
+d: : tprintf printf ( "\nHello world! = 0x%08x\n\n" 1234 ) ; tprintf
+: tprintf1 ( a b ) d: printf ( a @ b @ ) ; 
+'tprintf find wdiss
+'tprintf2 find wdiss
+#endif
+sp
+BigNum
+7 ! p 7 d: !! 8 !! 8 !!  
 sp
 : ! qexp ;
 7 !!! p 8 !!! p

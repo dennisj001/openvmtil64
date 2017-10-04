@@ -122,23 +122,27 @@ BigNum_EPrint ( )
 void
 BigNum_Info ( )
 {
-    _Printf ( ( byte* ) "MPFR library: %-12s\n MPFR header:  %s (based on %d.%d.%d)\n",
+    _Printf ( ( byte* ) "\nMPFR library: %-12s\nMPFR header:  %s (based on %d.%d.%d)\n",
         mpfr_get_version ( ), MPFR_VERSION_STRING, MPFR_VERSION_MAJOR,
         MPFR_VERSION_MINOR, MPFR_VERSION_PATCHLEVEL ) ;
 }
 
 void
 BigNum_FPrint ( )
-{
+{ 
     Context * cntx = _Context_ ;
     char * format ;
     mpfr_t * value = ( mpfr_t* ) _DataStack_Pop ( ) ;
     if ( _Q_->Verbosity )
     {
+#if 0        
         if ( cntx->System0->NumberBase == 10 ) format = "%*.*Rf" ;
         else if ( cntx->System0->NumberBase == 2 ) format = "%*.*Rb" ;
         else if ( cntx->System0->NumberBase == 16 ) format = "%*.*Rx" ;
         mpfr_printf ( format, _Context_->System0->BigNum_Printf_Width, _Context_->System0->BigNum_Printf_Precision, *value ) ;
+#else
+        mpfr_printf ( "%*.*Rf", 16, 16, *value ) ;
+#endif        
     }
     fflush ( stdout ) ;
 }

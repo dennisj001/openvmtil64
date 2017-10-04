@@ -1,5 +1,5 @@
 5
-: sp stack pause ;
+: sp ; //stack pause ;
 #if 1
 Root 
 "Control" namespace
@@ -11,7 +11,7 @@ Root
 // x 10 = "abrkcon" { { { kbhit 27 == } { break } { 1 p continue } ifElse 2 p } loop } word
 x 10 = 
 : abrkcon { { x @ 0 == } { break } { x @ p x dup @ 1 - = continue } ifElse 2 p } loop ;
-//'abrkcon find wdiss sp
+'abrkcon find wdiss sp
 abrkcon
 : abrk0 ( x ) { { x @ 0 == } { break } { x @ p x 1 -= continue } ifElse 2 p } loop ;
 nl 10 abrk0 sp

@@ -19,7 +19,6 @@ _Block_Copy ( byte * srcAddress, int64 bsize )
 {
     byte * saveHere = Here, * saveAddress = srcAddress ;
     ud_t * ud = Debugger_UdisInit ( _Debugger_ ) ;
-    Compiler * compiler = _Compiler_ ;
     int64 isize, left ;
 
     for ( left = bsize ; left > 0 ; srcAddress += isize )
@@ -68,7 +67,9 @@ _Block_Copy ( byte * srcAddress, int64 bsize )
             }
             else
             {
-                _CfrTil_AdjustGotoPoint ( ( int64 ) srcAddress ) ;
+                //_CfrTil_AdjustGotoPoint ( ( int64 ) srcAddress ) ;
+                dllist_Map1 ( _Context_->Compiler0->GotoList, ( MapFunction1 ) _AdjustGotoInfo, ( int64 ) srcAddress ) ;
+
             }
         }
 #if 0        

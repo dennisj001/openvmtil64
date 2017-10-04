@@ -191,12 +191,12 @@
 #define THRU_REG OPERAND_2_REG
 #define SCRATCH_REG OPERAND_2_REG // eax/edx are both used sometimes by ops ebx/ecx are not ?
 #define SREG SCRATCH_REG
-register uint64 *Dsp asm ("r15" ) ;
-#define STACK_POINTER R15D
-#define CPU_DSP R15d
+register uint64 *Dsp asm ("r14" ) ;
+#define STACK_POINTER R14D
+#define CPU_DSP R14d
 //register int64 *Fp asm ("rsi" ) ;
-#define FRAME_POINTER R14D
-#define CPU_FP R14d
+#define FRAME_POINTER R15D
+#define CPU_FP R15d
 #define DSP STACK_POINTER 
 #define FP FRAME_POINTER
 

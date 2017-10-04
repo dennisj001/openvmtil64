@@ -229,7 +229,7 @@ void _CompileFromName_Inline(byte *wordName);
 void _AdjustGotoInfo(dlnode *node, int64 originalAddress);
 void AdjustJmpOffsetPointer(dlnode *node, int64 address);
 void _GotoInfo_SetAndRemove(GotoInfo *gotoInfo, byte *address, int8 removeFlag);
-void _InstallGotoPoint_Key(dlnode *node, int64 bi, int64 key);
+void _InstallGotoPoint_Key(dlnode *node, int64 blockInfo, int64 key);
 void _CheckForGotoPoint(dlnode *node, int64 key, int64 *status);
 void _RemoveGotoPoint(dlnode *node, int64 key, int64 *status);
 void _CfrTil_InstallGotoCallPoints_Keyed(BlockInfo *bi, int64 key);
