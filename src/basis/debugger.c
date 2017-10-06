@@ -202,29 +202,23 @@ _Debugger_Init ( Debugger * debugger, Word * word, byte * address )
     debugger->SaveDsp = Dsp ;
     debugger->SaveTOS = TOS ;
     debugger->Key = 0 ;
-#if 0    
-    if ( GetState ( debugger, DBG_CONTINUE_MODE | DBG_AUTO_MODE ) )
-    {
-        //&& debugger->DebugAddress ) ) { debugger->DebugAddress+= 5 ; goto next ;}
-        debugger->GetESP ( ) ;
-    }
-    //else
-#endif        
+
+    if ( ! GetState ( debugger, DBG_BRK_INIT ) )
     {
         debugger->State = DBG_MENU | DBG_INFO | DBG_PROMPT ;
-        debugger->w_Word = word ;
     }
+    debugger->w_Word = word ;
 
     DebugOn ;
     if ( address )
     {
         debugger->DebugAddress = address ;
     }
-    else if ( debugger->cs_Cpu->Rsp )
+    else if ( GetState ( debugger, DBG_BRK_INIT ) && debugger->cs_Cpu->Rsp )
     {
         // remember : _Compile_CpuState_Save ( _Debugger_->cs_Cpu ) ; is called thru _Compile_Debug : <dbg>
         debugger->DebugAddress = ( byte* ) debugger->cs_Cpu->Rsp[0] ; // 0 is <dbg>
-        if ( debugger->DebugAddress )
+        if ( debugger->DebugAddress && ( ! word ) )
         {
             byte * da ;
             debugger->w_Word = word = Word_GetFromCodeAddress ( debugger->DebugAddress ) ;

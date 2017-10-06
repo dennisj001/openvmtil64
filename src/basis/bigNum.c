@@ -17,16 +17,16 @@ _BigNum_New ( byte * token )
                     mpfr_init_set_d ( *bfr, bf, MPFR_RNDN ) ;
                     goto retrn ;
                 }
-                else goto doDefaultZero ;
+                else goto doDefaultZeroValue ;
             }
         }
         if ( sscanf ( ( char* ) token, "%ld", &bi ) ) mpfr_init_set_si ( *bfr, bi, MPFR_RNDN ) ;
         //if ( sscanf ( ( char* ) token, "%lf", &bf ) ) mpfr_set_d ( *bfr, bf, MPFR_RNDD ) ;
         //else if ( sscanf ( ( char* ) token, "%ld", &bi ) ) mpfr_init2 ( *bfr, bi) ; //, MPFR_RNDN ) ;
-        else goto doDefaultZero ;
+        else goto doDefaultZeroValue ;
         goto retrn ;
     }
-doDefaultZero:
+doDefaultZeroValue:
     mpfr_init_set_si ( *bfr, ( long ) 0, MPFR_RNDN ) ;
 retrn:
     return bfr ;
@@ -135,7 +135,7 @@ BigNum_FPrint ( )
     mpfr_t * value = ( mpfr_t* ) _DataStack_Pop ( ) ;
     if ( _Q_->Verbosity )
     {
-#if 0        
+#if 1        
         if ( cntx->System0->NumberBase == 10 ) format = "%*.*Rf" ;
         else if ( cntx->System0->NumberBase == 2 ) format = "%*.*Rb" ;
         else if ( cntx->System0->NumberBase == 16 ) format = "%*.*Rx" ;
@@ -146,7 +146,27 @@ BigNum_FPrint ( )
     }
     fflush ( stdout ) ;
 }
-
+#if 0
+void
+BigNum_FPrint2 ( )
+{ 
+    Context * cntx = _Context_ ;
+    char * format ;
+    mpfr_t * value = ( mpfr_t* ) _DataStack_Pop ( ) ;
+    if ( _Q_->Verbosity )
+    {
+#if 1        
+        if ( cntx->System0->NumberBase == 10 ) format = "%*.*Rf" ;
+        else if ( cntx->System0->NumberBase == 2 ) format = "%*.*Rb" ;
+        else if ( cntx->System0->NumberBase == 16 ) format = "%*.*Rx" ;
+        mpfr_printf ( format, _Context_->System0->BigNum_Printf_Width, _Context_->System0->BigNum_Printf_Precision, *value ) ;
+#else
+        mpfr_printf ( "%*.*Rf", 16, 16, *value ) ;
+#endif        
+    }
+    fflush ( stdout ) ;
+}
+#endif
 // scientific format
 
 void

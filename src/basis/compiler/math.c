@@ -119,7 +119,6 @@ _Compile_Divide ( Compiler * compiler, uint64 type )
     if ( optFlag & OPTIMIZE_DONE ) return ;
     else if ( optFlag )
     {
-        //_Compile_MoveImm ( REG, R10D, 0, 0, 0, CELL ) ;
         _Compile_MoveImm ( REG, RDX, IMM_B | REX_B | MODRM_B | DISP_B, 0, 0, 0, CELL ) ;
         _Compile_Move_Reg_To_Reg ( ACC, ACC ) ;
         // for idiv the dividend must be eax:edx, divisor can be reg or rm ; here we use ECX
@@ -284,7 +283,7 @@ Compile_DivideEqual ( Compiler * compiler )
         else
         {
             _Compile_Move_StackNRm_To_Reg ( ACC, DSP, - 1 ) ; // address of dividend is second on stack
-            _Compile_MoveImm ( REG, R10D, IMM_B | REX_B | MODRM_B | DISP_B, 0, 0, 0, CELL ) ;
+            _Compile_MoveImm ( REG, RDX, IMM_B | REX_B | MODRM_B | DISP_B, 0, 0, 0, CELL ) ;
             Compile_IDIV ( MEM, DSP, 0, 0, 0, 0, 0 ) ; // divisor is tos
             _Compile_Stack_Drop ( DSP ) ;
             _Compile_Move_Reg_To_StackNRm_UsingReg ( DSP, 0, ACC, R11D ) ;

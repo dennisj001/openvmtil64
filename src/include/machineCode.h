@@ -184,13 +184,14 @@
 #define RETURN_REG ACC
 #define RETURN_REG_2 RDX
 #define OPERAND_REG R9D
+#define OREG OPERAND_REG
 #define CPU_OREG R9d
 #define OPERAND_2_REG R8D
-#define OREG OPERAND_REG
-#define DIV_MUL_REG_2 RDX
+#define OREG2 OPERAND_2_REG 
 #define THRU_REG OPERAND_2_REG
 #define SCRATCH_REG OPERAND_2_REG // eax/edx are both used sometimes by ops ebx/ecx are not ?
 #define SREG SCRATCH_REG
+#define DIV_MUL_REG_2 RDX
 register uint64 *Dsp asm ("r14" ) ;
 #define STACK_POINTER R14D
 #define CPU_DSP R14d

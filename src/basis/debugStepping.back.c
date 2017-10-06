@@ -451,19 +451,19 @@ Debugger_SetupReturnStackCopy ( Debugger * debugger, int64 showFlag ) // restore
         debugger->cs_Cpu->Rbp = ( uint64* ) ( debugger->CopyRBP ) ; //+ 0x20) ;
 #elif 0        
         //_Compile_Get_FromCAddress_ToReg_ThruReg ( RBP, ( byte * ) & debugger->ReturnStackCopyPointer - ( ( ( int64 ) debugger->cs_Cpu->Rbp ) - ( ( int64 ) debugger->cs_Cpu->Rsp ) ), R10D ) ;
-        _Compile_MoveImm_ToReg_ThruReg ( RSP, ( uint64 ) debugger->CopyRSP, CELL_SIZE, R10D ) ;
+        _Compile_MoveImm_ToReg_ThruReg ( RSP, ( uint64 ) debugger->CopyRSP, CELL_SIZE, RDX ) ;
         //_Compile_Get_FromCAddress_ToReg_ThruReg ( RBP, ( byte * ) & debugger->CopyRSP + ( ( ( int64 ) debugger->cs_Cpu->Rbp ) - ( ( int64 ) debugger->cs_Cpu->Rsp ) ), R10D ) ;
-        _Compile_MoveImm_ToReg_ThruReg ( RBP, ( uint64 ) debugger->CopyRSP + 0x20, CELL_SIZE, R10D ) ;
+        _Compile_MoveImm_ToReg_ThruReg ( RBP, ( uint64 ) debugger->CopyRSP + 0x20, CELL_SIZE, RDX ) ;
         //_Compile_Get_FromCAddress_ToReg_ThruReg ( RBP, ( byte * ) & debugger->CopyRSP + 0x10, R10D ) ;// ( ( ( int64 ) debugger->cs_Cpu->Rbp ) - ( ( int64 ) debugger->cs_Cpu->Rsp ) ), R10D ) ;
         //_Compile_Get_FromCAddress_ToReg_ThruReg ( RBP, ( byte * ) & debugger->CopyRSP + 0x10, R10D ) ;// ( ( ( int64 ) debugger->cs_Cpu->Rbp ) - ( ( int64 ) debugger->cs_Cpu->Rsp ) ), R10D ) ;
-        _Compile_Get_FromCAddress_ToReg ( R10D, ( byte * ) & debugger->cs_Cpu->R10d ) ; // restore our scratch reg
+        _Compile_Get_FromCAddress_ToReg ( RDX, ( byte * ) & debugger->cs_Cpu->Rdx ) ; // restore our scratch reg
 #else        
         //_Compile_Get_FromCAddress_ToReg ( RSP, ( byte * ) & debugger->CopyRSP ) ;
         //_Compile_Get_FromCAddress_ToReg_ThruReg ( RSP, ( byte * ) & debugger->CopyRSP, R10D ) ;
         //_Compile_Get_FromCAddress_ToReg_ThruReg ( RBP, ( byte * ) & debugger->CopyRSP + 0x10, R10D ) ;// ( ( ( int64 ) debugger->cs_Cpu->Rbp ) - ( ( int64 ) debugger->cs_Cpu->Rsp ) ), R10D ) ;
-        _Compile_MoveImm_ToReg_ThruReg ( RSP, 0x7fffffffd090, CELL_SIZE, R10D ) ;
-        _Compile_MoveImm_ToReg_ThruReg ( RBP, 0x7fffffffd0b0, CELL_SIZE, R10D ) ;
-        _Compile_Get_FromCAddress_ToReg ( R10D, ( byte * ) & debugger->cs_Cpu->R10d ) ; // restore our scratch reg
+        _Compile_MoveImm_ToReg_ThruReg ( RSP, 0x7fffffffd090, CELL_SIZE, RDX ) ;
+        _Compile_MoveImm_ToReg_ThruReg ( RBP, 0x7fffffffd0b0, CELL_SIZE, RDX ) ;
+        _Compile_Get_FromCAddress_ToReg ( RDX, ( byte * ) & debugger->cs_Cpu->Rdx ) ; // restore our scratch reg
 #endif        
         //_Debugger_CpuState_Show ( ) ;
     }

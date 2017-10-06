@@ -547,7 +547,7 @@ typedef struct ReadLiner
     byte LastCheckedInputKeyedCharacter ;
     int64 FileCharacterNumber ;
     int64 LineNumber ;
-    int64 InputLineCharacterNumber ; // set by _CfrTil_Key
+    //int64 InputLineCharacterNumber ; // set by _CfrTil_Key
     int64 OutputLineCharacterNumber ; // set by _CfrTil_Key
     int64 ReadIndex ;
     int64 EndPosition ; // index where the next input character is put
@@ -643,7 +643,7 @@ typedef struct
     int8 AccumulatedOffsetPointerFlag ;
     int32 * AccumulatedOffsetPointer ;
     int64 * FrameSizeCellOffset ;
-    int64 RegOrder [ 4 ] ; //= { EBX, EDX, ECX, EAX } ;
+    int8 RegOrder [ 4 ] ; 
     byte * RspSaveOffset ;
     byte * RspRestoreOffset ;
     Word * ReturnVariableWord ;

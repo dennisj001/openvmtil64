@@ -576,7 +576,7 @@ _CheckOptimizeOperands ( Compiler * compiler, int64 maxOperands )
                         {
                             Set_SCA ( 5 ) ;
                             _Compile_GetVarLitObj_RValue_To_Reg ( optInfo->O_five, ACC ) ;
-                            _Compile_MoveImm ( REG, R10D, IMM_B | REX_B | MODRM_B | DISP_B, 0, 0, 0, CELL ) ;
+                            _Compile_MoveImm ( REG, RDX, IMM_B | REX_B | MODRM_B | DISP_B, 0, 0, 0, CELL ) ;
                             // for idiv the dividend must be eax:edx, divisor can be reg or rm ; here we use ECX
                             // Compile_IDIV ( mod, rm, sib, disp, imm, size )
                             _Compile_MoveImm ( REG, OREG, IMM_B | REX_B | MODRM_B | DISP_B, 0, 0, *optInfo->O_two->W_PtrToValue, CELL ) ;
@@ -589,13 +589,13 @@ _CheckOptimizeOperands ( Compiler * compiler, int64 maxOperands )
                         {
                             Set_SCA ( 5 ) ;
                             _Compile_GetVarLitObj_RValue_To_Reg ( optInfo->O_five, ACC ) ;
-                            _Compile_MoveImm ( REG, R10D, IMM_B | REX_B | MODRM_B | DISP_B, 0, 0, 0, CELL ) ;
+                            _Compile_MoveImm ( REG, RDX, IMM_B | REX_B | MODRM_B | DISP_B, 0, 0, 0, CELL ) ;
                             Set_SCA ( 2 ) ;
                             _Compile_MoveImm ( REG, OREG, IMM_B | REX_B | MODRM_B | DISP_B, 0, 0, *optInfo->O_two->W_PtrToValue, CELL ) ;
                             Set_SCA ( 1 ) ;
                             Compile_IDIV ( REG, OREG, 0, 0, 0, 0, 0 ) ;
                             Set_SCA ( 0 ) ;
-                            _Compile_Move_Reg_To_Reg ( ACC, R10D ) ; // for consistency finally use R8 so optInfo can always count on eax as the pushed reg
+                            _Compile_Move_Reg_To_Reg ( ACC, RDX ) ; // for consistency finally use R8 so optInfo can always count on eax as the pushed reg
                             _Compile_Move ( MEM, ACC, compiler->optInfo->Optimize_Rm, 0, compiler->optInfo->Optimize_Disp ) ;
                         }
                         else if ( optInfo->O_one->Definition == CfrTil_ShiftLeft )
@@ -693,7 +693,7 @@ _CheckOptimizeOperands ( Compiler * compiler, int64 maxOperands )
                             if ( optInfo->O_six->W_OriginalWord == optInfo->O_five->W_OriginalWord )
                             {
                                 _Compile_GetVarLitObj_RValue_To_Reg ( optInfo->O_six, ACC ) ;
-                                _Compile_MoveImm ( REG, R10D, IMM_B | REX_B | MODRM_B | DISP_B, 0, 0, 0, CELL ) ;
+                                _Compile_MoveImm ( REG, RDX, IMM_B | REX_B | MODRM_B | DISP_B, 0, 0, 0, CELL ) ;
                                 _GetRmDispImm ( optInfo, optInfo->O_three, - 1 ) ;
                                 Set_SCA ( 1 ) ;
                                 Compile_IDIV ( MEM, compiler->optInfo->Optimize_Rm, DISP_B, 0, compiler->optInfo->Optimize_Disp, 0, 0 ) ;
@@ -702,7 +702,7 @@ _CheckOptimizeOperands ( Compiler * compiler, int64 maxOperands )
                             {
                                 _Compile_GetVarLitObj_RValue_To_Reg ( optInfo->O_five, ACC ) ;
                                 _Compile_GetVarLitObj_RValue_To_Reg ( optInfo->O_three, OREG ) ;
-                                _Compile_MoveImm ( REG, R10D, IMM_B | REX_B | MODRM_B | DISP_B, 0, 0, 0, CELL ) ;
+                                _Compile_MoveImm ( REG, RDX, IMM_B | REX_B | MODRM_B | DISP_B, 0, 0, 0, CELL ) ;
                                 Set_SCA ( 1 ) ;
                                 Compile_IDIV ( REG, OREG, 0, 0, 0, 0, 0 ) ;
                             }
@@ -712,7 +712,7 @@ _CheckOptimizeOperands ( Compiler * compiler, int64 maxOperands )
                                 Set_SCA ( 0 ) ;
                                 _Compile_Move ( MEM, ACC, compiler->optInfo->Optimize_Rm, 0, compiler->optInfo->Optimize_Disp ) ;
                             }
-                            else _Compile_Move ( MEM, R10D, compiler->optInfo->Optimize_Rm, 0, compiler->optInfo->Optimize_Disp ) ;
+                            else _Compile_Move ( MEM, RDX, compiler->optInfo->Optimize_Rm, 0, compiler->optInfo->Optimize_Disp ) ;
                         }
                         else continue ;
                         return ( OPTIMIZE_DONE | OPTIMIZE_RESET ) ;

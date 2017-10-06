@@ -57,7 +57,7 @@ _OVT_Pause ( byte * prompt, int64 signalsHandled )
     //if ( _Context_->ReadLiner0->Filename )
     {
         byte buffer [512], *defaultPrompt =
-            ( byte * ) "\n%s%s : at %s :: %s\n'd' (d)ebugger, 't' s(t)ack, c' (c)ontinue, 'q' (q)uit, 'x' e(x)it, 'i' (i)interpret, \\' or other <key> == pause loop starting with <other key>%s" ;
+            ( byte * ) "\n%s%s : at %s :: %s\n'd' (d)ebugger, 't' s(t)ack, c' (c)ontinue, 'q' (q)uit, 'x' e(x)it, 'i' '\\' or <key> (i)interpret, <return> loop%s" ;
         snprintf ( ( char* ) buffer, 512, ( char* ) prompt ? prompt : defaultPrompt, _Q_->ExceptionMessage ? _Q_->ExceptionMessage : ( byte* ) "\r", c_gd ( "pause" ),
             _Context_Location ( _Context_ ), c_gd ( _Debugger_->ShowLine ? _Debugger_->ShowLine : _Context_->ReadLiner0->InputLine ), c_gd ( "\n-> " ) ) ;
         DebugColors ;

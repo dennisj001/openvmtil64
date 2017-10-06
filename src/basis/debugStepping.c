@@ -160,7 +160,7 @@ Debugger_CompileAndStepOneInstruction ( Debugger * debugger )
             }
             else
             {
-                Debugger_SyncStackPointersFromCpuState ( debugger ) ;
+                //Debugger_SyncStackPointersFromCpuState ( debugger ) ;
                 SetState ( debugger, DBG_STACK_OLD, true ) ;
                 debugger->CopyRSP = 0 ;
                 if ( GetState ( debugger, DBG_BRK_INIT ) )
@@ -423,8 +423,8 @@ Debugger_SetupReturnStackCopy ( Debugger * debugger, int64 showFlag ) // restore
 #elif 0        
         //_Compile_Get_FromCAddress_ToReg ( RBP, ( byte * ) & debugger->CopyRSP - ( ( ( int64 ) debugger->cs_Cpu->Rbp ) - ( ( int64 ) debugger->cs_Cpu->Rsp ) ) ) ;
         //_Compile_Get_FromCAddress_ToReg ( RSP, ( byte * ) & debugger->CopyRSP ) ;
-        _Compile_Get_FromCAddress_ToReg_ThruReg ( RSP, ( byte * ) & debugger->CopyRSP, R10D ) ;
-        _Compile_Get_FromCAddress_ToReg_ThruReg ( RBP, ( byte * ) & debugger->CopyRSP - ( ( ( int64 ) debugger->cs_Cpu->Rbp ) - ( ( int64 ) debugger->cs_Cpu->Rsp ) ), R10D ) ;
+        _Compile_Get_FromCAddress_ToReg_ThruReg ( RSP, ( byte * ) & debugger->CopyRSP, RDX ) ;
+        _Compile_Get_FromCAddress_ToReg_ThruReg ( RBP, ( byte * ) & debugger->CopyRSP - ( ( ( int64 ) debugger->cs_Cpu->Rbp ) - ( ( int64 ) debugger->cs_Cpu->Rsp ) ), RDX ) ;
 #endif        
     }
 #endif    

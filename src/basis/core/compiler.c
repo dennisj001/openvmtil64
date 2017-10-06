@@ -219,10 +219,8 @@ Compiler_New ( uint64 type )
     compiler->CombinatorInfoStack = Stack_New ( 64, type ) ;
     compiler->InfixOperatorStack = Stack_New ( 32, type ) ;
     CompileOptInfo_New ( compiler, type ) ;
-    compiler->RegOrder [ 0 ] = R11D ;
-    compiler->RegOrder [ 1 ] = R10D ;
-    compiler->RegOrder [ 2 ] = OREG ;
-    compiler->RegOrder [ 3 ] = ACC ;
+    compiler->RegOrder [ 0 ] = OREG2 ;
+    compiler->RegOrder [ 1 ] = OREG ;
     Compiler_Init ( compiler, 0 ) ;
     return compiler ;
 }

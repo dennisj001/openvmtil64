@@ -1,6 +1,6 @@
 Int
 5
-: sp stack pause ;
+: sp ; //stack pause ;
 dbgOff 
 Combinators
 BigNum 
@@ -8,7 +8,7 @@ bnInit ( 0 0 )
 : qexp { dup 1 >= } { dup -- qexp * } { drop 1 } ifElse ;
 //: qexp { dup 1 <= } { drop 1 } { dup -- recurse * } ifElse ;
 "!" ' qexp find alias
-nl "64 ! = " ps 64 ! fprint nl 
+nl "64 ! = " ps 64 ! p nl 
 x 1000 ! =
 nl "1000 ! = " ps x @ fprint nl
 : aexp { dup 1 <= } { drop 1 } { dup -- aexp * } ifElse ;
@@ -17,9 +17,6 @@ nl "1000 ! = " ps x @ fprint nl
 : bexp0 ( n -- TOS ) { n @ 1 <= } { 1 } { n @ dup -- bexp0 * } ifElse ; 
 ' bexp find wdiss ' bexp0 find wdiss
 
-'!!! '! find alias 
-: !! qexp p nl ;
-'!! find wdiss
 7 ! p 8 ! p 8 ! p
 bno
 #if 0
@@ -38,12 +35,11 @@ d: : tprintf printf ( "\nHello world! = 0x%08x\n\n" 1234 ) ; tprintf
 #endif
 sp
 BigNum
-7 ! p 7 d: !! 8 !! 8 !!  
-sp
-: ! qexp ;
-7 !!! p 8 !!! p
-'!! 'qexp find alias
-7 !! p 8 !! p p 8 !! p
+nl 7 ! p
+: !! qexp p nl ;
+'!! find wdiss
+7 d: !! 8 !! 8 !!  
+7 ! d: p 8 !! 8 !! 
 sp
 //pause
 1000 ! p 

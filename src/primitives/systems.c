@@ -209,7 +209,7 @@ CfrTil_LineNumber ( )
 void
 CfrTil_LineCharacterNumber ( )
 {
-    _DataStack_Push ( ( int64 ) _Context_->ReadLiner0->InputLineCharacterNumber ) ;
+    _DataStack_Push ( ( int64 ) _Context_->ReadLiner0->ReadIndex ) ;
 }
 
 void

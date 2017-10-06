@@ -106,7 +106,7 @@ _Compile_CpuState_Restore ( Cpu * cpu, int8 cStackRegFlag )
     _Compile_Get_FromCAddress_ToReg ( RDI, ( byte* ) & cpu->Rdi ) ; // rdi
     _Compile_Get_FromCAddress_ToReg ( R8D, ( byte* ) & cpu->R8d ) ; // r8d
     _Compile_Get_FromCAddress_ToReg ( R9D, ( byte* ) & cpu->R9d ) ; // r9d
-    _Compile_Get_FromCAddress_ToReg ( OREG, ( byte* ) & cpu->R10d ) ; // r10d
+    _Compile_Get_FromCAddress_ToReg ( R10D, ( byte* ) & cpu->R10d ) ; // r10d
     _Compile_Get_FromCAddress_ToReg ( R11D, ( byte* ) & cpu->R11d ) ; // r11d
     _Compile_Get_FromCAddress_ToReg_ThruReg ( R12D, ( byte* ) & cpu->R12d, OREG ) ; // r12, r13, rsp, rbp : same problem
     _Compile_Get_FromCAddress_ToReg_ThruReg ( R13D, ( byte* ) & cpu->R13d, OREG ) ; // r12, r13, rsp, rbp : same problem
@@ -122,7 +122,7 @@ _Compile_CpuState_Restore ( Cpu * cpu, int8 cStackRegFlag )
     //_Compile_Get_FromCAddress_ToReg ( RBX, ( byte* ) & cpu->Rbx ) ; // restore scratch reg rax
     _Compile_Get_FromCAddress_ToReg ( ACC, ( byte* ) & cpu->Rax ) ; // restore scratch reg rax
 
-    _Compile_Get_FromCAddress_ToReg ( OREG, ( byte* ) & cpu->R9d ) ; // restore thru - scratch reg
+    _Compile_Get_FromCAddress_ToReg ( OREG, ( byte* ) & cpu->CPU_OREG ) ; // restore thru - scratch reg
 }
 
 void

@@ -150,7 +150,7 @@ void
 ReadLine_InputLine_Init ( ReadLiner * rl )
 {
     ReadLine_InputLine_Clear ( rl ) ;
-    rl->InputLineCharacterNumber = 0 ;
+    //rl->InputLineCharacterNumber = 0 ;
     rl->ReadIndex = 0 ;
     rl->InputLineString = rl->InputLine ;
     SetState ( rl, READLINER_DONE, false ) ;
@@ -470,7 +470,7 @@ byte
 _ReadLine_Key ( ReadLiner * rl, byte c )
 {
     rl->InputKeyedCharacter = c ;
-    rl->InputLineCharacterNumber ++ ;
+    //rl->InputLineCharacterNumber ++ ;
     rl->FileCharacterNumber ++ ;
     return rl->InputKeyedCharacter ;
 }

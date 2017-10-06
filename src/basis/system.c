@@ -147,12 +147,12 @@ CfrTil_system0 ( )
     _Compile_INT80 ( ) ;
     _Compile_Stack_PushReg ( DSP, ACC ) ;
 }
-
+#if 1
 void
 CfrTil_system1 ( )
 {
     _Compile_Stack_PopToReg ( DSP, ACC ) ;
-    _Compile_Stack_PopToReg ( DSP, R11D ) ;
+    _Compile_Stack_PopToReg ( DSP, RCX ) ;
     _Compile_INT80 ( ) ;
     _Compile_Stack_PushReg ( DSP, ACC ) ;
 }
@@ -161,7 +161,7 @@ void
 CfrTil_system2 ( )
 {
     _Compile_Stack_PopToReg ( DSP, ACC ) ;
-    _Compile_Stack_PopToReg ( DSP, R11D ) ;
+    _Compile_Stack_PopToReg ( DSP, RCX ) ;
     _Compile_Stack_PopToReg ( DSP, OREG ) ;
     _Compile_INT80 ( ) ;
     _Compile_Stack_PushReg ( DSP, ACC ) ;
@@ -171,13 +171,13 @@ void
 CfrTil_system3 ( )
 {
     _Compile_Stack_PopToReg ( DSP, ACC ) ;
-    _Compile_Stack_PopToReg ( DSP, R11D ) ;
+    _Compile_Stack_PopToReg ( DSP, RCX ) ;
     _Compile_Stack_PopToReg ( DSP, OREG ) ;
-    _Compile_Stack_PopToReg ( DSP, R10D ) ;
+    _Compile_Stack_PopToReg ( DSP, RDX ) ;
     _Compile_INT80 ( ) ;
     _Compile_Stack_PushReg ( DSP, ACC ) ;
 }
-
+#endif
 #if 0
 
 void *

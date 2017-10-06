@@ -491,6 +491,246 @@
         <in>words.c</in>
       </df>
     </df>
+    <logicalFolder name="src"
+                   displayName="src"
+                   projectFiles="true"
+                   root="../../backup/lib/mpfr-3.1.6/src">
+      <logicalFolder name="generic" displayName="generic" projectFiles="true">
+        <itemPath>../../backup/lib/mpfr-3.1.6/src/generic/mparam.h</itemPath>
+      </logicalFolder>
+      <itemPath>../../backup/lib/mpfr-3.1.6/src/abort_prec_max.c</itemPath>
+      <itemPath>../../backup/lib/mpfr-3.1.6/src/acos.c</itemPath>
+      <itemPath>../../backup/lib/mpfr-3.1.6/src/acosh.c</itemPath>
+      <itemPath>../../backup/lib/mpfr-3.1.6/src/add.c</itemPath>
+      <itemPath>../../backup/lib/mpfr-3.1.6/src/add1.c</itemPath>
+      <itemPath>../../backup/lib/mpfr-3.1.6/src/add1sp.c</itemPath>
+      <itemPath>../../backup/lib/mpfr-3.1.6/src/add_d.c</itemPath>
+      <itemPath>../../backup/lib/mpfr-3.1.6/src/add_ui.c</itemPath>
+      <itemPath>../../backup/lib/mpfr-3.1.6/src/agm.c</itemPath>
+      <itemPath>../../backup/lib/mpfr-3.1.6/src/ai.c</itemPath>
+      <itemPath>../../backup/lib/mpfr-3.1.6/src/asin.c</itemPath>
+      <itemPath>../../backup/lib/mpfr-3.1.6/src/asinh.c</itemPath>
+      <itemPath>../../backup/lib/mpfr-3.1.6/src/atan.c</itemPath>
+      <itemPath>../../backup/lib/mpfr-3.1.6/src/atan2.c</itemPath>
+      <itemPath>../../backup/lib/mpfr-3.1.6/src/atanh.c</itemPath>
+      <itemPath>../../backup/lib/mpfr-3.1.6/src/bernoulli.c</itemPath>
+      <itemPath>../../backup/lib/mpfr-3.1.6/src/buildopt.c</itemPath>
+      <itemPath>../../backup/lib/mpfr-3.1.6/src/cache.c</itemPath>
+      <itemPath>../../backup/lib/mpfr-3.1.6/src/cbrt.c</itemPath>
+      <itemPath>../../backup/lib/mpfr-3.1.6/src/check.c</itemPath>
+      <itemPath>../../backup/lib/mpfr-3.1.6/src/clear.c</itemPath>
+      <itemPath>../../backup/lib/mpfr-3.1.6/src/clears.c</itemPath>
+      <itemPath>../../backup/lib/mpfr-3.1.6/src/cmp.c</itemPath>
+      <itemPath>../../backup/lib/mpfr-3.1.6/src/cmp2.c</itemPath>
+      <itemPath>../../backup/lib/mpfr-3.1.6/src/cmp_abs.c</itemPath>
+      <itemPath>../../backup/lib/mpfr-3.1.6/src/cmp_d.c</itemPath>
+      <itemPath>../../backup/lib/mpfr-3.1.6/src/cmp_ld.c</itemPath>
+      <itemPath>../../backup/lib/mpfr-3.1.6/src/cmp_si.c</itemPath>
+      <itemPath>../../backup/lib/mpfr-3.1.6/src/cmp_ui.c</itemPath>
+      <itemPath>../../backup/lib/mpfr-3.1.6/src/comparisons.c</itemPath>
+      <itemPath>../../backup/lib/mpfr-3.1.6/src/const_catalan.c</itemPath>
+      <itemPath>../../backup/lib/mpfr-3.1.6/src/const_euler.c</itemPath>
+      <itemPath>../../backup/lib/mpfr-3.1.6/src/const_log2.c</itemPath>
+      <itemPath>../../backup/lib/mpfr-3.1.6/src/const_pi.c</itemPath>
+      <itemPath>../../backup/lib/mpfr-3.1.6/src/constant.c</itemPath>
+      <itemPath>../../backup/lib/mpfr-3.1.6/src/copysign.c</itemPath>
+      <itemPath>../../backup/lib/mpfr-3.1.6/src/cos.c</itemPath>
+      <itemPath>../../backup/lib/mpfr-3.1.6/src/cosh.c</itemPath>
+      <itemPath>../../backup/lib/mpfr-3.1.6/src/cot.c</itemPath>
+      <itemPath>../../backup/lib/mpfr-3.1.6/src/coth.c</itemPath>
+      <itemPath>../../backup/lib/mpfr-3.1.6/src/csc.c</itemPath>
+      <itemPath>../../backup/lib/mpfr-3.1.6/src/csch.c</itemPath>
+      <itemPath>../../backup/lib/mpfr-3.1.6/src/d_div.c</itemPath>
+      <itemPath>../../backup/lib/mpfr-3.1.6/src/d_sub.c</itemPath>
+      <itemPath>../../backup/lib/mpfr-3.1.6/src/digamma.c</itemPath>
+      <itemPath>../../backup/lib/mpfr-3.1.6/src/dim.c</itemPath>
+      <itemPath>../../backup/lib/mpfr-3.1.6/src/div.c</itemPath>
+      <itemPath>../../backup/lib/mpfr-3.1.6/src/div_2exp.c</itemPath>
+      <itemPath>../../backup/lib/mpfr-3.1.6/src/div_2si.c</itemPath>
+      <itemPath>../../backup/lib/mpfr-3.1.6/src/div_2ui.c</itemPath>
+      <itemPath>../../backup/lib/mpfr-3.1.6/src/div_d.c</itemPath>
+      <itemPath>../../backup/lib/mpfr-3.1.6/src/div_ui.c</itemPath>
+      <itemPath>../../backup/lib/mpfr-3.1.6/src/dump.c</itemPath>
+      <itemPath>../../backup/lib/mpfr-3.1.6/src/eint.c</itemPath>
+      <itemPath>../../backup/lib/mpfr-3.1.6/src/eq.c</itemPath>
+      <itemPath>../../backup/lib/mpfr-3.1.6/src/erf.c</itemPath>
+      <itemPath>../../backup/lib/mpfr-3.1.6/src/erfc.c</itemPath>
+      <itemPath>../../backup/lib/mpfr-3.1.6/src/exceptions.c</itemPath>
+      <itemPath>../../backup/lib/mpfr-3.1.6/src/exp.c</itemPath>
+      <itemPath>../../backup/lib/mpfr-3.1.6/src/exp10.c</itemPath>
+      <itemPath>../../backup/lib/mpfr-3.1.6/src/exp2.c</itemPath>
+      <itemPath>../../backup/lib/mpfr-3.1.6/src/exp3.c</itemPath>
+      <itemPath>../../backup/lib/mpfr-3.1.6/src/exp_2.c</itemPath>
+      <itemPath>../../backup/lib/mpfr-3.1.6/src/expm1.c</itemPath>
+      <itemPath>../../backup/lib/mpfr-3.1.6/src/extract.c</itemPath>
+      <itemPath>../../backup/lib/mpfr-3.1.6/src/factorial.c</itemPath>
+      <itemPath>../../backup/lib/mpfr-3.1.6/src/fits_intmax.c</itemPath>
+      <itemPath>../../backup/lib/mpfr-3.1.6/src/fits_s.h</itemPath>
+      <itemPath>../../backup/lib/mpfr-3.1.6/src/fits_sint.c</itemPath>
+      <itemPath>../../backup/lib/mpfr-3.1.6/src/fits_slong.c</itemPath>
+      <itemPath>../../backup/lib/mpfr-3.1.6/src/fits_sshort.c</itemPath>
+      <itemPath>../../backup/lib/mpfr-3.1.6/src/fits_u.h</itemPath>
+      <itemPath>../../backup/lib/mpfr-3.1.6/src/fits_uint.c</itemPath>
+      <itemPath>../../backup/lib/mpfr-3.1.6/src/fits_uintmax.c</itemPath>
+      <itemPath>../../backup/lib/mpfr-3.1.6/src/fits_ulong.c</itemPath>
+      <itemPath>../../backup/lib/mpfr-3.1.6/src/fits_ushort.c</itemPath>
+      <itemPath>../../backup/lib/mpfr-3.1.6/src/fma.c</itemPath>
+      <itemPath>../../backup/lib/mpfr-3.1.6/src/fms.c</itemPath>
+      <itemPath>../../backup/lib/mpfr-3.1.6/src/frac.c</itemPath>
+      <itemPath>../../backup/lib/mpfr-3.1.6/src/free_cache.c</itemPath>
+      <itemPath>../../backup/lib/mpfr-3.1.6/src/frexp.c</itemPath>
+      <itemPath>../../backup/lib/mpfr-3.1.6/src/gamma.c</itemPath>
+      <itemPath>../../backup/lib/mpfr-3.1.6/src/gammaonethird.c</itemPath>
+      <itemPath>../../backup/lib/mpfr-3.1.6/src/gen_inverse.h</itemPath>
+      <itemPath>../../backup/lib/mpfr-3.1.6/src/get_d.c</itemPath>
+      <itemPath>../../backup/lib/mpfr-3.1.6/src/get_d64.c</itemPath>
+      <itemPath>../../backup/lib/mpfr-3.1.6/src/get_exp.c</itemPath>
+      <itemPath>../../backup/lib/mpfr-3.1.6/src/get_f.c</itemPath>
+      <itemPath>../../backup/lib/mpfr-3.1.6/src/get_flt.c</itemPath>
+      <itemPath>../../backup/lib/mpfr-3.1.6/src/get_ld.c</itemPath>
+      <itemPath>../../backup/lib/mpfr-3.1.6/src/get_patches.c</itemPath>
+      <itemPath>../../backup/lib/mpfr-3.1.6/src/get_si.c</itemPath>
+      <itemPath>../../backup/lib/mpfr-3.1.6/src/get_sj.c</itemPath>
+      <itemPath>../../backup/lib/mpfr-3.1.6/src/get_str.c</itemPath>
+      <itemPath>../../backup/lib/mpfr-3.1.6/src/get_ui.c</itemPath>
+      <itemPath>../../backup/lib/mpfr-3.1.6/src/get_uj.c</itemPath>
+      <itemPath>../../backup/lib/mpfr-3.1.6/src/get_z.c</itemPath>
+      <itemPath>../../backup/lib/mpfr-3.1.6/src/get_z_exp.c</itemPath>
+      <itemPath>../../backup/lib/mpfr-3.1.6/src/gmp_op.c</itemPath>
+      <itemPath>../../backup/lib/mpfr-3.1.6/src/grandom.c</itemPath>
+      <itemPath>../../backup/lib/mpfr-3.1.6/src/hypot.c</itemPath>
+      <itemPath>../../backup/lib/mpfr-3.1.6/src/ieee_floats.h</itemPath>
+      <itemPath>../../backup/lib/mpfr-3.1.6/src/init.c</itemPath>
+      <itemPath>../../backup/lib/mpfr-3.1.6/src/init2.c</itemPath>
+      <itemPath>../../backup/lib/mpfr-3.1.6/src/inits.c</itemPath>
+      <itemPath>../../backup/lib/mpfr-3.1.6/src/inits2.c</itemPath>
+      <itemPath>../../backup/lib/mpfr-3.1.6/src/inp_str.c</itemPath>
+      <itemPath>../../backup/lib/mpfr-3.1.6/src/int_ceil_log2.c</itemPath>
+      <itemPath>../../backup/lib/mpfr-3.1.6/src/isinf.c</itemPath>
+      <itemPath>../../backup/lib/mpfr-3.1.6/src/isinteger.c</itemPath>
+      <itemPath>../../backup/lib/mpfr-3.1.6/src/isnan.c</itemPath>
+      <itemPath>../../backup/lib/mpfr-3.1.6/src/isnum.c</itemPath>
+      <itemPath>../../backup/lib/mpfr-3.1.6/src/isqrt.c</itemPath>
+      <itemPath>../../backup/lib/mpfr-3.1.6/src/isregular.c</itemPath>
+      <itemPath>../../backup/lib/mpfr-3.1.6/src/iszero.c</itemPath>
+      <itemPath>../../backup/lib/mpfr-3.1.6/src/jn.c</itemPath>
+      <itemPath>../../backup/lib/mpfr-3.1.6/src/jyn_asympt.c</itemPath>
+      <itemPath>../../backup/lib/mpfr-3.1.6/src/li2.c</itemPath>
+      <itemPath>../../backup/lib/mpfr-3.1.6/src/lngamma.c</itemPath>
+      <itemPath>../../backup/lib/mpfr-3.1.6/src/log.c</itemPath>
+      <itemPath>../../backup/lib/mpfr-3.1.6/src/log10.c</itemPath>
+      <itemPath>../../backup/lib/mpfr-3.1.6/src/log1p.c</itemPath>
+      <itemPath>../../backup/lib/mpfr-3.1.6/src/log2.c</itemPath>
+      <itemPath>../../backup/lib/mpfr-3.1.6/src/logging.c</itemPath>
+      <itemPath>../../backup/lib/mpfr-3.1.6/src/min_prec.c</itemPath>
+      <itemPath>../../backup/lib/mpfr-3.1.6/src/minmax.c</itemPath>
+      <itemPath>../../backup/lib/mpfr-3.1.6/src/modf.c</itemPath>
+      <itemPath>../../backup/lib/mpfr-3.1.6/src/mp_clz_tab.c</itemPath>
+      <itemPath>../../backup/lib/mpfr-3.1.6/src/mparam.h</itemPath>
+      <itemPath>../../backup/lib/mpfr-3.1.6/src/mpfr-gmp.c</itemPath>
+      <itemPath>../../backup/lib/mpfr-3.1.6/src/mpfr-gmp.h</itemPath>
+      <itemPath>../../backup/lib/mpfr-3.1.6/src/mpfr-impl.h</itemPath>
+      <itemPath>../../backup/lib/mpfr-3.1.6/src/mpfr-intmax.h</itemPath>
+      <itemPath>../../backup/lib/mpfr-3.1.6/src/mpfr-longlong.h</itemPath>
+      <itemPath>../../backup/lib/mpfr-3.1.6/src/mpfr-thread.h</itemPath>
+      <itemPath>../../backup/lib/mpfr-3.1.6/src/mpfr.h</itemPath>
+      <itemPath>../../backup/lib/mpfr-3.1.6/src/mpn_exp.c</itemPath>
+      <itemPath>../../backup/lib/mpfr-3.1.6/src/mul.c</itemPath>
+      <itemPath>../../backup/lib/mpfr-3.1.6/src/mul_2exp.c</itemPath>
+      <itemPath>../../backup/lib/mpfr-3.1.6/src/mul_2si.c</itemPath>
+      <itemPath>../../backup/lib/mpfr-3.1.6/src/mul_2ui.c</itemPath>
+      <itemPath>../../backup/lib/mpfr-3.1.6/src/mul_d.c</itemPath>
+      <itemPath>../../backup/lib/mpfr-3.1.6/src/mul_ui.c</itemPath>
+      <itemPath>../../backup/lib/mpfr-3.1.6/src/mulders.c</itemPath>
+      <itemPath>../../backup/lib/mpfr-3.1.6/src/neg.c</itemPath>
+      <itemPath>../../backup/lib/mpfr-3.1.6/src/next.c</itemPath>
+      <itemPath>../../backup/lib/mpfr-3.1.6/src/out_str.c</itemPath>
+      <itemPath>../../backup/lib/mpfr-3.1.6/src/pow.c</itemPath>
+      <itemPath>../../backup/lib/mpfr-3.1.6/src/pow_si.c</itemPath>
+      <itemPath>../../backup/lib/mpfr-3.1.6/src/pow_ui.c</itemPath>
+      <itemPath>../../backup/lib/mpfr-3.1.6/src/pow_z.c</itemPath>
+      <itemPath>../../backup/lib/mpfr-3.1.6/src/powerof2.c</itemPath>
+      <itemPath>../../backup/lib/mpfr-3.1.6/src/print_raw.c</itemPath>
+      <itemPath>../../backup/lib/mpfr-3.1.6/src/print_rnd_mode.c</itemPath>
+      <itemPath>../../backup/lib/mpfr-3.1.6/src/printf.c</itemPath>
+      <itemPath>../../backup/lib/mpfr-3.1.6/src/rec_sqrt.c</itemPath>
+      <itemPath>../../backup/lib/mpfr-3.1.6/src/reldiff.c</itemPath>
+      <itemPath>../../backup/lib/mpfr-3.1.6/src/rem1.c</itemPath>
+      <itemPath>../../backup/lib/mpfr-3.1.6/src/rint.c</itemPath>
+      <itemPath>../../backup/lib/mpfr-3.1.6/src/root.c</itemPath>
+      <itemPath>../../backup/lib/mpfr-3.1.6/src/round_near_x.c</itemPath>
+      <itemPath>../../backup/lib/mpfr-3.1.6/src/round_p.c</itemPath>
+      <itemPath>../../backup/lib/mpfr-3.1.6/src/round_prec.c</itemPath>
+      <itemPath>../../backup/lib/mpfr-3.1.6/src/round_raw_generic.c</itemPath>
+      <itemPath>../../backup/lib/mpfr-3.1.6/src/scale2.c</itemPath>
+      <itemPath>../../backup/lib/mpfr-3.1.6/src/sec.c</itemPath>
+      <itemPath>../../backup/lib/mpfr-3.1.6/src/sech.c</itemPath>
+      <itemPath>../../backup/lib/mpfr-3.1.6/src/set.c</itemPath>
+      <itemPath>../../backup/lib/mpfr-3.1.6/src/set_d.c</itemPath>
+      <itemPath>../../backup/lib/mpfr-3.1.6/src/set_d64.c</itemPath>
+      <itemPath>../../backup/lib/mpfr-3.1.6/src/set_dfl_prec.c</itemPath>
+      <itemPath>../../backup/lib/mpfr-3.1.6/src/set_exp.c</itemPath>
+      <itemPath>../../backup/lib/mpfr-3.1.6/src/set_f.c</itemPath>
+      <itemPath>../../backup/lib/mpfr-3.1.6/src/set_flt.c</itemPath>
+      <itemPath>../../backup/lib/mpfr-3.1.6/src/set_inf.c</itemPath>
+      <itemPath>../../backup/lib/mpfr-3.1.6/src/set_ld.c</itemPath>
+      <itemPath>../../backup/lib/mpfr-3.1.6/src/set_nan.c</itemPath>
+      <itemPath>../../backup/lib/mpfr-3.1.6/src/set_prc_raw.c</itemPath>
+      <itemPath>../../backup/lib/mpfr-3.1.6/src/set_prec.c</itemPath>
+      <itemPath>../../backup/lib/mpfr-3.1.6/src/set_q.c</itemPath>
+      <itemPath>../../backup/lib/mpfr-3.1.6/src/set_rnd.c</itemPath>
+      <itemPath>../../backup/lib/mpfr-3.1.6/src/set_si.c</itemPath>
+      <itemPath>../../backup/lib/mpfr-3.1.6/src/set_si_2exp.c</itemPath>
+      <itemPath>../../backup/lib/mpfr-3.1.6/src/set_sj.c</itemPath>
+      <itemPath>../../backup/lib/mpfr-3.1.6/src/set_str.c</itemPath>
+      <itemPath>../../backup/lib/mpfr-3.1.6/src/set_str_raw.c</itemPath>
+      <itemPath>../../backup/lib/mpfr-3.1.6/src/set_ui.c</itemPath>
+      <itemPath>../../backup/lib/mpfr-3.1.6/src/set_ui_2exp.c</itemPath>
+      <itemPath>../../backup/lib/mpfr-3.1.6/src/set_uj.c</itemPath>
+      <itemPath>../../backup/lib/mpfr-3.1.6/src/set_z.c</itemPath>
+      <itemPath>../../backup/lib/mpfr-3.1.6/src/set_z_exp.c</itemPath>
+      <itemPath>../../backup/lib/mpfr-3.1.6/src/set_zero.c</itemPath>
+      <itemPath>../../backup/lib/mpfr-3.1.6/src/setmax.c</itemPath>
+      <itemPath>../../backup/lib/mpfr-3.1.6/src/setmin.c</itemPath>
+      <itemPath>../../backup/lib/mpfr-3.1.6/src/setsign.c</itemPath>
+      <itemPath>../../backup/lib/mpfr-3.1.6/src/sgn.c</itemPath>
+      <itemPath>../../backup/lib/mpfr-3.1.6/src/si_op.c</itemPath>
+      <itemPath>../../backup/lib/mpfr-3.1.6/src/signbit.c</itemPath>
+      <itemPath>../../backup/lib/mpfr-3.1.6/src/sin.c</itemPath>
+      <itemPath>../../backup/lib/mpfr-3.1.6/src/sin_cos.c</itemPath>
+      <itemPath>../../backup/lib/mpfr-3.1.6/src/sinh.c</itemPath>
+      <itemPath>../../backup/lib/mpfr-3.1.6/src/sinh_cosh.c</itemPath>
+      <itemPath>../../backup/lib/mpfr-3.1.6/src/sqr.c</itemPath>
+      <itemPath>../../backup/lib/mpfr-3.1.6/src/sqrt.c</itemPath>
+      <itemPath>../../backup/lib/mpfr-3.1.6/src/sqrt_ui.c</itemPath>
+      <itemPath>../../backup/lib/mpfr-3.1.6/src/stack_interface.c</itemPath>
+      <itemPath>../../backup/lib/mpfr-3.1.6/src/strtofr.c</itemPath>
+      <itemPath>../../backup/lib/mpfr-3.1.6/src/sub.c</itemPath>
+      <itemPath>../../backup/lib/mpfr-3.1.6/src/sub1.c</itemPath>
+      <itemPath>../../backup/lib/mpfr-3.1.6/src/sub1sp.c</itemPath>
+      <itemPath>../../backup/lib/mpfr-3.1.6/src/sub_d.c</itemPath>
+      <itemPath>../../backup/lib/mpfr-3.1.6/src/sub_ui.c</itemPath>
+      <itemPath>../../backup/lib/mpfr-3.1.6/src/subnormal.c</itemPath>
+      <itemPath>../../backup/lib/mpfr-3.1.6/src/sum.c</itemPath>
+      <itemPath>../../backup/lib/mpfr-3.1.6/src/swap.c</itemPath>
+      <itemPath>../../backup/lib/mpfr-3.1.6/src/tan.c</itemPath>
+      <itemPath>../../backup/lib/mpfr-3.1.6/src/tanh.c</itemPath>
+      <itemPath>../../backup/lib/mpfr-3.1.6/src/uceil_exp2.c</itemPath>
+      <itemPath>../../backup/lib/mpfr-3.1.6/src/uceil_log2.c</itemPath>
+      <itemPath>../../backup/lib/mpfr-3.1.6/src/ufloor_log2.c</itemPath>
+      <itemPath>../../backup/lib/mpfr-3.1.6/src/ui_div.c</itemPath>
+      <itemPath>../../backup/lib/mpfr-3.1.6/src/ui_pow.c</itemPath>
+      <itemPath>../../backup/lib/mpfr-3.1.6/src/ui_pow_ui.c</itemPath>
+      <itemPath>../../backup/lib/mpfr-3.1.6/src/ui_sub.c</itemPath>
+      <itemPath>../../backup/lib/mpfr-3.1.6/src/urandom.c</itemPath>
+      <itemPath>../../backup/lib/mpfr-3.1.6/src/urandomb.c</itemPath>
+      <itemPath>../../backup/lib/mpfr-3.1.6/src/vasprintf.c</itemPath>
+      <itemPath>../../backup/lib/mpfr-3.1.6/src/version.c</itemPath>
+      <itemPath>../../backup/lib/mpfr-3.1.6/src/volatile.c</itemPath>
+      <itemPath>../../backup/lib/mpfr-3.1.6/src/yn.c</itemPath>
+      <itemPath>../../backup/lib/mpfr-3.1.6/src/zeta.c</itemPath>
+      <itemPath>../../backup/lib/mpfr-3.1.6/src/zeta_ui.c</itemPath>
+    </logicalFolder>
     <logicalFolder name="ExternalFiles"
                    displayName="Important Files"
                    projectFiles="false"
@@ -540,6 +780,1549 @@
           <preBuildCommand></preBuildCommand>
         </preBuild>
       </makefileType>
+      <item path="../../backup/lib/mpfr-3.1.6/src/abort_prec_max.c"
+            ex="false"
+            tool="0"
+            flavor2="3">
+        <cTool flags="1">
+        </cTool>
+      </item>
+      <item path="../../backup/lib/mpfr-3.1.6/src/acos.c"
+            ex="false"
+            tool="0"
+            flavor2="3">
+        <cTool flags="1">
+        </cTool>
+      </item>
+      <item path="../../backup/lib/mpfr-3.1.6/src/acosh.c"
+            ex="false"
+            tool="0"
+            flavor2="3">
+        <cTool flags="0">
+        </cTool>
+      </item>
+      <item path="../../backup/lib/mpfr-3.1.6/src/add.c"
+            ex="false"
+            tool="0"
+            flavor2="3">
+        <cTool flags="1">
+        </cTool>
+      </item>
+      <item path="../../backup/lib/mpfr-3.1.6/src/add1.c"
+            ex="false"
+            tool="0"
+            flavor2="3">
+        <cTool flags="1">
+        </cTool>
+      </item>
+      <item path="../../backup/lib/mpfr-3.1.6/src/add1sp.c"
+            ex="false"
+            tool="0"
+            flavor2="3">
+        <cTool flags="1">
+        </cTool>
+      </item>
+      <item path="../../backup/lib/mpfr-3.1.6/src/add_d.c"
+            ex="false"
+            tool="0"
+            flavor2="3">
+        <cTool flags="1">
+        </cTool>
+      </item>
+      <item path="../../backup/lib/mpfr-3.1.6/src/add_ui.c"
+            ex="false"
+            tool="0"
+            flavor2="3">
+        <cTool flags="1">
+        </cTool>
+      </item>
+      <item path="../../backup/lib/mpfr-3.1.6/src/agm.c"
+            ex="false"
+            tool="0"
+            flavor2="3">
+        <cTool flags="0">
+        </cTool>
+      </item>
+      <item path="../../backup/lib/mpfr-3.1.6/src/ai.c"
+            ex="false"
+            tool="0"
+            flavor2="3">
+        <cTool flags="1">
+        </cTool>
+      </item>
+      <item path="../../backup/lib/mpfr-3.1.6/src/asin.c"
+            ex="false"
+            tool="0"
+            flavor2="3">
+        <cTool flags="1">
+        </cTool>
+      </item>
+      <item path="../../backup/lib/mpfr-3.1.6/src/asinh.c"
+            ex="false"
+            tool="0"
+            flavor2="3">
+        <cTool flags="1">
+        </cTool>
+      </item>
+      <item path="../../backup/lib/mpfr-3.1.6/src/atan.c"
+            ex="false"
+            tool="0"
+            flavor2="3">
+        <cTool flags="1">
+        </cTool>
+      </item>
+      <item path="../../backup/lib/mpfr-3.1.6/src/atan2.c"
+            ex="false"
+            tool="0"
+            flavor2="3">
+        <cTool flags="0">
+        </cTool>
+      </item>
+      <item path="../../backup/lib/mpfr-3.1.6/src/atanh.c"
+            ex="false"
+            tool="0"
+            flavor2="3">
+        <cTool flags="1">
+        </cTool>
+      </item>
+      <item path="../../backup/lib/mpfr-3.1.6/src/bernoulli.c"
+            ex="false"
+            tool="0"
+            flavor2="3">
+        <cTool flags="0">
+        </cTool>
+      </item>
+      <item path="../../backup/lib/mpfr-3.1.6/src/buildopt.c"
+            ex="false"
+            tool="0"
+            flavor2="3">
+        <cTool flags="0">
+        </cTool>
+      </item>
+      <item path="../../backup/lib/mpfr-3.1.6/src/cache.c"
+            ex="false"
+            tool="0"
+            flavor2="3">
+        <cTool flags="1">
+        </cTool>
+      </item>
+      <item path="../../backup/lib/mpfr-3.1.6/src/cbrt.c"
+            ex="false"
+            tool="0"
+            flavor2="3">
+        <cTool flags="1">
+        </cTool>
+      </item>
+      <item path="../../backup/lib/mpfr-3.1.6/src/check.c"
+            ex="false"
+            tool="0"
+            flavor2="3">
+        <cTool flags="1">
+        </cTool>
+      </item>
+      <item path="../../backup/lib/mpfr-3.1.6/src/clear.c"
+            ex="false"
+            tool="0"
+            flavor2="3">
+        <cTool flags="1">
+        </cTool>
+      </item>
+      <item path="../../backup/lib/mpfr-3.1.6/src/clears.c"
+            ex="false"
+            tool="0"
+            flavor2="3">
+        <cTool flags="0">
+        </cTool>
+      </item>
+      <item path="../../backup/lib/mpfr-3.1.6/src/cmp.c"
+            ex="false"
+            tool="0"
+            flavor2="3">
+        <cTool flags="1">
+        </cTool>
+      </item>
+      <item path="../../backup/lib/mpfr-3.1.6/src/cmp2.c"
+            ex="false"
+            tool="0"
+            flavor2="3">
+        <cTool flags="1">
+        </cTool>
+      </item>
+      <item path="../../backup/lib/mpfr-3.1.6/src/cmp_abs.c"
+            ex="false"
+            tool="0"
+            flavor2="3">
+        <cTool flags="1">
+        </cTool>
+      </item>
+      <item path="../../backup/lib/mpfr-3.1.6/src/cmp_d.c"
+            ex="false"
+            tool="0"
+            flavor2="3">
+        <cTool flags="1">
+        </cTool>
+      </item>
+      <item path="../../backup/lib/mpfr-3.1.6/src/cmp_ld.c"
+            ex="false"
+            tool="0"
+            flavor2="3">
+        <cTool flags="1">
+        </cTool>
+      </item>
+      <item path="../../backup/lib/mpfr-3.1.6/src/cmp_si.c"
+            ex="false"
+            tool="0"
+            flavor2="3">
+        <cTool flags="1">
+        </cTool>
+      </item>
+      <item path="../../backup/lib/mpfr-3.1.6/src/cmp_ui.c"
+            ex="false"
+            tool="0"
+            flavor2="3">
+        <cTool flags="1">
+        </cTool>
+      </item>
+      <item path="../../backup/lib/mpfr-3.1.6/src/comparisons.c"
+            ex="false"
+            tool="0"
+            flavor2="3">
+        <cTool flags="1">
+        </cTool>
+      </item>
+      <item path="../../backup/lib/mpfr-3.1.6/src/const_catalan.c"
+            ex="false"
+            tool="0"
+            flavor2="3">
+        <cTool flags="0">
+        </cTool>
+      </item>
+      <item path="../../backup/lib/mpfr-3.1.6/src/const_euler.c"
+            ex="false"
+            tool="0"
+            flavor2="3">
+        <cTool flags="1">
+        </cTool>
+      </item>
+      <item path="../../backup/lib/mpfr-3.1.6/src/const_log2.c"
+            ex="false"
+            tool="0"
+            flavor2="3">
+        <cTool flags="1">
+        </cTool>
+      </item>
+      <item path="../../backup/lib/mpfr-3.1.6/src/const_pi.c"
+            ex="false"
+            tool="0"
+            flavor2="3">
+        <cTool flags="0">
+        </cTool>
+      </item>
+      <item path="../../backup/lib/mpfr-3.1.6/src/constant.c"
+            ex="false"
+            tool="0"
+            flavor2="3">
+        <cTool flags="1">
+        </cTool>
+      </item>
+      <item path="../../backup/lib/mpfr-3.1.6/src/copysign.c"
+            ex="false"
+            tool="0"
+            flavor2="3">
+        <cTool flags="1">
+        </cTool>
+      </item>
+      <item path="../../backup/lib/mpfr-3.1.6/src/cos.c"
+            ex="false"
+            tool="0"
+            flavor2="3">
+        <cTool flags="1">
+        </cTool>
+      </item>
+      <item path="../../backup/lib/mpfr-3.1.6/src/cosh.c"
+            ex="false"
+            tool="0"
+            flavor2="3">
+        <cTool flags="1">
+        </cTool>
+      </item>
+      <item path="../../backup/lib/mpfr-3.1.6/src/cot.c"
+            ex="false"
+            tool="0"
+            flavor2="3">
+        <cTool flags="1">
+        </cTool>
+      </item>
+      <item path="../../backup/lib/mpfr-3.1.6/src/coth.c"
+            ex="false"
+            tool="0"
+            flavor2="3">
+        <cTool flags="1">
+        </cTool>
+      </item>
+      <item path="../../backup/lib/mpfr-3.1.6/src/csc.c"
+            ex="false"
+            tool="0"
+            flavor2="3">
+        <cTool flags="1">
+        </cTool>
+      </item>
+      <item path="../../backup/lib/mpfr-3.1.6/src/csch.c"
+            ex="false"
+            tool="0"
+            flavor2="3">
+        <cTool flags="1">
+        </cTool>
+      </item>
+      <item path="../../backup/lib/mpfr-3.1.6/src/d_div.c"
+            ex="false"
+            tool="0"
+            flavor2="3">
+        <cTool flags="1">
+        </cTool>
+      </item>
+      <item path="../../backup/lib/mpfr-3.1.6/src/d_sub.c"
+            ex="false"
+            tool="0"
+            flavor2="3">
+        <cTool flags="0">
+        </cTool>
+      </item>
+      <item path="../../backup/lib/mpfr-3.1.6/src/digamma.c"
+            ex="false"
+            tool="0"
+            flavor2="3">
+        <cTool flags="1">
+        </cTool>
+      </item>
+      <item path="../../backup/lib/mpfr-3.1.6/src/dim.c"
+            ex="false"
+            tool="0"
+            flavor2="3">
+        <cTool flags="1">
+        </cTool>
+      </item>
+      <item path="../../backup/lib/mpfr-3.1.6/src/div.c"
+            ex="false"
+            tool="0"
+            flavor2="3">
+        <cTool flags="0">
+        </cTool>
+      </item>
+      <item path="../../backup/lib/mpfr-3.1.6/src/div_2exp.c"
+            ex="false"
+            tool="0"
+            flavor2="3">
+        <cTool flags="1">
+        </cTool>
+      </item>
+      <item path="../../backup/lib/mpfr-3.1.6/src/div_2si.c"
+            ex="false"
+            tool="0"
+            flavor2="3">
+        <cTool flags="1">
+        </cTool>
+      </item>
+      <item path="../../backup/lib/mpfr-3.1.6/src/div_2ui.c"
+            ex="false"
+            tool="0"
+            flavor2="3">
+        <cTool flags="1">
+        </cTool>
+      </item>
+      <item path="../../backup/lib/mpfr-3.1.6/src/div_d.c"
+            ex="false"
+            tool="0"
+            flavor2="3">
+        <cTool flags="1">
+        </cTool>
+      </item>
+      <item path="../../backup/lib/mpfr-3.1.6/src/div_ui.c"
+            ex="false"
+            tool="0"
+            flavor2="3">
+        <cTool flags="1">
+        </cTool>
+      </item>
+      <item path="../../backup/lib/mpfr-3.1.6/src/dump.c"
+            ex="false"
+            tool="0"
+            flavor2="3">
+        <cTool flags="1">
+        </cTool>
+      </item>
+      <item path="../../backup/lib/mpfr-3.1.6/src/eint.c"
+            ex="false"
+            tool="0"
+            flavor2="3">
+        <cTool flags="1">
+        </cTool>
+      </item>
+      <item path="../../backup/lib/mpfr-3.1.6/src/eq.c"
+            ex="false"
+            tool="0"
+            flavor2="3">
+        <cTool flags="1">
+        </cTool>
+      </item>
+      <item path="../../backup/lib/mpfr-3.1.6/src/erf.c"
+            ex="false"
+            tool="0"
+            flavor2="3">
+        <cTool flags="1">
+        </cTool>
+      </item>
+      <item path="../../backup/lib/mpfr-3.1.6/src/erfc.c"
+            ex="false"
+            tool="0"
+            flavor2="3">
+        <cTool flags="1">
+        </cTool>
+      </item>
+      <item path="../../backup/lib/mpfr-3.1.6/src/exceptions.c"
+            ex="false"
+            tool="0"
+            flavor2="3">
+        <cTool flags="0">
+        </cTool>
+      </item>
+      <item path="../../backup/lib/mpfr-3.1.6/src/exp.c"
+            ex="false"
+            tool="0"
+            flavor2="3">
+        <cTool flags="1">
+        </cTool>
+      </item>
+      <item path="../../backup/lib/mpfr-3.1.6/src/exp10.c"
+            ex="false"
+            tool="0"
+            flavor2="3">
+        <cTool flags="0">
+        </cTool>
+      </item>
+      <item path="../../backup/lib/mpfr-3.1.6/src/exp2.c"
+            ex="false"
+            tool="0"
+            flavor2="3">
+        <cTool flags="1">
+        </cTool>
+      </item>
+      <item path="../../backup/lib/mpfr-3.1.6/src/exp3.c"
+            ex="false"
+            tool="0"
+            flavor2="3">
+        <cTool flags="1">
+        </cTool>
+      </item>
+      <item path="../../backup/lib/mpfr-3.1.6/src/exp_2.c"
+            ex="false"
+            tool="0"
+            flavor2="3">
+        <cTool flags="1">
+        </cTool>
+      </item>
+      <item path="../../backup/lib/mpfr-3.1.6/src/expm1.c"
+            ex="false"
+            tool="0"
+            flavor2="3">
+        <cTool flags="1">
+        </cTool>
+      </item>
+      <item path="../../backup/lib/mpfr-3.1.6/src/extract.c"
+            ex="false"
+            tool="0"
+            flavor2="3">
+        <cTool flags="1">
+        </cTool>
+      </item>
+      <item path="../../backup/lib/mpfr-3.1.6/src/factorial.c"
+            ex="false"
+            tool="0"
+            flavor2="3">
+        <cTool flags="1">
+        </cTool>
+      </item>
+      <item path="../../backup/lib/mpfr-3.1.6/src/fits_intmax.c"
+            ex="false"
+            tool="0"
+            flavor2="3">
+        <cTool flags="1">
+        </cTool>
+      </item>
+      <item path="../../backup/lib/mpfr-3.1.6/src/fits_sint.c"
+            ex="false"
+            tool="0"
+            flavor2="3">
+        <cTool flags="1">
+        </cTool>
+      </item>
+      <item path="../../backup/lib/mpfr-3.1.6/src/fits_slong.c"
+            ex="false"
+            tool="0"
+            flavor2="3">
+        <cTool flags="1">
+        </cTool>
+      </item>
+      <item path="../../backup/lib/mpfr-3.1.6/src/fits_sshort.c"
+            ex="false"
+            tool="0"
+            flavor2="3">
+        <cTool flags="1">
+        </cTool>
+      </item>
+      <item path="../../backup/lib/mpfr-3.1.6/src/fits_uint.c"
+            ex="false"
+            tool="0"
+            flavor2="3">
+        <cTool flags="1">
+        </cTool>
+      </item>
+      <item path="../../backup/lib/mpfr-3.1.6/src/fits_uintmax.c"
+            ex="false"
+            tool="0"
+            flavor2="3">
+        <cTool flags="1">
+        </cTool>
+      </item>
+      <item path="../../backup/lib/mpfr-3.1.6/src/fits_ulong.c"
+            ex="false"
+            tool="0"
+            flavor2="3">
+        <cTool flags="0">
+        </cTool>
+      </item>
+      <item path="../../backup/lib/mpfr-3.1.6/src/fits_ushort.c"
+            ex="false"
+            tool="0"
+            flavor2="3">
+        <cTool flags="0">
+        </cTool>
+      </item>
+      <item path="../../backup/lib/mpfr-3.1.6/src/fma.c"
+            ex="false"
+            tool="0"
+            flavor2="3">
+        <cTool flags="1">
+        </cTool>
+      </item>
+      <item path="../../backup/lib/mpfr-3.1.6/src/fms.c"
+            ex="false"
+            tool="0"
+            flavor2="3">
+        <cTool flags="1">
+        </cTool>
+      </item>
+      <item path="../../backup/lib/mpfr-3.1.6/src/frac.c"
+            ex="false"
+            tool="0"
+            flavor2="3">
+        <cTool flags="1">
+        </cTool>
+      </item>
+      <item path="../../backup/lib/mpfr-3.1.6/src/free_cache.c"
+            ex="false"
+            tool="0"
+            flavor2="3">
+        <cTool flags="0">
+        </cTool>
+      </item>
+      <item path="../../backup/lib/mpfr-3.1.6/src/frexp.c"
+            ex="false"
+            tool="0"
+            flavor2="3">
+        <cTool flags="1">
+        </cTool>
+      </item>
+      <item path="../../backup/lib/mpfr-3.1.6/src/gamma.c"
+            ex="false"
+            tool="0"
+            flavor2="3">
+        <cTool flags="1">
+        </cTool>
+      </item>
+      <item path="../../backup/lib/mpfr-3.1.6/src/gammaonethird.c"
+            ex="false"
+            tool="0"
+            flavor2="3">
+        <cTool flags="1">
+        </cTool>
+      </item>
+      <item path="../../backup/lib/mpfr-3.1.6/src/get_d.c"
+            ex="false"
+            tool="0"
+            flavor2="3">
+        <cTool flags="1">
+        </cTool>
+      </item>
+      <item path="../../backup/lib/mpfr-3.1.6/src/get_d64.c"
+            ex="false"
+            tool="0"
+            flavor2="3">
+        <cTool flags="0">
+        </cTool>
+      </item>
+      <item path="../../backup/lib/mpfr-3.1.6/src/get_exp.c"
+            ex="false"
+            tool="0"
+            flavor2="3">
+        <cTool flags="1">
+        </cTool>
+      </item>
+      <item path="../../backup/lib/mpfr-3.1.6/src/get_f.c"
+            ex="false"
+            tool="0"
+            flavor2="3">
+        <cTool flags="1">
+        </cTool>
+      </item>
+      <item path="../../backup/lib/mpfr-3.1.6/src/get_flt.c"
+            ex="false"
+            tool="0"
+            flavor2="3">
+        <cTool flags="1">
+        </cTool>
+      </item>
+      <item path="../../backup/lib/mpfr-3.1.6/src/get_ld.c"
+            ex="false"
+            tool="0"
+            flavor2="3">
+        <cTool flags="1">
+        </cTool>
+      </item>
+      <item path="../../backup/lib/mpfr-3.1.6/src/get_patches.c"
+            ex="false"
+            tool="0"
+            flavor2="3">
+        <cTool flags="1">
+        </cTool>
+      </item>
+      <item path="../../backup/lib/mpfr-3.1.6/src/get_si.c"
+            ex="false"
+            tool="0"
+            flavor2="3">
+        <cTool flags="1">
+        </cTool>
+      </item>
+      <item path="../../backup/lib/mpfr-3.1.6/src/get_sj.c"
+            ex="false"
+            tool="0"
+            flavor2="3">
+        <cTool flags="1">
+        </cTool>
+      </item>
+      <item path="../../backup/lib/mpfr-3.1.6/src/get_str.c"
+            ex="false"
+            tool="0"
+            flavor2="3">
+        <cTool flags="1">
+        </cTool>
+      </item>
+      <item path="../../backup/lib/mpfr-3.1.6/src/get_ui.c"
+            ex="false"
+            tool="0"
+            flavor2="3">
+        <cTool flags="0">
+        </cTool>
+      </item>
+      <item path="../../backup/lib/mpfr-3.1.6/src/get_uj.c"
+            ex="false"
+            tool="0"
+            flavor2="3">
+        <cTool flags="1">
+        </cTool>
+      </item>
+      <item path="../../backup/lib/mpfr-3.1.6/src/get_z.c"
+            ex="false"
+            tool="0"
+            flavor2="3">
+        <cTool flags="1">
+        </cTool>
+      </item>
+      <item path="../../backup/lib/mpfr-3.1.6/src/get_z_exp.c"
+            ex="false"
+            tool="0"
+            flavor2="3">
+        <cTool flags="1">
+        </cTool>
+      </item>
+      <item path="../../backup/lib/mpfr-3.1.6/src/gmp_op.c"
+            ex="false"
+            tool="0"
+            flavor2="3">
+        <cTool flags="0">
+        </cTool>
+      </item>
+      <item path="../../backup/lib/mpfr-3.1.6/src/grandom.c"
+            ex="false"
+            tool="0"
+            flavor2="3">
+        <cTool flags="0">
+        </cTool>
+      </item>
+      <item path="../../backup/lib/mpfr-3.1.6/src/hypot.c"
+            ex="false"
+            tool="0"
+            flavor2="3">
+        <cTool flags="0">
+        </cTool>
+      </item>
+      <item path="../../backup/lib/mpfr-3.1.6/src/init.c"
+            ex="false"
+            tool="0"
+            flavor2="3">
+        <cTool flags="1">
+        </cTool>
+      </item>
+      <item path="../../backup/lib/mpfr-3.1.6/src/init2.c"
+            ex="false"
+            tool="0"
+            flavor2="3">
+        <cTool flags="0">
+        </cTool>
+      </item>
+      <item path="../../backup/lib/mpfr-3.1.6/src/inits.c"
+            ex="false"
+            tool="0"
+            flavor2="3">
+        <cTool flags="0">
+        </cTool>
+      </item>
+      <item path="../../backup/lib/mpfr-3.1.6/src/inits2.c"
+            ex="false"
+            tool="0"
+            flavor2="3">
+        <cTool flags="1">
+        </cTool>
+      </item>
+      <item path="../../backup/lib/mpfr-3.1.6/src/inp_str.c"
+            ex="false"
+            tool="0"
+            flavor2="3">
+        <cTool flags="1">
+        </cTool>
+      </item>
+      <item path="../../backup/lib/mpfr-3.1.6/src/int_ceil_log2.c"
+            ex="false"
+            tool="0"
+            flavor2="3">
+        <cTool flags="0">
+        </cTool>
+      </item>
+      <item path="../../backup/lib/mpfr-3.1.6/src/isinf.c"
+            ex="false"
+            tool="0"
+            flavor2="3">
+        <cTool flags="0">
+        </cTool>
+      </item>
+      <item path="../../backup/lib/mpfr-3.1.6/src/isinteger.c"
+            ex="false"
+            tool="0"
+            flavor2="3">
+        <cTool flags="0">
+        </cTool>
+      </item>
+      <item path="../../backup/lib/mpfr-3.1.6/src/isnan.c"
+            ex="false"
+            tool="0"
+            flavor2="3">
+        <cTool flags="1">
+        </cTool>
+      </item>
+      <item path="../../backup/lib/mpfr-3.1.6/src/isnum.c"
+            ex="false"
+            tool="0"
+            flavor2="3">
+        <cTool flags="1">
+        </cTool>
+      </item>
+      <item path="../../backup/lib/mpfr-3.1.6/src/isqrt.c"
+            ex="false"
+            tool="0"
+            flavor2="3">
+        <cTool flags="1">
+        </cTool>
+      </item>
+      <item path="../../backup/lib/mpfr-3.1.6/src/isregular.c"
+            ex="false"
+            tool="0"
+            flavor2="3">
+        <cTool flags="1">
+        </cTool>
+      </item>
+      <item path="../../backup/lib/mpfr-3.1.6/src/iszero.c"
+            ex="false"
+            tool="0"
+            flavor2="3">
+        <cTool flags="1">
+        </cTool>
+      </item>
+      <item path="../../backup/lib/mpfr-3.1.6/src/jn.c"
+            ex="false"
+            tool="0"
+            flavor2="3">
+        <cTool flags="1">
+        </cTool>
+      </item>
+      <item path="../../backup/lib/mpfr-3.1.6/src/jyn_asympt.c"
+            ex="true"
+            tool="3"
+            flavor2="0">
+      </item>
+      <item path="../../backup/lib/mpfr-3.1.6/src/li2.c"
+            ex="false"
+            tool="0"
+            flavor2="3">
+        <cTool flags="1">
+        </cTool>
+      </item>
+      <item path="../../backup/lib/mpfr-3.1.6/src/lngamma.c"
+            ex="false"
+            tool="0"
+            flavor2="3">
+        <cTool flags="1">
+        </cTool>
+      </item>
+      <item path="../../backup/lib/mpfr-3.1.6/src/log.c"
+            ex="false"
+            tool="0"
+            flavor2="3">
+        <cTool flags="1">
+        </cTool>
+      </item>
+      <item path="../../backup/lib/mpfr-3.1.6/src/log10.c"
+            ex="false"
+            tool="0"
+            flavor2="3">
+        <cTool flags="1">
+        </cTool>
+      </item>
+      <item path="../../backup/lib/mpfr-3.1.6/src/log1p.c"
+            ex="false"
+            tool="0"
+            flavor2="3">
+        <cTool flags="1">
+        </cTool>
+      </item>
+      <item path="../../backup/lib/mpfr-3.1.6/src/log2.c"
+            ex="false"
+            tool="0"
+            flavor2="3">
+        <cTool flags="1">
+        </cTool>
+      </item>
+      <item path="../../backup/lib/mpfr-3.1.6/src/logging.c"
+            ex="false"
+            tool="0"
+            flavor2="3">
+        <cTool flags="1">
+        </cTool>
+      </item>
+      <item path="../../backup/lib/mpfr-3.1.6/src/min_prec.c"
+            ex="false"
+            tool="0"
+            flavor2="3">
+        <cTool flags="0">
+        </cTool>
+      </item>
+      <item path="../../backup/lib/mpfr-3.1.6/src/minmax.c"
+            ex="false"
+            tool="0"
+            flavor2="3">
+        <cTool flags="1">
+        </cTool>
+      </item>
+      <item path="../../backup/lib/mpfr-3.1.6/src/modf.c"
+            ex="false"
+            tool="0"
+            flavor2="3">
+        <cTool flags="1">
+        </cTool>
+      </item>
+      <item path="../../backup/lib/mpfr-3.1.6/src/mp_clz_tab.c"
+            ex="false"
+            tool="0"
+            flavor2="3">
+        <cTool flags="1">
+        </cTool>
+      </item>
+      <item path="../../backup/lib/mpfr-3.1.6/src/mpfr-gmp.c"
+            ex="false"
+            tool="0"
+            flavor2="3">
+        <cTool flags="1">
+        </cTool>
+      </item>
+      <item path="../../backup/lib/mpfr-3.1.6/src/mpn_exp.c"
+            ex="false"
+            tool="0"
+            flavor2="3">
+        <cTool flags="1">
+        </cTool>
+      </item>
+      <item path="../../backup/lib/mpfr-3.1.6/src/mul.c"
+            ex="false"
+            tool="0"
+            flavor2="3">
+        <cTool flags="1">
+        </cTool>
+      </item>
+      <item path="../../backup/lib/mpfr-3.1.6/src/mul_2exp.c"
+            ex="false"
+            tool="0"
+            flavor2="3">
+        <cTool flags="1">
+        </cTool>
+      </item>
+      <item path="../../backup/lib/mpfr-3.1.6/src/mul_2si.c"
+            ex="false"
+            tool="0"
+            flavor2="3">
+        <cTool flags="1">
+        </cTool>
+      </item>
+      <item path="../../backup/lib/mpfr-3.1.6/src/mul_2ui.c"
+            ex="false"
+            tool="0"
+            flavor2="3">
+        <cTool flags="1">
+        </cTool>
+      </item>
+      <item path="../../backup/lib/mpfr-3.1.6/src/mul_d.c"
+            ex="false"
+            tool="0"
+            flavor2="3">
+        <cTool flags="1">
+        </cTool>
+      </item>
+      <item path="../../backup/lib/mpfr-3.1.6/src/mul_ui.c"
+            ex="false"
+            tool="0"
+            flavor2="3">
+        <cTool flags="0">
+        </cTool>
+      </item>
+      <item path="../../backup/lib/mpfr-3.1.6/src/mulders.c"
+            ex="false"
+            tool="0"
+            flavor2="3">
+        <cTool flags="1">
+        </cTool>
+      </item>
+      <item path="../../backup/lib/mpfr-3.1.6/src/neg.c"
+            ex="false"
+            tool="0"
+            flavor2="3">
+        <cTool flags="1">
+        </cTool>
+      </item>
+      <item path="../../backup/lib/mpfr-3.1.6/src/next.c"
+            ex="false"
+            tool="0"
+            flavor2="3">
+        <cTool flags="1">
+        </cTool>
+      </item>
+      <item path="../../backup/lib/mpfr-3.1.6/src/out_str.c"
+            ex="false"
+            tool="0"
+            flavor2="3">
+        <cTool flags="1">
+        </cTool>
+      </item>
+      <item path="../../backup/lib/mpfr-3.1.6/src/pow.c"
+            ex="false"
+            tool="0"
+            flavor2="3">
+        <cTool flags="0">
+        </cTool>
+      </item>
+      <item path="../../backup/lib/mpfr-3.1.6/src/pow_si.c"
+            ex="false"
+            tool="0"
+            flavor2="3">
+        <cTool flags="0">
+        </cTool>
+      </item>
+      <item path="../../backup/lib/mpfr-3.1.6/src/pow_ui.c"
+            ex="false"
+            tool="0"
+            flavor2="3">
+        <cTool flags="1">
+        </cTool>
+      </item>
+      <item path="../../backup/lib/mpfr-3.1.6/src/pow_z.c"
+            ex="false"
+            tool="0"
+            flavor2="3">
+        <cTool flags="1">
+        </cTool>
+      </item>
+      <item path="../../backup/lib/mpfr-3.1.6/src/powerof2.c"
+            ex="false"
+            tool="0"
+            flavor2="3">
+        <cTool flags="1">
+        </cTool>
+      </item>
+      <item path="../../backup/lib/mpfr-3.1.6/src/print_raw.c"
+            ex="false"
+            tool="0"
+            flavor2="3">
+        <cTool flags="1">
+        </cTool>
+      </item>
+      <item path="../../backup/lib/mpfr-3.1.6/src/print_rnd_mode.c"
+            ex="false"
+            tool="0"
+            flavor2="3">
+        <cTool flags="0">
+        </cTool>
+      </item>
+      <item path="../../backup/lib/mpfr-3.1.6/src/printf.c"
+            ex="false"
+            tool="0"
+            flavor2="3">
+        <cTool flags="1">
+        </cTool>
+      </item>
+      <item path="../../backup/lib/mpfr-3.1.6/src/rec_sqrt.c"
+            ex="false"
+            tool="0"
+            flavor2="3">
+        <cTool flags="0">
+        </cTool>
+      </item>
+      <item path="../../backup/lib/mpfr-3.1.6/src/reldiff.c"
+            ex="false"
+            tool="0"
+            flavor2="3">
+        <cTool flags="1">
+        </cTool>
+      </item>
+      <item path="../../backup/lib/mpfr-3.1.6/src/rem1.c"
+            ex="false"
+            tool="0"
+            flavor2="3">
+        <cTool flags="1">
+        </cTool>
+      </item>
+      <item path="../../backup/lib/mpfr-3.1.6/src/rint.c"
+            ex="false"
+            tool="0"
+            flavor2="3">
+        <cTool flags="0">
+        </cTool>
+      </item>
+      <item path="../../backup/lib/mpfr-3.1.6/src/root.c"
+            ex="false"
+            tool="0"
+            flavor2="3">
+        <cTool flags="1">
+        </cTool>
+      </item>
+      <item path="../../backup/lib/mpfr-3.1.6/src/round_near_x.c"
+            ex="false"
+            tool="0"
+            flavor2="3">
+        <cTool flags="1">
+        </cTool>
+      </item>
+      <item path="../../backup/lib/mpfr-3.1.6/src/round_p.c"
+            ex="false"
+            tool="0"
+            flavor2="3">
+        <cTool flags="1">
+        </cTool>
+      </item>
+      <item path="../../backup/lib/mpfr-3.1.6/src/round_prec.c"
+            ex="false"
+            tool="0"
+            flavor2="3">
+        <cTool flags="1">
+        </cTool>
+      </item>
+      <item path="../../backup/lib/mpfr-3.1.6/src/round_raw_generic.c"
+            ex="true"
+            tool="3"
+            flavor2="0">
+      </item>
+      <item path="../../backup/lib/mpfr-3.1.6/src/scale2.c"
+            ex="false"
+            tool="0"
+            flavor2="3">
+        <cTool flags="0">
+        </cTool>
+      </item>
+      <item path="../../backup/lib/mpfr-3.1.6/src/sec.c"
+            ex="false"
+            tool="0"
+            flavor2="3">
+        <cTool flags="0">
+        </cTool>
+      </item>
+      <item path="../../backup/lib/mpfr-3.1.6/src/sech.c"
+            ex="false"
+            tool="0"
+            flavor2="3">
+        <cTool flags="0">
+        </cTool>
+      </item>
+      <item path="../../backup/lib/mpfr-3.1.6/src/set.c"
+            ex="false"
+            tool="0"
+            flavor2="3">
+        <cTool flags="0">
+        </cTool>
+      </item>
+      <item path="../../backup/lib/mpfr-3.1.6/src/set_d.c"
+            ex="false"
+            tool="0"
+            flavor2="3">
+        <cTool flags="1">
+        </cTool>
+      </item>
+      <item path="../../backup/lib/mpfr-3.1.6/src/set_d64.c"
+            ex="false"
+            tool="0"
+            flavor2="3">
+        <cTool flags="1">
+        </cTool>
+      </item>
+      <item path="../../backup/lib/mpfr-3.1.6/src/set_dfl_prec.c"
+            ex="false"
+            tool="0"
+            flavor2="3">
+        <cTool flags="1">
+        </cTool>
+      </item>
+      <item path="../../backup/lib/mpfr-3.1.6/src/set_exp.c"
+            ex="false"
+            tool="0"
+            flavor2="3">
+        <cTool flags="1">
+        </cTool>
+      </item>
+      <item path="../../backup/lib/mpfr-3.1.6/src/set_f.c"
+            ex="false"
+            tool="0"
+            flavor2="3">
+        <cTool flags="1">
+        </cTool>
+      </item>
+      <item path="../../backup/lib/mpfr-3.1.6/src/set_flt.c"
+            ex="false"
+            tool="0"
+            flavor2="3">
+        <cTool flags="0">
+        </cTool>
+      </item>
+      <item path="../../backup/lib/mpfr-3.1.6/src/set_inf.c"
+            ex="false"
+            tool="0"
+            flavor2="3">
+        <cTool flags="1">
+        </cTool>
+      </item>
+      <item path="../../backup/lib/mpfr-3.1.6/src/set_ld.c"
+            ex="false"
+            tool="0"
+            flavor2="3">
+        <cTool flags="1">
+        </cTool>
+      </item>
+      <item path="../../backup/lib/mpfr-3.1.6/src/set_nan.c"
+            ex="false"
+            tool="0"
+            flavor2="3">
+        <cTool flags="1">
+        </cTool>
+      </item>
+      <item path="../../backup/lib/mpfr-3.1.6/src/set_prc_raw.c"
+            ex="false"
+            tool="0"
+            flavor2="3">
+        <cTool flags="1">
+        </cTool>
+      </item>
+      <item path="../../backup/lib/mpfr-3.1.6/src/set_prec.c"
+            ex="false"
+            tool="0"
+            flavor2="3">
+        <cTool flags="0">
+        </cTool>
+      </item>
+      <item path="../../backup/lib/mpfr-3.1.6/src/set_q.c"
+            ex="false"
+            tool="0"
+            flavor2="3">
+        <cTool flags="0">
+        </cTool>
+      </item>
+      <item path="../../backup/lib/mpfr-3.1.6/src/set_rnd.c"
+            ex="false"
+            tool="0"
+            flavor2="3">
+        <cTool flags="1">
+        </cTool>
+      </item>
+      <item path="../../backup/lib/mpfr-3.1.6/src/set_si.c"
+            ex="false"
+            tool="0"
+            flavor2="3">
+        <cTool flags="0">
+        </cTool>
+      </item>
+      <item path="../../backup/lib/mpfr-3.1.6/src/set_si_2exp.c"
+            ex="false"
+            tool="0"
+            flavor2="3">
+        <cTool flags="0">
+        </cTool>
+      </item>
+      <item path="../../backup/lib/mpfr-3.1.6/src/set_sj.c"
+            ex="false"
+            tool="0"
+            flavor2="3">
+        <cTool flags="1">
+        </cTool>
+      </item>
+      <item path="../../backup/lib/mpfr-3.1.6/src/set_str.c"
+            ex="false"
+            tool="0"
+            flavor2="3">
+        <cTool flags="0">
+        </cTool>
+      </item>
+      <item path="../../backup/lib/mpfr-3.1.6/src/set_str_raw.c"
+            ex="false"
+            tool="0"
+            flavor2="3">
+        <cTool flags="0">
+        </cTool>
+      </item>
+      <item path="../../backup/lib/mpfr-3.1.6/src/set_ui.c"
+            ex="false"
+            tool="0"
+            flavor2="3">
+        <cTool flags="0">
+        </cTool>
+      </item>
+      <item path="../../backup/lib/mpfr-3.1.6/src/set_ui_2exp.c"
+            ex="false"
+            tool="0"
+            flavor2="3">
+        <cTool flags="1">
+        </cTool>
+      </item>
+      <item path="../../backup/lib/mpfr-3.1.6/src/set_uj.c"
+            ex="false"
+            tool="0"
+            flavor2="3">
+        <cTool flags="0">
+        </cTool>
+      </item>
+      <item path="../../backup/lib/mpfr-3.1.6/src/set_z.c"
+            ex="false"
+            tool="0"
+            flavor2="3">
+        <cTool flags="1">
+        </cTool>
+      </item>
+      <item path="../../backup/lib/mpfr-3.1.6/src/set_z_exp.c"
+            ex="false"
+            tool="0"
+            flavor2="3">
+        <cTool flags="0">
+        </cTool>
+      </item>
+      <item path="../../backup/lib/mpfr-3.1.6/src/set_zero.c"
+            ex="false"
+            tool="0"
+            flavor2="3">
+        <cTool flags="1">
+        </cTool>
+      </item>
+      <item path="../../backup/lib/mpfr-3.1.6/src/setmax.c"
+            ex="false"
+            tool="0"
+            flavor2="3">
+        <cTool flags="1">
+        </cTool>
+      </item>
+      <item path="../../backup/lib/mpfr-3.1.6/src/setmin.c"
+            ex="false"
+            tool="0"
+            flavor2="3">
+        <cTool flags="1">
+        </cTool>
+      </item>
+      <item path="../../backup/lib/mpfr-3.1.6/src/setsign.c"
+            ex="false"
+            tool="0"
+            flavor2="3">
+        <cTool flags="0">
+        </cTool>
+      </item>
+      <item path="../../backup/lib/mpfr-3.1.6/src/sgn.c"
+            ex="false"
+            tool="0"
+            flavor2="3">
+        <cTool flags="1">
+        </cTool>
+      </item>
+      <item path="../../backup/lib/mpfr-3.1.6/src/si_op.c"
+            ex="false"
+            tool="0"
+            flavor2="3">
+        <cTool flags="1">
+        </cTool>
+      </item>
+      <item path="../../backup/lib/mpfr-3.1.6/src/signbit.c"
+            ex="false"
+            tool="0"
+            flavor2="3">
+        <cTool flags="1">
+        </cTool>
+      </item>
+      <item path="../../backup/lib/mpfr-3.1.6/src/sin.c"
+            ex="false"
+            tool="0"
+            flavor2="3">
+        <cTool flags="1">
+        </cTool>
+      </item>
+      <item path="../../backup/lib/mpfr-3.1.6/src/sin_cos.c"
+            ex="false"
+            tool="0"
+            flavor2="3">
+        <cTool flags="1">
+        </cTool>
+      </item>
+      <item path="../../backup/lib/mpfr-3.1.6/src/sinh.c"
+            ex="false"
+            tool="0"
+            flavor2="3">
+        <cTool flags="1">
+        </cTool>
+      </item>
+      <item path="../../backup/lib/mpfr-3.1.6/src/sinh_cosh.c"
+            ex="false"
+            tool="0"
+            flavor2="3">
+        <cTool flags="1">
+        </cTool>
+      </item>
+      <item path="../../backup/lib/mpfr-3.1.6/src/sqr.c"
+            ex="false"
+            tool="0"
+            flavor2="3">
+        <cTool flags="0">
+        </cTool>
+      </item>
+      <item path="../../backup/lib/mpfr-3.1.6/src/sqrt.c"
+            ex="false"
+            tool="0"
+            flavor2="3">
+        <cTool flags="0">
+        </cTool>
+      </item>
+      <item path="../../backup/lib/mpfr-3.1.6/src/sqrt_ui.c"
+            ex="false"
+            tool="0"
+            flavor2="3">
+        <cTool flags="1">
+        </cTool>
+      </item>
+      <item path="../../backup/lib/mpfr-3.1.6/src/stack_interface.c"
+            ex="false"
+            tool="0"
+            flavor2="3">
+        <cTool flags="1">
+        </cTool>
+      </item>
+      <item path="../../backup/lib/mpfr-3.1.6/src/strtofr.c"
+            ex="false"
+            tool="0"
+            flavor2="3">
+        <cTool flags="1">
+        </cTool>
+      </item>
+      <item path="../../backup/lib/mpfr-3.1.6/src/sub.c"
+            ex="false"
+            tool="0"
+            flavor2="3">
+        <cTool flags="1">
+        </cTool>
+      </item>
+      <item path="../../backup/lib/mpfr-3.1.6/src/sub1.c"
+            ex="false"
+            tool="0"
+            flavor2="3">
+        <cTool flags="1">
+        </cTool>
+      </item>
+      <item path="../../backup/lib/mpfr-3.1.6/src/sub1sp.c"
+            ex="false"
+            tool="0"
+            flavor2="3">
+        <cTool flags="1">
+        </cTool>
+      </item>
+      <item path="../../backup/lib/mpfr-3.1.6/src/sub_d.c"
+            ex="false"
+            tool="0"
+            flavor2="3">
+        <cTool flags="0">
+        </cTool>
+      </item>
+      <item path="../../backup/lib/mpfr-3.1.6/src/sub_ui.c"
+            ex="false"
+            tool="0"
+            flavor2="3">
+        <cTool flags="1">
+        </cTool>
+      </item>
+      <item path="../../backup/lib/mpfr-3.1.6/src/subnormal.c"
+            ex="false"
+            tool="0"
+            flavor2="3">
+        <cTool flags="0">
+        </cTool>
+      </item>
+      <item path="../../backup/lib/mpfr-3.1.6/src/sum.c"
+            ex="false"
+            tool="0"
+            flavor2="3">
+        <cTool flags="1">
+        </cTool>
+      </item>
+      <item path="../../backup/lib/mpfr-3.1.6/src/swap.c"
+            ex="false"
+            tool="0"
+            flavor2="3">
+        <cTool flags="1">
+        </cTool>
+      </item>
+      <item path="../../backup/lib/mpfr-3.1.6/src/tan.c"
+            ex="false"
+            tool="0"
+            flavor2="3">
+        <cTool flags="1">
+        </cTool>
+      </item>
+      <item path="../../backup/lib/mpfr-3.1.6/src/tanh.c"
+            ex="false"
+            tool="0"
+            flavor2="3">
+        <cTool flags="1">
+        </cTool>
+      </item>
+      <item path="../../backup/lib/mpfr-3.1.6/src/uceil_exp2.c"
+            ex="false"
+            tool="0"
+            flavor2="3">
+        <cTool flags="1">
+        </cTool>
+      </item>
+      <item path="../../backup/lib/mpfr-3.1.6/src/uceil_log2.c"
+            ex="false"
+            tool="0"
+            flavor2="3">
+        <cTool flags="1">
+        </cTool>
+      </item>
+      <item path="../../backup/lib/mpfr-3.1.6/src/ufloor_log2.c"
+            ex="false"
+            tool="0"
+            flavor2="3">
+        <cTool flags="1">
+        </cTool>
+      </item>
+      <item path="../../backup/lib/mpfr-3.1.6/src/ui_div.c"
+            ex="false"
+            tool="0"
+            flavor2="3">
+        <cTool flags="1">
+        </cTool>
+      </item>
+      <item path="../../backup/lib/mpfr-3.1.6/src/ui_pow.c"
+            ex="false"
+            tool="0"
+            flavor2="3">
+        <cTool flags="1">
+        </cTool>
+      </item>
+      <item path="../../backup/lib/mpfr-3.1.6/src/ui_pow_ui.c"
+            ex="false"
+            tool="0"
+            flavor2="3">
+        <cTool flags="1">
+        </cTool>
+      </item>
+      <item path="../../backup/lib/mpfr-3.1.6/src/ui_sub.c"
+            ex="false"
+            tool="0"
+            flavor2="3">
+        <cTool flags="1">
+        </cTool>
+      </item>
+      <item path="../../backup/lib/mpfr-3.1.6/src/urandom.c"
+            ex="false"
+            tool="0"
+            flavor2="3">
+        <cTool flags="1">
+        </cTool>
+      </item>
+      <item path="../../backup/lib/mpfr-3.1.6/src/urandomb.c"
+            ex="false"
+            tool="0"
+            flavor2="3">
+        <cTool flags="0">
+        </cTool>
+      </item>
+      <item path="../../backup/lib/mpfr-3.1.6/src/vasprintf.c"
+            ex="false"
+            tool="0"
+            flavor2="3">
+        <cTool flags="1">
+        </cTool>
+      </item>
+      <item path="../../backup/lib/mpfr-3.1.6/src/version.c"
+            ex="false"
+            tool="0"
+            flavor2="3">
+        <cTool flags="1">
+        </cTool>
+      </item>
+      <item path="../../backup/lib/mpfr-3.1.6/src/volatile.c"
+            ex="false"
+            tool="0"
+            flavor2="3">
+        <cTool flags="1">
+        </cTool>
+      </item>
+      <item path="../../backup/lib/mpfr-3.1.6/src/yn.c"
+            ex="false"
+            tool="0"
+            flavor2="3">
+        <cTool flags="1">
+        </cTool>
+      </item>
+      <item path="../../backup/lib/mpfr-3.1.6/src/zeta.c"
+            ex="false"
+            tool="0"
+            flavor2="3">
+        <cTool flags="1">
+        </cTool>
+      </item>
+      <item path="../../backup/lib/mpfr-3.1.6/src/zeta_ui.c"
+            ex="false"
+            tool="0"
+            flavor2="3">
+        <cTool flags="1">
+        </cTool>
+      </item>
       <item path="basis/_debug.c" ex="false" tool="0" flavor2="3">
         <cTool flags="3">
           <incDir>
@@ -1156,6 +2939,13 @@
         <cTool>
           <incDir>
             <pElem>mpfr-3.1.6/src</pElem>
+          </incDir>
+        </cTool>
+      </folder>
+      <folder path="src">
+        <cTool>
+          <incDir>
+            <pElem>../../backup/lib/mpfr-3.1.6/src</pElem>
           </incDir>
         </cTool>
       </folder>
