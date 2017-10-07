@@ -68,8 +68,8 @@ _dlsym ( byte * sym, byte * lib )
     void *fp, * hLibrary = dlopen ( ( char* ) lib, RTLD_GLOBAL | RTLD_LAZY ) ;
     if ( hLibrary )
     {
-        //fp = ( void* ) dlsym ( hLibrary, ( char* ) sym ) ;
-        fp = ( void* ) dlsym ( RTLD_DEFAULT, ( char* ) sym ) ; // either work after dlopen
+        fp = ( void* ) dlsym ( hLibrary, ( char* ) sym ) ;
+        //fp = ( void* ) dlsym ( RTLD_DEFAULT, ( char* ) sym ) ; // either work after dlopen
     }
     if ( ( ! hLibrary ) || ( ! fp ) )
     {

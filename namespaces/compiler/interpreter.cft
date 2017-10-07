@@ -39,7 +39,7 @@ testc1 ( | atoken aword )
 }
 //'testc1 find wdiss //pause 
 testc1 () ; //pause
-#if 0
+#if 1
 void
 interpret2 ( | atoken aword ) 
 {

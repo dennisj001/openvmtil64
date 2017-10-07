@@ -21,8 +21,8 @@ _BigNum_New ( byte * token )
             }
         }
         if ( sscanf ( ( char* ) token, "%ld", &bi ) ) mpfr_init_set_si ( *bfr, bi, MPFR_RNDN ) ;
-        //if ( sscanf ( ( char* ) token, "%lf", &bf ) ) mpfr_set_d ( *bfr, bf, MPFR_RNDD ) ;
-        //else if ( sscanf ( ( char* ) token, "%ld", &bi ) ) mpfr_init2 ( *bfr, bi) ; //, MPFR_RNDN ) ;
+            //if ( sscanf ( ( char* ) token, "%lf", &bf ) ) mpfr_set_d ( *bfr, bf, MPFR_RNDD ) ;
+            //else if ( sscanf ( ( char* ) token, "%ld", &bi ) ) mpfr_init2 ( *bfr, bi) ; //, MPFR_RNDN ) ;
         else goto doDefaultZeroValue ;
         goto retrn ;
     }
@@ -129,27 +129,51 @@ BigNum_Info ( )
 
 void
 BigNum_FPrint ( )
-{ 
+{
     Context * cntx = _Context_ ;
     char * format ;
     mpfr_t * value = ( mpfr_t* ) _DataStack_Pop ( ) ;
     if ( _Q_->Verbosity )
     {
-#if 1        
+#if 0        
+        {
+            unsigned int i ;
+            mpfr_t s, t, u ;
+
+            mpfr_init2 ( t, 200 ) ;
+            mpfr_set_d ( t, 1.0, MPFR_RNDD ) ;
+            mpfr_init2 ( s, 200 ) ;
+            mpfr_set_d ( s, 1.0, MPFR_RNDD ) ;
+            mpfr_init2 ( u, 200 ) ;
+            for ( i = 1 ; i <= 100 ; i ++ )
+            {
+                mpfr_mul_ui ( t, t, i, MPFR_RNDU ) ;
+                mpfr_set_d ( u, 1.0, MPFR_RNDD ) ;
+                mpfr_div ( u, u, t, MPFR_RNDD ) ;
+                mpfr_add ( s, s, u, MPFR_RNDD ) ;
+            }
+            printf ( "Sum is " ) ;
+            mpfr_out_str ( stdout, 10, 0, s, MPFR_RNDD ) ;
+            putchar ( '\n' ) ;
+            mpfr_clear ( s ) ;
+            mpfr_clear ( t ) ;
+            mpfr_clear ( u ) ;
+        }
+#endif        
         if ( cntx->System0->NumberBase == 10 ) format = "%*.*Rf" ;
         else if ( cntx->System0->NumberBase == 2 ) format = "%*.*Rb" ;
         else if ( cntx->System0->NumberBase == 16 ) format = "%*.*Rx" ;
-        mpfr_printf ( format, _Context_->System0->BigNum_Printf_Width, _Context_->System0->BigNum_Printf_Precision, *value ) ;
-#else
-        mpfr_printf ( "%*.*Rf", 16, 16, *value ) ;
-#endif        
+        //mpfr_printf ( format, _Context_->System0->BigNum_Printf_Width, _Context_->System0->BigNum_Printf_Precision, *value ) ;
+        mpfr_out_str ( stdout, cntx->System0->NumberBase, cntx->System0->BigNum_Printf_Precision, *value, MPFR_RNDN ) ;
+        //mpfr_clear ( *value ) ;
     }
     fflush ( stdout ) ;
 }
 #if 0
+
 void
 BigNum_FPrint2 ( )
-{ 
+{
     Context * cntx = _Context_ ;
     char * format ;
     mpfr_t * value = ( mpfr_t* ) _DataStack_Pop ( ) ;

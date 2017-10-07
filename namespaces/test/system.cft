@@ -3,7 +3,7 @@
 #if  1
 C 
 : sp ; //stack pause ;
-#if 0  //Zenfone2 @ not
+#if 1  //Zenfone2 @ not
 dlsym: printf /lib/x86_64-linux-gnu/libc.so.6 ; void_return
 dlsym: strcmp /lib/x86_64-linux-gnu/libc.so.6 ; //eax_return
 dlsym: sprintf /lib/x86_64-linux-gnu/libc.so.6 ; void_return
@@ -12,31 +12,27 @@ printf ("\n%s\n\t%s","hello world! - parse this!?", "\tand this!")"\n\talso this
 printf ( "\nHello world! = 0x%08x\n\n" 1234 ) 
 printf ( "\n%s = %d\n\n", "Hello world!", 42 ) 
 printf("\n%s\n\t","hello world! - parse this!?")"\n\talso this!" ps
-sp
+
 C_Syntax
 User
 Compiler
 : vckf ( n w ) 
     { verbosity @ n @ > } { w @ wordRun } if2 
 ;;
-//: dbv ( n ) dbgVerbosity n @ = ; 2 dbv
 : vckf1 ( w ) vckf ( 0 w @ ) ;; //_literal ) ;;
 vckf1 ( ' s find ) 
-//1 dbv
 C
 printf ( "\nHello world! = 0x%08x\n\n" 1234 ) 
 printf ( "\n%s\n\n", "hello world!\nparse this!\n" )"\n and this!\n" ps
 printf ( "\n%s\n\t", "hello world! - parse this!?" )"\t and this!" ps
 printf ( "\nHello world! = 0x%08x\n\n" 1234 ) 
 
-#if 0
-d: : tprintf printf ( "\nHello world! = 0x%08x\n\n" 1234 ) ; tprintf
-: tprintf1 ( a b ) d: printf ( a @ b @ ) ; 
+: tprintf printf ( "\nHello world! = 0x%08x\n\n" 1234 ) ; tprintf
+: tprintf1 ( a b ) printf ( a b) ;; 
+ tprintf1 ("\nHello world! = 0x%08x\n\n" 1234)
 'tprintf find wdiss
-'tprintf2 find wdiss
-#endif
+'tprintf1 find wdiss
 
-sp
 #endif
 "xc" var 
 xc 'e' = 
@@ -70,7 +66,7 @@ s: $$
 
 bigNumOff
 #if doScript
-$$ls -al /usr/local ; $$ls -al . ; 
+d: $$ls -al /usr/local ; $$ls -al . ; 
 $./script 
 $./lispScript 
 //pause

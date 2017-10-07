@@ -1335,6 +1335,8 @@ void Compile_Debug_GetESP(void);
 void _Compile_DebugRuntimeBreakpoint(void);
 /* basis/lambdaCalculus.c */
 ListObject *_LO_Eval(ListObject *l0, ListObject *locals, int64 applyFlag);
+ListObject *_LO_Read(void);
+ListObject *_LO_Apply(ListObject *l0, ListObject *lfunction, ListObject *ldata);
 void LO_Substitute(ListObject *lambdaParameters, ListObject *funcCallValues);
 ListObject *_LO_EvalList(ListObject *lorig, ListObject *locals, int64 applyFlag);
 ListObject *LO_SpecialFunction(ListObject *l0, ListObject *locals);
@@ -1367,7 +1369,6 @@ void LO_UnQuoteSplicing(void);
 void LO_Splice(void);
 void LO_UnQuote(void);
 void LO_SpliceAtTail(ListObject *lnew, ListObject *l0);
-ListObject *_LO_Read(void);
 ListObject *LO_PrepareReturnObject(void);
 void LO_BeginBlock(void);
 void LO_EndBlock(void);
@@ -1383,7 +1384,6 @@ void _Interpreter_LC_InterpretWord(Interpreter *interp, ListObject *l0, Word *wo
 void _LO_CompileOrInterpret_One(ListObject *l0);
 void _LO_CompileOrInterpret(ListObject *lfunction, ListObject *ldata);
 ListObject *_LO_Do_FunctionDataBlock(ListObject *lfunction, ListObject *lfdata);
-ListObject *_LO_Apply(ListObject *l0, ListObject *lfunction, ListObject *ldata);
 block CompileLispBlock(ListObject *args, ListObject *body);
 byte *_LO_PrintOneToString(ListObject *l0, byte *buffer, int64 in_a_LambdaFlag, int64 printValueFlag);
 byte *_LO_PrintListToString(ListObject *l0, byte *buffer, int64 lambdaFlag, int64 printValueFlag);
