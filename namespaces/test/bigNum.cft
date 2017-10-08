@@ -19,6 +19,15 @@ nl "1000 ! = " ps x @ fprint nl
 
 7 ! p 8 ! p 8 ! p
 nl 7 ! p
+
+#if 0
+//d: dlsym: mpfr_printf /usr/local/lib/libmpfr.so ; void_return
+d: dlsym: mpfr_sum /usr/local/lib/libmpfr.so ; void_return
+d: dlsym: mpfr_printf /usr/local/lib/libmpfr.so ; void_return
+//: mpfrp ( value ) mpfr_printf ( "%*.*Rf", 0, 0, value ) ;
+//: !! qexp mpfrp nl ;
+#endif
+
 : !! qexp p nl ;
 '!! find wdiss
 7 !! 8 !! 8 !!  

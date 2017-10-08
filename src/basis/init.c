@@ -191,10 +191,10 @@ CfrTil_MachineCodePrimitive_AddWords ( )
             callHook = & _CfrTil_->SyncEsiToDsp ;
         }
 #endif        
-        else if ( ( String_Equal ( p.ccp_Name, "moveToR8AndCall" ) ) && ( String_Equal ( p.NameSpace, "System" ) ) )
+        else if ( ( String_Equal ( p.ccp_Name, "setEaxToZero" ) ) && ( String_Equal ( p.NameSpace, "System" ) ) )
         {
             //functionArg = ( int64 ) BlockCallAddress ;
-            callHook = & _CfrTil_->MoveToR8AndCall ;
+            callHook = & _CfrTil_->SetEaxToZero ;
         }
         else
         {

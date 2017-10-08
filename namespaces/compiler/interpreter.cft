@@ -1,6 +1,8 @@
 
 
 5 
+C
+: sp ; // stack pause ;
 
 System Interpreter 
 // these #defines are a bunch of purposefully confusing looking early testing
@@ -16,10 +18,9 @@ System Interpreter
 #define xhi01 xhe0 xhe1()
 #define xhi1 1 2 + p 
 // #define is in the preprocessor vocabulary and can be used anywhere
-: sp ; //stack pause ;
  
 infixOn
-sp
+
 #define xhi0() 1 + 2 p
 c_syntaxOn
 #define xhii() p (1 + 2) 
@@ -39,7 +40,7 @@ testc1 ( | atoken aword )
 }
 //'testc1 find wdiss //pause 
 testc1 () ; //pause
-#if 1
+#if 0
 void
 interpret2 ( | atoken aword ) 
 {
@@ -70,19 +71,25 @@ interpret2 ( | atoken aword )
 sp
 
 interpret2 
+using
 c_syntaxOff sp
+
 #if 1
 : hi1 1 2 + p ;  
 : hey1 hi1 hi1 ; 
 : heey1 hey1 hey1 hey1 ;
-nl heey1 
+nl d: heey1 
 #endif
+
 i2halt
+
+sp
 "C_Combinators" notUsing
 infixOff
 sp
 #endif
-c_syntaxOff sp
+
+c_syntaxOff 
 
 2 + 7 assertStkChk // stack checking
 

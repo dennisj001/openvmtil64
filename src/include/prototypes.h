@@ -68,6 +68,7 @@ void _Compile_Jcc(int64 bindex, int64 overwriteFlag, int64 nz, int64 ttt);
 /* basis/compiler/_compile.c */
 void _Compile_Call_Acc(void);
 void Compile_DataStack_PopAndCall(void);
+void Compile_SetEaxToZero(void);
 void _Compile_Rsp_To(void);
 void _Compile_Rsp_Drop(void);
 void _Compile_Rsp_Get(void);

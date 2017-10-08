@@ -881,11 +881,11 @@ Compile_X_Group5 ( Compiler * compiler, int64 op )
     else
     {
         // assume rvalue on stack
-        DBI_ON ;
+        //DBI_ON ;
         _Compile_Group5 ( op, MEM, DSP, 0, 0, 0 ) ;
     }
     _BlockInfo_Setup_BI_tttn ( _Context_->Compiler0, ZERO_TTT, NZ, 3 ) ; // ?? // not less than 0 == greater than 0
-    DBI_OFF ;
+    //DBI_OFF ;
 }
 
 // X variable op compile for group 1 opCodes : +/-/and/or/xor - ia32 

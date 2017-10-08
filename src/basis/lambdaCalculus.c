@@ -254,7 +254,8 @@ next:
                     else
                     {
                         if ( word->CAttribute & NAMESPACE_TYPE ) _DataObject_Run ( word ) ;
-                        l0 = _DataObject_New ( T_LC_NEW, word, 0, word->CAttribute | ( GetState ( cntx->Compiler0, LC_ARG_PARSING ) ? IMMEDIATE : 0 ), T_LISP_SYMBOL | word->LAttribute, 0, word->Lo_Value, lexer->TokenStart_ReadLineIndex ) ;
+                        //l0 = _DataObject_New ( T_LC_NEW, word, 0, word->CAttribute | ( GetState ( cntx->Compiler0, LC_ARG_PARSING ) ? IMMEDIATE : 0 ), T_LISP_SYMBOL | word->LAttribute, 0, word->Lo_Value, lexer->TokenStart_ReadLineIndex ) ;
+                        l0 = _DataObject_New ( T_LC_NEW, word, 0, word->CAttribute, T_LISP_SYMBOL | word->LAttribute, 0, word->Lo_Value, lexer->TokenStart_ReadLineIndex ) ;
                     }
                 }
                 else
@@ -1189,9 +1190,12 @@ _LO_Apply_ArgList ( ListObject * l0, Word * word )
         word->W_SC_ScratchPadIndex = scwi ;
         word = Compiler_CopyDuplicatesAndPush ( word ) ;
         cntx->CurrentlyRunningWord = word ;
-        //Compile_Call ( ( byte* ) word->Definition ) ;
-        _Compile_MoveImm_To_Reg ( RAX, 0, CELL ) ; // for printf ?? others //System V ABI : "%rax is used to indicate the number of vector arguments passed to a function requiring a variable number of arguments"
-        _Compile_Call ( ( byte* ) word->Definition, OREG ) ;
+        if ( String_Equal ( word->Name, "printf" ) )
+        {
+            _Compile_MoveImm_To_Reg ( RAX, 0, CELL ) ; // for printf ?? others //System V ABI : "%rax is used to indicate the number of vector arguments passed to a function requiring a variable number of arguments"
+            _Compile_Call ( ( byte* ) word->Definition, OREG ) ;
+        }
+        else Compile_Call ( ( byte* ) word->Definition ) ;
         _DEBUG_SHOW ( word, 1 ) ;
         if ( ! svcm )
         {

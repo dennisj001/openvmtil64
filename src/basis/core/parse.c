@@ -131,18 +131,6 @@ gotNextToken:
 }
 
 void
-Compile_InitRegisterParamenterVariables ( Compiler * compiler )
-{
-    int64 regIndex, nRVars = compiler->NumberOfRegisterVariables, nPVars = compiler->NumberOfArgs ;
-    for ( regIndex = 0 ; nRVars -- > 0 && nPVars -- > 0 ; regIndex ++ )
-    {
-        //if ( GetState ( compiler, RETURN_TOS | RETURN_R8 ) ) 
-        _Compile_Move_StackN_To_Reg ( compiler->RegOrder [ regIndex ], DSP, regIndex * CELL ) ;
-        //else _Compile_Move_StackN_To_Reg ( regOrder [ regIndex ], FP, fpIndex ) ; //
-    }
-}
-
-void
 Compiler_TypedObjectInit ( Namespace * typeNamespace, Word * word )
 {
     word->TypeNamespace = typeNamespace ;
@@ -152,6 +140,18 @@ Compiler_TypedObjectInit ( Namespace * typeNamespace, Word * word )
     //_DObject_Init ( Word * word, uint64 value, uint64 ftype, byte * function, int64 arg )
     _DObject_Init ( word, ( int64 ) 0, LOCAL_OBJECT, ( byte* ) _DataObject_Run, 0 ) ;
     _Word_Add ( word, 1, 0 ) ;
+}
+
+void
+Compile_InitRegisterParamenterVariables ( Compiler * compiler )
+{
+    int64 regIndex, nRVars = compiler->NumberOfRegisterVariables, nPVars = compiler->NumberOfArgs ;
+    for ( regIndex = 0 ; nRVars -- > 0 && nPVars -- > 0 ; regIndex ++ )
+    {
+        //if ( GetState ( compiler, RETURN_TOS | RETURN_R8 ) ) 
+        _Compile_Move_StackN_To_Reg ( compiler->RegOrder [ regIndex ], DSP, regIndex * CELL ) ;
+        //else _Compile_Move_StackN_To_Reg ( regOrder [ regIndex ], FP, fpIndex ) ; //
+    }
 }
 
 // old docs :
@@ -235,28 +235,16 @@ _CfrTil_Parse_LocalsAndStackVariables ( int64 svf, int64 lispMode, ListObject * 
                 regFlag = true ;
                 continue ;
             }
-            if ( strcmp ( ( char* ) token, "R8:" ) == 0 )
-            {
-                regFlag = true ;
-                regToUseIndex = 3 ;
-                continue ;
-            }
-            else if ( strcmp ( ( char* ) token, "ECX:" ) == 0 )
-            {
-                regFlag = true ;
-                regToUseIndex = 1 ;
-                continue ;
-            }
-            else if ( strcmp ( ( char* ) token, "EDX:" ) == 0 )
-            {
-                regFlag = true ;
-                regToUseIndex = 2 ;
-                continue ;
-            }
-            else if ( strcmp ( ( char* ) token, "EBX:" ) == 0 )
+            if ( strcmp ( ( char* ) token, "REG1" ) == 0 )
             {
                 regFlag = true ;
                 regToUseIndex = 0 ;
+                continue ;
+            }
+            else if ( strcmp ( ( char* ) token, "REG2" ) == 0 )
+            {
+                regFlag = true ;
+                regToUseIndex = 1 ;
                 continue ;
             }
             if ( ( strcmp ( ( char* ) token, "{" ) == 0 ) || ( strcmp ( ( char* ) token, ";" ) == 0 ) )

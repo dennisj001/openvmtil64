@@ -13,6 +13,13 @@ Compile_DataStack_PopAndCall ( void )
     Compile_Pop_ToAcc_AndCall ( DSP ) ;
 }
 
+#if 0
+void
+Compile_SetEaxToZero ( void )
+{
+    _Compile_MoveImm_To_Reg ( RAX, 0, CELL ) ; // for printf ?? others //System V ABI : "%rax is used to indicate the number of vector arguments passed to a function requiring a variable number of arguments"
+}
+#endif
 // >R - Rsp to
 
 void
@@ -113,7 +120,7 @@ _Compile_LocalOrStackVar_RValue_To_Reg ( Word * word, int64 reg )
         _Compile_Move_StackN_To_Reg ( reg, FP, ParameterVarOffset ( word ) ) ; // account for stored bp and return value
     }
 #else
-    else if ( word->CAttribute & (LOCAL_VARIABLE|PARAMETER_VARIABLE) )
+    else if ( word->CAttribute & ( LOCAL_VARIABLE | PARAMETER_VARIABLE ) )
     {
         _Compile_Move_StackN_To_Reg ( reg, FP, LocalParameterVarOffset ( word ) ) ; // 2 : account for saved fp and return slot
     }
@@ -156,7 +163,7 @@ _Compile_GetVarLitObj_RValue_To_Reg ( Word * word, int64 reg )
         _Compile_Move_StackN_To_Reg ( reg, FP, ParameterVarOffset ( word ) ) ; // account for stored bp and return value
     }
 #else
-    else if ( word->CAttribute & (LOCAL_VARIABLE|PARAMETER_VARIABLE) )
+    else if ( word->CAttribute & ( LOCAL_VARIABLE | PARAMETER_VARIABLE ) )
     {
         _Compile_Move_StackN_To_Reg ( reg, FP, LocalParameterVarOffset ( word ) ) ; // 2 : account for saved fp and return slot
     }
@@ -201,7 +208,7 @@ _Compile_SetVarLitObj_With_Reg ( Word * word, int64 reg, int64 thruReg )
         _Compile_Move_Reg_To_StackN ( FP, ParameterVarOffset ( word ), reg ) ;
     }
 #else
-    else if ( word->CAttribute & (LOCAL_VARIABLE|PARAMETER_VARIABLE) )
+    else if ( word->CAttribute & ( LOCAL_VARIABLE | PARAMETER_VARIABLE ) )
     {
         _Compile_Move_Reg_To_StackN ( FP, LocalParameterVarOffset ( word ), reg ) ;
     }
@@ -238,7 +245,7 @@ _Compile_GetVarLitObj_LValue_To_Reg ( Word * word, int64 reg )
         _Compile_LEA ( reg, FP, 0, LocalVarIndex_Disp ( ParameterVarOffset ( word ) ) ) ;
     }
 #else
-    else if ( word->CAttribute & (LOCAL_VARIABLE|PARAMETER_VARIABLE) )
+    else if ( word->CAttribute & ( LOCAL_VARIABLE | PARAMETER_VARIABLE ) )
     {
         _Compile_LEA ( reg, FP, 0, LocalVarIndex_WordDisp ( word ) ) ;
     }

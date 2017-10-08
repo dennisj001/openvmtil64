@@ -1330,7 +1330,7 @@
             ex="false"
             tool="0"
             flavor2="3">
-        <cTool flags="0">
+        <cTool flags="1">
         </cTool>
       </item>
       <item path="../../backup/lib/mpfr-3.1.6/src/gamma.c"
@@ -1351,7 +1351,7 @@
             ex="false"
             tool="0"
             flavor2="3">
-        <cTool flags="0">
+        <cTool flags="1">
         </cTool>
       </item>
       <item path="../../backup/lib/mpfr-3.1.6/src/get_d64.c"

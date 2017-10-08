@@ -25,6 +25,7 @@ int factorial( n | rec1 )
     return rec1;
 }
 c_syntaxOff dscOff
+'factorial find wdiss
 7 factorial p //pause
 #endif
 
@@ -33,16 +34,17 @@ c_syntaxOff dscOff
     { n @ 1 > } { n @ fac @ * fac store n -- } while 
     fac @ 
 ;
-: qexp dup 1 <= if{ }else{ dup -- qexp * }fi ;
-: qexp2 dup 1 <= ?< >:< dup -- qexp2 * >? ;
+7 factorial p
+: qexp dup 1 <= if{ }else{ dup -- qexp * }fi ; 7 qexp p
+: qexp2 dup 1 <= ?< >:< dup -- qexp2 * >? ; 7 qexp2 p
 
-: bexp ( n ) n @ 1 > if{ n @ dup -- bexp * }else{ 1 }fi ;
-: bexp2 ( n ) { n @ 1 > } { n @ dup -- bexp2 * } { 1 } ifElse ;
+: bexp ( n ) n @ 1 > if{ n @ dup -- bexp * }else{ 1 }fi ; 7 bexp p
+: bexp2 ( n ) { n @ 1 > } { n @ dup -- bexp2 * } { 1 } ifElse ; 7 bexp2 p
 : bexp3 ( n ) { n @ 1 > } { n @ n @ -- bexp3 *  } { 1 } ifElse ;
-7 bexp3 p //pause
+7 bexp3 p pause
 c_syntaxOn
 int
-fac5 ( REG: n  | EAX: facc -- EAX ) 
+fac5 ( REG: n  | REG1: facc -- REG1 ) 
 { 
     facc = 1 ;
     while ( n > 1 ) 

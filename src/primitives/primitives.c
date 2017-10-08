@@ -615,7 +615,7 @@ MachineCodePrimitive MachineCodePrimitives [] = {
     { "syncEsiToDsp", CPRIMITIVE, 0, ( byte* ) _Compile_Sync_EsiToDsp, 0, "System", "Root" },
     { "syncDspToEsi", CPRIMITIVE, 0, ( byte* ) _Compile_Sync_DspToEsi, 0, "System", "Root" },
 #endif    
-    //{ "moveToR8AndCall", CPRIMITIVE, 0, ( byte* ) _Compile_MoveToR8AndCall, 0, "System", "Root" },
+    //{ "moveToR8AndCall", CPRIMITIVE, 0, ( byte* ) Compile_SetEaxToZero, 0, "System", "Root" },
     { "<dbg>", CFRTIL_WORD | DEBUG_WORD | INTERPRET_DBG, 0, ( byte* ) _Compile_DebugRuntimeBreakpoint, - 1, "Debug", "Root" },
     { "rsp", CFRTIL_WORD, 0, ( byte* ) _Compile_Rsp_Get, - 1, "System", "Root" },
     { "rsp@", CFRTIL_WORD, 0, ( byte* ) _Compile_Rsp_Fetch, - 1, "System", "Root" },

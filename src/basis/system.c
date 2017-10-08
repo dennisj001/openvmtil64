@@ -73,7 +73,7 @@ _dlsym ( byte * sym, byte * lib )
     }
     if ( ( ! hLibrary ) || ( ! fp ) )
     {
-        //_Printf ( ( byte* ) c_ad ( "\ndlsym : dlerror = %s\n" ), dlerror () ) ;
+        _Printf ( ( byte* ) c_ad ( "\ndlsym : dlerror = %s\n" ), dlerror () ) ;
         return 0 ;
     }
     return fp ;

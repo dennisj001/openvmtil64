@@ -163,8 +163,11 @@ BigNum_FPrint ( )
         if ( cntx->System0->NumberBase == 10 ) format = "%*.*Rf" ;
         else if ( cntx->System0->NumberBase == 2 ) format = "%*.*Rb" ;
         else if ( cntx->System0->NumberBase == 16 ) format = "%*.*Rx" ;
+        //_CfrTil_->SetEaxToZero () ;
         //mpfr_printf ( format, _Context_->System0->BigNum_Printf_Width, _Context_->System0->BigNum_Printf_Precision, *value ) ;
-        mpfr_out_str ( stdout, cntx->System0->NumberBase, cntx->System0->BigNum_Printf_Precision, *value, MPFR_RNDN ) ;
+        //mpfr_printf ( "%Rf", *value ) ;
+        //mpfr_out_str ( stdout, cntx->System0->NumberBase, cntx->System0->BigNum_Printf_Precision, *value, MPFR_RNDN ) ;
+        mpfr_out_str ( stdout, cntx->System0->NumberBase, 0, *value, MPFR_RNDN ) ;
         //mpfr_clear ( *value ) ;
     }
     fflush ( stdout ) ;
