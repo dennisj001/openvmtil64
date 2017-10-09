@@ -7,22 +7,45 @@
         <activeConfTypeElem>0</activeConfTypeElem>
         <activeConfIndexElem>0</activeConfIndexElem>
     </data>
-    <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
+    <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="2">
+        <file>
+            <url>basis/lambdaCalculus.c</url>
+            <bookmark id="1">
+                <name/>
+                <line>1073</line>
+                <key/>
+            </bookmark>
+            <bookmark id="2">
+                <name/>
+                <line>1191</line>
+                <key/>
+            </bookmark>
+        </file>
+    </editor-bookmarks>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
+            <file>file:/home/dennisj/openvmtil64/src/basis/system.c</file>
             <file>file:/home/dennisj/openvmtil64/src/basis/bigNum.c</file>
+            <file>file:/home/dennisj/openvmtil64/src/primitives/primitives.c</file>
             <file>file:/home/dennisj/openvmtil64/src/basis/core/string.c</file>
-            <file>file:/home/dennisj/openvmtil64/src/basis/sourceCode.c</file>
-            <file>file:/home/dennisj/openvmtil64/src/basis/compiler/combinators.c</file>
+            <file>file:/home/dennisj/openvmtil64/src/primitives/debuggers.c</file>
+            <file>file:/home/dennisj/openvmtil64/src/basis/exception.c</file>
             <file>file:/home/dennisj/openvmtil64/src/basis/debugStepping.c</file>
             <file>file:/home/dennisj/openvmtil64/src/basis/compiler/blocks.c</file>
+            <file>file:/home/dennisj/openvmtil64/src/basis/cfrtil.c</file>
             <file>file:/home/dennisj/openvmtil64/src/basis/openVmTil.c</file>
-            <file>file:/home/dennisj/openvmtil64/src/primitives/compilers.c</file>
-            <file>file:/home/dennisj/openvmtil64/src/basis/core/compile.c</file>
-            <file>file:/home/dennisj/openvmtil64/src/basis/debugOutput.c</file>
-            <file>file:/home/dennisj/openvmtil64/src/basis/_debug.c</file>
+            <file>file:/home/dennisj/openvmtil64/src/basis/compiler/memory.c</file>
+            <file>file:/home/dennisj/openvmtil64/src/basis/compiler/machineCode.c</file>
+            <file>file:/home/dennisj/openvmtil64/src/include/types.h</file>
+            <file>file:/home/dennisj/openvmtil64/.init.cft</file>
+            <file>file:/home/dennisj/openvmtil64/src/basis/debugger.c</file>
+            <file>file:/home/dennisj/openvmtil64/src/basis/compiler/cpu.c</file>
+            <file>file:/home/dennisj/openvmtil64/src/include/macros.h</file>
+            <file>file:/home/dennisj/openvmtil64/src/include/defines.h</file>
+            <file>file:/home/dennisj/openvmtil64/src/basis/core/dataStack.c</file>
+            <file>file:/home/dennisj/openvmtil64/src/basis/init.c</file>
             <file>file:/home/dennisj/openvmtil64/src/basis/core/dllist.c</file>
-            <file>file:/home/dennisj/openvmtil64/src/basis/core/array.c</file>
+            <file>file:/home/dennisj/openvmtil64/src/basis/lambdaCalculus.c</file>
         </group>
     </open-files>
 </project-private>

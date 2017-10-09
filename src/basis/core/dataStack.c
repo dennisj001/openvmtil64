@@ -81,7 +81,7 @@ DataStack_Pop ( )
 void
 CpuState_SyncStackPointersFromCpuState ( Cpu * cpus )
 {
-    if ( cpus->State ) Dsp = ( uint64* ) cpus->CPU_DSP ;
+    if ( GetState ( _CfrTil_->cs_Cpu, CPU_SAVED ) ) Dsp = ( uint64* ) cpus->CPU_DSP ;
     _CfrTil_SetStackPointerFromDsp ( _CfrTil_ ) ;
 }
 

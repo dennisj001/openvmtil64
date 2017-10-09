@@ -107,7 +107,13 @@ int64
 _Lexer_ConsiderDebugAndCommentTokens ( byte * token, int64 evalFlag, int64 addFlag )
 {
     Word * word = Finder_Word_FindUsing ( _Finder_, token, 1 ) ;
-    if ( word && ( word->CAttribute & DEBUG_WORD ) || ( word && ( word->LAttribute & W_COMMENT ) ) )
+    if ( word && ( word->LAttribute & W_COMMENT ) )
+    {
+        word->W_StartCharRlIndex = _Lexer_->TokenStart_ReadLineIndex ;
+        Word_Eval0 ( word ) ;
+        return true ;
+    }
+    else if ( word && ( word->CAttribute & DEBUG_WORD ) )
     {
         if ( evalFlag )
         {

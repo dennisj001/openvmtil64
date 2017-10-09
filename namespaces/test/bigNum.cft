@@ -28,10 +28,11 @@ d: dlsym: mpfr_printf /usr/local/lib/libmpfr.so ; void_return
 //: !! qexp mpfrp nl ;
 #endif
 
+"!" ' qexp find alias
+7 ! p 8 ! p
 : !! qexp p nl ;
 '!! find wdiss
-7 !! 8 !! 8 !!  
-7 ! p 8 !! 8 !! 
+7 d: !! 8 !! 8 !!  
 sp
 //pause
 1000 ! p 

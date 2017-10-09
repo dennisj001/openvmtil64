@@ -137,7 +137,7 @@ CfrTil_AddCPrimitives ( )
 }
 
 void
-CfrTil_MachineCodePrimitive_AddWords ( )
+CfrTil_MachineCodePrimitive_AddWords ( CfrTil * cfrTil )
 {
     int64 i, functionArg ;
     block * callHook ;
@@ -167,34 +167,51 @@ CfrTil_MachineCodePrimitive_AddWords ( )
         }
         else if ( ( String_Equal ( p.ccp_Name, "restoreCpuState" ) ) && ( String_Equal ( p.NameSpace, "System" ) ) )
         {
-            functionArg = ( int64 ) _CfrTil_->cs_Cpu ;
-            callHook = & _CfrTil_->RestoreCpuState ;
+            functionArg = ( int64 ) cfrTil->cs_Cpu ;
+            callHook = & cfrTil->RestoreCpuState ;
+        }
+        else if ( ( String_Equal ( p.ccp_Name, "saveCpu2State" ) ) && ( String_Equal ( p.NameSpace, "System" ) ) )
+        {
+            functionArg = ( int64 ) cfrTil->cs_Cpu2 ;
+            //functionArg = cfrTil ;
+            callHook = & cfrTil->SaveCpu2State ;
+        }
+        else if ( ( String_Equal ( p.ccp_Name, "restoreCpu2State" ) ) && ( String_Equal ( p.NameSpace, "System" ) ) )
+        {
+            functionArg = ( int64 ) cfrTil->cs_Cpu2 ;
+            //functionArg = cfrTil ;
+            callHook = & cfrTil->RestoreCpu2State ;
         }
         else if ( ( String_Equal ( p.ccp_Name, "saveCpuState" ) ) && ( String_Equal ( p.NameSpace, "System" ) ) )
         {
-            functionArg = ( int64 ) *&_CfrTil_->cs_Cpu ;
-            //functionArg = _CfrTil_ ;
-            callHook = & _CfrTil_->SaveCpuState ;
+            functionArg = ( int64 ) cfrTil->cs_Cpu ;
+            //functionArg = cfrTil ;
+            callHook = & cfrTil->SaveCpuState ;
         }
-        else if ( ( String_Equal ( p.ccp_Name, "restoreCpuStateHere" ) ) && ( String_Equal ( p.NameSpace, "System" ) ) )
+        else if ( ( String_Equal ( p.ccp_Name, "restoreSelectedCpuState" ) ) && ( String_Equal ( p.NameSpace, "System" ) ) )
         {
-            functionArg = ( int64 ) _CfrTil_->cs_Cpu ;
-            callHook = & _CfrTil_->RestoreCpuStateHere ;
+            functionArg = ( int64 ) cfrTil->cs_Cpu ;
+            callHook = & cfrTil->RestoreSelectedCpuState ;
+        }
+        else if ( ( String_Equal ( p.ccp_Name, "saveSelectedCpuState" ) ) && ( String_Equal ( p.NameSpace, "System" ) ) )
+        {
+            functionArg = ( int64 ) cfrTil->cs_Cpu ;
+            callHook = & cfrTil->SaveSelectedCpuState ;
         }
 #if 0       
         else if ( ( String_Equal ( p.ccp_Name, "syncDspToEsi" ) ) && ( String_Equal ( p.NameSpace, "System" ) ) )
         {
-            callHook = & _CfrTil_->SyncDspToEsi ;
+            callHook = & cfrTil->SyncDspToEsi ;
         }
         else if ( ( String_Equal ( p.ccp_Name, "syncEsiToDsp" ) ) && ( String_Equal ( p.NameSpace, "System" ) ) )
         {
-            callHook = & _CfrTil_->SyncEsiToDsp ;
+            callHook = & cfrTil->SyncEsiToDsp ;
         }
 #endif        
         else if ( ( String_Equal ( p.ccp_Name, "setEaxToZero" ) ) && ( String_Equal ( p.NameSpace, "System" ) ) )
         {
             //functionArg = ( int64 ) BlockCallAddress ;
-            callHook = & _CfrTil_->SetEaxToZero ;
+            callHook = & cfrTil->SetEaxToZero ;
         }
         else
         {

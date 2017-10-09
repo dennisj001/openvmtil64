@@ -47,24 +47,32 @@ _CfrTil_ReStart ( CfrTil * cfrTil, int64 restartCondition )
 void
 _CfrTil_CpuState_CheckSave ( )
 {
-    if ( ! ( _CfrTil_->cs_Cpu->State ) )
+    if ( ! GetState ( _CfrTil_->cs_Cpu, CPU_SAVED) )
     {
         _CfrTil_->SaveCpuState ( ) ;
-        _CfrTil_->cs_Cpu->State = 1 ;
+        SetState ( _CfrTil_->cs_Cpu, CPU_SAVED, true ) ; //->State = 1 ;
     }
 }
 
 void
-_CfrTil_CpuState_Show ( )
+CfrTil_CpuState_Show ( )
 {
     _CpuState_Show ( _CfrTil_->cs_Cpu ) ;
+}
+
+void
+CfrTil_CpuState_Current_Show ( )
+{
+    _CfrTil_->SaveCpu2State () ;
+    _CpuState_Show ( _CfrTil_->cs_Cpu2 ) ;
+    _CfrTil_->RestoreCpu2State () ;
 }
 
 void
 CfrTil_CpuState_CheckShow ( )
 {
     _CfrTil_CpuState_CheckSave ( ) ;
-    _CfrTil_CpuState_Show ( ) ;
+    CfrTil_CpuState_Show ( ) ;
 }
 
 void
@@ -166,6 +174,7 @@ _CfrTil_Init ( CfrTil * cfrTil, Namespace * nss )
 
     cfrTil->Debugger0 = _Debugger_New ( allocType ) ; // nb : must be after System_NamespacesInit
     cfrTil->cs_Cpu = CpuState_New ( allocType ) ;
+    cfrTil->cs_Cpu2 = CpuState_New ( allocType ) ;
     if ( cfrTil->SaveDsp && cfrTil->DataStack ) // with _Q_->RestartCondition = STOP from Debugger_Stop
     {
         Dsp = cfrTil->SaveDsp ;
@@ -186,7 +195,7 @@ _CfrTil_Init ( CfrTil * cfrTil, Namespace * nss )
     cfrTil->StoreWord = Finder_FindWord_AnyNamespace ( _Finder_, ( byte* ) "store" ) ;
     cfrTil->PokeWord = Finder_FindWord_AnyNamespace ( _Finder_, ( byte* ) "poke" ) ;
     cfrTil->LispNamespace = Namespace_Find ( ( byte* ) "Lisp" ) ;
-    CfrTil_MachineCodePrimitive_AddWords ( ) ; // in any case we need to reinit these for eg. debugger->SaveCpuState (), etc.
+    CfrTil_MachineCodePrimitive_AddWords ( cfrTil ) ; // in any case we need to reinit these for eg. debugger->SaveCpuState (), etc.
     CfrTil_ReadTables_Setup ( cfrTil ) ;
     CfrTil_LexerTables_Setup ( cfrTil ) ;
     cfrTil->LC = 0 ;

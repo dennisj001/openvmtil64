@@ -804,7 +804,8 @@ typedef struct _CfrTil
     int64 LogFlag, WordsAdded, FindWordCount, FindWordMaxCount, WordCreateCount, DObjectCreateCount ;
     uint64 * SaveDsp ;
     Cpu * cs_Cpu ;
-    block SaveCpuState, RestoreCpuState, SetEaxToZero, RestoreCpuStateHere ; //, SyncDspToEsi, SyncEsiToDsp ;
+    Cpu * cs_Cpu2 ;
+    block SaveCpuState, SaveCpu2State, RestoreCpuState, RestoreCpu2State, SetEaxToZero, RestoreSelectedCpuState, SaveSelectedCpuState ; //, SyncDspToEsi, SyncEsiToDsp ;
     Word * LastFinishedWord, *StoreWord, *PokeWord, *ScoOcCrw, *DebugWordListWord ; //, *DebugWordListWord ;
     byte ReadLine_CharacterTable [ 256 ] ;
     ReadLineFunction ReadLine_FunctionTable [ 24 ] ;

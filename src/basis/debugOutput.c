@@ -54,7 +54,7 @@ _Debugger_Locals_ShowALocal ( Debugger * debugger, Word * localsWord, byte * buf
 {
     int64 varOffset ;
     if ( localsWord->CAttribute & LOCAL_VARIABLE ) varOffset = LocalVarOffset ( localsWord ) ;
-    else if ( localsWord->CAttribute & PARAMETER_VARIABLE ) varOffset = -(localsWord->Index); //ParameterVarOffset ( localsWord ) ;
+    else if ( localsWord->CAttribute & PARAMETER_VARIABLE ) varOffset = - ( localsWord->Index ) ; //ParameterVarOffset ( localsWord ) ;
     uint64 * fp = ( int64* ) debugger->cs_Cpu->CPU_FP ;
     if ( fp < ( uint64* ) 0x7f000000 ) fp = 0 ;
     byte * address = ( byte* ) ( fp ? fp [ varOffset ] : 0 ) ;
@@ -128,11 +128,13 @@ Debugger_Locals_Show ( Debugger * debugger )
                 else _Debugger_Locals_ShowALocal ( debugger, scWord, buffer ) ;
             }
         }
+#if 0        
         if ( ! CompileMode )
         {
             _Printf ( "\nNext stepping instruction" ) ; // necessary in some cases
             Debugger_UdisOneInstruction ( debugger, debugger->DebugAddress, ( byte* ) "", ( byte* ) "" ) ;
         }
+#endif        
         if ( ! Compiling ) _Namespace_FreeNamespacesStack ( debugger->LocalsNamespacesStack ) ;
     }
     else if ( sc && debugger->LocalsNamespacesStack ) _Printf ( ( byte* ) "\nTry stepping a couple of instructions and try again." ) ;
@@ -140,13 +142,12 @@ Debugger_Locals_Show ( Debugger * debugger )
     compiler->NumberOfLocals = svLocals ;
     compiler->NumberOfRegisterVariables = svRegs ; //nb. prevent increasing the locals offset by adding in repeated calls to this function
 #if 0    
-else
-{
-    _Printf ( ( byte* ) c_ad ( "\nLocal variables values can be shown only at run time not at compile time." ) ) ;
-}
+    else
+    {
+        _Printf ( ( byte* ) c_ad ( "\nLocal variables values can be shown only at run time not at compile time." ) ) ;
+    }
 #endif
 }
-
 
 int64
 Debugger_TerminalLineWidth ( Debugger * debugger )
@@ -194,7 +195,7 @@ _Debugger_ShowEffects ( Debugger * debugger, Word * word, int8 stepFlag, int8 fo
     if ( Is_DebugShowOn && ( force || stepFlag || ( debugger->w_Word != debugger->LastEffectsWord ) ) )
     {
         Word * word = debugger->w_Word ;
-        if ( force || (( stepFlag ) || ( word ) && ( word != debugger->LastEffectsWord ) ))
+        if ( force || ( ( stepFlag ) || ( word ) && ( word != debugger->LastEffectsWord ) ) )
         {
             NoticeColors ;
             if ( ( word->CAttribute & OBJECT_FIELD ) && ( ! ( word->CAttribute & DOT ) ) )
@@ -592,21 +593,34 @@ _Debugger_DoNewlinePrompt ( Debugger * debugger )
 void
 _Debugger_DoState ( Debugger * debugger )
 {
-    if ( GetState ( debugger, DBG_RETURN ) )
+    if ( GetState ( debugger, DBG_STEPPING ) )
     {
-        _Printf ( ( byte* ) "\r" ) ;
-        SetState ( debugger, DBG_RETURN, false ) ;
+        if ( GetState ( debugger, DBG_START_STEPPING ) )
+        {
+            _Printf ( ( byte* ) " ... Next stepping instruction ..." ) ;
+        }
+        SetState ( debugger, DBG_START_STEPPING, false ) ;
+        Debugger_UdisOneInstruction ( debugger, debugger->DebugAddress, ( byte* ) "\r", ( byte* ) "" ) ;
     }
-    if ( GetState ( debugger, DBG_MENU ) )
+        //else if ( _Context_->ReadLiner0->OutputLineCharacterNumber ) _Printf ( "\n" ) ;
+    else
     {
-        Debugger_Menu ( debugger ) ;
-        SetState ( debugger, DBG_FILENAME_LOCATION_SHOWN, false ) ;
-    }
-    if ( GetState ( debugger, DBG_INFO ) ) Debugger_ShowInfo ( debugger, GetState ( debugger, DBG_RUNTIME ) ? ( byte* ) "<dbg>" : ( byte* ) "dbg", 0 ) ;
-    else if ( GetState ( debugger, DBG_PROMPT ) ) Debugger_ShowState ( debugger, GetState ( debugger, DBG_RUNTIME ) ? ( byte* ) "<dbg>" : ( byte* ) "dbg" ) ;
+        if ( GetState ( debugger, DBG_RETURN ) )
+        {
+            _Printf ( ( byte* ) "\r" ) ;
+            SetState ( debugger, DBG_RETURN, false ) ;
+        }
+        if ( GetState ( debugger, DBG_MENU ) )
+        {
+            Debugger_Menu ( debugger ) ;
+            SetState ( debugger, DBG_FILENAME_LOCATION_SHOWN, false ) ;
+        }
+        if ( GetState ( debugger, DBG_INFO ) ) Debugger_ShowInfo ( debugger, GetState ( debugger, DBG_RUNTIME ) ? ( byte* ) "<dbg>" : ( byte* ) "dbg", 0 ) ;
+        else if ( GetState ( debugger, DBG_PROMPT ) ) Debugger_ShowState ( debugger, GetState ( debugger, DBG_RUNTIME ) ? ( byte* ) "<dbg>" : ( byte* ) "dbg" ) ;
 
-    if ( GetState ( debugger, DBG_NEWLINE ) ) _Debugger_DoNewlinePrompt ( debugger ) ;
-    //Debugger_InitDebugWordList ( debugger ) ;
+        if ( GetState ( debugger, DBG_NEWLINE ) ) _Debugger_DoNewlinePrompt ( debugger ) ;
+        //Debugger_InitDebugWordList ( debugger ) ;
+    }
 }
 
 void

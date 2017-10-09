@@ -607,9 +607,12 @@ CPrimitive CPrimitives [] = {
 MachineCodePrimitive MachineCodePrimitives [] = {
     { "getESP", CPRIMITIVE, 0, ( byte* ) Compile_Debug_GetESP, -1, "System", "Root" },
     { "restoreCpuState", CPRIMITIVE, 0, ( byte* ) Compile_CpuState_Restore, 0, "System", "Root" },
-    //{ "restoreCpuStateHere", CPRIMITIVE, 0, ( byte* ) Compile_CpuState_RestoreHere, 0, "System", "Root" },
+    { "restoreSelectedCpuState", CPRIMITIVE, 0, ( byte* ) _Compile_CpuState_RestoreSelected, 0, "System", "Root" },
     { "restoreCpuState", CPRIMITIVE, 0, ( byte* ) Compile_CpuState_Restore, 0, "Debug", "Root" },
     { "saveCpuState", CPRIMITIVE, 0, ( byte* ) _Compile_CpuState_Save, 0, "System", "Root" },
+    { "saveCpu2State", CPRIMITIVE, 0, ( byte* ) _Compile_CpuState_Save, 0, "System", "Root" },
+    { "restoreCpu2State", CPRIMITIVE, 0, ( byte* ) _Compile_CpuState_Restore, 0, "System", "Root" },
+    { "saveSelectedCpuState", CPRIMITIVE, 0, ( byte* ) _Compile_CpuState_SaveSelected, 0, "System", "Root" },
     { "saveCpuState", CPRIMITIVE, 0, ( byte* ) _Compile_CpuState_Save, 0, "Debug", "Root" },
 #if 0    
     { "syncEsiToDsp", CPRIMITIVE, 0, ( byte* ) _Compile_Sync_EsiToDsp, 0, "System", "Root" },

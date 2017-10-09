@@ -236,12 +236,12 @@
 #define DEBUG_SETUP( word ) _DEBUG_SETUP( word, 0 )
 #define _DEBUG_SHOW( word, force ) _Debugger_PostShow ( _Debugger_, word, force ) ; //, token, word ) ;
 #define DEBUG_SHOW Debugger_PostShow ( _Debugger_ ) ; //, token, word ) ;
-#define DEBUG_INTRNAL_ON SetState ( _Debugger_, DBG_INTERNAL_ON, true ) 
-#define DEBUG_INTRNAL_OFF SetState ( _Debugger_, DBG_INTERNAL_ON, false ) 
-#define DBI GetState ( _Debugger_, DBG_INTERNAL_ON ) 
-#define DBI_N( n ) (GetState ( _Debugger_, DBG_INTERNAL_ON ) && ( _Q_->Verbosity > 3 ) )
-#define DBI_ON DEBUG_INTRNAL_ON
-#define DBI_OFF DEBUG_INTRNAL_OFF
+#define DEBUG_ASM_SHOW_ON SetState ( _Debugger_, DBG_ASM_SHOW_ON, true ) 
+#define DEBUG_ASM_SHOW_OFF SetState ( _Debugger_, DBG_ASM_SHOW_ON, false ) 
+#define DBI GetState ( _Debugger_, DBG_ASM_SHOW_ON ) 
+#define DBI_N( n ) (GetState ( _Debugger_, DBG_ASM_SHOW_ON ) && ( _Q_->Verbosity > 3 ) )
+#define DBI_ON DEBUG_ASM_SHOW_ON
+#define DBI_OFF DEBUG_ASM_SHOW_OFF
 
 #define Is_LValue( word ) ( GetState ( _Context_->Compiler0, LC_ARG_PARSING ) ? 0 : Interpret_CheckEqualBeforeSemi_LValue ( word ))
 #define IS_INCLUDING_FILES _Context_->System0->IncludeFileStackNumber

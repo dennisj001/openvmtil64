@@ -1174,8 +1174,8 @@ _LO_Apply_ArgList ( ListObject * l0, Word * word )
             }
             else
             {
-                debugger->cs_Cpu->State = 0 ;
-                _CfrTil_->cs_Cpu->State = 0 ;
+                SetState ( debugger->cs_Cpu, CPU_SAVED, false ) ;
+                SetState ( _CfrTil_->cs_Cpu, CPU_SAVED, false ) ; 
                 _Debugger_CpuState_CheckSave ( debugger ) ;
                 _CfrTil_CpuState_CheckSave ( ) ;
                 svcs = _Q_CodeByteArray ;

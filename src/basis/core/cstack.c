@@ -109,7 +109,7 @@ _Stack_Print ( Stack * stack, byte * name )
 {
     _Stack_PrintHeader ( stack, name ) ;
     Stack_PrintValues ( name, stack, Stack_Depth ( stack ) ) ;
-    CfrTil_NewLine ( ) ;
+    //CfrTil_NewLine ( ) ;
 }
 
 int64

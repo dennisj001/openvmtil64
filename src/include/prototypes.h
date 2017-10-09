@@ -68,7 +68,6 @@ void _Compile_Jcc(int64 bindex, int64 overwriteFlag, int64 nz, int64 ttt);
 /* basis/compiler/_compile.c */
 void _Compile_Call_Acc(void);
 void Compile_DataStack_PopAndCall(void);
-void Compile_SetEaxToZero(void);
 void _Compile_Rsp_To(void);
 void _Compile_Rsp_Drop(void);
 void _Compile_Rsp_Get(void);
@@ -122,6 +121,8 @@ void Compile_DivideEqual(Compiler *compiler);
 void _CfrTil_Do_IncDec(int64 op);
 /* basis/compiler/cpu.c */
 void _CpuState_Show(Cpu *cpu);
+void _Compile_CpuState_SaveSelected(Cpu *cpu);
+void _Compile_CpuState_RestoreSelected(Cpu *cpu);
 void _Compile_CpuState_Save(Cpu *cpu);
 void _Compile_CpuState_Restore(Cpu *cpu, int8 cStackRegFlag);
 void Compile_CpuState_Restore(Cpu *cpu);
@@ -325,7 +326,8 @@ void _CfrTil_MachineCodePrimitive_NewAdd(const char *name, uint64 cType, block *
 void _CfrTil_Run(CfrTil *cfrTil, int64 restartCondition);
 void _CfrTil_ReStart(CfrTil *cfrTil, int64 restartCondition);
 void _CfrTil_CpuState_CheckSave(void);
-void _CfrTil_CpuState_Show(void);
+void CfrTil_CpuState_Show(void);
+void CfrTil_CpuState_Current_Show(void);
 void CfrTil_CpuState_CheckShow(void);
 void CfrTil_Debugger_CheckSaveCpuStateShow(void);
 void CfrTil_Debugger_UdisOneInsn(void);
@@ -353,8 +355,8 @@ void _CfrTil_DebugOn(void);
 /* basis/core/parse.c */
 void _CfrTil_SingleQuote(int64 findWordFlag);
 void _CfrTil_Parse_ClassStructure(int64 cloneFlag);
-void Compile_InitRegisterParamenterVariables(Compiler *compiler);
 void Compiler_TypedObjectInit(Namespace *typeNamespace, Word *word);
+void Compile_InitRegisterParamenterVariables(Compiler *compiler);
 Namespace *_CfrTil_Parse_LocalsAndStackVariables(int64 svf, int64 lispMode, ListObject *args, Stack *nsStack, Namespace *localsNs);
 void Lexer_ParseAsAString(Lexer *lexer);
 void _Lexer_ParseBinary(Lexer *lexer, int64 offset);
@@ -410,7 +412,7 @@ void CfrTil_ResetAll_Init(CfrTil *cfrTil);
 void _CfrTil_InitialAddWordToNamespace(Word *word, byte *containingNamespaceName, byte *superNamespaceName);
 void _CfrTil_CPrimitiveNewAdd(const char *name, block b, uint64 ctype, uint64 ltype, const char *nameSpace, const char *superNamespace);
 void CfrTil_AddCPrimitives(void);
-void CfrTil_MachineCodePrimitive_AddWords(void);
+void CfrTil_MachineCodePrimitive_AddWords(CfrTil *cfrTil);
 /* basis/system.c */
 void *_dlsym(byte *sym, byte *lib);
 void *_Dlsym(byte *sym, byte *lib);

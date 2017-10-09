@@ -269,6 +269,7 @@ dscOn //verbosity 3 =
     _s 
     { verbosity @ 1 > }
 #else
+    //_s pause
     { verbosity @ 1 > }
 #endif
     {

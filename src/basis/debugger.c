@@ -173,10 +173,7 @@ _Debugger_Off ( Debugger * debugger )
     debugger->StartHere = 0 ;
     debugger->PreHere = 0 ;
     debugger->DebugAddress = 0 ;
-    //debugger->DebugWordListWord = 0 ;
-    //debugger->DebugWordList = 0 ;
-    //_CfrTil_->DebugWordList = 0 ;
-    debugger->cs_Cpu->State = 0 ;
+    SetState ( debugger->cs_Cpu, CPU_SAVED, false ) ;
     debugger->w_Word = 0 ;
     SetState ( debugger, DBG_STACK_OLD, true ) ;
     debugger->CopyRSP = 0 ;
@@ -371,15 +368,23 @@ Debugger_DoMenu ( Debugger * debugger )
 void
 Debugger_Stack ( Debugger * debugger )
 {
-    if ( GetState ( debugger, DBG_STEPPING ) && debugger->cs_Cpu->State )
+    if ( GetState ( debugger, DBG_STEPPING ) && GetState ( debugger->cs_Cpu, CPU_SAVED ) )
     {
         Debugger_SyncStackPointersFromCpuState ( debugger ) ;
         _CfrTil_PrintDataStack ( ) ;
         _Printf ( ( byte* ) "\n" ) ;
         SetState ( debugger, DBG_INFO, true ) ;
     }
-
     else CfrTil_PrintDataStack ( ) ;
+    if ( GetState ( debugger, DBG_STEPPING ) ) SetState ( debugger, DBG_START_STEPPING, true ) ;
+#if 0    
+    if ( GetState ( debugger, DBG_STEPPING ) )
+    {
+        _Printf ( ( byte* ) "Next stepping instruction ..." ) ;
+        Debugger_UdisOneInstruction ( debugger, debugger->DebugAddress, ( byte* ) "\r", ( byte* ) "" ) ;
+    }
+    else if ( _Context_->ReadLiner0->OutputLineCharacterNumber ) _Printf ( "\n" ) ;
+#endif    
 }
 
 void
@@ -400,7 +405,6 @@ Debugger_Source ( Debugger * debugger )
     //if ( GetState ( debugger, DBG_STEPPING ) ) Debugger_Step ( debugger ) ;
     //else
     {
-
         _CfrTil_Source ( debugger->w_Word ? debugger->w_Word : _CfrTil_->DebugWordListWord, 0 ) ;
         SetState ( debugger, DBG_INFO, true ) ;
     }
@@ -415,10 +419,10 @@ _Debugger_CpuState_Show ( )
 void
 _Debugger_CpuState_CheckSave ( Debugger * debugger )
 {
-    if ( ! ( debugger->cs_Cpu->State ) )
+    if ( ! GetState ( debugger->cs_Cpu, CPU_SAVED ) )
     {
         debugger->SaveCpuState ( ) ;
-        debugger->cs_Cpu->State = 1 ;
+        SetState ( debugger->cs_Cpu, CPU_SAVED, true ) ;
         //SetState ( debugger, DBG_REGS_SAVED, true ) ;
     }
 }
@@ -512,11 +516,10 @@ Debugger_Escape ( Debugger * debugger )
     Set_CompileMode ( false ) ;
     byte * lexerTokenBuffer = _Buffer_New_pbyte ( BUFFER_SIZE, B_UNLOCKED ) ;
     strcpy ( lexerTokenBuffer, _CfrTil_->TokenBuffer ) ;
-    _Printf ( "\n" ) ;
+    //_Printf ( "\n" ) ;
 
     Debugger_InterpretLine ( ) ;
 
-    if ( _Context_->ReadLiner0->OutputLineCharacterNumber ) _Printf ( "\n" ) ;
     strcpy ( _CfrTil_->TokenBuffer, lexerTokenBuffer ) ;
     Set_CompileMode ( svcm ) ;
     DebugOn ;
@@ -526,7 +529,16 @@ Debugger_Escape ( Debugger * debugger )
     debugger->State = saveDebuggerState ;
     _Context_->System0->State = saveSystemState ;
     SetState_TrueFalse ( debugger, DBG_ACTIVE | DBG_INFO, DBG_STEPPED | DBG_AUTO_MODE | DBG_AUTO_MODE_ONCE | DBG_INTERPRET_LOOP_DONE | DBG_COMMAND_LINE | DBG_ESCAPED ) ;
-    //Lexer_RestartToken ( _Lexer_ ) ;
+    if ( GetState ( debugger, DBG_STEPPING ) ) SetState ( debugger, DBG_START_STEPPING, true ) ;
+
+#if 0    
+    if ( GetState ( debugger, DBG_STEPPING ) )
+    {
+        _Printf ( ( byte* ) "Next stepping instruction ..." ) ;
+        Debugger_UdisOneInstruction ( debugger, debugger->DebugAddress, ( byte* ) "\r", ( byte* ) "" ) ;
+    }
+    else if ( _Context_->ReadLiner0->OutputLineCharacterNumber ) _Printf ( "\n" ) ;
+#endif    
 }
 
 void
@@ -634,7 +646,7 @@ Debugger_Delete ( Debugger * debugger )
 void
 CpuState_AdjustRdi ( Cpu * cpu, uint64 * dsp, Word * word )
 {
-    if ( cpu->State )
+    if ( GetState ( cpu, CPU_SAVED ) )
     {
         if ( word ) dsp = word->W_InitialRuntimeDsp ;
         if ( dsp ) cpu->Rsi = dsp ;

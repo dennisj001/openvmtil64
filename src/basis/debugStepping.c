@@ -88,18 +88,20 @@ start:
             // so that newDebugAddress, below, will be our next stepping insn
             newDebugAddress = debugger->DebugAddress + size ;
         }
-        else if ( debugger->Key == 'h' ) // step '(t)hru' the native code like a non-native subroutine
+        else if ( ( debugger->Key == 'h' ) || ( debugger->Key == 'o' ) )// step '(t)hru' the native code like a non-native subroutine
         {
             _Printf ( ( byte* ) "\ncalling t(h)ru - a subroutine : %s : .... :>", word ? ( char* ) c_gd ( word->Name ) : "" ) ;
             Compile_Call ( jcAddress ) ;
             newDebugAddress = debugger->DebugAddress + size ;
         }
+#if 0 // this actually steps over the call not calling it;?? i don't think we have any use for it, and it is not the expected behavior ??       
         else if ( debugger->Key == 'o' ) // step '(o)ver' the native code like a non-native subroutine
         {
             _Printf ( ( byte* ) "\nstepping '(o)ver' - a subroutine : %s : .... :>", word ? ( char* ) c_gd ( word->Name ) : "" ) ;
             //Compile_Call ( jcAddress ) ;
             newDebugAddress = debugger->DebugAddress + size ;
         }
+#endif        
         else if ( debugger->Key == 'u' ) // step o(u)t of the native code like a non-native subroutine
         {
             _Printf ( ( byte* ) "\nstepping thru and 'o(u)t' of a \"native\" subroutine : %s : .... :>", word ? ( char* ) c_gd ( word->Name ) : "" ) ;
@@ -178,7 +180,7 @@ Debugger_CompileAndStepOneInstruction ( Debugger * debugger )
                     _Debugger_CpuState_Show ( ) ;
                     Pause ( ) ;
                 }
-                debugger->cs_Cpu->State = 0 ;
+                SetState ( debugger->cs_Cpu, CPU_SAVED, false ) ;
             }
             goto end ;
         }
@@ -243,7 +245,7 @@ Debugger_CompileAndStepOneInstruction ( Debugger * debugger )
 end:
         if ( debugger->DebugAddress )
         {
-            Debugger_UdisOneInstruction ( debugger, debugger->DebugAddress, ( byte* ) "", ( byte* ) "" ) ; // the next instruction
+            //Debugger_UdisOneInstruction ( debugger, debugger->DebugAddress, ( byte* ) "", ( byte* ) "" ) ; // the next instruction
             // keep eip - instruction pointer - up to date ..
             debugger->cs_Cpu->Rip = ( uint64 * ) debugger->DebugAddress ;
         }
@@ -345,17 +347,21 @@ _Debugger_SetupStepping ( Debugger * debugger, Word * word, byte * address, byte
     debugger->DebugAddress = address ;
     debugger->w_Word = word ;
     //if ( ! GetState ( debugger, ( DBG_BRK_INIT ) ) ) Debugger_CheckSaveCpuState ( debugger ) ;
-    debugger->cs_Cpu->State = 0 ;
-    _CfrTil_->cs_Cpu->State = 0 ;
+    SetState ( debugger->cs_Cpu, CPU_SAVED, false ) ;
+    SetState ( _CfrTil_->cs_Cpu, CPU_SAVED, false ) ;
     _Debugger_CpuState_CheckSave ( debugger ) ;
     _CfrTil_CpuState_CheckSave ( ) ;
     debugger->LevelBitNamespaceMap = 0 ;
     Stack_Init ( debugger->LocalsNamespacesStack ) ;
+    SetState ( debugger, DBG_START_STEPPING, true ) ;
+    CfrTil_NewLine ( ) ;
+#if 0    
     if ( iflag )
     {
         _Printf ( "\nNext stepping instruction" ) ; // necessary in some cases
         Debugger_UdisOneInstruction ( debugger, address, ( byte* ) "", ( byte* ) "" ) ;
     }
+#endif    
     //debugger->SaveDsp = Dsp ; // saved before we start stepping
 }
 
@@ -445,7 +451,7 @@ void
 _Compile_Restore_C_CpuState ( CfrTil * cfrtil, int64 showFlag )
 {
     _Compile_CpuState_Restore ( cfrtil->cs_Cpu, 1 ) ;
-    if ( showFlag ) Compile_Call ( ( byte* ) _CfrTil_CpuState_Show ) ;
+    if ( showFlag ) Compile_Call ( ( byte* ) CfrTil_CpuState_Show ) ;
 }
 
 // restore the 'internal running cfrTil' cpu state which was saved after the last instruction : debugger->cs_CpuState is the 'internal running cfrTil' cpu state
