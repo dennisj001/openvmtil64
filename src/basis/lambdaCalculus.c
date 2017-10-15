@@ -235,8 +235,7 @@ next:
                     l0 = 0 ;
                     if ( ( word->LAttribute & ( T_LISP_READ_MACRO | T_LISP_IMMEDIATE ) ) && ( ! GetState ( _Q_->OVT_LC, LC_READ_MACRO_OFF ) ) )
                     {
-                        //word->Definition ( ) ; // scheme read macro preprocessor 
-                        _Block_Eval ( word->Definition ) ;
+                        Word_Eval ( word ) ;
                         if ( word->LAttribute & T_LISP_SPECIAL )
                         {
                             l0 = _DataObject_New ( T_LC_NEW, word, 0, word->CAttribute, T_LISP_SYMBOL | word->LAttribute, 0, * word->Lo_PtrToValue, lexer->TokenStart_ReadLineIndex ) ;
@@ -246,7 +245,7 @@ next:
                     else if ( word->LAttribute & T_LISP_TERMINATING_MACRO )
                     {
                         SetState ( _Q_->OVT_LC, ( LC_READ ), false ) ; // let the value be pushed in this case because we need to pop it below
-                        _Word_Eval ( word ) ;
+                        Word_Eval ( word ) ;
                         token1 = ( byte* ) _DataStack_Pop ( ) ;
                         SetState ( _Q_->OVT_LC, ( LC_READ ), true ) ;
                         l0 = _DataObject_New ( T_LC_LITERAL, 0, token1, LITERAL, 0, 0, 0, lexer->TokenStart_ReadLineIndex ) ;
@@ -293,7 +292,7 @@ next:
         _Q_->OVT_LC->ItemQuoteState = 0 ;
     }
     while ( lc->LispParenLevel ) ;
-    if ( ! lc->LispParenLevel ) lc->LC_SourceCode = _CfrTil_FinishSourceCode ( _CfrTil_ ) ;
+    if ( ( ! lc->LispParenLevel ) && ( ! GetState ( _Compiler_, LC_ARG_PARSING ) ) ) lc->LC_SourceCode = _CfrTil_FinishSourceCode ( _CfrTil_ ) ;
     SetState ( lc, LC_READ, false ) ;
     SetState ( cntx->Finder0, QID, false ) ;
     return lreturn ;
@@ -793,7 +792,7 @@ _LO_CfrTil ( ListObject * lfirst )
         }
         else if ( String_Equal ( ldata->Name, ( byte * ) "s:" ) )
         {
-            _CfrTil_DebugSourceCodeCompileOn ( ) ;
+            _CfrTil_DbgSourceCodeCompileOn ( ) ;
             word = _LO_Colon ( ldata ) ;
             ldata = _LO_Next ( ldata ) ; // bump ldata to account for name
         }
@@ -804,7 +803,7 @@ _LO_CfrTil ( ListObject * lfirst )
         }
         else if ( String_Equal ( ldata->Name, ( byte * ) ";s" ) && ( ! GetState ( cntx, C_SYNTAX ) ) )
         {
-            _CfrTil_DebugSourceCodeCompileOff ( ) ;
+            _CfrTil_DbgSourceCodeCompileOff ( ) ;
             _LO_Semi ( word ) ;
         }
         else if ( String_Equal ( ldata->Name, ( byte * ) ";" ) && ( ! GetState ( cntx, C_SYNTAX ) ) )
@@ -1039,17 +1038,16 @@ int64
 _LO_Apply_Arg ( ListObject ** pl1, int64 i )
 {
     Context * cntx = _Context_ ;
-    ListObject * l0, *l1, * l2 ;
-    int64 svcm = CompileMode ;
-    l1 = * pl1 ;
+    ListObject *l1 = * pl1, * l2 ;
     Word * word = l1 ;
 
+    //byte * svPreHere = _Debugger_->PreHere ;
+    Set_CompileMode ( true ) ;
     if ( l1->LAttribute & ( LIST | LIST_NODE ) )
     {
         // ?needs :: Compiler_CopyDuplicatesAndPush somewhere
         Set_CompileMode ( false ) ;
         l2 = LO_Eval ( l1 ) ;
-        //Set_CompileMode ( svcm ) ;
         DEBUG_SETUP ( l2 ) ;
         if ( ! l2 || ( l2->LAttribute & T_NIL ) )
         {
@@ -1066,16 +1064,18 @@ _LO_Apply_Arg ( ListObject ** pl1, int64 i )
     else if ( ( l1->CAttribute & _NON_MORPHISM_TYPE ) ) // and literals, etc.
     {
         word = l1->Lo_CfrTilWord ;
-        int64 scwi = l1->W_SC_ScratchPadIndex ;
-        word->W_SC_ScratchPadIndex = scwi ;
         word = Compiler_CopyDuplicatesAndPush ( word ) ;
+        word->W_SC_ScratchPadIndex = l1->W_SC_ScratchPadIndex ;
         word->StackPushRegisterCode = 0 ;
+        Word *baseObject = _Interpreter_->BaseObject ;
         _DEBUG_SETUP ( word, 0 ) ;
-        Word_Eval0 ( word ) ; // ?? move value directly to RegOrder reg
-        if ( CompileMode && ( ! ( l1->CAttribute & ( NAMESPACE_TYPE | OBJECT_FIELD | T_NIL ) ) ) ) // research : how does CAttribute get set to T_NIL?
+        _Word_Eval ( word ) ; // ?? move value directly to RegOrder reg
+        if ( CompileMode && ( ! _Lexer_IsTokenForwardDotted ( cntx->Lexer0, word->W_SC_ScratchPadIndex ) ) ) // research : how does CAttribute get set to T_NIL?
         {
             if ( word->StackPushRegisterCode ) SetHere ( word->StackPushRegisterCode ) ;
+            else if ( baseObject && baseObject->StackPushRegisterCode ) SetHere ( baseObject->StackPushRegisterCode ) ;
             _Compile_Move_Reg_To_Reg ( RegOrder ( i ++ ), ACC ) ;
+            if ( baseObject ) _Debugger_->PreHere = baseObject->Coding ;
             _DEBUG_SHOW ( word, 1 ) ;
         }
     }
@@ -1088,12 +1088,13 @@ _LO_Apply_Arg ( ListObject ** pl1, int64 i )
         // nb! this block is just CfrTil_ArrayBegin in arrays.c -- refactor??
         // ?needs :: Compiler_CopyDuplicatesAndPush somewhere
         Interpreter * interp = _Context_->Interpreter0 ;
-        Word * arrayBaseObject = ( ( Word * ) ( LO_Previous ( l1 ) ) )->Lo_CfrTilWord, *svBaseObject = interp->BaseObject ;
+        Word * arrayBaseObject = ( ( Word * ) ( LO_Previous ( l1 ) ) )->Lo_CfrTilWord ;
+        Word *baseObject = interp->BaseObject ;
         if ( arrayBaseObject )
         {
             Compiler *compiler = _Context_->Compiler0 ;
             int64 objSize = 0, increment = 0, variableFlag ;
-            int64 saveCompileMode = GetState ( compiler, COMPILE_MODE ) ;
+            int64 svcm = GetState ( compiler, COMPILE_MODE ) ;
             if ( ( ! arrayBaseObject->ArrayDimensions ) ) CfrTil_Exception ( ARRAY_DIMENSION_ERROR, QUIT ) ;
             if ( interp->CurrentObjectNamespace ) objSize = interp->CurrentObjectNamespace->Size ; //_CfrTil_VariableValueGet ( _Context_->Interpreter0->CurrentClassField, ( byte* ) "size" ) ; 
             if ( ! objSize )
@@ -1102,34 +1103,31 @@ _LO_Apply_Arg ( ListObject ** pl1, int64 i )
             }
             variableFlag = _CheckArrayDimensionForVariables_And_UpdateCompilerState ( ) ;
             _WordList_Pop ( _Context_->Compiler0->WordList, 0 ) ; // pop the initial '['
-            svBaseObject->AccumulatedOffset = 0 ;
             do
             {
                 word = l1 ;
                 byte * token = word->Name ;
-                DEBUG_SETUP ( word ) ;
-                if ( Do_NextArrayWordToken ( word, token, arrayBaseObject, objSize, saveCompileMode, &variableFlag ) ) break ;
-                _DEBUG_SHOW ( word, 1 ) ;
+                if ( Do_NextArrayWordToken ( word, token, arrayBaseObject, objSize, svcm, &variableFlag ) ) break ;
             }
             while ( l1 = LO_Next ( l1 ) ) ;
             *pl1 = l1 ;
             compiler->ArrayEnds = 0 ; // reset for next array word in the current word being compiled
-            interp->BaseObject = svBaseObject ; //arrayBaseObject ; // nb. : _Context_->Interpreter0->baseObject is reset by the interpreter by the types of words between array brackets
+            interp->BaseObject = baseObject ; //arrayBaseObject ; // nb. : _Context_->Interpreter0->baseObject is reset by the interpreter by the types of words between array brackets
             if ( CompileMode )
             {
-                DEBUG_SETUP ( svBaseObject ) ;
                 if ( ! variableFlag )
                 {
-                    SetHere ( svBaseObject->Coding ) ;
-                    _Compile_GetVarLitObj_LValue_To_Reg ( svBaseObject, ACC ) ;
-                    _Word_CompileAndRecord_PushReg ( svBaseObject, ACC ) ;
+                    SetHere ( baseObject->Coding ) ;
+                    _Compile_GetVarLitObj_LValue_To_Reg ( baseObject, ACC ) ;
+                    _Word_CompileAndRecord_PushReg ( baseObject, ACC ) ;
                 }
-                if ( Is_DebugModeOn ) Word_PrintOffset ( word, increment, svBaseObject->AccumulatedOffset ) ;
-                if ( svBaseObject->StackPushRegisterCode ) SetHere ( svBaseObject->StackPushRegisterCode ) ;
+                if ( Is_DebugModeOn ) Word_PrintOffset ( word, increment, baseObject->AccumulatedOffset ) ;
+                if ( baseObject->StackPushRegisterCode ) SetHere ( baseObject->StackPushRegisterCode ) ;
                 _Compile_Move_Reg_To_Reg ( RegOrder ( i ++ ), ACC ) ;
+                _Debugger_->PreHere = baseObject->Coding ;
+                _DEBUG_SHOW ( baseObject, 1 ) ;
             }
             interp->BaseObject = 0 ;
-            SetState ( compiler, COMPILE_MODE, saveCompileMode ) ;
         }
     }
     else
@@ -1140,8 +1138,8 @@ _LO_Apply_Arg ( ListObject ** pl1, int64 i )
         _DEBUG_SHOW ( word, 1 ) ;
     }
 done:
-    //_DEBUG_SHOW ( word, 1 ) ;
     DEBUG_SHOW ;
+    _Debugger_->PreHere = Here ;
     return i ;
 }
 // for calling 'C' functions such as printf or other system functions
@@ -1156,84 +1154,42 @@ _LO_Apply_ArgList ( ListObject * l0, Word * word )
     ByteArray * scs = _Q_CodeByteArray ;
     Compiler * compiler = cntx->Compiler0 ;
     int64 i, svcm = CompileMode ;
-    int8 showFlag = false ;
-    Debugger * debugger = _CfrTil_->Debugger0 ;
-    SetState ( compiler, LC_ARG_PARSING, true ) ;
-    ByteArray * svcs ;
 
     d0 ( if ( Is_DebugModeOn ) LO_Debug_ExtraShow ( 0, 2, 0, ( byte* ) "\nEntering _LO_Apply_ArgList..." ) ) ;
     if ( l0 )
     {
+        Set_CompileMode ( true ) ;
         if ( ! svcm )
         {
-            Set_CompileMode ( true ) ;
-            if ( Is_DebugModeOn )
-            {
-                _Debugger_->PreHere = Here ;
-                CfrTil_BeginBlock ( ) ;
-            }
-            else
-            {
-                SetState ( debugger->cs_Cpu, CPU_SAVED, false ) ;
-                SetState ( _CfrTil_->cs_Cpu, CPU_SAVED, false ) ; 
-                _Debugger_CpuState_CheckSave ( debugger ) ;
-                _CfrTil_CpuState_CheckSave ( ) ;
-                svcs = _Q_CodeByteArray ;
-                _ByteArray_ReInit ( debugger->StepInstructionBA ) ; // we are only compiling one insn here so clear our BA before each use
-                Set_CompilerSpace ( debugger->StepInstructionBA ) ; // now compile to this space
-                _Compile_Restore_Debugger_CpuState ( debugger, showFlag ) ; //&& ( _Q_->Verbosity >= 3 ) ) ; // restore our runtime state before the current insn
-                _Debugger_->PreHere = Here ;
-            }
+            CfrTil_BeginBlock ( ) ;
         }
+        if ( word->CAttribute & ( DLSYM_WORD | C_PREFIX ) ) Set_CompileMode ( true ) ;
+        _Debugger_->PreHere = Here ;
         for ( i = 0, l1 = _LO_First ( l0 ) ; l1 ; l1 = LO_Next ( l1 ) ) i = _LO_Apply_Arg ( &l1, i ) ;
-        int64 scwi = l0->W_SC_ScratchPadIndex ;
-        word->W_SC_ScratchPadIndex = scwi ;
+        Set_CompileMode ( true ) ;
+        _Debugger_->PreHere = Here ;
+        word->W_SC_ScratchPadIndex = l0->W_SC_ScratchPadIndex ;
         word = Compiler_CopyDuplicatesAndPush ( word ) ;
         cntx->CurrentlyRunningWord = word ;
         if ( String_Equal ( word->Name, "printf" ) )
         {
             _Compile_MoveImm_To_Reg ( RAX, 0, CELL ) ; // for printf ?? others //System V ABI : "%rax is used to indicate the number of vector arguments passed to a function requiring a variable number of arguments"
-            _Compile_Call ( ( byte* ) word->Definition, OREG ) ;
         }
-        else Compile_Call ( ( byte* ) word->Definition ) ;
+        _Compile_Call ( ( byte* ) word->Definition, OREG ) ; //printf needs RAX at 0, so generally use the operand reg (OREG) for all, why not?
         _DEBUG_SHOW ( word, 1 ) ;
         if ( ! svcm )
         {
-            if ( Is_DebugModeOn )
-            {
-                CfrTil_EndBlock ( ) ;
-                Set_CompilerSpace ( scs ) ;
-            }
-            else
-            {
-                _Compile_Restore_C_CpuState ( _CfrTil_, showFlag ) ; //&& ( _Q_->Verbosity >= 3 ) ) ; // finally restore our c compiler cpu register state
-                _Compile_Return ( ) ;
-                Set_CompilerSpace ( svcs ) ; // restore compiler space pointer before "do it" in case "do it" calls the compiler
-            }
-            if ( ! svcm )
-            {
-                if ( Is_DebugModeOn )
-                {
-                    DEBUG_SETUP ( word ) ;
-                    Debugger * debugger = _Debugger_ ;
-                    SetState ( debugger, DBG_BRK_INIT, true ) ;
-                    _Debugger_SetupStepping ( debugger, word, ( byte* ) _DataStack_Pop ( ), "lambda block", 1 ) ;
-                    SetState ( debugger, DBG_NEWLINE | DBG_PROMPT | DBG_INFO | DBG_AUTO_MODE | DBG_AUTO_MODE_ONCE, false ) ;
-                    _Debugger_InterpreterLoop ( debugger ) ;
-                }
-                else
-                {
-                    //_Debugger_Disassemble ( debugger, debugger->StepInstructionBA->BA_Data, 2 * K, 1 ) ;
-                    ( ( VoidFunction ) debugger->StepInstructionBA->BA_Data ) ( ) ;
-                    debugger->CopyRSP = 0 ; // we need this!! why ??
-                }
-            }
-            DEBUG_SHOW ;
+            CfrTil_EndBlock ( ) ;
+            Set_CompileMode ( svcm ) ;
+            Set_CompilerSpace ( scs ) ;
+            _DEBUG_SETUP ( word, 1 ) ;
+            CfrTil_BlockRun ( ) ;
         }
-        Set_CompileMode ( svcm ) ;
+        //Set_CompileMode ( svcm ) ;
         d0 ( if ( Is_DebugModeOn ) LO_Debug_ExtraShow ( 0, 2, 0, ( byte* ) "\nLeaving _LO_Apply_ArgList..." ) ) ;
         SetState ( compiler, LC_ARG_PARSING, false ) ;
     }
+    //DEBUG_SHOW ;
     return nil ;
 }
 

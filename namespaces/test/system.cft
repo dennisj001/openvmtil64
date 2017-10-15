@@ -1,14 +1,17 @@
 
 5
 #if  1
-C 
 : sp ; //stack pause ;
+C 
+"Dlsym" namespace Dlsym "libc" namespace libc
 #if 1  //Zenfone2 @ not
 dlsym: printf /lib/x86_64-linux-gnu/libc.so.6 ; void_return
-dlsym: strcmp /lib/x86_64-linux-gnu/libc.so.6 ; //eax_return
+dlsym: strcmp /lib/x86_64-linux-gnu/libc.so.6 ; rax_return
 dlsym: sprintf /lib/x86_64-linux-gnu/libc.so.6 ; void_return
+dlsym: strcat /lib/x86_64-linux-gnu/libc.so.6 ; void_return
+dlsym: memset /lib/x86_64-linux-gnu/libc.so.6 ; void_return
 #endif
-printf ("\n%s\n\t%s","hello world! - parse this!?", "\tand this!")"\n\talso this!" ps
+printf ("\n%s\n%d\t%s","hello world! - parse this!?", 1234, "\tand this!")"\n\talso this!" ps //pause
 printf ( "\nHello world! = 0x%08x\n\n" 1234 ) 
 printf ( "\n%s = %d\n\n", "Hello world!", 42 ) 
 printf("\n%s\n\t","hello world! - parse this!?")"\n\talso this!" ps
@@ -22,6 +25,7 @@ Compiler
 : vckf1 ( w ) vckf ( 0 w @ ) ;; //_literal ) ;;
 vckf1 ( ' s find ) 
 C
+libc
 printf ( "\nHello world! = 0x%08x\n\n" 1234 ) 
 printf ( "\n%s\n\n", "hello world!\nparse this!\n" )"\n and this!\n" ps
 printf ( "\n%s\n\t", "hello world! - parse this!?" )"\t and this!" ps
@@ -29,11 +33,14 @@ printf ( "\nHello world! = 0x%08x\n\n" 1234 )
 
 : tprintf printf ( "\nHello world! = 0x%08x\n\n" 1234 ) ; tprintf
 : tprintf1 ( a b ) printf ( a b) ;; 
- tprintf1 ("\nHello world! = 0x%08x\n\n" 1234)
-'tprintf find wdiss
-'tprintf1 find wdiss
+tprintf1 ("\nyes, Hello world! = 0x%08x", 1234 ) 
+: tprintf2 ( a b c ) printf ( a b c) ;; 
+tprintf2 ("\nyes, Hello world! = 0x%08x : %s", 1234, "and more yet" ) 
+//'tprintf find wdiss
+//'tprintf1 find wdiss
 
 #endif
+
 "xc" var 
 xc 'e' = 
 xc @ dup emit 'e' _assert //pause
@@ -50,11 +57,11 @@ Root
 : get ( vari -- TOS ) vari @ @ ;; //'get wdiss
 "x1" var set ( x1 876543 ) get ( x1 ) dup dup nl p nl 876543 _assert x1 @ _assert //pause
 sp
-#if 1
-String Shell
+#if 0
+String Shell C
 s: $$ 
     ""
-    { token dup ";" strcmp } 
+    { token dup ";" d: strcmp } 
     { 
         { dup "." strcmp } { strcat " " strcat } { strcat } if3
     } 

@@ -49,24 +49,24 @@ _Compile_CpuState_SaveSelected ( Cpu * cpu )
     // registers are pushed in this order ...
     // eax, ecx, edx, ebx, esp, ebp, esi, edi
     _Compile_PushReg ( ACC ) ;
-    _Compile_Set_CAddress_WithRegValue_ThruReg ( ( byte* ) & cpu->CPU_OREG, OREG, ACC ) ; // save operand reg thru accum
-    _Compile_PopToReg ( ACC ) ; // restore rax
+    //_Compile_Set_CAddress_WithRegValue_ThruReg ( ( byte* ) & cpu->CPU_OREG, OREG, ACC ) ; // save operand reg thru accum
 
-    //_Compile_Set_CAddress_WithRegValue_ThruReg ( ( byte* ) & cpu->Rsp, RSP, OREG ) ; // Rsp //this won't be accurate for the runtime because it is called from C 
+    _Compile_Set_CAddress_WithRegValue_ThruReg ( ( byte* ) & cpu->Rsp, RSP, OREG ) ; // Rsp //this won't be accurate for the runtime because it is called from C 
     //_Compile_Set_CAddress_WithRegValue_ThruReg ( ( byte* ) & cpu->Rbp, RBP, OREG ) ; // edx
-    _Compile_Set_CAddress_WithRegValue_ThruReg ( ( byte* ) & cpu->Rbx, RBX, OREG ) ; // ebx
-    _Compile_Set_CAddress_WithRegValue_ThruReg ( ( byte* ) & cpu->R10d, R10D, OREG ) ; // edx
+    //_Compile_Set_CAddress_WithRegValue_ThruReg ( ( byte* ) & cpu->Rbx, RBX, OREG ) ; // ebx
+    //_Compile_Set_CAddress_WithRegValue_ThruReg ( ( byte* ) & cpu->R10d, R10D, OREG ) ; // edx
     //_Compile_Set_CAddress_WithRegValue_ThruReg ( ( byte* ) & cpu->R11d, R11D, OREG ) ;// ebx
-    _Compile_Get_FromCAddress_ToReg ( OREG, ( byte* ) & cpu->CPU_OREG ) ; // our scratch reg
+    //_Compile_Get_FromCAddress_ToReg ( OREG, ( byte* ) & cpu->CPU_OREG ) ; // our scratch reg
+    _Compile_PopToReg ( ACC ) ; // restore rax
 }
 
 void
 _Compile_CpuState_RestoreSelected ( Cpu * cpu )
 {
-    //_Compile_Get_FromCAddress_ToReg_ThruReg ( RSP, ( byte * ) & cpu->Rsp, OREG ) ; // r12, r13, rsp, rbp : same problem
+    _Compile_Get_FromCAddress_ToReg_ThruReg ( RSP, ( byte * ) & cpu->Rsp, OREG ) ; // r12, r13, rsp, rbp : same problem
     //_Compile_Get_FromCAddress_ToReg_ThruReg ( RBP, ( byte * ) & cpu->Rbp, OREG ) ; // r12, r13, rsp, rbp : same problem
-    _Compile_Get_FromCAddress_ToReg ( RBX, ( byte* ) & cpu->Rbx ) ; // rbx
-    _Compile_Get_FromCAddress_ToReg ( R10D, ( byte* ) & cpu->R10d ) ; // r10d
+    //_Compile_Get_FromCAddress_ToReg ( RBX, ( byte* ) & cpu->Rbx ) ; // rbx
+    //_Compile_Get_FromCAddress_ToReg ( R10D, ( byte* ) & cpu->R10d ) ; // r10d
     //_Compile_Get_FromCAddress_ToReg ( R11D, ( byte* ) & cpu->R11d ) ; // r11d
 }
 
@@ -121,7 +121,7 @@ _Compile_CpuState_Save ( Cpu * cpu )
 // so that the cpu register state is as saved in the C struct when we leave
 
 void
-_Compile_CpuState_Restore ( Cpu * cpu, int8 cStackRegFlag )
+_Compile_CpuState_Restore ( Cpu * cpu, int64 cStackRegFlag )
 {
     _Compile_Get_FromCAddress_ToReg ( RAX, ( byte* ) & cpu->Rax ) ; // rax
     _Compile_Get_FromCAddress_ToReg ( RDX, ( byte* ) & cpu->Rdx ) ; // rdx

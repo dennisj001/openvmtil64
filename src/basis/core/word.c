@@ -14,26 +14,34 @@ _Word_Run ( Word * word )
 void
 Word_Run ( Word * word )
 {
-    if ( ! sigsetjmp ( _Context_->JmpBuf0, 0 ) )
+    //if ( ! sigsetjmp ( _Context_->JmpBuf0, 0 ) )
     {
         _Word_Run ( word ) ;
     }
-    else Dsp = _CfrTil_->SaveDsp ;
+    //else Dsp = _CfrTil_->SaveDsp ;
 }
 
 void
-Word_Eval0 ( Word * word )
+Word_SetCoding ( Word * word, byte * address )
+{
+    if ( ( word->CAttribute2 & ( SYNTACTIC | NOOP_WORD | NO_CODING ) ) || ( word->CAttribute & (DEBUG_WORD) )  || ( word->LAttribute & (W_COMMENT) ) ) word->Coding = 0 ;
+    else word->Coding = address ;
+}
+
+void
+_Word_Eval ( Word * word )
 {
     if ( word )
     {
-        word->Coding = Here ;
+        //word->Coding = Here ;
+        Word_SetCoding ( word, Here ) ;
         if ( ( word->CAttribute & IMMEDIATE ) || ( ! CompileMode ) )
         {
-            Word_Run ( word ) ;
+            _Word_Run ( word ) ;
         }
         else
         {
-            _Word_Compile ( word, 0 ) ;
+            _Word_Compile ( word ) ;
         }
     }
 }
@@ -43,16 +51,16 @@ _Word_Eval_Debug ( Word * word )
 {
     if ( word )
     {
-        word->Coding = Here ;
+        //word->Coding = Here ;
+        Word_SetCoding ( word, Here ) ;
         DEBUG_SETUP ( word ) ;
-        //if ( ! GetState ( word, STEPPED ) ) Word_Eval0 ( word ) ;
-        if ( ! GetState ( _Debugger_, DBG_STEPPED ) ) Word_Eval0 ( word ) ;
+        if ( ! GetState ( _Debugger_, DBG_STEPPED ) ) _Word_Eval ( word ) ;
         DEBUG_SHOW ;
     }
 }
 
 void
-_Word_Eval ( Word * word )
+Word_Eval ( Word * word )
 {
     if ( word )
     {
@@ -63,7 +71,7 @@ _Word_Eval ( Word * word )
         word->Coding = Here ;
         word->W_SC_WordIndex = _CfrTil_->SC_ScratchPadIndex ;
         if ( Is_DebugModeOn ) _Word_Eval_Debug ( word ) ;
-        else Word_Eval0 ( word ) ;
+        else _Word_Eval ( word ) ;
         //if ( word->CAttribute & DEBUG_WORD ) DefaultColors ; // reset colors after a debug word //?? have debug word do this - cleanup its own mess !!
         _CfrTil_SetStackPointerFromDsp ( _CfrTil_ ) ;
     }
@@ -76,7 +84,7 @@ _Word_Interpret ( Word * word )
 }
 
 void
-_Word_Compile ( Word * word, int8 wrapFlag )
+_Word_Compile ( Word * word )
 {
     if ( ! word->Definition )
     {
@@ -86,36 +94,10 @@ _Word_Compile ( Word * word, int8 wrapFlag )
     {
         _Compile_WordInline ( word ) ;
     }
-#if 0    
-    else if ( wrapFlag || GetState ( _Context_->Compiler0, COMPILER_WRAP_ON ) )
+    else
     {
-        ByteArray * svcs ;
-        Debugger * debugger = _Debugger_ ;
-        int8 showFlag = false ;
-        debugger->cs_Cpu->State = 0 ;
-        _CfrTil_->cs_Cpu->State = 0 ;
-        _Debugger_CpuState_CheckSave ( debugger ) ;
-        _CfrTil_CpuState_CheckSave ( ) ;
-        svcs = _Q_CodeByteArray ;
-        _ByteArray_ReInit ( debugger->StepInstructionBA ) ; // we are only compiling one insn here so clear our BA before each use
-        ByteArray_AllocateNew ( debugger->StepInstructionBA->BA_DataSize + sizeof ( ByteArray ), CODE ) ;
-        Set_CompilerSpace ( debugger->StepInstructionBA ) ; // now compile to this space
-        _Compile_Restore_Debugger_CpuState ( debugger, showFlag ) ; //&& ( _Q_->Verbosity >= 3 ) ) ; // restore our runtime state before the current insn
         Compile_Call ( ( byte* ) word->Definition ) ;
-        _Compile_Restore_C_CpuState ( _CfrTil_, showFlag ) ; //&& ( _Q_->Verbosity >= 3 ) ) ; // finally restore our c compiler cpu register state
-        _Compile_Return ( ) ;
-        Set_CompilerSpace ( svcs ) ; // restore compiler space pointer before "do it" in case "do it" calls the compiler
-        _Compile_PushReg ( DSP ) ;
-        _Compile_PushReg ( FP ) ;
-        Compile_Call ( ( byte* ) ( ( VoidFunction ) debugger->StepInstructionBA->BA_Data ) ) ;
-        _Debugger_Disassemble ( debugger, debugger->StepInstructionBA->BA_Data, 2 * K, 1 ) ;
-        _Compile_PopToReg ( FP ) ;
-        _Compile_PopToReg ( DSP ) ;
-        debugger->CopyRSP = 0 ; // we need this!! why ??
-        SetState ( _Context_->Compiler0, COMPILER_WRAP_ON, false ) ;
     }
-#endif    
-    else Compile_Call ( ( byte* ) word->Definition ) ;
 
 }
 

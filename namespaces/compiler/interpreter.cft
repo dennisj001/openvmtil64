@@ -2,7 +2,7 @@
 
 5 
 C
-: sp ; // stack pause ;
+: sp stack pause ;
 
 System Interpreter 
 // these #defines are a bunch of purposefully confusing looking early testing
@@ -40,7 +40,8 @@ testc1 ( | atoken aword )
 }
 //'testc1 find wdiss //pause 
 testc1 () ; //pause
-#if 0
+#if 1
+libc
 void
 interpret2 ( | atoken aword ) 
 {
@@ -78,7 +79,7 @@ c_syntaxOff sp
 : hi1 1 2 + p ;  
 : hey1 hi1 hi1 ; 
 : heey1 hey1 hey1 hey1 ;
-nl d: heey1 
+nl heey1 
 #endif
 
 i2halt

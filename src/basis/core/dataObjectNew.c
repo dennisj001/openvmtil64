@@ -140,7 +140,7 @@ _Class_Object_Init ( Word * word, Namespace * ns )
         Word * initWord = ( Word* ) _Stack_Pop ( nsstack ) ;
         DSP_Push ( ( int64 ) word->W_Object ) ;
         d0 ( CfrTil_PrintDataStack ( ) ) ;
-        _Word_Eval ( initWord ) ;
+        Word_Eval ( initWord ) ;
         d0 ( CfrTil_PrintDataStack ( ) ) ;
     }
     SetState ( _Debugger_, DEBUG_SHTL_OFF, false ) ;

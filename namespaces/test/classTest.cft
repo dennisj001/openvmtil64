@@ -49,7 +49,7 @@ DLLNode.size @ nl "DLLNode size = " prints Io.print nl
 "testNode" DLLNode new 
 testNode.AfterReference 1 =
 testNode.BeforeReference 2 =
-testNode.size @ dup p dump
+testNode testNode.size @ dup p dump
 DLLNode
 
 "DLList" class
@@ -153,7 +153,7 @@ scOff
 ' init find wdiss 
 "testClone" DLListClone new 
 "\nthis = " ps this hex p 
-"\nthis = " ps this @ hex p //pause
+"\nthis = " ps this hex p //pause
 
 testClone size @ dump
 decimal nl s "DLListClone size =" ps DLListClone size @ dup p nl 88 "Clone size" assert
@@ -161,7 +161,7 @@ testClone.TailNode.BeforeReference @ testClone "DLListClone init test : " assert
 // test 'this' to refer to 'this' in current namespace
 // d: this.TailNode.BeforeReference @ this "DLListClone init test2 : " assert
 
-"\nthis @ size @ p " ps this @ size @ p drop // sp // pause // for now we have to drop the 'this' pointer. TODO :: 'this' semantics have yet to be solidified
+"\nthis @ size @ p " ps this size @ p drop // sp // pause // for now we have to drop the 'this' pointer. TODO :: 'this' semantics have yet to be solidified
 "\nthis.size = " ps this.size @ p drop // sp //pause
 
 dbgOff

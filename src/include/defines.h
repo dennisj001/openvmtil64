@@ -284,10 +284,13 @@
 #define CATEGORY_EQUAL     ( (uint64) 1 << 63 )
 
 // CAttribute2
-#define R8_RETURN           ( (uint64) 1 << 0 ) 
+#define RAX_RETURN           ( (uint64) 1 << 0 ) 
 #define CATEGORY_SHIFT      ( (uint64) 1 << 1 ) 
 #define SOURCE_CODE_WORD    ( (uint64) 1 << 2 ) 
 #define TEMP_WORD           ( (uint64) 1 << 3 ) 
+#define NOOP_WORD           ( (uint64) 1 << 4 ) 
+#define SYNTACTIC           ( (uint64) 1 << 5 ) 
+#define NO_CODING           ( (uint64) 1 << 6 ) 
 
 // _CAttribute for interpreter word types - 4 bits/ 16 possibilities : N_WordAttribute bitfield
 #define WT_PREFIX                 1

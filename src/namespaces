@@ -18,6 +18,9 @@ optimizeOff inlineOff
 Root 
 : ' _tick ; immediate
 : find _find ; immediate
+'tick ' _tick find alias immediate
+'ndrop '_ndrop find alias immediate 
+
 "log" variable 
 "User" namespace 
 Io
@@ -35,7 +38,6 @@ Io
 : _logAppend "cfrTil.log" logAppend ;
 
 // aliases 
-// using pause
 Debug
 //"dbg" '_dbg find alias immediate debugWord
 "dbrk" ' <dbg> find alias debugWord
@@ -44,6 +46,8 @@ Debug
 'nt 'namespaceTreeWithWords find alias
 'dscOn 'dbgSourceCodeOn find alias
 'dscOff 'dbgSourceCodeOff find alias
+'scOn 'dscOn find alias
+'scOff 'dscOff find alias
 : v4 verbosity 4 = ;
 : v1 verbosity 1 = ;
 
@@ -105,7 +109,7 @@ Debug
 DebugFlag 0 =
 
 Compiler 
-// nb : .'"[] : these five characters - dot, tick, quote left bracket, right bracket - .'"[] - are character macros including the brackets they work at the char level in readline
+// nb :: .'"[] :: these five characters - dot, tick, quote left bracket, right bracket - .'"[] - are character macros including the brackets they work at the char level in readline
 // set up some traditional Forth words from internal primitives
 // core internal c defined words : begin _end token _tick _immediate definition compile constant variable alias compileModeOn wordInit wordAdd wordFinish
 //quote ' quote quote find alias _immediate
@@ -120,24 +124,17 @@ Compiler
 "xt@" { xt @ } word immediate // ' definition alias immediate
 "_semi" create { xt= wordFinish } xt= wordFinish 
 "semi" create { _end _semi } _semi 
-";" ' semi find alias immediate
-":" { compileModeOn sourceCodeInit token create begin } word // immediate // begin is not an immediate word
-//: word swap create swap _semi ;  //'word wordDisassemble pause
-: word ( name block ) name @ create block @ _semi ;  // works but it is 10 bytes more code
+";" ' semi find alias immediate syntactic
+: word swap create swap _semi ;  //'word wordDisassemble pause
+//: word ( name block ) name @ create block @ _semi ;  // works but it is 10 bytes more code
 'word find wdis //pause
+":" { compileModeOn sourceCodeInit token create begin } word // immediate // begin is not an immediate word
 : simple ( a b c ) a @ p b @ p c @ p ; 'simple find wdis 1 2 3 simple //pause
 
-"xt@" { xt @ } word immediate // ' definition alias immediate
-'tick ' _tick find alias immediate
-'ndrop '_ndrop find alias immediate 
-// : ' token _tick ; immediate
-// : ' token find ; immediate
-//'tick '_tick find alias immediate
 Class
 '_new 'new find alias prefix
 C
-"typedef" ' type find alias
-: ;; semi _prefix ; immediate
+: ;; semi _prefix ; immediate syntactic
 c_syntaxOn //using
 type int ; int.size = 4 ;
 type void ; void.size = 0 ;
@@ -368,7 +365,7 @@ sp
 : sh _sh ; prefix
 dbgOff
 dbgOn
-Root 'doScript 0 const
+Root 'doScript 1 const
 #if dbgOnVar @ 
 testCfrTil
 stringMacrosOff

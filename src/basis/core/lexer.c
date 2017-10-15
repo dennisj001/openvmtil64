@@ -110,7 +110,7 @@ _Lexer_ConsiderDebugAndCommentTokens ( byte * token, int64 evalFlag, int64 addFl
     if ( word && ( word->LAttribute & W_COMMENT ) )
     {
         word->W_StartCharRlIndex = _Lexer_->TokenStart_ReadLineIndex ;
-        Word_Eval0 ( word ) ;
+        _Word_Eval ( word ) ;
         return true ;
     }
     else if ( word && ( word->CAttribute & DEBUG_WORD ) )
@@ -829,18 +829,26 @@ Lexer_IsTokenReverseDotted ( Lexer * lexer )
 }
 
 Boolean
-Lexer_IsTokenForwardDotted ( Lexer * lexer )
+_Lexer_IsTokenForwardDotted ( Lexer * lexer, int64 end )
 {
     ReadLiner * rl = lexer->ReadLiner0 ;
-    int64 i, end = lexer->TokenEnd_ReadLineIndex ;
-    for ( i = end ; i < rl->MaxEndPosition ; i ++ )
+    int64 i, space ;
+    end = end ? end - 1 : lexer->TokenEnd_ReadLineIndex ;
+    for ( space = 0, i = end ; i < rl->MaxEndPosition ; i ++ )
     {
         if ( rl->InputLine [ i ] == '.' ) return true ;
         if ( rl->InputLine [ i ] == '[' ) return true ;
         if ( rl->InputLine [ i ] == '[' ) return true ;
-        if ( isgraph ( rl->InputLine [ i ] ) ) break ;
+        if ( rl->InputLine [ i ] == ' ' ) space ++ ;
+        if ( space && (isgraph ( rl->InputLine [ i ] ) ) ) break ;
     }
     return false ;
+}
+
+Boolean
+Lexer_IsTokenForwardDotted ( Lexer * lexer )
+{
+    return _Lexer_IsTokenForwardDotted ( lexer, 0 ) ;
 }
 
 #if 0

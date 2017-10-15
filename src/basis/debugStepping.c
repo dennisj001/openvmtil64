@@ -81,7 +81,14 @@ start:
             //if ( * debugger->DebugAddress == CALLI32 ) _Word_ShowSourceCode ( word ) ;
         }
 
-        if ( ( ! word ) || ( ! Debugger_CanWeStep ( debugger, word ) ) )//( jcAddress < ( byte* ) svcs->BA_Data ) || ( jcAddress > ( byte* ) svcs->bp_Last ) )
+        if ( ( debugger->Key == 'I' ) ) // force Into a subroution
+        {
+            _Printf ( ( byte* ) "\nforce calling (I)nto a subroutine : %s : .... :>", word ? ( char* ) c_gd ( word->Name ) : "" ) ;
+            //Compile_Call ( jcAddress ) ;
+            //newDebugAddress = debugger->DebugAddress + size ;
+            goto into ;
+        }
+        else if ( ( ! word ) || ( ! Debugger_CanWeStep ( debugger, word ) ) )//( jcAddress < ( byte* ) svcs->BA_Data ) || ( jcAddress > ( byte* ) svcs->bp_Last ) )
         {
             _Printf ( ( byte* ) "\ncalling thru - a non-native (C) subroutine : %s : .... :>", word ? ( char* ) c_gd ( word->Name ) : "" ) ;
             Compile_Call ( jcAddress ) ; // this will call jcAddress subroutine and return to our code to be compiled next
@@ -111,6 +118,7 @@ start:
         }
         else // step into the the jmp/call insn
         {
+            into :
             if ( word->CAttribute & ( ALIAS ) ) word = word->W_AliasOf ;
             if ( * debugger->DebugAddress == CALLI32 )
             {

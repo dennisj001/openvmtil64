@@ -30,6 +30,8 @@ _Namespace_Do_C_Type ( Namespace * ns )
                     SetState ( _Compiler_, C_COMBINATOR_PARSING, true ) ;
                     _Namespace_ActivateAsPrimary ( ns ) ;
                     Word * word = Word_New ( token1 ) ;
+                    word->Coding = Here ;
+                    _CfrTil_WordList_PushWord ( word ) ;
                     _DataStack_Push ( ( int64 ) word ) ; // token1 is the function name 
                     CfrTil_RightBracket ( ) ; //Set_CompileMode ( true ) ; //SetState ( _Context_->Compiler0, COMPILE_MODE, true ) ;
                     CfrTil_BeginBlock ( ) ;
@@ -130,7 +132,13 @@ _CfrTil_Do_ClassField ( Word * word )
     {
         Compiler_IncrementCurrentAccumulatedOffset ( compiler, word->Offset ) ;
     }
-#endif        
+#endif   
+#if 0    
+    if ( GetState ( cntx, C_SYNTAX ) && ( Is_LValue ( word ) ) )
+    {
+        compiler->LHS_Word = word ;
+    }
+#endif    
     if ( ( CompileMode ) || GetState ( compiler, LC_ARG_PARSING ) )
     {
 #if 0        
@@ -148,7 +156,8 @@ _CfrTil_Do_ClassField ( Word * word )
         //TOS += word->Offset ;
         if ( GetState ( cntx, C_SYNTAX ) && ( ! Is_LValue ( word ) ) && ( ! GetState ( _Context_, ADDRESS_OF_MODE ) ) )
         {
-            DSP_Push ( * ( int64* ) accumulatedAddress ) ; // C rvalue
+            //DSP_Push ( * ( int64* ) accumulatedAddress ) ; // C rvalue
+            TOS = ( * ( int64* ) accumulatedAddress ) ; // C rvalue
         }
         else
         {
@@ -171,7 +180,7 @@ CfrTil_Dot ( ) // .
         SetState ( cntx, CONTEXT_PARSING_QID, true ) ;
         d0 ( if ( Is_DebugModeOn ) Compiler_Show_WordList ( "\nCfrTil_Dot" ) ) ;
 
-        Word * word = Compiler_PreviousNonDebugWord ( - 1 ) ; // 0 : rem: we just popped the WordStack above
+        Word * word = Compiler_PreviousNonDebugWord ( 1 ) ; // 0 : rem: we just popped the WordStack above
         if ( word )
         {
             if ( word->CAttribute & NAMESPACE_TYPE )
@@ -181,7 +190,7 @@ CfrTil_Dot ( ) // .
             else
             {
                 cntx->Interpreter0->BaseObject = word ;
-                _DataObject_Run ( word ) ;
+                //_DataObject_Run ( word ) ;
             }
         }
     }
@@ -230,6 +239,7 @@ _Namespace_DoNamespace ( Namespace * ns, int64 immFlag )
     {
         Finder_SetQualifyingNamespace ( cntx->Finder0, ns ) ;
     }
+    cntx->Interpreter0->BaseObject = 0 ;
 }
 
 void
@@ -271,10 +281,8 @@ _Do_Variable ( Word * word )
     Context * cntx = _Context_ ;
     if ( GetState ( cntx, C_SYNTAX ) || GetState ( cntx->Compiler0, LC_ARG_PARSING ) )
     {
-        if ( Is_LValue ( word ) ) //_Context_->CurrentRunWord ) ) // word ) ) // ?? not sure exactly why this is necessary 
+        if ( Is_LValue ( word ) )
         {
-            //word = _Context_->CurrentRunWord ;
-            //if ( GetState ( cntx->Compiler0, DOING_C_TYPE ) ) _Compile_VarLitObj_LValue_To_Reg ( word, R8 ) ;
             cntx->Compiler0->LHS_Word = word ;
             word->Coding = Here ;
         }
@@ -309,7 +317,7 @@ _CfrTil_Do_Literal ( Word * word )
         else
         {
             Compile_ADDI ( REG, DSP, 0, sizeof (int64 ), 0 ) ;
-            _Compile_MoveImm_To_Mem ( DSP, ( int64 ) word->W_Value, CELL_SIZE ) ; 
+            _Compile_MoveImm_To_Mem ( DSP, ( int64 ) word->W_Value, CELL_SIZE ) ;
         }
 
     }
@@ -369,17 +377,21 @@ _CfrTil_Do_Variable ( Word * word )
     }
     else
     {
+
         if ( word->CAttribute & ( OBJECT | THIS ) )
         {
             if ( cntx->Compiler0->AccumulatedOffsetPointer )
             {
-                if ( GetState ( cntx, C_SYNTAX ) && ( ! Is_LValue ( word ) ) && ( Lexer_NextNonDelimiterChar ( cntx->Lexer0 ) != '.' ) )
+                if ( GetState ( cntx, C_SYNTAX ) )
                 {
-                    DSP_Push ( * ( int64* ) word->W_PtrToValue + word->AccumulatedOffset ) ;
+                    if ( ( ! Is_LValue ( word ) ) && ( Lexer_NextNonDelimiterChar ( cntx->Lexer0 ) != '.' ) )
+                    {
+                        DSP_Push ( * ( int64* ) word->W_PtrToValue + word->AccumulatedOffset ) ;
+                    }
+                    else DSP_Push ( word->W_PtrToValue + word->AccumulatedOffset ) ;
                 }
-                else DSP_Push ( word->W_PtrToValue + word->AccumulatedOffset ) ;
             }
-            else DSP_Push ( word->W_Value ) ; //*word->W_PtrToValue ) ;
+            else DSP_Push ( word->W_Value ) ;
         }
         else if ( word->CAttribute & NAMESPACE_VARIABLE )
         {
@@ -390,7 +402,11 @@ _CfrTil_Do_Variable ( Word * word )
                 else value = ( int64 ) * word->W_PtrToValue ;
             }
             else value = ( int64 ) word->W_PtrToValue ;
-            DSP_Push ( value ) ;
+            if ( cntx->Interpreter0->BaseObject )
+            {
+                TOS = value ;
+            }
+            else DSP_Push ( value ) ;
         }
     }
     //SetState ( _Context_, ADDRESS_OF_MODE, false ) ; // only good for one variable
@@ -446,10 +462,12 @@ _DataObject_Run ( Word * word )
     else if ( word->CAttribute & OBJECT_FIELD )
     {
         _CfrTil_Do_ClassField ( word ) ;
+        if ( ( ! Lexer_IsTokenForwardDotted ( cntx->Lexer0 ) ) && ( ! GetState ( cntx->Compiler0, LC_ARG_PARSING ) ) ) cntx->Interpreter0->BaseObject = 0 ;
     }
     else if ( word->CAttribute & ( NAMESPACE_VARIABLE | THIS | OBJECT | LOCAL_VARIABLE | PARAMETER_VARIABLE ) )
     {
         _CfrTil_Do_Variable ( word ) ;
+        if ( ( ! Lexer_IsTokenForwardDotted ( cntx->Lexer0 ) ) && ( ! GetState ( cntx->Compiler0, LC_ARG_PARSING ) ) ) cntx->Interpreter0->BaseObject = 0 ;
     }
     else if ( word->CAttribute & ( C_TYPE | C_CLASS ) )
     {
@@ -464,9 +482,11 @@ _DataObject_Run ( Word * word )
 void
 DataObject_Run ( )
 {
+    d0 ( Cpu_CheckRspForWordAlignment ( "DataObject_Run:Before" ) ) ;
     Word * word = _Context_->CurrentlyRunningWord ;
     DEBUG_SETUP ( word ) ;
     _DataObject_Run ( word ) ;
     DEBUG_SHOW ;
+    d0 ( Cpu_CheckRspForWordAlignment ( "DataObject_Run:After" ) ) ;
 }
 

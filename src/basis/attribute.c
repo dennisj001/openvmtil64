@@ -50,7 +50,7 @@ _Attribute_GetValue ( Attribute * attribute )
 }
 
 void
-CfrTil_Attribute_New ( )
+CfrTil_Type_New ( )
 {
     byte * name = ( byte * ) _DataStack_Pop ( ) ;
     int64 value = ( int64 ) _DataStack_Pop ( ) ;

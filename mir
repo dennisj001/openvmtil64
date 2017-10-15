@@ -9,5 +9,5 @@ ls -al ~/backup/archive/cfrtil.$1.tar.xz
 cd src
 make install_1
 cd ..
-cfrtil
+cfrtil64
 

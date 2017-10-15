@@ -44,7 +44,7 @@ Int User
 : oldL "namespaces/test/oldLisp.cft" include ;
 : lT lispTest ;
 : testX cST ;
-'doIA32 0 const
+'doIA32 1 const
 #if doIA32
 : basicT cT aT loT bT locT mT oT ia32 cntT lT fT sT sysT interpT ppT stT ;
 #else
@@ -88,8 +88,8 @@ System Combinators
 //"\ntest nested if 0 - wrong \n" ps pause
 #elif 1 
 //"\ntest nested elif 1 - correct \n" ps pause
-//{ doTest _TestDone_ @ not && } { basicT testX _TestDone_ ++ } if2  
-{ doTest _TestDone_ @ not && } { basicT _TestDone_ ++ } if2  
+{ doTest _TestDone_ @ not && } { basicT testX _TestDone_ ++ } if2  
+//{ doTest _TestDone_ @ not && } { basicT _TestDone_ ++ } if2  
 //#endif
 #elif 1
 "\ntest nested elif 1 - wrong \n" ps pause

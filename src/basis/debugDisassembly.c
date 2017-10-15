@@ -17,9 +17,9 @@ Debugger_Udis_GetInstructionSize ( Debugger * debugger )
 Boolean
 Debugger_ShowSourceCodeAtAddress ( Debugger * debugger, byte * address )
 {
-    if ( Compiling || (_Context_->CurrentlyRunningWord && _Context_->CurrentlyRunningWord->W_SC_WordList ))
+    if ( Compiling || ( _Context_->CurrentlyRunningWord && _Context_->CurrentlyRunningWord->W_SC_WordList ) )
     {
-        _Debugger_ShowSourceCodeAtAddress ( debugger, address ) ;
+        _Debugger_ShowDbgSourceCodeAtAddress ( debugger, address ) ;
         return true ;
     }
     return false ;
@@ -39,15 +39,6 @@ _Debugger_Disassemble ( Debugger * debugger, byte* address, int64 number, int64 
     return size ;
 }
 
-#if 0
-void
-Debugger_Disassemble ( Debugger * debugger, byte * format, byte * address, int64 cflag )
-{
-    _Printf ( ( byte* ) format, address ) ;
-    _Debugger_Disassemble ( debugger, address, Here - address, cflag ) ;
-}
-#endif
-
 void
 Debugger_Dis ( Debugger * debugger )
 {
@@ -66,9 +57,11 @@ Debugger_Dis ( Debugger * debugger )
     }
     else
     {
-        word = _Context_->CurrentlyRunningWord ;
+        //word = _Context_->CurrentlyRunningWord ;
         if ( word ) _Printf ( ( byte* ) "\nDisassembly of : %s.%s : has no code size! Disassembling accumulated ...", c_ud ( word->ContainingNamespace ? word->ContainingNamespace->Name : ( byte* ) "" ), c_gd ( word->Name ) ) ;
         Debugger_DisassembleAccumulated ( debugger ) ;
+        //SetState ( debugger, DBG_DISASM_ACC, false ) ;
+        //Debugger_DisassembleTotalAccumulated ( debugger ) ;
     }
 }
 
@@ -83,12 +76,10 @@ _Debugger_DisassembleWrittenCode ( Debugger * debugger )
     {
         if ( word && ( codeSize > 0 ) )
         {
-            //ConserveNewlines ;
             NamedByteArray * nba = Get_CompilerSpace ( )->OurNBA ;
-            byte * csName = nba ? ( byte * ) c_gd ( nba->NBA_Name ) : (byte*) "";
-            _Printf ( ( byte* ) "\nCode compiled to %s for word :> %s <: ...", csName, c_gd ( String_CB ( word->Name ) ) ) ;
+            byte * csName = nba ? ( byte * ) c_gd ( nba->NBA_Name ) : ( byte* ) "" ;
+            _Printf ( ( byte* ) "\nCode compiled to %s for word :> %s <: at %s", csName, c_gd ( String_CB ( word->Name ) ), Context_Location ( ) ) ;
             _Debugger_Disassemble ( debugger, debugger->PreHere, codeSize, word->CAttribute & ( CPRIMITIVE | DLSYM_WORD | DEBUG_WORD ) ? 1 : 0 ) ;
-            //debugger->PreHere = Here ;
         }
     }
 }
@@ -117,6 +108,5 @@ Debugger_DisassembleTotalAccumulated ( Debugger * debugger )
     }
     int64 size = Here - address ;
     _Debugger_Disassemble ( debugger, address, size, 0 ) ;
-    //_Printf ( ( byte* ) "\n" ) ;
 }
 

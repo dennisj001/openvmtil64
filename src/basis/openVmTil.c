@@ -1,6 +1,6 @@
 
 #include "../include/cfrtil.h"
-#define VERSION ((byte*) "0.823.304.000" ) // *.200 series is x86 ; the *.300 series is x64 : *300.600 series is with new x64 compiler
+#define VERSION ((byte*) "0.823.304.311" ) // *.200 series is x86 ; the *.300 series is x64 : *300.600 series is with new x64 compiler
 
 OpenVmTil * _Q_ ; // the only globally used variable except for two extern structures in primitives.c and a couple int64 in memSpace.c and 
 static struct termios SavedTerminalAttributes ; 

@@ -182,6 +182,7 @@ _CalculateRex ( int8 reg, int8 rm, int8 sib, int64 operandSize )
     _Compile_SUBI_DSP ( CELL ) 
 ;; 
 
+#if 0 // needs REX support
 Combinators
 d: :asm iax
     Compile_Stack_Pop_R8D ( ) 
@@ -252,6 +253,7 @@ Asm
     // _Compile_Move ( toRegOrMem mod reg rm disp | opCode ) 
     _Compile_Move ( REG, REG, dstReg @, srcReg @, 0 ) 
 ;;
-
+#endif
+ 
 infixOff
 2 + 7 assertStkChk // stack checking

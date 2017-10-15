@@ -150,7 +150,7 @@ a6.ar[2][2][1] dup hp 0x89 =
 a6x @ dup hp @ dup hp 0x89 _assert
 
 a6.ar[2][2][1] dup hp @ dup hp 0x89 _assert 
-"a6 : " ps location a6.size @ dump 
+"a6 : " ps location a6 a6.size @ dump 
 nl a6x @ @ hp 
 
 a6.ar[2][2][1] dup hp @ dup hp 0x89 _assert  

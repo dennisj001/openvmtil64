@@ -9,7 +9,6 @@ Interpreter_InterpretAToken ( Interpreter * interp, byte * token, int64 tokenSta
     {
         word = _Interpreter_TokenToWord ( interp, token ) ;
         _Interpreter_DoWord ( interp, word, tokenStartReadLineIndex ) ;
-        //if ( Compiling && ( word->CAttribute & ( LITERAL | CONSTANT ) ) && ( !( word->CAttribute & ( NAMESPACE_VARIABLE ) ) ) ) Word_Recycle ( word ) ;
     }
     else SetState ( _Context_->Lexer0, LEXER_END_OF_LINE, true ) ;
     return word ;
@@ -27,7 +26,7 @@ _Interpreter_DoWord_Default ( Interpreter * interp, Word * word )
 {
     word = Compiler_CopyDuplicatesAndPush ( word ) ;
     interp->w_Word = word ;
-    _Word_Eval ( word ) ;
+    Word_Eval ( word ) ;
     if ( IS_MORPHISM_TYPE ( word ) )
         SetState ( _Context_, ADDRESS_OF_MODE, false ) ;
     return word ; //let callee know about actual word evaled here after Compiler_CopyDuplicatesAndPush
@@ -52,6 +51,7 @@ _Interpreter_DoWord ( Interpreter * interp, Word * word, int64 tokenStartReadLin
         interp->w_Word = word ;
         if ( ( word->WAttribute == WT_INFIXABLE ) && ( GetState ( cntx, INFIX_MODE ) ) ) // nb. Interpreter must be in INFIX_MODE because it is effective for more than one word
         {
+            DEBUG_SETUP ( word ) ;
             Finder_SetNamedQualifyingNamespace ( cntx->Finder0, ( byte* ) "Infix" ) ;
             Interpreter_InterpretNextToken ( interp ) ;
             // then continue and interpret this 'word' - just one out of lexical order
@@ -59,12 +59,14 @@ _Interpreter_DoWord ( Interpreter * interp, Word * word, int64 tokenStartReadLin
         }
         else if ( ( word->WAttribute == WT_PREFIX ) || _Interpreter_IsWordPrefixing ( interp, word ) ) // with this almost any rpn function can be used prefix with a following '(' :: this checks for that condition
         {
+            DEBUG_SETUP ( word ) ;
             SetState ( cntx->Compiler0, DOING_A_PREFIX_WORD, true ) ;
             _Interpret_PrefixFunction_Until_RParen ( interp, word ) ;
             SetState ( cntx->Compiler0, DOING_A_PREFIX_WORD, false ) ;
         }
         else if ( word->WAttribute == WT_C_PREFIX_RTL_ARGS )
         {
+            DEBUG_SETUP ( word ) ;
             LC_CompileRun_C_ArgList ( word ) ;
         }
         else _Interpreter_DoWord_Default ( interp, word ) ; //  case WT_POSTFIX: case WT_INFIXABLE: // cf. also _Interpreter_SetupFor_MorphismWord

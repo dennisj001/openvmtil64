@@ -805,7 +805,7 @@ typedef struct _CfrTil
     uint64 * SaveDsp ;
     Cpu * cs_Cpu ;
     Cpu * cs_Cpu2 ;
-    block SaveCpuState, SaveCpu2State, RestoreCpuState, RestoreCpu2State, SetEaxToZero, RestoreSelectedCpuState, SaveSelectedCpuState ; //, SyncDspToEsi, SyncEsiToDsp ;
+    block CurrentBlock, SaveCpuState, SaveCpu2State, RestoreCpuState, RestoreCpu2State, CallCurrentBlock, RestoreSelectedCpuState, SaveSelectedCpuState ; //, SyncDspToEsi, SyncEsiToDsp ;
     Word * LastFinishedWord, *StoreWord, *PokeWord, *ScoOcCrw, *DebugWordListWord ; //, *DebugWordListWord ;
     byte ReadLine_CharacterTable [ 256 ] ;
     ReadLineFunction ReadLine_FunctionTable [ 24 ] ;
@@ -949,6 +949,7 @@ typedef struct
     const char * ccp_Name ;
     block blk_Definition ;
     uint64 ui64_CAttribute ;
+    uint64 ui64_CAttribute2 ;
     uint64 ui64_LAttribute ;
     const char *NameSpace ;
     const char * SuperNamespace ;

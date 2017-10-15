@@ -968,6 +968,8 @@ _Compile_Jcc ( int64 bindex, int64 overwriteFlag, int64 nz, int64 ttt )
 
 #if 0
 
+uint64 BlockCallAddress ;
+
 void
 _Compile_MoveToR8AndCall ( )
 {

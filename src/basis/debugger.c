@@ -108,7 +108,7 @@ _Debugger_InterpreterLoop ( Debugger * debugger )
 void
 _Debugger_PreSetup ( Debugger * debugger, Word * word, int8 forceFlag )
 {
-    if ( Is_DebugModeOn || forceFlag )
+    if ( ( Is_DebugModeOn && Is_DebugShowOn ) || forceFlag )
     {
         if ( forceFlag || GetState ( debugger, DBG_EVAL_AUTO_MODE ) || ( ! GetState ( debugger, DBG_AUTO_MODE | DBG_STEPPING ) ) )
         {
@@ -117,6 +117,7 @@ _Debugger_PreSetup ( Debugger * debugger, Word * word, int8 forceFlag )
             debugger->w_Word = word ;
             if ( word && word->Name[0] && ( forceFlag || ( word != debugger->LastSetupWord ) ) )
             {
+                if ( forceFlag ) debugger->LastShowWord = 0 ;
                 if ( ! word->Name ) word->Name = ( byte* ) "" ;
                 SetState ( debugger, DBG_COMPILE_MODE, CompileMode ) ;
                 SetState_TrueFalse ( debugger, DBG_ACTIVE | DBG_INFO | DBG_PROMPT, DBG_INTERPRET_LOOP_DONE | DBG_PRE_DONE | DBG_CONTINUE | DBG_STEPPING | DBG_STEPPED ) ;
@@ -344,6 +345,9 @@ Debugger_Eval ( Debugger * debugger )
     //SetState ( debugger, DBG_STEPPING, false ) ;
 
     if ( GetState ( debugger, DBG_AUTO_MODE ) ) SetState ( debugger, DBG_EVAL_AUTO_MODE, true ) ;
+    
+    d0 ( Cpu_CheckRspForWordAlignment ( "Debugger_Eval" ) ) ;
+
 }
 
 void
@@ -356,7 +360,8 @@ Debugger_SetupNextToken ( Debugger * debugger )
 void
 Debugger_Info ( Debugger * debugger )
 {
-    SetState ( debugger, DBG_INFO, true ) ;
+    if ( GetState ( debugger, DBG_STEPPING ) ) Debugger_Step ( debugger ) ;
+    else SetState ( debugger, DBG_INFO, true ) ;
 }
 
 void
@@ -438,7 +443,7 @@ void
 Debugger_Registers ( Debugger * debugger )
 {
     Debugger_CpuState_CheckSaveShow ( debugger ) ;
-    Debugger_UdisOneInstruction ( debugger, debugger->DebugAddress, ( byte* ) "\r\r", ( byte* ) "" ) ; // current insn
+    //Debugger_UdisOneInstruction ( debugger, debugger->DebugAddress, ( byte* ) "\r\r", ( byte* ) "" ) ; // current insn
 }
 
 void

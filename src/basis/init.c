@@ -8,7 +8,7 @@ _CfrTil_Init_SessionCore ( CfrTil * cfrTil, int64 cntxDelFlag, int64 promptFlag 
 {
     int64 i ;
     CfrTil_LogOff ( ) ;
-    CfrTil_SourceCodeOff () ;
+    CfrTil_DbgSourceCodeOff () ;
     _System_Init ( _Context_->System0 ) ;
     ReadLine_Init ( _Context_->ReadLiner0, _CfrTil_Key ) ;
     Lexer_Init ( _Context_->Lexer0, 0, 0, CONTEXT ) ;
@@ -114,7 +114,7 @@ _CfrTil_InitialAddWordToNamespace ( Word * word, byte * containingNamespaceName,
 }
 
 void
-_CfrTil_CPrimitiveNewAdd ( const char * name, block b, uint64 ctype, uint64 ltype, const char *nameSpace, const char * superNamespace )
+_CfrTil_CPrimitiveNewAdd ( const char * name, block b, uint64 ctype, uint64 ctype2, uint64 ltype, const char *nameSpace, const char * superNamespace )
 {
     Word * word = _Word_New ( ( byte* ) name, CPRIMITIVE | ctype, ltype, 1, 0, EXISTING ) ; //DICTIONARY ) ;
     _DObject_ValueDefinition_Init ( word, ( int64 ) b, BLOCK, 0, 0 ) ;
@@ -123,6 +123,7 @@ _CfrTil_CPrimitiveNewAdd ( const char * name, block b, uint64 ctype, uint64 ltyp
     else if ( ctype & PREFIX ) word->WAttribute = WT_PREFIX ;
     else if ( ctype & C_PREFIX_RTL_ARGS ) word->WAttribute = WT_C_PREFIX_RTL_ARGS ;
     else word->WAttribute = WT_POSTFIX ;
+    word->CAttribute2 = ctype2 ;
 }
 
 void
@@ -132,7 +133,7 @@ CfrTil_AddCPrimitives ( )
     for ( i = 0 ; CPrimitives [ i ].ccp_Name ; i ++ )
     {
         CPrimitive p = CPrimitives [ i ] ;
-        _CfrTil_CPrimitiveNewAdd ( p.ccp_Name, p.blk_Definition, p.ui64_CAttribute, p.ui64_LAttribute, ( char* ) p.NameSpace, ( char* ) p.SuperNamespace ) ;
+        _CfrTil_CPrimitiveNewAdd ( p.ccp_Name, p.blk_Definition, p.ui64_CAttribute, p.ui64_CAttribute2, p.ui64_LAttribute, ( char* ) p.NameSpace, ( char* ) p.SuperNamespace ) ;
     }
 }
 
@@ -198,20 +199,10 @@ CfrTil_MachineCodePrimitive_AddWords ( CfrTil * cfrTil )
             functionArg = ( int64 ) cfrTil->cs_Cpu ;
             callHook = & cfrTil->SaveSelectedCpuState ;
         }
-#if 0       
-        else if ( ( String_Equal ( p.ccp_Name, "syncDspToEsi" ) ) && ( String_Equal ( p.NameSpace, "System" ) ) )
-        {
-            callHook = & cfrTil->SyncDspToEsi ;
-        }
-        else if ( ( String_Equal ( p.ccp_Name, "syncEsiToDsp" ) ) && ( String_Equal ( p.NameSpace, "System" ) ) )
-        {
-            callHook = & cfrTil->SyncEsiToDsp ;
-        }
-#endif        
-        else if ( ( String_Equal ( p.ccp_Name, "setEaxToZero" ) ) && ( String_Equal ( p.NameSpace, "System" ) ) )
+        else if ( ( String_Equal ( p.ccp_Name, "callCurrentBlock" ) ) && ( String_Equal ( p.NameSpace, "System" ) ) )
         {
             //functionArg = ( int64 ) BlockCallAddress ;
-            callHook = & cfrTil->SetEaxToZero ;
+            callHook = & cfrTil->CallCurrentBlock ;
         }
         else
         {

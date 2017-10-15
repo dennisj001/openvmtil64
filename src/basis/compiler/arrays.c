@@ -78,10 +78,11 @@ Compile_ArrayDimensionOffset ( Word * word, int64 dimSize, int64 objSize )
 int64
 Do_NextArrayWordToken ( Word * word, byte * token, Word * arrayBaseObject, int64 objSize, int64 saveCompileMode, int64 *variableFlag )
 {
-    Interpreter * interp = _Context_->Interpreter0 ;
+    Context * cntx = _Context_ ;
+    Interpreter * interp = cntx->Interpreter0 ;
     Word * baseObject = interp->BaseObject ;
-    Compiler *compiler = _Context_->Compiler0 ;
-    int64 arrayIndex, increment ;
+    Compiler *compiler = cntx->Compiler0 ;
+    int64 arrayIndex, increment, value ;
     if ( token [0] == '[' ) // '[' == an "array begin"
     {
         *variableFlag = _CheckArrayDimensionForVariables_And_UpdateCompilerState ( ) ;
@@ -96,7 +97,7 @@ Do_NextArrayWordToken ( Word * word, byte * token, Word * arrayBaseObject, int64
             dimSize *= arrayBaseObject->ArrayDimensions [ dimNumber ] ; // the parser created and populated this array in _CfrTil_Parse_ClassStructure 
         }
         compiler->ArrayEnds ++ ;
-        if ( *variableFlag ) Compile_ArrayDimensionOffset ( _Context_->CurrentlyRunningWord, dimSize, objSize ) ;
+        if ( *variableFlag ) Compile_ArrayDimensionOffset ( cntx->CurrentlyRunningWord, dimSize, objSize ) ;
         else
         {
             // 'little endian' arrays (to maybe coin a term) : first index refers to lowest addresses
@@ -104,9 +105,21 @@ Do_NextArrayWordToken ( Word * word, byte * token, Word * arrayBaseObject, int64
             arrayIndex = _DataStack_Pop ( ) ;
             increment = arrayIndex * dimSize * objSize ; // keep a running total of 
             Compiler_IncrementCurrentAccumulatedOffset ( compiler, increment ) ;
+#if 1            
             if ( ! CompileMode ) _DataStack_SetTop ( _DataStack_GetTop ( ) + increment ) ; // after each dimension : in the end we have one lvalue remaining on the stack
+#else            
+            if ( ! CompileMode )
+            {
+                if ( ! Lexer_IsTokenForwardDotted ( cntx->Lexer0 ) ) 
+                {
+                    value = _DataStack_Pop ( ) + increment ;
+                }
+                else value = _DataStack_GetTop ( ) + increment ;
+                _DataStack_SetTop ( value ) ; // after each dimension : in the end we have one lvalue remaining on the stack
+            }
+#endif                
         }
-        if ( _Context_StrCmpNextToken ( _Context_, ( byte* ) "[" ) )
+        if ( _Context_StrCmpNextToken ( cntx, ( byte* ) "[" ) )
         {
             return 1 ;
         }
@@ -123,7 +136,7 @@ Do_NextArrayWordToken ( Word * word, byte * token, Word * arrayBaseObject, int64
         _Interpreter_DoWord ( interp, word, - 1 ) ;
     }
     else Interpreter_InterpretAToken ( interp, token, - 1 ) ;
-    if ( word && ( ! CompileMode ) ) _WordList_Pop ( _Context_->Compiler0->WordList, 0 ) ; // pop all tokens interpreted between '[' and ']'
+    if ( word && ( ! CompileMode ) ) _WordList_Pop ( cntx->Compiler0->WordList, 0 ) ; // pop all tokens interpreted between '[' and ']'
     Set_CompileMode ( saveCompileMode ) ;
     SetState ( compiler, COMPILE_MODE, saveCompileMode ) ;
     return 0 ;
@@ -132,21 +145,22 @@ Do_NextArrayWordToken ( Word * word, byte * token, Word * arrayBaseObject, int64
 void
 CfrTil_ArrayBegin ( void )
 {
-    Interpreter * interp = _Context_->Interpreter0 ;
+    Context * cntx = _Context_ ;
+    Interpreter * interp = cntx->Interpreter0 ;
     Word * baseObject = interp->BaseObject ;
     if ( baseObject )
     {
         Word * arrayBaseObject = 0 ;
         Word * word = 0 ; // word is used in DEBUG_*
-        Compiler *compiler = _Context_->Compiler0 ;
-        Lexer * lexer = _Context_->Lexer0 ;
+        Compiler *compiler = cntx->Compiler0 ;
+        Lexer * lexer = cntx->Lexer0 ;
         byte * token = lexer->OriginalToken ;
         int64 objSize = 0, increment = 0, variableFlag ;
         int64 saveCompileMode = GetState ( compiler, COMPILE_MODE ) ;
 
         arrayBaseObject = interp->LastWord ;
         if ( ! arrayBaseObject->ArrayDimensions ) CfrTil_Exception ( ARRAY_DIMENSION_ERROR, QUIT ) ;
-        if ( interp->CurrentObjectNamespace ) objSize = interp->CurrentObjectNamespace->Size ; //_CfrTil_VariableValueGet ( _Context_->Interpreter0->CurrentClassField, ( byte* ) "size" ) ; 
+        if ( interp->CurrentObjectNamespace ) objSize = interp->CurrentObjectNamespace->Size ; //_CfrTil_VariableValueGet ( cntx->Interpreter0->CurrentClassField, ( byte* ) "size" ) ; 
         if ( ! objSize )
         {
             CfrTil_Exception ( OBJECT_SIZE_ERROR, QUIT ) ;
@@ -161,12 +175,12 @@ CfrTil_ArrayBegin ( void )
         }
 #endif            
         variableFlag = _CheckArrayDimensionForVariables_And_UpdateCompilerState ( ) ;
-        _WordList_Pop ( _Context_->Compiler0->WordList, 0 ) ; // pop the initial '['
+        _WordList_Pop ( cntx->Compiler0->WordList, 0 ) ; // pop the initial '['
         do
         {
             token = Lexer_ReadToken ( lexer ) ;
-            word = Finder_Word_FindUsing ( _Context_->Finder0, token, 0 ) ;
-            if ( word && ( ! GetState ( _Context_->Compiler0, LC_ARG_PARSING ) ) ) word->W_StartCharRlIndex = _Context_->Lexer0->TokenStart_ReadLineIndex ;
+            word = Finder_Word_FindUsing ( cntx->Finder0, token, 0 ) ;
+            if ( word && ( ! GetState ( cntx->Compiler0, LC_ARG_PARSING ) ) ) word->W_StartCharRlIndex = cntx->Lexer0->TokenStart_ReadLineIndex ;
             DEBUG_SETUP ( word ) ;
             if ( Do_NextArrayWordToken ( word, token, arrayBaseObject, objSize, saveCompileMode, &variableFlag ) ) break ;
             DEBUG_SHOW ;
@@ -176,7 +190,7 @@ CfrTil_ArrayBegin ( void )
         compiler->ArrayEnds = 0 ; // reset for next array word in the current word being compiled
         if ( CompileMode )
         {
-            if ( ! variableFlag ) 
+            if ( ! variableFlag )
             {
                 SetHere ( baseObject->Coding ) ;
                 _Debugger_->StartHere = Here ; // for Debugger_DisassembleAccumulated
@@ -186,6 +200,7 @@ CfrTil_ArrayBegin ( void )
             }
             else SetState ( baseObject, OPTIMIZE_OFF, true ) ;
         }
+        if ( (! Lexer_IsTokenForwardDotted ( cntx->Lexer0 )) && ( !GetState ( cntx->Compiler0, LC_ARG_PARSING )) ) cntx->Interpreter0->BaseObject = 0 ;
         DEBUG_SHOW ;
         SetState ( compiler, COMPILE_MODE, saveCompileMode ) ;
     }

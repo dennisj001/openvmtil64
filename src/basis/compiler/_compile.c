@@ -13,13 +13,30 @@ Compile_DataStack_PopAndCall ( void )
     Compile_Pop_ToAcc_AndCall ( DSP ) ;
 }
 
+void
+Compile_Call_From_C_Address ( uint64 bptr )
+{
+    _Compile_Get_FromCAddress_ToReg ( ACC, ( byte* ) bptr ) ;
+    //_Compile_MoveImm_To_Reg ( ACC, ( uint64 ) bptr, CELL_SIZE ) ;
+    _Compile_Call_Acc ( ) ;
+
+}
+
+void
+Compile_Call_CurrentBlock ()
+{
+    Compile_Call_From_C_Address ( (uint64) &_CfrTil_->CurrentBlock ) ;
+}
+
 #if 0
+
 void
 Compile_SetEaxToZero ( void )
 {
     _Compile_MoveImm_To_Reg ( RAX, 0, CELL ) ; // for printf ?? others //System V ABI : "%rax is used to indicate the number of vector arguments passed to a function requiring a variable number of arguments"
 }
 #endif
+
 // >R - Rsp to
 
 void
@@ -129,6 +146,7 @@ _Compile_LocalOrStackVar_RValue_To_Reg ( Word * word, int64 reg )
     {
         _Compile_Move_Literal_Immediate_To_Reg ( reg, ( int64 ) word->W_PtrToValue ) ;
         _Compile_Move_Rm_To_Reg ( reg, reg, 0 ) ;
+        //_Compile_Move_Literal_Immediate_To_Reg ( reg, ( int64 ) word->W_Value ) ;
     }
 }
 
@@ -172,10 +190,19 @@ _Compile_GetVarLitObj_RValue_To_Reg ( Word * word, int64 reg )
     {
         _Compile_Move_Literal_Immediate_To_Reg ( reg, ( int64 ) word->W_PtrToValue ) ;
         _Compile_Move_Rm_To_Reg ( reg, reg, 0 ) ;
+        //_Compile_Move_Literal_Immediate_To_Reg ( reg, ( int64 ) word->W_Value ) ;
     }
-    else if ( word->CAttribute & ( LITERAL | CONSTANT | OBJECT | THIS ) )
+    else if ( word->CAttribute & ( LITERAL | CONSTANT ) )
     {
+        //_Compile_Move_Literal_Immediate_To_Reg ( reg, ( int64 ) word->W_PtrToValue ) ;
+        //_Compile_Move_Rm_To_Reg ( reg, reg, 0 ) ;
         _Compile_Move_Literal_Immediate_To_Reg ( reg, ( int64 ) word->W_Value ) ;
+    }
+    else if ( word->CAttribute & ( OBJECT | THIS ) )
+    {
+        _Compile_Move_Literal_Immediate_To_Reg ( reg, ( int64 ) word->W_PtrToValue ) ;
+        _Compile_Move_Rm_To_Reg ( reg, reg, 0 ) ;
+        //_Compile_Move_Literal_Immediate_To_Reg ( reg, ( int64 ) word->W_Value ) ;
     }
     else SyntaxError ( QUIT ) ;
     if ( word->CAttribute & ( OBJECT | THIS ) )

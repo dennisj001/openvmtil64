@@ -8,7 +8,7 @@ CfrTil_Colon ( )
     SetState ( _Context_->Compiler0, COMPILE_MODE, true ) ;
     CfrTil_SourceCode_Init ( ) ;
     CfrTil_Token ( ) ;
-    CfrTil_Word_New ( ) ;
+    CfrTil_Word_Create ( ) ;
     CfrTil_BeginBlock ( ) ;
 }
 
@@ -32,7 +32,7 @@ void
 CfrTil_SourceCodeCompileOff ( )
 {
     //SetState ( _CfrTil_, SOURCE_CODE_MODE, false ) ;
-    _CfrTil_DebugSourceCodeCompileOff ( ) ;
+    _CfrTil_DbgSourceCodeCompileOff ( ) ;
     if ( ! GetState ( _Context_, C_SYNTAX ) ) CfrTil_SemiColon ( ) ;
 }
 
@@ -104,10 +104,10 @@ Word_CodeSize ( )
 }
 
 void
-Word_Eval ( )
+CfrTil_Word_Eval ( )
 {
     Word * word = ( Word* ) _DataStack_Pop ( ) ;
-    _Word_Eval ( word ) ;
+    Word_Eval ( word ) ;
 }
 
 void
@@ -137,12 +137,13 @@ Word_Add ( )
 // forth : "create"
 
 void
-CfrTil_Word_New ( )
+CfrTil_Word_Create ( )
 {
     byte * name = ( byte* ) _DataStack_Pop ( ) ;
-    Word * word =  Word_New ( name ) ;
+    Word * word = Word_New ( name ) ;
+    //word->Coding = Here ;
+    //_CfrTil_WordList_PushWord ( word ) ;
     _DataStack_Push ( ( int64 ) word ) ;
-    //CfrTil_SourceCode_SetDebugWordList ( word ) ;
 }
 
 // ( token block -- word )
@@ -164,12 +165,14 @@ CfrTil_Alias ( )
     _CfrTil_Alias ( word, name ) ;
 }
 #if 0
+
 void
 CfrTil_Eval_C_Rtl_ArgList ( ) // C : x86 : ABI = 32 : protocol : right to left arguments from a list pushed on the stack
 {
     LC_CompileRun_C_ArgList ( ( Word * ) _DataStack_Pop ( ) ) ;
 }
 #endif
+
 void
 CfrTil_TextMacro ( )
 {
@@ -213,6 +216,12 @@ void
 CfrTil_Immediate ( void )
 {
     if ( _CfrTil_->LastFinishedWord ) _CfrTil_->LastFinishedWord->CAttribute |= IMMEDIATE ;
+}
+
+void
+CfrTil_Syntactic ( void )
+{
+    if ( _CfrTil_->LastFinishedWord ) _CfrTil_->LastFinishedWord->CAttribute2 |= SYNTACTIC ;
 }
 
 void
@@ -279,12 +288,12 @@ CfrTil_Void_Return ( void )
 }
 
 void
-CfrTil_R8_Return ( void )
+CfrTil_RAX_Return ( void )
 {
     if ( _CfrTil_->LastFinishedWord )
     {
         _CfrTil_->LastFinishedWord->CAttribute &= ~ C_RETURN ;
-        _CfrTil_->LastFinishedWord->CAttribute2 |= R8_RETURN ;
+        _CfrTil_->LastFinishedWord->CAttribute2 |= RAX_RETURN ;
     }
 }
 

@@ -446,7 +446,7 @@ next:
 void
 Debugger_ShowInfo ( Debugger * debugger, byte * prompt, int64 signal )
 {
-    if ( ( ! debugger->w_Word ) || debugger->w_Word != debugger->LastShowWord )
+    if ( ( ! debugger->w_Word ) || debugger->w_Word != debugger->LastShowWord || debugger->w_Word->WAttribute == WT_C_PREFIX_RTL_ARGS )
     {
         Context * cntx = _Context_ ;
         int64 sif = 0 ;
@@ -472,7 +472,7 @@ Debugger_ShowInfo ( Debugger * debugger, byte * prompt, int64 signal )
             //if ( _Q_->RestartCondition && (_Q_->RestartCondition < INITIAL_START) ) 
             Debugger_UdisOneInstruction ( debugger, debugger->DebugAddress, ( byte* ) "", ( byte* ) "" ) ; // the next instruction
         }
-        if ( ( ! sif ) && ( ! GetState ( debugger, DBG_STEPPING ) ) && ( GetState ( debugger, DBG_INFO ) ) ) _CfrTil_ShowInfo ( debugger, prompt, signal, 0 ) ;
+        if ( ( ! sif ) && ( ! GetState ( debugger, DBG_STEPPING ) ) && ( GetState ( debugger, DBG_INFO ) ) ) _CfrTil_ShowInfo ( debugger, prompt, signal, 1 ) ;
 
         if ( prompt == _Q_->ExceptionMessage ) _Q_->ExceptionMessage = 0 ;
     }

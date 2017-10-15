@@ -82,8 +82,8 @@ static : include/prototypes.h $(OBJECTS)
 cfrtil-gdb : CFLAGS = $(CFLAGS_CORE) -ggdb 
 cfrtil-gdb : include/prototypes.h $(OBJECTS) 
 	$(CC) $(CFLAGS) $(OBJECTS) -o cfrtil-gdb $(LIBS)
-	strip -o cfrtil cfrtil-gdb
-	mv cfrtil ../bin/
+	strip -o cfrtil64 cfrtil-gdb
+	mv cfrtil64 ../bin/cfrtil64
 
 cfrtilo : $(OBJECTS)
 	$(CC) $(CFLAGS) $(OBJECTS) -o $(OUT) $(LIBS)
@@ -274,7 +274,7 @@ _install : # we are in openvmtil directory
 	-sudo cp ../.init.cft /usr/local/lib/cfrTil
 	-sudo cp -r namespaces /usr/local/lib/cfrTil
 	-sudo cp lib/lib*.* /usr/lib
-	-sudo cp bin/cfrtil /usr/local/bin/cfrtil
+	-sudo cp bin/cfrtil64 /usr/local/bin/cfrtil64
 #	-sudo chown dennisj /usr/local/bin/cfrtil
 	-sudo ldconfig
 
@@ -307,10 +307,10 @@ install_1 :
 	ls -l /usr/local/bin/cfrtil*
 	
 run :
-	cfrtil
+	cfrtil64
 
 runLocal :
-	./cfrtil
+	./bin/cfrtil64
 
 #	as -adhls=vm.list -o stack.o vm.s
 # DO NOT DELETE

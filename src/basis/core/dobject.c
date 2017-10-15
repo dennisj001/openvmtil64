@@ -95,16 +95,19 @@ _DObject_ValueDefinition_Init ( Word * word, uint64 value, uint64 funcType, byte
         SetState ( _CfrTil_, DEBUG_SOURCE_CODE_MODE, false ) ;
         //if ( Compiling ) 
         Compiler_SetCompilingSpace_MakeSureOfRoom ( "ObjectSpace" ) ;
+        d0 ( Cpu_CheckRspForWordAlignment ( "_DObject_ValueDefinition_Init:Before" ) ) ; //SetHere ((byte*) (((uint64) (Here + 0x8)) & ( uint64 ) 0xfffffffffffffff0)) ;
+        //if ( (uint64) Here & (uint64) 0x8 )  SetHere (Here + 0x8) ;
         word->Coding = Here ;
         word->CodeStart = Here ;
-        word->Definition = ( block ) Here ;
+        word->Definition = ( block ) Here ; //(((uint64) (Here + 0x8)) & ( uint64 ) 0xfffffffffffffff0) ;
         if ( arg ) _DObject_C_StartupCompiledWords_DefInit ( function, arg ) ;
-        else Compile_Call ( ( byte* ) DataObject_Run ) ; //Compile_Call_ToAddressThruReg ( ( byte* ) DataObject_Run, R8 ) ;
+        else Compile_Call ( ( byte* ) DataObject_Run ) ;
         _Compile_Return ( ) ;
-        d0 ( _Debugger_Disassemble ( _Debugger_, (byte*) word->Definition, 32, 1 ) ) ;
+        d0 ( _Debugger_Disassemble ( _Debugger_, ( byte* ) word->Definition, 32, 1 ) ) ;
         word->S_CodeSize = Here - word->CodeStart ; // for use by inline
         Set_CompilerSpace ( svcs ) ;
         SetState ( _CfrTil_, DEBUG_SOURCE_CODE_MODE, sscm ) ;
+        d0 ( Cpu_CheckRspForWordAlignment ( "_DObject_ValueDefinition_Init:After" ) ) ; //SetHere ((byte*) (((uint64) (Here + 0x8)) & ( uint64 ) 0xfffffffffffffff0)) ;
     }
 }
 
@@ -141,7 +144,7 @@ _DObject_Init ( Word * word, uint64 value, uint64 ftype, byte * function, int64 
 // remember : Word = Namespace = DObject has a s_Symbol
 
 Word *
-_DObject_New ( byte * name, uint64 value, uint64 ctype, uint64 ltype, uint64 ftype, byte * function, int64 arg, int8 addToInNs, Namespace * addToNs, uint64 allocType )
+_DObject_New ( byte * name, uint64 value, uint64 ctype, uint64 ltype, uint64 ftype, byte * function, int64 arg, int64 addToInNs, Namespace * addToNs, uint64 allocType )
 {
     Word * word = _Word_New ( name, ctype, ltype, addToInNs, addToNs, allocType ) ; //( addToInNs || addToNs ) ? DICTIONARY : allocType ) ;
     _DObject_Init ( word, value, ftype, function, arg ) ;

@@ -1,17 +1,38 @@
 #include "../../include/cfrtil.h"
 
-uint64 BlockCallAddress ;
+#if 0
+void
+Cpu_CheckRspForWordAlignment ( byte * prefix )
+{
+    //d1 (
+    if ( _CfrTil_->SaveSelectedCpuState )
+    {
+        _CfrTil_->SaveSelectedCpuState ( ) ;
+        if ( ( uint64 ) _CfrTil_->cs_Cpu->Rsp & ( uint64 ) 0x7 )
+            _Printf ( ( byte* ) "\nUnaligned :: %s : Rsp = %lx : Word = \'%s\' at %s", prefix, _CfrTil_->cs_Cpu->Rsp, _Context_->CurrentlyRunningWord ? _Context_->CurrentlyRunningWord->Name : ( byte* ) "", Context_Location ( ) ) ; //= (uint64*) ((uint64) _CfrTil_->cs_Cpu->Rsp & ( uint64 ) 0xfffffffffffffff0) ;
+        else _Printf ( ( byte* ) "\nAligned  ::  %s : Rsp = %lx : Word = \'%s\' at %s", prefix, _CfrTil_->cs_Cpu->Rsp, _Context_->CurrentlyRunningWord ? _Context_->CurrentlyRunningWord->Name : ( byte* ) "", Context_Location ( ) ) ; //= (uint64*) ((uint64) _CfrTil_->cs_Cpu->Rsp & ( uint64 ) 0xfffffffffffffff0) ;
+    }
+    //    ) ;
+}
+#endif
 
 void
-Byte_PtrCall ( byte * ptr )
+Byte_PtrCall ( byte * bptr )
 {
-    if ( ptr ) ( ( block ) ptr ) ( ) ;
+    if ( bptr )
+    {
+        ( ( block ) bptr ) ( ) ;
+        //_CfrTil_->CurrentBlock = (block) bptr ;
+        //_CfrTil_->CallCurrentBlock () ;
+    }
 }
 
 void
 _Block_Eval ( block block )
 {
+    d0 ( Cpu_CheckRspForWordAlignment ( "_Block_Eval:Before" ) ) ;
     Byte_PtrCall ( ( byte * ) block ) ;
+    d0 ( Cpu_CheckRspForWordAlignment ( "_Block_Eval:After" ) ) ;
 }
 
 void
@@ -25,7 +46,7 @@ _Block_Copy ( byte * srcAddress, int64 bsize )
     {
         isize = _Udis_GetInstructionSize ( ud, srcAddress ) ;
         left -= isize ;
-        _CfrTil_AdjustSourceCodeAddress ( srcAddress, Here ) ;
+        _CfrTil_AdjustDbgSourceCodeAddress ( srcAddress, Here ) ;
         if ( * srcAddress == _RET )
         {
             if ( left && ( ( * srcAddress + 1 ) != NOOP ) ) //  noop from our logic overwrite
@@ -52,7 +73,7 @@ _Block_Copy ( byte * srcAddress, int64 bsize )
                 if ( word )
                 {
                     //_CfrTil_AdjustSourceCodeAddress ( jcAddress, Here ) ;
-                    _Word_Compile ( word, 0 ) ;
+                    _Word_Compile ( word ) ;
                     continue ;
                 }
                 //else (drop to) _CompileN ( srcAddress, isize )

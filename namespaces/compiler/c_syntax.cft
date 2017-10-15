@@ -1,5 +1,7 @@
 
 5 
+User
+: sp stack pause ;
 location
 //dbgOn 
 //verbosity 4 =
@@ -10,39 +12,34 @@ optimizeOn inlineOn
 System Interpreter Combinators C C_Combinators
 C String
 "Dlsym" namespace Dlsym "libc" namespace libc
-#if 0 //Zenfone2 @ not
-//'C notUsing
-"libc" namespace
-libc
-dlsym: strcmp /lib/libc.so.6 ;
-dlsym: strcat /lib/libc.so.6 ; void_return
-dlsym: memset /lib/libc.so.6 ; void_return
-dlsym: sprintf /lib/libc.so.6 ; void_return
-dlsym: printf /lib/libc.so.6 ; void_return
+#if 1 //Zenfone2 @ not
 libc.printf ("\nhello\n") //pause
 #endif
 C
 User
-//: sp sl pause ;
 c_syntaxOn
+libc
 #if 1
 typedef _CObj
 {
-    int hi ;
+    int64 hi ;
     char chars [ 32 ] ;
-    int hey ;
-    int heey2 ;
+    int64 hey ;
+    int64 heey2 ;
     char chars2 [ 32 ] ;
     int64 heey ;
-    int heey1 ;
+    int64 heey1 ;
 } cobj, CObj ;
+Class
 "CObj.size =" ps p ( CObj.size ) ;
 "chey" CObj new 
 CObj
 chey.hi = 1234 ;
 chey.chars [2] = 255 ;
-//chey.heey = #x123456789abcdef ; // doesn't work : still 32 bit limited ints
-chey.heey1 = #x12345678 ; 
+chey.heey = #x0123456789abcdef ; // doesn't work : still 32 bit limited ints
+dump ( chey, chey.size ) ;
+chey chey.size dump
+chey.heey1 = #x12345678 ;
 #if 1
 chey.heey2 = chey.heey1 ; // #x12345678 ; 
 chey.hey = chey.heey2 ; // #x12345678 ;
@@ -54,7 +51,7 @@ chey.chars [23] = 255 ;
 chey.chars [18] = #b10110 ; // #x16
 chey.hey = #x12345678 ;
 dump ( chey, cobj.size ) ; 
-sp
+
 p ( cobj.size ) ; 
 ' chey hex p
 //logOn sl using
@@ -66,15 +63,17 @@ var ( "x7" ) ;
 x7 = &chey.chars [ 18 ] ;
 sprintf ( x7, "%s", "\n\thoot" ) ;
 printf ( "%s", x7 ) ;
-//pause
 
-sprintf ( &chey.chars, "%s", "hoot" ) ;
+sprintf ( &chey.chars, "%s", "well" ) ;
 dump ( &chey, cobj.size ) ; 
-sprintf ( &chey.chars [ 24 ], "%s", "hoot" ) ;
+sprintf ( &chey.chars [ 24 ], "%s", "well" ) ;
+dump ( &chey, cobj.size ) ; 
+
 printf ( "\n\t%s\n", &chey.chars [ 24 ] ) ;
 printf ( "\n\t%s\n", "hoot" ) ; //&chey.chars [ 24 ] ) ;
 dump ( &chey, cobj.size ) ; // add '&' within parentheses for lvalue
-//scOn
+
+scOn
 void
 chi ( chey0, d | a b c )
 {
@@ -83,27 +82,27 @@ chi ( chey0, d | a b c )
     b = c + 2 ;
     a = b + c ;
     nl
-    p ( c ) ; c @ 3 "c should be 3" assert // 3
+    p ( c ) ; d: c @ 3 "c should be 3" assert // 3
     p ( b ) ; b @ 5 "b should be 5" assert // 5
     p ( a ) ; a @ 8 "a should be 8" assert // 8
     dump ( cobj.chey0, cobj.size ) ; 
     d = cobj.chey0.hey ;
     hex p ( d ) ;
-    printf ( "\n chi : d = %x\n", d ) ;
-    sprintf ( &cobj.chey0.chars, "\n\t\they = %x", d ) ; // add '&' within parentheses for lvalue
-    printf ( "\n chi : d = %x\n", d ) ;
-    sprintf ( &cobj.chey0.chars2, "\n\t\they hey = %x", cobj.chey0.hey ) ;
+    printf ( "\n chi : d = %lx\n", d ) ;
+    d: sprintf ( &cobj.chey0.chars, "\n\t\they = %lx", d ) ; // add '&' within parentheses for lvalue
+    printf ( "\n chi : d = %lx\n", d ) ;
+    sprintf ( &cobj.chey0.chars2, "\n\t\they hey = %lx", cobj.chey0.hey ) ;
     printf ( "\n cobj.chey0.chars = %s\n", &cobj.chey0.chars ) ;
     printf ( "\n cobj.chey0.chars2 = %s\n", &cobj.chey0.chars2 ) ;
-    printf ( "\n chi : d = %x\n", d ) ;
+    printf ( "\n chi : d = %lx\n", d ) ;
     d = cobj.chey0.hey ;
-    printf ( "\n%x\n", d ) ;
+    printf ( "\n%lx\n", d ) ;
     d #x12345678 _assert
     printf ( "\n%x\n", cobj.chey0.hey ) ;
     sprintf ( &chey0.chars [ 24 ], "%s", "hoot" ) ;
     dump ( &cobj.chey0, cobj.size ) ; 
 }
-//scOff
+scOff
 wdiss ( ' chi find )
 chi ( chey, 7 ) //pause
 #endif
@@ -291,7 +290,7 @@ C String libc
 //dbgOn
 s
 dscOn
-#if 0
+#if 1
 void
 $ ( | atoken, buffer, buffer1, Buffer buffer0 ) 
 {
