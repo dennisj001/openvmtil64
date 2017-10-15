@@ -22,8 +22,6 @@ Byte_PtrCall ( byte * bptr )
     if ( bptr )
     {
         ( ( block ) bptr ) ( ) ;
-        //_CfrTil_->CurrentBlock = (block) bptr ;
-        //_CfrTil_->CallCurrentBlock () ;
     }
 }
 
@@ -44,6 +42,7 @@ _Block_Copy ( byte * srcAddress, int64 bsize )
 
     for ( left = bsize ; left > 0 ; srcAddress += isize )
     {
+        PeepHole_Optimize ( ) ;
         isize = _Udis_GetInstructionSize ( ud, srcAddress ) ;
         left -= isize ;
         _CfrTil_AdjustDbgSourceCodeAddress ( srcAddress, Here ) ;

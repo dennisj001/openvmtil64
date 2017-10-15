@@ -229,7 +229,6 @@ _Compile_InstructionX64 ( int8 rex, int8 opCode, int8 modRm, int64 controlFlag, 
     if ( controlFlag & SIB_B ) _Compile_Int8 ( sib ) ;
     if ( controlFlag & DISP_B ) _Compile_ImmDispData ( disp, dispSize, 0 ) ;
     if ( controlFlag & IMM_B ) _Compile_ImmDispData ( imm, immSize, controlFlag & IMM_B ) ;
-    PeepHole_Optimize ( ) ;
     if ( DBI )
     {
         //d1 ( Word * currentWord = Compiling ? _Compiler_->CurrentWord : _Interpreter_->w_Word ) ;

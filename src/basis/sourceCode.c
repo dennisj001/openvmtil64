@@ -85,9 +85,9 @@ _Debugger_ShowDbgSourceCodeAtAddress ( Debugger * debugger, byte * address )
         if ( ! String_Equal ( sourceCode, "" ) )
         {
             int64 scwi, fixed = 0 ;
-            //Word * word = DWL_Find ( list, 0, address, 0, 0, 0, 0 ) ;
+            Word * word = DWL_Find ( list, 0, address, 0, 0, 0, 0 ) ;
             //Word * word = DWL_Find ( list, 0, address, 0, GetState ( _Context_, C_SYNTAX ), 0, 0 ) ;
-            Word * word = DWL_Find ( list, 0, address, 0, 1, 0, 0 ) ;
+            //Word * word = DWL_Find ( list, 0, address, 0, 1, 0, 0 ) ;
             if ( word && ( debugger->LastSourceCodeWord != word ) )
             {
                 d0 ( _List_ShowWord_SCWI_Address ( list ) ) ;
@@ -317,7 +317,8 @@ _CfrTil_DbgSourceCodeCompileOn ( )
     SetState ( _CfrTil_, DEBUG_SOURCE_CODE_MODE, true ) ;
     SetState ( _CfrTil_, GLOBAL_SOURCE_CODE_MODE, true ) ;
     Word * word = _CfrTil_WordList_TopWord ( ) ;
-    word->Coding = 0 ;
+    if ( ( word->CAttribute2 & ( SYNTACTIC | NOOP_WORD | NO_CODING ) ) || 
+        ( word->CAttribute & (DEBUG_WORD) )  || ( word->LAttribute & (W_COMMENT|W_PREPROCESSOR) ) ) word->Coding = 0 ;
 }
 
 void

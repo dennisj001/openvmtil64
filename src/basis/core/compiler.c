@@ -4,6 +4,7 @@
 Word *
 Compiler_CopyDuplicatesAndPush ( Word * word0 )
 {
+    if ( ( word0->CAttribute & (DEBUG_WORD) )  || ( word0->LAttribute & (W_COMMENT|W_PREPROCESSOR) ) ) return word0 ;
     if ( word0 && CompileMode && ( ! ( word0->CAttribute & ( DEBUG_WORD ) ) ) )
     {
         word0 = _Compiler_CopyDuplicatesAndPush ( _Context_->Compiler0, word0 ) ;

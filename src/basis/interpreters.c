@@ -87,7 +87,7 @@ _Interpret_PrefixFunction_Until_RParen ( Interpreter * interp, Word * prefixFunc
         byte * token ;
         int64 svs_c_rhs, flag = 0 ;
         Compiler * compiler = _Context_->Compiler0 ;
-        prefixFunction->W_StartCharRlIndex = interp->Lexer0->TokenStart_ReadLineIndex ;
+        prefixFunction->W_TokenStart_ReadLineIndex = interp->Lexer0->TokenStart_ReadLineIndex ;
         while ( 1 )
         {
             token = Lexer_ReadToken ( interp->Lexer0 ) ; // skip the opening left paren

@@ -109,7 +109,7 @@ _Lexer_ConsiderDebugAndCommentTokens ( byte * token, int64 evalFlag, int64 addFl
     Word * word = Finder_Word_FindUsing ( _Finder_, token, 1 ) ;
     if ( word && ( word->LAttribute & W_COMMENT ) )
     {
-        word->W_StartCharRlIndex = _Lexer_->TokenStart_ReadLineIndex ;
+        word->W_TokenStart_ReadLineIndex = _Lexer_->TokenStart_ReadLineIndex ;
         _Word_Eval ( word ) ;
         return true ;
     }
@@ -117,7 +117,7 @@ _Lexer_ConsiderDebugAndCommentTokens ( byte * token, int64 evalFlag, int64 addFl
     {
         if ( evalFlag )
         {
-            word->W_StartCharRlIndex = _Lexer_->TokenStart_ReadLineIndex ;
+            word->W_TokenStart_ReadLineIndex = _Lexer_->TokenStart_ReadLineIndex ;
             //Word_Eval0 ( word ) ;
             _Word_Eval_Debug ( word ) ;
         }

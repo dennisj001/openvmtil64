@@ -26,7 +26,7 @@ _Interpret_CheckEqualBeforeSemi_LValue ( byte * nc )
 int64
 Interpret_CheckEqualBeforeSemi_LValue ( Word * word )
 {
-    int64 tokenStartReadLineIndex = ( ( int64 ) word == - 1 ) ? _Context_->Lexer0->TokenStart_ReadLineIndex : word->W_StartCharRlIndex ;
+    int64 tokenStartReadLineIndex = ( ( int64 ) word == - 1 ) ? _Context_->Lexer0->TokenStart_ReadLineIndex : word->W_TokenStart_ReadLineIndex ;
     return _Interpret_CheckEqualBeforeSemi_LValue ( & _Context_->ReadLiner0->InputLine [ tokenStartReadLineIndex ] ) ; //word->W_StartCharRlIndex ] ) ;
 }
 
@@ -167,7 +167,7 @@ _CfrTil_C_Infix_EqualOp ( Word * opWord )
     Interpreter * interp = cntx->Interpreter0 ;
     Compiler *compiler = cntx->Compiler0 ;
     Word * word = Compiler_WordList ( 0 ), *lhsWord = compiler->LHS_Word ;
-    int64 scrli = word ? word->W_StartCharRlIndex : 0 ; //, svOOState = GetState ( _CfrTil_, OPTIMIZE_ON ) ;
+    int64 scrli = word ? word->W_TokenStart_ReadLineIndex : 0 ; //, svOOState = GetState ( _CfrTil_, OPTIMIZE_ON ) ;
     byte * svName, * token ;
     SetState ( compiler, C_INFIX_EQUAL, true ) ;
     _CfrTil_WordList_PopWords ( 2 ) ;
@@ -197,7 +197,7 @@ _CfrTil_C_Infix_EqualOp ( Word * opWord )
     svName = word->Name ;
     word->Name = "=" ;
     d0 ( if ( Is_DebugModeOn ) Compiler_Show_WordList ( "\nCfrTil_C_Infix_EqualOp : after _CfrTil_WordLists_PushWord ( word ) ;" ) ) ;
-    word->W_StartCharRlIndex = scrli ;
+    word->W_TokenStart_ReadLineIndex = scrli ;
     if ( opWord ) _Interpreter_DoWord_Default ( interp, opWord ) ;
     else _Interpreter_DoWord_Default ( interp, word ) ;
     word->Name = svName ;

@@ -31,6 +31,21 @@ TestAnd ( )
     if ( doTest && ( ! testDone ) ) _Printf ( "true" ) ;
     else _Printf ( "false" ) ;
 }
+
+void
+CfrTil_ObjectNew ( ) //int64 size, byte * name, uint64 category, int64 allocType )
+{
+    int64 allocType = _DataStack_Pop ( ) ;
+    int64 category = _DataStack_Pop ( ) ;
+    byte * name = (byte*) _DataStack_Pop ( ) ;
+    int64 size = _DataStack_Pop ( ) ;
+    
+    byte * obj = _CfrTil_NamelessObjectNew ( size, allocType ) ; //OBJECT_MEMORY ) ;
+    Word * word = _DObject_New ( name, ( int64 ) obj, ( OBJECT | IMMEDIATE | category ), 0, OBJECT, ( byte* ) _DataObject_Run, 0, 0, 0, DICTIONARY ) ;
+    word->Size = size ;
+    //return word ;
+    _DataStack_Push ( (uint64) word ) ;
+}
 #endif
 
 void

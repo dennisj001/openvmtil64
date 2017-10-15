@@ -228,7 +228,7 @@ next:
                 if ( qidFlag ) SetState ( cntx->Finder0, QID, false ) ;
                 if ( word )
                 {
-                    word->W_StartCharRlIndex = lexer->TokenStart_ReadLineIndex ;
+                    word->W_TokenStart_ReadLineIndex = lexer->TokenStart_ReadLineIndex ;
                     DEBUG_SETUP ( word ) ;
                     if ( qidFlag ) SetState ( word, QID, true ) ;
                     else SetState ( word, QID, false ) ;
@@ -817,7 +817,7 @@ _LO_CfrTil ( ListObject * lfirst )
             _LO_Semi ( word ) ;
             word->W_SourceCode = lc->LC_SourceCode ;
         }
-        else Interpreter_InterpretAToken ( cntx->Interpreter0, ldata->Name, ldata->W_StartCharRlIndex ) ;
+        else Interpreter_InterpretAToken ( cntx->Interpreter0, ldata->Name, ldata->W_TokenStart_ReadLineIndex ) ;
     }
     //CfrTil_AddStringToSourceCode ( _CfrTil_, ")" ) ;
     SetState ( _Context_->Compiler0, LC_CFRTIL, false ) ;
@@ -851,7 +851,7 @@ _LO_New_RawStringOrLiteral ( Lexer * lexer, byte * token, int64 qidFlag )
         uint64 ctokenType = qidFlag ? OBJECT : lexer->TokenType | LITERAL ;
         Word * word = _DObject_New ( lexer->OriginalToken, lexer->Literal, ( ctokenType | IMMEDIATE | LITERAL ), ctokenType, ctokenType,
             ( byte* ) _DataObject_Run, 0, 0, 0, 0 ) ;
-        word->W_StartCharRlIndex = lexer->TokenStart_ReadLineIndex ;
+        word->W_TokenStart_ReadLineIndex = lexer->TokenStart_ReadLineIndex ;
         //DEBUG_SETUP ( word ) ;
         if ( ( ! qidFlag ) && ( lexer->TokenType & T_RAW_STRING ) )
         {
@@ -883,7 +883,7 @@ _LO_New ( uint64 ltype, uint64 ctype, byte * value, Word * word, uint64 allocTyp
     {
         l0->Lo_CfrTilWord = word ;
         word->Lo_CfrTilWord = word ;
-        l0->W_StartCharRlIndex = word->W_StartCharRlIndex ;
+        l0->W_TokenStart_ReadLineIndex = word->W_TokenStart_ReadLineIndex ;
     }
     return l0 ;
 }
@@ -1035,7 +1035,7 @@ LO_CheckBeginBlock ( )
 }
 
 int64
-_LO_Apply_Arg ( ListObject ** pl1, int64 i )
+_LO_Apply_Arg ( ListObject ** pl1, int64 i, int8 svCompileMode )
 {
     Context * cntx = _Context_ ;
     ListObject *l1 = * pl1, * l2 ;
@@ -1067,21 +1067,25 @@ _LO_Apply_Arg ( ListObject ** pl1, int64 i )
         word = Compiler_CopyDuplicatesAndPush ( word ) ;
         word->W_SC_ScratchPadIndex = l1->W_SC_ScratchPadIndex ;
         word->StackPushRegisterCode = 0 ;
-        Word *baseObject = _Interpreter_->BaseObject ;
         _DEBUG_SETUP ( word, 0 ) ;
         _Word_Eval ( word ) ; // ?? move value directly to RegOrder reg
-        if ( CompileMode && ( ! _Lexer_IsTokenForwardDotted ( cntx->Lexer0, word->W_SC_ScratchPadIndex ) ) ) // research : how does CAttribute get set to T_NIL?
+        Word *baseObject = _Interpreter_->BaseObject ;
+        //if ( svCompileMode && ( ! _Lexer_IsTokenForwardDotted ( cntx->Lexer0, word->W_SC_ScratchPadIndex ) ) ) // research : how does CAttribute get set to T_NIL?
+        //if ( ( ! ( l1->CAttribute & ( NAMESPACE_TYPE | OBJECT_FIELD | T_NIL ) ) ) && ( ! _Lexer_IsTokenForwardDotted ( cntx->Lexer0, word->W_TokenEnd_ReadLineIndex ) ) )
+        if ( ( ! _Lexer_IsTokenForwardDotted ( cntx->Lexer0, word->W_TokenStart_ReadLineIndex + strlen (word->Name) - 1) ) )
+        //if ( ( ! ( l1->CAttribute & ( NAMESPACE_TYPE | OBJECT_FIELD | T_NIL ) ) ) || ( ! _Lexer_IsTokenForwardDotted ( cntx->Lexer0, word->W_SC_ScratchPadIndex ) ) )
         {
             if ( word->StackPushRegisterCode ) SetHere ( word->StackPushRegisterCode ) ;
             else if ( baseObject && baseObject->StackPushRegisterCode ) SetHere ( baseObject->StackPushRegisterCode ) ;
             _Compile_Move_Reg_To_Reg ( RegOrder ( i ++ ), ACC ) ;
             if ( baseObject ) _Debugger_->PreHere = baseObject->Coding ;
+            SetState ( cntx, ADDRESS_OF_MODE, false ) ;
             _DEBUG_SHOW ( word, 1 ) ;
         }
     }
     else if ( ( l1->Name [0] == '.' ) || ( l1->Name [0] == '&' ) )
     {
-        _Interpreter_DoWord ( cntx->Interpreter0, l1->Lo_CfrTilWord, l1->W_StartCharRlIndex ) ;
+        _Interpreter_DoWord ( cntx->Interpreter0, l1->Lo_CfrTilWord, l1->W_TokenStart_ReadLineIndex ) ;
     }
     else if ( ( l1->Name[0] == '[' ) )
     {
@@ -1165,13 +1169,14 @@ _LO_Apply_ArgList ( ListObject * l0, Word * word )
         }
         if ( word->CAttribute & ( DLSYM_WORD | C_PREFIX ) ) Set_CompileMode ( true ) ;
         _Debugger_->PreHere = Here ;
-        for ( i = 0, l1 = _LO_First ( l0 ) ; l1 ; l1 = LO_Next ( l1 ) ) i = _LO_Apply_Arg ( &l1, i ) ;
+        for ( i = 0, l1 = _LO_First ( l0 ) ; l1 ; l1 = LO_Next ( l1 ) ) i = _LO_Apply_Arg ( &l1, i, svcm ) ;
         Set_CompileMode ( true ) ;
         _Debugger_->PreHere = Here ;
+        word->Coding = Here ;
         word->W_SC_ScratchPadIndex = l0->W_SC_ScratchPadIndex ;
         word = Compiler_CopyDuplicatesAndPush ( word ) ;
         cntx->CurrentlyRunningWord = word ;
-        if ( String_Equal ( word->Name, "printf" ) )
+        if ( ( String_Equal ( word->Name, "printf" ) ||  ( String_Equal ( word->Name, "sprintf" )) ) )
         {
             _Compile_MoveImm_To_Reg ( RAX, 0, CELL ) ; // for printf ?? others //System V ABI : "%rax is used to indicate the number of vector arguments passed to a function requiring a variable number of arguments"
         }
@@ -1240,9 +1245,9 @@ _Interpreter_LC_InterpretWord ( Interpreter * interp, ListObject * l0, Word * wo
     Debugger * dbgr = _CfrTil_->Debugger0 ;
     Lexer * lexer = _Context_->Lexer0 ;
     if ( ! word ) word = l0 ;
-    word->W_StartCharRlIndex = l0->W_StartCharRlIndex ;
-    if ( word->W_StartCharRlIndex == lexer->TokenStart_ReadLineIndex ) SetState ( dbgr, DEBUG_SHTL_OFF, true ) ;
-    _Interpreter_DoWord ( interp, word, word->W_StartCharRlIndex ) ;
+    word->W_TokenStart_ReadLineIndex = l0->W_TokenStart_ReadLineIndex ;
+    if ( word->W_TokenStart_ReadLineIndex == lexer->TokenStart_ReadLineIndex ) SetState ( dbgr, DEBUG_SHTL_OFF, true ) ;
+    _Interpreter_DoWord ( interp, word, word->W_TokenStart_ReadLineIndex ) ;
     SetState ( dbgr, DEBUG_SHTL_OFF, false ) ;
 }
 

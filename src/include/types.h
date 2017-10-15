@@ -390,8 +390,9 @@ typedef struct _WordData
 #define ObjectCode S_WordData->Coding // used by objects/class words
 #define StackPushRegisterCode S_WordData->StackPushRegisterCode // used by Optimize
 #define W_SourceCode S_WordData->WD_SourceCode 
+#define W_TokenEnd_ReadLineIndex S_WordData->CursorPosition 
 #define W_CursorPosition S_WordData->CursorPosition 
-#define W_StartCharRlIndex S_WordData->StartCharRlIndex
+#define W_TokenStart_ReadLineIndex S_WordData->StartCharRlIndex
 #define S_FunctionTypesArray S_WordData->FunctionTypesArray
 #define RegToUse S_WordData->RegToUse
 #define ArrayDimensions S_WordData->ArrayDimensions

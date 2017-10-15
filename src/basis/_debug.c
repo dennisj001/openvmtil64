@@ -119,24 +119,14 @@ Compile_Debug_GetRSP ( ) // where we want the acquired pointer
 {
     _Compile_PushReg ( ACC ) ;
     _Compile_Set_CAddress_WithRegValue_ThruReg ( ( byte* ) & _Debugger_->DebugRSP, RSP, ACC ) ; // esp 
-    //_Compile_Set_CAddress_WithRegValue_ThruReg ( ( byte* ) & _Debugger_->cs_Cpu->Rsp, RSP, R11D ) ; // esp 
-    _Compile_Set_CAddress_WithRegValue_ThruReg ( ( byte* ) & _Debugger_->DebugRBP, RBP, ACC ) ; // esp 
-    //_Compile_Set_CAddress_WithRegValue_ThruReg ( ( byte* ) & _Debugger_->DebugESI, DSP, R11D ) ; // esi
-    //_Compile_Set_CAddress_WithRegValue_ThruReg ( ( byte* ) & _Debugger_->DebugEDI, R15, R11D ) ; // edi
+    //_Compile_Set_CAddress_WithRegValue_ThruReg ( ( byte* ) & _Debugger_->DebugRBP, RBP, ACC ) ; // esp 
     _Compile_PopToReg ( ACC ) ;
 }
 
 void
 _Compile_DebugRuntimeBreakpoint ( ) // where we want the acquired pointer
 {
-    //Compile_Call ( ( byte* ) CfrTil_Debugger_SaveCpuState ) ; //_Debugger_->SaveCpuState ) ;
-    //Compile_Call ( ( byte* ) _CfrTil_->SaveCpuState ) ;
-    //Compile_Call ( ( byte* ) CfrTil_Debugger_SaveCpuStateShow ) ;
-    //Compile_Debug_GetESP ( ) ;
     _Compile_CpuState_Save ( _Debugger_->cs_Cpu ) ;
-    //Compile_Call ( ( byte* ) _Debugger_CpuState_Show ) ;
-    //Compile_Call ( ( byte* ) Debugger_PrintReturnStackWindow ) ;
-    //Compile_Call ( ( byte* ) CfrTil_Debugger_State_Show ) ;
     Compile_Call ( ( byte* ) CfrTil_DebugRuntimeBreakpoint ) ;
 }
 

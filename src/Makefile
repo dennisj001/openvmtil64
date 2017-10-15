@@ -63,21 +63,21 @@ include/prototypes.h : $(INCLUDES)
 
 cfrtil : CFLAGS = $(CFLAGS_CORE)
 cfrtil : include/prototypes.h $(OBJECTS)
-	$(CC) $(CFLAGS) $(OBJECTS) -o cfrtil $(LIBS)
-	strip cfrtil
-	mv cfrtil ../bin/
+	$(CC) $(CFLAGS) $(OBJECTS) -o cfrtil64 $(LIBS)
+	strip cfrtil64
+	mv cfrtil64 ../bin/
 	
 cfrtils : CFLAGS = $(CFLAGS_CORE)
 cfrtils : include/prototypes.h $(OBJECTS)
-	$(CC) -static $(CFLAGS) $(OBJECTS) -o cfrtils $(LIBS)
-	strip cfrtils
-	mv cfrtils ../bin/
+	$(CC) -static $(CFLAGS) $(OBJECTS) -o cfrtil64s $(LIBS)
+	strip cfrtil64s
+	mv cfrtil64s ../bin/
 	
 static : CFLAGS = $(CFLAGS_CORE)
 static : include/prototypes.h $(OBJECTS)
-	$(CC) -static $(CFLAGS) $(OBJECTS) -o cfrtils $(LIBS)
-	strip cfrtils
-	mv cfrtils ../bin/
+	$(CC) -static $(CFLAGS) $(OBJECTS) -o cfrtil64s $(LIBS)
+	strip cfrtil64s
+	mv cfrtil64s ../bin/
 
 cfrtil-gdb : CFLAGS = $(CFLAGS_CORE) -ggdb 
 cfrtil-gdb : include/prototypes.h $(OBJECTS) 

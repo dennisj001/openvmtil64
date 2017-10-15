@@ -94,11 +94,11 @@ Debugger_Locals_Show ( Debugger * debugger )
     if ( ! Compiling )
     {
         byte * b = Buffer_New_pbyte ( BUFFER_SIZE ) ;
-        strcpy ( b, sc ) ;
+        strncpy ( b, sc, BUFFER_SIZE ) ;
         sc = b ;
         sc = DelimitSourceCodeStartForLispCfrTil ( sc ) ;
-        strcpy ( rl->InputLine, sc ) ;
-        strcat ( rl->InputLine, " <end> " ) ; //signal end of input
+        strncpy ( rl->InputLineString, sc, BUFFER_SIZE - 16 ) ;
+        strncat ( rl->InputLineString, " <end> ", 8 ) ; //signal end of input
         //if ( ! debugger->LevelBitNamespaceMap ) 
         debugger->LevelBitNamespaceMap = 0 ;
         Lexer * svLexer = _Context_->Lexer0 ;
@@ -302,7 +302,7 @@ Debugger_ShowSourceCodeLine ( Debugger * debugger, Word * word, byte * token0, i
     // NB!! : remember the highlighting formatting characters don't add any additional *length* to *visible* the output line
     char * nvw = ( char* ) Buffer_Data_Cleared ( _CfrTil_->DebugB ) ; // nvw : new view window
     char * il = ( char* ) String_New ( rl->InputLineString, TEMPORARY ) ; //nb! dont tamper with the input line. eg. removing its newline will affect other code which depends on newline
-    int64 totalBorder, idealBorder, leftBorder, rightBorder, lef, ref, tvw, nws, ots = word->W_StartCharRlIndex, nts ;
+    int64 totalBorder, idealBorder, leftBorder, rightBorder, lef, ref, tvw, nws, ots = word->W_TokenStart_ReadLineIndex, nts ;
     // ots : original token start (index into the source code), nws : new window start ; tvw: targetViewWidth ; nts : new token start
     // lef : left ellipsis flag, ref : right ellipsis flag
     const int64 fel = 32 - 1 ; //fe : formatingEstimate length : 2 formats with 8/12 chars on each sude - 32/48 :: 1 : a litte leave way
@@ -657,6 +657,7 @@ DelimitSourceCodeStartForLispCfrTil ( char * sc )
     {
         switch ( *sc )
         {
+            case '(': goto next ;
             case '"':
             {
                 sc ++ ;
@@ -672,7 +673,7 @@ DelimitSourceCodeStartForLispCfrTil ( char * sc )
                 }
                 else
                 {
-                    start = sc ;
+                    //start = sc ;
                     goto next ;
                 }
             }
@@ -680,10 +681,12 @@ DelimitSourceCodeStartForLispCfrTil ( char * sc )
         sc ++ ;
     }
 next:
+    start = sc ;
     while ( *sc )
     {
         switch ( *sc )
         {
+            case ')': return start ;
             case '"':
             {
                 while ( *sc ++ != '"' ) ;

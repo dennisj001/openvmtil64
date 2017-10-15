@@ -24,7 +24,7 @@ Word_Run ( Word * word )
 void
 Word_SetCoding ( Word * word, byte * address )
 {
-    if ( ( word->CAttribute2 & ( SYNTACTIC | NOOP_WORD | NO_CODING ) ) || ( word->CAttribute & (DEBUG_WORD) )  || ( word->LAttribute & (W_COMMENT) ) ) word->Coding = 0 ;
+    if ( ( word->CAttribute2 & ( SYNTACTIC | NOOP_WORD | NO_CODING ) ) || ( word->CAttribute & (DEBUG_WORD) )  || ( word->LAttribute & (W_COMMENT|W_PREPROCESSOR) ) ) word->Coding = 0 ;
     else word->Coding = address ;
 }
 
@@ -223,7 +223,9 @@ _Word_New ( byte * name, uint64 ctype, uint64 ltype, int8 addToInNs, Namespace *
     {
         word->S_WordData->Filename = rl->Filename ;
         word->S_WordData->LineNumber = rl->LineNumber ;
+        //word->W_TokenEnd_ReadLineIndex = _Lexer_->TokenEnd_ReadLineIndex ; //rl->CursorPosition ;
         word->W_CursorPosition = rl->CursorPosition ;
+        word->W_TokenStart_ReadLineIndex = _Lexer_->TokenStart_ReadLineIndex ;
     }
 #if 0    
     if ( _IsSourceCodeOn && ( ! Compiling ) && ( ! GetState ( _Context_->Interpreter0, PREPROCESSOR_MODE ) ) )
@@ -268,7 +270,7 @@ Word_PrintOffset ( Word * word, int64 increment, int64 totalIncrement )
 void
 _Word_Location_Printf ( Word * word )
 {
-    if ( word ) _Printf ( ( byte* ) "\n%s.%s : %s %d.%d", word->ContainingNamespace->Name, word->Name, word->S_WordData->Filename, word->S_WordData->LineNumber, word->W_CursorPosition ) ;
+    if ( word ) _Printf ( ( byte* ) "\n%s.%s : %s %d.%d", word->ContainingNamespace->Name, word->Name, word->S_WordData->Filename, word->S_WordData->LineNumber, word->W_TokenEnd_ReadLineIndex ) ;
 }
 
 byte *
@@ -276,7 +278,7 @@ _Word_SourceCodeLocation_pbyte ( Word * word )
 {
     //Buffer * buffer = Buffer_New ( BUFFER_SIZE ) ;
     byte * b = Buffer_Data ( _CfrTil_->ScratchB2 ) ;
-    if ( word ) sprintf ( ( char* ) b, "%s.%s : %s %ld.%ld", word->ContainingNamespace->Name, word->Name, word->S_WordData->Filename, word->S_WordData->LineNumber, word->W_CursorPosition ) ;
+    if ( word ) sprintf ( ( char* ) b, "%s.%s : %s %ld.%ld", word->ContainingNamespace->Name, word->Name, word->S_WordData->Filename, word->S_WordData->LineNumber, word->W_TokenEnd_ReadLineIndex ) ;
     return String_New ( b, TEMPORARY ) ;
 }
 

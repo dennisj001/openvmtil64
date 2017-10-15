@@ -1,7 +1,7 @@
 
 5 
 User
-: sp stack pause ;
+: sp ; //stack pause ;
 location
 //dbgOn 
 //verbosity 4 =
@@ -77,19 +77,20 @@ scOn
 void
 chi ( chey0, d | a b c )
 {
+    libc
     //<dbg> c = 1 + 2 ;
     c = 1 + 2 ;
     b = c + 2 ;
     a = b + c ;
     nl
-    p ( c ) ; d: c @ 3 "c should be 3" assert // 3
+    p ( c ) ; c @ 3 "c should be 3" assert // 3
     p ( b ) ; b @ 5 "b should be 5" assert // 5
     p ( a ) ; a @ 8 "a should be 8" assert // 8
     dump ( cobj.chey0, cobj.size ) ; 
     d = cobj.chey0.hey ;
     hex p ( d ) ;
     printf ( "\n chi : d = %lx\n", d ) ;
-    d: sprintf ( &cobj.chey0.chars, "\n\t\they = %lx", d ) ; // add '&' within parentheses for lvalue
+    sprintf ( &cobj.chey0.chars, "\n\t\they = %lx", d ) ; // add '&' within parentheses for lvalue
     printf ( "\n chi : d = %lx\n", d ) ;
     sprintf ( &cobj.chey0.chars2, "\n\t\they hey = %lx", cobj.chey0.hey ) ;
     printf ( "\n cobj.chey0.chars = %s\n", &cobj.chey0.chars ) ;
@@ -221,8 +222,8 @@ faccs2 ( REG: n | EAX: rec -- EAX )
     } 
 }
 ' faccs2 find wdiss
-faccs2 ( 7 ) p sp
-//pause
+faccs2 ( 7 ) p 
+// sp
 void
 interpret4 ( | atoken aword ) 
 {
@@ -278,28 +279,28 @@ i2halt // see above in interpret2
 i2halt // for second interpret3 
 i2halt // for third interpret4
 #endif
-sp 
+//sp 
 #endif
 
 #if 1
 c_syntaxOn
 C String libc
 //"buffer0" Buffer new ; 
-//d: typedef struct { byte buf [ 256 ]; } Buffer0 ;
+typedef struct { byte buf [ 256 ]; } Buffer0 ;
 // nb. this is a mess mainly for testing purposes 
 //dbgOn
 s
 dscOn
-#if 1
+#if 0
 void
-$ ( | atoken, buffer, buffer1, Buffer buffer0 ) 
+$ ( | atoken, buffer, buffer1, Buffer0 buffer0 ) 
 {
 #if dbOn  
     <dbg> buffer = &buffer0.buf ;
 #else
     buffer = &buffer0.buf ;
 #endif
-    memset ( buffer, 0, size ) ; 
+    memset ( buffer, 0, Buffer.size ) ; 
 #if 0
     buffer1 = &buffer1.buf ;
     memset ( buffer1, 0, Buffer.size ) ; 
@@ -356,7 +357,32 @@ $ ( | atoken, buffer, buffer1, Buffer buffer0 )
 #endif
     }
 } 
-#else 
+#elif 1
+void
+$ ( | atoken, buffer, buffer1, Buffer buffer0 ) 
+{
+    buffer = &buffer0.buf ;
+    memset ( buffer, 0, Buffer0.size ) ; 
+    while ( atoken = token () ) 
+    {   
+        printf ( "\n\ttoken = %s\n", atoken ) ; //pause () ;
+        if ( ! strcmp ( atoken, ";" ) ) 
+        { 
+            printf ( "\n\tbuffer = %s\n", buffer ) ; //pause () ;
+            sh ( buffer ) ;
+            break ; 
+        }
+        else 
+        { 
+            strcat ( buffer, atoken ) ;
+            if ( strcmp ( atoken, "." ) )
+            {
+                strcat ( buffer, " " ) ;
+            }
+        }
+    }
+} 
+#else
 void
 $ ( | atoken, buffer, buffer1, Buffer buffer0 ) 
 {
@@ -437,7 +463,7 @@ dscOff
 c_syntaxOff
 #if doScript
 "\n\nnew $ test\n" ps
-'$ find wdiss //pause
+'$ find wdiss pause
 $etc/script ; 
 $etc/lispScript ; $ls -al . ; 
 String

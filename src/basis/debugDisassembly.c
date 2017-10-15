@@ -49,11 +49,13 @@ Debugger_Dis ( Debugger * debugger )
         _Printf ( ( byte* ) "\nDisassembly of : %s.%s", c_ud ( word->ContainingNamespace ? word->ContainingNamespace->Name : ( byte* ) "" ), c_gd ( word->Name ) ) ;
         int64 codeSize = word->S_CodeSize ;
         _Debugger_Disassemble ( debugger, ( byte* ) word->CodeStart, codeSize ? codeSize : 64, word->CAttribute & ( CPRIMITIVE | DLSYM_WORD ) ? 1 : 0 ) ;
+#if 0        
         if ( debugger->DebugAddress )
         {
             _Printf ( ( byte* ) "\nNext instruction ..." ) ;
             Debugger_UdisOneInstruction ( debugger, debugger->DebugAddress, ( byte* ) "\n", ( byte* ) "" ) ; // the next instruction
         }
+#endif        
     }
     else
     {

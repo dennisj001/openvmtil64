@@ -24,13 +24,13 @@
     </editor-bookmarks>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/home/dennisj/openvmtil64/src/basis/debugDisassembly.c</file>
+            <file>file:/home/dennisj/openvmtil64/src/basis/core/readline.c</file>
+            <file>file:/home/dennisj/openvmtil64/src/basis/core/lexer.c</file>
             <file>file:/home/dennisj/openvmtil64/src/basis/debugger.c</file>
-            <file>file:/home/dennisj/openvmtil64/src/primitives/primitives.c</file>
             <file>file:/home/dennisj/openvmtil64/src/basis/sourceCode.c</file>
-            <file>file:/home/dennisj/openvmtil64/src/include/defines.h</file>
-            <file>file:/home/dennisj/openvmtil64/src/basis/core/interpret.c</file>
-            <file>file:/home/dennisj/openvmtil64/src/basis/core/word.c</file>
+            <file>file:/home/dennisj/openvmtil64/src/basis/core/dataObjectRun.c</file>
+            <file>file:/home/dennisj/openvmtil64/src/basis/core/dataObjectNew.c</file>
+            <file>file:/home/dennisj/openvmtil64/src/basis/debugOutput.c</file>
             <file>file:/home/dennisj/openvmtil64/src/basis/lambdaCalculus.c</file>
             <file>file:/home/dennisj/openvmtil64/src/basis/openVmTil.c</file>
         </group>

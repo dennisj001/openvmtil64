@@ -1383,7 +1383,7 @@ void LO_CheckEndBlock(void);
 int64 _LO_CheckBegunBlock(void);
 int64 _LO_CheckBeginBlock(void);
 int64 LO_CheckBeginBlock(void);
-int64 _LO_Apply_Arg(ListObject **pl1, int64 i);
+int64 _LO_Apply_Arg(ListObject **pl1, int64 i, int8 svCompileMode);
 ListObject *_LO_Apply_ArgList(ListObject *l0, Word *word);
 ListObject *_LO_Apply_C_LtoR_ArgList(ListObject *l0, Word *word);
 void LC_CompileRun_C_ArgList(Word *word);

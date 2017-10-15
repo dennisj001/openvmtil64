@@ -78,7 +78,7 @@ _DObject_ValueDefinition_Init ( Word * word, uint64 value, uint64 funcType, byte
 
     word->W_PtrToValue = & word->W_Value ; // lvalue
     word->W_Value = value ; // rvalue
-    if ( GetState ( _Context_->Compiler0, LC_ARG_PARSING | PREFIX_ARG_PARSING ) ) word->W_StartCharRlIndex = _Context_->Lexer0->TokenStart_ReadLineIndex ;
+    if ( GetState ( _Context_->Compiler0, LC_ARG_PARSING | PREFIX_ARG_PARSING ) ) word->W_TokenStart_ReadLineIndex = _Context_->Lexer0->TokenStart_ReadLineIndex ;
 
     if ( funcType & BLOCK )
     {

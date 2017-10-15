@@ -486,7 +486,7 @@ CPrimitive CPrimitives [] = {
     { "l:", CfrTil_Interpret_ReadToList, 0, 0, 0, "Interpreter", "Root" },
     { "_lx_", CfrTil_Interpret_List, 0, 0, 0, "Interpreter", "Root" },
     
-    { "#", CfrTil_PreProcessor, IMMEDIATE, 0, 0, "Interpreter", "Root" },
+    { "#", CfrTil_PreProcessor, IMMEDIATE, 0, W_PREPROCESSOR, "Interpreter", "Root" },
     
     
     { "!", CfrTil_CommentToEndOfLine, 0, 0, W_PREPROCESSOR, "PreProcessor", "Root" }, // in init.cft ; needed for script files starting with #! cfrtil -s

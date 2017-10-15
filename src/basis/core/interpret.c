@@ -45,7 +45,7 @@ _Interpreter_DoWord ( Interpreter * interp, Word * word, int64 tokenStartReadLin
     if ( word )
     {
         Context * cntx = _Context_ ;
-        word->W_StartCharRlIndex = ( tokenStartReadLineIndex <= 0 ) ? _Lexer_->TokenStart_ReadLineIndex : tokenStartReadLineIndex ;
+        word->W_TokenStart_ReadLineIndex = ( tokenStartReadLineIndex <= 0 ) ? _Lexer_->TokenStart_ReadLineIndex : tokenStartReadLineIndex ;
         word->W_SC_ScratchPadIndex = _CfrTil_->SC_ScratchPadIndex ;
         //DEBUG_SETUP ( word ) ;
         interp->w_Word = word ;
@@ -180,7 +180,7 @@ Word *
 _Compiler_CopyDuplicatesAndPush ( Compiler * compiler, Word * word )
 {
     Word *wordi, * word0 ;
-    int64 i, depth, wrli = word->W_StartCharRlIndex ; //, scwi = word->W_SC_WordIndex ;
+    int64 i, depth, wrli = word->W_TokenStart_ReadLineIndex ; //, scwi = word->W_SC_WordIndex ;
     //byte *coding = word->Coding ;
     dllist * list = compiler->WordList ;
     // we sometimes refer to more than one field of the same object, eg. 'this' in a block
@@ -202,7 +202,7 @@ _Compiler_CopyDuplicatesAndPush ( Compiler * compiler, Word * word )
             word0->W_OriginalWord = Word_GetOriginalWord ( word ) ;
             _dlnode_Init ( ( dlnode * ) word0 ) ; // necessary!
             word0->S_CAttribute |= ( uint64 ) RECYCLABLE_COPY ;
-            word0->W_StartCharRlIndex = wrli ;
+            word0->W_TokenStart_ReadLineIndex = wrli ;
             word0->StackPushRegisterCode = 0 ;
             d0( IsIt_C_LeftParen ( word ) ) ;
             break ;

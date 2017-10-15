@@ -5,8 +5,8 @@ _CpuState_Show ( Cpu * cpu )
 {
     byte * location = Context_Location ( ) ;
     if ( cpu == _Debugger_->cs_Cpu ) _Printf ( ( byte* ) "\nDebugger CpuState : at %s", location ) ;
-    if ( cpu == _CfrTil_->cs_Cpu2 ) _Printf ( ( byte* ) "\nCurrent CpuState : at %s", location ) ;
-    else _Printf ( ( byte* ) "\nC Runtime (_CfrTil_) CpuState :" ) ;
+    else if ( cpu == _CfrTil_->cs_Cpu2 ) _Printf ( ( byte* ) "\nCurrent CpuState : at %s", location ) ;
+    else _Printf ( ( byte* ) "\nC Runtime (_CfrTil_) CpuState : at %s", location ) ;
     _Printf ( ( byte* ) "\nRAX " UINT_FRMT_0x016, cpu->Rax ) ;
     _Printf ( ( byte* ) " RCX " UINT_FRMT_0x016, cpu->Rcx ) ;
     _Printf ( ( byte* ) " RDX " UINT_FRMT_0x016, cpu->Rdx ) ;
