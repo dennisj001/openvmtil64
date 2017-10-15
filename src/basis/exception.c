@@ -229,7 +229,7 @@ OpenVmTil_SignalAction ( int signal, siginfo_t * si, void * uc )
         _Q_->Signal = signal ;
         _Q_->SigAddress = si->si_addr ;
         _Q_->SigLocation = ( ( ! ( signal & ( SIGSEGV | SIGBUS ) ) ) && _Context_ ) ? ( byte* ) c_gd ( Context_Location ( ) ) : ( byte* ) "" ;
-        //_Printf ( (byte*) "\nOpenVmTil_SignalAction : address = %lx : %s", _Q_->SigAddress, _Q_->SigLocation ) ;
+        if ( (signal != SIGSEGV) || _Q_->SignalExceptionsHandled < 2 ) _Printf ( (byte*) "\nOpenVmTil_SignalAction : address = %lx : %s", _Q_->SigAddress, _Q_->SigLocation ) ;
         _OVT_Throw ( _Q_->RestartCondition, 0 ) ;
     }
 }

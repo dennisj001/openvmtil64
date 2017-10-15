@@ -463,7 +463,7 @@ dscOff
 c_syntaxOff
 #if doScript
 "\n\nnew $ test\n" ps
-'$ find wdiss pause
+'$ find wdiss //pause
 $etc/script ; 
 $etc/lispScript ; $ls -al . ; 
 String

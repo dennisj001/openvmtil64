@@ -83,17 +83,17 @@ void
 _ShellEscape ( char * str )
 {
     int status = 0 ;
-#if 0    
+#if 1   
     status = system ( str ) ;
 #elif 0  
     char *cmd[] = { str, ( char * ) 0 } ; //{ "ls", "-l", ( char * ) 0 } ;
     char *env[] = { ( char * ) 0 } ; //{ "HOME=/usr/home", "LOGNAME=home", ( char * ) 0 } ;
-    returned = execve ( "", cmd, env ) ;
+    status = execve ( "", cmd, env ) ;
 #elif 0
     status = execlp ( "str", "str", "", ( char * ) 0 ) ;
 #elif 0
     status = execl ( "", "sh", "-c", str, ( char * ) 0 ) ;
-#elif 0
+#elif 0 // bad!!??
     {
         pid_t pid ;
 
@@ -104,7 +104,7 @@ _ShellEscape ( char * str )
         }
         else return ;
     }
-#elif 1
+#elif 0
     {
         extern char **environ ;
         pid_t pid ;
@@ -112,6 +112,15 @@ _ShellEscape ( char * str )
         d0 ( _Q_->Verbosity = 2 ) ;
         if ( _Q_->Verbosity > 1 ) printf ( "\nposix_spawn :: command = %s\n", str ) ;
         //else printf ("\n") ;
+#if 0
+posix_spawn (pid_t *__restrict __pid,
+			const char *__restrict __path,
+			const posix_spawn_file_actions_t *__restrict
+			__file_actions,
+			const posix_spawnattr_t *__restrict __attrp,
+			char *const __argv[__restrict_arr],
+			char *const __envp[__restrict_arr]);
+#endif        
         status = posix_spawn ( &pid, "/bin/bash", NULL, NULL, argv, environ ) ;
 #if 1        
         if ( status == 0 )
