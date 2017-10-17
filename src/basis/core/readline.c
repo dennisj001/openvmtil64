@@ -1,5 +1,5 @@
 
-#include "../../include/cfrtil.h"
+#include "../../include/cfrtil64.h"
 
 #define ReadLine_AppendPoint( rl ) &rl->InputBuffer [ rl->EndPosition ]
 

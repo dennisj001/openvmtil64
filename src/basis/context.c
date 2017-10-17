@@ -1,5 +1,5 @@
 
-#include "../include/cfrtil.h"
+#include "../include/cfrtil64.h"
 
 void
 _Context_Prompt ( int64 control )
@@ -48,7 +48,7 @@ _Context_New ( CfrTil * cfrTil )
 {
     Context * cntx, *context0 = cfrTil->Context0 ;
     int64 allocType = CONTEXT ;
-    NBA * nba = MemorySpace_NBA_New ( _Q_->MemorySpace0, ( byte* ) String_New ( "ContextSpace", STRING_MEM ), 5 * K , allocType ) ;
+    NBA * nba = MemorySpace_NBA_New ( _Q_->MemorySpace0, ( byte* ) String_New ( "ContextSpace", STRING_MEM ), 5 * K, allocType ) ;
     _Q_->MemorySpace0->ContextSpace = nba ;
     _Context_ = cntx = ( Context* ) Mem_Allocate ( sizeof ( Context ), allocType ) ;
     cntx->ContextNba = nba ;
@@ -125,7 +125,7 @@ _CfrTil_Contex_NewRun_Void ( CfrTil * cfrTil, Word * word )
     {
         CfrTil_Context_PushNew ( cfrTil ) ;
         //word->Definition ( ) ;
-        _Block_Eval (  word->Definition ) ;
+        _Block_Eval ( word->Definition ) ;
         CfrTil_Context_PopDelete ( cfrTil ) ; // this could be coming back from wherever so the stack variables are gone
     }
 }
@@ -223,7 +223,7 @@ _Context_DoubleQuoteMacro ( Context * cntx )
     do
     {
         lexer->TokenInputCharacter = ReadLine_NextChar ( cntx->ReadLiner0 ) ;
-        if ( lexer->TokenInputCharacter == '\\' ) 
+        if ( lexer->TokenInputCharacter == '\\' )
             _BackSlash ( lexer, 1 ) ;
         else Lexer_Append_ConvertedCharacterToTokenBuffer ( lexer ) ;
     }
@@ -244,19 +244,16 @@ CfrTil_DoubleQuoteMacro ( )
     _Context_DoubleQuoteMacro ( _Context_ ) ;
 }
 
+#if 0
 void
 _Tick ( Context * cntx, int64 findWordFlag )
 {
     byte * token = ( byte* ) _DataStack_Pop ( ) ;
     if ( token )
     {
-        Word * word = 0 ;
-        if ( findWordFlag ) 
+        if ( findWordFlag )
         {
-            word = Finder_FindQualifiedIDWord ( cntx->Finder0, token ) ;
-        }
-        if ( word )
-        {
+            Word * word = Finder_FindQualifiedIDWord ( cntx->Finder0, token ) ;
             token = ( byte * ) word ;
         }
         else
@@ -264,11 +261,12 @@ _Tick ( Context * cntx, int64 findWordFlag )
             Lexer * lexer = cntx->Lexer0 ;
             Lexer_ParseObject ( lexer, token ) ; // create a string from a 'raw' token
             if ( GetState ( lexer, KNOWN_OBJECT ) ) token = ( byte* ) lexer->Literal ;
+            else token = 0 ;
         }
-        //if ( ! Compiling ) __CfrTil_SourceCode_Init ( _CfrTil_ ) ;
     }
     DSP_Push ( ( int64 ) token ) ;
 }
+#endif
 
 void
 Context_Interpret ( Context * cntx )

@@ -26,7 +26,7 @@ int factorial( n | rec1 )
 }
 c_syntaxOff dscOff
 'factorial find wdiss
-7 factorial p //pause
+7 factorial p pause
 #endif
 
 : factorial ( n  | fac -- TOS ) 

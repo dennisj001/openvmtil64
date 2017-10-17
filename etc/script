@@ -1,4 +1,4 @@
-#! /usr/local/bin/cfrtil -s
+#! /usr/local/bin/cfrtil64 -s
 
 verbosity 0 =
 : hi 1 6 + p ;
@@ -18,20 +18,13 @@ Lisp
 (define fibc (lambda ( n ) (ifElse (< n 2) n (+ (fibc (- n 1)) (fibc (- n 2))))))
 (fibc 20)
 lispOff //pause
-c_syntaxOn
-int
-fac4 ( n ) 
-{ 
-    facc = 1 ;
-    while ( n > 1 ) 
-    {
-        facc = n -- * facc ;
-    }
-    p ( facc ) ;
-    return ( facc ) ;
-}
-wdiss ( ' fac4 find ) ; 
-fac4 ( 7 ) dup p nl 5040 _assert0 s //pause
-c_syntaxOff
+: fac ( n  | rec1 -- TOS ) 
+    rec1 1 = 
+    { n @ 1 > } { n @ rec1 @ * rec1 store n -- } while 
+    rec1 @ 
+;
+' fac find wdiss
+7 fac dup p 5040 _assert0 
+nl
 bye
 

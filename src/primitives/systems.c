@@ -1,4 +1,4 @@
-#include "../include/cfrtil.h"
+#include "../include/cfrtil64.h"
 
 // void getStdin(void) {Chr = getc(InFile), Env.put(Chr) ; }
 // void putStdout(int64 c) {putc(c, OutFile);}
@@ -41,7 +41,7 @@ CfrTil_ObjectNew ( ) //int64 size, byte * name, uint64 category, int64 allocType
     int64 size = _DataStack_Pop ( ) ;
     
     byte * obj = _CfrTil_NamelessObjectNew ( size, allocType ) ; //OBJECT_MEMORY ) ;
-    Word * word = _DObject_New ( name, ( int64 ) obj, ( OBJECT | IMMEDIATE | category ), 0, OBJECT, ( byte* ) _DataObject_Run, 0, 0, 0, DICTIONARY ) ;
+    Word * word = _DObject_New (name, ( int64 ) obj, ( OBJECT | IMMEDIATE | category ), 0, 0, OBJECT, ( byte* ) _DataObject_Run, 0, 0, 0, DICTIONARY ) ;
     word->Size = size ;
     //return word ;
     _DataStack_Push ( (uint64) word ) ;
@@ -201,7 +201,7 @@ shell ( )
                 //if ( _Q_->Verbosity > 2 ) printf ( "\n\tbuffer = %s\n", buffer ) ; //pause () ;
             }
             else break ; 
-            if ( GetState ( _Context_->Lexer0, END_OF_FILE | END_OF_STRING | LEXER_END_OF_LINE ) ) break ;
+            //if ( GetState ( _Context_->Lexer0, END_OF_FILE | END_OF_STRING | LEXER_END_OF_LINE ) ) break ;
         }
         //if ( _Q_->Verbosity > 1 ) printf ( "\n\tbuffer = %s\n", buffer ) ; //pause () ;
         _ShellEscape ( buffer ) ;

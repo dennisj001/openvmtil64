@@ -30,11 +30,9 @@ typedef struct
     {
         uint64 T_CAttribute ;
         uint64 T_CAttribute2 ;
-        union
-        {
-            uint64 T_LAttribute ;
-            uint64 T_AAttribute ;
-        } ;
+        uint64 T_LAttribute ;
+        uint64 T_WordAttribute ;
+        uint64 T_WAllocationType ;
     } ;
     union
     {
@@ -43,9 +41,7 @@ typedef struct
         uint64 T_Size ;
         uint64 T_ChunkSize ; // remember MemChunk is prepended at memory allocation time
     } ;
-    uint64 T_WordAttribute ;
-    uint64 T_WAllocationType ;
-} CfrTilPropInfo, AttributeInfo, AttributeInfo, PI ;
+} AttributeInfo, AttributeInfo, TypeInfo, TI ;
 typedef struct
 {
     union
@@ -97,16 +93,12 @@ typedef struct _dobject
         dlnode * do_After ;
         dlnode * do_Before ;
     } ;
-    int16 do_Type ;
-    int16 do_Slots ;
-    union
+    struct
     {
-        struct
-        {
-            int16 do_int16_Size ;
-            int16 do_Etc ;
-        } ;
-        int32 do_int32_Size ;
+        int16 do_Type ;
+        int16 do_Slots ;
+        int16 do_Size ;
+        int16 do_InUseFlag ;
     } ;
     union
     {
@@ -131,11 +123,6 @@ typedef struct
         } ;
         byte * n_unmap ;
     } ;
-    union
-    {
-        AttributeInfo n_Attributes ;
-        type n_type ; // for future dynamic types and dynamic objects 
-    } ;
 } _DLNode, _Node, _listNode, _List ;
 typedef struct
 {
@@ -150,21 +137,15 @@ typedef struct
             } ;
             union
             {
-                node * n_CurrentNode ;
                 struct
                 {
                     int32 n_Type ;
                     int32 n_Slots ;
                 } ;
+                node * n_CurrentNode ;
                 byte * n_unmap ;
             } ;
-            union
-            {
-                AttributeInfo n_Attributes ;
-                type n_type ; // for future dynamic types and dynamic objects 
-            } ;
-
-        } ;
+        } ; //_DLNode, _Node, _listNode, _List ;
         struct
         {
             struct
@@ -172,19 +153,26 @@ typedef struct
                 dlnode * do_After ;
                 dlnode * do_Before ;
             } ;
-            int16 do_Type ;
-            int16 do_Slots ;
-            int16 do_Size ;
-            int16 do_Etc ;
             union
             {
+                struct
+                {
+                    int16 do_Type ;
+                    int16 do_Slots ;
+                    int16 do_Size ;
+                    int16 do_InUseFlag ;
+                } ;
                 byte * do_bData ;
                 int64 * do_iData ;
-                int64 do_InUseFlag ;
             } ;
         } ;
         _DLNode n_DLNode ;
         dobject n_dobject ;
+    } ;
+    union
+    {
+        AttributeInfo n_Attributes ;
+        type n_type ; // for future dynamic types and dynamic objects 
     } ;
 } DLNode, Node, listNode, List ;
 
@@ -229,7 +217,6 @@ typedef struct _Identifier
         dlnode * S_Node2 ;
         byte * S_pb_Data2 ;
     } ;
-
     union
     {
         uint64 S_Value3 ;
@@ -247,7 +234,7 @@ typedef struct _Identifier
 #define S_After S_Cdr
 #define S_Before S_Car
 #define S_CurrentNode n_CurrentNode
-#define S_AAttribute S_Node.n_Attributes.T_AAttribute
+//#define S_AAttribute S_Node.n_Attributes.T_AAttribute // Allocation type Attribute
 #define S_CAttribute S_Node.n_Attributes.T_CAttribute
 #define S_CAttribute2 S_Node.n_Attributes.T_CAttribute2
 #define S_CAttribute0 S_Node.n_Attributes.T_CAttribute0
@@ -430,7 +417,7 @@ typedef struct
 } ByteArray ;
 #define BA_AllocSize BA_MemChunk.S_Size
 #define BA_CAttribute BA_MemChunk.S_CAttribute
-#define BA_AAttribute BA_MemChunk.S_AAttribute
+#define BA_AAttribute BA_MemChunk.S_WAllocType
 typedef struct NamedByteArray
 {
     MemChunk NBA_MemChunk ;
@@ -445,7 +432,7 @@ typedef struct NamedByteArray
     dlnode NBA_ML_HeadNode ;
     dlnode NBA_ML_TailNode ;
 } NamedByteArray, NBA ;
-#define NBA_AAttribute NBA_Symbol.S_AAttribute
+#define NBA_AAttribute NBA_Symbol.S_WAllocType
 #define NBA_Chunk_Size NBA_Symbol.S_ChunkSize
 #define NBA_Name NBA_Symbol.S_Name
 typedef struct
@@ -644,7 +631,7 @@ typedef struct
     int8 AccumulatedOffsetPointerFlag ;
     int32 * AccumulatedOffsetPointer ;
     int64 * FrameSizeCellOffset ;
-    int8 RegOrder [ 4 ] ; 
+    int8 RegOrder [ 4 ] ;
     byte * RspSaveOffset ;
     byte * RspRestoreOffset ;
     Word * ReturnVariableWord ;

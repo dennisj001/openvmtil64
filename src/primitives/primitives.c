@@ -1,4 +1,4 @@
-#include "../include/cfrtil.h"
+#include "../include/cfrtil64.h"
 
 #if RETRO
 namespace retro
@@ -23,7 +23,8 @@ CPrimitive CPrimitives [] = {
     { "_Printf", ( block ) _Printf, 0, 0, LISP_C_RTL_ARGS | T_LISP_SPECIAL | LISP_VOID_RETURN, "Lisp", "Root" },
     { "define", ( block ) LO_Define, 0, 0, T_LISP_SPECIAL, "Lisp", "Root" },
     { "compile", ( block ) LO_CompileDefine, 0, 0, T_LISP_SPECIAL, "Lisp", "Root" },
-    { "_lambda", ( block ) LO_MakeLambda, 0, 0, T_LISP_SPECIAL, "Lisp", "Root" },
+    { "_lambda", ( block ) LO_Lambda, 0, 0, T_LAMBDA|T_LISP_SPECIAL, "Lisp", "Root" },
+    { "lambda", ( block ) LO_Lambda, IMMEDIATE, 0, T_LAMBDA|T_LISP_SPECIAL, "Lisp", "Root" },
     { "begin", ( block ) LO_Begin, 0, 0, T_LISP_SPECIAL, "Lisp", "Root" },
     { "set", ( block ) LO_Set, 0, 0, T_LISP_SPECIAL, "Lisp", "Root" },
     { "let", ( block ) LO_Let, 0, 0, T_LISP_SPECIAL, "Lisp", "Root" },

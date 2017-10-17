@@ -1,5 +1,5 @@
 
-#include "../include/cfrtil.h"
+#include "../include/cfrtil64.h"
 
 void
 CfrTil_Colon ( )
@@ -154,7 +154,7 @@ CfrTil_Word ( )
 {
     block b = ( block ) _DataStack_Pop ( ) ;
     byte * name = ( byte* ) _DataStack_Pop ( ) ;
-    _DataObject_New ( CFRTIL_WORD, 0, name, 0, 0, 0, ( int64 ) b, 0 ) ;
+    _DataObject_New (CFRTIL_WORD, 0, name, 0, 0, 0, 0, ( int64 ) b, 0 ) ;
 }
 
 void

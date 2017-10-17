@@ -1,5 +1,5 @@
 
-#include "../../include/cfrtil.h"
+#include "../../include/cfrtil64.h"
 
 /* from macros.h
 #define dobject_Get_M_Slot( dobj, m ) (((dobject*) dobj)->do_iData [m]) 
@@ -24,7 +24,7 @@ _dobject_Allocate ( int64 doType, int64 slots, uint64 allocType )
     dobject * dobj = ( dobject * ) _object_Allocate ( size, allocType ) ;
     dobj->do_iData = ( int64* ) ( ( dobject* ) dobj + 1 ) ;
     dobj->do_Slots = ( int16 ) slots ;
-    dobj->do_int16_Size = size ;
+    dobj->do_Size = size ;
     dobj->do_Type = ( int16 ) doType ;
     return dobj ;
 }
@@ -49,7 +49,7 @@ _dobject_Print ( dobject * dobj )
     _Printf ( ( byte* ) "\n\ndobject  = 0x%08x : word Name = %s", dobj, dobj->do_iData[2] ? ( ( Word* ) dobj->do_iData[2] )->Name : ( byte* ) "" ) ;
     _Printf ( ( byte* ) "\nType     = %d", dobj->do_Type ) ;
     _Printf ( ( byte* ) "\nSlots    = %d", dobj->do_Slots ) ;
-    _Printf ( ( byte* ) "\nSize     = %d", dobj->do_int16_Size ) ;
+    _Printf ( ( byte* ) "\nSize     = %d", dobj->do_Size ) ;
     for ( i = 0 ; i < dobj->do_Slots ; i ++ )
     {
         _Printf ( ( byte* ) "\nSlot [%d] = 0x%08x", i, dobj->do_iData[i] ) ;
@@ -93,13 +93,11 @@ _DObject_ValueDefinition_Init ( Word * word, uint64 value, uint64 funcType, byte
         ByteArray * svcs = _Q_CodeByteArray ;
         int64 sscm = GetState ( _CfrTil_, DEBUG_SOURCE_CODE_MODE ) ;
         SetState ( _CfrTil_, DEBUG_SOURCE_CODE_MODE, false ) ;
-        //if ( Compiling ) 
         Compiler_SetCompilingSpace_MakeSureOfRoom ( "ObjectSpace" ) ;
         d0 ( Cpu_CheckRspForWordAlignment ( "_DObject_ValueDefinition_Init:Before" ) ) ; //SetHere ((byte*) (((uint64) (Here + 0x8)) & ( uint64 ) 0xfffffffffffffff0)) ;
-        //if ( (uint64) Here & (uint64) 0x8 )  SetHere (Here + 0x8) ;
         word->Coding = Here ;
         word->CodeStart = Here ;
-        word->Definition = ( block ) Here ; //(((uint64) (Here + 0x8)) & ( uint64 ) 0xfffffffffffffff0) ;
+        word->Definition = ( block ) Here ; 
         if ( arg ) _DObject_C_StartupCompiledWords_DefInit ( function, arg ) ;
         else Compile_Call ( ( byte* ) DataObject_Run ) ;
         _Compile_Return ( ) ;
@@ -136,7 +134,6 @@ _DObject_Init ( Word * word, uint64 value, uint64 ftype, byte * function, int64 
     _DObject_ValueDefinition_Init ( word, value, ftype, function, arg ) ;
     _DObject_Finish ( word ) ;
     word->RunType = ftype ;
-    //_Word_Add ( word, addToInNs, addToNs ) ;
     return word ;
 }
 
@@ -144,9 +141,9 @@ _DObject_Init ( Word * word, uint64 value, uint64 ftype, byte * function, int64 
 // remember : Word = Namespace = DObject has a s_Symbol
 
 Word *
-_DObject_New ( byte * name, uint64 value, uint64 ctype, uint64 ltype, uint64 ftype, byte * function, int64 arg, int64 addToInNs, Namespace * addToNs, uint64 allocType )
+_DObject_New (byte * name, uint64 value, uint64 ctype, uint64 ctype2, uint64 ltype, uint64 ftype, byte * function, int64 arg, int64 addToInNs, Namespace * addToNs, uint64 allocType )
 {
-    Word * word = _Word_New ( name, ctype, ltype, addToInNs, addToNs, allocType ) ; //( addToInNs || addToNs ) ? DICTIONARY : allocType ) ;
+    Word * word = _Word_New (name, ctype, ctype2, ltype, addToInNs, addToNs, allocType ) ; //( addToInNs || addToNs ) ? DICTIONARY : allocType ) ;
     _DObject_Init ( word, value, ftype, function, arg ) ;
     _CfrTil_->DObjectCreateCount ++ ;
     return word ;
@@ -196,7 +193,7 @@ DObject_SubObjectInit ( DObject * dobject, Word * parent )
 DObject *
 DObject_Sub_New ( DObject * proto, byte * name, uint64 category )
 {
-    DObject * dobject = _DObject_New ( name, 0, ( category | DOBJECT | IMMEDIATE ), 0, DOBJECT, ( byte* ) _DataObject_Run, 0, 0, 0, DICTIONARY ) ;
+    DObject * dobject = _DObject_New (name, 0, ( category | DOBJECT | IMMEDIATE ), 0, 0, DOBJECT, ( byte* ) _DataObject_Run, 0, 0, 0, DICTIONARY ) ;
     DObject_SubObjectInit ( dobject, proto ) ;
     return dobject ;
 }

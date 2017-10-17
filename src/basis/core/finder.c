@@ -1,5 +1,5 @@
 
-#include "../../include/cfrtil.h"
+#include "../../include/cfrtil64.h"
 
 Symbol *
 DLList_FindName_InOneNamespaceList ( dllist * list, byte * name )

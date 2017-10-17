@@ -1,5 +1,5 @@
 
-#include "../../include/cfrtil.h"
+#include "../../include/cfrtil64.h"
 
 void
 _Udis_PrintInstruction ( ud_t * ud, byte * address, byte * prefix, byte * postfix )

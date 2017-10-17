@@ -58,7 +58,7 @@
         <in>atom.c</in>
         <in>attribute.c</in>
         <in>bigNum.c</in>
-        <in>cfrtil.c</in>
+        <in>cfrtil64.c</in>
         <in>colors.c</in>
         <in>context.c</in>
         <in>debugDisassembly.c</in>
@@ -87,16 +87,11 @@
       </df>
       <df name="include">
         <in>_proto.h</in>
-        <in>_types.h</in>
-        <in>bitfields.h</in>
-        <in>cfrtil.h</in>
-        <in>codegen_x86.h</in>
-        <in>defines.0.h</in>
+        <in>cfrtil64.h</in>
         <in>defines.h</in>
         <in>machineCode.h</in>
         <in>machineCodeMacros.h</in>
         <in>macros.h</in>
-        <in>mparam.h</in>
         <in>prototypes.h</in>
         <in>stacks.h</in>
         <in>types.h</in>
@@ -119,7 +114,6 @@
         <in>namespaces.c</in>
         <in>openvmtils.c</in>
         <in>parsers.c</in>
-        <in>primitives.back.c</in>
         <in>primitives.c</in>
         <in>stacks.c</in>
         <in>strings.c</in>

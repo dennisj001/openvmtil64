@@ -1,5 +1,5 @@
 
-#include "../include/cfrtil.h"
+#include "../include/cfrtil64.h"
 
 void
 Debugger_TableSetup ( Debugger * debugger )

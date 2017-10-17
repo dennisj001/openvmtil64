@@ -1,4 +1,4 @@
-#include "../../include/cfrtil.h"
+#include "../../include/cfrtil64.h"
 
 void
 _Word_Run ( Word * word )
@@ -24,7 +24,7 @@ Word_Run ( Word * word )
 void
 Word_SetCoding ( Word * word, byte * address )
 {
-    if ( ( word->CAttribute2 & ( SYNTACTIC | NOOP_WORD | NO_CODING ) ) || ( word->CAttribute & (DEBUG_WORD) )  || ( word->LAttribute & (W_COMMENT|W_PREPROCESSOR) ) ) word->Coding = 0 ;
+    if ( ( word->CAttribute2 & ( SYNTACTIC | NOOP_WORD | NO_CODING ) ) || ( word->CAttribute & ( DEBUG_WORD ) ) || ( word->LAttribute & ( W_COMMENT | W_PREPROCESSOR ) ) ) word->Coding = 0 ;
     else word->Coding = address ;
 }
 
@@ -145,12 +145,14 @@ _Word_Finish ( Word * word )
 {
     _DObject_Finish ( word ) ;
     CfrTil_Word_FinishSourceCode ( _CfrTil_, word ) ;
+#if 0    
     //if ( IsSourceCodeOn ) 
     {
         word->W_SC_WordList = _Context_->WordList ; //_CfrTil_->DebugWordList ;
         _Context_->WordList = 0 ;
         //_CfrTil_->DebugWordList = 0 ;
     }
+#endif    
     Compiler_Init ( _Context_->Compiler0, 0 ) ; // not really necessary should always be handled by EndBlock ?? but this allows for some syntax errors with a '{' but no '}' ??
 #if 0    
     if ( DBI )
@@ -213,11 +215,11 @@ _Word_Create ( byte * name, uint64 ctype, uint64 ctype2, uint64 ltype, uint64 al
 }
 
 Word *
-_Word_New ( byte * name, uint64 ctype, uint64 ltype, int8 addToInNs, Namespace * addToNs, uint64 allocType )
+_Word_New (byte * name, uint64 ctype, uint64 ctype2, uint64 ltype, int8 addToInNs, Namespace * addToNs, uint64 allocType )
 {
     CheckCodeSpaceForRoom ( ) ;
     ReadLiner * rl = _Context_->ReadLiner0 ;
-    Word * word = _Word_Create ( name, ctype, 0, ltype, allocType ) ; // CFRTIL_WORD : cfrTil compiled words as opposed to C compiled words
+    Word * word = _Word_Create ( name, ctype, ctype2, ltype, allocType ) ; // CFRTIL_WORD : cfrTil compiled words as opposed to C compiled words
     _Context_->Compiler0->CurrentWord = word ;
     if ( rl->InputStringOriginal )
     {
@@ -241,7 +243,7 @@ _Word_New ( byte * name, uint64 ctype, uint64 ltype, int8 addToInNs, Namespace *
 Word *
 Word_New ( byte * name )
 {
-    Word * word = _Word_New ( name, CFRTIL_WORD | WORD_CREATE, 0, 1, 0, DICTIONARY ) ;
+    Word * word = _Word_New (name, CFRTIL_WORD | WORD_CREATE, 0, 0, 1, 0, DICTIONARY ) ;
     return word ;
 }
 
@@ -379,13 +381,17 @@ _CfrTil_WordName_Run ( byte * name )
 Word *
 _CfrTil_Alias ( Word * word, byte * name )
 {
-    Word * alias = _Word_New ( name, word->CAttribute | ALIAS, word->LAttribute, 1, 0, DICTIONARY ) ; // inherit type from original word
-    //while ( ( ! word->Definition ) && word->W_AliasOf ) word = word->W_AliasOf ;
-    while ( ! word->Definition ) word = word->W_AliasOf ;
-    _Word_InitFinal ( alias, ( byte* ) word->Definition ) ;
-    alias->S_CodeSize = word->S_CodeSize ;
-    alias->W_AliasOf = word ;
-    return alias ;
+    if ( word )
+    {
+        Word * alias = _Word_New (name, word->CAttribute | ALIAS, word->CAttribute2, word->LAttribute, 1, 0, DICTIONARY ) ; // inherit type from original word
+        //while ( ( ! word->Definition ) && word->W_AliasOf ) word = word->W_AliasOf ;
+        while ( ! word->Definition ) word = word->W_AliasOf ;
+        _Word_InitFinal ( alias, ( byte* ) word->Definition ) ;
+        alias->S_CodeSize = word->S_CodeSize ;
+        alias->W_AliasOf = word ;
+        return alias ;
+    }
+    else Exception ( USEAGE_ERROR, ABORT ) ;
 }
 
 void
@@ -413,7 +419,7 @@ _CfrTil_Macro ( int64 mtype, byte * function )
     macroString = Parse_Macro ( mtype ) ;
     byte * code = String_New ( macroString, STRING_MEM ) ;
     //_DObject_New ( byte * name, uint64 value, uint64 ctype, uint64 ltype, uint64 ftype, byte * function, int64 arg, int64 addToInNs, Namespace * addToNs, uint64 allocType )
-    _DObject_New ( name, ( uint64 ) code, IMMEDIATE, 0, mtype, function, 0, 1, 0, DICTIONARY ) ;
+    _DObject_New (name, ( uint64 ) code, IMMEDIATE, 0, 0, mtype, function, 0, 1, 0, DICTIONARY ) ;
 }
 
 Word *

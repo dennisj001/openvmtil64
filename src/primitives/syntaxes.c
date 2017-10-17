@@ -1,4 +1,4 @@
-#include "../include/cfrtil.h"
+#include "../include/cfrtil64.h"
 
 // examples of the use of C_Combinators are in interpreter.cft
 
@@ -79,45 +79,21 @@ CfrTil_C_Semi ( )
     }
 }
 
-#if 0
-
 void
 CfrTil_End_C_Block ( )
 {
     Context * cntx = _Context_ ;
-    Compiler * compiler = cntx->Compiler0 ;
-    int64 numberOfLocals = compiler->NumberOfLocals, numberOfArgs = compiler->NumberOfArgs ; //CfrTil_EndBlock calls Compiler_Init ?? better way to do this ??
-    CfrTil_EndBlock ( ) ; // NB. CfrTil_EndBlock changes cntx->Compiler0->BlockLevel
-    if ( ! cntx->Compiler0->BlockLevel )
-    {
-        ///CfrTil_SemiColon ( ) ;
-        block b = ( block ) _DataStack_Pop ( ) ;
-        Word * word = ( Word* ) _DataStack_Pop ( ) ;
-        _Word_InitFinal ( word, ( byte* ) b ) ;
-        word->W_NumberOfArgs = numberOfArgs ;
-        word->W_NumberOfLocals = numberOfLocals ;
-        _CfrTil_Namespace_InNamespaceSet ( cntx->Compiler0->C_BackgroundNamespace ) ;
-    }
-}
-#else
-
-void
-CfrTil_End_C_Block ( )
-{
-    Context * cntx = _Context_ ;
-    Compiler * compiler = cntx->Compiler0 ;
-    int64 numberOfLocals = compiler->NumberOfLocals, numberOfArgs = compiler->NumberOfArgs ; //CfrTil_EndBlock calls Compiler_Init ?? better way to do this ??
     CfrTil_EndBlock ( ) ; // NB. CfrTil_EndBlock changes cntx->Compiler0->BlockLevel
     if ( ! cntx->Compiler0->BlockLevel ) _CfrTil_SemiColon ( ) ;
     else
     {
+        Compiler * compiler = cntx->Compiler0 ;
         Word * word = cntx->CurrentlyRunningWord ;
-        word->W_NumberOfArgs = numberOfArgs ;
-        word->W_NumberOfLocals = numberOfLocals ;
+        word->W_NumberOfArgs = compiler->NumberOfArgs ;
+        word->W_NumberOfLocals = compiler->NumberOfLocals ;
     }
     _CfrTil_Namespace_InNamespaceSet ( cntx->Compiler0->C_BackgroundNamespace ) ;
 }
-#endif
 
 void
 CfrTil_Begin_C_Block ( )
@@ -137,7 +113,7 @@ CfrTil_C_Class_New ( void )
 {
     byte * name = ( byte* ) _DataStack_Pop ( ) ;
 
-    return _DataObject_New ( C_CLASS, 0, name, 0, 0, 0, 0, 0 ) ;
+    return _DataObject_New (C_CLASS, 0, name, 0, 0, 0, 0, 0, 0 ) ;
 }
 
 void

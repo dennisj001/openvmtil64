@@ -1,4 +1,4 @@
-#include "../include/cfrtil.h"
+#include "../include/cfrtil64.h"
 
 void
 CfrTil_Here ( )
@@ -190,7 +190,7 @@ CfrTil_Literal ( )
     //Word * word = _DataObject_New ( LITERAL, 0, 0, LITERAL, 0, 0, ( uint64 ) _DataStack_Pop ( ), 0 ) ;
     //ByteArray * svcs = _Q_CodeByteArray ;
     //Compiler_SetCompilingSpace_MakeSureOfRoom ( "TempObjectSpace" ) ; 
-    Word * word = _DataObject_New ( CONSTANT, 0, "< lit >", LITERAL | CONSTANT, 0, 0, value, 0 ) ;
+    Word * word = _DataObject_New (CONSTANT, 0, "< lit >", LITERAL | CONSTANT, 0, 0, 0, value, 0 ) ;
     //Set_CompilerSpace ( svcs ) ;
     _Interpreter_DoWord ( _Context_->Interpreter0, word, - 1 ) ;
 }
@@ -200,14 +200,14 @@ CfrTil_Constant ( )
 {
     int64 value = _DataStack_Pop ( ) ;
     byte * name = ( byte* ) _DataStack_Pop ( ) ;
-    _DataObject_New ( CONSTANT, 0, name, LITERAL | CONSTANT, 0, 0, value, 0 ) ;
+    _DataObject_New (CONSTANT, 0, name, LITERAL | CONSTANT, 0, 0, 0, value, 0 ) ;
 }
 
 void
 CfrTil_Variable ( )
 {
     byte * name = ( byte* ) _DataStack_Pop ( ) ;
-    _DataObject_New ( NAMESPACE_VARIABLE, 0, name, NAMESPACE_VARIABLE, 0, 0, 0, 0 ) ;
+    _DataObject_New (NAMESPACE_VARIABLE, 0, name, NAMESPACE_VARIABLE, 0, 0, 0, 0, 0 ) ;
 }
 
 // "{|" - exit the Compiler start interpreting

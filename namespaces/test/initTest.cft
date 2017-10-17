@@ -43,12 +43,13 @@ Int User
 : lispTest "namespaces/test/lisp.cft" include ;
 : oldL "namespaces/test/oldLisp.cft" include ;
 : lT lispTest ;
+//: testX cST dT0 dT ;
 : testX cST ;
 'doIA32 1 const
 #if doIA32
 : basicT cT aT loT bT locT mT oT ia32 cntT lT fT sT sysT interpT ppT stT ;
 #else
-: basicT cT aT loT bT locT mT oT cntT lT fT sT sysT interpT ppT stT ;
+: basicT cT aT loT bT locT mT oT      cntT lT fT sT sysT interpT ppT stT ;
 #endif
 : _basicT bT mT cntT lT fT sysT  ;
 : testBasic basicT ;
@@ -87,7 +88,7 @@ System Combinators
 #if 0 
 //"\ntest nested if 0 - wrong \n" ps pause
 #elif 1 
-//"\ntest nested elif 1 - correct \n" ps pause
+"\ntest nested elif 1 - correct \n" ps //pause
 { doTest _TestDone_ @ not && } { basicT testX _TestDone_ ++ } if2  
 //{ doTest _TestDone_ @ not && } { basicT _TestDone_ ++ } if2  
 //#endif

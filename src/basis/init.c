@@ -1,4 +1,4 @@
-#include "../include/cfrtil.h"
+#include "../include/cfrtil64.h"
 
 // all except namespaces and number base
 // this is called by the main interpreter _CfrTil_Interpret
@@ -29,8 +29,6 @@ _CfrTil_Init_SessionCore ( CfrTil * cfrTil, int64 cntxDelFlag, int64 promptFlag 
     _OVT_Ok ( promptFlag ) ;
     cfrTil->SC_QuoteMode = 0 ;
     SC_Global_Off ;
-    //cfrTil->DebugWordList = 0 ;
-
     SetState_TrueFalse ( cfrTil, CFRTIL_RUN, DEBUG_MODE ) ;
     SetState ( cfrTil->Debugger0, DBG_ACTIVE, false ) ;
     DebugOff ;
@@ -48,8 +46,8 @@ void
 CfrTil_ResetAll_Init ( CfrTil * cfrTil )
 {
     byte * startDirectory = ( byte* ) "namespaces" ;
-    if ( ! GetState ( _Q_, OVT_IN_USEFUL_DIRECTORY ) ) startDirectory = ( byte* ) "/usr/local/lib/cfrTil/namespaces" ;
-    _DataObject_New ( NAMESPACE_VARIABLE, 0, ( byte* ) "_startDirectory_", NAMESPACE_VARIABLE, 0, 0, ( int64 ) startDirectory, 0 ) ;
+    if ( ! GetState ( _Q_, OVT_IN_USEFUL_DIRECTORY ) ) startDirectory = ( byte* ) "/usr/local/lib/cfrTil64/namespaces" ;
+    _DataObject_New (NAMESPACE_VARIABLE, 0, ( byte* ) "_startDirectory_", NAMESPACE_VARIABLE, 0, 0, 0, ( int64 ) startDirectory, 0 ) ;
     if ( ( _Q_->RestartCondition >= RESET_ALL ) ) // || ( _Q_->StartIncludeTries == 1 ) )
     {
         _Q_->StartIncludeTries = 0 ;
@@ -58,15 +56,6 @@ CfrTil_ResetAll_Init ( CfrTil * cfrTil )
         {
             _Q_->Verbosity = 0 ;
             _CfrTil_ContextNew_IncludeFile ( ( byte* ) "./namespaces/.sinit.cft" ) ;
-
-            d0
-                (
-                _Q_->Verbosity = 2 ;
-                _Printf ( ( byte* ) "\nIncluding Startup File : %s", _Q_->StartupFilename ) ; ;
-                OpenVmTil_Pause ( ) ;
-                _Q_->Verbosity = 0 ;
-                ) ;
-
             _CfrTil_ContextNew_IncludeFile ( _Q_->StartupFilename ) ;
         }
         else
@@ -116,7 +105,7 @@ _CfrTil_InitialAddWordToNamespace ( Word * word, byte * containingNamespaceName,
 void
 _CfrTil_CPrimitiveNewAdd ( const char * name, block b, uint64 ctype, uint64 ctype2, uint64 ltype, const char *nameSpace, const char * superNamespace )
 {
-    Word * word = _Word_New ( ( byte* ) name, CPRIMITIVE | ctype, ltype, 1, 0, EXISTING ) ; //DICTIONARY ) ;
+    Word * word = _Word_New (( byte* ) name, CPRIMITIVE | ctype, ctype2, ltype, 1, 0, EXISTING ) ; //DICTIONARY ) ;
     _DObject_ValueDefinition_Init ( word, ( int64 ) b, BLOCK, 0, 0 ) ;
     _CfrTil_InitialAddWordToNamespace ( word, ( byte* ) nameSpace, ( byte* ) superNamespace ) ;
     if ( ctype & INFIXABLE ) word->WAttribute = WT_INFIXABLE ;
@@ -171,6 +160,12 @@ CfrTil_MachineCodePrimitive_AddWords ( CfrTil * cfrTil )
             functionArg = ( int64 ) cfrTil->cs_Cpu ;
             callHook = & cfrTil->RestoreCpuState ;
         }
+        else if ( ( String_Equal ( p.ccp_Name, "saveCpuState" ) ) && ( String_Equal ( p.NameSpace, "System" ) ) )
+        {
+            functionArg = ( int64 ) cfrTil->cs_Cpu ;
+            //functionArg = cfrTil ;
+            callHook = & cfrTil->SaveCpuState ;
+        }
         else if ( ( String_Equal ( p.ccp_Name, "saveCpu2State" ) ) && ( String_Equal ( p.NameSpace, "System" ) ) )
         {
             functionArg = ( int64 ) cfrTil->cs_Cpu2 ;
@@ -182,12 +177,6 @@ CfrTil_MachineCodePrimitive_AddWords ( CfrTil * cfrTil )
             functionArg = ( int64 ) cfrTil->cs_Cpu2 ;
             //functionArg = cfrTil ;
             callHook = & cfrTil->RestoreCpu2State ;
-        }
-        else if ( ( String_Equal ( p.ccp_Name, "saveCpuState" ) ) && ( String_Equal ( p.NameSpace, "System" ) ) )
-        {
-            functionArg = ( int64 ) cfrTil->cs_Cpu ;
-            //functionArg = cfrTil ;
-            callHook = & cfrTil->SaveCpuState ;
         }
         else if ( ( String_Equal ( p.ccp_Name, "restoreSelectedCpuState" ) ) && ( String_Equal ( p.NameSpace, "System" ) ) )
         {

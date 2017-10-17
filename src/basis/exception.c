@@ -1,5 +1,5 @@
 
-#include "../include/cfrtil.h"
+#include "../include/cfrtil64.h"
 
 int64
 _OpenVmTil_ShowExceptionInfo ( )
@@ -172,12 +172,13 @@ _OVT_Throw ( int64 restartCondition, int8 pauseFlag )
                 if ( _Q_->Signal != SIGBUS )
                 {
                     _OpenVmTil_ShowExceptionInfo ( ) ;
+                    pauseFlag ++ ;
                     _Q_->RestartCondition = ABORT ;
                 }
             }
             else _Q_->RestartCondition = INITIAL_START ;
         }
-        if ( ( _Q_->SignalExceptionsHandled ++ >= 2 ) || ( restartCondition == INITIAL_START ) )
+        if ( ( _Q_->SignalExceptionsHandled > 1 ) || ( restartCondition == INITIAL_START ) )
         {
             jb = & _Q_->JmpBuf0 ;
             _Q_->RestartCondition = INITIAL_START ;
@@ -192,7 +193,7 @@ _OVT_Throw ( int64 restartCondition, int8 pauseFlag )
     printf ( "\n%s %s -> ...\n", ( jb == & _CfrTil_->JmpBuf0 ) ? "reseting cfrTil" : "fully restarting", ( _Q_->Signal == SIGSEGV ) ? ": SIGSEGV" : "" ) ;
     fflush ( stdout ) ;
 
-    if ( ( ! pauseFlag ) && ( _Q_->SignalExceptionsHandled < 3 ) ) _OVT_Pause ( 0, _Q_->SignalExceptionsHandled ) ;
+    //if ( ( ! pauseFlag ) && ( _Q_->SignalExceptionsHandled < 2 ) ) _OVT_Pause ( 0, _Q_->SignalExceptionsHandled ) ;
     siglongjmp ( *jb, 1 ) ;
 }
 
@@ -229,7 +230,7 @@ OpenVmTil_SignalAction ( int signal, siginfo_t * si, void * uc )
         _Q_->Signal = signal ;
         _Q_->SigAddress = si->si_addr ;
         _Q_->SigLocation = ( ( ! ( signal & ( SIGSEGV | SIGBUS ) ) ) && _Context_ ) ? ( byte* ) c_gd ( Context_Location ( ) ) : ( byte* ) "" ;
-        if ( (signal != SIGSEGV) || _Q_->SignalExceptionsHandled < 2 ) _Printf ( (byte*) "\nOpenVmTil_SignalAction : address = %lx : %s", _Q_->SigAddress, _Q_->SigLocation ) ;
+        if ( (signal != SIGSEGV) || _Q_->SignalExceptionsHandled < 2 ) _Printf ( (byte*) "\nOpenVmTil_SignalAction : address = 0x%016lx : %s", _Q_->SigAddress, _Q_->SigLocation ) ;
         _OVT_Throw ( _Q_->RestartCondition, 0 ) ;
     }
 }
@@ -341,6 +342,11 @@ CfrTil_Exception ( int64 signal, int64 restartCondition )
         case VARIABLE_NOT_FOUND_ERROR:
         {
             OpenVmTil_Throw ( ( byte* ) "Exception : Variable not found error", restartCondition, 1 ) ;
+            break ;
+        }
+        case USEAGE_ERROR :
+        {
+            OpenVmTil_Throw ( ( byte* ) "Exception : Useage Error", restartCondition, 1 ) ;
             break ;
         }
         case FIX_ME_ERROR:

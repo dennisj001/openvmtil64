@@ -1,4 +1,4 @@
-#include "../../include/cfrtil.h"
+#include "../../include/cfrtil64.h"
 
 /*
  * cfrTil namespaces basic understandings :
@@ -25,6 +25,7 @@ void
 _Namespace_DoAddSymbol ( Namespace * ns, Symbol * symbol )
 {
     dllist_AddNodeToHead ( ns->W_List, ( dlnode* ) symbol ) ;
+    d0 ( if ( String_Equal ( ns->Name, "Lisp") && String_Equal ( symbol->Name, "lambda" ) ) {_Printf ( (byte*) "\nGot it!\n"); Pause ();} ) ;
 }
 
 void
@@ -376,7 +377,7 @@ Namespace_FindOrNew_SetUsing ( byte * name, Namespace * containingNs, int64 setU
     Namespace * ns = _Namespace_Find ( name, containingNs, 0 ) ;
     if ( ! ns )
     {
-        ns = _DataObject_New ( NAMESPACE, 0, name, NAMESPACE | IMMEDIATE, 0, 0, ( int64 ) containingNs, 0 ) ;
+        ns = _DataObject_New (NAMESPACE, 0, name, NAMESPACE | IMMEDIATE, 0, 0, 0, ( int64 ) containingNs, 0 ) ;
     }
     if ( setUsingFlag ) _Namespace_SetState ( ns, USING ) ;
     return ns ;

@@ -1,4 +1,4 @@
-#include "../../include/cfrtil.h"
+#include "../../include/cfrtil64.h"
 
 // X variable op compile for group 5 opCodes - inc/dec - ia32 
 

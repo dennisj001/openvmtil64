@@ -1,4 +1,4 @@
-#include "../../include/cfrtil.h"
+#include "../../include/cfrtil64.h"
 // lexer.c has been strongly influenced by the ideas in the lisp reader algorithm 
 // "http://www.ai.mit.edu/projects/iiip/doc/CommonLISP/HyperSpec/Body/sec_2-2.html"
 // although it doesn't fully conform to them yet the intention is to be eventually somewhat of a superset of them
@@ -31,10 +31,10 @@ CfrTil_LexerTables_Setup ( CfrTil * cfrtl )
     cfrtl->LexerCharacterTypeTable [ '"' ].CharFunctionTableIndex = 5 ;
     cfrtl->LexerCharacterTypeTable [ '[' ].CharFunctionTableIndex = 11 ;
     cfrtl->LexerCharacterTypeTable [ ']' ].CharFunctionTableIndex = 11 ;
-    cfrtl->LexerCharacterTypeTable [ '\'' ].CharFunctionTableIndex = 11 ;
     cfrtl->LexerCharacterTypeTable [ '`' ].CharFunctionTableIndex = 11 ;
     cfrtl->LexerCharacterTypeTable [ '(' ].CharFunctionTableIndex = 11 ;
     cfrtl->LexerCharacterTypeTable [ ')' ].CharFunctionTableIndex = 11 ;
+    cfrtl->LexerCharacterTypeTable [ '\'' ].CharFunctionTableIndex = 11 ;
     //cfrtl->LexerCharacterTypeTable [ '%' ].CharFunctionTableIndex = 11 ;
     //cfrtl->LexerCharacterTypeTable [ '&' ].CharFunctionTableIndex = 11 ;
     //cfrtl->LexerCharacterTypeTable [ ',' ].CharFunctionTableIndex = 11 ;
@@ -67,6 +67,7 @@ CfrTil_LexerTables_Setup ( CfrTil * cfrtl )
     cfrtl->LexerCharacterFunctionTable [ 16 ] = AddressOf ;
     cfrtl->LexerCharacterFunctionTable [ 17 ] = AtFetch ;
     cfrtl->LexerCharacterFunctionTable [ 18 ] = Star ;
+    //cfrtl->LexerCharacterFunctionTable [ 19 ] = SingleQuote ;
 }
 
 byte
@@ -86,7 +87,7 @@ Lexer_ObjectToken_New ( Lexer * lexer, byte * token ) //, int64 parseFlag )
         {
             if ( GetState ( _Q_, AUTO_VAR ) ) // make it a 'variable' 
             {
-                word = _DataObject_New ( NAMESPACE_VARIABLE, 0, token, NAMESPACE_VARIABLE, 0, 0, 0, 0 ) ;
+                word = _DataObject_New (NAMESPACE_VARIABLE, 0, token, NAMESPACE_VARIABLE, 0, 0, 0, 0, 0 ) ;
             }
             else
             {
@@ -96,7 +97,7 @@ Lexer_ObjectToken_New ( Lexer * lexer, byte * token ) //, int64 parseFlag )
         }
         else
         {
-            word = _DataObject_New ( LITERAL, 0, token, 0, 0, 0, lexer->Literal, 0 ) ;
+            word = _DataObject_New (LITERAL, 0, token, 0, 0, 0, 0, lexer->Literal, 0 ) ;
         }
         lexer->TokenWord = word ;
     }
@@ -184,7 +185,7 @@ _Lexer_LexNextToken_WithDelimiters ( Lexer * lexer, byte * delimiters, int64 che
         if ( lexer->TokenWriteIndex && ( ! GetState ( lexer, LEXER_RETURN_NULL_TOKEN ) ) )
         {
             _AppendCharacterToTokenBuffer ( lexer, 0 ) ; // null terminate TokenBuffer
-            lexer->OriginalToken = String_New ( lexer->TokenBuffer, TEMPORARY ) ;
+            lexer->OriginalToken = String_New ( lexer->TokenBuffer, SESSION ) ; // not TEMPORARY or strings on the stack are deleted at each newline after startup
         }
         else
         {
@@ -473,6 +474,57 @@ SingleEscape ( Lexer * lexer )
 }
 
 void
+_BackSlash ( Lexer * lexer, int64 flag )
+{
+    ReadLiner * rl = lexer->ReadLiner0 ;
+    byte nextChar = ReadLine_PeekNextChar ( rl ), lastChar = rl->InputLine [ rl->ReadIndex - 2 ] ;
+    int64 i ;
+    if ( nextChar == 'n' )
+    {
+        _ReadLine_GetNextChar ( lexer->ReadLiner0 ) ;
+        lexer->TokenInputCharacter = '\n' ;
+        Lexer_AppendCharacterToTokenBuffer ( lexer ) ;
+    }
+    else if ( nextChar == 'r' )
+    {
+        _ReadLine_GetNextChar ( lexer->ReadLiner0 ) ;
+        lexer->TokenInputCharacter = '\r' ;
+        Lexer_AppendCharacterToTokenBuffer ( lexer ) ;
+    }
+    else if ( nextChar == 't' )
+    {
+        _ReadLine_GetNextChar ( lexer->ReadLiner0 ) ;
+        lexer->TokenInputCharacter = '\t' ;
+        Lexer_AppendCharacterToTokenBuffer ( lexer ) ;
+    }
+    else if ( lastChar == '/' ) // current lisp lambda abbreviation "/\"
+    {
+        Lexer_AppendCharacterToTokenBuffer ( lexer ) ;
+    }
+    else if ( nextChar == ' ' && GetState ( _Context_->Interpreter0, PREPROCESSOR_DEFINE ) )
+    {
+        i = ReadLiner_PeekSkipSpaces ( rl ) ;
+        if ( _ReadLine_PeekIndexedChar ( rl, i ) == '\n' ) ; // do nothing - don't append the newline 
+    }
+    else if ( nextChar == '\n' && GetState ( _Context_->Interpreter0, PREPROCESSOR_DEFINE ) ) _ReadLine_GetNextChar ( lexer->ReadLiner0 ) ; // ignore the newline
+    else if ( flag )
+    {
+        //Lexer_AppendCharacterToTokenBuffer ( lexer ) ; // the backslash
+        _Lexer_AppendCharToSourceCode ( lexer, lexer->TokenInputCharacter, 0 ) ; // the backslash 
+        __Lexer_AppendCharacterToTokenBuffer ( lexer, nextChar ) ; // the escaped char eg. '"'
+        _Lexer_AppendCharToSourceCode ( lexer, nextChar, 0 ) ;
+        _ReadLine_GetNextChar ( lexer->ReadLiner0 ) ;
+    }
+    else if ( ! flag ) SingleEscape ( lexer ) ; //Lexer_AppendCharacterToTokenBuffer ( lexer ) ;
+}
+
+void
+BackSlash ( Lexer * lexer )
+{
+    _BackSlash ( lexer, 1 ) ;
+}
+
+void
 _MultipleEscape ( Lexer * lexer )
 {
     byte multipleEscapeChar = lexer->TokenInputCharacter ;
@@ -691,57 +743,6 @@ Comma ( Lexer * lexer )
         }
     }
     Lexer_Default ( lexer ) ;
-}
-
-void
-_BackSlash ( Lexer * lexer, int64 flag )
-{
-    ReadLiner * rl = lexer->ReadLiner0 ;
-    byte nextChar = ReadLine_PeekNextChar ( rl ), lastChar = rl->InputLine [ rl->ReadIndex - 2 ] ;
-    int64 i ;
-    if ( nextChar == 'n' )
-    {
-        _ReadLine_GetNextChar ( lexer->ReadLiner0 ) ;
-        lexer->TokenInputCharacter = '\n' ;
-        Lexer_AppendCharacterToTokenBuffer ( lexer ) ;
-    }
-    else if ( nextChar == 'r' )
-    {
-        _ReadLine_GetNextChar ( lexer->ReadLiner0 ) ;
-        lexer->TokenInputCharacter = '\r' ;
-        Lexer_AppendCharacterToTokenBuffer ( lexer ) ;
-    }
-    else if ( nextChar == 't' )
-    {
-        _ReadLine_GetNextChar ( lexer->ReadLiner0 ) ;
-        lexer->TokenInputCharacter = '\t' ;
-        Lexer_AppendCharacterToTokenBuffer ( lexer ) ;
-    }
-    else if ( lastChar == '/' ) // current lisp lambda abbreviation "/\"
-    {
-        Lexer_AppendCharacterToTokenBuffer ( lexer ) ;
-    }
-    else if ( nextChar == ' ' && GetState ( _Context_->Interpreter0, PREPROCESSOR_DEFINE ) )
-    {
-        i = ReadLiner_PeekSkipSpaces ( rl ) ;
-        if ( _ReadLine_PeekIndexedChar ( rl, i ) == '\n' ) ; // do nothing - don't append the newline 
-    }
-    else if ( nextChar == '\n' && GetState ( _Context_->Interpreter0, PREPROCESSOR_DEFINE ) ) _ReadLine_GetNextChar ( lexer->ReadLiner0 ) ; // ignore the newline
-    else if ( flag )
-    {
-        //Lexer_AppendCharacterToTokenBuffer ( lexer ) ; // the backslash
-        _Lexer_AppendCharToSourceCode ( lexer, lexer->TokenInputCharacter, 0 ) ; // the backslash 
-        __Lexer_AppendCharacterToTokenBuffer ( lexer, nextChar ) ; // the escaped char eg. '"'
-        _Lexer_AppendCharToSourceCode ( lexer, nextChar, 0 ) ;
-        _ReadLine_GetNextChar ( lexer->ReadLiner0 ) ;
-    }
-    else if ( ! flag ) Lexer_AppendCharacterToTokenBuffer ( lexer ) ;
-}
-
-void
-BackSlash ( Lexer * lexer )
-{
-    _BackSlash ( lexer, 1 ) ;
 }
 
 void

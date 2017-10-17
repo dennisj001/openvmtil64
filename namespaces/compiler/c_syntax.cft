@@ -107,6 +107,7 @@ scOff
 wdiss ( ' chi find )
 chi ( chey, 7 ) //pause
 #endif
+
 #if 1
 void
 interpret2 ( | atoken aword ) 
@@ -184,7 +185,9 @@ interpret2 ( | atoken aword )
     }
 }
 #endif
+
 wdiss ( ' interpret2 find ) ;
+
 #if 1
 interpret2 
 using

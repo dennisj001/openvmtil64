@@ -1,49 +1,48 @@
-#include "../../include/cfrtil.h"
+#include "../../include/cfrtil64.h"
 
 void
 _CfrTil_SingleQuote ( int64 findWordFlag )
 {
     ReadLiner * rl = _ReadLiner_ ;
-    Word *word, * sqWord = _CfrTil_WordList_TopWord ( ) ;
+    Word *word, * sqWord = _CfrTil_WordList_TopWord ( ) ; //single quote word
     char buffer [5] ;
-    byte c, c0, c2 = 0, c1, c3 ;
+    byte c0, c1, c2 ;
     uint64 charLiteral = 0 ;
 
-    if ( sqWord && sqWord->Name[0] == '\'' && ( ( c2 = _ReadLine_PeekIndexedChar ( rl, 1 ) == '\'' ) || ( c1 = _ReadLine_PeekIndexedChar ( rl, 0 ) == '\\' ) ) )// parse a char type, eg. 'c' 
+    // remember : _ReadLine_PeekIndexedChar ( rl, 0 ) is the *next* char to be read
+    if ( sqWord && sqWord->Name[0] == '\'' && ( ( (c1 = _ReadLine_PeekIndexedChar ( rl, 1 )) == '\'' ) || ( (c0 = _ReadLine_PeekIndexedChar ( rl, 0 )) == '\\' ) ) )// parse a char type, eg. 'c' 
     {
         // notation :: c0 = original ' ; c1 = next char, etc.
         buffer[0] = '\'' ;
-        buffer[1] = c1 ;
+        buffer[1] = c0 ;
+        c0 = _ReadLine_GetNextChar ( rl ) ;
         c1 = _ReadLine_GetNextChar ( rl ) ;
-        c2 = _ReadLine_GetNextChar ( rl ) ;
-        if ( c1 == '\\' )
+        if ( c0 == '\\' )
         {
-            c3 = _ReadLine_GetNextChar ( rl ) ; // the closing '\''
-            if ( c2 == 't' ) charLiteral = 0x9 ;
-            else if ( c2 == 'n' ) charLiteral = 0xa ;
-            else if ( c2 == 'r' ) charLiteral = 0xd ;
-            else if ( c2 == 'b' ) charLiteral = 0x8 ;
-            buffer[2] = c2 ;
+            c2 = _ReadLine_GetNextChar ( rl ) ; // the closing '\''
+            if ( c1 == 't' ) charLiteral = 0x9 ;
+            else if ( c1 == 'n' ) charLiteral = 0xa ;
+            else if ( c1 == 'r' ) charLiteral = 0xd ;
+            else if ( c1 == 'b' ) charLiteral = 0x8 ;
+            buffer[2] = c1 ;
             buffer[3] = '\'' ; // c3
             buffer[4] = 0 ;
         }
         else
         {
-            charLiteral = c1 ;
+            charLiteral = c0 ;
             buffer[2] = '\'' ; // c2
             buffer[3] = 0 ;
         }
 done:
-        //Word * word0 = _CfrTil_WordList_Top ( ) ;
         CfrTil_WordLists_PopWord ( ) ; // pop the "'" token
-        word = _DObject_New ( buffer, charLiteral, LITERAL | CONSTANT | IMMEDIATE, 0, LITERAL, ( byte* ) _DataObject_Run, 0, 0, 0, TEMPORARY ) ;
+        word = _DObject_New (buffer, charLiteral, LITERAL | CONSTANT | IMMEDIATE, 0, 0, LITERAL, ( byte* ) _DataObject_Run, 0, 0, 0, TEMPORARY ) ;
         _Interpreter_DoWord ( _Interpreter_, word, _Lexer_->TokenStart_ReadLineIndex ) ;
-        //DebugWordList_Show ( ) ;
     }
     else
     {
         CfrTil_Token ( ) ;
-        _Tick ( _Context_, findWordFlag ) ;
+        //_Tick ( _Context_, findWordFlag ) ;
     }
 }
 

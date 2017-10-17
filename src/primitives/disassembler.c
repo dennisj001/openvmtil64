@@ -1,5 +1,5 @@
 
-#include "../include/cfrtil.h"
+#include "../include/cfrtil64.h"
 
 void
 _CfrTil_Word_Disassemble ( Word * word )
@@ -28,7 +28,7 @@ _Word_Disassemble ( Word * word )
     }
     else
     {
-        _Printf ( ( byte* ) "\nWordDisassemble : word = 0x%lx", word ) ;
+        _Printf ( ( byte* ) "\nWordDisassemble : word = 0x%016lx", word ) ;
     }
 }
 

@@ -1,5 +1,5 @@
 
-#include "../include/cfrtil.h"
+#include "../include/cfrtil64.h"
 
 /*
  * 
@@ -364,7 +364,7 @@ _CfrTil_SC_ScratchPadIndex_Init ( CfrTil * cfrtil )
 }
 
 void
-__CfrTil_SourceCode_Init ( CfrTil * cfrtil )
+SourceCode_Init ( CfrTil * cfrtil )
 {
     cfrtil->SC_ScratchPad [ 0 ] = 0 ;
     cfrtil->SC_ScratchPadIndex = 0 ;
@@ -373,9 +373,7 @@ __CfrTil_SourceCode_Init ( CfrTil * cfrtil )
 void
 _CfrTil_SourceCode_Init ( CfrTil * cfrtil )
 {
-    //cfrtil->SC_ScratchPad [ 0 ] = 0 ;
-    //cfrtil->SC_ScratchPadIndex = 0 ;
-    __CfrTil_SourceCode_Init ( cfrtil ) ;
+    SourceCode_Init ( cfrtil ) ;
     SetState ( cfrtil, SOURCE_CODE_INITIALIZED, true ) ;
 }
 
@@ -430,7 +428,7 @@ _CfrTil_FinishSourceCode ( CfrTil * cfrtil )
     //if ( ! word->SourceCode ) word->SourceCode = String_New ( cfrtil->SC_ScratchPad, STRING_MEM ) ;
     byte *sourceCode = String_New ( cfrtil->SC_ScratchPad, STRING_MEM ) ;
     Lexer_SourceCodeOff ( _Context_->Lexer0 ) ;
-    __CfrTil_SourceCode_Init ( cfrtil ) ;
+    SourceCode_Init ( cfrtil ) ;
     SetState ( cfrtil, SOURCE_CODE_INITIALIZED, false ) ;
 
     return sourceCode ;

@@ -5,7 +5,7 @@ SOURCES = basis/compiler/machineCode.c basis/compiler/_compile.c basis/compiler/
 	basis/core/conditionals.c basis/compiler/blocks.c basis/core/compile.c basis/core/_system.c\
 	basis/compiler/optimize.c basis/compiler/bits.c basis/compiler/udis.c basis/compiler/arrays.c \
 	basis/core/io.c basis/core/symbol.c basis/repl.c basis/core/syntax.c basis/core/dataObjectNew.c\
-        basis/cfrtil.c basis/core/parse.c basis/core/memSpace.c basis/init.c basis/system.c basis/core/charSet.c\
+        basis/cfrtil64.c basis/core/parse.c basis/core/memSpace.c basis/init.c basis/system.c basis/core/charSet.c\
 	basis/core/dllist.c basis/core/interpret.c basis/core/lexer.c basis/core/cstack.c basis/core/classes.c basis/debugOutput.c\
 	basis/core/namespace.c basis/history.c basis/core/readline.c basis/core/dataStack.c basis/context.c\
 	basis/core/word.c basis/core/readTable.c basis/bigNum.c basis/core/_readline.c basis/core/array.c\
@@ -22,18 +22,18 @@ SOURCES = basis/compiler/machineCode.c basis/compiler/_compile.c basis/compiler/
 	primitives/disassembler.c primitives/syntaxes.c primitives/cmaths.c primitives/dataObjectNews.c  #basis/x.c
 
 INCLUDES = include/machineCode.h include/defines.h include/types.h \
-	include/cfrtil.h include/macros.h include/bitfields.h \
+	include/cfrtil64.h include/macros.h \
 	include/machineCodeMacros.h include/stacks.h #include/gc.h
 
 OBJECTS = $(SOURCES:%.c=%.o) 
 CC = gcc
-OUT = cfrtil-gdb
+OUT = cfrtil64-gdb
 
 default : debug
 
-debug : cfrtil-gdb #cfrtils
-run : cfrtil
-all: cfrtil cfrtil-gdb #cfrtils
+debug : cfrtil64-gdb #cfrtil64s
+run : cfrtil64
+all: cfrtil64 cfrtil64-gdb #cfrtil64s
 	
 #CFLAGS_CORE = -m32 -finline-functions #-I/usr/include/x86_64-linux-gnu -I/usr/src/linux -I/usr/src/linux-headers-4.2.0-42-generic/arch/ia64/include -I/usr/include/x86_64-linux-gnu# -O3 -fomit-frame-pointer
 CFLAGS_CORE = -finline-functions #-I/usr/include/x86_64-linux-gnu -I/usr/src/linux -I/usr/src/linux-headers-4.2.0-42-generic/arch/ia64/include -I/usr/include/x86_64-linux-gnu# -O3 -fomit-frame-pointer
@@ -48,7 +48,7 @@ oclean :
 	
 _clean : 
 	make oclean
-	-rm cfrtil-gdb ../bin/cfrtil*
+	-rm cfrtil64-gdb ../bin/cfrtil64*
 
 clean : 
 	make _clean
@@ -61,14 +61,14 @@ include/prototypes.h : $(INCLUDES)
 	mv proto.h include/prototypes.h
 	make _clean
 
-cfrtil : CFLAGS = $(CFLAGS_CORE)
-cfrtil : include/prototypes.h $(OBJECTS)
+cfrtil64 : CFLAGS = $(CFLAGS_CORE)
+cfrtil64 : include/prototypes.h $(OBJECTS)
 	$(CC) $(CFLAGS) $(OBJECTS) -o cfrtil64 $(LIBS)
 	strip cfrtil64
 	mv cfrtil64 ../bin/
 	
-cfrtils : CFLAGS = $(CFLAGS_CORE)
-cfrtils : include/prototypes.h $(OBJECTS)
+cfrtil64s : CFLAGS = $(CFLAGS_CORE)
+cfrtil64s : include/prototypes.h $(OBJECTS)
 	$(CC) -static $(CFLAGS) $(OBJECTS) -o cfrtil64s $(LIBS)
 	strip cfrtil64s
 	mv cfrtil64s ../bin/
@@ -79,29 +79,29 @@ static : include/prototypes.h $(OBJECTS)
 	strip cfrtil64s
 	mv cfrtil64s ../bin/
 
-cfrtil-gdb : CFLAGS = $(CFLAGS_CORE) -ggdb 
-cfrtil-gdb : include/prototypes.h $(OBJECTS) 
-	$(CC) $(CFLAGS) $(OBJECTS) -o cfrtil-gdb $(LIBS)
-	strip -o cfrtil64 cfrtil-gdb
+cfrtil64-gdb : CFLAGS = $(CFLAGS_CORE) -ggdb 
+cfrtil64-gdb : include/prototypes.h $(OBJECTS) 
+	$(CC) $(CFLAGS) $(OBJECTS) -o cfrtil64-gdb $(LIBS)
+	strip -o cfrtil64 cfrtil64-gdb
 	mv cfrtil64 ../bin/cfrtil64
 
-cfrtilo : $(OBJECTS)
+cfrtil64o : $(OBJECTS)
 	$(CC) $(CFLAGS) $(OBJECTS) -o $(OUT) $(LIBS)
 	strip $(OUT)
 
-_cfrtil_O1 : CFLAGS = $(CFLAGS_CORE) -O1
-_cfrtil_O1 : OUT = cfrtilo1
-_cfrtil_O1 : cfrtilo
+_cfrtil64_O1 : CFLAGS = $(CFLAGS_CORE) -O1
+_cfrtil64_O1 : OUT = cfrtil64o1
+_cfrtil64_O1 : cfrtil64o
 
-_cfrtil_O2 : CFLAGS = $(CFLAGS_CORE) -O2
-_cfrtil_O2 : OUT = cfrtilo2
-_cfrtil_O2 : cfrtilo
+_cfrtil64_O2 : CFLAGS = $(CFLAGS_CORE) -O2
+_cfrtil64_O2 : OUT = cfrtil64o2
+_cfrtil64_O2 : cfrtil64o
 
-_cfrtil_O3 : CFLAGS = $(CFLAGS_CORE) -O3
-_cfrtil_O3 : OUT = cfrtilo3
-_cfrtil_O3 : cfrtilo
+_cfrtil64_O3 : CFLAGS = $(CFLAGS_CORE) -O3
+_cfrtil64_O3 : OUT = cfrtil64o3
+_cfrtil64_O3 : cfrtil64o
 
-_cfrtilo :  include/prototypes.h $(OBJECTS)
+_cfrtil64o :  include/prototypes.h $(OBJECTS)
 	$(CC) $(CFLAGS) basis/compiler/*.o basis/*.o primitives/*.o -o $(OUT) $(LIBS)
 
 primitives/cmaths.o : primitives/cmaths.c
@@ -145,17 +145,17 @@ primitives/gc.o : primitives/gc.c
 #-I/usr/include/fox-1.6 -DHAVE_XFT_H -DHAVE_XRANDR_H=1 -DSTARTUP_NOTIFICATION   -o xfi ../st/st.o icons.o xfeutils.o startupnotification.o StringList.o CommandWindow.o InputDialog.o DialogBox.o OverwriteBox.o FileDict.o IconList.o File.o FileList.o DirList.o FileDialog.o MessageBox.o DirHistBox.o TextLabel.o PathLinker.o XFileImage.o ../libsn/sn-common.o ../libsn/sn-launchee.o ../libsn/sn-launcher.o ../libsn/sn-list.o ../libsn/sn-monitor.o ../libsn/sn-util.o ../libsn/sn-xmessages.o ../libsn/sn-xutils.o -lutil -lfontconfig -lpng -lFOX-1.6  -lX11 -lfreetype -lXft -lXrandr
 
 tags :
-	ctags -R --c++-types=+px --excmd=pattern --exclude=Makefile --exclude=. /home/dennisj/projects/workspace/cfrtil
+	ctags -R --c++-types=+px --excmd=pattern --exclude=Makefile --exclude=. /home/dennisj/projects/workspace/cfrtil64
 
 proto:
 	touch include/defines.h
 	make include/prototypes.h
 
-optimize1 : oclean _cfrtil_O1
+optimize1 : oclean _cfrtil64_O1
 
-optimize2 : oclean _cfrtil_O2
+optimize2 : oclean _cfrtil64_O2
 
-optimize3 : oclean _cfrtil_O3
+optimize3 : oclean _cfrtil64_O3
 
 optimize :
 	make optimize1
@@ -163,14 +163,14 @@ optimize :
 	make optimize3
 	make clean
 	make
-	-rm bin/cfrtilo*
-	mv cfrtil cfrtil* bin
+	-rm bin/cfrtil64o*
+	mv cfrtil64 cfrtil64* bin
 
 editorClean :
 	rm *.*~ basis/*.*~ basis/compiler/*.*~ primitives/*.*~ include/*.*~
 
 realClean : _clean editorClean
-	rm cfrtil cfrtil-gdb
+	rm cfrtil64 cfrtil64-gdb
 
 udis :
 	wget http://prdownloads.sourceforge.net/udis86/udis86-1.7.2.tar.gz
@@ -235,54 +235,42 @@ suffix = *.[cfht^~]*
 sfx = *.[a-np-wz]*
 zip : 
 	-mv nbproject ../backup
-	zip  cfrtil.zip */$(sfx) */*/$(sfx) *.htm* Makefile m r script* netbeansReset *.cft* retroImage $(sfx)			    
+	zip  cfrtil64.zip */$(sfx) */*/$(sfx) *.htm* Makefile m r script* netbeansReset *.cft* retroImage $(sfx)			    
 	-mv ../backup/nbproject .
 
 tar.xz :	
-	tar -c --xz --exclude=nbproject --exclude=mpfr* --exclude=.git --exclude=*.png --exclude=cfrtil-gdb  --exclude=*.o --exclude *.kdev* -f cfrtil.tar.xz * *.*
-	#tar -c --xz --exclude=nbproject --exclude=.git --exclude=*.png --exclude=cfrtil-gdb  --exclude=*.o -f cfrtil.tar.xz * *.cft #.init.cft
+	tar -c --xz --exclude=nbproject --exclude=mpfr* --exclude=.git --exclude=*.png --exclude=cfrtil64-gdb  --exclude=*.o --exclude *.kdev* -f cfrtil64.tar.xz * *.*
+	#tar -c --xz --exclude=nbproject --exclude=.git --exclude=*.png --exclude=cfrtil64-gdb  --exclude=*.o -f cfrtil64.tar.xz * *.cft #.init.cft
 
 _xz : 
 	-rm core
-	-rm -rf ~/backup/openvmtil/
-	-cp -r ~/openvmtil/ ~/backup/openvmtil/
-	cd .. && tar -c --xz --exclude=nbproject --exclude=mpfr* --exclude=.git --exclude=*.png --exclude=cfrtil-gdb  --exclude=*.o --exclude *.kdev* -f cfrtil.tar.xz * .init.*
+	-rm -rf ~/backup/openvmtil64/
+	-cp -r ~/openvmtil64/ ~/backup/openvmtil64/
+	cd .. && tar -c --xz --exclude=nbproject --exclude=mpfr* --exclude=.git --exclude=*.png --exclude=cfrtil64-gdb  --exclude=*.o --exclude *.kdev* -f cfrtil64.tar.xz * .init.*
 
 xz : 
 	-make default
 	make _xz
 
 copy :
-	cp ../.init.cft namespaces
-	cp ../cfrtil.tar.xz ../cfrtil.$1.tar.xz
-	cp ../*.tar.xz ~/backup/archive
-	cp ../*.tar.xz ~/Public
-	cp ../*.tar.xz ~/ubackup 
-	cp ../*.tar.xz ~/Documents/backup/
-	cp ../*.tar.xz ~/Programs/Programs2/forth/cfrtil/backup/
-	cp ../*.tar.xz ~/Programs/Programs2/backup/
-	cp ../*.tar.xz ~/workspace/backup/
+	-cp ../.init.cft ../namespaces/
+	-cp ../*.tar.xz ~/backup/archive/
+	-cp ../*.tar.xz ~/Public/
+	-cp ../*.tar.xz ~/ubackup/
+	-cp ../*.tar.xz ~/Documents/backup/
+	-cp ../*.tar.xz ~/Programs/Programs2/forth/cfrtil64/backup/
+	-cp ../*.tar.xz ~/Programs/Programs2/backup/
+	-cp ../*.tar.xz ~/workspace/backup/
 	mv ../*.tar.xz ~/backup/
 
 _all : realClean install
 	make xz
 
-_install : # we are in openvmtil directory
-	-sudo rm -rf /usr/local/lib/cfrTil
-	-sudo mkdir /usr/local/lib/cfrTil
-	-cp ../.init.cft namespaces
-	-sudo cp ../.init.cft /usr/local/lib/cfrTil
-	-sudo cp -r namespaces /usr/local/lib/cfrTil
-	-sudo cp lib/lib*.* /usr/lib
-	-sudo cp bin/cfrtil64 /usr/local/bin/cfrtil64
-#	-sudo chown dennisj /usr/local/bin/cfrtil
-	-sudo ldconfig
-
 _install_1 : # we are in src directory
 	-mv ../.git ../../backup
-	-cp ../.init.cft ../namespaces
-	-sudo rm -rf /usr/local/lib/cfrTil/
-	-sudo cp -r ../ /usr/local/lib/cfrTil/
+	-cp ../.init.cft ../namespaces/
+	-sudo rm -rf /usr/local/lib/cfrTil64/
+	-sudo cp -r ../ /usr/local/lib/cfrTil64/
 	-sudo cp -r ../etc /usr/local/
 	-sudo cp ../lib/lib*.* /usr/lib
 #	-sudo rm -r /usr/local/lib/cfrTil/nbproject
@@ -294,17 +282,17 @@ install0 :
 	make _clean
 	make 
 	make _install
-	ls -l ./cfrtil
+	ls -l ./cfrtil64
 	
 install :
 	make
 	make _install
-	ls -l bin/cfrtil
+	ls -l bin/cfrtil64
 	
 install_1 :
 	make
 	make _install_1
-	ls -l /usr/local/bin/cfrtil*
+	ls -l /usr/local/bin/cfrtil64*
 	
 run :
 	cfrtil64

@@ -1,5 +1,5 @@
 
-#include "../../include/cfrtil.h"
+#include "../../include/cfrtil64.h"
 
 Word *
 Compiler_CopyDuplicatesAndPush ( Word * word0 )

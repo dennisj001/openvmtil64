@@ -1,5 +1,5 @@
 
-#include "../include/cfrtil.h"
+#include "../include/cfrtil64.h"
 
 #if 0 // not used yet -- maybe replaced by better DObject functionality
 Attribute *

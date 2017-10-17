@@ -1,5 +1,5 @@
 
-#include "../include/cfrtil.h"
+#include "../include/cfrtil64.h"
 
 void
 Debugger_Menu ( Debugger * debugger )
@@ -192,7 +192,7 @@ _Debugger_ShowEffects ( Debugger * debugger, Word * word, int8 stepFlag, int8 fo
     debugger->w_Word = word ;
     uint64* dsp = Dsp ;
     if ( ! dsp ) CfrTil_Exception ( STACK_ERROR, QUIT ) ;
-    if ( Is_DebugShowOn && ( force || stepFlag || ( debugger->w_Word != debugger->LastEffectsWord ) ) )
+    if ( Is_DebugOn && ( force || stepFlag || ( debugger->w_Word != debugger->LastEffectsWord ) ) )
     {
         Word * word = debugger->w_Word ;
         if ( force || ( ( stepFlag ) || ( word ) && ( word != debugger->LastEffectsWord ) ) )

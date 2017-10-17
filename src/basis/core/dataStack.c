@@ -1,5 +1,5 @@
 
-#include "../../include/cfrtil.h"
+#include "../../include/cfrtil64.h"
 
 // these functions are part of the C vm and can't be compiled
 // ! they are should only be called in C functions !

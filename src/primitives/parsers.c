@@ -1,5 +1,5 @@
 
-#include "../include/cfrtil.h"
+#include "../include/cfrtil64.h"
 
 void
 CfrTil_Token ( )
@@ -24,7 +24,7 @@ CfrTil_SingleQuote ( )
 void
 CfrTil_Tick ( )
 {
-    _CfrTil_SingleQuote ( 1 ) ;
+    _CfrTil_SingleQuote ( 0 ) ;
 }
 
 
