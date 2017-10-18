@@ -16,7 +16,7 @@ HistorySymbolList_Find ( byte * hstring )
     HistoryStringNode * hsn = 0 ;
     dlnode * node, * nextNode ;
 #if 1   
-    for ( node = dllist_First ( (dllist*) _Q_->OVT_HistorySpace.StringList ) ; node ; node = nextNode ) // index = dlnode_NextNode ( &_Q->HistoryList, (dlnode *) index ) )
+    for ( node = dllist_First ( ( dllist* ) _Q_->OVT_HistorySpace.StringList ) ; node ; node = nextNode ) // index = dlnode_NextNode ( &_Q->HistoryList, (dlnode *) index ) )
     {
         nextNode = dlnode_Next ( node ) ;
         hsn = ( HistoryStringNode* ) node ;
@@ -26,7 +26,7 @@ HistorySymbolList_Find ( byte * hstring )
         }
     }
 #else // some work towards eliminating the StringList and just using the MemList
-    for ( node = dllist_First ( (dllist*) _Q_->OVT_HistorySpace.MemList ) ; node ; node = nextNode ) // index = dlnode_NextNode ( &_Q->HistoryList, (dlnode *) index ) )
+    for ( node = dllist_First ( ( dllist* ) _Q_->OVT_HistorySpace.MemList ) ; node ; node = nextNode ) // index = dlnode_NextNode ( &_Q->HistoryList, (dlnode *) index ) )
     {
         nextNode = dlnode_Next ( node ) ;
         hsn = ( HistoryStringNode* ) ( ( MemChunk * ) node + 1 ) ;
@@ -111,10 +111,18 @@ HistorySpace_Delete ( )
 HistorySpace *
 _HistorySpace_Init ( OpenVmTil * ovt, int64 reset )
 {
-    ovt->OVT_HistorySpace.StringList = & ovt->OVT_HistorySpace._StringList ;
-    dllist_Init ( ovt->OVT_HistorySpace.StringList, &ovt->OVT_HistorySpace._StringList_HeadNode, &ovt->OVT_HistorySpace._StringList_TailNode ) ;
-    if ( ovt ) _Q_->OVT_HistorySpace.HistorySpaceNBA = ovt->MemorySpace0->HistorySpace ;
-    if ( reset ) _NamedByteArray_Init ( _Q_->OVT_HistorySpace.HistorySpaceNBA, ( byte* ) "HistorySpace", HISTORY_SIZE, HISTORY ) ;
+    if ( ovt )
+    {
+        if ( reset )
+        {
+            MemorySpace * ms = ovt->MemorySpace0 ;
+            ms->HistorySpace = MemorySpace_NBA_New ( ms, ( byte* ) "HistorySpace", HISTORY_SIZE, HISTORY ) ;
+        }
+        ovt->OVT_HistorySpace.StringList = & ovt->OVT_HistorySpace._StringList ;
+        dllist_Init ( ovt->OVT_HistorySpace.StringList, &ovt->OVT_HistorySpace._StringList_HeadNode, &ovt->OVT_HistorySpace._StringList_TailNode ) ;
+        ovt->OVT_HistorySpace.HistorySpaceNBA = ovt->MemorySpace0->HistorySpace ;
+        //if ( reset ) _NamedByteArray_Init ( _Q_->OVT_HistorySpace.HistorySpaceNBA, ( byte* ) "HistorySpace", HISTORY_SIZE, HISTORY ) ;
+    }
 }
 
 void

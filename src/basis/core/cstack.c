@@ -48,9 +48,11 @@ _Stack_PrintHeader ( Stack * stack, byte * name )
     int64 size = Stack_Depth ( stack ) ;
     uint64 * sp = stack->StackPointer ; // 0 based stack
     byte * location = c_gd ( Context_Location ( ) ) ;
-    _Printf ( ( byte* ) "\nStack at : %s :\n%s depth =%4d : %s = Top = " UINT_FRMT ", InitialTos = " UINT_FRMT ","
-        " Max = " UINT_FRMT ", Min = " UINT_FRMT ", Size = " UINT_FRMT, location,
-        name, size, stack == _DataStack_ ? "Dsp (R14)" : "", ( int64 ) sp, ( int64 ) stack->InitialTosPointer, ( int64 ) stack->StackMax, ( int64 ) stack->StackMin, stack->StackMax - stack->StackMin + 1 ) ;
+    _Printf ( ( byte* ) "\nStack at : %s :\n%s depth =%4d : %s = Top = " UINT_FRMT ", InitialTos = " UINT_FRMT
+        //" Max = " UINT_FRMT ", Min = " UINT_FRMT ", Size = " UINT_FRMT, location,
+        ", Size = " UINT_FRMT, location,
+        //name, size, stack == _DataStack_ ? "Dsp (R14)" : "", ( int64 ) sp, ( int64 ) stack->InitialTosPointer, ( int64 ) stack->StackMax, ( int64 ) stack->StackMin, stack->StackMax - stack->StackMin + 1 ) ;
+        name, size, stack == _DataStack_ ? "Dsp (R14)" : "", ( int64 ) sp, ( int64 ) stack->InitialTosPointer, stack->StackMax - stack->StackMin + 1 ) ;
 }
 
 void

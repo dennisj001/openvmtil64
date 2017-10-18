@@ -2,7 +2,7 @@
 sp
 Root.Int C
 // logic test
-d: Logic Bits
+Logic Bits
 sp
 : lt 1 2 < p ; lt 
 : lt2 1 2 > p ; lt2

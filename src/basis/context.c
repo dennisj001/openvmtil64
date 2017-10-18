@@ -42,25 +42,50 @@ Context_Delete ( Context * context )
     Mem_FreeItem ( &_Q_->PermanentMemList, ( byte* ) context ) ;
 }
 #endif    
+#if 0
+Context *
+_Context_Allocate ( CfrTil * cfrTil )
+{
+    Context * cntx = ( Context* ) OVT_CheckRecyclableAllocate ( _Q_->MemorySpace0->RecycledContextList, sizeof ( Context ), 1 ) ;
+    if ( ! cntx ) cntx = ( Context* ) Mem_Allocate ( sizeof ( Context ), CONTEXT ) ;
+    cntx->C_Node.n_InUseFlag = N_LOCKED ;
+    cntx->C_Node.n_Size = sizeof ( Context ) ;
+    dllist_AddNodeToHead ( _Q_->MemorySpace0->RecycledContextList, ( dlnode* ) cntx ) ;
+    return cntx ;
+}
+#else
+Context *
+_Context_Allocate ()
+{
+    NBA * nba = MemorySpace_NBA_New ( _Q_->MemorySpace0, ( byte* ) String_New ( "ContextSpace", STRING_MEM ), 10 * K, CONTEXT ) ;
+    _Q_->MemorySpace0->ContextSpace = nba ;
+    Context * cntx = ( Context* ) Mem_Allocate ( sizeof ( Context ), CONTEXT ) ;
+    cntx->ContextNba = nba ;
+    return cntx ;
+}
+#endif    
 
 Context *
-_Context_New ( CfrTil * cfrTil )
+_Context_Init ( Context * cntx0, Context * cntx )
 {
-    Context * cntx, *context0 = cfrTil->Context0 ;
-    int64 allocType = CONTEXT ;
-    NBA * nba = MemorySpace_NBA_New ( _Q_->MemorySpace0, ( byte* ) String_New ( "ContextSpace", STRING_MEM ), 5 * K, allocType ) ;
-    _Q_->MemorySpace0->ContextSpace = nba ;
-    _Context_ = cntx = ( Context* ) Mem_Allocate ( sizeof ( Context ), allocType ) ;
-    cntx->ContextNba = nba ;
-    if ( context0 && context0->System0 ) cntx->System0 = System_Copy ( context0->System0, allocType ) ; // nb : in this case System is copied -- DataStack is shared
-    else cntx->System0 = System_New ( allocType ) ;
-    cntx->ContextDataStack = cfrTil->DataStack ; // nb. using the same one and only DataStack
-    cntx->Interpreter0 = Interpreter_New ( allocType ) ;
+    if ( cntx0 && cntx0->System0 ) cntx->System0 = System_Copy ( cntx0->System0, CONTEXT ) ; // nb : in this case System is copied -- DataStack is shared
+    else cntx->System0 = System_New ( CONTEXT ) ;
+    cntx->Interpreter0 = Interpreter_New ( CONTEXT ) ;
     cntx->Lexer0 = cntx->Interpreter0->Lexer0 ;
     cntx->ReadLiner0 = cntx->Interpreter0->ReadLiner0 ;
     cntx->Lexer0->OurInterpreter = cntx->Interpreter0 ;
     cntx->Finder0 = cntx->Interpreter0->Finder0 ;
     cntx->Compiler0 = cntx->Interpreter0->Compiler0 ;
+    return cntx ;
+}
+
+Context *
+_Context_New ( CfrTil * cfrTil )
+{
+    Context * cntx, *cntx0 = cfrTil->Context0 ;
+    _Context_ = cfrTil->Context0 = cntx = _Context_Allocate () ;
+    _Context_Init ( cntx0, cntx ) ;
+    cntx->ContextDataStack = cfrTil->DataStack ; // nb. using the same one and only DataStack
     return cntx ;
 }
 
@@ -85,13 +110,31 @@ _Context_Run ( Context * cntx, ContextFunction contextFunction )
 Context *
 CfrTil_Context_PushNew ( CfrTil * cfrTil )
 {
-    Context * cntx ;
     _Stack_Push ( cfrTil->ContextStack, ( int64 ) cfrTil->Context0 ) ;
-    _Context_ = cntx = _Context_New ( cfrTil ) ;
-    cfrTil->Context0 = cntx ;
+    Context * cntx = _Context_New ( cfrTil ) ;
     return cntx ;
 }
+#if 0
+void
+Context_Recycle ( Context * cntx )
+{
+    if ( cntx )
+    {
+        cntx->C_Node.n_InUseFlag = N_FREE ; 
+        //cntx->C_Node.n_Size = sizeof ( Context ) ;
+    }
+}
 
+void
+CfrTil_Context_PopDelete ( CfrTil * cfrTil )
+{
+    //NBA * cnba = cfrTil->Context0->ContextNba ;
+    Context * cntx0 = cfrTil->Context0 ;
+    Context * cntx = ( Context* ) _Stack_Pop ( cfrTil->ContextStack ) ;
+    _Context_ = cfrTil->Context0 = cntx ;
+    Context_Recycle ( cntx0 ) ;
+}
+#else
 void
 CfrTil_Context_PopDelete ( CfrTil * cfrTil )
 {
@@ -101,6 +144,7 @@ CfrTil_Context_PopDelete ( CfrTil * cfrTil )
     _Q_->MemorySpace0->ContextSpace = cntx->ContextNba ;
     NamedByteArray_Delete ( cnba ) ;
 }
+#endif
 
 void
 _CfrTil_Contex_NewRun_1 ( CfrTil * cfrTil, ContextFunction_1 contextFunction, byte *arg )
@@ -124,7 +168,6 @@ _CfrTil_Contex_NewRun_Void ( CfrTil * cfrTil, Word * word )
     if ( word )
     {
         CfrTil_Context_PushNew ( cfrTil ) ;
-        //word->Definition ( ) ;
         _Block_Eval ( word->Definition ) ;
         CfrTil_Context_PopDelete ( cfrTil ) ; // this could be coming back from wherever so the stack variables are gone
     }
@@ -245,6 +288,7 @@ CfrTil_DoubleQuoteMacro ( )
 }
 
 #if 0
+
 void
 _Tick ( Context * cntx, int64 findWordFlag )
 {

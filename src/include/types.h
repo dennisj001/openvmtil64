@@ -95,10 +95,10 @@ typedef struct _dobject
     } ;
     struct
     {
-        int16 do_Type ;
-        int16 do_Slots ;
+        int32 do_Type ;
         int16 do_Size ;
-        int16 do_InUseFlag ;
+        int8 do_Slots ;
+        int8 do_InUseFlag ;
     } ;
     union
     {
@@ -119,7 +119,9 @@ typedef struct
         struct
         {
             int32 n_Type ;
-            int32 n_Slots ;
+            int16 n_Size ;
+            int8 n_Slots ;
+            int8 n_InUseFlag ;
         } ;
         byte * n_unmap ;
     } ;
@@ -140,7 +142,9 @@ typedef struct
                 struct
                 {
                     int32 n_Type ;
-                    int32 n_Slots ;
+                    int16 n_Size ;
+                    int8 n_Slots ;
+                    int8 n_InUseFlag ;
                 } ;
                 node * n_CurrentNode ;
                 byte * n_unmap ;
@@ -157,10 +161,10 @@ typedef struct
             {
                 struct
                 {
-                    int16 do_Type ;
-                    int16 do_Slots ;
+                    int32 do_Type ;
                     int16 do_Size ;
-                    int16 do_InUseFlag ;
+                    int8 do_Slots ;
+                    int8 do_InUseFlag ;
                 } ;
                 byte * do_bData ;
                 int64 * do_iData ;
@@ -266,7 +270,7 @@ typedef struct _Identifier
 #define LProp S_LAttribute
 #define WProp S_WAttribute
 #define Data S_pb_Data2
-#define InUseFlag S_Node.do_InUseFlag
+#define InUseFlag S_Node.n_InUseFlag
 
 #define Lo_CAttribute CAttribute
 #define Lo_LAttribute LAttribute
@@ -710,6 +714,7 @@ typedef struct
 } System ;
 typedef struct
 {
+    DLNode C_Node ;
     uint64 State ;
     int64 NsCount, WordCount ;
     ReadLiner *ReadLiner0 ;
@@ -837,6 +842,7 @@ typedef struct
     dlnode NBAsTailNode ;
     dllist * BufferList ;
     dllist * RecycledWordList ;
+    //dllist * RecycledContextList ;
     int64 RecycledWordCount ;
 } MemorySpace ;
 typedef struct
@@ -902,7 +908,7 @@ typedef struct
     dlnode PML_TailNode ;
     MemorySpace * MemorySpace0 ;
     int64 PermanentMemListRemainingAccounted, TotalNbaAccountedMemRemaining, TotalNbaAccountedMemAllocated, TotalMemSizeTarget ;
-    int64 Mmap_RemainingMemoryAllocated, OVT_InitialUnAccountedMemory, TotalMemFreed, TotalMemAllocated, NumberOfByteArrays ;
+    int64 Mmap_RemainingMemoryAllocated, OVT_InitialUnAccountedMemory, RunTimeAllocation, TotalMemFreed, TotalMemAllocated, NumberOfByteArrays ;
 
     // variables accessible from cfrTil
     int64 Verbosity ;

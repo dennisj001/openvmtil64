@@ -30,7 +30,7 @@ byte *
 Debugger_CompileOneInstruction ( Debugger * debugger, byte * jcAddress, Boolean showFlag )
 {
     ByteArray * svcs = _Q_CodeByteArray ;
-    _ByteArray_ReInit ( debugger->StepInstructionBA ) ; // we are only compiling one insn here so clear our BA before each use
+    _ByteArray_Init ( debugger->StepInstructionBA ) ; // we are only compiling one insn here so clear our BA before each use
     Set_CompilerSpace ( debugger->StepInstructionBA ) ; // now compile to this space
 
     _Compile_Save_C_CpuState ( _CfrTil_, showFlag ) ; //&& ( _Q_->Verbosity >= 3 ) ) ; // save our c compiler cpu register state

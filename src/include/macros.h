@@ -65,20 +65,20 @@
 //#define CompilerLastWord Compiler_WordStack( 0 )
 //#define WordsBack( n ) Compiler_WordStack( (-n) )
 #define WordsBack( n ) Compiler_WordList( (n) )
-#define B_FREE  1
-#define B_UNLOCKED 2
-#define B_LOCKED  4
-#define B_IN_USE B_LOCKED
-#define B_PERMANENT 8
+#define N_FREE  1
+#define N_UNLOCKED 2
+#define N_LOCKED  4
+#define N_IN_USE N_LOCKED
+#define N_PERMANENT 8
 #define Buffer_Data( b ) b->B_Data
 #define Buffer_DataCleared( b ) Buffer_Data_Cleared (b) 
 #define Buffer_Size( b ) b->B_Size
 #define SetBuffersUnused( force ) Buffers_SetAsUnused ( force ) 
-#define Buffer_MakePermanent( b ) b->InUseFlag = B_PERMANENT
-#define Buffer_Lock( b ) b->InUseFlag = B_LOCKED
-#define Buffer_Unlock( b ) b->InUseFlag = B_UNLOCKED
+#define Buffer_MakePermanent( b ) b->InUseFlag = N_PERMANENT
+#define Buffer_Lock( b ) b->InUseFlag = N_LOCKED
+#define Buffer_Unlock( b ) b->InUseFlag = N_UNLOCKED
 //#define Buffer_AllowReUse( b ) b->InUseFlag = B_FREE 
-#define _Buffer_SetAsFree( b )  b->InUseFlag = B_FREE 
+#define _Buffer_SetAsFree( b )  b->InUseFlag = N_FREE 
 
 #define Attribute_FromWord( word ) (( Attribute * ) (word)->This )
 
@@ -220,7 +220,7 @@
 #define Get_BA_Symbol_To_BA( s )  ( ByteArray* ) ( ( ( Symbol* ) s )->S_pb_Data2 ) 
 #define Set_NBA_Symbol_To_NBA( nba )  nba->NBA_Symbol.S_pb_Data2 = ( byte* ) nba
 #define Set_BA_Symbol_To_BA( ba )  ba->BA_Symbol.S_pb_Data2 = ( byte* ) ba
-#define MemCheck( block ) { _Calculate_TotalNbaAccountedMemAllocated ( 1 ) ; block ; _Calculate_TotalNbaAccountedMemAllocated ( 1 ) ; }
+#define MemCheck( block ) { Calculate_TotalNbaAccountedMemAllocated ( 1 ) ; block ; Calculate_TotalNbaAccountedMemAllocated ( 1 ) ; }
 
 #define _Debugger_ _CfrTil_->Debugger0
 #define DebugOff SetState ( _CfrTil_, DEBUG_MODE|_DEBUG_SHOW_, false )

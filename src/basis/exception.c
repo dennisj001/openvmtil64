@@ -54,7 +54,7 @@ int64
 _OVT_Pause ( byte * prompt, int64 signalsHandled )
 {
     int64 rtrn = 0 ;
-    //if ( _Context_->ReadLiner0->Filename )
+    if ( _CfrTil_ && _Context_ )
     {
         byte buffer [512], *defaultPrompt =
             ( byte * ) "\n%s%s : at %s :: %s\n'd' (d)ebugger, 't' s(t)ack, c' (c)ontinue, 'q' (q)uit, 'x' e(x)it, 'i' '\\' or <key> (i)interpret, <return> loop%s" ;
@@ -190,7 +190,7 @@ _OVT_Throw ( int64 restartCondition, int8 pauseFlag )
         if ( _Q_->RestartCondition >= INITIAL_START ) jb = & _Q_->JmpBuf0 ;
         else jb = & _CfrTil_->JmpBuf0 ;
     }
-    printf ( "\n%s %s -> ...\n", ( jb == & _CfrTil_->JmpBuf0 ) ? "reseting cfrTil" : "fully restarting", ( _Q_->Signal == SIGSEGV ) ? ": SIGSEGV" : "" ) ;
+    printf ( "\n%s %s at %s -> ...\n", ( jb == & _CfrTil_->JmpBuf0 ) ? "reseting cfrTil" : "fully restarting", ( _Q_->Signal == SIGSEGV ) ? ": SIGSEGV" : "", Context_Location () ) ;
     fflush ( stdout ) ;
 
     //if ( ( ! pauseFlag ) && ( _Q_->SignalExceptionsHandled < 2 ) ) _OVT_Pause ( 0, _Q_->SignalExceptionsHandled ) ;

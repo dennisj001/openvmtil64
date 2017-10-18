@@ -65,16 +65,16 @@ _Key ( FILE * f )
 }
 
 int64
-_Kbhit ()
+Kbhit_Pause ()
 {
-    if ( kbhit ( ) == ESC ) OpenVmTil_Pause ( ) ;
+    if ( kbhit () == ESC ) OpenVmTil_Pause ( ) ;
 }
 
 int64
 Key_Kbhit ( FILE * f )
 {
     int64 key = _Key ( f ) ;
-    _Kbhit () ;
+    Kbhit_Pause () ;
     return key ;
 }
 

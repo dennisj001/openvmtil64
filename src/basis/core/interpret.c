@@ -147,6 +147,7 @@ _Interpreter_IsWordPrefixing ( Interpreter * interp, Word * word )
 
 
 #if 0
+
 void
 IsIt_C_LeftParen ( Word * word )
 {
@@ -156,6 +157,7 @@ IsIt_C_LeftParen ( Word * word )
         Pause ( ) ;
     }
 }
+
 void
 Find_C_LeftParen ( )
 {
@@ -204,7 +206,7 @@ _Compiler_CopyDuplicatesAndPush ( Compiler * compiler, Word * word )
             word0->S_CAttribute |= ( uint64 ) RECYCLABLE_COPY ;
             word0->W_TokenStart_ReadLineIndex = wrli ;
             word0->StackPushRegisterCode = 0 ;
-            d0( IsIt_C_LeftParen ( word ) ) ;
+            d0 ( IsIt_C_LeftParen ( word ) ) ;
             break ;
         }
     }

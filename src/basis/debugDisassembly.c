@@ -17,7 +17,7 @@ Debugger_Udis_GetInstructionSize ( Debugger * debugger )
 Boolean
 Debugger_ShowSourceCodeAtAddress ( Debugger * debugger, byte * address )
 {
-    if ( Compiling || ( _Context_->CurrentlyRunningWord && _Context_->CurrentlyRunningWord->W_SC_WordList ) )
+    if ( ( _Context_->CurrentlyRunningWord && _Context_->CurrentlyRunningWord->W_SC_WordList ) )
     {
         _Debugger_ShowDbgSourceCodeAtAddress ( debugger, address ) ;
         return true ;

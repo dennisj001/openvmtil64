@@ -494,7 +494,7 @@ Tree_Map_State_Flag_OneArg_AnyNamespaceWithState ( uint64 state, MapFunction_1 m
 {
     d1 (
 
-         if ( _CfrTil_->Namespaces ) )
+    if ( _CfrTil_->Namespaces ) )
         {
             Word * word, * word2, *nextWord ;
             _CfrTil_->FindWordCount = 1 ;
@@ -544,6 +544,7 @@ start:
     for ( word = ( Word * ) dllist_First ( list ) ; word ; word = nextWord )
     {
 checkWord:
+        if ( kbhit ( ) ) return 0 ; // prevent unending loop here sometimes
         nextWord = ( Word* ) dlnode_Next ( ( node* ) word ) ;
         if ( mf ( ( Symbol* ) word ) )
         {
@@ -568,11 +569,14 @@ checkOWord:
     }
     rword = word ;
 doReturn:
-    if ( iword ) 
+    if ( iword )
     {
-        if ( ( rword == iword ) ) rword = 0 ; 
+        if ( ( rword == iword ) ) rword = 0 ;
     }
-    else { if ( ++ tci->WordWrapCount < 7 ) goto start ; }
+    else
+    {
+        if ( ++ tci->WordWrapCount < 7 ) goto start ;
+    }
     return rword ;
 }
 

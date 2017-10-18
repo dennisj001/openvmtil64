@@ -207,6 +207,17 @@ _CfrTil_Init ( CfrTil * cfrTil, Namespace * nss )
 void
 CfrTil_ResetMemory ( CfrTil * cfrTil )
 {
+#if 0    
+    if ( cfrTil->ContextStack )
+    {
+        while ( Stack_Depth ( cfrTil->ContextStack ) )
+        {
+            Context * cntx = ( Context* ) _Stack_Pop ( cfrTil->ContextStack ) ;
+            Context_Recycle ( cntx ) ;
+        }
+        //if ( cfrTil->Context0 ) NamedByteArray_Delete ( cfrTil->Context0->ContextNba ) ;
+    }
+#else
     if ( cfrTil->ContextStack )
     {
         while ( Stack_Depth ( cfrTil->ContextStack ) )
@@ -216,6 +227,7 @@ CfrTil_ResetMemory ( CfrTil * cfrTil )
         }
         if ( cfrTil->Context0 ) NamedByteArray_Delete ( cfrTil->Context0->ContextNba ) ;
     }
+#endif    
     //OVT_MemListFree_ContextMemory ( ) ;
     _OVT_MemListFree_CfrTilInternal ( ) ;
     OVT_MemListFree_Session ( ) ;

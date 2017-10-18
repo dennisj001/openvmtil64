@@ -242,7 +242,7 @@ _CfrTil_Version ( int64 flag )
     if ( flag || ( ( _Q_->Verbosity ) && ( _Q_->StartedTimes == 1 ) ) )
     {
         //AllowNewlines ;
-        _Printf ( ( byte* ) "\ncfrTil %s", _Q_->VersionString ) ;
+        _Printf ( ( byte* ) "\ncfrTil64 %s", _Q_->VersionString ) ;
     }
 }
 
@@ -430,7 +430,7 @@ CfrTil_ShellEscape ( )
 void
 OVT_Mem_ShowAllocated ( )
 {
-    _OVT_ShowPermanentMemList ( _Q_, 1 ) ;
+    _OVT_ShowPermanentMemList ( _Q_ ) ;
     OVT_ShowNBAs ( _Q_, 1 ) ;
 }
 

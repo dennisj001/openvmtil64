@@ -114,8 +114,9 @@ _Word_Allocate ( uint64 allocType )
     Word * word = 0 ;
     if ( allocType & ( COMPILER_TEMP | LISP_TEMP ) ) allocType = TEMPORARY ;
     else allocType = DICTIONARY ;
-    word = ( Word* ) OVT_CheckRecyclableAllocate ( _Q_->MemorySpace0->RecycledWordList, sizeof ( Word ) + sizeof ( WordData ) ) ;
-    if ( ! word ) word = ( Word* ) Mem_Allocate ( sizeof ( Word ) + sizeof ( WordData ), allocType ) ;
+    word = ( Word* ) OVT_CheckRecyclableAllocate ( _Q_->MemorySpace0->RecycledWordList, sizeof ( Word ) + sizeof ( WordData ), 0 ) ;
+    if ( word ) _Q_->MemorySpace0->RecycledWordCount ++ ;
+    else word = ( Word* ) Mem_Allocate ( sizeof ( Word ) + sizeof ( WordData ), allocType ) ;
     word->S_WordData = ( WordData * ) ( word + 1 ) ; // nb. "pointer arithmetic"
     return word ;
 }
@@ -145,22 +146,7 @@ _Word_Finish ( Word * word )
 {
     _DObject_Finish ( word ) ;
     CfrTil_Word_FinishSourceCode ( _CfrTil_, word ) ;
-#if 0    
-    //if ( IsSourceCodeOn ) 
-    {
-        word->W_SC_WordList = _Context_->WordList ; //_CfrTil_->DebugWordList ;
-        _Context_->WordList = 0 ;
-        //_CfrTil_->DebugWordList = 0 ;
-    }
-#endif    
     Compiler_Init ( _Context_->Compiler0, 0 ) ; // not really necessary should always be handled by EndBlock ?? but this allows for some syntax errors with a '{' but no '}' ??
-#if 0    
-    if ( DBI )
-    {
-        d1 ( _Printf ( ( byte* ) "\n_Word_Finish :: word = %s :: location : %s :", word->Name, Context_Location ( ) ) ) ;
-        d1 ( _CfrTil_Word_Disassemble ( word ) ) ;
-    }
-#endif    
 }
 
 void

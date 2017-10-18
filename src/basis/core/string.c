@@ -156,7 +156,7 @@ _String_UnBox ( byte * token )
 byte *
 _String_InsertColors ( byte * s, Colors * c )
 {
-    if ( s )
+    if ( _CfrTil_ && s )
     {
         Colors * current = _Q_->Current ;
         byte * tbuffer = Buffer_Data ( _CfrTil_->StringInsertB ) ;
@@ -918,9 +918,9 @@ _Buffer_New ( int64 size, int64 flag )
         {
             nextNode = dlnode_Next ( node ) ;
             b = ( Buffer* ) node ;
-            d0 ( if ( b->InUseFlag != B_PERMANENT ) _Printf ( "\n_Buffer_New : buffer = 0x%08x : flag = 0x%08x : size = %d : length = %d : data = %s\n", b, b->InUseFlag, b->B_Size, strlen ( b->B_Data ), b->B_Data ) ) ;
-            if ( ( b->InUseFlag & ( B_FREE | B_UNLOCKED ) ) && ( b->B_Size >= size ) ) goto done ;
-            else if ( b->InUseFlag == B_PERMANENT ) break ;
+            d0 ( if ( b->InUseFlag != N_PERMANENT ) _Printf ( "\n_Buffer_New : buffer = 0x%08x : flag = 0x%08x : size = %d : length = %d : data = %s\n", b, b->InUseFlag, b->B_Size, strlen ( b->B_Data ), b->B_Data ) ) ;
+            if ( ( b->InUseFlag & ( N_FREE | N_UNLOCKED ) ) && ( b->B_Size >= size ) ) goto done ;
+            else if ( b->InUseFlag == N_PERMANENT ) break ;
         }
     }
     d0 ( Buffer_PrintBuffers ( ) ) ;
@@ -928,7 +928,7 @@ _Buffer_New ( int64 size, int64 flag )
     b->B_CAttribute = BUFFER ;
     b->B_Size = size ;
     b->B_Data = ( byte* ) b + sizeof (Buffer ) ;
-    if ( flag & B_PERMANENT ) dllist_AddNodeToTail ( _Q_->MemorySpace0->BufferList, ( dlnode* ) b ) ;
+    if ( flag & N_PERMANENT ) dllist_AddNodeToTail ( _Q_->MemorySpace0->BufferList, ( dlnode* ) b ) ;
     else dllist_AddNodeToHead ( _Q_->MemorySpace0->BufferList, ( dlnode* ) b ) ;
 done:
     Mem_Clear ( b->B_Data, b->B_Size ) ;
@@ -941,7 +941,7 @@ done:
 int64
 Buffer_SetAsFree ( Buffer * b, int64 force )
 {
-    if ( b->InUseFlag & ( force ? ( B_IN_USE | B_LOCKED | B_UNLOCKED ) : ( B_UNLOCKED ) ) )
+    if ( b->InUseFlag & ( force ? ( N_IN_USE | N_LOCKED | N_UNLOCKED ) : ( N_UNLOCKED ) ) )
     {
         _Buffer_SetAsFree ( b ) ; // must check ; others may be permanent or locked ( true + 1, true + 2) .
         return true ;
@@ -980,10 +980,10 @@ Buffer_PrintBuffers ( )
             b = ( Buffer* ) node ;
             d0 ( _Printf ( "\nBuffer_PrintBuffers : buffer = 0x%08x : nextNode = 0x%08x : flag = 0x%08x : size = %d : length = %d : data = %s\n", b, dlnode_Next ( node ), b->InUseFlag, b->B_Size, strlen ( b->B_Data ), b->B_Data ) ) ;
             nextNode = dlnode_Next ( node ) ;
-            if ( b->InUseFlag & B_FREE ) free ++ ;
-            else if ( b->InUseFlag & B_UNLOCKED ) unlocked ++ ;
-            else if ( b->InUseFlag & B_LOCKED ) locked ++ ;
-            else if ( b->InUseFlag & B_PERMANENT ) permanent ++ ;
+            if ( b->InUseFlag & N_FREE ) free ++ ;
+            else if ( b->InUseFlag & N_UNLOCKED ) unlocked ++ ;
+            else if ( b->InUseFlag & N_LOCKED ) locked ++ ;
+            else if ( b->InUseFlag & N_PERMANENT ) permanent ++ ;
             total ++ ;
         }
     }
@@ -993,19 +993,19 @@ Buffer_PrintBuffers ( )
 Buffer *
 Buffer_New ( int64 size )
 {
-    return _Buffer_New ( size, B_UNLOCKED ) ;
+    return _Buffer_New ( size, N_UNLOCKED ) ;
 }
 
 Buffer *
 Buffer_NewLocked ( int64 size )
 {
-    return _Buffer_New ( size, B_LOCKED ) ;
+    return _Buffer_New ( size, N_LOCKED ) ;
 }
 
 Buffer *
 _Buffer_NewPermanent ( int64 size )
 {
-    return _Buffer_New ( size, B_PERMANENT ) ;
+    return _Buffer_New ( size, N_PERMANENT ) ;
 }
 
 byte *
@@ -1019,7 +1019,7 @@ byte *
 Buffer_New_pbyte ( int64 size )
 {
     //Buffer *b = Buffer_NewLocked ( size ) ;
-    Buffer *b = _Buffer_New ( size, B_LOCKED ) ;
+    Buffer *b = _Buffer_New ( size, N_LOCKED ) ;
     return Buffer_Data ( b ) ;
 }
 

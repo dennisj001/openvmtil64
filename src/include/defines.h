@@ -711,4 +711,4 @@
 
 #define CPU_SAVED    ( (uint64) 1 << 0 )
 #define CPU_SELECTED_SAVED ( (uint64) 1 << 1 )
-
+#define FULL_CONTEXT_SIZE ( 10 * K ) //( sizeof (Context) + sizeof (System) + sizeof (Interpreter) + sizeof ( Lexer ) + sizeof (Compiler) + sizeof ( Finder ) + sizeof (ReadLiner))

@@ -519,7 +519,7 @@ Debugger_Escape ( Debugger * debugger )
     DebugOff ;
     int64 svcm = Get_CompileMode ( ) ;
     Set_CompileMode ( false ) ;
-    byte * lexerTokenBuffer = _Buffer_New_pbyte ( BUFFER_SIZE, B_UNLOCKED ) ;
+    byte * lexerTokenBuffer = _Buffer_New_pbyte ( BUFFER_SIZE, N_UNLOCKED ) ;
     strcpy ( lexerTokenBuffer, _CfrTil_->TokenBuffer ) ;
     //_Printf ( "\n" ) ;
 
@@ -676,7 +676,7 @@ Debugger_ByteArray_AllocateNew ( int64 size, uint64 type )
 {
     ByteArray * ba = ( ByteArray* ) Mem_Allocate ( size + sizeof ( ByteArray ), type ) ; // nb! _Debugger_New needs this distinction for memory accounting 
     ByteArray_Init ( ba, size, type ) ;
-
+    _ByteArray_DataClear ( ba ) ;
     return ba ;
 }
 

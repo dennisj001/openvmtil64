@@ -86,12 +86,6 @@ ByteArray_IsAddressWwitinTheArray ( ByteArray * ba, byte * address )
     return false ;
 }
 
-void
-_ByteArray_ReInit ( ByteArray * ba )
-{
-    _ByteArray_Init ( ba ) ;
-}
-
 ByteArray *
 ByteArray_Init ( ByteArray * ba, int64 size, uint64 type )
 {
@@ -225,7 +219,7 @@ _NamedByteArray_AddNewByteArray ( NamedByteArray *nba, int64 size )
     dllist_AddNodeToHead ( &nba->NBA_BaList, ( dlnode* ) & nba->ba_CurrentByteArray->BA_Symbol ) ; // ByteArrays are linked here in the NBA with their BA_Symbol node. BA_MemChunk is linked in PermanentMemList
     nba->ba_CurrentByteArray->BA_Symbol.S_Value = ( uint64 ) nba->ba_CurrentByteArray ; // for FreeNbaList
     nba->ba_CurrentByteArray->OurNBA = nba ;
-    nba->TotalAllocSize += nba->ba_CurrentByteArray->BA_MemChunk.S_ChunkSize ;
+    nba->TotalAllocSize += nba->ba_CurrentByteArray->BA_AllocSize ; //BA_MemChunk.S_ChunkSize ; //+ sizeof ( ByteArray );
 
     nba->NumberOfByteArrays ++ ;
     return nba->ba_CurrentByteArray ;
