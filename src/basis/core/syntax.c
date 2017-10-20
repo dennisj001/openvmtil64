@@ -201,6 +201,7 @@ _CfrTil_C_Infix_EqualOp ( Word * opWord )
     if ( opWord ) _Interpreter_DoWord_Default ( interp, opWord ) ;
     else _Interpreter_DoWord_Default ( interp, word ) ;
     word->Name = svName ;
+    //_DEBUG_SHOW ( opWord ? opWord : word, 1 ) ;
     //SetState ( _Debugger_, DEBUG_SHTL_OFF, true ) ; // ?? : is this still needed (it was above, before) since we just temporarily adjusted the name
     if ( GetState ( compiler, C_COMBINATOR_LPAREN ) )
     {

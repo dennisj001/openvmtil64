@@ -105,7 +105,7 @@ typedef struct _dobject
         byte * do_bData ;
         int64 * do_iData ;
     } ;
-} dobject ;
+} dobject ; // size 4 x 64 bits
 typedef struct
 {
     struct
@@ -125,7 +125,7 @@ typedef struct
         } ;
         byte * n_unmap ;
     } ;
-} _DLNode, _Node, _listNode, _List ;
+} _DLNode, _Node, _listNode, _List ; // size : 3 x 64 bits
 typedef struct
 {
     union
@@ -644,6 +644,7 @@ typedef struct
     Namespace *C_BackgroundNamespace ; //, ** FunctionTypesArray ;
     dllist * GotoList ;
     dllist * CurrentSwitchList ;
+    dllist * RegisterParameterList ;
     CompileOptimizeInfo * optInfo ;
     Stack * CombinatorInfoStack ;
     Stack * PointerToOffset ;

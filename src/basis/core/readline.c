@@ -536,7 +536,7 @@ _ReadLine_TabCompletion_Check ( ReadLiner * rl )
                 TabCompletionInfo * tci = rl->TabCompletionInfo0 ;
                 RL_TC_StringInsert_AtCursor ( rl, tci->TrialWord->Name ) ;
             }
-            //else if ( rl->InputKeyedCharacter == '\r' ) rl->InputKeyedCharacter = ' ' ; // leave line as is and append a space instead of '\r'
+                //else if ( rl->InputKeyedCharacter == '\r' ) rl->InputKeyedCharacter = ' ' ; // leave line as is and append a space instead of '\r'
             else if ( rl->InputKeyedCharacter == '\r' ) rl->InputKeyedCharacter = '\n' ; // leave line as is and append a space instead of '\r'
         }
     }
@@ -624,19 +624,24 @@ _Readline_Is_AtEndOfBlock ( ReadLiner * rl0 )
     Word * word = Compiler_WordList ( 0 ) ;
     int64 iz, ib, index = word->W_TokenStart_ReadLineIndex + Strlen ( word->Name ), sd = _Stack_Depth ( _Context_->Compiler0->BlockStack ) ;
     byte c ;
-    if ( GetState ( _Context_, C_SYNTAX ) )
+    //if ( GetState ( _Context_, C_SYNTAX ) )
     {
         for ( ib = false, iz = false ; 1 ; iz = false )
         {
             c = rl->InputLine [ index ++ ] ;
             if ( ! c )
             {
+#if 0                
                 if ( iz ) return false ; // two '0' chars in a row returns false 
                 ReadLine_GetLine ( rl ) ;
                 index = 0 ;
                 iz = true ; // z : zero
                 continue ;
+#else
+                return false ;
+#endif                
             }
+            if ( ( c == ';' ) && ( ! GetState ( _Context_, C_SYNTAX ) ) ) return true ;
             if ( c == '}' )
             {
                 if ( -- sd <= 1 ) return true ;

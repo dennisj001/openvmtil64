@@ -105,7 +105,7 @@ _TabCompletion_Compare ( Word * word )
                         strOpRes = strcmp ( twn, searchToken ) ;
                         if ( ! strOpRes )
                         {
-                            strOpRes = stricmp ( twn, searchToken ) ;
+                            strOpRes = Stricmp ( twn, searchToken ) ;
                         }
                         if ( ( ! strOpRes ) ) //|| ( ! strOpRes1 ) )
                         {
@@ -118,7 +118,7 @@ _TabCompletion_Compare ( Word * word )
                     }
                     case 2: case 1:
                     {
-                        strOpRes = StrnCmp ( twn, searchToken, slst ) ;
+                        strOpRes = Strncmp ( twn, searchToken, slst ) ;
                         if ( ! strOpRes )
                         {
                             gotOne = tci->WordWrapCount ;
@@ -127,7 +127,7 @@ _TabCompletion_Compare ( Word * word )
                     }
                     case 3:
                     {
-                        strOpRes = StrnICmp ( twn, searchToken, slst ) ;
+                        strOpRes = StrniCmp ( twn, searchToken, slst ) ;
                         if ( ! strOpRes )
                         {
                             gotOne = tci->WordWrapCount ;

@@ -43,20 +43,21 @@ void
 Compiler_SetLocalsFrameSize_AtItsCellOffset ( Compiler * compiler )
 {
     int64 fsize = compiler->LocalsFrameSize = ( ( compiler->NumberOfLocals + 1 ) * CELL ) ; //1 : the frame pointer 
-    if ( fsize ) *( (int32*) ( compiler )->FrameSizeCellOffset ) = compiler->LocalsFrameSize ;
+    if ( fsize ) *( ( int32* ) ( compiler )->FrameSizeCellOffset ) = compiler->LocalsFrameSize ;
 }
 
 void
 _Compiler_RemoveLocalFrame ( Compiler * compiler )
 {
-    int64 parameterVarsSubAmount, returnValueFlag ;
+    int64 parameterVarsSubAmount ;
+    Boolean returnValueFlag ;
     Compiler_SetLocalsFrameSize_AtItsCellOffset ( compiler ) ;
     parameterVarsSubAmount = ( compiler->NumberOfArgs * CELL ) ;
-    if ( GetState ( _Context_, C_SYNTAX ) && ( compiler->CurrentWordCompiling->S_ContainingNamespace ) && ( ! String_Equal ( compiler->CurrentWordCompiling->S_ContainingNamespace->Name, "void" ) ) )
+    returnValueFlag = ( _Context_->CurrentlyRunningWord->CAttribute & C_RETURN ) || ( GetState ( compiler, RETURN_TOS | RETURN_ACCUM ) ) || IsWordRecursive || compiler->ReturnVariableWord ;
+    if ( (!returnValueFlag) && GetState ( _Context_, C_SYNTAX ) && ( compiler->CurrentWordCompiling->S_ContainingNamespace ) && ( ! String_Equal ( compiler->CurrentWordCompiling->S_ContainingNamespace->Name, "void" ) ) )
     {
         SetState ( compiler, RETURN_TOS, true ) ;
     }
-    returnValueFlag = ( _Context_->CurrentlyRunningWord->CAttribute & C_RETURN ) || ( GetState ( compiler, RETURN_TOS | RETURN_ACCUM ) ) || IsWordRecursive || compiler->ReturnVariableWord ;
     Word * word = compiler->ReturnVariableWord ;
     if ( word )
     {
@@ -73,16 +74,16 @@ _Compiler_RemoveLocalFrame ( Compiler * compiler )
     _Compile_LEA ( DSP, FP, 0, - LocalVarIndex_Disp ( 1 ) ) ; // restore sp - release locals stack frame
     _Compile_Move_StackN_To_Reg ( FP, DSP, 1 ) ; // restore the saved pre fp - cf AddLocalsFrame
     // remove the incoming parameters -- like in C
-    parameterVarsSubAmount -= returnValueFlag * CELL ; // reduce the subtract amount to make room for the return value
+    parameterVarsSubAmount -= ( returnValueFlag ? CELL : 0 ) ; // reduce the subtract amount to make room for the return value
     if ( parameterVarsSubAmount > 0 )
     {
         Compile_SUBI ( REG, DSP, 0, parameterVarsSubAmount, 0 ) ; // remove stack variables
     }
     else if ( parameterVarsSubAmount < 0 )
     {
-        Compile_ADDI ( REG, DSP, 0, abs (parameterVarsSubAmount), 0 ) ; // add a place on the stack for return value
+        Compile_ADDI ( REG, DSP, 0, abs ( parameterVarsSubAmount ), 0 ) ; // add a place on the stack for return value
     }
-     if ( returnValueFlag && ( ! GetState ( compiler, RETURN_ACCUM ) ) )
+    if ( returnValueFlag && ( ! GetState ( compiler, RETURN_ACCUM ) ) )
     {
         // nb : stack was already adjusted accordingly for this above by reducing the SUBI subAmount or adding if there weren't any parameter variables
         Compile_Move_ACC_To_TOS ( DSP ) ;
@@ -129,6 +130,7 @@ CfrTil_LocalVariablesBegin ( )
     _CfrTil_Parse_LocalsAndStackVariables ( 0, 0, 0, _Compiler_->LocalsNamespacesStack, 0 ) ;
 }
 #if 0
+
 void
 CheckAddLocalFrame ( Compiler * compiler )
 {

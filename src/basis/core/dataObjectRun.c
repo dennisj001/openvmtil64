@@ -293,8 +293,11 @@ _Do_Variable ( Word * word )
                 _Compile_GetVarLitObj_LValue_To_Reg ( word, ACC ) ;
                 //SetState ( _Context_, ADDRESS_OF_MODE, false ) ; // only good for one variable
             }
-            else _Compile_GetVarLitObj_RValue_To_Reg ( word, ACC ) ;
-            _Word_CompileAndRecord_PushReg ( word, ACC ) ;
+            else if ( ! ( word->CAttribute & REGISTER_VARIABLE ) )
+            {
+                _Compile_GetVarLitObj_RValue_To_Reg ( word, ACC ) ;
+            }
+            _Word_CompileAndRecord_PushReg ( word, ( word->CAttribute & REGISTER_VARIABLE ) ? word->RegToUse : ACC ) ;
         }
     }
     else
@@ -421,13 +424,14 @@ _Do_LocalObject_AllocateInit ( Namespace * typeNamespace, byte ** value, int64 s
 }
 
 #if 0
+
 void
-Do_LocalObject_AllocateInit () //( Namespace * typeNamespace, byte ** value, int64 size )
+Do_LocalObject_AllocateInit ( ) //( Namespace * typeNamespace, byte ** value, int64 size )
 {
     int64 size = _DataStack_Pop ( ) ;
-    byte ** value = (byte**) _DataStack_Pop ( ) ;
-    Namespace * typeNamespace = (Namespace*) _DataStack_Pop ( ) ;
-    
+    byte ** value = ( byte** ) _DataStack_Pop ( ) ;
+    Namespace * typeNamespace = ( Namespace* ) _DataStack_Pop ( ) ;
+
     //Word * word = _CfrTil_ObjectNew ( size, "<object>", 0, TEMPORARY ) ;
     //_Class_Object_Init ( word, typeNamespace ) ;
     //* value = ( byte* ) word->W_Value ;
@@ -450,18 +454,18 @@ _DataObject_Run ( Word * word )
 #if 0            
             int64 size = _Namespace_VariableValueGet ( word->TypeNamespace, ( byte* ) "size" ) ;
             //_Compile_MoveImm_To_Reg ( RDI, ( int64 ) size, CELL ) ;
-            _DataStack_Push ( (uint64) size ) ;
+            _DataStack_Push ( ( uint64 ) size ) ;
             //_Compile_Move_Rm_To_Reg ( RDI, RDI, 0 ) ;
             //_Compile_LEA ( RSI, FP, 0, LocalVarIndex_Disp ( LocalVarOffset ( word ) ) ) ; // 2 : account for saved fp and return slot
-            _DataStack_Push ( (uint64) LocalVarIndex_Disp ( LocalVarOffset ( word ) ) ) ;
+            _DataStack_Push ( ( uint64 ) LocalVarIndex_Disp ( LocalVarOffset ( word ) ) ) ;
             //_Compile_Move_Rm_To_Reg ( RSI, RSI, 0 ) ;
             //_Compile_MoveImm_To_Reg ( RDX, ( int64 ) word->TypeNamespace, CELL ) ;
-            _DataStack_Push ( (uint64) word->TypeNamespace ) ;
+            _DataStack_Push ( ( uint64 ) word->TypeNamespace ) ;
             Compile_Call ( ( byte* ) Do_LocalObject_AllocateInit ) ; // we want to only allocate this object once and only at run time; and not at compile time
 #else
             int64 size = _Namespace_VariableValueGet ( word->TypeNamespace, ( byte* ) "size" ) ;
             _Compile_MoveImm_To_Reg ( RDI, ( int64 ) word->TypeNamespace, CELL ) ;
-            _Compile_LEA ( RSI, FP, 0, LocalVarIndex_Disp ( LocalVarOffset ( word ) ) ) ; 
+            _Compile_LEA ( RSI, FP, 0, LocalVarIndex_Disp ( LocalVarOffset ( word ) ) ) ;
             //_Compile_Move_Rm_To_Reg ( RSI, RSI, 0 ) ;
             _Compile_MoveImm_To_Reg ( RDX, ( int64 ) size, CELL ) ;
             Compile_Call ( ( byte* ) _Do_LocalObject_AllocateInit ) ; // we want to only allocate this object once and only at run time; and not at compile time

@@ -8,21 +8,21 @@ MultipleEscape ( )
 }
 
 void
-CfrTil_StrLen ( )
+CfrTil_Strlen ( )
 {
     _DataStack_Push ( (int64) Strlen ( (char*) _DataStack_Pop ( ) ) ) ;
 }
 
 void
-CfrTil_StrCmp ( )
+CfrTil_Strcmp ( )
 {
-    _DataStack_Push ( (int64) strcmp ( (char*) _DataStack_Pop ( ), (char*) _DataStack_Pop ( ) ) ) ;
+    _DataStack_Push ( (int64) Strcmp ( (char*) _DataStack_Pop ( ), (char*) _DataStack_Pop ( ) ) ) ;
 }
 
 void
-CfrTil_StrICmp ( )
+CfrTil_Stricmp ( )
 {
-    _DataStack_Push ( (int64) stricmp ( (byte*) _DataStack_Pop ( ), (byte*) _DataStack_Pop ( ) ) ) ;
+    _DataStack_Push ( (int64) Stricmp ( (byte*) _DataStack_Pop ( ), (byte*) _DataStack_Pop ( ) ) ) ;
 }
 
 //char * strcat ( char * destination, const char * source );

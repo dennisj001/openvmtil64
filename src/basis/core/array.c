@@ -136,7 +136,7 @@ _ByteArray_SetHere_AndForDebug ( ByteArray * ba, byte * index )
     if ( index )
     {
         _ByteArray_SetEndIndex ( ba, index ) ;
-        //if ( _Debugger_ ) _Debugger_->PreHere = index ;
+        if ( _Debugger_ ) _Debugger_->PreHere = index ;
     }
 }
 
@@ -165,12 +165,12 @@ ByteArray_AppendCopyItem ( ByteArray * ba, int64 size, int64 data ) // size in b
         {
             case 1:
             {
-                *( ( byte* ) index ) = ( byte ) data ;
+                *( ( int8* ) index ) = ( byte ) data ;
                 break ;
             }
             case 2:
             {
-                *( ( short* ) index ) = ( int16 ) data ;
+                *( ( int16* ) index ) = ( int16 ) data ;
                 break ;
             }
             case 4:

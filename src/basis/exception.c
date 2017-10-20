@@ -144,7 +144,7 @@ OpenVmTil_Pause ( )
 {
 
     DebugColors ;
-    _OpenVmTil_Pause ( "" ) ;
+    _OpenVmTil_Pause ( Context_Location () ) ;
 }
 
 void

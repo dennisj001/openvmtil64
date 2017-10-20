@@ -167,42 +167,26 @@ _Compile_GetVarLitObj_RValue_To_Reg ( Word * word, int64 reg )
     word->Coding = Here ; // we don't need the word's code if compiling -- this is an optimization though
     if ( word->CAttribute & REGISTER_VARIABLE )
     {
-        return ;
-        //if ( word->RegToUse == reg ) return ;
-        //else _Compile_Move_Reg_To_Reg ( reg, word->RegToUse ) ;
+        if ( word->RegToUse == reg ) return ;
+        else _Compile_Move_Reg_To_Reg ( reg, word->RegToUse ) ;
     }
-#if 0    
-    else if ( word->CAttribute & LOCAL_VARIABLE )
-    {
-        _Compile_Move_StackN_To_Reg ( reg, FP, LocalVarOffset ( word ) ) ; // 2 : account for saved fp and return slot
-    }
-    else if ( word->CAttribute & PARAMETER_VARIABLE )
-    {
-        _Compile_Move_StackN_To_Reg ( reg, FP, ParameterVarOffset ( word ) ) ; // account for stored bp and return value
-    }
-#else
     else if ( word->CAttribute & ( LOCAL_VARIABLE | PARAMETER_VARIABLE ) )
     {
         _Compile_Move_StackN_To_Reg ( reg, FP, LocalParameterVarOffset ( word ) ) ; // 2 : account for saved fp and return slot
     }
-#endif    
     else if ( word->CAttribute & NAMESPACE_VARIABLE )
     {
         _Compile_Move_Literal_Immediate_To_Reg ( reg, ( int64 ) word->W_PtrToValue ) ;
         _Compile_Move_Rm_To_Reg ( reg, reg, 0 ) ;
-        //_Compile_Move_Literal_Immediate_To_Reg ( reg, ( int64 ) word->W_Value ) ;
     }
     else if ( word->CAttribute & ( LITERAL | CONSTANT ) )
     {
-        //_Compile_Move_Literal_Immediate_To_Reg ( reg, ( int64 ) word->W_PtrToValue ) ;
-        //_Compile_Move_Rm_To_Reg ( reg, reg, 0 ) ;
         _Compile_Move_Literal_Immediate_To_Reg ( reg, ( int64 ) word->W_Value ) ;
     }
     else if ( word->CAttribute & ( OBJECT | THIS ) )
     {
         _Compile_Move_Literal_Immediate_To_Reg ( reg, ( int64 ) word->W_PtrToValue ) ;
         _Compile_Move_Rm_To_Reg ( reg, reg, 0 ) ;
-        //_Compile_Move_Literal_Immediate_To_Reg ( reg, ( int64 ) word->W_Value ) ;
     }
     else SyntaxError ( QUIT ) ;
     if ( word->CAttribute & ( OBJECT | THIS ) )
@@ -225,21 +209,10 @@ _Compile_SetVarLitObj_With_Reg ( Word * word, int64 reg, int64 thruReg )
         if ( word->RegToUse == reg ) return ;
         else _Compile_Move_Reg_To_Reg ( word->RegToUse, reg ) ;
     }
-#if 0    
-    else if ( word->CAttribute & LOCAL_VARIABLE )
-    {
-        _Compile_Move_Reg_To_StackN ( FP, LocalVarOffset ( word ), reg ) ;
-    }
-    else if ( word->CAttribute & PARAMETER_VARIABLE )
-    {
-        _Compile_Move_Reg_To_StackN ( FP, ParameterVarOffset ( word ), reg ) ;
-    }
-#else
     else if ( word->CAttribute & ( LOCAL_VARIABLE | PARAMETER_VARIABLE ) )
     {
         _Compile_Move_Reg_To_StackN ( FP, LocalParameterVarOffset ( word ), reg ) ;
     }
-#endif    
     else if ( word->CAttribute & NAMESPACE_VARIABLE )
     {
         //_Compile_Move_Literal_Immediate_To_Reg ( thruReg, ( int64 ) word->W_PtrToValue ) ;
@@ -262,21 +235,10 @@ _Compile_GetVarLitObj_LValue_To_Reg ( Word * word, int64 reg )
     {
         _Compile_LocalOrStackVar_RValue_To_Reg ( word, reg ) ;
     }
-#if 0    
-    else if ( word->CAttribute & LOCAL_VARIABLE )
-    {
-        _Compile_LEA ( reg, FP, 0, LocalVarIndex_Disp ( LocalVarOffset ( word ) ) ) ; // 2 : account for saved fp and return slot
-    }
-    else if ( word->CAttribute & PARAMETER_VARIABLE )
-    {
-        _Compile_LEA ( reg, FP, 0, LocalVarIndex_Disp ( ParameterVarOffset ( word ) ) ) ;
-    }
-#else
     else if ( word->CAttribute & ( LOCAL_VARIABLE | PARAMETER_VARIABLE ) )
     {
         _Compile_LEA ( reg, FP, 0, LocalVarIndex_WordDisp ( word ) ) ;
     }
-#endif    
     else if ( word->CAttribute & NAMESPACE_VARIABLE )
     {
         int64 value ;

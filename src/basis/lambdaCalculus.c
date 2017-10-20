@@ -1412,7 +1412,7 @@ _LO_PrintOneToString ( ListObject * l0, byte * buffer, int64 in_a_LambdaFlag, in
                 {
                     if ( ( ! *l0->Lo_PtrToValue ) && l0->Lo_CfrTilWord )
                     {
-                        if ( _Q_->Verbosity > 2 ) snprintf ( ( char* ) buffer, BUFFER_SIZE, " %s = 0x%08lx", l0->Lo_CfrTilWord->Lo_Name, ( int64 ) l0->Lo_CfrTilWord ) ;
+                        if ( _Q_->Verbosity > 2 ) snprintf ( ( char* ) buffer, BUFFER_SIZE, " %s = 0x%016lx", l0->Lo_CfrTilWord->Lo_Name, ( int64 ) l0->Lo_CfrTilWord ) ;
                         else snprintf ( ( char* ) buffer, BUFFER_SIZE, " %s", l0->Lo_Name ) ;
                     }
                     else if ( l0->LAttribute & T_RAW_STRING )
@@ -1440,7 +1440,7 @@ _LO_PrintOneToString ( ListObject * l0, byte * buffer, int64 in_a_LambdaFlag, in
         }
         else if ( l0->LAttribute & BLOCK )
         {
-            snprintf ( ( char* ) buffer, BUFFER_SIZE, " %s:#<BLOCK>:0x%08lx", l0->Lo_Name, ( uint64 ) l0->Lo_UInteger ) ;
+            snprintf ( ( char* ) buffer, BUFFER_SIZE, " %s:#<BLOCK>:0x%016lx", l0->Lo_Name, ( uint64 ) l0->Lo_UInteger ) ;
         }
         else if ( l0->LAttribute & T_BIG_NUM )
         {
@@ -1448,10 +1448,10 @@ _LO_PrintOneToString ( ListObject * l0, byte * buffer, int64 in_a_LambdaFlag, in
         }
         else if ( l0->LAttribute & T_INT )
         {
-            if ( _Context_->System0->NumberBase == 16 ) snprintf ( ( char* ) buffer, BUFFER_SIZE, " 0x%08lx", ( uint64 ) l0->Lo_UInteger ) ;
+            if ( _Context_->System0->NumberBase == 16 ) snprintf ( ( char* ) buffer, BUFFER_SIZE, " 0x%016lx", ( uint64 ) l0->Lo_UInteger ) ;
             else
             {
-                format = ( ( ( int64 ) l0->Lo_Integer ) < 0 ) ? ( byte* ) " 0x%08lx" : ( byte* ) " %ld" ;
+                format = ( ( ( int64 ) l0->Lo_Integer ) < 0 ) ? ( byte* ) " 0x%016lx" : ( byte* ) " %ld" ;
                 snprintf ( ( char* ) buffer, BUFFER_SIZE, ( char* ) format, l0->Lo_Integer ) ;
             }
         }
@@ -1463,8 +1463,8 @@ _LO_PrintOneToString ( ListObject * l0, byte * buffer, int64 in_a_LambdaFlag, in
             }
             else
             {
-                format = ( ( ( int64 ) l0->Lo_Integer ) < 0 ) ? ( byte* ) " 0x%08lx" : ( byte* ) " %ld" ;
-                if ( ( l0->Lo_Integer < 0 ) || ( _Context_->System0->NumberBase == 16 ) ) snprintf ( ( char* ) buffer, BUFFER_SIZE, " 0x%08lx", ( uint64 ) l0->Lo_UInteger ) ;
+                format = ( ( ( int64 ) l0->Lo_Integer ) < 0 ) ? ( byte* ) " 0x%016lx" : ( byte* ) " %ld" ;
+                if ( ( l0->Lo_Integer < 0 ) || ( _Context_->System0->NumberBase == 16 ) ) snprintf ( ( char* ) buffer, BUFFER_SIZE, " 0x%016lx", ( uint64 ) l0->Lo_UInteger ) ;
                 else snprintf ( ( char* ) buffer, BUFFER_SIZE, ( char* ) format, l0->Lo_Integer ) ;
             }
         }

@@ -10,7 +10,7 @@ _CfrTil_SingleQuote ( int64 findWordFlag )
     uint64 charLiteral = 0 ;
 
     // remember : _ReadLine_PeekIndexedChar ( rl, 0 ) is the *next* char to be read
-    if ( sqWord && sqWord->Name[0] == '\'' && ( ( (c1 = _ReadLine_PeekIndexedChar ( rl, 1 )) == '\'' ) || ( (c0 = _ReadLine_PeekIndexedChar ( rl, 0 )) == '\\' ) ) )// parse a char type, eg. 'c' 
+    if ( sqWord && sqWord->Name[0] == '\'' && ( ( ( c1 = _ReadLine_PeekIndexedChar ( rl, 1 ) ) == '\'' ) || ( ( c0 = _ReadLine_PeekIndexedChar ( rl, 0 ) ) == '\\' ) ) )// parse a char type, eg. 'c' 
     {
         // notation :: c0 = original ' ; c1 = next char, etc.
         buffer[0] = '\'' ;
@@ -36,13 +36,12 @@ _CfrTil_SingleQuote ( int64 findWordFlag )
         }
 done:
         CfrTil_WordLists_PopWord ( ) ; // pop the "'" token
-        word = _DObject_New (buffer, charLiteral, LITERAL | CONSTANT | IMMEDIATE, 0, 0, LITERAL, ( byte* ) _DataObject_Run, 0, 0, 0, TEMPORARY ) ;
+        word = _DObject_New ( buffer, charLiteral, LITERAL | CONSTANT | IMMEDIATE, 0, 0, LITERAL, ( byte* ) _DataObject_Run, 0, 0, 0, TEMPORARY ) ;
         _Interpreter_DoWord ( _Interpreter_, word, _Lexer_->TokenStart_ReadLineIndex ) ;
     }
     else
     {
         CfrTil_Token ( ) ;
-        //_Tick ( _Context_, findWordFlag ) ;
     }
 }
 
@@ -144,12 +143,13 @@ Compiler_TypedObjectInit ( Namespace * typeNamespace, Word * word )
 void
 Compile_InitRegisterParamenterVariables ( Compiler * compiler )
 {
-    int64 regIndex, nRVars = compiler->NumberOfRegisterVariables, nPVars = compiler->NumberOfArgs ;
-    for ( regIndex = 0 ; nRVars -- > 0 && nPVars -- > 0 ; regIndex ++ )
+    dllist * list = compiler->RegisterParameterList ;
+    dlnode * node ;
+    int64 regIndex ;
+    for ( regIndex = 0, node = dllist_First ( ( dllist* ) list ) ; node ; node = dlnode_Next ( node ) )
     {
-        //if ( GetState ( compiler, RETURN_TOS | RETURN_R8 ) ) 
-        _Compile_Move_StackN_To_Reg ( compiler->RegOrder [ regIndex ], DSP, regIndex * CELL ) ;
-        //else _Compile_Move_StackN_To_Reg ( regOrder [ regIndex ], FP, fpIndex ) ; //
+        Word * word = ( Word* ) dobject_Get_M_Slot ( node, 0 ) ;
+        _Compile_Move_StackN_To_Reg ( word->RegToUse, DSP, regIndex * CELL ) ;
     }
 }
 
@@ -210,12 +210,12 @@ _CfrTil_Parse_LocalsAndStackVariables ( int64 svf, int64 lispMode, ListObject * 
                 typeNamespace = word ;
                 continue ;
             }
-            if ( strcmp ( ( char* ) token, "|" ) == 0 )
+            if ( String_Equal ( ( char* ) token, "|" ) )
             {
                 svff = 0 ; // set stack variable flag to off -- no more stack variables ; begin local variables
                 continue ; // don't add a node to our temporary list for this token
             }
-            if ( strcmp ( ( char* ) token, "--" ) == 0 ) // || ( strcmp ( ( char* ) token, "|-" ) == 0 ) || ( strcmp ( ( char* ) token, "|--" ) == 0 ) )
+            if ( String_Equal ( ( char* ) token, "--" ) ) // || ( String_Equal ( ( char* ) token, "|-" ) == 0 ) || ( String_Equal ( ( char* ) token, "|--" ) == 0 ) )
             {
                 if ( ! svf ) break ;
                 else
@@ -225,38 +225,29 @@ _CfrTil_Parse_LocalsAndStackVariables ( int64 svf, int64 lispMode, ListObject * 
                     continue ;
                 }
             }
-            if ( strcmp ( ( char* ) token, ")" ) == 0 )
+            if ( String_Equal ( ( char* ) token, ")" ) )
             {
                 break ;
             }
-            if ( strcmp ( ( char* ) token, "REG:" ) == 0 )
+            if ( String_Equal ( ( char* ) token, "REG" ) || Stringi_Equal ( ( char* ) token, "REGISTER" ) )
             {
                 regFlag = true ;
                 continue ;
             }
-            if ( strcmp ( ( char* ) token, "REG1" ) == 0 )
+            if ( ( ( ! GetState ( _Context_, C_SYNTAX ) ) && ( ! GetState ( word, W_C_SYNTAX ) ) ) &&
+                ( ( String_Equal ( ( char* ) token, "{" ) ) || ( String_Equal ( ( char* ) token, ";" ) ) ) )
             {
-                regFlag = true ;
-                regToUseIndex = 0 ;
-                continue ;
-            }
-            else if ( strcmp ( ( char* ) token, "REG2" ) == 0 )
-            {
-                regFlag = true ;
-                regToUseIndex = 1 ;
-                continue ;
-            }
-            if ( ( strcmp ( ( char* ) token, "{" ) == 0 ) || ( strcmp ( ( char* ) token, ";" ) == 0 ) )
-            {
-                _Printf ( ( byte* ) "\nLocal variables syntax error : no close parenthesis ')' found" ) ;
+                _Printf ( ( byte* ) "\nLocal variables syntax error : no closing parenthesis ')' found" ) ;
                 CfrTil_Exception ( SYNTAX_ERROR, 1 ) ;
             }
             if ( getReturnFlag )
             {
                 addWords = 0 ;
-                if ( stricmp ( token, ( byte* ) "R8" ) == 0 ) getReturn = RETURN_ACCUM ;
-                else if ( stricmp ( token, ( byte* ) "TOS" ) == 0 ) getReturn = RETURN_TOS ;
-                else if ( stricmp ( token, ( byte* ) "0" ) == 0 ) getReturn = DONT_REMOVE_STACK_VARIABLES ;
+                if ( String_Equal ( token, ( byte* ) "ACC" ) ) getReturn |= RETURN_ACCUM ;
+                else if ( String_Equal ( token, ( byte* ) "EAX" ) ) getReturn |= RETURN_ACCUM ;
+                else if ( String_Equal ( token, ( byte* ) "RAX" ) ) getReturn |= RETURN_ACCUM ;
+                else if ( String_Equal ( token, ( byte* ) "TOS" ) ) getReturn |= RETURN_TOS ;
+                else if ( String_Equal ( token, ( byte* ) "0" ) ) getReturn |= DONT_REMOVE_STACK_VARIABLES ;
                 else returnVariable = token ;
                 continue ;
             }
@@ -282,7 +273,15 @@ _CfrTil_Parse_LocalsAndStackVariables ( int64 svf, int64 lispMode, ListObject * 
                 word = _CfrTil_LocalWord ( token, ( ctype & LOCAL_VARIABLE ) ? ++ compiler->NumberOfLocals : ++ compiler->NumberOfArgs, ctype ) ; // svf : flag - whether stack variables are in the frame
                 if ( regFlag == true )
                 {
-                    word->RegToUse = compiler->RegOrder [ regToUseIndex ++ ] ;
+                    word->RegToUse = RegOrder ( regToUseIndex ++ ) ; //compiler->RegOrder [ regToUseIndex ++ ] ;
+                    if ( word->CAttribute & PARAMETER_VARIABLE )
+                    {
+                        if ( ! compiler->RegisterParameterList )
+                        {
+                            compiler->RegisterParameterList = _dllist_New ( TEMPORARY ) ;
+                        }
+                        _dllist_Push_M_Slot_Node ( compiler->RegisterParameterList, WORD, TEMPORARY, 1, ( ( int64 ) word ) ) ;
+                    }
                 }
                 regFlag = false ;
                 if ( typeNamespace )
@@ -502,7 +501,7 @@ Parse_Macro ( int64 type )
     if ( type == STRING_MACRO )
     {
         value = Lexer_ReadToken ( lexer ) ;
-        while ( strcmp ( ";", ( char* ) Lexer_ReadToken ( lexer ) ) ) ; // nb. we take only the first string all else ignored
+        while ( ! String_Equal ( ";", ( char* ) Lexer_ReadToken ( lexer ) ) ) ; // nb. we take only the first string all else ignored
     }
     else if ( type == TEXT_MACRO )
     {

@@ -269,11 +269,11 @@ CPrimitive CPrimitives [] = {
     { "goto:", CfrTil_Goto_Prefix, IMMEDIATE, 0, 0, "Asm", "Root" },
     { "jmp", CfrTil_Goto, IMMEDIATE, 0, 0, "Asm", "Root" },
 
-    { "Strlen", CfrTil_StrLen, 0, 0, 0, "String", "Root" },
-    { "strcmp", CfrTil_StrCmp, 0, 0, 0, "String", "Root" },
+    { "Strlen", CfrTil_Strlen, 0, 0, 0, "String", "Root" },
+    { "strcmp", CfrTil_Strcmp, 0, 0, 0, "String", "Root" },
     { "strcat", CfrTil_StrCat, 0, 0, 0, "String", "Root" },
     { "strcpy", CfrTil_StrCpy, 0, 0, 0, "String", "Root" },
-    { "stricmp", CfrTil_StrICmp, 0, 0, 0, "String", "Root" },
+    { "stricmp", CfrTil_Stricmp, 0, 0, 0, "String", "Root" },
 
     { "\"", CfrTil_DoubleQuoteMacro, IMMEDIATE | KEYWORD, 0, T_LISP_TERMINATING_MACRO, "Lexer", "Root" },
     { "%", MultipleEscape, IMMEDIATE, 0, 0, "Lexer", "Root" },

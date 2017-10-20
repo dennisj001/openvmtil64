@@ -99,6 +99,7 @@
 #define ADDR MEM // based on displacement, calculated at compile time
 #define RM_IS_VALUE REG
 #define RM_IS_REG_VALUE REG
+#define RM_SIB 0x4
 #define VALUE REG
 // SIB byte conversions
 #define SCALE_1 0

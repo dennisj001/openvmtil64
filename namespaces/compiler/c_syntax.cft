@@ -217,7 +217,7 @@ nl heey1
 #if 1
 c_syntaxOn
 int
-faccs2 ( REG: n | EAX: rec -- EAX ) 
+faccs2 ( n | rec -- RAX ) 
 {
     for ( rec = 1 ; n > 1 ; n-- )
     { 
@@ -265,7 +265,7 @@ interpret4 ( | atoken aword )
 
 interpret4
 int
-faccs3 ( REG: n | EAX: rec -- EAX ) 
+faccs3 ( n | rec -- RAX ) 
 {
     for ( rec = 1 ; n > 1 ; n-- )
     { 
@@ -284,7 +284,7 @@ i2halt // for third interpret4
 #endif
 //sp 
 #endif
-
+//pause
 #if 1
 c_syntaxOn
 C String libc

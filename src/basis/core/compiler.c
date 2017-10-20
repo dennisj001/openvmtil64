@@ -43,7 +43,7 @@ NamedByteArray *
 _Compiler_SetCompilingSpace ( byte * name )
 {
     NamedByteArray *nba = _OVT_Find_NBA ( name ) ;
-    Set_CompilerSpace ( nba->ba_CurrentByteArray ) ;
+    if ( nba ) Set_CompilerSpace ( nba->ba_CurrentByteArray ) ;
     return nba ;
 }
 
@@ -197,6 +197,8 @@ Compiler_Init ( Compiler * compiler, uint64 state )
     _Compiler_FreeAllLocalsNamespaces ( compiler ) ;
     Stack_Init ( compiler->LocalsNamespacesStack ) ;
     Stack_Init ( compiler->InfixOperatorStack ) ;
+    _dllist_Init ( compiler->CurrentSwitchList ) ;
+    _dllist_Init ( compiler->RegisterParameterList ) ;
     //Compiler_SetCompilingSpace ( ( byte* ) "CodeSpace" ) ;
     //Compiler_SetCompilingSpace_MakeSureOfRoom ( ( byte* ) "CodeSpace" ) ; // 2 * K : should be enough at least for now ??
     //OVT_MemListFree_TempObjects ( ) ;

@@ -127,7 +127,7 @@ Compile_Cmp_Set_tttn_Logic ( Compiler * compiler, int64 ttt, int64 negateFlag )
         {
             // Compile_CMP( toRegOrMem, mod, reg, rm, sib, disp )
             Compile_CMP ( compiler->optInfo->Optimize_Dest_RegOrMem, compiler->optInfo->Optimize_Mod,
-                compiler->optInfo->Optimize_Reg, compiler->optInfo->Optimize_Rm, 0, compiler->optInfo->Optimize_Disp, 0 ) ;
+                compiler->optInfo->Optimize_Reg, compiler->optInfo->Optimize_Rm, 0, compiler->optInfo->Optimize_Disp, CELL_SIZE ) ;
         }
     }
     else
@@ -145,10 +145,10 @@ Compile_Cmp_Set_tttn_Logic ( Compiler * compiler, int64 ttt, int64 negateFlag )
     d1 ( //if ( DBI )
     {
         d1 ( _Printf ( ( byte* ) "\nCompile_Cmp_Set_tttn_Logic :" ) ) ;
-        d1 ( _Debugger_Disassemble ( _Debugger_, ( byte* ) here, 12, 0 ) ) ;
+        d1 ( _Debugger_Disassemble ( _Debugger_, ( byte* ) here, Here - here, 0 ) ) ;
     } ) ;
 #endif    
-    DBI_OFF ;
+    //DBI_OFF ;
 }
 
 // SET : 0x0f 0x9tttn mod 000 rm/reg
@@ -164,7 +164,7 @@ _Compile_SETcc ( int8 ttt, int8 negFlag, int8 reg )
     //SC_ForcePush ( _Context_->CurrentlyRunningWord ) ;
     SC_SetForcePush ( true ) ;
     //int8 rex = _Calculate_Rex ( reg, 0, 1 ) ;//( immSize == 8 ) || ( controlFlag & REX_B ) ) ;
-    int8 rex = _Calculate_Rex ( 0, reg, 0 ) ; //( immSize == 8 ) || ( controlFlag & REX_B ) ) ;
+    int8 rex = Calculate_Rex ( 0, reg, 0 ) ; //( immSize == 8 ) || ( controlFlag & REX_B ) ) ;
     if ( rex ) _Compile_Int8 ( rex ) ;
     _Compile_Int8 ( ( byte ) 0x0f ) ;
     _Compile_Int8 ( ( 0x9 << 4 ) | ( ttt << 1 ) | negFlag ) ;
@@ -253,7 +253,7 @@ _Compile_LogicalAnd ( Compiler * compiler )
 #endif    
 }
 
-void
+void 
 Compile_LogicalAnd ( Compiler * compiler )
 {
     int64 optFlag = CheckOptimize ( compiler, 5 ) ;

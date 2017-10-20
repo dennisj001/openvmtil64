@@ -62,7 +62,7 @@ Compile_Store ( Compiler * compiler, int8 stackReg ) // !
             // allow for one of these to be R8 which is 0
             if ( compiler->optInfo->Optimize_SrcReg || compiler->optInfo->Optimize_DstReg ) _Compile_Move_Reg_To_Reg ( compiler->optInfo->Optimize_DstReg, compiler->optInfo->Optimize_SrcReg ) ;
                 //_Compile_Move ( int64 direction, int8 reg, int64 rm, int64 sib, int64 disp )
-            else _Compile_Move ( compiler->optInfo->Optimize_Dest_RegOrMem, compiler->optInfo->Optimize_Reg, compiler->optInfo->Optimize_Rm, 0, 0 ) ;
+            else _Compile_Move (0, compiler->optInfo->Optimize_Dest_RegOrMem, compiler->optInfo->Optimize_Reg, compiler->optInfo->Optimize_Rm, 0, 0 ) ;
         }
         else _Compile_Move_Reg_To_Rm ( compiler->optInfo->Optimize_Rm, compiler->optInfo->Optimize_Reg, compiler->optInfo->Optimize_Disp ) ;
     }
@@ -101,7 +101,7 @@ Compile_Poke ( Compiler * compiler, int8 stackReg ) // =
             // allow for one of these to be R8 which is 0
             if ( compiler->optInfo->Optimize_SrcReg || compiler->optInfo->Optimize_DstReg ) _Compile_Move_Reg_To_Reg ( compiler->optInfo->Optimize_DstReg, compiler->optInfo->Optimize_SrcReg ) ;
                 //_Compile_Move ( int64 direction, int8 reg, int64 rm, int64 sib, int64 disp )
-            else _Compile_Move ( compiler->optInfo->Optimize_Dest_RegOrMem, compiler->optInfo->Optimize_Reg, compiler->optInfo->Optimize_Rm, 0, 0 ) ;
+            else _Compile_Move (0, compiler->optInfo->Optimize_Dest_RegOrMem, compiler->optInfo->Optimize_Reg, compiler->optInfo->Optimize_Rm, 0, 0 ) ;
         }
         else _Compile_Move_Reg_To_Rm ( compiler->optInfo->Optimize_Rm, compiler->optInfo->Optimize_Reg, compiler->optInfo->Optimize_Disp ) ;
     }

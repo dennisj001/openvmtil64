@@ -2,7 +2,7 @@
 #include "../include/cfrtil64.h"
 
 void
-_CfrTil_Word_Disassemble ( Word * word )
+Word_Disassemble ( Word * word )
 {
     byte * start ;
     if ( word && word->Definition )
@@ -18,12 +18,12 @@ _CfrTil_Word_Disassemble ( Word * word )
 }
 
 void
-_Word_Disassemble ( Word * word )
+_CfrTil_Word_Disassemble ( Word * word )
 {
     if ( word )
     {
-        _Printf ( ( byte* ) "\nWord :: %s.%s : definition = 0x%08lx : disassembly at %s :", word->ContainingNamespace ? word->ContainingNamespace->Name : ( byte* ) "", c_gd ( word->Name ), ( uint64 ) word->Definition, Context_Location ( ) ) ;
-        _CfrTil_Word_Disassemble ( word ) ;
+        _Printf ( ( byte* ) "\nWord :: %s.%s : definition = 0x%016lx : disassembly at %s :", word->ContainingNamespace ? word->ContainingNamespace->Name : ( byte* ) "", c_gd ( word->Name ), ( uint64 ) word->Definition, Context_Location ( ) ) ;
+        Word_Disassemble ( word ) ;
         //_Printf ( ( byte* ) "\n" ) ;
     }
     else
@@ -36,7 +36,7 @@ void
 CfrTil_Word_Disassemble ( )
 {
     Word * word = ( Word* ) _DataStack_Pop ( ) ;
-    _Word_Disassemble ( word ) ;
+    _CfrTil_Word_Disassemble ( word ) ;
 }
 
 void
@@ -45,7 +45,7 @@ Debugger_WDis ( Debugger * debugger )
     //_Printf ( ( byte* ) "\n" ) ;
     Word * word = debugger->w_Word ;
     if ( ! word ) word = _Interpreter_->w_Word ;
-    _Word_Disassemble ( word ) ;
+    _CfrTil_Word_Disassemble ( word ) ;
 }
 
 void

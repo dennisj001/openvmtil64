@@ -411,31 +411,41 @@ String_ConvertToBackSlash ( byte * str0 )
     else return 0 ;
 }
 
-int64
-stricmp ( byte * str0, byte * str1 )
+Boolean
+Strcmp ( byte * str0, byte * str1 )
 {
-    int64 i, result = 0 ;
-    for ( i = 0 ; str0 [ i ] && ( ! result ) ; i ++ )
+    int64 i ; Boolean result = 0 ;
+    for ( i = 0 ; (str0 [ i ] || str1 [ i ]) && ( ! result ) ; i ++ )
     {
-        result = tolower ( ( int64 ) str0 [ i ] ) - tolower ( ( int64 ) str1 [ i ] ) ;
+        result = str0 [ i ] != str1 [ i ] ;
+    }
+    return result ;
+}
+
+Boolean
+Stricmp ( byte * str0, byte * str1 )
+{
+    int64 i ; Boolean result = 0 ;
+    for ( i = 0 ; (str0 [ i ] || str1 [ i ]) && ( ! result ) ; i ++ )
+    {
+        result = tolower ( str0 [ i ] ) != tolower ( str1 [ i ] ) ;
+    }
+    return result ;
+}
+
+Boolean
+Strncmp ( byte * str0, byte * str1, int64 n )
+{
+    int64 i ; Boolean result = 0 ;
+    for ( i = 0 ; (str0 [ i ] || str1 [ i ]) && ( ! result ) && n ; i ++, n-- )
+    {
+        result = str0 [ i ] != str1 [ i ] ;
     }
     return result ;
 }
 
 int64
-StrnCmp ( byte * str0, byte * str1, int64 n )
-{
-    int64 i, result = 0 ;
-    for ( i = 0 ; str0 [ i ] && str1 [ i ] && n && ( ! result ) ; i ++, n-- )
-    {
-        result = ( int64 ) str0 [ i ] - ( int64 ) str1 [ i ] ;
-    }
-    if ( ! n ) return result ;
-    else return ( - 1 ) ;
-}
-
-int64
-StrnICmp ( byte * str0, byte * str1, int64 n )
+StrniCmp ( byte * str0, byte * str1, int64 n )
 {
     int64 i, result = 0 ;
     for ( i = 0 ; str0 [ i ] && str1 [ i ] && n && ( ! result ) ; i ++, n -- )
@@ -704,12 +714,12 @@ String_FindStrnCmpIndex ( byte * sc, byte* name0, int64 index0, int64 wl0, int64
     int64 i, n, index = index0, slsc = Strlen ( sc ) ;
     for ( i = 0, n = wl0 + inc ; i <= n ; i ++ ) // tokens are parsed in different order with parameter and c rtl args, etc. 
     {
-        if ( ! StrnCmp ( & sc [ index - i ], name0, wl0 )) //l ) ) //wl0 ) )
+        if ( ! Strncmp ( & sc [ index - i ], name0, wl0 )) //l ) ) //wl0 ) )
         {
             index -= i ;
             goto done ;
         }
-        if ( (index + i <= slsc) && ( ! StrnCmp ( & sc [ index + i ], name0, wl0 )) )//l ) ) //wl0 ) )
+        if ( (index + i <= slsc) && ( ! Strncmp ( & sc [ index + i ], name0, wl0 )) )//l ) ) //wl0 ) )
         {
             index += i ;
             goto done ;

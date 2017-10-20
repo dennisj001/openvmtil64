@@ -108,19 +108,6 @@ _Word_Namespace ( Word * word )
     else return word->ContainingNamespace ;
 }
 
-Word *
-_Word_Allocate ( uint64 allocType )
-{
-    Word * word = 0 ;
-    if ( allocType & ( COMPILER_TEMP | LISP_TEMP ) ) allocType = TEMPORARY ;
-    else allocType = DICTIONARY ;
-    word = ( Word* ) OVT_CheckRecyclableAllocate ( _Q_->MemorySpace0->RecycledWordList, sizeof ( Word ) + sizeof ( WordData ), 0 ) ;
-    if ( word ) _Q_->MemorySpace0->RecycledWordCount ++ ;
-    else word = ( Word* ) Mem_Allocate ( sizeof ( Word ) + sizeof ( WordData ), allocType ) ;
-    word->S_WordData = ( WordData * ) ( word + 1 ) ; // nb. "pointer arithmetic"
-    return word ;
-}
-
 // deep copy from word0 to word
 
 void
@@ -184,6 +171,19 @@ _Word_Add ( Word * word, int64 addToInNs, Namespace * addToNs )
             else _Printf ( ( byte* ) "\nnew DObject :: %s.%s", ns->Name, word->Name ) ;
         }
     }
+}
+
+Word *
+_Word_Allocate ( uint64 allocType )
+{
+    Word * word = 0 ;
+    if ( allocType & ( COMPILER_TEMP | LISP_TEMP ) ) allocType = TEMPORARY ;
+    else allocType = DICTIONARY ;
+    word = ( Word* ) OVT_CheckRecyclableAllocate ( _Q_->MemorySpace0->RecycledWordList, sizeof ( Word ) + sizeof ( WordData ), 0 ) ;
+    if ( word ) _Q_->MemorySpace0->RecycledWordCount ++ ;
+    else word = ( Word* ) Mem_Allocate ( sizeof ( Word ) + sizeof ( WordData ), allocType ) ;
+    word->S_WordData = ( WordData * ) ( word + 1 ) ; // nb. "pointer arithmetic"
+    return word ;
 }
 
 Word *

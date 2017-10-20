@@ -365,13 +365,13 @@ sp
 //Zenfone2 1 =
 //mem pause
 : sh _sh ; prefix
-dbgOff
+//dbgOff
 dbgOn
 Root 'doScript 1 const
 #if dbgOnVar @ 
 testCfrTil
 stringMacrosOff
-//demo
+demo
 #endif
 //using pause
 2 + 7  assertStkChk // stack checking
@@ -403,4 +403,3 @@ Lisp
 lispOff
 #endif
 //verbosity 3 = mem
-

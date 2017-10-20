@@ -55,7 +55,8 @@ _GetRmDispImm ( CompileOptimizeInfo * optInfo, Word * word, int64 suggestedReg )
         optInfo->OptimizeFlag |= OPTIMIZE_REGISTER ;
         optInfo->Optimize_Dest_RegOrMem = REG ;
         optInfo->Optimize_Mod = REG ;
-        optInfo->Optimize_Rm = optInfo->Optimize_Reg = ( suggestedReg != - 1 ) ? suggestedReg : word->RegToUse ;
+        //optInfo->Optimize_Rm = optInfo->Optimize_Reg = ( suggestedReg != - 1 ) ? suggestedReg : word->RegToUse ;
+        optInfo->Optimize_Rm = optInfo->Optimize_Reg = word->RegToUse ;
     }
     else if ( word->CAttribute & LOCAL_VARIABLE )
     {
@@ -570,7 +571,7 @@ _CheckOptimizeOperands ( Compiler * compiler, int64 maxOperands )
                             Set_SCA ( 1 ) ;
                             _Compile_IMULI ( MEM, ACC, optInfo->Optimize_Rm, 0, compiler->optInfo->Optimize_Disp, *optInfo->O_two->W_PtrToValue, CELL ) ;
                             Set_SCA ( 0 ) ;
-                            _Compile_Move ( MEM, ACC, compiler->optInfo->Optimize_Rm, 0, compiler->optInfo->Optimize_Disp ) ;
+                            _Compile_Move (0, MEM, ACC, compiler->optInfo->Optimize_Rm, 0, compiler->optInfo->Optimize_Disp ) ;
                         }
                         else if ( optInfo->O_one->Definition == CfrTil_Divide )
                         {
@@ -583,7 +584,7 @@ _CheckOptimizeOperands ( Compiler * compiler, int64 maxOperands )
                             Set_SCA ( 1 ) ;
                             Compile_IDIV ( REG, OREG, 0, 0, 0, 0, 0 ) ;
                             Set_SCA ( 0 ) ;
-                            _Compile_Move ( MEM, ACC, compiler->optInfo->Optimize_Rm, 0, compiler->optInfo->Optimize_Disp ) ;
+                            _Compile_Move (0, MEM, ACC, compiler->optInfo->Optimize_Rm, 0, compiler->optInfo->Optimize_Disp ) ;
                         }
                         else if ( optInfo->O_one->Definition == CfrTil_Mod ) // "%" is in Lexer and Int
                         {
@@ -596,7 +597,7 @@ _CheckOptimizeOperands ( Compiler * compiler, int64 maxOperands )
                             Compile_IDIV ( REG, OREG, 0, 0, 0, 0, 0 ) ;
                             Set_SCA ( 0 ) ;
                             _Compile_Move_Reg_To_Reg ( ACC, RDX ) ; // for consistency finally use R8 so optInfo can always count on eax as the pushed reg
-                            _Compile_Move ( MEM, ACC, compiler->optInfo->Optimize_Rm, 0, compiler->optInfo->Optimize_Disp ) ;
+                            _Compile_Move (0, MEM, ACC, compiler->optInfo->Optimize_Rm, 0, compiler->optInfo->Optimize_Disp ) ;
                         }
                         else if ( optInfo->O_one->Definition == CfrTil_ShiftLeft )
                         {
@@ -634,7 +635,7 @@ _CheckOptimizeOperands ( Compiler * compiler, int64 maxOperands )
                                 _Compile_X_Group1 ( op, REG, optInfo->Optimize_Mod, ACC, optInfo->Optimize_Rm, 0, optInfo->Optimize_Disp, CELL ) ;
                                 _GetRmDispImm ( optInfo, optInfo->O_six, - 1 ) ;
                                 Set_SCA ( 0 ) ;
-                                _Compile_Move ( MEM, ACC, compiler->optInfo->Optimize_Rm, 0, compiler->optInfo->Optimize_Disp ) ;
+                                _Compile_Move (0, MEM, ACC, compiler->optInfo->Optimize_Rm, 0, compiler->optInfo->Optimize_Disp ) ;
                             }
                             else
                             {
@@ -652,18 +653,20 @@ _CheckOptimizeOperands ( Compiler * compiler, int64 maxOperands )
                             {
                                 _GetRmDispImm ( optInfo, optInfo->O_five, - 1 ) ;
                                 Set_SCA ( 1 ) ;
-                                _Compile_IMUL ( MEM, ACC, optInfo->Optimize_Rm, 0, optInfo->Optimize_Disp ) ;
+                                //_Compile_IMUL (MEM, ACC, optInfo->Optimize_Rm, REX_B | MODRM_B | DISP_B, 0, optInfo->Optimize_Disp ) ;
+                                Compile_MUL ( MEM, optInfo->Optimize_Rm, REX_B | MODRM_B | DISP_B, 0, optInfo->Optimize_Disp, 0, CELL_SIZE ) ;
                                 _GetRmDispImm ( optInfo, optInfo->O_six, - 1 ) ;
                                 Set_SCA ( 0 ) ;
-                                _Compile_Move ( MEM, ACC, compiler->optInfo->Optimize_Rm, 0, compiler->optInfo->Optimize_Disp ) ;
+                                _Compile_Move (0, MEM, ACC, compiler->optInfo->Optimize_Rm, 0, compiler->optInfo->Optimize_Disp ) ;
                             }
                             else
                             {
                                 _GetRmDispImm ( optInfo, optInfo->O_six, - 1 ) ;
                                 Set_SCA ( 1 ) ;
-                                _Compile_IMUL ( MEM, ACC, optInfo->Optimize_Rm, 0, optInfo->Optimize_Disp ) ;
+                                //_Compile_IMUL (MEM, ACC, optInfo->Optimize_Rm, REX_B | MODRM_B | DISP_B, 0, optInfo->Optimize_Disp ) ;
+                                Compile_MUL ( MEM, optInfo->Optimize_Rm, REX_B | MODRM_B | DISP_B, 0, optInfo->Optimize_Disp, 0, CELL_SIZE ) ;
                                 Set_SCA ( 0 ) ;
-                                _Compile_Move ( MEM, ACC, compiler->optInfo->Optimize_Rm, 0, compiler->optInfo->Optimize_Disp ) ;
+                                _Compile_Move (0, MEM, ACC, compiler->optInfo->Optimize_Rm, 0, compiler->optInfo->Optimize_Disp ) ;
                             }
                         }
                         else if ( ( optInfo->O_one->Definition == CfrTil_ShiftLeft ) || ( optInfo->O_one->Definition == CfrTil_ShiftRight ) )
@@ -685,7 +688,7 @@ _CheckOptimizeOperands ( Compiler * compiler, int64 maxOperands )
                                 _Compile_Group2_CL ( REG, op, ACC, 0, 0 ) ;
                                 _GetRmDispImm ( optInfo, optInfo->O_six, - 1 ) ;
                                 Set_SCA ( 0 ) ;
-                                _Compile_Move ( MEM, ACC, compiler->optInfo->Optimize_Rm, 0, compiler->optInfo->Optimize_Disp ) ;
+                                _Compile_Move (0, MEM, ACC, compiler->optInfo->Optimize_Rm, 0, compiler->optInfo->Optimize_Disp ) ;
                             }
                         }
                         else if ( ( optInfo->O_one->Definition == CfrTil_Divide ) || ( optInfo->O_one->Definition == CfrTil_Mod ) )
@@ -710,9 +713,9 @@ _CheckOptimizeOperands ( Compiler * compiler, int64 maxOperands )
                             if ( optInfo->O_one->Definition == CfrTil_Divide )
                             {
                                 Set_SCA ( 0 ) ;
-                                _Compile_Move ( MEM, ACC, compiler->optInfo->Optimize_Rm, 0, compiler->optInfo->Optimize_Disp ) ;
+                                _Compile_Move (0, MEM, ACC, compiler->optInfo->Optimize_Rm, 0, compiler->optInfo->Optimize_Disp ) ;
                             }
-                            else _Compile_Move ( MEM, RDX, compiler->optInfo->Optimize_Rm, 0, compiler->optInfo->Optimize_Disp ) ;
+                            else _Compile_Move (0, MEM, RDX, compiler->optInfo->Optimize_Rm, 0, compiler->optInfo->Optimize_Disp ) ;
                         }
                         else continue ;
                         return ( OPTIMIZE_DONE | OPTIMIZE_RESET ) ;
@@ -722,18 +725,27 @@ _CheckOptimizeOperands ( Compiler * compiler, int64 maxOperands )
                         SetHere ( optInfo->O_two->Coding ) ;
                         if ( optInfo->O_two->CAttribute & REGISTER_VARIABLE ) compiler->optInfo->Optimize_Dest_RegOrMem = REG ;
                         else if ( ( optInfo->O_two->CAttribute & THIS ) ) optInfo->Optimize_Dest_RegOrMem = MEM ;
-                        if ( optInfo->O_two->CAttribute & ( THIS | REGISTER_VARIABLE ) )
+#if 1                        
+                        if ( optInfo->O_two->CAttribute & THIS ) 
                         {
                             _Compile_GetVarLitObj_LValue_To_Reg ( optInfo->O_two, ACC ) ;
                             _GetRmDispImm ( optInfo, optInfo->O_one, - 1 ) ;
                             optInfo->Optimize_Rm = ACC ; // shouldn't need this but some code still references this as the rm ?? fix ??
                             return ( i | OPTIMIZE_RESET ) ;
                         }
+                        else if ( optInfo->O_two->CAttribute & REGISTER_VARIABLE ) 
+                        {
+                            //_GetRmDispImm ( optInfo, optInfo->O_two, - 1 ) ;
+                            Set_SCA ( 0 ) ;
+                            _Compile_MoveImm ( REG, optInfo->O_two->RegToUse, IMM_B | REX_B | MODRM_B, 0, 0, ( int64 ) optInfo->O_one->W_Value, CELL_SIZE ) ;
+                            return ( OPTIMIZE_DONE | OPTIMIZE_RESET ) ;
+                        }
                         else
+#endif                            
                         {
                             _GetRmDispImm ( optInfo, optInfo->O_two, - 1 ) ;
                             Set_SCA ( 0 ) ;
-                            _Compile_MoveImm ( MEM, compiler->optInfo->Optimize_Rm, IMM_B | REX_B | MODRM_B | DISP_B, 0, compiler->optInfo->Optimize_Disp, ( int64 ) optInfo->O_one->W_Value, CELL ) ;
+                            _Compile_MoveImm ( MEM, compiler->optInfo->Optimize_Rm, IMM_B | REX_B | MODRM_B | DISP_B, 0, compiler->optInfo->Optimize_Disp, ( int64 ) optInfo->O_one->W_Value, CELL_SIZE ) ;
                             return ( OPTIMIZE_DONE | OPTIMIZE_RESET ) ;
                         }
                     }
@@ -759,7 +771,7 @@ _CheckOptimizeOperands ( Compiler * compiler, int64 maxOperands )
                             _GetRmDispImm ( optInfo, optInfo->O_three, - 1 ) ;
                             //_Compile_Move ( int64 direction, int64 reg, int64 rm, int64 sib, int64 disp )
                             Set_SCA ( 0 ) ;
-                            _Compile_Move ( MEM, OREG, compiler->optInfo->Optimize_Rm, 0, compiler->optInfo->Optimize_Disp ) ;
+                            _Compile_Move (0, MEM, OREG, compiler->optInfo->Optimize_Rm, 0, compiler->optInfo->Optimize_Disp ) ;
                         }
                         return ( OPTIMIZE_DONE | OPTIMIZE_RESET ) ;
                     }
@@ -878,7 +890,7 @@ _CheckOptimizeOperands ( Compiler * compiler, int64 maxOperands )
                             else _Compile_GetVarLitObj_RValue_To_Reg ( optInfo->O_two, ACC ) ;
                             _GetRmDispImm ( optInfo, optInfo->O_one, - 1 ) ;
                             Word_Set_SCA ( optInfo->O_zero ) ;
-                            _Compile_Move ( MEM, ACC, compiler->optInfo->Optimize_Rm, 0, compiler->optInfo->Optimize_Disp ) ;
+                            _Compile_Move (0, MEM, ACC, compiler->optInfo->Optimize_Rm, 0, compiler->optInfo->Optimize_Disp ) ;
                             _Context_->CurrentlyRunningWord = svcrw ;
                             return ( OPTIMIZE_DONE | OPTIMIZE_RESET ) ;
                         }
@@ -891,7 +903,7 @@ _CheckOptimizeOperands ( Compiler * compiler, int64 maxOperands )
                         if ( optInfo->O_one->CAttribute & REGISTER_VARIABLE )
                         {
                             Set_SCA ( 0 ) ;
-                            _Compile_MoveImm ( REG, ACC, IMM_B | REX_B | MODRM_B | DISP_B, 0, 0, optInfo->Optimize_Imm, CELL ) ;
+                            _Compile_MoveImm ( REG, optInfo->O_one->RegToUse, IMM_B | REX_B | MODRM_B | DISP_B, 0, 0, optInfo->Optimize_Imm, CELL ) ;
                             return ( OPTIMIZE_DONE | OPTIMIZE_RESET ) ;
                         }
                         else
@@ -956,7 +968,7 @@ _CheckOptimizeOperands ( Compiler * compiler, int64 maxOperands )
                             {
                                 _GetRmDispImm ( optInfo, optInfo->O_one, - 1 ) ;
                                 Set_SCA ( 0 ) ;
-                                _Compile_Move ( MEM, ACC, compiler->optInfo->Optimize_Rm, 0, compiler->optInfo->Optimize_Disp ) ;
+                                _Compile_Move (0, MEM, ACC, compiler->optInfo->Optimize_Rm, 0, compiler->optInfo->Optimize_Disp ) ;
                             }
                             return ( OPTIMIZE_DONE | OPTIMIZE_RESET ) ;
                         }
@@ -969,7 +981,7 @@ _CheckOptimizeOperands ( Compiler * compiler, int64 maxOperands )
                             SetHere ( optInfo->O_two->StackPushRegisterCode ) ; //Coding ) ;
                             _GetRmDispImm ( optInfo, optInfo->O_one, - 1 ) ;
                             Set_SCA ( 0 ) ;
-                            _Compile_Move ( MEM, ACC, compiler->optInfo->Optimize_Rm, 0, compiler->optInfo->Optimize_Disp ) ;
+                            _Compile_Move (0, MEM, ACC, compiler->optInfo->Optimize_Rm, 0, compiler->optInfo->Optimize_Disp ) ;
                             return ( OPTIMIZE_DONE | OPTIMIZE_RESET ) ; // reset after '=' or store 
                         }
                         else return 0 ;
@@ -1020,7 +1032,9 @@ _CheckOptimizeOperands ( Compiler * compiler, int64 maxOperands )
                             {
                                 optInfo->Optimize_DstReg = optInfo->O_two->RegToUse ;
                                 optInfo->Optimize_SrcReg = optInfo->O_one->RegToUse ;
-                                _GetRmDispImm ( optInfo, optInfo->O_one, ACC ) ;
+                                optInfo->Optimize_Mod = REG ;
+                                optInfo->OptimizeFlag |= OPTIMIZE_REGISTER ;
+                                //_GetRmDispImm ( optInfo, optInfo->O_one, ACC ) ;
                             }
                             else
                             {
@@ -1143,7 +1157,11 @@ CheckOptimize ( Compiler * compiler, int64 maxOperands )
         SetState ( _CfrTil_, IN_OPTIMIZER, true ) ;
         d0 ( if ( Is_DebugModeOn ) Compiler_Show_WordList ( ( byte* ) "\nCheckOptimize : before optimize :" ) ) ;
         rtrn = _CheckOptimizeOperands ( compiler, maxOperands ) ;
-        if ( ! ( rtrn & ( OPTIMIZE_DONE ) ) ) Set_SCA ( 0 ) ;
+        if ( ! ( rtrn & ( OPTIMIZE_DONE ) ) )
+        {
+            Set_SCA ( 0 ) ;
+        }
+        //else {_DEBUG_SHOW ( _Context_->CurrentlyRunningWord, 1 ) ; }
         if ( ( rtrn & OPTIMIZE_RESET ) )
         {
             if ( ( ! Compiling ) && ( ! IsSourceCodeOn ) )

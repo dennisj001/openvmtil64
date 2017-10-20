@@ -472,21 +472,22 @@ Calculate_TotalNbaAccountedMemAllocated ( OpenVmTil * ovt, int64 flag )
     fflush ( stdout ) ;
 }
 
-#if 0 // mem leak debugging ...
+#if 1 // mem leak debugging ...
 
 void
-OVT_MemLeakAccount ( )
+OVT_MemLeakAccount ( Boolean check )
 {
     OpenVmTil * ovt = _Q_ ;
     if ( ovt )
     {
-        _Calculate_TotalNbaAccountedMemAllocated ( ovt, 0 ) ;
+        if ( check ) _Calculate_TotalNbaAccountedMemAllocated ( ovt, 0 ) ;
         int64 mm = ( mmap_TotalMemAllocated - mmap_TotalMemFreed ) ;
         //int64 om = (( ovt->TotalNbaAccountedMemAllocated - ovt->TotalNbaAccountedMemRemaining ) + ovt->OVT_InitialUnAccountedMemory ) ; 
         int64 om = ovt->TotalNbaAccountedMemAllocated + ovt->OVT_InitialUnAccountedMemory ;
         if ( om != mm )
         {
-            _Printf ( ( byte* ) "\nGot a memory allocation questionable leak = %ld", abs ( mm - om ) ) ;
+            //_Printf ( ( byte* ) "\nGot a memory allocation questionable leak = %ld", abs ( mm - om ) ) ;
+            _Printf ( ( byte* ) "\n_OVT_ShowMemoryAllocated :: memory allocation leak = %ld", abs ( mm - om ) ) ;
             Pause ( ) ;
         }
     }
@@ -495,7 +496,7 @@ OVT_MemLeakAccount ( )
 void
 MLA ( )
 {
-    OVT_MemLeakAccount ( ) ;
+    OVT_MemLeakAccount ( false ) ;
 }
 #endif
 
@@ -515,14 +516,8 @@ _OVT_ShowMemoryAllocated ( OpenVmTil * ovt )
     else if ( vf ) _Printf ( ( byte* ) c_ud ( memDiff2s ), memDiff2 ) ;
     if ( leak ) _Printf ( ( byte* ) c_ad ( leaks ), leak ) ;
     else if ( vf ) _Printf ( ( byte* ) c_ud ( leaks ), leak ) ;
-    
-    int64 mm = ( mmap_TotalMemAllocated - mmap_TotalMemFreed ) ;
-    int64 om = ovt->TotalNbaAccountedMemAllocated + ovt->OVT_InitialUnAccountedMemory ;
-    if ( om != mm )
-    {
-        _Printf ( ( byte* ) "\n_OVT_ShowMemoryAllocated :: memory allocation leak = %ld", abs ( mm - om ) ) ;
-        Pause ( ) ;
-    }
+
+    MLA ( ) ; 
     //if ( memDiff2 || leak || vf )
     {
         _Printf ( ( byte* ) "\nTotalNbaAccountedMemAllocated                    = %9d : <=: ovt->TotalNbaAccountedMemAllocated", ovt->TotalNbaAccountedMemAllocated ) ;
@@ -599,8 +594,8 @@ DLList_RecycleWordList ( dllist * list )
 void
 CheckCodeSpaceForRoom ( )
 {
-    if ( _Q_CodeByteArray->OurNBA->ba_CurrentByteArray->MemRemaining < ( 1 * K ) )
-        _Q_CodeByteArray = _ByteArray_AppendSpace_MakeSure ( _Q_CodeByteArray, 1 * K ) ;
+    if ( _Q_CodeByteArray->OurNBA->ba_CurrentByteArray->MemRemaining < ( 8 * K ) )
+        _Q_CodeByteArray = _ByteArray_AppendSpace_MakeSure ( _Q_CodeByteArray, 8 * K ) ;
 }
 
 #if 0

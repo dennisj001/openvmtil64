@@ -160,10 +160,16 @@ _Compile_Stack_Dup ( int8 stackReg )
 void
 _Compile_Stack_Pick ( int8 stackReg ) // pick
 {
+    //DBI_ON ;
     _Compile_Move_Rm_To_Reg ( ACC, stackReg, 0 ) ;
-    Compile_NOT ( REG, ACC, 0, 0, 0 ) ; // negate eax
-    _Compile_Move ( REG, ACC, stackReg, _CalculateSib ( SCALE_CELL, ACC, DSP ), 0 ) ; // move eax, [esi + eax * 4 ] ; but remember eax is now a negative number
+    Compile_NOT ( REG, ACC, 0, 0, 0 ) ; // negate acc
+    //_Compile_InstructionX64 ( int8 rex, int16 opCode, int8 modRm, int64 controlFlag, int8 sib, int64 disp, int8 dispSize, int64 imm, int8 immSize )
+    //_Calculate_Rex_Sib ( int8 reg, int8 rm, int8 scale, int8 index, int8 base, int8 rex_w_flag ) ;
+    int8 rex = _Calculate_Rex_With_Sib ( ACC, SCALE_8, ACC, DSP, CELL_SIZE ) ;
+    _Compile_Move ( rex, REG, ACC, stackReg, CalculateSib ( SCALE_CELL, ACC, DSP ), 0 ) ; // move ACC, [DSP + ACC * 4 ] ; but remember eax is now a negative number
+
     _Compile_Move_Reg_To_Rm ( stackReg, ACC, 0 ) ;
+   //DBI_OFF ;
 }
 
 void

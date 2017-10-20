@@ -1,6 +1,7 @@
 #include "../../include/cfrtil64.h"
 
 #if 0
+
 void
 Cpu_CheckRspForWordAlignment ( byte * prefix )
 {
@@ -107,11 +108,13 @@ _Block_Copy ( byte * srcAddress, int64 bsize )
 void
 Block_Copy ( byte * dst, byte * src, int64 qsize )
 {
+#if 0    
     if ( dst > src )
     {
         Error_Abort ( ( byte* ) "\nBlock_Copy :: Error : dst > src.\n" ) ;
         //return ; // ?? what is going on here ??
     }
+#endif    
     SetHere ( dst ) ;
     _Block_Copy ( src, qsize ) ;
 }
@@ -290,7 +293,24 @@ _CfrTil_EndBlock1 ( BlockInfo * bi )
         if ( compiler->NumberOfRegisterVariables )
         {
             bi->bp_First = bi->Start ;
-            if ( GetState ( compiler, RETURN_ACCUM ) )
+            if ( compiler->ReturnVariableWord )
+            {
+
+                if ( compiler->ReturnVariableWord )
+                {
+                    if ( compiler->ReturnVariableWord->CAttribute & REGISTER_VARIABLE )
+                    {
+                        //_Compile_Move_Reg_To_Reg ( ACC, compiler->ReturnVariableWord->RegToUse ) ;
+                        _Compile_Move_Reg_To_StackN ( DSP, 0, compiler->ReturnVariableWord->RegToUse ) ;
+                    }
+                    else
+                    {
+                        _Compile_GetVarLitObj_RValue_To_Reg ( compiler->ReturnVariableWord, ACC ) ;
+                        Compile_Move_ACC_To_TOS ( DSP ) ;
+                    }
+                }
+            }
+            else if ( GetState ( compiler, RETURN_ACCUM ) || GetState ( compiler, RETURN_TOS ) )
             {
                 Compile_Move_ACC_To_TOS ( DSP ) ;
             }

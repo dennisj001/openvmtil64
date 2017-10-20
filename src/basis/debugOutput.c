@@ -15,23 +15,24 @@ Debugger_Menu ( Debugger * debugger )
 // find and reconstruct locals source code in a buffer and parse it with the regular locals parse code
 
 void
-Debugger_ParseFunctionLocalVariables ( Debugger * debugger, Lexer * lexer )
+Debugger_ParseFunctionLocalVariables ( Debugger * debugger, Lexer * lexer, Boolean c_syntaxFlag )
 {
-    int64 levelBit = 0 ;
+    int64 levelBit = 0 ; Boolean lasvf = false ;
     byte * token, *prevToken = 0 ;
     _Compiler_->NumberOfLocals = 0 ;
     levelBit = 0 ;
     while ( ( token = _Lexer_ReadToken ( lexer, ( byte* ) " ,\n\r\t" ) ) )
     {
         if ( String_Equal ( token, "{" ) ) levelBit ++ ;
-        else if ( String_Equal ( token, "{" ) ) levelBit -- ;
-        else if ( String_Equal ( token, "(" ) )
+        else if ( String_Equal ( token, "}" ) ) { if ( --levelBit <= 0 ) return ; }
+        else if ( String_Equal ( token, "(" ) && ( lasvf == false ) )
         {
             if ( ! ( debugger->LevelBitNamespaceMap & ( ( uint64 ) 1 << ( levelBit ) ) ) )
             {
                 _CfrTil_Parse_LocalsAndStackVariables ( 1, 0, 0, debugger->LocalsNamespacesStack, 0 ) ;
                 debugger->LevelBitNamespaceMap |= ( ( uint64 ) 1 << ( levelBit ) ) ;
             }
+            if ( c_syntaxFlag ) lasvf = true ;
         }
         else if ( String_Equal ( token, "var" ) )
         {
@@ -44,7 +45,6 @@ Debugger_ParseFunctionLocalVariables ( Debugger * debugger, Lexer * lexer )
         }
         else if ( String_Equal ( token, ";" ) || String_Equal ( token, ")" ) ) return ;
         else if ( String_Equal ( token, "<end>" ) ) return ;
-        //_Printf ((byte*)"\ngot it!");
         prevToken = token ;
     }
 }
@@ -71,8 +71,7 @@ _Debugger_Locals_ShowALocal ( Debugger * debugger, Word * localsWord, byte * buf
 void
 Debugger_Locals_Show ( Debugger * debugger )
 {
-    //Word * scWord = debugger->w_Word ? debugger->w_Word : _CfrTil_->DebugWordListWord ;
-    Word * scWord = Compiling ? _Compiler_->CurrentWordCompiling : _Context_->CurrentlyRunningWord ;
+    Word * scWord = debugger->w_Word ? debugger->w_Word : Compiling ? _Compiler_->CurrentWordCompiling : _Context_->CurrentlyRunningWord ;
     //if ( ( ! CompileMode ) && scWord && scWord->W_SourceCode )
     int64 i ;
     Compiler * compiler = _Context_->Compiler0 ;
@@ -103,7 +102,7 @@ Debugger_Locals_Show ( Debugger * debugger )
         debugger->LevelBitNamespaceMap = 0 ;
         Lexer * svLexer = _Context_->Lexer0 ;
         _Context_->Lexer0 = lexer ;
-        Debugger_ParseFunctionLocalVariables ( debugger, lexer ) ;
+        Debugger_ParseFunctionLocalVariables ( debugger, lexer, ( ( GetState ( _Context_, C_SYNTAX ) ) || ( GetState ( scWord, W_C_SYNTAX ) ) )  ) ;
         _Context_->Lexer0 = svLexer ;
     }
     else debugger->LocalsNamespacesStack = compiler->LocalsNamespacesStack ;
@@ -362,7 +361,7 @@ _CfrTil_ShowInfo ( Debugger * debugger, byte * prompt, int64 signal, int64 force
         byte *location ;
         byte signalAscii [ 128 ] ;
         ReadLiner * rl = cntx->ReadLiner0 ;
-        char * compileOrInterpret = ( char* ) ( CompileMode ? "[c]" : "[i]" ), buffer [32] ;
+        char * compileOrInterpret = ( char* ) ( CompileMode ? "[c] " : "[i] " ), buffer [32] ;
 
         DebugColors ;
         if ( ! ( cntx && cntx->Lexer0 ) )
@@ -377,11 +376,11 @@ _CfrTil_ShowInfo ( Debugger * debugger, byte * prompt, int64 signal, int64 force
         byte * token0 = word ? word->Name : debugger->Token, *token1 ;
         if ( ( signal == 11 ) || _Q_->SigAddress )
         {
-            sprintf ( ( char* ) signalAscii, ( char * ) "\nError : signal " INT_FRMT ":: attempting address : " UINT_FRMT, signal, ( uint64 ) _Q_->SigAddress ) ;
+            sprintf ( ( char* ) signalAscii, ( char * ) "Error : signal " INT_FRMT ":: attempting address : " UINT_FRMT, signal, ( uint64 ) _Q_->SigAddress ) ;
             debugger->DebugAddress = _Q_->SigAddress ;
             //Debugger_Dis ( debugger ) ;
         }
-        else if ( signal ) sprintf ( ( char* ) signalAscii, ( char * ) "\nError : signal " INT_FRMT " ", signal ) ;
+        else if ( signal ) sprintf ( ( char* ) signalAscii, ( char * ) "Error : signal " INT_FRMT " ", signal ) ;
 
         if ( token0 )
         {
@@ -409,7 +408,7 @@ next:
                 }
                 else
                 {
-                    sprintf ( obuffer, "\n%s%s:: %s : %03ld.%03ld : %s :> %s <: 0x%08lx :> ", // <:: " INT_FRMT "." INT_FRMT " ",
+                    sprintf ( obuffer, "\n%s%s:: %s : %03ld.%03ld : %s :> %s <: 0x%016lx :> ", // <:: " INT_FRMT "." INT_FRMT " ",
                         prompt, signal ? ( char* ) signalAscii : " ", cc_location, rl->LineNumber, rl->ReadIndex,
                         word->ContainingNamespace ? ( char* ) word->ContainingNamespace->Name : ( char* ) "<literal>",
                         ( char* ) cc_Token, ( uint64 ) word->Definition ) ; //, _Q_->StartedTimes, _Q_->SignalExceptionsHandled ) ;
@@ -468,7 +467,7 @@ Debugger_ShowInfo ( Debugger * debugger, byte * prompt, int64 signal )
         else if ( debugger->w_Word ) debugger->Token = debugger->w_Word->Name ;
         if ( ( signal != SIGSEGV ) && GetState ( debugger, DBG_STEPPING ) )
         {
-            _Printf ( ( byte* ) "\nDebug Stepping Address : 0x%08lx", ( uint64 ) debugger->DebugAddress ) ;
+            _Printf ( ( byte* ) "\nDebug Stepping Address : 0x%016lx", ( uint64 ) debugger->DebugAddress ) ;
             //if ( _Q_->RestartCondition && (_Q_->RestartCondition < INITIAL_START) ) 
             Debugger_UdisOneInstruction ( debugger, debugger->DebugAddress, ( byte* ) "", ( byte* ) "" ) ; // the next instruction
         }

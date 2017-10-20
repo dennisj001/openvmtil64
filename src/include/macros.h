@@ -190,7 +190,8 @@
 #define Car( sym ) ((ListObject*) sym)->Lo_Car
 #define Cdr( sym ) ((ListObject*) sym)->Lo_Cdr
 
-#define String_Equal( string1, string2 ) (strncmp ( (char*) string1, (char*) string2, 128 ) == 0 )
+#define Stringi_Equal( string1, string2 ) (Stricmp ( (char*) string1, (char*) string2 ) == 0 )
+#define String_Equal( string1, string2 ) (Strcmp ( (char*) string1, (char*) string2 ) == 0 )
 #define sconvbs( d, s ) (byte*) _String_ConvertStringToBackSlash ( d, s )
 #define String_CB( string0 ) String_ConvertToBackSlash ( string0 )
 
@@ -238,7 +239,8 @@
 #define DEBUG_SHOW Debugger_PostShow ( _Debugger_ ) ; //, token, word ) ;
 #define DEBUG_ASM_SHOW_ON SetState ( _Debugger_, DBG_ASM_SHOW_ON, true ) 
 #define DEBUG_ASM_SHOW_OFF SetState ( _Debugger_, DBG_ASM_SHOW_ON, false ) 
-#define DBI GetState ( _Debugger_, DBG_ASM_SHOW_ON ) 
+#define _DBI GetState ( _Debugger_, DBG_ASM_SHOW_ON ) 
+#define DBI ( Is_DebugOn & _DBI )
 #define DBI_N( n ) (GetState ( _Debugger_, DBG_ASM_SHOW_ON ) && ( _Q_->Verbosity > 3 ) )
 #define DBI_ON DEBUG_ASM_SHOW_ON
 #define DBI_OFF DEBUG_ASM_SHOW_OFF

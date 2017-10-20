@@ -124,13 +124,10 @@ _Printf ( byte *format, ... )
     {
         va_list args ;
         va_start ( args, ( char* ) format ) ;
-        // int64 olength = vprintf ( ( char* ) format, args ) ;
         vprintf ( ( char* ) format, args ) ;
         if ( _CfrTil_ && _CfrTil_->LogFlag && _CfrTil_->LogFILE ) vfprintf ( _CfrTil_->LogFILE, ( char* ) format, args ) ;
         va_end ( args ) ;
         fflush ( stdout ) ;
-        fflush ( stdout ) ;
-        //_ReadLiner_->EndPosition += ((olength > 0) ? olength : 0) ;
     }
 }
 #if 0

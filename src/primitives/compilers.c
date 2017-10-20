@@ -15,7 +15,7 @@ CompileCall ( )
 void
 CompileACfrTilWord ( )
 {
-    _Word_Compile (( Word* ) _DataStack_Pop ( )) ;
+    _Word_Compile ( ( Word* ) _DataStack_Pop ( ) ) ;
 }
 
 void
@@ -141,17 +141,15 @@ CfrTil_Return ( )
 {
     if ( ! _Readline_Is_AtEndOfBlock ( _Context_->ReadLiner0 ) )
     {
-        //SetState ( _Context_->Compiler0, SAVE_Rsp, true ) ;
         _CfrTil_CompileCallGotoPoint ( 0, GI_RETURN ) ;
-        //byte * token = Lexer_PeekNextNonDebugTokenWord ( _Lexer_, 0 ) ;
-        //Word * word = Finder_Word_FindUsing ( _Finder_, token, 0 ) ;
-        //_Compiler_->ReturnVariableWord = word ;
     }
-    d0 ( else if ( Is_DebugModeOn )
+    if ( GetState ( _Context_, C_SYNTAX ) )
     {
-        _OVT_Pause ( "\nCheck \'return\'\n" ) ;
+        byte * token = Lexer_PeekNextNonDebugTokenWord ( _Lexer_, 0 ) ;
+        Word * word = Finder_Word_FindUsing ( _Finder_, token, 0 ) ;
+        if ( word->CAttribute & ( NAMESPACE_VARIABLE | LOCAL_VARIABLE | PARAMETER_VARIABLE ) ) _Compiler_->ReturnVariableWord = word ;
+        if ( word->CAttribute & REGISTER_VARIABLE ) Lexer_ReadToken ( _Context_->Lexer0 ) ; // don't compile anything let end block or locals deal with the return
     }
-    ) ;
 }
 
 void
@@ -190,7 +188,7 @@ CfrTil_Literal ( )
     //Word * word = _DataObject_New ( LITERAL, 0, 0, LITERAL, 0, 0, ( uint64 ) _DataStack_Pop ( ), 0 ) ;
     //ByteArray * svcs = _Q_CodeByteArray ;
     //Compiler_SetCompilingSpace_MakeSureOfRoom ( "TempObjectSpace" ) ; 
-    Word * word = _DataObject_New (CONSTANT, 0, "< lit >", LITERAL | CONSTANT, 0, 0, 0, value, 0 ) ;
+    Word * word = _DataObject_New ( CONSTANT, 0, "< lit >", LITERAL | CONSTANT, 0, 0, 0, value, 0 ) ;
     //Set_CompilerSpace ( svcs ) ;
     _Interpreter_DoWord ( _Context_->Interpreter0, word, - 1 ) ;
 }
@@ -200,14 +198,14 @@ CfrTil_Constant ( )
 {
     int64 value = _DataStack_Pop ( ) ;
     byte * name = ( byte* ) _DataStack_Pop ( ) ;
-    _DataObject_New (CONSTANT, 0, name, LITERAL | CONSTANT, 0, 0, 0, value, 0 ) ;
+    _DataObject_New ( CONSTANT, 0, name, LITERAL | CONSTANT, 0, 0, 0, value, 0 ) ;
 }
 
 void
 CfrTil_Variable ( )
 {
     byte * name = ( byte* ) _DataStack_Pop ( ) ;
-    _DataObject_New (NAMESPACE_VARIABLE, 0, name, NAMESPACE_VARIABLE, 0, 0, 0, 0, 0 ) ;
+    _DataObject_New ( NAMESPACE_VARIABLE, 0, name, NAMESPACE_VARIABLE, 0, 0, 0, 0, 0 ) ;
 }
 
 // "{|" - exit the Compiler start interpreting

@@ -225,7 +225,7 @@ CfrTil_Multiply ( ) // *
 {
     if ( CompileMode )
     {
-        Compile_IMultiply ( _Context_->Compiler0 ) ;
+        Compile_Multiply ( _Context_->Compiler0 ) ;
     }
     else
     {

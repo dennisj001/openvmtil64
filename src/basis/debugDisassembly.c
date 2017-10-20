@@ -74,14 +74,14 @@ _Debugger_DisassembleWrittenCode ( Debugger * debugger )
 {
     Word * word = debugger->w_Word ;
     int64 codeSize = Here - debugger->PreHere ;
-    if ( codeSize )
+    if ( codeSize != 0 )
     {
-        if ( word && ( codeSize > 0 ) )
+        if ( word ) //&& ( codeSize > 0 ) )
         {
             NamedByteArray * nba = Get_CompilerSpace ( )->OurNBA ;
             byte * csName = nba ? ( byte * ) c_gd ( nba->NBA_Name ) : ( byte* ) "" ;
             _Printf ( ( byte* ) "\nCode compiled to %s for word :> %s <: at %s", csName, c_gd ( String_CB ( word->Name ) ), Context_Location ( ) ) ;
-            _Debugger_Disassemble ( debugger, debugger->PreHere, codeSize, word->CAttribute & ( CPRIMITIVE | DLSYM_WORD | DEBUG_WORD ) ? 1 : 0 ) ;
+            _Debugger_Disassemble ( debugger, ( codeSize > 0 ) ? debugger->PreHere : Here, codeSize, word->CAttribute & ( CPRIMITIVE | DLSYM_WORD | DEBUG_WORD ) ? 1 : 0 ) ;
         }
     }
 }
