@@ -101,18 +101,29 @@
 #define RM_IS_REG_VALUE REG
 #define RM_SIB 0x4
 #define VALUE REG
+#define TO_REG 3
+#define TO_MEM 2
 // SIB byte conversions
 #define SCALE_1 0
 #define SCALE_2 1
 #define SCALE_4 2
 #define SCALE_8 3
 // control flag bits for _Compile_InstructionXxx
-#define MODRM_B     ( 1 << 0 ) // backwards compatibility
-#define SIB_B       ( 1 << 1 ) 
-#define DISP_B      ( 1 << 2 ) 
-#define IMM_B       ( 1 << 3 ) 
-#define REX_B       ( 1 << 4 ) 
+#define REX_B       ( 1 << 0 ) 
+#define MODRM_B     ( 1 << 1 ) // backwards compatibility
+#define SIB_B       ( 1 << 2 ) 
+#define DISP_B      ( 1 << 3 ) 
+#define IMM_B       ( 1 << 4 ) 
 #define REX_W_B       REX_B
+#define BYTE_B      ( 1 << 5 ) // 1 BYTE SIZE 
+#define WORD_B      ( 1 << 6 ) // 2 BYTE SIZE 
+#define DOUBLE_B    ( 1 << 7 ) // 4 BYTE SIZE 
+#define QUAD_B      ( 1 << 8 ) // 8 BYTE SIZE : CELL_SIZE
+#define REX 0x40
+#define REX_W 0x8 
+#define REX_R 0x4
+#define REX_X 0x2
+//#define REX_B 0x1 // same symbol with two different contextual meanings but has same internal value
 #if X64
 #define SCALE_CELL SCALE_8
 #else
@@ -160,20 +171,6 @@
 #define R13D R13 // RBP
 #define R14D R14 //Stack Pointer
 #define R15D R15 //Frame Pointer
-#define REX 1
-//int8 regOrder [] = { RDI, RSI, RDX, RCX, R8D, R9D } ;
-//#define PARAMETER_REG_ORDER { RDI, RSI, RDX, RCX, R8D, R9D } 
-//#define RegOrder( n ) PARAMETER_REG_ORDER [n]
-// DONT_USE_REGS RBP RBX R12-R15
-#else
-#define RAX ( 0x0 )
-#define RCX ( 0x1 )
-#define RDX ( 0x2 )
-#define RBX ( 0x3 )
-#define RSP ( 0x4 )
-#define RBP ( 0x5 )
-#define RSI ( 0x6 )
-#define RDI ( 0x7 )
 #endif
 #define NO_INDEX ( 0x4 ) // for sib byte with no index
 
@@ -201,30 +198,6 @@ register uint64 *Dsp asm ("r14" ) ;
 #define CPU_FP R15d
 #define DSP STACK_POINTER 
 #define FP FRAME_POINTER
-
-
-#if X64
-//#define DSP ESI
-//#define FP EDI
-//register int32 *Fp asm ("edi" ) ;
-//register int32 *Rsp asm ("esp" ) ;
-//register OpenVmTil *_Q_ asm ("r13" ) ;
-//register CfrTil *Q asm ("r13" ) ;
-//#define QP  R13
-#else
-register uint64 *Dsp asm ("r14" ) ; // gcc
-//register int64 *Esi asm ("esi" ) ; // gcc
-//register int64 *Edi asm ("edi" ) ; // gcc
-#if RETURN_STACK
-int64 *Rsp ; 
-#endif
-#define DSP R14
-//register int64 *Fp asm ("edi" ) ;
-//register int64 *Rsp asm ("esp" ) ;
-#define FP R15
-//#define QP  EDI
-#define REX 0
-#endif
 
 // EFLAGS
 #define CARRY_FLAG ( 1 << 0 )
@@ -321,3 +294,7 @@ int64 *Rsp ;
 #define _REG( insnAddr ) (*( (byte*) insnAddr + 1) & 56 )  // binary : 00111000 
 #define _MOD( insnAddr ) (*( (byte*) insnAddr + 1) & 192 ) // binary : 11000000 
 
+#define WORD 2
+#define DOUBLE 4
+#define QUAD 8
+#define OCTAL 8

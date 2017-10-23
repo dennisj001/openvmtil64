@@ -125,6 +125,10 @@
 #define c_gd( s ) cc ( (byte*) s, (_Q_->Current == &_Q_->Debug) ? &_Q_->Default : &_Q_->Debug ) 
 #define c_gu( s ) cc ( (byte*) s, (_Q_->Current == &_Q_->Debug) ? &_Q_->User : &_Q_->Debug ) 
 #define c_ug( s ) cc ( (byte*) s, (_Q_->Current == &_Q_->User) ? &_Q_->Debug : &_Q_->User ) 
+#define c_g( s ) cc ( (byte*) s, &_Q_->Debug ) 
+#define c_a( s ) cc ( (byte*) s, &_Q_->Alert ) 
+#define c_d( s ) cc ( (byte*) s, &_Q_->Default ) 
+#define c_u( s ) cc ( (byte*) s, &_Q_->User ) 
 
 #define _Context_ _Q_->OVT_Context
 #define _CfrTil_ _Q_->OVT_CfrTil

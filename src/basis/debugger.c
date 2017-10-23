@@ -128,6 +128,7 @@ _Debugger_PreSetup ( Debugger * debugger, Word * word, int8 forceFlag )
                 debugger->SaveTOS = TOS ;
                 debugger->Token = word->Name ;
                 debugger->PreHere = Here ;
+                _Namespace_FreeNamespacesStack ( debugger->LocalsNamespacesStack ) ;
                 DebugColors ;
                 _Debugger_InterpreterLoop ( debugger ) ; // core of this function
                 DefaultColors ;
@@ -345,7 +346,7 @@ Debugger_Eval ( Debugger * debugger )
     //SetState ( debugger, DBG_STEPPING, false ) ;
 
     if ( GetState ( debugger, DBG_AUTO_MODE ) ) SetState ( debugger, DBG_EVAL_AUTO_MODE, true ) ;
-    
+
     d0 ( Cpu_CheckRspForWordAlignment ( "Debugger_Eval" ) ) ;
 
 }
@@ -687,7 +688,7 @@ _Debugger_New ( uint64 type )
     debugger->cs_Cpu = CpuState_New ( type ) ;
     debugger->StepInstructionBA = Debugger_ByteArray_AllocateNew ( 8 * K, type ) ;
     debugger->DebugStack = Stack_New ( 256, type ) ;
-    debugger->LocalsNamespacesStack = Stack_New ( 32, type ) ;
+    //debugger->LocalsNamespacesStack = 0 ;//Stack_New ( 32, type ) ;
 
     Debugger_TableSetup ( debugger ) ;
     SetState ( debugger, DBG_INTERPRET_LOOP_DONE, true ) ;

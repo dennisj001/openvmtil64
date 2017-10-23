@@ -239,6 +239,49 @@ _OVT_Find_NBA ( byte * name )
     else return 0 ;
 }
 
+#if 0 //DEBUG_FIND_NBA
+void
+Print_NodeWordName ( Node * node )
+{
+#if 1    
+    NBA *nba = Get_NBA_Symbol_To_NBA ( (Symbol*) node ) ;
+    byte * name = nba->NBA_Symbol.S_Name ;
+    //if ( String_Equal ( ((Symbol*) 0x7ffff7f640b8 )->S_Name, ""  ) _Printf ((byte*)" %s", name) ;
+#else    
+    Word *w = (Word* ) node ;
+    byte * name = w->Name ;
+#endif    
+    _Printf ((byte*)" %s", name) ;
+}
+
+void
+DLList_PrintNames ( dllist * list )
+{
+    dllist_Map ( list, ( MapFunction0 ) Print_NodeWordName ) ;
+}
+
+void
+Debug_Find_Bug ( )
+{
+    byte * name = ((Symbol*) 0x7ffff7f640b8 )->S_Name ;
+    //if ( ! String_Equal ( name, "ContextSpace"  ) ) _Printf ((byte*)" %s", name) ;
+    if (( name == (byte*) 0x21c3677c82b40000 ) || (TOS == 0x21c3677c82b40000))
+    {
+        //CfrTil_Debugger_CheckSaveCpuStateShow ( ) ;
+        _Debugger_CpuState_Show ( ) ;
+        _Printf ((byte*)"\nGot it\n" ) ;
+        NBA *nba = _OVT_Find_NBA ( "ContextSpace" ) ;
+        Pause () ;
+    }
+
+    //DLList_PrintNames ( &_Q_->MemorySpace0->NBAs ) ;
+    //if ( nba->ba_CurrentByteArray->MemRemaining < 10000 ) 
+    {
+        //_Printf ( (byte*)"\nDebug_Find_NBA : nba->ba_CurrentByteArray->MemRemaining = %d", nba->ba_CurrentByteArray->MemRemaining ) ;
+        //Pause () ;
+    }
+}
+#endif
 // fuzzy still but haven't yet needed to adjust this one
 
 void
@@ -517,7 +560,7 @@ _OVT_ShowMemoryAllocated ( OpenVmTil * ovt )
     if ( leak ) _Printf ( ( byte* ) c_ad ( leaks ), leak ) ;
     else if ( vf ) _Printf ( ( byte* ) c_ud ( leaks ), leak ) ;
 
-    MLA ( ) ; 
+    MLA ( ) ;
     //if ( memDiff2 || leak || vf )
     {
         _Printf ( ( byte* ) "\nTotalNbaAccountedMemAllocated                    = %9d : <=: ovt->TotalNbaAccountedMemAllocated", ovt->TotalNbaAccountedMemAllocated ) ;

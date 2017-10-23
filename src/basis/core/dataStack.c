@@ -72,9 +72,9 @@ DataStack_Depth ( )
 int64
 DataStack_Pop ( )
 {
-    _DataStackPointer_ = Dsp ;
-    _DataStack_Pop ( ) ;
-    int64 top = Stack_Pop_WithExceptionOnEmpty ( _DataStack_ ) ;
+    //_DataStackPointer_ = Dsp ;
+    int64 top = _DataStack_Pop ( ) ;
+    //int64 top = Stack_Pop_WithExceptionOnEmpty ( _DataStack_ ) ;
     return top ;
 }
 

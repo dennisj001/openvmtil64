@@ -14,11 +14,11 @@ _Word_Run ( Word * word )
 void
 Word_Run ( Word * word )
 {
-    //if ( ! sigsetjmp ( _Context_->JmpBuf0, 0 ) )
+    if ( ! sigsetjmp ( _Context_->JmpBuf0, 0 ) )
     {
         _Word_Run ( word ) ;
     }
-    //else Dsp = _CfrTil_->SaveDsp ;
+    else Dsp = _CfrTil_->SaveDsp ;
 }
 
 void
@@ -37,7 +37,7 @@ _Word_Eval ( Word * word )
         Word_SetCoding ( word, Here ) ;
         if ( ( word->CAttribute & IMMEDIATE ) || ( ! CompileMode ) )
         {
-            _Word_Run ( word ) ;
+            Word_Run ( word ) ;
         }
         else
         {

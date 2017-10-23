@@ -152,7 +152,7 @@ BigNum
 : bnInit ( precision width ) precision @ pPrecision width @ pWidth 64 bPrecision ;;
 //'bnInit find wdis
 'p 'fprint find alias
-64 bPrecision 
+//64 bPrecision 
 bnInit ( 16 16 )
 Root
 : bigNumOff "BigNum" notUsing ;
@@ -256,7 +256,7 @@ dscOn //verbosity 3 =
 : _assert ( n m ) nl location "- _assert ::" ps { n @ m @ != } { hex n @ p "!=" ps m @ p "<:" ps "Error!" adps _info _pause } { " ok" ps } ifElse ;
 : _assert1 ( n m str ) { n @ m @ != } { str @ ps "error" ps _info _pause } if ;
 //: assert1 ( n m str ) location { n @ m @ != } { nl str @ ps ":>" ps hex n @ p "!=" ps m @ p "<:" ps "Error!" adps _info _pause } { str @ ps "ok\n" ps } ifElse ;
-: assert1 ( n m str ) location { n @ m @ != } { <dbg> nl str @ ps ":>" ps hex n @ p "!=" ps m @ p "<:" ps "Error!" adps _info _pause } { str @ ps "ok\n" ps } ifElse ;
+: assert1 ( n m str ) location { n @ m @ != } { nl str @ ps ":>" ps hex n @ p "!=" ps m @ p "<:" ps "Error!" adps _info _pause } { str @ ps "ok\n" ps } ifElse ;
 : assert1s ( s1 s2 str ) { s1 @ s2 @ strcmp } { nl str @ ps "error" ps _info _pause } if ;
 : _assert2 ( n m str ) { n @ m @ == } { str @ ps "ok" ps nl } { str @ ps "error" ps _info _pause } ifElse ; 
 : assert2 ( n m str ) { n @ m @ == } { nl str @ ps "ok" ps nl } { nl str @ ps "error" ps _info _pause } ifElse ;
@@ -264,7 +264,6 @@ dscOn //verbosity 3 =
 "assert" ' assert1 find alias
 : _assertStkChk ( n m | str )  
 #if dbgOnVar @
-    //<dbg>
     _s 
     { verbosity @ 1 > }
 #else
@@ -359,7 +358,6 @@ scOff
 
 stringMacrosOn
 System
-//s: assertStkChk <dbg> mem assertStkChk location pause ;s
 : testCfrTil "namespaces/init.cft" include ;
 sp 
 //Zenfone2 1 =

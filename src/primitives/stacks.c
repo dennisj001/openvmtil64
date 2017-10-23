@@ -41,7 +41,7 @@ CfrTil_Drop ( )
 void
 CfrTil_DropN ( )
 {
-    if ( CompileMode ) _Compile_Stack_DropN ( DSP, _DataStack_Pop ( ) ) ;
+    if ( CompileMode ) _Compile_Stack_DropN ( DSP, _DataStack_Top ( ) + 1 ) ;
     else _DataStack_DropN ( TOS + 1 ) ;
 }
 
@@ -71,7 +71,24 @@ CfrTil_Dup ( )
         _DataStack_Dup ( ) ;
     }
 }
-
+#if 0
+void
+CfrTil_Ndrop ( )
+{
+    if ( CompileMode )
+    {
+        //Compile_SUBI( mod, operandReg, offset, immediateData, size ) 
+        Word * one = Compiler_WordList ( 1 ) ;
+        SetHere ( one->Coding ) ;
+        Compile_SUBI ( REG, DSP, 0, one->W_Value * CELL_SIZE, BYTE ) ;
+    }
+    else
+    {
+        uint64 n = _DataStack_Top ( ) ;
+        _DataStack_DropN ( n + 1 ) ;
+    }
+}
+#endif
 // result is as if one did n dups in a row 
 
 void
@@ -102,7 +119,7 @@ CfrTil_Pick ( ) // pick
     {
         //* Dsp = ( * ( Dsp - * ( Dsp ) - 1 ) ) ;
         //int64 top = Dsp [0] ;
-        Dsp [0] = Dsp [ - (Dsp [0] + 1) ] ;
+        Dsp [0] = Dsp [ - ( Dsp [0] + 1 ) ] ;
     }
 }
 
@@ -128,6 +145,7 @@ CfrTil_PrintNReturnStack ( )
     // therefore TOS is in lower mem addresses, bottom of stack is in higher memory addresses
     int64 size = _DataStack_Pop ( ) ;
     _CfrTil_PrintNReturnStack ( size ) ;
+    CfrTil_NewLine () ;
 }
 
 void

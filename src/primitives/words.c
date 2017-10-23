@@ -86,7 +86,7 @@ void
 CfrTil_Word_Run ( )
 {
     Word * word = ( Word* ) _DataStack_Pop ( ) ;
-    _Word_Run ( word ) ;
+    Word_Run ( word ) ;
 }
 
 void

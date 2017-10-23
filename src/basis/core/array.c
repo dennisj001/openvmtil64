@@ -234,13 +234,15 @@ _NamedByteArray_Allocate ( int64 allocType )
 NamedByteArray *
 NamedByteArray_Allocate ( )
 {
-    return _NamedByteArray_Allocate ( OPENVMTIL ) ;
+    return _NamedByteArray_Allocate ( OPENVMTIL ) ; // allocate the nba structure OPENVMTIL but nba->NBA_AAttribute has it's own different type
 }
 
 void
 _NamedByteArray_Init ( NamedByteArray * nba, byte * name, int64 size, int64 atype )
 {
     _Symbol_NameInit ( ( Symbol* ) & nba->NBA_Symbol, name ) ;
+    //nba->NBA_Symbol.Name = name ;
+    nba->NBA_MemChunk.Name = name ;
     nba->NBA_AAttribute = atype ;
     dllist_Init ( &nba->NBA_BaList, &nba->NBA_ML_HeadNode, &nba->NBA_ML_TailNode ) ;
     nba->NBA_DataSize = size ;
@@ -257,19 +259,20 @@ NamedByteArray_Delete ( NamedByteArray * nba )
 {
     ByteArray * ba ;
     dlnode * node, *nodeNext ;
+    dlnode_Remove ( ( dlnode* ) & nba->NBA_Symbol ) ;
     for ( node = dllist_First ( ( dllist* ) & nba->NBA_BaList ) ; node ; node = nodeNext )
     {
         nodeNext = dlnode_Next ( node ) ;
         ba = Get_BA_Symbol_To_BA ( node ) ;
         _Mem_ChunkFree ( ( MemChunk * ) ba ) ;
     }
-    dlnode_Remove ( ( dlnode* ) & nba->NBA_Symbol ) ;
     _Mem_ChunkFree ( ( MemChunk * ) nba ) ; // mchunk )
 }
 
 NamedByteArray *
 NamedByteArray_New ( byte * name, int64 size, int64 atype )
 {
+    //if ( String_Equal ( "HistorySpace", name ) ) _Printf ( ( byte* ) "\nNamedByteArray_New : name = %s", name ) ;
     NamedByteArray * nba = NamedByteArray_Allocate ( ) ; // else the nba would be deleted with MemList_FreeExactType ( nba->NBA_AAttribute ) ;
     _NamedByteArray_Init ( nba, name, size, atype ) ;
     return nba ;

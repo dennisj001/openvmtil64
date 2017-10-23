@@ -225,32 +225,24 @@ void
 _Compile_LogicResult ( int64 reg )
 {
     // return 0 in R8 :
-    _Compile_MoveImm_To_Reg ( reg, 0, BYTE ) ; // 6 bytes
-    _Compile_JumpWithOffset ( 4 ) ; // 6 bytes
+    _Compile_MoveImm_To_Reg ( reg, 0, CELL_SIZE ) ; // 6 bytes
+    _Compile_JumpWithOffset ( 10 ) ; // 6 bytes
 
     //return 1 in R8 :
-    _Compile_MoveImm_To_Reg ( reg, 1, BYTE ) ;
+    _Compile_MoveImm_To_Reg ( reg, 1, CELL_SIZE ) ;
 }
 
 void
 _Compile_LogicalAnd ( Compiler * compiler )
 {
-#if 1    
     _Compile_TEST_Reg_To_Reg ( OREG, OREG ) ;
     _BlockInfo_Setup_BI_tttn ( _Context_->Compiler0, ZERO_TTT, NZ, 6 ) ; // not less than 0 == greater than 0
     Compile_JCC ( Z, ZERO_TTT, Here + 15 ) ; // if eax is zero return not(R8) == 1 else return 0
     _Compile_TEST_Reg_To_Reg ( ACC, ACC ) ;
     _BlockInfo_Setup_BI_tttn ( _Context_->Compiler0, ZERO_TTT, NZ, 6 ) ; // not less than 0 == greater than 0
-    Compile_JCC ( NZ, ZERO_TTT, Here + 15 ) ; // if eax is zero return not(R8) == 1 else return 0
+    Compile_JCC ( NZ, ZERO_TTT, Here + 21 ) ; // if eax is zero return not(R8) == 1 else return 0
     _Compile_LogicResult ( ACC ) ;
     _Compiler_CompileAndRecord_PushAccum ( compiler ) ;
-#else // bitwise and
-    _Compile_TEST_Reg_To_Reg ( ACC, OREG ) ;
-    _BlockInfo_Setup_BI_tttn ( _Context_->Compiler0, ZERO_TTT, NZ, 6 ) ; // not less than 0 == greater than 0
-    Compile_JCC ( NZ, ZERO_TTT, Here + 15 ) ; // if eax is zero return not(R8) == 1 else return 0
-    _Compile_LogicResult ( ACC ) ;
-    _Compiler_CompileAndRecord_PushAccum ( compiler ) ;
-#endif    
 }
 
 void 
@@ -274,18 +266,17 @@ Compile_LogicalAnd ( Compiler * compiler )
 }
 
 void
-Compile_LogicalNot ( Compiler * compiler )
+_Compile_LogicalNot ( Compiler * compiler )
 {
-    //int64 negFlag = Z ;
-    _Compile_TEST_Reg_To_Reg ( ACC, ACC ) ; // test insn logical and src op and dst op sets zf to result
+     _Compile_TEST_Reg_To_Reg ( ACC, ACC ) ; // test insn logical and src op and dst op sets zf to result
     _BlockInfo_Setup_BI_tttn ( compiler, ZERO_TTT, Z, 6 ) ; // if eax is zero zf will equal 1 which is not(R8) and if eax is not zero zf will equal 0 which is not(R8)
-    Compile_JCC ( Z, ZERO_TTT, Here + 15 ) ; // if eax is zero return not(R8) == 1 else return 0
+    Compile_JCC ( Z, ZERO_TTT, Here + 21 ) ; // if eax is zero return not(R8) == 1 else return 0
     _Compile_LogicResult ( ACC ) ;
     _Compiler_CompileAndRecord_PushAccum ( compiler ) ;
 }
 
 void
-_Compile_LogicalNot ( Compiler * compiler )
+Compile_LogicalNot ( Compiler * compiler )
 {
     //Word *one = Compiler_WordStack ( - 1 ) ; // assumes two values ( n m ) on the DSP stack 
     Word *one = Compiler_WordList ( 1 ) ; // assumes two values ( n m ) on the DSP stack 
@@ -316,7 +307,7 @@ _Compile_LogicalNot ( Compiler * compiler )
         else _Compile_Stack_PopToReg ( DSP, ACC ) ;
         //int64 a, b, c= 0, d ; a = 1; b = !a, d= !c ; _Printf ( "a = %d b = %d c =%d ~d = %d", a, b, c, d ) ;
     }
-    Compile_LogicalNot ( compiler ) ;
+    _Compile_LogicalNot ( compiler ) ;
 }
 
 //  logical equals - "=="

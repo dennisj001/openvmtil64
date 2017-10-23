@@ -27,7 +27,7 @@ _CpuState_Show ( Cpu * cpu )
     else _Printf ( ( byte* ) "\nRIP " UINT_FRMT_0x016, cpu->Rip ) ;
     _Printf ( ( byte* ) " RFlags :: 0x%08x :: %s", cpu->RFlags, _Print_Binary ( ( uint64 ) cpu->RFlags ) ) ;
     //_Printf ( (byte*) "_Printf_Binary ( ( uint64 ) cpu->RFlags ) ; //, 14, 14 ) ;
-    _Printf ( ( byte* ) " :: of:11 %d sf:7:%d, zf:6:%d, af:4:%d, pf:2:%d, cf:0:%d :: flag:bit:value",
+    _Printf ( ( byte* ) " :: of:11:%d sf:7:%d, zf:6:%d, af:4:%d, pf:2:%d, cf:0:%d :: flag:bit:value",
         ( uint64 ) cpu->RFlags & OVERFLOW_FLAG ? 1 : 0, ( uint64 ) cpu->RFlags & SIGN_FLAG ? 1 : 0, ( uint64 ) cpu->RFlags & ZERO_FLAG ? 1 : 0,
         ( uint64 ) cpu->RFlags & AUX_FLAG ? 1 : 0, ( uint64 ) cpu->RFlags & PARITY_FLAG ? 1 : 0, ( uint64 ) cpu->RFlags & CARRY_FLAG ? 1 : 0
         ) ;

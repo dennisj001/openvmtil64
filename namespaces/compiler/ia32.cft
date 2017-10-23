@@ -38,16 +38,16 @@
 // cfrTil uses intel syntax convention
 
 Compiler Compiling C Asm
- 
+: sp ; //stack pause ; 
 : :asm compileModeOn sourceCodeInit token create begin ' {| find compileWord sourceCodeOn ; immediate  
 //: :asm compileModeOn sourceCodeInit token create begin ' {| find compileWord ; immediate  
 : asm; ' |} find compileWord semi ; immediate
-' :asm find winfo //pause
-' asm; find winfo //pause
+' :asm find winfo //sp
+' asm; find winfo //sp
  
 : ;; ' ; find compileWord ' _prefix find compileWord ; immediate
 // C : ;; ' ;; find compileWord ; immediate
-' ;; find wdiss // pause
+' ;; find wdiss // sp
 'IA32 namespace
 IA32
 "namespaces/compiler/asmConstants.cft" include
@@ -75,7 +75,7 @@ _CalculateRex ( int8 reg, int8 rm, int8 sib, int64 operandSize )
 
 : _Compile_ModRm ( mod reg rm ) ( ( mod @ << 6 ) | ( ( reg @ & 7 ) << 3 ) | ( rm @ & 7 ) ) 1,  ;; 
 //: _Compile_ModRm ( mod reg rm ) ( ( mod @ << 6 ) | ( ( reg @ & 7 ) << 3 ) | ( rm @ & 7 ) ) 1,  ;; 
-//' _Compile_ModRm find wdiss pause
+//' _Compile_ModRm find wdiss sp
 
 : _Compile_Imm ( imm isize )
     { isize @ == 1 } { imm @ 1, } if 
@@ -160,7 +160,7 @@ _CalculateRex ( int8 reg, int8 rm, int8 sib, int64 operandSize )
     // some times we need cell_t even though a byte would work
     _Compile_InstructionX86 ( opCode @, 1, mod @, code @, rm @, disp @, imm @, iSize @ ) 
 ;;
-// ' _Compile_Group1_Immediate find wdiss pause
+// ' _Compile_Group1_Immediate find wdiss sp
 
 : _Compile_CALL_EAX _Compile_X86_OpModRegRm ( #xff, 3, 2, 0 ) ;; 
 
@@ -189,12 +189,12 @@ d: :asm iax
     _Compile_CALL_Reg ( R8D ) 
 asm; 
 
-' iax find wdiss //pause 
+' iax find wdiss //sp 
 User
 : qeval
     stk iax
 ;
-' qeval find wdiss // pause
+' qeval find wdiss // sp
 
 :asm stest
     _Compile_MoveTOS_ToR8D ( ) 
@@ -203,12 +203,12 @@ User
     _Compile_SUBI_DSP ( CELL ) 
 asm;
 
-' stest find wdiss // pause 
+' stest find wdiss // sp 
 s
 "\nthis is some purposefully funky code for testing\n" ps
 
 #if 1 //dbOn @ not
-s stest s //pause
+s stest s //sp
 s
 nl "ia32 test" ps "ok" dup ' ps find xt@ qeval "ok" "error" assert1s 
 #endif
@@ -230,7 +230,7 @@ Stack
     "end" label // above jcc to Here
 asm;
 
-' ndup find wdiss // pause
+' ndup find wdiss // sp
 
 Asm
 // following intel conventions in the naming : insn dst, src

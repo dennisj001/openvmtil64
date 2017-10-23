@@ -102,7 +102,7 @@ BigNum_StateShow ( )
 {
     BigNum_Info ( ) ;
     BigNum_GetAndPrint_BitPrecision ( ) ;
-    _Printf ( ( byte * ) "\nBigNum :: Width = %d : Preciosn = %d", _Context_->System0->BigNum_Printf_Width, _Context_->System0->BigNum_Printf_Precision ) ;
+    _Printf ( ( byte * ) "\nBigNum :: Width = %d : Precision = %d", _Context_->System0->BigNum_Printf_Width, _Context_->System0->BigNum_Printf_Precision ) ;
 
 }
 #if 0

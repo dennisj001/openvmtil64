@@ -113,11 +113,13 @@ _HistorySpace_Init ( OpenVmTil * ovt, int64 reset )
 {
     if ( ovt )
     {
+#if 0        
         if ( reset )
         {
             MemorySpace * ms = ovt->MemorySpace0 ;
             ms->HistorySpace = MemorySpace_NBA_New ( ms, ( byte* ) "HistorySpace", HISTORY_SIZE, HISTORY ) ;
         }
+#endif        
         ovt->OVT_HistorySpace.StringList = & ovt->OVT_HistorySpace._StringList ;
         dllist_Init ( ovt->OVT_HistorySpace.StringList, &ovt->OVT_HistorySpace._StringList_HeadNode, &ovt->OVT_HistorySpace._StringList_TailNode ) ;
         ovt->OVT_HistorySpace.HistorySpaceNBA = ovt->MemorySpace0->HistorySpace ;

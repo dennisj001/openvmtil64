@@ -280,7 +280,7 @@ CfrTil_BeginBlock ( )
 Boolean
 _Compiler_IsFrameNecessary ( Compiler * compiler )
 {
-    return ( compiler->NumberOfLocals || compiler->NumberOfArgs ) ; //|| GetState ( compiler, SAVE_Rsp ) ) ;
+    return ( compiler->NumberOfLocals + compiler->NumberOfArgs ) > compiler->NumberOfRegisterVariables ; //|| GetState ( compiler, SAVE_Rsp ) ) ;
 }
 
 void
@@ -292,7 +292,7 @@ _CfrTil_EndBlock1 ( BlockInfo * bi )
         _CfrTil_InstallGotoCallPoints_Keyed ( bi, GI_RETURN ) ;
         if ( compiler->NumberOfRegisterVariables )
         {
-            bi->bp_First = bi->Start ;
+            if ( compiler->NumberOfRegisterVariables >= (compiler->NumberOfArgs + compiler->NumberOfLocals) ) bi->bp_First = bi->Start ;
             if ( compiler->ReturnVariableWord )
             {
 

@@ -195,7 +195,7 @@ Compiler_Init ( Compiler * compiler, uint64 state )
     Stack_Init ( compiler->PointerToOffset ) ;
     Stack_Init ( compiler->CombinatorInfoStack ) ;
     _Compiler_FreeAllLocalsNamespaces ( compiler ) ;
-    Stack_Init ( compiler->LocalsNamespacesStack ) ;
+    //Stack_Init ( compiler->LocalsNamespacesStack ) ;
     Stack_Init ( compiler->InfixOperatorStack ) ;
     _dllist_Init ( compiler->CurrentSwitchList ) ;
     _dllist_Init ( compiler->RegisterParameterList ) ;

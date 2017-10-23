@@ -66,42 +66,23 @@ Compile_Multiply ( Compiler * compiler )
     if ( optFlag & OPTIMIZE_DONE ) return ;
     else if ( optFlag )
     {
-        // Compile_IMUL ( mod, rm, sib, disp, imm, size )
-        // always uses R8 as the first operand and destination of the operation
+        // optimizer must have put args in ACC and OREG
+        // always uses RAX as the first operand and destination of the operation
         if ( ! ( compiler->optInfo->OptimizeFlag & OPTIMIZE_REGISTER ) ) compiler->optInfo->Optimize_Reg = ACC ;
         else
         {
             compiler->optInfo->Optimize_Rm = compiler->optInfo->Optimize_SrcReg ;
             compiler->optInfo->Optimize_Reg = compiler->optInfo->Optimize_DstReg ;
         }
-        if ( compiler->optInfo->OptimizeFlag & OPTIMIZE_IMM )
-        {
-            // if ( imm == 0 ) skip this ; // TODO 
-            if ( ! compiler->optInfo->Optimize_Imm ) return ;
-            // IMULI : intel insn can't mult to tos in place must use reg ...
-            //_Compile_IMULI ( int64 mod, int64 reg, int64 rm, int64 sib, int64 disp, int64 imm, int64 size )
-            //_Compile_IMULI ( compiler->optInfo->Optimize_Mod, compiler->optInfo->Optimize_Reg, compiler->optInfo->Optimize_Rm, 0, compiler->optInfo->Optimize_Disp,
-            //    compiler->optInfo->Optimize_Imm, 0 ) ;
-            Compile_MUL ( compiler->optInfo->Optimize_Mod, compiler->optInfo->Optimize_Rm, REX_B | MODRM_B | DISP_B, 0,
-                compiler->optInfo->Optimize_Disp, compiler->optInfo->Optimize_Imm, CELL_SIZE ) ;
-        }
-        else
-        {
-            //_Compile_IMUL ( cell mod, cell reg, cell rm, cell sib, cell disp )
-            //_Compile_IMUL ( compiler->optInfo->Optimize_Mod, compiler->optInfo->Optimize_Reg, compiler->optInfo->Optimize_Rm, REX_B | MODRM_B | DISP_B, 0,
-            //    compiler->optInfo->Optimize_Disp ) ;
-            if ( compiler->optInfo->Optimize_DstReg != ACC ) _Compile_Move_Reg_To_Reg ( ACC, compiler->optInfo->Optimize_DstReg ) ;
-            Compile_MUL ( compiler->optInfo->Optimize_Mod, compiler->optInfo->Optimize_Rm, REX_B | MODRM_B | DISP_B, 0,
-                compiler->optInfo->Optimize_Disp, 0, CELL_SIZE ) ;
-            if ( compiler->optInfo->Optimize_DstReg != ACC ) _Compile_Move_Reg_To_Reg ( compiler->optInfo->Optimize_DstReg, ACC ) ;
-        }
+        if ( compiler->optInfo->Optimize_DstReg != ACC ) _Compile_Move_Reg_To_Reg ( ACC, compiler->optInfo->Optimize_DstReg ) ;
+        Compile_MUL ( compiler->optInfo->Optimize_Mod, compiler->optInfo->Optimize_Rm, REX_B | MODRM_B | DISP_B, 0,
+            compiler->optInfo->Optimize_Disp, 0, CELL_SIZE ) ;
+        if ( compiler->optInfo->Optimize_DstReg != ACC ) _Compile_Move_Reg_To_Reg ( compiler->optInfo->Optimize_DstReg, ACC ) ;
         //if ( GetState ( _Context_, C_SYNTAX ) ) _Stack_DropN ( _Context_->Compiler0->WordStack, 2 ) ;
-        //Word * zero = Compiler_WordStack ( 0 ) ;
         Word * zero = Compiler_WordList ( 0 ) ;
         zero->StackPushRegisterCode = Here ;
         if ( compiler->optInfo->Optimize_Rm == DSP ) Compile_Move_ACC_To_TOS ( DSP ) ;
-        else //_Compile_Stack_PushReg ( DSP, R8 ) ;
-            _Word_CompileAndRecord_PushReg ( zero, compiler->optInfo->Optimize_DstReg ? compiler->optInfo->Optimize_DstReg : ACC ) ;
+        else _Word_CompileAndRecord_PushReg ( zero, compiler->optInfo->Optimize_DstReg ? compiler->optInfo->Optimize_DstReg : ACC ) ;
     }
     else
     {

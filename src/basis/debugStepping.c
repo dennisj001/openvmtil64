@@ -84,8 +84,6 @@ start:
         if ( ( debugger->Key == 'I' ) ) // force Into a subroution
         {
             _Printf ( ( byte* ) "\nforce calling (I)nto a subroutine : %s : .... :>", word ? ( char* ) c_gd ( word->Name ) : "" ) ;
-            //Compile_Call ( jcAddress ) ;
-            //newDebugAddress = debugger->DebugAddress + size ;
             goto into ;
         }
         else if ( ( ! word ) || ( ! Debugger_CanWeStep ( debugger, word ) ) )//( jcAddress < ( byte* ) svcs->BA_Data ) || ( jcAddress > ( byte* ) svcs->bp_Last ) )
@@ -120,7 +118,7 @@ start:
         {
             into :
             if ( word->CAttribute & ( ALIAS ) ) word = word->W_AliasOf ;
-            if ( * debugger->DebugAddress == CALLI32 )
+            if ( ( * debugger->DebugAddress == CALLI32 ) || ( * ( uint16* ) debugger->DebugAddress ) == 0xff48 ) 
             {
                 if ( _Q_->Verbosity > 1 ) _Word_ShowSourceCode ( word ) ;
                 _Printf ( ( byte* ) "\nstepping into a cfrtil compiled function : %s : .... :>", word ? ( char* ) c_gd ( word->Name ) : "" ) ;
@@ -155,7 +153,7 @@ done:
 void
 Debugger_CompileAndStepOneInstruction ( Debugger * debugger )
 {
-    uint64 code ;
+    //uint64 code ;
     start:
     if ( debugger->DebugAddress )
     {
@@ -192,25 +190,18 @@ Debugger_CompileAndStepOneInstruction ( Debugger * debugger )
             }
             goto end ;
         }
-        else if ( (code = ( * ( uint16* ) debugger->DebugAddress )) == 0xff48 ) //untested 9-27-17
+        else if (( ( * ( uint16* ) debugger->DebugAddress ) == 0xff48 ) && (*(debugger->DebugAddress + 2 ) == 0xd0 )) //if ( ( * ( uint16* ) debugger->DebugAddress ) == 0xff48 ) //untested 9-27-17
         {
             jcAddress = (byte*) *(uint64*)(debugger->DebugAddress - CELL_SIZE) ;
-            Word * word = Word_GetFromCodeAddress ( jcAddress ) ;
-            //debugger->CurrentlyRunningWord = word ;
-            if ( word && ( word->CAttribute & ( DEBUG_WORD ) ) ) //&& ( ! GetState ( debugger, (DBG_CONTINUE_MODE|DBG_AUTO_MODE) ) ) )
-            {
-                SetState ( debugger, ( DBG_CONTINUE_MODE | DBG_AUTO_MODE ), false ) ;
-                _Printf ( ( byte* ) "\nskipping over a debug word : %s : at 0x%-8x", word ? ( char* ) c_gd ( word->Name ) : "", debugger->DebugAddress ) ;
-                debugger->DebugAddress += 5 ; // 5 : sizeof jmp/call insn // debugger->DebugAddress + size ; // skip the call insn to the next after it
-                goto end ;
-            }
+            goto doCall ;
         }
         else if ( ( * debugger->DebugAddress == JMPI32 ) || ( * debugger->DebugAddress == CALLI32 ) )
         {
+            Word * word ;
             jcAddress = JumpCallInstructionAddress ( debugger->DebugAddress ) ;
-            Word * word = Word_GetFromCodeAddress ( jcAddress ) ;
-            //debugger->CurrentlyRunningWord = word ;
-            if ( word && ( word->CAttribute & ( DEBUG_WORD ) ) ) //&& ( ! GetState ( debugger, (DBG_CONTINUE_MODE|DBG_AUTO_MODE) ) ) )
+            doCall:
+            word = Word_GetFromCodeAddress ( jcAddress ) ;
+            if ( word && ( word->CAttribute & ( DEBUG_WORD ) ) ) 
             {
                 SetState ( debugger, ( DBG_CONTINUE_MODE | DBG_AUTO_MODE ), false ) ;
                 _Printf ( ( byte* ) "\nskipping over a debug word : %s : at 0x%-8x", word ? ( char* ) c_gd ( word->Name ) : "", debugger->DebugAddress ) ;
@@ -360,7 +351,7 @@ _Debugger_SetupStepping ( Debugger * debugger, Word * word, byte * address, byte
     _Debugger_CpuState_CheckSave ( debugger ) ;
     _CfrTil_CpuState_CheckSave ( ) ;
     debugger->LevelBitNamespaceMap = 0 ;
-    Stack_Init ( debugger->LocalsNamespacesStack ) ;
+    //Stack_Init ( debugger->LocalsNamespacesStack ) ;
     SetState ( debugger, DBG_START_STEPPING, true ) ;
     CfrTil_NewLine ( ) ;
 #if 0    

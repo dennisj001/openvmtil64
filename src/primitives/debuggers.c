@@ -48,9 +48,9 @@ CfrTil_DebugOff ( )
 void
 CfrTil_DebugRuntimeBreakpoint ( )
 {
-    Debugger * debugger = _Debugger_ ;
     if ( ! CompileMode )
     {
+        Debugger * debugger = _Debugger_ ;
         if ( GetState ( debugger, DBG_INTERPRET_LOOP_DONE ) )//|| GetState ( debugger, DBG_CONTINUE_MODE|DBG_AUTO_MODE ) )
         {
             // GetESP and debugger->SaveCpuState ( ) has been called by _Compile_Debug1 which calls this function
@@ -65,11 +65,13 @@ CfrTil_DebugRuntimeBreakpoint ( )
             SetState ( debugger, DBG_RUNTIME_BREAKPOINT | DEBUG_SHTL_OFF, false ) ;
             // we just stepped this word and used it's arguments in the source code ; if we just return the interpreter will attempt to interpret the arguments
             Word * word = debugger->w_Word ;
+#if 1  // this is only accurate if we called into a leaf function with <dbg> from C
             if ( ( ! word ) || GetState ( word, STEPPED ) )
             {
                 _CfrTil_->SaveDsp = Dsp ;
                 siglongjmp ( _Context_->JmpBuf0, 1 ) ; //in Word_Run
             }
+#endif            
         }
     }
 }

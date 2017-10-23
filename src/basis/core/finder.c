@@ -27,8 +27,10 @@ _Finder_CompareDefinitionAddress ( Symbol * symbol, byte * address )
         Word * word = ( Word * ) symbol ;
         //byte * codeStart = ( byte* ) word->Definition ; // nb. this maybe more accurate ??
         byte * codeStart = word->CodeStart ;
+        d0 ( if ( String_Equal ("iFactorialX", symbol->S_Name) ) _Printf ((byte*)"\naddress = 0x%016lx :: %s :: codeStart = 0x%016lx : codeSize = %d", address, symbol->S_Name, codeStart, word->S_CodeSize) ) ;
         //if ( ((byte*) symbol == address) || ( codeStart && ( address >= codeStart ) && ( address <= ( codeStart + word->S_CodeSize ) ) ) )
-        if ( ( ( byte* ) symbol == address ) || ( codeStart && ( address >= codeStart ) && ( address <= ( codeStart + word->S_CodeSize ) ) ) )
+        if ( ( ( byte* ) symbol == address ) || ( codeStart && ( address >= codeStart ) && ( word->S_CodeSize ? address < ( codeStart + word->S_CodeSize ) : address == codeStart ) ) ) 
+        //if ( codeStart && ( address >= codeStart ) && ( address < ( codeStart + word->S_CodeSize ) ) )
         {
             return symbol ;
         }
