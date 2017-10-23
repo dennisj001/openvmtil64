@@ -110,6 +110,7 @@ User
     {
        //j @ w @ wordRun j @ p "." ps p ";" ps dn
        j @ w @ wordRun drop // j @ p "." ps p ";" ps
+       //j @ factorial drop // j @ p "." ps p ";" ps
     }
     for 
 ;
@@ -123,13 +124,13 @@ User
     for
 ;
 
-//: iFactorialX ( n w | k ) { k 1 = } { k @ n @ <= } { k ++ } { pause dfnba pause k @ nl p nl w @ _ifx } for ; 
 : iFactorialX ( n w | k ) { k 1 = } { k @ n @ <= } { k ++ } { w @ _ifx } for ; 
 //'iFactorialX find wdiss pause
 : iFactorialX2 ( n w | k ) { k 1 = } { k @ n @ <= } { k ++ } { w @ _ifx2 } for ; 
 
 //: _ffx ( n w | t ) nl 7 w @ wordRun decimal p nl { t 0 = } { t @ n @ < } { t ++ } { 100000 w @ iFactorialX } for ;
 : _ffx ( n w | t ) nl 7 w @ wordRun decimal p nl { t 0 = } { t @ n @ < } { t ++ } { 100000 w @ iFactorialX } for ;
+//: _ffx ( n w | t ) { t 0 = } { t @ n @ < } { t ++ } { 100000 w @ iFactorialX } for ;
 : _ffx2 ( n w | t ) nl 2 16 w @ wordRun decimal p nl { t 0 = } { t @ n @ < } { t ++ } { 100000 w @ iFactorialX2 } for ;
 
 nl "ffx ... " ps nl

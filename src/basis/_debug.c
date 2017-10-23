@@ -104,7 +104,7 @@ GetPostfix ( byte * address, byte* postfix, byte * buffer )
     }
     else
     {
-        str = String_CheckForAtAdddress ( ( byte* ) ( address + 2 )  ) ;
+        str = String_CheckForAtAdddress ( ( byte* ) ( address + 2 ) ) ;
         if ( str )
         {
             snprintf ( ( char* ) buffer, 128, "%s%s", prePostfix, str ) ;
@@ -119,8 +119,8 @@ Compile_Debug_GetRSP ( ) // where we want the acquired pointer
 {
     _Compile_PushReg ( ACC ) ;
     _Compile_Set_CAddress_WithRegValue_ThruReg ( ( byte* ) & _Debugger_->DebugRSP, RSP, ACC ) ; // esp 
-    //_Compile_Set_CAddress_WithRegValue_ThruReg ( ( byte* ) & _Debugger_->DebugRBP, RBP, ACC ) ; // esp 
     _Compile_PopToReg ( ACC ) ;
+    _Compile_Stack_PushReg ( DSP, ACC ) ;
 }
 
 void
@@ -135,7 +135,7 @@ _Compile_DebugRuntimeBreakpoint ( ) // where we want the acquired pointer
 void
 _Compile_Pause ( )
 {
-    _Compile_Debug_GetESP ( ( int64* ) & _Debugger_->DebugESP ) ;
+    _Compile_Debug_getRsp ( ( int64* ) & _Debugger_->DebugESP ) ;
     Compile_Call ( ( byte* ) _Debugger_->SaveCpuState ) ;
     Compile_Call ( ( byte* ) _CfrTil_->SaveCpuState ) ;
     Compile_Call ( ( byte* ) OpenVmTil_Pause ) ;

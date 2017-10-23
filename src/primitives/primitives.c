@@ -608,7 +608,7 @@ CPrimitive CPrimitives [] = {
 } ;
 
 MachineCodePrimitive MachineCodePrimitives [] = {
-    { "getESP", CPRIMITIVE, 0, ( byte* ) Compile_Debug_GetRSP, -1, "System", "Root" },
+    { "getRsp", CPRIMITIVE, 0, ( byte* ) Compile_Debug_GetRSP, -1, "System", "Root" },
     { "restoreCpuState", CPRIMITIVE, 0, ( byte* ) Compile_CpuState_Restore, 0, "System", "Root" },
     { "restoreSelectedCpuState", CPRIMITIVE, 0, ( byte* ) _Compile_CpuState_RestoreSelected, 0, "System", "Root" },
     { "restoreCpuState", CPRIMITIVE, 0, ( byte* ) Compile_CpuState_Restore, 0, "Debug", "Root" },

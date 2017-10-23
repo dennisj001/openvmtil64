@@ -116,9 +116,9 @@ start:
         }
         else // step into the the jmp/call insn
         {
-            into :
+into:
             if ( word->CAttribute & ( ALIAS ) ) word = word->W_AliasOf ;
-            if ( ( * debugger->DebugAddress == CALLI32 ) || ( * ( uint16* ) debugger->DebugAddress ) == 0xff48 ) 
+            if ( ( * debugger->DebugAddress == CALLI32 ) || ( * ( uint16* ) debugger->DebugAddress ) == 0xff48 )
             {
                 if ( _Q_->Verbosity > 1 ) _Word_ShowSourceCode ( word ) ;
                 _Printf ( ( byte* ) "\nstepping into a cfrtil compiled function : %s : .... :>", word ? ( char* ) c_gd ( word->Name ) : "" ) ;
@@ -154,7 +154,7 @@ void
 Debugger_CompileAndStepOneInstruction ( Debugger * debugger )
 {
     //uint64 code ;
-    start:
+start:
     if ( debugger->DebugAddress )
     {
         byte *jcAddress = 0 ;
@@ -168,44 +168,55 @@ Debugger_CompileAndStepOneInstruction ( Debugger * debugger )
             }
             else
             {
-                //Debugger_SyncStackPointersFromCpuState ( debugger ) ;
-                SetState ( debugger, DBG_STACK_OLD, true ) ;
-                debugger->CopyRSP = 0 ;
-                if ( GetState ( debugger, DBG_BRK_INIT ) )
+#if 0                
+                Debugger_GetWordFromAddress ( debugger ) ;
+                if ( ! String_Equal ( debugger->w_Word->Name, _Context_->CurrentlyRunningWord->Name ) )
                 {
-                    SetState_TrueFalse ( debugger, DBG_INTERPRET_LOOP_DONE | DBG_STEPPED, DBG_ACTIVE | DBG_BRK_INIT | DBG_STEPPING ) ;
+                    debugger->DebugAddress = (byte*) debugger->cs_Cpu->Rsp [0] ;// ?? what is the correct offset here ??
+                    Debugger_GetWordFromAddress ( debugger ) ;
                 }
                 else
+#endif                    
                 {
-                    SetState_TrueFalse ( debugger, DBG_INTERPRET_LOOP_DONE | DBG_STEPPED, DBG_ACTIVE | DBG_STEPPING ) ;
+                    //Debugger_SyncStackPointersFromCpuState ( debugger ) ;
+                    SetState ( debugger, DBG_STACK_OLD, true ) ;
+                    debugger->CopyRSP = 0 ;
+                    if ( GetState ( debugger, DBG_BRK_INIT ) )
+                    {
+                        SetState_TrueFalse ( debugger, DBG_INTERPRET_LOOP_DONE | DBG_STEPPED, DBG_ACTIVE | DBG_BRK_INIT | DBG_STEPPING ) ;
+                    }
+                    else
+                    {
+                        SetState_TrueFalse ( debugger, DBG_INTERPRET_LOOP_DONE | DBG_STEPPED, DBG_ACTIVE | DBG_STEPPING ) ;
+                    }
+                    if ( debugger->w_Word ) SetState ( debugger->w_Word, STEPPED, true ) ;
+                    debugger->DebugAddress = 0 ;
+                    if ( _Q_->Verbosity > 3 )
+                    {
+                        _Debugger_CpuState_Show ( ) ;
+                        Pause ( ) ;
+                    }
+                    SetState ( debugger->cs_Cpu, CPU_SAVED, false ) ;
                 }
-                if ( debugger->w_Word ) SetState ( debugger->w_Word, STEPPED, true ) ;
-                debugger->DebugAddress = 0 ;
-                if ( _Q_->Verbosity > 3 )
-                {
-                    _Debugger_CpuState_Show ( ) ;
-                    Pause ( ) ;
-                }
-                SetState ( debugger->cs_Cpu, CPU_SAVED, false ) ;
             }
             goto end ;
         }
-        else if (( ( * ( uint16* ) debugger->DebugAddress ) == 0xff48 ) && (*(debugger->DebugAddress + 2 ) == 0xd0 )) //if ( ( * ( uint16* ) debugger->DebugAddress ) == 0xff48 ) //untested 9-27-17
+        else if ( ( ( * ( uint16* ) debugger->DebugAddress ) == 0xff48 ) && ( *( debugger->DebugAddress + 2 ) == 0xd0 ) ) //if ( ( * ( uint16* ) debugger->DebugAddress ) == 0xff48 ) //untested 9-27-17
         {
-            jcAddress = (byte*) *(uint64*)(debugger->DebugAddress - CELL_SIZE) ;
+            jcAddress = ( byte* ) *( uint64* ) ( debugger->DebugAddress - CELL_SIZE ) ;
             goto doCall ;
         }
         else if ( ( * debugger->DebugAddress == JMPI32 ) || ( * debugger->DebugAddress == CALLI32 ) )
         {
             Word * word ;
             jcAddress = JumpCallInstructionAddress ( debugger->DebugAddress ) ;
-            doCall:
+doCall:
             word = Word_GetFromCodeAddress ( jcAddress ) ;
-            if ( word && ( word->CAttribute & ( DEBUG_WORD ) ) ) 
+            if ( word && ( word->CAttribute & ( DEBUG_WORD ) ) )
             {
                 SetState ( debugger, ( DBG_CONTINUE_MODE | DBG_AUTO_MODE ), false ) ;
                 _Printf ( ( byte* ) "\nskipping over a debug word : %s : at 0x%-8x", word ? ( char* ) c_gd ( word->Name ) : "", debugger->DebugAddress ) ;
-                debugger->DebugAddress += 5 ; // 5 : sizeof jmp/call insn // debugger->DebugAddress + size ; // skip the call insn to the next after it
+                debugger->DebugAddress += 3 ; // 5 : sizeof jmp/call insn // debugger->DebugAddress + size ; // skip the call insn to the next after it
                 goto end ;
             }
         }
@@ -246,6 +257,7 @@ end:
         {
             //Debugger_UdisOneInstruction ( debugger, debugger->DebugAddress, ( byte* ) "", ( byte* ) "" ) ; // the next instruction
             // keep eip - instruction pointer - up to date ..
+
             debugger->cs_Cpu->Rip = ( uint64 * ) debugger->DebugAddress ;
         }
     }
@@ -293,6 +305,7 @@ Debugger_PreStartStepping ( Debugger * debugger )
         }
     }
     else SetState_TrueFalse ( debugger, DBG_NEWLINE, DBG_STEPPING ) ;
+
     return ;
 }
 
@@ -329,6 +342,7 @@ Debugger_AfterStep ( Debugger * debugger )
     {
         SetState_TrueFalse ( debugger, DBG_PRE_DONE | DBG_STEPPED | DBG_NEWLINE | DBG_PROMPT | DBG_INFO, DBG_STEPPING ) ;
         //if ( GetState ( debugger, DBG_DONE ) ) SetState ( _CfrTil_, DEBUG_MODE, false ) ;
+
         return ;
     }
 }
@@ -357,6 +371,7 @@ _Debugger_SetupStepping ( Debugger * debugger, Word * word, byte * address, byte
 #if 0    
     if ( iflag )
     {
+
         _Printf ( "\nNext stepping instruction" ) ; // necessary in some cases
         Debugger_UdisOneInstruction ( debugger, address, ( byte* ) "", ( byte* ) "" ) ;
     }
@@ -367,6 +382,7 @@ _Debugger_SetupStepping ( Debugger * debugger, Word * word, byte * address, byte
 void
 Debugger_SetupStepping ( Debugger * debugger, int64 iflag )
 {
+
     _Debugger_SetupStepping ( debugger, debugger->w_Word, debugger->DebugAddress, 0, iflag ) ;
 }
 
@@ -384,22 +400,24 @@ _Debugger_SetupReturnStackCopy ( Debugger * debugger, int64 size, int8 showFlag 
             rsc0 = ( uint64 ) Mem_Allocate ( size, COMPILER_TEMP ) ;
             rsc = ( rsc0 + 0x8 ) & ( uint64 ) 0xfffffffffffffff0 ; // 16 byte alignment
             debugger->CopyRSP = ( byte* ) rsc + size - pushedWindow ;
-            if ( showFlag) ( _PrintNStackWindow ( ( int64* ) debugger->CopyRSP, "ReturnStackCopy", "RSCP", 4 ) ) ;
+            if ( showFlag ) ( _PrintNStackWindow ( ( int64* ) debugger->CopyRSP, "ReturnStackCopy", "RSCP", 4 ) ) ;
         }
         else rsc = ( uint64 ) ( debugger->CopyRSP - size + pushedWindow ) ;
         memcpy ( ( byte* ) rsc, ( ( byte* ) rsp ) - size + pushedWindow, size ) ; // pushedWindow (32) : account for useful current stack
-        if ( showFlag) ( _PrintNStackWindow ( ( uint64* ) rsp, "ReturnStack", "RSP", 4 ) ) ; //pushedWindow ) ) ;
-        if ( showFlag) ( _PrintNStackWindow ( ( int64* ) debugger->CopyRSP, "ReturnStackCopy", "RSCP", 4 ) ) ; //pushedWindow ) ) ;
+        if ( showFlag ) ( _PrintNStackWindow ( ( uint64* ) rsp, "ReturnStack", "RSP", 4 ) ) ; //pushedWindow ) ) ;
+        if ( showFlag ) ( _PrintNStackWindow ( ( int64* ) debugger->CopyRSP, "ReturnStackCopy", "RSCP", 4 ) ) ; //pushedWindow ) ) ;
         debugger->cs_Cpu->Rsp = ( uint64* ) debugger->CopyRSP ;
         SetState ( debugger, DBG_STACK_OLD, false ) ;
         return true ;
     }
+
     else return false ;
 }
 
 void
 Debugger_PrintReturnStackWindow ( )
 {
+
     _PrintNStackWindow ( ( int64* ) _Debugger_->cs_Cpu->Rsp, "Debugger ReturnStack (RSP)", "RSP", 4 ) ;
     //_PrintNStackWindow ( ( uint64* ) _Debugger_->ReturnStackCopyPointer, ( byte * ) "ReturnStackCopy", ( byte * ) "RSCP", 4 ) ;
 }
@@ -433,6 +451,7 @@ Debugger_SetupReturnStackCopy ( Debugger * debugger, int64 showFlag ) // restore
 #endif        
     }
 #endif    
+
     if ( showFlag ) Compile_Call ( ( byte* ) _Debugger_CpuState_Show ) ; // also dis insn
 }
 
@@ -443,6 +462,7 @@ _Compile_Restore_Debugger_CpuState ( Debugger * debugger, int64 showFlag ) // re
     // we don't have to worry so much about the compiler 'spoiling' our insn with restore 
     Debugger_SetupReturnStackCopy ( debugger, showFlag ) ; // restore the running cfrTil cpu state
     _Compile_CpuState_Restore ( debugger->cs_Cpu, 1 ) ;
+
     if ( showFlag ) Compile_Call ( ( byte* ) _Debugger_CpuState_Show ) ; // also dis insn
 }
 
@@ -450,6 +470,7 @@ void
 _Compile_Restore_C_CpuState ( CfrTil * cfrtil, int64 showFlag )
 {
     _Compile_CpuState_Restore ( cfrtil->cs_Cpu, 1 ) ;
+
     if ( showFlag ) Compile_Call ( ( byte* ) CfrTil_CpuState_Show ) ;
 }
 
@@ -459,6 +480,7 @@ void
 _Compile_Save_C_CpuState ( CfrTil * cfrtil, int64 showFlag )
 {
     _Compile_CpuState_Save ( cfrtil->cs_Cpu ) ;
+
     if ( showFlag ) Compile_Call ( ( byte* ) _CfrTil_CpuState_CheckSave ) ;
 }
 
@@ -468,6 +490,7 @@ _Compile_Save_Debugger_CpuState ( Debugger * debugger, int64 showFlag )
     _Compile_CpuState_Save ( debugger->cs_Cpu ) ;
     if ( showFlag ) Compile_Call ( ( byte* ) CfrTil_Debugger_UdisOneInsn ) ;
     if ( ( _Q_->Verbosity > 3 ) && ( debugger->cs_Cpu->Rsp != debugger->LastRsp ) ) Debugger_PrintReturnStackWindow ( ) ;
+
     if ( showFlag ) Compile_Call ( ( byte* ) CfrTil_Debugger_CheckSaveCpuStateShow ) ;
 }
 
@@ -476,6 +499,7 @@ Debugger_Stepping_Off ( Debugger * debugger )
 {
     if ( Debugger_IsStepping ( debugger ) )
     {
+
         Debugger_SetStepping ( debugger, false ) ;
         debugger->DebugAddress = 0 ;
     }
@@ -491,6 +515,7 @@ Debugger_GetWordFromAddress ( Debugger * debugger )
         if ( word ) debugger->w_Word = word ;
     }
     if ( ( ! word ) && debugger->Token ) word = Finder_FindWord_UsedNamespaces ( _Finder_, debugger->Token ) ;
+
     return word ;
 }
 
@@ -582,6 +607,7 @@ Debugger_CanWeStep ( Debugger * debugger, Word * word )
     else
     {
         SetState ( debugger, DBG_CAN_STEP, true ) ;
+
         return true ;
     }
 }

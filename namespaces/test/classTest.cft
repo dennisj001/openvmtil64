@@ -23,6 +23,8 @@ int16 size @ nl "int16 size = " prints print nl
 Integer "byte" class
 byte size 1 =
 byte size @ nl "byte size = " prints print nl
+//'int8 'byte find alias
+//Integer "int8" class int8 size 1 =
 sp
 Class
 "Buffer" class :{ byte buf [ 256 ]; };

@@ -687,7 +687,7 @@ typedef struct _Debugger
     byte * Token ;
     block SaveCpuState ;
     block RestoreCpuState ;
-    block GetESP ;
+    block getRsp ;
     byte * PreHere, *StartHere, *LastDisStart, *ShowLine, * Filename ;
     Stack *DebugStack ;
     Cpu * cs_Cpu ;

@@ -399,9 +399,9 @@ _CfrTil_PrintNReturnStack ( int64 size )
     }
     else
     {
-        _CfrTil_WordName_Run ( ( byte* ) "getESP" ) ;
-        uint64 * esp = ( uint64 * ) _DataStack_Pop ( ) ;
-        _PrintNStackWindow ( esp, ( byte* ) "Return Stack", ( byte* ) "Rsp (RSP)", size ) ;
+        _CfrTil_WordName_Run ( ( byte* ) "getRsp" ) ;
+        uint64 * rsp = ( uint64 * ) _DataStack_Pop ( ) ;
+        _PrintNStackWindow ( rsp, ( byte* ) "Return Stack", ( byte* ) "Rsp (RSP)", size ) ;
     }
 }
 

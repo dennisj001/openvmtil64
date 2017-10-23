@@ -138,10 +138,10 @@ CfrTil_MachineCodePrimitive_AddWords ( CfrTil * cfrTil )
 
         // initialize some values in MachineCodePrimitives that are variables and have to be calculated at run time
 #if 1        
-        if ( String_Equal ( p.ccp_Name, "getESP" ) )
+        if ( String_Equal ( p.ccp_Name, "getRsp" ) )
         {
             functionArg = - 1 ; //0 ; //( int64 ) debugger->DebugESP ;
-            callHook = & debugger->GetESP ;
+            callHook = & debugger->getRsp ;
         }
         else
 #endif            

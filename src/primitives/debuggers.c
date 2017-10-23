@@ -53,7 +53,7 @@ CfrTil_DebugRuntimeBreakpoint ( )
         Debugger * debugger = _Debugger_ ;
         if ( GetState ( debugger, DBG_INTERPRET_LOOP_DONE ) )//|| GetState ( debugger, DBG_CONTINUE_MODE|DBG_AUTO_MODE ) )
         {
-            // GetESP and debugger->SaveCpuState ( ) has been called by _Compile_Debug1 which calls this function
+            // getRsp and debugger->SaveCpuState ( ) has been called by _Compile_Debug1 which calls this function
             SetState ( debugger, (DBG_BRK_INIT), true ) ; 
             Debugger_On ( debugger ) ;
             debugger->StartHere = Here ;

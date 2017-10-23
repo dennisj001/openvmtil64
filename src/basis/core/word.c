@@ -65,7 +65,7 @@ Word_Eval ( Word * word )
     if ( word )
     {
         if ( word->CAttribute & DEBUG_WORD ) DebugColors ;
-        _Context_->CurrentlyRunningWord = word ;
+        //_Context_->CurrentlyRunningWord = word ;
         word->StackPushRegisterCode = 0 ; // nb. used! by the rewriting optInfo
         // keep track in the word itself where the machine code is to go, if this word is compiled or causes compiling code - used for optimization
         word->Coding = Here ;

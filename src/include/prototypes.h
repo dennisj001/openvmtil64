@@ -387,7 +387,6 @@ NamedByteArray *MemorySpace_NBA_New(MemorySpace *memSpace, byte *name, int64 siz
 void MemorySpace_Init(MemorySpace *ms);
 MemorySpace *MemorySpace_New(void);
 NamedByteArray *_OVT_Find_NBA(byte *name);
-void Debug_Find_Bug(void);
 void OVT_MemList_FreeNBAMemory(byte *name, uint64 moreThan, int64 always);
 void OVT_MemListFree_ContextMemory(void);
 void OVT_MemListFree_TempObjects(void);
