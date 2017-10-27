@@ -60,11 +60,9 @@ ReadLiner_GenerateFullNamespaceQualifiedName ( ReadLiner * rl, Word * w )
 void
 TM_WrapWordCount ( TabCompletionInfo * tci, Word * word )
 {
-    if ( word == tci->OriginalRunWord ) //|| ( ! tci->OriginalRunWord ) )
+    if ( word == tci->OriginalRunWord )
     {
-        //if ( tci->WordCount )
         tci->WordWrapCount ++ ;
-        //else tci->OriginalRunWord = word ;
     }
     else if ( ! tci->OriginalRunWord ) tci->OriginalRunWord = word ;
 }
@@ -75,7 +73,7 @@ _TabCompletion_Compare ( Word * word )
     ReadLiner * rl = _Context_->ReadLiner0 ;
     TabCompletionInfo * tci = rl->TabCompletionInfo0 ;
     byte * searchToken ;
-    int64 gotOne = 0, slst, sltwn, strOpRes = - 1 ; //, strOpRes1 = - 1, strOpRes2 = - 1, strOpRes3 = - 1 ;
+    int64 gotOne = 0, slst, sltwn, strOpRes = - 1 ; 
     tci->WordCount ++ ;
     TM_WrapWordCount ( tci, word ) ;
     if ( word )
@@ -85,13 +83,14 @@ _TabCompletion_Compare ( Word * word )
         byte * twn = tw->Name, *fqn ;
         if ( twn )
         {
+            d0 (if ( String_Equal ( twn, "rsp" ) ) _Printf ( ( byte* ) "got it" ) );
             slst = Strlen ( ( CString ) searchToken ), sltwn = Strlen ( twn ) ;
             if ( ! slst ) // we match anything when user ends with a dot ( '.' ) ...
             {
                 // except .. We don't want to jump down into a lower namespace here.
                 if ( ( tw->ContainingNamespace == tci->OriginalContainingNamespace ) ) // || ( tw->ContainingNamespace == _Q_->CfrTil->Namespaces ) )
                 {
-                    gotOne = 1 ;
+                    gotOne = true ; //1 ;
                 }
                 else return false ;
             }
@@ -102,40 +101,28 @@ _TabCompletion_Compare ( Word * word )
                         // this arrangement allows us to see some word matches before others
                     case 0: //case 1:
                     {
-                        strOpRes = strcmp ( twn, searchToken ) ;
-                        if ( ! strOpRes )
+                        strOpRes = String_Equal ( twn, searchToken ) ;
+                        if ( ( strOpRes ) && ( slst == sltwn ) )
                         {
-                            strOpRes = Stricmp ( twn, searchToken ) ;
-                        }
-                        if ( ( ! strOpRes ) ) //|| ( ! strOpRes1 ) )
-                        {
-                            if ( slst == sltwn )
-                            {
-                                gotOne = 1 ;
-                            }
+                            gotOne = true ;
                         }
                         break ;
                     }
-                    case 2: case 1:
+                    case 1: case 2:
                     {
-                        strOpRes = Strncmp ( twn, searchToken, slst ) ;
-                        if ( ! strOpRes )
+                        strOpRes = Stringn_Equal ( twn, searchToken, slst ) ;
+                        if ( strOpRes )
                         {
-                            gotOne = tci->WordWrapCount ;
+                            gotOne = true ; 
                         }
                         break ;
                     }
                     case 3:
                     {
-                        strOpRes = StrniCmp ( twn, searchToken, slst ) ;
-                        if ( ! strOpRes )
-                        {
-                            gotOne = tci->WordWrapCount ;
-                        }
-                        strOpRes = ( int64 ) strstr ( ( CString ) twn, ( CString ) searchToken ) ;
+                        strOpRes = Stringni_Equal ( twn, searchToken, slst ) ;
                         if ( strOpRes )
                         {
-                            gotOne = 31 ;
+                            gotOne = true ; 
                         }
                         break ;
                     }
@@ -144,7 +131,7 @@ _TabCompletion_Compare ( Word * word )
                         strOpRes = ( int64 ) strstr ( ( CString ) twn, ( CString ) searchToken ) ;
                         if ( strOpRes )
                         {
-                            gotOne = tci->WordWrapCount ;
+                            gotOne = true ; 
                         }
                         break ;
                     }
@@ -156,7 +143,7 @@ _TabCompletion_Compare ( Word * word )
                         strOpRes = ( int64 ) strstr ( ( CString ) bufw, ( CString ) bufo ) ;
                         if ( strOpRes )
                         {
-                            gotOne = tci->WordWrapCount ;
+                            gotOne = true ; 
                         }
                         break ;
                     }

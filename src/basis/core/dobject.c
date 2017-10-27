@@ -63,11 +63,11 @@ _DObject_C_StartupCompiledWords_DefInit ( byte * function, int64 arg )
 {
     if ( arg == - 1 )
     {
-        ( ( void (* )( ) )( function ) ) ( ) ;
+        ( ( void ( * )( ) )( function ) ) ( ) ;
     }
     else
     {
-        ( ( void (* ) ( int64 ) )( function ) ) ( arg ) ;
+        ( ( void ( * ) ( int64 ) )( function ) ) ( arg ) ;
     }
 }
 

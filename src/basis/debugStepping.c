@@ -37,6 +37,9 @@ Debugger_CompileOneInstruction ( Debugger * debugger, byte * jcAddress, Boolean 
 
     _Compile_Restore_Debugger_CpuState ( debugger, showFlag ) ; //&& ( _Q_->Verbosity >= 3 ) ) ; // restore our runtime state before the current insn
 
+#if NEW_CALL_RETURN      
+    Compile_ReturnStackStackPointer_To_CFT_RSP ( ) ;
+#endif    
     byte * nextInsn = _Debugger_CompileOneInstruction ( debugger, jcAddress ) ; // the single current stepping insn
 
     _Compile_Save_Debugger_CpuState ( debugger, showFlag ) ; //showRegsFlag ) ; //&& ( _Q_->Verbosity >= 3 ) ) ; // save our runtime state after the instruction : which we will restore before the next insn
@@ -111,18 +114,18 @@ start:
         {
             _Printf ( ( byte* ) "\nstepping thru and 'o(u)t' of a \"native\" subroutine : %s : .... :>", word ? ( char* ) c_gd ( word->Name ) : "" ) ;
             Compile_Call ( debugger->DebugAddress ) ;
-            if ( Stack_Depth ( debugger->DebugStack ) ) newDebugAddress = ( byte* ) _Stack_Pop ( debugger->DebugStack ) ;
+            if ( Stack_Depth ( debugger->ReturnStack ) ) newDebugAddress = ( byte* ) _Stack_Pop ( debugger->ReturnStack ) ;
             else newDebugAddress = 0 ;
         }
         else // step into the the jmp/call insn
         {
 into:
-            if ( word->CAttribute & ( ALIAS ) ) word = word->W_AliasOf ;
-            if ( ( * debugger->DebugAddress == CALLI32 ) || ( * ( uint16* ) debugger->DebugAddress ) == 0xff48 )
+            while ( word->CAttribute & ( ALIAS ) ) word = word->W_AliasOf ;
+            if ( ( * debugger->DebugAddress == CALLI32 ) || ( ( ( * ( uint16* ) debugger->DebugAddress ) == 0xff48 ) && ( *( debugger->DebugAddress + 2 ) == 0xd0 ) ) )  //( * ( uint16* ) debugger->DebugAddress ) == 0xff48 )
             {
                 if ( _Q_->Verbosity > 1 ) _Word_ShowSourceCode ( word ) ;
                 _Printf ( ( byte* ) "\nstepping into a cfrtil compiled function : %s : .... :>", word ? ( char* ) c_gd ( word->Name ) : "" ) ;
-                _Stack_Push ( debugger->DebugStack, ( int64 ) ( debugger->DebugAddress + size ) ) ; // the return address
+                _Stack_Push ( debugger->ReturnStack, ( int64 ) ( debugger->DebugAddress + size ) ) ; // the return address
                 // push the return address this time around; next time code at newDebugAddress will be processed
                 // when ret is the insn Debugger_StepOneInstruction will handle it 
             }
@@ -161,9 +164,9 @@ start:
         // special cases
         if ( * debugger->DebugAddress == _RET )
         {
-            if ( Stack_Depth ( debugger->DebugStack ) )
+            if ( Stack_Depth ( debugger->ReturnStack ) )
             {
-                debugger->DebugAddress = ( byte* ) _Stack_Pop ( debugger->DebugStack ) ;
+                debugger->DebugAddress = ( byte* ) _Stack_Pop ( debugger->ReturnStack ) ;
                 Debugger_GetWordFromAddress ( debugger ) ;
             }
             else

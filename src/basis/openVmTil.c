@@ -1,6 +1,6 @@
 
 #include "../include/cfrtil64.h"
-#define VERSION ((byte*) "0.824.320" ) // *.200 series is x86 ; the *.300 series is x64 : *300.600 series is with new x64 compiler
+#define VERSION ((byte*) "0.824.427" ) // *.200 series is x86 ; the *.300 series is x64 : *300.600 series is with new x64 compiler
 
 OpenVmTil * _Q_ ; // the only globally used variable except for two extern structures in primitives.c and a couple int64 in memSpace.c and 
 static struct termios SavedTerminalAttributes ;
@@ -15,12 +15,11 @@ void
 openvmtil ( int64 argc, char * argv [ ] )
 {
     LinuxInit ( &SavedTerminalAttributes ) ;
-    _Q_ = 0 ;
-    _OpenVmTil ( argc, argv ) ;
+    _OpenVmTil ( _Q_ = 0, argc, argv ) ;
 }
 
 void
-_OpenVmTil ( int64 argc, char * argv [ ] )
+_OpenVmTil ( OpenVmTil * ovt, int64 argc, char * argv [ ] )
 {
     int64 restartCondition = INITIAL_START ;
     while ( 1 )

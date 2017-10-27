@@ -622,14 +622,19 @@ MachineCodePrimitive MachineCodePrimitives [] = {
     { "syncDspToEsi", CPRIMITIVE, 0, ( byte* ) _Compile_Sync_DspToEsi, 0, "System", "Root" },
 #endif    
     { "callCurrentBlock", CPRIMITIVE, 0, ( byte* ) Compile_Call_CurrentBlock, 0, "System", "Root" },
+#if NEW_CALL_RETURN    
+    { "callCfrTilWord", CPRIMITIVE, 0, ( byte* ) Compile_Call_CfrTilWord, 0, "System", "Root" },
+    { "sync_ReturnStackStackPointer_To_CFT_RSP", CPRIMITIVE, 0, ( byte* ) Compile_ReturnStackStackPointer_To_CFT_RSP, 0, "System", "Root" },
+    { "sync_CFT_RSP_To_ReturnStackStackPointer", CPRIMITIVE, 0, ( byte* ) Compile_CFT_RSP_To_ReturnStackStackPointer, 0, "System", "Root" },
+#endif    
     //{ "<dbg>", CFRTIL_WORD | DEBUG_WORD | INTERPRET_DBG, 0, ( byte* ) _Compile_DebugRuntimeBreakpoint, - 1, "Debug", "Root" },
-    { "<dbg>", CFRTIL_WORD | INTERPRET_DBG, 0, ( byte* ) _Compile_DebugRuntimeBreakpoint, - 1, "Debug", "Root" },
-    { "rsp", CFRTIL_WORD, 0, ( byte* ) _Compile_Rsp_Get, - 1, "System", "Root" },
-    { "rsp@", CFRTIL_WORD, 0, ( byte* ) _Compile_Rsp_Fetch, - 1, "System", "Root" },
-    { ">rsp", CFRTIL_WORD, 0, ( byte* ) _Compile_Rsp_To, - 1, "System", "Root" },
-    { "rsp>", CFRTIL_WORD, 0, ( byte* ) _Compile_Rsp_From, - 1, "System", "Root" },
-    { "rdrop", CFRTIL_WORD, 0, ( byte* ) _Compile_Rsp_Drop, - 1, "Debug", "Root" },
-    { "rsp!", CFRTIL_WORD, 0, ( byte* ) _Compile_Rsp_Store, - 1, "System", "Root" },
+    { "<dbg>", CPRIMITIVE | INTERPRET_DBG, 0, ( byte* ) _Compile_DebugRuntimeBreakpoint, - 1, "Debug", "Root" },
+    { "rsp", CPRIMITIVE, 0, ( byte* ) _Compile_Rsp_Get, - 1, "System", "Root" },
+    { "rsp@", CPRIMITIVE, 0, ( byte* ) _Compile_Rsp_Fetch, - 1, "System", "Root" },
+    { ">rsp", CPRIMITIVE, 0, ( byte* ) _Compile_Rsp_To, - 1, "System", "Root" },
+    { "rsp>", CPRIMITIVE, 0, ( byte* ) _Compile_Rsp_From, - 1, "System", "Root" },
+    { "rdrop", CPRIMITIVE, 0, ( byte* ) _Compile_Rsp_Drop, - 1, "Debug", "Root" },
+    { "rsp!", CPRIMITIVE, 0, ( byte* ) _Compile_Rsp_Store, - 1, "System", "Root" },
     //{ "pushR8", CFRTIL_WORD, 0, ( byte* ) Compile_DataStack_PushR8, - 1, "System", "Root" },
     { 0 }
 } ;

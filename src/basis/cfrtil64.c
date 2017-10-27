@@ -192,6 +192,10 @@ _CfrTil_Init ( CfrTil * cfrTil, Namespace * nss )
     {
         _CfrTil_NamespacesInit ( cfrTil ) ;
     }
+    cfrTil->ReturnStack = Stack_New ( 256, CFRTIL ) ;
+#if NEW_CALL_RETURN    
+    //_Rsp_ = cfrTil->ReturnStack->StackPointer ;
+#endif    
     cfrTil->StoreWord = Finder_FindWord_AnyNamespace ( _Finder_, ( byte* ) "store" ) ;
     cfrTil->PokeWord = Finder_FindWord_AnyNamespace ( _Finder_, ( byte* ) "poke" ) ;
     cfrTil->LispNamespace = Namespace_Find ( ( byte* ) "Lisp" ) ;
@@ -380,8 +384,8 @@ CfrTil_Compile_SaveIncomingCpuState ( CfrTil * cfrtil )
     // save the incoming current C cpu state
 
     Compile_Call ( ( byte* ) cfrtil->SaveCpuState ) ; // save incoming current C cpu state
-    _Compile_MoveReg_ToMem ( RBP, ( byte * ) & cfrtil->cs_CpuState->Ebp, R11D, CELL ) ; // EBX : scratch reg
-    _Compile_MoveReg_ToMem ( RSP, ( byte * ) & cfrtil->cs_CpuState->Rsp, R11D, CELL ) ;
+    _Compile_MoveReg_ToMem ( RBP, ( byte * ) & cfrtil->cs_CpuState->Ebp, THRU_REG, CELL ) ; // EBX : scratch reg
+    _Compile_MoveReg_ToMem ( RSP, ( byte * ) & cfrtil->cs_CpuState->Rsp, THRU_REG, CELL ) ;
 
 }
 
@@ -390,7 +394,7 @@ CfrTil_Compile_RestoreIncomingCpuState ( CfrTil * cfrtil )
 {
     // restore the incoming current C cpu state
     Compile_Call ( ( byte* ) _CfrTil_->RestoreCpuState ) ;
-    _Compile_MoveMem_To_Reg ( RBP, ( byte * ) & cfrtil->cs_CpuState->Ebp, R11D, CELL ) ;
-    _Compile_MoveMem_To_Reg ( RSP, ( byte * ) & cfrtil->cs_CpuState->Rsp, R11D, CELL ) ;
+    _Compile_MoveMem_To_Reg ( RBP, ( byte * ) & cfrtil->cs_CpuState->Ebp, THRU_REG, CELL ) ;
+    _Compile_MoveMem_To_Reg ( RSP, ( byte * ) & cfrtil->cs_CpuState->Rsp, THRU_REG, CELL ) ;
 }
 #endif

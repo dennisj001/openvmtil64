@@ -256,12 +256,12 @@ _Compile_Write_Instruction_X64 ( int8 rex, int16 opCode, int8 modRm, int16 contr
     if ( _DBI ) //Is_DebugOn ) //
     {
         //d1 ( Word * currentWord = Compiling ? _Compiler_->CurrentWord : _Interpreter_->w_Word ) ;
-        d1 ( Word * currentWord = _Interpreter_->w_Word ) ;
-        d1 ( _Printf ( ( byte* ) "\n_Compile_InstructionX64 :: CurrentWord = %s :: location : %s :",
-            currentWord ? ( currentWord->Name ? String_ConvertToBackSlash ( currentWord->Name ) : ( byte* ) "" ) : ( byte* ) "", Context_Location ( ) ) ) ;
+        //d1 ( Word * currentWord = _Interpreter_->w_Word ) ;
+        //d1 ( _Printf ( ( byte* ) "\n_Compile_InstructionX64 :: CurrentWord = %s :: location : %s :",
+        //    currentWord ? ( currentWord->Name ? String_ConvertToBackSlash ( currentWord->Name ) : ( byte* ) "" ) : ( byte* ) "", Context_Location ( ) ) ) ;
         d1 ( Debugger_UdisOneInstruction ( _Debugger_, here, ( byte* ) "", ( byte* ) "" ) ; ) ;
         d0 ( _Debugger_Disassemble ( _Debugger_, ( byte* ) here, Here - here, 1 ) ) ;
-   }
+    }
 }
 #else
 {
@@ -519,7 +519,7 @@ _Compile_MoveImm ( int8 direction, int8 rm, int8 controlFlags, int8 sib, int64 d
         {
             // there is no x64 instruction to move imm64 to mem directly
             int8 thruReg = THRU_REG ;
-            _Compile_MoveImm_To_Reg ( thruReg, imm, immSize ) ; // thruReg : R11D : needs to be a parameter
+            _Compile_MoveImm_To_Reg ( thruReg, imm, immSize ) ; // thruReg : R8D : needs to be a parameter
             _Compile_Move_Reg_To_Rm ( rm, thruReg, disp ) ;
         }
         else
@@ -690,10 +690,11 @@ Compile_Move ( int8 dst, int8 rex, int8 mod, int8 reg, int8 rm, int16 controlFla
 }
 
 #endif
+
 void
 Compile_Move_WithSib ( int8 rex, int8 mod, int8 reg, int8 rm, int8 controlFlags, int8 scale, int8 index, int8 base )
 {
-    rex = _Calculate_Rex_With_Sib ( reg, controlFlags & (SCALE_8|SCALE_4|SCALE_1), index, base, controlFlags & (REX_W_B) ) ;
+    rex = _Calculate_Rex_With_Sib ( reg, controlFlags & ( SCALE_8 | SCALE_4 | SCALE_1 ), index, base, controlFlags & ( REX_W_B ) ) ;
     _Compile_Move ( rex, mod, reg, rm, CalculateSib ( scale, index, base ), 0 ) ; // move ACC, [DSP + ACC * 4 ] ; but remember eax is now a negative number
 }
 
@@ -712,7 +713,7 @@ Calculate_Address_FromOffset_ForCallOrJump ( byte * address )
         offset = * ( ( int32 * ) ( address + 2 ) ) ;
         iaddress = address + offset + 2 + INT32_SIZE ;
     }
-    else if (( ( * ( uint16* ) address ) == 0xff48 ) && (*(address + 2 ) == 0xd0 ))
+    else if ( ( ( * ( uint16* ) address ) == 0xff48 ) && ( *( address + 2 ) == 0xd0 ) )
     {
         iaddress = ( byte* ) ( * ( ( uint64* ) ( address - CELL ) ) ) ; // 3 : sizeof x64 call insn 
     }
@@ -848,15 +849,38 @@ Compile_Call_ToAddressThruReg ( byte * address, int8 reg )
 }
 
 void
-_Compile_Call ( byte * callAddr, int8 reg )
+_Compile_Call_ThruReg ( byte * callAddr, int8 reg )
 {
     Compile_Call_ToAddressThruReg ( callAddr, reg ) ; // x64
 }
 
 void
+_Compile_Call ( byte * callAddr )
+{
+    _Compile_Call_ThruReg ( callAddr, ACC ) ;
+}
+
+void
 Compile_Call ( byte * callAddr )
 {
-    _Compile_Call ( callAddr, ACC ) ;
+#if NEW_CALL_RETURN
+    Word * word = Word_GetFromCodeAddress ( callAddr ) ;
+    if ( word && ( ! ( word->CAttribute & CPRIMITIVE ) ) )
+    {
+        _Compile_Call_CfrTilWord ( callAddr ) ;
+    }
+    else
+    {
+        //DBI_ON ;
+        _Compile_PushReg ( CFT_RSP ) ;
+        _Compile_Call_ThruReg ( callAddr, ACC ) ;
+        _Compile_PopToReg ( CFT_RSP ) ;
+        //DBI_OFF ;
+    }
+#else
+    _Compile_Call_ThruReg ( callAddr, ACC ) ;
+#endif
+
 }
 
 void
@@ -867,6 +891,104 @@ _Compile_Call_NoOptimize ( byte * callAddr )
     //_Compile_InstructionX86 ( CALLI32, 0, 0, 0, 0, 0, disp, INT32_SIZE, 0, 0 ) ;
     Compile_Call ( callAddr ) ;
 }
+
+#if NEW_CALL_RETURN      
+
+void
+Compile_CfrTilWord_Return ( )
+{
+    DBI_ON ;
+    if ( _DBI )
+    {
+        Word * word = _Compiler_->CurrentWordCompiling ; //= Word_GetFromCodeAddress ( address ) ;
+        _Printf ( ( byte* ) "\nCompile_CfrTilWord_Return : word = %s : at %s", word ? word->Name : ( byte* ) "", Context_Location ( ) ) ;
+    }
+    //byte * here0 = Here ;
+    //_Compile_MoveImm ( REG, R11D, IMM_B | REX_B | MODRM_B | DISP_B, 0, 0, ( uint64 ) & _CfrTil_->ReturnStack->StackPointer, CELL ) ;
+    //_Compile_Move_Rm_To_Reg ( CFT_RSP, R11D, 0 ) ; //runtime _CfrTil_->ReturnStack->StackPointer to R11D //use R11D to distinguish returns from calls
+    _Compile_Stack_PopToReg ( CFT_RSP, ACC ) ;
+    //_Compile_Move_Reg_To_Rm ( R11D, CFT_RSP, 0 ) ;
+    _Compile_Group5 ( JMP, REG, ACC, 0, 0, 0 ) ;
+    //byte * here1 = Here ;
+    //int64 size = here1 - here0 ;
+    DBI_OFF ;
+}
+// push onto the C esp based stack with the 'push' instruction
+
+void
+_Compile_Call_CfrTilWord ( byte* address )
+{
+#if 0    
+    //_Compile_MoveImm ( REG, ACC, IMM_B | REX_B | MODRM_B | DISP_B, 0, 0, (uint64)&_RSP_, CELL ) ;
+    //_Compile_Move_Rm_To_Reg ( OREG, ACC, 0 ) ;
+    //_Compile_Move_Reg_To_Reg ( CFT_RSP, OREG ) ;
+    _Compile_Stack_Push ( CFT_RSP, Here + 10 ) ; // 5: sizeof (jmp 32)
+    _Compile_Move_Reg_To_Rm ( ACC, CFT_RSP, 0 ) ;
+    _Compile_JumpToAddress ( ( byte* ) word->Definition ) ;
+#else
+    DBI_ON ;
+    if ( _DBI )
+    {
+        Word * word = Word_GetFromCodeAddress ( address ) ;
+        _Printf ( ( byte* ) "\n_Compile_Call_CfrTilWord : word = %s : at %s", word ? word->Name : ( byte* ) "", Context_Location ( ) ) ;
+    }
+    //_Compile_MoveImm ( REG, OREG, IMM_B | REX_B | MODRM_B | DISP_B, 0, 0, ( uint64 ) & _CfrTil_->ReturnStack->StackPointer, CELL ) ;
+    //_Compile_Move_Rm_To_Reg ( CFT_RSP, OREG, 0 ) ; //runtime _CfrTil_->ReturnStack->StackPointer to OREG
+    _Compile_Stack_Push ( CFT_RSP, ( uint64 ) Here + 22 ) ;
+    //_Compile_Move_Reg_To_Rm ( OREG, CFT_RSP, 0 ) ;
+    _Compile_JumpToAddress ( address ) ;
+    DBI_OFF ;
+#endif    
+    //_Compile_Return ( ) ;
+
+    //*(++_RSP_) = Here + 5 ; 
+    //JmpTo ( word->Definition ) ;
+}
+
+void
+Compile_ReturnStackStackPointer_To_CFT_RSP ( )
+{
+    //DBI_ON ;
+#if 0    
+    _Compile_MoveImm ( REG, OREG, IMM_B | REX_B | MODRM_B | DISP_B, 0, 0, ( uint64 ) & _CfrTil_->ReturnStack->StackPointer, CELL ) ;
+    _Compile_Move_Reg_To_Reg ( CFT_RSP, OREG ) ; //runtime _CfrTil_->ReturnStack->StackPointer to OREG
+#else
+    _Compile_MoveImm ( REG, CFT_RSP, IMM_B | REX_B | MODRM_B | DISP_B, 0, 0, ( uint64 ) _CfrTil_->ReturnStack->StackPointer, CELL ) ;
+#endif    
+    //DBI_OFF ;
+}
+
+void
+Compile_CFT_RSP_To_ReturnStackStackPointer ( )
+{
+    //DBI_ON ;
+    _Compile_MoveImm ( REG, OREG, IMM_B | REX_B | MODRM_B | DISP_B, 0, 0, ( uint64 ) &_CfrTil_->ReturnStack->StackPointer, CELL ) ;
+    _Compile_Move_Reg_To_Rm ( OREG, CFT_RSP, 0 ) ;
+    //DBI_OFF ;
+}
+
+void
+Compile_Call_CfrTilWord ( )
+{
+    DBI_ON ;
+    if ( _DBI )
+    {
+        Word * word = _Context_->CurrentlyRunningWord ; //Word_GetFromCodeAddress ( address ) ;
+        _Printf ( ( byte* ) "\nCompile_Call_CfrTilWord : word = %s : at %s", word ? word->Name : ( byte* ) "", Context_Location ( ) ) ;
+    }
+    //_Compile_MoveImm ( REG, OREG, IMM_B | REX_B | MODRM_B | DISP_B, 0, 0, ( uint64 ) & _CfrTil_->ReturnStack->StackPointer, CELL ) ;
+    //_Compile_Move_Rm_To_Reg ( CFT_RSP, OREG, 0 ) ; //runtime _CfrTil_->ReturnStack->StackPointer to OREG
+    Compile_ReturnStackStackPointer_To_CFT_RSP ( ) ;
+    //_Compile_Move_Reg_To_Reg ( CFT_RSP, OREG ) ; 
+    _Compile_Stack_PopToReg ( DSP, ACC ) ; // TOS is word->Definition 
+    _Compile_Stack_Push ( CFT_RSP, ( uint64 ) Here + 33 ) ; // 5: sizeof (jmp 32)
+    //_Compile_Move_Reg_To_Rm ( OREG, CFT_RSP, 0 ) ;
+    Compile_CFT_RSP_To_ReturnStackStackPointer ( ) ;
+    _Compile_Group5 ( JMP, REG, ACC, 0, 0, 0 ) ;
+    DBI_OFF ;
+}
+
+#endif
 
 void
 _Compile_TEST_Reg_To_Reg ( int8 dstReg, int64 srcReg )
@@ -879,11 +1001,22 @@ _Compile_Return ( )
 {
     _Compile_Int8 ( 0xc3 ) ;
     //RET ( ) ; // use codegen_x86.h just to include it in
+}
+
+void
+Compile_Return ( )
+{
+#if NEW_CALL_RETURN      
+    if ( ( ! _Compiler_->CurrentWordCompiling ) || ( ! ( _Compiler_->CurrentWordCompiling->CAttribute & CFRTIL_WORD ) ) )
+        _Compile_Return ( ) ;
+    else Compile_CfrTilWord_Return ( ) ;
+#else
+    _Compile_Return ( ) ;
+#endif    
+    //RET ( ) ; // use codegen_x86.h just to include it in
     // pop rstack to R8
     //_Compile_JumpToReg ( R8 ) ;
 }
-
-// push onto the C esp based stack with the 'push' instruction
 
 void
 _Compile_PushReg ( int8 reg )
@@ -910,14 +1043,15 @@ _Compile_PopToReg ( int8 reg )
 #if 0    
     _Compile_Int8 ( 0x58 + reg ) ;
 #else
+#define dbgON_7 0
 #if dbgON_7    
     d1 ( byte * here = Here ) ;
 #endif    
     _Compile_Int8 ( 0x40 + ( ( reg > 7 ) ? 1 : 0 ) ) ;
     _Compile_Int8 ( 0x58 + ( reg & 0x7 ) ) ;
 #if dbgON_7     
-    D1 ( _Printf ( ( byte* ) "\n_Compile_PopToReg :" ) ) ;
-    D1 ( Debugger_UdisOneInstruction ( _Debugger_, here, ( byte* ) "", ( byte* ) "" ) ; ) ;
+    d1 ( _Printf ( ( byte* ) "\n_Compile_PopToReg :" ) ) ;
+    d1 ( Debugger_UdisOneInstruction ( _Debugger_, here, ( byte* ) "", ( byte* ) "" ) ; ) ;
 #endif
 #endif    
 }
@@ -1108,6 +1242,20 @@ _Compile_Jcc ( int64 bindex, int64 overwriteFlag, int64 nz, int64 ttt )
 }
 
 #if 0
+
+void
+Compile_SetRegWithValue ( )
+{
+    DBI_ON ;
+    _Compile_MoveImm ( REG, OREG, IMM_B | REX_B | MODRM_B | DISP_B, 0, 0, ( uint64 ) & _CfrTil_->ReturnStack->StackPointer, CELL ) ;
+    _Compile_Move_Rm_To_Reg ( CFT_RSP, OREG, 0 ) ; //runtime _CfrTil_->ReturnStack->StackPointer to OREG
+    //_Compile_Move_Reg_To_Reg ( CFT_RSP, OREG ) ; 
+    _Compile_Stack_PopToReg ( DSP, ACC ) ; // TOS is word->Definition 
+    _Compile_Stack_Push ( CFT_RSP, ( uint64 ) Here + 20 ) ; // 5: sizeof (jmp 32)
+    _Compile_Group5 ( JMP, REG, ACC, 0, 0, 0 ) ;
+    _Compile_Move_Reg_To_Rm ( OREG, CFT_RSP, 0 ) ;
+    DBI_OFF ;
+}
 
 uint64 BlockCallAddress ;
 

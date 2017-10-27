@@ -171,7 +171,7 @@ Debugger_On ( Debugger * debugger )
 void
 _Debugger_Off ( Debugger * debugger )
 {
-    Stack_Init ( debugger->DebugStack ) ;
+    Stack_Init ( debugger->ReturnStack ) ;
     debugger->StartHere = 0 ;
     debugger->PreHere = 0 ;
     debugger->DebugAddress = 0 ;
@@ -255,7 +255,7 @@ _Debugger_Init ( Debugger * debugger, Word * word, byte * address )
     debugger->CopyRSP = 0 ;
     SetState ( debugger, ( DBG_STACK_OLD ), true ) ;
     SetState ( debugger, DBG_STEPPING, false ) ;
-    Stack_Init ( debugger->DebugStack ) ;
+    Stack_Init ( debugger->ReturnStack ) ;
 }
 
 byte *
@@ -343,8 +343,6 @@ Debugger_Eval ( Debugger * debugger )
     }
     if ( ! debugger->PreHere ) debugger->PreHere = _Compiler_GetCodeSpaceHere ( ) ; // Here ;
     SetState_TrueFalse ( debugger, DBG_INTERPRET_LOOP_DONE | DBG_EVAL_AUTO_MODE, DBG_STEPPING ) ;
-    //SetState ( debugger, DBG_STEPPING, false ) ;
-
     if ( GetState ( debugger, DBG_AUTO_MODE ) ) SetState ( debugger, DBG_EVAL_AUTO_MODE, true ) ;
 
     d0 ( Cpu_CheckRspForWordAlignment ( "Debugger_Eval" ) ) ;
@@ -687,7 +685,7 @@ _Debugger_New ( uint64 type )
     Debugger * debugger = ( Debugger * ) Mem_Allocate ( sizeof (Debugger ), type ) ;
     debugger->cs_Cpu = CpuState_New ( type ) ;
     debugger->StepInstructionBA = Debugger_ByteArray_AllocateNew ( 8 * K, type ) ;
-    debugger->DebugStack = Stack_New ( 256, type ) ;
+    debugger->ReturnStack = Stack_New ( 256, type ) ;
     //debugger->LocalsNamespacesStack = 0 ;//Stack_New ( 32, type ) ;
 
     Debugger_TableSetup ( debugger ) ;

@@ -22,24 +22,40 @@ Byte_PtrCall ( byte * bptr )
 {
     if ( bptr )
     {
+#if NEW_CALL_RETURN      
+        _DataStack_Push ( ( uint64 ) bptr ) ;
+        _CfrTil_->CallCfrTilWord ( ) ;
+#else
         ( ( block ) bptr ) ( ) ;
+#endif        
     }
 }
 
 void
-_Block_Eval ( block block )
+_Block_Eval ( block blck )
 {
     d0 ( Cpu_CheckRspForWordAlignment ( "_Block_Eval:Before" ) ) ;
-    Byte_PtrCall ( ( byte * ) block ) ;
+    //Byte_PtrCall ( ( byte * ) block ) ;
+    if ( blck )
+    {
+#if NEW_CALL_RETURN      
+        _DataStack_Push ( ( uint64 ) blck ) ;
+        _CfrTil_->CallCfrTilWord ( ) ;
+#else
+        ( ( block ) blck ) ( ) ;
+#endif        
+    }
     d0 ( Cpu_CheckRspForWordAlignment ( "_Block_Eval:After" ) ) ;
 }
 
 void
-_Block_Copy ( byte * srcAddress, int64 bsize )
+_Block_Copy ( BlockInfo *bi, byte * srcAddress, int64 bsize )
 {
     byte * saveHere = Here, * saveAddress = srcAddress ;
     ud_t * ud = Debugger_UdisInit ( _Debugger_ ) ;
     int64 isize, left ;
+    byte mov_rax_r11__sub_r11_0x8 [ ] = { 0x49, 0x8b, 0x03, 0x49, 0x83, 0xeb, 0x08, 0x48 } ;
+    byte add_r11_0x8__mov_r8 [ ] = { 0x49, 0x83, 0xc3, 0x08, 0x49, 0xb8 } ;
 
     for ( left = bsize ; left > 0 ; srcAddress += isize )
     {
@@ -47,7 +63,47 @@ _Block_Copy ( byte * srcAddress, int64 bsize )
         isize = _Udis_GetInstructionSize ( ud, srcAddress ) ;
         left -= isize ;
         _CfrTil_AdjustDbgSourceCodeAddress ( srcAddress, Here ) ;
-        if ( * srcAddress == _RET )
+#if NEW_CALL_RETURN
+        if ( ! memcmp ( mov_rax_r11__sub_r11_0x8, srcAddress, 8 ) )                                  
+        {
+            //_Printf ( (byte*) "\ngot one\n") ;
+            break ; // don't include RET
+        }
+        if ( ! memcmp ( add_r11_0x8__mov_r8, srcAddress, 6 ) )                                  
+        {
+            //_Printf ( (byte*) "\ngot a Call : srcAddress = 0x%016lx : Here = 0x%016lx", srcAddress, Here ) ;
+            do
+            {
+                srcAddress += isize ;
+                isize = _Udis_GetInstructionSize ( ud, srcAddress ) ;
+                if ( ( isize == 5 ) && ( * srcAddress == JMPI32 ) ) 
+                {
+                    srcAddress += isize ;
+                    left -= isize ;
+                    break ;
+                }
+            }
+            while ( ( left -= isize ) > 0 ) ;
+            byte * jcAddress = JumpCallInstructionAddress ( srcAddress - isize ) ;
+#if 1            
+            Word * word = Word_GetFromCodeAddress ( jcAddress ) ;
+            _Printf ( (byte*) "\nCompiling call :: word = %s : srcAddress = 0x%016lx : Here = 0x%016lx", word->Name, srcAddress - isize, Here ) ;
+#endif            
+            Compile_Call ( jcAddress ) ; 
+            isize = 0 ; // adjust for end of for loop 
+            continue ;
+#if 0            
+                if ( word )
+                {
+                    //_CfrTil_AdjustSourceCodeAddress ( jcAddress, Here ) ;
+                    _Word_Compile ( word ) ;
+                    //srcAddress += isize ;
+                }
+#endif
+        }
+        else
+#endif        
+        if ( * srcAddress == _RET ) // don't include RET
         {
             if ( left && ( ( * srcAddress + 1 ) != NOOP ) ) //  noop from our logic overwrite
             {
@@ -59,7 +115,7 @@ _Block_Copy ( byte * srcAddress, int64 bsize )
         }
         else if ( * srcAddress == CALLI32 )
         {
-            int64 offset = * ( int32* ) ( srcAddress + 1 ) ; // 1 : 1 byte opCode
+            int32 offset = * ( int32* ) ( srcAddress + 1 ) ; // 1 : 1 byte opCode
             if ( ! offset )
             {
                 dllist_Map1 ( _Context_->Compiler0->GotoList, ( MapFunction1 ) AdjustJmpOffsetPointer, ( int64 ) ( srcAddress + 1 ) ) ;
@@ -68,6 +124,7 @@ _Block_Copy ( byte * srcAddress, int64 bsize )
             }
             else
             {
+#if 1                
                 byte * jcAddress = JumpCallInstructionAddress ( srcAddress ) ;
                 Word * word = Word_GetFromCodeAddress ( jcAddress ) ;
                 if ( word )
@@ -77,28 +134,56 @@ _Block_Copy ( byte * srcAddress, int64 bsize )
                     continue ;
                 }
                 //else (drop to) _CompileN ( srcAddress, isize )
+#else
+                byte * jcAddress = JumpCallInstructionAddress ( srcAddress ) ;
+#if 0            
+                if ( 1 ) //_DBI )
+                {
+                    Word * word = Word_GetFromCodeAddress ( ( byte* ) jcAddress ) ;
+                    if ( word ) _Printf ( ( byte* ) "\n_Compile_Call_CfrTilWord : word = %s : at %s", word ? word->Name : ( byte* ) "", Context_Location ( ) ) ;
+                }
+#endif            
+                Compile_Call ( jcAddress ) ;
+                continue ;
+#endif                
             }
         }
         else if ( * srcAddress == JMPI32 )
         {
             int64 offset = * ( int32* ) ( srcAddress + 1 ) ; // 1 : 1 byte opCode
-            if ( offset != 0 ) // signature of a goto point
+            if ( offset != 0 )
             {
                 dllist_Map1 ( _Context_->Compiler0->GotoList, ( MapFunction1 ) AdjustJmpOffsetPointer, ( int64 ) ( srcAddress + 1 ) ) ;
+#if 1                
+                byte * jcAddress = JumpCallInstructionAddress ( srcAddress ) ;
+                Word * word = Word_GetFromCodeAddress ( jcAddress ) ;
+                if ( word )
+                {
+                    //_CfrTil_AdjustSourceCodeAddress ( jcAddress, Here ) ;
+                    //_Word_Compile ( word ) ;
+                    _Compile_Call ( ( byte* ) word->Definition ) ;
+                    continue ;
+                }
+                //else (drop to) _CompileN ( srcAddress, isize )
+#else                
+                //_CompileN ( srcAddress, 1 ) ; // memcpy ( dstAddress, address, size ) ;
+                //byte * jcAddress = JumpCallInstructionAddress ( srcAddress ) ;
+                int32 disp = _CalculateOffsetForCallOrJump ( Here + 1, srcAddress, INT32_SIZE ) ;
+                //_CompileN ( &disp, 4 ) ; // memcpy ( dstAddress, address, size ) ;
+                byte * here = Here ;
+                _Compile_Int8 ( JMPI32 ) ;
+                _Compile_Int32 ( disp ) ;
+                Debugger_UdisOneInstruction ( _Debugger_, here, ( byte* ) "\r", ( byte* ) "" ) ;
+                continue ;
+#endif                
             }
-            else
+            else // if ( offset == 0 ) signature of a goto point
             {
                 //_CfrTil_AdjustGotoPoint ( ( int64 ) srcAddress ) ;
                 dllist_Map1 ( _Context_->Compiler0->GotoList, ( MapFunction1 ) _AdjustGotoInfo, ( int64 ) srcAddress ) ;
 
             }
         }
-#if 0        
-        else if ( ( * address == 0x49 ) && ( * ( address + 1 ) == 0xff ) )
-        {
-            iaddress = ( byte* ) ( * ( ( uint64* ) ( address - CELL ) ) ) ; // 3 : sizeof x64 call insn 
-        }
-#endif        
         _CompileN ( srcAddress, isize ) ; // memcpy ( dstAddress, address, size ) ;
     }
 }
@@ -106,7 +191,7 @@ _Block_Copy ( byte * srcAddress, int64 bsize )
 // nb : only blocks with one ret insn can be successfully compiled inline
 
 void
-Block_Copy ( byte * dst, byte * src, int64 qsize )
+Block_Copy ( BlockInfo *bi, byte * dst, byte * src, int64 qsize )
 {
 #if 0    
     if ( dst > src )
@@ -116,7 +201,7 @@ Block_Copy ( byte * dst, byte * src, int64 qsize )
     }
 #endif    
     SetHere ( dst ) ;
-    _Block_Copy ( src, qsize ) ;
+    _Block_Copy ( bi, src, qsize ) ;
 }
 
 int64
@@ -144,7 +229,7 @@ Block_CopyCompile_WithLogicFlag ( byte * srcAddress, int64 bindex, int64 jccFlag
     if ( ! GetState ( _CfrTil_, INLINE_ON ) ) Compile_Call ( srcAddress ) ;
     else
     {
-        _Block_Copy ( srcAddress, bi->bp_Last - bi->bp_First ) ;
+        _Block_Copy ( bi, srcAddress, bi->bp_Last - bi->bp_First ) ;
     }
     if ( jccFlag )
     {
@@ -152,9 +237,9 @@ Block_CopyCompile_WithLogicFlag ( byte * srcAddress, int64 bindex, int64 jccFlag
         _Context_->CurrentlyRunningWord = _Context_->SC_CurrentCombinator ;
         if ( jccFlag2 )
         {
-            //DBI_ON ;
+            DBI_ON ;
             Compile_JCC ( negFlag ? bi->NegFlag : ! bi->NegFlag, bi->Ttt, 0 ) ;
-            //DBI_OFF ;
+            DBI_OFF ;
         }
         else
         {
@@ -182,7 +267,11 @@ BlockInfo_Set_tttn ( BlockInfo * bi, int8 ttt, int8 n, int8 overWriteSize )
     bi->LogicCodeWord = _Context_->CurrentlyRunningWord ;
     bi->Ttt = ttt ;
     bi->NegFlag = n ;
+#if 0 //NEW_CALL_RETURN      
+    bi->OverWriteSize = 26 ; //overWriteSize ;
+#else    
     bi->OverWriteSize = overWriteSize ;
+#endif    
 }
 
 BlockInfo *
@@ -292,7 +381,7 @@ _CfrTil_EndBlock1 ( BlockInfo * bi )
         _CfrTil_InstallGotoCallPoints_Keyed ( bi, GI_RETURN ) ;
         if ( compiler->NumberOfRegisterVariables )
         {
-            if ( compiler->NumberOfRegisterVariables >= (compiler->NumberOfArgs + compiler->NumberOfLocals) ) bi->bp_First = bi->Start ;
+            if ( compiler->NumberOfRegisterVariables >= ( compiler->NumberOfArgs + compiler->NumberOfLocals ) ) bi->bp_First = bi->Start ;
             if ( compiler->ReturnVariableWord )
             {
 
@@ -325,7 +414,8 @@ _CfrTil_EndBlock1 ( BlockInfo * bi )
             bi->bp_First = bi->Start ; //bi->AfterFrame ; 
         }
     }
-    _Compile_Return ( ) ;
+    Compile_Return ( ) ;
+    //Compile_CfrTilWord_Return ( ) ;
     _DataStack_Push ( ( int64 ) bi->bp_First ) ;
     bi->bp_Last = Here ;
     _SetOffsetForCallOrJump ( bi->JumpOffset, Here ) ;

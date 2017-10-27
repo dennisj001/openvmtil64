@@ -278,6 +278,7 @@ _Debugger_ShowEffects ( Debugger * debugger, Word * word, int8 stepFlag, int8 fo
                 {
                     CfrTil_PrintDataStack ( ) ;
                 }
+#if 0                
                 //debugger->LastEffectsWord = word ;
                 if ( stepFlag && debugger->DebugAddress )
                 {
@@ -285,12 +286,13 @@ _Debugger_ShowEffects ( Debugger * debugger, Word * word, int8 stepFlag, int8 fo
                     // keep eip - instruction pointer - up to date ..
                     //debugger->cs_Cpu->Rip = ( uint64 * ) debugger->DebugAddress ;
                 }
+#endif                
             }
             //else debugger->LastEffectsWord = 0 ;
             DebugColors ;
             debugger->LastEffectsWord = word ;
             debugger->LastShowWord = debugger->w_Word ;
-            uint64 * dsp1 = Dsp ;
+            //uint64 * dsp1 = Dsp ;
             CfrTil_SetStackPointerFromDsp ( _CfrTil_ ) ;
         }
     }

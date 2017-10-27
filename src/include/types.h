@@ -689,7 +689,7 @@ typedef struct _Debugger
     block RestoreCpuState ;
     block getRsp ;
     byte * PreHere, *StartHere, *LastDisStart, *ShowLine, * Filename ;
-    Stack *DebugStack ;
+    Stack *ReturnStack ;
     Cpu * cs_Cpu ;
     byte* DebugAddress, *CopyRSP, *CopyRBP, *LastSourceCodeAddress ;
     uint64 * DebugRSP, *DebugRBP, *DebugRSI, *DebugRDI, * LastRsp ; //, *SavedIncomingESP, *SavedIncomingEBP ; //, SavedRunningESP, SavedRunningEBP;
@@ -786,7 +786,8 @@ typedef struct _StringTokenInfo
 typedef struct _CfrTil
 {
     uint64 State ;
-    Stack * DataStack ;
+    Stack *ReturnStack, * DataStack ;
+    //Stack * DataStack ;
     Namespace * Namespaces ;
     Context * Context0 ;
     Stack * ContextStack ;
@@ -799,7 +800,8 @@ typedef struct _CfrTil
     uint64 * SaveDsp ;
     Cpu * cs_Cpu ;
     Cpu * cs_Cpu2 ;
-    block CurrentBlock, SaveCpuState, SaveCpu2State, RestoreCpuState, RestoreCpu2State, CallCurrentBlock, RestoreSelectedCpuState, SaveSelectedCpuState ; //, SyncDspToEsi, SyncEsiToDsp ;
+    block CurrentBlock, SaveCpuState, SaveCpu2State, RestoreCpuState, RestoreCpu2State, CallCfrTilWord, CallCurrentBlock, RestoreSelectedCpuState, SaveSelectedCpuState ; //, SyncDspToEsi, SyncEsiToDsp ;
+    block Sync_ReturnStackStackPointer_To_CFT_RSP, Sync_CFT_RSP_To_ReturnStackStackPointer ;
     Word * LastFinishedWord, *StoreWord, *PokeWord, *ScoOcCrw, *DebugWordListWord ; //, *DebugWordListWord ;
     byte ReadLine_CharacterTable [ 256 ] ;
     ReadLineFunction ReadLine_FunctionTable [ 24 ] ;

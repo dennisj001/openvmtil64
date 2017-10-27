@@ -140,6 +140,9 @@
 #define _DataStack_ _CfrTil_->DataStack
 #define _DataStackPointer_ _DataStack_->StackPointer
 #define _SP_ _DataStackPointer_ 
+#define _ReturnStack_ _CfrTil_->ReturnStack
+#define _ReturnStackPointer_ _ReturnStack_->StackPointer
+#define _RSP_ _ReturnStackPointer_ 
 #define _AtCommandLine() ( ! _Context_->System0->IncludeFileStackNumber ) 
 #define AtCommandLine( rl ) \
         ( GetState ( _Debugger_, DBG_COMMAND_LINE ) || GetState ( _Context_, AT_COMMAND_LINE ) ||\
@@ -194,6 +197,8 @@
 #define Car( sym ) ((ListObject*) sym)->Lo_Car
 #define Cdr( sym ) ((ListObject*) sym)->Lo_Cdr
 
+#define Stringn_Equal( string1, string2, n ) (Strncmp ( (char*) string1, (char*) string2, n ) == 0 )
+#define Stringni_Equal( string1, string2, n ) (Strnicmp ( (char*) string1, (char*) string2, n ) == 0 )
 #define Stringi_Equal( string1, string2 ) (Stricmp ( (char*) string1, (char*) string2 ) == 0 )
 #define String_Equal( string1, string2 ) (Strcmp ( (char*) string1, (char*) string2 ) == 0 )
 #define sconvbs( d, s ) (byte*) _String_ConvertStringToBackSlash ( d, s )

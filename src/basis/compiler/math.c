@@ -207,11 +207,11 @@ Compile_MultiplyEqual ( Compiler * compiler )
             // address is in R8
             // Compile_IMUL ( mod, rm, sib, disp, imm, size )
             //_Compile_IMULI ( cell mod, cell reg, cell rm, cell sib, cell disp, cell imm, cell size )
-            if ( compiler->optInfo->UseReg ) _Compile_Move_Reg_To_Reg ( R11D, compiler->optInfo->UseReg ) ;
+            if ( compiler->optInfo->UseReg ) _Compile_Move_Reg_To_Reg ( THRU_REG, compiler->optInfo->UseReg ) ;
             else
             {
-                _Compile_Move_Reg_To_Reg ( R11D, ACC ) ;
-                _Compile_Move_Rm_To_Reg ( ACC, R11D, 0 ) ;
+                _Compile_Move_Reg_To_Reg ( THRU_REG, ACC ) ;
+                _Compile_Move_Rm_To_Reg ( ACC, THRU_REG, 0 ) ;
             }
             if ( compiler->optInfo->OptimizeFlag & OPTIMIZE_IMM )
             {
@@ -229,7 +229,7 @@ Compile_MultiplyEqual ( Compiler * compiler )
                 Compile_MUL ( compiler->optInfo->Optimize_Mod, compiler->optInfo->Optimize_Rm, REX_B | MODRM_B | DISP_B, 0,
                     compiler->optInfo->Optimize_Disp, 0, CELL_SIZE ) ;
             }
-            _Compile_Move_Reg_To_Rm ( R11D, ACC, 0 ) ;
+            _Compile_Move_Reg_To_Rm ( THRU_REG, ACC, 0 ) ;
         }
         else
         {
@@ -258,8 +258,8 @@ Compile_DivideEqual ( Compiler * compiler )
         {
             // assumes destination address is in EBX
             //_Compile_Move_Reg_To_Reg ( EBX, R8 ) ;
-            _Compile_Move_Reg_To_Reg ( R11D, ACC ) ; //R8D ) ; //compiler->optInfo->UseReg ) ;
-            _Compile_Move_Rm_To_Reg ( ACC, R11D, 0 ) ;
+            _Compile_Move_Reg_To_Reg ( THRU_REG, ACC ) ; //R8D ) ; //compiler->optInfo->UseReg ) ;
+            _Compile_Move_Rm_To_Reg ( ACC, THRU_REG, 0 ) ;
             _Compile_MoveImm ( REG, RDX, IMM_B | REX_B | MODRM_B, 0, 0, 0, CELL ) ;
             // Compile_IDIV( mod, rm, sib, disp, imm, size )
             if ( compiler->optInfo->OptimizeFlag & OPTIMIZE_IMM )
@@ -273,7 +273,7 @@ Compile_DivideEqual ( Compiler * compiler )
                 Compile_DIV ( compiler->optInfo->Optimize_Mod, compiler->optInfo->Optimize_Rm, REX_B | MODRM_B | DISP_B, 0,
                     compiler->optInfo->Optimize_Disp, 0, CELL_SIZE ) ;
             }
-            _Compile_Move_Reg_To_Rm ( R11D, ACC, 0 ) ; // move result to destination
+            _Compile_Move_Reg_To_Rm ( THRU_REG, ACC, 0 ) ; // move result to destination
         }
         else
         {
@@ -281,7 +281,7 @@ Compile_DivideEqual ( Compiler * compiler )
             _Compile_MoveImm ( REG, RDX, IMM_B | REX_B | MODRM_B | DISP_B, 0, 0, 0, CELL ) ;
             Compile_IDIV ( MEM, DSP, 0, 0, 0, 0, 0 ) ; // divisor is tos
             _Compile_Stack_Drop ( DSP ) ;
-            _Compile_Move_Reg_To_StackNRm_UsingReg ( DSP, 0, ACC, R11D ) ;
+            _Compile_Move_Reg_To_StackNRm_UsingReg ( DSP, 0, ACC, THRU_REG ) ;
         }
     }
 }

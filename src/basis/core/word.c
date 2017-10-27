@@ -7,7 +7,20 @@ _Word_Run ( Word * word )
     {
         word->W_InitialRuntimeDsp = Dsp ;
         _Context_->CurrentlyRunningWord = word ;
+#if 0 //NEW_CALL_RETURN      
+        if ( ! ( word->CAttribute & CFRTIL_WORD ) ) _Block_Eval ( word->Definition ) ;
+        else
+        {
+            //_Rsp_ = _CfrTil_->ReturnStack->StackPointer ;
+            _DataStack_Push ( ( uint64 ) word->Definition ) ;
+            _CfrTil_->CallCfrTilWord ( ) ;
+            //_CfrTil_->ReturnStack->StackPointer = _Rsp_ ;
+
+            
+        }
+#else
         _Block_Eval ( word->Definition ) ;
+#endif        
     }
 }
 
@@ -19,6 +32,7 @@ Word_Run ( Word * word )
         _Word_Run ( word ) ;
     }
     else Dsp = _CfrTil_->SaveDsp ;
+    _CfrTil_SetStackPointerFromDsp ( _CfrTil_ ) ;
 }
 
 void
@@ -33,7 +47,9 @@ _Word_Eval ( Word * word )
 {
     if ( word )
     {
-        //word->Coding = Here ;
+        word->StackPushRegisterCode = 0 ; // nb. used! by the rewriting optInfo
+        // keep track in the word itself where the machine code is to go, if this word is compiled or causes compiling code - used for optimization
+        word->W_SC_WordIndex = _CfrTil_->SC_ScratchPadIndex ;
         Word_SetCoding ( word, Here ) ;
         if ( ( word->CAttribute & IMMEDIATE ) || ( ! CompileMode ) )
         {
@@ -51,8 +67,6 @@ _Word_Eval_Debug ( Word * word )
 {
     if ( word )
     {
-        //word->Coding = Here ;
-        Word_SetCoding ( word, Here ) ;
         DEBUG_SETUP ( word ) ;
         if ( ! GetState ( _Debugger_, DBG_STEPPED ) ) _Word_Eval ( word ) ;
         DEBUG_SHOW ;
@@ -64,16 +78,8 @@ Word_Eval ( Word * word )
 {
     if ( word )
     {
-        if ( word->CAttribute & DEBUG_WORD ) DebugColors ;
-        //_Context_->CurrentlyRunningWord = word ;
-        word->StackPushRegisterCode = 0 ; // nb. used! by the rewriting optInfo
-        // keep track in the word itself where the machine code is to go, if this word is compiled or causes compiling code - used for optimization
-        word->Coding = Here ;
-        word->W_SC_WordIndex = _CfrTil_->SC_ScratchPadIndex ;
         if ( Is_DebugModeOn ) _Word_Eval_Debug ( word ) ;
         else _Word_Eval ( word ) ;
-        //if ( word->CAttribute & DEBUG_WORD ) DefaultColors ; // reset colors after a debug word //?? have debug word do this - cleanup its own mess !!
-        _CfrTil_SetStackPointerFromDsp ( _CfrTil_ ) ;
     }
 }
 
@@ -201,7 +207,7 @@ _Word_Create ( byte * name, uint64 ctype, uint64 ctype2, uint64 ltype, uint64 al
 }
 
 Word *
-_Word_New (byte * name, uint64 ctype, uint64 ctype2, uint64 ltype, int8 addToInNs, Namespace * addToNs, uint64 allocType )
+_Word_New ( byte * name, uint64 ctype, uint64 ctype2, uint64 ltype, int8 addToInNs, Namespace * addToNs, uint64 allocType )
 {
     CheckCodeSpaceForRoom ( ) ;
     ReadLiner * rl = _Context_->ReadLiner0 ;
@@ -229,7 +235,7 @@ _Word_New (byte * name, uint64 ctype, uint64 ctype2, uint64 ltype, int8 addToInN
 Word *
 Word_New ( byte * name )
 {
-    Word * word = _Word_New (name, CFRTIL_WORD | WORD_CREATE, 0, 0, 1, 0, DICTIONARY ) ;
+    Word * word = _Word_New ( name, CFRTIL_WORD | WORD_CREATE, 0, 0, 1, 0, DICTIONARY ) ;
     return word ;
 }
 
@@ -369,7 +375,7 @@ _CfrTil_Alias ( Word * word, byte * name )
 {
     if ( word )
     {
-        Word * alias = _Word_New (name, word->CAttribute | ALIAS, word->CAttribute2, word->LAttribute, 1, 0, DICTIONARY ) ; // inherit type from original word
+        Word * alias = _Word_New ( name, word->CAttribute | ALIAS, word->CAttribute2, word->LAttribute, 1, 0, DICTIONARY ) ; // inherit type from original word
         //while ( ( ! word->Definition ) && word->W_AliasOf ) word = word->W_AliasOf ;
         while ( ! word->Definition ) word = word->W_AliasOf ;
         _Word_InitFinal ( alias, ( byte* ) word->Definition ) ;
@@ -405,7 +411,7 @@ _CfrTil_Macro ( int64 mtype, byte * function )
     macroString = Parse_Macro ( mtype ) ;
     byte * code = String_New ( macroString, STRING_MEM ) ;
     //_DObject_New ( byte * name, uint64 value, uint64 ctype, uint64 ltype, uint64 ftype, byte * function, int64 arg, int64 addToInNs, Namespace * addToNs, uint64 allocType )
-    _DObject_New (name, ( uint64 ) code, IMMEDIATE, 0, 0, mtype, function, 0, 1, 0, DICTIONARY ) ;
+    _DObject_New ( name, ( uint64 ) code, IMMEDIATE, 0, 0, mtype, function, 0, 1, 0, DICTIONARY ) ;
 }
 
 Word *

@@ -8,6 +8,7 @@
 #else
 #define NO_GLOBAL_REGISTERS 0
 #endif
+#define NEW_CALL_RETURN 0
 
 #if DEBUG 
 #define D( x ) x
@@ -18,9 +19,10 @@
 #else 
 #define d1( x ) x
 #define d0( x ) 
-#define D1( x ) if ( _Is_DebugOn ) DBI_ON, x 
-#define DBI1( x ) if ( DBI ) x 
+#define D1( x ) if ( _Is_DebugOn ) x 
 #define D0( x ) 
+#define dbi0( x )  
+#define dbi1( x ) if ( DBI ) x 
 #endif
 
 //#define dO3( x ) x

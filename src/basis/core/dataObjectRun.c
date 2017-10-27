@@ -7,6 +7,7 @@ _Namespace_Do_C_Type ( Namespace * ns )
     Context * cntx = _Context_ ;
     Lexer * lexer = cntx->Lexer0 ;
     byte * token1, *token2 ;
+    cntx->Compiler0->C_BackgroundNamespace = _Namespace_FirstOnUsingList ( ) ; //nb! must be before CfrTil_LocalsAndStackVariablesBegin else CfrTil_End_C_Block will 
     if ( ! GetState ( cntx->Compiler0, DOING_C_TYPE ) )
     {
         SetState ( cntx->Compiler0, DOING_C_TYPE, true ) ;
@@ -35,7 +36,6 @@ _Namespace_Do_C_Type ( Namespace * ns )
                     _DataStack_Push ( ( int64 ) word ) ; // token1 is the function name 
                     CfrTil_RightBracket ( ) ; //Set_CompileMode ( true ) ; //SetState ( _Context_->Compiler0, COMPILE_MODE, true ) ;
                     CfrTil_BeginBlock ( ) ;
-                    cntx->Compiler0->C_BackgroundNamespace = _Namespace_FirstOnUsingList ( ) ; //nb! must be before CfrTil_LocalsAndStackVariablesBegin else CfrTil_End_C_Block will 
                     CfrTil_LocalsAndStackVariablesBegin ( ) ;
                     Ovt_AutoVarOn ( ) ;
                     do
@@ -67,6 +67,7 @@ _Namespace_Do_C_Type ( Namespace * ns )
                         else _Lexer_ConsiderDebugAndCommentTokens ( token, 1, 0 ) ;
                     }
                     while ( 1 ) ;
+                    //if ( cntx->Compiler0->C_BackgroundNamespace ) _CfrTil_Namespace_InNamespaceSet ( cntx->Compiler0->C_BackgroundNamespace ) ;
                     goto rtrn ;
                 }
                 else
@@ -92,7 +93,7 @@ _Namespace_Do_C_Type ( Namespace * ns )
                             if ( ( String_Equal ( token, ";" ) ) )
                             {
                                 _CfrTil_AddTokenToHeadOfTokenList ( token ) ;
-                                if ( cntx->Compiler0->C_BackgroundNamespace ) _CfrTil_Namespace_InNamespaceSet ( cntx->Compiler0->C_BackgroundNamespace ) ;
+                                //if ( cntx->Compiler0->C_BackgroundNamespace ) _CfrTil_Namespace_InNamespaceSet ( cntx->Compiler0->C_BackgroundNamespace ) ;
                                 break ;
                             }
                             else
@@ -102,7 +103,7 @@ _Namespace_Do_C_Type ( Namespace * ns )
                                     if ( GetState ( cntx->Compiler0, DOING_A_PREFIX_WORD ) ) _CfrTil_AddTokenToHeadOfTokenList ( token ) ; // add ahead of token2 :: ?? this could be screwing up other things and adds an unnecessary level of complexity
                                 }
                                 cntx->Compiler0->LHS_Word = 0 ;
-                                if ( cntx->Compiler0->C_BackgroundNamespace ) _CfrTil_Namespace_InNamespaceSet ( cntx->Compiler0->C_BackgroundNamespace ) ;
+                                //if ( cntx->Compiler0->C_BackgroundNamespace ) _CfrTil_Namespace_InNamespaceSet ( cntx->Compiler0->C_BackgroundNamespace ) ;
                                 break ;
                             }
                         }
@@ -114,6 +115,7 @@ _Namespace_Do_C_Type ( Namespace * ns )
         }
         else _Namespace_DoNamespace ( ns, 1 ) ;
 rtrn:
+        if ( cntx->Compiler0->C_BackgroundNamespace ) _CfrTil_Namespace_InNamespaceSet ( cntx->Compiler0->C_BackgroundNamespace ) ;
         SetState ( cntx->Compiler0, DOING_C_TYPE, false ) ;
     }
 }

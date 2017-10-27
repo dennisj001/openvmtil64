@@ -25,7 +25,7 @@ CfrTil_EndCombinator ( int64 quotesUsed, int64 moveFlag )
         byte * qCodeStart ;
         if ( bi->FrameStart ) qCodeStart = bi->bp_First ; // after the stack frame
         else qCodeStart = bi->ActualCodeStart ;
-        Block_Copy ( qCodeStart, bi->CombinatorStartsAt, Here - bi->CombinatorStartsAt ) ;
+        Block_Copy ( bi, qCodeStart, bi->CombinatorStartsAt, Here - bi->CombinatorStartsAt ) ;
     }
     _Stack_DropN ( compiler->CombinatorBlockInfoStack, quotesUsed ) ;
     if ( GetState ( compiler, LISP_COMBINATOR_MODE ) )

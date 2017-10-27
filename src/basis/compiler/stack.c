@@ -36,7 +36,7 @@ _Compile_Stack_Push ( int8 stackReg, int64 obj ) // runtime
 {
     Compile_ADDI ( REG, stackReg, 0, sizeof (int64 ), 0 ) ;
     //_Compile_MoveImm ( MEM, stackReg, 0, 0, obj, CELL ) ;
-    _Compile_SetStackN_WithObject ( DSP, 0, obj ) ;
+    _Compile_SetStackN_WithObject ( stackReg, 0, obj ) ;
 }
 
 void
@@ -178,9 +178,9 @@ void
 _Compile_Stack_Swap ( int8 stackReg )
 {
     _Compile_Move_Rm_To_Reg ( OREG, stackReg, 0 ) ;
-    _Compile_Move_Rm_To_Reg ( R11D, stackReg, - CELL ) ;
+    _Compile_Move_Rm_To_Reg ( THRU_REG, stackReg, - CELL ) ;
     _Compile_Move_Reg_To_Rm ( stackReg, OREG, - CELL ) ;
-    _Compile_Move_Reg_To_Rm ( stackReg, R11D, 0 ) ;
+    _Compile_Move_Reg_To_Rm ( stackReg, THRU_REG, 0 ) ;
 }
 
 void

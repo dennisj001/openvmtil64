@@ -190,9 +190,22 @@ CfrTil_MachineCodePrimitive_AddWords ( CfrTil * cfrTil )
         }
         else if ( ( String_Equal ( p.ccp_Name, "callCurrentBlock" ) ) && ( String_Equal ( p.NameSpace, "System" ) ) )
         {
-            //functionArg = ( int64 ) BlockCallAddress ;
             callHook = & cfrTil->CallCurrentBlock ;
         }
+#if NEW_CALL_RETURN        
+        else if ( ( String_Equal ( p.ccp_Name, "callCfrTilWord" ) ) && ( String_Equal ( p.NameSpace, "System" ) ) )
+        {
+            callHook = & cfrTil->CallCfrTilWord ;
+        }
+        else if ( ( String_Equal ( p.ccp_Name, "sync_ReturnStackStackPointer_To_CFT_RSP" ) ) && ( String_Equal ( p.NameSpace, "System" ) ) )
+        {
+            callHook = & cfrTil->Sync_ReturnStackStackPointer_To_CFT_RSP ;
+        }
+        else if ( ( String_Equal ( p.ccp_Name, "sync_CFT_RSP_To_ReturnStackStackPointer" ) ) && ( String_Equal ( p.NameSpace, "System" ) ) )
+        {
+            callHook = & cfrTil->Sync_CFT_RSP_To_ReturnStackStackPointer ;
+        }
+#endif        
         else
         {
             functionArg = - 1 ;

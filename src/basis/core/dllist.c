@@ -519,7 +519,7 @@ TC_Tree_Map_2 ( TabCompletionInfo * tci, dllist * list, MapFunction mf, Word * i
 {
     Word * word, *nextWord, *oword, *oNextWord, *rword = 0 ;
 start:
-    if ( iword )
+    if ( iword ) //initial word
     {
         if ( mf ( ( Symbol* ) iword ) )
         {
@@ -560,20 +560,21 @@ checkOWord:
                 {
                     rword = oNextWord ? oNextWord : nextWord ;
                     goto doReturn ;
-                    //return rword ;//break ;
+                    //return rword ;
                 }
             }
         }
     }
     rword = word ;
 doReturn:
-    if ( iword )
+    if ( ! rword )
     {
-        if ( ( rword == iword ) ) rword = 0 ;
-    }
-    else
-    {
-        if ( ++ tci->WordWrapCount < 7 ) goto start ;
+        if ( ++ tci->WordWrapCount > 5 ) // 5 : there are five cases in the switch in _TabCompletion_Compare
+        {
+            tci->WordWrapCount = 0 ;
+        }
+        iword = tci->OriginalRunWord ;
+        goto start ;
     }
     return rword ;
 }

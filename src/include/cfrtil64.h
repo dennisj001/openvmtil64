@@ -50,7 +50,7 @@
 #include "macros.h"
 
 extern OpenVmTil * _Q_;
-extern int64 *_Dsp_ ;
+//extern uint64 *_Dsp_, *_RSP_ ;
 extern CPrimitive CPrimitives [];
 extern MachineCodePrimitive MachineCodePrimitives [];
 extern uint64 mmap_TotalMemAllocated, mmap_TotalMemFreed ;

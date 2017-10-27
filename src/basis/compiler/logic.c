@@ -206,7 +206,7 @@ Compile_CheckReConfigureLogicInBlock ( BlockInfo * bi, int8 overwriteFlag )
             if ( overwriteFlag )
             {
                 int64 n ;
-                _Compile_Return ( ) ;
+                Compile_Return ( ) ;
                 bi->bp_Last = Here ;
                 for ( n = bi->OverWriteSize - 1 ; n ; n -- ) _Compile_Noop ( ) ; // adjust so Disassemble doesn't get an "invalid" insn; we overwrite a 3 byte insn ( 0fb6c0 : movzx eax, al ) with RET NOP NOP
                 SetHere ( saveHere ) ;
@@ -245,7 +245,7 @@ _Compile_LogicalAnd ( Compiler * compiler )
     _Compiler_CompileAndRecord_PushAccum ( compiler ) ;
 }
 
-void 
+void
 Compile_LogicalAnd ( Compiler * compiler )
 {
     int64 optFlag = CheckOptimize ( compiler, 5 ) ;
@@ -268,11 +268,13 @@ Compile_LogicalAnd ( Compiler * compiler )
 void
 _Compile_LogicalNot ( Compiler * compiler )
 {
-     _Compile_TEST_Reg_To_Reg ( ACC, ACC ) ; // test insn logical and src op and dst op sets zf to result
+    //DBI_ON ;
+    _Compile_TEST_Reg_To_Reg ( ACC, ACC ) ; // test insn logical and src op and dst op sets zf to result
     _BlockInfo_Setup_BI_tttn ( compiler, ZERO_TTT, Z, 6 ) ; // if eax is zero zf will equal 1 which is not(R8) and if eax is not zero zf will equal 0 which is not(R8)
     Compile_JCC ( Z, ZERO_TTT, Here + 21 ) ; // if eax is zero return not(R8) == 1 else return 0
     _Compile_LogicResult ( ACC ) ;
     _Compiler_CompileAndRecord_PushAccum ( compiler ) ;
+    //DBI_OFF ;
 }
 
 void

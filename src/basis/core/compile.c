@@ -29,7 +29,7 @@ _CompileFromUptoRET ( byte * data )
 void
 _Compile_WordInline ( Word * word ) // , byte * dstAddress )
 {
-    _Block_Copy ( ( byte* ) word->Definition, word->S_CodeSize ) ;
+    _Block_Copy ( 0, ( byte* ) word->Definition, word->S_CodeSize ) ;
 }
 
 void

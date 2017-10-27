@@ -25,68 +25,6 @@ Context_Location ( )
     return _Context_Location ( _Context_ ) ;
 }
 
-#if 0    
-
-Context *
-_Context_New ( CfrTil * cfrTil )
-{
-    Context * cntx, *context0 = cfrTil->Context0 ;
-    int32 allocType = CONTEXT ;
-    NBA * nba = MemorySpace_NBA_New ( _Q_->MemorySpace0, ( byte* ) String_New ( "ContextSpace", STRING_MEM ), 5 * K , allocType ) ;
-    _Q_->MemorySpace0->ContextSpace = nba ;
-    _Context_ = cntx = ( Context* ) Mem_Allocate ( sizeof ( Context ), allocType ) ;
-    cntx->ContextNba = nba ;
-    if ( context0 && context0->System0 ) cntx->System0 = System_Copy ( context0->System0, allocType ) ; // nb : in this case System is copied -- DataStack is shared
-    else cntx->System0 = System_New ( allocType ) ;
-    cntx->ContextDataStack = cfrTil->DataStack ; // nb. using the same one and only DataStack
-    cntx->Interpreter0 = Interpreter_New ( allocType ) ;
-    cntx->Lexer0 = cntx->Interpreter0->Lexer0 ;
-    cntx->ReadLiner0 = cntx->Interpreter0->ReadLiner0 ;
-    cntx->Lexer0->OurInterpreter = cntx->Interpreter0 ;
-    cntx->Finder0 = cntx->Interpreter0->Finder0 ;
-    cntx->Compiler0 = cntx->Interpreter0->Compiler0 ;
-    return cntx ;
-}
-
-void
-_Context_Run_1 ( Context * cntx, ContextFunction_1 contextFunction, byte * arg )
-{
-    contextFunction ( cntx, arg ) ;
-}
-
-void
-_Context_Run_2 ( Context * cntx, ContextFunction_2 contextFunction, byte * arg, int64 arg2 )
-{
-    contextFunction ( cntx, arg, arg2 ) ;
-}
-
-void
-_Context_Run ( Context * cntx, ContextFunction contextFunction )
-{
-    contextFunction ( cntx ) ;
-}
-
-Context *
-CfrTil_Context_PushNew ( CfrTil * cfrTil )
-{
-    Context * cntx ;
-    _Stack_Push ( cfrTil->ContextStack, ( int64 ) cfrTil->Context0 ) ;
-    _Context_ = cntx = _Context_New ( cfrTil ) ;
-    cfrTil->Context0 = cntx ;
-    return cntx ;
-}
-
-void
-CfrTil_Context_PopDelete ( CfrTil * cfrTil )
-{
-    NBA * cnba = cfrTil->Context0->ContextNba ;
-    Context * cntx = ( Context* ) _Stack_Pop ( cfrTil->ContextStack ) ;
-    _Context_ = cfrTil->Context0 = cntx ;
-    _Q_->MemorySpace0->ContextSpace = cntx->ContextNba ;
-    NamedByteArray_Delete ( cnba ) ;
-}
-
-#else   
 #if 0
 Context *
 _Context_Allocate ( CfrTil * cfrTil )
@@ -190,7 +128,6 @@ CfrTil_Context_PopDelete ( CfrTil * cfrTil )
     NamedByteArray_Delete ( cnba ) ;
 }
 #endif
-#endif    
 
 void
 _CfrTil_Contex_NewRun_1 ( CfrTil * cfrTil, ContextFunction_1 contextFunction, byte *arg )

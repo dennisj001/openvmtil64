@@ -445,7 +445,7 @@ Strncmp ( byte * str0, byte * str1, int64 n )
 }
 
 int64
-StrniCmp ( byte * str0, byte * str1, int64 n )
+Strnicmp ( byte * str0, byte * str1, int64 n )
 {
     int64 i, result = 0 ;
     for ( i = 0 ; str0 [ i ] && str1 [ i ] && n && ( ! result ) ; i ++, n -- )

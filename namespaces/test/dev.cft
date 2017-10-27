@@ -38,7 +38,7 @@ c_syntaxOff dscOff
 : qexp dup 1 <= if{ }else{ dup -- qexp * }fi ; 7 qexp p
 : qexp2 dup 1 <= ?< >:< dup -- qexp2 * >? ; 7 qexp2 p
 
-: bexp ( n ) n @ 1 > if{ n @ dup -- bexp * }else{ 1 }fi ; 7 bexp p
+: bexp ( n ) n @ 1 > if{ n @ dup -- bexp * }else{ 1 }fi ; 7 d: bexp p
 : bexp2 ( n ) { n @ 1 > } { n @ dup -- bexp2 * } { 1 } ifElse ; 7 bexp2 p
 : bexp3 ( n ) { n @ 1 > } { n @ n @ -- bexp3 *  } { 1 } ifElse ;
 7 bexp3 p //sp

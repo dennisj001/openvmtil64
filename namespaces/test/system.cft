@@ -40,7 +40,7 @@ tprintf2 ("\nyes, Hello world! = 0x%08x : %s", 1234, "and more yet" )
 //'tprintf1 find wdiss
 
 #endif
-
+nl
 "xc" var 
 xc 'e' = 
 xc @ dup emit 'e' _assert //pause

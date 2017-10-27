@@ -18,6 +18,7 @@ optimizeOff inlineOff
 Root 
 : ' _tick ; immediate
 : find _find ; immediate
+//_dbgOn 'tick ' _tick find alias immediate
 'tick ' _tick find alias immediate
 'ndrop '_ndrop find alias immediate 
 
@@ -239,7 +240,7 @@ System
 : wdiss ( pword ) _wdiss ( 0 pword @ ) ; //debugWord      // don't add wdiss words to history list
 : wdissl ( pword ) logOn _wdiss ( 0 pword @ ) logOff ; //debugWord      // don't add wdiss words to history list
 "winfo" ' wdiss find alias
-// ' wdiss wdiss
+//' wdiss find d: _wdiss
 : sys mem namespaces words stack using in ; 
 'aw 'allWords find alias
 : stk stack ; //debugWord 
