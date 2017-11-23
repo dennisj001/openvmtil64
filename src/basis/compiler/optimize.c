@@ -97,11 +97,16 @@ PeepHole_Optimize ( )
     {
         byte * here = _Q_CodeByteArray->EndIndex ;
         byte sub_r14_0x8__add_r14_0x8 [ ] = { 0x49, 0x83, 0xee, 0x08, 0x49, 0x83, 0xc6, 0x08 } ;
+        byte add_r14_0x8__mov_r14_rax__mov_rax_r14__sub_r14_0x8 [ ] = { 0x49, 0x83, 0xc6, 0x08, 0x49, 0x89, 0x06, 0x49, 0x8b, 0x06, 0x49, 0x83, 0xee, 0x08 } ;
         //byte add_esi_04__mov_tos_eax_sub_esi_04 [ ] = { 0x83, 0xc6, 0x04, 0x89, 0x06, 0x83, 0xee, 0x04 } ;
         //byte mov_eax_tos_sub_esi_04_test_eax_eax [ ] = { 0x89, 0x06, 0x83, 0xee, 0x04, 0x85, 0xc0 } ;
         if ( ! memcmp ( sub_r14_0x8__add_r14_0x8, here - 8, 8 ) )
         {
             _ByteArray_UnAppendSpace ( _Q_CodeByteArray, 8 ) ;
+        }
+        else if ( ! memcmp ( add_r14_0x8__mov_r14_rax__mov_rax_r14__sub_r14_0x8, here - 14, 14 ) )
+        {
+            _ByteArray_UnAppendSpace ( _Q_CodeByteArray, 14 ) ;
         }
 #if 0   // this occurs one time at startup in _assertStkChk : change it where it is caused and eliminate testing every instruction !! 
         else if ( ! memcmp ( mov_eax_tos_sub_esi_04_test_eax_eax, here - 7, 7 ) )

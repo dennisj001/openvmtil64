@@ -207,7 +207,7 @@ void SwitchAccessFunction(void);
 void CfrTil_Switch(void);
 /* basis/compiler/blocks.c */
 void Byte_PtrCall(byte *bptr);
-void _Block_Eval(block block);
+void _Block_Eval(block blck);
 void _Block_Copy(BlockInfo *bi, byte *srcAddress, int64 bsize);
 void Block_Copy(BlockInfo *bi, byte *dst, byte *src, int64 qsize);
 int64 Block_CopyCompile_WithLogicFlag(byte *srcAddress, int64 bindex, int64 jccFlag, int64 negFlag);

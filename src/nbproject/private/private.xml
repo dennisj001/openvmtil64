@@ -7,37 +7,47 @@
         <activeConfTypeElem>0</activeConfTypeElem>
         <activeConfIndexElem>0</activeConfIndexElem>
     </data>
-    <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="12">
+    <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="16">
         <file>
             <url>basis/compiler/machineCode.c</url>
+            <bookmark id="14">
+                <name/>
+                <line>66</line>
+                <key/>
+            </bookmark>
             <bookmark id="7">
                 <name/>
-                <line>253</line>
+                <line>256</line>
                 <key/>
             </bookmark>
             <bookmark id="10">
                 <name/>
-                <line>566</line>
+                <line>568</line>
                 <key/>
             </bookmark>
             <bookmark id="8">
                 <name/>
-                <line>622</line>
+                <line>624</line>
                 <key/>
             </bookmark>
             <bookmark id="9">
                 <name/>
-                <line>691</line>
+                <line>693</line>
                 <key/>
             </bookmark>
             <bookmark id="11">
                 <name/>
-                <line>875</line>
+                <line>876</line>
+                <key/>
+            </bookmark>
+            <bookmark id="15">
+                <name/>
+                <line>888</line>
                 <key/>
             </bookmark>
             <bookmark id="12">
                 <name/>
-                <line>1026</line>
+                <line>888</line>
                 <key/>
             </bookmark>
         </file>
@@ -55,14 +65,6 @@
             </bookmark>
         </file>
         <file>
-            <url>basis/core/lexer.c</url>
-            <bookmark id="3">
-                <name/>
-                <line>469</line>
-                <key/>
-            </bookmark>
-        </file>
-        <file>
             <url>basis/compiler/optimize.c</url>
             <bookmark id="4">
                 <name/>
@@ -70,15 +72,35 @@
                 <key/>
             </bookmark>
         </file>
+        <file>
+            <url>basis/core/lexer.c</url>
+            <bookmark id="3">
+                <name/>
+                <line>468</line>
+                <key/>
+            </bookmark>
+        </file>
+        <file>
+            <url>basis/compiler/stack.c</url>
+            <bookmark id="16">
+                <name/>
+                <line>74</line>
+                <key/>
+            </bookmark>
+        </file>
+        <file>
+            <url>basis/core/dataStack.c</url>
+            <bookmark id="13">
+                <name/>
+                <line>118</line>
+                <key/>
+            </bookmark>
+        </file>
     </editor-bookmarks>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/home/dennisj/openvmtil64/.init.cft</file>
-            <file>file:/home/dennisj/openvmtil64/src/include/machineCode.h</file>
-            <file>file:/home/dennisj/openvmtil64/src/basis/_debug.c</file>
-            <file>file:/home/dennisj/openvmtil64/src/basis/compiler/blocks.c</file>
-            <file>file:/home/dennisj/openvmtil64/src/basis/compiler/machineCode.c</file>
             <file>file:/home/dennisj/openvmtil64/src/basis/openVmTil.c</file>
+            <file>file:/home/dennisj/openvmtil64/src/basis/compiler/optimize.c</file>
         </group>
     </open-files>
 </project-private>
