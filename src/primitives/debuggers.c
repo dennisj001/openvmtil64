@@ -4,7 +4,7 @@ void
 CfrTil_Debug_AtAddress ( )
 {
     byte * address ;
-    address = ( byte* ) _DataStack_Pop ( ) ;
+    address = ( byte* ) DataStack_Pop ( ) ;
     _CfrTil_Debug_AtAddress ( address ) ;
 }
 
@@ -68,7 +68,7 @@ CfrTil_DebugRuntimeBreakpoint ( )
 #if 1  // this is only accurate if we called into a leaf function with <dbg> from C
             if ( ( ! word ) || GetState ( word, STEPPED ) )
             {
-                _CfrTil_->SaveDsp = Dsp ;
+                _CfrTil_->SaveDsp = _Dsp_ ;
                 siglongjmp ( _Context_->JmpBuf0, 1 ) ; //in Word_Run
             }
 #endif            

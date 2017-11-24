@@ -3,23 +3,8 @@
 void
 CfrTil_Dsp ( )
 {
-    _DataStack_Push ( ( int64 ) Dsp ) ;
+    DataStack_Push ( ( int64 ) _Dsp_ ) ;
 }
-
-#if 0 //use macros
-
-void
-Drop ( )
-{
-    Dsp -- ;
-}
-
-void
-DropN ( int64 n )
-{
-    Dsp -= n ;
-}
-#endif
 
 void
 CfrTil_Drop ( )
@@ -33,8 +18,7 @@ CfrTil_Drop ( )
     }
     else
     {
-
-        DSP_Drop ( ) ;
+        DataStack_Drop ( ) ;
     }
 }
 
@@ -42,7 +26,7 @@ void
 CfrTil_DropN ( )
 {
     if ( CompileMode ) _Compile_Stack_DropN ( DSP, _DataStack_Top ( ) + 1 ) ;
-    else _DataStack_DropN ( TOS + 1 ) ;
+    else DataStack_DropN ( TOS + 1 ) ;
 }
 
 void
@@ -54,7 +38,7 @@ _CfrTil_Push ( int64 value )
     }
     else
     {
-        _DataStack_Push ( value ) ;
+        DataStack_Push ( value ) ;
     }
 }
 
@@ -68,7 +52,7 @@ CfrTil_Dup ( )
     else
     {
 
-        _DataStack_Dup ( ) ;
+        DataStack_Dup ( ) ;
     }
 }
 #if 0
@@ -85,7 +69,7 @@ CfrTil_Ndrop ( )
     else
     {
         uint64 n = _DataStack_Top ( ) ;
-        _DataStack_DropN ( n + 1 ) ;
+        DataStack_DropN ( n + 1 ) ;
     }
 }
 #endif
@@ -95,12 +79,13 @@ void
 CfrTil_NDup ( )
 {
     int64 n = TOS ;
-    int64 value = * -- Dsp ; // -1 : n now occupies 1 to be also used slot
+    int64 value = * -- _Dsp_ ; // -1 : n now occupies 1 to be also used slot
     while ( n -- )
     {
 
-        * ++ Dsp = value ;
+        * ++ _Dsp_ = value ;
     }
+    _CfrTil_->Set_DspReg_FromDataStackPointer ( ) ; // update DSP reg
 }
 
 // pick is from stack below top index
@@ -119,7 +104,7 @@ CfrTil_Pick ( ) // pick
     {
         //* Dsp = ( * ( Dsp - * ( Dsp ) - 1 ) ) ;
         //int64 top = Dsp [0] ;
-        Dsp [0] = Dsp [ - ( Dsp [0] + 1 ) ] ;
+        _Dsp_ [0] = _Dsp_ [ - ( _Dsp_ [0] + 1 ) ] ;
     }
 }
 
@@ -133,17 +118,17 @@ CfrTil_Swap ( )
     else
     {
         int64 a = TOS ;
-        TOS = Dsp [ - 1 ] ;
-        Dsp [ - 1 ] = a ;
+        TOS = _Dsp_ [ - 1 ] ;
+        _Dsp_ [ - 1 ] = a ;
     }
 }
 
 void
-CfrTil_PrintNReturnStack ( )
+CfrTil_PrintNRspRegStack ( )
 {
     // Intel SoftwareDevelopersManual-253665.pdf section 6.2 : a push decrements ESP, a pop increments ESP
     // therefore TOS is in lower mem addresses, bottom of stack is in higher memory addresses
-    int64 size = _DataStack_Pop ( ) ;
+    int64 size = DataStack_Pop ( ) ;
     _CfrTil_PrintNReturnStack ( size ) ;
     CfrTil_NewLine () ;
 }
@@ -153,12 +138,12 @@ CfrTil_PrintNDataStack ( )
 {
     // Intel SoftwareDevelopersManual-253665.pdf section 6.2 : a push decrements ESP, a pop increments ESP
     // therefore TOS is in lower mem addresses, bottom of stack is in higher memory addresses
-    int64 size = _DataStack_Pop ( ) ;
+    int64 size = DataStack_Pop ( ) ;
     _CfrTil_PrintNDataStack ( size ) ;
 }
 
 void
-CfrTil_PrintReturnStack ( )
+CfrTil_PrintRspRegStack ( )
 {
     // Intel SoftwareDevelopersManual-253665.pdf section 6.2 : a push decrements ESP, a pop increments ESP
     // therefore TOS is in lower mem addresses, bottom of stack is in higher memory addresses

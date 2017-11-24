@@ -304,19 +304,20 @@ _CfrTil_Do_IncDec ( int64 op )
             if ( ( sd > 1 ) && one->CAttribute & ( PARAMETER_VARIABLE | LOCAL_VARIABLE | NAMESPACE_VARIABLE ) )
             {
                 *( ( int64* ) ( TOS ) ) += 1 ;
-                DSP_Drop ( ) ;
+                DataStack_Drop ( ) ;
             }
-            else Dsp [0] ++ ;
+            else _Dsp_ [0] ++ ;
         }
         else
         {
             if ( ( sd > 1 ) && one->CAttribute & ( PARAMETER_VARIABLE | LOCAL_VARIABLE | NAMESPACE_VARIABLE ) )
             {
                 *( ( int64* ) ( TOS ) ) -= 1 ;
-                DSP_Drop ( ) ;
+                DataStack_Drop ( ) ;
             }
-            else Dsp [0] -- ;
+            else _Dsp_ [0] -- ;
         }
+        //_CfrTil_->set_DspReg_FromDataStackPointer ( ) ; // update DSP reg
     }
 }
 

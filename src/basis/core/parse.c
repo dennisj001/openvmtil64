@@ -103,7 +103,7 @@ gotNextToken:
             if ( token && String_Equal ( ( char* ) token, "[" ) )
             {
                 CfrTil_InterpretNextToken ( ) ; // next token must be an integer for the array dimension size
-                arrayDimensionSize = _DataStack_Pop ( ) ;
+                arrayDimensionSize = DataStack_Pop ( ) ;
                 size = size * arrayDimensionSize ;
                 offset += size ;
                 sizeOf += size ;

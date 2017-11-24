@@ -10,7 +10,7 @@ Fflush ( )
 void
 CfrTil_Kbhit ( void )
 {
-    _DataStack_Push ( ( int64 ) kbhit ( ) ) ;
+    DataStack_Push ( ( int64 ) kbhit ( ) ) ;
 }
 
 void
@@ -22,7 +22,7 @@ _CfrTil_PrintString ( byte * string ) //  '."'
 void
 CfrTil_PrintString ( )
 {
-    _CfrTil_PrintString ( ( byte* ) _DataStack_Pop ( ) ) ;
+    _CfrTil_PrintString ( ( byte* ) DataStack_Pop ( ) ) ;
 }
 
 void
@@ -129,7 +129,7 @@ PrintfInt ( int64 n )
 void
 CfrTil_PrintInt ( )
 {
-    PrintfInt ( _DataStack_Pop ( ) ) ;
+    PrintfInt ( DataStack_Pop ( ) ) ;
 }
 
 void
@@ -137,14 +137,14 @@ CfrTil_HexPrintInt ( )
 {
     int64 svb = _Context_->System0->NumberBase ;
     _Context_->System0->NumberBase = 16 ;
-    PrintfInt ( _DataStack_Pop ( ) ) ;
+    PrintfInt ( DataStack_Pop ( ) ) ;
     _Context_->System0->NumberBase = svb ;
 }
 
 void
 CfrTil_Emit ( )
 {
-    int64 c = _DataStack_Pop ( ) ;
+    int64 c = DataStack_Pop ( ) ;
     if ( ( c >= 0 ) && ( c < 256 ) ) _Printf ( ( byte* ) "%c", c ) ;
     else Emit ( c ) ; //_Printf ( ( byte* ) "%c", ( ( CString ) c )[0] ) ;
 }
@@ -154,9 +154,9 @@ CfrTil_Key ( )
 {
 #if 0    
     ReadLine_Key ( _Context_->ReadLiner0 ) ;
-    _DataStack_Push ( _Context_->ReadLiner0->InputKeyedCharacter ) ;
+    DataStack_Push ( _Context_->ReadLiner0->InputKeyedCharacter ) ;
 #else
-    _DataStack_Push ( Key ( ) ) ;
+    DataStack_Push ( Key ( ) ) ;
 
 #endif    
 }
@@ -172,7 +172,7 @@ CfrTil_LogOn ( )
 void
 CfrTil_LogAppend ( )
 {
-    byte * logFilename = ( byte* ) _DataStack_Pop ( ) ;
+    byte * logFilename = ( byte* ) DataStack_Pop ( ) ;
     _CfrTil_->LogFILE = fopen ( ( char* ) logFilename, "a" ) ;
     CfrTil_LogOn ( ) ;
 }
@@ -180,7 +180,7 @@ CfrTil_LogAppend ( )
 void
 CfrTil_LogWrite ( )
 {
-    byte * logFilename = ( byte* ) _DataStack_Pop ( ) ;
+    byte * logFilename = ( byte* ) DataStack_Pop ( ) ;
     _CfrTil_->LogFILE = fopen ( ( char* ) logFilename, "w" ) ;
     CfrTil_LogOn ( ) ;
 }

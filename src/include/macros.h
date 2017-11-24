@@ -12,21 +12,22 @@
 #define _Compile_Int64( value ) ByteArray_AppendCopyItem ( _Q_CodeByteArray, 8, value )
 #define _Compile_Cell( value ) ByteArray_AppendCopyItem ( _Q_CodeByteArray, sizeof(int64), value )
 #define Here ( _ByteArray_Here ( _Q_CodeByteArray ) )
-#define SetHere( address )  _ByteArray_SetHere_AndForDebug ( _Q_CodeByteArray, address ) 
+#define SetHere( address )  _ByteArray_SetHere ( _Q_CodeByteArray, address ) 
 #define Set_CompilerSpace( byteArray ) (_Q_CodeByteArray = (byteArray))
 #define Get_CompilerSpace( ) _Q_CodeByteArray
 
-#define TOS Dsp[0]
-#define _TOS_ ( Dsp ? Dsp [ 0 ] : CfrTil_Exception ( STACK_ERROR, QUIT ), (uint64)-1 )
-#define DSP_Drop() _DataStack_Drop ( ) //(Dsp --)
-#define DSP_DropN( n ) (Dsp -= (int64) n )
-#define DSP_Push( v ) _DataStack_Push ( (int64) v ) //(*++Dsp = (int64) v )
-#define DSP_Pop() _DataStack_Pop () // ( Dsp -- [ 0 ] ) 
-#define DSP_Dup() _DataStack_Dup ()
+#define TOS _Dsp_[0]
+#define _TOS_ ( _Dsp_ ? _Dsp_ [ 0 ] : CfrTil_Exception ( STACK_ERROR, QUIT ), (uint64)-1 )
+//#define _DataStack_Drop() _DataStack_Drop ( ) //(Dsp --)
+//#define _DataStack_DropN( n ) _DataStack_DropN ( n ) //(_Dsp_ -= (int64) n )
+//#define _DataStack_Push( v ) _DataStack_Push ( (int64) v ) //(*++Dsp = (int64) v )
+//#define _DataStack_Pop() _DataStack_Pop () // ( Dsp -- [ 0 ] ) 
+//#define _DataStack_Dup() _DataStack_Dup ()
 #define DSP_Top( ) TOS 
 #define _DataStack_Top( ) TOS 
 #define _DataStack_GetTop( ) TOS
-#define _DataStack_SetTop( v ) { if ( Dsp ) { Dsp [ 0 ] = v ; } else { CfrTil_Exception ( STACK_ERROR, QUIT ) ; } }
+#define _DataStack_SetTop( v ) _Dsp_ [ 0 ] = v ;
+#define DataStack_SetTop( v ) { if ( _Dsp_ ) { _DataStack_SetTop( v ) } else { CfrTil_Exception ( STACK_ERROR, QUIT ) ; } }
 #define _GetTop( ) TOS
 #define _SetTop( v ) (TOS = v)
 #define Stack() CfrTil_PrintDataStack ( )
@@ -139,10 +140,13 @@
 #define _Finder_ _Context_->Finder0
 #define _DataStack_ _CfrTil_->DataStack
 #define _DataStackPointer_ _DataStack_->StackPointer
-#define _SP_ _DataStackPointer_ 
+#define _DSP_ _DataStackPointer_ 
+//#define _Dsp_ _Q_->OVT_CfrTil->DataStack->StackPointer 
+#define _ReturnStack_ _CfrTil_->ReturnStack
 #define _ReturnStack_ _CfrTil_->ReturnStack
 #define _ReturnStackPointer_ _ReturnStack_->StackPointer
 #define _RSP_ _ReturnStackPointer_ 
+//#define _Rsp_ _Q_->OVT_CfrTil->ReturnStack->StackPointer
 #define _AtCommandLine() ( ! _Context_->System0->IncludeFileStackNumber ) 
 #define AtCommandLine( rl ) \
         ( GetState ( _Debugger_, DBG_COMMAND_LINE ) || GetState ( _Context_, AT_COMMAND_LINE ) ||\
@@ -180,7 +184,7 @@
 #define Pause_2( msg, arg ) AlertColors; _Printf ( (byte*)msg, arg ) ; OpenVmTil_Pause () ;
 
 #define Error_Abort( msg ) Throw ( (byte*) msg, ABORT )
-#define Error( msg, state ) { AlertColors; _Printf ( (byte*)"\n\n%s\n\n", (byte*) msg, state ) ; if ((state) & PAUSE ) Pause () ; if ((state) >= QUIT ) Throw ( (byte*) msg, state ) ; }
+#define Error( msg, state ) { AlertColors; _Printf ( (byte*)"\n\n%s : at %s\n\n", (byte*) msg, state, Context_Location () ) ; if ((state) & PAUSE ) Pause () ; if ((state) >= QUIT ) Throw ( (byte*) msg, state ) ; }
 #define Error_1( msg, arg, state ) AlertColors; _Printf ( (byte*)"\n%s : %d\n\n", (byte*) msg, arg ) ; if (state & PAUSE ) Pause () ; if (state >= QUIT ) Throw ( (byte*) msg, state ) ; 
 #define Warning2( msg, str ) _Printf ( (byte*)"\n%s : %s", (byte*) msg, str ) ; 
 #define ErrorWithContinuation( msg, continuation ) Throw ( (byte*) msg, continuation )
@@ -292,7 +296,7 @@
 #define Set_SCA( index ) Word_Set_SCA (Compiler_WordList ( index )) ;
 //#define SC_Push( word ) DebugWordList_PushWord ( word ) 
 //#define Word_Set_SCA( word ) //DebugWordList_PushWord ( word ) 
-#define SC_SetForcePush( tf ) SetState ( _CfrTil_, SC_FORCE_PUSH, tf ) 
+//#define SC_SetForcePush( tf ) SetState ( _CfrTil_, SC_FORCE_PUSH, tf ) 
 #define _SC_Global_On SetState ( _CfrTil_, GLOBAL_SOURCE_CODE_MODE, true )
 #define SC_Global_On if ( GetState ( _CfrTil_, DEBUG_SOURCE_CODE_MODE ) ) { _SC_Global_On ; }
 #define SC_Global_Off SetState ( _CfrTil_, GLOBAL_SOURCE_CODE_MODE, false )

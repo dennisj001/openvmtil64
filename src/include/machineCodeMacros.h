@@ -81,7 +81,7 @@
 #define Compile_PUSH( mod, rm, sib, disp ) _Compile_Group5 ( PUSH, mod, rm, sib, disp, 0 )
 #define Compile_POP( mod, rm, sib, disp ) _Compile_Group5 ( POP, mod, rm, sib, disp, 0 )
 
-#define _Compile_TestImm_0xffffffff( mod, reg, rm, sib, disp ) _Compile_Test ( mod, reg, rm, disp, 0xffffffff )
+#define _Compile_TestImm_0xffffffff( mod, reg, rm, sib, disp ) _Compile_Test ( mod, reg, rm, IMM_B, disp, 0xffffffff )
 #if 0
 #define _Compile_TestImm_0xffffffff_R8( ) _CompileTest ( REG, 0, R8, 0, 0xffffffff )
 #define _Compile_TestImm_0_R8( ) _CompileTest ( REG, 0, R8, 0, 0 )

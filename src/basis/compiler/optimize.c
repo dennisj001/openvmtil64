@@ -273,14 +273,14 @@ _CheckOptimizeOperands ( Compiler * compiler, int64 maxOperands )
                         SetHere ( optInfo->O_two->Coding ) ;
                         // a little tricky here ...
                         // ?? maybe we should setup and use a special compiler stack and use it here ... ??
-                        DSP_Push ( ( int64 ) * optInfo->O_two->W_PtrToValue ) ;
-                        DSP_Push ( ( int64 ) * optInfo->O_one->W_PtrToValue ) ;
+                        DataStack_Push ( ( int64 ) * optInfo->O_two->W_PtrToValue ) ;
+                        DataStack_Push ( ( int64 ) * optInfo->O_one->W_PtrToValue ) ;
                         SetState ( compiler, COMPILE_MODE, false ) ;
                         SetState ( _CfrTil_, OPTIMIZE_ON, false ) ; //prevent recursion here
                         _Word_Run ( optInfo->O_zero ) ;
                         SetState ( compiler, COMPILE_MODE, true ) ;
                         SetState ( _CfrTil_, OPTIMIZE_ON, true ) ; //prevent recursion here
-                        value = _DataStack_Pop ( ) ;
+                        value = DataStack_Pop ( ) ;
                         Set_SCA ( 0 ) ;
                         _Compile_MoveImm_To_Reg ( ACC, value, CELL ) ;
                         _Word_CompileAndRecord_PushReg ( optInfo->O_zero, ACC ) ;
@@ -468,13 +468,13 @@ _CheckOptimizeOperands ( Compiler * compiler, int64 maxOperands )
                         // a little tricky here ...
                         // ?? maybe we should setup and use a special compiler stack and use it here ... ??
                         //_DataStack_Push ( (int64) optInfo->O_two->Object ) ;
-                        DSP_Push ( ( int64 ) * optInfo->O_one->W_PtrToValue ) ;
+                        DataStack_Push ( ( int64 ) * optInfo->O_one->W_PtrToValue ) ;
                         SetState ( compiler, COMPILE_MODE, false ) ;
                         SetState ( _CfrTil_, OPTIMIZE_ON, false ) ; //prevent recursion here
                         _Word_Run ( optInfo->O_zero ) ;
                         SetState ( compiler, COMPILE_MODE, true ) ;
                         SetState ( _CfrTil_, OPTIMIZE_ON, true ) ; //prevent recursion here
-                        value = _DataStack_Pop ( ) ;
+                        value = DataStack_Pop ( ) ;
                         Set_SCA ( 0 ) ;
                         _Compile_MoveImm_To_Reg ( ACC, value, CELL ) ;
                         _Word_CompileAndRecord_PushReg ( optInfo->O_zero, ACC ) ;

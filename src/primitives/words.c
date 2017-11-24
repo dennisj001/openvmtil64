@@ -15,8 +15,8 @@ CfrTil_Colon ( )
 Word *
 _CfrTil_SemiColon ( )
 {
-    block b = ( block ) _DataStack_Pop ( ) ;
-    Word * word = ( Word* ) _DataStack_Pop ( ) ;
+    block b = ( block ) DataStack_Pop ( ) ;
+    Word * word = ( Word* ) DataStack_Pop ( ) ;
     _Word_InitFinal ( word, ( byte* ) b ) ;
     return word ;
 }
@@ -39,28 +39,28 @@ CfrTil_SourceCodeCompileOff ( )
 void
 AddressToWord ( )
 {
-    _DataStack_Push ( ( int64 ) Finder_FindWordFromAddress_AnyNamespace ( _Context_->Finder0, ( byte* ) _DataStack_Pop ( ) ) ) ;
+    DataStack_Push ( ( int64 ) Finder_FindWordFromAddress_AnyNamespace ( _Context_->Finder0, ( byte* ) DataStack_Pop ( ) ) ) ;
 }
 
 void
 Word_Definition ( )
 {
-    Word * word = ( Word* ) _DataStack_Pop ( ) ;
-    _DataStack_Push ( ( int64 ) word->Definition ) ;
+    Word * word = ( Word* ) DataStack_Pop ( ) ;
+    DataStack_Push ( ( int64 ) word->Definition ) ;
 }
 
 void
 Word_Value ( )
 {
-    Word * word = ( Word* ) _DataStack_Pop ( ) ;
-    _DataStack_Push ( ( int64 ) word->W_Value ) ;
+    Word * word = ( Word* ) DataStack_Pop ( ) ;
+    DataStack_Push ( ( int64 ) word->W_Value ) ;
 }
 
 void
 Word_Xt_LValue ( )
 {
-    Word * word = ( Word* ) _DataStack_Pop ( ) ;
-    _DataStack_Push ( ( int64 ) & word->Definition ) ;
+    Word * word = ( Word* ) DataStack_Pop ( ) ;
+    DataStack_Push ( ( int64 ) & word->Definition ) ;
 }
 
 #if  0
@@ -68,7 +68,7 @@ Word_Xt_LValue ( )
 void
 Word_DefinitionStore ( )
 {
-    Word * word = ( Word * ) _DataStack_Pop ( ) ;
+    Word * word = ( Word * ) DataStack_Pop ( ) ;
     block b = ( block ) TOS ; // leave word on tos for anticipated further processing
     _Word_DefinitionStore ( word, b ) ;
 }
@@ -77,7 +77,7 @@ Word_DefinitionStore ( )
 void
 Word_DefinitionEqual ( )
 {
-    block b = ( block ) _DataStack_Pop ( ) ;
+    block b = ( block ) DataStack_Pop ( ) ;
     Word * word = ( Word* ) TOS ; // leave word on tos for anticipated further processing
     _Word_DefinitionStore ( word, b ) ;
 }
@@ -85,35 +85,35 @@ Word_DefinitionEqual ( )
 void
 CfrTil_Word_Run ( )
 {
-    Word * word = ( Word* ) _DataStack_Pop ( ) ;
+    Word * word = ( Word* ) DataStack_Pop ( ) ;
     Word_Run ( word ) ;
 }
 
 void
 Word_CodeStart ( )
 {
-    Word * word = ( Word* ) _DataStack_Pop ( ) ;
-    _DataStack_Push ( ( int64 ) word->CodeStart ) ;
+    Word * word = ( Word* ) DataStack_Pop ( ) ;
+    DataStack_Push ( ( int64 ) word->CodeStart ) ;
 }
 
 void
 Word_CodeSize ( )
 {
-    Word * word = ( Word* ) _DataStack_Pop ( ) ;
-    _DataStack_Push ( ( int64 ) word->S_CodeSize ) ;
+    Word * word = ( Word* ) DataStack_Pop ( ) ;
+    DataStack_Push ( ( int64 ) word->S_CodeSize ) ;
 }
 
 void
 CfrTil_Word_Eval ( )
 {
-    Word * word = ( Word* ) _DataStack_Pop ( ) ;
+    Word * word = ( Word* ) DataStack_Pop ( ) ;
     Word_Eval ( word ) ;
 }
 
 void
 Word_Finish ( )
 {
-    Word * word = ( Word* ) _DataStack_Pop ( ) ;
+    Word * word = ( Word* ) DataStack_Pop ( ) ;
     _Word_Finish ( word ) ;
 }
 
@@ -130,7 +130,7 @@ _Word_Begin ( )
 void
 Word_Add ( )
 {
-    Word * word = ( Word* ) _DataStack_Pop ( ) ;
+    Word * word = ( Word* ) DataStack_Pop ( ) ;
     _Word_Add ( word, 1, 0 ) ;
 }
 
@@ -139,11 +139,12 @@ Word_Add ( )
 void
 CfrTil_Word_Create ( )
 {
-    byte * name = ( byte* ) _DataStack_Pop ( ) ;
+    byte * name = ( byte* ) DataStack_Pop ( ) ;
     Word * word = Word_New ( name ) ;
+    //_Compiler_->CurrentCreatedWord = word ;
     //word->Coding = Here ;
     //_CfrTil_WordList_PushWord ( word ) ;
-    _DataStack_Push ( ( int64 ) word ) ;
+    DataStack_Push ( ( int64 ) word ) ;
 }
 
 // ( token block -- word )
@@ -152,16 +153,16 @@ CfrTil_Word_Create ( )
 void
 CfrTil_Word ( )
 {
-    block b = ( block ) _DataStack_Pop ( ) ;
-    byte * name = ( byte* ) _DataStack_Pop ( ) ;
+    block b = ( block ) DataStack_Pop ( ) ;
+    byte * name = ( byte* ) DataStack_Pop ( ) ;
     _DataObject_New (CFRTIL_WORD, 0, name, 0, 0, 0, 0, ( int64 ) b, 0 ) ;
 }
 
 void
 CfrTil_Alias ( )
 {
-    Word * word = ( Word* ) _DataStack_Pop ( ) ;
-    byte * name = ( byte* ) _DataStack_Pop ( ) ;
+    Word * word = ( Word* ) DataStack_Pop ( ) ;
+    byte * name = ( byte* ) DataStack_Pop ( ) ;
     _CfrTil_Alias ( word, name ) ;
 }
 #if 0
@@ -169,7 +170,7 @@ CfrTil_Alias ( )
 void
 CfrTil_Eval_C_Rtl_ArgList ( ) // C : x86 : ABI = 32 : protocol : right to left arguments from a list pushed on the stack
 {
-    LC_CompileRun_C_ArgList ( ( Word * ) _DataStack_Pop ( ) ) ;
+    LC_CompileRun_C_ArgList ( ( Word * ) DataStack_Pop ( ) ) ;
 }
 #endif
 
@@ -188,22 +189,22 @@ CfrTil_StringMacro ( )
 void
 Word_Name ( )
 {
-    Word * word = ( Word* ) _DataStack_Pop ( ) ;
-    _DataStack_Push ( ( int64 ) word->Name ) ;
+    Word * word = ( Word* ) DataStack_Pop ( ) ;
+    DataStack_Push ( ( int64 ) word->Name ) ;
 }
 
 void
 Word_Location ( )
 {
-    Word * word = ( Word* ) _DataStack_Pop ( ) ;
+    Word * word = ( Word* ) DataStack_Pop ( ) ;
     _Word_Location_Printf ( word ) ;
 }
 
 void
 Word_Namespace ( )
 {
-    Word * word = ( Word* ) _DataStack_Pop ( ) ;
-    _DataStack_Push ( ( int64 ) _Word_Namespace ( word ) ) ;
+    Word * word = ( Word* ) DataStack_Pop ( ) ;
+    DataStack_Push ( ( int64 ) _Word_Namespace ( word ) ) ;
 }
 
 void
@@ -231,8 +232,8 @@ CfrTil_IsImmediate ( void )
     Word * word = ( Word* ) TOS ;
     TOS = ( word->CAttribute & IMMEDIATE ) ;
 #else
-    Word * word = ( Word* ) _DataStack_Pop ( ) ;
-    _DataStack_Push ( word->CAttribute & IMMEDIATE ) ;
+    Word * word = ( Word* ) DataStack_Pop ( ) ;
+    DataStack_Push ( word->CAttribute & IMMEDIATE ) ;
 #endif    
 }
 
@@ -396,7 +397,7 @@ void
 _CfrTil_NamespaceWords ( )
 {
     int64 n = 0 ;
-    Namespace * ns = ( Namespace * ) _DataStack_Pop ( ) ;
+    Namespace * ns = ( Namespace * ) DataStack_Pop ( ) ;
     if ( ns )
     {
         _DoWords ( ( Symbol * ) ns, &n ) ;
@@ -408,9 +409,9 @@ _CfrTil_NamespaceWords ( )
 void
 CfrTil_NamespaceWords ( )
 {
-    byte * name = ( byte * ) _DataStack_Pop ( ) ;
+    byte * name = ( byte * ) DataStack_Pop ( ) ;
     Namespace * ns = _Namespace_Find ( name, 0, 0 ) ;
-    _DataStack_Push ( ( int64 ) ns ) ;
+    DataStack_Push ( ( int64 ) ns ) ;
     _CfrTil_NamespaceWords ( ) ;
 }
 

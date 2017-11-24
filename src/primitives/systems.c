@@ -35,16 +35,16 @@ TestAnd ( )
 void
 CfrTil_ObjectNew ( ) //int64 size, byte * name, uint64 category, int64 allocType )
 {
-    int64 allocType = _DataStack_Pop ( ) ;
-    int64 category = _DataStack_Pop ( ) ;
-    byte * name = (byte*) _DataStack_Pop ( ) ;
-    int64 size = _DataStack_Pop ( ) ;
+    int64 allocType = DataStack_Pop ( ) ;
+    int64 category = DataStack_Pop ( ) ;
+    byte * name = (byte*) DataStack_Pop ( ) ;
+    int64 size = DataStack_Pop ( ) ;
     
     byte * obj = _CfrTil_NamelessObjectNew ( size, allocType ) ; //OBJECT_MEMORY ) ;
     Word * word = _DObject_New (name, ( int64 ) obj, ( OBJECT | IMMEDIATE | category ), 0, 0, OBJECT, ( byte* ) _DataObject_Run, 0, 0, 0, DICTIONARY ) ;
     word->Size = size ;
     //return word ;
-    _DataStack_Push ( (uint64) word ) ;
+    DataStack_Push ( (uint64) word ) ;
 }
 #endif
 
@@ -57,7 +57,7 @@ CfrTil_InitTime ( )
 void
 CfrTil_TimerInit ( )
 {
-    int64 timer = _DataStack_Pop ( ) ;
+    int64 timer = DataStack_Pop ( ) ;
     if ( timer < 8 )
     {
         _System_TimerInit ( _Context_->System0, timer ) ;
@@ -149,7 +149,7 @@ posix_spawn (pid_t *__restrict __pid,
 void
 ShellEscape_Postfix ( )
 {
-    byte * str = ( byte* ) _DataStack_Pop ( ) ;
+    byte * str = ( byte* ) DataStack_Pop ( ) ;
     _ShellEscape ( ( char* ) str ) ;
     NewLine ( _Context_->Lexer0 ) ;
     SetState ( _Context_->Lexer0, LEXER_DONE, true ) ;
@@ -215,7 +215,7 @@ CfrTil_Filename ( )
 {
     byte * filename = _Context_->ReadLiner0->Filename ;
     if ( ! filename ) filename = ( byte* ) "command line" ;
-    _DataStack_Push ( ( int64 ) filename ) ;
+    DataStack_Push ( ( int64 ) filename ) ;
 }
 
 void
@@ -227,13 +227,13 @@ CfrTil_Location ( )
 void
 CfrTil_LineNumber ( )
 {
-    _DataStack_Push ( ( int64 ) _Context_->ReadLiner0->LineNumber ) ;
+    DataStack_Push ( ( int64 ) _Context_->ReadLiner0->LineNumber ) ;
 }
 
 void
 CfrTil_LineCharacterNumber ( )
 {
-    _DataStack_Push ( ( int64 ) _Context_->ReadLiner0->ReadIndex ) ;
+    DataStack_Push ( ( int64 ) _Context_->ReadLiner0->ReadIndex ) ;
 }
 
 void
@@ -332,7 +332,7 @@ CfrTil_Dump ( )
 void
 CfrTil_Source_AddToHistory ( )
 {
-    Word *word = ( Word* ) _DataStack_Pop ( ) ;
+    Word *word = ( Word* ) DataStack_Pop ( ) ;
     if ( word )
     {
         _CfrTil_Source ( word, 1 ) ;
@@ -343,7 +343,7 @@ CfrTil_Source_AddToHistory ( )
 void
 CfrTil_Source_DontAddToHistory ( )
 {
-    Word *word = ( Word* ) _DataStack_Pop ( ) ;
+    Word *word = ( Word* ) DataStack_Pop ( ) ;
     if ( word )
     {
         _CfrTil_Source ( word, 0 ) ;
@@ -354,7 +354,7 @@ CfrTil_Source_DontAddToHistory ( )
 void
 CfrTil_AllocateNew ( )
 {
-    _DataStack_Push ( ( int64 ) Mem_Allocate ( _DataStack_Pop ( ), OBJECT_MEMORY ) ) ;
+    DataStack_Push ( ( int64 ) Mem_Allocate ( DataStack_Pop ( ), OBJECT_MEMORY ) ) ;
 }
 
 void
@@ -423,7 +423,7 @@ CfrTil_ReturnFromFile ( )
 void
 CfrTil_ShellEscape ( )
 {
-    _ShellEscape ( ( char* ) _DataStack_Pop ( ) ) ;
+    _ShellEscape ( ( char* ) DataStack_Pop ( ) ) ;
     NewLine ( _Context_->Lexer0 ) ;
 }
 

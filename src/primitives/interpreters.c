@@ -3,7 +3,7 @@
 void
 CfrTil_DoWord ( )
 {
-    Word * word = ( Word* ) _DataStack_Pop ( ) ;
+    Word * word = ( Word* ) DataStack_Pop ( ) ;
     _Interpreter_DoWord ( _Context_->Interpreter0, word, - 1 ) ;
 }
 
@@ -88,7 +88,7 @@ CfrTil_Define ( )
 void
 CfrTil_Interpreter_IsDone ( )
 {
-    _DataStack_Push ( GetState ( _Context_->Interpreter0, END_OF_FILE | END_OF_STRING | INTERPRETER_DONE ) ) ;
+    DataStack_Push ( GetState ( _Context_->Interpreter0, END_OF_FILE | END_OF_STRING | INTERPRETER_DONE ) ) ;
 }
 
 void
@@ -119,27 +119,28 @@ void
 CfrTil_InterpretPromptedLine ( )
 {
     CfrTil_DoPrompt ( ) ;
-    Context_Interpret ( _CfrTil_->Context0 ) ;
+    //Context_Interpret ( _CfrTil_->Context0 ) ;
+    _Interpret_ToEndOfLine ( _Interpreter_ ) ;
 }
 
 void
 CfrTil_InterpretString ( )
 {
-    _Interpret_String ( ( byte* ) _DataStack_Pop ( ) ) ;
+    _Interpret_String ( ( byte* ) DataStack_Pop ( ) ) ;
 }
 
 void
 CfrTil_Interpreter_EvalWord ( )
 {
 
-    _Interpreter_DoWord ( _Context_->Interpreter0, ( Word* ) _DataStack_Pop ( ), - 1 ) ;
+    _Interpreter_DoWord ( _Context_->Interpreter0, ( Word* ) DataStack_Pop ( ), - 1 ) ;
 }
 
 void
 CfrTil_TokenToWord ( )
 {
-    byte * token = ( byte* ) _DataStack_Pop ( ) ;
-    _DataStack_Push ( ( int64 ) _Interpreter_TokenToWord ( _Context_->Interpreter0, token ) ) ;
+    byte * token = ( byte* ) DataStack_Pop ( ) ;
+    DataStack_Push ( ( int64 ) _Interpreter_TokenToWord ( _Context_->Interpreter0, token ) ) ;
 }
 
 void
@@ -176,13 +177,13 @@ CfrTil_Interpret_ReadToList ( )
 {
 
     dllist * interpList = _CfrTil_Interpret_ReadToList ( ) ;
-    _DataStack_Push ( ( int64 ) interpList ) ;
+    DataStack_Push ( ( int64 ) interpList ) ;
 }
 
 void
 CfrTil_Interpret_List ( )
 {
-    dllist * interpList = ( dllist* ) _DataStack_Pop ( ) ;
+    dllist * interpList = ( dllist* ) DataStack_Pop ( ) ;
     List_Interpret ( interpList ) ;
 }
 
@@ -192,7 +193,7 @@ CfrTil_Interpret_List ( )
 void
 CfrTil_Interpret_Python ( )
 {
-    byte * pstring = ( byte* ) _DataStack_Pop ( ) ;
+    byte * pstring = ( byte* ) DataStack_Pop ( ) ;
     wchar_t *program = Py_DecodeLocale ( "python3.7", NULL ) ;
     Py_SetProgramName ( program ) ; /* optional but recommended */
     Py_Initialize ( ) ;

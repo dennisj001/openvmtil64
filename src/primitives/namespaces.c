@@ -106,7 +106,7 @@ Namespace_PrettyPrint ( Namespace* ns, int64 indentFlag, int64 indentLevel )
 void
 CfrTil_Namespace_New ( )
 {
-    Namespace * ns = Namespace_FindOrNew_SetUsing ( ( byte* ) _DataStack_Pop ( ), _CfrTil_Namespace_InNamespaceGet ( ), 1 ) ;
+    Namespace * ns = Namespace_FindOrNew_SetUsing ( ( byte* ) DataStack_Pop ( ), _CfrTil_Namespace_InNamespaceGet ( ), 1 ) ;
     _Namespace_DoNamespace ( ns, 1 ) ;
 
 }
@@ -125,14 +125,14 @@ _CfrTil_Namespace_NotUsing ( byte * name )
 void
 CfrTil_Namespace_NotUsing ( )
 {
-    byte * name = ( byte* ) _DataStack_Pop ( ) ;
+    byte * name = ( byte* ) DataStack_Pop ( ) ;
     _CfrTil_Namespace_NotUsing ( name ) ;
 }
 
 void
 CfrTil_Namespace_UsingFirst ( )
 {
-    Namespace * ns = Namespace_Find ( ( byte* ) _DataStack_Pop ( ) ) ;
+    Namespace * ns = Namespace_Find ( ( byte* ) DataStack_Pop ( ) ) ;
     if ( ns )
     {
         _Namespace_AddToUsingList ( ns ) ;
@@ -142,7 +142,7 @@ CfrTil_Namespace_UsingFirst ( )
 void
 CfrTil_Namespace_UsingLast ( )
 {
-    _Namespace_UsingLast ( ( byte* ) _DataStack_Pop ( ) ) ;
+    _Namespace_UsingLast ( ( byte* ) DataStack_Pop ( ) ) ;
 }
 
 // "in"

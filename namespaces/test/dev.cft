@@ -38,7 +38,7 @@ c_syntaxOff dscOff
 : qexp dup 1 <= if{ }else{ dup -- qexp * }fi ; 7 qexp p
 : qexp2 dup 1 <= ?< >:< dup -- qexp2 * >? ; 7 qexp2 p
 
-: bexp ( n ) n @ 1 > if{ n @ dup -- bexp * }else{ 1 }fi ; 7 d: bexp p
+: bexp ( n ) n @ 1 > if{ n @ dup -- bexp * }else{ 1 }fi ; 7 bexp p
 : bexp2 ( n ) { n @ 1 > } { n @ dup -- bexp2 * } { 1 } ifElse ; 7 bexp2 p
 : bexp3 ( n ) { n @ 1 > } { n @ n @ -- bexp3 *  } { 1 } ifElse ;
 7 bexp3 p //sp
@@ -68,14 +68,14 @@ wdiss ( ' fac5 find ) ;
 fac5 ( 7 ) p //sp
 
 int
-faccs ( REG n | REG rec -- RAX ) 
+faccs ( REG n | REG rec ) //-- RAX ) 
 {
     rec = 1 ; 
     while ( n > 1 )
     { 
         rec = rec * n ;  n-- ; 
     } 
-    return rec ;
+    d: return rec ;
 }
 ' faccs find wdiss
 faccs ( 7 ) p //sp
@@ -224,7 +224,8 @@ fibPTC? ( n )
     }
     return fn ;
 }
-20 fibPTC? dup p 6765 _assert //sp
+' fibPTC? find wdiss
+d: fibPTC? (20) dup p 6765 _assert //sp
 int
 //fibPTC2? ( REG n | REG fn, REG fn1, REG fn2 )
 fibPTC2? ( n | fn, fn1, fn2 )
@@ -239,7 +240,7 @@ fibPTC2? ( n | fn, fn1, fn2 )
     return fn ;
 }
 ' fibPTC2? find wdiss
-20 fibPTC2? dup p 6765 _assert //sp 
+fibPTC2? (20) dup p 6765 _assert //sp 
 c_syntaxOff
 
 : _fibn1 ( n -- TOS ) { n @ 2 < } { n @ } { n -- n @ _fibn1 n -- n @  _fibn1 + } ifElse ;

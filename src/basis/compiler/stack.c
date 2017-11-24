@@ -39,6 +39,42 @@ _Compile_Stack_Push ( int8 stackReg, int64 obj ) // runtime
     _Compile_SetStackN_WithObject ( stackReg, 0, obj ) ;
 }
 
+// push a stack at an rvalue using an lvalue
+void
+_Compile_StackPtrLValue_PushObj ( uint64 stkPtrLvalue, int8 tempStkReg, int64 obj ) // c lvalue
+{
+#if 0    
+    Compile_ADDI ( REG, tempStkReg, 0, sizeof (int64 ), 0 ) ;
+    _Compile_MoveReg_ToAddress_ThruReg ( tempStkReg, ( byte* ) stkPtrLvalue, OREG ) ;
+    _Compile_SetStackN_WithObject ( tempStkReg, 0, obj ) ;
+#else
+    //_Compile_GetRValue_FromLValue_ToReg ( reg, ( byte* ) address ) ;
+    _Compile_MoveImm_To_Reg ( OREG, ( int64 ) stkPtrLvalue, CELL_SIZE ) ; // OREG is lvalue
+    _Compile_Move_Rm_To_Reg ( tempStkReg, OREG, 0 ) ; // tempStkReg is rvalue
+    //_Compile_MoveImm_To_Reg ( tempStkReg, ( int64 ) address, CELL_SIZE ) ;
+    Compile_ADDI ( REG, tempStkReg, 0, sizeof (int64 ), 0 ) ;
+    _Compile_SetStackN_WithObject ( tempStkReg, 0, obj ) ;
+    //_Compile_MoveReg_ToAddress_ThruReg ( reg, ( byte* ) lvalue, OREG ) ;
+    //_Compile_MoveImm_To_Reg ( OREG, ( int64 ) lvalue, CELL_SIZE ) ;
+    _Compile_Move_Reg_To_Rm ( OREG, tempStkReg, 0 ) ; //OREG remained as lvalue set as before 
+#endif    
+}
+
+// pop a stack at an rvalue using an lvalue
+void
+_Compile_StackPtrLValue_PopToReg ( uint64 stkPtrLvalue, int8 tempStkReg, int8 reg ) // c lvalue
+{
+    //_Compile_GetRValue_FromLValue_ToReg ( stackReg, ( byte* ) ptr ) ;
+    _Compile_MoveImm_To_Reg ( OREG, ( int64 ) stkPtrLvalue, CELL_SIZE ) ; // OREG is lvalue
+    _Compile_Move_Rm_To_Reg ( tempStkReg, OREG, 0 ) ; // OREG is rvalue stack ptr
+    //_Compile_MoveImm_To_Reg ( stackReg, ( int64 ) ptr, CELL_SIZE ) ;
+    _Compile_Move_StackN_To_Reg ( reg, tempStkReg, 0 ) ; // pop our rvalue stack ptr
+    Compile_SUBI ( REG, tempStkReg, 0, sizeof (int64 ), 0 ) ;
+    //_Compile_MoveReg_ToAddress_ThruReg ( reg, ( byte* ) lvalue, OREG ) ;
+    //_Compile_MoveImm_To_Reg ( thruReg, ( int64 ) lvalue, CELL_SIZE ) ;
+    _Compile_Move_Reg_To_Rm ( OREG, tempStkReg, 0 ) ; // move the new rvalue back to its lvalue - OREG
+}
+
 void
 _Compile_Move_StackN_To_Reg ( int8 reg, int8 stackReg, int64 index )
 {
@@ -84,7 +120,7 @@ _Compile_Stack_PopToReg ( int8 stackReg, int8 reg )
 }
 
 void
-Compile_Stack_PushR8 ( int8 stackReg )
+Compile_Stack_PushACCUM ( int8 stackReg )
 {
     _Compile_Stack_PushReg ( stackReg, ACC ) ;
 }
@@ -186,11 +222,11 @@ _Compile_Stack_Swap ( int8 stackReg )
 void
 Compile_DataStack_PushR8 ( )
 {
-    Compile_Stack_PushR8 ( DSP ) ;
+    Compile_Stack_PushACCUM ( DSP ) ;
 }
 
 void
-_Compile_Rsp_Push ( int64 value )
+_Compile_RspReg_Push ( int64 value )
 {
     _Compile_MoveImm_To_Reg ( ACC, value, CELL ) ;
     _Compile_PushReg ( ACC ) ;
@@ -204,3 +240,158 @@ Compile_DspPop_RspPush ( )
     _Compile_PushReg ( ACC ) ;
 }
 
+#define DEBUG_RETURN 0
+#if DEBUG_RETURN
+
+void
+DebugReturn ( )
+{
+    if ( Stack_Depth ( _CfrTil_->ReturnStack ) > 1 )
+    {
+        CfrTil_PrintReturnStack ( ) ;
+        _Printf ( ( byte* ) "\nDebugReturn : at %s", Context_Location ( ) ) ;
+        Pause ( ) ;
+    }
+}
+#endif
+void
+Compile_Set_DspReg_FromDataStackPointer ( )
+{
+    //DBI_ON ;
+    //_Compile_MoveImm ( REG, DSP, IMM_B | REX_B | MODRM_B | DISP_B, 0, 0, ( uint64 ) & _Dsp_, CELL ) ;
+    //_Compile_Move_Rm_To_Reg ( DSP, DSP, 0 ) ;
+    _Compile_GetRValue_FromLValue_ToReg ( DSP, ( byte* ) & _CfrTil_->DataStack->StackPointer ) ;
+    //DBI_OFF ;
+}
+
+void
+Compile_Set_DataStackPointer_FromDspReg ( )
+{
+    //DBI_ON ;
+    //_Compile_MoveImm ( REG, OREG, IMM_B | REX_B | MODRM_B | DISP_B, 0, 0, ( uint64 ) & _Dsp_, CELL ) ;
+    //_Compile_Move_Reg_To_Rm ( OREG, DSP, 0 ) ;
+    _Compile_MoveReg_ToAddress_ThruReg ( DSP, ( byte* ) & _CfrTil_->DataStack->StackPointer, OREG ) ;
+    //DBI_OFF ;
+}
+#if 0
+
+// push onto the C esp based stack with the 'push' instruction
+
+void
+Compile_Set_CfrTilRspReg_FromReturnStackPointer ( )
+{
+    //DBI_ON ;
+    //_Compile_MoveImm ( REG, CFT_RSP, IMM_B | REX_B | MODRM_B | DISP_B, 0, 0, ( uint64 ) & _Rsp_, CELL ) ;
+    //_Compile_Move_Rm_To_Reg ( CFT_RSP, CFT_RSP, 0 ) ;
+    _Compile_GetRValue_FromLValue_ToReg ( CFT_RSP, ( byte* ) & _Rsp_ ) ;
+    //DBI_OFF ;
+}
+
+void
+Compile_Set_ReturnStackPointer_FromCfrTilRspReg ( )
+{
+    //DBI_ON ;
+    //_Compile_MoveImm ( REG, OREG, IMM_B | REX_B | MODRM_B | DISP_B, 0, 0, ( uint64 ) & _Rsp_, CELL ) ;
+    //_Compile_Move_Reg_To_Rm ( OREG, CFT_RSP, 0 ) ;
+    _Compile_MoveReg_ToAddress_ThruReg ( CFT_RSP, ( byte* ) & _Rsp_, OREG ) ;
+    //DBI_OFF ;
+}
+
+void
+Compile_CfrTilWord_Return ( )
+{
+    //DBI_ON ;
+    if ( _DBI )
+    {
+        Word * word = _Compiler_->CurrentWordCompiling ; //= Word_GetFromCodeAddress ( address ) ;
+        _Printf ( ( byte* ) "\nCompile_CfrTilWord_Return : word = %s : at %s", word ? word->Name : ( byte* ) "", Context_Location ( ) ) ;
+    }
+    //Compile_Set_CfrTilRspReg_FromReturnStackPointer ( ) ;
+    //_Compile_Stack_PopToReg ( CFT_RSP, ACC ) ;
+    _Compile_StackPtrLValue_PopToReg ( (uint64)&_Rsp_, CFT_RSP, ACC ) ;
+#if DEBUG_RETURN
+    _Compile_Stack_PushReg ( DSP, ACC ) ;
+    _Compile_Call_ThruReg ( ( byte* ) DebugReturn, OREG ) ;
+    _Compile_Stack_PopToReg ( DSP, ACC ) ;
+#endif
+    //Compile_Set_ReturnStackPointer_FromCfrTilRspReg ( ) ;
+    _Compile_Group5 ( JMP, REG, ACC, 0, 0, 0 ) ;
+    //DBI_OFF ;
+}
+
+void
+_Compile_Call_CfrTilWord ( byte* address )
+{
+#if 0    
+    DBI_ON ;
+    if ( _DBI )
+    {
+        Word * word = Word_GetFromCodeAddress ( address ) ;
+        _Printf ( ( byte* ) "\n_Compile_Call_CfrTilWord : word = %s : at %s", word ? word->Name : ( byte* ) "", Context_Location ( ) ) ;
+    }
+#endif    
+    //Compile_Set_CfrTilRspReg_FromReturnStackPointer ( ) ;
+    //byte * here = Here ; int64 increment ;
+//#define INCREMENTb 35 // adjust this when changing below code ... 
+    //_Compile_Stack_Push ( CFT_RSP, ( uint64 ) Here + 22 ) ;
+    _Compile_StackPtrLValue_PushObj (  ( uint64 ) &_Rsp_, CFT_RSP, ( uint64 ) Here + 38 ) ;
+    //Compile_Set_ReturnStackPointer_FromCfrTilRspReg ( ) ;
+    _Compile_JumpToAddress ( address ) ;
+    //increment = Here - here ; // 20
+    //DBI_OFF ;
+}
+
+void
+Compile_Call_CfrTilWord ( )
+{
+#if 0    
+    DBI_ON ;
+    if ( _DBI )
+    {
+        Word * word = _Context_->CurrentlyRunningWord ;
+        _Printf ( ( byte* ) "\nCompile_Call_CfrTilWord : word = %s : at %s", word ? word->Name : ( byte* ) "", Context_Location ( ) ) ;
+    }
+#endif    
+    //Compile_Set_DspReg_FromDataStackPointer () ;
+    //Compile_Set_CfrTilRspReg_FromReturnStackPointer ( ) ;
+    _Compile_Stack_PopToReg ( DSP, ACC ) ; // TOS is word->Definition 
+    //Compile_Set_DataStackPointer_FromDspReg ( ) ;
+    //byte * here = Here ; int64 increment ;
+    //_Compile_Stack_Push ( CFT_RSP, ( uint64 ) Here + INCREMENTa ) ; // inc
+    _Compile_StackPtrLValue_PushObj (  ( uint64 ) &_Rsp_, CFT_RSP, ( uint64 ) Here + 36 ) ;
+    _Compile_Group5 ( JMP, REG, ACC, 0, 0, 0 ) ;
+    //increment = Here - here ; // 20
+    //Compile_Set_ReturnStackPointer_FromCfrTilRspReg ( ) ;
+    //increment = Here - here ; // 33
+    //Compile_Set_DspReg_FromDataStackPointer ( ) ;
+    //increment = Here - here ; // 46
+    //DBI_OFF ;
+}
+#endif
+
+void
+_Compile_TEST_Reg_To_Reg ( int8 dstReg, int64 srcReg )
+{
+    _Compile_Op_Special_Reg_To_Reg ( TEST_R_TO_R, dstReg, srcReg ) ;
+}
+
+void
+_Compile_Return ( )
+{
+    _Compile_Int8 ( 0xc3 ) ;
+    //RET ( ) ; // use codegen_x86.h just to include it in
+}
+
+#if 0
+void
+Compile_Return ( )
+{
+    if ( ( ! _Compiler_->CurrentWordCompiling ) || ( ! ( _Compiler_->CurrentWordCompiling->CAttribute & CFRTIL_WORD ) ) )
+        _Compile_Return ( ) ;
+    else Compile_CfrTilWord_Return ( ) ;
+    //RET ( ) ; // use codegen_x86.h just to include it in
+    // pop rstack to R8
+    //_Compile_JumpToReg ( R8 ) ;
+}
+
+#endif

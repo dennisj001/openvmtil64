@@ -1,12 +1,14 @@
 
 #include "../include/cfrtil64.h"
-#define VERSION ((byte*) "0.824.427" ) // *.200 series is x86 ; the *.300 series is x64 : *300.600 series is with new x64 compiler
+#define VERSION ((byte*) "0.824.800" ) // 0.823.200 series is x86 ; the 0.823.300 series is x64 : 0.823.300.600+ series is with new x64 compiler
+// 824.800 is with improves from 824.
 
-OpenVmTil * _Q_ ; // the only globally used variable except for two extern structures in primitives.c and a couple int64 in memSpace.c and 
-static struct termios SavedTerminalAttributes ;
+OpenVmTil * _Q_ ; 
+//uint64 * _Dsp_, *_Rsp_ ; // internal stack pointers
+uint64 *_Rsp_ ; // internal stack pointers
 
-int64
-main ( int64 argc, char * argv [ ] )
+int
+main ( int argc, char * argv [ ] )
 {
     openvmtil ( argc, argv ) ;
 }
@@ -14,7 +16,7 @@ main ( int64 argc, char * argv [ ] )
 void
 openvmtil ( int64 argc, char * argv [ ] )
 {
-    LinuxInit ( &SavedTerminalAttributes ) ;
+    LinuxInit () ;
     _OpenVmTil ( _Q_ = 0, argc, argv ) ;
 }
 
@@ -24,7 +26,7 @@ _OpenVmTil ( OpenVmTil * ovt, int64 argc, char * argv [ ] )
     int64 restartCondition = INITIAL_START ;
     while ( 1 )
     {
-        OpenVmTil * ovt = _Q_ = _OpenVmTil_New ( _Q_, argc, argv, & SavedTerminalAttributes ) ;
+        ovt = _Q_ = _OpenVmTil_New ( _Q_, argc, argv ) ;
         ovt->RestartCondition = restartCondition ;
         if ( ! sigsetjmp ( ovt->JmpBuf0, 0 ) )
         {
@@ -226,7 +228,7 @@ OVT_GetStartupOptions ( OpenVmTil * ovt )
 }
 
 OpenVmTil *
-_OpenVmTil_New ( OpenVmTil * ovt, int64 argc, char * argv [ ], struct termios * savedTerminalAttributes )
+_OpenVmTil_New ( OpenVmTil * ovt, int64 argc, char * argv [ ] )
 {
     char errorFilename [256] ;
     int64 fullRestart, restartCondition, startIncludeTries, exceptionsHandled ;
@@ -259,7 +261,7 @@ _OpenVmTil_New ( OpenVmTil * ovt, int64 argc, char * argv [ ], struct termios * 
     ovt->RestartCondition = FULL_RESTART ;
     ovt->Argc = argc ;
     ovt->Argv = argv ;
-    ovt->SavedTerminalAttributes = savedTerminalAttributes ;
+    //ovt->SavedTerminalAttributes = savedTerminalAttributes ;
 
     OVT_GetStartupOptions ( ovt ) ;
     int64 MIN_TotalMemSizeTarget = ( 300 * K ) ;

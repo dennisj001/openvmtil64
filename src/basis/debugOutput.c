@@ -179,7 +179,7 @@ Debugger_ShowStackChange ( Debugger * debugger, Word * word, byte * insert, byte
     name = word ? ( char* ) c_gd ( String_ConvertToBackSlash ( word->Name ) ) : "" ;
 start:
 
-    if ( GetState ( debugger, DBG_STEPPING ) ) sprintf ( ( char* ) b, "\nStack : %s at %s :> %s <: %s", insert, location, ( char* ) c_gd ( word->Name ), ( char* ) achange ) ;
+    if ( GetState ( debugger, DBG_STEPPING ) ) sprintf ( ( char* ) b, "\nStack : %s at %s :> %s <: %s", insert, location, ( char* ) c_gd ( name ), ( char* ) achange ) ;
     else sprintf ( ( char* ) b, "\nStack : %s at %s :> %s <: %s", insert, ( char* ) location, name, ( char* ) achange ) ;
     if ( ( sl = strlen ( ( char* ) b ) ) > 220 ) //we added alot of formatting chars //(tw = Debugger_TerminalLineWidth ( debugger ) ) )
     {
@@ -200,7 +200,7 @@ void
 _Debugger_ShowEffects ( Debugger * debugger, Word * word, int8 stepFlag, int8 force )
 {
     debugger->w_Word = word ;
-    uint64* dsp = Dsp ;
+    uint64* dsp = _Dsp_ ;
     if ( ! dsp ) CfrTil_Exception ( STACK_ERROR, QUIT ) ;
     if ( Is_DebugOn && ( force || stepFlag || ( debugger->w_Word != debugger->LastEffectsWord ) ) )
     {
@@ -218,8 +218,8 @@ _Debugger_ShowEffects ( Debugger * debugger, Word * word, int8 stepFlag, int8 fo
             _Debugger_DisassembleWrittenCode ( debugger ) ;
             const char * insert ;
             int64 change, depthChange ;
-            if ( Debugger_IsStepping ( debugger ) ) change = Dsp - debugger->SaveDsp ;
-            else change = Dsp - debugger->WordDsp ;
+            if ( Debugger_IsStepping ( debugger ) ) change = _Dsp_ - debugger->SaveDsp ;
+            else change = _Dsp_ - debugger->WordDsp ;
             depthChange = DataStack_Depth ( ) - debugger->SaveStackDepth ;
             if ( ( debugger->WordDsp && ( GetState ( debugger, DBG_STACK_CHANGE ) ) || ( change ) || ( debugger->SaveTOS != TOS ) || ( depthChange ) ) )
             {
@@ -231,10 +231,10 @@ _Debugger_ShowEffects ( Debugger * debugger, Word * word, int8 stepFlag, int8 fo
                 if ( GetState ( debugger, DBG_STACK_CHANGE ) ) SetState ( debugger, DBG_STACK_CHANGE, false ) ;
                 if ( depthChange > 0 ) sprintf ( ( char* ) pb_change, "%ld %s%s", depthChange, ( depthChange > 1 ) ? "cells" : "cell", " pushed onto to the stack. " ) ;
                 else if ( depthChange ) sprintf ( ( char* ) pb_change, "%ld %s%s", - depthChange, ( depthChange < - 1 ) ? "cells" : "cell", " popped off the stack. " ) ;
-                if ( Dsp && ( debugger->SaveTOS != TOS ) ) op = "changed" ;
+                if ( _Dsp_ && ( debugger->SaveTOS != TOS ) ) op = "changed" ;
                 else op = "set" ;
                 sprintf ( ( char* ) c, ( char* ) "0x%016lx", ( uint64 ) TOS ) ;
-                sprintf ( ( char* ) b, ( char* ) "TOS at : <0x%016lx> : %s to %s.", ( uint64 ) Dsp, op, c_gd ( c ) ) ;
+                sprintf ( ( char* ) b, ( char* ) "TOS at : <0x%016lx> : %s to %s.", ( uint64 ) _Dsp_, op, c_gd ( c ) ) ;
                 strcat ( ( char* ) pb_change, ( char* ) b ) ; // strcat ( (char*) _change, cc ( ( char* ) c, &_Q_->Default ) ) ;
                 name = word->Name ;
                 if ( name ) name = String_ConvertToBackSlash ( name ) ;
@@ -265,13 +265,13 @@ _Debugger_ShowEffects ( Debugger * debugger, Word * word, int8 stepFlag, int8 fo
                 }
                 if ( GetState ( _Context_->Lexer0, KNOWN_OBJECT ) )
                 {
-                    if ( Dsp > debugger->SaveDsp )
+                    if ( _Dsp_ > debugger->SaveDsp )
                     {
                         _Printf ( ( byte* ) "\nLiteral :> 0x%016lx <: was pushed onto the stack ...", TOS ) ;
                     }
-                    else if ( Dsp < debugger->SaveDsp )
+                    else if ( _Dsp_ < debugger->SaveDsp )
                     {
-                        _Printf ( ( byte* ) "\n%s popped %d value off the stack.", insert, ( debugger->SaveDsp - Dsp ) ) ;
+                        _Printf ( ( byte* ) "\n%s popped %d value off the stack.", insert, ( debugger->SaveDsp - _Dsp_ ) ) ;
                     }
                 }
                 if ( ( change > 1 ) || ( change < - 1 ) || ( _Q_->Verbosity > 1 ) )
@@ -293,7 +293,7 @@ _Debugger_ShowEffects ( Debugger * debugger, Word * word, int8 stepFlag, int8 fo
             debugger->LastEffectsWord = word ;
             debugger->LastShowWord = debugger->w_Word ;
             //uint64 * dsp1 = Dsp ;
-            CfrTil_SetStackPointerFromDsp ( _CfrTil_ ) ;
+            Set_DataStackPointer_FromDspReg () ;
         }
     }
     debugger->ShowLine = 0 ;
@@ -385,7 +385,7 @@ _CfrTil_ShowInfo ( Debugger * debugger, byte * prompt, int64 signal, int64 force
         else location = ( byte* ) "<command line>" ;
         if ( ( location == debugger->Filename ) && ( GetState ( debugger, DBG_FILENAME_LOCATION_SHOWN ) ) ) location = ( byte * ) "..." ;
         SetState ( debugger, DBG_FILENAME_LOCATION_SHOWN, true ) ;
-        Word * word = debugger->w_Word ;
+        Word * word = debugger->w_Word ? debugger->w_Word : _Context_->CurrentlyRunningWord ;
         byte * token0 = word ? word->Name : debugger->Token, *token1 ;
         if ( ( signal == 11 ) || _Q_->SigAddress )
         {
@@ -458,11 +458,11 @@ next:
 void
 Debugger_ShowInfo ( Debugger * debugger, byte * prompt, int64 signal )
 {
-    if ( ( ! debugger->w_Word ) || debugger->w_Word != debugger->LastShowWord || debugger->w_Word->WAttribute == WT_C_PREFIX_RTL_ARGS )
+    if ( ( ! debugger->w_Word ) || ( _ReadLiner_->ReadIndex != debugger->ReadIndex ) || debugger->w_Word->WAttribute == WT_C_PREFIX_RTL_ARGS )
     {
         Context * cntx = _Context_ ;
         int64 sif = 0 ;
-        if ( ( GetState ( debugger, DBG_INFO ) ) && GetState ( debugger, DBG_STEPPING ) )
+        if ( ( GetState ( debugger, DBG_INFO ) ) || GetState ( debugger, DBG_STEPPING ) )
         {
             _CfrTil_ShowInfo ( debugger, prompt, signal, 0 ) ;
             sif = 1 ;
@@ -630,7 +630,7 @@ _Debugger_DoState ( Debugger * debugger )
         if ( GetState ( debugger, DBG_INFO ) ) Debugger_ShowInfo ( debugger, GetState ( debugger, DBG_RUNTIME ) ? ( byte* ) "<dbg>" : ( byte* ) "dbg", 0 ) ;
         else if ( GetState ( debugger, DBG_PROMPT ) ) Debugger_ShowState ( debugger, GetState ( debugger, DBG_RUNTIME ) ? ( byte* ) "<dbg>" : ( byte* ) "dbg" ) ;
 
-        if ( GetState ( debugger, DBG_NEWLINE ) ) _Debugger_DoNewlinePrompt ( debugger ) ;
+        if ( GetState ( debugger, DBG_NEWLINE ) && (!GetState ( debugger, DBG_INFO ))) _Debugger_DoNewlinePrompt ( debugger ) ;
         //Debugger_InitDebugWordList ( debugger ) ;
     }
 }

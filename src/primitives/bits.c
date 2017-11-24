@@ -3,7 +3,7 @@
 // ( n ttt -- )
 
 void
-CfrTil_JMP ( ) 
+CfrTil_JMP ( )
 {
     if ( CompileMode )
     {
@@ -20,8 +20,8 @@ CfrTil_JMP ( )
 void
 CfrTil_Compile_Jcc ( )
 {
-    int64 ttt = _DataStack_Pop ( ) ;
-    int64 n = _DataStack_Pop ( ) ;
+    int64 ttt = DataStack_Pop ( ) ;
+    int64 n = DataStack_Pop ( ) ;
     Compile_JCC ( n, ttt, 0 ) ; // we do need to store and get this logic set by various conditions by the compiler : _Compile_SET_tttn_REG
     Stack_PointerToJmpOffset_Set ( ) ;
 }
@@ -29,21 +29,21 @@ CfrTil_Compile_Jcc ( )
 void
 CfrTil_Jcc_Label ( )
 {
-    int64 ttt = _DataStack_Pop ( ) ;
-    int64 n = _DataStack_Pop ( ) ;
-    Compile_JCC ( n, ttt, 0 ) ; 
+    int64 ttt = DataStack_Pop ( ) ;
+    int64 n = DataStack_Pop ( ) ;
+    Compile_JCC ( n, ttt, 0 ) ;
 #if 0    
     GotoInfo * gotoInfo = ( GotoInfo * ) _GotoInfo_Allocate ( ) ;
-    gotoInfo->pb_LabelName = (byte*) _DataStack_Pop () ;
+    gotoInfo->pb_LabelName = ( byte* ) DataStack_Pop ( ) ;
     gotoInfo->pb_JmpOffsetPointer = Here - INT32_SIZE ; // after the call opcode
     gotoInfo->GI_CAttribute = GI_CALL_LABEL ;
     dllist_AddNodeToTail ( _Context_->Compiler0->GotoList, ( dlnode* ) gotoInfo ) ;
 #endif    
-    GotoInfo_New ( (byte*) _DataStack_Pop () , GI_CALL_LABEL ) ;
+    GotoInfo_New ( ( byte* ) DataStack_Pop ( ), GI_CALL_LABEL ) ;
 }
 
 void
-CfrTil_JmpToHere ( ) 
+CfrTil_JmpToHere ( )
 {
     CfrTil_CalculateAndSetPreviousJmpOffset_ToHere ( ) ;
 }
@@ -84,8 +84,8 @@ CfrTil_BitWise_OR ( ) // xor
     }
     else
     {
-        Dsp [ - 1 ] = Dsp [ - 1 ] | TOS ;
-        Dsp -- ;
+        _Dsp_ [ - 1 ] = _Dsp_ [ - 1 ] | TOS ;
+        DataStack_Drop ( ) ;
     }
 }
 
@@ -99,10 +99,11 @@ CfrTil_BitWise_OrEqual ( ) // -=
     else
     {
         int64 *x, n ;
-        n = _DataStack_Pop ( ) ;
-        x = ( int64* ) _DataStack_Pop ( ) ;
+        n = DataStack_Pop ( ) ;
+        x = ( int64* ) DataStack_Pop ( ) ;
         *x = ( * x ) | n ;
         //_DataStack_SetTop ( Dsp, _DataStack_Pop () + _DataStack_GetTop ( Dsp ) ) ;
+        //_CfrTil_->set_DspReg_FromDataStackPointer ( ) ; // update DSP reg
     }
 }
 
@@ -115,8 +116,8 @@ CfrTil_BitWise_AND ( ) // xor
     }
     else
     {
-        Dsp [ - 1 ] = Dsp [ - 1 ] & TOS ;
-        Dsp -- ;
+        _Dsp_ [ - 1 ] = _Dsp_ [ - 1 ] & TOS ;
+        DataStack_Drop ( ) ;
     }
 }
 
@@ -130,8 +131,8 @@ CfrTil_BitWise_AndEqual ( ) // -=
     else
     {
         int64 *x, n ;
-        n = _DataStack_Pop ( ) ;
-        x = ( int64* ) _DataStack_Pop ( ) ;
+        n = DataStack_Pop ( ) ;
+        x = ( int64* ) DataStack_Pop ( ) ;
         *x = ( * x ) & n ;
         //_DataStack_SetTop ( Dsp, _DataStack_Pop () + _DataStack_GetTop ( Dsp ) ) ;
     }
@@ -146,8 +147,8 @@ CfrTil_BitWise_XOR ( ) // xor
     }
     else
     {
-        Dsp [ - 1 ] = Dsp [ - 1 ] ^ TOS ;
-        Dsp -- ;
+        _Dsp_ [ - 1 ] = _Dsp_ [ - 1 ] ^ TOS ;
+        DataStack_Drop ( ) ;
     }
 }
 
@@ -161,8 +162,8 @@ CfrTil_BitWise_XorEqual ( ) // -=
     else
     {
         int64 *x, n ;
-        n = _DataStack_Pop ( ) ;
-        x = ( int64* ) _DataStack_Pop ( ) ;
+        n = DataStack_Pop ( ) ;
+        x = ( int64* ) DataStack_Pop ( ) ;
         *x = ( * x ) ^ n ;
         //_DataStack_SetTop ( Dsp, _DataStack_Pop () + _DataStack_GetTop ( Dsp ) ) ;
     }
@@ -177,8 +178,8 @@ CfrTil_ShiftLeft ( ) // lshift
     }
     else
     {
-        Dsp [ - 1 ] = Dsp [ - 1 ] << TOS ;
-        Dsp -- ;
+        _Dsp_ [ - 1 ] = _Dsp_ [ - 1 ] << TOS ;
+        DataStack_Drop ( ) ;
     }
 }
 
@@ -191,23 +192,23 @@ CfrTil_ShiftRight ( ) // rshift
     }
     else
     {
-        Dsp [ - 1 ] = Dsp [ - 1 ] >> TOS ;
-        Dsp -- ;
+        _Dsp_ [ - 1 ] = _Dsp_ [ - 1 ] >> TOS ;
+        DataStack_Drop ( ) ;
     }
 }
 
 void
 CfrTil_ShiftLeft_Equal ( ) // +=
 {
-    if ( GetState( _Context_->Compiler0, BLOCK_MODE ) )
+    if ( GetState ( _Context_->Compiler0, BLOCK_MODE ) )
     {
         Compile_X_Shift ( _Context_->Compiler0, SHL, 0 ) ;
     }
     else
     {
         int64 *x, n ;
-        n = _DataStack_Pop ( ) ;
-        x = ( int64* ) _DataStack_Pop ( ) ;
+        n = DataStack_Pop ( ) ;
+        x = ( int64* ) DataStack_Pop ( ) ;
         *x = * x << n ;
         //_DataStack_SetTop ( Dsp, _DataStack_Pop () + _DataStack_GetTop ( Dsp ) ) ;
     }
@@ -216,15 +217,15 @@ CfrTil_ShiftLeft_Equal ( ) // +=
 void
 CfrTil_ShiftRight_Equal ( ) // +=
 {
-    if ( GetState( _Context_->Compiler0, BLOCK_MODE ) )
+    if ( GetState ( _Context_->Compiler0, BLOCK_MODE ) )
     {
         Compile_X_Shift ( _Context_->Compiler0, SHR, 0 ) ;
     }
     else
     {
         int64 *x, n ;
-        n = _DataStack_Pop ( ) ;
-        x = ( int64* ) _DataStack_Pop ( ) ;
+        n = DataStack_Pop ( ) ;
+        x = ( int64* ) DataStack_Pop ( ) ;
         *x = * x >> n ;
         //_DataStack_SetTop ( Dsp, _DataStack_Pop () + _DataStack_GetTop ( Dsp ) ) ;
     }

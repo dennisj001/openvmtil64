@@ -5,22 +5,28 @@ _Word_Run ( Word * word )
 {
     if ( word )
     {
-        word->W_InitialRuntimeDsp = Dsp ;
+        word->StackPushRegisterCode = 0 ; // nb. used! by the rewriting optInfo
+        // keep track in the word itself where the machine code is to go, if this word is compiled or causes compiling code - used for optimization
+        word->W_SC_WordIndex = _CfrTil_->SC_ScratchPadIndex ;
+        Word_SetCoding ( word, Here ) ;
+        word->W_InitialRuntimeDsp = _Dsp_ ;
         _Context_->CurrentlyRunningWord = word ;
-#if 0 //NEW_CALL_RETURN      
-        if ( ! ( word->CAttribute & CFRTIL_WORD ) ) _Block_Eval ( word->Definition ) ;
+        _Debugger_->PreHere = Here ;
+#if 0       
+        //if ( ! ( word->CAttribute & CFRTIL_WORD ) ) _Block_Eval ( word->Definition ) ;
+        if ( word->CAttribute & CPRIMITIVE ) _Block_Eval ( word->Definition ) ;
         else
         {
-            //_Rsp_ = _CfrTil_->ReturnStack->StackPointer ;
-            _DataStack_Push ( ( uint64 ) word->Definition ) ;
+            uint64 * rsp = _Rsp_ ;
+            DataStack_Push ( ( uint64 ) word->Definition ) ;
             _CfrTil_->CallCfrTilWord ( ) ;
-            //_CfrTil_->ReturnStack->StackPointer = _Rsp_ ;
-
-            
+            if ( _Rsp_ != rsp )
+                //if (( !String_Equal ( word->Name, ":") ) && ( !String_Equal ( word->Name, "'") ) && ( !String_Equal ( word->Name, "find") )&& ( !String_Equal ( word->Name, ";") ))
+                _Printf ( ( byte * ) "\nword = \'%s\' : _Rsp_ = %lx : at %s", word->Name, _Rsp_, Context_Location ( ) ) ;
         }
 #else
         _Block_Eval ( word->Definition ) ;
-#endif        
+#endif    
     }
 }
 
@@ -29,10 +35,11 @@ Word_Run ( Word * word )
 {
     if ( ! sigsetjmp ( _Context_->JmpBuf0, 0 ) )
     {
+        //_CfrTil_SyncStackPointers_ToRegs ( _CfrTil_ ) ;
         _Word_Run ( word ) ;
+        //_CfrTil_SyncStackPointers_FromRegs ( _CfrTil_ ) ;
     }
-    else Dsp = _CfrTil_->SaveDsp ;
-    _CfrTil_SetStackPointerFromDsp ( _CfrTil_ ) ;
+    else _Dsp_ = _CfrTil_->SaveDsp ;
 }
 
 void
@@ -47,10 +54,6 @@ _Word_Eval ( Word * word )
 {
     if ( word )
     {
-        word->StackPushRegisterCode = 0 ; // nb. used! by the rewriting optInfo
-        // keep track in the word itself where the machine code is to go, if this word is compiled or causes compiling code - used for optimization
-        word->W_SC_WordIndex = _CfrTil_->SC_ScratchPadIndex ;
-        Word_SetCoding ( word, Here ) ;
         if ( ( word->CAttribute & IMMEDIATE ) || ( ! CompileMode ) )
         {
             Word_Run ( word ) ;
@@ -195,6 +198,7 @@ _Word_Allocate ( uint64 allocType )
 Word *
 _Word_Create ( byte * name, uint64 ctype, uint64 ctype2, uint64 ltype, uint64 allocType )
 {
+    Compiler * compiler = _Compiler_ ;
     Word * word = _Word_Allocate ( allocType ? allocType : DICTIONARY ) ;
     if ( allocType & ( EXISTING ) ) _Symbol_NameInit ( ( Symbol * ) word, name ) ;
     else _Symbol_Init_AllocName ( ( Symbol* ) word, name, STRING_MEM ) ;
@@ -203,6 +207,10 @@ _Word_Create ( byte * name, uint64 ctype, uint64 ctype2, uint64 ltype, uint64 al
     word->CAttribute2 = ctype2 ;
     word->LAttribute = ltype ;
     if ( Is_NamespaceType ( word ) ) word->Lo_List = dllist_New ( ) ;
+    //if ( Compiling && ( ! compiler->CurrentCreatedWord ) && (!compiler->CurrentWordCompiling) && ( ! compiler->BlockLevel ) ) compiler->CurrentWordCompiling = word ;
+    //if ( Compiling && ( ! compiler->BlockLevel ) ) compiler->CurrentWordCompiling = word ;
+    _Compiler_->CurrentCreatedWord = word ;
+
     return word ;
 }
 
@@ -314,11 +322,11 @@ __Word_ShowSourceCode ( Word * word )
     if ( word && word->S_WordData && word->W_SourceCode ) //word->CAttribute & ( CPRIMITIVE | BLOCK ) )
     {
         Buffer *dstb = Buffer_NewLocked ( BUFFER_SIZE ) ;
-        byte * dst = dstb->B_Data ;
-        dst = _String_ConvertStringToBackSlash ( dst, word->W_SourceCode ) ;
+        byte * sc = dstb->B_Data ;
+        sc = _String_ConvertStringToBackSlash ( sc, word->W_SourceCode ) ;
         byte * name = c_gd ( word->Name ) ;
-        byte *dest = c_gd ( String_FilterMultipleSpaces ( dst, TEMPORARY ) ) ;
-        _Printf ( ( byte* ) "\nSourceCode for ""%s"" :> \n%s", name, dest ) ;
+        byte *scd = c_gd ( String_FilterMultipleSpaces ( sc, TEMPORARY ) ) ;
+        _Printf ( ( byte* ) "\nSourceCode for %s.%s :> \n%s", word->S_ContainingNamespace->Name, name, scd ) ;
         Buffer_Unlock ( dstb ) ;
         Buffer_SetAsFree ( dstb, 0 ) ;
     }

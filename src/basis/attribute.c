@@ -52,8 +52,8 @@ _Attribute_GetValue ( Attribute * attribute )
 void
 CfrTil_Type_New ( )
 {
-    byte * name = ( byte * ) _DataStack_Pop ( ) ;
-    int64 value = ( int64 ) _DataStack_Pop ( ) ;
+    byte * name = ( byte * ) DataStack_Pop ( ) ;
+    int64 value = ( int64 ) DataStack_Pop ( ) ;
     Attribute * attribute = _Attribute_New ( name, value ) ;
     _CfrTil_AddSymbol ( (Symbol*) attribute ) ;
 }

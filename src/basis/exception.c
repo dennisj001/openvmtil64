@@ -56,17 +56,25 @@ _OVT_Pause ( byte * prompt, int64 signalsHandled )
     int64 rtrn = 0 ;
     if ( _CfrTil_ && _Context_ )
     {
+        if ( _Context_->CurrentlyRunningWord ) _Debugger_->ShowLine = "" ;
         byte buffer [512], *defaultPrompt =
-            ( byte * ) "\n%s%s : at %s :: %s\n'd' (d)ebugger, 't' s(t)ack, c' (c)ontinue, 'q' (q)uit, 'x' e(x)it, 'i' '\\' or <key> (i)interpret, <return> loop%s" ;
-        snprintf ( ( char* ) buffer, 512, ( char* ) prompt ? prompt : defaultPrompt, _Q_->ExceptionMessage ? _Q_->ExceptionMessage : ( byte* ) "\r", c_gd ( "pause" ),
-            _Context_Location ( _Context_ ), c_gd ( _Debugger_->ShowLine ? _Debugger_->ShowLine : _Context_->ReadLiner0->InputLine ), c_gd ( "\n-> " ) ) ;
+            ( byte * ) "\n%s%s : at %s :: %s'd' (d)ebugger, 't' s(t)ack, c' (c)ontinue, 'q' (q)uit, 'x' e(x)it, 'i' '\\' or <key> (i)interpret, <return> loop%s" ;
+        snprintf ( ( char* ) buffer, 512, ( char* ) prompt ? prompt : defaultPrompt, _Q_->ExceptionMessage ? _Q_->ExceptionMessage : ( byte* ) "\r",
+            c_gd ( "pause" ), _Context_Location ( _Context_ ), c_gd ( _Debugger_->ShowLine ? _Debugger_->ShowLine : _Context_->ReadLiner0->InputLine ),
+            c_gd ( "\n-> " ) ) ;
         DebugColors ;
         int64 tlw = Strlen ( defaultPrompt ) ;
         if ( tlw > _Debugger_->TerminalLineWidth ) _Debugger_->TerminalLineWidth = tlw ;
-        if ( signalsHandled ) _Printf ( "\n_OVT_Pause : Signals Handled = %d : signal = %d : restart condition = %d\n", signalsHandled, _Q_->Signal, _Q_->RestartCondition ) ;
+        if ( signalsHandled ) _Printf ( "\n_OVT_Pause : Signals Handled = %d : signal = %d : restart condition = %d\n", signalsHandled, _Q_->Signal,
+            _Q_->RestartCondition ) ;
         do
         {
+            if ( _Context_->CurrentlyRunningWord )
+            {
+                _CfrTil_ShowInfo ( _Debugger_, "\r", _Q_->Signal, 1 ) ;
+            }
             _Printf ( ( byte* ) "%s", buffer ) ;
+
             int64 key = Key ( ) ;
             _ReadLine_PrintfClearTerminalLine ( ) ;
             if ( ( key == 'x' ) || ( key == 'X' ) )
@@ -144,7 +152,7 @@ OpenVmTil_Pause ( )
 {
 
     DebugColors ;
-    _OpenVmTil_Pause ( Context_Location () ) ;
+    _OpenVmTil_Pause ( Context_Location ( ) ) ;
 }
 
 void
@@ -185,12 +193,12 @@ _OVT_Throw ( int64 restartCondition, int8 pauseFlag )
         }
         else jb = & _CfrTil_->JmpBuf0 ;
     }
-    else 
+    else
     {
         if ( _Q_->RestartCondition >= INITIAL_START ) jb = & _Q_->JmpBuf0 ;
         else jb = & _CfrTil_->JmpBuf0 ;
     }
-    printf ( "\n%s %s at %s -> ...\n", ( jb == & _CfrTil_->JmpBuf0 ) ? "reseting cfrTil" : "fully restarting", ( _Q_->Signal == SIGSEGV ) ? ": SIGSEGV" : "", Context_Location () ) ;
+    printf ( "\n%s %s at %s -> ...\n", ( jb == & _CfrTil_->JmpBuf0 ) ? "reseting cfrTil" : "fully restarting", ( _Q_->Signal == SIGSEGV ) ? ": SIGSEGV" : "", Context_Location ( ) ) ;
     fflush ( stdout ) ;
 
     //if ( ( ! pauseFlag ) && ( _Q_->SignalExceptionsHandled < 2 ) ) _OVT_Pause ( 0, _Q_->SignalExceptionsHandled ) ;
@@ -230,7 +238,7 @@ OpenVmTil_SignalAction ( int signal, siginfo_t * si, void * uc )
         _Q_->Signal = signal ;
         _Q_->SigAddress = si->si_addr ;
         _Q_->SigLocation = ( ( ! ( signal & ( SIGSEGV | SIGBUS ) ) ) && _Context_ ) ? ( byte* ) c_gd ( Context_Location ( ) ) : ( byte* ) "" ;
-        if ( (signal != SIGSEGV) || _Q_->SignalExceptionsHandled < 2 ) _Printf ( (byte*) "\nOpenVmTil_SignalAction : address = 0x%016lx : %s", _Q_->SigAddress, _Q_->SigLocation ) ;
+        if ( ( signal != SIGSEGV ) || _Q_->SignalExceptionsHandled < 2 ) _Printf ( ( byte* ) "\nOpenVmTil_SignalAction : address = 0x%016lx : %s", _Q_->SigAddress, _Q_->SigLocation ) ;
         _OVT_Throw ( _Q_->RestartCondition, 0 ) ;
     }
 }
@@ -344,7 +352,7 @@ CfrTil_Exception ( int64 signal, int64 restartCondition )
             OpenVmTil_Throw ( ( byte* ) "Exception : Variable not found error", restartCondition, 1 ) ;
             break ;
         }
-        case USEAGE_ERROR :
+        case USEAGE_ERROR:
         {
             OpenVmTil_Throw ( ( byte* ) "Exception : Useage Error", restartCondition, 1 ) ;
             break ;
@@ -354,7 +362,7 @@ CfrTil_Exception ( int64 signal, int64 restartCondition )
             OpenVmTil_Throw ( ( byte* ) "Exception : Fix Me", restartCondition, 1 ) ;
             break ;
         }
-        case OUT_OF_CODE_MEMORY :
+        case OUT_OF_CODE_MEMORY:
         {
             OpenVmTil_Throw ( ( byte* ) "Exception : Out of Code Memory : Increase Code Memory Size for Startup!!", INITIAL_START, 1 ) ;
             break ;

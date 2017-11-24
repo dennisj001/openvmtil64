@@ -4,13 +4,13 @@
 void
 CfrTil_Power_03 ( ) // **
 {
-    int64 pow = Dsp [ 0 ], base = Dsp [ -1 ], n ;
+    int64 pow = _Dsp_ [ 0 ], base = _Dsp_ [ -1 ], n ;
     for ( n = base ; -- pow ; )
     {
         n *= base ;
     }
-    Dsp [ -1 ] = n ;
-    Dsp -- ;
+    _Dsp_ [ -1 ] = n ;
+    DataStack_Drop ( ) ;
 }
 
 int64

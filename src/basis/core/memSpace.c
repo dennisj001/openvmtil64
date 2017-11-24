@@ -515,7 +515,7 @@ Calculate_TotalNbaAccountedMemAllocated ( OpenVmTil * ovt, int64 flag )
     fflush ( stdout ) ;
 }
 
-#if 1 // mem leak debugging ...
+#if 0// mem leak debugging ...
 
 void
 OVT_MemLeakAccount ( Boolean check )
@@ -560,8 +560,8 @@ _OVT_ShowMemoryAllocated ( OpenVmTil * ovt )
     if ( leak ) _Printf ( ( byte* ) c_ad ( leaks ), leak ) ;
     else if ( vf ) _Printf ( ( byte* ) c_ud ( leaks ), leak ) ;
 
-    MLA ( ) ;
-    //if ( memDiff2 || leak || vf )
+    //MLA ( ) ;
+    if ( memDiff2 || leak || vf )
     {
         _Printf ( ( byte* ) "\nTotalNbaAccountedMemAllocated                    = %9d : <=: ovt->TotalNbaAccountedMemAllocated", ovt->TotalNbaAccountedMemAllocated ) ;
         _Printf ( ( byte* ) "\nMem Used - Categorized                           = %9d : <=: ovt->TotalNbaAccountedMemAllocated - ovt->TotalNbaAccountedMemRemaining", ovt->TotalNbaAccountedMemAllocated - ovt->TotalNbaAccountedMemRemaining ) ; //+ ovt->UnaccountedMem ) ) ;
@@ -578,6 +578,7 @@ _OVT_ShowMemoryAllocated ( OpenVmTil * ovt )
         _Printf ( ( byte* ) "\nOVT_InitialUnAccountedMemory                     = %9d : <=: ovt->OVT_InitialUnAccountedMemory", ovt->OVT_InitialUnAccountedMemory ) ; //+ ovt->UnaccountedMem ) ) ;
         _Printf ( ( byte* ) "\nTotalMemSizeTarget                               = %9d : <=: ovt->TotalMemSizeTarget", ovt->TotalMemSizeTarget ) ;
     }
+    else _Printf ( ( byte*) "\nMem                                         leak = %9d", leak ) ; 
     _Printf ( ( byte* ) "\nRecycledWordCount : %d", _Q_->MemorySpace0->RecycledWordCount ) ;
     Buffer_PrintBuffers ( ) ;
 }

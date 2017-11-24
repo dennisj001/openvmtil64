@@ -47,9 +47,9 @@ _Block_Eval ( block blck )
     }
     d0 ( Cpu_CheckRspForWordAlignment ( "_Block_Eval:After" ) ) ;
 }
-
+#if 0
 void
-_Block_Copy ( BlockInfo *bi, byte * srcAddress, int64 bsize )
+_Block_Copy ( byte * srcAddress, int64 bsize )
 {
     byte * saveHere = Here, * saveAddress = srcAddress ;
     ud_t * ud = Debugger_UdisInit ( _Debugger_ ) ;
@@ -187,11 +187,84 @@ _Block_Copy ( BlockInfo *bi, byte * srcAddress, int64 bsize )
         _CompileN ( srcAddress, isize ) ; // memcpy ( dstAddress, address, size ) ;
     }
 }
+#else
+void
+_Block_Copy ( byte * srcAddress, int64 bsize )
+{
+    byte * saveHere = Here, * saveAddress = srcAddress ;
+    ud_t * ud = Debugger_UdisInit ( _Debugger_ ) ;
+    int64 isize, left ;
+
+    for ( left = bsize ; left > 0 ; srcAddress += isize )
+    {
+        PeepHole_Optimize ( ) ;
+        isize = _Udis_GetInstructionSize ( ud, srcAddress ) ;
+        left -= isize ;
+        _CfrTil_AdjustDbgSourceCodeAddress ( srcAddress, Here ) ;
+        if ( * srcAddress == _RET ) // don't include RET
+        {
+            if ( left && ( ( * srcAddress + 1 ) != NOOP ) ) //  noop from our logic overwrite
+            {
+                // ?? unable at present to compile inline with more than one return in the block
+                SetHere ( saveHere ) ;
+                Compile_Call ( saveAddress ) ;
+            }
+            break ; // don't include RET
+        }
+        else if ( * srcAddress == CALLI32 )
+        {
+            int32 offset = * ( int32* ) ( srcAddress + 1 ) ; // 1 : 1 byte opCode
+            if ( ! offset )
+            {
+                dllist_Map1 ( _Context_->Compiler0->GotoList, ( MapFunction1 ) AdjustJmpOffsetPointer, ( int64 ) ( srcAddress + 1 ) ) ;
+                CfrTil_SetupRecursiveCall ( ) ;
+                continue ;
+            }
+            else
+            {
+                byte * jcAddress = JumpCallInstructionAddress ( srcAddress ) ;
+                Word * word = Word_GetFromCodeAddress ( jcAddress ) ;
+                if ( word )
+                {
+                    //_CfrTil_AdjustSourceCodeAddress ( jcAddress, Here ) ;
+                    _Word_Compile ( word ) ;
+                    continue ;
+                }
+            }
+        }
+        else if ( * srcAddress == JMPI32 )
+        {
+            int64 offset = * ( int32* ) ( srcAddress + 1 ) ; // 1 : 1 byte opCode
+            if ( offset != 0 )
+            {
+                dllist_Map1 ( _Context_->Compiler0->GotoList, ( MapFunction1 ) AdjustJmpOffsetPointer, ( int64 ) ( srcAddress + 1 ) ) ;
+                byte * jcAddress = JumpCallInstructionAddress ( srcAddress ) ;
+                Word * word = Word_GetFromCodeAddress ( jcAddress ) ;
+                if ( word )
+                {
+                    //_CfrTil_AdjustSourceCodeAddress ( jcAddress, Here ) ;
+                    //_Word_Compile ( word ) ;
+                    _Compile_Call ( ( byte* ) word->Definition ) ;
+                    continue ;
+                }
+            }
+            else // if ( offset == 0 ) signature of a goto point
+            {
+                //_CfrTil_AdjustGotoPoint ( ( int64 ) srcAddress ) ;
+                dllist_Map1 ( _Context_->Compiler0->GotoList, ( MapFunction1 ) _AdjustGotoInfo, ( int64 ) srcAddress ) ;
+
+            }
+        }
+        _CompileN ( srcAddress, isize ) ; // memcpy ( dstAddress, address, size ) ;
+    }
+}
+
+#endif
 
 // nb : only blocks with one ret insn can be successfully compiled inline
 
 void
-Block_Copy ( BlockInfo *bi, byte * dst, byte * src, int64 qsize )
+Block_Copy ( byte * dst, byte * src, int64 qsize )
 {
 #if 0    
     if ( dst > src )
@@ -201,7 +274,7 @@ Block_Copy ( BlockInfo *bi, byte * dst, byte * src, int64 qsize )
     }
 #endif    
     SetHere ( dst ) ;
-    _Block_Copy ( bi, src, qsize ) ;
+    _Block_Copy ( src, qsize ) ;
 }
 
 int64
@@ -229,8 +302,9 @@ Block_CopyCompile_WithLogicFlag ( byte * srcAddress, int64 bindex, int64 jccFlag
     if ( ! GetState ( _CfrTil_, INLINE_ON ) ) Compile_Call ( srcAddress ) ;
     else
     {
-        _Block_Copy ( bi, srcAddress, bi->bp_Last - bi->bp_First ) ;
+        _Block_Copy ( srcAddress, bi->bp_Last - bi->bp_First ) ;
     }
+#if 1   
     if ( jccFlag )
     {
         Word * svcrw = _Context_->CurrentlyRunningWord ;
@@ -249,6 +323,35 @@ Block_CopyCompile_WithLogicFlag ( byte * srcAddress, int64 bindex, int64 jccFlag
         _Context_->CurrentlyRunningWord = svcrw ;
         _Stack_PointerToJmpOffset_Set ( Here - INT32_SIZE ) ;
     }
+#else
+    if ( jccFlag )
+    {
+        Word * svcrw = _Context_->CurrentlyRunningWord ;
+        _Context_->CurrentlyRunningWord = _Context_->SC_CurrentCombinator ;
+        DBI_ON ;
+        if ( jccFlag2 )
+        {
+            Compile_JCC ( negFlag ? bi->NegFlag : ! bi->NegFlag, bi->Ttt, 0 ) ;
+        }
+        else
+        {
+#if 0            
+            if ( bi->LogicCodeWord && bi->LogicCodeWord->StackPushRegisterCode )
+            {
+                SetHere ( bi->LogicCodeWord->StackPushRegisterCode ) ;
+            }
+            else Compile_Pop_To_Acc ( DSP ) ;
+            _Compile_TEST_Reg_To_Reg ( ACC, ACC ) ;
+#else            
+            Compile_GetLogicFromTOS ( bi ) ;
+#endif            
+            Compile_JCC ( negFlag, ZERO_TTT, 0 ) ;
+        }
+        DBI_OFF ;
+        _Context_->CurrentlyRunningWord = svcrw ;
+        _Stack_PointerToJmpOffset_Set ( Here - INT32_SIZE ) ;
+    }
+#endif    
     return 1 ;
 }
 
@@ -414,9 +517,9 @@ _CfrTil_EndBlock1 ( BlockInfo * bi )
             bi->bp_First = bi->Start ; //bi->AfterFrame ; 
         }
     }
-    Compile_Return ( ) ;
+    _Compile_Return ( ) ;
     //Compile_CfrTilWord_Return ( ) ;
-    _DataStack_Push ( ( int64 ) bi->bp_First ) ;
+    DataStack_Push ( ( int64 ) bi->bp_First ) ;
     bi->bp_Last = Here ;
     _SetOffsetForCallOrJump ( bi->JumpOffset, Here ) ;
 }

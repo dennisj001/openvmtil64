@@ -74,7 +74,7 @@ _Debugger_DisassembleWrittenCode ( Debugger * debugger )
 {
     Word * word = debugger->w_Word ;
     int64 codeSize = Here - debugger->PreHere ;
-    if ( codeSize != 0 )
+    if ( codeSize > 0 )
     {
         if ( word ) //&& ( codeSize > 0 ) )
         {

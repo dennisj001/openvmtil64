@@ -18,7 +18,7 @@ _CfrTil_Init_SessionCore ( CfrTil * cfrTil, int64 cntxDelFlag, int64 promptFlag 
     CfrTil_ClearTokenList ( ) ;
     if ( cntxDelFlag )
     {
-        int64 stackDepth = Stack_Depth ( cfrTil->ContextStack ) ;
+        int64 stackDepth = Stack_Depth ( cfrTil->ContextDataStack ) ;
         for ( i = 0 ; i < stackDepth ; i ++ ) CfrTil_Context_PopDelete ( cfrTil ) ;
     }
     OVT_MemListFree_TempObjects ( ) ;
@@ -135,6 +135,7 @@ CfrTil_MachineCodePrimitive_AddWords ( CfrTil * cfrTil )
     for ( i = 0 ; MachineCodePrimitives [ i ].ccp_Name ; i ++ )
     {
         MachineCodePrimitive p = MachineCodePrimitives [ i ] ;
+        functionArg = - 1 ; // this is also flag in _DObject_ValueDefinition_Init
 
         // initialize some values in MachineCodePrimitives that are variables and have to be calculated at run time
 #if 1        
@@ -192,19 +193,19 @@ CfrTil_MachineCodePrimitive_AddWords ( CfrTil * cfrTil )
         {
             callHook = & cfrTil->CallCurrentBlock ;
         }
-#if NEW_CALL_RETURN        
-        else if ( ( String_Equal ( p.ccp_Name, "callCfrTilWord" ) ) && ( String_Equal ( p.NameSpace, "System" ) ) )
+#if 0        
+        else if ( ( String_Equal ( p.ccp_Name, "set_DspReg_FromDataStackPointer" ) ) && ( String_Equal ( p.NameSpace, "System" ) ) )
         {
-            callHook = & cfrTil->CallCfrTilWord ;
-        }
-        else if ( ( String_Equal ( p.ccp_Name, "sync_ReturnStackStackPointer_To_CFT_RSP" ) ) && ( String_Equal ( p.NameSpace, "System" ) ) )
+            callHook = & cfrTil->Set_DspReg_FromDataStackPointer ;
+        } 
+        else if ( ( String_Equal ( p.ccp_Name, "set_DataStackPointer_FromDspReg" ) ) && ( String_Equal ( p.NameSpace, "System" ) ) )
         {
-            callHook = & cfrTil->Sync_ReturnStackStackPointer_To_CFT_RSP ;
-        }
-        else if ( ( String_Equal ( p.ccp_Name, "sync_CFT_RSP_To_ReturnStackStackPointer" ) ) && ( String_Equal ( p.NameSpace, "System" ) ) )
+            callHook = & cfrTil->Set_DataStackPointer_FromDspReg ;
+        } 
+        else if ( ( String_Equal ( p.ccp_Name, "set_DataStackPointer_FromDspReg" ) ) && ( String_Equal ( p.NameSpace, "System" ) ) )
         {
-            callHook = & cfrTil->Sync_CFT_RSP_To_ReturnStackStackPointer ;
-        }
+            callHook = & cfrTil->_StackPtr_Push  ;
+        } 
 #endif        
         else
         {
@@ -213,6 +214,27 @@ CfrTil_MachineCodePrimitive_AddWords ( CfrTil * cfrTil )
         }
         _CfrTil_MachineCodePrimitive_NewAdd ( p.ccp_Name, p.ui64_CAttribute, callHook, p.Function, functionArg, p.NameSpace, p.SuperNamespace ) ;
     }
+#if 0
+    //{ "callCfrTilWord", CPRIMITIVE, 0, ( byte* ) Compile_Call_CfrTilWord, 0, "System", "Root" },
+        else if ( ( String_Equal ( p.ccp_Name, "callCfrTilWord" ) ) && ( String_Equal ( p.NameSpace, "System" ) ) )
+        {
+            callHook = & cfrTil->CallCfrTilWord ;
+        }
+        else if ( ( String_Equal ( p.ccp_Name, "set_CfrTilRsp_FromReturnStackPointer" ) ) && ( String_Equal ( p.NameSpace, "System" ) ) )
+        {
+            callHook = & cfrTil->Set_CfrTilRspReg_FromReturnStackPointer ;
+        } 
+        else if ( ( String_Equal ( p.ccp_Name, "set_ReturnStackPointer_FromCfrTilRsp" ) ) && ( String_Equal ( p.NameSpace, "System" ) ) )
+        {
+            callHook = & cfrTil->Set_ReturnStackPointer_FromCfrTilRspReg ;
+        } 
+    //_CfrTil_MachineCodePrimitive_NewAdd ( const char * name, uint64 cType, block * callHook, byte * function, int64 functionArg, const char *nameSpace, const char * superNamespace )
+    _CfrTil_MachineCodePrimitive_NewAdd ( "callCfrTilWord", CPRIMITIVE, & cfrTil->CallCfrTilWord, ( byte* ) Compile_Call_CfrTilWord, -1, "System", "Root" ) ;
+    _CfrTil_MachineCodePrimitive_NewAdd ( "set_CfrTilRsp_FromReturnStackPointer", CPRIMITIVE, & cfrTil->Set_CfrTilRspReg_FromReturnStackPointer, ( byte* ) Compile_Set_CfrTilRspReg_FromReturnStackPointer, -1, "System", "Root" ) ;
+    _CfrTil_MachineCodePrimitive_NewAdd ( "set_ReturnStackPointer_FromCfrTilRsp", CPRIMITIVE, & cfrTil->Set_ReturnStackPointer_FromCfrTilRspReg, ( byte* ) Compile_Set_ReturnStackPointer_FromCfrTilRspReg, -1, "System", "Root" ) ;
+#endif    
+    _CfrTil_MachineCodePrimitive_NewAdd ( "set_DataStackPointer_FromDspReg", CPRIMITIVE, & cfrTil->Set_DataStackPointer_FromDspReg, ( byte* ) Compile_Set_DataStackPointer_FromDspReg, -1, "System", "Root" ) ;
+    _CfrTil_MachineCodePrimitive_NewAdd ( "set_DspReg_FromDataStackPointer", CPRIMITIVE, & cfrTil->Set_DspReg_FromDataStackPointer, ( byte* ) Compile_Set_DspReg_FromDataStackPointer, -1, "System", "Root" ) ;
 }
 
 

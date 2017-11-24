@@ -468,7 +468,7 @@ typedef struct
     byte *ActualCodeStart ;
     int8 Ttt ;
     int8 NegFlag, OverWriteSize ;
-    Word * LogicCodeWord, *LiteralWord ;
+    Word * LogicCodeWord, *LiteralWord, *LastWord ;
     Namespace * LocalsNamespace ;
 } BlockInfo ;
 typedef struct
@@ -639,7 +639,7 @@ typedef struct
     byte * RspSaveOffset ;
     byte * RspRestoreOffset ;
     Word * ReturnVariableWord ;
-    Word * CurrentWord, *CurrentWordCompiling ;
+    Word * CurrentWord, *CurrentWordCompiling, *CurrentCreatedWord ;
     Word * LHS_Word ; //, *OptimizeOffWord;
     Namespace *C_BackgroundNamespace ; //, ** FunctionTypesArray ;
     dllist * GotoList ;
@@ -676,7 +676,7 @@ typedef void (* DebuggerFunction ) (struct _Debugger *) ;
 typedef struct _Debugger
 {
     uint64 State ;
-    uint64 * SaveDsp, *SaveEdi ;
+    uint64 * SaveDsp, *SaveEdi, *SaveRsp ;
     uint64 * WordDsp ;
     int64 SaveTOS ;
     int64 SaveStackDepth ;
@@ -693,7 +693,7 @@ typedef struct _Debugger
     Cpu * cs_Cpu ;
     byte* DebugAddress, *CopyRSP, *CopyRBP, *LastSourceCodeAddress ;
     uint64 * DebugRSP, *DebugRBP, *DebugRSI, *DebugRDI, * LastRsp ; //, *SavedIncomingESP, *SavedIncomingEBP ; //, SavedRunningESP, SavedRunningEBP;
-    int64 LastSourceCodeIndex, TerminalLineWidth ;
+    int64 LastSourceCodeIndex, TerminalLineWidth, ReadIndex ;
     ByteArray * StepInstructionBA ;
     byte CharacterTable [ 128 ] ;
     DebuggerFunction CharacterFunctionTable [ 34 ] ;
@@ -790,7 +790,7 @@ typedef struct _CfrTil
     //Stack * DataStack ;
     Namespace * Namespaces ;
     Context * Context0 ;
-    Stack * ContextStack ;
+    Stack * ContextDataStack ;
     Debugger * Debugger0 ;
     Stack * ObjectStack, *DebugStateStack ;
     Namespace * InNamespace, *LispNamespace ; //, *CfrTilWordCreateTemp ;
@@ -801,7 +801,8 @@ typedef struct _CfrTil
     Cpu * cs_Cpu ;
     Cpu * cs_Cpu2 ;
     block CurrentBlock, SaveCpuState, SaveCpu2State, RestoreCpuState, RestoreCpu2State, CallCfrTilWord, CallCurrentBlock, RestoreSelectedCpuState, SaveSelectedCpuState ; //, SyncDspToEsi, SyncEsiToDsp ;
-    block Sync_ReturnStackStackPointer_To_CFT_RSP, Sync_CFT_RSP_To_ReturnStackStackPointer ;
+    block Set_CfrTilRspReg_FromReturnStackPointer, Set_ReturnStackPointer_FromCfrTilRspReg, Set_DspReg_FromDataStackPointer, Set_DataStackPointer_FromDspReg ; //, PeekReg, PokeReg ;
+    ByteArray * PeekPokeByteArray ;
     Word * LastFinishedWord, *StoreWord, *PokeWord, *ScoOcCrw, *DebugWordListWord ; //, *DebugWordListWord ;
     byte ReadLine_CharacterTable [ 256 ] ;
     ReadLineFunction ReadLine_FunctionTable [ 24 ] ;
@@ -880,7 +881,7 @@ typedef struct
 {
     uint64 State ;
     CfrTil * OVT_CfrTil ;
-    struct termios * SavedTerminalAttributes ;
+    //struct termios * SavedTerminalAttributes ;
     Context * OVT_Context ;
     Interpreter * OVT_Interpreter ;
     HistorySpace OVT_HistorySpace ;

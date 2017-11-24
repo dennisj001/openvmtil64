@@ -40,7 +40,7 @@ _OpenVmTil_ColorsInit ( OpenVmTil * ovt )
 void
 Console ( )
 {
-    _DataStack_Push ( ( int64 ) & _Q_->Console ) ;
+    DataStack_Push ( ( int64 ) & _Q_->Console ) ;
 }
 
 void
@@ -103,12 +103,12 @@ void
 _CfrTil_SetRGBColor ( Colors * c )
 {
     int64 fr, fg, fb, br, bg, bb ;
-    bb = _DataStack_Pop ( ) ;
-    bg = _DataStack_Pop ( ) ;
-    br = _DataStack_Pop ( ) ;
-    fb = _DataStack_Pop ( ) ;
-    fg = _DataStack_Pop ( ) ;
-    fr = _DataStack_Pop ( ) ;
+    bb = DataStack_Pop ( ) ;
+    bg = DataStack_Pop ( ) ;
+    br = DataStack_Pop ( ) ;
+    fb = DataStack_Pop ( ) ;
+    fg = DataStack_Pop ( ) ;
+    fr = DataStack_Pop ( ) ;
     Colors_Get6 ( c, fr, fg, fb, br, bg, bb ) ;
 }
 
@@ -116,8 +116,8 @@ void
 _CfrTil_SetColors ( Colors * c )
 {
     int64 fg, bg ;
-    bg = _DataStack_Pop ( ) ;
-    fg = _DataStack_Pop ( ) ;
+    bg = DataStack_Pop ( ) ;
+    fg = DataStack_Pop ( ) ;
     _Colors_Init2 ( c, fg, bg ) ;
 }
 

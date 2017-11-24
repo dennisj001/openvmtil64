@@ -232,14 +232,14 @@ CfrTil_Token_Find ( )
 void
 CfrTil_Find ( )
 {
-    _DataStack_Push ( ( int64 ) Finder_FindToken ( _Context_->Finder0, _Context_->Lexer0->OriginalToken ) ) ;
+    DataStack_Push ( ( int64 ) Finder_FindToken ( _Context_->Finder0, _Context_->Lexer0->OriginalToken ) ) ;
 }
 
 void
 CfrTil_Postfix_Find ( )
 {
-    Word * word = Finder_Word_FindUsing ( _Context_->Finder0, ( byte* ) _DataStack_Pop ( ), 0 ) ;
-    _DataStack_Push ( ( int64 ) word ) ;
+    Word * word = Finder_Word_FindUsing ( _Context_->Finder0, ( byte* ) DataStack_Pop ( ), 0 ) ;
+    DataStack_Push ( ( int64 ) word ) ;
 }
 
 

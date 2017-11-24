@@ -647,7 +647,7 @@ StringMacro_Run ( byte * pb_namespaceName, byte * str )
     if ( sword )
     {
         _Word_Run ( sword ) ;
-        nstr = ( byte* ) _DataStack_Pop ( ) ;
+        nstr = ( byte* ) DataStack_Pop ( ) ;
 
         return nstr ;
     }
@@ -786,13 +786,13 @@ _IsString ( byte * address, int64 maxLength )
     for ( i = 0, count = 0 ; i < maxLength ; i ++ )
     {
         //if ( ! ( isprint ( address [i] ) || iscntrl ( address [i] ) ) ) return false ;
-        if ( ( address [i] >= ' ' && address [i] < 128 ) || ( address [i] == '\n' ) || ( address [i] == '\t' ) ) count ++ ;
-        else return false ;
         if ( ! address [i] )
         {
             if ( count ) return true ;
             else return false ;
         }
+        if ( ( address [i] >= ' ' && address [i] < 128 ) || ( address [i] == '\n' ) || ( address [i] == '\t' ) ) count ++ ;
+        else return false ;
     }
     return true ;
 }

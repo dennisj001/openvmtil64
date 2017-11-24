@@ -4,13 +4,12 @@
 void
 _Debugger_StepOneInstruction ( Debugger * debugger )
 {
-    _Debugger_SyncStackPointersFromCpuState ( debugger ) ;
-    debugger->SaveDsp = Dsp ;
     debugger->SaveTOS = TOS ;
-    debugger->PreHere = Here ;
+    //debugger->PreHere = Here ;
     debugger->SaveStackDepth = DataStack_Depth ( ) ;
     ( ( VoidFunction ) debugger->StepInstructionBA->BA_Data ) ( ) ;
-    _Debugger_SyncStackPointersFromCpuState ( debugger ) ;
+    _Debugger_Set_DataStackPointer_WithCpuStateDsp ( debugger ) ;
+    //_Set_DspReg_FromDataStackPointer ( ) ;
 }
 
 void
@@ -33,13 +32,11 @@ Debugger_CompileOneInstruction ( Debugger * debugger, byte * jcAddress, Boolean 
     _ByteArray_Init ( debugger->StepInstructionBA ) ; // we are only compiling one insn here so clear our BA before each use
     Set_CompilerSpace ( debugger->StepInstructionBA ) ; // now compile to this space
 
+    //_Compile_MoveReg_ToMem_ThruReg ( DSP, (byte*) &debugger->cs_Cpu->CPU_DSP, OREG ) ;
     _Compile_Save_C_CpuState ( _CfrTil_, showFlag ) ; //&& ( _Q_->Verbosity >= 3 ) ) ; // save our c compiler cpu register state
 
     _Compile_Restore_Debugger_CpuState ( debugger, showFlag ) ; //&& ( _Q_->Verbosity >= 3 ) ) ; // restore our runtime state before the current insn
 
-#if NEW_CALL_RETURN      
-    Compile_ReturnStackStackPointer_To_CFT_RSP ( ) ;
-#endif    
     byte * nextInsn = _Debugger_CompileOneInstruction ( debugger, jcAddress ) ; // the single current stepping insn
 
     _Compile_Save_Debugger_CpuState ( debugger, showFlag ) ; //showRegsFlag ) ; //&& ( _Q_->Verbosity >= 3 ) ) ; // save our runtime state after the instruction : which we will restore before the next insn
@@ -121,7 +118,7 @@ start:
         {
 into:
             while ( word->CAttribute & ( ALIAS ) ) word = word->W_AliasOf ;
-            if ( ( * debugger->DebugAddress == CALLI32 ) || ( ( ( * ( uint16* ) debugger->DebugAddress ) == 0xff48 ) && ( *( debugger->DebugAddress + 2 ) == 0xd0 ) ) )  //( * ( uint16* ) debugger->DebugAddress ) == 0xff48 )
+            if ( ( * debugger->DebugAddress == CALLI32 ) || ( ( ( * ( uint16* ) debugger->DebugAddress ) == 0xff48 ) && ( *( debugger->DebugAddress + 2 ) == 0xd0 ) ) ) //( * ( uint16* ) debugger->DebugAddress ) == 0xff48 )
             {
                 if ( _Q_->Verbosity > 1 ) _Word_ShowSourceCode ( word ) ;
                 _Printf ( ( byte* ) "\nstepping into a cfrtil compiled function : %s : .... :>", word ? ( char* ) c_gd ( word->Name ) : "" ) ;
@@ -157,11 +154,26 @@ void
 Debugger_CompileAndStepOneInstruction ( Debugger * debugger )
 {
     //uint64 code ;
-start:
+    //byte mov_rax_rbx__sub_rbx_0x8 [ ] = { 0x48, 0x8b, 0x03, 0x48, 0x83, 0xeb, 0x08 } ;
     if ( debugger->DebugAddress )
     {
         byte *jcAddress = 0 ;
         // special cases
+#if 0        
+        if ( ! memcmp ( mov_rax_rbx__sub_rbx_0x8, debugger->DebugAddress, 7 ) )
+        {
+            //_CfrTil_->Set_ReturnStackPointer_FromCfrTilRspReg () ;
+            //_RSP_ = _Rsp_ ;
+            if ( Stack_Depth ( _CfrTil_->ReturnStack ) > 1 )
+            {
+                CfrTil_PrintReturnStack ( ) ;
+                debugger->DebugAddress = ( byte* ) _Stack_Pop ( _CfrTil_->ReturnStack ) ;
+                Debugger_GetWordFromAddress ( debugger ) ;
+            }
+            else goto doReturn ;
+        }
+        //else 
+#endif        
         if ( * debugger->DebugAddress == _RET )
         {
             if ( Stack_Depth ( debugger->ReturnStack ) )
@@ -171,11 +183,12 @@ start:
             }
             else
             {
+doReturn:
 #if 0                
                 Debugger_GetWordFromAddress ( debugger ) ;
                 if ( ! String_Equal ( debugger->w_Word->Name, _Context_->CurrentlyRunningWord->Name ) )
                 {
-                    debugger->DebugAddress = (byte*) debugger->cs_Cpu->Rsp [0] ;// ?? what is the correct offset here ??
+                    debugger->DebugAddress = ( byte* ) debugger->cs_Cpu->Rsp [0] ; // ?? what is the correct offset here ??
                     Debugger_GetWordFromAddress ( debugger ) ;
                 }
                 else
@@ -276,15 +289,17 @@ Debugger_PreStartStepping ( Debugger * debugger )
     Word * word = debugger->w_Word ;
     if ( word )
     {
-        debugger->WordDsp = Dsp ; // by 'eval' we stop debugger->Stepping and //continue thru this word as if we hadn't stepped
+        debugger->WordDsp = _Dsp_ ; // by 'eval' we stop debugger->Stepping and //continue thru this word as if we hadn't stepped
         Debugger_CanWeStep ( debugger, word ) ;
         if ( ! GetState ( debugger, DBG_CAN_STEP ) )
         {
+#if 0            
             if ( Compiling )
             {
                 _Printf ( c_ad ( "\nStep :: Stepping is off in Compile mode." ) ) ;
             }
             else
+#endif                
             {
                 _Printf ( "\nStepping turned off for this word : %s%s%s%s : debugger->DebugAddress = 0x%016lx : (e)valuating",
                     c_ud ( word->S_ContainingNamespace ? word->S_ContainingNamespace->Name : ( byte* ) "<literal> " ),
@@ -318,7 +333,6 @@ Debugger_Step ( Debugger * debugger )
     if ( ! GetState ( debugger, DBG_STEPPING ) )
     {
         Debugger_PreStartStepping ( debugger ) ;
-        return ;
     }
     else
     {
@@ -371,21 +385,11 @@ _Debugger_SetupStepping ( Debugger * debugger, Word * word, byte * address, byte
     //Stack_Init ( debugger->LocalsNamespacesStack ) ;
     SetState ( debugger, DBG_START_STEPPING, true ) ;
     CfrTil_NewLine ( ) ;
-#if 0    
-    if ( iflag )
-    {
-
-        _Printf ( "\nNext stepping instruction" ) ; // necessary in some cases
-        Debugger_UdisOneInstruction ( debugger, address, ( byte* ) "", ( byte* ) "" ) ;
-    }
-#endif    
-    //debugger->SaveDsp = Dsp ; // saved before we start stepping
 }
 
 void
 Debugger_SetupStepping ( Debugger * debugger, int64 iflag )
 {
-
     _Debugger_SetupStepping ( debugger, debugger->w_Word, debugger->DebugAddress, 0, iflag ) ;
 }
 
@@ -603,7 +607,8 @@ Debugger_CanWeStep ( Debugger * debugger, Word * word )
         SetState ( debugger, DBG_CAN_STEP, false ) ; // debugger->State flag = false ;
         return false ;
     }
-    else if ( word && ( Compiling || ( word->CAttribute & ( CPRIMITIVE | DLSYM_WORD ) ) || ( word->LAttribute & T_LISP_DEFINE ) ) )
+        //else if ( word && ( Compiling || ( word->CAttribute & ( CPRIMITIVE | DLSYM_WORD ) ) || ( word->LAttribute & T_LISP_DEFINE ) ) )
+    else if ( word && ( word->CAttribute & ( CPRIMITIVE | DLSYM_WORD ) ) || ( word->LAttribute & T_LISP_DEFINE ) )
     {
         return false ;
     }

@@ -26,6 +26,7 @@ Context_Location ( )
 }
 
 #if 0
+
 Context *
 _Context_Allocate ( CfrTil * cfrTil )
 {
@@ -37,8 +38,9 @@ _Context_Allocate ( CfrTil * cfrTil )
     return cntx ;
 }
 #else
+
 Context *
-_Context_Allocate ()
+_Context_Allocate ( )
 {
     NBA * nba = MemorySpace_NBA_New ( _Q_->MemorySpace0, ( byte* ) String_New ( "ContextSpace", STRING_MEM ), 10 * K, OPENVMTIL ) ;
     _Q_->MemorySpace0->ContextSpace = nba ;
@@ -65,7 +67,7 @@ _Context_Init ( Context * cntx0, Context * cntx )
 Context *
 _Context_New ( CfrTil * cfrTil )
 {
-    Context * cntx = _Context_Allocate (), *cntx0 = cfrTil->Context0 ;
+    Context * cntx = _Context_Allocate ( ), *cntx0 = cfrTil->Context0 ;
     _Context_Init ( cntx0, cntx ) ;
     _Context_ = cfrTil->Context0 = cntx ;
     cntx->ContextDataStack = cfrTil->DataStack ; // nb. using the same one and only DataStack
@@ -93,17 +95,18 @@ _Context_Run ( Context * cntx, ContextFunction contextFunction )
 Context *
 CfrTil_Context_PushNew ( CfrTil * cfrTil )
 {
-    _Stack_Push ( cfrTil->ContextStack, ( int64 ) cfrTil->Context0 ) ;
+    _Stack_Push ( cfrTil->ContextDataStack, ( int64 ) cfrTil->Context0 ) ;
     Context * cntx = _Context_New ( cfrTil ) ;
     return cntx ;
 }
 #if 0
+
 void
 Context_Recycle ( Context * cntx )
 {
     if ( cntx )
     {
-        cntx->C_Node.n_InUseFlag = N_FREE ; 
+        cntx->C_Node.n_InUseFlag = N_FREE ;
         //cntx->C_Node.n_Size = sizeof ( Context ) ;
     }
 }
@@ -118,11 +121,12 @@ CfrTil_Context_PopDelete ( CfrTil * cfrTil )
     Context_Recycle ( cntx0 ) ;
 }
 #else
+
 void
 CfrTil_Context_PopDelete ( CfrTil * cfrTil )
 {
     NBA * cnba = cfrTil->Context0->ContextNba ;
-    Context * cntx = ( Context* ) _Stack_Pop ( cfrTil->ContextStack ) ;
+    Context * cntx = ( Context* ) _Stack_Pop ( cfrTil->ContextDataStack ) ;
     _Context_ = cfrTil->Context0 = cntx ;
     _Q_->MemorySpace0->ContextSpace = cntx->ContextNba ;
     NamedByteArray_Delete ( cnba ) ;
@@ -218,8 +222,13 @@ _Context_IncludeFile ( Context * cntx, byte *filename, int64 interpretFlag )
             if ( ! cntx->System0->IncludeFileStackNumber ) Ovt_AutoVarOff ( ) ;
             if ( _Q_->Verbosity > 2 ) _Printf ( ( byte* ) "\n%s included\n", filename ) ;
         }
-        else _Printf ( ( byte* ) "\nError : _CfrTil_IncludeFile : \"%s\" : not found! :: %s\n", filename,
-            _Context_Location ( ( Context* ) _CfrTil_->ContextStack->StackPointer [0] ) ) ;
+        else
+        {
+            //byte * buffer = Buffer_New_pbyte ( BUFFER_SIZE ) ;
+            _Printf ( ( byte* ) "\nError : _CfrTil_IncludeFile : \"%s\" : not found! :: %s\n", filename,
+                _Context_Location ( ( Context* ) _CfrTil_->ContextDataStack->StackPointer [0] ) ) ;
+            //Error ( buffer, ABORT ) ;
+        }
     }
 }
 
@@ -275,7 +284,7 @@ CfrTil_DoubleQuoteMacro ( )
 void
 _Tick ( Context * cntx, int64 findWordFlag )
 {
-    byte * token = ( byte* ) _DataStack_Pop ( ) ;
+    byte * token = ( byte* ) DataStack_Pop ( ) ;
     if ( token )
     {
         if ( findWordFlag )
@@ -291,7 +300,7 @@ _Tick ( Context * cntx, int64 findWordFlag )
             else token = 0 ;
         }
     }
-    DSP_Push ( ( int64 ) token ) ;
+    DataStack_Push ( ( int64 ) token ) ;
 }
 #endif
 

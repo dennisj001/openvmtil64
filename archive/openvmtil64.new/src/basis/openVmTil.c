@@ -1,6 +1,6 @@
 
 #include "../include/cfrtil64.h"
-#define VERSION ((byte*) "0.824.738" ) // 0.823.200 series is x86 ; the 0.823.300 series is x64 : 0.823.300.600+ series is with new x64 compiler
+#define VERSION ((byte*) "0.824.739" ) // 0.823.200 series is x86 ; the 0.823.300 series is x64 : 0.823.300.600+ series is with new x64 compiler
 
 OpenVmTil * _Q_ ; 
 uint64 * _Dsp_, *_Rsp_ ; // internal stack pointers

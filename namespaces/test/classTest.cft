@@ -173,7 +173,7 @@ dbgOff
 // TODO ( % using C "\nprintf output = " ps d: printf ( "this.size = %d", this.size ) this @ dup hex p size @ dup decimal p dump % ) //pause // 'this' is a pointer to a pointer 
 #endif
 
-d: TODO ( "'this' semantics have yet to be solidified" ) 
+TODO ( "'this' semantics have yet to be solidified" ) 
 sp
 testClone size @ dump
 sp

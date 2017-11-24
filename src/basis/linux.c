@@ -2,6 +2,7 @@
 #include "../include/cfrtil64.h"
 
 #if LINUX
+static struct termios SavedTerminalAttributes ;
 
 void
 _DisplaySignal ( int64 signal )
@@ -58,7 +59,7 @@ Linux_SetupSignals ( sigjmp_buf * sjb, int64 startTimes )
 void
 Linux_RestoreTerminalAttributes ( )
 {
-    tcsetattr ( STDIN_FILENO, TCSANOW, _Q_->SavedTerminalAttributes ) ;
+    tcsetattr ( STDIN_FILENO, TCSANOW, &SavedTerminalAttributes ) ;
 }
 struct termios term ;
 
@@ -101,9 +102,16 @@ Linux_SetInputMode ( struct termios * savedTerminalAttributes )
 }
 
 void
-LinuxInit ( struct termios * savedTerminalAttributes )
+_LinuxInit ( struct termios * savedTerminalAttributes )
 {
     Linux_SetInputMode ( savedTerminalAttributes ) ; // nb. save first !! then copy to _Q_ so atexit reset from global _Q_->SavedTerminalAttributes
+    //Linux_SetupSignals ( 1 ) ; //_Q_ ? ! _Q_->StartedTimes : 1 ) ;
+}
+
+void
+LinuxInit ()
+{
+    _LinuxInit ( &SavedTerminalAttributes ) ; // nb. save first !! then copy to _Q_ so atexit reset from global _Q_->SavedTerminalAttributes
     //Linux_SetupSignals ( 1 ) ; //_Q_ ? ! _Q_->StartedTimes : 1 ) ;
 }
 

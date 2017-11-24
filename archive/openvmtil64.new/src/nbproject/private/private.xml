@@ -7,7 +7,7 @@
         <activeConfTypeElem>0</activeConfTypeElem>
         <activeConfIndexElem>0</activeConfIndexElem>
     </data>
-    <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="16">
+    <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="18">
         <file>
             <url>basis/compiler/machineCode.c</url>
             <bookmark id="14">
@@ -96,19 +96,25 @@
                 <key/>
             </bookmark>
         </file>
+        <file>
+            <url>basis/compiler/combinators.c</url>
+            <bookmark id="18">
+                <name/>
+                <line>259</line>
+                <key/>
+            </bookmark>
+        </file>
     </editor-bookmarks>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/home/dennisj/openvmtil64.new/src/basis/compiler/combinators.c</file>
-            <file>file:/home/dennisj/openvmtil64.new/src/basis/openVmTil.c</file>
-            <file>file:/home/dennisj/openvmtil64.new/src/basis/compiler/blocks.c</file>
-            <file>file:/home/dennisj/openvmtil64.new/src/basis/core/word.c</file>
-            <file>file:/home/dennisj/openvmtil64.new/src/basis/core/array.c</file>
-            <file>file:/home/dennisj/openvmtil64.new/src/basis/compiler/machineCode.c</file>
-            <file>file:/home/dennisj/openvmtil64.new/src/basis/compiler/logic.c</file>
-            <file>file:/home/dennisj/openvmtil64.new/.init.cft</file>
-            <file>file:/home/dennisj/openvmtil64.new/src/basis/core/compile.c</file>
-            <file>file:/home/dennisj/openvmtil64.new/src/basis/core/interpret.c</file>
+            <file>file:/home/dennisj/openvmtil64/archive/openvmtil64.new/src/basis/compiler/combinators.c</file>
+            <file>file:/home/dennisj/openvmtil64/archive/openvmtil64.new/src/basis/core/compile.c</file>
+            <file>file:/home/dennisj/openvmtil64/archive/openvmtil64.new/src/basis/core/word.c</file>
+            <file>file:/home/dennisj/openvmtil64/archive/openvmtil64.new/src/basis/compiler/blocks.c</file>
+            <file>file:/home/dennisj/openvmtil64/archive/openvmtil64.new/src/basis/compiler/logic.c</file>
+            <file>file:/home/dennisj/openvmtil64/archive/openvmtil64.new/src/basis/openVmTil.c</file>
+            <file>file:/home/dennisj/openvmtil64/archive/openvmtil64.new/src/basis/core/lexer.c</file>
+            <file>file:/home/dennisj/openvmtil64/archive/openvmtil64.new/src/basis/core/dataStack.c</file>
         </group>
     </open-files>
 </project-private>

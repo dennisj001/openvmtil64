@@ -85,7 +85,7 @@ _OpenVmTil_AddStringToHistoryList ( byte * istring )
 void
 OpenVmTil_AddStringToHistory ( )
 {
-    byte * string = ( byte* ) _DataStack_Pop ( ) ;
+    byte * string = ( byte* ) DataStack_Pop ( ) ;
     _OpenVmTil_AddStringToHistoryList ( string ) ;
 }
 

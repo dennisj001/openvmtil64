@@ -204,7 +204,7 @@ DObject_Sub_New ( DObject * proto, byte * name, uint64 category )
 void
 CfrTil_SetPropertiesAsDObject ( )
 {
-    DObject * o = ( DObject * ) _DataStack_Pop ( ) ;
+    DObject * o = ( DObject * ) DataStack_Pop ( ) ;
     o->CAttribute |= DOBJECT ;
 }
 
@@ -222,8 +222,8 @@ _DObject_NewSlot ( DObject * proto, byte * name, int64 value )
 void
 CfrTil_DObject_Clone ( )
 {
-    DObject * proto = ( DObject * ) _DataStack_Pop ( ) ;
-    byte * name = ( byte * ) _DataStack_Pop ( ) ;
+    DObject * proto = ( DObject * ) DataStack_Pop ( ) ;
+    byte * name = ( byte * ) DataStack_Pop ( ) ;
     if ( ! ( proto->CAttribute & DOBJECT ) ) Error2 ( ( byte* ) "Cloning Error : \'%s\' is not a dynamic object.", proto->Name, 1 ) ;
     DObject_Sub_New ( proto, name, DOBJECT ) ;
 }
@@ -231,7 +231,7 @@ CfrTil_DObject_Clone ( )
 void
 DObject_NewClone ( DObject * proto )
 {
-    byte * name = ( byte* ) _DataStack_Pop ( ) ;
+    byte * name = ( byte* ) DataStack_Pop ( ) ;
     DObject_Sub_New ( proto, name, DOBJECT ) ;
 }
 

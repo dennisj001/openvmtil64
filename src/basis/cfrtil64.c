@@ -1,5 +1,6 @@
 
 #include "../include/cfrtil64.h"
+//uint64 *_Dsp_, * _Rsp_ ;
 
 void
 _CfrTil_Run ( CfrTil * cfrTil, int64 restartCondition )
@@ -37,7 +38,7 @@ _CfrTil_ReStart ( CfrTil * cfrTil, int64 restartCondition )
         {
             CfrTil_ResetAll_Init ( cfrTil ) ;
         }
-        case ABORT: CfrTil_SetStackPointerFromDsp ( cfrTil ) ;
+        case ABORT: Set_DataStackPointer_FromDspReg () ;
         default:
         case QUIT:
         case STOP: ;
@@ -118,14 +119,16 @@ _CfrTil_NamespacesInit ( CfrTil * cfrTil )
 void
 _CfrTil_DataStack_Init ( CfrTil * cfrTil )
 {
-    CfrTil_DataStack_InitEssential ( cfrTil ) ;
-    if ( _Q_->Verbosity > 2 ) _Printf ( ( byte* ) "\nData Stack reset." ) ;
+    _Stack_Init ( _CfrTil_->DataStack, _Q_->DataStackSize ) ;
+    //_Set_DspReg_FromDataStackPointer () ;
+    cfrTil->SaveDsp = _Dsp_ ;
 }
 
 void
 CfrTil_DataStack_Init ( )
 {
     _CfrTil_DataStack_Init ( _CfrTil_ ) ;
+    if ( _Q_->Verbosity > 2 ) _Printf ( ( byte* ) "\nData Stack reset." ) ;
 }
 
 void
@@ -165,7 +168,7 @@ _CfrTil_Init ( CfrTil * cfrTil, Namespace * nss )
 
     if ( _Q_->Verbosity > 2 ) _Printf ( ( byte* ) "\nSystem Memory is being reallocated.  " ) ;
 
-    cfrTil->ContextStack = Stack_New ( 256, allocType ) ;
+    cfrTil->ContextDataStack = Stack_New ( 256, allocType ) ;
     cfrTil->ObjectStack = Stack_New ( 1 * K, allocType ) ;
     //cfrTil->DebugStateStack = Stack_New ( 1 * K, allocType ) ;
     //_Stack_Push ( cfrTil->DebugStateStack, 0 ) ;
@@ -175,15 +178,7 @@ _CfrTil_Init ( CfrTil * cfrTil, Namespace * nss )
     cfrTil->Debugger0 = _Debugger_New ( allocType ) ; // nb : must be after System_NamespacesInit
     cfrTil->cs_Cpu = CpuState_New ( allocType ) ;
     cfrTil->cs_Cpu2 = CpuState_New ( allocType ) ;
-    if ( cfrTil->SaveDsp && cfrTil->DataStack ) // with _Q_->RestartCondition = STOP from Debugger_Stop
-    {
-        Dsp = cfrTil->SaveDsp ;
-    }
-    else
-    {
-        cfrTil->DataStack = Stack_New ( _Q_->DataStackSize, CFRTIL ) ;
-        _CfrTil_DataStack_Init ( cfrTil ) ;
-    }
+    cfrTil->PeekPokeByteArray = ByteArray_AllocateNew ( 32, allocType ) ;
     if ( nss )
     {
         cfrTil->Namespaces = nss ;
@@ -192,14 +187,23 @@ _CfrTil_Init ( CfrTil * cfrTil, Namespace * nss )
     {
         _CfrTil_NamespacesInit ( cfrTil ) ;
     }
-    cfrTil->ReturnStack = Stack_New ( 256, CFRTIL ) ;
-#if NEW_CALL_RETURN    
-    //_Rsp_ = cfrTil->ReturnStack->StackPointer ;
-#endif    
+    cfrTil->ReturnStack = Stack_New ( 1 * K, CFRTIL ) ;
+    _Rsp_ = cfrTil->ReturnStack->StackPointer ;
+    if ( cfrTil->SaveDsp && cfrTil->DataStack ) // with _Q_->RestartCondition = STOP from Debugger_Stop
+    {
+        _Dsp_ = cfrTil->SaveDsp ;
+    }
+    else
+    {
+        cfrTil->DataStack = Stack_New ( _Q_->DataStackSize, CFRTIL ) ;
+        _Dsp_ = cfrTil->DataStack->StackPointer ;
+        cfrTil->SaveDsp = _Dsp_ ;
+    }
+    CfrTil_MachineCodePrimitive_AddWords ( cfrTil ) ; // in any case we need to reinit these for eg. debugger->SaveCpuState (), etc.
+    _CfrTil_SyncStackPointers_ToRegs ( cfrTil ) ;
     cfrTil->StoreWord = Finder_FindWord_AnyNamespace ( _Finder_, ( byte* ) "store" ) ;
     cfrTil->PokeWord = Finder_FindWord_AnyNamespace ( _Finder_, ( byte* ) "poke" ) ;
     cfrTil->LispNamespace = Namespace_Find ( ( byte* ) "Lisp" ) ;
-    CfrTil_MachineCodePrimitive_AddWords ( cfrTil ) ; // in any case we need to reinit these for eg. debugger->SaveCpuState (), etc.
     CfrTil_ReadTables_Setup ( cfrTil ) ;
     CfrTil_LexerTables_Setup ( cfrTil ) ;
     cfrTil->LC = 0 ;
@@ -212,21 +216,21 @@ void
 CfrTil_ResetMemory ( CfrTil * cfrTil )
 {
 #if 0    
-    if ( cfrTil->ContextStack )
+    if ( cfrTil->ContextDataStack )
     {
-        while ( Stack_Depth ( cfrTil->ContextStack ) )
+        while ( Stack_Depth ( cfrTil->ContextDataStack ) )
         {
-            Context * cntx = ( Context* ) _Stack_Pop ( cfrTil->ContextStack ) ;
+            Context * cntx = ( Context* ) _Stack_Pop ( cfrTil->ContextDataStack ) ;
             Context_Recycle ( cntx ) ;
         }
         //if ( cfrTil->Context0 ) NamedByteArray_Delete ( cfrTil->Context0->ContextNba ) ;
     }
 #else
-    if ( cfrTil->ContextStack )
+    if ( cfrTil->ContextDataStack )
     {
-        while ( Stack_Depth ( cfrTil->ContextStack ) )
+        while ( Stack_Depth ( cfrTil->ContextDataStack ) )
         {
-            Context * cntx = ( Context* ) _Stack_Pop ( cfrTil->ContextStack ) ;
+            Context * cntx = ( Context* ) _Stack_Pop ( cfrTil->ContextDataStack ) ;
             NamedByteArray_Delete ( cntx->ContextNba ) ;
         }
         if ( cfrTil->Context0 ) NamedByteArray_Delete ( cfrTil->Context0->ContextNba ) ;

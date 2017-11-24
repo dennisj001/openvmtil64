@@ -91,7 +91,7 @@ _Compiler_RemoveLocalFrame ( Compiler * compiler )
 }
 
 void
-_Compile_Rsp_Restore ( )
+_Compile_RspReg_Restore ( )
 {
 #if 1    
     _Compile_Move_Rm_To_Reg ( RSP, R15, 4 ) ; // 4 : placeholder
@@ -102,7 +102,7 @@ _Compile_Rsp_Restore ( )
 }
 
 void
-_Compile_Rsp_Save ( )
+_Compile_RspReg_Save ( )
 {
 #if 1    
     _Compile_Move_Reg_To_Rm ( DSP, RSP, 4 ) ; // 4 : placeholder
@@ -151,7 +151,7 @@ CheckCompileRemoveLocalFrame ( Compiler * compiler )
 }
 
 void
-_Rsp_Setup ( )
+_RspReg_Setup ( )
 {
     Compiler * compiler = _Context_->Compiler0 ;
     if ( compiler->RspSaveOffset ) *( compiler->RspSaveOffset ) = ( compiler->NumberOfLocals + 2 ) * CELL ; // 2 : fp + esp

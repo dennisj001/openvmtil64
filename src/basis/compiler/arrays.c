@@ -102,7 +102,7 @@ Do_NextArrayWordToken ( Word * word, byte * token, Word * arrayBaseObject, int64
         {
             // 'little endian' arrays (to maybe coin a term) : first index refers to lowest addresses
             // d1 + d2*(D1) + d3*(D2*D1) + d4*(D3*D2*D1) ...
-            arrayIndex = _DataStack_Pop ( ) ;
+            arrayIndex = DataStack_Pop ( ) ;
             increment = arrayIndex * dimSize * objSize ; // keep a running total of 
             Compiler_IncrementCurrentAccumulatedOffset ( compiler, increment ) ;
 #if 1            
@@ -112,7 +112,7 @@ Do_NextArrayWordToken ( Word * word, byte * token, Word * arrayBaseObject, int64
             {
                 if ( ! Lexer_IsTokenForwardDotted ( cntx->Lexer0 ) ) 
                 {
-                    value = _DataStack_Pop ( ) + increment ;
+                    value = DataStack_Pop ( ) + increment ;
                 }
                 else value = _DataStack_GetTop ( ) + increment ;
                 _DataStack_SetTop ( value ) ; // after each dimension : in the end we have one lvalue remaining on the stack

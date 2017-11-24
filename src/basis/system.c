@@ -114,16 +114,16 @@ Dlsym ( byte * sym, byte * lib )
 void
 _CfrTil_Dlsym ( )
 {
-    byte * sym = ( byte* ) _DataStack_Pop ( ) ;
-    byte * lib = ( byte* ) _DataStack_Pop ( ) ;
-    _DataStack_Push ( ( int64 ) _Dlsym ( sym, lib ) ) ;
+    byte * sym = ( byte* ) DataStack_Pop ( ) ;
+    byte * lib = ( byte* ) DataStack_Pop ( ) ;
+    DataStack_Push ( ( int64 ) _Dlsym ( sym, lib ) ) ;
 }
 
 void
 CfrTil_DlsymWord ( )
 {
-    byte * lib = ( byte* ) _DataStack_Pop ( ) ;
-    byte * sym = ( byte* ) _DataStack_Pop ( ) ;
+    byte * lib = ( byte* ) DataStack_Pop ( ) ;
+    byte * sym = ( byte* ) DataStack_Pop ( ) ;
     Dlsym ( sym, lib ) ;
 }
 #endif
@@ -419,8 +419,8 @@ _CfrTil_Source ( Word *word, int64 addToHistoryFlag )
 void
 _CfrTil_Dump ( int64 dumpMod )
 {
-    int64 number = _DataStack_Pop ( ) ;
-    byte * address = ( byte* ) _DataStack_Pop ( ) ;
+    int64 number = DataStack_Pop ( ) ;
+    byte * address = ( byte* ) DataStack_Pop ( ) ;
     __CfrTil_Dump ( address, number, dumpMod ) ;
 }
 

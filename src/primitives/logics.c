@@ -13,7 +13,7 @@ CfrTil_LessThan ( ) // <
     else
     {
         int64 top, b ;
-        top = _DataStack_Pop ( ) ;
+        top = DataStack_Pop ( ) ;
         b = _DataStack_GetTop ( ) ;
         _DataStack_SetTop ( ( int64 ) ( b < top ) ) ;
         //_DataStack_SetTop ( Dsp, _DataStack_Pop () < _DataStack_GetTop ( Dsp ) ) ;
@@ -30,7 +30,7 @@ CfrTil_LessThanOrEqual ( ) // <
     else
     {
         int64 top, b ;
-        top = _DataStack_Pop ( ) ;
+        top = DataStack_Pop ( ) ;
         b = _DataStack_GetTop ( ) ;
         _DataStack_SetTop ( ( int64 ) ( b <= top ) ) ;
         //_DataStack_SetTop ( Dsp, _DataStack_Pop () < _DataStack_GetTop ( Dsp ) ) ;
@@ -49,7 +49,7 @@ CfrTil_GreaterThan ( ) // >
     else
     {
         int64 top, b ;
-        top = _DataStack_Pop ( ) ;
+        top = DataStack_Pop ( ) ;
         b = _DataStack_GetTop ( ) ;
         _DataStack_SetTop ( ( int64 ) ( b > top ) ) ;
         //_DataStack_SetTop ( Dsp, _DataStack_Pop () > _DataStack_GetTop ( Dsp ) ) ;
@@ -66,7 +66,7 @@ CfrTil_GreaterThanOrEqual ( ) // >
     else
     {
         int64 top, b ;
-        top = _DataStack_Pop ( ) ;
+        top = DataStack_Pop ( ) ;
         b = _DataStack_GetTop ( ) ;
         _DataStack_SetTop ( ( int64 ) ( b >= top ) ) ;
         //_DataStack_SetTop ( Dsp, _DataStack_Pop () > _DataStack_GetTop ( Dsp ) ) ;
@@ -83,7 +83,7 @@ CfrTil_Equals ( ) // ==
     else
     {
         int64 top, b ;
-        top = _DataStack_Pop ( ) ;
+        top = DataStack_Pop ( ) ;
         b = _DataStack_GetTop ( ) ;
         _DataStack_SetTop ( ( int64 ) ( b == top ) ) ;
         //_DataStack_SetTop ( _DataStack_Pop () == _DataStack_GetTop () ) ;
@@ -100,7 +100,7 @@ CfrTil_DoesNotEqual ( ) // !=
     else
     {
         int64 top, b ;
-        top = _DataStack_Pop ( ) ;
+        top = DataStack_Pop ( ) ;
         b = _DataStack_GetTop ( ) ;
         _DataStack_SetTop ( ( int64 ) ( b != top ) ) ;
         //_DataStack_SetTop ( _DataStack_Pop () > _DataStack_GetTop () ) ;
@@ -130,8 +130,8 @@ CfrTil_LogicalAnd ( ) // and
     }
     else
     {
-        Dsp [ - 1 ] = Dsp [ - 1 ] && TOS ;
-        Dsp -- ;
+        _Dsp_ [ - 1 ] = _Dsp_ [ - 1 ] && TOS ;
+        DataStack_Drop ( ) ;
     }
 }
 
@@ -144,8 +144,8 @@ CfrTil_LogicalOr ( ) // or
     }
     else
     {
-        Dsp [ - 1 ] = Dsp [ - 1 ] || TOS ;
-        Dsp -- ;
+        _Dsp_ [ - 1 ] = _Dsp_ [ - 1 ] || TOS ;
+        DataStack_Drop ( ) ;
     }
 }
 
@@ -158,8 +158,8 @@ CfrTil_LogicalXor ( ) // xor
     }
     else
     {
-        Dsp [ - 1 ] = Dsp [ - 1 ] ^ TOS ;
-        Dsp -- ;
+        _Dsp_ [ - 1 ] = _Dsp_ [ - 1 ] ^ TOS ;
+        DataStack_Drop ( ) ;
     }
 }
 

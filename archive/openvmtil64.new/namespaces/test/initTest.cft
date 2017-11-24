@@ -46,7 +46,7 @@ Int User
 : testX cST ;
 'doIA32 1 const
 #if doIA32
-: basicT cT <dbg> aT loT bT locT mT oT ia32 cntT lT fT sT sysT interpT ppT stT ;
+: basicT cT aT loT bT locT mT oT ia32 cntT lT fT sT sysT interpT ppT stT ;
 #else
 : basicT cT aT loT bT locT mT oT      cntT lT fT sT sysT interpT ppT stT ;
 #endif

@@ -52,7 +52,7 @@ _Stack_PrintHeader ( Stack * stack, byte * name )
         //" Max = " UINT_FRMT ", Min = " UINT_FRMT ", Size = " UINT_FRMT, location,
         ", Size = " UINT_FRMT, location,
         //name, size, stack == _DataStack_ ? "Dsp (R14)" : "", ( int64 ) sp, ( int64 ) stack->InitialTosPointer, ( int64 ) stack->StackMax, ( int64 ) stack->StackMin, stack->StackMax - stack->StackMin + 1 ) ;
-        name, size, stack == _DataStack_ ? "Dsp (R14)" : "", ( int64 ) sp, ( int64 ) stack->InitialTosPointer, stack->StackMax - stack->StackMin + 1 ) ;
+        name, size, stack == _DataStack_ ? "Dsp (R14)" : _ReturnStack_ ? "CfrTilRsp (Rbx)" : "", ( int64 ) sp, ( int64 ) stack->InitialTosPointer, stack->StackMax - stack->StackMin + 1 ) ;
 }
 
 void
@@ -275,7 +275,7 @@ int64
 _Stack_IntegrityCheck ( Stack * stack )
 {
     // first a simple integrity check of the stack info struct
-    _CfrTil_SetStackPointerFromDsp ( _CfrTil_ ) ;
+    //Set_StackPointerFromDsp ( _CfrTil_ ) ;
     if ( ( stack->StackMin == & stack->StackData [ 0 ] ) &&
         ( stack->StackMax == & stack->StackData [ stack->StackSize - 1 ] ) && // -1 : zero based array
         ( stack->InitialTosPointer == & stack->StackData [ - 1 ] ) )
@@ -400,7 +400,7 @@ _CfrTil_PrintNReturnStack ( int64 size )
     else
     {
         _CfrTil_WordName_Run ( ( byte* ) "getRsp" ) ;
-        uint64 * rsp = ( uint64 * ) _DataStack_Pop ( ) ;
+        uint64 * rsp = ( uint64 * ) DataStack_Pop ( ) ;
         _PrintNStackWindow ( rsp, ( byte* ) "Return Stack", ( byte* ) "Rsp (RSP)", size ) ;
     }
 }
@@ -408,6 +408,40 @@ _CfrTil_PrintNReturnStack ( int64 size )
 void
 _CfrTil_PrintNDataStack ( int64 size )
 {
-    _PrintNStackWindow ( Dsp, ( byte* ) "Data Stack", ( byte* ) "Dsp (DSP:R14)", size ) ;
+    _PrintNStackWindow ( _Dsp_, ( byte* ) "Data Stack", ( byte* ) "Dsp (DSP:R14)", size ) ;
 }
 
+
+void
+_CfrTil_SyncStackPointers_ToRegs ( CfrTil * cfrtil )
+{
+    //cfrtil->Set_CfrTilRspReg_FromReturnStackPointer ( ) ;
+    cfrtil->Set_DspReg_FromDataStackPointer ( ) ;
+}
+
+void
+CfrTil_SyncStackPointers_ToRegs ( CfrTil * cfrtil )
+{
+    if ( cfrtil )
+    {
+        //if ( cfrtil->ReturnStack ) cfrtil->Set_CfrTilRspReg_FromReturnStackPointer ( ) ;
+        if ( cfrtil->DataStack ) cfrtil->Set_DspReg_FromDataStackPointer ( ) ;
+    }
+}
+
+void
+_CfrTil_SyncStackPointers_FromRegs ( CfrTil * cfrtil )
+{
+    //cfrtil->Set_ReturnStackPointer_FromCfrTilRspReg ( ) ;
+    cfrtil->Set_DataStackPointer_FromDspReg ( ) ;
+}
+
+void
+CfrTil_SyncStackPointers_FromRegs ( CfrTil * cfrtil )
+{
+    if ( cfrtil )
+    {
+        //if ( cfrtil->ReturnStack ) cfrtil->Set_ReturnStackPointer_FromCfrTilRspReg ( ) ;
+        if ( cfrtil->DataStack ) cfrtil->Set_DataStackPointer_FromDspReg ( ) ;
+    }
+}

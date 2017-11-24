@@ -4,9 +4,9 @@
 void
 _Compile_C_Call_1_Arg ( byte* function, int64 arg )
 {
-    _Compile_Rsp_Push ( arg ) ;
+    _Compile_RspReg_Push ( arg ) ;
     Compile_Call ( function ) ;
-    _Compile_Rsp_Drop ( ) ;
+    _Compile_RspReg_Drop ( ) ;
 }
 
 void
@@ -29,7 +29,7 @@ _CompileFromUptoRET ( byte * data )
 void
 _Compile_WordInline ( Word * word ) // , byte * dstAddress )
 {
-    _Block_Copy ( 0, ( byte* ) word->Definition, word->S_CodeSize ) ;
+    _Block_Copy ( ( byte* ) word->Definition, word->S_CodeSize ) ;
 }
 
 void

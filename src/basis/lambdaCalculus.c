@@ -48,7 +48,7 @@
 #define LO_CopyOne( l0 ) _LO_AllocCopyOne ( l0, LispAllocType )
 #define LO_Eval( l0 ) _LO_Eval ( l0, 0, 1 )
 #define nil (_Q_->OVT_LC ? _Q_->OVT_LC->Nil : 0)
-#define LC_SaveStackPointer( lc ) { if ( lc ) lc->SaveStackPointer = (int64*) Dsp ; }
+#define LC_SaveStackPointer( lc ) { if ( lc ) lc->SaveStackPointer = (int64*) _Dsp_ ; }
 #define LC_RestoreStackPointer( lc ) _LC_ResetStack ( lc ) //{ if ( lc && lc->SaveStackPointer ) Dsp = lc->SaveStackPointer ; }
 
 ListObject *
@@ -247,7 +247,7 @@ next:
                     {
                         SetState ( _Q_->OVT_LC, ( LC_READ ), false ) ; // let the value be pushed in this case because we need to pop it below
                         Word_Eval ( word ) ;
-                        token1 = ( byte* ) _DataStack_Pop ( ) ;
+                        token1 = ( byte* ) DataStack_Pop ( ) ;
                         SetState ( _Q_->OVT_LC, ( LC_READ ), true ) ;
                         l0 = _DataObject_New (T_LC_LITERAL, 0, token1, LITERAL, 0, word->LAttribute, 0, 0, lexer->TokenStart_ReadLineIndex ) ;
                     }
@@ -699,7 +699,7 @@ _LO_Semi ( Word * word )
     if ( word )
     {
         CfrTil_EndBlock ( ) ;
-        block blk = ( block ) _DataStack_Pop ( ) ;
+        block blk = ( block ) DataStack_Pop ( ) ;
         _Word_InitFinal ( word, ( byte* ) blk ) ;
         word->LAttribute |= T_LISP_CFRTIL_COMPILED ;
         //Namespace_DoNamespace ( ( byte* ) "Lisp" ) ;
@@ -757,7 +757,7 @@ _LO_CfrTil ( ListObject * lfirst )
         {
             ldata = _LO_Next ( ldata ) ;
             Lexer_ParseObject ( _Lexer_, ldata->Name ) ;
-            DSP_Push ( ( int64 ) _Lexer_->Literal ) ;
+            DataStack_Push ( ( int64 ) _Lexer_->Literal ) ;
         }
         else if ( String_Equal ( ldata->Name, ( byte * ) "s:" ) )
         {
@@ -950,7 +950,7 @@ LO_PrepareReturnObject ( )
         {
             type = T_BIG_NUM ;
         }
-        return _DataObject_New (T_LC_NEW, 0, 0, LITERAL | type, 0, LITERAL | type, 0, _DataStack_Pop ( ), 0 ) ;
+        return _DataObject_New (T_LC_NEW, 0, 0, LITERAL | type, 0, LITERAL | type, 0, DataStack_Pop ( ), 0 ) ;
     }
     else return nil ;
 }
@@ -1038,7 +1038,7 @@ _LO_Apply_Arg ( ListObject ** pl1, int64 i, int8 svCompileMode )
         if ( ! l2 || ( l2->LAttribute & T_NIL ) )
         {
             //Compile_DspPop_RspPush ( ) ;
-            _Compile_MoveImm_To_Reg ( RegOrder ( i ++ ), _DataStack_Pop ( ), CELL_SIZE ) ;
+            _Compile_MoveImm_To_Reg ( RegOrder ( i ++ ), DataStack_Pop ( ), CELL_SIZE ) ;
         }
         else
         {
@@ -1124,7 +1124,7 @@ _LO_Apply_Arg ( ListObject ** pl1, int64 i, int8 svCompileMode )
     {
         word = Compiler_CopyDuplicatesAndPush ( word ) ;
         DEBUG_SETUP ( word ) ;
-        _Compile_MoveImm_To_Reg ( RegOrder ( i ++ ), _DataStack_Pop ( ), CELL_SIZE ) ;
+        _Compile_MoveImm_To_Reg ( RegOrder ( i ++ ), DataStack_Pop ( ), CELL_SIZE ) ;
         _DEBUG_SHOW ( word, 1 ) ;
     }
 done:
@@ -1316,7 +1316,7 @@ CompileLispBlock ( ListObject *args, ListObject * body )
     if ( GetState ( lc, LC_COMPILE_MODE ) )
     {
         LO_EndBlock ( ) ;
-        code = ( block ) _DataStack_Pop ( ) ;
+        code = ( block ) DataStack_Pop ( ) ;
     }
     else // nb. LISP_COMPILE_MODE : this state can change with some functions that can't be compiled yet
     {
@@ -1796,7 +1796,7 @@ LC_Read ( )
     //LambdaCalculus *lc = LC_New ( ) ;
     //LC_SaveStackPointer ( lc ) ;
     ListObject * l0 = _LO_Read_ListObject ( 1 ) ;
-    _DataStack_Push ( ( int64 ) l0 ) ;
+    DataStack_Push ( ( int64 ) l0 ) ;
 }
 
 void
@@ -1805,7 +1805,7 @@ LC_Eval ( )
     LC_New ( ) ;
     ListObject * l0 = ( ListObject * ) DataStack_Pop ( ), *l1 ;
     l1 = LO_Eval ( l0 ) ;
-    _DataStack_Push ( ( int64 ) l1 ) ;
+    DataStack_Push ( ( int64 ) l1 ) ;
 }
 
 void
@@ -1814,7 +1814,7 @@ LC_DupList ( )
     LC_New ( ) ;
     ListObject * l0 = ( ListObject * ) TOS, *l1 ;
     l1 = LO_Copy ( l0 ) ;
-    _DataStack_Push ( ( int64 ) l1 ) ;
+    DataStack_Push ( ( int64 ) l1 ) ;
 }
 
 void
@@ -1822,7 +1822,7 @@ _LC_SaveStack ( LambdaCalculus * lc )
 {
     if ( lc )
     {
-        lc->SaveStackPointer = Dsp ;
+        lc->SaveStackPointer = _Dsp_ ;
     }
 }
 
@@ -1831,7 +1831,7 @@ _LC_ResetStack ( LambdaCalculus * lc )
 {
     if ( lc )
     {
-        if ( lc->SaveStackPointer ) Dsp = lc->SaveStackPointer ;
+        if ( lc->SaveStackPointer ) _Dsp_ = lc->SaveStackPointer ;
         //lc->SaveStackPointer = Dsp ;
     }
 }

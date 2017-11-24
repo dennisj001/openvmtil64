@@ -229,7 +229,7 @@ System
 ;;
 : _wdiss ( addToHistoryFlag pword ) 
     nl pel 
-    nl "::> 'wdiss' is being called at" d: _ps location "<::" ps
+    nl "::> 'wdiss' is being called at" _ps location "<::" ps
     _source ( addToHistoryFlag @ pword @ ) nl pdl 
     pword @ wdis 
     { pword @ } 
@@ -241,7 +241,7 @@ System
 : wdiss ( pword ) _wdiss ( 0 pword @ ) ; //debugWord      // don't add wdiss words to history list
 : wdissl ( pword ) logOn _wdiss ( 0 pword @ ) logOff ; //debugWord      // don't add wdiss words to history list
 "winfo" ' wdiss find alias
-' wdiss find d: _wdiss
+d: ' wdiss find _wdiss
 : sys mem namespaces words stack using in ; 
 'aw 'allWords find alias
 : stk stack ; //debugWord 

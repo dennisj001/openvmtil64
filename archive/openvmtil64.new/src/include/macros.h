@@ -12,7 +12,7 @@
 #define _Compile_Int64( value ) ByteArray_AppendCopyItem ( _Q_CodeByteArray, 8, value )
 #define _Compile_Cell( value ) ByteArray_AppendCopyItem ( _Q_CodeByteArray, sizeof(int64), value )
 #define Here ( _ByteArray_Here ( _Q_CodeByteArray ) )
-#define SetHere( address )  _ByteArray_SetHere_AndForDebug ( _Q_CodeByteArray, address ) 
+#define SetHere( address )  _ByteArray_SetHere ( _Q_CodeByteArray, address ) 
 #define Set_CompilerSpace( byteArray ) (_Q_CodeByteArray = (byteArray))
 #define Get_CompilerSpace( ) _Q_CodeByteArray
 

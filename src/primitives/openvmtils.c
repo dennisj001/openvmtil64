@@ -4,19 +4,19 @@
 void
 OpenVmTil_Verbosity ( )
 {
-    _DataStack_Push ( ( int64 ) & _Q_->Verbosity ) ;
+    DataStack_Push ( ( int64 ) & _Q_->Verbosity ) ;
 }
 
 void
 Ovt_Optimize ( )
 {
-    _DataStack_Push ( ( int64 ) GetState ( _CfrTil_, OPTIMIZE_ON ) ? 1 : 0 ) ;
+    DataStack_Push ( ( int64 ) GetState ( _CfrTil_, OPTIMIZE_ON ) ? 1 : 0 ) ;
 }
 
 void
 Ovt_Inlining ( )
 {
-    _DataStack_Push ( ( int64 ) GetState ( _CfrTil_, INLINE_ON ) ? 1 : 0 ) ;
+    DataStack_Push ( ( int64 ) GetState ( _CfrTil_, INLINE_ON ) ? 1 : 0 ) ;
 }
 
 // allows variables to be created on first use without a "var" declaration
@@ -24,7 +24,7 @@ Ovt_Inlining ( )
 void
 Ovt_AutoVar ( )
 {
-    _DataStack_Push ( ( int64 ) GetState ( _Q_, AUTO_VAR ) ? 1 : 0 ) ;
+    DataStack_Push ( ( int64 ) GetState ( _Q_, AUTO_VAR ) ? 1 : 0 ) ;
 }
 
 void
@@ -44,43 +44,43 @@ Ovt_AutoVarOn ( )
 void
 OpenVmTil_HistorySize ( )
 {
-    _DataStack_Push ( ( int64 ) & _Q_->HistorySize ) ;
+    DataStack_Push ( ( int64 ) & _Q_->HistorySize ) ;
 }
 
 void
 OpenVmTil_DataStackSize ( )
 {
-    _DataStack_Push ( ( int64 ) & _Q_->DataStackSize ) ;
+    DataStack_Push ( ( int64 ) & _Q_->DataStackSize ) ;
 }
 
 void
 OpenVmTil_CodeSize ( )
 {
-    _DataStack_Push ( ( int64 ) & _Q_->MachineCodeSize ) ;
+    DataStack_Push ( ( int64 ) & _Q_->MachineCodeSize ) ;
 }
 
 void
 OpenVmTil_SessionObjectsSize ( )
 {
-    _DataStack_Push ( ( int64 ) & _Q_->SessionObjectsSize ) ;
+    DataStack_Push ( ( int64 ) & _Q_->SessionObjectsSize ) ;
 }
 
 void
 OpenVmTil_CompilerTempObjectsSize ( )
 {
-    _DataStack_Push ( ( int64 ) & _Q_->CompilerTempObjectsSize ) ;
+    DataStack_Push ( ( int64 ) & _Q_->CompilerTempObjectsSize ) ;
 }
 
 void
 OpenVmTil_ObjectsSize ( )
 {
-    _DataStack_Push ( ( int64 ) & _Q_->ObjectsSize ) ;
+    DataStack_Push ( ( int64 ) & _Q_->ObjectsSize ) ;
 }
 
 void
 OpenVmTil_DictionarySize ( )
 {
-    _DataStack_Push ( ( int64 ) & _Q_->DictionarySize ) ;
+    DataStack_Push ( ( int64 ) & _Q_->DictionarySize ) ;
 }
 
 void

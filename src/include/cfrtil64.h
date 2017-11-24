@@ -55,6 +55,7 @@ extern CPrimitive CPrimitives [];
 extern MachineCodePrimitive MachineCodePrimitives [];
 extern uint64 mmap_TotalMemAllocated, mmap_TotalMemFreed ;
 extern uint64 BlockCallAddress ;
+extern uint64 *_Dsp_, * _Rsp_ ;
 
 typedef int ( *mpf2andOutFunc) (mpfr_ptr, mpfr_srcptr, mpfr_srcptr, mpfr_rnd_t) ;
 

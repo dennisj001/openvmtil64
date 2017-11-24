@@ -26,7 +26,7 @@ CfrTil_If ( )
         else
         {
             Interpreter * interp = _Context_->Interpreter0 ;
-            if ( _DataStack_Pop ( ) )
+            if ( DataStack_Pop ( ) )
             {
                 // interpret until "else" or "endif"
                 byte * token = _Interpret_C_Until_EitherToken ( interp, ( byte* ) "else", ( byte* ) "endif", 0 ) ;
@@ -90,7 +90,7 @@ void
 Compile_Cmp_Set_tttn_Logic ( Compiler * compiler, int64 ttt, int64 negateFlag )
 {
     //SC_ForcePush ( _Context_->CurrentlyRunningWord ) ;
-    SC_SetForcePush ( true ) ;
+    //SC_SetForcePush ( true ) ;
     int64 optFlag = CheckOptimize ( compiler, 5 ) ;
 #define dbgON_13 0
 #if dbgON_13    
@@ -162,7 +162,7 @@ _Compile_SETcc ( int8 ttt, int8 negFlag, int8 reg )
     d1 ( byte * here = Here ) ;
 #endif    
     //SC_ForcePush ( _Context_->CurrentlyRunningWord ) ;
-    SC_SetForcePush ( true ) ;
+    //SC_SetForcePush ( true ) ;
     //int8 rex = _Calculate_Rex ( reg, 0, 1 ) ;//( immSize == 8 ) || ( controlFlag & REX_B ) ) ;
     int8 rex = Calculate_Rex ( 0, reg, 0 ) ; //( immSize == 8 ) || ( controlFlag & REX_B ) ) ;
     if ( rex ) _Compile_Int8 ( rex ) ;
@@ -186,11 +186,23 @@ _Compile_SET_tttn_REG ( int8 ttt, int8 negFlag, int8 reg )
 }
 
 void
-Compile_GetLogicFromTOS ( BlockInfo *bi )
+Compile_GetLogicFromTOS ( BlockInfo * bi )
 {
+#if 0     
+    //DBI_ON ;
     Compile_Pop_To_Acc ( DSP ) ;
-    SC_SetForcePush ( true ) ;
+    //Compile_CMPI( REG, ACC, 0, 0, CELL )  ; // no cmp insn with 64bit imm so ...
+    //_Compile_Move_Reg_To_Reg ( ACC, ACC ) ; // necessary after subtract in Pop
     _Compile_TEST_Reg_To_Reg ( ACC, ACC ) ;
+    //DBI_OFF ;
+#else    
+    if ( bi && bi->LogicCodeWord && bi->LogicCodeWord->StackPushRegisterCode )
+    {
+        SetHere ( bi->LogicCodeWord->StackPushRegisterCode ) ;
+    }
+    else Compile_Pop_To_Acc ( DSP ) ;
+    _Compile_TEST_Reg_To_Reg ( ACC, ACC ) ;
+#endif    
 }
 
 int64
@@ -206,7 +218,7 @@ Compile_CheckReConfigureLogicInBlock ( BlockInfo * bi, int8 overwriteFlag )
             if ( overwriteFlag )
             {
                 int64 n ;
-                Compile_Return ( ) ;
+                _Compile_Return ( ) ;
                 bi->bp_Last = Here ;
                 for ( n = bi->OverWriteSize - 1 ; n ; n -- ) _Compile_Noop ( ) ; // adjust so Disassemble doesn't get an "invalid" insn; we overwrite a 3 byte insn ( 0fb6c0 : movzx eax, al ) with RET NOP NOP
                 SetHere ( saveHere ) ;

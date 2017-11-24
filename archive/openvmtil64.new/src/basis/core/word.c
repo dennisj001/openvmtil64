@@ -5,8 +5,13 @@ _Word_Run ( Word * word )
 {
     if ( word )
     {
+        word->StackPushRegisterCode = 0 ; // nb. used! by the rewriting optInfo
+        // keep track in the word itself where the machine code is to go, if this word is compiled or causes compiling code - used for optimization
+        word->W_SC_WordIndex = _CfrTil_->SC_ScratchPadIndex ;
+        Word_SetCoding ( word, Here ) ;
         word->W_InitialRuntimeDsp = _Dsp_ ;
         _Context_->CurrentlyRunningWord = word ;
+        _Debugger_->PreHere = Here ;
 #if 1        
         //if ( ! ( word->CAttribute & CFRTIL_WORD ) ) _Block_Eval ( word->Definition ) ;
         if ( word->CAttribute & CPRIMITIVE ) _Block_Eval ( word->Definition ) ;
@@ -49,10 +54,6 @@ _Word_Eval ( Word * word )
 {
     if ( word )
     {
-        word->StackPushRegisterCode = 0 ; // nb. used! by the rewriting optInfo
-        // keep track in the word itself where the machine code is to go, if this word is compiled or causes compiling code - used for optimization
-        word->W_SC_WordIndex = _CfrTil_->SC_ScratchPadIndex ;
-        Word_SetCoding ( word, Here ) ;
         if ( ( word->CAttribute & IMMEDIATE ) || ( ! CompileMode ) )
         {
             Word_Run ( word ) ;

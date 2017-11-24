@@ -176,7 +176,6 @@ _Lexer_LexNextToken_WithDelimiters ( Lexer * lexer, byte * delimiters, int64 che
         lexer->State |= state ;
         while ( ( ! Lexer_CheckIfDone ( lexer, LEXER_DONE ) ) )
         {
-            //Lexer_GetChar ( lexer ) ;
             byte c = lexer->NextChar ( lexer->ReadLiner0 ) ;
             _Lexer_GetChar ( lexer, c ) ;
 

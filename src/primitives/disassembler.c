@@ -12,7 +12,7 @@ Word_Disassemble ( Word * word )
         if ( ( ! word->S_CodeSize ) && ( size > 0 ) )
         {
             word->S_CodeSize = size ;
-            _Printf ( "\n_CfrTil_Word_Disassemble : word - \'%s\' :: codeSize = %d", word->Name, size ) ;
+            _Printf ( (byte*) "\n_CfrTil_Word_Disassemble : word - \'%s\' :: codeSize = %d", word->Name, size ) ;
         }
     }
 }
@@ -35,7 +35,7 @@ _CfrTil_Word_Disassemble ( Word * word )
 void
 CfrTil_Word_Disassemble ( )
 {
-    Word * word = ( Word* ) _DataStack_Pop ( ) ;
+    Word * word = ( Word* ) DataStack_Pop ( ) ;
     _CfrTil_Word_Disassemble ( word ) ;
 }
 
@@ -51,8 +51,8 @@ Debugger_WDis ( Debugger * debugger )
 void
 CfrTil_Disassemble ( )
 {
-    uint64 number = _DataStack_Pop ( ) ;
-    byte * address = ( byte* ) _DataStack_Pop ( ) ;
+    uint64 number = DataStack_Pop ( ) ;
+    byte * address = ( byte* ) DataStack_Pop ( ) ;
     _Debugger_Disassemble ( _Debugger_, address, number, 0 ) ;
     //_Printf ( ( byte* ) "\n" ) ;
 }

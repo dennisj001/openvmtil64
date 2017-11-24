@@ -16,7 +16,7 @@ Compile_DataStack_PopAndCall ( void )
 void
 Compile_Call_From_C_Address ( uint64 bptr )
 {
-    _Compile_Get_FromCAddress_ToReg ( ACC, ( byte* ) bptr ) ;
+    _Compile_GetRValue_FromLValue_ToReg ( ACC, ( byte* ) bptr ) ;
     //_Compile_MoveImm_To_Reg ( ACC, ( uint64 ) bptr, CELL_SIZE ) ;
     _Compile_Call_Acc ( ) ;
 
@@ -40,7 +40,7 @@ Compile_SetEaxToZero ( void )
 // >R - Rsp to
 
 void
-_Compile_Rsp_To ( ) // data stack pop to rsp
+_Compile_RspReg_To ( ) // data stack pop to rsp
 {
     Compile_DspPop_RspPush ( ) ;
 }
@@ -48,7 +48,7 @@ _Compile_Rsp_To ( ) // data stack pop to rsp
 // rdrop
 
 void
-_Compile_Rsp_Drop ( )
+_Compile_RspReg_Drop ( )
 {
     _Compile_DropN_Rsp ( 1 ) ;
 }
@@ -56,7 +56,7 @@ _Compile_Rsp_Drop ( )
 // rsp
 
 void
-_Compile_Rsp_Get ( )
+_Compile_RspReg_Get ( )
 {
     _Compile_Stack_PushReg ( DSP, RSP ) ;
 }
@@ -64,7 +64,7 @@ _Compile_Rsp_Get ( )
 // rsp@
 
 void
-_Compile_Rsp_Fetch ( )
+_Compile_RspReg_Fetch ( )
 {
     _Compile_Move_Reg_To_Reg ( ACC, RSP ) ;
     _Compile_Move_Rm_To_Reg ( ACC, ACC, 0 ) ;
@@ -74,18 +74,18 @@ _Compile_Rsp_Fetch ( )
 // r< - r from
 
 void
-_Compile_Rsp_From ( )
+_Compile_RspReg_From ( )
 {
-    _Compile_Rsp_Fetch ( ) ;
-    _Compile_Rsp_Drop ( ) ;
+    _Compile_RspReg_Fetch ( ) ;
+    _Compile_RspReg_Drop ( ) ;
 }
 
 // Rsp! - Rsp store
 
 void
-_Compile_Rsp_Store ( ) // data stack pop to rsp [0] !
+_Compile_RspReg_Store ( ) // data stack pop to rsp [0] !
 {
-    _Compile_Rsp_From ( ) ;
+    _Compile_RspReg_From ( ) ;
     Compile_Store ( _Context_->Compiler0, DSP ) ;
 }
 

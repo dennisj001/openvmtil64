@@ -6,7 +6,7 @@
 // run all new object thru here ; good for debugging and understanding 
 
 Word *
-_DataObject_New (uint64 type, Word * word, byte * name, uint64 ctype, uint64 ctype2, uint64 ltype, int64 index, int64 value, int64 startCharRlIndex )
+_DataObject_New ( uint64 type, Word * word, byte * name, uint64 ctype, uint64 ctype2, uint64 ltype, int64 index, int64 value, int64 startCharRlIndex )
 {
     if ( startCharRlIndex ) _Context_->Lexer0->TokenStart_ReadLineIndex = startCharRlIndex ;
     if ( word && ( ! ( type & ( T_LC_NEW ) ) ) ) //&& !(type && (T_LC_NEW | T_LC_LITERAL))) 
@@ -27,7 +27,7 @@ _DataObject_New (uint64 type, Word * word, byte * name, uint64 ctype, uint64 cty
         }
         case CFRTIL_WORD:
         {
-            word = _DObject_New (name, value, ctype | BLOCK, ctype2, ltype | BLOCK, BLOCK, 0, 0, 1, 0, DICTIONARY ) ;
+            word = _DObject_New ( name, value, ctype | BLOCK, ctype2, ltype | BLOCK, BLOCK, 0, 0, 1, 0, DICTIONARY ) ;
             break ;
         }
         case NAMESPACE:
@@ -47,7 +47,7 @@ _DataObject_New (uint64 type, Word * word, byte * name, uint64 ctype, uint64 cty
         }
         case CONSTANT:
         {
-            word = _DObject_New (name, value, CONSTANT | IMMEDIATE, ctype2, 0, CONSTANT, ( byte* ) _DataObject_Run, 0, 1, 0, DICTIONARY ) ;
+            word = _DObject_New ( name, value, (CONSTANT | IMMEDIATE | CPRIMITIVE), ctype2, 0, CONSTANT, ( byte* ) _DataObject_Run, 0, 1, 0, DICTIONARY ) ;
             break ;
         }
         case OBJECT:
@@ -93,6 +93,7 @@ _DataObject_New (uint64 type, Word * word, byte * name, uint64 ctype, uint64 cty
         }
     }
     if ( word ) word->W_SC_ScratchPadIndex = _CfrTil_->SC_ScratchPadIndex ; //word->W_SC_ScratchPadIndex ? word->W_SC_ScratchPadIndex : _CfrTil_->SC_ScratchPadIndex ;
+    //word->CAttribute |= CPRIMITIVE ;
     return word ;
 }
 
@@ -111,7 +112,7 @@ Word *
 _CfrTil_ObjectNew ( int64 size, byte * name, uint64 category, int64 allocType )
 {
     byte * obj = _CfrTil_NamelessObjectNew ( size, allocType ) ; //OBJECT_MEMORY ) ;
-    Word * word = _DObject_New (name, ( int64 ) obj, ( OBJECT | IMMEDIATE | category ), 0, 0, OBJECT, ( byte* ) _DataObject_Run, 0, 0, 0, DICTIONARY ) ;
+    Word * word = _DObject_New ( name, ( int64 ) obj, ( OBJECT | IMMEDIATE | CPRIMITIVE | category ), 0, 0, OBJECT, ( byte* ) _DataObject_Run, 0, 0, 0, DICTIONARY ) ;
     word->Size = size ;
     return word ;
 }
@@ -138,7 +139,7 @@ _Class_Object_Init ( Word * word, Namespace * ns )
     for ( i = Stack_Depth ( nsstack ) ; i > 0 ; i -- )
     {
         Word * initWord = ( Word* ) _Stack_Pop ( nsstack ) ;
-        DSP_Push ( ( int64 ) word->W_Object ) ;
+        DataStack_Push ( ( int64 ) word->W_Object ) ;
         d0 ( CfrTil_PrintDataStack ( ) ) ;
         Word_Eval ( initWord ) ;
         d0 ( CfrTil_PrintDataStack ( ) ) ;
@@ -176,7 +177,7 @@ _Class_New ( byte * name, uint64 type, int64 cloneFlag )
         {
             size = _Namespace_VariableValueGet ( sns, ( byte* ) "size" ) ;
         }
-        ns = _DObject_New (name, 0, CPRIMITIVE | CLASS | IMMEDIATE | type, 0, 0, type, ( byte* ) _DataObject_Run, 0, 0, sns, DICTIONARY ) ;
+        ns = _DObject_New ( name, 0, CPRIMITIVE | CLASS | IMMEDIATE | type, 0, 0, type, ( byte* ) _DataObject_Run, 0, 0, sns, DICTIONARY ) ;
         _Namespace_DoNamespace ( ns, 1 ) ; // before "size", "this"
         Word *ws = _CfrTil_Variable_New ( ( byte* ) "size", size ) ; // start with size of the prototype for clone
         //ws->CAttribute |= NAMESPACE_VARIABLE ;
@@ -197,7 +198,7 @@ _Class_New ( byte * name, uint64 type, int64 cloneFlag )
 Word *
 _CfrTil_ClassField_New ( byte * token, Class * aclass, int64 size, int64 offset )
 {
-    Word * word = _DObject_New (token, 0, IMMEDIATE | OBJECT_FIELD, 0, 0, OBJECT_FIELD, ( byte* ) _DataObject_Run, 0, 1, 0, DICTIONARY ) ;
+    Word * word = _DObject_New ( token, 0, (IMMEDIATE | OBJECT_FIELD | CPRIMITIVE), 0, 0, OBJECT_FIELD, ( byte* ) _DataObject_Run, 0, 1, 0, DICTIONARY ) ;
     word->ClassFieldTypeNamespace = aclass ;
     word->Size = size ;
     word->Offset = offset ;
@@ -215,7 +216,7 @@ _CfrTil_Variable_New ( byte * name, int64 value )
         word = CfrTil_LocalWord ( name, LOCAL_VARIABLE ) ; // svf : flag - whether stack variables are in the frame
         SetState ( _Compiler_, VARIABLE_FRAME, true ) ;
     }
-    else word = _DObject_New (name, value, NAMESPACE_VARIABLE | IMMEDIATE, 0, 0, NAMESPACE_VARIABLE, ( byte* ) _DataObject_Run, 0, 1, 0, DICTIONARY ) ;
+    else word = _DObject_New ( name, value, (CPRIMITIVE | NAMESPACE_VARIABLE | IMMEDIATE), 0, 0, NAMESPACE_VARIABLE, ( byte* ) _DataObject_Run, 0, 1, 0, DICTIONARY ) ;
     return word ;
 }
 
@@ -223,7 +224,7 @@ void
 _CfrTil_Label ( byte * lname )
 {
     Namespace * ns = Namespace_FindOrNew_SetUsing ( ( byte* ) "__labels__", _CfrTil_->Namespaces, 1 ) ;
-    _DObject_New (lname, ( int64 ) Here, CONSTANT | IMMEDIATE, 0, 0, CONSTANT, ( byte* ) _DataObject_Run, 0, 0, ns, DICTIONARY ) ;
+    _DObject_New ( lname, ( int64 ) Here, CONSTANT | IMMEDIATE, 0, 0, CONSTANT, ( byte* ) _DataObject_Run, 0, 0, ns, DICTIONARY ) ;
 }
 
 Word *
@@ -232,7 +233,7 @@ _CfrTil_LocalWord ( byte * name, int64 index, int64 ctype ) // svf : flag - whet
     Word *word ;
     //if ( ! ( word = Finder_FindWord_InOneNamespace ( _Finder_, _CfrTil_Namespace_InNamespaceGet ( ), name ) ) )
     {
-        word = _DObject_New (name, 0, ( ctype | IMMEDIATE ), 0, 0, LOCAL_VARIABLE, ( byte* ) _DataObject_Run, 0, 1, 0, COMPILER_TEMP ) ;
+        word = _DObject_New ( name, 0, ( ctype | IMMEDIATE | CPRIMITIVE ), 0, 0, LOCAL_VARIABLE, ( byte* ) _DataObject_Run, 0, 1, 0, COMPILER_TEMP ) ;
         word->Index = index ; //( ctype & LOCAL_VARIABLE ) ? _Compiler_->NumberOfLocals : _Compiler_->NumberOfArgs ;
     }
     return word ;
@@ -277,14 +278,14 @@ Literal_New ( Lexer * lexer, uint64 uliteral )
         }
         name = lexer->OriginalToken ;
     }
-    word = _DObject_New (name, uliteral, LITERAL | CONSTANT | IMMEDIATE, 0, 0, LITERAL, ( byte* ) _DataObject_Run, 0, 0, 0, TEMPORARY ) ;
+    word = _DObject_New ( name, uliteral, CPRIMITIVE | LITERAL | CONSTANT | IMMEDIATE, 0, 0, LITERAL, ( byte* ) _DataObject_Run, 0, 0, 0, TEMPORARY ) ;
     return word ;
 }
 
 Namespace *
 _Namespace_New ( byte * name, Namespace * containingNs )
 {
-    Namespace * ns = _DObject_New (name, 0, ( CPRIMITIVE | NAMESPACE | IMMEDIATE ), 0, 0, NAMESPACE, ( byte* ) _DataObject_Run, 0, 0, containingNs, DICTIONARY ) ;
+    Namespace * ns = _DObject_New ( name, 0, ( CPRIMITIVE | NAMESPACE | IMMEDIATE ), 0, 0, NAMESPACE, ( byte* ) _DataObject_Run, 0, 0, containingNs, DICTIONARY ) ;
 
     return ns ;
 }
@@ -293,7 +294,7 @@ void
 _CfrTil_MachineCodePrimitive_NewAdd ( const char * name, uint64 cType, block * callHook, byte * function, int64 functionArg, const char *nameSpace, const char * superNamespace )
 {
     //_DObject_New ( byte * name, uint64 value, uint64 ctype, uint64 ltype, uint64 ftype, byte * function, int64 arg, int64 addToInNs, Namespace * addToNs, uint64 allocType )
-    Word * word = _DObject_New (( byte* ) name, ( uint64 ) function, cType, 0, 0, 0, function, functionArg, 0, 0, DICTIONARY ) ;
+    Word * word = _DObject_New ( ( byte* ) name, ( uint64 ) function, ( cType | CPRIMITIVE ), 0, 0, 0, function, functionArg, 0, 0, DICTIONARY ) ;
     if ( callHook ) *callHook = word->Definition ;
     _CfrTil_InitialAddWordToNamespace ( word, ( byte* ) nameSpace, ( byte* ) superNamespace ) ;
 }

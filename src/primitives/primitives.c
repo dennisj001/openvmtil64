@@ -300,7 +300,8 @@ CPrimitive CPrimitives [] = {
     { "sourceDontAdd", CfrTil_Source_DontAddToHistory, 0, 0, 0, "Debug", "Root" },
     { "stack", CfrTil_PrintDataStack, 0, 0, 0, "Debug", "Root" },
     { "rstack", CfrTil_PrintReturnStack, 0, 0, 0, "Debug", "Root" },
-    { "nrstack", CfrTil_PrintNReturnStack, 0, 0, 0, "Debug", "Root" },
+    { "rspRegstack", CfrTil_PrintRspRegStack, 0, 0, 0, "Debug", "Root" },
+    { "nRspRegstack", CfrTil_PrintNRspRegStack, 0, 0, 0, "Debug", "Root" },
     { "dstack", CfrTil_PrintNDataStack_8, 0, 0, 0, "Debug", "Root" },
     { "ndstack", CfrTil_PrintNDataStack, 0, 0, 0, "Debug", "Root" },
     { "s{", CfrTil_DbgSourceCodeBeginBlock, IMMEDIATE, 0, 0, "Debug", "Root" },
@@ -592,7 +593,6 @@ CPrimitive CPrimitives [] = {
     { "getStringToEndOfLine", String_GetStringToEndOfLine, 0, 0, 0, "Compiler", "Root" },
     { "sourceCodeInit", CfrTil_SourceCode_Init, 0, 0, 0, "Compiler", "Root" },
     { "sourceCodeOn", CfrTil_Lexer_SourceCodeOn, 0, 0, 0, "Compiler", "Root" },
-    //{ "<w>", CfrTil_WrapNextWord, IMMEDIATE, 0, 0, "Compiler", "Root" },
     
     { ",", CompileInt32, 0, 0, 0, "Compiling", "Compiler" },
     { "4,", CompileInt32, 0, 0, 0, "Compiling", "Compiler" },
@@ -603,6 +603,10 @@ CPrimitive CPrimitives [] = {
     { "n,", CompileN, 0, 0, 0, "Compiling", "Compiler" },
     { "_compileCall", CompileCall, 0, 0, 0, "Compiling", "Compiler" },
     { "_compileWord", CompileACfrTilWord, 0, 0, 0, "Compiling", "Compiler" },
+    { "peekReg", CfrTil_PeekReg, 0, 0, 0, "Compiling", "Compiler" },
+    { "pokeRegWithValue", CfrTil_PokeRegWithValue, 0, 0, 0, "Compiling", "Compiler" },
+    { "pokeRegAtAddress", CfrTil_PokeRegAtAddress, 0, 0, 0, "Compiling", "Compiler" },
+    { "rsp", CfrTil_Rsp, 0, 0, 0, "Compiling", "Compiler" },
 
     { 0 }
 } ;
@@ -617,25 +621,19 @@ MachineCodePrimitive MachineCodePrimitives [] = {
     { "restoreCpu2State", CPRIMITIVE, 0, ( byte* ) _Compile_CpuState_Restore, 0, "System", "Root" },
     { "saveSelectedCpuState", CPRIMITIVE, 0, ( byte* ) _Compile_CpuState_SaveSelected, 0, "System", "Root" },
     { "saveCpuState", CPRIMITIVE, 0, ( byte* ) _Compile_CpuState_Save, 0, "Debug", "Root" },
-#if 0    
-    { "syncEsiToDsp", CPRIMITIVE, 0, ( byte* ) _Compile_Sync_EsiToDsp, 0, "System", "Root" },
-    { "syncDspToEsi", CPRIMITIVE, 0, ( byte* ) _Compile_Sync_DspToEsi, 0, "System", "Root" },
-#endif    
     { "callCurrentBlock", CPRIMITIVE, 0, ( byte* ) Compile_Call_CurrentBlock, 0, "System", "Root" },
-#if NEW_CALL_RETURN    
-    { "callCfrTilWord", CPRIMITIVE, 0, ( byte* ) Compile_Call_CfrTilWord, 0, "System", "Root" },
-    { "sync_ReturnStackStackPointer_To_CFT_RSP", CPRIMITIVE, 0, ( byte* ) Compile_ReturnStackStackPointer_To_CFT_RSP, 0, "System", "Root" },
-    { "sync_CFT_RSP_To_ReturnStackStackPointer", CPRIMITIVE, 0, ( byte* ) Compile_CFT_RSP_To_ReturnStackStackPointer, 0, "System", "Root" },
-#endif    
-    //{ "<dbg>", CFRTIL_WORD | DEBUG_WORD | INTERPRET_DBG, 0, ( byte* ) _Compile_DebugRuntimeBreakpoint, - 1, "Debug", "Root" },
+    //{ "callCfrTilWord", CPRIMITIVE, 0, ( byte* ) Compile_Call_CfrTilWord, 0, "System", "Root" },
+    //{ "set_CfrTilRsp_FromReturnStackPointer", CPRIMITIVE, 0, ( byte* ) Compile_Set_CfrTilRspReg_FromReturnStackPointer, 0, "System", "Root" },
+    //{ "set_ReturnStackPointer_FromCfrTilRsp", CPRIMITIVE, 0, ( byte* ) Compile_Set_ReturnStackPointer_FromCfrTilRspReg, 0, "System", "Root" },
+    //{ "set_DspReg_FromDataStackPointer", CPRIMITIVE, 0, ( byte* ) Compile_Set_DspReg_FromDataStackPointer, 0, "System", "Root" },
+    //{ "set_DataStackPointer_FromDspReg", CPRIMITIVE, 0, ( byte* ) Compile_Set_DataStackPointer_FromDspReg, 0, "System", "Root" },
     { "<dbg>", CPRIMITIVE | INTERPRET_DBG, 0, ( byte* ) _Compile_DebugRuntimeBreakpoint, - 1, "Debug", "Root" },
-    { "rsp", CPRIMITIVE, 0, ( byte* ) _Compile_Rsp_Get, - 1, "System", "Root" },
-    { "rsp@", CPRIMITIVE, 0, ( byte* ) _Compile_Rsp_Fetch, - 1, "System", "Root" },
-    { ">rsp", CPRIMITIVE, 0, ( byte* ) _Compile_Rsp_To, - 1, "System", "Root" },
-    { "rsp>", CPRIMITIVE, 0, ( byte* ) _Compile_Rsp_From, - 1, "System", "Root" },
-    { "rdrop", CPRIMITIVE, 0, ( byte* ) _Compile_Rsp_Drop, - 1, "Debug", "Root" },
-    { "rsp!", CPRIMITIVE, 0, ( byte* ) _Compile_Rsp_Store, - 1, "System", "Root" },
-    //{ "pushR8", CFRTIL_WORD, 0, ( byte* ) Compile_DataStack_PushR8, - 1, "System", "Root" },
+    { "rspReg", CPRIMITIVE, 0, ( byte* ) _Compile_RspReg_Get, - 1, "System", "Root" },
+    { "rspReg@", CPRIMITIVE, 0, ( byte* ) _Compile_RspReg_Fetch, - 1, "System", "Root" },
+    { ">rspReg", CPRIMITIVE, 0, ( byte* ) _Compile_RspReg_To, - 1, "System", "Root" },
+    { "rspReg>", CPRIMITIVE, 0, ( byte* ) _Compile_RspReg_From, - 1, "System", "Root" },
+    { "rspRegdrop", CPRIMITIVE, 0, ( byte* ) _Compile_RspReg_Drop, - 1, "Debug", "Root" },
+    { "rspReg!", CPRIMITIVE, 0, ( byte* ) _Compile_RspReg_Store, - 1, "System", "Root" },
     { 0 }
 } ;
 

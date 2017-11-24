@@ -36,7 +36,7 @@ _GetCondStatus ( )
     SetState ( cntx->Compiler0, COMPILE_MODE, false ) ;
     _Interpret_ToEndOfLine ( cntx->Interpreter0 ) ;
     SetState ( cntx->Compiler0, COMPILE_MODE, svcm ) ;
-    status = _DataStack_Pop ( ) ;
+    status = DataStack_Pop ( ) ;
     if ( status > 0 ) status = 1 ;
     else return 0 ; //return status ;
 }

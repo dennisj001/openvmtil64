@@ -10,8 +10,8 @@ CfrTil_Plus ( ) // +
     }
     else
     {
-        Dsp [ - 1 ] = Dsp [ 0 ] + Dsp [ - 1 ] ;
-        Dsp -- ;
+        _Dsp_ [ - 1 ] = _Dsp_ [ 0 ] + _Dsp_ [ - 1 ] ;
+                DataStack_Drop ( ) ;
     }
 }
 
@@ -141,8 +141,8 @@ CfrTil_PlusEqual ( ) // +=
     {
 
         int64 *x, n ;
-        n = _DataStack_Pop ( ) ;
-        x = ( int64* ) _DataStack_Pop ( ) ;
+        n = DataStack_Pop ( ) ;
+        x = ( int64* ) DataStack_Pop ( ) ;
         *x = * x + n ;
         //_DataStack_SetTop ( Dsp, _DataStack_Pop () + _DataStack_GetTop ( Dsp ) ) ;
     }
@@ -159,8 +159,8 @@ CfrTil_MinusEqual ( ) // -=
     {
 
         int64 *x, n ;
-        n = _DataStack_Pop ( ) ;
-        x = ( int64* ) _DataStack_Pop ( ) ;
+        n = DataStack_Pop ( ) ;
+        x = ( int64* ) DataStack_Pop ( ) ;
         *x = * x - n ;
         //_DataStack_SetTop ( Dsp, _DataStack_Pop () + _DataStack_GetTop ( Dsp ) ) ;
     }
@@ -177,8 +177,8 @@ CfrTil_MultiplyEqual ( ) // *=
     {
 
         int64 *x, n ;
-        n = _DataStack_Pop ( ) ;
-        x = ( int64* ) _DataStack_Pop ( ) ;
+        n = DataStack_Pop ( ) ;
+        x = ( int64* ) DataStack_Pop ( ) ;
         *x = * x * n ;
         //_DataStack_SetTop ( Dsp, _DataStack_Pop () + _DataStack_GetTop ( Dsp ) ) ;
     }
@@ -195,8 +195,8 @@ CfrTil_DivideEqual ( ) // +=
     {
 
         int64 *x, n ;
-        n = _DataStack_Pop ( ) ;
-        x = ( int64* ) _DataStack_Pop ( ) ;
+        n = DataStack_Pop ( ) ;
+        x = ( int64* ) DataStack_Pop ( ) ;
         *x = * x / n ;
         //_DataStack_SetTop ( Dsp, _DataStack_Pop () + _DataStack_GetTop ( Dsp ) ) ;
     }
@@ -215,8 +215,8 @@ CfrTil_Minus ( )
     else
     {
 
-        Dsp [ - 1 ] = Dsp [ - 1 ] - Dsp [ 0 ] ;
-        Dsp -- ;
+        _Dsp_ [ - 1 ] = _Dsp_ [ - 1 ] - _Dsp_ [ 0 ] ;
+                DataStack_Drop ( ) ;
     }
 }
 
@@ -230,8 +230,8 @@ CfrTil_Multiply ( ) // *
     else
     {
 
-        Dsp [ - 1 ] = Dsp [ 0 ] * Dsp [ - 1 ] ;
-        Dsp -- ;
+        _Dsp_ [ - 1 ] = _Dsp_ [ 0 ] * _Dsp_ [ - 1 ] ;
+                DataStack_Drop ( ) ;
     }
 }
 
@@ -248,7 +248,7 @@ CfrTil_Divide ( ) // *
     {
 
         int64 a, b ;
-        a = _DataStack_Pop ( ) ;
+        a = DataStack_Pop ( ) ;
         b = _DataStack_GetTop ( ) ;
         _DataStack_SetTop ( ( int64 ) ( b / a ) ) ;
     }
@@ -265,7 +265,7 @@ CfrTil_Mod ( ) // *
     {
 
         int64 a, b ;
-        a = _DataStack_Pop ( ) ;
+        a = DataStack_Pop ( ) ;
         b = _DataStack_GetTop ( ) ;
         _DataStack_SetTop ( ( int64 ) ( b % a ) ) ;
     }
@@ -289,14 +289,14 @@ CFib ( )
 void
 CfrTil_Power ( ) // **
 {
-    int64 pow = Dsp [ 0 ], base = Dsp [ - 1 ], n ;
+    int64 pow = _Dsp_ [ 0 ], base = _Dsp_ [ - 1 ], n ;
     for ( n = base ; -- pow ; )
     {
 
         n *= base ;
     }
-    Dsp [ - 1 ] = n ;
-    Dsp -- ;
+    _Dsp_ [ - 1 ] = n ;
+                DataStack_Drop ( ) ;
 }
 
 void
@@ -367,9 +367,9 @@ call_a7 ( )
     memset ( &ar, 0, sizeof (A3 ) ) ;
     ar.ar[2][2][1] = 89 ;
 
-    int64 a = _DataStack_Pop ( ) ;
-    int64 b = _DataStack_Pop ( ) ;
-    int64 c = _DataStack_Pop ( ) ;
+    int64 a = DataStack_Pop ( ) ;
+    int64 b = DataStack_Pop ( ) ;
+    int64 c = DataStack_Pop ( ) ;
 
     a7 ( a, b, c, &ar ) ;
     memset ( &ar, 0, sizeof (A3 ) ) ;

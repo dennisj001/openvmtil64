@@ -5,52 +5,65 @@
 // ! they are should only be called in C functions !
 
 uint64
-_DataStack_Pop ( )
+DataStack_Pop ( )
 {
-    return Dsp -- [ 0 ] ;
+    //_CfrTil_->Set_DataStackPointer_FromDspReg ( ) ;
+    int64 value = _Dsp_ [ 0 ] ; //
+    _Dsp_ -- ;
+    //_CfrTil_->Set_DspReg_FromDataStackPointer ( ) ; // update DSP reg
+    return value ;
 }
 
 void
-_DataStack_Push ( int64 value )
+DataStack_Push ( int64 value )
 {
-    *++ Dsp = value ;
+    //_CfrTil_->Set_DataStackPointer_FromDspReg ( ) ;
+    _Dsp_ ++ ;
+    _Dsp_ [0] = value ;
+    //_CfrTil_->Set_DspReg_FromDataStackPointer ( ) ; // update DSP reg
 }
 
 void
-_DataStack_Dup ( )
+DataStack_Dup ( )
 {
-    Dsp [ 1 ] = TOS ;
-    Dsp ++ ;
+    //_CfrTil_->Set_DataStackPointer_FromDspReg ( ) ;
+    _Dsp_ [ 1 ] = _Dsp_[0] ;
+    _Dsp_ ++ ;
+    //_CfrTil_->Set_DspReg_FromDataStackPointer ( ) ; // update DSP reg
 }
 
 void
-_DataStack_DropN ( int64 n )
+DataStack_DropN ( int64 n )
 {
-    Dsp -= n ;
+    //_CfrTil_->Set_DataStackPointer_FromDspReg ( ) ;
+    _Dsp_ -= n ;
+    //_CfrTil_->Set_DspReg_FromDataStackPointer ( ) ; // update DSP reg
 }
 
 void
-_DataStack_Drop ( )
+DataStack_Drop ( )
 {
-    Dsp -- ;
+    //_CfrTil_->Set_DataStackPointer_FromDspReg ( ) ;
+    _Dsp_ -- ;
+    //_CfrTil_->Set_DspReg_FromDataStackPointer ( ) ; // update DSP reg
 }
 
-int64
+inline int64
 DataStack_Overflow ( )
 {
-    return ( Dsp >= _DataStack_->StackMax ) ;
+    return ( _Dsp_ >= _DataStack_->StackMax ) ;
 }
 
-int64
+inline int64
 DataStack_Underflow ( )
 {
-    return ( Dsp < _DataStack_->InitialTosPointer ) ;
+    return ( _Dsp_ < _DataStack_->StackMin ) ;
 }
 
 void
 DataStack_Check ( )
 {
-    if ( ( Dsp < _DataStack_->InitialTosPointer ) || ( Dsp >= _DataStack_->StackMax ) )
+    if ( DataStack_Underflow ( ) || DataStack_Overflow ( ) )
     {
         CfrTil_Exception ( STACK_OVERFLOW, QUIT ) ;
     }
@@ -61,7 +74,6 @@ DataStack_Depth ( )
 {
     if ( _Q_ && _CfrTil_ && _DataStack_ )
     {
-        _DataStackPointer_ = Dsp ;
         return Stack_Depth ( _DataStack_ ) ;
     }
     return 0 ;
@@ -69,110 +81,28 @@ DataStack_Depth ( )
 
 // safe form with stack checking
 
-int64
-DataStack_Pop ( )
+void
+CpuState_Set_CpuStateDsp_WithDataStackPointer ( Cpu * cpu )
 {
-    //_DataStackPointer_ = Dsp ;
-    int64 top = _DataStack_Pop ( ) ;
-    //int64 top = Stack_Pop_WithExceptionOnEmpty ( _DataStack_ ) ;
-    return top ;
+    cpu->CPU_DSP = _Dsp_ ;
 }
 
 void
-CpuState_SyncStackPointersFromCpuState ( Cpu * cpus )
+_Debugger_Set_DataStackPointer_WithCpuStateDsp ( Debugger * debugger )
 {
-    if ( GetState ( _CfrTil_->cs_Cpu, CPU_SAVED ) ) Dsp = ( uint64* ) cpus->CPU_DSP ;
-    _CfrTil_SetStackPointerFromDsp ( _CfrTil_ ) ;
+    _Dsp_ = debugger->cs_Cpu->CPU_DSP ;
 }
 
 void
-_Debugger_SyncStackPointersFromCpuState ( Debugger * debugger )
+Set_DataStackPointer_FromDspReg ( )
 {
-    CpuState_SyncStackPointersFromCpuState ( debugger->cs_Cpu ) ;
+    _CfrTil_->Set_DataStackPointer_FromDspReg ( ) ;
 }
 
 void
-Debugger_SyncStackPointersFromCpuState ( Debugger * debugger )
+_Set_DspReg_FromDataStackPointer ( )
 {
-    int64 pflag = false ;
-    if ( debugger->cs_Cpu->State && ( debugger->cs_Cpu->CPU_DSP != Dsp ) )
-    {
-        if ( Is_DebugModeOn && ( _Q_->Verbosity > 3 ) )
-        {
-            pflag = true ;
-            _Printf ( ( byte* ) "\n_Debugger_SetStackPointerFromDebuggerCpuState : stack pointer adjust ::> debugger->cs_CpuState->State = %d : Dsp = 0x%016lx != cpu->CPU_DSP = 0x%016lx",
-                debugger->cs_Cpu->State, Dsp, debugger->cs_Cpu->CPU_DSP ) ;
-        }
-        CpuState_SyncStackPointersFromCpuState ( debugger->cs_Cpu ) ;
-        if ( pflag )
-        {
-            _Printf ( ( byte* ) "\n_Debugger_SetStackPointerFromDebuggerCpuState : stack pointer adjusted ::> cfrTil->DataStack->StackPointer = 0x%016lx : Dsp = 0x%016lx : cpu->CPU_DSP = 0x%016lx\n",
-                _CfrTil_->DataStack->StackPointer, Dsp, debugger->cs_Cpu->CPU_DSP ) ;
-        }
-    }
-    else  _CfrTil_SetStackPointerFromDsp ( _CfrTil_ ) ;
-}
-
-void
-_CfrTil_SetStackPointerFromDsp ( CfrTil * cfrTil )
-{
-    d1 ( uint64 *dsp = Dsp ) ;
-    if ( cfrTil && cfrTil->DataStack ) cfrTil->DataStack->StackPointer = Dsp ;
-}
-
-void
-CfrTil_SetStackPointerFromDsp ( CfrTil * cfrTil )
-{
-    if ( cfrTil && cfrTil->DataStack ) //&& ( cfrTil->DataStack->StackPointer != Dsp ) )
-    {
-        if ( ( Is_DebugModeOn || ( _Q_->Verbosity > 3 ) ) && ( cfrTil->DataStack->StackPointer != Dsp ) )
-        {
-            _Printf ( ( byte* ) "\nCfrTil_SetStackPointerFromDsp : stack pointers adjust ::> DataStack->StackPointer = 0x%016lx != Dsp = 0x%016lx\n", cfrTil->DataStack->StackPointer, Dsp ) ;
-        }
-        _CfrTil_SetStackPointerFromDsp ( cfrTil ) ;
-    }
-}
-
-void
-CfrTil_SyncStackPointersFromDsp ( )
-{
-    CfrTil_SetStackPointerFromDsp ( _CfrTil_ ) ;
-}
-
-#if 0
-void
-CfrTil_SyncStackPointersFromESI ( )
-{
-    
-}
-#endif
-
-void
-_CfrTil_InitDspFromStackPointer ( CfrTil * cfrTil )
-{
-    if ( cfrTil && cfrTil->DataStack && ( cfrTil->DataStack->StackPointer != Dsp ) )
-    {
-        if ( Is_DebugModeOn || ( _Q_->Verbosity > 1 ) )
-        {
-            _Printf ( ( byte* ) "\n_CfrTil_SetDspFromStackPointer : stack pointers adjust ::> Dsp = 0x%016lx != DataStack->StackPointer = 0x%016lx\n", Dsp, cfrTil->DataStack->StackPointer ) ;
-        }
-        Dsp = cfrTil->DataStack->StackPointer ;
-    }
-}
-
-void
-CfrTil_InitDspFromStackPointer ( CfrTil * cfrTil )
-{
-    if ( cfrTil && cfrTil->DataStack ) _CfrTil_InitDspFromStackPointer ( cfrTil ) ;
-}
-
-void
-CfrTil_DataStack_InitEssential ( CfrTil * cfrTil )
-{
-    Stack * stk = cfrTil->DataStack ;
-    _Stack_Init ( stk, _Q_->DataStackSize ) ;
-    _CfrTil_InitDspFromStackPointer ( cfrTil ) ;
-    cfrTil->SaveDsp = Dsp ;
+    _CfrTil_->Set_DspReg_FromDataStackPointer ( ) ;
 }
 
 void
@@ -184,29 +114,113 @@ _CfrTil_PrintDataStack ( )
 void
 CfrTil_PrintDataStack ( )
 {
-    //CfrTil_SetStackPointerFromDsp ( _CfrTil_ ) ;
-    CfrTil_SyncStackPointersFromDsp ( ) ;
+    Set_DataStackPointer_FromDspReg ( ) ;
     _CfrTil_PrintDataStack ( ) ;
+}
+
+void
+CfrTil_PrintReturnStack ( )
+{
+    _CfrTil_->ReturnStack->StackPointer = _Rsp_ ;
+    _Stack_Print ( _CfrTil_->ReturnStack, ( byte* ) "ReturnStack" ) ;
 }
 
 void
 CfrTil_CheckInitDataStack ( )
 {
-    CfrTil_SetStackPointerFromDsp ( _CfrTil_ ) ;
+    //CfrTil_SetStackPointerFromDsp ( _CfrTil_ ) ;
     if ( Stack_Depth ( _DataStack_ ) < 0 )
     {
         _Stack_PrintHeader ( _DataStack_, ( byte* ) "DataStack" ) ;
         _Printf ( ( byte* ) c_ad ( "\n\nError : %s : %s : Stack Underflow!" ), _Context_->CurrentlyRunningWord ? _Context_->CurrentlyRunningWord->Name : ( byte * ) "", _Context_Location ( _Context_ ) ) ;
         _Printf ( ( byte* ) c_gd ( "\nReseting DataStack.\n" ) ) ;
+        _Stack_Init ( _CfrTil_->DataStack, _Q_->DataStackSize ) ;
         _CfrTil_DataStack_Init ( _CfrTil_ ) ;
         _Stack_PrintHeader ( _DataStack_, ( byte* ) "DataStack" ) ;
     }
-    //_Printf ( ( byte* ) "\n" ) ;
+    //_Set_DspReg_FromDataStackPointer ( ) ;
 }
 
 void
 CfrTil_DataStack_Size ( )
 {
-    _DataStack_Push ( DataStack_Depth ( ) ) ;
+    DataStack_Push ( DataStack_Depth ( ) ) ;
 }
+
+#if 0
+
+void
+Debugger_SyncStackPointersFromCpuState ( Debugger * debugger )
+{
+    int64 pflag = false ;
+    if ( debugger->cs_Cpu->State && ( debugger->cs_Cpu->CPU_DSP != _Dsp_ ) )
+    {
+        if ( Is_DebugModeOn && ( _Q_->Verbosity > 3 ) )
+        {
+            pflag = true ;
+            _Printf ( ( byte* ) "\n_Debugger_SetStackPointerFromDebuggerCpuState : stack pointer adjust ::> debugger->cs_CpuState->State = %d : Dsp = 0x%016lx != cpu->CPU_DSP = 0x%016lx",
+                debugger->cs_Cpu->State, _Dsp_, debugger->cs_Cpu->CPU_DSP ) ;
+        }
+        CpuState_Set_CpuStateDsp_WithDataStackPointer ( debugger->cs_Cpu ) ;
+        if ( pflag )
+        {
+            _Printf ( ( byte* ) "\n_Debugger_SetStackPointerFromDebuggerCpuState : stack pointer adjusted ::> cfrTil->DataStack->StackPointer = 0x%016lx : Dsp = 0x%016lx : cpu->CPU_DSP = 0x%016lx\n",
+                _CfrTil_->DataStack->StackPointer, _Dsp_, debugger->cs_Cpu->CPU_DSP ) ;
+        }
+    }
+    else Set_DataStackPointer_FromDspReg ( ) ;
+}
+
+void
+CfrTil_SetStackPointerFromDsp ( CfrTil * cfrTil )
+{
+    if ( cfrTil && cfrTil->DataStack )
+    {
+        if ( ( Is_DebugModeOn || ( _Q_->Verbosity > 3 ) ) && ( cfrTil->DataStack->StackPointer != _Dsp_ ) )
+        {
+            _Printf ( ( byte* ) "\nCfrTil_SetStackPointerFromDsp : stack pointers adjust ::> DataStack->StackPointer = 0x%016lx != Dsp = 0x%016lx\n", cfrTil->DataStack->StackPointer, _Dsp_ ) ;
+        }
+        Set_DataStackPointer_FromDspReg ( cfrTil ) ;
+    }
+}
+
+void
+CfrTil_SyncStackPointersFromDsp ( )
+{
+    CfrTil_SetStackPointerFromDsp ( _CfrTil_ ) ;
+}
+
+void
+_CfrTil_InitDspFromStackPointer ( CfrTil * cfrTil )
+{
+#if 0    
+    if ( cfrTil && cfrTil->DataStack && ( cfrTil->DataStack->StackPointer != _Dsp_ ) )
+    {
+        if ( Is_DebugModeOn || ( _Q_->Verbosity > 1 ) )
+        {
+            _Printf ( ( byte* ) "\n_CfrTil_SetDspFromStackPointer : stack pointers adjust ::> Dsp = 0x%016lx != DataStack->StackPointer = 0x%016lx\n", _Dsp_, cfrTil->DataStack->StackPointer ) ;
+        }
+    }
+#endif    
+    _Set_DspReg_FromDataStackPointer ( ) ;
+}
+
+void
+CfrTil_InitDspFromStackPointer ( CfrTil * cfrTil )
+{
+    if ( cfrTil && cfrTil->DataStack ) _CfrTil_InitDspFromStackPointer ( cfrTil ) ;
+}
+
+void
+CfrTil_DataStack_InitEssential ( CfrTil * cfrTil )
+{
+    //Stack * stk = cfrTil->DataStack ;
+    //_Stack_Init ( cfrTil->DataStack, _Q_->DataStackSize ) ;
+    //Stack_Init ( cfrTil->DataStack ) ;
+    //_CfrTil_InitDspFromStackPointer ( cfrTil ) ;
+    _Set_DspReg_FromDataStackPointer ( ) ;
+    cfrTil->SaveDsp = _Dsp_ ;
+}
+#endif
+
 

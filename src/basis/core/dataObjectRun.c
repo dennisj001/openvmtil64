@@ -33,7 +33,7 @@ _Namespace_Do_C_Type ( Namespace * ns )
                     Word * word = Word_New ( token1 ) ;
                     word->Coding = Here ;
                     _CfrTil_WordList_PushWord ( word ) ;
-                    _DataStack_Push ( ( int64 ) word ) ; // token1 is the function name 
+                    DataStack_Push ( ( int64 ) word ) ; // token1 is the function name 
                     CfrTil_RightBracket ( ) ; //Set_CompileMode ( true ) ; //SetState ( _Context_->Compiler0, COMPILE_MODE, true ) ;
                     CfrTil_BeginBlock ( ) ;
                     CfrTil_LocalsAndStackVariablesBegin ( ) ;
@@ -158,12 +158,12 @@ _CfrTil_Do_ClassField ( Word * word )
         //TOS += word->Offset ;
         if ( GetState ( cntx, C_SYNTAX ) && ( ! Is_LValue ( word ) ) && ( ! GetState ( _Context_, ADDRESS_OF_MODE ) ) )
         {
-            //DSP_Push ( * ( int64* ) accumulatedAddress ) ; // C rvalue
+            //_DataStack_Push ( * ( int64* ) accumulatedAddress ) ; // C rvalue
             TOS = ( * ( int64* ) accumulatedAddress ) ; // C rvalue
         }
         else
         {
-            //DSP_Push ( accumulatedAddress ) ;
+            //_DataStack_Push ( accumulatedAddress ) ;
             TOS = ( uint64 ) accumulatedAddress ;
             //SetState ( _Context_, ADDRESS_OF_MODE, false ) ;
         }
@@ -220,7 +220,7 @@ _Do_Literal ( int64 value )
         _Compile_MoveImm_To_Reg ( ACC, value, CELL ) ;
         _Compiler_CompileAndRecord_PushAccum ( _Context_->Compiler0 ) ; // does word == top of word stack always
     }
-    else DSP_Push ( value ) ;
+    else DataStack_Push ( value ) ;
 }
 
 // a constant is, of course, a literal
@@ -273,7 +273,7 @@ _CfrTil_Do_DynamicObject ( DObject * dobject )
     }
     else
     {
-        DSP_Push ( ( int64 ) dobject->W_PtrToValue ) ; //& dobject->W_DObjectValue ) ; //dobject ) ;
+        DataStack_Push ( ( int64 ) dobject->W_PtrToValue ) ; //& dobject->W_DObjectValue ) ; //dobject ) ;
     }
 }
 
@@ -328,8 +328,8 @@ _CfrTil_Do_Literal ( Word * word )
     }
     else
     {
-        if ( word->CAttribute & T_STRING | T_RAW_STRING ) DSP_Push ( word->W_PtrValue ) ;
-        else DSP_Push ( word->W_Value ) ;
+        if ( word->CAttribute & (T_STRING | T_RAW_STRING) ) DataStack_Push ( (uint64) word->W_PtrValue ) ;
+        else DataStack_Push ( word->W_Value ) ;
 
     }
 }
@@ -391,12 +391,12 @@ _CfrTil_Do_Variable ( Word * word )
                 {
                     if ( ( ! Is_LValue ( word ) ) && ( Lexer_NextNonDelimiterChar ( cntx->Lexer0 ) != '.' ) )
                     {
-                        DSP_Push ( * ( int64* ) word->W_PtrToValue + word->AccumulatedOffset ) ;
+                        DataStack_Push ( * ( int64* ) word->W_PtrToValue + word->AccumulatedOffset ) ;
                     }
-                    else DSP_Push ( word->W_PtrToValue + word->AccumulatedOffset ) ;
+                    else DataStack_Push ( (uint64) (word->W_PtrToValue + word->AccumulatedOffset) ) ;
                 }
             }
-            else DSP_Push ( word->W_Value ) ;
+            else DataStack_Push ( word->W_Value ) ;
         }
         else if ( word->CAttribute & NAMESPACE_VARIABLE )
         {
@@ -411,7 +411,7 @@ _CfrTil_Do_Variable ( Word * word )
             {
                 TOS = value ;
             }
-            else DSP_Push ( value ) ;
+            else DataStack_Push ( value ) ;
         }
     }
     //SetState ( _Context_, ADDRESS_OF_MODE, false ) ; // only good for one variable
@@ -430,9 +430,9 @@ _Do_LocalObject_AllocateInit ( Namespace * typeNamespace, byte ** value, int64 s
 void
 Do_LocalObject_AllocateInit ( ) //( Namespace * typeNamespace, byte ** value, int64 size )
 {
-    int64 size = _DataStack_Pop ( ) ;
-    byte ** value = ( byte** ) _DataStack_Pop ( ) ;
-    Namespace * typeNamespace = ( Namespace* ) _DataStack_Pop ( ) ;
+    int64 size = DataStack_Pop ( ) ;
+    byte ** value = ( byte** ) DataStack_Pop ( ) ;
+    Namespace * typeNamespace = ( Namespace* ) DataStack_Pop ( ) ;
 
     //Word * word = _CfrTil_ObjectNew ( size, "<object>", 0, TEMPORARY ) ;
     //_Class_Object_Init ( word, typeNamespace ) ;
@@ -456,13 +456,13 @@ _DataObject_Run ( Word * word )
 #if 0            
             int64 size = _Namespace_VariableValueGet ( word->TypeNamespace, ( byte* ) "size" ) ;
             //_Compile_MoveImm_To_Reg ( RDI, ( int64 ) size, CELL ) ;
-            _DataStack_Push ( ( uint64 ) size ) ;
+            DataStack_Push ( ( uint64 ) size ) ;
             //_Compile_Move_Rm_To_Reg ( RDI, RDI, 0 ) ;
             //_Compile_LEA ( RSI, FP, 0, LocalVarIndex_Disp ( LocalVarOffset ( word ) ) ) ; // 2 : account for saved fp and return slot
-            _DataStack_Push ( ( uint64 ) LocalVarIndex_Disp ( LocalVarOffset ( word ) ) ) ;
+            DataStack_Push ( ( uint64 ) LocalVarIndex_Disp ( LocalVarOffset ( word ) ) ) ;
             //_Compile_Move_Rm_To_Reg ( RSI, RSI, 0 ) ;
             //_Compile_MoveImm_To_Reg ( RDX, ( int64 ) word->TypeNamespace, CELL ) ;
-            _DataStack_Push ( ( uint64 ) word->TypeNamespace ) ;
+            DataStack_Push ( ( uint64 ) word->TypeNamespace ) ;
             Compile_Call ( ( byte* ) Do_LocalObject_AllocateInit ) ; // we want to only allocate this object once and only at run time; and not at compile time
 #else
             int64 size = _Namespace_VariableValueGet ( word->TypeNamespace, ( byte* ) "size" ) ;

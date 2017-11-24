@@ -4,16 +4,8 @@
 void
 CfrTil_Token ( )
 {
-    _DataStack_Push ( ( int64 ) Lexer_ReadToken ( _Context_->Lexer0 ) ) ;
+    DataStack_Push ( ( int64 ) Lexer_ReadToken ( _Context_->Lexer0 ) ) ;
 }
-
-#if 0
-void
-CfrTil_WrapNextWord ( )
-{
-    SetState ( _Context_->Compiler0, COMPILER_WRAP_ON, true ) ;
-}
-#endif
 
 void
 CfrTil_SingleQuote ( )
@@ -68,8 +60,8 @@ void
 CfrTil_Parse ( )
 {
     Lexer * lexer = _Context_->Lexer0 ;
-    byte * token = ( byte* ) _DataStack_Pop ( ) ;
+    byte * token = ( byte* ) DataStack_Pop ( ) ;
     Lexer_ParseObject ( lexer, token ) ;
-    _DataStack_Push ( lexer->Literal ) ;
+    DataStack_Push ( lexer->Literal ) ;
 }
 

@@ -147,11 +147,10 @@
         <gdb_interceptlist>
           <gdbinterceptoptions gdb_all="false" gdb_unhandled="true" gdb_unexpected="true"/>
         </gdb_interceptlist>
-        <gdb_signals>
-        </gdb_signals>
         <gdb_options>
           <DebugOptions>
-            <option name="debug_dir" value="/home/dennisj/openvmtil64.new"/>
+            <option name="debug_dir"
+                    value="/home/dennisj/openvmtil64/archive/openvmtil64.new"/>
           </DebugOptions>
         </gdb_options>
         <gdb_buildfirst gdb_buildfirst_overriden="false" gdb_buildfirst_old="false"/>
@@ -187,7 +186,7 @@
           <runcommandpicklistitem>"${OUTPUT_PATH}"</runcommandpicklistitem>
         </runcommandpicklist>
         <runcommand>"${OUTPUT_PATH}"</runcommand>
-        <rundir>/home/dennisj/openvmtil64.new</rundir>
+        <rundir>/home/dennisj/openvmtil64/archive/openvmtil64.new</rundir>
         <buildfirst>false</buildfirst>
         <terminal-type>0</terminal-type>
         <remove-instrumentation>0</remove-instrumentation>

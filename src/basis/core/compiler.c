@@ -203,6 +203,9 @@ Compiler_Init ( Compiler * compiler, uint64 state )
     //Compiler_SetCompilingSpace_MakeSureOfRoom ( ( byte* ) "CodeSpace" ) ; // 2 * K : should be enough at least for now ??
     //OVT_MemListFree_TempObjects ( ) ;
     //compiler->RegOrder [4] = { EBX, EDX, ECX, R8 } ;
+    compiler->CurrentCreatedWord = 0 ;
+    compiler->CurrentWord = 0 ;
+    compiler->CurrentWordCompiling = 0 ;
     SetBuffersUnused ( 1 ) ;
     SetState ( compiler, VARIABLE_FRAME, false ) ;
 }

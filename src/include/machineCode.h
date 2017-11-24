@@ -174,7 +174,7 @@
 #endif
 #define NO_INDEX ( 0x4 ) // for sib byte with no index
 
-// cfrTil uses RAX, RDX, R8D, R9D, R14, R15, R11
+// cfrTil uses RAX, RDX, R8D, R9D, R14, R15, RBX
 #define ACCUMULATOR_REG RAX                 // rax
 #define ACC ACCUMULATOR_REG
 #define CPU_ACCUM Rax
@@ -190,7 +190,9 @@
 #define SCRATCH_REG OPERAND_2_REG // eax/edx are both used sometimes by ops ebx/ecx are not ?
 #define SREG SCRATCH_REG
 #define DIV_MUL_REG_2 RDX                   // rdx
-register uint64 *Dsp asm ( "r14" ) ;
+#if DSP_IS_GLOBAL_REGISTER
+register uint64 *_Dsp_ asm ( "r14" ) ;
+#endif
 #define STACK_POINTER R14D                  // r14
 #define CPU_DSP R14d
 //register int64 *Fp asm ("rsi" ) ;
@@ -199,12 +201,10 @@ register uint64 *Dsp asm ( "r14" ) ;
 #define DSP STACK_POINTER 
 #define FP FRAME_POINTER
 
-#if NEW_CALL_RETURN
-//register uint64 *_Rsp_ asm ( "r10" ) ;
-#define CFRTIL_RETURN_STACK_POINTER R11D    // r11
+//register uint64 *_RspReg_ asm ( "r10" ) ;
+#define CFRTIL_RETURN_STACK_POINTER RBX    // rbx
 #define CFT_RSP CFRTIL_RETURN_STACK_POINTER
-#define CPU_CFT_RSP R11d
-#endif
+#define CPU_CFT_RSP Rbx
 
 // EFLAGS
 #define CARRY_FLAG ( 1 << 0 )

@@ -3,19 +3,25 @@
 void
 CfrTil_Here ( )
 {
-    _DataStack_Push ( ( int64 ) Here ) ;
+    DataStack_Push ( ( int64 ) Here ) ;
+}
+
+void
+CfrTil_Rsp ( )
+{
+    DataStack_Push ( ( int64 ) & _Rsp_ ) ;
 }
 
 void
 CompileCall ( )
 {
-    Compile_Call ( ( byte* ) _DataStack_Pop ( ) ) ;
+    Compile_Call ( ( byte* ) DataStack_Pop ( ) ) ;
 }
 
 void
 CompileACfrTilWord ( )
 {
-    _Word_Compile ( ( Word* ) _DataStack_Pop ( ) ) ;
+    _Word_Compile ( ( Word* ) DataStack_Pop ( ) ) ;
 }
 
 void
@@ -27,8 +33,8 @@ CompileInt64 ( )
         int64 q0 [2 ] ;
         int64 q ;
     } li ;
-    li.q0[1] = _DataStack_Pop ( ) ;
-    li.q0[0] = _DataStack_Pop ( ) ; // little endian - low order bits should be pushed first
+    li.q0[1] = DataStack_Pop ( ) ;
+    li.q0[0] = DataStack_Pop ( ) ; // little endian - low order bits should be pushed first
     _Compile_Int64 ( li.q ) ;
 
 }
@@ -36,7 +42,7 @@ CompileInt64 ( )
 void
 CompileInt32 ( )
 {
-    int64 l = _DataStack_Pop ( ) ;
+    int64 l = DataStack_Pop ( ) ;
     _Compile_Int32 ( l ) ;
 
 }
@@ -44,7 +50,7 @@ CompileInt32 ( )
 void
 CompileInt16 ( )
 {
-    int64 w = _DataStack_Pop ( ) ;
+    int64 w = DataStack_Pop ( ) ;
     _Compile_Int16 ( ( short ) w ) ;
 
 }
@@ -52,15 +58,15 @@ CompileInt16 ( )
 void
 CompileByte ( )
 {
-    int64 b = _DataStack_Pop ( ) ;
+    int64 b = DataStack_Pop ( ) ;
     _Compile_Int8 ( b ) ;
 }
 
 void
 CompileN ( )
 {
-    int64 size = _DataStack_Pop ( ) ;
-    byte * data = ( byte* ) _DataStack_Pop ( ) ;
+    int64 size = DataStack_Pop ( ) ;
+    byte * data = ( byte* ) DataStack_Pop ( ) ;
     _CompileN ( data, size ) ;
 }
 
@@ -113,7 +119,7 @@ _CfrTil_Goto ( byte * name )
 void
 CfrTil_Goto ( ) // runtime
 {
-    _CfrTil_Goto ( ( byte * ) _DataStack_Pop ( ) ) ; // runtime
+    _CfrTil_Goto ( ( byte * ) DataStack_Pop ( ) ) ; // runtime
 }
 
 void
@@ -126,7 +132,7 @@ CfrTil_Goto_Prefix ( ) // runtime
 void
 CfrTil_Label ( )
 {
-    _CfrTil_Label ( ( byte* ) _DataStack_Pop ( ) ) ;
+    _CfrTil_Label ( ( byte* ) DataStack_Pop ( ) ) ;
 }
 
 void
@@ -184,7 +190,7 @@ CfrTil_Tail ( )
 void
 CfrTil_Literal ( )
 {
-    int64 value = _DataStack_Pop ( ) ;
+    int64 value = DataStack_Pop ( ) ;
     //Word * word = _DataObject_New ( LITERAL, 0, 0, LITERAL, 0, 0, ( uint64 ) _DataStack_Pop ( ), 0 ) ;
     //ByteArray * svcs = _Q_CodeByteArray ;
     //Compiler_SetCompilingSpace_MakeSureOfRoom ( "TempObjectSpace" ) ; 
@@ -196,15 +202,15 @@ CfrTil_Literal ( )
 void
 CfrTil_Constant ( )
 {
-    int64 value = _DataStack_Pop ( ) ;
-    byte * name = ( byte* ) _DataStack_Pop ( ) ;
+    int64 value = DataStack_Pop ( ) ;
+    byte * name = ( byte* ) DataStack_Pop ( ) ;
     _DataObject_New ( CONSTANT, 0, name, LITERAL | CONSTANT, 0, 0, 0, value, 0 ) ;
 }
 
 void
 CfrTil_Variable ( )
 {
-    byte * name = ( byte* ) _DataStack_Pop ( ) ;
+    byte * name = ( byte* ) DataStack_Pop ( ) ;
     _DataObject_New ( NAMESPACE_VARIABLE, 0, name, NAMESPACE_VARIABLE, 0, 0, 0, 0, 0 ) ;
 }
 
@@ -239,6 +245,6 @@ CfrTil_RightBracket ( )
 void
 CfrTil_CompileMode ( )
 {
-    _DataStack_Push ( GetState ( _Context_->Compiler0, COMPILE_MODE ) ) ;
+    DataStack_Push ( GetState ( _Context_->Compiler0, COMPILE_MODE ) ) ;
 }
 

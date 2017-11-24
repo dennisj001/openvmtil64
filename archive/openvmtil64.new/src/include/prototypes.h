@@ -220,7 +220,7 @@ void CfrTil_Switch(void);
 void Byte_PtrCall(byte *bptr);
 void _Block_Eval(block blck);
 void _Block_Copy(byte *srcAddress, int64 bsize, Boolean includeReturnFlag);
-void Block_Copy(BlockInfo *bi, byte *dst, byte *src, int64 qsize);
+void Block_Copy(byte *dst, byte *src, int64 qsize);
 int64 Block_CopyCompile_WithLogicFlag(byte *srcAddress, int64 bindex, int64 jccFlag, int64 negFlag);
 int64 Block_CopyCompile(byte *srcAddress, int64 bindex, int64 jccFlag);
 void BlockInfo_Set_tttn(BlockInfo *bi, int8 ttt, int8 n, int8 overWriteSize);
