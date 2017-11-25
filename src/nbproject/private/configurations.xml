@@ -63,7 +63,6 @@
         <in>context.c</in>
         <in>debugDisassembly.c</in>
         <in>debugOutput.c</in>
-        <in>debugStepping.back.c</in>
         <in>debugStepping.c</in>
         <in>debugger.c</in>
         <in>exception.c</in>

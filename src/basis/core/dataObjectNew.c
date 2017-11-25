@@ -233,7 +233,8 @@ _CfrTil_LocalWord ( byte * name, int64 index, int64 ctype ) // svf : flag - whet
     Word *word ;
     //if ( ! ( word = Finder_FindWord_InOneNamespace ( _Finder_, _CfrTil_Namespace_InNamespaceGet ( ), name ) ) )
     {
-        word = _DObject_New ( name, 0, ( ctype | IMMEDIATE | CPRIMITIVE ), 0, 0, LOCAL_VARIABLE, ( byte* ) _DataObject_Run, 0, 1, 0, COMPILER_TEMP ) ;
+        //word = _DObject_New ( name, 0, ( ctype | IMMEDIATE | CPRIMITIVE ), 0, 0, LOCAL_VARIABLE, ( byte* ) _DataObject_Run, 0, 1, 0, COMPILER_TEMP ) ;
+        word = _DObject_New ( name, 0, ( ctype | IMMEDIATE ), 0, 0, LOCAL_VARIABLE, ( byte* ) _DataObject_Run, 0, 1, 0, COMPILER_TEMP ) ;
         word->Index = index ; //( ctype & LOCAL_VARIABLE ) ? _Compiler_->NumberOfLocals : _Compiler_->NumberOfArgs ;
     }
     return word ;
