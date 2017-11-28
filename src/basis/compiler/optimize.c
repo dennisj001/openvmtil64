@@ -246,8 +246,14 @@ _CheckOptimizeOperands ( Compiler * compiler, int64 maxOperands )
                         else
                         {
                             _Compile_GetVarLitObj_RValue_To_Reg ( optInfo->O_three, ACC ) ;
-                            _Compile_MoveImm_To_Reg ( OREG, ( int64 ) optInfo->O_one->W_Value, CELL ) ;
-                            optInfo->Optimize_Rm = OREG ;
+                            if ( optInfo->O_zero->CAttribute & CATEGORY_OP_DIVIDE )
+                            {
+                                _Compile_MoveImm_To_Reg ( OREG, ( int64 ) optInfo->O_one->W_Value, CELL ) ;
+                                optInfo->Optimize_Rm = OREG ;
+                            }
+                            else _GetRmDispImm ( optInfo, optInfo->O_one, - 1 ) ;
+                            //optInfo->OptimizeFlag = OPTIMIZE_IMM ;
+                            //optInfo->Optimize_Rm = OREG ;
                             optInfo->Optimize_Dest_RegOrMem = REG ;
                             optInfo->Optimize_Mod = REG ;
                         }
@@ -315,7 +321,11 @@ _CheckOptimizeOperands ( Compiler * compiler, int64 maxOperands )
                             }
                             else
                             {
-                                _GetRmDispImm ( optInfo, optInfo->O_two, - 1 ) ;
+                                if ( ( optInfo->O_zero->Definition == CfrTil_ShiftRight ) || ( optInfo->O_zero->Definition == CfrTil_ShiftLeft ) )
+                                {
+                                    _Compile_GetVarLitObj_RValue_To_Reg ( optInfo->O_two, RCX ) ;
+                                }
+                                else _GetRmDispImm ( optInfo, optInfo->O_two, - 1 ) ;
                                 optInfo->Optimize_Dest_RegOrMem = REG ;
                                 optInfo->Optimize_Mod = MEM ;
                                 optInfo->Optimize_Reg = ACC ;
@@ -544,22 +554,22 @@ _CheckOptimizeOperands ( Compiler * compiler, int64 maxOperands )
                         if ( optInfo->O_one->Definition == CfrTil_Minus )
                         {
                             Set_SCA ( 1 ) ;
-                            _Compile_X_Group1_Immediate ( SUB, MEM, optInfo->Optimize_Rm, compiler->optInfo->Optimize_Disp, *optInfo->O_two->W_PtrToValue, CELL ) ;
+                            _Compile_X_Group1_Immediate ( SUB, MEM, optInfo->Optimize_Rm, compiler->optInfo->Optimize_Disp, *optInfo->O_two->W_PtrToValue, 0 ) ; //CELL ) ;
                         }
                         else if ( optInfo->O_one->Definition == CfrTil_Plus )
                         {
                             Set_SCA ( 1 ) ;
-                            _Compile_X_Group1_Immediate ( ADD, MEM, optInfo->Optimize_Rm, compiler->optInfo->Optimize_Disp, *optInfo->O_two->W_PtrToValue, CELL ) ;
+                            _Compile_X_Group1_Immediate ( ADD, MEM, optInfo->Optimize_Rm, compiler->optInfo->Optimize_Disp, *optInfo->O_two->W_PtrToValue, 0 ) ; //CELL ) ;
                         }
                         else if ( optInfo->O_one->Definition == CfrTil_BitWise_AND )
                         {
                             Set_SCA ( 1 ) ;
-                            _Compile_X_Group1_Immediate ( AND, MEM, optInfo->Optimize_Rm, compiler->optInfo->Optimize_Disp, *optInfo->O_two->W_PtrToValue, CELL ) ;
+                            _Compile_X_Group1_Immediate ( AND, MEM, optInfo->Optimize_Rm, compiler->optInfo->Optimize_Disp, *optInfo->O_two->W_PtrToValue, 0 ) ; //CELL ) ;
                         }
                         else if ( optInfo->O_one->Definition == CfrTil_BitWise_OR )
                         {
                             Set_SCA ( 1 ) ;
-                            _Compile_X_Group1_Immediate ( OR, MEM, optInfo->Optimize_Rm, compiler->optInfo->Optimize_Disp, *optInfo->O_two->W_PtrToValue, CELL ) ;
+                            _Compile_X_Group1_Immediate ( OR, MEM, optInfo->Optimize_Rm, compiler->optInfo->Optimize_Disp, *optInfo->O_two->W_PtrToValue, 0 ) ; //CELL ) ;
                         }
                         else if ( optInfo->O_one->Definition == CfrTil_Multiply )
                         {
@@ -599,11 +609,13 @@ _CheckOptimizeOperands ( Compiler * compiler, int64 maxOperands )
                         {
                             //_Compile_Group2 ( int64 mod, int64 regOpCode, int64 rm, int64 sib, int64 disp, int64 imm )
                             Set_SCA ( 2 ) ;
+                            _Compile_MoveImm ( REG, RCX, IMM_B | REX_B | MODRM_B | DISP_B, 0, 0, *optInfo->O_two->W_PtrToValue, CELL ) ;
                             _Compile_Group2 ( MEM, SHL, optInfo->Optimize_Rm, 0, compiler->optInfo->Optimize_Disp, *optInfo->O_two->W_PtrToValue ) ;
                         }
                         else if ( optInfo->O_one->Definition == CfrTil_ShiftRight )
                         {
                             Set_SCA ( 2 ) ;
+                            _Compile_MoveImm ( REG, RCX, IMM_B | REX_B | MODRM_B | DISP_B, 0, 0, *optInfo->O_two->W_PtrToValue, CELL ) ;
                             _Compile_Group2 ( MEM, SHR, optInfo->Optimize_Rm, 0, compiler->optInfo->Optimize_Disp, *optInfo->O_two->W_PtrToValue ) ;
                         }
                         else continue ;
@@ -671,14 +683,14 @@ _CheckOptimizeOperands ( Compiler * compiler, int64 maxOperands )
                             else if ( optInfo->O_one->Definition == CfrTil_ShiftRight ) op = SHR ;
                             if ( optInfo->O_six->W_OriginalWord == optInfo->O_five->W_OriginalWord )
                             {
-                                _Compile_GetVarLitObj_RValue_To_Reg ( optInfo->O_three, OREG ) ;
+                                _Compile_GetVarLitObj_RValue_To_Reg ( optInfo->O_three, RCX ) ;
                                 _GetRmDispImm ( optInfo, optInfo->O_six, - 1 ) ;
                                 Set_SCA ( 1 ) ;
                                 _Compile_Group2_CL ( MEM, op, compiler->optInfo->Optimize_Rm, 0, compiler->optInfo->Optimize_Disp ) ;
                             }
                             else
                             {
-                                _Compile_GetVarLitObj_RValue_To_Reg ( optInfo->O_three, OREG ) ;
+                                _Compile_GetVarLitObj_RValue_To_Reg ( optInfo->O_three, RCX ) ;
                                 _Compile_GetVarLitObj_RValue_To_Reg ( optInfo->O_five, ACC ) ;
                                 Set_SCA ( 1 ) ;
                                 _Compile_Group2_CL ( REG, op, ACC, 0, 0 ) ;

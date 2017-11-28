@@ -388,14 +388,14 @@ void
 Debugger_Stack ( Debugger * debugger )
 {
     //_CfrTil_SyncStackPointers_FromRegs ( _CfrTil_ ) ;
-    //if ( GetState ( debugger, DBG_STEPPING ) && GetState ( debugger->cs_Cpu, CPU_SAVED ) )
+    if ( GetState ( debugger, DBG_STEPPING ) && GetState ( debugger->cs_Cpu, CPU_SAVED ) )
     {
         //Debugger_SyncStackPointersFromCpuState ( debugger ) ;
-        _CfrTil_PrintDataStack ( ) ;
+        _CfrTil_PrintDataStack ( ) ; // stack has been adjusted 
         _Printf ( ( byte* ) "\n" ) ;
         SetState ( debugger, DBG_INFO, true ) ;
     }
-    //else CfrTil_PrintDataStack ( ) ;
+    else CfrTil_PrintDataStack ( ) ;
     //if ( GetState ( debugger, DBG_STEPPING ) ) SetState ( debugger, DBG_START_STEPPING, true ) ;
 #if 0    
     if ( GetState ( debugger, DBG_STEPPING ) )

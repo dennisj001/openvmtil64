@@ -1,6 +1,15 @@
 
 #include "../../include/cfrtil64.h"
 
+void
+Byte_PtrCall ( byte * bptr )
+{
+    if ( bptr )
+    {
+        ( ( block ) bptr ) ( ) ;
+    }
+}
+
 ByteArray *
 _ByteArray_AppendSpace_MakeSure ( ByteArray * ba, int64 size ) // size in bytes
 {
@@ -131,12 +140,13 @@ _ByteArray_SetHere ( ByteArray * ba, byte * index )
 }
 
 void
-_ByteArray_SetHere_AndForDebug ( ByteArray * ba, byte * index )
+ByteArray_SetHere_AndForDebug ( ByteArray * ba, byte * index )
 {
     if ( index )
     {
-        _ByteArray_SetEndIndex ( ba, index ) ;
-        //if ( _Debugger_ ) _Debugger_->PreHere = index ;
+        //_ByteArray_SetEndIndex ( ba, index ) ;
+        _ByteArray_SetHere ( ba, index ) ;
+        if ( _Debugger_ ) _Debugger_->PreHere = index ;
     }
 }
 

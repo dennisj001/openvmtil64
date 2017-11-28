@@ -282,7 +282,7 @@ _Namespace_Find ( byte * name, Namespace * superNamespace, int64 exceptionFlag )
     else if ( exceptionFlag )
     {
         _Printf ( ( byte* ) "\nUnable to find Namespace : %s\n", name ) ;
-        CfrTil_Exception ( NAMESPACE_ERROR, 1 ) ;
+        CfrTil_Exception (NAMESPACE_ERROR, 0, 1 ) ;
         return 0 ;
     }
     return 0 ;

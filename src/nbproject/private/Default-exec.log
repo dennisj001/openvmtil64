@@ -235,8 +235,8 @@ called: gcc
 	-ggdb
 	-c
 	-o
-	basis/cfrtil.o
-	basis/cfrtil.c
+	basis/cfrtil64.o
+	basis/cfrtil64.c
 
 called: gcc
 	/home/dennisj/openvmtil64/src
@@ -927,7 +927,7 @@ called: gcc
 	basis/repl.o
 	basis/core/syntax.o
 	basis/core/dataObjectNew.o
-	basis/cfrtil.o
+	basis/cfrtil64.o
 	basis/core/parse.o
 	basis/core/memSpace.o
 	basis/init.o
@@ -995,7 +995,7 @@ called: gcc
 	primitives/cmaths.o
 	primitives/dataObjectNews.o
 	-o
-	cfrtil-gdb
+	cfrtil64-gdb
 	-L/usr/local/lib
 	-ludis86
 	-lrt
@@ -1011,7 +1011,7 @@ called: /usr/bin/ld
 	-plugin
 	/usr/lib/gcc/x86_64-linux-gnu/7/liblto_plugin.so
 	-plugin-opt=/usr/lib/gcc/x86_64-linux-gnu/7/lto-wrapper
-	-plugin-opt=-fresolution=/tmp/ccEmqzsN.res
+	-plugin-opt=-fresolution=/tmp/ccEs3Q0Q.res
 	-plugin-opt=-pass-through=-lgcc
 	-plugin-opt=-pass-through=-lgcc_s
 	-plugin-opt=-pass-through=-lc
@@ -1032,7 +1032,7 @@ called: /usr/bin/ld
 	-z
 	relro
 	-o
-	cfrtil-gdb
+	cfrtil64-gdb
 	/usr/lib/gcc/x86_64-linux-gnu/7/../../../x86_64-linux-gnu/Scrt1.o
 	/usr/lib/gcc/x86_64-linux-gnu/7/../../../x86_64-linux-gnu/crti.o
 	/usr/lib/gcc/x86_64-linux-gnu/7/crtbeginS.o
@@ -1068,7 +1068,7 @@ called: /usr/bin/ld
 	basis/repl.o
 	basis/core/syntax.o
 	basis/core/dataObjectNew.o
-	basis/cfrtil.o
+	basis/cfrtil64.o
 	basis/core/parse.o
 	basis/core/memSpace.o
 	basis/init.o

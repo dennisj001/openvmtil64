@@ -1,3 +1,4 @@
+5
 "\nclassTest.cft" ps //pause
 /*test comment*/ 5  // for stack checking see last lines
 #if "_ClassTest_" defined not // prevent including this file twice
@@ -8,6 +9,7 @@ Compiler
 hex
 : sl nl location nl stk _pause ; //sl
 Class
+: sp stack ; //pause ;
 sp
 "Pointer" class Pointer.size 8 = // 'size' must be set else it remains 0; whenever a :{ ... }; class declaration doesn't immediately follow the class declaration
 Class // "class" works like "namespace" so here we switch back to namespace 'Class' else following words would be in class 'Pointer'
@@ -172,7 +174,7 @@ dbgOff
 #else
 // TODO ( % using C "\nprintf output = " ps d: printf ( "this.size = %d", this.size ) this @ dup hex p size @ dup decimal p dump % ) //pause // 'this' is a pointer to a pointer 
 #endif
-
+sp
 TODO ( "'this' semantics have yet to be solidified" ) 
 sp
 testClone size @ dump

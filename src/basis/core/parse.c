@@ -82,7 +82,7 @@ gotNextToken:
             continue ;
         }
         ns = _Namespace_Find ( token, 0, 0 ) ;
-        if ( ! ns ) CfrTil_Exception ( NAMESPACE_ERROR, 1 ) ;
+        if ( ! ns ) CfrTil_Exception (NAMESPACE_ERROR, 0, 1 ) ;
         size = _Namespace_VariableValueGet ( ns, ( byte* ) "size" ) ;
         if ( ns && size )
         {
@@ -96,7 +96,7 @@ gotNextToken:
                 continue ;
             }
         }
-        else CfrTil_Exception ( NAMESPACE_ERROR, 1 ) ; // else structure component size error
+        else CfrTil_Exception (NAMESPACE_ERROR, 0, 1 ) ; // else structure component size error
         for ( i = 0 ; 1 ; )
         {
             token = Lexer_ReadToken ( _Context_->Lexer0 ) ;
@@ -109,7 +109,7 @@ gotNextToken:
                 sizeOf += size ;
                 token = Lexer_ReadToken ( _Context_->Lexer0 ) ;
                 arrayDimensions [ i ] = arrayDimensionSize ;
-                if ( ! String_Equal ( ( char* ) token, "]" ) ) CfrTil_Exception ( SYNTAX_ERROR, 1 ) ;
+                if ( ! String_Equal ( ( char* ) token, "]" ) ) CfrTil_Exception (SYNTAX_ERROR, 0, 1 ) ;
                 i ++ ;
             }
             else
@@ -238,7 +238,7 @@ _CfrTil_Parse_LocalsAndStackVariables ( int64 svf, int64 lispMode, ListObject * 
                 ( ( String_Equal ( ( char* ) token, "{" ) ) || ( String_Equal ( ( char* ) token, ";" ) ) ) )
             {
                 _Printf ( ( byte* ) "\nLocal variables syntax error : no closing parenthesis ')' found" ) ;
-                CfrTil_Exception ( SYNTAX_ERROR, 1 ) ;
+                CfrTil_Exception (SYNTAX_ERROR, 0, 1 ) ;
             }
             if ( getReturnFlag )
             {

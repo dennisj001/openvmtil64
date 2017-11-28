@@ -55,7 +55,7 @@ faccs3 ( n | rec -- TOS )
 ' faccs3 find wdiss
 faccs3 ( 7 ) p //sp
 int
-fac5 ( REG n  | REG facc ) 
+fac5 ( REG n  | REG facc -- RAX ) 
 { 
     facc = 1 ;
     while ( n > 1 ) 
@@ -68,20 +68,33 @@ wdiss ( ' fac5 find ) ;
 fac5 ( 7 ) p //sp
 
 int
-faccs ( REG n | REG rec ) //-- RAX ) 
+faccs ( REG n | REG rec -- RAX ) 
 {
     rec = 1 ; 
     while ( n > 1 )
     { 
         rec = rec * n ;  n-- ; 
     } 
-    d: return rec ;
+    return rec ;
 }
 ' faccs find wdiss
 faccs ( 7 ) p //sp
 
 int
-faccs2 ( REG n | REG rec -- RAX ) 
+fac5 ( REG n  | REG facc ) 
+{ 
+    facc = 1 ;
+    while ( n > 1 ) 
+    {
+        facc = facc * n -- ;
+    }
+    return facc ;
+}
+//wdiss ( ' fac5 find ) 
+fac5 ( 7 ) p  // pause
+
+int
+faccs2 ( REG n | REG rec ) 
 {
     for ( rec = 1 ; n > 1 ; n-- )
     { 
@@ -140,6 +153,7 @@ nl "ffx ... " ps nl
 : ffx ( wn | d ) 1 ti d wn @ _find = d @ wdiss 3 d @ _ffx nl wn @ ps ":" ps 1 time nl ;
 : ffx2 ( wn | d ) 1 ti d wn @ _find = d @ wdiss 3 d @ _ffx2 1 time nl ;
 
+#if 1 
 User
 "factorial" ffx 
 "cfactorial" ffx
@@ -154,7 +168,7 @@ C "qexp2" ffx
 "bexp2" ffx
 "bexp3" ffx
 "fac" ffx
-// "fac5" ffx sp
+"fac5" ffx //pause
 User
 "factorial" ffx
 "cfactorial3" ffx
@@ -169,6 +183,8 @@ using
 "faccs" ffx
 "fac5" ffx
 "fac4" ffx
+#endif
+
 sp
 #if 0
 //verbosity 3 =
@@ -202,7 +218,7 @@ C
 
 c_syntaxOn
 int 
-_fibn0 ( n | REG fib ) 
+_fibn0 ( n | fib ) 
 {
     fib = n ;
     if ( n > 1 ) 
@@ -211,11 +227,12 @@ _fibn0 ( n | REG fib )
     }
     return fib ;
 }
-//' _fibn0 find wdiss sp _fibn0 ( 20 ) p sp
+//' _fibn0 find d: wdiss sp _fibn0 ( 20 ) dup p 6765 _assert //sp
+dscOn
 int
-fibPTC? ( n )
+fibPTC? ( n | fn, fn1, fn2 ) 
 {
-    int fn, fn1, fn2 ;
+    //d: int fn, fn1, fn2 ;
     for ( fn = 0, fn1 = 0, fn2 = 1 ; n ; n -- ) 
     {   
         fn1 = fn2 ;
@@ -224,8 +241,9 @@ fibPTC? ( n )
     }
     return fn ;
 }
+dscOff
 ' fibPTC? find wdiss
-d: fibPTC? (20) dup p 6765 _assert //sp
+fibPTC? (20) dup p 6765 _assert //sp
 int
 //fibPTC2? ( REG n | REG fn, REG fn1, REG fn2 )
 fibPTC2? ( n | fn, fn1, fn2 )

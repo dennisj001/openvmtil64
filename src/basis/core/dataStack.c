@@ -65,7 +65,7 @@ DataStack_Check ( )
 {
     if ( DataStack_Underflow ( ) || DataStack_Overflow ( ) )
     {
-        CfrTil_Exception ( STACK_OVERFLOW, QUIT ) ;
+        CfrTil_Exception (STACK_OVERFLOW, 0, QUIT ) ;
     }
 }
 

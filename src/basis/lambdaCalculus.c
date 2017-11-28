@@ -867,7 +867,7 @@ _LO_New_RawStringOrLiteral ( Lexer * lexer, byte * token, int64 qidFlag )
     else
     {
         _Printf ( ( byte* ) "\n%s ?\n", ( char* ) token ) ;
-        CfrTil_Exception ( NOT_A_KNOWN_OBJECT, QUIT ) ;
+        CfrTil_Exception (NOT_A_KNOWN_OBJECT, 0, QUIT ) ;
         return 0 ;
     }
 }
@@ -1085,11 +1085,11 @@ _LO_Apply_Arg ( ListObject ** pl1, int64 i, int8 svCompileMode )
             Compiler *compiler = _Context_->Compiler0 ;
             int64 objSize = 0, increment = 0, variableFlag ;
             int64 svcm = GetState ( compiler, COMPILE_MODE ) ;
-            if ( ( ! arrayBaseObject->ArrayDimensions ) ) CfrTil_Exception ( ARRAY_DIMENSION_ERROR, QUIT ) ;
+            if ( ( ! arrayBaseObject->ArrayDimensions ) ) CfrTil_Exception (ARRAY_DIMENSION_ERROR, 0, QUIT ) ;
             if ( interp->CurrentObjectNamespace ) objSize = interp->CurrentObjectNamespace->Size ; //_CfrTil_VariableValueGet ( _Context_->Interpreter0->CurrentClassField, ( byte* ) "size" ) ; 
             if ( ! objSize )
             {
-                CfrTil_Exception ( OBJECT_SIZE_ERROR, QUIT ) ;
+                CfrTil_Exception (OBJECT_SIZE_ERROR, 0, QUIT ) ;
             }
             variableFlag = _CheckArrayDimensionForVariables_And_UpdateCompilerState ( ) ;
             _WordList_Pop ( _Context_->Compiler0->WordList, 0 ) ; // pop the initial '['
@@ -1333,7 +1333,7 @@ CompileLispBlock ( ListObject *args, ListObject * body )
     //DebugShow_OFF ;
     //_Word_InitFinal ( word, ( byte* ) code ) ; // nb. LISP_COMPILE_MODE is reset by _Word_Finish
     _Word_DefinitionStore ( word, ( block ) code ) ; // not _Word_InitFinal because this is already compiler->CurrentWordCompiling with W_SourceCode, etc.
-    Compiler_Init ( _Context_->Compiler0, 0 ) ; // not really necessary should always be handled by EndBlock ?? but this allows for some syntax errors with a '{' but no '}' ??
+    //Compiler_Init ( _Context_->Compiler0, 0 ) ; // not really necessary should always be handled by EndBlock ?? but this allows for some syntax errors with a '{' but no '}' ??
 
     //DebugShow_ON ;
     return code ;
@@ -1694,6 +1694,7 @@ LC_EvalPrint ( ListObject * l0 )
     //Dsp = dsp ;
     SetBuffersUnused ( 1 ) ;
     _Q_->OVT_LC->LispParenLevel = 0 ;
+    Compiler_Init ( _Context_->Compiler0, 0 ) ; // we could be compiling a cfrTil word as in oldLisp.cft
 }
 
 ListObject *
@@ -1726,7 +1727,6 @@ _LO_ReadEvalPrint_ListObject ( int64 parenLevel, int64 continueFlag )
     if ( ! continueFlag )
     {
         LC_Clear ( 0 ) ; // 0 : nb. !! very important for variables from previous evals : but fix; meditate on why? temporaries should be clearable
-        Compiler_Init ( _Context_->Compiler0, 0 ) ; // we could be compiling a cfrTil word as in oldLisp.cft
         Lexer_SetTokenDelimiters ( lexer, svDelimiters, 0 ) ;
     }
     SetState ( _Context_->Compiler0, VARIABLE_FRAME, false ) ;

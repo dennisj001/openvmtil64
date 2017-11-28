@@ -29,7 +29,7 @@ _CompileFromUptoRET ( byte * data )
 void
 _Compile_WordInline ( Word * word ) // , byte * dstAddress )
 {
-    _Block_Copy ( ( byte* ) word->Definition, word->S_CodeSize ) ;
+    _Block_Copy (( byte* ) word->Definition, word->S_CodeSize , 0) ;
 }
 
 void
@@ -72,6 +72,7 @@ _GotoInfo_SetAndRemove ( GotoInfo * gotoInfo, byte * address, int8 removeFlag )
 {
     _SetOffsetForCallOrJump ( gotoInfo->pb_JmpOffsetPointer, address ) ;
     if ( removeFlag ) GotoInfo_Remove ( ( dlnode* ) gotoInfo ) ;
+    //else gotoInfo->pb_JmpOffsetPointer = address ;
 }
 
 void
@@ -81,17 +82,26 @@ _InstallGotoPoint_Key ( dlnode * node, int64 blockInfo, int64 key )
     GotoInfo * gotoInfo = ( GotoInfo* ) node ;
     BlockInfo * bi = (BlockInfo *) blockInfo ;
     int64 address = * ( int32* ) gotoInfo->pb_JmpOffsetPointer ;
-    if ( ( address == 0 ) || ( key & GI_BREAK ) || ( key & GI_RETURN ) ) // if we move a block its recurse offset remains, check if this looks like at real offset pointer
+    if ( ( address == 0 ) || ( key & (GI_BREAK | GI_RETURN | GI_GOTO | GI_LABEL) ) ) // if we move a block its recurse offset remains, check if this looks like at real offset pointer
     {
-        if ( ( gotoInfo->GI_CAttribute & ( GI_GOTO | GI_CALL_LABEL ) ) && ( key & ( GI_GOTO | GI_CALL_LABEL ) ) )
+        if ( ( gotoInfo->GI_CAttribute & ( GI_GOTO | GI_LABEL ) ) && ( key & ( GI_GOTO | GI_LABEL ) ) )
         {
-            //Namespace * ns = Namespace_FindOrNew_SetUsing ( ( byte* ) "__labels__", _CfrTil_->Namespaces, 1 ) ;
             Namespace * ns = _Namespace_Find ( ( byte* ) "__labels__", _CfrTil_->Namespaces, 0 ) ;
             if ( ns && ( word = Finder_FindWord_InOneNamespace ( _Finder_, ns, gotoInfo->pb_LabelName ) ) )
             {
                 _GotoInfo_SetAndRemove ( gotoInfo, ( byte* ) word->W_Value, 0 ) ;
             }
         }
+#if 0        
+        else if ( ( gotoInfo->GI_CAttribute & ( GI_LABEL ) ) && ( key & ( GI_LABEL ) ) )
+        {
+            Namespace * ns = _Namespace_Find ( ( byte* ) "__labels__", _CfrTil_->Namespaces, 0 ) ;
+            if ( ns && ( word = Finder_FindWord_InOneNamespace ( _Finder_, ns, gotoInfo->pb_LabelName ) ) )
+            {
+                _GotoInfo_SetAndRemove ( gotoInfo, ( byte* ) word->W_Value, 0 ) ;
+            }
+        }
+#endif        
         else if ( ( gotoInfo->GI_CAttribute & GI_RETURN ) && ( key & GI_RETURN ) )
         {
             _GotoInfo_SetAndRemove ( gotoInfo, Here, 0 ) ;

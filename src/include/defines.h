@@ -372,7 +372,7 @@
 #define GI_GOTO ( (uint64) 1 << 3 )
 #define GI_RECURSE ( (uint64) 1 << 4 )
 #define GI_TAIL_CALL ( (uint64) 1 << 5 )
-#define GI_CALL_LABEL ( (uint64) 1 << 6 )
+#define GI_LABEL ( (uint64) 1 << 6 )
 
 // MemChunk / Memory Types
 #define OPENVMTIL ( (uint64) 1 << 0 )

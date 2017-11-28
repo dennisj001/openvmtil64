@@ -143,7 +143,7 @@ _OVT_Pause ( byte * prompt, int64 signalsHandled )
 int64
 _OpenVmTil_Pause ( byte * msg )
 {
-    _Printf ( ( byte* ) "%s", msg ) ;
+    _Printf ( ( byte* ) "\n%s", msg ) ;
     return _OVT_Pause ( 0, _Q_->SignalExceptionsHandled ) ;
 }
 
@@ -244,7 +244,7 @@ OpenVmTil_SignalAction ( int signal, siginfo_t * si, void * uc )
 }
 
 void
-CfrTil_Exception ( int64 signal, int64 restartCondition )
+CfrTil_Exception (int64 signal, byte * message, int64 restartCondition )
 {
     byte * b = Buffer_Data ( _CfrTil_->ScratchB1 ) ;
     AlertColors ;
@@ -369,8 +369,7 @@ CfrTil_Exception ( int64 signal, int64 restartCondition )
         }
         default:
         {
-            OpenVmTil_Throw ( 0, restartCondition, 1 ) ;
-
+            OpenVmTil_Throw ( message, restartCondition, 1 ) ;
             break ;
         }
     }

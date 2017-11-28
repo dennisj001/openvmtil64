@@ -110,11 +110,12 @@ _Compile_Divide ( Compiler * compiler, uint64 type )
     else if ( optFlag )
     {
         _Compile_MoveImm ( REG, RDX, IMM_B | REX_B | MODRM_B | DISP_B, 0, 0, 0, CELL ) ;
-        _Compile_Move_Reg_To_Reg ( ACC, ACC ) ;
+        //_Compile_Move_Reg_To_Reg ( ACC, ACC ) ;
         // for idiv the dividend must be eax:edx, divisor can be reg or rm ; here we use ECX
         // idiv eax by reg or mem
-        // Compile_IDIV ( mod, rm, sib, disp, imm, size )
-        Compile_IDIV ( compiler->optInfo->Optimize_Mod, compiler->optInfo->Optimize_Rm, ( ( compiler->optInfo->Optimize_Disp != 0 ) ? DISP_B : 0 ), 0,
+        // Compile_IDIV( mod, rm, controlFlag, sib, disp, imm, size )
+        int8 flags = ( ( compiler->optInfo->Optimize_Disp != 0 ) ? DISP_B : 0 ) ; //nb. there is no idiv imm insn
+        Compile_IDIV ( compiler->optInfo->Optimize_Mod, compiler->optInfo->Optimize_Rm, flags, 0,
             compiler->optInfo->Optimize_Disp, 0, 0 ) ;
         //_Compile_Move_Reg_To_Reg ( R8D, RAX ) ;
         if ( type == MOD ) reg = RDX ;

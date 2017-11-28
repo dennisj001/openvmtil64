@@ -32,14 +32,7 @@ CfrTil_Jcc_Label ( )
     int64 ttt = DataStack_Pop ( ) ;
     int64 n = DataStack_Pop ( ) ;
     Compile_JCC ( n, ttt, 0 ) ;
-#if 0    
-    GotoInfo * gotoInfo = ( GotoInfo * ) _GotoInfo_Allocate ( ) ;
-    gotoInfo->pb_LabelName = ( byte* ) DataStack_Pop ( ) ;
-    gotoInfo->pb_JmpOffsetPointer = Here - INT32_SIZE ; // after the call opcode
-    gotoInfo->GI_CAttribute = GI_CALL_LABEL ;
-    dllist_AddNodeToTail ( _Context_->Compiler0->GotoList, ( dlnode* ) gotoInfo ) ;
-#endif    
-    GotoInfo_New ( ( byte* ) DataStack_Pop ( ), GI_CALL_LABEL ) ;
+    GotoInfo_New ( ( byte* ) DataStack_Pop ( ), GI_LABEL ) ;
 }
 
 void

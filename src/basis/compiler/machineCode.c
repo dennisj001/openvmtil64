@@ -103,7 +103,7 @@ CalculateModRmByte ( int64 mod, int8 reg, int8 rm, int8 sib, int64 disp )
         //if ( ( mod < 3 ) && ( ( ( rm == 4 ) && ( sib == 0 ) ) || ( ( rm == 5 ) && ( disp == 0 ) ) ) )
     {
         // cf. InstructionSet-A-M-253666.pdf Table 2-2
-        CfrTil_Exception ( MACHINE_CODE_ERROR, 1 ) ;
+        CfrTil_Exception (MACHINE_CODE_ERROR, 0, 1 ) ;
     }
     if ( sib )
     {
@@ -394,7 +394,7 @@ _Compile_Op_Special_Reg_To_Reg ( int64 code, int8 rm, int8 reg ) // toRm = 0 => 
     else if ( code == XCHG_R_TO_R )
         opCode = 0x87 ;
     else
-        CfrTil_Exception ( MACHINE_CODE_ERROR, ABORT ) ;
+        CfrTil_Exception (MACHINE_CODE_ERROR, 0, ABORT ) ;
     // _Compile_InstructionX86 ( opCode, mod, reg, rm, modRmImmDispFlag, sib, disp, imm, immSize )
     Compile_CalcWrite_Instruction_X64 ( 0, opCode, 3, reg, rm, REX_B | MODRM_B, 0, 0, 0, 0, 0 ) ;
 }

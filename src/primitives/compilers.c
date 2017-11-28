@@ -103,7 +103,7 @@ GotoInfo_New ( byte * lname, uint64 type )
 }
 
 void
-_CfrTil_CompileCallGotoPoint ( byte * name, uint64 type )
+_CfrTil_CompileCallGoto ( byte * name, uint64 type )
 {
     if ( type == GI_RECURSE ) _Compile_UninitializedCall ( ) ;
     else _Compile_UninitializedJump ( ) ;
@@ -113,20 +113,20 @@ _CfrTil_CompileCallGotoPoint ( byte * name, uint64 type )
 void
 _CfrTil_Goto ( byte * name )
 {
-    _CfrTil_CompileCallGotoPoint ( name, GI_GOTO ) ;
+    _CfrTil_CompileCallGoto ( name, GI_GOTO ) ;
 }
 
 void
-CfrTil_Goto ( ) // runtime
+CfrTil_Goto ( ) 
 {
-    _CfrTil_Goto ( ( byte * ) DataStack_Pop ( ) ) ; // runtime
+    _CfrTil_Goto ( ( byte * ) DataStack_Pop ( ) ) ; 
 }
 
 void
-CfrTil_Goto_Prefix ( ) // runtime
+CfrTil_Goto_Prefix ( ) 
 {
     byte * gotoToken = Lexer_ReadToken ( _Context_->Lexer0 ) ;
-    _CfrTil_Goto ( gotoToken ) ; // runtime
+    _CfrTil_Goto ( gotoToken ) ; 
 }
 
 void
@@ -145,35 +145,46 @@ CfrTil_Label_Prefix ( )
 void
 CfrTil_Return ( )
 {
-    if ( ! _Readline_Is_AtEndOfBlock ( _Context_->ReadLiner0 ) )
-    {
-        _CfrTil_CompileCallGotoPoint ( 0, GI_RETURN ) ;
-    }
     if ( GetState ( _Context_, C_SYNTAX ) )
     {
         byte * token = Lexer_PeekNextNonDebugTokenWord ( _Lexer_, 0 ) ;
         Word * word = Finder_Word_FindUsing ( _Finder_, token, 0 ) ;
-        if ( word->CAttribute & ( NAMESPACE_VARIABLE | LOCAL_VARIABLE | PARAMETER_VARIABLE ) ) _Compiler_->ReturnVariableWord = word ;
-        if ( word->CAttribute & REGISTER_VARIABLE ) Lexer_ReadToken ( _Context_->Lexer0 ) ; // don't compile anything let end block or locals deal with the return
+        if ( word->CAttribute & ( NAMESPACE_VARIABLE | LOCAL_VARIABLE | PARAMETER_VARIABLE ) )
+        {
+            _Compiler_->ReturnVariableWord = word ;
+            //if ( word->CAttribute & REGISTER_VARIABLE ) 
+            Lexer_ReadToken ( _Context_->Lexer0 ) ; // don't compile anything let end block or locals deal with the return
+        }
+        else
+        {
+            if ( ! _Readline_Is_AtEndOfBlock ( _Context_->ReadLiner0 ) )
+            {
+                _CfrTil_CompileCallGoto ( 0, GI_RETURN ) ;
+            }
+        }
+    }
+    else if ( ! _Readline_Is_AtEndOfBlock ( _Context_->ReadLiner0 ) )
+    {
+        _CfrTil_CompileCallGoto ( 0, GI_RETURN ) ;
     }
 }
 
 void
 CfrTil_Continue ( )
 {
-    _CfrTil_CompileCallGotoPoint ( 0, GI_CONTINUE ) ;
+    _CfrTil_CompileCallGoto ( 0, GI_CONTINUE ) ;
 }
 
 void
 CfrTil_Break ( )
 {
-    _CfrTil_CompileCallGotoPoint ( 0, GI_BREAK ) ;
+    _CfrTil_CompileCallGoto ( 0, GI_BREAK ) ;
 }
 
 void
 CfrTil_SetupRecursiveCall ( )
 {
-    _CfrTil_CompileCallGotoPoint ( 0, GI_RECURSE ) ;
+    _CfrTil_CompileCallGoto ( 0, GI_RECURSE ) ;
 }
 
 #if 0
@@ -183,7 +194,7 @@ CfrTil_Tail ( )
 {
     _Printf ( ( byte* ) "\nTailCall not implemented yet. Fix me!\n" ) ;
     return ;
-    _CfrTil_CompileCallGotoPoint ( GI_TAIL_CALL ) ;
+    _CfrTil_CompileCallGoto ( GI_TAIL_CALL ) ;
 }
 #endif
 

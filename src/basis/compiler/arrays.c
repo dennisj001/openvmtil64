@@ -159,11 +159,11 @@ CfrTil_ArrayBegin ( void )
         int64 saveCompileMode = GetState ( compiler, COMPILE_MODE ) ;
 
         arrayBaseObject = interp->LastWord ;
-        if ( ! arrayBaseObject->ArrayDimensions ) CfrTil_Exception ( ARRAY_DIMENSION_ERROR, QUIT ) ;
+        if ( ! arrayBaseObject->ArrayDimensions ) CfrTil_Exception (ARRAY_DIMENSION_ERROR, 0, QUIT ) ;
         if ( interp->CurrentObjectNamespace ) objSize = interp->CurrentObjectNamespace->Size ; //_CfrTil_VariableValueGet ( cntx->Interpreter0->CurrentClassField, ( byte* ) "size" ) ; 
         if ( ! objSize )
         {
-            CfrTil_Exception ( OBJECT_SIZE_ERROR, QUIT ) ;
+            CfrTil_Exception (OBJECT_SIZE_ERROR, 0, QUIT ) ;
         }
 #if 0   // this would eliminate extra 'add eax, 0' code with arrays but nb!! : Compiler_IncrementCurrentAccumulatedOffset is being called in Do_NextArrayWordToken
         if ( Compiling && ( baseObject->AccumulatedOffset == 0 ) )

@@ -114,7 +114,7 @@ Mem_Allocate ( int64 size, uint64 allocType )
             _Q_->RunTimeAllocation += size ;
             return mmap_AllocMem ( size ) ;
         }
-        default: CfrTil_Exception ( MEMORY_ALLOCATION_ERROR, QUIT ) ;
+        default: CfrTil_Exception (MEMORY_ALLOCATION_ERROR, 0, QUIT ) ;
     }
 }
 

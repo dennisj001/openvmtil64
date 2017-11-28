@@ -15,16 +15,19 @@ _Interpret_String ( byte *str )
 }
 
 byte *
-_Interpret_C_Until_EitherToken ( Interpreter * interp, byte * end1, byte * end2, byte * delimiters )
+_Interpret_C_Until_EitherToken ( Interpreter * interp, byte * end1, byte * end2, byte* end3, byte * delimiters )
 {
-    dllist * plist = _Compiler_->PostfixLists ;
     byte * token = 0 ;
     while ( 1 )
     {
         token = _Lexer_ReadToken ( interp->Lexer0, delimiters ) ;
-        List_CheckInterpretLists_OnVariable ( plist, token ) ;
-        if ( String_Equal ( token, end1 ) || String_Equal ( token, end2 ) ) break ;
-        else if ( GetState ( interp->Compiler0, DOING_A_PREFIX_WORD ) && String_Equal ( token, ")" ) ) break ;
+        List_CheckInterpretLists_OnVariable ( _Compiler_->PostfixLists, token ) ;
+        if ( String_Equal ( token, end1 ) || String_Equal ( token, end2 ) || ( end3 ? String_Equal ( token, end3 ) : 0 ) ) break ;
+        else if ( GetState ( interp->Compiler0, DOING_A_PREFIX_WORD ) && String_Equal ( token, ")" ) )
+        {
+            if ( ! Compiling ) _Compiler_FreeAllLocalsNamespaces ( _Compiler_ ) ;
+            break ;
+        }
         else if ( GetState ( _Context_, C_SYNTAX ) && ( String_Equal ( token, "," ) || String_Equal ( token, ";" ) ) ) break ;
         else Interpreter_InterpretAToken ( interp, token, - 1 ) ;
     }
@@ -114,6 +117,7 @@ _Interpret_PrefixFunction_Until_RParen ( Interpreter * interp, Word * prefixFunc
         _Interpreter_DoWord_Default ( interp, prefixFunction ) ;
         SetState ( compiler, PREFIX_PARSING, false ) ;
         if ( GetState ( _Context_, C_SYNTAX ) ) SetState ( _Context_, C_RHS, svs_c_rhs ) ;
+        if ( ! Compiling ) _Compiler_FreeAllLocalsNamespaces ( compiler ) ;
     }
 }
 

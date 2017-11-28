@@ -69,7 +69,7 @@ _Stack_PrintValues ( byte * name, uint64 * stackPointer, int64 depth )
     }
     else //if ( stackDepth < 0 )
     {
-        CfrTil_Exception ( STACK_UNDERFLOW, QUIT ) ;
+        CfrTil_Exception (STACK_UNDERFLOW, 0, QUIT ) ;
     }
     //_Printf ( ( byte* ) "\n" ) ;
 }
@@ -111,7 +111,7 @@ _Stack_Print ( Stack * stack, byte * name )
 {
     _Stack_PrintHeader ( stack, name ) ;
     Stack_PrintValues ( name, stack, Stack_Depth ( stack ) ) ;
-    //CfrTil_NewLine ( ) ;
+    CfrTil_NewLine ( ) ;
 }
 
 int64
@@ -150,7 +150,7 @@ _Stack_Pop_ExceptionFlag ( Stack * stack, int64 exceptionOnEmptyFlag )
 {
     if ( _Stack_IsEmpty ( stack ) )
     {
-        if ( exceptionOnEmptyFlag ) CfrTil_Exception ( STACK_UNDERFLOW, QUIT ) ;
+        if ( exceptionOnEmptyFlag ) CfrTil_Exception (STACK_UNDERFLOW, 0, QUIT ) ;
         else return 0 ;
     }
     return __Stack_Pop ( stack ) ;
@@ -159,7 +159,7 @@ _Stack_Pop_ExceptionFlag ( Stack * stack, int64 exceptionOnEmptyFlag )
 int64
 _Stack_Pop ( Stack * stack )
 {
-    if ( _Stack_IsEmpty ( stack ) ) CfrTil_Exception ( STACK_UNDERFLOW, QUIT ) ;
+    if ( _Stack_IsEmpty ( stack ) ) CfrTil_Exception (STACK_UNDERFLOW, 0, QUIT ) ;
     return __Stack_Pop ( stack ) ;
 }
 
@@ -167,7 +167,7 @@ int64
 _Stack_PopOrTop ( Stack * stack )
 {
     int64 sd = Stack_Depth ( stack ) ;
-    if ( sd <= 0 ) CfrTil_Exception ( STACK_UNDERFLOW, QUIT ) ;
+    if ( sd <= 0 ) CfrTil_Exception (STACK_UNDERFLOW, 0, QUIT ) ;
     else if ( sd == 1 ) return _Stack_Top ( stack ) ;
     else return __Stack_Pop ( stack ) ;
 }
@@ -233,8 +233,8 @@ Stack_Push ( Stack * stack, int64 value )
     if ( _Stack_Overflow ( stack ) )
     {
         AlertColors ;
-        _Printf ( ( byte* ) "\nStackDepth = %d\n", Stack_Depth ( stack ) ) ;
-        CfrTil_Exception ( STACK_OVERFLOW, QUIT ) ;
+        _Printf ( ( byte* ) "\nStack_Push : _Stack_Overflow - StackDepth = %d\n", Stack_Depth ( stack ) ) ;
+        CfrTil_Exception (STACK_OVERFLOW, 0, QUIT ) ;
     }
     _Stack_Push ( stack, value ) ;
 #else
@@ -246,7 +246,7 @@ int64
 Stack_Pop_WithExceptionOnEmpty ( Stack * stack )
 {
 #if STACK_CHECK_ERROR
-    if ( _Stack_IsEmpty ( stack ) ) CfrTil_Exception ( STACK_UNDERFLOW, QUIT ) ;
+    if ( _Stack_IsEmpty ( stack ) ) CfrTil_Exception (STACK_UNDERFLOW, 0, QUIT ) ;
     return _Stack_Pop ( stack ) ;
 #else
     _Stack_Pop ( stack ) ;
@@ -264,7 +264,7 @@ void
 Stack_Dup ( Stack * stack )
 {
 #if STACK_CHECK_ERROR
-    if ( _Stack_Overflow ( stack ) ) CfrTil_Exception ( STACK_OVERFLOW, QUIT ) ;
+    if ( _Stack_Overflow ( stack ) ) CfrTil_Exception (STACK_OVERFLOW, 0, QUIT ) ;
     _Stack_Dup ( stack ) ;
 #else
     _Stack_Dup ( stack ) ;
@@ -282,6 +282,7 @@ _Stack_IntegrityCheck ( Stack * stack )
     {
         return true ;
     }
+    CfrTil_Exception (0, "Stack Integrity Error :", QUIT ) ;
     return false ;
 }
 

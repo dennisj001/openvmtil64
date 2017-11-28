@@ -82,7 +82,7 @@ _Namespace_Do_C_Type ( Namespace * ns )
                         cntx->Compiler0->C_BackgroundNamespace = _Namespace_FirstOnUsingList ( ) ;
                         while ( 1 )
                         {
-                            byte * token = _Interpret_C_Until_EitherToken ( cntx->Interpreter0, ( byte* ) ",", ( byte* ) ";", 0 ) ;
+                            byte * token = _Interpret_C_Until_EitherToken (cntx->Interpreter0, ( byte* ) ",", ( byte* ) ";", 0, 0 ) ;
                             if ( ! token ) break ;
                             if ( ( String_Equal ( token, "," ) ) )
                             {

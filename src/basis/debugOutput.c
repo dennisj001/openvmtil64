@@ -201,7 +201,7 @@ _Debugger_ShowEffects ( Debugger * debugger, Word * word, int8 stepFlag, int8 fo
 {
     debugger->w_Word = word ;
     uint64* dsp = _Dsp_ ;
-    if ( ! dsp ) CfrTil_Exception ( STACK_ERROR, QUIT ) ;
+    if ( ! dsp ) CfrTil_Exception (STACK_ERROR, 0, QUIT ) ;
     if ( Is_DebugOn && ( force || stepFlag || ( debugger->w_Word != debugger->LastEffectsWord ) ) )
     {
         Word * word = debugger->w_Word ;
@@ -218,8 +218,16 @@ _Debugger_ShowEffects ( Debugger * debugger, Word * word, int8 stepFlag, int8 fo
             _Debugger_DisassembleWrittenCode ( debugger ) ;
             const char * insert ;
             int64 change, depthChange ;
-            if ( Debugger_IsStepping ( debugger ) ) change = _Dsp_ - debugger->SaveDsp ;
-            else change = _Dsp_ - debugger->WordDsp ;
+            if ( Debugger_IsStepping ( debugger ) ) 
+            {
+                change = _Dsp_ - debugger->SaveDsp ;
+                debugger->SaveDsp = _Dsp_ ;
+            }
+            else 
+            {
+                change = _Dsp_ - debugger->WordDsp ;
+                debugger->WordDsp = _Dsp_ ;
+            }
             depthChange = DataStack_Depth ( ) - debugger->SaveStackDepth ;
             if ( ( debugger->WordDsp && ( GetState ( debugger, DBG_STACK_CHANGE ) ) || ( change ) || ( debugger->SaveTOS != TOS ) || ( depthChange ) ) )
             {
@@ -411,7 +419,6 @@ next:
             prompt = ( byte* ) buffer ;
             if ( word )
             {
-
                 if ( word->CAttribute & CPRIMITIVE )
                 {
                     sprintf ( obuffer, "\n%s%s:: %s : %03ld.%03ld : %s :> %s <: cprimitive :> ", // <:: " INT_FRMT "." INT_FRMT " ",

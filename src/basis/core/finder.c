@@ -164,7 +164,7 @@ Finder_FindToken_WithException ( Finder * finder, byte * token )
     {
         _Printf ( ( byte* ) "\n%s ?", ( char* ) token ) ;
         CfrTil_Using ( ) ;
-        CfrTil_Exception ( NOT_A_KNOWN_OBJECT, QUIT ) ;
+        CfrTil_Exception (NOT_A_KNOWN_OBJECT, 0, QUIT ) ;
     }
     return finder->FoundWord ;
 }

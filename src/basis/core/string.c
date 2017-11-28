@@ -543,7 +543,7 @@ String_InsertDataIntoStringSlot ( byte * str, int64 startOfSlot, int64 endOfSlot
         else strcat ( ( char* ) str, ( char* ) data ) ;
     }
 
-    else CfrTil_Exception ( BUFFER_OVERFLOW, 1 ) ;
+    else CfrTil_Exception (BUFFER_OVERFLOW, 0, 1 ) ;
 }
 
 byte *

@@ -1,6 +1,6 @@
 
 //#define myprintf(a, b, rest...) printf (a, b, ## rest)
-#define Exception( type, response ) CfrTil_Exception ( type, response )
+#define Exception( type, response ) CfrTil_Exception (type, 0, response )
 #define Stack_Pop(stack) Stack_Pop_WithExceptionOnEmpty ( stack )
 
 #define _Q_CodeByteArray _Q_->CodeByteArray
@@ -12,12 +12,13 @@
 #define _Compile_Int64( value ) ByteArray_AppendCopyItem ( _Q_CodeByteArray, 8, value )
 #define _Compile_Cell( value ) ByteArray_AppendCopyItem ( _Q_CodeByteArray, sizeof(int64), value )
 #define Here ( _ByteArray_Here ( _Q_CodeByteArray ) )
-#define SetHere( address )  _ByteArray_SetHere ( _Q_CodeByteArray, address ) 
+#define _SetHere( address )  _ByteArray_SetHere ( _Q_CodeByteArray, address ) 
+#define SetHere( address )  ByteArray_SetHere_AndForDebug ( _Q_CodeByteArray, address ) 
 #define Set_CompilerSpace( byteArray ) (_Q_CodeByteArray = (byteArray))
 #define Get_CompilerSpace( ) _Q_CodeByteArray
 
 #define TOS _Dsp_[0]
-#define _TOS_ ( _Dsp_ ? _Dsp_ [ 0 ] : CfrTil_Exception ( STACK_ERROR, QUIT ), (uint64)-1 )
+#define _TOS_ ( _Dsp_ ? _Dsp_ [ 0 ] : CfrTil_Exception (STACK_ERROR, 0, QUIT ), (uint64)-1 )
 //#define _DataStack_Drop() _DataStack_Drop ( ) //(Dsp --)
 //#define _DataStack_DropN( n ) _DataStack_DropN ( n ) //(_Dsp_ -= (int64) n )
 //#define _DataStack_Push( v ) _DataStack_Push ( (int64) v ) //(*++Dsp = (int64) v )
@@ -27,7 +28,7 @@
 #define _DataStack_Top( ) TOS 
 #define _DataStack_GetTop( ) TOS
 #define _DataStack_SetTop( v ) _Dsp_ [ 0 ] = v ;
-#define DataStack_SetTop( v ) { if ( _Dsp_ ) { _DataStack_SetTop( v ) } else { CfrTil_Exception ( STACK_ERROR, QUIT ) ; } }
+#define DataStack_SetTop( v ) { if ( _Dsp_ ) { _DataStack_SetTop( v ) } else { CfrTil_Exception (STACK_ERROR, 0, QUIT ) ; } }
 #define _GetTop( ) TOS
 #define _SetTop( v ) (TOS = v)
 #define Stack() CfrTil_PrintDataStack ( )
@@ -173,7 +174,7 @@
 #define Throw( msg, e ) OpenVmTil_Throw ( (byte*) msg, e, 1 )
 #define ThrowIt( msg ) OpenVmTil_Throw ( (byte*) msg,  _Q_->Thrown, 1 )
 #define catchAll if ( _OpenVmTil_Catch () ) 
-#define SyntaxError( abortFlag ) CfrTil_Exception ( SYNTAX_ERROR, abortFlag )
+#define SyntaxError( abortFlag ) CfrTil_Exception (SYNTAX_ERROR, 0, abortFlag )
 #define stopThisTry _OVT_PopExceptionStack ( )
 #define stopTrying _OVT_ClearExceptionStack ( )
 

@@ -59,7 +59,7 @@ _Interpret_Do_CombinatorLeftParen ( )
     int64 blocksParsed = 0, semiFlag = 0 ;
     byte * token ;
 
-    SetState ( compiler, C_COMBINATOR_LPAREN, true ) ;
+    if ( ! GetState ( _Compiler_, C_COMBINATOR_PARSING ) ) SetState ( compiler, C_COMBINATOR_LPAREN, true ) ;
     SetState ( compiler, PREFIX_PARSING, true ) ;
     while ( 1 )
     {
@@ -107,6 +107,8 @@ doLeftBracket:
             BlockInfo * bi = ( BlockInfo* ) _Stack_Top ( compiler->BlockStack ) ;
             bi->LiteralWord = cntx->CurrentlyRunningWord ;
         }
+        //List_CheckInterpretLists_OnVariable ( _Compiler_->PostfixLists, token ) ;
+        List_InterpretLists ( compiler->PostfixLists ) ;
     }
     SetState ( compiler, COMPILE_MODE, svcm ) ;
     SetState ( compiler, C_COMBINATOR_LPAREN, svclps ) ;
@@ -172,8 +174,8 @@ _CfrTil_C_Infix_EqualOp ( Word * opWord )
     SetState ( compiler, C_INFIX_EQUAL, true ) ;
     _CfrTil_WordList_PopWords ( 2 ) ;
     d0 ( if ( Is_DebugModeOn ) Compiler_Show_WordList ( "\nCfrTil_C_Infix_Equal0p : before interpret until ',' or ';' :" ) ) ;
-    if ( GetState ( compiler, C_COMBINATOR_LPAREN ) ) token = _Interpret_Until_Token ( _Context_->Interpreter0, ( byte* ) ")", 0 ) ;
-    else token = _Interpret_C_Until_EitherToken ( interp, ( byte* ) ";", ( byte* ) ",", ( byte* ) " \n\r\t" ) ;
+    if ( GetState ( compiler, C_COMBINATOR_LPAREN ) ) token = _Interpret_Until_Token ( interp, ( byte* ) ")", 0 ) ;
+    else token = _Interpret_C_Until_EitherToken (interp, ( byte* ) ";", ( byte* ) ",", ( byte* ) ")", ( byte* ) " \n\r\t" ) ;
     _CfrTil_AddTokenToHeadOfTokenList ( token ) ; // so the callee can check/use or use
     d0 ( if ( Is_DebugModeOn ) Compiler_Show_WordList ( "\nCfrTil_C_Infix_EqualOp : after interpret until ';' :" ) ) ;
     if ( lhsWord )
@@ -210,6 +212,8 @@ _CfrTil_C_Infix_EqualOp ( Word * opWord )
     }
     List_InterpretLists ( compiler->PostfixLists ) ;
     compiler->LHS_Word = 0 ;
+    //Interpreter_InterpretAToken ( interp, token, - 1 ) ;
+
     if ( ! Compiling ) CfrTil_InitSourceCode ( _CfrTil_ ) ;
     SetState ( _Debugger_, DEBUG_SHTL_OFF, false ) ;
     SetState ( compiler, C_INFIX_EQUAL, false ) ;

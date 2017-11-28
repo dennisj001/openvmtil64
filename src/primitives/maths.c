@@ -11,7 +11,7 @@ CfrTil_Plus ( ) // +
     else
     {
         _Dsp_ [ - 1 ] = _Dsp_ [ 0 ] + _Dsp_ [ - 1 ] ;
-                DataStack_Drop ( ) ;
+        DataStack_Drop ( ) ;
     }
 }
 
@@ -33,9 +33,10 @@ CfrTil_IncDec ( int64 op ) // +
         if ( nextWord && ( nextWord->CAttribute & ( CATEGORY_OP_ORDERED | CATEGORY_OP_UNORDERED | CATEGORY_OP_DIVIDE | CATEGORY_OP_EQUAL ) ) ) // postfix
         {
             List_DropN ( compiler->WordList, 1 ) ; // the operator; let higher level see the variable
-            Interpreter_InterpretNextToken ( cntx->Interpreter0 ) ;
+            //Interpreter_InterpretNextToken ( cntx->Interpreter0 ) ;
             if ( GetState ( compiler, C_INFIX_EQUAL ) && GetState ( _CfrTil_, OPTIMIZE_ON ) && CompileMode )
             {
+                SetHere ( one->Coding ) ;
                 // ?? couldn't this stuff be done with _Interpret_C_Until_EitherToken ??
                 dllist * postfixList = List_New ( ) ;
                 List_Push_1Value_Node ( postfixList, currentWord, COMPILER_TEMP ) ;
@@ -45,6 +46,7 @@ CfrTil_IncDec ( int64 op ) // +
             }
             else
             {
+                Interpreter_InterpretNextToken ( cntx->Interpreter0 ) ;
                 if ( sd > 1 )
                 {
                     _Interpreter_DoWord ( cntx->Interpreter0, one, - 1 ) ;
@@ -59,13 +61,15 @@ CfrTil_IncDec ( int64 op ) // +
             {
                 if ( ! GetState ( compiler, INFIX_LIST_INTERPRET ) )
                 {
+                    SetHere ( one->Coding ) ;
                     // ?? couldn't this stuff be done with _Interpret_C_Until_EitherToken ??
                     dllist * postfixList = List_New ( ) ;
                     List_Push_1Value_Node ( postfixList, currentWord, COMPILER_TEMP ) ;
                     List_Push_1Value_Node ( postfixList, one, COMPILER_TEMP ) ;
                     List_Push_1Value_Node ( compiler->PostfixLists, postfixList, COMPILER_TEMP ) ;
                     List_DropN ( compiler->WordList, 1 ) ; // the operator; let higher level see the variable for optimization
-                    _Interpreter_DoWord ( cntx->Interpreter0, one, - 1 ) ;
+                    //_Interpreter_DoWord ( cntx->Interpreter0, one, - 1 ) ;
+                    //List_InterpretLists ( compiler->PostfixLists ) ;
                     return ;
                 }
             }
@@ -216,7 +220,7 @@ CfrTil_Minus ( )
     {
 
         _Dsp_ [ - 1 ] = _Dsp_ [ - 1 ] - _Dsp_ [ 0 ] ;
-                DataStack_Drop ( ) ;
+        DataStack_Drop ( ) ;
     }
 }
 
@@ -231,7 +235,7 @@ CfrTil_Multiply ( ) // *
     {
 
         _Dsp_ [ - 1 ] = _Dsp_ [ 0 ] * _Dsp_ [ - 1 ] ;
-                DataStack_Drop ( ) ;
+        DataStack_Drop ( ) ;
     }
 }
 
@@ -296,7 +300,7 @@ CfrTil_Power ( ) // **
         n *= base ;
     }
     _Dsp_ [ - 1 ] = n ;
-                DataStack_Drop ( ) ;
+    DataStack_Drop ( ) ;
 }
 
 void
