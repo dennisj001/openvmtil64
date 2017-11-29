@@ -12,21 +12,7 @@ _Word_Run ( Word * word )
         word->W_InitialRuntimeDsp = _Dsp_ ;
         _Context_->CurrentlyRunningWord = word ;
         _Debugger_->PreHere = Here ;
-#if 0       
-        //if ( ! ( word->CAttribute & CFRTIL_WORD ) ) _Block_Eval ( word->Definition ) ;
-        if ( word->CAttribute & CPRIMITIVE ) _Block_Eval ( word->Definition ) ;
-        else
-        {
-            uint64 * rsp = _Rsp_ ;
-            DataStack_Push ( ( uint64 ) word->Definition ) ;
-            _CfrTil_->CallCfrTilWord ( ) ;
-            if ( _Rsp_ != rsp )
-                //if (( !String_Equal ( word->Name, ":") ) && ( !String_Equal ( word->Name, "'") ) && ( !String_Equal ( word->Name, "find") )&& ( !String_Equal ( word->Name, ";") ))
-                _Printf ( ( byte * ) "\nword = \'%s\' : _Rsp_ = %lx : at %s", word->Name, _Rsp_, Context_Location ( ) ) ;
-        }
-#else
         _Block_Eval ( word->Definition ) ;
-#endif    
     }
 }
 

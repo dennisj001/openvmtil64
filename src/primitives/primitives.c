@@ -469,7 +469,7 @@ CPrimitive CPrimitives [] = {
     { "compileMode_get", CfrTil_CompileMode, 0, 0, 0, "Interpreter", "Root" },
     { "compileModeOn", CfrTil_RightBracket, 0, 0, 0, "Interpreter", "Root" },
     { "compileModeOff", CfrTil_LeftBracket, 0, 0, 0, "Interpreter", "Root" },
-    { "//", CfrTil_CommentToEndOfLine, IMMEDIATE, 0, W_COMMENT, "Interpreter", "Root" },
+    { "//", CfrTil_CommentToEndOfLine, IMMEDIATE|KEYWORD, 0, W_COMMENT, "Interpreter", "Root" },
     { "#!", CfrTil_CommentToEndOfLine, IMMEDIATE, 0, W_COMMENT, "Interpreter", "Root" },
     { "*/", CfrTil_NoOp, IMMEDIATE, 0, W_COMMENT, "Interpreter", "Root" },
     { "/*", CfrTil_ParenthesisComment, IMMEDIATE, 0, W_COMMENT, "Interpreter", "Root" },

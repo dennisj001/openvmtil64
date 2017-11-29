@@ -320,7 +320,6 @@ _CfrTil_AddTokenToHeadOfTokenList ( byte * token )
 void
 CfrTil_ClearTokenList ( )
 {
-
     _dllist_Init ( _CfrTil_->TokenList ) ;
 }
 

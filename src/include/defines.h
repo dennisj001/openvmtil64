@@ -373,6 +373,7 @@
 #define GI_RECURSE ( (uint64) 1 << 4 )
 #define GI_TAIL_CALL ( (uint64) 1 << 5 )
 #define GI_LABEL ( (uint64) 1 << 6 )
+#define GI_GOTO_LABEL ( (uint64) 1 << 7 )
 
 // MemChunk / Memory Types
 #define OPENVMTIL ( (uint64) 1 << 0 )
@@ -589,6 +590,7 @@
 #define C_COMBINATOR_PARSING ( (uint64) 1 << 25 )
 #define INFIX_LIST_INTERPRET ( (uint64) 1 << 26 )
 #define COMPILER_WRAP_ON ( (uint64) 1 << 27 )
+#define C_BLOCK_PARSING ( (uint64) 1 << 28 )
 //#define C_FIRST_BLOCK ( (uint64) 1 << 20 )
 //#define MINUS_MINUS_MODE ( (uint64) 1 << 20 )
 //#define PLUS_PLUS_MODE ( (uint64) 1 << 21 )

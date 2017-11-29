@@ -223,9 +223,10 @@ _CfrTil_Variable_New ( byte * name, int64 value )
 void
 _CfrTil_Label ( byte * lname )
 {
-    //Namespace * ns = Namespace_FindOrNew_SetUsing ( ( byte* ) "__labels__", _CfrTil_->Namespaces, 1 ) ;
-    //_DObject_New ( lname, ( int64 ) Here, CONSTANT | IMMEDIATE, 0, 0, CONSTANT, ( byte* ) _DataObject_Run, 0, 0, ns, DICTIONARY ) ;
-    GotoInfo_New ( lname, GI_LABEL ) ;
+    GotoInfo * gotoInfo = GotoInfo_New ( lname, GI_LABEL ) ;
+    gotoInfo->LabeledAddress = Here ;
+    Namespace * ns = Namespace_FindOrNew_SetUsing ( ( byte* ) "__labels__", _CfrTil_->Namespaces, 1 ) ;
+    _DObject_New ( lname, ( int64 ) gotoInfo, CONSTANT | IMMEDIATE, 0, 0, CONSTANT, ( byte* ) _DataObject_Run, 0, 0, ns, DICTIONARY ) ;
 }
 
 Word *

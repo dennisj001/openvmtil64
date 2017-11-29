@@ -290,8 +290,9 @@ int64
 _Stack_Depth ( Stack * stack )
 {
     int64 depth = stack->StackPointer - stack->InitialTosPointer ; //+ 1 ; // + 1 :: zero based array - include the zero in depth 
-    if ( depth <= stack->StackSize ) return depth ;
-    return ( 0 ) ;
+    //if ( depth <= stack->StackSize ) return depth ;
+    //return ( 0 ) ;
+    return depth ;
 }
 
 int64

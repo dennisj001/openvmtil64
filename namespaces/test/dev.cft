@@ -249,7 +249,7 @@ int
 fibPTC2? ( n | fn, fn1, fn2 )
 {
     //int fn, fn1, fn2 ;
-    for ( fn = 0, fn1 = 0, fn2 = 1 ; n ; n -- ) 
+    d: for ( fn = 0, fn1 = 0, fn2 = 1 ; n ; n -- ) 
     {   
         fn1 = fn2 ;
         fn2 = fn ;
@@ -337,7 +337,7 @@ C
 : tfib3 ( n | m )  
     "Cfib2_O3       : " ps 1 ti m 1 = { m @ n @ < } { m @ cfib2_O3 p m ++ } while 1 time nl nl
     "locals fibPTC? : " ps 1 ti m 1 = { m @ n @ < } { m @ fibPTC? p m ++ } while 1 time nl nl
-    //"locals fibPTC2? : " ps 1 ti m 1 = { m @ n @ < } { m @ fibPTC2? m ++ } while 1 time nl nl
+    "locals fibPTC2? : " ps 1 ti m 1 = { m @ n @ < } { m @ fibPTC2? m ++ } while 1 time nl nl
 ;
 //' tfib1 find d: wdiss sp
 30 tfib1

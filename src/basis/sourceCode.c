@@ -205,8 +205,8 @@ PrepareDbgSourceCodeString ( byte * sc, Word * word, int64 scwi0 ) // sc : sourc
 void
 _CfrTil_AdjustDbgSourceCodeAddress ( byte * address, byte * newAddress )
 {
-    dllist * list ; 
-    if ( IsSourceCodeOn && ( list = _Compiler_->WordList ) )
+    dllist * list = _Compiler_->WordList ;
+    if ( IsSourceCodeOn && list )
     {
         DWL_Find ( list, 0, address, 0, 0, 0, newAddress ) ;
     }
@@ -503,7 +503,6 @@ CfrTil_AppendCharToSourceCode ( CfrTil * cfrtil, byte c, int64 convertToSpaceFla
 }
 
 #if 0
-
 dobject *
 DebugWordList_PushWord ( Word * word0 )
 {
@@ -544,7 +543,6 @@ _DWL_CheckPush_Word ( Word * word )
     {
         if ( ! ( word->LAttribute & ( W_COMMENT | W_PREPROCESSOR ) ) )
         {
-
             _CfrTil_->ScoOcCrw = word ;
             DebugWordList_PushWord ( _CfrTil_->ScoOcCrw ) ;
         }
@@ -555,7 +553,6 @@ _DWL_CheckPush_Word ( Word * word )
 void
 SC_DWL_PushCWL_Index ( int64 index )
 {
-
     _DWL_CheckPush_Word ( Compiler_WordList ( index ) ) ;
 }
 
@@ -621,7 +618,8 @@ DWL_Check_SCWI ( dlnode * node, byte * address, int64 scwi, Word * wordn, dlnode
     *diff1 = scwiDiff ;
     return foundNode ;
 }
-//#if 0
+
+#if 0
 
 dlnode *
 DWL_Find ( Word * word, byte * address, byte* name, int64 fromFirst, int64 takeFirstFind, byte * newAddress )
@@ -679,9 +677,7 @@ DWL_Find ( Word * word, byte * address, byte* name, int64 fromFirst, int64 takeF
     return foundNode ;
 }
 #else
-
-
-
+#endif
 #endif
 
 

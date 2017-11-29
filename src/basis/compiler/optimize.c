@@ -1056,8 +1056,8 @@ _CheckOptimizeOperands ( Compiler * compiler, int64 maxOperands )
                             SetHere ( optInfo->O_two->Coding ) ;
                             if ( ( optInfo->O_two->CAttribute & REGISTER_VARIABLE ) && ( optInfo->O_one->CAttribute & REGISTER_VARIABLE ) )
                             {
-                                optInfo->Optimize_DstReg = optInfo->O_two->RegToUse ;
-                                optInfo->Optimize_SrcReg = optInfo->O_one->RegToUse ;
+                                optInfo->Optimize_DstReg = optInfo->Optimize_Reg = optInfo->O_two->RegToUse ;
+                                optInfo->Optimize_SrcReg = optInfo->Optimize_Rm = optInfo->O_one->RegToUse ;
                                 optInfo->Optimize_Mod = REG ;
                                 optInfo->OptimizeFlag |= OPTIMIZE_REGISTER ;
                                 //_GetRmDispImm ( optInfo, optInfo->O_one, ACC ) ;

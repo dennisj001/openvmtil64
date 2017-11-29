@@ -55,10 +55,10 @@ hex
 infixOn
 Logic Bits Combinators IA32 
 
-#if 0
+#if 1
 c_syntaxOn
 int8 
-_CalculateRex ( int8 reg, int8 rm, int8 sib, int64 operandSize )
+_CalculateRex ( reg rm sib operandSize )
 {
     //  0100    WRXB
     int8 rex = 0 ;
@@ -72,9 +72,9 @@ _CalculateRex ( int8 reg, int8 rm, int8 sib, int64 operandSize )
         if ( rex ) rex |= 0x40 ;
     }
     return rex ;
-d: }
+}
 c_syntaxOff
-'_CalculateRex find wdiss pause
+'_CalculateRex find wdiss //pause
 #endif
 
 : _Compile_ModRm ( mod reg rm ) ( ( mod @ << 6 ) | ( ( reg @ & 7 ) << 3 ) | ( rm @ & 7 ) ) 1,  ;; 

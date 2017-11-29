@@ -11,7 +11,7 @@ _Block_Eval ( block blck )
 }
 
 void
-_Block_Copy (byte * srcAddress, int64 bsize , int8 optFlag)
+_Block_Copy ( byte * srcAddress, int64 bsize, int8 optFlag )
 {
     byte * saveHere = Here, * saveAddress = srcAddress ;
     ud_t * ud = Debugger_UdisInit ( _Debugger_ ) ;
@@ -23,6 +23,7 @@ _Block_Copy (byte * srcAddress, int64 bsize , int8 optFlag)
         isize = _Udis_GetInstructionSize ( ud, srcAddress ) ;
         left -= isize ;
         _CfrTil_AdjustDbgSourceCodeAddress ( srcAddress, Here ) ;
+        _CfrTil_AdjustLabels ( srcAddress ) ;
         if ( * srcAddress == _RET ) // don't include RET
         {
             if ( left && ( ( * srcAddress + 1 ) != NOOP ) ) //  noop from our logic overwrite
@@ -48,7 +49,6 @@ _Block_Copy (byte * srcAddress, int64 bsize , int8 optFlag)
                 Word * word = Word_GetFromCodeAddress ( jcAddress ) ;
                 if ( word )
                 {
-                    //_CfrTil_AdjustSourceCodeAddress ( jcAddress, Here ) ;
                     _Word_Compile ( word ) ;
                     continue ;
                 }
@@ -57,20 +57,10 @@ _Block_Copy (byte * srcAddress, int64 bsize , int8 optFlag)
         else if ( * srcAddress == JMPI32 )
         {
             int64 offset = * ( int32* ) ( srcAddress + 1 ) ; // 1 : 1 byte opCode
+            //byte * jcAddress = JumpCallInstructionAddress ( srcAddress ) ;
             if ( offset != 0 )
             {
                 dllist_Map1 ( _Context_->Compiler0->GotoList, ( MapFunction1 ) AdjustJmpOffsetPointer, ( int64 ) ( srcAddress + 1 ) ) ;
-#if 0 // wha??          
-                byte * jcAddress = JumpCallInstructionAddress ( srcAddress ) ;
-                Word * word = Word_GetFromCodeAddress ( jcAddress ) ;
-                if ( word )
-                {
-                    //_CfrTil_AdjustSourceCodeAddress ( jcAddress, Here ) ;
-                    //_Word_Compile ( word ) ;
-                    _Compile_Call ( ( byte* ) word->Definition ) ;
-                    continue ;
-                }
-#endif                
             }
             else //if ( offset == 0 ) //signature of a goto point
             {
@@ -98,7 +88,7 @@ Block_Copy ( byte * dst, byte * src, int64 qsize )
     }
 #endif    
     SetHere ( dst ) ;
-    _Block_Copy (src, qsize, 0) ;
+    _Block_Copy ( src, qsize, 0 ) ;
 }
 
 int64
@@ -126,7 +116,7 @@ Block_CopyCompile_WithLogicFlag ( byte * srcAddress, int64 bindex, int64 jccFlag
     if ( ! GetState ( _CfrTil_, INLINE_ON ) ) Compile_Call ( srcAddress ) ;
     else
     {
-        _Block_Copy (srcAddress, bi->bp_Last - bi->bp_First , 0) ;
+        _Block_Copy ( srcAddress, bi->bp_Last - bi->bp_First, 0 ) ;
     }
 #if 1   
     if ( jccFlag )
@@ -303,7 +293,7 @@ void
 _CfrTil_EndBlock1 ( BlockInfo * bi )
 {
     Compiler * compiler = _Context_->Compiler0 ;
-    if ( _Stack_IsEmpty ( compiler->BlockStack ) )
+    if ( ! _Stack_Depth ( compiler->BlockStack ) )
     {
         _CfrTil_InstallGotoCallPoints_Keyed ( bi, GI_RETURN ) ;
         if ( compiler->NumberOfRegisterVariables )
@@ -354,7 +344,7 @@ _CfrTil_EndBlock2 ( BlockInfo * bi )
     Compiler * compiler = _Context_->Compiler0 ;
     compiler->BlockLevel -- ;
     byte * bp_First = bi->bp_First ;
-    if ( _Stack_IsEmpty ( compiler->BlockStack ) )
+    if ( ! _Stack_Depth ( compiler->BlockStack ) )
     {
         _CfrTil_InstallGotoCallPoints_Keyed ( bi, GI_GOTO | GI_RECURSE ) ;
         CfrTil_TurnOffBlockCompiler ( ) ;

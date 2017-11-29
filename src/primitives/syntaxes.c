@@ -75,7 +75,8 @@ CfrTil_C_Semi ( )
     {
         compiler->LHS_Word = 0 ;
         if ( compiler->C_BackgroundNamespace ) _CfrTil_Namespace_InNamespaceSet ( compiler->C_BackgroundNamespace ) ;
-        //List_Init ( compiler->WordList ) ;
+        List_Init ( compiler->WordList ) ;
+        //CfrTil_End_C_Block ( ) ;
     }
 }
 
@@ -127,6 +128,8 @@ CfrTil_If_C_Combinator ( )
 {
     Word * currentWord0 = Compiler_WordList ( 0 ) ;
     currentWord0->W_SC_ScratchPadIndex = _CfrTil_->SC_ScratchPadIndex ;
+    byte svscp = GetState ( _Compiler_, C_COMBINATOR_PARSING ) ;
+    SetState ( _Compiler_, C_COMBINATOR_PARSING, true ) ;
     CfrTil_InterpretNBlocks ( 2, 1 ) ;
     if ( ! _Context_StrCmpNextToken ( _Context_, ( byte* ) "else" ) )
     {
@@ -140,6 +143,7 @@ CfrTil_If_C_Combinator ( )
         _Context_->SC_CurrentCombinator = currentWord0 ;
         CfrTil_If2Combinator ( ) ;
     }
+    SetState ( _Compiler_, C_COMBINATOR_PARSING, svscp ) ;
 }
 
 void

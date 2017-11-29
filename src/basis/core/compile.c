@@ -29,7 +29,7 @@ _CompileFromUptoRET ( byte * data )
 void
 _Compile_WordInline ( Word * word ) // , byte * dstAddress )
 {
-    _Block_Copy (( byte* ) word->Definition, word->S_CodeSize , 0) ;
+    _Block_Copy ( ( byte* ) word->Definition, word->S_CodeSize, 0 ) ;
 }
 
 void
@@ -38,7 +38,7 @@ _CompileFromName ( byte * wordName )
     Word * word = Finder_Word_FindUsing ( _Context_->Finder0, wordName, 0 ) ;
     // ?? Exception : error message here
     if ( ! word ) _Throw ( QUIT ) ;
-    _Word_Compile (word) ;
+    _Word_Compile ( word ) ;
 }
 
 void
@@ -64,7 +64,16 @@ void
 AdjustJmpOffsetPointer ( dlnode * node, int64 address )
 {
     GotoInfo * gi = ( GotoInfo * ) node ;
-    if ( gi->pb_JmpOffsetPointer == ( byte* ) address ) gi->pb_JmpOffsetPointer = Here + 1 ;
+    if ( gi->pb_JmpOffsetPointer == ( byte* ) address ) 
+        gi->pb_JmpOffsetPointer = Here + 1 ;
+}
+
+void
+AdjustLabel ( dlnode * node, int64 address )
+{
+    GotoInfo * gi = ( GotoInfo * ) node ;
+    if ( gi->LabeledAddress == ( byte* ) address ) 
+        gi->LabeledAddress = Here ;
 }
 
 void
@@ -72,7 +81,6 @@ _GotoInfo_SetAndRemove ( GotoInfo * gotoInfo, byte * address, int8 removeFlag )
 {
     _SetOffsetForCallOrJump ( gotoInfo->pb_JmpOffsetPointer, address ) ;
     if ( removeFlag ) GotoInfo_Remove ( ( dlnode* ) gotoInfo ) ;
-    //else gotoInfo->pb_JmpOffsetPointer = address ;
 }
 
 void
@@ -80,28 +88,19 @@ _InstallGotoPoint_Key ( dlnode * node, int64 blockInfo, int64 key )
 {
     Word * word ;
     GotoInfo * gotoInfo = ( GotoInfo* ) node ;
-    BlockInfo * bi = (BlockInfo *) blockInfo ;
+    BlockInfo * bi = ( BlockInfo * ) blockInfo ;
     int64 address = * ( int32* ) gotoInfo->pb_JmpOffsetPointer ;
-    if ( ( address == 0 ) || ( key & (GI_BREAK | GI_RETURN | GI_GOTO | GI_LABEL) ) ) // if we move a block its recurse offset remains, check if this looks like at real offset pointer
+    if ( ( address == 0 ) || ( key & ( GI_BREAK | GI_RETURN | GI_GOTO | GI_LABEL ) ) ) // if we move a block its recurse offset remains, check if this looks like at real offset pointer
     {
-        if ( ( gotoInfo->GI_CAttribute & ( GI_GOTO | GI_LABEL ) ) && ( key & ( GI_GOTO | GI_LABEL ) ) )
+        if ( ( gotoInfo->GI_CAttribute & ( GI_GOTO ) ) && ( key & ( GI_GOTO ) ) )
         {
             Namespace * ns = _Namespace_Find ( ( byte* ) "__labels__", _CfrTil_->Namespaces, 0 ) ;
             if ( ns && ( word = Finder_FindWord_InOneNamespace ( _Finder_, ns, gotoInfo->pb_LabelName ) ) )
             {
-                _GotoInfo_SetAndRemove ( gotoInfo, ( byte* ) word->W_Value, 0 ) ;
+                GotoInfo * giw = ( GotoInfo * ) word->W_Value ;
+                _GotoInfo_SetAndRemove ( gotoInfo, ( byte* ) giw->LabeledAddress, 0 ) ;
             }
         }
-#if 0        
-        else if ( ( gotoInfo->GI_CAttribute & ( GI_LABEL ) ) && ( key & ( GI_LABEL ) ) )
-        {
-            Namespace * ns = _Namespace_Find ( ( byte* ) "__labels__", _CfrTil_->Namespaces, 0 ) ;
-            if ( ns && ( word = Finder_FindWord_InOneNamespace ( _Finder_, ns, gotoInfo->pb_LabelName ) ) )
-            {
-                _GotoInfo_SetAndRemove ( gotoInfo, ( byte* ) word->W_Value, 0 ) ;
-            }
-        }
-#endif        
         else if ( ( gotoInfo->GI_CAttribute & GI_RETURN ) && ( key & GI_RETURN ) )
         {
             _GotoInfo_SetAndRemove ( gotoInfo, Here, 0 ) ;
@@ -158,10 +157,18 @@ _CfrTil_InstallGotoCallPoints_Keyed ( BlockInfo * bi, int64 key )
     dllist_Map2 ( _Context_->Compiler0->GotoList, ( MapFunction2 ) _InstallGotoPoint_Key, ( int64 ) bi, key ) ;
 }
 
+#if 0
 int64
 _CfrTil_AdjustGotoPoint ( int64 originalAddress )
 {
     dllist_Map1 ( _Context_->Compiler0->GotoList, ( MapFunction1 ) _AdjustGotoInfo, originalAddress ) ;
+}
+#endif
+
+int64
+_CfrTil_AdjustLabels ( byte * srcAddress )
+{
+    dllist_Map1 ( _Context_->Compiler0->GotoList, ( MapFunction1 ) AdjustLabel, ( int64 ) ( srcAddress ) ) ;
 }
 
 int64

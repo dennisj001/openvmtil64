@@ -371,7 +371,8 @@ Root 'doScript 1 const
 #if dbgOnVar @ 
 testCfrTil
 stringMacrosOff
-//demo dT0
+//demo 
+dT0
 #endif
 //using pause
 2 + 7  assertStkChk // stack checking
@@ -393,7 +394,7 @@ decimal
 bno Lisp 
 "lambda" tick _lambda find alias immediate
 ( ( lambda ( x y ) ( + x y ) ) 3 4 ) 
-#if 0
+#if 1
 BigNum
 (define yfac (lambda (yy n) (if* (< n 2) (1) (* n (yy yy (- n 1)))))) 
 (yfac yfac 10) nl
@@ -402,32 +403,26 @@ BigNum
 (yfacc yfacc 700) nl //pause
 (define fibc (lambda ( n ) (ifElse (< n 2) n (+ (fibc (- n 1)) (fibc (- n 2))))))
 (fibc 20)
-(define yfac (lambda (yy n) (if* (< n 2) (1) (* n (yy yy (- n 1)))))) 
-(yfac yfac 10) nl
-(define yfacc (lambda (yyy n1) (if* (< n1 2) (1) (* n1 (yyy yyy (- n1 1)))))) 
-(yfacc yfacc 10) nl
-(yfacc yfacc 700) nl pause
-(define yfac (lambda (yy n) (if* (< n 2) (1) (* n (yy yy (- n 1)))))) 
-(yfac yfac 10) nl
-(define yfacc (lambda (yyy n1) (if* (< n1 2) (1) (* n1 (yyy yyy (- n1 1)))))) 
-(yfacc yfacc 10) nl
-(yfacc yfacc 700) nl //pause
-(define yfac (lambda (yy n) (if* (< n 2) 1 (* n (yy yy (- n 1)))))) // code from : http://www.newlisp.org/index.cgi?Y_Function
-tick yfac find wdiss
-(yfac yfac 50) nl pause
-(define yfacc (lambda (yyy n1) (if* (< n1 2) 1 (* n1 (yyy yyy (- n1 1)))))) 
-// tick yfacc find wdiss
-(yfacc yfacc 10) nl
-(yfacc yfacc 7) nl
-(define yfac (lambda (yy n) (if* (< n 2) 1 (* n (yy yy (- n 1)))))) // code from : http://www.newlisp.org/index.cgi?Y_Function
-tick yfac find wdiss
-(yfac yfac 50) nl pause
-(define yfacc (lambda (yyy n1) (if* (< n1 2) 1 (* n1 (yyy yyy (- n1 1)))))) 
-// tick yfacc find wdiss
-(yfacc yfacc 10) nl
-(yfacc yfacc 7) nl
 sp
 bno
 #endif
 #endif
-//verbosity 3 = mem
+mem
+s
+c_syntaxOn
+int
+//fibPTC2? ( REG n | REG fn, REG fn1, REG fn2 )
+fibPTC2? ( n | fn, fn1, fn2 )
+{
+    //int fn, fn1, fn2 ;
+    for ( fn = 0, fn1 = 0, fn2 = 1 ; n ; d: n -- ) 
+    {   
+        fn1 = fn2 ;
+        fn2 = fn ;
+        fn = fn1 d: + fn2 ; 
+    }
+    return fn ;
+}
+' fibPTC2? find wdiss
+fibPTC2? (20) dup p 6765 _assert //sp 
+c_syntaxOff

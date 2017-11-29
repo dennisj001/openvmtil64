@@ -36,7 +36,7 @@
 #define Calculate_FrameSize( numberOfLocals )  ( ( numberOfLocals + 1 ) * CELL ) // 1 : space for fp
 
 #define _GetState( aState, state ) ( (aState) & (state) ) 
-#define GetState( obj, state ) ((obj) && _GetState( (obj)->State, state )) 
+#define GetState( obj, state ) ((obj) && _GetState( (obj)->State, (state) )) 
 #define _SetState( state, newState, flag ) ( ( (flag) > 0 ) ? ( (state) |= (newState) ) : ( (state) &= ~ (newState) ) ) 
 #define SetState_TrueFalse( obj, _true, _false )  ( ( (obj)->State |= (_true) ), ( (obj)->State &= ~ (_false) ) ) 
 #define SetState( obj, state, flag ) _SetState ( ((obj)->State), (state), flag )

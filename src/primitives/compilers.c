@@ -94,12 +94,13 @@ GotoInfo_Init ( GotoInfo * gotoInfo, byte * lname, uint64 type )
     return gotoInfo ;
 }
 
-void
+GotoInfo * 
 GotoInfo_New ( byte * lname, uint64 type )
 {
     GotoInfo * gotoInfo = ( GotoInfo * ) _GotoInfo_Allocate ( ) ;
     GotoInfo_Init ( gotoInfo, lname, type ) ;
     dllist_AddNodeToHead ( _Context_->Compiler0->GotoList, ( dlnode* ) gotoInfo ) ;
+    return gotoInfo ;
 }
 
 void
@@ -114,6 +115,15 @@ void
 _CfrTil_Goto ( byte * name )
 {
     _CfrTil_CompileCallGoto ( name, GI_GOTO ) ;
+}
+
+void
+_CfrTil_GotoLabel ( byte * name )
+{
+    //_CfrTil_CompileCallGoto ( name, GI_GOTO_LABEL ) ;
+    _Compile_UninitializedJump ( ) ;
+    GotoInfo_New ( name, GI_GOTO_LABEL ) ;
+    //dllist_Map1 ( _Context_->Compiler0->GotoList, ( MapFunction1 ) fun, ( int64 ) ( name ) ) ;
 }
 
 void

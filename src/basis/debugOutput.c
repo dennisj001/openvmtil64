@@ -471,7 +471,7 @@ Debugger_ShowInfo ( Debugger * debugger, byte * prompt, int64 signal )
         int64 sif = 0 ;
         if ( ( GetState ( debugger, DBG_INFO ) ) || GetState ( debugger, DBG_STEPPING ) )
         {
-            _CfrTil_ShowInfo ( debugger, prompt, signal, 0 ) ;
+            _CfrTil_ShowInfo ( debugger, prompt, signal, 1 ) ;
             sif = 1 ;
         }
         if ( ! ( cntx && cntx->Lexer0 ) )

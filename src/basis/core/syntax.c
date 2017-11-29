@@ -59,7 +59,8 @@ _Interpret_Do_CombinatorLeftParen ( )
     int64 blocksParsed = 0, semiFlag = 0 ;
     byte * token ;
 
-    if ( ! GetState ( _Compiler_, C_COMBINATOR_PARSING ) ) SetState ( compiler, C_COMBINATOR_LPAREN, true ) ;
+    //if ( ! GetState ( _Compiler_, C_COMBINATOR_PARSING ) ) 
+    SetState ( compiler, C_COMBINATOR_LPAREN, true ) ;
     SetState ( compiler, PREFIX_PARSING, true ) ;
     while ( 1 )
     {
@@ -80,23 +81,18 @@ _Interpret_Do_CombinatorLeftParen ( )
         }
         else if ( String_Equal ( ( char* ) token, ")" ) )
         {
-            byte * token1 = Lexer_PeekNextNonDebugTokenWord ( cntx->Lexer0, 1 ) ;
-            if ( String_Equal ( token1, "{" ) )
-            {
-                _Lexer_ReadToken ( cntx->Lexer0, 0 ) ; // drop the "{" token
-                goto doLeftBracket ;
-            }
-            else
-            {
-                CfrTil_ClearTokenList ( ) ;
-                token = token1 ;
-            }
+            List_InterpretLists ( _Compiler_->PostfixLists ) ;
+            CfrTil_EndBlock ( ) ;
+            //CfrTil_ClearTokenList ( ) ;
+            blocksParsed ++ ;
+            break ;
         }
         else if ( String_Equal ( token, "{" ) )
         {
-doLeftBracket:
+            List_InterpretLists ( _Compiler_->PostfixLists ) ;
             CfrTil_EndBlock ( ) ;
             CfrTil_BeginBlock ( ) ;
+            //SetState ( compiler, C_BLOCK_PARSING, true ) ;
             blocksParsed ++ ;
             break ;
         }
@@ -107,9 +103,8 @@ doLeftBracket:
             BlockInfo * bi = ( BlockInfo* ) _Stack_Top ( compiler->BlockStack ) ;
             bi->LiteralWord = cntx->CurrentlyRunningWord ;
         }
-        //List_CheckInterpretLists_OnVariable ( _Compiler_->PostfixLists, token ) ;
-        List_InterpretLists ( compiler->PostfixLists ) ;
     }
+    //List_InterpretLists ( compiler->PostfixLists ) ;
     SetState ( compiler, COMPILE_MODE, svcm ) ;
     SetState ( compiler, C_COMBINATOR_LPAREN, svclps ) ;
     //SetState ( compiler, PREFIX_ARG_PARSING, false ) ;
@@ -135,31 +130,57 @@ CfrTil_InterpretNBlocks ( int64 blocks, int64 takesLParenAsBlockFlag )
 {
     Context * cntx = _Context_ ;
     Interpreter * interp = cntx->Interpreter0 ;
+    Compiler *compiler = cntx->Compiler0 ;
     Word * word ;
-    int64 blocksParsed = 0, gotLpf = 0 ; // got leftParen Flag
+    int64 blocksParsed = 0 ;
     byte * token ;
-    SetState ( _Compiler_, C_COMBINATOR_PARSING, true ) ;
+    byte lcbp = 0, lccp = 0 ;
     for ( blocksParsed = 0 ; blocksParsed < blocks ; )
     {
         token = Lexer_ReadToken ( cntx->Lexer0 ) ;
 
-        if ( String_Equal ( ( char* ) token, "(" ) && takesLParenAsBlockFlag && ( ! gotLpf ) )
+        if ( String_Equal ( ( char* ) token, ";" ) )
+        {
+            List_InterpretLists ( _Compiler_->PostfixLists ) ;
+            if ( lccp && ( ! lcbp ) )
+            {
+                List_InterpretLists ( _Compiler_->PostfixLists ) ;
+                CfrTil_EndBlock ( ) ;
+                CfrTil_ClearTokenList ( ) ;
+                blocksParsed ++ ;
+                lccp = 0 ;
+            }
+            continue ;
+        }
+        else if ( String_Equal ( ( char* ) token, "(" ) && takesLParenAsBlockFlag )
         {
             CfrTil_BeginBlock ( ) ;
-            blocksParsed += _Interpret_Do_CombinatorLeftParen ( ) ;
-            SetState ( _Compiler_, C_COMBINATOR_PARSING, false ) ;
-            gotLpf = 1 ;
+            int _blocksParsed = _Interpret_Do_CombinatorLeftParen ( ) ;
+            List_InterpretLists ( _Compiler_->PostfixLists ) ;
+            if ( _blocksParsed )
+            {
+                CfrTil_BeginBlock ( ) ;
+                lccp = 1 ;
+                blocksParsed += _blocksParsed ;
+            }
+            continue ;
+        }
+        else if ( String_Equal ( ( char* ) token, "{" ) )
+        {
+            if ( ! lccp ) CfrTil_BeginBlock ( ) ;
+            lcbp = 1 ;
             continue ;
         }
         word = Interpreter_InterpretAToken ( interp, token, - 1 ) ;
-        if ( word && word->Definition == ( block ) CfrTil_EndBlock ) blocksParsed ++ ;
-        else if ( word && word->Definition == CfrTil_End_C_Block ) blocksParsed ++ ;
-        else if ( String_Equal ( ( char* ) token, "{" ) )
+        if ( word )
         {
-            SetState ( _Compiler_, C_COMBINATOR_PARSING, false ) ;
+            if ( ( word->Definition == ( block ) CfrTil_EndBlock ) || ( word->Definition == CfrTil_End_C_Block ) )
+            {
+                blocksParsed ++ ;
+                lcbp = 0 ;
+            }
         }
     }
-    SetState ( _Compiler_, C_COMBINATOR_PARSING, true ) ;
 }
 
 void
@@ -174,8 +195,8 @@ _CfrTil_C_Infix_EqualOp ( Word * opWord )
     SetState ( compiler, C_INFIX_EQUAL, true ) ;
     _CfrTil_WordList_PopWords ( 2 ) ;
     d0 ( if ( Is_DebugModeOn ) Compiler_Show_WordList ( "\nCfrTil_C_Infix_Equal0p : before interpret until ',' or ';' :" ) ) ;
-    if ( GetState ( compiler, C_COMBINATOR_LPAREN ) ) token = _Interpret_Until_Token ( interp, ( byte* ) ")", 0 ) ;
-    else token = _Interpret_C_Until_EitherToken (interp, ( byte* ) ";", ( byte* ) ",", ( byte* ) ")", ( byte* ) " \n\r\t" ) ;
+    //if ( GetState ( compiler, C_COMBINATOR_LPAREN ) ) token = _Interpret_Until_Token ( interp, ( byte* ) ")", 0 ) ;
+    token = _Interpret_C_Until_EitherToken ( interp, ( byte* ) ";", ( byte* ) ",", ( byte* ) ")", ( byte* ) " \n\r\t" ) ;
     _CfrTil_AddTokenToHeadOfTokenList ( token ) ; // so the callee can check/use or use
     d0 ( if ( Is_DebugModeOn ) Compiler_Show_WordList ( "\nCfrTil_C_Infix_EqualOp : after interpret until ';' :" ) ) ;
     if ( lhsWord )

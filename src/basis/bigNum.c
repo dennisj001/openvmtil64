@@ -135,11 +135,11 @@ BigNum_Info ( )
 }
 
 void
-BigNum_FPrint ( )
+_BigNum_FPrint ( mpfr_t * value )
 {
     Context * cntx = _Context_ ;
     char * format ;
-    mpfr_t * value = ( mpfr_t* ) DataStack_Pop ( ) ;
+    //mpfr_t * value = ( mpfr_t* ) DataStack_Pop ( ) ;
     if ( _Q_->Verbosity )
     {
 #if 0        
@@ -173,7 +173,7 @@ BigNum_FPrint ( )
         d1m ( if ( GetState ( _CfrTil_->cs_Cpu2, CPU_SELECTED_SAVED ) ) _CfrTil_->RestoreSelectedCpuState ( ) ) ;
         d1m ( CfrTil_CpuState_Current_Show ( ) ) ;
         d0 ( Cpu_CheckRspForWordAlignment ( "BigNum_FPrint" ) ) ;
-        
+        // a bug in mpfr apparently so ...
         if ( _CfrTil_->SaveSelectedCpuState ( ), (( uint64 ) _CfrTil_->cs_Cpu->Rsp & ( uint64 ) 0x8 ))
             mpfr_out_str ( stdout, cntx->System0->NumberBase, 0, *value, MPFR_RNDN ) ;
         else mpfr_printf ( format, _Context_->System0->BigNum_Printf_Width, _Context_->System0->BigNum_Printf_Precision, *value ) ;
@@ -183,8 +183,14 @@ BigNum_FPrint ( )
     }
     fflush ( stdout ) ;
 }
-#if 0
 
+void
+BigNum_FPrint ( )
+{
+    _BigNum_FPrint ( ( mpfr_t* ) DataStack_Pop ( ) ) ;
+}
+
+#if 0
 void
 BigNum_FPrint2 ( )
 {

@@ -450,6 +450,7 @@ typedef struct
     Symbol GI_Symbol ;
     byte * pb_LabelName ;
     byte * CompileAtAddress ;
+    byte * LabeledAddress ;
     byte * pb_JmpOffsetPointer ;
 } GotoInfo ;
 #define GI_CAttribute GI_Symbol.S_CAttribute
