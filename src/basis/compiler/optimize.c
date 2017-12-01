@@ -990,11 +990,18 @@ _CheckOptimizeOperands ( Compiler * compiler, int64 maxOperands )
                         if ( optInfo->O_two->StackPushRegisterCode )
                         {
                             SetHere ( optInfo->O_two->StackPushRegisterCode ) ; // leave optInfo->O_two value in R8 we don't need to push it
+                            Set_SCA ( 0 ) ;
                             if ( ! ( optInfo->O_one->CAttribute & REGISTER_VARIABLE ) )// this logic may need to be refined but it works with our C.factorial 
                             {
                                 _GetRmDispImm ( optInfo, optInfo->O_one, - 1 ) ;
-                                Set_SCA ( 0 ) ;
                                 _Compile_Move ( 0, MEM, ACC, compiler->optInfo->Optimize_Rm, 0, compiler->optInfo->Optimize_Disp ) ;
+                            }
+                            //_Compile_Move ( int8 rex, int8 mod, int8 reg, int8 rm, int8 sib, int64 disp )
+                            else if ( GetState ( _Context_, C_SYNTAX ) )
+                            {
+                                if ( optInfo->O_one->RegToUse != optInfo->O_two->RegToUse )
+                                _Compile_Move_Reg_To_Reg ( optInfo->O_one->RegToUse, optInfo->O_two->RegToUse ) ;
+
                             }
                             return ( OPTIMIZE_DONE | OPTIMIZE_RESET ) ;
                         }
@@ -1060,6 +1067,7 @@ _CheckOptimizeOperands ( Compiler * compiler, int64 maxOperands )
                                 optInfo->Optimize_SrcReg = optInfo->Optimize_Rm = optInfo->O_one->RegToUse ;
                                 optInfo->Optimize_Mod = REG ;
                                 optInfo->OptimizeFlag |= OPTIMIZE_REGISTER ;
+                                optInfo->Optimize_Dest_RegOrMem = REG ;
                                 //_GetRmDispImm ( optInfo, optInfo->O_one, ACC ) ;
                             }
                             else
@@ -1181,7 +1189,7 @@ CheckOptimize ( Compiler * compiler, int64 maxOperands )
     if ( GetState ( _CfrTil_, OPTIMIZE_ON ) )
     {
         SetState ( _CfrTil_, IN_OPTIMIZER, true ) ;
-        d0 ( if ( Is_DebugModeOn ) Compiler_Show_WordList ( ( byte* ) "\nCheckOptimize : before optimize :" ) ) ;
+        d1 ( if ( Is_DebugModeOn ) Compiler_Show_WordList ( ( byte* ) "\nCheckOptimize : before optimize :" ) ) ;
         rtrn = _CheckOptimizeOperands ( compiler, maxOperands ) ;
         if ( ! ( rtrn & ( OPTIMIZE_DONE ) ) )
         {
@@ -1198,7 +1206,7 @@ CheckOptimize ( Compiler * compiler, int64 maxOperands )
             }
             Set_SCA ( 0 ) ;
         }
-        d0 ( if ( Is_DebugModeOn ) Compiler_Show_WordList ( ( byte* ) "\nCheckOptimize : after optimize :" ) ) ;
+        d1 ( if ( Is_DebugModeOn ) Compiler_Show_WordList ( ( byte* ) "\nCheckOptimize : after optimize :" ) ) ;
         SetState ( _CfrTil_, IN_OPTIMIZER, false ) ;
         SetState ( _Context_, ADDRESS_OF_MODE, false ) ;
     }

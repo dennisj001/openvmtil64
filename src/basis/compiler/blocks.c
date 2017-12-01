@@ -181,7 +181,9 @@ void
 BlockInfo_Set_tttn ( BlockInfo * bi, int8 ttt, int8 n, int8 overWriteSize )
 {
     bi->LogicCode = Here ; // used by combinators
-    bi->LogicCodeWord = _Context_->CurrentlyRunningWord ;
+    Word * word = Compiler_WordList ( 1 ) ; //_Context_->CurrentlyRunningWord ;
+    //bi->LogicCodeWord = word ; //= Compiler_WordList ( 1 ) ; //_Context_->CurrentlyRunningWord ;
+    bi->LogicCodeWord = word ; //_Context_->CurrentlyRunningWord ;
     bi->Ttt = ttt ;
     bi->NegFlag = n ;
 #if 0 //NEW_CALL_RETURN      
@@ -361,6 +363,9 @@ byte *
 _CfrTil_EndBlock ( )
 {
     BlockInfo * bi = ( BlockInfo * ) Stack_Pop_WithExceptionOnEmpty ( _Context_->Compiler0->BlockStack ) ;
+    // this idea has the problem that in c syntax CurrentlyRunningWord is not really set in the usual way
+    //Word * word = Compiler_WordList ( 1 ) ; //_Context_->CurrentlyRunningWord ;
+    //bi->LogicCodeWord = Compiler_WordList ( 1 ) ; //_Context_->CurrentlyRunningWord ;
     _CfrTil_EndBlock1 ( bi ) ;
     byte * blockStart = _CfrTil_EndBlock2 ( bi ) ;
     return blockStart ;

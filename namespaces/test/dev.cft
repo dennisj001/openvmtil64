@@ -2,15 +2,13 @@
 5
 //bigNumOff
 optimizeOn inlineOn 
-#if 1
 bno //BigNum
 // optimizeOff inlineOff
 // verbosity 2 = 
 Compiler Logic Int C User 
-: sp ; //stack pause ;
+: sp ; ///stack pause ;
 var: facTest fibTest Dsp ;
 
-#if 1
 // tail recursion from http://c2.com/cgi/wiki?TailCallOptimization
 c_syntaxOn dscOn
 int factorial( n | rec1 )
@@ -27,8 +25,6 @@ int factorial( n | rec1 )
 c_syntaxOff dscOff
 'factorial find wdiss
 7 factorial p //sp
-#endif
-
 : factorial ( n  | fac -- TOS ) 
     fac 1 = 
     { n @ 1 > } { n @ fac @ * fac store n -- } while 
@@ -123,7 +119,7 @@ User
     {
        //j @ w @ wordRun j @ p "." ps p ";" ps dn
        j @ w @ wordRun drop // j @ p "." ps p ";" ps
-       //j @ factorial drop // j @ p "." ps p ";" ps
+       //j @ w @ wordRun j @ p "." ps p ";" ps
     }
     for 
 ;
@@ -150,11 +146,25 @@ nl "ffx ... " ps nl
 // : nlpsnl ( str n ) hex nl str @ ps n @ p nl ;;
 // "ffx" ( w ) { w dup @ find = w @ wdiss 3 w @ nlpsnl ( "w =" w @ ) _ffx } word
 // "ffx" ( w | d ) { d w @ find = d wdiss nlpsnl ( "word =" d @ ) 7 d @ _ffx } word
+
 : ffx ( wn | d ) 1 ti d wn @ _find = d @ wdiss 3 d @ _ffx nl wn @ ps ":" ps 1 time nl ;
 : ffx2 ( wn | d ) 1 ti d wn @ _find = d @ wdiss 3 d @ _ffx2 1 time nl ;
-
-#if 1 
+c_syntaxOn
 User
+int
+fibPTC2? ( REG n | REG fn, REG fn1, REG fn2 )
+{
+    for ( fn = 0, fn1 = 0, fn2 = 1 ; n ; n -- ) 
+    {   
+        fn1 = fn2 ;
+        fn2 = fn ;
+        fn = fn1 + fn2 ; 
+    }
+    return fn ;
+}
+c_syntaxOff
+User
+#if 1
 "factorial" ffx 
 "cfactorial" ffx
 "cfactorial2" ffx
@@ -183,10 +193,13 @@ using
 "faccs" ffx
 "fac5" ffx
 "fac4" ffx
+#else
+: _ffx_fib ( n w | t ) nl 7 w @ wordRun decimal p nl { t 0 = } { t @ n @ < } { t ++ } { 1 w @ iFactorialX } for ;
+: ffx_fib ( wn | d ) 1 ti d fibPTC2? = d @ wdiss 1 d @ _ffx_fib nl wn @ ps ":" ps 1 time nl ;
+"fibPTC2?" ffx_fib
+sp
 #endif
 
-sp
-#if 0
 //verbosity 3 =
 c_syntaxOn
 Root
@@ -198,7 +211,8 @@ c_syntaxOff
 //s: pow ( base power | out -- TOS ) { out 1 = } { power @ 0 > } { power power @ 1 - = } { out out @ base @ * = } for return out @ ;s
 : pow ( base power | out -- TOS ) { out 1 = } { power @ 0 > } { power power @ 1 - = } { out out @ base @ * = } for return out @ ;
 'pow find wdiss
-2 30 pow p //sp
+2 30 pow p sp
+#if 0
 "cpow" ffx2
 "pow" ffx2
 
@@ -210,11 +224,9 @@ sp
 #endif
 
 C
-#if 1 // fibTest @ 
 : tt ( | t ) t 6 = t ++ t @ p ;
 ' tt dup source find dup wdis code call
 
-#endif
 
 c_syntaxOn
 int 
@@ -245,11 +257,9 @@ dscOff
 ' fibPTC? find wdiss
 fibPTC? (20) dup p 6765 _assert //sp
 int
-//fibPTC2? ( REG n | REG fn, REG fn1, REG fn2 )
-fibPTC2? ( n | fn, fn1, fn2 )
+fibPTC2? ( REG n | REG fn, REG fn1, REG fn2 )
 {
-    //int fn, fn1, fn2 ;
-    d: for ( fn = 0, fn1 = 0, fn2 = 1 ; n ; n -- ) 
+    for ( fn = 0, fn1 = 0, fn2 = 1 ; n ; n -- ) 
     {   
         fn1 = fn2 ;
         fn2 = fn ;
@@ -260,6 +270,8 @@ fibPTC2? ( n | fn, fn1, fn2 )
 ' fibPTC2? find wdiss
 fibPTC2? (20) dup p 6765 _assert //sp 
 c_syntaxOff
+"fibPTC2?" ffx 
+sp
 
 : _fibn1 ( n -- TOS ) { n @ 2 < } { n @ } { n -- n @ _fibn1 n -- n @  _fibn1 + } ifElse ;
 ' _fibn1 find wdiss 20 _fibn1 p // sp
@@ -302,6 +314,7 @@ C
 : Cfib ( n ) 1 ti n @ cfib  p 1 time ;
 : Cfib_O3 ( n ) 1 ti n @ cfib_O3  p 1 time ;
 : fibPTC ( n ) 1 ti n @ fibPTC?  p 1 time ;
+: fibPTC2 ( n ) 1 ti n @ fibPTC2?  p 1 time ;
 : tfib ( n )  
     nl hex dsp p decimal nl "The fibonacci sequence" ps n @ p ":" ps nl 
     "C -O3 : " ps n @ Cfib_O3 nl 
@@ -311,6 +324,7 @@ C
     "no locals fib2 : " ps n @ fib2 nl
     "no locals fib3 : " ps n @ fib3 nl
     "fibPTC?        : " ps n @ fibPTC
+    "fibPTC2?        : " ps n @ fibPTC2
 ;
 15 tfib 30 tfib //40 tfib //45 tfib 
 : tfib1 ( n | m )  
@@ -325,7 +339,8 @@ C
     "no locals _fib2 : " ps 1 ti m 1 = { m @ n @ < } { m @ _fib2   p m ++ } while 1 time nl nl
     "no locals _fib3 : " ps 1 ti m 1 = { m @ n @ < } { m @ _fib3   p m ++ } while 1 time nl nl
     "no locals _fib4 : " ps 1 ti m 1 = { m @ n @ < } { m @ _fib4   p m ++ } while 1 time nl nl
-    "locals fibPTC?  : " ps 1 ti m 1 = { m @ n @ < } { m @ fibPTC? p m ++ } while 1 time nl nl
+    "fibPTC?  : " ps 1 ti m 1 = { m @ n @ < } { m @ fibPTC? p m ++ } while 1 time nl nl
+    "fibPTC2?  : " ps 1 ti m 1 = { m @ n @ < } { m @ fibPTC2? p m ++ } while 1 time nl nl
 ;
 
 : tfib2 ( n | m )  
@@ -336,8 +351,8 @@ C
 ;
 : tfib3 ( n | m )  
     "Cfib2_O3       : " ps 1 ti m 1 = { m @ n @ < } { m @ cfib2_O3 p m ++ } while 1 time nl nl
-    "locals fibPTC? : " ps 1 ti m 1 = { m @ n @ < } { m @ fibPTC? p m ++ } while 1 time nl nl
-    "locals fibPTC2? : " ps 1 ti m 1 = { m @ n @ < } { m @ fibPTC2? m ++ } while 1 time nl nl
+    "locals fibPTC? : " ps 1 ti m 1 = { m @ n @ < } { m @ fibPTC p m ++ } while 1 time nl nl
+    "locals fibPTC2? : " ps 1 ti m 1 = { m @ n @ < } { m @ fibPTC2 m ++ } while 1 time nl nl
 ;
 //' tfib1 find d: wdiss sp
 30 tfib1
@@ -350,7 +365,6 @@ C
 // ' _fib find wdiss
 ' _fib2 find wdiss
 // 40 fibx3 
-#if 1
 BigNum
 bnInit ( 0 0 )
 
@@ -375,12 +389,10 @@ s: fibBN ( n | svn fn fn1 fn2 -- TOS )
     { m @ dup p " : " _ps fibBN p { n @ m @ > } { "," _ps } if2 } 
     for
 ;
-nl nl 47 tfib3
-nl nl 100 tfib3
+nl nl 47 tfib3 //sp pause
+nl nl 100 tfib3 //sp pause
 nl 100 dup p fibBN p //sp
 bno
-#endif
-
 
 nl
 // verbosity 1 =

@@ -71,6 +71,7 @@ _OVT_Pause ( byte * prompt, int64 signalsHandled )
         {
             if ( _Context_->CurrentlyRunningWord )
             {
+                _Debugger_->w_Word = 0 ;
                 _CfrTil_ShowInfo ( _Debugger_, "\r", _Q_->Signal, 1 ) ;
             }
             _Printf ( ( byte* ) "%s", buffer ) ;

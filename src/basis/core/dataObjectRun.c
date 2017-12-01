@@ -208,7 +208,7 @@ _Word_CompileAndRecord_PushReg ( Word * word, int64 reg )
     {
         word->StackPushRegisterCode = Here ; // nb. used! by the rewriting optInfo
         if ( word->CAttribute & REGISTER_VARIABLE ) _Compile_Stack_PushReg ( DSP, word->RegToUse ) ;
-        else _Compile_Stack_PushReg ( DSP, reg ) ;
+        else { _Compile_Stack_PushReg ( DSP, reg ) ; word->RegToUse = reg ; }
     }
 }
 

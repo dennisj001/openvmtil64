@@ -141,7 +141,7 @@ dscOn verbosity 3 =
 ' fibPTC? find wdiss 
 20 fibPTC? dup p 6765 _assert0 verbosity 1 = //pause
 dscOff
-: fibPTC2? ( n | svn fn fn1 fn2 ) 
+: fibPTC3? ( n | svn fn fn1 fn2 ) 
     { svn n @ = fn 0 = fn1 0 = fn2 1 = } { n @ } { n n @ 1 - = } 
     {   
         fn1 fn2 @ = 
@@ -152,6 +152,24 @@ dscOff
     svn @ p " : " ps fn @ p "," ps
 ;
 sp
+c_syntaxOn
+int
+fibPTC2? ( REG n | REG fn, REG fn1, REG fn2 )
+//fibPTC2? ( n | fn, fn1, fn2 )
+//fibPTC2? ( n ) //| fn, fn1, fn2 )
+{
+    //int fn, fn1, fn2 ;
+    for ( fn = 0, fn1 = 0, fn2 = 1 ; n ; n -- ) 
+    {   
+        fn1 = fn2 ;
+        fn2 = fn ;
+        fn = fn1 + fn2 ; 
+    }
+    return fn ;
+}
+' fibPTC2? find wdiss
+fibPTC2? (20) dup p 6765 _assert //sp 
+c_syntaxOff
 #endif
 
 #if 1
@@ -371,7 +389,7 @@ fac5 ( REG n  | REG facc -- RAX )
     }
 }
 wdiss ( ' fac5 find ) 
-fac5 ( 7 ) p  // pause
+fac5 ( 7 ) dup p 5040 _assert // pause
 dscOff
 c_syntaxOff
 

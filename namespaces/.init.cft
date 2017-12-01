@@ -410,19 +410,26 @@ bno
 mem
 s
 c_syntaxOn
+dscOn
+//BigNum
 int
-//fibPTC2? ( REG n | REG fn, REG fn1, REG fn2 )
-fibPTC2? ( n | fn, fn1, fn2 )
+fibPTC2? ( REG n | REG fn, REG fn1, REG fn2 )
+//fibPTC2? ( n | fn, fn1, fn2 )
+//fibPTC2? ( n ) //| fn, fn1, fn2 )
 {
     //int fn, fn1, fn2 ;
-    for ( fn = 0, fn1 = 0, fn2 = 1 ; n ; d: n -- ) 
+    for ( fn = 0, fn1 = 0, fn2 = 1 ; n ; n -- ) 
     {   
         fn1 = fn2 ;
         fn2 = fn ;
-        fn = fn1 d: + fn2 ; 
+        fn = fn1 + fn2 ; 
     }
     return fn ;
 }
+dscOff
+fibPTC2? (20) p 
+//bno
 ' fibPTC2? find wdiss
 fibPTC2? (20) dup p 6765 _assert //sp 
+fibPTC2? (75) p
 c_syntaxOff

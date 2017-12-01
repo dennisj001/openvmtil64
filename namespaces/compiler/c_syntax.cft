@@ -107,7 +107,7 @@ scOff
 wdiss ( ' chi find )
 chi ( chey, 7 ) //pause
 #endif
-
+//s pause
 #if 1
 void
 interpret2 ( | atoken aword ) 
@@ -203,7 +203,7 @@ fac4 ( n  | facc -- TOS )
     return ( facc ) ;
 }
 wdiss ( ' fac4 find ) ; 
-fac4 ( 7 ) dup p 5040 _assert0 // s pause
+fac4 ( 7 ) dup p 5040 _assert0 //s pause
 
 User
 c_syntaxOff
