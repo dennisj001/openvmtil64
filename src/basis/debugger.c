@@ -46,31 +46,32 @@ Debugger_TableSetup ( Debugger * debugger )
     debugger->CharacterTable [ 27 ] = 15 ;
     debugger->CharacterTable [ ' ' ] = 11 ;
     debugger->CharacterTable [ 'g' ] = 10 ;
+    debugger->CharacterTable [ 'Z' ] = 8 ;
 
     // debugger : system related
+    debugger->CharacterFunctionTable [ 0 ] = Debugger_Default ;
     debugger->CharacterFunctionTable [ 1 ] = Debugger_Step ;
     debugger->CharacterFunctionTable [ 2 ] = Debugger_Eval ;
-    debugger->CharacterFunctionTable [ 21 ] = Debugger_AutoMode ;
+
+    // debugger internal
+    debugger->CharacterFunctionTable [ 4 ] = Debugger_Dis ;
+    debugger->CharacterFunctionTable [ 5 ] = Debugger_Info ;
+    debugger->CharacterFunctionTable [ 6 ] = Debugger_DoMenu ;
+    debugger->CharacterFunctionTable [ 7 ] = Debugger_Stack ;
+    debugger->CharacterFunctionTable [ 8 ] = Debugger_DWL_ShowList ;
+    debugger->CharacterFunctionTable [ 9 ] = Debugger_Source ;
+    debugger->CharacterFunctionTable [ 10 ] = Debugger_Registers ;
     debugger->CharacterFunctionTable [ 11 ] = Debugger_Continue ;
     debugger->CharacterFunctionTable [ 12 ] = Debugger_Quit ;
     debugger->CharacterFunctionTable [ 13 ] = Debugger_Parse ;
     debugger->CharacterFunctionTable [ 14 ] = Debugger_FindAny ;
     debugger->CharacterFunctionTable [ 15 ] = Debugger_Escape ;
-
-    // debugger internal
-    debugger->CharacterFunctionTable [ 0 ] = Debugger_Default ;
-    debugger->CharacterFunctionTable [ 4 ] = Debugger_Dis ;
-    debugger->CharacterFunctionTable [ 5 ] = Debugger_Info ;
-    debugger->CharacterFunctionTable [ 6 ] = Debugger_DoMenu ;
-    debugger->CharacterFunctionTable [ 7 ] = Debugger_Stack ;
-    //debugger->CharacterFunctionTable [ 8 ] = _Debugger_Verbosity ;
-    debugger->CharacterFunctionTable [ 9 ] = Debugger_Source ;
-    debugger->CharacterFunctionTable [ 10 ] = Debugger_Registers ;
     debugger->CharacterFunctionTable [ 16 ] = Debugger_OptimizeToggle ;
     debugger->CharacterFunctionTable [ 17 ] = Debugger_CodePointerUpdate ;
     debugger->CharacterFunctionTable [ 18 ] = Debugger_Dump ;
     //debugger->CharacterFunctionTable [ 19 ] = Debugger_ConsiderAndShowWord ; // fix me
     debugger->CharacterFunctionTable [ 20 ] = Debugger_DisassembleAccumulated ;
+    debugger->CharacterFunctionTable [ 21 ] = Debugger_AutoMode ;
     debugger->CharacterFunctionTable [ 22 ] = Debugger_WDis ;
     debugger->CharacterFunctionTable [ 23 ] = Debugger_Abort ;
     debugger->CharacterFunctionTable [ 24 ] = Debugger_Stop ;
@@ -330,6 +331,12 @@ Debugger_FindUsing ( Debugger * debugger )
 
         debugger->w_Word = Finder_Word_FindUsing ( _Context_->Finder0, debugger->Token, 0 ) ;
     }
+}
+
+void
+Debugger_DWL_ShowList ( Debugger * debugger )
+{
+    DWL_ShowList ( debugger->w_Word, 0 ) ;
 }
 
 void

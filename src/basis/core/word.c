@@ -1,6 +1,13 @@
 #include "../../include/cfrtil64.h"
 
 void
+Word_SetCoding ( Word * word, byte * address )
+{
+    if ( ( word->CAttribute2 & ( SYNTACTIC | NOOP_WORD | NO_CODING ) ) || ( word->CAttribute & ( DEBUG_WORD ) ) || ( word->LAttribute & ( W_COMMENT | W_PREPROCESSOR ) ) ) word->Coding = 0 ;
+    else word->Coding = address ;
+}
+
+void
 _Word_Run ( Word * word )
 {
     if ( word )
@@ -9,6 +16,9 @@ _Word_Run ( Word * word )
         // keep track in the word itself where the machine code is to go, if this word is compiled or causes compiling code - used for optimization
         word->W_SC_WordIndex = _CfrTil_->SC_ScratchPadIndex ;
         Word_SetCoding ( word, Here ) ;
+        //word->W_TokenStart_ReadLineIndex = ( tokenStartReadLineIndex <= 0 ) ? _Lexer_->TokenStart_ReadLineIndex : tokenStartReadLineIndex ;
+        //word->W_TokenStart_ReadLineIndex = _Lexer_->TokenStart_ReadLineIndex ;
+        //word->W_SC_ScratchPadIndex = _CfrTil_->SC_ScratchPadIndex ;
         word->W_InitialRuntimeDsp = _Dsp_ ;
         _Context_->CurrentlyRunningWord = word ;
         _Debugger_->PreHere = Here ;
@@ -17,22 +27,13 @@ _Word_Run ( Word * word )
 }
 
 void
-Word_Run ( Word * word )
+Word_Run_Debug ( Word * word )
 {
     if ( ! sigsetjmp ( _Context_->JmpBuf0, 0 ) )
     {
-        //_CfrTil_SyncStackPointers_ToRegs ( _CfrTil_ ) ;
         _Word_Run ( word ) ;
-        //_CfrTil_SyncStackPointers_FromRegs ( _CfrTil_ ) ;
     }
     else _Dsp_ = _CfrTil_->SaveDsp ;
-}
-
-void
-Word_SetCoding ( Word * word, byte * address )
-{
-    if ( ( word->CAttribute2 & ( SYNTACTIC | NOOP_WORD | NO_CODING ) ) || ( word->CAttribute & ( DEBUG_WORD ) ) || ( word->LAttribute & ( W_COMMENT | W_PREPROCESSOR ) ) ) word->Coding = 0 ;
-    else word->Coding = address ;
 }
 
 void
@@ -42,7 +43,7 @@ _Word_Eval ( Word * word )
     {
         if ( ( word->CAttribute & IMMEDIATE ) || ( ! CompileMode ) )
         {
-            Word_Run ( word ) ;
+            _Word_Run ( word ) ;
         }
         else
         {
@@ -57,7 +58,17 @@ _Word_Eval_Debug ( Word * word )
     if ( word )
     {
         DEBUG_SETUP ( word ) ;
-        if ( ! GetState ( _Debugger_, DBG_STEPPED ) ) _Word_Eval ( word ) ;
+        if ( ! GetState ( _Debugger_, DBG_STEPPED ) )
+        {
+            if ( ( word->CAttribute & IMMEDIATE ) || ( ! CompileMode ) )
+            {
+                Word_Run_Debug ( word ) ;
+            }
+            else
+            {
+                _Word_Compile ( word ) ;
+            }
+        }
         DEBUG_SHOW ;
     }
 }
@@ -67,6 +78,7 @@ Word_Eval ( Word * word )
 {
     if ( word )
     {
+        _Context_->CurrentlyRunningWord = word ;
         if ( Is_DebugModeOn ) _Word_Eval_Debug ( word ) ;
         else _Word_Eval ( word ) ;
     }
@@ -184,7 +196,7 @@ _Word_Allocate ( uint64 allocType )
 Word *
 _Word_Create ( byte * name, uint64 ctype, uint64 ctype2, uint64 ltype, uint64 allocType )
 {
-    Compiler * compiler = _Compiler_ ;
+    //Compiler * compiler = _Compiler_ ;
     Word * word = _Word_Allocate ( allocType ? allocType : DICTIONARY ) ;
     if ( allocType & ( EXISTING ) ) _Symbol_NameInit ( ( Symbol * ) word, name ) ;
     else _Symbol_Init_AllocName ( ( Symbol* ) word, name, STRING_MEM ) ;
@@ -213,7 +225,7 @@ _Word_New ( byte * name, uint64 ctype, uint64 ctype2, uint64 ltype, int8 addToIn
         word->S_WordData->LineNumber = rl->LineNumber ;
         //word->W_TokenEnd_ReadLineIndex = _Lexer_->TokenEnd_ReadLineIndex ; //rl->CursorPosition ;
         word->W_CursorPosition = rl->CursorPosition ;
-        word->W_TokenStart_ReadLineIndex = _Lexer_->TokenStart_ReadLineIndex ;
+        //word->W_TokenStart_ReadLineIndex = _Lexer_->TokenStart_ReadLineIndex ;
     }
 #if 0    
     if ( _IsSourceCodeOn && ( ! Compiling ) && ( ! GetState ( _Context_->Interpreter0, PREPROCESSOR_MODE ) ) )

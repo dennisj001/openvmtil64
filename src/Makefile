@@ -18,7 +18,7 @@ SOURCES = basis/compiler/machineCode.c basis/compiler/_compile.c basis/compiler/
 	primitives/strings.c primitives/bits.c primitives/maths.c primitives/logics.c primitives/openvmtils.c\
 	primitives/ios.c primitives/parsers.c primitives/interpreters.c primitives/namespaces.c primitives/systems.c\
 	primitives/compilers.c primitives/words.c  primitives/file.c primitives/stacks.c\
-	primitives/debuggers.c primitives/memory.c primitives/primitives.c primitives/contexts.c\
+	primitives/debuggers.c primitives/memorys.c primitives/primitives.c primitives/contexts.c\
 	primitives/disassembler.c primitives/syntaxes.c primitives/cmaths.c primitives/dataObjectNews.c  #basis/x.c
 
 INCLUDES = include/machineCode.h include/defines.h include/types.h \

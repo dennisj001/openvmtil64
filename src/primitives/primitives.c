@@ -104,8 +104,8 @@ CPrimitive CPrimitives [] = {
     { "&", CfrTil_AddressOf, IMMEDIATE, NO_CODING, ADDRESS_OF_OP, "C_Syntax", "C" }, // avoid name clash with '&&' and '&' 
     { "=", (block) CfrTil_C_Infix_Equal, IMMEDIATE | CATEGORY_EQUAL | KEYWORD, 0, 0, "C_Syntax", "C" }, //"Infix", "Compiler" },
 
-    { "}", CfrTil_TypedefStructEnd, IMMEDIATE, 0, 0, "C_Typedef", "C_Syntax" },
-    { "{", CfrTil_TypedefStructBegin, IMMEDIATE, 0, 0, "C_Typedef", "C_Syntax" },
+    { "}", CfrTil_TypedefStructEnd, IMMEDIATE | KEYWORD, 0, 0, "C_Typedef", "C_Syntax" },
+    { "{", CfrTil_TypedefStructBegin, IMMEDIATE | KEYWORD, 0, 0, "C_Typedef", "C_Syntax" },
 
     { ")", CfrTil_EndBlock, IMMEDIATE, 0, 0, "C_Combinators", "C" },
     //{ "(", CfrTil_BeginBlock, IMMEDIATE, 0, 0, "C_Combinators", "Combinators" },
@@ -311,6 +311,7 @@ CPrimitive CPrimitives [] = {
     { "dbgSourceCodeOn", _CfrTil_DbgSourceCodeCompileOn, IMMEDIATE, 0, 0, "Debug", "Root" },
     { "dbgSourceCodeOff", _CfrTil_DbgSourceCodeCompileOff, IMMEDIATE, 0, 0, "Debug", "Root" },
     { "scOff", CfrTil_DbgSourceCodeOff, 0, 0, 0, "Debug", "Root" },
+    { "scOn", CfrTil_DbgSourceCodeOn, 0, 0, 0, "Debug", "Root" },
     { "_dbgOn", CfrTil_DebugOn, DEBUG_WORD | INTERPRET_DBG, 0, 0, "Debug", "Root" },
     { "_dbgOff", CfrTil_DebugOff, INTERPRET_DBG, 0, 0, "Debug", "Root" },
     { ";d", CfrTil_DebugOff, DEBUG_WORD | INTERPRET_DBG, 0, 0, "Debug", "Root" },

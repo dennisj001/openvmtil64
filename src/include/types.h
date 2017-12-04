@@ -185,7 +185,7 @@ typedef struct
 #define n_Car afterWord 
 #define n_Cdr beforeWord
 typedef void ( *MapFunction0 ) ( dlnode * ) ;
-typedef void ( *MapFunction1 ) ( dlnode *, int64 ) ;
+typedef int64 ( *MapFunction1 ) ( dlnode *, int64 ) ;
 typedef void ( *MapFunction2 ) ( dlnode *, int64, int64 ) ;
 typedef void ( *MapFunction2_64 ) ( dlnode *, uint64, int64 ) ;
 typedef int64( *MapFunction3 ) ( dlnode *, int64, int64, int64 ) ;
@@ -625,7 +625,7 @@ typedef struct
     int64 NumberOfArgs ;
     int64 NumberOfRegisterVariables ;
     int64 LocalsFrameSize ;
-    int64 SaveCompileMode ;
+    int64 SaveCompileMode, SaveScratchPadIndex ;
     //int64 LispParenLevel;
     int64 ParenLevel ;
     int64 GlobalParenLevel ;

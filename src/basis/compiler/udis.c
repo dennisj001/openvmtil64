@@ -61,7 +61,7 @@ _Debugger_Udis_OneInstruction ( Debugger * debugger, byte * address, byte * pref
         ud_set_input_buffer ( ud, address, 16 ) ;
         ud_set_pc ( ud, ( int64 ) address ) ;
         isize = ud_disassemble ( ud ) ;
-        if ( Debugger_ShowSourceCodeAtAddress ( debugger, address ) ) ;
+        Debugger_ShowSourceCodeAtAddress ( debugger, address ) ;
         _Udis_PrintInstruction ( ud, address, prefix, postfix ) ; //, debugger->DebugAddress ) ;
         return isize ;
     }

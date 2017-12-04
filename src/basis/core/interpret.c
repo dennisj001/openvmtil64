@@ -45,7 +45,14 @@ _Interpreter_DoWord ( Interpreter * interp, Word * word, int64 tokenStartReadLin
     if ( word )
     {
         Context * cntx = _Context_ ;
-        word->W_TokenStart_ReadLineIndex = ( tokenStartReadLineIndex <= 0 ) ? _Lexer_->TokenStart_ReadLineIndex : tokenStartReadLineIndex ;
+        int64 tsrli ;
+        _Compiler_->SaveScratchPadIndex = word->W_SC_ScratchPadIndex ;
+        if ( tokenStartReadLineIndex <= 0 ) 
+        {
+            tsrli = _Lexer_->TokenStart_ReadLineIndex ;
+        }
+        else tsrli = tokenStartReadLineIndex ;
+        word->W_TokenStart_ReadLineIndex = tsrli ; //( tokenStartReadLineIndex <= 0 ) ? _Lexer_->TokenStart_ReadLineIndex : tokenStartReadLineIndex ;
         word->W_SC_ScratchPadIndex = _CfrTil_->SC_ScratchPadIndex ;
         //DEBUG_SETUP ( word ) ;
         interp->w_Word = word ;
@@ -177,43 +184,4 @@ Find_C_LeftParen ( )
     }
 }
 #endif
-
-Word *
-_Compiler_CopyDuplicatesAndPush ( Compiler * compiler, Word * word )
-{
-    Word *wordi, * word0 ;
-    int64 i, depth, wrli = word->W_TokenStart_ReadLineIndex ; //, scwi = word->W_SC_WordIndex ;
-    //byte *coding = word->Coding ;
-    dllist * list = compiler->WordList ;
-    // we sometimes refer to more than one field of the same object, eg. 'this' in a block
-    // each reference may be to a different labeled field each with a different offset so we must 
-    // create copies of the multiply referenced word to hold the referenced offsets for the optInfo
-    // 'word' is the 'baseObject' word. If it is already on the Object word Stack certain optimizations can be made.
-    // we also need to prevent a null StackPushRegisterCode for operator words used more than once in an optimization
-    depth = List_Depth ( list ) ;
-    word0 = word ; // we always push and return word1
-    word0->W_OriginalWord = word0 ;
-    word0->S_CAttribute &= ( ~ RECYCLABLE_COPY ) ;
-
-    for ( i = 0 ; i < depth ; i ++ )
-    {
-        wordi = ( Word* ) ( Compiler_WordList ( i ) ) ;
-        if ( word == wordi )
-        {
-            word0 = Word_Copy ( word, DICTIONARY ) ; //COMPILER_TEMP ) ; //WORD_COPY_MEM ) ; // especially for "this" so we can use a different Code & AccumulatedOffsetPointer not the existing 
-            word0->W_OriginalWord = Word_GetOriginalWord ( word ) ;
-            _dlnode_Init ( ( dlnode * ) word0 ) ; // necessary!
-            word0->S_CAttribute |= ( uint64 ) RECYCLABLE_COPY ;
-            word0->W_TokenStart_ReadLineIndex = wrli ;
-            word0->StackPushRegisterCode = 0 ;
-            d0 ( IsIt_C_LeftParen ( word ) ) ;
-            break ;
-        }
-    }
-    _CfrTil_WordList_PushWord ( word0 ) ;
-    d0 ( Word * sqWord = _CfrTil_WordList_TopWord ( ) ) ;
-    d0 ( _Printf ( ( byte* ) "\n_Compiler_CopyDuplicatesAndPush : %s", sqWord->Name ) ) ;
-
-    return word0 ;
-}
 

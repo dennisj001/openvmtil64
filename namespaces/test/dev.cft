@@ -370,8 +370,8 @@ bnInit ( 0 0 )
 
 : tbn ( | n m ) n 0 = m 3 = n m @ += n m @ += n m @ += n @ p ; tbn nl "should be 9" ps
 
-s: fibBN ( n | svn fn fn1 fn2 -- TOS ) 
-    { svn n @ = fn 0 = fn1 0 = fn2 1 = } { n @ 0 > } { n 1 -= } 
+s: fibBN ( REG n | REG fn REG fn1 REG fn2 ) 
+    { fn 0 = fn1 0 = fn2 1 = } { n @ 0 > } { n 1 -= } 
     {   
         fn1 fn2 @ = 
         fn2 fn @ = 
@@ -381,8 +381,8 @@ s: fibBN ( n | svn fn fn1 fn2 -- TOS )
     // nl svn @ fprint ":" ps fn @ fprint 
     fn @
 ;s
-//sp
-
+' fibBN find wdiss
+20 fibBN dup p 6765 _assert pause
 : tfib3 ( n | m )  
     "locals fibBN : " ps 
     { m 1 = } { m @ n @ <= } { m 1 +=  } 

@@ -29,14 +29,6 @@ CfrTil_SemiColon ( )
 }
 
 void
-CfrTil_SourceCodeCompileOff ( )
-{
-    //SetState ( _CfrTil_, SOURCE_CODE_MODE, false ) ;
-    _CfrTil_DbgSourceCodeCompileOff ( ) ;
-    if ( ! GetState ( _Context_, C_SYNTAX ) ) CfrTil_SemiColon ( ) ;
-}
-
-void
 AddressToWord ( )
 {
     DataStack_Push ( ( int64 ) Finder_FindWordFromAddress_AnyNamespace ( _Context_->Finder0, ( byte* ) DataStack_Pop ( ) ) ) ;
@@ -86,7 +78,7 @@ void
 CfrTil_Word_Run ( )
 {
     Word * word = ( Word* ) DataStack_Pop ( ) ;
-    Word_Run ( word ) ;
+    Word_Run_Debug ( word ) ;
 }
 
 void

@@ -23,6 +23,7 @@ _Block_Copy ( byte * srcAddress, int64 bsize, int8 optFlag )
         isize = _Udis_GetInstructionSize ( ud, srcAddress ) ;
         left -= isize ;
         _CfrTil_AdjustDbgSourceCodeAddress ( srcAddress, Here ) ;
+        //d1 ( if ( Is_DebugModeOn ) _DWL_ShowList ( _Compiler_->WordList, 0 ) ) ;
         _CfrTil_AdjustLabels ( srcAddress ) ;
         if ( * srcAddress == _RET ) // don't include RET
         {
@@ -365,7 +366,7 @@ _CfrTil_EndBlock ( )
     BlockInfo * bi = ( BlockInfo * ) Stack_Pop_WithExceptionOnEmpty ( _Context_->Compiler0->BlockStack ) ;
     // this idea has the problem that in c syntax CurrentlyRunningWord is not really set in the usual way
     //Word * word = Compiler_WordList ( 1 ) ; //_Context_->CurrentlyRunningWord ;
-    //bi->LogicCodeWord = Compiler_WordList ( 1 ) ; //_Context_->CurrentlyRunningWord ;
+    bi->LogicCodeWord = Compiler_WordList ( 1 ) ; //_Context_->CurrentlyRunningWord ;
     _CfrTil_EndBlock1 ( bi ) ;
     byte * blockStart = _CfrTil_EndBlock2 ( bi ) ;
     return blockStart ;

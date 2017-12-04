@@ -323,7 +323,7 @@ _dllist_PushNode ( dllist* list, dlnode * node )
 }
 
 dobject *
-_dllist_Push_M_Slot_Node ( dllist* list, int64 dobjType, int64 allocType, int64 m_slots, ... )
+_dllist_PushNew_M_Slot_Node ( dllist* list, int64 dobjType, int64 allocType, int64 m_slots, ... )
 {
     int64 i ;
     va_list args ;
@@ -419,6 +419,19 @@ dllist_Map1 ( dllist * list, MapFunction1 mf, int64 one )
         nextNode = dlnode_Next ( node ) ;
         mf ( node, one ) ;
     }
+}
+
+int64
+dllist_Map1_WReturn ( dllist * list, MapFunction1 mf, int64 one )
+{
+    int64 rtrn = 0 ;
+    dlnode * node, *nextNode ;
+    for ( node = dllist_First ( ( dllist* ) list ) ; node ; node = nextNode )
+    {
+        nextNode = dlnode_Next ( node ) ;
+        if ( rtrn = mf ( node, one ) ) break ;
+    }
+    return rtrn ;
 }
 
 void

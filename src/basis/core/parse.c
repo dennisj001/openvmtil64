@@ -280,7 +280,7 @@ _CfrTil_Parse_LocalsAndStackVariables ( int64 svf, int64 lispMode, ListObject * 
                         {
                             compiler->RegisterParameterList = _dllist_New ( TEMPORARY ) ;
                         }
-                        _dllist_Push_M_Slot_Node ( compiler->RegisterParameterList, WORD, TEMPORARY, 1, ( ( int64 ) word ) ) ;
+                        _List_PushNew ( compiler->RegisterParameterList, word ) ;
                     }
                 }
                 regFlag = false ;

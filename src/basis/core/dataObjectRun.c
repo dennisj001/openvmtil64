@@ -82,7 +82,7 @@ _Namespace_Do_C_Type ( Namespace * ns )
                         cntx->Compiler0->C_BackgroundNamespace = _Namespace_FirstOnUsingList ( ) ;
                         while ( 1 )
                         {
-                            byte * token = _Interpret_C_Until_EitherToken (cntx->Interpreter0, ( byte* ) ",", ( byte* ) ";", 0, 0 ) ;
+                            byte * token = _Interpret_C_Until_EitherToken ( cntx->Interpreter0, ( byte* ) ",", ( byte* ) ";", 0, 0 ) ;
                             if ( ! token ) break ;
                             if ( ( String_Equal ( token, "," ) ) )
                             {
@@ -208,7 +208,11 @@ _Word_CompileAndRecord_PushReg ( Word * word, int64 reg )
     {
         word->StackPushRegisterCode = Here ; // nb. used! by the rewriting optInfo
         if ( word->CAttribute & REGISTER_VARIABLE ) _Compile_Stack_PushReg ( DSP, word->RegToUse ) ;
-        else { _Compile_Stack_PushReg ( DSP, reg ) ; word->RegToUse = reg ; }
+        else
+        {
+            _Compile_Stack_PushReg ( DSP, reg ) ;
+            word->RegToUse = reg ;
+        }
     }
 }
 
@@ -304,8 +308,15 @@ _Do_Variable ( Word * word )
     }
     else
     {
-        _Compile_GetVarLitObj_LValue_To_Reg ( word, ACC ) ;
-        _Word_CompileAndRecord_PushReg ( word, ACC ) ;
+        if ( word->CAttribute & REGISTER_VARIABLE ) 
+        {
+            _Compile_Stack_PushReg ( DSP, word->RegToUse ) ;
+        }
+        else
+        {
+            _Compile_GetVarLitObj_LValue_To_Reg ( word, ACC ) ;
+            _Word_CompileAndRecord_PushReg ( word, ACC ) ;
+        }
     }
 }
 
@@ -328,7 +339,7 @@ _CfrTil_Do_Literal ( Word * word )
     }
     else
     {
-        if ( word->CAttribute & (T_STRING | T_RAW_STRING) ) DataStack_Push ( (uint64) word->W_PtrValue ) ;
+        if ( word->CAttribute & ( T_STRING | T_RAW_STRING ) ) DataStack_Push ( ( uint64 ) word->W_PtrValue ) ;
         else DataStack_Push ( word->W_Value ) ;
 
     }
@@ -393,7 +404,7 @@ _CfrTil_Do_Variable ( Word * word )
                     {
                         DataStack_Push ( * ( int64* ) word->W_PtrToValue + word->AccumulatedOffset ) ;
                     }
-                    else DataStack_Push ( (uint64) (word->W_PtrToValue + word->AccumulatedOffset) ) ;
+                    else DataStack_Push ( ( uint64 ) ( word->W_PtrToValue + word->AccumulatedOffset ) ) ;
                 }
             }
             else DataStack_Push ( word->W_Value ) ;

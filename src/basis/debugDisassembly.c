@@ -17,7 +17,7 @@ Debugger_Udis_GetInstructionSize ( Debugger * debugger )
 Boolean
 Debugger_ShowSourceCodeAtAddress ( Debugger * debugger, byte * address )
 {
-    if ( GetState ( _CfrTil_, DEBUG_SOURCE_CODE_MODE ) ) // ( _Context_->CurrentlyRunningWord ) && _Context_->CurrentlyRunningWord->W_SC_WordList ) )
+    if ( GetState ( _CfrTil_, GLOBAL_SOURCE_CODE_MODE )) //DEBUG_SOURCE_CODE_MODE ) ) // ( _Context_->CurrentlyRunningWord ) && _Context_->CurrentlyRunningWord->W_SC_WordList ) )
     {
         _Debugger_ShowDbgSourceCodeAtAddress ( debugger, address ) ;
         return true ;
@@ -96,7 +96,7 @@ Debugger_DisassembleAccumulated ( Debugger * debugger )
         size, ( char* ) debugger->EntryWord->Name, debugger->StartHere ) ;
     SetState ( debugger, DBG_DISASM_ACC, true ) ;
     if ( size > 0 ) _Debugger_Disassemble ( debugger, debugger->StartHere, size, 0 ) ;
-    SetState ( debugger, DBG_DISASM_ACC, true ) ;
+    SetState ( debugger, DBG_DISASM_ACC, false ) ;
 }
 
 void

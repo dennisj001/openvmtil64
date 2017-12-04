@@ -198,10 +198,15 @@ Compile_GetLogicFromTOS ( BlockInfo * bi )
 #else    
     if ( bi && bi->LogicCodeWord && bi->LogicCodeWord->StackPushRegisterCode )
     {
-        SetHere ( bi->LogicCodeWord->StackPushRegisterCode ) ;
+        //SetHere ( bi->LogicCodeWord->StackPushRegisterCode ) ;
+        _ByteArray_UnAppendSpace ( _Q_CodeByteArray, 7 ) ;
+        _Compile_TEST_Reg_To_Reg ( bi->LogicCodeWord->RegToUse, bi->LogicCodeWord->RegToUse ) ;
     }
-    else Compile_Pop_To_Acc ( DSP ) ;
-    _Compile_TEST_Reg_To_Reg ( ACC, ACC ) ;
+    else 
+    {
+        Compile_Pop_To_Acc ( DSP ) ;
+        _Compile_TEST_Reg_To_Reg ( ACC, ACC ) ;
+    }
 #endif    
 }
 

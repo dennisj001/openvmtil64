@@ -433,3 +433,21 @@ fibPTC2? (20) p
 fibPTC2? (20) dup p 6765 _assert //sp 
 fibPTC2? (75) p
 c_syntaxOff
+//verbosity 3 =
+//s: fibBN ( REG n | svn REG fn REG fn1 REG fn2 ) 
+s: fibBN ( REG n | REG fn REG fn1 REG fn2 -- RAX ) 
+    //{ svn n @ = fn 0 = fn1 0 = fn2 1 = } { n @ 0 > } { n 1 -= } 
+    { fn 0 = fn1 0 = fn2 1 = } { n @ 0 > } { n 1 -= } 
+    {   
+        fn1 fn2 @ = 
+        fn2 fn @ = 
+        fn fn1 @ fn2 @ + = 
+    }
+    for
+    //<dbg> nl svn @ p ":" ps fn @ p
+    //<dbg> fn @
+    fn @
+;s
+' fibBN find wdiss
+//20 fibBN dup p 6765 _assert //pause
+s

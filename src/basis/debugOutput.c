@@ -70,9 +70,9 @@ _Debugger_Locals_ShowALocal ( Debugger * debugger, Word * localsWord, byte * buf
     if ( localsWord->CAttribute & REGISTER_VARIABLE )
     {
         char * registerNames [ 16 ] = { ( char* ) "RAX", ( char* ) "RCX", ( char* ) "RDX", ( char* ) "RBX", ( char* ) "RBP", ( char* ) "RSP", ( char* ) "RSI", ( char* ) "RDI", ( char* ) "R8", ( char* ) "R9", ( char* ) "R10", ( char* ) "R11", ( char* ) "R12", ( char* ) "R13", ( char* ) "R14", ( char* ) "R15" } ;
-        _Printf ( ( byte* ) "\n%-018s : index = [  %3s   ]  : <0x%016lx> = 0x%016lx : %16s.%-16s : %s",
-            "Register Variable", registerNames [ localsWord->RegToUse ],
-            _Debugger_->cs_Cpu->Registers [ localsWord->RegToUse ], 0, localsWord->S_ContainingNamespace->Name, c_u(localsWord->Name), word2 ? buffer : stringValue ? stringValue : ( byte* ) "" ) ;
+        _Printf ( ( byte* ) "\n%-018s : index = [  %3s   ]  : 0x%016lx : %16s.%-16s : %s",
+            "Register Variable", registerNames [ localsWord->RegToUse ], _Debugger_->cs_Cpu->Registers [ localsWord->RegToUse ], 
+            localsWord->S_ContainingNamespace->Name, c_u(localsWord->Name), word2 ? buffer : stringValue ? stringValue : ( byte* ) "" ) ;
     }
     else _Printf ( ( byte* ) "\n%-018s : index = [r15%s0x%-2x]  : <0x%016lx> = 0x%016lx : %16s.%-16s : %s",
         ( localsWord->CAttribute & LOCAL_VARIABLE ) ? "LocalVariable" : "Parameter Variable", ( localsWord->CAttribute & LOCAL_VARIABLE ) ? "+" : "-",
