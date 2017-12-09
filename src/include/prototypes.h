@@ -619,10 +619,6 @@ Stack *Stack_Copy(Stack *stack, uint64 type);
 void _PrintNStackWindow(uint64 *reg, byte *name, byte *regName, int64 size);
 void _CfrTil_PrintNReturnStack(int64 size);
 void _CfrTil_PrintNDataStack(int64 size);
-void _CfrTil_SyncStackPointers_ToRegs(CfrTil *cfrtil);
-void CfrTil_SyncStackPointers_ToRegs(CfrTil *cfrtil);
-void _CfrTil_SyncStackPointers_FromRegs(CfrTil *cfrtil);
-void CfrTil_SyncStackPointers_FromRegs(CfrTil *cfrtil);
 /* basis/core/classes.c */
 void CfrTil_ClassStructureEnd(void);
 void CfrTil_ClassStructureBegin(void);
@@ -789,10 +785,10 @@ void DataStack_Check(void);
 int64 DataStack_Depth(void);
 void CpuState_Set_CpuStateDsp_WithDataStackPointer(Cpu *cpu);
 void _Debugger_Set_DataStackPointer_WithCpuStateDsp(Debugger *debugger);
-void Set_DataStackPointer_FromDspReg(void);
-void Set_DspReg_FromDataStackPointer(void);
 void _CfrTil_PrintDataStack(void);
 void CfrTil_PrintDataStack(void);
+void Set_DataStackPointer_FromDspReg(void);
+void Set_DspReg_FromDataStackPointer(void);
 void CfrTil_CheckInitDataStack(void);
 void CfrTil_DataStack_Size(void);
 /* basis/context.c */
