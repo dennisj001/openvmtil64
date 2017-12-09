@@ -42,7 +42,8 @@ _Compiler_AddLocalFrame ( Compiler * compiler )
 void
 Compiler_SetLocalsFrameSize_AtItsCellOffset ( Compiler * compiler )
 {
-    int64 fsize = compiler->LocalsFrameSize = ( ( compiler->NumberOfLocals + 1 ) * CELL ) ; //1 : the frame pointer 
+    int64 size = compiler->NumberOfLocals - compiler->NumberOfRegisterVariables ;
+    int64 fsize = compiler->LocalsFrameSize = ( ((size < 0 ? 0 : size ) + 1 ) * CELL ) ; //1 : the frame pointer 
     if ( fsize ) *( ( int32* ) ( compiler )->FrameSizeCellOffset ) = compiler->LocalsFrameSize ;
 }
 

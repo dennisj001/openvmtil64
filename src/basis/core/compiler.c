@@ -224,6 +224,8 @@ Compiler_Init ( Compiler * compiler, uint64 state )
     //CompileOptInfo_Init ( compiler ) ;
     compiler->NumberOfLocals = 0 ;
     compiler->NumberOfArgs = 0 ;
+    compiler->NumberOfRegisterLocals = 0 ;
+    compiler->NumberOfRegisterArgs = 0 ;
     compiler->NumberOfRegisterVariables = 0 ;
     compiler->LocalsFrameSize = 0 ;
     //compiler->FunctionTypesArray = 0 ;

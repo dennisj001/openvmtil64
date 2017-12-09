@@ -16,13 +16,12 @@ _Word_Run ( Word * word )
         // keep track in the word itself where the machine code is to go, if this word is compiled or causes compiling code - used for optimization
         word->W_SC_WordIndex = _CfrTil_->SC_ScratchPadIndex ;
         Word_SetCoding ( word, Here ) ;
-        //word->W_TokenStart_ReadLineIndex = ( tokenStartReadLineIndex <= 0 ) ? _Lexer_->TokenStart_ReadLineIndex : tokenStartReadLineIndex ;
-        //word->W_TokenStart_ReadLineIndex = _Lexer_->TokenStart_ReadLineIndex ;
-        //word->W_SC_ScratchPadIndex = _CfrTil_->SC_ScratchPadIndex ;
         word->W_InitialRuntimeDsp = _Dsp_ ;
         _Context_->CurrentlyRunningWord = word ;
         _Debugger_->PreHere = Here ;
+        //Set_DspReg_FromDataStackPointer ( ) ;
         _Block_Eval ( word->Definition ) ;
+        //Set_DataStackPointer_FromDspReg ( ) ;
     }
 }
 

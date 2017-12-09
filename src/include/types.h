@@ -623,6 +623,8 @@ typedef struct
     byte * StartPoint ;
     int64 NumberOfLocals ;
     int64 NumberOfArgs ;
+    int64 NumberOfRegisterLocals ;
+    int64 NumberOfRegisterArgs ;
     int64 NumberOfRegisterVariables ;
     int64 LocalsFrameSize ;
     int64 SaveCompileMode, SaveScratchPadIndex ;

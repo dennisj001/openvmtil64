@@ -4,8 +4,7 @@
 // 824.800 is with improves from 824.
 
 OpenVmTil * _Q_ ; 
-//uint64 * _Dsp_, *_Rsp_ ; // internal stack pointers
-uint64 *_Rsp_ ; // internal stack pointers
+uint64 *_Dsp_ ; 
 
 int
 main ( int argc, char * argv [ ] )

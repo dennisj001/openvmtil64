@@ -119,7 +119,6 @@ Block_CopyCompile_WithLogicFlag ( byte * srcAddress, int64 bindex, int64 jccFlag
     {
         _Block_Copy ( srcAddress, bi->bp_Last - bi->bp_First, 0 ) ;
     }
-#if 1   
     if ( jccFlag )
     {
         Word * svcrw = _Context_->CurrentlyRunningWord ;
@@ -136,37 +135,8 @@ Block_CopyCompile_WithLogicFlag ( byte * srcAddress, int64 bindex, int64 jccFlag
             Compile_JCC ( negFlag, ZERO_TTT, 0 ) ;
         }
         _Context_->CurrentlyRunningWord = svcrw ;
-        _Stack_PointerToJmpOffset_Set ( Here - INT32_SIZE ) ;
+        Stack_PointerToJmpOffset_Set ( );
     }
-#else
-    if ( jccFlag )
-    {
-        Word * svcrw = _Context_->CurrentlyRunningWord ;
-        _Context_->CurrentlyRunningWord = _Context_->SC_CurrentCombinator ;
-        DBI_ON ;
-        if ( jccFlag2 )
-        {
-            Compile_JCC ( negFlag ? bi->NegFlag : ! bi->NegFlag, bi->Ttt, 0 ) ;
-        }
-        else
-        {
-#if 0            
-            if ( bi->LogicCodeWord && bi->LogicCodeWord->StackPushRegisterCode )
-            {
-                SetHere ( bi->LogicCodeWord->StackPushRegisterCode ) ;
-            }
-            else Compile_Pop_To_Acc ( DSP ) ;
-            _Compile_TEST_Reg_To_Reg ( ACC, ACC ) ;
-#else            
-            Compile_GetLogicFromTOS ( bi ) ;
-#endif            
-            Compile_JCC ( negFlag, ZERO_TTT, 0 ) ;
-        }
-        DBI_OFF ;
-        _Context_->CurrentlyRunningWord = svcrw ;
-        _Stack_PointerToJmpOffset_Set ( Here - INT32_SIZE ) ;
-    }
-#endif    
     return 1 ;
 }
 
@@ -246,6 +216,7 @@ _CfrTil_BeginBlock0 ( )
     bi->ActualCodeStart = Here ;
     _Compile_UninitializedJump ( ) ;
     bi->JumpOffset = Here - INT32_SIZE ; // before CfrTil_CheckCompileLocalFrame after CompileUninitializedJump
+    Stack_PointerToJmpOffset_Set ( ) ;
     bi->bp_First = Here ; // after the jump for inlining
     return bi ;
 }
@@ -289,7 +260,8 @@ CfrTil_BeginBlock ( )
 Boolean
 _Compiler_IsFrameNecessary ( Compiler * compiler )
 {
-    return ( compiler->NumberOfLocals + compiler->NumberOfArgs ) > compiler->NumberOfRegisterVariables ; //|| GetState ( compiler, SAVE_Rsp ) ) ;
+    //return ( compiler->NumberOfLocals + compiler->NumberOfArgs ) > compiler->NumberOfRegisterVariables ; 
+    return ( compiler->NumberOfLocals + compiler->NumberOfArgs ) > (compiler->NumberOfRegisterLocals + compiler->NumberOfRegisterArgs) ;
 }
 
 void
@@ -299,7 +271,12 @@ _CfrTil_EndBlock1 ( BlockInfo * bi )
     if ( ! _Stack_Depth ( compiler->BlockStack ) )
     {
         _CfrTil_InstallGotoCallPoints_Keyed ( bi, GI_RETURN ) ;
-        if ( compiler->NumberOfRegisterVariables )
+        if ( _Compiler_IsFrameNecessary ( compiler ) && ( ! GetState ( compiler, DONT_REMOVE_STACK_VARIABLES ) ) )
+        {
+            _Compiler_RemoveLocalFrame ( compiler ) ;
+            bi->bp_First = bi->FrameStart ; // include _Compile_Rsp_Save code
+        }
+        else if ( compiler->NumberOfRegisterVariables )
         {
             if ( compiler->NumberOfRegisterVariables >= ( compiler->NumberOfArgs + compiler->NumberOfLocals ) ) bi->bp_First = bi->Start ;
             if ( compiler->ReturnVariableWord )
@@ -324,11 +301,6 @@ _CfrTil_EndBlock1 ( BlockInfo * bi )
                 Compile_Move_ACC_To_TOS ( DSP ) ;
             }
         }
-        else if ( _Compiler_IsFrameNecessary ( compiler ) && ( ! GetState ( compiler, DONT_REMOVE_STACK_VARIABLES ) ) )
-        {
-            _Compiler_RemoveLocalFrame ( compiler ) ;
-            bi->bp_First = bi->FrameStart ; // include _Compile_Rsp_Save code
-        }
         else
         {
             bi->bp_First = bi->Start ; //bi->AfterFrame ; 
@@ -338,6 +310,7 @@ _CfrTil_EndBlock1 ( BlockInfo * bi )
     //Compile_CfrTilWord_Return ( ) ;
     DataStack_Push ( ( int64 ) bi->bp_First ) ;
     bi->bp_Last = Here ;
+    CfrTil_CalculateAndSetPreviousJmpOffset ( bi->JumpOffset ) ;
     _SetOffsetForCallOrJump ( bi->JumpOffset, Here ) ;
 }
 

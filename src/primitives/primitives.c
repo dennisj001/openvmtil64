@@ -299,9 +299,9 @@ CPrimitive CPrimitives [] = {
     { "source", CfrTil_Source_AddToHistory, 0, 0, 0, "Debug", "Root" },
     { "sourceDontAdd", CfrTil_Source_DontAddToHistory, 0, 0, 0, "Debug", "Root" },
     { "stack", CfrTil_PrintDataStack, 0, 0, 0, "Debug", "Root" },
-    { "rstack", CfrTil_PrintReturnStack, 0, 0, 0, "Debug", "Root" },
-    { "rspRegstack", CfrTil_PrintRspRegStack, 0, 0, 0, "Debug", "Root" },
-    { "nRspRegstack", CfrTil_PrintNRspRegStack, 0, 0, 0, "Debug", "Root" },
+    //{ "rstack", CfrTil_PrintReturnStack, 0, 0, 0, "Debug", "Root" },
+    //{ "rspRegstack", CfrTil_PrintRspRegStack, 0, 0, 0, "Debug", "Root" },
+    //{ "nRspRegstack", CfrTil_PrintNRspRegStack, 0, 0, 0, "Debug", "Root" },
     { "dstack", CfrTil_PrintNDataStack_8, 0, 0, 0, "Debug", "Root" },
     { "ndstack", CfrTil_PrintNDataStack, 0, 0, 0, "Debug", "Root" },
     { "s{", CfrTil_DbgSourceCodeBeginBlock, IMMEDIATE, 0, 0, "Debug", "Root" },
@@ -607,7 +607,7 @@ CPrimitive CPrimitives [] = {
     { "peekReg", CfrTil_PeekReg, 0, 0, 0, "Compiling", "Compiler" },
     { "pokeRegWithValue", CfrTil_PokeRegWithValue, 0, 0, 0, "Compiling", "Compiler" },
     { "pokeRegAtAddress", CfrTil_PokeRegAtAddress, 0, 0, 0, "Compiling", "Compiler" },
-    { "rsp", CfrTil_Rsp, 0, 0, 0, "Compiling", "Compiler" },
+    //{ "rsp", CfrTil_Rsp, 0, 0, 0, "Compiling", "Compiler" },
 
     { 0 }
 } ;

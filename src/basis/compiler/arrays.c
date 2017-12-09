@@ -182,7 +182,7 @@ CfrTil_ArrayBegin ( void )
             word = Finder_Word_FindUsing ( cntx->Finder0, token, 0 ) ;
             if ( word && ( ! GetState ( cntx->Compiler0, LC_ARG_PARSING ) ) ) word->W_TokenStart_ReadLineIndex = cntx->Lexer0->TokenStart_ReadLineIndex ;
             DEBUG_SETUP ( word ) ;
-            if ( Do_NextArrayWordToken ( word, token, arrayBaseObject, objSize, saveCompileMode, &variableFlag ) ) break ;
+            if ( Do_NextArrayWordToken ( word, token, interp->BaseObject = arrayBaseObject, objSize, saveCompileMode, &variableFlag ) ) break ;
             DEBUG_SHOW ;
         }
         while ( 1 ) ;

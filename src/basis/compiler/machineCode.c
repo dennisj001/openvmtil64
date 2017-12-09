@@ -573,14 +573,14 @@ _Compile_MoveImm_To_Mem ( int8 rm, int64 imm, int8 immSize )
 }
 
 void
-_Compile_MoveMem_To_Reg ( int8 reg, byte * address, int8 iSize )
+_Compile_MoveMemValue_To_Reg ( int8 reg, byte * address, int8 iSize )
 {
     _Compile_MoveImm_To_Reg ( reg, ( int64 ) address, iSize ) ;
     _Compile_Move_Rm_To_Reg ( reg, reg, 0 ) ;
 }
 
 void
-_Compile_MoveMem_ToReg_ThruReg ( int8 reg, byte * address, int8 iSize, int8 thruReg )
+_Compile_MoveMemValue_ToReg_ThruReg ( int8 reg, byte * address, int8 iSize, int8 thruReg )
 {
     _Compile_MoveImm_To_Reg ( thruReg, ( int64 ) address, iSize ) ;
     _Compile_Move_Rm_To_Reg ( reg, thruReg, 0 ) ;

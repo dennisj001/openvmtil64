@@ -6,11 +6,13 @@ CfrTil_Here ( )
     DataStack_Push ( ( int64 ) Here ) ;
 }
 
+#if 0
 void
 CfrTil_Rsp ( )
 {
     DataStack_Push ( ( int64 ) & _Rsp_ ) ;
 }
+#endif
 
 void
 CompileCall ( )
@@ -152,10 +154,11 @@ CfrTil_Label_Prefix ( )
     _CfrTil_Label ( labelToken ) ;
 }
 
+// 'return' is a prefix word now C_SYNTAX or not
 void
 CfrTil_Return ( )
 {
-    if ( GetState ( _Context_, C_SYNTAX ) )
+    //if ( GetState ( _Context_, C_SYNTAX ) )
     {
         byte * token = Lexer_PeekNextNonDebugTokenWord ( _Lexer_, 0 ) ;
         Word * word = Finder_Word_FindUsing ( _Finder_, token, 0 ) ;
@@ -173,10 +176,12 @@ CfrTil_Return ( )
             }
         }
     }
+#if 0    
     else if ( ! _Readline_Is_AtEndOfBlock ( _Context_->ReadLiner0 ) )
     {
         _CfrTil_CompileCallGoto ( 0, GI_RETURN ) ;
     }
+#endif    
 }
 
 void

@@ -369,10 +369,10 @@ sp
 dbgOn
 Root 'doScript 1 const
 #if dbgOnVar @ 
-testCfrTil
+s
+d: testCfrTil
 stringMacrosOff
-//demo 
-dT0
+//demo dT0
 #endif
 //using pause
 2 + 7  assertStkChk // stack checking
@@ -435,7 +435,7 @@ fibPTC2? (75) p
 c_syntaxOff
 //verbosity 3 =
 //s: fibBN ( REG n | svn REG fn REG fn1 REG fn2 ) 
-s: fibBN ( REG n | REG fn REG fn1 REG fn2 -- RAX ) 
+s: fibBN ( REG n | REG fn REG fn1 REG fn2 ) 
     //{ svn n @ = fn 0 = fn1 0 = fn2 1 = } { n @ 0 > } { n 1 -= } 
     { fn 0 = fn1 0 = fn2 1 = } { n @ 0 > } { n 1 -= } 
     {   
@@ -444,10 +444,9 @@ s: fibBN ( REG n | REG fn REG fn1 REG fn2 -- RAX )
         fn fn1 @ fn2 @ + = 
     }
     for
-    //<dbg> nl svn @ p ":" ps fn @ p
-    //<dbg> fn @
-    fn @
+    //nl svn @ p ":" ps fn @ p
+    return fn
 ;s
 ' fibBN find wdiss
-//20 fibBN dup p 6765 _assert //pause
+20 fibBN dup p 6765 _assert //pause
 s

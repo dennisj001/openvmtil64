@@ -191,7 +191,7 @@
 #define SREG SCRATCH_REG
 #define DIV_MUL_REG_2 RDX                   // rdx
 #if DSP_IS_GLOBAL_REGISTER
-register uint64 *_Dsp_ asm ( "r14" ) ;
+//register uint64 *_Dsp_ asm ( "r14" ) ;
 #endif
 #define STACK_POINTER R14D                  // r14
 #define CPU_DSP R14d

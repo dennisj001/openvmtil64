@@ -142,6 +142,7 @@ CfrTil_PrintNDataStack ( )
     _CfrTil_PrintNDataStack ( size ) ;
 }
 
+#if 0
 void
 CfrTil_PrintRspRegStack ( )
 {
@@ -149,6 +150,7 @@ CfrTil_PrintRspRegStack ( )
     // therefore TOS is in lower mem addresses, bottom of stack is in higher memory addresses
     _CfrTil_PrintNReturnStack ( 8 ) ;
 }
+#endif
 
 void
 CfrTil_PrintNDataStack_8 ( )

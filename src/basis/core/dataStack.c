@@ -7,45 +7,45 @@
 uint64
 DataStack_Pop ( )
 {
-    //_CfrTil_->Set_DataStackPointer_FromDspReg ( ) ;
+    _CfrTil_->Set_DataStackPointer_FromDspReg ( ) ;
     int64 value = _Dsp_ [ 0 ] ; //
     _Dsp_ -- ;
-    //_CfrTil_->Set_DspReg_FromDataStackPointer ( ) ; // update DSP reg
+    _CfrTil_->Set_DspReg_FromDataStackPointer ( ) ; // update DSP reg
     return value ;
 }
 
 void
 DataStack_Push ( int64 value )
 {
-    //_CfrTil_->Set_DataStackPointer_FromDspReg ( ) ;
+    _CfrTil_->Set_DataStackPointer_FromDspReg ( ) ;
     _Dsp_ ++ ;
     _Dsp_ [0] = value ;
-    //_CfrTil_->Set_DspReg_FromDataStackPointer ( ) ; // update DSP reg
+    _CfrTil_->Set_DspReg_FromDataStackPointer ( ) ; // update DSP reg
 }
 
 void
 DataStack_Dup ( )
 {
-    //_CfrTil_->Set_DataStackPointer_FromDspReg ( ) ;
+    _CfrTil_->Set_DataStackPointer_FromDspReg ( ) ;
     _Dsp_ [ 1 ] = _Dsp_[0] ;
     _Dsp_ ++ ;
-    //_CfrTil_->Set_DspReg_FromDataStackPointer ( ) ; // update DSP reg
+    _CfrTil_->Set_DspReg_FromDataStackPointer ( ) ; // update DSP reg
 }
 
 void
 DataStack_DropN ( int64 n )
 {
-    //_CfrTil_->Set_DataStackPointer_FromDspReg ( ) ;
+    _CfrTil_->Set_DataStackPointer_FromDspReg ( ) ;
     _Dsp_ -= n ;
-    //_CfrTil_->Set_DspReg_FromDataStackPointer ( ) ; // update DSP reg
+    _CfrTil_->Set_DspReg_FromDataStackPointer ( ) ; // update DSP reg
 }
 
 void
 DataStack_Drop ( )
 {
-    //_CfrTil_->Set_DataStackPointer_FromDspReg ( ) ;
+    _CfrTil_->Set_DataStackPointer_FromDspReg ( ) ;
     _Dsp_ -- ;
-    //_CfrTil_->Set_DspReg_FromDataStackPointer ( ) ; // update DSP reg
+    _CfrTil_->Set_DspReg_FromDataStackPointer ( ) ; // update DSP reg
 }
 
 inline int64
@@ -100,7 +100,7 @@ Set_DataStackPointer_FromDspReg ( )
 }
 
 void
-_Set_DspReg_FromDataStackPointer ( )
+Set_DspReg_FromDataStackPointer ( )
 {
     _CfrTil_->Set_DspReg_FromDataStackPointer ( ) ;
 }
@@ -118,12 +118,14 @@ CfrTil_PrintDataStack ( )
     _CfrTil_PrintDataStack ( ) ;
 }
 
+#if 0
 void
 CfrTil_PrintReturnStack ( )
 {
     _CfrTil_->ReturnStack->StackPointer = _Rsp_ ;
     _Stack_Print ( _CfrTil_->ReturnStack, ( byte* ) "ReturnStack" ) ;
 }
+#endif
 
 void
 CfrTil_CheckInitDataStack ( )
@@ -202,7 +204,7 @@ _CfrTil_InitDspFromStackPointer ( CfrTil * cfrTil )
         }
     }
 #endif    
-    _Set_DspReg_FromDataStackPointer ( ) ;
+    Set_DspReg_FromDataStackPointer ( ) ;
 }
 
 void
@@ -218,7 +220,7 @@ CfrTil_DataStack_InitEssential ( CfrTil * cfrTil )
     //_Stack_Init ( cfrTil->DataStack, _Q_->DataStackSize ) ;
     //Stack_Init ( cfrTil->DataStack ) ;
     //_CfrTil_InitDspFromStackPointer ( cfrTil ) ;
-    _Set_DspReg_FromDataStackPointer ( ) ;
+    Set_DspReg_FromDataStackPointer ( ) ;
     cfrTil->SaveDsp = _Dsp_ ;
 }
 #endif

@@ -1,9 +1,10 @@
 
 5
-#if  1
-: sp ; //stack pause ;
 C 
+: sp ; //stack pause ; 
+sp
 "Dlsym" namespace Dlsym "libc" namespace libc
+
 #if 1  //Zenfone2 @ not
 dlsym: printf /lib/x86_64-linux-gnu/libc.so.6 ; void_return
 dlsym: strcmp /lib/x86_64-linux-gnu/libc.so.6 ; rax_return
@@ -11,11 +12,12 @@ dlsym: sprintf /lib/x86_64-linux-gnu/libc.so.6 ; void_return
 dlsym: strcat /lib/x86_64-linux-gnu/libc.so.6 ; void_return
 dlsym: memset /lib/x86_64-linux-gnu/libc.so.6 ; void_return
 #endif
+
 printf ("\n%s\n%d\t%s","hello world! - parse this!?", 1234, "\tand this!")"\n\talso this!" ps //pause
 printf ( "\nHello world! = 0x%08x\n\n" 1234 ) 
 printf ( "\n%s = %d\n\n", "Hello world!", 42 ) 
 printf("\n%s\n\t","hello world! - parse this!?")"\n\talso this!" ps
-
+sp
 C_Syntax
 User
 Compiler
@@ -26,10 +28,14 @@ Compiler
 vckf1 ( ' s find ) 
 C
 libc
+#if  1
+: sp ; //stack pause ; 
+sp
 printf ( "\nHello world! = 0x%08x\n\n" 1234 ) 
 printf ( "\n%s\n\n", "hello world!\nparse this!\n" )"\n and this!\n" ps
 printf ( "\n%s\n\t", "hello world! - parse this!?" )"\t and this!" ps
 printf ( "\nHello world! = 0x%08x\n\n" 1234 ) 
+sp
 
 : tprintf printf ( "\nHello world! = 0x%08x\n\n" 1234 ) ; tprintf
 : tprintf1 ( a b ) printf ( a b) ;; 
@@ -38,16 +44,18 @@ tprintf1 ("\nyes, Hello world! = 0x%08x", 1234 )
 tprintf2 ("\nyes, Hello world! = 0x%08x : %s", 1234, "and more yet" ) 
 //'tprintf find wdiss
 //'tprintf1 find wdiss
-
-#endif
-
+s
+sp
 nl
 "xc" var 
 xc 'e' = 
-xc @ dup emit 'e' _assert //pause
-s "x" var x 'e' = '\n' emit '\t' emit x @ emit '\r' emit 'u' emit '\b' emit 'i' emit 
+sp
+xc @ dup emit 'e' _assert //sp
+sp "x" var x 'e' = sp '\n' emit '\t' emit x @ emit '\r' emit 'u' emit '\b' emit 'i' emit 
 "\nline above should read... \ni\te" ps
-//pause
+sp 
+#endif
+
 Shell
 : hio  if 1 p else 0 p endif ;
 ' hio find wdiss
@@ -58,7 +66,7 @@ Root
 : get ( vari -- TOS ) vari @ @ ;; //'get wdiss
 "x1" var set ( x1 876543 ) get ( x1 ) dup dup nl p nl 876543 _assert x1 @ _assert //pause
 sp
-#if 1
+
 String Shell C
 s: $$ 
     ""
@@ -72,12 +80,14 @@ s: $$
 : $ streol _sh ;  
 '$$ find wdiss //pause
 
-bigNumOff
-#if doScript
+bno
+
+#if 1 //doScript
 $$ls -al /usr/local ; $$ls -al . ; 
 $etc/script 
 $etc/lispScript 
-//pause
+sp
 #endif
 
 2 + 7 assertStkChk // stack checking
+stack pause

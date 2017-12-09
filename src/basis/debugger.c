@@ -80,7 +80,7 @@ Debugger_TableSetup ( Debugger * debugger )
     debugger->CharacterFunctionTable [ 27 ] = _Debugger_State ;
     debugger->CharacterFunctionTable [ 28 ] = Debugger_DisassembleTotalAccumulated ;
     debugger->CharacterFunctionTable [ 29 ] = Debugger_Using ;
-    debugger->CharacterFunctionTable [ 30 ] = Debugger_ReturnStack ;
+    //debugger->CharacterFunctionTable [ 30 ] = Debugger_ReturnStack ;
     debugger->CharacterFunctionTable [ 31 ] = ( DebuggerFunction ) DebugWordList_Show ;
     debugger->CharacterFunctionTable [ 32 ] = Debugger_ShowCompilerWordList ;
 }
@@ -137,7 +137,7 @@ _Debugger_PreSetup ( Debugger * debugger, Word * word, int8 forceFlag )
                 if ( ! debugger->StartHere ) debugger->StartHere = Here ;
                 debugger->WordDsp = _Dsp_ ;
                 debugger->SaveTOS = TOS ;
-                debugger->SaveRsp = _Rsp_ ;
+                //debugger->SaveRsp = _Rsp_ ;
                 debugger->Token = word->Name ;
                 debugger->PreHere = Here ;
                 _Namespace_FreeNamespacesStack ( debugger->LocalsNamespacesStack ) ;
@@ -414,11 +414,13 @@ Debugger_Stack ( Debugger * debugger )
 #endif    
 }
 
+#if 0
 void
 Debugger_ReturnStack ( Debugger * debugger )
 {
     CfrTil_PrintReturnStack ( ) ;
 }
+#endif
 
 void
 Debugger_ShowCompilerWordList ( Debugger * debugger )

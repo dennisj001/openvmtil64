@@ -192,7 +192,6 @@ CfrTil_Dot ( ) // .
             else
             {
                 cntx->Interpreter0->BaseObject = word ;
-                //_DataObject_Run ( word ) ;
             }
         }
     }

@@ -229,7 +229,7 @@ _CfrTil_Parse_LocalsAndStackVariables ( int64 svf, int64 lispMode, ListObject * 
             {
                 break ;
             }
-            if ( String_Equal ( ( char* ) token, "REG" ) || Stringi_Equal ( ( char* ) token, "REGISTER" ) )
+            if ( Stringi_Equal ( ( char* ) token, "REG" ) || Stringi_Equal ( ( char* ) token, "REGISTER" ) )
             {
                 regFlag = true ;
                 continue ;
@@ -281,7 +281,9 @@ _CfrTil_Parse_LocalsAndStackVariables ( int64 svf, int64 lispMode, ListObject * 
                             compiler->RegisterParameterList = _dllist_New ( TEMPORARY ) ;
                         }
                         _List_PushNew ( compiler->RegisterParameterList, word ) ;
+                        compiler->NumberOfRegisterArgs++ ;
                     }
+                    else compiler->NumberOfRegisterLocals++ ;
                 }
                 regFlag = false ;
                 if ( typeNamespace )

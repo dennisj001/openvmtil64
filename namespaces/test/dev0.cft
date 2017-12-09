@@ -2,7 +2,7 @@
 bno dbgOff
 5
 dbOn 0 =
-: sp ; //stack pause ;
+: sp stack pause ;
 opOn // this currently requires the optimization to be on to compile correctly 
 // verbosity 2 = 
 // echoOn
@@ -21,12 +21,16 @@ tx1 7 _assert
 
 C
 #if 0 // - tail recursion from http://c2.com/cgi/wiki?TailCallOptimization
+c_syntaxOn
 int factorial ( int n )
 {
        int rec1 = 1;
        while ( n >= 2 ) rec1 *= n--;
        return rec1;
 }
+c_syntaxOff
+'factorial find wdiss 
+7 factorial p sp
 #endif
 
 : fac ( n  | rec1 -- TOS ) 
@@ -36,16 +40,17 @@ int factorial ( int n )
 ;
 // ' fac find wdiss
 7 fac dup p 5040 _assert0
-
-// doDemo @ #if
+sp
 #if 1
-: factorial ( REG n | REG rec -- RAX ) rec 1 = { n @ 1 > } { rec @ n @ * rec store n -- } while ;
+C
+sp
+: factorial ( REG n | REG rec ) rec 1 = { n @ 1 > } { rec @ n @ * rec store n -- } while return rec ;
 _wdiss ( 'factorial find ) 
 7 factorial dup p 5040 "factorial" assert1
-#endif
 sp
-// nl location "\nstarting Lisp\n stack is ..." ddps s
-nl location "\nstarting Lisp ..." ddps s
+#endif
+
+nl location "\nstarting Lisp\n stack is ..." ddps s
 sp
 Lisp 
 ( define g23 ( lambda ( a b c ) ( a b c))) 
@@ -401,9 +406,9 @@ int cpow ( base power | out ) s{ for ( out = 1 ; power ; ( power -= 1 ) ) { out 
 //int cpow ( base power | out ) { for ( out = 1 ; power ; power -= 1 ) { out = out * base ; } return out ; }
 cpow (2 30 ) p
 c_syntaxOff
-s: pow0 ( base power | out ) { out 1 = } { power @ 0 > } { power power @ 1 - = } { out out @ base @ * = } for return out @ ;s
-s: pow ( base power | out ) { out 1 = } { power @ 0 > } { power 1 -= } { out out @ base @ * = } for return out @ ;s
-//: pow ( base power | out -- TOS ) { out 1 = } { power @ 0 > } { power power @ 1 - = } { out out @ base @ * = } for return out @ ;
+s: pow0 ( base power | out ) { out 1 = } { power @ 0 > } { power power @ 1 - = } { out out @ base @ * = } for return out ;s
+s: pow ( base power | out ) { out 1 = } { power @ 0 > } { power 1 -= } { out out @ base @ * = } for return out ;s
+//: pow ( base power | out ) { out 1 = } { power @ 0 > } { power power @ 1 - = } { out out @ base @ * = } for return out ;
 2 30 pow0 p //pause
 2 30 pow p //pause
 scOff
@@ -411,7 +416,7 @@ scOff
 
 2 + 7 assertStkChk // stack checking
 
-location "\nending Lisp\n stack is ..." ddps s
+location "\nending Lisp\n stack is ..." ps s //ddps s
 // opOff
 // demo d: "bexp3" ffx
 //pause

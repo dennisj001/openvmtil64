@@ -282,7 +282,7 @@ _Stack_IntegrityCheck ( Stack * stack )
     {
         return true ;
     }
-    CfrTil_Exception (0, "Stack Integrity Error :", QUIT ) ;
+    CfrTil_Exception (0, c_ad ("\nStack Integrity Error :"), QUIT ) ;
     return false ;
 }
 

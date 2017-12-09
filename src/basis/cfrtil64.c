@@ -187,8 +187,8 @@ _CfrTil_Init ( CfrTil * cfrTil, Namespace * nss )
     {
         _CfrTil_NamespacesInit ( cfrTil ) ;
     }
-    cfrTil->ReturnStack = Stack_New ( 1 * K, CFRTIL ) ;
-    _Rsp_ = cfrTil->ReturnStack->StackPointer ;
+    //cfrTil->ReturnStack = Stack_New ( 1 * K, CFRTIL ) ;
+    //_Rsp_ = cfrTil->ReturnStack->StackPointer ;
     if ( cfrTil->SaveDsp && cfrTil->DataStack ) // with _Q_->RestartCondition = STOP from Debugger_Stop
     {
         _Dsp_ = cfrTil->SaveDsp ;
@@ -397,7 +397,7 @@ CfrTil_Compile_RestoreIncomingCpuState ( CfrTil * cfrtil )
 {
     // restore the incoming current C cpu state
     Compile_Call ( ( byte* ) _CfrTil_->RestoreCpuState ) ;
-    _Compile_MoveMem_To_Reg ( RBP, ( byte * ) & cfrtil->cs_CpuState->Ebp, THRU_REG, CELL ) ;
-    _Compile_MoveMem_To_Reg ( RSP, ( byte * ) & cfrtil->cs_CpuState->Rsp, THRU_REG, CELL ) ;
+    _Compile_MoveMemValue_To_Reg ( RBP, ( byte * ) & cfrtil->cs_CpuState->Ebp, THRU_REG, CELL ) ;
+    _Compile_MoveMemValue_To_Reg ( RSP, ( byte * ) & cfrtil->cs_CpuState->Rsp, THRU_REG, CELL ) ;
 }
 #endif

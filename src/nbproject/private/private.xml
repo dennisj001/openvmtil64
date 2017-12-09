@@ -7,7 +7,7 @@
         <activeConfTypeElem>0</activeConfTypeElem>
         <activeConfIndexElem>0</activeConfIndexElem>
     </data>
-    <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="25">
+    <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="26">
         <file>
             <url>basis/compiler/machineCode.c</url>
             <bookmark id="14">
@@ -65,36 +65,10 @@
             </bookmark>
         </file>
         <file>
-            <url>basis/compiler/optimize.c</url>
-            <bookmark id="23">
-                <name/>
-                <line>234</line>
-                <key/>
-            </bookmark>
-            <bookmark id="24">
-                <name/>
-                <line>995</line>
-                <key/>
-            </bookmark>
-            <bookmark id="25">
-                <name/>
-                <line>1066</line>
-                <key/>
-            </bookmark>
-        </file>
-        <file>
             <url>basis/core/lexer.c</url>
             <bookmark id="3">
                 <name/>
                 <line>468</line>
-                <key/>
-            </bookmark>
-        </file>
-        <file>
-            <url>basis/compiler/stack.c</url>
-            <bookmark id="16">
-                <name/>
-                <line>74</line>
                 <key/>
             </bookmark>
         </file>
@@ -111,22 +85,53 @@
                 <key/>
             </bookmark>
         </file>
+        <file>
+            <url>basis/compiler/optimize.c</url>
+            <bookmark id="23">
+                <name/>
+                <line>234</line>
+                <key/>
+            </bookmark>
+            <bookmark id="26">
+                <name/>
+                <line>866</line>
+                <key/>
+            </bookmark>
+            <bookmark id="24">
+                <name/>
+                <line>996</line>
+                <key/>
+            </bookmark>
+            <bookmark id="25">
+                <name/>
+                <line>1067</line>
+                <key/>
+            </bookmark>
+        </file>
+        <file>
+            <url>basis/compiler/stack.c</url>
+            <bookmark id="16">
+                <name/>
+                <line>74</line>
+                <key/>
+            </bookmark>
+        </file>
     </editor-bookmarks>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/home/dennisj/openvmtil64/src/basis/debugDisassembly.c</file>
-            <file>file:/home/dennisj/openvmtil64/src/basis/sourceCode.c</file>
-            <file>file:/home/dennisj/openvmtil64/src/basis/core/interpret.c</file>
-            <file>file:/home/dennisj/openvmtil64/src/basis/compiler/blocks.c</file>
+            <file>file:/home/dennisj/openvmtil64/src/include/cfrtil64.h</file>
+            <file>file:/home/dennisj/openvmtil64/src/basis/compiler/stack.c</file>
+            <file>file:/home/dennisj/openvmtil64/src/basis/exception.c</file>
+            <file>file:/home/dennisj/openvmtil64/src/basis/compiler/arrays.c</file>
             <file>file:/home/dennisj/openvmtil64/src/basis/openVmTil.c</file>
-            <file>file:/home/dennisj/openvmtil64/src/include/types.h</file>
+            <file>file:/home/dennisj/openvmtil64/src/basis/compiler/machineCode.c</file>
             <file>file:/home/dennisj/openvmtil64/.init.cft</file>
-            <file>file:/home/dennisj/openvmtil64/src/basis/debugger.c</file>
-            <file>file:/home/dennisj/openvmtil64/src/basis/core/compiler.c</file>
-            <file>file:/home/dennisj/openvmtil64/src/basis/compiler/optimize.c</file>
+            <file>file:/home/dennisj/openvmtil64/src/basis/core/cstack.c</file>
+            <file>file:/home/dennisj/openvmtil64/src/basis/core/dataObjectRun.c</file>
+            <file>file:/home/dennisj/openvmtil64/src/basis/core/dataStack.c</file>
+            <file>file:/home/dennisj/openvmtil64/src/include/machineCode.h</file>
             <file>file:/home/dennisj/openvmtil64/src/basis/core/word.c</file>
-            <file>file:/home/dennisj/openvmtil64/src/basis/core/dllist.c</file>
-            <file>file:/home/dennisj/openvmtil64/src/basis/core/array.c</file>
+            <file>file:/home/dennisj/openvmtil64/src/basis/core/dobject.c</file>
         </group>
     </open-files>
 </project-private>

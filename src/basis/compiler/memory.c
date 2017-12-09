@@ -18,13 +18,13 @@ _Compile_Get_C_Value_ToReg ( int8 reg, int64 value )
 void
 _Compile_GetRValue_FromLValue_ToReg ( int8 reg, byte * address )
 {
-    _Compile_MoveMem_To_Reg ( reg, ( byte* ) address, CELL_SIZE ) ;
+    _Compile_MoveMemValue_To_Reg ( reg, ( byte* ) address, CELL_SIZE ) ;
 }
 
 void
 _Compile_Get_FromCAddress_ToReg_ThruReg ( int8 reg, byte * address, int8 thruReg )
 {
-    _Compile_MoveMem_ToReg_ThruReg ( reg, address, CELL_SIZE, thruReg ) ;
+    _Compile_MoveMemValue_ToReg_ThruReg ( reg, address, CELL_SIZE, thruReg ) ;
 }
 
 // thru reg is a 'scratch' reg

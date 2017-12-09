@@ -14,6 +14,7 @@ _OpenVmTil_ShowExceptionInfo ( )
             if ( _CfrTil_ && ( debugger = _Debugger_ ) )
             {
                 DebugOn ;
+#if 0                    
                 if ( _Q_->Signal != 11 )
                 {
                     if ( ! debugger->w_Word )
@@ -24,7 +25,9 @@ _OpenVmTil_ShowExceptionInfo ( )
                         debugger->w_Word = word ;
                     }
                 }
-                else debugger->w_Word = _Context_->CurrentlyRunningWord ; //= word ; //_Interpreter_->LastWord ; ;
+                //else 
+#endif                
+                debugger->w_Word = _Context_->CurrentlyRunningWord ; //= word ; //_Interpreter_->LastWord ; ;
                 SetState ( debugger, DBG_INFO, true ) ;
                 Debugger_ShowInfo ( debugger, _Q_->ExceptionMessage, _Q_->Signal ) ;
 
