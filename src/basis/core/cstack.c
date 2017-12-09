@@ -413,7 +413,7 @@ _CfrTil_PrintNDataStack ( int64 size )
     _PrintNStackWindow ( _Dsp_, ( byte* ) "Data Stack", ( byte* ) "Dsp (DSP:R14)", size ) ;
 }
 
-
+#if 0
 void
 _CfrTil_SyncStackPointers_ToRegs ( CfrTil * cfrtil )
 {
@@ -430,7 +430,6 @@ CfrTil_SyncStackPointers_ToRegs ( CfrTil * cfrtil )
         if ( cfrtil->DataStack ) cfrtil->Set_DspReg_FromDataStackPointer ( ) ;
     }
 }
-
 void
 _CfrTil_SyncStackPointers_FromRegs ( CfrTil * cfrtil )
 {
@@ -447,3 +446,5 @@ CfrTil_SyncStackPointers_FromRegs ( CfrTil * cfrtil )
         if ( cfrtil->DataStack ) cfrtil->Set_DataStackPointer_FromDspReg ( ) ;
     }
 }
+#endif
+

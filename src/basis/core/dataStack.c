@@ -3,7 +3,7 @@
 
 // these functions are part of the C vm and can't be compiled
 // ! they are should only be called in C functions !
-
+#if ! DSP_IS_GLOBAL_REGISTER
 uint64
 DataStack_Pop ( )
 {
@@ -47,6 +47,41 @@ DataStack_Drop ( )
     _Dsp_ -- ;
     _CfrTil_->Set_DspReg_FromDataStackPointer ( ) ; // update DSP reg
 }
+#else
+uint64
+DataStack_Pop ( )
+{
+    int64 value = _Dsp_ [ 0 ] ; //
+    _Dsp_ -- ;
+    return value ;
+}
+
+void
+DataStack_Push ( int64 value )
+{
+    _Dsp_ ++ ;
+    _Dsp_ [0] = value ;
+}
+
+void
+DataStack_Dup ( )
+{
+    _Dsp_ [ 1 ] = _Dsp_[0] ;
+    _Dsp_ ++ ;
+}
+
+void
+DataStack_DropN ( int64 n )
+{
+    _Dsp_ -= n ;
+}
+
+void
+DataStack_Drop ( )
+{
+    _Dsp_ -- ;
+}
+#endif
 
 inline int64
 DataStack_Overflow ( )
@@ -74,6 +109,7 @@ DataStack_Depth ( )
 {
     if ( _Q_ && _CfrTil_ && _DataStack_ )
     {
+        _DataStackPointer_ =  _Dsp_ ;
         return Stack_Depth ( _DataStack_ ) ;
     }
     return 0 ;
@@ -94,18 +130,6 @@ _Debugger_Set_DataStackPointer_WithCpuStateDsp ( Debugger * debugger )
 }
 
 void
-Set_DataStackPointer_FromDspReg ( )
-{
-    _CfrTil_->Set_DataStackPointer_FromDspReg ( ) ;
-}
-
-void
-Set_DspReg_FromDataStackPointer ( )
-{
-    _CfrTil_->Set_DspReg_FromDataStackPointer ( ) ;
-}
-
-void
 _CfrTil_PrintDataStack ( )
 {
     _Stack_Print ( _DataStack_, ( byte* ) "DataStack" ) ;
@@ -116,6 +140,19 @@ CfrTil_PrintDataStack ( )
 {
     Set_DataStackPointer_FromDspReg ( ) ;
     _CfrTil_PrintDataStack ( ) ;
+}
+
+void
+Set_DataStackPointer_FromDspReg ( )
+{
+    //_DSP_ = _Dsp_ ;
+    _CfrTil_->Set_DataStackPointer_FromDspReg ( ) ;
+}
+
+void
+Set_DspReg_FromDataStackPointer ( )
+{
+    _CfrTil_->Set_DspReg_FromDataStackPointer ( ) ;
 }
 
 #if 0

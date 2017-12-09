@@ -547,7 +547,7 @@ void
 _OVT_ShowMemoryAllocated ( OpenVmTil * ovt )
 {
     int8 vf = ( ovt->Verbosity > 1 ) ;
-    if ( ! vf ) _Printf ( ( byte* ) c_gu ( "Increase the verbosity setting to 2 or more for more info here. ( Eg. : verbosity 2 = )" ) ) ;
+    if ( ! vf ) _Printf ( ( byte* ) c_gu ( "\nIncrease the verbosity setting to 2 or more for more info here. ( Eg. : verbosity 2 = )" ) ) ;
     int64 leak = ( mmap_TotalMemAllocated - mmap_TotalMemFreed ) - ( ovt->TotalMemAllocated - ovt->TotalMemFreed ) - ovt->OVT_InitialUnAccountedMemory ;
     Calculate_TotalNbaAccountedMemAllocated ( ovt, 1 ) ; //leak || vf ) ;
     _OVT_ShowPermanentMemList ( ovt ) ;
@@ -578,7 +578,8 @@ _OVT_ShowMemoryAllocated ( OpenVmTil * ovt )
         _Printf ( ( byte* ) "\nOVT_InitialUnAccountedMemory                     = %9d : <=: ovt->OVT_InitialUnAccountedMemory", ovt->OVT_InitialUnAccountedMemory ) ; //+ ovt->UnaccountedMem ) ) ;
         _Printf ( ( byte* ) "\nTotalMemSizeTarget                               = %9d : <=: ovt->TotalMemSizeTarget", ovt->TotalMemSizeTarget ) ;
     }
-    else _Printf ( ( byte*) "\nMem                                         leak = %9d", leak ) ; 
+    else {_Printf ( ( byte*) "\nTotal Memory Allocated                           = %9d"
+                             "\nTotal Memory leaks                               = %9d", ovt->TotalNbaAccountedMemAllocated, leak ) ; }
     _Printf ( ( byte* ) "\nRecycledWordCount : %d", _Q_->MemorySpace0->RecycledWordCount ) ;
     Buffer_PrintBuffers ( ) ;
 }

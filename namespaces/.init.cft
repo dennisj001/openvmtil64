@@ -369,10 +369,9 @@ sp
 dbgOn
 Root 'doScript 1 const
 #if dbgOnVar @ 
-testCfrTil
+//testCfrTil
+//demo dT0
 stringMacrosOff
-//demo 
-dT0
 #endif
 //using pause
 2 + 7  assertStkChk // stack checking
@@ -391,7 +390,7 @@ decimal
 ;
 ' fac find wdiss
 7 fac dup p 5040 _assert0
-bno Lisp 
+Lisp 
 "lambda" tick _lambda find alias immediate
 ( ( lambda ( x y ) ( + x y ) ) 3 4 ) 
 #if 1
@@ -404,6 +403,7 @@ BigNum
 (define fibc (lambda ( n ) (ifElse (< n 2) n (+ (fibc (- n 1)) (fibc (- n 2))))))
 (fibc 20)
 sp
+lispOff
 bno
 #endif
 #endif

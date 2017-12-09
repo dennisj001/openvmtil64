@@ -200,7 +200,7 @@ _CfrTil_Init ( CfrTil * cfrTil, Namespace * nss )
         cfrTil->SaveDsp = _Dsp_ ;
     }
     CfrTil_MachineCodePrimitive_AddWords ( cfrTil ) ; // in any case we need to reinit these for eg. debugger->SaveCpuState (), etc.
-    _CfrTil_SyncStackPointers_ToRegs ( cfrTil ) ;
+    //_CfrTil_SyncStackPointers_ToRegs ( cfrTil ) ;
     cfrTil->StoreWord = Finder_FindWord_AnyNamespace ( _Finder_, ( byte* ) "store" ) ;
     cfrTil->PokeWord = Finder_FindWord_AnyNamespace ( _Finder_, ( byte* ) "poke" ) ;
     cfrTil->LispNamespace = Namespace_Find ( ( byte* ) "Lisp" ) ;

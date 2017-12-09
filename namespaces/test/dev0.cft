@@ -2,7 +2,7 @@
 bno dbgOff
 5
 dbOn 0 =
-: sp stack pause ;
+: sp ; //stack pause ;
 opOn // this currently requires the optimization to be on to compile correctly 
 // verbosity 2 = 
 // echoOn

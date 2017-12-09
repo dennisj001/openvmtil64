@@ -294,7 +294,6 @@ dscOn //verbosity 3 =
 scOff
 //' _assertStkChk winfo //pause
 : TODO ( str ) nl nl pdl nl str @ adps location nl pdl nl nl { dbgOnVar @ } { sp } if2 ;;
-"getESP" ' rsp find alias
 Root
 "User" namespace
 User

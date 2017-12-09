@@ -85,7 +85,7 @@ CfrTil_NDup ( )
 
         * ++ _Dsp_ = value ;
     }
-    _CfrTil_->Set_DspReg_FromDataStackPointer ( ) ; // update DSP reg
+    //_CfrTil_->Set_DspReg_FromDataStackPointer ( ) ; // update DSP reg
 }
 
 // pick is from stack below top index

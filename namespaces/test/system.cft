@@ -90,4 +90,3 @@ sp
 #endif
 
 2 + 7 assertStkChk // stack checking
-stack pause

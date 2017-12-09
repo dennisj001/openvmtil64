@@ -190,15 +190,15 @@
 #define SCRATCH_REG OPERAND_2_REG // eax/edx are both used sometimes by ops ebx/ecx are not ?
 #define SREG SCRATCH_REG
 #define DIV_MUL_REG_2 RDX                   // rdx
-#if DSP_IS_GLOBAL_REGISTER
-//register uint64 *_Dsp_ asm ( "r14" ) ;
+#if DSP_IS_GLOBAL_REGISTER 
+register uint64 *_Dsp_ asm ( "r14" ) ;
+register int64 *Fp asm ("r15" ) ;
 #endif
 #define STACK_POINTER R14D                  // r14
+#define DSP STACK_POINTER 
 #define CPU_DSP R14d
-//register int64 *Fp asm ("rsi" ) ;
 #define FRAME_POINTER R15D                  // r15
 #define CPU_FP R15d
-#define DSP STACK_POINTER 
 #define FP FRAME_POINTER
 
 //register uint64 *_RspReg_ asm ( "r10" ) ;

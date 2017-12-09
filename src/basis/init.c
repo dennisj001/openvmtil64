@@ -193,20 +193,6 @@ CfrTil_MachineCodePrimitive_AddWords ( CfrTil * cfrTil )
         {
             callHook = & cfrTil->CallCurrentBlock ;
         }
-#if 0        
-        else if ( ( String_Equal ( p.ccp_Name, "set_DspReg_FromDataStackPointer" ) ) && ( String_Equal ( p.NameSpace, "System" ) ) )
-        {
-            callHook = & cfrTil->Set_DspReg_FromDataStackPointer ;
-        } 
-        else if ( ( String_Equal ( p.ccp_Name, "set_DataStackPointer_FromDspReg" ) ) && ( String_Equal ( p.NameSpace, "System" ) ) )
-        {
-            callHook = & cfrTil->Set_DataStackPointer_FromDspReg ;
-        } 
-        else if ( ( String_Equal ( p.ccp_Name, "set_DataStackPointer_FromDspReg" ) ) && ( String_Equal ( p.NameSpace, "System" ) ) )
-        {
-            callHook = & cfrTil->_StackPtr_Push  ;
-        } 
-#endif        
         else
         {
             functionArg = - 1 ;
@@ -214,25 +200,7 @@ CfrTil_MachineCodePrimitive_AddWords ( CfrTil * cfrTil )
         }
         _CfrTil_MachineCodePrimitive_NewAdd ( p.ccp_Name, p.ui64_CAttribute, callHook, p.Function, functionArg, p.NameSpace, p.SuperNamespace ) ;
     }
-#if 0
-    //{ "callCfrTilWord", CPRIMITIVE, 0, ( byte* ) Compile_Call_CfrTilWord, 0, "System", "Root" },
-        else if ( ( String_Equal ( p.ccp_Name, "callCfrTilWord" ) ) && ( String_Equal ( p.NameSpace, "System" ) ) )
-        {
-            callHook = & cfrTil->CallCfrTilWord ;
-        }
-        else if ( ( String_Equal ( p.ccp_Name, "set_CfrTilRsp_FromReturnStackPointer" ) ) && ( String_Equal ( p.NameSpace, "System" ) ) )
-        {
-            callHook = & cfrTil->Set_CfrTilRspReg_FromReturnStackPointer ;
-        } 
-        else if ( ( String_Equal ( p.ccp_Name, "set_ReturnStackPointer_FromCfrTilRsp" ) ) && ( String_Equal ( p.NameSpace, "System" ) ) )
-        {
-            callHook = & cfrTil->Set_ReturnStackPointer_FromCfrTilRspReg ;
-        } 
-    //_CfrTil_MachineCodePrimitive_NewAdd ( const char * name, uint64 cType, block * callHook, byte * function, int64 functionArg, const char *nameSpace, const char * superNamespace )
-    _CfrTil_MachineCodePrimitive_NewAdd ( "callCfrTilWord", CPRIMITIVE, & cfrTil->CallCfrTilWord, ( byte* ) Compile_Call_CfrTilWord, -1, "System", "Root" ) ;
-    _CfrTil_MachineCodePrimitive_NewAdd ( "set_CfrTilRsp_FromReturnStackPointer", CPRIMITIVE, & cfrTil->Set_CfrTilRspReg_FromReturnStackPointer, ( byte* ) Compile_Set_CfrTilRspReg_FromReturnStackPointer, -1, "System", "Root" ) ;
-    _CfrTil_MachineCodePrimitive_NewAdd ( "set_ReturnStackPointer_FromCfrTilRsp", CPRIMITIVE, & cfrTil->Set_ReturnStackPointer_FromCfrTilRspReg, ( byte* ) Compile_Set_ReturnStackPointer_FromCfrTilRspReg, -1, "System", "Root" ) ;
-#endif    
+    // this form (below) can and should replace the above form for adding here
     _CfrTil_MachineCodePrimitive_NewAdd ( "set_DataStackPointer_FromDspReg", CPRIMITIVE, & cfrTil->Set_DataStackPointer_FromDspReg, ( byte* ) Compile_Set_DataStackPointer_FromDspReg, -1, "System", "Root" ) ;
     _CfrTil_MachineCodePrimitive_NewAdd ( "set_DspReg_FromDataStackPointer", CPRIMITIVE, & cfrTil->Set_DspReg_FromDataStackPointer, ( byte* ) Compile_Set_DspReg_FromDataStackPointer, -1, "System", "Root" ) ;
 }

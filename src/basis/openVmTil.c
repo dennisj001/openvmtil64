@@ -1,10 +1,10 @@
 
 #include "../include/cfrtil64.h"
-#define VERSION ((byte*) "0.825.300" ) // 0.823.200 series is x86 ; the 0.823.300 series is x64 : 0.823.300.600+ series is with new x64 compiler
+#define VERSION ((byte*) "0.825.420" ) // 0.823.200 series is x86 ; the 0.823.300 series is x64 : 0.823.300.600+ series is with new x64 compiler
 // 824.800 is with improves from 824.
 
 OpenVmTil * _Q_ ; 
-uint64 *_Dsp_ ; 
+//uint64 *_Dsp_ ; 
 
 int
 main ( int argc, char * argv [ ] )

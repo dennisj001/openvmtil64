@@ -258,8 +258,6 @@ void
 Compile_Set_DspReg_FromDataStackPointer ( )
 {
     //DBI_ON ;
-    //_Compile_MoveImm ( REG, DSP, IMM_B | REX_B | MODRM_B | DISP_B, 0, 0, ( uint64 ) & _Dsp_, CELL ) ;
-    //_Compile_Move_Rm_To_Reg ( DSP, DSP, 0 ) ;
     _Compile_GetRValue_FromLValue_ToReg ( DSP, ( byte* ) & _CfrTil_->DataStack->StackPointer ) ; // must use a pointer here since we need not the compile rvalue of the StackPointer but its runtime rvalue
     //DBI_OFF ;
 }
@@ -268,8 +266,6 @@ void
 Compile_Set_DataStackPointer_FromDspReg ( )
 {
     //DBI_ON ;
-    //_Compile_MoveImm ( REG, OREG, IMM_B | REX_B | MODRM_B | DISP_B, 0, 0, ( uint64 ) & _Dsp_, CELL ) ;
-    //_Compile_Move_Reg_To_Rm ( OREG, DSP, 0 ) ;
     _Compile_MoveReg_ToAddress_ThruReg ( DSP, ( byte* ) & _CfrTil_->DataStack->StackPointer, OREG ) ;
     //DBI_OFF ;
 }

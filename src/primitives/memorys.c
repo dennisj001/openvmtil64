@@ -103,7 +103,7 @@ CfrTil_Poke ( ) // =
         uint64 * nos = ( uint64* ) _Dsp_ [ - 1 ] ;
         * nos = ( uint64 ) tos ;
         _Dsp_ -= 2 ;
-        _CfrTil_->Set_DspReg_FromDataStackPointer ( ) ; // update DSP reg
+        //_CfrTil_->Set_DspReg_FromDataStackPointer ( ) ; // update DSP reg
     }
 }
 
@@ -118,7 +118,7 @@ CfrTil_AtEqual ( ) // !
     {
         *( int64* ) _Dsp_ [ - 1 ] = * ( int64* ) TOS ;
         _Dsp_ -= 2 ;
-        _CfrTil_->Set_DspReg_FromDataStackPointer ( ) ; // update DSP reg
+        //_CfrTil_->Set_DspReg_FromDataStackPointer ( ) ; // update DSP reg
     }
 }
 
@@ -135,7 +135,7 @@ CfrTil_Store ( ) // !
     {
         * ( int64* ) ( TOS ) = _Dsp_ [ - 1 ] ;
         _Dsp_ -= 2 ;
-        _CfrTil_->Set_DspReg_FromDataStackPointer ( ) ; // update DSP reg
+        //_CfrTil_->Set_DspReg_FromDataStackPointer ( ) ; // update DSP reg
     }
 }
 
