@@ -6,7 +6,7 @@ bno //BigNum
 // optimizeOff inlineOff
 // verbosity 2 = 
 Compiler Logic Int C User 
-: sp ; ///stack pause ;
+: sp ; //stack pause ;
 var: facTest fibTest Dsp ;
 
 // tail recursion from http://c2.com/cgi/wiki?TailCallOptimization
@@ -270,7 +270,7 @@ fibPTC2? ( REG n | REG fn, REG fn1, REG fn2 )
 ' fibPTC2? find wdiss
 fibPTC2? (20) dup p 6765 _assert //sp 
 c_syntaxOff
-"fibPTC2?" ffx 
+//"fibPTC?" ffx 
 sp
 
 : _fibn1 ( n -- TOS ) { n @ 2 < } { n @ } { n -- n @ _fibn1 n -- n @  _fibn1 + } ifElse ;
@@ -350,15 +350,15 @@ C
     "no locals _fib3 : " ps 1 ti m 1 = { m @ n @ < } { m @ _fib3 p m ++ } while 1 time nl nl
 ;
 : tfib3 ( n | m )  
-    "Cfib2_O3       : " ps 1 ti m 1 = { m @ n @ < } { m @ cfib2_O3 p m ++ } while 1 time nl nl
-    "locals fibPTC? : " ps 1 ti m 1 = { m @ n @ < } { m @ fibPTC p m ++ } while 1 time nl nl
-    "locals fibPTC2? : " ps 1 ti m 1 = { m @ n @ < } { m @ fibPTC2 p m ++ } while 1 time nl nl
+    "Cfib2_O3       : " ps 1 ti m 1 = { m @ n @ <= } { m @ cfib2_O3 p m ++ } while 1 time nl nl
+    "locals fibPTC? : " ps 1 ti m 1 = { m @ n @ <= } { m @ fibPTC? p m ++ } while 1 time nl nl
+    "locals fibPTC2? : " ps 1 ti m 1 = { m @ n @ <= } { m @ fibPTC2? p m ++ } while 1 time nl nl
 ;
-//' tfib1 find d: wdiss sp
+//' tfib1 find d: wdiss sp pause
 30 tfib1
 30 tfib2
-' tfib3 find wdiss 
-93 tfib3 //sp
+' tfib3 find wdiss //pause
+92 tfib3 //sp
 : fibx ( n ) { n @ 0 >= } { n @ _fib p n -- } while ;
 : fibx2 ( n | m ) "fibonacci" ps n @ p ":" ps m 0 = { m @ n @ < n @ <= } { m @ n @ < _fib2 p m ++ } while ;
 // : fibx3 ( n | m ) "fibonacci" ps n @ p ":" ps m 0 = { m @ n @ < n @ <= } { m @ n @ < _fib3 p m ++ } while ;

@@ -104,7 +104,7 @@ GetPostfix ( byte * address, byte* postfix, byte * buffer )
     }
     else
     {
-        str = String_CheckForAtAdddress ( ( byte* ) ( address + 2 ) ) ;
+        str = String_CheckForAtAdddress ( *(( byte ** ) ( address + 2 )) ) ;
         if ( str )
         {
             snprintf ( ( char* ) buffer, 128, "%s%s", prePostfix, str ) ;

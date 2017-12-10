@@ -324,7 +324,7 @@ Word *_Class_Object_New(byte *name, uint64 category);
 Namespace *_Class_New(byte *name, uint64 type, int64 cloneFlag);
 Word *_CfrTil_ClassField_New(byte *token, Class *aclass, int64 size, int64 offset);
 Word *_CfrTil_Variable_New(byte *name, int64 value);
-void _CfrTil_Label(byte *lname);
+byte *_CfrTil_Label(byte *lname);
 Word *_CfrTil_LocalWord(byte *name, int64 index, int64 ctype);
 int64 ParameterVarOffset(Word *word);
 Word *CfrTil_LocalWord(byte *name, int64 ctype);

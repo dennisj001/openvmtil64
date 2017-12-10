@@ -128,8 +128,6 @@ Compiler
 //: word ( name block ) name @ create block @ _semi ;  // works but it is 10 bytes more code
 //'word find wdis //pause
 ":" { compileModeOn sourceCodeInit token create begin } word // immediate // begin is not an immediate word
-: simple ( a b c ) a @ p b @ p c @ p ; //'simple find wdis 
-1 2 3 simple //pause
 
 Class
 '_new 'new find alias prefix
@@ -365,88 +363,13 @@ sp
 //Zenfone2 1 =
 //mem pause
 : sh _sh ; prefix
-//dbgOff
-dbgOn
+dbgOff
+//dbgOn
 Root 'doScript 1 const
 #if dbgOnVar @ 
-//testCfrTil
-//demo dT0
+testCfrTil demo dT0
 stringMacrosOff
+: simple ( a b c ) a @ p b @ p c @ p ; //'simple find wdis 
+1 2 3 simple //pause
 #endif
-//using pause
 2 + 7  assertStkChk // stack checking
-s
-dbgOff
-#endif
-: argsOrderExample ( a b c d ) a @ p b @ p c @ p d @ p ; "\n 1 2 3 4 argsOrderExample ( a b c d )  => " ps   1 2 3 4 argsOrderExample 
-mp
-decimal
-
-#if 1
-: fac ( n  | rec1 -- TOS ) 
-    rec1 1 = 
-    { n @ 1 > } { n @ rec1 @ * rec1 store n -- } while 
-    rec1 @ 
-;
-' fac find wdiss
-7 fac dup p 5040 _assert0
-Lisp 
-"lambda" tick _lambda find alias immediate
-( ( lambda ( x y ) ( + x y ) ) 3 4 ) 
-#if 1
-BigNum
-(define yfac (lambda (yy n) (if* (< n 2) (1) (* n (yy yy (- n 1)))))) 
-(yfac yfac 10) nl
-(define yfacc (lambda (yyy n1) (if* (< n1 2) (1) (* n1 (yyy yyy (- n1 1)))))) 
-(yfacc yfacc 10) nl
-(yfacc yfacc 700) nl //pause
-(define fibc (lambda ( n ) (ifElse (< n 2) n (+ (fibc (- n 1)) (fibc (- n 2))))))
-(fibc 20)
-sp
-lispOff
-bno
-#endif
-#endif
-mem
-s
-c_syntaxOn
-dscOn
-//BigNum
-int
-fibPTC2? ( REG n | REG fn, REG fn1, REG fn2 )
-//fibPTC2? ( n | fn, fn1, fn2 )
-//fibPTC2? ( n ) //| fn, fn1, fn2 )
-{
-    //int fn, fn1, fn2 ;
-    for ( fn = 0, fn1 = 0, fn2 = 1 ; n ; n -- ) 
-    {   
-        fn1 = fn2 ;
-        fn2 = fn ;
-        fn = fn1 + fn2 ; 
-    }
-    return fn ;
-}
-dscOff
-fibPTC2? (20) p 
-//bno
-' fibPTC2? find wdiss
-fibPTC2? (20) dup p 6765 _assert //sp 
-fibPTC2? (75) p
-c_syntaxOff
-//verbosity 3 =
-//s: fibBN ( REG n | REG fn REG fn1 REG fn2 ) 
-s: fibBN ( REG n | REG fn REG fn1 REG fn2 ) 
-    //{ svn n @ = fn 0 = fn1 0 = fn2 1 = } { n @ 0 > } { n 1 -= } 
-    { fn 0 = fn1 0 = fn2 1 = } { n @ 0 > } { n 1 -= } 
-    {   
-        fn1 fn2 @ = 
-        fn2 fn @ = 
-        fn fn1 @ fn2 @ + = 
-    }
-    for
-    //nl svn @ p ":" ps fn @ p
-    return fn
-;s
-' fibBN find wdiss
-20 fibBN dup p 6765 _assert //pause
-s

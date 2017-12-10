@@ -20,15 +20,16 @@ CfrTil_EndCombinator ( int64 quotesUsed, int64 moveFlag )
     BlockInfo *bi = ( BlockInfo * ) _Stack_Pick ( compiler->CombinatorBlockInfoStack, quotesUsed - 1 ) ; // -1 : remember - stack is zero based ; stack[0] is top
     compiler->BreakPoint = Here ;
     _CfrTil_InstallGotoCallPoints_Keyed ( ( BlockInfo* ) bi, GI_CONTINUE | GI_BREAK ) ; //| GI_LABEL ) ;
-    if ( moveFlag && GetState ( _CfrTil_, INLINE_ON ) )
+    if ( moveFlag ) //&& GetState ( _CfrTil_, INLINE_ON ) )
     {
         byte * qCodeStart ;
         if ( bi->FrameStart ) 
             qCodeStart = bi->bp_First ; // after the stack frame
         else qCodeStart = bi->ActualCodeStart ;
         Block_Copy ( qCodeStart, bi->CombinatorStartsAt, Here - bi->CombinatorStartsAt ) ;
+        //_CfrTil_InstallGotoCallPoints_Keyed ( ( BlockInfo* ) bi, GI_GOTO ) ; //| GI_LABEL ) ;
     }
-    _CfrTil_InstallGotoCallPoints_Keyed ( ( BlockInfo* ) bi, GI_GOTO ) ; //| GI_LABEL ) ;
+    _CfrTil_InstallGotoCallPoints_Keyed ( ( BlockInfo* ) bi, GI_GOTO | GI_LABEL ) ; //| GI_LABEL ) ;
     _Stack_DropN ( compiler->CombinatorBlockInfoStack, quotesUsed ) ;
     if ( GetState ( compiler, LISP_COMBINATOR_MODE ) )
     {
@@ -111,13 +112,15 @@ CfrTil_LoopCombinator ( )
     DataStack_DropN ( 1 ) ;
     if ( CompileMode )
     {
+        
         CfrTil_BeginCombinator ( 1 ) ;
         byte * start = Here ;
-        _CfrTil_Label ( "start" ) ;
+        //byte * startString = _CfrTil_Label ( "start" ) ;
         compiler->ContinuePoint = start ;
         Block_CopyCompile ( ( byte* ) loopBlock, 0, 0 ) ;
         //_Compile_JumpToAddress ( start ) ;
-        _CfrTil_Goto ( "start" ) ;
+        //_CfrTil_Goto ( startString ) ;
+        _Compile_JumpToAddress ( start ) ;
         d0 ( _Debugger_Disassemble ( _Debugger_, start, 256, 0 ) ) ;
         CfrTil_EndCombinator ( 1, 1 ) ;
     }
@@ -139,7 +142,7 @@ CfrTil_WhileCombinator ( )
     {
         CfrTil_BeginCombinator ( 2 ) ;
         byte * start = Here ;
-        _CfrTil_Label ( "start" ) ;
+        //byte * startString = _CfrTil_Label ( "start" ) ;
         compiler->ContinuePoint = Here ;
         d0 ( if ( Is_DebugModeOn ) Compiler_Show_WordList ( ( byte* ) "\nCheckOptimize : after optimize :" ) ) ;
         if ( ! Block_CopyCompile ( ( byte* ) testBlock, 1, 1 ) )
@@ -148,8 +151,8 @@ CfrTil_WhileCombinator ( )
             return 0 ;
         }
         Block_CopyCompile ( ( byte* ) trueBlock, 0, 0 ) ;
-        //_Compile_JumpToAddress ( start ) ;
-        _CfrTil_Goto ( "start" ) ;
+        _Compile_JumpToAddress ( start ) ;
+        //_CfrTil_Goto ( startString ) ;
         CfrTil_CalculateAndSetPreviousJmpOffset_ToHere ( ) ;
         CfrTil_EndCombinator ( 2, 1 ) ;
     }
@@ -175,7 +178,7 @@ CfrTil_DoWhileCombinator ( )
     {
         CfrTil_BeginCombinator ( 2 ) ;
         byte * start = Here ;
-        _CfrTil_Label ( "start" ) ;
+        //byte * startString = _CfrTil_Label ( "start" ) ;
         compiler->ContinuePoint = Here ;
         Block_CopyCompile ( ( byte* ) doBlock, 1, 0 ) ;
         if ( ! Block_CopyCompile ( ( byte* ) testBlock, 0, 1 ) )
@@ -183,8 +186,8 @@ CfrTil_DoWhileCombinator ( )
             SetHere ( start ) ;
             return 0 ;
         }
-        //_Compile_JumpToAddress ( start ) ;
-        _CfrTil_Goto ( "start" ) ;
+        _Compile_JumpToAddress ( start ) ;
+        //_CfrTil_Goto ( startString ) ;
         CfrTil_CalculateAndSetPreviousJmpOffset_ToHere ( ) ;
         CfrTil_EndCombinator ( 2, 1 ) ;
     }
@@ -382,7 +385,8 @@ CfrTil_ForCombinator ( )
         CfrTil_BeginCombinator ( 4 ) ;
         Block_CopyCompile ( ( byte* ) doPreBlock, 3, 0 ) ;
 
-        _CfrTil_Label ( "start" ) ;
+        byte * start = Here ;
+        //byte * startString = _CfrTil_Label ( "start" ) ;
 
         Block_CopyCompile ( ( byte* ) testBlock, 2, 1 ) ;
 
@@ -393,7 +397,8 @@ CfrTil_ForCombinator ( )
         d0 ( Compiler_Show_WordList ( ( byte* ) "for combinator : before doPostBlock" ) ) ;
         Block_CopyCompile ( ( byte* ) doPostBlock, 1, 0 ) ;
 
-        _CfrTil_Goto ( "start" ) ;
+        //_CfrTil_Goto ( startString ) ;
+        _Compile_JumpToAddress ( start ) ;
 
         CfrTil_CalculateAndSetPreviousJmpOffset_ToHere ( ) ;
 

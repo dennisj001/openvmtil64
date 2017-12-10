@@ -33,12 +33,12 @@ nl 10 abrk0 sp
         label: hi 
         "ct0 before goto/label works" ps nl 
         goto: leave 
-        return 
+        //return 
     } _
     { j 1 = } { j @ n @ <= } { j ++ }
     {
        n @ p j @ p 
-       { n @ j @ == } { nl "testing ct0 : goto/label ->" ps goto: hi } { "continuing ct0" ps } ifElse
+       { n @ j @ == } { nl "testing ct0 : goto/label \'hi\' ->" ps goto: hi } { "continuing ct0" ps } ifElse
     }
     for
     label: leave 

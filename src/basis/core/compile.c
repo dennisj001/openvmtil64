@@ -53,7 +53,7 @@ void
 _AdjustGotoInfo ( dlnode * node, int64 originalAddress )
 {
     GotoInfo * gotoInfo = ( GotoInfo* ) node ;
-    if ( gotoInfo->CompileAtAddress == ( byte* ) originalAddress )
+    if (( gotoInfo->CompileAtAddress == ( byte* ) originalAddress ) ) //&& (gotoInfo->GI_CAttribute != GI_LABEL )) 
     {
         gotoInfo->CompileAtAddress = Here ;
         gotoInfo->pb_JmpOffsetPointer = Here + 1 ;
@@ -64,7 +64,7 @@ void
 AdjustJmpOffsetPointer ( dlnode * node, int64 address )
 {
     GotoInfo * gi = ( GotoInfo * ) node ;
-    if ( gi->pb_JmpOffsetPointer == ( byte* ) address ) 
+    if ( ( gi->pb_JmpOffsetPointer == ( byte* ) address ) ) //&& ( gi->GI_CAttribute != GI_GOTO ) )
         gi->pb_JmpOffsetPointer = Here + 1 ;
 }
 

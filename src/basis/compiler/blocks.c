@@ -13,7 +13,7 @@ _Block_Eval ( block blck )
 void
 _Block_Copy ( byte * srcAddress, int64 bsize, int8 optFlag )
 {
-    byte * saveHere = Here, * saveAddress = srcAddress ;
+    byte * saveHere = Here, * saveAddress = srcAddress, *end = srcAddress + bsize ;
     ud_t * ud = Debugger_UdisInit ( _Debugger_ ) ;
     int64 isize, left ;
 
@@ -65,9 +65,9 @@ _Block_Copy ( byte * srcAddress, int64 bsize, int8 optFlag )
             }
             else //if ( offset == 0 ) //signature of a goto point
             {
-                if ( optFlag ) continue ;
+                if ( optFlag ) continue ; // don't copy a jmp 0 offset
                 //_CfrTil_AdjustGotoPoint ( ( int64 ) srcAddress ) ;
-                dllist_Map1 ( _Context_->Compiler0->GotoList, ( MapFunction1 ) _AdjustGotoInfo, ( int64 ) srcAddress ) ;
+                dllist_Map1 ( _Context_->Compiler0->GotoList, ( MapFunction1 ) _AdjustGotoInfo, ( int64 ) srcAddress ) ; //, ( int64 ) end ) ;
                 //dllist_Map1 ( _Context_->Compiler0->GotoList, ( MapFunction1 ) AdjustJmpOffsetPointer, ( int64 ) ( srcAddress + 1 ) ) ;
 
             }
@@ -135,7 +135,7 @@ Block_CopyCompile_WithLogicFlag ( byte * srcAddress, int64 bindex, int64 jccFlag
             Compile_JCC ( negFlag, ZERO_TTT, 0 ) ;
         }
         _Context_->CurrentlyRunningWord = svcrw ;
-        Stack_PointerToJmpOffset_Set ( );
+        Stack_PointerToJmpOffset_Set ( ) ;
     }
     return 1 ;
 }
@@ -261,7 +261,7 @@ Boolean
 _Compiler_IsFrameNecessary ( Compiler * compiler )
 {
     //return ( compiler->NumberOfLocals + compiler->NumberOfArgs ) > compiler->NumberOfRegisterVariables ; 
-    return ( compiler->NumberOfLocals + compiler->NumberOfArgs ) > (compiler->NumberOfRegisterLocals + compiler->NumberOfRegisterArgs) ;
+    return ( compiler->NumberOfLocals + compiler->NumberOfArgs ) > ( compiler->NumberOfRegisterLocals + compiler->NumberOfRegisterArgs ) ;
 }
 
 void

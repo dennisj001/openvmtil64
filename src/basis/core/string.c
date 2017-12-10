@@ -808,7 +808,7 @@ byte *
 String_CheckForAtAdddress ( byte * address )
 {
 #if 1    
-    byte *string = 0, buffer [128] ; // use a string buffer instead ??
+    byte *string = 0 ; //, * address = (byte*) caddress ;
     //if ( ( address > ( byte* ) 0xf00000000000 ) )
     {
         if ( NamedByteArray_CheckAddress ( _Q_->MemorySpace0->StringSpace, address ) || NamedByteArray_CheckAddress ( _Q_->MemorySpace0->CompilerTempObjectSpace, address ) ||
@@ -817,6 +817,7 @@ String_CheckForAtAdddress ( byte * address )
         {
             if ( IsString ( address ) )
             {
+                byte buffer [128] ; // use a string buffer instead ??
                 snprintf ( ( char* ) buffer, 128, "< string : \'%s\' >", c_gd ( String_ConvertToBackSlash ( address ) ) ) ;
                 string = String_New ( buffer, TEMPORARY ) ;
             }

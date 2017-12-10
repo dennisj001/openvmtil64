@@ -92,7 +92,7 @@ DataStack_Overflow ( )
 inline int64
 DataStack_Underflow ( )
 {
-    return ( _Dsp_ < _DataStack_->StackMin ) ;
+    return ( _Dsp_ < _DataStack_->InitialTosPointer ) ;
 }
 
 void

@@ -266,6 +266,7 @@ void
 CfrTil_RightBracket ( )
 {
     SetState ( _Context_->Compiler0, COMPILE_MODE, true ) ;
+    //Compiler_Init ( _Compiler_, 0 ) ;
 }
 
 void

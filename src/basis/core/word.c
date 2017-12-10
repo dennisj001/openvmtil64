@@ -92,6 +92,7 @@ _Word_Interpret ( Word * word )
 void
 _Word_Compile ( Word * word )
 {
+    Set_SCA (0); 
     if ( ! word->Definition )
     {
         CfrTil_SetupRecursiveCall ( ) ;
@@ -139,7 +140,7 @@ _Word_Finish ( Word * word )
 {
     _DObject_Finish ( word ) ;
     CfrTil_Word_FinishSourceCode ( _CfrTil_, word ) ;
-    Compiler_Init ( _Context_->Compiler0, 0 ) ; // not really necessary should always be handled by EndBlock ?? but this allows for some syntax errors with a '{' but no '}' ??
+    //Compiler_Init ( _Context_->Compiler0, 0 ) ; // not really necessary should always be handled by EndBlock ?? but this allows for some syntax errors with a '{' but no '}' ??
 }
 
 void
