@@ -58,7 +58,6 @@ _Block_Copy ( byte * srcAddress, int64 bsize, int8 optFlag )
         else if ( * srcAddress == JMPI32 )
         {
             int64 offset = * ( int32* ) ( srcAddress + 1 ) ; // 1 : 1 byte opCode
-            //byte * jcAddress = JumpCallInstructionAddress ( srcAddress ) ;
             if ( offset != 0 )
             {
                 dllist_Map1 ( _Context_->Compiler0->GotoList, ( MapFunction1 ) AdjustJmpOffsetPointer, ( int64 ) ( srcAddress + 1 ) ) ;
@@ -66,9 +65,7 @@ _Block_Copy ( byte * srcAddress, int64 bsize, int8 optFlag )
             else //if ( offset == 0 ) //signature of a goto point
             {
                 if ( optFlag ) continue ; // don't copy a jmp 0 offset
-                //_CfrTil_AdjustGotoPoint ( ( int64 ) srcAddress ) ;
                 dllist_Map1 ( _Context_->Compiler0->GotoList, ( MapFunction1 ) _AdjustGotoInfo, ( int64 ) srcAddress ) ; //, ( int64 ) end ) ;
-                //dllist_Map1 ( _Context_->Compiler0->GotoList, ( MapFunction1 ) AdjustJmpOffsetPointer, ( int64 ) ( srcAddress + 1 ) ) ;
 
             }
         }
@@ -153,15 +150,10 @@ BlockInfo_Set_tttn ( BlockInfo * bi, int8 ttt, int8 n, int8 overWriteSize )
 {
     bi->LogicCode = Here ; // used by combinators
     Word * word = Compiler_WordList ( 1 ) ; //_Context_->CurrentlyRunningWord ;
-    //bi->LogicCodeWord = word ; //= Compiler_WordList ( 1 ) ; //_Context_->CurrentlyRunningWord ;
     bi->LogicCodeWord = word ; //_Context_->CurrentlyRunningWord ;
     bi->Ttt = ttt ;
     bi->NegFlag = n ;
-#if 0 //NEW_CALL_RETURN      
-    bi->OverWriteSize = 26 ; //overWriteSize ;
-#else    
     bi->OverWriteSize = overWriteSize ;
-#endif    
 }
 
 BlockInfo *

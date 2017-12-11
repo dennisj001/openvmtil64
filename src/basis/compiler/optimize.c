@@ -845,10 +845,18 @@ _CheckOptimizeOperands ( Compiler * compiler, int64 maxOperands )
                             }
                             else
                             {
-                                _Compile_GetVarLitObj_LValue_To_Reg ( optInfo->O_one, OREG ) ;
-                                _Compile_Move_Rm_To_Reg ( ACC, OREG, 0 ) ;
+                                if ( ! ( optInfo->O_one->CAttribute & REGISTER_VARIABLE ) )
+                                {
+                                    _Compile_GetVarLitObj_LValue_To_Reg ( optInfo->O_one, OREG ) ;
+                                    _Compile_Move_Rm_To_Reg ( ACC, OREG, 0 ) ;
+                                    optInfo->UseReg = OREG ;
+                                }
+                                else
+                                {
+                                    _Compile_GetVarLitObj_LValue_To_Reg ( optInfo->O_one, ACC ) ;
+                                    //optInfo->UseReg = ACC ;
+                                }
                                 _GetRmDispImm ( optInfo, optInfo->O_two, - 1 ) ;
-                                optInfo->UseReg = OREG ;
                                 optInfo->Optimize_Reg = ACC ;
                             }
                             return (i | OPTIMIZE_RESET ) ;
@@ -864,7 +872,7 @@ _CheckOptimizeOperands ( Compiler * compiler, int64 maxOperands )
                         int8 reg ;
                         if ( ( optInfo->O_zero->Definition == CfrTil_DivideEqual ) ) reg = ACC ; // div always uses RAX/RDX
                         else reg = ACC ;
-                        if ( ! (optInfo->O_two->CAttribute & REGISTER_VARIABLE )) _Compile_GetVarLitObj_LValue_To_Reg ( optInfo->O_two, reg ) ;
+                        if ( ! ( optInfo->O_two->CAttribute & REGISTER_VARIABLE ) ) _Compile_GetVarLitObj_LValue_To_Reg ( optInfo->O_two, reg ) ;
                         _GetRmDispImm ( optInfo, optInfo->O_two, - 1 ) ;
                         Set_SCA ( 1 ) ;
                         _GetRmDispImm ( optInfo, optInfo->O_one, - 1 ) ;
@@ -1210,7 +1218,7 @@ CheckOptimize ( Compiler * compiler, int64 maxOperands )
     if ( GetState ( _CfrTil_, OPTIMIZE_ON ) )
     {
         SetState ( _CfrTil_, IN_OPTIMIZER, true ) ;
-        d0 ( if ( Is_DebugModeOn ) Compiler_Show_WordList ( ( byte* ) "\nCheckOptimize : before optimize :" ) ) ;
+        d1 ( if ( Is_DebugModeOn ) Compiler_Show_WordList ( ( byte* ) "\nCheckOptimize : before optimize :" ) ) ;
         Set_SCA ( 0 ) ;
         rtrn = _CheckOptimizeOperands ( compiler, maxOperands ) ;
 #if 0        
@@ -1230,7 +1238,7 @@ CheckOptimize ( Compiler * compiler, int64 maxOperands )
             }
             //Set_SCA ( 0 ) ;
         }
-        d0 ( if ( Is_DebugModeOn ) Compiler_Show_WordList ( ( byte* ) "\nCheckOptimize : after optimize :" ) ) ;
+        d1 ( if ( Is_DebugModeOn ) Compiler_Show_WordList ( ( byte* ) "\nCheckOptimize : after optimize :" ) ) ;
         SetState ( _CfrTil_, IN_OPTIMIZER, false ) ;
         SetState ( _Context_, ADDRESS_OF_MODE, false ) ;
     }

@@ -208,8 +208,9 @@ Compile_MultiplyEqual ( Compiler * compiler )
             // address is in R8
             // Compile_IMUL ( mod, rm, sib, disp, imm, size )
             //_Compile_IMULI ( cell mod, cell reg, cell rm, cell sib, cell disp, cell imm, cell size )
+            // a little convulted logic here ...
             if ( compiler->optInfo->UseReg ) _Compile_Move_Reg_To_Reg ( THRU_REG, compiler->optInfo->UseReg ) ;
-            else
+            else if ( ! ( compiler->optInfo->O_one->CAttribute & REGISTER_VARIABLE ) )
             {
                 _Compile_Move_Reg_To_Reg ( THRU_REG, ACC ) ;
                 _Compile_Move_Rm_To_Reg ( ACC, THRU_REG, 0 ) ;
@@ -225,12 +226,16 @@ Compile_MultiplyEqual ( Compiler * compiler )
             {
                 // address is in R8
                 //_Compile_IMUL_Reg ( cell mod, cell reg, cell rm, cell sib, cell disp )
-                //_Compile_IMUL ( compiler->optInfo->Optimize_Mod, compiler->optInfo->Optimize_Reg, compiler->optInfo->Optimize_Rm, REX_B | MODRM_B | DISP_B, 0,
-                //    compiler->optInfo->Optimize_Disp ) ;
                 Compile_MUL ( compiler->optInfo->Optimize_Mod, compiler->optInfo->Optimize_Rm, REX_B | MODRM_B | DISP_B, 0,
                     compiler->optInfo->Optimize_Disp, 0, CELL_SIZE ) ;
             }
-            _Compile_Move_Reg_To_Rm ( THRU_REG, ACC, 0 ) ;
+            if ( compiler->optInfo->UseReg ) _Compile_Move_Reg_To_Rm ( THRU_REG, ACC, 0 ) ;
+            else 
+            {
+                if ( compiler->optInfo->O_one->CAttribute & REGISTER_VARIABLE )
+                    _Compile_Move_Reg_To_Reg ( compiler->optInfo->O_one->RegToUse, ACC ) ;
+                else _Compile_Move_Reg_To_Rm ( THRU_REG, ACC, 0 ) ;
+            }
         }
         else
         {

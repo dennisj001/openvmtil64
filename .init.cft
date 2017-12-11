@@ -373,3 +373,17 @@ stringMacrosOff
 1 2 3 simple //pause
 #endif
 2 + 7  assertStkChk // stack checking
+c_syntaxOn dscOn
+int factorial( REG n | REG rec1 )
+{
+    rec1 = 1;
+    while ( n >= 2 )
+    {
+        rec1 *= (n--) ; 
+        //rec1 = rec1 * n-- ;
+    }
+    return rec1;
+} prefix
+c_syntaxOff dscOff
+'factorial find wdiss
+factorial (7) p //sp

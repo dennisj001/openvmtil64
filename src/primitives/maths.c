@@ -62,6 +62,7 @@ CfrTil_IncDec ( int64 op ) // +
                 if ( ! GetState ( compiler, INFIX_LIST_INTERPRET ) )
                 {
                     SetHere ( one->Coding ) ;
+                    _CfrTil_WordList_PushWord ( one ) ;
                     // ?? couldn't this stuff be done with _Interpret_C_Until_EitherToken ??
                     dllist * postfixList = List_New ( ) ;
                     List_Push_1Value_Node ( postfixList, currentWord, COMPILER_TEMP ) ;

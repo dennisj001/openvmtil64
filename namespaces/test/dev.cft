@@ -13,18 +13,17 @@ var: facTest fibTest Dsp ;
 c_syntaxOn dscOn
 int factorial( n | rec1 )
 {
-    //d: int 
     rec1 = 1;
     while ( n >= 2 )
     {
-        rec1 *= (n--) ; 
+        d: rec1 *= (n--) ; 
         //rec1 = rec1 * n-- ;
     }
     return rec1;
-}
+} prefix
 c_syntaxOff dscOff
 'factorial find wdiss
-7 factorial p //sp
+d: factorial (7) p pause //sp
 : factorial ( n  | fac -- TOS ) 
     fac 1 = 
     { n @ 1 > } { n @ fac @ * fac store n -- } while 

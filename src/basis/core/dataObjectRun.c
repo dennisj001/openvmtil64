@@ -32,6 +32,7 @@ _Namespace_Do_C_Type ( Namespace * ns )
                     _Namespace_ActivateAsPrimary ( ns ) ;
                     Word * word = Word_New ( token1 ) ;
                     word->Coding = Here ;
+                    //word->WAttribute = WT_PREFIX ;
                     _CfrTil_WordList_PushWord ( word ) ;
                     DataStack_Push ( ( int64 ) word ) ; // token1 is the function name 
                     CfrTil_RightBracket ( ) ; //Set_CompileMode ( true ) ; //SetState ( _Context_->Compiler0, COMPILE_MODE, true ) ;
