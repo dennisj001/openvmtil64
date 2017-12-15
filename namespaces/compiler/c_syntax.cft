@@ -126,22 +126,8 @@ interpret2 ( | atoken aword )
         {
             if ( atoken )
             {       
-#if 0
-                // printf ( "\n\ttoken = %s", atoken ) ; 
-                aword = find ( atoken ) ; 
-                if ( aword )
-                { 
-                    doMorphismWord ( aword ) ; // can do it all -- compile itself, c syntax, etc.
-                } 
-                // test comment here
-                else 
-                { 
-                    literalInterpret (atoken ) ;
-                } 
-#else
                 aword = tokenToWord ( atoken ) ;
                 doWord ( aword ) ;
-#endif
             }       
         }
     }
@@ -165,21 +151,8 @@ interpret2 ( | atoken aword )
         {
             if ( atoken )
             {       
-#if 0
-                // printf ( "\n\ttoken = %s", atoken ) ; 
-                aword = find ( atoken ) ; 
-                if ( aword )
-                { 
-                    doMorphismWord ( aword ) ; // can do it all -- compile itself, c syntax, etc.
-                } 
-                else 
-                { 
-                    literalInterpret (atoken ) ;
-                } 
-#else
                 aword = tokenToWord ( atoken ) ;
                 doWord ( aword ) ;
-#endif
             }       
         }
     }
@@ -199,7 +172,6 @@ fac4 ( n  | facc -- TOS )
     {
         facc = n -- * facc ;
     }
-    // p ( facc ) ;
     return ( facc ) ;
 }
 wdiss ( ' fac4 find ) ; 
@@ -217,12 +189,13 @@ nl heey1
 #if 1
 c_syntaxOn
 int
-faccs2 ( n | rec -- RAX ) 
+faccs2 ( n | rec ) 
 {
     for ( rec = 1 ; n > 1 ; n-- )
     { 
         rec = rec * n ; 
     } 
+    return rec ;
 }
 ' faccs2 find wdiss
 faccs2 ( 7 ) p 
@@ -243,21 +216,8 @@ interpret4 ( | atoken aword )
         {
             if ( atoken )
             {       
-#if 0
-                // printf ( "\n\ttoken = %s", atoken ) ; 
-                aword = find ( atoken ) ; 
-                if ( aword )
-                { 
-                    doMorphismWord ( aword ) ; // can do it all -- compile itself, c syntax, etc.
-                } 
-                else 
-                { 
-                    literalInterpret (atoken ) ;
-                } 
-#else
                 aword = tokenToWord ( atoken ) ;
                 doWord ( aword ) ;
-#endif
             }       
         }
     }
@@ -265,12 +225,13 @@ interpret4 ( | atoken aword )
 
 interpret4
 int
-faccs3 ( n | rec -- RAX ) 
+faccs3 ( n | rec ) 
 {
     for ( rec = 1 ; n > 1 ; n-- )
     { 
         rec = rec * n ; 
     } 
+    return rec ;
 }
 ' faccs3 find wdiss
 faccs3 ( 7 ) p //pause
@@ -463,9 +424,9 @@ $ ( | atoken, buffer, buffer1, Buffer buffer0 )
 #endif
 dscOff
 
-c_syntaxOff
 #if doScript
 "\n\nnew $ test\n" ps
+void
 '$ find wdiss //pause
 $etc/script ; 
 $etc/lispScript ; 
@@ -474,7 +435,8 @@ $ls -al . ;
 String
 $$ls -al /usr/local ; $$ls -al . ;
 //pause
-;d
+dscOff
+c_syntaxOff
 #endif
 
 #endif

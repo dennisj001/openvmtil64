@@ -245,3 +245,12 @@ _CfrTil_C_Infix_EqualOp ( Word * opWord )
     SetState ( compiler, C_INFIX_EQUAL, false ) ;
 }
 
+void
+CfrTil_SetInNamespaceFromBackground ()
+{
+    Context * cntx = _Context_ ;
+    if ( cntx->Compiler0->C_FunctionBackgroundNamespace ) _CfrTil_Namespace_InNamespaceSet ( cntx->Compiler0->C_FunctionBackgroundNamespace ) ;
+    else 
+    if ( cntx->Compiler0->C_BackgroundNamespace ) _CfrTil_Namespace_InNamespaceSet ( cntx->Compiler0->C_BackgroundNamespace ) ;
+}
+

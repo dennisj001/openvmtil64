@@ -645,7 +645,7 @@ typedef struct
     Word * ReturnVariableWord ;
     Word * CurrentWord, *CurrentWordCompiling, *CurrentCreatedWord ;
     Word * LHS_Word ; //, *OptimizeOffWord;
-    Namespace *C_BackgroundNamespace ; //, ** FunctionTypesArray ;
+    Namespace *C_BackgroundNamespace, *C_FunctionBackgroundNamespace ; //, ** FunctionTypesArray ;
     dllist * GotoList ;
     dllist * CurrentSwitchList ;
     dllist * RegisterParameterList ;

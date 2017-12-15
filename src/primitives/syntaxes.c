@@ -37,7 +37,8 @@ CfrTil_C_Syntax_Off ( )
     Namespace_SetAsNotUsing_MoveToTail ( ( byte* ) "Infix" ) ;
     Namespace_SetAsNotUsing_MoveToTail ( ( byte* ) "C_Syntax" ) ;
     //Namespace_DoNamespace ( "Bits" ) ; // TODO : must be a better way
-    if ( cntx->Compiler0->C_BackgroundNamespace ) _CfrTil_Namespace_InNamespaceSet ( cntx->Compiler0->C_BackgroundNamespace ) ;
+    CfrTil_SetInNamespaceFromBackground () ;
+    //if ( cntx->Compiler0->C_BackgroundNamespace ) _CfrTil_Namespace_InNamespaceSet ( cntx->Compiler0->C_BackgroundNamespace ) ;
     Ovt_AutoVarOff ( ) ;
 }
 
@@ -93,7 +94,7 @@ CfrTil_End_C_Block ( )
         word->W_NumberOfArgs = compiler->NumberOfArgs ;
         word->W_NumberOfLocals = compiler->NumberOfLocals ;
     }
-    _CfrTil_Namespace_InNamespaceSet ( cntx->Compiler0->C_BackgroundNamespace ) ;
+    CfrTil_SetInNamespaceFromBackground () ;
 }
 
 void

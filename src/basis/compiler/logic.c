@@ -132,11 +132,11 @@ Compile_Cmp_Set_tttn_Logic ( Compiler * compiler, int64 ttt, int64 negateFlag )
     }
     else
     {
-        _Compile_Move_StackN_To_Reg ( OREG, DSP, 0 ) ;
+        _Compile_Move_StackN_To_Reg ( OP_REG, DSP, 0 ) ;
         _Compile_Move_StackN_To_Reg ( ACC, DSP, - 1 ) ;
         // must do the DropN before the CMP because CMP sets eflags 
         _Compile_Stack_DropN ( DSP, 2 ) ; // before cmp 
-        Compile_CMP ( REG, REG, ACC, OREG, 0, 0, CELL ) ;
+        Compile_CMP ( REG, REG, ACC, OP_REG, 0, 0, CELL ) ;
     }
     _Compile_SET_tttn_REG ( ttt, negateFlag, ACC ) ; // immediately after the 'cmp' insn which changes the flags appropriately
     _Compile_MOVZX_REG ( ACC ) ;
@@ -252,7 +252,7 @@ _Compile_LogicResult ( int64 reg )
 void
 _Compile_LogicalAnd ( Compiler * compiler )
 {
-    _Compile_TEST_Reg_To_Reg ( OREG, OREG ) ;
+    _Compile_TEST_Reg_To_Reg ( OP_REG, OP_REG ) ;
     _BlockInfo_Setup_BI_tttn ( _Context_->Compiler0, ZERO_TTT, NZ, 6 ) ; // not less than 0 == greater than 0
     Compile_JCC ( Z, ZERO_TTT, Here + 15 ) ; // if eax is zero return not(R8) == 1 else return 0
     _Compile_TEST_Reg_To_Reg ( ACC, ACC ) ;
@@ -277,7 +277,7 @@ Compile_LogicalAnd ( Compiler * compiler )
         Word *one = Compiler_WordList ( 1 ) ; // assumes two values ( n m ) on the DSP stack 
         if ( one->StackPushRegisterCode ) SetHere ( one->StackPushRegisterCode ) ;
         else _Compile_Stack_PopToReg ( DSP, ACC ) ;
-        _Compile_Stack_PopToReg ( DSP, OREG ) ;
+        _Compile_Stack_PopToReg ( DSP, OP_REG ) ;
         _Compile_LogicalAnd ( compiler ) ;
     }
 }
@@ -376,7 +376,7 @@ Compile_Logical_X ( Compiler * compiler, int64 op )
     {
         // TODO : this optimization somehow is *very* little used, why is that ?!? 
         // assumes we have unordered operands in eax, ecx
-        _Compile_X_Group1 ( op, REG, REG, ACC, OREG, 0, 0, CELL ) ;
+        _Compile_X_Group1 ( op, REG, REG, ACC, OP_REG, 0, 0, CELL ) ;
         _Compile_TEST_Reg_To_Reg ( ACC, ACC ) ;
         _BlockInfo_Setup_BI_tttn ( _Context_->Compiler0, ZERO_TTT, NZ, 6 ) ; // not less than 0 == greater than 0
         _Compiler_CompileAndRecord_PushAccum ( compiler ) ;

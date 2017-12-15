@@ -6,6 +6,12 @@ CfrTil_Here ( )
     DataStack_Push ( ( int64 ) Here ) ;
 }
 
+void
+CfrTil_Code ( )
+{
+    DataStack_Push ( ( int64 ) _Q_CodeByteArray ) ;
+}
+
 #if 0
 void
 CfrTil_Rsp ( )

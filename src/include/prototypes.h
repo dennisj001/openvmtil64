@@ -315,6 +315,7 @@ int64 _Interpret_Do_CombinatorLeftParen(void);
 void CfrTil_C_LeftParen(void);
 void CfrTil_InterpretNBlocks(int64 blocks, Boolean takesLParenAsBlockFlag);
 void _CfrTil_C_Infix_EqualOp(Word *opWord);
+void CfrTil_SetInNamespaceFromBackground(void);
 /* basis/core/dataObjectNew.c */
 Word *_DataObject_New(uint64 type, Word *word, byte *name, uint64 ctype, uint64 ctype2, uint64 ltype, int64 index, int64 value, int64 startCharRlIndex);
 byte *_CfrTil_NamelessObjectNew(int64 size, int64 allocType);
@@ -789,6 +790,7 @@ void _CfrTil_PrintDataStack(void);
 void CfrTil_PrintDataStack(void);
 void Set_DataStackPointer_FromDspReg(void);
 void Set_DspReg_FromDataStackPointer(void);
+void CfrTil_PrintReturnStack(void);
 void CfrTil_CheckInitDataStack(void);
 void CfrTil_DataStack_Size(void);
 /* basis/context.c */
@@ -1199,7 +1201,7 @@ byte *Buffer_New_pbyte(int64 size);
 /* basis/openVmTil.c */
 int main(int argc, char *argv[ ]);
 void openvmtil(int64 argc, char *argv[ ]);
-void _OpenVmTil(OpenVmTil *ovt, int64 argc, char *argv[ ]);
+void _OpenVmTil(int64 argc, char *argv[ ]);
 void _OpenVmTil_Run(OpenVmTil *ovt);
 OpenVmTil *_OpenVmTil_Allocate(void);
 void _OpenVmTil_Init(OpenVmTil *ovt, int64 resetHistory);
@@ -1625,6 +1627,7 @@ void CfrTil_ShellEscape(void);
 void OVT_Mem_ShowAllocated(void);
 /* primitives/compilers.c */
 void CfrTil_Here(void);
+void CfrTil_Code(void);
 void CompileCall(void);
 void CompileACfrTilWord(void);
 void CompileInt64(void);

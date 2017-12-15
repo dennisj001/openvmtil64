@@ -37,8 +37,8 @@
 
 // cfrTil uses intel syntax convention
 
+//C : sp stack pause ; 
 Compiler Compiling C Asm
-: sp ; //stack pause ; 
 : :asm compileModeOn sourceCodeInit token create begin ' {| find compileWord sourceCodeOn ; immediate  
 //: :asm compileModeOn sourceCodeInit token create begin ' {| find compileWord ; immediate  
 : asm; ' |} find compileWord semi ; immediate
@@ -61,22 +61,23 @@ int8
 _CalculateRex ( _reg rm sib operandSize )
 {
     //  0100    WRXB
-    int8 rex = 0 ;
-    if ( operandSize > 8 ) //INT32_SIZE )
-    {
-        rex = 8 ; // 1 << 3 ;
+    int8 rex = 8 ;
+    //if (( operandSize == 8 ) || (_reg > 0x7 ) || ( rm > 0x7 ) )
+    //{
+        //rex = 8 ; // 1 << 3 ;
         //byte rex = 0x48 ;
         if ( _reg > 0x7 ) rex += 4 ; // (1 << 2) ;
         if ( sib > 0x7 ) rex += 2 ; // 1 << 1 ;
         if ( rm > 0x7 ) rex += 1 ;
         if ( rex ) rex |= 0x40 ;
-    }
+    //}
     return rex ;
-}
+} prefix // prefix is not automatic with c syntax so they can be used like rpn words
 c_syntaxOff
 '_CalculateRex find wdiss //pause
 #endif
-
+infixOn // c_syntaxOff turns off infix
+//pause 
 : _Compile_ModRm ( mod _reg rm ) ( ( mod @ << 6 ) | ( ( _reg @ & 7 ) << 3 ) | ( rm @ & 7 ) ) 1,  ;; 
 //: _Compile_ModRm ( mod _reg rm ) ( ( mod @ << 6 ) | ( ( _reg @ & 7 ) << 3 ) | ( rm @ & 7 ) ) 1,  ;; 
 //' _Compile_ModRm find wdiss sp
@@ -105,24 +106,29 @@ c_syntaxOff
     { mod @ == 2 } { disp @ 4, } if
 ;; 
 
-// no sib yet -- sib has not been used here yet !
-: _Compile_InstructionX86 ( opCode modFlag mod _reg rm disp imm isize )
+// no sib yet -- sib has not been needed here yet !
+: _Compile_InstructionX64 ( opCode modFlag mod _reg rm disp imm isize | rex _here )
+    _here = here
+    rex = _CalculateRex ( _reg rm 0 isize ) 
+    { rex @ } { rex @ 1, } if2
     _Compile_OpCode ( opCode @ ) 
     { modFlag @ } { _Compile_ModRmDisp ( mod @, _reg @, rm @, disp @ ) } if
     { ( imm @ ) || ( isize @ ) } { _Compile_Imm ( imm @, isize @ ) } if
+    nl _here @ (here - (_here @)) dup p " : " ps dis
 ;;
+'_Compile_InstructionX64 find wdiss sp
 
 : _Compile_X86_OpModRegRmDisp ( opCode mod _reg rm disp )
-    _Compile_InstructionX86 ( opCode @, 1, mod @, _reg @, rm @, disp @, 0, 0 ) 
+    _Compile_InstructionX64 ( opCode @, 1, mod @, _reg @, rm @, disp @, 0, 0 ) 
 ;;
 
 : _Compile_X86_OpModRegRm ( opCode mod _reg rm )
-    _Compile_InstructionX86 ( opCode @, 1, mod @, _reg @, rm @, 0, 0, 0 ) 
+    _Compile_InstructionX64 ( opCode @, 1, mod @, _reg @, rm @, 0, 0, 0 ) 
 ;;
 
 : _Compile_Test (  mod, _reg, rm, disp, imm )
- // _Compile_InstructionX86 ( opCode modFlag mod _reg rm disp imm isize )
-    _Compile_InstructionX86 ( #xf7, 1, mod @, _reg @, rm @, disp @, imm @, CELL ) 
+ // _Compile_InstructionX64 ( opCode modFlag mod _reg rm disp imm isize )
+    _Compile_InstructionX64 ( #xf7, 1, mod @, _reg @, rm @, disp @, imm @, CELL ) 
 ;;
 
 : _Compile_Test_Imm (  mod, rm, disp, imm )
@@ -136,12 +142,12 @@ c_syntaxOff
 ;;
 : _Compile_Move ( toRegOrMem mod _reg rm disp | opCode ) 
     { toRegOrMem @ == REG } { opCode = #x8b } { opCode = #x89 } ifElse
-    _Compile_X86_OpModRegRmDisp ( opCode @, mod @, _reg @, rm @, disp @ ) // for improved testing, better is below ...
-    //_Compile_InstructionX86 ( opCode @, 1, mod @, _reg @, rm @, disp @, 0, 0 ) 
+    //_Compile_X86_OpModRegRmDisp ( opCode @, mod @, _reg @, rm @, disp @ ) // for improved testing, better is below ...
+    _Compile_InstructionX64 ( opCode @, 1, mod @, _reg @, rm @, disp @, 0, 0 ) 
 ;;
 
-: _Compile_Move_DataStackN_ToReg ( _reg n ) _Compile_Move ( REG, 0, _reg @, DSP, n @ * CELL ) ;; 
-: _Compile_MoveTOS_ToEAX () _Compile_Move_DataStackN_ToReg ( EAX, 0 ) ;; // _Compile_Move ( REG, 0, EAX, DSP, 0 ) 
+: _Compile_Move_DataStackN_ToReg ( _reg n ) _Compile_Move ( REG, 0, _reg @, DSP, n @ * CELL ) pause ;; 
+: _Compile_MoveTOS_To_R8D () _Compile_Move_DataStackN_ToReg ( R8D, 0 ) ;; // _Compile_Move ( REG, 0, EAX, DSP, 0 ) 
 
 : _Compile_Move_Reg_ToDataStackN ( n _reg ) _Compile_Move ( MEM, 1, _reg @, DSP, n @ * CELL ) ;; 
 
@@ -162,7 +168,7 @@ c_syntaxOff
     // we need to be able to set the size so we can know how big the instruction will be in eg. CompileVariable
     // otherwise it could be optimally deduced but let caller control by keeping operandSize parameter
     // some times we need cell_t even though a byte would work
-    _Compile_InstructionX86 ( opCode @, 1, mod @, code @, rm @, disp @, imm @, iSize @ ) 
+    _Compile_InstructionX64 ( opCode @, 1, mod @, code @, rm @, disp @, imm @, iSize @ ) 
 ;;
 // ' _Compile_Group1_Immediate find wdiss sp
 
@@ -188,8 +194,8 @@ c_syntaxOff
 
 #if 0 // needs REX support
 Combinators
-d: :asm iax
-    Compile_Stack_Pop_R8D ( ) 
+:asm iax
+    d: Compile_Stack_Pop_R8D ( ) 
     _Compile_CALL_Reg ( R8D ) 
 asm; 
 
@@ -201,7 +207,7 @@ User
 ' qeval find wdiss // sp
 
 :asm stest
-    _Compile_MoveTOS_ToR8D ( ) 
+    _Compile_MoveTOS_To_R8D ( ) 
     _Compile_Move_DataStackN_ToReg ( R8D, 0 ) 
     Compile_Stack_Push_R8D ( ) 
     _Compile_SUBI_DSP ( CELL ) 
@@ -211,7 +217,7 @@ asm;
 s
 "\nthis is some purposefully funky code for testing\n" ps
 
-#if 1 //dbOn @ not
+#if 0 //dbOn @ not
 s stest s //sp
 s
 nl "ia32 test" ps "ok" dup ' ps find xt@ qeval "ok" "error" assert1s 
@@ -219,7 +225,7 @@ nl "ia32 test" ps "ok" dup ' ps find xt@ qeval "ok" "error" assert1s
 
 Stack
 :asm ndup
-    _Compile_MoveTOS_ToR8D ( )
+    _Compile_MoveTOS_To_R8D ( )
     _Compile_SUBI_DSP ( CELL ) 
     _Compile_Move_DataStackN_ToReg ( R9D, 0 )
     "start" label 
@@ -260,4 +266,5 @@ Asm
 #endif
  
 infixOff
+//pause
 2 + 7 assertStkChk // stack checking

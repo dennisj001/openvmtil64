@@ -14,49 +14,6 @@ Compile_Plus ( Compiler * compiler )
     Compile_X_Group1 ( compiler, ADD, ZERO_TTT, NZ ) ;
 }
 
-#if 0
-
-void
-Compile_X_Group3 ( Compiler * compiler, int64 op )
-{
-    Word *zero = Compiler_WordStack ( 0 ) ; // refers to this current multiply insn word
-    if ( CheckOptimize ( compiler, 6 ) ) // 6 : especially for the factorial - qexp, bexp 
-    {
-        // Compile_IMUL ( mod, rm, sib, disp, imm, size )
-        // always uses R8 as the first operand and destination of the operation
-        if ( compiler->optInfo->OptimizeFlag & OPTIMIZE_IMM )
-        {
-            // IMULI : intel insn can't mult to tos in place must use reg ...
-            // _Compile_IMUL ( cell mod, cell reg, cell rm, cell sib, cell disp )
-            _Compile_Group3 ( op, compiler->optInfo->Optimize_Mod, ACC, REX_B | MODRM_B, compiler->optInfo->Optimize_Rm, 0, compiler->optInfo->Optimize_Disp,
-                compiler->optInfo->Optimize_Imm ) ;
-        }
-        else
-        {
-            //_Compile_IMUL ( cell mod, cell reg, cell rm, cell sib, cell disp )
-            _Compile_Group3 ( op, compiler->optInfo->Optimize_Mod, ACC, REX_B | MODRM_B, compiler->optInfo->Optimize_Rm, 0,
-                compiler->optInfo->Optimize_Disp ) ;
-        }
-        zero->StackPushRegisterCode = Here ;
-        _Compile_Stack_PushReg ( DSP, ACC ) ;
-    }
-    else
-    {
-        Compile_Pop_To_Acc ( DSP ) ;
-        //Compile_IMUL ( cell mod, cell reg, cell rm, sib, disp, imm, size )
-        _Compile_Group3 ( op, MEM, ACC, REX_B | MODRM_B, DSP, 0, 0 ) ;
-        //zero->StackPushRegisterCode = Here ;
-        Compile_Move_ACC_To_TOS ( DSP ) ;
-    }
-}
-
-void
-Compile_Multiply ( Compiler * compiler )
-{
-    Compile_X_Group3 ( compiler, MUL ) ;
-}
-#endif
-
 void
 Compile_Multiply ( Compiler * compiler )
 {
@@ -75,6 +32,11 @@ Compile_Multiply ( Compiler * compiler )
             compiler->optInfo->Optimize_Reg = compiler->optInfo->Optimize_DstReg ;
         }
         if ( compiler->optInfo->Optimize_DstReg != ACC ) _Compile_Move_Reg_To_Reg ( ACC, compiler->optInfo->Optimize_DstReg ) ;
+        if ( compiler->optInfo->OptimizeFlag & OPTIMIZE_IMM )
+        {
+            _Compile_MoveImm_To_Reg ( OP_REG, ( int64 ) compiler->optInfo->Optimize_Imm, CELL ) ;
+            compiler->optInfo->Optimize_Rm = OP_REG ;
+        }
         Compile_MUL ( compiler->optInfo->Optimize_Mod, compiler->optInfo->Optimize_Rm, REX_B | MODRM_B | DISP_B, 0,
             compiler->optInfo->Optimize_Disp, 0, CELL_SIZE ) ;
         if ( compiler->optInfo->Optimize_DstReg != ACC ) _Compile_Move_Reg_To_Reg ( compiler->optInfo->Optimize_DstReg, ACC ) ;
@@ -95,7 +57,6 @@ Compile_Multiply ( Compiler * compiler )
     }
     //DBI_OFF ;
 }
-
 #define DIVIDE 1
 #define MOD 2
 // ( a b -- a / b ) dividend in edx:eax, quotient in eax, remainder in edx ; immediate divisor in ecx
@@ -183,11 +144,11 @@ Compile_Group1_X_OpEqual ( Compiler * compiler, int64 op ) // +=/-= operationCod
             // next :
             // EBX is used by compiler as register variable in some combinators
             _Compile_Move_StackN_To_Reg ( ACC, DSP, 0 ) ; // n
-            _Compile_Move_StackN_To_Reg ( OREG, DSP, - 1 ) ; // x
+            _Compile_Move_StackN_To_Reg ( OP_REG, DSP, - 1 ) ; // x
             Compile_SUBI ( REG, DSP, 0, 2 * CELL_SIZE, BYTE ) ;
             //Compile_ADD ( MEM, MEM, R8, ECX, 0, 0, CELL ) ;
             //_Compile_Group1 ( ADD, toRegOrMem, mod, reg, rm, sib, disp, isize )
-            _Compile_X_Group1 ( op, MEM, MEM, ACC, OREG, 0, 0, CELL ) ;
+            _Compile_X_Group1 ( op, MEM, MEM, ACC, OP_REG, 0, 0, CELL ) ;
         }
     }
 }
@@ -243,7 +204,7 @@ Compile_MultiplyEqual ( Compiler * compiler )
             //_Compile_IMUL ( MEM, ACC, DSP, REX_B | MODRM_B | DISP_B, 0, 0 ) ;
             Compile_MUL ( MEM, DSP, REX_B | MODRM_B | DISP_B, 0, 0, 0, CELL_SIZE ) ;
             _Compile_Stack_Drop ( DSP ) ;
-            _Compile_Move_Reg_To_StackNRm_UsingReg ( DSP, 0, ACC, OREG ) ;
+            _Compile_Move_Reg_To_StackNRm_UsingReg ( DSP, 0, ACC, OP_REG ) ;
         }
     }
 }
@@ -270,9 +231,9 @@ Compile_DivideEqual ( Compiler * compiler )
             // Compile_IDIV( mod, rm, sib, disp, imm, size )
             if ( compiler->optInfo->OptimizeFlag & OPTIMIZE_IMM )
             {
-                _Compile_MoveImm ( REG, OREG, IMM_B | REX_B | MODRM_B, 0, 0, compiler->optInfo->Optimize_Imm, CELL ) ;
+                _Compile_MoveImm ( REG, OP_REG, IMM_B | REX_B | MODRM_B, 0, 0, compiler->optInfo->Optimize_Imm, CELL ) ;
                 //Compile_IDIV ( REG, R9D, 0, 0, 0, 0, 0 ) ;
-                Compile_IDIV ( REG, OREG, 0, 0, 0, 0, 0 ) ;
+                Compile_IDIV ( REG, OP_REG, 0, 0, 0, 0, 0 ) ;
             }
             else
             {

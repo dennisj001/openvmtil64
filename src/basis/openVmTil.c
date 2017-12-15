@@ -1,6 +1,6 @@
 
 #include "../include/cfrtil64.h"
-#define VERSION ((byte*) "0.826.200" ) // 0.823.200 series is x86 ; the 0.823.300 series is x64 : 0.823.300.600+ series is with new x64 compiler
+#define VERSION ((byte*) "0.826.411" ) // 0.823.200 series is x86 ; the 0.823.300 series is x64 : 0.823.300.600+ series is with new x64 compiler
 // 824.800 is with improves from 824.
 
 OpenVmTil * _Q_ ; 
@@ -16,16 +16,16 @@ void
 openvmtil ( int64 argc, char * argv [ ] )
 {
     LinuxInit () ;
-    _OpenVmTil ( _Q_ = 0, argc, argv ) ;
+    _OpenVmTil ( argc, argv ) ;
 }
 
 void
-_OpenVmTil ( OpenVmTil * ovt, int64 argc, char * argv [ ] )
+_OpenVmTil ( int64 argc, char * argv [ ] )
 {
     int64 restartCondition = INITIAL_START ;
     while ( 1 )
     {
-        ovt = _Q_ = _OpenVmTil_New ( _Q_, argc, argv ) ;
+        OpenVmTil * ovt = _Q_ = _OpenVmTil_New ( _Q_, argc, argv ) ;
         ovt->RestartCondition = restartCondition ;
         if ( ! sigsetjmp ( ovt->JmpBuf0, 0 ) )
         {

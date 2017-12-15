@@ -352,27 +352,22 @@ Root
 OpenVmTil
 : lispOff "Lisp" notUsing ; //lcReset ;
 
-
 c_syntaxOff
 scOff
 
-stringMacrosOn
-System
-: testCfrTil "namespaces/init.cft" include ;
 sp 
-//Zenfone2 1 =
-//mem pause
 : sh _sh ; prefix
-dbgOff
-//dbgOn
 Root 'doScript 1 const
+stringMacrosOn
+: testCfrTil "namespaces/init.cft" include ;
+dbgOff
+dbgOn
 #if dbgOnVar @ 
-testCfrTil demo dT0
+System
+testCfrTil dT0 //demo dT0
 stringMacrosOff
 : simple ( a b c ) a @ p b @ p c @ p ; //'simple find wdis 
 1 2 3 simple //pause
-#endif
-2 + 7  assertStkChk // stack checking
 c_syntaxOn dscOn
 int factorial( REG n | REG rec1 )
 {
@@ -387,3 +382,7 @@ int factorial( REG n | REG rec1 )
 c_syntaxOff dscOff
 'factorial find wdiss
 factorial (7) p //sp
+#else
+// you can trim this file to your needs and put your personal init code here maybe
+#endif
+2 + 7  assertStkChk // stack checking

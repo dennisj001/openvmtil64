@@ -52,9 +52,9 @@ interpret2 ( | atoken aword )
     {   
         atoken = token () ; 
         printf ( "\n\ttoken = %s", atoken ) ; 
-        //_pause () ;
         if ( ! ( strcmp ( atoken, "i2halt" ) ) ) 
         { 
+            printf ( "%s", "\n\n\tinterpret2 exiting ..." ) ; 
             //_pause ();
             return ; 
         }

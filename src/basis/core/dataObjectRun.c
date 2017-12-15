@@ -28,6 +28,7 @@ _Namespace_Do_C_Type ( Namespace * ns )
                 token2 = Lexer_PeekNextNonDebugTokenWord ( lexer, 1 ) ;
                 if ( token2 [0] == '(' )
                 {
+                    cntx->Compiler0->C_FunctionBackgroundNamespace = cntx->Compiler0->C_BackgroundNamespace ;
                     SetState ( _Compiler_, C_COMBINATOR_PARSING, true ) ;
                     _Namespace_ActivateAsPrimary ( ns ) ;
                     Word * word = Word_New ( token1 ) ;
@@ -68,6 +69,7 @@ _Namespace_Do_C_Type ( Namespace * ns )
                         else _Lexer_ConsiderDebugAndCommentTokens ( token, 1, 0 ) ;
                     }
                     while ( 1 ) ;
+                    //cntx->Compiler0->C_FunctionBackgroundNamespace = cntx->Compiler0->C_BackgroundNamespace ;
                     //if ( cntx->Compiler0->C_BackgroundNamespace ) _CfrTil_Namespace_InNamespaceSet ( cntx->Compiler0->C_BackgroundNamespace ) ;
                     goto rtrn ;
                 }
@@ -308,7 +310,7 @@ _Do_Variable ( Word * word )
     }
     else
     {
-        if ( word->CAttribute & REGISTER_VARIABLE ) 
+        if ( word->CAttribute & REGISTER_VARIABLE )
         {
             _Compile_Stack_PushReg ( DSP, word->RegToUse ) ;
         }

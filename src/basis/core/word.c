@@ -92,7 +92,7 @@ _Word_Interpret ( Word * word )
 void
 _Word_Compile ( Word * word )
 {
-    Set_SCA (0); 
+    Set_SCA ( 0 ) ;
     if ( ! word->Definition )
     {
         CfrTil_SetupRecursiveCall ( ) ;
@@ -160,12 +160,13 @@ _Word_InitFinal ( Word * word, byte * code )
 void
 _Word_Add ( Word * word, int64 addToInNs, Namespace * addToNs )
 {
-    Namespace * ins = _CfrTil_Namespace_InNamespaceGet ( ), *ns ;
+    Namespace * ins = 0, *ns ;
     if ( addToNs ) Namespace_DoAddWord ( addToNs, word ) ;
-    else if ( addToInNs && ins )
+    else if ( addToInNs ) //&& ins )
     {
         if ( ! ( word->CAttribute & ( LITERAL ) ) )
         {
+            Namespace * ins = _CfrTil_Namespace_InNamespaceGet ( ), *ns ;
             Namespace_DoAddWord ( ins, word ) ;
         }
     }

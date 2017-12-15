@@ -1166,7 +1166,7 @@ _LO_Apply_ArgList ( ListObject * l0, Word * word )
         {
             _Compile_MoveImm_To_Reg ( RAX, 0, CELL ) ; // for printf ?? others //System V ABI : "%rax is used to indicate the number of vector arguments passed to a function requiring a variable number of arguments"
         }
-        _Compile_Call_ThruReg ( ( byte* ) word->Definition, OREG ) ; //printf needs RAX at 0, so generally use the operand reg (OREG) for all, why not?
+        _Compile_Call_ThruReg ( ( byte* ) word->Definition, OP_REG ) ; //printf needs RAX at 0, so generally use the operand reg (OREG) for all, why not?
         _DEBUG_SHOW ( word, 1 ) ;
         if ( ! svcm )
         {

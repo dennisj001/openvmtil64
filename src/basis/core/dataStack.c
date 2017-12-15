@@ -4,6 +4,7 @@
 // these functions are part of the C vm and can't be compiled
 // ! they are should only be called in C functions !
 #if ! DSP_IS_GLOBAL_REGISTER
+
 uint64
 DataStack_Pop ( )
 {
@@ -48,6 +49,7 @@ DataStack_Drop ( )
     _CfrTil_->Set_DspReg_FromDataStackPointer ( ) ; // update DSP reg
 }
 #else
+
 uint64
 DataStack_Pop ( )
 {
@@ -100,7 +102,7 @@ DataStack_Check ( )
 {
     if ( DataStack_Underflow ( ) || DataStack_Overflow ( ) )
     {
-        CfrTil_Exception (STACK_OVERFLOW, 0, QUIT ) ;
+        CfrTil_Exception ( STACK_OVERFLOW, 0, QUIT ) ;
     }
 }
 
@@ -109,7 +111,7 @@ DataStack_Depth ( )
 {
     if ( _Q_ && _CfrTil_ && _DataStack_ )
     {
-        _DataStackPointer_ =  _Dsp_ ;
+        _DataStackPointer_ = _Dsp_ ;
         return Stack_Depth ( _DataStack_ ) ;
     }
     return 0 ;
@@ -155,14 +157,16 @@ Set_DspReg_FromDataStackPointer ( )
     _CfrTil_->Set_DspReg_FromDataStackPointer ( ) ;
 }
 
-#if 0
+
 void
 CfrTil_PrintReturnStack ( )
 {
-    _CfrTil_->ReturnStack->StackPointer = _Rsp_ ;
-    _Stack_Print ( _CfrTil_->ReturnStack, ( byte* ) "ReturnStack" ) ;
+    //_CfrTil_->ReturnStack->StackPointer = _Rsp_ ;
+    //_Stack_Print ( _CfrTil_->ReturnStack, ( byte* ) "ReturnStack" ) ;
+    _CfrTil_PrintNReturnStack ( 8 ) ;
+    CfrTil_NewLine ( ) ;
+
 }
-#endif
 
 void
 CfrTil_CheckInitDataStack ( )

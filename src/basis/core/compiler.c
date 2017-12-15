@@ -265,7 +265,7 @@ Compiler_New ( uint64 type )
     compiler->InfixOperatorStack = Stack_New ( 32, type ) ;
     CompileOptInfo_New ( compiler, type ) ;
     compiler->RegOrder [ 0 ] = OREG2 ;
-    compiler->RegOrder [ 1 ] = OREG ;
+    compiler->RegOrder [ 1 ] = OP_REG ;
     Compiler_Init ( compiler, 0 ) ;
     return compiler ;
 }

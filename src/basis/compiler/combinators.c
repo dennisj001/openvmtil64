@@ -27,6 +27,7 @@ CfrTil_EndCombinator ( int64 quotesUsed, int64 moveFlag )
             qCodeStart = bi->bp_First ; // after the stack frame
         else qCodeStart = bi->ActualCodeStart ;
         Block_Copy ( qCodeStart, bi->CombinatorStartsAt, Here - bi->CombinatorStartsAt ) ;
+        //Block_Copy ( qCodeStart, bi->CombinatorStartsAt, bi->bp_Last - bi->CombinatorStartsAt ) ;
     }
     _CfrTil_InstallGotoCallPoints_Keyed ( ( BlockInfo* ) bi, GI_GOTO ) ;
     _Stack_DropN ( compiler->CombinatorBlockInfoStack, quotesUsed ) ;

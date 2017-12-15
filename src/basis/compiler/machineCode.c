@@ -75,7 +75,7 @@
 int8
 RegOrder ( int8 n )
 {
-    int8 regOrder [] = { RDI, RSI, RDX, RCX, ACC, OREG } ;
+    int8 regOrder [] = { RDI, RSI, RDX, RCX, ACC, OP_REG } ;
     return regOrder [n] ;
 }
 #endif
@@ -1019,7 +1019,7 @@ Compile_X_Group5 ( Compiler * compiler, int64 op )
         //_Compile_Group5 ( int64 code, int64 mod, int8 rm, int8 sib, int64 disp, int64 size )
         _Compile_Group5 ( op, REG, ACC, 0, 0, CELL_SIZE ) ;
         // ++ == += :: -- == -= so :
-        _Compile_SetVarLitObj_With_Reg ( one, ACC, OREG ) ;
+        _Compile_SetVarLitObj_With_Reg ( one, ACC, OP_REG ) ;
     }
     else
     {
@@ -1122,13 +1122,13 @@ void
 Compile_SetRegWithValue ( )
 {
     DBI_ON ;
-    _Compile_MoveImm ( REG, OREG, IMM_B | REX_B | MODRM_B | DISP_B, 0, 0, ( uint64 ) & _CfrTil_->ReturnStack->StackPointer, CELL ) ;
-    _Compile_Move_Rm_To_Reg ( CFT_RSP, OREG, 0 ) ; //runtime _CfrTil_->ReturnStack->StackPointer to OREG
+    _Compile_MoveImm ( REG, OP_REG, IMM_B | REX_B | MODRM_B | DISP_B, 0, 0, ( uint64 ) & _CfrTil_->ReturnStack->StackPointer, CELL ) ;
+    _Compile_Move_Rm_To_Reg ( CFT_RSP, OP_REG, 0 ) ; //runtime _CfrTil_->ReturnStack->StackPointer to OREG
     //_Compile_Move_Reg_To_Reg ( CFT_RSP, OREG ) ; 
     _Compile_Stack_PopToReg ( DSP, ACC ) ; // TOS is word->Definition 
     _Compile_Stack_Push ( CFT_RSP, ( uint64 ) Here + 20 ) ; // 5: sizeof (jmp 32)
     _Compile_Group5 ( JMP, REG, ACC, 0, 0, 0 ) ;
-    _Compile_Move_Reg_To_Rm ( OREG, CFT_RSP, 0 ) ;
+    _Compile_Move_Reg_To_Rm ( OP_REG, CFT_RSP, 0 ) ;
     DBI_OFF ;
 }
 
@@ -1213,8 +1213,8 @@ _Compile_JmpCall_Using_RStack ( byte * jmpToAddr )
     Compile_ADDI ( MEM, ACC, 0, CELL, BYTE ) ; // add 4 to Rsp
     Compile_ADDI ( REG, ACC, 0, CELL, BYTE ) ; // 
     //_Compile_Move_Reg_To_Reg ( int8 dstReg, int64 srcReg ) ;
-    _Compile_MoveImm_To_Reg ( OREG, Here + x, CELL ) ; // x : number of bytes to the first byte after the jmp instruction
-    _Compile_Move_Reg_To_Rm ( ACC, OREG, 0 ) ;
+    _Compile_MoveImm_To_Reg ( OP_REG, Here + x, CELL ) ; // x : number of bytes to the first byte after the jmp instruction
+    _Compile_Move_Reg_To_Rm ( ACC, OP_REG, 0 ) ;
     _Compile_JumpToAddress ( byte * jmpToAddr ) ;
 }
 
