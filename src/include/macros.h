@@ -264,7 +264,7 @@
 
 #define dobject_Get_M_Slot( dobj, m ) (((dobject*) dobj)->do_iData [m]) 
 #define dobject_Set_M_Slot( dobj, m, value ) (((dobject*) dobj)->do_iData [m] = ((int64)value) ) 
-#define List_Set_N_Node_M_Slot( list, n, m, value ) _dllist_Set_N_Node_M_Slot ( list, 0, 0, value ) 
+#define List_Set_N_Node_M_Slot( list, n, m, value ) _dllist_Set_N_Node_M_Slot ( list, n, m, value ) 
 #define List_Get_N_Node_M_Slot( list, n, m ) _dllist_Get_N_Node_M_Slot ( (dllist * )list, (int64) n, (int64) m )
 // List_* macros when not generic refer to a single valued node list
 #define List_Init( list ) _dllist_Init ( list )

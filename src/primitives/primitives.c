@@ -450,6 +450,7 @@ CPrimitive CPrimitives [] = {
     { "addToHistoryOff", OpenVmTil_AddStringToHistoryOff, 0, 0, 0, "OpenVmTil", "Root" },
     { "showAllocated", OVT_Mem_ShowAllocated, 0, 0, 0, "OpenVmTil", "Root" },
 
+    { "_dup", CfrTil_Dup, CATEGORY_DUP, 0, 0, "Stack", "Root" },
     { "dup", CfrTil_Dup, IMMEDIATE | CATEGORY_DUP, 0, 0, "Stack", "Root" },
     { "ndup", CfrTil_NDup, 0, 0, 0, "Stack", "Root" },
     { "drop", CfrTil_Drop, IMMEDIATE, 0, 0, "Stack", "Root" },

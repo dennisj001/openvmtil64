@@ -72,10 +72,10 @@ _OVT_Pause ( byte * prompt, int64 signalsHandled )
             _Q_->RestartCondition ) ;
         do
         {
-            if ( _Context_->CurrentlyRunningWord )
+            if ( _Debugger_->w_Word = _Context_->CurrentlyRunningWord )
             {
+                _CfrTil_ShowInfo ( _Debugger_, "\r", _Q_->Signal, 0 ) ;
                 _Debugger_->w_Word = 0 ;
-                _CfrTil_ShowInfo ( _Debugger_, "\r", _Q_->Signal, 1 ) ;
             }
             _Printf ( ( byte* ) "%s", buffer ) ;
 

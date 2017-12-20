@@ -590,7 +590,7 @@
 #define C_COMBINATOR_PARSING ( (uint64) 1 << 25 )
 #define INFIX_LIST_INTERPRET ( (uint64) 1 << 26 )
 #define COMPILER_WRAP_ON ( (uint64) 1 << 27 )
-#define C_BLOCK_PARSING ( (uint64) 1 << 28 )
+//#define C_BLOCK_PARSING ( (uint64) 1 << 28 )
 //#define C_FIRST_BLOCK ( (uint64) 1 << 20 )
 //#define MINUS_MINUS_MODE ( (uint64) 1 << 20 )
 //#define PLUS_PLUS_MODE ( (uint64) 1 << 21 )
@@ -711,7 +711,7 @@
 #define PP_SKIP 0
 #define PP_INTERPRET 1
 #define PP_INTERP PP_INTERPRET
-#define PP_ELSE 0
+#define PP_ELSE 2
 #define PP_ELIF 1
 
 #define CPU_SAVED    ( (uint64) 1 << 0 )

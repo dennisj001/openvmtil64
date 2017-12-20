@@ -51,4 +51,11 @@ hex
 "INC" 0x40 const
 "DEC" 0x48 const
 
+#define REX_B       ( 1 << 0 ) 
+#define MODRM_B     ( 1 << 1 ) // backwards compatibility
+#define SIB_B       ( 1 << 2 ) 
+#define DISP_B      ( 1 << 3 ) 
+#define IMM_B       ( 1 << 4 ) 
+#define REX_W_B       REX_B
+
 2 + 7 assertStkChk // stack checking

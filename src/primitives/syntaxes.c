@@ -37,7 +37,7 @@ CfrTil_C_Syntax_Off ( )
     Namespace_SetAsNotUsing_MoveToTail ( ( byte* ) "Infix" ) ;
     Namespace_SetAsNotUsing_MoveToTail ( ( byte* ) "C_Syntax" ) ;
     //Namespace_DoNamespace ( "Bits" ) ; // TODO : must be a better way
-    CfrTil_SetInNamespaceFromBackground () ;
+    CfrTil_SetInNamespaceFromBackground ( ) ;
     //if ( cntx->Compiler0->C_BackgroundNamespace ) _CfrTil_Namespace_InNamespaceSet ( cntx->Compiler0->C_BackgroundNamespace ) ;
     Ovt_AutoVarOff ( ) ;
 }
@@ -94,7 +94,7 @@ CfrTil_End_C_Block ( )
         word->W_NumberOfArgs = compiler->NumberOfArgs ;
         word->W_NumberOfLocals = compiler->NumberOfLocals ;
     }
-    CfrTil_SetInNamespaceFromBackground () ;
+    CfrTil_SetInNamespaceFromBackground ( ) ;
 }
 
 void
@@ -115,7 +115,7 @@ CfrTil_C_Class_New ( void )
 {
     byte * name = ( byte* ) DataStack_Pop ( ) ;
 
-    return _DataObject_New (C_CLASS, 0, name, 0, 0, 0, 0, 0, 0 ) ;
+    return _DataObject_New ( C_CLASS, 0, name, 0, 0, 0, 0, 0, 0 ) ;
 }
 
 void
@@ -131,16 +131,19 @@ CfrTil_If_C_Combinator ( )
     currentWord0->W_SC_ScratchPadIndex = _CfrTil_->SC_ScratchPadIndex ;
     byte svscp = GetState ( _Compiler_, C_COMBINATOR_PARSING ) ;
     SetState ( _Compiler_, C_COMBINATOR_PARSING, true ) ;
-    CfrTil_InterpretNBlocks ( 2, 1 ) ;
+    CfrTil_InterpretNBlocks ( 2, 1, 0 ) ;
     if ( ! _Context_StrCmpNextToken ( _Context_, ( byte* ) "else" ) )
     {
         _CfrTil_GetTokenFromTokenList ( _Context_->Lexer0 ) ; // drop the "else" token
-        CfrTil_InterpretNBlocks ( 1, 0 ) ;
+        //CfrTil_BeginBlock ( ) ;
+        CfrTil_InterpretNBlocks ( 1, 0, 0 ) ;
+        //CfrTil_EndBlock ( ) ;
         _Context_->SC_CurrentCombinator = currentWord0 ;
         CfrTil_TrueFalseCombinator3 ( ) ;
     }
     else
     {
+        //CfrTil_EndBlock ( ) ;
         _Context_->SC_CurrentCombinator = currentWord0 ;
         CfrTil_If2Combinator ( ) ;
     }
@@ -153,10 +156,10 @@ CfrTil_DoWhile_C_Combinator ( )
     Word * currentWord0 = Compiler_WordList ( 0 ) ;
     currentWord0->W_SC_ScratchPadIndex = _CfrTil_->SC_ScratchPadIndex ;
     byte * start = Here ;
-    CfrTil_InterpretNBlocks ( 1, 0 ) ;
+    CfrTil_InterpretNBlocks ( 1, 0, 0 ) ;
     // just assume 'while' is there 
     Lexer_ReadToken ( _Context_->Lexer0 ) ; // drop the "while" token
-    CfrTil_InterpretNBlocks ( 1, 1 ) ;
+    CfrTil_InterpretNBlocks ( 1, 1, 0 ) ;
     _Context_->SC_CurrentCombinator = currentWord0 ;
     if ( ! CfrTil_DoWhileCombinator ( ) )
     {
@@ -169,7 +172,7 @@ CfrTil_For_C_Combinator ( )
 {
     Word * currentWord0 = Compiler_WordList ( 0 ) ;
     currentWord0->W_SC_ScratchPadIndex = _CfrTil_->SC_ScratchPadIndex ;
-    CfrTil_InterpretNBlocks ( 4, 1 ) ;
+    CfrTil_InterpretNBlocks ( 4, 1, 0 ) ;
     _Context_->SC_CurrentCombinator = currentWord0 ;
     CfrTil_ForCombinator ( ) ;
 }
@@ -179,7 +182,7 @@ CfrTil_Loop_C_Combinator ( )
 {
     Word * currentWord0 = Compiler_WordList ( 0 ) ;
     currentWord0->W_SC_ScratchPadIndex = _CfrTil_->SC_ScratchPadIndex ;
-    CfrTil_InterpretNBlocks ( 1, 0 ) ;
+    CfrTil_InterpretNBlocks ( 1, 0, 0 ) ;
     _Context_->SC_CurrentCombinator = currentWord0 ;
     CfrTil_LoopCombinator ( ) ;
 }
@@ -190,7 +193,7 @@ CfrTil_While_C_Combinator ( )
     Word * currentWord0 = Compiler_WordList ( 0 ) ;
     currentWord0->W_SC_ScratchPadIndex = _CfrTil_->SC_ScratchPadIndex ;
     byte * start = Here ;
-    CfrTil_InterpretNBlocks ( 2, 1 ) ;
+    CfrTil_InterpretNBlocks ( 2, 1, 0 ) ;
     _Context_->SC_CurrentCombinator = currentWord0 ;
     if ( ! CfrTil_WhileCombinator ( ) ) // TODO : has this idea been fully applied to the rest of the code?
     {

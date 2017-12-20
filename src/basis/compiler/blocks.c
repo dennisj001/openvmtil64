@@ -71,7 +71,7 @@ _Block_Copy ( byte * srcAddress, int64 bsize, int8 optFlag )
         }
         byte * here = Here ;
         _CompileN ( srcAddress, isize ) ; // memcpy ( dstAddress, address, size ) ;
-        d1 ( if ( Is_DebugModeOn )  _Debugger_Disassemble ( _Debugger_, ( byte* ) here, Here - here, 1 ) ) ;
+        d0 ( if ( Is_DebugModeOn ) _Debugger_Disassemble ( _Debugger_, ( byte* ) here, Here - here, 1 ) ) ;
     }
 }
 
@@ -113,11 +113,11 @@ Block_CopyCompile_WithLogicFlag ( byte * srcAddress, int64 bindex, int64 jccFlag
         }
         jccFlag2 = Compile_CheckReConfigureLogicInBlock ( bi, 1 ) ;
     }
-    if ( ! GetState ( _CfrTil_, INLINE_ON ) ) Compile_Call ( srcAddress ) ;
-    else
-    {
-        _Block_Copy ( srcAddress, bi->bp_Last - bi->bp_First, 0 ) ;
-    }
+    //if ( ! GetState ( _CfrTil_, INLINE_ON ) ) Compile_Call ( srcAddress ) ;
+    //else
+    //{
+    _Block_Copy ( srcAddress, bi->bp_Last - bi->bp_First, 0 ) ;
+    //}
     if ( jccFlag )
     {
         Word * svcrw = _Context_->CurrentlyRunningWord ;
@@ -152,7 +152,7 @@ BlockInfo_Set_tttn ( BlockInfo * bi, int8 ttt, int8 n, int8 overWriteSize )
 {
     bi->LogicCode = Here ; // used by combinators
     //Word * word =  //_Context_->CurrentlyRunningWord ;
-    if ( ! GetState ( _Context_, C_SYNTAX )  ) bi->LogicCodeWord = Compiler_WordList ( 1 ) ;
+    if ( ! GetState ( _Context_, C_SYNTAX ) ) bi->LogicCodeWord = Compiler_WordList ( 1 ) ;
     bi->Ttt = ttt ;
     bi->NegFlag = n ;
     bi->OverWriteSize = overWriteSize ;
@@ -333,7 +333,7 @@ _CfrTil_EndBlock ( )
     BlockInfo * bi = ( BlockInfo * ) Stack_Pop_WithExceptionOnEmpty ( _Context_->Compiler0->BlockStack ) ;
     // this idea has the problem that in c syntax CurrentlyRunningWord is not really set in the usual way
     //Word * word = Compiler_WordList ( 1 ) ; //_Context_->CurrentlyRunningWord ;
-    if ( ! GetState ( _Context_, C_SYNTAX )  ) bi->LogicCodeWord = Compiler_WordList ( 1 ) ;
+    if ( ! GetState ( _Context_, C_SYNTAX ) ) bi->LogicCodeWord = Compiler_WordList ( 1 ) ;
     _CfrTil_EndBlock1 ( bi ) ;
     byte * blockStart = _CfrTil_EndBlock2 ( bi ) ;
     return blockStart ;

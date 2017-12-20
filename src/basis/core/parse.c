@@ -82,7 +82,7 @@ gotNextToken:
             continue ;
         }
         ns = _Namespace_Find ( token, 0, 0 ) ;
-        if ( ! ns ) CfrTil_Exception (NAMESPACE_ERROR, 0, 1 ) ;
+        if ( ! ns ) CfrTil_Exception ( NAMESPACE_ERROR, 0, 1 ) ;
         size = _Namespace_VariableValueGet ( ns, ( byte* ) "size" ) ;
         if ( ns && size )
         {
@@ -96,7 +96,7 @@ gotNextToken:
                 continue ;
             }
         }
-        else CfrTil_Exception (NAMESPACE_ERROR, 0, 1 ) ; // else structure component size error
+        else CfrTil_Exception ( NAMESPACE_ERROR, 0, 1 ) ; // else structure component size error
         for ( i = 0 ; 1 ; )
         {
             token = Lexer_ReadToken ( _Context_->Lexer0 ) ;
@@ -109,7 +109,7 @@ gotNextToken:
                 sizeOf += size ;
                 token = Lexer_ReadToken ( _Context_->Lexer0 ) ;
                 arrayDimensions [ i ] = arrayDimensionSize ;
-                if ( ! String_Equal ( ( char* ) token, "]" ) ) CfrTil_Exception (SYNTAX_ERROR, 0, 1 ) ;
+                if ( ! String_Equal ( ( char* ) token, "]" ) ) CfrTil_Exception ( SYNTAX_ERROR, 0, 1 ) ;
                 i ++ ;
             }
             else
@@ -206,8 +206,14 @@ _CfrTil_Parse_LocalsAndStackVariables ( int64 svf, int64 lispMode, ListObject * 
             if ( String_Equal ( token, "(" ) ) continue ;
             word = Finder_Word_FindUsing ( finder, token, 1 ) ; // ?? find after Literal - eliminate making strings or numbers words ??
             if ( word && ( word->CAttribute & ( NAMESPACE | CLASS ) ) && ( CharTable_IsCharType ( ReadLine_PeekNextChar ( lexer->ReadLiner0 ), CHAR_ALPHA ) ) )
+                //if ( word && ( word->CAttribute & ( CLASS ) ) && ( CharTable_IsCharType ( ReadLine_PeekNextChar ( lexer->ReadLiner0 ), CHAR_ALPHA ) ) )
             {
-                typeNamespace = word ;
+                Word * iword ;
+                if ( ( iword = Finder_FindWord_InOneNamespace ( _Finder_, word, ( byte* ) "init" ) )
+                    || ( _Namespace_VariableValueGet ( word, ( byte* ) "size" ) > 8 ) )
+                {
+                    typeNamespace = word ;
+                }
                 continue ;
             }
             if ( String_Equal ( ( char* ) token, "|" ) )
@@ -238,7 +244,7 @@ _CfrTil_Parse_LocalsAndStackVariables ( int64 svf, int64 lispMode, ListObject * 
                 ( ( String_Equal ( ( char* ) token, "{" ) ) || ( String_Equal ( ( char* ) token, ";" ) ) ) )
             {
                 _Printf ( ( byte* ) "\nLocal variables syntax error : no closing parenthesis ')' found" ) ;
-                CfrTil_Exception (SYNTAX_ERROR, 0, 1 ) ;
+                CfrTil_Exception ( SYNTAX_ERROR, 0, 1 ) ;
             }
             if ( getReturnFlag )
             {
@@ -281,9 +287,9 @@ _CfrTil_Parse_LocalsAndStackVariables ( int64 svf, int64 lispMode, ListObject * 
                             compiler->RegisterParameterList = _dllist_New ( TEMPORARY ) ;
                         }
                         _List_PushNew ( compiler->RegisterParameterList, word ) ;
-                        compiler->NumberOfRegisterArgs++ ;
+                        compiler->NumberOfRegisterArgs ++ ;
                     }
-                    else compiler->NumberOfRegisterLocals++ ;
+                    else compiler->NumberOfRegisterLocals ++ ;
                 }
                 regFlag = false ;
                 if ( typeNamespace )

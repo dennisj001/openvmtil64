@@ -8,8 +8,8 @@ void _Compile_ImmDispData(int64 immDisp, int64 immSize, int8 forceFlag);
 void Compile_Int8(int64 opCode);
 int8 _Calculate_Rex_With_Sib(int8 reg, int8 scale, int8 index, int8 base, int8 rex_w_flag);
 int8 Calculate_Rex(int8 reg, int8 rm, int8 rex_w_flag);
-void Compile_CalcWrite_Instruction_X64(int8 rex, int8 opCode, int8 mod, int8 reg, int8 rm, int16 controlFlags, int8 sib, int64 disp, int8 dispSize, int64 imm, int8 immSize);
 void _Compile_Write_Instruction_X64(int8 rex, int16 opCode, int8 modRm, int16 controlFlags, int8 sib, int64 disp, int8 dispSize, int64 imm, int8 immSize);
+void Compile_CalcWrite_Instruction_X64(int8 rex, int8 opCode, int8 mod, int8 reg, int8 rm, int16 controlFlags, int8 sib, int64 disp, int8 dispSize, int64 imm, int8 immSize);
 void _Compile_LEA(int8 reg, int8 rm, int8 sib, int64 disp);
 void _Compile_X_Group1(int8 code, int8 toRegOrMem, int8 mod, int8 reg, int8 rm, int8 sib, int64 disp, int8 osize);
 void _Compile_X_Group1_Immediate(int8 code, int8 mod, int8 rm, int64 disp, int64 imm, int8 iSize);
@@ -313,7 +313,7 @@ int64 Interpret_CheckEqualBeforeSemi_LValue(Word *word);
 void Interpret_DoParenthesizedRValue(void);
 int64 _Interpret_Do_CombinatorLeftParen(void);
 void CfrTil_C_LeftParen(void);
-void CfrTil_InterpretNBlocks(int64 blocks, Boolean takesLParenAsBlockFlag);
+void CfrTil_InterpretNBlocks(int64 blocks, Boolean takesLParenAsBlockFlag, Boolean alsoTakesSemicolonToEndBlock);
 void _CfrTil_C_Infix_EqualOp(Word *opWord);
 void CfrTil_SetInNamespaceFromBackground(void);
 /* basis/core/dataObjectNew.c */
@@ -1230,13 +1230,13 @@ void CfrTil_DObject_Clone(void);
 void DObject_NewClone(DObject *proto);
 void DObject_New(void);
 /* basis/core/preprocessor.c */
-int64 GetOuterBlockStatus(void);
-int64 _GetCondStatus(void);
-int64 GetIfStatus(void);
+int64 GetAccumulatedBlockStatus(int listStart);
 int64 GetElxxStatus(int64 cond, int64 type);
-int64 GetElifStatus(void);
-int64 GetElseStatus(void);
-int64 GetEndifStatus(void);
+Boolean _GetCondStatus(void);
+Boolean GetIfStatus(void);
+Boolean GetElifStatus(void);
+Boolean GetElseStatus(void);
+Boolean GetEndifStatus(void);
 void SkipPreprocessorCode(void);
 /* basis/attribute.c */
 /* basis/lists.c */

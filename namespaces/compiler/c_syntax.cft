@@ -7,7 +7,7 @@ location
 //verbosity 4 =
 
 // maybe we're shooting for a "smart syntactic language" that will parse "poetic" syntactic arrangements
-#if 1
+#if 1 // if 0
 optimizeOn inlineOn 
 System Interpreter Combinators C C_Combinators
 C String
@@ -19,7 +19,7 @@ C
 User
 c_syntaxOn
 libc
-#if 1
+#if 1 // if 1
 typedef _CObj
 {
     int64 hi ;
@@ -40,13 +40,13 @@ chey.heey = #x0123456789abcdef ; // doesn't work : still 32 bit limited ints
 dump ( chey, chey.size ) ;
 chey chey.size dump
 chey.heey1 = #x12345678 ;
-#if 1
+#if 1 // if 2
 chey.heey2 = chey.heey1 ; // #x12345678 ; 
 chey.hey = chey.heey2 ; // #x12345678 ;
 #else
 chey.heey2 = #x12345678 ; 
 chey.hey = #x12345678 ;
-#endif
+#endif // if 2 endif
 chey.chars [23] = 255 ;
 chey.chars [18] = #b10110 ; // #x16
 chey.hey = #x12345678 ;
@@ -106,9 +106,9 @@ chi ( chey0, d | a b c )
 scOff
 wdiss ( ' chi find )
 chi ( chey, 7 ) //pause
-#endif
+#endif // if 1 : endif
 //s pause
-#if 1
+#if 1 // if 1
 void
 interpret2 ( | atoken aword ) 
 {
@@ -157,11 +157,11 @@ interpret2 ( | atoken aword )
         }
     }
 }
-#endif
+#endif // if 1 : endif
 
 wdiss ( ' interpret2 find ) ;
 
-#if 1
+#if 1 // if 1
 interpret2 
 using
 int
@@ -186,7 +186,7 @@ interpret3 words // i2halt code to exit interpret2
 : hey1 hi1 hi1 ; 
 : heey1 hey1 hey1 hey1 ;
 nl heey1 
-#if 1
+#if 1 // if 2
 c_syntaxOn
 int
 faccs2 ( n | rec ) 
@@ -237,16 +237,16 @@ faccs3 ( n | rec )
 faccs3 ( 7 ) p //pause
 c_syntaxOff
 //verbosity 2 = //verbosity @ p pause
-#endif
+#endif // if 2 : endif
 
 i2halt // see above in interpret2
 i2halt // for second interpret3 
 i2halt // for third interpret4
-#endif
+#endif // if 1 : endif
 //sp 
-#endif
+#endif // if 0 : endif
 //pause
-#if 1
+#if 1 // if 0
 c_syntaxOn
 C String libc
 //"buffer0" Buffer new ; 
@@ -255,7 +255,7 @@ typedef struct { byte buf [ 256 ]; } Buffer0 ;
 //dbgOn
 s
 dscOn
-#if 0
+#if 0 // if 1
 void
 $ ( | atoken, buffer, buffer1, Buffer0 buffer0 ) 
 {
@@ -274,7 +274,7 @@ $ ( | atoken, buffer, buffer1, Buffer0 buffer0 )
     while ( atoken = token () ) 
     {   
         //printf ( "\n\ttoken = %s\n", atoken ) ; //pause () ;
-#if 0 
+#if 0 // if 2
         if ( strcmp ( atoken, ";" ) )
         { 
             strcat ( buffer, atoken ) ;
@@ -286,7 +286,7 @@ $ ( | atoken, buffer, buffer1, Buffer0 buffer0 )
         }
         else
         {
-#if 1
+#if 1 
             {
                 d: printf ( "\n\tbuffer = %s\n", buffer ) ; //pause () ;
             }
@@ -318,10 +318,10 @@ $ ( | atoken, buffer, buffer1, Buffer0 buffer0 )
                 strcat ( buffer, " " ) ;
             }
         }
-#endif
+#endif // if 2 : endif
     }
 } 
-#elif 1
+#elif 1 // if 1 : elif
 void
 $ ( | atoken, buffer, buffer1, Buffer buffer0 ) 
 {
@@ -346,11 +346,12 @@ $ ( | atoken, buffer, buffer1, Buffer buffer0 )
         }
     }
 } 
-#else
+#else // if 1 : else
+dbgOff
 void
 $ ( | atoken, buffer, buffer1, Buffer buffer0 ) 
 {
-#if dbOn  
+#if dbgOnVar @  
     //<dbg>
     //_s () ;
     buffer = &buffer0.buf ;
@@ -368,7 +369,7 @@ $ ( | atoken, buffer, buffer1, Buffer buffer0 )
     while ( atoken = token () ) 
     {   
         //printf ( "\n\ttoken = %s\n", atoken ) ; //pause () ;
-#if 1 
+#if 1 // if 2
         if ( libc.strcmp ( atoken, ";" ) )
         { 
             strcat ( buffer, atoken ) ;
@@ -391,7 +392,7 @@ $ ( | atoken, buffer, buffer1, Buffer buffer0 )
             sh ( buffer ) ;
             break ; 
         }
-#else // test internal c compiler
+#else // if 2 : else : test internal c compiler
 #if 1
         if ( ! strcmp ( atoken, ";" ) ) 
 #else
@@ -414,17 +415,17 @@ $ ( | atoken, buffer, buffer1, Buffer buffer0 )
                 strcat ( buffer, " " ) ;
             }
         }
-#endif
+#endif // if 2 : endif
     }
     _s () ;
 #if dbOn  
     //<dbg> 
 #endif
 } 
-#endif
+#endif // if 1 : endif
 dscOff
 
-#if doScript
+#if doScript 
 "\n\nnew $ test\n" ps
 void
 '$ find wdiss //pause
@@ -439,7 +440,7 @@ dscOff
 c_syntaxOff
 #endif
 
-#endif
+#endif // if 0 : endif
 sp
 dbgOff verbosity 1 =
 s: hi ( a b | c ) c a @ b @ + = printf ("\n%d", c ) ;s 1 2 hi 

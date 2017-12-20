@@ -364,7 +364,7 @@ int64
 _dllist_Get_N_Node_M_Slot ( dllist * list, int64 n, int64 m )
 {
     dlnode * node ;
-    for ( node = dllist_First ( ( dllist* ) list ) ; node && ( -- n >= 0 ) ; node = dlnode_Next ( node ) ) ;
+    for ( node = dllist_First ( ( dllist* ) list ) ; node && ( -- n >= 0 ) ; node = dlnode_Next ( node ) ) ; // nb. this is a little subtle
     return node ? dobject_Get_M_Slot ( node, m ) : 0 ; // LIST_EMPTY
 }
 
@@ -372,7 +372,7 @@ void
 _dllist_Set_N_Node_M_Slot ( dllist * list, int64 n, int64 m, int64 value )
 {
     dlnode * node ;
-    for ( node = dllist_First ( ( dllist* ) list ) ; node && ( -- n >= 0 ) ; node = dlnode_Next ( node ) ) ;
+    for ( node = dllist_First ( ( dllist* ) list ) ; node && ( -- n >= 0 ) ; node = dlnode_Next ( node ) ) ; // nb. this is a little subtle
     if ( node ) dobject_Set_M_Slot ( node, m, value ) ;
 }
 

@@ -393,7 +393,7 @@ _CfrTil_ShowInfo ( Debugger * debugger, byte * prompt, int64 signal, int64 force
         else location = ( byte* ) "<command line>" ;
         if ( ( location == debugger->Filename ) && ( GetState ( debugger, DBG_FILENAME_LOCATION_SHOWN ) ) ) location = ( byte * ) "..." ;
         SetState ( debugger, DBG_FILENAME_LOCATION_SHOWN, true ) ;
-        Word * word = debugger->w_Word ? debugger->w_Word : _Context_->CurrentlyRunningWord ;
+        Word * word = debugger->LastShowWord = debugger->w_Word ? debugger->w_Word : _Context_->CurrentlyRunningWord ;
         byte * token0 = word ? word->Name : debugger->Token, *token1 ;
         if ( ( signal == 11 ) || _Q_->SigAddress )
         {

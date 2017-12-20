@@ -77,7 +77,7 @@ nl "before testAll" prints
 System Combinators
 //dbgOn
 //sp 
-#if 0
+#if 0 // if 0
 : itt { doTest _TestDone_ @ not && } { basicT testX _TestDone_ ++ } if2 ; 
 ' itt wdiss itt //pause
 #elif 0
@@ -85,7 +85,7 @@ System Combinators
 #elif 0
 //"\ntest nested elif 0 - wrong\n" ps pause
 #elif 1
-#if 0 
+#if 0 // if 1
 //"\ntest nested if 0 - wrong \n" ps pause
 #elif 1 
 "\ntest nested elif 1 - correct \n" ps //pause
@@ -93,8 +93,8 @@ System Combinators
 //: test0 { doTest _TestDone_ @ not && } { basicT testX _TestDone_ ++ } if2  ; d: test0
 //{ doTest _TestDone_ @ not && } { <dbg> basicT testX _TestDone_ ++ } if2  
 { doTest _TestDone_ @ not && } { basicT testX _TestDone_ ++ } if2  
-//#endif
-#elif 1
+//#endif // end if 1
+#elif 0
 "\ntest nested elif 1 - wrong \n" ps pause
 : shellOff "Shell" notUsing ;
 Shell
@@ -105,7 +105,8 @@ else
 endif
 shellOff
 // stack pause
-#endif
+#endif // end if 1
+#endif // end if 0
 nl "_TestDone_ =" ps _TestDone_ @ p nl
 { _TestDone_ @ not } { pause } if2 
 sp
