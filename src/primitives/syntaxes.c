@@ -124,6 +124,7 @@ CfrTil_C_Infix_Equal ( )
     _CfrTil_C_Infix_EqualOp ( 0 ) ;
 }
 
+#if 1
 void
 CfrTil_If_C_Combinator ( )
 {
@@ -135,9 +136,7 @@ CfrTil_If_C_Combinator ( )
     if ( ! _Context_StrCmpNextToken ( _Context_, ( byte* ) "else" ) )
     {
         _CfrTil_GetTokenFromTokenList ( _Context_->Lexer0 ) ; // drop the "else" token
-        //CfrTil_BeginBlock ( ) ;
         CfrTil_InterpretNBlocks ( 1, 0, 0 ) ;
-        //CfrTil_EndBlock ( ) ;
         _Context_->SC_CurrentCombinator = currentWord0 ;
         CfrTil_TrueFalseCombinator3 ( ) ;
     }
@@ -149,6 +148,43 @@ CfrTil_If_C_Combinator ( )
     }
     SetState ( _Compiler_, C_COMBINATOR_PARSING, svscp ) ;
 }
+
+#else
+
+void
+CfrTil_If_C_Combinator ( )
+{
+    Word * currentWord0 = Compiler_WordList ( 0 ) ;
+    currentWord0->W_SC_ScratchPadIndex = _CfrTil_->SC_ScratchPadIndex ;
+    byte svscp = GetState ( _Compiler_, C_COMBINATOR_PARSING ) ;
+    int64 blocksExtra = _Compiler_->BlocksBegunExtra ;
+    SetState ( _Compiler_, C_COMBINATOR_PARSING, true ) ;
+    CfrTil_InterpretNBlocks ( 2, 1, 1 ) ;
+    if ( ! _Context_StrCmpNextToken ( _Context_, ( byte* ) "else" ) )
+    {
+        blocksExtra = _Compiler_->BlocksBegunExtra ;
+        _CfrTil_GetTokenFromTokenList ( _Context_->Lexer0 ) ; // drop the "else" token
+        if ( _Context_StrCmpNextToken ( _Context_, ( byte* ) "{" ) )
+        {
+            CfrTil_BeginBlock ( ) ;
+            _Compiler_->BlocksBegunExtra ++ ;
+        }
+        CfrTil_InterpretNBlocks ( 1, 0, 1 ) ;
+        while ( _Compiler_->BlocksBegunExtra > blocksExtra ) CfrTil_EndBlock ( ), _Compiler_->BlocksBegunExtra -- ;
+        _Context_->SC_CurrentCombinator = currentWord0 ;
+        CfrTil_TrueFalseCombinator3 ( ) ;
+    }
+    else
+    {
+        //while ( _Compiler_->BlocksBegunExtra > 0 ) CfrTil_EndBlock ( ), _Compiler_->BlocksBegunExtra -- ;
+        while ( _Compiler_->BlocksBegunExtra > blocksExtra ) CfrTil_EndBlock ( ), _Compiler_->BlocksBegunExtra -- ;
+        _Context_->SC_CurrentCombinator = currentWord0 ;
+        CfrTil_If2Combinator ( ) ;
+    }
+    while ( _Compiler_->BlocksBegunExtra ) CfrTil_EndBlock ( ), _Compiler_->BlocksBegunExtra -- ;
+    SetState ( _Compiler_, C_COMBINATOR_PARSING, svscp ) ;
+}
+#endif
 
 void
 CfrTil_DoWhile_C_Combinator ( )

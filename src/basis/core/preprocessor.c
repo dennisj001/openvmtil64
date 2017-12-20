@@ -12,9 +12,9 @@ int64
 GetAccumulatedBlockStatus ( int listStart )
 {
     Interpreter * interp = _Context_->Interpreter0 ;
-    int64 status = 0, i, llen = List_Length ( interp->PreprocessorStackList ) ; 
+    int64 status = 0, i, llen = List_Length ( interp->PreprocessorStackList ) ;
     Ppibs status_i ;
-    for ( i = listStart ; i <= (llen-1) ; i ++ ) // -1: 0 based list
+    for ( i = listStart ; i <= ( llen - 1 ) ; i ++ ) // -1: 0 based list
     {
         status_i.int64_Ppibs = List_GetN ( interp->PreprocessorStackList, i ) ;
         status = status || ( status_i.IfBlockStatus || status_i.ElifStatus || status_i.ElseStatus ) ;
@@ -22,7 +22,6 @@ GetAccumulatedBlockStatus ( int listStart )
     }
     return llen ? status : 1 ; // 1 : default status
 }
-
 
 int64
 GetElxxStatus ( int64 cond, int64 type )
@@ -34,27 +33,31 @@ GetElxxStatus ( int64 cond, int64 type )
     Boolean status = false, accStatus = GetAccumulatedBlockStatus ( 1 ) ;
     if ( type == PP_ELIF )
     {
-        if (llen > 1) 
+        if ( ( top.ElseStatus || top.ElifStatus ) ) status = 0 ; // no 'elif 1' after an 'elif 1' or and 'else' in the same block
+        else
         {
-            if ( accStatus ) status = (! (top.IfBlockStatus || top.ElseStatus )) && cond ;
-            else status = 0 ;
+            if ( llen > 1 )
+            {
+                if ( accStatus ) status = ( ! ( top.IfBlockStatus || top.ElseStatus ) ) && cond ;
+                else status = 0 ;
+            }
+            else status = ( ! ( top.IfBlockStatus || top.ElseStatus ) ) && cond ;
         }
-        else status = (! (top.IfBlockStatus || top.ElseStatus )) && cond ;
         top.ElifStatus = status ;
         top.ElseStatus = 0 ; // normally elif can't come after else but we make reasonable (?) sense of it here
     }
     else if ( type == PP_ELSE )
     {
         //top.ElseStatus = 1 ;
-        if (llen > 1) 
+        if ( llen > 1 )
         {
-            if ( accStatus ) status = (! (top.IfBlockStatus || top.ElifStatus ))  ;
+            if ( accStatus ) status = ( ! ( top.IfBlockStatus || top.ElifStatus ) ) ;
             else status = 0 ;
         }
-        else status = (! (top.IfBlockStatus || top.ElifStatus ))  ;
+        else status = ( ! ( top.IfBlockStatus || top.ElifStatus ) ) ;
         top.ElseStatus = status ;
-        top.ElifStatus = status ; // so total block status will be the 'else' status
-     }
+        top.ElifStatus = 0 ; //status ; // so total block status will be the 'else' status
+    }
     List_SetTop ( interp->PreprocessorStackList, top.int64_Ppibs ) ;
     return status ;
 }

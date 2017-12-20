@@ -101,6 +101,7 @@ Block_CopyCompile_WithLogicFlag ( byte * srcAddress, int64 bindex, int64 jccFlag
     {
         if ( ! ( _Q_->OVT_LC && GetState ( _Q_->OVT_LC, ( LC_COMPILE_MODE ) ) ) )
         {
+            // this block is used in eg. interpret.cft
             if ( bi->LiteralWord )//&& bi->LiteralWord->StackPushRegisterCode ) // leave value in ACCUM, don't push it
             {
                 if ( bi->LiteralWord->W_Value != 0 )

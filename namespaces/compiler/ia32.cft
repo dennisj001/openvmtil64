@@ -37,7 +37,7 @@
 
 // cfrTil uses intel syntax convention
 
-//C : sp stack apause ; 
+//C : sp stack pause ; 
 Compiler Compiling C Asm
 : :asm compileModeOn sourceCodeInit token create begin ' {| find compileWord sourceCodeOn ; immediate  
 //: :asm compileModeOn sourceCodeInit token create begin ' {| find compileWord ; immediate  
@@ -66,13 +66,13 @@ CalculateModRegardingDisplacement ( int8 mod, int32 disp )
 {
     // mod reg r/m bits :
     //  00 000 000
-    if ( mod != REG )
+    d: if ( mod != REG )
     {
 #if 0
-        if ( disp == 0 ) mod = 0 ;
+        if ( disp == 0 ) mod d: = 0 ;
         else if ( disp <= 0xff ) mod = 1 ; 
-        else mod d: = 2 ; 
-#elif 0
+        else mod = 2 ; 
+#elif 1
         if ( disp == 0 ) 
             mod = 0 ;
         else 
@@ -85,7 +85,7 @@ CalculateModRegardingDisplacement ( int8 mod, int32 disp )
             }
         }
 #else
-        "\npreprocessor error\n" ps apause
+        //"\npreprocessor else\n" ps apause
         if ( disp == 0 ) 
         {
             mod = 0 ;
@@ -98,13 +98,14 @@ CalculateModRegardingDisplacement ( int8 mod, int32 disp )
             }
             else 
             {
-                {| "\npreprocessor error\n" ps apause |}
-                mod d: = 2 ; 
+                {| "\npreprocessor else\n" ps apause |}
+                mod = 2 ; 
             }
         }
 #endif
-    d: }
+    }
     return mod ;
+d: 
 } prefix
 'CalculateModRegardingDisplacement find wdiss apause
 
@@ -219,14 +220,14 @@ _Compile_ImmDispData ( int64 immDisp, int64 immSize, int forceFlag )
 //                      rex=16 imm=8, disp=4 sib=2  mod/Rm=1
 //                      REX_B  IMM_B  DISP_B SIB_B   MODRM_B
 
-d: void
+void
 _Compile_Write_Instruction_X64 ( rex, opCode, modRm, controlFlags, sib, disp, dispSize, imm, immSize )
 {
     if ( rex ) { compile1 ( rex ) ; }
     if ( opCode > 0xff ) { compile2 ( opCode ) ; }
     else { compile1 ( opCode ) ; }
-    d: if ( controlFlags & MODRM_B ) compile1 ( modRm ) ;
-    if ( sib && ( controlFlags & SIB_B ) ) compile1 ( sib ) ;
+    if ( controlFlags & MODRM_B ) compile1 ( modRm ) ;
+    d: if ( sib && ( controlFlags & SIB_B ) ) compile1 ( sib ) ;
     if ( disp || ( controlFlags & DISP_B ) ) _Compile_ImmDispData ( disp, dispSize, 0 ) ;
     if ( imm || ( controlFlags & IMM_B ) ) _Compile_ImmDispData ( imm, immSize, ( controlFlags & IMM_B ) ) ;
 } prefix
