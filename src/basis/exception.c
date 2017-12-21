@@ -14,7 +14,7 @@ _OpenVmTil_ShowExceptionInfo ( )
             if ( _CfrTil_ && ( debugger = _Debugger_ ) )
             {
                 DebugOn ;
-#if 0                    
+#if 1                   
                 if ( _Q_->Signal != 11 )
                 {
                     if ( ! debugger->w_Word )
@@ -25,7 +25,7 @@ _OpenVmTil_ShowExceptionInfo ( )
                         debugger->w_Word = word ;
                     }
                 }
-                //else 
+                else 
 #endif                
                 debugger->w_Word = _Context_->CurrentlyRunningWord ; //= word ; //_Interpreter_->LastWord ; ;
                 SetState ( debugger, DBG_INFO, true ) ;
@@ -61,7 +61,7 @@ _OVT_Pause ( byte * prompt, int64 signalsHandled )
     {
         if ( _Context_->CurrentlyRunningWord ) _Debugger_->ShowLine = "" ;
         byte buffer [512], *defaultPrompt =
-            ( byte * ) "\n%s%s : at %s :: %s'd' (d)ebugger, 't' s(t)ack, c' (c)ontinue, 'q' (q)uit, 'x' e(x)it, 'i' '\\' or <key> (i)interpret, <return> loop%s" ;
+            ( byte * ) "\n%s\n%s : at %s :: %s'd' (d)ebugger, 't' s(t)ack, c' (c)ontinue, 'q' (q)uit, 'x' e(x)it, 'i' '\\' or <key> (i)interpret, <return> loop%s" ;
         snprintf ( ( char* ) buffer, 512, ( char* ) prompt ? prompt : defaultPrompt, _Q_->ExceptionMessage ? _Q_->ExceptionMessage : ( byte* ) "\r",
             c_gd ( "pause" ), _Context_Location ( _Context_ ), c_gd ( _Debugger_->ShowLine ? _Debugger_->ShowLine : _Context_->ReadLiner0->InputLine ),
             c_gd ( "\n-> " ) ) ;

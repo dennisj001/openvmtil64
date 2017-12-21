@@ -59,20 +59,16 @@ hex
 infixOn
 Logic Bits Combinators IA32 
 : apause ; //pause ;
-#if 1
+#if 0
 c_syntaxOn
 int
 CalculateModRegardingDisplacement ( int8 mod, int32 disp )
 {
     // mod reg r/m bits :
     //  00 000 000
-    d: if ( mod != REG )
+    if ( mod != REG )
     {
 #if 0
-        if ( disp == 0 ) mod d: = 0 ;
-        else if ( disp <= 0xff ) mod = 1 ; 
-        else mod = 2 ; 
-#elif 1
         if ( disp == 0 ) 
             mod = 0 ;
         else 
@@ -81,10 +77,10 @@ CalculateModRegardingDisplacement ( int8 mod, int32 disp )
                 mod = 1 ; 
             else 
             {
-                mod d: = 2 ; 
+                mod = 2 ; 
             }
         }
-#else
+#elif 0
         //"\npreprocessor else\n" ps apause
         if ( disp == 0 ) 
         {
@@ -98,14 +94,17 @@ CalculateModRegardingDisplacement ( int8 mod, int32 disp )
             }
             else 
             {
-                {| "\npreprocessor else\n" ps apause |}
+                //{| "\npreprocessor else\n" ps apause |}
                 mod = 2 ; 
             }
         }
+#else
+        if ( disp == 0 ) mod = 0 ;
+        else if ( disp <= 0xff ) mod = 1 ; 
+        else mod = 2 ; 
 #endif
     }
     return mod ;
-d: 
 } prefix
 'CalculateModRegardingDisplacement find wdiss apause
 

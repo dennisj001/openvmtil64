@@ -312,7 +312,7 @@ int64 _Interpret_CheckEqualBeforeSemi_LValue(byte *nc);
 int64 Interpret_CheckEqualBeforeSemi_LValue(Word *word);
 void Interpret_DoParenthesizedRValue(void);
 int64 _Interpret_Do_CombinatorLeftParen(void);
-void CfrTil_InterpretNBlocks(int64 blocks, Boolean takesLParenAsBlockFlag, Boolean alsoTakesSemicolonToEndBlock);
+void CfrTil_InterpretNBlocks(int64 blocks, Boolean takesLParenAsBlockFlag, Boolean alsoTakesSemicolonToEndBlock, int8 blocksBegun);
 void CfrTil_C_LeftParen(void);
 void _CfrTil_C_Infix_EqualOp(Word *opWord);
 void CfrTil_SetInNamespaceFromBackground(void);

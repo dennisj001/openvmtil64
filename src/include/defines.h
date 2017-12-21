@@ -582,7 +582,7 @@
 #define INTERPRET_NBLOCKS ( (uint64) 1 << 17 )
 #define PREFIX_ARG_PARSING ( (uint64) 1 << 18 )
 #define LC_C_RTL_ARG_PARSING ( (uint64) 1 << 19 )
-#define PREFIX_PARSING ( (uint64) 1 << 20 )
+//#define PREFIX_PARSING ( (uint64) 1 << 20 )
 #define DOING_C_TYPE ( (uint64) 1 << 21 )
 #define DOING_A_PREFIX_WORD ( (uint64) 1 << 22 )
 #define LC_CFRTIL ( (uint64) 1 << 23 )

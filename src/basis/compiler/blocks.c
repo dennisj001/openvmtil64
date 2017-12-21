@@ -241,11 +241,13 @@ _CfrTil_BeginBlock2 ( BlockInfo * bi )
     _Stack_Push ( compiler->BlockStack, ( int64 ) bi ) ; // _Context->CompileSpace->IndexStart before set frame size after turn on
     _Stack_Push ( compiler->CombinatorBlockInfoStack, ( int64 ) bi ) ; // _Context->CompileSpace->IndexStart before set frame size after turn on
     compiler->LHS_Word = 0 ;
+    //compiler->BlocksBegun ++ ;
 }
 
 void
 CfrTil_BeginBlock ( )
 {
+    d0 ( if ( Is_DebugOn ) _Printf ((byte*) "\n\nCfrTil_BeginBlock : %s : %s\n\n", _Context_->CurrentlyRunningWord->Name, Context_Location ()) ) ;
     CheckCodeSpaceForRoom ( ) ;
     BlockInfo * bi = _CfrTil_BeginBlock0 ( ) ;
     _CfrTil_BeginBlock1 ( bi ) ;
@@ -313,6 +315,7 @@ byte *
 _CfrTil_EndBlock2 ( BlockInfo * bi )
 {
     Compiler * compiler = _Context_->Compiler0 ;
+    //compiler->BlocksBegun -- ;
     compiler->BlockLevel -- ;
     byte * bp_First = bi->bp_First ;
     if ( ! _Stack_Depth ( compiler->BlockStack ) )
@@ -320,9 +323,11 @@ _CfrTil_EndBlock2 ( BlockInfo * bi )
         _CfrTil_InstallGotoCallPoints_Keyed ( bi, GI_GOTO | GI_RECURSE ) ;
         CfrTil_TurnOffBlockCompiler ( ) ;
         Compiler_Init ( compiler, 0 ) ;
+        d0 ( if ( Is_DebugOn ) _Printf ((byte*) "\n\n_CfrTil_EndBlock2 : compiler off : %s : %s\n\n", _Context_->CurrentlyRunningWord->Name, Context_Location ()) ) ;
     }
     else
     {
+        d0 ( if ( Is_DebugOn ) _Printf ((byte*) "\n\n_CfrTil_EndBlock2 : _Stack_Depth ( compiler->BlockStack ) = %d : %s : %s\n\n", _Stack_Depth ( compiler->BlockStack ), _Context_->CurrentlyRunningWord->Name, Context_Location ()) ) ;
         _Namespace_RemoveFromUsingListAndClear ( bi->LocalsNamespace ) ; //_Compiler_FreeBlockInfoLocalsNamespace ( bi, compiler ) ;
     }
     return bp_First ;
@@ -331,6 +336,7 @@ _CfrTil_EndBlock2 ( BlockInfo * bi )
 byte *
 _CfrTil_EndBlock ( )
 {
+    d0 ( if ( Is_DebugOn ) _Printf ((byte*) "\n\nCfrTil_EndBlock : %s : %s\n\n", _Context_->CurrentlyRunningWord->Name, Context_Location ()) ) ;
     BlockInfo * bi = ( BlockInfo * ) Stack_Pop_WithExceptionOnEmpty ( _Context_->Compiler0->BlockStack ) ;
     // this idea has the problem that in c syntax CurrentlyRunningWord is not really set in the usual way
     //Word * word = Compiler_WordList ( 1 ) ; //_Context_->CurrentlyRunningWord ;

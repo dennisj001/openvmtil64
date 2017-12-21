@@ -1,0 +1,246 @@
+Debug Menu at : 
+namespaces/compiler/ia32.cft : 85.14 :
+(m)enu, so(U)rce, dum(p), (e)val, (d)is, dis(a)ccum, dis(A)ccum, (r)egisters, (l)ocals, (v)ariables, (I)nfo, (w)dis, s(h)ow
+(R)eturnStack, sto(P), (S)tate, (c)ontinue, (s)tep, (o)ver, (i)nto, o(u)t, t(h)ru, s(t)ack, auto(z), (V)erbosity, (q)uit, a(B)ort
+usi(N)g, s(H)ow DebugWordList, sh(O)w CompilerWordList
+'\n' - escape, , '\' - <esc> - escape, ' ' - <space> - continue
+dbg[c]  :: namespaces/compiler/ia32.cft : 085.014 : C_Combinators :> if <: cprimitive :>         d: if ( disp == 0 )  
+
+CfrTil_BeginBlock : if : namespaces/compiler/ia32.cft : 85.15
+
+
+dbg[c]  :: ... : 085.021 : locals_0 :> disp <: 0x00007ffff6b91708 :>         d: if ( disp == 0 )  
+Debugger :: Starting AutoMode : automatically repeating key :: 'e' ...
+dbg[c]  :: ... : 085.021 : locals_0 :> disp <: 0x00007ffff6b91708 :>         d: if ( disp == 0 )  
+Code compiled to CodeSpace for word :> disp <: at namespaces/compiler/ia32.cft : 85.21
+0x7ffff7fbe368    498b47f8                mov rax, [r15-0x8]                                     
+0x7ffff7fbe36c    4983c608                add r14, 0x8                                           
+0x7ffff7fbe370    498906                  mov [r14], rax                                         
+dbg[c]  :: ... : 085.024 : Logic :> == <: cprimitive :>         d: if ( disp == 0 )  
+dbg[c]  :: ... : 085.026 : <literal> :> 0 <: cprimitive :>         d: if ( disp == 0 )  
+Code compiled to CodeSpace for word :> 0 <: at namespaces/compiler/ia32.cft : 85.26
+0x7ffff7fbe373    48b80000000000000000    mov rax, 0x0                                           
+0x7ffff7fbe37d    4983c608                add r14, 0x8                                           
+0x7ffff7fbe381    498906                  mov [r14], rax                                         
+Code compiled to CodeSpace for word :> == <: at namespaces/compiler/ia32.cft : 85.26
+0x7ffff7fbe36c    4885c0                  test rax, rax                                          
+0x7ffff7fbe36f    0f94c0                  setz al                                                
+0x7ffff7fbe372    480fb6c0                movzx rax, al                                          
+0x7ffff7fbe376    4983c608                add r14, 0x8                                           
+0x7ffff7fbe37a    498906                  mov [r14], rax                                         
+
+CfrTil_EndBlock : == : namespaces/compiler/ia32.cft : 85.27
+
+
+
+_CfrTil_EndBlock2 : _Stack_Depth ( compiler->BlockStack ) = 2 : == : namespaces/compiler/ia32.cft : 85.27
+
+
+
+CfrTil_BeginBlock : == : namespaces/compiler/ia32.cft : 85.27
+
+
+dbg[c]  :: ... : 087.016 : locals_0 :> mod <: 0x00007ffff6b916fa :>             mod = 0 ;  
+dbg[c]  :: ... : 087.018 : C_Syntax :> = <: cprimitive :>             mod = 0 ;  
+dbg[c]  :: ... : 087.020 : <literal> :> 0 <: cprimitive :>             mod = 0 ;  
+Code compiled to CodeSpace for word :> 0 <: at namespaces/compiler/ia32.cft : 87.20
+0x7ffff7fbe383    48b80000000000000000    mov rax, 0x0                                           
+0x7ffff7fbe38d    4983c608                add r14, 0x8                                           
+0x7ffff7fbe391    498906                  mov [r14], rax                                         
+dbg[c]  :: ... : 087.022 : Compiler :> = <: cprimitive :>             mod = 0 ;  
+Code compiled to CodeSpace for word :> = <: at namespaces/compiler/ia32.cft : 87.22
+0x7ffff7fbe383    49b80000000000000000    mov r8, 0x0                                            
+0x7ffff7fbe38d    4d8947f0                mov [r15-0x10], r8                                     
+
+CfrTil_EndBlock : store : namespaces/compiler/ia32.cft : 88.10
+
+
+
+_CfrTil_EndBlock2 : _Stack_Depth ( compiler->BlockStack ) = 2 : store : namespaces/compiler/ia32.cft : 88.10
+
+
+
+CfrTil_BeginBlock : store : namespaces/compiler/ia32.cft : 90.10
+
+
+dbg[c]  :: ... : 091.015 : C_Combinators :> if <: cprimitive :>             if ( disp <= 0xff )  
+
+CfrTil_BeginBlock : if : namespaces/compiler/ia32.cft : 91.16
+
+
+dbg[c]  :: ... : 091.022 : locals_0 :> disp <: 0x00007ffff6b91708 :>             if ( disp <= 0xff )  
+dbg[c]  :: ... : 091.025 : Logic :> <= <: cprimitive :>             if ( disp <= 0xff )  
+dbg[c]  :: ... : 091.030 : <literal> :> 0xff <: cprimitive :>             if ( disp <= 0xff )  
+Code compiled to CodeSpace for word :> 0xff <: at namespaces/compiler/ia32.cft : 91.30
+0x7ffff7fbe39c    48b8ff00000000000000    mov rax, 0xff                                          
+0x7ffff7fbe3a6    4983c608                add r14, 0x8                                           
+0x7ffff7fbe3aa    498906                  mov [r14], rax                                         
+Code compiled to CodeSpace for word :> <= <: at namespaces/compiler/ia32.cft : 91.30
+0x7ffff7fbe39c    49837ff8ff              cmp qword [r15-0x8], 0xffffffffffffffff                              
+0x7ffff7fbe3a1    0f9ec0                  setle al                                               
+0x7ffff7fbe3a4    480fb6c0                movzx rax, al                                          
+0x7ffff7fbe3a8    4983c608                add r14, 0x8                                           
+0x7ffff7fbe3ac    498906                  mov [r14], rax                                         
+
+CfrTil_EndBlock : <= : namespaces/compiler/ia32.cft : 91.31
+
+
+
+_CfrTil_EndBlock2 : _Stack_Depth ( compiler->BlockStack ) = 3 : <= : namespaces/compiler/ia32.cft : 91.31
+
+
+
+CfrTil_BeginBlock : <= : namespaces/compiler/ia32.cft : 91.31
+
+
+dbg[c]  :: ... : 093.020 : locals_0 :> mod <: 0x00007ffff6b916fa :>                 mod = 1 ;  
+dbg[c]  :: ... : 093.022 : C_Syntax :> = <: cprimitive :>                 mod = 1 ;  
+dbg[c]  :: ... : 093.024 : <literal> :> 1 <: cprimitive :>                 mod = 1 ;  
+Code compiled to CodeSpace for word :> 1 <: at namespaces/compiler/ia32.cft : 93.24
+0x7ffff7fbe3b5    48b80100000000000000    mov rax, 0x1                                           
+0x7ffff7fbe3bf    4983c608                add r14, 0x8                                           
+0x7ffff7fbe3c3    498906                  mov [r14], rax                                         
+dbg[c]  :: ... : 093.026 : Compiler :> = <: cprimitive :>                 mod = 1 ;  
+Code compiled to CodeSpace for word :> = <: at namespaces/compiler/ia32.cft : 93.26
+0x7ffff7fbe3b5    49b80100000000000000    mov r8, 0x1                                            
+0x7ffff7fbe3bf    4d8947f0                mov [r15-0x10], r8                                     
+
+CfrTil_EndBlock : = : namespaces/compiler/ia32.cft : 94.14
+
+
+
+_CfrTil_EndBlock2 : _Stack_Depth ( compiler->BlockStack ) = 3 : = : namespaces/compiler/ia32.cft : 94.14
+
+
+
+CfrTil_BeginBlock : = : namespaces/compiler/ia32.cft : 96.14
+
+
+dbg[c]  :: ... : 097.018 : Interpreter :> // <: cprimitive :>                 //{| "\npreprocessor else\n" ps apause |}  
+dbg[c]  :: ... : 098.020 : locals_0 :> mod <: 0x00007ffff6b916fa :>                 mod = 2 ;  
+dbg[c]  :: ... : 098.022 : C_Syntax :> = <: cprimitive :>                 mod = 2 ;  
+dbg[c]  :: ... : 098.024 : <literal> :> 2 <: cprimitive :>                 mod = 2 ;  
+Code compiled to CodeSpace for word :> 2 <: at namespaces/compiler/ia32.cft : 98.24
+0x7ffff7fbe3c9    48b80200000000000000    mov rax, 0x2                                           
+0x7ffff7fbe3d3    4983c608                add r14, 0x8                                           
+0x7ffff7fbe3d7    498906                  mov [r14], rax                                         
+dbg[c]  :: ... : 098.026 : Compiler :> = <: cprimitive :>                 mod = 2 ;  
+Code compiled to CodeSpace for word :> = <: at namespaces/compiler/ia32.cft : 98.26
+0x7ffff7fbe3c9    49b80200000000000000    mov r8, 0x2                                            
+0x7ffff7fbe3d3    4d8947f0                mov [r15-0x10], r8                                     
+
+CfrTil_EndBlock : = : namespaces/compiler/ia32.cft : 99.14
+
+
+
+_CfrTil_EndBlock2 : _Stack_Depth ( compiler->BlockStack ) = 3 : = : namespaces/compiler/ia32.cft : 99.14
+
+
+Stack at : namespaces/compiler/ia32.cft : 99.14 :
+DataStack depth =   9 : Dsp (R14) = Top = 0x00007ffff7f25210, InitialTos = 0x00007ffff7f251c8, Size = 0x0000000000000800
+                    DataStack   [   0 ] < 0x00007ffff7f25210 > = 0x00007ffff7fbe383
+                    DataStack   [  -1 ] < 0x00007ffff7f25208 > = 0x00007ffff7fbe368
+                    DataStack   [  -2 ] < 0x00007ffff7f25200 > = 0x00007ffff7fbe34a
+                    DataStack   [  -3 ] < 0x00007ffff7f251f8 > = 0x00007ffff6b15a88             < word : int.CalculateModRegardingDisplacement : definition = 0x0000000000000000 >
+                    DataStack   [  -4 ] < 0x00007ffff7f251f0 > = 0x0000000000000005
+                    DataStack   [  -5 ] < 0x00007ffff7f251e8 > = 0x0000000000000005
+                    DataStack   [  -6 ] < 0x00007ffff7f251e0 > = 0x0000000000000005
+                    DataStack   [  -7 ] < 0x00007ffff7f251d8 > = 0x0000000000000005
+                    DataStack   [  -8 ] < 0x00007ffff7f251d0 > = 0x0000000000000005
+
+Stack at : namespaces/compiler/ia32.cft : 99.14 :
+DataStack depth =   9 : Dsp (R14) = Top = 0x00007ffff7f25210, InitialTos = 0x00007ffff7f251c8, Size = 0x0000000000000800
+                    DataStack   [   0 ] < 0x00007ffff7f25210 > = 0x00007ffff7fbe383
+                    DataStack   [  -1 ] < 0x00007ffff7f25208 > = 0x00007ffff7fbe368
+                    DataStack   [  -2 ] < 0x00007ffff7f25200 > = 0x00007ffff7fbe34a
+                    DataStack   [  -3 ] < 0x00007ffff7f251f8 > = 0x00007ffff6b15a88             < word : int.CalculateModRegardingDisplacement : definition = 0x0000000000000000 >
+                    DataStack   [  -4 ] < 0x00007ffff7f251f0 > = 0x0000000000000005
+                    DataStack   [  -5 ] < 0x00007ffff7f251e8 > = 0x0000000000000005
+                    DataStack   [  -6 ] < 0x00007ffff7f251e0 > = 0x0000000000000005
+                    DataStack   [  -7 ] < 0x00007ffff7f251d8 > = 0x0000000000000005
+                    DataStack   [  -8 ] < 0x00007ffff7f251d0 > = 0x0000000000000005
+
+
+CfrTil_EndBlock : = : namespaces/compiler/ia32.cft : 100.10
+
+
+
+_CfrTil_EndBlock2 : _Stack_Depth ( compiler->BlockStack ) = 2 : = : namespaces/compiler/ia32.cft : 100.10
+
+
+Stack at : namespaces/compiler/ia32.cft : 100.10 :
+DataStack depth =   7 : Dsp (R14) = Top = 0x00007ffff7f25200, InitialTos = 0x00007ffff7f251c8, Size = 0x0000000000000800
+                    DataStack   [   0 ] < 0x00007ffff7f25200 > = 0x00007ffff7fbe34a
+                    DataStack   [  -1 ] < 0x00007ffff7f251f8 > = 0x00007ffff6b15a88             < word : int.CalculateModRegardingDisplacement : definition = 0x0000000000000000 >
+                    DataStack   [  -2 ] < 0x00007ffff7f251f0 > = 0x0000000000000005
+                    DataStack   [  -3 ] < 0x00007ffff7f251e8 > = 0x0000000000000005
+                    DataStack   [  -4 ] < 0x00007ffff7f251e0 > = 0x0000000000000005
+                    DataStack   [  -5 ] < 0x00007ffff7f251d8 > = 0x0000000000000005
+                    DataStack   [  -6 ] < 0x00007ffff7f251d0 > = 0x0000000000000005
+
+Stack at : namespaces/compiler/ia32.cft : 100.10 :
+DataStack depth =   7 : Dsp (R14) = Top = 0x00007ffff7f25200, InitialTos = 0x00007ffff7f251c8, Size = 0x0000000000000800
+                    DataStack   [   0 ] < 0x00007ffff7f25200 > = 0x00007ffff7fbe34a
+                    DataStack   [  -1 ] < 0x00007ffff7f251f8 > = 0x00007ffff6b15a88             < word : int.CalculateModRegardingDisplacement : definition = 0x0000000000000000 >
+                    DataStack   [  -2 ] < 0x00007ffff7f251f0 > = 0x0000000000000005
+                    DataStack   [  -3 ] < 0x00007ffff7f251e8 > = 0x0000000000000005
+                    DataStack   [  -4 ] < 0x00007ffff7f251e0 > = 0x0000000000000005
+                    DataStack   [  -5 ] < 0x00007ffff7f251d8 > = 0x0000000000000005
+                    DataStack   [  -6 ] < 0x00007ffff7f251d0 > = 0x0000000000000005
+
+dbg[c]  :: ... : 101.001 : Interpreter :> # <: cprimitive :> #else  
+dbg[c]  :: ... : 101.006 : PreProcessor :> else <: cprimitive :> #else  
+dbg[c]  :: ... : 106.007 : Debug :> d: <: 0x00007ffff7fb71bc :>     d: }  
+Code compiled to CodeSpace for word :> d: <: at namespaces/compiler/ia32.cft : 106.9
+
+CfrTil_EndBlock : d: : namespaces/compiler/ia32.cft : 106.9
+
+
+
+_CfrTil_EndBlock2 : _Stack_Depth ( compiler->BlockStack ) = 1 : d: : namespaces/compiler/ia32.cft : 106.9
+
+
+Stack at : namespaces/compiler/ia32.cft : 107.11 :
+DataStack depth =   6 : Dsp (R14) = Top = 0x00007ffff7f251f8, InitialTos = 0x00007ffff7f251c8, Size = 0x0000000000000800
+                    DataStack   [   0 ] < 0x00007ffff7f251f8 > = 0x00007ffff6b15a88             < word : int.CalculateModRegardingDisplacement : definition = 0x0000000000000000 >
+                    DataStack   [  -1 ] < 0x00007ffff7f251f0 > = 0x0000000000000005
+                    DataStack   [  -2 ] < 0x00007ffff7f251e8 > = 0x0000000000000005
+                    DataStack   [  -3 ] < 0x00007ffff7f251e0 > = 0x0000000000000005
+                    DataStack   [  -4 ] < 0x00007ffff7f251d8 > = 0x0000000000000005
+                    DataStack   [  -5 ] < 0x00007ffff7f251d0 > = 0x0000000000000005
+
+Debug Menu at : 
+namespaces/compiler/ia32.cft : 107.11 :
+(m)enu, so(U)rce, dum(p), (e)val, (d)is, dis(a)ccum, dis(A)ccum, (r)egisters, (l)ocals, (v)ariables, (I)nfo, (w)dis, s(h)ow
+(R)eturnStack, sto(P), (S)tate, (c)ontinue, (s)tep, (o)ver, (i)nto, o(u)t, t(h)ru, s(t)ack, auto(z), (V)erbosity, (q)uit, a(B)ort
+usi(N)g, s(H)ow DebugWordList, sh(O)w CompilerWordList
+'\n' - escape, , '\' - <esc> - escape, ' ' - <space> - continue
+dbg[c]  :: namespaces/compiler/ia32.cft : 107.011 : Compiler :> return <: cprimitive :>     return mod ;  
+dbg[c]  :: ... : 107.017 : C_Syntax :> ; <: cprimitive :>     return mod ;  
+dbg[c]  :: ... : 108.003 : Debug :> d: <: 0x00007ffff7fb71bc :> d:  
+Code compiled to CodeSpace for word :> d: <: at namespaces/compiler/ia32.cft : 109.2
+Debug Menu at : 
+namespaces/compiler/ia32.cft : 109.2 :
+(m)enu, so(U)rce, dum(p), (e)val, (d)is, dis(a)ccum, dis(A)ccum, (r)egisters, (l)ocals, (v)ariables, (I)nfo, (w)dis, s(h)ow
+(R)eturnStack, sto(P), (S)tate, (c)ontinue, (s)tep, (o)ver, (i)nto, o(u)t, t(h)ru, s(t)ack, auto(z), (V)erbosity, (q)uit, a(B)ort
+usi(N)g, s(H)ow DebugWordList, sh(O)w CompilerWordList
+'\n' - escape, , '\' - <esc> - escape, ' ' - <space> - continue
+dbg[c]  :: namespaces/compiler/ia32.cft : 109.002 : C_Syntax :> } <: cprimitive :> } prefix  
+
+CfrTil_EndBlock : } : namespaces/compiler/ia32.cft : 109.2
+
+
+
+_CfrTil_EndBlock2 : compiler off : } : namespaces/compiler/ia32.cft : 109.2
+
+
+Code compiled to CodeSpace for word :> } <: at namespaces/compiler/ia32.cft : 109.2
+0x7ffff7fbe39c    498b47f0                mov rax, [r15-0x10]                                    
+0x7ffff7fbe3a0    4d8d77f8                lea r14, [r15-0x8]                                     
+0x7ffff7fbe3a4    4d8b7e08                mov r15, [r14+0x8]                                     
+0x7ffff7fbe3a8    4983ee08                sub r14, 0x8                                           
+0x7ffff7fbe3ac    498906                  mov [r14], rax                                         
+0x7ffff7fbe3af    c3                      ret                                                    
+Stack : word at namespaces/compiler/ia32.cft : 109.2 :> } <: 1 cell popped off the stack. TOS at : <0x00007ffff7f251f0> : changed to 0x0000000000000005.
+dbg[i]  :: ... : 109.009 : Compiler :> prefix <: cprimitive :> } prefix  
+dbg[i]  :: ... : 110.001 : Root :> ' <: 0x00007ffff7fb71de :> 
