@@ -19,11 +19,11 @@ CfrTil_EndCombinator ( int64 quotesUsed, int64 moveFlag )
     Compiler * compiler = _Context_->Compiler0 ;
     BlockInfo *bi = ( BlockInfo * ) _Stack_Pick ( compiler->CombinatorBlockInfoStack, quotesUsed - 1 ) ; // -1 : remember - stack is zero based ; stack[0] is top
     compiler->BreakPoint = Here ;
-    _CfrTil_InstallGotoCallPoints_Keyed ( ( BlockInfo* ) bi, GI_CONTINUE | GI_BREAK ) ; 
+    _CfrTil_InstallGotoCallPoints_Keyed ( ( BlockInfo* ) bi, GI_CONTINUE | GI_BREAK ) ;
     if ( moveFlag ) //&& GetState ( _CfrTil_, INLINE_ON ) )
     {
         byte * qCodeStart ;
-        if ( bi->FrameStart ) 
+        if ( bi->FrameStart )
             qCodeStart = bi->bp_First ; // after the stack frame
         else qCodeStart = bi->ActualCodeStart ;
         Block_Copy ( qCodeStart, bi->CombinatorStartsAt, Here - bi->CombinatorStartsAt ) ;
@@ -43,6 +43,8 @@ BlockInfo *
 CfrTil_BeginCombinator ( int64 quotesUsed )
 {
     Compiler * compiler = _Context_->Compiler0 ;
+    d1 ( if ( Is_DebugOn ) _Printf ( ( byte* ) "\n\nCfrTil_BeginCombinator : BlockStack depth = %d : DataStack depth = %d : %s : in  %s : quotes = %d : %s\n\n", _Stack_Depth ( compiler->BlockStack ), DataStack_Depth ( ),
+        _Context_->CurrentlyRunningWord->Name, compiler->CurrentWordCompiling->Name, quotesUsed, Context_Location ( ) ) ) ;
     BlockInfo *bi = ( BlockInfo * ) _Stack_Pick ( compiler->CombinatorBlockInfoStack, quotesUsed - 1 ) ; // -1 : remember - stack is zero based ; stack[0] is top
     // optimize out jmps such that the jmp from first block is to Here the start of the combinator code
     bi->CombinatorStartsAt = Here ;
@@ -63,7 +65,6 @@ CfrTil_DropBlock ( )
         CfrTil_EndCombinator ( 1, 0 ) ;
     }
 }
-
 
 void
 CfrTil_BlockRun ( )
@@ -92,7 +93,7 @@ CfrTil_LoopCombinator ( )
     DataStack_DropN ( 1 ) ;
     if ( CompileMode )
     {
-        
+
         CfrTil_BeginCombinator ( 1 ) ;
         byte * start = Here ;
         compiler->ContinuePoint = start ;
@@ -350,7 +351,7 @@ void
 CfrTil_ForCombinator ( )
 {
     Compiler * compiler = _Context_->Compiler0 ;
-    block doBlock = ( block ) TOS, doPostBlock = ( block ) _Dsp_ [ - 1 ], 
+    block doBlock = ( block ) TOS, doPostBlock = ( block ) _Dsp_ [ - 1 ],
         testBlock = ( block ) _Dsp_ [ - 2 ], doPreBlock = ( block ) _Dsp_ [ - 3 ] ;
     DataStack_DropN ( 4 ) ;
     if ( CompileMode )

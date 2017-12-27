@@ -122,17 +122,6 @@ CfrTil_Swap ( )
         _Dsp_ [ - 1 ] = a ;
     }
 }
-
-void
-CfrTil_PrintNRspRegStack ( )
-{
-    // Intel SoftwareDevelopersManual-253665.pdf section 6.2 : a push decrements ESP, a pop increments ESP
-    // therefore TOS is in lower mem addresses, bottom of stack is in higher memory addresses
-    int64 size = DataStack_Pop ( ) ;
-    _CfrTil_PrintNReturnStack ( size ) ;
-    CfrTil_NewLine () ;
-}
-
 void
 CfrTil_PrintNDataStack ( )
 {
@@ -151,6 +140,25 @@ CfrTil_PrintRspRegStack ( )
     _CfrTil_PrintNReturnStack ( 8 ) ;
 }
 #endif
+
+void
+CfrTil_PrintReturnStack ( )
+{
+    _CfrTil_PrintNReturnStack ( 8 ) ;
+    CfrTil_NewLine ( ) ;
+
+}
+
+
+void
+CfrTil_PrintNReturnStack ( )
+{
+    // Intel SoftwareDevelopersManual-253665.pdf section 6.2 : a push decrements ESP, a pop increments ESP
+    // therefore TOS is in lower mem addresses, bottom of stack is in higher memory addresses
+    int64 size = DataStack_Pop ( ) ;
+    _CfrTil_PrintNReturnStack ( size ) ;
+    CfrTil_NewLine () ;
+}
 
 void
 CfrTil_PrintNDataStack_8 ( )

@@ -134,7 +134,7 @@ _Debugger_Set_DataStackPointer_WithCpuStateDsp ( Debugger * debugger )
 void
 _CfrTil_PrintDataStack ( )
 {
-    _Stack_Print ( _DataStack_, ( byte* ) "DataStack" ) ;
+    Stack_Print ( _DataStack_, ( byte* ) "DataStack" ) ;
 }
 
 void
@@ -143,6 +143,7 @@ CfrTil_PrintDataStack ( )
     Set_DataStackPointer_FromDspReg ( ) ;
     _CfrTil_PrintDataStack ( ) ;
 }
+
 
 void
 Set_DataStackPointer_FromDspReg ( )
@@ -157,16 +158,6 @@ Set_DspReg_FromDataStackPointer ( )
     _CfrTil_->Set_DspReg_FromDataStackPointer ( ) ;
 }
 
-
-void
-CfrTil_PrintReturnStack ( )
-{
-    //_CfrTil_->ReturnStack->StackPointer = _Rsp_ ;
-    //_Stack_Print ( _CfrTil_->ReturnStack, ( byte* ) "ReturnStack" ) ;
-    _CfrTil_PrintNReturnStack ( 8 ) ;
-    CfrTil_NewLine ( ) ;
-
-}
 
 void
 CfrTil_CheckInitDataStack ( )

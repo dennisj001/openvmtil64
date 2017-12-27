@@ -71,7 +71,7 @@ _Block_Copy ( byte * srcAddress, int64 bsize, int8 optFlag )
         }
         byte * here = Here ;
         _CompileN ( srcAddress, isize ) ; // memcpy ( dstAddress, address, size ) ;
-        d0 ( if ( Is_DebugModeOn ) _Debugger_Disassemble ( _Debugger_, ( byte* ) here, Here - here, 1 ) ) ;
+        d1 ( if ( Is_DebugModeOn ) _Debugger_Disassemble ( _Debugger_, ( byte* ) here, Here - here, 1 ) ) ;
     }
 }
 
@@ -247,7 +247,7 @@ _CfrTil_BeginBlock2 ( BlockInfo * bi )
 void
 CfrTil_BeginBlock ( )
 {
-    d0 ( if ( Is_DebugOn ) _Printf ((byte*) "\n\nCfrTil_BeginBlock : %s : %s\n\n", _Context_->CurrentlyRunningWord->Name, Context_Location ()) ) ;
+    d1 ( if ( Is_DebugOn ) _Printf ((byte*) "\n\nCfrTil_BeginBlock : %s : %s\n\n", _Context_->CurrentlyRunningWord->Name, Context_Location ()) ) ;
     CheckCodeSpaceForRoom ( ) ;
     BlockInfo * bi = _CfrTil_BeginBlock0 ( ) ;
     _CfrTil_BeginBlock1 ( bi ) ;
@@ -323,11 +323,11 @@ _CfrTil_EndBlock2 ( BlockInfo * bi )
         _CfrTil_InstallGotoCallPoints_Keyed ( bi, GI_GOTO | GI_RECURSE ) ;
         CfrTil_TurnOffBlockCompiler ( ) ;
         Compiler_Init ( compiler, 0 ) ;
-        d0 ( if ( Is_DebugOn ) _Printf ((byte*) "\n\n_CfrTil_EndBlock2 : compiler off : %s : %s\n\n", _Context_->CurrentlyRunningWord->Name, Context_Location ()) ) ;
+        d1 ( if ( Is_DebugOn ) _Printf ((byte*) "\n\n_CfrTil_EndBlock2 : compiler off : %s : %s\n\n", _Context_->CurrentlyRunningWord->Name, Context_Location ()) ) ;
     }
     else
     {
-        d0 ( if ( Is_DebugOn ) _Printf ((byte*) "\n\n_CfrTil_EndBlock2 : _Stack_Depth ( compiler->BlockStack ) = %d : %s : %s\n\n", _Stack_Depth ( compiler->BlockStack ), _Context_->CurrentlyRunningWord->Name, Context_Location ()) ) ;
+        d1 ( if ( Is_DebugOn ) _Printf ((byte*) "\n\n_CfrTil_EndBlock2 : _Stack_Depth ( compiler->BlockStack ) = %d : %s : %s\n\n", _Stack_Depth ( compiler->BlockStack ), _Context_->CurrentlyRunningWord->Name, Context_Location ()) ) ;
         _Namespace_RemoveFromUsingListAndClear ( bi->LocalsNamespace ) ; //_Compiler_FreeBlockInfoLocalsNamespace ( bi, compiler ) ;
     }
     return bp_First ;
@@ -336,7 +336,7 @@ _CfrTil_EndBlock2 ( BlockInfo * bi )
 byte *
 _CfrTil_EndBlock ( )
 {
-    d0 ( if ( Is_DebugOn ) _Printf ((byte*) "\n\nCfrTil_EndBlock : %s : %s\n\n", _Context_->CurrentlyRunningWord->Name, Context_Location ()) ) ;
+    d1 ( if ( Is_DebugOn ) _Printf ((byte*) "\n\nCfrTil_EndBlock : %s : %s\n\n", _Context_->CurrentlyRunningWord->Name, Context_Location ()) ) ;
     BlockInfo * bi = ( BlockInfo * ) Stack_Pop_WithExceptionOnEmpty ( _Context_->Compiler0->BlockStack ) ;
     // this idea has the problem that in c syntax CurrentlyRunningWord is not really set in the usual way
     //Word * word = Compiler_WordList ( 1 ) ; //_Context_->CurrentlyRunningWord ;

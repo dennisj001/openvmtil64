@@ -505,7 +505,7 @@ void dllist_Map_OnePlusStatus(dllist *list, MapFunction2 mf, int64 one, int64 *s
 void Tree_Map_State_2Args(dllist *list, uint64 state, MapSymbolFunction2 mf, int64 one, int64 two);
 Word *Tree_Map_OneNamespace(Word *word, MapFunction_1 mf, int64 one);
 Word *Tree_Map_State_Flag_OneArg_AnyNamespaceWithState(uint64 state, MapFunction_1 mf, int64 one);
-Word *TC_Tree_Map_2(TabCompletionInfo *tci, dllist *list, MapFunction mf, Word *iword);
+Word *TC_Tree_Map_3(TabCompletionInfo *tci, MapFunction mf, Word *iword);
 /* basis/core/interpret.c */
 Word *Interpreter_InterpretAToken(Interpreter *interp, byte *token, int64 tokenStartReadLineIndex);
 void Interpreter_InterpretNextToken(Interpreter *interp);
@@ -586,7 +586,8 @@ void Stack_Print_AValue(uint64 *stackPointer, int64 i, byte *stackName, byte *bu
 void _Stack_PrintHeader(Stack *stack, byte *name);
 void _Stack_PrintValues(byte *name, uint64 *stackPointer, int64 depth);
 void Stack_PrintValues(byte *name, Stack *stack, int64 depth);
-void _Stack_Print(Stack *stack, byte *name);
+void _Stack_Print(Stack *stack, byte *name, int64 depth);
+void Stack_Print(Stack *stack, byte *name);
 int64 _Stack_Overflow(Stack *stack);
 int64 _Stack_IsEmpty(Stack *stack);
 void _Stack_Push(Stack *stack, int64 value);
@@ -790,7 +791,6 @@ void _CfrTil_PrintDataStack(void);
 void CfrTil_PrintDataStack(void);
 void Set_DataStackPointer_FromDspReg(void);
 void Set_DspReg_FromDataStackPointer(void);
-void CfrTil_PrintReturnStack(void);
 void CfrTil_CheckInitDataStack(void);
 void CfrTil_DataStack_Size(void);
 /* basis/context.c */
@@ -1301,6 +1301,7 @@ void Debugger_Parse(Debugger *debugger);
 void _Debugger_FindAny(Debugger *debugger);
 void Debugger_FindAny(Debugger *debugger);
 void Debugger_FindUsing(Debugger *debugger);
+void _Debugger_PrintDataStack(int64 depth);
 void Debugger_DWL_ShowList(Debugger *debugger);
 void Debugger_Variables(Debugger *debugger);
 void Debugger_Using(Debugger *debugger);
@@ -1309,6 +1310,7 @@ void Debugger_SetupNextToken(Debugger *debugger);
 void Debugger_Info(Debugger *debugger);
 void Debugger_DoMenu(Debugger *debugger);
 void Debugger_Stack(Debugger *debugger);
+void Debugger_ReturnStack(Debugger *debugger);
 void Debugger_ShowCompilerWordList(Debugger *debugger);
 void Debugger_Source(Debugger *debugger);
 void _Debugger_CpuState_Show(void);
@@ -1729,8 +1731,9 @@ void CfrTil_Dup(void);
 void CfrTil_NDup(void);
 void CfrTil_Pick(void);
 void CfrTil_Swap(void);
-void CfrTil_PrintNRspRegStack(void);
 void CfrTil_PrintNDataStack(void);
+void CfrTil_PrintReturnStack(void);
+void CfrTil_PrintNReturnStack(void);
 void CfrTil_PrintNDataStack_8(void);
 /* primitives/debuggers.c */
 void CfrTil_Debug_AtAddress(void);

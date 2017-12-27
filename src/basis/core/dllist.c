@@ -526,6 +526,7 @@ Tree_Map_State_Flag_OneArg_AnyNamespaceWithState ( uint64 state, MapFunction_1 m
     }
     return 0 ;
 }
+#if 0
 
 Word *
 TC_Tree_Map_2 ( TabCompletionInfo * tci, dllist * list, MapFunction mf, Word * iword )
@@ -591,6 +592,56 @@ doReturn:
     }
     return rword ;
 }
+#else
+
+Word *
+TC_Tree_Map_3 ( TabCompletionInfo * tci, MapFunction mf, Word * word )
+{
+    Word *nextWord, *ns, *rword = 0 ;
+start:
+    if ( word ) //initial word
+    {
+        //mf ( ( Symbol* ) word ) ;
+        //return nextWord = ( Word* ) dlnode_Next ( ( node* ) word ) ;
+        //if ( ! tci->OriginalRunWord ) tci->OriginalRunWord = word ;
+        ns = word->S_ContainingNamespace ;
+        //word->W_FoundMarker = tci->FoundMarker ;
+        goto checkWord ;
+    }
+    for ( ns = ( Word * ) dllist_First ( _CfrTil_->Namespaces->W_List ) ; ns ; ns = ( Word* ) dlnode_Next ( ( node* ) ns ) ) //ns = nextNs )
+    {
+checkList:
+        //nextNs = ( Word* ) dlnode_Next ( ( node* ) ns ) ;
+        for ( word = ( Word * ) dllist_First ( ns->S_SymbolList ) ; word ; word = nextWord ) //word = ( Word* ) dlnode_Next ( ( node* ) word )  )
+        {
+checkWord:
+            nextWord = ( Word* ) dlnode_Next ( ( node* ) word ) ;
+            ///while ( Is_NamespaceType ( nextWord ) ) nextWord = ( Word* ) dlnode_Next ( ( node* ) nextWord ) ;
+            //if ( nextWord && ( nextWord->W_FoundMarker == tci->FoundMarker ) ) break ;
+            if ( mf ( ( Symbol* ) word ) )
+            {
+                if ( nextWord )
+                {
+                    rword = nextWord ;
+                    goto doReturn ;
+                }
+                //else return 0 ;
+            }
+        }
+    }
+doReturn:
+    if ( ! rword )
+    {
+        if ( ++ tci->WordWrapCount > 8 ) // 5 : there are five cases in the switch in _TabCompletion_Compare
+        {
+            tci->WordWrapCount = 0 ;
+        }
+        word = 0 ; //tci->OriginalRunWord ;
+        goto start ;
+    }
+    return rword ;
+}
+#endif
 
 #if 0
 

@@ -519,8 +519,8 @@ typedef struct
 typedef struct TCI
 {
     uint64 State ;
-    int64 TokenFirstChar, TokenLastChar, EndDottedPos, DotSeparator, TokenLength, FoundCount ;
-    int64 FoundWrapCount, WordCount, WordWrapCount, SearchNumber, FoundMarker, StartFlag, ShownWrap ;
+    int64 TokenFirstChar, TokenLastChar, EndDottedPos, DotSeparator, TokenLength, FoundCount, MaxFoundCount ;
+    int64 FoundWrapCount, WordCount, WordWrapCount, LastWordWrapCount, FoundMarker, StartFlag, ShownWrap ;
     byte *SearchToken, * PreviousIdentifier, *Identifier ;
     Word * TrialWord, * OriginalWord, *RunWord, *OriginalRunWord, *NextWord, *ObjectExtWord ;
     Namespace * OriginalContainingNamespace, * MarkNamespace ;
@@ -731,7 +731,7 @@ typedef struct
     Stack * ContextDataStack ;
     byte * Location ;
     dllist * WordList ;
-    Word * CurrentlyRunningWord, *NlsWord, *SC_CurrentCombinator ;
+    Word * CurrentlyRunningWord, *NlsWord, *SC_CurrentCombinator, *SourceCodeWord ;
     NBA * ContextNba ;
     sigjmp_buf JmpBuf0 ;
 } Context ;

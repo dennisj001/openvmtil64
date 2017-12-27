@@ -301,7 +301,7 @@ CPrimitive CPrimitives [] = {
     { "stack", CfrTil_PrintDataStack, 0, 0, 0, "Debug", "Root" },
     { "rstack", CfrTil_PrintReturnStack, 0, 0, 0, "Debug", "Root" },
     //{ "rspRegstack", CfrTil_PrintRspRegStack, 0, 0, 0, "Debug", "Root" },
-    { "nrstack", CfrTil_PrintNRspRegStack, 0, 0, 0, "Debug", "Root" },
+    { "nrstack", CfrTil_PrintNReturnStack, 0, 0, 0, "Debug", "Root" },
     { "dstack", CfrTil_PrintNDataStack_8, 0, 0, 0, "Debug", "Root" },
     { "ndstack", CfrTil_PrintNDataStack, 0, 0, 0, "Debug", "Root" },
     { "s{", CfrTil_DbgSourceCodeBeginBlock, IMMEDIATE, 0, 0, "Debug", "Root" },

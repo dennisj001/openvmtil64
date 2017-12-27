@@ -58,7 +58,7 @@ _Debugger_CompileAndStepOneInstruction ( Debugger * debugger, byte * jcAddress )
     byte * nextInsn = Debugger_CompileOneInstruction ( debugger, jcAddress, showExtraFlag ) ; // compile the insn here
     Debugger_StepOneInstruction ( debugger ) ;
     if ( showExtraFlag && ( _Q_->Verbosity >= 3 ) ) Debug_ExtraShow ( Here - svHere, showExtraFlag ) ;
-    _Debugger_ShowEffects ( debugger, debugger->w_Word, 1, 0 ) ;
+    _Debugger_ShowEffects ( debugger, debugger->w_Word, GetState ( debugger, DBG_STEPPING ), 0 ) ;
     DebugColors ;
     debugger->DebugAddress = nextInsn ;
 }
@@ -79,6 +79,7 @@ start:
             debugger->w_Word = word ;
             debugger->Token = word->Name ;
             //if ( * debugger->DebugAddress == CALLI32 ) _Word_ShowSourceCode ( word ) ;
+            _Context_->SourceCodeWord = word ;
         }
 
         if ( ( debugger->Key == 'I' ) ) // force Into a subroution

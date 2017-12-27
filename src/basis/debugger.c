@@ -80,7 +80,7 @@ Debugger_TableSetup ( Debugger * debugger )
     debugger->CharacterFunctionTable [ 27 ] = _Debugger_State ;
     debugger->CharacterFunctionTable [ 28 ] = Debugger_DisassembleTotalAccumulated ;
     debugger->CharacterFunctionTable [ 29 ] = Debugger_Using ;
-    //debugger->CharacterFunctionTable [ 30 ] = Debugger_ReturnStack ;
+    debugger->CharacterFunctionTable [ 30 ] = Debugger_ReturnStack ;
     debugger->CharacterFunctionTable [ 31 ] = ( DebuggerFunction ) DebugWordList_Show ;
     debugger->CharacterFunctionTable [ 32 ] = Debugger_ShowCompilerWordList ;
 }
@@ -159,7 +159,7 @@ _Debugger_PreSetup ( Debugger * debugger, Word * word, int8 forceFlag )
 void
 _Debugger_PostShow ( Debugger * debugger, Word * word, int8 force )//, byte * token, Word * word )
 {
-    _Debugger_ShowEffects ( debugger, word, 0, force ) ;
+    _Debugger_ShowEffects ( debugger, word, GetState ( debugger, DBG_STEPPING ), force ) ;
     DefaultColors ;
 }
 
@@ -334,6 +334,14 @@ Debugger_FindUsing ( Debugger * debugger )
 }
 
 void
+_Debugger_PrintDataStack ( int64 depth )
+{
+    Set_DataStackPointer_FromDspReg ( ) ;
+    _Stack_Print ( _DataStack_, ( byte* ) "DataStack", depth ) ;
+    //if (depth < Stack_Depth (_DataStack_) ) _Printf ( ( byte* ) "\t\t    ........." ) ;
+}
+
+void
 Debugger_DWL_ShowList ( Debugger * debugger )
 {
     DWL_ShowList ( debugger->w_Word, 0 ) ;
@@ -398,11 +406,11 @@ Debugger_Stack ( Debugger * debugger )
     if ( GetState ( debugger, DBG_STEPPING ) && GetState ( debugger->cs_Cpu, CPU_SAVED ) )
     {
         //Debugger_SyncStackPointersFromCpuState ( debugger ) ;
-        _CfrTil_PrintDataStack ( ) ; // stack has been adjusted 
+        _Debugger_PrintDataStack ( Stack_Depth (_DataStack_) ) ;// stack has been adjusted 
         _Printf ( ( byte* ) "\n" ) ;
         SetState ( debugger, DBG_INFO, true ) ;
     }
-    else CfrTil_PrintDataStack ( ) ;
+    else _Debugger_PrintDataStack ( Stack_Depth (_DataStack_) ) ;
     //if ( GetState ( debugger, DBG_STEPPING ) ) SetState ( debugger, DBG_START_STEPPING, true ) ;
 #if 0    
     if ( GetState ( debugger, DBG_STEPPING ) )
@@ -414,7 +422,7 @@ Debugger_Stack ( Debugger * debugger )
 #endif    
 }
 
-#if 0
+#if 1
 void
 Debugger_ReturnStack ( Debugger * debugger )
 {

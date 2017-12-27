@@ -123,7 +123,8 @@ void
 _Debugger_ShowDbgSourceCodeAtAddress ( Debugger * debugger, byte * address )
 {
     // ...source code source code TP source code source code ... EOL
-    Word * scWord = Compiling ? _Compiler_->CurrentWordCompiling : _Context_->CurrentlyRunningWord ;
+    //Word * scWord = Compiling ? _Compiler_->CurrentWordCompiling : _Context_->CurrentlyRunningWord ;
+    Word * scWord = Compiling ? _Compiler_->CurrentWordCompiling : _Context_->SourceCodeWord ? _Context_->SourceCodeWord : _Context_->CurrentlyRunningWord ;
     dllist * list = scWord->W_SC_WordList ? scWord->W_SC_WordList : _Compiler_->WordList ;
     if ( scWord && list )
     {
@@ -326,14 +327,14 @@ DWL_ShowWord ( Word * word, byte * insert, int64 scwiDiff )
 void
 DebugWordList_Show ( )
 {
-    Word * scWord = Compiling ? _Compiler_->CurrentWordCompiling : _Context_->CurrentlyRunningWord ;
+    Word * scWord = Compiling ? _Compiler_->CurrentWordCompiling : _Context_->SourceCodeWord ? _Context_->SourceCodeWord : _Context_->CurrentlyRunningWord ;
     dllist * list = scWord->W_SC_WordList ? scWord->W_SC_WordList : _Compiler_->WordList ;
+    int64 index ;
+    dlnode * node, *nextNode ;
     if ( Is_DebugModeOn && list ) //= _CfrTil_->DebugWordList ) ) //GetState ( _CfrTil_, DEBUG_SOURCE_CODE_MODE ) )
     {
         //if ( _CfrTil_->DebugWordListWord ) 
         _Printf ( "\nSourceCode WordList : for word = %s", scWord->Name ) ;
-        int64 index ;
-        dlnode * node, *nextNode ;
         for ( index = 0, node = dllist_First ( ( dllist* ) list ) ; node ; node = nextNode, index ++ )
         {
             nextNode = dlnode_Next ( node ) ;
@@ -341,7 +342,7 @@ DebugWordList_Show ( )
             byte * address = ( byte* ) dobject_Get_M_Slot ( dobj, SCN_SC_CADDRESS ) ; // notice : we are setting the slot in the obj that was in the SCN_SC_WORD_INDEX slot (1) of the 
             int64 scwi = dobject_Get_M_Slot ( dobj, SCN_WORD_SC_INDEX ) ;
             Word * word = ( Word * ) dobject_Get_M_Slot ( dobj, SCN_SC_WORD ) ;
-            _Printf ( "\nSourceCode WordList : name %s : index %2d : word = 0x%016lx : \'%-12s\' : address = 0x%016lx : scwi = %3d", _CfrTil_->DebugWordListWord->Name, index, word, word->Name, address, scwi ) ;
+            _Printf ( "\nSourceCode WordList : name %s : index %2d : word = 0x%016lx : \'%-12s\' : address = 0x%016lx : scwi = %3d", scWord->Name, index, word, word->Name, address, scwi ) ;
         }
         //_Pause ( ) ;
     }
@@ -357,9 +358,6 @@ void
 _CfrTil_DbgSourceCodeCompileOn ( )
 {
     SetState ( _CfrTil_, ( DEBUG_SOURCE_CODE_MODE | GLOBAL_SOURCE_CODE_MODE ), true ) ;
-    //Word * word = _CfrTil_WordList_TopWord ( ) ;
-    //if ( ( word->CAttribute2 & ( SYNTACTIC | NOOP_WORD | NO_CODING ) ) || 
-    //    ( word->CAttribute & (DEBUG_WORD) )  || ( word->LAttribute & (W_COMMENT|W_PREPROCESSOR) ) ) word->Coding = 0 ;
 }
 
 void
@@ -383,7 +381,6 @@ CfrTil_SourceCodeCompileOn ( )
 void
 CfrTil_SourceCodeCompileOff ( )
 {
-    //SetState ( _CfrTil_, SOURCE_CODE_MODE, false ) ;
     _CfrTil_DbgSourceCodeCompileOff ( ) ;
     if ( ! GetState ( _Context_, C_SYNTAX ) ) CfrTil_SemiColon ( ) ;
 }
@@ -430,7 +427,6 @@ _CfrTil_SourceCode_Init ( CfrTil * cfrtil )
 void
 _CfrTil_InitSourceCode ( CfrTil * cfrtil )
 {
-    //if ( force || ( ! GetState ( _CfrTil_, SOURCE_CODE_INITIALIZED ) ) ) {
     Lexer_SourceCodeOn ( _Context_->Lexer0 ) ;
     _CfrTil_SourceCode_Init ( cfrtil ) ;
 }
