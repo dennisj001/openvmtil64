@@ -1053,7 +1053,7 @@ _LO_Apply_Arg ( ListObject ** pl1, int64 i, int8 svCompileMode )
         word = Compiler_CopyDuplicatesAndPush ( word ) ;
         word->W_SC_ScratchPadIndex = l1->W_SC_ScratchPadIndex ;
         word->StackPushRegisterCode = 0 ;
-        _DEBUG_SETUP ( word, 0 ) ;
+        _DEBUG_SETUP ( word, 1 ) ;
         _Word_Eval ( word ) ; // ?? move value directly to RegOrder reg
         Word *baseObject = _Interpreter_->BaseObject ;
         //if ( svCompileMode && ( ! _Lexer_IsTokenForwardDotted ( cntx->Lexer0, word->W_SC_ScratchPadIndex ) ) ) // research : how does CAttribute get set to T_NIL?
@@ -1123,7 +1123,7 @@ _LO_Apply_Arg ( ListObject ** pl1, int64 i, int8 svCompileMode )
     else
     {
         word = Compiler_CopyDuplicatesAndPush ( word ) ;
-        DEBUG_SETUP ( word ) ;
+        _DEBUG_SETUP ( word, 1 ) ;
         _Compile_MoveImm_To_Reg ( RegOrder ( i ++ ), DataStack_Pop ( ), CELL_SIZE ) ;
         _DEBUG_SHOW ( word, 1 ) ;
     }
@@ -1162,11 +1162,16 @@ _LO_Apply_ArgList ( ListObject * l0, Word * word )
         word->W_SC_ScratchPadIndex = l0->W_SC_ScratchPadIndex ;
         word = Compiler_CopyDuplicatesAndPush ( word ) ;
         cntx->CurrentlyRunningWord = word ;
+        _DEBUG_SETUP ( word, 1 ) ;
         if ( ( String_Equal ( word->Name, "printf" ) ||  ( String_Equal ( word->Name, "sprintf" )) ) )
         {
             _Compile_MoveImm_To_Reg ( RAX, 0, CELL ) ; // for printf ?? others //System V ABI : "%rax is used to indicate the number of vector arguments passed to a function requiring a variable number of arguments"
         }
+#if 0       
         _Compile_Call_ThruReg ( ( byte* ) word->Definition, OP_REG ) ; //printf needs RAX at 0, so generally use the operand reg (OREG) for all, why not?
+#else
+        _Word_Eval ( word ) ;
+#endif        
         _DEBUG_SHOW ( word, 1 ) ;
         if ( ! svcm )
         {

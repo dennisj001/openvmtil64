@@ -13,7 +13,7 @@ System Interpreter Combinators C C_Combinators
 C String
 "Dlsym" namespace Dlsym "libc" namespace libc
 #if 1 //Zenfone2 @ not
-libc.printf ("\nhello\n") //pause
+libc.printf ("\nhello %d\n", 7) //pause
 #endif
 C
 User
@@ -98,14 +98,15 @@ chi ( chey0, d | a b c )
     printf ( "\n chi : d = %lx\n", d ) ;
     d = cobj.chey0.hey ;
     printf ( "\n%lx\n", d ) ;
+    printf ( "\n chi : d = %lx\n", d ) ;
     d #x12345678 _assert
     printf ( "\n%x\n", cobj.chey0.hey ) ;
     sprintf ( &chey0.chars [ 24 ], "%s", "hoot" ) ;
     dump ( &cobj.chey0, cobj.size ) ; 
-}
-scOff
+} prefix
 wdiss ( ' chi find )
 chi ( chey, 7 ) //pause
+scOff
 #endif // if 1 : endif
 //s pause
 #if 1 // if 1

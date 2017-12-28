@@ -6,10 +6,12 @@ infixOn
 : hi ( | x -- x ) x = ( 2 + ( 3 * 4 ) ) x @ p ; 
 ' hi find wdiss
 hi 14 _assert1
-s
-: hi1 ( a b | x -- x ) x = 2 + ( ( a @ ) / ( b @ ) ) * ( 3 * 4 ) ; 
+s 
+dscOn
+: hi1 ( a b | x -- x ) x = ( 2 + ( ( a @ ) / ( b @ ) ) * ( 3 * 4 ) ) ; 
 ' hi1 find wdiss
 6 3 hi1 dup p 48 _assert1
+dscOff
 10 5 hi1 dup p 48 _assert1
 : hi2 ( a b | x -- x ) ( x = ( ( ( ( 2 + ( ( a @ ) / ( b @ ) ) ) * ( ( 3 * 4 ) ) ) ) ) ) ; 
 ' hi2 find wdiss

@@ -371,23 +371,3 @@ _Compile_TEST_Reg_To_Reg ( int8 dstReg, int64 srcReg )
     _Compile_Op_Special_Reg_To_Reg ( TEST_R_TO_R, dstReg, srcReg ) ;
 }
 
-void
-_Compile_Return ( )
-{
-    _Compile_Int8 ( 0xc3 ) ;
-    //RET ( ) ; // use codegen_x86.h just to include it in
-}
-
-#if 0
-void
-Compile_Return ( )
-{
-    if ( ( ! _Compiler_->CurrentWordCompiling ) || ( ! ( _Compiler_->CurrentWordCompiling->CAttribute & CFRTIL_WORD ) ) )
-        _Compile_Return ( ) ;
-    else Compile_CfrTilWord_Return ( ) ;
-    //RET ( ) ; // use codegen_x86.h just to include it in
-    // pop rstack to R8
-    //_Compile_JumpToReg ( R8 ) ;
-}
-
-#endif

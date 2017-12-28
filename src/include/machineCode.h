@@ -186,6 +186,7 @@
 #define CPU_OREG R9d
 #define OPERAND_2_REG R8D                   // r8
 #define OREG2 OPERAND_2_REG 
+#define CPU_OREG2 R8d
 #define THRU_REG OPERAND_2_REG
 #define SCRATCH_REG OPERAND_2_REG // eax/edx are both used sometimes by ops ebx/ecx are not ?
 #define SREG SCRATCH_REG

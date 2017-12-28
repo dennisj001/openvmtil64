@@ -381,7 +381,7 @@ infixOn // c_syntaxOff turns off infix
     _Compile_SUBI_DSP ( CELL ) 
 ;; 
 
-#if 1
+#if 0
 Combinators
 :asm iax
     d: Compile_Stack_Pop_R8D ( ) 

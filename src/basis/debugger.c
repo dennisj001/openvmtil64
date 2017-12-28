@@ -15,7 +15,7 @@ Debugger_TableSetup ( Debugger * debugger )
     debugger->CharacterTable [ 'm' ] = 6 ;
     debugger->CharacterTable [ 'T' ] = 7 ;
     //debugger->CharacterTable [ 'V' ] = 8 ;
-    debugger->CharacterTable [ 'r' ] = 30 ;
+    debugger->CharacterTable [ 'r' ] = 10 ;
     debugger->CharacterTable [ 'c' ] = 11 ;
     debugger->CharacterTable [ 'q' ] = 12 ;
     debugger->CharacterTable [ 'o' ] = 1 ;
@@ -137,14 +137,11 @@ _Debugger_PreSetup ( Debugger * debugger, Word * word, int8 forceFlag )
                 if ( ! debugger->StartHere ) debugger->StartHere = Here ;
                 debugger->WordDsp = _Dsp_ ;
                 debugger->SaveTOS = TOS ;
-                //debugger->SaveRsp = _Rsp_ ;
                 debugger->Token = word->Name ;
                 debugger->PreHere = Here ;
                 _Namespace_FreeNamespacesStack ( debugger->LocalsNamespacesStack ) ;
                 DebugColors ;
-                //_Stack_Push ( _ReturnStack_, next ) ;
                 _Debugger_InterpreterLoop ( debugger ) ; // core of this function
-                //next :
                 DefaultColors ;
 
                 debugger->ReadIndex = _ReadLiner_->ReadIndex ;
@@ -422,13 +419,11 @@ Debugger_Stack ( Debugger * debugger )
 #endif    
 }
 
-#if 1
 void
 Debugger_ReturnStack ( Debugger * debugger )
 {
     CfrTil_PrintReturnStack ( ) ;
 }
-#endif
 
 void
 Debugger_ShowCompilerWordList ( Debugger * debugger )

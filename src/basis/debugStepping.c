@@ -57,8 +57,8 @@ _Debugger_CompileAndStepOneInstruction ( Debugger * debugger, byte * jcAddress )
     byte * svHere = Here ; // save 
     byte * nextInsn = Debugger_CompileOneInstruction ( debugger, jcAddress, showExtraFlag ) ; // compile the insn here
     Debugger_StepOneInstruction ( debugger ) ;
-    if ( showExtraFlag && ( _Q_->Verbosity >= 3 ) ) Debug_ExtraShow ( Here - svHere, showExtraFlag ) ;
-    _Debugger_ShowEffects ( debugger, debugger->w_Word, GetState ( debugger, DBG_STEPPING ), 0 ) ;
+    if ( showExtraFlag ) Debug_ExtraShow ( Here - svHere, showExtraFlag ) ;
+    _Debugger_ShowEffects ( debugger, debugger->w_Word, GetState ( debugger, DBG_STEPPING ), showExtraFlag ) ;
     DebugColors ;
     debugger->DebugAddress = nextInsn ;
 }
@@ -94,20 +94,12 @@ start:
             // so that newDebugAddress, below, will be our next stepping insn
             newDebugAddress = debugger->DebugAddress + size ;
         }
-        else if ( ( debugger->Key == 'h' ) || ( debugger->Key == 'o' ) )// step '(t)hru' the native code like a non-native subroutine
+        else if ( ( debugger->Key == 'h' ) || ( debugger->Key == 'o' ) )// step 't(h)ru'/(o)ver the native code like a non-native subroutine
         {
             _Printf ( ( byte* ) "\ncalling t(h)ru - a subroutine : %s : .... :>", word ? ( char* ) c_gd ( word->Name ) : "" ) ;
             Compile_Call ( jcAddress ) ;
             newDebugAddress = debugger->DebugAddress + size ;
         }
-#if 0 // this actually steps over the call not calling it;?? i don't think we have any use for it, and it is not the expected behavior ??       
-        else if ( debugger->Key == 'o' ) // step '(o)ver' the native code like a non-native subroutine
-        {
-            _Printf ( ( byte* ) "\nstepping '(o)ver' - a subroutine : %s : .... :>", word ? ( char* ) c_gd ( word->Name ) : "" ) ;
-            //Compile_Call ( jcAddress ) ;
-            newDebugAddress = debugger->DebugAddress + size ;
-        }
-#endif        
         else if ( debugger->Key == 'u' ) // step o(u)t of the native code like a non-native subroutine
         {
             _Printf ( ( byte* ) "\nstepping thru and 'o(u)t' of a \"native\" subroutine : %s : .... :>", word ? ( char* ) c_gd ( word->Name ) : "" ) ;
@@ -159,22 +151,6 @@ Debugger_CompileAndStepOneInstruction ( Debugger * debugger )
     if ( debugger->DebugAddress )
     {
         byte *jcAddress = 0 ;
-        // special cases
-#if 0        
-        if ( ! memcmp ( mov_rax_rbx__sub_rbx_0x8, debugger->DebugAddress, 7 ) )
-        {
-            //_CfrTil_->Set_ReturnStackPointer_FromCfrTilRspReg () ;
-            //_RSP_ = _Rsp_ ;
-            if ( Stack_Depth ( _CfrTil_->ReturnStack ) > 1 )
-            {
-                CfrTil_PrintReturnStack ( ) ;
-                debugger->DebugAddress = ( byte* ) _Stack_Pop ( _CfrTil_->ReturnStack ) ;
-                Debugger_GetWordFromAddress ( debugger ) ;
-            }
-            else goto doReturn ;
-        }
-        //else 
-#endif        
         if ( * debugger->DebugAddress == _RET )
         {
             if ( Stack_Depth ( debugger->ReturnStack ) )
@@ -185,36 +161,27 @@ Debugger_CompileAndStepOneInstruction ( Debugger * debugger )
             else
             {
 doReturn:
-#if 0                
-                Debugger_GetWordFromAddress ( debugger ) ;
-                if ( ! String_Equal ( debugger->w_Word->Name, _Context_->CurrentlyRunningWord->Name ) )
+                SetState ( debugger, DBG_STACK_OLD, true ) ;
+                debugger->CopyRSP = 0 ;
+                if ( GetState ( debugger, DBG_BRK_INIT ) )
                 {
-                    debugger->DebugAddress = ( byte* ) debugger->cs_Cpu->Rsp [0] ; // ?? what is the correct offset here ??
-                    Debugger_GetWordFromAddress ( debugger ) ;
+                    SetState_TrueFalse ( debugger, DBG_INTERPRET_LOOP_DONE | DBG_STEPPED, DBG_ACTIVE | DBG_BRK_INIT | DBG_STEPPING ) ;
                 }
                 else
-#endif                    
                 {
-                    //Debugger_SyncStackPointersFromCpuState ( debugger ) ;
-                    SetState ( debugger, DBG_STACK_OLD, true ) ;
-                    debugger->CopyRSP = 0 ;
-                    if ( GetState ( debugger, DBG_BRK_INIT ) )
-                    {
-                        SetState_TrueFalse ( debugger, DBG_INTERPRET_LOOP_DONE | DBG_STEPPED, DBG_ACTIVE | DBG_BRK_INIT | DBG_STEPPING ) ;
-                    }
-                    else
-                    {
-                        SetState_TrueFalse ( debugger, DBG_INTERPRET_LOOP_DONE | DBG_STEPPED, DBG_ACTIVE | DBG_STEPPING ) ;
-                    }
-                    if ( debugger->w_Word ) SetState ( debugger->w_Word, STEPPED, true ) ;
-                    debugger->DebugAddress = 0 ;
-                    if ( _Q_->Verbosity > 3 )
-                    {
-                        _Debugger_CpuState_Show ( ) ;
-                        Pause ( ) ;
-                    }
-                    SetState ( debugger->cs_Cpu, CPU_SAVED, false ) ;
+                    SetState_TrueFalse ( debugger, DBG_INTERPRET_LOOP_DONE | DBG_STEPPED, DBG_ACTIVE | DBG_STEPPING ) ;
                 }
+                if ( debugger->w_Word ) SetState ( debugger->w_Word, STEPPED, true ) ;
+                debugger->DebugAddress = 0 ;
+                if ( _Q_->Verbosity > 3 )
+                {
+                    //_Debugger_CpuState_Show ( ) ;
+                    //CfrTil_CpuState_Show ( ) ;
+                    //d1 ( Debugger_ReturnStack ( debugger ) ) ;
+                    CfrTil_CpuState_Current_Show ( ) ;
+                    Pause ( ) ;
+                }
+                SetState ( debugger->cs_Cpu, CPU_SAVED, false ) ;
             }
             goto end ;
         }
@@ -406,7 +373,7 @@ _Debugger_SetupReturnStackCopy ( Debugger * debugger, int64 size, int8 showFlag 
         if ( ! debugger->CopyRSP )
         {
             rsc0 = ( uint64 ) Mem_Allocate ( size, COMPILER_TEMP ) ;
-            rsc = ( rsc0 + 0x8 ) & ( uint64 ) 0xfffffffffffffff0 ; // 16 byte alignment
+            rsc = ( rsc0 + 0xf ) & ( uint64 ) 0xfffffffffffffff0 ; // 16 byte alignment
             debugger->CopyRSP = ( byte* ) rsc + size - pushedWindow ;
             if ( showFlag ) ( _PrintNStackWindow ( ( int64* ) debugger->CopyRSP, "ReturnStackCopy", "RSCP", 4 ) ) ;
         }
@@ -440,7 +407,7 @@ Debugger_SetupReturnStackCopy ( Debugger * debugger, int64 showFlag ) // restore
     int64 stackSetupFlag = 0 ;
     if ( ( ! debugger->CopyRSP ) || GetState ( debugger, DBG_STACK_OLD ) )
     {
-        stackSetupFlag = _Debugger_SetupReturnStackCopy ( debugger, 8 * K, 0 ) ;
+        stackSetupFlag = _Debugger_SetupReturnStackCopy ( debugger, 8 * K, 1 ) ;
     }
 #if 0    
     // restore the running cfrTil esp/ebp : nb! : esp/ebp were not restored by debugger->RestoreCpuState and are being restore here in the proper context

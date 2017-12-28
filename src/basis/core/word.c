@@ -103,6 +103,7 @@ _Word_Compile ( Word * word )
     }
     else
     {
+        //d1 ( if ( Is_DebugOn ) _Compile_Stack_Push ( DSP, (int64) Here ) ) ; // lets us see the divisions of the stack
         Compile_Call ( ( byte* ) word->Definition ) ;
     }
 

@@ -50,7 +50,7 @@ void _Compile_CallThruMem(int8 reg);
 void _Compile_CallThruReg(int8 reg);
 void Compile_Call_ToAddressThruReg(byte *address, int8 reg);
 void _Compile_Call_ThruReg(byte *callAddr, int8 reg);
-void _Compile_Call(byte *callAddr);
+void _Compile_Call(byte *callAddr, int8 thruReg);
 void Compile_Call(byte *callAddr);
 void _Compile_Call_NoOptimize(byte *callAddr);
 void _Compile_PushReg(int8 reg);
@@ -64,6 +64,7 @@ void Compile_X_Group5(Compiler *compiler, int64 op);
 void _Compile_optInfo_X_Group1(Compiler *compiler, int64 op);
 void Compile_X_Group1(Compiler *compiler, int64 op, int64 ttt, int64 n);
 void _Compile_Jcc(int64 bindex, int64 overwriteFlag, int64 nz, int64 ttt);
+void _Compile_Return(void);
 /* basis/compiler/_compile.c */
 void _Compile_Call_Acc(void);
 void Compile_DataStack_PopAndCall(void);
@@ -165,7 +166,6 @@ void Compile_DspPop_RspPush(void);
 void Compile_Set_DspReg_FromDataStackPointer(void);
 void Compile_Set_DataStackPointer_FromDspReg(void);
 void _Compile_TEST_Reg_To_Reg(int8 dstReg, int64 srcReg);
-void _Compile_Return(void);
 /* basis/compiler/sequence.c */
 /* basis/compiler/logic.c */
 void CfrTil_If(void);
@@ -505,7 +505,7 @@ void dllist_Map_OnePlusStatus(dllist *list, MapFunction2 mf, int64 one, int64 *s
 void Tree_Map_State_2Args(dllist *list, uint64 state, MapSymbolFunction2 mf, int64 one, int64 two);
 Word *Tree_Map_OneNamespace(Word *word, MapFunction_1 mf, int64 one);
 Word *Tree_Map_State_Flag_OneArg_AnyNamespaceWithState(uint64 state, MapFunction_1 mf, int64 one);
-Word *TC_Tree_Map_3(TabCompletionInfo *tci, MapFunction mf, Word *iword);
+Word *TC_Tree_Map_3(TabCompletionInfo *tci, MapFunction mf, Word *word);
 /* basis/core/interpret.c */
 Word *Interpreter_InterpretAToken(Interpreter *interp, byte *token, int64 tokenStartReadLineIndex);
 void Interpreter_InterpretNextToken(Interpreter *interp);
@@ -1038,7 +1038,6 @@ void CfrTil_InterpreterRun(void);
 void RL_TabCompletion_Run(ReadLiner *rl, Word *rword);
 TabCompletionInfo *TabCompletionInfo_New(uint64 type);
 byte *ReadLiner_GenerateFullNamespaceQualifiedName(ReadLiner *rl, Word *w);
-void TM_WrapWordCount(TabCompletionInfo *tci, Word *word);
 Boolean _TabCompletion_Compare(Word *word);
 int64 _TC_FindPrevious_NamespaceQualifiedIdentifierStart(TabCompletionInfo *tci, byte *s, int64 pos);
 void RL_TC_StringInsert_AtCursor(ReadLiner *rl, byte *strToInsert);

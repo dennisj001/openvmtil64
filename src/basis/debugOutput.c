@@ -57,8 +57,9 @@ void
 _Debugger_Locals_ShowALocal ( Debugger * debugger, Word * localsWord, byte * buffer ) // use a debugger buffer instead ??
 {
     int64 varOffset ;
-    if ( localsWord->CAttribute & LOCAL_VARIABLE ) varOffset = LocalVarOffset ( localsWord ) ;
-    else if ( localsWord->CAttribute & PARAMETER_VARIABLE ) varOffset = - ( localsWord->Index ) ; //ParameterVarOffset ( localsWord ) ;
+    //if ( localsWord->CAttribute & LOCAL_VARIABLE ) varOffset = LocalVarOffset ( localsWord ) ;
+    //else if ( localsWord->CAttribute & PARAMETER_VARIABLE ) varOffset = - ( localsWord->Index ) ; //ParameterVarOffset ( localsWord ) ;
+    varOffset = LocalParameterVarOffset ( localsWord ) ;
     uint64 * fp = ( int64* ) debugger->cs_Cpu->CPU_FP ;
     if ( fp < ( uint64* ) 0x7f000000 ) fp = 0 ;
     byte * address = ( byte* ) ( fp ? fp [ varOffset ] : 0 ) ;
@@ -467,7 +468,7 @@ next:
 void
 Debugger_ShowInfo ( Debugger * debugger, byte * prompt, int64 signal )
 {
-    if ( ( ! debugger->w_Word ) || ( _ReadLiner_->ReadIndex != debugger->ReadIndex ) || debugger->w_Word->WAttribute == WT_C_PREFIX_RTL_ARGS )
+    //if ( ( ! debugger->w_Word ) || ( _ReadLiner_->ReadIndex != debugger->ReadIndex ) || debugger->w_Word->WAttribute == WT_C_PREFIX_RTL_ARGS )
     {
         Context * cntx = _Context_ ;
         int64 sif = 0 ;

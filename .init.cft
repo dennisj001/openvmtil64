@@ -358,12 +358,12 @@ scOff
 
 sp 
 : sh _sh ; prefix
-Root 'doScript 1 const
 stringMacrosOn
 : testCfrTil "namespaces/init.cft" include ;
 dbgOff
 dbgOn
 #if dbgOnVar @ 
+Root 'doScript 1 const
 System
 testCfrTil dT0 //demo dT0
 stringMacrosOff

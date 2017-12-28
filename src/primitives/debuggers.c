@@ -65,8 +65,8 @@ CfrTil_DebugRuntimeBreakpoint ( )
             _Debugger_InterpreterLoop ( debugger ) ;
             SetState ( debugger, DBG_RUNTIME_BREAKPOINT | DEBUG_SHTL_OFF, false ) ;
             // we just stepped this word and used it's arguments in the source code ; if we just return the interpreter will attempt to interpret the arguments
+#if 0  // this is only accurate if we called into a leaf function with <dbg> from C
             Word * word = debugger->w_Word ;
-#if 1  // this is only accurate if we called into a leaf function with <dbg> from C
             if ( ( ! word ) || GetState ( word, STEPPED ) )
             {
                 _CfrTil_->SaveDsp = _Dsp_ ;

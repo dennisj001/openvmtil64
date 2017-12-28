@@ -47,7 +47,7 @@ _DataObject_New ( uint64 type, Word * word, byte * name, uint64 ctype, uint64 ct
         }
         case CONSTANT:
         {
-            word = _DObject_New ( name, value, (CONSTANT | IMMEDIATE | CPRIMITIVE), ctype2, 0, CONSTANT, ( byte* ) _DataObject_Run, 0, 1, 0, DICTIONARY ) ;
+            word = _DObject_New ( name, value, ( CONSTANT | IMMEDIATE | CPRIMITIVE ), ctype2, 0, CONSTANT, ( byte* ) _DataObject_Run, 0, 1, 0, DICTIONARY ) ;
             break ;
         }
         case OBJECT:
@@ -198,7 +198,7 @@ _Class_New ( byte * name, uint64 type, int64 cloneFlag )
 Word *
 _CfrTil_ClassField_New ( byte * token, Class * aclass, int64 size, int64 offset )
 {
-    Word * word = _DObject_New ( token, 0, (IMMEDIATE | OBJECT_FIELD | CPRIMITIVE), 0, 0, OBJECT_FIELD, ( byte* ) _DataObject_Run, 0, 1, 0, DICTIONARY ) ;
+    Word * word = _DObject_New ( token, 0, ( IMMEDIATE | OBJECT_FIELD | CPRIMITIVE ), 0, 0, OBJECT_FIELD, ( byte* ) _DataObject_Run, 0, 1, 0, DICTIONARY ) ;
     word->ClassFieldTypeNamespace = aclass ;
     word->Size = size ;
     word->Offset = offset ;
@@ -216,7 +216,7 @@ _CfrTil_Variable_New ( byte * name, int64 value )
         word = CfrTil_LocalWord ( name, LOCAL_VARIABLE ) ; // svf : flag - whether stack variables are in the frame
         SetState ( _Compiler_, VARIABLE_FRAME, true ) ;
     }
-    else word = _DObject_New ( name, value, (CPRIMITIVE | NAMESPACE_VARIABLE | IMMEDIATE), 0, 0, NAMESPACE_VARIABLE, ( byte* ) _DataObject_Run, 0, 1, 0, DICTIONARY ) ;
+    else word = _DObject_New ( name, value, ( CPRIMITIVE | NAMESPACE_VARIABLE | IMMEDIATE ), 0, 0, NAMESPACE_VARIABLE, ( byte* ) _DataObject_Run, 0, 1, 0, DICTIONARY ) ;
     return word ;
 }
 
@@ -228,9 +228,9 @@ _CfrTil_Label ( byte * lname )
     Namespace * ns = Namespace_FindOrNew_SetUsing ( ( byte* ) "__labels__", _CfrTil_->Namespaces, 1 ) ;
     if ( Finder_FindWord_InOneNamespace ( _Finder_, ns, lname ) )
     {
-       byte bufferData [ 32 ], *buffer = ( byte* ) bufferData ;
-       sprintf ( ( char* ) buffer, "%s%d", lname, rand () ) ;
-       lname = buffer ;
+        byte bufferData [ 32 ], *buffer = ( byte* ) bufferData ;
+        sprintf ( ( char* ) buffer, "%s%d", lname, rand ( ) ) ;
+        lname = buffer ;
     }
     _DObject_New ( lname, ( int64 ) gotoInfo, CONSTANT | IMMEDIATE, 0, 0, CONSTANT, ( byte* ) _DataObject_Run, 0, 0, ns, DICTIONARY ) ;
     return lname ;

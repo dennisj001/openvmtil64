@@ -37,14 +37,16 @@ _Compiler_AddLocalFrame ( Compiler * compiler )
     _Compile_LEA ( FP, DSP, 0, LocalVarIndex_Disp ( 1 ) ) ; // set new fp
     Compile_ADDI ( REG, DSP, 0, ( compiler->LocalsFrameSize + 1 ) * CELL, INT32_SIZE ) ; // 1 : fp - add stack frame -- this value is going to be reset 
     compiler->FrameSizeCellOffset = ( int64* ) ( Here - INT32_SIZE ) ; // in case we have to add to the framesize with nested locals
+    if ( IsSourceCodeOn ) _Compile_Stack_Push ( DSP, ( int64 ) Here ) ; // lets us see the functions on the stack
 }
 
 void
 Compiler_SetLocalsFrameSize_AtItsCellOffset ( Compiler * compiler )
 {
+    if ( IsSourceCodeOn ) compiler->NumberOfLocals ++ ;
     int64 size = compiler->NumberOfLocals - compiler->NumberOfRegisterVariables ;
-    int64 fsize = compiler->LocalsFrameSize = ( ((size < 0 ? 0 : size ) + 1 ) * CELL ) ; //1 : the frame pointer 
-    if ( fsize ) *( ( int32* ) ( compiler )->FrameSizeCellOffset ) = compiler->LocalsFrameSize ;
+    int64 fsize = compiler->LocalsFrameSize = ( ( ( size < 0 ? 0 : size ) + 1 ) * CELL ) ; //1 : the frame pointer 
+    if ( fsize ) *( ( int32* ) ( compiler->FrameSizeCellOffset ) ) = compiler->LocalsFrameSize ; //+ ( IsSourceCodeOn ? 8 : 0 ) ;
 }
 
 void
@@ -53,9 +55,10 @@ _Compiler_RemoveLocalFrame ( Compiler * compiler )
     int64 parameterVarsSubAmount ;
     Boolean returnValueFlag ;
     Compiler_SetLocalsFrameSize_AtItsCellOffset ( compiler ) ;
-    parameterVarsSubAmount = ( compiler->NumberOfArgs * CELL ) ;
+    parameterVarsSubAmount = ( ( compiler->NumberOfArgs ) * CELL ) ;
+    //parameterVarsSubAmount = ( ( compiler->NumberOfArgs + ( IsSourceCodeOn ? 1 : 0 ) ) * CELL ) ;
     returnValueFlag = ( _Context_->CurrentlyRunningWord->CAttribute & C_RETURN ) || ( GetState ( compiler, RETURN_TOS | RETURN_ACCUM ) ) || IsWordRecursive || compiler->ReturnVariableWord ;
-    if ( (!returnValueFlag) && GetState ( _Context_, C_SYNTAX ) && ( compiler->CurrentWordCompiling->S_ContainingNamespace ) && ( ! String_Equal ( compiler->CurrentWordCompiling->S_ContainingNamespace->Name, "void" ) ) )
+    if ( ( ! returnValueFlag ) && GetState ( _Context_, C_SYNTAX ) && ( compiler->CurrentWordCompiling->S_ContainingNamespace ) && ( ! String_Equal ( compiler->CurrentWordCompiling->S_ContainingNamespace->Name, "void" ) ) )
     {
         SetState ( compiler, RETURN_TOS, true ) ;
     }
