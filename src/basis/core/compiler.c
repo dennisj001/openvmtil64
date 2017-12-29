@@ -7,13 +7,14 @@ CopyDuplicateWord ( dlnode * anode, Word * word0 )
     if ( word0 == wordi )
     {
         d0 ( if ( Is_DebugModeOn ) _DWL_ShowList ( _Compiler_->WordList, 0 ) );
-        //int64 wrli = word0->W_TokenStart_ReadLineIndex, scwi = word0->W_SC_WordIndex ;
+        int64 wrli = word0->W_TokenStart_ReadLineIndex, scwi = word0->W_SC_WordIndex ;
         Word * word1 = Word_Copy ( wordi, DICTIONARY ) ; //COMPILER_TEMP ) ; //WORD_COPY_MEM ) ; // especially for "this" so we can use a different Code & AccumulatedOffsetPointer not the existing 
         word1->W_OriginalWord = Word_GetOriginalWord ( word0 ) ;
         _dlnode_Init ( ( dlnode * ) word1 ) ; // necessary!
         word1->S_CAttribute |= ( uint64 ) RECYCLABLE_COPY ;
         word1->StackPushRegisterCode = 0 ;
-        wordi->W_SC_ScratchPadIndex = _Compiler_->SaveScratchPadIndex ;
+        wordi->W_SC_ScratchPadIndex = scwi ; //_Compiler_->SaveScratchPadIndex ;
+        wordi->W_TokenStart_ReadLineIndex = wrli ;
         return word1 ;
     }
     return 0 ;
@@ -25,14 +26,11 @@ _Compiler_CopyDuplicatesAndPush ( Compiler * compiler, Word * word0 )
     Word * word1, *wordToBePushed ;
     word0->W_OriginalWord = word0 ;
     word0->S_CAttribute &= ( ~ RECYCLABLE_COPY ) ;
-    //int64 depth = List_Depth ( compiler->WordList ) ;
     if ( word1 = ( Word * ) dllist_Map1_WReturn ( compiler->WordList, ( MapFunction1 ) CopyDuplicateWord, ( int64 ) word0 ) ) 
     {
         wordToBePushed = word1 ;
     }
     else wordToBePushed = word0 ;
-        //wordToBePushed->W_TokenStart_ReadLineIndex = _Lexer_->TokenStart_ReadLineIndex ;
-        //wordToBePushed->W_SC_ScratchPadIndex = _CfrTil_->SC_ScratchPadIndex ;
     _CfrTil_WordList_PushWord ( wordToBePushed ) ;
     return wordToBePushed ;
 }

@@ -63,7 +63,7 @@ dscOn //verbosity 3 =
 #if 1
 c_syntaxOn
 int
-CalculateModRegardingDisplacement ( int8 mod, int32 disp )
+CalculateModRegardingDisplacement ( mod,  disp )
 {
     // mod reg r/m bits :
     //  00 000 000
@@ -110,9 +110,9 @@ CalculateModRegardingDisplacement ( int8 mod, int32 disp )
 'CalculateModRegardingDisplacement find wdiss apause
 
 int
-CalculateModRmByte ( int64 mod, int _reg, int rm, int sib, int64 disp )
+CalculateModRmByte ( mod, _reg, rm, sib, disp | modRm )
 {
-    int modRm ;
+    // modRm ;
     mod = CalculateModRegardingDisplacement ( mod, disp ) ;
     if ( ( mod < 3 ) && ( rm == 4 ) ) //|| ( ( rm == 5 ) && ( disp == 0 ) ) ) )
         //if ( ( mod < 3 ) && ( ( ( rm == 4 ) && ( sib == 0 ) ) || ( ( rm == 5 ) && ( disp == 0 ) ) ) )
@@ -148,7 +148,7 @@ CalculateModRmByte ( int64 mod, int _reg, int rm, int sib, int64 disp )
 // operandSize : specific size of immediate data - BYTE or WORD
 // SIB : scale, index, base addressing byte
 void
-_Compile_ImmDispData ( int64 immDisp, int64 immSize, int forceFlag )
+_Compile_ImmDispData (  immDisp,  immSize,  forceFlag )
 {
     // the opcode probably is all that needs to be adjusted for this to not be necessary    
     // to not compile an imm when imm is a parameter, set isize == 0 and imm == 0
@@ -238,7 +238,7 @@ int
 _CalculateRex ( _reg rm sib operandSize )
 {
     //  0100    WRXB
-    int rex = 8 ;
+     rex = 8 ;
     if (( operandSize == 8 ) || (_reg > 0x7 ) || ( rm > 0x7 ) )
     {
         //rex = 8 ; // 1 << 3 ;
@@ -253,9 +253,9 @@ _CalculateRex ( _reg rm sib operandSize )
 '_CalculateRex find wdiss apause
 
 void
-Compile_CalcWrite_Instruction_X64 ( int rex, int opCode, int mod, int _reg, int rm, int16 controlFlags, int sib, int64 disp, int dispSize, int64 imm, int immSize | modRm )
+Compile_CalcWrite_Instruction_X64 (  rex,  opCode,  mod,  _reg,  rm, controlFlags,  sib,  disp,  dispSize,  imm,  immSize | modRm )
 {
-    <dbg> rex = Calculate_Rex ( _reg, rm, ( immSize == 8 ) || ( controlFlags Bits.& REX_B ) ) ;
+    <dbg> rex = Calculate_Rex ( _reg, rm, ( immSize == 8 ) || ( d: controlFlags Bits.& REX_B ) ) ;
     modRm = CalculateModRmByte ( mod, _reg, rm, sib, disp ) ;
     _Compile_Write_Instruction_X64 ( rex, opCode, modRm, controlFlags, sib, disp, dispSize, imm, immSize ) ;
 } prefix
@@ -265,16 +265,11 @@ c_syntaxOff
 infixOn // c_syntaxOff turns off infix
 
 // no sib yet -- sib has not been needed here yet !
-: _Compile_InstructionX64 ( opCode modFlag mod _reg rm disp imm isize | rex _here )
+: _Compile_InstructionX64 ( opCode modFlag mod _reg rm disp imm isize | _here )
     _here = here
-    rex = _CalculateRex ( _reg rm 0 isize ) 
-    Compile_CalcWrite_Instruction_X64 ( rex @, opCode @, mod @, _reg @, rm @, 0, 0, disp @, 8, 0, 0 )
-#if 0
-    { rex @ } { rex @ 1, } if2
-    _Compile_OpCode ( opCode @ ) 
-    { modFlag @ } { _Compile_ModRmDisp ( mod @, _reg @, rm @, disp @ ) } if
-    { ( imm @ ) || ( isize @ ) } { _Compile_Imm ( imm @, isize @ ) } if
-#endif
+    //Compile_CalcWrite_Instruction_X64 (  rex,  opCode,  mod,  _reg,  rm, controlFlags,  sib,  disp,  dispSize,  imm,  immSize | modRm )
+    d: Compile_CalcWrite_Instruction_X64 ( 0, opCode @, mod @, _reg @, rm @, 0, 0, disp @, 8, 0, 0 )
+    //printf ( "\n : ", _here @ (here - (_here @)) dup 
     nl _here @ (here - (_here @)) dup p " : " ps dis
 ;;
 '_Compile_InstructionX64 find wdiss sp
@@ -329,10 +324,8 @@ infixOn // c_syntaxOff turns off infix
     op @ 1, 
 ;;
 : _Compile_Move ( toRegOrMem mod _reg rm disp | opCode ) 
-    //<dbg> { toRegOrMem @ == REG } { opCode = #x8b } { opCode = #x89 } ifElse
     { toRegOrMem @ == REG } { opCode = #x8b } { opCode = #x89 } ifElse
-    //_Compile_X86_OpModRegRmDisp ( opCode @, mod @, _reg @, rm @, disp @ ) // for improved testing, better is below ...
-    _Compile_InstructionX64 ( opCode @, 1 mod @, _reg @, rm @, disp @, 0, 0 ) 
+    Compile_CalcWrite_Instruction_X64 ( 0, opCode @, mod @, _reg @, rm @, 0, 0, disp @, 8, 0, 0 )
 ;;
 
 : _Compile_Move_DataStackN_ToReg ( _reg n ) _Compile_Move ( REG, 0, _reg @, DSP, n @ * CELL ) apause ;; 

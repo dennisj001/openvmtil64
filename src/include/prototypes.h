@@ -187,6 +187,8 @@ void Compile_LessThan(Compiler *compiler);
 void Compile_GreaterThan(Compiler *compiler);
 void Compile_LessThanOrEqual(Compiler *compiler);
 void Compile_GreaterThanOrEqual(Compiler *compiler);
+void Compile_BlockInfoTestLogic(Compiler *compiler, int8 reg, int8 negFlag);
+void Compile_TestLogicAndStackPush(Compiler *compiler, int8 reg, int8 negFlag);
 void Compile_Logical_X(Compiler *compiler, int64 op);
 /* basis/core/dataObjectRun.c */
 void _Namespace_Do_C_Type(Namespace *ns);
@@ -216,8 +218,8 @@ void _Block_Copy(byte *srcAddress, int64 bsize, int8 optFlag);
 void Block_Copy(byte *dst, byte *src, int64 qsize);
 int64 Block_CopyCompile_WithLogicFlag(byte *srcAddress, int64 bindex, int64 jccFlag, int64 negFlag);
 int64 Block_CopyCompile(byte *srcAddress, int64 bindex, int64 jccFlag);
-void BlockInfo_Set_tttn(BlockInfo *bi, int8 ttt, int8 n, int8 overWriteSize);
-BlockInfo *_BlockInfo_Setup_BI_tttn(Compiler *compiler, int64 ttt, int64 negFlag, int64 overWriteSize);
+void BlockInfo_Set_tttn(BlockInfo *bi, int8 ttt, int8 negFlag, int8 overWriteSize);
+BlockInfo *BlockInfo_Setup_BI_tttn(Compiler *compiler, int8 ttt, int8 negFlag, int8 overWriteSize);
 void CfrTil_TurnOffBlockCompiler(void);
 void CfrTil_TurnOnBlockCompiler(void);
 BlockInfo *_CfrTil_BeginBlock0(void);
@@ -1024,6 +1026,9 @@ void CfrTil_Find(void);
 void CfrTil_Postfix_Find(void);
 /* basis/interpreters.c */
 void _Interpret_ListNode(dlnode *node);
+void List_Interpret(dllist *list);
+void List_InterpretLists(dllist *list);
+void List_CheckInterpretLists_OnVariable(dllist *list, byte *token);
 void _Interpret_String(byte *str);
 byte *_Interpret_C_Until_EitherToken(Interpreter *interp, byte *end1, byte *end2, byte *end3, byte *delimiters);
 byte *_Interpret_Until_Token(Interpreter *interp, byte *end, byte *delimiters);
@@ -1082,7 +1087,7 @@ void CfrTil_DbgSourceCode_Begin_C_Block(void);
 void CfrTil_DbgSourceCode_End_C_Block(void);
 void CfrTil_DbgSourceCodeOff(void);
 void CfrTil_DbgSourceCodeOn(void);
-byte *PrepareDbgSourceCodeString(byte *sc, Word *word, int64 scwi0);
+byte *PrepareDbgSourceCodeString(byte *sc, Word *word);
 void _CfrTil_AdjustDbgSourceCodeAddress(byte *address, byte *newAddress);
 void _CfrTil_WordList_PushWord(Word *word);
 Word *_CfrTil_WordList_TopWord(void);
@@ -1239,9 +1244,6 @@ Boolean GetEndifStatus(void);
 void SkipPreprocessorCode(void);
 /* basis/attribute.c */
 /* basis/lists.c */
-void List_Interpret(dllist *list);
-void List_InterpretLists(dllist *list);
-void List_CheckInterpretLists_OnVariable(dllist *list, byte *token);
 void _List_PrintNames(dllist *list, int64 count, int64 flag);
 void _List_Show_N_Word_Names(dllist *list, uint64 n, int64 showBeforeAfterFlag, int64 dbgFlag);
 void _List_ShowWord_SCWI_Address(dllist *list);

@@ -361,6 +361,7 @@ typedef struct _WordData
     {
         ListObject * LambdaArgs ;
         int64 Index ; // used by Variable and LocalWord
+        byte * LogicTestCode ;
     } ;
     dllist * SourceCodeWordList ;
     //uint64 SourceCodeWordIndex ;
@@ -465,7 +466,7 @@ typedef struct
     byte *bp_First ;
     byte *bp_Last ;
     byte *JumpOffset ;
-    byte *LogicCode ;
+    byte *LogicCode, *LogicTestCode ;
     byte *CombinatorStartsAt ;
     byte *ActualCodeStart ;
     int8 Ttt ;

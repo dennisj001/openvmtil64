@@ -208,9 +208,9 @@ _CfrTil_Parse_LocalsAndStackVariables ( int64 svf, int64 lispMode, ListObject * 
             if ( word && ( word->CAttribute & ( NAMESPACE | CLASS ) ) && ( CharTable_IsCharType ( ReadLine_PeekNextChar ( lexer->ReadLiner0 ), CHAR_ALPHA ) ) )
                 //if ( word && ( word->CAttribute & ( CLASS ) ) && ( CharTable_IsCharType ( ReadLine_PeekNextChar ( lexer->ReadLiner0 ), CHAR_ALPHA ) ) )
             {
-                Word * iword ;
-                if ( ( iword = Finder_FindWord_InOneNamespace ( _Finder_, word, ( byte* ) "init" ) )
-                    || ( _Namespace_VariableValueGet ( word, ( byte* ) "size" ) > 8 ) )
+                //Word * iword ;
+                //if ( ( iword = Finder_FindWord_InOneNamespace ( _Finder_, word, ( byte* ) "init" ) )
+                //    || ( _Namespace_VariableValueGet ( word, ( byte* ) "size" ) > 8 ) )
                 {
                     typeNamespace = word ;
                 }

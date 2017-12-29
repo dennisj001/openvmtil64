@@ -13,8 +13,8 @@ _Word_Run ( Word * word )
     if ( word )
     {
         word->StackPushRegisterCode = 0 ; // nb. used! by the rewriting optInfo
+        //word->W_SC_WordIndex = _CfrTil_->SC_ScratchPadIndex ; // nb! not here but in _Interpreter_DoWord so we can adjust to out of order words thru there
         // keep track in the word itself where the machine code is to go, if this word is compiled or causes compiling code - used for optimization
-        word->W_SC_WordIndex = _CfrTil_->SC_ScratchPadIndex ;
         Word_SetCoding ( word, Here ) ;
         word->W_InitialRuntimeDsp = _Dsp_ ;
         _Context_->CurrentlyRunningWord = word ;
@@ -77,7 +77,7 @@ Word_Eval ( Word * word )
 {
     if ( word )
     {
-        _Context_->CurrentlyRunningWord = word ;
+        //_Context_->CurrentlyRunningWord = word ;
         if ( Is_DebugModeOn ) _Word_Eval_Debug ( word ) ;
         else _Word_Eval ( word ) ;
     }

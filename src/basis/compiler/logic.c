@@ -29,7 +29,7 @@ CfrTil_If ( )
             if ( DataStack_Pop ( ) )
             {
                 // interpret until "else" or "endif"
-                byte * token = _Interpret_C_Until_EitherToken (interp, ( byte* ) "else", ( byte* ) "endif", 0, 0 ) ;
+                byte * token = _Interpret_C_Until_EitherToken ( interp, ( byte* ) "else", ( byte* ) "endif", 0, 0 ) ;
                 //if ( ( rtrn == 2 ) || ( rtrn == 0 ) ) return ;
                 if ( ( token == 0 ) || ( String_Equal ( token, "endif" ) ) ) return ;
                 Parse_SkipUntil_Token ( ( byte* ) "endif" ) ;
@@ -181,7 +181,7 @@ _Compile_SETcc ( int8 ttt, int8 negFlag, int8 reg )
 void
 _Compile_SET_tttn_REG ( int8 ttt, int8 negFlag, int8 reg )
 {
-    _BlockInfo_Setup_BI_tttn ( _Context_->Compiler0, ttt, negFlag, 6 ) ;
+    BlockInfo_Setup_BI_tttn ( _Context_->Compiler0, ttt, negFlag, 6 ) ;
     _Compile_SETcc ( ttt, negFlag, reg ) ;
 }
 
@@ -202,7 +202,7 @@ Compile_GetLogicFromTOS ( BlockInfo * bi )
         _ByteArray_UnAppendSpace ( _Q_CodeByteArray, 7 ) ;
         _Compile_TEST_Reg_To_Reg ( bi->LogicCodeWord->RegToUse, bi->LogicCodeWord->RegToUse ) ;
     }
-    else 
+    else
     {
         Compile_Pop_To_Acc ( DSP ) ;
         _Compile_TEST_Reg_To_Reg ( ACC, ACC ) ;
@@ -252,11 +252,9 @@ _Compile_LogicResult ( int64 reg )
 void
 _Compile_LogicalAnd ( Compiler * compiler )
 {
-    _Compile_TEST_Reg_To_Reg ( OP_REG, OP_REG ) ;
-    _BlockInfo_Setup_BI_tttn ( _Context_->Compiler0, ZERO_TTT, NZ, 6 ) ; // not less than 0 == greater than 0
+    Compile_BlockInfoTestLogic ( compiler, OP_REG, NZ ) ;
     Compile_JCC ( Z, ZERO_TTT, Here + 15 ) ; // if eax is zero return not(R8) == 1 else return 0
-    _Compile_TEST_Reg_To_Reg ( ACC, ACC ) ;
-    _BlockInfo_Setup_BI_tttn ( _Context_->Compiler0, ZERO_TTT, NZ, 6 ) ; // not less than 0 == greater than 0
+    Compile_BlockInfoTestLogic ( compiler, ACC, NZ ) ;
     Compile_JCC ( NZ, ZERO_TTT, Here + 21 ) ; // if eax is zero return not(R8) == 1 else return 0
     _Compile_LogicResult ( ACC ) ;
     _Compiler_CompileAndRecord_PushAccum ( compiler ) ;
@@ -286,8 +284,7 @@ void
 _Compile_LogicalNot ( Compiler * compiler )
 {
     //DBI_ON ;
-    _Compile_TEST_Reg_To_Reg ( ACC, ACC ) ; // test insn logical and src op and dst op sets zf to result
-    _BlockInfo_Setup_BI_tttn ( compiler, ZERO_TTT, Z, 6 ) ; // if eax is zero zf will equal 1 which is not(R8) and if eax is not zero zf will equal 0 which is not(R8)
+    Compile_BlockInfoTestLogic ( compiler, ACC, Z ) ;
     Compile_JCC ( Z, ZERO_TTT, Here + 21 ) ; // if eax is zero return not(R8) == 1 else return 0
     _Compile_LogicResult ( ACC ) ;
     _Compiler_CompileAndRecord_PushAccum ( compiler ) ;
@@ -368,6 +365,22 @@ Compile_GreaterThanOrEqual ( Compiler * compiler )
 }
 
 void
+Compile_BlockInfoTestLogic ( Compiler * compiler, int8 reg, int8 negFlag )
+{
+    BlockInfo *bi = ( BlockInfo * ) _Stack_Top ( compiler->CombinatorBlockInfoStack ) ;
+    bi->LogicTestCode = Here ;
+    _Compile_TEST_Reg_To_Reg ( reg, reg ) ;
+    BlockInfo_Set_tttn ( bi, ZERO_TTT, negFlag, 6 ) ;
+}
+
+void
+Compile_TestLogicAndStackPush ( Compiler * compiler, int8 reg, int8 negFlag )
+{
+    Compile_BlockInfoTestLogic ( compiler, reg, negFlag ) ;
+    _Compiler_CompileAndRecord_PushAccum ( compiler ) ;
+}
+
+void
 Compile_Logical_X ( Compiler * compiler, int64 op )
 {
     int64 optFlag = CheckOptimize ( compiler, 5 ) ;
@@ -377,9 +390,8 @@ Compile_Logical_X ( Compiler * compiler, int64 op )
         // TODO : this optimization somehow is *very* little used, why is that ?!? 
         // assumes we have unordered operands in eax, ecx
         _Compile_X_Group1 ( op, REG, REG, ACC, OP_REG, 0, 0, CELL ) ;
-        _Compile_TEST_Reg_To_Reg ( ACC, ACC ) ;
-        _BlockInfo_Setup_BI_tttn ( _Context_->Compiler0, ZERO_TTT, NZ, 6 ) ; // not less than 0 == greater than 0
-        _Compiler_CompileAndRecord_PushAccum ( compiler ) ;
+
+        Compile_TestLogicAndStackPush ( compiler, ACC, NZ ) ;
     }
     else
     {
@@ -389,8 +401,6 @@ Compile_Logical_X ( Compiler * compiler, int64 op )
         _Compile_X_Group1 ( op, REG, MEM, ACC, DSP, 0, - 4, CELL ) ;
         _Compile_Stack_DropN ( DSP, 2 ) ;
 
-        _Compile_TEST_Reg_To_Reg ( ACC, ACC ) ;
-        _BlockInfo_Setup_BI_tttn ( _Context_->Compiler0, ZERO_TTT, NZ, 6 ) ; // not less than 0 == greater than 0
-        _Compiler_CompileAndRecord_PushAccum ( compiler ) ;
+        Compile_TestLogicAndStackPush ( compiler, ACC, NZ ) ;
     }
 }

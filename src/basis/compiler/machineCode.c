@@ -902,7 +902,7 @@ Compile_X_Group5 ( Compiler * compiler, int64 op )
         //DBI_ON ;
         _Compile_Group5 ( op, MEM, DSP, 0, 0, 0 ) ;
     }
-    _BlockInfo_Setup_BI_tttn ( _Context_->Compiler0, ZERO_TTT, NZ, 3 ) ; // ?? // not less than 0 == greater than 0
+    BlockInfo_Setup_BI_tttn ( _Context_->Compiler0, ZERO_TTT, NZ, 3 ) ; // ?? // not less than 0 == greater than 0
     //DBI_OFF ;
 }
 
@@ -941,7 +941,7 @@ Compile_X_Group1 ( Compiler * compiler, int64 op, int64 ttt, int64 n )
     {
         //DBI ;
         _Compile_optInfo_X_Group1 ( compiler, op ) ;
-        _BlockInfo_Setup_BI_tttn ( _Context_->Compiler0, ttt, n, 3 ) ; // not less than 0 == greater than 0
+        BlockInfo_Setup_BI_tttn ( _Context_->Compiler0, ttt, n, 3 ) ; // not less than 0 == greater than 0
         if ( compiler->optInfo->Optimize_Rm != DSP ) // if the result is to a reg and not tos
         {
             //_Compile_Move_Reg_To_StackN ( DSP, 0, compiler->optInfo->Optimize_Reg ) ;
@@ -955,7 +955,7 @@ Compile_X_Group1 ( Compiler * compiler, int64 op, int64 ttt, int64 n )
         Compile_Pop_To_Acc ( DSP ) ;
         //_Compile_X_Group1 ( int64 code, int64 toRegOrMem, int64 mod, int8 reg, int8 rm, int8 sib, int64 disp, int64 osize )
         _Compile_X_Group1 ( op, MEM, MEM, ACC, DSP, 0, 0, CELL_SIZE ) ; // result is on TOS
-        _BlockInfo_Setup_BI_tttn ( _Context_->Compiler0, ttt, n, 3 ) ; // not less than 0 == greater than 0
+        BlockInfo_Setup_BI_tttn ( _Context_->Compiler0, ttt, n, 3 ) ; // not less than 0 == greater than 0
         //_Word_CompileAndRecord_PushR8 ( Compiler_WordList ( 0 ) ) ;
     }
 }

@@ -1016,7 +1016,9 @@ _CheckOptimizeOperands ( Compiler * compiler, int64 maxOperands )
                     {
                         if ( optInfo->O_two->StackPushRegisterCode )
                         {
-                            SetHere ( optInfo->O_two->StackPushRegisterCode ) ; // leave optInfo->O_two value in R8 we don't need to push it
+                            BlockInfo *bi = ( BlockInfo * ) _Stack_Top ( compiler->CombinatorBlockInfoStack ) ;
+                            if ( bi->LogicTestCode ) SetHere ( bi->LogicTestCode ) ; // no need for the test code on a 'store'
+                            else SetHere ( optInfo->O_two->StackPushRegisterCode ) ; // leave optInfo->O_two value in R8 we don't need to push it
                             Set_SCA ( 0 ) ;
                             if ( ! ( optInfo->O_one->CAttribute & REGISTER_VARIABLE ) )// this logic may need to be refined but it works with our C.factorial 
                             {

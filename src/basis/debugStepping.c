@@ -407,7 +407,7 @@ Debugger_SetupReturnStackCopy ( Debugger * debugger, int64 showFlag ) // restore
     int64 stackSetupFlag = 0 ;
     if ( ( ! debugger->CopyRSP ) || GetState ( debugger, DBG_STACK_OLD ) )
     {
-        stackSetupFlag = _Debugger_SetupReturnStackCopy ( debugger, 8 * K, 1 ) ;
+        stackSetupFlag = _Debugger_SetupReturnStackCopy ( debugger, 8 * K, showFlag ) ;
     }
 #if 0    
     // restore the running cfrTil esp/ebp : nb! : esp/ebp were not restored by debugger->RestoreCpuState and are being restore here in the proper context
@@ -444,7 +444,7 @@ _Compile_Restore_Debugger_CpuState ( Debugger * debugger, int64 showFlag ) // re
 void
 _Compile_Restore_C_CpuState ( CfrTil * cfrtil, int64 showFlag )
 {
-    _Compile_CpuState_Restore ( cfrtil->cs_Cpu, 1 ) ;
+    _Compile_CpuState_Restore ( cfrtil->cs_Cpu, showFlag ) ;
 
     if ( showFlag ) Compile_Call ( ( byte* ) CfrTil_CpuState_Show ) ;
 }

@@ -149,18 +149,18 @@ Block_CopyCompile ( byte * srcAddress, int64 bindex, int64 jccFlag )
 // 'tttn' is a notation from the intel manuals
 
 void
-BlockInfo_Set_tttn ( BlockInfo * bi, int8 ttt, int8 n, int8 overWriteSize )
+BlockInfo_Set_tttn ( BlockInfo * bi, int8 ttt, int8 negFlag, int8 overWriteSize )
 {
     bi->LogicCode = Here ; // used by combinators
     //Word * word =  //_Context_->CurrentlyRunningWord ;
     if ( ! GetState ( _Context_, C_SYNTAX ) ) bi->LogicCodeWord = Compiler_WordList ( 1 ) ;
     bi->Ttt = ttt ;
-    bi->NegFlag = n ;
+    bi->NegFlag = negFlag ;
     bi->OverWriteSize = overWriteSize ;
 }
 
 BlockInfo *
-_BlockInfo_Setup_BI_tttn ( Compiler * compiler, int64 ttt, int64 negFlag, int64 overWriteSize )
+BlockInfo_Setup_BI_tttn ( Compiler * compiler, int8 ttt, int8 negFlag, int8 overWriteSize )
 {
     BlockInfo *bi = ( BlockInfo * ) _Stack_Top ( compiler->CombinatorBlockInfoStack ) ;
     if ( bi )
@@ -247,7 +247,7 @@ _CfrTil_BeginBlock2 ( BlockInfo * bi )
 void
 CfrTil_BeginBlock ( )
 {
-    d1 ( if ( Is_DebugOn ) _Printf ((byte*) "\n\nCfrTil_BeginBlock : %s : %s\n\n", _Context_->CurrentlyRunningWord->Name, Context_Location ()) ) ;
+    d0 ( if ( Is_DebugOn ) _Printf ((byte*) "\n\nCfrTil_BeginBlock : %s : %s\n\n", _Context_->CurrentlyRunningWord->Name, Context_Location ()) ) ;
     CheckCodeSpaceForRoom ( ) ;
     BlockInfo * bi = _CfrTil_BeginBlock0 ( ) ;
     _CfrTil_BeginBlock1 ( bi ) ;

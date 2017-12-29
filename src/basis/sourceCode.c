@@ -123,7 +123,6 @@ void
 _Debugger_ShowDbgSourceCodeAtAddress ( Debugger * debugger, byte * address )
 {
     // ...source code source code TP source code source code ... EOL
-    //Word * scWord = Compiling ? _Compiler_->CurrentWordCompiling : _Context_->CurrentlyRunningWord ;
     Word * scWord = Compiling ? _Compiler_->CurrentWordCompiling : _Context_->SourceCodeWord ? _Context_->SourceCodeWord : _Context_->CurrentlyRunningWord ;
     dllist * list = scWord->W_SC_WordList ? scWord->W_SC_WordList : _Compiler_->WordList ;
     if ( scWord && list )
@@ -131,23 +130,18 @@ _Debugger_ShowDbgSourceCodeAtAddress ( Debugger * debugger, byte * address )
         byte *sourceCode = scWord->W_SourceCode ? scWord->W_SourceCode : String_New ( _CfrTil_->SC_ScratchPad, TEMPORARY ) ;
         if ( ! String_Equal ( sourceCode, "" ) )
         {
-            int64 scwi, fixed = 0 ;
+            int64 fixed = 0 ;
             Word * word = DWL_Find ( list, 0, address, 0, 0, 0, 0 ) ;
-            //Word * word = DWL_Find ( list, 0, address, 0, GetState ( _Context_, C_SYNTAX ), 0, 0 ) ;
-            //Word * word = DWL_Find ( list, 0, address, 0, 1, 0, 0 ) ;
             if ( word && ( debugger->LastSourceCodeWord != word ) )
             {
                 d0 ( _List_ShowWord_SCWI_Address ( list ) ) ;
-                //word = ( Word* ) dobject_Get_M_Slot ( dobj, SCN_SC_WORD ) ;
                 if ( GetState ( scWord, W_C_SYNTAX ) && String_Equal ( word->Name, "store" ) )
                 {
                     word->Name = ( byte* ) "=" ;
                     fixed = 1 ;
                 }
-                scwi = word->W_SC_WordIndex ; //dobject_Get_M_Slot ( dobj, SCN_WORD_SC_INDEX ) ;
-                byte * buffer = PrepareDbgSourceCodeString ( sourceCode, word, scwi ) ;
+                byte * buffer = PrepareDbgSourceCodeString ( sourceCode, word ) ;
                 _Printf ( ( byte* ) "\n%s", buffer ) ;
-                //debugger->LastSourceCodeIndex = scwi ;
                 debugger->LastSourceCodeWord = word ;
                 if ( fixed )
                 {
@@ -202,11 +196,12 @@ CfrTil_DbgSourceCodeOn ( )
 // ...source code source code TP source code source code ... EOL
 
 byte *
-PrepareDbgSourceCodeString ( byte * sc, Word * word, int64 scwi0 ) // sc : source code ; scwi : source code word index
+PrepareDbgSourceCodeString ( byte * sc, Word * word ) // sc : source code ; scwi : source code word index
 {
     byte * cc_line = ( byte* ) "" ;
     if ( sc )
     {
+        int64 scwi0 = word->W_SC_WordIndex ; 
         byte *nvw, * token0 = word->Name, *token1 ;
         int64 i, tp = 42, lef, leftBorder, ts, rightBorder, ref ; // tp : text point - where we want to start source code text to align with disassembly ; ref : right ellipsis flag
         token1 = String_ConvertToBackSlash ( token0 ) ;

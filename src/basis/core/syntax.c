@@ -197,6 +197,7 @@ _CfrTil_C_Infix_EqualOp ( Word * opWord )
     Compiler *compiler = cntx->Compiler0 ;
     Word * word = Compiler_WordList ( 0 ), *lhsWord = compiler->LHS_Word ;
     int64 tsrli = word ? word->W_TokenStart_ReadLineIndex : 0 ; //, svOOState = GetState ( _CfrTil_, OPTIMIZE_ON ) ;
+    int64 svscwi = word ? word->W_SC_WordIndex : 0 ; //, svOOState = GetState ( _CfrTil_, OPTIMIZE_ON ) ;
     byte * svName, * token ;
     SetState ( compiler, C_INFIX_EQUAL, true ) ;
     d0 ( if ( Is_DebugModeOn ) Compiler_Show_WordList ( "\nCfrTil_C_Infix_EqualOp : before pop 2 words" ) ) ;
@@ -229,6 +230,7 @@ _CfrTil_C_Infix_EqualOp ( Word * opWord )
     word->Name = "=" ;
     d0 ( if ( Is_DebugModeOn ) Compiler_Show_WordList ( "\nCfrTil_C_Infix_EqualOp : after _CfrTil_WordLists_PushWord ( word ) ;" ) ) ;
     word->W_TokenStart_ReadLineIndex = tsrli ;
+    word->W_SC_WordIndex = svscwi ;
     d0 ( if ( Is_DebugModeOn ) Compiler_Show_WordList ( "\nCfrTil_C_Infix_EqualOp : before op word" ) ) ;
     if ( opWord ) _Interpreter_DoWord_Default ( interp, opWord ) ;
     else _Interpreter_DoWord_Default ( interp, word ) ;
@@ -238,7 +240,7 @@ _CfrTil_C_Infix_EqualOp ( Word * opWord )
     if ( GetState ( compiler, C_COMBINATOR_LPAREN ) )
     {
         if ( word->StackPushRegisterCode ) SetHere ( word->StackPushRegisterCode ) ; // this is the usual after '=' in non C syntax; assuming optimizeOn
-        _BlockInfo_Setup_BI_tttn ( compiler, ZERO_TTT, NZ, 3 ) ; // must set logic flag for Compile_ReConfigureLogicInBlock in Block_Compile_WithLogicFlag
+        BlockInfo_Setup_BI_tttn ( compiler, ZERO_TTT, NZ, 3 ) ; // must set logic flag for Compile_ReConfigureLogicInBlock in Block_Compile_WithLogicFlag
     }
     List_InterpretLists ( compiler->PostfixLists ) ;
     compiler->LHS_Word = 0 ;

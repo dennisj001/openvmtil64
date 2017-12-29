@@ -9,6 +9,63 @@ _Interpret_ListNode ( dlnode * node )
 }
 
 void
+List_Interpret ( dllist * list )
+{
+    dllist_Map ( list, _Interpret_ListNode ) ;
+    List_Init ( list ) ;
+}
+
+// list : a list of lists of postfix operations needing to be interpreted
+
+void
+List_InterpretLists ( dllist * list )
+{
+    Compiler * compiler = _Compiler_ ;
+    int64 svs = GetState ( compiler, C_INFIX_EQUAL ) ;
+    SetState ( compiler, C_INFIX_EQUAL, false ) ;
+    SetState ( compiler, INFIX_LIST_INTERPRET, true ) ;
+    dlnode * node, *nextNode ;
+    for ( node = dllist_First ( ( dllist* ) list ) ; node ; node = nextNode )
+    {
+        // get nextNode before map function (mf) in case mf changes list by a Remove of current node
+        // problem could arise if mf removes Next node
+        nextNode = dlnode_Next ( node ) ;
+        dllist * list = ( dllist * ) dobject_Get_M_Slot ( node, 0 ) ;
+        List_Interpret ( list ) ;
+        dlnode_Remove ( node ) ;
+    }
+    List_Init ( list ) ;
+    SetState ( compiler, INFIX_LIST_INTERPRET, false ) ;
+    SetState ( compiler, C_INFIX_EQUAL, svs ) ;
+}
+
+// list : a list of lists of postfix operations needing to be interpreted
+
+void
+List_CheckInterpretLists_OnVariable ( dllist * list, byte * token )
+{
+    if ( list )
+    {
+        dlnode * node, *nextNode ;
+        for ( node = dllist_First ( ( dllist* ) list ) ; node ; node = nextNode )
+        {
+            // get nextNode before map function (mf) in case mf changes list by a Remove of current node
+            // problem could arise if mf removes Next node
+            nextNode = dlnode_Next ( node ) ;
+            dllist * plist = ( dllist * ) dobject_Get_M_Slot ( node, 0 ) ; // plist created in CfrTil_IncDec
+            Word * word = ( Word * ) List_Top ( plist ) ;
+            byte *checkPostfixToken = word ? word->Name : 0 ;
+            if ( checkPostfixToken && String_Equal ( checkPostfixToken, token ) )
+            {
+                List_Interpret ( plist ) ;
+                dlnode_Remove ( node ) ;
+            }
+        }
+        //List_Init ( list ) ;
+    }
+}
+
+void
 _Interpret_String ( byte *str )
 {
     _CfrTil_ContextNew_InterpretString ( _CfrTil_, str ) ;
@@ -88,9 +145,8 @@ _Interpret_PrefixFunction_Until_RParen ( Interpreter * interp, Word * prefixFunc
     {
         Word * word ;
         byte * token ;
-        int64 svs_c_rhs, flag = 0 ;
+        int64 svs_c_rhs, flag = 0 ; 
         Compiler * compiler = _Context_->Compiler0 ;
-        prefixFunction->W_TokenStart_ReadLineIndex = interp->Lexer0->TokenStart_ReadLineIndex ;
         while ( 1 )
         {
             token = Lexer_ReadToken ( interp->Lexer0 ) ; // skip the opening left paren
@@ -113,9 +169,7 @@ _Interpret_PrefixFunction_Until_RParen ( Interpreter * interp, Word * prefixFunc
         if ( flag ) Interpreter_InterpretAToken ( interp, token, - 1 ) ;
         else _Interpret_Until_Token ( interp, ( byte* ) ")", ( byte* ) " ,\n\r\t" ) ;
         SetState ( compiler, PREFIX_ARG_PARSING, false ) ;
-        //SetState ( compiler, PREFIX_PARSING, true ) ;
         _Interpreter_DoWord_Default ( interp, prefixFunction ) ;
-        //SetState ( compiler, PREFIX_PARSING, false ) ;
         if ( GetState ( _Context_, C_SYNTAX ) ) SetState ( _Context_, C_RHS, svs_c_rhs ) ;
         if ( ! Compiling ) _Compiler_FreeAllLocalsNamespaces ( compiler ) ;
     }
