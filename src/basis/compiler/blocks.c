@@ -10,6 +10,22 @@ _Block_Eval ( block blck )
     }
 }
 
+#if 0
+void
+_Block_SC_AdjustCopy ( byte * srcAddress, int64 bsize )
+{
+    ud_t * ud = Debugger_UdisInit ( _Debugger_ ) ;
+    int64 isize, left ;
+
+    for ( left = bsize ; left > 0 ; srcAddress += isize )
+    {
+        isize = _Udis_GetInstructionSize ( ud, srcAddress ) ;
+        left -= isize ;
+        _CfrTil_AdjustDbgSourceCodeAddress ( srcAddress, Here ) ;
+    }
+}
+#endif
+
 void
 _Block_Copy ( byte * srcAddress, int64 bsize, int8 optFlag )
 {
@@ -247,7 +263,9 @@ _CfrTil_BeginBlock2 ( BlockInfo * bi )
 void
 CfrTil_BeginBlock ( )
 {
-    d0 ( if ( Is_DebugOn ) _Printf ((byte*) "\n\nCfrTil_BeginBlock : %s : %s\n\n", _Context_->CurrentlyRunningWord->Name, Context_Location ()) ) ;
+    //Compiler * compiler = _Context_->Compiler0 ;
+    //d1 ( if ( Is_DebugOn ) _Printf ( ( byte* ) "\n\nCfrTil_BeginBlock : %s : blockStack depth = %d : %s\n\n", _Context_->CurrentlyRunningWord->Name, _Stack_Depth ( compiler->BlockStack ), Context_Location ( ) ) ) ;
+    //d1 ( _Printf ( ( byte* ) "\n\nentering CfrTil_BeginBlock : %s : blockStack depth = %d : %s\n\n", _Context_->CurrentlyRunningWord->Name, _Stack_Depth ( compiler->BlockStack ), Context_Location ( ) ) ) ;
     CheckCodeSpaceForRoom ( ) ;
     BlockInfo * bi = _CfrTil_BeginBlock0 ( ) ;
     _CfrTil_BeginBlock1 ( bi ) ;
@@ -315,19 +333,32 @@ byte *
 _CfrTil_EndBlock2 ( BlockInfo * bi )
 {
     Compiler * compiler = _Context_->Compiler0 ;
-    //compiler->BlocksBegun -- ;
     compiler->BlockLevel -- ;
     byte * bp_First = bi->bp_First ;
     if ( ! _Stack_Depth ( compiler->BlockStack ) )
     {
         _CfrTil_InstallGotoCallPoints_Keyed ( bi, GI_GOTO | GI_RECURSE ) ;
+#if 0   // does this idea work     
+        if ( IsSourceCodeOn )
+        {
+            byte * qCodeStart ;
+            if ( bi->FrameStart )
+                qCodeStart = bi->bp_First ; // after the stack frame
+            else qCodeStart = bi->ActualCodeStart ;
+            //Block_Copy ( qCodeStart, qCodeStart, Here - qCodeStart ) ;
+            _Block_SC_AdjustCopy ( qCodeStart, Here - qCodeStart ) ;
+            //bp_First = qCodeStart ;
+        }
+#endif        
         CfrTil_TurnOffBlockCompiler ( ) ;
         Compiler_Init ( compiler, 0 ) ;
-        d0 ( if ( Is_DebugOn ) _Printf ((byte*) "\n\n_CfrTil_EndBlock2 : compiler off : %s : %s\n\n", _Context_->CurrentlyRunningWord->Name, Context_Location ()) ) ;
+        //d0 ( if ( Is_DebugOn ) _Printf ( ( byte* ) "\n\nleaving _CfrTil_EndBlock2 : blockStack depth = %d : %s : %s\n\n", _Stack_Depth ( compiler->BlockStack ), _Context_->CurrentlyRunningWord->Name, Context_Location ( ) ) ) ;
+        //d1 ( _Printf ( ( byte* ) "\n\nleaving _CfrTil_EndBlock2 : blockStack depth = %d : %s : %s\n\n", _Stack_Depth ( compiler->BlockStack ), _Context_->CurrentlyRunningWord->Name, Context_Location ( ) ) ) ;
     }
     else
     {
-        d0 ( if ( Is_DebugOn ) _Printf ((byte*) "\n\n_CfrTil_EndBlock2 : _Stack_Depth ( compiler->BlockStack ) = %d : %s : %s\n\n", _Stack_Depth ( compiler->BlockStack ), _Context_->CurrentlyRunningWord->Name, Context_Location ()) ) ;
+        //d0 ( if ( Is_DebugOn ) _Printf ( ( byte* ) "\n\nleaving _CfrTil_EndBlock2 : blockStack depth = %d : %s : %s\n\n", _Stack_Depth ( compiler->BlockStack ), _Context_->CurrentlyRunningWord->Name, Context_Location ( ) ) ) ;
+        //d1 ( _Printf ( ( byte* ) "\n\nleaving _CfrTil_EndBlock2 : blockStack depth = %d : %s : %s\n\n", _Stack_Depth ( compiler->BlockStack ), _Context_->CurrentlyRunningWord->Name, Context_Location ( ) ) ) ;
         _Namespace_RemoveFromUsingListAndClear ( bi->LocalsNamespace ) ; //_Compiler_FreeBlockInfoLocalsNamespace ( bi, compiler ) ;
     }
     return bp_First ;
@@ -336,8 +367,22 @@ _CfrTil_EndBlock2 ( BlockInfo * bi )
 byte *
 _CfrTil_EndBlock ( )
 {
-    d0 ( if ( Is_DebugOn ) _Printf ((byte*) "\n\nCfrTil_EndBlock : %s : %s\n\n", _Context_->CurrentlyRunningWord->Name, Context_Location ()) ) ;
-    BlockInfo * bi = ( BlockInfo * ) Stack_Pop_WithExceptionOnEmpty ( _Context_->Compiler0->BlockStack ) ;
+    Compiler * compiler = _Context_->Compiler0 ;
+    //d1 ( if ( Is_DebugOn ) _Printf ( ( byte* ) "\n\nCfrTil_EndBlock : %s : blockStack depth = %d : %s\n\n", _Context_->CurrentlyRunningWord->Name, _Stack_Depth ( compiler->BlockStack ), Context_Location ( ) ) ) ;
+    //d1 ( _Printf ( ( byte* ) "\n\nentering CfrTil_EndBlock : %s : blockStack depth = %d : %s\n\n", _Context_->CurrentlyRunningWord->Name, _Stack_Depth ( compiler->BlockStack ), Context_Location ( ) ) ) ;
+    BlockInfo * bi = ( BlockInfo * ) Stack_Pop_WithExceptionOnEmpty ( compiler->BlockStack ) ;
+#if 0   // does this idea work     
+    if ( ( _Compiler_->BlockLevel == 1 ) && IsSourceCodeOn )
+    {
+        byte * qCodeStart ;
+        if ( bi->FrameStart )
+            qCodeStart = bi->bp_First ; // after the stack frame
+        else qCodeStart = bi->ActualCodeStart ;
+        //Block_Copy ( qCodeStart, qCodeStart, Here - qCodeStart ) ;
+        _Block_SC_AdjustCopy ( qCodeStart, Here - qCodeStart ) ;
+        //bp_First = qCodeStart ;
+    }
+#endif        
     // this idea has the problem that in c syntax CurrentlyRunningWord is not really set in the usual way
     //Word * word = Compiler_WordList ( 1 ) ; //_Context_->CurrentlyRunningWord ;
     if ( ! GetState ( _Context_, C_SYNTAX ) ) bi->LogicCodeWord = Compiler_WordList ( 1 ) ;

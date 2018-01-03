@@ -5,8 +5,8 @@
 // prefixes  opcode  modRm   sib        disp   immediate
 //  0 - 4    1 - 3   0 - 1  0 - 1      0,1,4    0,1,4      -- number of bytes
 // -----------------------------------------------------------------------
-//   modRm byte ( bits )  mod 0 : no disp ;; mod 1 : 1 byte disp : mod 2 : 4 byte disp ;; mod 3 : just _reg value
-//    mod     _reg      rm
+//   modRm byte ( bits )  imod 0 : no disp ;; imod 1 : 1 byte disp : imod 2 : 4 byte disp ;; imod 3 : just _reg value
+//    imod     _reg      rm
 //   7 - 6   5 - 3   2 - 0 
 //                   rm  4 - b100 => sib instead of ESP
 // -----------------------------------------------------------------------
@@ -30,10 +30,10 @@
 // intel syntax : opcode dst, src
 // att syntax   : opcode src, dst
 
-// note : x86-32 instruction format : || prefixes : 0-4 bytes | opCode : 1-3 bytes | mod : 0 - 1 byte | sib : 0 - 1 byte | disp : 0-4 bytes | immediate : 0-4 bytes ||
+// note : x86-32 instruction format : || prefixes : 0-4 bytes | opCode : 1-3 bytes | imod : 0 - 1 byte | sib : 0 - 1 byte | disp : 0-4 bytes | immediate : 0-4 bytes ||
 // note : intex syntax  : instruction dst, src
 //        att   syntax  : instruction src, dst
-// note : rm : _reg memory - the _register which contains the memory address in mod instructions
+// note : rm : _reg memory - the _register which contains the memory address in imod instructions
 
 // cfrTil uses intel syntax convention
 
@@ -63,77 +63,78 @@ dscOn //verbosity 3 =
 #if 1
 c_syntaxOn
 int
-CalculateModRegardingDisplacement ( mod,  disp )
+CalculateModRegardingDisplacement ( imod,  disp | rmod ) // imod/rmod avoid name class with 'mod' function
 {
     // mod reg r/m bits :
     //  00 000 000
-    if ( mod != REG )
+    if ( imod != REG )
     {
 #if 0
         if ( disp == 0 ) 
-            mod = 0 ;
+            rmod = 0 ;
         else 
         {   
             if ( disp <= 0xff ) 
-                mod = 1 ; 
+                rmod = 1 ; 
             else 
             {
-                mod = 2 ; 
+                rmod = 2 ; 
             }
         }
 #elif 0
         //"\npreprocessor else\n" ps apause
         if ( disp == 0 ) 
         {
-            mod = 0 ;
+            rmod = 0 ;
         }
         else 
         {   
             if ( disp <= 0xff ) 
             {       
-                mod = 1 ; 
+                rmod = 1 ; 
             }
             else 
             {
                 //{| "\npreprocessor else\n" ps apause |}
-                mod = 2 ; 
+                rmod = 2 ; 
             }
         }
 #else
-        if ( disp == 0 ) mod = 0 ;
-        else if ( disp <= 0xff ) mod = 1 ; 
-        else mod = 2 ; 
+        if ( disp == 0 ) rmod = 0 ;
+        else if ( disp <= 0xff ) rmod = 1 ; 
+        else rmod = 2 ;  
 #endif
     }
-    return mod ;
+    else rmod = imod ;
+    return rmod ;
 } prefix
 'CalculateModRegardingDisplacement find wdiss apause
 
 int
-CalculateModRmByte ( mod, _reg, rm, sib, disp | modRm )
+CalculateModRmByte ( imod, _reg, rm, sib, disp | modRm )
 {
-    // modRm ;
-    mod = CalculateModRegardingDisplacement ( mod, disp ) ;
-    if ( ( mod < 3 ) && ( rm == 4 ) ) //|| ( ( rm == 5 ) && ( disp == 0 ) ) ) )
-        //if ( ( mod < 3 ) && ( ( ( rm == 4 ) && ( sib == 0 ) ) || ( ( rm == 5 ) && ( disp == 0 ) ) ) )
+    d: imod = CalculateModRegardingDisplacement ( imod, disp ) ;
+    if ( ( imod < 3 ) && ( rm == 4 ) ) //|| ( ( rm == 5 ) && ( disp == 0 ) ) ) )
+        //if ( ( imod < 3 ) && ( ( ( rm == 4 ) && ( sib == 0 ) ) || ( ( rm == 5 ) && ( disp == 0 ) ) ) )
     {
         // cf. InstructionSet-A-M-253666.pdf Table 2-2
-        //d: CfrTil_Exception (MACHINE_CODE_ERROR, 0, 1 ) ;
+        <dbg> "\n\nCalculateModRmByte : MACHINE_CODE_ERROR\n\n" ps ;
+        pause ;
         quit ;
     }
     if ( sib )
     {
-        rm = 4 ; // from intel mod tables
+        rm = 4 ; // from intel imod tables
         _reg = 0 ;
     }
-    modRm = ( mod << 6 ) + ( ( _reg Bits.& 0x7 ) << 3 ) + ( rm Bits.& 0x7 ) ; // only use 3 bits of reg/rm
-    //modRm = ( mod << 6 ) + ( ( _reg ) << 3 ) + ( rm ) ; // only use 3 bits of reg/rm
+    //modRm d: = ( imod << 6 ) + ( ( ( _reg Bits.& 0x7 ) << 3 ) + ( rm Bits.& 0x7 ) ) ; // only use 3 bits of reg/rm
+    modRm = ( imod << 6 ) + ( ( _reg Bits.& 0x7 ) << 3 ) + ( rm Bits.& 0x7 ) ; // only use 3 bits of reg/rm
     return modRm ;
 } prefix
-'CalculateModRmByte find wdiss //apause
+'CalculateModRmByte find wdiss apause
 //-----------------------------------------------------------------------
-//   modRm byte ( bits )  mod 0 : no disp ; mod 1 : 1 byte disp : mod 2 : 4 byte disp ; mod 3 : just reg value
-//    mod     reg      rm
+//   modRm byte ( bits )  imod 0 : no disp ; imod 1 : 1 byte disp : imod 2 : 4 byte disp ; imod 3 : just reg value
+//    imod     reg      rm
 //   7 - 6   5 - 3   2 - 0
 //-----------------------------------------------------------------------
 //  reg/rm values :
@@ -144,7 +145,7 @@ CalculateModRmByte ( mod, _reg, rm, sib, disp | modRm )
 // some checks of the internal consistency of the instruction bits
 
 // instruction letter codes : I - immediate data ; 32 : 32 bit , 8 : 8 bit ; EAX, DSP : registers
-// we could have a mod of 0 so the modRmImmDispFlag is necessary
+// we could have a imod of 0 so the modRmImmDispFlag is necessary
 // operandSize : specific size of immediate data - BYTE or WORD
 // SIB : scale, index, base addressing byte
 void
@@ -195,7 +196,7 @@ _Compile_ImmDispData (  immDisp,  immSize,  forceFlag )
         }
     }
 } prefix
-'_Compile_ImmDispData find wdiss //apause
+//'_Compile_ImmDispData find wdiss //apause
 
 // Intel - InstructionSet-A-M-253666.pdf - section 2.1 :
 //-----------------------------------------------------------------------
@@ -203,8 +204,8 @@ _Compile_ImmDispData (  immDisp,  immSize,  forceFlag )
 // prefixes  opcode  modRm   sib       disp    immediate
 //  0 - 4    1 - 3   0 - 1  0 - 1    0,1,2,4    0,1,2,4      -- number of bytes
 //-----------------------------------------------------------------------
-//   modRm byte ( bits )  mod 0 : no disp ; mod 1 : 1 byte disp : mod 2 : 4 byte disp ; mod 3 : just reg value
-//    mod     reg      rm
+//   modRm byte ( bits )  imod 0 : no disp ; imod 1 : 1 byte disp : imod 2 : 4 byte disp ; imod 3 : just reg value
+//    imod     reg      rm
 //   7 - 6   5 - 3   2 -- 0 
 //-----------------------------------------------------------------------
 //  reg/rm values :
@@ -218,12 +219,13 @@ _Compile_ImmDispData (  immDisp,  immSize,  forceFlag )
 // REX prefix ?
 // controlFlags : bits ::  4      3       2     1      0         
 //                       rex    imm    disp   sib    modRm      
-//                      rex=16 imm=8, disp=4 sib=2  mod/Rm=1
+//                      rex=16 imm=8, disp=4 sib=2  imod/Rm=1
 //                      REX_B  IMM_B  DISP_B SIB_B   MODRM_B
 
 void
-_Compile_Write_Instruction_X64 ( rex, opCode, modRm, controlFlags, sib, disp, dispSize, imm, immSize )
+_Compile_Write_Instruction_X64 ( rex, opCode, modRm, controlFlags, sib, disp, dispSize, imm, immSize | _here )
 {
+    <dbg> _here = here
     if ( rex ) { compile1 ( rex ) ; }
     if ( opCode > 0xff ) { compile2 ( opCode ) ; }
     else { compile1 ( opCode ) ; }
@@ -231,8 +233,9 @@ _Compile_Write_Instruction_X64 ( rex, opCode, modRm, controlFlags, sib, disp, di
     if ( sib && ( controlFlags Bits.& SIB_B ) ) compile1 ( sib ) ;
     if ( disp || ( controlFlags Bits.& DISP_B ) ) _Compile_ImmDispData ( disp, dispSize, 0 ) ;
     if ( imm || ( controlFlags Bits.& IMM_B ) ) _Compile_ImmDispData ( imm, immSize, ( controlFlags Bits.& IMM_B ) ) ;
+    nl _here @ (here - (_here @)) dup p " : " ps dis
 } prefix
-'_Compile_Write_Instruction_X64 find wdiss apause
+//'_Compile_Write_Instruction_X64 find wdiss apause
 
 int 
 _CalculateRex ( _reg rm sib operandSize )
@@ -252,29 +255,82 @@ _CalculateRex ( _reg rm sib operandSize )
 } prefix // prefix is not automatic with c syntax so they can be used like rpn words
 '_CalculateRex find wdiss apause
 
+//verbosity 3 =
+
 void
-Compile_CalcWrite_Instruction_X64 (  rex,  opCode,  mod,  _reg,  rm, controlFlags,  sib,  disp,  dispSize,  imm,  immSize | modRm )
+Compile_CalcWrite_Instruction_X64 (  rex,  opCode,  imod,  _reg,  rm, controlFlags,  sib,  disp,  dispSize,  imm,  immSize | modRm )
 {
-    <dbg> rex = Calculate_Rex ( _reg, rm, ( immSize == 8 ) || ( d: controlFlags Bits.& REX_B ) ) ;
-    modRm = CalculateModRmByte ( mod, _reg, rm, sib, disp ) ;
+    rex = _CalculateRex ( _reg, rm, ( immSize == 8 ) || { controlFlags @ } { controlFlags Bits.& REX_B } if2 ) ;
+    //rex = _CalculateRex ( _reg, rm, ( immSize == 8 ) || ( controlFlags Bits.& REX_B ) ) ;
+    modRm = CalculateModRmByte ( imod, _reg, rm, sib, disp ) ;
     _Compile_Write_Instruction_X64 ( rex, opCode, modRm, controlFlags, sib, disp, dispSize, imm, immSize ) ;
 } prefix
-'Compile_CalcWrite_Instruction_X64 find wdiss
+'Compile_CalcWrite_Instruction_X64 find wdiss apause
 c_syntaxOff 
 #endif
+//verbosity 1 =
 infixOn // c_syntaxOff turns off infix
 
+: _Compile_Move ( toRegOrMem imod _reg rm disp | opCode ) 
+    { toRegOrMem @ == REG } { opCode = #x8b } { opCode = #x89 } ifElse
+    //Compile_CalcWrite_Instruction_X64 (  rex,  opCode,  imod,  _reg,  rm, controlFlags,  sib,  disp,  dispSize,  imm,  immSize | modRm )
+    //Compile_CalcWrite_Instruction_X64 ( 0, opCode @, imod @, _reg @, rm @, REX_B | MODRM_B | ( disp ? DISP_B : 0 ) | ( sib ? SIB_B : 0 ), 0, disp @, 8, 0, 0 )
+    Compile_CalcWrite_Instruction_X64 ( 0, opCode @, imod @, _reg @, rm @, REX_B | MODRM_B | DISP_B 0, disp @, 8, 0, 0 )
+;;
+
+: _Compile_Move_DataStackN_ToReg ( _reg n ) _Compile_Move ( REG, 0, _reg @, DSP, n @ * CELL ) ;; 
+
+// group1 : ADD OR ADC SBB AND_OPCODE SUB XOR CMP : with immediate data
+: _Compile_Group1_Immediate ( code imod rm disp imm immSize | opCode controlFlags )
+    // #x80 is the base opCode for this group of instructions 
+    // 1000 00sw 
+    opCode = #x80
+    { ( immSize @ > BYTE ) || ( imm @ > #xff ) } 
+    { 
+        opCode |= 1
+        // iSize = CELL
+    }
+    { 
+        { ( immSize @ <= BYTE ) || ( imm @ < #x100 ) } { opCode |= 3 } if
+    }
+    ifElse
+    // we need to be able to set the size so we can know how big the instruction will be in eg. CompileVariable
+    // otherwise it could be optimally deduced but let caller control by keeping operandSize parameter
+    // some times we need cell_t even though a byte would work
+    //_Compile_InstructionX64 ( opCode modFlag imod _reg rm disp imm isize | _here )
+    //_Compile_InstructionX64 ( opCode @, 1, imod @, code @, rm @, disp @, imm @, iSize @ ) 
+    controlFlags = 0
+    //Compile_CalcWrite_Instruction_X64 (  rex,  opCode,  imod,  _reg,  rm, controlFlags,  sib,  disp,  dispSize,  imm,  immSize | modRm )
+    Compile_CalcWrite_Instruction_X64 (  0,  opCode @,  imod @,  0,  rm @, controlFlags,  0,  disp @,  0,  imm @,  immSize @ )
+;;
+: _Compile_SUBI_DSP ( imm ) _Compile_Group1_Immediate ( SUB, REG, DSP, 0, imm @, 1 ) ;; 
+
+: Compile_Stack_Pop_R8D ()
+    _Compile_Move_DataStackN_ToReg ( R8D, 0 ) 
+    _Compile_SUBI_DSP ( CELL ) 
+;; 
+
+#if 1
+//verbosity 3 =
+Combinators
+:asm iax
+    d: Compile_Stack_Pop_R8D ( ) 
+    _Compile_CALL_Reg ( R8D ) 
+asm; 
+
+' iax find wdiss pause //sp 
+verbosity 1 =
 // no sib yet -- sib has not been needed here yet !
-: _Compile_InstructionX64 ( opCode modFlag mod _reg rm disp imm isize | _here )
+: _Compile_InstructionX64 ( opCode modFlag imod _reg rm disp imm isize | _here )
     _here = here
-    //Compile_CalcWrite_Instruction_X64 (  rex,  opCode,  mod,  _reg,  rm, controlFlags,  sib,  disp,  dispSize,  imm,  immSize | modRm )
-    d: Compile_CalcWrite_Instruction_X64 ( 0, opCode @, mod @, _reg @, rm @, 0, 0, disp @, 8, 0, 0 )
+    //Compile_CalcWrite_Instruction_X64 (  rex,  opCode,  imod,  _reg,  rm, controlFlags,  sib,  disp,  dispSize,  imm,  immSize | modRm )
+    <dbg> Compile_CalcWrite_Instruction_X64 ( 0, opCode @, imod @, _reg @, rm @, 0, 0, disp @, 8, 0, 0 )
     //printf ( "\n : ", _here @ (here - (_here @)) dup 
     nl _here @ (here - (_here @)) dup p " : " ps dis
 ;;
-'_Compile_InstructionX64 find wdiss sp
+//'_Compile_InstructionX64 find wdiss sp
 
-: _Compile_ModRm ( mod _reg rm ) ( ( mod @ << 6 ) | ( ( _reg @ Bits.& 7 ) << 3 ) | ( rm @ Bits.& 7 ) ) 1,  ;; 
+: _Compile_ModRm ( imod _reg rm ) ( ( imod @ << 6 ) | ( ( _reg @ Bits.& 7 ) << 3 ) | ( rm @ Bits.& 7 ) ) 1,  ;; 
 //' _Compile_ModRm find wdiss sp
 
 : _Compile_Imm ( imm isize )
@@ -286,36 +342,36 @@ infixOn // c_syntaxOff turns off infix
     { opCode @ > 255 } { opCode @ 2, } { opCode @ 1, } ifElse
 ;; 
 
-: _Compile_ModRmDisp ( mod _reg rm disp )
-    { mod @ != REG } 
+: _Compile_ModRmDisp ( imod _reg rm disp )
+    { imod @ != REG } 
     { 
-        { disp @ == 0 } { mod = 0 } 
+        { disp @ == 0 } { imod = 0 } 
         {
-            { disp <= #Xff } { mod = MEM8 } { mod = MEM32 } ifElse
+            { disp <= #Xff } { imod = MEM8 } { imod = MEM32 } ifElse
         }
         ifElse
     }
     if
-    _Compile_ModRm (  mod @, _reg @, rm @ )
-    { mod @ == 1 } { disp @ 1, } if
-    { mod @ == 2 } { disp @ 4, } if
+    _Compile_ModRm (  imod @, _reg @, rm @ )
+    { imod @ == 1 } { disp @ 1, } if
+    { imod @ == 2 } { disp @ 4, } if
 ;; 
 
-: _Compile_X86_OpModRegRmDisp ( opCode mod _reg rm disp )
-    _Compile_InstructionX64 ( opCode @, 1, mod @, _reg @, rm @, disp @, 0, 0 ) 
+: _Compile_X86_OpModRegRmDisp ( opCode imod _reg rm disp )
+    _Compile_InstructionX64 ( opCode @, 1, imod @, _reg @, rm @, disp @, 0, 0 ) 
 ;;
 
-: _Compile_X86_OpModRegRm ( opCode mod _reg rm )
-    _Compile_InstructionX64 ( opCode @, 1, mod @, _reg @, rm @, 0, 0, 0 ) 
+: _Compile_X86_OpModRegRm ( opCode imod _reg rm )
+    _Compile_InstructionX64 ( opCode @, 1, imod @, _reg @, rm @, 0, 0, 0 ) 
 ;;
 
-: _Compile_Test (  mod, _reg, rm, disp, imm )
- // _Compile_InstructionX64 ( opCode modFlag mod _reg rm disp imm isize )
-    _Compile_InstructionX64 ( #xf7, 1, mod @, _reg @, rm @, disp @, imm @, CELL ) 
+: _Compile_Test (  imod, _reg, rm, disp, imm )
+ // _Compile_InstructionX64 ( opCode modFlag imod _reg rm disp imm isize )
+    _Compile_InstructionX64 ( #xf7, 1, imod @, _reg @, rm @, disp @, imm @, CELL ) 
 ;;
 
-: _Compile_Test_Imm (  mod, rm, disp, imm )
-    _Compile_Test (  mod @, 0, rm @, disp @, imm @ )
+: _Compile_Test_Imm (  imod, rm, disp, imm )
+    _Compile_Test (  imod @, 0, rm @, disp @, imm @ )
 ;;
 
 : _Compile_IncDec_Reg ( op, _reg )
@@ -323,35 +379,11 @@ infixOn // c_syntaxOff turns off infix
     // op ( _reg @ ) += // TODO : research : why doesn't this work 
     op @ 1, 
 ;;
-: _Compile_Move ( toRegOrMem mod _reg rm disp | opCode ) 
-    { toRegOrMem @ == REG } { opCode = #x8b } { opCode = #x89 } ifElse
-    Compile_CalcWrite_Instruction_X64 ( 0, opCode @, mod @, _reg @, rm @, 0, 0, disp @, 8, 0, 0 )
-;;
 
-: _Compile_Move_DataStackN_ToReg ( _reg n ) _Compile_Move ( REG, 0, _reg @, DSP, n @ * CELL ) apause ;; 
 : _Compile_MoveTOS_To_R8D () _Compile_Move_DataStackN_ToReg ( R8D, 0 ) ;; // _Compile_Move ( REG, 0, EAX, DSP, 0 ) 
 
 : _Compile_Move_Reg_ToDataStackN ( n _reg ) _Compile_Move ( MEM, 1, _reg @, DSP, n @ * CELL ) ;; 
 
-// group1 : ADD OR ADC SBB AND_OPCODE SUB XOR CMP : with immediate data
-: _Compile_Group1_Immediate ( code mod rm disp imm iSize | opCode )
-    // #x80 is the base opCode for this group of instructions 
-    // 1000 00sw 
-    opCode = #x80
-    { ( iSize @ > BYTE ) || ( imm @ > #xff ) } 
-    { 
-        opCode |= 1
-        // iSize = CELL
-    }
-    { 
-        { ( iSize @ <= BYTE ) || ( imm @ < #x100 ) } { opCode |= 3 } if
-    }
-    ifElse
-    // we need to be able to set the size so we can know how big the instruction will be in eg. CompileVariable
-    // otherwise it could be optimally deduced but let caller control by keeping operandSize parameter
-    // some times we need cell_t even though a byte would work
-    _Compile_InstructionX64 ( opCode @, 1, mod @, code @, rm @, disp @, imm @, iSize @ ) 
-;;
 // ' _Compile_Group1_Immediate find wdiss sp
 
 : _Compile_CALL_EAX _Compile_X86_OpModRegRm ( #xff, 3, 2, 0 ) ;; 
@@ -360,8 +392,6 @@ infixOn // c_syntaxOff turns off infix
 
 : _Compile_ADDI_DSP ( imm ) _Compile_Group1_Immediate ( ADD, REG, DSP, 0, imm @, 1 ) ;; 
 
-: _Compile_SUBI_DSP ( imm ) _Compile_Group1_Immediate ( SUB, REG, DSP, 0, imm @, 1 ) ;; 
-
 : _Compile_CMP_REG_IMM ( _reg, imm, isize ) _Compile_Group1_Immediate ( CMP, REG, _reg @, 0, imm @, isize @ ) ;; 
 
 : Compile_Stack_Push_R8D ()
@@ -369,19 +399,6 @@ infixOn // c_syntaxOff turns off infix
     _Compile_Move_Reg_ToDataStackN ( 0, R8D ) 
 ;; 
 
-: Compile_Stack_Pop_R8D ()
-    _Compile_Move_DataStackN_ToReg ( R8D, 0 ) 
-    _Compile_SUBI_DSP ( CELL ) 
-;; 
-
-#if 0
-Combinators
-:asm iax
-    d: Compile_Stack_Pop_R8D ( ) 
-    _Compile_CALL_Reg ( R8D ) 
-asm; 
-
-' iax find wdiss //sp 
 User
 : qeval
     stk iax
@@ -428,21 +445,21 @@ Asm
 // following intel conventions in the naming : insn dst, src
 // move mem to _reg 
 : MOVrm ( _reg, ptr, disp ) // 8 bit disp
-    // _Compile_Move ( toRegOrMem mod _reg rm disp ) 
+    // _Compile_Move ( toRegOrMem imod _reg rm disp ) 
     _Compile_Move ( REG, MEM, _reg @, ptr @, disp @ ) 
 ;;
 // move mem to _reg : 32 bit offset
 : MOVLrm ( _reg, ptr, disp ) // 32 bit disp
-    // _Compile_Move ( toRegOrMem mod _reg rm disp ) 
+    // _Compile_Move ( toRegOrMem imod _reg rm disp ) 
     _Compile_Move ( REG, MEM32, _reg @, ptr @, disp @ ) 
 ;;
 : MOVmr ( ptr, disp, _reg ) 
-    // _Compile_Move ( toRegOrMem mod _reg rm disp ) 
+    // _Compile_Move ( toRegOrMem imod _reg rm disp ) 
     _Compile_Move ( MEM, MEM, _reg @, ptr @, disp @ ) 
 ;;
 // move _reg to _reg
 : MOVrr ( dstReg, srcReg )
-    // _Compile_Move ( toRegOrMem mod _reg rm disp | opCode ) 
+    // _Compile_Move ( toRegOrMem imod _reg rm disp | opCode ) 
     _Compile_Move ( REG, REG, dstReg @, srcReg @, 0 ) 
 ;;
 #endif

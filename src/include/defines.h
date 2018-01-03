@@ -472,7 +472,7 @@
 #define DBG_RETURN ( (uint64) 1 << 16 )
 #define DBG_STEPPED ( (uint64) 1 << 17 )
 #define DBG_PRE_DONE ( (uint64) 1 << 18 )
-#define DBG_STACK_CHANGE ( (uint64) 1 << 19 )
+#define DBG_SHOW_STACK_CHANGE ( (uint64) 1 << 19 )
 #define DBG_BRK_INIT ( (uint64) 1 << 20 )
 #define DBG_RUNTIME ( (uint64) 1 << 21 )
 #define DBG_COMPILE_MODE ( (uint64) 1 << 22 )
@@ -689,9 +689,11 @@
 #define SUBSTITUTE 2
 
 // Source Code Node (SCN) dobject slot indices
-#define SCN_SC_CADDRESS 0
-#define SCN_WORD_SC_INDEX 1
-#define SCN_SC_WORD 2
+#define SCN_WORD  0
+//#define SCN_SC_CADDRESS SCN_WORD
+#define SCN_SC_WORD_INDEX 1
+#define SCN_LAST_SLOT SCN_SC_WORD_INDEX
+#define SCN_NUMBER_OF_SLOTS (SCN_LAST_SLOT + 1) //1 : remember - 0 indexed array
 // Compiler Word List Node (CWLN) slot indices
 #define CWLN_WORD 0
 #define CWLN_SCN 1

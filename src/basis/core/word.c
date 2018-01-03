@@ -8,47 +8,48 @@ Word_SetCoding ( Word * word, byte * address )
 }
 
 void
-_Word_Run ( Word * word )
+Word_Run ( Word * word )
 {
     if ( word )
     {
         word->StackPushRegisterCode = 0 ; // nb. used! by the rewriting optInfo
-        //word->W_SC_WordIndex = _CfrTil_->SC_ScratchPadIndex ; // nb! not here but in _Interpreter_DoWord so we can adjust to out of order words thru there
         // keep track in the word itself where the machine code is to go, if this word is compiled or causes compiling code - used for optimization
         Word_SetCoding ( word, Here ) ;
         word->W_InitialRuntimeDsp = _Dsp_ ;
+        if ( ! word->W_SC_ScratchPadIndex ) word->W_SC_ScratchPadIndex = _CfrTil_->SC_ScratchPadIndex ;
         _Context_->CurrentlyRunningWord = word ;
         _Debugger_->PreHere = Here ;
-        //Set_DspReg_FromDataStackPointer ( ) ;
+        DEBUG_SETUP ( word ) ;
         _Block_Eval ( word->Definition ) ;
-        //Set_DataStackPointer_FromDspReg ( ) ;
+        DEBUG_SHOW ;
     }
 }
 
 void
-Word_Run_Debug ( Word * word )
-{
-    if ( ! sigsetjmp ( _Context_->JmpBuf0, 0 ) )
-    {
-        _Word_Run ( word ) ;
-    }
-    else _Dsp_ = _CfrTil_->SaveDsp ;
-}
-
-void
-_Word_Eval ( Word * word )
+Word_Eval ( Word * word )
 {
     if ( word )
     {
         if ( ( word->CAttribute & IMMEDIATE ) || ( ! CompileMode ) )
         {
-            _Word_Run ( word ) ;
+            Word_Run ( word ) ;
         }
         else
         {
             _Word_Compile ( word ) ;
         }
     }
+}
+
+#if 0
+void
+Word_Run_Debug ( Word * word )
+{
+    //if ( ! sigsetjmp ( _Context_->JmpBuf0, 0 ) )
+    {
+        Word_Run ( word ) ;
+    }
+    //else _Dsp_ = _CfrTil_->SaveDsp ;
 }
 
 void
@@ -82,6 +83,7 @@ Word_Eval ( Word * word )
         else _Word_Eval ( word ) ;
     }
 }
+#endif
 
 void
 _Word_Interpret ( Word * word )
@@ -92,7 +94,7 @@ _Word_Interpret ( Word * word )
 void
 _Word_Compile ( Word * word )
 {
-    Set_SCA ( 0 ) ;
+    Word_Set_SCA ( word ) ;
     if ( ! word->Definition )
     {
         CfrTil_SetupRecursiveCall ( ) ;

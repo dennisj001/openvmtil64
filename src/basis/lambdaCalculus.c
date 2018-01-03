@@ -751,7 +751,7 @@ _LO_CfrTil ( ListObject * lfirst )
     {
         if ( ldata->LAttribute & ( LIST_NODE ) )
         {
-            _CfrTil_Parse_LocalsAndStackVariables ( 1, 1, ldata, _Compiler_->LocalsNamespacesStack, 0 ) ;
+            _CfrTil_Parse_LocalsAndStackVariables ( 1, 1, ldata, _Compiler_->LocalsCompilingNamespacesStack, 0 ) ;
         }
         else if ( String_Equal ( ldata->Name, ( byte * ) "tick" ) || String_Equal ( ldata->Name, ( byte * ) "'" ) )
         {
@@ -1054,7 +1054,7 @@ _LO_Apply_Arg ( ListObject ** pl1, int64 i, int8 svCompileMode )
         word->W_SC_ScratchPadIndex = l1->W_SC_ScratchPadIndex ;
         word->StackPushRegisterCode = 0 ;
         _DEBUG_SETUP ( word, 1 ) ;
-        _Word_Eval ( word ) ; // ?? move value directly to RegOrder reg
+        Word_Eval ( word ) ; // ?? move value directly to RegOrder reg
         Word *baseObject = _Interpreter_->BaseObject ;
         //if ( svCompileMode && ( ! _Lexer_IsTokenForwardDotted ( cntx->Lexer0, word->W_SC_ScratchPadIndex ) ) ) // research : how does CAttribute get set to T_NIL?
         //if ( ( ! ( l1->CAttribute & ( NAMESPACE_TYPE | OBJECT_FIELD | T_NIL ) ) ) && ( ! _Lexer_IsTokenForwardDotted ( cntx->Lexer0, word->W_TokenEnd_ReadLineIndex ) ) )
@@ -1167,12 +1167,8 @@ _LO_Apply_ArgList ( ListObject * l0, Word * word )
         {
             _Compile_MoveImm_To_Reg ( RAX, 0, CELL ) ; // for printf ?? others //System V ABI : "%rax is used to indicate the number of vector arguments passed to a function requiring a variable number of arguments"
         }
-#if 0       
-        _Compile_Call_ThruReg ( ( byte* ) word->Definition, OP_REG ) ; //printf needs RAX at 0, so generally use the operand reg (OREG) for all, why not?
-#else
-        _Word_Eval ( word ) ;
-#endif        
-        _DEBUG_SHOW ( word, 1 ) ;
+        Word_Set_SCA ( word ) ;
+        Word_Eval ( word ) ;
         if ( ! svcm )
         {
             CfrTil_EndBlock ( ) ;
@@ -1181,6 +1177,7 @@ _LO_Apply_ArgList ( ListObject * l0, Word * word )
             _DEBUG_SETUP ( word, 1 ) ;
             CfrTil_BlockRun ( ) ;
         }
+        _DEBUG_SHOW ( word, 1 ) ;
         //Set_CompileMode ( svcm ) ;
         d0 ( if ( Is_DebugModeOn ) LO_Debug_ExtraShow ( 0, 2, 0, ( byte* ) "\nLeaving _LO_Apply_ArgList..." ) ) ;
         SetState ( compiler, LC_ARG_PARSING, false ) ;
@@ -1586,13 +1583,13 @@ _LO_FindWord ( Namespace * l0, byte * name, ListObject * locals )
     if ( GetState ( _Compiler_, LC_ARG_PARSING ) ) word = Finder_Word_FindUsing ( _Context_->Finder0, name, 0 ) ;
     else
     {
-        if ( locals ) word = Finder_FindWord_InOneNamespace ( _Finder_, locals, name ) ;
+        if ( locals ) word = _Finder_FindWord_InOneNamespace ( _Finder_, locals, name ) ;
         if ( ! word )
         {
-            word = Finder_FindWord_InOneNamespace ( _Finder_, _Q_->OVT_LC->LispTemporariesNamespace, name ) ;
+            word = _Finder_FindWord_InOneNamespace ( _Finder_, _Q_->OVT_LC->LispTemporariesNamespace, name ) ;
             if ( ! word )
             {
-                word = Finder_FindWord_InOneNamespace ( _Finder_, _Q_->OVT_LC->LispNamespace, name ) ; // prefer Lisp namespace
+                word = _Finder_FindWord_InOneNamespace ( _Finder_, _Q_->OVT_LC->LispNamespace, name ) ; // prefer Lisp namespace
                 if ( ! word )
                 {
                     word = Finder_Word_FindUsing ( _Context_->Finder0, name, 0 ) ;

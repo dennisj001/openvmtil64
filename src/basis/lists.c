@@ -34,19 +34,3 @@ _List_Show_N_Word_Names ( dllist * list, uint64 n, int64 showBeforeAfterFlag, in
     if ( dbgFlag ) DefaultColors ;
 }
 
-void
-_List_ShowWord_SCWI_Address ( dllist * list )
-{
-    dlnode * node, *nextNode ;
-    Word * nodeWord, *beforeWord, *afterWord ;
-    byte * thisName, *bt = Buffer_New_pbyte ( 64 ) ; //, *ba = Buffer_New_pbyte ( 64 ), *bb = Buffer_New_pbyte ( 64 ) ;
-    for ( node = dllist_First ( ( dllist* ) list ) ; node ; node = nextNode )
-    {
-        nextNode = dlnode_Next ( node ) ;
-        nodeWord = ( node->afterWord && node->afterWord->afterWord ? ( Word* ) dobject_Get_M_Slot ( node, 0 ) : 0 ) ;
-        if ( ! nodeWord ) break ;
-        thisName = nodeWord ? sconvbs ( bt, nodeWord->Name ) : ( byte* ) " " ;
-        _Printf ( ( byte* ) "\n\tName : %s : scwi = %d : coding = 0x%016lx", thisName, nodeWord->W_SC_WordIndex, nodeWord->Coding ) ;
-    }
-}
-

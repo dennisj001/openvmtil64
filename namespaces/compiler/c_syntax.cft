@@ -199,7 +199,7 @@ faccs2 ( n | rec )
     return rec ;
 }
 ' faccs2 find wdiss
-faccs2 ( 7 ) p 
+faccs2 ( 7 ) dup p 5040 _assert0 apause
 // sp
 void
 interpret4 ( | atoken aword ) 

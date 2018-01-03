@@ -61,7 +61,7 @@ CfrTil_Type_New ( )
 Attribute *
 _DObject_FindAttribute ( DObject * dobject, byte * name )
 {
-    Word * word = Finder_FindWord_InOneNamespace ( _Finder_, dobject, name ) ;
+    Word * word = _Finder_FindWord_InOneNamespace ( _Finder_, dobject, name ) ;
     if ( word ) return ( (Attribute*) word ) ;
     else return 0 ;
 }
@@ -97,7 +97,7 @@ _DObject_FindAttribute_BottomUp ( DObject * dobject, byte * name )
     Word * word = 0 ;
     do
     {
-        if ( ( word = Finder_FindWord_InOneNamespace ( _Finder_, dobject, name ) ) ) break ;
+        if ( ( word = _Finder_FindWord_InOneNamespace ( _Finder_, dobject, name ) ) ) break ;
     }
     while ( ( dobject = dobject->ContainingNamespace ) ) ;
     if ( word ) return (Attribute*) ( word ) ;

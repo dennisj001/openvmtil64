@@ -127,7 +127,7 @@ _Class_Object_Init ( Word * word, Namespace * ns )
     do
     {
         Word * initWord ;
-        if ( ( initWord = Finder_FindWord_InOneNamespace ( _Finder_, ns, ( byte* ) "init" ) ) )
+        if ( ( initWord = _Finder_FindWord_InOneNamespace ( _Finder_, ns, ( byte* ) "init" ) ) )
         {
             _Stack_Push ( nsstack, ( int64 ) initWord ) ;
         }
@@ -226,7 +226,7 @@ _CfrTil_Label ( byte * lname )
     GotoInfo * gotoInfo = GotoInfo_New ( lname, GI_LABEL ) ;
     gotoInfo->LabeledAddress = Here ;
     Namespace * ns = Namespace_FindOrNew_SetUsing ( ( byte* ) "__labels__", _CfrTil_->Namespaces, 1 ) ;
-    if ( Finder_FindWord_InOneNamespace ( _Finder_, ns, lname ) )
+    if ( _Finder_FindWord_InOneNamespace ( _Finder_, ns, lname ) )
     {
         byte bufferData [ 32 ], *buffer = ( byte* ) bufferData ;
         sprintf ( ( char* ) buffer, "%s%d", lname, rand ( ) ) ;
@@ -260,7 +260,7 @@ ParameterVarOffset ( Word * word )
 Word *
 CfrTil_LocalWord ( byte * name, int64 ctype ) // svf : flag - whether stack variables are in the frame
 {
-    _Namespace_FindOrNew_Local ( _Compiler_->LocalsNamespacesStack ) ;
+    _Namespace_FindOrNew_Local ( _Compiler_->LocalsCompilingNamespacesStack ) ;
     Finder_SetQualifyingNamespace ( _Finder_, 0 ) ;
     //( ctype & LOCAL_VARIABLE ) ? ++ _Compiler_->NumberOfLocals : +_Compiler_->NumberOfArgs ;
     //Word * word = _DataObject_New ( LOCAL_VARIABLE, 0, name, ( ctype | IMMEDIATE ), ltype, index ? index : ++ _Context_->Compiler0->NumberOfLocals, 0, 0 ) ;

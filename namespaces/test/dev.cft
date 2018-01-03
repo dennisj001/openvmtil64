@@ -114,7 +114,7 @@ User
 //'dn 'dfnba find alias  
 : factorial ( REG n | REG rec -- RAX ) rec 1 = { n @ 1 > } { rec @ n @ * rec store n -- } while return rec ;
 : _ifx ( w | j ) 
-    { j 1 = } { j @ 20 <= } { j ++ } 
+    { j 1 = } { j @ 30 <= } { j ++ } 
     {
        //j @ w @ wordRun j @ p "." ps p ";" ps dn
        j @ w @ wordRun drop // j @ p "." ps p ";" ps
@@ -137,7 +137,7 @@ User
 : iFactorialX2 ( n w | k ) { k 1 = } { k @ n @ <= } { k ++ } { w @ _ifx2 } for ; 
 
 //: _ffx ( n w | t ) nl 7 w @ wordRun decimal p nl { t 0 = } { t @ n @ < } { t ++ } { 100000 w @ iFactorialX } for ;
-: _ffx ( n w | t ) nl 7 w @ wordRun decimal p nl { t 0 = } { t @ n @ < } { t ++ } { 100000 w @ iFactorialX } for ;
+: _ffx ( n w | t ) nl 7 w @ wordRun decimal p nl { t 0 = } { t @ n @ < } { t ++ } { 2000 w @ iFactorialX } for ;
 //: _ffx ( n w | t ) { t 0 = } { t @ n @ < } { t ++ } { 100000 w @ iFactorialX } for ;
 : _ffx2 ( n w | t ) nl 2 16 w @ wordRun decimal p nl { t 0 = } { t @ n @ < } { t ++ } { 100000 w @ iFactorialX2 } for ;
 

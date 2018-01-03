@@ -111,7 +111,7 @@ _Lexer_ConsiderDebugAndCommentTokens ( byte * token, int64 evalFlag, int64 addFl
     if ( word && ( word->LAttribute & W_COMMENT ) )
     {
         word->W_TokenStart_ReadLineIndex = _Lexer_->TokenStart_ReadLineIndex ;
-        _Word_Eval ( word ) ;
+        Word_Eval ( word ) ;
         return true ;
     }
     else if ( word && ( word->CAttribute & DEBUG_WORD ) )
@@ -120,7 +120,7 @@ _Lexer_ConsiderDebugAndCommentTokens ( byte * token, int64 evalFlag, int64 addFl
         {
             word->W_TokenStart_ReadLineIndex = _Lexer_->TokenStart_ReadLineIndex ;
             //Word_Eval0 ( word ) ;
-            _Word_Eval_Debug ( word ) ;
+            Word_Eval ( word ) ;
         }
         else if ( addFlag ) _CfrTil_AddTokenToTailOfTokenList ( token ) ; // TODO ; list should instead be a stack
         return true ;

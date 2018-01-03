@@ -6,7 +6,7 @@
  * Compiler Word List has nodes (CWLNs) with 2 slots one for the *word and one for a pointer to a Source Code Node (SCN) which has source code index info.
  * CWLN : slot 0 word, slot 1 SCN
  * Source code nodes (SCNs) have three slots for the source code byte index, the code address, and a pointer to the word, they are on the _CfrTil_->DebugWordList.
- * SCN : slot 0 : SCN_SC_CADDRESS, slot 1 : SCN_WORD_SC_INDEX, slot 2 : SCN_SC_WORD
+ * SCN : slot 0 : SCN_WORD, slot 1 : SCN_WORD_SC_INDEX, slot 2 : address is SCN_WORD->Coding = word->Coding
  * So, they each have pointers to each other.
  * 
  */
@@ -19,9 +19,9 @@ DWL_Find ( dllist * list, Word * iword, byte * address, byte* name, int64 fromTo
 {
     byte * naddress ;
     Word * nword, *aFoundWord = 0, *foundWord = 0 ;
-    dlnode * anode = 0, *svAnode = 0 ;
+    dlnode * anode = 0 ;
     int64 numFound = 0 ;
-    uint64 fwDiff = 0, fDiff, minDiffFound = 0, scwi ; //, scwi0 = - 1 ;
+    uint64 fwDiff = 0, fDiff = 0, minDiffFound = 0, scwi ; //, scwi0 = - 1 ;
 
     if ( list && ( iword || name || address ) )
     {
@@ -119,33 +119,58 @@ DWL_ShowList ( Word * scWord, int8 fromFirst )
     }
 }
 
+#if 0
+
+void
+_List_ShowWord_SCWI_Address ( dllist * list )
+{
+    dlnode * node, *nextNode ;
+    Word * nodeWord, *beforeWord, *afterWord ;
+    byte * thisName, *bt = Buffer_New_pbyte ( 64 ) ; //, *ba = Buffer_New_pbyte ( 64 ), *bb = Buffer_New_pbyte ( 64 ) ;
+    for ( node = dllist_First ( ( dllist* ) list ) ; node ; node = nextNode )
+    {
+        nextNode = dlnode_Next ( node ) ;
+        //nodeWord = ( node->afterWord && node->afterWord->afterWord ? ( Word* ) dobject_Get_M_Slot ( node, 0 ) : 0 ) ;
+        nodeWord = ( node->afterWord && node->afterWord->afterWord ? ( Word* ) dobject_Get_M_Slot ( node, SCN_WORD ) : 0 ) ;
+        if ( ! nodeWord ) break ;
+        thisName = nodeWord ? sconvbs ( bt, nodeWord->Name ) : ( byte* ) " " ;
+        //_Printf ( ( byte* ) "\n\tName : %s : scwi = %d : coding = 0x%016lx", thisName, nodeWord->W_SC_WordIndex, nodeWord->Coding ) ;
+        if ( word ) _Printf ( "\nSourceCode WordList : for word \'%s\' : index %2d : word = 0x%016lx : \'%-12s\' : address = 0x%016lx : scwi = %3d", scWord->Name, index, word, word->Name, address, scwi ) ;
+    }
+}
+#endif
+
 void
 _Debugger_ShowDbgSourceCodeAtAddress ( Debugger * debugger, byte * address )
 {
     // ...source code source code TP source code source code ... EOL
-    Word * scWord = Compiling ? _Compiler_->CurrentWordCompiling : _Context_->SourceCodeWord ? _Context_->SourceCodeWord : _Context_->CurrentlyRunningWord ;
-    dllist * list = scWord->W_SC_WordList ? scWord->W_SC_WordList : _Compiler_->WordList ;
-    if ( scWord && list )
+    //Word * scWord = Compiling ? _Compiler_->CurrentWordCompiling : _Context_->SourceCodeWord ? _Context_->SourceCodeWord : _Context_->CurrentlyRunningWord ;
+    Word * scWord = Compiling ? _Compiler_->CurrentWordCompiling : GetState ( debugger, DBG_STEPPING ) ? Debugger_GetWordFromAddress ( debugger ) : _Context_->CurrentlyRunningWord ;
+    if ( scWord )
     {
-        byte *sourceCode = scWord->W_SourceCode ? scWord->W_SourceCode : String_New ( _CfrTil_->SC_ScratchPad, TEMPORARY ) ;
-        if ( ! String_Equal ( sourceCode, "" ) )
+        dllist * list = scWord->W_SC_WordList ? scWord->W_SC_WordList : _Compiler_->WordList ;
+        if ( list )
         {
-            int64 fixed = 0 ;
-            Word * word = DWL_Find ( list, 0, address, 0, 0, 0, 0 ) ;
-            if ( word && ( debugger->LastSourceCodeWord != word ) )
+            byte *sourceCode = scWord->W_SourceCode ? scWord->W_SourceCode : String_New ( _CfrTil_->SC_ScratchPad, TEMPORARY ) ;
+            if ( ! String_Equal ( sourceCode, "" ) )
             {
-                d0 ( _List_ShowWord_SCWI_Address ( list ) ) ;
-                if ( GetState ( scWord, W_C_SYNTAX ) && String_Equal ( word->Name, "store" ) )
+                int64 fixed = 0 ;
+                Word * word = DWL_Find ( list, 0, address, 0, 0, 0, 0 ) ;
+                if ( word && ( debugger->LastSourceCodeWord != word ) )
                 {
-                    word->Name = ( byte* ) "=" ;
-                    fixed = 1 ;
-                }
-                byte * buffer = PrepareDbgSourceCodeString ( sourceCode, word ) ;
-                _Printf ( ( byte* ) "\n%s", buffer ) ;
-                debugger->LastSourceCodeWord = word ;
-                if ( fixed )
-                {
-                    word->Name = ( byte* ) "store" ;
+                    d0 ( DebugWordList_Show ( ) ) ;
+                    if ( GetState ( scWord, W_C_SYNTAX ) && String_Equal ( word->Name, "store" ) )
+                    {
+                        word->Name = ( byte* ) "=" ;
+                        fixed = 1 ;
+                    }
+                    byte * buffer = PrepareDbgSourceCodeString ( sourceCode, word ) ;
+                    _Printf ( ( byte* ) "\n%s", buffer ) ;
+                    debugger->LastSourceCodeWord = word ;
+                    if ( fixed )
+                    {
+                        word->Name = ( byte* ) "store" ;
+                    }
                 }
             }
         }
@@ -201,7 +226,7 @@ PrepareDbgSourceCodeString ( byte * sc, Word * word ) // sc : source code ; scwi
     byte * cc_line = ( byte* ) "" ;
     if ( sc )
     {
-        int64 scwi0 = word->W_SC_WordIndex ; 
+        int64 scwi0 = word->W_SC_WordIndex ;
         byte *nvw, * token0 = word->Name, *token1 ;
         int64 i, tp = 42, lef, leftBorder, ts, rightBorder, ref ; // tp : text point - where we want to start source code text to align with disassembly ; ref : right ellipsis flag
         token1 = String_ConvertToBackSlash ( token0 ) ;
@@ -264,6 +289,9 @@ void
 _CfrTil_WordList_PushWord ( Word * word )
 {
     CompilerWordList_Push ( word ) ;
+    //Compiler * compiler = _Compiler_ ;
+    //d1 ( if ( Is_DebugOn && IsSourceCodeOn && compiler->CurrentWordCompiling ) _Printf ( ( byte* ) "\nW_SC_WordList for %s : length = %d\n", compiler->CurrentWordCompiling->Name, dllist_Length ( compiler->CurrentWordCompiling->W_SC_WordList ) ) ) ;
+    //d1 ( if ( GetState ( _Context_,C_SYNTAX ) && IsSourceCodeOn && compiler->CurrentWordCompiling ) _Printf ( ( byte* ) "\nWordList for %s : length = %d\n", compiler->CurrentWordCompiling->Name, dllist_Length ( compiler->WordList ) ) ) ;
 }
 
 Word *
@@ -287,7 +315,7 @@ CfrTil_WordList_PopNode ( )
  * Compiler Word List : has nodes (CWLNs) with 2 slots one for the *word and one for a pointer to a Source Code Node (SCN) which has source code index info.
  * CWLN : slot 0 word, slot 1 SCN
  * _CfrTil_->DebugWordList : has Source code nodes (SCNs) have three slots for source code byte index, the code address, and a pointer to the word, they are on the _CfrTil_->DebugWordList.
- * SCN : slot 0 : SCN_SC_CADDRESS, slot 1 : SCN_WORD_SC_INDEX, slot 2 : SCN_SC_WORD
+ * SCN : slot 0 : SCN_WORD = SCN_SC_CADDRESS, slot 1 : SCN_WORD_SC_INDEX, slot 2 : SCN_SC_WORD
  * So, they each have pointers to each other.
  * 
  */
@@ -320,27 +348,30 @@ DWL_ShowWord ( Word * word, byte * insert, int64 scwiDiff )
 }
 
 void
-DebugWordList_Show ( )
+DebugWordList_Show ( Debugger * debugger )
 {
-    Word * scWord = Compiling ? _Compiler_->CurrentWordCompiling : _Context_->SourceCodeWord ? _Context_->SourceCodeWord : _Context_->CurrentlyRunningWord ;
+    //Word * scWord = Compiling ? _Compiler_->CurrentWordCompiling : _Context_->SourceCodeWord ? _Context_->SourceCodeWord : _Context_->CurrentlyRunningWord ;
+    Word * scWord = Compiling ? _Compiler_->CurrentWordCompiling : GetState ( debugger, DBG_STEPPING ) ? Debugger_GetWordFromAddress ( debugger ) : _Context_->CurrentlyRunningWord ;
     dllist * list = scWord->W_SC_WordList ? scWord->W_SC_WordList : _Compiler_->WordList ;
     int64 index ;
     dlnode * node, *nextNode ;
     if ( Is_DebugModeOn && list ) //= _CfrTil_->DebugWordList ) ) //GetState ( _CfrTil_, DEBUG_SOURCE_CODE_MODE ) )
     {
         //if ( _CfrTil_->DebugWordListWord ) 
-        _Printf ( "\nSourceCode WordList : for word = %s", scWord->Name ) ;
+        _Printf ( "\nSourceCode WordList : for word \'%s\'", scWord->Name ) ;
         for ( index = 0, node = dllist_First ( ( dllist* ) list ) ; node ; node = nextNode, index ++ )
         {
             nextNode = dlnode_Next ( node ) ;
             dobject * dobj = ( dobject * ) node ;
-            byte * address = ( byte* ) dobject_Get_M_Slot ( dobj, SCN_SC_CADDRESS ) ; // notice : we are setting the slot in the obj that was in the SCN_SC_WORD_INDEX slot (1) of the 
-            int64 scwi = dobject_Get_M_Slot ( dobj, SCN_WORD_SC_INDEX ) ;
-            Word * word = ( Word * ) dobject_Get_M_Slot ( dobj, SCN_SC_WORD ) ;
-            _Printf ( "\nSourceCode WordList : name %s : index %2d : word = 0x%016lx : \'%-12s\' : address = 0x%016lx : scwi = %3d", scWord->Name, index, word, word->Name, address, scwi ) ;
+            int64 scwi = dobject_Get_M_Slot ( dobj, SCN_SC_WORD_INDEX ) ;
+            //Word * word = ( node->afterWord && node->afterWord->afterWord ? ( Word* ) dobject_Get_M_Slot ( node, SCN_WORD ) : 0 ) ;
+            Word * word = ( Word* ) dobject_Get_M_Slot ( dobj, SCN_WORD ) ;
+            byte * coding = word->Coding ; //( byte* ) dobject_Get_M_Slot ( dobj, SCN_SC_CADDRESS ) ; 
+            if ( word ) _Printf ( "\nSourceCode WordList : for word \'%s\' : index %2d : word = 0x%016lx : \'%-12s\' : coding = 0x%016lx : scwi = %3d", scWord->Name, index, word, word->Name, coding, scwi ) ;
         }
         //_Pause ( ) ;
     }
+    //_List_ShowWord_SCWI_Address ( list ) ; //_Compiler_->WordList ) ;
 }
 
 void
@@ -684,10 +715,10 @@ DWL_Find ( Word * word, byte * address, byte* name, int64 fromFirst, int64 takeF
             if ( address == naddress )
             {
                 numFound ++ ;
-                scwi = dobject_Get_M_Slot ( ( dobject * ) node, SCN_WORD_SC_INDEX ) ;
+                scwi = dobject_Get_M_Slot ( ( dobject * ) node, SCN_SC_WORD_INDEX ) ;
                 if ( newAddress )
                 {
-                    dobject_Set_M_Slot ( ( dobject * ) node, SCN_WORD_SC_INDEX, scwi ) ;
+                    dobject_Set_M_Slot ( ( dobject * ) node, SCN_SC_WORD_INDEX, scwi ) ;
                     dobject_Set_M_Slot ( ( dobject * ) node, SCN_SC_CADDRESS, newAddress ) ;
                     if ( _Q_->Verbosity > 2 )
                     {

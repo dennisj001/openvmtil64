@@ -5,17 +5,16 @@ void
 _Debugger_StepOneInstruction ( Debugger * debugger )
 {
     debugger->SaveTOS = TOS ;
-    //debugger->PreHere = Here ;
+    debugger->PreHere = Here ;
     debugger->SaveStackDepth = DataStack_Depth ( ) ;
     ( ( VoidFunction ) debugger->StepInstructionBA->BA_Data ) ( ) ;
     _Debugger_Set_DataStackPointer_WithCpuStateDsp ( debugger ) ;
-    //_Set_DspReg_FromDataStackPointer ( ) ;
 }
 
 void
 Debugger_StepOneInstruction ( Debugger * debugger )
 {
-    if ( ! sigsetjmp ( debugger->JmpBuf0, 0 ) )
+    //if ( ! sigsetjmp ( debugger->JmpBuf0, 0 ) )
     {
         _Debugger_StepOneInstruction ( debugger ) ;
     }
@@ -32,7 +31,6 @@ Debugger_CompileOneInstruction ( Debugger * debugger, byte * jcAddress, Boolean 
     _ByteArray_Init ( debugger->StepInstructionBA ) ; // we are only compiling one insn here so clear our BA before each use
     Set_CompilerSpace ( debugger->StepInstructionBA ) ; // now compile to this space
 
-    //_Compile_MoveReg_ToMem_ThruReg ( DSP, (byte*) &debugger->cs_Cpu->CPU_DSP, OREG ) ;
     _Compile_Save_C_CpuState ( _CfrTil_, showFlag ) ; //&& ( _Q_->Verbosity >= 3 ) ) ; // save our c compiler cpu register state
 
     _Compile_Restore_Debugger_CpuState ( debugger, showFlag ) ; //&& ( _Q_->Verbosity >= 3 ) ) ; // restore our runtime state before the current insn
@@ -58,7 +56,13 @@ _Debugger_CompileAndStepOneInstruction ( Debugger * debugger, byte * jcAddress )
     byte * nextInsn = Debugger_CompileOneInstruction ( debugger, jcAddress, showExtraFlag ) ; // compile the insn here
     Debugger_StepOneInstruction ( debugger ) ;
     if ( showExtraFlag ) Debug_ExtraShow ( Here - svHere, showExtraFlag ) ;
-    _Debugger_ShowEffects ( debugger, debugger->w_Word, GetState ( debugger, DBG_STEPPING ), showExtraFlag ) ;
+    if ( GetState ( debugger, DBG_AUTO_MODE ) && ( ! GetState ( debugger, DBG_CONTINUE_MODE ) ) ) 
+    {
+        SetState ( debugger, DBG_SHOW_STACK_CHANGE, false ) ;
+        Debugger_UdisOneInstruction ( debugger, debugger->DebugAddress, ( byte* ) "\r", ( byte* ) "" ) ;
+        if ( Compiling) _Debugger_DisassembleWrittenCode ( debugger ) ;
+    }
+    else _Debugger_ShowEffects ( debugger, debugger->w_Word, GetState ( debugger, DBG_STEPPING ), showExtraFlag ) ;
     DebugColors ;
     debugger->DebugAddress = nextInsn ;
 }
@@ -127,7 +131,7 @@ into:
     {
         _Printf ( ( byte* ) "\nstepping thru and out of a \"native\" subroutine : %s : .... :>", word ? ( char* ) c_gd ( word->Name ) : "" ) ;
         debugger->Key = 's' ;
-        SetState ( debugger, DBG_AUTO_MODE, true ) ;
+        SetState ( debugger, DBG_CONTINUE_MODE | DBG_AUTO_MODE, true ) ;
         goto doDefault ;
     }
     else
@@ -146,8 +150,6 @@ done:
 void
 Debugger_CompileAndStepOneInstruction ( Debugger * debugger )
 {
-    //uint64 code ;
-    //byte mov_rax_rbx__sub_rbx_0x8 [ ] = { 0x48, 0x8b, 0x03, 0x48, 0x83, 0xeb, 0x08 } ;
     if ( debugger->DebugAddress )
     {
         byte *jcAddress = 0 ;
@@ -196,6 +198,7 @@ doReturn:
             jcAddress = JumpCallInstructionAddress ( debugger->DebugAddress ) ;
 doCall:
             word = Word_GetFromCodeAddress ( jcAddress ) ;
+#if 0
             if ( word && ( word->CAttribute & ( DEBUG_WORD ) ) )
             {
                 SetState ( debugger, ( DBG_CONTINUE_MODE | DBG_AUTO_MODE ), false ) ;
@@ -203,6 +206,7 @@ doCall:
                 debugger->DebugAddress += 3 ; // 5 : sizeof jmp/call insn // debugger->DebugAddress + size ; // skip the call insn to the next after it
                 goto end ;
             }
+#endif
         }
         else if ( ( * debugger->DebugAddress == CALL_JMP_MOD_RM ) && ( _RM ( debugger->DebugAddress ) == 16 ) ) // inc/dec are also opcode == 0xff
         {
@@ -241,7 +245,6 @@ end:
         {
             //Debugger_UdisOneInstruction ( debugger, debugger->DebugAddress, ( byte* ) "", ( byte* ) "" ) ; // the next instruction
             // keep eip - instruction pointer - up to date ..
-
             debugger->cs_Cpu->Rip = ( uint64 * ) debugger->DebugAddress ;
         }
     }
@@ -286,7 +289,7 @@ Debugger_PreStartStepping ( Debugger * debugger )
         }
         else
         {
-            Debugger_SetupStepping ( debugger, 1 ) ;
+            Debugger_SetupStepping ( debugger ) ;
             SetState ( debugger, DBG_NEWLINE | DBG_PROMPT | DBG_INFO, false ) ;
         }
     }
@@ -333,7 +336,7 @@ Debugger_AfterStep ( Debugger * debugger )
 }
 
 void
-_Debugger_SetupStepping ( Debugger * debugger, Word * word, byte * address, byte *name, int64 iflag )
+_Debugger_SetupStepping ( Debugger * debugger, Word * word, byte * address, byte *name )
 {
     _Printf ( ( byte* ) "\nSetting up stepping : location = %s : debugger->word = \'%s\' : ...", c_gd ( _Context_Location ( _Context_ ) ), word ? word->Name : ( name ? name : ( byte* ) "" ) ) ;
     if ( word )
@@ -356,9 +359,9 @@ _Debugger_SetupStepping ( Debugger * debugger, Word * word, byte * address, byte
 }
 
 void
-Debugger_SetupStepping ( Debugger * debugger, int64 iflag )
+Debugger_SetupStepping ( Debugger * debugger )
 {
-    _Debugger_SetupStepping ( debugger, debugger->w_Word, debugger->DebugAddress, 0, iflag ) ;
+    _Debugger_SetupStepping ( debugger, debugger->w_Word, debugger->DebugAddress, 0 ) ;
 }
 
 int64
@@ -444,7 +447,7 @@ _Compile_Restore_Debugger_CpuState ( Debugger * debugger, int64 showFlag ) // re
 void
 _Compile_Restore_C_CpuState ( CfrTil * cfrtil, int64 showFlag )
 {
-    _Compile_CpuState_Restore ( cfrtil->cs_Cpu, showFlag ) ;
+    _Compile_CpuState_Restore ( cfrtil->cs_Cpu, 1 ) ;
 
     if ( showFlag ) Compile_Call ( ( byte* ) CfrTil_CpuState_Show ) ;
 }

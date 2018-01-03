@@ -5,10 +5,10 @@ decimal
 User
 C
 // demonstrate calling order of local variables
-dscOn 
+dscOn verbosity 3 =
 : hi ( m x | n -- n ) n m @ = n @ p ; : hey ( m x | n -- n ) n m @ = n @ 1 hi p n @ 1 hi p n @ 1 hi p ; 
 : heey ( m x | n -- n ) n m @ = n @ 1 hey p n @ 1 hey p n @ 1 hey p ; 
-7 1 heey p //pause
+7 1 heey dup p 7 _assert verbosity 1 = //pause
 dscOff
 : a123 ( one two three )
 
@@ -39,7 +39,7 @@ sp
 1 2 hey sp
 : hey1 ( a b ) a @ b @ hey ; 
 1 2 hey1 sp
-: hey2 ( n m | o q -- TOS )
+: hey2 ( n m | o q ) 
  	//nl "startHey2" prints
 	m @ o store     m @ o @ _assert0
 	n @ q store     n @ q @ _assert0
@@ -47,11 +47,11 @@ sp
 	n @ m @ + o @ + q @ + 1 + dup p 7 _assert0
         //" afterHey2" prints
 ;
-1 2 hey2 p sp
+1 2 hey2 sp
 
 nl "beforeHeey" prints nl
 
-: heey ( a b ) a @ b @ hey2 p a @ b @ hey2 ;
+: heey ( a b ) a @ b @ hey2 a @ b @ hey2 ;
 : heey2 ( a b ) a @ b @ heey a @ b @ heey ;
 : heeey2 ( a b ) a @ b @ heey2 a @ b @ heey2 ;
 : heeeey2 ( a b ) a @ b @ heeey2 a @ b @ heeey2 ;

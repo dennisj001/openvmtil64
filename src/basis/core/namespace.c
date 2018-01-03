@@ -276,7 +276,7 @@ Namespace *
 _Namespace_Find ( byte * name, Namespace * superNamespace, int64 exceptionFlag )
 {
     Word * word = 0 ;
-    if ( superNamespace ) word = Finder_FindWord_InOneNamespace ( _Finder_, superNamespace, name ) ;
+    if ( superNamespace ) word = _Finder_FindWord_InOneNamespace ( _Finder_, superNamespace, name ) ;
     if ( ! word ) word = Finder_FindWord_AnyNamespace ( _Finder_, name ) ;
     if ( word && ( word->CAttribute & ( NAMESPACE | CLASS | DOBJECT ) ) ) return ( Namespace* ) word ;
     else if ( exceptionFlag )

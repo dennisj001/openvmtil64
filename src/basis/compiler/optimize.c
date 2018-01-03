@@ -287,7 +287,7 @@ _CheckOptimizeOperands ( Compiler * compiler, int64 maxOperands )
                         DataStack_Push ( ( int64 ) * optInfo->O_one->W_PtrToValue ) ;
                         SetState ( compiler, COMPILE_MODE, false ) ;
                         SetState ( _CfrTil_, OPTIMIZE_ON, false ) ; //prevent recursion here
-                        _Word_Run ( optInfo->O_zero ) ;
+                        Word_Run ( optInfo->O_zero ) ;
                         SetState ( compiler, COMPILE_MODE, true ) ;
                         SetState ( _CfrTil_, OPTIMIZE_ON, true ) ; //prevent recursion here
                         value = DataStack_Pop ( ) ;
@@ -485,7 +485,7 @@ _CheckOptimizeOperands ( Compiler * compiler, int64 maxOperands )
                         DataStack_Push ( ( int64 ) * optInfo->O_one->W_PtrToValue ) ;
                         SetState ( compiler, COMPILE_MODE, false ) ;
                         SetState ( _CfrTil_, OPTIMIZE_ON, false ) ; //prevent recursion here
-                        _Word_Run ( optInfo->O_zero ) ;
+                        Word_Run ( optInfo->O_zero ) ;
                         SetState ( compiler, COMPILE_MODE, true ) ;
                         SetState ( _CfrTil_, OPTIMIZE_ON, true ) ; //prevent recursion here
                         value = DataStack_Pop ( ) ;
@@ -1020,6 +1020,7 @@ _CheckOptimizeOperands ( Compiler * compiler, int64 maxOperands )
                             if ( bi->LogicTestCode ) SetHere ( bi->LogicTestCode ) ; // no need for the test code on a 'store'
                             else SetHere ( optInfo->O_two->StackPushRegisterCode ) ; // leave optInfo->O_two value in R8 we don't need to push it
                             Set_SCA ( 0 ) ;
+                            _Debugger_->PreHere = optInfo->O_two->Coding ;
                             if ( ! ( optInfo->O_one->CAttribute & REGISTER_VARIABLE ) )// this logic may need to be refined but it works with our C.factorial 
                             {
                                 _GetRmDispImm ( optInfo, optInfo->O_one, - 1 ) ;
@@ -1221,7 +1222,7 @@ CheckOptimize ( Compiler * compiler, int64 maxOperands )
         d0 ( if ( Is_DebugModeOn ) Compiler_Show_WordList ( ( byte* ) "\nCheckOptimize : before optimize :" ) ) ;
         Set_SCA ( 0 ) ;
         rtrn = _CheckOptimizeOperands ( compiler, maxOperands ) ;
-#if 0        
+#if 1        
         if ( ! ( rtrn & ( OPTIMIZE_DONE ) ) )
         {
             Set_SCA ( 0 ) ;

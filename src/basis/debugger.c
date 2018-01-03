@@ -175,7 +175,6 @@ Debugger_On ( Debugger * debugger )
     debugger->LastSetupWord = 0 ;
     debugger->LastSourceCodeIndex = 0 ;
     debugger->PreHere = 0 ;
-    //Debugger_InitDebugWordList ( debugger ) ;
     DebugOn ;
     DebugShow_On ;
 }
@@ -263,7 +262,6 @@ _Debugger_Init ( Debugger * debugger, Word * word, byte * address )
 
         if ( _Context_->CurrentlyRunningWord ) debugger->Token = _Context_->CurrentlyRunningWord->Name ;
     }
-    //Debugger_InitDebugWordList ( debugger ) ;
     debugger->CopyRSP = 0 ;
     SetState ( debugger, ( DBG_STACK_OLD ), true ) ;
     SetState ( debugger, DBG_STEPPING, false ) ;
@@ -403,11 +401,11 @@ Debugger_Stack ( Debugger * debugger )
     if ( GetState ( debugger, DBG_STEPPING ) && GetState ( debugger->cs_Cpu, CPU_SAVED ) )
     {
         //Debugger_SyncStackPointersFromCpuState ( debugger ) ;
-        _Debugger_PrintDataStack ( Stack_Depth (_DataStack_) ) ;// stack has been adjusted 
+        _Debugger_PrintDataStack ( Stack_Depth ( _DataStack_ ) ) ; // stack has been adjusted 
         _Printf ( ( byte* ) "\n" ) ;
         SetState ( debugger, DBG_INFO, true ) ;
     }
-    else _Debugger_PrintDataStack ( Stack_Depth (_DataStack_) ) ;
+    else _Debugger_PrintDataStack ( Stack_Depth ( _DataStack_ ) ) ;
     //if ( GetState ( debugger, DBG_STEPPING ) ) SetState ( debugger, DBG_START_STEPPING, true ) ;
 #if 0    
     if ( GetState ( debugger, DBG_STEPPING ) )
@@ -485,11 +483,13 @@ Debugger_Continue ( Debugger * debugger )
         while ( debugger->DebugAddress )
         {
             Debugger_Step ( debugger ) ;
+            //Debugger_ShowInfo ( debugger, GetState ( debugger, DBG_RUNTIME ) ? ( byte* ) "<dbg>" : ( byte* ) "dbg", 0 ) ;
+
         }
         SetState_TrueFalse ( debugger, DBG_STEPPED, DBG_STEPPING ) ;
         SetState ( debugger, DBG_INTERPRET_LOOP_DONE, true ) ;
-        SetState ( debugger, DBG_AUTO_MODE, false ) ;
-        Debugger_Off ( debugger, 0 ) ;
+        SetState ( debugger, DBG_AUTO_MODE|DBG_CONTINUE_MODE, false ) ;
+        //Debugger_Off ( debugger, 0 ) ;
     }
     else if ( debugger->w_Word )
     {
@@ -718,7 +718,7 @@ _Debugger_New ( uint64 type )
     debugger->cs_Cpu = CpuState_New ( type ) ;
     debugger->StepInstructionBA = ByteArray_AllocateNew ( 8 * K, type ) ; //Debugger_ByteArray_AllocateNew ( 8 * K, type ) ;
     debugger->ReturnStack = Stack_New ( 256, type ) ;
-    //debugger->LocalsNamespacesStack = 0 ;//Stack_New ( 32, type ) ;
+    //debugger->LocalsNamespacesStack = Stack_New ( 32, type ) ;
 
     Debugger_TableSetup ( debugger ) ;
     SetState ( debugger, DBG_INTERPRET_LOOP_DONE, true ) ;

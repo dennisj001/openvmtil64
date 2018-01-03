@@ -641,12 +641,12 @@ StringMacro_Run ( byte * pb_namespaceName, byte * str )
     if ( pb_namespaceName )
     {
         ns = Namespace_Find ( pb_namespaceName ) ;
-        if ( ns ) sword = Finder_FindWord_InOneNamespace ( _Finder_, ns, str ) ;
+        if ( ns ) sword = _Finder_FindWord_InOneNamespace ( _Finder_, ns, str ) ;
     }
     else sword = Finder_FindWord_AnyNamespace ( _Finder_, str ) ;
     if ( sword )
     {
-        _Word_Run ( sword ) ;
+        Word_Run ( sword ) ;
         nstr = ( byte* ) DataStack_Pop ( ) ;
 
         return nstr ;

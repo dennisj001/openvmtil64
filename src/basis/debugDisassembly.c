@@ -109,6 +109,6 @@ Debugger_DisassembleTotalAccumulated ( Debugger * debugger )
         address = ( byte* ) _CfrTil_->LastFinishedWord->Definition ;
     }
     int64 size = Here - address ;
-    _Debugger_Disassemble ( debugger, address, size, 0 ) ;
+    _Debugger_Disassemble ( debugger, address, size, 1 ) ;
 }
 

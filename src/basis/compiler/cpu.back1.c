@@ -48,28 +48,26 @@ _Compile_CpuState_SaveSelected ( Cpu * cpu )
     // SoftwareDevelopersManual-253665.pdf, section 6.2
     // registers are pushed in this order ...
     // eax, ecx, edx, ebx, esp, ebp, esi, edi
-    _Compile_PushReg ( RDX ) ;
+    _Compile_PushReg ( ACC ) ;
     //_Compile_Set_CAddress_WithRegValue_ThruReg ( ( byte* ) & cpu->CPU_OREG, OREG, ACC ) ; // save operand reg thru accum
 
-    _Compile_Set_CAddress_WithRegValue_ThruReg ( ( byte* ) & cpu->Rsp, RSP, RDX ) ; // Rsp //this won't be accurate for the runtime because it is called from C 
+    _Compile_Set_CAddress_WithRegValue_ThruReg ( ( byte* ) & cpu->Rsp, RSP, OP_REG ) ; // Rsp //this won't be accurate for the runtime because it is called from C 
     //_Compile_Set_CAddress_WithRegValue_ThruReg ( ( byte* ) & cpu->Rbp, RBP, OREG ) ; // edx
     //_Compile_Set_CAddress_WithRegValue_ThruReg ( ( byte* ) & cpu->Rbx, RBX, OREG ) ; // ebx
     //_Compile_Set_CAddress_WithRegValue_ThruReg ( ( byte* ) & cpu->R10d, R10D, OREG ) ; // edx
     //_Compile_Set_CAddress_WithRegValue_ThruReg ( ( byte* ) & cpu->R11d, R11D, OREG ) ;// ebx
     //_Compile_Get_FromCAddress_ToReg ( OREG, ( byte* ) & cpu->CPU_OREG ) ; // our scratch reg
-    _Compile_PopToReg ( RDX ) ; // restore rax
+    _Compile_PopToReg ( ACC ) ; // restore rax
 }
 
 void
 _Compile_CpuState_RestoreSelected ( Cpu * cpu )
 {
-    _Compile_PushReg ( RDX ) ;
-    _Compile_Get_FromCAddress_ToReg_ThruReg ( RSP, ( byte * ) & cpu->Rsp, RDX ) ; // r12, r13, rsp, rbp : same problem
+    _Compile_Get_FromCAddress_ToReg_ThruReg ( RSP, ( byte * ) & cpu->Rsp, OP_REG ) ; // r12, r13, rsp, rbp : same problem
     //_Compile_Get_FromCAddress_ToReg_ThruReg ( RBP, ( byte * ) & cpu->Rbp, OREG ) ; // r12, r13, rsp, rbp : same problem
     //_Compile_Get_FromCAddress_ToReg ( RBX, ( byte* ) & cpu->Rbx ) ; // rbx
     //_Compile_Get_FromCAddress_ToReg ( R10D, ( byte* ) & cpu->R10d ) ; // r10d
     //_Compile_Get_FromCAddress_ToReg ( R11D, ( byte* ) & cpu->R11d ) ; // r11d
-    _Compile_PopToReg ( RDX ) ; // restore rax
 }
 
 void
@@ -82,27 +80,27 @@ _Compile_CpuState_Save ( Cpu * cpu )
     // registers are pushed in this order ...
     // eax, ecx, edx, ebx, esp, ebp, esi, edi
     _Compile_PushReg ( ACC ) ;
-    _Compile_Set_CAddress_WithRegValue_ThruReg ( ( byte* ) & cpu->Rdx, RDX, ACC ) ; // save operand reg thru accum
+    _Compile_Set_CAddress_WithRegValue_ThruReg ( ( byte* ) & cpu->CPU_OREG, OP_REG, ACC ) ; // save operand reg thru accum
     _Compile_PopToReg ( ACC ) ; // restore rax
 
-    _Compile_Set_CAddress_WithRegValue_ThruReg ( ( byte* ) & cpu->Rax, RAX, RDX ) ; // eax
-    _Compile_Set_CAddress_WithRegValue_ThruReg ( ( byte* ) & cpu->Rcx, RCX, RDX ) ; // edx
-    //_Compile_Set_CAddress_WithRegValue_ThruReg ( ( byte* ) & cpu->Rdx, RDX, RDX ) ; // edx
-    _Compile_Set_CAddress_WithRegValue_ThruReg ( ( byte* ) & cpu->Rbx, RBX, RDX ) ; // edx
-    _Compile_Set_CAddress_WithRegValue_ThruReg ( ( byte* ) & cpu->Rsp, RSP, RDX ) ; // Rsp //this won't be accurate for the runtime because it is called from C 
-    _Compile_Set_CAddress_WithRegValue_ThruReg ( ( byte* ) & cpu->Rbp, RBP, RDX ) ; // edx
-    _Compile_Set_CAddress_WithRegValue_ThruReg ( ( byte* ) & cpu->Rsi, RSI, RDX ) ; // edx
-    _Compile_Set_CAddress_WithRegValue_ThruReg ( ( byte* ) & cpu->Rdi, RDI, RDX ) ; // edx
+    _Compile_Set_CAddress_WithRegValue_ThruReg ( ( byte* ) & cpu->Rax, RAX, OP_REG ) ; // eax
+    _Compile_Set_CAddress_WithRegValue_ThruReg ( ( byte* ) & cpu->Rcx, RCX, OP_REG ) ; // edx
+    _Compile_Set_CAddress_WithRegValue_ThruReg ( ( byte* ) & cpu->Rdx, RDX, OP_REG ) ; // edx
+    _Compile_Set_CAddress_WithRegValue_ThruReg ( ( byte* ) & cpu->Rbx, RBX, OP_REG ) ; // edx
+    _Compile_Set_CAddress_WithRegValue_ThruReg ( ( byte* ) & cpu->Rsp, RSP, OP_REG ) ; // Rsp //this won't be accurate for the runtime because it is called from C 
+    _Compile_Set_CAddress_WithRegValue_ThruReg ( ( byte* ) & cpu->Rbp, RBP, OP_REG ) ; // edx
+    _Compile_Set_CAddress_WithRegValue_ThruReg ( ( byte* ) & cpu->Rsi, RSI, OP_REG ) ; // edx
+    _Compile_Set_CAddress_WithRegValue_ThruReg ( ( byte* ) & cpu->Rdi, RDI, OP_REG ) ; // edx
 
-    _Compile_Set_CAddress_WithRegValue_ThruReg ( ( byte* ) & cpu->R8d, R8D, RDX ) ; // edx
-    _Compile_Set_CAddress_WithRegValue_ThruReg ( ( byte* ) & cpu->R9d, R9D, RDX ) ; // edx
-    _Compile_Set_CAddress_WithRegValue_ThruReg ( ( byte* ) & cpu->R10d, R10D, RDX ) ; // edx
-    _Compile_Set_CAddress_WithRegValue_ThruReg ( ( byte* ) & cpu->R11d, R11D, RDX ) ; // ebx
+    _Compile_Set_CAddress_WithRegValue_ThruReg ( ( byte* ) & cpu->R8d, R8D, OP_REG ) ; // edx
+    _Compile_Set_CAddress_WithRegValue_ThruReg ( ( byte* ) & cpu->R9d, R9D, OP_REG ) ; // edx
+    _Compile_Set_CAddress_WithRegValue_ThruReg ( ( byte* ) & cpu->R10d, R10D, OP_REG ) ; // edx
+    _Compile_Set_CAddress_WithRegValue_ThruReg ( ( byte* ) & cpu->R11d, R11D, OP_REG ) ; // ebx
 
-    _Compile_Set_CAddress_WithRegValue_ThruReg ( ( byte* ) & cpu->R12d, R12D, RDX ) ; // esp //this won't be accurate for the runtime because it is called from C 
-    _Compile_Set_CAddress_WithRegValue_ThruReg ( ( byte* ) & cpu->R13d, R13D, RDX ) ; // ebp
-    _Compile_Set_CAddress_WithRegValue_ThruReg ( ( byte* ) & cpu->R14d, R14D, RDX ) ; // esi
-    _Compile_Set_CAddress_WithRegValue_ThruReg ( ( byte* ) & cpu->R15d, R15D, RDX ) ; // edi
+    _Compile_Set_CAddress_WithRegValue_ThruReg ( ( byte* ) & cpu->R12d, R12D, OP_REG ) ; // esp //this won't be accurate for the runtime because it is called from C 
+    _Compile_Set_CAddress_WithRegValue_ThruReg ( ( byte* ) & cpu->R13d, R13D, OP_REG ) ; // ebp
+    _Compile_Set_CAddress_WithRegValue_ThruReg ( ( byte* ) & cpu->R14d, R14D, OP_REG ) ; // esi
+    _Compile_Set_CAddress_WithRegValue_ThruReg ( ( byte* ) & cpu->R15d, R15D, OP_REG ) ; // edi
 
     //_Compile_MoveImm_To_Reg ( RAX, 0, CELL_SIZE ) ;
     _Compile_PushFD ( ) ; // save flags
@@ -110,12 +108,12 @@ _Compile_CpuState_Save ( Cpu * cpu )
     //_Compile_MoveImm_To_Reg ( RBX, 0xfffbffff, 4 ) ; // alignment bit
     //_Compile_Int8 ( 0x40 ) ;
     //Compile_AND ( REG, REG, RAX, RBX, 0, 0, CELL_SIZE ) ;
-    _Compile_Set_CAddress_WithRegValue_ThruReg ( ( byte* ) & cpu->RFlags, ACC, RDX ) ; //flags
+    _Compile_Set_CAddress_WithRegValue_ThruReg ( ( byte* ) & cpu->RFlags, ACC, OP_REG ) ; //flags
     _Compile_GetRValue_FromLValue_ToReg ( ACC, ( byte* ) & cpu->Rax ) ; // our scratch reg
 
     //_Compile_Set_C_LValue_WithImm_ThruReg ( ( int64 ) & cpu->State, CPU_STATE_SAVED, R9D, CELL ) ; // mark this CpuState as having been saved
     // restore our scratch regs so we leave things as we found them
-    _Compile_GetRValue_FromLValue_ToReg ( RDX, ( byte* ) & cpu->Rdx ) ; // our scratch reg
+    _Compile_GetRValue_FromLValue_ToReg ( OP_REG, ( byte* ) & cpu->CPU_OREG ) ; // our scratch reg
 }
 
 // we have the cpu register state stored in a C struct 
@@ -126,15 +124,14 @@ void
 _Compile_CpuState_Restore ( Cpu * cpu, int64 cStackRegFlag )
 {
     _Compile_GetRValue_FromLValue_ToReg ( RAX, ( byte* ) & cpu->Rax ) ; // rax
-    //_Compile_GetRValue_FromLValue_ToReg ( RDX, ( byte* ) & cpu->Rdx ) ; // rdx
+    _Compile_GetRValue_FromLValue_ToReg ( RDX, ( byte* ) & cpu->Rdx ) ; // rdx
     _Compile_GetRValue_FromLValue_ToReg ( RCX, ( byte* ) & cpu->Rcx ) ; // rcx
     _Compile_GetRValue_FromLValue_ToReg ( RBX, ( byte* ) & cpu->Rbx ) ; // rbx
-    //_Compile_GetRValue_FromLValue_ToReg ( RDX, ( byte* ) & cpu->CPU_OREG ) ; // restore thru - scratch reg
 
     if ( cStackRegFlag )
     {
-        _Compile_Get_FromCAddress_ToReg_ThruReg ( RSP, ( byte * ) & cpu->Rsp, RDX ) ; // r12, r13, rsp, rbp : same problem
-        _Compile_Get_FromCAddress_ToReg_ThruReg ( RBP, ( byte * ) & cpu->Rbp, RDX ) ; // r12, r13, rsp, rbp : same problem
+        _Compile_Get_FromCAddress_ToReg_ThruReg ( RSP, ( byte * ) & cpu->Rsp, OP_REG ) ; // r12, r13, rsp, rbp : same problem
+        _Compile_Get_FromCAddress_ToReg_ThruReg ( RBP, ( byte * ) & cpu->Rbp, OP_REG ) ; // r12, r13, rsp, rbp : same problem
     }
 
     _Compile_GetRValue_FromLValue_ToReg ( RSI, ( byte* ) & cpu->Rsi ) ; // rsi
@@ -143,8 +140,8 @@ _Compile_CpuState_Restore ( Cpu * cpu, int64 cStackRegFlag )
     _Compile_GetRValue_FromLValue_ToReg ( R9D, ( byte* ) & cpu->R9d ) ; // r9d
     _Compile_GetRValue_FromLValue_ToReg ( R10D, ( byte* ) & cpu->R10d ) ; // r10d
     _Compile_GetRValue_FromLValue_ToReg ( R11D, ( byte* ) & cpu->R11d ) ; // r11d
-    _Compile_Get_FromCAddress_ToReg_ThruReg ( R12D, ( byte* ) & cpu->R12d, RDX ) ; // r12, r13, rsp, rbp : same problem
-    _Compile_Get_FromCAddress_ToReg_ThruReg ( R13D, ( byte* ) & cpu->R13d, RDX ) ; // r12, r13, rsp, rbp : same problem
+    _Compile_Get_FromCAddress_ToReg_ThruReg ( R12D, ( byte* ) & cpu->R12d, OP_REG ) ; // r12, r13, rsp, rbp : same problem
+    _Compile_Get_FromCAddress_ToReg_ThruReg ( R13D, ( byte* ) & cpu->R13d, OP_REG ) ; // r12, r13, rsp, rbp : same problem
     _Compile_GetRValue_FromLValue_ToReg ( R14D, ( byte* ) & cpu->R14d ) ; // r14d
     _Compile_GetRValue_FromLValue_ToReg ( R15D, ( byte* ) & cpu->R15d ) ; // r15d
 
@@ -157,7 +154,7 @@ _Compile_CpuState_Restore ( Cpu * cpu, int64 cStackRegFlag )
     //_Compile_Get_FromCAddress_ToReg ( RBX, ( byte* ) & cpu->Rbx ) ; // restore scratch reg rax
     _Compile_GetRValue_FromLValue_ToReg ( ACC, ( byte* ) & cpu->Rax ) ; // restore scratch reg rax
 
-    _Compile_GetRValue_FromLValue_ToReg ( RDX, ( byte* ) & cpu->Rdx ) ; // restore thru - scratch reg
+    _Compile_GetRValue_FromLValue_ToReg ( OP_REG, ( byte* ) & cpu->CPU_OREG ) ; // restore thru - scratch reg
 }
 
 void

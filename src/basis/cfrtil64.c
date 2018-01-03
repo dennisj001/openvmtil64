@@ -208,8 +208,8 @@ _CfrTil_Init ( CfrTil * cfrTil, Namespace * nss )
     CfrTil_LexerTables_Setup ( cfrTil ) ;
     cfrTil->LC = 0 ;
     cfrTil->SC_QuoteMode = 0 ;
-    //cfrTil->CfrTilWordCreateTemp = Namespace_FindOrNew_SetUsing ( "CfrTilWordCreateTemp", cfrTil->Namespaces, 1 ) ;
-    //_Namespace_SetState ( cfrTil->CfrTilWordCreateTemp, NOT_USING ) ;
+    cfrTil->EndBlockWord = Finder_FindWord_InOneNamespace ( _Finder_, "Reserved", "}" ) ;
+    cfrTil->BeginBlockWord = Finder_FindWord_InOneNamespace ( _Finder_, "Reserved", "{" ) ;
 }
 
 void

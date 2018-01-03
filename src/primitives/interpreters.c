@@ -69,7 +69,7 @@ CfrTil_PreProcessor ( )
     SetState ( _Context_->Interpreter0, PREPROCESSOR_MODE, false ) ;
     if ( GetState ( _Context_->Interpreter0, PREPROCESSOR_DEFINE ) )
     {
-        int64 locals = Stack_Depth ( _Context_->Compiler0->LocalsNamespacesStack ) ;
+        int64 locals = Stack_Depth ( _Context_->Compiler0->LocalsCompilingNamespacesStack ) ;
         SetState ( _Context_->Interpreter0, PREPROCESSOR_DEFINE, false ) ;
         CfrTil_SemiColon ( ) ;
         CfrTil_Inline ( ) ;

@@ -95,7 +95,7 @@ _InstallGotoPoint_Key ( dlnode * node, int64 blockInfo, int64 key )
         if ( ( gotoInfo->GI_CAttribute & ( GI_GOTO ) ) && ( key & ( GI_GOTO ) ) )
         {
             Namespace * ns = _Namespace_Find ( ( byte* ) "__labels__", _CfrTil_->Namespaces, 0 ) ;
-            if ( ns && ( word = Finder_FindWord_InOneNamespace ( _Finder_, ns, gotoInfo->pb_LabelName ) ) )
+            if ( ns && ( word = _Finder_FindWord_InOneNamespace ( _Finder_, ns, gotoInfo->pb_LabelName ) ) )
             {
                 GotoInfo * giw = ( GotoInfo * ) word->W_Value ;
                 _GotoInfo_SetAndRemove ( gotoInfo, ( byte* ) giw->LabeledAddress, 0 ) ;

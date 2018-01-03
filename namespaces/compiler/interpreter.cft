@@ -68,7 +68,7 @@ interpret2 ( | atoken aword )
         }
     }
 }
-' interpret2 find wdiss 
+' interpret2 find wdiss apause
 sp
 
 interpret2 

@@ -242,7 +242,8 @@ int64
 _Context_StrCmpNextToken ( Context * cntx, byte * check )
 {
     byte *token = Lexer_PeekNextNonDebugTokenWord ( cntx->Lexer0, 1 ) ;
-    return strcmp ( ( char* ) token, ( char* ) check ) ;
+    if ( token ) return strcmp ( ( char* ) token, ( char* ) check ) ;
+    else return 0 ;
 }
 
 // this is funny!?

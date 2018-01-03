@@ -637,7 +637,7 @@ typedef struct
     int64 ArrayEnds ;
     byte * InitHere ;
     int64 * AccumulatedOptimizeOffsetPointer ;
-    int8 AccumulatedOffsetPointerFlag ;
+    int8 AccumulatedOffsetPointerFlag, InLParenBlock ;
     int32 * AccumulatedOffsetPointer ;
     int64 * FrameSizeCellOffset, BlocksBegun ;
     int8 RegOrder [ 4 ] ;
@@ -654,7 +654,7 @@ typedef struct
     Stack * CombinatorInfoStack ;
     Stack * PointerToOffset ;
     dllist * WordList, *PostfixLists ;
-    Stack * LocalsNamespacesStack ;
+    Stack * LocalsCompilingNamespacesStack ;
     Stack * CombinatorBlockInfoStack ;
     Stack * BlockStack ;
     Stack * NamespacesStack ;
@@ -808,7 +808,7 @@ typedef struct _CfrTil
     block CurrentBlock, SaveCpuState, SaveCpu2State, RestoreCpuState, RestoreCpu2State, CallCfrTilWord, CallCurrentBlock, RestoreSelectedCpuState, SaveSelectedCpuState ; //, SyncDspToEsi, SyncEsiToDsp ;
     block Set_CfrTilRspReg_FromReturnStackPointer, Set_ReturnStackPointer_FromCfrTilRspReg, Set_DspReg_FromDataStackPointer, Set_DataStackPointer_FromDspReg ; //, PeekReg, PokeReg ;
     ByteArray * PeekPokeByteArray ;
-    Word * LastFinishedWord, *StoreWord, *PokeWord, *ScoOcCrw, *DebugWordListWord ; //, *DebugWordListWord ;
+    Word * LastFinishedWord, *StoreWord, *PokeWord, *ScoOcCrw, *DebugWordListWord, *EndBlockWord, *BeginBlockWord ;
     byte ReadLine_CharacterTable [ 256 ] ;
     ReadLineFunction ReadLine_FunctionTable [ 24 ] ;
     CharacterType LexerCharacterTypeTable [ 256 ] ;
@@ -823,7 +823,6 @@ typedef struct _CfrTil
     byte * LispPrintBuffer ; // nb : keep this here -- if we add this field to Lexer it just makes the lexer bigger and we want the smallest lexer possible
     dllist *DebugWordList, *TokenList ;
     sigjmp_buf JmpBuf0 ;
-    //dllist *TokenList;
 } CfrTil ;
 typedef struct
 {

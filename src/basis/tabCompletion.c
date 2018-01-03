@@ -266,7 +266,7 @@ RL_TabCompletionInfo_Init ( ReadLiner * rl )
         {
             if ( Is_NamespaceType ( piw ) )
             {
-                if ( ( tci->OriginalWord = Finder_FindWord_InOneNamespace ( _Finder_, piw, tci->Identifier ) ) ) tci->RunWord = tci->OriginalWord ;
+                if ( ( tci->OriginalWord = _Finder_FindWord_InOneNamespace ( _Finder_, piw, tci->Identifier ) ) ) tci->RunWord = tci->OriginalWord ;
                 else if ( wf = Finder_FindWord_AnyNamespace ( _Finder_, tci->Identifier ), ( wf && ( wf->ContainingNamespace == piw ) ) ) tci->RunWord = tci->OriginalWord = wf ;
                 else tci->RunWord = ( Word* ) dllist_First ( ( dllist* ) piw->Lo_List ) ;
                 tci->OriginalContainingNamespace = piw ;
@@ -280,7 +280,7 @@ RL_TabCompletionInfo_Init ( ReadLiner * rl )
     }
     else
     {
-        if ( ( tci->OriginalWord = Finder_FindWord_InOneNamespace ( _Finder_, _CfrTil_Namespace_InNamespaceGet ( ), tci->Identifier ) ) ||
+        if ( ( tci->OriginalWord = _Finder_FindWord_InOneNamespace ( _Finder_, _CfrTil_Namespace_InNamespaceGet ( ), tci->Identifier ) ) ||
             ( tci->OriginalWord = _CfrTil_FindInAnyNamespace ( tci->Identifier ) ) )
         {
             if ( Is_NamespaceType ( tci->OriginalWord ) && ( tci->EndDottedPos ) )

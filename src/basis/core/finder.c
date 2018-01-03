@@ -98,7 +98,7 @@ Finder_Word_FindUsing ( Finder * finder, byte * name, int64 saveQns )
             if ( String_Equal ( ".", ( char* ) name ) ) word = Finder_FindWord_UsedNamespaces ( _Finder_, name ) ; // keep QualifyingNamespace intact // ?? assumes function of CfrTil_Dot is always and only named "." ??
             else
             {
-                word = Finder_FindWord_InOneNamespace ( _Finder_, finder->QualifyingNamespace, name ) ;
+                word = _Finder_FindWord_InOneNamespace ( _Finder_, finder->QualifyingNamespace, name ) ;
                 if ( ( ! saveQns ) && ( ! GetState ( finder, QID ) ) && ( ! Lexer_IsTokenForwardDotted ( _Context_->Lexer0 ) ) )
                 {
                     Finder_SetQualifyingNamespace ( finder, 0 ) ; // nb. QualifyingNamespace is only good for one find unless we are in a quid
@@ -190,13 +190,19 @@ Finder_New ( uint64 allocationType )
 }
 
 Word *
-Finder_FindWord_InOneNamespace ( Finder * finder, Namespace * ns, byte * name )
+_Finder_FindWord_InOneNamespace ( Finder * finder, Namespace * ns, byte * name )
 {
     if ( ns && name )
     {
         return finder->FoundWord = DLList_FindName_InOneNamespaceList ( ( dllist* ) ns->W_List, name ) ;
     }
     return 0 ;
+}
+
+Word *
+Finder_FindWord_InOneNamespace ( Finder * finder, byte *nsName, byte * name )
+{
+    return _Finder_FindWord_InOneNamespace ( finder, Namespace_Find ( nsName ), name ) ;
 }
 
 Word *

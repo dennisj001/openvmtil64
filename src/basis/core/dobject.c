@@ -23,12 +23,14 @@ _dobject_Allocate ( int64 doType, int64 slots, uint64 allocType )
     int64 size = sizeof ( dobject ) + ( slots * sizeof ( int64 ) ) ;
     dobject * dobj = ( dobject * ) _object_Allocate ( size, allocType ) ;
     dobj->do_iData = ( int64* ) ( ( dobject* ) dobj + 1 ) ;
-    dobj->do_Slots = ( int16 ) slots ;
-    dobj->do_Size = size ;
-    dobj->do_Type = ( int16 ) doType ;
+    dobj->do_Slots = ( int8 ) slots ;
+    dobj->do_Size = (int16) size ;
+    dobj->do_Type = ( int32 ) doType ;
+    dobj->do_InUseFlag = (Boolean) true ;
     return dobj ;
 }
 
+#if 0
 dobject *
 _dobject_New_M_Slot_Node ( int64 allocType, int64 dobjType, int64 m_slots, ... )
 {
@@ -41,6 +43,7 @@ _dobject_New_M_Slot_Node ( int64 allocType, int64 dobjType, int64 m_slots, ... )
     va_end ( args ) ;
     return dobj ;
 }
+#endif
 
 void
 _dobject_Print ( dobject * dobj )
@@ -154,7 +157,7 @@ _DObject_FindSlot_BottomUp ( DObject * dobject, byte * name )
     Word * word ;
     do
     {
-        if ( ( word = Finder_FindWord_InOneNamespace ( _Finder_, dobject, name ) ) ) break ;
+        if ( ( word = _Finder_FindWord_InOneNamespace ( _Finder_, dobject, name ) ) ) break ;
         dobject = dobject->ContainingNamespace ;
     }
     while ( dobject ) ;

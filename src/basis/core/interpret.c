@@ -46,14 +46,14 @@ _Interpreter_DoWord ( Interpreter * interp, Word * word, int64 tokenStartReadLin
     {
         Context * cntx = _Context_ ;
         int64 tsrli ;
-        _Compiler_->SaveScratchPadIndex = word->W_SC_ScratchPadIndex ;
+        _Compiler_->SaveScratchPadIndex = word->W_SC_ScratchPadIndex ; // = _CfrTil_->SC_ScratchPadIndex ;
         if ( tokenStartReadLineIndex <= 0 ) 
         {
             tsrli = _Lexer_->TokenStart_ReadLineIndex ;
         }
         else tsrli = tokenStartReadLineIndex ;
         word->W_TokenStart_ReadLineIndex = tsrli ; //( tokenStartReadLineIndex <= 0 ) ? _Lexer_->TokenStart_ReadLineIndex : tokenStartReadLineIndex ;
-        word->W_SC_ScratchPadIndex = _CfrTil_->SC_ScratchPadIndex ;
+        //word->W_SC_ScratchPadIndex = _CfrTil_->SC_ScratchPadIndex ;
         //DEBUG_SETUP ( word ) ;
         interp->w_Word = word ;
         if ( ( word->WAttribute == WT_INFIXABLE ) && ( GetState ( cntx, INFIX_MODE ) ) ) // nb. Interpreter must be in INFIX_MODE because it is effective for more than one word
@@ -169,7 +169,7 @@ IsIt_C_LeftParen ( Word * word )
 void
 Find_C_LeftParen ( )
 {
-    Word * word = Finder_FindWord_InOneNamespace ( _Finder_, Namespace_Find ( "C" ), "(" ) ;
+    Word * word = _Finder_FindWord_InOneNamespace ( _Finder_, Namespace_Find ( "C" ), "(" ) ;
     if ( word )
     {
         //if (String_Equal ( word->Name, "(" ) && String_Equal ( word->S_ContainingNamespace->Name, "C" ) )

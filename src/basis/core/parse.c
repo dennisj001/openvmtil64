@@ -183,7 +183,7 @@ _CfrTil_Parse_LocalsAndStackVariables ( int64 svf, int64 lispMode, ListObject * 
     Boolean regFlag = false ;
     byte *token, *returnVariable = 0 ;
     Namespace *typeNamespace = 0, *saveInNs = _CfrTil_->InNamespace ;
-    if ( ! localsNs ) localsNs = _Namespace_FindOrNew_Local ( nsStack ? nsStack : compiler->LocalsNamespacesStack ) ;
+    if ( ! localsNs ) localsNs = _Namespace_FindOrNew_Local ( nsStack ? nsStack : compiler->LocalsCompilingNamespacesStack ) ;
     //Namespace *localsNs = forceNewLocalsFlag ? _DataObject_New ( NAMESPACE, 0, ( byte* ) "tmpLocals", 0, 0, 0, ( int64 ) 0, 0 ) : Namespace_FindOrNew_Local ( ) ;
     //if ( forceNewLocalsFlag ) _Namespace_ActivateAsPrimary ( localsNs ) ;
 
@@ -307,7 +307,7 @@ _CfrTil_Parse_LocalsAndStackVariables ( int64 svf, int64 lispMode, ListObject * 
 
     // we support nested locals and may have locals in other blocks so the indexes are cumulative
     if ( compiler->NumberOfRegisterVariables ) Compile_InitRegisterParamenterVariables ( compiler ) ;
-    if ( returnVariable ) compiler->ReturnVariableWord = Finder_FindWord_InOneNamespace ( _Finder_, localsNs, returnVariable ) ;
+    if ( returnVariable ) compiler->ReturnVariableWord = _Finder_FindWord_InOneNamespace ( _Finder_, localsNs, returnVariable ) ;
 
     _CfrTil_->InNamespace = saveInNs ;
     //Compiler_WordList_RecycleInit ( compiler ) ;
