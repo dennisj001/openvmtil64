@@ -134,7 +134,7 @@ _Interpret_PrefixFunction_Until_Token ( Interpreter * interp, Word * prefixFunct
     _Interpret_Until_Token ( interp, end, delimiters ) ;
     SetState ( _Context_->Compiler0, PREFIX_ARG_PARSING, false ) ;
     //SetState ( _Context_->Compiler0, PREFIX_PARSING, true ) ;
-    if ( prefixFunction ) _Interpreter_DoWord_Default ( interp, prefixFunction ) ;
+    if ( prefixFunction ) _Interpreter_DoWord_Default (interp, prefixFunction , 0) ;
     //SetState ( _Context_->Compiler0, PREFIX_PARSING, false ) ;
 }
 
@@ -169,7 +169,7 @@ _Interpret_PrefixFunction_Until_RParen ( Interpreter * interp, Word * prefixFunc
         if ( flag ) Interpreter_InterpretAToken ( interp, token, - 1 ) ;
         else _Interpret_Until_Token ( interp, ( byte* ) ")", ( byte* ) " ,\n\r\t" ) ;
         SetState ( compiler, PREFIX_ARG_PARSING, false ) ;
-        _Interpreter_DoWord_Default ( interp, prefixFunction ) ;
+        _Interpreter_DoWord_Default (interp, prefixFunction , 0) ;
         if ( GetState ( _Context_, C_SYNTAX ) ) SetState ( _Context_, C_RHS, svs_c_rhs ) ;
         if ( ! Compiling ) _Compiler_FreeAllLocalsNamespaces ( compiler ) ;
     }

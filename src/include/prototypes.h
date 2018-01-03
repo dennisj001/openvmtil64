@@ -511,7 +511,7 @@ Word *TC_Tree_Map_3(TabCompletionInfo *tci, MapFunction mf, Word *word);
 /* basis/core/interpret.c */
 Word *Interpreter_InterpretAToken(Interpreter *interp, byte *token, int64 tokenStartReadLineIndex);
 void Interpreter_InterpretNextToken(Interpreter *interp);
-Word *_Interpreter_DoWord_Default(Interpreter *interp, Word *word);
+Word *_Interpreter_DoWord_Default(Interpreter *interp, Word *word, int64 scratchPadIndex);
 void _Interpreter_DoWord(Interpreter *interp, Word *word, int64 tokenStartReadLineIndex);
 Word *_Interpreter_NewWord(Interpreter *interp, byte *token);
 Word *_Interpreter_TokenToWord(Interpreter *interp, byte *token);

@@ -242,7 +242,7 @@ endblock:
             if ( word )
             {
                 //Word_Set_SCA ( word ) ;
-                _Interpreter_DoWord ( interp, word, - 1 ) ;
+                _Interpreter_DoWord (interp, word, - 1 ) ;
                 if ( ( blocksParsed < 2 ) && ( word->CAttribute & LITERAL ) && ( ! Is_LValue ( word ) ) ) //GetState ( cntx, C_LHS ) )
                 {
                     // this block is used in eg. interpret.cft
@@ -312,7 +312,7 @@ _CfrTil_C_Infix_EqualOp ( Word * opWord )
     {
         if ( opWord )
         {
-            _Interpreter_DoWord_Default ( interp, lhsWord ) ;
+            _Interpreter_DoWord_Default (interp, lhsWord , 0) ;
         }
         else
         {
@@ -329,13 +329,13 @@ _CfrTil_C_Infix_EqualOp ( Word * opWord )
     svName = word0->Name ;
     word0->Name = "=" ;
     d0 ( if ( Is_DebugModeOn ) Compiler_Show_WordList ( "\nCfrTil_C_Infix_EqualOp : after _CfrTil_WordLists_PushWord ( word ) ;" ) ) ;
-    word0->W_TokenStart_ReadLineIndex = tsrli ;
-    word0->W_SC_WordIndex = svscwi ;
     d0 ( if ( Is_DebugModeOn ) Compiler_Show_WordList ( "\nCfrTil_C_Infix_EqualOp : before op word" ) ) ;
     if ( opWord ) rword = opWord ;
     else rword = word0 ; //_Interpreter_DoWord_Default ( interp, opWord ) ;
+    rword->W_TokenStart_ReadLineIndex = tsrli ;
+    rword->W_SC_WordIndex = svscwi ;
     Word_Set_SCA ( rword ) ;
-    _Interpreter_DoWord_Default ( interp, rword ) ;
+    _Interpreter_DoWord_Default (interp, rword , svscwi) ;
     word0->Name = svName ;
     //_DEBUG_SHOW ( opWord ? opWord : word, 1 ) ;
     //SetState ( _Debugger_, DEBUG_SHTL_OFF, true ) ; // ?? : is this still needed (it was above, before) since we just temporarily adjusted the name

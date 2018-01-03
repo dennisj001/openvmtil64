@@ -228,7 +228,7 @@ CfrTil_Literal ( )
     //Compiler_SetCompilingSpace_MakeSureOfRoom ( "TempObjectSpace" ) ; 
     Word * word = _DataObject_New ( CONSTANT, 0, "< lit >", LITERAL | CONSTANT, 0, 0, 0, value, 0 ) ;
     //Set_CompilerSpace ( svcs ) ;
-    _Interpreter_DoWord ( _Context_->Interpreter0, word, - 1 ) ;
+    _Interpreter_DoWord (_Context_->Interpreter0, word, - 1 ) ;
 }
 
 void

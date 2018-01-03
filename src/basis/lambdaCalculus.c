@@ -317,7 +317,7 @@ _LO_Apply ( ListObject * l0, ListObject * lfunction, ListObject * ldata )
     {
         if ( lfunction->LAttribute & T_LISP_CFRTIL_COMPILED )
         {
-            _Interpreter_DoWord ( _Context_->Interpreter0, lfunction->Lo_CfrTilWord, - 1 ) ;
+            _Interpreter_DoWord (_Context_->Interpreter0, lfunction->Lo_CfrTilWord, - 1 ) ;
             vReturn = nil ;
         }
         else
@@ -1071,7 +1071,7 @@ _LO_Apply_Arg ( ListObject ** pl1, int64 i, int8 svCompileMode )
     }
     else if ( ( l1->Name [0] == '.' ) || ( l1->Name [0] == '&' ) )
     {
-        _Interpreter_DoWord ( cntx->Interpreter0, l1->Lo_CfrTilWord, l1->W_TokenStart_ReadLineIndex ) ;
+        _Interpreter_DoWord (cntx->Interpreter0, l1->Lo_CfrTilWord, l1->W_TokenStart_ReadLineIndex ) ;
     }
     else if ( ( l1->Name[0] == '[' ) )
     {
@@ -1235,7 +1235,7 @@ _Interpreter_LC_InterpretWord ( Interpreter * interp, ListObject * l0, Word * wo
     if ( ! word ) word = l0 ;
     word->W_TokenStart_ReadLineIndex = l0->W_TokenStart_ReadLineIndex ;
     if ( word->W_TokenStart_ReadLineIndex == lexer->TokenStart_ReadLineIndex ) SetState ( dbgr, DEBUG_SHTL_OFF, true ) ;
-    _Interpreter_DoWord ( interp, word, word->W_TokenStart_ReadLineIndex ) ;
+    _Interpreter_DoWord (interp, word, word->W_TokenStart_ReadLineIndex ) ;
     SetState ( dbgr, DEBUG_SHTL_OFF, false ) ;
 }
 

@@ -271,7 +271,7 @@ _Context_DoubleQuoteMacro ( Context * cntx )
     }
     //Word * word = _Interpreter_NewWord ( cntx->Interpreter0, String_New ( lexer->TokenBuffer, STRING_MEM ) ) ; //TEMPORARY ) ) ;
     Word * word = _Interpreter_NewWord ( cntx->Interpreter0, String_New ( lexer->TokenBuffer, TEMPORARY ) ) ;
-    _Interpreter_DoWord ( cntx->Interpreter0, word, lexer->TokenStart_ReadLineIndex ) ;
+    _Interpreter_DoWord (cntx->Interpreter0, word, lexer->TokenStart_ReadLineIndex ) ;
 }
 
 void

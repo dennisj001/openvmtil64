@@ -88,7 +88,7 @@ Word_Eval ( Word * word )
 void
 _Word_Interpret ( Word * word )
 {
-    _Interpreter_DoWord ( _Interpreter_, word, - 1 ) ;
+    _Interpreter_DoWord (_Interpreter_, word, - 1 ) ;
 }
 
 void

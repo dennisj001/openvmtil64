@@ -273,7 +273,7 @@ Compile_LogicalAnd ( Compiler * compiler )
     {
         //Word *one = Compiler_WordStack ( - 1 ) ; // assumes two values ( n m ) on the DSP stack 
         Word *one = Compiler_WordList ( 1 ) ; // assumes two values ( n m ) on the DSP stack 
-        if ( one->StackPushRegisterCode ) SetHere ( one->StackPushRegisterCode ) ;
+        if ( one->StackPushRegisterCode && (one->RegToUse == ACC )) SetHere ( one->StackPushRegisterCode ) ;
         else _Compile_Stack_PopToReg ( DSP, ACC ) ;
         _Compile_Stack_PopToReg ( DSP, OP_REG ) ;
         _Compile_LogicalAnd ( compiler ) ;

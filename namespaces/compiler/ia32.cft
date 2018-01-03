@@ -48,7 +48,6 @@ Compiler Compiling C Asm
 'compile2 '2, find alias
 'compile4 '4, find alias
 'compile8 '8, find alias
- 
 : ;; ' ; find compileWord ' _prefix find compileWord ; immediate
 // C : ;; ' ;; find compileWord ; immediate
 ' ;; find wdiss // sp
@@ -57,6 +56,8 @@ IA32
 "namespaces/compiler/asmConstants.cft" include
 hex
 Logic Bits Combinators IA32 
+
+'ia32_dbg 0 const  
 dscOn //verbosity 3 =
 : apause ; //pause ;
 
@@ -113,8 +114,8 @@ CalculateModRegardingDisplacement ( imod,  disp | rmod ) // imod/rmod avoid name
 int
 CalculateModRmByte ( imod, _reg, rm, sib, disp | modRm )
 {
-    d: imod = CalculateModRegardingDisplacement ( imod, disp ) ;
-    if ( ( imod < 3 ) && ( rm == 4 ) ) //|| ( ( rm == 5 ) && ( disp == 0 ) ) ) )
+    imod = CalculateModRegardingDisplacement ( imod, disp ) ;
+    if ( ( imod < 3 ) d: && ( rm == 4 ) ) //|| ( ( rm == 5 ) && ( disp == 0 ) ) ) )
         //if ( ( imod < 3 ) && ( ( ( rm == 4 ) && ( sib == 0 ) ) || ( ( rm == 5 ) && ( disp == 0 ) ) ) )
     {
         // cf. InstructionSet-A-M-253666.pdf Table 2-2
@@ -131,7 +132,7 @@ CalculateModRmByte ( imod, _reg, rm, sib, disp | modRm )
     modRm = ( imod << 6 ) + ( ( _reg Bits.& 0x7 ) << 3 ) + ( rm Bits.& 0x7 ) ; // only use 3 bits of reg/rm
     return modRm ;
 } prefix
-'CalculateModRmByte find wdiss apause
+'CalculateModRmByte find wdiss apause 
 //-----------------------------------------------------------------------
 //   modRm byte ( bits )  imod 0 : no disp ; imod 1 : 1 byte disp : imod 2 : 4 byte disp ; imod 3 : just reg value
 //    imod     reg      rm
@@ -310,7 +311,7 @@ infixOn // c_syntaxOff turns off infix
     _Compile_SUBI_DSP ( CELL ) 
 ;; 
 
-#if 1
+#if ia32_dbg
 //verbosity 3 =
 Combinators
 :asm iax

@@ -49,8 +49,8 @@ CfrTil_IncDec ( int64 op ) // +
                 Interpreter_InterpretNextToken ( cntx->Interpreter0 ) ;
                 if ( sd > 1 )
                 {
-                    _Interpreter_DoWord ( cntx->Interpreter0, one, - 1 ) ;
-                    _Interpreter_DoWord ( cntx->Interpreter0, currentWord, - 1 ) ;
+                    _Interpreter_DoWord (cntx->Interpreter0, one, - 1 ) ;
+                    _Interpreter_DoWord (cntx->Interpreter0, currentWord, - 1 ) ;
                     return ;
                 }
             }
