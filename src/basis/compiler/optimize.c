@@ -983,6 +983,7 @@ _CheckOptimizeOperands ( Compiler * compiler, int64 maxOperands )
                     {
                         if ( GetState ( _Context_, C_SYNTAX ) ) //&& ( optInfo->O_two->StackPushRegisterCode ) )
                         {
+#if 0                            
                             //SetHere ( optInfo->O_one->Coding ) ;
                             //_Compile_GetVarLitObj_LValue_To_Reg ( optInfo->O_one, ECX ) ;
                             _GetRmDispImm ( optInfo, optInfo->O_one, - 1 ) ;
@@ -996,6 +997,9 @@ _CheckOptimizeOperands ( Compiler * compiler, int64 maxOperands )
                             //_Set_SCA ( 0 ) ;
                             //_Compile_MoveImm ( MEM, R8, 0, 0, optInfo->Optimize_Imm, CELL ) ;
                             return ( i | OPTIMIZE_RESET ) ;
+#else
+                            return 0 ;
+#endif                            
                         }
                         else if ( optInfo->O_two->StackPushRegisterCode )
                         {

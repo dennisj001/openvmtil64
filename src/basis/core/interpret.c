@@ -26,6 +26,7 @@ _Interpreter_DoWord_Default ( Interpreter * interp, Word * word, int64 scratchPa
 {
     word = Compiler_CopyDuplicatesAndPush ( word ) ;
     word->W_SC_ScratchPadIndex = scratchPadIndex ; // _CfrTil_->SC_ScratchPadIndex ;
+    if ( ! word->W_SC_ScratchPadIndex ) word->W_SC_ScratchPadIndex = _CfrTil_->SC_ScratchPadIndex ;
     interp->w_Word = word ;
     Word_Eval ( word ) ;
     if ( IS_MORPHISM_TYPE ( word ) )

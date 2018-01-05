@@ -89,7 +89,12 @@ Compile_X_Shift ( Compiler * compiler, int64 op, int64 stackFlag )
     else
     {
         Word *one = ( Word* ) Compiler_WordList ( 1 ) ; // the operand
-        if ( one->StackPushRegisterCode )
+        if ( one->CAttribute && LITERAL )
+        {
+            SetHere ( one->Coding ) ; 
+            _Compile_MoveImm_To_Reg ( RCX, one->W_Value, 4 ) ;
+        }
+        else if ( one->StackPushRegisterCode )
         {
             SetHere ( one->StackPushRegisterCode ) ; // leave optInfo->O_two value in R8 we don't need to push it
             _Compile_Move_Reg_To_Reg ( RCX, one->RegToUse ) ;

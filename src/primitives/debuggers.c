@@ -14,6 +14,12 @@ CfrTil_LocalsShow ( )
     Debugger_Locals_Show ( _Debugger_ ) ;
 }
 
+void
+CfrTil_Debugger_Locals_Show ()
+{
+    Debugger_Locals_Show ( _Debugger_ ) ;
+}
+
 // put this '<dbg>' into cfrtil code for a runtime break into the debugger
 
 void

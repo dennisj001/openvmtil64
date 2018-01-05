@@ -131,10 +131,11 @@ _Interpret_Until_Token ( Interpreter * interp, byte * end, byte * delimiters )
 void
 _Interpret_PrefixFunction_Until_Token ( Interpreter * interp, Word * prefixFunction, byte * end, byte * delimiters )
 {
+    int64 svscwi =  _CfrTil_->SC_ScratchPadIndex ; 
     _Interpret_Until_Token ( interp, end, delimiters ) ;
     SetState ( _Context_->Compiler0, PREFIX_ARG_PARSING, false ) ;
     //SetState ( _Context_->Compiler0, PREFIX_PARSING, true ) ;
-    if ( prefixFunction ) _Interpreter_DoWord_Default (interp, prefixFunction , 0) ;
+    if ( prefixFunction ) _Interpreter_DoWord_Default (interp, prefixFunction , svscwi) ;
     //SetState ( _Context_->Compiler0, PREFIX_PARSING, false ) ;
 }
 
@@ -145,7 +146,7 @@ _Interpret_PrefixFunction_Until_RParen ( Interpreter * interp, Word * prefixFunc
     {
         Word * word ;
         byte * token ;
-        int64 svs_c_rhs, flag = 0 ; 
+        int64 svs_c_rhs, flag = 0, svscwi =  _CfrTil_->SC_ScratchPadIndex ; 
         Compiler * compiler = _Context_->Compiler0 ;
         while ( 1 )
         {
@@ -169,7 +170,7 @@ _Interpret_PrefixFunction_Until_RParen ( Interpreter * interp, Word * prefixFunc
         if ( flag ) Interpreter_InterpretAToken ( interp, token, - 1 ) ;
         else _Interpret_Until_Token ( interp, ( byte* ) ")", ( byte* ) " ,\n\r\t" ) ;
         SetState ( compiler, PREFIX_ARG_PARSING, false ) ;
-        _Interpreter_DoWord_Default (interp, prefixFunction , 0) ;
+        _Interpreter_DoWord_Default (interp, prefixFunction , svscwi) ;
         if ( GetState ( _Context_, C_SYNTAX ) ) SetState ( _Context_, C_RHS, svs_c_rhs ) ;
         if ( ! Compiling ) _Compiler_FreeAllLocalsNamespaces ( compiler ) ;
     }

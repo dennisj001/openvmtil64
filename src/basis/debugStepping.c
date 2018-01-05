@@ -11,6 +11,7 @@ _Debugger_StepOneInstruction ( Debugger * debugger )
     _Debugger_Set_DataStackPointer_WithCpuStateDsp ( debugger ) ;
 }
 
+#if 0
 void
 Debugger_StepOneInstruction ( Debugger * debugger )
 {
@@ -19,7 +20,7 @@ Debugger_StepOneInstruction ( Debugger * debugger )
         _Debugger_StepOneInstruction ( debugger ) ;
     }
 }
-
+#endif
 // Debugger_CompileOneInstruction ::
 // this function should not affect the C registers at all 
 // we save them before we call our stuff and restore them after
@@ -54,9 +55,9 @@ _Debugger_CompileAndStepOneInstruction ( Debugger * debugger, byte * jcAddress )
     Boolean showExtraFlag = false ;
     byte * svHere = Here ; // save 
     byte * nextInsn = Debugger_CompileOneInstruction ( debugger, jcAddress, showExtraFlag ) ; // compile the insn here
-    Debugger_StepOneInstruction ( debugger ) ;
+    _Debugger_StepOneInstruction ( debugger ) ;
     if ( showExtraFlag ) Debug_ExtraShow ( Here - svHere, showExtraFlag ) ;
-    if ( GetState ( debugger, DBG_AUTO_MODE ) && ( ! GetState ( debugger, DBG_CONTINUE_MODE ) ) ) 
+    if ( GetState ( debugger, DBG_AUTO_MODE ) ) //&& ( ! GetState ( debugger, DBG_CONTINUE_MODE ) ) ) 
     {
         SetState ( debugger, DBG_SHOW_STACK_CHANGE, false ) ;
         Debugger_UdisOneInstruction ( debugger, debugger->DebugAddress, ( byte* ) "\r", ( byte* ) "" ) ;
@@ -120,6 +121,7 @@ into:
                 if ( _Q_->Verbosity > 1 ) _Word_ShowSourceCode ( word ) ;
                 _Printf ( ( byte* ) "\nstepping into a cfrtil compiled function : %s : .... :>", word ? ( char* ) c_gd ( word->Name ) : "" ) ;
                 _Stack_Push ( debugger->ReturnStack, ( int64 ) ( debugger->DebugAddress + size ) ) ; // the return address
+                if ( GetState ( debugger, DBG_AUTO_MODE ) ) Compile_Call ( CfrTil_Debugger_Locals_Show ) ;
                 // push the return address this time around; next time code at newDebugAddress will be processed
                 // when ret is the insn Debugger_StepOneInstruction will handle it 
             }

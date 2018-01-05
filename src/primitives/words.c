@@ -75,13 +75,6 @@ Word_DefinitionEqual ( )
 }
 
 void
-CfrTil_Word_Run ( )
-{
-    Word * word = ( Word* ) DataStack_Pop ( ) ;
-    Word_Run ( word ) ;
-}
-
-void
 Word_CodeStart ( )
 {
     Word * word = ( Word* ) DataStack_Pop ( ) ;
@@ -93,6 +86,13 @@ Word_CodeSize ( )
 {
     Word * word = ( Word* ) DataStack_Pop ( ) ;
     DataStack_Push ( ( int64 ) word->S_CodeSize ) ;
+}
+
+void
+CfrTil_Word_Run ( )
+{
+    Word * word = ( Word* ) DataStack_Pop ( ) ;
+    Word_Run ( word ) ;
 }
 
 void

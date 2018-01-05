@@ -16,12 +16,9 @@ Word_Run ( Word * word )
         // keep track in the word itself where the machine code is to go, if this word is compiled or causes compiling code - used for optimization
         Word_SetCoding ( word, Here ) ;
         word->W_InitialRuntimeDsp = _Dsp_ ;
-        if ( ! word->W_SC_ScratchPadIndex ) word->W_SC_ScratchPadIndex = _CfrTil_->SC_ScratchPadIndex ;
+        //_Debugger_->PreHere = Here ; // in DEBUG_SETUP
         _Context_->CurrentlyRunningWord = word ;
-        _Debugger_->PreHere = Here ;
-        DEBUG_SETUP ( word ) ;
         _Block_Eval ( word->Definition ) ;
-        DEBUG_SHOW ;
     }
 }
 
@@ -30,6 +27,8 @@ Word_Eval ( Word * word )
 {
     if ( word )
     {
+        if ( ! word->W_SC_ScratchPadIndex ) word->W_SC_ScratchPadIndex = _CfrTil_->SC_ScratchPadIndex ; // nb! : needs to be done for compile also
+        DEBUG_SETUP ( word ) ;
         if ( ( word->CAttribute & IMMEDIATE ) || ( ! CompileMode ) )
         {
             Word_Run ( word ) ;
@@ -38,6 +37,7 @@ Word_Eval ( Word * word )
         {
             _Word_Compile ( word ) ;
         }
+        DEBUG_SHOW ;
     }
 }
 

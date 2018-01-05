@@ -4,17 +4,16 @@
 int64
 _OpenVmTil_ShowExceptionInfo ( )
 {
-    AlertColors ;
     if ( _Q_->Verbosity )
     {
         if ( _Q_->SignalExceptionsHandled < 2 )
         {
-            Word * word = 0 ;
-            Debugger * debugger ;
-            if ( _CfrTil_ && ( debugger = _Debugger_ ) )
+            if ( _CfrTil_ )
             {
+                Word * word = 0 ;
+                Debugger * debugger = _Debugger_ ;
+                _Debugger_Locals_Show ( debugger, debugger->w_Word ) ;
                 DebugOn ;
-#if 1                   
                 if ( _Q_->Signal != 11 )
                 {
                     if ( ! debugger->w_Word )
@@ -25,8 +24,7 @@ _OpenVmTil_ShowExceptionInfo ( )
                         debugger->w_Word = word ;
                     }
                 }
-                else 
-#endif                
+                AlertColors ;
                 debugger->w_Word = _Context_->CurrentlyRunningWord ; //= word ; //_Interpreter_->LastWord ; ;
                 SetState ( debugger, DBG_INFO, true ) ;
                 Debugger_ShowInfo ( debugger, _Q_->ExceptionMessage, _Q_->Signal ) ;
@@ -248,7 +246,7 @@ OpenVmTil_SignalAction ( int signal, siginfo_t * si, void * uc )
 }
 
 void
-CfrTil_Exception (int64 signal, byte * message, int64 restartCondition )
+CfrTil_Exception ( int64 signal, byte * message, int64 restartCondition )
 {
     byte * b = Buffer_Data ( _CfrTil_->ScratchB1 ) ;
     AlertColors ;
