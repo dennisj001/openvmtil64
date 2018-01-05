@@ -7,7 +7,7 @@ Int User
 //: d_TD  { "_TestDone_" _defined not } { "_TestDone_" _var } if ; d: d_TD
 { "_TestDone_" _defined not } { "_TestDone_" _var } if 
 : iinc "./init.cft" include ;
-: ia32 "namespaces/compiler/ia32.cft" include ; inline
+: x64 "namespaces/compiler/x64.cft" include ; inline
 : interpT "namespaces/compiler/interpreter.cft" include ;
 : itest _TestDone_ @ { "namespaces/test/initTest.cft" include } if1 ;
 : dT "namespaces/test/dev.cft" include ; inline
@@ -47,22 +47,22 @@ Int User
 : testX cST ;
 'doIA32 1 const
 #if doIA32
-: basicT cT aT loT bT locT mT oT ia32 cntT lT fT sT sysT interpT ppT stT ;
+: basicT cT aT loT bT locT mT oT x64 cntT lT fT sT sysT interpT ppT stT ;
 #else
 : basicT cT aT loT bT locT mT oT      cntT lT fT sT sysT interpT ppT stT ;
 #endif
 : _basicT bT mT cntT lT fT sysT  ;
 : testBasic basicT ;
 // : testAll testBasic testX ;
-: testAll cT aT loT bT locT mT oT ia32 cntT lT fT sT cST ;
+: testAll cT aT loT bT locT mT oT x64 cntT lT fT sT cST ;
 : testIt testAll ;
-: dtestAll cT aT lT loT mT oT ia32 cntT ; // for stepping thru test
+: dtestAll cT aT lT loT mT oT x64 cntT ; // for stepping thru test
 : demo! sOn 5 itest ;
 : odemo sOff 5 itest ;
 : demo _TestDone_ @ not { itest } if1 dT ; //dT0 ; 
 //' demo wdiss pause
 // : demo dT ;
-: test0 ia32 dT ; inline
+: test0 x64 dT ; inline
 : test1 inlineOff optimizeOff test0 ;
 : aoTest odemo cntT ;
 : aTest demo cntT ;

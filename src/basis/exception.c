@@ -13,6 +13,7 @@ _OpenVmTil_ShowExceptionInfo ( )
                 Word * word = 0 ;
                 Debugger * debugger = _Debugger_ ;
                 _Debugger_Locals_Show ( debugger, debugger->w_Word ) ;
+                Debugger_Stack ( debugger ) ;
                 DebugOn ;
                 if ( _Q_->Signal != 11 )
                 {

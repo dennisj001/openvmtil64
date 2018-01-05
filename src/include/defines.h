@@ -110,6 +110,8 @@
 
 #define true 1
 #define false 0
+#define on true 
+#define off false
 #define DONE true
 #define NOT_DONE false
 #define ESC 27

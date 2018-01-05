@@ -633,7 +633,6 @@ void Debugger_ParseFunctionLocalVariables(Debugger *debugger, Lexer *lexer, Bool
 void _Debugger_Locals_ShowALocal(Debugger *debugger, Word *localsWord, byte *buffer);
 void _Debugger_Locals_Show(Debugger *debugger, Word *scWord);
 void Debugger_Locals_Show(Debugger *debugger);
-void CfrTil_Debugger_Locals_Show(void);
 int64 Debugger_TerminalLineWidth(Debugger *debugger);
 void Debugger_ShowStackChange(Debugger *debugger, Word *word, byte *insert, byte *achange, int8 stepFlag);
 void _Debugger_ShowEffects(Debugger *debugger, Word *word, int8 stepFlag, int8 force);
@@ -1736,6 +1735,7 @@ void CfrTil_PrintNDataStack_8(void);
 /* primitives/debuggers.c */
 void CfrTil_Debug_AtAddress(void);
 void CfrTil_LocalsShow(void);
+void CfrTil_Debugger_Locals_Show(void);
 void CfrTil_DebugInfo(void);
 void CfrTil_DebugOn(void);
 void CfrTil_DebugOff(void);

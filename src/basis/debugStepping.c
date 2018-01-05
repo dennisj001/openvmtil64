@@ -121,7 +121,11 @@ into:
                 if ( _Q_->Verbosity > 1 ) _Word_ShowSourceCode ( word ) ;
                 _Printf ( ( byte* ) "\nstepping into a cfrtil compiled function : %s : .... :>", word ? ( char* ) c_gd ( word->Name ) : "" ) ;
                 _Stack_Push ( debugger->ReturnStack, ( int64 ) ( debugger->DebugAddress + size ) ) ; // the return address
-                if ( GetState ( debugger, DBG_AUTO_MODE ) ) Compile_Call ( CfrTil_Debugger_Locals_Show ) ;
+                if ( GetState ( debugger, DBG_AUTO_MODE ) )
+                {
+                    Compile_Call ( (byte*) CfrTil_Debugger_Locals_Show ) ;
+                    //SetState ( debugger, DBG_STEPPING|DBG_AUTO_MODE, off ) ;
+                }
                 // push the return address this time around; next time code at newDebugAddress will be processed
                 // when ret is the insn Debugger_StepOneInstruction will handle it 
             }
@@ -281,11 +285,14 @@ Debugger_PreStartStepping ( Debugger * debugger )
                     debugger->DebugAddress ) ;
                 //if ( debugger->DebugAddress ) Debugger_UdisOneInstruction ( debugger, debugger->DebugAddress, ( byte* ) "", ( byte* ) "" ) ; // the next instruction
             }
+#if 1            
             if ( GetState ( debugger, DBG_RUNTIME_BREAKPOINT ) && String_Equal ( debugger->w_Word->Name, "<dbg>" ) )
             {
                 debugger->DebugAddress += 5 ;
             }
-            else Debugger_Eval ( debugger ) ;
+            else 
+#endif            
+            Debugger_Eval ( debugger ) ;
             SetState ( _Debugger_, DBG_AUTO_MODE, false ) ; //if ( GetState ( debugger, DBG_AUTO_MODE ) )
             return ;
         }

@@ -1,5 +1,9 @@
 5 
 hex
+'true 1 const
+'false 0 const
+'on true const
+'off false const
 // asm constants
 // mod values
 "REG" 3 const  

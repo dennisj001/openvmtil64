@@ -244,7 +244,7 @@ _Compile_Write_Instruction_X64 ( int8 rex, int16 opCode, int8 modRm, int16 contr
     if ( sib && ( controlFlags & SIB_B ) ) _Compile_Int8 ( sib ) ;
     if ( disp || ( controlFlags & DISP_B ) ) _Compile_ImmDispData ( disp, dispSize, 0 ) ;
     if ( imm || ( controlFlags & IMM_B ) ) _Compile_ImmDispData ( imm, immSize, ( controlFlags & IMM_B ) ) ;
-    if ( DBI ) //Is_DebugOn ) //
+    if ( _DBI ) //Is_DebugOn ) //
     {
         //d1 ( Word * currentWord = Compiling ? _Compiler_->CurrentWord : _Interpreter_->w_Word ) ;
         //d1 ( Word * currentWord = _Interpreter_->w_Word ) ;
@@ -289,6 +289,7 @@ _Compile_X_Group1 ( int8 code, int8 toRegOrMem, int8 mod, int8 reg, int8 rm, int
     // some times we need cell_t where bytes would work
     // _Compile_InstructionX86 ( opCode, mod, reg, rm, modRmImmDispFlag, sib, disp, imm, immSize )
     Compile_CalcWrite_Instruction_X64 ( 0, opCode, mod, reg, rm, DISP_B | REX_B | MODRM_B, sib, disp, 0, 0, osize ) ;
+    //DBI_OFF ;
 }
 
 // opCode group 1 - 0x80-0x83 : ADD OR ADC SBB AND_OPCODE SUB XOR CMP : with immediate data
@@ -307,9 +308,11 @@ _Compile_X_Group1_Immediate ( int8 code, int8 mod, int8 rm, int64 disp, int64 im
     int64 opCode = 0x80 ;
     if ( ( iSize == CELL ) )
     {
-        ;
+        _Compile_MoveImm_To_Reg ( OP_REG, imm, iSize ) ;
+        _Compile_X_Group1 ( code, REG, REG, OP_REG, rm, 0, 0, iSize ) ; // + 1 : flag for _Compile_X_Group1
+        return ;
     }
-    if ( ( iSize > BYTE ) || ( imm >= 0x100 ) )
+    else if ( ( iSize > BYTE ) || ( imm >= 0x100 ) )
     {
         opCode |= 1 ;
     }
@@ -320,8 +323,6 @@ _Compile_X_Group1_Immediate ( int8 code, int8 mod, int8 rm, int64 disp, int64 im
     //_Compile_InstructionX86 ( int8 opCode, int8 mod, int8 reg, int8 rm, int8 controlFlags, int8 sib, int64 disp, int8 dispSize, int64 imm, int8 immSize )
     //DBI_ON ;
     Compile_CalcWrite_Instruction_X64 ( 0, opCode, mod, code, rm, REX_B | MODRM_B | IMM_B | DISP_B, 0, disp, 0, imm, iSize ) ;
-    //DBI_OFF ;
-    //_Compile_InstructionX86 ( opCode, mod, code, rm, IMM_B, 0, disp, imm, 0, iSize ) ;
 }
 
 void
@@ -751,7 +752,7 @@ _Compile_Call ( byte * callAddr, int8 thruReg )
 void
 Compile_Call ( byte * callAddr )
 {
-    _Compile_Call ( callAddr, (GetState ( _Compiler_, LC_ARG_PARSING ) ? OP_REG : ACC )) ;
+    _Compile_Call ( callAddr, ( GetState ( _Compiler_, LC_ARG_PARSING ) ? OP_REG : ACC ) ) ;
     //_Compile_Call ( callAddr, OP_REG ) ;
 }
 

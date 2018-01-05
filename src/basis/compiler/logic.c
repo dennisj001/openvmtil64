@@ -119,8 +119,8 @@ Compile_Cmp_Set_tttn_Logic ( Compiler * compiler, int64 ttt, int64 negateFlag )
             else
             {
                 // Compile_CMPI( mod, operandReg, offset, immediateData, size
-                Compile_CMPI ( compiler->optInfo->Optimize_Mod,
-                    compiler->optInfo->Optimize_Rm, compiler->optInfo->Optimize_Disp, compiler->optInfo->Optimize_Imm, 0 ) ;
+                if ( compiler->optInfo->Optimize_Imm >= 0x100000000 ) ;
+                else Compile_CMPI ( compiler->optInfo->Optimize_Mod, compiler->optInfo->Optimize_Rm, compiler->optInfo->Optimize_Disp, compiler->optInfo->Optimize_Imm, 0 ) ;
             }
         }
         else
@@ -273,7 +273,7 @@ Compile_LogicalAnd ( Compiler * compiler )
     {
         //Word *one = Compiler_WordStack ( - 1 ) ; // assumes two values ( n m ) on the DSP stack 
         Word *one = Compiler_WordList ( 1 ) ; // assumes two values ( n m ) on the DSP stack 
-        if ( one->StackPushRegisterCode && (one->RegToUse == ACC )) SetHere ( one->StackPushRegisterCode ) ;
+        if ( one->StackPushRegisterCode && ( one->RegToUse == ACC ) ) SetHere ( one->StackPushRegisterCode ) ;
         else _Compile_Stack_PopToReg ( DSP, ACC ) ;
         _Compile_Stack_PopToReg ( DSP, OP_REG ) ;
         _Compile_LogicalAnd ( compiler ) ;

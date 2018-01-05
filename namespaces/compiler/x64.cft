@@ -51,13 +51,13 @@ Compiler Compiling C Asm
 : ;; ' ; find compileWord ' _prefix find compileWord ; immediate
 // C : ;; ' ;; find compileWord ; immediate
 ' ;; find wdiss // sp
-'IA32 namespace
-IA32
+'X64 namespace
+X64
 "namespaces/compiler/asmConstants.cft" include
 hex
-Logic Bits Combinators IA32 
+Logic Bits Combinators X64 
 
-'ia32_dbg 0 const  
+'x64_dbg on const  
 dscOn //verbosity 3 =
 : apause ; //pause ;
 
@@ -226,7 +226,7 @@ _Compile_ImmDispData (  immDisp,  immSize,  forceFlag )
 void
 _Compile_Write_Instruction_X64 ( rex, opCode, modRm, controlFlags, sib, disp, dispSize, imm, immSize | _here )
 {
-    <dbg> _here = here ;
+    _here = here ;
     if ( rex ) { compile1 ( rex ) ; }
     if ( opCode > 0xff ) { compile2 ( opCode ) ; }
     else { compile1 ( opCode ) ; }
@@ -236,7 +236,7 @@ _Compile_Write_Instruction_X64 ( rex, opCode, modRm, controlFlags, sib, disp, di
     if ( imm || ( controlFlags Bits.& IMM_B ) ) _Compile_ImmDispData ( imm, immSize, ( controlFlags Bits.& IMM_B ) ) ;
 #if 1
     int nbytes = here - _here ; 
-    printf ( "\n_Compile_Write_Instruction_X64 : %lx : %d bytes", _here, nbytes ) ; dis ( _here, nbytes ) ; //pause () ;
+    printf ( "\n\n\n_Compile_Write_Instruction_X64 : %lx : %d bytes", _here, nbytes ) ; dis ( _here, nbytes ) ; nl ; nl ; pause () ;
 #endif
 } prefix
 //'_Compile_Write_Instruction_X64 find wdiss apause
@@ -264,10 +264,10 @@ _CalculateRex ( _reg rm sib operandSize )
 void
 Compile_CalcWrite_Instruction_X64 (  rex,  opCode,  imod,  _reg,  rm, controlFlags,  sib,  disp,  dispSize,  imm,  immSize | modRm )
 {
-    <dbg> rex = _CalculateRex ( _reg, rm, ( immSize == 8 ) || ( if ( controlFlags ) { controlFlags Bits.& REX_B } ) ) ;
+    rex = _CalculateRex ( _reg, rm, ( immSize == 8 ) || ( if ( controlFlags ) { controlFlags Bits.& REX_B } ) ) ;
     //rex = _CalculateRex ( _reg, rm, ( immSize == 8 ) || ( controlFlags Bits.& REX_B ) ) ;
     modRm = CalculateModRmByte ( imod, _reg, rm, sib, disp ) ;
-    <dbg> _Compile_Write_Instruction_X64 ( rex, opCode, modRm, controlFlags, sib, disp, dispSize, imm, immSize ) ;
+    _Compile_Write_Instruction_X64 ( rex, opCode, modRm, controlFlags, sib, disp, dispSize, imm, immSize ) ;
 } prefix
 //'Compile_CalcWrite_Instruction_X64 find wdiss apause
 c_syntaxOff 
@@ -279,7 +279,7 @@ infixOn // c_syntaxOff turns off infix
     { toRegOrMem @ == REG } { opCode = #x8b } { opCode = #x89 } ifElse
     //Compile_CalcWrite_Instruction_X64 (  rex,  opCode,  imod,  _reg,  rm, controlFlags,  sib,  disp,  dispSize,  imm,  immSize | modRm )
     //Compile_CalcWrite_Instruction_X64 ( 0, opCode @, imod @, _reg @, rm @, REX_B | MODRM_B | ( disp ? DISP_B : 0 ) | ( sib ? SIB_B : 0 ), 0, disp @, 8, 0, 0 )
-    <dbg> Compile_CalcWrite_Instruction_X64 ( 0, opCode @, imod @, _reg @, rm @, (REX_B | MODRM_B | DISP_B), 0, disp @, 8 0 0 )
+    Compile_CalcWrite_Instruction_X64 ( 0, opCode @, imod @, _reg @, rm @, (REX_B | MODRM_B | DISP_B), 0, disp @, 8 0 0 )
 ;;
 //                                          _Compile_Move ( toRegOrMem imod _reg rm disp | opCode ) 
 : _Compile_Move_DataStackN_ToReg ( _reg n ) _Compile_Move ( REG, 0, _reg @, DSP, n @ * CELL ) ;; 
@@ -314,7 +314,7 @@ infixOn // c_syntaxOff turns off infix
     _Compile_SUBI_DSP ( CELL ) 
 ;; 
 
-#if ia32_dbg
+#if x64_dbg
 //verbosity 3 =
 Combinators
 :asm iax
@@ -423,7 +423,7 @@ s
 #if 0 //dbOn @ not
 s stest s //sp
 s
-nl "ia32 test" ps "ok" dup ' ps find xt@ qeval "ok" "error" assert1s 
+nl "x64 test" ps "ok" dup ' ps find xt@ qeval "ok" "error" assert1s 
 #endif
 
 Stack

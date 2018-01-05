@@ -254,6 +254,7 @@
 #define DEBUG_ASM_SHOW_ON SetState ( _Debugger_, DBG_ASM_SHOW_ON, true ) 
 #define DEBUG_ASM_SHOW_OFF SetState ( _Debugger_, DBG_ASM_SHOW_ON, false ) 
 #define _DBI GetState ( _Debugger_, DBG_ASM_SHOW_ON ) 
+#define _DBI_ON SetState ( _Debugger_, DBG_ASM_SHOW_ON, true ) 
 #define DBI ( Is_DebugOn & _DBI )
 #define DBI_N( n ) (GetState ( _Debugger_, DBG_ASM_SHOW_ON ) && ( _Q_->Verbosity > 3 ) )
 #define DBI_ON DEBUG_ASM_SHOW_ON

@@ -389,6 +389,7 @@ _CfrTil_Alias ( Word * word, byte * name )
         //while ( ( ! word->Definition ) && word->W_AliasOf ) word = word->W_AliasOf ;
         while ( ! word->Definition ) word = word->W_AliasOf ;
         _Word_InitFinal ( alias, ( byte* ) word->Definition ) ;
+        //alias->CAttribute |= word->CAttribute ;
         alias->S_CodeSize = word->S_CodeSize ;
         alias->W_AliasOf = word ;
         return alias ;
