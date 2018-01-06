@@ -151,12 +151,13 @@ nl "goedel2 :: " ps goedel2 sp
         n @ 6 + 8 _assert0 
     } ix
     { (| n ) 
-        n @ p n 3 = n dup @ 4 + dup p = // junk 7
+        n @ p n 3 = n dup @ 4 + dup dup 7 _assert p = // junk 7
         n @ p n @ 7 _assert0 // 7
     } ix 
     n @ dup p // 9
 ;
-9 goedel4 _assert0 "\ngoedel4 :: output should read : \n'junk' 2 'junk' 7 'junk' 7 7 9" ps //pause
+"\ngoedel4 :: output should read : \n'junk' 2 'junk' 7 'junk' 7 7 9" ps //pause
+9 goedel4 _assert0 //pause
 //' goedel4 find wdiss     
 
 : goedel5 (| n -- TOS ) 

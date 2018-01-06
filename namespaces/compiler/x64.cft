@@ -57,7 +57,7 @@ X64
 hex
 Logic Bits Combinators X64 
 
-'x64_dbg on const  
+'x64_dbg 0 const  
 dscOn //verbosity 3 =
 : apause ; //pause ;
 

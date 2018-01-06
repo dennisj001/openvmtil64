@@ -17,6 +17,7 @@ Compile_Plus ( Compiler * compiler )
 void
 Compile_Multiply ( Compiler * compiler )
 {
+    CompileOptimizeInfo * optInfo = compiler->optInfo ;
     //if ( CheckOptimizeOperands ( compiler, 6 ) ) // 6 : especially for the factorial - qexp, bexp 
     //DBI_ON ;
     int64 optFlag = CheckOptimize ( compiler, 6 ) ;
@@ -25,26 +26,26 @@ Compile_Multiply ( Compiler * compiler )
     {
         // optimizer must have put args in ACC and OREG
         // always uses RAX as the first operand and destination of the operation
-        if ( ! ( compiler->optInfo->OptimizeFlag & OPTIMIZE_REGISTER ) ) compiler->optInfo->Optimize_Reg = ACC ;
+        if ( ! ( optInfo->OptimizeFlag & OPTIMIZE_REGISTER ) ) optInfo->Optimize_Reg = ACC ;
         else
         {
-            compiler->optInfo->Optimize_Rm = compiler->optInfo->Optimize_SrcReg ;
-            compiler->optInfo->Optimize_Reg = compiler->optInfo->Optimize_DstReg ;
+            optInfo->Optimize_Rm = optInfo->Optimize_SrcReg ;
+            optInfo->Optimize_Reg = optInfo->Optimize_DstReg ;
         }
-        if ( compiler->optInfo->Optimize_DstReg != ACC ) _Compile_Move_Reg_To_Reg ( ACC, compiler->optInfo->Optimize_DstReg ) ;
-        if ( compiler->optInfo->OptimizeFlag & OPTIMIZE_IMM )
+        if ( optInfo->Optimize_DstReg != ACC ) _Compile_Move_Reg_To_Reg ( ACC, optInfo->Optimize_DstReg ) ;
+        if ( optInfo->OptimizeFlag & OPTIMIZE_IMM )
         {
-            _Compile_MoveImm_To_Reg ( OP_REG, ( int64 ) compiler->optInfo->Optimize_Imm, CELL ) ;
-            compiler->optInfo->Optimize_Rm = OP_REG ;
+            _Compile_MoveImm_To_Reg ( OP_REG, ( int64 ) optInfo->Optimize_Imm, CELL ) ;
+            optInfo->Optimize_Rm = OP_REG ;
         }
-        Compile_MUL ( compiler->optInfo->Optimize_Mod, compiler->optInfo->Optimize_Rm, REX_B | MODRM_B | DISP_B, 0,
-            compiler->optInfo->Optimize_Disp, 0, CELL_SIZE ) ;
-        if ( compiler->optInfo->Optimize_DstReg != ACC ) _Compile_Move_Reg_To_Reg ( compiler->optInfo->Optimize_DstReg, ACC ) ;
+        Compile_MUL ( optInfo->Optimize_Mod, optInfo->Optimize_Rm, REX_B | MODRM_B | DISP_B, 0,
+            optInfo->Optimize_Disp, 0, CELL_SIZE ) ;
+        if ( optInfo->Optimize_DstReg != ACC ) _Compile_Move_Reg_To_Reg ( optInfo->Optimize_DstReg, ACC ) ;
         //if ( GetState ( _Context_, C_SYNTAX ) ) _Stack_DropN ( _Context_->Compiler0->WordStack, 2 ) ;
         Word * zero = Compiler_WordList ( 0 ) ;
         zero->StackPushRegisterCode = Here ;
-        if ( compiler->optInfo->Optimize_Rm == DSP ) Compile_Move_ACC_To_TOS ( DSP ) ;
-        else _Word_CompileAndRecord_PushReg ( zero, compiler->optInfo->Optimize_DstReg ? compiler->optInfo->Optimize_DstReg : ACC ) ;
+        if ( optInfo->Optimize_Rm == DSP ) Compile_Move_ACC_To_TOS ( DSP ) ;
+        else _Word_CompileAndRecord_PushReg ( zero, optInfo->Optimize_DstReg ? optInfo->Optimize_DstReg : ACC ) ;
     }
     else
     {
@@ -64,6 +65,7 @@ Compile_Multiply ( Compiler * compiler )
 void
 _Compile_Divide ( Compiler * compiler, uint64 type )
 {
+    CompileOptimizeInfo * optInfo = compiler->optInfo ;
     int8 reg ;
     // dividend in edx:eax, quotient/divisor in eax, remainder in edx
     int64 optFlag = CheckOptimize ( compiler, 5 ) ;
@@ -75,9 +77,9 @@ _Compile_Divide ( Compiler * compiler, uint64 type )
         // for idiv the dividend must be eax:edx, divisor can be reg or rm ; here we use ECX
         // idiv eax by reg or mem
         // Compile_IDIV( mod, rm, controlFlag, sib, disp, imm, size )
-        int8 flags = ( ( compiler->optInfo->Optimize_Disp != 0 ) ? DISP_B : 0 ) ; //nb. there is no idiv imm insn
-        Compile_IDIV ( compiler->optInfo->Optimize_Mod, compiler->optInfo->Optimize_Rm, flags, 0,
-            compiler->optInfo->Optimize_Disp, 0, 0 ) ;
+        int8 flags = ( ( optInfo->Optimize_Disp != 0 ) ? DISP_B : 0 ) ; //nb. there is no idiv imm insn
+        Compile_IDIV ( optInfo->Optimize_Mod, optInfo->Optimize_Rm, flags, 0,
+            optInfo->Optimize_Disp, 0, 0 ) ;
         //_Compile_Move_Reg_To_Reg ( R8D, RAX ) ;
         if ( type == MOD ) reg = RDX ;
         else reg = ACC ;
@@ -163,38 +165,38 @@ Compile_MultiplyEqual ( Compiler * compiler )
     }
     else
     {
-
+        CompileOptimizeInfo * optInfo = compiler->optInfo ;
         if ( CheckOptimize ( compiler, 5 ) )
         {
             // address is in R8
             // Compile_IMUL ( mod, rm, sib, disp, imm, size )
             //_Compile_IMULI ( cell mod, cell reg, cell rm, cell sib, cell disp, cell imm, cell size )
             // a little convulted logic here ...
-            if ( compiler->optInfo->UseReg ) _Compile_Move_Reg_To_Reg ( THRU_REG, compiler->optInfo->UseReg ) ;
-            else if ( ! ( compiler->optInfo->O_one->CAttribute & REGISTER_VARIABLE ) )
+            if ( optInfo->UseReg ) _Compile_Move_Reg_To_Reg ( THRU_REG, optInfo->UseReg ) ;
+            else if ( ! ( optInfo->O_one->CAttribute & REGISTER_VARIABLE ) )
             {
                 _Compile_Move_Reg_To_Reg ( THRU_REG, ACC ) ;
                 _Compile_Move_Rm_To_Reg ( ACC, THRU_REG, 0 ) ;
             }
-            if ( compiler->optInfo->OptimizeFlag & OPTIMIZE_IMM )
+            if ( optInfo->OptimizeFlag & OPTIMIZE_IMM )
             {
-                //_Compile_IMULI ( MEM, compiler->optInfo->Optimize_Reg, compiler->optInfo->Optimize_Rm, 0, compiler->optInfo->Optimize_Disp,
-                //    compiler->optInfo->Optimize_Imm, CELL ) ;
-                Compile_MUL ( MEM, compiler->optInfo->Optimize_Rm, REX_B | MODRM_B | DISP_B, 0,
-                    compiler->optInfo->Optimize_Disp, compiler->optInfo->Optimize_Imm, CELL_SIZE ) ;
+                //_Compile_IMULI ( MEM, optInfo->Optimize_Reg, optInfo->Optimize_Rm, 0, optInfo->Optimize_Disp,
+                //    optInfo->Optimize_Imm, CELL ) ;
+                Compile_MUL ( MEM, optInfo->Optimize_Rm, REX_B | MODRM_B | DISP_B, 0,
+                    optInfo->Optimize_Disp, optInfo->Optimize_Imm, CELL_SIZE ) ;
             }
             else
             {
                 // address is in R8
                 //_Compile_IMUL_Reg ( cell mod, cell reg, cell rm, cell sib, cell disp )
-                Compile_MUL ( compiler->optInfo->Optimize_Mod, compiler->optInfo->Optimize_Rm, REX_B | MODRM_B | DISP_B, 0,
-                    compiler->optInfo->Optimize_Disp, 0, CELL_SIZE ) ;
+                Compile_MUL ( optInfo->Optimize_Mod, optInfo->Optimize_Rm, REX_B | MODRM_B | DISP_B, 0,
+                    optInfo->Optimize_Disp, 0, CELL_SIZE ) ;
             }
-            if ( compiler->optInfo->UseReg ) _Compile_Move_Reg_To_Rm ( THRU_REG, ACC, 0 ) ;
-            else 
+            if ( optInfo->UseReg ) _Compile_Move_Reg_To_Rm ( THRU_REG, ACC, 0 ) ;
+            else
             {
-                if ( compiler->optInfo->O_one->CAttribute & REGISTER_VARIABLE )
-                    _Compile_Move_Reg_To_Reg ( compiler->optInfo->O_one->RegToUse, ACC ) ;
+                if ( optInfo->O_one->CAttribute & REGISTER_VARIABLE )
+                    _Compile_Move_Reg_To_Reg ( optInfo->O_one->RegToUse, ACC ) ;
                 else _Compile_Move_Reg_To_Rm ( THRU_REG, ACC, 0 ) ;
             }
         }
@@ -219,26 +221,27 @@ Compile_DivideEqual ( Compiler * compiler )
     }
     else
     {
+        CompileOptimizeInfo * optInfo = compiler->optInfo ;
         // for idiv the dividend must be eax:edx, divisor can be reg or rm
         // idiv eax by reg or mem
         if ( CheckOptimize ( compiler, 5 ) )
         {
             // assumes destination address is in EBX
             //_Compile_Move_Reg_To_Reg ( EBX, R8 ) ;
-            _Compile_Move_Reg_To_Reg ( THRU_REG, ACC ) ; //R8D ) ; //compiler->optInfo->UseReg ) ;
+            _Compile_Move_Reg_To_Reg ( THRU_REG, ACC ) ; //R8D ) ; //optInfo->UseReg ) ;
             _Compile_Move_Rm_To_Reg ( ACC, THRU_REG, 0 ) ;
             _Compile_MoveImm ( REG, RDX, IMM_B | REX_B | MODRM_B, 0, 0, 0, CELL ) ;
             // Compile_IDIV( mod, rm, sib, disp, imm, size )
-            if ( compiler->optInfo->OptimizeFlag & OPTIMIZE_IMM )
+            if ( optInfo->OptimizeFlag & OPTIMIZE_IMM )
             {
-                _Compile_MoveImm ( REG, OP_REG, IMM_B | REX_B | MODRM_B, 0, 0, compiler->optInfo->Optimize_Imm, CELL ) ;
+                _Compile_MoveImm ( REG, OP_REG, IMM_B | REX_B | MODRM_B, 0, 0, optInfo->Optimize_Imm, CELL ) ;
                 //Compile_IDIV ( REG, R9D, 0, 0, 0, 0, 0 ) ;
                 Compile_IDIV ( REG, OP_REG, 0, 0, 0, 0, 0 ) ;
             }
             else
             {
-                Compile_DIV ( compiler->optInfo->Optimize_Mod, compiler->optInfo->Optimize_Rm, REX_B | MODRM_B | DISP_B, 0,
-                    compiler->optInfo->Optimize_Disp, 0, CELL_SIZE ) ;
+                Compile_DIV ( optInfo->Optimize_Mod, optInfo->Optimize_Rm, REX_B | MODRM_B | DISP_B, 0,
+                    optInfo->Optimize_Disp, 0, CELL_SIZE ) ;
             }
             _Compile_Move_Reg_To_Rm ( THRU_REG, ACC, 0 ) ; // move result to destination
         }

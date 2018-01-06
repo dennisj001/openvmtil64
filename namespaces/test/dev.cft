@@ -23,20 +23,20 @@ int factorial( n | rec1 )
 } prefix
 c_syntaxOff dscOff
 'factorial find wdiss
-factorial (7) p //pause //sp
+factorial (7) dup p 5040 _assert //pause //sp
 : factorial ( n  | fac -- TOS ) 
     fac 1 = 
     { n @ 1 > } { n @ fac @ * fac store n -- } while 
     fac @ 
 ;
-7 factorial p
-: qexp dup 1 <= if{ }else{ dup -- qexp * }fi ; 7 qexp p
-: qexp2 dup 1 <= ?< >:< dup -- qexp2 * >? ; 7 qexp2 p
+7 factorial dup p 5040 _assert
+: qexp dup 1 <= if{ }else{ dup -- qexp * }fi ; 7 qexp dup p 5040 _assert
+: qexp2 dup 1 <= ?< >:< dup -- qexp2 * >? ; 7 qexp2 dup p 5040 _assert
 
-: bexp ( n ) n @ 1 > if{ n @ dup -- bexp * }else{ 1 }fi ; 7 bexp p
-: bexp2 ( n ) { n @ 1 > } { n @ dup -- bexp2 * } { 1 } ifElse ; 7 bexp2 p
+: bexp ( n ) n @ 1 > if{ n @ dup -- bexp * }else{ 1 }fi ; 7 bexp dup p 5040 _assert
+: bexp2 ( n ) { n @ 1 > } { n @ dup -- bexp2 * } { 1 } ifElse ; 7 bexp2 dup p 5040 _assert
 : bexp3 ( n ) { n @ 1 > } { n @ n @ -- bexp3 *  } { 1 } ifElse ;
-7 bexp3 p //sp
+7 bexp3 dup p 5040 _assert //sp
 c_syntaxOn
 int
 faccs3 ( n | rec -- TOS ) 
@@ -48,7 +48,7 @@ faccs3 ( n | rec -- TOS )
     //return rec ;
 }
 ' faccs3 find wdiss
-faccs3 ( 7 ) p //sp
+faccs3 ( 7 ) dup p 5040 _assert //sp
 int
 fac5 ( REG n  | REG facc -- RAX ) 
 { 
@@ -60,7 +60,7 @@ fac5 ( REG n  | REG facc -- RAX )
     return facc ;
 }
 wdiss ( ' fac5 find ) ; 
-fac5 ( 7 ) p //sp
+fac5 ( 7 ) dup p 5040 _assert //sp
 
 int
 faccs ( REG n | REG rec -- RAX ) 
@@ -73,7 +73,7 @@ faccs ( REG n | REG rec -- RAX )
     return rec ;
 }
 ' faccs find wdiss
-faccs ( 7 ) p //sp
+faccs ( 7 ) dup p 5040 _assert //sp
 
 int
 fac5 ( REG n  | REG facc ) 
@@ -86,7 +86,7 @@ fac5 ( REG n  | REG facc )
     return facc ;
 }
 //wdiss ( ' fac5 find ) 
-fac5 ( 7 ) p  // pause
+fac5 ( 7 ) dup p 5040 _assert  // pause
 
 int
 faccs2 ( REG n | REG rec ) 
@@ -98,7 +98,7 @@ faccs2 ( REG n | REG rec )
     return rec ;
 }
 ' faccs2 find wdiss
-faccs2 ( 7 ) p 
+faccs2 ( 7 ) dup p 5040 _assert 
 c_syntaxOff
 
 : fac ( n  | rec1 -- TOS ) 
@@ -106,6 +106,7 @@ c_syntaxOff
     { n @ 1 > } { rec1 n @ rec1 @ * = n -- } while 
     rec1 @ 
 ;
+7 fac dup p 5040 _assert 
 // : bexp2 ( n | rec1 ) { n @ 1 <= } { 1 } { n @ dup -- bexp2 * } ifElse ;
 
 : sdbg ( j ) { stackDepth 20 > } { state regs nl "stackDepth = " ps stackDepth p nl hex { j stackDepth = } { j @ 0 > } { j -- } { p } for quit } if2 ;
@@ -322,7 +323,7 @@ C
     "locals fib1  : " ps n @ fib1 nl 
     "no locals fib2 : " ps n @ fib2 nl
     "no locals fib3 : " ps n @ fib3 nl
-    "fibPTC?        : " ps n @ fibPTC
+    "fibPTC?        : " ps n @ fibPTC nl
     "fibPTC2?        : " ps n @ fibPTC2
 ;
 15 tfib 30 tfib //40 tfib //45 tfib 

@@ -183,6 +183,7 @@
 #define RETURN_REG_2 RDX                    // rdx
 #define OPERAND_REG R9D                     // r9
 #define OP_REG OPERAND_REG
+#define OREG OPERAND_REG
 #define CPU_OREG R9d
 #define OPERAND_2_REG R8D                   // r8
 #define OREG2 OPERAND_2_REG 

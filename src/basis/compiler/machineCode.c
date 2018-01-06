@@ -299,33 +299,6 @@ _Compile_X_Group1 ( int8 code, int8 toRegOrMem, int8 mod, int8 reg, int8 rm, int
 // ?!? shouldn't we just combine this with _Compile_Group1 (above) ?!?
 
 void
-_Compile_X_Group1_Immediate ( int8 code, int8 mod, int8 rm, int64 disp, int64 imm, int8 iSize )
-{
-    // 0x80 is the base opCode for this group of instructions but 0x80 is an alias for 0x82
-    // we always sign extend so opCodes 0x80 and 0x82 are not being used
-    // #x80 is the base opCode for this group of instructions 
-    // 1000 00sw 
-    int64 opCode = 0x80 ;
-    if ( ( iSize == CELL ) )
-    {
-        _Compile_MoveImm_To_Reg ( OP_REG, imm, iSize ) ;
-        _Compile_X_Group1 ( code, REG, REG, OP_REG, rm, 0, 0, iSize ) ; // + 1 : flag for _Compile_X_Group1
-        return ;
-    }
-    else if ( ( iSize > BYTE ) || ( imm >= 0x100 ) )
-    {
-        opCode |= 1 ;
-    }
-    else if ( ( iSize <= BYTE ) || ( imm < 0x100 ) ) opCode |= 3 ;
-    // we need to be able to set the size so we can know how big the instruction will be in eg. CompileVariable
-    // otherwise it could be optimally deduced but let caller control by keeping operandSize parameter
-    // some times we need cell_t where bytes would work
-    //_Compile_InstructionX86 ( int8 opCode, int8 mod, int8 reg, int8 rm, int8 controlFlags, int8 sib, int64 disp, int8 dispSize, int64 imm, int8 immSize )
-    //DBI_ON ;
-    Compile_CalcWrite_Instruction_X64 ( 0, opCode, mod, code, rm, REX_B | MODRM_B | IMM_B | DISP_B, 0, disp, 0, imm, iSize ) ;
-}
-
-void
 _Compile_Op_Group1_Reg_To_Reg ( int64 code, int8 dstReg, int64 srcReg )
 {
     _Compile_X_Group1 ( code, 2, REG, srcReg, dstReg, 0, 0, CELL ) ;
@@ -874,19 +847,20 @@ _Compile_MOVZX_REG ( int8 reg )
 void
 Compile_X_Group5 ( Compiler * compiler, int64 op )
 {
+    CompileOptimizeInfo * optInfo = compiler->optInfo ;
     int64 optFlag = CheckOptimize ( compiler, 3 ) ;
     //Word *one = Compiler_WordStack ( - 1 ) ; // assumes two values ( n m ) on the DSP stack 
     Word *one = Compiler_WordList ( 1 ) ; // assumes two values ( n m ) on the DSP stack 
     if ( optFlag & OPTIMIZE_DONE ) return ;
     else if ( optFlag )
     {
-        if ( compiler->optInfo->OptimizeFlag & OPTIMIZE_IMM )
+        if ( optInfo->OptimizeFlag & OPTIMIZE_IMM )
         {
-            _Compile_MoveImm_To_Reg ( ACC, compiler->optInfo->Optimize_Imm, CELL ) ;
-            compiler->optInfo->Optimize_Mod = REG ;
-            compiler->optInfo->Optimize_Rm = ACC ;
+            _Compile_MoveImm_To_Reg ( ACC, optInfo->Optimize_Imm, CELL ) ;
+            optInfo->Optimize_Mod = REG ;
+            optInfo->Optimize_Rm = ACC ;
         }
-        _Compile_Group5 ( op, compiler->optInfo->Optimize_Mod, compiler->optInfo->Optimize_Rm, 0, compiler->optInfo->Optimize_Disp, 0 ) ;
+        _Compile_Group5 ( op, optInfo->Optimize_Mod, optInfo->Optimize_Rm, 0, optInfo->Optimize_Disp, 0 ) ;
     }
     else if ( one && one->CAttribute & ( PARAMETER_VARIABLE | LOCAL_VARIABLE | NAMESPACE_VARIABLE ) ) // *( ( cell* ) ( TOS ) ) += 1 ;
     {
@@ -909,33 +883,42 @@ Compile_X_Group5 ( Compiler * compiler, int64 op )
 
 // X variable op compile for group 1 opCodes : +/-/and/or/xor - ia32 
 
-void
-_Compile_optInfo_X_Group1 ( Compiler * compiler, int64 op )
-{
-    Set_SCA ( 0 ) ;
-    if ( compiler->optInfo->OptimizeFlag & OPTIMIZE_IMM )
-    {
-        // Compile_SUBI( mod, operandReg, offset, immediateData, size )
-        _Compile_X_Group1_Immediate ( op, compiler->optInfo->Optimize_Mod,
-            compiler->optInfo->Optimize_Rm, compiler->optInfo->Optimize_Disp,
-            compiler->optInfo->Optimize_Imm, 0 ) ;
-    }
-    else
-    {
-        // _Compile_Group1 ( int64 code, int64 toRegOrMem, int64 mod, int8 reg, int8 rm, int8 sib, int64 disp, int64 osize )
-        _Compile_X_Group1 ( op, compiler->optInfo->Optimize_Dest_RegOrMem, compiler->optInfo->Optimize_Mod,
-            compiler->optInfo->Optimize_Reg, compiler->optInfo->Optimize_Rm, 0,
-            compiler->optInfo->Optimize_Disp, CELL_SIZE ) ;
-    }
-}
-
 // subtract second operand from first and store result in first
+
+void
+_Compile_X_Group1_Immediate ( int8 code, int8 mod, int8 rm, int64 disp, int64 imm, int8 iSize )
+{
+    // 0x80 is the base opCode for this group of instructions but 0x80 is an alias for 0x82
+    // we always sign extend so opCodes 0x80 and 0x82 are not being used
+    // #x80 is the base opCode for this group of instructions 
+    // 1000 00sw 
+    int64 opCode = 0x80 ;
+    if ( ( iSize == CELL ) )
+    {
+        _Compile_MoveImm_To_Reg ( OREG2, imm, iSize ) ;
+        //_Compile_X_Group1 ( int8 code, int8 toRegOrMem, int8 mod, int8 reg, int8 rm, int8 sib, int64 disp, int8 osize )
+        _Compile_X_Group1 ( code, REG, mod, rm, OREG2, 0, disp, iSize ) ; // + 1 : flag for _Compile_X_Group1
+        return ;
+    }
+    else if ( ( iSize > BYTE ) || ( imm >= 0x100 ) )
+    {
+        opCode |= 1 ;
+    }
+    else if ( ( iSize <= BYTE ) || ( imm < 0x100 ) ) opCode |= 3 ;
+    // we need to be able to set the size so we can know how big the instruction will be in eg. CompileVariable
+    // otherwise it could be optimally deduced but let caller control by keeping operandSize parameter
+    // some times we need cell_t where bytes would work
+    //_Compile_InstructionX86 ( int8 opCode, int8 mod, int8 reg, int8 rm, int8 controlFlags, int8 sib, int64 disp, int8 dispSize, int64 imm, int8 immSize )
+    //DBI_ON ;
+    Compile_CalcWrite_Instruction_X64 ( 0, opCode, mod, code, rm, REX_B | MODRM_B | IMM_B | DISP_B, 0, disp, 0, imm, iSize ) ;
+}
 
 // X variable op compile for group 1 opCodes : +/-/and/or/xor - ia32 
 
 void
 Compile_X_Group1 ( Compiler * compiler, int64 op, int64 ttt, int64 n )
 {
+    CompileOptimizeInfo * optInfo = compiler->optInfo ;
     int64 optFlag = CheckOptimize ( compiler, 5 ) ;
     if ( optFlag == OPTIMIZE_DONE ) return ;
     else if ( optFlag )
@@ -943,10 +926,10 @@ Compile_X_Group1 ( Compiler * compiler, int64 op, int64 ttt, int64 n )
         //DBI ;
         _Compile_optInfo_X_Group1 ( compiler, op ) ;
         BlockInfo_Setup_BI_tttn ( _Context_->Compiler0, ttt, n, 3 ) ; // not less than 0 == greater than 0
-        if ( compiler->optInfo->Optimize_Rm != DSP ) // if the result is to a reg and not tos
+        if ( optInfo->Optimize_Rm != DSP ) // if the result is to a reg and not tos
         {
-            //_Compile_Move_Reg_To_StackN ( DSP, 0, compiler->optInfo->Optimize_Reg ) ;
-            _Word_CompileAndRecord_PushReg ( Compiler_WordList ( 0 ), compiler->optInfo->Optimize_Reg ) ; //compiler->optInfo->Optimize_Rm ) ; // 0 : ?!? should be the exact variable 
+            //_Compile_Move_Reg_To_StackN ( DSP, 0, optInfo->Optimize_Reg ) ;
+            _Word_CompileAndRecord_PushReg ( Compiler_WordList ( 0 ), optInfo->Optimize_Reg ) ; //optInfo->Optimize_Rm ) ; // 0 : ?!? should be the exact variable 
         }
         //else Compile_SUBI ( REG, DSP, 0, CELL, 0 ) ;
         //DBI_OFF ;
@@ -958,6 +941,27 @@ Compile_X_Group1 ( Compiler * compiler, int64 op, int64 ttt, int64 n )
         _Compile_X_Group1 ( op, MEM, MEM, ACC, DSP, 0, 0, CELL_SIZE ) ; // result is on TOS
         BlockInfo_Setup_BI_tttn ( _Context_->Compiler0, ttt, n, 3 ) ; // not less than 0 == greater than 0
         //_Word_CompileAndRecord_PushR8 ( Compiler_WordList ( 0 ) ) ;
+    }
+}
+
+void
+_Compile_optInfo_X_Group1 ( Compiler * compiler, int64 op )
+{
+    CompileOptimizeInfo * optInfo = compiler->optInfo ;
+    Set_SCA ( 0 ) ;
+    if ( optInfo->OptimizeFlag & OPTIMIZE_IMM )
+    {
+        // Compile_SUBI( mod, operandReg, offset, immediateData, size )
+        _Compile_X_Group1_Immediate ( op, optInfo->Optimize_Mod,
+            optInfo->Optimize_Rm, optInfo->Optimize_Disp,
+            optInfo->Optimize_Imm, ( optInfo->Optimize_Imm >= 0x100000000 ) ? CELL : 0 ) ;
+    }
+    else
+    {
+        // _Compile_Group1 ( int64 code, int64 toRegOrMem, int64 mod, int8 reg, int8 rm, int8 sib, int64 disp, int64 osize )
+        _Compile_X_Group1 ( op, optInfo->Optimize_Dest_RegOrMem, optInfo->Optimize_Mod,
+            optInfo->Optimize_Reg, optInfo->Optimize_Rm, 0,
+            optInfo->Optimize_Disp, CELL_SIZE ) ;
     }
 }
 

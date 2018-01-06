@@ -341,6 +341,7 @@ _CheckOptimizeOperands ( Compiler * compiler, int64 maxOperands )
                     case ( OP_LC << ( 3 * O_BITS ) | OP_VAR << ( 2 * O_BITS ) | OP_FETCH << ( 1 * O_BITS ) | OP_ORDERED ):
                     case ( OP_LC << ( 3 * O_BITS ) | OP_VAR << ( 2 * O_BITS ) | OP_FETCH << ( 1 * O_BITS ) | OP_LOGIC ):
                     case ( OP_LC << ( 3 * O_BITS ) | OP_VAR << ( 2 * O_BITS ) | OP_FETCH << ( 1 * O_BITS ) | OP_DIVIDE ):
+#if 0                        
                     {
                         SetHere ( optInfo->O_three->Coding ) ;
                         _Compile_GetVarLitObj_RValue_To_Reg ( optInfo->O_three, ACC ) ;
@@ -351,8 +352,30 @@ _CheckOptimizeOperands ( Compiler * compiler, int64 maxOperands )
                         }
                         optInfo->Optimize_Dest_RegOrMem = REG ;
                         optInfo->Optimize_Mod = REG ;
+                        //optInfo->Optimize_Reg = ACC ;
                         return i ;
                     }
+#else
+                    {
+                        SetHere ( optInfo->O_three->Coding ) ;
+                        if ( optInfo->O_zero->CAttribute & CATEGORY_OP_DIVIDE )
+                        {
+                            _Compile_GetVarLitObj_RValue_To_Reg ( optInfo->O_three, ACC ) ;
+                            _Compile_GetVarLitObj_RValue_To_Reg ( optInfo->O_two, OREG ) ;
+                            optInfo->Optimize_Rm = OREG ;
+                        }
+                        else
+                        {
+                            _Compile_GetVarLitObj_RValue_To_Reg ( optInfo->O_two, ACC ) ;
+                            _GetRmDispImm ( optInfo, optInfo->O_three, OREG ) ;
+                            optInfo->Optimize_Rm = ACC ;
+                            optInfo->Optimize_Reg = ACC ;
+                        }
+                        optInfo->Optimize_Dest_RegOrMem = REG ;
+                        optInfo->Optimize_Mod = REG ;
+                        return i ;
+                    }
+#endif                    
                         // ?? assume correct first operand is there TOS - it would already be a user error if they were not ??
 #if 0 // something else needed here
                     case ( OP_VAR << ( 2 * O_BITS ) | OP_FETCH << ( 1 * O_BITS ) | OP_UNORDERED ):

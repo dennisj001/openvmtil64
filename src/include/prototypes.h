@@ -12,7 +12,6 @@ void _Compile_Write_Instruction_X64(int8 rex, int16 opCode, int8 modRm, int16 co
 void Compile_CalcWrite_Instruction_X64(int8 rex, int8 opCode, int8 mod, int8 reg, int8 rm, int16 controlFlags, int8 sib, int64 disp, int8 dispSize, int64 imm, int8 immSize);
 void _Compile_LEA(int8 reg, int8 rm, int8 sib, int64 disp);
 void _Compile_X_Group1(int8 code, int8 toRegOrMem, int8 mod, int8 reg, int8 rm, int8 sib, int64 disp, int8 osize);
-void _Compile_X_Group1_Immediate(int8 code, int8 mod, int8 rm, int64 disp, int64 imm, int8 iSize);
 void _Compile_Op_Group1_Reg_To_Reg(int64 code, int8 dstReg, int64 srcReg);
 void _Compile_Op_Special_Reg_To_Reg(int64 code, int8 rm, int8 reg);
 void _Compile_Group2(int64 mod, int8 regOpCode, int8 rm, int8 sib, int64 disp, int64 imm);
@@ -61,8 +60,9 @@ void _Compile_INT80(void);
 void _Compile_Noop(void);
 void _Compile_MOVZX_REG(int8 reg);
 void Compile_X_Group5(Compiler *compiler, int64 op);
-void _Compile_optInfo_X_Group1(Compiler *compiler, int64 op);
+void _Compile_X_Group1_Immediate(int8 code, int8 mod, int8 rm, int64 disp, int64 imm, int8 iSize);
 void Compile_X_Group1(Compiler *compiler, int64 op, int64 ttt, int64 n);
+void _Compile_optInfo_X_Group1(Compiler *compiler, int64 op);
 void _Compile_Jcc(int64 bindex, int64 overwriteFlag, int64 nz, int64 ttt);
 void _Compile_Return(void);
 /* basis/compiler/_compile.c */

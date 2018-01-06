@@ -229,7 +229,7 @@ _CfrTil_C_Infix_EqualOp ( Word * opWord )
     Word_Set_SCA ( rword ) ;
     d1 ( if ( Is_DebugModeOn ) Compiler_Show_WordList ( "\nCfrTil_C_Infix_EqualOp : after interpret until ';' :" ) ) ;
     _Interpreter_DoWord_Default ( interp, rword, svscwi ) ;
-    word0->Name = svName ;
+    rword->Name = svName ;
     //_DEBUG_SHOW ( opWord ? opWord : word, 1 ) ;
     //SetState ( _Debugger_, DEBUG_SHTL_OFF, true ) ; // ?? : is this still needed (it was above, before) since we just temporarily adjusted the name
     if ( GetState ( compiler, C_COMBINATOR_LPAREN ) )

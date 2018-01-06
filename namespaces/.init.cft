@@ -365,7 +365,7 @@ dbgOn
 #if dbgOnVar @ 
 Root 'doScript 1 const
 System
-testCfrTil dT0 //demo dT0
+testCfrTil dT0 // demo //dT0
 stringMacrosOff
 : simple ( a b c ) a @ p b @ p c @ p ; //'simple find wdis 
 1 2 3 simple //pause

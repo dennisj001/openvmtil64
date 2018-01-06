@@ -618,6 +618,7 @@ checkWord:
             nextWord = ( Word* ) dlnode_Next ( ( node* ) word ) ;
             ///while ( Is_NamespaceType ( nextWord ) ) nextWord = ( Word* ) dlnode_Next ( ( node* ) nextWord ) ;
             //if ( nextWord && ( nextWord->W_FoundMarker == tci->FoundMarker ) ) break ;
+            if ( kbhit () ) break ;
             if ( mf ( ( Symbol* ) word ) )
             {
                 if ( nextWord )

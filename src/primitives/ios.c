@@ -157,7 +157,6 @@ CfrTil_Key ( )
     DataStack_Push ( _Context_->ReadLiner0->InputKeyedCharacter ) ;
 #else
     DataStack_Push ( Key ( ) ) ;
-
 #endif    
 }
 

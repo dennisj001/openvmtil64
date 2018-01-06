@@ -68,7 +68,8 @@ sp
 0 1 tNotAnd 0 "0 1" assert 
 // test 64 bit cmp
 hex 
-: tcmp ( n m -- TOS ) n @ m @ > dup p n @ p m @ p ; nl 0x100000000 0xffffffff tcmp //pause 
+: tcmp ( n m -- TOS ) n @ p " > " ps m @ p n @ m @ > dup decimal p ; nl 0x100000000 0xffffffff tcmp 1 _assert 
+hex nl 0xffffffff 0x100000000 tcmp 0 _assert //pause 
 decimal
 sp
 2 + 7 assertStkChk sp // stack checking

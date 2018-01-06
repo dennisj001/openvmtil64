@@ -7,7 +7,7 @@ Int User
 //: d_TD  { "_TestDone_" _defined not } { "_TestDone_" _var } if ; d: d_TD
 { "_TestDone_" _defined not } { "_TestDone_" _var } if 
 : iinc "./init.cft" include ;
-: x64 "namespaces/compiler/x64.cft" include ; inline
+: x64 "namespaces/compiler/x64.cft" include ; 
 : interpT "namespaces/compiler/interpreter.cft" include ;
 : itest _TestDone_ @ { "namespaces/test/initTest.cft" include } if1 ;
 : dT "namespaces/test/dev.cft" include ; inline
@@ -45,11 +45,11 @@ Int User
 : lT lispTest ;
 //: testX cST dT0 dT ;
 : testX cST ;
-'doIA32 1 const
-#if doIA32
-: basicT cT aT loT bT locT mT oT x64 cntT lT fT sT sysT interpT ppT stT ;
+'doX64 1 const
+#if doX64
+: basicT cT mT aT loT bT locT oT x64 cntT lT fT sT sysT interpT ppT stT ;
 #else
-: basicT cT aT loT bT locT mT oT      cntT lT fT sT sysT interpT ppT stT ;
+: basicT cT mT aT loT bT locT oT      cntT lT fT sT sysT interpT ppT stT ;
 #endif
 : _basicT bT mT cntT lT fT sysT  ;
 : testBasic basicT ;
