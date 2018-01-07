@@ -1,11 +1,11 @@
 5 
-hex
 'true 1 const
 'false 0 const
 'on true const
 'off false const
 // asm constants
 // mod values
+decimal
 "REG" 3 const  
 "MEM8" 1 const
 "MEM32" 2 const

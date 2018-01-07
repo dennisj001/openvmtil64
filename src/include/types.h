@@ -471,7 +471,7 @@ typedef struct
     byte *ActualCodeStart ;
     int8 Ttt ;
     int8 NegFlag, OverWriteSize ;
-    Word * LogicCodeWord, *LiteralWord, *LastWord ;
+    Word * LogicCodeWord, *LastWord ;
     Namespace * LocalsNamespace ;
 } BlockInfo ;
 typedef struct
@@ -807,6 +807,7 @@ typedef struct _CfrTil
     Cpu * cs_Cpu2 ;
     block CurrentBlock, SaveCpuState, SaveCpu2State, RestoreCpuState, RestoreCpu2State, CallCfrTilWord, CallCurrentBlock, RestoreSelectedCpuState, SaveSelectedCpuState ; //, SyncDspToEsi, SyncEsiToDsp ;
     block Set_CfrTilRspReg_FromReturnStackPointer, Set_ReturnStackPointer_FromCfrTilRspReg, Set_DspReg_FromDataStackPointer, Set_DataStackPointer_FromDspReg ; //, PeekReg, PokeReg ;
+    block PopDspToR8AndCall ;
     ByteArray * PeekPokeByteArray ;
     Word * LastFinishedWord, *StoreWord, *PokeWord, *ScoOcCrw, *DebugWordListWord, *EndBlockWord, *BeginBlockWord ;
     byte ReadLine_CharacterTable [ 256 ] ;

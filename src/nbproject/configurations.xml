@@ -145,6 +145,8 @@
           <preBuildCommand></preBuildCommand>
         </preBuild>
       </makefileType>
+      <item path="../.init.cft" ex="false" tool="0" flavor2="0">
+      </item>
       <item path="basis/_debug.c" ex="false" tool="0" flavor2="3">
         <cTool flags="1">
           <incDir>

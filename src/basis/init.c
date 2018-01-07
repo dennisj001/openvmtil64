@@ -124,6 +124,7 @@ CfrTil_AddCPrimitives ( )
         CPrimitive p = CPrimitives [ i ] ;
         _CfrTil_CPrimitiveNewAdd ( p.ccp_Name, p.blk_Definition, p.ui64_CAttribute, p.ui64_CAttribute2, p.ui64_LAttribute, ( char* ) p.NameSpace, ( char* ) p.SuperNamespace ) ;
     }
+    //_CfrTil_CPrimitiveNewAdd ( p.ccp_Name, p.blk_Definition, p.ui64_CAttribute, p.ui64_CAttribute2, p.ui64_LAttribute, ( char* ) p.NameSpace, ( char* ) p.SuperNamespace ) ;
 }
 
 void
@@ -203,6 +204,8 @@ CfrTil_MachineCodePrimitive_AddWords ( CfrTil * cfrTil )
     // this form (below) can and should replace the above form for adding here
     _CfrTil_MachineCodePrimitive_NewAdd ( "set_DataStackPointer_FromDspReg", CPRIMITIVE, & cfrTil->Set_DataStackPointer_FromDspReg, ( byte* ) Compile_Set_DataStackPointer_FromDspReg, -1, "System", "Root" ) ;
     _CfrTil_MachineCodePrimitive_NewAdd ( "set_DspReg_FromDataStackPointer", CPRIMITIVE, & cfrTil->Set_DspReg_FromDataStackPointer, ( byte* ) Compile_Set_DspReg_FromDataStackPointer, -1, "System", "Root" ) ;
+    //{ "popDspToR8AndCall", CPRIMITIVE, 0, ( byte* ) _Compile_PopDspToR8AndCall, - 1, "System", "Root" },
+    _CfrTil_MachineCodePrimitive_NewAdd ( "popDspToR8AndCall", CPRIMITIVE, & cfrTil->PopDspToR8AndCall, ( byte* ) Compile_PopDspToR8AndCall, -1, "System", "Root" ) ;
 }
 
 

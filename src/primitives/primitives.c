@@ -637,6 +637,7 @@ MachineCodePrimitive MachineCodePrimitives [] = {
     { "rspReg>", CPRIMITIVE, 0, ( byte* ) _Compile_RspReg_From, - 1, "System", "Root" },
     { "rspRegdrop", CPRIMITIVE, 0, ( byte* ) _Compile_RspReg_Drop, - 1, "Debug", "Root" },
     { "rspReg!", CPRIMITIVE, 0, ( byte* ) _Compile_RspReg_Store, - 1, "System", "Root" },
+    //{ "popDspToR8AndCall", CPRIMITIVE, 0, ( byte* ) _Compile_PopDspToR8AndCall, - 1, "System", "Root" },
     { 0 }
 } ;
 

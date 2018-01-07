@@ -337,26 +337,16 @@ _CheckOptimizeOperands ( Compiler * compiler, int64 maxOperands )
                         }
                         return i ;
                     }
-                    case ( OP_LC << ( 3 * O_BITS ) | OP_VAR << ( 2 * O_BITS ) | OP_FETCH << ( 1 * O_BITS ) | OP_UNORDERED ):
                     case ( OP_LC << ( 3 * O_BITS ) | OP_VAR << ( 2 * O_BITS ) | OP_FETCH << ( 1 * O_BITS ) | OP_ORDERED ):
+                    {
+                        if ( optInfo->O_three->W_Value >= 0x100000000 ) return 0 ;
+                        else goto unordered ;
+                    }
+                    case ( OP_LC << ( 3 * O_BITS ) | OP_VAR << ( 2 * O_BITS ) | OP_FETCH << ( 1 * O_BITS ) | OP_UNORDERED ):
                     case ( OP_LC << ( 3 * O_BITS ) | OP_VAR << ( 2 * O_BITS ) | OP_FETCH << ( 1 * O_BITS ) | OP_LOGIC ):
                     case ( OP_LC << ( 3 * O_BITS ) | OP_VAR << ( 2 * O_BITS ) | OP_FETCH << ( 1 * O_BITS ) | OP_DIVIDE ):
-#if 0                        
                     {
-                        SetHere ( optInfo->O_three->Coding ) ;
-                        _Compile_GetVarLitObj_RValue_To_Reg ( optInfo->O_three, ACC ) ;
-                        if ( optInfo->O_zero->CAttribute & CATEGORY_OP_DIVIDE )
-                        {
-                            _Compile_GetVarLitObj_RValue_To_Reg ( optInfo->O_two, OP_REG ) ;
-                            optInfo->Optimize_Rm = OP_REG ;
-                        }
-                        optInfo->Optimize_Dest_RegOrMem = REG ;
-                        optInfo->Optimize_Mod = REG ;
-                        //optInfo->Optimize_Reg = ACC ;
-                        return i ;
-                    }
-#else
-                    {
+                        unordered :
                         SetHere ( optInfo->O_three->Coding ) ;
                         if ( optInfo->O_zero->CAttribute & CATEGORY_OP_DIVIDE )
                         {
@@ -366,16 +356,15 @@ _CheckOptimizeOperands ( Compiler * compiler, int64 maxOperands )
                         }
                         else
                         {
-                            _Compile_GetVarLitObj_RValue_To_Reg ( optInfo->O_two, ACC ) ;
                             _GetRmDispImm ( optInfo, optInfo->O_three, OREG ) ;
-                            optInfo->Optimize_Rm = ACC ;
-                            optInfo->Optimize_Reg = ACC ;
+                            _Compile_GetVarLitObj_RValue_To_Reg ( optInfo->O_two, ACC ) ;
+                            optInfo->Optimize_Rm = OREG ; 
+                            optInfo->Optimize_Reg = ACC ; //OREG ;
                         }
                         optInfo->Optimize_Dest_RegOrMem = REG ;
                         optInfo->Optimize_Mod = REG ;
                         return i ;
                     }
-#endif                    
                         // ?? assume correct first operand is there TOS - it would already be a user error if they were not ??
 #if 0 // something else needed here
                     case ( OP_VAR << ( 2 * O_BITS ) | OP_FETCH << ( 1 * O_BITS ) | OP_UNORDERED ):
@@ -889,16 +878,13 @@ _CheckOptimizeOperands ( Compiler * compiler, int64 maxOperands )
                         SetHere ( optInfo->O_two->Coding ) ;
                         //if ( optInfo->O_two->CAttribute & REGISTER_VARIABLE ) compiler->optInfo->Optimize_Dest_RegOrMem = REG ;
                         //else optInfo->Optimize_Dest_RegOrMem = MEM ;
-                        //if ( ( optInfo->O_zero->Definition == CfrTil_MultiplyEqual ) || ( optInfo->O_zero->Definition == CfrTil_DivideEqual ) )
-                        int8 reg ;
-                        if ( ( optInfo->O_zero->Definition == CfrTil_DivideEqual ) ) reg = ACC ; // div always uses RAX/RDX
-                        else reg = ACC ;
-                        if ( ! ( optInfo->O_two->CAttribute & REGISTER_VARIABLE ) ) _Compile_GetVarLitObj_LValue_To_Reg ( optInfo->O_two, reg ) ;
-                        _GetRmDispImm ( optInfo, optInfo->O_two, - 1 ) ;
-                        Set_SCA ( 1 ) ;
+                        if ( ( optInfo->O_zero->Definition == CfrTil_MultiplyEqual ) || ( optInfo->O_zero->Definition == CfrTil_DivideEqual ) )
+                        {
+                            if ( ! ( optInfo->O_two->CAttribute & REGISTER_VARIABLE ) ) _Compile_GetVarLitObj_LValue_To_Reg ( optInfo->O_two, ACC ) ;
+                        }
+                        else _GetRmDispImm ( optInfo, optInfo->O_two, - 1 ) ;
                         _GetRmDispImm ( optInfo, optInfo->O_one, - 1 ) ;
                         optInfo->Optimize_Dest_RegOrMem = REG ;
-                        Set_SCA ( 0 ) ;
                         return ( i | OPTIMIZE_RESET ) ;
                     }
                     case ( OP_VAR << ( 3 * O_BITS ) | OP_FETCH << ( 2 * O_BITS ) | OP_DIVIDE << ( 1 * O_BITS ) | OP_EQUAL ):
@@ -1129,9 +1115,11 @@ _CheckOptimizeOperands ( Compiler * compiler, int64 maxOperands )
                             }
                             else
                             {
-                                _Compile_GetVarLitObj_RValue_To_Reg ( optInfo->O_two, ACC ) ; //optInfo->O_two->RegToUse ? optInfo->O_two->RegToUse : R8 ) ;
-                                //_GetRmDispImm ( optInfo, optInfo->O_two, - 1 ) ;
-                                _GetRmDispImm ( optInfo, optInfo->O_one, - 1 ) ;
+                                _Compile_GetVarLitObj_RValue_To_Reg ( optInfo->O_two, ACC ) ;
+                                _Compile_GetVarLitObj_RValue_To_Reg ( optInfo->O_one, OREG ) ;
+                                optInfo->Optimize_Mod = REG ;
+                                optInfo->Optimize_Reg = ACC ;
+                                optInfo->Optimize_Rm = OREG ;
                                 optInfo->Optimize_Dest_RegOrMem = REG ;
                             }
                             return i ;

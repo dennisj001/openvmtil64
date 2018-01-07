@@ -9,7 +9,6 @@
           <in>bits.c</in>
           <in>blocks.c</in>
           <in>combinators.c</in>
-          <in>cpu.back1.c</in>
           <in>cpu.c</in>
           <in>locals.c</in>
           <in>logic.c</in>
@@ -152,7 +151,7 @@
         </gdb_signals>
         <gdb_options>
           <DebugOptions>
-            <option name="debug_dir" value="/home/dennisj/openvmtil64"/>
+            <option name="debug_dir" value="/media/sdc4/dennisj/openvmtil64"/>
           </DebugOptions>
         </gdb_options>
         <gdb_buildfirst gdb_buildfirst_overriden="false" gdb_buildfirst_old="false"/>
@@ -181,14 +180,14 @@
         </loadobjs>
       </dbxrtc>
       <nativedebugger version="1">
-        <engine>gdb</engine>
+        <engine>dbx</engine>
       </nativedebugger>
       <runprofile version="9">
         <runcommandpicklist>
           <runcommandpicklistitem>"${OUTPUT_PATH}"</runcommandpicklistitem>
         </runcommandpicklist>
         <runcommand>"${OUTPUT_PATH}"</runcommand>
-        <rundir>/home/dennisj/openvmtil64</rundir>
+        <rundir>/media/sdc4/dennisj/openvmtil64</rundir>
         <buildfirst>false</buildfirst>
         <terminal-type>0</terminal-type>
         <remove-instrumentation>0</remove-instrumentation>

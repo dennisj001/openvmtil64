@@ -103,12 +103,12 @@ void
 Debugger_DisassembleTotalAccumulated ( Debugger * debugger )
 {
     _Printf ( ( byte* ) "\nDisassembling the current word : \'%s\' : total accumulated code ...", _Context_->Compiler0->CurrentWordCompiling ? _Context_->Compiler0->CurrentWordCompiling->Name : ( byte* ) "" ) ;
-    byte * address ;
-    if ( ! ( Here - ( address = _Context_->Compiler0->InitHere ) ) )
+    byte * address = _Context_->Compiler0->InitHere ;
+    if ( ! ( Here - address ) )
     {
         address = ( byte* ) _CfrTil_->LastFinishedWord->Definition ;
     }
     int64 size = Here - address ;
-    _Debugger_Disassemble ( debugger, address, size, 1 ) ;
+    _Debugger_Disassemble ( debugger, address, size, !Compiling ) ;
 }
 

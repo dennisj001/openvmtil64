@@ -39,6 +39,7 @@ CfrTil_TEST ( )
 }
  */
 
+// opCodes TEST NOT NEG MUL DIV IMUL IDIV // group 3 - F6-F7
 void
 Compile_X_Group3 ( Compiler * compiler, int64 code ) //OP_1_ARG
 {

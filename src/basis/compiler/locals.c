@@ -37,7 +37,7 @@ _Compiler_AddLocalFrame ( Compiler * compiler )
     _Compile_LEA ( FP, DSP, 0, LocalVarIndex_Disp ( 1 ) ) ; // set new fp
     Compile_ADDI ( REG, DSP, 0, ( compiler->LocalsFrameSize + 1 ) * CELL, INT32_SIZE ) ; // 1 : fp - add stack frame -- this value is going to be reset 
     compiler->FrameSizeCellOffset = ( int64* ) ( Here - INT32_SIZE ) ; // in case we have to add to the framesize with nested locals
-    //if ( IsSourceCodeOn ) _Compile_Stack_Push ( DSP, ( int64 ) Here ) ; // lets us see the functions on the stack
+    d1 ( if ( IsSourceCodeOn ) Compile_Call ( ( byte* ) CfrTil_Debugger_Locals_Show ) ) ;
 }
 
 void

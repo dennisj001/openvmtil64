@@ -91,6 +91,7 @@ Compile_Cmp_Set_tttn_Logic ( Compiler * compiler, int64 ttt, int64 negateFlag )
 {
     //SC_ForcePush ( _Context_->CurrentlyRunningWord ) ;
     //SC_SetForcePush ( true ) ;
+    int8 reg = ACC ;
     int64 optFlag = CheckOptimize ( compiler, 5 ) ;
 #define dbgON_13 0
 #if dbgON_13    
@@ -118,9 +119,18 @@ Compile_Cmp_Set_tttn_Logic ( Compiler * compiler, int64 ttt, int64 negateFlag )
             }
             else
             {
+                int64 size ;
+                if ( compiler->optInfo->Optimize_Imm >= 0x100000000 )
+                {
+                    // considering _Compile_X_Group1_Immediate ( int8 code, int8 mod, int8 rm, int64 disp, uint64 imm, int8 iSize ) with size == 8
+                    size = 8 ;
+                    //negateFlag = ! negateFlag ;
+                    //reg = OREG2 ;
+                }
+                else size = 0 ;
+                //_DBI_ON ;
                 // Compile_CMPI( mod, operandReg, offset, immediateData, size
-                if ( compiler->optInfo->Optimize_Imm >= 0x100000000 ) ;
-                else Compile_CMPI ( compiler->optInfo->Optimize_Mod, compiler->optInfo->Optimize_Rm, compiler->optInfo->Optimize_Disp, compiler->optInfo->Optimize_Imm, 0 ) ;
+                Compile_CMPI ( compiler->optInfo->Optimize_Mod, compiler->optInfo->Optimize_Rm, compiler->optInfo->Optimize_Disp, compiler->optInfo->Optimize_Imm, size ) ;
             }
         }
         else
@@ -138,9 +148,11 @@ Compile_Cmp_Set_tttn_Logic ( Compiler * compiler, int64 ttt, int64 negateFlag )
         _Compile_Stack_DropN ( DSP, 2 ) ; // before cmp 
         Compile_CMP ( REG, REG, ACC, OP_REG, 0, 0, CELL ) ;
     }
-    _Compile_SET_tttn_REG ( ttt, negateFlag, ACC ) ; // immediately after the 'cmp' insn which changes the flags appropriately
-    _Compile_MOVZX_REG ( ACC ) ;
-    _Compiler_CompileAndRecord_PushAccum ( compiler ) ;
+    _Compile_SET_tttn_REG ( ttt, negateFlag, reg ) ; // immediately after the 'cmp' insn which changes the flags appropriately
+    _Compile_MOVZX_REG ( reg ) ;
+    //_Compiler_CompileAndRecord_PushAccum ( compiler ) ;
+    _Word_CompileAndRecord_PushReg ( Compiler_WordList ( 0 ), reg ) ;
+    //DBI_OFF ;
 #if dbgON_13    
     d1 ( //if ( DBI )
     {
@@ -225,7 +237,7 @@ Compile_CheckReConfigureLogicInBlock ( BlockInfo * bi, int8 overwriteFlag )
                 int64 n ;
                 _Compile_Return ( ) ;
                 bi->bp_Last = Here ;
-                for ( n = bi->OverWriteSize - 1 ; n ; n -- ) _Compile_Noop ( ) ; // adjust so Disassemble doesn't get an "invalid" insn; we overwrite a 3 byte insn ( 0fb6c0 : movzx eax, al ) with RET NOP NOP
+                for ( n = bi->OverWriteSize ; n > 0 ; n -- ) _Compile_Noop ( ) ; // adjust so Disassemble doesn't get an "invalid" insn; we overwrite a 3 byte insn ( 0fb6c0 : movzx eax, al ) with RET NOP NOP
                 SetHere ( saveHere ) ;
             }
             return true ;
@@ -241,23 +253,25 @@ Compile_CheckReConfigureLogicInBlock ( BlockInfo * bi, int8 overwriteFlag )
 void
 _Compile_LogicResult ( int64 reg )
 {
-    // return 0 in R8 :
+    // return 0 in reg :
     _Compile_MoveImm_To_Reg ( reg, 0, CELL_SIZE ) ; // 6 bytes
     _Compile_JumpWithOffset ( 10 ) ; // 6 bytes
 
-    //return 1 in R8 :
+    //return 1 in reg :
     _Compile_MoveImm_To_Reg ( reg, 1, CELL_SIZE ) ;
+    BlockInfo *bi = ( BlockInfo * ) _Stack_Top ( _Compiler_->CombinatorBlockInfoStack ) ;
+    bi->LogicCode = Here ; // used by combinators
 }
 
 void
 _Compile_LogicalAnd ( Compiler * compiler )
 {
-    Compile_BlockInfoTestLogic ( compiler, OP_REG, NZ ) ;
+    Compile_BlockInfoTestLogic ( compiler, OP_REG, Z ) ;
     Compile_JCC ( Z, ZERO_TTT, Here + 15 ) ; // if eax is zero return not(R8) == 1 else return 0
     Compile_BlockInfoTestLogic ( compiler, ACC, NZ ) ;
     Compile_JCC ( NZ, ZERO_TTT, Here + 21 ) ; // if eax is zero return not(R8) == 1 else return 0
     _Compile_LogicResult ( ACC ) ;
-    _Compiler_CompileAndRecord_PushAccum ( compiler ) ;
+    _Word_CompileAndRecord_PushReg ( Compiler_WordList ( 0 ), ACC ) ;
 }
 
 void
@@ -287,7 +301,7 @@ _Compile_LogicalNot ( Compiler * compiler )
     Compile_BlockInfoTestLogic ( compiler, ACC, Z ) ;
     Compile_JCC ( Z, ZERO_TTT, Here + 21 ) ; // if eax is zero return not(R8) == 1 else return 0
     _Compile_LogicResult ( ACC ) ;
-    _Compiler_CompileAndRecord_PushAccum ( compiler ) ;
+    _Word_CompileAndRecord_PushReg ( Compiler_WordList ( 0 ), ACC ) ;
     //DBI_OFF ;
 }
 
@@ -389,8 +403,7 @@ Compile_Logical_X ( Compiler * compiler, int64 op )
     {
         // TODO : this optimization somehow is *very* little used, why is that ?!? 
         // assumes we have unordered operands in eax, ecx
-        _Compile_X_Group1 ( op, REG, REG, ACC, OP_REG, 0, 0, CELL ) ;
-
+        _Compile_X_Group1 ( op, REG, REG, ACC, OREG, 0, 0, CELL ) ;
         Compile_TestLogicAndStackPush ( compiler, ACC, NZ ) ;
     }
     else

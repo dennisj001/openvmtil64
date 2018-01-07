@@ -56,6 +56,7 @@ CfrTil_Interpret_C_Block ( Boolean takesLParenAsBlock, Boolean semicolonWillAlso
     Context * cntx = _Context_ ;
     Compiler * compiler = cntx->Compiler0 ;
     Interpreter * interp = cntx->Interpreter0 ;
+    BlockInfo * bi ;
     Word * word ;
     int64 blocksParsed ;
     byte * token ;
@@ -64,11 +65,10 @@ CfrTil_Interpret_C_Block ( Boolean takesLParenAsBlock, Boolean semicolonWillAlso
     if ( beginBlockFlag )
     {
         // ? source code adjustments ?
-        if ( takesLParenAsBlock ) _CfrTil_->BeginBlockWord->Name = "(" ;
-        _CfrTil_->BeginBlockWord->W_SC_ScratchPadIndex = 0 ;
+        //if ( takesLParenAsBlock ) _CfrTil_->BeginBlockWord->Name = "(" ;
         _CfrTil_->BeginBlockWord->W_TokenStart_ReadLineIndex = _Lexer_->TokenStart_ReadLineIndex ;
-        Word_Eval ( _CfrTil_->BeginBlockWord ) ;
-        _CfrTil_->BeginBlockWord->Name = "{" ;
+        _Interpreter_DoWord_Default ( interp, _CfrTil_->BeginBlockWord, _CfrTil_->SC_ScratchPadIndex ) ;
+        //_CfrTil_->BeginBlockWord->Name = "{" ;
     }
     for ( blocksParsed = 0 ; token = Lexer_ReadToken ( cntx->Lexer0 ) ; )
     {
@@ -76,26 +76,27 @@ CfrTil_Interpret_C_Block ( Boolean takesLParenAsBlock, Boolean semicolonWillAlso
         {
             leftBracketParsed = 0 ;
             semicolonWillAlsoEndBlock = false ;
+            _CfrTil_->EndBlockWord->Name = "}" ;
             goto endblock ;
         }
         else if ( String_Equal ( ( char* ) token, ")" ) && takesLParenAsBlock && compiler->InLParenBlock )
         {
             compiler->InLParenBlock = false ;
             _CfrTil_->EndBlockWord->Name = ")" ;
-            _CfrTil_->EndBlockWord->W_SC_ScratchPadIndex = 0 ;
-            _CfrTil_->EndBlockWord->W_TokenStart_ReadLineIndex = _Lexer_->TokenStart_ReadLineIndex ;
-            Word_Eval ( _CfrTil_->EndBlockWord ) ;
-            _CfrTil_->EndBlockWord->Name = "}" ;
-            goto endblock2 ;
+            goto endblock ;
         }
         else if ( String_Equal ( ( char* ) token, ";" ) )
         {
             List_InterpretLists ( compiler->PostfixLists ) ;
             if ( semicolonWillAlsoEndBlock )
             {
+                _CfrTil_->EndBlockWord->Name = ";" ;
 endblock:
-                _CfrTil_->EndBlockWord->W_SC_ScratchPadIndex = 0 ;
-                Word_Eval ( _CfrTil_->EndBlockWord ) ;
+                bi = ( BlockInfo* ) _Stack_Top ( _Compiler_->BlockStack ) ;
+                bi->LogicCodeWord = word ;
+                _CfrTil_->EndBlockWord->W_TokenStart_ReadLineIndex = _Lexer_->TokenStart_ReadLineIndex ;
+                _Interpreter_DoWord_Default ( interp, _CfrTil_->EndBlockWord, _CfrTil_->SC_ScratchPadIndex ) ;
+                _CfrTil_->EndBlockWord->Name = "}" ;
 endblock2:
                 CfrTil_ClearTokenList ( ) ;
                 blocksParsed ++ ;
@@ -110,7 +111,6 @@ endblock2:
             while ( compiler->InLParenBlock ) blocksParsed += CfrTil_Interpret_C_Block ( 1, 1, 1 ) ; //semicolonWillAlsoEndBlock in case of a 'for' block
             if ( _Context_StrCmpNextToken ( _Context_, ( byte* ) "{" ) )//&& (!inLParenBlock) ) 
             {
-                //CfrTil_Interpret_C_Block ( Boolean takesLParenAsBlock, Boolean semicolonWillAlsoEndBlock, Boolean beginBlockFlag )
                 blocksParsed += CfrTil_Interpret_C_Block ( 0, 1, 1 ) ; //semicolonWillAlsoEndBlock for 'for' blocks
             }
             break ;
@@ -122,25 +122,17 @@ endblock2:
         }
         else
         {
-            //word = Interpreter_InterpretAToken ( interp, token, - 1 ) ;
             word = _Interpreter_TokenToWord ( interp, token ) ;
             if ( word )
             {
                 _Interpreter_DoWord ( interp, word, - 1 ) ;
-                if ( ( blocksParsed < 2 ) && ( word->CAttribute & LITERAL ) && ( ! Is_LValue ( word ) ) ) //GetState ( cntx, C_LHS ) )
-                {
-                    // this block is used in eg. interpret.cft
-                    // setup for optimization if this literal constant is the loop conditional
-                    BlockInfo * bi = ( BlockInfo* ) _Stack_Top ( _Compiler_->BlockStack ) ;
-                    bi->LiteralWord = word ;
-                    //bi->LiteralWord = bi->LogicCodeWord = word ;
-                }
-                else if ( word->CAttribute & COMBINATOR )
+                if ( word->CAttribute & COMBINATOR )
                 {
                     if ( beginBlockFlag && semicolonWillAlsoEndBlock )
                     {
                         goto endblock ;
                     }
+                    //else return ++blocksParsed ;
                 }
             }
         }
@@ -185,32 +177,15 @@ _CfrTil_C_Infix_EqualOp ( Word * opWord )
     d0 ( if ( Is_DebugModeOn ) Compiler_Show_WordList ( "\nCfrTil_C_Infix_EqualOp : before pop 2 words" ) ) ;
     if ( opWord ) _CfrTil_WordList_PopWords ( 2 ) ;
     d0 ( if ( Is_DebugModeOn ) Compiler_Show_WordList ( "\nCfrTil_C_Infix_Equal0p : before interpret until ',' or ';' :" ) ) ;
-    //if ( GetState ( compiler, C_COMBINATOR_LPAREN ) ) token = _Interpret_Until_Token ( interp, ( byte* ) ")", 0 ) ;
     d0 ( if ( Is_DebugOn ) CfrTil_Using ( ) ) ;
     token = _Interpret_C_Until_EitherToken ( interp, ( byte* ) ";", ( byte* ) ",", ( byte* ) ")", ( byte* ) " \n\r\t" ) ;
-    //List_InterpretLists ( _Compiler_->PostfixLists ) ;
     _CfrTil_AddTokenToHeadOfTokenList ( token ) ; // so the callee can check/use or use
     d0 ( if ( Is_DebugModeOn ) Compiler_Show_WordList ( "\nCfrTil_C_Infix_EqualOp : after interpret until ';' :" ) ) ;
     if ( lhsWord )
     {
-#if 0        
-        if ( opWord )
-        {
-            _Interpreter_DoWord_Default ( interp, lhsWord, 0 ) ;
-        }
-        else
-        {
-            _CfrTil_WordList_PushWord ( lhsWord ) ;
-            d0 ( if ( Is_DebugModeOn ) Compiler_Show_WordList ( "\nCfrTil_C_Infix_EqualOp : after interpret until ';' :" ) ) ;
-        }
-#else
         SetState ( cntx, C_SYNTAX, false ) ; // we don't want to just set compiler->LHS_Word
-        //_CfrTil_WordList_PushWord ( lhsWord ) ;
         _Interpreter_DoWord_Default ( interp, lhsWord, lhsWord->W_SC_WordIndex ) ;
-        //_Compile_GetVarLitObj_LValue_To_Reg ( lhsWord, ACC ) ;
-        //_Word_CompileAndRecord_PushReg ( lhsWord, ( lhsWord->CAttribute & REGISTER_VARIABLE ) ? lhsWord->RegToUse : ACC ) ;
         SetState ( cntx, C_SYNTAX, true ) ;
-#endif        
         word0 = _CfrTil_->StoreWord ;
     }
     else
@@ -230,8 +205,6 @@ _CfrTil_C_Infix_EqualOp ( Word * opWord )
     d1 ( if ( Is_DebugModeOn ) Compiler_Show_WordList ( "\nCfrTil_C_Infix_EqualOp : after interpret until ';' :" ) ) ;
     _Interpreter_DoWord_Default ( interp, rword, svscwi ) ;
     rword->Name = svName ;
-    //_DEBUG_SHOW ( opWord ? opWord : word, 1 ) ;
-    //SetState ( _Debugger_, DEBUG_SHTL_OFF, true ) ; // ?? : is this still needed (it was above, before) since we just temporarily adjusted the name
     if ( GetState ( compiler, C_COMBINATOR_LPAREN ) )
     {
         if ( word0->StackPushRegisterCode ) SetHere ( word0->StackPushRegisterCode ) ; // this is the usual after '=' in non C syntax; assuming optimizeOn
@@ -239,8 +212,6 @@ _CfrTil_C_Infix_EqualOp ( Word * opWord )
     }
     List_InterpretLists ( compiler->PostfixLists ) ;
     compiler->LHS_Word = 0 ;
-    //Interpreter_InterpretAToken ( interp, token, - 1 ) ;
-
     if ( ! Compiling ) CfrTil_InitSourceCode ( _CfrTil_ ) ;
     SetState ( _Debugger_, DEBUG_SHTL_OFF, false ) ;
     SetState ( compiler, C_INFIX_EQUAL, false ) ;

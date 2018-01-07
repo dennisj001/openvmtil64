@@ -130,6 +130,15 @@ _Compile_DebugRuntimeBreakpoint ( ) // where we want the acquired pointer
     Compile_Call ( ( byte* ) CfrTil_DebugRuntimeBreakpoint ) ;
 }
 
+void
+Compile_PopDspToR8AndCall ()
+{
+    // from x64.cft
+    //Compile_Stack_Pop_R8D ( ) ;
+    //_Compile_CALL_Reg ( R8D ) ;
+    _Compile_Stack_PopToReg ( DSP, R8 ) ;
+    _Compile_CallThruReg ( R8 ) ;
+}
 #if 0
 
 void

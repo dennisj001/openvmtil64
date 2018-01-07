@@ -74,7 +74,6 @@ _Debugger_CompileOneInstruction ( Debugger * debugger, byte * jcAddress )
     byte * newDebugAddress ;
     int64 size ;
     Word * word = 0 ;
-start:
     size = Debugger_Udis_GetInstructionSize ( debugger ) ;
     if ( jcAddress ) // jump or call address
     {
@@ -121,11 +120,6 @@ into:
                 if ( _Q_->Verbosity > 1 ) _Word_ShowSourceCode ( word ) ;
                 _Printf ( ( byte* ) "\nstepping into a cfrtil compiled function : %s : .... :>", word ? ( char* ) c_gd ( word->Name ) : "" ) ;
                 _Stack_Push ( debugger->ReturnStack, ( int64 ) ( debugger->DebugAddress + size ) ) ; // the return address
-                if ( GetState ( debugger, DBG_AUTO_MODE ) )
-                {
-                    Compile_Call ( (byte*) CfrTil_Debugger_Locals_Show ) ;
-                    //SetState ( debugger, DBG_STEPPING|DBG_AUTO_MODE, off ) ;
-                }
                 // push the return address this time around; next time code at newDebugAddress will be processed
                 // when ret is the insn Debugger_StepOneInstruction will handle it 
             }

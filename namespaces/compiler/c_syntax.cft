@@ -444,6 +444,6 @@ c_syntaxOff
 #endif // if 0 : endif
 sp
 dbgOff verbosity 1 =
-s: hi ( a b | c ) c a @ b @ + = printf ("\n%d", c ) ;s 1 2 hi 
+d: s: hi ( a b | c ) c a @ b @ + = d: printf ("\n%d", c ) ;s 1 2 d: hi 
 2 + 7 assertStkChk // stack checking
 

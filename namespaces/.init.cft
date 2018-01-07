@@ -255,7 +255,7 @@ System
 dscOn //verbosity 3 =
 #endif
 : _assert0 ( n m ) { n @ m @ != } { nl location hex n @ p "!=" ps m @ p "<:" ps "Error!" adps _info _pause } { } ifElse ;
-: _assert ( n m ) nl location "- _assert ::" ps { n @ m @ != } { hex n @ p "!=" ps m @ p "<:" ps "Error!" adps _info _pause } { " ok" ps } ifElse ;
+: _assert ( n m ) nl location "- _assert ::" ps { n @ m @ != } { hex n @ p "!=" ps m @ p "<:" ps "Error!" adps _info _pause } { " ok" ps nl } ifElse ;
 : _assert1 ( n m str ) { n @ m @ != } { str @ ps "error" ps _info _pause } if ;
 //: assert1 ( n m str ) location { n @ m @ != } { nl str @ ps ":>" ps hex n @ p "!=" ps m @ p "<:" ps "Error!" adps _info _pause } { str @ ps "ok\n" ps } ifElse ;
 : assert1 ( n m str ) location { n @ m @ != } { nl str @ ps ":>" ps hex n @ p "!=" ps m @ p "<:" ps "Error!" adps _info _pause } { str @ ps "ok\n" ps } ifElse ;
@@ -362,6 +362,7 @@ stringMacrosOn
 : testCfrTil "namespaces/init.cft" include ;
 dbgOff
 dbgOn
+
 #if dbgOnVar @ 
 Root 'doScript 1 const
 System

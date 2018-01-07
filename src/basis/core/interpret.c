@@ -48,7 +48,7 @@ _Interpreter_DoWord ( Interpreter * interp, Word * word, int64 tokenStartReadLin
     {
         Context * cntx = _Context_ ;
         int64 tsrli ;
-        _Compiler_->SaveScratchPadIndex = word->W_SC_ScratchPadIndex ; // = _CfrTil_->SC_ScratchPadIndex ;
+        _Compiler_->SaveScratchPadIndex = word->W_SC_ScratchPadIndex = _CfrTil_->SC_ScratchPadIndex ;
         if ( tokenStartReadLineIndex <= 0 )
         {
             tsrli = _Lexer_->TokenStart_ReadLineIndex ;
@@ -65,7 +65,7 @@ _Interpreter_DoWord ( Interpreter * interp, Word * word, int64 tokenStartReadLin
             Finder_SetNamedQualifyingNamespace ( cntx->Finder0, ( byte* ) "Infix" ) ;
             Interpreter_InterpretNextToken ( interp ) ;
             // then continue and interpret this 'word' - just one out of lexical order
-            _Interpreter_DoWord_Default ( interp, word, 0 ) ;
+            _Interpreter_DoWord_Default ( interp, word, word->W_SC_ScratchPadIndex ) ;
             List_InterpretLists ( _Compiler_->PostfixLists ) ;
         }
         else if ( ( word->WAttribute == WT_PREFIX ) || _Interpreter_IsWordPrefixing ( interp, word ) ) // with this almost any rpn function can be used prefix with a following '(' :: this checks for that condition

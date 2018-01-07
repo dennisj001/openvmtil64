@@ -80,13 +80,6 @@ _Block_Copy ( byte * srcAddress, int64 bsize, int8 optFlag )
 void
 Block_Copy ( byte * dst, byte * src, int64 qsize )
 {
-#if 0    
-    if ( dst > src )
-    {
-        Error_Abort ( ( byte* ) "\nBlock_Copy :: Error : dst > src.\n" ) ;
-        //return ; // ?? what is going on here ??
-    }
-#endif    
     SetHere ( dst ) ;
     _Block_Copy ( src, qsize, 0 ) ;
 }
@@ -99,42 +92,22 @@ Block_CopyCompile_WithLogicFlag ( byte * srcAddress, int64 bindex, int64 jccFlag
     BlockInfo *bi = ( BlockInfo * ) _Stack_Pick ( compiler->CombinatorBlockInfoStack, bindex ) ; // -1 : remember - stack is zero based ; stack[0] is top
     if ( jccFlag )
     {
-        if ( ! ( _Q_->OVT_LC && GetState ( _Q_->OVT_LC, ( LC_COMPILE_MODE ) ) ) )
-        {
-            // this block is used in eg. interpret.cft
-            if ( bi->LiteralWord )//&& bi->LiteralWord->StackPushRegisterCode ) // leave value in ACCUM, don't push it
-            {
-                if ( bi->LiteralWord->W_Value != 0 )
-                {
-                    return 1 ; // nothing need to be compiled 
-                }
-                // else somehow don't use this block at all ie. eliminate the dead code and don't just ...
-                return 0 ; // TODO : don't use the block/combinator
-            }
-        }
         jccFlag2 = Compile_CheckReConfigureLogicInBlock ( bi, 1 ) ;
     }
-    //if ( ! GetState ( _CfrTil_, INLINE_ON ) ) Compile_Call ( srcAddress ) ;
-    //else
-    //{
     _Block_Copy ( srcAddress, bi->bp_Last - bi->bp_First, 0 ) ;
-    //}
     if ( jccFlag )
     {
-        Word * svcrw = _Context_->CurrentlyRunningWord ;
-        _Context_->CurrentlyRunningWord = _Context_->SC_CurrentCombinator ;
+#if 1       
         if ( jccFlag2 )
         {
-            //DBI_ON ;
             Compile_JCC ( negFlag ? bi->NegFlag : ! bi->NegFlag, bi->Ttt, 0 ) ;
-            //DBI_OFF ;
         }
         else
+#endif            
         {
             Compile_GetLogicFromTOS ( bi ) ;
             Compile_JCC ( negFlag, ZERO_TTT, 0 ) ;
         }
-        _Context_->CurrentlyRunningWord = svcrw ;
         Stack_PointerToJmpOffset_Set ( ) ;
     }
     return 1 ;
@@ -152,7 +125,6 @@ void
 BlockInfo_Set_tttn ( BlockInfo * bi, int8 ttt, int8 negFlag, int8 overWriteSize )
 {
     bi->LogicCode = Here ; // used by combinators
-    //Word * word =  //_Context_->CurrentlyRunningWord ;
     if ( ! GetState ( _Context_, C_SYNTAX ) ) bi->LogicCodeWord = Compiler_WordList ( 1 ) ;
     bi->Ttt = ttt ;
     bi->NegFlag = negFlag ;
@@ -305,6 +277,8 @@ _CfrTil_EndBlock1 ( BlockInfo * bi )
             bi->bp_First = bi->Start ; //bi->AfterFrame ; 
         }
         //d1 ( if ( Is_DebugOn) _Compile_Stack_Drop ( DSP ) ) ; // debugger->DebugAddress pushed on call
+        //_Block_Copy ( bi->bp_First, Here - bi->bp_First, 0 ) ; // would like to copy so we can optimze if no combinators in a word
+
     }
     _Compile_Return ( ) ;
     DataStack_Push ( ( int64 ) bi->bp_First ) ;
@@ -318,7 +292,7 @@ _CfrTil_EndBlock2 ( BlockInfo * bi )
 {
     Compiler * compiler = _Context_->Compiler0 ;
     compiler->BlockLevel -- ;
-    byte * bp_First = bi->bp_First ;
+    byte * first = bi->bp_First ;
     if ( ! _Stack_Depth ( compiler->BlockStack ) )
     {
         _CfrTil_InstallGotoCallPoints_Keyed ( bi, GI_GOTO | GI_RECURSE ) ;
@@ -333,7 +307,7 @@ _CfrTil_EndBlock2 ( BlockInfo * bi )
         //d1 ( _Printf ( ( byte* ) "\n\nleaving _CfrTil_EndBlock2 : blockStack depth = %d : %s : %s\n\n", _Stack_Depth ( compiler->BlockStack ), _Context_->CurrentlyRunningWord->Name, Context_Location ( ) ) ) ;
         _Namespace_RemoveFromUsingListAndClear ( bi->LocalsNamespace ) ; //_Compiler_FreeBlockInfoLocalsNamespace ( bi, compiler ) ;
     }
-    return bp_First ;
+    return first ;
 }
 
 byte *

@@ -108,7 +108,7 @@ _Compile_Move_Reg_To_StackNRm_UsingReg ( int8 stackReg, int64 index, int8 reg, i
 void
 _Compile_Stack_PushReg ( int8 stackReg, int8 reg )
 {
-    Compile_ADDI ( REG, stackReg, 0, sizeof (int64 ), 0 ) ;
+    Compile_ADDI ( REG, stackReg, 0, sizeof (int64 ), 1 ) ;
     _Compile_Move_Reg_To_StackN ( stackReg, 0, reg ) ;
 }
 
@@ -116,7 +116,7 @@ void
 _Compile_Stack_PopToReg ( int8 stackReg, int8 reg )
 {
     _Compile_Move_StackN_To_Reg ( reg, stackReg, 0 ) ;
-    Compile_SUBI ( REG, stackReg, 0, sizeof (int64 ), 0 ) ;
+    Compile_SUBI ( REG, stackReg, 0, sizeof (int64 ), 1 ) ;
 }
 
 void
