@@ -7,8 +7,8 @@ Compile_Test ( Compiler * compiler )
 {
     if ( CheckOptimizeOperands ( compiler, 5 ) )
     {
-        _Compile_Test ( compiler->optInfo->Optimize_Mod, compiler->optInfo->Optimize_Reg,
-                compiler->optInfo->Optimize_Rm, compiler->optInfo->Optimize_Disp, compiler->optInfo->Optimize_Imm ) ;
+        _Compile_Test ( compiler->OptInfo->Optimize_Mod, compiler->OptInfo->Optimize_Reg,
+                compiler->OptInfo->Optimize_Rm, compiler->OptInfo->Optimize_Disp, compiler->OptInfo->Optimize_Imm ) ;
     }
     else
     {
@@ -48,16 +48,19 @@ Compile_X_Group3 ( Compiler * compiler, int64 code ) //OP_1_ARG
     else if ( optFlag )
     {
         //_Compile_Group3 ( cell code, cell mod, cell rm, cell sib, cell disp, cell imm, cell size )
-        _Compile_Group3 ( code, compiler->optInfo->Optimize_Mod,
-            compiler->optInfo->Optimize_Rm, REX_B | MODRM_B, 0, compiler->optInfo->Optimize_Disp, compiler->optInfo->Optimize_Imm, 0 ) ;
-        if ( compiler->optInfo->Optimize_Rm != DSP ) // if the result is not already tos
+        _Compile_Group3 ( code, compiler->OptInfo->Optimize_Mod,
+            compiler->OptInfo->Optimize_Rm, REX_B | MODRM_B, 0, compiler->OptInfo->Optimize_Disp, compiler->OptInfo->Optimize_Imm, 0 ) ;
+        if ( compiler->OptInfo->Optimize_Rm != DSP ) // if the result is not already tos
         {
-            if ( compiler->optInfo->Optimize_Rm != ACC ) _Compile_Move_Rm_To_Reg ( ACC, compiler->optInfo->Optimize_Rm,
-                compiler->optInfo->Optimize_Disp ) ;
-            _Compiler_CompileAndRecord_PushAccum ( compiler ) ;
+            if ( compiler->OptInfo->Optimize_Rm != ACC ) _Compile_Move_Rm_To_Reg ( ACC, compiler->OptInfo->Optimize_Rm,
+                compiler->OptInfo->Optimize_Disp ) ;
+            Compiler_CompileAndRecord_PushAccum ( compiler ) ;
         }
     }
     else
+Berkeley Patients Group
+
+
     {
         _Compile_Group3 ( code, MEM, DSP, REX_B | MODRM_B, 0, 0, 0, 0 ) ;
     }
@@ -71,20 +74,20 @@ Compile_X_Shift ( Compiler * compiler, int64 op, int64 stackFlag )
     else if ( optFlag )
     {
         // _Compile_Group2 ( int64 mod, int64 regOpCode, int64 rm, int64 sib, cell disp, cell imm )
-        if ( compiler->optInfo->OptimizeFlag & OPTIMIZE_IMM )
+        if ( compiler->OptInfo->OptimizeFlag & OPTIMIZE_IMM )
         {
-            _Compile_Group2 ( compiler->optInfo->Optimize_Mod,
-                op, compiler->optInfo->Optimize_Rm, 0, compiler->optInfo->Optimize_Disp, compiler->optInfo->Optimize_Imm ) ;
+            _Compile_Group2 ( compiler->OptInfo->Optimize_Mod,
+                op, compiler->OptInfo->Optimize_Rm, 0, compiler->OptInfo->Optimize_Disp, compiler->OptInfo->Optimize_Imm ) ;
         }
-        else //if ( ( compiler->optInfo->Optimize_Imm == 0 ) && ( compiler->optInfo->Optimize_Rm != ACC ) ) // this logic is prototype maybe not precise 
+        else //if ( ( compiler->OptInfo->Optimize_Imm == 0 ) && ( compiler->OptInfo->Optimize_Rm != ACC ) ) // this logic is prototype maybe not precise 
         {
-            _Compile_Group2_CL ( MEM, op, compiler->optInfo->Optimize_Rm, 0, compiler->optInfo->Optimize_Disp ) ;
+            _Compile_Group2_CL ( MEM, op, compiler->OptInfo->Optimize_Rm, 0, compiler->OptInfo->Optimize_Disp ) ;
         }
-        if ( stackFlag && ( compiler->optInfo->Optimize_Rm != DSP ) ) // if the result is not already tos
+        if ( stackFlag && ( compiler->OptInfo->Optimize_Rm != DSP ) ) // if the result is not already tos
         {
-            if ( compiler->optInfo->Optimize_Rm != ACC ) _Compile_Move_Rm_To_Reg ( ACC, compiler->optInfo->Optimize_Rm,
-                compiler->optInfo->Optimize_Disp ) ;
-            _Compiler_CompileAndRecord_PushAccum ( compiler ) ;
+            if ( compiler->OptInfo->Optimize_Rm != ACC ) _Compile_Move_Rm_To_Reg ( ACC, compiler->OptInfo->Optimize_Rm,
+                compiler->OptInfo->Optimize_Disp ) ;
+            Compiler_CompileAndRecord_PushAccum ( compiler ) ;
         }
     }
     else
@@ -93,11 +96,14 @@ Compile_X_Shift ( Compiler * compiler, int64 op, int64 stackFlag )
         if ( one->CAttribute && LITERAL )
         {
             SetHere ( one->Coding ) ; 
-            _Compile_MoveImm_To_Reg ( RCX, one->W_Value, 4 ) ;
+            //_Compile_MoveImm_To_Reg ( RCX, one->W_Value, 4 ) ;
+            //_Compile_Group2 ( int64 mod, int8 regOpCode, int8 rm, int8 sib, int64 disp, int64 imm )
+            _Compile_Group2 ( MEM, op, DSP, 0, 0, one->W_Value ) ;
+            return ;
         }
         else if ( one->StackPushRegisterCode )
         {
-            SetHere ( one->StackPushRegisterCode ) ; // leave optInfo->O_two value in R8 we don't need to push it
+            SetHere ( one->StackPushRegisterCode ) ; // leave optInfo_0_two value in R8 we don't need to push it
             _Compile_Move_Reg_To_Reg ( RCX, one->RegToUse ) ;
         }
         else

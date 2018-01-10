@@ -614,7 +614,8 @@ typedef struct
     int64 Optimize_DstReg ;
     int64 UseReg ;
     int64 SpecialReg ;
-    Word *O_zero, * O_one, *O_two, *O_three, *O_four, *O_five, *O_six ;
+    //Word *O_zero, * O_one, *O_two, *O_three, *O_four, *O_five, *O_six ;
+    Word * COIW [8] ;
 } CompileOptimizeInfo ;
 typedef struct
 {
@@ -650,7 +651,7 @@ typedef struct
     dllist * GotoList ;
     dllist * CurrentSwitchList ;
     dllist * RegisterParameterList ;
-    CompileOptimizeInfo * optInfo ;
+    CompileOptimizeInfo * OptInfo ;
     Stack * CombinatorInfoStack ;
     Stack * PointerToOffset ;
     dllist * WordList, *PostfixLists ;

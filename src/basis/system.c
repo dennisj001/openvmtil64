@@ -162,7 +162,7 @@ CfrTil_system2 ( )
 {
     _Compile_Stack_PopToReg ( DSP, ACC ) ;
     _Compile_Stack_PopToReg ( DSP, RCX ) ;
-    _Compile_Stack_PopToReg ( DSP, OP_REG ) ;
+    _Compile_Stack_PopToReg ( DSP, OREG ) ;
     _Compile_INT80 ( ) ;
     _Compile_Stack_PushReg ( DSP, ACC ) ;
 }
@@ -172,7 +172,7 @@ CfrTil_system3 ( )
 {
     _Compile_Stack_PopToReg ( DSP, ACC ) ;
     _Compile_Stack_PopToReg ( DSP, RCX ) ;
-    _Compile_Stack_PopToReg ( DSP, OP_REG ) ;
+    _Compile_Stack_PopToReg ( DSP, OREG ) ;
     _Compile_Stack_PopToReg ( DSP, RDX ) ;
     _Compile_INT80 ( ) ;
     _Compile_Stack_PushReg ( DSP, ACC ) ;

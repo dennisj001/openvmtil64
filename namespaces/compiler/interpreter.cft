@@ -9,7 +9,7 @@ System Interpreter
 #define xhe0 "xhi1 ="  
 #define xhe1() nl ps 
 #define xhe12 ( s ) s nl ps 
-#define xhi2 ( n ) xhe1( xhe0 ) 1 2 \
+#define xhi2 ( n ) xhe12 ( xhe0 @ ) 1 2 \
             + n @ \
             + p // backslash also works like C #define 
 #define xhi2a ( s n ) xhe1( s @ ) 1 2 \
@@ -36,7 +36,7 @@ testc1 ( | atoken aword )
     ps ( "\ntdbg4 =" ) ; p ( tdbg4 ) ; 
     ps ( "\ntdbg5 =" ) ; p ( tdbg5 ) ; 
     ps ( "\ntdbg6 =" ) ; p ( tdbg6 ) ; //_pause () ;
-    ps ( "\nxhii =" ) ; xhii () ; xhi0(); xhi1 ; xhi( 4 ); xhi01 ; xhi1 ; xhi2(8) ;
+    ps ( "\nxhii =" ) ; xhii () ; xhi0(); xhi1 ; xhi( 4 ); xhi01 ; xhi1 ; xhi2(8) ; xhi2a ( "xhi2a =", 8 ) ; 
 }
 //'testc1 find wdiss //pause 
 testc1 () ; //pause

@@ -27,7 +27,7 @@ _List_PrintNames ( dllist * list, int64 count, int64 flag )
 }
 
 void
-_List_Show_N_Word_Names ( dllist * list, uint64 n, int64 showBeforeAfterFlag, int64 dbgFlag ) //byte * listName, int64 dbgFlag )
+_List_Show_N_Word_Names ( dllist * list, uint64 n, int64 showBeforeAfterFlag, int64 dbgFlag )
 {
     if ( dbgFlag ) NoticeColors ;
     _List_PrintNames ( list, n, showBeforeAfterFlag ) ;

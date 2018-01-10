@@ -1248,16 +1248,19 @@ _LO_CompileOrInterpret_One ( ListObject * l0 )
     if ( l0 && ( ! ( l0->LAttribute & ( LIST | LIST_NODE | T_NIL ) ) ) )
     {
         Word * word = l0->Lo_CfrTilWord ;
-        d0 ( if ( Is_DebugModeOn ) LO_Debug_ExtraShow ( 1, 1, 0, ( byte* ) "\n_LO_CompileOrInterpret_One : entering\n\tl0 =%s, l0->Lo_CfrTilWord = %s.%s", c_gd ( _LO_PRINT_TO_STRING_WITH_VALUE ( l0 ) ), ( word && word->S_ContainingNamespace ) ? word->S_ContainingNamespace->Name : ( byte* ) "_", word ? word->Name : ( byte* ) "" ) ) ;
+        d0 ( if ( Is_DebugModeOn ) LO_Debug_ExtraShow ( 1, 1, 0, ( byte* ) "\n_LO_CompileOrInterpret_One : entering\n\tl0 =%s, l0->Lo_CfrTilWord = %s.%s", 
+            c_gd ( _LO_PRINT_TO_STRING_WITH_VALUE ( l0 ) ), ( word && word->S_ContainingNamespace ) ? word->S_ContainingNamespace->Name : ( byte* ) "_", word ? word->Name : ( byte* ) "" ) ) ;
         _Interpreter_LC_InterpretWord ( cntx->Interpreter0, l0, word ) ;
-        d0 ( if ( Is_DebugModeOn ) LO_Debug_ExtraShow ( 1, 1, 0, ( byte* ) "\n_LO_CompileOrInterpret_One : leaving\n\tl0 =%s, l0->Lo_CfrTilWord = %s.%s", c_gd ( _LO_PRINT_TO_STRING_WITH_VALUE ( l0 ) ), ( word && word->S_ContainingNamespace ) ? word->S_ContainingNamespace->Name : ( byte* ) "_", word ? word->Name : ( byte* ) "" ) ) ;
+        d0 ( if ( Is_DebugModeOn ) LO_Debug_ExtraShow ( 1, 1, 0, ( byte* ) "\n_LO_CompileOrInterpret_One : leaving\n\tl0 =%s, l0->Lo_CfrTilWord = %s.%s", 
+            c_gd ( _LO_PRINT_TO_STRING_WITH_VALUE ( l0 ) ), ( word && word->S_ContainingNamespace ) ? word->S_ContainingNamespace->Name : ( byte* ) "_", word ? word->Name : ( byte* ) "" ) ) ;
     }
 }
 
 void
 _LO_CompileOrInterpret ( ListObject * lfunction, ListObject * ldata )
 {
-    d0 ( if ( Is_DebugModeOn ) LO_Debug_ExtraShow ( 0, 1, 0, ( byte* ) "\n_LO_CompileOrInterpret : \n\tlfunction =%s\n\tldata =%s", c_gd ( _LO_PRINT_TO_STRING_WITH_VALUE ( lfunction ) ), c_gd ( _LO_PRINT_TO_STRING ( ldata ) ) ) ) ;
+    d0 ( if ( Is_DebugModeOn ) LO_Debug_ExtraShow ( 0, 1, 0, ( byte* ) "\n_LO_CompileOrInterpret : \n\tlfunction =%s\n\tldata =%s", 
+        c_gd ( _LO_PRINT_TO_STRING_WITH_VALUE ( lfunction ) ), c_gd ( _LO_PRINT_TO_STRING ( ldata ) ) ) ) ;
     ListObject * lfword = lfunction->Lo_CfrTilWord ;
 
     if ( ldata && lfword && ( lfword->CAttribute & ( CATEGORY_OP_ORDERED | CATEGORY_OP_UNORDERED ) ) ) // ?!!? 2 arg op with multi-args : this is not a precise distinction yet : need more types ?!!? 
@@ -1509,7 +1512,7 @@ _LO_PrintListToString ( ListObject * l0, byte * buffer, int64 lambdaFlag, int64 
             snprintf ( ( char* ) buffer2, BUFFER_SIZE, " (" ) ;
             if ( ! LO_strcat ( buffer, buffer2 ) ) goto done ; //return buffer ;
         }
-        for ( l1 = _LO_First ( l0 ) ; l1 ; l1 = lnext ) //_LO_Next ( l1 ) ) 
+        for ( l1 = _LO_First ( l0 ) ; l1 ; l1 = lnext ) 
         {
             lnext = _LO_Next ( l1 ) ; //
             if ( l1->LAttribute & ( LIST | LIST_NODE ) )
@@ -1535,12 +1538,9 @@ LO_Print ( ListObject * l0 )
 {
 
     DefaultColors ;
-    //ConserveNewlines ;
     SetState ( _Q_->OVT_LC, ( LC_PRINT_VALUE ), true ) ;
     _Printf ( ( byte* ) "%s", _LO_PRINT_TO_STRING ( l0 ) ) ;
     SetState ( _Q_->OVT_LC, LC_PRINT_VALUE, false ) ;
-    //SetBuffersUnused ( 0 ) ;
-    //AllowNewlines ;
 }
 
 //===================================================================================================================

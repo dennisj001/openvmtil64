@@ -424,12 +424,6 @@ Debugger_ReturnStack ( Debugger * debugger )
 }
 
 void
-Debugger_ShowCompilerWordList ( Debugger * debugger )
-{
-    Compiler_Show_WordList ( debugger->w_Word->Name ) ;
-}
-
-void
 Debugger_Source ( Debugger * debugger )
 {
     //if ( GetState ( debugger, DBG_STEPPING ) ) Debugger_Step ( debugger ) ;

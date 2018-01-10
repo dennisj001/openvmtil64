@@ -39,19 +39,19 @@ Debugger_ParseFunctionLocalVariables ( Debugger * debugger, Lexer * lexer, Boole
             }
             if ( c_syntaxFlag ) lasvf = true ;
         }
-        //else if ( String_Equal ( token, "var" ) || String_Equal ( token, "int" ) || (word && (word->CAttribute & CLASS) ))
-        else if ( String_Equal ( token, "var" ) || (word && (word->CAttribute & CLASS) ))
+            //else if ( String_Equal ( token, "var" ) || String_Equal ( token, "int" ) || (word && (word->CAttribute & CLASS) ))
+        else if ( String_Equal ( token, "var" ) || ( word && ( word->CAttribute & CLASS ) ) )
         {
             if ( ! ( debugger->LevelBitNamespaceMap & ( ( uint64 ) 1 << ( levelBit ) ) ) )
             {
                 _Namespace_FindOrNew_Local ( debugger->LocalsNamespacesStack ) ;
                 debugger->LevelBitNamespaceMap |= ( ( uint64 ) 1 << ( levelBit ) ) ;
             }
-            if ( String_Equal ( token, "var" ) ) aToken = prevToken ; 
+            if ( String_Equal ( token, "var" ) ) aToken = prevToken ;
             else aToken = Lexer_PeekNextNonDebugTokenWord ( _Lexer_, 0 ) ;
             _CfrTil_LocalWord ( aToken, ++ _Compiler_->NumberOfLocals, LOCAL_VARIABLE ) ;
         }
-        //else if ( String_Equal ( token, ";" ) || String_Equal ( token, ")" ) ) return ;
+            //else if ( String_Equal ( token, ";" ) || String_Equal ( token, ")" ) ) return ;
         else if ( String_Equal ( token, "<end>" ) ) return ;
         prevToken = token ;
     }
@@ -90,7 +90,7 @@ _Debugger_Locals_Show ( Debugger * debugger, Word * scWord )
         Compiler * compiler = _Context_->Compiler0 ;
         Lexer * lexer = Lexer_New ( COMPILER_TEMP ) ;
         ReadLiner * rl = lexer->ReadLiner0 ; //ReadLine_New ( allocType ) ; //_Context_->ReadLiner0 ;
-        int64 i, svArgs = compiler->NumberOfArgs ;
+        int64 i, n, svArgs = compiler->NumberOfArgs ;
         int64 svLocals = compiler->NumberOfLocals ;
         int64 svRegs = compiler->NumberOfRegisterVariables ; //nb. prevent increasing the locals offset by adding in repeated calls to this function
         compiler->NumberOfArgs = 0 ;
@@ -102,7 +102,7 @@ _Debugger_Locals_Show ( Debugger * debugger, Word * scWord )
         // show value of each local var on Locals list
         int64 * fp = ( int64* ) debugger->cs_Cpu->CPU_FP, * dsp = ( int64* ) debugger->cs_Cpu->CPU_DSP ;
         if ( ( ( uint64 ) fp < 0x7f0000000 ) ) fp = 0 ;
-        //if ( ! debugger->LocalsNamespacesStack )
+        //if ( ! Compiling )
         {
             //_Namespace_FreeNamespacesStack ( debugger->LocalsNamespacesStack ) ;
             debugger->LocalsNamespacesStack = Stack_New ( 32, COMPILER_TEMP ) ;
@@ -119,6 +119,7 @@ _Debugger_Locals_Show ( Debugger * debugger, Word * scWord )
             Debugger_ParseFunctionLocalVariables ( debugger, lexer, ( ( GetState ( _Context_, C_SYNTAX ) ) || ( GetState ( scWord, W_C_SYNTAX ) ) ) ) ;
             _Context_->Lexer0 = svLexer ;
         }
+        //else debugger->LocalsNamespacesStack = compiler->LocalsCompilingNamespacesStack ;
         if ( ( sc && debugger->LocalsNamespacesStack ) ) ///&& ( ( uint64 ) fp > 0xf0000000 ) )
         {
             //_Debugger_CpuState_Show ( ) ; // Debugger_Registers is included in Debugger_CpuState_Show
@@ -126,14 +127,14 @@ _Debugger_Locals_Show ( Debugger * debugger, Word * scWord )
             _Printf ( ( byte* ) "\n%s.%s.%s : \nFrame Pointer = R15 = <0x%016lx> = 0x%016lx : Stack Pointer = R14 <0x%016lx> = 0x%016lx",
                 c_gd ( scWord->ContainingNamespace->Name ), c_gd ( scWord->Name ), c_gd ( "locals" ),
                 ( uint64 ) fp, fp ? *fp : 0, ( uint64 ) dsp, dsp ? *dsp : 0 ) ;
-            for ( i = Stack_Depth ( debugger->LocalsNamespacesStack ) ; i >= 0 ; i -- )
+            for ( i = 0, n = Stack_Depth ( debugger->LocalsNamespacesStack ) ; i < n ; i ++ )
             {
-                dlnode * node, *nextNode ;
+                dlnode * node, *prevNode ;
                 Namespace * ns = ( Namespace* ) _Stack_Pick ( debugger->LocalsNamespacesStack, i ) ;
 
-                for ( node = dllist_First ( ns->W_List ) ; node ; node = nextNode )
+                for ( node = dllist_Last ( ns->W_List ) ; node ; node = prevNode )
                 {
-                    nextNode = dlnode_Next ( node ) ;
+                    prevNode = dlnode_Previous ( node ) ;
                     scWord = ( Word * ) node ;
                     _Debugger_Locals_ShowALocal ( debugger, scWord, buffer ) ;
                 }
@@ -143,8 +144,11 @@ _Debugger_Locals_Show ( Debugger * debugger, Word * scWord )
         compiler->NumberOfArgs = svArgs ;
         compiler->NumberOfLocals = svLocals ;
         compiler->NumberOfRegisterVariables = svRegs ; //nb. prevent increasing the locals offset by adding in repeated calls to this function
-        _Namespace_FreeNamespacesStack ( debugger->LocalsNamespacesStack ) ;
-        debugger->LocalsNamespacesStack = 0 ; //recycle it
+        //if ( ! Compiling )
+        {
+            _Namespace_FreeNamespacesStack ( debugger->LocalsNamespacesStack ) ;
+            debugger->LocalsNamespacesStack = 0 ; //recycle it
+        }
     }
 }
 

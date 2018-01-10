@@ -694,11 +694,9 @@
 #define SCN_WORD  0
 //#define SCN_SC_CADDRESS SCN_WORD
 #define SCN_SC_WORD_INDEX 1
-#define SCN_LAST_SLOT SCN_SC_WORD_INDEX
+#define SCN_IN_USE_FLAG 2
+#define SCN_LAST_SLOT SCN_IN_USE_FLAG
 #define SCN_NUMBER_OF_SLOTS (SCN_LAST_SLOT + 1) //1 : remember - 0 indexed array
-// Compiler Word List Node (CWLN) slot indices
-#define CWLN_WORD 0
-#define CWLN_SCN 1
 
 // gcc 6.x register adjusters : gcc 6 uses ebx for global variables pointer calculation
 #define GCC_7
@@ -721,3 +719,11 @@
 #define CPU_SAVED    ( (uint64) 1 << 0 )
 #define CPU_SELECTED_SAVED ( (uint64) 1 << 1 )
 #define FULL_CONTEXT_SIZE ( 10 * K ) //( sizeof (Context) + sizeof (System) + sizeof (Interpreter) + sizeof ( Lexer ) + sizeof (Compiler) + sizeof ( Finder ) + sizeof (ReadLiner))
+
+#define optInfo_0_zero  optInfo->COIW[0]
+#define optInfo_0_one   optInfo->COIW[1]
+#define optInfo_0_two   optInfo->COIW[2]
+#define optInfo_0_three optInfo->COIW[3]    
+#define optInfo_0_four  optInfo->COIW[4]
+#define optInfo_0_five  optInfo->COIW[5]
+#define optInfo_0_six   optInfo->COIW[6]

@@ -19,7 +19,7 @@ _Namespace_Do_C_Type ( Namespace * ns )
                 _CfrTil_InitSourceCode_WithName ( _CfrTil_, ns->Name ) ;
             }
             compiler->C_BackgroundNamespace = _Namespace_FirstOnUsingList ( ) ; //nb! must be before CfrTil_LocalsAndStackVariablesBegin else CfrTil_End_C_Block will 
-            if ( GetState ( cntx, C_SYNTAX ) ) //&& ( cntx->System0->IncludeFileStackNumber ) )
+            if ( GetState ( cntx, C_SYNTAX ) )
             {
                 LambdaCalculus * svlc = _Q_->OVT_LC ;
                 _Q_->OVT_LC = 0 ;
@@ -35,10 +35,9 @@ _Namespace_Do_C_Type ( Namespace * ns )
                     _Namespace_ActivateAsPrimary ( ns ) ;
                     Word * word = Word_New ( token1 ) ;
                     word->Coding = Here ;
-                    //word->WAttribute = WT_PREFIX ;
                     _CfrTil_WordList_PushWord ( word ) ;
-                    DataStack_Push ( ( int64 ) word ) ; // token1 is the function name 
-                    CfrTil_RightBracket ( ) ; //Set_CompileMode ( true ) ; //SetState ( _Context_->Compiler0, COMPILE_MODE, true ) ;
+                    DataStack_Push ( ( int64 ) word ) ; 
+                    CfrTil_RightBracket ( ) ; 
                     CfrTil_BeginBlock ( ) ;
                     CfrTil_LocalsAndStackVariablesBegin ( ) ;
                     Ovt_AutoVarOn ( ) ;
@@ -71,13 +70,10 @@ _Namespace_Do_C_Type ( Namespace * ns )
                         else _Lexer_ConsiderDebugAndCommentTokens ( token, 1, 0 ) ;
                     }
                     while ( 1 ) ;
-                    //compiler->C_FunctionBackgroundNamespace = compiler->C_BackgroundNamespace ;
-                    //if ( compiler->C_BackgroundNamespace ) _CfrTil_Namespace_InNamespaceSet ( compiler->C_BackgroundNamespace ) ;
                     goto rtrn ;
                 }
                 else
                 {
-                    //next :
                     if ( Compiling ) Ovt_AutoVarOn ( ) ;
                     _Namespace_DoNamespace ( ns, 1 ) ;
                     // remember : we have already gotten a token
@@ -98,7 +94,6 @@ _Namespace_Do_C_Type ( Namespace * ns )
                             if ( ( String_Equal ( token, ";" ) ) )
                             {
                                 _CfrTil_AddTokenToHeadOfTokenList ( token ) ;
-                                //if ( compiler->C_BackgroundNamespace ) _CfrTil_Namespace_InNamespaceSet ( compiler->C_BackgroundNamespace ) ;
                                 break ;
                             }
                             else
@@ -108,12 +103,10 @@ _Namespace_Do_C_Type ( Namespace * ns )
                                     if ( GetState ( compiler, DOING_A_PREFIX_WORD ) ) _CfrTil_AddTokenToHeadOfTokenList ( token ) ; // add ahead of token2 :: ?? this could be screwing up other things and adds an unnecessary level of complexity
                                 }
                                 compiler->LHS_Word = 0 ;
-                                //if ( compiler->C_BackgroundNamespace ) _CfrTil_Namespace_InNamespaceSet ( compiler->C_BackgroundNamespace ) ;
                                 break ;
                             }
                         }
                     }
-                    //Ovt_AutoVarOff ( ) ;
                 }
                 _Q_->OVT_LC = svlc ;
             }
@@ -226,7 +219,7 @@ _Do_Literal ( int64 value )
     if ( CompileMode )
     {
         _Compile_MoveImm_To_Reg ( ACC, value, CELL ) ;
-        _Compiler_CompileAndRecord_PushAccum ( _Context_->Compiler0 ) ; // does word == top of word stack always
+        Compiler_CompileAndRecord_PushAccum ( _Context_->Compiler0 ) ; // does word == top of word stack always
     }
     else DataStack_Push ( value ) ;
 }
@@ -329,16 +322,18 @@ _CfrTil_Do_Literal ( Word * word )
 {
     if ( CompileMode )
     {
-        if ( GetState ( _Context_, C_SYNTAX ) || GetState ( _Compiler_, LC_ARG_PARSING ) ) // for now until we have time to integrate this optimization
+        //if ( GetState ( _Context_, C_SYNTAX ) || GetState ( _Compiler_, LC_ARG_PARSING ) ) // for now until we have time to integrate this optimization
         {
             _Compile_GetVarLitObj_RValue_To_Reg ( word, ACC ) ;
             _Word_CompileAndRecord_PushReg ( word, ACC ) ;
         }
+#if 0        
         else
         {
             Compile_ADDI ( REG, DSP, 0, sizeof (int64 ), 0 ) ;
             _Compile_MoveImm_To_Mem ( DSP, ( int64 ) word->W_Value, CELL_SIZE ) ;
         }
+#endif        
 
     }
     else

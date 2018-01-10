@@ -57,9 +57,12 @@ X64
 hex
 Logic Bits Combinators X64 
 
-'x64_dbg 1 const  
+//'x64_dbg 1 const  
 #define x64_dbg 1
-dscOn //verbosity 3 =
+#if x64_dbg    
+dscOn 
+verbosity 3 =
+#endif    
 : apause ; //pause ;
 
 #if 1
@@ -130,7 +133,7 @@ CalculateModRmByte ( _mod, _reg, rm, sib, disp | modRm )
         _reg = 0 ;
     }
     //modRm d: = ( _mod << 6 ) + ( ( ( _reg Bits.& 0x7 ) << 3 ) + ( rm Bits.& 0x7 ) ) ; // only use 3 bits of reg/rm
-    modRm = ( _mod << 6 ) + ( ( _reg Bits.& 0x7 ) << 3 ) + ( rm Bits.& 0x7 ) ; // only use 3 bits of reg/rm
+    <dbg> modRm = ( _mod d: << 6 ) + ( ( ( _reg Bits.& 0x7 ) << 3 ) + ( rm Bits.& 0x7 ) ) ; // only use 3 bits of reg/rm
     return modRm ;
 } prefix
 //'CalculateModRmByte find wdiss apause 
@@ -316,19 +319,39 @@ infixOn // c_syntaxOff turns off infix
     // #x80 is the base opCode for this group of instructions 
     // 1000 00sw 
     opCode = #x80
-    { ( immSize @ > BYTE ) || ( imm @ > 0xff ) } 
+    //opCode = ( code << 3 ) 
+    //{ toRegOrMem == REG } { opCode |= 2 } if2
+
+    { ( immSize @ > BYTE ) || ( imm @ >= 0x100 ) } 
     { 
         opCode |= 1
-        // iSize = CELL
     }
     { 
-        { ( immSize @ <= BYTE ) || ( imm @ < 0x100 ) } { opCode |= 3 } if
+        { ( immSize @ <= BYTE ) || ( imm @ < 0x100 ) } { opCode |= 3 } if2
     }
     ifElse
     //controlFlags = (REX_B | MODRM_B | DISP_B | IMM_B) 
     //Compile_CalcWrite_Instruction_X64 (  rex,  opCode,  _mod,  _reg,  rm, controlFlags,  sib,  disp,  dispSize,  imm,  immSize | modRm )
-    <dbg> Compile_CalcWrite_Instruction_X64 (  0,  opCode @,  _mod @,  0,  rm @, (REX_B | MODRM_B | DISP_B | IMM_B) ,  0,  disp @,  0,  imm @,  immSize @ )
+    //Compile_CalcWrite_Instruction_X64 (  0,  opCode @,  _mod @,  0,  rm @, controlFlags @,  0,  disp @,  0,  imm @,  immSize @ )
+    Compile_CalcWrite_Instruction_X64 (  0,  opCode @,  _mod @,  0,  rm @, (REX_B | MODRM_B | DISP_B | IMM_B),  0,  disp @,  0,  imm @,  immSize @ )
 ;;
+
+c_syntaxOn
+void
+_Compile_Group5 ( code, mod, rm, sib, disp, size )
+{
+    // _Compile_InstructionX86 ( opCode, mod, reg, rm, modRmImmDispFlag, sib, disp, imm, immSize )
+    Compile_CalcWrite_Instruction_X64 ( 0, 0xff, mod, code, rm, REX_B | MODRM_B | DISP_B, sib, disp, size, 0, 0 ) ;
+} prefix
+
+void
+_Compile_CallThruReg ( int8 reg )
+{
+    _Compile_Group5 ( CALL, REG, reg, 0, 0, 0 ) ;
+} prefix
+c_syntaxOff
+
+//                          _Compile_Group1_Immediate ( code toRegOrMem _mod rm disp imm immSize | opCode controlFlags )
 : _Compile_SUBI_DSP ( imm ) _Compile_Group1_Immediate ( SUB, REG, DSP, 0, imm @, 1 ) ;; 
 
 'popDspToR8AndCall find wdiss
@@ -350,8 +373,10 @@ Compile_PopDspToR8AndCall ()
 #endif
 'popDspToR8AndCall find wdiss
 :asm iax
-    d: _Compile_Stack_PopToReg ( R8D ) ;
-    _Compile_CALL_Reg ( R8D ) 
+    //d: _Compile_Stack_PopToReg ( R8D ) ;
+    _Compile_Move_DataStackN_ToReg ( R8D, 0 ) 
+    d: _Compile_SUBI_DSP ( CELL ) 
+    _Compile_CallThruReg ( R8D ) 
 asm; 
 
 ' iax find wdiss pause //sp 
@@ -360,7 +385,7 @@ verbosity 1 =
 : _Compile_InstructionX64 ( opCode modFlag _mod _reg rm disp imm isize | _here )
     _here = here
     //Compile_CalcWrite_Instruction_X64 (  rex,  opCode,  _mod,  _reg,  rm, controlFlags,  sib,  disp,  dispSize,  imm,  immSize | modRm )
-    <dbg> Compile_CalcWrite_Instruction_X64 ( 0, opCode @, _mod @, _reg @, rm @, 0, 0, disp @, 8, 0, 0 )
+    Compile_CalcWrite_Instruction_X64 ( 0, opCode @, _mod @, _reg @, rm @, 0, 0, disp @, 8, 0, 0 )
     //printf ( "\n : ", _here @ (here - (_here @)) dup 
     nl _here @ (here - (_here @)) dup p " : " ps dis
 ;;

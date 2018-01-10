@@ -286,7 +286,7 @@
 #define WordList_Pop( list, m ) if ( ! IsSourceCodeOn ) _WordList_Pop( list, m )
 #define DebugWordList_Push( dobj ) _dllist_AddNodeToHead ( _CfrTil_->DebugWordList, ( dlnode* ) dobj )
 #define DbgWL_Push( node ) DebugWordList_Push( node )  
-#define _List_PushNew( list, word ) _dllist_PushNew_M_Slot_Node ( list, WORD, TEMPORARY, SCN_NUMBER_OF_SLOTS, ((int64) word), word->W_SC_WordIndex )
+#define _List_PushNew( list, word ) _dllist_PushNew_M_Slot_Node ( list, WORD, TEMPORARY, SCN_NUMBER_OF_SLOTS, ((int64) word), word->W_SC_WordIndex, 1 )
 #define CompilerWordList_Push( word ) _List_PushNew ( _Compiler_->WordList, word ) 
 #define IsGlobalsSourceCodeOn ( GetState ( _CfrTil_, GLOBAL_SOURCE_CODE_MODE ))
 #define _IsSourceCodeOn ( GetState ( _CfrTil_, DEBUG_SOURCE_CODE_MODE ) )

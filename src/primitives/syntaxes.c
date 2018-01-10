@@ -297,7 +297,6 @@ _CfrTil_TypeDef ( )
         alias->Lo_List = ns->Lo_List ;
         alias->CAttribute |= IMMEDIATE ;
     }
-
     while ( 1 ) ;
 }
 

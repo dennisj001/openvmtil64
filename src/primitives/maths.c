@@ -22,7 +22,7 @@ CfrTil_IncDec ( int64 op ) // +
 {
     Context * cntx = _Context_ ;
     Compiler * compiler = cntx->Compiler0 ;
-    if ( ! GetState ( compiler, LC_CFRTIL ) )
+    if ( ! GetState ( compiler, LC_CFRTIL )) //|INFIX_LIST_INTERPRET ) )
     {
         int64 sd = List_Depth ( compiler->WordList ) ;
         Word *one = ( Word* ) Compiler_WordList ( 1 ), *two = Compiler_WordList ( 2 ) ; //, *three = Compiler_WordList ( 3 ) ; // the operand
@@ -57,20 +57,17 @@ CfrTil_IncDec ( int64 op ) // +
         }
         if ( one->CAttribute & ( PARAMETER_VARIABLE | LOCAL_VARIABLE | NAMESPACE_VARIABLE ) )
         {
-            if ( ( ! ( two->CAttribute & ( KEYWORD ) ) ) && GetState ( _Context_, C_SYNTAX ) )
+            //if ( ( ! ( two->CAttribute & ( KEYWORD ) ) ) && GetState ( _Context_, C_SYNTAX ) )
             {
                 if ( ! GetState ( compiler, INFIX_LIST_INTERPRET ) )
                 {
                     SetHere ( one->Coding ) ;
                     _CfrTil_WordList_PushWord ( one ) ;
-                    // ?? couldn't this stuff be done with _Interpret_C_Until_EitherToken ??
                     dllist * postfixList = List_New ( ) ;
                     List_Push_1Value_Node ( postfixList, currentWord, COMPILER_TEMP ) ;
                     List_Push_1Value_Node ( postfixList, one, COMPILER_TEMP ) ;
                     List_Push_1Value_Node ( compiler->PostfixLists, postfixList, COMPILER_TEMP ) ;
                     List_DropN ( compiler->WordList, 1 ) ; // the operator; let higher level see the variable for optimization
-                    //_Interpreter_DoWord ( cntx->Interpreter0, one, - 1 ) ;
-                    //List_InterpretLists ( compiler->PostfixLists ) ;
                     return ;
                 }
             }
@@ -112,7 +109,6 @@ CfrTil_IncDec ( int64 op ) // +
                 List_Push_1Value_Node ( postfixList, Compiler_WordList ( i ), COMPILER_TEMP ) ;
                 List_Push_1Value_Node ( compiler->PostfixLists, postfixList, COMPILER_TEMP ) ;
                 List_DropN ( compiler->WordList, 1 ) ; // the operator; let higher level see the variable for optimization
-
                 return ;
             }
         }

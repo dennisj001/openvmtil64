@@ -25,8 +25,7 @@ Word *
 _Interpreter_DoWord_Default ( Interpreter * interp, Word * word, int64 scratchPadIndex )
 {
     word = Compiler_CopyDuplicatesAndPush ( word ) ;
-    word->W_SC_ScratchPadIndex = scratchPadIndex ; // _CfrTil_->SC_ScratchPadIndex ;
-    if ( ! word->W_SC_ScratchPadIndex ) word->W_SC_ScratchPadIndex = _CfrTil_->SC_ScratchPadIndex ;
+    word->W_SC_ScratchPadIndex = scratchPadIndex ? scratchPadIndex : _CfrTil_->SC_ScratchPadIndex ; ;
     interp->w_Word = word ;
     Word_Eval ( word ) ;
     if ( IS_MORPHISM_TYPE ( word ) )
@@ -48,16 +47,13 @@ _Interpreter_DoWord ( Interpreter * interp, Word * word, int64 tokenStartReadLin
     {
         Context * cntx = _Context_ ;
         int64 tsrli ;
-        _Compiler_->SaveScratchPadIndex = word->W_SC_ScratchPadIndex = _CfrTil_->SC_ScratchPadIndex ;
+        _Compiler_->SaveScratchPadIndex = _CfrTil_->SC_ScratchPadIndex ;
         if ( tokenStartReadLineIndex <= 0 )
         {
             tsrli = _Lexer_->TokenStart_ReadLineIndex ;
         }
         else tsrli = tokenStartReadLineIndex ;
         word->W_TokenStart_ReadLineIndex = tsrli ; //( tokenStartReadLineIndex <= 0 ) ? _Lexer_->TokenStart_ReadLineIndex : tokenStartReadLineIndex ;
-        //if ( scratchPadIndex ) word->W_SC_ScratchPadIndex = scratchPadIndex ; // _CfrTil_->SC_ScratchPadIndex ;
-        //else word->W_SC_ScratchPadIndex = 0 ;
-        //DEBUG_SETUP ( word ) ;
         interp->w_Word = word ;
         if ( ( word->WAttribute == WT_INFIXABLE ) && ( GetState ( cntx, INFIX_MODE ) ) ) // nb. Interpreter must be in INFIX_MODE because it is effective for more than one word
         {
@@ -65,8 +61,7 @@ _Interpreter_DoWord ( Interpreter * interp, Word * word, int64 tokenStartReadLin
             Finder_SetNamedQualifyingNamespace ( cntx->Finder0, ( byte* ) "Infix" ) ;
             Interpreter_InterpretNextToken ( interp ) ;
             // then continue and interpret this 'word' - just one out of lexical order
-            _Interpreter_DoWord_Default ( interp, word, word->W_SC_ScratchPadIndex ) ;
-            List_InterpretLists ( _Compiler_->PostfixLists ) ;
+            _Interpreter_DoWord_Default ( interp, word, 0 ) ;
         }
         else if ( ( word->WAttribute == WT_PREFIX ) || _Interpreter_IsWordPrefixing ( interp, word ) ) // with this almost any rpn function can be used prefix with a following '(' :: this checks for that condition
         {
@@ -82,7 +77,7 @@ _Interpreter_DoWord ( Interpreter * interp, Word * word, int64 tokenStartReadLin
         }
         else _Interpreter_DoWord_Default ( interp, word, 0 ) ; //  case WT_POSTFIX: case WT_INFIXABLE: // cf. also _Interpreter_SetupFor_MorphismWord
         if ( ! ( word->CAttribute & DEBUG_WORD ) ) interp->LastWord = word ;
-        //DEBUG_SHOW ;
+        if ( ! GetState ( _Context_, ( C_SYNTAX ) ) ) List_InterpretLists ( _Compiler_->PostfixLists ) ;
     }
 }
 

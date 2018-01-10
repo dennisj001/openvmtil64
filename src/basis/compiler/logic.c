@@ -101,57 +101,57 @@ Compile_Cmp_Set_tttn_Logic ( Compiler * compiler, int64 ttt, int64 negateFlag )
     else if ( optFlag )
     {
 #if 1  // clears the stack     
-        if ( ( optFlag == 2 ) && ( compiler->optInfo->Optimize_Rm == DSP ) )
+        if ( ( optFlag == 2 ) && ( compiler->OptInfo->Optimize_Rm == DSP ) )
         {
             //DBI_ON ;
             _Compile_Stack_PopToReg ( DSP, ACC ) ; // assuming optimize always uses R8 first
-            compiler->optInfo->Optimize_Rm = ACC ;
-            compiler->optInfo->Optimize_Mod = REG ;
+            compiler->OptInfo->Optimize_Rm = ACC ;
+            compiler->OptInfo->Optimize_Mod = REG ;
         }
 #endif        
         //DBI_ON ;
-        if ( compiler->optInfo->OptimizeFlag & OPTIMIZE_IMM )
+        if ( compiler->OptInfo->OptimizeFlag & OPTIMIZE_IMM )
         {
-            if ( ( ttt == EQUAL ) && ( compiler->optInfo->Optimize_Imm == 0 ) ) //Compile_TEST ( compiler->optInfo->Optimize_Mod, compiler->optInfo->Optimize_Rm, 0, compiler->optInfo->Optimize_Disp, compiler->optInfo->Optimize_Imm, CELL ) ;
+            if ( ( ttt == EQUAL ) && ( compiler->OptInfo->Optimize_Imm == 0 ) ) //Compile_TEST ( compiler->OptInfo->Optimize_Mod, compiler->OptInfo->Optimize_Rm, 0, compiler->OptInfo->Optimize_Disp, compiler->OptInfo->Optimize_Imm, CELL ) ;
             {
-                if ( compiler->optInfo->O_two->StackPushRegisterCode ) SetHere ( compiler->optInfo->O_two->StackPushRegisterCode ) ; // leave optInfo->O_two value in ACCUM we don't need to push it
+                if ( compiler->OptInfo->COIW [2]->StackPushRegisterCode ) SetHere ( compiler->OptInfo->COIW [2]->StackPushRegisterCode ) ; // leave optInfo_0_two value in ACCUM we don't need to push it
                 _Compile_TEST_Reg_To_Reg ( ACC, ACC ) ;
             }
             else
             {
                 int64 size ;
-                if ( compiler->optInfo->Optimize_Imm >= 0x100000000 )
+                if ( compiler->OptInfo->Optimize_Imm >= 0x100000000 )
                 {
                     // considering _Compile_X_Group1_Immediate ( int8 code, int8 mod, int8 rm, int64 disp, uint64 imm, int8 iSize ) with size == 8
                     size = 8 ;
-                    //negateFlag = ! negateFlag ;
+                    negateFlag = ! negateFlag ;
                     //reg = OREG2 ;
                 }
                 else size = 0 ;
                 //_DBI_ON ;
                 // Compile_CMPI( mod, operandReg, offset, immediateData, size
-                Compile_CMPI ( compiler->optInfo->Optimize_Mod, compiler->optInfo->Optimize_Rm, compiler->optInfo->Optimize_Disp, compiler->optInfo->Optimize_Imm, size ) ;
+                Compile_CMPI ( compiler->OptInfo->Optimize_Mod, compiler->OptInfo->Optimize_Rm, compiler->OptInfo->Optimize_Disp, compiler->OptInfo->Optimize_Imm, size ) ;
             }
         }
         else
         {
             // Compile_CMP( toRegOrMem, mod, reg, rm, sib, disp )
-            Compile_CMP ( compiler->optInfo->Optimize_Dest_RegOrMem, compiler->optInfo->Optimize_Mod,
-                compiler->optInfo->Optimize_Reg, compiler->optInfo->Optimize_Rm, 0, compiler->optInfo->Optimize_Disp, CELL_SIZE ) ;
+            Compile_CMP ( compiler->OptInfo->Optimize_Dest_RegOrMem, compiler->OptInfo->Optimize_Mod,
+                compiler->OptInfo->Optimize_Reg, compiler->OptInfo->Optimize_Rm, 0, compiler->OptInfo->Optimize_Disp, CELL_SIZE ) ;
         }
     }
     else
     {
-        _Compile_Move_StackN_To_Reg ( OP_REG, DSP, 0 ) ;
+        _Compile_Move_StackN_To_Reg ( OREG, DSP, 0 ) ;
         _Compile_Move_StackN_To_Reg ( ACC, DSP, - 1 ) ;
         // must do the DropN before the CMP because CMP sets eflags 
         _Compile_Stack_DropN ( DSP, 2 ) ; // before cmp 
-        Compile_CMP ( REG, REG, ACC, OP_REG, 0, 0, CELL ) ;
+        Compile_CMP ( REG, REG, ACC, OREG, 0, 0, CELL ) ;
     }
     _Compile_SET_tttn_REG ( ttt, negateFlag, reg ) ; // immediately after the 'cmp' insn which changes the flags appropriately
     _Compile_MOVZX_REG ( reg ) ;
-    //_Compiler_CompileAndRecord_PushAccum ( compiler ) ;
-    _Word_CompileAndRecord_PushReg ( Compiler_WordList ( 0 ), reg ) ;
+    //Compiler_CompileAndRecord_PushAccum ( compiler ) ;
+    _Compiler_CompileAndRecord_PushAccum ( compiler, ACC ) ;
     //DBI_OFF ;
 #if dbgON_13    
     d1 ( //if ( DBI )
@@ -266,12 +266,12 @@ _Compile_LogicResult ( int64 reg )
 void
 _Compile_LogicalAnd ( Compiler * compiler )
 {
-    Compile_BlockInfoTestLogic ( compiler, OP_REG, Z ) ;
+    Compile_BlockInfoTestLogic ( compiler, OREG, Z ) ;
     Compile_JCC ( Z, ZERO_TTT, Here + 15 ) ; // if eax is zero return not(R8) == 1 else return 0
     Compile_BlockInfoTestLogic ( compiler, ACC, NZ ) ;
     Compile_JCC ( NZ, ZERO_TTT, Here + 21 ) ; // if eax is zero return not(R8) == 1 else return 0
     _Compile_LogicResult ( ACC ) ;
-    _Word_CompileAndRecord_PushReg ( Compiler_WordList ( 0 ), ACC ) ;
+    _Compiler_CompileAndRecord_PushAccum ( compiler, ACC ) ;
 }
 
 void
@@ -289,7 +289,7 @@ Compile_LogicalAnd ( Compiler * compiler )
         Word *one = Compiler_WordList ( 1 ) ; // assumes two values ( n m ) on the DSP stack 
         if ( one->StackPushRegisterCode && ( one->RegToUse == ACC ) ) SetHere ( one->StackPushRegisterCode ) ;
         else _Compile_Stack_PopToReg ( DSP, ACC ) ;
-        _Compile_Stack_PopToReg ( DSP, OP_REG ) ;
+        _Compile_Stack_PopToReg ( DSP, OREG ) ;
         _Compile_LogicalAnd ( compiler ) ;
     }
 }
@@ -301,7 +301,7 @@ _Compile_LogicalNot ( Compiler * compiler )
     Compile_BlockInfoTestLogic ( compiler, ACC, Z ) ;
     Compile_JCC ( Z, ZERO_TTT, Here + 21 ) ; // if eax is zero return not(R8) == 1 else return 0
     _Compile_LogicResult ( ACC ) ;
-    _Word_CompileAndRecord_PushReg ( Compiler_WordList ( 0 ), ACC ) ;
+    _Compiler_CompileAndRecord_PushAccum ( compiler, ACC ) ;
     //DBI_OFF ;
 }
 
@@ -315,16 +315,16 @@ Compile_LogicalNot ( Compiler * compiler )
         // just need to get to valued to be operated on ( not'ed ) in eax
     else if ( optFlag ) //&& ( ! GetState ( _Context_->Compiler0, PREFIX_PARSING ) ) )
     {
-        if ( compiler->optInfo->OptimizeFlag & OPTIMIZE_IMM )
+        if ( compiler->OptInfo->OptimizeFlag & OPTIMIZE_IMM )
         {
-            _Compile_MoveImm_To_Reg ( ACC, compiler->optInfo->Optimize_Imm, CELL ) ;
+            _Compile_MoveImm_To_Reg ( ACC, compiler->OptInfo->Optimize_Imm, CELL ) ;
         }
-        else if ( compiler->optInfo->Optimize_Rm == DSP )
+        else if ( compiler->OptInfo->Optimize_Rm == DSP )
         {
             _Compile_Move_StackN_To_Reg ( ACC, DSP, 0 ) ;
             //_Compile_Stack_PopToReg ( DSP, R8 ) ;
         }
-        else if ( compiler->optInfo->Optimize_Rm != ACC )
+        else if ( compiler->OptInfo->Optimize_Rm != ACC )
         {
             _Compile_GetVarLitObj_RValue_To_Reg ( one, ACC ) ;
         }
@@ -391,7 +391,7 @@ void
 Compile_TestLogicAndStackPush ( Compiler * compiler, int8 reg, int8 negFlag )
 {
     Compile_BlockInfoTestLogic ( compiler, reg, negFlag ) ;
-    _Compiler_CompileAndRecord_PushAccum ( compiler ) ;
+    Compiler_CompileAndRecord_PushAccum ( compiler ) ;
 }
 
 void

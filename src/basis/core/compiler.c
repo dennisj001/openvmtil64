@@ -1,22 +1,23 @@
 
 #include "../../include/cfrtil64.h"
-
+// words need to be copied because a word may be used more than once in compiling a new word, 
+// each needs to have their own coding, wordIndex, etc.
+// this information is used by the compiler, optimizer and the debugger
 Word *
 CopyDuplicateWord ( dlnode * anode, Word * word0 )
 {
-    Word * wordi = ( Word* ) dobject_Get_M_Slot ( anode, 0 ) ;
-    if ( word0 == wordi )
+    Word * wordn = ( Word* ) dobject_Get_M_Slot ( anode, SCN_WORD ) ;
+    if ( word0 == wordn )
     {
         d0 ( if ( Is_DebugModeOn ) _DWL_ShowList ( _Compiler_->WordList, 0 ) ) ;
-        int64 wrli = word0->W_TokenStart_ReadLineIndex, scwi = word0->W_SC_WordIndex ;
-        Word * word1 = Word_Copy ( wordi, DICTIONARY ) ; //COMPILER_TEMP ) ; //WORD_COPY_MEM ) ; // especially for "this" so we can use a different Code & AccumulatedOffsetPointer not the existing 
-        word1->W_OriginalWord = Word_GetOriginalWord ( word0 ) ;
-        _dlnode_Init ( ( dlnode * ) word1 ) ; // necessary!
-        word1->S_CAttribute |= ( uint64 ) RECYCLABLE_COPY ;
-        word1->StackPushRegisterCode = 0 ;
-        wordi->W_SC_ScratchPadIndex = scwi ; //_Compiler_->SaveScratchPadIndex ;
-        wordi->W_TokenStart_ReadLineIndex = wrli ;
-        return word1 ;
+        Word * wordc = Word_Copy ( wordn, DICTIONARY ) ; // use DICTIONARY since we are recycling these anyway
+        wordc->W_OriginalWord = Word_GetOriginalWord ( word0 ) ;
+        _dlnode_Init ( ( dlnode * ) wordc ) ; // necessary!
+        wordc->S_CAttribute |= ( uint64 ) RECYCLABLE_COPY ;
+        wordc->StackPushRegisterCode = 0 ;
+        wordc->W_SC_ScratchPadIndex = word0->W_SC_WordIndex ; ; 
+        wordc->W_TokenStart_ReadLineIndex = word0->W_TokenStart_ReadLineIndex ;
+        return wordc ;
     }
     return 0 ;
 }
@@ -40,7 +41,7 @@ Word *
 Compiler_CopyDuplicatesAndPush ( Word * word0 )
 {
     if ( ( word0->CAttribute & ( DEBUG_WORD | INTERPRET_DBG ) ) || ( word0->LAttribute & ( W_COMMENT | W_PREPROCESSOR ) ) ) return word0 ;
-    if ( word0 && CompileMode )// && ( ! ( word0->CAttribute & ( DEBUG_WORD ) ) ) )
+    if ( word0 && CompileMode )
     {
         word0 = _Compiler_CopyDuplicatesAndPush ( _Context_->Compiler0, word0 ) ;
     }
@@ -110,16 +111,6 @@ Compiler_SetCompilingSpace_MakeSureOfRoom ( byte * name )
     _Compiler_SetCompilingSpace_MakeSureOfRoom ( name, 4 * K ) ;
 }
 
-void
-Compiler_Show_WordList ( byte * prefix )
-{
-    if ( Is_DebugModeOn ) NoticeColors ;
-    _Printf ( ( byte* ) "\n%s\nCompiler0->WordList : ", prefix ) ;
-    dllist * list = _Context_->Compiler0->WordList ;
-    _List_Show_N_Word_Names ( list, List_Depth ( list ), 0, 1 ) ; //( uint64 ) 256, ( byte* ) "WordList", Is_DebugOn ) ;
-    if ( Is_DebugModeOn ) DefaultColors ;
-}
-
 Word *
 Compiler_PreviousNonDebugWord ( int64 startIndex )
 {
@@ -141,35 +132,36 @@ _Compiler_FreeAllLocalsNamespaces ( Compiler * compiler )
 Word *
 Compiler_WordList ( int64 n )
 {
-    return ( Word * ) _dllist_Get_N_Node_M_Slot ( _Context_->Compiler0->WordList, n, 0 ) ;//SCN_SC_WORD ) ;
+    return ( Word * ) _dllist_Get_N_InUse_Node_M_Slot ( _Compiler_->WordList, n, SCN_WORD ) ; 
 }
 
 void
 _CompileOptInfo_Init ( Compiler * compiler )
 {
-    CompileOptimizeInfo * optInfo = compiler->optInfo ;
+    CompileOptimizeInfo * optInfo = compiler->OptInfo ;
     memset ( optInfo, 0, sizeof (CompileOptimizeInfo ) ) ;
 }
 
 void
 CompileOptInfo_Init ( Compiler * compiler )
 {
-    CompileOptimizeInfo * optInfo = compiler->optInfo ;
+    CompileOptimizeInfo * optInfo = compiler->OptInfo ;
     _CompileOptInfo_Init ( compiler ) ;
-    optInfo->O_zero = Compiler_WordList ( 0 ) ;
-    optInfo->O_one = Compiler_WordList ( 1 ) ;
-    optInfo->O_two = Compiler_WordList ( 2 ) ;
-    optInfo->O_three = Compiler_WordList ( 3 ) ;
-    optInfo->O_four = Compiler_WordList ( 4 ) ;
-    optInfo->O_five = Compiler_WordList ( 5 ) ;
-    optInfo->O_six = Compiler_WordList ( 6 ) ;
+    dlnode * node ; int64 i ;
+    for ( i = 0, node = dllist_First ( ( dllist* ) compiler->WordList ) ; node ; node = dlnode_Next ( node ) ) // nb. this is a little subtle
+    {
+        if ( dobject_Get_M_Slot ( node, SCN_IN_USE_FLAG ) ) 
+        {
+            if ( i < 8 ) optInfo->COIW [ i++ ] = (Word *) dobject_Get_M_Slot ( node, SCN_WORD ) ; 
+            else break ;
+        }
+    }
 }
 
 CompileOptimizeInfo *
 CompileOptInfo_New ( Compiler * compiler, uint64 type )
 {
-    compiler->optInfo = ( CompileOptimizeInfo * ) Mem_Allocate ( sizeof (CompileOptimizeInfo ), type ) ;
-    //CompileoptInfo_Init ( compiler ) ;
+    compiler->OptInfo = ( CompileOptimizeInfo * ) Mem_Allocate ( sizeof (CompileOptimizeInfo ), type ) ;
 }
 
 void
@@ -200,7 +192,6 @@ Compiler_Init ( Compiler * compiler, uint64 state )
 {
     compiler->State = state ;
     _dllist_Init ( compiler->GotoList ) ;
-    //if ( _ReadLiner_ ) Compiler_Show_WordList ( (byte*) _ReadLiner_->InputLineString ) ;
     if ( ! IsSourceCodeOn )
     {
         DLList_RecycleWordList ( compiler->WordList ) ;
@@ -216,7 +207,6 @@ Compiler_Init ( Compiler * compiler, uint64 state )
         }
         compiler->WordList = _dllist_New ( CONTEXT ) ;
     }
-    //Compiler_WordList_RecycleInit ( compiler ) ;
     CfrTil_InitBlockSystem ( compiler ) ;
     compiler->ContinuePoint = 0 ;
     compiler->BreakPoint = 0 ;
@@ -224,27 +214,20 @@ Compiler_Init ( Compiler * compiler, uint64 state )
     compiler->ParenLevel = 0 ;
     compiler->BlockLevel = 0 ;
     compiler->ArrayEnds = 0 ;
-    //CompileOptInfo_Init ( compiler ) ;
     compiler->NumberOfLocals = 0 ;
     compiler->NumberOfArgs = 0 ;
     compiler->NumberOfRegisterLocals = 0 ;
     compiler->NumberOfRegisterArgs = 0 ;
     compiler->NumberOfRegisterVariables = 0 ;
     compiler->LocalsFrameSize = 0 ;
-    //compiler->FunctionTypesArray = 0 ;
     compiler->AccumulatedOffsetPointer = 0 ;
     compiler->ReturnVariableWord = 0 ;
     Stack_Init ( compiler->PointerToOffset ) ;
     Stack_Init ( compiler->CombinatorInfoStack ) ;
     _Compiler_FreeAllLocalsNamespaces ( compiler ) ;
-    //Stack_Init ( compiler->LocalsNamespacesStack ) ;
     Stack_Init ( compiler->InfixOperatorStack ) ;
     _dllist_Init ( compiler->CurrentSwitchList ) ;
     _dllist_Init ( compiler->RegisterParameterList ) ;
-    //Compiler_SetCompilingSpace ( ( byte* ) "CodeSpace" ) ;
-    //Compiler_SetCompilingSpace_MakeSureOfRoom ( ( byte* ) "CodeSpace" ) ; // 2 * K : should be enough at least for now ??
-    //OVT_MemListFree_TempObjects ( ) ;
-    //compiler->RegOrder [4] = { EBX, EDX, ECX, R8 } ;
     compiler->CurrentCreatedWord = 0 ;
     compiler->CurrentWord = 0 ;
     compiler->CurrentWordCompiling = 0 ;
@@ -262,14 +245,13 @@ Compiler_New ( uint64 type )
     compiler->CombinatorBlockInfoStack = Stack_New ( 64, type ) ;
     compiler->GotoList = _dllist_New ( type ) ;
     compiler->LocalsCompilingNamespacesStack = Stack_New ( 32, type ) ;
-    //compiler->LocalsCompilerNamespacesStack = Stack_New ( 32, type ) ;
     compiler->NamespacesStack = Stack_New ( 32, type ) ;
     compiler->PointerToOffset = Stack_New ( 32, type ) ;
     compiler->CombinatorInfoStack = Stack_New ( 64, type ) ;
     compiler->InfixOperatorStack = Stack_New ( 32, type ) ;
     CompileOptInfo_New ( compiler, type ) ;
     compiler->RegOrder [ 0 ] = OREG2 ;
-    compiler->RegOrder [ 1 ] = OP_REG ;
+    compiler->RegOrder [ 1 ] = OREG ;
     Compiler_Init ( compiler, 0 ) ;
     return compiler ;
 }
@@ -301,10 +283,15 @@ Stack_PointerToJmpOffset_Set ( )
 }
 
 void
-_Compiler_CompileAndRecord_PushAccum ( Compiler * compiler )
+_Compiler_CompileAndRecord_PushAccum ( Compiler * compiler, int8 reg )
 {
-    //_Word_CompileAndRecord_PushR8 ( Compiler_WordStack ( 0 ) ) ;
-    _Word_CompileAndRecord_PushReg ( Compiler_WordList ( 0 ), ACC ) ;
+    _Word_CompileAndRecord_PushReg ( Compiler_WordList ( 0 ), reg ) ;
+}
+
+void
+Compiler_CompileAndRecord_PushAccum ( Compiler * compiler )
+{
+    _Compiler_CompileAndRecord_PushAccum ( compiler, ACC ) ;
 }
 
 

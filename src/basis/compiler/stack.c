@@ -6,7 +6,9 @@
 void
 _Compile_Stack_Drop ( int8 stackReg )
 {
+    //_DBI_ON ;
     Compile_SUBI ( REG, stackReg, 0, sizeof (int64 ), BYTE ) ; // 3 bytes long
+    //DBI_OFF ;
 }
 
 void
@@ -45,18 +47,18 @@ _Compile_StackPtrLValue_PushObj ( uint64 stkPtrLvalue, int8 tempStkReg, int64 ob
 {
 #if 0    
     Compile_ADDI ( REG, tempStkReg, 0, sizeof (int64 ), 0 ) ;
-    _Compile_MoveReg_ToAddress_ThruReg ( tempStkReg, ( byte* ) stkPtrLvalue, OP_REG ) ;
+    _Compile_MoveReg_ToAddress_ThruReg ( tempStkReg, ( byte* ) stkPtrLvalue, OREG ) ;
     _Compile_SetStackN_WithObject ( tempStkReg, 0, obj ) ;
 #else
     //_Compile_GetRValue_FromLValue_ToReg ( reg, ( byte* ) address ) ;
-    _Compile_MoveImm_To_Reg ( OP_REG, ( int64 ) stkPtrLvalue, CELL_SIZE ) ; // OREG is lvalue
-    _Compile_Move_Rm_To_Reg ( tempStkReg, OP_REG, 0 ) ; // tempStkReg is rvalue
+    _Compile_MoveImm_To_Reg ( OREG, ( int64 ) stkPtrLvalue, CELL_SIZE ) ; // OREG is lvalue
+    _Compile_Move_Rm_To_Reg ( tempStkReg, OREG, 0 ) ; // tempStkReg is rvalue
     //_Compile_MoveImm_To_Reg ( tempStkReg, ( int64 ) address, CELL_SIZE ) ;
     Compile_ADDI ( REG, tempStkReg, 0, sizeof (int64 ), 0 ) ;
     _Compile_SetStackN_WithObject ( tempStkReg, 0, obj ) ;
     //_Compile_MoveReg_ToAddress_ThruReg ( reg, ( byte* ) lvalue, OREG ) ;
     //_Compile_MoveImm_To_Reg ( OREG, ( int64 ) lvalue, CELL_SIZE ) ;
-    _Compile_Move_Reg_To_Rm ( OP_REG, tempStkReg, 0 ) ; //OREG remained as lvalue set as before 
+    _Compile_Move_Reg_To_Rm ( OREG, tempStkReg, 0 ) ; //OREG remained as lvalue set as before 
 #endif    
 }
 
@@ -65,14 +67,14 @@ void
 _Compile_StackPtrLValue_PopToReg ( uint64 stkPtrLvalue, int8 tempStkReg, int8 reg ) // c lvalue
 {
     //_Compile_GetRValue_FromLValue_ToReg ( stackReg, ( byte* ) ptr ) ;
-    _Compile_MoveImm_To_Reg ( OP_REG, ( int64 ) stkPtrLvalue, CELL_SIZE ) ; // OREG is lvalue
-    _Compile_Move_Rm_To_Reg ( tempStkReg, OP_REG, 0 ) ; // OREG is rvalue stack ptr
+    _Compile_MoveImm_To_Reg ( OREG, ( int64 ) stkPtrLvalue, CELL_SIZE ) ; // OREG is lvalue
+    _Compile_Move_Rm_To_Reg ( tempStkReg, OREG, 0 ) ; // OREG is rvalue stack ptr
     //_Compile_MoveImm_To_Reg ( stackReg, ( int64 ) ptr, CELL_SIZE ) ;
     _Compile_Move_StackN_To_Reg ( reg, tempStkReg, 0 ) ; // pop our rvalue stack ptr
     Compile_SUBI ( REG, tempStkReg, 0, sizeof (int64 ), 0 ) ;
     //_Compile_MoveReg_ToAddress_ThruReg ( reg, ( byte* ) lvalue, OREG ) ;
     //_Compile_MoveImm_To_Reg ( thruReg, ( int64 ) lvalue, CELL_SIZE ) ;
-    _Compile_Move_Reg_To_Rm ( OP_REG, tempStkReg, 0 ) ; // move the new rvalue back to its lvalue - OREG
+    _Compile_Move_Reg_To_Rm ( OREG, tempStkReg, 0 ) ; // move the new rvalue back to its lvalue - OREG
 }
 
 void
@@ -213,9 +215,9 @@ _Compile_Stack_Pick ( int8 stackReg ) // pick
 void
 _Compile_Stack_Swap ( int8 stackReg )
 {
-    _Compile_Move_Rm_To_Reg ( OP_REG, stackReg, 0 ) ;
+    _Compile_Move_Rm_To_Reg ( OREG, stackReg, 0 ) ;
     _Compile_Move_Rm_To_Reg ( THRU_REG, stackReg, - CELL ) ;
-    _Compile_Move_Reg_To_Rm ( stackReg, OP_REG, - CELL ) ;
+    _Compile_Move_Reg_To_Rm ( stackReg, OREG, - CELL ) ;
     _Compile_Move_Reg_To_Rm ( stackReg, THRU_REG, 0 ) ;
 }
 
@@ -266,7 +268,7 @@ void
 Compile_Set_DataStackPointer_FromDspReg ( )
 {
     //DBI_ON ;
-    _Compile_MoveReg_ToAddress_ThruReg ( DSP, ( byte* ) & _CfrTil_->DataStack->StackPointer, OP_REG ) ;
+    _Compile_MoveReg_ToAddress_ThruReg ( DSP, ( byte* ) & _CfrTil_->DataStack->StackPointer, OREG ) ;
     //DBI_OFF ;
 }
 #if 0
@@ -289,7 +291,7 @@ Compile_Set_ReturnStackPointer_FromCfrTilRspReg ( )
     //DBI_ON ;
     //_Compile_MoveImm ( REG, OREG, IMM_B | REX_B | MODRM_B | DISP_B, 0, 0, ( uint64 ) & _Rsp_, CELL ) ;
     //_Compile_Move_Reg_To_Rm ( OREG, CFT_RSP, 0 ) ;
-    _Compile_MoveReg_ToAddress_ThruReg ( CFT_RSP, ( byte* ) & _Rsp_, OP_REG ) ;
+    _Compile_MoveReg_ToAddress_ThruReg ( CFT_RSP, ( byte* ) & _Rsp_, OREG ) ;
     //DBI_OFF ;
 }
 
@@ -307,7 +309,7 @@ Compile_CfrTilWord_Return ( )
     _Compile_StackPtrLValue_PopToReg ( (uint64)&_Rsp_, CFT_RSP, ACC ) ;
 #if DEBUG_RETURN
     _Compile_Stack_PushReg ( DSP, ACC ) ;
-    _Compile_Call_ThruReg ( ( byte* ) DebugReturn, OP_REG ) ;
+    _Compile_Call_ThruReg ( ( byte* ) DebugReturn, OREG ) ;
     _Compile_Stack_PopToReg ( DSP, ACC ) ;
 #endif
     //Compile_Set_ReturnStackPointer_FromCfrTilRspReg ( ) ;

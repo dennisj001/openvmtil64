@@ -15,7 +15,7 @@
 void
 CfrTil_PeekReg ( ) // @
 {
-    DBI_ON ;
+    //DBI_ON ;
     //uint64 reg = _DataStack_Top () ;
     ByteArray * svcs = _Q_CodeByteArray, *ba = _CfrTil_->PeekPokeByteArray ;
     _ByteArray_DataClear ( ba ) ;
@@ -24,7 +24,7 @@ CfrTil_PeekReg ( ) // @
     _Compile_Return ( ) ;
     Set_CompilerSpace ( svcs ) ; // now compile to this space
     ( ( VoidFunction ) ba->BA_Data ) ( ) ;
-    DBI_OFF ;
+    //DBI_OFF ;
 }
 
 // pokeRegWithValue ( lvalue reg -- puts value of reg at lvalue address )
@@ -32,7 +32,7 @@ CfrTil_PeekReg ( ) // @
 void
 CfrTil_PokeRegWithValue ( ) // @
 {
-    DBI_ON ;
+    //DBI_ON ;
     uint64 reg = DataStack_Pop ( ) ;
     uint64 value = DataStack_Pop ( ) ;
     ByteArray * svcs = _Q_CodeByteArray, *ba = _CfrTil_->PeekPokeByteArray ;
@@ -44,14 +44,14 @@ CfrTil_PokeRegWithValue ( ) // @
     //int64 size = Here - here ;
     Set_CompilerSpace ( svcs ) ; // now compile to this space
     ( ( VoidFunction ) ba->BA_Data ) ( ) ;
-    DBI_OFF ;
+    //DBI_OFF ;
 }
 
 // pokeRegAtAddress ( address, reg -- )
 void
 CfrTil_PokeRegAtAddress ( ) // @
 {
-    DBI_ON ;
+    //DBI_ON ;
     uint64 reg = DataStack_Pop ( ) ;
     uint64 address = DataStack_Pop ( ) ;
     ByteArray * svcs = _Q_CodeByteArray, *ba = _CfrTil_->PeekPokeByteArray ;
@@ -66,7 +66,7 @@ CfrTil_PokeRegAtAddress ( ) // @
     //int64 size = Here - here ;
     Set_CompilerSpace ( svcs ) ; // now compile to this space
     ( ( VoidFunction ) ba->BA_Data ) ( ) ;
-    DBI_OFF ;
+    //DBI_OFF ;
 }
 #if TURN_DBI_OFF
 #undef DBI_ON
