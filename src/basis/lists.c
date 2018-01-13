@@ -15,8 +15,8 @@ _List_PrintNames ( dllist * list, int64 count, int64 flag )
         thisName = nodeWord ? sconvbs ( bt, nodeWord->Name ) : ( byte* ) " ", node ;
         if ( flag )
         {
-            beforeWord = ( node->beforeWord == list->afterWord ? 0 : ( Word * ) dobject_Get_M_Slot ( node->beforeWord, 0 ) ) ;
-            afterWord = ( node->afterWord == list->afterWord ? 0 : ( Word* ) dobject_Get_M_Slot ( node->afterWord, 0 ) ) ;
+            beforeWord = ( node->beforeWord == list->afterWord ? 0 : ( Word * ) dobject_Get_M_Slot ( node->beforeWord, SCN_WORD ) ) ;
+            afterWord = ( node->afterWord == list->afterWord ? 0 : ( Word* ) dobject_Get_M_Slot ( node->afterWord, SCN_WORD ) ) ;
             afterName = afterWord ? sconvbs ( ba, afterWord->Name ) : ( byte* ) " ", node->afterWord ;
             beforeName = beforeWord ? sconvbs ( bb, ( beforeWord )->Name ) : ( byte* ) " ", node->beforeWord ;
             _Printf ( ( byte* ) "\n\tName : %s 0x%08x \t\tBefore : %s 0x%08x : \t\tAfter : %s 0x%08x,",

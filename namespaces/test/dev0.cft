@@ -14,8 +14,8 @@ C Bits Experimental
 // ' tx find wdiss 
 Logic 
 // test constant folding
-: tx1 0 ! ! 8 2 / 2 / 3 & 4 | 1 + + ; 
-' tx1 find wdiss //pause
+: tx1 0 d: ! ! 8 2 / 2 / 3 & 4 | 1 + + ; 
+' tx1 find wdiss pause
 tx1 7 _assert
 // namespaceTreeWithWords
 

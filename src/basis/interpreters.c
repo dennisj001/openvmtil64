@@ -4,7 +4,7 @@
 void
 _Interpret_ListNode ( dlnode * node )
 {
-    Word * word = ( Word * ) dobject_Get_M_Slot ( node, 0 ) ;
+    Word * word = ( Word * ) dobject_Get_M_Slot ( node, SCN_WORD ) ;
     _Word_Interpret ( word ) ;
 }
 
@@ -32,7 +32,7 @@ List_InterpretLists ( dllist * list )
             // get nextNode before map function (mf) in case mf changes list by a Remove of current node
             // problem could arise if mf removes Next node
             nextNode = dlnode_Next ( node ) ;
-            dllist * list = ( dllist * ) dobject_Get_M_Slot ( node, 0 ) ;
+            dllist * list = ( dllist * ) dobject_Get_M_Slot ( node, SCN_WORD ) ;
             List_Interpret ( list ) ;
             dlnode_Remove ( node ) ;
         }
@@ -55,7 +55,7 @@ List_CheckInterpretLists_OnVariable ( dllist * list, byte * token )
             // get nextNode before map function (mf) in case mf changes list by a Remove of current node
             // problem could arise if mf removes Next node
             nextNode = dlnode_Next ( node ) ;
-            dllist * plist = ( dllist * ) dobject_Get_M_Slot ( node, 0 ) ; // plist created in CfrTil_IncDec
+            dllist * plist = ( dllist * ) dobject_Get_M_Slot ( node, SCN_WORD ) ; // plist created in CfrTil_IncDec
             Word * word = ( Word * ) List_Top ( plist ) ;
             byte *checkPostfixToken = word ? word->Name : 0 ;
             if ( checkPostfixToken && String_Equal ( checkPostfixToken, token ) )

@@ -58,9 +58,6 @@ Compile_X_Group3 ( Compiler * compiler, int64 code ) //OP_1_ARG
         }
     }
     else
-Berkeley Patients Group
-
-
     {
         _Compile_Group3 ( code, MEM, DSP, REX_B | MODRM_B, 0, 0, 0, 0 ) ;
     }

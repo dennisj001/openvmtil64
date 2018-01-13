@@ -388,3 +388,4 @@ factorial (7) p //sp
 // you can trim this file to your needs and put your personal init code here maybe
 #endif
 2 + 7  assertStkChk // stack checking
+s

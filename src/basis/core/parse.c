@@ -148,7 +148,7 @@ Compile_InitRegisterParamenterVariables ( Compiler * compiler )
     int64 regIndex ;
     for ( regIndex = 0, node = dllist_First ( ( dllist* ) list ) ; node ; node = dlnode_Next ( node ) )
     {
-        Word * word = ( Word* ) dobject_Get_M_Slot ( node, 0 ) ;
+        Word * word = ( Word* ) dobject_Get_M_Slot ( node, SCN_WORD ) ;
         _Compile_Move_StackN_To_Reg ( word->RegToUse, DSP, regIndex * CELL ) ;
     }
 }

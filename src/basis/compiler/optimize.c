@@ -308,14 +308,16 @@ _CheckOptimizeOperands ( Compiler * compiler, int64 maxOperands )
                         SetState ( compiler, COMPILE_MODE, true ) ;
                         SetState ( _CfrTil_, OPTIMIZE_ON, true ) ; //prevent recursion here
                         value = DataStack_Pop ( ) ;
-                        _CfrTil_WordList_PopWords ( 2, 1 ) ;
-                        Set_SCA ( 0 ) ;
-                        Word * zero = Compiler_WordList ( 0 ) ;
-                        zero->W_Value = value ;
+                        Word * two = optInfo_0_two ;
+                        _CfrTil_WordList_PopWords ( 3, 1 ) ;
+                        two->W_Value = value ;
                         //_DBI_ON ;
+                        CfrTil_WordList_PushWord ( two ) ;
+                        SetHere ( two->Coding ) ;
+                        _Set_SCA ( two ) ;
                         _Compile_MoveImm_To_Reg ( ACC, value, CELL ) ;
-                        _Word_CompileAndRecord_PushReg ( zero, ACC ) ;
-                        //DBI_OFF ;
+                        _Word_CompileAndRecord_PushReg ( two, ACC ) ;
+                        //Word_Eval ( two ) ;
                         return OPTIMIZE_DONE ;
                     }
                     case ( OP_VAR << ( 4 * O_BITS ) | OP_FETCH << ( 3 * O_BITS ) | OP_VAR << ( 2 * O_BITS ) | OP_FETCH << ( 1 * O_BITS ) | OP_DIVIDE ):
@@ -390,7 +392,7 @@ unordered:
                                 optInfo->Optimize_Rm = OREG ;
                                 optInfo->Optimize_Reg = ACC ; //OREG ;
                             }
-                            else  return 0 ;
+                            else return 0 ;
                         }
                         return i ;
                     }
@@ -524,17 +526,18 @@ unordered:
                         SetHere ( optInfo_0_one->Coding ) ;
                         // a little tricky here ...
                         // ?? maybe we should setup and use a special compiler stack and use it here ... ??
-                        //_DataStack_Push ( (int64) optInfo_0_two->Object ) ;
                         DataStack_Push ( ( int64 ) * optInfo_0_one->W_PtrToValue ) ;
                         SetState ( compiler, COMPILE_MODE, false ) ;
                         SetState ( _CfrTil_, OPTIMIZE_ON, false ) ; //prevent recursion here
-                        Word_Run ( optInfo_0_zero ) ;
+                        Word_Eval ( optInfo_0_zero ) ;
                         SetState ( compiler, COMPILE_MODE, true ) ;
                         SetState ( _CfrTil_, OPTIMIZE_ON, true ) ; //prevent recursion here
                         value = DataStack_Pop ( ) ;
-                        Set_SCA ( 0 ) ;
+                        Word *one = optInfo_0_one ;
                         _Compile_MoveImm_To_Reg ( ACC, value, CELL ) ;
-                        _Word_CompileAndRecord_PushReg ( optInfo_0_zero, ACC ) ;
+                        _Word_CompileAndRecord_PushReg ( one, ACC ) ;
+                        _CfrTil_WordList_PopWords ( 2, 1 ) ;
+                        CfrTil_WordList_PushWord ( one ) ;
                         return OPTIMIZE_DONE ;
                     }
                     case ( OP_VAR << ( 1 * O_BITS ) | OP_1_ARG ):
@@ -1099,6 +1102,7 @@ unordered:
                     case ( OP_VAR << ( 2 * O_BITS ) | OP_LC << ( 1 * O_BITS ) | OP_DIVIDE ):
 #if 1                        
                     {
+                        if ( GetState ( _Context_, C_SYNTAX ) ) return 0 ;
                         SetHere ( optInfo_0_two->Coding ) ;
                         if ( compiler->NumberOfRegisterVariables )
                         {
@@ -1108,15 +1112,13 @@ unordered:
                         }
                         else
                         {
-                            if ( optInfo_0_two->CAttribute & REGISTER_VARIABLE ) _GetRmDispImm ( optInfo, optInfo_0_two, - 1 ) ;
-                            else
-                            {
-                                _Compile_GetVarLitObj_RValue_To_Reg ( optInfo_0_two, ACC ) ;
-                            }
-                            _GetRmDispImm ( optInfo, optInfo_0_one, OREG ) ;
+                            //if ( optInfo_0_two->CAttribute & REGISTER_VARIABLE ) 
+                            _GetRmDispImm ( optInfo, optInfo_0_two, - 1 ) ;
+                            //else _Compile_GetVarLitObj_RValue_To_Reg ( optInfo_0_two, ACC ) ;
+                            _GetRmDispImm ( optInfo, optInfo_0_one, -1 ) ;
                             //_Compile_VarLitObj_RValue_To_Reg ( optInfo_0_one, ECX ) ;
-                            optInfo->Optimize_Dest_RegOrMem = REG ;
-                            optInfo->Optimize_Mod = REG ;
+                            optInfo->Optimize_Dest_RegOrMem = MEM ;
+                            optInfo->Optimize_Mod = MEM ;
                             optInfo->Optimize_Reg = ACC ; // shouldn't need this but some code still references this as the rm ?? fix ??
                         }
                         return i ;
@@ -1270,7 +1272,7 @@ CheckOptimize ( Compiler * compiler, int64 maxOperands )
         Set_SCA ( 0 ) ;
         rtrn = _CheckOptimizeOperands ( compiler, maxOperands ) ;
 #if 1        
-        //if ( ! ( rtrn & ( OPTIMIZE_DONE ) ) )
+        if ( ! ( rtrn & ( OPTIMIZE_DONE ) ) )
         {
             Set_SCA ( 0 ) ;
         }

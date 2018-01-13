@@ -120,6 +120,88 @@
         <in>systems.c</in>
         <in>words.c</in>
       </df>
+      <df name="udis86-1.7.2">
+        <df name="build">
+          <df name="m4">
+          </df>
+        </df>
+        <df name="docs">
+          <df name="manual">
+            <df name="static">
+            </df>
+          </df>
+          <df name="x86">
+          </df>
+        </df>
+        <df name="libudis86">
+          <df name=".deps">
+          </df>
+          <df name=".libs">
+          </df>
+          <in>decode.c</in>
+          <in>decode.h</in>
+          <in>extern.h</in>
+          <in>itab.c</in>
+          <in>itab.h</in>
+          <in>syn-att.c</in>
+          <in>syn-intel.c</in>
+          <in>syn.c</in>
+          <in>syn.h</in>
+          <in>types.h</in>
+          <in>udint.h</in>
+          <in>udis86.c</in>
+        </df>
+        <df name="m4">
+        </df>
+        <df name="scripts">
+        </df>
+        <df name="tests">
+          <df name=".deps">
+          </df>
+          <df name="asm">
+            <df name="16">
+              <in>disp.asm</in>
+              <in>test16.asm</in>
+            </df>
+            <df name="32">
+              <in>att.asm</in>
+              <in>corner.asm</in>
+              <in>disp.asm</in>
+              <in>invalid_seg.asm</in>
+              <in>obscure.asm</in>
+              <in>reljmp.asm</in>
+              <in>sext.asm</in>
+              <in>test32.asm</in>
+            </df>
+            <df name="64">
+              <df name="amd">
+                <in>invalid.asm</in>
+              </df>
+              <df name="intel">
+                <in>invalid.asm</in>
+              </df>
+              <in>branch.asm</in>
+              <in>disp.asm</in>
+              <in>reljmp.asm</in>
+              <in>sext.asm</in>
+              <in>test64.asm</in>
+            </df>
+          </df>
+          <in>bufoverrun.c</in>
+          <in>installcheck.c</in>
+          <in>libcheck.c</in>
+          <in>symresolve.c</in>
+        </df>
+        <df name="udcli">
+          <df name=".deps">
+          </df>
+          <df name=".libs">
+          </df>
+          <in>udcli.c</in>
+        </df>
+        <in>config.h</in>
+        <in>udis86.h</in>
+      </df>
     </df>
   </logicalFolder>
   <projectmakefile>Makefile</projectmakefile>

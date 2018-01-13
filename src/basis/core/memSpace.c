@@ -624,7 +624,7 @@ _CheckRecycleWord ( Word * w )
 void
 CheckRecycleWord ( Node * node )
 {
-    Word *w = ( Word* ) ( dlnode_Next ( ( dlnode* ) node ) ? dobject_Get_M_Slot ( node, 0 ) : 0 ) ;
+    Word *w = ( Word* ) ( dlnode_Next ( ( dlnode* ) node ) ? dobject_Get_M_Slot ( node, SCN_WORD ) : 0 ) ;
     _CheckRecycleWord ( w ) ;
 }
 

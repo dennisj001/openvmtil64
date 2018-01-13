@@ -3,11 +3,13 @@
 // words need to be copied because a word may be used more than once in compiling a new word, 
 // each needs to have their own coding, wordIndex, etc.
 // this information is used by the compiler, optimizer and the debugger
+
 Word *
 CopyDuplicateWord ( dlnode * anode, Word * word0 )
 {
     Word * wordn = ( Word* ) dobject_Get_M_Slot ( anode, SCN_WORD ) ;
-    if ( word0 == wordn )
+    int64 iuoFlag = dobject_Get_M_Slot ( anode, SCN_IN_USE_FLAG ) ;
+    if ( iuoFlag && ( word0 == wordn ) )
     {
         d0 ( if ( Is_DebugModeOn ) _DWL_ShowList ( _Compiler_->WordList, 0 ) ) ;
         Word * wordc = Word_Copy ( wordn, DICTIONARY ) ; // use DICTIONARY since we are recycling these anyway
@@ -15,7 +17,8 @@ CopyDuplicateWord ( dlnode * anode, Word * word0 )
         _dlnode_Init ( ( dlnode * ) wordc ) ; // necessary!
         wordc->S_CAttribute |= ( uint64 ) RECYCLABLE_COPY ;
         wordc->StackPushRegisterCode = 0 ;
-        wordc->W_SC_ScratchPadIndex = word0->W_SC_WordIndex ; ; 
+        wordc->W_SC_ScratchPadIndex = word0->W_SC_WordIndex ;
+        ;
         wordc->W_TokenStart_ReadLineIndex = word0->W_TokenStart_ReadLineIndex ;
         return wordc ;
     }
@@ -33,7 +36,7 @@ _Compiler_CopyDuplicatesAndPush ( Compiler * compiler, Word * word0 )
         wordToBePushed = word1 ;
     }
     else wordToBePushed = word0 ;
-    _CfrTil_WordList_PushWord ( wordToBePushed ) ;
+    CfrTil_WordList_PushWord ( wordToBePushed ) ;
     return wordToBePushed ;
 }
 
@@ -45,7 +48,7 @@ Compiler_CopyDuplicatesAndPush ( Word * word0 )
     {
         word0 = _Compiler_CopyDuplicatesAndPush ( _Context_->Compiler0, word0 ) ;
     }
-    else _CfrTil_WordList_PushWord ( word0 ) ;
+    else CfrTil_WordList_PushWord ( word0 ) ;
     return word0 ;
 }
 
@@ -132,7 +135,7 @@ _Compiler_FreeAllLocalsNamespaces ( Compiler * compiler )
 Word *
 Compiler_WordList ( int64 n )
 {
-    return ( Word * ) _dllist_Get_N_InUse_Node_M_Slot ( _Compiler_->WordList, n, SCN_WORD ) ; 
+    return ( Word * ) _dllist_Get_N_InUse_Node_M_Slot ( _Compiler_->WordList, n, SCN_WORD ) ;
 }
 
 void
@@ -147,12 +150,13 @@ CompileOptInfo_Init ( Compiler * compiler )
 {
     CompileOptimizeInfo * optInfo = compiler->OptInfo ;
     _CompileOptInfo_Init ( compiler ) ;
-    dlnode * node ; int64 i ;
+    dlnode * node ;
+    int64 i ;
     for ( i = 0, node = dllist_First ( ( dllist* ) compiler->WordList ) ; node ; node = dlnode_Next ( node ) ) // nb. this is a little subtle
     {
-        if ( dobject_Get_M_Slot ( node, SCN_IN_USE_FLAG ) ) 
+        if ( dobject_Get_M_Slot ( node, SCN_IN_USE_FLAG ) )
         {
-            if ( i < 8 ) optInfo->COIW [ i++ ] = (Word *) dobject_Get_M_Slot ( node, SCN_WORD ) ; 
+            if ( i < 8 ) optInfo->COIW [ i ++ ] = ( Word * ) dobject_Get_M_Slot ( node, SCN_WORD ) ;
             else break ;
         }
     }

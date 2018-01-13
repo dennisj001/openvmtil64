@@ -363,10 +363,10 @@ _dllist_DropN ( dllist * list, int64 n )
 int64
 _dllist_Get_N_InUse_Node_M_Slot ( dllist * list, int64 n, int64 m )
 {
-    dlnode * node ;
+    dlnode * node ; 
     for ( node = dllist_First ( ( dllist* ) list ) ; node ; node = dlnode_Next ( node ) ) // nb. this is a little subtle
     {
-        if ( dobject_Get_M_Slot ( node, SCN_IN_USE_FLAG ) ) -- n ;
+        if ( dobject_Get_M_Slot ( node, SCN_IN_USE_FLAG ) ) n -- ;
         if ( n < 0 ) break ;
     }
     return node ? dobject_Get_M_Slot ( node, m ) : 0 ; // LIST_EMPTY

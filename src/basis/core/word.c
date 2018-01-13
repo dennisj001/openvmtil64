@@ -16,7 +16,6 @@ Word_Run ( Word * word )
         // keep track in the word itself where the machine code is to go, if this word is compiled or causes compiling code - used for optimization
         Word_SetCoding ( word, Here ) ;
         word->W_InitialRuntimeDsp = _Dsp_ ;
-        //_Debugger_->PreHere = Here ; // in DEBUG_SETUP
         _Context_->CurrentlyRunningWord = word ;
         _Block_Eval ( word->Definition ) ;
     }

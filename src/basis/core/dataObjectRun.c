@@ -35,7 +35,7 @@ _Namespace_Do_C_Type ( Namespace * ns )
                     _Namespace_ActivateAsPrimary ( ns ) ;
                     Word * word = Word_New ( token1 ) ;
                     word->Coding = Here ;
-                    _CfrTil_WordList_PushWord ( word ) ;
+                    CfrTil_WordList_PushWord ( word ) ;
                     DataStack_Push ( ( int64 ) word ) ; 
                     CfrTil_RightBracket ( ) ; 
                     CfrTil_BeginBlock ( ) ;

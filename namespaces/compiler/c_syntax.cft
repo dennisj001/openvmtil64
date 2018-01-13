@@ -79,7 +79,7 @@ chi ( chey0, d | a b c )
 {
     libc
     //<dbg> c = 1 + 2 ;
-    c = 1 + 2 ;
+    d: c = 1 + 2 ;
     b = c + 2 ;
     a = b + c ;
     nl

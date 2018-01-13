@@ -293,6 +293,7 @@
 #define IsSourceCodeOn ( _IsSourceCodeOn || IsGlobalsSourceCodeOn )
 #define IsSourceCodeOff (!IsSourceCodeOn) //( GetState ( _CfrTil_, DEBUG_SOURCE_CODE_MODE ) || IsGlobalsSourceCodeOn ))
 //#define Word_Set_SCA( word )  { if ( word ) word->Coding = Here ; }
+#define _Set_SCA( word ) Word_Set_SCA ( word ) ;
 #define Set_SCA( index ) Word_Set_SCA (Compiler_WordList ( index )) ;
 //#define SC_Push( word ) DebugWordList_PushWord ( word ) 
 //#define Word_Set_SCA( word ) //DebugWordList_PushWord ( word ) 

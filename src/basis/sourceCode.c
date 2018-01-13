@@ -50,7 +50,7 @@ DWL_Find ( dllist * list, Word * iword, byte * address, byte* name, int64 fromFi
                         }
                         foundWord = aFoundWord ;
                     }
-                    else continue ;
+                    continue ;
 #if 0
                     if ( aFoundWord )
                     {
@@ -278,7 +278,7 @@ _CfrTil_AdjustDbgSourceCodeAddress ( byte * address, byte * newAddress )
 }
 
 void
-_CfrTil_WordList_PushWord ( Word * word )
+CfrTil_WordList_PushWord ( Word * word )
 {
     CompilerWordList_Push ( word ) ; //_List_PushNew ( _Compiler_->WordList, word ) ;
 }

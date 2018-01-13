@@ -58,7 +58,7 @@ hex
 Logic Bits Combinators X64 
 
 //'x64_dbg 1 const  
-#define x64_dbg 1
+#define x64_dbg 0
 #if x64_dbg    
 dscOn 
 verbosity 3 =
