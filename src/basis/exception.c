@@ -6,13 +6,13 @@ _OpenVmTil_ShowExceptionInfo ( )
 {
     if ( _Q_->Verbosity )
     {
-        if ( _Q_->SignalExceptionsHandled < 2 )
+        if ( _Q_->SignalExceptionsHandled++ < 2 )
         {
             if ( _CfrTil_ )
             {
                 Word * word = 0 ;
                 Debugger * debugger = _Debugger_ ;
-                _Debugger_Locals_Show ( debugger, debugger->w_Word ) ;
+                //_Debugger_Locals_Show ( debugger, debugger->w_Word ) ;
                 Debugger_Stack ( debugger ) ;
                 DebugOn ;
                 if ( _Q_->Signal != 11 )

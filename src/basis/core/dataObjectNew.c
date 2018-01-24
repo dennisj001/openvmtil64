@@ -3,7 +3,7 @@
 
 // Dynamic Object New : Word = Namespace = DObject : have a s_Symbol
 
-// run all new object thru here ; good for debugging and understanding 
+// runs all new object thru here ; good for debugging and understanding 
 
 Word *
 _DataObject_New ( uint64 type, Word * word, byte * name, uint64 ctype, uint64 ctype2, uint64 ltype, int64 index, int64 value, int64 startCharRlIndex )

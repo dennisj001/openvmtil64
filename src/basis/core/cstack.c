@@ -282,23 +282,26 @@ _Stack_IntegrityCheck ( Stack * stack )
 {
     // first a simple integrity check of the stack info struct
     //Set_StackPointerFromDsp ( _CfrTil_ ) ;
-    if ( ( stack->StackMin == & stack->StackData [ 0 ] ) &&
-        ( stack->StackMax == & stack->StackData [ stack->StackSize - 1 ] ) && // -1 : zero based array
+    if ( ( stack->StackMin == & (stack->StackData [ 0 ]) ) &&
+        ( stack->StackMax == & (stack->StackData [ stack->StackSize - 1 ]) ) && // -1 : zero based array
         ( stack->InitialTosPointer == & stack->StackData [ - 1 ] ) )
     {
         return true ;
     }
-    CfrTil_Exception ( 0, c_ad ( "\nStack Integrity Error :" ), QUIT ) ;
+    byte * errorString ;
+    if ( _Stack_Overflow ( stack ) ) errorString = "\nStack Integrity Error : Stack Overflow" ;
+    else errorString = "\nStack Integrity Error : Stack Underflow" ;
+    CfrTil_Exception ( 0, c_ad ( errorString ), QUIT ) ;
     return false ;
 }
 
 int64
 _Stack_Depth ( Stack * stack )
 {
-    int64 depth = stack->StackPointer - stack->InitialTosPointer ; //+ 1 ; // + 1 :: zero based array - include the zero in depth 
+    int64 depth = stack->StackPointer - stack->InitialTosPointer ; // + 1 :: zero based array - include the zero in depth 
     //if ( depth <= stack->StackSize ) return depth ;
     //return ( 0 ) ;
-    return depth ;
+    return ( depth ) ; //+ 1 ) ;// + 1 :: zero based array - include the zero in depth 
 }
 
 int64

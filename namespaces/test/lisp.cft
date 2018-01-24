@@ -140,7 +140,7 @@ nl (+ 1 2 3 ,@x)
 nl 
 ((q2 +) (q2 28) (q2 2)(q3 2) (q4 45))
 
-#if 0
+#if 1
 (( lambda ( x y ) ( + x y ) ) 3 4 ) 
 (define yfac (lambda (yy n) (if* (< n 2) 1 (* n (yy yy (- n 1)))))) 
 (yfac yfac 10) nl

@@ -2,7 +2,7 @@
 #include "../include/cfrtil64.h"
 
 void
-CfrTil_Colon ( )
+_CfrTil_Colon ( )
 {
     CfrTil_RightBracket ( ) ;
     SetState ( _Context_->Compiler0, COMPILE_MODE, true ) ;
@@ -10,6 +10,18 @@ CfrTil_Colon ( )
     CfrTil_Token ( ) ;
     CfrTil_Word_Create ( ) ;
     CfrTil_BeginBlock ( ) ;
+}
+
+void
+CfrTil_Colon ( )
+{
+    _CfrTil_Colon ( ) ;
+    byte * token = Lexer_PeekNextNonDebugTokenWord ( _Lexer_, 0 ) ;
+    if ( String_Equal ( token, "(") )
+    {
+        Lexer_ReadToken ( _Lexer_ ) ;
+        CfrTil_LocalsAndStackVariablesBegin ( ) ;
+    }
 }
 
 Word *
@@ -147,7 +159,7 @@ CfrTil_Word ( )
 {
     block b = ( block ) DataStack_Pop ( ) ;
     byte * name = ( byte* ) DataStack_Pop ( ) ;
-    _DataObject_New (CFRTIL_WORD, 0, name, 0, 0, 0, 0, ( int64 ) b, 0 ) ;
+    _DataObject_New ( CFRTIL_WORD, 0, name, 0, 0, 0, 0, ( int64 ) b, 0 ) ;
 }
 
 void

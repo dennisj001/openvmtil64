@@ -659,6 +659,7 @@
 #define LC_PRINT                ( (uint64) 1 << 13 )
 #define LC_READ_MACRO_OFF       ( (uint64) 1 << 14 )
 #define LC_READ_ONLY            ( (uint64) 1 << 15 )
+#define LC_READ_LAMBDA_LOCALS   ( (uint64) 1 << 16 )
 //#define LC_OBJECT_NEW_OFF        ( (uint64) 1 << 15 )
 //#define LC_PRINTED_SOURCE_CODE ( (uint64) 1 << 9 )
 

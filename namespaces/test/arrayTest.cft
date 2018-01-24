@@ -118,7 +118,8 @@ arr1 arr2 // should print decimal 0x59
 "\narr1 : " ps location arr1 size @ dump 
 : a3 ( n Ar1 a ) 
     a.ar [n @ 1 +] a.ar[n @ 2 +] @ = 
-    a.ar[n @ 1 +] @ dup hp 0x89 _assert 
+    a.ar[ n @ 1 +] @ dup hp 0x89 _assert decimal
+    a.ar[2] @ dup hp 0x89 _assert decimal
 ;
 
 ' a3 find wdiss

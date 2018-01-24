@@ -25,10 +25,6 @@ void
 _Namespace_DoAddSymbol ( Namespace * ns, Symbol * symbol )
 {
     dllist_AddNodeToHead ( ns->W_List, ( dlnode* ) symbol ) ;
-    d0 ( if ( String_Equal ( ns->Name, "Lisp" ) && String_Equal ( symbol->Name, "lambda" ) )
-    {
-        _Printf ( ( byte* ) "\nGot it!\n" ) ; Pause ( ) ;
-    } ) ;
 }
 
 void

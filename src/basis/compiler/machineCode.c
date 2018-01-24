@@ -367,6 +367,7 @@ Compile_X_Group5 ( Compiler * compiler, int64 op )
 // These are all operating on a memory operand
 // for use of immediate data with this group use _Compile_Group1_Immediate
 #if 0
+
 void
 _Compile_X_Group1 ( int8 code, int8 toRegOrMem, int8 mod, int8 reg, int8 rm, int8 sib, int64 disp, int8 osize )
 {
@@ -387,6 +388,7 @@ _Compile_X_Group1 ( int8 code, int8 toRegOrMem, int8 mod, int8 reg, int8 rm, int
     Compile_CalcWrite_Instruction_X64 ( 0, opCode, mod, reg, rm, DISP_B | REX_B | MODRM_B, sib, disp, 0, 0, osize ) ;
 }
 #else
+
 void
 _Compile_X_Group1 ( int8 code, int8 toRegOrMem, int8 mod, int8 reg, int8 rm, int8 sib, int64 disp, int8 osize )
 {
@@ -397,18 +399,18 @@ _Compile_X_Group1 ( int8 code, int8 toRegOrMem, int8 mod, int8 reg, int8 rm, int
     {
         // x64 has no insn to move mem to mem directly so ...
         // first move to a reg then from that reg to desired mem location
-        int8 tempReg = ( reg != OREG ) ? OREG : OREG2 ; 
+        int8 tempReg = ( reg != OREG ) ? OREG : OREG2 ;
         _Compile_Move_Rm_To_Reg ( tempReg, rm, disp ) ;
         mod = REG ;
         Compile_CalcWrite_Instruction_X64 ( 0, opCode, mod, reg, tempReg, DISP_B | REX_B | MODRM_B, sib, 0, 0, 0, osize ) ;
         _Compile_Move_Reg_To_Rm ( rm, tempReg, disp ) ;
     }
     else
-    // we need to be able to set the size so we can know how big the instruction will be in eg. CompileVariable
-    // otherwise it could be optimally deduced but let caller control by keeping operandSize parameter
-    // some times we need cell_t where bytes would work
-    // _Compile_InstructionX86 ( opCode, mod, reg, rm, modRmImmDispFlag, sib, disp, imm, immSize )
-    Compile_CalcWrite_Instruction_X64 ( 0, opCode, mod, reg, rm, DISP_B | REX_B | MODRM_B, sib, disp, 0, 0, osize ) ;
+        // we need to be able to set the size so we can know how big the instruction will be in eg. CompileVariable
+        // otherwise it could be optimally deduced but let caller control by keeping operandSize parameter
+        // some times we need cell_t where bytes would work
+        // _Compile_InstructionX86 ( opCode, mod, reg, rm, modRmImmDispFlag, sib, disp, imm, immSize )
+        Compile_CalcWrite_Instruction_X64 ( 0, opCode, mod, reg, rm, DISP_B | REX_B | MODRM_B, sib, disp, 0, 0, osize ) ;
 }
 
 #endif
@@ -459,31 +461,31 @@ _Compile_X_Group1_Immediate ( int8 code, int8 mod, int8 rm, int64 disp, uint64 i
         return ;
     }
 #elif 0
-    {
-        // x64 has no insn to do a group1op with int64 to mem directly so ...
-        // first move to a reg then from that reg to desired mem location
-        _Compile_MoveImm_To_Reg ( OREG2, imm, iSize ) ;
-        if ( ( rm != ACC ) && ( rm != OREG ) )
         {
-            _Compile_Move_Rm_To_Reg ( ACC, rm, disp ) ;
+            // x64 has no insn to do a group1op with int64 to mem directly so ...
+            // first move to a reg then from that reg to desired mem location
+            _Compile_MoveImm_To_Reg ( OREG2, imm, iSize ) ;
+            if ( ( rm != ACC ) && ( rm != OREG ) )
+            {
+                _Compile_Move_Rm_To_Reg ( ACC, rm, disp ) ;
+            }
+            _Compile_X_Group1_Reg_To_Reg ( code, ACC, OREG2 ) ;
+            //_Compile_X_Group1 ( int8 code, int8 toRegOrMem, int8 mod, int8 reg, int8 rm, int8 sib, int64 disp, int8 osize )
+            //_Compile_X_Group1 ( code, REG, REG, ACC, OREG, 0, disp, CELL ) ;
+            return ;
         }
-        _Compile_X_Group1_Reg_To_Reg ( code, ACC, OREG2 ) ;
-        //_Compile_X_Group1 ( int8 code, int8 toRegOrMem, int8 mod, int8 reg, int8 rm, int8 sib, int64 disp, int8 osize )
-        //_Compile_X_Group1 ( code, REG, REG, ACC, OREG, 0, disp, CELL ) ;
-        return ;
-    }
 #else    
-    {
-        //_DBI_ON ;
-        // x64 has no insn to do a group1op with int64 to mem directly so ...
-        // first move to a reg then from that reg group1Op to mem location
-        _Compile_MoveImm_To_Reg ( ACC, imm, iSize ) ;
-        //_Compile_X_Group1_Reg_To_Reg ( code, rm, OREG2 ) ;
-        //_Compile_X_Group1 ( int8 code, int8 toRegOrMem, int8 mod, int8 reg, int8 rm, int8 sib, int64 disp, int8 osize )
-        _Compile_X_Group1 ( code, REG, MEM, ACC, rm, 0, disp, CELL ) ;
-        //DBI_OFF ;
-        return ;
-    }
+        {
+            //_DBI_ON ;
+            // x64 has no insn to do a group1op with int64 to mem directly so ...
+            // first move to a reg then from that reg group1Op to mem location
+            _Compile_MoveImm_To_Reg ( ACC, imm, iSize ) ;
+            //_Compile_X_Group1_Reg_To_Reg ( code, rm, OREG2 ) ;
+            //_Compile_X_Group1 ( int8 code, int8 toRegOrMem, int8 mod, int8 reg, int8 rm, int8 sib, int64 disp, int8 osize )
+            _Compile_X_Group1 ( code, REG, MEM, ACC, rm, 0, disp, CELL ) ;
+            //DBI_OFF ;
+            return ;
+        }
 #endif    
     else if ( ( iSize > BYTE ) || ( imm >= 0x100 ) )
     {
@@ -512,18 +514,18 @@ Compile_X_Group1 ( Compiler * compiler, int64 op, int64 ttt, int64 n )
         //DBI ;
         _Compile_optInfo_X_Group1 ( compiler, op ) ;
         BlockInfo_Setup_BI_tttn ( _Context_->Compiler0, ttt, n, 3 ) ; // not less than 0 == greater than 0
-        if ( optInfo->Optimize_Rm != DSP ) // if the result is to a reg and not tos
+        if ( optInfo->Optimize_Rm == DSP ) // if the result is to a reg and not tos
         {
-            //_Compile_Move_Reg_To_StackN ( DSP, 0, optInfo->Optimize_Reg ) ;
-            _Word_CompileAndRecord_PushReg ( Compiler_WordList ( 0 ), optInfo->Optimize_Reg ) ; //optInfo->Optimize_Rm ) ; // 0 : ?!? should be the exact variable 
+            if ( optInfo->Optimize_Dest_RegOrMem == MEM ) return ;
+            else _Compile_Move_StackN_To_Reg ( optInfo->Optimize_Reg, DSP, 0 ) ;
         }
-        //else Compile_SUBI ( REG, DSP, 0, CELL, 0 ) ;
+        _Word_CompileAndRecord_PushReg ( Compiler_WordList ( 0 ), optInfo->Optimize_Reg ) ; //optInfo->Optimize_Rm ) ; // 0 : ?!? should be the exact variable 
         //DBI_OFF ;
     }
     else
     {
         //_DBI_ON ;
-        if ( (optInfo->COIW[1])->StackPushRegisterCode ) SetHere ( optInfo_0_one->StackPushRegisterCode ) ;
+        if ( ( optInfo->COIW[1] )->StackPushRegisterCode ) SetHere ( optInfo_0_one->StackPushRegisterCode ) ;
         else Compile_Pop_To_Acc ( DSP ) ;
         //_Compile_X_Group1 ( int64 code, int64 toRegOrMem, int64 mod, int8 reg, int8 rm, int8 sib, int64 disp, int64 osize )
         _Compile_X_Group1 ( op, MEM, MEM, ACC, DSP, 0, 0, CELL_SIZE ) ; // result is on TOS

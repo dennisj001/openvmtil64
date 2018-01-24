@@ -239,10 +239,10 @@ _CfrTil_ContextNew_IncludeFile ( byte * filename )
 }
 
 int64
-_Context_StrCmpNextToken ( Context * cntx, byte * check )
+_Context_StringEqual_PeekNextToken ( Context * cntx, byte * check )
 {
     byte *token = Lexer_PeekNextNonDebugTokenWord ( cntx->Lexer0, 1 ) ;
-    if ( token ) return strcmp ( ( char* ) token, ( char* ) check ) ;
+    if ( token ) return String_Equal ( ( char* ) token, ( char* ) check ) ;
     else return 0 ;
 }
 

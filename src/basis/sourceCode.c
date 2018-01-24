@@ -283,6 +283,13 @@ CfrTil_WordList_PushWord ( Word * word )
     CompilerWordList_Push ( word ) ; //_List_PushNew ( _Compiler_->WordList, word ) ;
 }
 
+void
+CfrTil_WordList_PushToken ( byte * token )
+{
+    Word * word = _Interpreter_TokenToWord ( _Interpreter_, token ) ;
+    CompilerWordList_Push ( word ) ; //_List_PushNew ( _Compiler_->WordList, word ) ;
+}
+
 Word *
 _CfrTil_WordList_TopWord ( )
 {
@@ -468,7 +475,7 @@ CfrTil_SourceCodeCompileOn ( )
 {
     _CfrTil_DbgSourceCodeCompileOn ( ) ;
     CfrTil_SourceCode_Init ( ) ;
-    if ( ! GetState ( _Context_, C_SYNTAX ) ) CfrTil_Colon ( ) ;
+    if ( ! GetState ( _Context_, C_SYNTAX ) ) _CfrTil_Colon ( ) ;
 }
 
 void

@@ -70,13 +70,12 @@ Compile_Store ( Compiler * compiler, int8 stackReg ) // !
     {
         //DBI_ON ;
         Word * word ;
-        d1 ( if ( Is_DebugModeOn ) Compiler_Show_WordList ( "\nCompile_Store : not optimized" ) ) ;
+        d0 ( if ( Is_DebugModeOn ) Compiler_Show_WordList ( "\nCompile_Store : not optimized" ) ) ;
         if ( ( word = ( Word* ) Compiler_WordList ( 1 ) ) && word->StackPushRegisterCode ) SetHere ( word->StackPushRegisterCode ) ;
         else _Compile_Move_Rm_To_Reg ( ACC, stackReg, 0 ) ;
         _Compile_Move_Rm_To_Reg ( OREG, stackReg, (word && word->StackPushRegisterCode) ? 0 : (- CELL_SIZE) ) ;
-        _Compile_Move_Reg_To_Rm ( ACC, OREG, 0 ) ;
-        Compile_SUBI ( REG, stackReg, 0, ( word && word->StackPushRegisterCode ) ? CELL_SIZE : 2 * CELL_SIZE, 0 ) ;
-        //Compile_SUBI ( REG, stackReg, 0, 2 * CELL_SIZE, BYTE ) ;
+        _Compile_Move_Reg_To_Rm ( ((word && word->StackPushRegisterCode) ? word->RegToUse : ACC), OREG, 0 ) ;
+        Compile_SUBI ( REG, stackReg, 0, (( word && word->StackPushRegisterCode ) ? 1 : 2 ) * CELL_SIZE, 0 ) ;
         //DBI_OFF ;
     }
 }

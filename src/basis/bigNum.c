@@ -173,11 +173,14 @@ _BigNum_FPrint ( mpfr_t * value )
         d1m ( if ( GetState ( _CfrTil_->cs_Cpu2, CPU_SELECTED_SAVED ) ) _CfrTil_->RestoreSelectedCpuState ( ) ) ;
         d1m ( CfrTil_CpuState_Current_Show ( ) ) ;
         d0 ( Cpu_CheckRspForWordAlignment ( "BigNum_FPrint" ) ) ;
-        // a bug in mpfr apparently so ...
-        if ( _CfrTil_->SaveSelectedCpuState ( ), (( uint64 ) _CfrTil_->cs_Cpu->Rsp & ( uint64 ) 0x8 ))
+        // a bug (?) in mpfr apparently so ...
+#if 1 // ?? bug work around ??       
+        if ( _CfrTil_->SaveSelectedCpuState ( ), ( ( uint64 ) _CfrTil_->cs_Cpu->Rsp & ( uint64 ) 0x8 ) )
             mpfr_out_str ( stdout, cntx->System0->NumberBase, 0, *value, MPFR_RNDN ) ;
         else mpfr_printf ( format, _Context_->System0->BigNum_Printf_Width, _Context_->System0->BigNum_Printf_Precision, *value ) ;
-        
+#else
+        mpfr_printf ( format, _Context_->System0->BigNum_Printf_Width, _Context_->System0->BigNum_Printf_Precision, *value ) ;
+#endif        
         d1m ( _CfrTil_->SaveSelectedCpuState ( ) ; SetState ( _CfrTil_->cs_Cpu2, CPU_SELECTED_SAVED, true ) ; ) ;
         d1m ( CfrTil_CpuState_Current_Show ( ) ) ;
     }
@@ -191,6 +194,7 @@ BigNum_FPrint ( )
 }
 
 #if 0
+
 void
 BigNum_FPrint2 ( )
 {

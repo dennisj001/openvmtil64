@@ -38,7 +38,7 @@ _CfrTil_ReStart ( CfrTil * cfrTil, int64 restartCondition )
         {
             CfrTil_ResetAll_Init ( cfrTil ) ;
         }
-        case ABORT: Set_DataStackPointer_FromDspReg () ;
+        case ABORT: Set_DataStackPointer_FromDspReg ( ) ;
         default:
         case QUIT:
         case STOP: ;
@@ -48,7 +48,7 @@ _CfrTil_ReStart ( CfrTil * cfrTil, int64 restartCondition )
 void
 _CfrTil_CpuState_CheckSave ( )
 {
-    if ( ! GetState ( _CfrTil_->cs_Cpu, CPU_SAVED) )
+    if ( ! GetState ( _CfrTil_->cs_Cpu, CPU_SAVED ) )
     {
         _CfrTil_->SaveCpuState ( ) ;
         SetState ( _CfrTil_->cs_Cpu, CPU_SAVED, true ) ; //->State = 1 ;
@@ -64,9 +64,9 @@ CfrTil_CpuState_Show ( )
 void
 CfrTil_CpuState_Current_Show ( )
 {
-    _CfrTil_->SaveCpu2State () ;
+    _CfrTil_->SaveCpu2State ( ) ;
     _CpuState_Show ( _CfrTil_->cs_Cpu2 ) ;
-    _CfrTil_->RestoreCpu2State () ;
+    _CfrTil_->RestoreCpu2State ( ) ;
 }
 
 void
@@ -110,7 +110,7 @@ CfrTil_PrintReturnStackWindow ( )
 void
 _CfrTil_NamespacesInit ( CfrTil * cfrTil )
 {
-    Namespace * ns = _DataObject_New (NAMESPACE, 0, ( byte* ) "Namespaces", 0, 0, 0, 0, 0, 0 ) ;
+    Namespace * ns = _DataObject_New ( NAMESPACE, 0, ( byte* ) "Namespaces", 0, 0, 0, 0, 0, 0 ) ;
     ns->State |= USING ; // nb. _Namespace_SetState ( ns, USING ) ; // !! can't be used with "Namespaces"
     cfrTil->Namespaces = ns ;
     CfrTil_AddCPrimitives ( ) ;
@@ -275,53 +275,6 @@ _CfrTil_New ( CfrTil * cfrTil )
     return cfrTil ;
 }
 
-
-//----------------------------------------------------------------------------------------|
-//              get from/ add to head  |              | get from head      add to tail    |      
-// TokenList Tail <--> TokenList Head  |<interpreter> | PeekList Head <--> PeekList Tail  |
-// token token token token token token | currentToken | token token token token token ... |
-//----------------------------------------------------------------------------------------|
-
-byte *
-_CfrTil_GetTokenFromTokenList ( Lexer * lexer )
-{
-    Symbol * tknSym ;
-    if ( tknSym = ( Symbol* ) _dllist_First ( ( dllist* ) _CfrTil_->TokenList ) )
-    {
-        dlnode_Remove ( ( dlnode* ) tknSym ) ;
-        lexer->TokenStart_ReadLineIndex = tknSym->S_Value ;
-        lexer->TokenEnd_ReadLineIndex = tknSym->S_Value2 ;
-
-        return tknSym->S_Name ;
-    }
-    return 0 ;
-}
-
-void
-_CfrTil_AddTokenToTailOfTokenList ( byte * token )
-{
-
-    Symbol * tknSym = _Symbol_New ( token, TEMPORARY ) ;
-    tknSym->S_Value = _Context_->Lexer0->TokenStart_ReadLineIndex ;
-    tknSym->S_Value2 = _Context_->Lexer0->TokenEnd_ReadLineIndex ;
-    dllist_AddNodeToTail ( _CfrTil_->TokenList, ( dlnode* ) tknSym ) ;
-}
-
-void
-_CfrTil_AddTokenToHeadOfTokenList ( byte * token )
-{
-
-    Symbol * tknSym = _Symbol_New ( token, TEMPORARY ) ;
-    tknSym->S_Value = _Context_->Lexer0->TokenStart_ReadLineIndex ;
-    tknSym->S_Value2 = _Context_->Lexer0->TokenEnd_ReadLineIndex ;
-    dllist_AddNodeToHead ( _CfrTil_->TokenList, ( dlnode* ) tknSym ) ;
-}
-
-void
-CfrTil_ClearTokenList ( )
-{
-    _dllist_Init ( _CfrTil_->TokenList ) ;
-}
 
 void
 CfrTil_OptimizeOn ( )

@@ -15,7 +15,7 @@ namespace Sl5 {
 #endif
 
 CPrimitive CPrimitives [] = {
-    { "(", ( block ) LO_ReadEvalPrint1, IMMEDIATE | KEYWORD, 0, 0, "Lisp", "Root" },
+    { "(", ( block ) LO_ReadEvalPrint_AfterAFirstLParen, IMMEDIATE | KEYWORD, 0, 0, "Lisp", "Root" },
     { "_(", ( block ) LC_Read, IMMEDIATE | KEYWORD, 0, 0, "Lisp", "Root" },
     { "eval", ( block ) LC_Eval, IMMEDIATE | KEYWORD, 0, 0, "Lisp", "Root" },
     { "print", ( block ) LC_PrintWithValue, 0, 0, 0, "Lisp", "Root" },
@@ -46,6 +46,8 @@ CPrimitive CPrimitives [] = {
     { "unquoteSplicing", ( block ) LO_UnQuoteSplicing, 0, 0, T_LISP_UNQUOTE_SPLICING | T_LISP_READ_MACRO, "Lisp", "Root" },
     { ",@", ( block ) LO_UnQuoteSplicing, 0, 0, T_LISP_UNQUOTE_SPLICING | T_LISP_READ_MACRO, "Lisp", "Root" },
     { "::", ( block ) _LO_CfrTil, 0, 0, T_LISP_CFRTIL | T_LISP_SPECIAL | T_LISP_IMMEDIATE, "Lisp", "Root" },
+    //{ ":", ( block ) _LO_Colon, 0, 0, T_LISP_COLON | T_LISP_IMMEDIATE | T_LISP_SPECIAL, "Lisp", "Root" },
+    { "lcReset", ( block ) LC_Reset, 0, 0, 0, "Lisp", "Root" },
     //{ ":", ( block ) _LO_Colon, 0, 0, T_LISP_COLON | T_LISP_IMMEDIATE | T_LISP_SPECIAL, "Lisp", "Root" },
 
     { "'", CfrTil_Tick, IMMEDIATE | KEYWORD, 0, 0, "Forth", "Root" },
@@ -102,12 +104,12 @@ CPrimitive CPrimitives [] = {
     { "type", ( block ) CfrTil_Type_New, 0, 0, 0, "C_Syntax", "C" },
     { "typedef", CfrTil_Typedef, 0, 0, 0, "C_Syntax", "C" },
     { "&", CfrTil_AddressOf, IMMEDIATE, NO_CODING, ADDRESS_OF_OP, "C_Syntax", "C" }, // avoid name clash with '&&' and '&' 
-    { "=", (block) CfrTil_C_Infix_Equal, IMMEDIATE | CATEGORY_EQUAL | KEYWORD, 0, 0, "C_Syntax", "C" }, //"Infix", "Compiler" },
+    //{ "=", (block) CfrTil_C_Infix_Equal, IMMEDIATE | CATEGORY_EQUAL | KEYWORD, 0, 0, "C_Syntax", "C" }, //"Infix", "Compiler" },
 
     { "}", CfrTil_TypedefStructEnd, IMMEDIATE | KEYWORD, 0, 0, "C_Typedef", "C_Syntax" },
     { "{", CfrTil_TypedefStructBegin, IMMEDIATE | KEYWORD, 0, 0, "C_Typedef", "C_Syntax" },
 
-    { ")", CfrTil_EndBlock, IMMEDIATE, 0, 0, "C_Combinators", "C" },
+    //{ ")", CfrTil_EndBlock, IMMEDIATE, 0, 0, "C_Combinators", "C" },
     //{ "(", CfrTil_BeginBlock, IMMEDIATE, 0, 0, "C_Combinators", "Combinators" },
     { "if", CfrTil_If_C_Combinator, KEYWORD | COMBINATOR | IMMEDIATE, 0, 0, "C_Combinators", "C" },
     { "while", CfrTil_While_C_Combinator, KEYWORD | COMBINATOR | IMMEDIATE, 0, 0, "C_Combinators", "C" },
@@ -115,8 +117,10 @@ CPrimitive CPrimitives [] = {
     { "for", CfrTil_For_C_Combinator, KEYWORD | COMBINATOR | IMMEDIATE, 0, 0, "C_Combinators", "C" },
     { "loop", CfrTil_Loop_C_Combinator, KEYWORD | COMBINATOR | IMMEDIATE, 0, 0, "C_Combinators", "C" },
 
+    { ":", CfrTil_Colon, IMMEDIATE | KEYWORD, 0, 0, "Infix", "Compiler" },
     { "(", Interpret_DoParenthesizedRValue, IMMEDIATE | KEYWORD, 0, 0, "Infix", "Compiler" },
-    { ")", CfrTil_EndBlock, IMMEDIATE | KEYWORD, 0, 0, "Infix", "Compiler" },
+    { "=", (block) CfrTil_C_Infix_Equal, IMMEDIATE | CATEGORY_EQUAL | KEYWORD, 0, 0, "Infix", "C" }, //"Infix", "Compiler" },
+    //{ ")", CfrTil_EndBlock, IMMEDIATE | KEYWORD, 0, 0, "Infix", "Compiler" },
 
     { "(", CfrTil_LocalsAndStackVariablesBegin, IMMEDIATE, 0, 0, "Locals", "Root" },
     { "(|", CfrTil_LocalVariablesBegin, IMMEDIATE, 0, 0, "Locals", "Root" },
@@ -531,7 +535,7 @@ CPrimitive CPrimitives [] = {
 
     // this section can be implemented by lower level calls - internally
     { "word", CfrTil_Word, 0, 0, 0, "Reserved", "Compiler" },
-    { ":", CfrTil_Colon, IMMEDIATE | KEYWORD, 0, 0, "Reserved", "Compiler" },
+    { ":", _CfrTil_Colon, IMMEDIATE | KEYWORD, 0, 0, "Reserved", "Compiler" },
     { "semi", CfrTil_SemiColon, KEYWORD, 0, 0, "Reserved", "Compiler" },
     { ";", CfrTil_SemiColon, IMMEDIATE | KEYWORD, SYNTACTIC, 0, "Reserved", "Compiler" },
     { "}", CfrTil_EndBlock, IMMEDIATE | KEYWORD, 0, 0, "Reserved", "Compiler" }, // moved to init.cft and renamed below
@@ -596,6 +600,7 @@ CPrimitive CPrimitives [] = {
     { "getStringToEndOfLine", String_GetStringToEndOfLine, 0, 0, 0, "Compiler", "Root" },
     { "sourceCodeInit", CfrTil_SourceCode_Init, 0, 0, 0, "Compiler", "Root" },
     { "sourceCodeOn", CfrTil_Lexer_SourceCodeOn, 0, 0, 0, "Compiler", "Root" },
+    { ")", CfrTil_NoOp, IMMEDIATE | KEYWORD, 0, 0, "Compiler", "Root" },
     
     { ",", CompileInt32, 0, 0, 0, "Compiling", "Compiler" },
     { "4,", CompileInt32, 0, 0, 0, "Compiling", "Compiler" },

@@ -1,5 +1,3 @@
-
-
 5 
 C
 : sp ; //stack pause ;
@@ -41,7 +39,7 @@ testc1 ( | atoken aword )
 //'testc1 find wdiss //pause 
 testc1 () ; //pause
 #if 1
-libc 
+C libc
 void
 interpret2 ( | atoken aword ) 
 {
@@ -68,15 +66,15 @@ interpret2 ( | atoken aword )
         }
     }
 }
-' interpret2 find wdiss apause
+' interpret2 find wdiss //pause
 sp
 
 interpret2 
 using
 c_syntaxOff sp
-
+User
 #if 1
-: hi1 1 2 + p ;  
+: hi1 1 2 + p ; hi1
 : hey1 hi1 hi1 ; 
 : heey1 hey1 hey1 hey1 ;
 nl heey1 

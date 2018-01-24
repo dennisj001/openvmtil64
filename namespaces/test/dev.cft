@@ -11,7 +11,7 @@ var: facTest fibTest Dsp ;
 
 // tail recursion from http://c2.com/cgi/wiki?TailCallOptimization
 c_syntaxOn dscOn
-int factorial( n | rec1 )
+int factoriali ( REG n | REG rec1 )
 {
     rec1 = 1;
     while ( n >= 2 )
@@ -23,7 +23,8 @@ int factorial( n | rec1 )
 } prefix
 c_syntaxOff dscOff
 'factorial find wdiss
-factorial (7) dup p 5040 _assert //pause //sp
+factoriali (7) dup p 5040 _assert //sp
+dscOff
 : factorial ( n  | fac -- TOS ) 
     fac 1 = 
     { n @ 1 > } { n @ fac @ * fac store n -- } while 

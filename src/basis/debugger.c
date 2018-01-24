@@ -126,7 +126,8 @@ _Debugger_PreSetup ( Debugger * debugger, Word * word, int8 forceFlag )
             if ( ! word ) word = _Context_->CurrentlyRunningWord ;
             if ( word && ( ! word->W_OriginalWord ) ) word->W_OriginalWord = word ;
             debugger->w_Word = word ;
-            if ( word && word->Name[0] && ( forceFlag || ( _ReadLiner_->ReadIndex != debugger->ReadIndex ) ) ) //(! debugger->LastSetupWord) || ( word->W_TokenStart_ReadLineIndex != debugger->LastSetupWord->W_TokenStart_ReadLineIndex ) ) )
+            //if ( word && word->Name[0] && ( forceFlag || ( _ReadLiner_->ReadIndex != debugger->ReadIndex ) ) ) //(! debugger->LastSetupWord) || ( word->W_TokenStart_ReadLineIndex != debugger->LastSetupWord->W_TokenStart_ReadLineIndex ) ) )
+            if ( word && word->Name[0] ) // && ( forceFlag || ( _ReadLiner_->ReadIndex != debugger->ReadIndex ) ) ) //(! debugger->LastSetupWord) || ( word->W_TokenStart_ReadLineIndex != debugger->LastSetupWord->W_TokenStart_ReadLineIndex ) ) )
             {
                 if ( forceFlag ) debugger->LastShowWord = 0 ;
                 if ( ! word->Name ) word->Name = ( byte* ) "" ;

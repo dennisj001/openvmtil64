@@ -168,7 +168,7 @@ _Word_Add ( Word * word, int64 addToInNs, Namespace * addToNs )
     {
         if ( ! ( word->CAttribute & ( LITERAL ) ) )
         {
-            Namespace * ins = _CfrTil_Namespace_InNamespaceGet ( ), *ns ;
+            Namespace * ins = _CfrTil_Namespace_InNamespaceGet ( ) ;
             Namespace_DoAddWord ( ins, word ) ;
         }
     }
@@ -215,27 +215,36 @@ _Word_Create ( byte * name, uint64 ctype, uint64 ctype2, uint64 ltype, uint64 al
     return word ;
 }
 
-Word *
-_Word_New ( byte * name, uint64 ctype, uint64 ctype2, uint64 ltype, int8 addToInNs, Namespace * addToNs, uint64 allocType )
+void
+Word_SetLocation ( Word * word )
 {
-    CheckCodeSpaceForRoom ( ) ;
     ReadLiner * rl = _Context_->ReadLiner0 ;
-    Word * word = _Word_Create ( name, ctype, ctype2, ltype, allocType ) ; // CFRTIL_WORD : cfrTil compiled words as opposed to C compiled words
-    _Context_->Compiler0->CurrentWord = word ;
     if ( rl->InputStringOriginal )
     {
         word->S_WordData->Filename = rl->Filename ;
         word->S_WordData->LineNumber = rl->LineNumber ;
-        //word->W_TokenEnd_ReadLineIndex = _Lexer_->TokenEnd_ReadLineIndex ; //rl->CursorPosition ;
         word->W_CursorPosition = rl->CursorPosition ;
         //word->W_TokenStart_ReadLineIndex = _Lexer_->TokenStart_ReadLineIndex ;
     }
+}
+
+Word *
+_Word_New ( byte * name, uint64 ctype, uint64 ctype2, uint64 ltype, int8 addToInNs, Namespace * addToNs, uint64 allocType )
+{
+    CheckCodeSpaceForRoom ( ) ;
+    //ReadLiner * rl = _Context_->ReadLiner0 ;
+    Word * word = _Word_Create ( name, ctype, ctype2, ltype, allocType ) ; // CFRTIL_WORD : cfrTil compiled words as opposed to C compiled words
+    _Context_->Compiler0->CurrentWord = word ;
 #if 0    
-    if ( _IsSourceCodeOn && ( ! Compiling ) && ( ! GetState ( _Context_->Interpreter0, PREPROCESSOR_MODE ) ) )
+    if ( rl->InputStringOriginal )
     {
-        CfrTil_SourceCode_SetDebugWordList ( word ) ;
+        word->S_WordData->Filename = rl->Filename ;
+        word->S_WordData->LineNumber = rl->LineNumber ;
+        word->W_CursorPosition = rl->CursorPosition ;
+        //word->W_TokenStart_ReadLineIndex = _Lexer_->TokenStart_ReadLineIndex ;
     }
 #endif    
+    Word_SetLocation ( word ) ;
     _CfrTil_->WordCreateCount ++ ;
     _Word_Add ( word, addToInNs, addToNs ) ;
     return word ;
@@ -385,10 +394,10 @@ _CfrTil_Alias ( Word * word, byte * name )
     if ( word )
     {
         Word * alias = _Word_New ( name, word->CAttribute | ALIAS, word->CAttribute2, word->LAttribute, 1, 0, DICTIONARY ) ; // inherit type from original word
-        //while ( ( ! word->Definition ) && word->W_AliasOf ) word = word->W_AliasOf ;
-        while ( ! word->Definition ) word = word->W_AliasOf ;
+        //while ( ( word->Definition ) && word->W_AliasOf ) word = word->W_AliasOf ;
+        //while ( ! word->Definition ) word = word->W_AliasOf ;
+        while ( word->W_AliasOf ) word = word->W_AliasOf ;
         _Word_InitFinal ( alias, ( byte* ) word->Definition ) ;
-        //alias->CAttribute |= word->CAttribute ;
         alias->S_CodeSize = word->S_CodeSize ;
         alias->W_AliasOf = word ;
         return alias ;

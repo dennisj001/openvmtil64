@@ -3,7 +3,6 @@
 void
 _Block_Eval ( block blck )
 {
-    //Byte_PtrCall ( ( byte * ) block ) ;
     if ( blck )
     {
         ( ( block ) blck ) ( ) ;
@@ -97,13 +96,11 @@ Block_CopyCompile_WithLogicFlag ( byte * srcAddress, int64 bindex, int64 jccFlag
     _Block_Copy ( srcAddress, bi->bp_Last - bi->bp_First, 0 ) ;
     if ( jccFlag )
     {
-#if 1       
         if ( jccFlag2 )
         {
             Compile_JCC ( negFlag ? bi->NegFlag : ! bi->NegFlag, bi->Ttt, 0 ) ;
         }
         else
-#endif            
         {
             Compile_GetLogicFromTOS ( bi ) ;
             Compile_JCC ( negFlag, ZERO_TTT, 0 ) ;

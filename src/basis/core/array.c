@@ -1,6 +1,7 @@
 
 #include "../../include/cfrtil64.h"
 
+#if 0
 void
 Byte_PtrCall ( byte * bptr )
 {
@@ -9,6 +10,7 @@ Byte_PtrCall ( byte * bptr )
         ( ( block ) bptr ) ( ) ;
     }
 }
+#endif
 
 ByteArray *
 _ByteArray_AppendSpace_MakeSure ( ByteArray * ba, int64 size ) // size in bytes

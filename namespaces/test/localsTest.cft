@@ -1,6 +1,6 @@
 
 5
-#if _TestDone_ @ not // prevent including twice
+#if 1 //_TestDone_ @ not // prevent including twice
 decimal
 User
 C
@@ -29,10 +29,10 @@ sp
 // nb. this is some of the oldest testing
 : hey ( n m | o q )
 	//nl "startHey" prints
-	o m @ = 	m @ o @ _assert0
-	q n @ =  	n @ q @ _assert0
+	o m @ = 	m @ o @ _assert
+	q n @ =  	n @ q @ _assert
 	n @ m @ o @ q @ + + + 1 + dup p 7 _assert
-	n @ m @ + o @ + q @ + 1 + dup p 7 _assert0
+	n @ m @ + o @ + q @ + 1 + dup p 7 _assert
         //" after hey" ps 
 ;
 ' hey find wdiss 
@@ -41,10 +41,10 @@ sp
 1 2 hey1 sp
 : hey2 ( n m | o q ) 
  	//nl "startHey2" prints
-	m @ o store     m @ o @ _assert0
-	n @ q store     n @ q @ _assert0
+	m @ o store     m @ o @ _assert
+	n @ q store     n @ q @ _assert
         n @ m @ hey 
-	n @ m @ + o @ + q @ + 1 + dup p 7 _assert0
+	n @ m @ + o @ + q @ + 1 + dup p 7 _assert
         //" afterHey2" prints
 ;
 1 2 hey2 sp
@@ -146,80 +146,78 @@ nl "goedel2 :: " ps goedel2 sp
     nl "goedel4 :: " ps nl
     n 9 =
     { 
-        (| n ) n @ p n 2 = n @ dup p 2 _assert0 // junk 2
-        { (| n ) n @ p n 3 = n @ 4 + dup p 7 _assert0 } ix // junk 7
-        n @ 6 + 8 _assert0 
+        (| n ) n @ p n 2 = n @ dup p 2 _assert // junk 2
+        { (| n ) n @ p n 3 = n @ 4 + dup p 7 _assert } ix // junk 7
+        n @ 6 + 8 _assert 
     } ix
     { (| n ) 
         n @ p n 3 = n dup @ 4 + dup dup 7 _assert p = // junk 7
-        n @ p n @ 7 _assert0 // 7
+        n @ p n @ 7 _assert // 7
     } ix 
     n @ dup p // 9
 ;
 "\ngoedel4 :: output should read : \n'junk' 2 'junk' 7 'junk' 7 7 9" ps //pause
-9 goedel4 _assert0 //pause
+9 goedel4 _assert //pause
 //' goedel4 find wdiss     
 
 : goedel5 (| n -- TOS ) 
     nl "goedel5 :: " ps nl
     n 9 =
     { 
-        (| n ) n @ p n 2 = n @ dup p 2 _assert0 // junk 2 n should be garbage here
-        { (| n ) n @ p n 3 = n @ 4 + dup p 7 _assert0 } ix // junk 7 n should be garbage here
-        n @ 6 + 8 _assert0 
+        (| n ) n @ p n 2 = n @ dup p 2 _assert // junk 2 n should be garbage here
+        { (| n ) n @ p n 3 = n @ 4 + dup p 7 _assert } ix // junk 7 n should be garbage here
+        n @ 6 + 8 _assert 
     } ix
     { (| n ) 
         n @ p n 3 = // junk
         n @ 4 + n store 
-        n @ dup p 7 _assert0 // 7
+        n @ dup p 7 _assert // 7
     } ix // n should be garbage here
     n @ dup p
 ;
-9 goedel5 _assert0 
+9 goedel5 _assert 
 "\ngoedel5 :: output should read : junk' 2 'junk' 7 7 9" ps //pause
-
-: goedel4 (| n -- TOS ) 
+//s pause
+: goedel6 (| n -- TOS ) 
+    nl "goedel6 :: " ps nl
     n 9 =
     { 
-        (| n ) n @ p n 2 = n @ dup p 2 _assert0 // first n should be garbage here; second n 2
-        { (| n ) n @ p n 3 = n @ 4 + dup p 7 _assert0 } ix // first n should be garbage here; second 7
-        //{ (| n ) n @ p n 3 = <dbg> n @ 4 + dup p 7 _assert0 } ix  // test comment //level 2
-        n @ 6 + 8 _assert0 
+        (| n ) n @ p n 2 = n @ dup p 2 _assert // first n should be garbage here; second n 2
+        { (| n ) n @ p n 3 = n @ 4 + dup p 7 _assert } ix // first n should be garbage here; second 7
+        n @ 6 + 8 _assert 
     } ix
-    { (| n ) n @ p 
+    { (| n ) 
+        n @ p 
         n 3 = 
-        //<dbg> n dup @ 4 + = 
         n dup @ 4 + = 
-        n @ dup p 7 _assert0 
+        n @ dup p 7 _assert 
     } ix // n should be garbage here
     n @ dup p
 ;
-//' goedel4 find wdiss pause   
-nl "goedel4 :: " ps nl
-9 goedel4 _assert0 
-"\ngoedel4 :: goedel4 output should read : \n'junk' 2 'junk' 7 7 'junk' 9" ps //pause
+//' goedel6 find wdiss pause   
+9 goedel6 _assert
+"\ngoedel6 :: goedel6 output should read : \n'junk' 2 'junk' 7 7 'junk' 9" ps //pause
 
-: goedel6 (| n -- TOS ) 
+: goedel7 (| n -- TOS ) 
+    nl "goedel7 :: " ps nl
     n 1 =
     { 
         'n var
-        n @ p n 2 = n @ dup p 2 _assert0 // first n should be garbage here; second n 2
-        { 'n var n @ p n 3 = n @ 4 + dup p 7 _assert0 } ix // first n should be garbage here; second 7
-        //{ 'n var n @ p n 3 = <dbg> n @ 4 + dup p 7 _assert0 } ix // first n should be garbage here; second 7
-        n @ 6 + 8 _assert0 
+        n @ p n 2 = n @ dup p 2 _assert // first n should be garbage here; second n 2
+        { 'n var n @ p n 3 = n @ 4 + dup p 7 _assert } ix // first n should be garbage here; second 7
+        //{ 'n var n @ p n 3 = <dbg> n @ 4 + dup p 7 _assert } ix // first n should be garbage here; second 7
+        n @ 6 + 8 _assert 
     } ix
-    { 'n var n @ p 
+    { 
         n 3 = 
-        //n dup @ 7 + = 
         n 7 += 
-        //n @ dup p 10 _assert0 
     } ix // first n should be garbage here; second 7
     n @ 8 + dup p
 ;
-//' goedel6 find wdiss pause   
-nl "goedel6 :: " ps nl
-9 goedel6 _assert0 
-"\ngoedel6 :: goedel6 output should read : \n'junk' 2 'junk' 7 7 'junk' 9" ps //pause
+//' goedel7 find wdiss pause   
+nl "goedel7 :: " ps nl
+18 goedel7 _assert 
+"\ngoedel7 :: goedel7 output should read : \n'junk' 2 'junk' 7 18" ps //pause
 #endif
 
 2 + 7 assertStkChk // stack checking

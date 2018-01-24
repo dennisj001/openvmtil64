@@ -79,7 +79,7 @@ chi ( chey0, d | a b c )
 {
     libc
     //<dbg> c = 1 + 2 ;
-    d: c = 1 + 2 ;
+    c = 1 + 2 ;
     b = c + 2 ;
     a = b + c ;
     nl
@@ -176,7 +176,7 @@ fac4 ( n  | facc -- TOS )
     return ( facc ) ;
 }
 wdiss ( ' fac4 find ) ; 
-fac4 ( 7 ) dup p 5040 _assert0 //s pause
+fac4 ( 7 ) dup p 5040 _assert //s pause
 
 User
 c_syntaxOff
@@ -197,7 +197,7 @@ faccs2 ( n | rec )
         rec = rec * n ; 
     } 
     return rec ;
-}
+} prefix
 ' faccs2 find wdiss
 faccs2 ( 7 ) dup p 5040 _assert0 apause
 // sp

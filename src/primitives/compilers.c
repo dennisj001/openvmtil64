@@ -168,7 +168,7 @@ CfrTil_Return ( )
     {
         byte * token = Lexer_PeekNextNonDebugTokenWord ( _Lexer_, 0 ) ;
         Word * word = Finder_Word_FindUsing ( _Finder_, token, 0 ) ;
-        if ( word->CAttribute & ( NAMESPACE_VARIABLE | LOCAL_VARIABLE | PARAMETER_VARIABLE ) )
+        if ( word && (word->CAttribute & ( NAMESPACE_VARIABLE | LOCAL_VARIABLE | PARAMETER_VARIABLE ) ) )
         {
             _Compiler_->ReturnVariableWord = word ;
             //if ( word->CAttribute & REGISTER_VARIABLE ) 
@@ -224,10 +224,10 @@ CfrTil_Literal ( )
 {
     int64 value = DataStack_Pop ( ) ;
     //Word * word = _DataObject_New ( LITERAL, 0, 0, LITERAL, 0, 0, ( uint64 ) _DataStack_Pop ( ), 0 ) ;
-    //ByteArray * svcs = _Q_CodeByteArray ;
-    //Compiler_SetCompilingSpace_MakeSureOfRoom ( "TempObjectSpace" ) ; 
-    Word * word = _DataObject_New ( CONSTANT, 0, "< lit >", LITERAL | CONSTANT, 0, 0, 0, value, 0 ) ;
-    //Set_CompilerSpace ( svcs ) ;
+    ByteArray * svcs = _Q_CodeByteArray ;
+    Compiler_SetCompilingSpace_MakeSureOfRoom ( "TempObjectSpace" ) ; 
+    Word * word = _DataObject_New ( LITERAL, 0, "<a literal>", LITERAL | CONSTANT, 0, 0, 0, value, 0 ) ;
+    Set_CompilerSpace ( svcs ) ;
     _Interpreter_DoWord (_Context_->Interpreter0, word, - 1 ) ;
 }
 

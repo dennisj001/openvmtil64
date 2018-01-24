@@ -17,8 +17,8 @@ printf ("\n%s\n%d\t%s","hello world! - parse this!?", 1234, "\tand this!")"\n\ta
 printf ( "\nHello world! = 0x%08x\n\n" 1234 ) 
 printf ( "\n%s = %d\n\n", "Hello world!", 42 ) 
 printf("\n%s\n\t","hello world! - parse this!?")"\n\talso this!" ps
-sp
-C_Syntax
+sp 
+
 User
 Compiler
 : vckf ( n w ) 

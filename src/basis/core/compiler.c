@@ -18,8 +18,8 @@ CopyDuplicateWord ( dlnode * anode, Word * word0 )
         wordc->S_CAttribute |= ( uint64 ) RECYCLABLE_COPY ;
         wordc->StackPushRegisterCode = 0 ;
         wordc->W_SC_ScratchPadIndex = word0->W_SC_WordIndex ;
-        ;
         wordc->W_TokenStart_ReadLineIndex = word0->W_TokenStart_ReadLineIndex ;
+        Word_SetLocation ( wordc ) ;
         return wordc ;
     }
     return 0 ;

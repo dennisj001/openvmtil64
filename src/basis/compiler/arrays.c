@@ -50,7 +50,7 @@ _CheckArrayDimensionForVariables_And_UpdateCompilerState ( )
 void
 Compile_ArrayDimensionOffset ( Word * word, int64 dimSize, int64 objSize )
 {
-    if ( *word->W_PtrToValue ) // if ! zero else 
+    if ( word->W_Value ) // if ! zero else 
     {
         // assume arrayIndex has just been pushed to TOS
         if ( word->StackPushRegisterCode )
@@ -119,7 +119,7 @@ Do_NextArrayWordToken ( Word * word, byte * token, Word * arrayBaseObject, int64
             }
 #endif                
         }
-        if ( _Context_StrCmpNextToken ( cntx, ( byte* ) "[" ) )
+        if ( ! _Context_StringEqual_PeekNextToken ( cntx, ( byte* ) "[" ) )
         {
             return 1 ;
         }

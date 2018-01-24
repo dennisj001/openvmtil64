@@ -1,9 +1,9 @@
-5 
-: stp ;
+5
+: sp ; //stack pause ;
 //verbosity 3 = 
 // nb. some of the testing code is attempting to see if it can cause an error it is not necessarily meant to be exemplary 
 verbosity 1 = 
-Int User
+Int User 
 //: d_TD  { "_TestDone_" _defined not } { "_TestDone_" _var } if ; d: d_TD
 { "_TestDone_" _defined not } { "_TestDone_" _var } if 
 : iinc "./init.cft" include ;
@@ -45,11 +45,12 @@ Int User
 : lT lispTest ;
 //: testX cST dT0 dT ;
 : testX cST ;
-'doX64 1 const
+
+'doX64 0 const
 #if doX64
-: basicT cT mT aT loT bT locT oT x64 cntT lT fT sT sysT interpT ppT stT ;
+: basicT ppT cT mT aT loT bT locT oT x64 cntT lT fT sT sysT interpT stT dT0 ;
 #else
-: basicT cT mT aT loT bT locT oT      cntT lT fT sT sysT interpT ppT stT ;
+: basicT ppT cT mT aT loT bT locT oT      cntT lT fT sT sysT interpT stT dT0 ;
 #endif
 : _basicT bT mT cntT lT fT sysT  ;
 : testBasic basicT ;
@@ -77,6 +78,7 @@ nl "before testAll" prints
 System Combinators
 //dbgOn
 //sp 
+
 #if 0 // if 0
 : itt { doTest _TestDone_ @ not && } { basicT testX _TestDone_ ++ } if2 ; 
 ' itt wdiss itt //pause
@@ -92,6 +94,7 @@ System Combinators
 // { doTest _TestDone_ @ not && } { basicT testX <dbg> _TestDone_ ++ } if2  
 //: test0 { doTest _TestDone_ @ not && } { basicT testX _TestDone_ ++ } if2  ; d: test0
 //{ doTest _TestDone_ @ not && } { <dbg> basicT testX _TestDone_ ++ } if2  
+sp
 { doTest _TestDone_ @ not && } { basicT testX _TestDone_ ++ } if2  
 //#endif // end if 1
 #elif 0

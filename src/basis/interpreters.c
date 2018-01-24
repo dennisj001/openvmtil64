@@ -74,6 +74,7 @@ _Interpret_String ( byte *str )
     _CfrTil_ContextNew_InterpretString ( _CfrTil_, str ) ;
 }
 
+#if 1
 byte *
 _Interpret_C_Until_EitherToken ( Interpreter * interp, byte * end1, byte * end2, byte* end3, byte * delimiters )
 {
@@ -91,6 +92,7 @@ _Interpret_C_Until_EitherToken ( Interpreter * interp, byte * end1, byte * end2,
         else if ( GetState ( _Context_, C_SYNTAX ) && ( String_Equal ( token, "," ) || String_Equal ( token, ";" ) ) ) break ;
         else Interpreter_InterpretAToken ( interp, token, - 1 ) ;
     }
+    //CfrTil_WordList_PushToken ( token ) ;
     return token ;
 }
 
@@ -107,13 +109,72 @@ _Interpret_Until_Token ( Interpreter * interp, byte * end, byte * delimiters )
             {
                 if ( GetState ( _Context_->Compiler0, C_COMBINATOR_LPAREN ) && ( String_Equal ( token, ";" ) ) )
                 {
-                    _CfrTil_AddTokenToHeadOfTokenList ( token ) ;
+                    _CfrTil_PushToken_OnTokenList ( token ) ;
                 }
                 break ;
             }
             if ( GetState ( _Context_, C_SYNTAX ) && String_Equal ( token, ";" ) && GetState ( _Compiler_, C_COMBINATOR_PARSING ) )
             {
-                _CfrTil_AddTokenToHeadOfTokenList ( token ) ;
+                _CfrTil_PushToken_OnTokenList ( token ) ;
+                break ;
+            }
+            else
+            {
+                d0 ( byte buffer [128] ;
+                    snprintf ( ( char* ) buffer, 128, "\n_Interpret_Until_Token : before interpret of %s", ( char* ) token ) ;
+                d0 ( if ( Is_DebugModeOn ) Compiler_Show_WordList ( buffer ) ) ) ;
+                Interpreter_InterpretAToken ( interp, token, - 1 ) ;
+                d0 ( snprintf ( ( char* ) buffer, 128, "\n_Interpret_Until_Token : after interpret of %s", ( char* ) token ) ;
+                if ( Is_DebugModeOn ) Compiler_Show_WordList ( buffer ) ) ;
+            }
+        }
+        else break ;
+    }
+    return token ;
+}
+
+#else
+byte *
+_Interpret_C_Until_EitherToken ( Interpreter * interp, byte * end1, byte * end2, byte* end3, byte * delimiters )
+{
+    byte * token = 0 ;
+    while ( 1 )
+    {
+        token = _Lexer_ReadToken ( interp->Lexer0, delimiters ) ;
+        List_CheckInterpretLists_OnVariable ( _Compiler_->PostfixLists, token ) ;
+        if ( GetState ( interp->Compiler0, DOING_A_PREFIX_WORD ) && String_Equal ( token, ")" ) )
+        {
+            if ( ! Compiling ) _Compiler_FreeAllLocalsNamespaces ( _Compiler_ ) ;
+            break ;
+        }
+        else if ( String_Equal ( token, end1 ) || String_Equal ( token, end2 ) || ( end3 ? String_Equal ( token, end3 ) : 0 ) ) break ;
+        else if ( GetState ( _Context_, C_SYNTAX ) && ( String_Equal ( token, "," ) || String_Equal ( token, ";" ) ) ) break ;
+        Interpreter_InterpretAToken ( interp, token, - 1 ) ;
+    }
+    return token ;
+}
+
+byte *
+_Interpret_Until_Token ( Interpreter * interp, byte * end, byte * delimiters )
+{
+    byte * token ;
+    while ( 1 )
+    {
+        token = _Lexer_ReadToken ( interp->Lexer0, delimiters ) ;
+        if ( token )
+        {
+            if ( String_Equal ( token, end ) )
+            {
+                if ( GetState ( _Context_->Compiler0, C_COMBINATOR_LPAREN ) && ( String_Equal ( token, ";" ) ) )
+                {
+                    _CfrTil_PushToken_OnTokenList ( token ) ;
+                }
+                else Interpreter_InterpretAToken ( interp, token, - 1 ) ;
+                break ;
+            }
+            if ( GetState ( _Context_, C_SYNTAX ) && String_Equal ( token, ";" ) && GetState ( _Compiler_, C_COMBINATOR_PARSING ) )
+            {
+                _CfrTil_PushToken_OnTokenList ( token ) ;
                 break ;
             }
             else
@@ -130,6 +191,8 @@ _Interpret_Until_Token ( Interpreter * interp, byte * end, byte * delimiters )
     }
     return token ;
 }
+#endif
+
 
 void
 _Interpret_PrefixFunction_Until_Token ( Interpreter * interp, Word * prefixFunction, byte * end, byte * delimiters )
@@ -137,9 +200,7 @@ _Interpret_PrefixFunction_Until_Token ( Interpreter * interp, Word * prefixFunct
     int64 svscwi = _CfrTil_->SC_ScratchPadIndex ;
     _Interpret_Until_Token ( interp, end, delimiters ) ;
     SetState ( _Context_->Compiler0, PREFIX_ARG_PARSING, false ) ;
-    //SetState ( _Context_->Compiler0, PREFIX_PARSING, true ) ;
     if ( prefixFunction ) _Interpreter_DoWord_Default ( interp, prefixFunction, svscwi ) ;
-    //SetState ( _Context_->Compiler0, PREFIX_PARSING, false ) ;
 }
 
 void
@@ -197,7 +258,6 @@ _Interpret_ToEndOfLine ( Interpreter * interp )
     {
         Interpreter_InterpretNextToken ( interp ) ;
         if ( GetState ( _Context_->Lexer0, LEXER_END_OF_LINE ) ) break ; // either the lexer with get a newline or the readLiner
-        //for ( i = 0 ; _ReadLine_PeekIndexedChar ( rl, i ) == ' ' ; i ++ ) ;
         i = ReadLiner_PeekSkipSpaces ( rl ) ;
         if ( _ReadLine_PeekIndexedChar ( rl, i ) == '\n' ) break ;
     }

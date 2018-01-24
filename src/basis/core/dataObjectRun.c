@@ -2,6 +2,87 @@
 #include "../../include/cfrtil64.h"
 
 void
+_DataObject_Run ( Word * word )
+{
+    Context * cntx = _Context_ ;
+    cntx->Interpreter0->w_Word = word ; // for ArrayBegin : all literals are run here
+    cntx->CurrentlyRunningWord = word ;
+    if ( word->LAttribute & LOCAL_OBJECT )
+    {
+        if ( ( word->CAttribute & LOCAL_VARIABLE ) && ( ! GetState ( word, W_INITIALIZED ) ) ) // this is a local variable so it is initialed at creation 
+        {
+#if 0            
+            int64 size = _Namespace_VariableValueGet ( word->TypeNamespace, ( byte* ) "size" ) ;
+            //_Compile_MoveImm_To_Reg ( RDI, ( int64 ) size, CELL ) ;
+            DataStack_Push ( ( uint64 ) size ) ;
+            //_Compile_Move_Rm_To_Reg ( RDI, RDI, 0 ) ;
+            //_Compile_LEA ( RSI, FP, 0, LocalVarIndex_Disp ( LocalVarOffset ( word ) ) ) ; // 2 : account for saved fp and return slot
+            DataStack_Push ( ( uint64 ) LocalVarIndex_Disp ( LocalVarOffset ( word ) ) ) ;
+            //_Compile_Move_Rm_To_Reg ( RSI, RSI, 0 ) ;
+            //_Compile_MoveImm_To_Reg ( RDX, ( int64 ) word->TypeNamespace, CELL ) ;
+            DataStack_Push ( ( uint64 ) word->TypeNamespace ) ;
+            Compile_Call ( ( byte* ) Do_LocalObject_AllocateInit ) ; // we want to only allocate this object once and only at run time; and not at compile time
+#else
+            int64 size = _Namespace_VariableValueGet ( word->TypeNamespace, ( byte* ) "size" ) ;
+            _Compile_MoveImm_To_Reg ( RDI, ( int64 ) word->TypeNamespace, CELL ) ;
+            _Compile_LEA ( RSI, FP, 0, LocalVarIndex_Disp ( LocalVarOffset ( word ) ) ) ;
+            //_Compile_Move_Rm_To_Reg ( RSI, RSI, 0 ) ;
+            _Compile_MoveImm_To_Reg ( RDX, ( int64 ) size, CELL ) ;
+            Compile_Call ( ( byte* ) _Do_LocalObject_AllocateInit ) ; // we want to only allocate this object once and only at run time; and not at compile time
+#endif            
+            SetState ( word, W_INITIALIZED, true ) ;
+        }
+        _CfrTil_Do_Variable ( word ) ;
+    }
+    else if ( word->CAttribute & T_LISP_SYMBOL )
+    {
+        if ( ! GetState ( cntx->Compiler0, LC_CFRTIL ) ) _CfrTil_Do_LispSymbol ( word ) ;
+        else _CfrTil_Do_Variable ( word ) ;
+    }
+    else if ( word->CAttribute & DOBJECT )
+    {
+        _CfrTil_Do_DynamicObject ( word ) ;
+    }
+    else if ( word->CAttribute & ( LITERAL | CONSTANT ) )
+    {
+        _CfrTil_Do_Literal ( word ) ;
+    }
+    else if ( word->CAttribute & OBJECT_FIELD )
+    {
+        _CfrTil_Do_ClassField ( word ) ;
+        if ( ( ! Lexer_IsTokenForwardDotted ( cntx->Lexer0 ) ) && ( ! GetState ( cntx->Compiler0, LC_ARG_PARSING ) ) ) cntx->Interpreter0->BaseObject = 0 ;
+    }
+    else if ( word->CAttribute & ( NAMESPACE_VARIABLE | THIS | OBJECT | LOCAL_VARIABLE | PARAMETER_VARIABLE ) )
+    {
+        _CfrTil_Do_Variable ( word ) ;
+        if ( ( ! Lexer_IsTokenForwardDotted ( cntx->Lexer0 ) ) && ( ! GetState ( cntx->Compiler0, LC_ARG_PARSING ) ) ) cntx->Interpreter0->BaseObject = 0 ;
+    }
+    else if ( word->CAttribute & ( C_TYPE | C_CLASS ) )
+    {
+        _Namespace_Do_C_Type ( word ) ;
+    }
+    else if ( word->CAttribute & ( NAMESPACE ) ) //| CLASS | CLASS_CLONE ) )
+    {
+        _Namespace_DoNamespace ( word, 1 ) ;
+    }
+    else if ( word->CAttribute & ( CLASS | CLASS_CLONE ) )
+    {
+        _Namespace_DoNamespace ( word, 0 ) ;
+    }
+}
+
+void
+DataObject_Run ( )
+{
+    d0 ( Cpu_CheckRspForWordAlignment ( "DataObject_Run:Before" ) ) ;
+    Word * word = _Context_->CurrentlyRunningWord ;
+    //DEBUG_SETUP ( word ) ;
+    _DataObject_Run ( word ) ;
+    //DEBUG_SHOW ;
+    d0 ( Cpu_CheckRspForWordAlignment ( "DataObject_Run:After" ) ) ;
+}
+
+void
 _Namespace_Do_C_Type ( Namespace * ns )
 {
     Context * cntx = _Context_ ;
@@ -25,7 +106,7 @@ _Namespace_Do_C_Type ( Namespace * ns )
                 _Q_->OVT_LC = 0 ;
                 // ?? parts of this could be screwing up other things and adds an unnecessary level of complexity
                 // for parsing C functions 
-                token1 = _Lexer_NextNonDebugOrCommentTokenWord ( lexer, 1 ) ;
+                token1 = _Lexer_NextNonDebugOrCommentTokenWord ( lexer, 1, 0 ) ; // ? peekFlag ?
                 int64 token1TokenStart_ReadLineIndex = lexer->TokenStart_ReadLineIndex ;
                 token2 = Lexer_PeekNextNonDebugTokenWord ( lexer, 1 ) ;
                 if ( token2 [0] == '(' )
@@ -41,6 +122,7 @@ _Namespace_Do_C_Type ( Namespace * ns )
                     CfrTil_BeginBlock ( ) ;
                     CfrTil_LocalsAndStackVariablesBegin ( ) ;
                     Ovt_AutoVarOn ( ) ;
+                    Namespace_DoNamespace ( ( byte* ) "C_Syntax" ) ;
                     do
                     {
                         byte * token = Lexer_ReadToken ( lexer ) ;
@@ -51,7 +133,7 @@ _Namespace_Do_C_Type ( Namespace * ns )
                         }
                         else if ( token [ 0 ] == '{' )
                         {
-#if 1                   // this is a little strange but for now i want this capacity somehow ??             
+#if 0                   // this is a little strange but for now i want this capacity somehow ??             
                             byte * token = Lexer_ReadToken ( lexer ) ;
                             if ( String_Equal ( token, "<dbg>" ) )
                             {
@@ -64,6 +146,8 @@ _Namespace_Do_C_Type ( Namespace * ns )
                                 bi->Start = Here ; // after _Compiler_AddLocalFrame and Compile_InitRegisterVariables
                             }
                             else if ( ! _Lexer_ConsiderDebugAndCommentTokens ( token, 1, 0 ) ) _CfrTil_AddTokenToTailOfTokenList ( token ) ;
+#else             
+                            //if ( ! _Lexer_ConsiderDebugAndCommentTokens ( token, 1, 0 ) ) _CfrTil_AddTokenToTailOfTokenList ( token ) ;
 #endif            
                             break ; // take nothing else (would be Syntax Error ) -- we have already done CfrTil_BeginBlock
                         }
@@ -93,14 +177,14 @@ _Namespace_Do_C_Type ( Namespace * ns )
                             }
                             if ( ( String_Equal ( token, ";" ) ) )
                             {
-                                _CfrTil_AddTokenToHeadOfTokenList ( token ) ;
+                                _CfrTil_PushToken_OnTokenList ( token ) ;
                                 break ;
                             }
                             else
                             {
                                 if ( ( String_Equal ( token, ")" ) ) )
                                 {
-                                    if ( GetState ( compiler, DOING_A_PREFIX_WORD ) ) _CfrTil_AddTokenToHeadOfTokenList ( token ) ; // add ahead of token2 :: ?? this could be screwing up other things and adds an unnecessary level of complexity
+                                    if ( GetState ( compiler, DOING_A_PREFIX_WORD ) ) _CfrTil_PushToken_OnTokenList ( token ) ; // add ahead of token2 :: ?? this could be screwing up other things and adds an unnecessary level of complexity
                                 }
                                 compiler->LHS_Word = 0 ;
                                 break ;
@@ -282,7 +366,7 @@ void
 _Do_Variable ( Word * word )
 {
     Context * cntx = _Context_ ;
-    if ( GetState ( cntx, C_SYNTAX ) || GetState ( cntx->Compiler0, LC_ARG_PARSING ) )
+    if ( GetState ( cntx, C_SYNTAX|INFIX_MODE ) || GetState ( cntx->Compiler0, LC_ARG_PARSING ) )
     {
         if ( Is_LValue ( word ) )
         {
@@ -338,7 +422,7 @@ _CfrTil_Do_Literal ( Word * word )
     }
     else
     {
-        if ( word->CAttribute & ( T_STRING | T_RAW_STRING ) ) DataStack_Push ( ( uint64 ) word->W_PtrValue ) ;
+        if ( word->CAttribute & ( T_STRING | T_RAW_STRING ) ) DataStack_Push ( ( uint64 ) word->W_BytePtr ) ;
         else DataStack_Push ( word->W_Value ) ;
 
     }
@@ -452,85 +536,4 @@ Do_LocalObject_AllocateInit ( ) //( Namespace * typeNamespace, byte ** value, in
 #endif
 // 'Run' :: this is part of runtime in the interpreter/compiler for data objects
 // they are compiled to much more optimized native code
-
-void
-_DataObject_Run ( Word * word )
-{
-    Context * cntx = _Context_ ;
-    cntx->Interpreter0->w_Word = word ; // for ArrayBegin : all literals are run here
-    cntx->CurrentlyRunningWord = word ;
-    if ( word->LAttribute & LOCAL_OBJECT )
-    {
-        if ( ( word->CAttribute & LOCAL_VARIABLE ) && ( ! GetState ( word, W_INITIALIZED ) ) ) // this is a local variable so it is initialed at creation 
-        {
-#if 0            
-            int64 size = _Namespace_VariableValueGet ( word->TypeNamespace, ( byte* ) "size" ) ;
-            //_Compile_MoveImm_To_Reg ( RDI, ( int64 ) size, CELL ) ;
-            DataStack_Push ( ( uint64 ) size ) ;
-            //_Compile_Move_Rm_To_Reg ( RDI, RDI, 0 ) ;
-            //_Compile_LEA ( RSI, FP, 0, LocalVarIndex_Disp ( LocalVarOffset ( word ) ) ) ; // 2 : account for saved fp and return slot
-            DataStack_Push ( ( uint64 ) LocalVarIndex_Disp ( LocalVarOffset ( word ) ) ) ;
-            //_Compile_Move_Rm_To_Reg ( RSI, RSI, 0 ) ;
-            //_Compile_MoveImm_To_Reg ( RDX, ( int64 ) word->TypeNamespace, CELL ) ;
-            DataStack_Push ( ( uint64 ) word->TypeNamespace ) ;
-            Compile_Call ( ( byte* ) Do_LocalObject_AllocateInit ) ; // we want to only allocate this object once and only at run time; and not at compile time
-#else
-            int64 size = _Namespace_VariableValueGet ( word->TypeNamespace, ( byte* ) "size" ) ;
-            _Compile_MoveImm_To_Reg ( RDI, ( int64 ) word->TypeNamespace, CELL ) ;
-            _Compile_LEA ( RSI, FP, 0, LocalVarIndex_Disp ( LocalVarOffset ( word ) ) ) ;
-            //_Compile_Move_Rm_To_Reg ( RSI, RSI, 0 ) ;
-            _Compile_MoveImm_To_Reg ( RDX, ( int64 ) size, CELL ) ;
-            Compile_Call ( ( byte* ) _Do_LocalObject_AllocateInit ) ; // we want to only allocate this object once and only at run time; and not at compile time
-#endif            
-            SetState ( word, W_INITIALIZED, true ) ;
-        }
-        _CfrTil_Do_Variable ( word ) ;
-    }
-    else if ( word->CAttribute & T_LISP_SYMBOL )
-    {
-        if ( ! GetState ( cntx->Compiler0, LC_CFRTIL ) ) _CfrTil_Do_LispSymbol ( word ) ;
-        else _CfrTil_Do_Variable ( word ) ;
-    }
-    else if ( word->CAttribute & DOBJECT )
-    {
-        _CfrTil_Do_DynamicObject ( word ) ;
-    }
-    else if ( word->CAttribute & ( LITERAL | CONSTANT ) )
-    {
-        _CfrTil_Do_Literal ( word ) ;
-    }
-    else if ( word->CAttribute & OBJECT_FIELD )
-    {
-        _CfrTil_Do_ClassField ( word ) ;
-        if ( ( ! Lexer_IsTokenForwardDotted ( cntx->Lexer0 ) ) && ( ! GetState ( cntx->Compiler0, LC_ARG_PARSING ) ) ) cntx->Interpreter0->BaseObject = 0 ;
-    }
-    else if ( word->CAttribute & ( NAMESPACE_VARIABLE | THIS | OBJECT | LOCAL_VARIABLE | PARAMETER_VARIABLE ) )
-    {
-        _CfrTil_Do_Variable ( word ) ;
-        if ( ( ! Lexer_IsTokenForwardDotted ( cntx->Lexer0 ) ) && ( ! GetState ( cntx->Compiler0, LC_ARG_PARSING ) ) ) cntx->Interpreter0->BaseObject = 0 ;
-    }
-    else if ( word->CAttribute & ( C_TYPE | C_CLASS ) )
-    {
-        _Namespace_Do_C_Type ( word ) ;
-    }
-    else if ( word->CAttribute & ( NAMESPACE ) ) //| CLASS | CLASS_CLONE ) )
-    {
-        _Namespace_DoNamespace ( word, 1 ) ;
-    }
-    else if ( word->CAttribute & ( CLASS | CLASS_CLONE ) )
-    {
-        _Namespace_DoNamespace ( word, 0 ) ;
-    }
-}
-
-void
-DataObject_Run ( )
-{
-    d0 ( Cpu_CheckRspForWordAlignment ( "DataObject_Run:Before" ) ) ;
-    Word * word = _Context_->CurrentlyRunningWord ;
-    DEBUG_SETUP ( word ) ;
-    _DataObject_Run ( word ) ;
-    DEBUG_SHOW ;
-    d0 ( Cpu_CheckRspForWordAlignment ( "DataObject_Run:After" ) ) ;
-}
 

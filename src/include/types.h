@@ -203,10 +203,10 @@ typedef struct _Identifier
     union
     {
         uint64 S_Value ;
-        byte * S_PtrValue ;
+        byte * S_BytePtr ;
         byte * S_Object ;
-        dllist * S_SymbolList ;
     } ;
+    dllist * S_SymbolList ;
     uint64 S_DObjectValue ; // nb! DynamicObject value can not be a union with S_SymbolList
     uint64 * S_PtrToValue ; // because we copy words with Compiler_PushCheckAndCopyDuplicates and we want the original value
     union // leave this here so we can add a ListObject to a namespace
@@ -300,7 +300,7 @@ typedef struct _Identifier
 #define W_Object S_Object
 #define W_Value2 S_Value2
 #define W_Value3 S_Value3
-#define W_PtrValue S_PtrValue
+#define W_BytePtr S_BytePtr
 #define W_PtrToValue S_PtrToValue
 #define W_DObjectValue S_DObjectValue
 
@@ -594,8 +594,9 @@ typedef struct Lexer
     byte * BasicTokenDelimiters ;
     byte * BasicDelimiterCharSet ;
     byte * TokenDelimitersAndDot ;
-    byte * DelimiterOrDotCharSet ;
-    int64 CurrentReadIndex, TokenWriteIndex ;
+    byte * DelimiterOrDotCharSet, *Filename ;
+    int64 CurrentReadIndex, TokenWriteIndex, LineNumber ;
+    Symbol * NextPeekListItem ;
     struct Interpreter * OurInterpreter ;
     ReadLiner * ReadLiner0 ;
     byte( *NextChar ) ( ReadLiner * rl ) ;
@@ -638,7 +639,7 @@ typedef struct
     int64 ArrayEnds ;
     byte * InitHere ;
     int64 * AccumulatedOptimizeOffsetPointer ;
-    int8 AccumulatedOffsetPointerFlag, InLParenBlock ;
+    int8 AccumulatedOffsetPointerFlag, InLParenBlock, SemicolonEndsThisBlock, TakesLParenAsBlock, BeginBlockFlag ;
     int32 * AccumulatedOffsetPointer ;
     int64 * FrameSizeCellOffset, BlocksBegun ;
     int8 RegOrder [ 4 ] ;

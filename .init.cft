@@ -117,6 +117,7 @@ Compiler
 "compileWord" ' _compileWord find alias immediate
 "compileCall" ' _compileCall find alias immediate
 "swap" ' _swap find alias immediate
+Interpreter 
 "{" ' begin find alias immediate keyword
 "end" ' _end find alias immediate
 "}" ' end find alias keyword
@@ -167,8 +168,8 @@ var: DebugFlag classTestRead streamLine doInit1 doDemo doTest doLisp COMBINATOR_
 : nstrcat: "" { token dup ";" strcmp } { strcat " " strcat } while drop ; immediate // nb : no quotation marks around names
 "mod" 'modulo find alias
 // "Preprocessor" class
-Lisp
-"lambda" "_lambda" find alias // nb! : can't use C/Compiler/Forth ' (tick) in Lisp namespace - it has another meaning there! : this construction also has same meaning
+//Lisp
+//"lambda" "_lambda" find alias // nb! : can't use C/Compiler/Forth ' (tick) in Lisp namespace - it has another meaning there! : this construction also has same meaning
 
 Namespace
 : using: { token dup ";" strcmp } { usingFirst } while drop ; // eg - "using: User Lisp ;"
@@ -225,12 +226,12 @@ System
 ;;
 : _wdiss ( addToHistoryFlag pword ) 
     nl pel 
-    nl "::> 'wdiss' is being called at" _ps location "<::" ps
     _source ( addToHistoryFlag @ pword @ ) nl pdl 
     pword @ wdis 
     { pword @ } 
     { nl "Word :" _ps hex pword p ":: Compiled at :" ps pword @ definition p } if
-    nl pel nl decimal 
+    nl pel decimal 
+    nl "::> 'wdiss' was called at" _ps location "<::" ps nl
 ;;
 //scOff
 //: wdiss ( pword ) _wdiss ( 1 pword @ ) ; //debugWord    // add wdiss words to history list
@@ -291,14 +292,14 @@ dscOn //verbosity 3 =
         ifElse
         //mem
     } if2 //_s //nl location nl //_pause
+    //_s _pause 
 ; 
 : assertStkChk _assertStkChk ; //stack _pause ; // s ;
 scOff
 //' _assertStkChk winfo //pause
 : TODO ( str ) nl nl pdl nl str @ adps location nl pdl nl nl { dbgOnVar @ } { sp } if2 ;;
 Root
-"User" namespace
-User
+User 
 //: pause nl "pausing at :" ddps location nl _pause ;
 : pause nl _pause ;
 //: pause _pause ;
@@ -315,8 +316,8 @@ User
 "s" ' stack find alias
 // : s stack location pause ;
 // : s stack dbg ;
-"istring" ' interpretString find alias
-"def" ' word find alias
+"istring" ' interpretString find alias 
+"def" ' word find alias 
 Compiler
 ">;" ' >? find alias
 
@@ -365,25 +366,39 @@ dbgOn
 
 #if dbgOnVar @ 
 Root 'doScript 1 const
-System
-testCfrTil dT0 //demo //dT0
+System 
+testCfrTil //demo //dT0
 stringMacrosOff
-: simple ( a b c ) a @ p b @ p c @ p ; //'simple find wdis 
-1 2 3 simple //pause
-c_syntaxOn dscOn
-int factorial( REG n | REG rec1 )
-{
-    rec1 = 1;
-    while ( n >= 2 )
-    {
-        rec1 *= (n--) ; 
-        //rec1 = rec1 * n-- ;
-    }
-    return rec1;
-} prefix
-c_syntaxOff dscOff
-'factorial find wdiss
-factorial (7) p //sp
+#if 1    
+Lisp
+: sp s pause ;
+BigNum
+(define yfac (lambda (yy n) (if* (< n 2) 1 (* n (yy yy (- n 1)))))) // code from : http://www.newlisp.org/index.cgi?Y_Function
+tick yfac find wdiss
+(yfac yfac 50) nl bno Lisp //pause
+(define yfacc (lambda (yyy n1) (if* (< n1 2) 1 (* n1 (yyy yyy (- n1 1)))))) 
+// tick yfacc find wdiss
+(yfacc yfacc 10) nl
+(yfacc yfacc 7) nl
+(define yfac (lambda (yy n) (if* (< n 2) 1 (* n (yy yy (- n 1)))))) // code from : http://www.newlisp.org/index.cgi?Y_Function
+tick yfac find wdiss
+(yfac yfac 50) nl //pause
+(define yfacc (lambda (yyy n1) (if* (< n1 2) 1 (* n1 (yyy yyy (- n1 1)))))) 
+// tick yfacc find wdiss
+(yfacc yfacc 10) nl
+(yfacc yfacc 7) nl
+(define x "let") (define a "the") // 'let' is a special word
+(define x1 'let) (define a1 the)
+nl ( Its 'a beautiful day don\'t 'let it get away )
+nl '( Its a beautiful day don\'t let it get away )
+nl '( Its a beautiful day don\'t @x1 it get away ) 
+nl `( ,Its ,a ,beautiful ,day ,don\'t ,@x1 ,it ,get ,away )
+nl `( Its ,a beautiful day don\'t ,x it get away )
+nl `( Its 'a beautiful day don\'t ,x1 it get away )
+nl `( Its a beautiful day don\'t ,@x it get away )
+nl `( Its a beautiful day don\'t ,@x1 it get away )
+lispOff    
+#endif    
 #else
 // you can trim this file to your needs and put your personal init code here maybe
 #endif

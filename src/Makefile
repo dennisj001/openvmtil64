@@ -193,9 +193,9 @@ _gmp :
 	sudo ldconfig
 	
 _mpfr :	
-	wget http://www.mpfr.org/mpfr-current/mpfr-3.1.6.tar.xz
-	tar xvf mpfr-3.1.6.tar.xz
-	cd mpfr-3.1.6 && \
+	wget http://www.mpfr.org/mpfr-current/mpfr-4.0.0.tar.xz
+	tar xvf mpfr-4.0.0.tar.xz
+	cd mpfr-4.0.0 && \
 	#./configure CFLAGS=-m32 ABI=32 --enable-shared && \
 	./configure --enable-shared && \
 	make && \

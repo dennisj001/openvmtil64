@@ -48,8 +48,8 @@ nl
 infixOff
 //pause
 c_syntaxOn
-void cmoe ( n m -- TOS ) { n <<= m ; dup(n) ; p (n) ; }  cmoe ( 2 6 ) ; 128 _assert0 cmoe ( 1 16 ) ; 65536 _assert0 "\nshould show 128 65536\n" ps // s pause
-void cmoe ( n m -- TOS ) { n >>= m ; dup(n) ; p (n) ; } cmoe ( 128 6 ) ; 2 _assert0 cmoe ( 65536 16 ) ; 1 _assert0 "\nshould show 2 1\n" ps s // pause
+void cmoe ( n m -- TOS ) { n <<= m ; p (n) ; return n ; }  cmoe ( 2 6 ) ; 128 _assert0 cmoe ( 1 16 ) ; 65536 _assert0 "\nshould show 128 65536\n" ps // s pause
+void cmoe ( n m -- TOS ) { n >>= m ; p (n) ; return n ; } cmoe ( 128 6 ) ; 2 _assert0 cmoe ( 65536 16 ) ; 1 _assert0 "\nshould show 2 1\n" ps s // pause
 c_syntaxOff
 //pause
 

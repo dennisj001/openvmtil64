@@ -87,17 +87,17 @@ Lexer_ObjectToken_New ( Lexer * lexer, byte * token ) //, int64 parseFlag )
         {
             if ( GetState ( _Q_, AUTO_VAR ) ) // make it a 'variable' 
             {
-                word = _DataObject_New (NAMESPACE_VARIABLE, 0, token, NAMESPACE_VARIABLE, 0, 0, 0, 0, 0 ) ;
+                word = _DataObject_New ( NAMESPACE_VARIABLE, 0, token, NAMESPACE_VARIABLE, 0, 0, 0, 0, 0 ) ;
             }
             else
             {
                 _Printf ( ( byte* ) "\n%s ?\n", ( char* ) token ) ;
-                CfrTil_Exception (NOT_A_KNOWN_OBJECT, 0, QUIT ) ;
+                CfrTil_Exception ( NOT_A_KNOWN_OBJECT, 0, QUIT ) ;
             }
         }
         else
         {
-            word = _DataObject_New (LITERAL, 0, token, 0, 0, 0, 0, lexer->Literal, 0 ) ;
+            word = _DataObject_New ( LITERAL, 0, token, 0, 0, 0, 0, lexer->Literal, 0 ) ;
         }
         lexer->TokenWord = word ;
     }
@@ -105,7 +105,7 @@ Lexer_ObjectToken_New ( Lexer * lexer, byte * token ) //, int64 parseFlag )
 }
 
 int64
-_Lexer_ConsiderDebugAndCommentTokens ( byte * token, int64 evalFlag, int64 addFlag )
+_Lexer_ConsiderDebugAndCommentTokens ( byte * token, int64 evalFlag, int64 reAddDebugWordsFlag )
 {
     Word * word = Finder_Word_FindUsing ( _Finder_, token, 1 ) ;
     if ( word && ( word->LAttribute & W_COMMENT ) )
@@ -119,24 +119,97 @@ _Lexer_ConsiderDebugAndCommentTokens ( byte * token, int64 evalFlag, int64 addFl
         if ( evalFlag )
         {
             word->W_TokenStart_ReadLineIndex = _Lexer_->TokenStart_ReadLineIndex ;
-            //Word_Eval0 ( word ) ;
             Word_Eval ( word ) ;
         }
-        else if ( addFlag ) _CfrTil_AddTokenToTailOfTokenList ( token ) ; // TODO ; list should instead be a stack
+        if ( reAddDebugWordsFlag ) _CfrTil_AddTokenToTailOfTokenList ( token ) ; // ToTail : fifo from Head
         return true ;
     }
     return false ;
 }
 
+//----------------------------------------------------------------------------------------|
+//              get from/ add to head  |              | get from head      add to tail    |      
+// TokenList Tail <--> TokenList Head  |<interpreter> | PeekList Head <--> PeekList Tail  |
+// token token token token token token | currentToken | token token token token token ... |
+//----------------------------------------------------------------------------------------|
+
+void
+_CfrTil_AddTokenToTailOfTokenList ( byte * token )
+{
+    d0 ( int64 depth = _dllist_Depth ( _CfrTil_->TokenList ) ) ;
+    d0 ( if ( depth ) { _Printf ( ( byte* ) "\nTokenList depth = %d\n", depth ) ; Pause () ; } ) ;
+    if ( token ) dllist_AddNodeToTail ( _CfrTil_->TokenList, ( dlnode* ) Lexer_Token_New ( token ) ) ;
+}
+
+void
+_CfrTil_PushToken_OnTokenList ( byte * token )
+{
+    d0 ( int64 depth = _dllist_Depth ( _CfrTil_->TokenList ) ) ;
+    d0 ( if ( depth ) { _Printf ( ( byte* ) "\nTokenList depth = %d\n", depth ) ; Pause () ; } ) ;
+    if ( token ) dllist_AddNodeToHead ( _CfrTil_->TokenList, ( dlnode* ) Lexer_Token_New ( token ) ) ;
+}
+
+void
+CfrTil_ClearTokenList ( )
+{
+    _dllist_Init ( _CfrTil_->TokenList ) ;
+}
+
+Symbol *
+Lexer_GetTokenFromTokenList ( Lexer * lexer, Boolean peekFlag )
+{
+    Symbol * tknSym ;
+    if ( ! ( peekFlag && ( tknSym = lexer->NextPeekListItem ) ) ) tknSym = ( Symbol* ) _dllist_First ( ( dllist* ) _CfrTil_->TokenList ) ;
+    if ( tknSym )
+    {
+        if ( peekFlag ) lexer->NextPeekListItem = ( Symbol* ) dlnode_Next ( ( dlnode * ) tknSym ) ;
+        else
+        {
+            lexer->NextPeekListItem = 0 ;
+            dlnode_Remove ( ( dlnode* ) tknSym ) ;
+        }
+        lexer->TokenStart_ReadLineIndex = tknSym->S_Value ;
+        lexer->TokenEnd_ReadLineIndex = tknSym->S_Value2 ;
+        lexer->LineNumber = tknSym->S_Value3 ;
+        lexer->OriginalToken = tknSym->S_Name ;
+        return tknSym ;
+    }
+    return 0 ;
+}
+
 byte *
-_Lexer_NextNonDebugOrCommentTokenWord ( Lexer * lexer, int64 evalFlag )
+Lexer_GetTokenNameFromTokenList ( Lexer * lexer, Boolean peekFlag )
+{
+    Symbol * tknSym = Lexer_GetTokenFromTokenList ( lexer, peekFlag ) ;
+    if ( tknSym )
+    {
+        return tknSym->S_Name ;
+    }
+    return 0 ;
+}
+
+Symbol *
+Lexer_Token_New ( byte * token )
+{
+    Symbol * tknSym = _Symbol_New ( token, TEMPORARY ) ;
+    tknSym->S_Value = _Context_->Lexer0->TokenStart_ReadLineIndex ;
+    tknSym->S_Value2 = _Context_->Lexer0->TokenEnd_ReadLineIndex ;
+    tknSym->S_Value3 = _Context_->Lexer0->LineNumber ;
+    return tknSym ;
+}
+
+byte *
+_Lexer_NextNonDebugOrCommentTokenWord ( Lexer * lexer, Boolean evalFlag, Boolean peekFlag )
 {
     byte * token ;
+    Boolean debugOrComment ;
     do
     {
-        token = _Lexer_LexNextToken_WithDelimiters ( lexer, 0, evalFlag ? 1 : 0, 0 ) ; // ?? the logic here ??
+        //_Lexer_LexNextToken_WithDelimiters (Lexer * lexer, byte * delimiters, Boolean checkListFlag, Boolean peekFlag, int reAddPeeked, uint64 state )
+        token = _Lexer_LexNextToken_WithDelimiters ( lexer, 0, 1, peekFlag, 0, 0 ) ; // ?? the logic here ??
+        debugOrComment = _Lexer_ConsiderDebugAndCommentTokens ( token, evalFlag, 0 ) ;
     }
-    while ( _Lexer_ConsiderDebugAndCommentTokens ( token, evalFlag, 0 ) ) ;
+    while ( debugOrComment ) ;
     return token ;
 }
 
@@ -147,8 +220,9 @@ Lexer_PeekNextNonDebugTokenWord ( Lexer * lexer, int64 evalFlag )
     if ( _AtCommandLine ( ) && Lexer_CheckIfDone ( lexer, LEXER_DONE ) ) return 0 ;
     else
     {
-        token = _Lexer_NextNonDebugOrCommentTokenWord ( lexer, evalFlag ) ;
-        _CfrTil_AddTokenToTailOfTokenList ( token ) ; // TODO ; list should instead be a stack
+        token = _Lexer_NextNonDebugOrCommentTokenWord ( lexer, evalFlag, 0 ) ; // 0 : peekFlag off because we are reAdding it below
+        //_CfrTil_AddTokenToTailOfTokenList ( token ) ; // TODO ; list should instead be a stack
+        _CfrTil_PushToken_OnTokenList ( token ) ; // TODO ; list should instead be a stack
     }
     return token ;
 }
@@ -168,9 +242,9 @@ Lexer_GetChar ( Lexer * lexer )
 }
 
 byte *
-_Lexer_LexNextToken_WithDelimiters ( Lexer * lexer, byte * delimiters, int64 checkListFlag, uint64 state )
+_Lexer_LexNextToken_WithDelimiters ( Lexer * lexer, byte * delimiters, Boolean checkListFlag, Boolean peekFlag, int reAddPeeked, uint64 state )
 {
-    if ( ( ! checkListFlag ) || ( ! ( lexer->OriginalToken = _CfrTil_GetTokenFromTokenList ( lexer ) ) ) ) // ( ! checkListFlag ) : allows us to peek multiple tokens ahead if we     {
+    if ( ( ! checkListFlag ) || ( ! ( lexer->OriginalToken = Lexer_GetTokenNameFromTokenList ( lexer, peekFlag ) ) ) ) // ( ! checkListFlag ) : allows us to peek multiple tokens ahead if we     {
     {
         Lexer_Init ( lexer, delimiters, lexer->State, CONTEXT ) ;
         lexer->State |= state ;
@@ -192,6 +266,8 @@ _Lexer_LexNextToken_WithDelimiters ( Lexer * lexer, byte * delimiters, int64 che
         }
         lexer->Token_Length = lexer->OriginalToken ? Strlen ( ( char* ) lexer->OriginalToken ) : 0 ;
         lexer->TokenEnd_ReadLineIndex = lexer->TokenStart_ReadLineIndex + lexer->Token_Length ;
+        //lexer->LineNumber = lexer->ReadLiner0->LineNumber ;
+        if ( peekFlag && reAddPeeked ) _CfrTil_PushToken_OnTokenList ( lexer->OriginalToken ) ;
     }
     return lexer->OriginalToken ;
 }
@@ -199,7 +275,7 @@ _Lexer_LexNextToken_WithDelimiters ( Lexer * lexer, byte * delimiters, int64 che
 void
 Lexer_LexNextToken_WithDelimiters ( Lexer * lexer, byte * delimiters )
 {
-    _Lexer_LexNextToken_WithDelimiters ( lexer, delimiters, 1, 0 ) ;
+    _Lexer_LexNextToken_WithDelimiters ( lexer, delimiters, 1, 0, 1, 0 ) ;
 }
 
 byte *
@@ -294,6 +370,8 @@ Lexer_Init ( Lexer * lexer, byte * delimiters, uint64 state, uint64 allocType )
     lexer->TokenDelimitersAndDot = ( byte* ) " .\n\r\t" ;
     lexer->DelimiterOrDotCharSet = CharSet_New ( lexer->TokenDelimitersAndDot, allocType ) ;
     lexer->TokenStart_ReadLineIndex = - 1 ;
+    lexer->Filename = lexer->ReadLiner0->Filename ;
+    lexer->LineNumber = lexer->ReadLiner0->LineNumber ;
     Lexer_RestartToken ( lexer ) ;
 }
 
@@ -301,8 +379,8 @@ Lexer *
 Lexer_New ( uint64 allocType )
 {
     Lexer * lexer = ( Lexer * ) Mem_Allocate ( sizeof (Lexer ), allocType ) ;
-    Lexer_Init ( lexer, 0, 0, allocType ) ;
     lexer->ReadLiner0 = ReadLine_New ( allocType ) ;
+    Lexer_Init ( lexer, 0, 0, allocType ) ;
     lexer->NextChar = _Lexer_NextChar ;
 
     return lexer ;
@@ -716,7 +794,7 @@ Lexer_CheckMacroRepl ( Lexer * lexer )
 void
 Comma ( Lexer * lexer )
 {
-    if ( GetState ( _Context_, C_SYNTAX ) && lexer->TokenWriteIndex )
+    if ( GetState ( _Context_, C_SYNTAX | INFIX_MODE ) && lexer->TokenWriteIndex )
     {
         Lexer_MakeItTheNextToken ( lexer ) ;
         return ;
@@ -840,7 +918,7 @@ _Lexer_IsTokenForwardDotted ( Lexer * lexer, int64 end )
         if ( rl->InputLine [ i ] == '[' ) return true ;
         if ( rl->InputLine [ i ] == '[' ) return true ;
         if ( rl->InputLine [ i ] == ' ' ) space ++ ;
-        if ( space && (isgraph ( rl->InputLine [ i ] ) ) ) break ;
+        if ( space && ( isgraph ( rl->InputLine [ i ] ) ) ) break ;
     }
     return false ;
 }
