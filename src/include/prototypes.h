@@ -1,7 +1,7 @@
 /* basis/compiler/machineCode.c */
 int8 RegOrder(int8 n);
 int8 CalculateModRegardingDisplacement(int64 mod, int64 disp);
-int8 CalculateModRmByte(int64 mod, int8 reg, int8 rm, int8 sib, int64 disp);
+int8 CalculateModRmByte(int64 mod, int8 regOrCode, int8 rm, int8 sib, int64 disp);
 int64 CalculateSib(int64 scale, int64 indexReg, int64 baseReg);
 byte _CalculateRex(int8 reg, int8 rm, int8 sib, int64 operandSize);
 void _Compile_ImmDispData(int64 immDisp, int64 size, int8 forceFlag);
@@ -20,7 +20,6 @@ void _Compile_X_Group1(int8 code, int8 toRegOrMem, int8 mod, int8 reg, int8 rm, 
 void _Compile_X_Group1_Reg_To_Reg(int64 code, int8 dstReg, int64 srcReg);
 void _Compile_X_Group1_Immediate(int8 code, int8 mod, int8 rm, int64 disp, uint64 imm, int8 iSize);
 void Compile_X_Group1(Compiler *compiler, int64 op, int64 ttt, int64 n);
-void _Compile_optInfo_X_Group1(Compiler *compiler, int64 op);
 void _Compile_IMULI(int64 mod, int8 reg, int8 rm, int8 sib, int64 disp, int64 imm, int64 size);
 void _Compile_IMUL(int64 mod, int8 reg, int8 rm, int8 controlFlags, int8 sib, int64 disp);
 void _Compile_Test(int64 mod, int8 reg, int8 rm, int8 controlFlags, int64 disp, int64 imm);
@@ -117,6 +116,7 @@ void Compile_Multiply(Compiler *compiler);
 void _Compile_Divide(Compiler *compiler, uint64 type);
 void Compile_Divide(Compiler *compiler);
 void Compile_Mod(Compiler *compiler);
+void _Compile_optInfo_X_Group1(Compiler *compiler, int64 op);
 void Compile_Group1_X_OpEqual(Compiler *compiler, int64 op);
 void Compile_MultiplyEqual(Compiler *compiler);
 void Compile_DivideEqual(Compiler *compiler);

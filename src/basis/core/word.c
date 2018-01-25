@@ -232,18 +232,8 @@ Word *
 _Word_New ( byte * name, uint64 ctype, uint64 ctype2, uint64 ltype, int8 addToInNs, Namespace * addToNs, uint64 allocType )
 {
     CheckCodeSpaceForRoom ( ) ;
-    //ReadLiner * rl = _Context_->ReadLiner0 ;
     Word * word = _Word_Create ( name, ctype, ctype2, ltype, allocType ) ; // CFRTIL_WORD : cfrTil compiled words as opposed to C compiled words
     _Context_->Compiler0->CurrentWord = word ;
-#if 0    
-    if ( rl->InputStringOriginal )
-    {
-        word->S_WordData->Filename = rl->Filename ;
-        word->S_WordData->LineNumber = rl->LineNumber ;
-        word->W_CursorPosition = rl->CursorPosition ;
-        //word->W_TokenStart_ReadLineIndex = _Lexer_->TokenStart_ReadLineIndex ;
-    }
-#endif    
     Word_SetLocation ( word ) ;
     _CfrTil_->WordCreateCount ++ ;
     _Word_Add ( word, addToInNs, addToNs ) ;

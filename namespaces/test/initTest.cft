@@ -46,7 +46,6 @@ Int User
 //: testX cST dT0 dT ;
 : testX cST ;
 
-'doX64 0 const
 #if doX64
 : basicT ppT cT mT aT loT bT locT oT x64 cntT lT fT sT sysT interpT stT dT0 ;
 #else

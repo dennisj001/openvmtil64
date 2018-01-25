@@ -134,7 +134,7 @@ CalculateModRmByte ( _mod, _reg, rm, sib, disp | modRm )
     }
     //modRm d: = ( _mod << 6 ) + ( ( ( _reg Bits.& 0x7 ) << 3 ) + ( rm Bits.& 0x7 ) ) ; // only use 3 bits of reg/rm
     modRm = ( _mod << 6 ) + ( ( ( _reg Bits.& 0x7 ) << 3 ) + ( rm Bits.& 0x7 ) ) ; // only use 3 bits of reg/rm
-    return modRm ;
+    <dbg> return modRm ;
 } prefix
 'CalculateModRmByte find wdiss apause 
 //-----------------------------------------------------------------------
@@ -333,9 +333,8 @@ _Compile_Group1_Immediate ( code _mod rm disp imm immSize | opCode controlFlags 
         if ( ( immSize <= BYTE ) || ( imm < 0x100 ) ) opCode |= 3 ; 
     }
     //controlFlags = (REX_B | MODRM_B | DISP_B | IMM_B) 
-    //Compile_CalcWrite_Instruction_X64 (  rex,  opCode,  _mod,  _reg,  rm, controlFlags,  sib,  disp,  dispSize,  imm,  immSize | modRm )
-    //Compile_CalcWrite_Instruction_X64 (  0,  opCode @,  _mod @,  0,  rm @, controlFlags @,  0,  disp @,  0,  imm @,  immSize @ )
-    Compile_CalcWrite_Instruction_X64 (  0,  opCode,  _mod,  0,  rm, (REX_B | MODRM_B | DISP_B | IMM_B),  0,  disp,  0,  imm,  immSize ) ;
+    //Compile_CalcWrite_Instruction_X64 ( 0, opCode, mod, code, rm, REX_B | MODRM_B | IMM_B | DISP_B, 0, disp, 0, imm, iSize ) ;
+    Compile_CalcWrite_Instruction_X64 (  0,  opCode,  _mod,  code,  rm, (REX_B | MODRM_B | DISP_B | IMM_B),  0,  disp,  0,  imm,  immSize ) ;
 } prefix
 
 void
@@ -380,7 +379,7 @@ c3                      ret
 #endif
 'popDspToR8AndCall find wdiss
 :asm iax
-    d: _Compile_Stack_PopToReg ( R8D ) ;
+    _Compile_Stack_PopToReg ( R8D ) ;
     //_Compile_Move_DataStackN_ToReg ( R8D, 0 ) 
     //d: _Compile_SUBI_DSP ( CELL ) 
     _Compile_CallThruReg ( R8D ) 

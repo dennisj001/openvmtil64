@@ -361,44 +361,16 @@ sp
 : sh _sh ; prefix
 stringMacrosOn
 : testCfrTil "namespaces/init.cft" include ;
+
 dbgOff
 dbgOn
-
-#if dbgOnVar @ 
+: Is_DebugOn dbgOnVar @ ;
+#if Is_DebugOn 
+'doX64 0 const
 Root 'doScript 1 const
 System 
 testCfrTil //demo //dT0
 stringMacrosOff
-#if 1    
-Lisp
-: sp s pause ;
-BigNum
-(define yfac (lambda (yy n) (if* (< n 2) 1 (* n (yy yy (- n 1)))))) // code from : http://www.newlisp.org/index.cgi?Y_Function
-tick yfac find wdiss
-(yfac yfac 50) nl bno Lisp //pause
-(define yfacc (lambda (yyy n1) (if* (< n1 2) 1 (* n1 (yyy yyy (- n1 1)))))) 
-// tick yfacc find wdiss
-(yfacc yfacc 10) nl
-(yfacc yfacc 7) nl
-(define yfac (lambda (yy n) (if* (< n 2) 1 (* n (yy yy (- n 1)))))) // code from : http://www.newlisp.org/index.cgi?Y_Function
-tick yfac find wdiss
-(yfac yfac 50) nl //pause
-(define yfacc (lambda (yyy n1) (if* (< n1 2) 1 (* n1 (yyy yyy (- n1 1)))))) 
-// tick yfacc find wdiss
-(yfacc yfacc 10) nl
-(yfacc yfacc 7) nl
-(define x "let") (define a "the") // 'let' is a special word
-(define x1 'let) (define a1 the)
-nl ( Its 'a beautiful day don\'t 'let it get away )
-nl '( Its a beautiful day don\'t let it get away )
-nl '( Its a beautiful day don\'t @x1 it get away ) 
-nl `( ,Its ,a ,beautiful ,day ,don\'t ,@x1 ,it ,get ,away )
-nl `( Its ,a beautiful day don\'t ,x it get away )
-nl `( Its 'a beautiful day don\'t ,x1 it get away )
-nl `( Its a beautiful day don\'t ,@x it get away )
-nl `( Its a beautiful day don\'t ,@x1 it get away )
-lispOff    
-#endif    
 #else
 // you can trim this file to your needs and put your personal init code here maybe
 #endif

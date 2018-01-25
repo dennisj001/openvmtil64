@@ -26,6 +26,7 @@ dscOff
 ;;
 a1234 ( 1 2 3 4 )
 sp
+dscOn
 // nb. this is some of the oldest testing
 : hey ( n m | o q )
 	//nl "startHey" prints
@@ -36,7 +37,7 @@ sp
         //" after hey" ps 
 ;
 ' hey find wdiss 
-1 2 hey sp
+1 2 hey sp dscOff
 : hey1 ( a b ) a @ b @ hey ; 
 1 2 hey1 sp
 : hey2 ( n m | o q ) 
@@ -151,15 +152,14 @@ nl "goedel2 :: " ps goedel2 sp
         n @ 6 + 8 _assert 
     } ix
     { (| n ) 
-        n @ p n 3 = n dup @ 4 + dup dup 7 _assert p = // junk 7
+        n @ p n 3 = n dup @ 4 + dup dup 7 _assert p n store // junk 7
         n @ p n @ 7 _assert // 7
     } ix 
     n @ dup p // 9
 ;
 "\ngoedel4 :: output should read : \n'junk' 2 'junk' 7 'junk' 7 7 9" ps //pause
+' goedel4 find wdiss     
 9 goedel4 _assert //pause
-//' goedel4 find wdiss     
-
 : goedel5 (| n -- TOS ) 
     nl "goedel5 :: " ps nl
     n 9 =
@@ -189,7 +189,7 @@ nl "goedel2 :: " ps goedel2 sp
     { (| n ) 
         n @ p 
         n 3 = 
-        n dup @ 4 + = 
+        n dup @ 4 + n store 
         n @ dup p 7 _assert 
     } ix // n should be garbage here
     n @ dup p

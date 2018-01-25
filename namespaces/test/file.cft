@@ -17,8 +17,5 @@ ofile ( "namespaces/test/file.cft" )
 : hey hi hi ;
 : heey hey hey ;
 heey
-#if dbOn @
-#else
 2 + 7 assertStkChk // stack checking
-#endif
 

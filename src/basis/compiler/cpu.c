@@ -133,6 +133,7 @@ _Compile_CpuState_Restore ( Cpu * cpu, int64 cStackRegFlag )
 
     if ( cStackRegFlag )
     {
+        cpu->Rsp = (uint64*) ((uint64) cpu->Rsp & (uint64) 0xfffffffffffffff0) ;
         _Compile_Get_FromCAddress_ToReg_ThruReg ( RSP, ( byte * ) & cpu->Rsp, RDX ) ; // r12, r13, rsp, rbp : same problem
         _Compile_Get_FromCAddress_ToReg_ThruReg ( RBP, ( byte * ) & cpu->Rbp, RDX ) ; // r12, r13, rsp, rbp : same problem
     }

@@ -93,7 +93,7 @@ CalculateModRegardingDisplacement ( int64 mod, int64 disp )
 }
 
 int8
-CalculateModRmByte ( int64 mod, int8 reg, int8 rm, int8 sib, int64 disp )
+CalculateModRmByte ( int64 mod, int8 regOrCode, int8 rm, int8 sib, int64 disp )
 {
     int8 modRm ;
     mod = CalculateModRegardingDisplacement ( mod, disp ) ;
@@ -106,9 +106,9 @@ CalculateModRmByte ( int64 mod, int8 reg, int8 rm, int8 sib, int64 disp )
     if ( sib )
     {
         rm = 4 ; // from intel mod tables
-        reg = 0 ;
+        regOrCode = 0 ;
     }
-    modRm = ( mod << 6 ) + ( ( reg & 0x7 ) << 3 ) + ( rm & 0x7 ) ; // only use 3 bits of reg/rm
+    modRm = ( mod << 6 ) + ( ( regOrCode & 0x7 ) << 3 ) + ( rm & 0x7 ) ; // only use 3 bits of reg/rm
     //modRm = ( mod << 6 ) + ( ( reg ) << 3 ) + ( rm ) ; // only use 3 bits of reg/rm
     return modRm ;
 }
@@ -445,7 +445,7 @@ _Compile_X_Group1_Immediate ( int8 code, int8 mod, int8 rm, int64 disp, uint64 i
     // #x80 is the base opCode for this group of instructions 
     // 1000 00sw 
     int64 opCode = 0x80 ;
-    if ( ( ( iSize > 4 ) || ( imm >= 0x100000000 ) ) && disp )
+    if ( ( ( iSize > 4 ) || ( imm >= 0x100000000 ) ) ) //&& disp )
 #if 0        
     {
         // x64 has no insn to do a group1op with int64 to mem directly so ...
@@ -479,10 +479,12 @@ _Compile_X_Group1_Immediate ( int8 code, int8 mod, int8 rm, int64 disp, uint64 i
             //_DBI_ON ;
             // x64 has no insn to do a group1op with int64 to mem directly so ...
             // first move to a reg then from that reg group1Op to mem location
-            _Compile_MoveImm_To_Reg ( ACC, imm, iSize ) ;
-            //_Compile_X_Group1_Reg_To_Reg ( code, rm, OREG2 ) ;
+            _Compile_MoveImm_To_Reg ( OREG, imm, iSize ) ;
+            if ( ! disp )
+            _Compile_X_Group1_Reg_To_Reg ( code, ACC, OREG ) ;
             //_Compile_X_Group1 ( int8 code, int8 toRegOrMem, int8 mod, int8 reg, int8 rm, int8 sib, int64 disp, int8 osize )
-            _Compile_X_Group1 ( code, REG, MEM, ACC, rm, 0, disp, CELL ) ;
+            else _Compile_X_Group1 ( code, MEM, MEM, OREG, rm, 0, disp, CELL ) ;
+            //else _Compile_X_Group1 ( code, MEM, MEM, rm, OREG, 0, disp, CELL ) ;
             //DBI_OFF ;
             return ;
         }
@@ -516,8 +518,9 @@ Compile_X_Group1 ( Compiler * compiler, int64 op, int64 ttt, int64 n )
         BlockInfo_Setup_BI_tttn ( _Context_->Compiler0, ttt, n, 3 ) ; // not less than 0 == greater than 0
         if ( optInfo->Optimize_Rm == DSP ) // if the result is to a reg and not tos
         {
-            if ( optInfo->Optimize_Dest_RegOrMem == MEM ) return ;
-            else _Compile_Move_StackN_To_Reg ( optInfo->Optimize_Reg, DSP, 0 ) ;
+            //if ( optInfo->Optimize_Dest_RegOrMem == MEM ) return ;
+            //else 
+            _Compile_Move_StackN_To_Reg ( optInfo->Optimize_Reg, DSP, 0 ) ;
         }
         _Word_CompileAndRecord_PushReg ( Compiler_WordList ( 0 ), optInfo->Optimize_Reg ) ; //optInfo->Optimize_Rm ) ; // 0 : ?!? should be the exact variable 
         //DBI_OFF ;
@@ -528,33 +531,13 @@ Compile_X_Group1 ( Compiler * compiler, int64 op, int64 ttt, int64 n )
         if ( ( optInfo->COIW[1] )->StackPushRegisterCode ) SetHere ( optInfo_0_one->StackPushRegisterCode ) ;
         else Compile_Pop_To_Acc ( DSP ) ;
         //_Compile_X_Group1 ( int64 code, int64 toRegOrMem, int64 mod, int8 reg, int8 rm, int8 sib, int64 disp, int64 osize )
-        _Compile_X_Group1 ( op, MEM, MEM, ACC, DSP, 0, 0, CELL_SIZE ) ; // result is on TOS
+        _Compile_X_Group1 ( op, MEM, MEM, ACC, DSP, 0, 0, CELL ) ; // result is on TOS
         //BlockInfo_Setup_BI_tttn ( compiler, ttt, n, 3 ) ; // not less than 0 == greater than 0
         //Word_CompileAndRecord_Push ( Compiler_WordList ( 0 ) ) ;
         //Compiler_CompileAndRecord_PushAccum ( compiler ) ;
+        //Compile_Move_ACC_To_TOS ( DSP ) ;
+        //_Word_CompileAndRecord_PushReg ( optInfo->COIW[0], ACC ) ;
         //DBI_OFF ;
-    }
-}
-
-void
-_Compile_optInfo_X_Group1 ( Compiler * compiler, int64 op )
-{
-    CompileOptimizeInfo * optInfo = compiler->OptInfo ;
-    Set_SCA ( 0 ) ;
-    if ( optInfo->OptimizeFlag & OPTIMIZE_IMM )
-    {
-        int64 imm = optInfo->Optimize_Imm ;
-        // Compile_SUBI( mod, operandReg, offset, immediateData, size )
-        _Compile_X_Group1_Immediate ( op, optInfo->Optimize_Mod,
-            optInfo->Optimize_Rm, optInfo->Optimize_Disp,
-            optInfo->Optimize_Imm, ( imm >= 0x100000000 ) ? CELL : ( ( imm >= 0x100 ) ? 4 : 1 ) ) ;
-    }
-    else
-    {
-        // _Compile_Group1 ( int64 code, int64 toRegOrMem, int64 mod, int8 reg, int8 rm, int8 sib, int64 disp, int64 osize )
-        _Compile_X_Group1 ( op, optInfo->Optimize_Dest_RegOrMem, optInfo->Optimize_Mod,
-            optInfo->Optimize_Reg, optInfo->Optimize_Rm, 0,
-            optInfo->Optimize_Disp, CELL_SIZE ) ;
     }
 }
 
