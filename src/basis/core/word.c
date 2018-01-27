@@ -28,7 +28,7 @@ Word_Eval ( Word * word )
     {
         if ( ! word->W_SC_ScratchPadIndex ) word->W_SC_ScratchPadIndex = _CfrTil_->SC_ScratchPadIndex ; // nb! : needs to be done for compile also
         DEBUG_SETUP ( word ) ;
-        if ( ! GetState ( _Debugger_->w_Word, STEPPED ) )
+        if ( ! GetState ( word, STEPPED ) )
         {
             if ( ( word->CAttribute & IMMEDIATE ) || ( ! CompileMode ) )
             {

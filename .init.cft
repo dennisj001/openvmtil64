@@ -375,7 +375,7 @@ stringMacrosOff
 // you can trim this file to your needs and put your personal init code here maybe
 //int fac5 ( REG n | REG facc -- RAX ) { d: facc = 1 ; while ( n > 1 ) { facc = facc * n -- ; } }
 dscOn
-verbosity 3 =
+//verbosity 3 =
 c_syntaxOn
 int
 fac5 ( REG n  | REG facc -- RAX ) 
