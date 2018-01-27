@@ -12,13 +12,16 @@
           <in>cpu.c</in>
           <in>locals.c</in>
           <in>logic.c</in>
+          <in>machineCode.back.c</in>
           <in>machineCode.c</in>
+          <in>math.back.c</in>
           <in>math.c</in>
           <in>mcPrimitives.c</in>
+          <in>memory.back.c</in>
           <in>memory.c</in>
+          <in>optimize.back.c</in>
           <in>optimize.c</in>
           <in>runtime.c</in>
-          <in>sequence.c</in>
           <in>stack.c</in>
           <in>udis.c</in>
         </df>
@@ -48,6 +51,7 @@
           <in>preprocessor.c</in>
           <in>readTable.c</in>
           <in>readline.c</in>
+          <in>sequence.c</in>
           <in>sockets.c</in>
           <in>string.c</in>
           <in>symbol.c</in>

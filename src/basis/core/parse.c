@@ -233,7 +233,7 @@ _CfrTil_Parse_LocalsAndStackVariables ( int64 svf, int64 lispMode, ListObject * 
             {
                 break ;
             }
-            if ( Stringi_Equal ( ( char* ) token, "REG" ) || Stringi_Equal ( ( char* ) token, "REGISTER" ) )
+            if ( String_Equal ( ( char* ) token, "REG" ) || String_Equal ( ( char* ) token, "REGISTER" ) )
             {
                 regFlag = true ;
                 continue ;

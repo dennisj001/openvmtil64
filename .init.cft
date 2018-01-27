@@ -366,7 +366,7 @@ dbgOff
 dbgOn
 : Is_DebugOn dbgOnVar @ ;
 #if Is_DebugOn 
-'doX64 0 const
+'doX64 1 const
 Root 'doScript 1 const
 System 
 testCfrTil //demo //dT0

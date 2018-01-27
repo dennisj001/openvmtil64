@@ -1,7 +1,7 @@
 /* basis/compiler/machineCode.c */
 int8 RegOrder(int8 n);
 int8 CalculateModRegardingDisplacement(int64 mod, int64 disp);
-int8 CalculateModRmByte(int64 mod, int8 regOrCode, int8 rm, int8 sib, int64 disp);
+int8 CalculateModRmByte(int64 mod, int8 reg, int8 rm, int8 sib, int64 disp);
 int64 CalculateSib(int64 scale, int64 indexReg, int64 baseReg);
 byte _CalculateRex(int8 reg, int8 rm, int8 sib, int64 operandSize);
 void _Compile_ImmDispData(int64 immDisp, int64 size, int8 forceFlag);
@@ -973,6 +973,7 @@ void NamedByteArray_Delete(NamedByteArray *nba);
 NamedByteArray *NamedByteArray_New(byte *name, int64 size, int64 atype);
 int64 NamedByteArray_CheckAddress(NamedByteArray *nba, byte *address);
 /* basis/core/compiler.c */
+Word *_CopyDuplicateWord(Word *word0);
 Word *CopyDuplicateWord(dlnode *anode, Word *word0);
 Word *_Compiler_CopyDuplicatesAndPush(Compiler *compiler, Word *word0);
 Word *Compiler_CopyDuplicatesAndPush(Word *word0);

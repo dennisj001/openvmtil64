@@ -367,9 +367,3 @@ Compile_Call_CfrTilWord ( )
 }
 #endif
 
-void
-_Compile_TEST_Reg_To_Reg ( int8 dstReg, int64 srcReg )
-{
-    _Compile_Op_Special_Reg_To_Reg ( TEST_R_TO_R, dstReg, srcReg ) ;
-}
-

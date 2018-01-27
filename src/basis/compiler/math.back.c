@@ -7,7 +7,7 @@ Compile_Minus ( Compiler * compiler )
 {
     Compile_X_Group1 ( compiler, SUB, ZERO_TTT, NZ ) ;
 }
- 
+
 void
 Compile_Plus ( Compiler * compiler )
 {

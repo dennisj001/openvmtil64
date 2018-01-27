@@ -31,7 +31,7 @@ nl
 // ' lnt6 find wdiss
 sp
 nl
-: lt7 1 1 - not p ; lt7 sp
+: lt7 1 1 - not dup p ; lt7 1 _assert sp
 : lt7b 1 1 + not p ; lt7b sp
 : lt8 1 not p ; lt8
 sp

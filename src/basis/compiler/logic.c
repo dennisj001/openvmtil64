@@ -321,8 +321,8 @@ Compile_LogicalNot ( Compiler * compiler )
         }
         else if ( compiler->OptInfo->Optimize_Rm == DSP )
         {
-            _Compile_Move_StackN_To_Reg ( ACC, DSP, 0 ) ;
-            //_Compile_Stack_PopToReg ( DSP, R8 ) ;
+            if ( one->StackPushRegisterCode ) SetHere (one->StackPushRegisterCode ) ;
+            else _Compile_Move_StackN_To_Reg ( ACC, DSP, 0 ) ;
         }
         else if ( compiler->OptInfo->Optimize_Rm != ACC )
         {

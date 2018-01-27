@@ -6,7 +6,7 @@ _Compile_Set_C_LValue_WithImm_ThruReg ( int64 address, int64 value, int8 rm, byt
     _Compile_MoveImm_To_Reg ( rm, address, CELL ) ;
     _Compile_MoveImm_To_Mem ( rm, value, operandSize ) ;
 }
- 
+
 void
 _Compile_Get_C_Value_ToReg ( int8 reg, int64 value )
 {
@@ -73,9 +73,9 @@ Compile_Store ( Compiler * compiler, int8 stackReg ) // !
         d0 ( if ( Is_DebugModeOn ) Compiler_Show_WordList ( "\nCompile_Store : not optimized" ) ) ;
         if ( ( word = ( Word* ) Compiler_WordList ( 1 ) ) && word->StackPushRegisterCode ) SetHere ( word->StackPushRegisterCode ) ;
         else _Compile_Move_Rm_To_Reg ( ACC, stackReg, 0 ) ;
-        _Compile_Move_Rm_To_Reg ( OREG, stackReg, (word && word->StackPushRegisterCode) ? 0 : (- CELL_SIZE) ) ;
-        _Compile_Move_Reg_To_Rm ( ((word && word->StackPushRegisterCode) ? word->RegToUse : ACC), OREG, 0 ) ;
-        Compile_SUBI ( REG, stackReg, 0, (( word && word->StackPushRegisterCode ) ? 1 : 2 ) * CELL_SIZE, 0 ) ;
+        _Compile_Move_Rm_To_Reg ( OREG, stackReg, ( word && word->StackPushRegisterCode ) ? 0 : ( - CELL_SIZE ) ) ;
+        _Compile_Move_Reg_To_Rm ( ( ( word && word->StackPushRegisterCode ) ? word->RegToUse : ACC ), OREG, 0 ) ;
+        Compile_SUBI ( REG, stackReg, 0, ( ( word && word->StackPushRegisterCode ) ? 1 : 2 ) * CELL_SIZE, 0 ) ;
         //DBI_OFF ;
     }
 }
@@ -107,11 +107,24 @@ Compile_Poke ( Compiler * compiler, int8 stackReg ) // =
     }
     else
     {
-        _Compile_Move_Rm_To_Reg ( OREG, stackReg, 0 ) ;
-        _Compile_Move_Rm_To_Reg ( ACC, stackReg, - CELL_SIZE ) ;
-        _Compile_Move_Reg_To_Rm ( ACC, OREG, 0 ) ;
-        //if ( ! GetState ( _Context_, C_SYNTAX ) ) 
-        Compile_SUBI ( REG, stackReg, 0, 2 * CELL_SIZE, BYTE ) ;
+        //_DBI_ON ;
+#if 1       
+        if ( compiler->OptInfo->COIW[1]->StackPushRegisterCode )
+        {
+            SetHere ( compiler->OptInfo->COIW[1]->StackPushRegisterCode ) ;
+            _Compile_Move_Rm_To_Reg ( OREG, stackReg, 0 ) ;
+            _Compile_Move_Reg_To_Rm ( OREG, compiler->OptInfo->COIW[1]->RegToUse, 0 ) ;
+            Compile_SUBI ( REG, stackReg, 0, CELL_SIZE, BYTE ) ;
+        }
+        else
+#endif            
+        {
+            _Compile_Move_Rm_To_Reg ( OREG, stackReg, 0 ) ;
+            _Compile_Move_Rm_To_Reg ( ACC, stackReg, - CELL_SIZE ) ;
+            _Compile_Move_Reg_To_Rm ( ACC, OREG, 0 ) ;
+            Compile_SUBI ( REG, stackReg, 0, 2 * CELL_SIZE, BYTE ) ;
+        }
+        //DBI_OFF ;
     }
 }
 

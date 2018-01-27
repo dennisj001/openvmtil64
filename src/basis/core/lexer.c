@@ -897,7 +897,11 @@ Lexer_IsTokenReverseDotted ( Lexer * lexer )
     int64 i, start = lexer->TokenStart_ReadLineIndex - 1 ;
     for ( i = start ; i >= 0 ; i -- )
     {
-        if ( rl->InputLine [ i ] == '.' ) return true ;
+        if ( rl->InputLine [ i ] == '.' ) 
+        {
+            if ( rl->InputLine [ --i ] != '.' ) // watch for (double/triple) dot ellipsis
+            return true ;
+        }
         if ( rl->InputLine [ i ] == ']' ) return true ;
         if ( rl->InputLine [ i ] == '[' ) return true ;
 
@@ -914,7 +918,11 @@ _Lexer_IsTokenForwardDotted ( Lexer * lexer, int64 end )
     end = end ? end - 1 : lexer->TokenEnd_ReadLineIndex ;
     for ( space = 0, i = end ; i < rl->MaxEndPosition ; i ++ )
     {
-        if ( rl->InputLine [ i ] == '.' ) return true ;
+        if ( rl->InputLine [ i ] == '.' ) 
+        {
+            if ( rl->InputLine [ ++i ] != '.' ) // watch for (double/triple) dot ellipsis
+            return true ;
+        }
         if ( rl->InputLine [ i ] == '[' ) return true ;
         if ( rl->InputLine [ i ] == '[' ) return true ;
         if ( rl->InputLine [ i ] == ' ' ) space ++ ;

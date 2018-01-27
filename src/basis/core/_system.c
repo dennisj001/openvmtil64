@@ -97,9 +97,9 @@ void
 _System_Init ( System * system )
 {
     system->NumberBase = 10 ;
-    mpfr_prec_t precision = 20, width = 20 ;
+    mpfr_prec_t precision = 90, width = 20 ;
     //system->BigNumPrecision = precision ; // digits here
-    mpfr_set_default_prec ( ( ( precision / 3 ) * 10 ) + 16 ) ; // bits here :: + 16 : add 5 extra digits of precision :: "precision is the number of bits used to represent the significand of a floating-point number"
+    mpfr_set_default_prec ( precision ) ; //( ( precision / 3 ) * 10 ) + 16 ) ; // bits here :: + 16 : add 5 extra digits of precision :: "precision is the number of bits used to represent the significand of a floating-point number"
     //system->BigNumWidth = width < system->BigNumPrecision - 4 ? width : system->BigNumPrecision ; // digits here
     system->IncludeFileStackNumber = 0 ;
 }

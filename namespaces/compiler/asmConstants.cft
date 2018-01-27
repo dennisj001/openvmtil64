@@ -12,14 +12,14 @@ decimal
 "MEM0" 0 const
 "MEM" MEM0 const
 // registers
-"EAX" 0 const 
-"ECX" 1 const 
-"EDX" 2 const 
-"EBX" 3 const 
-"ESP" 4 const 
-"EBP" 5 const 
-"ESI" 6 const
-"EDI" 7 const 
+"RAX" 0 const 
+"RCX" 1 const 
+"RDX" 2 const 
+"RBX" 3 const 
+"RSP" 4 const 
+"RBP" 5 const 
+"RSI" 6 const
+"RDI" 7 const 
 "R8D" 8 const 
 "R9D" 9 const 
 "R10D" 10 const 
@@ -47,13 +47,16 @@ decimal
 "ADD" 0 const
 "SUB" 5 const
 "CMP" 7 const
+"CALL" 2 const
 "BYTE" 1 const
 "CELL" 8 const
 "N" 1 const // used with JCC n/ttt notation
 
 // opCodes
-"INC" 0x40 const
-"DEC" 0x48 const
+//"INC" 0x40 const
+//"DEC" 0x48 const
+'INC 0 const
+'DEC 1 const
 
 #if 0 // not working yet
 c_syntaxOn

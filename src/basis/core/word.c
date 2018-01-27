@@ -199,7 +199,6 @@ _Word_Allocate ( uint64 allocType )
 Word *
 _Word_Create ( byte * name, uint64 ctype, uint64 ctype2, uint64 ltype, uint64 allocType )
 {
-    //Compiler * compiler = _Compiler_ ;
     Word * word = _Word_Allocate ( allocType ? allocType : DICTIONARY ) ;
     if ( allocType & ( EXISTING ) ) _Symbol_NameInit ( ( Symbol * ) word, name ) ;
     else _Symbol_Init_AllocName ( ( Symbol* ) word, name, STRING_MEM ) ;
@@ -208,10 +207,7 @@ _Word_Create ( byte * name, uint64 ctype, uint64 ctype2, uint64 ltype, uint64 al
     word->CAttribute2 = ctype2 ;
     word->LAttribute = ltype ;
     if ( Is_NamespaceType ( word ) ) word->Lo_List = dllist_New ( ) ;
-    //if ( Compiling && ( ! compiler->CurrentCreatedWord ) && (!compiler->CurrentWordCompiling) && ( ! compiler->BlockLevel ) ) compiler->CurrentWordCompiling = word ;
-    //if ( Compiling && ( ! compiler->BlockLevel ) ) compiler->CurrentWordCompiling = word ;
     _Compiler_->CurrentCreatedWord = word ;
-
     return word ;
 }
 

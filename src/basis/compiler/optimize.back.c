@@ -297,7 +297,7 @@ _CheckOptimizeOperands ( Compiler * compiler, int64 maxOperands )
                     case ( OP_LC << ( 2 * O_BITS ) | OP_LC << ( 1 * O_BITS ) | OP_LOGIC ):
                     {
                         int64 value ;
-                        //SetHere ( optInfo_0_two->Coding ) ;
+                        SetHere ( optInfo_0_two->Coding ) ;
                         // a little tricky here ...
                         // ?? maybe we should setup and use a special compiler stack and use it here ... ??
                         DataStack_Push ( ( int64 ) * optInfo_0_two->W_PtrToValue ) ;
@@ -309,11 +309,16 @@ _CheckOptimizeOperands ( Compiler * compiler, int64 maxOperands )
                         SetState ( _CfrTil_, OPTIMIZE_ON, true ) ; //prevent recursion here
                         value = DataStack_Pop ( ) ;
                         Word * two = optInfo_0_two ;
+                        //_CfrTil_WordList_PopWords ( 3, 1 ) ; // this idea would mess up a future optimization
                         two->W_Value = value ;
+                        //_DBI_ON ;
+                        //CfrTil_WordList_PushWord ( two ) ; // this idea would mess up a future optimization
                         SetHere ( two->Coding ) ;
                         _Set_SCA ( two ) ;
                         _Compile_MoveImm_To_Reg ( ACC, value, CELL ) ;
-                        _Word_CompileAndRecord_PushReg ( optInfo_0_zero, ACC ) ; // this is helpful in future optimizations looking for StackPushRegisterCode
+                        _Word_CompileAndRecord_PushReg ( optInfo_0_zero, ACC ) ;
+                        //_Word_CompileAndRecord_PushReg ( two, ACC ) ;
+                        //Word_Eval ( two ) ;
                         _DEBUG_SHOW ( two, 0 ) ;
                         return OPTIMIZE_DONE ;
                     }
@@ -457,14 +462,22 @@ unordered:
                         if ( optInfo_0_two->StackPushRegisterCode )
                         {
                             SetHere ( optInfo_0_two->StackPushRegisterCode ) ; // leave optInfo_0_two value in R8 we don't need to push it
-                            _GetRmDispImm ( optInfo, optInfo_0_one, -1 ) ;
-                            optInfo->Optimize_Dest_RegOrMem = REG ; //REG ;
+                            _GetRmDispImm ( optInfo, optInfo_0_one, ACC ) ;
+                            optInfo->Optimize_Dest_RegOrMem = REG ;
                             optInfo->Optimize_Mod = REG ;
-                            optInfo->Optimize_Reg = ACC ; // only for "mod" will it be edx else eax
-                            //optInfo->Optimize_Rm = ACC ;
-                            return i ;
+                            //optInfo->Optimize_Reg = OREG ; // only for "mod" will it be edx else eax
+                            optInfo->Optimize_Rm = ACC ; //optInfo_0_two->RegToUse ;
                         }
-                        else return 0 ;
+                        else
+                        {
+                            SetHere ( optInfo_0_one->Coding ) ;
+                            _GetRmDispImm ( optInfo, optInfo_0_one, - 1 ) ;
+                            optInfo->Optimize_Dest_RegOrMem = MEM ;
+                            optInfo->Optimize_Mod = MEM ;
+                            //optInfo->Optimize_Reg = OREG ; // only for "mod" will it be edx else eax
+                            optInfo->Optimize_Rm = DSP ;
+                        }
+                        return i ;
                     }
                     case ( OP_ORDERED << ( 2 * O_BITS ) | OP_LC << ( 1 * O_BITS ) | OP_DIVIDE ):
                     case ( OP_UNORDERED << ( 2 * O_BITS ) | OP_LC << ( 1 * O_BITS ) | OP_DIVIDE ):
@@ -1248,18 +1261,12 @@ unordered:
                     case ( OP_VAR << ( 4 * O_BITS ) | OP_DUP << ( 3 * O_BITS ) | OP_FETCH << ( 2 * O_BITS ) | OP_LC << ( 1 * O_BITS ) | OP_LOGIC ):
                     case ( OP_VAR << ( 4 * O_BITS ) | OP_DUP << ( 3 * O_BITS ) | OP_FETCH << ( 2 * O_BITS ) | OP_LC << ( 1 * O_BITS ) | OP_DIVIDE ):
                     {
-                        SetHere ( optInfo_0_four->Coding ) ;
-                        _Compile_GetVarLitObj_LValue_To_Reg ( optInfo_0_four, ACC ) ;
-                        Compile_ADDI ( REG, DSP, 0, CELL, 0 ) ;
-                        _Compile_Move_Reg_To_StackN ( DSP, 0, ACC ) ;
+                        SetHere ( optInfo_0_three->Coding ) ;
                         _Compile_GetVarLitObj_RValue_To_Reg ( optInfo_0_four, ACC ) ;
-                         _Word_CompileAndRecord_PushReg ( optInfo_0_four, ACC ) ;
-                        _GetRmDispImm ( optInfo, optInfo_0_one, - 1 ) ;
-                        //_CfrTil_WordList_PopWords ( 2, 1 ) ;
-                        optInfo->Optimize_Mod = MEM ;
-                        optInfo->Optimize_Rm = DSP ;
-                        optInfo->Optimize_Reg = ACC ;
-                        optInfo->Optimize_Dest_RegOrMem = MEM ;
+                        _GetRmDispImm ( optInfo, optInfo_0_one, -1 ) ;
+                        optInfo->Optimize_Mod = REG ;
+                        optInfo->Optimize_Rm = ACC ;
+                        optInfo->Optimize_Dest_RegOrMem = REG ;
                         return i ; //( OPTIMIZE_DONE ) ;
                     }
                     case ( OP_LOGIC << ( 1 * O_BITS ) | OP_DUP ):

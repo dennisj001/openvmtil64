@@ -5,14 +5,30 @@
 // this information is used by the compiler, optimizer and the debugger
 
 Word *
+_CopyDuplicateWord ( Word * word0 )
+{
+    d0 ( if ( Is_DebugModeOn ) _DWL_ShowList ( _Compiler_->WordList, 0 ) ) ;
+    Word * wordc = Word_Copy ( word0, DICTIONARY ) ; // use DICTIONARY since we are recycling these anyway
+    wordc->W_OriginalWord = Word_GetOriginalWord ( word0 ) ;
+    _dlnode_Init ( ( dlnode * ) wordc ) ; // necessary!
+    wordc->S_CAttribute |= ( uint64 ) RECYCLABLE_COPY ;
+    wordc->StackPushRegisterCode = 0 ;
+    wordc->W_SC_ScratchPadIndex = word0->W_SC_WordIndex ;
+    wordc->W_TokenStart_ReadLineIndex = word0->W_TokenStart_ReadLineIndex ;
+    Word_SetLocation ( wordc ) ;
+    return wordc ;
+}
+
+Word *
 CopyDuplicateWord ( dlnode * anode, Word * word0 )
 {
     Word * wordn = ( Word* ) dobject_Get_M_Slot ( anode, SCN_WORD ) ;
     int64 iuoFlag = dobject_Get_M_Slot ( anode, SCN_IN_USE_FLAG ) ;
     if ( iuoFlag && ( word0 == wordn ) )
+#if 0        
     {
         d0 ( if ( Is_DebugModeOn ) _DWL_ShowList ( _Compiler_->WordList, 0 ) ) ;
-        Word * wordc = Word_Copy ( wordn, DICTIONARY ) ; // use DICTIONARY since we are recycling these anyway
+        Word * wordc = Word_Copy ( word0, DICTIONARY ) ; // use DICTIONARY since we are recycling these anyway
         wordc->W_OriginalWord = Word_GetOriginalWord ( word0 ) ;
         _dlnode_Init ( ( dlnode * ) wordc ) ; // necessary!
         wordc->S_CAttribute |= ( uint64 ) RECYCLABLE_COPY ;
@@ -22,6 +38,9 @@ CopyDuplicateWord ( dlnode * anode, Word * word0 )
         Word_SetLocation ( wordc ) ;
         return wordc ;
     }
+#else
+    return _CopyDuplicateWord ( word0 ) ;
+#endif    
     return 0 ;
 }
 

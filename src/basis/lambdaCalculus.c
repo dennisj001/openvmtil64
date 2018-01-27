@@ -725,14 +725,14 @@ _LO_Apply_Arg ( ListObject ** pl1, int64 i, int8 svCompileMode )
     ListObject *l1 = * pl1, * l2 ;
     Word * word = l1 ;
 
-    //byte * svPreHere = _Debugger_->PreHere ;
     Set_CompileMode ( true ) ;
     if ( l1->LAttribute & ( LIST | LIST_NODE ) )
     {
         // ?needs :: Compiler_CopyDuplicatesAndPush somewhere
         Set_CompileMode ( false ) ;
         l2 = LO_Eval ( l1 ) ;
-        DEBUG_SETUP ( l2 ) ;
+        //DEBUG_SETUP ( l2 ) ;
+        _Debugger_->PreHere = Here ;
         if ( ! l2 || ( l2->LAttribute & T_NIL ) )
         {
             //Compile_DspPop_RspPush ( ) ;
@@ -751,19 +751,17 @@ _LO_Apply_Arg ( ListObject ** pl1, int64 i, int8 svCompileMode )
         word = Compiler_CopyDuplicatesAndPush ( word ) ;
         word->W_SC_ScratchPadIndex = l1->W_SC_ScratchPadIndex ;
         word->StackPushRegisterCode = 0 ;
-        _DEBUG_SETUP ( word, 1 ) ;
+        byte * here = Here ;
         Word_Eval ( word ) ; // ?? move value directly to RegOrder reg
         Word *baseObject = _Interpreter_->BaseObject ;
-        //if ( svCompileMode && ( ! _Lexer_IsTokenForwardDotted ( cntx->Lexer0, word->W_SC_ScratchPadIndex ) ) ) // research : how does CAttribute get set to T_NIL?
-        //if ( ( ! ( l1->CAttribute & ( NAMESPACE_TYPE | OBJECT_FIELD | T_NIL ) ) ) && ( ! _Lexer_IsTokenForwardDotted ( cntx->Lexer0, word->W_TokenEnd_ReadLineIndex ) ) )
         if ( ( ! _Lexer_IsTokenForwardDotted ( cntx->Lexer0, word->W_TokenStart_ReadLineIndex + strlen ( word->Name ) - 1 ) ) )
-            //if ( ( ! ( l1->CAttribute & ( NAMESPACE_TYPE | OBJECT_FIELD | T_NIL ) ) ) || ( ! _Lexer_IsTokenForwardDotted ( cntx->Lexer0, word->W_SC_ScratchPadIndex ) ) )
         {
             if ( word->StackPushRegisterCode ) SetHere ( word->StackPushRegisterCode ) ;
             else if ( baseObject && baseObject->StackPushRegisterCode ) SetHere ( baseObject->StackPushRegisterCode ) ;
             _Compile_Move_Reg_To_Reg ( RegOrder ( i ++ ), ACC ) ;
             if ( baseObject ) _Debugger_->PreHere = baseObject->Coding ;
             SetState ( cntx, ADDRESS_OF_MODE, false ) ;
+            _Debugger_->PreHere = here ;
             _DEBUG_SHOW ( word, 1 ) ;
         }
     }
@@ -826,7 +824,6 @@ _LO_Apply_Arg ( ListObject ** pl1, int64 i, int8 svCompileMode )
         _DEBUG_SHOW ( word, 1 ) ;
     }
 done:
-    DEBUG_SHOW ;
     _Debugger_->PreHere = Here ;
     return i ;
 }
@@ -860,7 +857,7 @@ _LO_Apply_ArgList ( ListObject * l0, Word * word )
         word->W_SC_ScratchPadIndex = l0->W_SC_ScratchPadIndex ;
         word = Compiler_CopyDuplicatesAndPush ( word ) ;
         cntx->CurrentlyRunningWord = word ;
-        _DEBUG_SETUP ( word, 1 ) ;
+        //_DEBUG_SETUP ( word, 1 ) ;
         if ( ( String_Equal ( word->Name, "printf" ) || ( String_Equal ( word->Name, "sprintf" ) ) ) )
         {
             _Compile_MoveImm_To_Reg ( RAX, 0, CELL ) ; // for printf ?? others //System V ABI : "%rax is used to indicate the number of vector arguments passed to a function requiring a variable number of arguments"
@@ -875,7 +872,7 @@ _LO_Apply_ArgList ( ListObject * l0, Word * word )
             _DEBUG_SETUP ( word, 1 ) ;
             CfrTil_BlockRun ( ) ;
         }
-        _DEBUG_SHOW ( word, 1 ) ;
+        //_DEBUG_SHOW ( word, 1 ) ;
         //Set_CompileMode ( svcm ) ;
         d0 ( if ( Is_DebugModeOn ) LO_Debug_ExtraShow ( 0, 2, 0, ( byte* ) "\nLeaving _LO_Apply_ArgList..." ) ) ;
         SetState ( compiler, LC_ARG_PARSING, false ) ;
