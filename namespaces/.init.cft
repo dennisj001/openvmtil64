@@ -363,7 +363,7 @@ stringMacrosOn
 : testCfrTil "namespaces/init.cft" include ;
 
 dbgOff
-//dbgOn
+dbgOn
 : Is_DebugOn dbgOnVar @ ;
 #if Is_DebugOn 
 'doX64 1 const
