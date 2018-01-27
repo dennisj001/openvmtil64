@@ -219,7 +219,7 @@ c_syntaxOff
 : pow ( base power | out ) { out 1 = } { power @ 0 > } { power power @ 1 - = } { out out @ base @ * = } for return out ;
 'pow find wdiss
 2 30 pow p sp
-#if 0
+#if 1
 "cpow" ffx2
 "pow" ffx2
 
@@ -228,6 +228,7 @@ Int
 "pow_03" ffx2
 //sp
 sp
+pause
 #endif
 
 C
@@ -364,9 +365,9 @@ sp
 
 : tfib2 ( n | m )  
     "Cfib_O3        : " ps 1 ti m 1 = { m @ n @ < } { m @ cfib_O3 p m ++ } while 1 time nl nl
-    //"no locals _fib4 : " ps 1 ti m 1 = { m @ n @ < } { m @ _fib4 p m ++ } while 1 time nl nl
+    "no locals _fib4 : " ps 1 ti m 1 = { m @ n @ < } { m @ _fib4 p m ++ } while 1 time nl nl
     "locals _fibn1   : " ps 1 ti m 1 = { m @ n @ < } { m @ _fibn1 p m ++ } while 1 time nl nl
-    //"no locals _fib3 : " ps 1 ti m 1 = { m @ n @ < } { m @ _fib3 p m ++ } while 1 time nl nl
+    "no locals _fib3 : " ps 1 ti m 1 = { m @ n @ < } { m @ _fib3 p m ++ } while 1 time nl nl
 ;
 : tfib3 ( n | m )  
     "Cfib2_O3       : " ps 1 ti m 1 = { m @ n @ <= } { m @ cfib2_O3 p m ++ } while 1 time nl nl
@@ -412,11 +413,11 @@ s: fibBN ( n | fn fn1 fn2 -- TOS )
 nl nl 47 tfib3 //sp pause
 nl nl 92 tfib3 //sp pause
 nl 92 dup p fibBN p //sp
-//bno
+bno
 
 nl
 // verbosity 1 =
-// namespaceTreeWithWords
+namespaceTreeWithWords
 
 2 + 7 assertStkChk // stack checking
 s

@@ -6,6 +6,7 @@ Interpreter_Init ( Interpreter * interp )
 {
     _Q_->OVT_Interpreter = interp ;
     interp->State = 0 ;
+    _dllist_Init ( interp->PreprocessorStackList  ) ;
 }
 
 Interpreter *

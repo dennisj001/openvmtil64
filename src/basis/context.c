@@ -221,6 +221,7 @@ _Context_IncludeFile ( Context * cntx, byte *filename, int64 interpretFlag )
             cntx->System0->IncludeFileStackNumber -- ;
             if ( ! cntx->System0->IncludeFileStackNumber ) Ovt_AutoVarOff ( ) ;
             if ( _Q_->Verbosity > 2 ) _Printf ( ( byte* ) "\n%s included\n", filename ) ;
+            Interpreter_Init ( cntx->Interpreter0 ) ; // ?? mainly to reset the PreprocessorStackList after the end of every file ??
         }
         else
         {
