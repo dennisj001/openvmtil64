@@ -12,6 +12,7 @@ void _Compile_Write_Instruction_X64(int8 rex, int16 opCode, int8 modRm, int16 co
 void Compile_CalcWrite_Instruction_X64(int8 rex, int8 opCode, int8 mod, int8 reg, int8 rm, int16 controlFlags, int8 sib, int64 disp, int8 dispSize, uint64 imm, int8 immSize);
 void _Compile_LEA(int8 reg, int8 rm, int8 sib, int64 disp);
 void _Compile_Op_Special_Reg_To_Reg(int64 code, int8 rm, int8 reg);
+void _Compile_TEST_Reg_To_Reg(int8 dstReg, int64 srcReg);
 void _Compile_Group2(int64 mod, int8 regOpCode, int8 rm, int8 sib, int64 disp, int64 imm);
 void _Compile_Group2_CL(int64 mod, int8 regOpCode, int8 rm, int8 sib, int64 disp);
 void _Compile_Group3(int64 code, int64 mod, int8 rm, int8 controlFlags, int8 sib, int64 disp, int64 imm, int64 size);
@@ -32,7 +33,6 @@ void _Compile_MoveImm_To_Reg(int8 reg, int64 imm, int8 immSize);
 void _Compile_MoveImm_To_Mem(int8 rm, int64 imm, int8 immSize);
 void _Compile_MoveMemValue_To_Reg(int8 reg, byte *address, int8 iSize);
 void _Compile_MoveMemValue_ToReg_ThruReg(int8 reg, byte *address, int8 iSize, int8 thruReg);
-void _Compile_MoveImm_ToReg_ThruReg(int8 reg, uint64 value, int8 iSize, int8 thruReg);
 void _Compile_MoveReg_ToAddress_ThruReg(int8 reg, byte *address, int8 thruReg);
 void _Compile_Move(int8 rex, int8 mod, int8 reg, int8 rm, int8 sib, int64 disp);
 void Compile_Move_WithSib(int8 rex, int8 mod, int8 reg, int8 rm, int8 controlFlags, int8 scale, int8 index, int8 base);
@@ -85,7 +85,7 @@ void _Compile_GetVarLitObj_RValue_To_Reg(Word *word, int64 reg);
 void _Compile_SetVarLitObj_With_Reg(Word *word, int64 reg, int64 thruReg);
 void _Compile_GetVarLitObj_LValue_To_Reg(Word *word, int64 reg);
 /* basis/compiler/memory.c */
-void _Compile_Set_C_LValue_WithImm_ThruReg(int64 address, int64 value, int8 rm, byte operandSize);
+void _Compile_Set_C_LValue_WithImm_ThruReg(byte *address, int64 value, int8 rm, byte operandSize);
 void _Compile_Get_C_Value_ToReg(int8 reg, int64 value);
 void _Compile_GetRValue_FromLValue_ToReg(int8 reg, byte *address);
 void _Compile_Get_FromCAddress_ToReg_ThruReg(int8 reg, byte *address, int8 thruReg);
@@ -165,7 +165,6 @@ void _Compile_RspReg_Push(int64 value);
 void Compile_DspPop_RspPush(void);
 void Compile_Set_DspReg_FromDataStackPointer(void);
 void Compile_Set_DataStackPointer_FromDspReg(void);
-void _Compile_TEST_Reg_To_Reg(int8 dstReg, int64 srcReg);
 /* basis/compiler/sequence.c */
 /* basis/compiler/logic.c */
 void CfrTil_If(void);

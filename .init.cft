@@ -363,7 +363,7 @@ stringMacrosOn
 : testCfrTil "namespaces/init.cft" include ;
 
 dbgOff
-dbgOn
+//dbgOn
 : Is_DebugOn dbgOnVar @ ;
 #if Is_DebugOn 
 'doX64 1 const
@@ -380,10 +380,10 @@ c_syntaxOn
 int
 fac5 ( REG n  | REG facc -- RAX ) 
 { 
-    d: facc = 1 ;
+    facc = 1 ;
     while ( n > 1 ) 
     {
-        facc = facc * n -- ;
+        facc = <dbg> facc * n -- ;
     }
 }
 wdiss ( ' fac5 find ) 

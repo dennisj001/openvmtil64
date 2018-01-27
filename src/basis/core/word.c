@@ -12,12 +12,15 @@ Word_Run ( Word * word )
 {
     if ( word )
     {
-        word->StackPushRegisterCode = 0 ; // nb. used! by the rewriting optInfo
-        // keep track in the word itself where the machine code is to go, if this word is compiled or causes compiling code - used for optimization
-        Word_SetCoding ( word, Here ) ;
-        word->W_InitialRuntimeDsp = _Dsp_ ;
-        _Context_->CurrentlyRunningWord = word ;
-        _Block_Eval ( word->Definition ) ;
+        if ( ! sigsetjmp ( _Context_->JmpBuf0, 0 ) ) // used by CfrTil_DebugRuntimeBreakpoint
+        {
+            word->StackPushRegisterCode = 0 ; // nb. used! by the rewriting optInfo
+            // keep track in the word itself where the machine code is to go, if this word is compiled or causes compiling code - used for optimization
+            Word_SetCoding ( word, Here ) ;
+            word->W_InitialRuntimeDsp = _Dsp_ ;
+            _Context_->CurrentlyRunningWord = word ;
+            _Block_Eval ( word->Definition ) ;
+        }
     }
 }
 
@@ -39,6 +42,7 @@ Word_Eval ( Word * word )
                 _Word_Compile ( word ) ;
             }
         }
+        SetState ( word, STEPPED, false ) ;
         DEBUG_SHOW ;
     }
 }

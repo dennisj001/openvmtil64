@@ -90,6 +90,7 @@ _Compile_CpuState_Save ( Cpu * cpu )
     //_Compile_Set_CAddress_WithRegValue_ThruReg ( ( byte* ) & cpu->Rdx, RDX, RDX ) ; // edx
     _Compile_Set_CAddress_WithRegValue_ThruReg ( ( byte* ) & cpu->Rbx, RBX, RDX ) ; // edx
     _Compile_Set_CAddress_WithRegValue_ThruReg ( ( byte* ) & cpu->Rsp, RSP, RDX ) ; // Rsp //this won't be accurate for the runtime because it is called from C 
+    cpu->Rsp = (uint64*) ((uint64) cpu->Rsp & (uint64) 0xfffffffffffffff0) ;
     _Compile_Set_CAddress_WithRegValue_ThruReg ( ( byte* ) & cpu->Rbp, RBP, RDX ) ; // edx
     _Compile_Set_CAddress_WithRegValue_ThruReg ( ( byte* ) & cpu->Rsi, RSI, RDX ) ; // edx
     _Compile_Set_CAddress_WithRegValue_ThruReg ( ( byte* ) & cpu->Rdi, RDI, RDX ) ; // edx
@@ -115,6 +116,7 @@ _Compile_CpuState_Save ( Cpu * cpu )
 
     //_Compile_Set_C_LValue_WithImm_ThruReg ( ( int64 ) & cpu->State, CPU_STATE_SAVED, R9D, CELL ) ; // mark this CpuState as having been saved
     // restore our scratch regs so we leave things as we found them
+    _Compile_Set_C_LValue_WithImm_ThruReg ( (byte*) & cpu->State, CPU_SAVED, RDX, CELL ) ;
     _Compile_GetRValue_FromLValue_ToReg ( RDX, ( byte* ) & cpu->Rdx ) ; // our scratch reg
 }
 

@@ -1,9 +1,9 @@
 #include "../../include/cfrtil64.h"
 
 void
-_Compile_Set_C_LValue_WithImm_ThruReg ( int64 address, int64 value, int8 rm, byte operandSize )
+_Compile_Set_C_LValue_WithImm_ThruReg ( byte * address, int64 value, int8 rm, byte operandSize )
 {
-    _Compile_MoveImm_To_Reg ( rm, address, CELL ) ;
+    _Compile_MoveImm_To_Reg ( rm, (int64) address, CELL ) ;
     _Compile_MoveImm_To_Mem ( rm, value, operandSize ) ;
 }
  

@@ -705,12 +705,14 @@ _Compile_MoveMemValue_ToReg_ThruReg ( int8 reg, byte * address, int8 iSize, int8
     _Compile_Move_Rm_To_Reg ( reg, thruReg, 0 ) ;
 }
 
+#if 0
 void
 _Compile_MoveImm_ToReg_ThruReg ( int8 reg, uint64 value, int8 iSize, int8 thruReg )
 {
     _Compile_MoveImm_To_Reg ( thruReg, value, iSize ) ;
     _Compile_Move_Reg_To_Reg ( reg, thruReg ) ;
 }
+#endif
 
 void
 _Compile_MoveReg_ToAddress_ThruReg ( int8 reg, byte * address, int8 thruReg )

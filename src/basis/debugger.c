@@ -110,6 +110,7 @@ _Debugger_InterpreterLoop ( Debugger * debugger )
     while ( GetState ( debugger, DBG_STEPPING ) || ( ! GetState ( debugger, DBG_INTERPRET_LOOP_DONE ) ) || 
        ( ( GetState ( debugger, DBG_AUTO_MODE ) ) && ( ! ( GetState ( debugger, DBG_EVAL_AUTO_MODE ) ) ) ) ) ;
     SetState ( debugger, DBG_STACK_OLD, true ) ;
+    //SetState ( debugger, DBG_BRK_INIT, false ) ;
     if ( GetState ( debugger, DBG_STEPPED ) )
     {
         if ( debugger->w_Word ) SetState ( debugger->w_Word, STEPPED, true ) ;
@@ -261,7 +262,6 @@ _Debugger_Init ( Debugger * debugger, Word * word, byte * address )
     else
     {
         debugger->w_Word = _Context_->CurrentlyRunningWord ;
-
         if ( _Context_->CurrentlyRunningWord ) debugger->Token = _Context_->CurrentlyRunningWord->Name ;
     }
     debugger->CopyRSP = 0 ;
@@ -478,7 +478,6 @@ Debugger_Continue ( Debugger * debugger )
         {
             Debugger_Step ( debugger ) ;
             //Debugger_ShowInfo ( debugger, GetState ( debugger, DBG_RUNTIME ) ? ( byte* ) "<dbg>" : ( byte* ) "dbg", 0 ) ;
-
         }
         SetState_TrueFalse ( debugger, DBG_STEPPED, DBG_STEPPING ) ;
         SetState ( debugger, DBG_INTERPRET_LOOP_DONE, true ) ;

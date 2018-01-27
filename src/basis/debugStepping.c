@@ -351,7 +351,7 @@ _Debugger_SetupStepping ( Debugger * debugger, Word * word, byte * address, byte
     debugger->DebugAddress = address ;
     debugger->w_Word = word ;
     //if ( ! GetState ( debugger, ( DBG_BRK_INIT ) ) ) Debugger_CheckSaveCpuState ( debugger ) ;
-    SetState ( debugger->cs_Cpu, CPU_SAVED, false ) ;
+    if ( ! GetState ( debugger, DBG_BRK_INIT ) ) SetState ( debugger->cs_Cpu, CPU_SAVED, false ) ;
     SetState ( _CfrTil_->cs_Cpu, CPU_SAVED, false ) ;
     _Debugger_CpuState_CheckSave ( debugger ) ;
     _CfrTil_CpuState_CheckSave ( ) ;
