@@ -363,7 +363,7 @@ stringMacrosOn
 : testCfrTil "namespaces/init.cft" include ;
 
 dbgOff
-dbgOn
+//dbgOn
 : Is_DebugOn dbgOnVar @ ;
 #if Is_DebugOn 
 'doX64 1 const
@@ -373,6 +373,24 @@ testCfrTil //demo //dT0
 stringMacrosOff
 #else
 // you can trim this file to your needs and put your personal init code here maybe
+dscOn
+//verbosity 3 =
+c_syntaxOn
+int
+fac5 ( REG n  | REG facc -- RAX ) 
+{ 
+    facc = 1 ;
+    while ( n > 1 ) 
+    {
+        facc = facc * n -- ;
+    }
+}
+wdiss ( ' fac5 find ) 
+7 d: fac5 dup p 5040 _assert //pause
+dscOff
+c_syntaxOff
+sp
+
 #endif
 2 + 7  assertStkChk // stack checking
 s

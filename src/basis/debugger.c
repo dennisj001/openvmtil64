@@ -107,7 +107,8 @@ _Debugger_InterpreterLoop ( Debugger * debugger )
         }
 #endif        
     }
-    while ( GetState ( debugger, DBG_STEPPING ) || ( ! GetState ( debugger, DBG_INTERPRET_LOOP_DONE ) ) || ( GetState ( debugger, DBG_AUTO_MODE ) && ( ! GetState ( debugger, DBG_EVAL_AUTO_MODE ) ) ) ) ;
+    while ( GetState ( debugger, DBG_STEPPING ) || ( ! GetState ( debugger, DBG_INTERPRET_LOOP_DONE ) ) || 
+       ( ( GetState ( debugger, DBG_AUTO_MODE ) ) && ( ! ( GetState ( debugger, DBG_EVAL_AUTO_MODE ) ) ) ) ) ;
     SetState ( debugger, DBG_STACK_OLD, true ) ;
     if ( GetState ( debugger, DBG_STEPPED ) )
     {
@@ -366,8 +367,6 @@ Debugger_Eval ( Debugger * debugger )
     {
         Debugger_Continue ( debugger ) ;
     }
-    //if ( ! debugger->PreHere ) 
-    //debugger->PreHere = _Compiler_GetCodeSpaceHere ( ) ; // Here ;
     SetState_TrueFalse ( debugger, DBG_INTERPRET_LOOP_DONE | DBG_EVAL_AUTO_MODE, DBG_STEPPING ) ;
     if ( GetState ( debugger, DBG_AUTO_MODE ) ) SetState ( debugger, DBG_EVAL_AUTO_MODE, true ) ;
     debugger->PreHere = Here ;

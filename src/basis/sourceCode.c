@@ -88,9 +88,9 @@ DWL_Find ( dllist * list, Word * iword, byte * address, byte* name, int64 fromFi
             }
         }
     }
-    if ( ( ! newAddress ) && ( _Q_->Verbosity > 2 ) && ( numFound ) )
+    if ( ( ! newAddress ) && ( numFound ) )
     {
-        if ( foundWord )
+        if ( ( foundWord ) && ( _Q_->Verbosity > 2 ) )
         {
             _Printf ( ( byte* ) "\nNumber Found = %d :: minDiffFound = %d : window = %d : Choosen node = %s :", numFound, minDiffFound, fDiff, foundWord->Name ) ;
             _DWL_ShowWord_Print ( foundWord, 0, "CHOSEN", foundWord->Coding, 0, minDiffFound, 1 ) ; //_DWL_ShowWord ( foundWord, "CHOSEN", minDiffFound ) ;

@@ -28,19 +28,23 @@ Word_Eval ( Word * word )
     {
         if ( ! word->W_SC_ScratchPadIndex ) word->W_SC_ScratchPadIndex = _CfrTil_->SC_ScratchPadIndex ; // nb! : needs to be done for compile also
         DEBUG_SETUP ( word ) ;
-        if ( ( word->CAttribute & IMMEDIATE ) || ( ! CompileMode ) )
+        if ( ! GetState ( _Debugger_->w_Word, STEPPED ) )
         {
-            Word_Run ( word ) ;
-        }
-        else
-        {
-            _Word_Compile ( word ) ;
+            if ( ( word->CAttribute & IMMEDIATE ) || ( ! CompileMode ) )
+            {
+                Word_Run ( word ) ;
+            }
+            else
+            {
+                _Word_Compile ( word ) ;
+            }
         }
         DEBUG_SHOW ;
     }
 }
 
 #if 0
+
 void
 Word_Run_Debug ( Word * word )
 {
@@ -87,7 +91,7 @@ Word_Eval ( Word * word )
 void
 _Word_Interpret ( Word * word )
 {
-    _Interpreter_DoWord (_Interpreter_, word, - 1 ) ;
+    _Interpreter_DoWord ( _Interpreter_, word, - 1 ) ;
 }
 
 void
