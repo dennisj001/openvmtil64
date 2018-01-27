@@ -228,7 +228,7 @@ Int
 "pow_03" ffx2
 //sp
 sp
-pause
+//pause
 #endif
 
 C

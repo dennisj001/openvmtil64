@@ -10,7 +10,7 @@
  * So, they each have pointers to each other.
  * 
  */
-const int64 SC_WINDOW = 10 ;
+const int64 SC_WINDOW = 50 ;
 const int64 SCWI_MAX_DIFF = 60 ;
 const int64 SCWI_MIN_DIFF = 2 ;
 
@@ -21,7 +21,7 @@ DWL_Find ( dllist * list, Word * iword, byte * address, byte* name, int64 fromFi
     Word * nword, *aFoundWord = 0, *foundWord = 0 ;
     dlnode * anode = 0 ; //, *foundWordNode = 0 ;
     int64 numFound = 0 ;
-    uint64 fwDiff = -1, fDiff = 0, minDiffFound = 0, scwi ;
+    uint64 fwDiff = - 1, fDiff = 0, minDiffFound = 0, scwi ;
 
     if ( list && ( iword || name || address ) )
     {
@@ -63,7 +63,8 @@ DWL_Find ( dllist * list, Word * iword, byte * address, byte* name, int64 fromFi
                 if ( foundWord )
                 {
                     fDiff = abs ( scwi - foundWord->W_SC_WordIndex ) ;
-                    if ( fDiff < SC_WINDOW ) 
+                    //if ( ( fDiff < SC_WINDOW ) || ( scwi < foundWord->W_SC_WordIndex ) )
+                    if ( ( scwi < foundWord->W_SC_WordIndex ) )
                     {
                         foundWord = aFoundWord ;
                         if ( fDiff < fwDiff )
@@ -71,13 +72,13 @@ DWL_Find ( dllist * list, Word * iword, byte * address, byte* name, int64 fromFi
                             foundWord = aFoundWord ;
                             fwDiff = fDiff ;
                         }
-                        //else fwDiff = fDiff ;
+                        else if ( ! fwDiff ) fwDiff = fDiff ;
                     }
                 }
                 else
                 {
                     foundWord = aFoundWord ;
-                    fwDiff = fDiff ;
+                    fwDiff = fDiff = scwi ; //fDiff ;
                 }
                 if ( ( ! minDiffFound ) || ( fDiff < minDiffFound ) ) minDiffFound = fDiff ;
                 if ( ( _Q_->Verbosity > 2 ) )
@@ -146,7 +147,7 @@ _Debugger_ShowDbgSourceCodeAtAddress ( Debugger * debugger, byte * address )
             if ( ! String_Equal ( sourceCode, "" ) )
             {
                 int64 fixed = 0 ;
-                Word * word = DWL_Find ( list, 0, address, 0, 0, 0, 0 ) ;
+                Word * word = DWL_Find ( list, 0, address, 0, 1, 0, 0 ) ;
                 if ( word && ( debugger->LastSourceCodeWord != word ) )
                 {
                     d0 ( DebugWordList_Show ( ) ) ;
@@ -368,7 +369,7 @@ _DWL_ShowWord_Print ( Word * word, int64 index, byte * prefix, byte * coding, by
             prefix, name, coding, scwi, scwiDiff, iuFlag ) ;
     }
 #if 0    
-else
+    else
     {
         _Printf ( ( byte* ) "\n\t%s :: \'%-28s\' : coding  = 0x%08x : scwi = %03d, inUse = %s",
             prefix, name, coding, scwi, iuFlag ) ;
