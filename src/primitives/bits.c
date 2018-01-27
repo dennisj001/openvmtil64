@@ -32,7 +32,7 @@ CfrTil_Jcc_Label ( )
     int64 ttt = DataStack_Pop ( ) ;
     int64 n = DataStack_Pop ( ) ;
     Compile_JCC ( n, ttt, 0 ) ;
-    GotoInfo_New ( ( byte* ) DataStack_Pop ( ), GI_LABEL ) ;
+    GotoInfo_New ( ( byte* ) DataStack_Pop ( ), GI_GOTO ) ;
 }
 
 void

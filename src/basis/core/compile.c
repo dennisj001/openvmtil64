@@ -92,7 +92,8 @@ _InstallGotoPoint_Key ( dlnode * node, int64 blockInfo, int64 key )
     int64 address = * ( int32* ) gotoInfo->pb_JmpOffsetPointer ;
     if ( ( address == 0 ) || ( key & ( GI_BREAK | GI_RETURN | GI_GOTO | GI_LABEL ) ) ) // if we move a block its recurse offset remains, check if this looks like at real offset pointer
     {
-        if ( ( gotoInfo->GI_CAttribute & ( GI_GOTO ) ) && ( key & ( GI_GOTO ) ) )
+        if ( ( ( gotoInfo->GI_CAttribute & ( GI_GOTO ) ) && ( key & ( GI_GOTO )) ) )
+            // || ( ( gotoInfo->GI_CAttribute & ( GI_LABEL ) ) && ( key & ( GI_LABEL )) ) )
         {
             Namespace * ns = _Namespace_Find ( ( byte* ) "__labels__", _CfrTil_->Namespaces, 0 ) ;
             if ( ns && ( word = _Finder_FindWord_InOneNamespace ( _Finder_, ns, gotoInfo->pb_LabelName ) ) )

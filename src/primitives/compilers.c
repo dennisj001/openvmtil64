@@ -128,10 +128,7 @@ _CfrTil_Goto ( byte * name )
 void
 _CfrTil_GotoLabel ( byte * name )
 {
-    //_CfrTil_CompileCallGoto ( name, GI_GOTO_LABEL ) ;
-    _Compile_UninitializedJump ( ) ;
-    GotoInfo_New ( name, GI_GOTO_LABEL ) ;
-    //dllist_Map1 ( _Context_->Compiler0->GotoList, ( MapFunction1 ) fun, ( int64 ) ( name ) ) ;
+    _CfrTil_CompileCallGoto ( name, GI_GOTO_LABEL ) ;
 }
 
 void

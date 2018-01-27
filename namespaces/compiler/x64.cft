@@ -41,7 +41,7 @@
 Compiler Compiling C Asm
 : :asm compileModeOn sourceCodeInit token create begin ' {| find compileWord sourceCodeOn ; immediate  
 //: :asm compileModeOn sourceCodeInit token create begin ' {| find compileWord ; immediate  
-: asm; ' |} find compileWord semi ; immediate
+: asm; semi ' {| find compileWord ; immediate
 ' :asm find winfo //sp
 ' asm; find winfo //sp
 'compile1 '1, find alias
@@ -260,8 +260,8 @@ _Compile_ImmDispData (  immDisp,  immSize,  forceFlag )
 void
 _Compile_Write_Instruction_X64 ( rex, opCode, modRm, controlFlags, sib, disp, dispSize, imm, immSize | _here )
 {
-    int nbytes ;
-    _here = here ;
+    //int nbytes ;
+    //_here = here ;
     if ( rex ) compile1 ( rex ) ; 
     if ( opCode >= 0x100 ) compile2 ( opCode ) ; 
     else compile1 ( opCode ) ; 
@@ -269,7 +269,7 @@ _Compile_Write_Instruction_X64 ( rex, opCode, modRm, controlFlags, sib, disp, di
     if ( sib && ( controlFlags Bits.& SIB_B ) ) compile1 ( sib ) ;
     if ( disp || ( controlFlags Bits.& DISP_B ) ) _Compile_ImmDispData ( disp, dispSize, 0 ) ;
     if ( imm || ( controlFlags Bits.& IMM_B ) ) _Compile_ImmDispData ( imm, immSize, ( controlFlags Bits.& IMM_B ) ) ;
-#if 1
+#if 0
     nbytes = here - _here ; 
     printf ( "\n_Compile_Write_Instruction_X64 : %lx : %d bytes : ...", _here, nbytes ) ; dis ( _here, nbytes ) ; //nl ; nl ; nl ; //pause () ;
 #endif
@@ -279,7 +279,7 @@ _Compile_Write_Instruction_X64 ( rex, opCode, modRm, controlFlags, sib, disp, di
 int 
 _CalculateRex ( _reg rm rex_w_flag )
 {
-j#if 1   
+#if 1   
     //  0100    WRXB
     rex = 0 ;
     if ( rex_w_flag ) rex = 8 ;
@@ -390,14 +390,14 @@ _Compile_TEST_Reg_To_Reg ( dstReg, srcReg )
 #define Compile_INC( mod, rm, sib, disp ) _Compile_Group5 ( INC, mod, rm, sib, disp, 0  )
 #define Compile_DEC( mod, rm, sib, disp ) _Compile_Group5 ( DEC, mod, rm, sib, disp, 0  )
 c_syntaxOff
-
+infixOn
 sp
 //'popDspToR8AndCall find wdiss
 : _Compile_Stack_PopToReg ( _reg ) 
     _Compile_Move_DataStackN_ToReg ( _reg @, 0 ) // 4d8b06
-    "\nshould show :     4d8b06                  mov r8, [r14]" ps
+    //"\nshould show :     4d8b06                  mov r8, [r14]" ps
     _Compile_SUBI_DSP ( CELL ) 
-    "\nshould show :     4983ee08                sub r14, 0x8" ps
+    //"\nshould show :     4983ee08                sub r14, 0x8" ps
 ;; 
 sp
 
@@ -421,7 +421,7 @@ sp
 :asm iax
     _Compile_Stack_PopToReg ( RAX ) 
     _Compile_CallThruReg ( RAX ) 
-    "\nshould show :     48ffd0                  call rax" ps {| sp |} //pause
+    //"\nshould show :     48ffd0                  call rax" ps {| sp |} 
 asm; 
 
 ' iax find wdiss sp 
@@ -431,14 +431,8 @@ asm;
 ;;
 
 : _Compile_IncDec_Reg ( op, _reg )
-#if 0    
-    op += ( _reg @ )  
-    // op ( _reg @ ) += // TODO : research : why doesn't this work 
-    op @ 1, 
-#else
     //_Compile_Group5 ( op @, REG, _reg @, 0, 0, 0  )
-    Compile_CalcWrite_Instruction_X64 ( 0, 0xff, REG, op @, _reg @, REX_B MODRM_B |, 0, 0, 0, 0, 0 ) 
-#endif        
+    Compile_CalcWrite_Instruction_X64 ( 0, 0xff, REG, op @, _reg @, REX_B | MODRM_B, 0, 0, 0, 0, 0 ) 
 ;;
 
 : _Compile_MoveTOS_To_R8D () _Compile_Move_DataStackN_ToReg ( R8D, 0 ) ;; // _Compile_Move ( REG, 0, EAX, DSP, 0 ) 
@@ -481,12 +475,7 @@ Stack
     _Compile_SUBI_DSP ( CELL ) 
     _Compile_Move_DataStackN_ToReg ( R9D, 0 )
     "start" label 
-    //_Compile_Test_Imm (  _mod, rm, disp, imm )
-    //d: _Compile_Test_Imm ( REG, R8D, 0, 0xffffffffffffffff )
-    //_Compile_Test ( REG, R8D, IMM_B, 0, 0xffffffff )
-    // _Compile_Test ( REG, 0, R9D, 0, -1 )
-    // _Compile_CMP_REG_IMM ( R8D, 0, CELL )  
-    _Compile_TEST_Reg_To_Reg ( R9D, R9D )
+    _Compile_TEST_Reg_To_Reg ( R8D, R8D )
     "end" 0 EQ jcc
     _Compile_ADDI_DSP ( CELL ) 
     _Compile_Move_Reg_To_StackN ( DSP, 0, R9D ) 
@@ -495,7 +484,8 @@ Stack
     "end" label // above jcc to Here
 asm;
 
-' ndup find wdiss sp
+' ndup find wdiss sp //pause
+7 ndup 7 ndrop
 
 Asm
 // following intel conventions in the naming : insn dst, src
@@ -522,63 +512,6 @@ Asm
  
 infixOff
 
-#if 0
-: _Compile_ModRm ( _mod _reg rm ) ( ( _mod @ << 6 ) | ( ( _reg @ Bits.& 7 ) << 3 ) | ( rm @ Bits.& 7 ) ) 1,  ;; 
-//' _Compile_ModRm find wdiss sp
-
-: _Compile_Imm ( imm isize )
-    { isize @ == 1 } { imm @ 1, } if 
-    { isize @ == 4 } { imm @ 4, } if 
-;;
-
-: _Compile_OpCode ( opCode ) 
-    { opCode @ > 255 } { opCode @ 2, } { opCode @ 1, } ifElse
-;; 
-
-: _Compile_ModRmDisp ( _mod _reg rm disp )
-    { _mod @ != REG } 
-    { 
-        { disp @ == 0 } { _mod = 0 } 
-        {
-            { disp <= #Xff } { _mod = MEM8 } { _mod = MEM32 } ifElse
-        }
-        ifElse
-    }
-    if
-    _Compile_ModRm (  _mod @, _reg @, rm @ )
-    { _mod @ == 1 } { disp @ 1, } if
-    { _mod @ == 2 } { disp @ 4, } if
-;; 
-
-: _Compile_X86_OpModRegRmDisp ( opCode _mod _reg rm disp )
-    _Compile_InstructionX64 ( opCode @, 1, _mod @, _reg @, rm @, disp @, 0, 0 ) 
-;;
-
-: _Compile_X86_OpModRegRm ( opCode _mod _reg rm )
-    _Compile_InstructionX64 ( opCode @, 1, _mod @, _reg @, rm @, 0, 0, 0 ) 
-;;
-: _Compile_CALL_EAX _Compile_X86_OpModRegRm ( #xff, 3, 2, 0 ) ;; 
-
-: _Compile_CALL_Reg ( _reg ) _Compile_X86_OpModRegRm ( #xff, 3, 2, _reg @ ) ;; 
-
-: _Compile_Test (  _mod, _reg, rm, disp, imm )
-    // _Compile_InstructionX64 ( opCode modFlag _mod _reg rm disp imm isize )
-    //_Compile_InstructionX64 ( #xf7, 1, _mod @, _reg @, rm @, disp @, imm @, CELL ) 
-    //Compile_CalcWrite_Instruction_X64 (  rex,  opCode,  _mod,  _reg,  rm, controlFlags,  sib,  disp,  dispSize,  imm,  immSize | modRm )
-    Compile_CalcWrite_Instruction_X64 (  0,  #xf7,  _mod @,  _reg @,  rm @, controlFlags,  0,  disp @,  0,  imm @,  0 )
-;;
-
-verbosity 1 =
-// no sib yet -- sib has not been needed here yet !
-: _Compile_InstructionX64 ( opCode modFlag _mod _reg rm disp imm isize | _here )
-    _here = here
-    //Compile_CalcWrite_Instruction_X64 (  rex,  opCode,  _mod,  _reg,  rm, controlFlags,  sib,  disp,  dispSize,  imm,  immSize | modRm )
-    Compile_CalcWrite_Instruction_X64 ( 0, opCode @, _mod @, _reg @, rm @, 0, 0, disp @, 8, 0, 0 )
-    //printf ( "\n : ", _here @ (here - (_here @)) dup 
-    nl _here @ (here - (_here @)) dup p " : " ps dis
-;;
-//'_Compile_InstructionX64 find wdiss sp
-#endif
 sp 
 2 + 7 assertStkChk // stack checking
 
