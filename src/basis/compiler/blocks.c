@@ -70,7 +70,7 @@ _Block_Copy ( byte * srcAddress, int64 bsize, int8 optFlag )
         }
         byte * here = Here ;
         _CompileN ( srcAddress, isize ) ; // memcpy ( dstAddress, address, size ) ;
-        d1 ( if ( Is_DebugModeOn ) _Debugger_Disassemble ( _Debugger_, ( byte* ) here, Here - here, 1 ) ) ;
+        d0 ( if ( Is_DebugModeOn ) _Debugger_Disassemble ( _Debugger_, ( byte* ) here, Here - here, 1 ) ) ;
     }
 }
 

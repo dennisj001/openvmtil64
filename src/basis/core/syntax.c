@@ -109,7 +109,7 @@ CfrTil_Interpret_C_Blocks ( int64 blocks, Boolean takesAnElseFlag, Boolean semic
         {
             compiler->InLParenBlock = false ;
             compiler->TakesLParenAsBlock = false ;
-            //_CfrTil_->EndBlockWord->Name = ")" ;
+            _CfrTil_->EndBlockWord->Name = ")" ;
             Interpret_C_Block_EndBlock ( word ) ;
             if ( ! _Context_StringEqual_PeekNextToken ( _Context_, ( byte* ) "{" ) )
             {
@@ -123,7 +123,7 @@ CfrTil_Interpret_C_Blocks ( int64 blocks, Boolean takesAnElseFlag, Boolean semic
             List_InterpretLists ( compiler->PostfixLists ) ;
             if ( semicolonEndsThisBlock )
             {
-                //_CfrTil_->EndBlockWord->Name = ";" ;
+                _CfrTil_->EndBlockWord->Name = ";" ;
                 Interpret_C_Block_EndBlock ( word ) ;
                 blocksParsed ++ ;
             }

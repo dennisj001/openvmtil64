@@ -266,7 +266,6 @@ _Lexer_LexNextToken_WithDelimiters ( Lexer * lexer, byte * delimiters, Boolean c
         }
         lexer->Token_Length = lexer->OriginalToken ? Strlen ( ( char* ) lexer->OriginalToken ) : 0 ;
         lexer->TokenEnd_ReadLineIndex = lexer->TokenStart_ReadLineIndex + lexer->Token_Length ;
-        //lexer->LineNumber = lexer->ReadLiner0->LineNumber ;
         if ( peekFlag && reAddPeeked ) _CfrTil_PushToken_OnTokenList ( lexer->OriginalToken ) ;
     }
     return lexer->OriginalToken ;
@@ -923,10 +922,10 @@ _Lexer_IsTokenForwardDotted ( Lexer * lexer, int64 end )
             if ( rl->InputLine [ ++i ] != '.' ) // watch for (double/triple) dot ellipsis
             return true ;
         }
-        if ( rl->InputLine [ i ] == '[' ) return true ;
-        if ( rl->InputLine [ i ] == '[' ) return true ;
-        if ( rl->InputLine [ i ] == ' ' ) space ++ ;
-        if ( space && ( isgraph ( rl->InputLine [ i ] ) ) ) break ;
+        else if ( rl->InputLine [ i ] == '[' ) return true ;
+        else if ( rl->InputLine [ i ] == ']' ) return true ;
+        else if ( rl->InputLine [ i ] == ' ' ) space ++ ;
+        else if ( space && ( isgraph ( rl->InputLine [ i ] ) ) ) break ;
     }
     return false ;
 }

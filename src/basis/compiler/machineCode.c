@@ -856,7 +856,7 @@ _Compile_UninitializedJump ( ) // runtime
 void
 _Compile_JCC ( int64 negFlag, int64 ttt, uint64 disp )
 {
-#define dbgON_10 1
+#define dbgON_10 0
 #if dbgON_10    
     d1 ( byte * here = Here ) ;
 #endif    
@@ -1016,7 +1016,7 @@ _Compile_Noop ( )
 void
 _Compile_MOVZX_REG ( int8 reg )
 {
-#define dbgON_12 1
+#define dbgON_12 0
 #if dbgON_12    
     d1 ( byte * here = Here ) ;
 #endif    
@@ -1030,7 +1030,7 @@ _Compile_MOVZX_REG ( int8 reg )
     d1 ( if ( DBI )
     {
         d1 ( _Printf ( ( byte* ) "\n_Compile_MOVZX_REG :" ) ) ;
-            d1 ( Debugger_UdisOneInstruction ( _Debugger_, here, ( byte* ) "", ( byte* ) "" ) ; ) ;
+        d1 ( Debugger_UdisOneInstruction ( _Debugger_, here, ( byte* ) "", ( byte* ) "" ) ; ) ;
     } ) ;
 #endif    
 }

@@ -49,7 +49,7 @@ Int User
 #if doX64
 : basicT ppT cT mT aT loT bT locT oT x64 cntT lT fT sT sysT interpT stT dT0 ;
 #else
-: basicT ppT cT mT aT loT bT locT oT      cntT lT fT sT sysT interpT stT dT0 ;
+: basicT ppT cT mT aT loT bT locT oT     cntT lT fT sT sysT interpT stT dT0 ;
 #endif
 : _basicT bT mT cntT lT fT sysT  ;
 : testBasic basicT ;
@@ -72,7 +72,6 @@ Int User
 // the action starts here
 nl "before testAll" prints
  
-
 "doTest" 1 const
 System Combinators
 //dbgOn
@@ -113,5 +112,5 @@ nl "_TestDone_ =" ps _TestDone_ @ p nl
 { _TestDone_ @ not } { pause } if2 
 sp
 2 + 7 assertStkChk // stack checking
-"\nending initTest.cft\nstack is...\n" ddps s
+//"\nending initTest.cft\nstack is...\n" ddps sp
 

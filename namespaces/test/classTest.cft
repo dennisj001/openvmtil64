@@ -9,11 +9,11 @@ Compiler
 hex
 : sl nl location nl stk _pause ; //sl
 Class
-: sp stack ; //pause ;
+: sp ; //stack ; //pause ;
 sp
 using
-"Pointer" class Pointer.size 8 = // 'size' must be set else it remains 0; whenever a :{ ... }; class declaration doesn't immediately follow the class declaration
 Class // "class" works like "namespace" so here we switch back to namespace 'Class' else following words would be in class 'Pointer'
+"Pointer" class Pointer.size 8 = // 'size' must be set else it remains 0; whenever a :{ ... }; class declaration doesn't immediately follow the class declaration
 "Integer" namespace // Integer.size 4 = doesn't work because a namespace doesn't have 'size' and 'this' variables automatically created
 //"int16" class int16 size 2 = // 'size' must be declared else it remains 0; ( see above note )
 //Integer "int32" class int32.size 4 = // 'size' must be declared else it remains 0; ( see above note )
@@ -78,7 +78,7 @@ testList DLList.size @ dup p dump //pause
 
 dbgOff 
 #if dbgOnVar @
-d: testList.HeadNode.AfterReference @ testList.TailNode.BeforeReference  "class init test : "  assert  : hi 1 2 3 4 5 + + + + p ; : hey hi hi hi hi hi ; hey : hi 1 2 3 4 5 + + + + p ; : hey hi hi hi hi hi ; hey // debugger test
+testList.HeadNode.AfterReference @ testList.TailNode.BeforeReference  "class init test : "  assert  : hi 1 2 3 4 5 + + + + p ; : hey hi hi hi hi hi ; hey : hi 1 2 3 4 5 + + + + p ; : hey hi hi hi hi hi ; hey // debugger test
 dbgOff
 #else
 testList.HeadNode.AfterReference @ testList.TailNode.BeforeReference  "class init test : " assert 

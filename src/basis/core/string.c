@@ -710,7 +710,7 @@ int64
 String_FindStrnCmpIndex ( byte * sc, byte* name0, int64 index0, int64 wl0, int64 inc )
 {
     byte * scspp2, *scspp ; 
-    d1 ( scspp = & sc [ index0 ] ) ;
+    d0 ( scspp = & sc [ index0 ] ) ;
     int64 i, n, index = index0, slsc = Strlen ( sc ) ;
     for ( i = 0, n = wl0 + inc ; i <= n ; i ++ ) // tokens are parsed in different order with parameter and c rtl args, etc. 
     {
@@ -728,7 +728,7 @@ String_FindStrnCmpIndex ( byte * sc, byte* name0, int64 index0, int64 wl0, int64
     }
     index = index0 ;
 done:
-    d1 ( scspp2 = & sc [ index ] ) ;
+    d0 ( scspp2 = & sc [ index ] ) ;
     return index ;
 }
 
@@ -998,7 +998,7 @@ Buffer_PrintBuffers ( )
             total ++ ;
         }
     }
-    d1 ( _Printf ("\nBuffer_PrintBuffers : total = %d : free = %d : unlocked = %d : locked = %d : permanent = %d", total, free, unlocked, locked, permanent ) ) ;
+    if ( _Q_->Verbosity > 1 ) _Printf ("\nBuffer_PrintBuffers : total = %d : free = %d : unlocked = %d : locked = %d : permanent = %d", total, free, unlocked, locked, permanent ) ;
 }
 
 Buffer *

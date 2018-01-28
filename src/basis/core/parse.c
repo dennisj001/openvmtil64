@@ -1,9 +1,10 @@
 #include "../../include/cfrtil64.h"
 
 void
-_CfrTil_SingleQuote ( int64 findWordFlag )
+_CfrTil_SingleQuote ()
 {
     ReadLiner * rl = _ReadLiner_ ;
+    Lexer * lexer = _Lexer_ ;
     Word *word, * sqWord = _CfrTil_WordList_TopWord ( ) ; //single quote word
     char buffer [5] ;
     byte c0, c1, c2 ;
@@ -37,10 +38,29 @@ _CfrTil_SingleQuote ( int64 findWordFlag )
 done:
         CfrTil_WordLists_PopWord ( ) ; // pop the "'" token
         word = _DObject_New ( buffer, charLiteral, LITERAL | CONSTANT | IMMEDIATE, 0, 0, LITERAL, ( byte* ) _DataObject_Run, 0, 0, 0, TEMPORARY ) ;
-        _Interpreter_DoWord (_Interpreter_, word, _Lexer_->TokenStart_ReadLineIndex ) ;
+        _Interpreter_DoWord ( _Interpreter_, word, _Lexer_->TokenStart_ReadLineIndex ) ;
     }
     else
     {
+        byte * token = ( byte* ) "" ;
+        while ( 1 )
+        {
+            int64 i = lexer->TokenEnd_ReadLineIndex ;
+            while ( ( i < rl->MaxEndPosition ) && ( rl->InputLine [ i ] == ' ' ) ) i ++ ;
+            if ( _Lexer_IsTokenForwardDotted ( _Lexer_, i + 1 ) ) // 1 : pre-adjust for an adjustment in _Lexer_IsTokenForwardDotted
+            {
+                token = Lexer_ReadToken ( lexer ) ;
+                if ( String_Equal ( ".", ( char* ) token ) ) continue ;
+                word = _Interpreter_TokenToWord ( _Interpreter_, token ) ;
+                if ( word && ( word->CAttribute & ( C_TYPE | C_CLASS | NAMESPACE ) ) ) Finder_SetQualifyingNamespace ( _Finder_, word ) ;
+                else
+                {
+                    DataStack_Push ( ( int64 ) token ) ;
+                    return ;
+                }
+            }
+            else break ;
+        }
         CfrTil_Token ( ) ;
     }
 }
@@ -82,9 +102,7 @@ gotNextToken:
             continue ;
         }
         ns = _Namespace_Find ( token, 0, 0 ) ;
-        if ( ! ns ) CfrTil_Exception ( NAMESPACE_ERROR, 0, 1 ) ;
-        size = _Namespace_VariableValueGet ( ns, ( byte* ) "size" ) ;
-        if ( ns && size )
+        if ( ns && ( size = _Namespace_VariableValueGet ( ns, ( byte* ) "size" ) ) )
         {
             token = Lexer_ReadToken ( _Context_->Lexer0 ) ;
             arrayBaseObject = _CfrTil_ClassField_New ( token, ns, size, offset ) ; // nb! : in case there is an array so it will be there for ArrayDimensions

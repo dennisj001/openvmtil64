@@ -369,7 +369,7 @@ dbgOn
 'doX64 1 const
 Root 'doScript 1 const
 System 
-testCfrTil //demo //dT0
+testCfrTil // dT0 //demo //dT0
 stringMacrosOff
 #else
 // you can trim this file to your needs and put your personal init code here maybe
@@ -383,11 +383,26 @@ fac5 ( REG n  | REG facc -- RAX )
     facc = 1 ;
     while ( n > 1 ) 
     {
-        facc = <dbg> facc * n -- ;
+        facc = facc * n -- ;
     }
 }
 wdiss ( ' fac5 find ) 
-7 d: fac5 dup p 5040 _assert //pause
+7 fac5 dup p 5040 _assert //pause
+ 
+int
+fibPTC? ( n | fn, fn1, fn2 ) 
+{
+    //d: int fn, fn1, fn2 ;
+    for ( fn = 0, fn1 = 0, fn2 = 1 ; n ; n -- ) 
+    {   
+        fn1 = fn2 ;
+        fn2 = fn ;
+        <dbg> fn = fn1 + fn2 ; 
+    }
+    return fn ;
+} 
+' fibPTC? find wdiss
+20 d: fibPTC? dup p 6765 _assert sp
 dscOff
 c_syntaxOff
 sp

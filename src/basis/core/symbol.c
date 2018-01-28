@@ -50,11 +50,35 @@ Symbol_NewValue ( int64 value, uint64 allocType )
 }
 
 Symbol *
+Symbol_CompareName2 ( Symbol * symbol, byte * name, Namespace * ns )
+{
+    //d1 ( if ( _Q_->Verbosity > 3 ) _Printf ( (byte*) "\n symbol name = %s : name = %s", symbol->S_Name, name ) ) ;
+    d0 ( if ( Is_DebugOn && String_Equal ( symbol->S_Name, "int" ) ) { _Printf ( ( byte* ) "\n symbol name = %s : name = %s", symbol->S_Name, name ) ; Pause ( ) ; } ) ;
+    d0 ( if ( Is_DebugOn ) { _Printf ( ( byte* ) "\n symbol name = %s.%s : name = %s",
+            symbol->S_ContainingNamespace ? symbol->S_ContainingNamespace->Name : ( byte* ) "", symbol->S_Name, name ) ; } ) ; //Pause () ; } ) ;
+    if ( name && symbol && symbol->S_Name && ( String_Equal ( symbol->S_Name, name ) ) && (symbol->S_ContainingNamespace == ns) )
+    {
+        d0 ( if ( Is_DebugOn ) { _Printf ( ( byte* ) "\n FOUND : symbol name = %s.%s : name = %s",
+            symbol->S_ContainingNamespace ? symbol->S_ContainingNamespace->Name : ( byte* ) "", symbol->S_Name, name ) ; } ) ; //Pause () ; } ) ;
+            
+        return symbol ;
+    }
+    else return 0 ;
+}
+
+Symbol *
 _Symbol_CompareName ( Symbol * symbol, byte * name )
 {
     //d1 ( if ( _Q_->Verbosity > 3 ) _Printf ( (byte*) "\n symbol name = %s : name = %s", symbol->S_Name, name ) ) ;
-    //d1 ( if ( Is_DebugOn && String_Equal ( symbol->S_Name, "_CalculateRex" ) ) { _Printf ( (byte*) "\n symbol name = %s : name = %s", symbol->S_Name, name ) ; Pause () ; } ) ;
-    if ( name && symbol && symbol->S_Name && ( String_Equal ( symbol->S_Name, name ) ) ) return symbol ;
+    d0 ( if ( Is_DebugOn && String_Equal ( symbol->S_Name, "int" ) ) { _Printf ( ( byte* ) "\n symbol name = %s : name = %s", symbol->S_Name, name ) ; Pause ( ) ; } ) ;
+    d0 ( if ( Is_DebugOn ) { _Printf ( ( byte* ) "\n symbol name = %s.%s : name = %s",
+            symbol->S_ContainingNamespace ? symbol->S_ContainingNamespace->Name : ( byte* ) "", symbol->S_Name, name ) ; } ) ; //Pause () ; } ) ;
+    if ( name && symbol && symbol->S_Name && ( String_Equal ( symbol->S_Name, name ) ) )
+    {
+        d0 ( if ( Is_DebugOn ) { _Printf ( ( byte* ) "\n FOUND : symbol name = %s.%s : name = %s",
+            symbol->S_ContainingNamespace ? symbol->S_ContainingNamespace->Name : ( byte* ) "", symbol->S_Name, name ) ; } ) ; //Pause () ; } ) ;
+        return symbol ;
+    }
     else return 0 ;
 }
 

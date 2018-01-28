@@ -202,7 +202,7 @@ MemorySpace_Init ( MemorySpace * ms )
     ms->CompilerTempObjectSpace = MemorySpace_NBA_New ( ms, ( byte* ) "CompilerTempObjectSpace", ovt->CompilerTempObjectsSize, COMPILER_TEMP ) ;
     ms->CodeSpace = MemorySpace_NBA_New ( ms, ( byte* ) "CodeSpace", ovt->MachineCodeSize, CODE ) ;
     ms->SessionObjectsSpace = MemorySpace_NBA_New ( ms, ( byte* ) "SessionObjectsSpace", ovt->SessionObjectsSize, SESSION ) ;
-    ms->SessionCodeSpace = MemorySpace_NBA_New ( ms, ( byte* ) "SessionCodeSpace", ovt->SessionCodeSize, SESSION_CODE ) ;
+    //ms->SessionCodeSpace = MemorySpace_NBA_New ( ms, ( byte* ) "SessionCodeSpace", ovt->SessionCodeSize, SESSION_CODE ) ;
     ms->DictionarySpace = MemorySpace_NBA_New ( ms, ( byte* ) "DictionarySpace", ovt->DictionarySize, DICTIONARY ) ;
     ms->LispTempSpace = MemorySpace_NBA_New ( ms, ( byte* ) "LispTempSpace", ovt->LispTempSize, LISP_TEMP ) ;
     ms->BufferSpace = MemorySpace_NBA_New ( ms, ( byte* ) "BufferSpace", ovt->BufferSpaceSize, BUFFER ) ;
@@ -239,49 +239,6 @@ _OVT_Find_NBA ( byte * name )
     else return 0 ;
 }
 
-#if 0 //DEBUG_FIND_NBA
-void
-Print_NodeWordName ( Node * node )
-{
-#if 1    
-    NBA *nba = Get_NBA_Symbol_To_NBA ( (Symbol*) node ) ;
-    byte * name = nba->NBA_Symbol.S_Name ;
-    //if ( String_Equal ( ((Symbol*) 0x7ffff7f640b8 )->S_Name, ""  ) _Printf ((byte*)" %s", name) ;
-#else    
-    Word *w = (Word* ) node ;
-    byte * name = w->Name ;
-#endif    
-    _Printf ((byte*)" %s", name) ;
-}
-
-void
-DLList_PrintNames ( dllist * list )
-{
-    dllist_Map ( list, ( MapFunction0 ) Print_NodeWordName ) ;
-}
-
-void
-Debug_Find_Bug ( )
-{
-    byte * name = ((Symbol*) 0x7ffff7f640b8 )->S_Name ;
-    //if ( ! String_Equal ( name, "ContextSpace"  ) ) _Printf ((byte*)" %s", name) ;
-    if (( name == (byte*) 0x21c3677c82b40000 ) || (TOS == 0x21c3677c82b40000))
-    {
-        //CfrTil_Debugger_CheckSaveCpuStateShow ( ) ;
-        _Debugger_CpuState_Show ( ) ;
-        _Printf ((byte*)"\nGot it\n" ) ;
-        NBA *nba = _OVT_Find_NBA ( "ContextSpace" ) ;
-        Pause () ;
-    }
-
-    //DLList_PrintNames ( &_Q_->MemorySpace0->NBAs ) ;
-    //if ( nba->ba_CurrentByteArray->MemRemaining < 10000 ) 
-    {
-        //_Printf ( (byte*)"\nDebug_Find_NBA : nba->ba_CurrentByteArray->MemRemaining = %d", nba->ba_CurrentByteArray->MemRemaining ) ;
-        //Pause () ;
-    }
-}
-#endif
 // fuzzy still but haven't yet needed to adjust this one
 
 void
@@ -340,14 +297,11 @@ OVT_MemListFree_LispTemp ( )
     OVT_MemList_FreeNBAMemory ( ( byte* ) "LispTempSpace", 2 * M, 1 ) ;
 }
 
-#if 1
-
 void
 OVT_MemListFree_Session ( )
 {
     OVT_MemList_FreeNBAMemory ( ( byte* ) "SessionObjectsSpace", 2 * M, 1 ) ;
 }
-#endif
 
 void
 OVT_MemListFree_Buffers ( )
@@ -603,7 +557,6 @@ void
 Word_Recycle ( Word * w )
 {
     d0 ( IsIt_C_LeftParen ( w ) ) ;
-    //( ( DLNode* ) w )->n_Size = sizeof (Word ) + sizeof (WordData ) ;
     if ( w ) dllist_AddNodeToHead ( _Q_->MemorySpace0->RecycledWordList, ( dlnode* ) w ) ;
 }
 
@@ -666,20 +619,5 @@ OVT_MemListFree_Objects ( )
     OVT_MemList_FreeNBAMemory ( ( byte* ) "ObjectSpace", 20 * M, 0 ) ;
 }
 
-
-#if 0
-
-void
-Interpreter_DebugNow ( Interpreter * interp )
-{
-    if ( Is_DebugModeOn )
-    {
-        _Printf ( "\nInterpreter_DebugNow : %s", interp->w_Word->Name ) ;
-        Word * word = Finder_Word_FindUsing ( interp->Finder0, "dbOn", 0 ) ;
-        if ( word == 0 )
-            _Printf ( "\nProblem here!\n" ) ;
-    }
-}
-#endif
 
 #endif

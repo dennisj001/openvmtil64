@@ -9,14 +9,19 @@ DLList_FindName_InOneNamespaceList ( dllist * list, byte * name )
     return s ;
 }
 
+Symbol *
+DLList_FindName_InOneNamespace ( Namespace * ns, byte * name )
+{
+    Symbol * s = ( Symbol* ) Tree_Map_OneNamespace ( ( Word* ) dllist_First ( ( dllist* ) ns->W_List ),
+        ( MapFunction_1 ) _Symbol_CompareName, ( int64 ) name ) ;
+    if ( ! s ) s = ( Symbol* ) Tree_Map_OneNamespace2 ( _CfrTil_->Namespaces, ( MapFunction_2 ) Symbol_CompareName2, ( int64 ) name, ( int64 ) ns ) ;
+    return s ;
+}
+
 Word *
 Finder_Word_Find ( Finder * finder, uint64 state, byte * name )
 {
-    d1 ( if ( _CfrTil_->Namespaces ) )
-    {
-        return finder->FoundWord = Tree_Map_State_Flag_OneArg_AnyNamespaceWithState ( state, ( MapFunction_1 ) Symbol_CompareName, ( int64 ) name ) ;
-    }
-    d1 ( else return 0 ) ;
+    return finder->FoundWord = Tree_Map_State_Flag_OneArg_AnyNamespaceWithState ( state, ( MapFunction_1 ) Symbol_CompareName, ( int64 ) name ) ;
 }
 
 Symbol *
@@ -27,10 +32,11 @@ _Finder_CompareDefinitionAddress ( Symbol * symbol, byte * address )
         Word * word = ( Word * ) symbol ;
         //byte * codeStart = ( byte* ) word->Definition ; // nb. this maybe more accurate ??
         byte * codeStart = word->CodeStart ;
-        d0 ( if ( String_Equal ("iFactorialX", symbol->S_Name) ) _Printf ((byte*)"\naddress = 0x%016lx :: %s :: codeStart = 0x%016lx : codeSize = %d", address, symbol->S_Name, codeStart, word->S_CodeSize) ) ;
+        d0 ( if ( String_Equal ( "iFactorialX", symbol->S_Name ) ) _Printf ( ( byte* ) "\naddress = 0x%016lx :: %s :: codeStart = 0x%016lx : codeSize = %d", address, symbol->S_Name, codeStart, word->S_CodeSize ) ) ;
         //if ( ((byte*) symbol == address) || ( codeStart && ( address >= codeStart ) && ( address <= ( codeStart + word->S_CodeSize ) ) ) )
-        if ( ( ( byte* ) symbol == address ) || ( codeStart && ( address >= codeStart ) && ( word->S_CodeSize ? address < ( codeStart + word->S_CodeSize ) : address == codeStart ) ) ) 
-        //if ( codeStart && ( address >= codeStart ) && ( address < ( codeStart + word->S_CodeSize ) ) )
+        if ( ( ( byte* ) symbol == address ) || ( codeStart && ( address >= codeStart ) && 
+            ( word->S_CodeSize ? address < ( codeStart + word->S_CodeSize ) : address == codeStart ) ) )
+            //if ( codeStart && ( address >= codeStart ) && ( address < ( codeStart + word->S_CodeSize ) ) )
         {
             return symbol ;
         }
@@ -95,14 +101,17 @@ Finder_Word_FindUsing ( Finder * finder, byte * name, int64 saveQns )
         // the InNamespace takes precedence with this one exception is this best logic ??               
         if ( finder->QualifyingNamespace )
         {
-            if ( String_Equal ( ".", ( char* ) name ) ) word = Finder_FindWord_UsedNamespaces ( _Finder_, name ) ; // keep QualifyingNamespace intact // ?? assumes function of CfrTil_Dot is always and only named "." ??
+            if ( String_Equal ( ".", ( char* ) name ) ) //|| String_Equal ( "find", ( char* ) name ) ) 
+            {
+                word = Finder_FindWord_UsedNamespaces ( _Finder_, name ) ; // keep QualifyingNamespace intact // ?? assumes function of CfrTil_Dot is always and only named "." ??
+            }
             else
             {
                 word = _Finder_FindWord_InOneNamespace ( _Finder_, finder->QualifyingNamespace, name ) ;
-                if ( ( ! saveQns ) && ( ! GetState ( finder, QID ) ) && ( ! Lexer_IsTokenForwardDotted ( _Context_->Lexer0 ) ) )
+                if ( word && (word->CAttribute & (C_TYPE|C_CLASS|NAMESPACE)) ) Finder_SetQualifyingNamespace ( finder, word ) ;
+                else if ( word && ( ! saveQns ) && ( ! GetState ( finder, QID ) ) && ( ! Lexer_IsTokenForwardDotted ( _Context_->Lexer0 ) ) )
                 {
                     Finder_SetQualifyingNamespace ( finder, 0 ) ; // nb. QualifyingNamespace is only good for one find unless we are in a quid
-                    //finder->QualifyingNamespace = 0 ;
                 }
             }
         }
@@ -164,7 +173,7 @@ Finder_FindToken_WithException ( Finder * finder, byte * token )
     {
         _Printf ( ( byte* ) "\n%s ?", ( char* ) token ) ;
         CfrTil_Using ( ) ;
-        CfrTil_Exception (NOT_A_KNOWN_OBJECT, 0, QUIT ) ;
+        CfrTil_Exception ( NOT_A_KNOWN_OBJECT, 0, QUIT ) ;
     }
     return finder->FoundWord ;
 }
@@ -194,7 +203,8 @@ _Finder_FindWord_InOneNamespace ( Finder * finder, Namespace * ns, byte * name )
 {
     if ( ns && name )
     {
-        return finder->FoundWord = DLList_FindName_InOneNamespaceList ( ( dllist* ) ns->W_List, name ) ;
+        //return finder->FoundWord = DLList_FindName_InOneNamespaceList ( ( dllist* ) ns->W_List, name ) ;
+        return finder->FoundWord = DLList_FindName_InOneNamespace ( ns, name ) ;
     }
     return 0 ;
 }

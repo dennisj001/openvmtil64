@@ -43,7 +43,7 @@ BlockInfo *
 CfrTil_BeginCombinator ( int64 quotesUsed )
 {
     Compiler * compiler = _Context_->Compiler0 ;
-    d1 ( if ( Is_DebugOn ) _Printf ( ( byte* ) "\n\nCfrTil_BeginCombinator : blockStack depth = %d : DataStack depth = %d : running \'%s\' : compiling  \'%s\' : quotes = %d : %s\n\n", 
+    d0 ( if ( Is_DebugOn ) _Printf ( ( byte* ) "\n\nCfrTil_BeginCombinator : blockStack depth = %d : DataStack depth = %d : running \'%s\' : compiling  \'%s\' : quotes = %d : %s\n\n", 
         _Stack_Depth ( compiler->BlockStack ), DataStack_Depth ( ),
         _Context_->CurrentlyRunningWord->Name, compiler->CurrentWordCompiling->Name, quotesUsed, Context_Location ( ) ) ) ;
     BlockInfo *bi = ( BlockInfo * ) _Stack_Pick ( compiler->CombinatorBlockInfoStack, quotesUsed - 1 ) ; // -1 : remember - stack is zero based ; stack[0] is top

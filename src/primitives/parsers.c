@@ -10,13 +10,13 @@ CfrTil_Token ( )
 void
 CfrTil_SingleQuote ( )
 {
-    _CfrTil_SingleQuote ( 0 ) ;
+    _CfrTil_SingleQuote () ;
 }
 
 void
 CfrTil_Tick ( )
 {
-    _CfrTil_SingleQuote ( 0 ) ;
+    _CfrTil_SingleQuote () ;
 }
 
 

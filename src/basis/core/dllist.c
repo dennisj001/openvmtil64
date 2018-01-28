@@ -540,6 +540,18 @@ Tree_Map_OneNamespace ( Word * word, MapFunction_1 mf, int64 one )
 }
 
 Word *
+Tree_Map_OneNamespace2 ( Namespace * ns, MapFunction_2 mf2, int64 one, int64 two )
+{
+    Word * word, *nextWord ;
+    for ( word = (Word *) dllist_First ( ( dllist* ) ns->W_List ) ; word ; word = nextWord )
+    {
+        nextWord = ( Word* ) dlnode_Next ( ( node* ) word ) ;
+        if ( mf2 ( ( Symbol* ) word, one, two ) ) return word ;
+    }
+    return 0 ;
+}
+
+Word *
 Tree_Map_State_Flag_OneArg_AnyNamespaceWithState ( uint64 state, MapFunction_1 mf, int64 one )
 {
     if ( _CfrTil_->Namespaces )

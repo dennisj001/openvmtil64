@@ -2,6 +2,7 @@
 5
 //bigNumOff
 optimizeOn inlineOn 
+lispOff
 bno //BigNum
 // optimizeOff inlineOff
 // verbosity 2 = 
@@ -22,7 +23,7 @@ int factoriali ( REG n | REG rec1 )
     }
     return rec1;
 } prefix
-c_syntaxOff dscOff
+c_syntaxOff 
 'factorial find wdiss
 factoriali (7) dup p 5040 _assert //sp
 dscOff
@@ -248,11 +249,11 @@ _fibn0 ( n | fib )
     return fib ;
 }
 //' _fibn0 find d: wdiss sp _fibn0 ( 20 ) dup p 6765 _assert //sp
-dscOn
+dscOn 
 int
-fibPTC? ( n | fn, fn1, fn2 ) 
+fibPTC? ( n ) //| fn, fn1, fn2 ) 
 {
-    //d: int fn, fn1, fn2 ;
+    int fn, fn1, fn2 ;
     for ( fn = 0, fn1 = 0, fn2 = 1 ; n ; n -- ) 
     {   
         fn1 = fn2 ;
@@ -261,9 +262,9 @@ fibPTC? ( n | fn, fn1, fn2 )
     }
     return fn ;
 }
+' int.fibPTC? find wdiss
+int.fibPTC? (20) dup p 6765 _assert sp
 dscOff
-' fibPTC? find wdiss
-fibPTC? (20) dup p 6765 _assert sp
 int
 fibPTC2? ( REG n | REG fn, REG fn1, REG fn2 )
 {
@@ -275,8 +276,8 @@ fibPTC2? ( REG n | REG fn, REG fn1, REG fn2 )
     }
     return fn ;
 }
-' fibPTC2? find wdiss
-fibPTC2? (20) dup p 6765 _assert sp 
+' int.fibPTC2? find wdiss
+20 int.fibPTC2? dup p 6765 _assert sp 
 c_syntaxOff
 //"fibPTC?" ffx 
 sp

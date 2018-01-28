@@ -165,7 +165,6 @@ void _Compile_RspReg_Push(int64 value);
 void Compile_DspPop_RspPush(void);
 void Compile_Set_DspReg_FromDataStackPointer(void);
 void Compile_Set_DataStackPointer_FromDspReg(void);
-/* basis/compiler/sequence.c */
 /* basis/compiler/logic.c */
 void CfrTil_If(void);
 void CfrTil_Else(void);
@@ -304,6 +303,7 @@ Symbol *__Symbol_New(uint64 allocType);
 Symbol *_Symbol_New(byte *name, uint64 allocType);
 Symbol *Symbol_New(byte *name);
 Symbol *Symbol_NewValue(int64 value, uint64 allocType);
+Symbol *Symbol_CompareName2(Symbol *symbol, byte *name, Namespace *ns);
 Symbol *_Symbol_CompareName(Symbol *symbol, byte *name);
 Symbol *Symbol_CompareName(Symbol *symbol, byte *name);
 /* basis/repl.c */
@@ -361,7 +361,7 @@ void CfrTil_InlineOff(void);
 void _CfrTil_DebugOff(void);
 void _CfrTil_DebugOn(void);
 /* basis/core/parse.c */
-void _CfrTil_SingleQuote(int64 findWordFlag);
+void _CfrTil_SingleQuote(void);
 void _CfrTil_Parse_ClassStructure(int64 cloneFlag);
 void Compiler_TypedObjectInit(Namespace *typeNamespace, Word *word);
 void Compile_InitRegisterParamenterVariables(Compiler *compiler);
@@ -504,6 +504,7 @@ int64 dllist_Map3(dllist *list, MapFunction3 mf, int64 one, int64 two, int64 thr
 void dllist_Map_OnePlusStatus(dllist *list, MapFunction2 mf, int64 one, int64 *status);
 void Tree_Map_State_2Args(dllist *list, uint64 state, MapSymbolFunction2 mf, int64 one, int64 two);
 Word *Tree_Map_OneNamespace(Word *word, MapFunction_1 mf, int64 one);
+Word *Tree_Map_OneNamespace2(Namespace *ns, MapFunction_2 mf2, int64 one, int64 two);
 Word *Tree_Map_State_Flag_OneArg_AnyNamespaceWithState(uint64 state, MapFunction_1 mf, int64 one);
 Word *TC_Tree_Map_3(TabCompletionInfo *tci, MapFunction mf, Word *wordi);
 /* basis/core/interpret.c */
@@ -1003,6 +1004,7 @@ void Compiler_CompileAndRecord_PushAccum(Compiler *compiler);
 /* basis/core/dllnodes.c */
 /* basis/core/finder.c */
 Symbol *DLList_FindName_InOneNamespaceList(dllist *list, byte *name);
+Symbol *DLList_FindName_InOneNamespace(Namespace *ns, byte *name);
 Word *Finder_Word_Find(Finder *finder, uint64 state, byte *name);
 Symbol *_Finder_CompareDefinitionAddress(Symbol *symbol, byte *address);
 Symbol *_Finder_CompareDefinitionAddress_NoAlias(Symbol *symbol, byte *address);

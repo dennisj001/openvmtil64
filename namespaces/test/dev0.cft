@@ -30,10 +30,12 @@ factorial ( n | rec )
        rec1 = 1;
        while ( n >= 2 ) rec1 *= (n--) ;
        return rec1;
-} prefix
+} 
 c_syntaxOff
 'factorial find wdiss 
-factorial (7) dup p 5040 _assert sp
+7 factorial dup p 5040 _assert sp //pause
+'C.int.factorial find wdiss 
+7 C.int.factorial dup p 5040 _assert sp //pause
 #endif
 
 : fac ( n  | rec1 -- TOS ) 
@@ -428,7 +430,7 @@ Root
 int cpow ( base power | out ) s{ for ( out = 1 ; power ; ( power -= 1 ) ) { out = out * base ; } return out ; }s 
 //int cpow ( base power | out ) { for ( out = 1 ; power ; power -= 1 ) { out = out * base ; } return out ; }
 cpow (2 30 ) p
-c_syntaxOff
+c_syntaxOff 
 s: pow0 ( base power | out ) { out 1 = } { power @ 0 > } { power power @ 1 - = } { out out @ base @ * = } for return out ;s
 s: pow ( base power | out ) { out 1 = } { power @ 0 > } { power 1 -= } { out out @ base @ * = } for return out ;s
 //: pow ( base power | out ) { out 1 = } { power @ 0 > } { power power @ 1 - = } { out out @ base @ * = } for return out ;

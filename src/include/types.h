@@ -318,8 +318,7 @@ typedef int64( *MapFunction_Word_PtrInt ) ( ListObject *, Word *, int64 * ) ;
 typedef int64( *MapFunction ) ( Symbol * ) ;
 typedef int64( *MapFunction_1 ) ( Symbol *, int64 ) ;
 typedef int64( *MapFunction_Word ) ( Symbol *, Word * ) ;
-typedef
-int64( *MapFunction_2 ) ( Symbol *, int64, int64 ) ;
+typedef int64( *MapFunction_2 ) ( Symbol *, int64, int64 ) ;
 typedef void ( *MapSymbolFunction ) ( Symbol * ) ;
 typedef void ( *MapSymbolFunction2 ) ( Symbol *, int64, int64 ) ;
 typedef Word* ( *MapNodeFunction ) ( dlnode * node ) ;
@@ -833,7 +832,7 @@ typedef struct
     // static buffers
     // short term memory
     NamedByteArray * SessionObjectsSpace ; // until reset
-    NamedByteArray * SessionCodeSpace ; // until reset
+    //NamedByteArray * SessionCodeSpace ; // until reset
     NamedByteArray * TempObjectSpace ; // lasts for one line
     NamedByteArray * CompilerTempObjectSpace ; // lasts for compile of one word
     NamedByteArray * ContextSpace ;
@@ -934,7 +933,7 @@ typedef struct
     int64 TempObjectsSize ;
     int64 CompilerTempObjectsSize ;
     int64 SessionObjectsSize ;
-    int64 SessionCodeSize ;
+    //int64 SessionCodeSize ;
     int64 DataStackSize ;
     int64 HistorySize ;
     int64 OpenVmTilSize ;

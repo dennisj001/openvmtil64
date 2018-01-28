@@ -30,7 +30,7 @@ _dobject_Allocate ( int64 doType, int64 slots, uint64 allocType )
     return dobj ;
 }
 
-#if 0
+#if 0 // keep this it may be useful later
 
 dobject *
 _dobject_New_M_Slot_Node ( int64 allocType, int64 dobjType, int64 m_slots, ... )
