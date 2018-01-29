@@ -185,7 +185,7 @@ sp
     
 #if 1
 BigNum
-bnInit ( 64 16 )
+bnInit ( 16 16 )
 
 : tbn ( | n m ) n 0 = m 3 = n m @ += n m @ += n m @ += n @ p ; tbn // should be 9
 
@@ -303,6 +303,7 @@ nl (+ 1 3 4 ,@x7)
 #if 1
 //lcReset    
 BigNum
+bnInit ( 16 16 )
 (define yfac (lambda (yy n) (if* (< n 2) (1) (* n (yy yy (- n 1)))))) 
 (yfac yfac 10) nl
 (define yfacc (lambda (yyy n1) (if* (< n1 2) (1) (* n1 (yyy yyy (- n1 1)))))) 

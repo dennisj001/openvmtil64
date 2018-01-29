@@ -42,15 +42,15 @@ Compiler Compiling C Asm
 : :asm compileModeOn sourceCodeInit token create begin ' {| find compileWord sourceCodeOn ; immediate  
 //: :asm compileModeOn sourceCodeInit token create begin ' {| find compileWord ; immediate  
 : asm; semi ' {| find compileWord ; immediate
-' :asm find winfo //sp
-' asm; find winfo //sp
+//' :asm find winfo //sp
+//' asm; find winfo //sp
 'compile1 '1, find alias
 'compile2 '2, find alias
 'compile4 '4, find alias
 'compile8 '8, find alias
 : ;; ' ; find compileWord ' _prefix find compileWord ; immediate
 // C : ;; ' ;; find compileWord ; immediate
-' ;; find wdiss // sp
+//' ;; find wdiss // sp
 'X64 namespace
 X64
 "namespaces/compiler/asmConstants.cft" include
@@ -484,9 +484,9 @@ Stack
     "end" label // above jcc to Here
 asm;
 
-' ndup find wdiss sp //pause
-7 ndup 7 ndrop
-
+' ndup find wdiss sp 
+s 7 ndup 7 ndrop
+//s pause
 Asm
 // following intel conventions in the naming : insn dst, src
 // move mem to _reg 

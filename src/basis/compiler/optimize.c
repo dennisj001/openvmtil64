@@ -268,7 +268,6 @@ _CheckOptimizeOperands ( Compiler * compiler, int64 maxOperands )
                         if ( optInfo_0_three->StackPushRegisterCode )
                         {
                             SetHere ( optInfo_0_three->StackPushRegisterCode ) ; // leave optInfo_0_two value in R8 we don't need to push it
-                            _Compile_GetVarLitObj_RValue_To_Reg ( optInfo_0_three, ACC ) ;
                             _Compile_GetVarLitObj_RValue_To_Reg ( optInfo_0_one, OREG ) ;
                             optInfo->Optimize_Dest_RegOrMem = REG ;
                             optInfo->Optimize_Mod = REG ;
@@ -297,7 +296,6 @@ _CheckOptimizeOperands ( Compiler * compiler, int64 maxOperands )
                     case ( OP_LC << ( 2 * O_BITS ) | OP_LC << ( 1 * O_BITS ) | OP_LOGIC ):
                     {
                         int64 value ;
-                        //SetHere ( optInfo_0_two->Coding ) ;
                         // a little tricky here ...
                         // ?? maybe we should setup and use a special compiler stack and use it here ... ??
                         DataStack_Push ( ( int64 ) * optInfo_0_two->W_PtrToValue ) ;
@@ -308,13 +306,12 @@ _CheckOptimizeOperands ( Compiler * compiler, int64 maxOperands )
                         SetState ( compiler, COMPILE_MODE, true ) ;
                         SetState ( _CfrTil_, OPTIMIZE_ON, true ) ; //prevent recursion here
                         value = DataStack_Pop ( ) ;
-                        Word * two = optInfo_0_two ;
-                        two->W_Value = value ;
-                        SetHere ( two->Coding ) ;
-                        _Set_SCA ( two ) ;
+                        //optInfo_0_two->W_Value = value ; // not necessary to change better to keep original
+                        SetHere ( optInfo_0_two->Coding ) ;
+                        _Set_SCA ( optInfo_0_two ) ;
                         _Compile_MoveImm_To_Reg ( ACC, value, CELL ) ;
                         _Word_CompileAndRecord_PushReg ( optInfo_0_zero, ACC ) ; // this is helpful in future optimizations looking for StackPushRegisterCode
-                        _DEBUG_SHOW ( two, 0 ) ;
+                        _DEBUG_SHOW ( optInfo_0_two, 0 ) ;
                         return OPTIMIZE_DONE ;
                     }
                     case ( OP_VAR << ( 4 * O_BITS ) | OP_FETCH << ( 3 * O_BITS ) | OP_VAR << ( 2 * O_BITS ) | OP_FETCH << ( 1 * O_BITS ) | OP_DIVIDE ):
