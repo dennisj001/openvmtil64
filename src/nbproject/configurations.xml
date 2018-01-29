@@ -54,6 +54,7 @@
         <in>_debug.c</in>
         <in>attribute.c</in>
         <in>bigNum.c</in>
+        <in>bigNum.gmp.c</in>
         <in>cfrtil64.c</in>
         <in>colors.c</in>
         <in>context.c</in>
@@ -172,6 +173,13 @@
           <incDir>
             <pElem>basis</pElem>
             <pElem>include</pElem>
+            <pElem>.</pElem>
+          </incDir>
+        </cTool>
+      </item>
+      <item path="basis/bigNum.gmp.c" ex="false" tool="0" flavor2="3">
+        <cTool flags="0">
+          <incDir>
             <pElem>.</pElem>
           </incDir>
         </cTool>

@@ -45,7 +45,7 @@ Compile_Multiply ( Compiler * compiler )
             optInfo->Optimize_Disp, 0, CELL_SIZE ) ;
         if ( optInfo->Optimize_DstReg != ACC ) _Compile_Move_Reg_To_Reg ( optInfo->Optimize_DstReg, ACC ) ;
         //if ( GetState ( _Context_, C_SYNTAX ) ) _Stack_DropN ( _Context_->Compiler0->WordStack, 2 ) ;
-        Word * zero = Compiler_WordList ( 0 ) ;
+        Word * zero = _Compiler_WordList ( compiler, 0 ) ; 
         zero->StackPushRegisterCode = Here ;
         if ( optInfo->Optimize_Rm == DSP ) Compile_Move_ACC_To_TOS ( DSP ) ;
         else _Word_CompileAndRecord_PushReg ( zero, optInfo->Optimize_DstReg ? optInfo->Optimize_DstReg : ACC ) ;
@@ -167,7 +167,7 @@ Compile_MultiplyEqual ( Compiler * compiler )
 {
     if ( ( GetState ( _Context_, C_SYNTAX ) ) && ( ! GetState ( compiler, C_INFIX_EQUAL ) ) )
     {
-        Word * zero = Compiler_WordList ( 0 ) ;
+        Word * zero = _Compiler_WordList ( compiler, 0 ) ; 
         _CfrTil_C_Infix_EqualOp ( zero ) ;
     }
     else
@@ -223,7 +223,7 @@ Compile_DivideEqual ( Compiler * compiler )
 {
     if ( ( GetState ( _Context_, C_SYNTAX ) ) && ( ! GetState ( compiler, C_INFIX_EQUAL ) ) )
     {
-        Word * zero = Compiler_WordList ( 0 ) ;
+        Word * zero = _Compiler_WordList ( compiler, 0 ) ; 
         _CfrTil_C_Infix_EqualOp ( zero ) ;
     }
     else
@@ -275,7 +275,7 @@ _CfrTil_Do_IncDec ( int64 op )
     else
     {
         int64 sd = List_Depth ( compiler->WordList ) ;
-        Word *one = ( Word* ) Compiler_WordList ( 1 ) ; // the operand
+        Word *one = ( Word* ) _Compiler_WordList ( compiler, 1 ) ; // the operand
         if ( op == INC )
         {
             if ( ( sd > 1 ) && one->CAttribute & ( PARAMETER_VARIABLE | LOCAL_VARIABLE | NAMESPACE_VARIABLE ) )

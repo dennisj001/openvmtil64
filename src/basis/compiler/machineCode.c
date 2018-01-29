@@ -338,7 +338,7 @@ Compile_X_Group5 ( Compiler * compiler, int64 op )
     CompileOptimizeInfo * optInfo = compiler->OptInfo ;
     int64 optFlag = CheckOptimize ( compiler, 3 ) ;
     //Word *one = Compiler_WordStack ( - 1 ) ; // assumes two values ( n m ) on the DSP stack 
-    Word *one = Compiler_WordList ( 1 ) ; // assumes two values ( n m ) on the DSP stack 
+    Word *one = _Compiler_WordList ( compiler, 1 ) ; // assumes two values ( n m ) on the DSP stack 
     if ( optFlag & OPTIMIZE_DONE ) return ;
     else if ( optFlag )
     {
@@ -374,29 +374,6 @@ Compile_X_Group5 ( Compiler * compiler, int64 op )
 // note : the opReg - operand register parameter is always used for the rm field of the resulting machine code
 // These are all operating on a memory operand
 // for use of immediate data with this group use _Compile_Group1_Immediate
-#if 0
-
-void
-_Compile_X_Group1 ( int8 code, int8 toRegOrMem, int8 mod, int8 reg, int8 rm, int8 sib, int64 disp, int8 osize )
-{
-    int64 opCode = code << 3 ;
-    if ( osize > BYTE ) opCode |= 1 ;
-    if ( toRegOrMem == REG ) opCode |= 2 ;
-    if ( ( osize > 4 ) && disp && ( toRegOrMem == MEM ) )
-    {
-        _Compile_Move_Rm_To_Reg ( ( reg != OREG ) ? OREG : OREG2, rm, disp ) ;
-        mod = REG ;
-        rm = ( reg != OREG ) ? OREG : OREG2 ;
-        disp = 0 ;
-    }
-    // we need to be able to set the size so we can know how big the instruction will be in eg. CompileVariable
-    // otherwise it could be optimally deduced but let caller control by keeping operandSize parameter
-    // some times we need cell_t where bytes would work
-    // _Compile_InstructionX86 ( opCode, mod, reg, rm, modRmImmDispFlag, sib, disp, imm, immSize )
-    Compile_CalcWrite_Instruction_X64 ( 0, opCode, mod, reg, rm, DISP_B | REX_B | MODRM_B, sib, disp, 0, 0, osize ) ;
-}
-#else
-
 void
 _Compile_X_Group1 ( int8 code, int8 toRegOrMem, int8 mod, int8 reg, int8 rm, int8 sib, int64 disp, int8 osize )
 {
@@ -421,7 +398,6 @@ _Compile_X_Group1 ( int8 code, int8 toRegOrMem, int8 mod, int8 reg, int8 rm, int
         Compile_CalcWrite_Instruction_X64 ( 0, opCode, mod, reg, rm, DISP_B | REX_B | MODRM_B, sib, disp, 0, 0, osize ) ;
 }
 
-#endif
 // opCode group 1 - 0x80-0x83 : ADD OR ADC SBB AND_OPCODE SUB XOR CMP : with immediate data
 // this is for immediate operands operating on REG direction
 // mod := REG | MEM
@@ -454,56 +430,26 @@ _Compile_X_Group1_Immediate ( int8 code, int8 mod, int8 rm, int64 disp, uint64 i
     // 1000 00sw 
     int64 opCode = 0x80 ;
     if ( ( ( iSize > 4 ) || ( imm >= 0x100000000 ) ) ) //&& disp )
-#if 0       
     {
-        _DBI_ON ;
+        //_DBI_ON ;
         // x64 has no insn to do a group1op with int64 to mem directly so ...
         // first move to a reg then from that reg group1Op to mem location
-        _Compile_MoveImm_To_Reg ( OREG2, imm, iSize ) ;
         if ( ! disp )
-            _Compile_X_Group1_Reg_To_Reg ( code, ACC, OREG2 ) ;
+        {
+            _Compile_MoveImm_To_Reg ( OREG, imm, iSize ) ;
+            _Compile_X_Group1_Reg_To_Reg ( code, ACC, OREG ) ;
+        }
+            //_Compile_X_Group1_Reg_To_Reg ( code, rm, OREG2 ) ;
             //_Compile_X_Group1 ( int8 code, int8 toRegOrMem, int8 mod, int8 reg, int8 rm, int8 sib, int64 disp, int8 osize )
-        else _Compile_X_Group1 ( code, MEM, MEM, OREG2, rm, 0, disp, CELL ) ;
-        //else _Compile_X_Group1 ( code, MEM, MEM, rm, OREG, 0, disp, CELL ) ;
-        DBI_OFF ;
+        else
+        {
+            _Compile_MoveImm_To_Reg ( ACC, imm, iSize ) ;
+            _Compile_X_Group1 ( code, REG, MEM, ACC, rm, 0, disp, CELL ) ;
+        }
+        //DBI_OFF ;
         return ;
     }
-#elif 0
-        {
-            // x64 has no insn to do a group1op with int64 to mem directly so ...
-            // first move to a reg then from that reg to desired mem location
-            _Compile_MoveImm_To_Reg ( OREG2, imm, iSize ) ;
-            if ( ( rm != ACC ) && ( rm != OREG ) )
-            {
-                _Compile_Move_Rm_To_Reg ( ACC, rm, disp ) ;
-            }
-            _Compile_X_Group1_Reg_To_Reg ( code, ACC, OREG2 ) ;
-            //_Compile_X_Group1 ( int8 code, int8 toRegOrMem, int8 mod, int8 reg, int8 rm, int8 sib, int64 disp, int8 osize )
-            //_Compile_X_Group1 ( code, REG, REG, ACC, OREG, 0, disp, CELL ) ;
-            return ;
-        }
-#else    
-        {
-            //_DBI_ON ;
-            // x64 has no insn to do a group1op with int64 to mem directly so ...
-            // first move to a reg then from that reg group1Op to mem location
-            if ( ! disp )
-            {
-                _Compile_MoveImm_To_Reg ( OREG, imm, iSize ) ;
-                _Compile_X_Group1_Reg_To_Reg ( code, ACC, OREG ) ;
-            }
-                //_Compile_X_Group1_Reg_To_Reg ( code, rm, OREG2 ) ;
-                //_Compile_X_Group1 ( int8 code, int8 toRegOrMem, int8 mod, int8 reg, int8 rm, int8 sib, int64 disp, int8 osize )
-            else
-            {
-                _Compile_MoveImm_To_Reg ( ACC, imm, iSize ) ;
-                _Compile_X_Group1 ( code, REG, MEM, ACC, rm, 0, disp, CELL ) ;
-            }
-            //DBI_OFF ;
-            return ;
-        }
-#endif    
-else if ( ( iSize > BYTE ) || ( imm >= 0x100 ) )
+    else if ( ( iSize > BYTE ) || ( imm >= 0x100 ) )
     {
         opCode |= 1 ;
     }
@@ -533,8 +479,7 @@ Compile_X_Group1 ( Compiler * compiler, int64 op, int64 ttt, int64 n )
         if ( optInfo->Optimize_Rm == DSP ) // if the result is to a reg and not tos
         {
             if ( optInfo->Optimize_Dest_RegOrMem == MEM ) return ;
-            else
-                _Compile_Move_StackN_To_Reg ( optInfo->Optimize_Reg, DSP, 0 ) ;
+            else _Compile_Move_StackN_To_Reg ( optInfo->Optimize_Reg, DSP, 0 ) ;
         }
         _Word_CompileAndRecord_PushReg ( Compiler_WordList ( 0 ), optInfo->Optimize_Reg ) ; //optInfo->Optimize_Rm ) ; // 0 : ?!? should be the exact variable 
         //DBI_OFF ;
@@ -546,9 +491,6 @@ Compile_X_Group1 ( Compiler * compiler, int64 op, int64 ttt, int64 n )
         else Compile_Pop_To_Acc ( DSP ) ;
         //_Compile_X_Group1 ( int64 code, int64 toRegOrMem, int64 mod, int8 reg, int8 rm, int8 sib, int64 disp, int64 osize )
         _Compile_X_Group1 ( op, MEM, MEM, ACC, DSP, 0, 0, CELL_SIZE ) ; // result is on TOS
-        //BlockInfo_Setup_BI_tttn ( compiler, ttt, n, 3 ) ; // not less than 0 == greater than 0
-        //Word_CompileAndRecord_Push ( Compiler_WordList ( 0 ) ) ;
-        //Compiler_CompileAndRecord_PushAccum ( compiler ) ;
         //DBI_OFF ;
     }
 }
@@ -572,11 +514,7 @@ void
 _Compile_IMUL ( int64 mod, int8 reg, int8 rm, int8 controlFlags, int8 sib, int64 disp )
 {
     int8 rex = Calculate_Rex ( reg, rm, 0 ) ;
-    //if ( rex ) _Compile_Int8 ( rex ) ;
-    //_Compile_Int8 ( 0x0f ) ;
     int8 modRm = CalculateModRmByte ( mod, reg, rm, sib, disp ) ;
-    // _Compile_InstructionX86 ( opCode, mod, reg, rm, modRmImmDispFlag, sib, disp, imm, immSize )
-    //_Compile_InstructionX86 ( 0xaf, mod, reg, rm, REX_B | MODRM_B, sib, disp, 0, 0, 0 ) ;
     //_Compile_InstructionX64 ( int8 rex, int8 opCode, int8 modRm, int64 controlFlags, int8 sib, int64 disp, int8 dispSize, int64 imm, int8 immSize ) ;
     _Compile_Write_Instruction_X64 ( rex, 0x0faf, modRm, controlFlags, sib, disp, 0, 0, 0 ) ;
 }
@@ -668,11 +606,7 @@ _Compile_MoveImm ( int8 direction, int8 rm, int8 controlFlags, int8 sib, int64 d
 void
 _Compile_MoveImm_To_Reg ( int8 reg, int64 imm, int8 immSize )
 {
-#if 1    
     _Compile_MoveImm ( REG, reg, IMM_B | REX_B | MODRM_B, 0, 0, imm, immSize ) ;
-#else    
-    Compile_Move ( TO_REG, 0, 0, reg, 0, IMM_B | REX_B | MODRM_B, 0, 0, imm, immSize ) ;
-#endif        
 }
 
 // _Compile_MoveImm_To_Mem ( int8 reg, int64 imm, int8 iSize )
@@ -680,15 +614,7 @@ _Compile_MoveImm_To_Reg ( int8 reg, int64 imm, int8 immSize )
 void
 _Compile_MoveImm_To_Mem ( int8 rm, int64 imm, int8 immSize )
 {
-#if 1   
     _Compile_MoveImm ( MEM, rm, IMM_B | REX_B | MODRM_B, 0, 0, imm, immSize ) ;
-#else    
-    //Compile_Move ( int8 dst, int8 rex, int8 mod, int8 reg, int8 rm, int16 controlFlags, int64 disp, int8 dispSize, int64 imm, int8 immSize )
-    //DBI_ON ;
-    Compile_Move ( TO_MEM, 0, 0, 0, rm, IMM_B | REX_B | MODRM_B, 0, 0, imm, immSize ) ;
-    //DBI_OFF ;
-#endif    
-
 }
 
 void
@@ -704,15 +630,6 @@ _Compile_MoveMemValue_ToReg_ThruReg ( int8 reg, byte * address, int8 iSize, int8
     _Compile_MoveImm_To_Reg ( thruReg, ( int64 ) address, iSize ) ;
     _Compile_Move_Rm_To_Reg ( reg, thruReg, 0 ) ;
 }
-
-#if 0
-void
-_Compile_MoveImm_ToReg_ThruReg ( int8 reg, uint64 value, int8 iSize, int8 thruReg )
-{
-    _Compile_MoveImm_To_Reg ( thruReg, value, iSize ) ;
-    _Compile_Move_Reg_To_Reg ( reg, thruReg ) ;
-}
-#endif
 
 void
 _Compile_MoveReg_ToAddress_ThruReg ( int8 reg, byte * address, int8 thruReg )
@@ -786,9 +703,7 @@ Calculate_Address_FromOffset_ForCallOrJump ( byte * address )
 int32
 _CalculateOffsetForCallOrJump ( byte * compileAtAddress, byte * jmpToAddr, int8 offsetSize )
 {
-    //int32 offset = ( jmpToAddr - ( compileAtAddress + 4 ) ) ; // 4 sizeof offset //call/jmp insn x66 mode //sizeof (int64 ) ) ; // we have to go back the instruction size to get to the start of the insn 
     int32 offset = ( jmpToAddr - ( compileAtAddress + offsetSize ) ) ; // operandSize sizeof offset //call/jmp insn x64/x86 mode //sizeof (cell) ) ; // we have to go back the instruction size to get to the start of the insn 
-    //int32 offset = ( jmpToAddr - ( compileAtAddress + CELL_SIZE ) ) ; // operandSize sizeof offset //call/jmp insn x64/x86 mode //sizeof (cell) ) ; // we have to go back the instruction size to get to the start of the insn 
     return offset ;
 }
 
@@ -802,17 +717,11 @@ _SetOffsetForCallOrJump ( byte * compileAtAddress, byte * jmpToAddr )
 void
 _Compile_JumpToAddress ( byte * jmpToAddr ) // runtime
 {
-#if 1
     if ( jmpToAddr != ( Here + 5 ) ) // optimization : don't need to jump to the next instruction
     {
         int32 disp = _CalculateOffsetForCallOrJump ( Here + 1, jmpToAddr, INT32_SIZE ) ;
-        // _Compile_InstructionX86 ( opCode, mod, reg, rm, modRmImmDispFlag, sib, disp, imm, immSize )
         Compile_CalcWrite_Instruction_X64 ( 0, 0xe9, 0, 0, 0, DISP_B, 0, disp, INT32_SIZE, 0, 0 ) ; // with jmp instruction : disp is compiled an immediate offset
     }
-#else
-    _Compile_MoveImm_To_R8 ( jumpToAddr ) ;
-    _Compile_Group5 ( JMP, 0, 0, 0, 0 ) ;
-#endif
 }
 
 void
@@ -851,7 +760,7 @@ _Compile_UninitializedJump ( ) // runtime
     _Compile_UninitializedJmpOrCall ( JMPI32 ) ;
 }
 
-// JE, JNE, ... see machineCode.h
+// JE, JNE, JZ, JNZ, ... see machineCode.h
 
 void
 _Compile_JCC ( int64 negFlag, int64 ttt, uint64 disp )
@@ -864,7 +773,7 @@ _Compile_JCC ( int64 negFlag, int64 ttt, uint64 disp )
     _Compile_Int8 ( 0x8 << 4 | ttt << 1 | negFlag ) ; // little endian ordering
     _Compile_Int32 ( disp ) ;
 #if dbgON_10    
-    if ( DBI )
+    if ( _DBI )
     {
         d1 ( _Printf ( ( byte* ) "\n_Compile_JCC :" ) ) ;
         d1 ( Debugger_UdisOneInstruction ( _Debugger_, here, ( byte* ) "", ( byte* ) "" ) ; ) ;
@@ -919,7 +828,6 @@ void
 Compile_Call ( byte * callAddr )
 {
     _Compile_Call ( callAddr, ( GetState ( _Compiler_, LC_ARG_PARSING ) ? OREG : ACC ) ) ;
-    //_Compile_Call ( callAddr, OREG ) ;
 }
 
 void
@@ -1030,7 +938,7 @@ _Compile_MOVZX_REG ( int8 reg )
     d1 ( if ( DBI )
     {
         d1 ( _Printf ( ( byte* ) "\n_Compile_MOVZX_REG :" ) ) ;
-        d1 ( Debugger_UdisOneInstruction ( _Debugger_, here, ( byte* ) "", ( byte* ) "" ) ; ) ;
+            d1 ( Debugger_UdisOneInstruction ( _Debugger_, here, ( byte* ) "", ( byte* ) "" ) ; ) ;
     } ) ;
 #endif    
 }
@@ -1048,7 +956,7 @@ _Compile_Jcc ( int64 bindex, int64 overwriteFlag, int64 nz, int64 ttt )
     }
     else
     {
-        Compile_GetLogicFromTOS ( bi ) ; // after cmp we test our condition with setcc. if cc is true a 1 will be sign extended in R8 and pushed on the stack 
+        Compile_GetLogicFromTOS ( bi, 0 ) ; // after cmp we test our condition with setcc. if cc is true a 1 will be sign extended in R8 and pushed on the stack 
         // then in the non optimized|inline case we cmp the TOS with 0. If ZERO (zf is 1) we know the test was false (for IF), if N(ot) ZERO we know it was true 
         // (for IF). So, in the non optimized|inline case if ZERO we jmp if N(ot) ZERO we continue. In the optimized|inline case we check result of first cmp; if jcc sees
         // not true (with IF that means jcc N(ot) ZERO) we jmp and if true (with IF that means jcc ZERO) we continue. 

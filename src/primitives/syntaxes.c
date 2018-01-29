@@ -123,15 +123,13 @@ CfrTil_C_Infix_Equal ( )
     _CfrTil_C_Infix_EqualOp ( 0 ) ;
 }
 
-#if 1
-
 void
 CfrTil_If_C_Combinator ( )
 {
     Compiler * compiler = _Compiler_ ;
     Word * combinatorWord0 = Compiler_WordList ( 0 ) ;
     combinatorWord0->W_SC_ScratchPadIndex = _CfrTil_->SC_ScratchPadIndex ;
-    byte svscp = GetState ( compiler, C_COMBINATOR_PARSING ), bb = 0 ;
+    byte svscp = GetState ( compiler, C_COMBINATOR_PARSING ) ;
     SetState ( compiler, C_COMBINATOR_PARSING, true ) ;
     compiler->TakesLParenAsBlock = true ;
     compiler->BeginBlockFlag = false ;
@@ -143,48 +141,12 @@ CfrTil_If_C_Combinator ( )
     }
     else
     {
-        d1 ( if ( Is_DebugOn ) _Printf ( ( byte* ) "\n\nbefore CfrTil_If2Combinator : blockStack depth = %d : %s : %s\n\n", _Stack_Depth ( compiler->BlockStack ), _Context_->CurrentlyRunningWord->Name, Context_Location ( ) ) ) ;
+        d0 ( if ( Is_DebugOn ) _Printf ( ( byte* ) "\n\nbefore CfrTil_If2Combinator : blockStack depth = %d : %s : %s\n\n", _Stack_Depth ( compiler->BlockStack ), _Context_->CurrentlyRunningWord->Name, Context_Location ( ) ) ) ;
         CfrTil_If2Combinator ( ) ;
     }
     SetState ( compiler, C_COMBINATOR_PARSING, svscp ) ;
     d1 ( if ( Is_DebugOn ) CfrTil_PrintDataStack ( ) ) ;
 }
-
-#else
-
-void
-CfrTil_If_C_Combinator ( )
-{
-    Word * currentWord0 = Compiler_WordList ( 0 ) ;
-    currentWord0->W_SC_ScratchPadIndex = _CfrTil_->SC_ScratchPadIndex ;
-    byte svscp = GetState ( _Compiler_, C_COMBINATOR_PARSING ), bb ;
-    SetState ( _Compiler_, C_COMBINATOR_PARSING, true ) ;
-    CfrTil_Interpret_C_Blocks ( 2, 1, 0 ) ; //_Context_StrCmpNextToken ( _Context_, ( byte* ) "{" ) ) ;
-    if ( _Context_StringEqual_PeekNextToken ( _Context_, ( byte* ) "else" ) )
-    {
-        Lexer_GetTokenNameFromTokenList ( _Context_->Lexer0 ) ; // drop the "else" token
-        if ( ! _Context_StringEqual_PeekNextToken ( _Context_, ( byte* ) "{" ) )
-        {
-            CfrTil_BeginBlock ( ) ;
-            bb = 1 ;
-        }
-        else bb = 0 ;
-        CfrTil_Interpret_C_Blocks ( 1, 0, 0 ) ;
-        _Context_->SC_CurrentCombinator = currentWord0 ;
-        d0 ( if ( Is_DebugOn ) _Printf ( ( byte* ) "\n\nbefore CfrTil_TrueFalseCombinator3 : _Stack_Depth ( compiler->BlockStack ) = %d : %s : %s\n\n", _Stack_Depth ( _Compiler_->BlockStack ), _Context_->CurrentlyRunningWord->Name, Context_Location ( ) ) ) ;
-        CfrTil_TrueFalseCombinator3 ( ) ;
-    }
-    else
-    {
-        _Context_->SC_CurrentCombinator = currentWord0 ;
-        d1 ( if ( Is_DebugOn ) _Printf ( ( byte* ) "\n\nbefore CfrTil_If2Combinator : _Stack_Depth ( compiler->BlockStack ) = %d : %s : %s\n\n", _Stack_Depth ( _Compiler_->BlockStack ), _Context_->CurrentlyRunningWord->Name, Context_Location ( ) ) ) ;
-        CfrTil_If2Combinator ( ) ;
-    }
-    SetState ( _Compiler_, C_COMBINATOR_PARSING, svscp ) ;
-    d0 ( if ( Is_DebugOn ) CfrTil_PrintDataStack ( ) ) ;
-}
-
-#endif
 
 void
 CfrTil_DoWhile_C_Combinator ( )

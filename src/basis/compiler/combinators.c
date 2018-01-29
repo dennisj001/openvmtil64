@@ -23,8 +23,7 @@ CfrTil_EndCombinator ( int64 quotesUsed, int64 moveFlag )
     if ( moveFlag ) //&& GetState ( _CfrTil_, INLINE_ON ) )
     {
         byte * qCodeStart ;
-        if ( bi->FrameStart )
-            qCodeStart = bi->bp_First ; // after the stack frame
+        if ( bi->FrameStart ) qCodeStart = bi->bp_First ; // after the stack frame
         else qCodeStart = bi->ActualCodeStart ;
         Block_Copy ( qCodeStart, bi->CombinatorStartsAt, Here - bi->CombinatorStartsAt ) ;
         //Block_Copy ( qCodeStart, bi->CombinatorStartsAt, bi->bp_Last - bi->CombinatorStartsAt ) ;
@@ -189,12 +188,12 @@ CfrTil_If1Combinator ( )
     {
         //DBI_ON ;
         BlockInfo * bi = CfrTil_BeginCombinator ( 1 ) ;
-        if ( bi->LastWord && bi->LastWord->StackPushRegisterCode )
+        if ( bi->LogicCodeWord && bi->LogicCodeWord->StackPushRegisterCode )
         {
-            //SetHere ( bi->LastWord->StackPushRegisterCode ) ;
+            SetHere ( bi->LogicCodeWord->StackPushRegisterCode ) ;
             _Compile_TEST_Reg_To_Reg ( ACC, ACC ) ;
         }
-        else Compile_GetLogicFromTOS ( bi ) ;
+        else Compile_GetLogicFromTOS ( bi, 0 ) ;
 
         _Compile_UninitializedJumpEqualZero ( ) ;
         Stack_PointerToJmpOffset_Set ( ) ;
@@ -245,7 +244,7 @@ CfrTil_TrueFalseCombinator2 ( )
     {
         CfrTil_BeginCombinator ( 2 ) ;
 
-        Compile_GetLogicFromTOS ( 0 ) ;
+        Compile_GetLogicFromTOS ( 0, 0 ) ;
         _Compile_UninitializedJumpEqualZero ( ) ;
         Stack_PointerToJmpOffset_Set ( ) ;
 

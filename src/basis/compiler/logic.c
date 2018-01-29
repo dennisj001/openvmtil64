@@ -148,7 +148,7 @@ Compile_Cmp_Set_tttn_Logic ( Compiler * compiler, int64 ttt, int64 negateFlag )
         _Compile_Stack_DropN ( DSP, 2 ) ; // before cmp 
         Compile_CMP ( REG, REG, ACC, OREG, 0, 0, CELL ) ;
     }
-    _Compile_SET_tttn_REG ( ttt, negateFlag, reg ) ; // immediately after the 'cmp' insn which changes the flags appropriately
+    _Compile_SETcc_tttn_REG ( ttt, negateFlag, reg ) ; // immediately after the 'cmp' insn which changes the flags appropriately
     _Compile_MOVZX_REG ( reg ) ;
     //Compiler_CompileAndRecord_PushAccum ( compiler ) ;
     _Compiler_CompileAndRecord_PushAccum ( compiler, ACC ) ;
@@ -191,27 +191,20 @@ _Compile_SETcc ( int8 ttt, int8 negFlag, int8 reg )
 }
 
 void
-_Compile_SET_tttn_REG ( int8 ttt, int8 negFlag, int8 reg )
+_Compile_SETcc_tttn_REG ( int8 ttt, int8 negFlag, int8 reg )
 {
     BlockInfo_Setup_BI_tttn ( _Context_->Compiler0, ttt, negFlag, 6 ) ;
     _Compile_SETcc ( ttt, negFlag, reg ) ;
 }
 
+// cf. : Compile_BlockInfoTestLogic ( Compiler * compiler, int8 reg, int8 negFlag )
 void
-Compile_GetLogicFromTOS ( BlockInfo * bi )
+Compile_GetLogicFromTOS ( BlockInfo * bi, byte * start )
 {
-#if 0     
-    //DBI_ON ;
-    Compile_Pop_To_Acc ( DSP ) ;
-    //Compile_CMPI( REG, ACC, 0, 0, CELL )  ; // no cmp insn with 64bit imm so ...
-    //_Compile_Move_Reg_To_Reg ( ACC, ACC ) ; // necessary after subtract in Pop
-    _Compile_TEST_Reg_To_Reg ( ACC, ACC ) ;
-    //DBI_OFF ;
-#else    
     if ( bi && bi->LogicCodeWord && bi->LogicCodeWord->StackPushRegisterCode )
     {
-        //SetHere ( bi->LogicCodeWord->StackPushRegisterCode ) ;
-        _ByteArray_UnAppendSpace ( _Q_CodeByteArray, 7 ) ;
+        //if ( start ) SetHere ( start + (bi->LogicCodeWord->StackPushRegisterCode - bi->Start) ) ; else 
+        _ByteArray_UnAppendSpace ( _Q_CodeByteArray, 7 ) ; // 7 : add r14, 0x8, mov [r14], rax 
         _Compile_TEST_Reg_To_Reg ( bi->LogicCodeWord->RegToUse, bi->LogicCodeWord->RegToUse ) ;
     }
     else
@@ -219,7 +212,6 @@ Compile_GetLogicFromTOS ( BlockInfo * bi )
         Compile_Pop_To_Acc ( DSP ) ;
         _Compile_TEST_Reg_To_Reg ( ACC, ACC ) ;
     }
-#endif    
 }
 
 int64
@@ -228,16 +220,17 @@ Compile_CheckReConfigureLogicInBlock ( BlockInfo * bi, int8 overwriteFlag )
     if ( GetState ( _CfrTil_, OPTIMIZE_ON | INLINE_ON ) )
     {
         byte * saveHere = Here ;
-        if ( bi->LogicCode ) // && ( bi->LogicCodeWord->Symbol->Category & CATEGORY_LOGIC ) )
+        if ( bi->JccLogicCode ) // && ( bi->LogicCodeWord->Symbol->Category & CATEGORY_LOGIC ) )
         {
-            SetHere ( bi->LogicCode ) ;
+            SetHere ( bi->JccLogicCode ) ;
             // standard compile of logic is overwritten for optimize and inline
             if ( overwriteFlag )
             {
-                int64 n ;
+                int64 i, n ;
                 _Compile_Return ( ) ;
                 bi->bp_Last = Here ;
-                for ( n = bi->OverWriteSize ; n > 0 ; n -- ) _Compile_Noop ( ) ; // adjust so Disassemble doesn't get an "invalid" insn; we overwrite a 3 byte insn ( 0fb6c0 : movzx eax, al ) with RET NOP NOP
+                for ( i = 0, n = bi->OverWriteSize - 1; i < n ; i++ ) _Compile_Noop ( ) ; // adjust so Disassemble doesn't get an "invalid" insn; we overwrite a 3 byte insn ( 0fb6c0 : movzx eax, al ) with RET NOP NOP
+                //for ( i = 0, n = (3 - 1) ; i < n ; i++ ) _Compile_Noop ( ) ; // adjust so Disassemble doesn't get an "invalid" insn; we overwrite a 3 byte insn ( 0fb6c0 : movzx eax, al ) with RET NOP NOP
                 SetHere ( saveHere ) ;
             }
             return true ;
@@ -251,16 +244,44 @@ Compile_CheckReConfigureLogicInBlock ( BlockInfo * bi, int8 overwriteFlag )
  */
 
 void
-_Compile_LogicResult ( int64 reg )
+Compile_BlockInfoTestLogic ( Compiler * compiler, int8 reg, int8 negFlag )
 {
+    BlockInfo *bi = ( BlockInfo * ) _Stack_Top ( compiler->CombinatorBlockInfoStack ) ;
+#if 0    
+    if ( bi->LogicCodeWord && bi->LogicCodeWord->StackPushRegisterCode ) 
+        SetHere (bi->LogicCodeWord->StackPushRegisterCode) ;
+#endif    
+    bi->LogicTestCode = Here ;
+    _Compile_TEST_Reg_To_Reg ( reg, reg ) ;
+    BlockInfo_Set_tttn ( bi, ZERO_TTT, negFlag, 6 ) ; // 6 : length of jcc insn ?
+}
+
+void
+Compile_TestLogicAndStackPush ( Compiler * compiler, int8 reg, int8 negFlag )
+{
+    Compile_BlockInfoTestLogic ( compiler, reg, negFlag ) ;
+    Compiler_CompileAndRecord_PushAccum ( compiler ) ;
+}
+
+BlockInfo *
+_Set_JccLogicCode ( Compiler * compiler )
+{
+    BlockInfo *bi = ( BlockInfo * ) _Stack_Top ( compiler->CombinatorBlockInfoStack ) ;
+    bi->JccLogicCode = Here ; // used by combinators
+    return bi ;
+}
+
+void
+_Compile_LogicResultForStack ( int64 reg, Boolean negFlag )
+{
+    Compile_JCC ( negFlag, ZERO_TTT, Here + 21 ) ; // if eax is zero return not(R8) == 1 else return 0
     // return 0 in reg :
     _Compile_MoveImm_To_Reg ( reg, 0, CELL_SIZE ) ; // 6 bytes
     _Compile_JumpWithOffset ( 10 ) ; // 6 bytes
 
     //return 1 in reg :
     _Compile_MoveImm_To_Reg ( reg, 1, CELL_SIZE ) ;
-    BlockInfo *bi = ( BlockInfo * ) _Stack_Top ( _Compiler_->CombinatorBlockInfoStack ) ;
-    bi->LogicCode = Here ; // used by combinators
+    //_Set_JccLogicCode ( _Compiler_ ) ;
 }
 
 void
@@ -269,8 +290,8 @@ _Compile_LogicalAnd ( Compiler * compiler )
     Compile_BlockInfoTestLogic ( compiler, OREG, Z ) ;
     Compile_JCC ( Z, ZERO_TTT, Here + 15 ) ; // if eax is zero return not(R8) == 1 else return 0
     Compile_BlockInfoTestLogic ( compiler, ACC, NZ ) ;
-    Compile_JCC ( NZ, ZERO_TTT, Here + 21 ) ; // if eax is zero return not(R8) == 1 else return 0
-    _Compile_LogicResult ( ACC ) ;
+    _Compile_LogicResultForStack ( ACC, NZ ) ;
+    _Set_JccLogicCode ( compiler ) ;
     _Compiler_CompileAndRecord_PushAccum ( compiler, ACC ) ;
 }
 
@@ -286,7 +307,7 @@ Compile_LogicalAnd ( Compiler * compiler )
     else
     {
         //Word *one = Compiler_WordStack ( - 1 ) ; // assumes two values ( n m ) on the DSP stack 
-        Word *one = Compiler_WordList ( 1 ) ; // assumes two values ( n m ) on the DSP stack 
+        Word *one = _Compiler_WordList ( compiler, 1 ) ; // assumes two values ( n m ) on the DSP stack 
         if ( one->StackPushRegisterCode && ( one->RegToUse == ACC ) ) SetHere ( one->StackPushRegisterCode ) ;
         else _Compile_Stack_PopToReg ( DSP, ACC ) ;
         _Compile_Stack_PopToReg ( DSP, OREG ) ;
@@ -294,13 +315,22 @@ Compile_LogicalAnd ( Compiler * compiler )
     }
 }
 
+BlockInfo *
+_Set_JccLogicCodeForNot ( Compiler * compiler )
+{
+    BlockInfo *bi = ( BlockInfo * ) _Stack_Top ( compiler->CombinatorBlockInfoStack ) ;
+    bi->JccLogicCodeForNot = Here ; // used by combinators
+    return bi ;
+}
+
 void
 _Compile_LogicalNot ( Compiler * compiler )
 {
-    //DBI_ON ;
+    //_DBI_ON ;
     Compile_BlockInfoTestLogic ( compiler, ACC, Z ) ;
-    Compile_JCC ( Z, ZERO_TTT, Here + 21 ) ; // if eax is zero return not(R8) == 1 else return 0
-    _Compile_LogicResult ( ACC ) ;
+    _Set_JccLogicCodeForNot ( compiler ) ;
+    _Compile_LogicResultForStack ( ACC, Z ) ;
+    _Set_JccLogicCode ( compiler ) ;
     _Compiler_CompileAndRecord_PushAccum ( compiler, ACC ) ;
     //DBI_OFF ;
 }
@@ -309,7 +339,7 @@ void
 Compile_LogicalNot ( Compiler * compiler )
 {
     //Word *one = Compiler_WordStack ( - 1 ) ; // assumes two values ( n m ) on the DSP stack 
-    Word *one = Compiler_WordList ( 1 ) ; // assumes two values ( n m ) on the DSP stack 
+    Word *one = _Compiler_WordList ( compiler, 1 ) ; // assumes two values ( n m ) on the DSP stack 
     int64 optFlag = CheckOptimize ( compiler, 2 ) ; // check especially for cases that optimize literal ops
     if ( optFlag & OPTIMIZE_DONE ) return ;
         // just need to get to valued to be operated on ( not'ed ) in eax
@@ -376,22 +406,6 @@ void
 Compile_GreaterThanOrEqual ( Compiler * compiler )
 {
     Compile_Cmp_Set_tttn_Logic ( compiler, LESS, NZ ) ;
-}
-
-void
-Compile_BlockInfoTestLogic ( Compiler * compiler, int8 reg, int8 negFlag )
-{
-    BlockInfo *bi = ( BlockInfo * ) _Stack_Top ( compiler->CombinatorBlockInfoStack ) ;
-    bi->LogicTestCode = Here ;
-    _Compile_TEST_Reg_To_Reg ( reg, reg ) ;
-    BlockInfo_Set_tttn ( bi, ZERO_TTT, negFlag, 6 ) ;
-}
-
-void
-Compile_TestLogicAndStackPush ( Compiler * compiler, int8 reg, int8 negFlag )
-{
-    Compile_BlockInfoTestLogic ( compiler, reg, negFlag ) ;
-    Compiler_CompileAndRecord_PushAccum ( compiler ) ;
 }
 
 void

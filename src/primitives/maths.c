@@ -25,7 +25,7 @@ CfrTil_IncDec ( int64 op ) // +
     if ( ! GetState ( compiler, LC_CFRTIL ) ) //|INFIX_LIST_INTERPRET ) )
     {
         int64 sd = List_Depth ( compiler->WordList ) ;
-        Word *one = ( Word* ) Compiler_WordList ( 1 ) ; //, *three = Compiler_WordList ( 3 ) ; // the operand
+        Word *one = ( Word* ) _Compiler_WordList ( compiler, 1 ) ; //, *three = Compiler_WordList ( 3 ) ; // the operand
         byte * nextToken = Lexer_PeekNextNonDebugTokenWord ( cntx->Lexer0, 1 ) ;
         Word * currentWord = _Context_->CurrentlyRunningWord ;
         Word * nextWord = Finder_Word_FindUsing ( cntx->Interpreter0->Finder0, nextToken, 0 ) ;
@@ -107,8 +107,8 @@ CfrTil_IncDec ( int64 op ) // +
                     Word * word ;
                     dllist * postfixList = List_New ( ) ;
                     List_Push_1Value_Node ( postfixList, currentWord, COMPILER_TEMP ) ; // remember : this will be lifo
-                    for ( i = 1 ; word = Compiler_WordList ( i ), ( word->CAttribute & ( CATEGORY_OP_ORDERED | CATEGORY_OP_UNORDERED | CATEGORY_OP_DIVIDE | CATEGORY_OP_EQUAL ) ) ; i ++ ) ;
-                    List_Push_1Value_Node ( postfixList, Compiler_WordList ( i ), COMPILER_TEMP ) ;
+                    for ( i = 1 ; word = _Compiler_WordList ( compiler, i ), ( word->CAttribute & ( CATEGORY_OP_ORDERED | CATEGORY_OP_UNORDERED | CATEGORY_OP_DIVIDE | CATEGORY_OP_EQUAL ) ) ; i ++ ) ;
+                    List_Push_1Value_Node ( postfixList, _Compiler_WordList ( compiler, i ), COMPILER_TEMP ) ;
                     List_Push_1Value_Node ( compiler->PostfixLists, postfixList, COMPILER_TEMP ) ;
                     List_DropN ( compiler->WordList, 1 ) ; // the operator; let higher level see the variable for optimization
                     return ;

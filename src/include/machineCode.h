@@ -277,7 +277,8 @@ register int64 *Fp asm ("r15" ) ;
 #define IDIV_f ( 0x8 | IDIV )
 
 // conditional jump
-// jcc32 0x0f ( 0x8 << 8 | ttt << 1 | n ) : 2 bytes : little endian -> { 0x8 << | ttt << 1 | n, 0x0f }
+// jcc32 0x0f ( 0x8 << 8 | ttt << 1 | n ) : 2 bytes : little endian -> { 0x8 << 8 | ttt << 1 | n, 0x0f }
+// setcc32 0x0f ( 0x9 << 8 | ttt << 1 | n ) : 2 bytes : little endian -> { 0x9 << 8 | ttt << 1 | n, 0x0f }
 // jcc8 ( 0x7 << 4 | ttt << 1 | n ) : 1 byte
 // n : on/off bit
 #define ZERO 0
@@ -289,15 +290,15 @@ register int64 *Fp asm ("r15" ) ;
 //#define OVERFLOW 0
 //#define NO_OVERFLOW 1
 #define BELOW 1
-#define EQUAL 2
-#define ZERO_TTT 2
-#define BE 3
+#define EQUAL 2    // 2 << 1 : becomes 0100
+#define ZERO_TTT 2 // 2 << 1 : becomes 0100
+#define BE 3       // 3 << 1 : becomes 0110
 #define NA 3
 #define SIGN 4
 #define PARITY 5
 #define LESS 6
-#define LE 7
-#define NG 7
+#define LE 7       // 7 << 1 : becomes 1110
+#define NG 7       // 7 << 1 : becomes 1110
 
 #define _RM( insnAddr )  (*( (byte*) insnAddr + 1) & 7 )   // binary : 00000111
 #define _REG( insnAddr ) (*( (byte*) insnAddr + 1) & 56 )  // binary : 00111000 

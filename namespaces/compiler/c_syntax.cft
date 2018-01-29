@@ -339,11 +339,11 @@ $ ( | atoken, buffer, buffer1, Buffer buffer0 )
         }
         else 
         { 
-            strcat ( buffer, atoken ) ;
             if ( strcmp ( atoken, "." ) )
             {
-                strcat ( buffer, " " ) ;
+                strcat ( buffer, " " ) ; // for shell '.' which means current directory - needs the space after
             }
+            strcat ( buffer, atoken ) ;
         }
     }
 } 
@@ -410,11 +410,11 @@ $ ( | atoken, buffer, buffer1, Buffer buffer0 )
         // test comment here
         { 
             //strcat ( buffer, atoken ) ;
-            strcat ( buffer, atoken ) ;
             if ( strcmp ( atoken, "." ) )
             {
                 strcat ( buffer, " " ) ;
             }
+            strcat ( buffer, atoken ) ;
         }
 #endif // if 2 : endif
     }
@@ -424,15 +424,15 @@ $ ( | atoken, buffer, buffer1, Buffer buffer0 )
 #endif
 } 
 #endif // if 1 : endif
+'void.$ find wdiss //pause
 dscOff
 
 #if doScript 
 "\n\nnew $ test\n" ps
-void
-'$ find wdiss //pause
-$etc/script ; 
-$etc/lispScript ; 
-$ls -al . ; 
+void.$ls -al . ;
+//pause
+void.$etc/script ; 
+void.$etc/lispScript ; 
 //pause
 String
 $$ls -al /usr/local ; $$ls -al . ;

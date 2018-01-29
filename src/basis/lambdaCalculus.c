@@ -864,6 +864,8 @@ _LO_Apply_ArgList ( ListObject * l0, Word * word )
         }
         Word_Set_SCA ( word ) ;
         Word_Eval ( word ) ;
+        if ( word->CAttribute2 & RAX_RETURN ) 
+            _Word_CompileAndRecord_PushReg ( word, ACC ) ;
         if ( ! svcm )
         {
             CfrTil_EndBlock ( ) ;

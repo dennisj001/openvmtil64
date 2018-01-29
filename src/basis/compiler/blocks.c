@@ -12,12 +12,13 @@ _Block_Eval ( block blck )
 void
 _Block_Copy ( byte * srcAddress, int64 bsize, int8 optFlag )
 {
-    byte * saveHere = Here, * saveAddress = srcAddress, *end = srcAddress + bsize ;
+    byte * saveHere = Here, * saveAddress = srcAddress ;
     ud_t * ud = Debugger_UdisInit ( _Debugger_ ) ;
     int64 isize, left ;
 
     for ( left = bsize ; left > 0 ; srcAddress += isize )
     {
+        byte * here = Here ;
         PeepHole_Optimize ( ) ;
         isize = _Udis_GetInstructionSize ( ud, srcAddress ) ;
         left -= isize ;
@@ -68,7 +69,6 @@ _Block_Copy ( byte * srcAddress, int64 bsize, int8 optFlag )
 
             }
         }
-        byte * here = Here ;
         _CompileN ( srcAddress, isize ) ; // memcpy ( dstAddress, address, size ) ;
         d0 ( if ( Is_DebugModeOn ) _Debugger_Disassemble ( _Debugger_, ( byte* ) here, Here - here, 1 ) ) ;
     }
@@ -76,18 +76,12 @@ _Block_Copy ( byte * srcAddress, int64 bsize, int8 optFlag )
 
 // nb : only blocks with one ret insn can be successfully compiled inline
 
-void
-Block_Copy ( byte * dst, byte * src, int64 qsize )
-{
-    SetHere ( dst ) ;
-    _Block_Copy ( src, qsize, 0 ) ;
-}
-
 int64
-Block_CopyCompile_WithLogicFlag ( byte * srcAddress, int64 bindex, int64 jccFlag, int64 negFlag )
+Block_CopyCompile_WithLogicFlag ( byte * srcAddress, int64 bindex, Boolean jccFlag, Boolean negFlag )
 {
     Compiler * compiler = _Context_->Compiler0 ;
     int64 jccFlag2 ;
+    byte * start = Here ;
     BlockInfo *bi = ( BlockInfo * ) _Stack_Pick ( compiler->CombinatorBlockInfoStack, bindex ) ; // -1 : remember - stack is zero based ; stack[0] is top
     if ( jccFlag )
     {
@@ -96,16 +90,27 @@ Block_CopyCompile_WithLogicFlag ( byte * srcAddress, int64 bindex, int64 jccFlag
     _Block_Copy ( srcAddress, bi->bp_Last - bi->bp_First, 0 ) ;
     if ( jccFlag )
     {
+        //_DBI_ON ;
         if ( jccFlag2 )
         {
+#if 1          
+            if ( bi->JccLogicCodeForNot )
+            {
+                SetHere ( start + (bi->JccLogicCodeForNot - bi->Start) ) ;
+                Compile_JCC ( negFlag ? Z : NZ, bi->Ttt, 0 ) ;
+            }
+            else Compile_JCC ( negFlag ? bi->NegFlag : ! bi->NegFlag, bi->Ttt, 0 ) ;
+#else
             Compile_JCC ( negFlag ? bi->NegFlag : ! bi->NegFlag, bi->Ttt, 0 ) ;
+#endif           
         }
         else
         {
-            Compile_GetLogicFromTOS ( bi ) ;
+            Compile_GetLogicFromTOS ( bi, start ) ;
             Compile_JCC ( negFlag, ZERO_TTT, 0 ) ;
         }
         Stack_PointerToJmpOffset_Set ( ) ;
+        //DBI_OFF ;
     }
     return 1 ;
 }
@@ -116,16 +121,23 @@ Block_CopyCompile ( byte * srcAddress, int64 bindex, int64 jccFlag )
     return Block_CopyCompile_WithLogicFlag ( srcAddress, bindex, jccFlag, 0 ) ;
 }
 
+void
+Block_Copy ( byte * dst, byte * src, int64 qsize )
+{
+    SetHere ( dst ) ;
+    _Block_Copy ( src, qsize, 0 ) ;
+}
+
 // 'tttn' is a notation from the intel manuals
 
 void
 BlockInfo_Set_tttn ( BlockInfo * bi, int8 ttt, int8 negFlag, int8 overWriteSize )
 {
-    bi->LogicCode = Here ; // used by combinators
-    if ( ! GetState ( _Context_, C_SYNTAX ) ) bi->LogicCodeWord = Compiler_WordList ( 1 ) ;
+    //if ( ! GetState ( _Context_, C_SYNTAX ) ) bi->LogicCodeWord = Compiler_WordList ( 1 ) ;
     bi->Ttt = ttt ;
     bi->NegFlag = negFlag ;
-    bi->OverWriteSize = overWriteSize ;
+    bi->OverWriteSize = 6 ; //6 : add r14, 08  ; mov [r1], rax :=: 6 bytes
+    bi->JccLogicCode = Here ; // used by combinators
 }
 
 BlockInfo *
@@ -199,7 +211,6 @@ _CfrTil_BeginBlock1 ( BlockInfo * bi )
         if ( compiler->NumberOfRegisterVariables ) Compile_InitRegisterParamenterVariables ( compiler ) ; // this function is called twice to deal with words that have locals before the first block and regular colon words
     }
     bi->Start = bi->AfterFrame = Here ; // after _Compiler_AddLocalFrame and Compile_InitRegisterVariables
-    //SC_Global_On ;
     return bi ;
 }
 
@@ -210,7 +221,6 @@ _CfrTil_BeginBlock2 ( BlockInfo * bi )
     _Stack_Push ( compiler->BlockStack, ( int64 ) bi ) ; // _Context->CompileSpace->IndexStart before set frame size after turn on
     _Stack_Push ( compiler->CombinatorBlockInfoStack, ( int64 ) bi ) ; // _Context->CompileSpace->IndexStart before set frame size after turn on
     compiler->LHS_Word = 0 ;
-    //compiler->BlocksBegun ++ ;
 }
 
 void
@@ -314,7 +324,7 @@ _CfrTil_EndBlock ( )
     //d1 ( if ( Is_DebugOn ) _Printf ( ( byte* ) "\n\nCfrTil_EndBlock : %s : blockStack depth = %d : %s\n\n", _Context_->CurrentlyRunningWord->Name, _Stack_Depth ( compiler->BlockStack ), Context_Location ( ) ) ) ;
     //d1 ( _Printf ( ( byte* ) "\n\nentering CfrTil_EndBlock : %s : blockStack depth = %d : %s\n\n", _Context_->CurrentlyRunningWord->Name, _Stack_Depth ( compiler->BlockStack ), Context_Location ( ) ) ) ;
     BlockInfo * bi = ( BlockInfo * ) Stack_Pop_WithExceptionOnEmpty ( compiler->BlockStack ) ;
-    if ( ! GetState ( _Context_, C_SYNTAX ) ) bi->LogicCodeWord = Compiler_WordList ( 1 ) ;
+    if ( ! GetState ( _Context_, C_SYNTAX ) ) bi->LogicCodeWord = _Compiler_WordList ( compiler, 1 ) ; 
     _CfrTil_EndBlock1 ( bi ) ;
     byte * blockStart = _CfrTil_EndBlock2 ( bi ) ;
     return blockStart ;

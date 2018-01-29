@@ -1,7 +1,5 @@
-//mem pause 
 //verbosity 0 = 
 // logOn
-//: mp ; //mem pause ; mp
 "BigNum" notUsing 
 "Lisp" notUsing
 verbosity 1 = 
@@ -18,6 +16,7 @@ optimizeOff inlineOff
 Root 
 : ' _tick ; immediate
 : find _find ; immediate
+//_dbgOn 'tick ' _tick find alias immediate
 'tick ' _tick find alias immediate
 'ndrop '_ndrop find alias immediate 
 
@@ -118,6 +117,7 @@ Compiler
 "compileWord" ' _compileWord find alias immediate
 "compileCall" ' _compileCall find alias immediate
 "swap" ' _swap find alias immediate
+Interpreter 
 "{" ' begin find alias immediate keyword
 "end" ' _end find alias immediate
 "}" ' end find alias keyword
@@ -127,18 +127,22 @@ Compiler
 ";" ' semi find alias immediate syntactic
 : word swap create swap _semi ;  //'word wordDisassemble pause
 //: word ( name block ) name @ create block @ _semi ;  // works but it is 10 bytes more code
-'word find wdis //pause
+//'word find wdis //pause
 ":" { compileModeOn sourceCodeInit token create begin } word // immediate // begin is not an immediate word
-: simple ( a b c ) a @ p b @ p c @ p ; 'simple find wdis 1 2 3 simple //pause
 
 Class
 '_new 'new find alias prefix
 C
 : ;; semi _prefix ; immediate syntactic
 c_syntaxOn //using
-type int ; int.size = 4 ;
+type int8 ; int8.size = 1 ;
+type int16 ; int16.size = 2 ;
+type int32 ; int32.size = 4 ;
+type int64 ; int64.size = 8 ;
 type void ; void.size = 0 ;
 type char ; char.size = 1 ;
+type word ; word.size = 2 ;
+type int ; int.size = 8 ;
 type long ; long.size = 8 ;
 type quad ; quad.size = 16 ;
 c_syntaxOff
@@ -148,10 +152,9 @@ BigNum
 // pWidth : "Minimum number of characters to be printed. If the value to be printed is shorter than this number, 
 // the result is padded with blank spaces. The value is not truncated even if the result is larger."
 // pPrecision : this is the number of digits to be printed after the decimal point" 
-: bnInit ( precision width ) precision @ pPrecision width @ pWidth 64 bPrecision ;;
-'bnInit find wdis
+: bnInit ( precision width ) precision @ pPrecision width @ pWidth ;; 
+//'bnInit find wdis
 'p 'fprint find alias
-64 bPrecision 
 bnInit ( 16 16 )
 Root
 : bigNumOff "BigNum" notUsing ;
@@ -164,8 +167,8 @@ var: DebugFlag classTestRead streamLine doInit1 doDemo doTest doLisp COMBINATOR_
 : nstrcat: "" { token dup ";" strcmp } { strcat " " strcat } while drop ; immediate // nb : no quotation marks around names
 "mod" 'modulo find alias
 // "Preprocessor" class
-Lisp
-"lambda" "_lambda" find alias // nb! : can't use C/Compiler/Forth ' (tick) in Lisp namespace - it has another meaning there! : this construction also has same meaning
+//Lisp
+//"lambda" "_lambda" find alias // nb! : can't use C/Compiler/Forth ' (tick) in Lisp namespace - it has another meaning there! : this construction also has same meaning
 
 Namespace
 : using: { token dup ";" strcmp } { usingFirst } while drop ; // eg - "using: User Lisp ;"
@@ -222,19 +225,19 @@ System
 ;;
 : _wdiss ( addToHistoryFlag pword ) 
     nl pel 
-    nl "::> 'wdiss' is being called at" _ps location "<::" ps
     _source ( addToHistoryFlag @ pword @ ) nl pdl 
     pword @ wdis 
     { pword @ } 
     { nl "Word :" _ps hex pword p ":: Compiled at :" ps pword @ definition p } if
-    nl pel nl decimal 
+    nl pel decimal 
+    nl "::> 'wdiss' was called at" _ps location "<::" ps nl
 ;;
 //scOff
 //: wdiss ( pword ) _wdiss ( 1 pword @ ) ; //debugWord    // add wdiss words to history list
 : wdiss ( pword ) _wdiss ( 0 pword @ ) ; //debugWord      // don't add wdiss words to history list
 : wdissl ( pword ) logOn _wdiss ( 0 pword @ ) logOff ; //debugWord      // don't add wdiss words to history list
 "winfo" ' wdiss find alias
-// ' wdiss wdiss
+//' wdiss find d: _wdiss
 : sys mem namespaces words stack using in ; 
 'aw 'allWords find alias
 : stk stack ; //debugWord 
@@ -252,10 +255,10 @@ System
 dscOn //verbosity 3 =
 #endif
 : _assert0 ( n m ) { n @ m @ != } { nl location hex n @ p "!=" ps m @ p "<:" ps "Error!" adps _info _pause } { } ifElse ;
-: _assert ( n m ) nl location "- _assert ::" ps { n @ m @ != } { hex n @ p "!=" ps m @ p "<:" ps "Error!" adps _info _pause } { " ok" ps } ifElse ;
+: _assert ( n m ) nl location "- _assert ::" ps { n @ m @ != } { hex n @ p "!=" ps m @ p "<:" ps "Error!" adps _info _pause } { " ok" ps nl } ifElse ;
 : _assert1 ( n m str ) { n @ m @ != } { str @ ps "error" ps _info _pause } if ;
 //: assert1 ( n m str ) location { n @ m @ != } { nl str @ ps ":>" ps hex n @ p "!=" ps m @ p "<:" ps "Error!" adps _info _pause } { str @ ps "ok\n" ps } ifElse ;
-: assert1 ( n m str ) location { n @ m @ != } { <dbg> nl str @ ps ":>" ps hex n @ p "!=" ps m @ p "<:" ps "Error!" adps _info _pause } { str @ ps "ok\n" ps } ifElse ;
+: assert1 ( n m str ) location { n @ m @ != } { nl str @ ps ":>" ps hex n @ p "!=" ps m @ p "<:" ps "Error!" adps _info _pause } { str @ ps "ok\n" ps } ifElse ;
 : assert1s ( s1 s2 str ) { s1 @ s2 @ strcmp } { nl str @ ps "error" ps _info _pause } if ;
 : _assert2 ( n m str ) { n @ m @ == } { str @ ps "ok" ps nl } { str @ ps "error" ps _info _pause } ifElse ; 
 : assert2 ( n m str ) { n @ m @ == } { nl str @ ps "ok" ps nl } { nl str @ ps "error" ps _info _pause } ifElse ;
@@ -263,7 +266,6 @@ dscOn //verbosity 3 =
 "assert" ' assert1 find alias
 : _assertStkChk ( n m | str )  
 #if dbgOnVar @
-    //<dbg>
     _s 
     { verbosity @ 1 > }
 #else
@@ -289,14 +291,14 @@ dscOn //verbosity 3 =
         ifElse
         //mem
     } if2 //_s //nl location nl //_pause
+    //_s _pause 
 ; 
 : assertStkChk _assertStkChk ; //stack _pause ; // s ;
 scOff
 //' _assertStkChk winfo //pause
 : TODO ( str ) nl nl pdl nl str @ adps location nl pdl nl nl { dbgOnVar @ } { sp } if2 ;;
 Root
-"User" namespace
-User
+User 
 //: pause nl "pausing at :" ddps location nl _pause ;
 : pause nl _pause ;
 //: pause _pause ;
@@ -313,8 +315,8 @@ User
 "s" ' stack find alias
 // : s stack location pause ;
 // : s stack dbg ;
-"istring" ' interpretString find alias
-"def" ' word find alias
+"istring" ' interpretString find alias 
+"def" ' word find alias 
 Compiler
 ">;" ' >? find alias
 
@@ -323,7 +325,7 @@ Root C
 // : include location s include location s pause ;
 // : include location nl include ;
 
-: include1 dup debugColors "\n'include'" ps ps " :: at :" ps location nl defaultColors sp include  ;
+: include1 _dup debugColors "\n'include'" ps ps " :: at :" ps location nl defaultColors sp include  ;
 Debug
 #if ( DebugFlag @ )
 : s stack alertColors location defaultColors ;
@@ -351,23 +353,60 @@ Root
 OpenVmTil
 : lispOff "Lisp" notUsing ; //lcReset ;
 
-
 c_syntaxOff
 scOff
 
+sp 
+: sh _sh ; prefix
 stringMacrosOn
-: argsOrderExample ( a b c d ) a @ p b @ p c @ p d @ p ; "\n 1 2 3 4 argsOrderExample ( a b c d )  => " ps   1 2 3 4 argsOrderExample 
-mp
-nl 789654321 9087654321 * dup p binary p
+: testCfrTil "namespaces/init.cft" include ;
 
-#if 1
-: fac ( n  | rec1 -- TOS ) 
-    rec1 1 = 
-    { n @ 1 > } { n @ rec1 @ * rec1 store n -- } while 
-    rec1 @ 
-;
-' fac find wdiss
-7 fac dup p 5040 _assert0
-
+dbgOff
+//dbgOn
+: Is_DebugOn dbgOnVar @ ;
+#if Is_DebugOn 
+'doX64 1 const
+Root 'doScript 1 const
+System 
+testCfrTil // dT0 //demo //dT0
+stringMacrosOff
+#else
+#if 0
+// you can trim this file to your needs and put your personal init code here maybe
+//int fac5 ( REG n | REG facc -- RAX ) { d: facc = 1 ; while ( n > 1 ) { facc = facc * n -- ; } }
+dscOn
+//verbosity 3 =
+c_syntaxOn
+int
+fac5 ( REG n  | REG facc -- RAX ) 
+{ 
+    facc = 1 ;
+    while ( n > 1 ) 
+    {
+        facc = facc * n -- ;
+    }
+}
+wdiss ( ' fac5 find ) 
+7 fac5 dup p 5040 _assert //pause
+ 
+int
+fibPTC? ( n | fn, fn1, fn2 ) 
+{
+    //d: int fn, fn1, fn2 ;
+    for ( fn = 0, fn1 = 0, fn2 = 1 ; n ; n -- ) 
+    {   
+        fn1 = fn2 ;
+        fn2 = fn ;
+        <dbg> fn = fn1 + fn2 ; 
+    }
+    return fn ;
+} 
+' fibPTC? find wdiss
+20 d: fibPTC? dup p 6765 _assert sp
+dscOff
+c_syntaxOff
+sp
 #endif
-
+#endif
+2 + 7  assertStkChk // stack checking
+s

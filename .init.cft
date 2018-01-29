@@ -152,10 +152,9 @@ BigNum
 // pWidth : "Minimum number of characters to be printed. If the value to be printed is shorter than this number, 
 // the result is padded with blank spaces. The value is not truncated even if the result is larger."
 // pPrecision : this is the number of digits to be printed after the decimal point" 
-: bnInit ( precision width ) precision @ pPrecision width @ pWidth 64 bPrecision ;;
+: bnInit ( precision width ) precision @ pPrecision width @ pWidth ;; 
 //'bnInit find wdis
 'p 'fprint find alias
-//64 bPrecision 
 bnInit ( 16 16 )
 Root
 : bigNumOff "BigNum" notUsing ;

@@ -389,7 +389,7 @@ sp
 // 40 fibx3 
 sp
 BigNum
-bnInit ( 0 0 )
+bnInit ( 64 64 )
 : tbn ( | n m ) n 0 = m 3 = n m @ += n m @ += n m @ += n @ p ; tbn nl "should be 9" ps
 bno
 s: fibBN ( n | fn fn1 fn2 -- TOS ) 

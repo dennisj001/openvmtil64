@@ -57,27 +57,6 @@ BigNum_GetPrintfWidth ( )
     DataStack_Push ( ( int64 ) _Context_->System0->BigNum_Printf_Width ) ;
 }
 
-// set from BigNum 
-
-void
-BigNum_Set_PrintfPrecision ( )
-{
-    //int64 precision = DataStack_Pop ( ) ; // number of decimal digits
-    mpfr_t * prec = ( mpfr_t* ) DataStack_Pop ( ) ; // number of decimal digits
-    int64 precision = mpfr_get_si ( *prec, MPFR_RNDN ) ;
-    _Context_->System0->BigNum_Printf_Precision = precision ; // this precision is used by BigNum_FPrint like printf
-}
-
-// set from BigNum 
-
-void
-BigNum_Set_PrintfWidth ( )
-{
-    mpfr_t * mpfwidth = ( mpfr_t* ) DataStack_Pop ( ) ;
-    int64 width = mpfr_get_si ( *mpfwidth, MPFR_RNDN ) ;
-    _Context_->System0->BigNum_Printf_Width = width ;
-}
-
 // internal mpfr bit precision
 
 void
@@ -90,11 +69,36 @@ BigNum_GetAndPrint_BitPrecision ( )
 // set from BigNum 
 
 void
-BigNum_SetDefaultBitPrecision ( )
+BigNum_Set_PrintfWidth ( )
 {
-    mpfr_t * prec = ( mpfr_t* ) DataStack_Pop ( ) ; // number of decimal digits
+    mpfr_t * mpfwidth = ( mpfr_t* ) DataStack_Pop ( ) ;
+    long width = mpfr_get_si ( *mpfwidth, MPFR_RNDN ) ;
+    _Context_->System0->BigNum_Printf_Width = width ;
+}
+
+// set from BigNum 
+
+void
+BN_SetDefaultBitPrecision ( long precision )
+{
+    mpfr_set_default_prec ( precision ) ; // "precision is the number of bits used to represent the significand of a floating-point number"
+    _Context_->System0->BigNum_Printf_Precision = precision ;
+}
+
+void
+_BigNum_SetDefaultBitPrecision ( mpfr_t * prec )
+{
     long precision = mpfr_get_si ( *prec, MPFR_RNDN ) ;
     mpfr_set_default_prec ( precision ) ; // "precision is the number of bits used to represent the significand of a floating-point number"
+    _Context_->System0->BigNum_Printf_Precision = precision ;
+    //BN_SetDefaultBitPrecision ( precision ) ;
+}
+
+void
+BigNum_Set_PrintfPrecision ( )
+{
+    mpfr_t * prec = ( mpfr_t* ) DataStack_Pop ( ) ; // number of decimal digits
+    _BigNum_SetDefaultBitPrecision ( prec ) ;
 }
 
 void
@@ -104,6 +108,13 @@ BigNum_StateShow ( )
     BigNum_GetAndPrint_BitPrecision ( ) ;
     _Printf ( ( byte * ) "\nBigNum :: Width = %d : Precision = %d", _Context_->System0->BigNum_Printf_Width, _Context_->System0->BigNum_Printf_Precision ) ;
 
+}
+
+void
+BigNum_Init ( )
+{
+    BN_SetDefaultBitPrecision ( 16 ) ;
+    _Context_->System0->BigNum_Printf_Width = 16 ;
 }
 #if 0
 

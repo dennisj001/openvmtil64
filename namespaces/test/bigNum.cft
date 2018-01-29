@@ -14,7 +14,7 @@ d: dlsym: mpfr_printf /usr/local/lib/libmpfr.so ; void_return
 
 Combinators
 BigNum 
-bnInit ( 0 0 )
+bnInit ( 16 16 )
 : qexp { dup 1 >= } { dup -- qexp * } { drop 1 } ifElse ;
 //: qexp { dup 1 <= } { drop 1 } { dup -- recurse * } ifElse ;
 "!" ' qexp find alias
@@ -37,17 +37,14 @@ nl 7 ! p
 7 !! 8 !! 8 !!   // this is not right still
 sp
 //pause
-1000 ! p 
-bno
-#if 0
+1000 ! 
 x store
-BigNum
-d: : bexpl ( n | l ) { l x @ = n @ 1 <= } { 1 l @ fprint } { n @ dup 1 - bexpl * } ifElse ; 
-7 d: bexpl //fprint 
-sp 
+x @ p
+: bexpl ( n | l ) { l x @ = n @ 1 <= } { 1 l @ p } { n @ dup 1 - bexpl * } ifElse ; 
+7 bexpl dup p 
 : _bassert ( n m ) { n @ m @ != } { nl "error" ps _info pause } if ; 
 5040 _bassert
-#endif
+sp //pause
 
 nl "starting BigNum" ps nl
 BigNum
@@ -58,5 +55,4 @@ sp
 bigNumOff
 Int
 2 + 7 assertStkChk // stack checking
-bno
  

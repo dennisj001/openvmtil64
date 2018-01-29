@@ -99,16 +99,9 @@ _Debugger_InterpreterLoop ( Debugger * debugger )
         }
         SetState ( _Debugger_, DBG_AUTO_MODE_ONCE, false ) ;
         debugger->CharacterFunctionTable [ debugger->CharacterTable [ debugger->Key ] ] ( debugger ) ;
-#if 0        
-        if ( _Rsp_ != debugger->SaveRsp )
-        {
-            _Printf ( ( byte * ) "\nword = \'%s\' : _Rsp_ = %lx : at %s", debugger->w_Word->Name, _Rsp_, Context_Location ( ) ) ;
-            debugger->SaveRsp = _Rsp_ ;
-        }
-#endif        
     }
-    while ( GetState ( debugger, DBG_STEPPING ) || ( ! GetState ( debugger, DBG_INTERPRET_LOOP_DONE ) ) || 
-       ( ( GetState ( debugger, DBG_AUTO_MODE ) ) && ( ! ( GetState ( debugger, DBG_EVAL_AUTO_MODE ) ) ) ) ) ;
+    while ( GetState ( debugger, DBG_STEPPING ) || ( ! GetState ( debugger, DBG_INTERPRET_LOOP_DONE ) ) ||
+        ( ( GetState ( debugger, DBG_AUTO_MODE ) ) && ( ! ( GetState ( debugger, DBG_EVAL_AUTO_MODE ) ) ) ) ) ;
     SetState ( debugger, DBG_STACK_OLD, true ) ;
     //SetState ( debugger, DBG_BRK_INIT, false ) ;
     if ( GetState ( debugger, DBG_STEPPED ) )
@@ -426,12 +419,10 @@ Debugger_ReturnStack ( Debugger * debugger )
 void
 Debugger_Source ( Debugger * debugger )
 {
-    //if ( GetState ( debugger, DBG_STEPPING ) ) Debugger_Step ( debugger ) ;
-    //else
-    {
-        _CfrTil_Source ( debugger->w_Word ? debugger->w_Word : _CfrTil_->DebugWordListWord, 0 ) ;
-        SetState ( debugger, DBG_INFO, true ) ;
-    }
+    Word * scWord = Compiling ? _Compiler_->CurrentWordCompiling : GetState ( debugger, DBG_STEPPING ) ? 
+        Debugger_GetWordFromAddress ( debugger ) : _Context_->CurrentlyRunningWord ;
+    _CfrTil_Source ( scWord, 0 ) ; //debugger->w_Word ? debugger->w_Word : _CfrTil_->DebugWordListWord, 0 ) ;
+    SetState ( debugger, DBG_INFO, true ) ;
 }
 
 void
@@ -481,7 +472,7 @@ Debugger_Continue ( Debugger * debugger )
         }
         SetState_TrueFalse ( debugger, DBG_STEPPED, DBG_STEPPING ) ;
         SetState ( debugger, DBG_INTERPRET_LOOP_DONE, true ) ;
-        SetState ( debugger, DBG_AUTO_MODE|DBG_CONTINUE_MODE, false ) ;
+        SetState ( debugger, DBG_AUTO_MODE | DBG_CONTINUE_MODE, false ) ;
         //Debugger_Off ( debugger, 0 ) ;
     }
     else if ( debugger->w_Word )

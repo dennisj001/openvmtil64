@@ -176,7 +176,7 @@ CPrimitive CPrimitives [] = {
 
     { "pWidth", BigNum_Set_PrintfWidth, 0, 0, 0, "BigNum", "Class" },
     { "pPrecision", BigNum_Set_PrintfPrecision, 0, 0, 0, "BigNum", "Class" },
-    { "bPrecision", BigNum_SetDefaultBitPrecision, 0, 0, 0, "BigNum", "Class" },
+    //{ "bPrecision", BigNum_SetDefaultBitPrecision, 0, 0, 0, "BigNum", "Class" },
     { "bnState", BigNum_StateShow, 0, 0, 0, "BigNum", "Class" },
     
     //{ "get_p_pWidth", BigNum_GetPrintfWidth_Pointer, 0, 0, 0, "BigNum", "Class" },

@@ -3,7 +3,10 @@
 C 
 : sp ; //stack pause ; 
 sp
-"Dlsym" namespace Dlsym "libc" namespace libc
+"Dlsym" namespace 
+Dlsym 
+"libc" namespace 
+libc
 
 #if 1  //Zenfone2 @ not
 dlsym: printf /lib/x86_64-linux-gnu/libc.so.6 ; void_return

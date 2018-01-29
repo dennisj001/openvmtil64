@@ -465,12 +465,12 @@ typedef struct
     byte *bp_First ;
     byte *bp_Last ;
     byte *JumpOffset ;
-    byte *LogicCode, *LogicTestCode ;
+    byte *JccLogicCode, *LogicTestCode, *JccLogicCodeForNot ;
     byte *CombinatorStartsAt ;
     byte *ActualCodeStart ;
     int8 Ttt ;
     int8 NegFlag, OverWriteSize ;
-    Word * LogicCodeWord, *LastWord ;
+    Word * LogicCodeWord ;
     Namespace * LocalsNamespace ;
 } BlockInfo ;
 typedef struct
@@ -713,8 +713,8 @@ typedef struct
 {
     uint64 State ;
     int64 NumberBase ;
-    int64 BigNum_Printf_Precision ;
-    int64 BigNum_Printf_Width ;
+    long BigNum_Printf_Precision ;
+    long BigNum_Printf_Width ;
     int64 ExceptionFlag ;
     int64 IncludeFileStackNumber ;
     struct timespec Timers [ 8 ] ;

@@ -62,6 +62,7 @@
         <in>atom.c</in>
         <in>attribute.c</in>
         <in>bigNum.c</in>
+        <in>bigNum.gmp.c</in>
         <in>cfrtil64.c</in>
         <in>colors.c</in>
         <in>context.c</in>

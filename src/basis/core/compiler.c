@@ -152,9 +152,15 @@ _Compiler_FreeAllLocalsNamespaces ( Compiler * compiler )
 }
 
 Word *
+_Compiler_WordList ( Compiler * compiler, int64 n )
+{
+    return ( Word * ) _dllist_Get_N_InUse_Node_M_Slot ( compiler->WordList, n, SCN_WORD ) ;
+}
+
+Word *
 Compiler_WordList ( int64 n )
 {
-    return ( Word * ) _dllist_Get_N_InUse_Node_M_Slot ( _Compiler_->WordList, n, SCN_WORD ) ;
+    return ( Word * ) _Compiler_WordList ( _Compiler_, n ) ;
 }
 
 void

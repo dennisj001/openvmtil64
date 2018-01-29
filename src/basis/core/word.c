@@ -323,11 +323,11 @@ _Word_Print ( Word * word )
 void
 __Word_ShowSourceCode ( Word * word )
 {
-    if ( word && word->S_WordData && word->W_SourceCode ) //word->CAttribute & ( CPRIMITIVE | BLOCK ) )
+    if ( word && word->S_WordData ) //&& word->W_SourceCode ) //word->CAttribute & ( CPRIMITIVE | BLOCK ) )
     {
         Buffer *dstb = Buffer_NewLocked ( BUFFER_SIZE ) ;
         byte * sc = dstb->B_Data ;
-        sc = _String_ConvertStringToBackSlash ( sc, word->W_SourceCode ) ;
+        sc = _String_ConvertStringToBackSlash ( sc, word->W_SourceCode ? word->W_SourceCode : String_New ( _CfrTil_->SC_ScratchPad, TEMPORARY ) ) ;
         byte * name = c_gd ( word->Name ) ;
         byte *scd = c_gd ( String_FilterMultipleSpaces ( sc, TEMPORARY ) ) ;
         _Printf ( ( byte* ) "\nSourceCode for %s.%s :> \n%s", word->S_ContainingNamespace->Name, name, scd ) ;
