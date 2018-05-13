@@ -414,10 +414,14 @@ String_ConvertToBackSlash ( byte * str0 )
 Boolean
 Strcmp ( byte * str0, byte * str1 )
 {
-    int64 i ; Boolean result = 0 ;
-    for ( i = 0 ; (str0 [ i ] || str1 [ i ]) && ( ! result ) ; i ++ )
+    int64 i ;
+    Boolean result = 0 ;
+    if ( str0 && str1 )
     {
-        result = str0 [ i ] != str1 [ i ] ;
+        for ( i = 0 ; ( str0 [ i ] || str1 [ i ] ) && ( ! result ) ; i ++ )
+        {
+            result = str0 [ i ] != str1 [ i ] ;
+        }
     }
     return result ;
 }
@@ -425,8 +429,9 @@ Strcmp ( byte * str0, byte * str1 )
 Boolean
 Stricmp ( byte * str0, byte * str1 )
 {
-    int64 i ; Boolean result = 0 ;
-    for ( i = 0 ; (str0 [ i ] || str1 [ i ]) && ( ! result ) ; i ++ )
+    int64 i ;
+    Boolean result = 0 ;
+    for ( i = 0 ; ( str0 [ i ] || str1 [ i ] ) && ( ! result ) ; i ++ )
     {
         result = tolower ( str0 [ i ] ) != tolower ( str1 [ i ] ) ;
     }
@@ -436,8 +441,9 @@ Stricmp ( byte * str0, byte * str1 )
 Boolean
 Strncmp ( byte * str0, byte * str1, int64 n )
 {
-    int64 i ; Boolean result = 0 ;
-    for ( i = 0 ; (str0 [ i ] || str1 [ i ]) && ( ! result ) && n ; i ++, n-- )
+    int64 i ;
+    Boolean result = 0 ;
+    for ( i = 0 ; ( str0 [ i ] || str1 [ i ] ) && ( ! result ) && n ; i ++, n -- )
     {
         result = str0 [ i ] != str1 [ i ] ;
     }
@@ -543,7 +549,7 @@ String_InsertDataIntoStringSlot ( byte * str, int64 startOfSlot, int64 endOfSlot
         else strcat ( ( char* ) str, ( char* ) data ) ;
     }
 
-    else CfrTil_Exception (BUFFER_OVERFLOW, 0, 1 ) ;
+    else CfrTil_Exception ( BUFFER_OVERFLOW, 0, 1 ) ;
 }
 
 byte *
@@ -668,7 +674,7 @@ _CfrTil_StringMacros_Init ( )
         //memset ( sti, 0, sizeof (StrTokInfo ) ) ;
         // sti->In will be set in _CfrTil_StrTok
         sti->Delimiters = delimiters ;
-        sti->CharSet0 = CharSet_New ( delimiters, DICTIONARY) ; //TEMPORARY ) ;
+        sti->CharSet0 = CharSet_New ( delimiters, DICTIONARY ) ; //TEMPORARY ) ;
         CharSet_SetChar ( sti->CharSet0, '"' ) ; // always add a '"' as a delimiter
         sti->Out = Buffer_Data ( _CfrTil_->StringMacroB ) ;
         SetState ( sti, STI_INITIALIZED, true ) ;
@@ -706,20 +712,21 @@ _String_GetStringToEndOfLine ( )
 
 // this code is also used in PrepareSourceCodeString in cfrtil.c 
 // it makes or attempts to make sure that that tokenStart (ts) is correct for any string
+
 int64
 String_FindStrnCmpIndex ( byte * sc, byte* name0, int64 index0, int64 wl0, int64 inc )
 {
-    byte * scspp2, *scspp ; 
+    byte * scspp2, *scspp ;
     d0 ( scspp = & sc [ index0 ] ) ;
     int64 i, n, index = index0, slsc = Strlen ( sc ) ;
     for ( i = 0, n = wl0 + inc ; i <= n ; i ++ ) // tokens are parsed in different order with parameter and c rtl args, etc. 
     {
-        if ( ! Strncmp ( & sc [ index - i ], name0, wl0 )) //l ) ) //wl0 ) )
+        if ( ! Strncmp ( & sc [ index - i ], name0, wl0 ) ) //l ) ) //wl0 ) )
         {
             index -= i ;
             goto done ;
         }
-        if ( (index + i <= slsc) && ( ! Strncmp ( & sc [ index + i ], name0, wl0 )) )//l ) ) //wl0 ) )
+        if ( ( index + i <= slsc ) && ( ! Strncmp ( & sc [ index + i ], name0, wl0 ) ) )//l ) ) //wl0 ) )
         {
             index += i ;
             goto done ;
@@ -738,6 +745,7 @@ done:
 // ref : right ellipsis flag
 // lef : left ellipsis flag
 // dl : diff in length of token and token with highlighting :: dl = slt1 - slt0
+
 byte * // nvw, lef, leftBorder, nts, token0, rightBorder, ref
 _String_HighlightTokenInputLine ( byte * nvw, int8 lef, int64 leftBorder, int64 tokenStart, byte *token, int64 rightBorder, int8 ref, int8 dl )
 {
@@ -963,8 +971,9 @@ Buffer_SetAsFree ( Buffer * b, int64 force )
 void
 Buffers_SetAsUnused ( int64 force )
 {
-    dlnode * node, * nextNode ; 
-    Buffer * b ; int64 total = 0, setFree = 0;
+    dlnode * node, * nextNode ;
+    Buffer * b ;
+    int64 total = 0, setFree = 0 ;
     if ( _Q_ && _Q_->MemorySpace0 )
     {
         for ( node = dllist_First ( ( dllist* ) _Q_->MemorySpace0->BufferList ) ; node ; node = nextNode )
@@ -975,7 +984,7 @@ Buffers_SetAsUnused ( int64 force )
             total ++ ;
         }
     }
-    d0 ( if ( setFree > 2 ) _Printf ("\nBuffers_SetAsUnused : total = %d : freed = %d", total, setFree ) ) ;
+    d0 ( if ( setFree > 2 ) _Printf ( "\nBuffers_SetAsUnused : total = %d : freed = %d", total, setFree ) ) ;
 }
 
 void
@@ -983,7 +992,7 @@ Buffer_PrintBuffers ( )
 {
     dlnode * node, * nextNode ;
     Buffer * b ;
-    int64 total = 0, free = 0, locked = 0, unlocked = 0, permanent = 0;
+    int64 total = 0, free = 0, locked = 0, unlocked = 0, permanent = 0 ;
     if ( _Q_ && _Q_->MemorySpace0 )
     {
         for ( node = dllist_First ( ( dllist* ) _Q_->MemorySpace0->BufferList ) ; node ; node = nextNode )
@@ -998,7 +1007,7 @@ Buffer_PrintBuffers ( )
             total ++ ;
         }
     }
-    if ( _Q_->Verbosity > 1 ) _Printf ("\nBuffer_PrintBuffers : total = %d : free = %d : unlocked = %d : locked = %d : permanent = %d", total, free, unlocked, locked, permanent ) ;
+    if ( _Q_->Verbosity > 1 ) _Printf ( "\nBuffer_PrintBuffers : total = %d : free = %d : unlocked = %d : locked = %d : permanent = %d", total, free, unlocked, locked, permanent ) ;
 }
 
 Buffer *

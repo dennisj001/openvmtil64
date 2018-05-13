@@ -5,8 +5,15 @@ _Block_Eval ( block blck )
 {
     if ( blck )
     {
+        //GetTestRsp_Block () ;
         ( ( block ) blck ) ( ) ;
     }
+}
+
+void
+_Block_Eval_AdjustRSP ( block blck )
+{
+    _CfrTil_->CallReg_AdjustRSP ( ) ;
 }
 
 void
@@ -31,7 +38,7 @@ _Block_Copy ( byte * srcAddress, int64 bsize, int8 optFlag )
             {
                 // ?? unable at present to compile inline with more than one return in the block
                 SetHere ( saveHere ) ;
-                Compile_Call ( saveAddress ) ;
+                _Compile_Call ( saveAddress ) ;
             }
             break ; // don't include RET
         }
@@ -96,7 +103,7 @@ Block_CopyCompile_WithLogicFlag ( byte * srcAddress, int64 bindex, Boolean jccFl
 #if 1          
             if ( bi->JccLogicCodeForNot )
             {
-                SetHere ( start + (bi->JccLogicCodeForNot - bi->Start) ) ;
+                SetHere ( start + ( bi->JccLogicCodeForNot - bi->Start ) ) ;
                 Compile_JCC ( negFlag ? Z : NZ, bi->Ttt, 0 ) ;
             }
             else Compile_JCC ( negFlag ? bi->NegFlag : ! bi->NegFlag, bi->Ttt, 0 ) ;
@@ -324,7 +331,7 @@ _CfrTil_EndBlock ( )
     //d1 ( if ( Is_DebugOn ) _Printf ( ( byte* ) "\n\nCfrTil_EndBlock : %s : blockStack depth = %d : %s\n\n", _Context_->CurrentlyRunningWord->Name, _Stack_Depth ( compiler->BlockStack ), Context_Location ( ) ) ) ;
     //d1 ( _Printf ( ( byte* ) "\n\nentering CfrTil_EndBlock : %s : blockStack depth = %d : %s\n\n", _Context_->CurrentlyRunningWord->Name, _Stack_Depth ( compiler->BlockStack ), Context_Location ( ) ) ) ;
     BlockInfo * bi = ( BlockInfo * ) Stack_Pop_WithExceptionOnEmpty ( compiler->BlockStack ) ;
-    if ( ! GetState ( _Context_, C_SYNTAX ) ) bi->LogicCodeWord = _Compiler_WordList ( compiler, 1 ) ; 
+    if ( ! GetState ( _Context_, C_SYNTAX ) ) bi->LogicCodeWord = _Compiler_WordList ( compiler, 1 ) ;
     _CfrTil_EndBlock1 ( bi ) ;
     byte * blockStart = _CfrTil_EndBlock2 ( bi ) ;
     return blockStart ;

@@ -50,7 +50,7 @@ CPrimitive CPrimitives [] = {
     { "lcReset", ( block ) LC_Reset, 0, 0, 0, "Lisp", "Root" },
     //{ ":", ( block ) _LO_Colon, 0, 0, T_LISP_COLON | T_LISP_IMMEDIATE | T_LISP_SPECIAL, "Lisp", "Root" },
 
-    { "'", CfrTil_Tick, IMMEDIATE | KEYWORD, 0, 0, "Forth", "Root" },
+    { "'", CfrTil_SingleQuote, IMMEDIATE | KEYWORD, 0, 0, "Forth", "Root" },
 
     { "_Printf", ( block ) _Printf, LISP_C_RTL_ARGS | LISP_VOID_RETURN, 0, 0, "C", "Root" },
     { "printf", ( block ) _Printf, C_PREFIX_RTL_ARGS, 0, 0, "C", "Root" },

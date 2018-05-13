@@ -96,7 +96,8 @@ _DObject_ValueDefinition_Init ( Word * word, uint64 value, uint64 funcType, byte
         ByteArray * svcs = _Q_CodeByteArray ;
         int64 sscm = GetState ( _CfrTil_, DEBUG_SOURCE_CODE_MODE ) ;
         SetState ( _CfrTil_, DEBUG_SOURCE_CODE_MODE, false ) ;
-        Compiler_SetCompilingSpace_MakeSureOfRoom ( "ObjectSpace" ) ;
+        //Compiler_SetCompilingSpace_MakeSureOfRoom ( "ObjectSpace" ) ;
+        _NBA_SetCompilingSpace_MakeSureOfRoom ( _Q_->MemorySpace0->ObjectSpace, 4 * K ) ;
         d0 ( Cpu_CheckRspForWordAlignment ( "_DObject_ValueDefinition_Init:Before" ) ) ; //SetHere ((byte*) (((uint64) (Here + 0x8)) & ( uint64 ) 0xfffffffffffffff0)) ;
         word->Coding = Here ;
         word->CodeStart = Here ;

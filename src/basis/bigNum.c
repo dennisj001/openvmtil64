@@ -150,50 +150,12 @@ _BigNum_FPrint ( mpfr_t * value )
 {
     Context * cntx = _Context_ ;
     char * format ;
-    //mpfr_t * value = ( mpfr_t* ) DataStack_Pop ( ) ;
     if ( _Q_->Verbosity )
     {
-#if 0        
-        {
-            unsigned int i ;
-            mpfr_t s, t, u ;
-
-            mpfr_init2 ( t, 200 ) ;
-            mpfr_set_d ( t, 1.0, MPFR_RNDD ) ;
-            mpfr_init2 ( s, 200 ) ;
-            mpfr_set_d ( s, 1.0, MPFR_RNDD ) ;
-            mpfr_init2 ( u, 200 ) ;
-            for ( i = 1 ; i <= 100 ; i ++ )
-            {
-                mpfr_mul_ui ( t, t, i, MPFR_RNDU ) ;
-                mpfr_set_d ( u, 1.0, MPFR_RNDD ) ;
-                mpfr_div ( u, u, t, MPFR_RNDD ) ;
-                mpfr_add ( s, s, u, MPFR_RNDD ) ;
-            }
-            printf ( "Sum is " ) ;
-            mpfr_out_str ( stdout, 10, 0, s, MPFR_RNDD ) ;
-            putchar ( '\n' ) ;
-            mpfr_clear ( s ) ;
-            mpfr_clear ( t ) ;
-            mpfr_clear ( u ) ;
-        }
-#endif       
         if ( cntx->System0->NumberBase == 10 ) format = "%*.*Rf" ;
         else if ( cntx->System0->NumberBase == 2 ) format = "%*.*Rb" ;
         else if ( cntx->System0->NumberBase == 16 ) format = "%*.*Rx" ;
-        d1m ( if ( GetState ( _CfrTil_->cs_Cpu2, CPU_SELECTED_SAVED ) ) _CfrTil_->RestoreSelectedCpuState ( ) ) ;
-        d1m ( CfrTil_CpuState_Current_Show ( ) ) ;
-        d0 ( Cpu_CheckRspForWordAlignment ( "BigNum_FPrint" ) ) ;
-        // a bug (?) in mpfr apparently so ...
-#if 1 // ?? bug work around ??       
-        if ( _CfrTil_->SaveSelectedCpuState ( ), ( ( uint64 ) _CfrTil_->cs_Cpu->Rsp & ( uint64 ) 0x8 ) )
-            mpfr_out_str ( stdout, cntx->System0->NumberBase, 0, *value, MPFR_RNDN ) ;
-        else mpfr_printf ( format, _Context_->System0->BigNum_Printf_Width, _Context_->System0->BigNum_Printf_Precision, *value ) ;
-#else
         mpfr_printf ( format, _Context_->System0->BigNum_Printf_Width, _Context_->System0->BigNum_Printf_Precision, *value ) ;
-#endif        
-        d1m ( _CfrTil_->SaveSelectedCpuState ( ) ; SetState ( _CfrTil_->cs_Cpu2, CPU_SELECTED_SAVED, true ) ; ) ;
-        d1m ( CfrTil_CpuState_Current_Show ( ) ) ;
     }
     fflush ( stdout ) ;
 }

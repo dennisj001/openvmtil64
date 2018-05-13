@@ -443,25 +443,26 @@ _Lexer_ParseDecimal ( Lexer * lexer, byte * token )
 {
     float f ;
     // use 0x format for hex numbers with decimal NumberBase state
+    //D1 (String_Equal (_ReadLiner_->Filename, "namespaces/test/math.cft") ? CfrTil_CpuState_Current_Show ( ) : 0 ) ; //Debugger_CfrTilRegisters (_Debugger_) : 0 ) ;
     if ( sscanf ( ( char* ) token, HEX_UINT_FRMT, ( uint64* ) & lexer->Literal ) )
     {
         lexer->TokenType = ( T_INT | KNOWN_OBJECT ) ;
         SetState ( lexer, KNOWN_OBJECT, true ) ;
         Lexer_ParseBigNum ( lexer, token ) ;
     }
-    else if ( sscanf ( ( char* ) token, INT_FRMT_FOR_HEX, ( int64* ) & lexer->Literal ) )
+    else if ( sscanf ( ( char* ) token, INT_FRMT_FOR_HEX, ( uint64* ) & lexer->Literal ) )
     {
         lexer->TokenType = ( T_INT | KNOWN_OBJECT ) ;
         SetState ( lexer, KNOWN_OBJECT, true ) ;
         Lexer_ParseBigNum ( lexer, token ) ;
     }
-    else if ( sscanf ( ( char* ) token, INT_FRMT, ( int64* ) & lexer->Literal ) )
+    else if ( sscanf ( ( char* ) token, INT_FRMT, ( uint64* ) & lexer->Literal ) )
     {
         lexer->TokenType = ( T_INT | KNOWN_OBJECT ) ;
         SetState ( lexer, KNOWN_OBJECT, true ) ;
         Lexer_ParseBigNum ( lexer, token ) ;
     }
-    else if ( sscanf ( ( char* ) token, LISP_DECIMAL_FRMT, ( int64* ) & lexer->Literal ) )
+    else if ( sscanf ( ( char* ) token, LISP_DECIMAL_FRMT, ( uint64* ) & lexer->Literal ) )
     {
         lexer->TokenType = ( T_INT | KNOWN_OBJECT ) ;
         SetState ( lexer, KNOWN_OBJECT, true ) ;

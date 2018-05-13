@@ -356,15 +356,10 @@ _CheckOptimizeOperands ( Compiler * compiler, int64 maxOperands )
                         return i ;
                     }
                     case ( OP_LC << ( 3 * O_BITS ) | OP_VAR << ( 2 * O_BITS ) | OP_FETCH << ( 1 * O_BITS ) | OP_ORDERED ):
-                    {
-                        if ( optInfo_0_three->W_Value >= 0x100000000 ) return 0 ;
-                        else goto unordered ;
-                    }
                     case ( OP_LC << ( 3 * O_BITS ) | OP_VAR << ( 2 * O_BITS ) | OP_FETCH << ( 1 * O_BITS ) | OP_UNORDERED ):
                     case ( OP_LC << ( 3 * O_BITS ) | OP_VAR << ( 2 * O_BITS ) | OP_FETCH << ( 1 * O_BITS ) | OP_LOGIC ):
                     case ( OP_LC << ( 3 * O_BITS ) | OP_VAR << ( 2 * O_BITS ) | OP_FETCH << ( 1 * O_BITS ) | OP_DIVIDE ):
                     {
-unordered:
                         SetHere ( optInfo_0_three->Coding ) ;
                         if ( optInfo_0_zero->CAttribute & CATEGORY_OP_DIVIDE )
                         {
@@ -454,7 +449,7 @@ unordered:
                         if ( optInfo_0_two->StackPushRegisterCode )
                         {
                             SetHere ( optInfo_0_two->StackPushRegisterCode ) ; // leave optInfo_0_two value in R8 we don't need to push it
-                            _GetRmDispImm ( optInfo, optInfo_0_one, -1 ) ;
+                            _GetRmDispImm ( optInfo, optInfo_0_one, - 1 ) ;
                             optInfo->Optimize_Dest_RegOrMem = REG ; //REG ;
                             optInfo->Optimize_Mod = REG ;
                             optInfo->Optimize_Reg = ACC ; // only for "mod" will it be edx else eax
@@ -508,6 +503,32 @@ unordered:
                             return i ;
                         }
                         else return 0 ;
+                    }
+                    case ( OP_VAR << ( 2 * O_BITS ) | OP_LC << ( 1 * O_BITS ) | OP_UNORDERED ):
+                    case ( OP_VAR << ( 2 * O_BITS ) | OP_LC << ( 1 * O_BITS ) | OP_ORDERED ):
+                    case ( OP_VAR << ( 2 * O_BITS ) | OP_LC << ( 1 * O_BITS ) | OP_DIVIDE ):
+                    {
+                        if ( GetState ( _Context_, C_SYNTAX ) ) return 0 ;
+                        //if ( optInfo_0_two->CAttribute & REGISTER_VARIABLE ) 
+                        if ( optInfo_0_two->StackPushRegisterCode )
+                        {
+                            SetHere ( optInfo_0_two->StackPushRegisterCode ) ; //Coding ) ;
+                            //_Compile_GetVarLitObj_RValue_To_Reg ( optInfo_0_two, ACC ) ;
+                        }
+                        //_GetRmDispImm ( optInfo, optInfo_0_two, - 1 ) ;
+                        _GetRmDispImm ( optInfo, optInfo_0_one, - 1 ) ;
+                        optInfo->Optimize_Dest_RegOrMem = MEM ;
+                        optInfo->Optimize_Mod = REG ;
+                        optInfo->Optimize_Reg = ACC ; // shouldn't need this but some code still references this as the rm ?? fix ??
+                        return i ;
+                    }
+                    case ( OP_VAR << ( 2 * O_BITS ) | OP_LC << ( 1 * O_BITS ) | OP_LOGIC ):
+                    {
+                        SetHere ( optInfo_0_two->Coding ) ;
+                        _GetRmDispImm ( optInfo, optInfo_0_two, - 1 ) ;
+                        _GetRmDispImm ( optInfo, optInfo_0_one, - 1 ) ;
+                        optInfo->Optimize_Dest_RegOrMem = MEM ;
+                        return i ;
                     }
                     case ( OP_VAR << ( 3 * O_BITS ) | OP_FETCH << ( 2 * O_BITS ) | OP_DUP << ( 1 * O_BITS ) | OP_1_ARG ):
                     {
@@ -1105,33 +1126,40 @@ unordered:
                         else return 0 ;
                     }
                         // C_SYNTAX 
-                    case ( OP_VAR << ( 2 * O_BITS ) | OP_LC << ( 1 * O_BITS ) | OP_UNORDERED ):
-                    case ( OP_VAR << ( 2 * O_BITS ) | OP_LC << ( 1 * O_BITS ) | OP_ORDERED ):
-                    case ( OP_VAR << ( 2 * O_BITS ) | OP_LC << ( 1 * O_BITS ) | OP_DIVIDE ):
-#if 1                        
+                    case ( OP_UNORDERED << ( 2 * O_BITS ) | OP_VAR << ( 1 * O_BITS ) | OP_DIVIDE ):
+                    case ( OP_ORDERED << ( 2 * O_BITS ) | OP_VAR << ( 1 * O_BITS ) | OP_DIVIDE ):
+                    case ( OP_DIVIDE << ( 2 * O_BITS ) | OP_VAR << ( 1 * O_BITS ) | OP_DIVIDE ):
+                    case ( OP_DIVIDE << ( 2 * O_BITS ) | OP_VAR << ( 1 * O_BITS ) | OP_UNORDERED ):
+                    case ( OP_DIVIDE << ( 2 * O_BITS ) | OP_VAR << ( 1 * O_BITS ) | OP_ORDERED ):
+                    case ( OP_ORDERED << ( 2 * O_BITS ) | OP_VAR << ( 1 * O_BITS ) | OP_UNORDERED ):
+                    case ( OP_UNORDERED << ( 2 * O_BITS ) | OP_VAR << ( 1 * O_BITS ) | OP_UNORDERED ):
+                    case ( OP_ORDERED << ( 2 * O_BITS ) | OP_VAR << ( 1 * O_BITS ) | OP_ORDERED ):
+                    case ( OP_UNORDERED << ( 2 * O_BITS ) | OP_VAR << ( 1 * O_BITS ) | OP_ORDERED ):
                     {
-                        if ( GetState ( _Context_, C_SYNTAX ) ) return 0 ;
-                        //if ( optInfo_0_two->CAttribute & REGISTER_VARIABLE ) 
-                        if ( optInfo_0_two->StackPushRegisterCode )
+                        if ( GetState ( _Context_, C_SYNTAX ) )
                         {
-                            SetHere ( optInfo_0_two->StackPushRegisterCode ) ; //Coding ) ;
-                            //_Compile_GetVarLitObj_RValue_To_Reg ( optInfo_0_two, ACC ) ;
+                            if ( optInfo_0_two->StackPushRegisterCode )
+                            {
+                                SetHere ( optInfo_0_two->StackPushRegisterCode ) ; // leave optInfo_0_two value in R8 we don't need to push it
+                                if ( optInfo_0_one->CAttribute & ( THIS | OBJECT ) )
+                                {
+                                    _Compile_GetVarLitObj_RValue_To_Reg ( optInfo_0_one, OREG ) ;
+                                    optInfo->Optimize_Dest_RegOrMem = REG ;
+                                    optInfo->Optimize_Mod = REG ;
+                                    optInfo->Optimize_Reg = ACC ; // shouldn't need this but some code still references this as the rm ?? fix ??
+                                    optInfo->Optimize_Rm = OREG ;
+                                }
+                                else
+                                {
+                                    _GetRmDispImm ( optInfo, optInfo_0_one, - 1 ) ;
+                                    optInfo->Optimize_Dest_RegOrMem = REG ;
+                                    optInfo->Optimize_Mod = MEM ;
+                                }
+                                return i ;
+                            }
+                            else return 0 ;
                         }
-                        //_GetRmDispImm ( optInfo, optInfo_0_two, - 1 ) ;
-                        _GetRmDispImm ( optInfo, optInfo_0_one, - 1 ) ;
-                        optInfo->Optimize_Dest_RegOrMem = MEM ;
-                        optInfo->Optimize_Mod = REG ;
-                        optInfo->Optimize_Reg = ACC ; // shouldn't need this but some code still references this as the rm ?? fix ??
-                        return i ;
-                    }
-#endif                    
-                    case ( OP_VAR << ( 2 * O_BITS ) | OP_LC << ( 1 * O_BITS ) | OP_LOGIC ):
-                    {
-                        SetHere ( optInfo_0_two->Coding ) ;
-                        _GetRmDispImm ( optInfo, optInfo_0_two, - 1 ) ;
-                        _GetRmDispImm ( optInfo, optInfo_0_one, - 1 ) ;
-                        optInfo->Optimize_Dest_RegOrMem = MEM ;
-                        return i ;
+                        else continue ;
                     }
                     case ( OP_VAR << ( 2 * O_BITS ) | OP_VAR << ( 1 * O_BITS ) | OP_LOGIC ):
                     case ( OP_VAR << ( 2 * O_BITS ) | OP_VAR << ( 1 * O_BITS ) | OP_UNORDERED ):
@@ -1159,9 +1187,8 @@ unordered:
                             }
                             return i ;
                         }
-                        //else continue ;
+                        else continue ;
                     }
-                        // C Syntax :: ...
                     case ( OP_VAR << ( 2 * O_BITS ) | OP_VAR << ( 1 * O_BITS ) | OP_ORDERED ):
                     case ( OP_VAR << ( 2 * O_BITS ) | OP_VAR << ( 1 * O_BITS ) | OP_DIVIDE ):
                         //case ( OP_VAR << ( 2 * O_BITS ) | OP_VAR << ( 1 * O_BITS ) | OP_UNORDERED ):
@@ -1250,7 +1277,7 @@ unordered:
                         Compile_ADDI ( REG, DSP, 0, CELL, 0 ) ;
                         _Compile_Move_Reg_To_StackN ( DSP, 0, ACC ) ;
                         _Compile_GetVarLitObj_RValue_To_Reg ( optInfo_0_four, ACC ) ;
-                         _Word_CompileAndRecord_PushReg ( optInfo_0_four, ACC ) ;
+                        _Word_CompileAndRecord_PushReg ( optInfo_0_four, ACC ) ;
                         _GetRmDispImm ( optInfo, optInfo_0_one, - 1 ) ;
                         //_CfrTil_WordList_PopWords ( 2, 1 ) ;
                         optInfo->Optimize_Mod = MEM ;

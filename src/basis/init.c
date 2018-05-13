@@ -205,7 +205,13 @@ CfrTil_MachineCodePrimitive_AddWords ( CfrTil * cfrTil )
     _CfrTil_MachineCodePrimitive_NewAdd ( "set_DataStackPointer_FromDspReg", CPRIMITIVE, & cfrTil->Set_DataStackPointer_FromDspReg, ( byte* ) Compile_Set_DataStackPointer_FromDspReg, -1, "System", "Root" ) ;
     _CfrTil_MachineCodePrimitive_NewAdd ( "set_DspReg_FromDataStackPointer", CPRIMITIVE, & cfrTil->Set_DspReg_FromDataStackPointer, ( byte* ) Compile_Set_DspReg_FromDataStackPointer, -1, "System", "Root" ) ;
     //{ "popDspToR8AndCall", CPRIMITIVE, 0, ( byte* ) _Compile_PopDspToR8AndCall, - 1, "System", "Root" },
-    _CfrTil_MachineCodePrimitive_NewAdd ( "popDspToR8AndCall", CPRIMITIVE, & cfrTil->PopDspToR8AndCall, ( byte* ) Compile_PopDspToR8AndCall, -1, "System", "Root" ) ;
+    //_CfrTil_MachineCodePrimitive_NewAdd ( "popDspToR8AndCall", CPRIMITIVE, & cfrTil->PopDspToR8AndCall, ( byte* ) Compile_PopDspToR8AndCall, -1, "System", "Root" ) ;
+#if 0 //RSP_ADJUST // x64 ABI   
+    _CfrTil_MachineCodePrimitive_NewAdd ( "callReg_TestRSP", CPRIMITIVE, & cfrTil->CallReg_TestRSP, ( byte* ) Compile_Call_ToAddressThruReg_TestAlignRSP, -1, "System", "Root" ) ;
+    _CfrTil_MachineCodePrimitive_NewAdd ( "callReg_AdjustRSP", CPRIMITIVE, & cfrTil->CallReg_AdjustRSP, ( byte* ) Compile_CallReg_AdjustRSP, -1, "System", "Root" ) ;
+#endif    
+    //_CfrTil_MachineCodePrimitive_NewAdd ( "adjustRSPAndCall", CPRIMITIVE, (block*)& cfrTil->adjustRSPAndCall, ( byte* ) Compile_AdjustRSPAndCall, -1, "System", "Root" ) ;
+    //_CfrTil_MachineCodePrimitive_NewAdd ( "adjustRSP", CPRIMITIVE, (block*)& cfrTil->adjustRSP, ( byte* ) Compile_AdjustRSP, -1, "System", "Root" ) ;
 }
 
 

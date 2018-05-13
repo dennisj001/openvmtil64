@@ -1,5 +1,5 @@
 #include "../include/cfrtil64.h"
-#define VERSION ((byte*) "0.830.710" ) 
+#define VERSION ((byte*) "0.831.200" ) 
 
 OpenVmTil * _Q_ ; 
 
@@ -176,7 +176,7 @@ _OpenVmTil_CalculateMemSpaceSizes ( OpenVmTil * ovt, int64 restartCondition, int
     dictionarySize = ( int64 ) ( 0.333 * ( ( double ) coreMemTargetSize ) ) ;
     codeSize = ( int64 ) ( 0.333 * ( ( double ) coreMemTargetSize ) ) ;
     //codeSize = ( codeSize > ( 500 * K ) ) ? codeSize : 100 * K ;
-    codeSize = ( codeSize < ( 200 * K ) ) ? 200 * K : codeSize ;
+    codeSize = ( codeSize < ( 500 * K ) ) ? 500 * K : codeSize ;
 
     ovt->SignalExceptionsHandled = exceptionsHandled ;
     ovt->Verbosity = verbosity ;

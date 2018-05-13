@@ -244,85 +244,13 @@ i2halt // see above in interpret2
 i2halt // for second interpret3 
 i2halt // for third interpret4
 #endif // if 1 : endif
-//sp 
 #endif // if 0 : endif
-//pause
-#if 1 // if 0
+
 c_syntaxOn
 C String libc
-//"buffer0" Buffer new ; 
 typedef struct { byte buf [ 256 ]; } Buffer0 ;
-// nb. this is a mess mainly for testing purposes 
-//dbgOn
 s
 dscOn
-#if 0 // if 1
-void
-$ ( | atoken, buffer, buffer1, Buffer0 buffer0 ) 
-{
-#if dbOn  
-    <dbg> buffer = &buffer0.buf ;
-#else
-    buffer = &buffer0.buf ;
-#endif
-    memset ( buffer, 0, Buffer.size ) ; 
-#if 0
-    buffer1 = &buffer1.buf ;
-    memset ( buffer1, 0, Buffer.size ) ; 
-    //sprintf ( buffer, "%s", "" ) ;
-    while ( atoken = token () ) 
-#endif
-    while ( atoken = token () ) 
-    {   
-        //printf ( "\n\ttoken = %s\n", atoken ) ; //pause () ;
-#if 0 // if 2
-        if ( strcmp ( atoken, ";" ) )
-        { 
-            strcat ( buffer, atoken ) ;
-            if ( strcmp ( atoken, "." ) )
-            {
-                strcat ( buffer, " " ) ;
-            }
-            //printf ( "\n\tbuffer = %s\n", buffer ) ; //pause () ;
-        }
-        else
-        {
-#if 1 
-            {
-                d: printf ( "\n\tbuffer = %s\n", buffer ) ; //pause () ;
-            }
-#endif
-            //<dbg> sh ( buffer ) ;
-            sh ( buffer ) ;
-            break ; 
-        }
-#else // test internal c compiler
-#if 1
-        if ( ! strcmp ( atoken, ";" ) ) 
-#else
-        strcpy ( buffer1, atoken ) ;
-        if ( buffer1.buf [0] == ';' )
-#endif
-        { 
-            printf ( "\n\tbuffer = %s\n", buffer ) ; //pause () ;
-            sh ( buffer ) ;
-            break ; 
-        }
-        // test comment here
-        else 
-        // test comment here
-        { 
-            //strcat ( buffer, atoken ) ;
-            strcat ( buffer, atoken ) ;
-            if ( strcmp ( atoken, "." ) )
-            {
-                strcat ( buffer, " " ) ;
-            }
-        }
-#endif // if 2 : endif
-    }
-} 
-#elif 1 // if 1 : elif
 void
 $ ( | atoken, buffer, buffer1, Buffer buffer0 ) 
 {
@@ -347,83 +275,6 @@ $ ( | atoken, buffer, buffer1, Buffer buffer0 )
         }
     }
 } 
-#else // if 1 : else
-dbgOff
-void
-$ ( | atoken, buffer, buffer1, Buffer buffer0 ) 
-{
-#if dbgOnVar @  
-    //<dbg>
-    //_s () ;
-    buffer = &buffer0.buf ;
-    printf ( "\nsize = %d", Buffer.size ) ; 
-    memset ( buffer, 0, Buffer.size ) ; 
-    //sprintf ( buffer, "%s", "" ) ;
-    printf ( "\n\tbuffer = \'%s\'\n", buffer ) ; //pause () ;
-#else
-    buffer = &buffer0.buf ;
-    memset ( buffer, 0, Buffer.size ) ; 
-#endif
-#if dbOn  
-    //<dbg> 
-#endif
-    while ( atoken = token () ) 
-    {   
-        //printf ( "\n\ttoken = %s\n", atoken ) ; //pause () ;
-#if 1 // if 2
-        if ( libc.strcmp ( atoken, ";" ) )
-        { 
-            strcat ( buffer, atoken ) ;
-            if ( strcmp ( atoken, "." ) )
-            {
-                strcat ( buffer, " " ) ;
-            }
-            //printf ( "\n\tbuffer = %s\n", buffer ) ; //pause () ;
-        }
-        else
-        {
-#if 1
-            {
-                printf ( "\n\tbuffer = %s\n", buffer ) ; //pause () ;
-            }
-#endif
-#if dbOn  
-            //<dbg> 
-#endif
-            sh ( buffer ) ;
-            break ; 
-        }
-#else // if 2 : else : test internal c compiler
-#if 1
-        if ( ! strcmp ( atoken, ";" ) ) 
-#else
-        strcpy ( buffer1, atoken ) ;
-        if ( buffer1.buf [0] == ';' )
-#endif
-        { 
-            printf ( "\n\tbuffer = %s\n", buffer ) ; //pause () ;
-            sh ( buffer ) ;
-            break ; 
-        }
-        // test comment here
-        else 
-        // test comment here
-        { 
-            //strcat ( buffer, atoken ) ;
-            if ( strcmp ( atoken, "." ) )
-            {
-                strcat ( buffer, " " ) ;
-            }
-            strcat ( buffer, atoken ) ;
-        }
-#endif // if 2 : endif
-    }
-    _s () ;
-#if dbOn  
-    //<dbg> 
-#endif
-} 
-#endif // if 1 : endif
 'void.$ find wdiss //pause
 dscOff
 
@@ -438,12 +289,11 @@ String
 $$ls -al /usr/local ; $$ls -al . ;
 //pause
 dscOff
-c_syntaxOff
 #endif
-
-#endif // if 0 : endif
+c_syntaxOff
+verbosity 1 =
 sp
-dbgOff verbosity 1 =
+dbgOff 
 s: hi ( a b | c ) c a @ b @ + = printf ("\nshould read 3 : %d", c ) ;s 1 2 hi //pause
 2 + 7 assertStkChk // stack checking
 

@@ -13,6 +13,7 @@ CfrTil_Code ( )
 }
 
 #if 0
+
 void
 CfrTil_Rsp ( )
 {
@@ -102,7 +103,7 @@ GotoInfo_Init ( GotoInfo * gotoInfo, byte * lname, uint64 type )
     return gotoInfo ;
 }
 
-GotoInfo * 
+GotoInfo *
 GotoInfo_New ( byte * lname, uint64 type )
 {
     GotoInfo * gotoInfo = ( GotoInfo * ) _GotoInfo_Allocate ( ) ;
@@ -114,7 +115,11 @@ GotoInfo_New ( byte * lname, uint64 type )
 void
 _CfrTil_CompileCallGoto ( byte * name, uint64 type )
 {
-    if ( type == GI_RECURSE ) _Compile_UninitializedCall ( ) ;
+    if ( type == GI_RECURSE ) 
+    {
+        //Compile_CallReg_TestRSP ( 0 ) ; 
+        _Compile_UninitializedCall ( ) ;
+    }
     else _Compile_UninitializedJump ( ) ;
     GotoInfo_New ( name, type ) ;
 }
@@ -132,16 +137,16 @@ _CfrTil_GotoLabel ( byte * name )
 }
 
 void
-CfrTil_Goto ( ) 
+CfrTil_Goto ( )
 {
-    _CfrTil_Goto ( ( byte * ) DataStack_Pop ( ) ) ; 
+    _CfrTil_Goto ( ( byte * ) DataStack_Pop ( ) ) ;
 }
 
 void
-CfrTil_Goto_Prefix ( ) 
+CfrTil_Goto_Prefix ( )
 {
     byte * gotoToken = Lexer_ReadToken ( _Context_->Lexer0 ) ;
-    _CfrTil_Goto ( gotoToken ) ; 
+    _CfrTil_Goto ( gotoToken ) ;
 }
 
 void
@@ -158,6 +163,7 @@ CfrTil_Label_Prefix ( )
 }
 
 // 'return' is a prefix word now C_SYNTAX or not
+
 void
 CfrTil_Return ( )
 {
@@ -165,7 +171,7 @@ CfrTil_Return ( )
     {
         byte * token = Lexer_PeekNextNonDebugTokenWord ( _Lexer_, 0 ) ;
         Word * word = Finder_Word_FindUsing ( _Finder_, token, 0 ) ;
-        if ( word && (word->CAttribute & ( NAMESPACE_VARIABLE | LOCAL_VARIABLE | PARAMETER_VARIABLE ) ) )
+        if ( word && ( word->CAttribute & ( NAMESPACE_VARIABLE | LOCAL_VARIABLE | PARAMETER_VARIABLE ) ) )
         {
             _Compiler_->ReturnVariableWord = word ;
             //if ( word->CAttribute & REGISTER_VARIABLE ) 
@@ -180,7 +186,7 @@ CfrTil_Return ( )
         }
     }
 #if 0    
-    else if ( ! _Readline_Is_AtEndOfBlock ( _Context_->ReadLiner0 ) )
+else if ( ! _Readline_Is_AtEndOfBlock ( _Context_->ReadLiner0 ) )
     {
         _CfrTil_CompileCallGoto ( 0, GI_RETURN ) ;
     }
@@ -222,10 +228,11 @@ CfrTil_Literal ( )
     int64 value = DataStack_Pop ( ) ;
     //Word * word = _DataObject_New ( LITERAL, 0, 0, LITERAL, 0, 0, ( uint64 ) _DataStack_Pop ( ), 0 ) ;
     ByteArray * svcs = _Q_CodeByteArray ;
-    Compiler_SetCompilingSpace_MakeSureOfRoom ( "TempObjectSpace" ) ; 
+    //Compiler_SetCompilingSpace_MakeSureOfRoom ( "TempObjectSpace" ) ; 
+    _NBA_SetCompilingSpace_MakeSureOfRoom ( _Q_->MemorySpace0->TempObjectSpace, 4 * K ) ;
     Word * word = _DataObject_New ( LITERAL, 0, "<a literal>", LITERAL | CONSTANT, 0, 0, 0, value, 0 ) ;
     Set_CompilerSpace ( svcs ) ;
-    _Interpreter_DoWord (_Context_->Interpreter0, word, - 1 ) ;
+    _Interpreter_DoWord ( _Context_->Interpreter0, word, - 1 ) ;
 }
 
 void

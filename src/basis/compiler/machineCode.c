@@ -374,6 +374,7 @@ Compile_X_Group5 ( Compiler * compiler, int64 op )
 // note : the opReg - operand register parameter is always used for the rm field of the resulting machine code
 // These are all operating on a memory operand
 // for use of immediate data with this group use _Compile_Group1_Immediate
+
 void
 _Compile_X_Group1 ( int8 code, int8 toRegOrMem, int8 mod, int8 reg, int8 rm, int8 sib, int64 disp, int8 osize )
 {
@@ -426,7 +427,6 @@ _Compile_X_Group1_Immediate ( int8 code, int8 mod, int8 rm, int64 disp, uint64 i
 {
     // 0x80 is the base opCode for this group of instructions but 0x80 is an alias for 0x82
     // we always sign extend so opCodes 0x80 and 0x82 are not being used
-    // #x80 is the base opCode for this group of instructions 
     // 1000 00sw 
     int64 opCode = 0x80 ;
     if ( ( ( iSize > 4 ) || ( imm >= 0x100000000 ) ) ) //&& disp )
@@ -437,7 +437,8 @@ _Compile_X_Group1_Immediate ( int8 code, int8 mod, int8 rm, int64 disp, uint64 i
         if ( ! disp )
         {
             _Compile_MoveImm_To_Reg ( OREG, imm, iSize ) ;
-            _Compile_X_Group1_Reg_To_Reg ( code, ACC, OREG ) ;
+            //_Compile_X_Group1_Reg_To_Reg ( code, ACC, OREG ) ;
+            _Compile_X_Group1_Reg_To_Reg ( code, rm, OREG ) ;
         }
             //_Compile_X_Group1_Reg_To_Reg ( code, rm, OREG2 ) ;
             //_Compile_X_Group1 ( int8 code, int8 toRegOrMem, int8 mod, int8 reg, int8 rm, int8 sib, int64 disp, int8 osize )
@@ -751,6 +752,7 @@ _Compile_JumpWithOffset ( int64 disp ) // runtime
 void
 _Compile_UninitializedCall ( ) // runtime
 {
+    //_Compile_PushReg ( SCRATCH_REG ) ; // push any 8 bytes to align the stack
     _Compile_UninitializedJmpOrCall ( CALLI32 ) ;
 }
 
@@ -765,7 +767,7 @@ _Compile_UninitializedJump ( ) // runtime
 void
 _Compile_JCC ( int64 negFlag, int64 ttt, uint64 disp )
 {
-#define dbgON_10 0
+#define dbgON_10 1
 #if dbgON_10    
     d1 ( byte * here = Here ) ;
 #endif    
@@ -794,46 +796,77 @@ Compile_JCC ( int64 negFlag, int64 ttt, byte * jmpToAddr )
 }
 
 void
-_Compile_CallThruMem ( int8 reg )
+_Compile_Jcc ( int64 bindex, int64 overwriteFlag, int64 nz, int64 ttt )
 {
-    _Compile_Group5 ( CALL, MEM, reg, 0, 0, 0 ) ;
+    BlockInfo *bi = ( BlockInfo * ) _Stack_Pick ( _Context_->Compiler0->CombinatorBlockInfoStack, bindex ) ; // -1 : remember - stack is zero based ; stack[0] is top
+    if ( Compile_CheckReConfigureLogicInBlock ( bi, overwriteFlag ) )
+    {
+        //_Compile_TEST_Reg_To_Reg ( R8, R8 ) ;
+        Compile_JCC ( ! bi->NegFlag, bi->Ttt, 0 ) ; // we do need to store and get this logic set by various conditions by the compiler : _Compile_SET_tttn_REG
+    }
+    else
+    {
+        Compile_GetLogicFromTOS ( bi, 0 ) ; // after cmp we test our condition with setcc. if cc is true a 1 will be sign extended in R8 and pushed on the stack 
+        // then in the non optimized|inline case we cmp the TOS with 0. If ZERO (zf is 1) we know the test was false (for IF), if N(ot) ZERO we know it was true 
+        // (for IF). So, in the non optimized|inline case if ZERO we jmp if N(ot) ZERO we continue. In the optimized|inline case we check result of first cmp; if jcc sees
+        // not true (with IF that means jcc N(ot) ZERO) we jmp and if true (with IF that means jcc ZERO) we continue. 
+        // nb. without optimize|inline there is another cmp in Compile_GetLogicFromTOS which reverse the polarity of the logic 
+        // ?? an open question ?? i assume it works the same in all cases we are using - exceptions ?? 
+        // so adjust ...
+        Compile_JCC ( Z, ttt, 0 ) ;
+    }
 }
 
 void
-_Compile_CallThruReg ( int8 reg )
+_Compile_CallThru ( int8 reg, int8 regOrMem )
 {
-    _Compile_Group5 ( CALL, REG, reg, 0, 0, 0 ) ;
+    _Compile_Group5 ( CALL, regOrMem, reg, 0, 0, 0 ) ;
+}
+
+void
+Compile_CallThru_AdjustRSP ( int8 reg, int8 regOrMem )
+{
+    Compile_SUBI ( REG, RSP, 0, 8, 0 ) ;
+    _Compile_CallThru ( reg, regOrMem ) ;
+    Compile_ADDI ( REG, RSP, 0, 8, 0 ) ;
 }
 
 void
 Compile_Call_ToAddressThruReg ( byte * address, int8 reg )
 {
     _Compile_MoveImm_To_Reg ( reg, ( int64 ) address, CELL ) ;
-    _Compile_CallThruReg ( reg ) ;
+    Compile_CallThru_AdjustRSP ( reg, REG ) ;
 }
 
 void
-_Compile_Call_ThruReg ( byte * callAddr, int8 reg )
+_Compile_Call ( byte * callAddr )
 {
-    Compile_Call_ToAddressThruReg ( callAddr, reg ) ; // x64
+    Compile_Call_ToAddressThruReg ( callAddr, R8 ) ; //( GetState ( _Compiler_, LC_ARG_PARSING ) ? OREG : ACC ) ) ;
 }
 
 void
-_Compile_Call ( byte * callAddr, int8 thruReg )
+Compile_Call_ToAddressThruReg_TestAlignRSP ( byte * address, int8 reg )
 {
-    _Compile_Call_ThruReg ( callAddr, thruReg ) ;
+#if 1    
+    //DBI_ON ;
+    _Compile_MoveImm_To_Reg ( reg, ( int64 ) address, CELL ) ;
+    _Compile_Move_Reg_To_Reg ( RAX, RSP ) ;
+    Compile_TEST_AL_ImmByte ( 0x8 ) ;
+    Compile_JCC ( Z, ZERO_TTT, Here + 22 ) ;
+    Compile_CallThru_AdjustRSP ( reg, REG ) ;
+    _Compile_JumpWithOffset ( 3 ) ; // runtime
+    _Compile_CallThru ( reg, REG ) ;
+    //DBI_OFF ;
+#else
+    Compile_CallThru_AdjustRSP ( reg, REG ) ;
+#endif    
 }
 
 void
 Compile_Call ( byte * callAddr )
 {
-    _Compile_Call ( callAddr, ( GetState ( _Compiler_, LC_ARG_PARSING ) ? OREG : ACC ) ) ;
-}
-
-void
-_Compile_Call_NoOptimize ( byte * callAddr )
-{
-    Compile_Call ( callAddr ) ;
+    //Compile_Call_ToAddressThruReg_TestAlignRSP ( callAddr, R8 ) ; //( GetState ( _Compiler_, LC_ARG_PARSING ) ? OREG : ACC ) ) ;
+    _Compile_Call ( callAddr ) ;
 }
 
 void
@@ -847,7 +880,7 @@ _Compile_PushReg ( int8 reg )
     if ( reg > 7 ) _Compile_Int8 ( 0x40 + ( ( reg > 7 ) ? 1 : 0 ) ) ;
     _Compile_Int8 ( 0x50 + ( reg & 0x7 ) ) ;
 #if dbgON_5     
-    d1 ( _Printf ( ( byte* ) "\n_Compile_PushReg :" ) ) ;
+    //d1 ( _Printf ( ( byte* ) "\n_Compile_PushReg :" ) ) ;
     d1 ( Debugger_UdisOneInstruction ( _Debugger_, here, ( byte* ) "", ( byte* ) "" ) ; ) ;
 #endif
 }
@@ -868,7 +901,7 @@ _Compile_PopToReg ( int8 reg )
     if ( reg > 7 ) _Compile_Int8 ( 0x40 + ( ( reg > 7 ) ? 1 : 0 ) ) ;
     _Compile_Int8 ( 0x58 + ( reg & 0x7 ) ) ;
 #if dbgON_7     
-    d1 ( _Printf ( ( byte* ) "\n_Compile_PopToReg :" ) ) ;
+    //d1 ( _Printf ( ( byte* ) "\n_Compile_PopToReg :" ) ) ;
     d1 ( Debugger_UdisOneInstruction ( _Debugger_, here, ( byte* ) "", ( byte* ) "" ) ; ) ;
 #endif
 #endif    
@@ -902,6 +935,21 @@ _Compile_PushFD ( )
     _Compile_Int8 ( 0x9c ) ;
 #if dbgON_9     
     d1 ( _Printf ( ( byte* ) "\n_Compile_PushFD :" ) ) ;
+    d1 ( Debugger_UdisOneInstruction ( _Debugger_, here, ( byte* ) "", ( byte* ) "" ) ; ) ;
+#endif
+}
+
+void
+Compile_TEST_AL_ImmByte ( byte imm )
+{
+#define dbgON_7a 0
+#if dbgON_7a    
+    d1 ( byte * here = Here ) ;
+#endif    
+    _Compile_Int8 ( 0xa8 ) ;
+    _Compile_Int8 ( imm ) ;
+#if dbgON_7a     
+    //d1 ( _Printf ( ( byte* ) "\nCompile_TEST_AL_ImmByte :" ) ) ;
     d1 ( Debugger_UdisOneInstruction ( _Debugger_, here, ( byte* ) "", ( byte* ) "" ) ; ) ;
 #endif
 }
@@ -943,36 +991,38 @@ _Compile_MOVZX_REG ( int8 reg )
 #endif    
 }
 
-// first part of "combinator tookit"
-
-void
-_Compile_Jcc ( int64 bindex, int64 overwriteFlag, int64 nz, int64 ttt )
-{
-    BlockInfo *bi = ( BlockInfo * ) _Stack_Pick ( _Context_->Compiler0->CombinatorBlockInfoStack, bindex ) ; // -1 : remember - stack is zero based ; stack[0] is top
-    if ( Compile_CheckReConfigureLogicInBlock ( bi, overwriteFlag ) )
-    {
-        //_Compile_TEST_Reg_To_Reg ( R8, R8 ) ;
-        Compile_JCC ( ! bi->NegFlag, bi->Ttt, 0 ) ; // we do need to store and get this logic set by various conditions by the compiler : _Compile_SET_tttn_REG
-    }
-    else
-    {
-        Compile_GetLogicFromTOS ( bi, 0 ) ; // after cmp we test our condition with setcc. if cc is true a 1 will be sign extended in R8 and pushed on the stack 
-        // then in the non optimized|inline case we cmp the TOS with 0. If ZERO (zf is 1) we know the test was false (for IF), if N(ot) ZERO we know it was true 
-        // (for IF). So, in the non optimized|inline case if ZERO we jmp if N(ot) ZERO we continue. In the optimized|inline case we check result of first cmp; if jcc sees
-        // not true (with IF that means jcc N(ot) ZERO) we jmp and if true (with IF that means jcc ZERO) we continue. 
-        // nb. without optimize|inline there is another cmp in Compile_GetLogicFromTOS which reverse the polarity of the logic 
-        // ?? an open question ?? i assume it works the same in all cases we are using - exceptions ?? 
-        // so adjust ...
-        Compile_JCC ( Z, ttt, 0 ) ;
-    }
-}
-
 void
 _Compile_Return ( )
 {
     _Compile_Int8 ( 0xc3 ) ;
     //RET ( ) ; // use codegen_x86.h just to include it in
 }
+
+#if 0 //RSP_ADJUST
+
+void
+Compile_AdjustRSP ( )
+{
+    //DBI_ON ;
+    _Compile_X_Group1_Immediate ( AND, REG, RSP, 0, 0x7ffffffffffffff0, 0 ) ;
+    //_Compile_Return () ;
+    //DBI_OFF ;
+}
+
+void
+Compile_AdjustRSPAndCall ( )
+{
+    //DBI_ON ;
+    _Compile_X_Group1_Immediate ( AND, REG, RSP, 0, 0x7ffffffffffffff0, 0 ) ;
+    _Compile_GetRValue_FromLValue_ToReg ( ACC, ( byte * ) & CurrentDefinition ) ;
+    _Compile_Call_ThruReg ( ACC ) ;
+    //_Compile_Call ( (byte*)&_CfrTil_->RestoreSelectedCpuState, ACC ) ;
+    _Compile_GetRValue_FromLValue_ToReg ( ACC, ( byte* ) & _CfrTil_->RestoreSelectedCpuState ) ;
+    _Compile_Call_ThruReg ( ACC ) ;
+    //_Compile_Return () ;
+    //DBI_OFF ;
+}
+#endif
 
 #if TURN_DBI_OFF
 #undef DBI_ON

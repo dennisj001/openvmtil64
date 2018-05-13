@@ -85,7 +85,7 @@ s: $$
 
 bno
 
-#if 1 //doScript
+#if 0 //doScript
 $$ls -al /usr/local ; $$ls -al . ; 
 $etc/script 
 $etc/lispScript 

@@ -44,7 +44,7 @@ Compiler Compiling C Asm
 : asm; semi ' {| find compileWord ; immediate
 //' :asm find winfo //sp
 //' asm; find winfo //sp
-'compile1 '1, find alias
+'compile1 '1, find alias // we can't use ',' as part of a word.name with C syntax 
 'compile2 '2, find alias
 'compile4 '4, find alias
 'compile8 '8, find alias
@@ -91,7 +91,7 @@ CalculateModRegardingDisplacement ( _mod,  disp | rmod ) // _mod/rmod avoid name
         }
 #elif 0
         //"\npreprocessor else\n" ps apause
-        d: if ( disp == 0 ) 
+        if ( disp == 0 ) 
         {
             rmod = 0 ;
         }

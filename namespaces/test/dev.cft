@@ -131,7 +131,7 @@ User
     { k 2 = j 1 = } { j @ 23 <= } { j ++ } 
     {
        //k @ j @ w @ wordRun j @ p "." ps p ";" ps
-       j @ k @ w @ wordRun 3 ndrop // j @ p "." ps p ";" ps
+       j @ k @ w @ wordRun drop //3 ndrop pause // j @ p "." ps p ";" ps
     }
     for
 ;
@@ -219,10 +219,10 @@ c_syntaxOff
 //s: pow ( base power | out -- TOS ) { out 1 = } { power @ 0 > } { power power @ 1 - = } { out out @ base @ * = } for return out @ ;s
 : pow ( base power | out ) { out 1 = } { power @ 0 > } { power power @ 1 - = } { out out @ base @ * = } for return out ;
 'pow find wdiss
-2 30 pow p sp
-#if 1
-"cpow" ffx2
+2 30 pow dup p  1073741824 _assert 
+: pow ( base power | out ) { out 1 = } { power @ 0 > } { power power @ 1 - = } { out out @ base @ * = } for return out ;
 "pow" ffx2
+"cpow" ffx2
 
 Int
 "**" ffx2
@@ -230,7 +230,6 @@ Int
 //sp
 sp
 //pause
-#endif
 
 C
 : tt ( | t ) t 6 = t ++ t @ p ;

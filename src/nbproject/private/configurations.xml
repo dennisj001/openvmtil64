@@ -12,14 +12,11 @@
           <in>cpu.c</in>
           <in>locals.c</in>
           <in>logic.c</in>
-          <in>machineCode.back.c</in>
           <in>machineCode.c</in>
           <in>math.back.c</in>
           <in>math.c</in>
           <in>mcPrimitives.c</in>
-          <in>memory.back.c</in>
           <in>memory.c</in>
-          <in>optimize.back.c</in>
           <in>optimize.c</in>
           <in>runtime.c</in>
           <in>stack.c</in>
@@ -156,7 +153,7 @@
         </gdb_signals>
         <gdb_options>
           <DebugOptions>
-            <option name="debug_dir" value="/media/sdc4/dennisj/openvmtil64"/>
+            <option name="debug_dir" value="/home/dennisj/openvmtil64.0.830.717/"/>
           </DebugOptions>
         </gdb_options>
         <gdb_buildfirst gdb_buildfirst_overriden="false" gdb_buildfirst_old="false"/>
@@ -190,9 +187,10 @@
       <runprofile version="9">
         <runcommandpicklist>
           <runcommandpicklistitem>"${OUTPUT_PATH}"</runcommandpicklistitem>
+          <runcommandpicklistitem>cfrtil64-gdb</runcommandpicklistitem>
         </runcommandpicklist>
-        <runcommand>"${OUTPUT_PATH}"</runcommand>
-        <rundir>/media/sdc4/dennisj/openvmtil64</rundir>
+        <runcommand>cfrtil64-gdb</runcommand>
+        <rundir>/home/dennisj/openvmtil64.0.830.717/src/.</rundir>
         <buildfirst>false</buildfirst>
         <terminal-type>0</terminal-type>
         <remove-instrumentation>0</remove-instrumentation>

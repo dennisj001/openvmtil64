@@ -7,28 +7,33 @@ Debugger_TableSetup ( Debugger * debugger )
     int64 i ;
     for ( i = 0 ; i < 128 ; i ++ ) debugger->CharacterTable [ i ] = 0 ;
     debugger->CharacterTable [ 0 ] = 0 ;
+    debugger->CharacterTable [ 'o' ] = 1 ;
+    debugger->CharacterTable [ 'i' ] = 1 ;
+    debugger->CharacterTable [ 'u' ] = 1 ;
     debugger->CharacterTable [ 's' ] = 1 ;
+    debugger->CharacterTable [ 'h' ] = 1 ;
     debugger->CharacterTable [ 'e' ] = 2 ;
     debugger->CharacterTable [ 'w' ] = 3 ;
     debugger->CharacterTable [ 'd' ] = 4 ;
     debugger->CharacterTable [ 'I' ] = 5 ;
     debugger->CharacterTable [ 'm' ] = 6 ;
     debugger->CharacterTable [ 'T' ] = 7 ;
+    debugger->CharacterTable [ 't' ] = 7 ;
+    debugger->CharacterTable [ 'Z' ] = 8 ;
+    debugger->CharacterTable [ 'U' ] = 9 ;
     //debugger->CharacterTable [ 'V' ] = 8 ;
     debugger->CharacterTable [ 'r' ] = 10 ;
+    debugger->CharacterTable [ 'g' ] = 10 ;
     debugger->CharacterTable [ 'c' ] = 11 ;
+    debugger->CharacterTable [ ' ' ] = 11 ;
     debugger->CharacterTable [ 'q' ] = 12 ;
-    debugger->CharacterTable [ 'o' ] = 1 ;
-    debugger->CharacterTable [ 'i' ] = 1 ;
-    debugger->CharacterTable [ 'u' ] = 1 ;
-    debugger->CharacterTable [ 't' ] = 7 ;
-    debugger->CharacterTable [ 'U' ] = 9 ;
     debugger->CharacterTable [ 'f' ] = 14 ;
     debugger->CharacterTable [ '\\'] = 15 ;
+    debugger->CharacterTable [ '\n' ] = 15 ;
+    debugger->CharacterTable [ 27 ] = 15 ;
     debugger->CharacterTable [ 'G' ] = 16 ;
     debugger->CharacterTable [ 'n' ] = 17 ;
     debugger->CharacterTable [ 'p' ] = 18 ;
-    debugger->CharacterTable [ 'h' ] = 1 ;
     debugger->CharacterTable [ 'a' ] = 20 ;
     debugger->CharacterTable [ 'z' ] = 21 ;
     debugger->CharacterTable [ 'w' ] = 22 ;
@@ -42,11 +47,7 @@ Debugger_TableSetup ( Debugger * debugger )
     debugger->CharacterTable [ 'R' ] = 30 ;
     debugger->CharacterTable [ 'H' ] = 31 ;
     debugger->CharacterTable [ 'O' ] = 32 ;
-    debugger->CharacterTable [ '\n' ] = 15 ;
-    debugger->CharacterTable [ 27 ] = 15 ;
-    debugger->CharacterTable [ ' ' ] = 11 ;
-    debugger->CharacterTable [ 'g' ] = 10 ;
-    debugger->CharacterTable [ 'Z' ] = 8 ;
+    debugger->CharacterTable [ 'Q' ] = 33 ;
 
     // debugger : system related
     debugger->CharacterFunctionTable [ 0 ] = Debugger_Default ;
@@ -83,6 +84,7 @@ Debugger_TableSetup ( Debugger * debugger )
     debugger->CharacterFunctionTable [ 30 ] = Debugger_ReturnStack ;
     debugger->CharacterFunctionTable [ 31 ] = ( DebuggerFunction ) DebugWordList_Show ;
     debugger->CharacterFunctionTable [ 32 ] = Debugger_ShowCompilerWordList ;
+    debugger->CharacterFunctionTable [ 33 ] = Debugger_CfrTilRegisters ;
 }
 
 void
@@ -153,7 +155,6 @@ void
 _Debugger_PostShow ( Debugger * debugger, Word * word, int8 force )//, byte * token, Word * word )
 {
     _Debugger_ShowEffects ( debugger, word, GetState ( debugger, DBG_STEPPING ), force ) ;
-    DefaultColors ;
 }
 
 void
@@ -454,6 +455,13 @@ Debugger_Registers ( Debugger * debugger )
 {
     Debugger_CpuState_CheckSaveShow ( debugger ) ;
     //Debugger_UdisOneInstruction ( debugger, debugger->DebugAddress, ( byte* ) "\r\r", ( byte* ) "" ) ; // current insn
+}
+
+void
+Debugger_CfrTilRegisters ( Debugger * debugger )
+{
+    _CfrTil_CpuState_CheckSave ( ) ;
+    CfrTil_CpuState_Show ( ) ;
 }
 
 void

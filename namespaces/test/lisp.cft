@@ -236,7 +236,7 @@ nl (list (1 2)) (list 1 2)
 lispOff 
 "\nending lisp.cft\n" ddps
 sp 
-#if doScript
+#if 0 //doScript
 String
 $ls -al /usr/local ; 
 $etc/script ;

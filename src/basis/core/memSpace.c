@@ -594,7 +594,7 @@ CheckCodeSpaceForRoom ( )
 {
     if ( _Q_CodeByteArray->OurNBA->ba_CurrentByteArray->MemRemaining < ( 4 * K ) )
     {
-        if ( Compiling ) { _Printf ((byte*)"\nLess than 4K of CodeSpace remaining : this will probably mean you have to set CodeSpace higher in openvmtil.c\n"); Pause () ; }
+        if ( Compiling ) { _Printf ((byte*)"\nLess than 4K of MachineCodeSize remaining : this will probably mean you have to increase codeSize size in openvmtil.c\n"); Pause () ; }
         _Q_CodeByteArray = _ByteArray_AppendSpace_MakeSure ( _Q_CodeByteArray, 4 * K ) ;
     }
 }

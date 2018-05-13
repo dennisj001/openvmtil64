@@ -7,6 +7,8 @@ Word_SetCoding ( Word * word, byte * address )
     else word->Coding = address ;
 }
 
+//block CurrentDefinition ;
+
 void
 Word_Run ( Word * word )
 {
@@ -22,6 +24,7 @@ Word_Run ( Word * word )
             _Block_Eval ( word->Definition ) ;
         }
     }
+    //TestGetRsp ( ) ;
 }
 
 void
@@ -98,6 +101,29 @@ _Word_Interpret ( Word * word )
     _Interpreter_DoWord ( _Interpreter_, word, - 1 ) ;
 }
 
+#if 0 // RSP_ADJUST
+Boolean rspAdjusted = false ;
+uint64 * ARsp ;
+
+void
+RspAdjust ( )
+{
+    if ( _CfrTil_->SaveSelectedCpuState ( ), ( ( uint64 ) _CfrTil_->cs_Cpu->Rsp & ( uint64 ) 0x8 ) )
+    {
+        ARsp = _CfrTil_->cs_Cpu->Rsp, _CfrTil_->cs_Cpu->Rsp += 0x8, _CfrTil_->RestoreSelectedCpuState ( ), rspAdjusted = true ;
+    }
+}
+
+void
+RspRestore ( )
+{
+    if ( rspAdjusted )
+    {
+        _CfrTil_->cs_Cpu->Rsp = ARsp, _CfrTil_->RestoreSelectedCpuState ( ), rspAdjusted = false ;
+    }
+}
+#endif
+
 void
 _Word_Compile ( Word * word )
 {
@@ -112,8 +138,14 @@ _Word_Compile ( Word * word )
     }
     else
     {
-        //d1 ( if ( Is_DebugOn ) _Compile_Stack_Push ( DSP, (int64) Here ) ) ; // lets us see the divisions of the stack
-        Compile_Call ( ( byte* ) word->Definition ) ;
+        if ( word->CAttribute & CPRIMITIVE )
+        {
+            d0 (_Printf ( (byte* ) "\n_Word_Compile : %s : name = %s", Context_Location (), word->Name) );
+            // there is an slight overhead for CPRIMITIVE functions to align RSP for ABI-X64
+            Compile_Call_ToAddressThruReg_TestAlignRSP ( (byte*) word->Definition, R8 ) ;
+            //Compile_Call ( ( byte* ) word->Definition ) ;
+        }
+        else _Compile_Call ( ( byte* ) word->Definition ) ;
     }
 
 }
@@ -385,7 +417,7 @@ _CfrTil_WordName_Run ( byte * name )
 Word *
 _CfrTil_Alias ( Word * word, byte * name )
 {
-    if ( word )
+    if ( word && word->Definition )
     {
         Word * alias = _Word_New ( name, word->CAttribute | ALIAS, word->CAttribute2, word->LAttribute, 1, 0, DICTIONARY ) ; // inherit type from original word
         //while ( ( word->Definition ) && word->W_AliasOf ) word = word->W_AliasOf ;

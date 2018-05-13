@@ -4,9 +4,12 @@
 void
 _Compile_C_Call_1_Arg ( byte* function, int64 arg )
 {
-    _Compile_RspReg_Push ( arg ) ;
-    Compile_Call ( function ) ;
-    _Compile_RspReg_Drop ( ) ;
+    //_Compile_RspReg_Push ( arg ) ;
+    _Compile_PushReg ( RDI ) ;
+    _Compile_MoveImm_To_Reg ( RDI, arg, CELL ) ;
+    _Compile_Call ( function ) ;
+    _Compile_PopToReg ( RDI ) ;
+    //_Compile_RspReg_Drop ( ) ;
 }
 
 void

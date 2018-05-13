@@ -702,7 +702,7 @@ typedef struct _Debugger
     int64 LastSourceCodeIndex, TerminalLineWidth, ReadIndex ;
     ByteArray * StepInstructionBA ;
     byte CharacterTable [ 128 ] ;
-    DebuggerFunction CharacterFunctionTable [ 34 ] ;
+    DebuggerFunction CharacterFunctionTable [ 36 ] ;
     ud_t * Udis ;
     Stack * LocalsNamespacesStack ;
     dllist * DebugWordList ;
@@ -734,6 +734,7 @@ typedef struct
     byte * Location ;
     dllist * WordList ;
     Word * CurrentlyRunningWord, *NlsWord, *SC_CurrentCombinator, *SourceCodeWord ;
+    block CurrentlyRunningWordDefinition ;
     NBA * ContextNba ;
     sigjmp_buf JmpBuf0 ;
 } Context ;
@@ -807,8 +808,9 @@ typedef struct _CfrTil
     Cpu * cs_Cpu ;
     Cpu * cs_Cpu2 ;
     block CurrentBlock, SaveCpuState, SaveCpu2State, RestoreCpuState, RestoreCpu2State, CallCfrTilWord, CallCurrentBlock, RestoreSelectedCpuState, SaveSelectedCpuState ; //, SyncDspToEsi, SyncEsiToDsp ;
-    block Set_CfrTilRspReg_FromReturnStackPointer, Set_ReturnStackPointer_FromCfrTilRspReg, Set_DspReg_FromDataStackPointer, Set_DataStackPointer_FromDspReg ; //, PeekReg, PokeReg ;
-    block PopDspToR8AndCall ;
+    //block Set_CfrTilRspReg_FromReturnStackPointer, Set_ReturnStackPointer_FromCfrTilRspReg, Set_DspReg_FromDataStackPointer, Set_DataStackPointer_FromDspReg ; //, PeekReg, PokeReg ;
+    block Set_DspReg_FromDataStackPointer, Set_DataStackPointer_FromDspReg ; //, PeekReg, PokeReg ;
+    block PopDspToR8AndCall, CallReg_TestRSP, CallReg_AdjustRSP ; //adjustRSPAndCall, adjustRSP ;
     ByteArray * PeekPokeByteArray ;
     Word * LastFinishedWord, *StoreWord, *PokeWord, *ScoOcCrw, *DebugWordListWord, *EndBlockWord, *BeginBlockWord ;
     byte ReadLine_CharacterTable [ 256 ] ;

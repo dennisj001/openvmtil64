@@ -39,7 +39,7 @@ CopyDuplicateWord ( dlnode * anode, Word * word0 )
         return wordc ;
     }
 #else
-    return _CopyDuplicateWord ( word0 ) ;
+        return _CopyDuplicateWord ( word0 ) ;
 #endif    
     return 0 ;
 }

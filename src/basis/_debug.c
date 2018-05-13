@@ -104,7 +104,7 @@ GetPostfix ( byte * address, byte* postfix, byte * buffer )
     }
     else
     {
-        str = String_CheckForAtAdddress ( *(( byte ** ) ( address + 2 )) ) ;
+        str = String_CheckForAtAdddress ( *( ( byte ** ) ( address + 2 ) ) ) ;
         if ( str )
         {
             snprintf ( ( char* ) buffer, 128, "%s%s", prePostfix, str ) ;
@@ -130,16 +130,52 @@ _Compile_DebugRuntimeBreakpoint ( ) // where we want the acquired pointer
     Compile_Call ( ( byte* ) CfrTil_DebugRuntimeBreakpoint ) ;
 }
 
+uint64
+GetRsp ( )
+{
+    _CfrTil_->SaveSelectedCpuState ( ) ;
+    return (uint64) _CfrTil_->cs_Cpu->Rsp ;
+}
+
+uint64
+_GetTestRsp ()
+{
+    uint64 rsp = GetRsp ( ) ;
+    return rsp ;
+    //if ( rsp & ( uint64 ) 0x8 ) return rsp ;
+    //else return 0 ;
+}
+
 void
-Compile_PopDspToR8AndCall ()
+_GetTestRsp_ ( byte * src )
+{
+    uint64 rsp = _GetTestRsp () ;
+    if ( rsp & 0x8 )
+        _Printf ( ( byte* ) "\n%s : %s : rsp = %llx", src, Context_Location (), rsp ) ;
+}
+
+void
+GetTestRsp_Word ()
+{
+    _GetTestRsp_ ( (byte*) "Word" ) ;
+}
+
+void
+GetTestRsp_Block ()
+{
+    _GetTestRsp_ ( (byte*) "Block" ) ;
+}
+#if 0
+
+void
+Compile_PopDspToR8AndCall ( )
 {
     // from x64.cft
     //Compile_Stack_Pop_R8D ( ) ;
     //_Compile_CALL_Reg ( R8D ) ;
     _Compile_Stack_PopToReg ( DSP, R8 ) ;
-    _Compile_CallThruReg ( R8 ) ;
+    _Compile_Call_ThruReg ( R8 ) ;
 }
-#if 0
 
 void
 _Compile_Pause ( )

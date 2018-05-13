@@ -218,6 +218,17 @@ ByteArray_AppendCopyUpToRET ( ByteArray * ba, byte * data ) // size in bytes
     ByteArray_AppendCopy ( ba, i, data ) ; // ! after we find out how big 'i' is
 }
 
+void
+_NBA_SetCompilingSpace_MakeSureOfRoom ( NamedByteArray * nba, int64 room )
+{
+    if ( nba )
+    {
+        Set_CompilerSpace ( nba->ba_CurrentByteArray ) ;
+        ByteArray * ba = _ByteArray_AppendSpace_MakeSure ( nba->ba_CurrentByteArray, room ) ;
+        if ( ! ba ) Error_Abort ( ( byte* ) "\nCompiler_SetCompilingSpace_MakeSureOfRoom : no ba?!\n" ) ;
+    }
+}
+
 ByteArray *
 _NamedByteArray_AddNewByteArray ( NamedByteArray *nba, int64 size )
 {
