@@ -73,7 +73,7 @@ _Compile_CpuState_RestoreSelected ( Cpu * cpu )
 }
 
 void
-_Compile_CpuState_Save ( Cpu * cpu )
+Compile_CpuState_Save ( Cpu * cpu )
 {
     // push order for pushad
     // nb : intel stacks grow down toward lesser memory by 

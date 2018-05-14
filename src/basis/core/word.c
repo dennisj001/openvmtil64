@@ -138,14 +138,17 @@ _Word_Compile ( Word * word )
     }
     else
     {
+#if RSP_ADJUST        
         if ( word->CAttribute & CPRIMITIVE )
         {
-            d0 (_Printf ( (byte* ) "\n_Word_Compile : %s : name = %s", Context_Location (), word->Name) );
+            d0 ( _Printf ( ( byte* ) "\n_Word_Compile : %s : name = %s", Context_Location ( ), word->Name ) ) ;
             // there is an slight overhead for CPRIMITIVE functions to align RSP for ABI-X64
-            Compile_Call_ToAddressThruReg_TestAlignRSP ( (byte*) word->Definition, R8 ) ;
+            Compile_Call_ToAddressThruReg_TestAlignRSP ( ( byte* ) word->Definition, R8 ) ;
             //Compile_Call ( ( byte* ) word->Definition ) ;
         }
-        else _Compile_Call ( ( byte* ) word->Definition ) ;
+        else
+#endif            
+        _Compile_Call ( ( byte* ) word->Definition ) ;
     }
 
 }

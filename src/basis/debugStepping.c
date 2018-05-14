@@ -460,7 +460,7 @@ _Compile_Restore_C_CpuState ( CfrTil * cfrtil, int64 showFlag )
 void
 _Compile_Save_C_CpuState ( CfrTil * cfrtil, int64 showFlag )
 {
-    _Compile_CpuState_Save ( cfrtil->cs_Cpu ) ;
+    Compile_CpuState_Save ( cfrtil->cs_Cpu ) ;
 
     if ( showFlag ) Compile_Call ( ( byte* ) _CfrTil_CpuState_CheckSave ) ;
 }
@@ -468,7 +468,7 @@ _Compile_Save_C_CpuState ( CfrTil * cfrtil, int64 showFlag )
 void
 _Compile_Save_Debugger_CpuState ( Debugger * debugger, int64 showFlag )
 {
-    _Compile_CpuState_Save ( debugger->cs_Cpu ) ;
+    Compile_CpuState_Save ( debugger->cs_Cpu ) ;
     if ( showFlag ) Compile_Call ( ( byte* ) CfrTil_Debugger_UdisOneInsn ) ;
     if ( ( _Q_->Verbosity > 3 ) && ( debugger->cs_Cpu->Rsp != debugger->LastRsp ) ) Debugger_PrintReturnStackWindow ( ) ;
 

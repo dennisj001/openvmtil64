@@ -11,6 +11,7 @@
 #define NEW_CALL_RETURN 0
 #define DSP_IS_GLOBAL_REGISTER 1 
 #define RSP_ADJUST true
+#define NEW_CPU_PIPELINE_STATE true
 
 #if DEBUG 
 #define D( x ) x
@@ -729,3 +730,13 @@
 #define optInfo_0_four  optInfo->COIW[4]
 #define optInfo_0_five  optInfo->COIW[5]
 #define optInfo_0_six   optInfo->COIW[6]
+
+// CpuPipelineState
+#define ONE_REG_ARG             ( (uint8) 1 << 0 )
+#define TWO_REG_ARGS            ( (uint8) 1 << 1 )
+#define ONE_STACK_ARG           ( (uint8) 1 << 2 )
+#define TWO_STACK_ARGS          ( (uint8) 1 << 3 )
+#define ONE_REG_ONE_STACK_ARG   ( (uint8) 1 << 4 )
+#define ONE_STACK_ONE_REG_ARG   ( (uint8) 1 << 5 )
+
+

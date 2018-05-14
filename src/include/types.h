@@ -185,8 +185,8 @@ typedef struct
 #define n_Car afterWord 
 #define n_Cdr beforeWord
 typedef void ( *MapFunction0 ) ( dlnode * ) ;
-typedef int64 ( *MapFunction1 ) ( dlnode *, int64 ) ;
-typedef int64 ( *MapFunction2 ) ( dlnode *, int64, int64 ) ;
+typedef int64( *MapFunction1 ) ( dlnode *, int64 ) ;
+typedef int64( *MapFunction2 ) ( dlnode *, int64, int64 ) ;
 //typedef void ( *MapFunction2 ) ( dlnode *, int64, int64 ) ;
 typedef void ( *MapFunction2_64 ) ( dlnode *, uint64, int64 ) ;
 typedef int64( *MapFunction3 ) ( dlnode *, int64, int64, int64 ) ;
@@ -318,7 +318,8 @@ typedef int64( *MapFunction_Word_PtrInt ) ( ListObject *, Word *, int64 * ) ;
 typedef int64( *MapFunction ) ( Symbol * ) ;
 typedef int64( *MapFunction_1 ) ( Symbol *, int64 ) ;
 typedef int64( *MapFunction_Word ) ( Symbol *, Word * ) ;
-typedef int64( *MapFunction_2 ) ( Symbol *, int64, int64 ) ;
+typedef
+int64( *MapFunction_2 ) ( Symbol *, int64, int64 ) ;
 typedef void ( *MapSymbolFunction ) ( Symbol * ) ;
 typedef void ( *MapSymbolFunction2 ) ( Symbol *, int64, int64 ) ;
 typedef Word* ( *MapNodeFunction ) ( dlnode * node ) ;
@@ -601,6 +602,23 @@ typedef struct Lexer
     byte( *NextChar ) ( ReadLiner * rl ) ;
     byte * TokenBuffer ;
 } Lexer ;
+
+#if NEW_CPU_PIPELINE_STATE    
+typedef struct
+{
+    union
+    {
+        uint64 uint64_CPState ;
+        struct
+        {
+            uint8 State ;
+            uint8 FirstArgReg ;
+            uint8 SecondArgReg ;
+        } ;
+    } ;
+
+} CpuPipelineState ;
+#endif
 typedef struct
 {
     int64 OptimizeFlag ;
@@ -613,9 +631,17 @@ typedef struct
     int64 Optimize_SrcReg ;
     int64 Optimize_DstReg ;
     int64 UseReg ;
-    int64 SpecialReg ;
-    //Word *O_zero, * O_one, *O_two, *O_three, *O_four, *O_five, *O_six ;
-    Word * COIW [8] ;
+    union
+    {
+        struct
+        {
+            Word *O_zero, * O_one, *O_two, *O_three, *O_four, *O_five, *O_six, *O_seven ;
+        } ;
+        Word * COIW [8] ; // CompileOptimizeInfo Word array
+    } ;
+#if NEW_CPU_PIPELINE_STATE    
+    CpuPipelineState CPState ;
+#endif   
 } CompileOptimizeInfo ;
 typedef struct
 {

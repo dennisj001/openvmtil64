@@ -126,10 +126,11 @@ Compile_Debug_GetRSP ( ) // where we want the acquired pointer
 void
 _Compile_DebugRuntimeBreakpoint ( ) // where we want the acquired pointer
 {
-    _Compile_CpuState_Save ( _Debugger_->cs_Cpu ) ;
+    Compile_CpuState_Save ( _Debugger_->cs_Cpu ) ;
     Compile_Call ( ( byte* ) CfrTil_DebugRuntimeBreakpoint ) ;
 }
 
+#if 0
 uint64
 GetRsp ( )
 {
@@ -165,7 +166,6 @@ GetTestRsp_Block ()
 {
     _GetTestRsp_ ( (byte*) "Block" ) ;
 }
-#if 0
 
 void
 Compile_PopDspToR8AndCall ( )

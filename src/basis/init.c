@@ -8,7 +8,7 @@ _CfrTil_Init_SessionCore ( CfrTil * cfrTil, int64 cntxDelFlag, int64 promptFlag 
 {
     int64 i ;
     CfrTil_LogOff ( ) ;
-    CfrTil_DbgSourceCodeOff () ;
+    CfrTil_DbgSourceCodeOff ( ) ;
     _System_Init ( _Context_->System0 ) ;
     ReadLine_Init ( _Context_->ReadLiner0, _CfrTil_Key ) ;
     Lexer_Init ( _Context_->Lexer0, 0, 0, CONTEXT ) ;
@@ -47,8 +47,8 @@ CfrTil_ResetAll_Init ( CfrTil * cfrTil )
 {
     byte * startDirectory = ( byte* ) "namespaces" ;
     if ( ! GetState ( _Q_, OVT_IN_USEFUL_DIRECTORY ) ) startDirectory = ( byte* ) "/usr/local/lib/cfrTil64/namespaces" ;
-    _DataObject_New (NAMESPACE_VARIABLE, 0, ( byte* ) "_startDirectory_", NAMESPACE_VARIABLE, 0, 0, 0, ( int64 ) startDirectory, 0 ) ;
-    if ( ( _Q_->RestartCondition >= RESET_ALL ) ) 
+    _DataObject_New ( NAMESPACE_VARIABLE, 0, ( byte* ) "_startDirectory_", NAMESPACE_VARIABLE, 0, 0, 0, ( int64 ) startDirectory, 0 ) ;
+    if ( ( _Q_->RestartCondition >= RESET_ALL ) )
     {
         _Q_->StartIncludeTries = 0 ;
         _CfrTil_Init_SessionCore ( cfrTil, 1, 0 ) ;
@@ -105,7 +105,7 @@ _CfrTil_InitialAddWordToNamespace ( Word * word, byte * containingNamespaceName,
 void
 _CfrTil_CPrimitiveNewAdd ( const char * name, block b, uint64 ctype, uint64 ctype2, uint64 ltype, const char *nameSpace, const char * superNamespace )
 {
-    Word * word = _Word_New (( byte* ) name, CPRIMITIVE | ctype, ctype2, ltype, 1, 0, EXISTING ) ; //DICTIONARY ) ;
+    Word * word = _Word_New ( ( byte* ) name, CPRIMITIVE | ctype, ctype2, ltype, 1, 0, EXISTING ) ; //DICTIONARY ) ;
     _DObject_ValueDefinition_Init ( word, ( int64 ) b, BLOCK, 0, 0 ) ;
     _CfrTil_InitialAddWordToNamespace ( word, ( byte* ) nameSpace, ( byte* ) superNamespace ) ;
     if ( ctype & INFIXABLE ) word->WAttribute = WT_INFIXABLE ;
@@ -133,82 +133,36 @@ CfrTil_MachineCodePrimitive_AddWords ( CfrTil * cfrTil )
     int64 i, functionArg ;
     block * callHook ;
     Debugger * debugger = _Debugger_ ;
+#if 1  
     for ( i = 0 ; MachineCodePrimitives [ i ].ccp_Name ; i ++ )
     {
         MachineCodePrimitive p = MachineCodePrimitives [ i ] ;
         functionArg = - 1 ; // this is also flag in _DObject_ValueDefinition_Init
-
-        // initialize some values in MachineCodePrimitives that are variables and have to be calculated at run time
-#if 1        
-        if ( String_Equal ( p.ccp_Name, "getRsp" ) )
-        {
-            functionArg = - 1 ; //0 ; //( int64 ) debugger->DebugESP ;
-            callHook = & debugger->getRsp ;
-        }
-        else
-#endif            
-        if ( ( String_Equal ( p.ccp_Name, "restoreCpuState" ) ) && ( String_Equal ( p.NameSpace, "Debug" ) ) )
-        {
-            functionArg = ( int64 ) debugger->cs_Cpu ;
-            callHook = & debugger->RestoreCpuState ;
-        }
-        else if ( ( String_Equal ( p.ccp_Name, "saveCpuState" ) ) && ( String_Equal ( p.NameSpace, "Debug" ) ) )
-        {
-            functionArg = ( int64 ) debugger->cs_Cpu ;
-            callHook = & debugger->SaveCpuState ;
-        }
-        else if ( ( String_Equal ( p.ccp_Name, "restoreCpuState" ) ) && ( String_Equal ( p.NameSpace, "System" ) ) )
-        {
-            functionArg = ( int64 ) cfrTil->cs_Cpu ;
-            callHook = & cfrTil->RestoreCpuState ;
-        }
-        else if ( ( String_Equal ( p.ccp_Name, "saveCpuState" ) ) && ( String_Equal ( p.NameSpace, "System" ) ) )
-        {
-            functionArg = ( int64 ) cfrTil->cs_Cpu ;
-            //functionArg = cfrTil ;
-            callHook = & cfrTil->SaveCpuState ;
-        }
-        else if ( ( String_Equal ( p.ccp_Name, "saveCpu2State" ) ) && ( String_Equal ( p.NameSpace, "System" ) ) )
-        {
-            functionArg = ( int64 ) cfrTil->cs_Cpu2 ;
-            //functionArg = cfrTil ;
-            callHook = & cfrTil->SaveCpu2State ;
-        }
-        else if ( ( String_Equal ( p.ccp_Name, "restoreCpu2State" ) ) && ( String_Equal ( p.NameSpace, "System" ) ) )
-        {
-            functionArg = ( int64 ) cfrTil->cs_Cpu2 ;
-            //functionArg = cfrTil ;
-            callHook = & cfrTil->RestoreCpu2State ;
-        }
-        else if ( ( String_Equal ( p.ccp_Name, "restoreSelectedCpuState" ) ) && ( String_Equal ( p.NameSpace, "System" ) ) )
-        {
-            functionArg = ( int64 ) cfrTil->cs_Cpu ;
-            callHook = & cfrTil->RestoreSelectedCpuState ;
-        }
-        else if ( ( String_Equal ( p.ccp_Name, "saveSelectedCpuState" ) ) && ( String_Equal ( p.NameSpace, "System" ) ) )
-        {
-            functionArg = ( int64 ) cfrTil->cs_Cpu ;
-            callHook = & cfrTil->SaveSelectedCpuState ;
-        }
-        else if ( ( String_Equal ( p.ccp_Name, "callCurrentBlock" ) ) && ( String_Equal ( p.NameSpace, "System" ) ) )
-        {
-            callHook = & cfrTil->CallCurrentBlock ;
-        }
-        else
-        {
-            functionArg = - 1 ;
-            callHook = 0 ;
-        }
+        callHook = 0 ;
         _CfrTil_MachineCodePrimitive_NewAdd ( p.ccp_Name, p.ui64_CAttribute, callHook, p.Function, functionArg, p.NameSpace, p.SuperNamespace ) ;
     }
+#endif    
     // this form (below) can and should replace the above form for adding here
-    _CfrTil_MachineCodePrimitive_NewAdd ( "set_DataStackPointer_FromDspReg", CPRIMITIVE, & cfrTil->Set_DataStackPointer_FromDspReg, ( byte* ) Compile_Set_DataStackPointer_FromDspReg, -1, "System", "Root" ) ;
-    _CfrTil_MachineCodePrimitive_NewAdd ( "set_DspReg_FromDataStackPointer", CPRIMITIVE, & cfrTil->Set_DspReg_FromDataStackPointer, ( byte* ) Compile_Set_DspReg_FromDataStackPointer, -1, "System", "Root" ) ;
+    _CfrTil_MachineCodePrimitive_NewAdd ( "getRsp", CPRIMITIVE, & debugger->getRsp, ( byte* ) Compile_Debug_GetRSP, - 1, "System", "Root" ) ;
+
+    _CfrTil_MachineCodePrimitive_NewAdd ( "restoreCpuState", CPRIMITIVE, & debugger->RestoreCpuState, ( byte* ) Compile_CpuState_Restore, ( int64 ) debugger->cs_Cpu, "Debug", "Root" ) ;
+    _CfrTil_MachineCodePrimitive_NewAdd ( "saveCpuState", CPRIMITIVE, & debugger->SaveCpuState, ( byte* ) Compile_CpuState_Save, ( int64 ) debugger->cs_Cpu, "Debug", "Root" ) ;
+
+    _CfrTil_MachineCodePrimitive_NewAdd ( "restoreCpuState", CPRIMITIVE, & cfrTil->RestoreCpuState, ( byte* ) Compile_CpuState_Restore, ( int64 ) cfrTil->cs_Cpu, "System", "Root" ) ;
+    _CfrTil_MachineCodePrimitive_NewAdd ( "saveCpuState", CPRIMITIVE, & cfrTil->SaveCpuState, ( byte* ) Compile_CpuState_Save, ( int64 ) cfrTil->cs_Cpu, "System", "Root" ) ;
+    _CfrTil_MachineCodePrimitive_NewAdd ( "restoreCpu2State", CPRIMITIVE, & cfrTil->RestoreCpu2State, ( byte* ) Compile_CpuState_Restore, ( int64 ) cfrTil->cs_Cpu2, "System", "Root" ) ;
+    _CfrTil_MachineCodePrimitive_NewAdd ( "saveCpu2State", CPRIMITIVE, & cfrTil->SaveCpu2State, ( byte* ) Compile_CpuState_Save, ( int64 ) cfrTil->cs_Cpu2, "System", "Root" ) ;
+
+    _CfrTil_MachineCodePrimitive_NewAdd ( "restoreSelectedCpuState", CPRIMITIVE, & cfrTil->RestoreSelectedCpuState, ( byte* ) _Compile_CpuState_RestoreSelected, ( int64 ) cfrTil->cs_Cpu, "System", "Root" ) ;
+    _CfrTil_MachineCodePrimitive_NewAdd ( "saveSelectedCpuState", CPRIMITIVE, & cfrTil->SaveSelectedCpuState, ( byte* ) _Compile_CpuState_SaveSelected, ( int64 ) cfrTil->cs_Cpu, "System", "Root" ) ;
+    _CfrTil_MachineCodePrimitive_NewAdd ( "callCurrentBlock", CPRIMITIVE, & cfrTil->CallCurrentBlock, ( byte* ) Compile_Call_CurrentBlock, - 1, "System", "Root" ) ;
+    _CfrTil_MachineCodePrimitive_NewAdd ( "set_DataStackPointer_FromDspReg", CPRIMITIVE, & cfrTil->Set_DataStackPointer_FromDspReg, ( byte* ) Compile_Set_DataStackPointer_FromDspReg, - 1, "System", "Root" ) ;
+    _CfrTil_MachineCodePrimitive_NewAdd ( "set_DspReg_FromDataStackPointer", CPRIMITIVE, & cfrTil->Set_DspReg_FromDataStackPointer, ( byte* ) Compile_Set_DspReg_FromDataStackPointer, - 1, "System", "Root" ) ;
     //{ "popDspToR8AndCall", CPRIMITIVE, 0, ( byte* ) _Compile_PopDspToR8AndCall, - 1, "System", "Root" },
     //_CfrTil_MachineCodePrimitive_NewAdd ( "popDspToR8AndCall", CPRIMITIVE, & cfrTil->PopDspToR8AndCall, ( byte* ) Compile_PopDspToR8AndCall, -1, "System", "Root" ) ;
 #if 0 //RSP_ADJUST // x64 ABI   
-    _CfrTil_MachineCodePrimitive_NewAdd ( "callReg_TestRSP", CPRIMITIVE, & cfrTil->CallReg_TestRSP, ( byte* ) Compile_Call_ToAddressThruReg_TestAlignRSP, -1, "System", "Root" ) ;
-    _CfrTil_MachineCodePrimitive_NewAdd ( "callReg_AdjustRSP", CPRIMITIVE, & cfrTil->CallReg_AdjustRSP, ( byte* ) Compile_CallReg_AdjustRSP, -1, "System", "Root" ) ;
+    _CfrTil_MachineCodePrimitive_NewAdd ( "callReg_TestRSP", CPRIMITIVE, & cfrTil->CallReg_TestRSP, ( byte* ) Compile_Call_ToAddressThruReg_TestAlignRSP, - 1, "System", "Root" ) ;
+    _CfrTil_MachineCodePrimitive_NewAdd ( "callReg_AdjustRSP", CPRIMITIVE, & cfrTil->CallReg_AdjustRSP, ( byte* ) Compile_CallReg_AdjustRSP, - 1, "System", "Root" ) ;
 #endif    
     //_CfrTil_MachineCodePrimitive_NewAdd ( "adjustRSPAndCall", CPRIMITIVE, (block*)& cfrTil->adjustRSPAndCall, ( byte* ) Compile_AdjustRSPAndCall, -1, "System", "Root" ) ;
     //_CfrTil_MachineCodePrimitive_NewAdd ( "adjustRSP", CPRIMITIVE, (block*)& cfrTil->adjustRSP, ( byte* ) Compile_AdjustRSP, -1, "System", "Root" ) ;

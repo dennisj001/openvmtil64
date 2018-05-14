@@ -153,7 +153,7 @@
         </gdb_signals>
         <gdb_options>
           <DebugOptions>
-            <option name="debug_dir" value="/home/dennisj/openvmtil64.0.830.717/"/>
+            <option name="debug_dir" value="/home/dennisj/openvmtil64"/>
           </DebugOptions>
         </gdb_options>
         <gdb_buildfirst gdb_buildfirst_overriden="false" gdb_buildfirst_old="false"/>
@@ -187,10 +187,9 @@
       <runprofile version="9">
         <runcommandpicklist>
           <runcommandpicklistitem>"${OUTPUT_PATH}"</runcommandpicklistitem>
-          <runcommandpicklistitem>cfrtil64-gdb</runcommandpicklistitem>
         </runcommandpicklist>
-        <runcommand>cfrtil64-gdb</runcommand>
-        <rundir>/home/dennisj/openvmtil64.0.830.717/src/.</rundir>
+        <runcommand>"${OUTPUT_PATH}"</runcommand>
+        <rundir>.</rundir>
         <buildfirst>false</buildfirst>
         <terminal-type>0</terminal-type>
         <remove-instrumentation>0</remove-instrumentation>

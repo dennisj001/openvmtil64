@@ -260,6 +260,11 @@ _CheckOptimizeOperands ( Compiler * compiler, int64 maxOperands )
                             else _GetRmDispImm ( optInfo, optInfo_0_one, - 1 ) ;
                             optInfo->Optimize_Dest_RegOrMem = REG ;
                             optInfo->Optimize_Mod = REG ;
+#if NEW_CPU_PIPELINE_STATE                           
+                            optInfo->CPState.FirstArgReg = ACC ;
+                            optInfo->CPState.SecondArgReg = OREG ;
+                            optInfo->CPState.State = TWO_REG_ARGS ;
+#endif                            
                         }
                         return i ;
                     }
@@ -994,7 +999,11 @@ _CheckOptimizeOperands ( Compiler * compiler, int64 maxOperands )
                             //_Context_->CurrentlyRunningWord = optInfo_0_two ;
                             if ( ! ( optInfo_0_two->CAttribute & REGISTER_VARIABLE ) )
                             {
-                                if ( GetState ( _Context_, ADDRESS_OF_MODE ) ) _Compile_GetVarLitObj_LValue_To_Reg ( optInfo_0_two, ACC ) ;
+                                if ( GetState ( _Context_, ADDRESS_OF_MODE ) )
+                                {
+                                    _Compile_GetVarLitObj_LValue_To_Reg ( optInfo_0_two, ACC ) ;
+                                    //SetState ( _Context_, ADDRESS_OF_MODE, false ) ;
+                                }
                                 else _Compile_GetVarLitObj_RValue_To_Reg ( optInfo_0_two, ACC ) ;
                                 if ( optInfo_0_one->CAttribute & REGISTER_VARIABLE )
                                 {

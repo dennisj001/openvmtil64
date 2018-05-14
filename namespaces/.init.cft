@@ -367,10 +367,10 @@ stringMacrosOn
 Root 
 'doX64 1 const
 'doScript 1 const
-//'doPow 1 const
 '_doDemo 0 const    
-dbgOff
-dbgOn
+//dbgOff
+//dbgOn 
+dbgOnVar 1 = 
 #if Is_DebugOn 
 System 
 testCfrTil // dT0 //demo //dT0
@@ -381,4 +381,5 @@ stringMacrosOff
 #else
 // you can trim this file to your needs and put your personal init code here maybe
 #endif
+//s: hi ( a b | c ) c a @ b @ + = printf ("\nshould read 3 : %d", c ) ;s 1 2 d: hi //pause
 2 + 7  assertStkChk // stack checking

@@ -28,8 +28,7 @@ _Interpreter_DoWord_Default ( Interpreter * interp, Word * word, int64 scratchPa
     word->W_SC_ScratchPadIndex = scratchPadIndex ? scratchPadIndex : _CfrTil_->SC_ScratchPadIndex ; ;
     interp->w_Word = word ;
     Word_Eval ( word ) ;
-    if ( IS_MORPHISM_TYPE ( word ) )
-        SetState ( _Context_, ADDRESS_OF_MODE, false ) ;
+    if ( IS_MORPHISM_TYPE ( word ) ) SetState ( _Context_, ADDRESS_OF_MODE, false ) ;
     return word ; //let callee know about actual word evaled here after Compiler_CopyDuplicatesAndPush
 }
 
