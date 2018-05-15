@@ -540,7 +540,7 @@ Tree_Map_OneNamespace ( Word * word, MapFunction_1 mf, int64 one )
 }
 
 Word *
-Tree_Map_OneNamespace2 ( Namespace * ns, MapFunction_2 mf2, int64 one, int64 two )
+Tree_Map_OneNamespace_TwoArgs ( Namespace * ns, MapFunction_2 mf2, int64 one, int64 two )
 {
     Word * word, *nextWord ;
     for ( word = (Word *) dllist_First ( ( dllist* ) ns->W_List ) ; word ; word = nextWord )
@@ -552,7 +552,7 @@ Tree_Map_OneNamespace2 ( Namespace * ns, MapFunction_2 mf2, int64 one, int64 two
 }
 
 Word *
-Tree_Map_State_Flag_OneArg_AnyNamespaceWithState ( uint64 state, MapFunction_1 mf, int64 one )
+Tree_Map_State_OneArg ( uint64 state, MapFunction_1 mf, int64 one )
 {
     if ( _CfrTil_->Namespaces )
     {
@@ -576,44 +576,75 @@ Tree_Map_State_Flag_OneArg_AnyNamespaceWithState ( uint64 state, MapFunction_1 m
     return 0 ;
 }
 
+#if 1
 Word *
-TC_Tree_Map_3 ( TabCompletionInfo * tci, MapFunction mf, Word * wordi )
+TC_Tree_Map ( TabCompletionInfo * tci, MapFunction mf, Word * wordi )
 {
-    Word *nextWord, *ns, *rword = 0 ;
+    Word *word = wordi, *nextWord, *ns, *nextNs, *rword = 0 ; //return word
 start:
-    if ( wordi ) //initial word
+    if ( word ) 
     {
-        ns = wordi->S_ContainingNamespace ;
+        ns = word->S_ContainingNamespace ;
+        nextNs = ( Word* ) dlnode_Next ( ( node* ) ns ) ;
         goto checkWord ;
     }
-    for ( ns = ( Word * ) dllist_First ( _CfrTil_->Namespaces->W_List ) ; ns ; ns = ( Word* ) dlnode_Next ( ( node* ) ns ) )
+    for ( ns = ( Word * ) dllist_First ( _CfrTil_->Namespaces->W_List ) ; ns ; ns = nextNs )
     {
-checkList:
-        for ( wordi = ( Word * ) dllist_First ( ns->S_SymbolList ) ; wordi ; wordi = nextWord )
+        nextNs = ( Word* ) dlnode_Next ( ( node* ) ns ) ;
+        for ( word = ( Word * ) dllist_First ( ns->S_SymbolList ) ; word ; word = nextWord )
         {
 checkWord:
-            nextWord = ( Word* ) dlnode_Next ( ( node* ) wordi ) ;
-            if ( kbhit ( ) ) break ;
-            if ( mf ( ( Symbol* ) wordi ) )
+            nextWord = ( Word* ) dlnode_Next ( ( node* ) word ) ;
+            //if ( kbhit ( ) ) break ;
+            if ( mf ( ( Symbol* ) word ) )
             {
                 if ( nextWord )
                 {
                     rword = nextWord ;
-                    goto doReturn ;
                 }
+                else if ( nextNs ) rword = (Word*) dllist_First ( nextNs->S_SymbolList ) ;
+                else rword = 0 ;
+                goto doReturn ;
             }
         }
     }
 doReturn:
     if ( ! rword )
     {
-        if ( ++ tci->WordWrapCount > 8 ) // 5 : there are five cases in the switch in _TabCompletion_Compare
+        if ( ++ tci->WordWrapCount > 6 ) // 5 : there are five cases in the switch in _TabCompletion_Compare
         {
+            tci->FoundMarker = rand ( ) ;
             tci->WordWrapCount = 0 ;
+            //word = 0 ; 
         }
-        wordi = 0 ; //tci->OriginalRunWord ;
+        word = 0 ; //tci->OriginalRunWord ;
         goto start ;
     }
     return rword ;
 }
-
+#else
+Word *
+TC_Tree_Map ( TabCompletionInfo * tci, MapFunction mf, Word * one )
+{
+    if ( _CfrTil_->Namespaces )
+    {
+        Word * word, * word2, *nextWord ;
+        _CfrTil_->FindWordCount = 1 ;
+        if ( mf ( ( Symbol* ) one ) ) return _CfrTil_->Namespaces ;
+        for ( word = ( Word * ) dllist_First ( ( dllist* ) _CfrTil_->Namespaces->W_List ) ; word ; word = nextWord )
+        {
+            nextWord = ( Word* ) dlnode_Next ( ( node* ) word ) ;
+            _CfrTil_->FindWordCount ++ ;
+            if ( mf ( ( Symbol* ) word ) ) return word ;
+            else if ( Is_NamespaceType ( word ) )
+            {
+                //if ( ( word->State & state ) )
+                {
+                    if ( ( word2 = Tree_Map_OneNamespace ( ( Word* ) dllist_First ( ( dllist* ) word->W_List ), mf, one ) ) ) return word2 ;
+                }
+            }
+        }
+    }
+    return 0 ;
+}
+#endif

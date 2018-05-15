@@ -14,14 +14,14 @@ DLList_FindName_InOneNamespace ( Namespace * ns, byte * name )
 {
     Symbol * s = ( Symbol* ) Tree_Map_OneNamespace ( ( Word* ) dllist_First ( ( dllist* ) ns->W_List ),
         ( MapFunction_1 ) _Symbol_CompareName, ( int64 ) name ) ;
-    if ( ! s ) s = ( Symbol* ) Tree_Map_OneNamespace2 ( _CfrTil_->Namespaces, ( MapFunction_2 ) Symbol_CompareName2, ( int64 ) name, ( int64 ) ns ) ;
+    if ( ! s ) s = ( Symbol* ) Tree_Map_OneNamespace_TwoArgs ( _CfrTil_->Namespaces, ( MapFunction_2 ) Symbol_CompareName2, ( int64 ) name, ( int64 ) ns ) ;
     return s ;
 }
 
 Word *
 Finder_Word_Find ( Finder * finder, uint64 state, byte * name )
 {
-    return finder->FoundWord = Tree_Map_State_Flag_OneArg_AnyNamespaceWithState ( state, ( MapFunction_1 ) Symbol_CompareName, ( int64 ) name ) ;
+    return finder->FoundWord = Tree_Map_State_OneArg ( state, ( MapFunction_1 ) Symbol_CompareName, ( int64 ) name ) ;
 }
 
 Symbol *
@@ -61,7 +61,7 @@ Finder_FindWordFromAddress_InOneNamespace ( Finder * finder, Namespace * ns, byt
 Word *
 Finder_FindWordFromAddress_AnyNamespace ( Finder * finder, byte * address )
 {
-    finder->FoundWord = Tree_Map_State_Flag_OneArg_AnyNamespaceWithState ( USING | NOT_USING,
+    finder->FoundWord = Tree_Map_State_OneArg ( USING | NOT_USING,
         ( MapFunction_1 ) _Finder_CompareDefinitionAddress, ( int64 ) address ) ;
     CfrTil_WordAccounting ( "Finder_Address_FindAny" ) ;
     return finder->FoundWord ;
@@ -70,7 +70,7 @@ Finder_FindWordFromAddress_AnyNamespace ( Finder * finder, byte * address )
 Word *
 Finder_FindWordFromAddress_AnyNamespace_NoAlias ( Finder * finder, byte * address )
 {
-    return finder->FoundWord = Tree_Map_State_Flag_OneArg_AnyNamespaceWithState ( USING | NOT_USING,
+    return finder->FoundWord = Tree_Map_State_OneArg ( USING | NOT_USING,
         ( MapFunction_1 ) _Finder_CompareDefinitionAddress_NoAlias, ( int64 ) address ) ;
 }
 

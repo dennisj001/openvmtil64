@@ -6,8 +6,7 @@ RL_TabCompletion_Run ( ReadLiner * rl, Word * rword )
 {
     TabCompletionInfo * tci = rl->TabCompletionInfo0 ;
     tci->StartFlag = 0 ;
-    //Word * nextWord = TC_Tree_Map_2 ( tci, _CfrTil_->Namespaces->W_List, ( MapFunction ) _TabCompletion_Compare, rword ) ; // new
-    Word * nextWord = TC_Tree_Map_3 ( tci, ( MapFunction ) _TabCompletion_Compare, rword ) ; // new
+    Word * nextWord = TC_Tree_Map ( tci, ( MapFunction ) _TabCompletion_Compare, rword ) ; // new
     tci->NextWord = nextWord ; // wrap around
 }
 
@@ -86,6 +85,8 @@ _TabCompletion_Compare ( Word * word )
             }
             else
             {
+#if 1               
+                //tci->WordWrapCount = 8 ;
                 switch ( tci->WordWrapCount )
                 {
                         // this arrangement allows us to see some word matches before others
@@ -117,7 +118,7 @@ _TabCompletion_Compare ( Word * word )
                         }
                         break ;
                     }
-                    //case 3 : case 4:
+                        //case 3 : case 4:
 #endif                    
                     case 4:
                     {
@@ -138,6 +139,7 @@ _TabCompletion_Compare ( Word * word )
                         break ;
                     }
                     case 6: default:
+#endif                        
                     {
                         byte bufw [128], bufo[128] ;
                         strToLower ( bufw, twn ) ;
@@ -147,7 +149,7 @@ _TabCompletion_Compare ( Word * word )
                         {
                             gotOne = true ;
                         }
-                        break ;
+                        //break ;
                     }
                 }
             }
@@ -155,15 +157,16 @@ _TabCompletion_Compare ( Word * word )
             {
                 if ( word->W_FoundMarker == tci->FoundMarker )
                 {
+#if 0                   
                     tci->FoundMarker = rand ( ) ;
                     tci->FoundWrapCount ++ ;
-                        tci->FoundCount = 0 ;
-#if 1                    
-                    if ( ++ tci->WordWrapCount > 8 ) // 5 : there are five cases in the switch in _TabCompletion_Compare
+                    tci->FoundCount = 0 ;
+                    if ( ++ tci->WordWrapCount > 6 ) // 5 : there are five cases in the switch in _TabCompletion_Compare
                     {
                         tci->WordWrapCount = 0 ;
                     }
 #endif                    
+                    return false ;
                 }
                 word->W_FoundMarker = tci->FoundMarker ;
                 fqn = ReadLiner_GenerateFullNamespaceQualifiedName ( rl, tw ) ;
@@ -301,6 +304,7 @@ RL_TabCompletionInfo_Init ( ReadLiner * rl )
     tci->WordWrapCount = 0 ;
     tci->WordCount = 0 ;
     tci->StartFlag = 0 ;
+    srand ( time (0) ) ;
     tci->FoundMarker = rand ( ) ;
     tci->FoundWrapCount = 0 ;
     _Context_->NlsWord = 0 ;
