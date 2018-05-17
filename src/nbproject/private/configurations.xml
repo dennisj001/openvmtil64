@@ -9,6 +9,8 @@
           <in>bits.c</in>
           <in>blocks.c</in>
           <in>combinators.c</in>
+          <in>compile.c</in>
+          <in>compiler.c</in>
           <in>cpu.c</in>
           <in>locals.c</in>
           <in>logic.c</in>
@@ -28,8 +30,6 @@
           <in>array.c</in>
           <in>charSet.c</in>
           <in>classes.c</in>
-          <in>compile.c</in>
-          <in>compiler.c</in>
           <in>conditionals.c</in>
           <in>cstack.c</in>
           <in>dataObjectNew.c</in>

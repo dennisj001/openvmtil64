@@ -232,7 +232,7 @@ void _CfrTil_EndBlock1(BlockInfo *bi);
 byte *_CfrTil_EndBlock2(BlockInfo *bi);
 byte *_CfrTil_EndBlock(void);
 void CfrTil_EndBlock(void);
-/* basis/core/compile.c */
+/* basis/compiler/compile.c */
 void _Compile_C_Call_1_Arg(byte *function, int64 arg);
 void _CompileN(byte *data, int64 size);
 void _CompileFromUptoRET(byte *data);
@@ -978,7 +978,7 @@ void _NamedByteArray_Init(NamedByteArray *nba, byte *name, int64 size, int64 aty
 void NamedByteArray_Delete(NamedByteArray *nba);
 NamedByteArray *NamedByteArray_New(byte *name, int64 size, int64 atype);
 int64 NamedByteArray_CheckAddress(NamedByteArray *nba, byte *address);
-/* basis/core/compiler.c */
+/* basis/compiler/compiler.c */
 Word *_CopyDuplicateWord(Word *word0);
 Word *CopyDuplicateWord(dlnode *anode, Word *word0);
 Word *_Compiler_CopyDuplicatesAndPush(Compiler *compiler, Word *word0);

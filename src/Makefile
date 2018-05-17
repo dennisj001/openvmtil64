@@ -2,14 +2,14 @@
 SOURCES = basis/compiler/machineCode.c basis/compiler/_compile.c basis/compiler/memory.c\
 	basis/compiler/combinators.c basis/compiler/math.c basis/compiler/cpu.c \
 	basis/compiler/stack.c basis/compiler/logic.c basis/core/dataObjectRun.c\
-	basis/core/conditionals.c basis/compiler/blocks.c basis/core/compile.c basis/core/_system.c\
+	basis/core/conditionals.c basis/compiler/blocks.c basis/compiler/compile.c basis/core/_system.c\
 	basis/compiler/optimize.c basis/compiler/bits.c basis/compiler/udis.c basis/compiler/arrays.c \
 	basis/core/io.c basis/core/symbol.c basis/repl.c basis/core/syntax.c basis/core/dataObjectNew.c\
         basis/cfrtil64.c basis/core/parse.c basis/core/memSpace.c basis/init.c basis/system.c basis/core/charSet.c\
 	basis/core/dllist.c basis/core/interpret.c basis/core/lexer.c basis/core/cstack.c basis/core/classes.c basis/debugOutput.c\
 	basis/core/namespace.c basis/history.c basis/core/readline.c basis/core/dataStack.c basis/context.c\
 	basis/core/word.c basis/core/readTable.c basis/bigNum.c basis/core/_readline.c basis/core/array.c\
-	basis/core/compiler.c basis/core/dllnodes.c basis/core/finder.c basis/interpreters.c\
+	basis/compiler/compiler.c basis/core/dllnodes.c basis/core/finder.c basis/interpreters.c\
 	basis/tabCompletion.c basis/colors.c basis/sourceCode.c basis/debugStepping.c\
 	basis/core/string.c basis/openVmTil.c basis/core/dobject.c basis/core/preprocessor.c\
 	basis/attribute.c basis/lists.c basis/debugDisassembly.c\
@@ -164,7 +164,7 @@ optimize :
 	make clean
 	make
 	-rm bin/cfrtil64o*
-	mv cfrtil64 cfrtil64* bin
+	mv cfrtil64 cfrtil64* ../bin
 
 editorClean :
 	rm *.*~ basis/*.*~ basis/compiler/*.*~ primitives/*.*~ include/*.*~

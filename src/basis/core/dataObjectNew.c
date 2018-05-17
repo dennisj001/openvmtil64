@@ -227,12 +227,12 @@ _CfrTil_Label ( byte * lname )
     Namespace * ns = Namespace_FindOrNew_SetUsing ( ( byte* ) "__labels__", _CfrTil_->Namespaces, 1 ) ;
     if ( _Finder_FindWord_InOneNamespace ( _Finder_, ns, lname ) )
     {
-        byte bufferData [ 32 ], *buffer = ( byte* ) bufferData ;
-        sprintf ( ( char* ) buffer, "%s%d", lname, rand ( ) ) ;
-        lname = buffer ;
+        byte bufferData [ 32 ] ;
+        sprintf ( ( char* ) bufferData, "%s%d", lname, rand ( ) ) ;
+        lname = bufferData ;
     }
-    _DObject_New ( lname, ( int64 ) gotoInfo, CONSTANT | IMMEDIATE, 0, 0, CONSTANT, ( byte* ) _DataObject_Run, 0, 0, ns, DICTIONARY ) ;
-    return lname ;
+    Word * word = _DObject_New ( lname, ( int64 ) gotoInfo, CONSTANT | IMMEDIATE, 0, 0, CONSTANT, ( byte* ) _DataObject_Run, 0, 0, ns, DICTIONARY ) ;
+    return word->Name ;
 }
 
 Word *
