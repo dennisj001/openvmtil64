@@ -1334,7 +1334,8 @@ CheckOptimize ( Compiler * compiler, int64 maxOperands )
             Set_SCA ( 0 ) ;
         }
         //else {_DEBUG_SHOW ( _Context_->CurrentlyRunningWord, 1 ) ; }
-#endif        
+#endif 
+#if 0        
         if ( ( rtrn & OPTIMIZE_RESET ) )
         {
             if ( ( ! Compiling ) && ( ! IsSourceCodeOn ) )
@@ -1345,6 +1346,7 @@ CheckOptimize ( Compiler * compiler, int64 maxOperands )
             }
             //Set_SCA ( 0 ) ;
         }
+#endif        
         d0 ( if ( Is_DebugModeOn ) Compiler_Show_WordList ( ( byte* ) "\nCheckOptimize : after optimize :" ) ) ;
         SetState ( _CfrTil_, IN_OPTIMIZER, false ) ;
         SetState ( _Context_, ADDRESS_OF_MODE, false ) ;

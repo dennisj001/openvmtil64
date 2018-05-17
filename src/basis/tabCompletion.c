@@ -304,7 +304,7 @@ RL_TabCompletionInfo_Init ( ReadLiner * rl )
     tci->WordWrapCount = 0 ;
     tci->WordCount = 0 ;
     tci->StartFlag = 0 ;
-    srand ( time (0) ) ;
+    //srand ( time (0) ) ;
     tci->FoundMarker = rand ( ) ;
     tci->FoundWrapCount = 0 ;
     _Context_->NlsWord = 0 ;

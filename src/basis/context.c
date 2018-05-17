@@ -28,7 +28,7 @@ Context_Location ( )
 #if 0
 
 Context *
-_Context_Allocate ( CfrTil * cfrTil )
+_Context_Allocate ( )
 {
     Context * cntx = ( Context* ) OVT_CheckRecyclableAllocate ( _Q_->MemorySpace0->RecycledContextList, sizeof ( Context ), 1 ) ;
     if ( ! cntx ) cntx = ( Context* ) Mem_Allocate ( sizeof ( Context ), CONTEXT ) ;

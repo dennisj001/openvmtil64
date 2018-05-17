@@ -534,7 +534,8 @@ _OVT_ShowMemoryAllocated ( OpenVmTil * ovt )
     }
     else {_Printf ( ( byte*) "\nTotal Memory Allocated                           = %9d"
                              "\nTotal Memory leaks                               = %9d", ovt->TotalNbaAccountedMemAllocated, leak ) ; }
-    _Printf ( ( byte* ) "\nRecycledWordCount : %d", _Q_->MemorySpace0->RecycledWordCount ) ;
+    int64 wordSize = (sizeof ( Word ) + sizeof ( WordData )) ;
+    _Printf ( ( byte* )      "\nRecycledWordCount = %d x %d bytes :   Recycled = %9d", _Q_->MemorySpace0->RecycledWordCount, wordSize, _Q_->MemorySpace0->RecycledWordCount * wordSize) ;
     Buffer_PrintBuffers ( ) ;
 }
 
@@ -543,8 +544,14 @@ OVT_CheckRecyclableAllocate ( dllist * list, int64 size, int8 checkInUseFlag )
 {
     DLNode * node = 0 ;
     if ( _Q_ && _Q_->MemorySpace0 ) node = ( DLNode* ) dllist_First ( ( dllist* ) list ) ;
-    if ( node && ( checkInUseFlag ? ( node->n_Size == size ) && ( node->n_InUseFlag == N_FREE ) : 0 ) )
+    if ( node ) 
     {
+#if 0 // not needed for now because we are only recycling and checking for words        
+        if ( checkInUseFlag ) 
+        {
+            if ( ( node->n_Size != size ) || ( node->n_InUseFlag != N_FREE ) ) return 0 ;
+        }
+#endif        
         dlnode_Remove ( ( dlnode* ) node ) ; // necessary else we destroy the list!
         Mem_Clear ( ( byte* ) node, size ) ;
         if ( checkInUseFlag ) node->n_InUseFlag = N_IN_USE ;
@@ -557,7 +564,10 @@ void
 Word_Recycle ( Word * w )
 {
     d0 ( IsIt_C_LeftParen ( w ) ) ;
-    if ( w ) dllist_AddNodeToHead ( _Q_->MemorySpace0->RecycledWordList, ( dlnode* ) w ) ;
+    if ( w ) 
+    {
+        dllist_AddNodeToHead ( _Q_->MemorySpace0->RecycledWordList, ( dlnode* ) w ) ;
+    }
 }
 
 void
