@@ -231,7 +231,7 @@ _CheckOptimizeOperands ( Compiler * compiler, int64 maxOperands )
             int64 mask = ( 0xf ) << ( i * O_BITS ) ;
             if ( state )
             {
-                state &= ~ mask ;
+                state &= ~ mask ; 
                 switch ( state )
                     // these cases of bitwised ORed values represent the "optimize window" ; the right most ORed value is top of word stack = current word
                     // the leftmost ORed value is fartherest down in the stack, etc.

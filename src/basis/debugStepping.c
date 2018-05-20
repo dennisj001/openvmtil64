@@ -433,7 +433,7 @@ Debugger_SetupReturnStackCopy ( Debugger * debugger, int64 showFlag ) // restore
     }
 #endif    
 
-    if ( showFlag ) Compile_Call ( ( byte* ) _Debugger_CpuState_Show ) ; // also dis insn
+    if ( showFlag ) Compile_Call_TestRSP ( ( byte* ) _Debugger_CpuState_Show ) ; // also dis insn
 }
 
 void
@@ -444,7 +444,7 @@ _Compile_Restore_Debugger_CpuState ( Debugger * debugger, int64 showFlag ) // re
     Debugger_SetupReturnStackCopy ( debugger, showFlag ) ; // restore the running cfrTil cpu state
     _Compile_CpuState_Restore ( debugger->cs_Cpu, 1 ) ;
 
-    if ( showFlag ) Compile_Call ( ( byte* ) _Debugger_CpuState_Show ) ; // also dis insn
+    if ( showFlag ) Compile_Call_TestRSP ( ( byte* ) _Debugger_CpuState_Show ) ; // also dis insn
 }
 
 void
@@ -452,7 +452,7 @@ _Compile_Restore_C_CpuState ( CfrTil * cfrtil, int64 showFlag )
 {
     _Compile_CpuState_Restore ( cfrtil->cs_Cpu, 1 ) ;
 
-    if ( showFlag ) Compile_Call ( ( byte* ) CfrTil_CpuState_Show ) ;
+    if ( showFlag ) Compile_Call_TestRSP ( ( byte* ) CfrTil_CpuState_Show ) ;
 }
 
 // restore the 'internal running cfrTil' cpu state which was saved after the last instruction : debugger->cs_CpuState is the 'internal running cfrTil' cpu state
@@ -462,17 +462,17 @@ _Compile_Save_C_CpuState ( CfrTil * cfrtil, int64 showFlag )
 {
     Compile_CpuState_Save ( cfrtil->cs_Cpu ) ;
 
-    if ( showFlag ) Compile_Call ( ( byte* ) _CfrTil_CpuState_CheckSave ) ;
+    if ( showFlag ) Compile_Call_TestRSP ( ( byte* ) _CfrTil_CpuState_CheckSave ) ;
 }
 
 void
 _Compile_Save_Debugger_CpuState ( Debugger * debugger, int64 showFlag )
 {
     Compile_CpuState_Save ( debugger->cs_Cpu ) ;
-    if ( showFlag ) Compile_Call ( ( byte* ) CfrTil_Debugger_UdisOneInsn ) ;
+    if ( showFlag ) Compile_Call_TestRSP ( ( byte* ) CfrTil_Debugger_UdisOneInsn ) ;
     if ( ( _Q_->Verbosity > 3 ) && ( debugger->cs_Cpu->Rsp != debugger->LastRsp ) ) Debugger_PrintReturnStackWindow ( ) ;
 
-    if ( showFlag ) Compile_Call ( ( byte* ) CfrTil_Debugger_CheckSaveCpuStateShow ) ;
+    if ( showFlag ) Compile_Call_TestRSP ( ( byte* ) CfrTil_Debugger_CheckSaveCpuStateShow ) ;
 }
 
 void

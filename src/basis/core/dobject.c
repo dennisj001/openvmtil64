@@ -103,7 +103,7 @@ _DObject_ValueDefinition_Init ( Word * word, uint64 value, uint64 funcType, byte
         word->CodeStart = Here ;
         word->Definition = ( block ) Here ;
         if ( arg ) _DObject_C_StartupCompiledWords_DefInit ( function, arg ) ;
-        else Compile_Call ( ( byte* ) DataObject_Run ) ;
+        else Compile_Call_TestRSP ( ( byte* ) DataObject_Run ) ;
         _Compile_Return ( ) ;
         d0 ( _Debugger_Disassemble ( _Debugger_, ( byte* ) word->Definition, 32, 1 ) ) ;
         word->S_CodeSize = Here - word->CodeStart ; // for use by inline

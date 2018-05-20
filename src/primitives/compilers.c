@@ -24,7 +24,7 @@ CfrTil_Rsp ( )
 void
 CompileCall ( )
 {
-    Compile_Call ( ( byte* ) DataStack_Pop ( ) ) ;
+    Compile_Call_TestRSP ( ( byte* ) DataStack_Pop ( ) ) ;
 }
 
 void

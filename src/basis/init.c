@@ -161,7 +161,7 @@ CfrTil_MachineCodePrimitive_AddWords ( CfrTil * cfrTil )
     //{ "popDspToR8AndCall", CPRIMITIVE, 0, ( byte* ) _Compile_PopDspToR8AndCall, - 1, "System", "Root" },
     //_CfrTil_MachineCodePrimitive_NewAdd ( "popDspToR8AndCall", CPRIMITIVE, & cfrTil->PopDspToR8AndCall, ( byte* ) Compile_PopDspToR8AndCall, -1, "System", "Root" ) ;
 #if 0 //RSP_ADJUST // x64 ABI   
-    _CfrTil_MachineCodePrimitive_NewAdd ( "callReg_TestRSP", CPRIMITIVE, & cfrTil->CallReg_TestRSP, ( byte* ) Compile_Call_ToAddressThruReg_TestAlignRSP, - 1, "System", "Root" ) ;
+    _CfrTil_MachineCodePrimitive_NewAdd ( "callReg_TestRSP", CPRIMITIVE, & cfrTil->CallReg_TestRSP, ( byte* ) _Compile_Call_ToAddressThruReg_TestAlignRSP, - 1, "System", "Root" ) ;
     _CfrTil_MachineCodePrimitive_NewAdd ( "callReg_AdjustRSP", CPRIMITIVE, & cfrTil->CallReg_AdjustRSP, ( byte* ) Compile_CallReg_AdjustRSP, - 1, "System", "Root" ) ;
 #endif    
     //_CfrTil_MachineCodePrimitive_NewAdd ( "adjustRSPAndCall", CPRIMITIVE, (block*)& cfrTil->adjustRSPAndCall, ( byte* ) Compile_AdjustRSPAndCall, -1, "System", "Root" ) ;

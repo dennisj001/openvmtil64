@@ -37,7 +37,7 @@ _Compiler_AddLocalFrame ( Compiler * compiler )
     _Compile_LEA ( FP, DSP, 0, LocalVarIndex_Disp ( 1 ) ) ; // set new fp
     Compile_ADDI ( REG, DSP, 0, ( compiler->LocalsFrameSize + 1 ) * CELL, INT32_SIZE ) ; // 1 : fp - add stack frame -- this value is going to be reset 
     compiler->FrameSizeCellOffset = ( int64* ) ( Here - INT32_SIZE ) ; // in case we have to add to the framesize with nested locals
-    d0 ( if ( IsSourceCodeOn ) Compile_Call ( ( byte* ) CfrTil_Debugger_Locals_Show ) ) ;
+    d0 ( if ( IsSourceCodeOn ) Compile_Call_TestRSP ( ( byte* ) CfrTil_Debugger_Locals_Show ) ) ;
 }
 
 void
@@ -93,33 +93,6 @@ _Compiler_RemoveLocalFrame ( Compiler * compiler )
         Compile_Move_ACC_To_TOS ( DSP ) ;
     }
 }
-
-void
-_Compile_RspReg_Restore ( )
-{
-#if 1    
-    _Compile_Move_Rm_To_Reg ( RSP, R15, 4 ) ; // 4 : placeholder
-    _Context_->Compiler0->RspRestoreOffset = Here - 1 ;
-#else    
-    _Compile_Stack_PopToReg ( DSP, RSP ) ;
-#endif    
-}
-
-void
-_Compile_RspReg_Save ( )
-{
-#if 1    
-    _Compile_Move_Reg_To_Rm ( DSP, RSP, 4 ) ; // 4 : placeholder
-    _Context_->Compiler0->RspSaveOffset = Here - 1 ; // only takes one byte for _Compile_Move_Reg_To_Rm ( ESI, 4, ESP )
-    // TO DO : i think this (below) is what it should be but some adjustments need to be made to make it work 
-    //byte * here = Here ;
-    //_Compile_Stack_Push_Reg ( DSP, ESP ) ;
-    //compiler->RspSaveOffset = here ; // only takes one byte for _Compile_Move_Reg_To_Rm ( ESI, 4, ESP )
-#else    
-    _Compile_Stack_PushReg ( DSP, RSP ) ;
-#endif    
-}
-
 // rvalue
 
 void

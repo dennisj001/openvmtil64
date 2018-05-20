@@ -74,7 +74,7 @@ CfrTil_Switch ( )
         // call SwitchAccessFunction 
         //_Compile_PushLiteral ( ( int64 ) _Context_->Compiler0->CurrentSwitchList ) ;
         _Do_Literal ( ( int64 ) _Context_->Compiler0->CurrentSwitchList ) ;
-        Compile_Call ( ( byte* ) SwitchAccessFunction ) ;
+        Compile_Call_TestRSP ( ( byte* ) SwitchAccessFunction ) ;
     }
     else
     {

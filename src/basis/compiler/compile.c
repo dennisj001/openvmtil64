@@ -7,7 +7,7 @@ _Compile_C_Call_1_Arg ( byte* function, int64 arg )
     //_Compile_RspReg_Push ( arg ) ;
     _Compile_PushReg ( RDI ) ;
     _Compile_MoveImm_To_Reg ( RDI, arg, CELL ) ;
-    _Compile_Call ( function ) ;
+    Compile_Call ( function ) ;
     _Compile_PopToReg ( RDI ) ;
     //_Compile_RspReg_Drop ( ) ;
 }
@@ -191,3 +191,30 @@ CfrTil_RemoveGotoPoints ( int64 key ) // compile time
     return status ;
 }
 
+#if 0
+void
+_Compile_RspReg_Restore ( )
+{
+#if 1    
+    _Compile_Move_Rm_To_Reg ( RSP, R15, 4 ) ; // 4 : placeholder
+    _Context_->Compiler0->RspRestoreOffset = Here - 1 ;
+#else    
+    _Compile_Stack_PopToReg ( DSP, RSP ) ;
+#endif    
+}
+
+void
+_Compile_RspReg_Save ( )
+{
+#if 1    
+    _Compile_Move_Reg_To_Rm ( DSP, RSP, 4 ) ; // 4 : placeholder
+    _Context_->Compiler0->RspSaveOffset = Here - 1 ; // only takes one byte for _Compile_Move_Reg_To_Rm ( ESI, 4, ESP )
+    // TO DO : i think this (below) is what it should be but some adjustments need to be made to make it work 
+    //byte * here = Here ;
+    //_Compile_Stack_Push_Reg ( DSP, ESP ) ;
+    //compiler->RspSaveOffset = here ; // only takes one byte for _Compile_Move_Reg_To_Rm ( ESI, 4, ESP )
+#else    
+    _Compile_Stack_PushReg ( DSP, RSP ) ;
+#endif    
+}
+#endif

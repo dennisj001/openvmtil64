@@ -682,13 +682,18 @@ Calculate_Address_FromOffset_ForCallOrJump ( byte * address )
         offset = * ( ( int32 * ) ( address + 2 ) ) ;
         iaddress = address + offset + 2 + INT32_SIZE ;
     }
-    else if ( ( ( * ( uint16* ) address ) == 0xff49 ) && ( *( address + 2 ) == 0xd1 ) ) // call r9
+    else if ( ( ( * ( uint16* ) address ) == 0xff49 ) && (( *( address + 2 ) == 0xd1 ) || ( *( address + 2 ) == 0xd0 ))) // call r8/r9
     {
-        iaddress = ( byte* ) ( * ( ( uint64* ) ( address - CELL ) ) ) ; // 3 : sizeof x64 call insn 
+        if ( ( ( * ( uint16* ) (address - 25) ) == 0xb849 ) ) iaddress = ( byte* ) ( * ( ( uint64* ) ( address - 23) ) ) ; //mov r8, 0xxx in Compile_Call_TestRSP  
+        else if ( ( ( * ( uint16* ) (address - 37) ) == 0xb849 ) ) iaddress = ( byte* ) ( * ( ( uint64* ) ( address - 35) ) ) ; //mov r8, 0xxx in Compile_Call_TestRSP
+        //else 
+        else iaddress = ( byte* ) ( * ( ( uint64* ) ( address - CELL ) ) ) ;  
     }
     else if ( ( ( * ( uint16* ) address ) == 0xff48 ) && ( *( address + 2 ) == 0xd0 ) ) // call rax
     {
-        iaddress = ( byte* ) ( * ( ( uint64* ) ( address - CELL ) ) ) ; // 3 : sizeof x64 call insn 
+        //if ( ( ( * ( uint32* ) (address - 4) ) == 0x4883ec08 ) ) iaddress = ( byte* ) ( * ( ( uint64* ) ( address - (CELL + 4)) ) ) ;//sub rsp, 0x8    
+        //else 
+        iaddress = ( byte* ) ( * ( ( uint64* ) ( address - CELL ) ) ) ;  
     }
     return iaddress ;
 }
@@ -839,34 +844,35 @@ Compile_Call_ToAddressThruReg ( byte * address, int8 reg )
 }
 
 void
-_Compile_Call ( byte * callAddr )
+Compile_Call ( byte * address )
 {
-    Compile_Call_ToAddressThruReg ( callAddr, R8 ) ; //( GetState ( _Compiler_, LC_ARG_PARSING ) ? OREG : ACC ) ) ;
+    //Compile_Call_ToAddressThruReg ( callAddr, R8 ) ; //( GetState ( _Compiler_, LC_ARG_PARSING ) ? OREG : ACC ) ) ;
+    _Compile_MoveImm_To_Reg ( R8, ( int64 ) address, CELL ) ;
+    _Compile_CallThru ( R8, REG ) ;
 }
 
 void
-Compile_Call_ToAddressThruReg_TestAlignRSP ( byte * address, int8 reg )
+_Compile_Call_ToAddressThruReg_TestAlignRSP ( byte * address, int8 thruReg )
 {
 #if 1    
     //DBI_ON ;
-    _Compile_MoveImm_To_Reg ( reg, ( int64 ) address, CELL ) ;
+    _Compile_MoveImm_To_Reg ( thruReg, ( int64 ) address, CELL ) ;
     _Compile_Move_Reg_To_Reg ( RAX, RSP ) ;
     Compile_TEST_AL_ImmByte ( 0x8 ) ;
     Compile_JCC ( Z, ZERO_TTT, Here + 22 ) ;
-    Compile_CallThru_AdjustRSP ( reg, REG ) ;
+    Compile_CallThru_AdjustRSP ( thruReg, REG ) ;
     _Compile_JumpWithOffset ( 3 ) ; // runtime
-    _Compile_CallThru ( reg, REG ) ;
+    _Compile_CallThru ( thruReg, REG ) ;
     //DBI_OFF ;
 #else
-    Compile_CallThru_AdjustRSP ( reg, REG ) ;
+    Compile_CallThru_AdjustRSP ( thruReg, REG ) ;
 #endif    
 }
 
 void
-Compile_Call ( byte * callAddr )
+Compile_Call_TestRSP ( byte * address )
 {
-    //Compile_Call_ToAddressThruReg_TestAlignRSP ( callAddr, R8 ) ; //( GetState ( _Compiler_, LC_ARG_PARSING ) ? OREG : ACC ) ) ;
-    _Compile_Call ( callAddr ) ;
+    _Compile_Call_ToAddressThruReg_TestAlignRSP ( address, R8 ) ;
 }
 
 void

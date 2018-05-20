@@ -28,7 +28,7 @@ _DataObject_Run ( Word * word )
             _Compile_LEA ( RSI, FP, 0, LocalVarIndex_Disp ( LocalVarOffset ( word ) ) ) ;
             //_Compile_Move_Rm_To_Reg ( RSI, RSI, 0 ) ;
             _Compile_MoveImm_To_Reg ( RDX, ( int64 ) size, CELL ) ;
-            Compile_Call ( ( byte* ) _Do_LocalObject_AllocateInit ) ; // we want to only allocate this object once and only at run time; and not at compile time
+            Compile_Call_TestRSP ( ( byte* ) _Do_LocalObject_AllocateInit ) ; // we want to only allocate this object once and only at run time; and not at compile time
 #endif            
             SetState ( word, W_INITIALIZED, true ) ;
         }
