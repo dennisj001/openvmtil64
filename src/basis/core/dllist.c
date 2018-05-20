@@ -595,7 +595,7 @@ start:
         {
 checkWord:
             nextWord = ( Word* ) dlnode_Next ( ( node* ) word ) ;
-            //if ( kbhit ( ) ) break ;
+            if ( kbhit ( ) ) return 0 ; //must be here else could loop forever !?
             if ( mf ( ( Symbol* ) word ) )
             {
                 if ( nextWord )

@@ -55,7 +55,6 @@ void Compile_Call_ToAddressThruReg(byte *address, int8 reg);
 void Compile_Call(byte *address);
 void _Compile_Call_ToAddressThruReg_TestAlignRSP(byte *address, int8 thruReg);
 void Compile_Call_TestRSP(byte *address);
-void Compile_Call(byte *callAddr);
 void _Compile_PushReg(int8 reg);
 void _Compile_PopToReg(int8 reg);
 void _Compile_PopFD(void);

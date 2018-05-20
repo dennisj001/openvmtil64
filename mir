@@ -1,6 +1,8 @@
 cd src
-make cfrtil64-gdb
+make _clean
+make _cfrtil64_O3
 make static
+mv ../bin/cfrtil64o3 ../bin/cfrtil64
 make xz
 cp ../cfrtil64.tar.xz ../cfrtil64.$1.tar.xz
 make copy

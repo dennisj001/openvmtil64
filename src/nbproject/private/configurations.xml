@@ -98,6 +98,10 @@
         <in>types.h</in>
         <in>udis86.h</in>
       </df>
+      <df name="objects">
+        <df name="O3">
+        </df>
+      </df>
       <df name="primitives">
         <in>bits.c</in>
         <in>cmaths.c</in>

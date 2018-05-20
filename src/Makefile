@@ -31,7 +31,7 @@ OUT = cfrtil64-gdb
 
 default : debug
 
-debug : cfrtil64-gdb #cfrtil64s
+debug : cfrtil64-gdb 
 run : cfrtil64
 all: cfrtil64 cfrtil64-gdb #cfrtil64s
 	
@@ -44,11 +44,11 @@ LIBS = -L/usr/local/lib -ludis86 -lrt -lc -ldl -lm  -lmpfr -lgmp #-lpython3.7#-l
 #LIBS = -ludis86 -lgmp -lrt -lc -ldl -lm #-lffi -lgc
 
 oclean : 
-	-rm basis/*.o primitives/*.o basis/compiler/*.o basis/core/*.o 
+	-rm basis/*.o primitives/*.o basis/compiler/*.o basis/core/*.o bin/cfrtil*
 	
 _clean : 
 	make oclean
-	-rm cfrtil64-gdb ../bin/cfrtil64*
+	-rm cfrtil64* ../bin/cfrtil64*
 
 clean : 
 	make _clean
@@ -62,28 +62,27 @@ include/prototypes.h : $(INCLUDES)
 	make _clean
 
 cfrtil64 : CFLAGS = $(CFLAGS_CORE)
-cfrtil64 : include/prototypes.h $(OBJECTS)
-	$(CC) $(CFLAGS) $(OBJECTS) -o cfrtil64 $(LIBS)
-	strip cfrtil64
+cfrtil64 : include/prototypes.h $(OBJECTS) _cfrtil64_O3
+	$(CC) $(CFLAGS) $(OBJECTS) -o cfrtil64o3 $(LIBS)
+	strip -o cfrtil64 cfrtil64o3
 	mv cfrtil64 ../bin/
 	
 cfrtil64s : CFLAGS = $(CFLAGS_CORE)
 cfrtil64s : include/prototypes.h $(OBJECTS)
-	$(CC) -static $(CFLAGS) $(OBJECTS) -o cfrtil64s $(LIBS)
+	$(CC) -static $(CFLAGS) $(OBJECTS) -O3 -o cfrtil64s $(LIBS)
 	strip cfrtil64s
 	mv cfrtil64s ../bin/
 	
 static : CFLAGS = $(CFLAGS_CORE)
 static : include/prototypes.h $(OBJECTS)
-	$(CC) -static $(CFLAGS) $(OBJECTS) -o cfrtil64s $(LIBS)
+	$(CC) -static $(CFLAGS) $(OBJECTS) -O3 -o cfrtil64s $(LIBS)
 	strip cfrtil64s
 	mv cfrtil64s ../bin/
 
 cfrtil64-gdb : CFLAGS = $(CFLAGS_CORE) -ggdb 
 cfrtil64-gdb : include/prototypes.h $(OBJECTS) 
 	$(CC) $(CFLAGS) $(OBJECTS) -o cfrtil64-gdb $(LIBS)
-	strip -o cfrtil64 cfrtil64-gdb
-	mv cfrtil64 ../bin/cfrtil64
+	mv cfrtil64-gdb ../bin
 
 cfrtil64o : $(OBJECTS)
 	$(CC) $(CFLAGS) $(OBJECTS) -o $(OUT) $(LIBS)
@@ -100,6 +99,7 @@ _cfrtil64_O2 : cfrtil64o
 _cfrtil64_O3 : CFLAGS = $(CFLAGS_CORE) -O3
 _cfrtil64_O3 : OUT = cfrtil64o3
 _cfrtil64_O3 : cfrtil64o
+	mv cfrtil64o3 ../bin
 
 _cfrtil64o :  include/prototypes.h $(OBJECTS)
 	$(CC) $(CFLAGS) basis/compiler/*.o basis/*.o primitives/*.o -o $(OUT) $(LIBS)
@@ -239,7 +239,7 @@ zip :
 	-mv ../backup/nbproject .
 
 tar.xz :	
-	tar -c --xz --exclude=nbproject --exclude=mpfr* --exclude=.git --exclude=*.png --exclude=cfrtil64-gdb  --exclude=*.o --exclude *.kdev* -f cfrtil64.tar.xz * *.*
+	tar -c --xz --exclude=nbproject --exclude=objects --exclude=mpfr* --exclude=.git --exclude=*.png --exclude=cfrtil64-gdb  --exclude=*.o --exclude *.kdev* -f cfrtil64.tar.xz * *.*
 	#tar -c --xz --exclude=nbproject --exclude=.git --exclude=*.png --exclude=cfrtil64-gdb  --exclude=*.o -f cfrtil64.tar.xz * *.cft #.init.cft
 
 _xz : 
