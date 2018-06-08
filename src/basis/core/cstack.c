@@ -22,7 +22,7 @@ Stack_Print_AValue_WordName ( Stack * stack, int64 i, byte * stackName, byte * b
         byte wname [ 128 ] ;
         //_String_ConvertStringToBackSlash ( wname, word->Name ) ;
         sprintf ( ( char* ) buffer, "< %s.%s >", word->ContainingNamespace ? ( char* ) word->ContainingNamespace->Name : "<literal>", c_gd ( _String_ConvertStringToBackSlash ( wname, word->Name ) ) ) ;
-        _Printf ( ( byte* ) "\n\t\t    %s   [ %3ld ] < " UINT_FRMT " > = " UINT_FRMT "\t\t%s", stackName, i, ( uint64 ) & stackPointer [ - i ], stackPointer [ - i ], word ? ( char* ) buffer : "" ) ;
+        _Printf ( ( byte* ) "\n\t    %s   [ %3ld ] < " UINT_FRMT " > = " UINT_FRMT "\t%s", stackName, i, ( uint64 ) & stackPointer [ - i ], stackPointer [ - i ], word ? ( char* ) buffer : "" ) ;
     }
 }
 
@@ -38,7 +38,7 @@ Stack_Print_AValue ( uint64 * stackPointer, int64 i, byte * stackName, byte * bu
         else sprintf ( ( char* ) buffer, "< word : %s.%s : definition = 0x%016lx >", word->ContainingNamespace->Name, c_gd ( word->Name ), ( uint64 ) word->Definition ) ;
     }
     else string = String_CheckForAtAdddress ( ( byte* ) ( ( byte* ) ( stackPointer[i] ) ) ) ;
-    _Printf ( ( byte* ) "\n\t\t    %s   [ %3ld ] < " UINT_FRMT " > = " UINT_FRMT "\t\t%s",
+    _Printf ( ( byte* ) "\n\t    %s   [ %3ld ] < " UINT_FRMT " > = " UINT_FRMT "\t%s",
         stackName, i, ( uint64 ) & stackPointer [ i ], stackPointer [ i ], word ? buffer : string ? string : ( byte* ) "" ) ;
 }
 

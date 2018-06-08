@@ -5,8 +5,12 @@ C
 Int
 : mt 6 ++ ; mt 7 _assert
 : mt1 8 -- ; mt1 7 _assert
-//: mta 1 5 + d: ++ ; mta 7 _assert
-//: mt1a 9 1 - --  ; mt1a 7 _assert
+
+#if 0
+: mta 1 5 + ++ ; mta 7 _assert
+: mt1a 9 1 - --  ; mt1a 7 _assert
+#endif
+
 : mt2 ( n ) ++ n @ 7 _assert ; 6 mt2 
 : mt3 ( n ) n @ ++ 7 _assert ; 6 mt3 
 : mt4 ( n ) n ++ n @ 7 _assert ; 6 mt4 
@@ -39,10 +43,10 @@ C
 128 6 moe 65536 16 moe "\nshould show 2 1\n" ps s // pause
 infixOn
 nl
-: moe ( n m ) n <<= m n @ p ;
+: moe ( n m ) n <<= m n p ; // infix variables are rvalues
 ' moe find wdiss
 2 6 moe 1 16 moe "\nshould show 128 65536\n" ps // s pause
-: moe ( n m ) n >>= m n @ p ;
+: moe ( n m ) n >>= m n p ;
 ' moe find wdiss
 128 6 moe 65536 16 moe "\nshould show 2 1\n" ps // s pause
 infixOff

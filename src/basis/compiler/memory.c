@@ -40,7 +40,7 @@ Compile_Peek ( Compiler * compiler, int8 stackReg ) // @
 {
     int64 optFlag = CheckOptimize ( compiler, 3 ) ;
     if ( optFlag & OPTIMIZE_DONE ) return ;
-    _Compile_Move_Rm_To_Reg ( ACC, stackReg, 0 ) ;
+    else if ( ! optFlag ) _Compile_Move_Rm_To_Reg ( ACC, stackReg, 0 ) ;
     _Compile_Move_Rm_To_Reg ( ACC, ACC, 0 ) ;
     _Compile_Move_Reg_To_Rm ( stackReg, ACC, 0 ) ;
 }

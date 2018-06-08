@@ -356,7 +356,7 @@ Compile_LogicalNot ( Compiler * compiler )
         }
         else if ( compiler->OptInfo->Optimize_Rm != ACC )
         {
-            _Compile_GetVarLitObj_RValue_To_Reg ( one, ACC ) ;
+            Compile_GetVarLitObj_RValue_To_Reg ( one, ACC ) ;
         }
     }
     else

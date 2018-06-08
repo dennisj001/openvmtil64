@@ -10,8 +10,9 @@
 #endif
 #define NEW_CALL_RETURN 0
 #define DSP_IS_GLOBAL_REGISTER 1 
-#define RSP_ADJUST true
+#define X84_ABI_RSP_ADJUST true
 #define NEW_CPU_PIPELINE_STATE true
+#define NEW_OPTIMIZER false
 
 #if DEBUG 
 #define D( x ) x
@@ -289,7 +290,7 @@
 #define OBJECT_OPERATOR DOT             
 #define COMBINATOR      ( (uint64) 1 << 61 )
 #define LISP_CFRTIL     ( (uint64) 1 << 62 )
-#define CATEGORY_EQUAL     ( (uint64) 1 << 63 )
+#define CATEGORY_OP_OPEQUAL     ( (uint64) 1 << 63 )
 
 // CAttribute2
 #define RAX_RETURN           ( (uint64) 1 << 0 ) 

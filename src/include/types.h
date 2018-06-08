@@ -20,7 +20,7 @@ typedef void (*vFunction_2_Arg ) ( int64, int64 ) ;
 typedef int64( *cFunction_0_Arg ) ( ) ;
 typedef int64( *cFunction_1_Arg ) ( int64 ) ;
 typedef int64( *cFunction_2_Arg ) ( int64, int64 ) ;
-typedef VoidFunction block ;
+typedef VoidFunction block ; // code block
 typedef byte AsciiCharSet [ 256 ] ;
 
 typedef byte * function, * object, * type, * slot ;

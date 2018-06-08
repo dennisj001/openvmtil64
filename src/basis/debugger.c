@@ -82,7 +82,7 @@ Debugger_TableSetup ( Debugger * debugger )
     debugger->CharacterFunctionTable [ 28 ] = Debugger_DisassembleTotalAccumulated ;
     debugger->CharacterFunctionTable [ 29 ] = Debugger_Using ;
     debugger->CharacterFunctionTable [ 30 ] = Debugger_ReturnStack ;
-    debugger->CharacterFunctionTable [ 31 ] = ( DebuggerFunction ) DebugWordList_Show ;
+    debugger->CharacterFunctionTable [ 31 ] = DebugWordList_Show ;
     debugger->CharacterFunctionTable [ 32 ] = Debugger_ShowCompilerWordList ;
     debugger->CharacterFunctionTable [ 33 ] = Debugger_CfrTilRegisters ;
 }

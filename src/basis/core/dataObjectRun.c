@@ -382,7 +382,7 @@ _Do_Variable ( Word * word )
             }
             else if ( ! ( word->CAttribute & REGISTER_VARIABLE ) )
             {
-                _Compile_GetVarLitObj_RValue_To_Reg ( word, ACC ) ;
+                Compile_GetVarLitObj_RValue_To_Reg ( word, ACC ) ;
             }
             _Word_CompileAndRecord_PushReg ( word, ( word->CAttribute & REGISTER_VARIABLE ) ? word->RegToUse : ACC ) ;
         }
@@ -408,7 +408,7 @@ _CfrTil_Do_Literal ( Word * word )
     {
         //if ( GetState ( _Context_, C_SYNTAX ) || GetState ( _Compiler_, LC_ARG_PARSING ) ) // for now until we have time to integrate this optimization
         {
-            _Compile_GetVarLitObj_RValue_To_Reg ( word, ACC ) ;
+            Compile_GetVarLitObj_RValue_To_Reg ( word, ACC ) ;
             _Word_CompileAndRecord_PushReg ( word, ACC ) ;
         }
 #if 0        

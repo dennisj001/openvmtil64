@@ -3,9 +3,14 @@
 void
 _Block_Eval ( block blck )
 {
+    ( ( block ) blck ) ( ) ;
+}
+
+void
+Block_Eval ( block blck )
+{
     if ( blck )
     {
-        //GetTestRsp_Block () ;
         ( ( block ) blck ) ( ) ;
     }
 }
@@ -276,7 +281,7 @@ _CfrTil_EndBlock1 ( BlockInfo * bi )
                     }
                     else
                     {
-                        _Compile_GetVarLitObj_RValue_To_Reg ( compiler->ReturnVariableWord, ACC ) ;
+                        Compile_GetVarLitObj_RValue_To_Reg ( compiler->ReturnVariableWord, ACC ) ;
                         Compile_Move_ACC_To_TOS ( DSP ) ;
                     }
                 }

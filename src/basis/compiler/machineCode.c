@@ -353,9 +353,13 @@ Compile_X_Group5 ( Compiler * compiler, int64 op )
     else if ( one && one->CAttribute & ( PARAMETER_VARIABLE | LOCAL_VARIABLE | NAMESPACE_VARIABLE ) ) // *( ( cell* ) ( TOS ) ) += 1 ;
     {
         SetHere ( one->Coding ) ;
-        _Compile_GetVarLitObj_RValue_To_Reg ( one, ACC ) ;
+        Compile_GetVarLitObj_RValue_To_Reg ( one, ACC ) ;
         //_Compile_Group5 ( int64 code, int64 mod, int8 rm, int8 sib, int64 disp, int64 size )
+#if NEW_OPTIMIZER    
+        _Compile_Group5 ( op, REG, ACC, 0, 0, 0 ) ;
+#else    
         _Compile_Group5 ( op, REG, ACC, 0, 0, CELL_SIZE ) ;
+#endif    
         // ++ == += :: -- == -= so :
         _Compile_SetVarLitObj_With_Reg ( one, ACC, OREG ) ;
     }

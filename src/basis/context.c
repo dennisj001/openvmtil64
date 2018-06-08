@@ -155,7 +155,7 @@ _CfrTil_Contex_NewRun_Void ( CfrTil * cfrTil, Word * word )
     if ( word )
     {
         CfrTil_Context_PushNew ( cfrTil ) ;
-        _Block_Eval ( word->Definition ) ;
+        Block_Eval ( word->Definition ) ;
         CfrTil_Context_PopDelete ( cfrTil ) ; // this could be coming back from wherever so the stack variables are gone
     }
 }

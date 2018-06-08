@@ -79,9 +79,9 @@ Word *_CfrTil_VariableGet(Namespace *ns, byte *name);
 int64 _CfrTil_VariableValueGet(byte *nameSpace, byte *name);
 void _Compile_SetAtAddress_WithReg(int64 *address, int64 reg, int64 thruReg);
 void _Compile_Move_Literal_Immediate_To_Reg(int64 reg, int64 value);
-void _Compile_LocalOrStackVar_RValue_To_Reg(Word *word, int64 reg);
-void Do_ObjectOffset(Word *word, int64 reg);
 void _Compile_GetVarLitObj_RValue_To_Reg(Word *word, int64 reg);
+void Do_ObjectOffset(Word *word, int64 reg);
+void Compile_GetVarLitObj_RValue_To_Reg(Word *word, int64 reg);
 void _Compile_SetVarLitObj_With_Reg(Word *word, int64 reg, int64 thruReg);
 void _Compile_GetVarLitObj_LValue_To_Reg(Word *word, int64 reg);
 /* basis/compiler/memory.c */
@@ -214,6 +214,7 @@ void SwitchAccessFunction(void);
 void CfrTil_Switch(void);
 /* basis/compiler/blocks.c */
 void _Block_Eval(block blck);
+void Block_Eval(block blck);
 void _Block_Eval_AdjustRSP(block blck);
 void _Block_Copy(byte *srcAddress, int64 bsize, int8 optFlag);
 int64 Block_CopyCompile_WithLogicFlag(byte *srcAddress, int64 bindex, Boolean jccFlag, Boolean negFlag);
@@ -1110,7 +1111,7 @@ void CfrTil_WordLists_PopWord(void);
 void _DWL_ShowWord_Print(Word *word, int64 index, byte *prefix, byte *coding, byte *newCoding, int64 scwiDiff, Boolean iuoFlag);
 void _DWL_ShowWord(dlnode *anode, byte *prefix, int64 scwiDiff);
 int64 DWL_ShowWord(dlnode *anode, int64 index, int64 inUseOnlyFlag);
-void SC_WordList_Show(dllist *list, Word *scWord, Boolean inUseOnlyFlag);
+void SC_WordList_Show(dllist *list, Word *scWord, Boolean inUseOnlyFlag, byte *listName);
 void DebugWordList_Show(Debugger *debugger);
 void Compiler_Show_WordList(byte *prefix);
 void Debugger_ShowCompilerWordList(Debugger *debugger);

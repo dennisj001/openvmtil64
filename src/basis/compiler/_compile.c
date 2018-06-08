@@ -118,49 +118,6 @@ _Compile_Move_Literal_Immediate_To_Reg ( int64 reg, int64 value )
 }
 
 void
-_Compile_LocalOrStackVar_RValue_To_Reg ( Word * word, int64 reg )
-{
-    Word_Set_SCA ( word ) ;
-    word->Coding = Here ; // we don't need the word's code if compiling -- this is an optimization though
-    if ( word->CAttribute & REGISTER_VARIABLE )
-    {
-        if ( word->RegToUse == reg ) return ;
-        else _Compile_Move_Reg_To_Reg ( reg, word->RegToUse ) ;
-    }
-#if 0    
-    else if ( word->CAttribute & LOCAL_VARIABLE )
-    {
-        _Compile_Move_StackN_To_Reg ( reg, FP, LocalVarOffset ( word ) ) ; // 2 : account for saved fp and return slot
-    }
-    else if ( word->CAttribute & PARAMETER_VARIABLE )
-    {
-        _Compile_Move_StackN_To_Reg ( reg, FP, ParameterVarOffset ( word ) ) ; // account for stored bp and return value
-    }
-#else
-    else if ( word->CAttribute & ( LOCAL_VARIABLE | PARAMETER_VARIABLE ) )
-    {
-        _Compile_Move_StackN_To_Reg ( reg, FP, LocalParameterVarOffset ( word ) ) ; // 2 : account for saved fp and return slot
-    }
-#endif    
-    else if ( word->CAttribute & ( OBJECT | THIS ) )
-    {
-        _Compile_Move_Literal_Immediate_To_Reg ( reg, ( int64 ) word->W_PtrToValue ) ;
-        _Compile_Move_Rm_To_Reg ( reg, reg, 0 ) ;
-        //_Compile_Move_Literal_Immediate_To_Reg ( reg, ( int64 ) word->W_Value ) ;
-    }
-}
-
-void
-Do_ObjectOffset ( Word * word, int64 reg )
-{
-    Compiler * compiler = _Context_->Compiler0 ;
-    int64 offset = word->AccumulatedOffset ;
-    if ( GetState ( _CfrTil_, IN_OPTIMIZER ) && ( offset == 0 ) ) return ;
-    Compile_ADDI ( REG, reg, 0, offset, INT32_SIZE ) ; // only a 32 bit offset ??
-    compiler->AccumulatedOffsetPointer = ( int32* ) ( Here - INT32_SIZE ) ; // offset will be calculated as we go along by ClassFields and Array accesses
-}
-
-void
 _Compile_GetVarLitObj_RValue_To_Reg ( Word * word, int64 reg )
 {
     Word_Set_SCA ( word ) ;
@@ -189,6 +146,22 @@ _Compile_GetVarLitObj_RValue_To_Reg ( Word * word, int64 reg )
         _Compile_Move_Rm_To_Reg ( reg, reg, 0 ) ;
     }
     else SyntaxError ( QUIT ) ;
+}
+
+void
+Do_ObjectOffset ( Word * word, int64 reg )
+{
+    Compiler * compiler = _Context_->Compiler0 ;
+    int64 offset = word->AccumulatedOffset ;
+    if ( GetState ( _CfrTil_, IN_OPTIMIZER ) && ( offset == 0 ) ) return ;
+    Compile_ADDI ( REG, reg, 0, offset, INT32_SIZE ) ; // only a 32 bit offset ??
+    compiler->AccumulatedOffsetPointer = ( int32* ) ( Here - INT32_SIZE ) ; // offset will be calculated as we go along by ClassFields and Array accesses
+}
+
+void
+Compile_GetVarLitObj_RValue_To_Reg ( Word * word, int64 reg )
+{
+    _Compile_GetVarLitObj_RValue_To_Reg ( word, reg ) ;
     if ( word->CAttribute & ( OBJECT | THIS ) )
     {
         Do_ObjectOffset ( word, reg ) ;
@@ -233,7 +206,7 @@ _Compile_GetVarLitObj_LValue_To_Reg ( Word * word, int64 reg )
     }
     else if ( word->CAttribute & ( OBJECT | THIS ) || ( word->WAttribute & WT_QID ) ) //pointers
     {
-        _Compile_LocalOrStackVar_RValue_To_Reg ( word, reg ) ;
+        _Compile_GetVarLitObj_RValue_To_Reg ( word, reg ) ;
     }
     else if ( word->CAttribute & ( LOCAL_VARIABLE | PARAMETER_VARIABLE ) )
     {

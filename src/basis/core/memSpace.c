@@ -535,7 +535,7 @@ _OVT_ShowMemoryAllocated ( OpenVmTil * ovt )
     else {_Printf ( ( byte*) "\nTotal Memory Allocated                           = %9d"
                              "\nTotal Memory leaks                               = %9d", ovt->TotalNbaAccountedMemAllocated, leak ) ; }
     int64 wordSize = (sizeof ( Word ) + sizeof ( WordData )) ;
-    _Printf ( ( byte* )      "\nRecycledWordCount = %d x %d bytes :   Recycled = %9d", _Q_->MemorySpace0->RecycledWordCount, wordSize, _Q_->MemorySpace0->RecycledWordCount * wordSize) ;
+    _Printf ( ( byte* )      "\nRecycledWordCount = %5d x %3d bytes : Recycled = %9d", _Q_->MemorySpace0->RecycledWordCount, wordSize, _Q_->MemorySpace0->RecycledWordCount * wordSize) ;
     Buffer_PrintBuffers ( ) ;
 }
 

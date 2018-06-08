@@ -21,10 +21,9 @@ Word_Run ( Word * word )
             Word_SetCoding ( word, Here ) ;
             word->W_InitialRuntimeDsp = _Dsp_ ;
             _Context_->CurrentlyRunningWord = word ;
-            _Block_Eval ( word->Definition ) ;
+            Block_Eval ( word->Definition ) ;
         }
     }
-    //TestGetRsp ( ) ;
 }
 
 void
@@ -128,6 +127,7 @@ void
 _Word_Compile ( Word * word )
 {
     Word_Set_SCA ( word ) ;
+    Word_SetCoding ( word, Here ) ;
     if ( ! word->Definition )
     {
         CfrTil_SetupRecursiveCall ( ) ;
@@ -138,17 +138,16 @@ _Word_Compile ( Word * word )
     }
     else
     {
-#if RSP_ADJUST        
+#if X84_ABI_RSP_ADJUST        
         if ( word->CAttribute & CPRIMITIVE )
         {
             d0 ( _Printf ( ( byte* ) "\n_Word_Compile : %s : name = %s", Context_Location ( ), word->Name ) ) ;
             // there is an slight overhead for CPRIMITIVE functions to align RSP for ABI-X64
             Compile_Call_TestRSP ( ( byte* ) word->Definition ) ;
-            //Compile_Call ( ( byte* ) word->Definition ) ;
         }
         else
 #endif            
-        Compile_Call ( ( byte* ) word->Definition ) ;
+            Compile_Call ( ( byte* ) word->Definition ) ;
     }
 
 }
@@ -229,13 +228,14 @@ _Word_Add ( Word * word, int64 addToInNs, Namespace * addToNs )
 Word *
 _Word_Allocate ( uint64 allocType )
 {
-    Word * word = 0 ; int64 size ;
+    Word * word = 0 ;
+    int64 size ;
     if ( allocType & ( COMPILER_TEMP | LISP_TEMP ) ) allocType = TEMPORARY ;
     else allocType = DICTIONARY ;
     word = ( Word* ) OVT_CheckRecyclableAllocate ( _Q_->MemorySpace0->RecycledWordList, sizeof ( Word ) + sizeof ( WordData ), 0 ) ;
     if ( word ) _Q_->MemorySpace0->RecycledWordCount ++ ;
-    else word = ( Word* ) Mem_Allocate ( size = (sizeof ( Word ) + sizeof ( WordData )), allocType ) ;
-    ((DLNode*)word)->n_Size == size ;
+    else word = ( Word* ) Mem_Allocate ( size = ( sizeof ( Word ) + sizeof ( WordData ) ), allocType ) ;
+    ( ( DLNode* ) word )->n_Size = size ;
     word->S_WordData = ( WordData * ) ( word + 1 ) ; // nb. "pointer arithmetic"
     return word ;
 }
@@ -413,7 +413,7 @@ Word_GetFromCodeAddress_NoAlias ( byte * address )
 void
 _CfrTil_WordName_Run ( byte * name )
 {
-    _Block_Eval ( Finder_Word_FindUsing ( _Context_->Finder0, name, 0 )->Definition ) ;
+    Block_Eval ( Finder_Word_FindUsing ( _Context_->Finder0, name, 0 )->Definition ) ;
 }
 
 // alias : postfix

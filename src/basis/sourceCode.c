@@ -360,7 +360,7 @@ _DWL_ShowWord_Print ( Word * word, int64 index, byte * prefix, byte * coding, by
     }
     else if ( index )
     {
-        _Printf ( "\n\tSourceCode WordList : index %2d : \'%-28s\' : coding = 0x%08x : scwi = %03d : inUse = %s",
+        _Printf ( "\n\tWordList : index %2d : \'%-28s\' : coding = 0x%08x : scwi = %03d : inUse = %s",
             index, name, coding, scwi, iuFlag ) ;
     }
     else //if ( scwiDiff )
@@ -405,18 +405,18 @@ DWL_ShowWord ( dlnode * anode, int64 index, int64 inUseOnlyFlag )
         {
             //_Printf ( "\nSourceCode WordList : index %2d : word = 0x%016lx : \'%-12s\' : coding = 0x%016lx : scwi = %3d : inUse = %s",
             //    index, word, word->Name, word->Coding, scwi, iuoFlag ? "true" : "false" ) ;
-            _DWL_ShowWord_Print ( word, index, "SourceCode WordList", word->Coding, 0, 0, iuoFlag ) ;
+            _DWL_ShowWord_Print ( word, index, "WordList", word->Coding, 0, 0, iuoFlag ) ;
         }
     }
     return 0 ;
 }
 
 void
-SC_WordList_Show ( dllist * list, Word * scWord, Boolean inUseOnlyFlag )
+SC_WordList_Show ( dllist * list, Word * scWord, Boolean inUseOnlyFlag, byte * listName )
 {
     if ( list )
     {
-        if ( scWord ) _Printf ( "\nSourceCode WordList : for word \'%s\' :", scWord->Name ) ;
+        if ( scWord ) _Printf ( "\n%s WordList : for word \'%s\' :", listName, scWord->Name ) ;
         dllist_Map_Indexed ( list, ( int64 ) inUseOnlyFlag, 0, DWL_ShowWord ) ;
     }
 }
@@ -426,8 +426,7 @@ DebugWordList_Show ( Debugger * debugger )
 {
     Word * scWord = Compiling ? _Compiler_->CurrentWordCompiling : GetState ( debugger, DBG_STEPPING ) ? Debugger_GetWordFromAddress ( debugger ) : _Context_->CurrentlyRunningWord ;
     dllist * list = scWord->W_SC_WordList ? scWord->W_SC_WordList : _Compiler_->WordList ;
-    _Printf ( "\nSourceCode WordList : for word \'%s\'", scWord->Name ) ;
-    SC_WordList_Show ( list, scWord, 0 ) ;
+    SC_WordList_Show ( list, scWord, 0, list == scWord->W_SC_WordList ? "SourceCode" : "Compiler" ) ;
 }
 
 void
@@ -436,9 +435,9 @@ Compiler_Show_WordList ( byte * prefix )
 
     Word * scWord = Compiling ? _Compiler_->CurrentWordCompiling : GetState ( _Debugger_, DBG_STEPPING ) ? Debugger_GetWordFromAddress ( _Debugger_ ) : _Context_->CurrentlyRunningWord ;
     if ( Is_DebugModeOn ) NoticeColors ;
-    _Printf ( ( byte* ) "\n%s\nCompiler0->WordList : ", prefix ) ;
     dllist * list = _Context_->Compiler0->WordList ;
-    SC_WordList_Show ( list, scWord, 1 ) ;
+    _Printf ( "\n%s", prefix ) ;
+    SC_WordList_Show ( list, scWord, 1, "Compiler" ) ;
     if ( Is_DebugModeOn ) DefaultColors ;
 }
 

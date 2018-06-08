@@ -295,9 +295,9 @@ dscOn //verbosity 3 =
     } if2 //_s //nl location nl //_pause
     //_s _pause 
 ; 
-: assertStkChk _assertStkChk ; //stack _pause ; // s ;
+: assertStkChk _assertStkChk ; 
 scOff
-//' _assertStkChk winfo //pause
+' _assertStkChk wdiss //pause
 : TODO ( str ) nl nl pdl nl str @ adps location nl pdl nl nl { dbgOnVar @ } { sp } if2 ;;
 Root
 User 
@@ -382,4 +382,5 @@ stringMacrosOff
 // you can trim this file to your needs and put your personal init code here maybe
 #endif
 //s: hi ( a b | c ) c a @ b @ + = printf ("\nshould read 3 : %d", c ) ;s 1 2 d: hi //pause
+//s: hi ( a b | c ) c a @ b @ d: + 1 - = printf ("\nshould read 3 : %d", c ) ;s 1 2 d: hi //pause
 2 + 7  assertStkChk // stack checking

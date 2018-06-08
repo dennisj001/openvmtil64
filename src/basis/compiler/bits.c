@@ -78,7 +78,7 @@ Compile_X_Shift ( Compiler * compiler, int64 op, int64 stackFlag )
         }
         else //if ( ( compiler->OptInfo->Optimize_Imm == 0 ) && ( compiler->OptInfo->Optimize_Rm != ACC ) ) // this logic is prototype maybe not precise 
         {
-            _Compile_Group2_CL ( MEM, op, compiler->OptInfo->Optimize_Rm, 0, compiler->OptInfo->Optimize_Disp ) ;
+            _Compile_Group2_CL ( compiler->OptInfo->Optimize_Mod, op, compiler->OptInfo->Optimize_Rm, 0, compiler->OptInfo->Optimize_Disp ) ;
         }
         if ( stackFlag && ( compiler->OptInfo->Optimize_Rm != DSP ) ) // if the result is not already tos
         {
