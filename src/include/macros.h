@@ -216,13 +216,13 @@
 
 #define NAMESPACE_TYPE ( NAMESPACE | DOBJECT | CLASS | C_TYPE | C_CLASS | CLASS_CLONE )
 #define NAMESPACE_RELATED_TYPE ( NAMESPACE_TYPE | OBJECT_FIELD )
-#define OBJECT_TYPE ( LITERAL | CONSTANT | NAMESPACE_VARIABLE | LOCAL_VARIABLE | OBJECT | DOBJECT | PARAMETER_VARIABLE )
-#define _NON_MORPHISM_TYPE ( OBJECT_TYPE | NAMESPACE_RELATED_TYPE )
-#define NON_MORPHISM_TYPE(word) (word->CAttribute & _NON_MORPHISM_TYPE)
-#define IS_MORPHISM_TYPE( word ) ( ( ( ! ( word->CAttribute & ( _NON_MORPHISM_TYPE | OBJECT_OPERATOR ) ) ) && ( ! ( word->LAttribute & ADDRESS_OF_OP ) ) ) || ( word->CAttribute & ( KEYWORD|BLOCK ) ))
+#define OBJECT_TYPE ( LITERAL | CONSTANT | NAMESPACE_VARIABLE | LOCAL_VARIABLE | OBJECT | DOBJECT | PARAMETER_VARIABLE | T_LISP_SYMBOL )
+#define NON_MORPHISM_TYPE ( OBJECT_TYPE | NAMESPACE_RELATED_TYPE )
+#define IS_NON_MORPHISM_TYPE(word) (word->CAttribute & NON_MORPHISM_TYPE)
+#define IS_MORPHISM_TYPE( word ) ( ( ( ! ( word->CAttribute & ( NON_MORPHISM_TYPE | DEBUG_WORD | OBJECT_OPERATOR ) ) ) && ( ! ( word->LAttribute & ADDRESS_OF_OP ) ) ) || ( word->CAttribute & ( CATEGORY_OP|KEYWORD|BLOCK ) ))
 
 #define Is_NamespaceType( w ) ( w ? (( ( Namespace* ) w )->CAttribute & NAMESPACE_TYPE) : 0 )
-#define Is_ValueType( w ) ( w ? ( ( Namespace* ) w )->CAttribute & (_NON_MORPHISM_TYPE (w)) : 0 )
+#define Is_ValueType( w ) ( w ? ( ( Namespace* ) w )->CAttribute & (NON_MORPHISM_TYPE (w)) : 0 )
 #define String_Init( s ) s[0]=0 ; 
 
 // memory allocation
@@ -254,11 +254,10 @@
 #define DEBUG_ASM_SHOW_ON SetState ( _Debugger_, DBG_ASM_SHOW_ON, true ) 
 #define DEBUG_ASM_SHOW_OFF SetState ( _Debugger_, DBG_ASM_SHOW_ON, false ) 
 #define _DBI GetState ( _Debugger_, DBG_ASM_SHOW_ON ) 
-#define _DBI_ON SetState ( _Debugger_, DBG_ASM_SHOW_ON, true ) 
-#define DBI ( Is_DebugOn & _DBI )
-#define DBI_N( n ) (GetState ( _Debugger_, DBG_ASM_SHOW_ON ) && ( _Q_->Verbosity > 3 ) )
 #define DBI_ON DEBUG_ASM_SHOW_ON
 #define DBI_OFF DEBUG_ASM_SHOW_OFF
+#define DBI ( Is_DebugOn & _DBI )
+#define DBI_N( n ) (GetState ( _Debugger_, DBG_ASM_SHOW_ON ) && ( _Q_->Verbosity > n ) )
 
 #define Is_LValue( word ) ( GetState ( _Context_->Compiler0, LC_ARG_PARSING ) ? 0 : Interpret_CheckEqualBeforeSemi_LValue ( word ))
 #define IS_INCLUDING_FILES _Context_->System0->IncludeFileStackNumber
@@ -286,8 +285,8 @@
 #define WordList_Pop( list, m ) if ( ! IsSourceCodeOn ) _WordList_Pop( list, m )
 #define DebugWordList_Push( dobj ) _dllist_AddNodeToHead ( _CfrTil_->DebugWordList, ( dlnode* ) dobj )
 #define DbgWL_Push( node ) DebugWordList_Push( node )  
-#define _List_PushNew( list, word ) _dllist_PushNew_M_Slot_Node ( list, WORD, TEMPORARY, SCN_NUMBER_OF_SLOTS, ((int64) word), word->W_SC_WordIndex, 1 )
-#define CompilerWordList_Push( word ) _List_PushNew ( _Compiler_->WordList, word ) 
+#define _List_PushNew( list, word, inUseFlag ) _dllist_PushNew_M_Slot_Node ( list, WORD, TEMPORARY, SCN_NUMBER_OF_SLOTS, ((int64) word), word->W_SC_WordIndex, inUseFlag )
+#define CompilerWordList_Push( word, inUseFlag ) _List_PushNew ( _Compiler_->WordList, word, inUseFlag ) 
 #define IsGlobalsSourceCodeOn ( GetState ( _CfrTil_, GLOBAL_SOURCE_CODE_MODE ))
 #define _IsSourceCodeOn ( GetState ( _CfrTil_, DEBUG_SOURCE_CODE_MODE ) )
 #define IsSourceCodeOn ( _IsSourceCodeOn || IsGlobalsSourceCodeOn )

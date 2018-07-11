@@ -736,16 +736,16 @@ _LO_Apply_Arg ( ListObject ** pl1, int64 i, int8 svCompileMode )
         if ( ! l2 || ( l2->LAttribute & T_NIL ) )
         {
             //Compile_DspPop_RspPush ( ) ;
-            _Compile_MoveImm_To_Reg ( RegOrder ( i ++ ), DataStack_Pop ( ), CELL_SIZE ) ;
+            Compile_MoveImm_To_Reg ( RegOrder ( i ++ ), DataStack_Pop ( ), CELL_SIZE ) ;
         }
         else
         {
             //_Compile_PushRspImm ( ( int64 ) * l2->Lo_PtrToValue ) ;
-            _Compile_MoveImm_To_Reg ( RegOrder ( i ++ ), ( int64 ) * l2->Lo_PtrToValue, CELL_SIZE ) ;
+            Compile_MoveImm_To_Reg ( RegOrder ( i ++ ), ( int64 ) * l2->Lo_PtrToValue, CELL_SIZE ) ;
         }
         _DEBUG_SHOW ( l2, 1 ) ;
     }
-    else if ( ( l1->CAttribute & _NON_MORPHISM_TYPE ) ) // and literals, etc.
+    else if ( ( l1->CAttribute & NON_MORPHISM_TYPE ) ) // and literals, etc.
     {
         word = l1->Lo_CfrTilWord ;
         word = Compiler_CopyDuplicatesAndPush ( word ) ;
@@ -758,7 +758,7 @@ _LO_Apply_Arg ( ListObject ** pl1, int64 i, int8 svCompileMode )
         {
             if ( word->StackPushRegisterCode ) SetHere ( word->StackPushRegisterCode ) ;
             else if ( baseObject && baseObject->StackPushRegisterCode ) SetHere ( baseObject->StackPushRegisterCode ) ;
-            _Compile_Move_Reg_To_Reg ( RegOrder ( i ++ ), ACC ) ;
+            Compile_Move_Reg_To_Reg ( RegOrder ( i ++ ), ACC ) ;
             if ( baseObject ) _Debugger_->PreHere = baseObject->Coding ;
             SetState ( cntx, ADDRESS_OF_MODE, false ) ;
             _Debugger_->PreHere = here ;
@@ -809,7 +809,7 @@ _LO_Apply_Arg ( ListObject ** pl1, int64 i, int8 svCompileMode )
                 }
                 if ( Is_DebugModeOn ) Word_PrintOffset ( word, increment, baseObject->AccumulatedOffset ) ;
                 if ( baseObject->StackPushRegisterCode ) SetHere ( baseObject->StackPushRegisterCode ) ;
-                _Compile_Move_Reg_To_Reg ( RegOrder ( i ++ ), ACC ) ;
+                Compile_Move_Reg_To_Reg ( RegOrder ( i ++ ), ACC ) ;
                 _Debugger_->PreHere = baseObject->Coding ;
                 _DEBUG_SHOW ( baseObject, 1 ) ;
             }
@@ -820,7 +820,7 @@ _LO_Apply_Arg ( ListObject ** pl1, int64 i, int8 svCompileMode )
     {
         word = Compiler_CopyDuplicatesAndPush ( word ) ;
         _DEBUG_SETUP ( word, 1 ) ;
-        _Compile_MoveImm_To_Reg ( RegOrder ( i ++ ), DataStack_Pop ( ), CELL_SIZE ) ;
+        Compile_MoveImm_To_Reg ( RegOrder ( i ++ ), DataStack_Pop ( ), CELL_SIZE ) ;
         _DEBUG_SHOW ( word, 1 ) ;
     }
 done:
@@ -860,7 +860,7 @@ _LO_Apply_ArgList ( ListObject * l0, Word * word )
         //_DEBUG_SETUP ( word, 1 ) ;
         if ( ( String_Equal ( word->Name, "printf" ) || ( String_Equal ( word->Name, "sprintf" ) ) ) )
         {
-            _Compile_MoveImm_To_Reg ( RAX, 0, CELL ) ; // for printf ?? others //System V ABI : "%rax is used to indicate the number of vector arguments passed to a function requiring a variable number of arguments"
+            Compile_MoveImm_To_Reg ( RAX, 0, CELL ) ; // for printf ?? others //System V ABI : "%rax is used to indicate the number of vector arguments passed to a function requiring a variable number of arguments"
         }
         Word_Set_SCA ( word ) ;
         Word_Eval ( word ) ;
@@ -976,7 +976,7 @@ _LO_CompileOrInterpret ( ListObject * lfunction, ListObject * ldata )
             if ( GetState ( _Q_->OVT_LC, LC_INTERP_DONE ) ) return ;
             _LO_CompileOrInterpret_One ( ldata ) ; // research : how does CAttribute get set to T_NIL?
         }
-        if ( lfword && ( ! ( lfword->CAttribute & LISP_CFRTIL ) ) ) _LO_CompileOrInterpret_One ( lfword ) ; // ( ! ( lfword->CAttribute & LISP_CFRTIL ) ) : don't do it twice (see above)
+        if ( lfword && ( ! ( lfword->CAttribute2 & LISP_CFRTIL ) ) ) _LO_CompileOrInterpret_One ( lfword ) ; // ( ! ( lfword->CAttribute & LISP_CFRTIL ) ) : don't do it twice (see above)
     }
 }
 
@@ -1531,12 +1531,12 @@ _LO_CfrTil ( ListObject * lfirst )
         {
             _CfrTil_DbgSourceCodeCompileOn ( ) ;
             word = _LO_Colon ( ldata ) ;
-            ldata = _LO_Next ( ldata ) ; // bump ldata to account for name
+            ldata = _LO_Next ( ldata ) ; // bump ldata to account for name - skip name
         }
         else if ( String_Equal ( ldata->Name, ( byte * ) ":" ) )
         {
             word = _LO_Colon ( ldata ) ;
-            ldata = _LO_Next ( ldata ) ; // bump ldata to account for name
+            ldata = _LO_Next ( ldata ) ; // bump ldata to account for name - skip name
         }
         else if ( String_Equal ( ldata->Name, ( byte * ) ";s" ) && ( ! GetState ( cntx, C_SYNTAX ) ) )
         {

@@ -13,19 +13,22 @@ var: facTest fibTest Dsp ;
 
 // tail recursion from http://c2.com/cgi/wiki?TailCallOptimization
 c_syntaxOn dscOn
-int factoriali ( REG n | REG rec1 )
+int factoriali ( REG n | REG res )
 {
-    rec1 = 1;
+    res = 1;
     while ( n >= 2 )
     {
-        rec1 *= (n--) ; 
-        //rec1 = rec1 * n-- ;
+#if 1
+        res *= (n--) ; 
+#else
+        res = res * (n--) ;
+#endif
     }
-    return rec1;
+    return res;
 } prefix
 c_syntaxOff 
-'factorial find wdiss
-factoriali (7) dup p 5040 _assert //sp
+'factoriali find wdiss
+factoriali (7) dup p 5040 _assert //pause //sp
 dscOff
 : factorial ( n  | fac -- TOS ) 
     fac 1 = 
@@ -104,13 +107,13 @@ faccs2 ( REG n | REG rec )
 faccs2 ( 7 ) dup p 5040 _assert 
 c_syntaxOff
 
-: fac ( n  | rec1 -- TOS ) 
-    rec1 1 = 
-    { n @ 1 > } { rec1 n @ rec1 @ * = n -- } while 
-    rec1 @ 
+: fac ( n  | res -- TOS ) 
+    res 1 = 
+    { n @ 1 > } { res n @ res @ * = n -- } while 
+    res @ 
 ;
 7 fac dup p 5040 _assert 
-// : bexp2 ( n | rec1 ) { n @ 1 <= } { 1 } { n @ dup -- bexp2 * } ifElse ;
+// : bexp2 ( n | res ) { n @ 1 <= } { 1 } { n @ dup -- bexp2 * } ifElse ;
 
 : sdbg ( j ) { stackDepth 20 > } { state regs nl "stackDepth = " ps stackDepth p nl hex { j stackDepth = } { j @ 0 > } { j -- } { p } for quit } if2 ;
 
@@ -175,16 +178,21 @@ reps 20000 =
 "factorial" ffx
 "cfactorial" ffx
 "cfactorial2" ffx
+"cfactorial3" ffx
 User "qexp" ffx
 C "bexp" ffx
 "bexp2" ffx
-"factorial" ffx
+"factoriali" ffx
 C "qexp" ffx
 C "qexp2" ffx
 "bexp" ffx
 "bexp2" ffx
 "bexp3" ffx
+#if 0
 "fac" ffx
+#else
+TODO ( "fac ffx : dev.cft : problem with SC_WordList" )
+#endif
 "fac5" ffx //pause
 User
 "factorial" ffx

@@ -34,7 +34,7 @@ Stack_Print_AValue ( uint64 * stackPointer, int64 i, byte * stackName, byte * bu
     word = Word_GetFromCodeAddress ( ( byte* ) ( stackPointer [ i ] ) ) ;
     if ( word )
     {
-        if ( NON_MORPHISM_TYPE ( word ) ) sprintf ( ( char* ) buffer, "< word : %s.%s : value = 0x%016lx >", word->ContainingNamespace->Name, c_gd ( word->Name ), ( uint64 ) word->S_Value ) ;
+        if ( IS_NON_MORPHISM_TYPE ( word ) ) sprintf ( ( char* ) buffer, "< word : %s.%s : value = 0x%016lx >", word->ContainingNamespace->Name, c_gd ( word->Name ), ( uint64 ) word->S_Value ) ;
         else sprintf ( ( char* ) buffer, "< word : %s.%s : definition = 0x%016lx >", word->ContainingNamespace->Name, c_gd ( word->Name ), ( uint64 ) word->Definition ) ;
     }
     else string = String_CheckForAtAdddress ( ( byte* ) ( ( byte* ) ( stackPointer[i] ) ) ) ;

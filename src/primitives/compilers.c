@@ -252,22 +252,14 @@ CfrTil_Variable ( )
 
 // "{|" - exit the Compiler start interpreting
 // named after the forth word '[' 
-// meaning is reversed from forth which doesn't have blocks
 
 void
 CfrTil_LeftBracket ( )
 {
-    SetState ( _Context_->Compiler0, COMPILE_MODE, false ) ;
+    Compiler * compiler = _Compiler_ ;
+    SetState ( compiler, COMPILE_MODE, false ) ;
+    if ( compiler->SaveOptimizeState ) CfrTil_OptimizeOn ( ) ; 
 }
-
-#if 0
-
-void
-CfrTil_CompileModeOn ( )
-{
-    SetState ( _Context_->Compiler0, COMPILE_MODE, true ) ;
-}
-#endif
 
 // "|}" - enter the Compiler
 // named following the forth word ']'
@@ -275,8 +267,9 @@ CfrTil_CompileModeOn ( )
 void
 CfrTil_RightBracket ( )
 {
-    SetState ( _Context_->Compiler0, COMPILE_MODE, true ) ;
-    //Compiler_Init ( _Compiler_, 0 ) ;
+    Compiler * compiler = _Compiler_ ;
+    SetState ( compiler, COMPILE_MODE, true ) ;
+    compiler->SaveOptimizeState = GetState ( _CfrTil_, OPTIMIZE_ON ) ;
 }
 
 void

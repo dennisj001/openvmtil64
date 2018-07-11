@@ -52,13 +52,12 @@ _Interpreter_DoWord ( Interpreter * interp, Word * word, int64 tokenStartReadLin
             tsrli = _Lexer_->TokenStart_ReadLineIndex ;
         }
         else tsrli = tokenStartReadLineIndex ;
-        word->W_TokenStart_ReadLineIndex = tsrli ; //( tokenStartReadLineIndex <= 0 ) ? _Lexer_->TokenStart_ReadLineIndex : tokenStartReadLineIndex ;
+        word->W_TokenStart_ReadLineIndex = tsrli ; 
         interp->w_Word = word ;
         if ( ( word->WAttribute == WT_INFIXABLE ) && ( GetState ( cntx, INFIX_MODE ) ) ) // nb. Interpreter must be in INFIX_MODE because it is effective for more than one word
         {
             DEBUG_SETUP ( word ) ;
-            //Finder_SetNamedQualifyingNamespace ( cntx->Finder0, ( byte* ) "Infix" ) ;
-            _Namespace_SetState ( _Namespace_Find ( "Infix", 0, 0 ), USING ) ;
+            //Namespace_SetState ( _CfrTil_->InfixNamespace, USING ) ;
             Interpreter_InterpretNextToken ( interp ) ;
             // then continue and interpret this 'word' - just one out of lexical order
             _Interpreter_DoWord_Default ( interp, word, 0 ) ;

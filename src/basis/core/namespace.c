@@ -91,6 +91,12 @@ Namespace_IsUsing ( byte * name )
 void
 _Namespace_SetState ( Namespace * ns, uint64 state )
 {
+    ns->State = state ;
+}
+
+void
+Namespace_SetState ( Namespace * ns, uint64 state )
+{
     if ( ns )
     {
         d0 ( if ( Is_DebugModeOn )
@@ -100,7 +106,7 @@ _Namespace_SetState ( Namespace * ns, uint64 state )
             _Printf ( ( byte* ) "\n\nNamespace : %s :: Before _Namespace_SetState : \n\t", ns->Name ) ;
                 List_PrintNames ( _CfrTil_->Namespaces->W_List, 5 ) ;
         } ) ;
-        ns->State = state ;
+        _Namespace_SetState ( ns, state ) ;
         if ( state & USING ) _Namespace_AddToNamespacesHead_SetAsInNamespace ( ns ) ; // make it first on the list
         else _Namespace_AddToNamespacesTail_ResetFromInNamespace ( ns ) ;
         d0 ( if ( Is_DebugModeOn )
@@ -142,7 +148,7 @@ _Namespace_AddToUsingList ( Namespace * ns )
     {
         ns = ( Word* ) _Stack_Pop ( stack ) ;
         if ( ns->W_OriginalWord ) ns = ns->W_OriginalWord ; //_Namespace_Find ( ns->Name, 0, 0 ) ; // this is needed because of Compiler_PushCheckAndCopyDuplicates
-        _Namespace_SetState ( ns, USING ) ;
+        Namespace_SetState ( ns, USING ) ;
     }
 }
 
@@ -278,7 +284,7 @@ _Namespace_Find ( byte * name, Namespace * superNamespace, int64 exceptionFlag )
     else if ( exceptionFlag )
     {
         _Printf ( ( byte* ) "\nUnable to find Namespace : %s\n", name ) ;
-        CfrTil_Exception (NAMESPACE_ERROR, 0, 1 ) ;
+        CfrTil_Exception ( NAMESPACE_ERROR, 0, 1 ) ;
         return 0 ;
     }
     return 0 ;
@@ -382,7 +388,7 @@ Namespace_FindOrNew_SetUsing ( byte * name, Namespace * containingNs, int64 setU
     {
         ns = _DataObject_New ( NAMESPACE, 0, name, NAMESPACE | IMMEDIATE, 0, 0, 0, ( int64 ) containingNs, 0 ) ;
     }
-    if ( setUsingFlag ) _Namespace_SetState ( ns, USING ) ;
+    if ( setUsingFlag ) Namespace_SetState ( ns, USING ) ;
     return ns ;
 }
 

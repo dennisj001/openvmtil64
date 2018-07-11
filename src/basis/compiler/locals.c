@@ -75,6 +75,7 @@ _Compiler_RemoveLocalFrame ( Compiler * compiler )
     {
         Compile_Move_TOS_To_ACCUM ( DSP ) ;
     }
+    //PeepHole_Optimize ( ) ;
     _Compile_LEA ( DSP, FP, 0, - LocalVarIndex_Disp ( 1 ) ) ; // restore sp - release locals stack frame
     _Compile_Move_StackN_To_Reg ( FP, DSP, 1 ) ; // restore the saved pre fp - cf AddLocalsFrame
     // remove the incoming parameters -- like in C

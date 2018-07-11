@@ -19,7 +19,7 @@
 #define _Compile_ADC_Reg_To_Reg( dstReg, srcReg ) _Compile_X_Group1_Reg_To_Reg ( ADC, dstReg, srcReg )
 
 //#define _Compile_TEST_Reg_To_Reg( dstReg, srcReg ) _Compile_Op_Special_Reg_To_Reg ( TEST_R_TO_R, dstReg, srcReg )
-#define _Compile_XCHG_Reg_To_Reg( dstReg, srcReg ) _Compile_Op_Special_Reg_To_Reg ( XCHG_R_TO_R, dstReg, srcReg )
+//#define _Compile_XCHG_Reg_To_Reg( dstReg, srcReg ) _Compile_Op_Special_Reg_To_Reg ( XCHG_R_TO_R, dstReg, srcReg )
 
 
 #define Compile_ADD( toRegOrMem, mod, reg, rm, sib, disp, isize ) _Compile_X_Group1 ( ADD, toRegOrMem, mod, reg, rm, sib, disp, isize )
@@ -45,22 +45,22 @@
 #define CfrtTil_Compile_JL( jmpToAddr ) Compile_JCC ( 0, LESS, jmpToAddr )
 
 // group 2
-#define Compile_ROL( mod, rm, sib, disp, imm ) _Compile_Group2 ( mod, ROL, rm, sib, disp, imm )
-#define Compile_ROR( mod, rm, sib, disp, imm ) _Compile_Group2 ( mod, ROR, rm, sib, disp, imm )
-#define Compile_RCL( mod, rm, sib, disp, imm ) _Compile_Group2 ( mod, RCL, rm, sib, disp, imm )
-#define Compile_RCR( mod, rm, sib, disp, imm ) _Compile_Group2 ( mod, RCR, rm, sib, disp, imm )
-#define Compile_SHL( mod, rm, sib, disp, imm ) _Compile_Group2 ( mod, SHL, rm, sib, disp, imm )
-#define Compile_SHR( mod, rm, sib, disp, imm ) _Compile_Group2 ( mod, SHR, rm, sib, disp, imm )
-#define Compile_SAL( mod, rm, sib, disp, imm ) _Compile_Group2 ( mod, SAL, rm, sib, disp, imm )
-#define Compile_SAR( mod, rm, sib, disp, imm ) _Compile_Group2 ( mod, SAR, rm, sib, disp, imm )
-#define Compile_ROL_CL( mod, rm, sib, disp ) _Compile_Group2_CL ( mod, ROL, rm, sib, disp )
-#define Compile_ROR_CL( mod, rm, sib, disp ) _Compile_Group2_CL ( mod, ROR, rm, sib, disp )
-#define Compile_RLC_CL( mod, rm, sib, disp ) _Compile_Group2_CL ( mod, RCL, rm, sib, disp )
-#define Compile_RCR_CL( mod, rm, sib, disp ) _Compile_Group2_CL ( mod, RCR, rm, sib, disp )
-#define Compile_SHL_CL( mod, rm, sib, disp ) _Compile_Group2_CL ( mod, SHL, rm, sib, disp )
-#define Compile_SHR_CL( mod, rm, sib, disp ) _Compile_Group2_CL ( mod, SHR, rm, sib, disp )
-#define Compile_SAL_CL( mod, rm, sib, disp ) _Compile_Group2_CL ( mod, SAL, rm, sib, disp )
-#define Compile_SAR_CL( mod, rm, sib, disp ) _Compile_Group2_CL ( mod, SAR, rm, sib, disp )
+#define Compile_ROL( mod, rm, sib, disp, imm ) _Compile_Group2 ( mod, ROL, rm, 0, sib, disp, imm )
+#define Compile_ROR( mod, rm, sib, disp, imm ) _Compile_Group2 ( mod, ROR, rm, 0, sib, disp, imm )
+#define Compile_RCL( mod, rm, sib, disp, imm ) _Compile_Group2 ( mod, RCL, rm, 0, sib, disp, imm )
+#define Compile_RCR( mod, rm, sib, disp, imm ) _Compile_Group2 ( mod, RCR, rm, 0, sib, disp, imm )
+#define Compile_SHL( mod, rm, sib, disp, imm ) _Compile_Group2 ( mod, SHL, rm, 0, sib, disp, imm )
+#define Compile_SHR( mod, rm, sib, disp, imm ) _Compile_Group2 ( mod, SHR, rm, 0, sib, disp, imm )
+#define Compile_SAL( mod, rm, sib, disp, imm ) _Compile_Group2 ( mod, SAL, rm, 0, sib, disp, imm )
+#define Compile_SAR( mod, rm, sib, disp, imm ) _Compile_Group2 ( mod, SAR, rm, 0, sib, disp, imm )
+#define Compile_ROL_CL( mod, rm, sib, disp ) _Compile_Group2_CL ( mod, ROL, rm, 0, sib, disp )
+#define Compile_ROR_CL( mod, rm, sib, disp ) _Compile_Group2_CL ( mod, ROR, rm, 0, sib, disp )
+#define Compile_RLC_CL( mod, rm, sib, disp ) _Compile_Group2_CL ( mod, RCL, rm, 0, sib, disp )
+#define Compile_RCR_CL( mod, rm, sib, disp ) _Compile_Group2_CL ( mod, RCR, rm, 0, sib, disp )
+#define Compile_SHL_CL( mod, rm, sib, disp ) _Compile_Group2_CL ( mod, SHL, rm, 0, sib, disp )
+#define Compile_SHR_CL( mod, rm, sib, disp ) _Compile_Group2_CL ( mod, SHR, rm, 0, sib, disp )
+#define Compile_SAL_CL( mod, rm, sib, disp ) _Compile_Group2_CL ( mod, SAL, rm, 0, sib, disp )
+#define Compile_SAR_CL( mod, rm, sib, disp ) _Compile_Group2_CL ( mod, SAR, rm, 0, sib, disp )
 
 //group 3
 // div eax, src ::=> eax/(src - modRm) quotient in eax remainder in edx
@@ -79,7 +79,8 @@
 #define Compile_INC( mod, rm, sib, disp ) _Compile_Group5 ( INC, mod, rm, sib, disp, 0  )
 #define Compile_DEC( mod, rm, sib, disp ) _Compile_Group5 ( DEC, mod, rm, sib, disp, 0  )
 #define Compile_PUSH( mod, rm, sib, disp ) _Compile_Group5 ( PUSH, mod, rm, sib, disp, 0 )
-#define Compile_POP( mod, rm, sib, disp ) _Compile_Group5 ( POP, mod, rm, sib, disp, 0 )
+
+#define Compile_POP( mod, rm, sib, disp ) _Compile_GroupPushPop ( POP, mod, rm, sib, disp, 0 )
 
 #define _Compile_TestImm_0xffffffff( mod, reg, rm, sib, disp ) _Compile_Test ( mod, reg, rm, IMM_B, disp, 0xffffffff )
 #if 0
@@ -89,6 +90,6 @@
 #define _Compile_TestImm_0_Rm( rm, sib, disp ) _Compile_Test ( MEM, 0, rm, disp, 0 )
 #endif
 #define  PUSH_IMM    0x68      
-#define _Compile_PushRspImm( data ) _Compile_Write_Instruction_X64 (0, PUSH_IMM, 0, 0, 0, 0, 0, 0, CELL , ( int64 ) data, 0)
+#define _Compile_PushRspImm( data ) _Compile_Write_Instruction_X64 (0, 0, PUSH_IMM, 0, 0, 0, 0, 0, 0, CELL )
 
 

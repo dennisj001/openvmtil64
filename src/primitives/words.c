@@ -5,7 +5,6 @@ void
 _CfrTil_Colon ( )
 {
     CfrTil_RightBracket ( ) ;
-    SetState ( _Context_->Compiler0, COMPILE_MODE, true ) ;
     CfrTil_SourceCode_Init ( ) ;
     CfrTil_Token ( ) ;
     CfrTil_Word_Create ( ) ;
@@ -17,7 +16,7 @@ CfrTil_Colon ( )
 {
     _CfrTil_Colon ( ) ;
     byte * token = Lexer_PeekNextNonDebugTokenWord ( _Lexer_, 0 ) ;
-    if ( String_Equal ( token, "(") )
+    if ( String_Equal ( token, "(" ) )
     {
         Lexer_ReadToken ( _Lexer_ ) ;
         CfrTil_LocalsAndStackVariablesBegin ( ) ;
@@ -145,9 +144,6 @@ CfrTil_Word_Create ( )
 {
     byte * name = ( byte* ) DataStack_Pop ( ) ;
     Word * word = Word_New ( name ) ;
-    //_Compiler_->CurrentCreatedWord = word ;
-    //word->Coding = Here ;
-    //_CfrTil_WordList_PushWord ( word ) ;
     DataStack_Push ( ( int64 ) word ) ;
 }
 
@@ -196,12 +192,54 @@ Word_Name ( )
     Word * word = ( Word* ) DataStack_Pop ( ) ;
     DataStack_Push ( ( int64 ) word->Name ) ;
 }
+#if 0
 
 void
 Word_Location ( )
 {
     Word * word = ( Word* ) DataStack_Pop ( ) ;
-    _Word_Location_Printf ( word ) ;
+    _Location_Printf ( word ) ;
+}
+dllist *wcall = 0 ; // wordCompiledAt_LocationList
+#endif
+
+Location *
+Location_New ( )
+{
+    ReadLiner * rl = _ReadLiner_ ;
+    Location * loc = ( Location * ) Mem_Allocate ( sizeof ( Location ), OBJECT_MEMORY ) ;
+    loc->Filename = rl->Filename ;
+    loc->LineNumber = rl->LineNumber ;
+    loc->CursorPosition = _Context_->Lexer0->CurrentReadIndex ; // rl->CursorPosition ;
+    return loc ;
+}
+
+void
+Location_PushNew ( )
+{
+    Location * loc = Location_New ( ) ;
+    _Compile_DataStack_Push ( ( int64 ) loc ) ;
+}
+
+void
+CompileTime_Location ( )
+{
+    if ( Compiling )
+    {
+        Location_PushNew ( ) ;
+        Word_Compile_CurrentRunningWord ( ) ;
+        _Context_->CurrentlyRunningWord->CAttribute |= IMMEDIATE ;
+    }
+    else
+    {
+        Location_Printf ( ) ;
+    }
+}
+
+void
+Word_Compile_CurrentRunningWord ( )
+{
+    Compile_Call ( ( byte* ) _Context_->CurrentlyRunningWord->Definition ) ;
 }
 
 void
@@ -221,6 +259,16 @@ void
 CfrTil_Immediate ( void )
 {
     if ( _CfrTil_->LastFinishedWord ) _CfrTil_->LastFinishedWord->CAttribute |= IMMEDIATE ;
+}
+
+void
+CfrTil_StackVariable ( void )
+{
+    if ( _CfrTil_->LastFinishedWord )
+    {
+        _CfrTil_->LastFinishedWord->CAttribute2 |= VARIABLE ;
+        _CfrTil_->LastFinishedWord->CAttribute |= STACK_VARIABLE ;
+    }
 }
 
 void

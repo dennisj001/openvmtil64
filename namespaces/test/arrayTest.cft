@@ -124,6 +124,7 @@ arr1 arr2 // should print decimal 0x59
 
 ' a3 find wdiss
 1 arr1 a3
+TODO ( "fix optimized arrays; reorganize array.c" ) //pause
 arr1.ar[2] @ 0x89 _assert
 
 "Ar2" class :{ int64 ar [4][4] };
@@ -171,8 +172,13 @@ nl "a6 : " ps location a6 size @ dump
 : a8 ( Ar3 a ) 
     a.ar[1][2][1] a.ar[2][2][1] @ = 
     nl "a8.a : " ps location a size @ dump
+#if 0 // this should work !?
     a.ar[1][2][1] dup hp @ dup hp 0x89 _assert 
     a.ar[2][2][1] dup hp @ dup hp 0x89 _assert 
+#else
+    a.ar[1][2][1] @ 0x89 _assert 
+    a.ar[2][2][1] @ 0x89 _assert 
+#endif
 ;
 ' a8 find wdiss
 

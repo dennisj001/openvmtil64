@@ -29,6 +29,7 @@ OBJECTS = $(SOURCES:%.c=%.o)
 CC = gcc
 OUT = cfrtil64-gdb
 
+//all : default
 default : debug
 
 debug : cfrtil64-gdb 
@@ -44,12 +45,11 @@ LIBS = -L/usr/local/lib -ludis86 -lrt -lc -ldl -lm  -lmpfr -lgmp #-lpython3.7#-l
 #LIBS = -ludis86 -lgmp -lrt -lc -ldl -lm #-lffi -lgc
 
 oclean : 
-	-rm basis/*.o primitives/*.o basis/compiler/*.o basis/core/*.o bin/cfrtil*
+	-rm basis/*.o primitives/*.o basis/compiler/*.o basis/core/*.o 
 	
 _clean : 
 	make oclean
-	-rm cfrtil64* ../bin/cfrtil64*
-
+	
 clean : 
 	make _clean
 	touch include/defines.h
@@ -157,7 +157,7 @@ optimize2 : oclean _cfrtil64_O2
 
 optimize3 : oclean _cfrtil64_O3
 
-optimize :
+optimize : 
 	make optimize1
 	make optimize2
 	make optimize3

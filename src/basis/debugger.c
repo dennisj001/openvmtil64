@@ -82,8 +82,8 @@ Debugger_TableSetup ( Debugger * debugger )
     debugger->CharacterFunctionTable [ 28 ] = Debugger_DisassembleTotalAccumulated ;
     debugger->CharacterFunctionTable [ 29 ] = Debugger_Using ;
     debugger->CharacterFunctionTable [ 30 ] = Debugger_ReturnStack ;
-    debugger->CharacterFunctionTable [ 31 ] = DebugWordList_Show ;
-    debugger->CharacterFunctionTable [ 32 ] = Debugger_ShowCompilerWordList ;
+    debugger->CharacterFunctionTable [ 31 ] = DebugWordList_ShowAll ;
+    debugger->CharacterFunctionTable [ 32 ] = Debugger_Show_InUse_CompilerWordList ;
     debugger->CharacterFunctionTable [ 33 ] = Debugger_CfrTilRegisters ;
 }
 
@@ -168,10 +168,10 @@ Debugger_On ( Debugger * debugger )
 {
     _Debugger_Init ( debugger, 0, 0 ) ;
     SetState_TrueFalse ( _Debugger_, DBG_MENU | DBG_INFO, DBG_STEPPING | DBG_AUTO_MODE | DBG_PRE_DONE | DBG_INTERPRET_LOOP_DONE ) ;
-    debugger->StartHere = Here ;
     debugger->LastSetupWord = 0 ;
     debugger->LastSourceCodeIndex = 0 ;
     debugger->PreHere = 0 ;
+    if ( ! Is_DebugModeOn ) debugger->StartHere = Here ;
     DebugOn ;
     DebugShow_On ;
 }
@@ -179,15 +179,18 @@ Debugger_On ( Debugger * debugger )
 void
 _Debugger_Off ( Debugger * debugger )
 {
-    Stack_Init ( debugger->ReturnStack ) ;
-    debugger->StartHere = 0 ;
-    debugger->PreHere = 0 ;
-    debugger->DebugAddress = 0 ;
-    SetState ( debugger->cs_Cpu, CPU_SAVED, false ) ;
-    debugger->w_Word = 0 ;
-    SetState ( debugger, DBG_STACK_OLD, true ) ;
-    debugger->CopyRSP = 0 ;
-    SetState ( _Debugger_, DBG_BRK_INIT | DBG_ACTIVE | DBG_STEPPING | DBG_PRE_DONE | DBG_AUTO_MODE | DBG_EVAL_AUTO_MODE, false ) ;
+    if ( debugger )
+    {
+        Stack_Init ( debugger->ReturnStack ) ;
+        debugger->StartHere = 0 ;
+        debugger->PreHere = 0 ;
+        debugger->DebugAddress = 0 ;
+        SetState ( debugger->cs_Cpu, CPU_SAVED, false ) ;
+        debugger->w_Word = 0 ;
+        SetState ( debugger, DBG_STACK_OLD, true ) ;
+        debugger->CopyRSP = 0 ;
+        SetState ( _Debugger_, DBG_BRK_INIT | DBG_ACTIVE | DBG_STEPPING | DBG_PRE_DONE | DBG_AUTO_MODE | DBG_EVAL_AUTO_MODE, false ) ;
+    }
 }
 
 void
@@ -215,8 +218,6 @@ _Debugger_Init ( Debugger * debugger, Word * word, byte * address )
         debugger->State = DBG_MENU | DBG_INFO | DBG_PROMPT ;
     }
     debugger->w_Word = word ;
-
-    DebugOn ;
     if ( address )
     {
         debugger->DebugAddress = address ;
@@ -364,8 +365,6 @@ Debugger_Eval ( Debugger * debugger )
     SetState_TrueFalse ( debugger, DBG_INTERPRET_LOOP_DONE | DBG_EVAL_AUTO_MODE, DBG_STEPPING ) ;
     if ( GetState ( debugger, DBG_AUTO_MODE ) ) SetState ( debugger, DBG_EVAL_AUTO_MODE, true ) ;
     debugger->PreHere = Here ;
-    d0 ( Cpu_CheckRspForWordAlignment ( "Debugger_Eval" ) ) ;
-
 }
 
 void
@@ -420,7 +419,7 @@ Debugger_ReturnStack ( Debugger * debugger )
 void
 Debugger_Source ( Debugger * debugger )
 {
-    Word * scWord = Compiling ? _Compiler_->CurrentWordCompiling : GetState ( debugger, DBG_STEPPING ) ? 
+    Word * scWord = Compiling ? _Compiler_->CurrentWordCompiling : GetState ( debugger, DBG_STEPPING ) ?
         Debugger_GetWordFromAddress ( debugger ) : _Context_->CurrentlyRunningWord ;
     _CfrTil_Source ( scWord, 0 ) ; //debugger->w_Word ? debugger->w_Word : _CfrTil_->DebugWordListWord, 0 ) ;
     SetState ( debugger, DBG_INFO, true ) ;
@@ -531,8 +530,8 @@ Debugger_InterpretLine ( )
 void
 Debugger_Escape ( Debugger * debugger )
 {
-    Boolean saveSystemState = _Context_->System0->State ;
-    Boolean saveDebuggerState = debugger->State ;
+    uint64 saveSystemState = _Context_->System0->State ;
+    uint64 saveDebuggerState = debugger->State ;
     SetState ( _Context_->System0, ADD_READLINE_TO_HISTORY, true ) ;
     SetState_TrueFalse ( debugger, DBG_COMMAND_LINE | DBG_ESCAPED, DBG_ACTIVE ) ;
     _Debugger_ = Debugger_Copy ( debugger, TEMPORARY ) ;

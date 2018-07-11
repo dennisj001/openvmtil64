@@ -1,6 +1,6 @@
 
-"\nstarting lisp.cft\n" ddps
 5
+"\nstarting lisp.cft\n" ddps
 Lisp
 "lambda" tick _lambda find alias immediate
 "/\" tick lambda find alias
@@ -152,17 +152,15 @@ nl
 #endif
 
 //pause
+//optimizeOff
 nl
 ( :: : hioo 3 4 + dup p ; : hio 5 6 + dup p ; hio hioo ) 7 _assert 11 _assert s // pause
 ( hioo ) ( hio ) 11 _assert 7 _assert hio hioo 7 _assert 11 _assert 
 tick hioo find wdiss //pause
 
-#if 0
-( :: C : bexp43 ( n ) { n @ 1 > } { n @ n @ d: -- bexp43 * } { 1 } ifElse ; )
-//d: ( :: C : bexp43 ( n ) { n @ 1 > } { n @ n -- @ bexp43 * } { 1 } ifElse ; )
+( :: C : bexp43 ( n ) { n @ 1 > } { n @ n @ -- bexp43 * } { 1 } ifElse ; )
 tick bexp43 find wdiss //pause
-7 C bexp43 dup 5040 nl _assert p nl 
-#endif
+7 C bexp43 dup 5040 nl "C : bexp43_assert" assert p nl 
 
 s
 lispOff
@@ -184,28 +182,28 @@ lispOff
 //' goedel3 find wdiss pause   
 nl "goedel3 :: " ps nl
 9 goedel3 _assert0  "\ngoedel3 output should read : \n'junk' 2 'junk' 7 'junk' 7 9" ps //pause
-
 Debug Lisp // test comment
 ( :: 
-    "\ngoedel7 output : " ps  nl 
-    : goedel7 (| n -- TOS ) 
-        n 9 = // test comment //level 0
+    : goedel6 (| n -- TOS ) 
+        nl "goedel6 :: " ps nl
+        n 9 =
         { 
-            (| n ) n @ p n 2 = n @ dup p 2 _assert0 //level 1
-            { (| n ) n @ p n 3 = n @ 4 + dup p 7 _assert0 } ix  // test comment //level 2
-            n @ 6 /*testing comment ... //level 1
-            testing comment*/ + 8 _assert0 /*test comment*/ //level 1
+            (| n ) n @ p n 2 = n @ dup p 2 "goedel6_1_assert" assert // first n should be garbage here; second n 2
+            { (| n ) n @ p n 3 = n @ 4 + dup p 7 "goedel6_2_assert" assert } ix // first n should be garbage here; second 7
+            n @ 6 + 8 "goedel6_3_assert" assert 
         } ix
-        { (| n ) //level 3
-            n @ p n 3 = 
+        { (| n ) 
+            n @ p 
+            n 3 = 
             n dup @ 4 + = 
-            n @ p n @ 7 _assert0 
-        } ix 
-        n @ dup p //level 0
+            n @ dup p 7 "goedel6_4_assert" assert 
+        } ix // n should be garbage here
+        n @ dup p
     ;
-    tick goedel7 find wdiss 
-    goedel7 9 _assert0 "\ngoedel7 output should read : \n'junk' 2 'junk' 7 'junk' 7 9" ps 
-) 
+    //' goedel6 find wdiss pause   
+    9 goedel6 "goedel6_0_assert" assert
+    "\ngoedel6 :: goedel6 output should read : \n'junk' 2 'junk' 7 7 'junk' 9" ps //pause
+)
 ( ::
     "\ngoedel8 output : " ps  nl 
     : goedel8 (| n -- TOS ) 
@@ -229,14 +227,18 @@ Debug Lisp // test comment
 //pause
 tick goedel7 find wdiss 
 s
-#endif
 Lisp
 nl (list (1 2)) (list 1 2)
 //pause
+
+#endif // lisp '::' problems
+
 lispOff 
+
+
 "\nending lisp.cft\n" ddps
 sp 
-#if 0 //doScript
+#if 1 //doScript
 String
 $ls -al /usr/local ; 
 $etc/script ;
@@ -244,7 +246,7 @@ $etc/lispScript ;
 //pause
 : hi 1 2 + p ; pause hi nl
 $ls  -al ;
-//s: hi ( a b | c ) c a @ b @ + = printf ("\n%d", c ) ;s 1 2 hi 
+s: hi ( a b | c ) c a @ b @ + = printf ("\n%d", c ) ;s 1 2 hi //pause
 verbosity 1 =
 s
 //pause

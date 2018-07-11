@@ -76,7 +76,6 @@ CfrTil_DebugRuntimeBreakpoint ( )
                 Debugger_SetupStepping ( debugger ) ;
                 SetState_TrueFalse ( debugger, DBG_RUNTIME | DBG_RESTORE_REGS | DBG_ACTIVE | DBG_RUNTIME_BREAKPOINT | DEBUG_SHTL_OFF,
                     DBG_INTERPRET_LOOP_DONE | DBG_PRE_DONE | DBG_CONTINUE | DBG_NEWLINE | DBG_PROMPT | DBG_INFO | DBG_MENU ) ;
-                //SetState ( debugger, DBG_RUNTIME_BREAKPOINT | DEBUG_SHTL_OFF, true ) ;
             }
         }
         else { debugger->DebugAddress += 3 ;  SetState ( _Debugger_, ( DBG_AUTO_MODE | DBG_AUTO_MODE_ONCE ), false ) ; } // 3 : sizeof call rax insn
@@ -87,7 +86,6 @@ CfrTil_DebugRuntimeBreakpoint ( )
         Word * word = debugger->w_Word ;
         if ( ( ! word ) || GetState ( word, STEPPED ) )
         {
-            //_CfrTil_->SaveDsp = _Dsp_ ;
             siglongjmp ( _Context_->JmpBuf0, 1 ) ; //in Word_Run
         }
 #endif            

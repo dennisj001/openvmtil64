@@ -92,7 +92,7 @@ Compile_Cmp_Set_tttn_Logic ( Compiler * compiler, int64 ttt, int64 negateFlag )
     //SC_ForcePush ( _Context_->CurrentlyRunningWord ) ;
     //SC_SetForcePush ( true ) ;
     int8 reg = ACC ;
-    int64 optFlag = CheckOptimize ( compiler, 5 ) ;
+    int64 optFlag = Compiler_CheckOptimize (compiler) ;
 #define dbgON_13 0
 #if dbgON_13    
     d1 ( byte * here = Here ) ;
@@ -122,14 +122,10 @@ Compile_Cmp_Set_tttn_Logic ( Compiler * compiler, int64 ttt, int64 negateFlag )
                 int64 size ;
                 if ( compiler->OptInfo->Optimize_Imm >= 0x100000000 )
                 {
-                    // considering _Compile_X_Group1_Immediate ( int8 code, int8 mod, int8 rm, int64 disp, uint64 imm, int8 iSize ) with size == 8
                     size = 8 ;
                     negateFlag = ! negateFlag ;
-                    //reg = OREG2 ;
                 }
                 else size = 0 ;
-                //_DBI_ON ;
-                // Compile_CMPI( mod, operandReg, offset, immediateData, size
                 Compile_CMPI ( compiler->OptInfo->Optimize_Mod, compiler->OptInfo->Optimize_Rm, compiler->OptInfo->Optimize_Disp, compiler->OptInfo->Optimize_Imm, size ) ;
             }
         }
@@ -149,9 +145,9 @@ Compile_Cmp_Set_tttn_Logic ( Compiler * compiler, int64 ttt, int64 negateFlag )
         Compile_CMP ( REG, REG, ACC, OREG, 0, 0, CELL ) ;
     }
     _Compile_SETcc_tttn_REG ( ttt, negateFlag, reg ) ; // immediately after the 'cmp' insn which changes the flags appropriately
-    _Compile_MOVZX_REG ( reg ) ;
+    _Compile_MOVZX_BYTE_REG ( reg ) ;
     //Compiler_CompileAndRecord_PushAccum ( compiler ) ;
-    _Compiler_CompileAndRecord_PushAccum ( compiler, ACC ) ;
+    _Compiler_CompileAndRecord_Word0_PushReg ( compiler, ACC ) ;
     //DBI_OFF ;
 #if dbgON_13    
     d1 ( //if ( DBI )
@@ -276,29 +272,31 @@ _Compile_LogicResultForStack ( int64 reg, Boolean negFlag )
 {
     Compile_JCC ( negFlag, ZERO_TTT, Here + 21 ) ; // if eax is zero return not(R8) == 1 else return 0
     // return 0 in reg :
-    _Compile_MoveImm_To_Reg ( reg, 0, CELL_SIZE ) ; // 6 bytes
+    Compile_MoveImm_To_Reg ( reg, 0, CELL_SIZE ) ; // 6 bytes
     _Compile_JumpWithOffset ( 10 ) ; // 6 bytes
 
     //return 1 in reg :
-    _Compile_MoveImm_To_Reg ( reg, 1, CELL_SIZE ) ;
+    Compile_MoveImm_To_Reg ( reg, 1, CELL_SIZE ) ;
     //_Set_JccLogicCode ( _Compiler_ ) ;
 }
 
 void
 _Compile_LogicalAnd ( Compiler * compiler )
 {
+    CompileOptimizeInfo * optInfo = compiler->OptInfo ;
+    //if ( ( optInfo->wordArg2_Op || optInfo->xBetweenArg1AndArg2 ) ) _Compile_Stack_PopToReg ( DSP, OREG ) ;
     Compile_BlockInfoTestLogic ( compiler, OREG, Z ) ;
     Compile_JCC ( Z, ZERO_TTT, Here + 15 ) ; // if eax is zero return not(R8) == 1 else return 0
     Compile_BlockInfoTestLogic ( compiler, ACC, NZ ) ;
     _Compile_LogicResultForStack ( ACC, NZ ) ;
     _Set_JccLogicCode ( compiler ) ;
-    _Compiler_CompileAndRecord_PushAccum ( compiler, ACC ) ;
+    _Compiler_CompileAndRecord_Word0_PushReg ( compiler, ACC ) ;
 }
 
 void
 Compile_LogicalAnd ( Compiler * compiler )
 {
-    int64 optFlag = CheckOptimize ( compiler, 5 ) ;
+    int64 optFlag = Compiler_CheckOptimize (compiler) ;
     if ( optFlag & OPTIMIZE_DONE ) return ;
     else if ( optFlag )
     {
@@ -331,7 +329,7 @@ _Compile_LogicalNot ( Compiler * compiler )
     _Set_JccLogicCodeForNot ( compiler ) ;
     _Compile_LogicResultForStack ( ACC, Z ) ;
     _Set_JccLogicCode ( compiler ) ;
-    _Compiler_CompileAndRecord_PushAccum ( compiler, ACC ) ;
+    _Compiler_CompileAndRecord_Word0_PushReg ( compiler, ACC ) ;
     //DBI_OFF ;
 }
 
@@ -340,14 +338,14 @@ Compile_LogicalNot ( Compiler * compiler )
 {
     //Word *one = Compiler_WordStack ( - 1 ) ; // assumes two values ( n m ) on the DSP stack 
     Word *one = _Compiler_WordList ( compiler, 1 ) ; // assumes two values ( n m ) on the DSP stack 
-    int64 optFlag = CheckOptimize ( compiler, 2 ) ; // check especially for cases that optimize literal ops
+    int64 optFlag = Compiler_CheckOptimize (compiler) ; // check especially for cases that optimize literal ops
     if ( optFlag & OPTIMIZE_DONE ) return ;
         // just need to get to valued to be operated on ( not'ed ) in eax
-    else if ( optFlag ) //&& ( ! GetState ( _Context_->Compiler0, PREFIX_PARSING ) ) )
+    else if ( optFlag ) 
     {
         if ( compiler->OptInfo->OptimizeFlag & OPTIMIZE_IMM )
         {
-            _Compile_MoveImm_To_Reg ( ACC, compiler->OptInfo->Optimize_Imm, CELL ) ;
+            Compile_MoveImm_To_Reg ( ACC, compiler->OptInfo->Optimize_Imm, CELL ) ;
         }
         else if ( compiler->OptInfo->Optimize_Rm == DSP )
         {
@@ -411,7 +409,7 @@ Compile_GreaterThanOrEqual ( Compiler * compiler )
 void
 Compile_Logical_X ( Compiler * compiler, int64 op )
 {
-    int64 optFlag = CheckOptimize ( compiler, 5 ) ;
+    int64 optFlag = Compiler_CheckOptimize (compiler) ;
     if ( optFlag == OPTIMIZE_DONE ) return ;
     else if ( optFlag )
     {
@@ -425,7 +423,7 @@ Compile_Logical_X ( Compiler * compiler, int64 op )
         // operands are still on the stack
         _Compile_Move_StackN_To_Reg ( ACC, DSP, 0 ) ;
         //_Compile_Group1 ( int64 code, int64 toRegOrMem, int64 mod, int64 reg, int64 rm, int64 sib, int64 disp, int64 osize )
-        _Compile_X_Group1 ( op, REG, MEM, ACC, DSP, 0, - 4, CELL ) ;
+        _Compile_X_Group1 ( op, REG, MEM, ACC, DSP, 0, CELL, CELL ) ;
         _Compile_Stack_DropN ( DSP, 2 ) ;
 
         Compile_TestLogicAndStackPush ( compiler, ACC, NZ ) ;

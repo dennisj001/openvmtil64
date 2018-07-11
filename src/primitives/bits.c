@@ -191,11 +191,13 @@ CfrTil_ShiftRight ( ) // rshift
 }
 
 void
-CfrTil_ShiftLeft_Equal ( ) // +=
+CfrTil_ShiftLeft_Equal ( ) // <<=
 {
-    if ( GetState ( _Context_->Compiler0, BLOCK_MODE ) )
+    Compiler * compiler = _Context_->Compiler0 ;
+    if ( GetState ( compiler, BLOCK_MODE ) )
     {
-        Compile_X_Shift ( _Context_->Compiler0, SHL, 0 ) ;
+        Compile_X_Shift ( compiler, SHL, 0, 1 ) ;
+        Compile_Move_Reg_To_Rm ( OREG2, RAX, 0 ) ;
     }
     else
     {
@@ -208,11 +210,12 @@ CfrTil_ShiftLeft_Equal ( ) // +=
 }
 
 void
-CfrTil_ShiftRight_Equal ( ) // +=
+CfrTil_ShiftRight_Equal ( ) // >>=
 {
     if ( GetState ( _Context_->Compiler0, BLOCK_MODE ) )
     {
-        Compile_X_Shift ( _Context_->Compiler0, SHR, 0 ) ;
+        Compile_X_Shift ( _Context_->Compiler0, SHR, 0, 1 ) ;
+        Compile_Move_Reg_To_Rm ( OREG2, RAX, 0 ) ;
     }
     else
     {

@@ -92,6 +92,8 @@
 #define MOD_DISP_8 1
 #define MOD_DISP_32 2
 #define MOD_REG 3
+#define TO_REG 3
+#define TO_MEM MOD_DISP_32
 // mod field values
 #define REG MOD_REG
 #define MEM 0 // 0 - 2 based on displacement, calculated at compile time
@@ -101,8 +103,6 @@
 #define RM_IS_REG_VALUE REG
 #define RM_SIB 0x4
 #define VALUE REG
-#define TO_REG 3
-#define TO_MEM 2
 // SIB byte conversions
 #define SCALE_1 0
 #define SCALE_2 1
@@ -175,38 +175,39 @@
 #define NO_INDEX ( 0x4 ) // for sib byte with no index
 
 // cfrTil uses RAX, RDX, R8D, R9D, R14, R15, RBX
-#define ACCUMULATOR_REG RAX                 // rax
-#define ACC ACCUMULATOR_REG
-#define CPU_ACCUM Rax
-#define ACCUM ACCUMULATOR_REG
-#define RETURN_REG ACC
-#define RETURN_REG_2 RDX                    // rdx
-#define OPERAND_REG R9D                     // r9
-#define OP_REG OPERAND_REG
-#define OREG OPERAND_REG
-#define CPU_OREG R9d
-#define OPERAND_2_REG R8D                   // r8
-#define OREG2 OPERAND_2_REG 
-#define CPU_OREG2 R8d
-#define THRU_REG OPERAND_2_REG
-#define SCRATCH_REG OPERAND_2_REG // eax/edx are both used sometimes by ops ebx/ecx are not ?
-#define SREG SCRATCH_REG
-#define DIV_MUL_REG_2 RDX                   // rdx
+#define ACCUMULATOR_REG         RAX                     // rax
+#define ACC                     ACCUMULATOR_REG
+#define CPU_ACCUM               Rax
+#define ACCUM                   ACCUMULATOR_REG
+#define RETURN_REG              ACC
+#define RETURN_REG_2            RDX                     // rdx
+#define OPERAND_REG             RCX                     // rcx
+#define OP_REG                  OPERAND_REG
+#define OREG                    OPERAND_REG
+#define CPU_OREG                Rcx
+#define OPERAND_2_REG           RBX                     // rbx
+#define OREG2                   OPERAND_2_REG 
+#define CPU_OREG2               Rbx
+#define THRU_REG                R9                      // r9
+#define SCRATCH_REG             R8                      // r8 // eax/edx are both used sometimes by ops ebx/ecx are not ?
+#define SREG                    SCRATCH_REG
+#define DIV_MUL_REG_2           RDX                     // rdx
+#define CALL_THRU_REG           THRU_REG                // R9
 #if DSP_IS_GLOBAL_REGISTER 
-register uint64 *_Dsp_ asm ( "r14" ) ;
-register int64 *Fp asm ("r15" ) ;
+register uint64 *_Dsp_          asm ( "r14" ) ;
+register int64 *Fp              asm ("r15" ) ;
 #endif
-#define STACK_POINTER R14D                  // r14
-#define DSP STACK_POINTER 
-#define CPU_DSP R14d
-#define FRAME_POINTER R15D                  // r15
-#define CPU_FP R15d
-#define FP FRAME_POINTER
+#define STACK_POINTER           R14D                    // r14
+#define DSP                     STACK_POINTER 
+#define CPU_DSP                 R14d
+#define FRAME_POINTER           R15D                    // r15
+#define CPU_FP                  R15d
+#define FP                      FRAME_POINTER
 
 //register uint64 *_RspReg_ asm ( "r10" ) ;
-#define CFRTIL_RETURN_STACK_POINTER RBX    // rbx
-#define CFT_RSP CFRTIL_RETURN_STACK_POINTER
-#define CPU_CFT_RSP Rbx
+#define CFRTIL_RETURN_STACK_POINTER         RBX         // rbx
+#define CFT_RSP                             CFRTIL_RETURN_STACK_POINTER
+#define CPU_CFT_RSP                         Rbx
 
 // EFLAGS
 #define CARRY_FLAG ( 1 << 0 )
@@ -225,7 +226,7 @@ register int64 *Fp asm ("r15" ) ;
 // sign extend field
 //#define SIGN_EXT 1
 //#define NO_SIGN_EXT 0
-// code field
+// group 1 code field
 #define ADD 0
 #define OR 1
 #define ADC 2
@@ -275,6 +276,12 @@ register int64 *Fp asm ("r15" ) ;
 #define IDIV 7
 #define IMUL_f ( 0x8 | IMUL ) // distinguish from other overloaded group codes
 #define IDIV_f ( 0x8 | IDIV )
+
+// below are arbitrarily chosen
+#define MODULO 9
+#define MOV 10
+#define DIVIDE 1
+#define MOD 2
 
 // conditional jump
 // jcc32 0x0f ( 0x8 << 8 | ttt << 1 | n ) : 2 bytes : little endian -> { 0x8 << 8 | ttt << 1 | n, 0x0f }

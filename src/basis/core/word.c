@@ -3,7 +3,7 @@
 void
 Word_SetCoding ( Word * word, byte * address )
 {
-    if ( ( word->CAttribute2 & ( SYNTACTIC | NOOP_WORD | NO_CODING ) ) || ( word->CAttribute & ( DEBUG_WORD ) ) || ( word->LAttribute & ( W_COMMENT | W_PREPROCESSOR ) ) ) word->Coding = 0 ;
+    if ( ( word->CAttribute2 & ( SYNTACTIC | NO_OP_WORD | NO_CODING ) ) || ( word->CAttribute & ( DEBUG_WORD ) ) || ( word->LAttribute & ( W_COMMENT | W_PREPROCESSOR ) ) ) word->Coding = 0 ;
     else word->Coding = address ;
 }
 
@@ -31,6 +31,7 @@ Word_Eval ( Word * word )
 {
     if ( word )
     {
+        _Context_->CurrentEvalWord = word ;
         if ( ! word->W_SC_ScratchPadIndex ) word->W_SC_ScratchPadIndex = _CfrTil_->SC_ScratchPadIndex ; // nb! : needs to be done for compile also
         DEBUG_SETUP ( word ) ;
         if ( ! GetState ( word, STEPPED ) )
@@ -138,16 +139,7 @@ _Word_Compile ( Word * word )
     }
     else
     {
-#if X84_ABI_RSP_ADJUST        
-        if ( word->CAttribute & CPRIMITIVE )
-        {
-            d0 ( _Printf ( ( byte* ) "\n_Word_Compile : %s : name = %s", Context_Location ( ), word->Name ) ) ;
-            // there is an slight overhead for CPRIMITIVE functions to align RSP for ABI-X64
-            Compile_Call_TestRSP ( ( byte* ) word->Definition ) ;
-        }
-        else
-#endif            
-            Compile_Call ( ( byte* ) word->Definition ) ;
+        Compile_CallWord_X84_ABI_RSP_ADJUST ( word ) ;
     }
 
 }
@@ -184,7 +176,6 @@ _Word_Finish ( Word * word )
 {
     _DObject_Finish ( word ) ;
     CfrTil_Word_FinishSourceCode ( _CfrTil_, word ) ;
-    //Compiler_Init ( _Context_->Compiler0, 0 ) ; // not really necessary should always be handled by EndBlock ?? but this allows for some syntax errors with a '{' but no '}' ??
 }
 
 void
@@ -310,9 +301,16 @@ Word_PrintOffset ( Word * word, int64 increment, int64 totalIncrement )
 }
 
 void
-_Word_Location_Printf ( Word * word )
+_Location_Printf ( Location * loc )
 {
-    if ( word ) _Printf ( ( byte* ) "\n%s.%s : %s %d.%d", word->ContainingNamespace->Name, word->Name, word->S_WordData->Filename, word->S_WordData->LineNumber, word->W_TokenEnd_ReadLineIndex ) ;
+    if ( loc ) _Printf ( ( byte* ) "\nRun Time Location : %s %d.%d", loc->Filename, loc->LineNumber, loc->CursorPosition ) ;
+}
+
+void
+Location_Printf ( )
+{
+    Location * loc = ( Location* ) DataStack_Pop ( ) ;
+    if ( loc ) _Printf ( ( byte* ) "\nRun Time Location : %s %d.%d", loc->Filename, loc->LineNumber, loc->CursorPosition ) ;
 }
 
 byte *

@@ -2,6 +2,30 @@ Int
 5
 : sp ; //stack pause ;
 dbgOff 
+C
+#if 0 // testing before bignum starts // - tail recursion from http://c2.com/cgi/wiki?TailCallOptimization
+: factorial ( n | rec ) rec 1 = { n @ 1 > } { rec @ n @ * rec store n -- } while return rec ;
+_wdiss ( 'factorial find ) 
+7 factorial dup p 5040 "factorial" assert1
+: factorial ( REG n | REG rec ) rec 1 = { n @ 1 > } { rec @ n @ * rec store n -- } while return rec ;
+_wdiss ( 'factorial find ) 
+7 factorial dup p 5040 "factorial" assert1
+c_syntaxOn
+int 
+factorial ( n | rec )
+{
+       rec = 1;
+       while ( n d: > 1 ) rec *= (n--) ;
+       return rec ;
+} 
+c_syntaxOff
+'factorial find wdiss 
+7 factorial dup p 5040 _assert sp //pause
+'C.int.factorial find wdiss 
+7 d: C.int.factorial dup p 5040 _assert sp //pause
+#else
+TODO ( "fix me : bigNum.cft : REG factorial" ) //pause
+#endif
 
 #if 0
 BigNum 
@@ -16,7 +40,6 @@ Combinators
 BigNum 
 bnInit ( 16 16 )
 : qexp { dup 1 >= } { dup -- qexp * } { drop 1 } ifElse ;
-//: qexp { dup 1 <= } { drop 1 } { dup -- recurse * } ifElse ;
 "!" ' qexp find alias
 nl "64 ! = " ps 64 ! p nl 
 x 1000 ! =
@@ -26,7 +49,7 @@ nl "1000 ! = " ps x @ fprint nl
 : bexp ( n -- TOS ) { n @ 1 <= } { 1 } { n @ dup 1 - bexp * } ifElse ; 
 : bexp0 ( n -- TOS ) { n @ 1 <= } { 1 } { n @ dup -- bexp0 * } ifElse ; 
 ' bexp find wdiss ' bexp0 find wdiss
-
+7 bexp0 p //pause
 7 ! p 8 ! p 8 ! p
 nl 7 ! p
 
@@ -40,7 +63,9 @@ sp
 1000 ! 
 x store
 x @ p
-: bexpl ( n | l ) { l x @ = n @ 1 <= } { 1 l @ p } { n @ dup 1 - bexpl * } ifElse ; 
+//: bexpl ( n | l ) { l x @ = n @ 1 <= } { 1 l @ p } { n @ dup 1 - bexpl * } ifElse ; 
+//: bexpl ( n -- TOS ) { n @ 1 <= } { 1 } { n @ dup 1 - bexpl * } ifElse ; 
+: bexpl ( n -- TOS ) { n @ 1 <= } { 1 } { n @ dup 1 - bexpl * } ifElse ; 
 7 bexpl dup p 
 : _bassert ( n m ) { n @ m @ != } { nl "error" ps _info pause } if ; 
 5040 _bassert

@@ -16,13 +16,7 @@ Block_Eval ( block blck )
 }
 
 void
-_Block_Eval_AdjustRSP ( block blck )
-{
-    _CfrTil_->CallReg_AdjustRSP ( ) ;
-}
-
-void
-_Block_Copy ( byte * srcAddress, int64 bsize, int8 optFlag )
+_Block_Copy ( byte * srcAddress, int64 bsize, int8 optFlag, int8 retFlag )
 {
     byte * saveHere = Here, * saveAddress = srcAddress ;
     ud_t * ud = Debugger_UdisInit ( _Debugger_ ) ;
@@ -45,7 +39,7 @@ _Block_Copy ( byte * srcAddress, int64 bsize, int8 optFlag )
                 SetHere ( saveHere ) ;
                 Compile_Call ( saveAddress ) ;
             }
-            break ; // don't include RET
+            if ( ! retFlag ) break ; // don't include RET
         }
         else if ( * srcAddress == CALLI32 )
         {
@@ -99,7 +93,7 @@ Block_CopyCompile_WithLogicFlag ( byte * srcAddress, int64 bindex, Boolean jccFl
     {
         jccFlag2 = Compile_CheckReConfigureLogicInBlock ( bi, 1 ) ;
     }
-    _Block_Copy ( srcAddress, bi->bp_Last - bi->bp_First, 0 ) ;
+    _Block_Copy ( srcAddress, bi->bp_Last - bi->bp_First, 0, 0 ) ;
     if ( jccFlag )
     {
         //_DBI_ON ;
@@ -134,10 +128,10 @@ Block_CopyCompile ( byte * srcAddress, int64 bindex, int64 jccFlag )
 }
 
 void
-Block_Copy ( byte * dst, byte * src, int64 qsize )
+Block_Copy ( byte * dst, byte * src, int64 qsize, int8 retFlag )
 {
     SetHere ( dst ) ;
-    _Block_Copy ( src, qsize, 0 ) ;
+    _Block_Copy ( src, qsize, 0, retFlag ) ;
 }
 
 // 'tttn' is a notation from the intel manuals
@@ -169,18 +163,18 @@ BlockInfo_Setup_BI_tttn ( Compiler * compiler, int8 ttt, int8 negFlag, int8 over
 void
 CfrTil_TurnOffBlockCompiler ( )
 {
-    SetState ( _Context_->Compiler0, COMPILE_MODE, false ) ;
-    _Compiler_FreeAllLocalsNamespaces ( _Context_->Compiler0 ) ;
+    Compiler * compiler = _Context_->Compiler0 ;
+    if ( !GetState ( compiler, LISP_MODE) ) CfrTil_LeftBracket ( ) ; 
+    _Compiler_FreeAllLocalsNamespaces ( compiler ) ;
     _CfrTil_RemoveNamespaceFromUsingListAndClear ( ( byte* ) "__labels__" ) ;
-    SetState ( _Context_->Compiler0, VARIABLE_FRAME, false ) ;
+    SetState ( compiler, VARIABLE_FRAME, false ) ;
 }
 
 void
 CfrTil_TurnOnBlockCompiler ( )
 {
-    Compiler * compiler = _Context_->Compiler0 ;
-    SetState ( compiler, COMPILE_MODE, true ) ;
-    Compiler_WordList_RecycleInit ( compiler ) ;
+    CfrTil_RightBracket ( ) ; 
+    Compiler_WordList_RecycleInit ( _Context_->Compiler0 ) ;
 }
 
 // blocks are a notation for subroutines or blocks of code compiled in order,
@@ -206,6 +200,7 @@ _CfrTil_BeginBlock0 ( )
     bi->JumpOffset = Here - INT32_SIZE ; // before CfrTil_CheckCompileLocalFrame after CompileUninitializedJump
     Stack_PointerToJmpOffset_Set ( ) ;
     bi->bp_First = Here ; // after the jump for inlining
+
     return bi ;
 }
 
@@ -223,12 +218,14 @@ _CfrTil_BeginBlock1 ( BlockInfo * bi )
         if ( compiler->NumberOfRegisterVariables ) Compile_InitRegisterParamenterVariables ( compiler ) ; // this function is called twice to deal with words that have locals before the first block and regular colon words
     }
     bi->Start = bi->AfterFrame = Here ; // after _Compiler_AddLocalFrame and Compile_InitRegisterVariables
+
     return bi ;
 }
 
 BlockInfo *
 _CfrTil_BeginBlock2 ( BlockInfo * bi )
 {
+
     Compiler * compiler = _Context_->Compiler0 ;
     _Stack_Push ( compiler->BlockStack, ( int64 ) bi ) ; // _Context->CompileSpace->IndexStart before set frame size after turn on
     _Stack_Push ( compiler->CombinatorBlockInfoStack, ( int64 ) bi ) ; // _Context->CompileSpace->IndexStart before set frame size after turn on
@@ -238,9 +235,6 @@ _CfrTil_BeginBlock2 ( BlockInfo * bi )
 void
 CfrTil_BeginBlock ( )
 {
-    //Compiler * compiler = _Context_->Compiler0 ;
-    //d1 ( if ( Is_DebugOn ) _Printf ( ( byte* ) "\n\nCfrTil_BeginBlock : %s : blockStack depth = %d : %s\n\n", _Context_->CurrentlyRunningWord->Name, _Stack_Depth ( compiler->BlockStack ), Context_Location ( ) ) ) ;
-    //d1 ( _Printf ( ( byte* ) "\n\nentering CfrTil_BeginBlock : %s : blockStack depth = %d : %s\n\n", _Context_->CurrentlyRunningWord->Name, _Stack_Depth ( compiler->BlockStack ), Context_Location ( ) ) ) ;
     CheckCodeSpaceForRoom ( ) ;
     BlockInfo * bi = _CfrTil_BeginBlock0 ( ) ;
     _CfrTil_BeginBlock1 ( bi ) ;
@@ -250,7 +244,6 @@ CfrTil_BeginBlock ( )
 Boolean
 _Compiler_IsFrameNecessary ( Compiler * compiler )
 {
-    //return ( compiler->NumberOfLocals + compiler->NumberOfArgs ) > compiler->NumberOfRegisterVariables ; 
     return ( compiler->NumberOfLocals + compiler->NumberOfArgs ) > ( compiler->NumberOfRegisterLocals + compiler->NumberOfRegisterArgs ) ;
 }
 
@@ -276,7 +269,6 @@ _CfrTil_EndBlock1 ( BlockInfo * bi )
                 {
                     if ( compiler->ReturnVariableWord->CAttribute & REGISTER_VARIABLE )
                     {
-                        //_Compile_Move_Reg_To_Reg ( ACC, compiler->ReturnVariableWord->RegToUse ) ;
                         _Compile_Move_Reg_To_StackN ( DSP, 0, compiler->ReturnVariableWord->RegToUse ) ;
                     }
                     else
@@ -293,11 +285,9 @@ _CfrTil_EndBlock1 ( BlockInfo * bi )
         }
         else
         {
+
             bi->bp_First = bi->Start ; //bi->AfterFrame ; 
         }
-        //d1 ( if ( Is_DebugOn) _Compile_Stack_Drop ( DSP ) ) ; // debugger->DebugAddress pushed on call
-        //_Block_Copy ( bi->bp_First, Here - bi->bp_First, 0 ) ; // would like to copy so we can optimze if no combinators in a word
-
     }
     _Compile_Return ( ) ;
     DataStack_Push ( ( int64 ) bi->bp_First ) ;
@@ -312,18 +302,15 @@ _CfrTil_EndBlock2 ( BlockInfo * bi )
     Compiler * compiler = _Context_->Compiler0 ;
     compiler->BlockLevel -- ;
     byte * first = bi->bp_First ;
+    //Block_Copy ( bi->bp_First, bi->bp_First, Here - bi->bp_First, 1 ) ; // for PeepHoleOptimize
     if ( ! _Stack_Depth ( compiler->BlockStack ) )
     {
         _CfrTil_InstallGotoCallPoints_Keyed ( bi, GI_GOTO | GI_RECURSE ) ;
         CfrTil_TurnOffBlockCompiler ( ) ;
         Compiler_Init ( compiler, 0 ) ;
-        //d0 ( if ( Is_DebugOn ) _Printf ( ( byte* ) "\n\nleaving _CfrTil_EndBlock2 : blockStack depth = %d : %s : %s\n\n", _Stack_Depth ( compiler->BlockStack ), _Context_->CurrentlyRunningWord->Name, Context_Location ( ) ) ) ;
-        //d1 ( _Printf ( ( byte* ) "\n\nleaving _CfrTil_EndBlock2 : blockStack depth = %d : %s : %s\n\n", _Stack_Depth ( compiler->BlockStack ), _Context_->CurrentlyRunningWord->Name, Context_Location ( ) ) ) ;
     }
     else
     {
-        //d0 ( if ( Is_DebugOn ) _Printf ( ( byte* ) "\n\nleaving _CfrTil_EndBlock2 : blockStack depth = %d : %s : %s\n\n", _Stack_Depth ( compiler->BlockStack ), _Context_->CurrentlyRunningWord->Name, Context_Location ( ) ) ) ;
-        //d1 ( _Printf ( ( byte* ) "\n\nleaving _CfrTil_EndBlock2 : blockStack depth = %d : %s : %s\n\n", _Stack_Depth ( compiler->BlockStack ), _Context_->CurrentlyRunningWord->Name, Context_Location ( ) ) ) ;
         _Namespace_RemoveFromUsingListAndClear ( bi->LocalsNamespace ) ; //_Compiler_FreeBlockInfoLocalsNamespace ( bi, compiler ) ;
     }
     return first ;
@@ -333,8 +320,6 @@ byte *
 _CfrTil_EndBlock ( )
 {
     Compiler * compiler = _Context_->Compiler0 ;
-    //d1 ( if ( Is_DebugOn ) _Printf ( ( byte* ) "\n\nCfrTil_EndBlock : %s : blockStack depth = %d : %s\n\n", _Context_->CurrentlyRunningWord->Name, _Stack_Depth ( compiler->BlockStack ), Context_Location ( ) ) ) ;
-    //d1 ( _Printf ( ( byte* ) "\n\nentering CfrTil_EndBlock : %s : blockStack depth = %d : %s\n\n", _Context_->CurrentlyRunningWord->Name, _Stack_Depth ( compiler->BlockStack ), Context_Location ( ) ) ) ;
     BlockInfo * bi = ( BlockInfo * ) Stack_Pop_WithExceptionOnEmpty ( compiler->BlockStack ) ;
     if ( ! GetState ( _Context_, C_SYNTAX ) ) bi->LogicCodeWord = _Compiler_WordList ( compiler, 1 ) ;
     _CfrTil_EndBlock1 ( bi ) ;

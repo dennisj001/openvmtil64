@@ -1,52 +1,662 @@
 #include "../../include/cfrtil64.h"
-#define old 0
-// TODO : this file is kinda rough and should/could be made a lot more elegant and checked for strict accuracy
 
-/* ************************************************
- * Optimization : observations, assumptions and reasoning ( bottom up heuristics )
- * Optimization here is nothing but a logical reduction of already compiled code and overwriting it with the optimized code.
- * - It seems somewhat similar to the shift-reduce cycle in (top down) compiler theory.
- * ------------------------------------------------
- * - currently optimizable words are : operators (ops), variables, or literals 
- * -- operands are variables or literals and can be the output or function return value of ops (operators)
- * -- the system is either compiling or interpreting, in a block or not
- *      --- if interpreting there are no local variables (they are not implemented yet)
- * -- variables are either stack, local, or global
- * -- local variables are indexed by the FP register
- * -- stacks are indexed by DSP or by FP when there are also local variables
- * -- operators always leave their output operands on the stack unless when optimized by a following operand (which will rewrite the code to leave it in a register)
- * -- operators take either 1 or 2 operands : cf. defines.h
- *      --- 1 operand : @, ~, not, dup, ++, --
- *      --- 2 operand operators are of optInfo_0_two types, ie. taking either ordered or unordered operands
- *          ---- ordered operands : /, -, logic, op_equal : =, +=, -=, *=, etc
- *                  ------ requiring register for a operand : op_equal
- *          ---- unordered operands : +, * 
- * -- ordered operators example subtract : subtract second operand from first and store result in first
-- Intel addressing can have 1 or 2 regs or 1 mem address and 1 reg per instruction
- * Assuming :
- * -- reg use order EAX, ECX, EBX, EDX => 1st op EAX, 2nd op ECX, ... (nb: div/mod always uses edx)
- * -- result of any op is always in EAX which may or may not be pushed on the stack (Dsp [0] = TOS = top of stack)
- * -- functions return a value as TOS unless declared different in the locals declaration
- * So :
- * - we take different combinations of previous words that leave operands on the stack
- *  - and optimize access to them for different word categories and let those words know by
- *  - means of Optimize_Flag (cf. defines.h) the state of the operands - whether reg or stack (mem) and 
- *  - in what order or registers
+/* ------
+ * 2 args
+ * ----------
+ * lit lit op 
+ * lit var op
+ * var lit op
+ * var var op
+ * -------
+ * op args
+ * -------
+ * lit op op
+ * op lit op
+ * op var op
+ * var op op
+ * op op op
  * 
- * - tail recursion from http://c2.com/cgi/wiki?TailCallOptimization
- * int64 factorial( int64 n )
- {
-        int64 accum = 1;
-        while ( n >= 2 )
-                accum *= n--;
-        return accum;
- }
- * *************************************************/
+ * x xword [var|lit|op] op :: xword = nonvar, nonlit, nonop
+ * [var|lit|op] [var|lit|op] op :: 9 combinations + x betweenWord [var|lit|op] op :: 3 combinations = 12 total combinations
+ * ----------------------------
+ * 1 arg
+ * -----
+ * [var|lit|op] op :: 3 combinations
+ * 15 total total combinations
+ * 
+ */
+// remember this is rpn code so arg 1 is lower on the stack (STACK_1) than arg2 (STACK_0)
+// need to consider also REGISTER args/parameters !!
+// but we still need to consider types (sizes) and type checking
+// and ARM cpu adjustments
 
-// this function maybe needs to be refined - rethought
+// get arg actual setup
+// convert arg setup to standard arg1=ACC, arg2=OREG (RCX)
+// setup machine insn parameters 
+
+// standard locations are :: arg1=reg=ACC=RAX ; arg2=rm=OREG=RCX
+// for 2 arg ops : STACK_1= arg1 : STACK_0 = arg2 
+
+int64
+Compiler_CheckOptimize (Compiler * compiler)
+{
+    Word * word = Compiler_WordList ( 0 ) ;
+    if ( GetState ( _CfrTil_, OPTIMIZE_ON ) ) return Compiler_GetOptimizeState ( compiler, word ) ;
+}
+
+int64
+Compiler_GetOptimizeState ( Compiler * compiler, Word * word )
+{
+    if ( word )
+    {
+        CompileOptimizeInfo * optInfo = compiler->OptInfo ;
+        CompileOptInfo_Init ( compiler, compiler->OptInfo->State ) ; // State : not used yet ??
+        optInfo->opWord = word ;
+        SetState ( _CfrTil_, IN_OPTIMIZER, true ) ;
+        optInfo->Arg1AssumedLocation = LOC_STACK_0 ;
+        optInfo->Arg2AssumedLocation = LOC_STACK_1 ;
+        for ( optInfo->node = optInfo->wordNode = dllist_First ( ( dllist* ) compiler->WordList ), optInfo->node = dlnode_Next ( optInfo->node ) ;
+            optInfo->node ; optInfo->node = optInfo->nextNode )
+        {
+            optInfo->nextNode = dlnode_Next ( optInfo->node ) ;
+            if ( dobject_Get_M_Slot ( optInfo->node, SCN_IN_USE_FLAG ) ) optInfo->wordn = ( Word* ) dobject_Get_M_Slot ( optInfo->node, SCN_WORD ) ;
+            else continue ;
+            if ( optInfo->wordn->CAttribute2 & ( NO_OP_WORD | LEFT_PAREN ) ) continue ;
+            else if ( optInfo->wordn->CAttribute & ( CATEGORY_OP ) )
+            {
+                if ( optInfo->wordn->Definition == CfrTil_DoubleQuoteMacro ) continue ;
+                else if ( optInfo->wordn->CAttribute & ( CATEGORY_OP_LOAD ) )
+                {
+                    optInfo->rvalue ++ ; // for constructions like @ @ and @ @ @ etc.
+                    continue ;
+                }
+                else
+                {
+                    optInfo->NumberOfArgs ++ ;
+                    if ( optInfo->wordArg2 )
+                    {
+                        optInfo->wordArg1 = optInfo->wordn ;
+                        optInfo->wordArg1_Op = true ;
+                    }
+                    else
+                    {
+                        optInfo->wordArg2 = optInfo->wordn ;
+                        optInfo->wordArg2_Op = true ;
+                    }
+                    if ( optInfo->wordArg1 ) break ;
+                    continue ; //break ;
+                }
+            }
+            else if ( IS_MORPHISM_TYPE ( optInfo->wordn ) )
+            {
+                if ( optInfo->wordArg2 )
+                {
+                    optInfo->xBetweenArg1AndArg2 = optInfo->wordn ;
+                    //optInfo->NumberOfArgs ++ ;
+                    //optInfo->wordArg2 = optInfo->wordn ;
+                }
+                break ; // no optimization possible if ( ( ! optInfo->wordArg2 ) && ( IS_MORPHISM_TYPE ( optInfo->wordn ) ) )
+            }
+            else if ( optInfo->wordArg2 )
+            {
+                optInfo->NumberOfArgs ++ ;
+                optInfo->wordArg1 = optInfo->wordn ;
+                optInfo->wordArg1Node = optInfo->node ;
+                optInfo->wordArg1_rvalue = optInfo->rvalue ? optInfo->rvalue : ( GetState ( _Context_, INFIX_MODE ) && ( ! ( optInfo->opWord->CAttribute & ( CATEGORY_OP_EQUAL ) ) ) ) ;
+                optInfo->rvalue = false ;
+                if ( optInfo->wordArg1->CAttribute & ( CONSTANT | LITERAL ) ) optInfo->wordArg1_literal = true ;
+                break ;
+            }
+            else // nb! : remember this is a rpn optimizer ; get second arg first when going right to left : arg1 arg2 op 
+            {
+                optInfo->NumberOfArgs ++ ;
+                optInfo->wordArg2 = optInfo->wordn ;
+                optInfo->wordArg2Node = optInfo->node ;
+                optInfo->wordArg2_rvalue = optInfo->rvalue ? optInfo->rvalue : ( GetState ( _Context_, INFIX_MODE ) && ( ! ( optInfo->opWord->CAttribute & ( CATEGORY_OP_STORE ) ) ) ) ;
+                optInfo->rvalue = false ;
+                if ( optInfo->wordArg2->CAttribute & ( CONSTANT | LITERAL ) ) optInfo->wordArg2_literal = true ;
+                if ( optInfo->opWord->CAttribute & ( CATEGORY_OP_LOAD ) && ( ! ( GetState ( _Context_, INFIX_MODE ) ) ) ) optInfo->wordArg2_rvalue ++ ;
+                if ( optInfo->opWord->CAttribute & ( CATEGORY_OP_1_ARG | CATEGORY_OP_STACK | CATEGORY_OP_LOAD ) ) break ;
+            }
+        }
+        Compiler_OptimizeForOp ( compiler ) ;
+        SetState ( _CfrTil_, IN_OPTIMIZER, false ) ;
+        return optInfo->rtrn ;
+    }
+    else return 0 ;
+}
 
 void
-_GetRmDispImm ( CompileOptimizeInfo * optInfo, Word * word, int64 suggestedReg )
+Compiler_OptimizeForOp ( Compiler * compiler )
+{
+    CompileOptimizeInfo * optInfo = compiler->OptInfo ;
+    Compiler_SetupArgsToStandardLocations ( compiler ) ;
+    if ( optInfo->opWord->CAttribute & ( CATEGORY_OP_STORE ) ) Compile_Optimize_Store ( compiler ) ;
+    else if ( optInfo->opWord->CAttribute & ( CATEGORY_OP_EQUAL ) ) Compile_Optimize_Equal ( compiler ) ;
+    else if ( optInfo->opWord->CAttribute & ( CATEGORY_OP_OPEQUAL ) ) Compile_Optimize_OpEqual ( compiler ) ;
+    else if ( ! optInfo->rtrn ) Setup_MachineCodeInsnParameters ( compiler, REG, REG, ACC, OREG, 0, 0, 0, 0 ) ;
+}
+
+// standard locations are :: arg1=reg=ACC=RAX ; arg2=rm=OREG=RCX
+// for 2 arg ops : STACK_1= arg1 : STACK_0 = arg2 
+// for 1 arg ops : STACK_0= arg1 
+
+void
+Compiler_SetupArgsToStandardLocations ( Compiler * compiler )
+{
+    CompileOptimizeInfo * optInfo = compiler->OptInfo ;
+    // op args first
+    Word_Set_SCA ( optInfo->opWord ) ;
+    if ( optInfo->opWord->CAttribute & ( CATEGORY_DUP ) ) Compile_Optimize_Dup ( compiler ) ;
+    else if ( optInfo->wordArg1_literal && optInfo->wordArg2_literal ) Do_OptimizeOp2Literals ( compiler ) ;
+    else if ( optInfo->wordArg2_Op || optInfo->xBetweenArg1AndArg2 ) Compiler_Optimizer_WordArg2Op_Or_xBetweenArg1AndArg2 ( compiler ) ;
+    else if ( ( optInfo->NumberOfArgs == 2 ) || optInfo->wordArg1_Op ) Compiler_Optimizer_2Args_Or_WordArg1_Op ( compiler ) ;
+    else if ( optInfo->NumberOfArgs == 1 ) Compiler_Optimizer_1Arg ( compiler ) ;
+    else if ( optInfo->NumberOfArgs == 0 ) Compiler_Optimizer_0Args ( compiler ) ;
+    //else Error ( "\nCompiler_SetupArgsToStandardLocations : Shouldn't come here!!\n", QUIT ) ;
+}
+
+void
+Compiler_Optimizer_0Args ( Compiler * compiler )
+{
+    CompileOptimizeInfo * optInfo = compiler->OptInfo ;
+    if ( optInfo->opWord->CAttribute & CATEGORY_OP_LOAD ) return ;
+    else if ( optInfo->opWord->CAttribute & CATEGORY_OP_1_ARG )
+    {
+        _Compile_Move_StackN_To_Reg ( ACC, DSP, 0 ), optInfo->Optimize_Reg = ACC | REG_ON_BIT ;
+        Compile_SUBI ( REG, DSP, 0, CELL, 0 ) ;
+    }
+    else Compile_StandardUnoptimized ( compiler ) ;
+}
+
+void
+Compiler_Optimizer_WordArg2Op_Or_xBetweenArg1AndArg2 ( Compiler * compiler )
+{
+    CompileOptimizeInfo * optInfo = compiler->OptInfo ;
+    if ( ( optInfo->wordArg2 && optInfo->wordArg2->StackPushRegisterCode ) || ( optInfo->xBetweenArg1AndArg2->StackPushRegisterCode ) )
+    {
+        if ( optInfo->wordArg2->StackPushRegisterCode ) SetHere ( optInfo->wordArg2->StackPushRegisterCode ) ;
+        else if ( optInfo->xBetweenArg1AndArg2->StackPushRegisterCode ) SetHere ( optInfo->xBetweenArg1AndArg2->StackPushRegisterCode ) ;
+        if ( ! ( optInfo->opWord->CAttribute & ( CATEGORY_OP_1_ARG | CATEGORY_OP_OPEQUAL ) ) )
+        {
+            Compile_Move_Reg_To_Reg ( OREG, ACC ) ;
+            _Compile_Move_StackN_To_Reg ( ACC, DSP, 0 ) ;
+            Compile_SUBI ( REG, DSP, 0, CELL, 0 ) ;
+            optInfo->Optimize_Reg = ACC | REG_ON_BIT ; // 0x16 : let Setup_MachineCodeInsnParameters know we have a parameter for it in case of ACC == 0
+            optInfo->Optimize_Rm = OREG | REG_ON_BIT ;
+
+        }
+    }
+    else Compile_StandardUnoptimized ( compiler ) ;
+}
+
+void
+Compiler_Optimizer_1Arg ( Compiler * compiler )
+{
+    CompileOptimizeInfo * optInfo = compiler->OptInfo ;
+    // remember : CATEGORY_DUP && CATEGORY_OP_LOAD were handled already in Compiler_OptimizeForOpNew
+    if ( optInfo->opWord->CAttribute & ( CATEGORY_OP_LOAD ) ) Compiler_CompileOptimizedLoad ( compiler ) ;
+    else if ( optInfo->opWord->CAttribute & ( CATEGORY_PLUS_PLUS_MINUS_MINUS ) ) Compiler_CompileOptimize_IncDec ( compiler ) ;
+    else if ( optInfo->wordArg2->StackPushRegisterCode )
+    {
+        SetHere ( optInfo->wordArg2->StackPushRegisterCode ), optInfo->Optimize_Reg = ACC | REG_ON_BIT ;
+    }
+    else _Compile_Move_StackN_To_Reg ( ACC, DSP, 0 ), optInfo->Optimize_Reg = ACC | REG_ON_BIT ;
+}
+
+void
+Compiler_Optimizer_2Args_Or_WordArg1_Op ( Compiler * compiler )
+{
+    // we know ( ! ( optInfo->wordArg2_Op || optInfo->xBetweenArg1AndArg2 ) ) because we already handled that above
+    CompileOptimizeInfo * optInfo = compiler->OptInfo ;
+    // can this be optimized ??            
+    if ( optInfo->wordArg2->CAttribute & DOBJECT ) Compile_StandardUnoptimized ( compiler ) ;
+    else
+    {
+        int8 rm = OREG ;
+        if ( optInfo->opWord->CAttribute & CATEGORY_OP_OPEQUAL ) SetHere ( optInfo->wordArg1->Coding ) ;
+        else
+        {
+            optInfo->Optimize_Reg = ACC | REG_ON_BIT ;
+            if ( optInfo->wordArg1->StackPushRegisterCode )
+            {
+                SetHere ( optInfo->wordArg1->StackPushRegisterCode ) ;
+                if ( optInfo->wordArg1_Op && ( optInfo->wordArg1->RegFlags ) )
+                {
+                    rm = optInfo->wordArg1->Opt_Reg ;
+                    optInfo->Optimize_Rm = rm ;
+                }
+            }
+            else
+            {
+                SetHere ( optInfo->wordArg2->Coding ) ;
+                _Compile_Stack_PopToReg ( DSP, ACC ) ;
+            }
+        }
+        Compile_StandardArg ( optInfo->wordArg2, rm, optInfo->wordArg2_rvalue, 0 ) ;
+        optInfo->Optimize_Rm = rm | REG_ON_BIT ;
+    }
+}
+
+void
+Compile_StandardArg ( Word * word, int8 reg, Boolean rvalueFlag, byte * setHere )
+{
+    if ( setHere ) SetHere ( setHere ) ;
+    if ( rvalueFlag -- )
+    {
+        if ( word->CAttribute & REGISTER_VARIABLE ) return ;
+        else
+        {
+            Compile_GetVarLitObj_RValue_To_Reg ( word, reg ) ;
+            while ( rvalueFlag -- ) Compile_Move_Rm_To_Reg ( ACC, ACC, 0 ) ;
+        }
+    }
+    else _Compile_GetVarLitObj_LValue_To_Reg ( word, reg ) ;
+    word->StackPushRegisterCode = Here ; // we are not pushing this but in case we are just rewriting the code in the next arg ?
+}
+
+void
+Compile_StandardUnoptimized ( Compiler * compiler )
+{
+    CompileOptimizeInfo * optInfo = compiler->OptInfo ;
+    _Compile_Move_StackN_To_Reg ( OREG, DSP, 0 ), optInfo->Optimize_Rm = OREG | REG_ON_BIT ;
+    _Compile_Move_StackN_To_Reg ( ACC, DSP, - 1 ), optInfo->Optimize_Reg = ACC | REG_ON_BIT ;
+    Compile_SUBI ( REG, DSP, 0, 2 * CELL, 0 ) ;
+}
+
+void
+Compiler_CompileOptimize_IncDec ( Compiler * compiler )
+{
+    CompileOptimizeInfo * optInfo = compiler->OptInfo ;
+    if ( GetState ( _Context_, C_SYNTAX ) || ( ! optInfo->wordArg2_rvalue ) )
+    {
+        GetRmDispImm ( optInfo, optInfo->wordArg2, - 1 ) ;
+        if ( ! ( optInfo->OptimizeFlag & OPTIMIZE_IMM ) )
+        {
+            int8 reg ;
+            if ( optInfo->wordArg2->CAttribute & REGISTER_VARIABLE ) reg = optInfo->wordArg2->RegToUse ;
+            else reg = optInfo->Optimize_Rm ;
+            SetHere ( optInfo->wordArg2->Coding ) ;
+            if ( optInfo->wordArg2->CAttribute & ( NAMESPACE_VARIABLE ) )
+            {
+                _Compile_Move_Literal_Immediate_To_Reg ( reg, ( int64 ) optInfo->wordArg2->W_PtrToValue ) ;
+            }
+            _Compile_Group5 ( optInfo->opWord->W_OpInsnCode, ( optInfo->wordArg2->CAttribute & REGISTER_VARIABLE ) ? REG : MEM, reg, 0, optInfo->Optimize_Disp, 0 ) ;
+            optInfo->rtrn = OPTIMIZE_DONE ;
+        }
+    }
+}
+
+void
+Compiler_CompileOptimizedLoad ( Compiler * compiler )
+{
+    CompileOptimizeInfo * optInfo = compiler->OptInfo ;
+    if ( optInfo->wordArg2->StackPushRegisterCode )
+    {
+        SetHere ( optInfo->wordArg2->StackPushRegisterCode ) ;
+        if ( optInfo->wordArg2->CAttribute & DOBJECT )
+        {
+            Compile_Move_Rm_To_Reg ( ACC, ACC, 0 ) ;
+        }
+        else
+        {
+            Compile_StandardArg ( optInfo->wordArg2, ACC, optInfo->wordArg2_rvalue, optInfo->wordArg2->Coding ) ;
+        }
+        _Word_CompileAndRecord_PushReg ( optInfo->wordArg2, ACC ) ;
+    }
+    else
+    {
+        Compile_Move_Rm_To_Reg ( ACC, DSP, 0 ) ;
+        Compile_Move_Rm_To_Reg ( ACC, ACC, 0 ) ;
+        Compile_Move_Reg_To_Rm ( DSP, ACC, 0 ) ;
+    }
+    optInfo->rtrn = OPTIMIZE_DONE ;
+}
+
+int8
+CheckForRegisterVariable ( Compiler * compiler, int8 reg )
+{
+    CompileOptimizeInfo * optInfo = compiler->OptInfo ;
+    if ( ( reg == OREG ) && ( optInfo->wordArg2 && optInfo->wordArg2->CAttribute & REGISTER_VARIABLE ) ) reg = optInfo->wordArg2->RegToUse ;
+    else if ( ( reg == ACC ) && ( optInfo->wordArg1 && optInfo->wordArg1->CAttribute & REGISTER_VARIABLE ) ) reg = optInfo->wordArg1->RegToUse ;
+    return reg ;
+}
+
+// if we have a parameter already set in optInfo honor it else use the default 
+// adjust if needed
+
+void
+Setup_MachineCodeInsnParameters ( Compiler * compiler, int8 direction, int8 mod, int8 reg, int8 rm, int64 disp, int64 immediate, int8 immSize, int8 forceSet )
+{
+    CompileOptimizeInfo * optInfo = compiler->OptInfo ;
+    if ( optInfo->rtrn != OPTIMIZE_DONE )
+    {
+        optInfo->Optimize_Reg = CheckForRegisterVariable ( compiler, reg ) ;
+        if ( ( optInfo->Optimize_Reg & REG_ON_BIT ) && ( ! forceSet ) ) optInfo->Optimize_Reg = ( optInfo->Optimize_Reg & 0xf ) ;
+        optInfo->Optimize_Mod = mod ;
+        optInfo->Optimize_Dest_RegOrMem = direction ;
+        if ( optInfo->opWord->CAttribute & CATEGORY_OP_1_ARG ) rm = ACC ;
+        optInfo->Optimize_Rm = CheckForRegisterVariable ( compiler, rm ) ;
+        if ( ( optInfo->Optimize_Rm & REG_ON_BIT ) && ( ! forceSet ) ) optInfo->Optimize_Rm = ( optInfo->Optimize_Rm & 0xf ) ;
+        optInfo->Optimize_Disp = disp ;
+        if ( ( optInfo->wordArg2 && optInfo->wordArg2->CAttribute & REGISTER_VARIABLE ) ||
+            ( optInfo->wordArg1 && optInfo->wordArg1->CAttribute & REGISTER_VARIABLE ) )
+        {
+            optInfo->OptimizeFlag |= OPTIMIZE_REGISTER ;
+            if ( ! ( ( optInfo->opWord->Definition == CfrTil_Multiply ) || ( optInfo->opWord->Definition == CfrTil_Divide ) ) ) // actually all ops without a reg operand - only an rm
+            {
+                optInfo->opWord->RegFlags = true ; //?? integrate this  
+                optInfo->opWord->Opt_Reg = optInfo->Optimize_Reg ;
+                optInfo->opWord->Opt_Rm = optInfo->Optimize_Rm ;
+            }
+        }
+        if ( ( optInfo->opWord->Definition == CfrTil_ShiftLeft ) || ( optInfo->opWord->Definition == CfrTil_ShiftRight ) ||
+            ( optInfo->opWord->Definition == CfrTil_ShiftRight_Equal ) || ( optInfo->opWord->Definition == CfrTil_ShiftRight_Equal ) )
+        {
+            optInfo->Optimize_Rm = CheckForRegisterVariable ( compiler, ACC ) ;
+        }
+        optInfo->rtrn = 1 ;
+    }
+}
+
+void
+Compile_Optimize_Dup ( Compiler * compiler )
+{
+    CompileOptimizeInfo * optInfo = compiler->OptInfo ;
+    Word_Set_SCA ( optInfo->opWord ) ;
+    if ( optInfo->wordArg2 && optInfo->wordArg2->StackPushRegisterCode )
+    {
+        SetHere ( optInfo->wordArg2->StackPushRegisterCode ) ;
+        Compile_ADDI ( REG, DSP, 0, 2 * CELL, 0 ) ;
+        _Compile_Move_Reg_To_StackN ( DSP, 0, ACC ) ;
+        _Compile_Move_Reg_To_StackN ( DSP, - 1, ACC ) ;
+    }
+    else
+    {
+
+        Compile_Move_Rm_To_Reg ( ACC, DSP, 0 ) ;
+        //optInfo->opWord->StackPushRegisterCode = Here ;
+        Compile_ADDI ( REG, DSP, 0, sizeof (int64 ), 0 ) ;
+        Compile_Move_Reg_To_Rm ( DSP, ACC, 0 ) ;
+    }
+    optInfo->rtrn = OPTIMIZE_DONE ;
+}
+
+void
+Word_SetHere_StackPushRegisterCode ( Word * word )
+{
+    if ( ! ( word->CAttribute & REGISTER_VARIABLE ) )
+    {
+        if ( word->StackPushRegisterCode ) SetHere ( word->StackPushRegisterCode ) ;
+    }
+}
+
+// OpEqual is different from Store/Equal because we have to do the op first then the equal, obviously but important to remember 
+// we need to set up the more specific OpEqual for that
+// arg1 *= arg2 
+// equals
+// arg1 = arg1 * arg2 ;
+
+void
+Compile_Optimize_OpEqual ( Compiler * compiler )
+{
+#if 0 // original works some // but this needs to be reworked and better integrated with the new optimizer  ??  
+    CompileOptimizeInfo * optInfo = compiler->OptInfo ;
+    Word_Set_SCA ( optInfo->opWord ) ;
+    Setup_MachineCodeInsnParameters ( compiler, MEM, REG, OREG2, ACC, 0, 0, 0, 1 ) ;
+    if ( optInfo->NumberOfArgs == 2 )
+    {
+        if ( ! optInfo->xBetweenArg1AndArg2 )
+        {
+            if ( optInfo->wordArg2->StackPushRegisterCode ) SetHere ( optInfo->wordArg2->StackPushRegisterCode ) ;
+            _Compile_GetVarLitObj_LValue_To_Reg ( optInfo->wordArg1, OREG2 ) ; // OREG2 is used as lvalue in a OP_OPEQUAL category insn
+            Compile_StandardArg ( optInfo->wordArg1, ACC, 1, 0 ) ;
+        }
+        else optInfo->rtrn = 0 ;
+    }
+    if ( optInfo->NumberOfArgs )
+    {
+        if ( ( optInfo->opWord->Definition == CfrTil_MultiplyEqual ) || ( optInfo->opWord->Definition == CfrTil_DivideEqual ) ) optInfo->Optimize_Rm = OREG ;
+        if ( ( optInfo->opWord->CAttribute2 & OP_RAX_PLUS_1ARG ) || ( optInfo->opWord->CAttribute & BIT_SHIFT ) ) optInfo->Optimize_Reg = OREG ; // RCX
+        else if ( ( optInfo->opWord->Definition == CfrTil_PlusEqual ) || ( optInfo->opWord->Definition == CfrTil_MinusEqual ) ||
+            ( optInfo->opWord->Definition == CfrTil_BitWise_OrEqual ) || ( optInfo->opWord->Definition == CfrTil_BitWise_AndEqual ) )
+        {
+            optInfo->Optimize_Rm = OREG2 ;
+            optInfo->Optimize_Mod = MEM ;
+            optInfo->Optimize_Reg = OREG ;
+        }
+    }
+    else optInfo->rtrn = 0 ;
+#elif 1  // need to think about how to handle reg variables in general this works at least partially for a very limited set 
+    CompileOptimizeInfo * optInfo = compiler->OptInfo ;
+    //Word_Set_SCA ( optInfo->opWord ) ;
+    if ( optInfo->wordArg1 && ( optInfo->wordArg1->CAttribute & REGISTER_VARIABLE ) &&
+        ( ( optInfo->opWord->CAttribute2 & OP_RAX_PLUS_1ARG ) || ( optInfo->opWord->CAttribute & BIT_SHIFT ) ) )
+    {
+        Word_Set_SCA ( optInfo->wordArg1 ) ;
+        Compile_Move_Reg_To_Reg ( RAX, optInfo->wordArg1->RegToUse ) ;
+        if ( optInfo->wordArg2->CAttribute & REGISTER_VARIABLE )
+        {
+            optInfo->Optimize_Rm = optInfo->wordArg2->RegToUse ;
+            optInfo->Optimize_Mod = REG ;
+            optInfo->rtrn = 1 ;
+            return ;
+        }
+    }
+    Setup_MachineCodeInsnParameters ( compiler, MEM, REG, OREG2, ACC, 0, 0, 0, 1 ) ;
+    if ( optInfo->NumberOfArgs == 2 )
+    {
+        if ( ! optInfo->xBetweenArg1AndArg2 )
+        {
+            Word_SetHere_StackPushRegisterCode ( optInfo->wordArg2 ) ;
+            if ( optInfo->wordArg1 && ( ! ( optInfo->wordArg1->CAttribute & REGISTER_VARIABLE ) ) )
+            {
+                Word_Set_SCA ( optInfo->wordArg1 ) ;
+                _Compile_GetVarLitObj_LValue_To_Reg ( optInfo->wordArg1, OREG2 ) ; // OREG2 is used as lvalue in a OP_OPEQUAL category insn
+                Compile_StandardArg ( optInfo->wordArg1, ACC, 1, 0 ) ;
+            }
+        }
+        else optInfo->rtrn = 0 ;
+    }
+    if ( optInfo->NumberOfArgs )
+    {
+        if ( ( optInfo->opWord->Definition == CfrTil_MultiplyEqual ) || ( optInfo->opWord->Definition == CfrTil_DivideEqual ) ) optInfo->Optimize_Rm = OREG ;
+        if ( ( optInfo->opWord->CAttribute2 & OP_RAX_PLUS_1ARG ) || ( optInfo->opWord->CAttribute & BIT_SHIFT ) ) optInfo->Optimize_Reg = OREG ; // RCX
+        else if ( ( optInfo->opWord->Definition == CfrTil_PlusEqual ) || ( optInfo->opWord->Definition == CfrTil_MinusEqual ) ||
+            ( optInfo->opWord->Definition == CfrTil_BitWise_OrEqual ) || ( optInfo->opWord->Definition == CfrTil_BitWise_AndEqual ) )
+        {
+            optInfo->Optimize_Rm = OREG2 ;
+            optInfo->Optimize_Mod = MEM ;
+            optInfo->Optimize_Reg = OREG ;
+        }
+    }
+
+    else optInfo->rtrn = 0 ;
+#else // scraps
+    CompileOptimizeInfo * optInfo = compiler->OptInfo ;
+    int8 reg = ( optInfo->wordArg1->CAttribute & REGISTER_VARIABLE ) ? optInfo->wordArg1->RegToUse : ACC ;
+    int8 rm = ( optInfo->wordArg2->CAttribute & REGISTER_VARIABLE ) ? optInfo->wordArg2->RegToUse : OREG ;
+    Setup_MachineCodeInsnParameters ( compiler, MEM, REG, OREG2, reg, 0, 0, 0, 1 ) ;
+    //if ( ( optInfo->wordArg2 && optInfo->wordArg2->CAttribute & REGISTER_VARIABLE ) &&
+    //    ( optInfo->wordArg1 && optInfo->wordArg1->CAttribute & REGISTER_VARIABLE ) ) return ;
+    if ( optInfo->NumberOfArgs == 2 )
+    {
+        if ( ! optInfo->xBetweenArg1AndArg2 )
+        {
+            //if ( optInfo->wordArg2->StackPushRegisterCode ) SetHere ( optInfo->wordArg2->StackPushRegisterCode ) ;
+            Word_SetHere_StackPushRegisterCode ( optInfo->wordArg2 ) ;
+            Word_Set_SCA ( optInfo->wordArg1 ) ;
+            _Compile_GetVarLitObj_LValue_To_Reg ( optInfo->wordArg1, OREG2 ) ; // OREG2 is used as lvalue in a OP_OPEQUAL category insn
+            Compile_StandardArg ( optInfo->wordArg1, rm, 1, 0 ) ;
+        }
+        else optInfo->rtrn = 0 ;
+    }
+    if ( optInfo->NumberOfArgs )
+    {
+        if ( ( optInfo->opWord->Definition == CfrTil_MultiplyEqual ) || ( optInfo->opWord->Definition == CfrTil_DivideEqual ) ) optInfo->Optimize_Rm = rm ;
+        if ( ( optInfo->opWord->CAttribute2 & OP_RAX_PLUS_1ARG ) || ( optInfo->opWord->CAttribute & BIT_SHIFT ) ) optInfo->Optimize_Reg = rm ; // RCX
+        else if ( ( optInfo->opWord->Definition == CfrTil_PlusEqual ) || ( optInfo->opWord->Definition == CfrTil_MinusEqual ) ||
+            ( optInfo->opWord->Definition == CfrTil_BitWise_OrEqual ) || ( optInfo->opWord->Definition == CfrTil_BitWise_AndEqual ) )
+        {
+            optInfo->Optimize_Rm = OREG2 ;
+            optInfo->Optimize_Mod = MEM ;
+            optInfo->Optimize_Reg = rm ;
+        }
+    }
+    else optInfo->rtrn = 0 ;
+    Word_Set_SCA ( optInfo->opWord ) ;
+#endif    
+}
+
+void
+Compile_Optimize_Equal ( Compiler * compiler )
+{
+    CompileOptimizeInfo * optInfo = compiler->OptInfo ;
+    int8 reg ;
+    if ( optInfo->wordArg1 && ( optInfo->wordArg1->CAttribute & REGISTER_VARIABLE ) )
+    {
+        reg = optInfo->wordArg1->RegToUse ;
+        if ( optInfo->wordArg2_literal )
+        {
+            SetHere ( optInfo->wordArg2->Coding ) ;
+            Word_Set_SCA ( optInfo->wordArg2 ) ;
+            Compile_MoveImm_To_Reg ( reg, optInfo->wordArg2->W_Value, CELL ) ;
+        }
+        else
+        {
+            if ( optInfo->wordArg2->CAttribute & REGISTER_VARIABLE )
+            {
+                SetHere ( optInfo->wordArg1->Coding ) ;
+            }
+            Word_Set_SCA ( optInfo->wordArg2 ) ;
+            Compile_Move_Reg_To_Reg ( ( optInfo->wordArg2->CAttribute & REGISTER_VARIABLE ) ? optInfo->wordArg2->RegToUse : ACC, reg ) ;
+        }
+        goto done ;
+    }
+
+    else reg = OREG ;
+    Word_Set_SCA ( optInfo->opWord ) ;
+    Compile_Move_Reg_To_Rm ( ACC, reg, 0 ) ;
+done:
+    optInfo->rtrn = OPTIMIZE_DONE ;
+}
+
+void
+Compile_Optimize_Store ( Compiler * compiler )
+{
+    CompileOptimizeInfo * optInfo = compiler->OptInfo ;
+    int8 reg = OREG, rm = ACC ;
+    if ( optInfo->wordArg2 && ( optInfo->wordArg2->CAttribute & REGISTER_VARIABLE ) )
+    {
+        reg = optInfo->wordArg2->RegToUse ;
+        if ( optInfo->wordArg1_literal )
+        {
+            SetHere ( optInfo->wordArg1->Coding ) ;
+            Word_Set_SCA ( optInfo->wordArg1 ) ;
+            Compile_MoveImm_To_Reg ( reg, optInfo->wordArg1->W_Value, CELL ) ;
+        }
+        else
+        {
+            rm = optInfo->wordArg1->RegToUse ;
+            if ( optInfo->wordArg1->CAttribute & REGISTER_VARIABLE )
+            {
+                SetHere ( optInfo->wordArg1->Coding ) ;
+            }
+            else
+            {
+                SetHere ( optInfo->wordArg2->Coding ) ;
+            }
+            if ( optInfo->wordArg1_Op && optInfo->wordArg1->RegFlags )
+            {
+
+                rm = optInfo->wordArg1->Opt_Reg ;
+                //optInfo->wordArg1->Opt_Reg = 0 ;
+                optInfo->wordArg1->RegFlags = false ; // reset !
+            }
+            Word_Set_SCA ( optInfo->opWord ) ;
+            Compile_Move_Reg_To_Reg ( reg, rm ) ;
+        }
+        goto done ;
+    }
+    Word_Set_SCA ( optInfo->opWord ) ;
+    Compile_Move_Reg_To_Rm ( reg, rm, 0 ) ;
+done:
+    optInfo->rtrn = OPTIMIZE_DONE ;
+}
+
+void
+Do_OptimizeOp2Literals ( Compiler * compiler )
+{
+    CompileOptimizeInfo * optInfo = compiler->OptInfo ;
+
+    if ( optInfo->wordArg1->Coding ) SetHere ( optInfo->wordArg1->Coding ) ;
+    int64 value ;
+    // a little tricky here ...
+    // ?? maybe we should setup and use a special compiler stack and use it here ... ??
+    DataStack_Push ( ( int64 ) * optInfo_0_two->W_PtrToValue ) ;
+    DataStack_Push ( ( int64 ) * optInfo_0_one->W_PtrToValue ) ;
+    SetState ( compiler, COMPILE_MODE, false ) ;
+    SetState ( _CfrTil_, OPTIMIZE_ON, false ) ; //prevent recursion here
+    Word_Run ( optInfo_0_zero ) ;
+    SetState ( compiler, COMPILE_MODE, true ) ;
+    SetState ( _CfrTil_, OPTIMIZE_ON, true ) ; //prevent recursion here
+    value = DataStack_Pop ( ) ;
+    SetHere ( optInfo_0_two->Coding ) ;
+    _Set_SCA ( optInfo_0_two ) ;
+    Compile_MoveImm_To_Reg ( ACC, value, CELL ) ;
+    _Word_CompileAndRecord_PushReg ( optInfo->opWord, ACC ) ; // this is helpful in future optimizations looking for StackPushRegisterCode
+    optInfo->rtrn = OPTIMIZE_DONE ;
+}
+
+// skip back WordStack words for the args of an op parameter in GetOptimizeState
+
+void
+PeepHole_Optimize ( )
+{
+    if ( GetState ( _CfrTil_, OPTIMIZE_ON ) )
+    {
+        byte * here = _Q_CodeByteArray->EndIndex ;
+        byte sub_r14_0x8__add_r14_0x8 [ ] = { 0x49, 0x83, 0xee, 0x08, 0x49, 0x83, 0xc6, 0x08 } ;
+        byte add_r14_0x8__mov_r14_rax__mov_rax_r14__sub_r14_0x8 [ ] = { 0x49, 0x83, 0xc6, 0x08, 0x49, 0x89, 0x06, 0x49, 0x8b, 0x06, 0x49, 0x83, 0xee, 0x08 } ;
+        //byte add_r14_0x8__mov_r14_rdi__mov_rax_r14__sub_r14_0x8 [ ] = { 0x49, 0x83, 0xc6, 0x08, 0x49, 0x89, 0x3e, 0x49, 0x8b, 0x06, 0x49, 0x83, 0xee, 0x08 } ;
+        //byte add_esi_04__mov_tos_eax_sub_esi_04 [ ] = { 0x83, 0xc6, 0x04, 0x89, 0x06, 0x83, 0xee, 0x04 } ;
+        //byte mov_eax_tos_sub_esi_04_test_eax_eax [ ] = { 0x89, 0x06, 0x83, 0xee, 0x04, 0x85, 0xc0 } ;
+        byte mov_r14_rax__mov_rax_r14 [] = { 0x49, 0x89, 0x06, 0x49, 0x8b, 0x06 } ;
+        byte add_rax_0x0 [] = { 0x48, 0x81, 0xc0, 0x00, 0x00, 0x00, 0x00 } ;
+        if ( ! memcmp ( sub_r14_0x8__add_r14_0x8, here - 8, 8 ) )
+        {
+            _ByteArray_UnAppendSpace ( _Q_CodeByteArray, 8 ) ;
+        }
+        else if ( ! memcmp ( add_r14_0x8__mov_r14_rax__mov_rax_r14__sub_r14_0x8, here - 14, 14 ) )
+        {
+            _ByteArray_UnAppendSpace ( _Q_CodeByteArray, 14 ) ;
+        }
+        else if ( ! memcmp ( mov_r14_rax__mov_rax_r14, here - 6, 6 ) )
+        {
+            _ByteArray_UnAppendSpace ( _Q_CodeByteArray, 6 ) ;
+        }
+        else if ( ! memcmp ( add_rax_0x0, here - 7, 7 ) )
+        {
+            _ByteArray_UnAppendSpace ( _Q_CodeByteArray, 7 ) ;
+        }
+#if 0        
+        else if ( ! memcmp ( add_r14_0x8__mov_r14_rdi__mov_rax_r14__sub_r14_0x8, here - 14, 14 ) )
+        {
+            _ByteArray_UnAppendSpace ( _Q_CodeByteArray, 14 ) ;
+        }
+            // this occurs one time at startup in _assertStkChk : change it where it is caused and eliminate testing every instruction !! 
+        else if ( ! memcmp ( mov_eax_tos_sub_esi_04_test_eax_eax, here - 7, 7 ) )
+        {
+
+            _ByteArray_UnAppendSpace ( _Q_CodeByteArray, 7 ) ;
+            _Compile_TEST_Reg_To_Reg ( ACC, ACC ) ;
+        }
+#endif        
+    }
+}
+
+void
+GetRmDispImm ( CompileOptimizeInfo * optInfo, Word * word, int64 suggestedReg )
 {
     if ( suggestedReg == - 1 ) suggestedReg = ACC ;
     optInfo->Optimize_Reg = suggestedReg ;
@@ -78,7 +688,7 @@ _GetRmDispImm ( CompileOptimizeInfo * optInfo, Word * word, int64 suggestedReg )
     else if ( word->CAttribute & ( NAMESPACE_VARIABLE ) )
     {
         if ( suggestedReg == - 1 ) suggestedReg = ACC ;
-        _Compile_Move_Literal_Immediate_To_Reg ( suggestedReg, ( int64 ) word->W_PtrToValue ) ; // ?? should this be here ??
+        //_Compile_Move_Literal_Immediate_To_Reg ( suggestedReg, ( int64 ) word->W_PtrToValue ) ; // ?? should this be here ??
         optInfo->Optimize_Rm = suggestedReg ;
         optInfo->OptimizeFlag |= OPTIMIZE_RM ;
     }
@@ -88,1461 +698,3 @@ _GetRmDispImm ( CompileOptimizeInfo * optInfo, Word * word, int64 suggestedReg )
         optInfo->OptimizeFlag |= OPTIMIZE_RM ;
     }
 }
-#if 1
-
-void
-PeepHole_Optimize ( )
-{
-    if ( GetState ( _CfrTil_, OPTIMIZE_ON ) )
-    {
-        byte * here = _Q_CodeByteArray->EndIndex ;
-        byte sub_r14_0x8__add_r14_0x8 [ ] = { 0x49, 0x83, 0xee, 0x08, 0x49, 0x83, 0xc6, 0x08 } ;
-        byte add_r14_0x8__mov_r14_rax__mov_rax_r14__sub_r14_0x8 [ ] = { 0x49, 0x83, 0xc6, 0x08, 0x49, 0x89, 0x06, 0x49, 0x8b, 0x06, 0x49, 0x83, 0xee, 0x08 } ;
-        //byte add_r14_0x8__mov_r14_rdi__mov_rax_r14__sub_r14_0x8 [ ] = { 0x49, 0x83, 0xc6, 0x08, 0x49, 0x89, 0x3e, 0x49, 0x8b, 0x06, 0x49, 0x83, 0xee, 0x08 } ;
-        //byte add_esi_04__mov_tos_eax_sub_esi_04 [ ] = { 0x83, 0xc6, 0x04, 0x89, 0x06, 0x83, 0xee, 0x04 } ;
-        //byte mov_eax_tos_sub_esi_04_test_eax_eax [ ] = { 0x89, 0x06, 0x83, 0xee, 0x04, 0x85, 0xc0 } ;
-        if ( ! memcmp ( sub_r14_0x8__add_r14_0x8, here - 8, 8 ) )
-        {
-            _ByteArray_UnAppendSpace ( _Q_CodeByteArray, 8 ) ;
-        }
-        else if ( ! memcmp ( add_r14_0x8__mov_r14_rax__mov_rax_r14__sub_r14_0x8, here - 14, 14 ) )
-        {
-            _ByteArray_UnAppendSpace ( _Q_CodeByteArray, 14 ) ;
-        }
-#if 0        
-        else if ( ! memcmp ( add_r14_0x8__mov_r14_rdi__mov_rax_r14__sub_r14_0x8, here - 14, 14 ) )
-        {
-            _ByteArray_UnAppendSpace ( _Q_CodeByteArray, 14 ) ;
-        }
-            // this occurs one time at startup in _assertStkChk : change it where it is caused and eliminate testing every instruction !! 
-        else if ( ! memcmp ( mov_eax_tos_sub_esi_04_test_eax_eax, here - 7, 7 ) )
-        {
-            _ByteArray_UnAppendSpace ( _Q_CodeByteArray, 7 ) ;
-            _Compile_TEST_Reg_To_Reg ( ACC, ACC ) ;
-        }
-#endif        
-    }
-}
-#endif
-// rpn therefore look behind 
-// translate word classes into bit patterns
-
-int64
-_GetWordStackListState ( int64 count )
-{
-    int64 attribute ;
-    int64 state = 0, op = 0 ; // , dpth = _Stack_Depth ( compiler->WordStack ) ;
-    int64 i, j, objectFieldFlag = 0 ;
-    Word * word ;
-    for ( j = 0, i = 0 ; j < count ; j ++, i ++ )
-    {
-        //word = Compiler_WordStack ( - j ) ;
-        word = Compiler_WordList ( j ) ;
-        if ( ! word ) break ;
-        if ( GetState ( word, OPTIMIZE_OFF ) )
-        {
-            SetState ( word, OPTIMIZE_OFF, false ) ;
-            continue ;
-        }
-        attribute = word->CAttribute ;
-        if ( attribute & ( DEBUG_WORD ) )
-        {
-            i -- ;
-            continue ;
-        }
-        else if ( attribute & ( THIS | OBJECT | OBJECT_FIELD ) )
-        {
-            if ( objectFieldFlag )
-            {
-                // this case comes up with arrays
-                -- i ;
-                if ( attribute & ( THIS | OBJECT ) )
-                {
-                    -- count ;
-                    objectFieldFlag = false ;
-                }
-                continue ; // don't record an OBJECT_FIELD
-            }
-            else if ( attribute & OBJECT_FIELD )
-            {
-                if ( ! objectFieldFlag ) ++ count ; // only increment/decrement count once per object
-                objectFieldFlag = true ;
-                continue ; // don't record an OBJECT_FIELD
-            }
-            //op = OP_OBJECT ;
-            op = OP_VAR ;
-        }
-        else
-        {
-            objectFieldFlag = false ;
-            if ( attribute & ( LITERAL | CONSTANT ) ) op = OP_LC ;
-                //else if ( category & ( THIS | OBJECT | OBJECT_FIELD ) ) op = OP_OBJECT ;
-            else if ( attribute & ( LOCAL_VARIABLE | PARAMETER_VARIABLE | NAMESPACE_VARIABLE ) ) op = OP_VAR ;
-            else if ( attribute & ( CATEGORY_OP_EQUAL ) ) op = OP_EQUAL ;
-            else if ( attribute & ( CATEGORY_OP_OPEQUAL ) ) op = OP_OPEQUAL ;
-            else if ( attribute & ( CATEGORY_OP_1_ARG ) ) op = OP_1_ARG ;
-            else if ( attribute & ( CATEGORY_LOGIC ) ) op = OP_LOGIC ;
-            else if ( attribute & ( CATEGORY_OP_UNORDERED ) ) op = OP_UNORDERED ;
-            else if ( attribute & ( CATEGORY_OP_STORE ) ) op = OP_STORE ;
-            else if ( attribute & ( CATEGORY_OP_ORDERED ) ) op = OP_ORDERED ;
-            else if ( attribute & ( CATEGORY_DUP ) ) op = OP_DUP ;
-                //else if ( category & ( CATEGORY_RECURSIVE ) ) op = OP_RECURSE ;
-            else if ( attribute & ( CATEGORY_OP_LOAD ) ) op = OP_FETCH ;
-            else if ( attribute & ( CATEGORY_OP_DIVIDE ) ) op = OP_DIVIDE ;
-            else if ( attribute & ( CPRIMITIVE | BLOCK ) ) continue ; //op = OP_CPRIMITIVE ;
-                //else if ( category & ( STACKING ) ) op = OP_STACK ;
-            else
-            {
-                break ;
-            }
-        }
-        state |= ( op << ( i * O_BITS ) ) ;
-    }
-    return state ;
-}
-
-// A rewriting optInfo with smart operators :
-// we have operands on the stack, this optimizes their locations for an operation
-// such as add, sub, mul, div, shl, shr, =, etc.
-// the op will then be : op dst, src -- intel syntax
-// generally set it up so that src operand is in eax register and dst operand is tos
-// if we can set this up return true else false
-//
-// the optimization is simple reason applied to the situation where it 
-// occurs based solely on what words are already in the Compiler Word Stack (compiler->WordStack)
-// eg. an operator that takes 2 args : if there is optInfo_0_one in the optimize window 
-// the other must be on stack so we assume it to be there and rewrite the code
-// as if it was there, if it wasn't there the user has made an error by using the
-// operator in the first place and also, of course, the compiled code will probably crash
-
-int64
-_CheckOptimizeOperands ( Compiler * compiler, int64 maxOperands )
-{
-    int64 i = 0 ;
-    if ( GetState ( _CfrTil_, OPTIMIZE_ON ) )
-    {
-        CompileOptInfo_Init ( compiler ) ;
-        CompileOptimizeInfo * optInfo = compiler->OptInfo ;
-        int64 state = _GetWordStackListState ( maxOperands ) ;
-        int64 depth = List_Depth ( compiler->WordList ) ;
-        if ( maxOperands > depth ) maxOperands = depth ;
-        for ( i = maxOperands ; i > 0 ; i -- )
-        {
-            int64 mask = ( 0xf ) << ( i * O_BITS ) ;
-            if ( state )
-            {
-                state &= ~ mask ;
-                switch ( state )
-                    // these cases of bitwised ORed values represent the "optimize window" ; the right most ORed value is top of word stack = current word
-                    // the leftmost ORed value is fartherest down in the stack, etc.
-                {
-                    case ( OP_VAR << ( 3 * O_BITS ) | OP_FETCH << ( 2 * O_BITS ) | OP_LC << ( 1 * O_BITS ) | OP_UNORDERED ):
-                    case ( OP_VAR << ( 3 * O_BITS ) | OP_FETCH << ( 2 * O_BITS ) | OP_LC << ( 1 * O_BITS ) | OP_ORDERED ):
-                    case ( OP_VAR << ( 3 * O_BITS ) | OP_FETCH << ( 2 * O_BITS ) | OP_LC << ( 1 * O_BITS ) | OP_DIVIDE ):
-                        //case ( OP_VAR << ( 3 * O_BITS ) | OP_FETCH << ( 2 * O_BITS ) | OP_LC << ( 1 * O_BITS ) | OP_LOGIC ):
-                    {
-                        SetHere ( optInfo_0_three->Coding ) ;
-                        if ( compiler->NumberOfRegisterVariables )
-                        {
-                            if ( optInfo_0_zero->CAttribute & CATEGORY_OP_DIVIDE )
-                                return 0 ; // seems untested 
-                            _GetRmDispImm ( optInfo, optInfo_0_one, - 1 ) ;
-                            _GetRmDispImm ( optInfo, optInfo_0_three, - 1 ) ;
-                        }
-                        else
-                        {
-                            Compile_GetVarLitObj_RValue_To_Reg ( optInfo_0_three, ACC ) ;
-                            if ( optInfo_0_zero->CAttribute & CATEGORY_OP_DIVIDE )
-                            {
-                                _Compile_MoveImm_To_Reg ( OREG, ( int64 ) optInfo_0_one->W_Value, CELL ) ;
-                                optInfo->Optimize_Rm = OREG ;
-                            }
-                            else _GetRmDispImm ( optInfo, optInfo_0_one, - 1 ) ;
-                            optInfo->Optimize_Dest_RegOrMem = REG ;
-                            optInfo->Optimize_Mod = REG ;
-#if NEW_CPU_PIPELINE_STATE                           
-                            optInfo->CPState.FirstArgReg = ACC ;
-                            optInfo->CPState.SecondArgReg = OREG ;
-                            optInfo->CPState.State = TWO_REG_ARGS ;
-#endif                            
-                        }
-                        return i ;
-                    }
-                    case ( OP_VAR << ( 3 * O_BITS ) | OP_FETCH << ( 2 * O_BITS ) | OP_LC << ( 1 * O_BITS ) | OP_LOGIC ):
-                    {
-                        if ( optInfo_0_three->StackPushRegisterCode )
-                        {
-                            SetHere ( optInfo_0_three->StackPushRegisterCode ) ; // leave optInfo_0_two value in R8 we don't need to push it
-                            Compile_GetVarLitObj_RValue_To_Reg ( optInfo_0_one, OREG ) ;
-                            optInfo->Optimize_Dest_RegOrMem = REG ;
-                            optInfo->Optimize_Mod = REG ;
-                            optInfo->Optimize_Rm = OREG ;
-                            optInfo->Optimize_Reg = ACC ; //OREG ;
-                            return i ;
-                        }
-                        else
-                        {
-                            if ( compiler->NumberOfRegisterVariables )
-                            {
-                                SetHere ( optInfo_0_three->Coding ) ;
-                                _GetRmDispImm ( optInfo, optInfo_0_three, - 1 ) ;
-                                _GetRmDispImm ( optInfo, optInfo_0_one, - 1 ) ;
-                                optInfo->Optimize_Dest_RegOrMem = MEM ;
-                                return i ;
-                            }
-                        }
-                    }
-                        // CONSTANT_FOLDING 
-                        // this is the code to collapse (fold) constants and literals with integer operators
-                        // can collapse a pipeline of constants with operators
-                    case ( OP_LC << ( 2 * O_BITS ) | OP_LC << ( 1 * O_BITS ) | OP_DIVIDE ):
-                    case ( OP_LC << ( 2 * O_BITS ) | OP_LC << ( 1 * O_BITS ) | OP_UNORDERED ):
-                    case ( OP_LC << ( 2 * O_BITS ) | OP_LC << ( 1 * O_BITS ) | OP_ORDERED ):
-                    case ( OP_LC << ( 2 * O_BITS ) | OP_LC << ( 1 * O_BITS ) | OP_LOGIC ):
-                    {
-                        int64 value ;
-                        // a little tricky here ...
-                        // ?? maybe we should setup and use a special compiler stack and use it here ... ??
-                        DataStack_Push ( ( int64 ) * optInfo_0_two->W_PtrToValue ) ;
-                        DataStack_Push ( ( int64 ) * optInfo_0_one->W_PtrToValue ) ;
-                        SetState ( compiler, COMPILE_MODE, false ) ;
-                        SetState ( _CfrTil_, OPTIMIZE_ON, false ) ; //prevent recursion here
-                        Word_Eval ( optInfo_0_zero ) ;
-                        SetState ( compiler, COMPILE_MODE, true ) ;
-                        SetState ( _CfrTil_, OPTIMIZE_ON, true ) ; //prevent recursion here
-                        value = DataStack_Pop ( ) ;
-                        //optInfo_0_two->W_Value = value ; // not necessary to change better to keep original
-                        SetHere ( optInfo_0_two->Coding ) ;
-                        _Set_SCA ( optInfo_0_two ) ;
-                        _Compile_MoveImm_To_Reg ( ACC, value, CELL ) ;
-                        _Word_CompileAndRecord_PushReg ( optInfo_0_zero, ACC ) ; // this is helpful in future optimizations looking for StackPushRegisterCode
-                        _DEBUG_SHOW ( optInfo_0_two, 0 ) ;
-                        return OPTIMIZE_DONE ;
-                    }
-                    case ( OP_VAR << ( 4 * O_BITS ) | OP_FETCH << ( 3 * O_BITS ) | OP_VAR << ( 2 * O_BITS ) | OP_FETCH << ( 1 * O_BITS ) | OP_DIVIDE ):
-                    case ( OP_VAR << ( 4 * O_BITS ) | OP_FETCH << ( 3 * O_BITS ) | OP_VAR << ( 2 * O_BITS ) | OP_FETCH << ( 1 * O_BITS ) | OP_UNORDERED ):
-                    case ( OP_VAR << ( 4 * O_BITS ) | OP_FETCH << ( 3 * O_BITS ) | OP_VAR << ( 2 * O_BITS ) | OP_FETCH << ( 1 * O_BITS ) | OP_ORDERED ):
-                    case ( OP_VAR << ( 4 * O_BITS ) | OP_FETCH << ( 3 * O_BITS ) | OP_VAR << ( 2 * O_BITS ) | OP_FETCH << ( 1 * O_BITS ) | OP_LOGIC ):
-                    {
-                        SetHere ( optInfo_0_four->Coding ) ;
-                        if ( compiler->NumberOfRegisterVariables )
-                        {
-                            optInfo->Optimize_DstReg = optInfo_0_four->RegToUse ;
-                            optInfo->Optimize_SrcReg = optInfo_0_two->RegToUse ;
-                            _GetRmDispImm ( optInfo, optInfo_0_two, ACC ) ;
-                            optInfo->Optimize_Dest_RegOrMem = REG ;
-                            optInfo->Optimize_Mod = REG ;
-                        }
-                        else
-                        {
-                            Compile_GetVarLitObj_RValue_To_Reg ( optInfo_0_four, ACC ) ;
-                            if ( optInfo_0_two->CAttribute & ( THIS | OBJECT ) )
-                            {
-                                Compile_GetVarLitObj_RValue_To_Reg ( optInfo_0_two, OREG ) ;
-                                optInfo->Optimize_Reg = ACC ; // shouldn't need this but some code still references this as the rm ?? fix ??
-                                optInfo->Optimize_Rm = OREG ;
-                                optInfo->Optimize_Dest_RegOrMem = REG ;
-                                optInfo->Optimize_Mod = REG ;
-                            }
-                            else
-                            {
-                                if ( ( optInfo_0_zero->Definition == CfrTil_ShiftRight ) || ( optInfo_0_zero->Definition == CfrTil_ShiftLeft ) )
-                                {
-                                    Compile_GetVarLitObj_RValue_To_Reg ( optInfo_0_two, RCX ) ;
-                                }
-                                else if ( optInfo_0_zero->Definition == CfrTil_LogicalAnd ) Compile_GetVarLitObj_RValue_To_Reg ( optInfo_0_two, OREG ) ;
-                                else _GetRmDispImm ( optInfo, optInfo_0_two, -1 ) ;
-                                optInfo->Optimize_Dest_RegOrMem = REG ;
-                                optInfo->Optimize_Mod = MEM ;
-                                optInfo->Optimize_Reg = ACC ;
-                                //optInfo->Optimize_Rm = RCX ;
-                            }
-                        }
-                        return i ;
-                    }
-                    case ( OP_LC << ( 3 * O_BITS ) | OP_VAR << ( 2 * O_BITS ) | OP_FETCH << ( 1 * O_BITS ) | OP_ORDERED ):
-                    case ( OP_LC << ( 3 * O_BITS ) | OP_VAR << ( 2 * O_BITS ) | OP_FETCH << ( 1 * O_BITS ) | OP_UNORDERED ):
-                    case ( OP_LC << ( 3 * O_BITS ) | OP_VAR << ( 2 * O_BITS ) | OP_FETCH << ( 1 * O_BITS ) | OP_LOGIC ):
-                    case ( OP_LC << ( 3 * O_BITS ) | OP_VAR << ( 2 * O_BITS ) | OP_FETCH << ( 1 * O_BITS ) | OP_DIVIDE ):
-                    {
-                        SetHere ( optInfo_0_three->Coding ) ;
-                        if ( optInfo_0_zero->CAttribute & CATEGORY_OP_DIVIDE )
-                        {
-                            Compile_GetVarLitObj_RValue_To_Reg ( optInfo_0_three, ACC ) ;
-                            Compile_GetVarLitObj_RValue_To_Reg ( optInfo_0_two, OREG ) ;
-                            optInfo->Optimize_Rm = OREG ;
-                            optInfo->Optimize_Dest_RegOrMem = REG ;
-                            optInfo->Optimize_Mod = REG ;
-                        }
-                        else
-                        {
-                            if ( optInfo_0_three->StackPushRegisterCode )
-                            {
-                                SetHere ( optInfo_0_three->StackPushRegisterCode ) ; // leave optInfo_0_two value in R8 we don't need to push it
-                                //else SetHere ( optInfo_0_three->Coding ) ;
-                                Compile_GetVarLitObj_RValue_To_Reg ( optInfo_0_two, OREG ) ;
-                                optInfo->Optimize_Dest_RegOrMem = REG ;
-                                optInfo->Optimize_Mod = REG ;
-                                optInfo->Optimize_Rm = OREG ;
-                                optInfo->Optimize_Reg = ACC ; //OREG ;
-                            }
-                            else return 0 ;
-                        }
-                        return i ;
-                    }
-                        // ?? assume correct first operand is there TOS - it would already be a user error if they were not ??
-#if 0 // something else needed here
-                    case ( OP_VAR << ( 2 * O_BITS ) | OP_FETCH << ( 1 * O_BITS ) | OP_UNORDERED ):
-                    case ( OP_VAR << ( 2 * O_BITS ) | OP_FETCH << ( 1 * O_BITS ) | OP_ORDERED ):
-                        //case ( OP_VAR << ( 2 * O_BITS ) | OP_FETCH << ( 1 * O_BITS ) | OP_DIVIDE ):
-#endif                        
-                    case ( OP_VAR << ( 2 * O_BITS ) | OP_FETCH << ( 1 * O_BITS ) | OP_LOGIC ):
-                    {
-                        SetHere ( optInfo_0_two->Coding ) ;
-                        Compile_GetVarLitObj_RValue_To_Reg ( optInfo_0_two, ACC ) ; //OREG ) ;
-                        optInfo->Optimize_Dest_RegOrMem = MEM ;
-                        optInfo->Optimize_Mod = MEM ;
-                        optInfo->Optimize_Reg = ACC ;
-                        optInfo->Optimize_Rm = DSP ;
-                        return i ;
-                    }
-                    case ( OP_DUP << ( 2 * O_BITS ) | OP_LC << ( 1 * O_BITS ) | OP_DIVIDE ):
-                    case ( OP_DUP << ( 2 * O_BITS ) | OP_LC << ( 1 * O_BITS ) | OP_UNORDERED ):
-                    case ( OP_DUP << ( 2 * O_BITS ) | OP_LC << ( 1 * O_BITS ) | OP_ORDERED ):
-                    case ( OP_DUP << ( 2 * O_BITS ) | OP_LC << ( 1 * O_BITS ) | OP_LOGIC ):
-                    {
-                        SetHere ( optInfo_0_two->Coding ) ;
-                        _GetRmDispImm ( optInfo, optInfo_0_one, - 1 ) ;
-                        optInfo->Optimize_Dest_RegOrMem = MEM ;
-                        optInfo->Optimize_Mod = MEM ;
-                        optInfo->Optimize_Rm = DSP ;
-                        return i ;
-                    }
-                        // assume correct first operand (optInfo_0_two) must be there on the stack
-                        //case ( OP_LC << ( 1 * O_BITS ) | OP_DIVIDE ):
-                    case ( OP_LC << ( 1 * O_BITS ) | OP_UNORDERED ):
-                    case ( OP_LC << ( 1 * O_BITS ) | OP_ORDERED ):
-                    case ( OP_LC << ( 1 * O_BITS ) | OP_LOGIC ):
-                    {
-                        if ( optInfo_0_two->StackPushRegisterCode )
-                        {
-                            SetHere ( optInfo_0_two->StackPushRegisterCode ) ; // leave optInfo_0_two value in R8 we don't need to push it
-                            _GetRmDispImm ( optInfo, optInfo_0_one, - 1 ) ;
-                            optInfo->Optimize_Dest_RegOrMem = REG ;
-                            optInfo->Optimize_Mod = REG ;
-                            optInfo->Optimize_Rm = ACC ;
-                        }
-                        else
-                        {
-                            if ( ! ( optInfo_0_one->CAttribute & REGISTER_VARIABLE ) )
-                                SetHere ( optInfo_0_one->Coding ) ;
-                            _GetRmDispImm ( optInfo, optInfo_0_one, - 1 ) ;
-                            optInfo->Optimize_Dest_RegOrMem = MEM ;
-                            optInfo->Optimize_Mod = MEM ;
-                            optInfo->Optimize_Rm = DSP ;
-                        }
-                        return i ;
-                    }
-                        //case ( OP_DIVIDE << ( 2 * O_BITS ) | OP_LC << ( 1 * O_BITS ) | OP_DIVIDE ):
-                    case ( OP_DIVIDE << ( 2 * O_BITS ) | OP_LC << ( 1 * O_BITS ) | OP_UNORDERED ):
-                    case ( OP_DIVIDE << ( 2 * O_BITS ) | OP_LC << ( 1 * O_BITS ) | OP_ORDERED ):
-                    case ( OP_ORDERED << ( 2 * O_BITS ) | OP_LC << ( 1 * O_BITS ) | OP_UNORDERED ):
-                    case ( OP_UNORDERED << ( 2 * O_BITS ) | OP_LC << ( 1 * O_BITS ) | OP_UNORDERED ):
-                    case ( OP_ORDERED << ( 2 * O_BITS ) | OP_LC << ( 1 * O_BITS ) | OP_ORDERED ):
-                    case ( OP_UNORDERED << ( 2 * O_BITS ) | OP_LC << ( 1 * O_BITS ) | OP_ORDERED ):
-                    {
-                        if ( optInfo_0_two->StackPushRegisterCode )
-                        {
-                            SetHere ( optInfo_0_two->StackPushRegisterCode ) ; // leave optInfo_0_two value in R8 we don't need to push it
-                            _GetRmDispImm ( optInfo, optInfo_0_one, - 1 ) ;
-                            optInfo->Optimize_Dest_RegOrMem = REG ; //REG ;
-                            optInfo->Optimize_Mod = REG ;
-                            optInfo->Optimize_Reg = ACC ; // only for "mod" will it be edx else eax
-                            //optInfo->Optimize_Rm = ACC ;
-                            return i ;
-                        }
-                        else return 0 ;
-                    }
-                    case ( OP_ORDERED << ( 2 * O_BITS ) | OP_LC << ( 1 * O_BITS ) | OP_DIVIDE ):
-                    case ( OP_UNORDERED << ( 2 * O_BITS ) | OP_LC << ( 1 * O_BITS ) | OP_DIVIDE ):
-                    case ( OP_DIVIDE << ( 2 * O_BITS ) | OP_LC << ( 1 * O_BITS ) | OP_DIVIDE ):
-                    {
-
-                        if ( optInfo_0_two->StackPushRegisterCode )
-                        {
-                            SetHere ( optInfo_0_two->StackPushRegisterCode ) ; // leave optInfo_0_two value in R8 we don't need to push it
-                            _Compile_MoveImm_To_Reg ( OREG, ( int64 ) * optInfo_0_one->W_PtrToValue, CELL ) ;
-                            optInfo->Optimize_Mod = REG ;
-                            optInfo->Optimize_Rm = OREG ;
-                            return i ;
-                        }
-                        else return 0 ;
-                    }
-                    case ( OP_UNORDERED << ( 3 * O_BITS ) | OP_VAR << ( 2 * O_BITS ) | OP_FETCH << ( 1 * O_BITS ) | OP_DIVIDE ):
-                    case ( OP_ORDERED << ( 3 * O_BITS ) | OP_VAR << ( 2 * O_BITS ) | OP_FETCH << ( 1 * O_BITS ) | OP_DIVIDE ):
-                    case ( OP_DIVIDE << ( 3 * O_BITS ) | OP_VAR << ( 2 * O_BITS ) | OP_FETCH << ( 1 * O_BITS ) | OP_DIVIDE ):
-                    case ( OP_DIVIDE << ( 3 * O_BITS ) | OP_VAR << ( 2 * O_BITS ) | OP_FETCH << ( 1 * O_BITS ) | OP_UNORDERED ):
-                    case ( OP_DIVIDE << ( 3 * O_BITS ) | OP_VAR << ( 2 * O_BITS ) | OP_FETCH << ( 1 * O_BITS ) | OP_ORDERED ):
-                    case ( OP_ORDERED << ( 3 * O_BITS ) | OP_VAR << ( 2 * O_BITS ) | OP_FETCH << ( 1 * O_BITS ) | OP_UNORDERED ):
-                    case ( OP_UNORDERED << ( 3 * O_BITS ) | OP_VAR << ( 2 * O_BITS ) | OP_FETCH << ( 1 * O_BITS ) | OP_UNORDERED ):
-                    case ( OP_ORDERED << ( 3 * O_BITS ) | OP_VAR << ( 2 * O_BITS ) | OP_FETCH << ( 1 * O_BITS ) | OP_ORDERED ):
-                    case ( OP_UNORDERED << ( 3 * O_BITS ) | OP_VAR << ( 2 * O_BITS ) | OP_FETCH << ( 1 * O_BITS ) | OP_ORDERED ):
-                    {
-                        if ( optInfo_0_three->StackPushRegisterCode )
-                        {
-                            SetHere ( optInfo_0_three->StackPushRegisterCode ) ; // leave optInfo_0_two value in R8 we don't need to push it
-                            if ( optInfo_0_two->CAttribute & ( THIS | OBJECT ) )
-                            {
-                                Compile_GetVarLitObj_RValue_To_Reg ( optInfo_0_two, OREG ) ;
-                                optInfo->Optimize_Dest_RegOrMem = REG ;
-                                optInfo->Optimize_Mod = REG ;
-                                optInfo->Optimize_Reg = ACC ; // shouldn't need this but some code still references this as the rm ?? fix ??
-                                optInfo->Optimize_Rm = OREG ;
-                            }
-                            else
-                            {
-                                _GetRmDispImm ( optInfo, optInfo_0_two, - 1 ) ;
-                                optInfo->Optimize_Dest_RegOrMem = REG ;
-                                optInfo->Optimize_Mod = MEM ;
-                            }
-                            return i ;
-                        }
-                        else return 0 ;
-                    }
-                    case ( OP_VAR << ( 2 * O_BITS ) | OP_LC << ( 1 * O_BITS ) | OP_UNORDERED ):
-                    case ( OP_VAR << ( 2 * O_BITS ) | OP_LC << ( 1 * O_BITS ) | OP_ORDERED ):
-                    case ( OP_VAR << ( 2 * O_BITS ) | OP_LC << ( 1 * O_BITS ) | OP_DIVIDE ):
-                    {
-                        if ( GetState ( _Context_, C_SYNTAX ) ) return 0 ;
-                        //if ( optInfo_0_two->CAttribute & REGISTER_VARIABLE ) 
-                        if ( optInfo_0_two->StackPushRegisterCode )
-                        {
-                            SetHere ( optInfo_0_two->StackPushRegisterCode ) ; //Coding ) ;
-                            //_Compile_GetVarLitObj_RValue_To_Reg ( optInfo_0_two, ACC ) ;
-                        }
-                        //_GetRmDispImm ( optInfo, optInfo_0_two, - 1 ) ;
-                        _GetRmDispImm ( optInfo, optInfo_0_one, - 1 ) ;
-                        optInfo->Optimize_Dest_RegOrMem = MEM ;
-                        optInfo->Optimize_Mod = REG ;
-                        optInfo->Optimize_Reg = ACC ; // shouldn't need this but some code still references this as the rm ?? fix ??
-                        return i ;
-                    }
-                    case ( OP_VAR << ( 2 * O_BITS ) | OP_LC << ( 1 * O_BITS ) | OP_LOGIC ):
-                    {
-                        SetHere ( optInfo_0_two->Coding ) ;
-                        _GetRmDispImm ( optInfo, optInfo_0_two, - 1 ) ;
-                        _GetRmDispImm ( optInfo, optInfo_0_one, - 1 ) ;
-                        optInfo->Optimize_Dest_RegOrMem = MEM ;
-                        return i ;
-                    }
-                    case ( OP_VAR << ( 3 * O_BITS ) | OP_FETCH << ( 2 * O_BITS ) | OP_DUP << ( 1 * O_BITS ) | OP_1_ARG ):
-                    {
-                        SetHere ( optInfo_0_three->Coding ) ;
-                        Compile_GetVarLitObj_RValue_To_Reg ( optInfo_0_three, ACC ) ;
-                        Compile_ADDI ( REG, DSP, 0, 2 * CELL, 0 ) ;
-                        _Compile_Move_Reg_To_StackN ( DSP, - 1, ACC ) ;
-                        _Compile_Move_Reg_To_StackN ( DSP, 0, ACC ) ;
-                        optInfo->Optimize_Dest_RegOrMem = MEM ;
-                        optInfo->Optimize_Mod = MEM ;
-                        optInfo->Optimize_Rm = DSP ;
-                        return i ;
-                    }
-                        // CONSTANT_FOLDING - 1 arg op
-                        // this is the code to collapse (fold) constants and literals with integer operators
-                        // can collapse a pipeline of constants with operators
-                    case ( OP_LC << ( 1 * O_BITS ) | OP_1_ARG ):
-                    {
-                        // compile to a constant
-                        int64 value ;
-                        SetHere ( optInfo_0_one->Coding ) ;
-                        // a little tricky here ...
-                        // ?? maybe we should setup and use a special compiler stack and use it here ... ??
-                        DataStack_Push ( ( int64 ) * optInfo_0_one->W_PtrToValue ) ;
-                        SetState ( compiler, COMPILE_MODE, false ) ;
-                        SetState ( _CfrTil_, OPTIMIZE_ON, false ) ; //prevent recursion here
-                        Word_Eval ( optInfo_0_zero ) ;
-                        SetState ( compiler, COMPILE_MODE, true ) ;
-                        SetState ( _CfrTil_, OPTIMIZE_ON, true ) ; //prevent recursion here
-                        value = DataStack_Pop ( ) ;
-                        Word *one = optInfo_0_one ;
-                        _Compile_MoveImm_To_Reg ( ACC, value, CELL ) ;
-                        _Word_CompileAndRecord_PushReg ( one, ACC ) ;
-                        //_CfrTil_WordList_PopWords ( 2, 1 ) ;
-                        //CfrTil_WordList_PushWord ( one ) ;
-                        return OPTIMIZE_DONE ;
-                    }
-                    case ( OP_VAR << ( 1 * O_BITS ) | OP_1_ARG ):
-                    {
-                        //if ( ! GetState ( _Context_->Compiler0, PREFIX_ARG_PARSING ) )
-                        {
-                            if ( optInfo_0_one->StackPushRegisterCode ) SetHere ( optInfo_0_one->StackPushRegisterCode ) ;
-                            else SetHere ( optInfo_0_one->Coding ) ;
-                            _GetRmDispImm ( optInfo, optInfo_0_one, - 1 ) ;
-                            optInfo->Optimize_Dest_RegOrMem = REG ;
-                            return i ;
-                        }
-                        //else return 0 ;
-                    }
-                    case ( OP_VAR << ( 2 * O_BITS ) | OP_UNORDERED << ( 1 * O_BITS ) | OP_1_ARG ):
-                    case ( OP_VAR << ( 2 * O_BITS ) | OP_ORDERED << ( 1 * O_BITS ) | OP_1_ARG ):
-                    case ( OP_VAR << ( 2 * O_BITS ) | OP_LOGIC << ( 1 * O_BITS ) | OP_1_ARG ):
-                    case ( OP_VAR << ( 2 * O_BITS ) | OP_1_ARG << ( 1 * O_BITS ) | OP_1_ARG ):
-                    case ( OP_VAR << ( 2 * O_BITS ) | OP_DIVIDE << ( 1 * O_BITS ) | OP_1_ARG ):
-                    {
-                        // this is mainly for postfix inc/dec in C_SYNTAX
-                        if ( GetState ( _Context_, C_SYNTAX ) )
-                        {
-                            if ( optInfo_0_one->StackPushRegisterCode )
-                            {
-                                SetHere ( optInfo_0_one->StackPushRegisterCode ) ;
-                            }
-                            _GetRmDispImm ( optInfo, optInfo_0_two, - 1 ) ;
-                            return i ;
-                        }
-                        else return 0 ;
-                    }
-                    case ( OP_UNORDERED << ( 1 * O_BITS ) | OP_1_ARG ):
-                    case ( OP_ORDERED << ( 1 * O_BITS ) | OP_1_ARG ):
-                    case ( OP_LOGIC << ( 1 * O_BITS ) | OP_1_ARG ):
-                    case ( OP_1_ARG << ( 1 * O_BITS ) | OP_1_ARG ):
-                    case ( OP_DIVIDE << ( 1 * O_BITS ) | OP_1_ARG ):
-                    {
-                        if ( ! GetState ( _Context_, C_SYNTAX ) )
-                        {
-                            if ( optInfo_0_one->StackPushRegisterCode )
-                            {
-                                SetHere ( optInfo_0_one->StackPushRegisterCode ) ;
-                                compiler->OptInfo->Optimize_Rm = ACC ;
-                                optInfo->Optimize_Mod = REG ;
-                            }
-                            else compiler->OptInfo->Optimize_Rm = DSP ;
-                            return i ;
-                        }
-                        else return 0 ;
-                    }
-                    case ( OP_STACK << ( 1 * O_BITS ) | OP_1_ARG ):
-                    {
-                        optInfo->Optimize_Mod = MEM ;
-                        optInfo->Optimize_Rm = DSP ;
-                        return i ;
-                    }
-                        // OP_EQUAL
-                    case ( OP_VAR << ( 5 * O_BITS ) | OP_VAR << ( 4 * O_BITS ) | OP_FETCH << ( 3 * O_BITS ) | OP_LC << ( 2 * O_BITS ) | OP_DIVIDE << ( 1 * O_BITS ) | OP_EQUAL ):
-                    case ( OP_VAR << ( 5 * O_BITS ) | OP_VAR << ( 4 * O_BITS ) | OP_FETCH << ( 3 * O_BITS ) | OP_LC << ( 2 * O_BITS ) | OP_UNORDERED << ( 1 * O_BITS ) | OP_EQUAL ):
-                    case ( OP_VAR << ( 5 * O_BITS ) | OP_VAR << ( 4 * O_BITS ) | OP_FETCH << ( 3 * O_BITS ) | OP_LC << ( 2 * O_BITS ) | OP_ORDERED << ( 1 * O_BITS ) | OP_EQUAL ):
-                    {
-                        SetHere ( optInfo_0_five->Coding ) ;
-                        _GetRmDispImm ( optInfo, optInfo_0_five, - 1 ) ;
-                        if ( optInfo_0_one->Definition == CfrTil_Minus )
-                        {
-                            Set_SCA ( 1 ) ;
-                            _Compile_X_Group1_Immediate ( SUB, MEM, optInfo->Optimize_Rm, compiler->OptInfo->Optimize_Disp, *optInfo_0_two->W_PtrToValue, 0 ) ; //CELL ) ;
-                        }
-                        else if ( optInfo_0_one->Definition == CfrTil_Plus )
-                        {
-                            Set_SCA ( 1 ) ;
-                            _Compile_X_Group1_Immediate ( ADD, MEM, optInfo->Optimize_Rm, compiler->OptInfo->Optimize_Disp, *optInfo_0_two->W_PtrToValue, 0 ) ; //CELL ) ;
-                        }
-                        else if ( optInfo_0_one->Definition == CfrTil_BitWise_AND )
-                        {
-                            Set_SCA ( 1 ) ;
-                            _Compile_X_Group1_Immediate ( AND, MEM, optInfo->Optimize_Rm, compiler->OptInfo->Optimize_Disp, *optInfo_0_two->W_PtrToValue, 0 ) ; //CELL ) ;
-                        }
-                        else if ( optInfo_0_one->Definition == CfrTil_BitWise_OR )
-                        {
-                            Set_SCA ( 1 ) ;
-                            _Compile_X_Group1_Immediate ( OR, MEM, optInfo->Optimize_Rm, compiler->OptInfo->Optimize_Disp, *optInfo_0_two->W_PtrToValue, 0 ) ; //CELL ) ;
-                        }
-                        else if ( optInfo_0_one->Definition == CfrTil_Multiply )
-                        {
-                            //_Compile_IMULI ( int64 mod, int64 reg, int64 rm, int64 sib, int64 disp, int64 imm, int64 size )
-                            Set_SCA ( 1 ) ;
-                            _Compile_IMULI ( MEM, ACC, optInfo->Optimize_Rm, 0, compiler->OptInfo->Optimize_Disp, *optInfo_0_two->W_PtrToValue, CELL ) ;
-                            Set_SCA ( 0 ) ;
-                            _Compile_Move ( 0, MEM, ACC, compiler->OptInfo->Optimize_Rm, 0, compiler->OptInfo->Optimize_Disp ) ;
-                        }
-                        else if ( optInfo_0_one->Definition == CfrTil_Divide )
-                        {
-                            Compile_GetVarLitObj_RValue_To_Reg ( optInfo_0_five, ACC ) ;
-                            _Compile_MoveImm ( REG, RDX, IMM_B | REX_B | MODRM_B | DISP_B, 0, 0, 0, CELL ) ;
-                            // for idiv the dividend must be eax:edx, divisor can be reg or rm ; here we use ECX
-                            // Compile_IDIV ( mod, rm, sib, disp, imm, size )
-                            _Compile_MoveImm ( REG, OREG, IMM_B | REX_B | MODRM_B | DISP_B, 0, 0, *optInfo_0_two->W_PtrToValue, CELL ) ;
-                            Set_SCA ( 1 ) ;
-                            Compile_IDIV ( REG, OREG, 0, 0, 0, 0, 0 ) ;
-                            Set_SCA ( 0 ) ;
-                            _Compile_Move ( 0, MEM, ACC, compiler->OptInfo->Optimize_Rm, 0, compiler->OptInfo->Optimize_Disp ) ;
-                        }
-                        else if ( optInfo_0_one->Definition == CfrTil_Mod ) // "%" is in Lexer and Int
-                        {
-                            Compile_GetVarLitObj_RValue_To_Reg ( optInfo_0_five, ACC ) ;
-                            _Compile_MoveImm ( REG, RDX, IMM_B | REX_B | MODRM_B | DISP_B, 0, 0, 0, CELL ) ;
-                            Set_SCA ( 2 ) ;
-                            _Compile_MoveImm ( REG, OREG, IMM_B | REX_B | MODRM_B | DISP_B, 0, 0, *optInfo_0_two->W_PtrToValue, CELL ) ;
-                            Set_SCA ( 1 ) ;
-                            Compile_IDIV ( REG, OREG, 0, 0, 0, 0, 0 ) ;
-                            Set_SCA ( 0 ) ;
-                            _Compile_Move_Reg_To_Reg ( ACC, RDX ) ; // for consistency finally use R8 so optInfo can always count on eax as the pushed reg
-                            _Compile_Move ( 0, MEM, ACC, compiler->OptInfo->Optimize_Rm, 0, compiler->OptInfo->Optimize_Disp ) ;
-                        }
-                        else if ( optInfo_0_one->Definition == CfrTil_ShiftLeft )
-                        {
-                            //_Compile_Group2 ( int64 mod, int64 regOpCode, int64 rm, int64 sib, int64 disp, int64 imm )
-                            Set_SCA ( 2 ) ;
-                            _Compile_MoveImm ( REG, RCX, IMM_B | REX_B | MODRM_B | DISP_B, 0, 0, *optInfo_0_two->W_PtrToValue, CELL ) ;
-                            _Compile_Group2 ( MEM, SHL, optInfo->Optimize_Rm, 0, compiler->OptInfo->Optimize_Disp, *optInfo_0_two->W_PtrToValue ) ;
-                        }
-                        else if ( optInfo_0_one->Definition == CfrTil_ShiftRight )
-                        {
-                            Set_SCA ( 2 ) ;
-                            _Compile_MoveImm ( REG, RCX, IMM_B | REX_B | MODRM_B | DISP_B, 0, 0, *optInfo_0_two->W_PtrToValue, CELL ) ;
-                            _Compile_Group2 ( MEM, SHR, optInfo->Optimize_Rm, 0, compiler->OptInfo->Optimize_Disp, *optInfo_0_two->W_PtrToValue ) ;
-                        }
-                        else continue ;
-                        return ( OPTIMIZE_DONE | OPTIMIZE_RESET ) ;
-                    }
-                    case ( OP_VAR << ( 6 * O_BITS ) | OP_VAR << ( 5 * O_BITS ) | OP_FETCH << ( 4 * O_BITS ) | OP_VAR << ( 3 * O_BITS ) | OP_FETCH << ( 2 * O_BITS ) | OP_DIVIDE << ( 1 * O_BITS ) | OP_EQUAL ):
-                    case ( OP_VAR << ( 6 * O_BITS ) | OP_VAR << ( 5 * O_BITS ) | OP_FETCH << ( 4 * O_BITS ) | OP_VAR << ( 3 * O_BITS ) | OP_FETCH << ( 2 * O_BITS ) | OP_UNORDERED << ( 1 * O_BITS ) | OP_EQUAL ):
-                    case ( OP_VAR << ( 6 * O_BITS ) | OP_VAR << ( 5 * O_BITS ) | OP_FETCH << ( 4 * O_BITS ) | OP_VAR << ( 3 * O_BITS ) | OP_FETCH << ( 2 * O_BITS ) | OP_ORDERED << ( 1 * O_BITS ) | OP_EQUAL ):
-                    {
-                        int64 op ;
-                        // this needs to be more optimized - these different ifs maybe can be condensed
-                        SetHere ( optInfo_0_six->Coding ) ;
-                        if ( ( optInfo_0_one->Definition == CfrTil_Minus ) || ( optInfo_0_one->Definition == CfrTil_Plus ) ||
-                            ( optInfo_0_one->Definition == CfrTil_BitWise_AND ) || ( optInfo_0_one->Definition == CfrTil_BitWise_OR ) )
-                        {
-                            if ( optInfo_0_one->Definition == CfrTil_Minus ) op = SUB ;
-                            else if ( optInfo_0_one->Definition == CfrTil_Plus ) op = ADD ;
-                            else if ( optInfo_0_one->Definition == CfrTil_BitWise_AND ) op = AND ;
-                            else if ( optInfo_0_one->Definition == CfrTil_BitWise_OR ) op = OR ;
-                            if ( optInfo_0_six->W_OriginalWord != optInfo_0_five->W_OriginalWord )
-                            {
-                                Compile_GetVarLitObj_RValue_To_Reg ( optInfo_0_five, ACC ) ;
-                                _GetRmDispImm ( optInfo, optInfo_0_three, - 1 ) ;
-                                Set_SCA ( 1 ) ;
-                                _Compile_X_Group1 ( op, REG, optInfo->Optimize_Mod, ACC, optInfo->Optimize_Rm, 0, optInfo->Optimize_Disp, CELL ) ;
-                                Set_SCA ( 0 ) ;
-                                if ( optInfo_0_six->CAttribute & REGISTER_VARIABLE )
-                                {
-                                    _Compile_Move_Reg_To_Reg ( optInfo_0_six->RegToUse, ACC ) ;
-                                }
-                                else
-                                {
-                                    _GetRmDispImm ( optInfo, optInfo_0_six, - 1 ) ;
-                                    _Compile_Move ( 0, MEM, ACC, compiler->OptInfo->Optimize_Rm, 0, compiler->OptInfo->Optimize_Disp ) ;
-                                }
-                            }
-                            else
-                            {
-                                Compile_GetVarLitObj_RValue_To_Reg ( optInfo_0_three, ACC ) ;
-                                _GetRmDispImm ( optInfo, optInfo_0_six, - 1 ) ;
-                                Set_SCA ( 1 ) ;
-                                _Compile_X_Group1 ( op, MEM, optInfo->Optimize_Mod, ACC, optInfo->Optimize_Rm, 0, optInfo->Optimize_Disp, CELL ) ;
-                            }
-                        }
-                        else if ( optInfo_0_one->Definition == CfrTil_Multiply )
-                        {
-                            Compile_GetVarLitObj_RValue_To_Reg ( optInfo_0_three, ACC ) ;
-                            if ( optInfo_0_six->W_OriginalWord != optInfo_0_five->W_OriginalWord )
-                            {
-                                _GetRmDispImm ( optInfo, optInfo_0_five, - 1 ) ;
-                                Set_SCA ( 1 ) ;
-                                //_Compile_IMUL (MEM, ACC, optInfo->Optimize_Rm, REX_B | MODRM_B | DISP_B, 0, optInfo->Optimize_Disp ) ;
-                                Compile_MUL ( MEM, optInfo->Optimize_Rm, REX_B | MODRM_B | DISP_B, 0, optInfo->Optimize_Disp, 0, CELL_SIZE ) ;
-                                _GetRmDispImm ( optInfo, optInfo_0_six, - 1 ) ;
-                                Set_SCA ( 0 ) ;
-                                _Compile_Move ( 0, MEM, ACC, compiler->OptInfo->Optimize_Rm, 0, compiler->OptInfo->Optimize_Disp ) ;
-                            }
-                            else
-                            {
-                                _GetRmDispImm ( optInfo, optInfo_0_six, - 1 ) ;
-                                Set_SCA ( 1 ) ;
-                                //_Compile_IMUL (MEM, ACC, optInfo->Optimize_Rm, REX_B | MODRM_B | DISP_B, 0, optInfo->Optimize_Disp ) ;
-                                Compile_MUL ( MEM, optInfo->Optimize_Rm, REX_B | MODRM_B | DISP_B, 0, optInfo->Optimize_Disp, 0, CELL_SIZE ) ;
-                                Set_SCA ( 0 ) ;
-                                _Compile_Move ( 0, MEM, ACC, compiler->OptInfo->Optimize_Rm, 0, compiler->OptInfo->Optimize_Disp ) ;
-                            }
-                        }
-                        else if ( ( optInfo_0_one->Definition == CfrTil_ShiftLeft ) || ( optInfo_0_one->Definition == CfrTil_ShiftRight ) )
-                        {
-                            if ( optInfo_0_one->Definition == CfrTil_ShiftLeft ) op = SHL ;
-                            else if ( optInfo_0_one->Definition == CfrTil_ShiftRight ) op = SHR ;
-                            if ( optInfo_0_six->W_OriginalWord == optInfo_0_five->W_OriginalWord )
-                            {
-                                Compile_GetVarLitObj_RValue_To_Reg ( optInfo_0_three, RCX ) ;
-                                _GetRmDispImm ( optInfo, optInfo_0_six, - 1 ) ;
-                                Set_SCA ( 1 ) ;
-                                _Compile_Group2_CL ( MEM, op, compiler->OptInfo->Optimize_Rm, 0, compiler->OptInfo->Optimize_Disp ) ;
-                            }
-                            else
-                            {
-                                Compile_GetVarLitObj_RValue_To_Reg ( optInfo_0_three, RCX ) ;
-                                Compile_GetVarLitObj_RValue_To_Reg ( optInfo_0_five, ACC ) ;
-                                Set_SCA ( 1 ) ;
-                                _Compile_Group2_CL ( REG, op, ACC, 0, 0 ) ;
-                                _GetRmDispImm ( optInfo, optInfo_0_six, - 1 ) ;
-                                Set_SCA ( 0 ) ;
-                                _Compile_Move ( 0, MEM, ACC, compiler->OptInfo->Optimize_Rm, 0, compiler->OptInfo->Optimize_Disp ) ;
-                            }
-                        }
-                        else if ( ( optInfo_0_one->Definition == CfrTil_Divide ) || ( optInfo_0_one->Definition == CfrTil_Mod ) )
-                        {
-                            if ( optInfo_0_six->W_OriginalWord == optInfo_0_five->W_OriginalWord )
-                            {
-                                Compile_GetVarLitObj_RValue_To_Reg ( optInfo_0_six, ACC ) ;
-                                _Compile_MoveImm ( REG, RDX, IMM_B | REX_B | MODRM_B | DISP_B, 0, 0, 0, CELL ) ;
-                                _GetRmDispImm ( optInfo, optInfo_0_three, - 1 ) ;
-                                Set_SCA ( 1 ) ;
-                                Compile_IDIV ( MEM, compiler->OptInfo->Optimize_Rm, DISP_B, 0, compiler->OptInfo->Optimize_Disp, 0, 0 ) ;
-                            }
-                            else
-                            {
-                                Compile_GetVarLitObj_RValue_To_Reg ( optInfo_0_five, ACC ) ;
-                                Compile_GetVarLitObj_RValue_To_Reg ( optInfo_0_three, OREG ) ;
-                                _Compile_MoveImm ( REG, RDX, IMM_B | REX_B | MODRM_B | DISP_B, 0, 0, 0, CELL ) ;
-                                Set_SCA ( 1 ) ;
-                                Compile_IDIV ( REG, OREG, 0, 0, 0, 0, 0 ) ;
-                            }
-                            _GetRmDispImm ( optInfo, optInfo_0_six, - 1 ) ;
-                            if ( optInfo_0_one->Definition == CfrTil_Divide )
-                            {
-                                Set_SCA ( 0 ) ;
-                                _Compile_Move ( 0, MEM, ACC, compiler->OptInfo->Optimize_Rm, 0, compiler->OptInfo->Optimize_Disp ) ;
-                            }
-                            else _Compile_Move ( 0, MEM, RDX, compiler->OptInfo->Optimize_Rm, 0, compiler->OptInfo->Optimize_Disp ) ;
-                        }
-                        else continue ;
-                        return ( OPTIMIZE_DONE | OPTIMIZE_RESET ) ;
-                    }
-                    case ( OP_VAR << ( 2 * O_BITS ) | OP_LC << ( 1 * O_BITS ) | OP_EQUAL ):
-                    {
-                        SetHere ( optInfo_0_two->Coding ) ;
-                        if ( optInfo_0_two->CAttribute & REGISTER_VARIABLE ) optInfo->Optimize_Dest_RegOrMem = REG ;
-                        else if ( optInfo_0_two->CAttribute & THIS ) optInfo->Optimize_Dest_RegOrMem = MEM ;
-#if 1                        
-                        if ( optInfo_0_two->CAttribute & THIS )
-                        {
-                            _Compile_GetVarLitObj_LValue_To_Reg ( optInfo_0_two, ACC ) ;
-                            _GetRmDispImm ( optInfo, optInfo_0_one, - 1 ) ;
-                            optInfo->Optimize_Rm = ACC ; // shouldn't need this but some code still references this as the rm ?? fix ??
-                            return ( i | OPTIMIZE_RESET ) ;
-                        }
-                        else if ( optInfo_0_two->CAttribute & REGISTER_VARIABLE )
-                        {
-                            //_GetRmDispImm ( optInfo, optInfo_0_two, - 1 ) ;
-                            Set_SCA ( 0 ) ;
-                            _Compile_MoveImm ( REG, optInfo_0_two->RegToUse, IMM_B | REX_B | MODRM_B, 0, 0, ( int64 ) optInfo_0_one->W_Value, CELL_SIZE ) ;
-                            return ( OPTIMIZE_DONE | OPTIMIZE_RESET ) ;
-                        }
-                        else
-#endif                            
-                        {
-                            _GetRmDispImm ( optInfo, optInfo_0_two, - 1 ) ;
-                            Set_SCA ( 0 ) ;
-                            _Compile_MoveImm ( MEM, compiler->OptInfo->Optimize_Rm, IMM_B | REX_B | MODRM_B | DISP_B, 0, compiler->OptInfo->Optimize_Disp, ( int64 ) optInfo_0_one->W_Value, CELL_SIZE ) ;
-                            return ( OPTIMIZE_DONE | OPTIMIZE_RESET ) ;
-                        }
-                    }
-                    case ( OP_VAR << ( 3 * O_BITS ) | OP_VAR << ( 2 * O_BITS ) | OP_FETCH << ( 1 * O_BITS ) | OP_EQUAL ):
-                    {
-                        SetHere ( optInfo_0_three->Coding ) ;
-                        if ( optInfo_0_three->CAttribute & REGISTER_VARIABLE ) compiler->OptInfo->Optimize_Dest_RegOrMem = REG ;
-                        else if ( ( optInfo_0_two->CAttribute & THIS ) ) optInfo->Optimize_Dest_RegOrMem = MEM ;
-                        if ( optInfo_0_three->CAttribute & ( THIS | REGISTER_VARIABLE ) )
-                        {
-                            SetHere ( optInfo_0_three->StackPushRegisterCode ) ;
-                            if ( optInfo_0_two->CAttribute & REGISTER_VARIABLE )
-                            {
-                                Set_SCA ( 0 ) ;
-                                _Compile_Move_Reg_To_Reg ( optInfo_0_three->RegToUse, optInfo_0_two->RegToUse ) ;
-                            }
-                            else
-                            {
-                                Compile_GetVarLitObj_RValue_To_Reg ( optInfo_0_two, OREG ) ;
-                                Set_SCA ( 0 ) ;
-                                _Compile_Move_Reg_To_Rm ( ACC, OREG, 0 ) ;
-                            }
-                        }
-                        else
-                        {
-                            Compile_GetVarLitObj_RValue_To_Reg ( optInfo_0_two, OREG ) ;
-                            _GetRmDispImm ( optInfo, optInfo_0_three, - 1 ) ;
-                            //_Compile_Move ( int64 direction, int64 reg, int64 rm, int64 sib, int64 disp )
-                            Set_SCA ( 0 ) ;
-                            _Compile_Move ( 0, MEM, OREG, compiler->OptInfo->Optimize_Rm, 0, compiler->OptInfo->Optimize_Disp ) ;
-                        }
-                        return ( OPTIMIZE_DONE | OPTIMIZE_RESET ) ;
-                    }
-                    case ( OP_VAR << ( 4 * O_BITS ) | OP_FETCH << ( 3 * O_BITS ) | OP_VAR << ( 2 * O_BITS ) | OP_FETCH << ( 1 * O_BITS ) | OP_EQUAL ):
-                    {
-                        SetHere ( optInfo_0_four->Coding ) ;
-                        Compile_GetVarLitObj_RValue_To_Reg ( optInfo_0_four, ACC ) ;
-                        Compile_GetVarLitObj_RValue_To_Reg ( optInfo_0_two, OREG ) ;
-                        Set_SCA ( 0 ) ;
-                        _Compile_Move_Reg_To_Rm ( ACC, OREG, 0 ) ;
-                        return ( OPTIMIZE_DONE | OPTIMIZE_RESET ) ;
-                    }
-                    case ( OP_VAR << ( 3 * O_BITS ) | OP_VAR << ( 2 * O_BITS ) | OP_FETCH << ( 1 * O_BITS ) | OP_OPEQUAL ):
-                    {
-                        SetHere ( optInfo_0_three->Coding ) ;
-                        if ( optInfo_0_zero->CAttribute & BIT_SHIFT )
-                        {
-                            Compile_GetVarLitObj_RValue_To_Reg ( optInfo_0_two, RCX ) ; // bit shift uses RCX - cl
-                            _GetRmDispImm ( optInfo, optInfo_0_three, - 1 ) ;
-                            optInfo->Optimize_Mod = MEM ;
-                        }
-                        else
-                        {
-                            int8 reg ;
-                            if ( ( optInfo_0_zero->Definition == CfrTil_DivideEqual ) ) reg = ACC ; // div always uses RAX/RDX
-                            else reg = ACC ;
-                            _Compile_GetVarLitObj_LValue_To_Reg ( optInfo_0_three, reg ) ;
-                            _GetRmDispImm ( optInfo, optInfo_0_two, - 1 ) ;
-                            //optInfo->UseReg = R8D ;
-                        }
-                        return (i | OPTIMIZE_RESET ) ;
-                    }
-                    case ( OP_VAR << ( 2 * O_BITS ) | OP_VAR << ( 1 * O_BITS ) | OP_OPEQUAL ):
-                    {
-                        if ( GetState ( _Context_, ( C_SYNTAX | INFIX_MODE ) ) )
-                        {
-                            SetHere ( optInfo_0_two->Coding ) ;
-                            if ( optInfo_0_zero->CAttribute & BIT_SHIFT )
-                            {
-                                Compile_GetVarLitObj_RValue_To_Reg ( optInfo_0_one, RCX ) ; // bit shift uses RCX - cl
-                                _GetRmDispImm ( optInfo, optInfo_0_two, - 1 ) ;
-                                optInfo->Optimize_Mod = MEM ;
-                            }
-                            else
-                            {
-                                if ( ! ( optInfo_0_one->CAttribute & REGISTER_VARIABLE ) )
-                                {
-                                    _Compile_GetVarLitObj_LValue_To_Reg ( optInfo_0_one, OREG ) ;
-                                    _Compile_Move_Rm_To_Reg ( ACC, OREG, 0 ) ;
-                                    optInfo->UseReg = OREG ;
-                                }
-                                else
-                                {
-                                    _Compile_GetVarLitObj_LValue_To_Reg ( optInfo_0_one, ACC ) ;
-                                    //optInfo->UseReg = ACC ;
-                                }
-                                _GetRmDispImm ( optInfo, optInfo_0_two, - 1 ) ;
-                                optInfo->Optimize_Reg = ACC ;
-                            }
-                            return (i | OPTIMIZE_RESET ) ;
-                        }
-                        else return 0 ;
-                    }
-                    case ( OP_VAR << ( 2 * O_BITS ) | OP_LC << ( 1 * O_BITS ) | OP_OPEQUAL ):
-                    {
-                        SetHere ( optInfo_0_two->Coding ) ;
-                        //if ( optInfo_0_two->CAttribute & REGISTER_VARIABLE ) compiler->OptInfo->Optimize_Dest_RegOrMem = REG ;
-                        //else optInfo->Optimize_Dest_RegOrMem = MEM ;
-                        if ( ( optInfo_0_zero->Definition == CfrTil_MultiplyEqual ) || ( optInfo_0_zero->Definition == CfrTil_DivideEqual ) )
-                        {
-                            if ( ! ( optInfo_0_two->CAttribute & REGISTER_VARIABLE ) ) _Compile_GetVarLitObj_LValue_To_Reg ( optInfo_0_two, ACC ) ;
-                        }
-                        else _GetRmDispImm ( optInfo, optInfo_0_two, - 1 ) ;
-                        _GetRmDispImm ( optInfo, optInfo_0_one, - 1 ) ;
-                        optInfo->Optimize_Dest_RegOrMem = REG ;
-                        return ( i | OPTIMIZE_RESET ) ;
-                    }
-                    case ( OP_VAR << ( 3 * O_BITS ) | OP_FETCH << ( 2 * O_BITS ) | OP_DIVIDE << ( 1 * O_BITS ) | OP_EQUAL ):
-                    case ( OP_VAR << ( 3 * O_BITS ) | OP_FETCH << ( 2 * O_BITS ) | OP_LOGIC << ( 1 * O_BITS ) | OP_EQUAL ):
-                    case ( OP_VAR << ( 3 * O_BITS ) | OP_FETCH << ( 2 * O_BITS ) | OP_UNORDERED << ( 1 * O_BITS ) | OP_EQUAL ):
-                    case ( OP_VAR << ( 3 * O_BITS ) | OP_FETCH << ( 2 * O_BITS ) | OP_ORDERED << ( 1 * O_BITS ) | OP_EQUAL ):
-                    {
-                        if ( optInfo_0_one->StackPushRegisterCode )
-                        {
-                            SetHere ( optInfo_0_one->StackPushRegisterCode ) ;
-                            Set_SCA ( 3 ) ;
-                            _Compile_Move_StackN_To_Reg ( OREG, DSP, 0 ) ;
-                            Set_SCA ( 0 ) ;
-                            _Compile_Move_Reg_To_Rm ( OREG, ACC, 0 ) ;
-                            return ( OPTIMIZE_DONE | OPTIMIZE_RESET ) ;
-                        }
-                        else return 0 ;
-                    }
-#if 0                    
-                        //case ( OP_VAR << ( 2 * O_BITS ) | OP_CPRIMITIVE << ( 1 * O_BITS ) | OP_EQUAL ):
-                    case ( OP_VAR << ( 2 * O_BITS ) | OP_VAR << ( 1 * O_BITS ) | OP_EQUAL ):
-                    {
-                        if ( optInfo_0_two->StackPushRegisterCode )
-                        {
-                            SetHere ( optInfo_0_two->Coding ) ;
-                            // arg order is maintained here
-                            _Compile_GetVarLitObj_LValue_To_Reg ( optInfo_0_two, ACC ) ;
-                            if ( optInfo_0_two->StackPushRegisterCode ) SetHere ( optInfo_0_two->StackPushRegisterCode ) ;
-                            _Compile_GetVarLitObj_LValue_To_Reg ( optInfo_0_one, OREG ) ;
-                            optInfo->Optimize_Rm = ACC ;
-                            optInfo->Optimize_Reg = OREG ;
-                            return (i | OPTIMIZE_RESET ) ;
-                        }
-                        else return 0 ;
-                    }
-#endif                    
-                        // OP_STORE
-                    case ( OP_VAR << ( 2 * O_BITS ) | OP_VAR << ( 1 * O_BITS ) | OP_STORE ): // "!" - store
-                    {
-                        // this block is a good place to start thinking about improvine _Compile_Move to be comprehensive 
-                        if ( GetState ( _Context_, C_SYNTAX ) )
-                        {
-                            SetHere ( optInfo_0_two->Coding ) ;
-                            Word_Set_SCA ( optInfo_0_two ) ;
-                            //Word * svcrw = _Context_->CurrentlyRunningWord ;
-                            //_Context_->CurrentlyRunningWord = optInfo_0_two ;
-                            if ( ! ( optInfo_0_two->CAttribute & REGISTER_VARIABLE ) )
-                            {
-                                if ( GetState ( _Context_, ADDRESS_OF_MODE ) )
-                                {
-                                    _Compile_GetVarLitObj_LValue_To_Reg ( optInfo_0_two, ACC ) ;
-                                    //SetState ( _Context_, ADDRESS_OF_MODE, false ) ;
-                                }
-                                else Compile_GetVarLitObj_RValue_To_Reg ( optInfo_0_two, ACC ) ;
-                                if ( optInfo_0_one->CAttribute & REGISTER_VARIABLE )
-                                {
-                                    _Compile_Move_Reg_To_Reg ( optInfo_0_one->RegToUse, ACC ) ;
-                                    return ( OPTIMIZE_DONE | OPTIMIZE_RESET ) ;
-                                }
-                            }
-                            _GetRmDispImm ( optInfo, optInfo_0_one, - 1 ) ;
-                            Word_Set_SCA ( optInfo_0_zero ) ;
-                            if ( optInfo_0_two->CAttribute & REGISTER_VARIABLE )
-                            {
-                                if ( optInfo_0_one->CAttribute & REGISTER_VARIABLE ) _Compile_Move_Reg_To_Reg ( optInfo_0_one->RegToUse, optInfo_0_two->RegToUse ) ;
-                                else _Compile_Move ( 0, REG, optInfo_0_two->RegToUse, compiler->OptInfo->Optimize_Rm, 0, compiler->OptInfo->Optimize_Disp ) ;
-                            }
-                            else
-                            {
-                                if ( optInfo_0_one->CAttribute & REGISTER_VARIABLE ) _Compile_Move ( 0, REG, optInfo_0_one->RegToUse, ACC, 0, 0 ) ;
-                                else _Compile_Move ( 0, MEM, ACC, compiler->OptInfo->Optimize_Rm, 0, compiler->OptInfo->Optimize_Disp ) ;
-                            }
-                            //_Context_->CurrentlyRunningWord = svcrw ;
-                            return ( OPTIMIZE_DONE | OPTIMIZE_RESET ) ;
-                        }
-                        else return 0 ;
-                    }
-                    case ( OP_LC << ( 2 * O_BITS ) | OP_VAR << ( 1 * O_BITS ) | OP_STORE ): // "!" - store
-                    {
-                        SetHere ( optInfo_0_two->Coding ) ;
-                        _GetRmDispImm ( optInfo, optInfo_0_two, - 1 ) ;
-                        if ( optInfo_0_one->CAttribute & REGISTER_VARIABLE )
-                        {
-                            Set_SCA ( 0 ) ;
-                            _Compile_MoveImm ( REG, optInfo_0_one->RegToUse, IMM_B | REX_B | MODRM_B | DISP_B, 0, 0, optInfo->Optimize_Imm, CELL ) ;
-                            return ( OPTIMIZE_DONE | OPTIMIZE_RESET ) ;
-                        }
-                        else
-                        {
-                            //_Compile_GetVarLitObj_LValue_To_Reg ( optInfo_0_one, R8 ) ;
-                            _GetRmDispImm ( optInfo, optInfo_0_one, - 1 ) ;
-                            //_Set_SCA ( 0 ) ;
-                            return ( i | OPTIMIZE_RESET ) ;
-                        }
-                    }
-                    case ( OP_DUP << ( 2 * O_BITS ) | OP_VAR << ( 1 * O_BITS ) | OP_STORE ): // "!" - store
-                    {
-                        SetHere ( optInfo_0_two->Coding ) ;
-                        if ( ! ( optInfo_0_one->CAttribute & REGISTER_VARIABLE ) ) //_Compile_MoveImm ( REG, R8, 0, 0, optInfo->Optimize_Imm, CELL ) ;
-                        {
-                            _Compile_GetVarLitObj_LValue_To_Reg ( optInfo_0_one, OREG ) ;
-                        }
-                        Set_SCA ( 0 ) ;
-                        _Compile_Move_Reg_To_Rm ( OREG, ACC, 0 ) ;
-                        return ( OPTIMIZE_DONE | OPTIMIZE_RESET ) ;
-                    }
-#if 1                   
-                    case ( OP_VAR << ( 1 * O_BITS ) | OP_STORE ): // "!" - store
-                    {
-                        if ( GetState ( _Context_, C_SYNTAX ) ) //&& ( optInfo_0_two->StackPushRegisterCode ) )
-                        {
-#if 0                            
-                            //SetHere ( optInfo_0_one->Coding ) ;
-                            //_Compile_GetVarLitObj_LValue_To_Reg ( optInfo_0_one, ECX ) ;
-                            _GetRmDispImm ( optInfo, optInfo_0_one, - 1 ) ;
-                            if ( optInfo_0_two && optInfo_0_two->StackPushRegisterCode ) SetHere ( optInfo_0_two->StackPushRegisterCode ) ;
-                            else
-                            {
-                                // assume two has pushed something onto the stack ?!
-                                _Compile_Move_StackN_To_Reg ( ACC, DSP, 0 ) ;
-                                _Compile_Stack_Drop ( DSP ) ;
-                            }
-                            //_Set_SCA ( 0 ) ;
-                            //_Compile_MoveImm ( MEM, R8, 0, 0, optInfo->Optimize_Imm, CELL ) ;
-                            return ( i | OPTIMIZE_RESET ) ;
-#else
-                            return 0 ;
-#endif                            
-                        }
-                        else if ( optInfo_0_two->StackPushRegisterCode )
-                        {
-                            SetHere ( optInfo_0_two->StackPushRegisterCode ) ;
-                            //_Set_SCA ( 0 ) ;
-                            //_Compile_Move_Reg_To_Rm ( ECX, R8, 0 ) ;
-                            //return ( OPTIMIZE_DONE | OPTIMIZE_RESET ) ;
-                            _GetRmDispImm ( optInfo, optInfo_0_one, - 1 ) ;
-                            return ( i | OPTIMIZE_RESET ) ;
-                        }
-                        return ( 0 ) ;
-                    }
-#endif 
-#if 1                   
-                    case ( OP_DIVIDE << ( 2 * O_BITS ) | OP_VAR << ( 1 * O_BITS ) | OP_STORE ): // "!" - store
-                    case ( OP_ORDERED << ( 2 * O_BITS ) | OP_VAR << ( 1 * O_BITS ) | OP_STORE ): // "!" - store
-                    case ( OP_UNORDERED << ( 2 * O_BITS ) | OP_VAR << ( 1 * O_BITS ) | OP_STORE ): // "!" - store
-                    case ( OP_LOGIC << ( 2 * O_BITS ) | OP_VAR << ( 1 * O_BITS ) | OP_STORE ): // "!" - store
-                    {
-                        if ( optInfo_0_two->StackPushRegisterCode )
-                        {
-                            BlockInfo *bi = ( BlockInfo * ) _Stack_Top ( compiler->CombinatorBlockInfoStack ) ;
-                            if ( bi->LogicTestCode ) SetHere ( bi->LogicTestCode ) ; // no need for the test code on a 'store'
-                            else SetHere ( optInfo_0_two->StackPushRegisterCode ) ; // leave optInfo_0_two value in R8 we don't need to push it
-                            Set_SCA ( 0 ) ;
-                            _Debugger_->PreHere = optInfo_0_two->Coding ;
-                            if ( ! ( optInfo_0_one->CAttribute & REGISTER_VARIABLE ) )// this logic may need to be refined but it works with our C.factorial 
-                            {
-                                _GetRmDispImm ( optInfo, optInfo_0_one, - 1 ) ;
-                                _Compile_Move ( 0, MEM, ACC, compiler->OptInfo->Optimize_Rm, 0, compiler->OptInfo->Optimize_Disp ) ;
-                            }
-                                //_Compile_Move ( int8 rex, int8 mod, int8 reg, int8 rm, int8 sib, int64 disp )
-                            else if ( GetState ( _Context_, C_SYNTAX ) )
-                            {
-                                if ( optInfo_0_one->RegToUse != optInfo_0_two->RegToUse )
-                                    _Compile_Move_Reg_To_Reg ( optInfo_0_one->RegToUse, optInfo_0_two->RegToUse ) ;
-
-                            }
-                            return ( OPTIMIZE_DONE | OPTIMIZE_RESET ) ;
-                        }
-                        else return 0 ;
-                    }
-#endif                    
-                    case ( OP_FETCH << ( 2 * O_BITS ) | OP_VAR << ( 1 * O_BITS ) | OP_STORE ): // "!" - store
-                    {
-                        if ( optInfo_0_two->StackPushRegisterCode )
-                        {
-                            SetHere ( optInfo_0_two->StackPushRegisterCode ) ; //Coding ) ;
-                            _GetRmDispImm ( optInfo, optInfo_0_one, - 1 ) ;
-                            Set_SCA ( 0 ) ;
-                            _Compile_Move ( 0, MEM, ACC, compiler->OptInfo->Optimize_Rm, 0, compiler->OptInfo->Optimize_Disp ) ;
-                            return ( OPTIMIZE_DONE | OPTIMIZE_RESET ) ; // reset after '=' or store 
-                        }
-                        else return 0 ;
-                    }
-                        // C_SYNTAX 
-                    case ( OP_UNORDERED << ( 2 * O_BITS ) | OP_VAR << ( 1 * O_BITS ) | OP_DIVIDE ):
-                    case ( OP_ORDERED << ( 2 * O_BITS ) | OP_VAR << ( 1 * O_BITS ) | OP_DIVIDE ):
-                    case ( OP_DIVIDE << ( 2 * O_BITS ) | OP_VAR << ( 1 * O_BITS ) | OP_DIVIDE ):
-                    case ( OP_DIVIDE << ( 2 * O_BITS ) | OP_VAR << ( 1 * O_BITS ) | OP_UNORDERED ):
-                    case ( OP_DIVIDE << ( 2 * O_BITS ) | OP_VAR << ( 1 * O_BITS ) | OP_ORDERED ):
-                    case ( OP_ORDERED << ( 2 * O_BITS ) | OP_VAR << ( 1 * O_BITS ) | OP_UNORDERED ):
-                    case ( OP_UNORDERED << ( 2 * O_BITS ) | OP_VAR << ( 1 * O_BITS ) | OP_UNORDERED ):
-                    case ( OP_ORDERED << ( 2 * O_BITS ) | OP_VAR << ( 1 * O_BITS ) | OP_ORDERED ):
-                    case ( OP_UNORDERED << ( 2 * O_BITS ) | OP_VAR << ( 1 * O_BITS ) | OP_ORDERED ):
-                    {
-                        if ( GetState ( _Context_, C_SYNTAX ) )
-                        {
-                            if ( optInfo_0_two->StackPushRegisterCode )
-                            {
-                                SetHere ( optInfo_0_two->StackPushRegisterCode ) ; // leave optInfo_0_two value in R8 we don't need to push it
-                                if ( optInfo_0_one->CAttribute & ( THIS | OBJECT ) )
-                                {
-                                    Compile_GetVarLitObj_RValue_To_Reg ( optInfo_0_one, OREG ) ;
-                                    optInfo->Optimize_Dest_RegOrMem = REG ;
-                                    optInfo->Optimize_Mod = REG ;
-                                    optInfo->Optimize_Reg = ACC ; // shouldn't need this but some code still references this as the rm ?? fix ??
-                                    optInfo->Optimize_Rm = OREG ;
-                                }
-                                else
-                                {
-                                    _GetRmDispImm ( optInfo, optInfo_0_one, - 1 ) ;
-                                    optInfo->Optimize_Dest_RegOrMem = REG ;
-                                    optInfo->Optimize_Mod = MEM ;
-                                }
-                                return i ;
-                            }
-                            else return 0 ;
-                        }
-                        else continue ;
-                    }
-                    case ( OP_VAR << ( 2 * O_BITS ) | OP_VAR << ( 1 * O_BITS ) | OP_LOGIC ):
-                    case ( OP_VAR << ( 2 * O_BITS ) | OP_VAR << ( 1 * O_BITS ) | OP_UNORDERED ):
-                    {
-                        if ( GetState ( _Context_, C_SYNTAX ) )
-                        {
-                            SetHere ( optInfo_0_two->Coding ) ;
-                            if ( ( optInfo_0_two->CAttribute & REGISTER_VARIABLE ) && ( optInfo_0_one->CAttribute & REGISTER_VARIABLE ) )
-                            {
-                                optInfo->Optimize_DstReg = optInfo->Optimize_Reg = optInfo_0_two->RegToUse ;
-                                optInfo->Optimize_SrcReg = optInfo->Optimize_Rm = optInfo_0_one->RegToUse ;
-                                optInfo->Optimize_Mod = REG ;
-                                optInfo->OptimizeFlag |= OPTIMIZE_REGISTER ;
-                                optInfo->Optimize_Dest_RegOrMem = REG ;
-                                //_GetRmDispImm ( optInfo, optInfo_0_one, ACC ) ;
-                            }
-                            else
-                            {
-                                Compile_GetVarLitObj_RValue_To_Reg ( optInfo_0_two, ACC ) ;
-                                Compile_GetVarLitObj_RValue_To_Reg ( optInfo_0_one, OREG ) ;
-                                optInfo->Optimize_Mod = REG ;
-                                optInfo->Optimize_Reg = ACC ;
-                                optInfo->Optimize_Rm = OREG ;
-                                optInfo->Optimize_Dest_RegOrMem = REG ;
-                            }
-                            return i ;
-                        }
-                        else continue ;
-                    }
-                    case ( OP_VAR << ( 2 * O_BITS ) | OP_VAR << ( 1 * O_BITS ) | OP_ORDERED ):
-                    case ( OP_VAR << ( 2 * O_BITS ) | OP_VAR << ( 1 * O_BITS ) | OP_DIVIDE ):
-                        //case ( OP_VAR << ( 2 * O_BITS ) | OP_VAR << ( 1 * O_BITS ) | OP_UNORDERED ):
-                    {
-                        if ( GetState ( _Context_, C_SYNTAX ) )
-                        {
-                            SetHere ( optInfo_0_two->Coding ) ;
-                            if ( compiler->NumberOfRegisterVariables )
-                            {
-                                optInfo->Optimize_DstReg = optInfo_0_two->RegToUse ;
-                                optInfo->Optimize_SrcReg = optInfo_0_one->RegToUse ;
-                                _GetRmDispImm ( optInfo, optInfo_0_one, ACC ) ;
-                            }
-                            else
-                            {
-                                Compile_GetVarLitObj_RValue_To_Reg ( optInfo_0_two, ACC ) ;
-                                //_GetRmDispImm ( optInfo, optInfo_0_two, - 1 ) ;
-                                _GetRmDispImm ( optInfo, optInfo_0_one, - 1 ) ;
-                                optInfo->Optimize_Dest_RegOrMem = REG ;
-                            }
-                            return i ;
-                        }
-                        else continue ;
-                    }
-                    case ( OP_LC << ( 2 * O_BITS ) | OP_VAR << ( 1 * O_BITS ) | OP_LOGIC ):
-                    case ( OP_LC << ( 2 * O_BITS ) | OP_VAR << ( 1 * O_BITS ) | OP_DIVIDE ):
-                    case ( OP_LC << ( 2 * O_BITS ) | OP_VAR << ( 1 * O_BITS ) | OP_UNORDERED ):
-                    case ( OP_LC << ( 2 * O_BITS ) | OP_VAR << ( 1 * O_BITS ) | OP_ORDERED ):
-                    {
-                        if ( GetState ( _Context_, C_SYNTAX ) )
-                        {
-                            SetHere ( optInfo_0_two->Coding ) ;
-                            Compile_GetVarLitObj_RValue_To_Reg ( optInfo_0_one, OREG ) ;
-                            //_GetRmDispImm ( optInfo, optInfo_0_two, - 1 ) ;
-                            _GetRmDispImm ( optInfo, optInfo_0_two, - 1 ) ;
-                            //_Compile_VarConstOrLit_LValue_To_Reg ( optInfo_0_two, R8)
-                            optInfo->Optimize_Mod = REG ;
-                            optInfo->Optimize_Dest_RegOrMem = REG ;
-                            return i ;
-                        }
-                        else continue ;
-                    }
-                        // MISCELLANEOUS
-                    case ( OP_VAR << ( 2 * O_BITS ) | OP_FETCH << ( 1 * O_BITS ) | OP_FETCH ):
-                    {
-                        if ( ! ( optInfo_0_two->CAttribute & REGISTER_VARIABLE ) )
-                        {
-                            SetHere ( optInfo_0_two->Coding ) ;
-                            Compile_GetVarLitObj_RValue_To_Reg ( optInfo_0_two, ACC ) ;
-                            _Compile_Move_Rm_To_Reg ( ACC, ACC, 0 ) ;
-                            _Word_CompileAndRecord_PushReg ( optInfo_0_two, ACC ) ;
-                            return OPTIMIZE_DONE ;
-                            //optInfo_0_zero->StackPushRegisterCode = optInfo_0_one->StackPushRegisterCode ; // used in further optimization
-                        }
-                        return ( OPTIMIZE_DONE | OPTIMIZE_DONT_RESET ) ;
-                    }
-                    case ( OP_VAR << ( 1 * O_BITS ) | OP_FETCH ):
-                    {
-                        if ( ! ( optInfo_0_one->CAttribute & REGISTER_VARIABLE ) )
-                        {
-                            SetHere ( optInfo_0_one->Coding ) ;
-                            Compile_GetVarLitObj_RValue_To_Reg ( optInfo_0_one, ACC ) ;
-                            _Word_CompileAndRecord_PushReg ( optInfo_0_one, ACC ) ;
-                            optInfo_0_zero->StackPushRegisterCode = optInfo_0_one->StackPushRegisterCode ; // used in further optimization
-                        }
-                        return ( OPTIMIZE_DONE | OPTIMIZE_DONT_RESET ) ;
-                    }
-                    case ( OP_VAR << ( 2 * O_BITS ) | OP_FETCH << ( 1 * O_BITS ) | OP_DUP ):
-                    {
-                        if ( optInfo_0_two->StackPushRegisterCode )
-                        {
-                            SetHere ( optInfo_0_two->StackPushRegisterCode ) ;
-                            Compile_ADDI ( REG, DSP, 0, 2 * CELL, 0 ) ;
-                            _Compile_Move_Reg_To_StackN ( DSP, 0, ACC ) ;
-                            _Compile_Move_Reg_To_StackN ( DSP, - 1, ACC ) ;
-                            return ( OPTIMIZE_DONE ) ;
-                        }
-                    }
-                    case ( OP_VAR << ( 4 * O_BITS ) | OP_DUP << ( 3 * O_BITS ) | OP_FETCH << ( 2 * O_BITS ) | OP_LC << ( 1 * O_BITS ) | OP_UNORDERED ):
-                    case ( OP_VAR << ( 4 * O_BITS ) | OP_DUP << ( 3 * O_BITS ) | OP_FETCH << ( 2 * O_BITS ) | OP_LC << ( 1 * O_BITS ) | OP_ORDERED ):
-                    case ( OP_VAR << ( 4 * O_BITS ) | OP_DUP << ( 3 * O_BITS ) | OP_FETCH << ( 2 * O_BITS ) | OP_LC << ( 1 * O_BITS ) | OP_LOGIC ):
-                    case ( OP_VAR << ( 4 * O_BITS ) | OP_DUP << ( 3 * O_BITS ) | OP_FETCH << ( 2 * O_BITS ) | OP_LC << ( 1 * O_BITS ) | OP_DIVIDE ):
-                    {
-                        SetHere ( optInfo_0_four->Coding ) ;
-                        _Compile_GetVarLitObj_LValue_To_Reg ( optInfo_0_four, ACC ) ;
-                        Compile_ADDI ( REG, DSP, 0, CELL, 0 ) ;
-                        _Compile_Move_Reg_To_StackN ( DSP, 0, ACC ) ;
-                        Compile_GetVarLitObj_RValue_To_Reg ( optInfo_0_four, ACC ) ;
-                        _Word_CompileAndRecord_PushReg ( optInfo_0_four, ACC ) ;
-                        _GetRmDispImm ( optInfo, optInfo_0_one, - 1 ) ;
-                        //_CfrTil_WordList_PopWords ( 2, 1 ) ;
-                        optInfo->Optimize_Mod = MEM ;
-                        optInfo->Optimize_Rm = DSP ;
-                        optInfo->Optimize_Reg = ACC ;
-                        optInfo->Optimize_Dest_RegOrMem = MEM ;
-                        return i ; //( OPTIMIZE_DONE ) ;
-                    }
-                    case ( OP_LOGIC << ( 1 * O_BITS ) | OP_DUP ):
-                    case ( OP_DIVIDE << ( 1 * O_BITS ) | OP_DUP ):
-                    case ( OP_UNORDERED << ( 1 * O_BITS ) | OP_DUP ):
-                    case ( OP_ORDERED << ( 1 * O_BITS ) | OP_DUP ):
-                    case ( OP_LC << ( 1 * O_BITS ) | OP_DUP ):
-                    {
-                        if ( optInfo_0_one->StackPushRegisterCode )
-                        {
-                            SetHere ( optInfo_0_one->StackPushRegisterCode ) ;
-                            Compile_ADDI ( REG, DSP, 0, 2 * CELL, 0 ) ;
-                            _Compile_Move_Reg_To_StackN ( DSP, 0, ACC ) ;
-                            _Compile_Move_Reg_To_StackN ( DSP, - 1, ACC ) ;
-                            return ( OPTIMIZE_DONE ) ;
-                        }
-                    }
-                    default: continue ;
-                }
-            }
-        }
-    }
-    return i ;
-}
-
-#if NEW_OPTIMIZER    
-
-int64
-CheckOptimize ( Compiler * compiler, int64 maxOperands )
-{
-    return NewOptimize ( Compiler_WordList ( 0 ) ) ;
-}
-
-int64
-NewOptimize ( Word * word )
-{
-    int64 rtrn = 0 ;
-    if ( word )
-    {
-        Compiler * compiler = _Compiler_ ;
-        Word *wordn, *wordArg1RAX = 0, *wordArg2RCX = 0 ;
-        dlnode * node, *nextNode, *wordArg2RCXNode, *wordArg1RAXNode ;
-        int8 reg = RAX ;
-#if 0        
-        if ( word->CAttribute & ( CATEGORY_OP_LOAD ) )
-        {
-            wordn = Compiler_WordList ( 1 ) ;
-            Compile_GetVarLitObj_RValue_To_Reg ( wordn, RAX ) ;
-            rtrn = OPTIMIZE_DONE ;
-            goto done ;
-        }
-#endif        
-        if ( Compiling && ( word->CAttribute & ( IMMEDIATE | CPRIMITIVE ) ) ) // if CPRIMITIVE it is assumed to be a NAMESPACE_VARIABLE??
-        {
-#if 0            
-            if ( word->CAttribute & ( CATEGORY_DUP | CATEGORY_OP_LOAD ) )
-            {
-                rtrn = OPTIMIZE_DONE ;
-                goto done ;
-            }
-            else
-#endif            
-                if ( word->CAttribute & ( CATEGORY_OP_OPEQUAL | CATEGORY_OP_UNORDERED | CATEGORY_OP_ORDERED | CATEGORY_OP_1_ARG | CATEGORY_OP_EQUAL | CATEGORY_OP_STORE | CATEGORY_DUP | CATEGORY_OP_LOAD ) )
-            {
-                CompileOptInfo_Init ( compiler ) ;
-                CompileOptimizeInfo * optInfo = compiler->OptInfo ;
-                for ( node = dllist_First ( ( dllist* ) compiler->WordList ), node = dlnode_Next ( node ) ; node ; node = nextNode )
-                {
-                    nextNode = dlnode_Next ( node ) ;
-                    wordn = ( Word* ) dobject_Get_M_Slot ( node, SCN_WORD ) ;
-                    if ( wordn->CAttribute & ( CPRIMITIVE | OBJECT | THIS | PARAMETER_VARIABLE | LITERAL | CONSTANT | LOCAL_VARIABLE | NAMESPACE_VARIABLE | REGISTER_VARIABLE ) )
-                    {
-                        if ( wordn->CAttribute & ( CATEGORY_OP_LOAD ) )
-                        {
-                            dlnode_Remove ( node ) ;
-                            continue ;
-                        }
-                        else if ( wordArg2RCX )
-                        {
-                            wordArg1RAX = wordn ;
-                            wordArg1RAXNode = node ;
-                            if ( wordArg1RAX->CAttribute & ( CPRIMITIVE ) ) //| THIS | OBJECT ) )
-                            {
-                                rtrn = 0 ;
-                                goto done ;
-                            }
-                            else if ( word->CAttribute & ( CATEGORY_OP_STORE ) )
-                            {
-                                if ( wordArg1RAX->CAttribute & ( CPRIMITIVE ) ) //| THIS | OBJECT ) )
-                                {
-                                    rtrn = 0 ;
-                                    goto done ;
-                                }
-                                SetHere ( wordArg1RAX->Coding ) ;
-                                _Compile_GetVarLitObj_LValue_To_Reg ( wordArg2RCX, RAX ) ;
-                                Compile_GetVarLitObj_RValue_To_Reg ( wordArg1RAX, RCX ) ;
-                                _Compile_Move_Reg_To_Rm ( RAX, RCX, 0 ) ;
-                                rtrn = OPTIMIZE_DONE ;
-                                goto done ;
-                            }
-                            else if ( word->CAttribute & ( CATEGORY_OP_EQUAL ) )
-                            {
-                                if ( wordArg1RAX->CAttribute & ( CPRIMITIVE | THIS | OBJECT ) )
-                                {
-                                    rtrn = 0 ;
-                                    goto done ;
-                                }
-                                SetHere ( wordArg1RAX->Coding ) ;
-                                _Compile_GetVarLitObj_LValue_To_Reg ( wordArg1RAX, RAX ) ;
-                                if ( wordArg2RCX->CAttribute & ( THIS | OBJECT ) ) break ; //_Compile_Move_Reg_To_Reg ( RCX, RAX ) ;
-                                else Compile_GetVarLitObj_RValue_To_Reg ( wordArg2RCX, RCX ) ;
-                                _Compile_Move_Reg_To_Rm ( RAX, RCX, 0 ) ;
-                                rtrn = OPTIMIZE_DONE ;
-                                goto done ;
-                            }
-                            if ( word->CAttribute & ( BIT_SHIFT ) )
-                            {
-                                if ( word->CAttribute & ( CATEGORY_OP_OPEQUAL ) )
-                                {
-                                    _Compile_GetVarLitObj_LValue_To_Reg ( wordArg1RAX, RAX ) ;
-                                    optInfo->Optimize_Mod = MEM ;
-                                }
-                                else
-                                {
-                                    Compile_GetVarLitObj_RValue_To_Reg ( wordArg1RAX, RAX ) ;
-                                    optInfo->Optimize_Mod = REG ;
-                                }
-                                optInfo->Optimize_Rm = RAX ;
-                                rtrn = 1 ;
-                                goto done ;
-                            }
-                            else
-                            {
-                                wordArg1RAX->Coding = Here ;
-                                Compile_GetVarLitObj_RValue_To_Reg ( wordArg1RAX, reg ) ;
-                                dlnode_Remove ( wordArg1RAXNode ) ;
-                                dlnode_Remove ( wordArg2RCXNode ) ;
-                            }
-                            break ;
-                        }
-                        else if ( wordn->CAttribute & ( CATEGORY_OP_UNORDERED | CATEGORY_OP_ORDERED | CATEGORY_OP_1_ARG ) )
-                        {
-                            // this block needs to be fixed
-                            if ( wordArg2RCX ) // then this will be wordArg1RAX
-                            {
-                                wordArg1RAX = wordn ;
-                                //if ( wordn->RegToUse == RAX ) reg = RCX ;
-                                //else reg = RAX ;
-                                if ( wordArg1RAX->StackPushRegisterCode ) SetHere ( wordArg1RAX->StackPushRegisterCode ) ;
-                                if ( wordArg1RAX->CAttribute & ( CATEGORY_OP_UNORDERED | CATEGORY_OP_ORDERED | CATEGORY_OP_1_ARG ) )
-                                {
-                                    Compile_GetVarLitObj_RValue_To_Reg ( wordArg2RCX, RCX ) ;
-                                }
-                                else
-                                {
-                                    Compile_GetVarLitObj_RValue_To_Reg ( wordArg1RAX, RAX ) ;
-                                }
-                                break ;
-                            }
-                            else wordArg2RCX = wordn ;
-                        }
-                        else
-                        {
-                            wordArg2RCX = wordn ;
-                            wordArg2RCXNode = node ;
-                            if ( word->CAttribute & ( CATEGORY_OP_1_ARG | CATEGORY_DUP ) ) reg = RAX ;
-                            else reg = RCX ;
-                            if ( word->CAttribute & ( CATEGORY_OP_LOAD ) )
-                            {
-                                //Compile_GetVarLitObj_RValue_To_Reg ( wordArg2RCX, RAX ) ;
-                                if ( wordArg2RCX->StackPushRegisterCode )
-                                {
-                                    SetHere ( wordArg2RCX->Coding ) ; //StackPushRegisterCode ) ;
-                                    Compile_GetVarLitObj_RValue_To_Reg ( wordArg2RCX, RAX ) ;
-                                    _Compiler_CompileAndRecord_PushAccum ( compiler, RAX ) ;
-                                    rtrn = OPTIMIZE_DONE ; //0 ; //
-                                }
-                                else rtrn = 0 ;
-                                goto done ;
-                            }
-                            else if ( word->CAttribute & ( CATEGORY_OP_1_ARG ) )
-                            {
-                                rtrn = 0 ;
-                                goto done ;
-                            }
-                            else if ( wordArg2RCX->CAttribute & ( CPRIMITIVE | THIS | OBJECT ) )
-                            {
-                                rtrn = 0 ;
-                                goto done ;
-                            }
-                            else
-                            {
-                                wordArg2RCX->Coding = Here ;
-                                if ( word->CAttribute & ( BIT_SHIFT ) )
-                                {
-                                    Compile_GetVarLitObj_RValue_To_Reg ( wordArg2RCX, RCX ) ;
-                                }
-                                else Compile_GetVarLitObj_RValue_To_Reg ( wordArg2RCX, reg ) ;
-                            }
-                        }
-                    }
-                }
-                //Compile_Op ( word ) ; //Mod = REG, with RAX, RCX ; StackPushRegister RAX
-                // remove nodes except op
-                optInfo->Optimize_Mod = REG ;
-                optInfo->Optimize_Reg = RAX ;
-
-                optInfo->Optimize_Rm = RCX ;
-                //SetState ( _CfrTil_, OPTIMIZE_ON, false ) ;
-                rtrn = 1 ;
-                goto done ;
-            }
-        }
-    }
-done:
-    return rtrn ;
-}
-
-#else
-
-int64
-CheckOptimize ( Compiler * compiler, int64 maxOperands )
-{
-    int64 rtrn = 0 ;
-    if ( GetState ( _CfrTil_, OPTIMIZE_ON ) )
-    {
-        SetState ( _CfrTil_, IN_OPTIMIZER, true ) ;
-        d0 ( if ( Is_DebugModeOn ) Compiler_Show_WordList ( ( byte* ) "\nCheckOptimize : before optimize :" ) ) ;
-        Set_SCA ( 0 ) ;
-        rtrn = _CheckOptimizeOperands ( compiler, maxOperands ) ;
-#if 1        
-        if ( ! ( rtrn & ( OPTIMIZE_DONE ) ) )
-        {
-            Set_SCA ( 0 ) ;
-        }
-        //else {_DEBUG_SHOW ( _Context_->CurrentlyRunningWord, 1 ) ; }
-#endif 
-#if 0        
-        if ( ( rtrn & OPTIMIZE_RESET ) )
-        {
-            if ( ( ! Compiling ) && ( ! IsSourceCodeOn ) )
-            {
-                d0 ( Compiler_Show_WordList ( ( byte* ) _ReadLiner_->InputLineString ) ) ;
-                DLList_RecycleWordList ( compiler->WordList ) ; //dllist_Map ( compiler->WordList, ( MapFunction0 ) CheckRecycleWord ) ;
-                //List_Init ( compiler->WordList ) ;
-            }
-            //Set_SCA ( 0 ) ;
-        }
-#endif        
-        d0 ( if ( Is_DebugModeOn ) Compiler_Show_WordList ( ( byte* ) "\nCheckOptimize : after optimize :" ) ) ;
-        SetState ( _CfrTil_, IN_OPTIMIZER, false ) ;
-        SetState ( _Context_, ADDRESS_OF_MODE, false ) ;
-    }
-#if NEW_OPTIMIZER    
-    else rtrn = 1 ;
-#endif    
-    return rtrn ;
-}
-#endif

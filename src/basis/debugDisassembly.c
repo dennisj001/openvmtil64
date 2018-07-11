@@ -17,7 +17,7 @@ Debugger_Udis_GetInstructionSize ( Debugger * debugger )
 Boolean
 Debugger_ShowSourceCodeAtAddress ( Debugger * debugger, byte * address )
 {
-    if ( GetState ( _CfrTil_, GLOBAL_SOURCE_CODE_MODE )) //DEBUG_SOURCE_CODE_MODE ) ) // ( _Context_->CurrentlyRunningWord ) && _Context_->CurrentlyRunningWord->W_SC_WordList ) )
+    if ( GetState ( _CfrTil_, GLOBAL_SOURCE_CODE_MODE ) ) //DEBUG_SOURCE_CODE_MODE ) ) // ( _Context_->CurrentlyRunningWord ) && _Context_->CurrentlyRunningWord->W_SC_WordList ) )
     {
         _Debugger_ShowDbgSourceCodeAtAddress ( debugger, address ) ;
         return true ;
@@ -48,7 +48,9 @@ Debugger_Dis ( Debugger * debugger )
     {
         _Printf ( ( byte* ) "\nDisassembly of : %s.%s", c_ud ( word->ContainingNamespace ? word->ContainingNamespace->Name : ( byte* ) "" ), c_gd ( word->Name ) ) ;
         int64 codeSize = word->S_CodeSize ;
+        SetState ( debugger, DBG_DISASM_ACC, true ) ;
         _Debugger_Disassemble ( debugger, ( byte* ) word->CodeStart, codeSize ? codeSize : 64, word->CAttribute & ( CPRIMITIVE | DLSYM_WORD ) ? 1 : 0 ) ;
+        SetState ( debugger, DBG_DISASM_ACC, false ) ;
 #if 0        
         if ( debugger->DebugAddress )
         {
@@ -109,6 +111,12 @@ Debugger_DisassembleTotalAccumulated ( Debugger * debugger )
         address = ( byte* ) _CfrTil_->LastFinishedWord->Definition ;
     }
     int64 size = Here - address ;
-    _Debugger_Disassemble ( debugger, address, size, !Compiling ) ;
+    int64 svState = GetState ( _CfrTil_, GLOBAL_SOURCE_CODE_MODE ) ;
+    SetState ( _CfrTil_, GLOBAL_SOURCE_CODE_MODE, true ) ;
+    SetState ( debugger, DBG_DISASM_ACC, true ) ;
+    //debugger->LastSourceCodeWord = 0 ;
+    _Debugger_Disassemble ( debugger, address, size, ! Compiling ) ;
+    SetState ( _CfrTil_, GLOBAL_SOURCE_CODE_MODE, svState ) ;
+    SetState ( debugger, DBG_DISASM_ACC, false ) ;
 }
 

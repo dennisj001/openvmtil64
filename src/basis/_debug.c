@@ -32,6 +32,17 @@ JumpCallInstructionAddress ( byte * address )
     return jcAddress ;
 }
 
+byte *
+JumpCallInstructionAddress_X64ABI ( byte * address )
+{
+    int64 offset ;
+    if ( ( * ( address - 5 ) ) == 0xe9 ) offset = 35 ;
+    else if ( ( * ( address - 10 ) ) == 0x49 ) offset = 8 ;
+    else offset = 23 ;
+    byte * jcAddress = * ( byte** ) ( address - offset ) ; //JumpCallInstructionAddress ( debugger->DebugAddress ) ;
+    return jcAddress ;
+}
+
 void
 _CfrTil_ACharacterDump ( char aChar )
 {
@@ -130,16 +141,24 @@ _Compile_DebugRuntimeBreakpoint ( ) // where we want the acquired pointer
     Compile_Call_TestRSP ( ( byte* ) CfrTil_DebugRuntimeBreakpoint ) ;
 }
 
+void
+_Compile_WordCompiledAt_Location ( ) // where we want the acquired pointer
+{
+    Compile_CpuState_Save ( _Debugger_->cs_Cpu ) ;
+    Compile_Call_TestRSP ( ( byte* ) CompileTime_Location ) ;
+}
+
 #if 0
+
 uint64
 GetRsp ( )
 {
     _CfrTil_->SaveSelectedCpuState ( ) ;
-    return (uint64) _CfrTil_->cs_Cpu->Rsp ;
+    return ( uint64 ) _CfrTil_->cs_Cpu->Rsp ;
 }
 
 uint64
-_GetTestRsp ()
+_GetTestRsp ( )
 {
     uint64 rsp = GetRsp ( ) ;
     return rsp ;
@@ -150,21 +169,21 @@ _GetTestRsp ()
 void
 _GetTestRsp_ ( byte * src )
 {
-    uint64 rsp = _GetTestRsp () ;
+    uint64 rsp = _GetTestRsp ( ) ;
     if ( rsp & 0x8 )
-        _Printf ( ( byte* ) "\n%s : %s : rsp = %llx", src, Context_Location (), rsp ) ;
+        _Printf ( ( byte* ) "\n%s : %s : rsp = %llx", src, Context_Location ( ), rsp ) ;
 }
 
 void
-GetTestRsp_Word ()
+GetTestRsp_Word ( )
 {
-    _GetTestRsp_ ( (byte*) "Word" ) ;
+    _GetTestRsp_ ( ( byte* ) "Word" ) ;
 }
 
 void
-GetTestRsp_Block ()
+GetTestRsp_Block ( )
 {
-    _GetTestRsp_ ( (byte*) "Block" ) ;
+    _GetTestRsp_ ( ( byte* ) "Block" ) ;
 }
 
 void

@@ -3,8 +3,8 @@
 void
 _dlnode_Init ( dlnode * node )
 {
-    node->afterWord = 0 ;
-    node->beforeWord = 0 ;
+    node->afterNode = 0 ;
+    node->beforeNode = 0 ;
 }
 
 dlnode *
@@ -15,9 +15,9 @@ _dlnode_New ( uint64 allocType )
 }
 
 // toward the TailNode
-#define _dlnode_Next( node ) node->afterWord
+#define _dlnode_Next( node ) node->afterNode
 // toward the HeadNode
-#define _dlnode_Previous( node ) node->beforeWord
+#define _dlnode_Previous( node ) node->beforeNode
 
 // toward the TailNode
 
@@ -25,7 +25,7 @@ dlnode *
 dlnode_Next ( dlnode * node )
 {
     // don't return TailNode return 0
-    if ( node && node->afterWord && node->afterWord->afterWord )
+    if ( node && node->afterNode && node->afterNode->afterNode )
     {
         return _dlnode_Next ( node ) ;
     }
@@ -38,7 +38,7 @@ dlnode *
 dlnode_Previous ( dlnode * node )
 {
     // don't return HeadNode return 0
-    if ( node && node->beforeWord && node->beforeWord->beforeWord )
+    if ( node && node->beforeNode && node->beforeNode->beforeNode )
     {
         return _dlnode_Previous ( node ) ;
     }
@@ -51,10 +51,10 @@ dlnode_InsertThisAfterANode ( dlnode * node, dlnode * anode ) // Insert this Aft
     if ( node && anode )
     {
         D0 ( if ( anode->N_CAttribute & T_TAIL ) Error ( "\nCan't Insert a node after the TailNode!\n", QUIT ) ; ) ;
-        if ( anode->afterWord ) anode->afterWord->beforeWord = node ; // don't overwrite a Head or Tail node 
-        node->afterWord = anode->afterWord ;
-        anode->afterWord = node ; // after the above statement ! obviously
-        node->beforeWord = anode ;
+        if ( anode->afterNode ) anode->afterNode->beforeNode = node ; // don't overwrite a Head or Tail node 
+        node->afterNode = anode->afterNode ;
+        anode->afterNode = node ; // after the above statement ! obviously
+        node->beforeNode = anode ;
     }
 }
 
@@ -64,10 +64,10 @@ dlnode_InsertThisBeforeANode ( dlnode * node, dlnode * anode ) // Insert this Be
     if ( node && anode )
     {
         D0 ( if ( anode->N_CAttribute & T_HEAD ) Error ( "\nCan't Insert a node before the HeadNode!\n", QUIT ) ; ) ;
-        if ( anode->beforeWord ) anode->beforeWord->afterWord = node ; // don't overwrite a Head or Tail node
-        node->beforeWord = anode->beforeWord ;
-        anode->beforeWord = node ; // after the above statement ! obviously
-        node->afterWord = anode ;
+        if ( anode->beforeNode ) anode->beforeNode->afterNode = node ; // don't overwrite a Head or Tail node
+        node->beforeNode = anode->beforeNode ;
+        anode->beforeNode = node ; // after the above statement ! obviously
+        node->afterNode = anode ;
     }
 }
 
@@ -77,10 +77,10 @@ dlnode_Remove ( dlnode * node )
     if ( node )
     {
         //D1 ( if ( (int64) (((Node)node)->n_Attribute.T_CAttribute) & ( T_HEAD | T_TAIL ) ) Error ( "\nCan't remove the Head or Tail node!\n", QUIT ) ) ;
-        if ( node->beforeWord ) node->beforeWord->afterWord = node->afterWord ;
-        if ( node->afterWord ) node->afterWord->beforeWord = node->beforeWord ;
-        node->afterWord = 0 ;
-        node->beforeWord = 0 ;
+        if ( node->beforeNode ) node->beforeNode->afterNode = node->afterNode ;
+        if ( node->afterNode ) node->afterNode->beforeNode = node->beforeNode ;
+        node->afterNode = 0 ;
+        node->beforeNode = 0 ;
     }
     return node ;
 }
@@ -90,10 +90,10 @@ dlnode_ReplaceNodeWithANode ( dlnode * node, dlnode * anode )
 {
     if ( node && anode )
     {
-        dlnode * afterWord = node->n_After ;
-        D0 ( if ( afterWord->N_Attribute.T_CAttribute & ( T_HEAD | T_TAIL ) ) Error ( "\nCan't remove the Head or Tail node!\n", QUIT ) ) ;
+        dlnode * afterNode = node->n_After ;
+        D0 ( if ( afterNode->N_Attribute.T_CAttribute & ( T_HEAD | T_TAIL ) ) Error ( "\nCan't remove the Head or Tail node!\n", QUIT ) ) ;
         dlnode_Remove ( node ) ;
-        dlnode_InsertThisBeforeANode ( anode, afterWord ) ;
+        dlnode_InsertThisBeforeANode ( anode, afterNode ) ;
     }
 }
 
@@ -103,8 +103,8 @@ dlnode_Replace ( dlnode * replacedNode, dlnode * replacingNode )
     if ( replacedNode && replacingNode )
     {
         D0 ( if ( replacedNode->N_Attribute.T_CAttribute & ( T_HEAD | T_TAIL ) ) Error ( "\nCan't remove the Head or Tail replacedNode!\n", QUIT ) ) ;
-        if ( replacedNode->beforeWord ) replacedNode->beforeWord->afterWord = replacingNode ;
-        if ( replacedNode->afterWord ) replacedNode->afterWord->beforeWord = replacingNode ;
+        if ( replacedNode->beforeNode ) replacedNode->beforeNode->afterNode = replacingNode ;
+        if ( replacedNode->afterNode ) replacedNode->afterNode->beforeNode = replacingNode ;
     }
     //return replacingNode ;
 }
@@ -114,10 +114,10 @@ _dllist_Init ( dllist * list )
 {
     if ( list )
     {
-        list->head->afterWord = ( dlnode * ) list->tail ;
-        list->head->beforeWord = ( dlnode * ) 0 ;
-        list->tail->afterWord = ( dlnode* ) 0 ;
-        list->tail->beforeWord = ( dlnode * ) list->head ;
+        list->head->afterNode = ( dlnode * ) list->tail ;
+        list->head->beforeNode = ( dlnode * ) 0 ;
+        list->tail->afterNode = ( dlnode* ) 0 ;
+        list->tail->beforeNode = ( dlnode * ) list->head ;
         //list->Head->N_Attribute.T_CAttribute = T_HEAD ;
         //list->Tail->N_Attribute.T_CAttribute = T_TAIL ;
         list->n_CurrentNode = 0 ;
@@ -230,7 +230,7 @@ dlnode *
 dllist_First ( dllist * list )
 {
     if ( ! list ) return 0 ;
-    return dlnode_Next ( list->head ) ;
+    return _dllist_First ( list ) ;
 }
 
 dlnode *
@@ -353,9 +353,56 @@ _dllist_PopNode ( dllist * list )
 void
 _dllist_DropN ( dllist * list, int64 n )
 {
-    dlnode * node ;
-    for ( node = dllist_First ( ( dllist* ) list ) ; node && ( -- n >= 0 ) ; node = dlnode_Next ( node ) )
+    dlnode * node, *nextNode ;
+    for ( node = dllist_First ( ( dllist* ) list ) ; node && ( -- n >= 0 ) ; node = nextNode )
     {
+        nextNode = dlnode_Next ( node ) ; // before Remove
+        dlnode_Remove ( node ) ;
+    }
+}
+
+//_dllist_RemoveNodes including 'last'
+void
+_dllist_RemoveNodes ( dlnode *first, dlnode * last )
+{
+#if 1 
+    dlnode * node, *nextNode ;
+    for ( node = first ; node ; node = nextNode )
+    {
+        nextNode = dlnode_Next ( node ) ; // before Remove
+#else
+    dlnode * node, *previousNode ;
+    for ( node = first ; node ; node = previousNode )
+    {
+        previousNode = dlnode_Previous ( node ) ; // before Remove
+#endif        
+        // DEBUG
+        //Word * word = ( Word* ) dobject_Get_M_Slot ( node, SCN_WORD ) ;
+
+        dlnode_Remove ( node ) ;
+        if ( node == last ) break ;
+    }
+}
+
+void
+_dllist_RemoveNodes_UntilWord ( dlnode *first, Word * word )
+{
+#if 1 
+    dlnode * node, *nextNode ;
+    for ( node = first ; node ; node = nextNode )
+    {
+        Word * word1 = ( Word* ) dobject_Get_M_Slot ( node, SCN_WORD ) ;
+        if ( word1 == word ) break ;
+        nextNode = dlnode_Next ( node ) ; // before Remove
+#else
+    dlnode * node, *previousNode ;
+    for ( node = first ; node ; node = previousNode )
+    {
+        previousNode = dlnode_Previous ( node ) ; // before Remove
+#endif        
+        // DEBUG
+        //Word * word = ( Word* ) dobject_Get_M_Slot ( node, SCN_WORD ) ;
+
         dlnode_Remove ( node ) ;
     }
 }
@@ -363,7 +410,7 @@ _dllist_DropN ( dllist * list, int64 n )
 int64
 _dllist_Get_N_InUse_Node_M_Slot ( dllist * list, int64 n, int64 m )
 {
-    dlnode * node ; 
+    dlnode * node ;
     for ( node = dllist_First ( ( dllist* ) list ) ; node ; node = dlnode_Next ( node ) ) // nb. this is a little subtle
     {
         if ( dobject_Get_M_Slot ( node, SCN_IN_USE_FLAG ) ) n -- ;
@@ -426,7 +473,7 @@ dllist_Map_Indexed ( dllist * list, int64 flag, int64 fromFirst, MapFunction2 mf
     }
     else
     {
-        for ( index = _dllist_Depth (list), node = dllist_Last ( ( dllist* ) list ) ; node ; node = prevNode, index -- )
+        for ( index = _dllist_Depth ( list ), node = dllist_Last ( ( dllist* ) list ) ; node ; node = prevNode, index -- )
         {
             prevNode = dlnode_Previous ( node ) ;
             mf ( node, index, flag ) ;
@@ -543,7 +590,7 @@ Word *
 Tree_Map_OneNamespace_TwoArgs ( Namespace * ns, MapFunction_2 mf2, int64 one, int64 two )
 {
     Word * word, *nextWord ;
-    for ( word = (Word *) dllist_First ( ( dllist* ) ns->W_List ) ; word ; word = nextWord )
+    for ( word = ( Word * ) dllist_First ( ( dllist* ) ns->W_List ) ; word ; word = nextWord )
     {
         nextWord = ( Word* ) dlnode_Next ( ( node* ) word ) ;
         if ( mf2 ( ( Symbol* ) word, one, two ) ) return word ;
@@ -577,12 +624,13 @@ Tree_Map_State_OneArg ( uint64 state, MapFunction_1 mf, int64 one )
 }
 
 #if 1
+
 Word *
 TC_Tree_Map ( TabCompletionInfo * tci, MapFunction mf, Word * wordi )
 {
     Word *word = wordi, *nextWord, *ns, *nextNs, *rword = 0 ; //return word
 start:
-    if ( word ) 
+    if ( word )
     {
         ns = word->S_ContainingNamespace ;
         nextNs = ( Word* ) dlnode_Next ( ( node* ) ns ) ;
@@ -602,7 +650,7 @@ checkWord:
                 {
                     rword = nextWord ;
                 }
-                else if ( nextNs ) rword = (Word*) dllist_First ( nextNs->S_SymbolList ) ;
+                else if ( nextNs ) rword = ( Word* ) dllist_First ( nextNs->S_SymbolList ) ;
                 else rword = 0 ;
                 goto doReturn ;
             }
@@ -623,6 +671,7 @@ doReturn:
     return rword ;
 }
 #else
+
 Word *
 TC_Tree_Map ( TabCompletionInfo * tci, MapFunction mf, Word * one )
 {

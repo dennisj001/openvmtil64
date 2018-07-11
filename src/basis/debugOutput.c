@@ -59,7 +59,7 @@ Debugger_ParseFunctionLocalVariables ( Debugger * debugger, Lexer * lexer, Boole
             }
             if ( String_Equal ( token, "var" ) ) aToken = prevToken ;
             else aToken = Lexer_PeekNextNonDebugTokenWord ( _Lexer_, 0 ) ;
-            _CfrTil_LocalWord ( aToken, ++ _Compiler_->NumberOfLocals, LOCAL_VARIABLE ) ;
+            _CfrTil_LocalWord (aToken, ++ _Compiler_->NumberOfLocals, LOCAL_VARIABLE , 0, 0) ;
         }
             //else if ( String_Equal ( token, ";" ) || String_Equal ( token, ")" ) ) return ;
         else if ( String_Equal ( token, "<end>" ) ) return ;
@@ -116,7 +116,7 @@ _Debugger_Locals_Show ( Debugger * debugger, Word * scWord )
             byte * b = Buffer_New_pbyte ( BUFFER_SIZE ) ;
             strncpy ( b, sc, BUFFER_SIZE ) ;
             sc = b ;
-            sc = DelimitSourceCodeStartForLispCfrTil ( sc ) ;
+            sc = String_DelimitSourceCodeStartForLispCfrTil ( sc ) ;
             strncpy ( rl->InputLineString, sc, BUFFER_SIZE - 16 ) ;
             strncat ( rl->InputLineString, " <end> ", 8 ) ; //signal end of input
             //if ( ! debugger->LevelBitNamespaceMap ) 
@@ -130,7 +130,7 @@ _Debugger_Locals_Show ( Debugger * debugger, Word * scWord )
         if ( ( sc && debugger->LocalsNamespacesStack ) ) ///&& ( ( uint64 ) fp > 0xf0000000 ) )
         {
             //_Debugger_CpuState_Show ( ) ; // Debugger_Registers is included in Debugger_CpuState_Show
-            Debugger_CpuState_CheckSaveShow ( debugger ) ;
+            //Debugger_CpuState_CheckSaveShow ( debugger ) ;
             _Printf ( ( byte* ) "\n%s.%s.%s : \nFrame Pointer = R15 = <0x%016lx> = 0x%016lx : Stack Pointer = R14 <0x%016lx> = 0x%016lx",
                 scWord->ContainingNamespace ? c_gd ( scWord->ContainingNamespace->Name ) : ( byte* ) "", c_gd ( scWord->Name ), c_gd ( "locals" ),
                 ( uint64 ) fp, fp ? *fp : 0, ( uint64 ) dsp, dsp ? *dsp : 0 ) ;
@@ -408,7 +408,7 @@ _CfrTil_ShowInfo ( Debugger * debugger, byte * prompt, int64 signal, int64 force
         byte * token0 = word ? word->Name : debugger->Token, *token1 ;
         if ( ( signal == 11 ) || _Q_->SigAddress )
         {
-            sprintf ( ( char* ) signalAscii, ( char * ) "Error : signal " INT_FRMT ":: attempting address : " UINT_FRMT, signal, ( uint64 ) _Q_->SigAddress ) ;
+            sprintf ( ( char* ) signalAscii, ( char * ) "Error : signal " INT_FRMT ":: attempting address : \n" UINT_FRMT, signal, ( uint64 ) _Q_->SigAddress ) ;
             debugger->DebugAddress = _Q_->SigAddress ;
             //Debugger_Dis ( debugger ) ;
         }
@@ -422,8 +422,9 @@ _CfrTil_ShowInfo ( Debugger * debugger, byte * prompt, int64 signal, int64 force
             char * cc_Token = ( char* ) cc ( token0, &_Q_->Notice ) ;
             char * cc_location = ( char* ) cc ( location, &_Q_->Debug ) ;
 next:
-            if ( signal ) AlertColors ;
-            else DebugColors ;
+            //if ( signal ) AlertColors ;
+            //else 
+            DebugColors ;
             prompt = prompt ? prompt : ( byte* ) "" ;
             strcpy ( ( char* ) buffer, ( char* ) prompt ) ; //, BUFFER_SIZE ) ;
             strcat ( buffer, compileOrInterpret ) ; //, BUFFER_SIZE ) ;
@@ -664,7 +665,7 @@ LO_Debug_ExtraShow ( int64 showStackFlag, int64 verbosity, int64 wordList, byte 
             vsprintf ( ( char* ) out, ( char* ) format, args ) ;
             va_end ( args ) ;
             DebugColors ;
-            if ( wordList ) Compiler_Show_WordList ( ( byte* ) out ) ;
+            if ( wordList ) _Compiler_Show_WordList (( byte* ) out, 0) ;
             else
             {
                 printf ( "%s", out ) ;
@@ -676,66 +677,4 @@ LO_Debug_ExtraShow ( int64 showStackFlag, int64 verbosity, int64 wordList, byte 
         }
     }
 }
-
-byte *
-DelimitSourceCodeStartForLispCfrTil ( char * sc )
-{
-    byte * start = 0 ;
-    while ( *sc )
-    {
-        switch ( *sc )
-        {
-            case '(': goto next ;
-            case '"':
-            {
-                sc ++ ;
-                while ( *sc != '"' ) sc ++ ;
-                break ;
-            }
-            case ':':
-            {
-                if ( *( sc + 1 ) == ':' )
-                {
-                    sc ++ ;
-                    break ;
-                }
-                else
-                {
-                    //start = sc ;
-                    goto next ;
-                }
-            }
-        }
-        sc ++ ;
-    }
-next:
-    start = sc ;
-    while ( *sc )
-    {
-        switch ( *sc )
-        {
-            case ')': return start ;
-            case '"':
-            {
-                while ( *sc ++ != '"' ) ;
-                sc ++ ;
-                break ;
-            }
-            case ';':
-            {
-                if ( *( sc + 1 ) == ';' )
-                {
-                    sc += 2 ;
-                }
-                *( sc + 1 ) = ' ' ;
-                *( sc + 2 ) = 0 ;
-                return start ;
-            }
-        }
-        sc ++ ;
-    }
-    return start ;
-}
-
-
 

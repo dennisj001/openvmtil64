@@ -98,7 +98,6 @@ _DObject_ValueDefinition_Init ( Word * word, uint64 value, uint64 funcType, byte
         SetState ( _CfrTil_, DEBUG_SOURCE_CODE_MODE, false ) ;
         //Compiler_SetCompilingSpace_MakeSureOfRoom ( "ObjectSpace" ) ;
         _NBA_SetCompilingSpace_MakeSureOfRoom ( _Q_->MemorySpace0->ObjectSpace, 4 * K ) ;
-        d0 ( Cpu_CheckRspForWordAlignment ( "_DObject_ValueDefinition_Init:Before" ) ) ; //SetHere ((byte*) (((uint64) (Here + 0x8)) & ( uint64 ) 0xfffffffffffffff0)) ;
         word->Coding = Here ;
         word->CodeStart = Here ;
         word->Definition = ( block ) Here ;
@@ -109,7 +108,6 @@ _DObject_ValueDefinition_Init ( Word * word, uint64 value, uint64 funcType, byte
         word->S_CodeSize = Here - word->CodeStart ; // for use by inline
         Set_CompilerSpace ( svcs ) ;
         SetState ( _CfrTil_, DEBUG_SOURCE_CODE_MODE, sscm ) ;
-        d0 ( Cpu_CheckRspForWordAlignment ( "_DObject_ValueDefinition_Init:After" ) ) ; //SetHere ((byte*) (((uint64) (Here + 0x8)) & ( uint64 ) 0xfffffffffffffff0)) ;
     }
 }
 
@@ -191,7 +189,7 @@ DObject_SubObjectInit ( DObject * dobject, Word * parent )
     Namespace_DoAddWord ( parent, dobject ) ;
     dobject->CAttribute |= parent->CAttribute ;
     dobject->Slots = parent->Slots ;
-    _Namespace_SetState ( parent, USING ) ;
+    Namespace_SetState ( parent, USING ) ;
 }
 
 DObject *

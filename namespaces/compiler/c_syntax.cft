@@ -19,7 +19,6 @@ C
 User
 c_syntaxOn
 libc
-#if 1 // if 1
 typedef _CObj
 {
     int64 hi ;
@@ -40,13 +39,8 @@ chey.heey = #x0123456789abcdef ; // doesn't work : still 32 bit limited ints
 dump ( chey, chey.size ) ;
 chey chey.size dump
 chey.heey1 = #x12345678 ;
-#if 1 // if 2
 chey.heey2 = chey.heey1 ; // #x12345678 ; 
 chey.hey = chey.heey2 ; // #x12345678 ;
-#else
-chey.heey2 = #x12345678 ; 
-chey.hey = #x12345678 ;
-#endif // if 2 endif
 chey.chars [23] = 255 ;
 chey.chars [18] = #b10110 ; // #x16
 chey.hey = #x12345678 ;
@@ -83,9 +77,9 @@ chi ( chey0, d | a b c )
     b = c + 2 ;
     a = b + c ;
     nl
-    p ( c ) ; c @ 3 "c should be 3" assert // 3
-    p ( b ) ; b @ 5 "b should be 5" assert // 5
-    p ( a ) ; a @ 8 "a should be 8" assert // 8
+    p ( c ) ; c 3 "c should be 3" assert // 3
+    p ( b ) ; b 5 "b should be 5" assert // 5
+    p ( a ) ; a 8 "a should be 8" assert // 8
     dump ( cobj.chey0, cobj.size ) ; 
     d = cobj.chey0.hey ;
     hex p ( d ) ;
@@ -107,9 +101,9 @@ chi ( chey0, d | a b c )
 wdiss ( ' chi find )
 chi ( chey, 7 ) //pause
 scOff
-#endif // if 1 : endif
 //s pause
 #if 1 // if 1
+optimizeOff
 void
 interpret2 ( | atoken aword ) 
 {
@@ -161,7 +155,7 @@ interpret2 ( | atoken aword )
 #endif // if 1 : endif
 
 wdiss ( ' interpret2 find ) ;
-
+optimizeOff
 #if 1 // if 1
 interpret2 
 using
@@ -187,6 +181,7 @@ interpret3 words // i2halt code to exit interpret2
 : hey1 hi1 hi1 ; 
 : heey1 hey1 hey1 hey1 ;
 nl heey1 
+
 #if 1 // if 2
 c_syntaxOn
 int
@@ -201,6 +196,7 @@ faccs2 ( n | rec )
 ' faccs2 find wdiss
 faccs2 ( 7 ) dup p 5040 _assert0 apause
 // sp
+optimizeOff
 void
 interpret4 ( | atoken aword ) 
 {
@@ -294,6 +290,6 @@ c_syntaxOff
 verbosity 1 =
 sp
 dbgOff 
-s: hi ( a b | c ) c a @ b @ + = printf ("\nshould read 3 : %d", c ) ;s 1 2 hi //pause
+s: hi ( a b | c ) c a b + = printf ("\nshould read 3 : %d", c ) ;s 1 2 hi //pause
 2 + 7 assertStkChk // stack checking
 

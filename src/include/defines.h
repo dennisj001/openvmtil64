@@ -12,7 +12,7 @@
 #define DSP_IS_GLOBAL_REGISTER 1 
 #define X84_ABI_RSP_ADJUST true
 #define NEW_CPU_PIPELINE_STATE true
-#define NEW_OPTIMIZER false
+#define NEW_OPTIMIZER true
 
 #if DEBUG 
 #define D( x ) x
@@ -286,10 +286,10 @@
 #define C_CLASS         ( (uint64) 1 << 57 ) 
 #define C_TYPEDEF       ( (uint64) 1 << 58 ) 
 #define PREFIXABLE      ( (uint64) 1 << 59 ) 
-#define DOT             ( (uint64) 1 << 60 ) 
-#define OBJECT_OPERATOR DOT             
+#define OBJECT_OPERATOR ( (uint64) 1 << 60 ) 
+#define DOT             OBJECT_OPERATOR              
 #define COMBINATOR      ( (uint64) 1 << 61 )
-#define LISP_CFRTIL     ( (uint64) 1 << 62 )
+#define CATEGORY_OP     ( (uint64) 1 << 62 )
 #define CATEGORY_OP_OPEQUAL     ( (uint64) 1 << 63 )
 
 // CAttribute2
@@ -297,9 +297,16 @@
 #define CATEGORY_SHIFT      ( (uint64) 1 << 1 ) 
 #define SOURCE_CODE_WORD    ( (uint64) 1 << 2 ) 
 #define TEMP_WORD           ( (uint64) 1 << 3 ) 
-#define NOOP_WORD           ( (uint64) 1 << 4 ) 
+#define NO_OP_WORD           ( (uint64) 1 << 4 ) 
 #define SYNTACTIC           ( (uint64) 1 << 5 ) 
 #define NO_CODING           ( (uint64) 1 << 6 ) 
+#define DO_DOES             ( (uint64) 1 << 7 ) 
+#define ARRAY_TYPE          ( (uint64) 1 << 8 ) 
+#define VARIABLE            ( (uint64) 1 << 9 ) 
+#define LISP_CFRTIL         ( (uint64) 1 << 10 )
+#define LEFT_PAREN          ( (uint64) 1 << 11 )
+#define RIGHT_PAREN         ( (uint64) 1 << 12 )
+#define OP_RAX_PLUS_1ARG    ( (uint64) 1 << 13 )
 
 // _CAttribute for interpreter word types - 4 bits/ 16 possibilities : N_WordAttribute bitfield
 #define WT_PREFIX                 1
@@ -369,6 +376,10 @@
 #define OFF ( 0 )
 #define PROMPT "-: "
 #define STARTUP_TIME_IT 8 // random number not 0 or 1
+// newOptimize
+#define OPT_BREAK       2
+#define OPT_CONTINUE    1
+#define OPT_DONE        0
 
 // GotoInfo Types
 #define GI_BREAK ( (uint64) 1 << 0 )
@@ -433,29 +444,6 @@
 //#define OPTIMIZE_TOS ( (uint64) 1 << 11 )
 //#define OPTIMIZE_NOS ( (uint64) 1 << 12 ) // Next On Stack = Dsp [ -1 ]
 
-#define OP_LC 1 // literal/constant
-#define OP_VAR 2 
-#define OP_FETCH 3 
-#define OP_STORE 4 
-//#define OP_CPRIMITIVE 4  
-#define OP_ORDERED 5 
-#define OP_UNORDERED 6 
-#define OP_LOGIC 7 
-#define OP_1_ARG 8 
-//#define OP_RECURSE 9 
-#define OP_EQUAL 9 
-#define OP_DUP 10  // stack or local var
-#define OP_DIVIDE 11
-#define OP_OBJECT 12  
-#define OP_STACK 13  
-#define OP_C_RETURN 14
-//#define OP_STACKING 17
-#define OP_OPEQUAL 15 
-// #define O_BITS 4 // bits needed to encode category codes
-#define O_BITS 4 // experiment with 64 bit encoding 
-
-#define DONT_PUSH_R8 (( byte* ) 1 )
-#define PUSH_R8 (( byte* ) 2 )
 
 // Debugger Flags
 //#define DBG_DONE ( (uint64) 1 << 0 ) 
@@ -528,9 +516,8 @@
 #define OPTIMIZE_ON ( (uint64) 1 << 25 )
 #define INLINE_ON ( (uint64) 1 << 26 )
 #define READLINE_ECHO_ON ( (uint64) 1 << 27 )
-#define OPTIMIZE_OFF ( (uint64) 1 << 28 )
-#define IN_OPTIMIZER ( (uint64) 1 << 29 )
-#define SCA_ON ( (uint64) 1 << 30 )
+#define IN_OPTIMIZER ( (uint64) 1 << 28 )
+#define SCA_ON ( (uint64) 1 << 29 )
 
 // interpreter flags
 #define INTERPRETER_DONE ( (uint64) 1 << 28 )
@@ -740,4 +727,65 @@
 #define ONE_REG_ONE_STACK_ARG   ( (uint8) 1 << 4 )
 #define ONE_STACK_ONE_REG_ARG   ( (uint8) 1 << 5 )
 
+// insn op codes for CATEGORY_OP words
+#define OP_PLUS_PLUS                ( (uint64) 1 << 0 )
+#define OP_MINUS_MINUS              ( (uint64) 1 << 0 )
+#define OP_LOGICAL_NOT              ( (uint64) 1 << 1 )
+#define OP_EQUAL                    ( (uint64) 1 << 2 ) 
+#define OP_LOGICAL_OR               ( (uint64) 1 << 3 ) 
+#define OP_LOGICAL_XOR              ( (uint64) 1 << 4 ) 
+#define OP_LOGICAL_AND              ( (uint64) 1 << 5 ) 
+#define OP_LESS_THAN                ( (uint64) 1 << 6 ) 
+#define OP_GREATER_THAN             ( (uint64) 1 << 7 ) 
+#define OP_EQUALS                   ( (uint64) 1 << 8 ) 
+#define OP_DOES_NOT_EQUAL           ( (uint64) 1 << 9 ) 
+#define OP_LESS_THAN_OR_EQUAL       ( (uint64) 1 << 10 ) 
+#define OP_GREATER_THAN_OR_EQUAL    ( (uint64) 1 << 11 ) 
+#define OP_PLUS                     ( (uint64) 1 << 12 ) 
+#define OP_MINUS                    ( (uint64) 1 << 13 ) 
+#define OP_PLUS_EQUAL               ( (uint64) 1 << 14 ) 
+#define OP_MINUS_EQUAL              ( (uint64) 1 << 15 ) 
+#define OP_MULTIPLY                 ( (uint64) 1 << 16 ) 
+#define OP_DIVIDE                   ( (uint64) 1 << 17 ) 
+#define OP_MOD                      ( (uint64) 1 << 18 ) 
+#define OP_MULTIPLY_EQUAL           ( (uint64) 1 << 19 ) 
+#define OP_DIVIDE_EQUAL             ( (uint64) 1 << 20 ) 
+#define OP_SHIFT_LEFT               ( (uint64) 1 << 21 ) 
+#define OP_SHIFT_RIGHT              ( (uint64) 1 << 22 ) 
+#define OP_BITWISE_OR               ( (uint64) 1 << 23 ) 
+#define OP_BITWISE_AND              ( (uint64) 1 << 24 ) 
+#define OP_BITWISE_XOR              ( (uint64) 1 << 25 ) 
+#define OP_BITWISE_NOT              ( (uint64) 1 << 26 ) 
+#define OP_BITWISE_NEG              ( (uint64) 1 << 27 ) 
+#define OP_SHIFT_LEFT_EQUAL         ( (uint64) 1 << 28 ) 
+#define OP_SHIFT_RIGHT_EQUAL        ( (uint64) 1 << 29 ) 
+#define OP_BITWISE_AND_EQUAL        ( (uint64) 1 << 30 ) 
+#define OP_BITWISE_OR_EQUAL         ( (uint64) 1 << 31 ) 
+#define OP_PEEK                     ( (uint64) 1 << 32 ) 
+#define OP_STORE                    ( (uint64) 1 << 33 ) 
+#define OP_POKE                     ( (uint64) 1 << 34 ) 
 
+#if 0
+#define OP_LC 1 // literal/constant
+#define OP_VAR 2 
+#define OP_FETCH 3 
+#define OP_STORE 4 
+//#define OP_CPRIMITIVE 4  
+#define OP_ORDERED 5 
+#define OP_UNORDERED 6 
+#define OP_LOGIC 7 
+#define OP_1_ARG 8 
+//#define OP_RECURSE 9 
+#define OP_EQUAL 9 
+#define OP_DUP 10  // stack or local var
+#define OP_DIVIDE 11
+#define OP_OBJECT 12  
+#define OP_STACK 13  
+#define OP_C_RETURN 14
+//#define OP_STACKING 17
+#define OP_OPEQUAL 15 
+// #define O_BITS 4 // bits needed to encode category codes
+#define O_BITS 4 // experiment with 64 bit encoding 
+#define DONT_PUSH_R8 (( byte* ) 1 )
+#define PUSH_R8 (( byte* ) 2 )
+#endif

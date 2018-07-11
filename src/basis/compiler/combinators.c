@@ -25,7 +25,7 @@ CfrTil_EndCombinator ( int64 quotesUsed, int64 moveFlag )
         byte * qCodeStart ;
         if ( bi->FrameStart ) qCodeStart = bi->bp_First ; // after the stack frame
         else qCodeStart = bi->ActualCodeStart ;
-        Block_Copy ( qCodeStart, bi->CombinatorStartsAt, Here - bi->CombinatorStartsAt ) ;
+        Block_Copy ( qCodeStart, bi->CombinatorStartsAt, Here - bi->CombinatorStartsAt, 0 ) ;
     }
     _CfrTil_InstallGotoCallPoints_Keyed ( ( BlockInfo* ) bi, GI_GOTO ) ;
     _Stack_DropN ( compiler->CombinatorBlockInfoStack, quotesUsed ) ;
@@ -120,7 +120,7 @@ CfrTil_WhileCombinator ( )
         CfrTil_BeginCombinator ( 2 ) ;
         byte * start = Here ;
         compiler->ContinuePoint = Here ;
-        d0 ( if ( Is_DebugModeOn ) Compiler_Show_WordList ( ( byte* ) "\nCheckOptimize : after optimize :" ) ) ;
+        d0 ( if ( Is_DebugModeOn ) _Compiler_Show_WordList (( byte* ) "\nCheckOptimize : after optimize :", 0) ) ;
         if ( ! Block_CopyCompile ( ( byte* ) testBlock, 1, 1 ) )
         {
             SetHere ( start ) ;
@@ -366,14 +366,14 @@ CfrTil_ForCombinator ( )
 
         Block_CopyCompile ( ( byte* ) doBlock, 0, 0 ) ;
 
-        d0 ( Compiler_Show_WordList ( ( byte* ) "for combinator : before doPostBlock" ) ) ;
+        d0 ( _Compiler_Show_WordList (( byte* ) "for combinator : before doPostBlock", 0) ) ;
         Block_CopyCompile ( ( byte* ) doPostBlock, 1, 0 ) ;
 
         _Compile_JumpToAddress ( start ) ;
 
         CfrTil_CalculateAndSetPreviousJmpOffset_ToHere ( ) ;
 
-        CfrTil_EndCombinator ( 4, 1 ) ; //0 ) ; //! GetState ( _Context_, C_SYNTAX ) ) ;
+        CfrTil_EndCombinator ( 4, 0 ) ; //0 ) ; //! GetState ( _Context_, C_SYNTAX ) ) ;
     }
     else
     {

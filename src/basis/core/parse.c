@@ -38,7 +38,7 @@ _CfrTil_SingleQuote ()
 done:
         CfrTil_WordLists_PopWord ( ) ; // pop the "'" token
         word = _DObject_New ( buffer, charLiteral, LITERAL | CONSTANT | IMMEDIATE, 0, 0, LITERAL, ( byte* ) _DataObject_Run, 0, 0, 0, TEMPORARY ) ;
-        _Interpreter_DoWord ( _Interpreter_, word, _Lexer_->TokenStart_ReadLineIndex ) ;
+        _Interpreter_DoWord ( _Interpreter_, word, -1 ) ; //_Lexer_->TokenStart_ReadLineIndex ) ;
     }
     else
     {
@@ -196,7 +196,7 @@ _CfrTil_Parse_LocalsAndStackVariables ( int64 svf, int64 lispMode, ListObject * 
     SetState ( _CfrTil_, DEBUG_SOURCE_CODE_MODE, false ) ;
     byte * svDelimiters = lexer->TokenDelimiters ;
     Word * word ;
-    int64 ctype ;
+    int64 ctype = 0, ctype2 = 0, ltype = 0 ;
     int64 svff = 0, addWords, getReturn = 0, getReturnFlag = 0, regToUseIndex = 0 ;
     Boolean regFlag = false ;
     byte *token, *returnVariable = 0 ;
@@ -285,14 +285,14 @@ _CfrTil_Parse_LocalsAndStackVariables ( int64 svf, int64 lispMode, ListObject * 
                 {
                     //compiler->NumberOfLocals ++ ;
                     ctype = LOCAL_VARIABLE ;
-                    if ( lispMode ) ctype |= T_LISP_SYMBOL ;
+                    if ( lispMode ) ltype |= T_LISP_SYMBOL ; // no ltype yet for _CfrTil_LocalWord
                 }
                 if ( regFlag == true )
                 {
                     ctype |= REGISTER_VARIABLE ;
                     compiler->NumberOfRegisterVariables ++ ;
                 }
-                word = _CfrTil_LocalWord ( token, ( ctype & LOCAL_VARIABLE ) ? ++ compiler->NumberOfLocals : ++ compiler->NumberOfArgs, ctype ) ; // svf : flag - whether stack variables are in the frame
+                word = _CfrTil_LocalWord (token, ( ctype & LOCAL_VARIABLE ) ? ++ compiler->NumberOfLocals : ++ compiler->NumberOfArgs, ctype , ctype2, ltype) ; // svf : flag - whether stack variables are in the frame
                 if ( regFlag == true )
                 {
                     word->RegToUse = RegOrder ( regToUseIndex ++ ) ; //compiler->RegOrder [ regToUseIndex ++ ] ;
@@ -302,7 +302,7 @@ _CfrTil_Parse_LocalsAndStackVariables ( int64 svf, int64 lispMode, ListObject * 
                         {
                             compiler->RegisterParameterList = _dllist_New ( TEMPORARY ) ;
                         }
-                        _List_PushNew ( compiler->RegisterParameterList, word ) ;
+                        _List_PushNew ( compiler->RegisterParameterList, word, 1 ) ;
                         compiler->NumberOfRegisterArgs ++ ;
                     }
                     else compiler->NumberOfRegisterLocals ++ ;

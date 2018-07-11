@@ -37,18 +37,18 @@ CfrTil_Namespaces_Root ( )
     //_Namespace_Map_2 ( dllist * list, cell state, MapSymbolFunction2 mf, cell one, cell two )
     _Namespace_MapAny_2Args ( ( MapSymbolFunction2 ) _Namespace_DoSetState, NOT_USING, 0 ) ;
 
-    _Namespace_SetState ( ns1, USING ) ;
-    _Namespace_SetState ( ns2, USING ) ;
-    _Namespace_SetState ( ns3, USING ) ;
-    _Namespace_SetState ( ns4, USING ) ;
-    _Namespace_SetState ( ns5, USING ) ;
-    _Namespace_SetState ( ns6, USING ) ;
-    _Namespace_SetState ( ns7, USING ) ;
-    _Namespace_SetState ( ns8, USING ) ;
-    _Namespace_SetState ( ns9, USING ) ;
-    _Namespace_SetState ( ns10, USING ) ;
-    _Namespace_SetState ( ns11, USING ) ;
-    _Namespace_SetState ( ns12, USING ) ;
+    Namespace_SetState ( ns1, USING ) ;
+    Namespace_SetState ( ns2, USING ) ;
+    Namespace_SetState ( ns3, USING ) ;
+    Namespace_SetState ( ns4, USING ) ;
+    Namespace_SetState ( ns5, USING ) ;
+    Namespace_SetState ( ns6, USING ) ;
+    Namespace_SetState ( ns7, USING ) ;
+    Namespace_SetState ( ns8, USING ) ;
+    Namespace_SetState ( ns9, USING ) ;
+    Namespace_SetState ( ns10, USING ) ;
+    Namespace_SetState ( ns11, USING ) ;
+    Namespace_SetState ( ns12, USING ) ;
     //
 }
 #endif

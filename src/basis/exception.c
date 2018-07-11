@@ -6,7 +6,7 @@ _OpenVmTil_ShowExceptionInfo ( )
 {
     if ( _Q_->Verbosity )
     {
-        if ( _Q_->SignalExceptionsHandled++ < 2 )
+        if ( _Q_->SignalExceptionsHandled++ < 2 ) // ++ : for when this block throws and exception prevent looping and stack overflow
         {
             if ( _CfrTil_ )
             {
@@ -229,19 +229,24 @@ void
 OpenVmTil_SignalAction ( int signal, siginfo_t * si, void * uc )
 {
     d0 ( _Printf ( ( byte* ) "\nOpenVmTil_SignalAction :: signal = %d\n", signal ) ) ;
+    _Q_->Signal = signal ;
+    _Q_->SigAddress = ( Is_DebugOn && _Debugger_->DebugAddress ) ? _Debugger_->DebugAddress : si->si_addr ;
+    _Q_->SigLocation = ( ( ! ( signal & ( SIGSEGV | SIGBUS ) ) ) && _Context_ ) ? ( byte* ) c_gd ( Context_Location ( ) ) : ( byte* ) "" ;
     if ( ( signal >= SIGCHLD ) || ( signal == SIGTRAP ) ) //||( signal == SIGBUS ))
     {
-        //_DisplaySignal ( _Q_->Signal ) ;
         if ( ( signal != SIGCHLD ) && ( signal != SIGWINCH ) && ( signal != SIGTRAP ) ) _OpenVmTil_ShowExceptionInfo ( ) ;
         _Q_->SigAddress = 0 ; //|| ( signal == SIGWINCH ) ) _Q_->SigAddress = 0 ; // 17 : "CHILD TERMINATED" : ignore; its just back from a shell fork
+        _Q_->Signal = 0 ;
     }
     else
     {
         _Q_->SignalExceptionsHandled ++ ;
-        _Q_->Signal = signal ;
-        _Q_->SigAddress = si->si_addr ;
-        _Q_->SigLocation = ( ( ! ( signal & ( SIGSEGV | SIGBUS ) ) ) && _Context_ ) ? ( byte* ) c_gd ( Context_Location ( ) ) : ( byte* ) "" ;
         if ( ( signal != SIGSEGV ) || _Q_->SignalExceptionsHandled < 2 ) _Printf ( ( byte* ) "\nOpenVmTil_SignalAction : address = 0x%016lx : %s", _Q_->SigAddress, _Q_->SigLocation ) ;
+        if ( _Debugger_->DebugAddress ) 
+        {
+            _Debugger_Udis_OneInstruction ( _Debugger_, _Debugger_->DebugAddress, "", "" ) ;
+            Debugger_Registers ( _Debugger_ ) ;
+        }
         _OVT_Throw ( _Q_->RestartCondition, 0 ) ;
     }
 }

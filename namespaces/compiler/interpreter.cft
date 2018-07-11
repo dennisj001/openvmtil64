@@ -1,7 +1,7 @@
 5 
 C
 : sp ; //stack pause ;
-
+optimizeOff
 System Interpreter 
 // these #defines are a bunch of purposefully confusing looking early testing
 #define xhe0 "xhi1 ="  
@@ -81,7 +81,6 @@ nl heey1
 #endif
 
 i2halt
-
 sp
 "C_Combinators" notUsing
 infixOff

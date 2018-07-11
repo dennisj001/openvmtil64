@@ -57,14 +57,14 @@ Compile_ArrayDimensionOffset ( Word * word, int64 dimSize, int64 objSize )
         {
             SetHere ( word->StackPushRegisterCode ) ;
             //_Compile_IMULI ( int64 mod, int64 reg, int64 rm, int64 sib, int64 disp, int64 imm, int64 size )
-            _Compile_IMULI ( REG, ACC, ACC, 0, 0, dimSize * objSize, 0 ) ;
+            Compile_IMULI ( REG, ACC, ACC, 0, 0, dimSize * objSize ) ;
             //Compile_ADD( toRegOrMem, mod, reg, rm, sib, disp, isize ) 
             Compile_ADD ( MEM, MEM, ACC, DSP, 0, 0, CELL ) ;
         }
         else
         {
             //_Compile_IMULI ( int64 mod, int64 reg, int64 rm, int64 sib, int64 disp, int64 imm, int64 size )
-            _Compile_IMULI ( MEM, ACC, DSP, 0, 0, dimSize * objSize, 0 ) ;
+            Compile_IMULI ( MEM, ACC, DSP, 0, 0, dimSize * objSize ) ;
             _Compile_Stack_DropN ( DSP, 1 ) ; // drop the array index
             //Compile_ADD( toRegOrMem, mod, reg, rm, sib, disp, isize ) 
             Compile_ADD ( MEM, MEM, ACC, DSP, 0, 0, CELL ) ;
@@ -91,12 +91,12 @@ Do_NextArrayWordToken ( Word * word, byte * token, Word * arrayBaseObject, int64
     else if ( token [0] == ']' ) // ']' == an "array end"
     {
         int64 dimNumber = compiler->ArrayEnds, dimSize = 1 ;
-        Compiler_OptimizerWordList_Reset ( compiler ) ; // prevent optimizatin problems eg. ar[ n @ ] @
         while ( -- dimNumber >= 0 ) // -- : zero based ns->ArrayDimensions
         {
             dimSize *= arrayBaseObject->ArrayDimensions [ dimNumber ] ; // the parser created and populated this array in _CfrTil_Parse_ClassStructure 
         }
         compiler->ArrayEnds ++ ;
+        
         if ( *variableFlag ) Compile_ArrayDimensionOffset ( cntx->CurrentlyRunningWord, dimSize, objSize ) ;
         else
         {
@@ -105,24 +105,11 @@ Do_NextArrayWordToken ( Word * word, byte * token, Word * arrayBaseObject, int64
             arrayIndex = DataStack_Pop ( ) ;
             increment = arrayIndex * dimSize * objSize ; // keep a running total of 
             Compiler_IncrementCurrentAccumulatedOffset ( compiler, increment ) ;
-#if 1            
             if ( ! CompileMode ) _DataStack_SetTop ( _DataStack_GetTop ( ) + increment ) ; // after each dimension : in the end we have one lvalue remaining on the stack
-#else            
-            if ( ! CompileMode )
-            {
-                if ( ! Lexer_IsTokenForwardDotted ( cntx->Lexer0 ) ) 
-                {
-                    value = DataStack_Pop ( ) + increment ;
-                }
-                else value = _DataStack_GetTop ( ) + increment ;
-                _DataStack_SetTop ( value ) ; // after each dimension : in the end we have one lvalue remaining on the stack
-            }
-#endif                
         }
-        if ( ! _Context_StringEqual_PeekNextToken ( cntx, ( byte* ) "[" ) )
-        {
-            return 1 ;
-        }
+        //CfrTil_ArrayEnd () ;
+        
+        if ( ! _Context_StringEqual_PeekNextToken (cntx, ( byte* ) "[" , 0) ) return 1 ; // breaks the calling function
         if ( Is_DebugModeOn ) Word_PrintOffset ( word, increment, baseObject->AccumulatedOffset ) ;
         return 0 ;
     }
@@ -133,10 +120,9 @@ Do_NextArrayWordToken ( Word * word, byte * token, Word * arrayBaseObject, int64
     else Set_CompileMode ( false ) ; //SetState ( compiler, COMPILE_MODE, false ) ;
     if ( word )
     {
-        _Interpreter_DoWord (interp, word, - 1 ) ;
+        _Interpreter_DoWord ( interp, word, - 1 ) ;
     }
     else Interpreter_InterpretAToken ( interp, token, - 1 ) ;
-    if ( word && ( ! CompileMode ) ) _WordList_Pop ( cntx->Compiler0->WordList, 0 ) ; // pop all tokens interpreted between '[' and ']'
     Set_CompileMode ( saveCompileMode ) ;
     SetState ( compiler, COMPILE_MODE, saveCompileMode ) ;
     return 0 ;
@@ -156,24 +142,17 @@ CfrTil_ArrayBegin ( void )
         Lexer * lexer = cntx->Lexer0 ;
         byte * token = lexer->OriginalToken ;
         int64 objSize = 0, increment = 0, variableFlag ;
-        int64 saveCompileMode = GetState ( compiler, COMPILE_MODE ) ;
+        int64 saveCompileMode = GetState ( compiler, COMPILE_MODE ) ; //, svOpState = GetState ( _CfrTil_, OPTIMIZE_ON ) ;
+        baseObject->CAttribute2 |= ARRAY_TYPE ;
+        CfrTil_OptimizeOn ( ) ; // internal to arrays optimize must be on
 
         arrayBaseObject = interp->LastWord ;
-        if ( ! arrayBaseObject->ArrayDimensions ) CfrTil_Exception (ARRAY_DIMENSION_ERROR, 0, QUIT ) ;
+        if ( ! arrayBaseObject->ArrayDimensions ) CfrTil_Exception ( ARRAY_DIMENSION_ERROR, 0, QUIT ) ;
         if ( interp->CurrentObjectNamespace ) objSize = interp->CurrentObjectNamespace->Size ; //_CfrTil_VariableValueGet ( cntx->Interpreter0->CurrentClassField, ( byte* ) "size" ) ; 
         if ( ! objSize )
         {
-            CfrTil_Exception (OBJECT_SIZE_ERROR, 0, QUIT ) ;
+            CfrTil_Exception ( OBJECT_SIZE_ERROR, 0, QUIT ) ;
         }
-#if 0   // this would eliminate extra 'add eax, 0' code with arrays but nb!! : Compiler_IncrementCurrentAccumulatedOffset is being called in Do_NextArrayWordToken
-        if ( Compiling && ( baseObject->AccumulatedOffset == 0 ) )
-        {
-            SetHere ( baseObject->Coding ) ;
-            SetState ( _CfrTil_, IN_OPTIMIZER, true ) ; // controls Do_ObjectOffset code
-            _Do_Variable ( baseObject ) ;
-            SetState ( _CfrTil_, IN_OPTIMIZER, false ) ;
-        }
-#endif            
         variableFlag = _CheckArrayDimensionForVariables_And_UpdateCompilerState ( ) ;
         _WordList_Pop ( cntx->Compiler0->WordList, 0 ) ; // pop the initial '['
         do
@@ -198,17 +177,26 @@ CfrTil_ArrayBegin ( void )
                 _Compile_GetVarLitObj_LValue_To_Reg ( baseObject, ACC ) ;
                 _Word_CompileAndRecord_PushReg ( baseObject, ACC ) ;
             }
-            else SetState ( baseObject, OPTIMIZE_OFF, true ) ;
+            else
+            {
+                //svOpState = GetState ( _CfrTil_, OPTIMIZE_ON ) ;
+                CfrTil_OptimizeOff ( ) ; //SetState ( baseObject, OPTIMIZE_OFF, true ) ;
+            }
         }
-        if ( (! Lexer_IsTokenForwardDotted ( cntx->Lexer0 )) && ( !GetState ( cntx->Compiler0, LC_ARG_PARSING )) ) cntx->Interpreter0->BaseObject = 0 ;
+        if ( ( ! Lexer_IsTokenForwardDotted ( cntx->Lexer0 ) ) && ( ! GetState ( cntx->Compiler0, LC_ARG_PARSING ) ) ) cntx->Interpreter0->BaseObject = 0 ;
         DEBUG_SHOW ;
+        _dllist_RemoveNodes_UntilWord ( dllist_First ( ( dllist* ) compiler->WordList ), baseObject ) ;
         SetState ( compiler, COMPILE_MODE, saveCompileMode ) ;
+        //SetState ( _CfrTil_, OPTIMIZE_ON, svOpState ) ;
+        //CfrTil_OptimizeOn ( ) ;
     }
+    //CfrTil_ArrayEnd () ;
 }
 
 void
 CfrTil_ArrayEnd ( void )
 {
-    SetState ( _Context_->Interpreter0->BaseObject, OPTIMIZE_OFF, false ) ; // possibly set in ArrayBegin
+    //SetState ( _Context_->Interpreter0->BaseObject, OPTIMIZE_OFF, false ) ; // possibly set in ArrayBegin
+    CfrTil_OptimizeOn ( ) ;
 }
 

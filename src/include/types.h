@@ -180,10 +180,10 @@ typedef struct
     } ;
 } DLNode, Node, listNode, List ;
 
-#define afterWord n_After 
-#define beforeWord n_Before 
-#define n_Car afterWord 
-#define n_Cdr beforeWord
+#define afterNode n_After 
+#define beforeNode n_Before 
+#define n_Car afterNode 
+#define n_Cdr beforeNode
 typedef void ( *MapFunction0 ) ( dlnode * ) ;
 typedef int64( *MapFunction1 ) ( dlnode *, int64 ) ;
 typedef int64( *MapFunction2 ) ( dlnode *, int64, int64 ) ;
@@ -323,6 +323,14 @@ int64( *MapFunction_2 ) ( Symbol *, int64, int64 ) ;
 typedef void ( *MapSymbolFunction ) ( Symbol * ) ;
 typedef void ( *MapSymbolFunction2 ) ( Symbol *, int64, int64 ) ;
 typedef Word* ( *MapNodeFunction ) ( dlnode * node ) ;
+typedef struct location
+{
+    byte * Filename ;
+    int32 LineNumber ;
+    int32 CursorPosition ;
+    Word * LocationWord ;
+    byte * LocationAddress ;
+} Location ;
 typedef struct _WordData
 {
     uint64 RunType ;
@@ -341,16 +349,28 @@ typedef struct _WordData
     byte * ObjectCode ; // used by objects/class words
     byte * StackPushRegisterCode ; // used by the optInfo
     Word * AliasOf, *OriginalWord ;
-    dllist * LocalNamespaces ;
+    int64 Offset ; // used by ClassField
+    struct
+    {
+        int8 RegToUse ;
+        int8 Opt_Rm ;
+        int8 Opt_Reg ; //?? do we need something here
+        int8 SrcReg ;
+        int8 DstReg ;
+        int8 RegFlags ; // future uses available here !!
+        uint8 OpInsnGroup ;
+        uint8 OpInsnCode ;
+        //int16 RegFlags2 ; // filler for use with a int64 in a union ; future uses available here !!
+    } ;
+    union
+    {
+        dllist * LocalNamespaces ;
+        Location * OurLocation ;
+    } ;
     union
     {
         int64 * ArrayDimensions ;
         byte *WD_SourceCode ; // arrays don't have source code
-    } ;
-    union
-    {
-        int64 Offset ; // used by ClassField
-        int64 RegToUse ; // reg code : ECX, EBX, EDX, EAX, (1, 3, 2, 0) : in this order, cf. machineCode.h
     } ;
     union
     {
@@ -381,6 +401,7 @@ typedef struct _WordData
 #define Index S_WordData->Index // used by Variable and LocalWord
 #define NestedObjects S_WordData->NestedObjects // used by Variable and LocalWord
 #define ObjectCode S_WordData->Coding // used by objects/class words
+#define W_OurLocation S_WordData->OurLocation
 #define StackPushRegisterCode S_WordData->StackPushRegisterCode // used by Optimize
 #define W_SourceCode S_WordData->WD_SourceCode 
 #define W_TokenEnd_ReadLineIndex S_WordData->CursorPosition 
@@ -388,6 +409,10 @@ typedef struct _WordData
 #define W_TokenStart_ReadLineIndex S_WordData->StartCharRlIndex
 #define S_FunctionTypesArray S_WordData->FunctionTypesArray
 #define RegToUse S_WordData->RegToUse
+#define Opt_Rm S_WordData->Opt_Rm
+#define Opt_Reg S_WordData->Opt_Reg
+#define RmReg S_WordData->RmReg
+#define RegFlags S_WordData->RegFlags
 #define ArrayDimensions S_WordData->ArrayDimensions
 #define W_AliasOf S_WordData->AliasOf
 #define TypeNamespace S_WordData->TypeNamespace 
@@ -403,6 +428,8 @@ typedef struct _WordData
 #define W_SC_ScratchPadIndex S_WordData->SC_ScratchPadIndex 
 #define W_SC_WordList S_WordData->SourceCodeWordList 
 #define W_SC_WordIndex W_SC_ScratchPadIndex 
+#define W_OpInsnCode S_WordData->OpInsnCode 
+#define W_OpInsnGroup S_WordData->OpInsnGroup
 typedef struct
 {
     Symbol P_Symbol ;
@@ -621,6 +648,16 @@ typedef struct
 #endif
 typedef struct
 {
+    union
+    {
+        uint64 State ;
+        struct
+        {
+            uint8 State_ACC ;
+            uint8 State_OREG ;
+            uint8 State_OREG2 ;
+        } ;
+    } ;
     int64 OptimizeFlag ;
     int64 Optimize_Dest_RegOrMem ;
     int64 Optimize_Mod ;
@@ -628,6 +665,7 @@ typedef struct
     int64 Optimize_Rm ;
     int64 Optimize_Disp ;
     int64 Optimize_Imm ;
+    int64 Optimize_ImmSize ;
     int64 Optimize_SrcReg ;
     int64 Optimize_DstReg ;
     int64 UseReg ;
@@ -642,6 +680,60 @@ typedef struct
 #if NEW_CPU_PIPELINE_STATE    
     CpuPipelineState CPState ;
 #endif   
+    // ArgXLocation    
+#define ASSUMED_LOC_LITERAL     ( (uint64) 1 << 0 )
+#define ASSUMED_STACK_0         ( (uint64) 1 << 1 )
+#define ASSUMED_STACK_1         ( (uint64) 1 << 2 )
+#define ASSUMED_STACK_2         ( (uint64) 1 << 3 )
+#define ASSUMED_STACK_3         ( (uint64) 1 << 4 )
+#define ASSUMED_LOC_ACC         ( (uint64) 1 << 5 )
+#define ASSUMED_LOC_OREG        ( (uint64) 1 << 6 )
+#define ASSUMED_LOC_OREG2       ( (uint64) 1 << 7 )
+#define IDEAL_LOC_LITERAL       ( (uint64) 1 << 8 )
+#define IDEAL_STACK_0           ( (uint64) 1 << 9 )
+#define IDEAL_STACK_1           ( (uint64) 1 << 10 )
+#define IDEAL_STACK_2           ( (uint64) 1 << 11 )
+#define IDEAL_STACK_3           ( (uint64) 1 << 12 )
+#define IDEAL_LOC_ACC           ( (uint64) 1 << 13 )
+#define IDEAL_LOC_OREG          ( (uint64) 1 << 14 )
+#define IDEAL_LOC_OREG2         ( (uint64) 1 << 15 )
+#define LOC_STACK_0             ( 1 << 4 )
+#define LOC_STACK_1             ( 1 << 5 )
+#define LOC_ACC                 ( 1 << 6 )
+#define LOC_OREG                ( 1 << 7 )
+#define REG_ON_BIT              ( 0x10 ) // decimal 16, beyond the 15 regs
+    //#define LOC_STACK_2             ( 1 << 8 )
+    int64 rtrn, NumberOfArgs ;
+    int64 Arg1Location, Arg2Location ;
+    int8 Arg1AssumedLocation, Arg2AssumedLocation, Arg1ActualLocation, Arg2ActualLocation, Arg1IdealLocation, Arg2IdealLocation ;
+    byte * Arg1SetHere, *Arg2SetHere ;
+    uint16 ControlFlags ;
+    Word *opWord, *wordn, *wordm, *wordArg1, *wordArg2, *xBetweenArg1AndArg2 ;
+    dlnode * node, *nodem, *wordNode, *nextNode, *wordArg2Node, *wordArg1Node ; //, *wordArg2OREGNode, *wordArg1ACCNode ;
+    Boolean rvalue, wordArg1_rvalue, wordArg2_rvalue, wordArg1_literal, wordArg2_literal ;
+    Boolean wordOp, wordArg1_Op, wordArg2_Op, opRmFlag, opTakesARegFlag, opTakesImmFlag, op1ArgOnly ;
+    // CompileOptimizeInfo State values
+#define ACC_1L                   ( (uint64) 1 << 1 )              
+#define ACC_1R                   ( (uint64) 1 << 2 )              
+#define ACC_2L                   ( (uint64) 1 << 3 )              
+#define ACC_2R                   ( (uint64) 1 << 4 )              
+#define OREG_1L                  ( (uint64) 1 << 5 )              
+#define OREG_1R                  ( (uint64) 1 << 6 )              
+#define OREG_2L                  ( (uint64) 1 << 7 )              
+#define OREG_2R                  ( (uint64) 1 << 8 )              
+#define OREG2_1L                 ( (uint64) 1 << 9 )              
+#define OREG2_1R                 ( (uint64) 1 << 10 )              
+#define OREG2_2L                 ( (uint64) 1 << 11 )              
+#define OREG2_2R                 ( (uint64) 1 << 12 )  
+#define OP_RESULT_ACC            ( (uint64) 1 << 13 )  
+#define OP_RESULT_OREG           ( (uint64) 1 << 14 )  
+#define OP_RESULT_OREG2          ( (uint64) 1 << 15 )
+    // CompileOptimizeInfo StateRegValues ;  
+#define ARG1_L                   ( 1 << 0 )
+#define ARG1_R                   ( 1 << 1 )
+#define ARG2_L                   ( 1 << 2 )
+#define ARG2_R                   ( 1 << 3 )
+#define OP_RESULT                ( 1 << 4 )
 } CompileOptimizeInfo ;
 typedef struct
 {
@@ -656,7 +748,7 @@ typedef struct
     int64 NumberOfRegisterArgs ;
     int64 NumberOfRegisterVariables ;
     int64 LocalsFrameSize ;
-    int64 SaveCompileMode, SaveScratchPadIndex ;
+    int64 SaveCompileMode, SaveOptimizeState, SaveScratchPadIndex ;
     //int64 LispParenLevel;
     int64 ParenLevel ;
     int64 GlobalParenLevel ;
@@ -664,7 +756,7 @@ typedef struct
     int64 ArrayEnds ;
     byte * InitHere ;
     int64 * AccumulatedOptimizeOffsetPointer ;
-    int8 AccumulatedOffsetPointerFlag, InLParenBlock, SemicolonEndsThisBlock, TakesLParenAsBlock, BeginBlockFlag ;
+    int8 InLParenBlock, SemicolonEndsThisBlock, TakesLParenAsBlock, BeginBlockFlag ;
     int32 * AccumulatedOffsetPointer ;
     int64 * FrameSizeCellOffset, BlocksBegun ;
     int8 RegOrder [ 4 ] ;
@@ -759,7 +851,7 @@ typedef struct
     Stack * ContextDataStack ;
     byte * Location ;
     dllist * WordList ;
-    Word * CurrentlyRunningWord, *NlsWord, *SC_CurrentCombinator, *SourceCodeWord ;
+    Word * CurrentlyRunningWord, *CurrentEvalWord, *NlsWord, *SC_CurrentCombinator, *SourceCodeWord, *CurrentDisassemblyWord ;
     block CurrentlyRunningWordDefinition ;
     NBA * ContextNba ;
     sigjmp_buf JmpBuf0 ;
@@ -836,9 +928,9 @@ typedef struct _CfrTil
     block CurrentBlock, SaveCpuState, SaveCpu2State, RestoreCpuState, RestoreCpu2State, CallCfrTilWord, CallCurrentBlock, RestoreSelectedCpuState, SaveSelectedCpuState ; //, SyncDspToEsi, SyncEsiToDsp ;
     //block Set_CfrTilRspReg_FromReturnStackPointer, Set_ReturnStackPointer_FromCfrTilRspReg, Set_DspReg_FromDataStackPointer, Set_DataStackPointer_FromDspReg ; //, PeekReg, PokeReg ;
     block Set_DspReg_FromDataStackPointer, Set_DataStackPointer_FromDspReg ; //, PeekReg, PokeReg ;
-    block PopDspToR8AndCall, CallReg_TestRSP, CallReg_AdjustRSP ; //adjustRSPAndCall, adjustRSP ;
+    block PopDspToR8AndCall, CallReg_TestRSP ; //adjustRSPAndCall, adjustRSP ;
     ByteArray * PeekPokeByteArray ;
-    Word * LastFinishedWord, *StoreWord, *PokeWord, *ScoOcCrw, *DebugWordListWord, *EndBlockWord, *BeginBlockWord ;
+    Word * LastFinishedWord, *StoreWord, *PokeWord, *ScoOcCrw, *DebugWordListWord, *EndBlockWord, *BeginBlockWord, *InfixNamespace ;
     byte ReadLine_CharacterTable [ 256 ] ;
     ReadLineFunction ReadLine_FunctionTable [ 24 ] ;
     CharacterType LexerCharacterTypeTable [ 256 ] ;
@@ -979,6 +1071,8 @@ typedef struct
 typedef struct
 {
     const char * ccp_Name ;
+    uint8 OpInsnCodeGroup ;
+    uint8 OpInsnCode ;
     block blk_Definition ;
     uint64 ui64_CAttribute ;
     uint64 ui64_CAttribute2 ;
@@ -1015,5 +1109,3 @@ typedef struct ppibs
 }
 PreProcessorIfBlockStatus, Ppibs ;
 //typedef int64( *cFunction_2_Arg ) ( int64, int64 ) ;
-
-

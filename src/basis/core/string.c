@@ -710,26 +710,63 @@ _String_GetStringToEndOfLine ( )
     return str ;
 }
 
+int64
+String_CheckWordSize ( byte * str, int64 wl, Boolean punctFlag )
+{
+    byte * start, *end ;
+    int64 i, length ;
+    for ( i = 0 ; ; i -- ) 
+    {
+        if ( punctFlag ) 
+        {
+            if ( ! ispunct ( str[i] ) ) break ;
+        }
+        else if ( ispunct ( str[i] ) || (str[i]==' ')) break ;
+        if ( abs (i) >= ( wl + 1 ) ) break ;
+    }
+    start = & str [i+1] ;
+    for ( i = 0 ; ; i ++ ) 
+    {
+        if ( punctFlag ) 
+        {
+            if ( ! ispunct ( str[i] ) ) break ;
+        }
+        else if ( ispunct ( str[i] ) || (str[i]==' ')) break ;
+        if ( abs (i) >= ( wl + 1 ) ) break ;
+    }
+    end = & str [i-1] ;
+    length = end - start + 1 ;
+    return length == wl ;
+}
 // this code is also used in PrepareSourceCodeString in cfrtil.c 
 // it makes or attempts to make sure that that tokenStart (ts) is correct for any string
 
 int64
 String_FindStrnCmpIndex ( byte * sc, byte* name0, int64 index0, int64 wl0, int64 inc )
 {
-    byte * scspp2, *scspp ;
+    byte * scspp2, *scspp, *scindex ;
     d0 ( scspp = & sc [ index0 ] ) ;
     int64 i, n, index = index0, slsc = Strlen ( sc ) ;
+    Boolean punctuationFlag = ispunct ( name0[0] ) ;
     for ( i = 0, n = wl0 + inc ; i <= n ; i ++ ) // tokens are parsed in different order with parameter and c rtl args, etc. 
     {
-        if ( ! Strncmp ( & sc [ index - i ], name0, wl0 ) ) //l ) ) //wl0 ) )
+        scindex = & sc [ index - i ] ;
+        if ( ! Strncmp ( scindex, name0, wl0 ) ) 
         {
-            index -= i ;
-            goto done ;
+            if ( String_CheckWordSize ( scindex, wl0, punctuationFlag ) )
+            {
+                index -= i ;
+                goto done ;
+            }
         }
+        scindex = & sc [ index + i ] ;
         if ( ( index + i <= slsc ) && ( ! Strncmp ( & sc [ index + i ], name0, wl0 ) ) )//l ) ) //wl0 ) )
         {
-            index += i ;
-            goto done ;
+            if ( String_CheckWordSize ( scindex, wl0, punctuationFlag ) )
+            {
+                index += i ;
+                goto done ;
+            }
         }
         d0 ( if ( ( i > 12 ) && ( i < 20 ) ) _Printf ( ( byte* ) "\n&sc[index - i] = %20s :: name0 = %20s\n", & sc [ index - i ], name0 ) ) ;
     }
@@ -845,6 +882,66 @@ String_CheckGetValueAtAddress ( byte * address )
     if ( word ) string = word->Name ;
     else string = String_CheckForAtAdddress ( address ) ;
     return string ;
+}
+
+byte *
+String_DelimitSourceCodeStartForLispCfrTil ( char * sc )
+{
+    byte * start = 0 ;
+    while ( *sc )
+    {
+        switch ( *sc )
+        {
+            case '(': goto next ;
+            case '"':
+            {
+                sc ++ ;
+                while ( *sc != '"' ) sc ++ ;
+                break ;
+            }
+            case ':':
+            {
+                if ( *( sc + 1 ) == ':' )
+                {
+                    sc ++ ;
+                    break ;
+                }
+                else
+                {
+                    //start = sc ;
+                    goto next ;
+                }
+            }
+        }
+        sc ++ ;
+    }
+next:
+    start = sc ;
+    while ( *sc )
+    {
+        switch ( *sc )
+        {
+            case ')': return start ;
+            case '"':
+            {
+                while ( *sc ++ != '"' ) ;
+                sc ++ ;
+                break ;
+            }
+            case ';':
+            {
+                if ( *( sc + 1 ) == ';' )
+                {
+                    sc += 2 ;
+                }
+                *( sc + 1 ) = ' ' ;
+                *( sc + 2 ) = 0 ;
+                return start ;
+            }
+        }
+        sc ++ ;
+    }
+    return start ;
 }
 
 #if 0 // some future possibly useful string functions

@@ -22,9 +22,9 @@ CfrTil_IncDec ( int64 op ) // +
 {
     Context * cntx = _Context_ ;
     Compiler * compiler = cntx->Compiler0 ;
-    if ( ! GetState ( compiler, LC_CFRTIL ) ) //|INFIX_LIST_INTERPRET ) )
+    int64 sd = List_Depth ( compiler->WordList ) ;
+    if ( ( sd > 1 ) && ( ! GetState ( compiler, LC_CFRTIL ) ) ) //|INFIX_LIST_INTERPRET ) )
     {
-        int64 sd = List_Depth ( compiler->WordList ) ;
         Word *one = ( Word* ) _Compiler_WordList ( compiler, 1 ) ; //, *three = Compiler_WordList ( 3 ) ; // the operand
         byte * nextToken = Lexer_PeekNextNonDebugTokenWord ( cntx->Lexer0, 1 ) ;
         Word * currentWord = _Context_->CurrentlyRunningWord ;
@@ -61,6 +61,7 @@ CfrTil_IncDec ( int64 op ) // +
             {
                 if ( ! GetState ( compiler, INFIX_LIST_INTERPRET ) )
                 {
+                    List_DropN ( compiler->WordList, 1 ) ; // the operator; let higher level see the variable
                     SetHere ( one->Coding ) ;
                     CfrTil_WordList_PushWord ( one ) ;
                     dllist * postfixList = List_New ( ) ;
@@ -89,9 +90,9 @@ CfrTil_IncDec ( int64 op ) // +
             {
                 //_Compile_GetVarLitObj_RValue_To_Reg ( nextWord, R8D ) ;
                 _Compile_Move_Literal_Immediate_To_Reg ( THRU_REG, ( int64 ) nextWord->W_PtrToValue ) ;
-                _Compile_Move_Rm_To_Reg ( ACC, THRU_REG, 0 ) ;
+                Compile_Move_Rm_To_Reg ( ACC, THRU_REG, 0 ) ;
                 _Compile_Group5 ( op, REG, ACC, 0, 0, 0 ) ;
-                _Compile_Move_Reg_To_Rm ( THRU_REG, ACC, 0 ) ;
+                Compile_Move_Reg_To_Rm ( THRU_REG, ACC, 0 ) ;
 
             }
             //_Word_CompileAndRecord_PushReg ( nextWord, R8D ) ;

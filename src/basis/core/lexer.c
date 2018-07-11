@@ -120,9 +120,13 @@ _Lexer_ConsiderDebugAndCommentTokens ( byte * token, int64 evalFlag, int64 reAdd
         {
             word->W_TokenStart_ReadLineIndex = _Lexer_->TokenStart_ReadLineIndex ;
             Word_Eval ( word ) ;
+            return true ;
         }
-        if ( reAddDebugWordsFlag ) _CfrTil_AddTokenToTailOfTokenList ( token ) ; // ToTail : fifo from Head
-        return true ;
+        else if ( reAddDebugWordsFlag ) 
+        {
+            _CfrTil_AddTokenToTailOfTokenList ( token ) ; // ToTail : fifo from Head
+            return false ;
+        }
     }
     return false ;
 }

@@ -74,7 +74,6 @@ _Interpret_String ( byte *str )
     _CfrTil_ContextNew_InterpretString ( _CfrTil_, str ) ;
 }
 
-#if 1
 byte *
 _Interpret_C_Until_EitherToken ( Interpreter * interp, byte * end1, byte * end2, byte* end3, byte * delimiters )
 {
@@ -86,6 +85,7 @@ _Interpret_C_Until_EitherToken ( Interpreter * interp, byte * end1, byte * end2,
         if ( String_Equal ( token, end1 ) || String_Equal ( token, end2 ) || ( end3 ? String_Equal ( token, end3 ) : 0 ) ) break ;
         else if ( GetState ( interp->Compiler0, DOING_A_PREFIX_WORD ) && String_Equal ( token, ")" ) )
         {
+            Interpreter_InterpretAToken ( interp, token, - 1 ) ;
             if ( ! Compiling ) _Compiler_FreeAllLocalsNamespaces ( _Compiler_ ) ;
             break ;
         }
@@ -122,77 +122,16 @@ _Interpret_Until_Token ( Interpreter * interp, byte * end, byte * delimiters )
             {
                 d0 ( byte buffer [128] ;
                     snprintf ( ( char* ) buffer, 128, "\n_Interpret_Until_Token : before interpret of %s", ( char* ) token ) ;
-                d0 ( if ( Is_DebugModeOn ) Compiler_Show_WordList ( buffer ) ) ) ;
+                d0 ( if ( Is_DebugModeOn ) _Compiler_Show_WordList (buffer, 0) ) ) ;
                 Interpreter_InterpretAToken ( interp, token, - 1 ) ;
                 d0 ( snprintf ( ( char* ) buffer, 128, "\n_Interpret_Until_Token : after interpret of %s", ( char* ) token ) ;
-                if ( Is_DebugModeOn ) Compiler_Show_WordList ( buffer ) ) ;
+                if ( Is_DebugModeOn ) _Compiler_Show_WordList (buffer, 0) ) ;
             }
         }
         else break ;
     }
     return token ;
 }
-
-#else
-byte *
-_Interpret_C_Until_EitherToken ( Interpreter * interp, byte * end1, byte * end2, byte* end3, byte * delimiters )
-{
-    byte * token = 0 ;
-    while ( 1 )
-    {
-        token = _Lexer_ReadToken ( interp->Lexer0, delimiters ) ;
-        List_CheckInterpretLists_OnVariable ( _Compiler_->PostfixLists, token ) ;
-        if ( GetState ( interp->Compiler0, DOING_A_PREFIX_WORD ) && String_Equal ( token, ")" ) )
-        {
-            if ( ! Compiling ) _Compiler_FreeAllLocalsNamespaces ( _Compiler_ ) ;
-            break ;
-        }
-        else if ( String_Equal ( token, end1 ) || String_Equal ( token, end2 ) || ( end3 ? String_Equal ( token, end3 ) : 0 ) ) break ;
-        else if ( GetState ( _Context_, C_SYNTAX ) && ( String_Equal ( token, "," ) || String_Equal ( token, ";" ) ) ) break ;
-        Interpreter_InterpretAToken ( interp, token, - 1 ) ;
-    }
-    return token ;
-}
-
-byte *
-_Interpret_Until_Token ( Interpreter * interp, byte * end, byte * delimiters )
-{
-    byte * token ;
-    while ( 1 )
-    {
-        token = _Lexer_ReadToken ( interp->Lexer0, delimiters ) ;
-        if ( token )
-        {
-            if ( String_Equal ( token, end ) )
-            {
-                if ( GetState ( _Context_->Compiler0, C_COMBINATOR_LPAREN ) && ( String_Equal ( token, ";" ) ) )
-                {
-                    _CfrTil_PushToken_OnTokenList ( token ) ;
-                }
-                else Interpreter_InterpretAToken ( interp, token, - 1 ) ;
-                break ;
-            }
-            if ( GetState ( _Context_, C_SYNTAX ) && String_Equal ( token, ";" ) && GetState ( _Compiler_, C_COMBINATOR_PARSING ) )
-            {
-                _CfrTil_PushToken_OnTokenList ( token ) ;
-                break ;
-            }
-            else
-            {
-                d0 ( byte buffer [128] ;
-                    snprintf ( ( char* ) buffer, 128, "\n_Interpret_Until_Token : before interpret of %s", ( char* ) token ) ;
-                if ( Is_DebugModeOn ) Compiler_Show_WordList ( buffer ) ) ;
-                Interpreter_InterpretAToken ( interp, token, - 1 ) ;
-                d0 ( snprintf ( ( char* ) buffer, 128, "\n_Interpret_Until_Token : after interpret of %s", ( char* ) token ) ;
-                if ( Is_DebugModeOn ) Compiler_Show_WordList ( buffer ) ) ;
-            }
-        }
-        else break ;
-    }
-    return token ;
-}
-#endif
-
 
 void
 _Interpret_PrefixFunction_Until_Token ( Interpreter * interp, Word * prefixFunction, byte * end, byte * delimiters )
@@ -229,7 +168,7 @@ _Interpret_PrefixFunction_Until_RParen ( Interpreter * interp, Word * prefixFunc
             }
             else break ;
         }
-        d0 ( if ( Is_DebugModeOn ) Compiler_Show_WordList ( "\n_Interpret_PrefixFunction_Until_RParen" ) ) ;
+        d0 ( if ( Is_DebugModeOn ) _Compiler_Show_WordList ("\n_Interpret_PrefixFunction_Until_RParen", 0) ) ;
         SetState ( compiler, PREFIX_ARG_PARSING, true ) ;
         if ( flag ) Interpreter_InterpretAToken ( interp, token, - 1 ) ;
         else _Interpret_Until_Token ( interp, ( byte* ) ")", ( byte* ) " ,\n\r\t" ) ;

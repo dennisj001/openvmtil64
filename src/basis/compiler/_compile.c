@@ -23,9 +23,9 @@ Compile_Call_From_C_Address ( uint64 bptr )
 }
 
 void
-Compile_Call_CurrentBlock ()
+Compile_Call_CurrentBlock ( )
 {
-    Compile_Call_From_C_Address ( (uint64) &_CfrTil_->CurrentBlock ) ;
+    Compile_Call_From_C_Address ( ( uint64 ) & _CfrTil_->CurrentBlock ) ;
 }
 
 #if 0
@@ -33,7 +33,7 @@ Compile_Call_CurrentBlock ()
 void
 Compile_SetEaxToZero ( void )
 {
-    _Compile_MoveImm_To_Reg ( RAX, 0, CELL ) ; // for printf ?? others //System V ABI : "%rax is used to indicate the number of vector arguments passed to a function requiring a variable number of arguments"
+    Compile_MoveImm_To_Reg ( RAX, 0, CELL ) ; // for printf ?? others //System V ABI : "%rax is used to indicate the number of vector arguments passed to a function requiring a variable number of arguments"
 }
 #endif
 
@@ -66,8 +66,8 @@ _Compile_RspReg_Get ( )
 void
 _Compile_RspReg_Fetch ( )
 {
-    _Compile_Move_Reg_To_Reg ( ACC, RSP ) ;
-    _Compile_Move_Rm_To_Reg ( ACC, ACC, 0 ) ;
+    Compile_Move_Reg_To_Reg ( ACC, RSP ) ;
+    Compile_Move_Rm_To_Reg ( ACC, ACC, 0 ) ;
     _Compile_Stack_PushReg ( DSP, ACC ) ;
 }
 
@@ -108,13 +108,13 @@ void
 _Compile_SetAtAddress_WithReg ( int64 * address, int64 reg, int64 thruReg )
 {
     _Compile_Move_Literal_Immediate_To_Reg ( thruReg, ( int64 ) address ) ;
-    _Compile_Move_Reg_To_Rm ( thruReg, reg, 0 ) ;
+    Compile_Move_Reg_To_Rm ( thruReg, reg, 0 ) ;
 }
 
 void
 _Compile_Move_Literal_Immediate_To_Reg ( int64 reg, int64 value )
 {
-    _Compile_MoveImm_To_Reg ( reg, value, CELL ) ;
+    Compile_MoveImm_To_Reg ( reg, value, CELL ) ;
 }
 
 void
@@ -125,7 +125,7 @@ _Compile_GetVarLitObj_RValue_To_Reg ( Word * word, int64 reg )
     if ( word->CAttribute & REGISTER_VARIABLE )
     {
         if ( word->RegToUse == reg ) return ;
-        else _Compile_Move_Reg_To_Reg ( reg, word->RegToUse ) ;
+        else Compile_Move_Reg_To_Reg ( reg, word->RegToUse ) ;
     }
     else if ( word->CAttribute & ( LOCAL_VARIABLE | PARAMETER_VARIABLE ) )
     {
@@ -134,17 +134,23 @@ _Compile_GetVarLitObj_RValue_To_Reg ( Word * word, int64 reg )
     else if ( word->CAttribute & NAMESPACE_VARIABLE )
     {
         _Compile_Move_Literal_Immediate_To_Reg ( reg, ( int64 ) word->W_PtrToValue ) ;
-        _Compile_Move_Rm_To_Reg ( reg, reg, 0 ) ;
+        Compile_Move_Rm_To_Reg ( reg, reg, 0 ) ;
     }
     else if ( word->CAttribute & ( LITERAL | CONSTANT ) )
     {
         _Compile_Move_Literal_Immediate_To_Reg ( reg, ( int64 ) word->W_Value ) ;
     }
+    else if ( word->CAttribute & DOBJECT )
+    {
+        _CfrTil_Do_DynamicObject_ToReg ( word, reg ) ;
+        Compile_Move_Rm_To_Reg ( reg, reg, 0 ) ;
+    }
     else if ( word->CAttribute & ( OBJECT | THIS ) )
     {
         _Compile_Move_Literal_Immediate_To_Reg ( reg, ( int64 ) word->W_PtrToValue ) ;
-        _Compile_Move_Rm_To_Reg ( reg, reg, 0 ) ;
+        Compile_Move_Rm_To_Reg ( reg, reg, 0 ) ;
     }
+    else if ( word->CAttribute & ( CPRIMITIVE ) ) ; // do nothing here
     else SyntaxError ( QUIT ) ;
 }
 
@@ -153,9 +159,14 @@ Do_ObjectOffset ( Word * word, int64 reg )
 {
     Compiler * compiler = _Context_->Compiler0 ;
     int64 offset = word->AccumulatedOffset ;
-    if ( GetState ( _CfrTil_, IN_OPTIMIZER ) && ( offset == 0 ) ) return ;
-    Compile_ADDI ( REG, reg, 0, offset, INT32_SIZE ) ; // only a 32 bit offset ??
-    compiler->AccumulatedOffsetPointer = ( int32* ) ( Here - INT32_SIZE ) ; // offset will be calculated as we go along by ClassFields and Array accesses
+#if 1  
+    if ( ( offset == 0 ) && GetState ( _CfrTil_, IN_OPTIMIZER ) ) return ;
+    else
+#endif        
+    {
+        Compile_ADDI ( REG, reg, 0, offset, INT32_SIZE ) ; // only a 32 bit offset ??
+        compiler->AccumulatedOffsetPointer = ( int32* ) ( Here - INT32_SIZE ) ; // offset will be calculated as we go along by ClassFields and Array accesses
+    }
 }
 
 void
@@ -166,7 +177,7 @@ Compile_GetVarLitObj_RValue_To_Reg ( Word * word, int64 reg )
     {
         Do_ObjectOffset ( word, reg ) ;
         //if ( ! ( word->LAttribute & LOCAL_OBJECT ) ) _Compile_Move_Rm_To_Reg ( reg, reg, 0 ) ; // ?? this for LOCAL_OBJECT seems like we need to better integrate LOCAL_OBJECT
-        _Compile_Move_Rm_To_Reg ( reg, reg, 0 ) ;
+        Compile_Move_Rm_To_Reg ( reg, reg, 0 ) ;
     }
 }
 
@@ -180,7 +191,7 @@ _Compile_SetVarLitObj_With_Reg ( Word * word, int64 reg, int64 thruReg )
     if ( word->CAttribute & REGISTER_VARIABLE )
     {
         if ( word->RegToUse == reg ) return ;
-        else _Compile_Move_Reg_To_Reg ( word->RegToUse, reg ) ;
+        else Compile_Move_Reg_To_Reg ( word->RegToUse, reg ) ;
     }
     else if ( word->CAttribute & ( LOCAL_VARIABLE | PARAMETER_VARIABLE ) )
     {
@@ -202,7 +213,7 @@ _Compile_GetVarLitObj_LValue_To_Reg ( Word * word, int64 reg )
     if ( word->CAttribute & REGISTER_VARIABLE )
     {
         if ( word->RegToUse == reg ) return ;
-        else _Compile_Move_Reg_To_Reg ( reg, word->RegToUse ) ;
+        else Compile_Move_Reg_To_Reg ( reg, word->RegToUse ) ;
     }
     else if ( word->CAttribute & ( OBJECT | THIS ) || ( word->WAttribute & WT_QID ) ) //pointers
     {
@@ -211,6 +222,14 @@ _Compile_GetVarLitObj_LValue_To_Reg ( Word * word, int64 reg )
     else if ( word->CAttribute & ( LOCAL_VARIABLE | PARAMETER_VARIABLE ) )
     {
         _Compile_LEA ( reg, FP, 0, LocalVarIndex_WordDisp ( word ) ) ;
+    }
+    else if ( word->CAttribute & ( LITERAL | CONSTANT ) ) // literals and constants don't have lvalues only rvalues
+    {
+        _Compile_Move_Literal_Immediate_To_Reg ( reg, ( int64 ) word->W_Value ) ;
+    }
+    else if ( word->CAttribute & DOBJECT )
+    {
+        _CfrTil_Do_DynamicObject_ToReg ( word, reg ) ;
     }
     else if ( word->CAttribute & NAMESPACE_VARIABLE )
     {
@@ -222,6 +241,7 @@ _Compile_GetVarLitObj_LValue_To_Reg ( Word * word, int64 reg )
         else value = ( int64 ) word->W_PtrToValue ;
         _Compile_Move_Literal_Immediate_To_Reg ( reg, ( int64 ) value ) ;
     }
+    else if ( word->CAttribute & ( CPRIMITIVE ) ) ; // do nothing here
     else SyntaxError ( QUIT ) ;
     if ( word->CAttribute & ( OBJECT | THIS ) || ( word->WAttribute & WT_QID ) )
     {

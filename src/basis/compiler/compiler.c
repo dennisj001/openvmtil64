@@ -24,24 +24,8 @@ CopyDuplicateWord ( dlnode * anode, Word * word0 )
 {
     Word * wordn = ( Word* ) dobject_Get_M_Slot ( anode, SCN_WORD ) ;
     int64 iuoFlag = dobject_Get_M_Slot ( anode, SCN_IN_USE_FLAG ) ;
-    if ( iuoFlag && ( word0 == wordn ) )
-#if 0        
-    {
-        d0 ( if ( Is_DebugModeOn ) _DWL_ShowList ( _Compiler_->WordList, 0 ) ) ;
-        Word * wordc = Word_Copy ( word0, DICTIONARY ) ; // use DICTIONARY since we are recycling these anyway
-        wordc->W_OriginalWord = Word_GetOriginalWord ( word0 ) ;
-        _dlnode_Init ( ( dlnode * ) wordc ) ; // necessary!
-        wordc->S_CAttribute |= ( uint64 ) RECYCLABLE_COPY ;
-        wordc->StackPushRegisterCode = 0 ;
-        wordc->W_SC_ScratchPadIndex = word0->W_SC_WordIndex ;
-        wordc->W_TokenStart_ReadLineIndex = word0->W_TokenStart_ReadLineIndex ;
-        Word_SetLocation ( wordc ) ;
-        return wordc ;
-    }
-#else
-        return _CopyDuplicateWord ( word0 ) ;
-#endif    
-    return 0 ;
+    if ( iuoFlag && ( word0 == wordn ) ) return _CopyDuplicateWord ( word0 ) ;
+    else return 0 ;
 }
 
 Word *
@@ -78,10 +62,12 @@ Compiler_IncrementCurrentAccumulatedOffset ( Compiler * compiler, int64 incremen
     {
         ( *( int64* ) ( compiler->AccumulatedOffsetPointer ) ) += ( increment ) ;
     }
+#if 1   
     if ( compiler->AccumulatedOptimizeOffsetPointer )
     {
         ( *( int64* ) ( compiler->AccumulatedOptimizeOffsetPointer ) ) += ( increment ) ;
     }
+#endif    
 }
 
 void
@@ -91,10 +77,12 @@ Compiler_SetCurrentAccumulatedOffsetValue ( Compiler * compiler, int64 value )
     {
         ( *( int64* ) ( compiler->AccumulatedOffsetPointer ) ) = ( value ) ;
     }
+#if 1    
     if ( compiler->AccumulatedOptimizeOffsetPointer )
     {
         ( *( int64* ) ( compiler->AccumulatedOptimizeOffsetPointer ) ) = ( value ) ;
     }
+#endif    
 }
 
 NamedByteArray *
@@ -171,7 +159,7 @@ _CompileOptInfo_Init ( Compiler * compiler )
 }
 
 void
-CompileOptInfo_Init ( Compiler * compiler )
+CompileOptInfo_Init ( Compiler * compiler, uint64 state )
 {
     CompileOptimizeInfo * optInfo = compiler->OptInfo ;
     _CompileOptInfo_Init ( compiler ) ;
@@ -185,6 +173,7 @@ CompileOptInfo_Init ( Compiler * compiler )
             else break ;
         }
     }
+    optInfo->State = state ;
 }
 
 CompileOptimizeInfo *
@@ -232,7 +221,6 @@ Compiler_Init ( Compiler * compiler, uint64 state )
         if ( compiler->CurrentWordCompiling )
         {
             compiler->CurrentWordCompiling->W_SC_WordList = compiler->WordList ;
-            //d1 ( if ( IsSourceCodeOn ) _Printf ( ( byte* ) "\nW_SC_WordList for %s : length = %d : %d\n", compiler->CurrentWordCompiling->Name, dllist_Length ( compiler->CurrentWordCompiling->W_SC_WordList ), dllist_Length ( compiler->WordList ) ) ) ;
         }
         compiler->WordList = _dllist_New ( CONTEXT ) ;
     }
@@ -312,15 +300,15 @@ Stack_PointerToJmpOffset_Set ( )
 }
 
 void
-_Compiler_CompileAndRecord_PushAccum ( Compiler * compiler, int8 reg )
+_Compiler_CompileAndRecord_Word0_PushReg ( Compiler * compiler, int8 reg )
 {
-    _Word_CompileAndRecord_PushReg ( Compiler_WordList ( 0 ), reg ) ;
+    _Word_CompileAndRecord_PushReg ( _Compiler_WordList ( compiler, 0 ), reg ) ;
 }
 
 void
 Compiler_CompileAndRecord_PushAccum ( Compiler * compiler )
 {
-    _Compiler_CompileAndRecord_PushAccum ( compiler, ACC ) ;
+    _Compiler_CompileAndRecord_Word0_PushReg ( compiler, ACC ) ;
 }
 
 
