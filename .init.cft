@@ -160,8 +160,10 @@ BigNum
 bnInit ( 16 16 )
 Root
 : bigNumOff "BigNum" notUsing ;
-'bno 'bigNumOff find alias
-bno
+'bnoff 'bigNumOff find alias
+: bnon BigNum bnInit ( 16 16 ) ;
+//d: bnon
+bnoff
 
 Compiler 
 : var: { token dup ";" strcmp } { _var } while drop ; immediate // nb : no quotation marks around variable names with var: ... ;
@@ -357,7 +359,7 @@ stringMacrosOn
 Root 
 'doX64 1 const
 'doScript 1 const
-'_doDemo 1 const    
+'_doDemo 0 const    
 //dbgOff
 //dbgOn 
 dbgOnVar 1 = 

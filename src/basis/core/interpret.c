@@ -22,9 +22,9 @@ Interpreter_InterpretNextToken ( Interpreter * interp )
 }
 
 Word *
-_Interpreter_DoWord_Default ( Interpreter * interp, Word * word, int64 scratchPadIndex )
+_Interpreter_DoWord_Default ( Interpreter * interp, Word * word0, int64 scratchPadIndex )
 {
-    word = Compiler_CopyDuplicatesAndPush ( word ) ;
+    Word * word = Compiler_CopyDuplicatesAndPush ( word0 ) ;
     word->W_SC_ScratchPadIndex = scratchPadIndex ? scratchPadIndex : _CfrTil_->SC_ScratchPadIndex ; ;
     interp->w_Word = word ;
     Word_Eval ( word ) ;

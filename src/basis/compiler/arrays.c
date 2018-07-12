@@ -107,7 +107,6 @@ Do_NextArrayWordToken ( Word * word, byte * token, Word * arrayBaseObject, int64
             Compiler_IncrementCurrentAccumulatedOffset ( compiler, increment ) ;
             if ( ! CompileMode ) _DataStack_SetTop ( _DataStack_GetTop ( ) + increment ) ; // after each dimension : in the end we have one lvalue remaining on the stack
         }
-        //CfrTil_ArrayEnd () ;
         
         if ( ! _Context_StringEqual_PeekNextToken (cntx, ( byte* ) "[" , 0) ) return 1 ; // breaks the calling function
         if ( Is_DebugModeOn ) Word_PrintOffset ( word, increment, baseObject->AccumulatedOffset ) ;

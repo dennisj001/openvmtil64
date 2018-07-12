@@ -9,7 +9,7 @@ Word_Disassemble ( Word * word )
     {
         start = word->CodeStart ;
         _Context_->CurrentDisassemblyWord = word ;
-        int64 size = _Debugger_Disassemble ( _Debugger_, start, word->S_CodeSize ? word->S_CodeSize : 128, 0 ) ; //1 ) ;
+        int64 size = _Debugger_Disassemble ( _Debugger_, start, word->S_CodeSize ? word->S_CodeSize : 128, 1 ) ;
         if ( ( ! word->S_CodeSize ) && ( size > 0 ) )
         {
             word->S_CodeSize = size ;

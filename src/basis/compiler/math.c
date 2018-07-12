@@ -18,14 +18,14 @@ void
 Compile_Multiply ( Compiler * compiler )
 {
     CompileOptimizeInfo * optInfo = compiler->OptInfo ;
-    int64 optFlag = Compiler_CheckOptimize (compiler) ;
+    int64 optFlag = Compiler_CheckOptimize ( compiler, 0 ) ;
     if ( optFlag & OPTIMIZE_DONE ) return ;
     else if ( optFlag )
     {
         //_Compile_IMUL ( int8 mod, int8 reg, int8 rm, int8 sib, int64 disp, uint64 imm )
         //optInfo->Optimize_Reg = ACC ; // emulate MUL
         _Compile_IMUL ( optInfo->Optimize_Mod, optInfo->Optimize_Reg, optInfo->Optimize_Rm, 0, optInfo->Optimize_Disp, 0 ) ;
-        if ( optInfo->Optimize_Rm == DSP )  _Compile_Move_Reg_To_StackN ( DSP, 0, optInfo->Optimize_Reg ) ;
+        if ( optInfo->Optimize_Rm == DSP ) _Compile_Move_Reg_To_StackN ( DSP, 0, optInfo->Optimize_Reg ) ;
         else _Word_CompileAndRecord_PushReg ( _Compiler_WordList ( compiler, 0 ), optInfo->Optimize_Reg ) ;
     }
     else
@@ -46,13 +46,11 @@ _Compile_Divide ( Compiler * compiler, uint64 type )
     CompileOptimizeInfo * optInfo = compiler->OptInfo ;
     int8 reg ;
     // dividend in edx:eax, quotient/divisor in eax, remainder in edx
-    int64 optFlag = Compiler_CheckOptimize (compiler) ;
+    int64 optFlag = Compiler_CheckOptimize ( compiler, 0 ) ;
     if ( optFlag & OPTIMIZE_DONE ) return ;
     else if ( optFlag )
     {
         Compile_MoveImm ( REG, RDX, 0, 0, 0, CELL ) ;
-        // Compile_IDIV( mod, rm, controlFlag, sib, disp, imm, size )
-        int8 flags = ( ( optInfo->Optimize_Disp != 0 ) ? DISP_B : 0 ) ; //nb. there is no idiv imm insn
 #if 0        
         if ( optInfo->OptimizeFlag & OPTIMIZE_IMM )
         {
@@ -62,8 +60,8 @@ _Compile_Divide ( Compiler * compiler, uint64 type )
             optInfo->Optimize_Mod = REG ;
         }
 #endif        
-        Compile_IDIV ( optInfo->Optimize_Mod, optInfo->Optimize_Rm, flags, 0,
-            optInfo->Optimize_Disp, 0, 0 ) ;
+        // Compile_IDIV( mod, rm, controlFlag, sib, disp, imm, size )
+        Compile_IDIV ( optInfo->Optimize_Mod, optInfo->Optimize_Rm, ( ( optInfo->Optimize_Disp != 0 ) ? DISP_B : 0 ), 0, optInfo->Optimize_Disp, 0, 0 ) ;
         if ( type == MODULO ) reg = RDX ;
         else reg = ACC ;
         if ( reg != ACC ) Compile_Move_Reg_To_Reg ( ACC, reg ) ; // for consistency finally use RAX so optInfo can always count on rax as the pushed reg
@@ -129,7 +127,9 @@ _Compile_optInfo_X_Group1 ( Compiler * compiler, int64 op )
 void
 Compile_Group1_X_OpEqual ( Compiler * compiler, int64 op ) // +=/-= operationCode
 {
-    if ( Compiler_CheckOptimize (compiler) )
+    int64 optFlag = Compiler_CheckOptimize ( compiler, 0 ) ;
+    if ( optFlag & OPTIMIZE_DONE ) return ;
+    else if ( optFlag )
     {
         _Compile_optInfo_X_Group1 ( compiler, op ) ;
     }
@@ -146,7 +146,9 @@ void
 Compile_MultiplyEqual ( Compiler * compiler )
 {
     CompileOptimizeInfo * optInfo = compiler->OptInfo ;
-    if ( Compiler_CheckOptimize (compiler) )
+    int64 optFlag = Compiler_CheckOptimize ( compiler, 0 ) ;
+    if ( optFlag & OPTIMIZE_DONE ) return ;
+    else if ( optFlag )
     {
         Word_Set_SCA ( optInfo->opWord ) ;
         if ( optInfo->OptimizeFlag & OPTIMIZE_IMM )
@@ -161,7 +163,7 @@ Compile_MultiplyEqual ( Compiler * compiler )
             Compile_MUL ( optInfo->Optimize_Mod, optInfo->Optimize_Rm, REX_B | MODRM_B | DISP_B, 0,
                 optInfo->Optimize_Disp, 0, CELL_SIZE ) ;
         }
-        if ( optInfo->wordArg1->CAttribute & REGISTER_VARIABLE ) 
+        if ( optInfo->wordArg1->CAttribute & REGISTER_VARIABLE )
         {
             if ( optInfo->wordArg1->RegToUse != ACC ) Compile_Move_Reg_To_Reg ( optInfo->wordArg1->RegToUse, RAX ) ;
         }
@@ -190,7 +192,9 @@ Compile_DivideEqual ( Compiler * compiler )
         CompileOptimizeInfo * optInfo = compiler->OptInfo ;
         // for idiv the dividend must be eax:edx, divisor can be reg or rm
         // idiv eax by reg or mem
-        if ( Compiler_CheckOptimize (compiler) )
+        int64 optFlag = Compiler_CheckOptimize ( compiler, 0 ) ;
+        if ( optFlag & OPTIMIZE_DONE ) return ;
+        else if ( optFlag )
         {
             Compile_MoveImm ( REG, RDX, 0, 0, 0, CELL ) ;
             // Compile_IDIV( mod, rm, sib, disp, imm, size )

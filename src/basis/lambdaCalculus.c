@@ -750,7 +750,7 @@ _LO_Apply_Arg ( ListObject ** pl1, int64 i, int8 svCompileMode )
         word = l1->Lo_CfrTilWord ;
         word = Compiler_CopyDuplicatesAndPush ( word ) ;
         word->W_SC_ScratchPadIndex = l1->W_SC_ScratchPadIndex ;
-        word->StackPushRegisterCode = 0 ;
+        //word->StackPushRegisterCode = 0 ;
         byte * here = Here ;
         Word_Eval ( word ) ; // ?? move value directly to RegOrder reg
         Word *baseObject = _Interpreter_->BaseObject ;
@@ -856,7 +856,7 @@ _LO_Apply_ArgList ( ListObject * l0, Word * word )
         word->Coding = Here ;
         word->W_SC_ScratchPadIndex = l0->W_SC_ScratchPadIndex ;
         word = Compiler_CopyDuplicatesAndPush ( word ) ;
-        cntx->CurrentlyRunningWord = word ;
+        //cntx->CurrentlyRunningWord = word ;
         //_DEBUG_SETUP ( word, 1 ) ;
         if ( ( String_Equal ( word->Name, "printf" ) || ( String_Equal ( word->Name, "sprintf" ) ) ) )
         {

@@ -83,7 +83,7 @@ s: $$
 : $ streol _sh ;  
 '$$ find wdiss //pause
 
-bno
+bnoff
 
 #if 0 //doScript
 $$ls -al /usr/local ; $$ls -al . ; 

@@ -38,7 +38,7 @@ _Compile_Set_CAddress_WithRegValue_ThruReg ( byte * address, int8 reg, int8 thru
 void
 Compile_Peek ( Compiler * compiler, int8 stackReg ) // @
 {
-    int64 optFlag = Compiler_CheckOptimize (compiler) ;
+    int64 optFlag = Compiler_CheckOptimize (compiler, 0) ;
     if ( optFlag & OPTIMIZE_DONE ) return ;
     else if ( ! optFlag ) Compile_Move_Rm_To_Reg ( ACC, stackReg, 0 ) ;
     Compile_Move_Rm_To_Reg ( ACC, ACC, 0 ) ;
@@ -50,7 +50,7 @@ Compile_Peek ( Compiler * compiler, int8 stackReg ) // @
 void
 Compile_Store ( Compiler * compiler, int8 stackReg ) // !
 {
-    int64 optFlag = Compiler_CheckOptimize (compiler) ;
+    int64 optFlag = Compiler_CheckOptimize (compiler, 0) ;
     if ( optFlag & OPTIMIZE_DONE ) return ;
     else if ( optFlag )
     {
@@ -87,7 +87,7 @@ Compile_Store ( Compiler * compiler, int8 stackReg ) // !
 void
 Compile_Poke ( Compiler * compiler, int8 stackReg ) // =
 {
-    int64 optFlag = Compiler_CheckOptimize (compiler) ;
+    int64 optFlag = Compiler_CheckOptimize (compiler, 0) ;
     if ( optFlag & OPTIMIZE_DONE ) return ;
     else if ( optFlag )
     {

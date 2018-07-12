@@ -1,5 +1,5 @@
 
-bno dbgOff
+bnoff dbgOff
 5 
 dbOn 0 =
 User Lisp    
@@ -83,7 +83,7 @@ tick fib find wdiss // pause
 (if* 1 7 2)
 (+ 2 5)
 
-bno
+bnoff
 (define g1 (lambda (a1 b1 c1)(a1 b1 c1))) 
 (define g2 (/\(a b c)(a b c)))     
 (g + 3 4 )(g / 14 2 ) 
@@ -183,9 +183,7 @@ c_syntaxOff
 sp
     
 #if 1
-BigNum
-bnInit ( 16 16 )
-
+bnon
 : tbn ( | n m ) n 0 = m 3 = n m @ += n m @ += n m @ += n @ p ; tbn // should be 9
 
 s: fibBN ( n | svn fn fn1 fn2 -- TOS ) 
@@ -209,8 +207,8 @@ sp
 ;
 nl nl 47 tfib3
 nl nl 100 tfib3
-nl 100 dup p fibBN p 
-bno
+nl 100 dup p fibBN p //pause
+bnoff
 //pause
 #endif
 
@@ -301,9 +299,7 @@ nl (+ 1 3 4 ,@x7)
 //pause
 
 #if 1
-//lcReset    
-BigNum
-bnInit ( 16 16 )
+bnon
 (define yfac (lambda (yy n) (if* (< n 2) (1) (* n (yy yy (- n 1)))))) 
 (yfac yfac 10) nl
 (define yfacc (lambda (yyy n1) (if* (< n1 2) (1) (* n1 (yyy yyy (- n1 1)))))) 
@@ -329,7 +325,7 @@ tick yfac find wdiss
 (yfacc yfacc 10) nl
 (yfacc yfacc 7) nl
 sp
-bno //pause
+bnoff //pause
 #endif
 #if 1    
 Lisp
@@ -445,15 +441,19 @@ Lisp
 BigNum
 (define yfac (lambda (yy n) (if* (< n 2) 1 (* n (yy yy (- n 1)))))) // code from : http://www.newlisp.org/index.cgi?Y_Function
 tick yfac find wdiss
-"\nyfac : 50 factorial = " ps (yfac yfac 50) nl bno Lisp //pause
+"\nyfac : 50 factorial = " ps (yfac yfac 50) nl 
+bnoff 
+Lisp //pause
 (define yfacc (lambda (yyy n1) (if* (< n1 2) 1 (* n1 (yyy yyy (- n1 1)))))) 
 // tick yfacc find wdiss
 (yfacc yfacc 10) nl
 (yfacc yfacc 7) nl
-BigNum
+bnon //BigNum
 (define yfac (lambda (yy n) (if* (< n 2) 1 (* n (yy yy (- n 1)))))) // code from : http://www.newlisp.org/index.cgi?Y_Function
 tick yfac find wdiss
-(yfac yfac 50) nl bno Lisp //pause
+(yfac yfac 50) nl 
+bnoff 
+Lisp //pause
 (define yfacc (lambda (yyy n1) (if* (< n1 2) 1 (* n1 (yyy yyy (- n1 1)))))) 
 // tick yfacc find wdiss
 (yfacc yfacc 10) nl

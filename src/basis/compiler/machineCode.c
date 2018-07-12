@@ -85,7 +85,7 @@ CalculateModRegardingDisplacement ( int8 mod, int64 disp )
 uint8
 CalculateModRmByte ( int8 mod, int8 reg, int8 rm, int8 sib, int64 disp )
 {
-    int8 modRm ;
+    uint8 modRm ;
     mod = CalculateModRegardingDisplacement ( mod, disp ) ;
     if ( ( mod < 3 ) && ( rm == 4 ) ) //|| ( ( rm == 5 ) && ( disp == 0 ) ) ) )
         //if ( ( mod < 3 ) && ( ( ( rm == 4 ) && ( sib == 0 ) ) || ( ( rm == 5 ) && ( disp == 0 ) ) ) )
@@ -341,7 +341,7 @@ void
 Compile_X_Group1 ( Compiler * compiler, int64 op, int64 ttt, int64 n )
 {
     CompileOptimizeInfo * optInfo = compiler->OptInfo ;
-    int64 optFlag = Compiler_CheckOptimize (compiler) ;
+    int64 optFlag = Compiler_CheckOptimize (compiler, 0) ;
     if ( optFlag == OPTIMIZE_DONE ) return ;
     else if ( optFlag )
     {
@@ -379,7 +379,7 @@ _Compile_Group2 ( int8 mod, int8 regOpCode, int8 rm, int64 controlFlags, int8 si
 {
     //cell opCode = 0xc1 ; // rm32 imm8
     // _Compile_InstructionX86 ( opCode, mod, reg, rm, modRmImmDispFlag, sib, disp, imm, immSize )
-    Compile_CalcWrite_Instruction_X64 ( 0, 0xc1, mod, regOpCode, rm, ( controlFlags | REX_B | MODRM_B | ( disp ? DISP_B : 0 ) ), sib, disp, 0, imm, BYTE ) ;
+    Compile_CalcWrite_Instruction_X64 ( 0, 0xc1, mod, regOpCode, rm, ( controlFlags | REX_B | MODRM_B | ( disp ? DISP_B : 0 ) ), sib, disp, 0, imm, (imm ? BYTE : 0) ) ;
 }
 
 void
@@ -418,7 +418,7 @@ void
 Compile_X_Group5 ( Compiler * compiler, int64 op )
 {
     CompileOptimizeInfo * optInfo = compiler->OptInfo ;
-    int64 optFlag = Compiler_CheckOptimize (compiler) ;
+    int64 optFlag = Compiler_CheckOptimize (compiler, 0) ;
     //Word *one = Compiler_WordStack ( - 1 ) ; // assumes two values ( n m ) on the DSP stack 
     Word *one = _Compiler_WordList ( compiler, 1 ) ; // assumes two values ( n m ) on the DSP stack 
     if ( optFlag & OPTIMIZE_DONE ) return ;
@@ -841,6 +841,14 @@ _Compile_Call_ToAddressThruReg_TestAlignRSP ( byte * address, int8 thruReg )
 #else
     Compile_CallThru_AdjustRSP ( thruReg, REG ) ;
 #endif    
+}
+
+void
+Compile_SetCurrentlyRunningWord_Call_TestRSP ( byte * address, Word * word )
+{
+    //_Compile_Stack_Push ( DSP, (int64) word ) ;
+    Compile_MoveImm_To_Reg ( RDI, ( int64 ) word, CELL ) ;
+    _Compile_Call_ToAddressThruReg_TestAlignRSP ( address, CALL_THRU_REG ) ;
 }
 
 void

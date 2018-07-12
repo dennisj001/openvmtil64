@@ -167,15 +167,15 @@ lispOff
 : goedel3 (| n -- TOS ) 
     n 9 =
     { 
-        (| n ) n @ p n 2 = n @ dup p 2 _assert0 // first n should be garbage here; second n 2
-        { (| n ) n @ p n 3 = n @ 4 + dup p 7 _assert0 } ix // first n should be garbage here; second 7
-        //{ (| n ) n @ p n 3 = <dbg> n @ 4 + dup p 7 _assert0 } ix  // test comment //level 2
-        n @ 6 + 8 _assert0 
+        (| n ) n @ p n 2 = n @ dup p 2 "goedel3_assert1" assert // first n should be garbage here; second n 2
+        { (| n ) n @ p n 3 = n @ 4 + dup p 7 "goedel3_assert2" assert } ix // first n should be garbage here; second 7
+        //{ (| n ) n @ p n 3 = <dbg> n @ 4 + dup p 7 "goedel3_assert" assert } ix  // test comment //level 2
+        n @ 6 + 8 "goedel3_assert4" assert 
     } ix
     { (| n ) n @ p 
         n 3 = 
         n dup @ 4 + = 
-        n @ dup p 7 _assert0 
+        n @ dup p 7 "goedel3_assert5" assert
     } ix // n should be garbage here
     n @ dup p
 ;

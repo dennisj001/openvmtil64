@@ -12,9 +12,10 @@ _CopyDuplicateWord ( Word * word0 )
     wordc->W_OriginalWord = Word_GetOriginalWord ( word0 ) ;
     _dlnode_Init ( ( dlnode * ) wordc ) ; // necessary!
     wordc->S_CAttribute |= ( uint64 ) RECYCLABLE_COPY ;
-    wordc->StackPushRegisterCode = 0 ;
-    wordc->W_SC_ScratchPadIndex = word0->W_SC_WordIndex ;
-    wordc->W_TokenStart_ReadLineIndex = word0->W_TokenStart_ReadLineIndex ;
+    // included with Word_Copy
+    //wordc->StackPushRegisterCode = word0->StackPushRegisterCode ;
+    //wordc->W_SC_ScratchPadIndex = word0->W_SC_WordIndex ;
+    //wordc->W_TokenStart_ReadLineIndex = word0->W_TokenStart_ReadLineIndex ;
     Word_SetLocation ( wordc ) ;
     return wordc ;
 }
@@ -152,20 +153,18 @@ Compiler_WordList ( int64 n )
 }
 
 void
-_CompileOptInfo_Init ( Compiler * compiler )
+_CompileOptimizeInfo_Init ( CompileOptimizeInfo * optInfo )
 {
-    CompileOptimizeInfo * optInfo = compiler->OptInfo ;
     memset ( optInfo, 0, sizeof (CompileOptimizeInfo ) ) ;
 }
 
 void
-CompileOptInfo_Init ( Compiler * compiler, uint64 state )
+CompileOptimizeInfo_Init ( CompileOptimizeInfo * optInfo, uint64 state )
 {
-    CompileOptimizeInfo * optInfo = compiler->OptInfo ;
-    _CompileOptInfo_Init ( compiler ) ;
+    _CompileOptimizeInfo_Init ( optInfo ) ;
     dlnode * node ;
     int64 i ;
-    for ( i = 0, node = dllist_First ( ( dllist* ) compiler->WordList ) ; node ; node = dlnode_Next ( node ) ) // nb. this is a little subtle
+    for ( i = 0, node = dllist_First ( ( dllist* ) _Compiler_->WordList ) ; node ; node = dlnode_Next ( node ) ) // nb. this is a little subtle
     {
         if ( dobject_Get_M_Slot ( node, SCN_IN_USE_FLAG ) )
         {
@@ -177,9 +176,25 @@ CompileOptInfo_Init ( Compiler * compiler, uint64 state )
 }
 
 CompileOptimizeInfo *
-CompileOptInfo_New ( Compiler * compiler, uint64 type )
+_CompileOptimizeInfo_New ( uint64 type )
 {
-    compiler->OptInfo = ( CompileOptimizeInfo * ) Mem_Allocate ( sizeof (CompileOptimizeInfo ), type ) ;
+    CompileOptimizeInfo * optInfo = ( CompileOptimizeInfo * ) Mem_Allocate ( sizeof (CompileOptimizeInfo ), type ) ;
+    return optInfo ;
+}
+
+
+CompileOptimizeInfo *
+Compiler_CompileOptimizeInfo_New ( Compiler * compiler, uint64 type )
+{
+    compiler->OptInfo = _CompileOptimizeInfo_New ( type ) ;
+}
+
+CompileOptimizeInfo *
+CompileOptInfo_NewCopy ( CompileOptimizeInfo * optInfo, uint64 type )
+{
+    CompileOptimizeInfo * copyOptInfo = _CompileOptimizeInfo_New ( type ) ;
+    memcpy ( copyOptInfo, optInfo, sizeof (CompileOptimizeInfo ) ) ;   
+    return copyOptInfo ;
 }
 
 void
@@ -213,7 +228,7 @@ Compiler_Init ( Compiler * compiler, uint64 state )
     if ( ! IsSourceCodeOn )
     {
         DLList_RecycleWordList ( compiler->WordList ) ;
-        List_Init ( compiler->WordList ) ;
+        compiler->WordList = _dllist_New ( TEMPORARY ) ;
     }
     else
     {
@@ -221,8 +236,9 @@ Compiler_Init ( Compiler * compiler, uint64 state )
         if ( compiler->CurrentWordCompiling )
         {
             compiler->CurrentWordCompiling->W_SC_WordList = compiler->WordList ;
+            compiler->CurrentWordCompiling->W_SC_MemSpaceRandMarker = _Q_->MemorySpace0->TempObjectSpace->InitFreedRandMarker ; // this insures that memory for this list hasn't been recycled
         }
-        compiler->WordList = _dllist_New ( CONTEXT ) ;
+        compiler->WordList = _dllist_New ( TEMPORARY ) ;
     }
     CfrTil_InitBlockSystem ( compiler ) ;
     compiler->ContinuePoint = 0 ;
@@ -257,7 +273,7 @@ Compiler_New ( uint64 type )
 {
     Compiler * compiler = ( Compiler * ) Mem_Allocate ( sizeof (Compiler ), type ) ;
     compiler->BlockStack = Stack_New ( 64, type ) ;
-    compiler->WordList = _dllist_New ( type ) ;
+    compiler->WordList = _dllist_New ( TEMPORARY ) ;
     compiler->PostfixLists = _dllist_New ( type ) ;
     compiler->CombinatorBlockInfoStack = Stack_New ( 64, type ) ;
     compiler->GotoList = _dllist_New ( type ) ;
@@ -266,7 +282,7 @@ Compiler_New ( uint64 type )
     compiler->PointerToOffset = Stack_New ( 32, type ) ;
     compiler->CombinatorInfoStack = Stack_New ( 64, type ) ;
     compiler->InfixOperatorStack = Stack_New ( 32, type ) ;
-    CompileOptInfo_New ( compiler, type ) ;
+    Compiler_CompileOptimizeInfo_New ( compiler, type ) ;
     compiler->RegOrder [ 0 ] = OREG2 ;
     compiler->RegOrder [ 1 ] = OREG ;
     Compiler_Init ( compiler, 0 ) ;

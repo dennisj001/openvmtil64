@@ -132,7 +132,7 @@ _Debugger_ShowDbgSourceCodeAtAddress ( Debugger * debugger, byte * address )
     Word * scWord = Compiling ? _Compiler_->CurrentWordCompiling : GetState ( debugger, DBG_STEPPING ) ? Debugger_GetWordFromAddress ( debugger ) : _Context_->CurrentDisassemblyWord ;
     if ( scWord )
     {
-        dllist * list = scWord->W_SC_WordList ? scWord->W_SC_WordList : _Compiler_->WordList ;
+        dllist * list = (scWord->W_SC_WordList && (scWord->W_SC_MemSpaceRandMarker == _Q_->MemorySpace0->TempObjectSpace->InitFreedRandMarker)) ? scWord->W_SC_WordList : 0 ; //_Compiler_->WordList ;
         if ( list )
         {
             byte *sourceCode = scWord->W_SourceCode ? scWord->W_SourceCode : String_New ( _CfrTil_->SC_ScratchPad, TEMPORARY ) ;
@@ -322,13 +322,13 @@ _DWL_ShowWord_Print ( Word * word, int64 index, byte * prefix, byte * coding, by
     byte * name = String_ConvertToBackSlash ( word->Name ), *iuFlag = iuoFlag ? "true" : "false" ;
     if ( newCoding )
     {
-        _Printf ( ( byte* ) "\n\t%s :: \'%-28s\' : oldCoding  = 0x%08x : newCoding = 0x%08x : scwi = %03d, inUse = %s",
-            prefix, name, coding, newCoding, scwi, iuFlag ) ;
+        _Printf ( ( byte* ) "\n\t%s :: word = 0x%08x : \'%-28s\' : oldCoding  = 0x%08x : newCoding = 0x%08x : scwi = %03d, inUse = %s",
+            prefix, word, name, coding, newCoding, scwi, iuFlag ) ;
     }
     else if ( index )
     {
-        _Printf ( "\n\tWordList : index %2d : \'%-28s\' : coding = 0x%08x : scwi = %03d : inUse = %s",
-            index, name, coding, scwi, iuFlag ) ;
+        _Printf ( "\n\tWordList : index %2d : word = 0x%08x : \'%-28s\' : coding = 0x%08x : scwi = %03d : inUse = %s",
+            index, word, name, coding, scwi, iuFlag ) ;
     }
     else //if ( scwiDiff )
     {

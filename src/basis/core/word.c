@@ -159,7 +159,6 @@ _Word_Copy ( Word * word, Word * word0 )
     WordData * swdata = word->S_WordData ;
     memcpy ( word, word0, sizeof ( Word ) + sizeof ( WordData ) ) ;
     word->S_WordData = swdata ; // restore the WordData pointer we overwrote by the above memcpy
-    //memcpy ( word->S_WordData, word0->S_WordData, sizeof (WordData ) ) ;
 }
 
 Word *

@@ -246,7 +246,7 @@ c_syntaxOn
 C String libc
 typedef struct { byte buf [ 256 ]; } Buffer0 ;
 s
-dscOn
+
 void
 $ ( | atoken, buffer, buffer1, Buffer buffer0 ) 
 {
@@ -272,7 +272,7 @@ $ ( | atoken, buffer, buffer1, Buffer buffer0 )
     }
 } 
 'void.$ find wdiss //pause
-dscOff
+
 
 #if doScript 
 "\n\nnew $ test\n" ps
@@ -284,7 +284,7 @@ void.$etc/lispScript ;
 String
 $$ls -al /usr/local ; $$ls -al . ;
 //pause
-dscOff
+
 #endif
 c_syntaxOff
 verbosity 1 =

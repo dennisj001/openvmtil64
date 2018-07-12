@@ -1,14 +1,12 @@
 
 5
-//bigNumOff
 optimizeOn inlineOn 
 lispOff
-bno //BigNum
+bnoff 
 // optimizeOff inlineOff
 // verbosity 2 = 
 Compiler Logic Int C User 
 : sp ; //stack pause ;
-//: _assert _assert0 sp ;
 var: facTest fibTest Dsp ;
 
 // tail recursion from http://c2.com/cgi/wiki?TailCallOptimization
@@ -29,7 +27,7 @@ int factoriali ( REG n | REG res )
 c_syntaxOff 
 'factoriali find wdiss
 factoriali (7) dup p 5040 _assert //pause //sp
-dscOff
+//dscOff
 : factorial ( n  | fac -- TOS ) 
     fac 1 = 
     { n @ 1 > } { n @ fac @ * fac store n -- } while 
@@ -188,11 +186,7 @@ C "qexp2" ffx
 "bexp" ffx
 "bexp2" ffx
 "bexp3" ffx
-#if 0
 "fac" ffx
-#else
-TODO ( "fac ffx : dev.cft : problem with SC_WordList" )
-#endif
 "fac5" ffx //pause
 User
 "factorial" ffx
@@ -395,10 +389,8 @@ sp
 ' _fib2 find wdiss
 // 40 fibx3 
 sp
-BigNum
-bnInit ( 64 64 )
+bnon
 : tbn ( | n m ) n 0 = m 3 = n m @ += n m @ += n m @ += n @ p ; tbn nl "should be 9" ps
-bno
 s: fibBN ( n | fn fn1 fn2 -- TOS ) 
     { fn 0 = fn1 0 = fn2 1 = } { n @ 0 > } { n 1 -= } 
     {   
@@ -411,17 +403,17 @@ s: fibBN ( n | fn fn1 fn2 -- TOS )
     fn @
 ;s
 ' fibBN find wdiss
-20 fibBN dup p 6765 _assert //pause
+20 fibBN p 
 : tfib3 ( n | m )  
     "locals fibBN : " ps 
     { m 1 = } { m @ n @ <= } { m 1 +=  } 
     { m @ dup p " : " _ps fibBN p { n @ m @ > } { "," _ps } if2 } 
     for
 ;
-nl nl 47 tfib3 //sp pause
-nl nl 92 tfib3 //sp pause
-nl 92 dup p fibBN p //sp
-bno
+//nl nl 47 tfib3 //sp pause
+nl nl 100 tfib3 //sp pause
+nl 100 dup p fibBN p //sp
+bnoff //pause
 
 nl
 // verbosity 1 =

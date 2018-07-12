@@ -386,7 +386,8 @@ Namespace_FindOrNew_SetUsing ( byte * name, Namespace * containingNs, int64 setU
     Namespace * ns = _Namespace_Find ( name, containingNs, 0 ) ;
     if ( ! ns )
     {
-        ns = _DataObject_New ( NAMESPACE, 0, name, NAMESPACE | IMMEDIATE, 0, 0, 0, ( int64 ) containingNs, 0 ) ;
+        //ns = _DataObject_New ( NAMESPACE, 0, name, NAMESPACE | IMMEDIATE, 0, 0, 0, ( int64 ) containingNs, 0 ) ;
+        ns = _DataObject_New ( NAMESPACE, 0, name, NAMESPACE, 0, 0, 0, ( int64 ) containingNs, 0 ) ;
     }
     if ( setUsingFlag ) Namespace_SetState ( ns, USING ) ;
     return ns ;

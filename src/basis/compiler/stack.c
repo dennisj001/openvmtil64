@@ -174,7 +174,7 @@ void
 _Compile_Stack_Dup ( int8 stackReg )
 {
     Compiler * compiler = _Context_->Compiler0 ;
-    int64 optFlag = Compiler_CheckOptimize (compiler) ;
+    int64 optFlag = Compiler_CheckOptimize (compiler, 0) ;
     if ( optFlag & OPTIMIZE_DONE ) return ;
     else
     {

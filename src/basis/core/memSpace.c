@@ -97,7 +97,7 @@ Mem_Allocate ( int64 size, uint64 allocType )
     {
         case OPENVMTIL: return _Allocate ( size, ms->OpenVmTilSpace ) ;
         case LISP: case OBJECT_MEMORY: return _Allocate ( size, ms->ObjectSpace ) ;
-        case TEMPORARY: return _Allocate ( size, ms->TempObjectSpace ) ;
+        case TEMPORARY: return _Allocate ( size, ms->TempObjectSpace ) ; // used for SourceCode
         case DICTIONARY: return _Allocate ( size, ms->DictionarySpace ) ;
         case SESSION: return _Allocate ( size, ms->SessionObjectsSpace ) ;
         case CODE: return _Allocate ( size, ms->CodeSpace ) ;
@@ -270,6 +270,7 @@ OVT_MemList_FreeNBAMemory ( byte * name, uint64 moreThan, int64 always )
                 }
             }
         }
+        nba->InitFreedRandMarker = rand () ;
     }
 }
 

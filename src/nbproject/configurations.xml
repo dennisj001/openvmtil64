@@ -106,9 +106,9 @@
                    kind="IMPORTANT_FILES_FOLDER">
       <itemPath>../.init.cft</itemPath>
       <itemPath>Makefile</itemPath>
+      <itemPath>../ReadMe.txt</itemPath>
       <itemPath>../etc</itemPath>
       <itemPath>nbproject/private/launcher.properties</itemPath>
-      <itemPath>../m</itemPath>
       <itemPath>../mir</itemPath>
       <itemPath>../namespaces</itemPath>
     </logicalFolder>

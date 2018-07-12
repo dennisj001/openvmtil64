@@ -96,15 +96,14 @@ _DObject_ValueDefinition_Init ( Word * word, uint64 value, uint64 funcType, byte
         ByteArray * svcs = _Q_CodeByteArray ;
         int64 sscm = GetState ( _CfrTil_, DEBUG_SOURCE_CODE_MODE ) ;
         SetState ( _CfrTil_, DEBUG_SOURCE_CODE_MODE, false ) ;
-        //Compiler_SetCompilingSpace_MakeSureOfRoom ( "ObjectSpace" ) ;
         _NBA_SetCompilingSpace_MakeSureOfRoom ( _Q_->MemorySpace0->ObjectSpace, 4 * K ) ;
         word->Coding = Here ;
         word->CodeStart = Here ;
         word->Definition = ( block ) Here ;
         if ( arg ) _DObject_C_StartupCompiledWords_DefInit ( function, arg ) ;
-        else Compile_Call_TestRSP ( ( byte* ) DataObject_Run ) ;
+        else Compile_SetCurrentlyRunningWord_Call_TestRSP ( ( byte* ) _DataObject_Run, word ) ;
         _Compile_Return ( ) ;
-        d0 ( _Debugger_Disassemble ( _Debugger_, ( byte* ) word->Definition, 32, 1 ) ) ;
+        d0 ( _Debugger_Disassemble ( _Debugger_, ( byte* ) word->Definition, 64, 1 ) ) ;
         word->S_CodeSize = Here - word->CodeStart ; // for use by inline
         Set_CompilerSpace ( svcs ) ;
         SetState ( _CfrTil_, DEBUG_SOURCE_CODE_MODE, sscm ) ;

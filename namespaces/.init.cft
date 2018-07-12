@@ -160,8 +160,10 @@ BigNum
 bnInit ( 16 16 )
 Root
 : bigNumOff "BigNum" notUsing ;
-'bno 'bigNumOff find alias
-bno
+'bnoff 'bigNumOff find alias
+: bnon BigNum bnInit ( 16 16 ) ;
+//d: bnon
+bnoff
 
 Compiler 
 : var: { token dup ";" strcmp } { _var } while drop ; immediate // nb : no quotation marks around variable names with var: ... ;

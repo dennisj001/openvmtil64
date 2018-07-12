@@ -92,7 +92,7 @@ Compile_Cmp_Set_tttn_Logic ( Compiler * compiler, int64 ttt, int64 negateFlag )
     //SC_ForcePush ( _Context_->CurrentlyRunningWord ) ;
     //SC_SetForcePush ( true ) ;
     int8 reg = ACC ;
-    int64 optFlag = Compiler_CheckOptimize (compiler) ;
+    int64 optFlag = Compiler_CheckOptimize (compiler, 0) ;
 #define dbgON_13 0
 #if dbgON_13    
     d1 ( byte * here = Here ) ;
@@ -296,7 +296,7 @@ _Compile_LogicalAnd ( Compiler * compiler )
 void
 Compile_LogicalAnd ( Compiler * compiler )
 {
-    int64 optFlag = Compiler_CheckOptimize (compiler) ;
+    int64 optFlag = Compiler_CheckOptimize (compiler, 0) ;
     if ( optFlag & OPTIMIZE_DONE ) return ;
     else if ( optFlag )
     {
@@ -338,7 +338,7 @@ Compile_LogicalNot ( Compiler * compiler )
 {
     //Word *one = Compiler_WordStack ( - 1 ) ; // assumes two values ( n m ) on the DSP stack 
     Word *one = _Compiler_WordList ( compiler, 1 ) ; // assumes two values ( n m ) on the DSP stack 
-    int64 optFlag = Compiler_CheckOptimize (compiler) ; // check especially for cases that optimize literal ops
+    int64 optFlag = Compiler_CheckOptimize (compiler, 0) ; // check especially for cases that optimize literal ops
     if ( optFlag & OPTIMIZE_DONE ) return ;
         // just need to get to valued to be operated on ( not'ed ) in eax
     else if ( optFlag ) 
@@ -409,7 +409,7 @@ Compile_GreaterThanOrEqual ( Compiler * compiler )
 void
 Compile_Logical_X ( Compiler * compiler, int64 op )
 {
-    int64 optFlag = Compiler_CheckOptimize (compiler) ;
+    int64 optFlag = Compiler_CheckOptimize (compiler, 0) ;
     if ( optFlag == OPTIMIZE_DONE ) return ;
     else if ( optFlag )
     {

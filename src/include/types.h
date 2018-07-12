@@ -384,7 +384,7 @@ typedef struct _WordData
         byte * LogicTestCode ;
     } ;
     dllist * SourceCodeWordList ;
-    //uint64 SourceCodeWordIndex ;
+    int64 SourceCodeMemSpaceRandMarker ;
 } WordData ; // try to put all compiler related data here so in the future we can maybe delete WordData at runtime
 
 // to keep using existing code without rewriting ...
@@ -427,6 +427,7 @@ typedef struct _WordData
 #define W_OriginalWord S_WordData->OriginalWord
 #define W_SC_ScratchPadIndex S_WordData->SC_ScratchPadIndex 
 #define W_SC_WordList S_WordData->SourceCodeWordList 
+#define W_SC_MemSpaceRandMarker S_WordData->SourceCodeMemSpaceRandMarker
 #define W_SC_WordIndex W_SC_ScratchPadIndex 
 #define W_OpInsnCode S_WordData->OpInsnCode 
 #define W_OpInsnGroup S_WordData->OpInsnGroup
@@ -460,7 +461,7 @@ typedef struct NamedByteArray
     int64 MemInitial ;
     int64 MemAllocated ;
     int64 MemRemaining ;
-    int64 NumberOfByteArrays, CheckTimes ;
+    int64 NumberOfByteArrays, CheckTimes, InitFreedRandMarker ;
     dllist NBA_BaList ;
     dlnode NBA_ML_HeadNode ;
     dlnode NBA_ML_TailNode ;
@@ -751,7 +752,7 @@ typedef struct
     int64 SaveCompileMode, SaveOptimizeState, SaveScratchPadIndex ;
     //int64 LispParenLevel;
     int64 ParenLevel ;
-    int64 GlobalParenLevel ;
+    int64 GlobalParenLevel, OptimizeForcedReturn ;
     int64 BlockLevel ;
     int64 ArrayEnds ;
     byte * InitHere ;
