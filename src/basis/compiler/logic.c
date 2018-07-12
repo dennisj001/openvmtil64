@@ -285,6 +285,7 @@ _Compile_LogicalAnd ( Compiler * compiler )
 {
     CompileOptimizeInfo * optInfo = compiler->OptInfo ;
     //if ( ( optInfo->wordArg2_Op || optInfo->xBetweenArg1AndArg2 ) ) _Compile_Stack_PopToReg ( DSP, OREG ) ;
+    Set_SCA ( 0 ) ;
     Compile_BlockInfoTestLogic ( compiler, OREG, Z ) ;
     Compile_JCC ( Z, ZERO_TTT, Here + 15 ) ; // if eax is zero return not(R8) == 1 else return 0
     Compile_BlockInfoTestLogic ( compiler, ACC, NZ ) ;
@@ -325,6 +326,7 @@ void
 _Compile_LogicalNot ( Compiler * compiler )
 {
     //_DBI_ON ;
+    Set_SCA ( 0 ) ;
     Compile_BlockInfoTestLogic ( compiler, ACC, Z ) ;
     _Set_JccLogicCodeForNot ( compiler ) ;
     _Compile_LogicResultForStack ( ACC, Z ) ;

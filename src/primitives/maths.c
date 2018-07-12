@@ -36,11 +36,11 @@ CfrTil_IncDec ( int64 op ) // +
             //Interpreter_InterpretNextToken ( cntx->Interpreter0 ) ;
             if ( GetState ( compiler, C_INFIX_EQUAL ) && GetState ( _CfrTil_, OPTIMIZE_ON ) && CompileMode )
             {
-                SetHere ( one->Coding ) ;
+                if ( one ) SetHere ( one->Coding ) ;
                 // ?? couldn't this stuff be done with _Interpret_C_Until_EitherToken ??
                 dllist * postfixList = List_New ( ) ;
                 List_Push_1Value_Node ( postfixList, currentWord, COMPILER_TEMP ) ;
-                List_Push_1Value_Node ( postfixList, one, COMPILER_TEMP ) ;
+                if ( one ) List_Push_1Value_Node ( postfixList, one, COMPILER_TEMP ) ;
                 List_Push_1Value_Node ( compiler->PostfixLists, postfixList, COMPILER_TEMP ) ;
                 return ;
             }
@@ -55,7 +55,7 @@ CfrTil_IncDec ( int64 op ) // +
                 }
             }
         }
-        if ( one->CAttribute & ( PARAMETER_VARIABLE | LOCAL_VARIABLE | NAMESPACE_VARIABLE ) )
+        if ( one && one->CAttribute & ( PARAMETER_VARIABLE | LOCAL_VARIABLE | NAMESPACE_VARIABLE ) )
         {
             //if ( ( ! ( two->CAttribute & ( KEYWORD ) ) ) && GetState ( _Context_, C_SYNTAX ) )
             {

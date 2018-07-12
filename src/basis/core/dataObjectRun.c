@@ -8,6 +8,7 @@ _DataObject_Run ( Word * word0 )
     Word * word = cntx->CurrentlyRunningWord ; // = word0 : set CurrentlyRunningWord with the DObject Compile_SetCurrentlyRunningWord_Call_TestRSP created word
     Word * ns = word0 ; // set CurrentlyRunningWord with the DObject Compile_SetCurrentlyRunningWord_Call_TestRSP created word
     cntx->Interpreter0->w_Word = word ; // for ArrayBegin : all literals are run here
+    _Set_SCA ( word0 ) ; _Set_SCA ( word ) ;
     if ( word->LAttribute & LOCAL_OBJECT )
     {
         if ( ( word->CAttribute & LOCAL_VARIABLE ) && ( ! GetState ( word, W_INITIALIZED ) ) ) // this is a local variable so it is initialed at creation 
@@ -62,7 +63,7 @@ _DataObject_Run ( Word * word0 )
 void
 DataObject_Run ( )
 {
-    Word * word = (Word *) DataStack_Pop () ;//_Context_->CurrentlyRunningWord ;
+    Word * word = ( Word * ) DataStack_Pop ( ) ; //_Context_->CurrentlyRunningWord ;
     _DataObject_Run ( word ) ;
 }
 

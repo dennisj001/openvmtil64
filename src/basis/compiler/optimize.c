@@ -199,7 +199,7 @@ Compiler_Optimizer_WordArg2Op_Or_xBetweenArg1AndArg2 ( Compiler * compiler )
             _Compile_Move_StackN_To_Reg ( ACC, DSP, 0 ) ;
             Compile_SUBI ( REG, DSP, 0, CELL, 0 ) ;
             optInfo->Optimize_Reg = ACC | REG_ON_BIT ; // 0x16 : let Setup_MachineCodeInsnParameters know we have a parameter for it in case of ACC == 0
-            optInfo->Optimize_Rm = OREG | REG_ON_BIT ;
+            optInfo->Optimize_Rm = OREG ;
 
         }
     }
@@ -213,10 +213,7 @@ Compiler_Optimizer_1Arg ( Compiler * compiler )
     // remember : CATEGORY_DUP && CATEGORY_OP_LOAD were handled already in Compiler_OptimizeForOpNew
     if ( optInfo->opWord->CAttribute & ( CATEGORY_OP_LOAD ) ) Compiler_CompileOptimizedLoad ( compiler ) ;
     else if ( optInfo->opWord->CAttribute & ( CATEGORY_PLUS_PLUS_MINUS_MINUS ) ) Compiler_CompileOptimize_IncDec ( compiler ) ;
-    else if ( optInfo->wordArg2->StackPushRegisterCode )
-    {
-        Word_SetHere_StackPushRegisterCode ( optInfo->wordArg2 ), optInfo->Optimize_Reg = ACC | REG_ON_BIT ;
-    }
+    else if ( optInfo->wordArg2->StackPushRegisterCode ) Word_SetHere_StackPushRegisterCode ( optInfo->wordArg2 ), optInfo->Optimize_Reg = ACC | REG_ON_BIT ;
     else _Compile_Move_StackN_To_Reg ( ACC, DSP, 0 ), optInfo->Optimize_Reg = ACC | REG_ON_BIT ;
 }
 
@@ -249,7 +246,6 @@ Compiler_Optimizer_2Args_Or_WordArg1_Op ( Compiler * compiler )
                 _Compile_Stack_PopToReg ( DSP, ACC ) ;
             }
         }
-
         Compile_StandardArg ( optInfo->wordArg2, rm, optInfo->wordArg2_rvalue, 0 ) ;
         optInfo->Optimize_Rm = rm | REG_ON_BIT ;
     }
@@ -272,7 +268,7 @@ void
 Compile_StandardUnoptimized ( Compiler * compiler )
 {
     CompileOptimizeInfo * optInfo = compiler->OptInfo ;
-    _Compile_Move_StackN_To_Reg ( OREG, DSP, 0 ), optInfo->Optimize_Rm = OREG | REG_ON_BIT ;
+    _Compile_Move_StackN_To_Reg ( OREG, DSP, 0 ), optInfo->Optimize_Rm = OREG ;
     _Compile_Move_StackN_To_Reg ( ACC, DSP, - 1 ), optInfo->Optimize_Reg = ACC | REG_ON_BIT ;
     Compile_SUBI ( REG, DSP, 0, 2 * CELL, 0 ) ;
 }
@@ -344,7 +340,7 @@ Setup_MachineCodeInsnParameters ( Compiler * compiler, int8 direction, int8 mod,
     CompileOptimizeInfo * optInfo = compiler->OptInfo ;
     if ( optInfo->rtrn != OPTIMIZE_DONE )
     {
-        optInfo->Optimize_Reg = CheckForRegisterVariable ( compiler, reg ) ;
+        optInfo->Optimize_Reg = CheckForRegisterVariable ( compiler, reg ) ; // register variables override REG_ON_BIT
         if ( ( optInfo->Optimize_Reg & REG_ON_BIT ) && ( ! forceSet ) ) optInfo->Optimize_Reg = ( optInfo->Optimize_Reg & 0xf ) ;
         optInfo->Optimize_Mod = mod ;
         optInfo->Optimize_Dest_RegOrMem = direction ;
@@ -352,26 +348,8 @@ Setup_MachineCodeInsnParameters ( Compiler * compiler, int8 direction, int8 mod,
         optInfo->Optimize_Rm = CheckForRegisterVariable ( compiler, rm ) ;
         if ( ( optInfo->Optimize_Rm & REG_ON_BIT ) && ( ! forceSet ) ) optInfo->Optimize_Rm = ( optInfo->Optimize_Rm & 0xf ) ;
         optInfo->Optimize_Disp = disp ;
-        if ( ( optInfo->wordArg2 && optInfo->wordArg2->CAttribute & REGISTER_VARIABLE ) ||
-            ( optInfo->wordArg1 && optInfo->wordArg1->CAttribute & REGISTER_VARIABLE ) )
-        {
+        if ( ( optInfo->wordArg2 && optInfo->wordArg2->CAttribute & REGISTER_VARIABLE ) || ( optInfo->wordArg1 && optInfo->wordArg1->CAttribute & REGISTER_VARIABLE ) )
             optInfo->OptimizeFlag |= OPTIMIZE_REGISTER ;
-#if 0            
-            if ( ! ( ( optInfo->opWord->Definition == CfrTil_Multiply ) || ( optInfo->opWord->Definition == CfrTil_Divide ) ) ) // actually all ops without a reg operand - only an rm
-            {
-                optInfo->opWord->RegFlags = true ; //?? integrate this  
-                optInfo->opWord->Opt_Reg = optInfo->Optimize_Reg ;
-                optInfo->opWord->Opt_Rm = optInfo->Optimize_Rm ;
-            }
-#endif            
-        }
-#if 0        
-        if ( ( optInfo->opWord->Definition == CfrTil_ShiftLeft ) || ( optInfo->opWord->Definition == CfrTil_ShiftRight ) ||
-            ( optInfo->opWord->Definition == CfrTil_ShiftLeft_Equal ) || ( optInfo->opWord->Definition == CfrTil_ShiftRight_Equal ) )
-        {
-            optInfo->Optimize_Rm = CheckForRegisterVariable ( compiler, OREG ) ;
-        }
-#endif        
         if ( optInfo->opWord->CAttribute & BIT_SHIFT ) optInfo->Optimize_Rm = RAX ;
         optInfo->rtrn = 1 ;
     }
@@ -406,6 +384,18 @@ Word_SetHere_StackPushRegisterCode ( Word * word )
     if ( word->StackPushRegisterCode ) SetHere ( word->StackPushRegisterCode ) ;
 }
 
+#if 0
+void
+Compiler_Compile1Op ( Compiler * compiler )
+{
+    CompileOptimizeInfo * optInfo = compiler->OptInfo ;
+    //_Compile_IMUL ( int8 mod, int8 reg, int8 rm, int8 sib, int64 disp, uint64 imm )
+    //optInfo->Optimize_Reg = ACC ; // emulate MUL
+    _Compile_IMUL ( optInfo->Optimize_Mod, optInfo->Optimize_Reg, optInfo->Optimize_Rm, 0, optInfo->Optimize_Disp, 0 ) ;
+    if ( optInfo->Optimize_Rm == DSP ) _Compile_Move_Reg_To_StackN ( DSP, 0, optInfo->Optimize_Reg ) ;
+    else _Word_CompileAndRecord_PushReg ( _Compiler_WordList ( compiler, 0 ), optInfo->Optimize_Reg ) ;
+}
+#endif
 // OpEqual is different from Store/Equal because we have to do the op first then the equal, obviously but important to remember 
 // we need to set up the more specific OpEqual for that
 // arg1 *= arg2 
@@ -648,3 +638,4 @@ GetRmDispImm ( CompileOptimizeInfo * optInfo, Word * word, int64 suggestedReg )
         optInfo->OptimizeFlag |= OPTIMIZE_RM ;
     }
 }
+

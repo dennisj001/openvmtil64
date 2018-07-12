@@ -760,7 +760,7 @@ typedef struct
     int8 InLParenBlock, SemicolonEndsThisBlock, TakesLParenAsBlock, BeginBlockFlag ;
     int32 * AccumulatedOffsetPointer ;
     int64 * FrameSizeCellOffset, BlocksBegun ;
-    int8 RegOrder [ 4 ] ;
+    //int8 RegOrder [ 4 ] ;
     byte * RspSaveOffset ;
     byte * RspRestoreOffset ;
     Word * ReturnVariableWord ;

@@ -229,6 +229,7 @@ _CfrTil_Do_IncDec ( int64 op )
 {
     Context * cntx = _Context_ ;
     Compiler * compiler = cntx->Compiler0 ;
+    Set_SCA ( 0 ) ;
     if ( CompileMode )
     {
         Compile_X_Group5 ( compiler, op ) ; // ? INC : DEC ) ; //, RVALUE ) ;

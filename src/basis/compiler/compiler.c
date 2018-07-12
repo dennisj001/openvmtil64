@@ -40,7 +40,6 @@ _Compiler_CopyDuplicatesAndPush ( Compiler * compiler, Word * word0 )
         wordToBePushed = word1 ;
     }
     else wordToBePushed = word0 ;
-    CfrTil_WordList_PushWord ( wordToBePushed ) ;
     return wordToBePushed ;
 }
 
@@ -52,7 +51,7 @@ Compiler_CopyDuplicatesAndPush ( Word * word0 )
     {
         word0 = _Compiler_CopyDuplicatesAndPush ( _Context_->Compiler0, word0 ) ;
     }
-    else CfrTil_WordList_PushWord ( word0 ) ;
+    CfrTil_WordList_PushWord ( word0 ) ;
     return word0 ;
 }
 
@@ -228,7 +227,7 @@ Compiler_Init ( Compiler * compiler, uint64 state )
     if ( ! IsSourceCodeOn )
     {
         DLList_RecycleWordList ( compiler->WordList ) ;
-        compiler->WordList = _dllist_New ( TEMPORARY ) ;
+        compiler->WordList = _dllist_New ( CFRTIL ) ;
     }
     else
     {
@@ -238,7 +237,7 @@ Compiler_Init ( Compiler * compiler, uint64 state )
             compiler->CurrentWordCompiling->W_SC_WordList = compiler->WordList ;
             compiler->CurrentWordCompiling->W_SC_MemSpaceRandMarker = _Q_->MemorySpace0->TempObjectSpace->InitFreedRandMarker ; // this insures that memory for this list hasn't been recycled
         }
-        compiler->WordList = _dllist_New ( TEMPORARY ) ;
+        compiler->WordList = _dllist_New ( CFRTIL ) ;
     }
     CfrTil_InitBlockSystem ( compiler ) ;
     compiler->ContinuePoint = 0 ;
@@ -273,7 +272,7 @@ Compiler_New ( uint64 type )
 {
     Compiler * compiler = ( Compiler * ) Mem_Allocate ( sizeof (Compiler ), type ) ;
     compiler->BlockStack = Stack_New ( 64, type ) ;
-    compiler->WordList = _dllist_New ( TEMPORARY ) ;
+    compiler->WordList = _dllist_New ( CFRTIL ) ;
     compiler->PostfixLists = _dllist_New ( type ) ;
     compiler->CombinatorBlockInfoStack = Stack_New ( 64, type ) ;
     compiler->GotoList = _dllist_New ( type ) ;
@@ -283,8 +282,7 @@ Compiler_New ( uint64 type )
     compiler->CombinatorInfoStack = Stack_New ( 64, type ) ;
     compiler->InfixOperatorStack = Stack_New ( 32, type ) ;
     Compiler_CompileOptimizeInfo_New ( compiler, type ) ;
-    compiler->RegOrder [ 0 ] = OREG2 ;
-    compiler->RegOrder [ 1 ] = OREG ;
+    //compiler->RegOrder [ 0 ] = OREG2 ;  compiler->RegOrder [ 1 ] = OREG ;
     Compiler_Init ( compiler, 0 ) ;
     return compiler ;
 }

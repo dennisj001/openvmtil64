@@ -286,6 +286,12 @@ _CfrTil_WordList_TopWord ( )
 }
 
 void
+Word_Set_SCA ( Word * word0 )
+{
+    if ( word0 ) word0->Coding = Here ;
+}
+
+void
 _CfrTil_WordList_PopWords (int64 n)
 {
     Compiler * compiler = _Compiler_ ;
@@ -415,12 +421,6 @@ Debugger_Show_InUse_CompilerWordList ( Debugger * debugger )
 {
     byte * prefix = debugger->w_Word->Name ;
     _Compiler_Show_WordList (prefix, 1) ;
-}
-
-void
-Word_Set_SCA ( Word * word0 )
-{
-    if ( word0 ) word0->Coding = Here ;
 }
 
 void

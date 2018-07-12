@@ -359,7 +359,7 @@ stringMacrosOn
 Root 
 'doX64 1 const
 'doScript 1 const
-'_doDemo 0 const    
+'_doDemo 1 const    
 //dbgOff
 //dbgOn 
 dbgOnVar 1 = 

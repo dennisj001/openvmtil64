@@ -75,11 +75,7 @@ void
 CFactorial3_O3 ( void )
 {
     int64 rec1 = 1, n = TOS ;
-    while ( n > 1 )
-    {
-
-        rec1 *= n -- ;
-    }
+    while ( n > 1 ) rec1 *= n -- ;
     TOS = rec1 ;
 }
 

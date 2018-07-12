@@ -1,5 +1,5 @@
 cd src
-make oclean
+//make oclean
 make default
 make static
 strip -o ../bin/cfrtil64 ../bin/cfrtil64-gdb
