@@ -710,6 +710,13 @@ _String_GetStringToEndOfLine ( )
     return str ;
 }
 
+Boolean 
+IsPunct ( byte b )
+{
+    if ( ispunct (b) && ( b != '_')) return true ;
+    else return false;
+}
+
 int64
 String_CheckWordSize ( byte * str, int64 wl, Boolean punctFlag )
 {
@@ -719,9 +726,9 @@ String_CheckWordSize ( byte * str, int64 wl, Boolean punctFlag )
     {
         if ( punctFlag ) 
         {
-            if ( ! ispunct ( str[i] ) ) break ;
+            if ( ! IsPunct ( str[i] ) ) break ;
         }
-        else if ( ispunct ( str[i] ) || (str[i]==' ')) break ;
+        else if ( IsPunct ( str[i] ) || (str[i]==' ')) break ;
         if ( abs (i) >= ( wl + 1 ) ) break ;
     }
     start = & str [i+1] ;
@@ -729,9 +736,9 @@ String_CheckWordSize ( byte * str, int64 wl, Boolean punctFlag )
     {
         if ( punctFlag ) 
         {
-            if ( ! ispunct ( str[i] ) ) break ;
+            if ( ! IsPunct ( str[i] ) ) break ;
         }
-        else if ( ispunct ( str[i] ) || (str[i]==' ')) break ;
+        else if ( IsPunct ( str[i] ) || (str[i]==' ')) break ;
         if ( abs (i) >= ( wl + 1 ) ) break ;
     }
     end = & str [i-1] ;
@@ -747,7 +754,7 @@ String_FindStrnCmpIndex ( byte * sc, byte* name0, int64 index0, int64 wl0, int64
     byte * scspp2, *scspp, *scindex ;
     d0 ( scspp = & sc [ index0 ] ) ;
     int64 i, n, index = index0, slsc = Strlen ( sc ) ;
-    Boolean punctuationFlag = ispunct ( name0[0] ) ;
+    Boolean punctuationFlag = IsPunct ( name0[0] ) ;
     for ( i = 0, n = wl0 + inc ; i <= n ; i ++ ) // tokens are parsed in different order with parameter and c rtl args, etc. 
     {
         scindex = & sc [ index - i ] ;

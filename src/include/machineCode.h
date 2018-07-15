@@ -289,9 +289,9 @@ register int64 *Fp              asm ("r15" ) ;
 // jcc8 ( 0x7 << 4 | ttt << 1 | n ) : 1 byte
 // n : on/off bit
 #define ZERO 0
-#define Z ZERO 
+#define NEGFLAG_Z ZERO 
 #define NOT_ZERO 1
-#define NZ NOT_ZERO
+#define NEGFLAG_NZ NOT_ZERO
 // ttt : condition codes
 // remember these are left shifted one
 //#define OVERFLOW 0

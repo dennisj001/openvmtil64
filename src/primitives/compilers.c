@@ -117,7 +117,6 @@ _CfrTil_CompileCallGoto ( byte * name, uint64 type )
 {
     if ( type == GI_RECURSE ) 
     {
-        //Compile_CallReg_TestRSP ( 0 ) ; 
         _Compile_UninitializedCall ( ) ;
     }
     else _Compile_UninitializedJump ( ) ;

@@ -49,7 +49,7 @@ Debugger_Dis ( Debugger * debugger )
         _Printf ( ( byte* ) "\nDisassembly of : %s.%s", c_ud ( word->ContainingNamespace ? word->ContainingNamespace->Name : ( byte* ) "" ), c_gd ( word->Name ) ) ;
         int64 codeSize = word->S_CodeSize ;
         SetState ( debugger, DBG_DISASM_ACC, true ) ;
-        _Debugger_Disassemble ( debugger, ( byte* ) word->CodeStart, codeSize ? codeSize : 64, (word->CAttribute & ( CPRIMITIVE | DLSYM_WORD | DEBUG_WORD ) ? 1 : 0) ) ;
+        _Debugger_Disassemble ( debugger, ( byte* ) word->CodeStart, codeSize ? codeSize : 64, ( word->CAttribute & ( CPRIMITIVE | DLSYM_WORD | DEBUG_WORD ) ? 1 : 0 ) ) ;
         SetState ( debugger, DBG_DISASM_ACC, false ) ;
 #if 0        
         if ( debugger->DebugAddress )
@@ -75,16 +75,13 @@ void
 _Debugger_DisassembleWrittenCode ( Debugger * debugger )
 {
     Word * word = debugger->w_Word ;
-    int64 codeSize = Here - debugger->PreHere ;
-    if ( codeSize > 0 )
+    int64 codeSize = debugger->PreHere ? Here - debugger->PreHere : 0 ;
+    if ( word && ( codeSize > 0 ) )
     {
-        if ( word ) //&& ( codeSize > 0 ) )
-        {
-            NamedByteArray * nba = Get_CompilerSpace ( )->OurNBA ;
-            byte * csName = nba ? ( byte * ) c_gd ( nba->NBA_Name ) : ( byte* ) "" ;
-            _Printf ( ( byte* ) "\nCode compiled to %s for word :> %s <: at %s", csName, c_gd ( String_CB ( word->Name ) ), Context_Location ( ) ) ;
-            _Debugger_Disassemble ( debugger, ( codeSize > 0 ) ? debugger->PreHere : Here, codeSize, (word->CAttribute & ( CPRIMITIVE | DLSYM_WORD | DEBUG_WORD ) ? 1 : 0) ) ;
-        }
+        NamedByteArray * nba = Get_CompilerSpace ( )->OurNBA ;
+        byte * csName = nba ? ( byte * ) c_gd ( nba->NBA_Name ) : ( byte* ) "" ;
+        _Printf ( ( byte* ) "\nCode compiled to %s for word :> %s <: %4d bytes : at %s", csName, c_gd ( String_CB ( word->Name ) ), codeSize, Context_Location ( ) ) ;
+        _Debugger_Disassemble ( debugger, ( codeSize > 0 ) ? debugger->PreHere : Here, codeSize, ( word->CAttribute & ( CPRIMITIVE | DLSYM_WORD | DEBUG_WORD ) ? 1 : 0 ) ) ;
     }
 }
 
@@ -104,7 +101,6 @@ Debugger_DisassembleAccumulated ( Debugger * debugger )
 void
 Debugger_DisassembleTotalAccumulated ( Debugger * debugger )
 {
-    _Printf ( ( byte* ) "\nDisassembling the current word : \'%s\' : total accumulated code ...", _Context_->Compiler0->CurrentWordCompiling ? _Context_->Compiler0->CurrentWordCompiling->Name : ( byte* ) "" ) ;
     byte * address = _Context_->Compiler0->InitHere ;
     if ( ! ( Here - address ) )
     {
@@ -115,6 +111,7 @@ Debugger_DisassembleTotalAccumulated ( Debugger * debugger )
     SetState ( _CfrTil_, GLOBAL_SOURCE_CODE_MODE, true ) ;
     SetState ( debugger, DBG_DISASM_ACC, true ) ;
     //debugger->LastSourceCodeWord = 0 ;
+    _Printf ( ( byte* ) "\nDisassembling the current word : \'%s\' : %4d bytes : total accumulated code ...", _Context_->Compiler0->CurrentWordCompiling ? _Context_->Compiler0->CurrentWordCompiling->Name : ( byte* ) "", size ) ;
     _Debugger_Disassemble ( debugger, address, size, ! Compiling ) ;
     SetState ( _CfrTil_, GLOBAL_SOURCE_CODE_MODE, svState ) ;
     SetState ( debugger, DBG_DISASM_ACC, false ) ;

@@ -152,21 +152,42 @@ __Stack_Pop ( Stack * stack )
 }
 
 int64
-_Stack_Pop_ExceptionFlag ( Stack * stack, int64 exceptionOnEmptyFlag )
+_Stack_Pop ( Stack * stack )
 {
-    if ( _Stack_IsEmpty ( stack ) )
-    {
-        if ( exceptionOnEmptyFlag ) CfrTil_Exception ( STACK_UNDERFLOW, 0, QUIT ) ;
-        else return 0 ;
-    }
     return __Stack_Pop ( stack ) ;
 }
 
 int64
-_Stack_Pop ( Stack * stack )
+Stack_Pop_WithExceptionFlag ( Stack * stack, int64 exceptionOnEmptyFlag )
 {
-    if ( _Stack_IsEmpty ( stack ) ) CfrTil_Exception ( STACK_UNDERFLOW, 0, QUIT ) ;
-    return __Stack_Pop ( stack ) ;
+    if ( _Stack_IsEmpty ( stack ) )
+    {
+        if ( exceptionOnEmptyFlag == 1 ) CfrTil_Exception ( STACK_UNDERFLOW, 0, QUIT ) ;
+        else return 0 ;
+    }
+    return _Stack_Pop ( stack ) ;
+}
+
+int64
+Stack_Pop_WithZeroOnEmpty ( Stack * stack )
+{
+    Stack_Pop_WithExceptionFlag ( stack, 0 ) ;
+}
+
+int64
+Stack_Pop_WithExceptionOnEmpty ( Stack * stack )
+{
+    Stack_Pop_WithExceptionFlag ( stack, 1 ) ;
+}
+
+int64
+Stack_Pop ( Stack * stack )
+{
+#if STACK_CHECK_ERROR
+    return Stack_Pop_WithExceptionFlag ( stack, 1 ) ;
+#else
+    return _Stack_Pop ( stack ) ;
+#endif    
 }
 
 int64
@@ -248,24 +269,6 @@ Stack_Push ( Stack * stack, int64 value )
 #endif
 }
 
-int64
-Stack_Pop_WithExceptionOnEmpty ( Stack * stack )
-{
-#if STACK_CHECK_ERROR
-    if ( _Stack_IsEmpty ( stack ) ) CfrTil_Exception ( STACK_UNDERFLOW, 0, QUIT ) ;
-    return _Stack_Pop ( stack ) ;
-#else
-    _Stack_Pop ( stack ) ;
-#endif
-}
-
-int64
-Stack_Pop_WithZeroOnEmpty ( Stack * stack )
-{
-    if ( _Stack_IsEmpty ( stack ) ) return 0 ;
-    return _Stack_Pop ( stack ) ;
-}
-
 void
 Stack_Dup ( Stack * stack )
 {
@@ -282,8 +285,8 @@ _Stack_IntegrityCheck ( Stack * stack )
 {
     // first a simple integrity check of the stack info struct
     //Set_StackPointerFromDsp ( _CfrTil_ ) ;
-    if ( ( stack->StackMin == & (stack->StackData [ 0 ]) ) &&
-        ( stack->StackMax == & (stack->StackData [ stack->StackSize - 1 ]) ) && // -1 : zero based array
+    if ( ( stack->StackMin == & ( stack->StackData [ 0 ] ) ) &&
+        ( stack->StackMax == & ( stack->StackData [ stack->StackSize - 1 ] ) ) && // -1 : zero based array
         ( stack->InitialTosPointer == & stack->StackData [ - 1 ] ) )
     {
         return true ;

@@ -48,6 +48,7 @@ Debugger_TableSetup ( Debugger * debugger )
     debugger->CharacterTable [ 'H' ] = 31 ;
     debugger->CharacterTable [ 'O' ] = 32 ;
     debugger->CharacterTable [ 'Q' ] = 33 ;
+    debugger->CharacterTable [ 'L' ] = 34 ;
 
     // debugger : system related
     debugger->CharacterFunctionTable [ 0 ] = Debugger_Default ;
@@ -85,6 +86,7 @@ Debugger_TableSetup ( Debugger * debugger )
     debugger->CharacterFunctionTable [ 31 ] = DebugWordList_ShowAll ;
     debugger->CharacterFunctionTable [ 32 ] = Debugger_Show_InUse_CompilerWordList ;
     debugger->CharacterFunctionTable [ 33 ] = Debugger_CfrTilRegisters ;
+    debugger->CharacterFunctionTable [ 34 ] = Debugger_GotoList_Print ;
 }
 
 void
@@ -313,6 +315,12 @@ Debugger_FindAny ( Debugger * debugger )
     if ( debugger->w_Word ) _Printf ( ( byte* ) ( byte* ) "\nFound Word :: %s.%s\n", debugger->w_Word->S_ContainingNamespace->Name, debugger->w_Word->Name ) ;
 
     else _Printf ( ( byte* ) ( byte* ) "\nToken not found : %s\n", debugger->Token ) ;
+}
+
+void
+Debugger_GotoList_Print ( Debugger * debugger )
+{
+    Compiler_GotoList_Print ( ) ;    
 }
 
 void

@@ -145,7 +145,7 @@ dscOn //verbosity 3 =
     fn @ 
 ;
 ' fibPTC? find wdiss 
-20 fibPTC? dup p 6765 _assert0 verbosity 1 = //pause
+20 fibPTC? dup p 6765 _assert0 verbosity 1 = pause
 dscOff
 : fibPTC3? ( n | svn fn fn1 fn2 ) 
     { svn n @ = fn 0 = fn1 0 = fn2 1 = } { n @ } { n n @ 1 - = } 

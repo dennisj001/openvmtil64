@@ -44,21 +44,12 @@ Int User
 : ppT preprocessorTest ;
 : lT lispTest ;
 
+: testX cST ;
 #if doX64
-#if 0 //NEW_OPTIMIZER_WORKING
-: basicT ppT cT mT fT stT ;
-: testX ;
-#else
-//: basicT ppT cT mT aT loT bT locT fT oT x64 cntT lT sT sysT interpT stT dT0 ;
-: basicT   ppT cT mT aT loT bT locT fT oT x64      lT sT sysT interpT stT ;
-//: basicT   ppT cT mT loT bT locT fT oT x64      lT sT sysT interpT stT ; // no aT or cntT ??
-TODO ( "no aT or cntT ??" )
-: testX cST dT0 ;
-#endif
+: basicT ppT cT mT aT loT bT locT fT oT x64 cntT lT sT sysT interpT stT dT0 ;
 #else
 : basicT ppT cT mT aT loT bT locT fT oT     cntT lT sT sysT interpT stT cST dT0 ;
 //: testX cST dT0 dT ;
-: testX cST ;
 #endif
 : _basicT bT mT cntT lT fT sysT  ;
 : testBasic basicT ;

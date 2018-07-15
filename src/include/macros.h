@@ -1,7 +1,6 @@
 
 //#define myprintf(a, b, rest...) printf (a, b, ## rest)
 #define Exception( type, response ) CfrTil_Exception (type, 0, response )
-#define Stack_Pop(stack) Stack_Pop_WithExceptionOnEmpty ( stack )
 
 #define _Q_CodeByteArray _Q_->CodeByteArray
 #define _Q_CodeSpace _Q_->MemorySpace0->CodeSpace
@@ -67,6 +66,7 @@
 //#define CompilerLastWord Compiler_WordStack( 0 )
 //#define WordsBack( n ) Compiler_WordStack( (-n) )
 #define WordsBack( n ) Compiler_WordList( (n) )
+#define WordStack( n ) Compiler_WordList( (n) )
 #define N_FREE  1
 #define N_UNLOCKED 2
 #define N_LOCKED  4
@@ -257,6 +257,7 @@
 #define DBI_ON DEBUG_ASM_SHOW_ON
 #define DBI_OFF DEBUG_ASM_SHOW_OFF
 #define DBI ( Is_DebugOn & _DBI )
+#define Is_DebugOn_DBI ( Is_DebugOn ? DBI : 0 )
 #define DBI_N( n ) (GetState ( _Debugger_, DBG_ASM_SHOW_ON ) && ( _Q_->Verbosity > n ) )
 
 #define Is_LValue( word ) ( GetState ( _Context_->Compiler0, LC_ARG_PARSING ) ? 0 : Interpret_CheckEqualBeforeSemi_LValue ( word ))

@@ -54,6 +54,7 @@ DWL_Find ( dllist * list, Word * iword, byte * address, byte* name, int64 fromFi
                 }
                 if ( foundWord )
                 {
+                    // remember there are probably many words with this compiled at address because we don't remove when we rewrite code
                     fDiff = abs ( scwi - foundWord->W_SC_WordIndex ) ;
                     //if ( ( fDiff < SC_WINDOW ) || ( scwi < foundWord->W_SC_WordIndex ) )
                     if ( ( scwi < foundWord->W_SC_WordIndex ) )

@@ -20,14 +20,14 @@ CfrTil_EndCombinator ( int64 quotesUsed, int64 moveFlag )
     BlockInfo *bi = ( BlockInfo * ) _Stack_Pick ( compiler->CombinatorBlockInfoStack, quotesUsed - 1 ) ; // -1 : remember - stack is zero based ; stack[0] is top
     compiler->BreakPoint = Here ;
     _CfrTil_InstallGotoCallPoints_Keyed ( ( BlockInfo* ) bi, GI_CONTINUE | GI_BREAK ) ;
-    if ( moveFlag ) 
+    if ( moveFlag )
     {
         byte * qCodeStart ;
         if ( bi->FrameStart ) qCodeStart = bi->bp_First ; // after the stack frame
         else qCodeStart = bi->ActualCodeStart ;
         Block_Copy ( qCodeStart, bi->CombinatorStartsAt, Here - bi->CombinatorStartsAt, 0 ) ;
     }
-    _CfrTil_InstallGotoCallPoints_Keyed ( ( BlockInfo* ) bi, GI_GOTO ) ;
+    //_CfrTil_InstallGotoCallPoints_Keyed ( ( BlockInfo* ) bi, GI_GOTO | GI_RETURN | GI_RECURSE ) ; // done in EndBlock not here
     _Stack_DropN ( compiler->CombinatorBlockInfoStack, quotesUsed ) ;
     if ( GetState ( compiler, LISP_COMBINATOR_MODE ) )
     {
@@ -41,7 +41,7 @@ BlockInfo *
 CfrTil_BeginCombinator ( int64 quotesUsed )
 {
     Compiler * compiler = _Context_->Compiler0 ;
-    d0 ( if ( Is_DebugOn ) _Printf ( ( byte* ) "\n\nCfrTil_BeginCombinator : blockStack depth = %d : DataStack depth = %d : running \'%s\' : compiling  \'%s\' : quotes = %d : %s\n\n", 
+    d0 ( if ( Is_DebugOn ) _Printf ( ( byte* ) "\n\nCfrTil_BeginCombinator : blockStack depth = %d : DataStack depth = %d : running \'%s\' : compiling  \'%s\' : quotes = %d : %s\n\n",
         _Stack_Depth ( compiler->BlockStack ), DataStack_Depth ( ),
         _Context_->CurrentlyRunningWord->Name, compiler->CurrentWordCompiling->Name, quotesUsed, Context_Location ( ) ) ) ;
     BlockInfo *bi = ( BlockInfo * ) _Stack_Pick ( compiler->CombinatorBlockInfoStack, quotesUsed - 1 ) ; // -1 : remember - stack is zero based ; stack[0] is top
@@ -57,10 +57,12 @@ CfrTil_BeginCombinator ( int64 quotesUsed )
 void
 CfrTil_DropBlock ( )
 {
+    //block dropBlock = ( block ) TOS ;
     DataStack_DropN ( 1 ) ;
     if ( CompileMode )
     {
         CfrTil_BeginCombinator ( 1 ) ;
+        //Block_CopyCompile ( ( byte* ) dropBlock, 0, 0 ) ; // in case there are control labels
         CfrTil_EndCombinator ( 1, 0 ) ;
     }
 }
@@ -120,7 +122,7 @@ CfrTil_WhileCombinator ( )
         CfrTil_BeginCombinator ( 2 ) ;
         byte * start = Here ;
         compiler->ContinuePoint = Here ;
-        d0 ( if ( Is_DebugModeOn ) _Compiler_Show_WordList (( byte* ) "\nCheckOptimize : after optimize :", 0) ) ;
+        d0 ( if ( Is_DebugModeOn ) _Compiler_Show_WordList ( ( byte* ) "\nCheckOptimize : after optimize :", 0 ) ) ;
         if ( ! Block_CopyCompile ( ( byte* ) testBlock, 1, 1 ) )
         {
             SetHere ( start ) ;
@@ -187,13 +189,7 @@ CfrTil_If1Combinator ( )
     {
         //DBI_ON ;
         BlockInfo * bi = CfrTil_BeginCombinator ( 1 ) ;
-        if ( bi->LogicCodeWord && bi->LogicCodeWord->StackPushRegisterCode )
-        {
-            SetHere ( bi->LogicCodeWord->StackPushRegisterCode ) ;
-            _Compile_TEST_Reg_To_Reg ( ACC, ACC ) ;
-        }
-        else Compile_GetLogicFromTOS ( bi, 0 ) ;
-
+        Compile_BlockLogicTest ( bi ) ;
         _Compile_UninitializedJumpEqualZero ( ) ;
         Stack_PointerToJmpOffset_Set ( ) ;
         Block_CopyCompile ( ( byte* ) doBlock, 0, 0 ) ;
@@ -243,7 +239,7 @@ CfrTil_TrueFalseCombinator2 ( )
     {
         CfrTil_BeginCombinator ( 2 ) ;
 
-        Compile_GetLogicFromTOS ( 0, 0 ) ;
+        Compile_BlockLogicTest ( 0 ) ;
         _Compile_UninitializedJumpEqualZero ( ) ;
         Stack_PointerToJmpOffset_Set ( ) ;
 
@@ -360,20 +356,19 @@ CfrTil_ForCombinator ( )
 
         byte * start = Here ;
 
-        Block_CopyCompile ( ( byte* ) testBlock, 2, 1 ) ;
+        Block_CopyCompile ( ( byte* ) testBlock, 2, 1 ) ; // 1 : jccFlag for this block
 
         compiler->ContinuePoint = Here ;
 
         Block_CopyCompile ( ( byte* ) doBlock, 0, 0 ) ;
 
-        d0 ( _Compiler_Show_WordList (( byte* ) "for combinator : before doPostBlock", 0) ) ;
+        d0 ( _Compiler_Show_WordList ( ( byte* ) "for combinator : before doPostBlock", 0 ) ) ;
         Block_CopyCompile ( ( byte* ) doPostBlock, 1, 0 ) ;
 
         _Compile_JumpToAddress ( start ) ;
-
         CfrTil_CalculateAndSetPreviousJmpOffset_ToHere ( ) ;
 
-        CfrTil_EndCombinator ( 4, 0 ) ; //0 ) ; //! GetState ( _Context_, C_SYNTAX ) ) ;
+        CfrTil_EndCombinator ( 4, 1 ) ; 
     }
     else
     {

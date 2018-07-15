@@ -226,7 +226,7 @@ _CfrTil_C_Infix_EqualOp ( Word * opWord )
     if ( GetState ( compiler, C_COMBINATOR_LPAREN ) )
     {
         if ( word0->StackPushRegisterCode ) SetHere ( word0->StackPushRegisterCode ) ; // this is the usual after '=' in non C syntax; assuming optimizeOn
-        BlockInfo_Setup_BI_tttn ( compiler, ZERO_TTT, NZ, 3 ) ; // must set logic flag for Compile_ReConfigureLogicInBlock in Block_Compile_WithLogicFlag
+        BlockInfo_Setup_BI_tttn ( compiler, ZERO_TTT, NEGFLAG_NZ, 6 ) ; // must set logic flag for Compile_ReConfigureLogicInBlock in Block_Compile_WithLogicFlag
     }
     List_InterpretLists ( compiler->PostfixLists ) ;
     compiler->LHS_Word = 0 ;

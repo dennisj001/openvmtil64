@@ -121,7 +121,6 @@ void
 _Compile_GetVarLitObj_RValue_To_Reg ( Word * word, int64 reg )
 {
     Word_Set_SCA ( word ) ;
-    word->Coding = Here ; // we don't need the word's code if compiling -- this is an optimization though
     if ( word->CAttribute & REGISTER_VARIABLE )
     {
         if ( word->RegToUse == reg ) return ;
@@ -209,7 +208,6 @@ void
 _Compile_GetVarLitObj_LValue_To_Reg ( Word * word, int64 reg )
 {
     Word_Set_SCA ( word ) ;
-    word->Coding = Here ;
     if ( word->CAttribute & REGISTER_VARIABLE )
     {
         if ( word->RegToUse == reg ) return ;

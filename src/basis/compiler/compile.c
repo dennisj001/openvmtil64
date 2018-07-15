@@ -56,10 +56,11 @@ void
 _AdjustGotoInfo ( dlnode * node, int64 originalAddress )
 {
     GotoInfo * gotoInfo = ( GotoInfo* ) node ;
-    if (( gotoInfo->CompileAtAddress == ( byte* ) originalAddress ) ) //&& (gotoInfo->GI_CAttribute != GI_LABEL )) 
+    if ( ( gotoInfo->CompileAtAddress == ( byte* ) originalAddress ) ) //&& (gotoInfo->GI_CAttribute != GI_LABEL )) 
     {
         gotoInfo->CompileAtAddress = Here ;
         gotoInfo->pb_JmpOffsetPointer = Here + 1 ;
+        //_CfrTil_AdjustDbgSourceCodeAddress ( (byte*) originalAddress, Here + 1 ) ;
     }
 }
 
@@ -68,14 +69,17 @@ AdjustJmpOffsetPointer ( dlnode * node, int64 address )
 {
     GotoInfo * gi = ( GotoInfo * ) node ;
     if ( ( gi->pb_JmpOffsetPointer == ( byte* ) address ) ) //&& ( gi->GI_CAttribute != GI_GOTO ) )
+    {
         gi->pb_JmpOffsetPointer = Here + 1 ;
+        //_CfrTil_AdjustDbgSourceCodeAddress ( (byte*) address, Here + 1 ) ;
+    }
 }
 
 void
 AdjustLabel ( dlnode * node, int64 address )
 {
     GotoInfo * gi = ( GotoInfo * ) node ;
-    if ( gi->LabeledAddress == ( byte* ) address ) 
+    if ( gi->LabeledAddress == ( byte* ) address )
         gi->LabeledAddress = Here ;
 }
 
@@ -95,7 +99,7 @@ _InstallGotoPoint_Key ( dlnode * node, int64 blockInfo, int64 key )
     int64 address = * ( int32* ) gotoInfo->pb_JmpOffsetPointer ;
     if ( ( address == 0 ) || ( key & ( GI_BREAK | GI_RETURN | GI_GOTO | GI_LABEL ) ) ) // if we move a block its recurse offset remains, check if this looks like at real offset pointer
     {
-        if ( ( ( gotoInfo->GI_CAttribute & ( GI_GOTO ) ) && ( key & ( GI_GOTO )) ) )
+        if ( ( ( gotoInfo->GI_CAttribute & ( GI_GOTO ) ) && ( key & ( GI_GOTO ) ) ) )
             // || ( ( gotoInfo->GI_CAttribute & ( GI_LABEL ) ) && ( key & ( GI_LABEL )) ) )
         {
             Namespace * ns = _Namespace_Find ( ( byte* ) "__labels__", _CfrTil_->Namespaces, 0 ) ;
@@ -162,6 +166,7 @@ _CfrTil_InstallGotoCallPoints_Keyed ( BlockInfo * bi, int64 key )
 }
 
 #if 0
+
 int64
 _CfrTil_AdjustGotoPoint ( int64 originalAddress )
 {
@@ -192,6 +197,7 @@ CfrTil_RemoveGotoPoints ( int64 key ) // compile time
 }
 
 #if 0
+
 void
 _Compile_RspReg_Restore ( )
 {

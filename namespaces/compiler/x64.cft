@@ -490,7 +490,7 @@ Stack
 asm;
 
 ' ndup find wdiss sp 
-s 7 ndup 7 ndrop
+7 ndup 7 ndrop
 //s pause
 Asm
 // following intel conventions in the naming : insn dst, src

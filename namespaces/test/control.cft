@@ -27,17 +27,25 @@ nl 10 abrk0 sp
 
 : leaving ( str n j ) s "leaving" ps str @ ps "n =" ps n @ p "j = " ps j @ p s ;
 
+: ct00 ( n | j ) 
+    { j 1 = } { j @ n @ <= } { j ++ }
+    {
+       n @ p j @ p 
+    }
+    for
+;
+'ct00 find wdiss
+17 ct00 //pause
 : ct0 ( n | j ) 
     nl "ct0 : " ps nl
     { 
         label: test1 
         "ct0 before goto/label works" ps nl 
         goto: leave 
-        //return 
     } _
     { j 1 = } { j @ n @ <= } { j ++ }
     {
-       n @ <dbg> p j @ p 
+       n @ p j @ p 
        { n @ j @ == } { nl "testing ct0 : goto/label \'hi\' ->" ps goto: test1 } { "continuing ct0" ps } ifElse
     }
     for
@@ -45,7 +53,7 @@ nl 10 abrk0 sp
     "ct0" n @ j @ leaving
 ;
 'ct0 find wdiss
-17 d: ct0 //pause
+17 ct0 //pause
 : ct1 ( n | j ) 
     nl "ct1 : " ps nl
     { j 1 = } { j @ n @ <= } { j ++ }
@@ -71,7 +79,7 @@ ct2
     nl "hic2 : done " ps nl 
 ;
 'hic2 find wdiss
-//3 hic2 pause
+3 hic2 //pause
 #if 1 //dbOn @ not
 7 hic2
 #endif

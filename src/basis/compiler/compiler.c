@@ -139,6 +139,41 @@ _Compiler_FreeAllLocalsNamespaces ( Compiler * compiler )
     _Namespace_FreeNamespacesStack ( compiler->LocalsCompilingNamespacesStack ) ;
 }
 
+#if 0
+typedef struct
+{
+    Symbol GI_Symbol ;
+    byte * pb_LabelName ;
+    byte * CompileAtAddress ;
+    byte * LabeledAddress ;
+    byte * pb_JmpOffsetPointer ;
+} GotoInfo ;
+// GotoInfo Types
+#define GI_BREAK ( (uint64) 1 << 0 )
+#define GI_RETURN ( (uint64) 1 << 1 )
+#define GI_CONTINUE ( (uint64) 1 << 2 )
+#define GI_GOTO ( (uint64) 1 << 3 )
+#define GI_RECURSE ( (uint64) 1 << 4 )
+#define GI_TAIL_CALL ( (uint64) 1 << 5 )
+#define GI_LABEL ( (uint64) 1 << 6 )
+#define GI_GOTO_LABEL ( (uint64) 1 << 7 )
+#endif
+void
+GotoInfo_Print ( dlnode * node )
+{
+    GotoInfo * gi = ( GotoInfo * ) node ;
+    _Printf ("\nLabelName = %s : Type = %3d : CompileAtAddress = 0x%016lx : LabeledAddress = 0x%016lx : JmpOffsetPointer = : 0x%016lx", 
+        gi->pb_LabelName, gi->GI_CAttribute, gi->CompileAtAddress, gi->LabeledAddress, gi->pb_JmpOffsetPointer ) ;
+}
+
+void
+Compiler_GotoList_Print ( )
+{
+    Compiler * compiler = _Context_->Compiler0 ;
+    _Printf ("\nTypes : GI_BREAK = 1 : GI_RETURN = 2 : GI_CONTINUE = 4 : GI_GOTO = 8 : GI_RECURSE = 16 : GI_LABEL = 64 : GI_GOTO_LABEL = 128" ) ;
+    dllist_Map ( compiler->GotoList, ( MapFunction0 ) GotoInfo_Print ) ;
+}
+
 Word *
 _Compiler_WordList ( Compiler * compiler, int64 n )
 {
@@ -282,7 +317,6 @@ Compiler_New ( uint64 type )
     compiler->CombinatorInfoStack = Stack_New ( 64, type ) ;
     compiler->InfixOperatorStack = Stack_New ( 32, type ) ;
     Compiler_CompileOptimizeInfo_New ( compiler, type ) ;
-    //compiler->RegOrder [ 0 ] = OREG2 ;  compiler->RegOrder [ 1 ] = OREG ;
     Compiler_Init ( compiler, 0 ) ;
     return compiler ;
 }
@@ -290,9 +324,8 @@ Compiler_New ( uint64 type )
 void
 CfrTil_CalculateAndSetPreviousJmpOffset ( byte * jmpToAddress )
 {
-    // we can now not compile blocks (cf. _Compile_Block_WithLogicFlag ) if their logic is not called so depth check is necessary
-    if ( _Stack_Depth ( _Context_->Compiler0->PointerToOffset ) )
-        _SetOffsetForCallOrJump ( ( byte* ) Stack_Pop ( _Context_->Compiler0->PointerToOffset ), jmpToAddress ) ;
+    // we now can not compile blocks (cf. _Compile_Block_WithLogicFlag ) if their logic is not called so depth check is necessary
+    if ( _Stack_Depth ( _Context_->Compiler0->PointerToOffset ) ) _SetOffsetForCallOrJump ( ( byte* ) Stack_Pop ( _Context_->Compiler0->PointerToOffset ), jmpToAddress ) ;
 }
 
 void

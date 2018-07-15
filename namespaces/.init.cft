@@ -360,9 +360,8 @@ Root
 'doX64 1 const
 'doScript 1 const
 '_doDemo 1 const    
-//dbgOff
-//dbgOn 
-dbgOnVar 1 = 
+dbgOff
+dbgOn 
 #if Is_DebugOn 
 System 
 testCfrTil // dT0 //demo //dT0
@@ -372,6 +371,20 @@ demo
 stringMacrosOff
 #else
 // you can trim this file to your needs and put your personal init code here maybe
+dscOn //verbosity 3 =
+: fibPTC? ( n | fn fn1 fn2 -- TOS) 
+    { fn 0 = fn1 0 = fn2 1 = } d: { n @ } { n n @ 1 - = } 
+    {   
+        fn1 fn2 @ = 
+        fn2 fn @ = 
+        fn fn1 @ fn2 @ + = 
+    }
+    d: for
+    fn @ 
+;
+' fibPTC? find wdiss 
+20 d: fibPTC? dup p 6765 _assert0 verbosity 1 = //pause
+dscOff
 #endif
 //s: hi ( a b | c ) c a @ b @ + = printf ("\nshould read 3 : %d", c ) ;s 1 2 d: hi //pause
 //s: hi ( a b | c ) c a @ b @ d: + 1 - = printf ("\nshould read 3 : %d", c ) ;s 1 2 d: hi //pause

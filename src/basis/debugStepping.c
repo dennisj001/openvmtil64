@@ -589,7 +589,7 @@ Debugger_CanWeStep ( Debugger * debugger, Word * word )
         return false ;
     }
         //else if ( word && ( Compiling || ( word->CAttribute & ( CPRIMITIVE | DLSYM_WORD ) ) || ( word->LAttribute & T_LISP_DEFINE ) ) )
-    else if ( word && ( word->CAttribute & ( CPRIMITIVE | DLSYM_WORD ) ) || ( word->LAttribute & T_LISP_DEFINE ) )
+    else if ( word && ( word->CAttribute & ( CPRIMITIVE | DLSYM_WORD ) ) ) //|| ( word->LAttribute & T_LISP_DEFINE ) )
     {
         return false ;
     }

@@ -1,5 +1,6 @@
 
 5
+//s pause
 optimizeOn inlineOn 
 lispOff
 bnoff 
@@ -421,5 +422,5 @@ nl
 namespaceTreeWithWords
 
 2 + 7 assertStkChk // stack checking
-s
+5 // stack adjustment fixme ??
 
