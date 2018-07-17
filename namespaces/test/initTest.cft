@@ -44,12 +44,13 @@ Int User
 : ppT preprocessorTest ;
 : lT lispTest ;
 
-: testX cST ;
 #if doX64
-: basicT ppT cT mT aT loT bT locT fT oT x64 cntT lT sT sysT interpT stT dT0 ;
+: basicT ppT cT mT aT loT bT locT fT oT x64 cntT lT sT sysT interpT stT cST dT0 ;
+: testX cST ;
 #else
-: basicT ppT cT mT aT loT bT locT fT oT     cntT lT sT sysT interpT stT cST dT0 ;
-//: testX cST dT0 dT ;
+//: basicT ppT cT mT aT loT bT locT fT oT     cntT lT sT sysT interpT stT cST dT0 ;
+: basicT ppT cT mT aT loT bT locT fT oT     cntT lT sT sysT dT0 ; //interpT stT cST dT0 ;
+: testX ; //cST dT0 dT ;
 #endif
 : _basicT bT mT cntT lT fT sysT  ;
 : testBasic basicT ;

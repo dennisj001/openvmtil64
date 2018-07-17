@@ -16,7 +16,7 @@ CfrTil_Colon ( )
 {
     _CfrTil_Colon ( ) ;
     byte * token = Lexer_PeekNextNonDebugTokenWord ( _Lexer_, 0 ) ;
-    if ( String_Equal ( token, "(" ) )
+    if (( String_Equal ( token, "(" ) ) && ((!GetState ( _Context_->Interpreter0, PREPROCESSOR_DEFINE )) ))
     {
         Lexer_ReadToken ( _Lexer_ ) ;
         CfrTil_LocalsAndStackVariablesBegin ( ) ;

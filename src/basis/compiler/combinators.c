@@ -20,14 +20,23 @@ CfrTil_EndCombinator ( int64 quotesUsed, int64 moveFlag )
     BlockInfo *bi = ( BlockInfo * ) _Stack_Pick ( compiler->CombinatorBlockInfoStack, quotesUsed - 1 ) ; // -1 : remember - stack is zero based ; stack[0] is top
     compiler->BreakPoint = Here ;
     _CfrTil_InstallGotoCallPoints_Keyed ( ( BlockInfo* ) bi, GI_CONTINUE | GI_BREAK ) ;
+#if 1  
     if ( moveFlag )
     {
         byte * qCodeStart ;
-        if ( bi->FrameStart ) qCodeStart = bi->bp_First ; // after the stack frame
-        else qCodeStart = bi->ActualCodeStart ;
-        Block_Copy ( qCodeStart, bi->CombinatorStartsAt, Here - bi->CombinatorStartsAt, 0 ) ;
+        //if ( bi->LocalFrameStart ) 
+        //qCodeStart = bi->bp_First ; // after the stack frame
+        //else 
+        qCodeStart = bi->ActualCodeStart ;
+        //int64 size = Here - bi->CombinatorStartsAt ;
+        //if ( size > 0 ) BI_Block_Copy (bi, qCodeStart, bi->CombinatorStartsAt, Here - bi->CombinatorStartsAt, 0 ) ;
+        //else SetHere ( qCodeStart ) ;
+        BI_Block_Copy ( bi, qCodeStart, bi->CombinatorStartsAt, Here - bi->CombinatorStartsAt, 0 ) ; //bi->CopiedSize, 0 ) ; //Here - bi->CombinatorStartsAt, 0 ) ;
+        //if ( Is_DebugModeOn ) 
+        //_Debugger_Disassemble ( _Debugger_, ( byte* ) qCodeStart, Here - here, 1 )  ;
     }
-    //_CfrTil_InstallGotoCallPoints_Keyed ( ( BlockInfo* ) bi, GI_GOTO | GI_RETURN | GI_RECURSE ) ; // done in EndBlock not here
+#endif    
+    //_CfrTil_InstallGotoCallPoints_Keyed ( ( BlockInfo* ) bi, GI_GOTO | GI_RETURN | GI_RECURSE ) ; // done in a final EndBlock not here
     _Stack_DropN ( compiler->CombinatorBlockInfoStack, quotesUsed ) ;
     if ( GetState ( compiler, LISP_COMBINATOR_MODE ) )
     {
@@ -41,13 +50,15 @@ BlockInfo *
 CfrTil_BeginCombinator ( int64 quotesUsed )
 {
     Compiler * compiler = _Context_->Compiler0 ;
-    d0 ( if ( Is_DebugOn ) _Printf ( ( byte* ) "\n\nCfrTil_BeginCombinator : blockStack depth = %d : DataStack depth = %d : running \'%s\' : compiling  \'%s\' : quotes = %d : %s\n\n",
+#if 0    
+    if ( Is_DebugOn ) _Printf ( ( byte* ) "\n\nCfrTil_BeginCombinator : blockStack depth = %d : DataStack depth = %d : running \'%s\' : compiling  \'%s\' : quotes = %d : %s\n\n",
         _Stack_Depth ( compiler->BlockStack ), DataStack_Depth ( ),
-        _Context_->CurrentlyRunningWord->Name, compiler->CurrentWordCompiling->Name, quotesUsed, Context_Location ( ) ) ) ;
+        _Context_->CurrentlyRunningWord->Name, compiler->CurrentWordCompiling->Name, quotesUsed, Context_Location ( ) ) ;
+#endif    
     BlockInfo *bi = ( BlockInfo * ) _Stack_Pick ( compiler->CombinatorBlockInfoStack, quotesUsed - 1 ) ; // -1 : remember - stack is zero based ; stack[0] is top
     // optimize out jmps such that the jmp from first block is to Here the start of the combinator code
     bi->CombinatorStartsAt = Here ;
-    //_dllist_Init ( compiler->GotoList ) ; // gotos span combinators?
+    //_dllist_Init ( compiler->GotoList ) ; // no! : gotos can span combinators within a word?
     _SetOffsetForCallOrJump ( bi->JumpOffset, bi->CombinatorStartsAt ) ;
     return bi ;
 }
@@ -123,11 +134,7 @@ CfrTil_WhileCombinator ( )
         byte * start = Here ;
         compiler->ContinuePoint = Here ;
         d0 ( if ( Is_DebugModeOn ) _Compiler_Show_WordList ( ( byte* ) "\nCheckOptimize : after optimize :", 0 ) ) ;
-        if ( ! Block_CopyCompile ( ( byte* ) testBlock, 1, 1 ) )
-        {
-            SetHere ( start ) ;
-            return 0 ;
-        }
+        Block_CopyCompile ( ( byte* ) testBlock, 1, 1 ) ;
         Block_CopyCompile ( ( byte* ) trueBlock, 0, 0 ) ;
         _Compile_JumpToAddress ( start ) ;
         CfrTil_CalculateAndSetPreviousJmpOffset_ToHere ( ) ;
@@ -157,11 +164,7 @@ CfrTil_DoWhileCombinator ( )
         byte * start = Here ;
         compiler->ContinuePoint = Here ;
         Block_CopyCompile ( ( byte* ) doBlock, 1, 0 ) ;
-        if ( ! Block_CopyCompile ( ( byte* ) testBlock, 0, 1 ) )
-        {
-            SetHere ( start ) ;
-            return 0 ;
-        }
+        Block_CopyCompile ( ( byte* ) testBlock, 0, 1 ) ;
         _Compile_JumpToAddress ( start ) ;
         CfrTil_CalculateAndSetPreviousJmpOffset_ToHere ( ) ;
         CfrTil_EndCombinator ( 2, 1 ) ;
@@ -252,14 +255,8 @@ CfrTil_TrueFalseCombinator2 ( )
     }
     else
     {
-        if ( testCondition )
-        {
-            Block_Eval ( trueBlock ) ;
-        }
-        else
-        {
-            Block_Eval ( falseBlock ) ;
-        }
+        if ( testCondition ) Block_Eval ( trueBlock ) ;
+        else Block_Eval ( falseBlock ) ;
     }
 }
 
@@ -269,8 +266,7 @@ CfrTil_TrueFalseCombinator2 ( )
 void
 CfrTil_TrueFalseCombinator3 ( )
 {
-    block testBlock = ( block ) _Dsp_ [ - 2 ], trueBlock = ( block ) _Dsp_ [ - 1 ],
-        falseBlock = ( block ) TOS ;
+    block testBlock = ( block ) Dsp ( 2 ), trueBlock = ( block ) Dsp ( 1 ), falseBlock = ( block ) Dsp ( 0 ) ;
     DataStack_DropN ( 3 ) ;
     if ( CompileMode )
     {
@@ -285,14 +281,8 @@ CfrTil_TrueFalseCombinator3 ( )
     else
     {
         Block_Eval ( testBlock ) ;
-        if ( DataStack_Pop ( ) )
-        {
-            Block_Eval ( trueBlock ) ;
-        }
-        else
-        {
-            Block_Eval ( falseBlock ) ;
-        }
+        if ( DataStack_Pop ( ) ) Block_Eval ( trueBlock ) ;
+        else Block_Eval ( falseBlock ) ;
     }
 }
 
@@ -332,8 +322,7 @@ CfrTil_DoWhileDoCombinator ( )
         {
             Block_Eval ( doBlock1 ) ;
             Block_Eval ( testBlock ) ;
-            if ( ! DataStack_Pop ( ) )
-                break ;
+            if ( ! DataStack_Pop ( ) ) break ;
             Block_Eval ( doBlock2 ) ;
         }
         while ( 1 ) ;
@@ -368,7 +357,7 @@ CfrTil_ForCombinator ( )
         _Compile_JumpToAddress ( start ) ;
         CfrTil_CalculateAndSetPreviousJmpOffset_ToHere ( ) ;
 
-        CfrTil_EndCombinator ( 4, 1 ) ; 
+        CfrTil_EndCombinator ( 4, 1 ) ;
     }
     else
     {

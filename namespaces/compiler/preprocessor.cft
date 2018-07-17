@@ -81,7 +81,7 @@ ppxe dup @ 1 + =
 
 #endif // if 4 : endif 
 
-ppx @ dup "ppx =" ps p 4 _assert nl
+ppx @ dup "ppx =" ps p 4 d: _assert nl
 ppxe @ dup "ppxe =" ps p 0 _assert 
 #endif // if 3 : endif
 apause

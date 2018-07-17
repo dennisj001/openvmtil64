@@ -154,7 +154,7 @@ Debugger_CompileAndStepOneInstruction ( Debugger * debugger )
 {
     if ( debugger->DebugAddress )
     {
-        byte *jcAddress = 0 ;
+        byte *jcAddress = 0, *adr ;
         if ( * debugger->DebugAddress == _RET )
         {
             if ( Stack_Depth ( debugger->ReturnStack ) )
@@ -230,7 +230,8 @@ doReturn:
             if ( mod == 192 ) jcAddress = ( byte* ) _Debugger_->cs_Cpu->Rax ;
             // else it could be inc/dec
         }
-        else if ( ( * debugger->DebugAddress == 0x0f ) && ( ( * ( debugger->DebugAddress + 1 ) >> 4 ) == 0x8 ) ) // jcc 
+        else if ( adr = debugger->DebugAddress, (( * adr == 0x0f ) && ( ( * ( adr + 1 ) >> 4 ) == 0x8 )) || 
+            (adr = debugger->DebugAddress + 1, ( * adr == 0x0f ) && ( ( * ( adr + 1 ) >> 4 ) == 0x8 )) ) // jcc 
         {
             SetState ( debugger, DBG_JCC_INSN, true ) ;
             jcAddress = Debugger_DoJcc ( debugger, 2 ) ;
@@ -541,7 +542,7 @@ Debugger_DoJcc ( Debugger * debugger, int64 numOfBytes )
             jcAddress = 0 ;
         }
     }
-    else if ( ttt == BE ) // ttt 011 :  below or equal
+    else if ( ttt == BE_TTT ) // ttt 011 :  below or equal
     {
         if ( ( n == 0 ) && ! ( ( ( uint64 ) debugger->cs_Cpu->RFlags & CARRY_FLAG ) | ( ( uint64 ) debugger->cs_Cpu->RFlags & ZERO_FLAG ) ) )
         {
@@ -552,7 +553,7 @@ Debugger_DoJcc ( Debugger * debugger, int64 numOfBytes )
             jcAddress = 0 ;
         }
     }
-    else if ( ttt == LESS ) // ttt 110
+    else if ( ttt == LESS_TTT ) // ttt 110
     {
         if ( ( n == 0 ) && ! ( ( ( uint64 ) debugger->cs_Cpu->RFlags & SIGN_FLAG ) ^ ( ( uint64 ) debugger->cs_Cpu->RFlags & OVERFLOW_FLAG ) ) )
         {
@@ -563,7 +564,7 @@ Debugger_DoJcc ( Debugger * debugger, int64 numOfBytes )
             jcAddress = 0 ;
         }
     }
-    else if ( ttt == LE ) // ttt 111
+    else if ( ttt == LE_TTT ) // ttt 111
     {
         if ( ( n == 0 ) &&
             ! ( ( ( ( uint64 ) debugger->cs_Cpu->RFlags & SIGN_FLAG ) ^ ( ( uint64 ) debugger->cs_Cpu->RFlags & OVERFLOW_FLAG ) ) | ( ( uint64 ) debugger->cs_Cpu->RFlags & ZERO_FLAG ) ) )

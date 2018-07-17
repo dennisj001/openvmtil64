@@ -10,7 +10,7 @@ C Compiler Int Lexer
 ; prefix
 //pause
 #endif 
-' ofile find wdiss 
+' ofile find wdiss //pause
 ofile ( "namespaces/test/file.cft" )
 // pause
 : hi 1 2 + p ;

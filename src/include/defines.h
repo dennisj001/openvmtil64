@@ -483,6 +483,7 @@
 #define DBG_ASM_SHOW_ON ( (uint64) 1 << 33 )
 #define DBG_DISASM_ACC ( (uint64) 1 << 34 )
 #define DBG_START_STEPPING ( (uint64) 1 << 35 )
+#define DBG_OUTPUT_INSERTION ( (uint64) 1 << 36 )
 
 #define SIZEOF_AddressAfterJmpCallStack 16
 // TODO : nb. flags need to be edited !!!!! for right category, overlap, use/non-use, etc.

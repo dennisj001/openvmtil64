@@ -218,10 +218,10 @@ PrepareDbgSourceCodeString ( byte * sc, Word * word ) // sc : source code ; scwi
         int64 tw = Debugger_TerminalLineWidth ( _Debugger_ ), slt0 = Strlen ( token0 ), slt1 = Strlen ( token1 ) ; // 3 : 0,1,2,3 ; ts : tokenStart
         int64 dl = slt1 - slt0 ;
         dl = dl > 0 ? dl : 0 ;
-        int64 scwsi = String_FindStrnCmpIndex ( sc, token0, scwi0, slt0, 20 ) ; //inc ) ;
+        int64 slsc = strlen ( sc ) ;
+        int64 scwsi = String_FindStrnCmpIndex ( sc, token0, scwi0, slt0, slsc - scwi0 ) ; //20 ) ; //inc ) ;
         d0 ( byte * scspp0 = & sc [ scwi0 ] ) ;
         d0 ( byte * scspp2 = & sc [ scwsi ] ) ;
-        int64 slsc = strlen ( sc ) ;
         nvw = ( char* ) Buffer_New_pbyte ( ( slsc > BUFFER_SIZE ) ? slsc : BUFFER_SIZE ) ;
         //if ( ( slsc > tp ) && ( scwsi + 4 ) > tp )
         if ( ( slsc > tp ) && ( scwsi > tp ) )

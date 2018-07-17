@@ -493,8 +493,9 @@ Lexer_ParseObject ( Lexer * lexer, byte * token )
             if ( ( c = tolower ( token [1] ) ) == 'x' )
             {
                 token [1] = c ;
-                if ( token [0] == '#' ) token [0] = '0' ; // Scheme format to C format
-                _Lexer_ParseHex ( lexer, token[0] == '#' ? &token[1] : token ) ; // #x
+                //if ( token [0] == '#' ) token [0] = '0' ; // Scheme format to C format
+                //_Lexer_ParseHex ( lexer, token[0] == '#' ? &token[1] : token ) ; // #x
+                _Lexer_ParseHex ( lexer, token ) ; // #x
                 return ;
             }
             else if ( ( c = tolower ( token [1] ) ) == 'b' )

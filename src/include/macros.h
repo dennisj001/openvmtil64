@@ -12,6 +12,7 @@
 #define _Compile_Cell( value ) ByteArray_AppendCopyItem ( _Q_CodeByteArray, sizeof(int64), value )
 #define Here ( _ByteArray_Here ( _Q_CodeByteArray ) )
 #define _SetHere( address )  _ByteArray_SetHere ( _Q_CodeByteArray, address ) 
+#define SetDebuggerPreHere( address ) _Debugger_->PreHere = (address) 
 #define SetHere( address )  ByteArray_SetHere_AndForDebug ( _Q_CodeByteArray, address ) 
 #define Set_CompilerSpace( byteArray ) (_Q_CodeByteArray = (byteArray))
 #define Get_CompilerSpace( ) _Q_CodeByteArray
@@ -31,6 +32,8 @@
 #define _GetTop( ) TOS
 #define _SetTop( v ) (TOS = v)
 #define Stack() CfrTil_PrintDataStack ( )
+#define DataStack( n ) _Dsp_ [ - (n) ] 
+#define Dsp( n ) DataStack( n ) 
 
 #define Calculate_FrameSize( numberOfLocals )  ( ( numberOfLocals + 1 ) * CELL ) // 1 : space for fp
 

@@ -606,7 +606,7 @@ PeepHole_Optimize ( )
         {
 
             _ByteArray_UnAppendSpace ( _Q_CodeByteArray, 7 ) ;
-            _Compile_TEST_Reg_To_Reg ( ACC, ACC ) ;
+            Compile_TEST_Reg_To_Reg ( ACC, ACC ) ;
         }
 #endif        
     }

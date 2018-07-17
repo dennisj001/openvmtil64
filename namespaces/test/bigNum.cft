@@ -3,7 +3,7 @@ Int
 : sp ; //stack pause ;
 dbgOff 
 C
-#if 0 // testing before bignum starts // - tail recursion from http://c2.com/cgi/wiki?TailCallOptimization
+// testing before bignum starts // - tail recursion from http://c2.com/cgi/wiki?TailCallOptimization
 : factorial ( n | rec ) rec 1 = { n @ 1 > } { rec @ n @ * rec store n -- } while return rec ;
 _wdiss ( 'factorial find ) 
 7 factorial dup p 5040 "factorial" assert1
@@ -15,17 +15,14 @@ int
 factorial ( n | rec )
 {
        rec = 1;
-       while ( n d: > 1 ) rec *= (n--) ;
+       while ( n > 1 ) rec *= (n--) ;
        return rec ;
 } 
 c_syntaxOff
 'factorial find wdiss 
 7 factorial dup p 5040 _assert sp //pause
 'C.int.factorial find wdiss 
-7 d: C.int.factorial dup p 5040 _assert sp //pause
-#else
-TODO ( "fix me : bigNum.cft : REG factorial" ) //pause
-#endif
+7 C.int.factorial dup p 5040 _assert sp //pause
 
 #if 0
 BigNum 

@@ -234,7 +234,7 @@ _Compile_Write_Instruction_X64 ( int8 rex, uint8 opCode0, uint8 opCode1, int8 mo
     if ( sib && ( controlFlags & SIB_B ) ) _Compile_Int8 ( sib ) ;
     if ( disp || ( controlFlags & DISP_B ) ) _Compile_ImmDispData ( disp, dispSize, 0 ) ;
     if ( imm || ( controlFlags & IMM_B ) ) _Compile_ImmDispData ( imm, immSize, ( controlFlags & IMM_B ) ) ;
-    if ( DBI ) //Is_DebugOn ) //
+    if ( _DBI ) //Is_DebugOn ) //
     {
         //d1 ( Word * currentWord = Compiling ? _Compiler_->CurrentWord : _Interpreter_->w_Word ) ;
         //d1 ( Word * currentWord = _Interpreter_->w_Word ) ;
@@ -347,7 +347,7 @@ Compile_X_Group1 ( Compiler * compiler, int64 op, int64 ttt, int64 n )
     {
         //DBI ;
         _Compile_optInfo_X_Group1 ( compiler, op ) ;
-        BlockInfo_Setup_BI_tttn ( _Context_->Compiler0, ttt, n, 6 ) ;
+        Compiler_Setup_BI_tttn ( _Context_->Compiler0, ttt, n ) ;
         if ( optInfo->Optimize_Rm == DSP ) // if the result is to a reg and not tos
         {
             if ( optInfo->Optimize_Dest_RegOrMem == MEM ) return ; //_Compile_Move_Reg_To_StackN ( DSP, 0, optInfo->Optimize_Reg ) ; //return ;
@@ -449,7 +449,7 @@ Compile_X_Group5 ( Compiler * compiler, int64 op )
         // assume rvalue on stack
         _Compile_Group5 ( op, MEM, DSP, 0, 0, 0 ) ;
     }
-    BlockInfo_Setup_BI_tttn ( _Context_->Compiler0, ZERO_TTT, NEGFLAG_NZ, 6 ) ;
+    Compiler_Setup_BI_tttn ( _Context_->Compiler0, ZERO_TTT, NEGFLAG_NZ ) ;
     _Word_CompileAndRecord_PushReg ( Compiler_WordList ( 0 ), optInfo->Optimize_Reg ) ; // 0 : ?!? should be the exact variable 
 }
 
@@ -463,9 +463,19 @@ _Compile_LEA ( int8 reg, int8 rm, int8 sib, int64 disp )
 }
 
 void
-_Compile_TEST_Reg_To_Reg ( int8 dstReg, int64 srcReg )
+_Compile_TEST_Reg_To_Reg ( int8 dstReg, int64 srcReg, int8 size )
 {
-    Compile_CalcWrite_Instruction_X64 ( 0, 0x85, TO_REG, srcReg, dstReg, REX_B | MODRM_B, 0, 0, 0, 0, 0 ) ;
+    int8 opCode1 ;
+    if ( size == BYTE ) opCode1 = 0x84 ;
+    else opCode1 = 0x85 ;
+    Compile_CalcWrite_Instruction_X64 ( 0, opCode1, TO_REG, srcReg, dstReg, REX_B | MODRM_B, 0, 0, 0, 0, 0 ) ;
+}
+
+void
+Compile_TEST_Reg_To_Reg ( int8 dstReg, int64 srcReg )
+{
+    //Compile_CalcWrite_Instruction_X64 ( 0, 0x85, TO_REG, srcReg, dstReg, REX_B | MODRM_B, 0, 0, 0, 0, 0 ) ;
+    _Compile_TEST_Reg_To_Reg ( dstReg, srcReg, CELL ) ;
 }
 
 // mul reg with imm to rm
@@ -701,7 +711,9 @@ _Compile_JumpToAddress ( byte * jmpToAddr ) // runtime
     if ( jmpToAddr != ( Here + 5 ) ) // optimization : don't need to jump to the next instruction
     {
         int32 disp = _CalculateOffsetForCallOrJump ( Here + 1, jmpToAddr, INT32_SIZE ) ;
+        //disp += _Compiler_->DispSpaceRemoved ;
         Compile_CalcWrite_Instruction_X64 ( 0, 0xe9, 0, 0, 0, DISP_B, 0, disp, INT32_SIZE, 0, 0 ) ; // with jmp instruction : disp is compiled an immediate offset
+        //_Compiler_->DispSpaceRemoved = 0 ;
     }
 }
 
@@ -714,7 +726,7 @@ _Compile_JumpToReg ( int8 reg ) // runtime
 void
 _Compile_UninitializedJumpEqualZero ( )
 {
-    Compile_JCC ( NEGFLAG_Z, ZERO_TTT, 0 ) ;
+    _Compile_Jcc ( NEGFLAG_Z, ZERO_TTT, 0 ) ;
 }
 
 void
@@ -740,53 +752,6 @@ void
 _Compile_UninitializedJump ( ) // runtime
 {
     _Compile_UninitializedJmpOrCall ( JMPI32 ) ;
-}
-
-// JE, JNE, JZ, JNZ, ... see machineCode.h
-
-void
-_Compile_JCC ( int64 negFlag, int64 ttt, uint64 disp )
-{
-    //DBI_ON ;
-    Compile_CalcWrite_Instruction_X64 ( 0x0f, ( 0x8 << 4 | ttt << 1 | negFlag ), 0, 0, 0, DISP_B, 0, disp, INT32_SIZE, 0, 0 ) ;
-    //DBI_OFF ;
-}
-
-void
-Compile_JCC ( int64 negFlag, int64 ttt, byte * jmpToAddr )
-{
-    uint64 disp ;
-    if ( jmpToAddr )
-    {
-        disp = _CalculateOffsetForCallOrJump ( Here + 2, jmpToAddr, INT32_SIZE ) ;
-    }
-    else disp = 0 ; // allow this function to be used to have a delayed compile of the actual address
-    _Compile_JCC ( negFlag, ttt, disp ) ;
-}
-
-void
-_Compile_Jcc ( int64 bindex, int8 overwriteFlag, int8 ttt ) // , int8 nz
-{
-    BlockInfo *bi = ( BlockInfo * ) _Stack_Pick ( _Context_->Compiler0->CombinatorBlockInfoStack, bindex ) ; // -1 : remember - stack is zero based ; stack[0] is top
-    if ( Compile_CheckReConfigureLogicInBlock ( bi, overwriteFlag ) )
-    {
-#if 1        
-        Compile_JCC ( ! bi->NegFlag, bi->Ttt, 0 ) ; // we do need to store and get this logic set by various conditions by the compiler : _Compile_SET_tttn_REG
-#else
-        Compile_JCC ( nz, bi->Ttt, 0 ) ; // we do need to store and get this logic set by various conditions by the compiler : _Compile_SET_tttn_REG
-#endif        
-    }
-    else
-    {
-        Compile_BlockLogicTest ( bi ) ; // after cmp we test our condition with setcc. if cc is true a 1 will be sign extended in R8 and pushed on the stack 
-        // then in the non optimized|inline case we cmp the TOS with 0. If ZERO (zf is 1) we know the test was false (for IF), if N(ot) ZERO we know it was true 
-        // (for IF). So, in the non optimized|inline case if ZERO we jmp if N(ot) ZERO we continue. In the optimized|inline case we check result of first cmp; if jcc sees
-        // not true (with IF that means jcc N(ot) ZERO) we jmp and if true (with IF that means jcc ZERO) we continue. 
-        // nb. without optimize|inline there is another cmp in Compile_GetLogicFromTOS which reverse the polarity of the logic 
-        // ?? an open question ?? i assume it works the same in all cases we are using - exceptions ?? 
-        // so adjust ...
-        Compile_JCC ( NEGFLAG_Z, ttt, 0 ) ;
-    }
 }
 
 void
@@ -829,7 +794,7 @@ _Compile_Call_ToAddressThruReg_TestAlignRSP ( byte * address, int8 thruReg )
     Compile_MoveImm_To_Reg ( thruReg, ( int64 ) address, CELL ) ;
     Compile_Move_Reg_To_Reg ( RAX, RSP ) ;
     Compile_TEST_AL_ImmByte ( 0x8 ) ;
-    Compile_JCC ( NEGFLAG_Z, ZERO_TTT, Here + 22 ) ;
+    _Compile_Jcc ( NEGFLAG_Z, ZERO_TTT, Here + 22 ) ;
     Compile_CallThru_AdjustRSP ( thruReg, REG ) ;
     _Compile_JumpWithOffset ( 3 ) ; // runtime
     _Compile_CallThru ( thruReg, REG ) ;
@@ -869,112 +834,6 @@ Compile_CallWord_X84_ABI_RSP_ADJUST ( Word * word )
         Compile_Call_TestRSP ( ( byte* ) word->Definition ) ;
     }
     else Compile_Call ( ( byte* ) word->Definition ) ;
-}
-
-void
-_Compile_SETcc ( int8 ttt, int8 negFlag, int8 reg )
-{
-#define dbgON_11 0
-#if dbgON_11    
-    d1 ( byte * here = Here ) ;
-#endif    
-    int8 rex = Calculate_Rex ( 0, reg, 0 ) ; //( immSize == 8 ) || ( controlFlag & REX_B ) ) ;
-    if ( rex ) _Compile_Int8 ( rex ) ;
-    _Compile_Int8 ( ( byte ) 0x0f ) ;
-    _Compile_Int8 ( ( 0x9 << 4 ) | ( ttt << 1 ) | negFlag ) ;
-    _Compile_Int8 ( CalculateModRmByte ( REG, 0, reg, 0, 0 ) ) ;
-#if dbgON_11    
-    d1 ( //if ( DBI )
-    {
-        d1 ( _Printf ( ( byte* ) "\n_Compile_SETcc :" ) ) ;
-        d1 ( Debugger_UdisOneInstruction ( _Debugger_, here, ( byte* ) "", ( byte* ) "" ) ; ) ;
-    } ) ;
-#endif    
-    //Compile_CalcWrite_Instruction_X64 ( uint8 opCode0, uint8 opCode1, int8 mod, int8 reg, int8 rm, int16 controlFlags, int8 sib, int64 disp, int8 dispSize, uint64 imm, int8 immSize )
-}
-
-// SET : 0x0f 0x9tttn mod 000 rm/reg
-// ?!? wanna use TEST insn here to eliminate need for _Compile_MOVZX_REG insn ?!? is that possible
-
-void
-_Compile_SETcc_tttn_REG ( int8 ttt, int8 negFlag, int8 reg )
-{
-    byte * here = Here ;
-    BlockInfo * bi = BlockInfo_Setup_BI_tttn ( _Context_->Compiler0, ttt, negFlag, 6 ) ; // 6 : 0f9ec0 : setle al ; 480fb6c0 movzx rax, al :: 7 - 1 for initial 'ret' : i've forgotten *how, exactly* this actually works ??          
-    _Compile_SETcc ( ttt, negFlag, reg ) ;
-    _Compile_MOVZX_BYTE_REG ( reg ) ;
-    bi->OverWriteSize = Here - here ;
-}
-
-// ttt n : notation from intel manual 253667 ( N-Z ) - table B-10 : ttt = condition codes, n is a negation bit
-// tttn notation is used with the SET and JCC instructions
-
-// note : intex syntax  : instruction dst, src
-//        att   syntax  : instruction src, dst
-// cmp : compares by subtracting src from dst, dst - src, and setting eflags like a "sub" insn 
-// eflags affected : cf of sf zf af pf : Intel Instrucion Set Reference Manual for "cmp"
-// ?? can this be done better with test/jcc ??
-// want to use 'test eax, 0' as a 0Branch (cf. jonesforth) basis for all block conditionals like if/else, do/while, for ...
-
-void
-Compile_Cmp_Set_tttn_Logic ( Compiler * compiler, int64 ttt, int64 negateFlag )
-{
-    int8 reg = ACC ;
-    int64 optFlag = Compiler_CheckOptimize ( compiler, 0 ) ;
-    if ( optFlag & OPTIMIZE_DONE ) return ;
-    else if ( optFlag )
-    {
-        if ( ( optFlag == 2 ) && ( compiler->OptInfo->Optimize_Rm == DSP ) )
-        {
-            //DBI_ON ;
-            _Compile_Stack_PopToReg ( DSP, ACC ) ; // assuming optimize always uses R8 first
-            compiler->OptInfo->Optimize_Rm = ACC ;
-            compiler->OptInfo->Optimize_Mod = REG ;
-        }
-        //DBI_ON ;
-        if ( compiler->OptInfo->OptimizeFlag & OPTIMIZE_IMM )
-        {
-            if ( ( ttt == EQUAL ) && ( compiler->OptInfo->Optimize_Imm == 0 ) ) //Compile_TEST ( compiler->OptInfo->Optimize_Mod, compiler->OptInfo->Optimize_Rm, 0, compiler->OptInfo->Optimize_Disp, compiler->OptInfo->Optimize_Imm, CELL ) ;
-            {
-                if ( compiler->OptInfo->COIW [2]->StackPushRegisterCode ) SetHere ( compiler->OptInfo->COIW [2]->StackPushRegisterCode ) ; // leave optInfo_0_two value in ACCUM we don't need to push it
-                _Compile_TEST_Reg_To_Reg ( ACC, ACC ) ;
-            }
-            else
-            {
-                int64 size ;
-                if ( compiler->OptInfo->Optimize_Imm >= 0x100000000 )
-                {
-                    size = 8 ;
-                    negateFlag = ! negateFlag ;
-                }
-                else size = 0 ;
-                Compile_CMPI ( compiler->OptInfo->Optimize_Mod, compiler->OptInfo->Optimize_Rm, compiler->OptInfo->Optimize_Disp, compiler->OptInfo->Optimize_Imm, size ) ;
-            }
-        }
-        else
-        {
-            // Compile_CMP( toRegOrMem, mod, reg, rm, sib, disp )
-            Compile_CMP ( compiler->OptInfo->Optimize_Dest_RegOrMem, compiler->OptInfo->Optimize_Mod,
-                compiler->OptInfo->Optimize_Reg, compiler->OptInfo->Optimize_Rm, 0, compiler->OptInfo->Optimize_Disp, CELL_SIZE ) ;
-        }
-    }
-    else
-    {
-        _Compile_Move_StackN_To_Reg ( OREG, DSP, 0 ) ;
-        _Compile_Move_StackN_To_Reg ( ACC, DSP, - 1 ) ;
-        // must do the DropN before the CMP because CMP sets eflags 
-        _Compile_Stack_DropN ( DSP, 2 ) ; // before cmp 
-        Compile_CMP ( REG, REG, ACC, OREG, 0, 0, CELL ) ;
-    }
-    _Compile_SETcc_tttn_REG ( ttt, negateFlag, reg ) ; // immediately after the 'cmp' insn which changes the flags appropriately
-    _Compiler_CompileAndRecord_Word0_PushReg ( compiler, ACC ) ;
-#if 0 
-    d1 ( //if ( DBI )
-    {
-        d1 ( _Printf ( ( byte* ) "\nCompile_Cmp_Set_tttn_Logic :" ) ) ;
-        d1 ( _Debugger_Disassemble ( _Debugger_, ( byte* ) here, Here - here, 0 ) ) ;
-    } ) ;
-#endif    
 }
 
 void
@@ -1041,10 +900,10 @@ _Compile_Noop ( )
 // Zero eXtend from byte to cell
 
 void
-_Compile_MOVZX_BYTE_REG ( int8 reg )
+_Compile_MOVZX_BYTE_REG ( int8 reg, int8 rm )
 {
     //DBI_ON ;
-    Compile_CalcWrite_Instruction_X64 ( 0x0f, 0xb6, REG, reg, 0, ( REX_B | MODRM_B ), 0, 0, 0, 0, 0 ) ;
+    Compile_CalcWrite_Instruction_X64 ( 0x0f, 0xb6, REG, reg, rm, ( REX_B | MODRM_B ), 0, 0, 0, 0, 0 ) ;
     //DBI_OFF ;
 }
 

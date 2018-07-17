@@ -1,6 +1,5 @@
 
 #include "../include/cfrtil64.h"
-//uint64 *_Dsp_, * _Rsp_ ;
 
 void
 _CfrTil_Run ( CfrTil * cfrTil, int64 restartCondition )
@@ -151,6 +150,7 @@ _CfrTil_Init ( CfrTil * cfrTil, Namespace * nss )
     cfrTil->DebugB = _Buffer_NewPermanent ( BUFFER_SIZE ) ;
     cfrTil->DebugB1 = _Buffer_NewPermanent ( BUFFER_SIZE ) ;
     cfrTil->DebugB2 = _Buffer_NewPermanent ( BUFFER_SIZE ) ;
+    cfrTil->DebugB3 = _Buffer_NewPermanent ( BUFFER_SIZE ) ;
     cfrTil->StringInsertB = _Buffer_NewPermanent ( BUFFER_SIZE ) ;
     cfrTil->StringInsertB2 = _Buffer_NewPermanent ( BUFFER_SIZE ) ;
     cfrTil->StringInsertB3 = _Buffer_NewPermanent ( BUFFER_SIZE ) ;

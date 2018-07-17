@@ -59,7 +59,7 @@ Debugger_ParseFunctionLocalVariables ( Debugger * debugger, Lexer * lexer, Boole
             }
             if ( String_Equal ( token, "var" ) ) aToken = prevToken ;
             else aToken = Lexer_PeekNextNonDebugTokenWord ( _Lexer_, 0 ) ;
-            _CfrTil_LocalWord (aToken, ++ _Compiler_->NumberOfLocals, LOCAL_VARIABLE , 0, 0) ;
+            _CfrTil_LocalWord ( aToken, ++ _Compiler_->NumberOfLocals, LOCAL_VARIABLE, 0, 0 ) ;
         }
             //else if ( String_Equal ( token, ";" ) || String_Equal ( token, ")" ) ) return ;
         else if ( String_Equal ( token, "<end>" ) ) return ;
@@ -328,6 +328,7 @@ byte *
 Debugger_ShowSourceCodeLine ( Debugger * debugger, Word * word, byte * token0, int64 twAlreayUsed )
 {
     ReadLiner * rl = _Context_->ReadLiner0 ;
+    Boolean ins = GetState ( _Debugger_, DBG_OUTPUT_INSERTION ) ;
     int64 slt = Strlen ( token0 ) ;
 
     // NB!! : remember the highlighting formatting characters don't add any additional *length* to *visible* the output line
@@ -341,12 +342,12 @@ Debugger_ShowSourceCodeLine ( Debugger * debugger, Word * word, byte * token0, i
     d0 ( if ( _Q_->Verbosity > 2 ) _Printf ( ( byte* ) "\nTerminal Width = %d\n", tw ) ) ;
     tvw = tw - ( twAlreayUsed - fel ) ; //subtract the formatting chars which don't add to visible length
     int64 i = 0, slil = Strlen ( String_RemoveEndWhitespace ( il ) ) ;
-    ots = String_FindStrnCmpIndex ( il, token0, ots, slt, 20 ) ;
+    if ( ! ins ) ots = String_FindStrnCmpIndex ( il, token0, ots, slt, slil - ots ) ; //20 ) ;
     totalBorder = ( tvw - slt ) ; // the borders allow us to slide token within the window of tvw
     // try to get nts relatively the same as ots
     idealBorder = ( totalBorder / 2 ) ;
     leftBorder = rightBorder = idealBorder ; // tentatively set leftBorder/rightBorder as ideally equal
-    nws = ots - idealBorder ;
+    nws = ots - idealBorder - ( ins ? ( slt / 2 ) + 1 : 0 ) ;
     nts = idealBorder ;
     if ( nws < 0 )
     {
@@ -364,21 +365,29 @@ Debugger_ShowSourceCodeLine ( Debugger * debugger, Word * word, byte * token0, i
             rightBorder += ( tvw - slil ) ;
         }
         leftBorder = totalBorder - rightBorder ;
-        nts = leftBorder ;
+        nts = leftBorder ; //+ (ins ? (slt/2 + 1) : 0 ) ;
     }
-    Strncpy ( nvw, &il[nws], tvw ) ; // copy the the new view window to buffer nvw
-    int64 slb = Strlen ( nvw ) ;
-    if ( slb > ( tvw + 8 ) ) // is there a need for ellipsis
+    if ( ins )
+    {
+        Strncpy ( nvw, &il[nws], ots ) ;
+        strcat ( nvw, token0 ) ;
+        strcat ( nvw, " " ) ;
+        strcat ( nvw, &il[ots] ) ;
+    }
+    else Strncpy ( nvw, &il[nws], tvw ) ; // copy the the new view window to buffer nvw
+    int64 slNvw = Strlen ( nvw ) ;
+    if ( slNvw > ( tvw + 8 ) ) // is there a need for ellipsis
     {
         if ( ( ots - leftBorder ) < 4 ) lef = 0, ref = 1 ;
         else lef = ref = 1 ;
     }
-    else if ( slb > ( tvw + 4 ) ) // is there a need for one ellipsis
+    else if ( slNvw > ( tvw + 4 ) ) // is there a need for one ellipsis
     {
         if ( ( ots - leftBorder ) < 4 ) lef = 0, ref = 1 ;
         else lef = 1, ref = 0 ; // choose lef as preferable
     }
     else lef = ref = 0 ;
+
     byte * cc_line = word ? _String_HighlightTokenInputLine ( nvw, lef, leftBorder, nts, token0, rightBorder, ref, 0 ) : ( byte* ) "" ; // nts : new token start is a index into b - the nwv buffer
 
     return cc_line ;
@@ -436,7 +445,7 @@ next:
                     sprintf ( obuffer, "\n%s%s:: %s : %03ld.%03ld : %s :> %s <: cprimitive :> ", // <:: " INT_FRMT "." INT_FRMT " ",
                         prompt, signal ? ( char* ) signalAscii : " ", cc_location, rl->LineNumber, rl->ReadIndex,
                         word->ContainingNamespace ? ( char* ) word->ContainingNamespace->Name : "<literal>",
-                        cc_Token ) ; 
+                        cc_Token ) ;
                 }
                 else
                 {
@@ -444,7 +453,7 @@ next:
                         prompt, signal ? ( char* ) signalAscii : " ", cc_location, rl->LineNumber, rl->ReadIndex,
                         word->ContainingNamespace ? ( char* ) word->ContainingNamespace->Name : ( char* ) "<literal>",
                         //( char* ) cc_Token, ( uint64 ) word->Definition ) ; //, _Q_->StartedTimes, _Q_->SignalExceptionsHandled ) ;
-                        ( char* ) cc_Token, ( uint64 ) word ) ; 
+                        ( char* ) cc_Token, ( uint64 ) word ) ;
                 }
                 byte * cc_line = Debugger_ShowSourceCodeLine ( debugger, word, token0, ( int64 ) Strlen ( obuffer ) ) ;
                 String_RemoveEndWhitespace ( cc_line ) ;
@@ -666,7 +675,7 @@ LO_Debug_ExtraShow ( int64 showStackFlag, int64 verbosity, int64 wordList, byte 
             vsprintf ( ( char* ) out, ( char* ) format, args ) ;
             va_end ( args ) ;
             DebugColors ;
-            if ( wordList ) _Compiler_Show_WordList (( byte* ) out, 0) ;
+            if ( wordList ) _Compiler_Show_WordList ( ( byte* ) out, 0 ) ;
             else
             {
                 printf ( "%s", out ) ;
@@ -677,5 +686,17 @@ LO_Debug_ExtraShow ( int64 showStackFlag, int64 verbosity, int64 wordList, byte 
             DefaultColors ;
         }
     }
+}
+
+void
+_Debugger_PostShow ( Debugger * debugger, Word * word, int8 force )//, byte * token, Word * word )
+{
+    _Debugger_ShowEffects ( debugger, word, GetState ( debugger, DBG_STEPPING ), force ) ;
+}
+
+void
+Debugger_PostShow ( Debugger * debugger )
+{
+    _Debugger_PostShow ( debugger, debugger->w_Word, 0 ) ;
 }
 

@@ -154,18 +154,6 @@ _Debugger_PreSetup ( Debugger * debugger, Word * word, int8 forceFlag )
 }
 
 void
-_Debugger_PostShow ( Debugger * debugger, Word * word, int8 force )//, byte * token, Word * word )
-{
-    _Debugger_ShowEffects ( debugger, word, GetState ( debugger, DBG_STEPPING ), force ) ;
-}
-
-void
-Debugger_PostShow ( Debugger * debugger )
-{
-    _Debugger_PostShow ( debugger, debugger->w_Word, 0 ) ;
-}
-
-void
 Debugger_On ( Debugger * debugger )
 {
     _Debugger_Init ( debugger, 0, 0 ) ;

@@ -722,24 +722,22 @@ String_CheckWordSize ( byte * str, int64 wl, Boolean punctFlag )
 {
     byte * start, *end ;
     int64 i, length ;
-    for ( i = 0 ; ; i -- ) 
+    for ( i = -1 ; abs (i) < (wl + 1) ; i -- ) // go to left of str first
     {
         if ( punctFlag ) 
         {
             if ( ! IsPunct ( str[i] ) ) break ;
         }
         else if ( IsPunct ( str[i] ) || (str[i]==' ')) break ;
-        if ( abs (i) >= ( wl + 1 ) ) break ;
     }
     start = & str [i+1] ;
-    for ( i = 0 ; ; i ++ ) 
+    for ( i = 1 ; abs (i) < (wl+1) ; i ++ ) // ... then to the right side of str
     {
         if ( punctFlag ) 
         {
             if ( ! IsPunct ( str[i] ) ) break ;
         }
         else if ( IsPunct ( str[i] ) || (str[i]==' ')) break ;
-        if ( abs (i) >= ( wl + 1 ) ) break ;
     }
     end = & str [i-1] ;
     length = end - start + 1 ;
@@ -758,7 +756,7 @@ String_FindStrnCmpIndex ( byte * sc, byte* name0, int64 index0, int64 wl0, int64
     for ( i = 0, n = wl0 + inc ; i <= n ; i ++ ) // tokens are parsed in different order with parameter and c rtl args, etc. 
     {
         scindex = & sc [ index - i ] ;
-        if ( ! Strncmp ( scindex, name0, wl0 ) ) 
+        if ( (( index - 1 ) >= 0 ) && ( ! Strncmp ( scindex, name0, wl0 ) ) )
         {
             if ( String_CheckWordSize ( scindex, wl0, punctuationFlag ) )
             {

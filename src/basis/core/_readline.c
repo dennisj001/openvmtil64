@@ -60,6 +60,12 @@ ReadLine_LastChar ( ReadLiner * rl )
 }
 
 byte
+ReadLine_LastReadChar ( ReadLiner * rl )
+{
+    return rl->InputLine [ rl->ReadIndex - 2 ] ;
+}
+
+byte
 ReadLine_PeekNextNonWhitespaceChar ( ReadLiner * rl )
 {
     int64 index = rl->ReadIndex ;

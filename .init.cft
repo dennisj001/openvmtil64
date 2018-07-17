@@ -258,8 +258,8 @@ System
 #if Is_DebugOn
 dscOn //verbosity 3 =
 #endif
-: _assert0 ( n m ) { n @ m @ != } { nl location hex n @ p "!=" ps m @ p "<:" ps "Error!" adps _info _pause } { } ifElse ;
-: _assert ( n m ) nl  nl "_assert ::" ps { n @ m @ != } { n @ p "!=" ps m @ p "<:" ps "Error!" adps _info _pause } { " ok" ps nl } ifElse ;
+: _assert0 ( n m ) { n @ m @ != } { nl location hex n @ p "!=" ps m @ p "<:" ps "Error!" adps _info _pause } { } ifElse ; //{ " ok" ps nl } ifElse ; // no "ok" with this word
+: _assert ( n m ) nl  nl "_assert ::" ps { n @ m @ != } { n @ p "!=" ps m @ p "<:" ps "Error!" adps _info _pause } { " ok" ps nl } d: ifElse ;
 : _assert1 ( n m str ) { n @ m @ != } { str @ ps "error" ps _info _pause } if ;
 : assert1 ( n m str ) { n @ m @ != } { nl str @ ps ":> got : " ps n @ p "!=" ps m @ p " : expected <:" ps "Error!" adps _info _pause } { str @ ps "ok\n" ps } ifElse ;
 : assert1s ( s1 s2 str ) { s1 @ s2 @ strcmp } { nl str @ ps "error" ps _info _pause } if ;
@@ -293,13 +293,23 @@ User
 : pause nl _pause ;
 : opOff optimizeOff inlineOff state ;
 : opOn1 optimizeOn inlineOn { verbosity @ 1 > } { state } if ;
-: vck ( n w ) { verbosity @ n @ > } { w @ wordRun drop } if2 ;
-: opOn 
+: vck ( n w ) { verbosity @ n @ != } { verbosity n @ = w @ _find wordRun } d: if2 ;
+'vck find wdiss //pause
+: opOn ( n )
     optimizeOn inlineOn 
-    1 ' state literal vck  
+#if 1
+    n @ ' state literal vck  // literal pops the stack and turns 'state into a string
+#elif 1 // same functionally
+    n @  "state" vck  // literal turns 'state into a string
+#elif 0 // doesn't work
+    n @ 'state vck  // literal turns 'state into a string
+#endif
+    //pause
 ;
-// ' opOn @ winfo
-opOn
+' opOn find winfo //pause
+2 d: opOn 
+1 opOn 
+
 "s" ' stack find alias
 // : s stack location pause ;
 // : s stack dbg ;
@@ -359,7 +369,7 @@ stringMacrosOn
 Root 
 'doX64 1 const
 'doScript 1 const
-'_doDemo 0 const    
+'_doDemo 1 const    
 dbgOff
 dbgOn 
 #if Is_DebugOn 
@@ -372,6 +382,8 @@ stringMacrosOff
 #else
 // you can trim this file to your needs and put your personal init code here maybe
 dscOn //verbosity 3 =
+: _assert0 ( n m ) { n @ m @ != } { nl location hex n @ p "!=" ps m @ p "<:" ps "Error!" adps _info _pause } { " ok" ps nl } ifElse ; 
+//'_assert0 find wdiss pause
 : fibPTC? ( n | fn fn1 fn2 -- TOS) 
     { fn 0 = fn1 0 = fn2 1 = } { n @ } { n n @ 1 - = } 
     {   
@@ -383,8 +395,29 @@ dscOn //verbosity 3 =
     fn @ 
 ;
 ' fibPTC? find wdiss 
-20 fibPTC? dup p 6765 _assert0 verbosity 1 = pause
+20 fibPTC? dup p 6765 _assert0 //pause
+c_syntaxOn
+int
+fac5 ( REG n  | REG facc ) 
+{ 
+    facc = 1 ;
+    while ( n > 1 ) 
+    {
+        facc = facc * n -- ;
+    }
+    return facc ;
+}
+wdiss ( ' fac5 find ) //pause
+fac5 ( 7 ) dup p 5040 _assert  //pause
 dscOff
+c_syntaxOff
+: fac ( n  | rec1 -- TOS ) 
+    rec1 1 = 
+    { n @ 1 > } { n @ rec1 @ * rec1 store n -- } while 
+    rec1 @ 
+;
+' fac find wdiss //pause
+7 fac dup p 5040 _assert 
 #endif
 //s: hi ( a b | c ) c a @ b @ + = printf ("\nshould read 3 : %d", c ) ;s 1 2 d: hi //pause
 //s: hi ( a b | c ) c a @ b @ d: + 1 - = printf ("\nshould read 3 : %d", c ) ;s 1 2 d: hi //pause

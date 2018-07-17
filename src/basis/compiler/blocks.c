@@ -16,14 +16,16 @@ Block_Eval ( block blck )
 }
 
 void
-_Block_Copy ( byte * srcAddress, int64 bsize, int8 optFlag, int8 retFlag )
+BI_Block_Copy (BlockInfo * bi, byte* dstAddress, byte * srcAddress, int64 bsize, int8 optFlag )
 {
     Compiler * compiler = _Compiler_ ;
+    if ( ! bi ) bi = ( BlockInfo * ) _Stack_Top ( compiler->CombinatorBlockInfoStack ) ;
     byte * saveHere = Here, * saveAddress = srcAddress ;
     ud_t * ud = Debugger_UdisInit ( _Debugger_ ) ;
     int64 isize, left ;
-
-    for ( left = bsize ; left > 0 ; srcAddress += isize )
+    if ( dstAddress ) SetHere ( dstAddress ) ;
+    bi->CopiedToStart = Here ;
+    for ( left = bsize ; ( left > 0 ) ; srcAddress += isize )
     {
         byte * here = Here ;
         PeepHole_Optimize ( ) ;
@@ -32,20 +34,15 @@ _Block_Copy ( byte * srcAddress, int64 bsize, int8 optFlag, int8 retFlag )
         _CfrTil_AdjustDbgSourceCodeAddress ( srcAddress, Here ) ;
         //d1 ( if ( Is_DebugModeOn ) _DWL_ShowList ( _Compiler_->WordList, 0 ) ) ;
         _CfrTil_AdjustLabels ( srcAddress ) ;
-#if TESTING        
-        if ( ( * srcAddress == _RET ) && ( retFlag != 2 ) )// used by TESTING in EndBlock don't include RET
-#else            
         if ( * srcAddress == _RET )
-#endif            
         {
-            if ( left && ( ( * srcAddress + 1 ) != NOOP ) ) //  noop from our logic overwrite
+            if ( ( left > 0 ) && ( ( * srcAddress + 1 ) != NOOP ) ) //  noop from our logic overwrite
             {
                 // ?? unable at present to compile inline with more than one return in the block
-                // retFlag == 2  : maybe a start
                 SetHere ( saveHere ) ;
                 Compile_Call ( saveAddress ) ;
             }
-            if ( ! retFlag ) break ; // don't include RET
+            else break ; // don't include RET
         }
         else if ( * srcAddress == CALLI32 )
         {
@@ -70,7 +67,7 @@ _Block_Copy ( byte * srcAddress, int64 bsize, int8 optFlag, int8 retFlag )
         else if ( * srcAddress == JMPI32 )
         {
             int64 offset = * ( int32* ) ( srcAddress + 1 ) ; // 1 : 1 byte JMPI32 opCode
-            if ( offset != 0 )
+            if ( offset )
             {
                 dllist_Map1 ( compiler->GotoList, ( MapFunction1 ) AdjustJmpOffsetPointer, ( int64 ) ( srcAddress + 1 ) ) ;
             }
@@ -85,131 +82,55 @@ _Block_Copy ( byte * srcAddress, int64 bsize, int8 optFlag, int8 retFlag )
         //_CfrTil_AdjustDbgSourceCodeAddress ( srcAddress, Here ) ;
         d0 ( if ( Is_DebugModeOn ) _Debugger_Disassemble ( _Debugger_, ( byte* ) here, Here - here, 1 ) ) ;
     }
-}
-
-// cf. : Compile_BlockInfoTestLogic ( Compiler * compiler, int8 reg, int8 negFlag )
-
-void
-_Compile_GetTestLogicFromTOS ( )
-{
-    Compile_Pop_To_Acc ( DSP ) ;
-    _Compile_TEST_Reg_To_Reg ( ACC, ACC ) ;
+    bi->CopiedToEnd = Here ;
+    bi->CopiedSize = bi->CopiedToEnd - bi->CopiedToStart ;
+    _Debugger_Disassemble ( _Debugger_, ( byte* ) bi->CopiedToStart, bi->CopiedSize, 1 ) ;
 }
 
 void
 Compile_BlockLogicTest ( BlockInfo * bi ) // , byte * start )
 {
-    if ( bi && bi->LogicCodeWord && bi->LogicCodeWord->StackPushRegisterCode )
+    int64 diff ;
+    Word_Set_SCA ( bi->LogicCodeWord ) ;
+    if ( bi && ( bi->JccLogicCode || ( bi->LogicCodeWord && bi->LogicCodeWord->StackPushRegisterCode ) ) )
     {
-        //if ( start ) SetHere ( start + (bi->LogicCodeWord->StackPushRegisterCode - bi->Start) ) ; else 
-#if 1        
-        _ByteArray_UnAppendSpace ( _Q_CodeByteArray, 7 ) ; // else it crashes in x64.cft:stest ?? : 7 : add r14, 0x8, mov [r14], rax 
-#else        
-        SetHere ( bi->LogicCodeWord->StackPushRegisterCode ) ;
-#endif        
-        BI_Set_JccLogicCodeToHere ( bi ) ;
-        _Compile_TEST_Reg_To_Reg ( bi->LogicCodeWord->RegToUse, bi->LogicCodeWord->RegToUse ) ;
+        if ( ! bi->JccLogicCode )
+        {
+            bi->JccLogicCode = bi->LogicCodeWord->StackPushRegisterCode ;
+        }
+        diff = bi->JccLogicCode - bi->bp_First ;
+        bi->CopiedToLogicJccCode = bi->CopiedToStart + diff ;
+        SetHere ( bi->CopiedToLogicJccCode ) ; 
+        if ( ! ( bi->LogicCodeWord->CAttribute & CATEGORY_LOGIC ) ) _Compile_TestCode ( bi->LogicCodeWord->RegToUse, CELL ) ;
+        //d1 ( if ( Is_DebugOn ) _Debugger_Disassemble ( _Debugger_, ( byte* ) bi->JccLogicCode, Here - bi->JccLogicCode, 0 ) ) ;
     }
     else
     {
-        BI_Set_JccLogicCodeToHere ( bi ) ;
-        _Compile_GetTestLogicFromTOS ( ) ;
+        _Compile_GetTestLogicFromTOS ( bi ) ;
+        SetHere ( bi->CopiedToLogicJccCode ) ; 
     }
 }
-
-int64
-Compile_CheckReConfigureLogicInBlock ( BlockInfo * bi, int8 overwriteFlag )
-{
-    if ( GetState ( _CfrTil_, OPTIMIZE_ON | INLINE_ON ) )
-#if 1      
-    {
-        if ( bi->JccLogicCode ) // && ( bi->LogicCodeWord->Symbol->Category & CATEGORY_LOGIC ) )
-        {
-            SetHere ( bi->JccLogicCode ) ;
-            return true ;
-        }
-        else if ( bi->LogicCodeWord )
-        {
-            Compile_BlockLogicTest ( bi ) ;
-            return true ;
-        }
-    }
-#else
-        if ( bi->LogicCodeWord )
-        {
-            Compile_BlockLogicTest ( bi ) ;
-            return true ;
-        }
-#endif    
-    return false ;
-}
-
-/*
- *  Logical operators
- */
 
 void
-Compile_BlockInfoTestLogic ( Compiler * compiler, int8 reg, int8 negFlag )
-{
-    BlockInfo *bi = ( BlockInfo * ) _Stack_Top ( compiler->CombinatorBlockInfoStack ) ;
-    bi->LogicTestCode = Here ;
-    _Compile_TEST_Reg_To_Reg ( reg, reg ) ;
-    _BlockInfo_Setup_BI_tttn ( bi, ZERO_TTT, negFlag, 6 ) ; // 6 : length of jcc insn ?
-}
-
-// nb : only blocks with one ret insn can be successfully compiled inline
-
-int64
-Block_CopyCompile_WithLogicFlag ( byte * srcAddress, int64 bindex, Boolean jccFlag, Boolean negFlag )
+Block_CopyCompile ( byte * srcAddress, int64 bindex, Boolean jccFlag )
 {
     Compiler * compiler = _Context_->Compiler0 ;
+    //int64 depth = _Stack_Depth ( compiler->CombinatorBlockInfoStack ) ;
     BlockInfo *bi = ( BlockInfo * ) _Stack_Pick ( compiler->CombinatorBlockInfoStack, bindex ) ;
-    _Block_Copy ( srcAddress, bi->bp_Last - bi->bp_First, 0, 0 ) ;
+    BI_Block_Copy (bi, Here, srcAddress, bi->bp_Last - bi->bp_First, 0 ) ;
+    //if ( Is_DebugModeOn ) 
+    //_Debugger_Disassemble ( _Debugger_, ( byte* ) bi->CopiedToStart, bi->CopiedSize, 1 ) ;
     if ( jccFlag )
     {
-        DBI_ON ;
         Compile_BlockLogicTest ( bi ) ;
-        Compile_JCC ( negFlag, ZERO_TTT, 0 ) ;
+        //bi->CopiedToLogicJccCode = Here ;
+        _Compile_Jcc ( 0, ZERO_TTT, 0 ) ;
         Stack_PointerToJmpOffset_Set ( ) ;
-        DBI_OFF ;
+        bi->CopiedToEnd = Here ;
+        bi->CopiedSize = bi->CopiedToEnd - bi->CopiedToStart ;
+        //if ( Is_DebugModeOn ) 
+        _Debugger_Disassemble ( _Debugger_, ( byte* ) bi->CopiedToStart, bi->CopiedSize, 1 ) ;
     }
-    return 1 ;
-}
-
-int64
-Block_CopyCompile ( byte * srcAddress, int64 bindex, int64 jccFlag )
-{
-    return Block_CopyCompile_WithLogicFlag ( srcAddress, bindex, jccFlag, 0 ) ;
-}
-
-void
-Block_Copy ( byte * dst, byte * src, int64 qsize, int8 retFlag )
-{
-    SetHere ( dst ) ;
-    _Block_Copy ( src, qsize, 0, retFlag ) ;
-}
-
-// 'tttn' is a notation from the intel manuals
-
-void
-_BlockInfo_Setup_BI_tttn ( BlockInfo * bi, int8 ttt, int8 negFlag, int8 overWriteSize )
-{
-    //if ( ! GetState ( _Context_, C_SYNTAX ) ) bi->LogicCodeWord = Compiler_WordList ( 1 ) ;
-    bi->Ttt = ttt ;
-    bi->NegFlag = negFlag ;
-    bi->OverWriteSize = overWriteSize ; // 6 ; // 0f9ec0 : setle al ; 480fb6c0 movzx rax, al :: 7 - 1 for initial 'ret' : i've forgotten *how, exactly* this actually works ??          
-    BI_Set_JccLogicCodeToHere ( bi ) ;
-}
-
-BlockInfo *
-BlockInfo_Setup_BI_tttn ( Compiler * compiler, int8 ttt, int8 negFlag, int8 overWriteSize )
-{
-    BlockInfo *bi = ( BlockInfo * ) _Stack_Top ( compiler->CombinatorBlockInfoStack ) ;
-    if ( bi )
-    {
-        _BlockInfo_Setup_BI_tttn ( bi, ttt, negFlag, overWriteSize ) ;
-    }
-    return bi ;
 }
 
 // a 'block' is merely a notation borrowed from C
@@ -269,11 +190,11 @@ _CfrTil_BeginBlock1 ( BlockInfo * bi )
         // remember : we always jmp around the blocks to the combinator ; the combinator sees the blocks on the stack and uses them otherwise they are lost
         // the jmps are optimized out so the word->Definition is a call to the first combinator
         // we always add a frame and if not needed move the blocks to overwrite the extra code
-        bi->FrameStart = Here ; // before _Compile_AddLocalFrame
+        bi->LocalFrameStart = Here ; // before _Compile_AddLocalFrame
         _Compiler_AddLocalFrame ( compiler ) ; // cf EndBlock : if frame is not needed we use BI_Start else BI_FrameStart -- ?? could waste some code space ??
         if ( compiler->NumberOfRegisterVariables ) Compile_InitRegisterParamenterVariables ( compiler ) ; // this function is called twice to deal with words that have locals before the first block and regular colon words
     }
-    bi->Start = bi->AfterFrame = Here ; // after _Compiler_AddLocalFrame and Compile_InitRegisterVariables
+    bi->Start = bi->AfterLocalFrame = Here ; // after _Compiler_AddLocalFrame and Compile_InitRegisterVariables
 
     return bi ;
 }
@@ -312,7 +233,7 @@ _CfrTil_EndBlock1 ( BlockInfo * bi )
         if ( _Compiler_IsFrameNecessary ( compiler ) && ( ! GetState ( compiler, DONT_REMOVE_STACK_VARIABLES ) ) )
         {
             _Compiler_RemoveLocalFrame ( compiler ) ;
-            bi->bp_First = bi->FrameStart ; // include _Compile_Rsp_Save code
+            bi->bp_First = bi->LocalFrameStart ; // include _Compile_Rsp_Save code
         }
         else if ( compiler->NumberOfRegisterVariables )
         {
@@ -347,7 +268,7 @@ _CfrTil_EndBlock1 ( BlockInfo * bi )
     _Compile_Return ( ) ;
     DataStack_Push ( ( int64 ) bi->bp_First ) ;
     bi->bp_Last = Here ;
-    CfrTil_CalculateAndSetPreviousJmpOffset ( bi->JumpOffset ) ;
+    Compiler_CalculateAndSetPreviousJmpOffset ( compiler, bi->JumpOffset ) ;
     _SetOffsetForCallOrJump ( bi->JumpOffset, Here ) ;
 }
 
@@ -362,7 +283,7 @@ _CfrTil_EndBlock2 ( BlockInfo * bi )
     {
         _CfrTil_InstallGotoCallPoints_Keyed ( bi, GI_GOTO | GI_RECURSE ) ;
 #if TESTING        
-        Block_Copy ( bi->bp_First, bi->bp_First, Here - bi->bp_First, 2 ) ; // 2 : retFlag will include '_' (dropped blocks) with a 'ret' : final optimization and for PeepHoleOptimize
+        BI_Block_Copy ( bi, bi->bp_First, bi->bp_First, Here - bi->bp_First, 2 ) ; // 2 : retFlag will include '_' (dropped blocks) with a 'ret' : final optimization and for PeepHoleOptimize
 #endif        
         CfrTil_TurnOffBlockCompiler ( ) ;
         Compiler_Init ( compiler, 0 ) ;

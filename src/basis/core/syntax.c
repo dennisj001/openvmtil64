@@ -10,7 +10,7 @@ _Interpret_CheckEqualBeforeSemi_LValue ( byte * nc )
         if ( *nc == '=' )
         {
             if ( * ( nc + 1 ) == '=' ) return false ;
-            // else if ( ispunct ( * ( nc - 1 ) ) && ( ( * ( nc - 1 ) != ' ' ) ) ) return false ;
+                // else if ( ispunct ( * ( nc - 1 ) ) && ( ( * ( nc - 1 ) != ' ' ) ) ) return false ;
             else if ( ispunct ( * ( nc - 1 ) ) ) return false ;
             else return true ; // we have an lvalue
         }
@@ -50,28 +50,33 @@ Interpret_DoParenthesizedRValue ( )
 }
 
 void
-Interpret_C_Block_EndBlock ( Word * word, byte * actualToken )
+Interpret_C_Block_EndBlock ( Word * word, byte * tokenToUse, Boolean insertFlag )
 {
-    BlockInfo * bi = ( BlockInfo* ) _Stack_Top ( _Compiler_->BlockStack ) ;
-    bi->LogicCodeWord = word ;
-    if ( actualToken ) _CfrTil_->EndBlockWord->Name = actualToken ;
+    Compiler * compiler = _Compiler_ ;
+    BlockInfo * bi = ( BlockInfo* ) _Stack_Top ( compiler->BlockStack ) ;
+    bi->LogicCodeWord = _Compiler_WordList ( compiler, 1 ) ; //word ;
+    if ( tokenToUse ) _CfrTil_->EndBlockWord->Name = tokenToUse ;
+    if ( insertFlag ) SetState ( _Debugger_, DBG_OUTPUT_INSERTION, true ) ;
     _CfrTil_->EndBlockWord->W_TokenStart_ReadLineIndex = _Lexer_->TokenStart_ReadLineIndex ;
     _Interpreter_DoWord_Default ( _Interpreter_, _CfrTil_->EndBlockWord, _CfrTil_->SC_ScratchPadIndex ) ;
     _CfrTil_->EndBlockWord->Name = "}" ;
     //CfrTil_ClearTokenList ( ) ;
+    SetState ( _Debugger_, DBG_OUTPUT_INSERTION, false ) ;
 }
 
 void
-Interpret_C_Block_BeginBlock ( byte * actualToken )
+Interpret_C_Block_BeginBlock ( byte * tokenToUse, Boolean insertFlag )
 {
     Context * cntx = _Context_ ;
     Compiler * compiler = cntx->Compiler0 ;
     // ? source code adjustments ?
-    if ( actualToken ) _CfrTil_->BeginBlockWord->Name = actualToken ;
+    if ( tokenToUse ) _CfrTil_->BeginBlockWord->Name = tokenToUse ;
+    if ( insertFlag ) SetState ( _Debugger_, DBG_OUTPUT_INSERTION, true ) ;
     _CfrTil_->BeginBlockWord->W_TokenStart_ReadLineIndex = _Lexer_->TokenStart_ReadLineIndex ;
     _Interpreter_DoWord_Default ( _Interpreter_, _CfrTil_->BeginBlockWord, _CfrTil_->SC_ScratchPadIndex ) ;
     _CfrTil_->BeginBlockWord->Name = "{" ;
     compiler->BeginBlockFlag = false ;
+    SetState ( _Debugger_, DBG_OUTPUT_INSERTION, false ) ;
 }
 
 int64
@@ -91,18 +96,17 @@ CfrTil_Interpret_C_Blocks ( int64 blocks, Boolean takesAnElseFlag, Boolean semic
         {
             // interpret a (possible 'for') c parenthesis expression
             compiler->InLParenBlock = true ;
-            Interpret_C_Block_BeginBlock ( "(" ) ;
+            Interpret_C_Block_BeginBlock ( "(", 0 ) ;
             compiler->TakesLParenAsBlock = false ; // after the first block
         }
         else if ( String_Equal ( ( char* ) token, "{" ) )
         {
-            Interpret_C_Block_BeginBlock ( "{" ) ;
+            Interpret_C_Block_BeginBlock ( "{", 0 ) ;
             semicolonEndsThisBlock = false ;
         }
         else if ( String_Equal ( ( char* ) token, "}" ) )
         {
-            //_CfrTil_->EndBlockWord->Name = "}" ;
-            Interpret_C_Block_EndBlock ( word, "}" ) ;
+            Interpret_C_Block_EndBlock ( word, "}", 0 ) ;
             blocksParsed ++ ;
         }
         else if ( String_Equal ( ( char* ) token, ")" ) && compiler->InLParenBlock )
@@ -110,10 +114,10 @@ CfrTil_Interpret_C_Blocks ( int64 blocks, Boolean takesAnElseFlag, Boolean semic
             List_InterpretLists ( compiler->PostfixLists ) ;
             compiler->InLParenBlock = false ;
             compiler->TakesLParenAsBlock = false ;
-            Interpret_C_Block_EndBlock ( word, ")" ) ;
+            Interpret_C_Block_EndBlock ( word, ")", 0 ) ;
             if ( ! _Context_StringEqual_PeekNextToken ( _Context_, ( byte* ) "{", 0 ) )
             {
-                Interpret_C_Block_BeginBlock ( "{" ) ;
+                Interpret_C_Block_BeginBlock ( "{", 1 ) ;
                 semicolonEndsThisBlock = true ;
             }
             blocksParsed ++ ;
@@ -123,11 +127,10 @@ CfrTil_Interpret_C_Blocks ( int64 blocks, Boolean takesAnElseFlag, Boolean semic
             List_InterpretLists ( compiler->PostfixLists ) ;
             if ( semicolonEndsThisBlock )
             {
-                //_CfrTil_->EndBlockWord->Name = ";" ;
-                Interpret_C_Block_EndBlock ( word, ";" ) ;
+                Interpret_C_Block_EndBlock ( word, ";", 0 ) ;
                 blocksParsed ++ ;
             }
-            if ( compiler->InLParenBlock ) Interpret_C_Block_BeginBlock ( "{" ) ;
+            if ( compiler->InLParenBlock ) Interpret_C_Block_BeginBlock ( "{", 0 ) ;
         }
         else if ( String_Equal ( ( char* ) token, "else" ) )
         {
@@ -136,7 +139,7 @@ CfrTil_Interpret_C_Blocks ( int64 blocks, Boolean takesAnElseFlag, Boolean semic
                 takesAnElseFlag = false ;
                 if ( ! _Context_StringEqual_PeekNextToken ( _Context_, ( byte* ) "{", 0 ) )
                 {
-                    Interpret_C_Block_BeginBlock ( "{" ) ;
+                    Interpret_C_Block_BeginBlock ( "{", 1 ) ;
                     semicolonEndsThisBlock = true ;
                 }
             }
@@ -154,7 +157,7 @@ CfrTil_Interpret_C_Blocks ( int64 blocks, Boolean takesAnElseFlag, Boolean semic
                     //Word * lastWord = Compiler_WordList ( 0 ) ;
                     if ( semicolonEndsThisBlock ) //&& ( _CfrTil_->EndBlockWord == lastWord ) ) //String_Equal ( lastWord->Name, ";" ) ) // ??
                     {
-                        Interpret_C_Block_EndBlock ( word, ";" ) ;
+                        Interpret_C_Block_EndBlock ( word, "}", 1 ) ;
                         blocksParsed ++ ;
                     }
                 }
@@ -177,12 +180,31 @@ void
 CfrTil_C_LeftParen ( )
 {
     Compiler * compiler = _Context_->Compiler0 ;
+#if 0    
     if ( ( ( ! CompileMode ) && ( ! GetState ( _Context_->Interpreter0, PREPROCESSOR_MODE ) ) ) ||
-        ( ( CompileMode && ( ! GetState ( compiler, VARIABLE_FRAME ) ) ) || ( ReadLine_PeekNextNonWhitespaceChar ( _Context_->Lexer0->ReadLiner0 ) == '|' ) ) ) //( ! GetState ( _Context_, INFIX_MODE ) ) )
+        ( ( CompileMode && ( ! GetState ( compiler, VARIABLE_FRAME ) ) ) || 
+        ( ReadLine_PeekNextNonWhitespaceChar ( _Context_->Lexer0->ReadLiner0 ) == '|' ) ) ) //( ! GetState ( _Context_, INFIX_MODE ) ) )
+#elif 1     
+    if ( GetState ( _Context_->Interpreter0, PREPROCESSOR_MODE ) )
+    {
+        if ( isalnum (ReadLine_LastReadChar ( _ReadLiner_ ))) CfrTil_LocalsAndStackVariablesBegin ( ) ;
+    }
+    else if ( ( CompileMode && ( ! GetState ( compiler, VARIABLE_FRAME ) ) ) 
+        || ( ReadLine_PeekNextNonWhitespaceChar ( _Context_->Lexer0->ReadLiner0 ) == '|' ) )  //( ! GetState ( _Context_, INFIX_MODE ) ) )
     {
         CfrTil_LocalsAndStackVariablesBegin ( ) ;
     }
     else Interpret_DoParenthesizedRValue ( ) ;
+#else  
+        
+    if ( ( GetState ( _Context_->Interpreter0, PREPROCESSOR_MODE ) && isalnum (ReadLine_LastReadChar ( _ReadLiner_ )) ) ||
+        ( ( CompileMode && ( ! GetState ( compiler, VARIABLE_FRAME ) ) ) 
+        || ( ReadLine_PeekNextNonWhitespaceChar ( _Context_->Lexer0->ReadLiner0 ) == '|' ) ) ) //( ! GetState ( _Context_, INFIX_MODE ) ) )
+    {
+        CfrTil_LocalsAndStackVariablesBegin ( ) ;
+    }
+    else Interpret_DoParenthesizedRValue ( ) ;
+#endif        
 }
 
 void
@@ -226,7 +248,7 @@ _CfrTil_C_Infix_EqualOp ( Word * opWord )
     if ( GetState ( compiler, C_COMBINATOR_LPAREN ) )
     {
         if ( word0->StackPushRegisterCode ) SetHere ( word0->StackPushRegisterCode ) ; // this is the usual after '=' in non C syntax; assuming optimizeOn
-        BlockInfo_Setup_BI_tttn ( compiler, ZERO_TTT, NEGFLAG_NZ, 6 ) ; // must set logic flag for Compile_ReConfigureLogicInBlock in Block_Compile_WithLogicFlag
+        Compiler_Setup_BI_tttn ( compiler, ZERO_TTT, NEGFLAG_NZ ) ; // must set logic flag for Compile_ReConfigureLogicInBlock in Block_Compile_WithLogicFlag
     }
     List_InterpretLists ( compiler->PostfixLists ) ;
     compiler->LHS_Word = 0 ;

@@ -488,17 +488,19 @@ typedef struct
 {
     Symbol BI_Symbol ;
     uint64 State ;
-    byte *FrameStart, *AfterFrame ;
+    byte *LocalFrameStart, *AfterLocalFrame ;
     byte * AfterRspSave ;
     byte *Start ;
     byte *bp_First ;
     byte *bp_Last ;
     byte *JumpOffset ;
-    byte *JccLogicCode, *LogicTestCode, *JccLogicCodeForNot ;
+    byte *JccLogicCode, *LogicTestCode ; 
     byte *CombinatorStartsAt ;
     byte *ActualCodeStart ;
+    byte * CopiedFrom, *CopiedToStart, *CopiedToEnd, *CopiedToLogicJccCode ;
+    int64 CopiedSize ;
     int8 Ttt ;
-    int8 NegFlag, OverWriteSize ;
+    int8 NegFlag ; 
     Word * LogicCodeWord ;
     Namespace * LocalsNamespace ;
 } BlockInfo ;
@@ -937,7 +939,7 @@ typedef struct _CfrTil
     CharacterType LexerCharacterTypeTable [ 256 ] ;
     LexerFunction LexerCharacterFunctionTable [ 24 ] ;
     Buffer *StringB, * TokenB, *OriginalInputLineB, *InputLineB, *SourceCodeSPB, *StringInsertB, *StringInsertB2, *StringInsertB3, *StringInsertB4, *StringInsertB5, *StrCatBuffer ;
-    Buffer *TabCompletionBuf, * LC_PrintB, * LC_DefineB, *DebugB, *DebugB1, *DebugB2, *ScratchB1, *ScratchB2, *ScratchB3, *StringMacroB ; // token buffer, tab completion backup, source code scratch pad, 
+    Buffer *TabCompletionBuf, * LC_PrintB, * LC_DefineB, *DebugB, *DebugB1, *DebugB2, *DebugB3, *ScratchB1, *ScratchB2, *ScratchB3, *StringMacroB ; // token buffer, tab completion backup, source code scratch pad, 
     StrTokInfo Sti ;
     byte * OriginalInputLine ;
     byte * TokenBuffer ;

@@ -322,16 +322,16 @@ Compiler_New ( uint64 type )
 }
 
 void
-CfrTil_CalculateAndSetPreviousJmpOffset ( byte * jmpToAddress )
+Compiler_CalculateAndSetPreviousJmpOffset ( Compiler * compiler, byte * jmpToAddress )
 {
     // we now can not compile blocks (cf. _Compile_Block_WithLogicFlag ) if their logic is not called so depth check is necessary
-    if ( _Stack_Depth ( _Context_->Compiler0->PointerToOffset ) ) _SetOffsetForCallOrJump ( ( byte* ) Stack_Pop ( _Context_->Compiler0->PointerToOffset ), jmpToAddress ) ;
+    if ( _Stack_Depth ( compiler->PointerToOffset ) ) _SetOffsetForCallOrJump ( ( byte* ) Stack_Pop ( compiler->PointerToOffset ), jmpToAddress ) ;
 }
 
 void
 CfrTil_CalculateAndSetPreviousJmpOffset_ToHere ( )
 {
-    CfrTil_CalculateAndSetPreviousJmpOffset ( Here ) ;
+    Compiler_CalculateAndSetPreviousJmpOffset ( _Context_->Compiler0, Here ) ;
 }
 
 void

@@ -148,7 +148,7 @@ ByteArray_SetHere_AndForDebug ( ByteArray * ba, byte * index )
     {
         //_ByteArray_SetEndIndex ( ba, index ) ;
         _ByteArray_SetHere ( ba, index ) ;
-        if ( _Debugger_ ) _Debugger_->PreHere = index ;
+        //if ( _Debugger_ ) _Debugger_->PreHere = index ;
     }
 }
 

@@ -290,6 +290,8 @@ c_syntaxOff
 verbosity 1 =
 sp
 dbgOff 
-s: hi ( a b | c ) c a b + = printf ("\nshould read 3 : %d", c ) ;s 1 2 hi //pause
+infixOff
+1 opOn
+s: hi ( a b | c ) c a @ b @ + = printf ("\nshould read 3 : %d", c ) ;s 1 2 hi //pause
 2 + 7 assertStkChk // stack checking
 
