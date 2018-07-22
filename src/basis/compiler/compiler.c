@@ -264,6 +264,7 @@ Compiler_Init ( Compiler * compiler, uint64 state )
         DLList_RecycleWordList ( compiler->WordList ) ;
         compiler->WordList = _dllist_New ( CFRTIL ) ;
     }
+#if 1    
     else
     {
         _Context_->WordList = compiler->WordList ;
@@ -272,8 +273,10 @@ Compiler_Init ( Compiler * compiler, uint64 state )
             compiler->CurrentWordCompiling->W_SC_WordList = compiler->WordList ;
             compiler->CurrentWordCompiling->W_SC_MemSpaceRandMarker = _Q_->MemorySpace0->TempObjectSpace->InitFreedRandMarker ; // this insures that memory for this list hasn't been recycled
         }
+        DLList_RecycleWordList ( compiler->WordList ) ;
         compiler->WordList = _dllist_New ( CFRTIL ) ;
     }
+#endif    
     CfrTil_InitBlockSystem ( compiler ) ;
     compiler->ContinuePoint = 0 ;
     compiler->BreakPoint = 0 ;
