@@ -16,7 +16,7 @@ Block_Eval ( block blck )
 }
 
 void
-BI_Block_Copy (BlockInfo * bi, byte* dstAddress, byte * srcAddress, int64 bsize, int8 optFlag )
+BI_Block_Copy ( BlockInfo * bi, byte* dstAddress, byte * srcAddress, int64 bsize, int8 optFlag )
 {
     Compiler * compiler = _Compiler_ ;
     if ( ! bi ) bi = ( BlockInfo * ) _Stack_Top ( compiler->CombinatorBlockInfoStack ) ;
@@ -27,8 +27,8 @@ BI_Block_Copy (BlockInfo * bi, byte* dstAddress, byte * srcAddress, int64 bsize,
     bi->CopiedToStart = Here ;
     for ( left = bsize ; ( left > 0 ) ; srcAddress += isize )
     {
-        byte * here = Here ;
-        PeepHole_Optimize ( ) ;
+        //byte * here = Here ;
+        if ( optFlag ) PeepHole_Optimize ( ) ;
         isize = _Udis_GetInstructionSize ( ud, srcAddress ) ;
         left -= isize ;
         _CfrTil_AdjustDbgSourceCodeAddress ( srcAddress, Here ) ;
@@ -67,24 +67,14 @@ BI_Block_Copy (BlockInfo * bi, byte* dstAddress, byte * srcAddress, int64 bsize,
         else if ( * srcAddress == JMPI32 )
         {
             int64 offset = * ( int32* ) ( srcAddress + 1 ) ; // 1 : 1 byte JMPI32 opCode
-            if ( offset )
-            {
-                dllist_Map1 ( compiler->GotoList, ( MapFunction1 ) AdjustJmpOffsetPointer, ( int64 ) ( srcAddress + 1 ) ) ;
-            }
-            else //if ( offset == 0 ) //signature of a goto point
-            {
-                if ( optFlag ) continue ; // don't copy a jmp 0 offset
-                dllist_Map1 ( compiler->GotoList, ( MapFunction1 ) _AdjustGotoInfo, ( int64 ) srcAddress ) ; //, ( int64 ) end ) ;
-
-            }
+            if ( offset ) dllist_Map1 ( compiler->GotoList, ( MapFunction1 ) AdjustJmpOffsetPointer, ( int64 ) ( srcAddress + 1 ) ) ;
+            else dllist_Map1 ( compiler->GotoList, ( MapFunction1 ) _AdjustGotoInfo, ( int64 ) srcAddress ) ; //, ( int64 ) end ) ;
         }
         _CompileN ( srcAddress, isize ) ; // memcpy ( dstAddress, address, size ) ;
-        //_CfrTil_AdjustDbgSourceCodeAddress ( srcAddress, Here ) ;
-        d0 ( if ( Is_DebugModeOn ) _Debugger_Disassemble ( _Debugger_, ( byte* ) here, Here - here, 1 ) ) ;
+        d0 ( if ( Is_DebugModeOn ) _Debugger_Disassemble ( _Debugger_, bi->CopiedToStart, bi->CopiedToEnd - bi->CopiedToStart, 1 ) ) ;
     }
     bi->CopiedToEnd = Here ;
     bi->CopiedSize = bi->CopiedToEnd - bi->CopiedToStart ;
-    _Debugger_Disassemble ( _Debugger_, ( byte* ) bi->CopiedToStart, bi->CopiedSize, 1 ) ;
 }
 
 void
@@ -98,16 +88,20 @@ Compile_BlockLogicTest ( BlockInfo * bi ) // , byte * start )
         {
             bi->JccLogicCode = bi->LogicCodeWord->StackPushRegisterCode ;
         }
-        diff = bi->JccLogicCode - bi->bp_First ;
-        bi->CopiedToLogicJccCode = bi->CopiedToStart + diff ;
-        SetHere ( bi->CopiedToLogicJccCode ) ; 
-        if ( ! ( bi->LogicCodeWord->CAttribute & CATEGORY_LOGIC ) ) _Compile_TestCode ( bi->LogicCodeWord->RegToUse, CELL ) ;
-        //d1 ( if ( Is_DebugOn ) _Debugger_Disassemble ( _Debugger_, ( byte* ) bi->JccLogicCode, Here - bi->JccLogicCode, 0 ) ) ;
+        diff = bi->JccLogicCode - bi->bp_First ; // find its diff position in original block
+        bi->CopiedToLogicJccCode = bi->CopiedToStart + diff ; // use diff in copied block
+        if ( ( ! ( bi->LogicCodeWord->CAttribute & CATEGORY_LOGIC ) ) )
+        {
+            SetHere ( bi->CopiedToLogicJccCode ) ;
+            _Compile_TestCode ( bi->LogicCodeWord->RegToUse, CELL ) ;
+            bi->CopiedToLogicJccCode = Here ;
+            BI_Set_setTtnn ( bi, TTT_ZERO, NEGFLAG_ON, TTT_ZERO, NEGFLAG_OFF ) ;
+        }
     }
     else
     {
         _Compile_GetTestLogicFromTOS ( bi ) ;
-        SetHere ( bi->CopiedToLogicJccCode ) ; 
+        bi->CopiedToLogicJccCode = Here ;
     }
 }
 
@@ -115,21 +109,16 @@ void
 Block_CopyCompile ( byte * srcAddress, int64 bindex, Boolean jccFlag )
 {
     Compiler * compiler = _Context_->Compiler0 ;
-    //int64 depth = _Stack_Depth ( compiler->CombinatorBlockInfoStack ) ;
     BlockInfo *bi = ( BlockInfo * ) _Stack_Pick ( compiler->CombinatorBlockInfoStack, bindex ) ;
-    BI_Block_Copy (bi, Here, srcAddress, bi->bp_Last - bi->bp_First, 0 ) ;
-    //if ( Is_DebugModeOn ) 
-    //_Debugger_Disassemble ( _Debugger_, ( byte* ) bi->CopiedToStart, bi->CopiedSize, 1 ) ;
+    BI_Block_Copy ( bi, Here, srcAddress, bi->bp_Last - bi->bp_First, 0 ) ; //nb!! 0 : turns off peephole optimization ; peephole optimization will be done in CfrTil_EndCombinator
     if ( jccFlag )
     {
         Compile_BlockLogicTest ( bi ) ;
-        //bi->CopiedToLogicJccCode = Here ;
-        _Compile_Jcc ( 0, ZERO_TTT, 0 ) ;
+        _BI_Compile_Jcc (bi, 0) ; 
         Stack_PointerToJmpOffset_Set ( ) ;
         bi->CopiedToEnd = Here ;
         bi->CopiedSize = bi->CopiedToEnd - bi->CopiedToStart ;
-        //if ( Is_DebugModeOn ) 
-        _Debugger_Disassemble ( _Debugger_, ( byte* ) bi->CopiedToStart, bi->CopiedSize, 1 ) ;
+        d0 ( if ( Is_DebugModeOn ) _Debugger_Disassemble ( _Debugger_, ( byte* ) bi->CopiedToStart, bi->CopiedSize, 1 ) ) ;
     }
 }
 
@@ -171,7 +160,7 @@ _CfrTil_BeginBlock0 ( )
     {
         CfrTil_TurnOnBlockCompiler ( ) ;
     }
-    bi->ActualCodeStart = Here ;
+    bi->OriginalActualCodeStart = Here ;
     _Compile_UninitializedJump ( ) ;
     bi->JumpOffset = Here - INT32_SIZE ; // before CfrTil_CheckCompileLocalFrame after CompileUninitializedJump
     Stack_PointerToJmpOffset_Set ( ) ;
@@ -254,16 +243,9 @@ _CfrTil_EndBlock1 ( BlockInfo * bi )
                     }
                 }
             }
-            else if ( GetState ( compiler, RETURN_ACCUM ) || GetState ( compiler, RETURN_TOS ) )
-            {
-                Compile_Move_ACC_To_TOS ( DSP ) ;
-            }
+            else if ( GetState ( compiler, RETURN_ACCUM ) || GetState ( compiler, RETURN_TOS ) ) Compile_Move_ACC_To_TOS ( DSP ) ;
         }
-        else
-        {
-
-            bi->bp_First = bi->Start ; //bi->AfterFrame ; 
-        }
+        else bi->bp_First = bi->Start ; //bi->AfterFrame ; 
     }
     _Compile_Return ( ) ;
     DataStack_Push ( ( int64 ) bi->bp_First ) ;
@@ -282,7 +264,7 @@ _CfrTil_EndBlock2 ( BlockInfo * bi )
     if ( ! _Stack_Depth ( compiler->BlockStack ) )
     {
         _CfrTil_InstallGotoCallPoints_Keyed ( bi, GI_GOTO | GI_RECURSE ) ;
-#if TESTING        
+#if 0 // TESTING        
         BI_Block_Copy ( bi, bi->bp_First, bi->bp_First, Here - bi->bp_First, 2 ) ; // 2 : retFlag will include '_' (dropped blocks) with a 'ret' : final optimization and for PeepHoleOptimize
 #endif        
         CfrTil_TurnOffBlockCompiler ( ) ;
@@ -300,7 +282,7 @@ _CfrTil_EndBlock ( )
 {
     Compiler * compiler = _Context_->Compiler0 ;
     BlockInfo * bi = ( BlockInfo * ) Stack_Pop_WithExceptionOnEmpty ( compiler->BlockStack ) ;
-    if ( ! GetState ( _Context_, C_SYNTAX ) ) bi->LogicCodeWord = _Compiler_WordList ( compiler, 1 ) ;
+    bi->LogicCodeWord = _Compiler_WordList ( compiler, 1 ) ;
     _CfrTil_EndBlock1 ( bi ) ;
     byte * blockStart = _CfrTil_EndBlock2 ( bi ) ;
     return blockStart ;

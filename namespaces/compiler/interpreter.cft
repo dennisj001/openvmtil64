@@ -1,16 +1,16 @@
 5 
 C
 : sp ; //stack pause ;
-optimizeOff
+//optimizeOff
 System Interpreter 
 // these #defines are a bunch of purposefully confusing looking early testing
 #define xhe0 "xhi1 ="  
 #define xhe1() nl ps 
-#define xhe12 ( s ) s nl ps 
-#define xhi2 ( n ) xhe12 ( xhe0 @ ) 1 2 \
+#define xhe12( s ) s nl ps 
+#define xhi2( n ) xhe12 ( xhe0 @ ) 1 2 \
             + n @ \
             + p // backslash also works like C #define 
-#define xhi2a ( s n ) xhe1( s @ ) 1 2 \
+#define xhi2a( s n ) xhe1( s @ ) 1 2 \
             + n @ \
             + p 
 #define xhi01 xhe0 xhe1()

@@ -379,6 +379,13 @@ _Namespace_FreeNamespacesStack ( Stack * stack )
 }
 
 Namespace *
+Namespace_New ( byte * name, Namespace * containingNs )
+{
+    //ns = _DataObject_New ( NAMESPACE, 0, name, NAMESPACE | IMMEDIATE, 0, 0, 0, ( int64 ) containingNs, 0 ) ;
+    Namespace * ns = _DataObject_New ( NAMESPACE, 0, name, NAMESPACE, 0, 0, 0, ( int64 ) containingNs, 0 ) ;
+}
+
+Namespace *
 Namespace_FindOrNew_SetUsing ( byte * name, Namespace * containingNs, int64 setUsingFlag )
 {
     //if ( ! isprint ( name [0] ) ) Error_Abort ( "\nNamespace must begin with printable character!" ) ;
@@ -387,7 +394,8 @@ Namespace_FindOrNew_SetUsing ( byte * name, Namespace * containingNs, int64 setU
     if ( ! ns )
     {
         //ns = _DataObject_New ( NAMESPACE, 0, name, NAMESPACE | IMMEDIATE, 0, 0, 0, ( int64 ) containingNs, 0 ) ;
-        ns = _DataObject_New ( NAMESPACE, 0, name, NAMESPACE, 0, 0, 0, ( int64 ) containingNs, 0 ) ;
+        //ns = _DataObject_New ( NAMESPACE, 0, name, NAMESPACE, 0, 0, 0, ( int64 ) containingNs, 0 ) ;
+        ns = Namespace_New ( name, containingNs ) ;
     }
     if ( setUsingFlag ) Namespace_SetState ( ns, USING ) ;
     return ns ;

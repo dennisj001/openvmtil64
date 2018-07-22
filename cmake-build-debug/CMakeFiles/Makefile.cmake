@@ -45,5 +45,5 @@ set(CMAKE_MAKEFILE_PRODUCTS
 
 # Dependency information for all targets:
 set(CMAKE_DEPEND_INFO_FILES
-  "CMakeFiles/openvmtil64.dir/DependInfo.cmake"
+  "CMakeFiles/cfrtil-gdb.dir/DependInfo.cmake"
   )

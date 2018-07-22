@@ -36,9 +36,11 @@ byte *
 JumpCallInstructionAddress_X64ABI ( byte * address )
 {
     int64 offset ;
-    if ( ( * ( address - 5 ) ) == 0xe9 ) offset = 35 ;
-    else if ( ( * ( address - 10 ) ) == 0x49 ) offset = 8 ;
-    else offset = 23 ;
+    //if ( ( * ( address - 5 ) ) == 0xe9 ) offset = 35 ;
+    //else 
+    if ( ( ( * ( address - 20 ) ) == 0x49 ) &&  ( ( * ( address - 19 ) ) == 0xb8 ) ) offset = 18 ;
+    else offset = 8 ; //if ( ( * ( address - 10 ) ) == 0x49 ) offset = 8 ;
+    //else offset = 23 ;
     byte * jcAddress = * ( byte** ) ( address - offset ) ; //JumpCallInstructionAddress ( debugger->DebugAddress ) ;
     return jcAddress ;
 }
@@ -102,7 +104,7 @@ GetPostfix ( byte * address, byte* postfix, byte * buffer )
             byte * name = ( byte* ) c_gd ( word->Name ) ; //, &_Q_->Default ) ;
             if ( ( byte* ) word->CodeStart == iaddress )
             {
-                snprintf ( ( char* ) buffer, 128, "%s< %s.%s >%s", prePostfix, word->ContainingNamespace->Name, name, postfix ) ;
+                snprintf ( ( char* ) buffer, 128, "%s< %s.%s : " UINT_FRMT " >%s", prePostfix, word->ContainingNamespace->Name, name, (uint64) iaddress, postfix ) ;
             }
             else
             {

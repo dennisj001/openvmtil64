@@ -16,23 +16,28 @@ sp
 : mt2 ( n ) ++ n @ 7 _assert ; 6 mt2 
 : mt3 ( n ) n @ ++ n @ 7 _assert ; 6 mt3 
 : mt4 ( n ) n @ ++ n @ 7 _assert ; 6 mt4 
+sp
 'mt5v var
 : mt5 mt5v 6 = mt5v @ ++ 7 _assert ; mt5
-
+sp
 #if 1
 C
-: t* ( a b -- TOS ) a @ b @ * ; 3 4 t* 12 _assert
-: t+ ( a b -- TOS ) a @ b @ + ; 3 4 t+ 7 _assert 
+: t* ( a b -- TOS ) a @ b @ * ; 3 4 t* 12 _assert sp
+: t+ ( a b -- TOS ) a @ b @ + ; 3 4 t+ 7 _assert sp
 : t* ( a b c d -- TOS ) a @ b @ c @ d @ * * * ; 
 ' t* find wdiss 
 1 2 3 4 t* 24 _assert
+sp
 : t+ ( a b c d -- TOS ) a @ b @ c @ d @ + + + ; 
 //' t+ find wdiss 
 1 2 3 4 t+ 10 _assert
+sp
 : hi ( n -- TOS ) n @ 2 / 2 / 2 / 2 / ; 32 hi  
 2 _assert
+sp
 : hi ( n -- TOS ) n @ 2 * 2 * 2 * 2 * ; 2 hi 32 _assert  
 //' hi find wdiss
+sp
 : hi ( n -- TOS ) 32 n @ / n @ / n @ / n @ / ; 2 hi 2 _assert
 : hi ( n -- TOS ) 2 n @ * n @ * n @ * n @ * ; 2 hi 32 _assert
 //' hi find wdiss
@@ -56,8 +61,8 @@ sp
 infixOff
 //pause
 c_syntaxOn
-void cmoe ( n m -- TOS ) { n <<= m ; p (n) ; return n ; }  cmoe ( 2 6 ) ; 128 _assert0 cmoe ( 1 16 ) ; 65536 _assert0 "\nshould show 128 65536\n" ps sp
-void cmoe ( n m -- TOS ) { n >>= m ; p (n) ; return n ; } cmoe ( 128 6 ) ; 2 _assert0 cmoe ( 65536 16 ) ; 1 _assert0 "\nshould show 2 1\n" ps sp
+void cmoe ( n m -- TOS ) { n <<= m ; p (n) ; return n ; }  cmoe ( 2 6 ) ; sp ; 128 _assert0 cmoe ( 1 16 ) ; 65536 _assert "\nshould show 128 65536\n" ps sp
+void cmoe ( n m -- TOS ) { n >>= m ; p (n) ; return n ; } cmoe ( 128 6 ) ; 2 _assert cmoe ( 65536 16 ) ; 1 _assert "\nshould show 2 1\n" ps sp
 c_syntaxOff
 //pause
 sp

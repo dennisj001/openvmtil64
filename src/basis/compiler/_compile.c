@@ -22,6 +22,14 @@ Compile_Call_From_C_Address ( uint64 bptr )
 
 }
 
+// c ffi : foreign function interface
+void
+Compile_SetCurrentlyRunningWord_Call_TestRSP ( byte * address, Word * word )
+{
+    Compile_MoveImm_To_Reg ( RDI, ( int64 ) word, CELL ) ;
+    Compile_Call_ToAddressThruReg_TestAlignRSP ( address, CALL_THRU_REG ) ;
+}
+
 void
 Compile_Call_CurrentBlock ( )
 {

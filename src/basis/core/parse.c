@@ -278,13 +278,11 @@ _CfrTil_Parse_LocalsAndStackVariables ( int64 svf, int64 lispMode, ListObject * 
             {
                 if ( svff )
                 {
-                    //compiler->NumberOfArgs ++ ;
                     ctype = PARAMETER_VARIABLE ;
                     if ( lispMode ) ctype |= T_LISP_SYMBOL ;
                 }
                 else
                 {
-                    //compiler->NumberOfLocals ++ ;
                     ctype = LOCAL_VARIABLE ;
                     if ( lispMode ) ltype |= T_LISP_SYMBOL ; // no ltype yet for _CfrTil_LocalWord
                 }

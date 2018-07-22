@@ -1,15 +1,17 @@
-Int 
 5
-: sp ; //stack pause ;
+Int 
 dbgOff 
 C
+: sp ; //stack pause ;
+sp
 // testing before bignum starts // - tail recursion from http://c2.com/cgi/wiki?TailCallOptimization
 : factorial ( n | rec ) rec 1 = { n @ 1 > } { rec @ n @ * rec store n -- } while return rec ;
-_wdiss ( 'factorial find ) 
+'factorial find wdiss // _wdiss ( 'factorial find ) 
 7 factorial dup p 5040 "factorial" assert1
 : factorial ( REG n | REG rec ) rec 1 = { n @ 1 > } { rec @ n @ * rec store n -- } while return rec ;
-_wdiss ( 'factorial find ) 
+'factorial find wdiss // _wdiss ( 'factorial find ) 
 7 factorial dup p 5040 "factorial" assert1
+sp
 c_syntaxOn
 int 
 factorial ( n | rec )
@@ -23,7 +25,7 @@ c_syntaxOff
 7 factorial dup p 5040 _assert sp //pause
 'C.int.factorial find wdiss 
 7 C.int.factorial dup p 5040 _assert sp //pause
-
+sp
 #if 0
 BigNum 
 //d: dlsym: mpfr_printf /usr/local/lib/libmpfr.so ; void_return
@@ -36,6 +38,8 @@ d: dlsym: mpfr_printf /usr/local/lib/libmpfr.so ; void_return
 Combinators
 BigNum 
 bnInit ( 16 16 )
+: sp ; //stack pause ;
+
 : qexp { dup 1 >= } { dup -- qexp * } { drop 1 } ifElse ;
 "!" ' qexp find alias
 nl "64 ! = " ps 64 ! p nl 

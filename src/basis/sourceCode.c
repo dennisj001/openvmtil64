@@ -289,7 +289,7 @@ _CfrTil_WordList_TopWord ( )
 void
 Word_Set_SCA ( Word * word0 )
 {
-    if ( word0 ) word0->Coding = Here ;
+    if ( word0 ) Word_SetCoding ( word0, Here ) ;
 }
 
 void

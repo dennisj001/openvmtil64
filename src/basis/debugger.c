@@ -314,11 +314,7 @@ Debugger_GotoList_Print ( Debugger * debugger )
 void
 Debugger_FindUsing ( Debugger * debugger )
 {
-    if ( debugger->Token )
-    {
-
-        debugger->w_Word = Finder_Word_FindUsing ( _Context_->Finder0, debugger->Token, 0 ) ;
-    }
+    if ( debugger->Token ) debugger->w_Word = Finder_Word_FindUsing ( _Context_->Finder0, debugger->Token, 0 ) ;
 }
 
 void

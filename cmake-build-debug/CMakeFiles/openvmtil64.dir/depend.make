@@ -551,8 +551,6 @@ CMakeFiles/openvmtil64.dir/src/basis/core/sequence.c.o: ../src/include/prototype
 CMakeFiles/openvmtil64.dir/src/basis/core/sequence.c.o: ../src/include/stacks.h
 CMakeFiles/openvmtil64.dir/src/basis/core/sequence.c.o: ../src/include/types.h
 
-CMakeFiles/openvmtil64.dir/src/basis/core/sockets.c.o: ../src/basis/core/sockets.c
-
 CMakeFiles/openvmtil64.dir/src/basis/core/string.c.o: ../src/include/udis86.h
 CMakeFiles/openvmtil64.dir/src/basis/core/string.c.o: ../src/basis/core/string.c
 CMakeFiles/openvmtil64.dir/src/basis/core/string.c.o: ../src/include/cfrtil64.h
@@ -806,8 +804,6 @@ CMakeFiles/openvmtil64.dir/src/basis/types.c.o: ../src/include/prototypes.h
 CMakeFiles/openvmtil64.dir/src/basis/types.c.o: ../src/include/stacks.h
 CMakeFiles/openvmtil64.dir/src/basis/types.c.o: ../src/include/types.h
 
-CMakeFiles/openvmtil64.dir/src/nbproject/private/c_standard_headers_indexer.c.o: ../src/nbproject/private/c_standard_headers_indexer.c
-
 CMakeFiles/openvmtil64.dir/src/primitives/bits.c.o: ../src/include/udis86.h
 CMakeFiles/openvmtil64.dir/src/primitives/bits.c.o: ../src/include/cfrtil64.h
 CMakeFiles/openvmtil64.dir/src/primitives/bits.c.o: ../src/include/defines.h
@@ -1049,6 +1045,4 @@ CMakeFiles/openvmtil64.dir/src/primitives/words.c.o: ../src/include/prototypes.h
 CMakeFiles/openvmtil64.dir/src/primitives/words.c.o: ../src/include/stacks.h
 CMakeFiles/openvmtil64.dir/src/primitives/words.c.o: ../src/include/types.h
 CMakeFiles/openvmtil64.dir/src/primitives/words.c.o: ../src/primitives/words.c
-
-CMakeFiles/openvmtil64.dir/src/nbproject/private/cpp_standard_headers_indexer.cpp.o: ../src/nbproject/private/cpp_standard_headers_indexer.cpp
 

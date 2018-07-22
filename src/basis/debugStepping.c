@@ -155,6 +155,7 @@ Debugger_CompileAndStepOneInstruction ( Debugger * debugger )
     if ( debugger->DebugAddress )
     {
         byte *jcAddress = 0, *adr ;
+        Word * word ;
         if ( * debugger->DebugAddress == _RET )
         {
             if ( Stack_Depth ( debugger->ReturnStack ) )
@@ -167,21 +168,12 @@ Debugger_CompileAndStepOneInstruction ( Debugger * debugger )
 doReturn:
                 SetState ( debugger, DBG_STACK_OLD, true ) ;
                 debugger->CopyRSP = 0 ;
-                if ( GetState ( debugger, DBG_BRK_INIT ) )
-                {
-                    SetState_TrueFalse ( debugger, DBG_INTERPRET_LOOP_DONE | DBG_STEPPED, DBG_ACTIVE | DBG_BRK_INIT | DBG_STEPPING ) ;
-                }
-                else
-                {
-                    SetState_TrueFalse ( debugger, DBG_INTERPRET_LOOP_DONE | DBG_STEPPED, DBG_ACTIVE | DBG_STEPPING ) ;
-                }
+                if ( GetState ( debugger, DBG_BRK_INIT ) ) SetState_TrueFalse ( debugger, DBG_INTERPRET_LOOP_DONE | DBG_STEPPED, DBG_ACTIVE | DBG_BRK_INIT | DBG_STEPPING ) ;
+                else SetState_TrueFalse ( debugger, DBG_INTERPRET_LOOP_DONE | DBG_STEPPED, DBG_ACTIVE | DBG_STEPPING ) ;
                 if ( debugger->w_Word ) SetState ( debugger->w_Word, STEPPED, true ) ;
                 debugger->DebugAddress = 0 ;
                 if ( _Q_->Verbosity > 3 )
                 {
-                    //_Debugger_CpuState_Show ( ) ;
-                    //CfrTil_CpuState_Show ( ) ;
-                    //d1 ( Debugger_ReturnStack ( debugger ) ) ;
                     CfrTil_CpuState_Current_Show ( ) ;
                     Pause ( ) ;
                 }
@@ -196,24 +188,23 @@ doReturn:
             goto doCall ;
         }
 #endif        
+        else if ( ( * debugger->DebugAddress == CALLI32 ) || ( ( ( * ( uint16* ) debugger->DebugAddress ) == 0xff49 ) && ( *( debugger->DebugAddress + 2 ) == 0xd1 ) ) )
+        {
+            jcAddress = JumpCallInstructionAddress_X64ABI ( debugger->DebugAddress ) ;
+            goto doJmpCall ;
+        }
         else if ( ( * debugger->DebugAddress == JMPI32 ) || ( * debugger->DebugAddress == CALLI32 ) )
         {
             jcAddress = JumpCallInstructionAddress ( debugger->DebugAddress ) ;
-            //Word * word = Word_GetFromCodeAddress ( jcAddress ) ;
-#if 0
-            if ( word && ( word->CAttribute & ( DEBUG_WORD ) ) )
+doJmpCall:
+            word = Word_GetFromCodeAddress ( jcAddress ) ;
+            if ( word && ( word->CAttribute & ( DEBUG_WORD ) ) && ( ! ( word->CAttribute2 & ( RT_STEPPING_DEBUG ) ) ) )
             {
                 SetState ( debugger, ( DBG_CONTINUE_MODE | DBG_AUTO_MODE ), false ) ;
                 _Printf ( ( byte* ) "\nskipping over a debug word : %s : at 0x%-8x", word ? ( char* ) c_gd ( word->Name ) : "", debugger->DebugAddress ) ;
                 debugger->DebugAddress += 3 ; // 5 : sizeof jmp/call insn // debugger->DebugAddress + size ; // skip the call insn to the next after it
                 goto end ;
             }
-#endif
-        }
-        else if ( ( * debugger->DebugAddress == CALLI32 ) || ( ( ( * ( uint16* ) debugger->DebugAddress ) == 0xff49 ) && ( *( debugger->DebugAddress + 2 ) == 0xd1 ) ) )
-        {
-            jcAddress = JumpCallInstructionAddress_X64ABI ( debugger->DebugAddress ) ;
-            //Word * word = Word_GetFromCodeAddress ( jcAddress ) ;
         }
         else if ( ( * debugger->DebugAddress == CALL_JMP_MOD_RM ) && ( _RM ( debugger->DebugAddress ) == 16 ) ) // inc/dec are also opcode == 0xff
         {
@@ -230,8 +221,8 @@ doReturn:
             if ( mod == 192 ) jcAddress = ( byte* ) _Debugger_->cs_Cpu->Rax ;
             // else it could be inc/dec
         }
-        else if ( adr = debugger->DebugAddress, (( * adr == 0x0f ) && ( ( * ( adr + 1 ) >> 4 ) == 0x8 )) || 
-            (adr = debugger->DebugAddress + 1, ( * adr == 0x0f ) && ( ( * ( adr + 1 ) >> 4 ) == 0x8 )) ) // jcc 
+        else if ( adr = debugger->DebugAddress, ( ( * adr == 0x0f ) && ( ( * ( adr + 1 ) >> 4 ) == 0x8 ) ) ||
+            ( adr = debugger->DebugAddress + 1, ( * adr == 0x0f ) && ( ( * ( adr + 1 ) >> 4 ) == 0x8 ) ) ) // jcc 
         {
             SetState ( debugger, DBG_JCC_INSN, true ) ;
             jcAddress = Debugger_DoJcc ( debugger, 2 ) ;
@@ -287,7 +278,7 @@ Debugger_PreStartStepping ( Debugger * debugger )
                     debugger->DebugAddress ) ;
                 //if ( debugger->DebugAddress ) Debugger_UdisOneInstruction ( debugger, debugger->DebugAddress, ( byte* ) "", ( byte* ) "" ) ; // the next instruction
             }
-#if 1            
+#if 0            
             if ( GetState ( debugger, DBG_RUNTIME_BREAKPOINT ) && String_Equal ( debugger->w_Word->Name, "<dbg>" ) )
             {
                 debugger->DebugAddress += 5 ;
@@ -520,7 +511,7 @@ Debugger_DoJcc ( Debugger * debugger, int64 numOfBytes )
     // cf. Intel Software Developers Manual v1. (253665), Appendix B
     // ?? nb. some of this may not be (thoroughly) tested as of 11-14-2011 -- but no known problems after months of usual testing ??
     // setting jcAddress to 0 means we don't branch and just continue with the next instruction
-    if ( ttt == BELOW ) // ttt 001
+    if ( ttt == TTT_BELOW ) // ttt 001
     {
         if ( ( n == 0 ) && ! ( ( uint64 ) debugger->cs_Cpu->RFlags & CARRY_FLAG ) )
         {
@@ -531,7 +522,7 @@ Debugger_DoJcc ( Debugger * debugger, int64 numOfBytes )
             jcAddress = 0 ;
         }
     }
-    else if ( ttt == ZERO_TTT ) // ttt 010
+    else if ( ttt == TTT_ZERO ) // ttt 010
     {
         if ( ( n == 0 ) && ! ( ( uint64 ) debugger->cs_Cpu->RFlags & ZERO_FLAG ) )
         {
@@ -542,7 +533,7 @@ Debugger_DoJcc ( Debugger * debugger, int64 numOfBytes )
             jcAddress = 0 ;
         }
     }
-    else if ( ttt == BE_TTT ) // ttt 011 :  below or equal
+    else if ( ttt == TTT_BE ) // ttt 011 :  below or equal
     {
         if ( ( n == 0 ) && ! ( ( ( uint64 ) debugger->cs_Cpu->RFlags & CARRY_FLAG ) | ( ( uint64 ) debugger->cs_Cpu->RFlags & ZERO_FLAG ) ) )
         {
@@ -553,7 +544,7 @@ Debugger_DoJcc ( Debugger * debugger, int64 numOfBytes )
             jcAddress = 0 ;
         }
     }
-    else if ( ttt == LESS_TTT ) // ttt 110
+    else if ( ttt == TTT_LESS ) // ttt 110
     {
         if ( ( n == 0 ) && ! ( ( ( uint64 ) debugger->cs_Cpu->RFlags & SIGN_FLAG ) ^ ( ( uint64 ) debugger->cs_Cpu->RFlags & OVERFLOW_FLAG ) ) )
         {
@@ -564,7 +555,7 @@ Debugger_DoJcc ( Debugger * debugger, int64 numOfBytes )
             jcAddress = 0 ;
         }
     }
-    else if ( ttt == LE_TTT ) // ttt 111
+    else if ( ttt == TTT_LE ) // ttt 111
     {
         if ( ( n == 0 ) &&
             ! ( ( ( ( uint64 ) debugger->cs_Cpu->RFlags & SIGN_FLAG ) ^ ( ( uint64 ) debugger->cs_Cpu->RFlags & OVERFLOW_FLAG ) ) | ( ( uint64 ) debugger->cs_Cpu->RFlags & ZERO_FLAG ) ) )

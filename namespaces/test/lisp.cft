@@ -2,6 +2,8 @@
 5
 "\nstarting lisp.cft\n" ddps
 Lisp
+: sp ; //stack pause ;
+sp
 "lambda" tick _lambda find alias immediate
 "/\" tick lambda find alias
 "/." tick lambda find alias
@@ -141,14 +143,16 @@ nl
 ((q2 +) (q2 28) (q2 2)(q3 2) (q4 45))
 
 #if 1
+Int Lisp
 (( lambda ( x y ) ( + x y ) ) 3 4 ) 
 (define yfac (lambda (yy n) (if* (< n 2) 1 (* n (yy yy (- n 1)))))) 
 (yfac yfac 10) nl
 (define yfacc (lambda (yyy n1) (if* (< n1 2) (1) (* n1 (yyy yyy (- n1 1)))))) 
 (yfacc yfacc 10) nl
-(yfacc yfacc 7) nl //pause
+(yfacc yfacc 7) nl 
 (define fibc (lambda ( n ) (ifElse (< n 2) n (+ (fibc (- n 1)) (fibc (- n 2))))))
 (fibc 20)
+sp
 #endif
 
 //pause
@@ -157,10 +161,16 @@ nl
 ( :: : hioo 3 4 + dup p ; : hio 5 6 + dup p ; hio hioo ) 7 _assert 11 _assert s // pause
 ( hioo ) ( hio ) 11 _assert 7 _assert hio hioo 7 _assert 11 _assert 
 tick hioo find wdiss //pause
-
-( :: C : bexp43 ( n ) { n @ 1 > } { n @ n @ -- bexp43 * } { 1 } ifElse ; )
-tick bexp43 find wdiss //pause
+lispOff
+C
+: bexp43 ( n ) { n @ 1 > } { n @ n @ -- bexp43 * } { 1 } ifElse ;
 7 C bexp43 dup 5040 nl "C : bexp43_assert" assert p nl 
+tick bexp43 find wdiss //pause
+sp
+Lisp
+( :: C : bexp44 ( n ) { n @ 1 > } { n @ n @ -- bexp44 * } { 1 } ifElse ; )
+tick bexp44 find wdiss //pause
+7 C bexp44 dup 5040 nl "C : bexp43_assert" assert p nl 
 
 s
 lispOff
@@ -225,8 +235,8 @@ Debug Lisp // test comment
     goedel8 9 _assert0 "\ngoedel8 output should read : \n'junk' 2 'junk' 7 'junk' 10 9" ps //pause
 ) 
 //pause
-tick goedel7 find wdiss 
-s
+tick goedel8 find wdiss 
+sp
 Lisp
 nl (list (1 2)) (list 1 2)
 //pause
@@ -235,7 +245,7 @@ nl (list (1 2)) (list 1 2)
 
 lispOff 
 
-
+sp
 "\nending lisp.cft\n" ddps
 sp 
 #if 1 //doScript
@@ -248,8 +258,9 @@ $etc/lispScript ;
 $ls  -al ;
 s: hi ( a b | c ) c a @ b @ + = printf ("\n%d", c ) ;s 1 2 hi //pause
 verbosity 1 =
-s
-//pause
-#endif
+sp
 
+#endif
+sp
 2 + 7 assertStkChk // stack checking
+sp

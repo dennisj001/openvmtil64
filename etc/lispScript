@@ -1,5 +1,7 @@
 #! /usr/local/bin/cfrtil64 -s
 verbosity 1 =
+state
+version
 Int
 Lisp
 nl 

@@ -1,6 +1,7 @@
 
 5
-//s pause
+: sp ; //s pause ; 
+sp
 optimizeOn inlineOn 
 lispOff
 bnoff 
@@ -116,7 +117,7 @@ c_syntaxOff
 // : bexp2 ( n | res ) { n @ 1 <= } { 1 } { n @ dup -- bexp2 * } ifElse ;
 
 : sdbg ( j ) { stackDepth 20 > } { state regs nl "stackDepth = " ps stackDepth p nl hex { j stackDepth = } { j @ 0 > } { j -- } { p } for quit } if2 ;
-
+sp
 User
 //'dn 'dfnba find alias  
 : factorial ( REG n | REG rec -- RAX ) rec 1 = { n @ 1 > } { rec @ n @ * rec store n -- } while return rec ;

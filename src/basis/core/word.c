@@ -420,9 +420,9 @@ _CfrTil_Alias ( Word * word, byte * name )
 {
     if ( word && word->Definition )
     {
-        Word * alias = _Word_New ( name, word->CAttribute | ALIAS, word->CAttribute2, word->LAttribute, 1, 0, DICTIONARY ) ; // inherit type from original word
         //while ( ( word->Definition ) && word->W_AliasOf ) word = word->W_AliasOf ;
         //while ( ! word->Definition ) word = word->W_AliasOf ;
+        Word * alias = _Word_New ( name, word->CAttribute | ALIAS, word->CAttribute2, word->LAttribute, 1, 0, DICTIONARY ) ; // inherit type from original word
         while ( word->W_AliasOf ) word = word->W_AliasOf ;
         _Word_InitFinal ( alias, ( byte* ) word->Definition ) ;
         alias->S_CodeSize = word->S_CodeSize ;

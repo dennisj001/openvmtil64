@@ -551,8 +551,6 @@ CMakeFiles/openvmtil64.dir/src/basis/core/sequence.c.o
  /home/dennisj/openvmtil64/src/include/prototypes.h
  /home/dennisj/openvmtil64/src/include/stacks.h
  /home/dennisj/openvmtil64/src/include/types.h
-CMakeFiles/openvmtil64.dir/src/basis/core/sockets.c.o
- /home/dennisj/openvmtil64/src/basis/core/sockets.c
 CMakeFiles/openvmtil64.dir/src/basis/core/string.c.o
  ../src/include/udis86.h
  /home/dennisj/openvmtil64/src/basis/core/string.c
@@ -806,8 +804,6 @@ CMakeFiles/openvmtil64.dir/src/basis/types.c.o
  /home/dennisj/openvmtil64/src/include/prototypes.h
  /home/dennisj/openvmtil64/src/include/stacks.h
  /home/dennisj/openvmtil64/src/include/types.h
-CMakeFiles/openvmtil64.dir/src/nbproject/private/c_standard_headers_indexer.c.o
- /home/dennisj/openvmtil64/src/nbproject/private/c_standard_headers_indexer.c
 CMakeFiles/openvmtil64.dir/src/primitives/bits.c.o
  ../src/include/udis86.h
  /home/dennisj/openvmtil64/src/include/cfrtil64.h
@@ -1050,5 +1046,3 @@ CMakeFiles/openvmtil64.dir/src/primitives/words.c.o
  /home/dennisj/openvmtil64/src/include/stacks.h
  /home/dennisj/openvmtil64/src/include/types.h
  /home/dennisj/openvmtil64/src/primitives/words.c
-CMakeFiles/openvmtil64.dir/src/nbproject/private/cpp_standard_headers_indexer.cpp.o
- /home/dennisj/openvmtil64/src/nbproject/private/cpp_standard_headers_indexer.cpp

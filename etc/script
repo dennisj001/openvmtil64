@@ -4,8 +4,10 @@ verbosity 0 =
 : hi 1 6 + p ;
 : hey nl hi hi hi ;
 verbosity 1 = 
+state
+version
 hey
-//version
+version
 nl 
 verbosity 1 =
 Int

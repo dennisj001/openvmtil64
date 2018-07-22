@@ -495,12 +495,12 @@ typedef struct
     byte *bp_Last ;
     byte *JumpOffset ;
     byte *JccLogicCode, *LogicTestCode ; 
-    byte *CombinatorStartsAt ;
-    byte *ActualCodeStart ;
-    byte * CopiedFrom, *CopiedToStart, *CopiedToEnd, *CopiedToLogicJccCode ;
+    byte *CombinatorStartsAt, *CombinatorEndsAt ;
+    byte *OriginalActualCodeStart ;
+    byte * CopiedFrom, *CopiedToStart, *CopiedToEnd, *CopiedToLogicJccCode, *ActualCopiedToJccCode ;
     int64 CopiedSize ;
-    int8 Ttt ;
-    int8 NegFlag ; 
+    int8 SetccTtt, JccTtt ;
+    int8 SetccNegFlag, JccNegFlag ; 
     Word * LogicCodeWord ;
     Namespace * LocalsNamespace ;
 } BlockInfo ;
@@ -773,9 +773,9 @@ typedef struct
     dllist * CurrentSwitchList ;
     dllist * RegisterParameterList ;
     CompileOptimizeInfo * OptInfo ;
+    dllist * WordList, *PostfixLists ;
     Stack * CombinatorInfoStack ;
     Stack * PointerToOffset ;
-    dllist * WordList, *PostfixLists ;
     Stack * LocalsCompilingNamespacesStack ;
     Stack * CombinatorBlockInfoStack ;
     Stack * BlockStack ;
@@ -881,7 +881,7 @@ typedef struct _LambdaCalculus
     uint64 State ;
     int64 DontCopyFlag, Loop, LispParenLevel ;
     Namespace * LispTemporariesNamespace, *LispNamespace ;
-    ListObject * Nil, *True, *CurrentList, *CurrentLambdaFunction ; //, *ListFirst;
+    ListObject * Nil, *True, *CurrentList, *CurrentLambdaFunction, *LastInterpretedWord ; //, *ListFirst;
     ByteArray * SavedCodeSpace ;
     uint64 ItemQuoteState, QuoteState ;
     struct _CfrTil * OurCfrTil ;
@@ -931,7 +931,7 @@ typedef struct _CfrTil
     block CurrentBlock, SaveCpuState, SaveCpu2State, RestoreCpuState, RestoreCpu2State, CallCfrTilWord, CallCurrentBlock, RestoreSelectedCpuState, SaveSelectedCpuState ; //, SyncDspToEsi, SyncEsiToDsp ;
     //block Set_CfrTilRspReg_FromReturnStackPointer, Set_ReturnStackPointer_FromCfrTilRspReg, Set_DspReg_FromDataStackPointer, Set_DataStackPointer_FromDspReg ; //, PeekReg, PokeReg ;
     block Set_DspReg_FromDataStackPointer, Set_DataStackPointer_FromDspReg ; //, PeekReg, PokeReg ;
-    block PopDspToR8AndCall, CallReg_TestRSP ; //adjustRSPAndCall, adjustRSP ;
+    block PopDspToR8AndCall, CallReg_TestRSP, Call_ToAddressThruR8_TestAlignRSP ; //adjustRSPAndCall, adjustRSP ;
     ByteArray * PeekPokeByteArray ;
     Word * LastFinishedWord, *StoreWord, *PokeWord, *ScoOcCrw, *DebugWordListWord, *EndBlockWord, *BeginBlockWord, *InfixNamespace ;
     byte ReadLine_CharacterTable [ 256 ] ;
@@ -1090,6 +1090,7 @@ typedef struct
 {
     const char * ccp_Name ;
     uint64 ui64_CAttribute ;
+    uint64 ui64_CAttribute2 ;
     block blk_CallHook ;
     byte * Function ;
     int64 i32_FunctionArg ;

@@ -6,7 +6,7 @@ _OpenVmTil_ShowExceptionInfo ( )
 {
     if ( _Q_->Verbosity )
     {
-        if ( _Q_->SignalExceptionsHandled++ < 2 ) // ++ : for when this block throws and exception prevent looping and stack overflow
+        if ( _Q_->SignalExceptionsHandled ++ < 2 ) // ++ : for when this block throws and exception prevent looping and stack overflow
         {
             if ( _CfrTil_ )
             {
@@ -96,8 +96,18 @@ _OVT_Pause ( byte * prompt, int64 signalsHandled )
             }
             else if ( key == 'd' )
             {
-                CfrTil_DebugOn ( ) ;
-                SetState ( _Debugger_, DBG_INFO | DBG_MENU | DBG_PROMPT, true ) ;
+                if ( Is_DebugOn ) 
+                {
+                    Debugger * debugger = _Debugger_ ;
+                    SetState ( debugger, DBG_AUTO_MODE, false );
+                    SetState ( debugger, DBG_EVAL_AUTO_MODE, false ) ;
+                    _Debugger_InterpreterLoop ( debugger ) ;
+                }
+                else
+                {
+                    CfrTil_DebugOn ( ) ;
+                    SetState ( _Debugger_, DBG_INFO | DBG_MENU | DBG_PROMPT, true ) ;
+                }
                 break ;
             }
             else if ( key == 'c' )
@@ -214,7 +224,7 @@ OpenVmTil_Throw ( byte * excptMessage, int64 restartCondition, int64 infoFlag )
     _Q_->ExceptionMessage = excptMessage ;
     _Q_->Thrown = restartCondition ;
 
-    if ( infoFlag ) _OpenVmTil_ShowExceptionInfo ( ) ;
+    if ( infoFlag && (_Q_->SignalExceptionsHandled ++ < 2) ) _OpenVmTil_ShowExceptionInfo ( ) ;
     _OVT_Throw ( restartCondition, 0 ) ;
 }
 
@@ -242,7 +252,7 @@ OpenVmTil_SignalAction ( int signal, siginfo_t * si, void * uc )
     {
         _Q_->SignalExceptionsHandled ++ ;
         if ( ( signal != SIGSEGV ) || _Q_->SignalExceptionsHandled < 2 ) _Printf ( ( byte* ) "\nOpenVmTil_SignalAction : address = 0x%016lx : %s", _Q_->SigAddress, _Q_->SigLocation ) ;
-        if ( _Debugger_->DebugAddress ) 
+        if ( _Debugger_->DebugAddress )
         {
             _Debugger_Udis_OneInstruction ( _Debugger_, _Debugger_->DebugAddress, "", "" ) ;
             Debugger_Registers ( _Debugger_ ) ;

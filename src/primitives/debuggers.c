@@ -18,7 +18,7 @@ void
 _CfrTil_Debugger_Locals_Show ( )
 {
     Debugger_Locals_Show ( _Debugger_ ) ;
-    Pause ( ) ;
+    //Pause ( ) ;
 }
 
 void

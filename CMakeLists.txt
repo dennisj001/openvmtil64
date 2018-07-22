@@ -5,7 +5,7 @@ set(CMAKE_CXX_STANDARD 11)
 
 include_directories(src/include)
 
-add_executable(openvmtil64
+add_executable(cfrtil-gdb
         namespaces/test/arrayTest.cft
         namespaces/test/bigNum.cft
         namespaces/test/bigNum.test.cft
@@ -69,7 +69,6 @@ add_executable(openvmtil64
         src/basis/core/readline.c
         src/basis/core/readTable.c
         src/basis/core/sequence.c
-        src/basis/core/sockets.c
         src/basis/core/string.c
         src/basis/core/symbol.c
         src/basis/core/syntax.c
@@ -111,8 +110,6 @@ add_executable(openvmtil64
         src/include/stacks.h
         src/include/types.h
         src/include/udis86.h
-        src/nbproject/private/c_standard_headers_indexer.c
-        src/nbproject/private/cpp_standard_headers_indexer.cpp
         src/primitives/bits.c
         src/primitives/cmaths.c
         src/primitives/compilers.c
@@ -135,8 +132,8 @@ add_executable(openvmtil64
         src/primitives/syntaxes.c
         src/primitives/systems.c
         src/primitives/words.c
-        src/Makefile
-        m
-        mir
-        r
-        ReadMe.txt)
+        )
+find_library(udis86_LIB udis86)
+find_library(mpfr_LIB mpfr)
+find_library(gmp_LIB gmp)
+target_link_libraries( cfrtil-gdb udis86 rt c dl m  mpfr gmp )

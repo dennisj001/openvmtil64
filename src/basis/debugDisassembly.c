@@ -39,6 +39,14 @@ _Debugger_Disassemble ( Debugger * debugger, byte* address, int64 number, int64 
     return size ;
 }
 
+int64
+Debugger_Disassemble ( Debugger * debugger, byte* address, int64 number, int64 cflag )
+{
+    CfrTil_NewLine ( ) ;
+    int64 size = _Debugger_Disassemble ( debugger, address, number, cflag ) ;
+    _Printf ( ( byte * ) "\n%d bytes disassembled", size ) ;
+}
+
 void
 Debugger_Dis ( Debugger * debugger )
 {
@@ -102,6 +110,7 @@ void
 Debugger_DisassembleTotalAccumulated ( Debugger * debugger )
 {
     byte * address = _Context_->Compiler0->InitHere ;
+    Word * word = _Context_->Compiler0->CurrentWordCompiling ;
     if ( ! ( Here - address ) )
     {
         address = ( byte* ) _CfrTil_->LastFinishedWord->Definition ;
@@ -110,9 +119,8 @@ Debugger_DisassembleTotalAccumulated ( Debugger * debugger )
     int64 svState = GetState ( _CfrTil_, GLOBAL_SOURCE_CODE_MODE ) ;
     SetState ( _CfrTil_, GLOBAL_SOURCE_CODE_MODE, true ) ;
     SetState ( debugger, DBG_DISASM_ACC, true ) ;
-    //debugger->LastSourceCodeWord = 0 ;
-    _Printf ( ( byte* ) "\nDisassembling the current word : \'%s\' : %4d bytes : total accumulated code ...", _Context_->Compiler0->CurrentWordCompiling ? _Context_->Compiler0->CurrentWordCompiling->Name : ( byte* ) "", size ) ;
-    _Debugger_Disassemble ( debugger, address, size, ! Compiling ) ;
+    _Printf ( ( byte* ) "\nDisassembling the current word : \'%s\' : %4d bytes : total accumulated code ...", word ? word->Name : ( byte* ) "", size ) ;
+    Debugger_Disassemble ( debugger, address, size, ! Compiling ) ;
     SetState ( _CfrTil_, GLOBAL_SOURCE_CODE_MODE, svState ) ;
     SetState ( debugger, DBG_DISASM_ACC, false ) ;
 }

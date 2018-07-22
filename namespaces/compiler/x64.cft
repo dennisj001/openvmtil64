@@ -59,7 +59,7 @@ hex
 Logic Bits Combinators X64 
 
 'x64_dbg 1 const  
-'DBI 1 const
+'DBI 0 const
 //#define x64_dbg 1
 #if x64_dbg    
 dscOn 
@@ -78,9 +78,8 @@ CalculateModRegardingDisplacement ( _mod,  disp | rmod ) // _mod/rmod avoid name
     //  00 000 000
     if ( _mod != REG )
     {
-#if 0
-        if ( disp == 0 ) 
-            rmod = 0 ;
+#if 0 // c_syntax/preprocessor tesing
+        if ( disp == 0 ) rmod = 0 ;
         else 
         {   
             if ( disp <= 0xff ) 
@@ -267,7 +266,6 @@ _Compile_Write_Instruction_X64 ( rex, opCode, modRm, controlFlags, sib, disp, di
     int nbytes ;
     _here = Here ;
 #endif
-    <dbg>
     if ( rex ) compile1 ( rex ) ; 
     if ( opCode >= 0x100 ) compile2 ( opCode ) ; 
     else compile1 ( opCode ) ; 
@@ -277,7 +275,7 @@ _Compile_Write_Instruction_X64 ( rex, opCode, modRm, controlFlags, sib, disp, di
     if ( imm || ( controlFlags Bits.& IMM_B ) ) _Compile_ImmDispData ( imm, immSize, ( controlFlags Bits.& IMM_B ) ) ;
 #if DBI
     nbytes = Here - _here ; 
-    printf ( "\n_Compile_Write_Instruction_X64 : %lx : %d bytes : ...", _here, nbytes ) ; dis ( _here, nbytes ) ; //pause () ; //nl ; nl ; nl ; //
+    printf ( "\n_Compile_Write_Instruction_X64 : %lx : %d bytes : ...", _here, nbytes ) ; dis ( _here, nbytes ) ; //pause () ; nl ; nl ; 
 #endif
 } prefix
 //'_Compile_Write_Instruction_X64 find wdiss pause
@@ -306,7 +304,6 @@ _CalculateRex ( _reg rm rex_w_flag | rex )
 void
 Compile_CalcWrite_Instruction_X64 (  rex,  opCode,  _mod,  _reg,  rm, controlFlags,  sib,  disp,  dispSize,  imm,  immSize | modRm )
 {
-    <dbg>
     rex = _CalculateRex ( _reg, rm, ( immSize == 8 ) || ( controlFlags Bits.& REX_B ) ) ;
     modRm = CalculateModRmByte ( _mod, _reg, rm, sib, disp ) ;
     _Compile_Write_Instruction_X64 ( rex, opCode, modRm, controlFlags, sib, disp, dispSize, imm, immSize ) ;
@@ -318,11 +315,11 @@ void
 _Compile_Move ( toRegOrMem _mod _reg rm controlFlags disp | opCode ) 
 {
     if ( toRegOrMem == REG ) opCode = #x8b ; 
-    else opCode = #x89 d: ; 
+    else opCode = #x89 ; 
     //Compile_CalcWrite_Instruction_X64 ( rex,  opCode,  _mod,  _reg,  rm, controlFlags,  sib,  disp,  dispSize,  imm,  immSize | modRm )
     Compile_CalcWrite_Instruction_X64 ( 0, opCode, _mod, _reg, rm, controlFlags, 0, disp, 0, 0, 0 ) ;
 } prefix
-'_Compile_Move find wdiss pause
+'_Compile_Move find wdiss //pause
 
 //                                          _Compile_Move ( toRegOrMem _mod _reg rm controlFlags disp | opCode ) 
 void _Compile_Move_DataStackN_ToReg ( _reg n ) { _Compile_Move ( REG, MEM, _reg, DSP, (REX_B | MODRM_B | DISP_B), n * CELL ) ; } prefix 
@@ -333,8 +330,8 @@ _Compile_Group1_Immediate ( code _mod rm disp imm immSize | opCode ) //controlFl
 {
     // #x80 is the base opCode for this group of instructions 
     // 1000 00sw 
-    //opCode = #x80 ;
-    opCode = ( code << 3 ) 
+    opCode = #x80 ;
+    //opCode = ( code << 3 ) ;
     //{ toRegOrMem == REG } { opCode |= 2 } if2
 
     if ( ( immSize > BYTE ) || ( imm >= 0x100 ) )
@@ -404,34 +401,39 @@ sp
     //"\nshould show :     4983ee08                sub r14, 0x8" ps
 ;; 
 sp
-
+//'_Compile_Stack_PopToReg find wdiss //pause
 #if 0
+c_syntaxOn
 void
 Compile_PopDspToR8AndCall ()
 {
     _Compile_Stack_PopToReg ( DSP, R8 ) ;
     _Compile_CallThruReg ( R8 ) ;
 }
+#if 0
 4d8b06                  mov r8, [r14]                                          
 4983ee08                sub r14, 0x8                                           
 49ffd0                  call r8                                                
 c3                      ret      
 #endif
+c_syntaxOff
+'Compile_PopDspToR8AndCall find wdiss
+#endif
+
 
 #if x64_dbg
 //verbosity 3 =
 Combinators
 
-'popDspToR8AndCall find wdiss
 sp
 :asm iax
-    d: _Compile_Stack_PopToReg ( R8D )             //4d8b06                  mov r8, [r14]       
+    _Compile_Stack_PopToReg ( R8D )             //4d8b06                  mov r8, [r14]       
     _Compile_CallThruReg ( R8D )                //4983ee08                sub r14, 0x8
                                                 //49ffd0                  call r8  
                                                 //c3                      ret      
 asm; 
 
-' iax find wdiss sp 
+' iax find wdiss // pause // sp 
 
 : _Compile_Test_Imm (  _mod, rm, disp, imm )
     _Compile_Test ( _mod @, rm @, IMM_B, disp @, imm @ )
@@ -493,8 +495,8 @@ Stack
 asm;
 
 ' ndup find wdiss sp 
-7 ndup 7 ndrop
-//s pause
+7 ndup s 7 ndrop
+s 
 Asm
 // following intel conventions in the naming : insn dst, src
 // move mem to _reg 

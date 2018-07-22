@@ -41,7 +41,6 @@ file(REMOVE_RECURSE
   "CMakeFiles/openvmtil64.dir/src/basis/core/readline.c.o"
   "CMakeFiles/openvmtil64.dir/src/basis/core/readTable.c.o"
   "CMakeFiles/openvmtil64.dir/src/basis/core/sequence.c.o"
-  "CMakeFiles/openvmtil64.dir/src/basis/core/sockets.c.o"
   "CMakeFiles/openvmtil64.dir/src/basis/core/string.c.o"
   "CMakeFiles/openvmtil64.dir/src/basis/core/symbol.c.o"
   "CMakeFiles/openvmtil64.dir/src/basis/core/syntax.c.o"
@@ -73,8 +72,6 @@ file(REMOVE_RECURSE
   "CMakeFiles/openvmtil64.dir/src/basis/system.c.o"
   "CMakeFiles/openvmtil64.dir/src/basis/tabCompletion.c.o"
   "CMakeFiles/openvmtil64.dir/src/basis/types.c.o"
-  "CMakeFiles/openvmtil64.dir/src/nbproject/private/c_standard_headers_indexer.c.o"
-  "CMakeFiles/openvmtil64.dir/src/nbproject/private/cpp_standard_headers_indexer.cpp.o"
   "CMakeFiles/openvmtil64.dir/src/primitives/bits.c.o"
   "CMakeFiles/openvmtil64.dir/src/primitives/cmaths.c.o"
   "CMakeFiles/openvmtil64.dir/src/primitives/compilers.c.o"
@@ -102,6 +99,6 @@ file(REMOVE_RECURSE
 )
 
 # Per-language clean rules from dependency scanning.
-foreach(lang C CXX)
+foreach(lang C)
   include(CMakeFiles/openvmtil64.dir/cmake_clean_${lang}.cmake OPTIONAL)
 endforeach()

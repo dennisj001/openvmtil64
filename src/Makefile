@@ -29,7 +29,7 @@ OBJECTS = $(SOURCES:%.c=%.o)
 CC = gcc
 OUT = cfrtil64-gdb
 
-//all : default
+#all : default
 default : debug
 
 debug : cfrtil64-gdb 

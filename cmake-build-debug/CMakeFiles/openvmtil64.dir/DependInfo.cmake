@@ -1,7 +1,6 @@
 # The set of languages for which implicit dependencies are needed:
 set(CMAKE_DEPENDS_LANGUAGES
   "C"
-  "CXX"
   )
 # The set of files for implicit dependencies of each language:
 set(CMAKE_DEPENDS_CHECK_C
@@ -55,7 +54,6 @@ set(CMAKE_DEPENDS_CHECK_C
   "/home/dennisj/openvmtil64/src/basis/core/readTable.c" "/home/dennisj/openvmtil64/cmake-build-debug/CMakeFiles/openvmtil64.dir/src/basis/core/readTable.c.o"
   "/home/dennisj/openvmtil64/src/basis/core/readline.c" "/home/dennisj/openvmtil64/cmake-build-debug/CMakeFiles/openvmtil64.dir/src/basis/core/readline.c.o"
   "/home/dennisj/openvmtil64/src/basis/core/sequence.c" "/home/dennisj/openvmtil64/cmake-build-debug/CMakeFiles/openvmtil64.dir/src/basis/core/sequence.c.o"
-  "/home/dennisj/openvmtil64/src/basis/core/sockets.c" "/home/dennisj/openvmtil64/cmake-build-debug/CMakeFiles/openvmtil64.dir/src/basis/core/sockets.c.o"
   "/home/dennisj/openvmtil64/src/basis/core/string.c" "/home/dennisj/openvmtil64/cmake-build-debug/CMakeFiles/openvmtil64.dir/src/basis/core/string.c.o"
   "/home/dennisj/openvmtil64/src/basis/core/symbol.c" "/home/dennisj/openvmtil64/cmake-build-debug/CMakeFiles/openvmtil64.dir/src/basis/core/symbol.c.o"
   "/home/dennisj/openvmtil64/src/basis/core/syntax.c" "/home/dennisj/openvmtil64/cmake-build-debug/CMakeFiles/openvmtil64.dir/src/basis/core/syntax.c.o"
@@ -79,7 +77,6 @@ set(CMAKE_DEPENDS_CHECK_C
   "/home/dennisj/openvmtil64/src/basis/system.c" "/home/dennisj/openvmtil64/cmake-build-debug/CMakeFiles/openvmtil64.dir/src/basis/system.c.o"
   "/home/dennisj/openvmtil64/src/basis/tabCompletion.c" "/home/dennisj/openvmtil64/cmake-build-debug/CMakeFiles/openvmtil64.dir/src/basis/tabCompletion.c.o"
   "/home/dennisj/openvmtil64/src/basis/types.c" "/home/dennisj/openvmtil64/cmake-build-debug/CMakeFiles/openvmtil64.dir/src/basis/types.c.o"
-  "/home/dennisj/openvmtil64/src/nbproject/private/c_standard_headers_indexer.c" "/home/dennisj/openvmtil64/cmake-build-debug/CMakeFiles/openvmtil64.dir/src/nbproject/private/c_standard_headers_indexer.c.o"
   "/home/dennisj/openvmtil64/src/primitives/bits.c" "/home/dennisj/openvmtil64/cmake-build-debug/CMakeFiles/openvmtil64.dir/src/primitives/bits.c.o"
   "/home/dennisj/openvmtil64/src/primitives/cmaths.c" "/home/dennisj/openvmtil64/cmake-build-debug/CMakeFiles/openvmtil64.dir/src/primitives/cmaths.c.o"
   "/home/dennisj/openvmtil64/src/primitives/compilers.c" "/home/dennisj/openvmtil64/cmake-build-debug/CMakeFiles/openvmtil64.dir/src/primitives/compilers.c.o"
@@ -107,15 +104,6 @@ set(CMAKE_C_COMPILER_ID "GNU")
 
 # The include file search paths:
 set(CMAKE_C_TARGET_INCLUDE_PATH
-  "../src/include"
-  )
-set(CMAKE_DEPENDS_CHECK_CXX
-  "/home/dennisj/openvmtil64/src/nbproject/private/cpp_standard_headers_indexer.cpp" "/home/dennisj/openvmtil64/cmake-build-debug/CMakeFiles/openvmtil64.dir/src/nbproject/private/cpp_standard_headers_indexer.cpp.o"
-  )
-set(CMAKE_CXX_COMPILER_ID "GNU")
-
-# The include file search paths:
-set(CMAKE_CXX_TARGET_INCLUDE_PATH
   "../src/include"
   )
 

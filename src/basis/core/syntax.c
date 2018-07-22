@@ -54,7 +54,7 @@ Interpret_C_Block_EndBlock ( Word * word, byte * tokenToUse, Boolean insertFlag 
 {
     Compiler * compiler = _Compiler_ ;
     BlockInfo * bi = ( BlockInfo* ) _Stack_Top ( compiler->BlockStack ) ;
-    bi->LogicCodeWord = _Compiler_WordList ( compiler, 1 ) ; //word ;
+    //bi->LogicCodeWord = _Compiler_WordList ( compiler, 1 ) ; //word ;
     if ( tokenToUse ) _CfrTil_->EndBlockWord->Name = tokenToUse ;
     if ( insertFlag ) SetState ( _Debugger_, DBG_OUTPUT_INSERTION, true ) ;
     _CfrTil_->EndBlockWord->W_TokenStart_ReadLineIndex = _Lexer_->TokenStart_ReadLineIndex ;
@@ -182,30 +182,35 @@ CfrTil_C_LeftParen ( )
     Compiler * compiler = _Context_->Compiler0 ;
 #if 0    
     if ( ( ( ! CompileMode ) && ( ! GetState ( _Context_->Interpreter0, PREPROCESSOR_MODE ) ) ) ||
-        ( ( CompileMode && ( ! GetState ( compiler, VARIABLE_FRAME ) ) ) || 
+        ( ( CompileMode && ( ! GetState ( compiler, VARIABLE_FRAME ) ) ) ||
         ( ReadLine_PeekNextNonWhitespaceChar ( _Context_->Lexer0->ReadLiner0 ) == '|' ) ) ) //( ! GetState ( _Context_, INFIX_MODE ) ) )
 #elif 1     
-    if ( GetState ( _Context_->Interpreter0, PREPROCESSOR_MODE ) )
+    if ( ( GetState ( _Context_->Interpreter0, PREPROCESSOR_MODE ) ) ) // && ( isalnum ( ReadLine_LastReadChar ( _ReadLiner_ ) ) ) )
     {
-        if ( isalnum (ReadLine_LastReadChar ( _ReadLiner_ ))) CfrTil_LocalsAndStackVariablesBegin ( ) ;
+        // this is for "#define" (which is parsed as '#' 'define', two words)
+        if ( isalnum (ReadLine_LastReadChar ( _ReadLiner_ ))) 
+        //if ( ! Compiling) 
+        CfrTil_LocalsAndStackVariablesBegin ( ) ;
+        else Interpret_DoParenthesizedRValue ( ) ;
     }
-    else if ( ( CompileMode && ( ! GetState ( compiler, VARIABLE_FRAME ) ) ) 
-        || ( ReadLine_PeekNextNonWhitespaceChar ( _Context_->Lexer0->ReadLiner0 ) == '|' ) )  //( ! GetState ( _Context_, INFIX_MODE ) ) )
+    //else if ( ( CompileMode && ( ! GetState ( compiler, VARIABLE_FRAME ) ) )
+    else if ( ( ( ! GetState ( compiler, VARIABLE_FRAME ) ) )
+        || ( ReadLine_PeekNextNonWhitespaceChar ( _Context_->Lexer0->ReadLiner0 ) == '|' ) ) //( ! GetState ( _Context_, INFIX_MODE ) ) )
     {
         CfrTil_LocalsAndStackVariablesBegin ( ) ;
     }
     else Interpret_DoParenthesizedRValue ( ) ;
 #else  
-        
-    if ( ( GetState ( _Context_->Interpreter0, PREPROCESSOR_MODE ) && isalnum (ReadLine_LastReadChar ( _ReadLiner_ )) ) ||
-        ( ( CompileMode && ( ! GetState ( compiler, VARIABLE_FRAME ) ) ) 
+
+    if ( ( GetState ( _Context_->Interpreter0, PREPROCESSOR_MODE ) && isalnum ( ReadLine_LastReadChar ( _ReadLiner_ ) ) ) ||
+        ( ( CompileMode && ( ! GetState ( compiler, VARIABLE_FRAME ) ) )
         || ( ReadLine_PeekNextNonWhitespaceChar ( _Context_->Lexer0->ReadLiner0 ) == '|' ) ) ) //( ! GetState ( _Context_, INFIX_MODE ) ) )
     {
         CfrTil_LocalsAndStackVariablesBegin ( ) ;
     }
     else Interpret_DoParenthesizedRValue ( ) ;
 #endif        
-}
+    }
 
 void
 _CfrTil_C_Infix_EqualOp ( Word * opWord )
@@ -248,14 +253,16 @@ _CfrTil_C_Infix_EqualOp ( Word * opWord )
     if ( GetState ( compiler, C_COMBINATOR_LPAREN ) )
     {
         if ( word0->StackPushRegisterCode ) SetHere ( word0->StackPushRegisterCode ) ; // this is the usual after '=' in non C syntax; assuming optimizeOn
-        Compiler_Setup_BI_tttn ( compiler, ZERO_TTT, NEGFLAG_NZ ) ; // must set logic flag for Compile_ReConfigureLogicInBlock in Block_Compile_WithLogicFlag
+        Compiler_Set_BI_setTtnn ( compiler, TTT_ZERO, NEGFLAG_ON, TTT_ZERO, NEGFLAG_Z ) ; // must set logic flag for Compile_ReConfigureLogicInBlock in Block_Compile_WithLogicFlag
     }
     List_InterpretLists ( compiler->PostfixLists ) ;
     compiler->LHS_Word = 0 ;
     if ( ! Compiling ) CfrTil_InitSourceCode ( _CfrTil_ ) ;
     SetState ( _Debugger_, DEBUG_SHTL_OFF, false ) ;
     SetState ( compiler, C_INFIX_EQUAL, false ) ;
-    d0 ( if ( Is_DebugModeOn ) _Compiler_Show_WordList ( "\nCfrTil_C_Infix_EqualOp : just before return", 0 ) ) ;
+    d0 (
+
+    if ( Is_DebugModeOn ) _Compiler_Show_WordList ( "\nCfrTil_C_Infix_EqualOp : just before return", 0 ) ) ;
     //if ( ! GetState ( cntx, C_SYNTAX ) ) 
     _CfrTil_PushToken_OnTokenList ( token ) ; // so the callee can check use or use
 }

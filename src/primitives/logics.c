@@ -140,7 +140,7 @@ CfrTil_LogicalOr ( ) // or
 {
     if ( CompileMode )
     {
-        Compile_Logical_X ( _Context_->Compiler0, OR ) ;
+        Compile_Logical_X ( _Context_->Compiler0, OR, TTT_ZERO, NEGFLAG_ON, TTT_ZERO, NEGFLAG_Z ) ;
     }
     else
     {
@@ -154,7 +154,7 @@ CfrTil_LogicalXor ( ) // xor
 {
     if ( CompileMode )
     {
-        Compile_Logical_X ( _Context_->Compiler0, XOR ) ;
+        Compile_Logical_X ( _Context_->Compiler0, XOR, TTT_ZERO, NEGFLAG_ON, TTT_ZERO, NEGFLAG_Z ) ;
     }
     else
     {

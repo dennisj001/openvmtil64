@@ -710,11 +710,11 @@ _String_GetStringToEndOfLine ( )
     return str ;
 }
 
-Boolean 
+Boolean
 IsPunct ( byte b )
 {
-    if ( ispunct (b) && ( b != '_')) return true ;
-    else return false;
+    if ( ispunct ( b ) && ( b != '_' ) ) return true ;
+    else return false ;
 }
 
 int64
@@ -722,24 +722,24 @@ String_CheckWordSize ( byte * str, int64 wl, Boolean punctFlag )
 {
     byte * start, *end ;
     int64 i, length ;
-    for ( i = -1 ; abs (i) < (wl + 1) ; i -- ) // go to left of str first
+    for ( i = - 1 ; abs ( i ) < ( wl + 1 ) ; i -- ) // go to left of str first
     {
-        if ( punctFlag ) 
+        if ( punctFlag )
         {
             if ( ! IsPunct ( str[i] ) ) break ;
         }
-        else if ( IsPunct ( str[i] ) || (str[i]==' ')) break ;
+        else if ( IsPunct ( str[i] ) || ( str[i] == ' ' ) ) break ;
     }
-    start = & str [i+1] ;
-    for ( i = 1 ; abs (i) < (wl+1) ; i ++ ) // ... then to the right side of str
+    start = & str [i + 1] ;
+    for ( i = 1 ; abs ( i ) < ( wl + 1 ) ; i ++ ) // ... then to the right side of str
     {
-        if ( punctFlag ) 
+        if ( punctFlag )
         {
             if ( ! IsPunct ( str[i] ) ) break ;
         }
-        else if ( IsPunct ( str[i] ) || (str[i]==' ')) break ;
+        else if ( IsPunct ( str[i] ) || ( str[i] == ' ' ) ) break ;
     }
-    end = & str [i-1] ;
+    end = & str [i - 1] ;
     length = end - start + 1 ;
     return length == wl ;
 }
@@ -753,10 +753,10 @@ String_FindStrnCmpIndex ( byte * sc, byte* name0, int64 index0, int64 wl0, int64
     d0 ( scspp = & sc [ index0 ] ) ;
     int64 i, n, index = index0, slsc = Strlen ( sc ) ;
     Boolean punctuationFlag = IsPunct ( name0[0] ) ;
-    for ( i = 0, n = wl0 + inc ; i <= n ; i ++ ) // tokens are parsed in different order with parameter and c rtl args, etc. 
+    for ( i = 0, n = wl0 + inc ; ( i <= n ) && ( i <= index ) ; i ++ ) // tokens are parsed in different order with parameter and c rtl args, etc. 
     {
         scindex = & sc [ index - i ] ;
-        if ( (( index - 1 ) >= 0 ) && ( ! Strncmp ( scindex, name0, wl0 ) ) )
+        if ( ( ( index - 1 ) >= 0 ) && ( ! Strncmp ( scindex, name0, wl0 ) ) )
         {
             if ( String_CheckWordSize ( scindex, wl0, punctuationFlag ) )
             {

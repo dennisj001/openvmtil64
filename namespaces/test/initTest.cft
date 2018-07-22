@@ -46,7 +46,8 @@ Int User
 
 #if doX64
 : basicT ppT cT mT aT loT bT locT fT oT x64 cntT lT sT sysT interpT stT cST dT0 ;
-: testX cST ;
+//: basicT ppT cT mT aT loT bT locT fT oT x64 lT sT sysT interpT stT cST dT0 ;
+: testX ;
 #else
 //: basicT ppT cT mT aT loT bT locT fT oT     cntT lT sT sysT interpT stT cST dT0 ;
 : basicT ppT cT mT aT loT bT locT fT oT     cntT lT sT sysT dT0 ; //interpT stT cST dT0 ;

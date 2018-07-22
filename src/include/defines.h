@@ -307,6 +307,7 @@
 #define LEFT_PAREN          ( (uint64) 1 << 11 )
 #define RIGHT_PAREN         ( (uint64) 1 << 12 )
 #define OP_RAX_PLUS_1ARG    ( (uint64) 1 << 13 )
+#define RT_STEPPING_DEBUG   ( (uint64) 1 << 14 )
 
 // _CAttribute for interpreter word types - 4 bits/ 16 possibilities : N_WordAttribute bitfield
 #define WT_PREFIX                 1
@@ -344,7 +345,6 @@
 #define T_LISP__DEFINE ( (uint64) 1 << 37 )
 #define T_LISP_VALUE ( (uint64) 1 << 38 )
 #define T_LISP_WORD ( (uint64) 1 << 39 )
-#define T_LISP_SYMBOL ( (uint64) 1 << 44 )
 #define T_LISP_CFRTIL ( (uint64) 1 << 45 )
 #define T_LISP_COLON ( (uint64) 1 << 46 )
 #define T_LISP_IMMEDIATE ( (uint64) 1 << 48 )
@@ -357,6 +357,7 @@
 #define W_COMMENT ( (uint64) 1 << 53 )
 #define LOCAL_OBJECT ( (uint64) 1 << 54 )
 #define W_PREPROCESSOR ( (uint64) 1 << 55 )
+#define T_LISP_SYMBOL ( (uint64) 1 << 56 )
 
 //#define   ( (uint64) 1 <<  )
 #define NEW_RUN_COMPOSITE 0

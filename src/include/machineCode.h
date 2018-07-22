@@ -193,6 +193,8 @@
 #define SREG                    SCRATCH_REG
 #define DIV_MUL_REG_2           RDX                     // rdx
 #define CALL_THRU_REG           THRU_REG                // R9
+#define SCRATCH_REG2            THRU_REG                      // r8 // eax/edx are both used sometimes by ops ebx/ecx are not ?
+#define SREG2                    SCRATCH_REG2
 #if DSP_IS_GLOBAL_REGISTER 
 register uint64 *_Dsp_          asm ( "r14" ) ;
 register int64 *Fp              asm ("r15" ) ;
@@ -292,20 +294,23 @@ register int64 *Fp              asm ("r15" ) ;
 #define NEGFLAG_Z ZERO 
 #define NOT_ZERO 1
 #define NEGFLAG_NZ NOT_ZERO
+#define NEGFLAG_TRUE NOT_ZERO
+#define NEGFLAG_FALSE ZERO
+#define NEGFLAG_ON NEGFLAG_TRUE //NEGFLAG_NZ
+#define NEGFLAG_OFF NEGFLAG_FALSE //NEGFLAG_Z
 // ttt : condition codes
 // remember these are left shifted one
 //#define OVERFLOW 0
 //#define NO_OVERFLOW 1
-#define BELOW 1
-#define EQUAL 2    
-#define ZERO_TTT 2
-#define BE_TTT 3       
-#define NA_TTT 3
-#define SIGN_TTT 4
-#define PARITY_TTT 5
-#define LESS_TTT 6
-#define LE_TTT 7       
-#define NG_TTT 7       
+#define TTT_BELOW 1
+#define TTT_EQUAL 2    
+#define TTT_ZERO 2
+#define TTT_BE 3   // BE below or equal    
+#define TTT_A 3 // A above
+#define TTT_SIGN 4
+#define TTT_PARITY 5
+#define TTT_LESS 6
+#define TTT_LE 7   
 
 #define _RM( insnAddr )  (*( (byte*) insnAddr + 1) & 7 )   // binary : 00000111
 #define _REG( insnAddr ) (*( (byte*) insnAddr + 1) & 56 )  // binary : 00111000 

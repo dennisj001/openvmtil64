@@ -42,6 +42,7 @@ _Compile_Stack_Push ( int8 stackReg, int64 obj ) // runtime
 }
 
 // push a stack at an rvalue using an lvalue
+
 void
 _Compile_StackPtrLValue_PushObj ( uint64 stkPtrLvalue, int8 tempStkReg, int64 obj ) // c lvalue
 {
@@ -63,6 +64,7 @@ _Compile_StackPtrLValue_PushObj ( uint64 stkPtrLvalue, int8 tempStkReg, int64 ob
 }
 
 // pop a stack at an rvalue using an lvalue
+
 void
 _Compile_StackPtrLValue_PopToReg ( uint64 stkPtrLvalue, int8 tempStkReg, int8 reg ) // c lvalue
 {
@@ -174,7 +176,7 @@ void
 _Compile_Stack_Dup ( int8 stackReg )
 {
     Compiler * compiler = _Context_->Compiler0 ;
-    int64 optFlag = Compiler_CheckOptimize (compiler, 0) ;
+    int64 optFlag = Compiler_CheckOptimize ( compiler, 0 ) ;
     if ( optFlag & OPTIMIZE_DONE ) return ;
     else
     {
@@ -190,7 +192,7 @@ _Compile_Stack_Dup ( int8 stackReg )
         {
             Compile_Move_Rm_To_Reg ( ACC, DSP, 0 ) ;
             Compiler_WordList ( 0 )->StackPushRegisterCode = Here ;
-            Compile_ADDI ( REG, DSP, 0, sizeof (int64 ), 0 ) ; 
+            Compile_ADDI ( REG, DSP, 0, sizeof (int64 ), 0 ) ;
             Compile_Move_Reg_To_Rm ( DSP, ACC, 0 ) ;
         }
     }
@@ -225,9 +227,10 @@ void
 _Compile_Stack_Swap ( int8 stackReg )
 {
     Compile_Move_Rm_To_Reg ( OREG, stackReg, 0 ) ;
-    Compile_Move_Rm_To_Reg ( THRU_REG, stackReg, - CELL ) ;
+    Compile_Move_Rm_To_Reg ( RAX, stackReg, - CELL ) ;
     Compile_Move_Reg_To_Rm ( stackReg, OREG, - CELL ) ;
-    Compile_Move_Reg_To_Rm ( stackReg, THRU_REG, 0 ) ;
+    //SetHere ( WordStack ( 0 )->StackPushRegisterCode ) ;
+    Compile_Move_Reg_To_Rm ( stackReg, RAX, 0 ) ;
 }
 
 void
@@ -265,6 +268,7 @@ DebugReturn ( )
     }
 }
 #endif
+
 void
 Compile_Set_DspReg_FromDataStackPointer ( )
 {

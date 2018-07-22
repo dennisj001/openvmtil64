@@ -1065,33 +1065,9 @@ CMakeFiles/openvmtil64.dir/src/basis/core/sequence.c.o.provides: CMakeFiles/open
 CMakeFiles/openvmtil64.dir/src/basis/core/sequence.c.o.provides.build: CMakeFiles/openvmtil64.dir/src/basis/core/sequence.c.o
 
 
-CMakeFiles/openvmtil64.dir/src/basis/core/sockets.c.o: CMakeFiles/openvmtil64.dir/flags.make
-CMakeFiles/openvmtil64.dir/src/basis/core/sockets.c.o: ../src/basis/core/sockets.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/dennisj/openvmtil64/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_43) "Building C object CMakeFiles/openvmtil64.dir/src/basis/core/sockets.c.o"
-	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/openvmtil64.dir/src/basis/core/sockets.c.o   -c /home/dennisj/openvmtil64/src/basis/core/sockets.c
-
-CMakeFiles/openvmtil64.dir/src/basis/core/sockets.c.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing C source to CMakeFiles/openvmtil64.dir/src/basis/core/sockets.c.i"
-	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /home/dennisj/openvmtil64/src/basis/core/sockets.c > CMakeFiles/openvmtil64.dir/src/basis/core/sockets.c.i
-
-CMakeFiles/openvmtil64.dir/src/basis/core/sockets.c.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/openvmtil64.dir/src/basis/core/sockets.c.s"
-	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/dennisj/openvmtil64/src/basis/core/sockets.c -o CMakeFiles/openvmtil64.dir/src/basis/core/sockets.c.s
-
-CMakeFiles/openvmtil64.dir/src/basis/core/sockets.c.o.requires:
-
-.PHONY : CMakeFiles/openvmtil64.dir/src/basis/core/sockets.c.o.requires
-
-CMakeFiles/openvmtil64.dir/src/basis/core/sockets.c.o.provides: CMakeFiles/openvmtil64.dir/src/basis/core/sockets.c.o.requires
-	$(MAKE) -f CMakeFiles/openvmtil64.dir/build.make CMakeFiles/openvmtil64.dir/src/basis/core/sockets.c.o.provides.build
-.PHONY : CMakeFiles/openvmtil64.dir/src/basis/core/sockets.c.o.provides
-
-CMakeFiles/openvmtil64.dir/src/basis/core/sockets.c.o.provides.build: CMakeFiles/openvmtil64.dir/src/basis/core/sockets.c.o
-
-
 CMakeFiles/openvmtil64.dir/src/basis/core/string.c.o: CMakeFiles/openvmtil64.dir/flags.make
 CMakeFiles/openvmtil64.dir/src/basis/core/string.c.o: ../src/basis/core/string.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/dennisj/openvmtil64/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_44) "Building C object CMakeFiles/openvmtil64.dir/src/basis/core/string.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/dennisj/openvmtil64/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_43) "Building C object CMakeFiles/openvmtil64.dir/src/basis/core/string.c.o"
 	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/openvmtil64.dir/src/basis/core/string.c.o   -c /home/dennisj/openvmtil64/src/basis/core/string.c
 
 CMakeFiles/openvmtil64.dir/src/basis/core/string.c.i: cmake_force
@@ -1115,7 +1091,7 @@ CMakeFiles/openvmtil64.dir/src/basis/core/string.c.o.provides.build: CMakeFiles/
 
 CMakeFiles/openvmtil64.dir/src/basis/core/symbol.c.o: CMakeFiles/openvmtil64.dir/flags.make
 CMakeFiles/openvmtil64.dir/src/basis/core/symbol.c.o: ../src/basis/core/symbol.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/dennisj/openvmtil64/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_45) "Building C object CMakeFiles/openvmtil64.dir/src/basis/core/symbol.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/dennisj/openvmtil64/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_44) "Building C object CMakeFiles/openvmtil64.dir/src/basis/core/symbol.c.o"
 	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/openvmtil64.dir/src/basis/core/symbol.c.o   -c /home/dennisj/openvmtil64/src/basis/core/symbol.c
 
 CMakeFiles/openvmtil64.dir/src/basis/core/symbol.c.i: cmake_force
@@ -1139,7 +1115,7 @@ CMakeFiles/openvmtil64.dir/src/basis/core/symbol.c.o.provides.build: CMakeFiles/
 
 CMakeFiles/openvmtil64.dir/src/basis/core/syntax.c.o: CMakeFiles/openvmtil64.dir/flags.make
 CMakeFiles/openvmtil64.dir/src/basis/core/syntax.c.o: ../src/basis/core/syntax.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/dennisj/openvmtil64/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_46) "Building C object CMakeFiles/openvmtil64.dir/src/basis/core/syntax.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/dennisj/openvmtil64/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_45) "Building C object CMakeFiles/openvmtil64.dir/src/basis/core/syntax.c.o"
 	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/openvmtil64.dir/src/basis/core/syntax.c.o   -c /home/dennisj/openvmtil64/src/basis/core/syntax.c
 
 CMakeFiles/openvmtil64.dir/src/basis/core/syntax.c.i: cmake_force
@@ -1163,7 +1139,7 @@ CMakeFiles/openvmtil64.dir/src/basis/core/syntax.c.o.provides.build: CMakeFiles/
 
 CMakeFiles/openvmtil64.dir/src/basis/core/word.c.o: CMakeFiles/openvmtil64.dir/flags.make
 CMakeFiles/openvmtil64.dir/src/basis/core/word.c.o: ../src/basis/core/word.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/dennisj/openvmtil64/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_47) "Building C object CMakeFiles/openvmtil64.dir/src/basis/core/word.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/dennisj/openvmtil64/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_46) "Building C object CMakeFiles/openvmtil64.dir/src/basis/core/word.c.o"
 	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/openvmtil64.dir/src/basis/core/word.c.o   -c /home/dennisj/openvmtil64/src/basis/core/word.c
 
 CMakeFiles/openvmtil64.dir/src/basis/core/word.c.i: cmake_force
@@ -1187,7 +1163,7 @@ CMakeFiles/openvmtil64.dir/src/basis/core/word.c.o.provides.build: CMakeFiles/op
 
 CMakeFiles/openvmtil64.dir/src/basis/_debug.c.o: CMakeFiles/openvmtil64.dir/flags.make
 CMakeFiles/openvmtil64.dir/src/basis/_debug.c.o: ../src/basis/_debug.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/dennisj/openvmtil64/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_48) "Building C object CMakeFiles/openvmtil64.dir/src/basis/_debug.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/dennisj/openvmtil64/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_47) "Building C object CMakeFiles/openvmtil64.dir/src/basis/_debug.c.o"
 	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/openvmtil64.dir/src/basis/_debug.c.o   -c /home/dennisj/openvmtil64/src/basis/_debug.c
 
 CMakeFiles/openvmtil64.dir/src/basis/_debug.c.i: cmake_force
@@ -1211,7 +1187,7 @@ CMakeFiles/openvmtil64.dir/src/basis/_debug.c.o.provides.build: CMakeFiles/openv
 
 CMakeFiles/openvmtil64.dir/src/basis/atom.c.o: CMakeFiles/openvmtil64.dir/flags.make
 CMakeFiles/openvmtil64.dir/src/basis/atom.c.o: ../src/basis/atom.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/dennisj/openvmtil64/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_49) "Building C object CMakeFiles/openvmtil64.dir/src/basis/atom.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/dennisj/openvmtil64/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_48) "Building C object CMakeFiles/openvmtil64.dir/src/basis/atom.c.o"
 	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/openvmtil64.dir/src/basis/atom.c.o   -c /home/dennisj/openvmtil64/src/basis/atom.c
 
 CMakeFiles/openvmtil64.dir/src/basis/atom.c.i: cmake_force
@@ -1235,7 +1211,7 @@ CMakeFiles/openvmtil64.dir/src/basis/atom.c.o.provides.build: CMakeFiles/openvmt
 
 CMakeFiles/openvmtil64.dir/src/basis/attribute.c.o: CMakeFiles/openvmtil64.dir/flags.make
 CMakeFiles/openvmtil64.dir/src/basis/attribute.c.o: ../src/basis/attribute.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/dennisj/openvmtil64/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_50) "Building C object CMakeFiles/openvmtil64.dir/src/basis/attribute.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/dennisj/openvmtil64/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_49) "Building C object CMakeFiles/openvmtil64.dir/src/basis/attribute.c.o"
 	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/openvmtil64.dir/src/basis/attribute.c.o   -c /home/dennisj/openvmtil64/src/basis/attribute.c
 
 CMakeFiles/openvmtil64.dir/src/basis/attribute.c.i: cmake_force
@@ -1259,7 +1235,7 @@ CMakeFiles/openvmtil64.dir/src/basis/attribute.c.o.provides.build: CMakeFiles/op
 
 CMakeFiles/openvmtil64.dir/src/basis/bigNum.c.o: CMakeFiles/openvmtil64.dir/flags.make
 CMakeFiles/openvmtil64.dir/src/basis/bigNum.c.o: ../src/basis/bigNum.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/dennisj/openvmtil64/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_51) "Building C object CMakeFiles/openvmtil64.dir/src/basis/bigNum.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/dennisj/openvmtil64/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_50) "Building C object CMakeFiles/openvmtil64.dir/src/basis/bigNum.c.o"
 	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/openvmtil64.dir/src/basis/bigNum.c.o   -c /home/dennisj/openvmtil64/src/basis/bigNum.c
 
 CMakeFiles/openvmtil64.dir/src/basis/bigNum.c.i: cmake_force
@@ -1283,7 +1259,7 @@ CMakeFiles/openvmtil64.dir/src/basis/bigNum.c.o.provides.build: CMakeFiles/openv
 
 CMakeFiles/openvmtil64.dir/src/basis/bigNum.gmp.c.o: CMakeFiles/openvmtil64.dir/flags.make
 CMakeFiles/openvmtil64.dir/src/basis/bigNum.gmp.c.o: ../src/basis/bigNum.gmp.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/dennisj/openvmtil64/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_52) "Building C object CMakeFiles/openvmtil64.dir/src/basis/bigNum.gmp.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/dennisj/openvmtil64/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_51) "Building C object CMakeFiles/openvmtil64.dir/src/basis/bigNum.gmp.c.o"
 	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/openvmtil64.dir/src/basis/bigNum.gmp.c.o   -c /home/dennisj/openvmtil64/src/basis/bigNum.gmp.c
 
 CMakeFiles/openvmtil64.dir/src/basis/bigNum.gmp.c.i: cmake_force
@@ -1307,7 +1283,7 @@ CMakeFiles/openvmtil64.dir/src/basis/bigNum.gmp.c.o.provides.build: CMakeFiles/o
 
 CMakeFiles/openvmtil64.dir/src/basis/cfrtil64.c.o: CMakeFiles/openvmtil64.dir/flags.make
 CMakeFiles/openvmtil64.dir/src/basis/cfrtil64.c.o: ../src/basis/cfrtil64.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/dennisj/openvmtil64/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_53) "Building C object CMakeFiles/openvmtil64.dir/src/basis/cfrtil64.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/dennisj/openvmtil64/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_52) "Building C object CMakeFiles/openvmtil64.dir/src/basis/cfrtil64.c.o"
 	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/openvmtil64.dir/src/basis/cfrtil64.c.o   -c /home/dennisj/openvmtil64/src/basis/cfrtil64.c
 
 CMakeFiles/openvmtil64.dir/src/basis/cfrtil64.c.i: cmake_force
@@ -1331,7 +1307,7 @@ CMakeFiles/openvmtil64.dir/src/basis/cfrtil64.c.o.provides.build: CMakeFiles/ope
 
 CMakeFiles/openvmtil64.dir/src/basis/colors.c.o: CMakeFiles/openvmtil64.dir/flags.make
 CMakeFiles/openvmtil64.dir/src/basis/colors.c.o: ../src/basis/colors.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/dennisj/openvmtil64/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_54) "Building C object CMakeFiles/openvmtil64.dir/src/basis/colors.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/dennisj/openvmtil64/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_53) "Building C object CMakeFiles/openvmtil64.dir/src/basis/colors.c.o"
 	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/openvmtil64.dir/src/basis/colors.c.o   -c /home/dennisj/openvmtil64/src/basis/colors.c
 
 CMakeFiles/openvmtil64.dir/src/basis/colors.c.i: cmake_force
@@ -1355,7 +1331,7 @@ CMakeFiles/openvmtil64.dir/src/basis/colors.c.o.provides.build: CMakeFiles/openv
 
 CMakeFiles/openvmtil64.dir/src/basis/context.c.o: CMakeFiles/openvmtil64.dir/flags.make
 CMakeFiles/openvmtil64.dir/src/basis/context.c.o: ../src/basis/context.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/dennisj/openvmtil64/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_55) "Building C object CMakeFiles/openvmtil64.dir/src/basis/context.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/dennisj/openvmtil64/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_54) "Building C object CMakeFiles/openvmtil64.dir/src/basis/context.c.o"
 	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/openvmtil64.dir/src/basis/context.c.o   -c /home/dennisj/openvmtil64/src/basis/context.c
 
 CMakeFiles/openvmtil64.dir/src/basis/context.c.i: cmake_force
@@ -1379,7 +1355,7 @@ CMakeFiles/openvmtil64.dir/src/basis/context.c.o.provides.build: CMakeFiles/open
 
 CMakeFiles/openvmtil64.dir/src/basis/debugDisassembly.c.o: CMakeFiles/openvmtil64.dir/flags.make
 CMakeFiles/openvmtil64.dir/src/basis/debugDisassembly.c.o: ../src/basis/debugDisassembly.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/dennisj/openvmtil64/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_56) "Building C object CMakeFiles/openvmtil64.dir/src/basis/debugDisassembly.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/dennisj/openvmtil64/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_55) "Building C object CMakeFiles/openvmtil64.dir/src/basis/debugDisassembly.c.o"
 	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/openvmtil64.dir/src/basis/debugDisassembly.c.o   -c /home/dennisj/openvmtil64/src/basis/debugDisassembly.c
 
 CMakeFiles/openvmtil64.dir/src/basis/debugDisassembly.c.i: cmake_force
@@ -1403,7 +1379,7 @@ CMakeFiles/openvmtil64.dir/src/basis/debugDisassembly.c.o.provides.build: CMakeF
 
 CMakeFiles/openvmtil64.dir/src/basis/debugger.c.o: CMakeFiles/openvmtil64.dir/flags.make
 CMakeFiles/openvmtil64.dir/src/basis/debugger.c.o: ../src/basis/debugger.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/dennisj/openvmtil64/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_57) "Building C object CMakeFiles/openvmtil64.dir/src/basis/debugger.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/dennisj/openvmtil64/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_56) "Building C object CMakeFiles/openvmtil64.dir/src/basis/debugger.c.o"
 	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/openvmtil64.dir/src/basis/debugger.c.o   -c /home/dennisj/openvmtil64/src/basis/debugger.c
 
 CMakeFiles/openvmtil64.dir/src/basis/debugger.c.i: cmake_force
@@ -1427,7 +1403,7 @@ CMakeFiles/openvmtil64.dir/src/basis/debugger.c.o.provides.build: CMakeFiles/ope
 
 CMakeFiles/openvmtil64.dir/src/basis/debugOutput.c.o: CMakeFiles/openvmtil64.dir/flags.make
 CMakeFiles/openvmtil64.dir/src/basis/debugOutput.c.o: ../src/basis/debugOutput.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/dennisj/openvmtil64/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_58) "Building C object CMakeFiles/openvmtil64.dir/src/basis/debugOutput.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/dennisj/openvmtil64/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_57) "Building C object CMakeFiles/openvmtil64.dir/src/basis/debugOutput.c.o"
 	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/openvmtil64.dir/src/basis/debugOutput.c.o   -c /home/dennisj/openvmtil64/src/basis/debugOutput.c
 
 CMakeFiles/openvmtil64.dir/src/basis/debugOutput.c.i: cmake_force
@@ -1451,7 +1427,7 @@ CMakeFiles/openvmtil64.dir/src/basis/debugOutput.c.o.provides.build: CMakeFiles/
 
 CMakeFiles/openvmtil64.dir/src/basis/debugStepping.c.o: CMakeFiles/openvmtil64.dir/flags.make
 CMakeFiles/openvmtil64.dir/src/basis/debugStepping.c.o: ../src/basis/debugStepping.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/dennisj/openvmtil64/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_59) "Building C object CMakeFiles/openvmtil64.dir/src/basis/debugStepping.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/dennisj/openvmtil64/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_58) "Building C object CMakeFiles/openvmtil64.dir/src/basis/debugStepping.c.o"
 	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/openvmtil64.dir/src/basis/debugStepping.c.o   -c /home/dennisj/openvmtil64/src/basis/debugStepping.c
 
 CMakeFiles/openvmtil64.dir/src/basis/debugStepping.c.i: cmake_force
@@ -1475,7 +1451,7 @@ CMakeFiles/openvmtil64.dir/src/basis/debugStepping.c.o.provides.build: CMakeFile
 
 CMakeFiles/openvmtil64.dir/src/basis/exception.c.o: CMakeFiles/openvmtil64.dir/flags.make
 CMakeFiles/openvmtil64.dir/src/basis/exception.c.o: ../src/basis/exception.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/dennisj/openvmtil64/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_60) "Building C object CMakeFiles/openvmtil64.dir/src/basis/exception.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/dennisj/openvmtil64/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_59) "Building C object CMakeFiles/openvmtil64.dir/src/basis/exception.c.o"
 	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/openvmtil64.dir/src/basis/exception.c.o   -c /home/dennisj/openvmtil64/src/basis/exception.c
 
 CMakeFiles/openvmtil64.dir/src/basis/exception.c.i: cmake_force
@@ -1499,7 +1475,7 @@ CMakeFiles/openvmtil64.dir/src/basis/exception.c.o.provides.build: CMakeFiles/op
 
 CMakeFiles/openvmtil64.dir/src/basis/history.c.o: CMakeFiles/openvmtil64.dir/flags.make
 CMakeFiles/openvmtil64.dir/src/basis/history.c.o: ../src/basis/history.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/dennisj/openvmtil64/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_61) "Building C object CMakeFiles/openvmtil64.dir/src/basis/history.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/dennisj/openvmtil64/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_60) "Building C object CMakeFiles/openvmtil64.dir/src/basis/history.c.o"
 	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/openvmtil64.dir/src/basis/history.c.o   -c /home/dennisj/openvmtil64/src/basis/history.c
 
 CMakeFiles/openvmtil64.dir/src/basis/history.c.i: cmake_force
@@ -1523,7 +1499,7 @@ CMakeFiles/openvmtil64.dir/src/basis/history.c.o.provides.build: CMakeFiles/open
 
 CMakeFiles/openvmtil64.dir/src/basis/init.c.o: CMakeFiles/openvmtil64.dir/flags.make
 CMakeFiles/openvmtil64.dir/src/basis/init.c.o: ../src/basis/init.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/dennisj/openvmtil64/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_62) "Building C object CMakeFiles/openvmtil64.dir/src/basis/init.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/dennisj/openvmtil64/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_61) "Building C object CMakeFiles/openvmtil64.dir/src/basis/init.c.o"
 	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/openvmtil64.dir/src/basis/init.c.o   -c /home/dennisj/openvmtil64/src/basis/init.c
 
 CMakeFiles/openvmtil64.dir/src/basis/init.c.i: cmake_force
@@ -1547,7 +1523,7 @@ CMakeFiles/openvmtil64.dir/src/basis/init.c.o.provides.build: CMakeFiles/openvmt
 
 CMakeFiles/openvmtil64.dir/src/basis/interpreter.c.o: CMakeFiles/openvmtil64.dir/flags.make
 CMakeFiles/openvmtil64.dir/src/basis/interpreter.c.o: ../src/basis/interpreter.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/dennisj/openvmtil64/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_63) "Building C object CMakeFiles/openvmtil64.dir/src/basis/interpreter.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/dennisj/openvmtil64/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_62) "Building C object CMakeFiles/openvmtil64.dir/src/basis/interpreter.c.o"
 	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/openvmtil64.dir/src/basis/interpreter.c.o   -c /home/dennisj/openvmtil64/src/basis/interpreter.c
 
 CMakeFiles/openvmtil64.dir/src/basis/interpreter.c.i: cmake_force
@@ -1571,7 +1547,7 @@ CMakeFiles/openvmtil64.dir/src/basis/interpreter.c.o.provides.build: CMakeFiles/
 
 CMakeFiles/openvmtil64.dir/src/basis/interpreters.c.o: CMakeFiles/openvmtil64.dir/flags.make
 CMakeFiles/openvmtil64.dir/src/basis/interpreters.c.o: ../src/basis/interpreters.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/dennisj/openvmtil64/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_64) "Building C object CMakeFiles/openvmtil64.dir/src/basis/interpreters.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/dennisj/openvmtil64/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_63) "Building C object CMakeFiles/openvmtil64.dir/src/basis/interpreters.c.o"
 	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/openvmtil64.dir/src/basis/interpreters.c.o   -c /home/dennisj/openvmtil64/src/basis/interpreters.c
 
 CMakeFiles/openvmtil64.dir/src/basis/interpreters.c.i: cmake_force
@@ -1595,7 +1571,7 @@ CMakeFiles/openvmtil64.dir/src/basis/interpreters.c.o.provides.build: CMakeFiles
 
 CMakeFiles/openvmtil64.dir/src/basis/json.c.o: CMakeFiles/openvmtil64.dir/flags.make
 CMakeFiles/openvmtil64.dir/src/basis/json.c.o: ../src/basis/json.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/dennisj/openvmtil64/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_65) "Building C object CMakeFiles/openvmtil64.dir/src/basis/json.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/dennisj/openvmtil64/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_64) "Building C object CMakeFiles/openvmtil64.dir/src/basis/json.c.o"
 	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/openvmtil64.dir/src/basis/json.c.o   -c /home/dennisj/openvmtil64/src/basis/json.c
 
 CMakeFiles/openvmtil64.dir/src/basis/json.c.i: cmake_force
@@ -1619,7 +1595,7 @@ CMakeFiles/openvmtil64.dir/src/basis/json.c.o.provides.build: CMakeFiles/openvmt
 
 CMakeFiles/openvmtil64.dir/src/basis/lambdaCalculus.c.o: CMakeFiles/openvmtil64.dir/flags.make
 CMakeFiles/openvmtil64.dir/src/basis/lambdaCalculus.c.o: ../src/basis/lambdaCalculus.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/dennisj/openvmtil64/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_66) "Building C object CMakeFiles/openvmtil64.dir/src/basis/lambdaCalculus.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/dennisj/openvmtil64/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_65) "Building C object CMakeFiles/openvmtil64.dir/src/basis/lambdaCalculus.c.o"
 	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/openvmtil64.dir/src/basis/lambdaCalculus.c.o   -c /home/dennisj/openvmtil64/src/basis/lambdaCalculus.c
 
 CMakeFiles/openvmtil64.dir/src/basis/lambdaCalculus.c.i: cmake_force
@@ -1643,7 +1619,7 @@ CMakeFiles/openvmtil64.dir/src/basis/lambdaCalculus.c.o.provides.build: CMakeFil
 
 CMakeFiles/openvmtil64.dir/src/basis/linux.c.o: CMakeFiles/openvmtil64.dir/flags.make
 CMakeFiles/openvmtil64.dir/src/basis/linux.c.o: ../src/basis/linux.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/dennisj/openvmtil64/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_67) "Building C object CMakeFiles/openvmtil64.dir/src/basis/linux.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/dennisj/openvmtil64/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_66) "Building C object CMakeFiles/openvmtil64.dir/src/basis/linux.c.o"
 	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/openvmtil64.dir/src/basis/linux.c.o   -c /home/dennisj/openvmtil64/src/basis/linux.c
 
 CMakeFiles/openvmtil64.dir/src/basis/linux.c.i: cmake_force
@@ -1667,7 +1643,7 @@ CMakeFiles/openvmtil64.dir/src/basis/linux.c.o.provides.build: CMakeFiles/openvm
 
 CMakeFiles/openvmtil64.dir/src/basis/lists.c.o: CMakeFiles/openvmtil64.dir/flags.make
 CMakeFiles/openvmtil64.dir/src/basis/lists.c.o: ../src/basis/lists.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/dennisj/openvmtil64/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_68) "Building C object CMakeFiles/openvmtil64.dir/src/basis/lists.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/dennisj/openvmtil64/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_67) "Building C object CMakeFiles/openvmtil64.dir/src/basis/lists.c.o"
 	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/openvmtil64.dir/src/basis/lists.c.o   -c /home/dennisj/openvmtil64/src/basis/lists.c
 
 CMakeFiles/openvmtil64.dir/src/basis/lists.c.i: cmake_force
@@ -1691,7 +1667,7 @@ CMakeFiles/openvmtil64.dir/src/basis/lists.c.o.provides.build: CMakeFiles/openvm
 
 CMakeFiles/openvmtil64.dir/src/basis/openVmTil.c.o: CMakeFiles/openvmtil64.dir/flags.make
 CMakeFiles/openvmtil64.dir/src/basis/openVmTil.c.o: ../src/basis/openVmTil.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/dennisj/openvmtil64/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_69) "Building C object CMakeFiles/openvmtil64.dir/src/basis/openVmTil.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/dennisj/openvmtil64/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_68) "Building C object CMakeFiles/openvmtil64.dir/src/basis/openVmTil.c.o"
 	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/openvmtil64.dir/src/basis/openVmTil.c.o   -c /home/dennisj/openvmtil64/src/basis/openVmTil.c
 
 CMakeFiles/openvmtil64.dir/src/basis/openVmTil.c.i: cmake_force
@@ -1715,7 +1691,7 @@ CMakeFiles/openvmtil64.dir/src/basis/openVmTil.c.o.provides.build: CMakeFiles/op
 
 CMakeFiles/openvmtil64.dir/src/basis/repl.c.o: CMakeFiles/openvmtil64.dir/flags.make
 CMakeFiles/openvmtil64.dir/src/basis/repl.c.o: ../src/basis/repl.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/dennisj/openvmtil64/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_70) "Building C object CMakeFiles/openvmtil64.dir/src/basis/repl.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/dennisj/openvmtil64/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_69) "Building C object CMakeFiles/openvmtil64.dir/src/basis/repl.c.o"
 	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/openvmtil64.dir/src/basis/repl.c.o   -c /home/dennisj/openvmtil64/src/basis/repl.c
 
 CMakeFiles/openvmtil64.dir/src/basis/repl.c.i: cmake_force
@@ -1739,7 +1715,7 @@ CMakeFiles/openvmtil64.dir/src/basis/repl.c.o.provides.build: CMakeFiles/openvmt
 
 CMakeFiles/openvmtil64.dir/src/basis/sourceCode.c.o: CMakeFiles/openvmtil64.dir/flags.make
 CMakeFiles/openvmtil64.dir/src/basis/sourceCode.c.o: ../src/basis/sourceCode.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/dennisj/openvmtil64/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_71) "Building C object CMakeFiles/openvmtil64.dir/src/basis/sourceCode.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/dennisj/openvmtil64/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_70) "Building C object CMakeFiles/openvmtil64.dir/src/basis/sourceCode.c.o"
 	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/openvmtil64.dir/src/basis/sourceCode.c.o   -c /home/dennisj/openvmtil64/src/basis/sourceCode.c
 
 CMakeFiles/openvmtil64.dir/src/basis/sourceCode.c.i: cmake_force
@@ -1763,7 +1739,7 @@ CMakeFiles/openvmtil64.dir/src/basis/sourceCode.c.o.provides.build: CMakeFiles/o
 
 CMakeFiles/openvmtil64.dir/src/basis/system.c.o: CMakeFiles/openvmtil64.dir/flags.make
 CMakeFiles/openvmtil64.dir/src/basis/system.c.o: ../src/basis/system.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/dennisj/openvmtil64/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_72) "Building C object CMakeFiles/openvmtil64.dir/src/basis/system.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/dennisj/openvmtil64/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_71) "Building C object CMakeFiles/openvmtil64.dir/src/basis/system.c.o"
 	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/openvmtil64.dir/src/basis/system.c.o   -c /home/dennisj/openvmtil64/src/basis/system.c
 
 CMakeFiles/openvmtil64.dir/src/basis/system.c.i: cmake_force
@@ -1787,7 +1763,7 @@ CMakeFiles/openvmtil64.dir/src/basis/system.c.o.provides.build: CMakeFiles/openv
 
 CMakeFiles/openvmtil64.dir/src/basis/tabCompletion.c.o: CMakeFiles/openvmtil64.dir/flags.make
 CMakeFiles/openvmtil64.dir/src/basis/tabCompletion.c.o: ../src/basis/tabCompletion.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/dennisj/openvmtil64/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_73) "Building C object CMakeFiles/openvmtil64.dir/src/basis/tabCompletion.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/dennisj/openvmtil64/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_72) "Building C object CMakeFiles/openvmtil64.dir/src/basis/tabCompletion.c.o"
 	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/openvmtil64.dir/src/basis/tabCompletion.c.o   -c /home/dennisj/openvmtil64/src/basis/tabCompletion.c
 
 CMakeFiles/openvmtil64.dir/src/basis/tabCompletion.c.i: cmake_force
@@ -1811,7 +1787,7 @@ CMakeFiles/openvmtil64.dir/src/basis/tabCompletion.c.o.provides.build: CMakeFile
 
 CMakeFiles/openvmtil64.dir/src/basis/types.c.o: CMakeFiles/openvmtil64.dir/flags.make
 CMakeFiles/openvmtil64.dir/src/basis/types.c.o: ../src/basis/types.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/dennisj/openvmtil64/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_74) "Building C object CMakeFiles/openvmtil64.dir/src/basis/types.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/dennisj/openvmtil64/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_73) "Building C object CMakeFiles/openvmtil64.dir/src/basis/types.c.o"
 	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/openvmtil64.dir/src/basis/types.c.o   -c /home/dennisj/openvmtil64/src/basis/types.c
 
 CMakeFiles/openvmtil64.dir/src/basis/types.c.i: cmake_force
@@ -1833,57 +1809,9 @@ CMakeFiles/openvmtil64.dir/src/basis/types.c.o.provides: CMakeFiles/openvmtil64.
 CMakeFiles/openvmtil64.dir/src/basis/types.c.o.provides.build: CMakeFiles/openvmtil64.dir/src/basis/types.c.o
 
 
-CMakeFiles/openvmtil64.dir/src/nbproject/private/c_standard_headers_indexer.c.o: CMakeFiles/openvmtil64.dir/flags.make
-CMakeFiles/openvmtil64.dir/src/nbproject/private/c_standard_headers_indexer.c.o: ../src/nbproject/private/c_standard_headers_indexer.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/dennisj/openvmtil64/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_75) "Building C object CMakeFiles/openvmtil64.dir/src/nbproject/private/c_standard_headers_indexer.c.o"
-	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/openvmtil64.dir/src/nbproject/private/c_standard_headers_indexer.c.o   -c /home/dennisj/openvmtil64/src/nbproject/private/c_standard_headers_indexer.c
-
-CMakeFiles/openvmtil64.dir/src/nbproject/private/c_standard_headers_indexer.c.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing C source to CMakeFiles/openvmtil64.dir/src/nbproject/private/c_standard_headers_indexer.c.i"
-	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /home/dennisj/openvmtil64/src/nbproject/private/c_standard_headers_indexer.c > CMakeFiles/openvmtil64.dir/src/nbproject/private/c_standard_headers_indexer.c.i
-
-CMakeFiles/openvmtil64.dir/src/nbproject/private/c_standard_headers_indexer.c.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/openvmtil64.dir/src/nbproject/private/c_standard_headers_indexer.c.s"
-	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/dennisj/openvmtil64/src/nbproject/private/c_standard_headers_indexer.c -o CMakeFiles/openvmtil64.dir/src/nbproject/private/c_standard_headers_indexer.c.s
-
-CMakeFiles/openvmtil64.dir/src/nbproject/private/c_standard_headers_indexer.c.o.requires:
-
-.PHONY : CMakeFiles/openvmtil64.dir/src/nbproject/private/c_standard_headers_indexer.c.o.requires
-
-CMakeFiles/openvmtil64.dir/src/nbproject/private/c_standard_headers_indexer.c.o.provides: CMakeFiles/openvmtil64.dir/src/nbproject/private/c_standard_headers_indexer.c.o.requires
-	$(MAKE) -f CMakeFiles/openvmtil64.dir/build.make CMakeFiles/openvmtil64.dir/src/nbproject/private/c_standard_headers_indexer.c.o.provides.build
-.PHONY : CMakeFiles/openvmtil64.dir/src/nbproject/private/c_standard_headers_indexer.c.o.provides
-
-CMakeFiles/openvmtil64.dir/src/nbproject/private/c_standard_headers_indexer.c.o.provides.build: CMakeFiles/openvmtil64.dir/src/nbproject/private/c_standard_headers_indexer.c.o
-
-
-CMakeFiles/openvmtil64.dir/src/nbproject/private/cpp_standard_headers_indexer.cpp.o: CMakeFiles/openvmtil64.dir/flags.make
-CMakeFiles/openvmtil64.dir/src/nbproject/private/cpp_standard_headers_indexer.cpp.o: ../src/nbproject/private/cpp_standard_headers_indexer.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/dennisj/openvmtil64/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_76) "Building CXX object CMakeFiles/openvmtil64.dir/src/nbproject/private/cpp_standard_headers_indexer.cpp.o"
-	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/openvmtil64.dir/src/nbproject/private/cpp_standard_headers_indexer.cpp.o -c /home/dennisj/openvmtil64/src/nbproject/private/cpp_standard_headers_indexer.cpp
-
-CMakeFiles/openvmtil64.dir/src/nbproject/private/cpp_standard_headers_indexer.cpp.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/openvmtil64.dir/src/nbproject/private/cpp_standard_headers_indexer.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/dennisj/openvmtil64/src/nbproject/private/cpp_standard_headers_indexer.cpp > CMakeFiles/openvmtil64.dir/src/nbproject/private/cpp_standard_headers_indexer.cpp.i
-
-CMakeFiles/openvmtil64.dir/src/nbproject/private/cpp_standard_headers_indexer.cpp.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/openvmtil64.dir/src/nbproject/private/cpp_standard_headers_indexer.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/dennisj/openvmtil64/src/nbproject/private/cpp_standard_headers_indexer.cpp -o CMakeFiles/openvmtil64.dir/src/nbproject/private/cpp_standard_headers_indexer.cpp.s
-
-CMakeFiles/openvmtil64.dir/src/nbproject/private/cpp_standard_headers_indexer.cpp.o.requires:
-
-.PHONY : CMakeFiles/openvmtil64.dir/src/nbproject/private/cpp_standard_headers_indexer.cpp.o.requires
-
-CMakeFiles/openvmtil64.dir/src/nbproject/private/cpp_standard_headers_indexer.cpp.o.provides: CMakeFiles/openvmtil64.dir/src/nbproject/private/cpp_standard_headers_indexer.cpp.o.requires
-	$(MAKE) -f CMakeFiles/openvmtil64.dir/build.make CMakeFiles/openvmtil64.dir/src/nbproject/private/cpp_standard_headers_indexer.cpp.o.provides.build
-.PHONY : CMakeFiles/openvmtil64.dir/src/nbproject/private/cpp_standard_headers_indexer.cpp.o.provides
-
-CMakeFiles/openvmtil64.dir/src/nbproject/private/cpp_standard_headers_indexer.cpp.o.provides.build: CMakeFiles/openvmtil64.dir/src/nbproject/private/cpp_standard_headers_indexer.cpp.o
-
-
 CMakeFiles/openvmtil64.dir/src/primitives/bits.c.o: CMakeFiles/openvmtil64.dir/flags.make
 CMakeFiles/openvmtil64.dir/src/primitives/bits.c.o: ../src/primitives/bits.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/dennisj/openvmtil64/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_77) "Building C object CMakeFiles/openvmtil64.dir/src/primitives/bits.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/dennisj/openvmtil64/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_74) "Building C object CMakeFiles/openvmtil64.dir/src/primitives/bits.c.o"
 	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/openvmtil64.dir/src/primitives/bits.c.o   -c /home/dennisj/openvmtil64/src/primitives/bits.c
 
 CMakeFiles/openvmtil64.dir/src/primitives/bits.c.i: cmake_force
@@ -1907,7 +1835,7 @@ CMakeFiles/openvmtil64.dir/src/primitives/bits.c.o.provides.build: CMakeFiles/op
 
 CMakeFiles/openvmtil64.dir/src/primitives/cmaths.c.o: CMakeFiles/openvmtil64.dir/flags.make
 CMakeFiles/openvmtil64.dir/src/primitives/cmaths.c.o: ../src/primitives/cmaths.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/dennisj/openvmtil64/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_78) "Building C object CMakeFiles/openvmtil64.dir/src/primitives/cmaths.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/dennisj/openvmtil64/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_75) "Building C object CMakeFiles/openvmtil64.dir/src/primitives/cmaths.c.o"
 	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/openvmtil64.dir/src/primitives/cmaths.c.o   -c /home/dennisj/openvmtil64/src/primitives/cmaths.c
 
 CMakeFiles/openvmtil64.dir/src/primitives/cmaths.c.i: cmake_force
@@ -1931,7 +1859,7 @@ CMakeFiles/openvmtil64.dir/src/primitives/cmaths.c.o.provides.build: CMakeFiles/
 
 CMakeFiles/openvmtil64.dir/src/primitives/compilers.c.o: CMakeFiles/openvmtil64.dir/flags.make
 CMakeFiles/openvmtil64.dir/src/primitives/compilers.c.o: ../src/primitives/compilers.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/dennisj/openvmtil64/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_79) "Building C object CMakeFiles/openvmtil64.dir/src/primitives/compilers.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/dennisj/openvmtil64/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_76) "Building C object CMakeFiles/openvmtil64.dir/src/primitives/compilers.c.o"
 	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/openvmtil64.dir/src/primitives/compilers.c.o   -c /home/dennisj/openvmtil64/src/primitives/compilers.c
 
 CMakeFiles/openvmtil64.dir/src/primitives/compilers.c.i: cmake_force
@@ -1955,7 +1883,7 @@ CMakeFiles/openvmtil64.dir/src/primitives/compilers.c.o.provides.build: CMakeFil
 
 CMakeFiles/openvmtil64.dir/src/primitives/contexts.c.o: CMakeFiles/openvmtil64.dir/flags.make
 CMakeFiles/openvmtil64.dir/src/primitives/contexts.c.o: ../src/primitives/contexts.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/dennisj/openvmtil64/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_80) "Building C object CMakeFiles/openvmtil64.dir/src/primitives/contexts.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/dennisj/openvmtil64/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_77) "Building C object CMakeFiles/openvmtil64.dir/src/primitives/contexts.c.o"
 	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/openvmtil64.dir/src/primitives/contexts.c.o   -c /home/dennisj/openvmtil64/src/primitives/contexts.c
 
 CMakeFiles/openvmtil64.dir/src/primitives/contexts.c.i: cmake_force
@@ -1979,7 +1907,7 @@ CMakeFiles/openvmtil64.dir/src/primitives/contexts.c.o.provides.build: CMakeFile
 
 CMakeFiles/openvmtil64.dir/src/primitives/dataObjectNews.c.o: CMakeFiles/openvmtil64.dir/flags.make
 CMakeFiles/openvmtil64.dir/src/primitives/dataObjectNews.c.o: ../src/primitives/dataObjectNews.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/dennisj/openvmtil64/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_81) "Building C object CMakeFiles/openvmtil64.dir/src/primitives/dataObjectNews.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/dennisj/openvmtil64/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_78) "Building C object CMakeFiles/openvmtil64.dir/src/primitives/dataObjectNews.c.o"
 	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/openvmtil64.dir/src/primitives/dataObjectNews.c.o   -c /home/dennisj/openvmtil64/src/primitives/dataObjectNews.c
 
 CMakeFiles/openvmtil64.dir/src/primitives/dataObjectNews.c.i: cmake_force
@@ -2003,7 +1931,7 @@ CMakeFiles/openvmtil64.dir/src/primitives/dataObjectNews.c.o.provides.build: CMa
 
 CMakeFiles/openvmtil64.dir/src/primitives/debuggers.c.o: CMakeFiles/openvmtil64.dir/flags.make
 CMakeFiles/openvmtil64.dir/src/primitives/debuggers.c.o: ../src/primitives/debuggers.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/dennisj/openvmtil64/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_82) "Building C object CMakeFiles/openvmtil64.dir/src/primitives/debuggers.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/dennisj/openvmtil64/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_79) "Building C object CMakeFiles/openvmtil64.dir/src/primitives/debuggers.c.o"
 	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/openvmtil64.dir/src/primitives/debuggers.c.o   -c /home/dennisj/openvmtil64/src/primitives/debuggers.c
 
 CMakeFiles/openvmtil64.dir/src/primitives/debuggers.c.i: cmake_force
@@ -2027,7 +1955,7 @@ CMakeFiles/openvmtil64.dir/src/primitives/debuggers.c.o.provides.build: CMakeFil
 
 CMakeFiles/openvmtil64.dir/src/primitives/disassembler.c.o: CMakeFiles/openvmtil64.dir/flags.make
 CMakeFiles/openvmtil64.dir/src/primitives/disassembler.c.o: ../src/primitives/disassembler.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/dennisj/openvmtil64/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_83) "Building C object CMakeFiles/openvmtil64.dir/src/primitives/disassembler.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/dennisj/openvmtil64/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_80) "Building C object CMakeFiles/openvmtil64.dir/src/primitives/disassembler.c.o"
 	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/openvmtil64.dir/src/primitives/disassembler.c.o   -c /home/dennisj/openvmtil64/src/primitives/disassembler.c
 
 CMakeFiles/openvmtil64.dir/src/primitives/disassembler.c.i: cmake_force
@@ -2051,7 +1979,7 @@ CMakeFiles/openvmtil64.dir/src/primitives/disassembler.c.o.provides.build: CMake
 
 CMakeFiles/openvmtil64.dir/src/primitives/file.c.o: CMakeFiles/openvmtil64.dir/flags.make
 CMakeFiles/openvmtil64.dir/src/primitives/file.c.o: ../src/primitives/file.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/dennisj/openvmtil64/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_84) "Building C object CMakeFiles/openvmtil64.dir/src/primitives/file.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/dennisj/openvmtil64/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_81) "Building C object CMakeFiles/openvmtil64.dir/src/primitives/file.c.o"
 	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/openvmtil64.dir/src/primitives/file.c.o   -c /home/dennisj/openvmtil64/src/primitives/file.c
 
 CMakeFiles/openvmtil64.dir/src/primitives/file.c.i: cmake_force
@@ -2075,7 +2003,7 @@ CMakeFiles/openvmtil64.dir/src/primitives/file.c.o.provides.build: CMakeFiles/op
 
 CMakeFiles/openvmtil64.dir/src/primitives/interpreters.c.o: CMakeFiles/openvmtil64.dir/flags.make
 CMakeFiles/openvmtil64.dir/src/primitives/interpreters.c.o: ../src/primitives/interpreters.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/dennisj/openvmtil64/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_85) "Building C object CMakeFiles/openvmtil64.dir/src/primitives/interpreters.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/dennisj/openvmtil64/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_82) "Building C object CMakeFiles/openvmtil64.dir/src/primitives/interpreters.c.o"
 	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/openvmtil64.dir/src/primitives/interpreters.c.o   -c /home/dennisj/openvmtil64/src/primitives/interpreters.c
 
 CMakeFiles/openvmtil64.dir/src/primitives/interpreters.c.i: cmake_force
@@ -2099,7 +2027,7 @@ CMakeFiles/openvmtil64.dir/src/primitives/interpreters.c.o.provides.build: CMake
 
 CMakeFiles/openvmtil64.dir/src/primitives/ios.c.o: CMakeFiles/openvmtil64.dir/flags.make
 CMakeFiles/openvmtil64.dir/src/primitives/ios.c.o: ../src/primitives/ios.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/dennisj/openvmtil64/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_86) "Building C object CMakeFiles/openvmtil64.dir/src/primitives/ios.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/dennisj/openvmtil64/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_83) "Building C object CMakeFiles/openvmtil64.dir/src/primitives/ios.c.o"
 	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/openvmtil64.dir/src/primitives/ios.c.o   -c /home/dennisj/openvmtil64/src/primitives/ios.c
 
 CMakeFiles/openvmtil64.dir/src/primitives/ios.c.i: cmake_force
@@ -2123,7 +2051,7 @@ CMakeFiles/openvmtil64.dir/src/primitives/ios.c.o.provides.build: CMakeFiles/ope
 
 CMakeFiles/openvmtil64.dir/src/primitives/logics.c.o: CMakeFiles/openvmtil64.dir/flags.make
 CMakeFiles/openvmtil64.dir/src/primitives/logics.c.o: ../src/primitives/logics.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/dennisj/openvmtil64/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_87) "Building C object CMakeFiles/openvmtil64.dir/src/primitives/logics.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/dennisj/openvmtil64/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_84) "Building C object CMakeFiles/openvmtil64.dir/src/primitives/logics.c.o"
 	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/openvmtil64.dir/src/primitives/logics.c.o   -c /home/dennisj/openvmtil64/src/primitives/logics.c
 
 CMakeFiles/openvmtil64.dir/src/primitives/logics.c.i: cmake_force
@@ -2147,7 +2075,7 @@ CMakeFiles/openvmtil64.dir/src/primitives/logics.c.o.provides.build: CMakeFiles/
 
 CMakeFiles/openvmtil64.dir/src/primitives/maths.c.o: CMakeFiles/openvmtil64.dir/flags.make
 CMakeFiles/openvmtil64.dir/src/primitives/maths.c.o: ../src/primitives/maths.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/dennisj/openvmtil64/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_88) "Building C object CMakeFiles/openvmtil64.dir/src/primitives/maths.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/dennisj/openvmtil64/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_85) "Building C object CMakeFiles/openvmtil64.dir/src/primitives/maths.c.o"
 	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/openvmtil64.dir/src/primitives/maths.c.o   -c /home/dennisj/openvmtil64/src/primitives/maths.c
 
 CMakeFiles/openvmtil64.dir/src/primitives/maths.c.i: cmake_force
@@ -2171,7 +2099,7 @@ CMakeFiles/openvmtil64.dir/src/primitives/maths.c.o.provides.build: CMakeFiles/o
 
 CMakeFiles/openvmtil64.dir/src/primitives/memorys.c.o: CMakeFiles/openvmtil64.dir/flags.make
 CMakeFiles/openvmtil64.dir/src/primitives/memorys.c.o: ../src/primitives/memorys.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/dennisj/openvmtil64/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_89) "Building C object CMakeFiles/openvmtil64.dir/src/primitives/memorys.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/dennisj/openvmtil64/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_86) "Building C object CMakeFiles/openvmtil64.dir/src/primitives/memorys.c.o"
 	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/openvmtil64.dir/src/primitives/memorys.c.o   -c /home/dennisj/openvmtil64/src/primitives/memorys.c
 
 CMakeFiles/openvmtil64.dir/src/primitives/memorys.c.i: cmake_force
@@ -2195,7 +2123,7 @@ CMakeFiles/openvmtil64.dir/src/primitives/memorys.c.o.provides.build: CMakeFiles
 
 CMakeFiles/openvmtil64.dir/src/primitives/namespaces.c.o: CMakeFiles/openvmtil64.dir/flags.make
 CMakeFiles/openvmtil64.dir/src/primitives/namespaces.c.o: ../src/primitives/namespaces.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/dennisj/openvmtil64/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_90) "Building C object CMakeFiles/openvmtil64.dir/src/primitives/namespaces.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/dennisj/openvmtil64/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_87) "Building C object CMakeFiles/openvmtil64.dir/src/primitives/namespaces.c.o"
 	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/openvmtil64.dir/src/primitives/namespaces.c.o   -c /home/dennisj/openvmtil64/src/primitives/namespaces.c
 
 CMakeFiles/openvmtil64.dir/src/primitives/namespaces.c.i: cmake_force
@@ -2219,7 +2147,7 @@ CMakeFiles/openvmtil64.dir/src/primitives/namespaces.c.o.provides.build: CMakeFi
 
 CMakeFiles/openvmtil64.dir/src/primitives/openvmtils.c.o: CMakeFiles/openvmtil64.dir/flags.make
 CMakeFiles/openvmtil64.dir/src/primitives/openvmtils.c.o: ../src/primitives/openvmtils.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/dennisj/openvmtil64/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_91) "Building C object CMakeFiles/openvmtil64.dir/src/primitives/openvmtils.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/dennisj/openvmtil64/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_88) "Building C object CMakeFiles/openvmtil64.dir/src/primitives/openvmtils.c.o"
 	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/openvmtil64.dir/src/primitives/openvmtils.c.o   -c /home/dennisj/openvmtil64/src/primitives/openvmtils.c
 
 CMakeFiles/openvmtil64.dir/src/primitives/openvmtils.c.i: cmake_force
@@ -2243,7 +2171,7 @@ CMakeFiles/openvmtil64.dir/src/primitives/openvmtils.c.o.provides.build: CMakeFi
 
 CMakeFiles/openvmtil64.dir/src/primitives/parsers.c.o: CMakeFiles/openvmtil64.dir/flags.make
 CMakeFiles/openvmtil64.dir/src/primitives/parsers.c.o: ../src/primitives/parsers.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/dennisj/openvmtil64/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_92) "Building C object CMakeFiles/openvmtil64.dir/src/primitives/parsers.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/dennisj/openvmtil64/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_89) "Building C object CMakeFiles/openvmtil64.dir/src/primitives/parsers.c.o"
 	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/openvmtil64.dir/src/primitives/parsers.c.o   -c /home/dennisj/openvmtil64/src/primitives/parsers.c
 
 CMakeFiles/openvmtil64.dir/src/primitives/parsers.c.i: cmake_force
@@ -2267,7 +2195,7 @@ CMakeFiles/openvmtil64.dir/src/primitives/parsers.c.o.provides.build: CMakeFiles
 
 CMakeFiles/openvmtil64.dir/src/primitives/primitives.c.o: CMakeFiles/openvmtil64.dir/flags.make
 CMakeFiles/openvmtil64.dir/src/primitives/primitives.c.o: ../src/primitives/primitives.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/dennisj/openvmtil64/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_93) "Building C object CMakeFiles/openvmtil64.dir/src/primitives/primitives.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/dennisj/openvmtil64/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_90) "Building C object CMakeFiles/openvmtil64.dir/src/primitives/primitives.c.o"
 	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/openvmtil64.dir/src/primitives/primitives.c.o   -c /home/dennisj/openvmtil64/src/primitives/primitives.c
 
 CMakeFiles/openvmtil64.dir/src/primitives/primitives.c.i: cmake_force
@@ -2291,7 +2219,7 @@ CMakeFiles/openvmtil64.dir/src/primitives/primitives.c.o.provides.build: CMakeFi
 
 CMakeFiles/openvmtil64.dir/src/primitives/stacks.c.o: CMakeFiles/openvmtil64.dir/flags.make
 CMakeFiles/openvmtil64.dir/src/primitives/stacks.c.o: ../src/primitives/stacks.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/dennisj/openvmtil64/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_94) "Building C object CMakeFiles/openvmtil64.dir/src/primitives/stacks.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/dennisj/openvmtil64/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_91) "Building C object CMakeFiles/openvmtil64.dir/src/primitives/stacks.c.o"
 	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/openvmtil64.dir/src/primitives/stacks.c.o   -c /home/dennisj/openvmtil64/src/primitives/stacks.c
 
 CMakeFiles/openvmtil64.dir/src/primitives/stacks.c.i: cmake_force
@@ -2315,7 +2243,7 @@ CMakeFiles/openvmtil64.dir/src/primitives/stacks.c.o.provides.build: CMakeFiles/
 
 CMakeFiles/openvmtil64.dir/src/primitives/strings.c.o: CMakeFiles/openvmtil64.dir/flags.make
 CMakeFiles/openvmtil64.dir/src/primitives/strings.c.o: ../src/primitives/strings.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/dennisj/openvmtil64/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_95) "Building C object CMakeFiles/openvmtil64.dir/src/primitives/strings.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/dennisj/openvmtil64/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_92) "Building C object CMakeFiles/openvmtil64.dir/src/primitives/strings.c.o"
 	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/openvmtil64.dir/src/primitives/strings.c.o   -c /home/dennisj/openvmtil64/src/primitives/strings.c
 
 CMakeFiles/openvmtil64.dir/src/primitives/strings.c.i: cmake_force
@@ -2339,7 +2267,7 @@ CMakeFiles/openvmtil64.dir/src/primitives/strings.c.o.provides.build: CMakeFiles
 
 CMakeFiles/openvmtil64.dir/src/primitives/syntaxes.c.o: CMakeFiles/openvmtil64.dir/flags.make
 CMakeFiles/openvmtil64.dir/src/primitives/syntaxes.c.o: ../src/primitives/syntaxes.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/dennisj/openvmtil64/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_96) "Building C object CMakeFiles/openvmtil64.dir/src/primitives/syntaxes.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/dennisj/openvmtil64/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_93) "Building C object CMakeFiles/openvmtil64.dir/src/primitives/syntaxes.c.o"
 	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/openvmtil64.dir/src/primitives/syntaxes.c.o   -c /home/dennisj/openvmtil64/src/primitives/syntaxes.c
 
 CMakeFiles/openvmtil64.dir/src/primitives/syntaxes.c.i: cmake_force
@@ -2363,7 +2291,7 @@ CMakeFiles/openvmtil64.dir/src/primitives/syntaxes.c.o.provides.build: CMakeFile
 
 CMakeFiles/openvmtil64.dir/src/primitives/systems.c.o: CMakeFiles/openvmtil64.dir/flags.make
 CMakeFiles/openvmtil64.dir/src/primitives/systems.c.o: ../src/primitives/systems.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/dennisj/openvmtil64/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_97) "Building C object CMakeFiles/openvmtil64.dir/src/primitives/systems.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/dennisj/openvmtil64/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_94) "Building C object CMakeFiles/openvmtil64.dir/src/primitives/systems.c.o"
 	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/openvmtil64.dir/src/primitives/systems.c.o   -c /home/dennisj/openvmtil64/src/primitives/systems.c
 
 CMakeFiles/openvmtil64.dir/src/primitives/systems.c.i: cmake_force
@@ -2387,7 +2315,7 @@ CMakeFiles/openvmtil64.dir/src/primitives/systems.c.o.provides.build: CMakeFiles
 
 CMakeFiles/openvmtil64.dir/src/primitives/words.c.o: CMakeFiles/openvmtil64.dir/flags.make
 CMakeFiles/openvmtil64.dir/src/primitives/words.c.o: ../src/primitives/words.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/dennisj/openvmtil64/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_98) "Building C object CMakeFiles/openvmtil64.dir/src/primitives/words.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/dennisj/openvmtil64/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_95) "Building C object CMakeFiles/openvmtil64.dir/src/primitives/words.c.o"
 	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/openvmtil64.dir/src/primitives/words.c.o   -c /home/dennisj/openvmtil64/src/primitives/words.c
 
 CMakeFiles/openvmtil64.dir/src/primitives/words.c.i: cmake_force
@@ -2453,7 +2381,6 @@ openvmtil64_OBJECTS = \
 "CMakeFiles/openvmtil64.dir/src/basis/core/readline.c.o" \
 "CMakeFiles/openvmtil64.dir/src/basis/core/readTable.c.o" \
 "CMakeFiles/openvmtil64.dir/src/basis/core/sequence.c.o" \
-"CMakeFiles/openvmtil64.dir/src/basis/core/sockets.c.o" \
 "CMakeFiles/openvmtil64.dir/src/basis/core/string.c.o" \
 "CMakeFiles/openvmtil64.dir/src/basis/core/symbol.c.o" \
 "CMakeFiles/openvmtil64.dir/src/basis/core/syntax.c.o" \
@@ -2485,8 +2412,6 @@ openvmtil64_OBJECTS = \
 "CMakeFiles/openvmtil64.dir/src/basis/system.c.o" \
 "CMakeFiles/openvmtil64.dir/src/basis/tabCompletion.c.o" \
 "CMakeFiles/openvmtil64.dir/src/basis/types.c.o" \
-"CMakeFiles/openvmtil64.dir/src/nbproject/private/c_standard_headers_indexer.c.o" \
-"CMakeFiles/openvmtil64.dir/src/nbproject/private/cpp_standard_headers_indexer.cpp.o" \
 "CMakeFiles/openvmtil64.dir/src/primitives/bits.c.o" \
 "CMakeFiles/openvmtil64.dir/src/primitives/cmaths.c.o" \
 "CMakeFiles/openvmtil64.dir/src/primitives/compilers.c.o" \
@@ -2555,7 +2480,6 @@ openvmtil64: CMakeFiles/openvmtil64.dir/src/basis/core/preprocessor.c.o
 openvmtil64: CMakeFiles/openvmtil64.dir/src/basis/core/readline.c.o
 openvmtil64: CMakeFiles/openvmtil64.dir/src/basis/core/readTable.c.o
 openvmtil64: CMakeFiles/openvmtil64.dir/src/basis/core/sequence.c.o
-openvmtil64: CMakeFiles/openvmtil64.dir/src/basis/core/sockets.c.o
 openvmtil64: CMakeFiles/openvmtil64.dir/src/basis/core/string.c.o
 openvmtil64: CMakeFiles/openvmtil64.dir/src/basis/core/symbol.c.o
 openvmtil64: CMakeFiles/openvmtil64.dir/src/basis/core/syntax.c.o
@@ -2587,8 +2511,6 @@ openvmtil64: CMakeFiles/openvmtil64.dir/src/basis/sourceCode.c.o
 openvmtil64: CMakeFiles/openvmtil64.dir/src/basis/system.c.o
 openvmtil64: CMakeFiles/openvmtil64.dir/src/basis/tabCompletion.c.o
 openvmtil64: CMakeFiles/openvmtil64.dir/src/basis/types.c.o
-openvmtil64: CMakeFiles/openvmtil64.dir/src/nbproject/private/c_standard_headers_indexer.c.o
-openvmtil64: CMakeFiles/openvmtil64.dir/src/nbproject/private/cpp_standard_headers_indexer.cpp.o
 openvmtil64: CMakeFiles/openvmtil64.dir/src/primitives/bits.c.o
 openvmtil64: CMakeFiles/openvmtil64.dir/src/primitives/cmaths.c.o
 openvmtil64: CMakeFiles/openvmtil64.dir/src/primitives/compilers.c.o
@@ -2613,7 +2535,7 @@ openvmtil64: CMakeFiles/openvmtil64.dir/src/primitives/systems.c.o
 openvmtil64: CMakeFiles/openvmtil64.dir/src/primitives/words.c.o
 openvmtil64: CMakeFiles/openvmtil64.dir/build.make
 openvmtil64: CMakeFiles/openvmtil64.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/dennisj/openvmtil64/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_99) "Linking CXX executable openvmtil64"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/dennisj/openvmtil64/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_96) "Linking C executable openvmtil64"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/openvmtil64.dir/link.txt --verbose=$(VERBOSE)
 
 # Rule to build all files generated by this target.
@@ -2663,7 +2585,6 @@ CMakeFiles/openvmtil64.dir/requires: CMakeFiles/openvmtil64.dir/src/basis/core/p
 CMakeFiles/openvmtil64.dir/requires: CMakeFiles/openvmtil64.dir/src/basis/core/readline.c.o.requires
 CMakeFiles/openvmtil64.dir/requires: CMakeFiles/openvmtil64.dir/src/basis/core/readTable.c.o.requires
 CMakeFiles/openvmtil64.dir/requires: CMakeFiles/openvmtil64.dir/src/basis/core/sequence.c.o.requires
-CMakeFiles/openvmtil64.dir/requires: CMakeFiles/openvmtil64.dir/src/basis/core/sockets.c.o.requires
 CMakeFiles/openvmtil64.dir/requires: CMakeFiles/openvmtil64.dir/src/basis/core/string.c.o.requires
 CMakeFiles/openvmtil64.dir/requires: CMakeFiles/openvmtil64.dir/src/basis/core/symbol.c.o.requires
 CMakeFiles/openvmtil64.dir/requires: CMakeFiles/openvmtil64.dir/src/basis/core/syntax.c.o.requires
@@ -2695,8 +2616,6 @@ CMakeFiles/openvmtil64.dir/requires: CMakeFiles/openvmtil64.dir/src/basis/source
 CMakeFiles/openvmtil64.dir/requires: CMakeFiles/openvmtil64.dir/src/basis/system.c.o.requires
 CMakeFiles/openvmtil64.dir/requires: CMakeFiles/openvmtil64.dir/src/basis/tabCompletion.c.o.requires
 CMakeFiles/openvmtil64.dir/requires: CMakeFiles/openvmtil64.dir/src/basis/types.c.o.requires
-CMakeFiles/openvmtil64.dir/requires: CMakeFiles/openvmtil64.dir/src/nbproject/private/c_standard_headers_indexer.c.o.requires
-CMakeFiles/openvmtil64.dir/requires: CMakeFiles/openvmtil64.dir/src/nbproject/private/cpp_standard_headers_indexer.cpp.o.requires
 CMakeFiles/openvmtil64.dir/requires: CMakeFiles/openvmtil64.dir/src/primitives/bits.c.o.requires
 CMakeFiles/openvmtil64.dir/requires: CMakeFiles/openvmtil64.dir/src/primitives/cmaths.c.o.requires
 CMakeFiles/openvmtil64.dir/requires: CMakeFiles/openvmtil64.dir/src/primitives/compilers.c.o.requires
