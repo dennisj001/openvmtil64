@@ -7,12 +7,43 @@
         <activeConfTypeElem>0</activeConfTypeElem>
         <activeConfIndexElem>0</activeConfIndexElem>
     </data>
-    <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="1">
+    <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="7">
+        <file>
+            <url>basis/compiler/blocks.c</url>
+            <bookmark id="7">
+                <name/>
+                <line>179</line>
+                <key/>
+            </bookmark>
+            <bookmark id="6">
+                <name/>
+                <line>330</line>
+                <key/>
+            </bookmark>
+        </file>
+        <file>
+            <url>basis/compiler/optimize.c</url>
+            <bookmark id="2">
+                <name/>
+                <line>106</line>
+                <key/>
+            </bookmark>
+            <bookmark id="3">
+                <name/>
+                <line>182</line>
+                <key/>
+            </bookmark>
+        </file>
         <file>
             <url>basis/compiler/combinators.c</url>
-            <bookmark id="1">
+            <bookmark id="4">
                 <name/>
-                <line>268</line>
+                <line>26</line>
+                <key/>
+            </bookmark>
+            <bookmark id="5">
+                <name/>
+                <line>220</line>
                 <key/>
             </bookmark>
         </file>

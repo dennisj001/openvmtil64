@@ -135,15 +135,6 @@ CfrTil_MachineCodePrimitive_AddWords ( CfrTil * cfrTil )
     int64 i, functionArg ;
     block * callHook ;
     Debugger * debugger = _Debugger_ ;
-#if 1  
-    for ( i = 0 ; MachineCodePrimitives [ i ].ccp_Name ; i ++ )
-    {
-        MachineCodePrimitive p = MachineCodePrimitives [ i ] ;
-        functionArg = - 1 ; // this is also flag in _DObject_ValueDefinition_Init
-        callHook = 0 ;
-        _CfrTil_MachineCodePrimitive_NewAdd (p.ccp_Name, p.ui64_CAttribute, p.ui64_CAttribute2, callHook, p.Function, functionArg, p.NameSpace, p.SuperNamespace ) ;
-    }
-#endif    
     // this form (below) can and should replace the above form for adding here
     _CfrTil_MachineCodePrimitive_NewAdd ("getRsp", CPRIMITIVE, 0, & debugger->getRsp, ( byte* ) Compile_Debug_GetRSP, - 1, "System", "Root" ) ;
 
@@ -169,6 +160,15 @@ CfrTil_MachineCodePrimitive_AddWords ( CfrTil * cfrTil )
 #endif    
     //_CfrTil_MachineCodePrimitive_NewAdd ( "adjustRSPAndCall", CPRIMITIVE, (block*)& cfrTil->adjustRSPAndCall, ( byte* ) Compile_AdjustRSPAndCall, -1, "System", "Root" ) ;
     //_CfrTil_MachineCodePrimitive_NewAdd ( "adjustRSP", CPRIMITIVE, (block*)& cfrTil->adjustRSP, ( byte* ) Compile_AdjustRSP, -1, "System", "Root" ) ;
+#if 1  
+    for ( i = 0 ; MachineCodePrimitives [ i ].ccp_Name ; i ++ )
+    {
+        MachineCodePrimitive p = MachineCodePrimitives [ i ] ;
+        functionArg = - 1 ; // this is also flag in _DObject_ValueDefinition_Init
+        callHook = 0 ;
+        _CfrTil_MachineCodePrimitive_NewAdd (p.ccp_Name, p.ui64_CAttribute, p.ui64_CAttribute2, callHook, p.Function, functionArg, p.NameSpace, p.SuperNamespace ) ;
+    }
+#endif    
 }
 
 

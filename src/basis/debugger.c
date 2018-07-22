@@ -207,6 +207,7 @@ _Debugger_Init ( Debugger * debugger, Word * word, byte * address )
     {
         debugger->State = DBG_MENU | DBG_INFO | DBG_PROMPT ;
     }
+    if (( ! GetState ( debugger, DBG_INTERPRET_LOOP_DONE ) ) || (!(debugger->w_Word)))
     debugger->w_Word = word ;
     if ( address )
     {
@@ -215,7 +216,8 @@ _Debugger_Init ( Debugger * debugger, Word * word, byte * address )
     else if ( GetState ( debugger, DBG_BRK_INIT ) && debugger->cs_Cpu->Rsp )
     {
         // remember : _Compile_CpuState_Save ( _Debugger_->cs_Cpu ) ; is called thru _Compile_Debug : <dbg>
-        debugger->DebugAddress = ( byte* ) debugger->cs_Cpu->Rsp[0] ; // 0 is <dbg>
+        debugger->DebugAddress = debugger->w_Word ? debugger->w_Word->Coding + 3 : ( byte* ) debugger->cs_Cpu->Rsp[1] ;
+        //debugger->DebugAddress = ( byte* ) debugger->cs_Cpu->Rsp[0] ; // 0 is <dbg>
         if ( debugger->DebugAddress && ( ! word ) )
         {
             byte * da ;

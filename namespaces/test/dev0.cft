@@ -168,8 +168,7 @@ fibPTC2? ( REG n | REG fn, REG fn1, REG fn2 )
 ' fibPTC2? find wdiss
 fibPTC2? (20) dup p 6765 _assert //pause //sp 
 c_syntaxOff
-sp
-    
+sp    
 bnon
 : tbn ( | n m ) n 0 = m 3 = n m @ += n m @ += n m @ += n @ p ; tbn // should be 9
 

@@ -3,7 +3,8 @@
 void
 Word_SetCoding ( Word * word, byte * address )
 {
-    if ( ( word->CAttribute2 & ( SYNTACTIC | NO_OP_WORD | NO_CODING ) ) || ( word->CAttribute & ( DEBUG_WORD ) ) || ( word->LAttribute & ( W_COMMENT | W_PREPROCESSOR ) ) ) word->Coding = 0 ;
+    //if ( ( word->CAttribute2 & ( SYNTACTIC | NO_OP_WORD | NO_CODING ) ) || ( word->CAttribute & ( DEBUG_WORD ) ) || ( word->LAttribute & ( W_COMMENT | W_PREPROCESSOR ) ) ) word->Coding = 0 ;
+    if ( ( word->CAttribute2 & ( SYNTACTIC | NO_OP_WORD | NO_CODING ) ) || ( word->LAttribute & ( W_COMMENT | W_PREPROCESSOR ) ) ) word->Coding = 0 ;
     else word->Coding = address ;
 }
 

@@ -71,10 +71,10 @@ BI_Block_Copy ( BlockInfo * bi, byte* dstAddress, byte * srcAddress, int64 bsize
             else dllist_Map1 ( compiler->GotoList, ( MapFunction1 ) _AdjustGotoInfo, ( int64 ) srcAddress ) ; //, ( int64 ) end ) ;
         }
         _CompileN ( srcAddress, isize ) ; // memcpy ( dstAddress, address, size ) ;
-        d0 ( if ( Is_DebugModeOn ) _Debugger_Disassemble ( _Debugger_, bi->CopiedToStart, bi->CopiedToEnd - bi->CopiedToStart, 1 ) ) ;
     }
     bi->CopiedToEnd = Here ;
     bi->CopiedSize = bi->CopiedToEnd - bi->CopiedToStart ;
+    d1 ( if ( Is_DebugModeOn ) Debugger_Disassemble ( _Debugger_, bi->CopiedToStart, bi->CopiedSize, 1 ) ) ;
 }
 
 void
@@ -114,11 +114,11 @@ Block_CopyCompile ( byte * srcAddress, int64 bindex, Boolean jccFlag )
     if ( jccFlag )
     {
         Compile_BlockLogicTest ( bi ) ;
-        _BI_Compile_Jcc (bi, 0) ; 
+        _BI_Compile_Jcc ( bi, 0 ) ;
         Stack_PointerToJmpOffset_Set ( ) ;
         bi->CopiedToEnd = Here ;
         bi->CopiedSize = bi->CopiedToEnd - bi->CopiedToStart ;
-        d0 ( if ( Is_DebugModeOn ) _Debugger_Disassemble ( _Debugger_, ( byte* ) bi->CopiedToStart, bi->CopiedSize, 1 ) ) ;
+        d0 ( if ( Is_DebugModeOn ) Debugger_Disassemble ( _Debugger_, ( byte* ) bi->CopiedToStart, bi->CopiedSize, 1 ) ) ;
     }
 }
 
@@ -264,8 +264,13 @@ _CfrTil_EndBlock2 ( BlockInfo * bi )
     if ( ! _Stack_Depth ( compiler->BlockStack ) )
     {
         _CfrTil_InstallGotoCallPoints_Keyed ( bi, GI_GOTO | GI_RECURSE ) ;
-#if 0 // TESTING        
-        BI_Block_Copy ( bi, bi->bp_First, bi->bp_First, Here - bi->bp_First, 2 ) ; // 2 : retFlag will include '_' (dropped blocks) with a 'ret' : final optimization and for PeepHoleOptimize
+#if 0
+        int64 size = bi->bp_Last - first ;
+        d1 ( if ( Is_DebugModeOn ) Debugger_Disassemble ( _Debugger_, ( byte* ) first, size, 1 ) ) ;
+        BI_Block_Copy ( bi, Here, first, size, 1 ) ;
+        d1 ( if ( Is_DebugModeOn ) Debugger_Disassemble ( _Debugger_, ( byte* ) bi->CopiedToStart, bi->CopiedSize, 1 ) ) ;
+        BI_Block_Copy ( bi, first, bi->CopiedToStart, bi->CopiedSize, 1 ) ;
+        d1 ( if ( Is_DebugModeOn ) Debugger_Disassemble ( _Debugger_, ( byte* ) first, bi->CopiedSize, 1 ) ) ;
 #endif        
         CfrTil_TurnOffBlockCompiler ( ) ;
         Compiler_Init ( compiler, 0 ) ;

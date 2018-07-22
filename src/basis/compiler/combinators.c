@@ -12,32 +12,6 @@
 
 // nb : can't fully optimize if there is code between blocks
 // check if there is any code between blocks if so we can't optimize fully
-#if 0
-
-void
-CfrTil_EndCombinator ( int64 quotesUsed, int64 moveFlag, 0 )
-{
-    Compiler * compiler = _Context_->Compiler0 ;
-    BlockInfo *bi = ( BlockInfo * ) _Stack_Pick ( compiler->CombinatorBlockInfoStack, quotesUsed - 1 ) ; // -1 : remember - stack is zero based ; stack[0] is top
-    compiler->BreakPoint = Here ;
-    _CfrTil_InstallGotoCallPoints_Keyed ( ( BlockInfo* ) bi, GI_CONTINUE | GI_BREAK ) ;
-    bi->CombinatorEndsAt = Here ;
-    if ( moveFlag && Compiling )
-    {
-        byte * qCodeStart ;
-        qCodeStart = bi->OriginalActualCodeStart ;
-        BI_Block_Copy ( bi, qCodeStart, bi->CombinatorStartsAt, bi->CombinatorEndsAt - bi->CombinatorStartsAt, 1 ) ; //bi->CopiedSize, 0 ) ; //Here - bi->CombinatorStartsAt, 0 ) ;
-    }
-    //_CfrTil_InstallGotoCallPoints_Keyed ( ( BlockInfo* ) bi, GI_GOTO | GI_RETURN | GI_RECURSE ) ; // done in a final EndBlock not here
-    _Stack_DropN ( compiler->CombinatorBlockInfoStack, quotesUsed ) ;
-    if ( GetState ( compiler, LISP_COMBINATOR_MODE ) )
-    {
-        _Stack_Pop ( compiler->CombinatorInfoStack ) ;
-        if ( ! Stack_Depth ( compiler->CombinatorInfoStack ) ) SetState ( compiler, LISP_COMBINATOR_MODE, false ) ;
-    }
-}
-#else
-
 void
 CfrTil_EndCombinator ( int64 quotesUsed, int64 moveFlag, int64 jccBlockIndex, Boolean jccBlockFlag )
 {
@@ -48,22 +22,6 @@ CfrTil_EndCombinator ( int64 quotesUsed, int64 moveFlag, int64 jccBlockIndex, Bo
     _CfrTil_InstallGotoCallPoints_Keyed ( ( BlockInfo* ) bi, GI_CONTINUE | GI_BREAK ) ;
     bi->CombinatorEndsAt = Here ;
     if ( moveFlag && Compiling ) BI_Block_Copy ( bi, bi->OriginalActualCodeStart, bi->CombinatorStartsAt, bi->CombinatorEndsAt - bi->CombinatorStartsAt, 0 ) ;
-#if 0   
-    if (jccBlockIndex || jccBlockFlag ) 
-    {
-        int64 movDiff = bi->CombinatorStartsAt - bi->OriginalActualCodeStart ;
-        d1 ( if ( Is_DebugModeOn ) Debugger_Disassemble ( _Debugger_, bi->CopiedToStart, bi->CopiedSize, 1 ) ) ;
-        BlockInfo *bi1 = ( BlockInfo * ) _Stack_Pick ( compiler->CombinatorBlockInfoStack, jccBlockIndex ) ;
-        //_BI_Compile_Jcc (bi1, 0) ; // , int8 nz
-        int32 offset = *(int*) (bi1->ActualCopiedToJccCode - movDiff + 2) ;
-        byte * address = bi1->ActualCopiedToJccCode + offset ;
-        //_SetOffsetForCallOrJump ( bi1->ActualCopiedToJccCode - movDiff + 2, address - movDiff ) ; // 2 : size of insn minus offset
-        * ( ( int32* ) address ) = address - movDiff ;
-
-        //_Stack_Pop ( compiler->PointerToOffset ) ;
-        d1 ( if ( Is_DebugModeOn ) Debugger_Disassemble ( _Debugger_, bi1->CopiedToStart, bi1->CopiedSize, 1 ) ) ;
-    }
-#endif    
     //_CfrTil_InstallGotoCallPoints_Keyed ( ( BlockInfo* ) bi, GI_GOTO | GI_RETURN | GI_RECURSE ) ; // done in a final EndBlock not here
     _Stack_DropN ( compiler->CombinatorBlockInfoStack, quotesUsed ) ;
     if ( GetState ( compiler, LISP_COMBINATOR_MODE ) )
@@ -73,7 +31,6 @@ CfrTil_EndCombinator ( int64 quotesUsed, int64 moveFlag, int64 jccBlockIndex, Bo
     }
 }
 
-#endif
 // Combinators are first created after the original code using 'Here' in CfrTil_BeginCombinator 
 // then copied into the original code locations at EndCombinator
 

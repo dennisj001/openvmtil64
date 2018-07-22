@@ -268,7 +268,7 @@ dscOn //verbosity 3 =
 : assert0 ( n m ) { n @ m @ != } { nl "error" ps _info _pause } if ; 
 "assert" ' assert1 find alias
 : _assertStkChk ( n m | str )  
-    { verbosity @ 1 > }
+    { verbosity @ } //1 > }
     {
         { DebugFlag @ } 
         { 
@@ -371,7 +371,7 @@ Root
 'doScript 1 const
 '_doDemo 0 const    
 dbgOff
-dbgOn 
+//dbgOn 
 #if Is_DebugOn 
 System 
 testCfrTil // dT0 //demo //dT0
@@ -381,15 +381,9 @@ demo
 stringMacrosOff
 #else
 // you can trim this file to your needs and put your personal init code here maybe
-Lisp
-d: (define fib (lambda (n) ( ifElse (< n 2) n (+ (fib (- n 1)) (fib (- n 2))))))
-(define fib2 (lambda (n) (ifElse (< n 2) n (+ (fib2 (- n 1)) (fib2 (- n 2))))))
-tick fib find wdiss 
-sp
-(fib 20) (fib2 20)
-pause
-lispOff
+: hi 1 2 + 3 <dbg> + p ; 
+d: hi
 #endif
 s: hi ( a b | c ) c a @ b @ + = printf ("\nshould read 3 : %d", c ) ;s 1 2 hi //pause
 s: hi ( a b | c ) c a @ b @ + 1 - = printf ("\nshould read 3 : %d", c ) ;s 1 3 hi //pause
-2 + 7  assertStkChk // stack checking
+2 + 7  d: assertStkChk // stack checking

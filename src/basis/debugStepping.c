@@ -205,6 +205,15 @@ doJmpCall:
                 debugger->DebugAddress += 3 ; // 5 : sizeof jmp/call insn // debugger->DebugAddress + size ; // skip the call insn to the next after it
                 goto end ;
             }
+            else 
+            {
+                SetState ( debugger, DBG_INTERPRET_LOOP_DONE, true ) ;
+                debugger->w_Word = word ;
+                debugger->w_Word->Coding = debugger->DebugAddress ;
+                word->Definition () ;
+                debugger->DebugAddress += 3 ;
+                goto end ;
+            }
         }
         else if ( ( * debugger->DebugAddress == CALL_JMP_MOD_RM ) && ( _RM ( debugger->DebugAddress ) == 16 ) ) // inc/dec are also opcode == 0xff
         {

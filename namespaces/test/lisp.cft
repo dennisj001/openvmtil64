@@ -248,7 +248,7 @@ lispOff
 sp
 "\nending lisp.cft\n" ddps
 sp 
-#if 1 //doScript
+#if 0 //doScript
 String
 $ls -al /usr/local ; 
 $etc/script ;
