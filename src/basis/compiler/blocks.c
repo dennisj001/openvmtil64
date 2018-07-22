@@ -81,7 +81,6 @@ void
 Compile_BlockLogicTest ( BlockInfo * bi ) // , byte * start )
 {
     int64 diff ;
-    Word_Set_SCA ( bi->LogicCodeWord ) ;
     if ( bi && ( bi->JccLogicCode || ( bi->LogicCodeWord && bi->LogicCodeWord->StackPushRegisterCode ) ) )
     {
         if ( ! bi->JccLogicCode )
@@ -92,6 +91,7 @@ Compile_BlockLogicTest ( BlockInfo * bi ) // , byte * start )
         bi->CopiedToLogicJccCode = bi->CopiedToStart + diff ; // use diff in copied block
         if ( ( ! ( bi->LogicCodeWord->CAttribute & CATEGORY_LOGIC ) ) )
         {
+            _Set_SCA ( bi->LogicCodeWord ) ;
             SetHere ( bi->CopiedToLogicJccCode ) ;
             _Compile_TestCode ( bi->LogicCodeWord->RegToUse, CELL ) ;
             bi->CopiedToLogicJccCode = Here ;

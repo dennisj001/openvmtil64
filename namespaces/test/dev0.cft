@@ -88,12 +88,16 @@ Lisp
 ( define h ( lambda ( a b c ) ( + a b c)))
 ( define k ( lambda ( a b ) ( + a b )))
 nl
+
+// from lisp.cft 58-59
+//(define g ( /\ (a b c) (a b c) ) )
+//(define h ( /\ (a b c) (a c b) ) ) 
 ( k ( j 1 2 3 ) ( h 2 3 66 ) ) sp // 77 ...
 ( + ( k ( j 1 2 3 ) ( h 2 3 66 ) ) ( + 698 2 ) ) // 777
 ( + ( k ( j 1 2 3 ) ( h 2 3 59 ) ) 7 ) // 77
-( g + ( k ( j 1 2 ( h 2 3 ( k 59 4 ) ) ) 6 ) 0 ) // 77
+( g1 + ( k ( j 1 2 ( h 2 3 ( k 59 4 ) ) ) 6 ) 0 ) // 77
 ( - ( + 1 2 ( * 3 4 ) ( / 4 2 ) ( - 9 8 ) 10 770 787 34 ) 21 787 34 )  // == 777
-sp
+pause
     
 // demo : interspersing C code with lisp compiled code
 C Compiler
@@ -170,7 +174,7 @@ fibPTC2? (20) dup p 6765 _assert //pause //sp
 c_syntaxOff
 sp    
 bnon
-: tbn ( | n m ) n 0 = m 3 = n m @ += n m @ += n m @ += n @ p ; tbn // should be 9
+: tbn ( | n m -- TOS ) n 0 = m 3 = n m @ += n m @ += n m @ += n @ dup p ; tbn 9 _assert " : should be 9" ps
 
 s: fibBN ( n | svn fn fn1 fn2 -- TOS ) 
     { svn n @ = fn 0 = fn1 0 = fn2 1 = } { n @ 0 > } { n 1 -= } 
@@ -191,9 +195,9 @@ sp
     { m @ dup p " : " _ps fibBN p { n @ m @ > } { "," _ps } if2 } 
     for
 ;
-nl nl 47 tfib3
-nl nl 100 tfib3
-nl 100 dup p fibBN p //pause
+nl nl 92 tfib3
+nl nl 92 tfib3
+nl 92 dup p fibBN p //pause
 bnoff
 //pause
 
@@ -257,7 +261,7 @@ decimal
 1 5 test1 32 _assert0 //pause
 : test1 ( n m | a -- TOS ) a n @ m @ >> = a @ ; //'test1 find wdiss 
 8 1 test1 4 _assert0 //pause
-
+ 
 Int
 Lisp
 (define fibc2 ( lambda ( n ) ( ifElse ( < n 2 ) n ( + ( fibc2 ( - n 1 ) ) ( fibc2 ( - n 2 ) ) ) ) ) )
@@ -287,22 +291,22 @@ bnon
 (yfac yfac 10) nl
 (define yfacc (lambda (yyy n1) (if* (< n1 2) (1) (* n1 (yyy yyy (- n1 1)))))) 
 (yfacc yfacc 10) nl
-(yfacc yfacc 700) nl //pause
+(yfacc yfacc 20) nl //pause
 (define yfac (lambda (yy n) (if* (< n 2) (1) (* n (yy yy (- n 1)))))) 
 (yfac yfac 10) nl
 (define yfacc (lambda (yyy n1) (if* (< n1 2) (1) (* n1 (yyy yyy (- n1 1)))))) 
 (yfacc yfacc 10) nl
-(yfacc yfacc 700) nl //pause
+(yfacc yfacc 20) nl //pause
 (define yfac (lambda (yy n) (if* (< n 2) 1 (* n (yy yy (- n 1)))))) // code from : http://www.newlisp.org/index.cgi?Y_Function
 tick yfac find wdiss
-(yfac yfac 50) nl //pause
+(yfac yfac 20) nl //pause
 (define yfacc (lambda (yyy n1) (if* (< n1 2) 1 (* n1 (yyy yyy (- n1 1)))))) 
 // tick yfacc find wdiss
 (yfacc yfacc 10) nl
 (yfacc yfacc 7) nl
 (define yfac (lambda (yy n) (if* (< n 2) 1 (* n (yy yy (- n 1)))))) // code from : http://www.newlisp.org/index.cgi?Y_Function
 tick yfac find wdiss
-(yfac yfac 50) nl 
+(yfac yfac 20) nl 
 (define yfacc (lambda (yyy n1) (if* (< n1 2) 1 (* n1 (yyy yyy (- n1 1)))))) 
 // tick yfacc find wdiss
 (yfacc yfacc 10) nl
@@ -313,14 +317,14 @@ Lisp
 //: sp s pause ; 
 (define yfac (lambda (yy n) (if* (< n 2) 1 (* n (yy yy (- n 1)))))) // code from : http://www.newlisp.org/index.cgi?Y_Function
 tick yfac find wdiss
-(yfac yfac 50) nl //pause
+(yfac yfac 20) nl //pause
 (define yfacc (lambda (yyy n1) (if* (< n1 2) 1 (* n1 (yyy yyy (- n1 1)))))) 
 // tick yfacc find wdiss
 (yfacc yfacc 10) nl
 (yfacc yfacc 7) nl
 (define yfac (lambda (yy n) (if* (< n 2) 1 (* n (yy yy (- n 1)))))) // code from : http://www.newlisp.org/index.cgi?Y_Function
 tick yfac find wdiss
-(yfac yfac 50) nl //pause
+(yfac yfac 20) nl //pause
 (define yfacc (lambda (yyy n1) (if* (< n1 2) 1 (* n1 (yyy yyy (- n1 1)))))) 
 // tick yfacc find wdiss
 (yfacc yfacc 10) nl
@@ -404,7 +408,7 @@ c_syntaxOn
 Root
 int cpow ( base power | out ) s{ for ( out = 1 ; power ; ( power -= 1 ) ) { out = out * base ; } return out ; }s 
 //int cpow ( base power | out ) { for ( out = 1 ; power ; power -= 1 ) { out = out * base ; } return out ; }
-cpow (2 30 ) p
+cpow (2 30 ) "2 ^ 30 : " ps p
 c_syntaxOff 
 s: pow0 ( base power | out ) { out 1 = } { power @ 0 > } { power power @ 1 - = } { out out @ base @ * = } for return out ;s
 s: pow ( base power | out ) { out 1 = } { power @ 0 > } { power 1 -= } { out out @ base @ * = } for return out ;s
@@ -428,7 +432,7 @@ sp
 bnon //BigNum
 (define yfac (lambda (yy n) (if* (< n 2) 1 (* n (yy yy (- n 1)))))) // code from : http://www.newlisp.org/index.cgi?Y_Function
 tick yfac find wdiss
-(yfac yfac 50) nl 
+(yfac yfac 20) nl 
 bnoff 
 Lisp //pause
 (define yfacc (lambda (yyy n1) (if* (< n1 2) 1 (* n1 (yyy yyy (- n1 1)))))) 

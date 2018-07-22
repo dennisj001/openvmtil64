@@ -1,12 +1,10 @@
 5 // stack checking marker
+: sp ; //stack pause ; 
 //verbosity 0 = 
 // logOn
-"BigNum" notUsing 
-"Lisp" notUsing
 verbosity 1 = 
 Debug
 : d: _dbgOn dbgSourceCodeOn ; immediate debugWord // a debugWord has special behavior : doesn't interfere with optimization
-
 "OptimizeOn" variable
 OptimizeOn 1 = 
 #if OptimizeOn @
@@ -179,7 +177,7 @@ Namespace
 : notUsing: { token dup ";" strcmp } { notUsing } while drop ; 
 : usingLast: { token dup ";" strcmp } { usingLast } while drop ; 
 notUsing: C_Combinators C_Syntax Lisp ;
-
+sp
 System
 "Black" 0 const
 "Red" 1 const
@@ -258,7 +256,7 @@ System
 #if Is_DebugOn
 dscOn //verbosity 3 =
 #endif
-: _assert0 ( n m ) { n @ m @ != } { nl location hex n @ p "!=" ps m @ p "<:" ps "Error!" adps _info _pause } { nl } ifElse ; //{ " ok" ps nl } ifElse ; // no "ok" with this word
+: _assert0 ( n m ) { n @ m @ != } { nl location hex n @ p "!=" ps m @ p "<:" ps "Error!" adps _info _pause } { } ifElse ; //{ " ok" ps nl } ifElse ; // no "ok" with this word
 : _assert ( n m ) nl  nl "_assert ::" ps { n @ m @ != } { n @ p "!=" ps m @ p "<:" ps "Error!" adps _info _pause } { " ok" ps nl } ifElse ;
 : _assert1 ( n m str ) { n @ m @ != } { str @ ps "error" ps _info _pause } if ;
 : assert1 ( n m str ) { n @ m @ != } { nl str @ ps ":> got : " ps n @ p "!=" ps m @ p " : expected <:" ps "Error!" adps _info _pause } { str @ ps "ok\n" ps } ifElse ;
@@ -268,7 +266,7 @@ dscOn //verbosity 3 =
 : assert0 ( n m ) { n @ m @ != } { nl "error" ps _info _pause } if ; 
 "assert" ' assert1 find alias
 : _assertStkChk ( n m | str )  
-    { verbosity @ } //1 > }
+    { verbosity @ 1 > }
     {
         { DebugFlag @ } 
         { 
@@ -375,16 +373,17 @@ dbgOn
 #if Is_DebugOn 
 System 
 testCfrTil // dT0 //demo //dT0
-5 
 #if _doDemo 
 demo 
 #endif //dT0
 stringMacrosOff
 #else
 // you can trim this file to your needs and put your personal init code here maybe
+#if 0
 : hi 1 2 + 3 <dbg> + p ; 
 d: hi
-#endif
 s: hi ( a b | c ) c a @ b @ + = printf ("\nshould read 3 : %d", c ) ;s 1 2 hi //pause
 s: hi ( a b | c ) c a @ b @ + 1 - = printf ("\nshould read 3 : %d", c ) ;s 1 3 hi //pause
-2 + 7  d: assertStkChk // stack checking
+#endif
+#endif
+2 + 7  assertStkChk // stack checking

@@ -156,7 +156,7 @@ Compiler_SetupArgsToStandardLocations ( Compiler * compiler )
 {
     CompileOptimizeInfo * optInfo = compiler->OptInfo ;
     // op args first
-    Word_Set_SCA ( optInfo->opWord ) ;
+    _Set_SCA ( optInfo->opWord ) ;
     if ( optInfo->opWord->CAttribute & ( CATEGORY_DUP ) ) Compile_Optimize_Dup ( compiler ) ;
     else if ( optInfo->wordArg1_literal && optInfo->wordArg2_literal ) Do_OptimizeOp2Literals ( compiler ) ;
     else if ( optInfo->wordArg2_Op || optInfo->xBetweenArg1AndArg2 ) Compiler_Optimizer_WordArg2Op_Or_xBetweenArg1AndArg2 ( compiler ) ;
@@ -312,7 +312,7 @@ void
 Compiler_CompileOptimizedLoad ( Compiler * compiler )
 {
     CompileOptimizeInfo * optInfo = compiler->OptInfo ;
-    Word_Set_SCA ( optInfo->opWord ) ;
+    _Set_SCA ( optInfo->opWord ) ;
     if ( optInfo->wordArg2->StackPushRegisterCode )
     {
         if ( optInfo->wordArg2->CAttribute & DOBJECT )
@@ -374,7 +374,7 @@ void
 Compile_Optimize_Dup ( Compiler * compiler )
 {
     CompileOptimizeInfo * optInfo = compiler->OptInfo ;
-    Word_Set_SCA ( optInfo->opWord ) ;
+    _Set_SCA ( optInfo->opWord ) ;
     if ( optInfo->wordArg2 && optInfo->wordArg2->StackPushRegisterCode )
     {
         _SetHere_To_Word_StackPushRegisterCode ( optInfo->wordArg2 ) ;
@@ -449,7 +449,7 @@ Compile_Optimize_OpEqual ( Compiler * compiler )
         CompileOptimizeInfo * svOptInfo = optInfo ;
         optInfo = tempOptInfo ;
         compiler->OptInfo = optInfo ; // we want to keep using the same variable
-        Word_Set_SCA ( optInfo->opWord ) ;
+        _Set_SCA ( optInfo->opWord ) ;
         Setup_MachineCodeInsnParameters ( compiler, REG, REG, ACC, OREG, 0, 0, 0, 1 ) ;
         if ( optInfo->NumberOfArgs == 2 )
         {
@@ -467,7 +467,7 @@ Compile_Optimize_OpEqual ( Compiler * compiler )
         compiler->OptimizeForcedReturn = 1 ;
         Block_Eval ( def ) ;
         Word_Check_SetHere_To_StackPushRegisterCode ( optInfo->opWord ) ;
-        Word_Set_SCA ( optInfo->opWord ) ;
+        _Set_SCA ( optInfo->opWord ) ;
         if ( ! ( optInfo->wordArg1->CAttribute & REGISTER_VARIABLE ) ) Compile_Move_Reg_To_Rm ( OREG2, optInfo->wordArg1->RegToUse, 0 ) ;
         compiler->OptimizeForcedReturn = 0 ;
         compiler->OptInfo = svOptInfo ;
@@ -487,7 +487,7 @@ Compile_Optimize_Equal ( Compiler * compiler )
         if ( optInfo->wordArg2_literal )
         {
             SetHere ( optInfo->wordArg2->Coding ) ;
-            Word_Set_SCA ( optInfo->wordArg2 ) ;
+            _Set_SCA ( optInfo->wordArg2 ) ;
             Compile_MoveImm_To_Reg ( reg, optInfo->wordArg2->W_Value, CELL ) ;
         }
         else
@@ -496,14 +496,14 @@ Compile_Optimize_Equal ( Compiler * compiler )
             {
                 SetHere ( optInfo->wordArg1->Coding ) ;
             }
-            Word_Set_SCA ( optInfo->wordArg2 ) ;
+            _Set_SCA ( optInfo->wordArg2 ) ;
             Compile_Move_Reg_To_Reg ( ( optInfo->wordArg2->CAttribute & REGISTER_VARIABLE ) ? optInfo->wordArg2->RegToUse : ACC, reg ) ;
         }
         goto done ;
     }
 
     else reg = OREG ;
-    Word_Set_SCA ( optInfo->opWord ) ;
+    _Set_SCA ( optInfo->opWord ) ;
     Compile_Move_Reg_To_Rm ( ACC, reg, 0 ) ;
 done:
     optInfo->rtrn = OPTIMIZE_DONE ;
@@ -520,7 +520,7 @@ Compile_Optimize_Store ( Compiler * compiler )
         if ( optInfo->wordArg1_literal )
         {
             SetHere ( optInfo->wordArg1->Coding ) ;
-            Word_Set_SCA ( optInfo->wordArg1 ) ;
+            _Set_SCA ( optInfo->wordArg1 ) ;
             Compile_MoveImm_To_Reg ( reg, optInfo->wordArg1->W_Value, CELL ) ;
         }
         else
@@ -541,12 +541,12 @@ Compile_Optimize_Store ( Compiler * compiler )
                 //optInfo->wordArg1->Opt_Reg = 0 ;
                 optInfo->wordArg1->RegFlags = false ; // reset !
             }
-            Word_Set_SCA ( optInfo->opWord ) ;
+            _Set_SCA ( optInfo->opWord ) ;
             Compile_Move_Reg_To_Reg ( reg, rm ) ;
         }
         goto done ;
     }
-    Word_Set_SCA ( optInfo->opWord ) ;
+    _Set_SCA ( optInfo->opWord ) ;
     Compile_Move_Reg_To_Rm ( reg, rm, 0 ) ;
 done:
     optInfo->rtrn = OPTIMIZE_DONE ;

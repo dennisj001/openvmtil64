@@ -496,7 +496,7 @@ ReadLine_SetRawInputFunction ( ReadLiner * rl, ReadLiner_KeyFunction ripf )
 }
 
 void
-ReadLine_ReadFileToString ( ReadLiner * rl, FILE * file )
+ReadLine_ReadFileIntoAString ( ReadLiner * rl, FILE * file )
 {
     int64 size, result ;
     size = _File_Size ( file ) ;

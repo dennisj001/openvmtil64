@@ -812,7 +812,7 @@ byte _ReadLine_Key(ReadLiner *rl, byte c);
 byte ReadLine_Key(ReadLiner *rl);
 byte ReadLine_GetNextCharFromString(ReadLiner *rl);
 void ReadLine_SetRawInputFunction(ReadLiner *rl, ReadLiner_KeyFunction ripf);
-void ReadLine_ReadFileToString(ReadLiner *rl, FILE *file);
+void ReadLine_ReadFileIntoAString(ReadLiner *rl, FILE *file);
 void ReadLine_SetInputString(ReadLiner *rl, byte *string);
 void _ReadLine_TabCompletion_Check(ReadLiner *rl);
 void _ReadLine_GetLine(ReadLiner *rl, byte c);

@@ -864,7 +864,7 @@ _LO_Apply_ArgList ( ListObject * l0, Word * word )
         {
             Compile_MoveImm_To_Reg ( RAX, 0, CELL ) ; // for printf ?? others //System V ABI : "%rax is used to indicate the number of vector arguments passed to a function requiring a variable number of arguments"
         }
-        Word_Set_SCA ( word ) ;
+        _Set_SCA ( word ) ;
         Word_Eval ( word ) ;
         if ( word->CAttribute2 & RAX_RETURN )
             _Word_CompileAndRecord_PushReg ( word, ACC ) ;
@@ -1522,6 +1522,7 @@ _LO_CfrTil ( ListObject * lfirst )
     //CfrTil_AddStringToSourceCode ( _CfrTil_, lfirst->Name ) ;
     for ( ldata = _LO_Next ( lfirst ) ; ldata ; ldata = _LO_Next ( ldata ) )
     {
+        _Set_SCA ( ldata->CfrTilWord ) ;
         if ( ldata->LAttribute & ( LIST_NODE ) )
         {
             _CfrTil_Parse_LocalsAndStackVariables ( 1, 1, ldata, _Compiler_->LocalsCompilingNamespacesStack, 0 ) ;
@@ -1559,7 +1560,7 @@ _LO_CfrTil ( ListObject * lfirst )
             _LO_Semi ( word ) ;
             word->W_SourceCode = lc->LC_SourceCode ;
         }
-        else Word_Set_SCA ( ldata->CfrTilWord ), Interpreter_InterpretAToken ( cntx->Interpreter0, ldata->Name, ldata->W_TokenStart_ReadLineIndex ) ;
+        else Interpreter_InterpretAToken ( cntx->Interpreter0, ldata->Name, ldata->W_TokenStart_ReadLineIndex ) ;
     }
     //CfrTil_AddStringToSourceCode ( _CfrTil_, ")" ) ;
     SetState ( _Context_->Compiler0, LC_CFRTIL, false ) ;

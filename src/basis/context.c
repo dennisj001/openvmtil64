@@ -213,7 +213,7 @@ _Context_IncludeFile ( Context * cntx, byte *filename, int64 interpretFlag )
             cntx->System0->IncludeFileStackNumber ++ ;
             _SetEcho ( 0 ) ;
 
-            ReadLine_ReadFileToString ( rl, file ) ;
+            ReadLine_ReadFileIntoAString ( rl, file ) ;
             fclose ( file ) ;
 
             if ( interpretFlag ) Interpret_UntilFlaggedWithInit ( cntx->Interpreter0, END_OF_STRING ) ;
@@ -240,7 +240,7 @@ _CfrTil_ContextNew_IncludeFile ( byte * filename )
 }
 
 int64
-_Context_StringEqual_PeekNextToken (Context * cntx, byte * check , Boolean evalFlag)
+_Context_StringEqual_PeekNextToken ( Context * cntx, byte * check, Boolean evalFlag )
 {
     byte *token = Lexer_PeekNextNonDebugTokenWord ( cntx->Lexer0, evalFlag ) ;
     if ( token ) return String_Equal ( ( char* ) token, ( char* ) check ) ;
@@ -272,7 +272,7 @@ _Context_DoubleQuoteMacro ( Context * cntx )
     }
     //Word * word = _Interpreter_NewWord ( cntx->Interpreter0, String_New ( lexer->TokenBuffer, STRING_MEM ) ) ; //TEMPORARY ) ) ;
     Word * word = _Interpreter_NewWord ( cntx->Interpreter0, String_New ( lexer->TokenBuffer, TEMPORARY ) ) ;
-    _Interpreter_DoWord (cntx->Interpreter0, word, -1 ) ; //lexer->TokenStart_ReadLineIndex ) ;
+    _Interpreter_DoWord ( cntx->Interpreter0, word, - 1 ) ; //lexer->TokenStart_ReadLineIndex ) ;
 }
 
 void

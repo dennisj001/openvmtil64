@@ -150,7 +150,7 @@ Compile_MultiplyEqual ( Compiler * compiler )
     if ( optFlag & OPTIMIZE_DONE ) return ;
     else if ( optFlag )
     {
-        Word_Set_SCA ( optInfo->opWord ) ;
+        _Set_SCA ( optInfo->opWord ) ;
         if ( optInfo->OptimizeFlag & OPTIMIZE_IMM )
         {
             //_Compile_IMULI ( MEM, optInfo->Optimize_Reg, optInfo->Optimize_Rm, 0, optInfo->Optimize_Disp, optInfo->Optimize_Imm, CELL ) ;
@@ -198,7 +198,7 @@ Compile_DivideEqual ( Compiler * compiler )
         {
             Compile_MoveImm ( REG, RDX, 0, 0, 0, CELL ) ;
             // Compile_IDIV( mod, rm, sib, disp, imm, size )
-            Word_Set_SCA ( optInfo->opWord ) ;
+            _Set_SCA ( optInfo->opWord ) ;
             if ( optInfo->OptimizeFlag & OPTIMIZE_IMM )
             {
                 //Compile_MoveImm ( int8 direction, int8 rm, int8 sib, int64 disp, int64 imm, int8 immSize )

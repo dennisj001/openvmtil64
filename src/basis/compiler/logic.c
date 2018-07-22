@@ -200,7 +200,7 @@ Compile_Cmp_Set_setTtnn_Logic ( Compiler * compiler, int8 setTtn, int8 setNegate
     if ( optFlag & OPTIMIZE_DONE ) return ;
     else if ( optFlag )
     {
-        Word_Set_SCA ( WordStack ( 0 ) ) ;
+        _Set_SCA ( WordStack ( 0 ) ) ;
         if ( compiler->OptInfo->OptimizeFlag & OPTIMIZE_IMM )
         {
             if ( ( setTtn == TTT_EQUAL ) && ( compiler->OptInfo->Optimize_Imm == 0 ) ) //Compile_TEST ( compiler->OptInfo->Optimize_Mod, compiler->OptInfo->Optimize_Rm, 0, compiler->OptInfo->Optimize_Disp, compiler->OptInfo->Optimize_Imm, CELL ) ;

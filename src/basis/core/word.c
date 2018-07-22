@@ -128,7 +128,7 @@ RspRestore ( )
 void
 _Word_Compile ( Word * word )
 {
-    Word_Set_SCA ( word ) ;
+    _Set_SCA ( word ) ;
     Word_SetCoding ( word, Here ) ;
     if ( ! word->Definition )
     {

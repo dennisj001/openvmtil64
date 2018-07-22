@@ -304,7 +304,7 @@ _CfrTil_Do_DynamicObject_ToReg ( DObject * dobject0, int8 reg )
         }
         else dobject = ndobject ;
     }
-    Word_Set_SCA ( dobject ) ;
+    _Set_SCA ( dobject ) ;
     if ( CompileMode ) _Compile_Move_Literal_Immediate_To_Reg ( reg, ( int64 ) & dobject->W_Value ) ;
     cntx->Interpreter0->CurrentObjectNamespace = TypeNamespace_Get ( dobject ) ; // do this elsewhere when needed
     return dobject ;

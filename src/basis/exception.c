@@ -224,14 +224,13 @@ OpenVmTil_Throw ( byte * excptMessage, int64 restartCondition, int64 infoFlag )
     _Q_->ExceptionMessage = excptMessage ;
     _Q_->Thrown = restartCondition ;
 
-    if ( infoFlag && (_Q_->SignalExceptionsHandled ++ < 2) ) _OpenVmTil_ShowExceptionInfo ( ) ;
+    if ( infoFlag && (_Q_->SignalExceptionsHandled < 2) ) _OpenVmTil_ShowExceptionInfo ( ) ;
     _OVT_Throw ( restartCondition, 0 ) ;
 }
 
 void
 _OpenVmTil_LongJmp_WithMsg ( int64 restartCondition, byte * msg )
 {
-
     OpenVmTil_Throw ( msg, restartCondition, 0 ) ;
 }
 
@@ -250,7 +249,7 @@ OpenVmTil_SignalAction ( int signal, siginfo_t * si, void * uc )
     }
     else
     {
-        _Q_->SignalExceptionsHandled ++ ;
+        //_Q_->SignalExceptionsHandled ++ ;
         if ( ( signal != SIGSEGV ) || _Q_->SignalExceptionsHandled < 2 ) _Printf ( ( byte* ) "\nOpenVmTil_SignalAction : address = 0x%016lx : %s", _Q_->SigAddress, _Q_->SigLocation ) ;
         if ( _Debugger_->DebugAddress )
         {
