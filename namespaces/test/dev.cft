@@ -423,5 +423,5 @@ nl
 namespaceTreeWithWords
 
 2 + 7 assertStkChk // stack checking
-5 // stack adjustment fixme ??
+// stack adjustment fixme ??
 

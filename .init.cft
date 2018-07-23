@@ -401,3 +401,4 @@ lispOff
 
 #endif
 2 + 7  assertStkChk // stack checking
+s
