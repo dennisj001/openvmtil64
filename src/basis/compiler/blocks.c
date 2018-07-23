@@ -1,21 +1,7 @@
+
 #include "../../include/cfrtil64.h"
 
-void
-_Block_Eval ( block blck )
-{
-    ( ( block ) blck ) ( ) ;
-}
-
-void
-Block_Eval ( block blck )
-{
-    if ( blck )
-    {
-        ( ( block ) blck ) ( ) ;
-    }
-}
-
-void
+void 
 BI_Block_Copy ( BlockInfo * bi, byte* dstAddress, byte * srcAddress, int64 bsize, int8 optFlag )
 {
     Compiler * compiler = _Compiler_ ;

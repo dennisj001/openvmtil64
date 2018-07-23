@@ -112,7 +112,9 @@ Compiler_GetOptimizeState ( Compiler * compiler, Word * word )
                 optInfo->NumberOfArgs ++ ;
                 optInfo->wordArg1 = optInfo->wordn ;
                 optInfo->wordArg1Node = optInfo->node ;
-                optInfo->wordArg1_rvalue = optInfo->rvalue ? optInfo->rvalue : ( GetState ( _Context_, INFIX_MODE ) && ( ! ( optInfo->opWord->CAttribute & ( CATEGORY_OP_EQUAL ) ) ) ) ;
+                optInfo->wordArg1_rvalue = optInfo->rvalue ? optInfo->rvalue :
+                    ( ( GetState ( _Context_, INFIX_MODE ) || GetState ( compiler, LISP_MODE ) ) 
+                    && ( ! ( optInfo->opWord->CAttribute & ( CATEGORY_OP_EQUAL ) ) ) ) ;
                 optInfo->rvalue = false ;
                 if ( optInfo->wordArg1->CAttribute & ( CONSTANT | LITERAL ) ) optInfo->wordArg1_literal = true ;
                 break ;
@@ -122,7 +124,9 @@ Compiler_GetOptimizeState ( Compiler * compiler, Word * word )
                 optInfo->NumberOfArgs ++ ;
                 optInfo->wordArg2 = optInfo->wordn ;
                 optInfo->wordArg2Node = optInfo->node ;
-                optInfo->wordArg2_rvalue = optInfo->rvalue ? optInfo->rvalue : ( GetState ( _Context_, INFIX_MODE ) && ( ! ( optInfo->opWord->CAttribute & ( CATEGORY_OP_STORE ) ) ) ) ;
+                optInfo->wordArg2_rvalue = optInfo->rvalue ? optInfo->rvalue :
+                    ( ( GetState ( _Context_, INFIX_MODE ) || GetState ( compiler, LISP_MODE ) ) 
+                    && ( ! ( optInfo->opWord->CAttribute & ( CATEGORY_OP_STORE ) ) ) ) ;
                 optInfo->rvalue = false ;
                 if ( optInfo->wordArg2->CAttribute & ( CONSTANT | LITERAL ) ) optInfo->wordArg2_literal = true ;
                 if ( optInfo->opWord->CAttribute & ( CATEGORY_OP_LOAD ) && ( ! ( GetState ( _Context_, INFIX_MODE ) ) ) ) optInfo->wordArg2_rvalue ++ ;
@@ -183,14 +187,14 @@ Compiler_Optimizer_0Args ( Compiler * compiler )
         if ( optInfo->wordArg2 )
         {
             if ( optInfo->wordArg2->StackPushRegisterCode ) _SetHere_To_Word_StackPushRegisterCode ( optInfo->wordArg2 ) ;
-            //else if ( optInfo->wordArg2->CAttribute & CATEGORY_DUP ) ;
+                //else if ( optInfo->wordArg2->CAttribute & CATEGORY_DUP ) ;
             else //if ( optInfo->wordArg2->CAttribute & ( CATEGORY_STACK ) )
             {
                 _Compile_Move_StackN_To_Reg ( ACC, DSP, 0 ), optInfo->Optimize_Reg = ACC | REG_ON_BIT ;
                 Compile_SUBI ( REG, DSP, 0, CELL, 0 ) ;
             }
         }
-        //Word_Check_SetHere_To_StackPushRegisterCode ( optInfo->opWord ) ;
+        else Word_Check_SetHere_To_StackPushRegisterCode ( optInfo->opWord ) ;
     }
 #endif    
     else Compile_StandardUnoptimized ( compiler ) ;
@@ -259,6 +263,7 @@ Compiler_Optimizer_2Args_Or_WordArg1_Op ( Compiler * compiler )
         }
         Compile_StandardArg ( optInfo->wordArg2, rm, optInfo->wordArg2_rvalue, 0 ) ;
         optInfo->Optimize_Rm = rm | REG_ON_BIT ;
+        //optInfo->rtrn = 1 ;
     }
 }
 

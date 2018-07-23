@@ -17,7 +17,7 @@ _DataObject_New ( uint64 type, Word * word, byte * name, uint64 ctype, uint64 ct
     {
         case T_LC_NEW:
         {
-            word = _LO_New ( ltype, ctype, ( byte* ) value, word, LISP_TEMP ) ; // all words are symbols
+            word = _LO_New ( ltype, ctype, ctype2, ( byte* ) value, word, LISP_TEMP ) ; // all words are symbols
             break ;
         }
         case T_LC_LITERAL:

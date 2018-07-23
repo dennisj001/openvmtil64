@@ -25,6 +25,7 @@
           <in>_readline.c</in>
           <in>_system.c</in>
           <in>array.c</in>
+          <in>block.c</in>
           <in>charSet.c</in>
           <in>classes.c</in>
           <in>conditionals.c</in>
@@ -247,6 +248,8 @@
       <item path="basis/core/array.c" ex="false" tool="0" flavor2="0">
         <cTool flags="0">
         </cTool>
+      </item>
+      <item path="basis/core/block.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="basis/core/charSet.c" ex="false" tool="0" flavor2="0">
         <cTool flags="0">

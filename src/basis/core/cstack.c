@@ -294,7 +294,7 @@ _Stack_IntegrityCheck ( Stack * stack )
     byte * errorString ;
     if ( _Stack_Overflow ( stack ) ) errorString = "\nStack Integrity Error : Stack Overflow" ;
     else errorString = "\nStack Integrity Error : Stack Underflow" ;
-    CfrTil_Exception ( 0, c_ad ( errorString ), QUIT ) ;
+    CfrTil_Exception ( 0, c_da ( errorString ), QUIT ) ;
     return false ;
 }
 

@@ -267,7 +267,7 @@ _Word_New ( byte * name, uint64 ctype, uint64 ctype2, uint64 ltype, int8 addToIn
     _Context_->Compiler0->CurrentWord = word ;
     Word_SetLocation ( word ) ;
     _CfrTil_->WordCreateCount ++ ;
-    _Word_Add ( word, addToInNs, addToNs ) ;
+    _Word_Add ( word, addToInNs, addToNs ) ; // add to the head of the list
     return word ;
 }
 

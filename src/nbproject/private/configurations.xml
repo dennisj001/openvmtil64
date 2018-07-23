@@ -8,7 +8,6 @@
           <in>arrays.c</in>
           <in>bits.c</in>
           <in>blocks.c</in>
-          <in>combinators.back.c</in>
           <in>combinators.c</in>
           <in>compile.c</in>
           <in>compiler.c</in>
@@ -28,6 +27,7 @@
           <in>_readline.c</in>
           <in>_system.c</in>
           <in>array.c</in>
+          <in>block.c</in>
           <in>charSet.c</in>
           <in>classes.c</in>
           <in>conditionals.c</in>
@@ -74,6 +74,8 @@
         <in>interpreters.c</in>
         <in>json.c</in>
         <in>lambdaCalculus.c</in>
+        <in>lambdaCalculus.new.c</in>
+        <in>lambdaCalculus.old.c</in>
         <in>linux.c</in>
         <in>lists.c</in>
         <in>openVmTil.c</in>

@@ -140,7 +140,7 @@ _Debugger_ShowDbgSourceCodeAtAddress ( Debugger * debugger, byte * address )
             if ( ! String_Equal ( sourceCode, "" ) )
             {
                 int64 fixed = 0 ;
-                Word * word = DWL_Find ( list, 0, address, 0, 1, 0, 0 ) ;
+                Word * word = DWL_Find ( list, 0, address, 0, 0, 0, 0 ) ;
                 if ( word && ( debugger->LastSourceCodeWord != word ) )
                 {
                     d0 ( DebugWordList_ShowAll ( ) ) ;
@@ -267,7 +267,7 @@ _CfrTil_AdjustDbgSourceCodeAddress ( byte * address, byte * newAddress )
     if ( IsSourceCodeOn && list )
     {
         //DWL_Find ( dllist * list, Word * iword, byte * address, byte* name, int64 fromFirstFlag, int64 takeFirstFind, byte * newAddress ) // nb fromTop is from the end of the list because it is the top 'push'
-        DWL_Find ( list, 0, address, 0, 1, 0, newAddress ) ; // nb. fromFirst is from the top of a stack that was pushed
+        DWL_Find ( list, 0, address, 0, 0, 0, newAddress ) ; // nb. fromFirst is from the top of a stack that was pushed
     }
 }
 

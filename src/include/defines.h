@@ -652,8 +652,7 @@
 #define LC_READ_MACRO_OFF       ( (uint64) 1 << 14 )
 #define LC_READ_ONLY            ( (uint64) 1 << 15 )
 #define LC_READ_LAMBDA_LOCALS   ( (uint64) 1 << 16 )
-//#define LC_OBJECT_NEW_OFF        ( (uint64) 1 << 15 )
-//#define LC_PRINTED_SOURCE_CODE ( (uint64) 1 << 9 )
+#define LC_LAMBDA_COMPILE_MODE  ( (uint64) 1 << 17 )
 
 // LambdaBody states
 #define USED ( 1<< 0 )

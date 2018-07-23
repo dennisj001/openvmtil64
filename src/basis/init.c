@@ -112,7 +112,7 @@ _CfrTil_CPrimitiveNewAdd ( const char * name, uint64 opInsnGroup, uint64 opInsCo
     _DObject_ValueDefinition_Init ( word, ( int64 ) b, BLOCK, 0, 0 ) ;
     _CfrTil_InitialAddWordToNamespace ( word, ( byte* ) nameSpace, ( byte* ) superNamespace ) ;
     if ( ctype & INFIXABLE ) word->WAttribute = WT_INFIXABLE ;
-    else if ( ctype & PREFIX ) word->WAttribute = WT_PREFIX ;
+    //else if ( ctype & PREFIX ) word->WAttribute = WT_PREFIX ;
     else if ( ctype & C_PREFIX_RTL_ARGS ) word->WAttribute = WT_C_PREFIX_RTL_ARGS ;
     else word->WAttribute = WT_POSTFIX ;
     word->CAttribute2 = ctype2 ;

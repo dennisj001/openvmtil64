@@ -25,13 +25,21 @@ Word *
 _Interpreter_DoWord_Default ( Interpreter * interp, Word * word0, int64 scratchPadIndex )
 {
     Word * word = Compiler_CopyDuplicatesAndPush ( word0 ) ;
-    word->W_SC_ScratchPadIndex = scratchPadIndex ? scratchPadIndex : _CfrTil_->SC_ScratchPadIndex ; ;
+    word->W_SC_ScratchPadIndex = scratchPadIndex ? scratchPadIndex : _CfrTil_->SC_ScratchPadIndex ;
     interp->w_Word = word ;
     Word_Eval ( word ) ;
     if ( IS_MORPHISM_TYPE ( word ) ) SetState ( _Context_, ADDRESS_OF_MODE, false ) ;
     return word ; //let callee know about actual word evaled here after Compiler_CopyDuplicatesAndPush
 }
 
+void
+Interpreter_DoPrefixWord ( Context * cntx, Interpreter * interp, Word * word )
+{
+    DEBUG_SETUP ( word ) ;
+    SetState ( cntx->Compiler0, DOING_A_PREFIX_WORD, true ) ;
+    _Interpret_PrefixFunction_Until_RParen ( interp, word ) ;
+    SetState ( cntx->Compiler0, DOING_A_PREFIX_WORD, false ) ;
+}
 // four types of words related to syntax
 // 1. regular rpn - reverse polish notation
 // 2. regular polish, prefix notation where the function precedes the arguments - lisp
@@ -46,13 +54,14 @@ _Interpreter_DoWord ( Interpreter * interp, Word * word, int64 tokenStartReadLin
     {
         Context * cntx = _Context_ ;
         int64 tsrli ;
+        Boolean prefixing ;
         _Compiler_->SaveScratchPadIndex = _CfrTil_->SC_ScratchPadIndex ;
         if ( tokenStartReadLineIndex <= 0 )
         {
             tsrli = _Lexer_->TokenStart_ReadLineIndex ;
         }
         else tsrli = tokenStartReadLineIndex ;
-        word->W_TokenStart_ReadLineIndex = tsrli ; 
+        word->W_TokenStart_ReadLineIndex = tsrli ;
         interp->w_Word = word ;
         if ( ( word->WAttribute == WT_INFIXABLE ) && ( GetState ( cntx, INFIX_MODE ) ) ) // nb. Interpreter must be in INFIX_MODE because it is effective for more than one word
         {
@@ -62,13 +71,15 @@ _Interpreter_DoWord ( Interpreter * interp, Word * word, int64 tokenStartReadLin
             // then continue and interpret this 'word' - just one out of lexical order
             _Interpreter_DoWord_Default ( interp, word, 0 ) ;
         }
-        else if ( ( word->WAttribute == WT_PREFIX ) || _Interpreter_IsWordPrefixing ( interp, word ) ) // with this almost any rpn function can be used prefix with a following '(' :: this checks for that condition
+        else if ( ( word->WAttribute == WT_PREFIX ) ) 
         {
-            DEBUG_SETUP ( word ) ;
-            SetState ( cntx->Compiler0, DOING_A_PREFIX_WORD, true ) ;
-            _Interpret_PrefixFunction_Until_RParen ( interp, word ) ;
-            SetState ( cntx->Compiler0, DOING_A_PREFIX_WORD, false ) ;
+            if ( _Interpreter_IsWordPrefixing ( interp, word ) )
+            {
+                Interpreter_DoPrefixWord ( cntx, interp, word ) ;
+            }
+            else _SyntaxError ( "Attempting to call a prefix function without following parenthesized args", 1 ) ;
         }
+        else if ( Interpreter_IsWordPrefixing ( interp, word ) ) Interpreter_DoPrefixWord ( cntx, interp, word ) ;
         else if ( word->WAttribute == WT_C_PREFIX_RTL_ARGS )
         {
             DEBUG_SETUP ( word ) ;
@@ -138,14 +149,21 @@ Interpreter_ReadNextTokenToWord ( Interpreter * interp )
 Boolean
 _Interpreter_IsWordPrefixing ( Interpreter * interp, Word * word )
 {
-    if ( ( GetState ( _Context_, PREFIX_MODE ) ) && ( ! _Q_->OVT_LC ) ) //_Namespace_IsUsing ( _CfrTil_->LispNamespace ) ) )
+    // with this any postfix word that is not a keyword or a c rtl arg word can now be used prefix with parentheses 
+    byte c = Lexer_NextNonDelimiterChar ( interp->Lexer0 ) ;
+    if ( ( c == '(' ) )
     {
-        // with this any postfix word that is not a keyword or a c rtl arg word can now be used prefix with parentheses 
-        byte c = Lexer_NextNonDelimiterChar ( interp->Lexer0 ) ;
-        if ( ( c == '(' ) && ( ! ( word->CAttribute & KEYWORD ) ) && ( ! ( word->WAttribute & WT_C_PREFIX_RTL_ARGS ) ) )
-        {
-            return true ;
-        }
+        return true ;
+    }
+    else return false ;
+}
+
+Boolean
+Interpreter_IsWordPrefixing ( Interpreter * interp, Word * word )
+{
+    if ( ( GetState ( _Context_, PREFIX_MODE ) ) && ( ! _Q_->OVT_LC ) && ( ! ( word->CAttribute & KEYWORD ) ) && ( ! ( word->WAttribute & WT_C_PREFIX_RTL_ARGS ) ) ) //_Namespace_IsUsing ( _CfrTil_->LispNamespace ) ) )
+    {
+        return _Interpreter_IsWordPrefixing ( interp, word ) ;
     }
     return false ;
 }

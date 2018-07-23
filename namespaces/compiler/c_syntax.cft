@@ -277,10 +277,8 @@ $ ( | atoken, buffer, buffer1, Buffer buffer0 )
 #if doScript 
 "\n\nnew $ test\n" ps
 void.$ls -al . ;
-//pause
 void.$etc/script ; 
 void.$etc/lispScript ; 
-//pause
 String
 $$ls -al /usr/local ; $$ls -al . ;
 //pause

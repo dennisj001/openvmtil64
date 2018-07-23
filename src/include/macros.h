@@ -177,7 +177,8 @@
 #define Throw( msg, e ) OpenVmTil_Throw ( ((byte*) msg), (e), 1 )
 #define ThrowIt( msg ) OpenVmTil_Throw ( ((byte*) msg),  _Q_->Thrown, 1 )
 #define catchAll if ( _OpenVmTil_Catch () ) 
-#define SyntaxError( abortFlag ) CfrTil_Exception (SYNTAX_ERROR, 0, abortFlag )
+#define _SyntaxError( message, abortFlag ) CfrTil_Exception (SYNTAX_ERROR, message, abortFlag )
+#define SyntaxError( abortFlag ) _SyntaxError( 0, abortFlag ) 
 #define stopThisTry _OVT_PopExceptionStack ( )
 #define stopTrying _OVT_ClearExceptionStack ( )
 
@@ -219,7 +220,7 @@
 
 #define NAMESPACE_TYPE ( NAMESPACE | DOBJECT | CLASS | C_TYPE | C_CLASS | CLASS_CLONE )
 #define NAMESPACE_RELATED_TYPE ( NAMESPACE_TYPE | OBJECT_FIELD )
-#define OBJECT_TYPE ( LITERAL | CONSTANT | NAMESPACE_VARIABLE | LOCAL_VARIABLE | OBJECT | DOBJECT | PARAMETER_VARIABLE | T_LISP_SYMBOL )
+#define OBJECT_TYPE ( LITERAL | CONSTANT | NAMESPACE_VARIABLE | LOCAL_VARIABLE | OBJECT | DOBJECT | PARAMETER_VARIABLE | T_LISP_SYMBOL ) // | T_LISP_SYMBOL
 #define NON_MORPHISM_TYPE ( OBJECT_TYPE | NAMESPACE_RELATED_TYPE )
 #define IS_NON_MORPHISM_TYPE(word) (word->CAttribute & NON_MORPHISM_TYPE)
 #define IS_MORPHISM_TYPE( word ) ( ( ( ! ( word->CAttribute & ( NON_MORPHISM_TYPE | DEBUG_WORD | OBJECT_OPERATOR ) ) ) && ( ! ( word->LAttribute & (ADDRESS_OF_OP|T_LISP_SYMBOL ) ) ) ) || ( word->CAttribute & ( CATEGORY_OP|KEYWORD|BLOCK ) ))

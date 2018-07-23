@@ -238,13 +238,13 @@ CfrTil_ResetMemory ( CfrTil * cfrTil )
     }
 #endif    
     //OVT_MemListFree_ContextMemory ( ) ;
-    _OVT_MemListFree_CfrTilInternal ( ) ;
     OVT_MemListFree_Session ( ) ;
     OVT_MemListFree_ContextMemory ( ) ;
     OVT_MemListFree_LispTemp ( ) ;
     OVT_MemListFree_TempObjects ( ) ;
     OVT_MemListFree_Buffers ( ) ;
     OVT_MemListFree_CompilerTempObjects ( ) ;
+    _OVT_MemListFree_CfrTilInternal ( ) ;
     if ( _Q_->Verbosity > 1 ) OVT_ShowMemoryAllocated ( ) ;
 }
 

@@ -151,6 +151,7 @@ Int Lisp
 (yfacc yfacc 10) nl
 (yfacc yfacc 7) nl 
 (define fibc (lambda ( n ) (ifElse (< n 2) n (+ (fibc (- n 1)) (fibc (- n 2))))))
+"\nfibc 20 = " ps
 (fibc 20)
 sp
 #endif

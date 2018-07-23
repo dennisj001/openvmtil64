@@ -96,10 +96,10 @@ _OVT_Pause ( byte * prompt, int64 signalsHandled )
             }
             else if ( key == 'd' )
             {
-                if ( Is_DebugOn ) 
+                if ( Is_DebugOn )
                 {
                     Debugger * debugger = _Debugger_ ;
-                    SetState ( debugger, DBG_AUTO_MODE, false );
+                    SetState ( debugger, DBG_AUTO_MODE, false ) ;
                     SetState ( debugger, DBG_EVAL_AUTO_MODE, false ) ;
                     _Debugger_InterpreterLoop ( debugger ) ;
                 }
@@ -211,7 +211,8 @@ _OVT_Throw ( int64 restartCondition, int8 pauseFlag )
         if ( _Q_->RestartCondition >= INITIAL_START ) jb = & _Q_->JmpBuf0 ;
         else jb = & _CfrTil_->JmpBuf0 ;
     }
-    printf ( "\n%s %s at %s -> ...\n", ( jb == & _CfrTil_->JmpBuf0 ) ? "reseting cfrTil" : "fully restarting", ( _Q_->Signal == SIGSEGV ) ? ": SIGSEGV" : "", Context_Location ( ) ) ;
+    printf ( "\n%s\n%s %s at %s -> ...", ( _Q_->ExceptionMessage ? _Q_->ExceptionMessage : (byte*) "" ), 
+        ( jb == & _CfrTil_->JmpBuf0 ) ? "reseting cfrTil" : "fully restarting", ( _Q_->Signal == SIGSEGV ) ? ": SIGSEGV" : "", Context_Location ( ) ) ;
     fflush ( stdout ) ;
 
     //if ( ( ! pauseFlag ) && ( _Q_->SignalExceptionsHandled < 2 ) ) _OVT_Pause ( 0, _Q_->SignalExceptionsHandled ) ;
@@ -224,7 +225,7 @@ OpenVmTil_Throw ( byte * excptMessage, int64 restartCondition, int64 infoFlag )
     _Q_->ExceptionMessage = excptMessage ;
     _Q_->Thrown = restartCondition ;
 
-    if ( infoFlag && (_Q_->SignalExceptionsHandled < 2) ) _OpenVmTil_ShowExceptionInfo ( ) ;
+    if ( infoFlag && ( _Q_->SignalExceptionsHandled < 2 ) ) _OpenVmTil_ShowExceptionInfo ( ) ;
     _OVT_Throw ( restartCondition, 0 ) ;
 }
 

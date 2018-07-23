@@ -2,7 +2,7 @@
 SOURCES = basis/compiler/machineCode.c basis/compiler/_compile.c basis/compiler/memory.c\
 	basis/compiler/combinators.c basis/compiler/math.c basis/compiler/cpu.c \
 	basis/compiler/stack.c basis/compiler/logic.c basis/core/dataObjectRun.c\
-	basis/core/conditionals.c basis/compiler/blocks.c basis/compiler/compile.c basis/core/_system.c\
+	basis/core/block.c basis/compiler/blocks.c basis/core/conditionals.c basis/compiler/compile.c basis/core/_system.c\
 	basis/compiler/optimize.c basis/compiler/bits.c basis/compiler/udis.c basis/compiler/arrays.c \
 	basis/core/io.c basis/core/symbol.c basis/repl.c basis/core/syntax.c basis/core/dataObjectNew.c\
         basis/cfrtil64.c basis/core/parse.c basis/core/memSpace.c basis/init.c basis/system.c basis/core/charSet.c\

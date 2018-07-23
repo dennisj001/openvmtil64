@@ -28,7 +28,7 @@ _OpenVmTil_ColorsInit ( OpenVmTil * ovt )
     Colors_Init6 ( &ovt->Notice, 127, 127, 0, 255, 255, 255 ) ;
     Colors_Init6 ( &ovt->User, 0, 255, 0, 255, 255, 255 ) ;
 
-    _Colors_Init2 ( &ovt->Alert, Color_Red, Color_Default ) ;
+    _Colors_Init2 ( &ovt->Alert, Color_Magenta, Color_Black ) ; //Color_Red, Color_Default ) ;
     _Colors_Init2 ( &ovt->Debug, Color_Blue, Color_Default ) ;
     _Colors_Init2 ( &ovt->Default, Color_Default, Color_Default ) ;
     _Colors_Init2 ( &ovt->Notice, Color_Yellow, Color_Black ) ;

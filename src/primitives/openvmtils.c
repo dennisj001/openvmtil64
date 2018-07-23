@@ -139,6 +139,7 @@ _OVT_Ok ( int64 promptFlag )
     }
     if ( ( _Q_->Verbosity >  0 ) && ( _Q_->InitSessionCoreTimes ++ == 1 ) )
     {
+        DefaultColors ;
         System_Time ( _CfrTil_->Context0->System0, 0, ( char* ) "Startup", 1 ) ; //_Q_->StartedTimes == 1 ) ;
         _CfrTil_Version ( 0 ) ;
         _Printf ( (byte*) "\nOpenVmTil : cfrTil comes with ABSOLUTELY NO WARRANTY; for details type `license' in the source directory." ) ;

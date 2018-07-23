@@ -89,15 +89,15 @@ Lisp
 ( define k ( lambda ( a b ) ( + a b )))
 nl
 
-// from lisp.cft 58-59
+// from lisp.cft lines 58-59
 //(define g ( /\ (a b c) (a b c) ) )
 //(define h ( /\ (a b c) (a c b) ) ) 
 ( k ( j 1 2 3 ) ( h 2 3 66 ) ) sp // 77 ...
 ( + ( k ( j 1 2 3 ) ( h 2 3 66 ) ) ( + 698 2 ) ) // 777
 ( + ( k ( j 1 2 3 ) ( h 2 3 59 ) ) 7 ) // 77
-( g1 + ( k ( j 1 2 ( h 2 3 ( k 59 4 ) ) ) 6 ) 0 ) // 77
+( g + ( k ( j 1 2 ( h 2 3 ( k 59 4 ) ) ) 6 ) 0 ) // 77
 ( - ( + 1 2 ( * 3 4 ) ( / 4 2 ) ( - 9 8 ) 10 770 787 34 ) 21 787 34 )  // == 777
-pause
+TODO ( "fix lambda calculus here" ) //pause
     
 // demo : interspersing C code with lisp compiled code
 C Compiler
@@ -439,6 +439,11 @@ Lisp //pause
 // tick yfacc find wdiss
 (yfacc yfacc 10) nl
 (yfacc yfacc 7) nl
+(define fib (lambda (n) ( ifElse (< n 2) n (+ (fib (- n 1)) (fib (- n 2))))))
+(define fib2 (lambda (n) (ifElse (< n 2) n (+ (fib2 (- n 1)) (fib2 (- n 2))))))
+tick fib find wdiss 
+sp
+(fib 20) (fib2 20)
 (define x "let") (define a "the") // 'let' is a special word
 (define x1 'let) (define a1 the)
 sp

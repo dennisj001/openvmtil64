@@ -7,30 +7,30 @@
         <activeConfTypeElem>0</activeConfTypeElem>
         <activeConfIndexElem>0</activeConfIndexElem>
     </data>
-    <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="7">
+    <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="9">
         <file>
             <url>basis/compiler/blocks.c</url>
             <bookmark id="7">
                 <name/>
-                <line>179</line>
+                <line>165</line>
                 <key/>
             </bookmark>
             <bookmark id="6">
                 <name/>
-                <line>330</line>
+                <line>287</line>
                 <key/>
             </bookmark>
         </file>
         <file>
-            <url>basis/compiler/optimize.c</url>
-            <bookmark id="2">
+            <url>basis/lambdaCalculus.c</url>
+            <bookmark id="8">
                 <name/>
-                <line>106</line>
+                <line>707</line>
                 <key/>
             </bookmark>
-            <bookmark id="3">
+            <bookmark id="9">
                 <name/>
-                <line>182</line>
+                <line>1791</line>
                 <key/>
             </bookmark>
         </file>
@@ -47,18 +47,40 @@
                 <key/>
             </bookmark>
         </file>
+        <file>
+            <url>basis/compiler/optimize.c</url>
+            <bookmark id="2">
+                <name/>
+                <line>106</line>
+                <key/>
+            </bookmark>
+            <bookmark id="3">
+                <name/>
+                <line>182</line>
+                <key/>
+            </bookmark>
+        </file>
     </editor-bookmarks>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/home/dennisj/openvmtil64/.init.cft</file>
-            <file>file:/home/dennisj/openvmtil64/src/basis/system.c</file>
-            <file>file:/home/dennisj/openvmtil64/src/basis/core/string.c</file>
-            <file>file:/home/dennisj/openvmtil64/src/primitives/primitives.c</file>
-            <file>file:/home/dennisj/openvmtil64/src/basis/compiler/optimize.c</file>
-            <file>file:/home/dennisj/openvmtil64/src/basis/exception.c</file>
-            <file>file:/home/dennisj/openvmtil64/src/basis/compiler/blocks.c</file>
-            <file>file:/home/dennisj/openvmtil64/src/basis/core/dobject.c</file>
-            <file>file:/home/dennisj/openvmtil64/src/basis/openVmTil.c</file>
+            <file>file:/media/sdc4/dennisj/openvmtil64/src/basis/core/interpret.c</file>
+            <file>file:/media/sdc4/dennisj/openvmtil64/src/basis/core/string.c</file>
+            <file>file:/media/sdc4/dennisj/openvmtil64/src/basis/compiler/optimize.c</file>
+            <file>file:/media/sdc4/dennisj/openvmtil64/src/basis/core/namespace.c</file>
+            <file>file:/media/sdc4/dennisj/openvmtil64/src/basis/openVmTil.c</file>
+            <file>file:/media/sdc4/dennisj/openvmtil64/src/basis/core/dobject.c</file>
+            <file>file:/media/sdc4/dennisj/openvmtil64/src/primitives/compilers.c</file>
+            <file>file:/media/sdc4/dennisj/openvmtil64/src/basis/core/block.c</file>
+            <file>file:/media/sdc4/dennisj/openvmtil64/src/basis/core/dataObjectNew.c</file>
+            <file>file:/media/sdc4/dennisj/openvmtil64/src/basis/core/word.c</file>
+            <file>file:/media/sdc4/dennisj/openvmtil64/src/include/macros.h</file>
+            <file>file:/media/sdc4/dennisj/openvmtil64/src/primitives/systems.c</file>
+            <file>file:/media/sdc4/dennisj/openvmtil64/src/basis/lambdaCalculus.c</file>
+            <file>file:/media/sdc4/dennisj/openvmtil64/src/basis/system.c</file>
+            <file>file:/media/sdc4/dennisj/openvmtil64/src/basis/sourceCode.c</file>
+            <file>file:/media/sdc4/dennisj/openvmtil64/src/basis/core/finder.c</file>
+            <file>file:/media/sdc4/dennisj/openvmtil64/src/primitives/primitives.c</file>
+            <file>file:/media/sdc4/dennisj/openvmtil64/.init.cft</file>
         </group>
     </open-files>
 </project-private>

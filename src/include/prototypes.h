@@ -219,16 +219,10 @@ void _CfrTil_Do_Literal(Word *word);
 void _CfrTil_Do_LispSymbol(Word *word);
 void _CfrTil_Do_Variable(Word *word);
 void _Do_LocalObject_AllocateInit(Namespace *typeNamespace, byte **value, int64 size);
-/* basis/core/conditionals.c */
-CaseNode *_CaseNode_New(uint64 type, block block, int64 value);
-void _CfrTil_Case(uint64 allocType);
-void CfrTil_Case(void);
-void Switch_MapFunction(dlnode *node, uint64 switchValue);
-void SwitchAccessFunction(void);
-void CfrTil_Switch(void);
-/* basis/compiler/blocks.c */
+/* basis/core/block.c */
 void _Block_Eval(block blck);
 void Block_Eval(block blck);
+/* basis/compiler/blocks.c */
 void BI_Block_Copy(BlockInfo *bi, byte *dstAddress, byte *srcAddress, int64 bsize, int8 optFlag);
 void Compile_BlockLogicTest(BlockInfo *bi);
 void Block_CopyCompile(byte *srcAddress, int64 bindex, Boolean jccFlag);
@@ -243,6 +237,13 @@ void _CfrTil_EndBlock1(BlockInfo *bi);
 byte *_CfrTil_EndBlock2(BlockInfo *bi);
 byte *_CfrTil_EndBlock(void);
 void CfrTil_EndBlock(void);
+/* basis/core/conditionals.c */
+CaseNode *_CaseNode_New(uint64 type, block block, int64 value);
+void _CfrTil_Case(uint64 allocType);
+void CfrTil_Case(void);
+void Switch_MapFunction(dlnode *node, uint64 switchValue);
+void SwitchAccessFunction(void);
+void CfrTil_Switch(void);
 /* basis/compiler/compile.c */
 void _Compile_C_Call_1_Arg(byte *function, int64 arg);
 void _CompileN(byte *data, int64 size);
@@ -547,11 +548,13 @@ Word *TC_Tree_Map(TabCompletionInfo *tci, MapFunction mf, Word *wordi);
 Word *Interpreter_InterpretAToken(Interpreter *interp, byte *token, int64 tokenStartReadLineIndex);
 void Interpreter_InterpretNextToken(Interpreter *interp);
 Word *_Interpreter_DoWord_Default(Interpreter *interp, Word *word0, int64 scratchPadIndex);
+void Interpreter_DoPrefixWord(Context *cntx, Interpreter *interp, Word *word);
 void _Interpreter_DoWord(Interpreter *interp, Word *word, int64 tokenStartReadLineIndex);
 Word *_Interpreter_NewWord(Interpreter *interp, byte *token);
 Word *_Interpreter_TokenToWord(Interpreter *interp, byte *token);
 Word *Interpreter_ReadNextTokenToWord(Interpreter *interp);
 Boolean _Interpreter_IsWordPrefixing(Interpreter *interp, Word *word);
+Boolean Interpreter_IsWordPrefixing(Interpreter *interp, Word *word);
 /* basis/core/lexer.c */
 void CfrTil_LexerTables_Setup(CfrTil *cfrtl);
 byte Lexer_NextNonDelimiterChar(Lexer *lexer);
@@ -1081,10 +1084,6 @@ void CfrTil_Token_Find(void);
 void CfrTil_Find(void);
 void CfrTil_Postfix_Find(void);
 /* basis/interpreters.c */
-void _Interpret_ListNode(dlnode *node);
-void List_Interpret(dllist *list);
-void List_InterpretLists(dllist *list);
-void List_CheckInterpretLists_OnVariable(dllist *list, byte *token);
 void _Interpret_String(byte *str);
 byte *_Interpret_C_Until_EitherToken(Interpreter *interp, byte *end1, byte *end2, byte *end3, byte *delimiters);
 byte *_Interpret_Until_Token(Interpreter *interp, byte *end, byte *delimiters);
@@ -1306,6 +1305,10 @@ Boolean GetEndifStatus(void);
 void SkipPreprocessorCode(void);
 /* basis/attribute.c */
 /* basis/lists.c */
+void _Interpret_ListNode(dlnode *node);
+void List_Interpret(dllist *list);
+void List_InterpretLists(dllist *list);
+void List_CheckInterpretLists_OnVariable(dllist *list, byte *token);
 void _List_PrintNames(dllist *list, int64 count, int64 flag);
 void _List_Show_N_Word_Names(dllist *list, uint64 n, int64 showBeforeAfterFlag, int64 dbgFlag);
 /* basis/debugDisassembly.c */
@@ -1428,7 +1431,7 @@ ListObject *_LO_Define(ListObject *idNode, ListObject *locals);
 ListObject *_LO_MakeLambda(ListObject *l0);
 ListObject *LO_SpecialFunction(ListObject *l0, ListObject *locals);
 ListObject *_LO_New_RawStringOrLiteral(Lexer *lexer, byte *token, int64 qidFlag);
-ListObject *_LO_New(uint64 ltype, uint64 ctype, byte *value, Word *word, uint64 allocType);
+ListObject *_LO_New(uint64 ltype, uint64 ctype, uint64 ctype2, byte *value, Word *word, uint64 allocType);
 void LO_Quote(void);
 void LO_QuasiQuote(void);
 void LO_UnQuoteSplicing(void);

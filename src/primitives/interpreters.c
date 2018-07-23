@@ -61,11 +61,12 @@ CfrTil_Endif_ConditionalInterpret ( )
 void
 CfrTil_PreProcessor ( )
 {
+    Interpreter * interp = _Context_->Interpreter0 ;
     _CfrTil_UnAppendTokenFromSourceCode ( _CfrTil_, _Context_->Lexer0->OriginalToken ) ;
     Lexer_SourceCodeOff ( _Lexer_ ) ;
     Finder_SetNamedQualifyingNamespace ( _Context_->Finder0, ( byte* ) "PreProcessor" ) ;
     SetState ( _Context_->Interpreter0, PREPROCESSOR_MODE, true ) ;
-    _Interpret_ToEndOfLine ( _Context_->Interpreter0 ) ;
+    _Interpret_ToEndOfLine ( interp ) ;
     SetState ( _Context_->Interpreter0, PREPROCESSOR_MODE, false ) ;
     if ( GetState ( _Context_->Interpreter0, PREPROCESSOR_DEFINE ) )
     {

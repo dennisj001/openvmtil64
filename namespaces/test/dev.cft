@@ -414,8 +414,8 @@ s: fibBN ( n | fn fn1 fn2 -- TOS )
     for
 ;
 //nl nl 47 tfib3 //sp pause
-nl nl 100 tfib3 //sp pause
-nl 100 dup p fibBN p //sp
+nl nl 92 tfib3 //sp pause
+nl 92 dup p fibBN p //sp
 bnoff //pause
 
 nl
