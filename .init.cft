@@ -345,7 +345,7 @@ C Compiler Int Lexer
 'ofile find wdiss
 Root
 : license ofile ( "./LICENSE" ) ;
-license //pause
+//license //pause
 OpenVmTil
 : lispOff "Lisp" notUsing ; //lcReset ;
 
@@ -367,9 +367,9 @@ stringMacrosOn
 Root 
 'doX64 1 const
 'doScript 1 const
-'_doDemo 0 const    
+'_doDemo 1 const    
 dbgOff
-//dbgOn 
+dbgOn 
 #if Is_DebugOn 
 System 
 testCfrTil // dT0 //demo //dT0
@@ -381,7 +381,7 @@ stringMacrosOff
 #else
 // you can trim this file to your needs and put your personal init code here maybe
 
-#if 0
+#if 1
 Lisp
 
 ( define j ( lambda ( a b c ) ( + a b c)))

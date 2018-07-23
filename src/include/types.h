@@ -707,14 +707,14 @@ typedef struct
 #define REG_ON_BIT              ( 0x10 ) // decimal 16, beyond the 15 regs
     //#define LOC_STACK_2             ( 1 << 8 )
     int64 rtrn, NumberOfArgs ;
-    int64 Arg1Location, Arg2Location ;
-    int8 Arg1AssumedLocation, Arg2AssumedLocation, Arg1ActualLocation, Arg2ActualLocation, Arg1IdealLocation, Arg2IdealLocation ;
-    byte * Arg1SetHere, *Arg2SetHere ;
+    //int64 Arg1Location, Arg2Location ;
+    //int8 Arg1AssumedLocation, Arg2AssumedLocation, Arg1ActualLocation, Arg2ActualLocation, Arg1IdealLocation, Arg2IdealLocation ;
+    //byte * Arg1SetHere, *Arg2SetHere ;
     uint16 ControlFlags ;
     Word *opWord, *wordn, *wordm, *wordArg1, *wordArg2, *xBetweenArg1AndArg2 ;
     dlnode * node, *nodem, *wordNode, *nextNode, *wordArg2Node, *wordArg1Node ; //, *wordArg2OREGNode, *wordArg1ACCNode ;
     Boolean rvalue, wordArg1_rvalue, wordArg2_rvalue, wordArg1_literal, wordArg2_literal ;
-    Boolean wordOp, wordArg1_Op, wordArg2_Op, opRmFlag, opTakesARegFlag, opTakesImmFlag, op1ArgOnly ;
+    Boolean wordOp, wordArg1_Op, wordArg2_Op ;//, opRmFlag, opTakesARegFlag, opTakesImmFlag, op1ArgOnly ;
     // CompileOptimizeInfo State values
 #define ACC_1L                   ( (uint64) 1 << 1 )              
 #define ACC_1R                   ( (uint64) 1 << 2 )              

@@ -365,20 +365,10 @@ _dllist_DropN ( dllist * list, int64 n )
 void
 _dllist_RemoveNodes ( dlnode *first, dlnode * last )
 {
-#if 1 
     dlnode * node, *nextNode ;
     for ( node = first ; node ; node = nextNode )
     {
         nextNode = dlnode_Next ( node ) ; // before Remove
-#else
-    dlnode * node, *previousNode ;
-    for ( node = first ; node ; node = previousNode )
-    {
-        previousNode = dlnode_Previous ( node ) ; // before Remove
-#endif        
-        // DEBUG
-        //Word * word = ( Word* ) dobject_Get_M_Slot ( node, SCN_WORD ) ;
-
         dlnode_Remove ( node ) ;
         if ( node == last ) break ;
     }
@@ -387,22 +377,12 @@ _dllist_RemoveNodes ( dlnode *first, dlnode * last )
 void
 _dllist_RemoveNodes_UntilWord ( dlnode *first, Word * word )
 {
-#if 1 
     dlnode * node, *nextNode ;
     for ( node = first ; node ; node = nextNode )
     {
         Word * word1 = ( Word* ) dobject_Get_M_Slot ( node, SCN_WORD ) ;
         if ( word1 == word ) break ;
         nextNode = dlnode_Next ( node ) ; // before Remove
-#else
-    dlnode * node, *previousNode ;
-    for ( node = first ; node ; node = previousNode )
-    {
-        previousNode = dlnode_Previous ( node ) ; // before Remove
-#endif        
-        // DEBUG
-        //Word * word = ( Word* ) dobject_Get_M_Slot ( node, SCN_WORD ) ;
-
         dlnode_Remove ( node ) ;
     }
 }
@@ -457,7 +437,7 @@ _dllist_SetTopValue ( dllist * list, int64 value )
 }
 
 void
-dllist_Map_Indexed ( dllist * list, int64 flag, int64 fromFirst, MapFunction2 mf )
+dllist_Map_FromFirstFlag_Indexed ( dllist * list, int64 flag, int64 fromFirst, MapFunction2 mf )
 {
     dlnode * node, *nextNode, *prevNode ;
     int64 index ;
@@ -477,6 +457,30 @@ dllist_Map_Indexed ( dllist * list, int64 flag, int64 fromFirst, MapFunction2 mf
         {
             prevNode = dlnode_Previous ( node ) ;
             mf ( node, index, flag ) ;
+        }
+    }
+}
+
+void
+dllist_Map2_FromFirstFlag ( dllist * list, MapFunction2 mf, int64 one, int64 two, int64 fromFirstFlag )
+{
+    dlnode * node, *nextNode, *prevNode ;
+    if ( fromFirstFlag )
+    {
+        for ( node = dllist_First ( ( dllist* ) list ) ; node ; node = nextNode )
+        {
+            // get nextNode before map function (mf) in case mf changes list by a Remove of current node
+            // problem could arise if mf removes Next node
+            nextNode = dlnode_Next ( node ) ;
+            mf ( node, one, two ) ;
+        }
+    }
+    else
+    {
+        for ( node = dllist_Last ( ( dllist* ) list ) ; node ; node = prevNode )
+        {
+            prevNode = dlnode_Previous ( node ) ;
+            mf ( node, one, two ) ;
         }
     }
 }
@@ -623,8 +627,6 @@ Tree_Map_State_OneArg ( uint64 state, MapFunction_1 mf, int64 one )
     return 0 ;
 }
 
-#if 1
-
 Word *
 TC_Tree_Map ( TabCompletionInfo * tci, MapFunction mf, Word * wordi )
 {
@@ -670,30 +672,3 @@ doReturn:
     }
     return rword ;
 }
-#else
-
-Word *
-TC_Tree_Map ( TabCompletionInfo * tci, MapFunction mf, Word * one )
-{
-    if ( _CfrTil_->Namespaces )
-    {
-        Word * word, * word2, *nextWord ;
-        _CfrTil_->FindWordCount = 1 ;
-        if ( mf ( ( Symbol* ) one ) ) return _CfrTil_->Namespaces ;
-        for ( word = ( Word * ) dllist_First ( ( dllist* ) _CfrTil_->Namespaces->W_List ) ; word ; word = nextWord )
-        {
-            nextWord = ( Word* ) dlnode_Next ( ( node* ) word ) ;
-            _CfrTil_->FindWordCount ++ ;
-            if ( mf ( ( Symbol* ) word ) ) return word ;
-            else if ( Is_NamespaceType ( word ) )
-            {
-                //if ( ( word->State & state ) )
-                {
-                    if ( ( word2 = Tree_Map_OneNamespace ( ( Word* ) dllist_First ( ( dllist* ) word->W_List ), mf, one ) ) ) return word2 ;
-                }
-            }
-        }
-    }
-    return 0 ;
-}
-#endif

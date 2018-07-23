@@ -15,11 +15,11 @@ const int64 SCWI_MAX_DIFF = 60 ;
 const int64 SCWI_MIN_DIFF = 2 ;
 
 Word *
-DWL_Find ( dllist * list, Word * iword, byte * address, byte* name, int64 fromFirstFlag, int64 takeFirstFind, byte * newAddress ) // nb fromTop is from the end of the list because it is the top 'push'
+DWL_Find ( dllist * list, Word * iword, byte * address, byte* name, int64 takeFirstFind, byte * newAddress, int64 fromFirstFlag ) // nb fromTop is from the end of the list because it is the top 'push'
 {
     byte * naddress, iuFlag ;
     Word * nword, *aFoundWord = 0, *foundWord = 0 ;
-    dlnode * anode = 0 ; 
+    dlnode * anode = 0 ;
     int64 numFound = 0 ;
     uint64 fwDiff = - 1, fDiff = 0, minDiffFound = 0, scwi ;
 
@@ -71,7 +71,7 @@ DWL_Find ( dllist * list, Word * iword, byte * address, byte* name, int64 fromFi
                 else
                 {
                     foundWord = aFoundWord ;
-                    fwDiff = fDiff = scwi ; 
+                    fwDiff = fDiff = scwi ;
                 }
                 if ( ( ! minDiffFound ) || ( fDiff < minDiffFound ) ) minDiffFound = fDiff ;
                 if ( ( _Q_->Verbosity > 2 ) )
@@ -99,30 +99,14 @@ DWL_Find ( dllist * list, Word * iword, byte * address, byte* name, int64 fromFi
 void
 _DWL_ShowList ( dllist * list, int8 fromFirst )
 {
-    if ( list )
-    {
-        dlnode * node = 0 ;
-        for ( node = fromFirst ? dllist_First ( ( dllist* ) list ) : dllist_Last ( ( dllist* ) list ) ; node ;
-            node = fromFirst ? dlnode_Next ( node ) : dlnode_Previous ( node ) )
-        {
-            _DWL_ShowWord ( node, "List", 0 ) ;
-        }
-    }
+    if ( list ) dllist_Map2_FromFirstFlag ( list, ( MapFunction2 ) _DWL_ShowWord, ( int64 ) "List", 0, fromFirst ) ;
 }
 
 void
 DWL_ShowList ( Word * scWord, int8 fromFirst )
 {
     dllist * list = scWord->W_SC_WordList ? scWord->W_SC_WordList : _Compiler_->WordList ;
-    if ( list )
-    {
-        dlnode * node = 0 ;
-        for ( node = fromFirst ? dllist_First ( ( dllist* ) list ) : dllist_Last ( ( dllist* ) list ) ; node ;
-            node = fromFirst ? dlnode_Next ( node ) : dlnode_Previous ( node ) )
-        {
-            _DWL_ShowWord ( node, "List", 0 ) ;
-        }
-    }
+    if ( list ) _DWL_ShowList ( list, fromFirst ) ;
 }
 
 void
@@ -133,14 +117,14 @@ _Debugger_ShowDbgSourceCodeAtAddress ( Debugger * debugger, byte * address )
     Word * scWord = Compiling ? _Compiler_->CurrentWordCompiling : GetState ( debugger, DBG_STEPPING ) ? Debugger_GetWordFromAddress ( debugger ) : _Context_->CurrentDisassemblyWord ;
     if ( scWord )
     {
-        dllist * list = (scWord->W_SC_WordList && (scWord->W_SC_MemSpaceRandMarker == _Q_->MemorySpace0->TempObjectSpace->InitFreedRandMarker)) ? scWord->W_SC_WordList : 0 ; //_Compiler_->WordList ;
+        dllist * list = ( scWord->W_SC_WordList && ( scWord->W_SC_MemSpaceRandMarker == _Q_->MemorySpace0->TempObjectSpace->InitFreedRandMarker ) ) ? scWord->W_SC_WordList : 0 ; //_Compiler_->WordList ;
         if ( list )
         {
             byte *sourceCode = scWord->W_SourceCode ? scWord->W_SourceCode : String_New ( _CfrTil_->SC_ScratchPad, TEMPORARY ) ;
             if ( ! String_Equal ( sourceCode, "" ) )
             {
                 int64 fixed = 0 ;
-                Word * word = DWL_Find ( list, 0, address, 0, 0, 0, 0 ) ;
+                Word * word = DWL_Find ( list, 0, address, 0, 0, 0, 1 ) ;
                 if ( word && ( debugger->LastSourceCodeWord != word ) )
                 {
                     d0 ( DebugWordList_ShowAll ( ) ) ;
@@ -267,14 +251,14 @@ _CfrTil_AdjustDbgSourceCodeAddress ( byte * address, byte * newAddress )
     if ( IsSourceCodeOn && list )
     {
         //DWL_Find ( dllist * list, Word * iword, byte * address, byte* name, int64 fromFirstFlag, int64 takeFirstFind, byte * newAddress ) // nb fromTop is from the end of the list because it is the top 'push'
-        DWL_Find ( list, 0, address, 0, 0, 0, newAddress ) ; // nb. fromFirst is from the top of a stack that was pushed
+        DWL_Find ( list, 0, address, 0, 0, newAddress, 1 ) ; // nb. fromFirst is from the top of a stack that was pushed
     }
 }
 
 void
 CfrTil_WordList_PushWord ( Word * word )
 {
-    CompilerWordList_Push ( word, ( ! ( word->CAttribute & ( NAMESPACE|OBJECT_OPERATOR|OBJECT_FIELD ) ) ) || ( word->CAttribute & ( DOBJECT )) ) ; //_List_PushNew ( _Compiler_->WordList, word ) ;
+    CompilerWordList_Push ( word, ( ! ( word->CAttribute & ( NAMESPACE | OBJECT_OPERATOR | OBJECT_FIELD ) ) ) || ( word->CAttribute & ( DOBJECT ) ) ) ; //_List_PushNew ( _Compiler_->WordList, word ) ;
 }
 
 Word *
@@ -287,13 +271,21 @@ _CfrTil_WordList_TopWord ( )
 }
 
 void
+SC_ListClearAddress ( dlnode * node, byte * address )
+{
+    Word * nword = ( Word* ) dobject_Get_M_Slot ( node, SCN_WORD ) ;
+    if ( nword->Coding == address ) nword->Coding = 0 ;
+}
+
+void
 Word_Set_SCA ( Word * word0 )
 {
+    dllist_Map1 ( _Compiler_->WordList, ( MapFunction1 ) SC_ListClearAddress, ( int64 ) Here ) ;
     if ( word0 ) Word_SetCoding ( word0, Here ) ;
 }
 
 void
-_CfrTil_WordList_PopWords (int64 n)
+_CfrTil_WordList_PopWords ( int64 n )
 {
     Compiler * compiler = _Compiler_ ;
     dllist * list = compiler->WordList ;
@@ -317,7 +309,7 @@ _CfrTil_WordList_PopWords (int64 n)
 void
 CfrTil_WordLists_PopWord ( )
 {
-    _CfrTil_WordList_PopWords (1) ;
+    _CfrTil_WordList_PopWords ( 1 ) ;
 }
 
 // too many showWord functions 
@@ -342,13 +334,6 @@ _DWL_ShowWord_Print ( Word * word, int64 index, byte * prefix, byte * coding, by
         _Printf ( ( byte* ) "\n\t%s :: \'%-28s\' : coding  = 0x%08x : scwi = %03d, scwiDiff = %03d : inUse = %s",
             prefix, name, coding, scwi, scwiDiff, iuFlag ) ;
     }
-#if 0    
-    else
-    {
-        _Printf ( ( byte* ) "\n\t%s :: \'%-28s\' : coding  = 0x%08x : scwi = %03d, inUse = %s",
-            prefix, name, coding, scwi, iuFlag ) ;
-    }
-#endif    
 }
 
 void
@@ -357,11 +342,8 @@ _DWL_ShowWord ( dlnode * anode, byte * prefix, int64 scwiDiff )
     if ( anode )
     {
         dobject * dobj = ( dobject * ) anode ;
-        //int64 scwi = dobject_Get_M_Slot ( dobj, SCN_SC_WORD_INDEX ) ;
         Word * word = ( Word* ) dobject_Get_M_Slot ( dobj, SCN_WORD ) ;
         int64 iuoFlag = dobject_Get_M_Slot ( dobj, SCN_IN_USE_FLAG ) ;
-        //_Printf ( ( byte* ) "\n\tDWL_ShowWord :: %s :: word :: = 0x%016lx : word Name = \'%-12s\'\t : Coding  = 0x%08x : W_SC_WordIndex = %d, scwiDiff = %d",
-        //    prefix, word, String_ConvertToBackSlash ( word->Name ), word->Coding, word->W_SC_WordIndex, scwiDiff ) ;
         _DWL_ShowWord_Print ( word, 0, prefix, word->Coding, 0, scwiDiff, iuoFlag ) ;
     }
 }
@@ -388,7 +370,7 @@ SC_WordList_Show ( dllist * list, Word * scWord, Boolean inUseOnlyFlag, byte * l
     if ( list )
     {
         if ( scWord ) _Printf ( "\n%s WordList : for word \'%s\' :", listName, scWord->Name ) ;
-        dllist_Map_Indexed ( list, ( int64 ) inUseOnlyFlag, 0, DWL_ShowWord ) ;
+        dllist_Map_FromFirstFlag_Indexed ( list, ( int64 ) inUseOnlyFlag, 0, DWL_ShowWord ) ;
     }
 }
 
@@ -401,7 +383,7 @@ DebugWordList_ShowAll ( Debugger * debugger )
 }
 
 void
-_Compiler_Show_WordList (byte * prefix, int8 inUseFlag)
+_Compiler_Show_WordList ( byte * prefix, int8 inUseFlag )
 {
 
     Word * scWord = Compiling ? _Compiler_->CurrentWordCompiling : GetState ( _Debugger_, DBG_STEPPING ) ? Debugger_GetWordFromAddress ( _Debugger_ ) : _Context_->CurrentlyRunningWord ;
@@ -412,16 +394,16 @@ _Compiler_Show_WordList (byte * prefix, int8 inUseFlag)
 }
 
 void
-Compiler_Show_WordList (byte * prefix)
+Compiler_Show_WordList ( byte * prefix )
 {
-    _Compiler_Show_WordList (prefix, 0) ;
+    _Compiler_Show_WordList ( prefix, 0 ) ;
 }
 
 void
 Debugger_Show_InUse_CompilerWordList ( Debugger * debugger )
 {
     byte * prefix = debugger->w_Word->Name ;
-    _Compiler_Show_WordList (prefix, 1) ;
+    _Compiler_Show_WordList ( prefix, 1 ) ;
 }
 
 void
@@ -591,7 +573,6 @@ CfrTil_AppendCharToSourceCode ( CfrTil * cfrtil, byte c, int64 convertToSpaceFla
             else cfrtil->SC_QuoteMode = 1 ;
             _CfrTil_AppendCharToSourceCode ( cfrtil, c ) ;
         }
-#if 1        
         else if ( convertToSpaceFlag )
         {
             c = String_ConvertEscapeCharToSpace ( c ) ;
@@ -600,7 +581,6 @@ CfrTil_AppendCharToSourceCode ( CfrTil * cfrtil, byte c, int64 convertToSpaceFla
                 _CfrTil_AppendCharToSourceCode ( cfrtil, c ) ;
             }
         }
-#endif        
         else
         {
             _String_AppendConvertCharToBackSlashAtIndex ( cfrtil->SC_ScratchPad, c, &cfrtil->SC_ScratchPadIndex, cfrtil->SC_QuoteMode ) ;

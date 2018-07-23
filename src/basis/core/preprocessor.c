@@ -28,7 +28,7 @@ GetElxxStatus ( int64 cond, int64 type )
 {
     Interpreter * interp = _Context_->Interpreter0 ;
     int64 llen = List_Length ( interp->PreprocessorStackList ) ;
-    Ppibs top ;
+    Ppibs top, current ;
     top.int64_Ppibs = List_Top ( interp->PreprocessorStackList ) ;
     Boolean status = false, accStatus = GetAccumulatedBlockStatus ( 1 ) ;
     if ( type == PP_ELIF )
@@ -48,7 +48,7 @@ GetElxxStatus ( int64 cond, int64 type )
     }
     else if ( type == PP_ELSE )
     {
-        //top.ElseStatus = 1 ;
+#if 1        
         if ( llen > 1 )
         {
             if ( accStatus ) status = ( ! ( top.IfBlockStatus || top.ElifStatus ) ) ;
@@ -57,6 +57,14 @@ GetElxxStatus ( int64 cond, int64 type )
         else status = ( ! ( top.IfBlockStatus || top.ElifStatus ) ) ;
         top.ElseStatus = status ;
         top.ElifStatus = 0 ; //status ; // so total block status will be the 'else' status
+#else        
+        if ( llen ) current.int64_Ppibs = List_GetN ( interp->PreprocessorStackList, llen - 1 ) ; // -1: 0 based list
+        else SyntaxError ( 1 ) ;
+        status = ( ! ( current.IfBlockStatus || current.ElifStatus ) ) ;
+        current.ElseStatus = status ;
+        current.ElifStatus = 0 ; //status ; // so total block status will be the 'else' status
+        List_SetN ( interp->PreprocessorStackList, ( llen - 1 ), current.int64_Ppibs ) ;
+#endif        
     }
     List_SetTop ( interp->PreprocessorStackList, top.int64_Ppibs ) ;
     return status ;
@@ -83,8 +91,9 @@ GetIfStatus ( )
     Interpreter * interp = _Context_->Interpreter0 ;
     Ppibs cstatus ;
     cstatus.int64_Ppibs = 0 ;
-    Boolean accStatus, cond = _GetCondStatus ( ) ;
+    Boolean accStatus, cond ;
     accStatus = GetAccumulatedBlockStatus ( 0 ) ;
+    cond = _GetCondStatus ( ) ;
     cstatus.IfBlockStatus = cond && accStatus ; // 1 default is to do interpret
     List_Push ( interp->PreprocessorStackList, cstatus.int64_Ppibs, TEMPORARY ) ;
     return cstatus.IfBlockStatus ;
@@ -112,7 +121,7 @@ GetEndifStatus ( )
 }
 
 void
-SkipPreprocessorCode ( )
+SkipPreprocessorCode ( Boolean toEndifFlag )
 {
     Context * cntx = _Context_ ;
     Lexer * lexer = cntx->Lexer0 ;
@@ -144,23 +153,30 @@ SkipPreprocessorCode ( )
                 byte * token1 = Lexer_ReadToken ( lexer ) ;
                 if ( token1 )
                 {
-                    if ( String_Equal ( token1, "if" ) )
+                    if ( toEndifFlag )
                     {
-                        if ( GetIfStatus ( ) ) goto done ; // PP_INTERP
+                        if ( String_Equal ( token1, "endif" ) ) goto done ;
                     }
-                    else if ( String_Equal ( token1, "else" ) )
+                    else
                     {
-                        if ( GetElseStatus ( ) ) goto done ;
+                        if ( String_Equal ( token1, "if" ) )
+                        {
+                            if ( GetIfStatus ( ) ) goto done ; // PP_INTERP
+                        }
+                        else if ( String_Equal ( token1, "else" ) )
+                        {
+                            if ( GetElseStatus ( ) ) goto done ;
+                        }
+                        else if ( String_Equal ( token1, "elif" ) )
+                        {
+                            if ( GetElifStatus ( ) ) goto done ;
+                        }
+                        else if ( String_Equal ( token1, "endif" ) )
+                        {
+                            if ( toEndifFlag || GetEndifStatus ( ) ) goto done ;
+                        }
+                        else _SyntaxError ( "Stray '#' in code!", 1 ) ;
                     }
-                    else if ( String_Equal ( token1, "elif" ) )
-                    {
-                        if ( GetElifStatus ( ) ) goto done ;
-                    }
-                    else if ( String_Equal ( token1, "endif" ) )
-                    {
-                        if ( GetEndifStatus ( ) ) goto done ;
-                    }
-                    //else syntax error
                 }
                 else goto done ;
             }
@@ -169,5 +185,29 @@ SkipPreprocessorCode ( )
     while ( token ) ;
 done:
     Lexer_SourceCodeOn ( lexer ) ;
+}
+
+void
+CfrTil_If_ConditionalInterpret ( )
+{
+    if ( ! GetIfStatus ( ) ) SkipPreprocessorCode ( 0 ) ;
+}
+
+void
+CfrTil_Elif_ConditionalInterpret ( )
+{
+    if ( ! GetElifStatus ( ) ) SkipPreprocessorCode ( 0 ) ;
+}
+
+void
+CfrTil_Else_ConditionalInterpret ( )
+{
+    if ( ! GetElseStatus ( ) ) SkipPreprocessorCode ( 1 ) ;
+}
+
+void
+CfrTil_Endif_ConditionalInterpret ( )
+{
+    if ( ! GetEndifStatus ( ) ) SkipPreprocessorCode ( 0 ) ;
 }
 

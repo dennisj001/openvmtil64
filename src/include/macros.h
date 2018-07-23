@@ -275,6 +275,7 @@
 #define List_Init( list ) _dllist_Init ( list )
 #define List_DropN( list, n ) _dllist_DropN ( list, n )
 #define List_GetN( list, n ) List_Get_N_Node_M_Slot( list, n, 0 )  //_dllist_GetTopValue ( list )
+#define List_SetN( list, n, value ) List_Set_N_Node_M_Slot( list, n, 0, value )
 #define List_SetTop( list, value ) List_Set_N_Node_M_Slot( list, 0, 0, value )
 #define List_Pop( list ) _dllist_PopNode ( list )
 #define List_Top( list ) List_GetN( list, 0 ) 

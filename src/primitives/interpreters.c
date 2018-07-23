@@ -35,30 +35,6 @@ CfrTil_ParenthesisComment ( )
 }
 
 void
-CfrTil_If_ConditionalInterpret ( )
-{
-    if ( ! GetIfStatus ( ) ) SkipPreprocessorCode ( ) ;
-}
-
-void
-CfrTil_Elif_ConditionalInterpret ( )
-{
-    if ( ! GetElifStatus ( ) ) SkipPreprocessorCode ( ) ;
-}
-
-void
-CfrTil_Else_ConditionalInterpret ( )
-{
-    if ( ! GetElseStatus ( ) ) SkipPreprocessorCode ( ) ;
-}
-
-void
-CfrTil_Endif_ConditionalInterpret ( )
-{
-    if ( ! GetEndifStatus ( ) ) SkipPreprocessorCode ( ) ;
-}
-
-void
 CfrTil_PreProcessor ( )
 {
     Interpreter * interp = _Context_->Interpreter0 ;

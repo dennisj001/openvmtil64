@@ -7,7 +7,7 @@
 Word *
 _CopyDuplicateWord ( Word * word0 )
 {
-    d0 ( if ( Is_DebugModeOn ) _DWL_ShowList ( _Compiler_->WordList, 0 ) ) ;
+    d0 ( if ( Is_DebugModeOn ) DWL_ShowList ( _Compiler_->WordList, 0 ) ) ;
     Word * wordc = Word_Copy ( word0, DICTIONARY ) ; // use DICTIONARY since we are recycling these anyway
     wordc->W_OriginalWord = Word_GetOriginalWord ( word0 ) ;
     _dlnode_Init ( ( dlnode * ) wordc ) ; // necessary!

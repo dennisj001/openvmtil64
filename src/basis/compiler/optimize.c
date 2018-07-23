@@ -63,8 +63,6 @@ Compiler_GetOptimizeState ( Compiler * compiler, Word * word )
         CompileOptimizeInfo_Init ( optInfo, compiler->OptInfo->State ) ; // State : not used yet ??
         optInfo->opWord = word ;
         SetState ( _CfrTil_, IN_OPTIMIZER, true ) ;
-        optInfo->Arg1AssumedLocation = LOC_STACK_0 ;
-        optInfo->Arg2AssumedLocation = LOC_STACK_1 ;
         for ( optInfo->node = optInfo->wordNode = dllist_First ( ( dllist* ) compiler->WordList ), optInfo->node = dlnode_Next ( optInfo->node ) ;
             optInfo->node ; optInfo->node = optInfo->nextNode )
         {
@@ -93,8 +91,6 @@ Compiler_GetOptimizeState ( Compiler * compiler, Word * word )
                         optInfo->wordArg2 = optInfo->wordn ;
                         optInfo->wordArg2_Op = true ;
                     }
-                    //if ( optInfo->wordArg1 ) break ;
-                    //else continue ; //
                     break ;
                 }
             }
@@ -112,9 +108,9 @@ Compiler_GetOptimizeState ( Compiler * compiler, Word * word )
                 optInfo->NumberOfArgs ++ ;
                 optInfo->wordArg1 = optInfo->wordn ;
                 optInfo->wordArg1Node = optInfo->node ;
-                optInfo->wordArg1_rvalue = optInfo->rvalue ? optInfo->rvalue :
+                optInfo->wordArg1_rvalue = optInfo->rvalue ? optInfo->rvalue : 
                     ( ( GetState ( _Context_, INFIX_MODE ) || GetState ( compiler, LISP_MODE ) ) 
-                    && ( ! ( optInfo->opWord->CAttribute & ( CATEGORY_OP_EQUAL ) ) ) ) ;
+                    && ( ! ( optInfo->opWord->CAttribute & ( CATEGORY_OP_EQUAL ) ) ) ) ; // rem : rvalue can be higher than 1 (cf. above for '@ @')
                 optInfo->rvalue = false ;
                 if ( optInfo->wordArg1->CAttribute & ( CONSTANT | LITERAL ) ) optInfo->wordArg1_literal = true ;
                 break ;
@@ -126,7 +122,7 @@ Compiler_GetOptimizeState ( Compiler * compiler, Word * word )
                 optInfo->wordArg2Node = optInfo->node ;
                 optInfo->wordArg2_rvalue = optInfo->rvalue ? optInfo->rvalue :
                     ( ( GetState ( _Context_, INFIX_MODE ) || GetState ( compiler, LISP_MODE ) ) 
-                    && ( ! ( optInfo->opWord->CAttribute & ( CATEGORY_OP_STORE ) ) ) ) ;
+                    && ( ! ( optInfo->opWord->CAttribute & ( CATEGORY_OP_STORE ) ) ) ) ; // rem : rvalue can be higher than 1 (cf. above for '@ @')
                 optInfo->rvalue = false ;
                 if ( optInfo->wordArg2->CAttribute & ( CONSTANT | LITERAL ) ) optInfo->wordArg2_literal = true ;
                 if ( optInfo->opWord->CAttribute & ( CATEGORY_OP_LOAD ) && ( ! ( GetState ( _Context_, INFIX_MODE ) ) ) ) optInfo->wordArg2_rvalue ++ ;
@@ -167,7 +163,6 @@ Compiler_SetupArgsToStandardLocations ( Compiler * compiler )
     else if ( ( optInfo->NumberOfArgs == 2 ) || optInfo->wordArg1_Op ) Compiler_Optimizer_2Args_Or_WordArg1_Op ( compiler ) ;
     else if ( optInfo->NumberOfArgs == 1 ) Compiler_Optimizer_1Arg ( compiler ) ;
     else if ( optInfo->NumberOfArgs == 0 ) Compiler_Optimizer_0Args ( compiler ) ;
-    //else Error ( "\nCompiler_SetupArgsToStandardLocations : Shouldn't come here!!\n", QUIT ) ;
 }
 
 void
