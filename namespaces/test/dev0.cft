@@ -97,7 +97,6 @@ nl
 ( + ( k ( j 1 2 3 ) ( h 2 3 59 ) ) 7 ) // 77
 ( g + ( k ( j 1 2 ( h 2 3 ( k 59 4 ) ) ) 6 ) 0 ) // 77
 ( - ( + 1 2 ( * 3 4 ) ( / 4 2 ) ( - 9 8 ) 10 770 787 34 ) 21 787 34 )  // == 777
-TODO ( "fix lambda calculus here" ) //pause
     
 // demo : interspersing C code with lisp compiled code
 C Compiler

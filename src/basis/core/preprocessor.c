@@ -86,7 +86,7 @@ GetIfStatus ( )
     Boolean accStatus, cond = _GetCondStatus ( ) ;
     accStatus = GetAccumulatedBlockStatus ( 0 ) ;
     cstatus.IfBlockStatus = cond && accStatus ; // 1 default is to do interpret
-    List_Push ( interp->PreprocessorStackList, cstatus.int64_Ppibs, COMPILER_TEMP ) ;
+    List_Push ( interp->PreprocessorStackList, cstatus.int64_Ppibs, TEMPORARY ) ;
     return cstatus.IfBlockStatus ;
 }
 

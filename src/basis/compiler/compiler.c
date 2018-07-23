@@ -262,7 +262,7 @@ Compiler_Init ( Compiler * compiler, uint64 state )
     if ( ! IsSourceCodeOn )
     {
         DLList_RecycleWordList ( compiler->WordList ) ;
-        compiler->WordList = _dllist_New ( TEMPORARY ) ;
+        compiler->WordList = _dllist_New ( CFRTIL ) ;
     }
 #if 1    
     else
@@ -274,7 +274,7 @@ Compiler_Init ( Compiler * compiler, uint64 state )
             compiler->CurrentWordCompiling->W_SC_MemSpaceRandMarker = _Q_->MemorySpace0->TempObjectSpace->InitFreedRandMarker ; // this insures that memory for this list hasn't been recycled
         }
         DLList_RecycleWordList ( compiler->WordList ) ;
-        compiler->WordList = _dllist_New ( TEMPORARY ) ;
+        compiler->WordList = _dllist_New ( CFRTIL ) ;
     }
 #endif    
     CfrTil_InitBlockSystem ( compiler ) ;
