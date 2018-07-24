@@ -74,14 +74,14 @@ _Namespace_AddToNamespacesTail_ResetFromInNamespace ( Namespace * ns )
     _Namespace_ResetFromInNamespace ( ns ) ;
 }
 
-Namespace *
+Boolean
 _Namespace_IsUsing ( Namespace * ns )
 {
-    if ( GetState ( ns, USING ) ) return ns ;
+    if ( GetState ( ns, USING ) ) return 1 ;
     return 0 ;
 }
 
-Namespace *
+Boolean
 Namespace_IsUsing ( byte * name )
 {
     Namespace * ns = Namespace_Find ( name ) ;
@@ -382,7 +382,7 @@ Namespace *
 Namespace_New ( byte * name, Namespace * containingNs )
 {
     //ns = _DataObject_New ( NAMESPACE, 0, name, NAMESPACE | IMMEDIATE, 0, 0, 0, ( int64 ) containingNs, 0 ) ;
-    Namespace * ns = _DataObject_New ( NAMESPACE, 0, name, NAMESPACE, 0, 0, 0, ( int64 ) containingNs, 0 ) ;
+    Namespace * ns = _DataObject_New (NAMESPACE, 0, name, NAMESPACE, 0, 0, 0, ( int64 ) containingNs, 0 , -1) ;
 }
 
 Namespace *

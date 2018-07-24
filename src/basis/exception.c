@@ -2,7 +2,7 @@
 #include "../include/cfrtil64.h"
 
 int64
-_OpenVmTil_ShowExceptionInfo ( )
+_OpenVmTil_ShowExceptionInfo ( Boolean all )
 {
     if ( _Q_->Verbosity )
     {
@@ -13,7 +13,7 @@ _OpenVmTil_ShowExceptionInfo ( )
                 Word * word = 0 ;
                 Debugger * debugger = _Debugger_ ;
                 //_Debugger_Locals_Show ( debugger, debugger->w_Word ) ;
-                Debugger_Stack ( debugger ) ;
+                if ( all ) Debugger_Stack ( debugger ) ;
                 DebugOn ;
                 if ( _Q_->Signal != 11 )
                 {
@@ -192,7 +192,7 @@ _OVT_Throw ( int64 restartCondition, int8 pauseFlag )
                 jb = & _CfrTil_->JmpBuf0 ;
                 if ( _Q_->Signal != SIGBUS )
                 {
-                    _OpenVmTil_ShowExceptionInfo ( ) ;
+                    _OpenVmTil_ShowExceptionInfo ( 0 ) ;
                     pauseFlag ++ ;
                     _Q_->RestartCondition = ABORT ;
                 }
@@ -211,7 +211,7 @@ _OVT_Throw ( int64 restartCondition, int8 pauseFlag )
         if ( _Q_->RestartCondition >= INITIAL_START ) jb = & _Q_->JmpBuf0 ;
         else jb = & _CfrTil_->JmpBuf0 ;
     }
-    printf ( "\n%s\n%s %s at %s -> ...", ( _Q_->ExceptionMessage ? _Q_->ExceptionMessage : (byte*) "" ), 
+    printf ( "\n%s\n%s %s at %s -> ...", ( _Q_->ExceptionMessage ? _Q_->ExceptionMessage : ( byte* ) "" ),
         ( jb == & _CfrTil_->JmpBuf0 ) ? "reseting cfrTil" : "fully restarting", ( _Q_->Signal == SIGSEGV ) ? ": SIGSEGV" : "", Context_Location ( ) ) ;
     fflush ( stdout ) ;
 
@@ -225,7 +225,7 @@ OpenVmTil_Throw ( byte * excptMessage, int64 restartCondition, int64 infoFlag )
     _Q_->ExceptionMessage = excptMessage ;
     _Q_->Thrown = restartCondition ;
 
-    if ( infoFlag && ( _Q_->SignalExceptionsHandled < 2 ) ) _OpenVmTil_ShowExceptionInfo ( ) ;
+    if ( infoFlag && ( _Q_->SignalExceptionsHandled < 2 ) ) _OpenVmTil_ShowExceptionInfo ( 1 ) ;
     _OVT_Throw ( restartCondition, 0 ) ;
 }
 
@@ -244,7 +244,7 @@ OpenVmTil_SignalAction ( int signal, siginfo_t * si, void * uc )
     _Q_->SigLocation = ( ( ! ( signal & ( SIGSEGV | SIGBUS ) ) ) && _Context_ ) ? ( byte* ) c_gd ( Context_Location ( ) ) : ( byte* ) "" ;
     if ( ( signal >= SIGCHLD ) || ( signal == SIGTRAP ) ) //||( signal == SIGBUS ))
     {
-        if ( ( signal != SIGCHLD ) && ( signal != SIGWINCH ) && ( signal != SIGTRAP ) ) _OpenVmTil_ShowExceptionInfo ( ) ;
+        if ( ( signal != SIGCHLD ) && ( signal != SIGWINCH ) && ( signal != SIGTRAP ) ) _OpenVmTil_ShowExceptionInfo ( 1 ) ;
         _Q_->SigAddress = 0 ; //|| ( signal == SIGWINCH ) ) _Q_->SigAddress = 0 ; // 17 : "CHILD TERMINATED" : ignore; its just back from a shell fork
         _Q_->Signal = 0 ;
     }

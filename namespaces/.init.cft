@@ -46,6 +46,7 @@ Debug
 'dscOff 'dbgSourceCodeOff find alias
 'scOn 'dscOn find alias
 'scOff 'dscOff find alias
+
 : v4 verbosity 4 = ;
 : v1 verbosity 1 = ;
 
@@ -341,7 +342,7 @@ C Compiler Int Lexer
     file name @ fopen =
     nl { result file @ input 1 fread = input @ emit } { result @ 1 == } doWhile 
     file @ fclose
-; prefix
+d: ; prefix
 'ofile find wdiss
 Root
 : license ofile ( "./LICENSE" ) ;
@@ -367,10 +368,11 @@ stringMacrosOn
 Root 
 'doX64 1 const
 'doScript 1 const
-'_doDemo 1 const    
+'_doDemo 0 const    
 dbgOff
-dbgOn 
+//dbgOn 
 #if Is_DebugOn 
+scOn
 System 
 testCfrTil // dT0 //demo //dT0
 #if _doDemo 
@@ -396,6 +398,10 @@ Lisp
 ( g + ( k ( j 1 2 ( h 2 3 ( k 59 4 ) ) ) 6 ) 0 ) // 77
 ( - ( + 1 2 ( * 3 4 ) ( / 4 2 ) ( - 9 8 ) 10 770 787 34 ) 21 787 34 )  // == 777
 
+d: (define fib (lambda (n) ( ifElse (< n 2) n (+ (fib (- n 1)) (fib (- n 2))))))
+tick fib find d: wdiss 
+(fib 20) 
+pause
 lispOff
 #endif
 

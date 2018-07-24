@@ -755,21 +755,21 @@ String_FindStrnCmpIndex ( byte * sc, byte* name0, int64 index0, int64 wl0, int64
     Boolean punctuationFlag = IsPunct ( name0[0] ) ;
     for ( i = 0, n = wl0 + inc ; ( i <= n ) && ( i <= index ) ; i ++ ) // tokens are parsed in different order with parameter and c rtl args, etc. 
     {
-        scindex = & sc [ index - i ] ;
-        if ( ( ( index - 1 ) >= 0 ) && ( ! Strncmp ( scindex, name0, wl0 ) ) )
-        {
-            if ( String_CheckWordSize ( scindex, wl0, punctuationFlag ) )
-            {
-                index -= i ;
-                goto done ;
-            }
-        }
         scindex = & sc [ index + i ] ;
         if ( ( index + i <= slsc ) && ( ! Strncmp ( & sc [ index + i ], name0, wl0 ) ) )//l ) ) //wl0 ) )
         {
             if ( String_CheckWordSize ( scindex, wl0, punctuationFlag ) )
             {
                 index += i ;
+                goto done ;
+            }
+        }
+        scindex = & sc [ index - i ] ;
+        if ( ( ( index - 1 ) >= 0 ) && ( ! Strncmp ( scindex, name0, wl0 ) ) )
+        {
+            if ( String_CheckWordSize ( scindex, wl0, punctuationFlag ) )
+            {
+                index -= i ;
                 goto done ;
             }
         }

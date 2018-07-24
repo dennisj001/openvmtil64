@@ -490,7 +490,7 @@
 // TODO : nb. flags need to be edited !!!!! for right category, overlap, use/non-use, etc.
 // CfrTil state flags added to System flags
 #define CFRTIL_RUN ( (uint64) 1 << 0 )
-#define SOURCE_CODE_INITIALIZED  ( (uint64) 1 << 1 )
+#define SOURCE_CODE_STARTED  ( (uint64) 1 << 1 )
 #define DEBUG_MODE ( (uint64) 1 << 7 )
 #define DEBUG_SOURCE_CODE_MODE ( (uint64) 1 << 8 )
 #define STRING_MACROS_ON ( (uint64) 1 << 9 )

@@ -119,7 +119,7 @@ Do_NextArrayWordToken ( Word * word, byte * token, Word * arrayBaseObject, int64
     else Set_CompileMode ( false ) ; //SetState ( compiler, COMPILE_MODE, false ) ;
     if ( word )
     {
-        _Interpreter_DoWord ( interp, word, - 1 ) ;
+        _Interpreter_DoWord (interp, word, - 1 , -1) ;
     }
     else Interpreter_InterpretAToken ( interp, token, - 1 ) ;
     Set_CompileMode ( saveCompileMode ) ;
@@ -153,7 +153,7 @@ CfrTil_ArrayBegin ( void )
             CfrTil_Exception ( OBJECT_SIZE_ERROR, 0, QUIT ) ;
         }
         variableFlag = _CheckArrayDimensionForVariables_And_UpdateCompilerState ( ) ;
-        _WordList_Pop ( cntx->Compiler0->WordList, 0 ) ; // pop the initial '['
+        _WordList_Pop ( _CfrTil_->WordList, 0 ) ; // pop the initial '['
         do
         {
             token = Lexer_ReadToken ( lexer ) ;
@@ -184,7 +184,7 @@ CfrTil_ArrayBegin ( void )
         }
         if ( ( ! Lexer_IsTokenForwardDotted ( cntx->Lexer0 ) ) && ( ! GetState ( cntx->Compiler0, LC_ARG_PARSING ) ) ) cntx->Interpreter0->BaseObject = 0 ;
         DEBUG_SHOW ;
-        _dllist_RemoveNodes_UntilWord ( dllist_First ( ( dllist* ) compiler->WordList ), baseObject ) ;
+        _dllist_RemoveNodes_UntilWord ( dllist_First ( ( dllist* ) _CfrTil_->WordList ), baseObject ) ;
         SetState ( compiler, COMPILE_MODE, saveCompileMode ) ;
         //SetState ( _CfrTil_, OPTIMIZE_ON, svOpState ) ;
         //CfrTil_OptimizeOn ( ) ;

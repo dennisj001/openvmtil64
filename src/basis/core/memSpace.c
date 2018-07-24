@@ -114,7 +114,7 @@ Mem_Allocate ( int64 size, uint64 allocType )
             _Q_->RunTimeAllocation += size ;
             return mmap_AllocMem ( size ) ;
         }
-        default: CfrTil_Exception (MEMORY_ALLOCATION_ERROR, 0, QUIT ) ;
+        default: CfrTil_Exception ( MEMORY_ALLOCATION_ERROR, 0, QUIT ) ;
     }
 }
 
@@ -270,7 +270,7 @@ OVT_MemList_FreeNBAMemory ( byte * name, uint64 moreThan, int64 always )
                 }
             }
         }
-        nba->InitFreedRandMarker = rand () ;
+        nba->InitFreedRandMarker = rand ( ) ;
     }
 }
 
@@ -533,10 +533,13 @@ _OVT_ShowMemoryAllocated ( OpenVmTil * ovt )
         _Printf ( ( byte* ) "\nOVT_InitialUnAccountedMemory                     = %9d : <=: ovt->OVT_InitialUnAccountedMemory", ovt->OVT_InitialUnAccountedMemory ) ; //+ ovt->UnaccountedMem ) ) ;
         _Printf ( ( byte* ) "\nTotalMemSizeTarget                               = %9d : <=: ovt->TotalMemSizeTarget", ovt->TotalMemSizeTarget ) ;
     }
-    else {_Printf ( ( byte*) "\nTotal Memory Allocated                           = %9d"
-                             "\nTotal Memory leaks                               = %9d", ovt->TotalNbaAccountedMemAllocated, leak ) ; }
-    int64 wordSize = (sizeof ( Word ) + sizeof ( WordData )) ;
-    _Printf ( ( byte* )      "\nRecycledWordCount = %5d x %3d bytes : Recycled = %9d", _Q_->MemorySpace0->RecycledWordCount, wordSize, _Q_->MemorySpace0->RecycledWordCount * wordSize) ;
+    else
+    {
+        _Printf ( ( byte* ) "\nTotal Memory Allocated                           = %9d"
+            "\nTotal Memory leaks                               = %9d", ovt->TotalNbaAccountedMemAllocated, leak ) ;
+    }
+    int64 wordSize = ( sizeof ( Word ) + sizeof ( WordData ) ) ;
+    _Printf ( ( byte* ) "\nRecycledWordCount = %5d x %3d bytes : Recycled = %9d", _Q_->MemorySpace0->RecycledWordCount, wordSize, _Q_->MemorySpace0->RecycledWordCount * wordSize ) ;
     Buffer_PrintBuffers ( ) ;
 }
 
@@ -545,10 +548,10 @@ OVT_CheckRecyclableAllocate ( dllist * list, int64 size, int8 checkInUseFlag )
 {
     DLNode * node = 0 ;
     if ( _Q_ && _Q_->MemorySpace0 ) node = ( DLNode* ) dllist_First ( ( dllist* ) list ) ;
-    if ( node ) 
+    if ( node )
     {
 #if 0 // not needed for now because we are only recycling and checking for words        
-        if ( checkInUseFlag ) 
+        if ( checkInUseFlag )
         {
             if ( ( node->n_Size != size ) || ( node->n_InUseFlag != N_FREE ) ) return 0 ;
         }
@@ -564,11 +567,7 @@ OVT_CheckRecyclableAllocate ( dllist * list, int64 size, int8 checkInUseFlag )
 void
 Word_Recycle ( Word * w )
 {
-    d0 ( IsIt_C_LeftParen ( w ) ) ;
-    if ( w ) 
-    {
-        dllist_AddNodeToHead ( _Q_->MemorySpace0->RecycledWordList, ( dlnode* ) w ) ;
-    }
+    if ( w ) dllist_AddNodeToHead ( _Q_->MemorySpace0->RecycledWordList, ( dlnode* ) w ) ;
 }
 
 void
@@ -576,7 +575,7 @@ _CheckRecycleWord ( Word * w )
 {
     if ( w && ( w->S_CAttribute & RECYCLABLE_COPY ) )
     {
-        if ( ! ( IsSourceCodeOn && w->State & W_SOURCE_CODE_MODE ) )
+        if ( ( ! ( IsSourceCodeOn ) ) && GetState ( w, W_SOURCE_CODE_MODE ) )
         {
             d0 ( _Printf ( ( byte* ) "\nrecycling : %s", w->Name ) ) ;
             d0 ( if ( String_Equal ( w->Name, "(" ) ) _Printf ( "\nRecycle : Got it! : %s\n", w->Name ) ) ;
@@ -595,7 +594,7 @@ CheckRecycleWord ( Node * node )
 void
 DLList_RecycleWordList ( dllist * list )
 {
-    //if ( list == (_Compiler_? _Compiler_->WordList : (dllist*) 0) )
+    //if ( list == (_Compiler_? _CfrTil_->WordList : (dllist*) 0) )
     dllist_Map ( list, ( MapFunction0 ) CheckRecycleWord ) ;
     //else dllist_Map ( list, ( MapFunction0 ) _CheckRecycleWord ) ;
 }
@@ -605,7 +604,11 @@ CheckCodeSpaceForRoom ( )
 {
     if ( _Q_CodeByteArray->OurNBA->ba_CurrentByteArray->MemRemaining < ( 4 * K ) )
     {
-        if ( Compiling ) { _Printf ((byte*)"\nLess than 4K of MachineCodeSize remaining : this will probably mean you have to increase codeSize size in openvmtil.c\n"); Pause () ; }
+        if ( Compiling )
+        {
+            _Printf ( ( byte* ) "\nLess than 4K of MachineCodeSize remaining : this will probably mean you have to increase codeSize size in openvmtil.c\n" ) ;
+            Pause ( ) ;
+        }
         _Q_CodeByteArray = _ByteArray_AppendSpace_MakeSure ( _Q_CodeByteArray, 4 * K ) ;
     }
 }

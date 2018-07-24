@@ -341,7 +341,7 @@ typedef struct _WordData
     int64 LineNumber ;
     int64 CursorPosition ;
     int64 StartCharRlIndex ;
-    int64 SC_ScratchPadIndex ;
+    int64 SC_WordIndex ;
     int64 NumberOfArgs ;
     int64 NumberOfLocals ;
     uint64 * InitialRuntimeDsp ;
@@ -425,10 +425,9 @@ typedef struct _WordData
 #define W_SearchNumber W_Value2
 #define W_FoundMarker W_Value3
 #define W_OriginalWord S_WordData->OriginalWord
-#define W_SC_ScratchPadIndex S_WordData->SC_ScratchPadIndex 
+#define W_SC_WordIndex S_WordData->SC_WordIndex 
 #define W_SC_WordList S_WordData->SourceCodeWordList 
 #define W_SC_MemSpaceRandMarker S_WordData->SourceCodeMemSpaceRandMarker
-#define W_SC_WordIndex W_SC_ScratchPadIndex 
 #define W_OpInsnCode S_WordData->OpInsnCode 
 #define W_OpInsnGroup S_WordData->OpInsnGroup
 typedef struct
@@ -751,11 +750,10 @@ typedef struct
     int64 NumberOfRegisterArgs ;
     int64 NumberOfRegisterVariables ;
     int64 LocalsFrameSize ;
-    int64 SaveCompileMode, SaveOptimizeState, SaveScratchPadIndex ;
+    int64 SaveCompileMode, SaveOptimizeState ; //, SaveScratchPadIndex ;
     //int64 LispParenLevel;
     int64 ParenLevel ;
     int64 GlobalParenLevel, OptimizeForcedReturn ;
-    int64 BlockLevel ;
     int64 ArrayEnds ;
     byte * InitHere ;
     int64 * AccumulatedOptimizeOffsetPointer ;
@@ -766,14 +764,14 @@ typedef struct
     byte * RspSaveOffset ;
     byte * RspRestoreOffset ;
     Word * ReturnVariableWord ;
-    Word * CurrentWord, *CurrentWordCompiling, *CurrentCreatedWord ;
-    Word * LHS_Word ; //, *OptimizeOffWord;
+    Word * CurrentWord, *CurrentCreatedWord ;
+    Word * LHS_Word ; 
     Namespace *C_BackgroundNamespace, *C_FunctionBackgroundNamespace ; //, ** FunctionTypesArray ;
     dllist * GotoList ;
     dllist * CurrentSwitchList ;
     dllist * RegisterParameterList ;
     CompileOptimizeInfo * OptInfo ;
-    dllist * WordList, *PostfixLists ;
+    dllist *PostfixLists ;
     Stack * CombinatorInfoStack ;
     Stack * PointerToOffset ;
     Stack * LocalsCompilingNamespacesStack ;
@@ -853,7 +851,6 @@ typedef struct
     System * System0 ;
     Stack * ContextDataStack ;
     byte * Location ;
-    dllist * WordList ;
     Word * CurrentlyRunningWord, *CurrentEvalWord, *NlsWord, *SC_CurrentCombinator, *SourceCodeWord, *CurrentDisassemblyWord ;
     block CurrentlyRunningWordDefinition ;
     NBA * ContextNba ;
@@ -933,7 +930,8 @@ typedef struct _CfrTil
     block Set_DspReg_FromDataStackPointer, Set_DataStackPointer_FromDspReg ; //, PeekReg, PokeReg ;
     block PopDspToR8AndCall, CallReg_TestRSP, Call_ToAddressThruR8_TestAlignRSP ; //adjustRSPAndCall, adjustRSP ;
     ByteArray * PeekPokeByteArray ;
-    Word * LastFinishedWord, *StoreWord, *PokeWord, *ScoOcCrw, *DebugWordListWord, *EndBlockWord, *BeginBlockWord, *InfixNamespace ;
+    Word * LastFinished_DObject, * LastFinished_Word, *StoreWord, *PokeWord, *ScoOcCrw, * CurrentWordCompiling ; 
+    Word *ScWord, *DebugWordListWord, *EndBlockWord, *BeginBlockWord, *InfixNamespace ;
     byte ReadLine_CharacterTable [ 256 ] ;
     ReadLineFunction ReadLine_FunctionTable [ 24 ] ;
     CharacterType LexerCharacterTypeTable [ 256 ] ;
@@ -944,9 +942,9 @@ typedef struct _CfrTil
     byte * OriginalInputLine ;
     byte * TokenBuffer ;
     byte * SC_ScratchPad ; // nb : keep this here -- if we add this field to Lexer it just makes the lexer bigger and we want the smallest lexer possible
-    int64 SC_ScratchPadIndex, SC_QuoteMode, DWL_SC_ScratchPadIndex ; //, SCA_BlockedIndex ;
+    int64 SC_SPIndex, SC_QuoteMode ; // SC_SPI == SC_ScratchPadIndex ;
     byte * LispPrintBuffer ; // nb : keep this here -- if we add this field to Lexer it just makes the lexer bigger and we want the smallest lexer possible
-    dllist *DebugWordList, *TokenList ;
+    dllist *TokenList, * WordList ;
     sigjmp_buf JmpBuf0 ;
 } CfrTil ;
 typedef struct

@@ -292,7 +292,7 @@
 #define DebugWordList_Push( dobj ) _dllist_AddNodeToHead ( _CfrTil_->DebugWordList, ( dlnode* ) dobj )
 #define DbgWL_Push( node ) DebugWordList_Push( node )  
 #define _List_PushNew( list, word, inUseFlag ) _dllist_PushNew_M_Slot_Node ( list, WORD, TEMPORARY, SCN_NUMBER_OF_SLOTS, ((int64) word), word->W_SC_WordIndex, inUseFlag )
-#define CompilerWordList_Push( word, inUseFlag ) _List_PushNew ( _Compiler_->WordList, word, inUseFlag ) 
+#define CompilerWordList_Push( word, inUseFlag ) _List_PushNew ( _CfrTil_->WordList, word, inUseFlag ) 
 #define IsGlobalsSourceCodeOn ( GetState ( _CfrTil_, GLOBAL_SOURCE_CODE_MODE ))
 #define _IsSourceCodeOn ( GetState ( _CfrTil_, DEBUG_SOURCE_CODE_MODE ) )
 #define IsSourceCodeOn ( _IsSourceCodeOn || IsGlobalsSourceCodeOn )
@@ -308,7 +308,8 @@
 #define SC_Global_Off SetState ( _CfrTil_, GLOBAL_SOURCE_CODE_MODE, false )
 #define _Block_SCA( index ) _CfrTil_Block_SetSourceCodeAddress( index )
 #define _Block_SCA_Clear _Block_SCA( -1 ) ;
-#define Compiler_OptimizerWordList_Reset( compiler ) List_Init ( compiler->WordList ) 
+#define SC_SPI _CfrTil_->SC_SPIndex
+#define Compiler_OptimizerWordList_Reset( compiler ) List_Init ( _CfrTil_->WordList ) 
 
 #define Strncat( dst, src, n ) strncat ( (char *__restrict) dst, (const char *__restrict) src, (size_t) n )
 #define Strlen( s ) ( s ? strlen ( (const char *) s ) : 0 )

@@ -22,7 +22,7 @@ CfrTil_IncDec ( int64 op ) // +
 {
     Context * cntx = _Context_ ;
     Compiler * compiler = cntx->Compiler0 ;
-    int64 sd = List_Depth ( compiler->WordList ) ;
+    int64 sd = List_Depth ( _CfrTil_->WordList ) ;
     if ( ( sd > 1 ) && ( ! GetState ( compiler, LC_CFRTIL ) ) ) //|INFIX_LIST_INTERPRET ) )
     {
         Word *one = ( Word* ) _Compiler_WordList ( compiler, 1 ) ; //, *three = Compiler_WordList ( 3 ) ; // the operand
@@ -32,7 +32,7 @@ CfrTil_IncDec ( int64 op ) // +
         SetState ( _Debugger_, DEBUG_SHTL_OFF, true ) ;
         if ( nextWord && ( nextWord->CAttribute & ( CATEGORY_OP_ORDERED | CATEGORY_OP_UNORDERED | CATEGORY_OP_DIVIDE | CATEGORY_OP_EQUAL ) ) ) // postfix
         {
-            List_DropN ( compiler->WordList, 1 ) ; // the operator; let higher level see the variable
+            List_DropN ( _CfrTil_->WordList, 1 ) ; // the operator; let higher level see the variable
             //Interpreter_InterpretNextToken ( cntx->Interpreter0 ) ;
             if ( GetState ( compiler, C_INFIX_EQUAL ) && GetState ( _CfrTil_, OPTIMIZE_ON ) && CompileMode )
             {
@@ -49,8 +49,8 @@ CfrTil_IncDec ( int64 op ) // +
                 Interpreter_InterpretNextToken ( cntx->Interpreter0 ) ;
                 if ( sd > 1 )
                 {
-                    _Interpreter_DoWord ( cntx->Interpreter0, one, - 1 ) ;
-                    _Interpreter_DoWord ( cntx->Interpreter0, currentWord, - 1 ) ;
+                    _Interpreter_DoWord (cntx->Interpreter0, one, - 1 , -1) ;
+                    _Interpreter_DoWord (cntx->Interpreter0, currentWord, - 1 , -1) ;
                     return ;
                 }
             }
@@ -61,21 +61,21 @@ CfrTil_IncDec ( int64 op ) // +
             {
                 if ( ! GetState ( compiler, INFIX_LIST_INTERPRET ) )
                 {
-                    List_DropN ( compiler->WordList, 1 ) ; // the operator; let higher level see the variable
+                    List_DropN ( _CfrTil_->WordList, 1 ) ; // the operator; let higher level see the variable
                     SetHere ( one->Coding ) ;
                     CfrTil_WordList_PushWord ( one ) ;
                     dllist * postfixList = List_New ( ) ;
                     List_Push_1Value_Node ( postfixList, currentWord, COMPILER_TEMP ) ;
                     List_Push_1Value_Node ( postfixList, one, COMPILER_TEMP ) ;
                     List_Push_1Value_Node ( compiler->PostfixLists, postfixList, COMPILER_TEMP ) ;
-                    List_DropN ( compiler->WordList, 1 ) ; // the operator; let higher level see the variable for optimization
+                    List_DropN ( _CfrTil_->WordList, 1 ) ; // the operator; let higher level see the variable for optimization
                     return ;
                 }
             }
         }
         else if ( nextWord && ( nextWord->CAttribute & ( PARAMETER_VARIABLE | LOCAL_VARIABLE | NAMESPACE_VARIABLE ) ) ) // prefix
         {
-            //List_DropN ( compiler->WordList, 1 ) ; // the operator; let higher level see the variable
+            //List_DropN ( _CfrTil_->WordList, 1 ) ; // the operator; let higher level see the variable
             //_Interpreter_DoWord ( cntx->Interpreter0, nextWord, - 1 ) ;
             //_Compiler_CopyDuplicatesAndPush ( compiler, currentWord ) ; // the operator
             //_Interpreter_DoWord ( cntx->Interpreter0, currentWord, - 1 ) ;
@@ -111,7 +111,7 @@ CfrTil_IncDec ( int64 op ) // +
                     for ( i = 1 ; word = _Compiler_WordList ( compiler, i ), ( word->CAttribute & ( CATEGORY_OP_ORDERED | CATEGORY_OP_UNORDERED | CATEGORY_OP_DIVIDE | CATEGORY_OP_EQUAL ) ) ; i ++ ) ;
                     List_Push_1Value_Node ( postfixList, _Compiler_WordList ( compiler, i ), COMPILER_TEMP ) ;
                     List_Push_1Value_Node ( compiler->PostfixLists, postfixList, COMPILER_TEMP ) ;
-                    List_DropN ( compiler->WordList, 1 ) ; // the operator; let higher level see the variable for optimization
+                    List_DropN ( _CfrTil_->WordList, 1 ) ; // the operator; let higher level see the variable for optimization
                     return ;
                 }
             }

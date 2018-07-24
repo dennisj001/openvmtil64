@@ -8,7 +8,7 @@ Interpreter_InterpretAToken ( Interpreter * interp, byte * token, int64 tokenSta
     if ( token )
     {
         word = _Interpreter_TokenToWord ( interp, token ) ;
-        _Interpreter_DoWord ( interp, word, tokenStartReadLineIndex ) ;
+        _Interpreter_DoWord ( interp, word, tokenStartReadLineIndex, - 1 ) ;
     }
     else SetState ( _Context_->Lexer0, LEXER_END_OF_LINE, true ) ;
     return word ;
@@ -25,7 +25,7 @@ Word *
 _Interpreter_DoWord_Default ( Interpreter * interp, Word * word0, int64 scratchPadIndex )
 {
     Word * word = Compiler_CopyDuplicatesAndPush ( word0 ) ;
-    word->W_SC_ScratchPadIndex = scratchPadIndex ? scratchPadIndex : _CfrTil_->SC_ScratchPadIndex ;
+    word->W_SC_WordIndex = scratchPadIndex ? scratchPadIndex : _CfrTil_->SC_SPIndex ;
     interp->w_Word = word ;
     Word_Eval ( word ) ;
     if ( IS_MORPHISM_TYPE ( word ) ) SetState ( _Context_, ADDRESS_OF_MODE, false ) ;
@@ -48,30 +48,28 @@ Interpreter_DoPrefixWord ( Context * cntx, Interpreter * interp, Word * word )
 // we just rearrange the functions and args such that they all become regular rpn - forth like
 
 void
-_Interpreter_DoWord ( Interpreter * interp, Word * word, int64 tokenStartReadLineIndex )
+_Interpreter_DoWord ( Interpreter * interp, Word * word, int64 tokenStartReadLineIndex, int64 scIndex )
 {
     if ( word )
     {
         Context * cntx = _Context_ ;
         int64 tsrli ;
-        Boolean prefixing ;
-        _Compiler_->SaveScratchPadIndex = _CfrTil_->SC_ScratchPadIndex ;
         if ( tokenStartReadLineIndex <= 0 )
         {
             tsrli = _Lexer_->TokenStart_ReadLineIndex ;
         }
         else tsrli = tokenStartReadLineIndex ;
+        word->W_SC_WordIndex = ( scIndex != - 1 ) ? scIndex : _CfrTil_->SC_SPIndex ;
         word->W_TokenStart_ReadLineIndex = tsrli ;
         interp->w_Word = word ;
         if ( ( word->WAttribute == WT_INFIXABLE ) && ( GetState ( cntx, INFIX_MODE ) ) ) // nb. Interpreter must be in INFIX_MODE because it is effective for more than one word
         {
             DEBUG_SETUP ( word ) ;
-            //Namespace_SetState ( _CfrTil_->InfixNamespace, USING ) ;
             Interpreter_InterpretNextToken ( interp ) ;
             // then continue and interpret this 'word' - just one out of lexical order
             _Interpreter_DoWord_Default ( interp, word, 0 ) ;
         }
-        else if ( ( word->WAttribute == WT_PREFIX ) ) 
+        else if ( ( word->WAttribute == WT_PREFIX ) )
         {
             if ( _Interpreter_IsWordPrefixing ( interp, word ) )
             {
@@ -85,7 +83,7 @@ _Interpreter_DoWord ( Interpreter * interp, Word * word, int64 tokenStartReadLin
             DEBUG_SETUP ( word ) ;
             LC_CompileRun_C_ArgList ( word ) ;
         }
-        else _Interpreter_DoWord_Default ( interp, word, 0 ) ; //  case WT_POSTFIX: case WT_INFIXABLE: // cf. also _Interpreter_SetupFor_MorphismWord
+        else _Interpreter_DoWord_Default ( interp, word, _CfrTil_->SC_SPIndex ) ; //  case WT_POSTFIX: case WT_INFIXABLE: // cf. also _Interpreter_SetupFor_MorphismWord
         if ( ! ( word->CAttribute & DEBUG_WORD ) ) interp->LastWord = word ;
         if ( ! GetState ( _Context_, ( C_SYNTAX ) ) ) List_InterpretLists ( _Compiler_->PostfixLists ) ;
     }
@@ -111,7 +109,7 @@ _Interpreter_NewWord ( Interpreter * interp, byte * token )
                     if ( ! String_Equal ( token2, "=" ) ) return 0 ; // it was already 'interpreted' by Lexer_ObjectToken_New
                 }
             }
-            word->W_SC_ScratchPadIndex = _CfrTil_->SC_ScratchPadIndex ;
+            word->W_SC_WordIndex = _CfrTil_->SC_SPIndex ;
             return interp->w_Word = word ;
         }
     }

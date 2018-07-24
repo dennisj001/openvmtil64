@@ -4,7 +4,7 @@ void
 CfrTil_DoWord ( )
 {
     Word * word = ( Word* ) DataStack_Pop ( ) ;
-    _Interpreter_DoWord (_Context_->Interpreter0, word, - 1 ) ;
+    _Interpreter_DoWord (_Context_->Interpreter0, word, - 1 , -1) ;
 }
 
 void
@@ -110,7 +110,7 @@ void
 CfrTil_Interpreter_EvalWord ( )
 {
 
-    _Interpreter_DoWord (_Context_->Interpreter0, ( Word* ) DataStack_Pop ( ), - 1 ) ;
+    _Interpreter_DoWord (_Context_->Interpreter0, ( Word* ) DataStack_Pop ( ), - 1 , -1) ;
 }
 
 void

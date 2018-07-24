@@ -7,7 +7,7 @@
         <activeConfTypeElem>0</activeConfTypeElem>
         <activeConfIndexElem>0</activeConfIndexElem>
     </data>
-    <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="9">
+    <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="14">
         <file>
             <url>basis/compiler/blocks.c</url>
             <bookmark id="7">
@@ -17,20 +17,20 @@
             </bookmark>
             <bookmark id="6">
                 <name/>
-                <line>287</line>
+                <line>290</line>
                 <key/>
             </bookmark>
         </file>
         <file>
             <url>basis/lambdaCalculus.c</url>
-            <bookmark id="8">
+            <bookmark id="11">
                 <name/>
-                <line>707</line>
+                <line>139</line>
                 <key/>
             </bookmark>
-            <bookmark id="9">
+            <bookmark id="12">
                 <name/>
-                <line>1791</line>
+                <line>470</line>
                 <key/>
             </bookmark>
         </file>
@@ -51,36 +51,39 @@
             <url>basis/compiler/optimize.c</url>
             <bookmark id="2">
                 <name/>
-                <line>106</line>
+                <line>102</line>
                 <key/>
             </bookmark>
             <bookmark id="3">
                 <name/>
-                <line>182</line>
+                <line>181</line>
+                <key/>
+            </bookmark>
+        </file>
+        <file>
+            <url>basis/sourceCode.c</url>
+            <bookmark id="14">
+                <name/>
+                <line>30</line>
+                <key/>
+            </bookmark>
+            <bookmark id="13">
+                <name/>
+                <line>283</line>
                 <key/>
             </bookmark>
         </file>
     </editor-bookmarks>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/media/sdc4/dennisj/openvmtil64/src/basis/core/interpret.c</file>
-            <file>file:/media/sdc4/dennisj/openvmtil64/src/basis/core/string.c</file>
-            <file>file:/media/sdc4/dennisj/openvmtil64/src/basis/compiler/optimize.c</file>
-            <file>file:/media/sdc4/dennisj/openvmtil64/src/basis/core/namespace.c</file>
-            <file>file:/media/sdc4/dennisj/openvmtil64/src/basis/openVmTil.c</file>
-            <file>file:/media/sdc4/dennisj/openvmtil64/src/basis/core/dobject.c</file>
-            <file>file:/media/sdc4/dennisj/openvmtil64/src/primitives/compilers.c</file>
-            <file>file:/media/sdc4/dennisj/openvmtil64/src/basis/core/block.c</file>
-            <file>file:/media/sdc4/dennisj/openvmtil64/src/basis/core/dataObjectNew.c</file>
-            <file>file:/media/sdc4/dennisj/openvmtil64/src/basis/core/word.c</file>
+            <file>file:/media/sdc4/dennisj/openvmtil64/src/basis/compiler/blocks.c</file>
             <file>file:/media/sdc4/dennisj/openvmtil64/src/include/macros.h</file>
-            <file>file:/media/sdc4/dennisj/openvmtil64/src/primitives/systems.c</file>
-            <file>file:/media/sdc4/dennisj/openvmtil64/src/basis/lambdaCalculus.c</file>
-            <file>file:/media/sdc4/dennisj/openvmtil64/src/basis/system.c</file>
+            <file>file:/media/sdc4/dennisj/openvmtil64/src/basis/compiler/compiler.c</file>
             <file>file:/media/sdc4/dennisj/openvmtil64/src/basis/sourceCode.c</file>
-            <file>file:/media/sdc4/dennisj/openvmtil64/src/basis/core/finder.c</file>
-            <file>file:/media/sdc4/dennisj/openvmtil64/src/primitives/primitives.c</file>
-            <file>file:/media/sdc4/dennisj/openvmtil64/.init.cft</file>
+            <file>file:/media/sdc4/dennisj/openvmtil64/src/basis/openVmTil.c</file>
+            <file>file:/media/sdc4/dennisj/openvmtil64/src/basis/context.c</file>
+            <file>file:/media/sdc4/dennisj/openvmtil64/src/basis/core/block.c</file>
+            <file>file:/media/sdc4/dennisj/openvmtil64/src/primitives/syntaxes.c</file>
         </group>
     </open-files>
 </project-private>

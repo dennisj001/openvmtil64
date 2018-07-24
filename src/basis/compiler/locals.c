@@ -54,11 +54,12 @@ _Compiler_RemoveLocalFrame ( Compiler * compiler )
 {
     int64 parameterVarsSubAmount ;
     Boolean returnValueFlag ;
+    Set_SCA ( 0 ) ;
     Compiler_SetLocalsFrameSize_AtItsCellOffset ( compiler ) ;
     parameterVarsSubAmount = ( ( compiler->NumberOfArgs ) * CELL ) ;
     //parameterVarsSubAmount = ( ( compiler->NumberOfArgs + ( IsSourceCodeOn ? 1 : 0 ) ) * CELL ) ;
     returnValueFlag = ( _Context_->CurrentlyRunningWord->CAttribute & C_RETURN ) || ( GetState ( compiler, RETURN_TOS | RETURN_ACCUM ) ) || IsWordRecursive || compiler->ReturnVariableWord ;
-    if ( ( ! returnValueFlag ) && GetState ( _Context_, C_SYNTAX ) && ( compiler->CurrentWordCompiling->S_ContainingNamespace ) && ( ! String_Equal ( compiler->CurrentWordCompiling->S_ContainingNamespace->Name, "void" ) ) )
+    if ( ( ! returnValueFlag ) && GetState ( _Context_, C_SYNTAX ) && ( _CfrTil_->CurrentWordCompiling->S_ContainingNamespace ) && ( ! String_Equal ( _CfrTil_->CurrentWordCompiling->S_ContainingNamespace->Name, "void" ) ) )
     {
         SetState ( compiler, RETURN_TOS, true ) ;
     }

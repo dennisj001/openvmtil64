@@ -70,7 +70,7 @@ _Interpret_Until_Token ( Interpreter * interp, byte * end, byte * delimiters )
 void
 _Interpret_PrefixFunction_Until_Token ( Interpreter * interp, Word * prefixFunction, byte * end, byte * delimiters )
 {
-    int64 svscwi = _CfrTil_->SC_ScratchPadIndex ;
+    int64 svscwi = _CfrTil_->SC_SPIndex ;
     _Interpret_Until_Token ( interp, end, delimiters ) ;
     SetState ( _Context_->Compiler0, PREFIX_ARG_PARSING, false ) ;
     if ( prefixFunction ) _Interpreter_DoWord_Default ( interp, prefixFunction, svscwi ) ;
@@ -83,7 +83,7 @@ _Interpret_PrefixFunction_Until_RParen ( Interpreter * interp, Word * prefixFunc
     {
         Word * word ;
         byte * token ;
-        int64 svs_c_rhs, flag = 0, svscwi = _CfrTil_->SC_ScratchPadIndex ;
+        int64 svs_c_rhs, flag = 0, svscwi = _CfrTil_->SC_SPIndex ;
         Compiler * compiler = _Context_->Compiler0 ;
         while ( 1 )
         {

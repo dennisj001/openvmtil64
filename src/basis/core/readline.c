@@ -403,7 +403,7 @@ ReadLiner_InsertTextMacro ( ReadLiner * rl, Word * word )
     int64 nlen = ( Strlen ( ( char* ) word->Name ) + 1 ) ;
     String_InsertDataIntoStringSlot ( rl->InputLine, rl->ReadIndex - nlen, rl->ReadIndex, ( byte* ) word->W_Value ) ; // size in bytes
     rl->ReadIndex -= nlen ;
-    _CfrTil_UnAppendFromSourceCode ( _CfrTil_, nlen ) ;
+    _CfrTil_UnAppendFromSourceCode_NChars ( _CfrTil_, nlen ) ;
 }
 
 void

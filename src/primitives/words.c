@@ -4,6 +4,7 @@
 void
 _CfrTil_Colon ( )
 {
+    Set_SCA (0) ;
     CfrTil_RightBracket ( ) ;
     CfrTil_SourceCode_Init ( ) ;
     CfrTil_Token ( ) ;
@@ -24,11 +25,11 @@ CfrTil_Colon ( )
 }
 
 Word *
-_CfrTil_SemiColon ( )
+_CfrTil_InitFinal ( )
 {
     block b = ( block ) DataStack_Pop ( ) ;
     Word * word = ( Word* ) DataStack_Pop ( ) ;
-    _Word_InitFinal ( word, ( byte* ) b ) ;
+    Word_InitFinal ( word, ( byte* ) b ) ;
     return word ;
 }
 
@@ -36,7 +37,7 @@ void
 CfrTil_SemiColon ( )
 {
     CfrTil_EndBlock ( ) ;
-    _CfrTil_SemiColon ( ) ;
+    _CfrTil_InitFinal ( ) ;
 }
 
 void
@@ -155,7 +156,7 @@ CfrTil_Word ( )
 {
     block b = ( block ) DataStack_Pop ( ) ;
     byte * name = ( byte* ) DataStack_Pop ( ) ;
-    _DataObject_New ( CFRTIL_WORD, 0, name, 0, 0, 0, 0, ( int64 ) b, 0 ) ;
+    _DataObject_New (CFRTIL_WORD, 0, name, 0, 0, 0, 0, ( int64 ) b, 0 , -1) ;
 }
 
 void
@@ -232,7 +233,7 @@ CompileTime_Location ( )
     }
     else
     {
-        Location_Printf ( ) ;
+        CfrTil_Location_Printf ( ) ;
     }
 }
 
@@ -252,29 +253,33 @@ Word_Namespace ( )
 void
 CfrTil_Keyword ( void )
 {
-    if ( _CfrTil_->LastFinishedWord ) _CfrTil_->LastFinishedWord->CAttribute |= KEYWORD ;
+    Word * word = _CfrTil_->LastFinished_DObject ; 
+    if ( word ) word->CAttribute |= KEYWORD ;
 }
 
 void
 CfrTil_Immediate ( void )
 {
-    if ( _CfrTil_->LastFinishedWord ) _CfrTil_->LastFinishedWord->CAttribute |= IMMEDIATE ;
+    Word * word = _CfrTil_->LastFinished_DObject ; 
+    if ( word ) word->CAttribute |= IMMEDIATE ;
 }
 
 void
 CfrTil_StackVariable ( void )
 {
-    if ( _CfrTil_->LastFinishedWord )
+    Word * word = _CfrTil_->LastFinished_DObject ; 
+    if ( word )
     {
-        _CfrTil_->LastFinishedWord->CAttribute2 |= VARIABLE ;
-        _CfrTil_->LastFinishedWord->CAttribute |= STACK_VARIABLE ;
+        word->CAttribute2 |= VARIABLE ;
+        word->CAttribute |= STACK_VARIABLE ;
     }
 }
 
 void
 CfrTil_Syntactic ( void )
 {
-    if ( _CfrTil_->LastFinishedWord ) _CfrTil_->LastFinishedWord->CAttribute2 |= SYNTACTIC ;
+    Word * word = _CfrTil_->LastFinished_DObject ; 
+    if ( word ) word->CAttribute2 |= SYNTACTIC ;
 }
 
 void
@@ -292,50 +297,55 @@ CfrTil_IsImmediate ( void )
 void
 CfrTil_Inline ( void )
 {
-    if ( _CfrTil_->LastFinishedWord ) _CfrTil_->LastFinishedWord->CAttribute |= INLINE ;
+    Word * word = _CfrTil_->LastFinished_DObject ; 
+    if ( word ) word->CAttribute |= INLINE ;
 }
 
 void
 CfrTil_Prefix ( void )
 {
-    if ( _CfrTil_->LastFinishedWord )
+    Word * word = _CfrTil_->LastFinished_DObject ; 
+    if ( word )
     {
-        //_CfrTil_->LastFinishedWord->CAttribute |= PREFIX ;
-        _CfrTil_->LastFinishedWord->WAttribute = WT_PREFIX ;
+        //word->CAttribute |= PREFIX ;
+        word->WAttribute = WT_PREFIX ;
     }
 }
 
 void
 CfrTil_C_Prefix ( void )
 {
-    if ( _CfrTil_->LastFinishedWord )
+    Word * word = _CfrTil_->LastFinished_DObject ; 
+    if ( word )
     {
-        _CfrTil_->LastFinishedWord->CAttribute |= C_PREFIX | C_PREFIX_RTL_ARGS ;
-        _CfrTil_->LastFinishedWord->WAttribute = WT_C_PREFIX_RTL_ARGS ;
+        word->CAttribute |= C_PREFIX | C_PREFIX_RTL_ARGS ;
+        word->WAttribute = WT_C_PREFIX_RTL_ARGS ;
     }
 }
 
 void
 CfrTil_C_Return ( void )
 {
-    if ( _CfrTil_->LastFinishedWord )
+    Word * word = _CfrTil_->LastFinished_DObject ; 
+    if ( word )
     {
-        _CfrTil_->LastFinishedWord->CAttribute |= C_RETURN | C_PREFIX_RTL_ARGS ;
-        _CfrTil_->LastFinishedWord->WAttribute = WT_C_PREFIX_RTL_ARGS ;
+        word->CAttribute |= C_RETURN | C_PREFIX_RTL_ARGS ;
+        word->WAttribute = WT_C_PREFIX_RTL_ARGS ;
     }
 }
 
 void
 CfrTil_Void_Return ( void )
 {
-    if ( _CfrTil_->LastFinishedWord )
+    Word * word = _CfrTil_->LastFinished_DObject ; 
+    if ( word )
     {
-        _CfrTil_->LastFinishedWord->CAttribute &= ~ C_RETURN ;
-        _CfrTil_->LastFinishedWord->CAttribute |= VOID_RETURN ;
+        word->CAttribute &= ~ C_RETURN ;
+        word->CAttribute |= VOID_RETURN ;
         if ( GetState ( _Context_, C_SYNTAX ) )
         {
-            _CfrTil_->LastFinishedWord->CAttribute |= C_PREFIX_RTL_ARGS ;
-            _CfrTil_->LastFinishedWord->WAttribute = WT_C_PREFIX_RTL_ARGS ;
+            word->CAttribute |= C_PREFIX_RTL_ARGS ;
+            word->WAttribute = WT_C_PREFIX_RTL_ARGS ;
         }
     }
 }
@@ -343,17 +353,19 @@ CfrTil_Void_Return ( void )
 void
 CfrTil_RAX_Return ( void )
 {
-    if ( _CfrTil_->LastFinishedWord )
+    Word * word = _CfrTil_->LastFinished_DObject ; 
+    if ( word )
     {
-        _CfrTil_->LastFinishedWord->CAttribute &= ~ C_RETURN ;
-        _CfrTil_->LastFinishedWord->CAttribute2 |= RAX_RETURN ;
+        word->CAttribute &= ~ C_RETURN ;
+        word->CAttribute2 |= RAX_RETURN ;
     }
 }
 
 void
 CfrTil_DebugWord ( void )
 {
-    if ( _CfrTil_->LastFinishedWord ) _CfrTil_->LastFinishedWord->CAttribute |= DEBUG_WORD ;
+    Word * word = _CfrTil_->LastFinished_DObject ; 
+    if ( word ) word->CAttribute |= DEBUG_WORD ;
 }
 
 void

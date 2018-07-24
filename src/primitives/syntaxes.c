@@ -71,7 +71,7 @@ CfrTil_C_Semi ( )
     if ( ! Compiling )
     {
         CfrTil_InitSourceCode ( _CfrTil_ ) ;
-        Compiler_Init ( compiler, 0 ) ;
+        Compiler_Init ( compiler, 0, 0 ) ;
     }
     else
     {
@@ -84,11 +84,12 @@ void
 CfrTil_End_C_Block ( )
 {
     Context * cntx = _Context_ ;
+    Compiler * compiler = cntx->Compiler0 ;
     CfrTil_EndBlock ( ) ; // NB. CfrTil_EndBlock changes cntx->Compiler0->BlockLevel
-    if ( ! cntx->Compiler0->BlockLevel ) _CfrTil_SemiColon ( ) ;
+    if ( ! Compiler_BlockLevel ( compiler )  ) _CfrTil_InitFinal ( ) ;
     else
     {
-        Compiler * compiler = cntx->Compiler0 ;
+        // we're still compiling so ... ??
         Word * word = cntx->CurrentlyRunningWord ;
         word->W_NumberOfArgs = compiler->NumberOfArgs ;
         word->W_NumberOfLocals = compiler->NumberOfLocals ;
@@ -114,7 +115,7 @@ CfrTil_C_Class_New ( void )
 {
     byte * name = ( byte* ) DataStack_Pop ( ) ;
 
-    return _DataObject_New ( C_CLASS, 0, name, 0, 0, 0, 0, 0, 0 ) ;
+    return _DataObject_New (C_CLASS, 0, name, 0, 0, 0, 0, 0, 0 , -1) ;
 }
 
 void
@@ -128,7 +129,7 @@ CfrTil_If_C_Combinator ( )
 {
     Compiler * compiler = _Compiler_ ;
     Word * combinatorWord0 = Compiler_WordList ( 0 ) ;
-    combinatorWord0->W_SC_ScratchPadIndex = _CfrTil_->SC_ScratchPadIndex ;
+    combinatorWord0->W_SC_WordIndex = _CfrTil_->SC_SPIndex ;
     byte svscp = GetState ( compiler, C_COMBINATOR_PARSING ) ;
     SetState ( compiler, C_COMBINATOR_PARSING, true ) ;
     compiler->TakesLParenAsBlock = true ;
@@ -152,7 +153,7 @@ void
 CfrTil_DoWhile_C_Combinator ( )
 {
     Word * currentWord0 = Compiler_WordList ( 0 ) ;
-    currentWord0->W_SC_ScratchPadIndex = _CfrTil_->SC_ScratchPadIndex ;
+    currentWord0->W_SC_WordIndex = _CfrTil_->SC_SPIndex ;
     byte * start = Here ;
     _Compiler_->BeginBlockFlag = false ;
     CfrTil_Interpret_C_Blocks ( 1, 0, 0 ) ;
@@ -172,7 +173,7 @@ void
 CfrTil_For_C_Combinator ( )
 {
     Word * currentWord0 = Compiler_WordList ( 0 ) ;
-    currentWord0->W_SC_ScratchPadIndex = _CfrTil_->SC_ScratchPadIndex ;
+    currentWord0->W_SC_WordIndex = _CfrTil_->SC_SPIndex ;
     //_Compiler_->SemicolonEndsThisBlock = true ;
     _Compiler_->TakesLParenAsBlock = true ;
     _Compiler_->BeginBlockFlag = false ;
@@ -185,7 +186,7 @@ void
 CfrTil_Loop_C_Combinator ( )
 {
     Word * currentWord0 = Compiler_WordList ( 0 ) ;
-    currentWord0->W_SC_ScratchPadIndex = _CfrTil_->SC_ScratchPadIndex ;
+    currentWord0->W_SC_WordIndex = _CfrTil_->SC_SPIndex ;
     _Compiler_->BeginBlockFlag = false ;
     CfrTil_Interpret_C_Blocks ( 1, 0, 0 ) ;
     _Context_->SC_CurrentCombinator = currentWord0 ;
@@ -196,7 +197,7 @@ void
 CfrTil_While_C_Combinator ( )
 {
     Word * currentWord0 = Compiler_WordList ( 0 ) ;
-    currentWord0->W_SC_ScratchPadIndex = _CfrTil_->SC_ScratchPadIndex ;
+    currentWord0->W_SC_WordIndex = _CfrTil_->SC_SPIndex ;
     byte * start = Here ;
     _Compiler_->TakesLParenAsBlock = true ;
     _Compiler_->BeginBlockFlag = false ;

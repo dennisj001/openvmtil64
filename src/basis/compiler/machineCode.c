@@ -428,7 +428,8 @@ Compile_X_Group5 ( Compiler * compiler, int64 op )
             Compile_MoveImm_To_Reg ( ACC, optInfo->Optimize_Imm, CELL ) ;
             optInfo->Optimize_Mod = REG ;
             optInfo->Optimize_Rm = ACC ;
-        }
+        } 
+        _Set_SCA ( optInfo->opWord ) ;
         _Compile_Group5 ( op, optInfo->Optimize_Mod, optInfo->Optimize_Rm, 0, optInfo->Optimize_Disp, 0 ) ;
     }
     else if ( one && one->CAttribute & ( PARAMETER_VARIABLE | LOCAL_VARIABLE | NAMESPACE_VARIABLE ) ) // *( ( cell* ) ( TOS ) ) += 1 ;
@@ -439,6 +440,7 @@ Compile_X_Group5 ( Compiler * compiler, int64 op )
         {
             Compile_GetVarLitObj_RValue_To_Reg ( one, ACC ) ;
             //_Compile_Group5 ( int8 code, int8 mod, int8 rm, int8 sib, int64 disp, int8 size )
+            Set_SCA ( 0 ) ;
             _Compile_Group5 ( op, REG, ACC, 0, 0, 0 ) ;
             // ++ == += :: -- == -= so :
             _Compile_SetVarLitObj_With_Reg ( one, ACC, OREG ) ;

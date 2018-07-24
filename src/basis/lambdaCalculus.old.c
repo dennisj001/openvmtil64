@@ -410,7 +410,7 @@ _LO_Define ( ListObject * idNode, ListObject * locals )
     Word * word = idNode->Lo_CfrTilWord ;
     word->Definition = 0 ; // reset the definition from LO_Read
     value0 = _LO_Next ( idNode ) ;
-    compiler->CurrentWordCompiling = word ;
+    _CfrTil_->CurrentWordCompiling = word ;
     word->Lo_CfrTilWord = word ;
     SetState ( _Q_->OVT_LC, ( LC_DEFINE_MODE ), true ) ;
     word->W_SourceCode = _Q_->OVT_LC->LC_SourceCode ; //String_New ( _Q_->OVT_LC->LC_SourceCode, STRING_MEM ) ; //String_New ( _CfrTil_->SC_ScratchPad, STRING_MEM ) ;
@@ -788,7 +788,7 @@ _LO_Apply_Arg ( ListObject ** pl1, int64 i, int8 svCompileMode )
                 CfrTil_Exception ( OBJECT_SIZE_ERROR, 0, QUIT ) ;
             }
             variableFlag = _CheckArrayDimensionForVariables_And_UpdateCompilerState ( ) ;
-            _WordList_Pop ( _Context_->Compiler0->WordList, 0 ) ; // pop the initial '['
+            _WordList_Pop ( _CfrTil_->WordList, 0 ) ; // pop the initial '['
             do
             {
                 word = l1 ;
@@ -1008,7 +1008,7 @@ CompileLispBlock ( ListObject *args, ListObject * body )
     Compiler *compiler = _Context_->Compiler0 ;
     block code ;
     byte * here = Here ;
-    Word * word = compiler->CurrentWordCompiling ;
+    Word * word = _CfrTil_->CurrentWordCompiling ;
     LO_BeginBlock ( ) ; // must have a block before local variables if there are register variables because _CfrTil_Parse_LocalsAndStackVariables will compile something
     Namespace * locals = _CfrTil_Parse_LocalsAndStackVariables ( 1, 1, args, 0, 0 ) ;
     word->CAttribute = BLOCK ;
@@ -1034,7 +1034,7 @@ CompileLispBlock ( ListObject *args, ListObject * body )
     }
     //DebugShow_OFF ;
     //_Word_InitFinal ( word, ( byte* ) code ) ; // nb. LISP_COMPILE_MODE is reset by _Word_Finish
-    _Word_DefinitionStore ( word, ( block ) code ) ; // not _Word_InitFinal because this is already compiler->CurrentWordCompiling with W_SourceCode, etc.
+    _Word_DefinitionStore ( word, ( block ) code ) ; // not _Word_InitFinal because this is already _CfrTil_->CurrentWordCompiling with W_SourceCode, etc.
     //Compiler_Init ( _Context_->Compiler0, 0 ) ; // not really necessary should always be handled by EndBlock ?? but this allows for some syntax errors with a '{' but no '}' ??
 
     //DebugShow_ON ;

@@ -109,7 +109,7 @@ CfrTil_PrintReturnStackWindow ( )
 void
 _CfrTil_NamespacesInit ( CfrTil * cfrTil )
 {
-    Namespace * ns = _DataObject_New ( NAMESPACE, 0, ( byte* ) "Namespaces", 0, 0, 0, 0, 0, 0 ) ;
+    Namespace * ns = _DataObject_New (NAMESPACE, 0, ( byte* ) "Namespaces", 0, 0, 0, 0, 0, 0 , -1) ;
     ns->State |= USING ; // nb. _Namespace_SetState ( ns, USING ) ; // !! can't be used with "Namespaces"
     cfrTil->Namespaces = ns ;
     CfrTil_AddCPrimitives ( ) ;
@@ -275,7 +275,6 @@ _CfrTil_New ( CfrTil * cfrTil )
     Linux_SetupSignals ( &cfrTil->JmpBuf0, 1 ) ;
     return cfrTil ;
 }
-
 
 void
 CfrTil_OptimizeOn ( )

@@ -162,7 +162,7 @@ _Debugger_Locals_Show ( Debugger * debugger, Word * scWord )
 void
 Debugger_Locals_Show ( Debugger * debugger )
 {
-    Word * scWord = Compiling ? _Compiler_->CurrentWordCompiling :
+    Word * scWord = Compiling ? _CfrTil_->CurrentWordCompiling :
         ( debugger->DebugAddress ? Word_GetFromCodeAddress ( debugger->DebugAddress ) : _Context_->CurrentlyRunningWord ) ;
     _Debugger_Locals_Show ( debugger, scWord ) ;
 }

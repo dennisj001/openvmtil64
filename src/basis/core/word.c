@@ -4,8 +4,9 @@ void
 Word_SetCoding ( Word * word, byte * address )
 {
     //if ( ( word->CAttribute2 & ( SYNTACTIC | NO_OP_WORD | NO_CODING ) ) || ( word->CAttribute & ( DEBUG_WORD ) ) || ( word->LAttribute & ( W_COMMENT | W_PREPROCESSOR ) ) ) word->Coding = 0 ;
-    if ( ( word->CAttribute2 & ( SYNTACTIC | NO_OP_WORD | NO_CODING ) ) || ( word->LAttribute & ( W_COMMENT | W_PREPROCESSOR ) ) ) word->Coding = 0 ;
-    else word->Coding = address ;
+    //if ( ( word->CAttribute2 & ( NO_OP_WORD | NO_CODING ) ) || ( word->CAttribute & ( DEBUG_WORD ) ) || ( word->LAttribute & ( W_COMMENT | W_PREPROCESSOR ) ) ) word->Coding = 0 ; //
+    //else 
+    word->Coding = address ;
 }
 
 //block CurrentDefinition ;
@@ -33,7 +34,7 @@ Word_Eval ( Word * word )
     if ( word )
     {
         _Context_->CurrentEvalWord = word ;
-        if ( ! word->W_SC_ScratchPadIndex ) word->W_SC_ScratchPadIndex = _CfrTil_->SC_ScratchPadIndex ; // nb! : needs to be done for compile also
+        if ( ! word->W_SC_WordIndex ) word->W_SC_WordIndex = _CfrTil_->SC_SPIndex ; // nb! : needs to be done for compile also
         DEBUG_SETUP ( word ) ;
         if ( ! GetState ( word, STEPPED ) )
         {
@@ -51,79 +52,11 @@ Word_Eval ( Word * word )
     }
 }
 
-#if 0
-
-void
-Word_Run_Debug ( Word * word )
-{
-    //if ( ! sigsetjmp ( _Context_->JmpBuf0, 0 ) )
-    {
-        Word_Run ( word ) ;
-    }
-    //else _Dsp_ = _CfrTil_->SaveDsp ;
-}
-
-void
-_Word_Eval_Debug ( Word * word )
-{
-    if ( word )
-    {
-        DEBUG_SETUP ( word ) ;
-        if ( ! GetState ( _Debugger_, DBG_STEPPED ) )
-        {
-            if ( ( word->CAttribute & IMMEDIATE ) || ( ! CompileMode ) )
-            {
-                Word_Run_Debug ( word ) ;
-            }
-            else
-            {
-                _Word_Compile ( word ) ;
-            }
-        }
-        DEBUG_SHOW ;
-    }
-}
-
-void
-Word_Eval ( Word * word )
-{
-    if ( word )
-    {
-        //_Context_->CurrentlyRunningWord = word ;
-        if ( Is_DebugModeOn ) _Word_Eval_Debug ( word ) ;
-        else _Word_Eval ( word ) ;
-    }
-}
-#endif
-
 void
 _Word_Interpret ( Word * word )
 {
-    _Interpreter_DoWord ( _Interpreter_, word, - 1 ) ;
+    _Interpreter_DoWord (_Interpreter_, word, - 1 , -1) ;
 }
-
-#if 0 // RSP_ADJUST
-Boolean rspAdjusted = false ;
-uint64 * ARsp ;
-
-void
-RspAdjust ( )
-{
-    if ( _CfrTil_->SaveSelectedCpuState ( ), ( ( uint64 ) _CfrTil_->cs_Cpu->Rsp & ( uint64 ) 0x8 ) )
-    {
-        ARsp = _CfrTil_->cs_Cpu->Rsp, _CfrTil_->cs_Cpu->Rsp += 0x8, _CfrTil_->RestoreSelectedCpuState ( ), rspAdjusted = true ;
-    }
-}
-
-void
-RspRestore ( )
-{
-    if ( rspAdjusted )
-    {
-        _CfrTil_->cs_Cpu->Rsp = ARsp, _CfrTil_->RestoreSelectedCpuState ( ), rspAdjusted = false ;
-    }
-}
-#endif
 
 void
 _Word_Compile ( Word * word )
@@ -174,8 +107,8 @@ Word_Copy ( Word * word0, uint64 allocType )
 void
 _Word_Finish ( Word * word )
 {
-    _DObject_Finish ( word ) ;
-    CfrTil_Word_FinishSourceCode ( _CfrTil_, word ) ;
+    //DObject_Finish ( word ) ;
+    CfrTil_FinishSourceCode ( _CfrTil_, word ) ;
 }
 
 void
@@ -185,7 +118,7 @@ _Word_DefinitionStore ( Word * word, block code )
 }
 
 void
-_Word_InitFinal ( Word * word, byte * code )
+Word_InitFinal ( Word * word, byte * code )
 {
     _Word_DefinitionStore ( word, ( block ) code ) ;
     if ( ! word->S_ContainingNamespace ) _Word_Add ( word, 1, 0 ) ; // don't re-add if it is a recursive word cf. CfrTil_BeginRecursiveWord
@@ -243,6 +176,7 @@ _Word_Create ( byte * name, uint64 ctype, uint64 ctype2, uint64 ltype, uint64 al
     word->LAttribute = ltype ;
     if ( Is_NamespaceType ( word ) ) word->Lo_List = dllist_New ( ) ;
     _Compiler_->CurrentCreatedWord = word ;
+    _CfrTil_->WordCreateCount ++ ;
     return word ;
 }
 
@@ -255,7 +189,7 @@ Word_SetLocation ( Word * word )
         word->S_WordData->Filename = rl->Filename ;
         word->S_WordData->LineNumber = rl->LineNumber ;
         word->W_CursorPosition = rl->CursorPosition ;
-        //word->W_TokenStart_ReadLineIndex = _Lexer_->TokenStart_ReadLineIndex ;
+        word->W_TokenStart_ReadLineIndex = _Lexer_->TokenStart_ReadLineIndex ; // ?? must not be set here ??
     }
 }
 
@@ -264,9 +198,8 @@ _Word_New ( byte * name, uint64 ctype, uint64 ctype2, uint64 ltype, int8 addToIn
 {
     CheckCodeSpaceForRoom ( ) ;
     Word * word = _Word_Create ( name, ctype, ctype2, ltype, allocType ) ; // CFRTIL_WORD : cfrTil compiled words as opposed to C compiled words
-    _Context_->Compiler0->CurrentWord = word ;
+    _Compiler_->CurrentWord = word ;
     Word_SetLocation ( word ) ;
-    _CfrTil_->WordCreateCount ++ ;
     _Word_Add ( word, addToInNs, addToNs ) ; // add to the head of the list
     return word ;
 }
@@ -300,23 +233,9 @@ Word_PrintOffset ( Word * word, int64 increment, int64 totalIncrement )
     if ( Is_DebugModeOn ) DefaultColors ;
 }
 
-void
-_Location_Printf ( Location * loc )
-{
-    if ( loc ) _Printf ( ( byte* ) "\nRun Time Location : %s %d.%d", loc->Filename, loc->LineNumber, loc->CursorPosition ) ;
-}
-
-void
-Location_Printf ( )
-{
-    Location * loc = ( Location* ) DataStack_Pop ( ) ;
-    if ( loc ) _Printf ( ( byte* ) "\nRun Time Location : %s %d.%d", loc->Filename, loc->LineNumber, loc->CursorPosition ) ;
-}
-
 byte *
 _Word_SourceCodeLocation_pbyte ( Word * word )
 {
-    //Buffer * buffer = Buffer_New ( BUFFER_SIZE ) ;
     byte * b = Buffer_Data ( _CfrTil_->ScratchB2 ) ;
     if ( word ) sprintf ( ( char* ) b, "%s.%s : %s %ld.%ld", word->ContainingNamespace->Name, word->Name, word->S_WordData->Filename, word->S_WordData->LineNumber, word->W_TokenEnd_ReadLineIndex ) ;
     return String_New ( b, TEMPORARY ) ;
@@ -341,9 +260,8 @@ Word_Info ( Word * word )
 }
 
 void
-Word_Show ( Word * word )
+Word_Print ( Word * word )
 {
-    //if ( word ) _Printf ( ( byte* ) "\n%s.%s : %s %d.%d", word->ContainingNamespace->Name, word->Name ) ;
     if ( word ) _Printf ( ( byte* ) "\n%s", Word_Info ( word ) ) ;
 }
 
@@ -421,11 +339,9 @@ _CfrTil_Alias ( Word * word, byte * name )
 {
     if ( word && word->Definition )
     {
-        //while ( ( word->Definition ) && word->W_AliasOf ) word = word->W_AliasOf ;
-        //while ( ! word->Definition ) word = word->W_AliasOf ;
         Word * alias = _Word_New ( name, word->CAttribute | ALIAS, word->CAttribute2, word->LAttribute, 1, 0, DICTIONARY ) ; // inherit type from original word
         while ( word->W_AliasOf ) word = word->W_AliasOf ;
-        _Word_InitFinal ( alias, ( byte* ) word->Definition ) ;
+        Word_InitFinal ( alias, ( byte* ) word->Definition ) ;
         alias->S_CodeSize = word->S_CodeSize ;
         alias->W_AliasOf = word ;
         return alias ;

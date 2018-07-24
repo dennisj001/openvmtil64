@@ -6,15 +6,16 @@
 void
 _CfrTil_Init_SessionCore ( CfrTil * cfrTil, int64 cntxDelFlag, int64 promptFlag )
 {
+    Context * cntx = cfrTil->Context0 ;
     int64 i ;
     CfrTil_LogOff ( ) ;
     CfrTil_DbgSourceCodeOff ( ) ;
-    _System_Init ( _Context_->System0 ) ;
-    ReadLine_Init ( _Context_->ReadLiner0, _CfrTil_Key ) ;
-    Lexer_Init ( _Context_->Lexer0, 0, 0, CONTEXT ) ;
-    Finder_Init ( _Context_->Finder0 ) ;
-    Compiler_Init ( _Context_->Compiler0, 0 ) ;
-    Interpreter_Init ( _Context_->Interpreter0 ) ;
+    _System_Init ( cntx->System0 ) ;
+    ReadLine_Init ( cntx->ReadLiner0, _CfrTil_Key ) ;
+    Lexer_Init ( cntx->Lexer0, 0, 0, CONTEXT ) ;
+    Finder_Init ( cntx->Finder0 ) ;
+    Compiler_Init (cntx->Compiler0, 0 , 0) ;
+    Interpreter_Init ( cntx->Interpreter0 ) ;
     CfrTil_ClearTokenList ( ) ;
     if ( cntxDelFlag )
     {
@@ -48,7 +49,7 @@ CfrTil_ResetAll_Init ( CfrTil * cfrTil )
 {
     byte * startDirectory = ( byte* ) "namespaces" ;
     if ( ! GetState ( _Q_, OVT_IN_USEFUL_DIRECTORY ) ) startDirectory = ( byte* ) "/usr/local/lib/cfrTil64/namespaces" ;
-    _DataObject_New ( NAMESPACE_VARIABLE, 0, ( byte* ) "_startDirectory_", NAMESPACE_VARIABLE, 0, 0, 0, ( int64 ) startDirectory, 0 ) ;
+    _DataObject_New (NAMESPACE_VARIABLE, 0, ( byte* ) "_startDirectory_", NAMESPACE_VARIABLE, 0, 0, 0, ( int64 ) startDirectory, 0 , -1) ;
     if ( ( _Q_->RestartCondition >= RESET_ALL ) )
     {
         _Q_->StartIncludeTries = 0 ;

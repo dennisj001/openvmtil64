@@ -87,7 +87,7 @@ _DObject_ValueDefinition_Init ( Word * word, uint64 value, uint64 funcType, byte
         word->CodeStart = ( byte* ) word->Definition ;
         if ( NamedByteArray_CheckAddress ( _Q_CodeSpace, word->CodeStart ) ) word->S_CodeSize = Here - word->CodeStart ;
         else word->S_CodeSize = 0 ;
-        word->W_Value = (uint64) word->Definition ; // rvalue
+        word->W_Value = ( uint64 ) word->Definition ; // rvalue
     }
     else
     {
@@ -95,7 +95,7 @@ _DObject_ValueDefinition_Init ( Word * word, uint64 value, uint64 funcType, byte
         d0 ( _Printf ( ( byte* ) "\n_DObject_ValueDefinition_Init :" ) ) ;
         ByteArray * svcs = _Q_CodeByteArray ;
         int64 sscm = GetState ( _CfrTil_, DEBUG_SOURCE_CODE_MODE ) ;
-        SetState ( _CfrTil_, DEBUG_SOURCE_CODE_MODE, false ) ;
+        CfrTil_DbgSourceCodeOff ( ) ;
         _NBA_SetCompilingSpace_MakeSureOfRoom ( _Q_->MemorySpace0->ObjectSpace, 4 * K ) ;
         word->Coding = Here ;
         word->CodeStart = Here ;
@@ -111,21 +111,22 @@ _DObject_ValueDefinition_Init ( Word * word, uint64 value, uint64 funcType, byte
 }
 
 void
-_DObject_Finish ( Word * word )
+DObject_Finish ( Word * word )
 {
     uint64 ctype = word->CAttribute ;
     if ( ! ( ctype & CPRIMITIVE ) )
     {
-        if ( GetState ( _CfrTil_, OPTIMIZE_ON ) ) word->State |= COMPILED_OPTIMIZED ;
-        if ( GetState ( _CfrTil_, INLINE_ON ) ) word->State |= COMPILED_INLINE ;
-        if ( GetState ( _Context_, INFIX_MODE ) ) word->State |= W_INFIX_MODE ;
-        if ( GetState ( _Context_, C_SYNTAX ) ) word->State |= W_C_SYNTAX ;
-        //if ( IsSourceCodeOn ) word->State |= W_SOURCE_CODE_MODE ;
+        if ( GetState ( _CfrTil_, OPTIMIZE_ON ) ) SetState ( word, COMPILED_OPTIMIZED, true ) ;
+        if ( GetState ( _CfrTil_, INLINE_ON ) ) SetState ( word, COMPILED_INLINE, true ) ;
+        if ( GetState ( _Context_, INFIX_MODE ) ) SetState ( word, W_INFIX_MODE, true ) ;
+        if ( GetState ( _Context_, C_SYNTAX ) ) SetState ( word, W_C_SYNTAX, true ) ;
+        if ( IsSourceCodeOn ) SetState ( word, W_SOURCE_CODE_MODE, true ) ;
     }
     if ( GetState ( _Context_, INFIX_MODE ) ) word->CAttribute |= INFIX_WORD ;
     word->W_NumberOfArgs = _Context_->Compiler0->NumberOfArgs ;
     word->W_NumberOfLocals = _Context_->Compiler0->NumberOfLocals ;
-    _CfrTil_->LastFinishedWord = word ;
+    _CfrTil_->LastFinished_DObject = word ;
+    //word->W_SourceCode = String_New ( _CfrTil_->SC_ScratchPad, STRING_MEM ) ;
 }
 
 Word *
@@ -133,7 +134,7 @@ _DObject_Init ( Word * word, uint64 value, uint64 ftype, byte * function, int64 
 {
     // remember : Word = Namespace = DObject : each have an s_Symbol
     _DObject_ValueDefinition_Init ( word, value, ftype, function, arg ) ;
-    _DObject_Finish ( word ) ;
+    DObject_Finish ( word ) ; // don't need to fully finish here ??
     word->RunType = ftype ;
     return word ;
 }

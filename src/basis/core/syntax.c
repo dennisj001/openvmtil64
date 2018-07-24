@@ -58,7 +58,7 @@ Interpret_C_Block_EndBlock ( Word * word, byte * tokenToUse, Boolean insertFlag 
     if ( tokenToUse ) _CfrTil_->EndBlockWord->Name = tokenToUse ;
     if ( insertFlag ) SetState ( _Debugger_, DBG_OUTPUT_INSERTION, true ) ;
     _CfrTil_->EndBlockWord->W_TokenStart_ReadLineIndex = _Lexer_->TokenStart_ReadLineIndex ;
-    _Interpreter_DoWord_Default ( _Interpreter_, _CfrTil_->EndBlockWord, _CfrTil_->SC_ScratchPadIndex ) ;
+    _Interpreter_DoWord_Default ( _Interpreter_, _CfrTil_->EndBlockWord, _CfrTil_->SC_SPIndex ) ;
     _CfrTil_->EndBlockWord->Name = "}" ;
     //CfrTil_ClearTokenList ( ) ;
     SetState ( _Debugger_, DBG_OUTPUT_INSERTION, false ) ;
@@ -73,7 +73,7 @@ Interpret_C_Block_BeginBlock ( byte * tokenToUse, Boolean insertFlag )
     if ( tokenToUse ) _CfrTil_->BeginBlockWord->Name = tokenToUse ;
     if ( insertFlag ) SetState ( _Debugger_, DBG_OUTPUT_INSERTION, true ) ;
     _CfrTil_->BeginBlockWord->W_TokenStart_ReadLineIndex = _Lexer_->TokenStart_ReadLineIndex ;
-    _Interpreter_DoWord_Default ( _Interpreter_, _CfrTil_->BeginBlockWord, _CfrTil_->SC_ScratchPadIndex ) ;
+    _Interpreter_DoWord_Default ( _Interpreter_, _CfrTil_->BeginBlockWord, _CfrTil_->SC_SPIndex ) ;
     _CfrTil_->BeginBlockWord->Name = "{" ;
     compiler->BeginBlockFlag = false ;
     SetState ( _Debugger_, DBG_OUTPUT_INSERTION, false ) ;
@@ -151,7 +151,7 @@ CfrTil_Interpret_C_Blocks ( int64 blocks, Boolean takesAnElseFlag, Boolean semic
             word = _Interpreter_TokenToWord ( interp, token ) ;
             if ( word )
             {
-                _Interpreter_DoWord ( interp, word, - 1 ) ;
+                _Interpreter_DoWord (interp, word, - 1 , -1) ;
                 if ( word->CAttribute & COMBINATOR )
                 {
                     //Word * lastWord = Compiler_WordList ( 0 ) ;
@@ -272,7 +272,6 @@ CfrTil_SetInNamespaceFromBackground ( )
 {
     Context * cntx = _Context_ ;
     if ( cntx->Compiler0->C_FunctionBackgroundNamespace ) _CfrTil_Namespace_InNamespaceSet ( cntx->Compiler0->C_FunctionBackgroundNamespace ) ;
-    else
-        if ( cntx->Compiler0->C_BackgroundNamespace ) _CfrTil_Namespace_InNamespaceSet ( cntx->Compiler0->C_BackgroundNamespace ) ;
+    else if ( cntx->Compiler0->C_BackgroundNamespace ) _CfrTil_Namespace_InNamespaceSet ( cntx->Compiler0->C_BackgroundNamespace ) ;
 }
 

@@ -24,6 +24,7 @@ Compile_Multiply ( Compiler * compiler )
     {
         //_Compile_IMUL ( int8 mod, int8 reg, int8 rm, int8 sib, int64 disp, uint64 imm )
         //optInfo->Optimize_Reg = ACC ; // emulate MUL
+        _Set_SCA ( optInfo->opWord ) ;
         _Compile_IMUL ( optInfo->Optimize_Mod, optInfo->Optimize_Reg, optInfo->Optimize_Rm, 0, optInfo->Optimize_Disp, 0 ) ;
         if ( optInfo->Optimize_Rm == DSP ) _Compile_Move_Reg_To_StackN ( DSP, 0, optInfo->Optimize_Reg ) ;
         else _Word_CompileAndRecord_PushReg ( _Compiler_WordList ( compiler, 0 ), optInfo->Optimize_Reg ) ;
@@ -61,6 +62,7 @@ _Compile_Divide ( Compiler * compiler, uint64 type )
         }
 #endif        
         // Compile_IDIV( mod, rm, controlFlag, sib, disp, imm, size )
+        _Set_SCA ( optInfo->opWord ) ;
         Compile_IDIV ( optInfo->Optimize_Mod, optInfo->Optimize_Rm, ( ( optInfo->Optimize_Disp != 0 ) ? DISP_B : 0 ), 0, optInfo->Optimize_Disp, 0, 0 ) ;
         if ( type == MODULO ) reg = RDX ;
         else reg = ACC ;
@@ -150,7 +152,6 @@ Compile_MultiplyEqual ( Compiler * compiler )
     if ( optFlag & OPTIMIZE_DONE ) return ;
     else if ( optFlag )
     {
-        _Set_SCA ( optInfo->opWord ) ;
         if ( optInfo->OptimizeFlag & OPTIMIZE_IMM )
         {
             //_Compile_IMULI ( MEM, optInfo->Optimize_Reg, optInfo->Optimize_Rm, 0, optInfo->Optimize_Disp, optInfo->Optimize_Imm, CELL ) ;
@@ -160,6 +161,7 @@ Compile_MultiplyEqual ( Compiler * compiler )
         else
         {
             //_Compile_IMUL_Reg ( cell mod, cell reg, cell rm, cell sib, cell disp )
+            _Set_SCA ( optInfo->opWord ) ;
             Compile_MUL ( optInfo->Optimize_Mod, optInfo->Optimize_Rm, REX_B | MODRM_B | DISP_B, 0,
                 optInfo->Optimize_Disp, 0, CELL_SIZE ) ;
         }
@@ -198,7 +200,6 @@ Compile_DivideEqual ( Compiler * compiler )
         {
             Compile_MoveImm ( REG, RDX, 0, 0, 0, CELL ) ;
             // Compile_IDIV( mod, rm, sib, disp, imm, size )
-            _Set_SCA ( optInfo->opWord ) ;
             if ( optInfo->OptimizeFlag & OPTIMIZE_IMM )
             {
                 //Compile_MoveImm ( int8 direction, int8 rm, int8 sib, int64 disp, int64 imm, int8 immSize )
@@ -208,6 +209,7 @@ Compile_DivideEqual ( Compiler * compiler )
             }
             else
             {
+                _Set_SCA ( optInfo->opWord ) ;
                 Compile_DIV ( optInfo->Optimize_Mod, optInfo->Optimize_Rm, REX_B | MODRM_B | DISP_B, 0,
                     optInfo->Optimize_Disp, 0, CELL_SIZE ) ;
             }
@@ -229,14 +231,13 @@ _CfrTil_Do_IncDec ( int64 op )
 {
     Context * cntx = _Context_ ;
     Compiler * compiler = cntx->Compiler0 ;
-    Set_SCA ( 0 ) ;
     if ( CompileMode )
     {
         Compile_X_Group5 ( compiler, op ) ; // ? INC : DEC ) ; //, RVALUE ) ;
     }
     else
     {
-        int64 sd = List_Depth ( compiler->WordList ) ;
+        int64 sd = List_Depth ( _CfrTil_->WordList ) ;
         Word *one = ( Word* ) _Compiler_WordList ( compiler, 1 ) ; // the operand
         if ( op == INC )
         {

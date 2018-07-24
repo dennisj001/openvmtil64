@@ -120,7 +120,7 @@ c_syntaxOff
 sp
 User
 //'dn 'dfnba find alias  
-: factorial ( REG n | REG rec -- RAX ) rec 1 = { n @ 1 > } { rec @ n @ * rec store n -- } while return rec ;
+: factorial ( REG n | REG rec -- RAX ) rec 1 = { n @ 1 > } d: { rec @ n @ * rec store n -- } while return rec ;
 : _ifx ( w | j ) 
     { j 1 = } { j @ 23 <= } { j ++ } 
     {
@@ -423,5 +423,4 @@ nl
 namespaceTreeWithWords
 
 2 + 7 assertStkChk // stack checking
-// stack adjustment fixme ??
-
+s

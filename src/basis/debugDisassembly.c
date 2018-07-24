@@ -110,12 +110,13 @@ void
 Debugger_DisassembleTotalAccumulated ( Debugger * debugger )
 {
     byte * address = _Context_->Compiler0->InitHere ;
-    Word * word = _Context_->Compiler0->CurrentWordCompiling ;
+    Word * word = _CfrTil_->CurrentWordCompiling ;
     if ( ! ( Here - address ) )
     {
-        address = ( byte* ) _CfrTil_->LastFinishedWord->Definition ;
+        address = ( byte* ) _CfrTil_->LastFinished_DObject->Definition ;
     }
     int64 size = Here - address ;
+    size = (size > 0) ? size : 128 ;
     int64 svState = GetState ( _CfrTil_, GLOBAL_SOURCE_CODE_MODE ) ;
     SetState ( _CfrTil_, GLOBAL_SOURCE_CODE_MODE, true ) ;
     SetState ( debugger, DBG_DISASM_ACC, true ) ;

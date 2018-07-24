@@ -38,7 +38,7 @@ _CfrTil_SingleQuote ()
 done:
         CfrTil_WordLists_PopWord ( ) ; // pop the "'" token
         word = _DObject_New ( buffer, charLiteral, LITERAL | CONSTANT | IMMEDIATE, 0, 0, LITERAL, ( byte* ) _DataObject_Run, 0, 0, 0, TEMPORARY ) ;
-        _Interpreter_DoWord ( _Interpreter_, word, -1 ) ; //_Lexer_->TokenStart_ReadLineIndex ) ;
+        _Interpreter_DoWord (_Interpreter_, word, -1 , -1) ; //_Lexer_->TokenStart_ReadLineIndex ) ;
     }
     else
     {
@@ -193,7 +193,7 @@ _CfrTil_Parse_LocalsAndStackVariables ( int64 svf, int64 lispMode, ListObject * 
     Lexer * lexer = cntx->Lexer0 ;
     Finder * finder = cntx->Finder0 ;
     int64 scm = IsSourceCodeOn ;
-    SetState ( _CfrTil_, DEBUG_SOURCE_CODE_MODE, false ) ;
+    CfrTil_DbgSourceCodeOff ( ) ;
     byte * svDelimiters = lexer->TokenDelimiters ;
     Word * word ;
     int64 ctype = 0, ctype2 = 0, ltype = 0 ;

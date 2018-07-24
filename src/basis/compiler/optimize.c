@@ -63,7 +63,7 @@ Compiler_GetOptimizeState ( Compiler * compiler, Word * word )
         CompileOptimizeInfo_Init ( optInfo, compiler->OptInfo->State ) ; // State : not used yet ??
         optInfo->opWord = word ;
         SetState ( _CfrTil_, IN_OPTIMIZER, true ) ;
-        for ( optInfo->node = optInfo->wordNode = dllist_First ( ( dllist* ) compiler->WordList ), optInfo->node = dlnode_Next ( optInfo->node ) ;
+        for ( optInfo->node = optInfo->wordNode = dllist_First ( ( dllist* ) _CfrTil_->WordList ), optInfo->node = dlnode_Next ( optInfo->node ) ;
             optInfo->node ; optInfo->node = optInfo->nextNode )
         {
             optInfo->nextNode = dlnode_Next ( optInfo->node ) ;
@@ -301,6 +301,7 @@ Compiler_CompileOptimize_IncDec ( Compiler * compiler )
             {
                 _Compile_Move_Literal_Immediate_To_Reg ( reg, ( int64 ) optInfo->wordArg2->W_PtrToValue ) ;
             }
+            _Set_SCA ( optInfo->opWord ) ; 
             _Compile_Group5 ( optInfo->opWord->W_OpInsnCode, ( optInfo->wordArg2->CAttribute & REGISTER_VARIABLE ) ? REG : MEM, reg, 0, optInfo->Optimize_Disp, 0 ) ;
             optInfo->rtrn = OPTIMIZE_DONE ;
         }

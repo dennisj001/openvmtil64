@@ -1,7 +1,7 @@
 
 #include "../../include/cfrtil64.h"
 
-void 
+void
 BI_Block_Copy ( BlockInfo * bi, byte* dstAddress, byte * srcAddress, int64 bsize, int8 optFlag )
 {
     Compiler * compiler = _Compiler_ ;
@@ -18,7 +18,7 @@ BI_Block_Copy ( BlockInfo * bi, byte* dstAddress, byte * srcAddress, int64 bsize
         isize = _Udis_GetInstructionSize ( ud, srcAddress ) ;
         left -= isize ;
         _CfrTil_AdjustDbgSourceCodeAddress ( srcAddress, Here ) ;
-        //d1 ( if ( Is_DebugModeOn ) _DWL_ShowList ( _Compiler_->WordList, 0 ) ) ;
+        d0 ( if ( Is_DebugModeOn ) _DWL_ShowList ( _CfrTil_->WordList, 0 ) ) ;
         _CfrTil_AdjustLabels ( srcAddress ) ;
         if ( * srcAddress == _RET )
         {
@@ -60,7 +60,7 @@ BI_Block_Copy ( BlockInfo * bi, byte* dstAddress, byte * srcAddress, int64 bsize
     }
     bi->CopiedToEnd = Here ;
     bi->CopiedSize = bi->CopiedToEnd - bi->CopiedToStart ;
-    d1 ( if ( Is_DebugModeOn ) Debugger_Disassemble ( _Debugger_, bi->CopiedToStart, bi->CopiedSize, 1 ) ) ;
+    d0 ( if ( Is_DebugModeOn ) Debugger_Disassemble ( _Debugger_, bi->CopiedToStart, bi->CopiedSize, 1 ) ) ;
 }
 
 void
@@ -125,7 +125,7 @@ void
 CfrTil_TurnOnBlockCompiler ( )
 {
     CfrTil_RightBracket ( ) ;
-    Compiler_WordList_RecycleInit ( _Context_->Compiler0 ) ;
+    //Compiler_WordList_RecycleInit ( _Context_->Compiler0 ) ;
 }
 
 // blocks are a notation for subroutines or blocks of code compiled in order,
@@ -138,13 +138,13 @@ CfrTil_TurnOnBlockCompiler ( )
 BlockInfo *
 _CfrTil_BeginBlock0 ( )
 {
-    Compiler * compiler = _Context_->Compiler0 ;
+    Context * cntx = _Context_ ;
+    Compiler * compiler = cntx->Compiler0 ;
     BlockInfo *bi = ( BlockInfo * ) Mem_Allocate ( sizeof (BlockInfo ), COMPILER_TEMP ) ;
-    if ( ! compiler->BlockLevel ) compiler->CurrentWordCompiling = compiler->CurrentWord ;
-    compiler->BlockLevel ++ ;
-    if ( ! CompileMode ) // first block
+    if ( ( ! CompileMode ) || ( ! Compiler_BlockLevel ( compiler )  ) )// first block
     {
         CfrTil_TurnOnBlockCompiler ( ) ;
+        _CfrTil_->CurrentWordCompiling = compiler->CurrentCreatedWord ;
     }
     bi->OriginalActualCodeStart = Here ;
     _Compile_UninitializedJump ( ) ;
@@ -202,7 +202,8 @@ void
 _CfrTil_EndBlock1 ( BlockInfo * bi )
 {
     Compiler * compiler = _Context_->Compiler0 ;
-    if ( ! _Stack_Depth ( compiler->BlockStack ) )
+    Set_SCA ( 0 ) ;
+    if ( ! Compiler_BlockLevel ( compiler ) )
     {
         _CfrTil_InstallGotoCallPoints_Keyed ( bi, GI_RETURN ) ;
         if ( _Compiler_IsFrameNecessary ( compiler ) && ( ! GetState ( compiler, DONT_REMOVE_STACK_VARIABLES ) ) )
@@ -231,7 +232,7 @@ _CfrTil_EndBlock1 ( BlockInfo * bi )
             }
             else if ( GetState ( compiler, RETURN_ACCUM ) || GetState ( compiler, RETURN_TOS ) ) Compile_Move_ACC_To_TOS ( DSP ) ;
         }
-        else bi->bp_First = bi->Start ; //bi->AfterFrame ; 
+        else bi->bp_First = bi->Start ;  
     }
     _Compile_Return ( ) ;
     DataStack_Push ( ( int64 ) bi->bp_First ) ;
@@ -243,11 +244,10 @@ _CfrTil_EndBlock1 ( BlockInfo * bi )
 byte *
 _CfrTil_EndBlock2 ( BlockInfo * bi )
 {
-    Set_SCA ( 0 ) ;
-    Compiler * compiler = _Context_->Compiler0 ;
-    compiler->BlockLevel -- ;
+    Context * cntx = _Context_ ;
+    Compiler * compiler = cntx->Compiler0 ;
     byte * first = bi->bp_First ;
-    if ( ! _Stack_Depth ( compiler->BlockStack ) )
+    if ( ! Compiler_BlockLevel ( compiler ) )
     {
         _CfrTil_InstallGotoCallPoints_Keyed ( bi, GI_GOTO | GI_RECURSE ) ;
 #if 0
@@ -259,7 +259,7 @@ _CfrTil_EndBlock2 ( BlockInfo * bi )
         d1 ( if ( Is_DebugModeOn ) Debugger_Disassemble ( _Debugger_, ( byte* ) first, bi->CopiedSize, 1 ) ) ;
 #endif        
         CfrTil_TurnOffBlockCompiler ( ) ;
-        Compiler_Init ( compiler, 0 ) ;
+        Compiler_Init ( compiler, 0, 1 ) ;
     }
     else
     {
@@ -271,7 +271,8 @@ _CfrTil_EndBlock2 ( BlockInfo * bi )
 byte *
 _CfrTil_EndBlock ( )
 {
-    Compiler * compiler = _Context_->Compiler0 ;
+    Context * cntx = _Context_ ;
+    Compiler * compiler = cntx->Compiler0 ;
     BlockInfo * bi = ( BlockInfo * ) Stack_Pop_WithExceptionOnEmpty ( compiler->BlockStack ) ;
     bi->LogicCodeWord = _Compiler_WordList ( compiler, 1 ) ;
     _CfrTil_EndBlock1 ( bi ) ;

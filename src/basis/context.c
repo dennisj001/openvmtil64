@@ -68,8 +68,8 @@ Context *
 _Context_New ( CfrTil * cfrTil )
 {
     Context * cntx = _Context_Allocate ( ), *cntx0 = cfrTil->Context0 ;
-    _Context_Init ( cntx0, cntx ) ;
     _Context_ = cfrTil->Context0 = cntx ;
+    _Context_Init ( cntx0, cntx ) ;
     cntx->ContextDataStack = cfrTil->DataStack ; // nb. using the same one and only DataStack
     return cntx ;
 }
@@ -253,7 +253,7 @@ void
 _Context_DoubleQuoteMacro ( Context * cntx )
 {
     Lexer * lexer = cntx->Lexer0 ;
-    if ( ! GetState ( _CfrTil_, SOURCE_CODE_INITIALIZED ) )
+    if ( ! GetState ( _CfrTil_, SOURCE_CODE_STARTED ) )
     {
         CfrTil_InitSourceCode_WithCurrentInputChar ( _CfrTil_ ) ; // must be here for wdiss and add addToHistory
     }
@@ -272,7 +272,7 @@ _Context_DoubleQuoteMacro ( Context * cntx )
     }
     //Word * word = _Interpreter_NewWord ( cntx->Interpreter0, String_New ( lexer->TokenBuffer, STRING_MEM ) ) ; //TEMPORARY ) ) ;
     Word * word = _Interpreter_NewWord ( cntx->Interpreter0, String_New ( lexer->TokenBuffer, TEMPORARY ) ) ;
-    _Interpreter_DoWord ( cntx->Interpreter0, word, - 1 ) ; //lexer->TokenStart_ReadLineIndex ) ;
+    _Interpreter_DoWord (cntx->Interpreter0, word, - 1 , -1) ; //lexer->TokenStart_ReadLineIndex ) ;
 }
 
 void

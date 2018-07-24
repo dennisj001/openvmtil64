@@ -87,7 +87,7 @@ Lexer_ObjectToken_New ( Lexer * lexer, byte * token ) //, int64 parseFlag )
         {
             if ( GetState ( _Q_, AUTO_VAR ) ) // make it a 'variable' 
             {
-                word = _DataObject_New ( NAMESPACE_VARIABLE, 0, token, NAMESPACE_VARIABLE, 0, 0, 0, 0, 0 ) ;
+                word = _DataObject_New (NAMESPACE_VARIABLE, 0, token, NAMESPACE_VARIABLE, 0, 0, 0, 0, 0 , -1) ;
             }
             else
             {
@@ -97,7 +97,7 @@ Lexer_ObjectToken_New ( Lexer * lexer, byte * token ) //, int64 parseFlag )
         }
         else
         {
-            word = _DataObject_New ( LITERAL, 0, token, 0, 0, 0, 0, lexer->Literal, 0 ) ;
+            word = _DataObject_New (LITERAL, 0, token, 0, 0, 0, 0, lexer->Literal, 0 , -1) ;
         }
         lexer->TokenWord = word ;
     }
@@ -256,7 +256,6 @@ _Lexer_LexNextToken_WithDelimiters ( Lexer * lexer, byte * delimiters, Boolean c
         {
             byte c = lexer->NextChar ( lexer->ReadLiner0 ) ;
             _Lexer_GetChar ( lexer, c ) ;
-
         }
         lexer->CurrentTokenDelimiter = lexer->TokenInputCharacter ;
         if ( lexer->TokenWriteIndex && ( ! GetState ( lexer, LEXER_RETURN_NULL_TOKEN ) ) )

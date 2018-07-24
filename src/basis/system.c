@@ -58,6 +58,19 @@ main ( int64 argc, char **argv )
 
 #endif
 
+void
+_Location_Printf ( Location * loc )
+{
+    if ( loc ) _Printf ( ( byte* ) "\nRun Time Location : %s %d.%d", loc->Filename, loc->LineNumber, loc->CursorPosition ) ;
+}
+
+void
+CfrTil_Location_Printf ( )
+{
+    Location * loc = ( Location* ) DataStack_Pop ( ) ;
+    _Location_Printf ( loc ) ;
+}
+
 // lib : full library path
 
 #define RTLD_DEFAULT ((void *) 0)
@@ -73,7 +86,7 @@ _dlsym ( byte * sym, byte * lib )
     }
     if ( ( ! hLibrary ) || ( ! fp ) )
     {
-        _Printf ( ( byte* ) c_ad ( "\ndlsym : dlerror = %s\n" ), dlerror () ) ;
+        _Printf ( ( byte* ) c_ad ( "\ndlsym : dlerror = %s\n" ), dlerror ( ) ) ;
         return 0 ;
     }
     return fp ;
@@ -104,7 +117,7 @@ void
 Dlsym ( byte * sym, byte * lib )
 {
     block b = ( block ) _Dlsym ( sym, lib ) ;
-    Word * word = _DataObject_New (CFRTIL_WORD, 0, sym, CPRIMITIVE | DLSYM_WORD | C_PREFIX | C_RETURN | C_PREFIX_RTL_ARGS, 0, 0, 0, ( int64 ) b, 0 ) ;
+    Word * word = _DataObject_New (CFRTIL_WORD, 0, sym, CPRIMITIVE | DLSYM_WORD | C_PREFIX | C_RETURN | C_PREFIX_RTL_ARGS, 0, 0, 0, ( int64 ) b, 0 , -1) ;
     word->WAttribute |= WT_C_PREFIX_RTL_ARGS ;
 }
 
@@ -133,7 +146,7 @@ void
 CfrTil_Dlsym ( )
 {
     byte * sym = Lexer_ReadToken ( _Context_->Lexer0 ) ;
-    byte * lib = _Lexer_LexNextToken_WithDelimiters (_Context_->Lexer0, 0, 1, 0, 1, LEXER_ALLOW_DOT ) ;
+    byte * lib = _Lexer_LexNextToken_WithDelimiters ( _Context_->Lexer0, 0, 1, 0, 1, LEXER_ALLOW_DOT ) ;
     byte * semi = Lexer_ReadToken ( _Context_->Lexer0 ) ; // drop the semi
     Dlsym ( sym, lib ) ;
 }
@@ -148,6 +161,7 @@ CfrTil_system0 ( )
     _Compile_Stack_PushReg ( DSP, ACC ) ;
 }
 #if 1
+
 void
 CfrTil_system1 ( )
 {
@@ -294,6 +308,12 @@ _CfrTil_SystemState_Print ( int64 pflag )
     if ( pflag && ( _Q_->Verbosity > 2 ) ) OpenVmTil_Print_DataSizeofInfo ( pflag ) ;
     _CfrTil_WordAccounting_Print ( ( byte* ) "_CfrTil_SystemState_Print" ) ;
     BigNum_StateShow ( ) ;
+    Boolean dsc = GetState ( _CfrTil_, DEBUG_SOURCE_CODE_MODE ) ;
+    _Printf ( ( byte* ) "\nDebug Source Code %s", dsc ? "on" : "off" ) ;
+    Boolean bno = Namespace_IsUsing ( "BigNum" ) ;
+    _Printf ( ( byte* ) " : BigNum %s", bno ? "on" : "off" ) ;
+    Boolean lo = Namespace_IsUsing ( "Lisp" ) ;
+    _Printf ( ( byte* ) " : Lisp %s", lo ? "on" : "off" ) ;
 }
 
 void
@@ -404,12 +424,24 @@ _CfrTil_Source ( Word *word, int64 addToHistoryFlag )
         {
             __Word_ShowSourceCode ( word ) ; // source code has newlines for multiline history
             if ( addToHistoryFlag ) _OpenVmTil_AddStringToHistoryList ( word->W_SourceCode ) ;
-            if ( word->S_WordData->Filename ) _Printf ( ( byte* ) "\nSource code file location of %s : \"%s\" : %d.%d :: called at : %s", name, word->S_WordData->Filename, word->S_WordData->LineNumber, word->W_TokenEnd_ReadLineIndex, Context_IsInFile ( _Context_ ) ? Context_Location ( ) : ( byte* ) "command line" ) ;
+            if ( word->S_WordData->Filename ) _Printf ( ( byte* ) "\nSource code file location of %s : \"%s\" : %d.%d :: we are now at : %s", name, word->S_WordData->Filename, word->S_WordData->LineNumber, word->W_TokenEnd_ReadLineIndex, Context_IsInFile ( _Context_ ) ? Context_Location ( ) : ( byte* ) "command line" ) ;
             if ( ( word->LAttribute & T_LISP_DEFINE ) && ( ! ( word->LAttribute & T_LISP_COMPILED_WORD ) ) ) _Printf ( ( byte* ) "\nLambda Calculus word : interpreted not compiled" ) ; // do nothing here
-            else if ( ! ( category & CPRIMITIVE ) ) _Printf ( ( byte* ) "\nCompiled with : %s%s%s%s", GetState ( word, COMPILED_OPTIMIZED ) ? "optimizeOn" : "optimizeOff", GetState ( word, COMPILED_INLINE ) ? ", inlineOn" : ", inlineOff",
-                GetState ( word, W_C_SYNTAX ) ? ", c_syntaxOn" : "", GetState ( word, W_INFIX_MODE ) ? ", infixOn" : "" ) ;
-            if ( GetState ( word, W_SOURCE_CODE_MODE ) ) _Printf ( ( byte* ) "%s", ", sourceCodeOn" ) ;
-            if ( word->Definition && word->S_CodeSize ) _Printf ( ( byte* ) " -- starting at address : 0x%x -- code size = %d bytes", word->Definition, word->S_CodeSize ) ;
+            else if ( ! ( category & CPRIMITIVE ) )
+            {
+                _Printf ( ( byte* ) "\nCompiled with : %s%s%s%s",
+                    GetState ( word, COMPILED_OPTIMIZED ) ? "optimizeOn" : "optimizeOff", GetState ( word, COMPILED_INLINE ) ? ", inlineOn" : ", inlineOff",
+                    GetState ( word, W_C_SYNTAX ) ? ", c_syntaxOn" : "", GetState ( word, W_INFIX_MODE ) ? ", infixOn" : "" ) ;
+                Boolean dsc = GetState ( _CfrTil_, DEBUG_SOURCE_CODE_MODE ) ;
+                _Printf ( ( byte* ) "\nDebug Source Code %s", dsc ? "on" : "off" ) ;
+                Boolean bno = Namespace_IsUsing ( "BigNum" ) ;
+                _Printf ( ( byte* ) " : BigNum %s", bno ? "on" : "off" ) ;
+                Boolean lo = Namespace_IsUsing ( "Lisp" ) ;
+                _Printf ( ( byte* ) " : Lisp %s", lo ? "on" : "off" ) ;
+                Boolean wsc = GetState ( word, W_SOURCE_CODE_MODE ) ;
+                //_Printf ( ( byte* ) "%s", ", sourceCodeOn" ) ;
+                _Printf ( ( byte* ) " : Word Source Code %s", wsc ? "on" : "off" ) ;
+            }
+            if ( word->Definition && word->S_CodeSize ) _Printf ( ( byte* ) "\nstarting at address : 0x%x -- code size = %d bytes", word->Definition, word->S_CodeSize ) ;
             //else _Printf ( ( byte* ) " -- starting at address : 0x%x", word->Definition ) ;
         }
         //_Printf ( ( byte* ) "\n" ) ;
