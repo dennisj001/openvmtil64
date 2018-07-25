@@ -51,7 +51,7 @@ _Compiler_CheckOptimize ( Compiler * compiler, Word * word, int64 _forcedReturn 
 int64
 Compiler_CheckOptimize ( Compiler * compiler, int64 forcedReturn )
 {
-    return _Compiler_CheckOptimize ( compiler, Compiler_WordList ( 0 ), forcedReturn ) ;
+    return _Compiler_CheckOptimize ( compiler, CfrTil_WordList ( 0 ), forcedReturn ) ;
 }
 
 int64
@@ -63,7 +63,7 @@ Compiler_GetOptimizeState ( Compiler * compiler, Word * word )
         CompileOptimizeInfo_Init ( optInfo, compiler->OptInfo->State ) ; // State : not used yet ??
         optInfo->opWord = word ;
         SetState ( _CfrTil_, IN_OPTIMIZER, true ) ;
-        for ( optInfo->node = optInfo->wordNode = dllist_First ( ( dllist* ) _CfrTil_->WordList ), optInfo->node = dlnode_Next ( optInfo->node ) ;
+        for ( optInfo->node = optInfo->wordNode = dllist_First ( ( dllist* ) _CfrTil_->CompilerWordList ), optInfo->node = dlnode_Next ( optInfo->node ) ;
             optInfo->node ; optInfo->node = optInfo->nextNode )
         {
             optInfo->nextNode = dlnode_Next ( optInfo->node ) ;
@@ -422,7 +422,7 @@ Compiler_CompileOp ( Compiler * compiler )
     //optInfo->Optimize_Reg = ACC ; // emulate MUL
     _Compile_IMUL ( optInfo->Optimize_Mod, optInfo->Optimize_Reg, optInfo->Optimize_Rm, 0, optInfo->Optimize_Disp, 0 ) ;
     if ( optInfo->Optimize_Rm == DSP ) _Compile_Move_Reg_To_StackN ( DSP, 0, optInfo->Optimize_Reg ) ;
-    else _Word_CompileAndRecord_PushReg ( _Compiler_WordList ( compiler, 0 ), optInfo->Optimize_Reg ) ;
+    else _Word_CompileAndRecord_PushReg ( _CfrTil_WordList (0), optInfo->Optimize_Reg ) ;
 }
 #endif
 // OpEqual is different from Store/Equal because we have to do the op first then the equal, obviously but important to remember 
@@ -548,12 +548,15 @@ Compile_Optimize_Store ( Compiler * compiler )
         goto done ;
     }
     
-#if 0    
+#if 0  
     else
     {
-        if ( optInfo->NumberOfArgs == 2 )
+        if (( compiler->LHS_Word ) && ( optInfo->NumberOfArgs == 2 ))
         {
-            SetHere ( optInfo->wordArg1->Coding ) ;
+            //if ( compiler->LHS_Word ) SetHere ( optInfo->wordArg2->Coding ) ;
+            //else 
+            //SetHere ( optInfo->wordArg1->Coding ) ; 
+            SetHere ( optInfo->wordArg2->Coding ) ;
             _Compile_GetVarLitObj_LValue_To_Reg ( optInfo->wordArg2, reg ) ;
             Compile_GetVarLitObj_RValue_To_Reg ( optInfo->wordArg1, rm ) ;
         }
@@ -561,7 +564,7 @@ Compile_Optimize_Store ( Compiler * compiler )
 #endif
     
     _Set_SCA ( optInfo->opWord ) ;
-    Compile_Move_Reg_To_Rm ( reg, rm, 0 ) ;
+    Compile_Move_Reg_To_Rm ( reg, rm, 0 ) ; // dst = reg ; src = rm
 done:
     optInfo->rtrn = OPTIMIZE_DONE ;
 }

@@ -388,13 +388,15 @@ stringMacrosOff
 #else
 // you can trim this file to your needs and put your personal init code here maybe
 
+#if 1
 c_syntaxOn
 Root
 //int cpow ( base power | out ) s{ for ( out = 1 ; power ; ( power -= 1 ) ) { out = out * base ; } return out ; }s 
-int cpow ( base power | out ) { for ( d: out = 1 ; power ; power -= 1 ) { out = out * base ; } return out ; }
-'cpow find wdiss
+d: int cpow ( base power | out ) { for ( out = 1 ; power ; power -= 1 ) { out = out * base ; } return out ; }
+'cpow find d: wdiss
 c_syntaxOff
 2 30 d: cpow dup p  1073741824 _assert
+#endif
 
 #endif
 2 + 7  assertStkChk // stack checking

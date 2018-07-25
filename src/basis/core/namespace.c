@@ -104,7 +104,7 @@ Namespace_SetState ( Namespace * ns, uint64 state )
             //CfrTil_Namespaces_PrettyPrintTree ( ) ;
             //CfrTil_Using ( ) ;
             _Printf ( ( byte* ) "\n\nNamespace : %s :: Before _Namespace_SetState : \n\t", ns->Name ) ;
-                List_PrintNames ( _CfrTil_->Namespaces->W_List, 5 ) ;
+                _List_PrintNames ( _CfrTil_->Namespaces->W_List, 5, 0 ) ;
         } ) ;
         _Namespace_SetState ( ns, state ) ;
         if ( state & USING ) _Namespace_AddToNamespacesHead_SetAsInNamespace ( ns ) ; // make it first on the list
@@ -114,7 +114,7 @@ Namespace_SetState ( Namespace * ns, uint64 state )
             //CfrTil_Namespaces_PrettyPrintTree ( ) ;
             //CfrTil_Using ( ) ;
             _Printf ( ( byte* ) "\n\nNamespace : %s :: After _Namespace_SetState : \n\t", ns->Name ) ;
-                List_PrintNames ( _CfrTil_->Namespaces->W_List, 5 ) ;
+                _List_PrintNames ( _CfrTil_->Namespaces->W_List, 5, 0 ) ;
         } ) ;
     }
 }
@@ -159,6 +159,7 @@ _Namespace_ActivateAsPrimary ( Namespace * ns )
     {
         Finder_SetQualifyingNamespace ( _Context_->Finder0, ns ) ;
         _Namespace_AddToUsingList ( ns ) ;
+        //dllist_AddNodeToHead ( _CfrTil_->Namespaces->W_List, ( dlnode* ) ns ) ;
         _CfrTil_->InNamespace = ns ;
         _Context_->Interpreter0->BaseObject = 0 ;
     }

@@ -4,7 +4,7 @@
 void
 _CfrTil_Colon ( )
 {
-    CfrTil_RightBracket ( ) ;
+    //CfrTil_RightBracket ( ) ;
     CfrTil_SourceCode_Init ( ) ;
     CfrTil_Token ( ) ;
     CfrTil_Word_Create ( ) ;

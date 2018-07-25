@@ -137,7 +137,7 @@ Compile_LogicalAnd ( Compiler * compiler )
     }
     else
     {
-        Word *one = _Compiler_WordList ( compiler, 1 ) ; // assumes two values ( n m ) on the DSP stack 
+        Word *one = _CfrTil_WordList (1) ; // assumes two values ( n m ) on the DSP stack 
         if ( one->StackPushRegisterCode && ( one->RegToUse == ACC ) ) SetHere ( one->StackPushRegisterCode ) ;
         else _Compile_Stack_PopToReg ( DSP, ACC ) ;
         _Compile_Stack_PopToReg ( DSP, OREG ) ;
@@ -313,7 +313,7 @@ Compile_Logical_X ( Compiler * compiler, int64 op, int8 setTtn, int8 setNegateFl
 void
 Compile_LogicalNot ( Compiler * compiler )
 {
-    Word *one = _Compiler_WordList ( compiler, 1 ) ; // assumes two values ( n m ) on the DSP stack 
+    Word *one = _CfrTil_WordList (1) ; // assumes two values ( n m ) on the DSP stack 
     int64 optFlag = Compiler_CheckOptimize ( compiler, 0 ) ; // check especially for cases that optimize literal ops
     if ( optFlag & OPTIMIZE_DONE ) return ;
         // just need to get to valued to be operated on ( not'ed ) in eax

@@ -1032,7 +1032,7 @@ _LO_Apply_Arg ( ListObject ** pl1, int64 i, int8 svCompileMode )
                 CfrTil_Exception ( OBJECT_SIZE_ERROR, 0, QUIT ) ;
             }
             variableFlag = _CheckArrayDimensionForVariables_And_UpdateCompilerState ( ) ;
-            _WordList_Pop ( _CfrTil_->WordList, 0 ) ; // pop the initial '['
+            _WordList_Pop ( _CfrTil_->CompilerWordList, 0 ) ; // pop the initial '['
             do
             {
                 word = l1 ;

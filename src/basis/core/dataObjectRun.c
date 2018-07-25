@@ -84,6 +84,7 @@ _Namespace_Do_C_Type ( Namespace * ns )
                 Compiler_Init (compiler, 0 ) ; //compiler->State ) ;
                 _CfrTil_InitSourceCode_WithName ( _CfrTil_, ns->Name ) ;
             }
+            CfrTil_WordList_RecycleInit ( _CfrTil_, 0, 0, 1, 1 ) ;
             compiler->C_BackgroundNamespace = _Namespace_FirstOnUsingList ( ) ; //nb! must be before CfrTil_LocalsAndStackVariablesBegin else CfrTil_End_C_Block will 
             if ( GetState ( cntx, C_SYNTAX ) )
             {
@@ -92,22 +93,21 @@ _Namespace_Do_C_Type ( Namespace * ns )
                 // ?? parts of this could be screwing up other things and adds an unnecessary level of complexity
                 // for parsing C functions 
                 token1 = _Lexer_NextNonDebugOrCommentTokenWord ( lexer, 1, 0 ) ; // ? peekFlag ?
-                int64 token1TokenStart_ReadLineIndex = lexer->TokenStart_ReadLineIndex ;
+                int64 t1_tsrli = lexer->TokenStart_ReadLineIndex ;
                 token2 = Lexer_PeekNextNonDebugTokenWord ( lexer, 1 ) ;
                 if ( token2 [0] == '(' )
                 {
                     compiler->C_FunctionBackgroundNamespace = compiler->C_BackgroundNamespace ;
                     SetState ( _Compiler_, C_COMBINATOR_PARSING, true ) ;
+                    Namespace_DoNamespace ( ( byte* ) "C_Syntax" ) ;
                     _Namespace_ActivateAsPrimary ( ns ) ;
                     Word * word = Word_New ( token1 ) ;
                     word->Coding = Here ;
                     CfrTil_WordList_PushWord ( word ) ;
                     DataStack_Push ( ( int64 ) word ) ;
-                    CfrTil_RightBracket ( ) ;
                     CfrTil_BeginBlock ( ) ;
                     CfrTil_LocalsAndStackVariablesBegin ( ) ;
                     Ovt_AutoVarOn ( ) ;
-                    Namespace_DoNamespace ( ( byte* ) "C_Syntax" ) ;
                     do
                     {
                         byte * token = Lexer_ReadToken ( lexer ) ;
@@ -130,7 +130,7 @@ _Namespace_Do_C_Type ( Namespace * ns )
                     if ( Compiling ) Ovt_AutoVarOn ( ) ;
                     _Namespace_DoNamespace ( ns, 1 ) ;
                     // remember : we have already gotten a token
-                    Interpreter_InterpretAToken ( cntx->Interpreter0, token1, token1TokenStart_ReadLineIndex ) ;
+                    Interpreter_InterpretAToken ( cntx->Interpreter0, token1, t1_tsrli ) ;
                     if ( Compiling )
                     {
                         compiler->C_BackgroundNamespace = _Namespace_FirstOnUsingList ( ) ;
@@ -166,7 +166,7 @@ _Namespace_Do_C_Type ( Namespace * ns )
         }
         else _Namespace_DoNamespace ( ns, 1 ) ;
 rtrn:
-        if ( compiler->C_BackgroundNamespace ) _CfrTil_Namespace_InNamespaceSet ( compiler->C_BackgroundNamespace ) ;
+        if (( ! Compiling ) && compiler->C_BackgroundNamespace ) _CfrTil_Namespace_InNamespaceSet ( compiler->C_BackgroundNamespace ) ;
         SetState ( compiler, DOING_C_TYPE, false ) ;
     }
 }
@@ -398,7 +398,7 @@ _CfrTil_Do_Variable ( Word * word )
     Context * cntx = _Context_ ;
     // since we can have multiple uses of the same word in a block we make copies in Compiler_CheckAndCopyDuplicates 
     // so be sure to use the current copy on top of the WordStack
-    if ( CompileMode && GetState ( _CfrTil_, OPTIMIZE_ON ) && ( ! _Q_->OVT_LC ) ) word = Compiler_WordList ( 0 ) ; //_Context_->CurrentlyRunningWord ; //WordStack ( 0 ) ;
+    if ( CompileMode && GetState ( _CfrTil_, OPTIMIZE_ON ) && ( ! _Q_->OVT_LC ) ) word = CfrTil_WordList ( 0 ) ; //_Context_->CurrentlyRunningWord ; //WordStack ( 0 ) ;
     if ( ! ( word->CAttribute & ( NAMESPACE_VARIABLE ) ) )
     {
         if ( word->CAttribute & ( OBJECT | THIS | QID ) || GetState ( word, QID ) ) //Finder_GetQualifyingNamespace ( cntx->Finder0 ) )

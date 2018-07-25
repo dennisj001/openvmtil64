@@ -67,6 +67,8 @@ List_CheckInterpretLists_OnVariable ( dllist * list, byte * token )
         //List_Init ( list ) ;
     }
 }
+#if 1
+
 void
 _List_PrintNames ( dllist * list, int64 count, int64 flag )
 {
@@ -76,11 +78,11 @@ _List_PrintNames ( dllist * list, int64 count, int64 flag )
     for ( node = dllist_First ( ( dllist* ) list ) ; node && count -- ; node = nextNode )
     {
         nextNode = dlnode_Next ( node ) ;
-        nodeWord = ( node->afterNode && node->afterNode->afterNode ? ( Word* ) dobject_Get_M_Slot ( node, 0 ) : 0 ) ;
-        if ( ! nodeWord ) break ;
-        thisName = nodeWord ? sconvbs ( bt, nodeWord->Name ) : ( byte* ) " ", node ;
         if ( flag )
         {
+            nodeWord = ( node->afterNode && node->afterNode->afterNode ? ( Word* ) dobject_Get_M_Slot ( node, 0 ) : 0 ) ;
+            if ( ! nodeWord ) break ;
+            thisName = nodeWord ? sconvbs ( bt, nodeWord->Name ) : ( byte* ) " ", node ;
             beforeNode = ( node->beforeNode == list->afterNode ? 0 : ( Word * ) dobject_Get_M_Slot ( node->beforeNode, SCN_WORD ) ) ;
             afterNode = ( node->afterNode == list->afterNode ? 0 : ( Word* ) dobject_Get_M_Slot ( node->afterNode, SCN_WORD ) ) ;
             afterName = afterNode ? sconvbs ( ba, afterNode->Name ) : ( byte* ) " ", node->afterNode ;
@@ -88,7 +90,7 @@ _List_PrintNames ( dllist * list, int64 count, int64 flag )
             _Printf ( ( byte* ) "\n\tName : %s 0x%08x \t\tBefore : %s 0x%08x : \t\tAfter : %s 0x%08x,",
                 thisName, node, beforeName, node->beforeNode, afterName, node->afterNode ) ;
         }
-        else _Printf ( ( byte* ) "\n\tName : %s", thisName ) ;
+        else _Printf ( ( byte* ) "\n\tName : %s", ( ( Word* ) ( node ) )->Name ) ; //thisName ) ;
     }
 }
 
@@ -99,4 +101,4 @@ _List_Show_N_Word_Names ( dllist * list, uint64 n, int64 showBeforeAfterFlag, in
     _List_PrintNames ( list, n, showBeforeAfterFlag ) ;
     if ( dbgFlag ) DefaultColors ;
 }
-
+#endif

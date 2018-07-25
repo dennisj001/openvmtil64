@@ -7,7 +7,7 @@
 Word *
 _CopyDuplicateWord ( Word * word0 )
 {
-    d0 ( if ( Is_DebugModeOn ) DWL_ShowList ( _CfrTil_->WordList, 0 ) ) ;
+    d0 ( if ( Is_DebugModeOn ) DWL_ShowList ( _CfrTil_->CompilerWordList, 0 ) ) ;
     Word * wordc = Word_Copy ( word0, DICTIONARY ) ; // use DICTIONARY since we are recycling these anyway
     wordc->W_OriginalWord = Word_GetOriginalWord ( word0 ) ;
     _dlnode_Init ( ( dlnode * ) wordc ) ; // necessary!
@@ -31,7 +31,7 @@ _CfrTil_CopyDuplicatesAndPush ( Word * word0 )
     Word * word1, *wordToBePushed ;
     word0->W_OriginalWord = word0 ;
     word0->S_CAttribute &= ( ~ RECYCLABLE_COPY ) ;
-    if ( word1 = ( Word * ) dllist_Map1_WReturn ( _CfrTil_->WordList, ( MapFunction1 ) CopyDuplicateWord, ( int64 ) word0 ) )
+    if ( word1 = ( Word * ) dllist_Map1_WReturn ( _CfrTil_->CompilerWordList, ( MapFunction1 ) CopyDuplicateWord, ( int64 ) word0 ) )
     {
         wordToBePushed = word1 ;
     }
@@ -122,7 +122,7 @@ Compiler_PreviousNonDebugWord ( int64 startIndex )
 {
     Word * word ;
     int64 i ;
-    for ( i = startIndex ; ( word = ( Word* ) Compiler_WordList ( i ) ) && i > - 3 ; i -- )
+    for ( i = startIndex ; ( word = ( Word* ) CfrTil_WordList ( i ) ) && i > - 3 ; i -- )
     {
         if ( ( Symbol* ) word && ( ! ( word->CAttribute & DEBUG_WORD ) ) ) break ;
     }
@@ -173,15 +173,15 @@ Compiler_GotoList_Print ( )
 }
 
 Word *
-_Compiler_WordList ( Compiler * compiler, int64 n )
+_CfrTil_WordList ( int64 n )
 {
-    return ( Word * ) _dllist_Get_N_InUse_Node_M_Slot ( _CfrTil_->WordList, n, SCN_WORD ) ;
+    return ( Word * ) _dllist_Get_N_InUse_Node_M_Slot ( _CfrTil_->CompilerWordList, n, SCN_WORD ) ;
 }
 
 Word *
-Compiler_WordList ( int64 n )
+CfrTil_WordList ( int64 n )
 {
-    return ( Word * ) _Compiler_WordList ( _Compiler_, n ) ;
+    return ( Word * ) _CfrTil_WordList ( n ) ;
 }
 
 void
@@ -196,7 +196,7 @@ CompileOptimizeInfo_Init ( CompileOptimizeInfo * optInfo, uint64 state )
     _CompileOptimizeInfo_Init ( optInfo ) ;
     dlnode * node ;
     int64 i ;
-    for ( i = 0, node = dllist_First ( ( dllist* ) _CfrTil_->WordList ) ; node ; node = dlnode_Next ( node ) ) // nb. this is a little subtle
+    for ( i = 0, node = dllist_First ( ( dllist* ) _CfrTil_->CompilerWordList ) ; node ; node = dlnode_Next ( node ) ) // nb. this is a little subtle
     {
         if ( dobject_Get_M_Slot ( node, SCN_IN_USE_FLAG ) )
         {
@@ -241,24 +241,6 @@ CfrTil_InitBlockSystem ( Compiler * compiler )
     Stack_Init ( compiler->CombinatorBlockInfoStack ) ;
 }
 
-void
-CfrTil_WordList_RecycleInit (CfrTil * cfrtil, Boolean force )
-{
-    Word * svWord = WordStack ( 0 ) ;
-    if ( ( ! IsSourceCodeOn ) || force ) 
-    {
-        DLList_RecycleWordList ( cfrtil->WordList ) ;
-        List_Init ( cfrtil->WordList ) ;
-    }
-    if ( svWord )
-    {
-        svWord->W_SC_Index = 0 ; // before pushWord !
-        CfrTil_WordList_PushWord ( svWord ) ; // for source code
-        Word_Set_SCA ( svWord ) ;
-    }
-    cfrtil->ScWord = 0 ;
-}
-
 int64
 Compiler_BlockLevel ( Compiler * compiler )
 {
@@ -272,7 +254,7 @@ Compiler_Init ( Compiler * compiler, uint64 state )
     compiler->State = state ;
     _dllist_Init ( compiler->GotoList ) ;
     CfrTil_InitBlockSystem ( compiler ) ;
-    CfrTil_WordList_RecycleInit (_CfrTil_, 0) ;
+    //CfrTil_WordList_RecycleInit ( _CfrTil_, 0, 0 ) ;
     compiler->ContinuePoint = 0 ;
     compiler->BreakPoint = 0 ;
     compiler->InitHere = Here ;
@@ -304,7 +286,6 @@ Compiler_New ( uint64 type )
 {
     Compiler * compiler = ( Compiler * ) Mem_Allocate ( sizeof (Compiler ), type ) ;
     compiler->BlockStack = Stack_New ( 64, type ) ;
-    _CfrTil_->WordList = _dllist_New ( type ) ;
     compiler->PostfixLists = _dllist_New ( type ) ;
     compiler->CombinatorBlockInfoStack = Stack_New ( 64, type ) ;
     compiler->GotoList = _dllist_New ( type ) ;
@@ -346,7 +327,7 @@ Stack_PointerToJmpOffset_Set ( )
 void
 _Compiler_CompileAndRecord_Word0_PushReg ( Compiler * compiler, int8 reg )
 {
-    _Word_CompileAndRecord_PushReg ( _Compiler_WordList ( compiler, 0 ), reg ) ;
+    _Word_CompileAndRecord_PushReg ( _CfrTil_WordList ( 0 ), reg ) ;
 }
 
 void

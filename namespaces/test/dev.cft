@@ -213,17 +213,13 @@ sp
 #endif
 
 //verbosity 3 =
-#if 0
 c_syntaxOn
 Root
 //int cpow ( base power | out ) s{ for ( out = 1 ; power ; ( power -= 1 ) ) { out = out * base ; } return out ; }s 
-int cpow ( base power | out ) { for ( d: out = 1 ; power ; power -= 1 ) { out = out * base ; } return out ; }
+int cpow ( base power | out ) { for ( out = 1 ; power ; power -= 1 ) { out = out * base ; } return out ; }
 'cpow find wdiss
 c_syntaxOff
-2 30 d: cpow dup p  1073741824 _assert
-#else
-TODO ( "fix cpow in dev.cft line 220" )
-#endif
+2 30 cpow dup p  1073741824 _assert
 
 #if 1
 //s: pow ( base power | out -- TOS ) { out 1 = } { power @ 0 > } { power power @ 1 - = } { out out @ base @ * = } for return out @ ;s
@@ -305,7 +301,7 @@ sp
     }fi 
 ;
 20 _fib p //sp
-: _fib2 dup 2 < ?< >:< dup -- _fib2 swap 2 - _fib2 + >; ; 20 _fib2 p //sp
+d: : _fib2 dup 2 < ?< >:< dup -- _fib2 swap 2 - _fib2 + >; ; 20 _fib2 p //sp
 
 : _fib3 
     dup 2 < 
@@ -347,7 +343,7 @@ C
 #if 1        
     "no locals fib  : " ps n @ fib nl 
     //"locals fibn0 : " ps n @ fibn0 nl 
-    "locals fib1  : " ps n @ fib1 nl 
+    "locals fib1    : " ps n @ fib1 nl 
     "no locals fib2 : " ps n @ fib2 nl
     "no locals fib3 : " ps n @ fib3 nl
 #endif        

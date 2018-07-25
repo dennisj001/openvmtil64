@@ -362,13 +362,13 @@ Compile_X_Group1 ( Compiler * compiler, int64 op, int64 ttt, int64 n )
     else
     {
         //_DBI_ON ;
-        Word * one = Compiler_WordList ( 1 ) ;
+        Word * one = CfrTil_WordList ( 1 ) ;
         if ( one && one->StackPushRegisterCode ) SetHere ( one->StackPushRegisterCode ) ;
         else Compile_Pop_To_Acc ( DSP ) ;
         //_Compile_X_Group1 ( int8 code, int64 toRegOrMem, int8 mod, int8 reg, int8 rm, int8 sib, int64 disp, int64 osize )
         Set_SCA (0) ;
         _Compile_X_Group1 ( op, REG, MEM, ACC, DSP, 0, 0, CELL_SIZE ) ; // result is on TOS
-        _Word_CompileAndRecord_PushReg ( Compiler_WordList ( 0 ), ACC ) ; // 0 : ?!? should be the exact variable 
+        _Word_CompileAndRecord_PushReg ( CfrTil_WordList ( 0 ), ACC ) ; // 0 : ?!? should be the exact variable 
         //DBI_OFF ;
     }
 }
@@ -422,7 +422,7 @@ Compile_X_Group5 ( Compiler * compiler, int64 op )
 {
     CompileOptimizeInfo * optInfo = compiler->OptInfo ;
     int64 optFlag = Compiler_CheckOptimize ( compiler, 0 ) ;
-    Word *one = _Compiler_WordList ( compiler, 1 ) ; // assumes two values ( n m ) on the DSP stack 
+    Word *one = _CfrTil_WordList (1) ; // assumes two values ( n m ) on the DSP stack 
     if ( optFlag & OPTIMIZE_DONE ) return ;
     else if ( optFlag )
     {
@@ -455,7 +455,7 @@ Compile_X_Group5 ( Compiler * compiler, int64 op )
         _Compile_Group5 ( op, MEM, DSP, 0, 0, 0 ) ;
     }
     Compiler_Set_BI_setTtnn ( _Context_->Compiler0, TTT_ZERO, NEGFLAG_NZ, TTT_ZERO, NEGFLAG_Z ) ;
-    _Word_CompileAndRecord_PushReg ( Compiler_WordList ( 0 ), optInfo->Optimize_Reg ) ; // 0 : ?!? should be the exact variable 
+    _Word_CompileAndRecord_PushReg ( CfrTil_WordList ( 0 ), optInfo->Optimize_Reg ) ; // 0 : ?!? should be the exact variable 
 }
 
 // load reg with effective address of [ mod rm sib disp ]

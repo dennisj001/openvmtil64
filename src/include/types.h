@@ -942,7 +942,7 @@ typedef struct _CfrTil
     byte * SC_Buffer ; // nb : keep this here -- if we add this field to Lexer it just makes the lexer bigger and we want the smallest lexer possible
     int64 SC_Index, SC_QuoteMode ; // SC_Index == SC_Buffer Index ;
     byte * LispPrintBuffer ; // nb : keep this here -- if we add this field to Lexer it just makes the lexer bigger and we want the smallest lexer possible
-    dllist *TokenList, * WordList ;
+    dllist *TokenList, * CompilerWordList ;
     sigjmp_buf JmpBuf0 ;
 } CfrTil ;
 typedef struct

@@ -594,9 +594,7 @@ CheckRecycleWord ( Node * node )
 void
 DLList_RecycleWordList ( dllist * list )
 {
-    //if ( list == (_Compiler_? _CfrTil_->WordList : (dllist*) 0) )
     dllist_Map ( list, ( MapFunction0 ) CheckRecycleWord ) ;
-    //else dllist_Map ( list, ( MapFunction0 ) _CheckRecycleWord ) ;
 }
 
 void

@@ -180,7 +180,7 @@ _Compile_Stack_Dup ( int8 stackReg )
     if ( optFlag & OPTIMIZE_DONE ) return ;
     else
     {
-        Word * one = Compiler_WordList ( 1 ) ;
+        Word * one = CfrTil_WordList ( 1 ) ;
         if ( one->StackPushRegisterCode )
         {
             SetHere ( one->StackPushRegisterCode ) ;
@@ -191,7 +191,7 @@ _Compile_Stack_Dup ( int8 stackReg )
         else
         {
             Compile_Move_Rm_To_Reg ( ACC, DSP, 0 ) ;
-            Compiler_WordList ( 0 )->StackPushRegisterCode = Here ;
+            CfrTil_WordList ( 0 )->StackPushRegisterCode = Here ;
             Compile_ADDI ( REG, DSP, 0, sizeof (int64 ), 0 ) ;
             Compile_Move_Reg_To_Rm ( DSP, ACC, 0 ) ;
         }

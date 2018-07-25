@@ -96,7 +96,7 @@ Compile_X_Shift ( Compiler * compiler, int64 op, Boolean stackFlag, Boolean opEq
     }
     else
     {
-        Word *one = ( Word* ) _Compiler_WordList ( compiler, 1 ) ; // the operand
+        Word *one = ( Word* ) _CfrTil_WordList (1) ; // the operand
         if ( one->CAttribute && LITERAL )
         {
             SetHere ( one->Coding ) ;

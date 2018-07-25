@@ -185,7 +185,7 @@ CfrTil_Return ( )
         }
     }
 #if 0    
-    else if ( ! _Readline_Is_AtEndOfBlock ( _Context_->ReadLiner0 ) )
+else if ( ! _Readline_Is_AtEndOfBlock ( _Context_->ReadLiner0 ) )
     {
         _CfrTil_CompileCallGoto ( 0, GI_RETURN ) ;
     }
@@ -260,19 +260,6 @@ CfrTil_LeftBracket ( )
     if ( compiler->SaveOptimizeState ) CfrTil_OptimizeOn ( ) ;
 }
 
-void
-CfrTil_t ( )
-{
-    Word * svWord = WordStack ( 0 ) ;
-    CfrTil_WordList_RecycleInit ( _CfrTil_, 1 ) ;
-    if ( svWord )
-    {
-        svWord->W_SC_Index = 0 ; // before pushWord !
-        CfrTil_WordList_PushWord ( svWord ) ; // for source code
-        Word_Set_SCA ( svWord ) ;
-    }
-}
-
 // "|}" - enter the Compiler
 // named following the forth word ']'
 
@@ -282,7 +269,6 @@ CfrTil_RightBracket ( )
     Compiler * compiler = _Compiler_ ;
     SetState ( compiler, COMPILE_MODE, true ) ;
     compiler->SaveOptimizeState = GetState ( _CfrTil_, OPTIMIZE_ON ) ;
-    CfrTil_WordList_RecycleInit ( _CfrTil_, 1 ) ;
 }
 
 void

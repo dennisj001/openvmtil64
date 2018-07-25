@@ -480,7 +480,7 @@ _LO_Define ( ListObject * idNode, ListObject * locals )
     LambdaCalculus * lc = _Q_->OVT_LC ;
     ListObject *value0, *value, *l1 ;
     Word * word = idNode->Lo_CfrTilWord ;
-    CfrTil_WordList_RecycleInit (_CfrTil_, 1) ;
+    CfrTil_WordList_RecycleInit (_CfrTil_, word, 0, 1, 1) ;
     word->Definition = 0 ; // reset the definition from LO_Read
     value0 = _LO_Next ( idNode ) ;
     _CfrTil_->CurrentWordCompiling = word ;
@@ -859,7 +859,7 @@ _LO_Apply_Arg ( ListObject ** pl1, int64 i )
                 CfrTil_Exception ( OBJECT_SIZE_ERROR, 0, QUIT ) ;
             }
             variableFlag = _CheckArrayDimensionForVariables_And_UpdateCompilerState ( ) ;
-            _WordList_Pop ( _CfrTil_->WordList, 0 ) ; // pop the initial '['
+            _WordList_Pop ( _CfrTil_->CompilerWordList, 0 ) ; // pop the initial '['
             do
             {
                 word = l1 ;
@@ -1454,7 +1454,7 @@ _LO_Colon ( ListObject * lfirst )
     lname = _LO_Next ( lcolon ) ;
     ldata = _LO_Next ( lname ) ;
     _CfrTil_Namespace_NotUsing ( ( byte* ) "Lisp" ) ; // nb. don't use Lisp words when compiling cfrTil
-    CfrTil_RightBracket ( ) ;
+    //CfrTil_RightBracket ( ) ;
     Word * word = Word_New ( lname->Name ) ;
     SetState ( cntx->Compiler0, COMPILE_MODE, true ) ;
     CfrTil_BeginBlock ( ) ;

@@ -58,7 +58,7 @@ Interpret_C_Block_EndBlock ( Word * word, byte * tokenToUse, Boolean insertFlag 
     if ( tokenToUse ) _CfrTil_->EndBlockWord->Name = tokenToUse ;
     if ( insertFlag ) SetState ( _Debugger_, DBG_OUTPUT_INSERTION, true ) ;
     _CfrTil_->EndBlockWord->W_RL_Index = _Lexer_->TokenStart_ReadLineIndex ;
-    _Interpreter_DoWord_Default (_Interpreter_, _CfrTil_->EndBlockWord, -1, _CfrTil_->SC_Index ) ;
+    _Interpreter_DoWord_Default ( _Interpreter_, _CfrTil_->EndBlockWord, - 1, _CfrTil_->SC_Index ) ;
     _CfrTil_->EndBlockWord->Name = "}" ;
     //CfrTil_ClearTokenList ( ) ;
     SetState ( _Debugger_, DBG_OUTPUT_INSERTION, false ) ;
@@ -73,7 +73,7 @@ Interpret_C_Block_BeginBlock ( byte * tokenToUse, Boolean insertFlag )
     if ( tokenToUse ) _CfrTil_->BeginBlockWord->Name = tokenToUse ;
     if ( insertFlag ) SetState ( _Debugger_, DBG_OUTPUT_INSERTION, true ) ;
     _CfrTil_->BeginBlockWord->W_RL_Index = _Lexer_->TokenStart_ReadLineIndex ;
-    _Interpreter_DoWord_Default (_Interpreter_, _CfrTil_->BeginBlockWord, -1, _CfrTil_->SC_Index ) ;
+    _Interpreter_DoWord_Default ( _Interpreter_, _CfrTil_->BeginBlockWord, - 1, _CfrTil_->SC_Index ) ;
     _CfrTil_->BeginBlockWord->Name = "{" ;
     compiler->BeginBlockFlag = false ;
     SetState ( _Debugger_, DBG_OUTPUT_INSERTION, false ) ;
@@ -151,7 +151,7 @@ CfrTil_Interpret_C_Blocks ( int64 blocks, Boolean takesAnElseFlag, Boolean semic
             word = _Interpreter_TokenToWord ( interp, token ) ;
             if ( word )
             {
-                _Interpreter_DoWord (interp, word, - 1 , -1) ;
+                _Interpreter_DoWord ( interp, word, - 1, - 1 ) ;
                 if ( word->CAttribute & COMBINATOR )
                 {
                     //Word * lastWord = Compiler_WordList ( 0 ) ;
@@ -188,12 +188,12 @@ CfrTil_C_LeftParen ( )
     if ( ( GetState ( _Context_->Interpreter0, PREPROCESSOR_MODE ) ) ) // && ( isalnum ( ReadLine_LastReadChar ( _ReadLiner_ ) ) ) )
     {
         // this is for "#define" (which is parsed as '#' 'define', two words)
-        if ( isalnum (ReadLine_LastReadChar ( _ReadLiner_ ))) 
-        //if ( ! Compiling) 
-        CfrTil_LocalsAndStackVariablesBegin ( ) ;
+        if ( isalnum ( ReadLine_LastReadChar ( _ReadLiner_ ) ) )
+            //if ( ! Compiling) 
+            CfrTil_LocalsAndStackVariablesBegin ( ) ;
         else Interpret_DoParenthesizedRValue ( ) ;
     }
-    //else if ( ( CompileMode && ( ! GetState ( compiler, VARIABLE_FRAME ) ) )
+        //else if ( ( CompileMode && ( ! GetState ( compiler, VARIABLE_FRAME ) ) )
     else if ( ( ( ! GetState ( compiler, VARIABLE_FRAME ) ) )
         || ( ReadLine_PeekNextNonWhitespaceChar ( _Context_->Lexer0->ReadLiner0 ) == '|' ) ) //( ! GetState ( _Context_, INFIX_MODE ) ) )
     {
@@ -218,7 +218,7 @@ _CfrTil_C_Infix_EqualOp ( Word * opWord )
     Context * cntx = _Context_ ;
     Interpreter * interp = cntx->Interpreter0 ;
     Compiler *compiler = cntx->Compiler0 ;
-    Word * word0 = Compiler_WordList ( 0 ), *lhsWord = compiler->LHS_Word, *rword ;
+    Word * word0 = CfrTil_WordList ( 0 ), *lhsWord = compiler->LHS_Word, *rword ;
     int64 tsrli = word0 ? word0->W_RL_Index : 0 ;
     int64 svscwi = word0 ? word0->W_SC_Index : 0 ;
     byte * svName, * token ;
@@ -233,7 +233,7 @@ _CfrTil_C_Infix_EqualOp ( Word * opWord )
     {
         int64 svState = cntx->State ;
         SetState ( cntx, C_SYNTAX | INFIX_MODE, false ) ; // we don't want to just set compiler->LHS_Word
-        _Interpreter_DoWord_Default (interp, lhsWord, -1, lhsWord->W_SC_Index ) ;
+        _Interpreter_DoWord_Default ( interp, lhsWord, - 1, lhsWord->W_SC_Index ) ;
         cntx->State = svState ;
         word0 = _CfrTil_->StoreWord ;
     }
@@ -248,7 +248,9 @@ _CfrTil_C_Infix_EqualOp ( Word * opWord )
     rword->W_SC_Index = svscwi ;
     svName = rword->Name ;
     rword->Name = "=" ;
-    _Interpreter_DoWord_Default (interp, rword, -1, svscwi ) ;
+    if ( lhsWord ) SetState ( _Debugger_, DBG_OUTPUT_INSERTION, true ) ; // activate this in disassemble source code ??
+    _Interpreter_DoWord_Default ( interp, rword, - 1, svscwi ) ;
+    SetState ( _Debugger_, DBG_OUTPUT_INSERTION, true ) ;
     rword->Name = svName ;
     if ( GetState ( compiler, C_COMBINATOR_LPAREN ) )
     {

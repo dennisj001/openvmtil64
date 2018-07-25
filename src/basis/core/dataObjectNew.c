@@ -194,7 +194,7 @@ _Class_New ( byte * name, uint64 type, int64 cloneFlag )
         _Printf ( ( byte* ) "\nNamespace Error ? : class \"%s\" already exists!\n", ns->Name ) ;
         _Namespace_DoNamespace ( ns, 1 ) ;
     }
-    CfrTil_WordList_RecycleInit (_CfrTil_, 0) ;
+    CfrTil_WordList_RecycleInit (_CfrTil_, 0, 1, 0, 0) ;
 
     return ns ;
 }

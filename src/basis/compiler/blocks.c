@@ -18,7 +18,7 @@ BI_Block_Copy ( BlockInfo * bi, byte* dstAddress, byte * srcAddress, int64 bsize
         isize = _Udis_GetInstructionSize ( ud, srcAddress ) ;
         left -= isize ;
         _CfrTil_AdjustDbgSourceCodeAddress ( srcAddress, Here ) ;
-        d0 ( if ( Is_DebugModeOn ) _DWL_ShowList ( _CfrTil_->WordList, 0 ) ) ;
+        d0 ( if ( Is_DebugModeOn ) _DWL_ShowList ( _CfrTil_->CompilerWordList, 0 ) ) ;
         _CfrTil_AdjustLabels ( srcAddress ) ;
         if ( * srcAddress == _RET )
         {
@@ -125,7 +125,7 @@ void
 CfrTil_TurnOnBlockCompiler ( )
 {
     CfrTil_RightBracket ( ) ;
-    //Compiler_WordList_RecycleInit ( _Context_->Compiler0 ) ;
+    CfrTil_WordList_RecycleInit ( _CfrTil_, _CfrTil_->CurrentWordCompiling, 0, 1, 1 ) ;
 }
 
 // blocks are a notation for subroutines or blocks of code compiled in order,
@@ -143,8 +143,8 @@ _CfrTil_BeginBlock0 ( )
     BlockInfo *bi = ( BlockInfo * ) Mem_Allocate ( sizeof (BlockInfo ), COMPILER_TEMP ) ;
     if ( ( ! CompileMode ) || ( ! Compiler_BlockLevel ( compiler )  ) )// first block
     {
-        CfrTil_TurnOnBlockCompiler ( ) ;
         _CfrTil_->CurrentWordCompiling = compiler->CurrentCreatedWord ;
+        CfrTil_TurnOnBlockCompiler ( ) ;
     }
     bi->OriginalActualCodeStart = Here ;
     _Compile_UninitializedJump ( ) ;
@@ -274,7 +274,7 @@ _CfrTil_EndBlock ( )
     Context * cntx = _Context_ ;
     Compiler * compiler = cntx->Compiler0 ;
     BlockInfo * bi = ( BlockInfo * ) Stack_Pop_WithExceptionOnEmpty ( compiler->BlockStack ) ;
-    bi->LogicCodeWord = _Compiler_WordList ( compiler, 1 ) ;
+    bi->LogicCodeWord = _CfrTil_WordList (1) ;
     _CfrTil_EndBlock1 ( bi ) ;
     byte * blockStart = _CfrTil_EndBlock2 ( bi ) ;
     return blockStart ;

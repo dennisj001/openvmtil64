@@ -272,13 +272,13 @@ $ ( | atoken, buffer, buffer1, Buffer buffer0 )
     }
 } 
 'void.$ find wdiss //pause
-
+TODO ( "fix $ in c_syntax.cft" )
 
 #if doScript 
 "\n\nnew $ test\n" ps
 void.$ls -al . ;
-void.$etc/script ; 
-void.$etc/lispScript ; 
+d: void.$ etc/script ; 
+void.$ etc/lispScript ; 
 String
 $$ls -al /usr/local ; $$ls -al . ;
 //pause

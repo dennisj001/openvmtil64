@@ -68,8 +68,8 @@
 //#define CompilerWordStack _Context_->Compiler0->WordStack
 //#define CompilerLastWord Compiler_WordStack( 0 )
 //#define WordsBack( n ) Compiler_WordStack( (-n) )
-#define WordsBack( n ) Compiler_WordList( (n) )
-#define WordStack( n ) Compiler_WordList( (n) )
+#define WordsBack( n ) CfrTil_WordList( (n) )
+#define WordStack( n ) CfrTil_WordList( (n) )
 #define N_FREE  1
 #define N_UNLOCKED 2
 #define N_LOCKED  4
@@ -292,14 +292,14 @@
 #define DebugWordList_Push( dobj ) _dllist_AddNodeToHead ( _CfrTil_->DebugWordList, ( dlnode* ) dobj )
 #define DbgWL_Push( node ) DebugWordList_Push( node )  
 #define _List_PushNew( list, word, inUseFlag ) _dllist_PushNew_M_Slot_Node ( list, WORD, TEMPORARY, SCN_NUMBER_OF_SLOTS, ((int64) word), word->W_SC_Index, inUseFlag )
-#define CompilerWordList_Push( word, inUseFlag ) _List_PushNew ( _CfrTil_->WordList, word, inUseFlag ) 
+#define CompilerWordList_Push( word, inUseFlag ) _List_PushNew ( _CfrTil_->CompilerWordList, word, inUseFlag ) 
 #define IsGlobalsSourceCodeOn ( GetState ( _CfrTil_, GLOBAL_SOURCE_CODE_MODE ))
 #define _IsSourceCodeOn ( GetState ( _CfrTil_, DEBUG_SOURCE_CODE_MODE ) )
 #define IsSourceCodeOn ( _IsSourceCodeOn || IsGlobalsSourceCodeOn )
 #define IsSourceCodeOff (!IsSourceCodeOn) //( GetState ( _CfrTil_, DEBUG_SOURCE_CODE_MODE ) || IsGlobalsSourceCodeOn ))
 //#define _Set_SCA( word )  { if ( word ) word->Coding = Here ; }
 #define _Set_SCA( word ) Word_Set_SCA ( word ) ;
-#define Set_SCA( index ) _Set_SCA (Compiler_WordList ( index )) ;
+#define Set_SCA( index ) _Set_SCA (CfrTil_WordList ( index )) ;
 //#define SC_Push( word ) DebugWordList_PushWord ( word ) 
 //#define _Set_SCA( word ) //DebugWordList_PushWord ( word ) 
 //#define SC_SetForcePush( tf ) SetState ( _CfrTil_, SC_FORCE_PUSH, tf ) 
@@ -309,7 +309,7 @@
 #define _Block_SCA( index ) _CfrTil_Block_SetSourceCodeAddress( index )
 #define _Block_SCA_Clear _Block_SCA( -1 ) ;
 #define L_SCI _Lexer_->SC_Index
-#define Compiler_OptimizerWordList_Reset( compiler ) List_Init ( _CfrTil_->WordList ) 
+#define Compiler_OptimizerWordList_Reset( compiler ) List_Init ( _CfrTil_->CompilerWordList ) 
 
 #define Strncat( dst, src, n ) strncat ( (char *__restrict) dst, (const char *__restrict) src, (size_t) n )
 #define Strlen( s ) ( s ? strlen ( (const char *) s ) : 0 )

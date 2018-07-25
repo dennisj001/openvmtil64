@@ -250,7 +250,7 @@ lispOff
 sp
 "\nending lisp.cft\n" ddps
 sp 
-#if 0 //doScript
+#if doScript
 String
 $ls -al /usr/local ; 
 $etc/script ;
