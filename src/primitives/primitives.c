@@ -104,7 +104,7 @@ CPrimitive CPrimitives [] = {
     { "c_class", 0, 0, ( block ) CfrTil_C_Class_New, 0, 0, 0, "C_Syntax", "C" },
     { "type", 0, 0, ( block ) CfrTil_Type_New, 0, 0, 0, "C_Syntax", "C" },
     { "typedef", 0, 0, CfrTil_Typedef, 0, 0, 0, "C_Syntax", "C" },
-    { "&", 0, 0, CfrTil_AddressOf, IMMEDIATE, NO_CODING, ADDRESS_OF_OP, "C_Syntax", "C" }, // avoid name clash with '&&' and '&' 
+    { "&", 0, 0, CfrTil_AddressOf, IMMEDIATE, (NO_CODING|ADDRESS_OF_OP), 0, "C_Syntax", "C" }, // avoid name clash with '&&' and '&' 
     //{ "=", 0, 0, (block) CfrTil_C_Infix_Equal, IMMEDIATE | CATEGORY_EQUAL | KEYWORD, 0, 0, "C_Syntax", "C" }, //"Infix", "Compiler" },
 
     { "}", 0, 0, CfrTil_TypedefStructEnd, IMMEDIATE | KEYWORD, 0, 0, "C_Typedef", "C_Syntax" },

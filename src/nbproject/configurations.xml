@@ -105,9 +105,9 @@
                    displayName="Important Files"
                    projectFiles="false"
                    kind="IMPORTANT_FILES_FOLDER">
-      <itemPath>../.init.cft</itemPath>
       <itemPath>Makefile</itemPath>
       <itemPath>../etc</itemPath>
+      <itemPath>../init.cft</itemPath>
       <itemPath>nbproject/private/launcher.properties</itemPath>
       <itemPath>../m</itemPath>
       <itemPath>../mir</itemPath>

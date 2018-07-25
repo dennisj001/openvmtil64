@@ -199,7 +199,7 @@ void
 Compiler_Optimizer_WordArg2Op_Or_xBetweenArg1AndArg2 ( Compiler * compiler )
 {
     CompileOptimizeInfo * optInfo = compiler->OptInfo ;
-    if ( ( optInfo->wordArg2 && optInfo->wordArg2->StackPushRegisterCode ) || ( optInfo->xBetweenArg1AndArg2->StackPushRegisterCode ) )
+    if ( ( optInfo->wordArg2 && optInfo->wordArg2->StackPushRegisterCode ) || ( optInfo->xBetweenArg1AndArg2 && optInfo->xBetweenArg1AndArg2->StackPushRegisterCode ) )
     {
         if ( optInfo->wordArg2->StackPushRegisterCode ) _SetHere_To_Word_StackPushRegisterCode ( optInfo->wordArg2 ) ;
         else if ( optInfo->xBetweenArg1AndArg2->StackPushRegisterCode ) _SetHere_To_Word_StackPushRegisterCode ( optInfo->xBetweenArg1AndArg2 ) ;
@@ -314,7 +314,7 @@ Compiler_CompileOptimizedLoad ( Compiler * compiler )
 {
     CompileOptimizeInfo * optInfo = compiler->OptInfo ;
     _Set_SCA ( optInfo->opWord ) ;
-    if ( optInfo->wordArg2->StackPushRegisterCode )
+    if ( optInfo->wordArg2 && optInfo->wordArg2->StackPushRegisterCode )
     {
         if ( optInfo->wordArg2->CAttribute & DOBJECT )
         {
@@ -547,6 +547,19 @@ Compile_Optimize_Store ( Compiler * compiler )
         }
         goto done ;
     }
+    
+#if 0    
+    else
+    {
+        if ( optInfo->NumberOfArgs == 2 )
+        {
+            SetHere ( optInfo->wordArg1->Coding ) ;
+            _Compile_GetVarLitObj_LValue_To_Reg ( optInfo->wordArg2, reg ) ;
+            Compile_GetVarLitObj_RValue_To_Reg ( optInfo->wordArg1, rm ) ;
+        }
+    }
+#endif
+    
     _Set_SCA ( optInfo->opWord ) ;
     Compile_Move_Reg_To_Rm ( reg, rm, 0 ) ;
 done:

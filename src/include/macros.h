@@ -223,7 +223,7 @@
 #define OBJECT_TYPE ( LITERAL | CONSTANT | NAMESPACE_VARIABLE | LOCAL_VARIABLE | OBJECT | DOBJECT | PARAMETER_VARIABLE | T_LISP_SYMBOL ) // | T_LISP_SYMBOL
 #define NON_MORPHISM_TYPE ( OBJECT_TYPE | NAMESPACE_RELATED_TYPE )
 #define IS_NON_MORPHISM_TYPE(word) (word->CAttribute & NON_MORPHISM_TYPE)
-#define IS_MORPHISM_TYPE( word ) ( ( ( ! ( word->CAttribute & ( NON_MORPHISM_TYPE | DEBUG_WORD | OBJECT_OPERATOR ) ) ) && ( ! ( word->LAttribute & (ADDRESS_OF_OP|T_LISP_SYMBOL ) ) ) ) || ( word->CAttribute & ( CATEGORY_OP|KEYWORD|BLOCK ) ))
+#define IS_MORPHISM_TYPE( word ) ( ( ( ! ( word->CAttribute & ( NON_MORPHISM_TYPE | DEBUG_WORD | OBJECT_OPERATOR ) ) ) && ( ! ( word->LAttribute & (T_LISP_SYMBOL ) ) ) && ( ! ( word->CAttribute2 & (ADDRESS_OF_OP) ) ) ) || ( word->CAttribute & ( CATEGORY_OP|KEYWORD|BLOCK ) ))
 
 #define Is_NamespaceType( w ) ( w ? (( ( Namespace* ) w )->CAttribute & NAMESPACE_TYPE) : 0 )
 #define Is_ValueType( w ) ( w ? ( ( Namespace* ) w )->CAttribute & (NON_MORPHISM_TYPE (w)) : 0 )
@@ -291,7 +291,7 @@
 #define WordList_Pop( list, m ) if ( ! IsSourceCodeOn ) _WordList_Pop( list, m )
 #define DebugWordList_Push( dobj ) _dllist_AddNodeToHead ( _CfrTil_->DebugWordList, ( dlnode* ) dobj )
 #define DbgWL_Push( node ) DebugWordList_Push( node )  
-#define _List_PushNew( list, word, inUseFlag ) _dllist_PushNew_M_Slot_Node ( list, WORD, TEMPORARY, SCN_NUMBER_OF_SLOTS, ((int64) word), word->W_SC_WordIndex, inUseFlag )
+#define _List_PushNew( list, word, inUseFlag ) _dllist_PushNew_M_Slot_Node ( list, WORD, TEMPORARY, SCN_NUMBER_OF_SLOTS, ((int64) word), word->W_SC_Index, inUseFlag )
 #define CompilerWordList_Push( word, inUseFlag ) _List_PushNew ( _CfrTil_->WordList, word, inUseFlag ) 
 #define IsGlobalsSourceCodeOn ( GetState ( _CfrTil_, GLOBAL_SOURCE_CODE_MODE ))
 #define _IsSourceCodeOn ( GetState ( _CfrTil_, DEBUG_SOURCE_CODE_MODE ) )
@@ -308,7 +308,7 @@
 #define SC_Global_Off SetState ( _CfrTil_, GLOBAL_SOURCE_CODE_MODE, false )
 #define _Block_SCA( index ) _CfrTil_Block_SetSourceCodeAddress( index )
 #define _Block_SCA_Clear _Block_SCA( -1 ) ;
-#define SC_SPI _CfrTil_->SC_SPIndex
+#define L_SCI _Lexer_->SC_Index
 #define Compiler_OptimizerWordList_Reset( compiler ) List_Init ( _CfrTil_->WordList ) 
 
 #define Strncat( dst, src, n ) strncat ( (char *__restrict) dst, (const char *__restrict) src, (size_t) n )

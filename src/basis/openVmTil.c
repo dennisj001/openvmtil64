@@ -1,5 +1,5 @@
 #include "../include/cfrtil64.h"
-#define VERSION ((byte*) "0.843.970" ) 
+#define VERSION ((byte*) "0.844.210" ) 
 
 OpenVmTil * _Q_ ; 
 
@@ -55,14 +55,14 @@ _OpenVmTil_Init ( OpenVmTil * ovt, int64 resetHistory )
     //ovt->psi_PrintStateInfo = PrintStateInfo_New ( ) ; // variable init needed by any allocation which call _Printf
     ovt->VersionString = VERSION ;
     // ? where do we want the init file ?
-    if ( _File_Exists ( ( byte* ) "./.init.cft" ) )
+    if ( _File_Exists ( ( byte* ) "./init.cft" ) )
     {
-        ovt->InitString = ( byte* ) "\"./.init.cft\" include" ; // could allow override with a startup parameter
+        ovt->InitString = ( byte* ) "\"./init.cft\" include" ; // could allow override with a startup parameter
         SetState ( ovt, OVT_IN_USEFUL_DIRECTORY, true ) ;
     }
     else
     {
-        ovt->InitString = ( byte* ) "\"/usr/local/lib/cfrTil64/.init.cft\" include" ; // could allow override with a startup parameter
+        ovt->InitString = ( byte* ) "\"/usr/local/lib/cfrTil64/init.cft\" include" ; // could allow override with a startup parameter
         SetState ( ovt, OVT_IN_USEFUL_DIRECTORY, false ) ;
     }
     if ( ovt->Verbosity > 1 )

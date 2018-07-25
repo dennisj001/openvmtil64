@@ -6,10 +6,10 @@
 // runs all new object thru here ; good for debugging and understanding 
 
 Word *
-_DataObject_New ( uint64 type, Word * word, byte * name, uint64 ctype, uint64 ctype2, uint64 ltype, int64 index, int64 value, int64 startCharRlIndex, int64 scIndex )
+_DataObject_New ( uint64 type, Word * word, byte * name, uint64 ctype, uint64 ctype2, uint64 ltype, int64 index, int64 value, int64 tsrli, int64 scwi )
 {
-    if ( startCharRlIndex == - 1 ) startCharRlIndex = _Lexer_->TokenStart_ReadLineIndex ;
-    else if ( startCharRlIndex ) _Lexer_->TokenStart_ReadLineIndex = startCharRlIndex ;
+    tsrli = ( tsrli != - 1 ) ? tsrli : _Lexer_->TokenStart_ReadLineIndex ;
+    scwi = ( scwi != - 1 ) ? scwi : _Lexer_->SC_Index ;
     if ( word && ( ! ( type & ( T_LC_NEW ) ) ) ) //&& !(type && (T_LC_NEW | T_LC_LITERAL))) 
     {
         Word_Recycle ( word ) ;
@@ -18,7 +18,7 @@ _DataObject_New ( uint64 type, Word * word, byte * name, uint64 ctype, uint64 ct
     {
         case T_LC_NEW:
         {
-            word = _LO_New ( ltype, ctype, ctype2, ( byte* ) value, word, LISP_TEMP, startCharRlIndex, scIndex ) ; // all words are symbols
+            word = _LO_New ( ltype, ctype, ctype2, ( byte* ) value, word, LISP_TEMP, tsrli, scwi ) ; // all words are symbols
             break ;
         }
         case T_LC_LITERAL:
@@ -93,7 +93,7 @@ _DataObject_New ( uint64 type, Word * word, byte * name, uint64 ctype, uint64 ct
             break ;
         }
     }
-    if ( word && ( ! word->W_SC_WordIndex ) ) word->W_SC_WordIndex = _CfrTil_->SC_SPIndex ; //word->W_SC_ScratchPadIndex ? word->W_SC_ScratchPadIndex : _CfrTil_->SC_ScratchPadIndex ;
+    //if ( word && ( ! word->W_SC_Index ) ) word->W_SC_Index = _CfrTil_->SC_Index ; //word->W_SC_ScratchPadIndex ? word->W_SC_ScratchPadIndex : _CfrTil_->SC_ScratchPadIndex ;
     return word ;
 }
 
@@ -194,7 +194,7 @@ _Class_New ( byte * name, uint64 type, int64 cloneFlag )
         _Printf ( ( byte* ) "\nNamespace Error ? : class \"%s\" already exists!\n", ns->Name ) ;
         _Namespace_DoNamespace ( ns, 1 ) ;
     }
-    Compiler_WordList_RecycleInit ( _Context_->Compiler0 ) ;
+    CfrTil_WordList_RecycleInit (_CfrTil_, 0) ;
 
     return ns ;
 }

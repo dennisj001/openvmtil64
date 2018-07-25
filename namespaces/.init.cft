@@ -342,7 +342,7 @@ C Compiler Int Lexer
     file name @ fopen =
     nl { result file @ input 1 fread = input @ emit } { result @ 1 == } doWhile 
     file @ fclose
-d: ; prefix
+; prefix
 'ofile find wdiss
 Root
 : license ofile ( "./LICENSE" ) ;
@@ -370,7 +370,7 @@ Root
 'doScript 1 const
 '_doDemo 0 const    
 dbgOff
-//dbgOn 
+dbgOn 
 #if Is_DebugOn 
 scOn
 System 

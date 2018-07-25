@@ -120,7 +120,7 @@ c_syntaxOff
 sp
 User
 //'dn 'dfnba find alias  
-: factorial ( REG n | REG rec -- RAX ) rec 1 = { n @ 1 > } d: { rec @ n @ * rec store n -- } while return rec ;
+: factorial ( REG n | REG rec -- RAX ) rec 1 = { n @ 1 > } { rec @ n @ * rec store n -- } while return rec ;
 : _ifx ( w | j ) 
     { j 1 = } { j @ 23 <= } { j ++ } 
     {
@@ -213,13 +213,18 @@ sp
 #endif
 
 //verbosity 3 =
+#if 0
 c_syntaxOn
 Root
 //int cpow ( base power | out ) s{ for ( out = 1 ; power ; ( power -= 1 ) ) { out = out * base ; } return out ; }s 
-int cpow ( base power | out ) { for ( out = 1 ; power ; power -= 1 ) { out = out * base ; } return out ; }
+int cpow ( base power | out ) { for ( d: out = 1 ; power ; power -= 1 ) { out = out * base ; } return out ; }
 'cpow find wdiss
 c_syntaxOff
-2 30 cpow dup p  1073741824 _assert
+2 30 d: cpow dup p  1073741824 _assert
+#else
+TODO ( "fix cpow in dev.cft line 220" )
+#endif
+
 #if 1
 //s: pow ( base power | out -- TOS ) { out 1 = } { power @ 0 > } { power power @ 1 - = } { out out @ base @ * = } for return out @ ;s
 : pow ( base power | out ) { out 1 = } { power @ 0 > } { power power @ 1 - = } { out out @ base @ * = } for return out ;
@@ -227,7 +232,7 @@ c_syntaxOff
 2 30 pow dup p  1073741824 _assert 
 : pow ( base power | out ) { out 1 = } { power @ 0 > } { power power @ 1 - = } { out out @ base @ * = } for return out ;
 "pow" ffx2
-"cpow" ffx2
+//"cpow" ffx2
 
 Int
 "**" ffx2

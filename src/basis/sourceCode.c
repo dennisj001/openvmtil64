@@ -44,7 +44,7 @@ DWL_Find ( dllist * list, Word * iword, byte * address, byte* name, int64 takeFi
                     if ( ! foundWord )
                     {
                         nword->Coding = newAddress ;
-                        //if ( _Q_->Verbosity > 2 )
+                        if ( _Q_->Verbosity > 2 )
                         {
                             d1 ( if ( Is_DebugModeOn ) _DWL_ShowWord_Print ( nword, 0, "CODING ADJUST", address, newAddress, 0, iuFlag ) ) ;
                         }
@@ -55,9 +55,9 @@ DWL_Find ( dllist * list, Word * iword, byte * address, byte* name, int64 takeFi
                 if ( foundWord )
                 {
                     // remember there are probably many words with this compiled at address because we don't remove when we rewrite code
-                    fDiff = abs ( scwi - foundWord->W_SC_WordIndex ) ;
+                    fDiff = abs ( scwi - foundWord->W_SC_Index ) ;
                     //if ( ( fDiff < SC_WINDOW ) || ( scwi < foundWord->W_SC_WordIndex ) )
-                    if ( ( scwi < foundWord->W_SC_WordIndex ) )
+                    if ( ( scwi < foundWord->W_SC_Index ) )
                     {
                         foundWord = aFoundWord ;
                         if ( fDiff < fwDiff )
@@ -76,7 +76,7 @@ DWL_Find ( dllist * list, Word * iword, byte * address, byte* name, int64 takeFi
                 if ( ( ! minDiffFound ) || ( fDiff < minDiffFound ) ) minDiffFound = fDiff ;
                 if ( ( _Q_->Verbosity > 2 ) )
                 {
-                    _DWL_ShowWord ( anode, "FOUND", fDiff ) ;
+                    d1 ( if ( Is_DebugModeOn ) _DWL_ShowWord ( anode, "FOUND", fDiff ) ) ;
                 }
                 if ( foundWord && takeFirstFind ) break ;
             }
@@ -90,23 +90,31 @@ DWL_Find ( dllist * list, Word * iword, byte * address, byte* name, int64 takeFi
             _DWL_ShowWord_Print ( foundWord, 0, "CHOSEN", foundWord->Coding, 0, minDiffFound, 1 ) ; //_DWL_ShowWord ( foundWord, "CHOSEN", minDiffFound ) ;
         }
         if ( address ) _Debugger_->LastSourceCodeAddress = address ;
-        if ( foundWord ) _Debugger_->LastSourceCodeIndex = foundWord->W_SC_WordIndex ;
+        if ( foundWord ) _Debugger_->LastSourceCodeIndex = foundWord->W_SC_Index ;
         return foundWord ;
     }
     return 0 ;
 }
 
+Word *
+Get_SourceCodeWord ()
+{    
+    Word * scWord = _CfrTil_->ScWord ? _CfrTil_->ScWord : Compiling ? _CfrTil_->CurrentWordCompiling : _CfrTil_->LastFinished_DObject ; 
+    //GetState ( debugger, DBG_STEPPING ) ? Debugger_GetWordFromAddress ( debugger ) : _Context_->CurrentDisassemblyWord ;
+    return scWord ;
+}    
+
 void
 _Debugger_ShowDbgSourceCodeAtAddress ( Debugger * debugger, byte * address )
 {
     // ...source code source code TP source code source code ... EOL
-    Word * scWord = _CfrTil_->ScWord ? _CfrTil_->ScWord : Compiling ? _CfrTil_->CurrentWordCompiling : _CfrTil_->LastFinished_DObject ; //GetState ( debugger, DBG_STEPPING ) ? Debugger_GetWordFromAddress ( debugger ) : _Context_->CurrentDisassemblyWord ;
+    Word * scWord = Get_SourceCodeWord () ;
     if ( scWord )
     {
         dllist * list = ( scWord->W_SC_WordList ) ; //&& ( scWord->W_SC_MemSpaceRandMarker == _Q_->MemorySpace0->TempObjectSpace->InitFreedRandMarker ) ) ? scWord->W_SC_WordList : 0 ; //_CfrTil_->WordList ;
         if ( list )
         {
-            byte *sourceCode = scWord->W_SourceCode ? scWord->W_SourceCode : String_New ( _CfrTil_->SC_ScratchPad, TEMPORARY ) ;
+            byte *sourceCode = scWord->W_SourceCode ? scWord->W_SourceCode : String_New ( _CfrTil_->SC_Buffer, TEMPORARY ) ;
             if ( ! String_Equal ( sourceCode, "" ) )
             {
                 int64 fixed = 0 ;
@@ -141,7 +149,7 @@ PrepareDbgSourceCodeString ( byte * sc, Word * word ) // sc : source code ; scwi
     byte * cc_line = ( byte* ) "" ;
     if ( sc && word )
     {
-        int64 scwi0 = word->W_SC_WordIndex ;
+        int64 scwi0 = word->W_SC_Index ;
         byte *nvw, * token0 = word->Name, *token1 ;
         int64 i, tp = 42, lef, leftBorder, ts, rightBorder, ref ; // tp : text point - where we want to start source code text to align with disassembly ; ref : right ellipsis flag
         token1 = String_ConvertToBackSlash ( token0 ) ;
@@ -215,7 +223,7 @@ SC_ListClearAddress ( dlnode * node, Word * word, byte * address )
     if ( ( nword->Coding == address ) ) //&& ( nword->W_SC_WordIndex != word->W_SC_WordIndex ) )
     {
         nword->Coding = 0 ;
-        d0 ( if ( Is_DebugModeOn ) _Printf ( ( byte* ) "\nnword %s with scwi %d :: cleared for word %s with scwi %d", nword->Name, nword->W_SC_WordIndex, word->Name, word->W_SC_WordIndex ) ) ;
+        d0 ( if ( Is_DebugModeOn ) _Printf ( ( byte* ) "\nnword %s with scwi %d :: cleared for word %s with scwi %d", nword->Name, nword->W_SC_Index, word->Name, word->W_SC_Index ) ) ;
     }
 }
 
@@ -265,7 +273,7 @@ CfrTil_WordLists_PopWord ( )
 void
 _DWL_ShowWord_Print ( Word * word, int64 index, byte * prefix, byte * coding, byte * newCoding, int64 scwiDiff, Boolean iuoFlag )
 {
-    int64 scwi = word->W_SC_WordIndex ;
+    int64 scwi = word->W_SC_Index ;
     byte * name = String_ConvertToBackSlash ( word->Name ), *iuFlag = iuoFlag ? "true" : "false" ;
     if ( newCoding )
     {
@@ -325,7 +333,7 @@ SC_WordList_Show ( dllist * list, Word * scWord, Boolean inUseOnlyFlag, byte * l
 void
 DebugWordList_ShowAll ( Debugger * debugger )
 {
-    Word * scWord = Compiling ? _CfrTil_->CurrentWordCompiling : GetState ( debugger, DBG_STEPPING ) ? Debugger_GetWordFromAddress ( debugger ) : _Context_->CurrentlyRunningWord ;
+    Word * scWord = Get_SourceCodeWord () ; //Compiling ? _CfrTil_->CurrentWordCompiling : GetState ( debugger, DBG_STEPPING ) ? Debugger_GetWordFromAddress ( debugger ) : _Context_->CurrentlyRunningWord ;
     dllist * list = scWord->W_SC_WordList ? scWord->W_SC_WordList : _CfrTil_->WordList ;
     SC_WordList_Show ( list, scWord, 0, list == scWord->W_SC_WordList ? "SourceCode" : "Compiler" ) ;
 }
@@ -335,7 +343,7 @@ void
 _Compiler_Show_WordList ( byte * prefix, int8 inUseFlag )
 {
 
-    Word * scWord = Compiling ? _CfrTil_->CurrentWordCompiling : GetState ( _Debugger_, DBG_STEPPING ) ? Debugger_GetWordFromAddress ( _Debugger_ ) : _Context_->CurrentlyRunningWord ;
+    Word * scWord = Get_SourceCodeWord () ;//Compiling ? _CfrTil_->CurrentWordCompiling : GetState ( _Debugger_, DBG_STEPPING ) ? Debugger_GetWordFromAddress ( _Debugger_ ) : _Context_->CurrentlyRunningWord ;
     if ( Is_DebugModeOn ) NoticeColors ;
     _Printf ( "\n%s", prefix ) ;
     SC_WordList_Show ( _CfrTil_->WordList, scWord, inUseFlag, "Compiler" ) ;
@@ -426,6 +434,7 @@ CfrTil_SourceCodeCompileOn_Colon ( )
 {
     CfrTil_DbgSourceCodeOn ( ) ;
     CfrTil_SourceCode_Init ( ) ;
+    //CfrTil_WordList_RecycleInit ( _CfrTil_ ) 
     if ( ! GetState ( _Context_, C_SYNTAX ) ) _CfrTil_Colon ( ) ;
 }
 
@@ -441,8 +450,8 @@ _CfrTil_AddStringToSourceCode ( CfrTil * cfrtil, byte * str )
 {
     if ( str )
     {
-        strcat ( ( char* ) cfrtil->SC_ScratchPad, ( char* ) str ) ;
-        strcat ( ( CString ) cfrtil->SC_ScratchPad, ( CString ) " " ) ;
+        strcat ( ( char* ) cfrtil->SC_Buffer, ( char* ) str ) ;
+        strcat ( ( CString ) cfrtil->SC_Buffer, ( CString ) " " ) ;
     }
 }
 
@@ -450,20 +459,20 @@ void
 CfrTil_AddStringToSourceCode ( CfrTil * cfrtil, byte * str )
 {
     _CfrTil_AddStringToSourceCode ( cfrtil, str ) ;
-    cfrtil->SC_SPIndex += ( Strlen ( ( char* ) str ) + 1 ) ; // 1 : add " " (above)
+    cfrtil->SC_Index += ( Strlen ( ( char* ) str ) + 1 ) ; // 1 : add " " (above)
 }
 
 void
 _CfrTil_SC_ScratchPadIndex_Init ( CfrTil * cfrtil )
 {
-    cfrtil->SC_SPIndex = Strlen ( ( char* ) _CfrTil_->SC_ScratchPad ) ;
+    cfrtil->SC_Index = Strlen ( ( char* ) _CfrTil_->SC_Buffer ) ;
 }
 
 void
 CfrTil_SourceCode_InitEnd ( CfrTil * cfrtil )
 {
-    cfrtil->SC_ScratchPad [ 0 ] = 0 ;
-    cfrtil->SC_SPIndex = 0 ;
+    cfrtil->SC_Buffer [ 0 ] = 0 ;
+    cfrtil->SC_Index = 0 ;
     SetState ( cfrtil, SOURCE_CODE_STARTED, false ) ;
 }
 
@@ -541,7 +550,7 @@ _CfrTil_Init_Recycling_SourceCodeWordList ( CfrTil * cfrtil, Word * word )
 byte *
 _CfrTil_GetSourceCode ()
 {
-    byte * sc = String_New ( _CfrTil_->SC_ScratchPad, STRING_MEM ) ;
+    byte * sc = String_New ( _CfrTil_->SC_Buffer, STRING_MEM ) ;
     return sc ;
 }
 
@@ -563,10 +572,10 @@ CfrTil_FinishSourceCode ( CfrTil * cfrtil, Word * word )
 void
 _CfrTil_UnAppendFromSourceCode_NChars ( CfrTil * cfrtil, int64 nchars )
 {
-    int64 plen = Strlen ( ( CString ) cfrtil->SC_ScratchPad ) ;
+    int64 plen = Strlen ( ( CString ) cfrtil->SC_Buffer ) ;
     if ( plen >= nchars )
     {
-        cfrtil->SC_ScratchPad [ Strlen ( ( CString ) cfrtil->SC_ScratchPad ) - nchars ] = 0 ;
+        cfrtil->SC_Buffer [ Strlen ( ( CString ) cfrtil->SC_Buffer ) - nchars ] = 0 ;
     }
     _CfrTil_SC_ScratchPadIndex_Init ( cfrtil ) ;
 }
@@ -584,14 +593,14 @@ void
 _CfrTil_AppendCharToSourceCode ( CfrTil * cfrtil, byte c )
 {
 
-    cfrtil->SC_ScratchPad [ cfrtil->SC_SPIndex ++ ] = c ;
-    cfrtil->SC_ScratchPad [ cfrtil->SC_SPIndex ] = 0 ;
+    cfrtil->SC_Buffer [ cfrtil->SC_Index ++ ] = c ;
+    cfrtil->SC_Buffer [ cfrtil->SC_Index ] = 0 ;
 }
 
 void
 CfrTil_AppendCharToSourceCode ( CfrTil * cfrtil, byte c, int64 convertToSpaceFlag )
 {
-    if ( cfrtil->SC_SPIndex < ( SOURCE_CODE_BUFFER_SIZE - 1 ) )
+    if ( cfrtil->SC_Index < ( SOURCE_CODE_BUFFER_SIZE - 1 ) )
     {
         if ( c == '"' )
         {
@@ -602,14 +611,14 @@ CfrTil_AppendCharToSourceCode ( CfrTil * cfrtil, byte c, int64 convertToSpaceFla
         else if ( convertToSpaceFlag )
         {
             c = String_ConvertEscapeCharToSpace ( c ) ;
-            if ( ! ( ( c == ' ' ) && ( cfrtil->SC_ScratchPad [ cfrtil->SC_SPIndex - 1 ] == ' ' ) ) )
+            if ( ! ( ( c == ' ' ) && ( cfrtil->SC_Buffer [ cfrtil->SC_Index - 1 ] == ' ' ) ) )
             {
                 _CfrTil_AppendCharToSourceCode ( cfrtil, c ) ;
             }
         }
         else
         {
-            _String_AppendConvertCharToBackSlashAtIndex ( cfrtil->SC_ScratchPad, c, &cfrtil->SC_SPIndex, cfrtil->SC_QuoteMode ) ;
+            _String_AppendConvertCharToBackSlashAtIndex ( cfrtil->SC_Buffer, c, &cfrtil->SC_Index, cfrtil->SC_QuoteMode ) ;
         }
     }
 }

@@ -26,7 +26,7 @@ CopyDuplicateWord ( dlnode * anode, Word * word0 )
 }
 
 Word *
-_Compiler_CopyDuplicatesAndPush ( Compiler * compiler, Word * word0 )
+_CfrTil_CopyDuplicatesAndPush ( Word * word0 )
 {
     Word * word1, *wordToBePushed ;
     word0->W_OriginalWord = word0 ;
@@ -45,7 +45,7 @@ Compiler_CopyDuplicatesAndPush ( Word * word0 )
     if ( ( word0->CAttribute & ( DEBUG_WORD | INTERPRET_DBG ) ) || ( word0->LAttribute & ( W_COMMENT | W_PREPROCESSOR ) ) ) return word0 ;
     if ( word0 && CompileMode )
     {
-        word0 = _Compiler_CopyDuplicatesAndPush ( _Context_->Compiler0, word0 ) ;
+        word0 = _CfrTil_CopyDuplicatesAndPush ( word0 ) ;
     }
     CfrTil_WordList_PushWord ( word0 ) ;
     return word0 ;
@@ -242,13 +242,21 @@ CfrTil_InitBlockSystem ( Compiler * compiler )
 }
 
 void
-Compiler_WordList_RecycleInit ( Compiler * compiler )
+CfrTil_WordList_RecycleInit (CfrTil * cfrtil, Boolean force )
 {
-    if ( ! IsSourceCodeOn )
+    Word * svWord = WordStack ( 0 ) ;
+    if ( ( ! IsSourceCodeOn ) || force ) 
     {
-        DLList_RecycleWordList ( _CfrTil_->WordList ) ;
-        List_Init ( _CfrTil_->WordList ) ;
+        DLList_RecycleWordList ( cfrtil->WordList ) ;
+        List_Init ( cfrtil->WordList ) ;
     }
+    if ( svWord )
+    {
+        svWord->W_SC_Index = 0 ; // before pushWord !
+        CfrTil_WordList_PushWord ( svWord ) ; // for source code
+        Word_Set_SCA ( svWord ) ;
+    }
+    cfrtil->ScWord = 0 ;
 }
 
 int64
@@ -259,11 +267,12 @@ Compiler_BlockLevel ( Compiler * compiler )
 }
 
 void
-Compiler_Init ( Compiler * compiler, uint64 state, Boolean recycle )
+Compiler_Init ( Compiler * compiler, uint64 state )
 {
     compiler->State = state ;
     _dllist_Init ( compiler->GotoList ) ;
     CfrTil_InitBlockSystem ( compiler ) ;
+    CfrTil_WordList_RecycleInit (_CfrTil_, 0) ;
     compiler->ContinuePoint = 0 ;
     compiler->BreakPoint = 0 ;
     compiler->InitHere = Here ;
@@ -287,6 +296,7 @@ Compiler_Init ( Compiler * compiler, uint64 state, Boolean recycle )
     compiler->CurrentWord = 0 ;
     SetBuffersUnused ( 1 ) ;
     SetState ( compiler, VARIABLE_FRAME, false ) ;
+    //if ( _Lexer_ ) Lexer_Init ( _Lexer_, 0, 0, CONTEXT ) ;
 }
 
 Compiler *
@@ -294,7 +304,7 @@ Compiler_New ( uint64 type )
 {
     Compiler * compiler = ( Compiler * ) Mem_Allocate ( sizeof (Compiler ), type ) ;
     compiler->BlockStack = Stack_New ( 64, type ) ;
-    _CfrTil_->WordList = _dllist_New ( CFRTIL ) ;
+    _CfrTil_->WordList = _dllist_New ( type ) ;
     compiler->PostfixLists = _dllist_New ( type ) ;
     compiler->CombinatorBlockInfoStack = Stack_New ( 64, type ) ;
     compiler->GotoList = _dllist_New ( type ) ;
@@ -304,7 +314,7 @@ Compiler_New ( uint64 type )
     compiler->CombinatorInfoStack = Stack_New ( 64, type ) ;
     compiler->InfixOperatorStack = Stack_New ( 32, type ) ;
     Compiler_CompileOptimizeInfo_New ( compiler, type ) ;
-    Compiler_Init ( compiler, 0, 0 ) ;
+    Compiler_Init ( compiler, 0 ) ;
     return compiler ;
 }
 

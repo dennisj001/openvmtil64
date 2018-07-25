@@ -226,6 +226,7 @@ void
 _Compile_Write_Instruction_X64 ( int8 rex, uint8 opCode0, uint8 opCode1, int8 modRm, int16 controlFlags, int8 sib, int64 disp, int8 dispSize, int64 imm, int8 immSize )
 {
     d1 ( byte * here = Here ) ;
+    //Set_SCA (0) ;
     //if ( controlFlags & REX_B ) rex |= 0x40 ; 
     if ( rex ) _Compile_Int8 ( rex ) ;
     if ( opCode0 ) _Compile_Int8 ( ( byte ) opCode0 ) ;
@@ -269,6 +270,7 @@ _Compile_X_Group1 ( int8 code, int8 toRegOrMem, int8 mod, int8 reg, int8 rm, int
     // otherwise it could be optimally deduced but let caller control by keeping operandSize parameter
     // some times we need cell_t where bytes would work
     // _Compile_InstructionX86 ( opCode, mod, reg, rm, modRmImmDispFlag, sib, disp, imm, immSize )
+    Set_SCA (0) ;
     Compile_CalcWrite_Instruction_X64 ( 0, opCode, mod, reg, rm, DISP_B | REX_B | MODRM_B, sib, disp, 0, 0, osize ) ;
 }
 
@@ -364,6 +366,7 @@ Compile_X_Group1 ( Compiler * compiler, int64 op, int64 ttt, int64 n )
         if ( one && one->StackPushRegisterCode ) SetHere ( one->StackPushRegisterCode ) ;
         else Compile_Pop_To_Acc ( DSP ) ;
         //_Compile_X_Group1 ( int8 code, int64 toRegOrMem, int8 mod, int8 reg, int8 rm, int8 sib, int64 disp, int64 osize )
+        Set_SCA (0) ;
         _Compile_X_Group1 ( op, REG, MEM, ACC, DSP, 0, 0, CELL_SIZE ) ; // result is on TOS
         _Word_CompileAndRecord_PushReg ( Compiler_WordList ( 0 ), ACC ) ; // 0 : ?!? should be the exact variable 
         //DBI_OFF ;

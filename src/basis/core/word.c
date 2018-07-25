@@ -34,7 +34,6 @@ Word_Eval ( Word * word )
     if ( word )
     {
         _Context_->CurrentEvalWord = word ;
-        if ( ! word->W_SC_WordIndex ) word->W_SC_WordIndex = _CfrTil_->SC_SPIndex ; // nb! : needs to be done for compile also
         DEBUG_SETUP ( word ) ;
         if ( ! GetState ( word, STEPPED ) )
         {
@@ -49,13 +48,14 @@ Word_Eval ( Word * word )
         }
         SetState ( word, STEPPED, false ) ;
         DEBUG_SHOW ;
+        //word->W_SC_WordIndex = 0 ; // clear for next word usage
     }
 }
 
 void
 _Word_Interpret ( Word * word )
 {
-    _Interpreter_DoWord (_Interpreter_, word, - 1 , -1) ;
+    _Interpreter_DoWord ( _Interpreter_, word, - 1, - 1 ) ;
 }
 
 void
@@ -189,7 +189,6 @@ Word_SetLocation ( Word * word )
         word->S_WordData->Filename = rl->Filename ;
         word->S_WordData->LineNumber = rl->LineNumber ;
         word->W_CursorPosition = rl->CursorPosition ;
-        word->W_TokenStart_ReadLineIndex = _Lexer_->TokenStart_ReadLineIndex ; // ?? must not be set here ??
     }
 }
 
@@ -279,7 +278,7 @@ __Word_ShowSourceCode ( Word * word )
     {
         Buffer *dstb = Buffer_NewLocked ( BUFFER_SIZE ) ;
         byte * sc = dstb->B_Data ;
-        sc = _String_ConvertStringToBackSlash ( sc, word->W_SourceCode ? word->W_SourceCode : String_New ( _CfrTil_->SC_ScratchPad, TEMPORARY ) ) ;
+        sc = _String_ConvertStringToBackSlash ( sc, word->W_SourceCode ? word->W_SourceCode : String_New ( _CfrTil_->SC_Buffer, TEMPORARY ) ) ;
         byte * name = c_gd ( word->Name ) ;
         byte *scd = c_gd ( String_FilterMultipleSpaces ( sc, TEMPORARY ) ) ;
         _Printf ( ( byte* ) "\nSourceCode for %s.%s :> \n%s", word->S_ContainingNamespace->Name, name, scd ) ;

@@ -308,6 +308,7 @@
 #define RIGHT_PAREN         ( (uint64) 1 << 12 )
 #define OP_RAX_PLUS_1ARG    ( (uint64) 1 << 13 )
 #define RT_STEPPING_DEBUG   ( (uint64) 1 << 14 )
+#define ADDRESS_OF_OP       ( (uint64) 1 << 15 )
 
 // _CAttribute for interpreter word types - 4 bits/ 16 possibilities : N_WordAttribute bitfield
 #define WT_PREFIX                 1
@@ -352,8 +353,7 @@
 #define T_LC_LITERAL ( (uint64) 1 << 50 )
 #define T_LC_NEW ( (uint64) 1 << 51 )
 
-// common properties
-#define ADDRESS_OF_OP ( (uint64) 1 << 52 )
+// more common properties
 #define W_COMMENT ( (uint64) 1 << 53 )
 #define LOCAL_OBJECT ( (uint64) 1 << 54 )
 #define W_PREPROCESSOR ( (uint64) 1 << 55 )

@@ -380,10 +380,10 @@ sp
 //pause
 lispOff
 List
-_((lambda ( a b) (+ a b)) 3 4 ) dupList eval printList nl printList s lcReset // ?? working
+//_((lambda ( a b) (+ a b)) 3 4 ) dupList eval printList nl printList s lcReset // ?? working
+TODO ( "fix experimental lambda" )
 //pause
 s: bexp3 ( n ) { n @ 1 > } { n @ n @ -- bexp3 *  } { 1 } ifElse ;s
-dscOn
 'bexp3 find wdiss 7 bexp3 p //pause
 c_syntaxOn
 int
@@ -404,9 +404,9 @@ sp
 //verbosity 3 =
 c_syntaxOn
 Root
-int cpow ( base power | out ) s{ for ( out = 1 ; power ; ( power -= 1 ) ) { out = out * base ; } return out ; }s 
+int cpow ( base power | out ) for ( out = 1 ; power ; ( power -= 1 ) ) { out = out * base ; } return out ; 
 //int cpow ( base power | out ) { for ( out = 1 ; power ; power -= 1 ) { out = out * base ; } return out ; }
-cpow (2 30 ) "2 ^ 30 : " ps p
+cpow (2 30 ) "2 ^ 30 : " ps p sp
 c_syntaxOff 
 s: pow0 ( base power | out ) { out 1 = } { power @ 0 > } { power power @ 1 - = } { out out @ base @ * = } for return out ;s
 s: pow ( base power | out ) { out 1 = } { power @ 0 > } { power 1 -= } { out out @ base @ * = } for return out ;s

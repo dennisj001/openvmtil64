@@ -138,7 +138,7 @@ _CfrTil_Init ( CfrTil * cfrTil, Namespace * nss )
     // TODO : organize these buffers and their use 
     cfrTil->OriginalInputLineB = _Buffer_NewPermanent ( BUFFER_SIZE ) ;
     cfrTil->InputLineB = _Buffer_NewPermanent ( BUFFER_SIZE ) ;
-    cfrTil->SourceCodeSPB = _Buffer_NewPermanent ( SOURCE_CODE_BUFFER_SIZE ) ;
+    cfrTil->SourceCodeBuffer = _Buffer_NewPermanent ( SOURCE_CODE_BUFFER_SIZE ) ;
     cfrTil->LC_PrintB = _Buffer_NewPermanent ( BUFFER_SIZE ) ;
     cfrTil->LC_DefineB = _Buffer_NewPermanent ( BUFFER_SIZE ) ;
     cfrTil->TokenB = _Buffer_NewPermanent ( BUFFER_SIZE ) ;
@@ -160,7 +160,7 @@ _CfrTil_Init ( CfrTil * cfrTil, Namespace * nss )
     cfrTil->StringMacroB = _Buffer_NewPermanent ( BUFFER_SIZE ) ;
     cfrTil->StrCatBuffer = _Buffer_NewPermanent ( BUFFER_SIZE ) ;
     cfrTil->OriginalInputLine = Buffer_Data ( cfrTil->OriginalInputLineB ) ;
-    cfrTil->SC_ScratchPad = Buffer_Data ( cfrTil->SourceCodeSPB ) ;
+    cfrTil->SC_Buffer = Buffer_Data ( cfrTil->SourceCodeBuffer ) ;
     cfrTil->LispPrintBuffer = Buffer_Data ( cfrTil->LC_PrintB ) ;
     //cfrTil->LispDefineBuffer = Buffer_Data ( cfrTil->LC_DefineB ) ;
     cfrTil->TokenBuffer = Buffer_Data ( cfrTil->TokenB ) ;

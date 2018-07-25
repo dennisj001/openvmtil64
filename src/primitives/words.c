@@ -4,7 +4,6 @@
 void
 _CfrTil_Colon ( )
 {
-    Set_SCA (0) ;
     CfrTil_RightBracket ( ) ;
     CfrTil_SourceCode_Init ( ) ;
     CfrTil_Token ( ) ;

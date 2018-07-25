@@ -132,7 +132,7 @@ _Debugger_PreSetup ( Debugger * debugger, Word * word, int8 forceFlag )
                 if ( ! word->Name ) word->Name = ( byte* ) "" ;
                 SetState ( debugger, DBG_COMPILE_MODE, CompileMode ) ;
                 SetState_TrueFalse ( debugger, DBG_ACTIVE | DBG_INFO | DBG_PROMPT, DBG_INTERPRET_LOOP_DONE | DBG_PRE_DONE | DBG_CONTINUE | DBG_STEPPING | DBG_STEPPED ) ;
-                debugger->TokenStart_ReadLineIndex = word->W_TokenStart_ReadLineIndex ;
+                debugger->TokenStart_ReadLineIndex = word->W_RL_Index ;
                 debugger->SaveDsp = _Dsp_ ;
                 if ( ! debugger->StartHere ) debugger->StartHere = Here ;
                 debugger->WordDsp = _Dsp_ ;

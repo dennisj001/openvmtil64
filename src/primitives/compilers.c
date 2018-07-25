@@ -115,7 +115,7 @@ GotoInfo_New ( byte * lname, uint64 type )
 void
 _CfrTil_CompileCallGoto ( byte * name, uint64 type )
 {
-    if ( type == GI_RECURSE ) 
+    if ( type == GI_RECURSE )
     {
         _Compile_UninitializedCall ( ) ;
     }
@@ -185,7 +185,7 @@ CfrTil_Return ( )
         }
     }
 #if 0    
-else if ( ! _Readline_Is_AtEndOfBlock ( _Context_->ReadLiner0 ) )
+    else if ( ! _Readline_Is_AtEndOfBlock ( _Context_->ReadLiner0 ) )
     {
         _CfrTil_CompileCallGoto ( 0, GI_RETURN ) ;
     }
@@ -229,9 +229,9 @@ CfrTil_Literal ( )
     ByteArray * svcs = _Q_CodeByteArray ;
     //Compiler_SetCompilingSpace_MakeSureOfRoom ( "TempObjectSpace" ) ; 
     _NBA_SetCompilingSpace_MakeSureOfRoom ( _Q_->MemorySpace0->TempObjectSpace, 4 * K ) ;
-    Word * word = _DataObject_New (LITERAL, 0, "<a literal>", LITERAL | CONSTANT, 0, 0, 0, value, -1 , -1) ;
+    Word * word = _DataObject_New ( LITERAL, 0, "<a literal>", LITERAL | CONSTANT, 0, 0, 0, value, - 1, - 1 ) ;
     Set_CompilerSpace ( svcs ) ;
-    _Interpreter_DoWord (_Context_->Interpreter0, word, - 1 , -1) ;
+    _Interpreter_DoWord ( _Context_->Interpreter0, word, - 1, - 1 ) ;
 }
 
 void
@@ -239,14 +239,14 @@ CfrTil_Constant ( )
 {
     int64 value = DataStack_Pop ( ) ;
     byte * name = ( byte* ) DataStack_Pop ( ) ;
-    _DataObject_New (CONSTANT, 0, name, LITERAL | CONSTANT, 0, 0, 0, value, -1 , -1) ;
+    _DataObject_New ( CONSTANT, 0, name, LITERAL | CONSTANT, 0, 0, 0, value, - 1, - 1 ) ;
 }
 
 void
 CfrTil_Variable ( )
 {
     byte * name = ( byte* ) DataStack_Pop ( ) ;
-    _DataObject_New (NAMESPACE_VARIABLE, 0, name, NAMESPACE_VARIABLE, 0, 0, 0, 0, -1 , -1) ;
+    _DataObject_New ( NAMESPACE_VARIABLE, 0, name, NAMESPACE_VARIABLE, 0, 0, 0, 0, - 1, - 1 ) ;
 }
 
 // "{|" - exit the Compiler start interpreting
@@ -257,7 +257,20 @@ CfrTil_LeftBracket ( )
 {
     Compiler * compiler = _Compiler_ ;
     SetState ( compiler, COMPILE_MODE, false ) ;
-    if ( compiler->SaveOptimizeState ) CfrTil_OptimizeOn ( ) ; 
+    if ( compiler->SaveOptimizeState ) CfrTil_OptimizeOn ( ) ;
+}
+
+void
+CfrTil_t ( )
+{
+    Word * svWord = WordStack ( 0 ) ;
+    CfrTil_WordList_RecycleInit ( _CfrTil_, 1 ) ;
+    if ( svWord )
+    {
+        svWord->W_SC_Index = 0 ; // before pushWord !
+        CfrTil_WordList_PushWord ( svWord ) ; // for source code
+        Word_Set_SCA ( svWord ) ;
+    }
 }
 
 // "|}" - enter the Compiler
@@ -269,6 +282,7 @@ CfrTil_RightBracket ( )
     Compiler * compiler = _Compiler_ ;
     SetState ( compiler, COMPILE_MODE, true ) ;
     compiler->SaveOptimizeState = GetState ( _CfrTil_, OPTIMIZE_ON ) ;
+    CfrTil_WordList_RecycleInit ( _CfrTil_, 1 ) ;
 }
 
 void

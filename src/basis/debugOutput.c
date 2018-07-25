@@ -105,7 +105,7 @@ _Debugger_Locals_Show ( Debugger * debugger, Word * scWord )
         int64 svRegs = compiler->NumberOfRegisterVariables ; //nb. prevent increasing the locals offset by adding in repeated calls to this function
         //Stack_Init ( debugger->LocalsNamespacesStack ) ;
         byte buffer [ 256 ] ; //* sc = scWord->W_SourceCode ; //, * localScString ; // use a debugger buffer instead ??
-        byte *sc = scWord->W_SourceCode ? scWord->W_SourceCode : String_New ( _CfrTil_->SC_ScratchPad, TEMPORARY ) ;
+        byte *sc = scWord->W_SourceCode ? scWord->W_SourceCode : String_New ( _CfrTil_->SC_Buffer, TEMPORARY ) ;
         // show value of each local var on Locals list
         int64 * fp = ( int64* ) debugger->cs_Cpu->CPU_FP, * dsp = ( int64* ) debugger->cs_Cpu->CPU_DSP ;
         if ( ( ( uint64 ) fp < 0x7f0000000 ) ) fp = dsp ; //0 ;
@@ -334,7 +334,7 @@ Debugger_ShowSourceCodeLine ( Debugger * debugger, Word * word, byte * token0, i
     // NB!! : remember the highlighting formatting characters don't add any additional *length* to *visible* the output line
     char * nvw = ( char* ) Buffer_Data_Cleared ( _CfrTil_->DebugB ) ; // nvw : new view window
     char * il = ( char* ) String_New ( rl->InputLineString, TEMPORARY ) ; //nb! dont tamper with the input line. eg. removing its newline will affect other code which depends on newline
-    int64 totalBorder, idealBorder, leftBorder, rightBorder, lef, ref, tvw, nws, ots = word->W_TokenStart_ReadLineIndex, nts ;
+    int64 totalBorder, idealBorder, leftBorder, rightBorder, lef, ref, tvw, nws, ots = word->W_RL_Index, nts ;
     // ots : original token start (index into the source code), nws : new window start ; tvw: targetViewWidth ; nts : new token start
     // lef : left ellipsis flag, ref : right ellipsis flag
     const int64 fel = 32 - 1 ; //fe : formatingEstimate length : 2 formats with 8/12 chars on each sude - 32/48 :: 1 : a litte leave way

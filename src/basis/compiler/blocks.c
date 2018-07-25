@@ -259,7 +259,7 @@ _CfrTil_EndBlock2 ( BlockInfo * bi )
         d1 ( if ( Is_DebugModeOn ) Debugger_Disassemble ( _Debugger_, ( byte* ) first, bi->CopiedSize, 1 ) ) ;
 #endif        
         CfrTil_TurnOffBlockCompiler ( ) ;
-        Compiler_Init ( compiler, 0, 1 ) ;
+        Compiler_Init (compiler, 0) ;
     }
     else
     {

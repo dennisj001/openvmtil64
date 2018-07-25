@@ -14,7 +14,7 @@ _CfrTil_Init_SessionCore ( CfrTil * cfrTil, int64 cntxDelFlag, int64 promptFlag 
     ReadLine_Init ( cntx->ReadLiner0, _CfrTil_Key ) ;
     Lexer_Init ( cntx->Lexer0, 0, 0, CONTEXT ) ;
     Finder_Init ( cntx->Finder0 ) ;
-    Compiler_Init (cntx->Compiler0, 0 , 0) ;
+    Compiler_Init (cntx->Compiler0, 0 ) ;
     Interpreter_Init ( cntx->Interpreter0 ) ;
     CfrTil_ClearTokenList ( ) ;
     if ( cntxDelFlag )

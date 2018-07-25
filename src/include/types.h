@@ -406,7 +406,7 @@ typedef struct _WordData
 #define W_SourceCode S_WordData->WD_SourceCode 
 #define W_TokenEnd_ReadLineIndex S_WordData->CursorPosition 
 #define W_CursorPosition S_WordData->CursorPosition 
-#define W_TokenStart_ReadLineIndex S_WordData->StartCharRlIndex
+#define W_RL_Index S_WordData->StartCharRlIndex
 #define S_FunctionTypesArray S_WordData->FunctionTypesArray
 #define RegToUse S_WordData->RegToUse
 #define Opt_Rm S_WordData->Opt_Rm
@@ -425,7 +425,7 @@ typedef struct _WordData
 #define W_SearchNumber W_Value2
 #define W_FoundMarker W_Value3
 #define W_OriginalWord S_WordData->OriginalWord
-#define W_SC_WordIndex S_WordData->SC_WordIndex 
+#define W_SC_Index S_WordData->SC_WordIndex 
 #define W_SC_WordList S_WordData->SourceCodeWordList 
 #define W_SC_MemSpaceRandMarker S_WordData->SourceCodeMemSpaceRandMarker
 #define W_OpInsnCode S_WordData->OpInsnCode 
@@ -615,9 +615,7 @@ typedef struct Lexer
     Word * TokenWord ;
     byte TokenInputCharacter ;
     byte CurrentTokenDelimiter ;
-    int64 TokenStart_ReadLineIndex ;
-    int64 TokenEnd_ReadLineIndex ;
-    int64 Token_Length ;
+    int64 TokenStart_ReadLineIndex, TokenEnd_ReadLineIndex, Token_Length, SC_Index ; //Tsrli = TokenStart_ReadLineIndex
     byte * TokenDelimiters ;
     byte * DelimiterCharSet ;
     byte * BasicTokenDelimiters ;
@@ -936,13 +934,13 @@ typedef struct _CfrTil
     ReadLineFunction ReadLine_FunctionTable [ 24 ] ;
     CharacterType LexerCharacterTypeTable [ 256 ] ;
     LexerFunction LexerCharacterFunctionTable [ 24 ] ;
-    Buffer *StringB, * TokenB, *OriginalInputLineB, *InputLineB, *SourceCodeSPB, *StringInsertB, *StringInsertB2, *StringInsertB3, *StringInsertB4, *StringInsertB5, *StrCatBuffer ;
+    Buffer *StringB, * TokenB, *OriginalInputLineB, *InputLineB, *SourceCodeBuffer, *StringInsertB, *StringInsertB2, *StringInsertB3, *StringInsertB4, *StringInsertB5, *StrCatBuffer ;
     Buffer *TabCompletionBuf, * LC_PrintB, * LC_DefineB, *DebugB, *DebugB1, *DebugB2, *DebugB3, *ScratchB1, *ScratchB2, *ScratchB3, *StringMacroB ; // token buffer, tab completion backup, source code scratch pad, 
     StrTokInfo Sti ;
     byte * OriginalInputLine ;
     byte * TokenBuffer ;
-    byte * SC_ScratchPad ; // nb : keep this here -- if we add this field to Lexer it just makes the lexer bigger and we want the smallest lexer possible
-    int64 SC_SPIndex, SC_QuoteMode ; // SC_SPI == SC_ScratchPadIndex ;
+    byte * SC_Buffer ; // nb : keep this here -- if we add this field to Lexer it just makes the lexer bigger and we want the smallest lexer possible
+    int64 SC_Index, SC_QuoteMode ; // SC_Index == SC_Buffer Index ;
     byte * LispPrintBuffer ; // nb : keep this here -- if we add this field to Lexer it just makes the lexer bigger and we want the smallest lexer possible
     dllist *TokenList, * WordList ;
     sigjmp_buf JmpBuf0 ;

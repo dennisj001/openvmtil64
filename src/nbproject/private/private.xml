@@ -7,17 +7,17 @@
         <activeConfTypeElem>0</activeConfTypeElem>
         <activeConfIndexElem>0</activeConfIndexElem>
     </data>
-    <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="14">
+    <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="18">
         <file>
             <url>basis/compiler/blocks.c</url>
             <bookmark id="7">
                 <name/>
-                <line>165</line>
+                <line>164</line>
                 <key/>
             </bookmark>
             <bookmark id="6">
                 <name/>
-                <line>290</line>
+                <line>287</line>
                 <key/>
             </bookmark>
         </file>
@@ -28,9 +28,19 @@
                 <line>139</line>
                 <key/>
             </bookmark>
+            <bookmark id="18">
+                <name/>
+                <line>412</line>
+                <key/>
+            </bookmark>
             <bookmark id="12">
                 <name/>
-                <line>470</line>
+                <line>540</line>
+                <key/>
+            </bookmark>
+            <bookmark id="17">
+                <name/>
+                <line>991</line>
                 <key/>
             </bookmark>
         </file>
@@ -67,23 +77,39 @@
                 <line>30</line>
                 <key/>
             </bookmark>
+            <bookmark id="15">
+                <name/>
+                <line>112</line>
+                <key/>
+            </bookmark>
+            <bookmark id="16">
+                <name/>
+                <line>113</line>
+                <key/>
+            </bookmark>
             <bookmark id="13">
                 <name/>
-                <line>283</line>
+                <line>229</line>
                 <key/>
             </bookmark>
         </file>
     </editor-bookmarks>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/media/sdc4/dennisj/openvmtil64/src/basis/compiler/blocks.c</file>
-            <file>file:/media/sdc4/dennisj/openvmtil64/src/include/macros.h</file>
+            <file>file:/media/sdc4/dennisj/openvmtil64/src/basis/core/interpret.c</file>
+            <file>file:/media/sdc4/dennisj/openvmtil64/src/basis/core/string.c</file>
             <file>file:/media/sdc4/dennisj/openvmtil64/src/basis/compiler/compiler.c</file>
-            <file>file:/media/sdc4/dennisj/openvmtil64/src/basis/sourceCode.c</file>
             <file>file:/media/sdc4/dennisj/openvmtil64/src/basis/openVmTil.c</file>
-            <file>file:/media/sdc4/dennisj/openvmtil64/src/basis/context.c</file>
-            <file>file:/media/sdc4/dennisj/openvmtil64/src/basis/core/block.c</file>
-            <file>file:/media/sdc4/dennisj/openvmtil64/src/primitives/syntaxes.c</file>
+            <file>file:/media/sdc4/dennisj/openvmtil64/src/basis/debugOutput.c</file>
+            <file>file:/media/sdc4/dennisj/openvmtil64/src/basis/core/dataObjectNew.c</file>
+            <file>file:/media/sdc4/dennisj/openvmtil64/src/basis/compiler/udis.c</file>
+            <file>file:/media/sdc4/dennisj/openvmtil64/src/basis/core/word.c</file>
+            <file>file:/media/sdc4/dennisj/openvmtil64/src/include/macros.h</file>
+            <file>file:/media/sdc4/dennisj/openvmtil64/src/basis/debugDisassembly.c</file>
+            <file>file:/media/sdc4/dennisj/openvmtil64/src/basis/lambdaCalculus.c</file>
+            <file>file:/media/sdc4/dennisj/openvmtil64/src/basis/sourceCode.c</file>
+            <file>file:/media/sdc4/dennisj/openvmtil64/src/basis/core/lexer.c</file>
+            <file>file:/media/sdc4/dennisj/openvmtil64/src/basis/lists.c</file>
         </group>
     </open-files>
 </project-private>

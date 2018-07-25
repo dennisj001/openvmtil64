@@ -200,7 +200,6 @@ Compile_Cmp_Set_setTtnn_Logic ( Compiler * compiler, int8 setTtn, int8 setNegate
     if ( optFlag & OPTIMIZE_DONE ) return ;
     else if ( optFlag )
     {
-        _Set_SCA ( WordStack ( 0 ) ) ;
         if ( compiler->OptInfo->OptimizeFlag & OPTIMIZE_IMM )
         {
             if ( ( setTtn == TTT_EQUAL ) && ( compiler->OptInfo->Optimize_Imm == 0 ) ) //Compile_TEST ( compiler->OptInfo->Optimize_Mod, compiler->OptInfo->Optimize_Rm, 0, compiler->OptInfo->Optimize_Disp, compiler->OptInfo->Optimize_Imm, CELL ) ;
@@ -217,12 +216,14 @@ Compile_Cmp_Set_setTtnn_Logic ( Compiler * compiler, int8 setTtn, int8 setNegate
                     setNegateFlag = ! setNegateFlag ;
                 }
                 else size = 0 ;
+                Set_SCA ( 0 ) ;
                 Compile_CMPI ( compiler->OptInfo->Optimize_Mod, compiler->OptInfo->Optimize_Rm, compiler->OptInfo->Optimize_Disp, compiler->OptInfo->Optimize_Imm, size ) ;
             }
         }
         else
         {
             // Compile_CMP( toRegOrMem, mod, reg, rm, sib, disp )
+            Set_SCA ( 0 ) ;
             Compile_CMP ( compiler->OptInfo->Optimize_Dest_RegOrMem, compiler->OptInfo->Optimize_Mod,
                 compiler->OptInfo->Optimize_Reg, compiler->OptInfo->Optimize_Rm, 0, compiler->OptInfo->Optimize_Disp, CELL_SIZE ) ;
         }
@@ -233,6 +234,7 @@ Compile_Cmp_Set_setTtnn_Logic ( Compiler * compiler, int8 setTtn, int8 setNegate
         _Compile_Move_StackN_To_Reg ( ACC, DSP, - 1 ) ;
         // must do the DropN before the CMP because CMP sets eflags 
         _Compile_Stack_DropN ( DSP, 2 ) ; // before cmp 
+        Set_SCA ( 0 ) ;
         Compile_CMP ( REG, REG, ACC, OREG, 0, 0, CELL ) ;
     }
     _Compile_SETcc_setTtnn_REG ( compiler, setTtn, setNegateFlag, jccTtt, jccNegFlag, ACC, ACC ) ; //nb! should always be ACC! : immediately after the 'cmp' insn which changes the flags appropriately

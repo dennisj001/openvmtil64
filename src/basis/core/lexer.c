@@ -13,61 +13,63 @@
 #define _AppendCharacterToTokenBuffer( lex, character ) lexer->TokenBuffer [ lex->TokenWriteIndex ] = character
 #define SourceCode_AppendPoint &_CfrTil_->SC_ScratchPad [ Strlen ( ( CString ) _CfrTil_->SC_ScratchPad ) ]
 
-void
-CfrTil_LexerTables_Setup ( CfrTil * cfrtl )
+byte *
+_Lexer_LexNextToken_WithDelimiters ( Lexer * lexer, byte * delimiters, Boolean checkListFlag, Boolean peekFlag, int reAddPeeked, uint64 state )
 {
-    int64 i ;
-    for ( i = 0 ; i < 256 ; i ++ ) cfrtl->LexerCharacterTypeTable [ i ].CharInfo = 0 ;
-    cfrtl->LexerCharacterTypeTable [ 0 ].CharFunctionTableIndex = 1 ;
-    cfrtl->LexerCharacterTypeTable [ '-' ].CharFunctionTableIndex = 2 ;
-    cfrtl->LexerCharacterTypeTable [ '>' ].CharFunctionTableIndex = 3 ;
-    cfrtl->LexerCharacterTypeTable [ '.' ].CharFunctionTableIndex = 4 ;
-    cfrtl->LexerCharacterTypeTable [ '\n' ].CharFunctionTableIndex = 6 ;
-    cfrtl->LexerCharacterTypeTable [ '\\' ].CharFunctionTableIndex = 7 ;
-    cfrtl->LexerCharacterTypeTable [ eof ].CharFunctionTableIndex = 8 ;
-    cfrtl->LexerCharacterTypeTable [ '\r' ].CharFunctionTableIndex = 9 ;
-    cfrtl->LexerCharacterTypeTable [ ',' ].CharFunctionTableIndex = 10 ;
+    if ( ( ! checkListFlag ) || ( ! ( lexer->OriginalToken = Lexer_GetTokenNameFromTokenList ( lexer, peekFlag ) ) ) ) // ( ! checkListFlag ) : allows us to peek multiple tokens ahead if we     {
+    {
+        Lexer_Init ( lexer, delimiters, lexer->State, CONTEXT ) ;
+        lexer->State |= state ;
+        lexer->SC_Index = _CfrTil_->SC_Index ;
+        while ( ( ! Lexer_CheckIfDone ( lexer, LEXER_DONE ) ) )
+        {
+            byte c = lexer->NextChar ( lexer->ReadLiner0 ) ;
+            _Lexer_GetChar ( lexer, c ) ;
+        }
+        lexer->CurrentTokenDelimiter = lexer->TokenInputCharacter ;
+        if ( lexer->TokenWriteIndex && ( ! GetState ( lexer, LEXER_RETURN_NULL_TOKEN ) ) )
+        {
+            _AppendCharacterToTokenBuffer ( lexer, 0 ) ; // null terminate TokenBuffer
+            lexer->OriginalToken = String_New ( lexer->TokenBuffer, SESSION ) ; // not TEMPORARY or strings on the stack are deleted at each newline after startup
+        }
+        else
+        {
+            lexer->OriginalToken = ( byte * ) 0 ; // why not goto restartToken ? -- to allow user to hit newline and get response
+        }
+        lexer->Token_Length = lexer->OriginalToken ? Strlen ( ( char* ) lexer->OriginalToken ) : 0 ;
+        lexer->TokenEnd_ReadLineIndex = lexer->TokenStart_ReadLineIndex + lexer->Token_Length ;
+        if ( peekFlag && reAddPeeked ) _CfrTil_PushToken_OnTokenList ( lexer->OriginalToken ) ;
+    }
+    return lexer->OriginalToken ;
+}
 
-    cfrtl->LexerCharacterTypeTable [ '"' ].CharFunctionTableIndex = 5 ;
-    cfrtl->LexerCharacterTypeTable [ '[' ].CharFunctionTableIndex = 11 ;
-    cfrtl->LexerCharacterTypeTable [ ']' ].CharFunctionTableIndex = 11 ;
-    cfrtl->LexerCharacterTypeTable [ '`' ].CharFunctionTableIndex = 11 ;
-    cfrtl->LexerCharacterTypeTable [ '(' ].CharFunctionTableIndex = 11 ;
-    cfrtl->LexerCharacterTypeTable [ ')' ].CharFunctionTableIndex = 11 ;
-    cfrtl->LexerCharacterTypeTable [ '\'' ].CharFunctionTableIndex = 11 ;
-    //cfrtl->LexerCharacterTypeTable [ '%' ].CharFunctionTableIndex = 11 ;
-    //cfrtl->LexerCharacterTypeTable [ '&' ].CharFunctionTableIndex = 11 ;
-    //cfrtl->LexerCharacterTypeTable [ ',' ].CharFunctionTableIndex = 11 ;
-
-    cfrtl->LexerCharacterTypeTable [ '$' ].CharFunctionTableIndex = 12 ;
-    cfrtl->LexerCharacterTypeTable [ '#' ].CharFunctionTableIndex = 12 ;
-    cfrtl->LexerCharacterTypeTable [ '/' ].CharFunctionTableIndex = 14 ;
-    cfrtl->LexerCharacterTypeTable [ ';' ].CharFunctionTableIndex = 15 ;
-    cfrtl->LexerCharacterTypeTable [ '&' ].CharFunctionTableIndex = 16 ;
-    cfrtl->LexerCharacterTypeTable [ '@' ].CharFunctionTableIndex = 17 ;
-    cfrtl->LexerCharacterTypeTable [ '*' ].CharFunctionTableIndex = 18 ;
-
-    cfrtl->LexerCharacterFunctionTable [ 0 ] = Lexer_Default ;
-    cfrtl->LexerCharacterFunctionTable [ 1 ] = _Zero ;
-    cfrtl->LexerCharacterFunctionTable [ 2 ] = Minus ;
-    cfrtl->LexerCharacterFunctionTable [ 3 ] = GreaterThan ;
-    cfrtl->LexerCharacterFunctionTable [ 4 ] = Dot ;
-    cfrtl->LexerCharacterFunctionTable [ 5 ] = DoubleQuote ;
-    cfrtl->LexerCharacterFunctionTable [ 6 ] = NewLine ;
-    cfrtl->LexerCharacterFunctionTable [ 7 ] = BackSlash ;
-    cfrtl->LexerCharacterFunctionTable [ 8 ] = _EOF ;
-    cfrtl->LexerCharacterFunctionTable [ 9 ] = CarriageReturn ;
-    cfrtl->LexerCharacterFunctionTable [ 10 ] = Comma ;
-
-    cfrtl->LexerCharacterFunctionTable [ 11 ] = TerminatingMacro ;
-    cfrtl->LexerCharacterFunctionTable [ 12 ] = NonTerminatingMacro ;
-    cfrtl->LexerCharacterFunctionTable [ 13 ] = SingleEscape ;
-    cfrtl->LexerCharacterFunctionTable [ 14 ] = ForwardSlash ;
-    cfrtl->LexerCharacterFunctionTable [ 15 ] = Semi ;
-    cfrtl->LexerCharacterFunctionTable [ 16 ] = AddressOf ;
-    cfrtl->LexerCharacterFunctionTable [ 17 ] = AtFetch ;
-    cfrtl->LexerCharacterFunctionTable [ 18 ] = Star ;
-    //cfrtl->LexerCharacterFunctionTable [ 19 ] = SingleQuote ;
+void
+Lexer_Init ( Lexer * lexer, byte * delimiters, uint64 state, uint64 allocType )
+{
+    //SetBuffersUnused ( 1 ) ;
+    lexer->TokenBuffer = _CfrTil_->TokenBuffer ;
+    Mem_Clear ( lexer->TokenBuffer, BUFFER_SIZE ) ;
+    //lexer->TokenBuffer = _Buffer_New_pbyte ( BUFFER_SIZE, B_UNLOCKED ) ; //_CfrTil_->TokenBuffer ;
+    //_CfrTil_->TokenBuffer = lexer->TokenBuffer  ;
+    lexer->OriginalToken = 0 ;
+    lexer->Literal = 0 ;
+    lexer->SC_Index = _CfrTil_->SC_Index ;
+    Lexer_SetBasicTokenDelimiters ( lexer, ( byte* ) " \n\r\t", allocType ) ;
+    if ( delimiters ) Lexer_SetTokenDelimiters ( lexer, delimiters, allocType ) ;
+    else
+    {
+        lexer->DelimiterCharSet = lexer->BasicDelimiterCharSet ; //Lexer_SetTokenDelimiters ( lexer, " \n\r\t", allocType ) ;
+        lexer->TokenDelimiters = lexer->BasicTokenDelimiters ;
+    }
+    lexer->State = state & ( ~ LEXER_RETURN_NULL_TOKEN ) ;
+    SetState ( lexer, KNOWN_OBJECT | LEXER_DONE | END_OF_FILE | END_OF_STRING | LEXER_END_OF_LINE, false ) ;
+    lexer->TokenDelimitersAndDot = ( byte* ) " .\n\r\t" ;
+    lexer->DelimiterOrDotCharSet = CharSet_New ( lexer->TokenDelimitersAndDot, allocType ) ;
+    lexer->TokenStart_ReadLineIndex = - 1 ;
+    lexer->Filename = lexer->ReadLiner0->Filename ;
+    lexer->LineNumber = lexer->ReadLiner0->LineNumber ;
+    lexer->SC_Index = 0 ;
+    Lexer_RestartToken ( lexer ) ;
 }
 
 byte
@@ -110,7 +112,7 @@ _Lexer_ConsiderDebugAndCommentTokens ( byte * token, int64 evalFlag, int64 reAdd
     Word * word = Finder_Word_FindUsing ( _Finder_, token, 1 ) ;
     if ( word && ( word->LAttribute & W_COMMENT ) )
     {
-        word->W_TokenStart_ReadLineIndex = _Lexer_->TokenStart_ReadLineIndex ;
+        word->W_RL_Index = _Lexer_->TokenStart_ReadLineIndex ;
         Word_Eval ( word ) ;
         return true ;
     }
@@ -118,7 +120,7 @@ _Lexer_ConsiderDebugAndCommentTokens ( byte * token, int64 evalFlag, int64 reAdd
     {
         if ( evalFlag )
         {
-            word->W_TokenStart_ReadLineIndex = _Lexer_->TokenStart_ReadLineIndex ;
+            word->W_RL_Index = _Lexer_->TokenStart_ReadLineIndex ;
             Word_Eval ( word ) ;
             return true ;
         }
@@ -245,35 +247,6 @@ Lexer_GetChar ( Lexer * lexer )
     _Lexer_GetChar ( lexer, lexer->NextChar ( lexer->ReadLiner0 ) ) ;
 }
 
-byte *
-_Lexer_LexNextToken_WithDelimiters ( Lexer * lexer, byte * delimiters, Boolean checkListFlag, Boolean peekFlag, int reAddPeeked, uint64 state )
-{
-    if ( ( ! checkListFlag ) || ( ! ( lexer->OriginalToken = Lexer_GetTokenNameFromTokenList ( lexer, peekFlag ) ) ) ) // ( ! checkListFlag ) : allows us to peek multiple tokens ahead if we     {
-    {
-        Lexer_Init ( lexer, delimiters, lexer->State, CONTEXT ) ;
-        lexer->State |= state ;
-        while ( ( ! Lexer_CheckIfDone ( lexer, LEXER_DONE ) ) )
-        {
-            byte c = lexer->NextChar ( lexer->ReadLiner0 ) ;
-            _Lexer_GetChar ( lexer, c ) ;
-        }
-        lexer->CurrentTokenDelimiter = lexer->TokenInputCharacter ;
-        if ( lexer->TokenWriteIndex && ( ! GetState ( lexer, LEXER_RETURN_NULL_TOKEN ) ) )
-        {
-            _AppendCharacterToTokenBuffer ( lexer, 0 ) ; // null terminate TokenBuffer
-            lexer->OriginalToken = String_New ( lexer->TokenBuffer, SESSION ) ; // not TEMPORARY or strings on the stack are deleted at each newline after startup
-        }
-        else
-        {
-            lexer->OriginalToken = ( byte * ) 0 ; // why not goto restartToken ? -- to allow user to hit newline and get response
-        }
-        lexer->Token_Length = lexer->OriginalToken ? Strlen ( ( char* ) lexer->OriginalToken ) : 0 ;
-        lexer->TokenEnd_ReadLineIndex = lexer->TokenStart_ReadLineIndex + lexer->Token_Length ;
-        if ( peekFlag && reAddPeeked ) _CfrTil_PushToken_OnTokenList ( lexer->OriginalToken ) ;
-    }
-    return lexer->OriginalToken ;
-}
-
 void
 Lexer_LexNextToken_WithDelimiters ( Lexer * lexer, byte * delimiters )
 {
@@ -348,33 +321,6 @@ Lexer_SetBasicTokenDelimiters ( Lexer * lexer, byte * delimiters, uint64 allocTy
 {
     lexer->BasicDelimiterCharSet = CharSet_New ( delimiters, allocType ) ;
     lexer->BasicTokenDelimiters = delimiters ;
-}
-
-void
-Lexer_Init ( Lexer * lexer, byte * delimiters, uint64 state, uint64 allocType )
-{
-    //SetBuffersUnused ( 1 ) ;
-    lexer->TokenBuffer = _CfrTil_->TokenBuffer ;
-    Mem_Clear ( lexer->TokenBuffer, BUFFER_SIZE ) ;
-    //lexer->TokenBuffer = _Buffer_New_pbyte ( BUFFER_SIZE, B_UNLOCKED ) ; //_CfrTil_->TokenBuffer ;
-    //_CfrTil_->TokenBuffer = lexer->TokenBuffer  ;
-    lexer->OriginalToken = 0 ;
-    lexer->Literal = 0 ;
-    Lexer_SetBasicTokenDelimiters ( lexer, ( byte* ) " \n\r\t", allocType ) ;
-    if ( delimiters ) Lexer_SetTokenDelimiters ( lexer, delimiters, allocType ) ;
-    else
-    {
-        lexer->DelimiterCharSet = lexer->BasicDelimiterCharSet ; //Lexer_SetTokenDelimiters ( lexer, " \n\r\t", allocType ) ;
-        lexer->TokenDelimiters = lexer->BasicTokenDelimiters ;
-    }
-    lexer->State = state & ( ~ LEXER_RETURN_NULL_TOKEN ) ;
-    SetState ( lexer, KNOWN_OBJECT | LEXER_DONE | END_OF_FILE | END_OF_STRING | LEXER_END_OF_LINE, false ) ;
-    lexer->TokenDelimitersAndDot = ( byte* ) " .\n\r\t" ;
-    lexer->DelimiterOrDotCharSet = CharSet_New ( lexer->TokenDelimitersAndDot, allocType ) ;
-    lexer->TokenStart_ReadLineIndex = - 1 ;
-    lexer->Filename = lexer->ReadLiner0->Filename ;
-    lexer->LineNumber = lexer->ReadLiner0->LineNumber ;
-    Lexer_RestartToken ( lexer ) ;
 }
 
 Lexer *
@@ -938,6 +884,64 @@ Lexer_IsTokenForwardDotted ( Lexer * lexer )
 {
     return _Lexer_IsTokenForwardDotted ( lexer, 0 ) ;
 }
+
+void
+CfrTil_LexerTables_Setup ( CfrTil * cfrtl )
+{
+    int64 i ;
+    for ( i = 0 ; i < 256 ; i ++ ) cfrtl->LexerCharacterTypeTable [ i ].CharInfo = 0 ;
+    cfrtl->LexerCharacterTypeTable [ 0 ].CharFunctionTableIndex = 1 ;
+    cfrtl->LexerCharacterTypeTable [ '-' ].CharFunctionTableIndex = 2 ;
+    cfrtl->LexerCharacterTypeTable [ '>' ].CharFunctionTableIndex = 3 ;
+    cfrtl->LexerCharacterTypeTable [ '.' ].CharFunctionTableIndex = 4 ;
+    cfrtl->LexerCharacterTypeTable [ '\n' ].CharFunctionTableIndex = 6 ;
+    cfrtl->LexerCharacterTypeTable [ '\\' ].CharFunctionTableIndex = 7 ;
+    cfrtl->LexerCharacterTypeTable [ eof ].CharFunctionTableIndex = 8 ;
+    cfrtl->LexerCharacterTypeTable [ '\r' ].CharFunctionTableIndex = 9 ;
+    cfrtl->LexerCharacterTypeTable [ ',' ].CharFunctionTableIndex = 10 ;
+
+    cfrtl->LexerCharacterTypeTable [ '"' ].CharFunctionTableIndex = 5 ;
+    cfrtl->LexerCharacterTypeTable [ '[' ].CharFunctionTableIndex = 11 ;
+    cfrtl->LexerCharacterTypeTable [ ']' ].CharFunctionTableIndex = 11 ;
+    cfrtl->LexerCharacterTypeTable [ '`' ].CharFunctionTableIndex = 11 ;
+    cfrtl->LexerCharacterTypeTable [ '(' ].CharFunctionTableIndex = 11 ;
+    cfrtl->LexerCharacterTypeTable [ ')' ].CharFunctionTableIndex = 11 ;
+    cfrtl->LexerCharacterTypeTable [ '\'' ].CharFunctionTableIndex = 11 ;
+    //cfrtl->LexerCharacterTypeTable [ '%' ].CharFunctionTableIndex = 11 ;
+    //cfrtl->LexerCharacterTypeTable [ '&' ].CharFunctionTableIndex = 11 ;
+    //cfrtl->LexerCharacterTypeTable [ ',' ].CharFunctionTableIndex = 11 ;
+
+    cfrtl->LexerCharacterTypeTable [ '$' ].CharFunctionTableIndex = 12 ;
+    cfrtl->LexerCharacterTypeTable [ '#' ].CharFunctionTableIndex = 12 ;
+    cfrtl->LexerCharacterTypeTable [ '/' ].CharFunctionTableIndex = 14 ;
+    cfrtl->LexerCharacterTypeTable [ ';' ].CharFunctionTableIndex = 15 ;
+    cfrtl->LexerCharacterTypeTable [ '&' ].CharFunctionTableIndex = 16 ;
+    cfrtl->LexerCharacterTypeTable [ '@' ].CharFunctionTableIndex = 17 ;
+    cfrtl->LexerCharacterTypeTable [ '*' ].CharFunctionTableIndex = 18 ;
+
+    cfrtl->LexerCharacterFunctionTable [ 0 ] = Lexer_Default ;
+    cfrtl->LexerCharacterFunctionTable [ 1 ] = _Zero ;
+    cfrtl->LexerCharacterFunctionTable [ 2 ] = Minus ;
+    cfrtl->LexerCharacterFunctionTable [ 3 ] = GreaterThan ;
+    cfrtl->LexerCharacterFunctionTable [ 4 ] = Dot ;
+    cfrtl->LexerCharacterFunctionTable [ 5 ] = DoubleQuote ;
+    cfrtl->LexerCharacterFunctionTable [ 6 ] = NewLine ;
+    cfrtl->LexerCharacterFunctionTable [ 7 ] = BackSlash ;
+    cfrtl->LexerCharacterFunctionTable [ 8 ] = _EOF ;
+    cfrtl->LexerCharacterFunctionTable [ 9 ] = CarriageReturn ;
+    cfrtl->LexerCharacterFunctionTable [ 10 ] = Comma ;
+
+    cfrtl->LexerCharacterFunctionTable [ 11 ] = TerminatingMacro ;
+    cfrtl->LexerCharacterFunctionTable [ 12 ] = NonTerminatingMacro ;
+    cfrtl->LexerCharacterFunctionTable [ 13 ] = SingleEscape ;
+    cfrtl->LexerCharacterFunctionTable [ 14 ] = ForwardSlash ;
+    cfrtl->LexerCharacterFunctionTable [ 15 ] = Semi ;
+    cfrtl->LexerCharacterFunctionTable [ 16 ] = AddressOf ;
+    cfrtl->LexerCharacterFunctionTable [ 17 ] = AtFetch ;
+    cfrtl->LexerCharacterFunctionTable [ 18 ] = Star ;
+    //cfrtl->LexerCharacterFunctionTable [ 19 ] = SingleQuote ;
+}
+
 
 #if 0
 

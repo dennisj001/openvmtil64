@@ -342,7 +342,7 @@ C Compiler Int Lexer
     file name @ fopen =
     nl { result file @ input 1 fread = input @ emit } { result @ 1 == } doWhile 
     file @ fclose
-d: ; prefix
+; prefix
 'ofile find wdiss
 Root
 : license ofile ( "./LICENSE" ) ;
@@ -368,10 +368,15 @@ stringMacrosOn
 Root 
 'doX64 1 const
 'doScript 1 const
-'_doDemo 0 const    
+'_doDemo 1 const    
+'todo 0 const    
 dbgOff
-//dbgOn 
+dbgOn 
 #if Is_DebugOn 
+#if todo
+: _TODO ( str ) TODO ( str @ ) ;;
+: TODO ( str ) _TODO ( str @ ) pause ;;
+#endif
 scOn
 System 
 testCfrTil // dT0 //demo //dT0
@@ -383,27 +388,13 @@ stringMacrosOff
 #else
 // you can trim this file to your needs and put your personal init code here maybe
 
-#if 1
-Lisp
-
-( define j ( lambda ( a b c ) ( + a b c)))
-(define h ( lambda (a b c) (a c b) ) ) 
-( define h ( lambda ( a b c ) ( + a b c)))
-( define k ( lambda ( a b ) ( + a b )))
-(define g ( lambda (a b c) (a b c) ) )
-
-( k ( j 1 2 3 ) ( h 2 3 66 ) ) sp // 77 ...
-( + ( k ( j 1 2 3 ) ( h 2 3 66 ) ) ( + 698 2 ) ) // 777
-( + ( k ( j 1 2 3 ) ( h 2 3 59 ) ) 7 ) // 77
-( g + ( k ( j 1 2 ( h 2 3 ( k 59 4 ) ) ) 6 ) 0 ) // 77
-( - ( + 1 2 ( * 3 4 ) ( / 4 2 ) ( - 9 8 ) 10 770 787 34 ) 21 787 34 )  // == 777
-
-d: (define fib (lambda (n) ( ifElse (< n 2) n (+ (fib (- n 1)) (fib (- n 2))))))
-tick fib find d: wdiss 
-(fib 20) 
-pause
-lispOff
-#endif
+c_syntaxOn
+Root
+//int cpow ( base power | out ) s{ for ( out = 1 ; power ; ( power -= 1 ) ) { out = out * base ; } return out ; }s 
+int cpow ( base power | out ) { for ( d: out = 1 ; power ; power -= 1 ) { out = out * base ; } return out ; }
+'cpow find wdiss
+c_syntaxOff
+2 30 d: cpow dup p  1073741824 _assert
 
 #endif
 2 + 7  assertStkChk // stack checking

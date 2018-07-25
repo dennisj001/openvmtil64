@@ -13,7 +13,7 @@ CfrTil_CommentToEndOfLine ( )
     _CfrTil_UnAppendTokenFromSourceCode ( _CfrTil_, _Context_->Lexer0->OriginalToken ) ;
     Lexer_SourceCodeOff ( _Lexer_ ) ;
     ReadLiner_CommentToEndOfLine ( _Context_->ReadLiner0 ) ;
-    String_RemoveEndWhitespace ( _CfrTil_->SC_ScratchPad ) ;
+    String_RemoveEndWhitespace ( _CfrTil_->SC_Buffer ) ;
     _CfrTil_SC_ScratchPadIndex_Init ( _CfrTil_ ) ;
     SetState ( _Context_->Lexer0, LEXER_END_OF_LINE, true ) ;
     Lexer_SourceCodeOn ( _Lexer_ ) ;

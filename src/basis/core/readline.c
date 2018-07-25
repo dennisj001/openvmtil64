@@ -622,7 +622,7 @@ _Readline_Is_AtEndOfBlock ( ReadLiner * rl0 )
 {
     ReadLiner * rl = ReadLine_Copy ( rl0, COMPILER_TEMP ) ;
     Word * word = Compiler_WordList ( 0 ) ;
-    int64 iz, ib, index = word->W_TokenStart_ReadLineIndex + Strlen ( word->Name ), sd = _Stack_Depth ( _Context_->Compiler0->BlockStack ) ;
+    int64 iz, ib, index = word->W_RL_Index + Strlen ( word->Name ), sd = _Stack_Depth ( _Context_->Compiler0->BlockStack ) ;
     byte c ;
     //if ( GetState ( _Context_, C_SYNTAX ) )
     {

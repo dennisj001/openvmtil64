@@ -108,6 +108,7 @@ _Compile_optInfo_X_Group1 ( Compiler * compiler, int64 op )
     {
         int64 imm = optInfo->Optimize_Imm ;
         // Compile_SUBI( mod, operandReg, offset, immediateData, size )
+        Set_SCA (0) ;
         _Compile_X_Group1_Immediate ( op, optInfo->Optimize_Mod,
             optInfo->Optimize_Rm, optInfo->Optimize_Disp,
             optInfo->Optimize_Imm, ( imm >= 0x100000000 ) ? CELL : ( ( imm >= 0x100 ) ? 4 : 1 ) ) ;
@@ -115,6 +116,7 @@ _Compile_optInfo_X_Group1 ( Compiler * compiler, int64 op )
     else
     {
         // _Compile_Group1 ( int64 code, int64 toRegOrMem, int64 mod, int8 reg, int8 rm, int8 sib, int64 disp, int64 osize )
+        Set_SCA (0) ;
         _Compile_X_Group1 ( op, optInfo->Optimize_Dest_RegOrMem, optInfo->Optimize_Mod,
             optInfo->Optimize_Reg, optInfo->Optimize_Rm, 0,
             optInfo->Optimize_Disp, CELL_SIZE ) ;

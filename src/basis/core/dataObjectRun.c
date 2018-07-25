@@ -81,7 +81,7 @@ _Namespace_Do_C_Type ( Namespace * ns )
         {
             if ( ( ! Compiling ) )
             {
-                Compiler_Init (compiler, 0 , 0) ; //compiler->State ) ;
+                Compiler_Init (compiler, 0 ) ; //compiler->State ) ;
                 _CfrTil_InitSourceCode_WithName ( _CfrTil_, ns->Name ) ;
             }
             compiler->C_BackgroundNamespace = _Namespace_FirstOnUsingList ( ) ; //nb! must be before CfrTil_LocalsAndStackVariablesBegin else CfrTil_End_C_Block will 
@@ -332,12 +332,15 @@ _Do_Variable ( Word * word )
     Context * cntx = _Context_ ;
     if ( GetState ( cntx, C_SYNTAX | INFIX_MODE ) || GetState ( cntx->Compiler0, LC_ARG_PARSING ) )
     {
+#if 1       
         if ( Is_LValue ( word ) )
         {
             cntx->Compiler0->LHS_Word = word ;
             word->Coding = Here ;
+            //_Compile_GetVarLitObj_LValue_To_Reg ( word, ACC ) ;
         }
         else
+#endif            
         {
             if ( GetState ( _Context_, ADDRESS_OF_MODE ) )
             {

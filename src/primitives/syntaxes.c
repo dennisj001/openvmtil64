@@ -71,7 +71,7 @@ CfrTil_C_Semi ( )
     if ( ! Compiling )
     {
         CfrTil_InitSourceCode ( _CfrTil_ ) ;
-        Compiler_Init ( compiler, 0, 0 ) ;
+        Compiler_Init (compiler, 0) ;
     }
     else
     {
@@ -129,7 +129,7 @@ CfrTil_If_C_Combinator ( )
 {
     Compiler * compiler = _Compiler_ ;
     Word * combinatorWord0 = Compiler_WordList ( 0 ) ;
-    combinatorWord0->W_SC_WordIndex = _CfrTil_->SC_SPIndex ;
+    combinatorWord0->W_SC_Index = _Lexer_->SC_Index ;
     byte svscp = GetState ( compiler, C_COMBINATOR_PARSING ) ;
     SetState ( compiler, C_COMBINATOR_PARSING, true ) ;
     compiler->TakesLParenAsBlock = true ;
@@ -153,7 +153,7 @@ void
 CfrTil_DoWhile_C_Combinator ( )
 {
     Word * currentWord0 = Compiler_WordList ( 0 ) ;
-    currentWord0->W_SC_WordIndex = _CfrTil_->SC_SPIndex ;
+    currentWord0->W_SC_Index = _Lexer_->SC_Index ;
     byte * start = Here ;
     _Compiler_->BeginBlockFlag = false ;
     CfrTil_Interpret_C_Blocks ( 1, 0, 0 ) ;
@@ -173,7 +173,7 @@ void
 CfrTil_For_C_Combinator ( )
 {
     Word * currentWord0 = Compiler_WordList ( 0 ) ;
-    currentWord0->W_SC_WordIndex = _CfrTil_->SC_SPIndex ;
+    currentWord0->W_SC_Index = _Lexer_->SC_Index ;
     //_Compiler_->SemicolonEndsThisBlock = true ;
     _Compiler_->TakesLParenAsBlock = true ;
     _Compiler_->BeginBlockFlag = false ;
@@ -186,7 +186,7 @@ void
 CfrTil_Loop_C_Combinator ( )
 {
     Word * currentWord0 = Compiler_WordList ( 0 ) ;
-    currentWord0->W_SC_WordIndex = _CfrTil_->SC_SPIndex ;
+    currentWord0->W_SC_Index = _Lexer_->SC_Index ;
     _Compiler_->BeginBlockFlag = false ;
     CfrTil_Interpret_C_Blocks ( 1, 0, 0 ) ;
     _Context_->SC_CurrentCombinator = currentWord0 ;
@@ -197,7 +197,7 @@ void
 CfrTil_While_C_Combinator ( )
 {
     Word * currentWord0 = Compiler_WordList ( 0 ) ;
-    currentWord0->W_SC_WordIndex = _CfrTil_->SC_SPIndex ;
+    currentWord0->W_SC_Index = _Lexer_->SC_Index ;
     byte * start = Here ;
     _Compiler_->TakesLParenAsBlock = true ;
     _Compiler_->BeginBlockFlag = false ;

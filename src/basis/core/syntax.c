@@ -28,7 +28,7 @@ _Interpret_CheckEqualBeforeSemi_LValue ( byte * nc )
 int64
 Interpret_CheckEqualBeforeSemi_LValue ( Word * word )
 {
-    int64 tokenStartReadLineIndex = ( ( int64 ) word == - 1 ) ? _Context_->Lexer0->TokenStart_ReadLineIndex : word->W_TokenStart_ReadLineIndex ;
+    int64 tokenStartReadLineIndex = ( ( int64 ) word == - 1 ) ? _Context_->Lexer0->TokenStart_ReadLineIndex : word->W_RL_Index ;
     return _Interpret_CheckEqualBeforeSemi_LValue ( & _Context_->ReadLiner0->InputLine [ tokenStartReadLineIndex ] ) ; //word->W_StartCharRlIndex ] ) ;
 }
 
@@ -57,8 +57,8 @@ Interpret_C_Block_EndBlock ( Word * word, byte * tokenToUse, Boolean insertFlag 
     //bi->LogicCodeWord = _Compiler_WordList ( compiler, 1 ) ; //word ;
     if ( tokenToUse ) _CfrTil_->EndBlockWord->Name = tokenToUse ;
     if ( insertFlag ) SetState ( _Debugger_, DBG_OUTPUT_INSERTION, true ) ;
-    _CfrTil_->EndBlockWord->W_TokenStart_ReadLineIndex = _Lexer_->TokenStart_ReadLineIndex ;
-    _Interpreter_DoWord_Default ( _Interpreter_, _CfrTil_->EndBlockWord, _CfrTil_->SC_SPIndex ) ;
+    _CfrTil_->EndBlockWord->W_RL_Index = _Lexer_->TokenStart_ReadLineIndex ;
+    _Interpreter_DoWord_Default (_Interpreter_, _CfrTil_->EndBlockWord, -1, _CfrTil_->SC_Index ) ;
     _CfrTil_->EndBlockWord->Name = "}" ;
     //CfrTil_ClearTokenList ( ) ;
     SetState ( _Debugger_, DBG_OUTPUT_INSERTION, false ) ;
@@ -72,8 +72,8 @@ Interpret_C_Block_BeginBlock ( byte * tokenToUse, Boolean insertFlag )
     // ? source code adjustments ?
     if ( tokenToUse ) _CfrTil_->BeginBlockWord->Name = tokenToUse ;
     if ( insertFlag ) SetState ( _Debugger_, DBG_OUTPUT_INSERTION, true ) ;
-    _CfrTil_->BeginBlockWord->W_TokenStart_ReadLineIndex = _Lexer_->TokenStart_ReadLineIndex ;
-    _Interpreter_DoWord_Default ( _Interpreter_, _CfrTil_->BeginBlockWord, _CfrTil_->SC_SPIndex ) ;
+    _CfrTil_->BeginBlockWord->W_RL_Index = _Lexer_->TokenStart_ReadLineIndex ;
+    _Interpreter_DoWord_Default (_Interpreter_, _CfrTil_->BeginBlockWord, -1, _CfrTil_->SC_Index ) ;
     _CfrTil_->BeginBlockWord->Name = "{" ;
     compiler->BeginBlockFlag = false ;
     SetState ( _Debugger_, DBG_OUTPUT_INSERTION, false ) ;
@@ -219,8 +219,8 @@ _CfrTil_C_Infix_EqualOp ( Word * opWord )
     Interpreter * interp = cntx->Interpreter0 ;
     Compiler *compiler = cntx->Compiler0 ;
     Word * word0 = Compiler_WordList ( 0 ), *lhsWord = compiler->LHS_Word, *rword ;
-    int64 tsrli = word0 ? word0->W_TokenStart_ReadLineIndex : 0 ;
-    int64 svscwi = word0 ? word0->W_SC_WordIndex : 0 ;
+    int64 tsrli = word0 ? word0->W_RL_Index : 0 ;
+    int64 svscwi = word0 ? word0->W_SC_Index : 0 ;
     byte * svName, * token ;
     SetState ( compiler, C_INFIX_EQUAL, true ) ;
     d0 ( if ( Is_DebugModeOn ) _Compiler_Show_WordList ( "\nCfrTil_C_Infix_EqualOp : before pop 2 words", 0 ) ) ;
@@ -233,7 +233,7 @@ _CfrTil_C_Infix_EqualOp ( Word * opWord )
     {
         int64 svState = cntx->State ;
         SetState ( cntx, C_SYNTAX | INFIX_MODE, false ) ; // we don't want to just set compiler->LHS_Word
-        _Interpreter_DoWord_Default ( interp, lhsWord, lhsWord->W_SC_WordIndex ) ;
+        _Interpreter_DoWord_Default (interp, lhsWord, -1, lhsWord->W_SC_Index ) ;
         cntx->State = svState ;
         word0 = _CfrTil_->StoreWord ;
     }
@@ -244,11 +244,11 @@ _CfrTil_C_Infix_EqualOp ( Word * opWord )
     d0 ( if ( Is_DebugModeOn ) _Compiler_Show_WordList ( "\nCfrTil_C_Infix_EqualOp : before op word", 0 ) ) ;
     if ( opWord ) rword = opWord ;
     else rword = word0 ; //_Interpreter_DoWord_Default ( interp, opWord ) ;
-    rword->W_TokenStart_ReadLineIndex = tsrli ;
-    rword->W_SC_WordIndex = svscwi ;
+    rword->W_RL_Index = tsrli ;
+    rword->W_SC_Index = svscwi ;
     svName = rword->Name ;
     rword->Name = "=" ;
-    _Interpreter_DoWord_Default ( interp, rword, svscwi ) ;
+    _Interpreter_DoWord_Default (interp, rword, -1, svscwi ) ;
     rword->Name = svName ;
     if ( GetState ( compiler, C_COMBINATOR_LPAREN ) )
     {
