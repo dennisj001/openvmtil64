@@ -554,7 +554,7 @@ _ReadLine_GetLine ( ReadLiner * rl, byte c )
         if ( ! c ) ReadLine_Key ( rl ) ;
         else _ReadLine_Key ( rl, c ), c = 0 ;
 
-        if ( AtCommandLine ( rl ) ) _ReadLine_TabCompletion_Check ( rl ) ;
+        if ( _AtCommandLine () ) _ReadLine_TabCompletion_Check ( rl ) ;
         _CfrTil_->ReadLine_FunctionTable [ _CfrTil_->ReadLine_CharacterTable [ rl->InputKeyedCharacter ] ] ( rl ) ;
         SetState ( rl, ANSI_ESCAPE, false ) ;
     }

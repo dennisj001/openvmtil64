@@ -12,6 +12,20 @@ Word_SetCoding ( Word * word, byte * address )
 //block CurrentDefinition ;
 
 void
+_Word_Run ( Word * word )
+{
+    if ( word )
+    {
+        word->StackPushRegisterCode = 0 ; // nb. used! by the rewriting optInfo
+        // keep track in the word itself where the machine code is to go, if this word is compiled or causes compiling code - used for optimization
+        Word_SetCoding ( word, Here ) ;
+        word->W_InitialRuntimeDsp = _Dsp_ ;
+        _Context_->CurrentlyRunningWord = word ;
+        Block_Eval ( word->Definition ) ;
+    }
+}
+
+void
 Word_Run ( Word * word )
 {
     if ( word )
@@ -62,7 +76,6 @@ void
 _Word_Compile ( Word * word )
 {
     _Set_SCA ( word ) ;
-    Word_SetCoding ( word, Here ) ;
     if ( ! word->Definition )
     {
         CfrTil_SetupRecursiveCall ( ) ;

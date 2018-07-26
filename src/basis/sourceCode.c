@@ -528,7 +528,7 @@ CfrTil_Lexer_SourceCodeOn ( )
 byte *
 _CfrTil_GetSourceCode ()
 {
-    byte * sc = String_New ( _CfrTil_->SC_Buffer, STRING_MEM ) ;
+    byte * sc = String_New_SourceCode ( _CfrTil_->SC_Buffer ) ;
     return sc ;
 }
 
@@ -544,7 +544,6 @@ byte *
 CfrTil_FinishSourceCode ( CfrTil * cfrtil, Word * word )
 {
     _CfrTil_Finish_WordSourceCode ( cfrtil, word ) ;
-    //_CfrTil_Init_Recycling_SourceCodeWordList ( cfrtil, word ) ;
     CfrTil_WordList_RecycleInit (cfrtil, word, 0, 0 , 0) ;
 }
 

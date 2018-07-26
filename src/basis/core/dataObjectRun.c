@@ -86,7 +86,7 @@ _Namespace_Do_C_Type ( Namespace * ns )
     Context * cntx = _Context_ ;
     Lexer * lexer = cntx->Lexer0 ;
     Compiler * compiler = cntx->Compiler0 ;
-    byte * token1, *token2 ;
+    byte * token1, *token2 ; Word * beginWord ;
     if ( ! GetState ( compiler, DOING_C_TYPE ) )
     {
         SetState ( compiler, DOING_C_TYPE, true ) ;
@@ -114,12 +114,18 @@ _Namespace_Do_C_Type ( Namespace * ns )
                     SetState ( _Compiler_, C_COMBINATOR_PARSING, true ) ;
                     Namespace_DoNamespace ( ( byte* ) "C_Syntax" ) ;
                     _Namespace_ActivateAsPrimary ( ns ) ;
-                    Word * word = Word_New ( token1 ) ;
-                    word->Coding = Here ;
-                    CfrTil_WordList_PushWord ( word ) ;
+                    Word * word = Word_New ( token1 ) ; // "("
                     DataStack_Push ( ( int64 ) word ) ;
-                    CfrTil_BeginBlock ( ) ;
+#if 1                    
+                    beginWord = _CfrTil_->BeginBlockWord ;
+                    Block_Eval ( beginWord->Definition ) ; //( beginWord ) ;
                     CfrTil_LocalsAndStackVariablesBegin ( ) ;
+                    CfrTil_WordList_PushWord ( beginWord ) ;
+                    _Set_SCA ( beginWord ) ;
+#else                    
+                    CfrTil_BeginBlock ( ) ; // nb! before CfrTil_LocalsAndStackVariablesBegin
+                    CfrTil_LocalsAndStackVariablesBegin ( ) ;
+#endif                    
                     Ovt_AutoVarOn ( ) ;
                     do
                     {

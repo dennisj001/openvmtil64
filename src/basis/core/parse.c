@@ -1,7 +1,7 @@
 #include "../../include/cfrtil64.h"
 
 void
-_CfrTil_SingleQuote ()
+_CfrTil_SingleQuote ( )
 {
     ReadLiner * rl = _ReadLiner_ ;
     Lexer * lexer = _Lexer_ ;
@@ -10,6 +10,7 @@ _CfrTil_SingleQuote ()
     byte c0, c1, c2 ;
     uint64 charLiteral = 0 ;
 
+    //if ( ! Compiling ) _CfrTil_InitSourceCode_WithName ( _CfrTil_, lexer->OriginalToken ) ;
     // remember : _ReadLine_PeekIndexedChar ( rl, 0 ) is the *next* char to be read
     if ( sqWord && sqWord->Name[0] == '\'' && ( ( ( c1 = _ReadLine_PeekIndexedChar ( rl, 1 ) ) == '\'' ) || ( ( c0 = _ReadLine_PeekIndexedChar ( rl, 0 ) ) == '\\' ) ) )// parse a char type, eg. 'c' 
     {
@@ -38,10 +39,11 @@ _CfrTil_SingleQuote ()
 done:
         CfrTil_WordLists_PopWord ( ) ; // pop the "'" token
         word = _DObject_New ( buffer, charLiteral, LITERAL | CONSTANT | IMMEDIATE, 0, 0, LITERAL, ( byte* ) _DataObject_Run, 0, 0, 0, TEMPORARY ) ;
-        _Interpreter_DoWord (_Interpreter_, word, -1 , -1) ; //_Lexer_->TokenStart_ReadLineIndex ) ;
+        _Interpreter_DoWord ( _Interpreter_, word, - 1, - 1 ) ; //_Lexer_->TokenStart_ReadLineIndex ) ;
     }
     else
     {
+        if ( ! Compiling ) _CfrTil_InitSourceCode_WithName ( _CfrTil_, lexer->OriginalToken ) ;
         byte * token = ( byte* ) "" ;
         while ( 1 )
         {
@@ -61,6 +63,7 @@ done:
             }
             else break ;
         }
+        if ( ( ! AtCommandLine ( rl ) ) && ( ! GetState ( _CfrTil_, SOURCE_CODE_STARTED ) ) ) _CfrTil_InitSourceCode_WithName ( _CfrTil_, lexer->OriginalToken ) ;
         CfrTil_Token ( ) ;
     }
 }
@@ -114,11 +117,11 @@ gotNextToken:
                 continue ;
             }
         }
-        else 
+        else
         {
-            byte * buffer = Buffer_Clear (_CfrTil_->ScratchB1) ;
+            byte * buffer = Buffer_Clear ( _CfrTil_->ScratchB1 ) ;
             sprintf ( buffer, "\n_CfrTil_Parse_ClassStructure : can't find namespace : \'%s\'", token ) ;
-            _SyntaxError ( (byte*) buffer, 1 ) ; // else structure component size error
+            _SyntaxError ( ( byte* ) buffer, 1 ) ; // else structure component size error
         }
         for ( i = 0 ; 1 ; )
         {
@@ -297,7 +300,7 @@ _CfrTil_Parse_LocalsAndStackVariables ( int64 svf, int64 lispMode, ListObject * 
                     ctype |= REGISTER_VARIABLE ;
                     compiler->NumberOfRegisterVariables ++ ;
                 }
-                word = _CfrTil_LocalWord (token, ( ctype & LOCAL_VARIABLE ) ? ++ compiler->NumberOfLocals : ++ compiler->NumberOfArgs, ctype , ctype2, ltype) ; // svf : flag - whether stack variables are in the frame
+                word = _CfrTil_LocalWord ( token, ( ctype & LOCAL_VARIABLE ) ? ++ compiler->NumberOfLocals : ++ compiler->NumberOfArgs, ctype, ctype2, ltype ) ; // svf : flag - whether stack variables are in the frame
                 if ( regFlag == true )
                 {
                     word->RegToUse = RegOrder ( regToUseIndex ++ ) ; //compiler->RegOrder [ regToUseIndex ++ ] ;

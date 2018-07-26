@@ -925,7 +925,6 @@ typedef struct _CfrTil
     Cpu * cs_Cpu ;
     Cpu * cs_Cpu2 ;
     block CurrentBlock, SaveCpuState, SaveCpu2State, RestoreCpuState, RestoreCpu2State, CallCfrTilWord, CallCurrentBlock, RestoreSelectedCpuState, SaveSelectedCpuState ; //, SyncDspToEsi, SyncEsiToDsp ;
-
     block Set_DspReg_FromDataStackPointer, Set_DataStackPointer_FromDspReg ; //, PeekReg, PokeReg ;
     block PopDspToR8AndCall, CallReg_TestRSP, Call_ToAddressThruR8_TestAlignRSP ; //adjustRSPAndCall, adjustRSP ;
     ByteArray * PeekPokeByteArray ;

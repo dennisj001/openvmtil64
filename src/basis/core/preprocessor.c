@@ -5,7 +5,7 @@ void
 CfrTil_PreProcessor ( )
 {
     Interpreter * interp = _Context_->Interpreter0 ;
-    _CfrTil_InitSourceCode_WithName ( _CfrTil_, _Lexer_->OriginalToken ) ;
+    if ( ! Compiling ) _CfrTil_InitSourceCode_WithName ( _CfrTil_, _Lexer_->OriginalToken ) ;
     Finder_SetNamedQualifyingNamespace ( _Finder_, ( byte* ) "PreProcessor" ) ;
     SetState ( interp, PREPROCESSOR_MODE, true ) ;
     _Interpret_ToEndOfLine ( interp ) ;

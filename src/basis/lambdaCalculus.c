@@ -1517,7 +1517,7 @@ _LO_CfrTil ( ListObject * lfirst )
         else if ( String_Equal ( ldata->Name, ( byte * ) ";" ) && ( ! GetState ( cntx, C_SYNTAX ) ) )
         {
             ListObject *ldata1 = _LO_Next ( ldata ) ; // bump ldata to account for name
-            word->W_SourceCode = String_New ( _CfrTil_->SC_Buffer, STRING_MEM ) ;
+            word->W_SourceCode = String_New_SourceCode ( _CfrTil_->SC_Buffer ) ;
             if ( ldata1 && String_Equal ( ldata1->Name, ( byte * ) ":" ) )
             {
                 _CfrTil_InitSourceCode_WithName ( _CfrTil_, "(" ) ;

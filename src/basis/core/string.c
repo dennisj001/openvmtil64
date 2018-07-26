@@ -591,6 +591,12 @@ String_New ( byte * string, uint64 allocType )
     return 0 ;
 }
 
+byte *
+String_New_SourceCode ( byte * string )
+{
+    return String_New ( string, STRING_MEM ) ;
+}
+
 byte
 _String_NextNonDelimiterChar ( byte * str0, byte * cset )
 {

@@ -117,7 +117,7 @@ void
 Dlsym ( byte * sym, byte * lib )
 {
     block b = ( block ) _Dlsym ( sym, lib ) ;
-    Word * word = _DataObject_New (CFRTIL_WORD, 0, sym, CPRIMITIVE | DLSYM_WORD | C_PREFIX | C_RETURN | C_PREFIX_RTL_ARGS, 0, 0, 0, ( int64 ) b, 0, 0 , -1) ;
+    Word * word = _DataObject_New ( CFRTIL_WORD, 0, sym, CPRIMITIVE | DLSYM_WORD | C_PREFIX | C_RETURN | C_PREFIX_RTL_ARGS, 0, 0, 0, ( int64 ) b, 0, 0, - 1 ) ;
     word->WAttribute |= WT_C_PREFIX_RTL_ARGS ;
 }
 
@@ -454,5 +454,18 @@ _CfrTil_Dump ( int64 dumpMod )
     int64 number = DataStack_Pop ( ) ;
     byte * address = ( byte* ) DataStack_Pop ( ) ;
     __CfrTil_Dump ( address, number, dumpMod ) ;
+}
+
+Boolean
+_AtCommandLine ( )
+{
+    return ( ! _Context_->System0->IncludeFileStackNumber ) ;
+}
+
+Boolean
+AtCommandLine ( ReadLiner *rl )
+{
+    ( ( GetState ( _Debugger_, DBG_COMMAND_LINE ) || GetState ( _Context_, AT_COMMAND_LINE ) ) ||
+        ( GetState ( rl, CHAR_ECHO ) && ( _AtCommandLine ( ) ) ) ) ;
 }
 

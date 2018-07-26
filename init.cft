@@ -369,7 +369,7 @@ Root
 'doX64 1 const
 'doScript 1 const
 'doScript2 1 const
-'_doDemo 1 const    
+'_doDemo 0 const    
 'todo 0 const    
 dbgOff
 //dbgOn 
@@ -393,66 +393,12 @@ stringMacrosOff
 #else
 // you can trim this file to your needs and put your personal init code here maybe
 
-#if 0
-String Shell C
-s: $$ 
-    ""
-    { token dup ";" strcmp } 
-    { 
-        { dup "." strcmp } { strcat " " strcat } { strcat } if3
-    } 
-    while drop location "$$" ps dup ps _sh return
-;s  // allows more than one shell command on a ';' separated line 
-"streol" 'getStringToEndOfLine find alias
-: $ streol _sh ;  
-'$$ find wdiss //pause
-Int "byte" class
-byte size 1 =
-"libc" namespace libc
-dlsym: printf /lib/x86_64-linux-gnu/libc.so.6 ; void_return
-dlsym: strcmp /lib/x86_64-linux-gnu/libc.so.6 ; rax_return
-dlsym: sprintf /lib/x86_64-linux-gnu/libc.so.6 ; void_return
-dlsym: strcat /lib/x86_64-linux-gnu/libc.so.6 ; void_return
-dlsym: memset /lib/x86_64-linux-gnu/libc.so.6 ; void_return
+#if 1
 c_syntaxOn
-C String libc
-typedef struct { byte buf [ 256 ]; } CBuffer ;
-void
-$ ( | atoken, buffer, CBuffer buffer0 ) 
-{
-    buffer = &buffer0.buf ;
-    memset ( buffer, 0, libc.CBuffer.size ) ; 
-    while ( atoken = token () ) 
-    {   
-        printf ( "\n\ttoken = %s\n", atoken ) ; //pause () ;
-        if ( ! strcmp ( atoken, ";" ) ) 
-        { 
-            printf ( "\n\tbuffer = %s\n", buffer ) ; //pause () ;
-            sh ( buffer ) ;
-            break ; 
-        }
-        else 
-        { 
-            if ( strcmp ( atoken, "." ) )
-            {
-                strcat ( buffer, " " ) ; // for shell '.' which means current directory - needs the space after
-            }
-            strcat ( buffer, atoken ) ;
-        }
-    }
-} 
-'void.$ find wdiss sp
-TODO ( "fix $ in c_syntax.cft" )
-
-#if doScript2 
-"\n\nnew $ test\n" ps
-void
-$ls -al . ;
-$ etc/script ; 
-$ etc/lispScript ; 
-String C
-$$ls -al /usr/local ; $$ls -al . ;
-sp
+d: int _fib1c ( n ) { if ( n < 2 ) { n ; } else { _fib1c ( n - 1 ) + _fib1c ( n - 2 ) ; } }
+c_syntaxOff
+' _fib1c find wdiss
+20 _fib1c p //pause
 #endif
 
 c_syntaxOff

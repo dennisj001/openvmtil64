@@ -145,17 +145,10 @@
 #define _DataStack_ _CfrTil_->DataStack
 #define _DataStackPointer_ _DataStack_->StackPointer
 #define _DSP_ _DataStackPointer_ 
-//#define _Dsp_ _Q_->OVT_CfrTil->DataStack->StackPointer 
 #define _ReturnStack_ _CfrTil_->ReturnStack
 #define _ReturnStack_ _CfrTil_->ReturnStack
 #define _ReturnStackPointer_ _ReturnStack_->StackPointer
 #define _RSP_ _ReturnStackPointer_ 
-//#define _Rsp_ _Q_->OVT_CfrTil->ReturnStack->StackPointer
-#define _AtCommandLine() ( ! _Context_->System0->IncludeFileStackNumber ) 
-#define AtCommandLine( rl ) \
-        ( GetState ( _Debugger_, DBG_COMMAND_LINE ) || GetState ( _Context_, AT_COMMAND_LINE ) ||\
-        ( GetState ( rl, CHAR_ECHO ) && ( ! _Context_->System0->IncludeFileStackNumber ) ) ) // ?? essentially : at a command line ??
-//#define SessionString_New( string ) String_New ( string, SESSION ) 
 #define TemporaryString_New( string ) String_New ( string, TEMPORARY ) 
 #define IsWordRecursive CfrTil_CheckForGotoPoints ( GI_RECURSE )
 #define AppendCharToSourceCode( c ) //_Lexer_AppendCharToSourceCode ( lexer, c ) 
