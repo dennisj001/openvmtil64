@@ -10,19 +10,23 @@ _OpenVmTil_ShowExceptionInfo ( int signal )
         {
             if ( _CfrTil_ )
             {
-                Word * word = 0 ;
                 Debugger * debugger = _Debugger_ ;
-                //_Debugger_Locals_Show ( debugger, debugger->w_Word ) ;
-                if ( signal != SIGSEGV ) Debugger_Stack ( debugger ) ;
+                if ( _Q_->ExceptionMessage ) _Printf ( "\n%s: %s\n", _Q_->ExceptionMessage, _Q_->ExceptionSpecialMessage ) ;
+                Word * word = _Q_->ExceptionWord ;
                 DebugOn ;
-                if ( _Q_->Signal != 11 )
+                if ( _Q_->Signal != SIGSEGV )
                 {
-                    if ( ! debugger->w_Word )
+                    if ( debugger->w_Word ) _Debugger_Locals_Show ( debugger, debugger->w_Word ) ;
+                    Debugger_Stack ( debugger ) ;
+                    if ( ! word )
                     {
-                        Word * word = 0 ;
-                        if ( _Q_->SigAddress ) word = Word_GetFromCodeAddress ( ( byte* ) _Q_->SigAddress ) ;
-                        if ( ! word ) word = _Context_->CurrentlyRunningWord ;
-                        debugger->w_Word = word ;
+                        word = Finder_Word_FindUsing ( _Finder_, _Q_->ExceptionToken, 1 ) ;
+                        if ( ! word )
+                        {
+                            if ( _Q_->SigAddress ) word = Word_GetFromCodeAddress ( ( byte* ) _Q_->SigAddress ) ;
+                            else word = _Context_->CurrentlyRunningWord ;
+                            debugger->w_Word = word ;
+                        }
                     }
                 }
                 AlertColors ;
@@ -220,10 +224,11 @@ _OVT_Throw ( int64 restartCondition, int8 pauseFlag )
 }
 
 void
-OpenVmTil_Throw ( byte * excptMessage, int64 restartCondition, int64 infoFlag )
+OpenVmTil_Throw ( byte * excptMessage, byte * specialMessage, int64 restartCondition, int64 infoFlag )
 {
     _Q_->ExceptionMessage = excptMessage ;
     _Q_->Thrown = restartCondition ;
+    _Q_->ExceptionSpecialMessage = specialMessage ;
 
     if ( infoFlag && ( _Q_->SignalExceptionsHandled < 2 ) ) _OpenVmTil_ShowExceptionInfo ( 0 ) ;
     _OVT_Throw ( restartCondition, 0 ) ;
@@ -232,7 +237,7 @@ OpenVmTil_Throw ( byte * excptMessage, int64 restartCondition, int64 infoFlag )
 void
 _OpenVmTil_LongJmp_WithMsg ( int64 restartCondition, byte * msg )
 {
-    OpenVmTil_Throw ( msg, restartCondition, 0 ) ;
+    OpenVmTil_Throw ( msg, 0, restartCondition, 0 ) ;
 }
 
 void
@@ -270,124 +275,124 @@ CfrTil_Exception ( int64 signal, byte * message, int64 restartCondition )
     {
         case CASE_NOT_LITERAL_ERROR:
         {
-            OpenVmTil_Throw ( ( byte* ) "Exception : Syntax Error : \"case\" only takes a literal/constant as its parameter after the block", restartCondition, 1 ) ;
+            OpenVmTil_Throw ( ( byte* ) "Exception : Syntax Error : \"case\" only takes a literal/constant as its parameter after the block", 0, restartCondition, 1 ) ;
             break ;
         }
         case DEBUG_ERROR:
         {
-            OpenVmTil_Throw ( ( byte* ) "Exception : Debug Error : User is not in debug mode", restartCondition, 1 ) ;
+            OpenVmTil_Throw ( ( byte* ) "Exception : Debug Error : User is not in debug mode", 0, restartCondition, 1 ) ;
             break ;
         }
         case OBJECT_REFERENCE_ERROR:
         {
-            OpenVmTil_Throw ( ( byte* ) "Exception : Object Reference Error", restartCondition, 1 ) ;
+            OpenVmTil_Throw ( ( byte* ) "Exception : Object Reference Error", 0, restartCondition, 1 ) ;
             break ;
         }
         case OBJECT_SIZE_ERROR:
         {
             sprintf ( ( char* ) b, "Exception : Warning : Class object size is 0. Did you declare 'size' for %s? ",
                 _Context_->CurrentlyRunningWord->ContainingNamespace->Name ) ;
-            OpenVmTil_Throw ( b, restartCondition, 1 ) ;
+            OpenVmTil_Throw ( b, 0, restartCondition, 1 ) ;
             break ;
         }
         case STACK_OVERFLOW:
         {
-            OpenVmTil_Throw ( ( byte* ) "Exception : Stack Overflow", restartCondition, 1 ) ;
+            OpenVmTil_Throw ( ( byte* ) "Exception : Stack Overflow", 0, restartCondition, 1 ) ;
             break ;
         }
         case STACK_UNDERFLOW:
         {
-            OpenVmTil_Throw ( ( byte* ) "Exception : Stack Underflow", restartCondition, 1 ) ;
+            OpenVmTil_Throw ( ( byte* ) "Exception : Stack Underflow", 0, restartCondition, 1 ) ;
             break ;
         }
         case STACK_ERROR:
         {
-            OpenVmTil_Throw ( ( byte* ) "Exception : Stack Error", restartCondition, 1 ) ;
+            OpenVmTil_Throw ( ( byte* ) "Exception : Stack Error", 0, restartCondition, 1 ) ;
             break ;
         }
         case SEALED_NAMESPACE_ERROR:
         {
-            OpenVmTil_Throw ( ( byte* ) "Exception : New words can not be added to sealed namespaces", restartCondition, 1 ) ;
+            OpenVmTil_Throw ( ( byte* ) "Exception : New words can not be added to sealed namespaces", 0, restartCondition, 1 ) ;
             break ;
         }
         case NAMESPACE_ERROR:
         {
-            OpenVmTil_Throw ( ( byte* ) "Exception : Namespace (Not Found?) Error", restartCondition, 1 ) ;
+            OpenVmTil_Throw ( ( byte* ) "Exception : Namespace (Not Found?) Error", 0, restartCondition, 1 ) ;
             break ;
         }
         case SYNTAX_ERROR:
         {
-            OpenVmTil_Throw ( ( byte* ) "Exception : Syntax Error", restartCondition, 1 ) ;
+            OpenVmTil_Throw ( ( byte* ) "Exception : Syntax Error", message, restartCondition, 1 ) ;
             break ;
         }
         case NESTED_COMPILE_ERROR:
         {
-            OpenVmTil_Throw ( ( byte* ) "Exception : Nested Compile Error", restartCondition, 1 ) ;
+            OpenVmTil_Throw ( ( byte* ) "Exception : Nested Compile Error", 0, restartCondition, 1 ) ;
             break ;
         }
         case COMPILE_TIME_ONLY:
         {
-            OpenVmTil_Throw ( ( byte* ) "Exception : Compile Time Use Only", restartCondition, 1 ) ;
+            OpenVmTil_Throw ( ( byte* ) "Exception : Compile Time Use Only", 0, restartCondition, 1 ) ;
             break ;
         }
         case BUFFER_OVERFLOW:
         {
-            OpenVmTil_Throw ( ( byte* ) "Exception : Buffer Overflow", restartCondition, 1 ) ;
+            OpenVmTil_Throw ( ( byte* ) "Exception : Buffer Overflow", 0, restartCondition, 1 ) ;
             break ;
         }
         case MEMORY_ALLOCATION_ERROR:
         {
-            OpenVmTil_Throw ( ( byte* ) "Exception : Memory Allocation Error", restartCondition, 1 ) ;
+            OpenVmTil_Throw ( ( byte* ) "Exception : Memory Allocation Error", 0, restartCondition, 1 ) ;
             break ;
         }
         case LABEL_NOT_FOUND_ERROR:
         {
-            OpenVmTil_Throw ( ( byte* ) "Exception : Word not found. Misssing namespace qualifier?\n", QUIT, 1 ) ;
+            OpenVmTil_Throw ( ( byte* ) "Exception : Word not found. Misssing namespace qualifier?\n", 0, QUIT, 1 ) ;
             break ;
         }
         case NOT_A_KNOWN_OBJECT:
         {
-            OpenVmTil_Throw ( ( byte* ) "Exception : Not a known object.\n", QUIT, 1 ) ;
+            OpenVmTil_Throw ( ( byte* ) "Exception : Not a known object.\n", message, QUIT, 1 ) ;
             break ;
         }
         case ARRAY_DIMENSION_ERROR:
         {
-            OpenVmTil_Throw ( ( byte* ) "Exception : Array has no dimensions!? ", QUIT, 1 ) ;
+            OpenVmTil_Throw ( ( byte* ) "Exception : Array has no dimensions!? ", 0, QUIT, 1 ) ;
             break ;
         }
         case INLINE_MULTIPLE_RETURN_ERROR:
         {
-            OpenVmTil_Throw ( ( byte* ) "Exception : Multiple return points in a inlined function", restartCondition, 1 ) ;
+            OpenVmTil_Throw ( ( byte* ) "Exception : Multiple return points in a inlined function", 0, restartCondition, 1 ) ;
             break ;
         }
         case MACHINE_CODE_ERROR:
         {
-            OpenVmTil_Throw ( ( byte* ) "Exception : in machine coding", restartCondition, 1 ) ;
+            OpenVmTil_Throw ( ( byte* ) "Exception : in machine coding", 0, restartCondition, 1 ) ;
             break ;
         }
         case VARIABLE_NOT_FOUND_ERROR:
         {
-            OpenVmTil_Throw ( ( byte* ) "Exception : Variable not found error", restartCondition, 1 ) ;
+            OpenVmTil_Throw ( ( byte* ) "Exception : Variable not found error", 0, restartCondition, 1 ) ;
             break ;
         }
         case USEAGE_ERROR:
         {
-            OpenVmTil_Throw ( ( byte* ) "Exception : Useage Error", restartCondition, 1 ) ;
+            OpenVmTil_Throw ( ( byte* ) "Exception : Useage Error", 0, restartCondition, 1 ) ;
             break ;
         }
         case FIX_ME_ERROR:
         {
-            OpenVmTil_Throw ( ( byte* ) "Exception : Fix Me", restartCondition, 1 ) ;
+            OpenVmTil_Throw ( ( byte* ) "Exception : Fix Me", 0, restartCondition, 1 ) ;
             break ;
         }
         case OUT_OF_CODE_MEMORY:
         {
-            OpenVmTil_Throw ( ( byte* ) "Exception : Out of Code Memory : Increase Code Memory Size for Startup!!", INITIAL_START, 1 ) ;
+            OpenVmTil_Throw ( ( byte* ) "Exception : Out of Code Memory : Increase Code Memory Size for Startup!!", 0, INITIAL_START, 1 ) ;
             break ;
         }
         default:
         {
-            OpenVmTil_Throw ( message, restartCondition, 1 ) ;
+            OpenVmTil_Throw ( message, 0, restartCondition, 1 ) ;
             break ;
         }
     }
@@ -402,7 +407,7 @@ Error3 ( byte * format, byte * one, byte * two, int64 three )
 
     char buffer [ 128 ] ;
     sprintf ( ( char* ) buffer, ( char* ) format, one, two ) ;
-    Error ( ( byte* ) buffer, three ) ;
+    Error ( ( byte* ) buffer, "", three ) ;
 }
 
 void
@@ -410,6 +415,6 @@ Error2 ( byte * format, byte * one, int64 two )
 {
     char buffer [ 128 ] ;
     sprintf ( ( char* ) buffer, ( char* ) format, one ) ;
-    Error ( ( byte* ) buffer, two ) ;
+    Error ( ( byte* ) buffer, "", two ) ;
 }
 

@@ -29,6 +29,7 @@ _Compile_TestCode ( int8 reg, int8 size )
 void
 BI_CompileRecord_TestCode_Reg ( BlockInfo *bi, int8 reg, int8 size )
 {
+    Set_SCA ( 0 ) ;
     bi->LogicTestCode = Here ;
     _Compile_TestCode ( reg, size ) ;
 }

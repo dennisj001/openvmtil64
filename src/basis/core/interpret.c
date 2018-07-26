@@ -61,19 +61,23 @@ _Interpreter_DoWord ( Interpreter * interp, Word * word, int64 tsrli, int64 scwi
         interp->w_Word = word ;
         if ( ( word->WAttribute == WT_INFIXABLE ) && ( GetState ( cntx, INFIX_MODE ) ) ) // nb. Interpreter must be in INFIX_MODE because it is effective for more than one word
         {
+            doInfix :
             DEBUG_SETUP ( word ) ;
             Interpreter_InterpretNextToken ( interp ) ;
             // then continue and interpret this 'word' - just one out of lexical order
             _Interpreter_DoWord_Default ( interp, word, tsrli, scwi ) ;
         }
-        else if ( ( word->WAttribute == WT_PREFIX ) )
+#if 1       
+        else if ( word->CAttribute & PREFIX ) //WAttribute == WT_PREFIX ) 
         {
             if ( _Interpreter_IsWordPrefixing ( interp, word ) )
             {
                 Interpreter_DoPrefixWord ( cntx, interp, word ) ;
             }
+            else  if ( word->CAttribute & CATEGORY_OP_1_ARG ) goto doInfix ; 
             else _SyntaxError ( "Attempting to call a prefix function without following parenthesized args", 1 ) ;
         }
+#endif        
         else if ( Interpreter_IsWordPrefixing ( interp, word ) ) Interpreter_DoPrefixWord ( cntx, interp, word ) ;
         else if ( word->WAttribute == WT_C_PREFIX_RTL_ARGS )
         {

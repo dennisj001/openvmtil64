@@ -244,14 +244,12 @@ i2halt // for third interpret4
 
 c_syntaxOn
 C String libc
-typedef struct { byte buf [ 256 ]; } Buffer0 ;
-s
-
+typedef struct { byte buf [ 256 ]; } CBuffer ;
 void
-$ ( | atoken, buffer, buffer1, Buffer buffer0 ) 
+$ ( | atoken, buffer, CBuffer buffer0 ) 
 {
     buffer = &buffer0.buf ;
-    memset ( buffer, 0, Buffer0.size ) ; 
+    memset ( buffer, 0, CBuffer.size ) ; 
     while ( atoken = token () ) 
     {   
         printf ( "\n\ttoken = %s\n", atoken ) ; //pause () ;
@@ -271,20 +269,21 @@ $ ( | atoken, buffer, buffer1, Buffer buffer0 )
         }
     }
 } 
-'void.$ find wdiss //pause
+'void.$ find wdiss sp
 TODO ( "fix $ in c_syntax.cft" )
 
-#if doScript 
+#if doScript2 
 "\n\nnew $ test\n" ps
-void.$ls -al . ;
-d: void.$ etc/script ; 
-void.$ etc/lispScript ; 
-String
+void
+$ls -al . ;
+$ etc/script ; 
+$ etc/lispScript ; 
 $$ls -al /usr/local ; $$ls -al . ;
-//pause
-
+sp
 #endif
+
 c_syntaxOff
+//pause
 verbosity 1 =
 sp
 dbgOff 

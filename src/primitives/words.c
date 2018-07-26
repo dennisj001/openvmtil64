@@ -2,25 +2,26 @@
 #include "../include/cfrtil64.h"
 
 void
-_CfrTil_Colon ( )
+_CfrTil_Colon ( Boolean initSC )
 {
     //CfrTil_RightBracket ( ) ;
-    CfrTil_SourceCode_Init ( ) ;
+    if ( initSC) CfrTil_SourceCode_Init ( ) ;
     CfrTil_Token ( ) ;
     CfrTil_Word_Create ( ) ;
     CfrTil_BeginBlock ( ) ;
+    
+    byte * token = Lexer_PeekNextNonDebugTokenWord ( _Lexer_, 0 ) ;
+    if ( ( String_Equal ( token, "(" ) ) && ( ! GetState ( _Context_->Interpreter0, PREPROCESSOR_DEFINE ) ) )
+    {
+        Lexer_ReadToken ( _Lexer_ ) ;
+        CfrTil_LocalsAndStackVariablesBegin ( ) ;
+    }
 }
 
 void
 CfrTil_Colon ( )
 {
-    _CfrTil_Colon ( ) ;
-    byte * token = Lexer_PeekNextNonDebugTokenWord ( _Lexer_, 0 ) ;
-    if (( String_Equal ( token, "(" ) ) && ((!GetState ( _Context_->Interpreter0, PREPROCESSOR_DEFINE )) ))
-    {
-        Lexer_ReadToken ( _Lexer_ ) ;
-        CfrTil_LocalsAndStackVariablesBegin ( ) ;
-    }
+    _CfrTil_Colon ( 1 ) ;
 }
 
 Word *
@@ -155,7 +156,7 @@ CfrTil_Word ( )
 {
     block b = ( block ) DataStack_Pop ( ) ;
     byte * name = ( byte* ) DataStack_Pop ( ) ;
-    _DataObject_New (CFRTIL_WORD, 0, name, 0, 0, 0, 0, ( int64 ) b, 0 , -1) ;
+    _DataObject_New ( CFRTIL_WORD, 0, name, 0, 0, 0, 0, ( int64 ) b, 0, 0, - 1 ) ;
 }
 
 void
@@ -252,21 +253,21 @@ Word_Namespace ( )
 void
 CfrTil_Keyword ( void )
 {
-    Word * word = _CfrTil_->LastFinished_DObject ; 
+    Word * word = _CfrTil_->LastFinished_DObject ;
     if ( word ) word->CAttribute |= KEYWORD ;
 }
 
 void
 CfrTil_Immediate ( void )
 {
-    Word * word = _CfrTil_->LastFinished_DObject ; 
+    Word * word = _CfrTil_->LastFinished_DObject ;
     if ( word ) word->CAttribute |= IMMEDIATE ;
 }
 
 void
 CfrTil_StackVariable ( void )
 {
-    Word * word = _CfrTil_->LastFinished_DObject ; 
+    Word * word = _CfrTil_->LastFinished_DObject ;
     if ( word )
     {
         word->CAttribute2 |= VARIABLE ;
@@ -277,7 +278,7 @@ CfrTil_StackVariable ( void )
 void
 CfrTil_Syntactic ( void )
 {
-    Word * word = _CfrTil_->LastFinished_DObject ; 
+    Word * word = _CfrTil_->LastFinished_DObject ;
     if ( word ) word->CAttribute2 |= SYNTACTIC ;
 }
 
@@ -296,25 +297,25 @@ CfrTil_IsImmediate ( void )
 void
 CfrTil_Inline ( void )
 {
-    Word * word = _CfrTil_->LastFinished_DObject ; 
+    Word * word = _CfrTil_->LastFinished_DObject ;
     if ( word ) word->CAttribute |= INLINE ;
 }
 
 void
 CfrTil_Prefix ( void )
 {
-    Word * word = _CfrTil_->LastFinished_DObject ; 
+    Word * word = _CfrTil_->LastFinished_DObject ;
     if ( word )
     {
         //word->CAttribute |= PREFIX ;
-        word->WAttribute = WT_PREFIX ;
+        word->CAttribute |= PREFIX ;
     }
 }
 
 void
 CfrTil_C_Prefix ( void )
 {
-    Word * word = _CfrTil_->LastFinished_DObject ; 
+    Word * word = _CfrTil_->LastFinished_DObject ;
     if ( word )
     {
         word->CAttribute |= C_PREFIX | C_PREFIX_RTL_ARGS ;
@@ -325,7 +326,7 @@ CfrTil_C_Prefix ( void )
 void
 CfrTil_C_Return ( void )
 {
-    Word * word = _CfrTil_->LastFinished_DObject ; 
+    Word * word = _CfrTil_->LastFinished_DObject ;
     if ( word )
     {
         word->CAttribute |= C_RETURN | C_PREFIX_RTL_ARGS ;
@@ -336,7 +337,7 @@ CfrTil_C_Return ( void )
 void
 CfrTil_Void_Return ( void )
 {
-    Word * word = _CfrTil_->LastFinished_DObject ; 
+    Word * word = _CfrTil_->LastFinished_DObject ;
     if ( word )
     {
         word->CAttribute &= ~ C_RETURN ;
@@ -352,7 +353,7 @@ CfrTil_Void_Return ( void )
 void
 CfrTil_RAX_Return ( void )
 {
-    Word * word = _CfrTil_->LastFinished_DObject ; 
+    Word * word = _CfrTil_->LastFinished_DObject ;
     if ( word )
     {
         word->CAttribute &= ~ C_RETURN ;
@@ -363,7 +364,7 @@ CfrTil_RAX_Return ( void )
 void
 CfrTil_DebugWord ( void )
 {
-    Word * word = _CfrTil_->LastFinished_DObject ; 
+    Word * word = _CfrTil_->LastFinished_DObject ;
     if ( word ) word->CAttribute |= DEBUG_WORD ;
 }
 

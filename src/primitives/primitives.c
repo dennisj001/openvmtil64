@@ -539,7 +539,7 @@ CPrimitive CPrimitives [] = {
 
     // this section can be implemented by lower level calls - internally
     { "word", 0, 0, CfrTil_Word, 0, 0, 0, "Reserved", "Compiler" },
-    { ":", 0, 0, _CfrTil_Colon, IMMEDIATE | KEYWORD, 0, 0, "Reserved", "Compiler" },
+    { ":", 0, 0, CfrTil_Colon, IMMEDIATE | KEYWORD, 0, 0, "Reserved", "Compiler" },
     { "semi", 0, 0, CfrTil_SemiColon, KEYWORD, 0, 0, "Reserved", "Compiler" },
     { ";", 0, 0, CfrTil_SemiColon, IMMEDIATE | KEYWORD, SYNTACTIC, 0, "Reserved", "Compiler" },
     { "}", 0, 0, CfrTil_EndBlock, IMMEDIATE | KEYWORD, 0, 0, "Reserved", "Compiler" }, // moved to init.cft and renamed below

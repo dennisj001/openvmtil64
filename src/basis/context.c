@@ -70,6 +70,7 @@ _Context_New ( CfrTil * cfrTil )
     Context * cntx = _Context_Allocate ( ), *cntx0 = cfrTil->Context0 ;
     _Context_ = cfrTil->Context0 = cntx ;
     _Context_Init ( cntx0, cntx ) ;
+    cntx->PreprocessorStackList = _dllist_New ( CONTEXT ) ;
     cntx->ContextDataStack = cfrTil->DataStack ; // nb. using the same one and only DataStack
     return cntx ;
 }

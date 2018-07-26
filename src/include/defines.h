@@ -728,6 +728,7 @@
 #define ONE_REG_ONE_STACK_ARG   ( (uint8) 1 << 4 )
 #define ONE_STACK_ONE_REG_ARG   ( (uint8) 1 << 5 )
 
+#if 0
 // insn op codes for CATEGORY_OP words
 #define OP_PLUS_PLUS                ( (uint64) 1 << 0 )
 #define OP_MINUS_MINUS              ( (uint64) 1 << 0 )
@@ -766,7 +767,6 @@
 #define OP_STORE                    ( (uint64) 1 << 33 ) 
 #define OP_POKE                     ( (uint64) 1 << 34 ) 
 
-#if 0
 #define OP_LC 1 // literal/constant
 #define OP_VAR 2 
 #define OP_FETCH 3 

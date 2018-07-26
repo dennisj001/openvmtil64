@@ -3,7 +3,7 @@
 
 #if 0 // not used yet -- maybe replaced by better DObject functionality
 Attribute *
-_Type_Create ( )
+Type_Create ( )
 {
     Attribute * attribute ;
 #if 0    
@@ -31,7 +31,7 @@ _Attribute_Init ( Attribute * attribute, byte * name, int64 value, uint64 catego
 Attribute *
 _Attribute_New ( byte * name, int64 value )
 {
-    Attribute * attribute = _Type_Create ( ) ;
+    Attribute * attribute = Type_Create ( ) ;
     _Attribute_Init ( attribute, name, value, attribute | NAMESPACE_VARIABLE ) ;
     return attribute ;
 }

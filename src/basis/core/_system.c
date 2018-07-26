@@ -29,7 +29,7 @@ _System_Time ( System * system, uint64 timer, char * format, byte * toString )
         }
         sprintf ( ( char* ) toString, format, seconds2 - seconds, nseconds2 - nseconds ) ;
     }
-    else Throw ( ( byte* ) "Error: timer index must be less than 8\n", QUIT ) ;
+    else Throw (  ( byte* ) "_System_Time : ", ( byte* ) "Error: timer index must be less than 8\n", QUIT ) ;
 }
 
 void

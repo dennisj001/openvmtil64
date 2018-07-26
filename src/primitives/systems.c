@@ -62,7 +62,7 @@ CfrTil_TimerInit ( )
     {
         _System_TimerInit ( _Context_->System0, timer ) ;
     }
-    else Throw ( ( byte* ) "Error: timer index must be less than 8", QUIT ) ;
+    else Throw ( "CfrTil_TimerInit : ", "Error: timer index must be less than 8", QUIT ) ;
 }
 
 void
@@ -76,7 +76,7 @@ void
 CfrTil_Throw ( )
 {
     byte * msg = ( byte * ) DataStack_Pop ( ) ;
-    Throw ( msg, 0 ) ;
+    Throw ( "", msg, 0 ) ;
 }
 
 void
@@ -181,16 +181,24 @@ typedef struct
 void
 shell ( )
 {
+    Lexer * lexer = _Lexer_ ;
     char * atoken, * buffer ;
     Buffer0 buffer0 ;
     buffer = buffer0.buf ;
     memset ( buffer, 0, sizeof (Buffer0 ) ) ;
     sprintf ( buffer, "%s", "" ) ;
-    SetState ( _Context_->Lexer0, END_OF_FILE | END_OF_STRING | LEXER_END_OF_LINE, false ) ;
+    SetState ( lexer, END_OF_FILE | END_OF_STRING | LEXER_END_OF_LINE, false ) ;
     do
     {
-        while ( ( atoken = ( char* ) Lexer_ReadToken ( _Context_->Lexer0 ) ) )
+        while ( atoken = Lexer_PeekNextNonDebugTokenWord ( lexer, 0 ) )
         {
+            if ( GetState ( lexer, END_OF_FILE | END_OF_STRING | LEXER_END_OF_LINE ) ) 
+            {
+                if ( String_Equal ( atoken, ";" ) ) Lexer_ReadToken ( lexer ) ;
+                goto done ;
+            }
+            atoken = Lexer_ReadToken ( lexer ) ;
+
             if ( ! String_Equal ( atoken, ";" ) )
             {
                 strcat ( buffer, atoken ) ;
@@ -198,15 +206,14 @@ shell ( )
                 {
                     strcat ( buffer, " " ) ;
                 }
-                //if ( _Q_->Verbosity > 2 ) printf ( "\n\tbuffer = %s\n", buffer ) ; //pause () ;
             }
             else break ; 
-            //if ( GetState ( _Context_->Lexer0, END_OF_FILE | END_OF_STRING | LEXER_END_OF_LINE ) ) break ;
         }
-        //if ( _Q_->Verbosity > 1 ) printf ( "\n\tbuffer = %s\n", buffer ) ; //pause () ;
         _ShellEscape ( buffer ) ;
     }
     while ( ! GetState ( _Context_->Lexer0, END_OF_FILE | END_OF_STRING | LEXER_END_OF_LINE ) ) ;
+    done :
+    SetState ( lexer, END_OF_FILE | END_OF_STRING | LEXER_END_OF_LINE, false ) ;
 }
 #endif
 

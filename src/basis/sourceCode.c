@@ -434,7 +434,7 @@ CfrTil_SourceCodeCompileOn_Colon ( )
     CfrTil_DbgSourceCodeOn ( ) ;
     CfrTil_SourceCode_Init ( ) ;
     //CfrTil_WordList_RecycleInit ( _CfrTil_ ) 
-    if ( ! GetState ( _Context_, C_SYNTAX ) ) _CfrTil_Colon ( ) ;
+    if ( ! GetState ( _Context_, C_SYNTAX ) ) _CfrTil_Colon ( 0 ) ;
 }
 
 void

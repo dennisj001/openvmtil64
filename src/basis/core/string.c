@@ -1013,17 +1013,17 @@ _String_CountTabs ( byte * start, byte * end )
 }
 #endif
 
-void
-_Buffer_Clear ( Buffer * b )
+byte * 
+Buffer_Clear ( Buffer * b )
 {
     Mem_Clear ( b->B_Data, b->B_Size ) ;
+    return Buffer_Data ( b )  ;
 }
 
 byte *
 Buffer_Data_Cleared ( Buffer * b )
 {
     Mem_Clear ( b->B_Data, b->B_Size ) ;
-
     return Buffer_Data ( b ) ; //b->B_Data ;
 }
 

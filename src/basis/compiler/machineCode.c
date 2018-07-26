@@ -270,7 +270,7 @@ _Compile_X_Group1 ( int8 code, int8 toRegOrMem, int8 mod, int8 reg, int8 rm, int
     // otherwise it could be optimally deduced but let caller control by keeping operandSize parameter
     // some times we need cell_t where bytes would work
     // _Compile_InstructionX86 ( opCode, mod, reg, rm, modRmImmDispFlag, sib, disp, imm, immSize )
-    Set_SCA (0) ;
+    Set_SCA ( 0 ) ;
     Compile_CalcWrite_Instruction_X64 ( 0, opCode, mod, reg, rm, DISP_B | REX_B | MODRM_B, sib, disp, 0, 0, osize ) ;
 }
 
@@ -366,7 +366,7 @@ Compile_X_Group1 ( Compiler * compiler, int64 op, int64 ttt, int64 n )
         if ( one && one->StackPushRegisterCode ) SetHere ( one->StackPushRegisterCode ) ;
         else Compile_Pop_To_Acc ( DSP ) ;
         //_Compile_X_Group1 ( int8 code, int64 toRegOrMem, int8 mod, int8 reg, int8 rm, int8 sib, int64 disp, int64 osize )
-        Set_SCA (0) ;
+        _Set_SCA ( optInfo->opWord ) ;
         _Compile_X_Group1 ( op, REG, MEM, ACC, DSP, 0, 0, CELL_SIZE ) ; // result is on TOS
         _Word_CompileAndRecord_PushReg ( CfrTil_WordList ( 0 ), ACC ) ; // 0 : ?!? should be the exact variable 
         //DBI_OFF ;
@@ -422,7 +422,7 @@ Compile_X_Group5 ( Compiler * compiler, int64 op )
 {
     CompileOptimizeInfo * optInfo = compiler->OptInfo ;
     int64 optFlag = Compiler_CheckOptimize ( compiler, 0 ) ;
-    Word *one = _CfrTil_WordList (1) ; // assumes two values ( n m ) on the DSP stack 
+    Word *one = _CfrTil_WordList ( 1 ) ; // assumes two values ( n m ) on the DSP stack 
     if ( optFlag & OPTIMIZE_DONE ) return ;
     else if ( optFlag )
     {
@@ -431,7 +431,7 @@ Compile_X_Group5 ( Compiler * compiler, int64 op )
             Compile_MoveImm_To_Reg ( ACC, optInfo->Optimize_Imm, CELL ) ;
             optInfo->Optimize_Mod = REG ;
             optInfo->Optimize_Rm = ACC ;
-        } 
+        }
         _Set_SCA ( optInfo->opWord ) ;
         _Compile_Group5 ( op, optInfo->Optimize_Mod, optInfo->Optimize_Rm, 0, optInfo->Optimize_Disp, 0 ) ;
     }
@@ -610,7 +610,7 @@ Compile_MoveImm ( int8 direction, int8 rm, int8 sib, int64 disp, int64 imm, int8
         }
     }
 #if 0    
-    else
+else
     {
         if ( immSize > BYTE ) opCode |= 1 ;
         if ( direction == REG ) mod = 3 ;

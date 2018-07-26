@@ -46,7 +46,7 @@ _ByteArray_AppendSpace_MakeSure ( ByteArray * ba, int64 size ) // size in bytes
             ba = _NamedByteArray_AddNewByteArray ( nba, nba->NBA_DataSize ) ; //( nba->NBA_DataSize > size ) ? nba->NBA_DataSize : ( nba->NBA_DataSize + size ) ) ; //size ) ;
         }
     }
-    else Error_Abort ( ( byte* ) "\n_ByteArray_AppendSpace_MakeSure : no nba?!\n" ) ;
+    else Error_Abort ( "_ByteArray_AppendSpace_MakeSure", ( byte* ) "\n_ByteArray_AppendSpace_MakeSure : no nba?!\n" ) ;
 done:
     return ba ;
 }
@@ -197,7 +197,7 @@ ByteArray_AppendCopyItem ( ByteArray * ba, int64 size, int64 data ) // size in b
             }
         }
     }
-    else Error ( "\nByteArray_AppendCopyItem : Out of memory", ABORT ) ;
+    else Error ( "ByteArray_AppendCopyItem", " : Out of memory", ABORT ) ;
 }
 
 void
@@ -225,7 +225,7 @@ _NBA_SetCompilingSpace_MakeSureOfRoom ( NamedByteArray * nba, int64 room )
     {
         Set_CompilerSpace ( nba->ba_CurrentByteArray ) ;
         ByteArray * ba = _ByteArray_AppendSpace_MakeSure ( nba->ba_CurrentByteArray, room ) ;
-        if ( ! ba ) Error_Abort ( ( byte* ) "\nCompiler_SetCompilingSpace_MakeSureOfRoom : no ba?!\n" ) ;
+        if ( ! ba ) Error_Abort ( "\n_NBA_SetCompilingSpace_MakeSureOfRoom :", "no ba?!\n" ) ;
     }
 }
 

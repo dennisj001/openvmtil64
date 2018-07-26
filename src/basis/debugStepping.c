@@ -198,21 +198,19 @@ doReturn:
             jcAddress = JumpCallInstructionAddress ( debugger->DebugAddress ) ;
 doJmpCall:
             word = Word_GetFromCodeAddress ( jcAddress ) ;
-            if ( word && ( word->CAttribute & ( DEBUG_WORD ) ) && ( ! ( word->CAttribute2 & ( RT_STEPPING_DEBUG ) ) ) )
+            if ( word )
             {
-                SetState ( debugger, ( DBG_CONTINUE_MODE | DBG_AUTO_MODE ), false ) ;
-                _Printf ( ( byte* ) "\nskipping over a debug word : %s : at 0x%-8x", word ? ( char* ) c_gd ( word->Name ) : "", debugger->DebugAddress ) ;
-                debugger->DebugAddress += 3 ; // 5 : sizeof jmp/call insn // debugger->DebugAddress + size ; // skip the call insn to the next after it
-                goto end ;
-            }
-            else 
-            {
-                SetState ( debugger, DBG_INTERPRET_LOOP_DONE, true ) ;
-                debugger->w_Word = word ;
-                debugger->w_Word->Coding = debugger->DebugAddress ;
-                word->Definition () ;
-                debugger->DebugAddress += 3 ;
-                goto end ;
+                if ( ( word->CAttribute & ( DEBUG_WORD ) ) )
+                {
+                    if ( word->CAttribute2 & ( RT_STEPPING_DEBUG ) )
+                    {
+                        //SetState ( debugger, ( DBG_CONTINUE_MODE | DBG_AUTO_MODE ), false ) ;
+                        // we are already stepping here and now so skip
+                        _Printf ( ( byte* ) "\nskipping over a rt breakpoint debug word : %s : at 0x%-8x", word ? ( char* ) c_gd ( word->Name ) : "", debugger->DebugAddress ) ;
+                        debugger->DebugAddress += 3 ;
+                        goto end ;
+                    }
+                }
             }
         }
         else if ( ( * debugger->DebugAddress == CALL_JMP_MOD_RM ) && ( _RM ( debugger->DebugAddress ) == 16 ) ) // inc/dec are also opcode == 0xff
@@ -247,6 +245,7 @@ doJmpCall:
             SetState ( debugger, DBG_JCC_INSN, false ) ;
             goto end ;
         }
+doIt:
         _Debugger_CompileAndStepOneInstruction ( debugger, jcAddress ) ; //? jcAddress : debugger->DebugAddress ) ;
 end:
         if ( debugger->DebugAddress )
@@ -347,7 +346,7 @@ Debugger_AfterStep ( Debugger * debugger )
 }
 
 void
-_Debugger_SetupStepping ( Debugger * debugger, Word * word, byte * address, byte *name )
+_Debugger_SetupStepping ( Debugger * debugger, Word * word, byte * address, byte * name )
 {
     _Printf ( ( byte* ) "\nSetting up stepping : location = %s : debugger->word = \'%s\' : ...", c_gd ( _Context_Location ( _Context_ ) ), word ? word->Name : ( name ? name : ( byte* ) "" ) ) ;
     if ( word )

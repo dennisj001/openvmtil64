@@ -117,7 +117,7 @@ void
 Dlsym ( byte * sym, byte * lib )
 {
     block b = ( block ) _Dlsym ( sym, lib ) ;
-    Word * word = _DataObject_New (CFRTIL_WORD, 0, sym, CPRIMITIVE | DLSYM_WORD | C_PREFIX | C_RETURN | C_PREFIX_RTL_ARGS, 0, 0, 0, ( int64 ) b, 0 , -1) ;
+    Word * word = _DataObject_New (CFRTIL_WORD, 0, sym, CPRIMITIVE | DLSYM_WORD | C_PREFIX | C_RETURN | C_PREFIX_RTL_ARGS, 0, 0, 0, ( int64 ) b, 0, 0 , -1) ;
     word->WAttribute |= WT_C_PREFIX_RTL_ARGS ;
 }
 
@@ -416,7 +416,7 @@ _CfrTil_Source ( Word *word, int64 addToHistoryFlag )
         // else CfrTil_Exception ( 0, QUIT ) ;
         if ( category & INLINE ) _Printf ( ( byte* ) ", %s", "inline" ) ;
         if ( category & IMMEDIATE ) _Printf ( ( byte* ) ", %s", "immediate" ) ;
-        if ( word->WAttribute & WT_PREFIX ) _Printf ( ( byte* ) ", %s", "prefix" ) ;
+        if ( word->CAttribute & PREFIX ) _Printf ( ( byte* ) ", %s", "prefix" ) ;
         if ( category & C_PREFIX ) _Printf ( ( byte* ) ", %s", "c_prefix" ) ;
         if ( category & C_RETURN ) _Printf ( ( byte* ) ", %s", "c_return" ) ;
         if ( category & INFIXABLE ) _Printf ( ( byte* ) ", %s", "infixable" ) ;

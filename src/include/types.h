@@ -493,13 +493,13 @@ typedef struct
     byte *bp_First ;
     byte *bp_Last ;
     byte *JumpOffset ;
-    byte *JccLogicCode, *LogicTestCode ; 
+    byte *JccLogicCode, *LogicTestCode ;
     byte *CombinatorStartsAt, *CombinatorEndsAt ;
     byte *OriginalActualCodeStart ;
     byte * CopiedFrom, *CopiedToStart, *CopiedToEnd, *CopiedToLogicJccCode, *ActualCopiedToJccCode ;
     int64 CopiedSize ;
     int8 SetccTtt, JccTtt ;
-    int8 SetccNegFlag, JccNegFlag ; 
+    int8 SetccNegFlag, JccNegFlag ;
     Word * LogicCodeWord ;
     Namespace * LocalsNamespace ;
 } BlockInfo ;
@@ -711,7 +711,7 @@ typedef struct
     Word *opWord, *wordn, *wordm, *wordArg1, *wordArg2, *xBetweenArg1AndArg2 ;
     dlnode * node, *nodem, *wordNode, *nextNode, *wordArg2Node, *wordArg1Node ; //, *wordArg2OREGNode, *wordArg1ACCNode ;
     Boolean rvalue, wordArg1_rvalue, wordArg2_rvalue, wordArg1_literal, wordArg2_literal ;
-    Boolean wordOp, wordArg1_Op, wordArg2_Op ;//, opRmFlag, opTakesARegFlag, opTakesImmFlag, op1ArgOnly ;
+    Boolean wordOp, wordArg1_Op, wordArg2_Op ; //, opRmFlag, opTakesARegFlag, opTakesImmFlag, op1ArgOnly ;
     // CompileOptimizeInfo State values
 #define ACC_1L                   ( (uint64) 1 << 1 )              
 #define ACC_1R                   ( (uint64) 1 << 2 )              
@@ -763,7 +763,7 @@ typedef struct
     byte * RspRestoreOffset ;
     Word * ReturnVariableWord ;
     Word * CurrentWord, *CurrentCreatedWord ;
-    Word * LHS_Word ; 
+    Word * LHS_Word ;
     Namespace *C_BackgroundNamespace, *C_FunctionBackgroundNamespace ; //, ** FunctionTypesArray ;
     dllist * GotoList ;
     dllist * CurrentSwitchList ;
@@ -790,7 +790,7 @@ typedef struct Interpreter
     Word * BaseObject ; //, *QidObject, *ArrayObject;
     Word *CurrentObjectNamespace, *ThisNamespace ;
     int64 WordType ;
-    dllist * PreprocessorStackList ;
+    //dllist * PreprocessorStackList ;
     dllist * InterpList ;
 } Interpreter ;
 
@@ -851,6 +851,7 @@ typedef struct
     byte * Location ;
     Word * CurrentlyRunningWord, *CurrentEvalWord, *NlsWord, *SC_CurrentCombinator, *SourceCodeWord, *CurrentDisassemblyWord ;
     block CurrentlyRunningWordDefinition ;
+    dllist * PreprocessorStackList ;
     NBA * ContextNba ;
     sigjmp_buf JmpBuf0 ;
 } Context ;
@@ -924,11 +925,11 @@ typedef struct _CfrTil
     Cpu * cs_Cpu ;
     Cpu * cs_Cpu2 ;
     block CurrentBlock, SaveCpuState, SaveCpu2State, RestoreCpuState, RestoreCpu2State, CallCfrTilWord, CallCurrentBlock, RestoreSelectedCpuState, SaveSelectedCpuState ; //, SyncDspToEsi, SyncEsiToDsp ;
-    //block Set_CfrTilRspReg_FromReturnStackPointer, Set_ReturnStackPointer_FromCfrTilRspReg, Set_DspReg_FromDataStackPointer, Set_DataStackPointer_FromDspReg ; //, PeekReg, PokeReg ;
+
     block Set_DspReg_FromDataStackPointer, Set_DataStackPointer_FromDspReg ; //, PeekReg, PokeReg ;
     block PopDspToR8AndCall, CallReg_TestRSP, Call_ToAddressThruR8_TestAlignRSP ; //adjustRSPAndCall, adjustRSP ;
     ByteArray * PeekPokeByteArray ;
-    Word * LastFinished_DObject, * LastFinished_Word, *StoreWord, *PokeWord, *ScoOcCrw, * CurrentWordCompiling ; 
+    Word * LastFinished_DObject, * LastFinished_Word, *StoreWord, *PokeWord, *ScoOcCrw, * CurrentWordCompiling ;
     Word *ScWord, *DebugWordListWord, *EndBlockWord, *BeginBlockWord, *InfixNamespace ;
     byte ReadLine_CharacterTable [ 256 ] ;
     ReadLineFunction ReadLine_FunctionTable [ 24 ] ;
@@ -1022,6 +1023,9 @@ typedef struct
     byte *ErrorFilename ;
     byte *VersionString ;
     byte *ExceptionMessage ;
+    byte *ExceptionSpecialMessage ;
+    byte * ExceptionToken ;
+    Word * ExceptionWord ;
     int64 RestartCondition ;
     int64 Signal ;
 
@@ -1106,6 +1110,8 @@ typedef struct ppibs
             unsigned DoItStatus : 1 ; // controls whether we do nested if block
         } ;
     } ;
+    byte * Filename ;
+    int64 LineNumber ;
 }
 PreProcessorIfBlockStatus, Ppibs ;
 //typedef int64( *cFunction_2_Arg ) ( int64, int64 ) ;

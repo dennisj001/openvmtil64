@@ -8,7 +8,8 @@ _DataObject_Run ( Word * word0 )
     Word * word = cntx->CurrentlyRunningWord ; // = word0 : set CurrentlyRunningWord with the DObject Compile_SetCurrentlyRunningWord_Call_TestRSP created word
     Word * ns = word0 ; // set CurrentlyRunningWord with the DObject Compile_SetCurrentlyRunningWord_Call_TestRSP created word
     cntx->Interpreter0->w_Word = word ; // for ArrayBegin : all literals are run here
-    _Set_SCA ( word0 ) ; _Set_SCA ( word ) ;
+    _Set_SCA ( word0 ) ;
+    _Set_SCA ( word ) ;
     if ( word->LAttribute & LOCAL_OBJECT )
     {
         if ( ( word->CAttribute & LOCAL_VARIABLE ) && ( ! GetState ( word, W_INITIALIZED ) ) ) // this is a local variable so it is initialed at creation 
@@ -68,6 +69,18 @@ DataObject_Run ( )
 }
 
 void
+Compiler_Get_C_BackgroundNamespace ( Compiler * compiler )
+{
+    compiler->C_BackgroundNamespace = _Namespace_FirstOnUsingList ( ) ; //nb! must be before CfrTil_LocalsAndStackVariablesBegin else CfrTil_End_C_Block will 
+}
+
+void
+Compiler_SetAs_InNamespace_C_BackgroundNamespace ( Compiler * compiler )
+{
+    if ( compiler->C_BackgroundNamespace ) _CfrTil_Namespace_InNamespaceSet ( compiler->C_BackgroundNamespace ) ;
+}
+
+void
 _Namespace_Do_C_Type ( Namespace * ns )
 {
     Context * cntx = _Context_ ;
@@ -81,11 +94,11 @@ _Namespace_Do_C_Type ( Namespace * ns )
         {
             if ( ( ! Compiling ) )
             {
-                Compiler_Init (compiler, 0 ) ; //compiler->State ) ;
+                Compiler_Init ( compiler, 0 ) ; //compiler->State ) ;
                 _CfrTil_InitSourceCode_WithName ( _CfrTil_, ns->Name ) ;
             }
             CfrTil_WordList_RecycleInit ( _CfrTil_, 0, 0, 1, 1 ) ;
-            compiler->C_BackgroundNamespace = _Namespace_FirstOnUsingList ( ) ; //nb! must be before CfrTil_LocalsAndStackVariablesBegin else CfrTil_End_C_Block will 
+            Compiler_Get_C_BackgroundNamespace ( compiler ) ;
             if ( GetState ( cntx, C_SYNTAX ) )
             {
                 LambdaCalculus * svlc = _Q_->OVT_LC ;
@@ -133,7 +146,7 @@ _Namespace_Do_C_Type ( Namespace * ns )
                     Interpreter_InterpretAToken ( cntx->Interpreter0, token1, t1_tsrli ) ;
                     if ( Compiling )
                     {
-                        compiler->C_BackgroundNamespace = _Namespace_FirstOnUsingList ( ) ;
+                        Compiler_Get_C_BackgroundNamespace ( compiler ) ;
                         while ( 1 )
                         {
                             byte * token = _Interpret_C_Until_EitherToken ( cntx->Interpreter0, ( byte* ) ",", ( byte* ) ";", 0, 0 ) ;
@@ -166,7 +179,7 @@ _Namespace_Do_C_Type ( Namespace * ns )
         }
         else _Namespace_DoNamespace ( ns, 1 ) ;
 rtrn:
-        if (( ! Compiling ) && compiler->C_BackgroundNamespace ) _CfrTil_Namespace_InNamespaceSet ( compiler->C_BackgroundNamespace ) ;
+        if ( ! Compiling ) Compiler_SetAs_InNamespace_C_BackgroundNamespace ( compiler ) ;
         SetState ( compiler, DOING_C_TYPE, false ) ;
     }
 }

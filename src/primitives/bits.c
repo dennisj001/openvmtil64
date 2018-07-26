@@ -13,7 +13,7 @@ CfrTil_JMP ( )
     }
     else
     {
-        Error_Abort ( ( byte* ) "\njmp : can only be used in compile mode." ) ;
+        Error_Abort ( "", "\njmp : can only be used in compile mode." ) ;
     }
 }
 

@@ -345,7 +345,7 @@ Namespace_RemoveFromUsingList_WithCheck ( byte * name )
     {
         Namespace_RemoveFromUsingList ( name ) ;
     }
-    else Throw ( ( byte* ) "Error : can't remove Root namespace", QUIT ) ;
+    else Throw ( ( byte* ) "Namespace_RemoveFromUsingList_WithCheck", ( byte* ) "Error : can't remove Root namespace", QUIT ) ;
 }
 
 void
@@ -383,7 +383,7 @@ Namespace *
 Namespace_New ( byte * name, Namespace * containingNs )
 {
     //ns = _DataObject_New ( NAMESPACE, 0, name, NAMESPACE | IMMEDIATE, 0, 0, 0, ( int64 ) containingNs, 0 ) ;
-    Namespace * ns = _DataObject_New (NAMESPACE, 0, name, NAMESPACE, 0, 0, 0, ( int64 ) containingNs, 0 , -1) ;
+    Namespace * ns = _DataObject_New (NAMESPACE, 0, name, NAMESPACE, 0, 0, 0, ( int64 ) containingNs, 0, 0 , -1) ;
 }
 
 Namespace *

@@ -4,7 +4,7 @@ void
 CfrTil_DoWord ( )
 {
     Word * word = ( Word* ) DataStack_Pop ( ) ;
-    _Interpreter_DoWord (_Context_->Interpreter0, word, - 1 , -1) ;
+    _Interpreter_DoWord ( _Context_->Interpreter0, word, - 1, - 1 ) ;
 }
 
 void
@@ -35,31 +35,18 @@ CfrTil_ParenthesisComment ( )
 }
 
 void
-CfrTil_PreProcessor ( )
-{
-    Interpreter * interp = _Context_->Interpreter0 ;
-    _CfrTil_UnAppendTokenFromSourceCode ( _CfrTil_, _Context_->Lexer0->OriginalToken ) ;
-    Lexer_SourceCodeOff ( _Lexer_ ) ;
-    Finder_SetNamedQualifyingNamespace ( _Context_->Finder0, ( byte* ) "PreProcessor" ) ;
-    SetState ( _Context_->Interpreter0, PREPROCESSOR_MODE, true ) ;
-    _Interpret_ToEndOfLine ( interp ) ;
-    SetState ( _Context_->Interpreter0, PREPROCESSOR_MODE, false ) ;
-    if ( GetState ( _Context_->Interpreter0, PREPROCESSOR_DEFINE ) )
-    {
-        int64 locals = Stack_Depth ( _Context_->Compiler0->LocalsCompilingNamespacesStack ) ;
-        SetState ( _Context_->Interpreter0, PREPROCESSOR_DEFINE, false ) ;
-        CfrTil_SemiColon ( ) ;
-        CfrTil_Inline ( ) ;
-        if ( locals ) CfrTil_Prefix ( ) ;
-    }
-    Lexer_SourceCodeOn ( _Lexer_ ) ;
-}
-
-void
 CfrTil_Define ( )
 {
-    SetState ( _Context_->Interpreter0, PREPROCESSOR_DEFINE, true ) ;
-    CfrTil_Colon ( ) ;
+    Interpreter * interp = _Context_->Interpreter0 ;
+    SetState ( interp, PREPROCESSOR_DEFINE, true ) ;
+    _CfrTil_Colon ( 0 ) ;
+    _Interpret_ToEndOfLine ( interp ) ;
+    int64 locals = Stack_Depth ( _Context_->Compiler0->LocalsCompilingNamespacesStack ) ;
+    SetState ( interp, PREPROCESSOR_DEFINE, false ) ;
+    CfrTil_SemiColon ( ) ;
+    CfrTil_Inline ( ) ;
+    if ( locals ) CfrTil_Prefix ( ) ;
+    CfrTil_SourceCode_Init ( ) ; //don't leave the define in sc
 }
 
 void
@@ -110,7 +97,7 @@ void
 CfrTil_Interpreter_EvalWord ( )
 {
 
-    _Interpreter_DoWord (_Context_->Interpreter0, ( Word* ) DataStack_Pop ( ), - 1 , -1) ;
+    _Interpreter_DoWord ( _Context_->Interpreter0, ( Word* ) DataStack_Pop ( ), - 1, - 1 ) ;
 }
 
 void

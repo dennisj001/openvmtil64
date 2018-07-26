@@ -49,7 +49,7 @@ CfrTil_ResetAll_Init ( CfrTil * cfrTil )
 {
     byte * startDirectory = ( byte* ) "namespaces" ;
     if ( ! GetState ( _Q_, OVT_IN_USEFUL_DIRECTORY ) ) startDirectory = ( byte* ) "/usr/local/lib/cfrTil64/namespaces" ;
-    _DataObject_New (NAMESPACE_VARIABLE, 0, ( byte* ) "_startDirectory_", NAMESPACE_VARIABLE, 0, 0, 0, ( int64 ) startDirectory, 0 , -1) ;
+    _DataObject_New (NAMESPACE_VARIABLE, 0, ( byte* ) "_startDirectory_", NAMESPACE_VARIABLE, 0, 0, 0, ( int64 ) startDirectory, 0, 0 , -1) ;
     if ( ( _Q_->RestartCondition >= RESET_ALL ) )
     {
         _Q_->StartIncludeTries = 0 ;
@@ -113,7 +113,7 @@ _CfrTil_CPrimitiveNewAdd ( const char * name, uint64 opInsnGroup, uint64 opInsCo
     _DObject_ValueDefinition_Init ( word, ( int64 ) b, BLOCK, 0, 0 ) ;
     _CfrTil_InitialAddWordToNamespace ( word, ( byte* ) nameSpace, ( byte* ) superNamespace ) ;
     if ( ctype & INFIXABLE ) word->WAttribute = WT_INFIXABLE ;
-    //else if ( ctype & PREFIX ) word->WAttribute = WT_PREFIX ;
+    else if ( ctype & PREFIX ) word->WAttribute = WT_PREFIX ;
     else if ( ctype & C_PREFIX_RTL_ARGS ) word->WAttribute = WT_C_PREFIX_RTL_ARGS ;
     else word->WAttribute = WT_POSTFIX ;
     word->CAttribute2 = ctype2 ;

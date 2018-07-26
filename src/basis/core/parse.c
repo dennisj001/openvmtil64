@@ -68,17 +68,17 @@ done:
 // assuming we are using "Class" namespace
 // syntax : ':{' ( classId identifer ( '[' integer ']' )* ';' ? )* '};'
 
-void
+int64
 _CfrTil_Parse_ClassStructure ( int64 cloneFlag )
 {
     int64 size = 0, offset = 0, sizeOf = 0, i, arrayDimensionSize ;
-    Namespace *ns, *inNs = _CfrTil_Namespace_InNamespaceGet ( ), *arrayBaseObject ;
+    Namespace *ns, *classNs = _CfrTil_Namespace_InNamespaceGet ( ), *arrayBaseObject ;
     byte * token ;
     int64 arrayDimensions [ 32 ] ;
     memset ( arrayDimensions, 0, sizeof (arrayDimensions ) ) ;
     if ( cloneFlag )
     {
-        offset = _Namespace_VariableValueGet ( inNs, ( byte* ) "size" ) ; // allows for cloning - prototyping
+        offset = _Namespace_VariableValueGet ( classNs, ( byte* ) "size" ) ; // allows for cloning - prototyping
         sizeOf = offset ;
     }
     while ( 1 )
@@ -86,7 +86,7 @@ _CfrTil_Parse_ClassStructure ( int64 cloneFlag )
         // each name/word is an increasing offset from object address on stack
         // first name is at 0 offset
         // token = Lexer_NextToken ( _Context_->Lexer0 ) ;
-        _CfrTil_Namespace_InNamespaceSet ( inNs ) ; // parsing arrays changes namespace so reset it here
+        _CfrTil_Namespace_InNamespaceSet ( classNs ) ; // parsing arrays changes namespace so reset it here
         token = _Lexer_ReadToken ( _Context_->Lexer0, ( byte* ) " ,\n\r\t" ) ;
 gotNextToken:
         if ( String_Equal ( ( char* ) token, "};" ) ) break ;
@@ -114,7 +114,12 @@ gotNextToken:
                 continue ;
             }
         }
-        else CfrTil_Exception ( NAMESPACE_ERROR, 0, 1 ) ; // else structure component size error
+        else 
+        {
+            byte * buffer = Buffer_Clear (_CfrTil_->ScratchB1) ;
+            sprintf ( buffer, "\n_CfrTil_Parse_ClassStructure : can't find namespace : \'%s\'", token ) ;
+            _SyntaxError ( (byte*) buffer, 1 ) ; // else structure component size error
+        }
         for ( i = 0 ; 1 ; )
         {
             token = Lexer_ReadToken ( _Context_->Lexer0 ) ;
@@ -143,7 +148,8 @@ gotNextToken:
             }
         }
     }
-    _Namespace_VariableValueSet ( inNs, ( byte* ) "size", sizeOf ) ;
+    _Namespace_VariableValueSet ( classNs, ( byte* ) "size", sizeOf ) ;
+    return sizeOf ;
 }
 
 void
@@ -531,13 +537,11 @@ Parse_Macro ( int64 type )
     else if ( type == TEXT_MACRO )
     {
         int64 n = 0 ;
-        //Buffer * b = Buffer_New ( BUFFER_SIZE ) ;
         byte nc, *buffer = Buffer_Data ( _CfrTil_->ScratchB1 ) ;
         buffer [0] = 0 ;
         do
         {
             nc = _ReadLine_GetNextChar ( _Context_->ReadLiner0 ) ;
-            //_Lexer_AppendCharToSourceCode ( lexer, nc ) ;
             if ( nc == ';' )
             {
                 buffer [ n ] = 0 ;

@@ -89,17 +89,19 @@ Lexer_ObjectToken_New ( Lexer * lexer, byte * token ) //, int64 parseFlag )
         {
             if ( GetState ( _Q_, AUTO_VAR ) ) // make it a 'variable' 
             {
-                word = _DataObject_New (NAMESPACE_VARIABLE, 0, token, NAMESPACE_VARIABLE, 0, 0, 0, 0, 0 , -1) ;
+                word = _DataObject_New (NAMESPACE_VARIABLE, 0, token, NAMESPACE_VARIABLE, 0, 0, 0, 0, 0, 0 , -1) ;
             }
             else
             {
-                _Printf ( ( byte* ) "\n%s ?\n", ( char* ) token ) ;
-                CfrTil_Exception ( NOT_A_KNOWN_OBJECT, 0, QUIT ) ;
+                _Q_->ExceptionToken = token ;
+                byte *buffer = Buffer_Data ( _CfrTil_->ScratchB1 ) ;
+                sprintf ( buffer, ( byte* ) "\n%s ?\n", ( char* ) token ) ;
+                CfrTil_Exception ( NOT_A_KNOWN_OBJECT, buffer, QUIT ) ;
             }
         }
         else
         {
-            word = _DataObject_New (LITERAL, 0, token, 0, 0, 0, 0, lexer->Literal, 0 , -1) ;
+            word = _DataObject_New (LITERAL, 0, token, 0, 0, 0, 0, lexer->Literal, 0, 0 , -1) ;
         }
         lexer->TokenWord = word ;
     }

@@ -91,6 +91,7 @@ Compile_Poke ( Compiler * compiler, int8 stackReg ) // =
     if ( optFlag & OPTIMIZE_DONE ) return ;
     else if ( optFlag )
     {
+        _Set_SCA ( compiler->OptInfo->opWord ) ;
         if ( compiler->OptInfo->OptimizeFlag & OPTIMIZE_IMM )
         {
             // _Compile_MoveImm ( cell direction, cell rm, cell disp, cell imm, cell operandSize )

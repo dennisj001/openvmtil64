@@ -253,15 +253,15 @@ sp
 #if doScript
 String
 $ls -al /usr/local ; 
-$etc/script ;
-$etc/lispScript ; 
+$etc/script ; 
 //pause
-: hi 1 2 + p ; pause hi nl
+$etc/lispScript ; 
+: hi 1 2 + p ; hi nl
 $ls  -al ;
+//pause
 s: hi ( a b | c ) c a @ b @ + = printf ("\n%d", c ) ;s 1 2 hi //pause
 verbosity 1 =
 sp
-
 #endif
 sp
 2 + 7 assertStkChk // stack checking

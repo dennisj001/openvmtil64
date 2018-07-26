@@ -172,10 +172,10 @@
 //#define _catch( e ) if ( _OpenVmTil_Catch () ) // nb. : if no _throw in _catch block don't use 'return'
 #define _finally _OpenVmTil_Finally () // nb. : ! use only once and after the first _try block !
 #define _throw( e ) _Throw (e) // _longjmp( *(jmp_buf*) _Stack_PopOrTop ( _Q_->ExceptionStack ), e ) 
-#define _Throw( e ) OpenVmTil_Throw ( (e == QUIT) ? (byte*) "\nQuit?\n" : (e == ABORT) ? (byte*) "\nAbort?\n" : (byte*) "", e, 1 )
-#define _ThrowIt OpenVmTil_Throw ( (byte*) "",  _Q_->Thrown, 1 )
-#define Throw( msg, e ) OpenVmTil_Throw ( ((byte*) msg), (e), 1 )
-#define ThrowIt( msg ) OpenVmTil_Throw ( ((byte*) msg),  _Q_->Thrown, 1 )
+#define _Throw( e ) OpenVmTil_Throw ((e == QUIT) ? (byte*) "\nQuit?\n" : (e == ABORT) ? (byte*) "\nAbort?\n" : (byte*) "", 0, e, 1 )
+#define _ThrowIt OpenVmTil_Throw ((byte*) "", (byte*) "", 0,  _Q_->Thrown, 1 )
+#define Throw( emsg, smsg, e ) OpenVmTil_Throw (((byte*) emsg), ((byte*) smsg), (e), 1 )
+#define ThrowIt( msg ) OpenVmTil_Throw (((byte*) msg),  _Q_->Thrown, 1 )
 #define catchAll if ( _OpenVmTil_Catch () ) 
 #define _SyntaxError( message, abortFlag ) CfrTil_Exception (SYNTAX_ERROR, message, abortFlag )
 #define SyntaxError( abortFlag ) _SyntaxError( 0, abortFlag ) 
@@ -188,8 +188,8 @@
 #define Pause_1( msg ) AlertColors; _Printf ( (byte*)"\n%s", msg ) ; OpenVmTil_Pause () ;
 #define Pause_2( msg, arg ) AlertColors; _Printf ( (byte*)msg, arg ) ; OpenVmTil_Pause () ;
 
-#define Error_Abort( msg ) Throw ( (byte*) msg, ABORT )
-#define Error( msg, state ) { AlertColors; _Printf ( (byte*)"\n\n%s : at %s\n\n", (byte*) msg, state, Context_Location () ) ; if ((state) & PAUSE ) Pause () ; if ((state) >= QUIT ) Throw ( (byte*) msg, state ) ; }
+#define Error_Abort( emsg, smsg ) Throw ( emsg, smsg, ABORT )
+#define Error( emsg, smsg, state ) { AlertColors; _Printf ( (byte*)"\n\n%s : %s : at %s\n\n", (byte*) emsg, smsg, Context_Location () ) ; if ((state) & PAUSE ) Pause () ; if ((state) >= QUIT ) Throw ( emsg, smsg, state ) ; }
 #define Error_1( msg, arg, state ) AlertColors; _Printf ( (byte*)"\n%s : %d\n\n", (byte*) msg, arg ) ; if (state & PAUSE ) Pause () ; if (state >= QUIT ) Throw ( (byte*) msg, state ) ; 
 #define Warning2( msg, str ) _Printf ( (byte*)"\n%s : %s", (byte*) msg, str ) ; 
 #define ErrorWithContinuation( msg, continuation ) Throw ( (byte*) msg, continuation )

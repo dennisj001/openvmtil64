@@ -6,7 +6,7 @@ Interpreter_Init ( Interpreter * interp )
 {
     _Q_->OVT_Interpreter = interp ;
     interp->State = 0 ;
-    _dllist_Init ( interp->PreprocessorStackList  ) ;
+    _dllist_Init ( _Context_->PreprocessorStackList  ) ;
 }
 
 Interpreter *
@@ -19,7 +19,6 @@ Interpreter_New ( uint64 type )
     interp->Lexer0->OurInterpreter = interp ;
     interp->Finder0 = Finder_New ( type ) ;
     interp->Compiler0 = Compiler_New ( type ) ;
-    interp->PreprocessorStackList = _dllist_New ( type ) ;
     Interpreter_Init ( interp ) ;
     return interp ;
 }

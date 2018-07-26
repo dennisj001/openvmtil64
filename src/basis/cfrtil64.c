@@ -44,6 +44,20 @@ _CfrTil_ReStart ( CfrTil * cfrTil, int64 restartCondition )
     }
 }
 
+#if 0
+void
+CfrTil_WordList_PushAndAdd_Firs ( )
+{
+    Word * svWord = WordStack ( 0 ) ;
+    if ( svWord )
+    {
+        svWord->W_SC_Index = 0 ; // before pushWord !
+        CfrTil_WordList_PushWord ( svWord ) ; // for source code
+        Word_Set_SCA ( svWord ) ;
+    }
+}
+#endif
+
 void
 CfrTil_WordList_RecycleInit ( CfrTil * cfrtil, Word * scWord, Boolean recycle, Boolean force, Boolean saveWord0 )
 {
@@ -59,6 +73,7 @@ CfrTil_WordList_RecycleInit ( CfrTil * cfrtil, Word * scWord, Boolean recycle, B
         if ( recycle )
         {
             DLList_RecycleWordList ( cfrtil->CompilerWordList ) ;
+            List_Init ( cfrtil->CompilerWordList ) ;
             cfrtil->ScWord = 0 ;
         }
         cfrtil->CompilerWordList = _dllist_New ( CFRTIL ) ;
@@ -71,7 +86,6 @@ CfrTil_WordList_RecycleInit ( CfrTil * cfrtil, Word * scWord, Boolean recycle, B
     else
     {
         DLList_RecycleWordList ( cfrtil->CompilerWordList ) ;
-        //cfrtil->WordList = _dllist_New ( DICTIONARY ) ;
         List_Init ( cfrtil->CompilerWordList ) ;
     }
     if ( svWord )
@@ -170,7 +184,7 @@ CfrTil_PrintReturnStackWindow ( )
 void
 _CfrTil_NamespacesInit ( CfrTil * cfrTil )
 {
-    Namespace * ns = _DataObject_New ( NAMESPACE, 0, ( byte* ) "Namespaces", 0, 0, 0, 0, 0, 0, - 1 ) ;
+    Namespace * ns = _DataObject_New (NAMESPACE, 0, ( byte* ) "Namespaces", 0, 0, 0, 0, 0, 0, 0, - 1 ) ;
     ns->State |= USING ; // nb. _Namespace_SetState ( ns, USING ) ; // !! can't be used with "Namespaces"
     cfrTil->Namespaces = ns ;
     CfrTil_AddCPrimitives ( ) ;
@@ -235,6 +249,7 @@ _CfrTil_Init ( CfrTil * cfrTil, Namespace * nss )
     //_Stack_Push ( cfrTil->DebugStateStack, 0 ) ;
     cfrTil->TokenList = _dllist_New ( allocType ) ;
     cfrTil->CompilerWordList = _dllist_New ( allocType ) ;
+    
     _Context_ = cfrTil->Context0 = _Context_New ( cfrTil ) ;
 
     cfrTil->Debugger0 = _Debugger_New ( allocType ) ; // nb : must be after System_NamespacesInit

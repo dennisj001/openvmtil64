@@ -6,7 +6,7 @@
 // runs all new object thru here ; good for debugging and understanding 
 
 Word *
-_DataObject_New ( uint64 type, Word * word, byte * name, uint64 ctype, uint64 ctype2, uint64 ltype, int64 index, int64 value, int64 tsrli, int64 scwi )
+_DataObject_New (uint64 type, Word * word, byte * name, uint64 ctype, uint64 ctype2, uint64 ltype, int64 index, int64 value, int allocType, int64 tsrli, int64 scwi )
 {
     tsrli = ( tsrli != - 1 ) ? tsrli : _Lexer_->TokenStart_ReadLineIndex ;
     scwi = ( scwi != - 1 ) ? scwi : _Lexer_->SC_Index ;
@@ -18,7 +18,7 @@ _DataObject_New ( uint64 type, Word * word, byte * name, uint64 ctype, uint64 ct
     {
         case T_LC_NEW:
         {
-            word = _LO_New ( ltype, ctype, ctype2, ( byte* ) value, word, LISP_TEMP, tsrli, scwi ) ; // all words are symbols
+            word = _LO_New ( ltype, ctype, ctype2, ( byte* ) value, word, (allocType ? allocType : LISP_TEMP), tsrli, scwi ) ; // all words are symbols
             break ;
         }
         case T_LC_LITERAL:
@@ -79,7 +79,7 @@ _DataObject_New ( uint64 type, Word * word, byte * name, uint64 ctype, uint64 ct
         case C_TYPE:
         {
             word = _Class_New ( name, C_TYPE, 0 ) ;
-            _Type_Create ( ) ;
+            Type_Create ( ) ;
             break ;
         }
         case C_TYPEDEF:
@@ -191,7 +191,7 @@ _Class_New ( byte * name, uint64 type, int64 cloneFlag )
     }
     else
     {
-        _Printf ( ( byte* ) "\nNamespace Error ? : class \"%s\" already exists!\n", ns->Name ) ;
+        _Printf ( ( byte* ) "\nNamespace Error ? : \'%s\' already exists! : %s : size = %d\n", ns->Name, _Word_SourceCodeLocation_pbyte ( ns ), ns->Size ) ;
         _Namespace_DoNamespace ( ns, 1 ) ;
     }
     CfrTil_WordList_RecycleInit (_CfrTil_, 0, 1, 0, 0) ;

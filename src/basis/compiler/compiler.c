@@ -108,7 +108,7 @@ _Compiler_SetCompilingSpace_MakeSureOfRoom ( byte * name, int64 room )
 {
     NamedByteArray * nba = _Compiler_SetCompilingSpace ( name ) ; // same problem as namespace ; this can be called in the middle of compiling another word 
     ByteArray * ba = _ByteArray_AppendSpace_MakeSure ( nba->ba_CurrentByteArray, room ) ;
-    if ( ! ba ) Error_Abort ( ( byte* ) "\nCompiler_SetCompilingSpace_MakeSureOfRoom : no ba?!\n" ) ;
+    if ( ! ba ) Error_Abort ( "\n_Compiler_SetCompilingSpace_MakeSureOfRoom", "no ba?!\n" ) ;
 }
 
 void
