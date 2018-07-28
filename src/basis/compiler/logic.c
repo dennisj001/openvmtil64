@@ -124,7 +124,7 @@ _Compile_LogicalAnd ( Compiler * compiler )
     Compiler_BI_CompileRecord_TestCode_Set_setTtnn ( compiler, ACC, TTT_ZERO, NEGFLAG_NZ, TTT_ZERO, NEGFLAG_Z ) ;
     _Compile_LogicResultForStack ( ACC, TTT_ZERO, NEGFLAG_NZ ) ; // jnz
     Compiler_Set_LogicCode ( compiler, TTT_ZERO, NEGFLAG_NZ, TTT_ZERO, NEGFLAG_Z ) ;
-    _Compiler_CompileAndRecord_Word0_PushReg ( compiler, ACC ) ;
+    _Compiler_CompileAndRecord_Word0_PushReg (ACC) ;
 }
 
 void
@@ -155,7 +155,7 @@ _Compile_LogicalNot ( Compiler * compiler )
     //_Set_JccLogicCodeForNot ( compiler ) ;
     _Compile_LogicResultForStack ( ACC, TTT_ZERO, NEGFLAG_Z ) ;
     Compiler_Set_LogicCode ( compiler, TTT_ZERO, NEGFLAG_Z, TTT_ZERO, NEGFLAG_NZ ) ;
-    _Compiler_CompileAndRecord_Word0_PushReg ( compiler, ACC ) ;
+    _Compiler_CompileAndRecord_Word0_PushReg (ACC) ;
     //DBI_OFF ;
 }
 
@@ -217,14 +217,14 @@ Compile_Cmp_Set_setTtnn_Logic ( Compiler * compiler, int8 setTtn, int8 setNegate
                     setNegateFlag = ! setNegateFlag ;
                 }
                 else size = 0 ;
-                Set_SCA ( 0 ) ;
+                WordList_SetCoding ( 0, Here ) ;
                 Compile_CMPI ( compiler->OptInfo->Optimize_Mod, compiler->OptInfo->Optimize_Rm, compiler->OptInfo->Optimize_Disp, compiler->OptInfo->Optimize_Imm, size ) ;
             }
         }
         else
         {
             // Compile_CMP( toRegOrMem, mod, reg, rm, sib, disp )
-            Set_SCA ( 0 ) ;
+            WordList_SetCoding ( 0, Here ) ;
             Compile_CMP ( compiler->OptInfo->Optimize_Dest_RegOrMem, compiler->OptInfo->Optimize_Mod,
                 compiler->OptInfo->Optimize_Reg, compiler->OptInfo->Optimize_Rm, 0, compiler->OptInfo->Optimize_Disp, CELL_SIZE ) ;
         }
@@ -235,11 +235,12 @@ Compile_Cmp_Set_setTtnn_Logic ( Compiler * compiler, int8 setTtn, int8 setNegate
         _Compile_Move_StackN_To_Reg ( ACC, DSP, - 1 ) ;
         // must do the DropN before the CMP because CMP sets eflags 
         _Compile_Stack_DropN ( DSP, 2 ) ; // before cmp 
-        Set_SCA ( 0 ) ;
+        WordList_SetCoding ( 0, Here ) ;
         Compile_CMP ( REG, REG, ACC, OREG, 0, 0, CELL ) ;
     }
-    _Compile_SETcc_setTtnn_REG ( compiler, setTtn, setNegateFlag, jccTtt, jccNegFlag, ACC, ACC ) ; //nb! should always be ACC! : immediately after the 'cmp' insn which changes the flags appropriately
-    _Compiler_CompileAndRecord_Word0_PushReg ( compiler, ACC ) ;
+    int8 reg = ACC ; //nb! reg should always be ACC! : immediately after the 'cmp' insn which changes the flags appropriately
+    _Compile_SETcc_setTtnn_REG ( compiler, setTtn, setNegateFlag, jccTtt, jccNegFlag, reg, reg ) ; //nb! should always be ACC! : immediately after the 'cmp' insn which changes the flags appropriately
+    _Word_CompileAndRecord_PushReg ( _CfrTil_WordList ( 0 ), reg ) ; //ACC ) ;
 }
 
 //  logical equals - "=="

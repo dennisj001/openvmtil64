@@ -362,6 +362,7 @@ _dllist_DropN ( dllist * list, int64 n )
 }
 
 //_dllist_RemoveNodes including 'last'
+
 void
 _dllist_RemoveNodes ( dlnode *first, dlnode * last )
 {
@@ -437,7 +438,7 @@ _dllist_SetTopValue ( dllist * list, int64 value )
 }
 
 void
-dllist_Map_FromFirstFlag_Indexed ( dllist * list, int64 flag, int64 fromFirst, MapFunction2 mf )
+dllist_Map4_FromFirstFlag_Indexed ( dllist * list, Boolean fromFirst, MapFunction4 mf, int64 one, int64 two, int64 three )
 {
     dlnode * node, *nextNode, *prevNode ;
     int64 index ;
@@ -448,7 +449,7 @@ dllist_Map_FromFirstFlag_Indexed ( dllist * list, int64 flag, int64 fromFirst, M
             // get nextNode before map function (mf) in case mf changes list by a Remove of current node
             // problem could arise if mf removes Next node
             nextNode = dlnode_Next ( node ) ;
-            mf ( node, index, flag ) ;
+            mf ( node, index, one, two, three ) ;
         }
     }
     else
@@ -456,7 +457,7 @@ dllist_Map_FromFirstFlag_Indexed ( dllist * list, int64 flag, int64 fromFirst, M
         for ( index = _dllist_Depth ( list ), node = dllist_Last ( ( dllist* ) list ) ; node ; node = prevNode, index -- )
         {
             prevNode = dlnode_Previous ( node ) ;
-            mf ( node, index, flag ) ;
+            mf ( node, index, one, two, three ) ;
         }
     }
 }
@@ -499,6 +500,17 @@ dllist_Map ( dllist * list, MapFunction0 mf )
 }
 
 void
+dllist_Map1_FromEnd ( dllist * list, MapFunction1 mf, int64 one )
+{
+    dlnode * node, *previousNode ;
+    for ( node = dllist_Last ( ( dllist* ) list ) ; node ; node = previousNode )
+    {
+        previousNode = dlnode_Previous ( node ) ;
+        mf ( node, one ) ;
+    }
+}
+
+void
 dllist_Map1 ( dllist * list, MapFunction1 mf, int64 one )
 {
     dlnode * node, *nextNode ;
@@ -520,6 +532,17 @@ dllist_Map1_WReturn ( dllist * list, MapFunction1 mf, int64 one )
         if ( rtrn = mf ( node, one ) ) break ;
     }
     return rtrn ;
+}
+
+void
+dllist_Map2_FromEnd ( dllist * list, MapFunction2 mf, int64 one, int64 two )
+{
+    dlnode * node, *previousNode ;
+    for ( node = dllist_Last ( ( dllist* ) list ) ; node ; node = previousNode )
+    {
+        previousNode = dlnode_Previous ( node ) ;
+        mf ( node, one, two ) ;
+    }
 }
 
 void

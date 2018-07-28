@@ -13,12 +13,10 @@ BI_Block_Copy ( BlockInfo * bi, byte* dstAddress, byte * srcAddress, int64 bsize
     bi->CopiedToStart = Here ;
     for ( left = bsize ; ( left > 0 ) ; srcAddress += isize )
     {
-        //byte * here = Here ;
         if ( optFlag ) PeepHole_Optimize ( ) ;
         isize = _Udis_GetInstructionSize ( ud, srcAddress ) ;
         left -= isize ;
         _CfrTil_AdjustDbgSourceCodeAddress ( srcAddress, Here ) ;
-        d0 ( if ( Is_DebugModeOn ) _DWL_ShowList ( _CfrTil_->CompilerWordList, 0 ) ) ;
         _CfrTil_AdjustLabels ( srcAddress ) ;
         if ( * srcAddress == _RET )
         {
@@ -126,6 +124,7 @@ CfrTil_TurnOnBlockCompiler ( )
 {
     CfrTil_RightBracket ( ) ;
     CfrTil_WordList_RecycleInit ( _CfrTil_, _CfrTil_->CurrentWordCompiling, 0, 1, 1 ) ;
+    //Word_RecycleWordList ( _CfrTil_->ScWord ) ;
 }
 
 // blocks are a notation for subroutines or blocks of code compiled in order,
@@ -148,6 +147,7 @@ _CfrTil_BeginBlock0 ( )
     }
     bi->OriginalActualCodeStart = Here ;
     _Compile_UninitializedJump ( ) ;
+    Set_SCA ( 0 ) ; // after the jump! -- the jump is optimized out
     bi->JumpOffset = Here - INT32_SIZE ; // before CfrTil_CheckCompileLocalFrame after CompileUninitializedJump
     Stack_PointerToJmpOffset_Set ( ) ;
     bi->bp_First = Here ; // after the jump for inlining
@@ -158,7 +158,6 @@ _CfrTil_BeginBlock0 ( )
 BlockInfo *
 _CfrTil_BeginBlock1 ( BlockInfo * bi )
 {
-    Set_SCA ( 0 ) ;
     Compiler * compiler = _Context_->Compiler0 ;
     if ( _Stack_IsEmpty ( compiler->BlockStack ) )
     {
@@ -202,7 +201,6 @@ void
 _CfrTil_EndBlock1 ( BlockInfo * bi )
 {
     Compiler * compiler = _Context_->Compiler0 ;
-    Set_SCA ( 0 ) ;
     if ( ! Compiler_BlockLevel ( compiler ) )
     {
         _CfrTil_InstallGotoCallPoints_Keyed ( bi, GI_RETURN ) ;
@@ -234,6 +232,7 @@ _CfrTil_EndBlock1 ( BlockInfo * bi )
         }
         else bi->bp_First = bi->Start ;  
     }
+    Set_SCA ( 0 ) ;
     _Compile_Return ( ) ;
     DataStack_Push ( ( int64 ) bi->bp_First ) ;
     bi->bp_Last = Here ;

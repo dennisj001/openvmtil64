@@ -171,12 +171,12 @@ GetEndifStatus ( )
 }
 
 void
-SkipPreprocessorCode ( Boolean toEndifFlag )
+SkipPreprocessorCode ( Boolean skipControl )
 {
     Context * cntx = _Context_ ;
     Lexer * lexer = cntx->Lexer0 ;
     byte * token ;
-    int64 ifCount = 0, endifStatus = 0 ; //toEndifFlag ? 1 : 0 ;
+    int64 ifLevel = 0 ; 
     Lexer_SourceCodeOff ( lexer ) ;
     do
     {
@@ -206,24 +206,26 @@ SkipPreprocessorCode ( Boolean toEndifFlag )
                 {
                     if ( String_Equal ( token1, "if" ) )
                     {
-                        if ( toEndifFlag ) ifCount ++ ;
+                        if ( skipControl == 1 ) ifLevel ++ ;
                         else if ( GetIfStatus ( ) ) goto done ; // PP_INTERP
                     }
                     else if ( String_Equal ( token1, "else" ) )
                     {
-                        if ( toEndifFlag ) continue ;
+                        if ( skipControl == 1 ) continue ;
+                        //else if ( ( skipControl == 2 ) && ( ! ifLevel ) ) goto done ;
                         else if ( GetElseStatus ( ) ) goto done ;
                     }
                     else if ( String_Equal ( token1, "elif" ) )
                     {
-                        if ( toEndifFlag ) continue ;
+                        if ( skipControl == 1 ) continue ;
+                        //else if ( ( skipControl == 2 ) && ( ! ifLevel ) ) goto done ;
                         else if ( GetElifStatus ( ) ) goto done ;
                     }
                     else if ( String_Equal ( token1, "endif" ) )
                     {
-                        if ( toEndifFlag )
+                        if ( skipControl == 1 )
                         {
-                            if ( -- ifCount <= 0 )
+                            if ( -- ifLevel < 0 )
                             {
 #if DEBUG_SAVE_DONT_DELETE
                                 endifStatus = _GetEndifStatus ( ) ;
@@ -231,17 +233,17 @@ SkipPreprocessorCode ( Boolean toEndifFlag )
                                 {
                                     Ppibs *top = ( Ppibs * ) List_GetN ( _Context_->PreprocessorStackList, 0 ) ;
                                     byte *buffer = Buffer_Data ( _CfrTil_->ScratchB1 ) ;
-                                    sprintf ( buffer, ( byte* ) "top : endifStatus = %ld : ifCount = %ld", endifStatus, ifCount ) ;
+                                    sprintf ( buffer, ( byte* ) "top : endifStatus = %ld : ifCount = %ld", endifStatus, ifLevel ) ;
                                     dbg ( Ppibs_Print ( top, buffer ) ) ;
                                     Ppibs *first = ( Ppibs * ) List_GetN ( _Context_->PreprocessorStackList, 1 ) ;
-                                    sprintf ( buffer, ( byte* ) "first : endifStatus = %ld : ifCount = %ld", endifStatus, ifCount ) ;
+                                    sprintf ( buffer, ( byte* ) "first : endifStatus = %ld : ifCount = %ld", endifStatus, ifLevel ) ;
                                     dbg ( Ppibs_Print ( first, buffer ) ) ;
                                 }
 #endif                                    
                                 goto done ;
                             }
                         }
-                        else if ( toEndifFlag || GetEndifStatus ( ) ) goto done ;
+                        else if ( GetEndifStatus ( ) ) goto done ;
                     }
                     else _SyntaxError ( "Stray '#' in code!", 1 ) ;
                 }
@@ -263,7 +265,7 @@ CfrTil_If_ConditionalInterpret ( )
 void
 CfrTil_Elif_ConditionalInterpret ( )
 {
-    if ( ! GetElifStatus ( ) ) SkipPreprocessorCode ( 0 ) ;
+    if ( ! GetElifStatus ( ) ) SkipPreprocessorCode ( 2 ) ;
 }
 
 void

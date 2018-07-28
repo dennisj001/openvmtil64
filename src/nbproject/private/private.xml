@@ -9,55 +9,6 @@
     </data>
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="19">
         <file>
-            <url>basis/compiler/combinators.c</url>
-            <bookmark id="4">
-                <name/>
-                <line>26</line>
-                <key/>
-            </bookmark>
-            <bookmark id="5">
-                <name/>
-                <line>220</line>
-                <key/>
-            </bookmark>
-        </file>
-        <file>
-            <url>basis/compiler/optimize.c</url>
-            <bookmark id="2">
-                <name/>
-                <line>102</line>
-                <key/>
-            </bookmark>
-            <bookmark id="3">
-                <name/>
-                <line>181</line>
-                <key/>
-            </bookmark>
-        </file>
-        <file>
-            <url>basis/sourceCode.c</url>
-            <bookmark id="14">
-                <name/>
-                <line>30</line>
-                <key/>
-            </bookmark>
-            <bookmark id="15">
-                <name/>
-                <line>119</line>
-                <key/>
-            </bookmark>
-            <bookmark id="16">
-                <name/>
-                <line>120</line>
-                <key/>
-            </bookmark>
-            <bookmark id="13">
-                <name/>
-                <line>236</line>
-                <key/>
-            </bookmark>
-        </file>
-        <file>
             <url>basis/compiler/blocks.c</url>
             <bookmark id="7">
                 <name/>
@@ -98,20 +49,77 @@
                 <key/>
             </bookmark>
         </file>
+        <file>
+            <url>basis/compiler/optimize.c</url>
+            <bookmark id="2">
+                <name/>
+                <line>102</line>
+                <key/>
+            </bookmark>
+            <bookmark id="3">
+                <name/>
+                <line>181</line>
+                <key/>
+            </bookmark>
+        </file>
+        <file>
+            <url>basis/sourceCode.c</url>
+            <bookmark id="14">
+                <name/>
+                <line>30</line>
+                <key/>
+            </bookmark>
+            <bookmark id="15">
+                <name/>
+                <line>119</line>
+                <key/>
+            </bookmark>
+            <bookmark id="16">
+                <name/>
+                <line>120</line>
+                <key/>
+            </bookmark>
+            <bookmark id="13">
+                <name/>
+                <line>250</line>
+                <key/>
+            </bookmark>
+        </file>
+        <file>
+            <url>basis/compiler/combinators.c</url>
+            <bookmark id="4">
+                <name/>
+                <line>26</line>
+                <key/>
+            </bookmark>
+            <bookmark id="5">
+                <name/>
+                <line>220</line>
+                <key/>
+            </bookmark>
+        </file>
     </editor-bookmarks>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/media/sdc4/dennisj/openvmtil64/src/primitives/words.c</file>
-            <file>file:/media/sdc4/dennisj/openvmtil64/src/basis/core/word.c</file>
             <file>file:/media/sdc4/dennisj/openvmtil64/src/basis/core/preprocessor.c</file>
-            <file>file:/media/sdc4/dennisj/openvmtil64/src/primitives/interpreters.c</file>
+            <file>file:/media/sdc4/dennisj/openvmtil64/src/basis/compiler/optimize.c</file>
+            <file>file:/media/sdc4/dennisj/openvmtil64/src/basis/compiler/_compile.c</file>
             <file>file:/media/sdc4/dennisj/openvmtil64/src/basis/openVmTil.c</file>
+            <file>file:/media/sdc4/dennisj/openvmtil64/src/basis/core/dobject.c</file>
+            <file>file:/media/sdc4/dennisj/openvmtil64/src/basis/compiler/machineCode.c</file>
+            <file>file:/media/sdc4/dennisj/openvmtil64/src/basis/cfrtil64.c</file>
+            <file>file:/media/sdc4/dennisj/openvmtil64/src/basis/core/dllist.c</file>
+            <file>file:/media/sdc4/dennisj/openvmtil64/src/basis/core/block.c</file>
+            <file>file:/media/sdc4/dennisj/openvmtil64/src/basis/compiler/blocks.c</file>
+            <file>file:/media/sdc4/dennisj/openvmtil64/src/basis/core/dataObjectNew.c</file>
+            <file>file:/media/sdc4/dennisj/openvmtil64/src/basis/core/word.c</file>
+            <file>file:/media/sdc4/dennisj/openvmtil64/src/include/macros.h</file>
+            <file>file:/media/sdc4/dennisj/openvmtil64/src/basis/core/array.c</file>
+            <file>file:/media/sdc4/dennisj/openvmtil64/src/basis/debugger.c</file>
             <file>file:/media/sdc4/dennisj/openvmtil64/src/basis/sourceCode.c</file>
             <file>file:/media/sdc4/dennisj/openvmtil64/init.cft</file>
-            <file>file:/media/sdc4/dennisj/openvmtil64/src/basis/core/lexer.c</file>
-            <file>file:/media/sdc4/dennisj/openvmtil64/src/primitives/primitives.c</file>
-            <file>file:/media/sdc4/dennisj/openvmtil64/src/basis/core/syntax.c</file>
-            <file>file:/media/sdc4/dennisj/openvmtil64/src/basis/core/block.c</file>
+            <file>file:/media/sdc4/dennisj/openvmtil64/src/basis/core/dataObjectRun.c</file>
+            <file>file:/media/sdc4/dennisj/openvmtil64/src/include/prototypes.h</file>
         </group>
     </open-files>
 </project-private>

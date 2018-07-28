@@ -675,7 +675,7 @@ LO_Debug_ExtraShow ( int64 showStackFlag, int64 verbosity, int64 wordList, byte 
             vsprintf ( ( char* ) out, ( char* ) format, args ) ;
             va_end ( args ) ;
             DebugColors ;
-            if ( wordList ) _Compiler_Show_WordList ( ( byte* ) out, 0 ) ;
+            if ( wordList ) Compiler_SC_WordList_Show (( byte* ) out, 0 , 0) ;
             else
             {
                 printf ( "%s", out ) ;

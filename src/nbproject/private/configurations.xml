@@ -74,8 +74,6 @@
         <in>interpreters.c</in>
         <in>json.c</in>
         <in>lambdaCalculus.c</in>
-        <in>lambdaCalculus.new.c</in>
-        <in>lambdaCalculus.old.c</in>
         <in>linux.c</in>
         <in>lists.c</in>
         <in>openVmTil.c</in>

@@ -5,7 +5,7 @@ void
 _Debugger_ShowDbgSourceCodeAtAddress ( Debugger * debugger, byte * address )
 {
     // ...source code source code TP source code source code ... EOL
-    Word * scWord = Get_SourceCodeWord () ;
+    Word * scWord = Get_SourceCodeWord ( ) ;
     if ( scWord )
     {
         dllist * list = ( scWord->W_SC_WordList ) ; //&& ( scWord->W_SC_MemSpaceRandMarker == _Q_->MemorySpace0->TempObjectSpace->InitFreedRandMarker ) ) ? scWord->W_SC_WordList : 0 ; //_CfrTil_->CompilerWordList ;
@@ -18,7 +18,7 @@ _Debugger_ShowDbgSourceCodeAtAddress ( Debugger * debugger, byte * address )
                 Word * word = DWL_Find ( list, 0, address, 0, 0, 0, 0 ) ;
                 if ( word && ( debugger->LastSourceCodeWord != word ) )
                 {
-                    d0 ( DebugWordList_ShowAll ( ) ) ;
+                    d0 ( DebugWordList_Show_All ( ) ) ;
 
                     if ( GetState ( scWord, W_C_SYNTAX ) && String_Equal ( word->Name, "store" ) )
                     {
@@ -57,13 +57,13 @@ DWL_Find ( dllist * list, Word * iword, byte * address, byte* name, int64 takeFi
     byte * naddress, iuFlag ;
     Word * nword, *aFoundWord = 0, *foundWord = 0 ;
     dlnode * anode = 0 ;
-    int64 numFound = 0 ;
+    int64 numFound = 0, i ;
     uint64 fwDiff = - 1, fDiff = 0, minDiffFound = 0, scwi ;
 
     if ( list && ( iword || name || address ) )
     {
-        for ( anode = fromFirstFlag ? dllist_First ( list ) : dllist_Last ( list ) ; anode ;
-            anode = fromFirstFlag ? dlnode_Next ( anode ) : dlnode_Previous ( anode ) )
+        for ( i = 0, anode = fromFirstFlag ? dllist_First ( list ) : dllist_Last ( list ) ; anode ;
+            anode = fromFirstFlag ? dlnode_Next ( anode ) : dlnode_Previous ( anode ), i ++ )
         {
             nword = ( Word* ) dobject_Get_M_Slot ( anode, SCN_WORD ) ;
             naddress = nword->Coding ;
@@ -80,7 +80,7 @@ DWL_Find ( dllist * list, Word * iword, byte * address, byte* name, int64 takeFi
                 {
                     if ( ! foundWord )
                     {
-                        nword->Coding = newAddress ;
+                        Word_SetCoding ( nword, newAddress ) ;
                         if ( _Q_->Verbosity > 2 )
                         {
                             d1 ( if ( Is_DebugModeOn ) _DWL_ShowWord_Print ( nword, 0, "CODING ADJUST", address, newAddress, 0, iuFlag ) ) ;
@@ -113,7 +113,7 @@ DWL_Find ( dllist * list, Word * iword, byte * address, byte* name, int64 takeFi
                 if ( ( ! minDiffFound ) || ( fDiff < minDiffFound ) ) minDiffFound = fDiff ;
                 if ( ( _Q_->Verbosity > 2 ) )
                 {
-                    d1 ( if ( Is_DebugModeOn ) _DWL_ShowWord ( anode, "FOUND", fDiff ) ) ;
+                    d1 ( if ( Is_DebugModeOn ) DWL_ShowWord ( anode, i, 0, ( int64 ) "FOUND", fDiff ) ) ;
                 }
                 if ( foundWord && takeFirstFind ) break ;
             }
@@ -134,11 +134,11 @@ DWL_Find ( dllist * list, Word * iword, byte * address, byte* name, int64 takeFi
 }
 
 Word *
-Get_SourceCodeWord ()
-{    
-    Word * scWord = _CfrTil_->ScWord ? _CfrTil_->ScWord : Compiling ? _CfrTil_->CurrentWordCompiling : _CfrTil_->LastFinished_DObject ; 
+Get_SourceCodeWord ( )
+{
+    Word * scWord = _CfrTil_->ScWord ? _CfrTil_->ScWord : Compiling ? _CfrTil_->CurrentWordCompiling : _CfrTil_->LastFinished_DObject ;
     return scWord ;
-}    
+}
 
 // ...source code source code TP source code source code ... EOL
 
@@ -215,14 +215,26 @@ CfrTil_WordList_PushWord ( Word * word )
 }
 
 void
-SC_ListClearAddress ( dlnode * node, Word * word, byte * address )
+SC_ListClearAddress ( dlnode * node, byte * address )
 {
     Word * nword = ( Word* ) dobject_Get_M_Slot ( node, SCN_WORD ) ;
     //int64 scwi = dobject_Get_M_Slot ( node, SCN_SC_WORD_INDEX ) ; //nword->W_SC_WordIndex ;
     if ( ( nword->Coding == address ) ) //&& ( nword->W_SC_WordIndex != word->W_SC_WordIndex ) )
     {
-        nword->Coding = 0 ;
-        d0 ( if ( Is_DebugModeOn ) _Printf ( ( byte* ) "\nnword %s with scwi %d :: cleared for word %s with scwi %d", nword->Name, nword->W_SC_Index, word->Name, word->W_SC_Index ) ) ;
+        Word_SetCoding ( nword, 0 ) ;
+        d0 ( if ( Is_DebugModeOn ) _Printf ( ( byte* ) "\nnword %s with scwi %d :: cleared for word %s with scwi %d",
+            nword->Name, nword->W_SC_Index, word->Name, word->W_SC_Index ) ) ;
+    }
+}
+
+void
+Word_Clear_PreviousUseOf_A_SCA ( Word * word )
+{
+    if ( Compiling && word )
+    {
+        byte * coding = word->Coding ;
+        dllist_Map1_FromEnd ( _CfrTil_->CompilerWordList, ( MapFunction1 ) SC_ListClearAddress, ( int64 ) word->Coding ) ;
+        word->Coding = coding ;
     }
 }
 
@@ -231,7 +243,7 @@ Word_Set_SCA ( Word * word )
 {
     if ( Compiling && word )
     {
-        dllist_Map2 ( _CfrTil_->CompilerWordList, ( MapFunction2 ) SC_ListClearAddress, ( int64 ) word, ( int64 ) Here ) ;
+        dllist_Map2_FromEnd ( _CfrTil_->CompilerWordList, ( MapFunction2 ) SC_ListClearAddress, ( int64 ) word, ( int64 ) Here ) ;
         Word_SetCoding ( word, Here ) ;
     }
 }
@@ -272,107 +284,81 @@ CfrTil_WordLists_PopWord ( )
 void
 _DWL_ShowWord_Print ( Word * word, int64 index, byte * prefix, byte * coding, byte * newCoding, int64 scwiDiff, Boolean iuoFlag )
 {
-    int64 scwi = word->W_SC_Index ;
-    byte * name = String_ConvertToBackSlash ( word->Name ), *iuFlag = iuoFlag ? "true" : "false" ;
-    if ( newCoding )
+    if ( word )
     {
-        _Printf ( ( byte* ) "\n\t%s :: word = 0x%08x : \'%-28s\' : oldCoding  = 0x%08x : newCoding = 0x%08x : scwi = %03d, inUse = %s",
-            prefix, word, name, coding, newCoding, scwi, iuFlag ) ;
-    }
-    else if ( index )
-    {
-        _Printf ( "\n\tWordList : index %2d : word = 0x%08x : \'%-28s\' : coding = 0x%08x : scwi = %03d : inUse = %s",
-            index, word, name, coding, scwi, iuFlag ) ;
-    }
-    else //if ( scwiDiff )
-    {
-        _Printf ( ( byte* ) "\n\t%s :: \'%-28s\' : coding  = 0x%08x : scwi = %03d, scwiDiff = %03d : inUse = %s",
-            prefix, name, coding, scwi, scwiDiff, iuFlag ) ;
-    }
-}
-
-void
-_DWL_ShowWord ( dlnode * anode, byte * prefix, int64 scwiDiff )
-{
-    if ( anode )
-    {
-        dobject * dobj = ( dobject * ) anode ;
-        Word * word = ( Word* ) dobject_Get_M_Slot ( dobj, SCN_WORD ) ;
-        int64 iuoFlag = dobject_Get_M_Slot ( dobj, SCN_IN_USE_FLAG ) ;
-        _DWL_ShowWord_Print ( word, 0, prefix, word->Coding, 0, scwiDiff, iuoFlag ) ;
-    }
-}
-
-int64
-DWL_ShowWord ( dlnode * anode, int64 index, int64 inUseOnlyFlag )
-{
-    if ( anode )
-    {
-        dobject * dobj = ( dobject * ) anode ;
-        Word * word = ( Word* ) dobject_Get_M_Slot ( dobj, SCN_WORD ) ;
-        int64 iuoFlag = dobject_Get_M_Slot ( dobj, SCN_IN_USE_FLAG ) ;
-        if ( word && Compiling && ( ( ! inUseOnlyFlag ) || ( inUseOnlyFlag && iuoFlag ) ) )
+        int64 scwi = word->W_SC_Index ;
+        byte * name = String_ConvertToBackSlash ( word->Name ), *iuFlag = iuoFlag ? "true" : "false" ;
+        if ( newCoding )
         {
-            _DWL_ShowWord_Print ( word, index, "WordList", word->Coding, 0, 0, iuoFlag ) ;
+            _Printf ( ( byte* ) "\n\t%s :: word = 0x%08x : \'%-28s\' : oldCoding  = 0x%08x : newCoding = 0x%08x : scwi = %03d, inUse = %s",
+                prefix, word, name, coding, newCoding, scwi, iuFlag ) ;
+        }
+        else if ( index )
+        {
+            _Printf ( "\n\tWordList : index %2d : word = 0x%08x : \'%-28s\' : coding = 0x%08x : scwi = %03d : inUse = %s",
+                index, word, name, coding, scwi, iuFlag ) ;
+        }
+        else //if ( scwiDiff )
+        {
+            _Printf ( ( byte* ) "\n\t%s :: \'%-28s\' : coding  = 0x%08x : scwi = %03d, scwiDiff = %03d : inUse = %s",
+                prefix, name, coding, scwi, scwiDiff, iuFlag ) ;
         }
     }
-    return 0 ;
 }
 
 void
-SC_WordList_Show ( dllist * list, Word * scWord, Boolean inUseOnlyFlag, byte * listName )
+DWL_ShowWord ( dlnode * anode, int64 index, int64 inUseOnlyFlag, int64 prefix, int64 scwiDiff )
+{
+    if ( anode )
+    {
+        dobject * dobj = ( dobject * ) anode ;
+        Word * word = ( Word* ) dobject_Get_M_Slot ( dobj, SCN_WORD ) ;
+        int64 iuoFlag = dobject_Get_M_Slot ( dobj, SCN_IN_USE_FLAG ) ;
+        if ( word && ( ( ! inUseOnlyFlag ) || ( inUseOnlyFlag && iuoFlag ) ) )
+        {
+            //_DWL_ShowWord_Print ( word, index, prefix, coding, newCoding, scwiDiff, iuoFlag )
+            _DWL_ShowWord_Print ( word, index, ( byte* ) prefix, word->Coding, 0, scwiDiff, iuoFlag ) ;
+        }
+    }
+}
+
+void
+SC_WordList_Show ( dllist * list, Word * scWord, Boolean fromFirstFlag, Boolean inUseOnlyFlag, byte * listName )
 {
     if ( list )
     {
         if ( scWord ) _Printf ( "\n%s WordList : for word \'%s\' :", listName, scWord->Name ) ;
-        dllist_Map_FromFirstFlag_Indexed ( list, ( int64 ) inUseOnlyFlag, 0, DWL_ShowWord ) ;
+        dllist_Map4_FromFirstFlag_Indexed ( list, fromFirstFlag, DWL_ShowWord, inUseOnlyFlag, ( int64 ) "", 0 ) ;
     }
 }
 
-void
-DebugWordList_ShowAll ( Debugger * debugger )
-{
-    Word * scWord = Get_SourceCodeWord () ; //Compiling ? _CfrTil_->CurrentWordCompiling : GetState ( debugger, DBG_STEPPING ) ? Debugger_GetWordFromAddress ( debugger ) : _Context_->CurrentlyRunningWord ;
-    dllist * list = scWord->W_SC_WordList ? scWord->W_SC_WordList : _CfrTil_->CompilerWordList ;
-    SC_WordList_Show ( list, scWord, 0, list == scWord->W_SC_WordList ? "SourceCode" : "CfrTil:CompilerWordList" ) ;
-}
 // too much/many shows ?? combine some
 
 void
-_Compiler_Show_WordList ( byte * prefix, int8 inUseFlag )
+Compiler_SC_WordList_Show ( byte * prefix, int8 inUseOnlyFlag, Boolean showInDebugColors )
 {
-
-    Word * scWord = Get_SourceCodeWord () ;//Compiling ? _CfrTil_->CurrentWordCompiling : GetState ( _Debugger_, DBG_STEPPING ) ? Debugger_GetWordFromAddress ( _Debugger_ ) : _Context_->CurrentlyRunningWord ;
-    if ( Is_DebugModeOn ) NoticeColors ;
-    _Printf ( "\n%s", prefix ) ;
-    SC_WordList_Show ( _CfrTil_->CompilerWordList, scWord, inUseFlag, "CfrTil:CompilerWordList" ) ;
-    if ( Is_DebugModeOn ) DefaultColors ;
+    Word * scWord = Get_SourceCodeWord ( ) ;
+    dllist * list = Compiling ? _CfrTil_->CompilerWordList : scWord ? scWord->W_SC_WordList : _CfrTil_->CompilerWordList ;
+    if ( Is_DebugModeOn || showInDebugColors ) NoticeColors ;
+    if ( prefix ) _Printf ( "\n%s : %s", prefix, scWord->Name ) ;
+    _Printf ( "\n%s", scWord->Name ) ;
+    byte *buffer = Buffer_Data ( _CfrTil_->ScratchB1 ) ;
+    sprintf ( buffer, ( byte* ) "%s : %s", (list == _CfrTil_->CompilerWordList) ? "CfrTil WordList" : "source code word list for the word", 
+        inUseOnlyFlag ? "in use only" : "all" ) ;
+    SC_WordList_Show ( list, scWord, 0, inUseOnlyFlag, buffer ) ;
+    if ( Is_DebugModeOn || showInDebugColors ) DefaultColors ;
 }
 
 void
-Compiler_Show_WordList ( byte * prefix )
+DebugWordList_Show_All ( Debugger * debugger )
 {
-    _Compiler_Show_WordList ( prefix, 0 ) ;
+    Compiler_SC_WordList_Show ( 0, 0, 0 ) ;
 }
 
 void
-Debugger_Show_InUse_CompilerWordList ( Debugger * debugger )
+DebugWordList_Show_InUse ( Debugger * debugger )
 {
-    byte * prefix = debugger->w_Word->Name ;
-    _Compiler_Show_WordList ( prefix, 1 ) ;
-}
-
-void
-_DWL_ShowList ( dllist * list, int8 fromFirst )
-{
-    if ( list ) dllist_Map2_FromFirstFlag ( list, ( MapFunction2 ) _DWL_ShowWord, ( int64 ) "List", 0, fromFirst ) ;
-}
-
-void
-DWL_ShowList ( Word * scWord, int8 fromFirst )
-{
-    dllist * list = scWord->W_SC_WordList ? scWord->W_SC_WordList : _CfrTil_->CompilerWordList ;
-    if ( list ) _DWL_ShowList ( list, fromFirst ) ;
+    Compiler_SC_WordList_Show ( 0, 1, 0 ) ;
 }
 
 void
@@ -391,6 +377,7 @@ CfrTil_DbgSourceCodeEndBlock ( )
 }
 
 #if 0
+
 void
 CfrTil_DbgSourceCode_Begin_C_Block ( )
 {
@@ -526,7 +513,7 @@ CfrTil_Lexer_SourceCodeOn ( )
 }
 
 byte *
-_CfrTil_GetSourceCode ()
+_CfrTil_GetSourceCode ( )
 {
     byte * sc = String_New_SourceCode ( _CfrTil_->SC_Buffer ) ;
     return sc ;
@@ -535,7 +522,7 @@ _CfrTil_GetSourceCode ()
 byte *
 _CfrTil_Finish_WordSourceCode ( CfrTil * cfrtil, Word * word )
 {
-    if ( ! word->W_SourceCode ) word->W_SourceCode = _CfrTil_GetSourceCode () ;
+    if ( ! word->W_SourceCode ) word->W_SourceCode = _CfrTil_GetSourceCode ( ) ;
     Lexer_SourceCodeOff ( _Lexer_ ) ;
     CfrTil_SourceCode_InitEnd ( cfrtil ) ;
 }
@@ -544,7 +531,7 @@ byte *
 CfrTil_FinishSourceCode ( CfrTil * cfrtil, Word * word )
 {
     _CfrTil_Finish_WordSourceCode ( cfrtil, word ) ;
-    CfrTil_WordList_RecycleInit (cfrtil, word, 0, 0 , 0) ;
+    CfrTil_WordList_RecycleInit ( cfrtil, word, 0, 0, 0 ) ;
 }
 
 void

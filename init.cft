@@ -369,10 +369,10 @@ Root
 'doX64 1 const
 'doScript 1 const
 'doScript2 1 const
-'_doDemo 0 const    
+'_doDemo 1 const    
 'todo 0 const    
 dbgOff
-//dbgOn 
+dbgOn 
 #if Is_DebugOn 
 
 #if todo
@@ -393,15 +393,34 @@ stringMacrosOff
 #else
 // you can trim this file to your needs and put your personal init code here maybe
 
-#if 1
+#if 0
 c_syntaxOn
-d: int _fib1c ( n ) { if ( n < 2 ) { n ; } else { _fib1c ( n - 1 ) + _fib1c ( n - 2 ) ; } }
+int _fib1c ( n ) { if ( n < 2 ) { n ; } else { _fib1c ( n - 1 ) + _fib1c ( n - 2 ) ; d: } }
 c_syntaxOff
 ' _fib1c find wdiss
 20 _fib1c p //pause
-#endif
-
 c_syntaxOff
+#endif
+#if 0
+d: : fibBN ( n | fn fn1 fn2 -- TOS ) 
+    { fn 0 = fn1 0 = fn2 1 = } { n @ 0 > } { n 1 -= } 
+    {   
+        fn1 fn2 @ = 
+        fn2 fn @ = 
+        fn fn1 @ fn2 @ + = 
+    }
+    for
+    // nl svn @ fprint ":" ps fn @ fprint 
+    fn @
+;
+' fibBN find wdiss
+20 fibBN p 
+#endif
+//: factorial ( n | rec ) rec 1 = { n @ 1 > } { rec @ n @ d: * rec store n -- } while return rec d: ;
+: factorial ( REG n | REG rec ) rec 1 = { n @ 1 d: > } { rec @ n @ * rec store n -- } while return rec ;
+'factorial find wdiss // _wdiss ( 'factorial find ) 
+7 factorial dup p 5040 "factorial" assert1
+
 //pause
 #endif
 

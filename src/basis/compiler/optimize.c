@@ -38,20 +38,20 @@
 // for 2 arg ops : STACK_1= arg1 : STACK_0 = arg2 
 
 int64
-_Compiler_CheckOptimize ( Compiler * compiler, Word * word, int64 _forcedReturn )
+_Compiler_CheckOptimize ( Compiler * compiler, Word * word, int64 _specialReturn )
 {
-    int64 forcedReturn = _forcedReturn ? _forcedReturn : compiler->OptimizeForcedReturn ;
-    if ( ! forcedReturn )
+    int64 specialReturn = _specialReturn ? _specialReturn : compiler->OptimizeForcedReturn ;
+    if ( ! specialReturn )
     {
-        if ( GetState ( _CfrTil_, OPTIMIZE_ON ) ) _forcedReturn = Compiler_GetOptimizeState ( compiler, word ) ;
+        if ( GetState ( _CfrTil_, OPTIMIZE_ON ) ) _specialReturn = Compiler_GetOptimizeState ( compiler, word ) ;
     }
-    return _forcedReturn ? _forcedReturn : compiler->OptimizeForcedReturn ;
+    return _specialReturn ? _specialReturn : compiler->OptimizeForcedReturn ;
 }
 
 int64
-Compiler_CheckOptimize ( Compiler * compiler, int64 forcedReturn )
+Compiler_CheckOptimize ( Compiler * compiler, int64 specialReturn )
 {
-    return _Compiler_CheckOptimize ( compiler, CfrTil_WordList ( 0 ), forcedReturn ) ;
+    return _Compiler_CheckOptimize ( compiler, CfrTil_WordList ( 0 ), specialReturn ) ;
 }
 
 int64
@@ -156,7 +156,7 @@ Compiler_SetupArgsToStandardLocations ( Compiler * compiler )
 {
     CompileOptimizeInfo * optInfo = compiler->OptInfo ;
     // op args first
-    _Set_SCA ( optInfo->opWord ) ;
+    //_Set_SCA ( optInfo->opWord ) ;
     if ( optInfo->opWord->CAttribute & ( CATEGORY_DUP ) ) Compile_Optimize_Dup ( compiler ) ;
     else if ( optInfo->wordArg1_literal && optInfo->wordArg2_literal ) Do_OptimizeOp2Literals ( compiler ) ;
     else if ( optInfo->wordArg2_Op || optInfo->xBetweenArg1AndArg2 ) Compiler_Optimizer_WordArg2Op_Or_xBetweenArg1AndArg2 ( compiler ) ;
@@ -244,6 +244,11 @@ Compiler_Optimizer_2Args_Or_WordArg1_Op ( Compiler * compiler )
             if ( optInfo->wordArg1->StackPushRegisterCode )
             {
                 _SetHere_To_Word_StackPushRegisterCode ( optInfo->wordArg1 ) ;
+#if 0                
+                d1 ( if ( Is_DebugOn ) DebugWordList_Show_All ( _Debugger_ ) ) ;
+                Word_Clear_PreviousUseOf_A_SCA ( optInfo->wordArg1 ) ;
+                d1 ( if ( Is_DebugOn ) DebugWordList_Show_All ( _Debugger_ ) ) ;
+#endif                
                 if ( optInfo->wordArg1_Op && ( optInfo->wordArg1->RegFlags ) )
                 {
                     rm = optInfo->wordArg1->Opt_Reg ;

@@ -724,13 +724,15 @@ IsPunct ( byte b )
 }
 
 int64
-String_CheckWordSize ( byte * str, int64 wl, Boolean lPunctFlag, Boolean rPunctFlag )
+String_CheckWordSize ( byte * str, int64 wl ) //, Boolean lPunctFlag, Boolean rPunctFlag )
 {
     byte * start, *end ;
     int64 i, length ;
+    Boolean punctFlag = IsPunct ( str [0] ), rPunctFlag = IsPunct ( str [Strlen (str)] ) ; //punctFlag means first character of word is punctuation 
+
     for ( i = - 1 ; abs ( i ) < ( wl + 1 ) ; i -- ) // go to left of str first
     {
-        if ( lPunctFlag )
+        if ( punctFlag )
         {
             if ( ! IsPunct ( str[i] ) ) break ;
         }
@@ -758,13 +760,12 @@ String_FindStrnCmpIndex ( byte * sc, byte* name0, int64 index0, int64 wl0, int64
     byte * scspp2, *scspp, *scindex ;
     d0 ( scspp = & sc [ index0 ] ) ;
     int64 i, n, index = index0, slsc = Strlen ( sc ), sln0 = Strlen ( name0 ) ;
-    Boolean lPunctuationFlag = IsPunct ( name0 [0] ), rPunctuationFlag = IsPunct ( name0 [sln0 - 1] ) ;
     for ( i = 0, n = wl0 + inc ; ( i <= n ) && ( i <= index ) ; i ++ ) // tokens are parsed in different order with parameter and c rtl args, etc. 
     {
         scindex = & sc [ index + i ] ;
         if ( ( index + i <= slsc ) && ( ! Strncmp ( & sc [ index + i ], name0, wl0 ) ) )//l ) ) //wl0 ) )
         {
-            if ( String_CheckWordSize ( scindex, wl0, lPunctuationFlag, rPunctuationFlag ) )
+            if ( String_CheckWordSize ( scindex, wl0 ) )  //lPunctuationFlag, rPunctuationFlag ) )
             {
                 index += i ;
                 goto done ;
@@ -773,7 +774,7 @@ String_FindStrnCmpIndex ( byte * sc, byte* name0, int64 index0, int64 wl0, int64
         scindex = & sc [ index - i ] ;
         if ( ( ( index - 1 ) >= 0 ) && ( ! Strncmp ( scindex, name0, wl0 ) ) )
         {
-            if ( String_CheckWordSize ( scindex, wl0, lPunctuationFlag, rPunctuationFlag ) )
+            if ( String_CheckWordSize ( scindex, wl0 ) ) //lPunctuationFlag, rPunctuationFlag ) )
             {
                 index -= i ;
                 goto done ;

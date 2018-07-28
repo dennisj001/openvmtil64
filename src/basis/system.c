@@ -314,6 +314,7 @@ _CfrTil_SystemState_Print ( int64 pflag )
     _Printf ( ( byte* ) " : BigNum %s", bno ? "on" : "off" ) ;
     Boolean lo = Namespace_IsUsing ( "Lisp" ) ;
     _Printf ( ( byte* ) " : Lisp %s", lo ? "on" : "off" ) ;
+    _Printf ( ( byte* ) "\n%s : at %s", Compiling ? "compiling" : "interpreting", Context_Location () ) ;
 }
 
 void

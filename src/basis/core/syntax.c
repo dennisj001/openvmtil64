@@ -151,7 +151,7 @@ CfrTil_Interpret_C_Blocks ( int64 blocks, Boolean takesAnElseFlag, Boolean semic
             word = _Interpreter_TokenToWord ( interp, token ) ;
             if ( word )
             {
-                _Interpreter_DoWord ( interp, word, - 1, - 1 ) ;
+                _Interpreter_DoWord ( interp, word, -1, -1 ) ; //word->W_RL_Index, word->W_SC_Index ) ;
                 if ( word->CAttribute & COMBINATOR )
                 {
                     //Word * lastWord = Compiler_WordList ( 0 ) ;
@@ -223,12 +223,12 @@ _CfrTil_C_Infix_EqualOp ( Word * opWord )
     int64 svscwi = word0 ? word0->W_SC_Index : 0 ;
     byte * svName, * token ;
     SetState ( compiler, C_INFIX_EQUAL, true ) ;
-    d0 ( if ( Is_DebugModeOn ) _Compiler_Show_WordList ( "\nCfrTil_C_Infix_EqualOp : before pop 2 words", 0 ) ) ;
+    d0 ( if ( Is_DebugModeOn ) Compiler_SC_WordList_Show ("\nCfrTil_C_Infix_EqualOp : before pop 2 words", 0 , 0) ) ;
     if ( opWord ) _CfrTil_WordList_PopWords ( 1 ) ;
-    d0 ( if ( Is_DebugModeOn ) _Compiler_Show_WordList ( "\nCfrTil_C_Infix_Equal0p : before interpret until ',' or ';' :", 0 ) ) ;
+    d0 ( if ( Is_DebugModeOn ) Compiler_SC_WordList_Show ("\nCfrTil_C_Infix_Equal0p : before interpret until ',' or ';' :", 0 , 0) ) ;
     d0 ( if ( Is_DebugOn ) CfrTil_Using ( ) ) ;
     token = _Interpret_C_Until_EitherToken ( interp, ( byte* ) ";", ( byte* ) ",", ( byte* ) ")", ( byte* ) " \n\r\t" ) ;
-    d0 ( if ( Is_DebugModeOn ) _Compiler_Show_WordList ( "\nCfrTil_C_Infix_EqualOp : after interpret until ';' :", 0 ) ) ;
+    d0 ( if ( Is_DebugModeOn ) Compiler_SC_WordList_Show ("\nCfrTil_C_Infix_EqualOp : after interpret until ';' :", 0 , 0) ) ;
     if ( lhsWord )
     {
         int64 svState = cntx->State ;
@@ -241,15 +241,15 @@ _CfrTil_C_Infix_EqualOp ( Word * opWord )
     {
         word0 = _CfrTil_->PokeWord ;
     }
-    d0 ( if ( Is_DebugModeOn ) _Compiler_Show_WordList ( "\nCfrTil_C_Infix_EqualOp : before op word", 0 ) ) ;
+    d0 ( if ( Is_DebugModeOn ) Compiler_SC_WordList_Show ("\nCfrTil_C_Infix_EqualOp : before op word", 0 , 0) ) ;
     if ( opWord ) rword = opWord ;
     else rword = word0 ; //_Interpreter_DoWord_Default ( interp, opWord ) ;
-    rword->W_RL_Index = tsrli ;
-    rword->W_SC_Index = svscwi ;
+    //rword->W_RL_Index = tsrli ;
+    //rword->W_SC_Index = svscwi ;
     svName = rword->Name ;
     rword->Name = "=" ;
     if ( lhsWord ) SetState ( _Debugger_, DBG_OUTPUT_INSERTION, true ) ; // activate this in disassemble source code ??
-    _Interpreter_DoWord_Default ( interp, rword, - 1, svscwi ) ;
+    _Interpreter_DoWord_Default ( interp, rword, tsrli, svscwi ) ;
     SetState ( _Debugger_, DBG_OUTPUT_INSERTION, true ) ;
     rword->Name = svName ;
     if ( GetState ( compiler, C_COMBINATOR_LPAREN ) )
@@ -264,7 +264,7 @@ _CfrTil_C_Infix_EqualOp ( Word * opWord )
     SetState ( compiler, C_INFIX_EQUAL, false ) ;
     d0 (
 
-    if ( Is_DebugModeOn ) _Compiler_Show_WordList ( "\nCfrTil_C_Infix_EqualOp : just before return", 0 ) ) ;
+    if ( Is_DebugModeOn ) Compiler_SC_WordList_Show ("\nCfrTil_C_Infix_EqualOp : just before return", 0 , 0) ) ;
     //if ( ! GetState ( cntx, C_SYNTAX ) ) 
     _CfrTil_PushToken_OnTokenList ( token ) ; // so the callee can check use or use
 }

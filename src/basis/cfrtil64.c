@@ -45,6 +45,7 @@ _CfrTil_ReStart ( CfrTil * cfrTil, int64 restartCondition )
 }
 
 #if 0
+
 void
 CfrTil_WordList_PushAndAdd_Firs ( )
 {
@@ -59,17 +60,29 @@ CfrTil_WordList_PushAndAdd_Firs ( )
 #endif
 
 void
-CfrTil_WordList_RecycleInit ( CfrTil * cfrtil, Word * scWord, Boolean recycle, Boolean force, Boolean saveWord0 )
+Word_RecycleWordList ( Word * scWord )
+{
+    if ( scWord )
+    {
+        DLList_RecycleWordList ( scWord->W_SC_WordList ) ;
+        List_Init ( scWord->W_SC_WordList ) ;
+    }
+    DLList_RecycleWordList ( _CfrTil_->CompilerWordList ) ;
+    List_Init ( _CfrTil_->CompilerWordList ) ;
+}
+
+// recycling : TODO combine CfrTil_WordList_RecycleInit with _CfrTil_Init_Recycling_SourceCodeWordList
+void
+CfrTil_WordList_RecycleInit ( CfrTil * cfrtil, Word * word, Boolean recycle, Boolean force, Boolean saveWord0 )
 {
     Word * svWord ;
     if ( saveWord0 ) svWord = WordStack ( 0 ) ;
     else svWord = 0 ;
-    if ( IsSourceCodeOn && scWord ) cfrtil->LastFinished_DObject = cfrtil->CurrentWordCompiling = cfrtil->ScWord = scWord ;
-    cfrtil->ScWord = scWord ? scWord : Get_SourceCodeWord ( ) ;
+    if ( IsSourceCodeOn && word ) cfrtil->LastFinished_DObject = cfrtil->CurrentWordCompiling = cfrtil->ScWord = word ;
+    else cfrtil->ScWord = word ? word : Get_SourceCodeWord ( ) ;
     if ( ( ! IsSourceCodeOn ) || force )
     {
-        if ( cfrtil->ScWord )
-            cfrtil->ScWord->W_SC_WordList = cfrtil->CompilerWordList ;
+        if ( cfrtil->ScWord ) cfrtil->ScWord->W_SC_WordList = cfrtil->CompilerWordList ;
         if ( recycle )
         {
             DLList_RecycleWordList ( cfrtil->CompilerWordList ) ;
@@ -92,7 +105,7 @@ CfrTil_WordList_RecycleInit ( CfrTil * cfrtil, Word * scWord, Boolean recycle, B
     {
         svWord->W_SC_Index = 0 ; // before pushWord !
         CfrTil_WordList_PushWord ( svWord ) ; // for source code
-        Word_Set_SCA ( svWord ) ;
+        //Word_Set_SCA ( svWord ) ;
     }
 }
 
@@ -184,7 +197,7 @@ CfrTil_PrintReturnStackWindow ( )
 void
 _CfrTil_NamespacesInit ( CfrTil * cfrTil )
 {
-    Namespace * ns = _DataObject_New (NAMESPACE, 0, ( byte* ) "Namespaces", 0, 0, 0, 0, 0, 0, 0, - 1 ) ;
+    Namespace * ns = _DataObject_New ( NAMESPACE, 0, ( byte* ) "Namespaces", 0, 0, 0, 0, 0, 0, 0, - 1 ) ;
     ns->State |= USING ; // nb. _Namespace_SetState ( ns, USING ) ; // !! can't be used with "Namespaces"
     cfrTil->Namespaces = ns ;
     CfrTil_AddCPrimitives ( ) ;
@@ -249,7 +262,7 @@ _CfrTil_Init ( CfrTil * cfrTil, Namespace * nss )
     //_Stack_Push ( cfrTil->DebugStateStack, 0 ) ;
     cfrTil->TokenList = _dllist_New ( allocType ) ;
     cfrTil->CompilerWordList = _dllist_New ( allocType ) ;
-    
+
     _Context_ = cfrTil->Context0 = _Context_New ( cfrTil ) ;
 
     cfrTil->Debugger0 = _Debugger_New ( allocType ) ; // nb : must be after System_NamespacesInit

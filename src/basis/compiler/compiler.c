@@ -7,7 +7,6 @@
 Word *
 _CopyDuplicateWord ( Word * word0 )
 {
-    d0 ( if ( Is_DebugModeOn ) DWL_ShowList ( _CfrTil_->CompilerWordList, 0 ) ) ;
     Word * wordc = Word_Copy ( word0, DICTIONARY ) ; // use DICTIONARY since we are recycling these anyway
     wordc->W_OriginalWord = Word_GetOriginalWord ( word0 ) ;
     _dlnode_Init ( ( dlnode * ) wordc ) ; // necessary!
@@ -325,15 +324,24 @@ Stack_PointerToJmpOffset_Set ( )
 }
 
 void
-_Compiler_CompileAndRecord_Word0_PushReg ( Compiler * compiler, int8 reg )
+_Compiler_CompileAndRecord_Word0_PushReg (int8 reg)
 {
-    _Word_CompileAndRecord_PushReg ( _CfrTil_WordList ( 0 ), reg ) ;
+    Word * word = _CfrTil_WordList ( 0 ) ;
+    _Word_CompileAndRecord_PushReg ( word, reg ) ;
+}
+
+void
+Compiler_CompileAndRecord_Word0_PushRegToUse ()
+{
+    Word * word = _CfrTil_WordList ( 0 ) ;
+    _Word_CompileAndRecord_PushReg ( word, word->RegToUse ) ;
 }
 
 void
 Compiler_CompileAndRecord_PushAccum ( Compiler * compiler )
 {
-    _Compiler_CompileAndRecord_Word0_PushReg ( compiler, ACC ) ;
+    Word * word = _CfrTil_WordList ( 0 ) ;
+    _Word_CompileAndRecord_PushReg ( word, ACC ) ;
 }
 
 

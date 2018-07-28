@@ -8,8 +8,6 @@ _DataObject_Run ( Word * word0 )
     Word * word = cntx->CurrentlyRunningWord ; // = word0 : set CurrentlyRunningWord with the DObject Compile_SetCurrentlyRunningWord_Call_TestRSP created word
     Word * ns = word0 ; // set CurrentlyRunningWord with the DObject Compile_SetCurrentlyRunningWord_Call_TestRSP created word
     cntx->Interpreter0->w_Word = word ; // for ArrayBegin : all literals are run here
-    _Set_SCA ( word0 ) ;
-    _Set_SCA ( word ) ;
     if ( word->LAttribute & LOCAL_OBJECT )
     {
         if ( ( word->CAttribute & LOCAL_VARIABLE ) && ( ! GetState ( word, W_INITIALIZED ) ) ) // this is a local variable so it is initialed at creation 
@@ -116,7 +114,7 @@ _Namespace_Do_C_Type ( Namespace * ns )
                     _Namespace_ActivateAsPrimary ( ns ) ;
                     Word * word = Word_New ( token1 ) ; // "("
                     DataStack_Push ( ( int64 ) word ) ;
-#if 1                    
+#if 0                    
                     beginWord = _CfrTil_->BeginBlockWord ;
                     Block_Eval ( beginWord->Definition ) ; //( beginWord ) ;
                     CfrTil_LocalsAndStackVariablesBegin ( ) ;
@@ -235,7 +233,7 @@ CfrTil_Dot ( ) // .
     if ( ! cntx->Interpreter0->BaseObject )
     {
         SetState ( cntx, CONTEXT_PARSING_QID, true ) ;
-        d0 ( if ( Is_DebugModeOn ) _Compiler_Show_WordList ( "\nCfrTil_Dot", 0 ) ) ;
+        d0 ( if ( Is_DebugModeOn ) Compiler_SC_WordList_Show ("\nCfrTil_Dot", 0 , 0) ) ;
 
         Word * word = Compiler_PreviousNonDebugWord ( 0 ) ; // 0 : rem: we just popped the WordStack above
         if ( word )
@@ -355,7 +353,7 @@ _Do_Variable ( Word * word )
         if ( Is_LValue ( word ) )
         {
             cntx->Compiler0->LHS_Word = word ;
-            word->Coding = Here ;
+            Word_SetCoding ( word, Here ) ;
             //_Compile_GetVarLitObj_LValue_To_Reg ( word, ACC ) ;
         }
         else
@@ -423,7 +421,7 @@ _CfrTil_Do_Variable ( Word * word )
         if ( word->CAttribute & ( OBJECT | THIS | QID ) || GetState ( word, QID ) ) //Finder_GetQualifyingNamespace ( cntx->Finder0 ) )
         {
             word->AccumulatedOffset = 0 ;
-            word->Coding = Here ;
+            Word_SetCoding ( word, Here ) ;
             cntx->Interpreter0->BaseObject = word ;
             cntx->Interpreter0->CurrentObjectNamespace = TypeNamespace_Get ( word ) ;
             cntx->Compiler0->AccumulatedOffsetPointer = 0 ;

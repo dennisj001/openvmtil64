@@ -241,7 +241,7 @@ CfrTil_Constant ( )
     byte * name = ( byte* ) DataStack_Pop ( ) ;
     Word * word = _DataObject_New ( CONSTANT, 0, name, LITERAL | CONSTANT, 0, 0, 0, value, 0, - 1, - 1 ) ;
     byte *buffer = Buffer_Data ( _CfrTil_->ScratchB1 ) ;
-    sprintf ( buffer, ( byte* ) "\'%s %ld const", ( char* ) name, value ) ;
+    sprintf ( buffer, ( byte* ) "\'%s %ld const // (hypothetical)", ( char* ) name, value ) ;
     word->W_SourceCode = String_New_SourceCode ( buffer ) ;
 
 

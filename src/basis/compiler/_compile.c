@@ -23,6 +23,7 @@ Compile_Call_From_C_Address ( uint64 bptr )
 }
 
 // c ffi : foreign function interface
+
 void
 Compile_SetCurrentlyRunningWord_Call_TestRSP ( byte * address, Word * word )
 {
@@ -193,8 +194,8 @@ Compile_GetVarLitObj_RValue_To_Reg ( Word * word, int64 reg )
 void
 _Compile_SetVarLitObj_With_Reg ( Word * word, int64 reg, int64 thruReg )
 {
-    _Set_SCA ( word ) ;
-    word->Coding = Here ; // we don't need the word's code if compiling -- this is an optimization though
+    //_Set_SCA ( word ) ;
+    // we don't need the word's code if compiling -- this is an optimization though
     if ( word->CAttribute & REGISTER_VARIABLE )
     {
         if ( word->RegToUse == reg ) return ;
@@ -215,7 +216,7 @@ _Compile_SetVarLitObj_With_Reg ( Word * word, int64 reg, int64 thruReg )
 void
 _Compile_GetVarLitObj_LValue_To_Reg ( Word * word, int64 reg )
 {
-    _Set_SCA ( word ) ;
+    _Set_SCA ( word ) ; 
     if ( word->CAttribute & REGISTER_VARIABLE )
     {
         if ( word->RegToUse == reg ) return ;

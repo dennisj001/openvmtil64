@@ -25,8 +25,8 @@ Word *
 _Interpreter_DoWord_Default ( Interpreter * interp, Word * word0, int64 tsrli, int64 scwi )
 {
     Word * word = Compiler_CopyDuplicatesAndPush ( word0 ) ;
-    word->W_SC_Index = word0->W_SC_Index = ( scwi != - 1 ) ? scwi : _Lexer_->SC_Index ;
-    word->W_RL_Index = word0->W_RL_Index = ( tsrli != - 1 ) ? tsrli : _Lexer_->TokenStart_ReadLineIndex ;
+    word->W_SC_Index = ( scwi != - 1 ) ? scwi : _Lexer_->SC_Index ;
+    word->W_RL_Index = ( tsrli != - 1 ) ? tsrli : _Lexer_->TokenStart_ReadLineIndex ;
     interp->w_Word = word ;
     Word_Eval ( word ) ;
     if ( IS_MORPHISM_TYPE ( word ) ) SetState ( _Context_, ADDRESS_OF_MODE, false ) ;
@@ -54,15 +54,13 @@ _Interpreter_DoWord ( Interpreter * interp, Word * word, int64 tsrli, int64 scwi
     if ( word )
     {
         Context * cntx = _Context_ ;
-        tsrli = ( tsrli != - 1 ) ? tsrli : _Lexer_->TokenStart_ReadLineIndex ;
-        scwi = ( scwi != - 1 ) ? scwi : _Lexer_->SC_Index ;
-        word->W_SC_Index = scwi ;
-        word->W_RL_Index = tsrli ;
+        word->W_RL_Index = tsrli = ( tsrli != - 1 ) ? tsrli : _Lexer_->TokenStart_ReadLineIndex ;
+        word->W_SC_Index = scwi = ( scwi != - 1 ) ? scwi : _Lexer_->SC_Index ;
         interp->w_Word = word ;
         if ( ( word->WAttribute == WT_INFIXABLE ) && ( GetState ( cntx, INFIX_MODE ) ) ) // nb. Interpreter must be in INFIX_MODE because it is effective for more than one word
         {
             doInfix :
-            DEBUG_SETUP ( word ) ;
+            //DEBUG_SETUP ( word ) ;
             Interpreter_InterpretNextToken ( interp ) ;
             // then continue and interpret this 'word' - just one out of lexical order
             _Interpreter_DoWord_Default ( interp, word, tsrli, scwi ) ;
@@ -81,7 +79,7 @@ _Interpreter_DoWord ( Interpreter * interp, Word * word, int64 tsrli, int64 scwi
         else if ( Interpreter_IsWordPrefixing ( interp, word ) ) Interpreter_DoPrefixWord ( cntx, interp, word ) ;
         else if ( word->WAttribute == WT_C_PREFIX_RTL_ARGS )
         {
-            DEBUG_SETUP ( word ) ;
+            //DEBUG_SETUP ( word ) ;
             LC_CompileRun_C_ArgList ( word ) ;
         }
         else _Interpreter_DoWord_Default ( interp, word, tsrli, scwi ) ; //  case WT_POSTFIX: case WT_INFIXABLE: // cf. also _Interpreter_SetupFor_MorphismWord

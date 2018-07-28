@@ -113,7 +113,7 @@ CfrTil_WhileCombinator ( )
         CfrTil_BeginCombinator ( 2 ) ;
         byte * start = Here ;
         compiler->ContinuePoint = Here ;
-        d0 ( if ( Is_DebugModeOn ) _Compiler_Show_WordList ( ( byte* ) "\nCheckOptimize : after optimize :", 0 ) ) ;
+        d0 ( if ( Is_DebugModeOn ) Compiler_SC_WordList_Show (( byte* ) "\nCheckOptimize : after optimize :", 0 , 0) ) ;
         Block_CopyCompile ( ( byte* ) testBlock, 1, 1 ) ;
         Block_CopyCompile ( ( byte* ) trueBlock, 0, 0 ) ;
         _Compile_JumpToAddress ( start ) ;
@@ -331,7 +331,7 @@ CfrTil_ForCombinator ( )
 
         Block_CopyCompile ( ( byte* ) doBlock, 0, 0 ) ;
 
-        d0 ( _Compiler_Show_WordList ( ( byte* ) "for combinator : before doPostBlock", 0 ) ) ;
+        d0 ( Compiler_SC_WordList_Show (( byte* ) "for combinator : before doPostBlock", 0 , 0) ) ;
         Block_CopyCompile ( ( byte* ) doPostBlock, 1, 0 ) ;
 
         _Compile_JumpToAddress ( start ) ;

@@ -60,7 +60,7 @@ Debugger_TableSetup ( Debugger * debugger )
     debugger->CharacterFunctionTable [ 5 ] = Debugger_Info ;
     debugger->CharacterFunctionTable [ 6 ] = Debugger_DoMenu ;
     debugger->CharacterFunctionTable [ 7 ] = Debugger_Stack ;
-    debugger->CharacterFunctionTable [ 8 ] = Debugger_DWL_ShowList ;
+    //debugger->CharacterFunctionTable [ 8 ] = Debugger_DWL_ShowList ;
     debugger->CharacterFunctionTable [ 9 ] = Debugger_Source ;
     debugger->CharacterFunctionTable [ 10 ] = Debugger_Registers ;
     debugger->CharacterFunctionTable [ 11 ] = Debugger_Continue ;
@@ -83,8 +83,8 @@ Debugger_TableSetup ( Debugger * debugger )
     debugger->CharacterFunctionTable [ 28 ] = Debugger_DisassembleTotalAccumulated ;
     debugger->CharacterFunctionTable [ 29 ] = Debugger_Using ;
     debugger->CharacterFunctionTable [ 30 ] = Debugger_ReturnStack ;
-    debugger->CharacterFunctionTable [ 31 ] = DebugWordList_ShowAll ;
-    debugger->CharacterFunctionTable [ 32 ] = Debugger_Show_InUse_CompilerWordList ;
+    debugger->CharacterFunctionTable [ 31 ] = DebugWordList_Show_All ;
+    debugger->CharacterFunctionTable [ 32 ] = DebugWordList_Show_InUse ;
     debugger->CharacterFunctionTable [ 33 ] = Debugger_CfrTilRegisters ;
     debugger->CharacterFunctionTable [ 34 ] = Debugger_GotoList_Print ;
 }
@@ -102,6 +102,7 @@ _Debugger_InterpreterLoop ( Debugger * debugger )
             if ( debugger->Key != 'z' ) debugger->SaveKey = debugger->Key ;
         }
         SetState ( _Debugger_, DBG_AUTO_MODE_ONCE, false ) ;
+        //d1 ( if ( Is_DebugOn ) DebugWordList_Show_All ( _Debugger_ ) ) ;
         debugger->CharacterFunctionTable [ debugger->CharacterTable [ debugger->Key ] ] ( debugger ) ;
     }
     while ( GetState ( debugger, DBG_STEPPING ) || ( ! GetState ( debugger, DBG_INTERPRET_LOOP_DONE ) ) ||
@@ -325,12 +326,6 @@ _Debugger_PrintDataStack ( int64 depth )
     Set_DataStackPointer_FromDspReg ( ) ;
     _Stack_Print ( _DataStack_, ( byte* ) "DataStack", depth ) ;
     //if (depth < Stack_Depth (_DataStack_) ) _Printf ( ( byte* ) "\t\t    ........." ) ;
-}
-
-void
-Debugger_DWL_ShowList ( Debugger * debugger )
-{
-    DWL_ShowList ( debugger->w_Word, 0 ) ;
 }
 
 void

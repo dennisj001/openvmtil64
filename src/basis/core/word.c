@@ -3,14 +3,18 @@
 void
 Word_SetCoding ( Word * word, byte * address )
 {
-    //if ( ( word->CAttribute2 & ( SYNTACTIC | NO_OP_WORD | NO_CODING ) ) || ( word->CAttribute & ( DEBUG_WORD ) ) || ( word->LAttribute & ( W_COMMENT | W_PREPROCESSOR ) ) ) word->Coding = 0 ;
-    //if ( ( word->CAttribute2 & ( NO_OP_WORD | NO_CODING ) ) || ( word->CAttribute & ( DEBUG_WORD ) ) || ( word->LAttribute & ( W_COMMENT | W_PREPROCESSOR ) ) ) word->Coding = 0 ; //
-    //else 
+    word->Coding = address ;
+}
+
+void
+WordList_SetCoding ( int64 index, byte * address )
+{
+    Word * word = WordStack ( index ) ;
     word->Coding = address ;
 }
 
 //block CurrentDefinition ;
-
+#if 0
 void
 _Word_Run ( Word * word )
 {
@@ -18,13 +22,13 @@ _Word_Run ( Word * word )
     {
         word->StackPushRegisterCode = 0 ; // nb. used! by the rewriting optInfo
         // keep track in the word itself where the machine code is to go, if this word is compiled or causes compiling code - used for optimization
-        Word_SetCoding ( word, Here ) ;
+        Word_SetCoding ( word, Here ) ; // if we change it later (eg. in lambda calculus) we must change it there because the rest of the compiler depends on this
         word->W_InitialRuntimeDsp = _Dsp_ ;
         _Context_->CurrentlyRunningWord = word ;
         Block_Eval ( word->Definition ) ;
     }
 }
-
+#else
 void
 Word_Run ( Word * word )
 {
@@ -34,13 +38,14 @@ Word_Run ( Word * word )
         {
             word->StackPushRegisterCode = 0 ; // nb. used! by the rewriting optInfo
             // keep track in the word itself where the machine code is to go, if this word is compiled or causes compiling code - used for optimization
-            Word_SetCoding ( word, Here ) ;
+            Word_SetCoding ( word, Here ) ; // if we change it later (eg. in lambda calculus) we must change it there because the rest of the compiler depends on this
             word->W_InitialRuntimeDsp = _Dsp_ ;
             _Context_->CurrentlyRunningWord = word ;
             Block_Eval ( word->Definition ) ;
         }
     }
 }
+#endif
 
 void
 Word_Eval ( Word * word )
@@ -62,7 +67,6 @@ Word_Eval ( Word * word )
         }
         SetState ( word, STEPPED, false ) ;
         DEBUG_SHOW ;
-        //word->W_SC_WordIndex = 0 ; // clear for next word usage
     }
 }
 
@@ -120,7 +124,6 @@ Word_Copy ( Word * word0, uint64 allocType )
 void
 _Word_Finish ( Word * word )
 {
-    //DObject_Finish ( word ) ;
     CfrTil_FinishSourceCode ( _CfrTil_, word ) ;
 }
 

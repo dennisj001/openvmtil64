@@ -424,8 +424,8 @@ Lexer_Default ( Lexer * lexer )
         }
         else
         {
+            lexer->CurrentReadIndex ++ ;
             Lexer_RestartToken ( lexer ) ; //prevent null token which complicates lexers
-
             return ;
         }
     }
