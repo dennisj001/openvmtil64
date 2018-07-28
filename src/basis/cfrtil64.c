@@ -108,7 +108,7 @@ CfrTil_WordList_RecycleInit ( CfrTil * cfrtil, Word * word, Boolean recycle, Boo
         //Word_Set_SCA ( svWord ) ;
     }
 }
-
+#if 0
 void
 _CfrTil_Init_Recycling_SourceCodeWordList ( CfrTil * cfrtil, Word * word )
 {
@@ -131,6 +131,7 @@ _CfrTil_Init_Recycling_SourceCodeWordList ( CfrTil * cfrtil, Word * word )
         List_Init ( cfrtil->CompilerWordList ) ;
     }
 }
+#endif
 
 void
 _CfrTil_CpuState_CheckSave ( )
