@@ -244,7 +244,7 @@ Compiler_Optimizer_2Args_Or_WordArg1_Op ( Compiler * compiler )
             if ( optInfo->wordArg1->StackPushRegisterCode )
             {
                 _SetHere_To_Word_StackPushRegisterCode ( optInfo->wordArg1 ) ;
-#if 0                
+#if 1                
                 d1 ( if ( Is_DebugOn ) DebugWordList_Show_All ( _Debugger_ ) ) ;
                 Word_Clear_PreviousUseOf_A_SCA ( optInfo->wordArg1 ) ;
                 d1 ( if ( Is_DebugOn ) DebugWordList_Show_All ( _Debugger_ ) ) ;

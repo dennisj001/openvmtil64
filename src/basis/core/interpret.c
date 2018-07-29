@@ -54,8 +54,8 @@ _Interpreter_DoWord ( Interpreter * interp, Word * word, int64 tsrli, int64 scwi
     if ( word )
     {
         Context * cntx = _Context_ ;
-        word->W_RL_Index = tsrli = ( tsrli != - 1 ) ? tsrli : _Lexer_->TokenStart_ReadLineIndex ;
-        word->W_SC_Index = scwi = ( scwi != - 1 ) ? scwi : _Lexer_->SC_Index ;
+        //word->W_RL_Index = tsrli = ( tsrli != - 1 ) ? tsrli : _Lexer_->TokenStart_ReadLineIndex ;
+        //word->W_SC_Index = scwi = ( scwi != - 1 ) ? scwi : _Lexer_->SC_Index ;
         interp->w_Word = word ;
         if ( ( word->WAttribute == WT_INFIXABLE ) && ( GetState ( cntx, INFIX_MODE ) ) ) // nb. Interpreter must be in INFIX_MODE because it is effective for more than one word
         {
@@ -80,6 +80,8 @@ _Interpreter_DoWord ( Interpreter * interp, Word * word, int64 tsrli, int64 scwi
         else if ( word->WAttribute == WT_C_PREFIX_RTL_ARGS )
         {
             //DEBUG_SETUP ( word ) ;
+            word->W_RL_Index = tsrli = ( tsrli != - 1 ) ? tsrli : _Lexer_->TokenStart_ReadLineIndex ;
+            word->W_SC_Index = scwi = ( scwi != - 1 ) ? scwi : _Lexer_->SC_Index ;
             LC_CompileRun_C_ArgList ( word ) ;
         }
         else _Interpreter_DoWord_Default ( interp, word, tsrli, scwi ) ; //  case WT_POSTFIX: case WT_INFIXABLE: // cf. also _Interpreter_SetupFor_MorphismWord

@@ -466,7 +466,7 @@ _AtCommandLine ( )
 Boolean
 AtCommandLine ( ReadLiner *rl )
 {
-    ( ( GetState ( _Debugger_, DBG_COMMAND_LINE ) || GetState ( _Context_, AT_COMMAND_LINE ) ) ||
+    return ( ( GetState ( _Debugger_, DBG_COMMAND_LINE ) || GetState ( _Context_, AT_COMMAND_LINE ) ) ||
         ( GetState ( rl, CHAR_ECHO ) && ( _AtCommandLine ( ) ) ) ) ;
 }
 

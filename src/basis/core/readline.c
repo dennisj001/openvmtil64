@@ -466,6 +466,78 @@ ReadLine_IsReverseTokenQualifiedID ( ReadLiner * rl )
     String_IsReverseTokenQualifiedID ( rl->InputLine, rl->ReadIndex ) ; //int64 pos ) ;
 }
 
+void
+Readline_Setup_OneStringInterpret ( ReadLiner * rl, byte * str )
+{
+    rl->ReadIndex = 0 ;
+    SetState ( rl, STRING_MODE, true ) ;
+    ReadLine_SetInputLine ( rl, str ) ;
+}
+
+void
+Readline_SaveInputLine ( ReadLiner * rl )
+{
+    byte * svLine = Buffer_Data ( _CfrTil_->InputLineB ) ;
+    strcpy ( ( char* ) svLine, ( char* ) rl->InputLine ) ;
+}
+
+void
+Readline_RestoreInputLine ( ReadLiner * rl )
+{
+    byte * svLine = Buffer_Data ( _CfrTil_->InputLineB ) ;
+    strcpy ( ( char* ) rl->InputLine, ( char* ) svLine ) ;
+}
+
+Boolean
+_Readline_CheckArrayDimensionForVariables ( ReadLiner * rl )
+{
+    byte *p, * ilri = & rl->InputLine [ rl->ReadIndex ], * prb = ( byte* ) strchr ( ( char* ) &rl->InputLine [ rl->ReadIndex ], ']' ) ;
+    if ( prb )
+    {
+        for ( p = ilri ; p != prb ; p ++ ) if ( isalpha ( * p ) ) return true ;
+    }
+    return false ;
+}
+
+Boolean
+_Readline_Is_AtEndOfBlock ( ReadLiner * rl0 )
+{
+    ReadLiner * rl = ReadLine_Copy ( rl0, COMPILER_TEMP ) ;
+    Word * word = CfrTil_WordList ( 0 ) ;
+    int64 iz, ib, index = word->W_RL_Index + Strlen ( word->Name ), sd = _Stack_Depth ( _Context_->Compiler0->BlockStack ) ;
+    byte c ;
+    //if ( GetState ( _Context_, C_SYNTAX ) )
+    {
+        for ( ib = false, iz = false ; 1 ; iz = false )
+        {
+            c = rl->InputLine [ index ++ ] ;
+            if ( ! c )
+            {
+#if 0                
+                if ( iz ) return false ; // two '0' chars in a row returns false 
+                ReadLine_GetLine ( rl ) ;
+                index = 0 ;
+                iz = true ; // z : zero
+                continue ;
+#else
+                return false ;
+#endif                
+            }
+            if ( ( c == ';' ) && ( ! GetState ( _Context_, C_SYNTAX ) ) ) return true ;
+            if ( c == '}' )
+            {
+                if ( -- sd <= 1 ) return true ;
+                ib = 1 ; // b : bracket
+                continue ;
+            }
+
+            if ( ( c == '/' ) && ( rl->InputLine [ index ] == '/' ) ) CfrTil_CommentToEndOfLine ( ) ;
+            else if ( ib && ( c > ' ' ) && ( c != ';' ) ) return false ;
+        }
+    }
+    return false ;
+}
+
 byte
 _ReadLine_Key ( ReadLiner * rl, byte c )
 {
@@ -554,7 +626,7 @@ _ReadLine_GetLine ( ReadLiner * rl, byte c )
         if ( ! c ) ReadLine_Key ( rl ) ;
         else _ReadLine_Key ( rl, c ), c = 0 ;
 
-        if ( _AtCommandLine () ) _ReadLine_TabCompletion_Check ( rl ) ;
+        if ( AtCommandLine (rl) ) _ReadLine_TabCompletion_Check ( rl ) ;
         _CfrTil_->ReadLine_FunctionTable [ _CfrTil_->ReadLine_CharacterTable [ rl->InputKeyedCharacter ] ] ( rl ) ;
         SetState ( rl, ANSI_ESCAPE, false ) ;
     }
@@ -583,77 +655,4 @@ ReadLine_NextChar ( ReadLiner * rl )
     nchar = _ReadLine_GetNextChar ( rl ) ;
     return nchar ;
 }
-
-void
-Readline_Setup_OneStringInterpret ( ReadLiner * rl, byte * str )
-{
-    rl->ReadIndex = 0 ;
-    SetState ( rl, STRING_MODE, true ) ;
-    ReadLine_SetInputLine ( rl, str ) ;
-}
-
-void
-Readline_SaveInputLine ( ReadLiner * rl )
-{
-    byte * svLine = Buffer_Data ( _CfrTil_->InputLineB ) ;
-    strcpy ( ( char* ) svLine, ( char* ) rl->InputLine ) ;
-}
-
-void
-Readline_RestoreInputLine ( ReadLiner * rl )
-{
-    byte * svLine = Buffer_Data ( _CfrTil_->InputLineB ) ;
-    strcpy ( ( char* ) rl->InputLine, ( char* ) svLine ) ;
-}
-
-int64
-_Readline_CheckArrayDimensionForVariables ( ReadLiner * rl )
-{
-    byte *p, * ilri = & rl->InputLine [ rl->ReadIndex ], * prb = ( byte* ) strchr ( ( char* ) &rl->InputLine [ rl->ReadIndex ], ']' ) ;
-    if ( prb )
-    {
-        for ( p = ilri ; p != prb ; p ++ ) if ( isalpha ( * p ) ) return true ;
-    }
-    return false ;
-}
-
-int64
-_Readline_Is_AtEndOfBlock ( ReadLiner * rl0 )
-{
-    ReadLiner * rl = ReadLine_Copy ( rl0, COMPILER_TEMP ) ;
-    Word * word = CfrTil_WordList ( 0 ) ;
-    int64 iz, ib, index = word->W_RL_Index + Strlen ( word->Name ), sd = _Stack_Depth ( _Context_->Compiler0->BlockStack ) ;
-    byte c ;
-    //if ( GetState ( _Context_, C_SYNTAX ) )
-    {
-        for ( ib = false, iz = false ; 1 ; iz = false )
-        {
-            c = rl->InputLine [ index ++ ] ;
-            if ( ! c )
-            {
-#if 0                
-                if ( iz ) return false ; // two '0' chars in a row returns false 
-                ReadLine_GetLine ( rl ) ;
-                index = 0 ;
-                iz = true ; // z : zero
-                continue ;
-#else
-                return false ;
-#endif                
-            }
-            if ( ( c == ';' ) && ( ! GetState ( _Context_, C_SYNTAX ) ) ) return true ;
-            if ( c == '}' )
-            {
-                if ( -- sd <= 1 ) return true ;
-                ib = 1 ; // b : bracket
-                continue ;
-            }
-
-            if ( ( c == '/' ) && ( rl->InputLine [ index ] == '/' ) ) CfrTil_CommentToEndOfLine ( ) ;
-            else if ( ib && ( c > ' ' ) && ( c != ';' ) ) return false ;
-        }
-    }
-    return false ;
-}
-
 
