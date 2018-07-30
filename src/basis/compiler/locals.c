@@ -31,6 +31,27 @@
  */
 
 void
+Compile_InitRegisterParamenterVariables ( Compiler * compiler )
+{
+    dllist * list = compiler->RegisterParameterList ;
+    dlnode * node ;
+    for ( node = dllist_First ( ( dllist* ) list ) ; node ; node = dlnode_Next ( node ) )
+    {
+        Word * word = ( Word* ) dobject_Get_M_Slot ( node, SCN_WORD ) ;
+        if ( compiler->NumberOfLocals + compiler->NumberOfArgs )
+        {
+            _Compile_Move_StackN_To_Reg ( word->RegToUse, FP, LocalParameterVarOffset ( word ) ) ;
+            compiler->NumberOfArgs ++ ;
+        }
+        else
+        {
+            _Compile_Move_StackN_To_Reg ( word->RegToUse, DSP, - ( compiler->NumberOfLocals + word->Index ) ) ;
+
+        }
+    }
+}
+
+void
 _Compiler_AddLocalFrame ( Compiler * compiler )
 {
     _Compile_Move_Reg_To_StackN ( DSP, 1, FP ) ; // save pre fp
@@ -43,10 +64,9 @@ _Compiler_AddLocalFrame ( Compiler * compiler )
 void
 Compiler_SetLocalsFrameSize_AtItsCellOffset ( Compiler * compiler )
 {
-    //if ( IsSourceCodeOn ) compiler->NumberOfLocals ++ ; // interesting idea but not fully working yet
-    int64 size = compiler->NumberOfLocals - compiler->NumberOfRegisterVariables ;
+    int64 size = compiler->NumberOfLocals + compiler->NumberOfRegisterLocals ;
     int64 fsize = compiler->LocalsFrameSize = ( ( ( size < 0 ? 0 : size ) + 1 ) * CELL ) ; //1 : the frame pointer 
-    if ( fsize ) *( ( int32* ) ( compiler->FrameSizeCellOffset ) ) = compiler->LocalsFrameSize ; //+ ( IsSourceCodeOn ? 8 : 0 ) ;
+    if ( fsize ) *( ( int32* ) ( compiler->FrameSizeCellOffset ) ) = fsize ; //compiler->LocalsFrameSize ; //+ ( IsSourceCodeOn ? 8 : 0 ) ;
 }
 
 void
@@ -54,7 +74,7 @@ _Compiler_RemoveLocalFrame ( Compiler * compiler )
 {
     int64 parameterVarsSubAmount ;
     Boolean returnValueFlag ;
-    Set_SCA ( 0 ) ;
+    WordStack_SCHCPUSCA ( 0, 1 ) ;
     Compiler_SetLocalsFrameSize_AtItsCellOffset ( compiler ) ;
     parameterVarsSubAmount = ( ( compiler->NumberOfArgs ) * CELL ) ;
     //parameterVarsSubAmount = ( ( compiler->NumberOfArgs + ( IsSourceCodeOn ? 1 : 0 ) ) * CELL ) ;

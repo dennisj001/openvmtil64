@@ -2,94 +2,6 @@
 #include "../include/cfrtil64.h"
 
 void
-Debugger_TableSetup ( Debugger * debugger )
-{
-    int64 i ;
-    for ( i = 0 ; i < 128 ; i ++ ) debugger->CharacterTable [ i ] = 0 ;
-    debugger->CharacterTable [ 0 ] = 0 ;
-    debugger->CharacterTable [ 'o' ] = 1 ;
-    debugger->CharacterTable [ 'i' ] = 1 ;
-    debugger->CharacterTable [ 'u' ] = 1 ;
-    debugger->CharacterTable [ 's' ] = 1 ;
-    debugger->CharacterTable [ 'h' ] = 1 ;
-    debugger->CharacterTable [ 'e' ] = 2 ;
-    debugger->CharacterTable [ 'w' ] = 3 ;
-    debugger->CharacterTable [ 'd' ] = 4 ;
-    debugger->CharacterTable [ 'I' ] = 5 ;
-    debugger->CharacterTable [ 'm' ] = 6 ;
-    debugger->CharacterTable [ 'T' ] = 7 ;
-    debugger->CharacterTable [ 't' ] = 7 ;
-    debugger->CharacterTable [ 'Z' ] = 8 ;
-    debugger->CharacterTable [ 'U' ] = 9 ;
-    //debugger->CharacterTable [ 'V' ] = 8 ;
-    debugger->CharacterTable [ 'r' ] = 10 ;
-    debugger->CharacterTable [ 'g' ] = 10 ;
-    debugger->CharacterTable [ 'c' ] = 11 ;
-    debugger->CharacterTable [ ' ' ] = 11 ;
-    debugger->CharacterTable [ 'q' ] = 12 ;
-    debugger->CharacterTable [ 'f' ] = 14 ;
-    debugger->CharacterTable [ '\\'] = 15 ;
-    debugger->CharacterTable [ '\n' ] = 15 ;
-    debugger->CharacterTable [ 27 ] = 15 ;
-    debugger->CharacterTable [ 'G' ] = 16 ;
-    debugger->CharacterTable [ 'n' ] = 17 ;
-    debugger->CharacterTable [ 'p' ] = 18 ;
-    debugger->CharacterTable [ 'a' ] = 20 ;
-    debugger->CharacterTable [ 'z' ] = 21 ;
-    debugger->CharacterTable [ 'w' ] = 22 ;
-    debugger->CharacterTable [ 'B' ] = 23 ;
-    debugger->CharacterTable [ 'P' ] = 24 ;
-    debugger->CharacterTable [ 'l' ] = 25 ;
-    debugger->CharacterTable [ 'v' ] = 26 ;
-    debugger->CharacterTable [ 'S' ] = 27 ;
-    debugger->CharacterTable [ 'A' ] = 28 ;
-    debugger->CharacterTable [ 'N' ] = 29 ;
-    debugger->CharacterTable [ 'R' ] = 30 ;
-    debugger->CharacterTable [ 'H' ] = 31 ;
-    debugger->CharacterTable [ 'O' ] = 32 ;
-    debugger->CharacterTable [ 'Q' ] = 33 ;
-    debugger->CharacterTable [ 'L' ] = 34 ;
-
-    // debugger : system related
-    debugger->CharacterFunctionTable [ 0 ] = Debugger_Default ;
-    debugger->CharacterFunctionTable [ 1 ] = Debugger_Step ;
-    debugger->CharacterFunctionTable [ 2 ] = Debugger_Eval ;
-
-    // debugger internal
-    debugger->CharacterFunctionTable [ 4 ] = Debugger_Dis ;
-    debugger->CharacterFunctionTable [ 5 ] = Debugger_Info ;
-    debugger->CharacterFunctionTable [ 6 ] = Debugger_DoMenu ;
-    debugger->CharacterFunctionTable [ 7 ] = Debugger_Stack ;
-    //debugger->CharacterFunctionTable [ 8 ] = Debugger_DWL_ShowList ;
-    debugger->CharacterFunctionTable [ 9 ] = Debugger_Source ;
-    debugger->CharacterFunctionTable [ 10 ] = Debugger_Registers ;
-    debugger->CharacterFunctionTable [ 11 ] = Debugger_Continue ;
-    debugger->CharacterFunctionTable [ 12 ] = Debugger_Quit ;
-    debugger->CharacterFunctionTable [ 13 ] = Debugger_Parse ;
-    debugger->CharacterFunctionTable [ 14 ] = Debugger_FindAny ;
-    debugger->CharacterFunctionTable [ 15 ] = Debugger_Escape ;
-    debugger->CharacterFunctionTable [ 16 ] = Debugger_OptimizeToggle ;
-    debugger->CharacterFunctionTable [ 17 ] = Debugger_CodePointerUpdate ;
-    debugger->CharacterFunctionTable [ 18 ] = Debugger_Dump ;
-    //debugger->CharacterFunctionTable [ 19 ] = Debugger_ConsiderAndShowWord ; // fix me
-    debugger->CharacterFunctionTable [ 20 ] = Debugger_DisassembleAccumulated ;
-    debugger->CharacterFunctionTable [ 21 ] = Debugger_AutoMode ;
-    debugger->CharacterFunctionTable [ 22 ] = Debugger_WDis ;
-    debugger->CharacterFunctionTable [ 23 ] = Debugger_Abort ;
-    debugger->CharacterFunctionTable [ 24 ] = Debugger_Stop ;
-    debugger->CharacterFunctionTable [ 25 ] = Debugger_Locals_Show ;
-    debugger->CharacterFunctionTable [ 26 ] = Debugger_Variables ;
-    debugger->CharacterFunctionTable [ 27 ] = _Debugger_State ;
-    debugger->CharacterFunctionTable [ 28 ] = Debugger_DisassembleTotalAccumulated ;
-    debugger->CharacterFunctionTable [ 29 ] = Debugger_Using ;
-    debugger->CharacterFunctionTable [ 30 ] = Debugger_ReturnStack ;
-    debugger->CharacterFunctionTable [ 31 ] = DebugWordList_Show_All ;
-    debugger->CharacterFunctionTable [ 32 ] = DebugWordList_Show_InUse ;
-    debugger->CharacterFunctionTable [ 33 ] = Debugger_CfrTilRegisters ;
-    debugger->CharacterFunctionTable [ 34 ] = Debugger_GotoList_Print ;
-}
-
-void
 _Debugger_InterpreterLoop ( Debugger * debugger )
 {
     Set_DataStackPointer_FromDspReg ( ) ;
@@ -102,18 +14,15 @@ _Debugger_InterpreterLoop ( Debugger * debugger )
             if ( debugger->Key != 'z' ) debugger->SaveKey = debugger->Key ;
         }
         SetState ( _Debugger_, DBG_AUTO_MODE_ONCE, false ) ;
-        //d1 ( if ( Is_DebugOn ) DebugWordList_Show_All ( _Debugger_ ) ) ;
         debugger->CharacterFunctionTable [ debugger->CharacterTable [ debugger->Key ] ] ( debugger ) ;
     }
     while ( GetState ( debugger, DBG_STEPPING ) || ( ! GetState ( debugger, DBG_INTERPRET_LOOP_DONE ) ) ||
         ( ( GetState ( debugger, DBG_AUTO_MODE ) ) && ( ! ( GetState ( debugger, DBG_EVAL_AUTO_MODE ) ) ) ) ) ;
     SetState ( debugger, DBG_STACK_OLD, true ) ;
-    //SetState ( debugger, DBG_BRK_INIT, false ) ;
     if ( GetState ( debugger, DBG_STEPPED ) )
     {
         if ( debugger->w_Word ) SetState ( debugger->w_Word, STEPPED, true ) ;
     }
-    //_Set_DspReg_FromDataStackPointer ( ) ;
 }
 
 void
@@ -126,8 +35,7 @@ _Debugger_PreSetup ( Debugger * debugger, Word * word, int8 forceFlag )
             if ( ! word ) word = _Context_->CurrentlyRunningWord ;
             if ( word && ( ! word->W_OriginalWord ) ) word->W_OriginalWord = word ;
             debugger->w_Word = word ;
-            //if ( word && word->Name[0] && ( forceFlag || ( _ReadLiner_->ReadIndex != debugger->ReadIndex ) ) ) //(! debugger->LastSetupWord) || ( word->W_TokenStart_ReadLineIndex != debugger->LastSetupWord->W_TokenStart_ReadLineIndex ) ) )
-            if ( word && word->Name[0] ) // && ( forceFlag || ( _ReadLiner_->ReadIndex != debugger->ReadIndex ) ) ) //(! debugger->LastSetupWord) || ( word->W_TokenStart_ReadLineIndex != debugger->LastSetupWord->W_TokenStart_ReadLineIndex ) ) )
+            if ( word && word->Name[0] ) 
             {
                 if ( forceFlag ) debugger->LastShowWord = 0 ;
                 if ( ! word->Name ) word->Name = ( byte* ) "" ;
@@ -218,7 +126,6 @@ _Debugger_Init ( Debugger * debugger, Word * word, byte * address )
     {
         // remember : _Compile_CpuState_Save ( _Debugger_->cs_Cpu ) ; is called thru _Compile_Debug : <dbg>
         debugger->DebugAddress = debugger->w_Word ? debugger->w_Word->Coding + 3 : ( byte* ) debugger->cs_Cpu->Rsp[1] ;
-        //debugger->DebugAddress = ( byte* ) debugger->cs_Cpu->Rsp[0] ; // 0 is <dbg>
         if ( debugger->DebugAddress && ( ! word ) )
         {
             byte * da ;
@@ -379,24 +286,13 @@ Debugger_DoMenu ( Debugger * debugger )
 void
 Debugger_Stack ( Debugger * debugger )
 {
-    //_CfrTil_SyncStackPointers_FromRegs ( _CfrTil_ ) ;
     if ( GetState ( debugger, DBG_STEPPING ) && GetState ( debugger->cs_Cpu, CPU_SAVED ) )
     {
-        //Debugger_SyncStackPointersFromCpuState ( debugger ) ;
         _Debugger_PrintDataStack ( Stack_Depth ( _DataStack_ ) ) ; // stack has been adjusted 
         _Printf ( ( byte* ) "\n" ) ;
         SetState ( debugger, DBG_INFO, true ) ;
     }
     else _Debugger_PrintDataStack ( Stack_Depth ( _DataStack_ ) ) ;
-    //if ( GetState ( debugger, DBG_STEPPING ) ) SetState ( debugger, DBG_START_STEPPING, true ) ;
-#if 0    
-    if ( GetState ( debugger, DBG_STEPPING ) )
-    {
-        _Printf ( ( byte* ) "Next stepping instruction ..." ) ;
-        Debugger_UdisOneInstruction ( debugger, debugger->DebugAddress, ( byte* ) "\r", ( byte* ) "" ) ;
-    }
-    else if ( _Context_->ReadLiner0->OutputLineCharacterNumber ) _Printf ( "\n" ) ;
-#endif    
 }
 
 void
@@ -427,7 +323,6 @@ _Debugger_CpuState_CheckSave ( Debugger * debugger )
     {
         debugger->SaveCpuState ( ) ;
         SetState ( debugger->cs_Cpu, CPU_SAVED, true ) ;
-        //SetState ( debugger, DBG_REGS_SAVED, true ) ;
     }
 }
 
@@ -442,7 +337,6 @@ void
 Debugger_Registers ( Debugger * debugger )
 {
     Debugger_CpuState_CheckSaveShow ( debugger ) ;
-    //Debugger_UdisOneInstruction ( debugger, debugger->DebugAddress, ( byte* ) "\r\r", ( byte* ) "" ) ; // current insn
 }
 
 void
@@ -459,17 +353,14 @@ Debugger_Continue ( Debugger * debugger )
     {
         debugger->Key = debugger->SaveKey ;
         // continue stepping thru
-        //SetState ( debugger, DBG_CONTINUE_MODE | DBG_AUTO_MODE, true ) ;
         SetState ( debugger, DBG_AUTO_MODE, true ) ;
         while ( debugger->DebugAddress )
         {
             Debugger_Step ( debugger ) ;
-            //Debugger_ShowInfo ( debugger, GetState ( debugger, DBG_RUNTIME ) ? ( byte* ) "<dbg>" : ( byte* ) "dbg", 0 ) ;
         }
         SetState_TrueFalse ( debugger, DBG_STEPPED, DBG_STEPPING ) ;
         SetState ( debugger, DBG_INTERPRET_LOOP_DONE, true ) ;
         SetState ( debugger, DBG_AUTO_MODE | DBG_CONTINUE_MODE, false ) ;
-        //Debugger_Off ( debugger, 0 ) ;
     }
     else if ( debugger->w_Word )
     {
@@ -530,7 +421,6 @@ Debugger_Escape ( Debugger * debugger )
     Set_CompileMode ( false ) ;
     byte * lexerTokenBuffer = _Buffer_New_pbyte ( BUFFER_SIZE, N_UNLOCKED ) ;
     strcpy ( lexerTokenBuffer, _CfrTil_->TokenBuffer ) ;
-    //_Printf ( "\n" ) ;
 
     Debugger_InterpretLine ( ) ;
 
@@ -544,15 +434,6 @@ Debugger_Escape ( Debugger * debugger )
     _Context_->System0->State = saveSystemState ;
     SetState_TrueFalse ( debugger, DBG_ACTIVE | DBG_INFO, DBG_STEPPED | DBG_AUTO_MODE | DBG_AUTO_MODE_ONCE | DBG_INTERPRET_LOOP_DONE | DBG_COMMAND_LINE | DBG_ESCAPED ) ;
     if ( GetState ( debugger, DBG_STEPPING ) ) SetState ( debugger, DBG_START_STEPPING, true ) ;
-
-#if 0    
-    if ( GetState ( debugger, DBG_STEPPING ) )
-    {
-        _Printf ( ( byte* ) "Next stepping instruction ..." ) ;
-        Debugger_UdisOneInstruction ( debugger, debugger->DebugAddress, ( byte* ) "\r", ( byte* ) "" ) ;
-    }
-    else if ( _Context_->ReadLiner0->OutputLineCharacterNumber ) _Printf ( "\n" ) ;
-#endif    
 }
 
 void
@@ -622,13 +503,11 @@ Debugger_Default ( Debugger * debugger )
     {
         _Printf ( ( byte* ) "\ndbg :> <%d> <: is not an assigned key code", debugger->Key ) ;
     }
-    //SetState ( debugger, DBG_MENU | DBG_PROMPT | DBG_NEWLINE, true ) ;
 }
 
 void
 _Debugger_State ( Debugger * debugger )
 {
-
     byte * buf = Buffer_Data ( _CfrTil_->DebugB2 ) ;
     _CfrTil_GetSystemState_String0 ( buf ) ;
     _Printf ( ( byte* ) buf ) ;
@@ -637,7 +516,6 @@ _Debugger_State ( Debugger * debugger )
 void
 _Debugger_Copy ( Debugger * debugger, Debugger * debugger0 )
 {
-
     memcpy ( debugger, debugger0, sizeof (Debugger ) ) ;
 }
 
@@ -646,50 +524,14 @@ Debugger_Copy ( Debugger * debugger0, uint64 type )
 {
     Debugger * debugger = ( Debugger * ) Mem_Allocate ( sizeof (Debugger ), type ) ;
     _Debugger_Copy ( debugger, debugger0 ) ;
-
     return debugger ;
 }
 
 void
 Debugger_Delete ( Debugger * debugger )
 {
-
     Mem_FreeItem ( &_Q_->PermanentMemList, ( byte* ) debugger ) ;
 }
-
-void
-CpuState_AdjustRdi ( Cpu * cpu, uint64 * dsp, Word * word )
-{
-    if ( GetState ( cpu, CPU_SAVED ) )
-    {
-        if ( word ) dsp = word->W_InitialRuntimeDsp ;
-        if ( dsp ) cpu->Rsi = dsp ;
-        if ( cpu->Rsi )
-        {
-            cpu->Rdi = cpu->Rsi + 1 ;
-            *( cpu->Rdi ) = ( uint64 ) cpu->Rsi ;
-        }
-    }
-}
-
-void
-Debugger_AdjustRdi ( Debugger * debugger, uint64* dsp, Word * word )
-{
-    CpuState_AdjustRdi ( debugger->cs_Cpu, dsp, word ) ;
-}
-
-// nb! _Debugger_New needs this distinction for memory accounting 
-#if 0
-
-ByteArray *
-Debugger_ByteArray_AllocateNew ( int64 size, uint64 type )
-{
-    ByteArray * ba = ( ByteArray* ) Mem_Allocate ( size + sizeof ( ByteArray ), type ) ; // nb! _Debugger_New needs this distinction for memory accounting 
-    ByteArray_Init ( ba, size, type ) ;
-    //_ByteArray_DataClear ( ba ) ;
-    return ba ;
-}
-#endif
 
 Debugger *
 _Debugger_New ( uint64 type )
@@ -703,9 +545,7 @@ _Debugger_New ( uint64 type )
     Debugger_TableSetup ( debugger ) ;
     SetState ( debugger, DBG_INTERPRET_LOOP_DONE, true ) ;
     SetState ( debugger, DBG_STEPPING, false ) ;
-    //debugger->WordList = List_New ( ) ;
     Debugger_UdisInit ( debugger ) ;
-    //int64 tw = GetTerminalWidth ( ) ;
     debugger->TerminalLineWidth = 120 ; // (tw > 145) ? tw : 145 ;
 
     return debugger ;
@@ -728,7 +568,6 @@ _CfrTil_Debug_AtAddress ( byte * address )
     }
     else
     {
-
         _CfrTil_DebugContinue ( 1 ) ;
     }
 }
@@ -740,6 +579,94 @@ _CfrTil_DebugContinue ( int64 autoFlagOff )
     {
         if ( autoFlagOff ) SetState ( _Debugger_, DBG_AUTO_MODE, false ) ;
     }
+}
+
+void
+Debugger_TableSetup ( Debugger * debugger )
+{
+    int64 i ;
+    for ( i = 0 ; i < 128 ; i ++ ) debugger->CharacterTable [ i ] = 0 ;
+    debugger->CharacterTable [ 0 ] = 0 ;
+    debugger->CharacterTable [ 'o' ] = 1 ;
+    debugger->CharacterTable [ 'i' ] = 1 ;
+    debugger->CharacterTable [ 'u' ] = 1 ;
+    debugger->CharacterTable [ 's' ] = 1 ;
+    debugger->CharacterTable [ 'h' ] = 1 ;
+    debugger->CharacterTable [ 'e' ] = 2 ;
+    debugger->CharacterTable [ 'w' ] = 3 ;
+    debugger->CharacterTable [ 'd' ] = 4 ;
+    debugger->CharacterTable [ 'I' ] = 5 ;
+    debugger->CharacterTable [ 'm' ] = 6 ;
+    debugger->CharacterTable [ 'T' ] = 7 ;
+    debugger->CharacterTable [ 't' ] = 7 ;
+    debugger->CharacterTable [ 'Z' ] = 8 ;
+    debugger->CharacterTable [ 'U' ] = 9 ;
+    //debugger->CharacterTable [ 'V' ] = 8 ;
+    debugger->CharacterTable [ 'r' ] = 10 ;
+    debugger->CharacterTable [ 'g' ] = 10 ;
+    debugger->CharacterTable [ 'c' ] = 11 ;
+    debugger->CharacterTable [ ' ' ] = 11 ;
+    debugger->CharacterTable [ 'q' ] = 12 ;
+    debugger->CharacterTable [ 'f' ] = 14 ;
+    debugger->CharacterTable [ '\\'] = 15 ;
+    debugger->CharacterTable [ '\n' ] = 15 ;
+    debugger->CharacterTable [ 27 ] = 15 ;
+    debugger->CharacterTable [ 'G' ] = 16 ;
+    debugger->CharacterTable [ 'n' ] = 17 ;
+    debugger->CharacterTable [ 'p' ] = 18 ;
+    debugger->CharacterTable [ 'a' ] = 20 ;
+    debugger->CharacterTable [ 'z' ] = 21 ;
+    debugger->CharacterTable [ 'w' ] = 22 ;
+    debugger->CharacterTable [ 'B' ] = 23 ;
+    debugger->CharacterTable [ 'P' ] = 24 ;
+    debugger->CharacterTable [ 'l' ] = 25 ;
+    debugger->CharacterTable [ 'v' ] = 26 ;
+    debugger->CharacterTable [ 'S' ] = 27 ;
+    debugger->CharacterTable [ 'A' ] = 28 ;
+    debugger->CharacterTable [ 'N' ] = 29 ;
+    debugger->CharacterTable [ 'R' ] = 30 ;
+    debugger->CharacterTable [ 'H' ] = 31 ;
+    debugger->CharacterTable [ 'O' ] = 32 ;
+    debugger->CharacterTable [ 'Q' ] = 33 ;
+    debugger->CharacterTable [ 'L' ] = 34 ;
+
+    // debugger : system related
+    debugger->CharacterFunctionTable [ 0 ] = Debugger_Default ;
+    debugger->CharacterFunctionTable [ 1 ] = Debugger_Step ;
+    debugger->CharacterFunctionTable [ 2 ] = Debugger_Eval ;
+
+    // debugger internal
+    debugger->CharacterFunctionTable [ 4 ] = Debugger_Dis ;
+    debugger->CharacterFunctionTable [ 5 ] = Debugger_Info ;
+    debugger->CharacterFunctionTable [ 6 ] = Debugger_DoMenu ;
+    debugger->CharacterFunctionTable [ 7 ] = Debugger_Stack ;
+    //debugger->CharacterFunctionTable [ 8 ] = Debugger_DWL_ShowList ;
+    debugger->CharacterFunctionTable [ 9 ] = Debugger_Source ;
+    debugger->CharacterFunctionTable [ 10 ] = Debugger_Registers ;
+    debugger->CharacterFunctionTable [ 11 ] = Debugger_Continue ;
+    debugger->CharacterFunctionTable [ 12 ] = Debugger_Quit ;
+    debugger->CharacterFunctionTable [ 13 ] = Debugger_Parse ;
+    debugger->CharacterFunctionTable [ 14 ] = Debugger_FindAny ;
+    debugger->CharacterFunctionTable [ 15 ] = Debugger_Escape ;
+    debugger->CharacterFunctionTable [ 16 ] = Debugger_OptimizeToggle ;
+    debugger->CharacterFunctionTable [ 17 ] = Debugger_CodePointerUpdate ;
+    debugger->CharacterFunctionTable [ 18 ] = Debugger_Dump ;
+    //debugger->CharacterFunctionTable [ 19 ] = Debugger_ConsiderAndShowWord ; // fix me
+    debugger->CharacterFunctionTable [ 20 ] = Debugger_DisassembleAccumulated ;
+    debugger->CharacterFunctionTable [ 21 ] = Debugger_AutoMode ;
+    debugger->CharacterFunctionTable [ 22 ] = Debugger_WDis ;
+    debugger->CharacterFunctionTable [ 23 ] = Debugger_Abort ;
+    debugger->CharacterFunctionTable [ 24 ] = Debugger_Stop ;
+    debugger->CharacterFunctionTable [ 25 ] = Debugger_Locals_Show ;
+    debugger->CharacterFunctionTable [ 26 ] = Debugger_Variables ;
+    debugger->CharacterFunctionTable [ 27 ] = _Debugger_State ;
+    debugger->CharacterFunctionTable [ 28 ] = Debugger_DisassembleTotalAccumulated ;
+    debugger->CharacterFunctionTable [ 29 ] = Debugger_Using ;
+    debugger->CharacterFunctionTable [ 30 ] = Debugger_ReturnStack ;
+    debugger->CharacterFunctionTable [ 31 ] = DebugWordList_Show_All ;
+    debugger->CharacterFunctionTable [ 32 ] = DebugWordList_Show_InUse ;
+    debugger->CharacterFunctionTable [ 33 ] = Debugger_CfrTilRegisters ;
+    debugger->CharacterFunctionTable [ 34 ] = Debugger_GotoList_Print ;
 }
 
 

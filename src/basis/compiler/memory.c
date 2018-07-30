@@ -72,7 +72,7 @@ Compile_Store ( Compiler * compiler, int8 stackReg ) // !
         //DBI_ON ;
         Word * word ;
         d0 ( if ( Is_DebugModeOn ) Compiler_SC_WordList_Show ("\nCompile_Store : not optimized", 0, 0) ) ;
-        if ( ( word = ( Word* ) _CfrTil_WordList (1) ) && word->StackPushRegisterCode ) SetHere ( word->StackPushRegisterCode ) ;
+        if ( ( word = ( Word* ) _CfrTil_WordList (1) ) && word->StackPushRegisterCode ) SetHere (word->StackPushRegisterCode, 1) ;
         else Compile_Move_Rm_To_Reg ( ACC, stackReg, 0 ) ;
         Compile_Move_Rm_To_Reg ( OREG, stackReg, (word && word->StackPushRegisterCode) ? 0 : (- CELL_SIZE) ) ;
         Compile_Move_Reg_To_Rm ( ((word && word->StackPushRegisterCode) ? word->RegToUse : ACC), OREG, 0 ) ;
@@ -91,7 +91,7 @@ Compile_Poke ( Compiler * compiler, int8 stackReg ) // =
     if ( optFlag & OPTIMIZE_DONE ) return ;
     else if ( optFlag )
     {
-        _Set_SCA ( compiler->OptInfo->opWord ) ;
+        Word_SetCodingHere_And_ClearPreviousUseOf_This_SCA (compiler->OptInfo->opWord, 0) ;
         if ( compiler->OptInfo->OptimizeFlag & OPTIMIZE_IMM )
         {
             // _Compile_MoveImm ( cell direction, cell rm, cell disp, cell imm, cell operandSize )

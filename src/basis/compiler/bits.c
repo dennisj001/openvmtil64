@@ -99,7 +99,7 @@ Compile_X_Shift ( Compiler * compiler, int64 op, Boolean stackFlag, Boolean opEq
         Word *one = ( Word* ) _CfrTil_WordList (1) ; // the operand
         if ( one->CAttribute && LITERAL )
         {
-            SetHere ( one->Coding ) ;
+            SetHere (one->Coding, 1) ;
             //_Compile_MoveImm_To_Reg ( OREG, one->W_Value, 4 ) ;
             //_Compile_Group2 ( int64 mod, int8 regOpCode, int8 rm, int8 sib, int64 disp, int64 imm )
             _Compile_Group2 ( MEM, op, DSP, 0, 0, 0, one->W_Value ) ;
@@ -107,7 +107,7 @@ Compile_X_Shift ( Compiler * compiler, int64 op, Boolean stackFlag, Boolean opEq
         }
         else if ( one->StackPushRegisterCode )
         {
-            SetHere ( one->StackPushRegisterCode ) ; // leave optInfo_0_two value in R8 we don't need to push it
+            SetHere (one->StackPushRegisterCode, 1) ; // leave optInfo_0_two value in R8 we don't need to push it
             Compile_Move_Reg_To_Reg ( OREG, one->RegToUse ) ;
         }
         else

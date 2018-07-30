@@ -22,7 +22,7 @@ _CfrTil_Case ( uint64 allocType )
         Word * literalWord = WordsBack ( 1 ) ;
         if ( ! ( literalWord->CAttribute & LITERAL ) ) CfrTil_Exception (CASE_NOT_LITERAL_ERROR, 0, 1 ) ;
         caseValue = ( int64 ) literalWord->W_Value ;
-        SetHere ( literalWord->Coding ) ;
+        SetHere (literalWord->Coding, 1) ;
         DataStack_DropN ( 1 ) ;
         //Dsp -- ;
     }

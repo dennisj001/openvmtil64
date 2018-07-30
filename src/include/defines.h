@@ -266,7 +266,6 @@
 #define C_PREFIX ( (uint64) 1 << 40 )
 #define ALIAS ( (uint64) 1 << 41 )
 #define DYNAMIC_OBJECT ( (uint64) 1 << 42 )
-#define ADDRESS_OF_OPERATOR 
 #define DOBJECT DYNAMIC_OBJECT
 #define C_PREFIX_RTL_ARGS ( (uint64) 1 << 43 )
 #define KEYWORD ( (uint64) 1 << 44 )
@@ -293,29 +292,30 @@
 #define CATEGORY_OP_OPEQUAL     ( (uint64) 1 << 63 )
 
 // CAttribute2
-#define RAX_RETURN           ( (uint64) 1 << 0 ) 
-#define CATEGORY_SHIFT      ( (uint64) 1 << 1 ) 
-#define SOURCE_CODE_WORD    ( (uint64) 1 << 2 ) 
-#define TEMP_WORD           ( (uint64) 1 << 3 ) 
-#define NO_OP_WORD           ( (uint64) 1 << 4 ) 
-#define SYNTACTIC           ( (uint64) 1 << 5 ) 
-#define NO_CODING           ( (uint64) 1 << 6 ) 
-#define DO_DOES             ( (uint64) 1 << 7 ) 
-#define ARRAY_TYPE          ( (uint64) 1 << 8 ) 
-#define VARIABLE            ( (uint64) 1 << 9 ) 
+#define RAX_RETURN          ( (uint64) 1 <<  0 ) 
+#define CATEGORY_SHIFT      ( (uint64) 1 <<  1 ) 
+#define SOURCE_CODE_WORD    ( (uint64) 1 <<  2 ) 
+#define TEMP_WORD           ( (uint64) 1 <<  3 ) 
+#define NO_OP_WORD          ( (uint64) 1 <<  4 ) 
+#define SYNTACTIC           ( (uint64) 1 <<  5 ) 
+#define NO_CODING           ( (uint64) 1 <<  6 ) 
+#define DO_DOES             ( (uint64) 1 <<  7 ) 
+#define ARRAY_TYPE          ( (uint64) 1 <<  8 ) 
+#define VARIABLE            ( (uint64) 1 <<  9 ) 
 #define LISP_CFRTIL         ( (uint64) 1 << 10 )
 #define LEFT_PAREN          ( (uint64) 1 << 11 )
 #define RIGHT_PAREN         ( (uint64) 1 << 12 )
 #define OP_RAX_PLUS_1ARG    ( (uint64) 1 << 13 )
 #define RT_STEPPING_DEBUG   ( (uint64) 1 << 14 )
 #define ADDRESS_OF_OP       ( (uint64) 1 << 15 )
+#define BLOCK_DELIMITER     ( (uint64) 1 << 16 )
 
 // _CAttribute for interpreter word types - 4 bits/ 16 possibilities : N_WordAttribute bitfield
-#define WT_PREFIX                 1
-#define WT_INFIXABLE              2
-#define WT_C_PREFIX_RTL_ARGS      3
-#define WT_POSTFIX                4
-#define WT_QID                    5
+#define WT_PREFIX                 ( (uint64) 1 <<  0 ) 
+#define WT_INFIXABLE              ( (uint64) 1 <<  1 ) 
+#define WT_C_PREFIX_RTL_ARGS      ( (uint64) 1 <<  2 ) 
+#define WT_POSTFIX                ( (uint64) 1 <<  3 ) 
+#define WT_QID                    ( (uint64) 1 <<  4 ) 
 
 // LType - lisp types
 #define T_LAMBDA ( (uint64) 1 << 11 )

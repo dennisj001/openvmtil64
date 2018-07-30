@@ -827,8 +827,8 @@ _LO_Apply_Arg ( ListObject ** pl1, int64 i )
         Word *baseObject = _Interpreter_->BaseObject ;
         if ( ( word->Name[0] == '\"' ) || ( ! _Lexer_IsTokenForwardDotted ( cntx->Lexer0, l1->W_RL_Index + Strlen ( word->Name ) - 1 ) ) ) // ( word->Name[0] == '\"' ) : sometimes strings have ".[]" chars within but are still just strings
         {
-            if ( word->StackPushRegisterCode ) SetHere ( word->StackPushRegisterCode ) ;
-            else if ( baseObject && baseObject->StackPushRegisterCode ) SetHere ( baseObject->StackPushRegisterCode ) ;
+            if ( word->StackPushRegisterCode ) SetHere (word->StackPushRegisterCode, 1) ;
+            else if ( baseObject && baseObject->StackPushRegisterCode ) SetHere (baseObject->StackPushRegisterCode, 1) ;
             Compile_Move_Reg_To_Reg ( RegOrder ( i ++ ), ACC ) ;
             if ( baseObject ) _Debugger_->PreHere = baseObject->Coding ;
             SetState ( cntx, ADDRESS_OF_MODE, false ) ;
@@ -874,12 +874,12 @@ _LO_Apply_Arg ( ListObject ** pl1, int64 i )
             {
                 if ( ! variableFlag )
                 {
-                    SetHere ( baseObject->Coding ) ;
+                    SetHere (baseObject->Coding, 1) ;
                     _Compile_GetVarLitObj_LValue_To_Reg ( baseObject, ACC ) ;
                     _Word_CompileAndRecord_PushReg ( baseObject, ACC ) ;
                 }
                 if ( Is_DebugModeOn ) Word_PrintOffset ( word, increment, baseObject->AccumulatedOffset ) ;
-                if ( baseObject->StackPushRegisterCode ) SetHere ( baseObject->StackPushRegisterCode ) ;
+                if ( baseObject->StackPushRegisterCode ) SetHere (baseObject->StackPushRegisterCode, 1) ;
                 Compile_Move_Reg_To_Reg ( RegOrder ( i ++ ), ACC ) ;
                 _Debugger_->PreHere = baseObject->Coding ;
                 _DEBUG_SHOW ( baseObject, 1 ) ;
@@ -924,7 +924,7 @@ _LO_Apply_ArgList ( ListObject * l0, Word * word )
         for ( i = 0, l1 = _LO_First ( l0 ) ; l1 ; l1 = LO_Next ( l1 ) ) i = _LO_Apply_Arg ( &l1, i ) ;
         Set_CompileMode ( true ) ;
         _Debugger_->PreHere = Here ;
-        Word_SetCoding ( word, Here ) ;
+        Word_SetCoding (word, Here , 1) ;
         word->W_SC_Index = l0->W_SC_Index ;
         word = Compiler_CopyDuplicatesAndPush ( word ) ;
         cntx->CurrentlyRunningWord = word ;
@@ -932,7 +932,7 @@ _LO_Apply_ArgList ( ListObject * l0, Word * word )
         {
             Compile_MoveImm_To_Reg ( RAX, 0, CELL ) ; // for printf ?? others //System V ABI : "%rax is used to indicate the number of vector arguments passed to a function requiring a variable number of arguments"
         }
-        _Set_SCA ( word ) ;
+        Word_SetCodingHere_And_ClearPreviousUseOf_This_SCA (word, 0) ;
         Word_Eval ( word ) ;
         if ( word->CAttribute2 & RAX_RETURN ) _Word_CompileAndRecord_PushReg ( word, ACC ) ;
         if ( ! svcm )
@@ -1010,7 +1010,7 @@ CompileLispBlock ( ListObject *args, ListObject * body )
     }
     else // nb. LISP_COMPILE_MODE : this state can change with some functions that can't be compiled yet
     {
-        SetHere ( here ) ; //recover the unused code space
+        SetHere (here, 1) ; //recover the unused code space
         code = 0 ;
         word->LAttribute &= ~ T_LISP_COMPILED_WORD ;
         if ( _Q_->Verbosity > 1 )
@@ -1487,7 +1487,7 @@ _LO_CfrTil ( ListObject * lfirst )
     SetState ( compiler, LISP_MODE, false ) ;
     for ( ldata = _LO_Next ( lfirst ) ; ldata ; ldata = _LO_Next ( ldata ) )
     {
-        _Set_SCA ( ldata->CfrTilWord ) ;
+        Word_SetCodingHere_And_ClearPreviousUseOf_This_SCA (ldata->CfrTilWord, 0) ;
         if ( ldata->LAttribute & ( LIST_NODE ) )
         {
             _CfrTil_Parse_LocalsAndStackVariables ( 1, 1, ldata, compiler->LocalsCompilingNamespacesStack, 0 ) ;

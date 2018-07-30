@@ -1,18 +1,5 @@
 #include "../../include/cfrtil64.h"
 
-void
-Word_SetCoding ( Word * word, byte * address )
-{
-    word->Coding = address ;
-}
-
-void
-WordList_SetCoding ( int64 index, byte * address )
-{
-    Word * word = WordStack ( index ) ;
-    word->Coding = address ;
-}
-
 //block CurrentDefinition ;
 #if 0
 void
@@ -22,7 +9,7 @@ _Word_Run ( Word * word )
     {
         word->StackPushRegisterCode = 0 ; // nb. used! by the rewriting optInfo
         // keep track in the word itself where the machine code is to go, if this word is compiled or causes compiling code - used for optimization
-        Word_SetCoding ( word, Here ) ; // if we change it later (eg. in lambda calculus) we must change it there because the rest of the compiler depends on this
+        Word_SetCoding (word, Here , 1) ; // if we change it later (eg. in lambda calculus) we must change it there because the rest of the compiler depends on this
         word->W_InitialRuntimeDsp = _Dsp_ ;
         _Context_->CurrentlyRunningWord = word ;
         Block_Eval ( word->Definition ) ;
@@ -38,7 +25,7 @@ Word_Run ( Word * word )
         {
             word->StackPushRegisterCode = 0 ; // nb. used! by the rewriting optInfo
             // keep track in the word itself where the machine code is to go, if this word is compiled or causes compiling code - used for optimization
-            Word_SetCoding ( word, Here ) ; // if we change it later (eg. in lambda calculus) we must change it there because the rest of the compiler depends on this
+            Word_SetCoding (word, Here , 1) ; // if we change it later (eg. in lambda calculus) we must change it there because the rest of the compiler depends on this
             word->W_InitialRuntimeDsp = _Dsp_ ;
             _Context_->CurrentlyRunningWord = word ;
             Block_Eval ( word->Definition ) ;
@@ -79,7 +66,7 @@ _Word_Interpret ( Word * word )
 void
 _Word_Compile ( Word * word )
 {
-    _Set_SCA ( word ) ;
+    Word_SetCodingHere_And_ClearPreviousUseOf_This_SCA (word, 0) ;
     if ( ! word->Definition )
     {
         CfrTil_SetupRecursiveCall ( ) ;

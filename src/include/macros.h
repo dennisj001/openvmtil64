@@ -5,7 +5,6 @@
 #define _Q_CodeByteArray _Q_->CodeByteArray
 #define _Q_CodeSpace _Q_->MemorySpace0->CodeSpace
 #define _Compile_Int8( value ) ByteArray_AppendCopyItem ( _Q_CodeByteArray, 1, value )
-//#define Compile_Int8( opCode ) Compile_StartOpCode_Int8 ( opCode ) 
 #define _Compile_Int16( value ) ByteArray_AppendCopyItem ( _Q_CodeByteArray, 2, value )
 #define _Compile_Int32( value ) ByteArray_AppendCopyItem ( _Q_CodeByteArray, 4, value )
 #define _Compile_Int64( value ) ByteArray_AppendCopyItem ( _Q_CodeByteArray, 8, value )
@@ -13,17 +12,12 @@
 #define Here ( _ByteArray_Here ( _Q_CodeByteArray ) )
 #define _SetHere( address )  _ByteArray_SetHere ( _Q_CodeByteArray, address ) 
 #define SetDebuggerPreHere( address ) _Debugger_->PreHere = (address) 
-#define SetHere( address )  ByteArray_SetHere_AndForDebug ( _Q_CodeByteArray, address ) 
+//#define SetHere( address )  ByteArray_SetHere_AndForDebug (_Q_CodeByteArray, address , 1) 
 #define Set_CompilerSpace( byteArray ) (_Q_CodeByteArray = (byteArray))
 #define Get_CompilerSpace( ) _Q_CodeByteArray
 
 #define TOS _Dsp_[0]
 #define _TOS_ ( _Dsp_ ? _Dsp_ [ 0 ] : CfrTil_Exception (STACK_ERROR, 0, QUIT ), (uint64)-1 )
-//#define _DataStack_Drop() _DataStack_Drop ( ) //(Dsp --)
-//#define _DataStack_DropN( n ) _DataStack_DropN ( n ) //(_Dsp_ -= (int64) n )
-//#define _DataStack_Push( v ) _DataStack_Push ( (int64) v ) //(*++Dsp = (int64) v )
-//#define _DataStack_Pop() _DataStack_Pop () // ( Dsp -- [ 0 ] ) 
-//#define _DataStack_Dup() _DataStack_Dup ()
 #define DSP_Top( ) TOS 
 #define _DataStack_Top( ) TOS 
 #define _DataStack_GetTop( ) TOS
@@ -44,11 +38,7 @@
 #define SetState( obj, state, flag ) _SetState ( ((obj)->State), (state), flag )
 #define Debugger_IsStepping( debugger ) GetState ( debugger, DBG_STEPPING )
 #define Debugger_SetStepping( debugger, flag ) SetState ( debugger, DBG_STEPPING, flag )  
-//#define Debugger_IsRestoreCpuState( debugger ) GetState ( debugger, DBG_RESTORE_REGS )
-//#define Debugger_SetRestoreCpuState( debugger, flag ) SetState ( debugger, DBG_RESTORE_REGS, flag ) 
 #define Debugger_SetMenu( debugger, flag ) SetState ( debugger, DBG_MENU, flag )
-//#define Debugger_IsDone( debugger ) GetState ( debugger, DBG_DONE )
-//#define Debugger_SetDone( debugger, flag ) SetState ( debugger, DBG_DONE, flag ) 
 #define Debugger_IsNewLine( debugger ) GetState ( debugger, DBG_NEWLINE )
 #define Debugger_SetNewLine( debugger, flag ) SetState ( debugger, DBG_NEWLINE, flag ) 
 
@@ -61,13 +51,6 @@
 
 #define Stack_N( stack, offset ) ((stack)->StackPointer [ (offset) ] )
 #define Stack_OffsetValue( stack, offset ) ((stack)->StackPointer [ (offset) ] )
-//#define _Compiler_WordStack( compiler, n ) ((Word*) (Stack_OffsetValue ( (compiler)->WordStack, (n))))
-//#define Compiler_WordStack( n ) ((Word*) _Compiler_WordStack( _Context_->Compiler0, (n) ))
-//#define _Compiler_WordList( compiler, n ) ((Word*) (List_GetN ( (compiler)->WordList, (n))))
-//#define Compiler_WordList( n ) ((Word*) _Compiler_WordList( _Context_->Compiler0, (n) ))
-//#define CompilerWordStack _Context_->Compiler0->WordStack
-//#define CompilerLastWord Compiler_WordStack( 0 )
-//#define WordsBack( n ) Compiler_WordStack( (-n) )
 #define WordsBack( n ) CfrTil_WordList( (n) )
 #define WordStack( n ) CfrTil_WordList( (n) )
 #define N_FREE  1
@@ -123,6 +106,7 @@
 #define NoticeColors Ovt_NoticeColors () 
 
 // Change Colors
+// code :: cc change colors : u user : d  default : a alert : g debug
 #define cc( s, c ) (byte*) _String_InsertColors ( (byte*) ( (byte*) s ? (byte*) s : (byte*) "" ), (c) ) 
 #define c_ud( s ) cc ( (byte*) s, (_Q_->Current == &_Q_->User) ? &_Q_->Default : &_Q_->User ) 
 #define c_ad( s ) cc ( (byte*) s, (_Q_->Current == &_Q_->Alert) ? &_Q_->Default : &_Q_->Alert ) 
@@ -130,10 +114,12 @@
 #define c_gd( s ) cc ( (byte*) s, (_Q_->Current == &_Q_->Debug) ? &_Q_->Default : &_Q_->Debug ) 
 #define c_gu( s ) cc ( (byte*) s, (_Q_->Current == &_Q_->Debug) ? &_Q_->User : &_Q_->Debug ) 
 #define c_ug( s ) cc ( (byte*) s, (_Q_->Current == &_Q_->User) ? &_Q_->Debug : &_Q_->User ) 
+#define c_gn( s ) cc ( (byte*) s, (_Q_->Current == &_Q_->Debug) ? &_Q_->Notice : &_Q_->Debug ) 
 #define c_g( s ) cc ( (byte*) s, &_Q_->Debug ) 
 #define c_a( s ) cc ( (byte*) s, &_Q_->Alert ) 
 #define c_d( s ) cc ( (byte*) s, &_Q_->Default ) 
 #define c_u( s ) cc ( (byte*) s, &_Q_->User ) 
+#define c_n( s ) cc ( (byte*) s, &_Q_->Notice ) 
 
 #define _Context_ _Q_->OVT_Context
 #define _CfrTil_ _Q_->OVT_CfrTil
@@ -276,7 +262,6 @@
 #define List_Length( list ) List_Depth ( list )
 #define List_New() _dllist_New ( TEMPORARY ) 
 #define List_Push_1Value_Node( list, value, allocType ) _dllist_PushNew_M_Slot_Node ( list, WORD, allocType, 1, ((int64) value) )
-//#define List_Push_2Value_Node( list, value1, value2 ) _dllist_Push_M_Slot_Node ( list, WORD, DICTIONARY, 2, ((int64) value1), ((int64) value2) )
 #define List_Push( list, value, allocType ) List_Push_1Value_Node ( list, value, allocType )
 #define List_PushNode( list, node ) _dllist_AddNodeToHead ( list, ( dlnode* ) node )
 
@@ -290,12 +275,8 @@
 #define _IsSourceCodeOn ( GetState ( _CfrTil_, DEBUG_SOURCE_CODE_MODE ) )
 #define IsSourceCodeOn ( _IsSourceCodeOn || IsGlobalsSourceCodeOn )
 #define IsSourceCodeOff (!IsSourceCodeOn) //( GetState ( _CfrTil_, DEBUG_SOURCE_CODE_MODE ) || IsGlobalsSourceCodeOn ))
-//#define _Set_SCA( word )  { if ( word ) word->Coding = Here ; }
-#define _Set_SCA( word ) Word_Set_SCA ( word ) ;
-#define Set_SCA( index ) _Set_SCA (CfrTil_WordList ( index )) ;
-//#define SC_Push( word ) DebugWordList_PushWord ( word ) 
-//#define _Set_SCA( word ) //DebugWordList_PushWord ( word ) 
-//#define SC_SetForcePush( tf ) SetState ( _CfrTil_, SC_FORCE_PUSH, tf ) 
+#define _Word_SCH_CPUSCA( word, clearFlag ) Word_SetCodingHere_And_ClearPreviousUseOf_This_SCA ( word, clearFlag) 
+#define WordStack_SCHCPUSCA( index, clearFlag ) _Word_SCH_CPUSCA (CfrTil_WordList ( index ), clearFlag) 
 #define _SC_Global_On SetState ( _CfrTil_, GLOBAL_SOURCE_CODE_MODE, true )
 #define SC_Global_On if ( GetState ( _CfrTil_, DEBUG_SOURCE_CODE_MODE ) ) { _SC_Global_On ; }
 #define SC_Global_Off SetState ( _CfrTil_, GLOBAL_SOURCE_CODE_MODE, false )
@@ -307,7 +288,5 @@
 #define Strncat( dst, src, n ) strncat ( (char *__restrict) dst, (const char *__restrict) src, (size_t) n )
 #define Strlen( s ) ( s ? strlen ( (const char *) s ) : 0 )
 #define Strncpy( dst, src, n ) strncpy ( (char *__restrict) dst, (const char *__restrict) src, (size_t) n )
-//#define Sprintf( s, fmt, ...) sprintf ( (char *__restrict) s, (const char *__restrict) fmt, ... )
 #define Map0( dllist, mf ) dllist_Map ( dllist, (MapFunction0) mf )
-//#define SetStackPointerFromDsp()  if ( _CfrTil_ && _CfrTil_->DataStack ) _CfrTil_->DataStack->StackPointer = Dsp ;
 

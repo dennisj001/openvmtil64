@@ -183,7 +183,7 @@ _Compile_Stack_Dup ( int8 stackReg )
         Word * one = CfrTil_WordList ( 1 ) ;
         if ( one->StackPushRegisterCode )
         {
-            SetHere ( one->StackPushRegisterCode ) ;
+            SetHere (one->StackPushRegisterCode, 1) ;
             Compile_ADDI ( REG, DSP, 0, 2 * CELL, 0 ) ;
             _Compile_Move_Reg_To_StackN ( DSP, 0, ACC ) ;
             _Compile_Move_Reg_To_StackN ( DSP, - 1, ACC ) ;

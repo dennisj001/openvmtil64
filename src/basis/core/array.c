@@ -2,6 +2,7 @@
 #include "../../include/cfrtil64.h"
 
 #if 0
+
 void
 Byte_PtrCall ( byte * bptr )
 {
@@ -142,14 +143,31 @@ _ByteArray_SetHere ( ByteArray * ba, byte * index )
 }
 
 void
-ByteArray_SetHere_AndForDebug ( ByteArray * ba, byte * index )
+_SetPreHere_ForDebug ( byte * index )
+{
+    _Debugger_->PreHere = index ;
+}
+
+void
+SetPreHere_ForDebug ( byte * index )
+{
+    if ( _Debugger_ ) _SetPreHere_ForDebug ( index ) ;
+}
+
+void
+ByteArray_SetHere_AndForDebug ( ByteArray * ba, byte * index, Boolean forDebugFlag )
 {
     if ( index )
     {
-        //_ByteArray_SetEndIndex ( ba, index ) ;
         _ByteArray_SetHere ( ba, index ) ;
-        //if ( _Debugger_ ) _Debugger_->PreHere = index ;
+        if ( forDebugFlag ) SetPreHere_ForDebug ( index ) ;
     }
+}
+
+void
+SetHere ( byte * address, Boolean setForDebugFlag )
+{
+    ByteArray_SetHere_AndForDebug ( _Q_->CodeByteArray, address, setForDebugFlag ) ;
 }
 
 byte *

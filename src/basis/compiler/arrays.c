@@ -55,7 +55,7 @@ Compile_ArrayDimensionOffset ( Word * word, int64 dimSize, int64 objSize )
         // assume arrayIndex has just been pushed to TOS
         if ( word->StackPushRegisterCode )
         {
-            SetHere ( word->StackPushRegisterCode ) ;
+            SetHere (word->StackPushRegisterCode, 1) ;
             //_Compile_IMULI ( int64 mod, int64 reg, int64 rm, int64 sib, int64 disp, int64 imm, int64 size )
             Compile_IMULI ( REG, ACC, ACC, 0, 0, dimSize * objSize ) ;
             //Compile_ADD( toRegOrMem, mod, reg, rm, sib, disp, isize ) 
@@ -70,7 +70,7 @@ Compile_ArrayDimensionOffset ( Word * word, int64 dimSize, int64 objSize )
             Compile_ADD ( MEM, MEM, ACC, DSP, 0, 0, CELL ) ;
         }
     }
-    else SetHere ( word->Coding ) ; // is 0 don't compile anything for that word
+    else SetHere (word->Coding, 1) ; // is 0 don't compile anything for that word
 }
 
 // v.0.775.840
@@ -96,7 +96,7 @@ Do_NextArrayWordToken ( Word * word, byte * token, Word * arrayBaseObject, int64
             dimSize *= arrayBaseObject->ArrayDimensions [ dimNumber ] ; // the parser created and populated this array in _CfrTil_Parse_ClassStructure 
         }
         compiler->ArrayEnds ++ ;
-        
+
         if ( *variableFlag ) Compile_ArrayDimensionOffset ( cntx->CurrentlyRunningWord, dimSize, objSize ) ;
         else
         {
@@ -107,8 +107,8 @@ Do_NextArrayWordToken ( Word * word, byte * token, Word * arrayBaseObject, int64
             Compiler_IncrementCurrentAccumulatedOffset ( compiler, increment ) ;
             if ( ! CompileMode ) _DataStack_SetTop ( _DataStack_GetTop ( ) + increment ) ; // after each dimension : in the end we have one lvalue remaining on the stack
         }
-        
-        if ( ! _Context_StringEqual_PeekNextToken (cntx, ( byte* ) "[" , 0) ) return 1 ; // breaks the calling function
+
+        if ( ! _Context_StringEqual_PeekNextToken ( cntx, ( byte* ) "[", 0 ) ) return 1 ; // breaks the calling function
         if ( Is_DebugModeOn ) Word_PrintOffset ( word, increment, baseObject->AccumulatedOffset ) ;
         return 0 ;
     }
@@ -119,9 +119,9 @@ Do_NextArrayWordToken ( Word * word, byte * token, Word * arrayBaseObject, int64
     else Set_CompileMode ( false ) ; //SetState ( compiler, COMPILE_MODE, false ) ;
     if ( word )
     {
-        _Interpreter_DoWord (interp, word, - 1 , -1) ;
+        _Interpreter_DoWord ( interp, word, word->W_RL_Index, word->W_SC_Index ) ;
     }
-    else Interpreter_InterpretAToken ( interp, token, - 1 ) ;
+    else Interpreter_InterpretAToken ( interp, token, -1 ) ; 
     Set_CompileMode ( saveCompileMode ) ;
     SetState ( compiler, COMPILE_MODE, saveCompileMode ) ;
     return 0 ;
@@ -170,7 +170,7 @@ CfrTil_ArrayBegin ( void )
         {
             if ( ! variableFlag )
             {
-                SetHere ( baseObject->Coding ) ;
+                SetHere (baseObject->Coding, 1) ;
                 _Debugger_->StartHere = Here ; // for Debugger_DisassembleAccumulated
                 _Debugger_->EntryWord = baseObject ; // for Debugger_DisassembleAccumulated
                 _Compile_GetVarLitObj_LValue_To_Reg ( baseObject, ACC ) ;

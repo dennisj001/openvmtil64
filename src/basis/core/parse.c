@@ -167,19 +167,6 @@ Compiler_TypedObjectInit ( Namespace * typeNamespace, Word * word )
     _Word_Add ( word, 1, 0 ) ;
 }
 
-void
-Compile_InitRegisterParamenterVariables ( Compiler * compiler )
-{
-    dllist * list = compiler->RegisterParameterList ;
-    dlnode * node ;
-    int64 regIndex ;
-    for ( regIndex = 0, node = dllist_First ( ( dllist* ) list ) ; node ; node = dlnode_Next ( node ) )
-    {
-        Word * word = ( Word* ) dobject_Get_M_Slot ( node, SCN_WORD ) ;
-        _Compile_Move_StackN_To_Reg ( word->RegToUse, DSP, regIndex * CELL ) ;
-    }
-}
-
 // old docs :
 // parse local variable notation to a temporary "_locals_" namespace
 // calculate necessary frame size
@@ -287,7 +274,7 @@ _CfrTil_Parse_LocalsAndStackVariables ( int64 svf, int64 lispMode, ListObject * 
             {
                 if ( svff )
                 {
-                    ctype = PARAMETER_VARIABLE ;
+                    ctype = PARAMETER_VARIABLE ; // aka Arg
                     if ( lispMode ) ctype |= T_LISP_SYMBOL ;
                 }
                 else
@@ -298,7 +285,9 @@ _CfrTil_Parse_LocalsAndStackVariables ( int64 svf, int64 lispMode, ListObject * 
                 if ( regFlag == true )
                 {
                     ctype |= REGISTER_VARIABLE ;
-                    compiler->NumberOfRegisterVariables ++ ;
+                    if ( ctype & LOCAL_VARIABLE ) { compiler->NumberOfLocals -- ; }
+                    else { compiler->NumberOfArgs -- ; }
+                    compiler->NumberOfRegisterVariables = compiler->NumberOfRegisterArgs + compiler->NumberOfRegisterLocals ;
                 }
                 word = _CfrTil_LocalWord ( token, ( ctype & LOCAL_VARIABLE ) ? ++ compiler->NumberOfLocals : ++ compiler->NumberOfArgs, ctype, ctype2, ltype ) ; // svf : flag - whether stack variables are in the frame
                 if ( regFlag == true )

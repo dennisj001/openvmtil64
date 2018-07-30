@@ -194,7 +194,7 @@ typedef void ( *MapFunction4 ) ( dlnode *, int64, int64, int64, int64 ) ;
 typedef void ( *MapFunction5 ) ( dlnode *, int64, int64, int64, int64, int64 ) ;
 typedef
 Boolean( *BoolMapFunction_1 ) ( dlnode * ) ;
-typedef struct _Identifier
+typedef struct _Identifier // _Symbol
 {
     DLNode S_Node ;
     int64 Slots ; // number of slots in Object
@@ -248,12 +248,10 @@ typedef struct _Identifier
 #define S_LAttribute S_Node.n_Attributes.T_LAttribute
 #define S_Size S_Node.n_Attributes.T_Size
 #define S_ChunkSize S_Node.n_Attributes.T_ChunkSize
-//#define S_Name S_Name 
 #define S_NumberOfSlots S_Size
 #define S_Pointer W_Value
 #define S_String W_Value
 #define S_unmap S_Node.n_unmap
-//#define S_ChunkData S_Node.N_ChunkData
 #define S_CodeSize Size // used by Debugger, Finder
 #define S_MacroLength Size // used by Debugger, Finder
 
@@ -284,7 +282,7 @@ typedef struct _Identifier
 #define Lo_Head Lo_Car
 #define Lo_Tail Lo_Cdr
 #define Lo_NumberOfSlots Size
-#define Lo_CfrTilWord CfrTilWord //S_WordData->CfrTilWord
+#define Lo_CfrTilWord CfrTilWord 
 #define Lo_List S_SymbolList 
 #define Lo_Value S_Value
 #define Lo_PtrToValue S_PtrToValue 
@@ -360,7 +358,6 @@ typedef struct _WordData
         int8 RegFlags ; // future uses available here !!
         uint8 OpInsnGroup ;
         uint8 OpInsnCode ;
-        //int16 RegFlags2 ; // filler for use with a int64 in a union ; future uses available here !!
     } ;
     union
     {
@@ -384,12 +381,14 @@ typedef struct _WordData
         byte * LogicTestCode ;
     } ;
     dllist * SourceCodeWordList ;
+    byte * SourceCoding ; //
     int64 SourceCodeMemSpaceRandMarker ;
 } WordData ; // try to put all compiler related data here so in the future we can maybe delete WordData at runtime
 
 // to keep using existing code without rewriting ...
 #define CodeStart S_WordData->CodeStart // set at Word allocation 
 #define Coding S_WordData->Coding // nb : !! this field is set by the Interpreter and modified by the Compiler in some cases so we also need (!) CodeStart both are needed !!  
+#define SourceCoding S_WordData->SourceCoding // nb : !! this field is set by the Interpreter and modified by the Compiler in some cases so we also need (!) CodeStart both are needed !!  
 #define Offset S_WordData->Offset // used by ClassField
 #define W_NumberOfArgs S_WordData->NumberOfArgs 
 #define W_NumberOfLocals S_WordData->NumberOfLocals 
@@ -489,7 +488,6 @@ typedef struct
     uint64 State ;
     byte *LocalFrameStart, *AfterLocalFrame ;
     byte * AfterRspSave ;
-    byte *Start ;
     byte *bp_First ;
     byte *bp_Last ;
     byte *JumpOffset ;
@@ -571,7 +569,6 @@ typedef struct ReadLiner
     byte LastCheckedInputKeyedCharacter ;
     int64 FileCharacterNumber ;
     int64 LineNumber ;
-    //int64 InputLineCharacterNumber ; // set by _CfrTil_Key
     int64 OutputLineCharacterNumber ; // set by _CfrTil_Key
     int64 ReadIndex ;
     int64 EndPosition ; // index where the next input character is put
@@ -702,16 +699,12 @@ typedef struct
 #define LOC_ACC                 ( 1 << 6 )
 #define LOC_OREG                ( 1 << 7 )
 #define REG_ON_BIT              ( 0x10 ) // decimal 16, beyond the 15 regs
-    //#define LOC_STACK_2             ( 1 << 8 )
     int64 rtrn, NumberOfArgs ;
-    //int64 Arg1Location, Arg2Location ;
-    //int8 Arg1AssumedLocation, Arg2AssumedLocation, Arg1ActualLocation, Arg2ActualLocation, Arg1IdealLocation, Arg2IdealLocation ;
-    //byte * Arg1SetHere, *Arg2SetHere ;
     uint16 ControlFlags ;
     Word *opWord, *wordn, *wordm, *wordArg1, *wordArg2, *xBetweenArg1AndArg2 ;
-    dlnode * node, *nodem, *wordNode, *nextNode, *wordArg2Node, *wordArg1Node ; //, *wordArg2OREGNode, *wordArg1ACCNode ;
+    dlnode * node, *nodem, *wordNode, *nextNode, *wordArg2Node, *wordArg1Node ; 
     Boolean rvalue, wordArg1_rvalue, wordArg2_rvalue, wordArg1_literal, wordArg2_literal ;
-    Boolean wordOp, wordArg1_Op, wordArg2_Op ; //, opRmFlag, opTakesARegFlag, opTakesImmFlag, op1ArgOnly ;
+    Boolean wordOp, wordArg1_Op, wordArg2_Op ; 
     // CompileOptimizeInfo State values
 #define ACC_1L                   ( (uint64) 1 << 1 )              
 #define ACC_1R                   ( (uint64) 1 << 2 )              
@@ -749,7 +742,6 @@ typedef struct
     int64 NumberOfRegisterVariables ;
     int64 LocalsFrameSize ;
     int64 SaveCompileMode, SaveOptimizeState ; //, SaveScratchPadIndex ;
-    //int64 LispParenLevel;
     int64 ParenLevel ;
     int64 GlobalParenLevel, OptimizeForcedReturn ;
     int64 ArrayEnds ;
@@ -758,7 +750,6 @@ typedef struct
     int8 InLParenBlock, SemicolonEndsThisBlock, TakesLParenAsBlock, BeginBlockFlag ;
     int32 * AccumulatedOffsetPointer ;
     int64 * FrameSizeCellOffset, BlocksBegun ;
-    //int8 RegOrder [ 4 ] ;
     byte * RspSaveOffset ;
     byte * RspRestoreOffset ;
     Word * ReturnVariableWord ;
@@ -786,11 +777,10 @@ typedef struct Interpreter
     Lexer * Lexer0 ;
     Compiler * Compiler0 ;
     byte * Token ;
-    Word *w_Word, *LastWord ; //*IncDecWord, *IncDecOp, 
-    Word * BaseObject ; //, *QidObject, *ArrayObject;
+    Word *w_Word, *LastWord ; 
+    Word * BaseObject ; 
     Word *CurrentObjectNamespace, *ThisNamespace ;
     int64 WordType ;
-    //dllist * PreprocessorStackList ;
     dllist * InterpList ;
 } Interpreter ;
 
@@ -804,7 +794,7 @@ typedef struct _Debugger
     int64 SaveTOS ;
     int64 SaveStackDepth ;
     int64 Key ;
-    int64 SaveKey ; //Verbosity;
+    int64 SaveKey ; 
     int64 TokenStart_ReadLineIndex, Esi, Edi ;
     Word * w_Word, *EntryWord, *LastShowWord, *LastEffectsWord, *LastSetupWord, *SteppedWord, *CurrentlyRunningWord, *LastSourceCodeWord ;
     byte * Token ;
@@ -824,7 +814,7 @@ typedef struct _Debugger
     Stack * LocalsNamespacesStack ;
     dllist * DebugWordList ;
     uint64 LevelBitNamespaceMap ;
-    sigjmp_buf JmpBuf0 ; //, JmpBuf1 ; 
+    sigjmp_buf JmpBuf0 ;  
 } Debugger ;
 typedef struct
 {
@@ -911,7 +901,6 @@ typedef struct _CfrTil
 {
     uint64 State ;
     Stack *ReturnStack, * DataStack ;
-    //Stack * DataStack ;
     Namespace * Namespaces ;
     Context * Context0 ;
     Stack * ContextDataStack ;
@@ -971,7 +960,6 @@ typedef struct
     dlnode NBAsTailNode ;
     dllist * BufferList ;
     dllist * RecycledWordList ;
-    //dllist * RecycledContextList ;
     int64 RecycledWordCount ;
 } MemorySpace ;
 typedef struct
@@ -1006,7 +994,6 @@ typedef struct
 {
     uint64 State ;
     CfrTil * OVT_CfrTil ;
-    //struct termios * SavedTerminalAttributes ;
     Context * OVT_Context ;
     Interpreter * OVT_Interpreter ;
     HistorySpace OVT_HistorySpace ;
@@ -1065,8 +1052,6 @@ typedef struct
 
     int64 Thrown ;
     sigjmp_buf JmpBuf0 ;
-
-    //byte ** _Name_ ;
 } OpenVmTil ;
 
 // note : this puts these namespaces on the search list such that last, in the above list, will be searched first
@@ -1083,8 +1068,6 @@ typedef struct
     const char * SuperNamespace ;
 } CPrimitive ;
 
-// ( byte * name, int64 value, uint64 ctype, uint64 ltype, uint64 ftype, byte * function, int64 arg, int64 addToInNs, Namespace * addToNs, uint64 allocType )
-// ( const char * name, block b, uint64 ctype, uint64 ltype, const char *nameSpace, const char * superNamespace )
 typedef struct
 {
     const char * ccp_Name ;
@@ -1113,4 +1096,3 @@ typedef struct ppibs
     int64 LineNumber ;
 }
 PreProcessorIfBlockStatus, Ppibs ;
-//typedef int64( *cFunction_2_Arg ) ( int64, int64 ) ;

@@ -254,7 +254,7 @@ _CfrTil_C_Infix_EqualOp ( Word * opWord )
     rword->Name = svName ;
     if ( GetState ( compiler, C_COMBINATOR_LPAREN ) )
     {
-        if ( word0->StackPushRegisterCode ) SetHere ( word0->StackPushRegisterCode ) ; // this is the usual after '=' in non C syntax; assuming optimizeOn
+        if ( word0->StackPushRegisterCode ) SetHere (word0->StackPushRegisterCode, 1) ; // this is the usual after '=' in non C syntax; assuming optimizeOn
         Compiler_Set_BI_setTtnn ( compiler, TTT_ZERO, NEGFLAG_ON, TTT_ZERO, NEGFLAG_Z ) ; // must set logic flag for Compile_ReConfigureLogicInBlock in Block_Compile_WithLogicFlag
     }
     List_InterpretLists ( compiler->PostfixLists ) ;

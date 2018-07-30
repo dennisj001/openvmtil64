@@ -13,7 +13,7 @@ CfrTil_Drop ( )
     {
         //Word * one = Compiler_WordStack ( - 1 ) ;
         Word * one = CfrTil_WordList ( 1 ) ;
-        if ( GetState ( _CfrTil_, OPTIMIZE_ON ) && one && ( one->StackPushRegisterCode ) ) SetHere ( one->StackPushRegisterCode ) ;
+        if ( GetState ( _CfrTil_, OPTIMIZE_ON ) && one && ( one->StackPushRegisterCode ) ) SetHere (one->StackPushRegisterCode, 1) ;
         else _Compile_Stack_Drop ( DSP ) ;
     }
     else
@@ -63,7 +63,7 @@ CfrTil_Ndrop ( )
     {
         //Compile_SUBI( mod, operandReg, offset, immediateData, size ) 
         Word * one = CfrTil_WordList ( 1 ) ;
-        SetHere ( one->Coding ) ;
+        SetHere (one->Coding, 1) ;
         Compile_SUBI ( REG, DSP, 0, one->W_Value * CELL_SIZE, BYTE ) ;
     }
     else

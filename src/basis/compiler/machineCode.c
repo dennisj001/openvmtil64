@@ -269,8 +269,7 @@ _Compile_X_Group1 ( int8 code, int8 toRegOrMem, int8 mod, int8 reg, int8 rm, int
     // we need to be able to set the size so we can know how big the instruction will be in eg. CompileVariable
     // otherwise it could be optimally deduced but let caller control by keeping operandSize parameter
     // some times we need cell_t where bytes would work
-    // _Compile_InstructionX86 ( opCode, mod, reg, rm, modRmImmDispFlag, sib, disp, imm, immSize )
-    Set_SCA ( 0 ) ;
+    //WordStack_SCHCPUSCA ( 0, 0 ) ;
     Compile_CalcWrite_Instruction_X64 ( 0, opCode, mod, reg, rm, DISP_B | REX_B | MODRM_B, sib, disp, 0, 0, osize ) ;
 }
 
@@ -363,10 +362,10 @@ Compile_X_Group1 ( Compiler * compiler, int64 op, int64 ttt, int64 n )
     {
         //_DBI_ON ;
         Word * one = CfrTil_WordList ( 1 ) ;
-        if ( one && one->StackPushRegisterCode ) SetHere ( one->StackPushRegisterCode ) ;
+        if ( one && one->StackPushRegisterCode ) SetHere ( one->StackPushRegisterCode, 1 ) ;
         else Compile_Pop_To_Acc ( DSP ) ;
         //_Compile_X_Group1 ( int8 code, int64 toRegOrMem, int8 mod, int8 reg, int8 rm, int8 sib, int64 disp, int64 osize )
-        _Set_SCA ( optInfo->opWord ) ;
+        Word_SetCodingHere_And_ClearPreviousUseOf_This_SCA ( optInfo->opWord, 0 ) ;
         _Compile_X_Group1 ( op, REG, MEM, ACC, DSP, 0, 0, CELL_SIZE ) ; // result is on TOS
         _Word_CompileAndRecord_PushReg ( CfrTil_WordList ( 0 ), ACC ) ; // 0 : ?!? should be the exact variable 
         //DBI_OFF ;
@@ -432,18 +431,18 @@ Compile_X_Group5 ( Compiler * compiler, int64 op )
             optInfo->Optimize_Mod = REG ;
             optInfo->Optimize_Rm = ACC ;
         }
-        _Set_SCA ( optInfo->opWord ) ;
+        Word_SetCodingHere_And_ClearPreviousUseOf_This_SCA ( optInfo->opWord, 0 ) ;
         _Compile_Group5 ( op, optInfo->Optimize_Mod, optInfo->Optimize_Rm, 0, optInfo->Optimize_Disp, 0 ) ;
     }
     else if ( one && one->CAttribute & ( PARAMETER_VARIABLE | LOCAL_VARIABLE | NAMESPACE_VARIABLE ) ) // *( ( cell* ) ( TOS ) ) += 1 ;
     {
-        SetHere ( one->Coding ) ;
+        SetHere ( one->Coding, 1 ) ;
         if ( one->CAttribute & REGISTER_VARIABLE ) _Compile_Group5 ( op, REG, one->RegToUse, 0, 0, 0 ) ;
         else
         {
             Compile_GetVarLitObj_RValue_To_Reg ( one, ACC ) ;
             //_Compile_Group5 ( int8 code, int8 mod, int8 rm, int8 sib, int64 disp, int8 size )
-            Set_SCA ( 0 ) ;
+            WordStack_SCHCPUSCA ( 0, 0 ) ;
             _Compile_Group5 ( op, REG, ACC, 0, 0, 0 ) ;
             // ++ == += :: -- == -= so :
             _Compile_SetVarLitObj_With_Reg ( one, ACC, OREG ) ;
@@ -610,7 +609,7 @@ Compile_MoveImm ( int8 direction, int8 rm, int8 sib, int64 disp, int64 imm, int8
         }
     }
 #if 0    
-else
+    else
     {
         if ( immSize > BYTE ) opCode |= 1 ;
         if ( direction == REG ) mod = 3 ;

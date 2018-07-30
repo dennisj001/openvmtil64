@@ -133,7 +133,7 @@ _InstallGotoPoint_Key ( dlnode * node, int64 blockInfo, int64 key )
         }
         else if ( ( gotoInfo->GI_CAttribute & GI_TAIL_CALL ) && ( key & GI_TAIL_CALL ) )
         {
-            _GotoInfo_SetAndRemove ( gotoInfo, bi->Start, 0 ) ;
+            _GotoInfo_SetAndRemove ( gotoInfo, bi->AfterLocalFrame, 0 ) ;
         }
     }
 }

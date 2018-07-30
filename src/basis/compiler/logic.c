@@ -29,7 +29,7 @@ _Compile_TestCode ( int8 reg, int8 size )
 void
 BI_CompileRecord_TestCode_Reg ( BlockInfo *bi, int8 reg, int8 size )
 {
-    Set_SCA ( 0 ) ;
+    WordStack_SCHCPUSCA (0, 1) ;
     bi->LogicTestCode = Here ;
     _Compile_TestCode ( reg, size ) ;
 }
@@ -118,7 +118,7 @@ Compiler_Set_LogicCode ( Compiler * compiler, int8 setTtn, int8 setNegFlag, int8
 void
 _Compile_LogicalAnd ( Compiler * compiler )
 {
-    Set_SCA ( 0 ) ;
+    WordStack_SCHCPUSCA (0, 1) ;
     Compiler_BI_CompileRecord_TestCode_Set_setTtnn ( compiler, OREG, TTT_ZERO, NEGFLAG_Z, TTT_ZERO, NEGFLAG_NZ ) ; // jz
     _Compile_Jcc ( NEGFLAG_Z, TTT_ZERO, Here + 15 ) ; // if eax is zero return not(R8) == 1 else return 0
     Compiler_BI_CompileRecord_TestCode_Set_setTtnn ( compiler, ACC, TTT_ZERO, NEGFLAG_NZ, TTT_ZERO, NEGFLAG_Z ) ;
@@ -139,7 +139,7 @@ Compile_LogicalAnd ( Compiler * compiler )
     else
     {
         Word *one = _CfrTil_WordList (1) ; // assumes two values ( n m ) on the DSP stack 
-        if ( one->StackPushRegisterCode && ( one->RegToUse == ACC ) ) SetHere ( one->StackPushRegisterCode ) ;
+        if ( one->StackPushRegisterCode && ( one->RegToUse == ACC ) ) SetHere (one->StackPushRegisterCode, 1) ;
         else _Compile_Stack_PopToReg ( DSP, ACC ) ;
         _Compile_Stack_PopToReg ( DSP, OREG ) ;
         _Compile_LogicalAnd ( compiler ) ;
@@ -150,7 +150,7 @@ void
 _Compile_LogicalNot ( Compiler * compiler )
 {
     //_DBI_ON ;
-    Set_SCA ( 0 ) ;
+    WordStack_SCHCPUSCA (0, 1) ;
     Compiler_BI_CompileRecord_TestCode_Set_setTtnn ( compiler, ACC, TTT_ZERO, NEGFLAG_Z, TTT_ZERO, NEGFLAG_NZ ) ;
     //_Set_JccLogicCodeForNot ( compiler ) ;
     _Compile_LogicResultForStack ( ACC, TTT_ZERO, NEGFLAG_Z ) ;
@@ -205,7 +205,7 @@ Compile_Cmp_Set_setTtnn_Logic ( Compiler * compiler, int8 setTtn, int8 setNegate
         {
             if ( ( setTtn == TTT_EQUAL ) && ( compiler->OptInfo->Optimize_Imm == 0 ) ) //Compile_TEST ( compiler->OptInfo->Optimize_Mod, compiler->OptInfo->Optimize_Rm, 0, compiler->OptInfo->Optimize_Disp, compiler->OptInfo->Optimize_Imm, CELL ) ;
             {
-                if ( compiler->OptInfo->COIW [2]->StackPushRegisterCode ) SetHere ( compiler->OptInfo->COIW [2]->StackPushRegisterCode ) ; // leave optInfo_0_two value in ACCUM we don't need to push it
+                if ( compiler->OptInfo->COIW [2]->StackPushRegisterCode ) SetHere (compiler->OptInfo->COIW [2]->StackPushRegisterCode, 1) ; // leave optInfo_0_two value in ACCUM we don't need to push it
                 Compiler_BI_CompileRecord_TestCode_ArgRegNum ( compiler, 1 ) ;
             }
             else
@@ -327,7 +327,7 @@ Compile_LogicalNot ( Compiler * compiler )
         }
         else if ( compiler->OptInfo->Optimize_Rm == DSP )
         {
-            if ( one->StackPushRegisterCode ) SetHere ( one->StackPushRegisterCode ) ;
+            if ( one->StackPushRegisterCode ) SetHere (one->StackPushRegisterCode, 1) ;
             else _Compile_Move_StackN_To_Reg ( ACC, DSP, 0 ) ;
         }
         else if ( compiler->OptInfo->Optimize_Rm != ACC )
@@ -337,7 +337,7 @@ Compile_LogicalNot ( Compiler * compiler )
     }
     else
     {
-        if ( one->StackPushRegisterCode ) SetHere ( one->StackPushRegisterCode ) ; // PREFIX_PARSING : nb! could be a prefix function 
+        if ( one->StackPushRegisterCode ) SetHere (one->StackPushRegisterCode, 1) ; // PREFIX_PARSING : nb! could be a prefix function 
         else if ( one->CAttribute2 & RAX_RETURN ) ; // do nothing
         else _Compile_Stack_PopToReg ( DSP, ACC ) ;
         //int64 a, b, c= 0, d ; a = 1; b = !a, d= !c ; _Printf ( "a = %d b = %d c =%d ~d = %d", a, b, c, d ) ;
@@ -362,8 +362,8 @@ _Compile_Jcc ( int64 setNegFlag, int64 setTtn, byte * jmpToAddr )
 void
 _BI_Compile_Jcc ( BlockInfo *bi, byte* address ) // , int8 nz
 {
-    if ( bi->CopiedToLogicJccCode ) SetHere ( bi->CopiedToLogicJccCode ) ;
-    else SetHere ( bi->JccLogicCode ) ;
+    if ( bi->CopiedToLogicJccCode ) SetHere (bi->CopiedToLogicJccCode, 1) ;
+    else SetHere (bi->JccLogicCode, 1) ;
     bi->ActualCopiedToJccCode = Here ;
     _Compile_Jcc ( bi->JccNegFlag, bi->JccTtt, address ) ; // we do need to store and get this logic set by various conditions by the compiler : _Compile_SET_setTtnn_REG
 }

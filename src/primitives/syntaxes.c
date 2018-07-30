@@ -165,7 +165,7 @@ CfrTil_DoWhile_C_Combinator ( )
     _Context_->SC_CurrentCombinator = currentWord0 ;
     if ( ! CfrTil_DoWhileCombinator ( ) )
     {
-        SetHere ( start ) ;
+        SetHere (start, 1) ;
     }
 }
 
@@ -205,7 +205,7 @@ CfrTil_While_C_Combinator ( )
     _Context_->SC_CurrentCombinator = currentWord0 ;
     if ( ! CfrTil_WhileCombinator ( ) ) // TODO : has this idea been fully applied to the rest of the code?
     {
-        SetHere ( start ) ;
+        SetHere (start, 1) ;
     }
 }
 

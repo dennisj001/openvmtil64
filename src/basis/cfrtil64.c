@@ -54,7 +54,7 @@ CfrTil_WordList_PushAndAdd_Firs ( )
     {
         svWord->W_SC_Index = 0 ; // before pushWord !
         CfrTil_WordList_PushWord ( svWord ) ; // for source code
-        Word_Set_SCA ( svWord ) ;
+        Word_SetCodingHere_And_ClearPreviousUseOf_This_SCA (svWord, 0) ;
     }
 }
 #endif

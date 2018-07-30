@@ -379,30 +379,30 @@ dbgOn
 : _TODO ( str ) TODO ( str @ ) ;;
 : TODO ( str ) _TODO ( str @ ) pause ;;
 #endif
-
 scOn
 System 
 testCfrTil // dT0 //demo //dT0
-
 #if _doDemo 
 demo 
 #endif //dT0
-
 stringMacrosOff
 
 #else
-// you can trim this file to your needs and put your personal init code here maybe
 
-#if 0
+// you can trim this file to your needs and put your personal init code here maybe
+#if 1
+: factorial ( REG n | REG rec ) rec 1 = { n @ 1 > } { rec @ n @ * rec store n -- } while return rec ;
+'factorial find wdiss 
+7 factorial dup p 5040 "factorial" assert1
 c_syntaxOn
-int _fib1c ( n ) { if ( n < 2 ) { n ; } else { _fib1c ( n - 1 ) + _fib1c ( n - 2 ) ; d: } }
+int _fib1c ( n ) { if ( n < 2 ) { n ; } else { _fib1c ( n - 1 ) + _fib1c ( n - 2 ) ; } }
 c_syntaxOff
 ' _fib1c find wdiss
 20 _fib1c p //pause
 c_syntaxOff
 #endif
-#if 0
-d: : fibBN ( n | fn fn1 fn2 -- TOS ) 
+#if 1
+: fibBN ( n | fn fn1 fn2 -- TOS ) 
     { fn 0 = fn1 0 = fn2 1 = } { n @ 0 > } { n 1 -= } 
     {   
         fn1 fn2 @ = 
@@ -414,14 +414,40 @@ d: : fibBN ( n | fn fn1 fn2 -- TOS )
     fn @
 ;
 ' fibBN find wdiss
-20 fibBN p 
+20 fibBN dup p 6765 _assert 
+d: : fibBN ( n | fn REG fn1 fn2 -- TOS ) 
+    { fn 0 = fn1 0 = fn2 1 = } { n @ 0 > } { n 1 -= } 
+    {   
+        fn1 fn2 @ = 
+        fn2 fn @ = 
+        fn fn1 @ fn2 @ + = 
+    }
+    for
+    // nl svn @ fprint ":" ps fn @ fprint 
+    fn @
+;
+' fibBN find wdiss
+20 fibBN dup p 6765 _assert 
+: fibBN ( REG n | fn fn1 fn2 -- TOS ) 
+    { fn 0 = fn1 0 = fn2 1 = } { n @ 0 > } { n 1 -= } 
+    {   
+        fn1 fn2 @ = 
+        fn2 fn @ = 
+        fn fn1 @ fn2 @ + = 
+    }
+    for
+    // nl svn @ fprint ":" ps fn @ fprint 
+    fn @
+;
+' fibBN find wdiss
+20 fibBN dup p 6765 _assert 
 #endif
+#if 1
 //: factorial ( n | rec ) rec 1 = { n @ 1 > } { rec @ n @ d: * rec store n -- } while return rec d: ;
-d: 
 : factorial ( REG n | REG rec ) rec 1 = { d: n @ 1 > } { rec @ n @ * rec store n -- } while return rec ;
 'factorial find wdiss // _wdiss ( 'factorial find ) 
 7 factorial dup p 5040 "factorial" assert1
-
+#endif
 //pause
 #endif
 

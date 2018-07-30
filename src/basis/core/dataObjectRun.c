@@ -119,7 +119,7 @@ _Namespace_Do_C_Type ( Namespace * ns )
                     Block_Eval ( beginWord->Definition ) ; //( beginWord ) ;
                     CfrTil_LocalsAndStackVariablesBegin ( ) ;
                     CfrTil_WordList_PushWord ( beginWord ) ;
-                    _Set_SCA ( beginWord ) ;
+                    Word_SetCodingHere_And_ClearPreviousUseOf_This_SCA (beginWord, 0) ;
 #else                    
                     CfrTil_BeginBlock ( ) ; // nb! before CfrTil_LocalsAndStackVariablesBegin
                     CfrTil_LocalsAndStackVariablesBegin ( ) ;
@@ -321,7 +321,7 @@ _CfrTil_Do_DynamicObject_ToReg ( DObject * dobject0, int8 reg )
         }
         else dobject = ndobject ;
     }
-    _Set_SCA ( dobject ) ;
+    Word_SetCodingHere_And_ClearPreviousUseOf_This_SCA (dobject, 0) ;
     if ( CompileMode ) _Compile_Move_Literal_Immediate_To_Reg ( reg, ( int64 ) & dobject->W_Value ) ;
     cntx->Interpreter0->CurrentObjectNamespace = TypeNamespace_Get ( dobject ) ; // do this elsewhere when needed
     return dobject ;
@@ -349,20 +349,16 @@ _Do_Variable ( Word * word )
     Context * cntx = _Context_ ;
     if ( GetState ( cntx, C_SYNTAX | INFIX_MODE ) || GetState ( cntx->Compiler0, LC_ARG_PARSING ) )
     {
-#if 1       
         if ( Is_LValue ( word ) )
         {
             cntx->Compiler0->LHS_Word = word ;
-            Word_SetCoding ( word, Here ) ;
-            //_Compile_GetVarLitObj_LValue_To_Reg ( word, ACC ) ;
+            Word_SetCoding (word, Here , 1) ;
         }
         else
-#endif            
         {
             if ( GetState ( _Context_, ADDRESS_OF_MODE ) )
             {
                 _Compile_GetVarLitObj_LValue_To_Reg ( word, ACC ) ;
-                //SetState ( _Context_, ADDRESS_OF_MODE, false ) ; // only good for one variable
             }
             else if ( ! ( word->CAttribute & REGISTER_VARIABLE ) )
             {
@@ -373,12 +369,11 @@ _Do_Variable ( Word * word )
     }
     else
     {
-        if ( word->CAttribute & REGISTER_VARIABLE )
+        if ( word->CAttribute & REGISTER_VARIABLE ) 
         {
-            //_Compile_Stack_PushReg ( DSP, word->RegToUse ) ;
-            _Word_CompileAndRecord_PushReg ( word, word->RegToUse ) ;
+            SetPreHere_ForDebug ( Here ) ;
         }
-        else
+        else 
         {
             _Compile_GetVarLitObj_LValue_To_Reg ( word, ACC ) ;
             _Word_CompileAndRecord_PushReg ( word, ACC ) ;
@@ -421,7 +416,7 @@ _CfrTil_Do_Variable ( Word * word )
         if ( word->CAttribute & ( OBJECT | THIS | QID ) || GetState ( word, QID ) ) //Finder_GetQualifyingNamespace ( cntx->Finder0 ) )
         {
             word->AccumulatedOffset = 0 ;
-            Word_SetCoding ( word, Here ) ;
+            Word_SetCoding (word, Here , 1) ;
             cntx->Interpreter0->BaseObject = word ;
             cntx->Interpreter0->CurrentObjectNamespace = TypeNamespace_Get ( word ) ;
             cntx->Compiler0->AccumulatedOffsetPointer = 0 ;

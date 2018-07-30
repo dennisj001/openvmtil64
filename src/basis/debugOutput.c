@@ -10,7 +10,7 @@ Debugger_Menu ( Debugger * debugger )
         "\nusi(N)g, s(H)ow DebugWordList, sh(O)w CompilerWordList, Q - CfrTil Registers, L - GotoList_Print"
         "\n'\\n' - escape, , '\\\' - <esc> - escape, ' ' - <space> - continue", c_gd ( Context_Location ( ) ) ) ;
     SetState ( debugger, DBG_MENU, false ) ;
-}
+} 
 
 // find and reconstruct locals source code in a buffer and parse it with the regular locals parse code
 
@@ -83,7 +83,8 @@ _Debugger_Locals_ShowALocal ( Debugger * debugger, Word * localsWord, byte * buf
     if ( localsWord->CAttribute & REGISTER_VARIABLE )
     {
         char * registerNames [ 16 ] = { ( char* ) "RAX", ( char* ) "RCX", ( char* ) "RDX", ( char* ) "RBX", ( char* ) "RBP", ( char* ) "RSP", ( char* ) "RSI", ( char* ) "RDI", ( char* ) "R8", ( char* ) "R9", ( char* ) "R10", ( char* ) "R11", ( char* ) "R12", ( char* ) "R13", ( char* ) "R14", ( char* ) "R15" } ;
-        _Printf ( ( byte* ) "\n%-018s : index = [  %3s   ]  : 0x%016lx : %16s.%-16s : %s",
+        //_Printf ( ( byte* ) "\n%-018s : index = [  %3s   ]  : 0x%016lx : %16s.%-16s : %s",
+        _Printf ( ( byte* ) "\n%-018s : index = [  %3s   ]  : <register  location> = 0x%016lx : %16s.%-16s : %s",
             "Register Variable", registerNames [ localsWord->RegToUse ], _Debugger_->cs_Cpu->Registers [ localsWord->RegToUse ],
             localsWord->S_ContainingNamespace->Name, c_u ( localsWord->Name ), word2 ? buffer : stringValue ? stringValue : ( byte* ) "" ) ;
     }
@@ -214,7 +215,7 @@ _Debugger_ShowEffects ( Debugger * debugger, Word * word, int8 stepFlag, int8 fo
         Word * word = debugger->w_Word ;
         if ( force || ( ( stepFlag ) || ( word ) && ( word != debugger->LastEffectsWord ) ) )
         {
-            NoticeColors ;
+            DebugColors ;
             if ( ( word->CAttribute & OBJECT_FIELD ) && ( ! ( word->CAttribute & DOT ) ) )
             {
                 if ( strcmp ( ( char* ) word->Name, "[" ) && strcmp ( ( char* ) word->Name, "]" ) ) // this block is repeated in arrays.c : make it into a function - TODO
@@ -244,14 +245,11 @@ _Debugger_ShowEffects ( Debugger * debugger, Word * word, int8 stepFlag, int8 fo
                 pb_change [ 0 ] = 0 ;
 
                 if ( GetState ( debugger, DBG_SHOW_STACK_CHANGE ) ) SetState ( debugger, DBG_SHOW_STACK_CHANGE, false ) ;
-                //if ( depthChange > 0 ) sprintf ( ( char* ) pb_change, "%ld %s%s", depthChange, ( depthChange > 1 ) ? "cells" : "cell", " pushed onto to the stack. " ) ;
-                //else if ( depthChange ) sprintf ( ( char* ) pb_change, "%ld %s%s", - depthChange, ( depthChange < - 1 ) ? "cells" : "cell", " popped off the stack. " ) ;
                 if ( depthChange > 0 ) sprintf ( ( char* ) pb_change, "%ld %s%s", depthChange, ( depthChange > 1 ) ? "cells" : "cell", " pushed. " ) ;
                 else if ( depthChange ) sprintf ( ( char* ) pb_change, "%ld %s%s", - depthChange, ( depthChange < - 1 ) ? "cells" : "cell", " popped. " ) ;
                 if ( _Dsp_ && ( debugger->SaveTOS != TOS ) ) op = "changed" ;
                 else op = "set" ;
                 sprintf ( ( char* ) c, ( char* ) "0x%016lx", ( uint64 ) TOS ) ;
-                //sprintf ( ( char* ) b, ( char* ) "TOS at : <0x%016lx> : %s to %s.", ( uint64 ) _Dsp_, op, c_gd ( c ) ) ;
                 sprintf ( ( char* ) b, ( char* ) "TOS %s to %s.", op, c_gd ( c ) ) ;
                 strcat ( ( char* ) pb_change, ( char* ) b ) ; // strcat ( (char*) _change, cc ( ( char* ) c, &_Q_->Default ) ) ;
                 name = word->Name ;
@@ -297,21 +295,10 @@ _Debugger_ShowEffects ( Debugger * debugger, Word * word, int8 stepFlag, int8 fo
                 {
                     _Debugger_PrintDataStack ( change + 1 ) ;
                 }
-#if 0                
-                //debugger->LastEffectsWord = word ;
-                if ( stepFlag && debugger->DebugAddress )
-                {
-                    Debugger_UdisOneInstruction ( debugger, debugger->DebugAddress, ( byte* ) "", ( byte* ) "" ) ; // the next instruction
-                    // keep eip - instruction pointer - up to date ..
-                    //debugger->cs_Cpu->Rip = ( uint64 * ) debugger->DebugAddress ;
-                }
-#endif                
             }
-            //else debugger->LastEffectsWord = 0 ;
             DebugColors ;
             debugger->LastEffectsWord = word ;
             debugger->LastShowWord = debugger->w_Word ;
-            //uint64 * dsp1 = Dsp ;
             Set_DataStackPointer_FromDspReg ( ) ;
         }
     }
@@ -650,7 +637,6 @@ _Debugger_DoState ( Debugger * debugger )
     else if ( GetState ( debugger, DBG_PROMPT ) ) Debugger_ShowState ( debugger, GetState ( debugger, DBG_RUNTIME ) ? ( byte* ) "<dbg>" : ( byte* ) "dbg" ) ;
 
     if ( GetState ( debugger, DBG_NEWLINE ) && ( ! GetState ( debugger, DBG_INFO ) ) ) _Debugger_DoNewlinePrompt ( debugger ) ;
-    //Debugger_InitDebugWordList ( debugger ) ;
     if ( GetState ( debugger, DBG_STEPPING | DBG_CONTINUE_MODE ) && ( ! GetState ( debugger, DBG_INFO ) ) )
     {
         if ( GetState ( debugger, DBG_START_STEPPING ) )
@@ -660,6 +646,7 @@ _Debugger_DoState ( Debugger * debugger )
         }
         Debugger_UdisOneInstruction ( debugger, debugger->DebugAddress, ( byte* ) "\r", ( byte* ) "" ) ;
     }
+    debugger->PreHere = Here ;
 }
 
 void
