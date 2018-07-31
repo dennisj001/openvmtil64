@@ -275,7 +275,7 @@
 #define _IsSourceCodeOn ( GetState ( _CfrTil_, DEBUG_SOURCE_CODE_MODE ) )
 #define IsSourceCodeOn ( _IsSourceCodeOn || IsGlobalsSourceCodeOn )
 #define IsSourceCodeOff (!IsSourceCodeOn) //( GetState ( _CfrTil_, DEBUG_SOURCE_CODE_MODE ) || IsGlobalsSourceCodeOn ))
-#define _Word_SCH_CPUSCA( word, clearFlag ) Word_SetCodingHere_And_ClearPreviousUseOf_This_SCA ( word, clearFlag) 
+#define _Word_SCH_CPUSCA( word, clearFlag ) Word_SetCodingHere_And_ClearPreviousUseOf_Here_SCA ( word, clearFlag) 
 #define WordStack_SCHCPUSCA( index, clearFlag ) _Word_SCH_CPUSCA (CfrTil_WordList ( index ), clearFlag) 
 #define _SC_Global_On SetState ( _CfrTil_, GLOBAL_SOURCE_CODE_MODE, true )
 #define SC_Global_On if ( GetState ( _CfrTil_, DEBUG_SOURCE_CODE_MODE ) ) { _SC_Global_On ; }

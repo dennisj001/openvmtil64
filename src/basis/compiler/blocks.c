@@ -9,7 +9,7 @@ BI_Block_Copy ( BlockInfo * bi, byte* dstAddress, byte * srcAddress, int64 bsize
     byte * saveHere = Here, * saveAddress = srcAddress ;
     ud_t * ud = Debugger_UdisInit ( _Debugger_ ) ;
     int64 isize, left ;
-    if ( dstAddress ) SetHere (dstAddress, 1) ;
+    if ( dstAddress ) SetHere ( dstAddress, 1 ) ;
     bi->CopiedToStart = Here ;
     for ( left = bsize ; ( left > 0 ) ; srcAddress += isize )
     {
@@ -23,7 +23,7 @@ BI_Block_Copy ( BlockInfo * bi, byte* dstAddress, byte * srcAddress, int64 bsize
             if ( ( left > 0 ) && ( ( * srcAddress + 1 ) != NOOP ) ) //  noop from our logic overwrite
             {
                 // ?? unable at present to compile inline with more than one return in the block
-                SetHere (saveHere, 1) ;
+                SetHere ( saveHere, 1 ) ;
                 Compile_Call ( saveAddress ) ;
             }
             else break ; // don't include RET
@@ -75,8 +75,8 @@ Compile_BlockLogicTest ( BlockInfo * bi ) // , byte * start )
         bi->CopiedToLogicJccCode = bi->CopiedToStart + diff ; // use diff in copied block
         if ( ( ! ( bi->LogicCodeWord->CAttribute & CATEGORY_LOGIC ) ) )
         {
-            SetHere (bi->CopiedToLogicJccCode, 1) ;
-            Word_SetCodingHere_And_ClearPreviousUseOf_This_SCA (bi->LogicCodeWord, 0) ;
+            SetHere ( bi->CopiedToLogicJccCode, 1 ) ;
+            Word_SetCodingHere_And_ClearPreviousUseOf_Here_SCA ( bi->LogicCodeWord, 0 ) ;
             _Compile_TestCode ( bi->LogicCodeWord->RegToUse, CELL ) ;
             bi->CopiedToLogicJccCode = Here ;
             BI_Set_setTtnn ( bi, TTT_ZERO, NEGFLAG_ON, TTT_ZERO, NEGFLAG_OFF ) ;
@@ -124,6 +124,7 @@ CfrTil_TurnOnBlockCompiler ( )
 {
     CfrTil_RightBracket ( ) ;
     CfrTil_WordList_RecycleInit ( _CfrTil_, _CfrTil_->CurrentWordCompiling, 0, 1, 1 ) ;
+    Compiler_RecycleOptInfos ( _Compiler_ ) ;
     //Word_RecycleWordList ( _CfrTil_->ScWord ) ;
 }
 
@@ -140,7 +141,7 @@ _CfrTil_BeginBlock0 ( )
     Context * cntx = _Context_ ;
     Compiler * compiler = cntx->Compiler0 ;
     BlockInfo *bi = ( BlockInfo * ) Mem_Allocate ( sizeof (BlockInfo ), COMPILER_TEMP ) ;
-    if ( ( ! CompileMode ) || ( ! Compiler_BlockLevel ( compiler )  ) )// first block
+    if ( ( ! CompileMode ) || ( ! Compiler_BlockLevel ( compiler ) ) )// first block
     {
         _CfrTil_->CurrentWordCompiling = compiler->CurrentCreatedWord ;
         CfrTil_TurnOnBlockCompiler ( ) ;
@@ -149,7 +150,7 @@ _CfrTil_BeginBlock0 ( )
     _Compile_UninitializedJump ( ) ;
     bi->JumpOffset = Here - INT32_SIZE ; // before CfrTil_CheckCompileLocalFrame after CompileUninitializedJump
     Stack_PointerToJmpOffset_Set ( ) ;
-    WordStack_SCHCPUSCA (0, 0) ; // after the jump! -- the jump is optimized out
+    WordStack_SCHCPUSCA ( 0, 0 ) ; // after the jump! -- the jump is optimized out
     bi->bp_First = Here ; // after the jump for inlining
 
     return bi ;
@@ -163,13 +164,12 @@ _CfrTil_BeginBlock1 ( BlockInfo * bi )
     {
         // remember : we always jmp around the blocks to the combinator ; the combinator sees the blocks on the stack and uses them otherwise they are lost
         // the jmps are optimized out so the word->Definition is a call to the first combinator
-        // we always add a frame and if not needed move the blocks to overwrite the extra code
+        // we always add a frame and if not needed we move the blocks to overwrite the extra code
         bi->LocalFrameStart = Here ; // before _Compile_AddLocalFrame
         _Compiler_AddLocalFrame ( compiler ) ; // cf EndBlock : if frame is not needed we use BI_Start else BI_FrameStart -- ?? could waste some code space ??
-        if ( compiler->NumberOfRegisterArgs ) Compile_InitRegisterParamenterVariables ( compiler ) ; // this function is called twice to deal with words that have locals before the first block and regular colon words
+        if ( compiler->NumberOfRegisterArgs ) Compile_Init_RegisterParamenterVariables ( compiler ) ; // this function is called twice to deal with words that have locals before the first block and regular colon words
     }
     bi->AfterLocalFrame = Here ; // after _Compiler_AddLocalFrame and Compile_InitRegisterVariables
-
     return bi ;
 }
 
@@ -194,7 +194,7 @@ CfrTil_BeginBlock ( )
 Boolean
 _Compiler_IsFrameNecessary ( Compiler * compiler )
 {
-    return ( compiler->NumberOfLocals + compiler->NumberOfArgs ) > ( compiler->NumberOfRegisterLocals + compiler->NumberOfRegisterArgs ) ;
+    return ( compiler->NumberOfLocals + compiler->NumberOfArgs ) > 0 ; //( compiler->NumberOfRegisterLocals + compiler->NumberOfRegisterArgs ) ;
 }
 
 void
@@ -214,24 +214,21 @@ _CfrTil_EndBlock1 ( BlockInfo * bi )
             if ( compiler->NumberOfRegisterVariables >= ( compiler->NumberOfArgs + compiler->NumberOfLocals ) ) bi->bp_First = bi->AfterLocalFrame ;
             if ( compiler->ReturnVariableWord )
             {
-                if ( compiler->ReturnVariableWord )
+                if ( compiler->ReturnVariableWord->CAttribute & REGISTER_VARIABLE )
                 {
-                    if ( compiler->ReturnVariableWord->CAttribute & REGISTER_VARIABLE )
-                    {
-                        _Compile_Move_Reg_To_StackN ( DSP, 0, compiler->ReturnVariableWord->RegToUse ) ;
-                    }
-                    else
-                    {
-                        Compile_GetVarLitObj_RValue_To_Reg ( compiler->ReturnVariableWord, ACC ) ;
-                        Compile_Move_ACC_To_TOS ( DSP ) ;
-                    }
+                    _Compile_Move_Reg_To_StackN ( DSP, 0, compiler->ReturnVariableWord->RegToUse ) ;
+                }
+                else
+                {
+                    Compile_GetVarLitObj_RValue_To_Reg ( compiler->ReturnVariableWord, ACC ) ;
+                    Compile_Move_ACC_To_TOS ( DSP ) ;
                 }
             }
             else if ( GetState ( compiler, RETURN_ACCUM ) || GetState ( compiler, RETURN_TOS ) ) Compile_Move_ACC_To_TOS ( DSP ) ;
         }
-        else bi->bp_First = bi->AfterLocalFrame ;  
+        else bi->bp_First = bi->AfterLocalFrame ;
     }
-    WordStack_SCHCPUSCA (0, 0) ;
+    WordStack_SCHCPUSCA ( 0, 0 ) ;
     _Compile_Return ( ) ;
     DataStack_Push ( ( int64 ) bi->bp_First ) ;
     bi->bp_Last = Here ;
@@ -257,7 +254,7 @@ _CfrTil_EndBlock2 ( BlockInfo * bi )
         d1 ( if ( Is_DebugModeOn ) Debugger_Disassemble ( _Debugger_, ( byte* ) first, bi->CopiedSize, 1 ) ) ;
 #endif        
         CfrTil_TurnOffBlockCompiler ( ) ;
-        Compiler_Init (compiler, 0) ;
+        Compiler_Init ( compiler, 0 ) ;
     }
     else
     {
@@ -272,7 +269,7 @@ _CfrTil_EndBlock ( )
     Context * cntx = _Context_ ;
     Compiler * compiler = cntx->Compiler0 ;
     BlockInfo * bi = ( BlockInfo * ) Stack_Pop_WithExceptionOnEmpty ( compiler->BlockStack ) ;
-    bi->LogicCodeWord = _CfrTil_WordList (1) ;
+    bi->LogicCodeWord = _CfrTil_WordList ( 1 ) ;
     _CfrTil_EndBlock1 ( bi ) ;
     byte * blockStart = _CfrTil_EndBlock2 ( bi ) ;
     return blockStart ;

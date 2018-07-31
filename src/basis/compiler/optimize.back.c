@@ -59,11 +59,8 @@ Compiler_GetOptimizeState ( Compiler * compiler, Word * word )
 {
     if ( word )
     {
-        CompileOptimizeInfo * optInfo ;
-        int64 state = compiler->OptInfo->State ;
-        compiler->OptInfo = Compiler_CompileOptimizeInfo_PushNew ( compiler ) ;
-        optInfo = compiler->OptInfo ;
-        CompileOptimizeInfo_Init ( optInfo, state ) ; // State : not used yet ??
+        CompileOptimizeInfo * optInfo = compiler->OptInfo ;
+        CompileOptimizeInfo_Init ( optInfo, compiler->OptInfo->State ) ; // State : not used yet ??
         optInfo->opWord = word ;
         SetState ( _CfrTil_, IN_OPTIMIZER, true ) ;
         for ( optInfo->node = optInfo->wordNode = dllist_First ( ( dllist* ) _CfrTil_->CompilerWordList ), optInfo->node = dlnode_Next ( optInfo->node ) ;
@@ -87,7 +84,6 @@ Compiler_GetOptimizeState ( Compiler * compiler, Word * word )
                     if ( optInfo->wordArg2 )
                     {
                         optInfo->wordArg1 = optInfo->wordn ;
-                        optInfo->wordArg1Node = optInfo->node ;
                         optInfo->wordArg1_Op = true ;
                     }
                     else
@@ -210,22 +206,19 @@ Compiler_Optimizer_WordArg2Op_Or_xBetweenArg1AndArg2 ( Compiler * compiler )
     if ( ( optInfo->wordArg2 && optInfo->wordArg2->StackPushRegisterCode ) ||
         ( optInfo->xBetweenArg1AndArg2 && optInfo->xBetweenArg1AndArg2->StackPushRegisterCode ) )
     {
-        //if ( optInfo->wordArg2->StackPushRegisterCode ) _SetHere_To_Word_StackPushRegisterCode ( optInfo->wordArg2, 0 ) ;
-        //if ( optInfo->xBetweenArg1AndArg2->StackPushRegisterCode )
-        //    _SetHere_To_Word_StackPushRegisterCode ( optInfo->xBetweenArg1AndArg2, 0 ) ;
-        Word_Check_SetHere_To_StackPushRegisterCode ( optInfo->xBetweenArg1AndArg2, 1 ) ;
-        Word_Check_SetHere_To_StackPushRegisterCode ( optInfo->wordArg2, 1 ) ;
+        if ( optInfo->wordArg2->StackPushRegisterCode ) _SetHere_To_Word_StackPushRegisterCode ( optInfo->wordArg2, 0 ) ;
+        else if ( optInfo->xBetweenArg1AndArg2->StackPushRegisterCode )
+            _SetHere_To_Word_StackPushRegisterCode ( optInfo->xBetweenArg1AndArg2, 0 ) ;
         if ( ! ( optInfo->opWord->CAttribute & ( CATEGORY_OP_1_ARG | CATEGORY_OP_OPEQUAL ) ) )
         {
-            if ( ! ( ( optInfo->opWord->CAttribute & ( CATEGORY_OP_EQUAL ) ) && Compile_Optimize_EqualCheck ( compiler ) ) )
-            {
-                _Word_SCH_CPUSCA ( optInfo->wordArg2, 1 ) ;
-                Compile_Move_Reg_To_Reg ( OREG, ACC ) ;
-                _Compile_Stack_PopToReg ( DSP, ACC ) ;
-                optInfo->Optimize_Reg = ACC | REG_ON_BIT ; // 0x16 : let Setup_MachineCodeInsnParameters know we have a parameter for it in case of ACC == 0
-                optInfo->Optimize_Rm = OREG ;
-            }
-            else Word_Check_SetHere_To_StackPushRegisterCode ( optInfo->wordArg2, 1 ) ; // the rest of the code will be handled in Compile_Optimize_Equal
+            //_Word_SCH_CPUSCA ( optInfo->opWord, 0 ) ;
+            _Word_SCH_CPUSCA ( optInfo->wordArg2, 1 ) ;
+            Compile_Move_Reg_To_Reg ( OREG, ACC ) ;
+            _Compile_Move_StackN_To_Reg ( ACC, DSP, 0 ) ;
+            Compile_SUBI ( REG, DSP, 0, CELL, 0 ) ;
+            optInfo->Optimize_Reg = ACC | REG_ON_BIT ; // 0x16 : let Setup_MachineCodeInsnParameters know we have a parameter for it in case of ACC == 0
+            optInfo->Optimize_Rm = OREG ;
+
         }
     }
     else Compile_StandardUnoptimized ( compiler ) ;
@@ -261,7 +254,7 @@ Compiler_Optimizer_2Args_Or_WordArg1_Op ( Compiler * compiler )
             optInfo->Optimize_Reg = ACC | REG_ON_BIT ;
             if ( optInfo->wordArg1->StackPushRegisterCode )
             {
-                _SetHere_To_Word_StackPushRegisterCode ( optInfo->wordArg1, 1 ) ;
+                _SetHere_To_Word_StackPushRegisterCode ( optInfo->wordArg1, 0 ) ;
             }
             else if ( optInfo->wordArg1->CAttribute & REGISTER_VARIABLE )
             {
@@ -275,7 +268,7 @@ Compiler_Optimizer_2Args_Or_WordArg1_Op ( Compiler * compiler )
             }
         }
         Compile_StandardArg ( optInfo->wordArg2, rm, optInfo->wordArg2_rvalue, 0 ) ;
-        optInfo->Optimize_Rm = rm | REG_ON_BIT ;
+        //optInfo->Optimize_Rm = rm | REG_ON_BIT ;
     }
 }
 
@@ -446,7 +439,7 @@ _SetHere_To_Word_StackPushRegisterCode ( Word * word, Boolean setDebugFlag )
 void
 Word_Check_SetHere_To_StackPushRegisterCode ( Word * word, Boolean setDebugFlag )
 {
-    if ( word && word->StackPushRegisterCode ) _SetHere_To_Word_StackPushRegisterCode ( word, setDebugFlag ) ;
+    if ( word->StackPushRegisterCode ) _SetHere_To_Word_StackPushRegisterCode ( word, setDebugFlag ) ;
 }
 
 #if 0
@@ -515,32 +508,6 @@ Compile_Optimize_OpEqual ( Compiler * compiler )
     else optInfo->rtrn = 0 ;
 }
 
-// nb! : assumes that reg 0
-
-Word *
-Compile_Optimize_EqualCheck ( Compiler * compiler )
-{
-    CompileOptimizeInfo * coi = ( COI * ) _Stack_Pick ( compiler->OptimizeInfoStack, 1 ) ;
-    Word * word ;
-    dlnode * node, *nextNode ;
-    if ( coi->NumberOfArgs == 2 )
-    {
-        for ( node = coi->wordArg1Node ; node && ( nextNode = dlnode_Next ( node ) ) ; node = nextNode )
-        {
-            word = ( Word* ) dobject_Get_M_Slot ( nextNode, SCN_WORD ) ;
-            if ( word->CAttribute & ( LOCAL_VARIABLE | PARAMETER_VARIABLE ) )
-            {
-                if ( word->CAttribute & REGISTER_VARIABLE )
-                {
-                    return compiler->OptInfo->wordArg0_ForOpEqual = word ;
-                }
-                break ;
-            }
-        }
-    }
-    return 0 ; 
-}
-#define STACK_PUSH_REGISTER_CODE_SIZE 7 // bytes
 void
 Compile_Optimize_Equal ( Compiler * compiler )
 {
@@ -553,7 +520,7 @@ Compile_Optimize_Equal ( Compiler * compiler )
     else dstReg = ACC ;
     if ( ( optInfo->wordArg2 && ( optInfo->wordArg2->CAttribute & REGISTER_VARIABLE ) ) || optInfo->wordArg2_Op )
     {
-        srcReg = ( optInfo->wordArg2->RegToUse != ACC ) ? optInfo->wordArg2->RegToUse : OREG ;
+        srcReg = (optInfo->wordArg2->RegToUse != ACC) ? optInfo->wordArg2->RegToUse : OREG ;
     }
     else srcReg = OREG ;
     if ( optInfo->wordArg2_literal )
@@ -571,25 +538,8 @@ Compile_Optimize_Equal ( Compiler * compiler )
         }
         //else Compile_Move_Reg_To_Reg ( srcReg, OREG ) ; //optInfo->wordArg2->RegToUse ) ;
     }
-    Word_SetCodingHere_And_ClearPreviousUseOf_Here_SCA ( optInfo->opWord, 1 ) ;
-    if ( ( optInfo->NumberOfArgs == 1 ) && optInfo->wordArg2_Op )
-    {
-        Word * word = compiler->OptInfo->wordArg0_ForOpEqual ;
-        if ( word ) 
-        {
-            Compile_Move_Reg_To_Reg ( word->RegToUse, optInfo->wordArg2->RegToUse ) ; // & 0xf turn off REG_ON_BIT
-            if ( word->StackPushRegisterCode )
-            {
-                byte * src = word->StackPushRegisterCode + STACK_PUSH_REGISTER_CODE_SIZE ;
-                BI_Block_Copy ( 0, word->StackPushRegisterCode, src, Here - src, 0 ) ;
-            }
-            compiler->OptInfo->wordArg0_ForOpEqual = 0 ;
-            goto done ;
-        }
-    }
     if ( optInfo->wordArg1 && ( optInfo->wordArg1->CAttribute & REGISTER_VARIABLE ) ) Compile_Move_Reg_To_Reg ( dstReg, srcReg ) ;
     else Compile_Move_Reg_To_Rm ( dstReg, srcReg, 0 ) ;
-done:
     optInfo->rtrn = OPTIMIZE_DONE ;
 }
 

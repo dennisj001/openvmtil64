@@ -219,11 +219,12 @@ _CfrTil_Parse_LocalsAndStackVariables ( int64 svf, int64 lispMode, ListObject * 
             if ( String_Equal ( token, "(" ) ) continue ;
             word = Finder_Word_FindUsing ( finder, token, 1 ) ; // ?? find after Literal - eliminate making strings or numbers words ??
             if ( word && ( word->CAttribute & ( NAMESPACE | CLASS ) ) && ( CharTable_IsCharType ( ReadLine_PeekNextChar ( lexer->ReadLiner0 ), CHAR_ALPHA ) ) )
-                //if ( word && ( word->CAttribute & ( CLASS ) ) && ( CharTable_IsCharType ( ReadLine_PeekNextChar ( lexer->ReadLiner0 ), CHAR_ALPHA ) ) )
             {
-                //Word * iword ;
-                //if ( ( iword = Finder_FindWord_InOneNamespace ( _Finder_, word, ( byte* ) "init" ) )
-                //    || ( _Namespace_VariableValueGet ( word, ( byte* ) "size" ) > 8 ) )
+#if 0                
+                Word * iword ;
+                if ( ( iword = Finder_FindWord_InOneNamespace ( _Finder_, word, ( byte* ) "init" ) )
+                    || ( _Namespace_VariableValueGet ( word, ( byte* ) "size" ) > 8 ) )
+#endif                
                 {
                     typeNamespace = word ;
                 }
@@ -285,14 +286,14 @@ _CfrTil_Parse_LocalsAndStackVariables ( int64 svf, int64 lispMode, ListObject * 
                 if ( regFlag == true )
                 {
                     ctype |= REGISTER_VARIABLE ;
-                    if ( ctype & LOCAL_VARIABLE ) { compiler->NumberOfLocals -- ; }
-                    else { compiler->NumberOfArgs -- ; }
-                    compiler->NumberOfRegisterVariables = compiler->NumberOfRegisterArgs + compiler->NumberOfRegisterLocals ;
+                    compiler->NumberOfRegisterVariables ++ ;
+                    if ( ctype & LOCAL_VARIABLE ) compiler->NumberOfLocals -- ;
+                    else if ( ctype & PARAMETER_VARIABLE ) compiler->NumberOfArgs -- ;
                 }
                 word = _CfrTil_LocalWord ( token, ( ctype & LOCAL_VARIABLE ) ? ++ compiler->NumberOfLocals : ++ compiler->NumberOfArgs, ctype, ctype2, ltype ) ; // svf : flag - whether stack variables are in the frame
                 if ( regFlag == true )
                 {
-                    word->RegToUse = RegOrder ( regToUseIndex ++ ) ; //compiler->RegOrder [ regToUseIndex ++ ] ;
+                    word->RegToUse = RegOrder ( regToUseIndex ++ ) ;
                     if ( word->CAttribute & PARAMETER_VARIABLE )
                     {
                         if ( ! compiler->RegisterParameterList )
@@ -308,7 +309,6 @@ _CfrTil_Parse_LocalsAndStackVariables ( int64 svf, int64 lispMode, ListObject * 
                 if ( typeNamespace )
                 {
                     Compiler_TypedObjectInit ( typeNamespace, word ) ;
-                    //SetState ( word, W_INITIALIZED, false ) ; // shouldn't be necessary
                 }
                 typeNamespace = 0 ;
                 if ( String_Equal ( token, "this" ) ) word->CAttribute |= THIS ;
@@ -319,7 +319,7 @@ _CfrTil_Parse_LocalsAndStackVariables ( int64 svf, int64 lispMode, ListObject * 
     compiler->State |= getReturn ;
 
     // we support nested locals and may have locals in other blocks so the indexes are cumulative
-    if ( compiler->NumberOfRegisterVariables ) Compile_InitRegisterParamenterVariables ( compiler ) ;
+    if ( compiler->NumberOfRegisterVariables ) Compile_Init_RegisterParamenterVariables ( compiler ) ;
     if ( returnVariable ) compiler->ReturnVariableWord = _Finder_FindWord_InOneNamespace ( _Finder_, localsNs, returnVariable ) ;
 
     _CfrTil_->InNamespace = saveInNs ;
@@ -327,8 +327,8 @@ _CfrTil_Parse_LocalsAndStackVariables ( int64 svf, int64 lispMode, ListObject * 
     finder->FoundWord = 0 ;
     Lexer_SetTokenDelimiters ( lexer, svDelimiters, COMPILER_TEMP ) ;
     SetState ( compiler, VARIABLE_FRAME, true ) ;
-    //cntx->CurrentlyRunningWord->W_NumberOfArgs = compiler->NumberOfArgs ;
     SetState ( _CfrTil_, DEBUG_SOURCE_CODE_MODE, scm ) ;
+    compiler->LocalsNamespace = localsNs ;
     return localsNs ;
 }
 

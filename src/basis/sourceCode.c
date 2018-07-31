@@ -172,7 +172,7 @@ _Word_SetCoding_And_ClearPreviousUseOf_A_SCA ( Word * word, byte * index, Boolea
 }
 
 void
-Word_SetCodingHere_And_ClearPreviousUseOf_This_SCA ( Word * word, Boolean clearPreviousFlag )
+Word_SetCodingHere_And_ClearPreviousUseOf_Here_SCA ( Word * word, Boolean clearPreviousFlag )
 {
     _Word_SetCoding_And_ClearPreviousUseOf_A_SCA ( word, Here, clearPreviousFlag ) ;
 }

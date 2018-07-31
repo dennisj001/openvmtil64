@@ -372,7 +372,7 @@ Root
 '_doDemo 1 const    
 'todo 0 const    
 dbgOff
-dbgOn 
+//dbgOn 
 #if Is_DebugOn 
 
 #if todo
@@ -389,7 +389,10 @@ stringMacrosOff
 
 #else
 
-// you can trim this file to your needs and put your personal init code here maybe
+// of course you can trim this file to your needs and put your personal init code here maybe
+lispOff
+List
+_((lambda ( a b) (+ a b)) 3 4 ) dupList eval printList nl printList s lcReset  
 #if 1
 : factorial ( REG n | REG rec ) rec 1 = { n @ 1 > } { rec @ n @ * rec store n -- } while return rec ;
 'factorial find wdiss 
@@ -411,11 +414,11 @@ c_syntaxOff
     }
     for
     // nl svn @ fprint ":" ps fn @ fprint 
-    fn @
+    return fn
 ;
 ' fibBN find wdiss
 20 fibBN dup p 6765 _assert 
-d: : fibBN ( n | fn REG fn1 fn2 -- TOS ) 
+: fibBN ( n | fn REG fn1 fn2 -- TOS ) 
     { fn 0 = fn1 0 = fn2 1 = } { n @ 0 > } { n 1 -= } 
     {   
         fn1 fn2 @ = 
@@ -428,7 +431,59 @@ d: : fibBN ( n | fn REG fn1 fn2 -- TOS )
 ;
 ' fibBN find wdiss
 20 fibBN dup p 6765 _assert 
-: fibBN ( REG n | fn fn1 fn2 -- TOS ) 
+: fibBN ( n | fn REG fn1 REG fn2 -- TOS ) 
+    { fn 0 = fn1 0 = fn2 1 = } { n @ 0 > } { n 1 -= } 
+    {   
+        fn1 fn2 @ = 
+        fn2 fn @ = 
+        fn fn1 @ fn2 @ + = 
+    }
+    for
+    // nl svn @ fprint ":" ps fn @ fprint 
+    fn @
+;
+' fibBN find wdiss
+20 fibBN dup p 6765 _assert 
+: fibBN ( n | fn REG fn1 REG fn2 -- TOS ) 
+    { fn 0 = fn1 0 = fn2 1 = } { n @ 0 > } { n 1 -= } 
+    {   
+        fn1 fn2 @ = 
+        fn2 fn @ = 
+        fn fn1 @ fn2 @ + = 
+    }
+    for
+    // nl svn @ fprint ":" ps fn @ fprint 
+    fn @
+;
+' fibBN find wdiss
+20 fibBN dup p 6765 _assert 
+: fibBN ( REG n | fn fn1 REG fn2 -- TOS ) 
+    { fn 0 = fn1 0 = fn2 1 = } { n @ 0 > } { n 1 -= } 
+    {   
+        fn1 fn2 @ = 
+        fn2 fn @ = 
+        fn fn1 @ fn2 @ + = 
+    }
+    for
+    // nl svn @ fprint ":" ps fn @ fprint 
+    fn @
+;
+' fibBN find wdiss
+20 fibBN dup p 6765 _assert 
+: fibBN ( REG n | fn REG fn1 REG fn2 -- TOS ) 
+    { fn 0 = fn1 0 = fn2 1 = } { n @ 0 > } { n 1 -= } 
+    {   
+        fn1 fn2 @ = 
+        fn2 fn @ = 
+        fn fn1 @ fn2 @ + = 
+    }
+    for
+    // nl svn @ fprint ":" ps fn @ fprint 
+    fn @
+;
+' fibBN find wdiss
+20 fibBN dup p 6765 _assert 
+: fibBN ( REG n | REG fn fn1 REG fn2 -- TOS ) 
     { fn 0 = fn1 0 = fn2 1 = } { n @ 0 > } { n 1 -= } 
     {   
         fn1 fn2 @ = 
@@ -443,9 +498,11 @@ d: : fibBN ( n | fn REG fn1 fn2 -- TOS )
 20 fibBN dup p 6765 _assert 
 #endif
 #if 1
-//: factorial ( n | rec ) rec 1 = { n @ 1 > } { rec @ n @ d: * rec store n -- } while return rec d: ;
-: factorial ( REG n | REG rec ) rec 1 = { d: n @ 1 > } { rec @ n @ * rec store n -- } while return rec ;
-'factorial find wdiss // _wdiss ( 'factorial find ) 
+: factorial ( n | rec ) rec 1 = { n @ 1 > } { rec @ n @ * rec store n -- } while return rec ;
+'factorial find wdiss 
+7 factorial dup p 5040 "factorial" assert1
+: factorial ( REG n | REG rec ) rec 1 = { n @ 1 > } { rec @ n @ * rec store n -- } while return rec ;
+'factorial find wdiss 
 7 factorial dup p 5040 "factorial" assert1
 #endif
 //pause

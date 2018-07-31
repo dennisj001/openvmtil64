@@ -31,7 +31,7 @@
  */
 
 void
-Compile_InitRegisterParamenterVariables ( Compiler * compiler )
+Compile_Init_RegisterParamenterVariables ( Compiler * compiler )
 {
     dllist * list = compiler->RegisterParameterList ;
     dlnode * node ;
@@ -56,7 +56,7 @@ _Compiler_AddLocalFrame ( Compiler * compiler )
 {
     _Compile_Move_Reg_To_StackN ( DSP, 1, FP ) ; // save pre fp
     _Compile_LEA ( FP, DSP, 0, LocalVarIndex_Disp ( 1 ) ) ; // set new fp
-    Compile_ADDI ( REG, DSP, 0, ( compiler->LocalsFrameSize + 1 ) * CELL, INT32_SIZE ) ; // 1 : fp - add stack frame -- this value is going to be reset 
+    Compile_ADDI ( REG, DSP, 0, 1 * CELL, INT32_SIZE ) ; // 1 : fp - add stack frame -- this value is going to be reset 
     compiler->FrameSizeCellOffset = ( int64* ) ( Here - INT32_SIZE ) ; // in case we have to add to the framesize with nested locals
     d0 ( if ( Is_DebugOn ) Compile_Call_TestRSP ( ( byte* ) CfrTil_Debugger_Locals_Show ) ) ;
 }
@@ -64,7 +64,7 @@ _Compiler_AddLocalFrame ( Compiler * compiler )
 void
 Compiler_SetLocalsFrameSize_AtItsCellOffset ( Compiler * compiler )
 {
-    int64 size = compiler->NumberOfLocals + compiler->NumberOfRegisterLocals ;
+    int64 size = compiler->NumberOfLocals ; //+ compiler->NumberOfRegisterLocals ;
     int64 fsize = compiler->LocalsFrameSize = ( ( ( size < 0 ? 0 : size ) + 1 ) * CELL ) ; //1 : the frame pointer 
     if ( fsize ) *( ( int32* ) ( compiler->FrameSizeCellOffset ) ) = fsize ; //compiler->LocalsFrameSize ; //+ ( IsSourceCodeOn ? 8 : 0 ) ;
 }
@@ -73,28 +73,39 @@ void
 _Compiler_RemoveLocalFrame ( Compiler * compiler )
 {
     int64 parameterVarsSubAmount ;
-    Boolean returnValueFlag ;
+    Boolean returnValueFlag, already = false ;
+    Word * one ;
     WordStack_SCHCPUSCA ( 0, 1 ) ;
     Compiler_SetLocalsFrameSize_AtItsCellOffset ( compiler ) ;
     parameterVarsSubAmount = ( ( compiler->NumberOfArgs ) * CELL ) ;
-    //parameterVarsSubAmount = ( ( compiler->NumberOfArgs + ( IsSourceCodeOn ? 1 : 0 ) ) * CELL ) ;
     returnValueFlag = ( _Context_->CurrentlyRunningWord->CAttribute & C_RETURN ) || ( GetState ( compiler, RETURN_TOS | RETURN_ACCUM ) ) || IsWordRecursive || compiler->ReturnVariableWord ;
+    if ( ! _Q_->OVT_LC ) one = WordStack ( 1 ) ;
+    else one = 0 ;
     if ( ( ! returnValueFlag ) && GetState ( _Context_, C_SYNTAX ) && ( _CfrTil_->CurrentWordCompiling->S_ContainingNamespace ) && ( ! String_Equal ( _CfrTil_->CurrentWordCompiling->S_ContainingNamespace->Name, "void" ) ) )
     {
         SetState ( compiler, RETURN_TOS, true ) ;
     }
-    //Word * word = compiler->ReturnVariableWord ;
     if ( compiler->ReturnVariableWord )
     {
         Compile_GetVarLitObj_RValue_To_Reg ( compiler->ReturnVariableWord, ACC ) ; // nb. these variables have no lasting lvalue - they exist on the stack - therefore we can only return there rvalue
     }
     else if ( compiler->NumberOfArgs && returnValueFlag && ( ! GetState ( compiler, RETURN_ACCUM ) ) )
     {
-        Compile_Move_TOS_To_ACCUM ( DSP ) ; // save TOS to ACCUM so we can set return it as TOS below
+        if ( one && one->StackPushRegisterCode )
+        {
+            already = true ;
+            SetHere ( one->StackPushRegisterCode, 1 ) ;
+        }
+        else Compile_Move_TOS_To_ACCUM ( DSP ) ; // save TOS to ACCUM so we can set return it as TOS below
     }
     else if ( GetState ( compiler, RETURN_TOS ) )
     {
-        Compile_Move_TOS_To_ACCUM ( DSP ) ;
+        if ( one && one->StackPushRegisterCode )
+        {
+            already = true ;
+            SetHere ( one->StackPushRegisterCode, 1 ) ;
+        }
+        else Compile_Move_TOS_To_ACCUM ( DSP ) ; // save TOS to ACCUM so we can set return it as TOS below
     }
     //PeepHole_Optimize ( ) ;
     _Compile_LEA ( DSP, FP, 0, - LocalVarIndex_Disp ( 1 ) ) ; // restore sp - release locals stack frame
@@ -105,7 +116,7 @@ _Compiler_RemoveLocalFrame ( Compiler * compiler )
     {
         Compile_SUBI ( REG, DSP, 0, parameterVarsSubAmount, 0 ) ; // remove stack variables
     }
-    else if ( parameterVarsSubAmount < 0 )
+    else if ( ( ! already ) && ( parameterVarsSubAmount < 0 ) )
     {
         Compile_ADDI ( REG, DSP, 0, abs ( parameterVarsSubAmount ), 0 ) ; // add a place on the stack for return value
     }

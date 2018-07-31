@@ -645,6 +645,7 @@ typedef struct
 #endif
 typedef struct
 {
+    Symbol COI_Symbol ;
     union
     {
         uint64 State ;
@@ -701,7 +702,7 @@ typedef struct
 #define REG_ON_BIT              ( 0x10 ) // decimal 16, beyond the 15 regs
     int64 rtrn, NumberOfArgs ;
     uint16 ControlFlags ;
-    Word *opWord, *wordn, *wordm, *wordArg1, *wordArg2, *xBetweenArg1AndArg2 ;
+    Word *opWord, *wordn, *wordm, *wordArg1, *wordArg2, *xBetweenArg1AndArg2, *wordArg0_ForOpEqual ;
     dlnode * node, *nodem, *wordNode, *nextNode, *wordArg2Node, *wordArg1Node ; 
     Boolean rvalue, wordArg1_rvalue, wordArg2_rvalue, wordArg1_literal, wordArg2_literal ;
     Boolean wordOp, wordArg1_Op, wordArg2_Op ; 
@@ -727,7 +728,7 @@ typedef struct
 #define ARG2_L                   ( 1 << 2 )
 #define ARG2_R                   ( 1 << 3 )
 #define OP_RESULT                ( 1 << 4 )
-} CompileOptimizeInfo ;
+} CompileOptimizeInfo, COI ;
 typedef struct
 {
     uint64 State ;
@@ -755,7 +756,7 @@ typedef struct
     Word * ReturnVariableWord ;
     Word * CurrentWord, *CurrentCreatedWord ;
     Word * LHS_Word ;
-    Namespace *C_BackgroundNamespace, *C_FunctionBackgroundNamespace ; //, ** FunctionTypesArray ;
+    Namespace *C_BackgroundNamespace, *C_FunctionBackgroundNamespace, *LocalsNamespace ; //, ** FunctionTypesArray ;
     dllist * GotoList ;
     dllist * CurrentSwitchList ;
     dllist * RegisterParameterList ;
@@ -768,6 +769,7 @@ typedef struct
     Stack * BlockStack ;
     Stack * NamespacesStack ;
     Stack * InfixOperatorStack ;
+    Stack * OptimizeInfoStack ;
 } Compiler ;
 typedef struct Interpreter
 {
@@ -796,7 +798,8 @@ typedef struct _Debugger
     int64 Key ;
     int64 SaveKey ; 
     int64 TokenStart_ReadLineIndex, Esi, Edi ;
-    Word * w_Word, *EntryWord, *LastShowWord, *LastEffectsWord, *LastSetupWord, *SteppedWord, *CurrentlyRunningWord, *LastSourceCodeWord ;
+    Word * w_Word, *EntryWord, *LastShowWord, *LastEffectsWord; 
+    Word *LocalsNamespace, *LastSetupWord, *SteppedWord, *CurrentlyRunningWord, *LastSourceCodeWord ;
     byte * Token ;
     block SaveCpuState ;
     block RestoreCpuState ;
@@ -960,6 +963,7 @@ typedef struct
     dlnode NBAsTailNode ;
     dllist * BufferList ;
     dllist * RecycledWordList ;
+    dllist * RecycledOptInfoList ;
     int64 RecycledWordCount ;
 } MemorySpace ;
 typedef struct

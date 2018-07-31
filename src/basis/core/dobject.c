@@ -226,7 +226,7 @@ CfrTil_DObject_Clone ( )
 {
     DObject * proto = ( DObject * ) DataStack_Pop ( ) ;
     byte * name = ( byte * ) DataStack_Pop ( ) ;
-    if ( ! ( proto->CAttribute & DOBJECT ) ) Error2 ( ( byte* ) "Cloning Error : \'%s\' is not a dynamic object.", proto->Name, 1 ) ;
+    if ( ! ( proto->CAttribute & DOBJECT ) ) Error ( ( byte* ) "Cloning Error : \'%s\' is not a dynamic object.", proto->Name, 1 ) ;
     DObject_Sub_New ( proto, name, DOBJECT ) ;
 }
 

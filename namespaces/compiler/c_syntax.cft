@@ -270,7 +270,6 @@ $ ( | atoken, buffer, CBuffer buffer0 )
     }
 } 
 'void.$ find wdiss sp
-TODO ( "fix $ in c_syntax.cft" )
 
 #if doScript2 
 "\n\nnew $ test\n" ps

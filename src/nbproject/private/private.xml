@@ -7,17 +7,17 @@
         <activeConfTypeElem>0</activeConfTypeElem>
         <activeConfIndexElem>0</activeConfIndexElem>
     </data>
-    <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="32">
+    <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="33">
         <file>
             <url>basis/compiler/blocks.c</url>
             <bookmark id="7">
                 <name/>
-                <line>163</line>
+                <line>164</line>
                 <key/>
             </bookmark>
             <bookmark id="6">
                 <name/>
-                <line>285</line>
+                <line>282</line>
                 <key/>
             </bookmark>
         </file>
@@ -66,27 +66,32 @@
             <url>basis/compiler/optimize.c</url>
             <bookmark id="32">
                 <name/>
-                <line>215</line>
+                <line>222</line>
                 <key/>
             </bookmark>
             <bookmark id="29">
                 <name/>
-                <line>249</line>
+                <line>254</line>
                 <key/>
             </bookmark>
             <bookmark id="30">
                 <name/>
-                <line>264</line>
+                <line>269</line>
+                <key/>
+            </bookmark>
+            <bookmark id="33">
+                <name/>
+                <line>406</line>
                 <key/>
             </bookmark>
             <bookmark id="28">
                 <name/>
-                <line>476</line>
+                <line>492</line>
                 <key/>
             </bookmark>
             <bookmark id="31">
                 <name/>
-                <line>502</line>
+                <line>545</line>
                 <key/>
             </bookmark>
         </file>
@@ -127,13 +132,12 @@
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
             <file>file:/media/sdc4/dennisj/openvmtil64/src/basis/compiler/blocks.c</file>
+            <file>file:/media/sdc4/dennisj/openvmtil64/src/basis/compiler/compiler.c</file>
             <file>file:/media/sdc4/dennisj/openvmtil64/src/basis/compiler/optimize.c</file>
-            <file>file:/media/sdc4/dennisj/openvmtil64/src/basis/core/parse.c</file>
-            <file>file:/media/sdc4/dennisj/openvmtil64/src/basis/sourceCode.c</file>
             <file>file:/media/sdc4/dennisj/openvmtil64/src/basis/openVmTil.c</file>
             <file>file:/media/sdc4/dennisj/openvmtil64/init.cft</file>
             <file>file:/media/sdc4/dennisj/openvmtil64/src/basis/compiler/locals.c</file>
-            <file>file:/media/sdc4/dennisj/openvmtil64/src/basis/core/block.c</file>
+            <file>file:/media/sdc4/dennisj/openvmtil64/src/basis/core/memSpace.c</file>
         </group>
     </open-files>
 </project-private>

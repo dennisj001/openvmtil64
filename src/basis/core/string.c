@@ -727,8 +727,8 @@ int64
 String_CheckWordSize ( byte * str, int64 wl ) //, Boolean lPunctFlag, Boolean rPunctFlag )
 {
     byte * start, *end ;
-    int64 i, length ;
-    Boolean punctFlag = IsPunct ( str [0] ), rPunctFlag = IsPunct ( str [Strlen (str)] ) ; //punctFlag means first character of word is punctuation 
+    int64 i, length ; 
+    Boolean punctFlag = IsPunct ( str [0] ), rPunctFlag = IsPunct ( str [wl - 1] ) ; //punctFlag means first character of word is punctuation 
 
     for ( i = - 1 ; abs ( i ) < ( wl + 1 ) ; i -- ) // go to left of str first
     {
@@ -765,7 +765,7 @@ String_FindStrnCmpIndex ( byte * sc, byte* name0, int64 index0, int64 wl0, int64
         scindex = & sc [ index + i ] ;
         if ( ( index + i <= slsc ) && ( ! Strncmp ( & sc [ index + i ], name0, wl0 ) ) )//l ) ) //wl0 ) )
         {
-            if ( String_CheckWordSize ( scindex, wl0 ) )  //lPunctuationFlag, rPunctuationFlag ) )
+            if ( String_CheckWordSize ( scindex, wl0 ) ) //lPunctuationFlag, rPunctuationFlag ) )
             {
                 index += i ;
                 goto done ;
@@ -1020,11 +1020,11 @@ _String_CountTabs ( byte * start, byte * end )
 }
 #endif
 
-byte * 
+byte *
 Buffer_Clear ( Buffer * b )
 {
     Mem_Clear ( b->B_Data, b->B_Size ) ;
-    return Buffer_Data ( b )  ;
+    return Buffer_Data ( b ) ;
 }
 
 byte *

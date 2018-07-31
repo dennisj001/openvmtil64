@@ -159,7 +159,6 @@ _Namespace_ActivateAsPrimary ( Namespace * ns )
     {
         Finder_SetQualifyingNamespace ( _Context_->Finder0, ns ) ;
         _Namespace_AddToUsingList ( ns ) ;
-        //dllist_AddNodeToHead ( _CfrTil_->Namespaces->W_List, ( dlnode* ) ns ) ;
         _CfrTil_->InNamespace = ns ;
         _Context_->Interpreter0->BaseObject = 0 ;
     }
@@ -306,7 +305,6 @@ _Namespace_UsingLast ( byte * name )
 void
 _Namespace_RemoveFromUsingList ( Namespace * ns )
 {
-    //ns->State = NOT_USING ;
     _Namespace_SetAsNotUsing_MoveToTail ( ns ) ;
     _Namespace_MapAny_2Args ( ( MapSymbolFunction2 ) _RemoveSubNamespacesFromUsingList, ( int64 ) ns, 0 ) ;
 }
@@ -382,7 +380,6 @@ _Namespace_FreeNamespacesStack ( Stack * stack )
 Namespace *
 Namespace_New ( byte * name, Namespace * containingNs )
 {
-    //ns = _DataObject_New ( NAMESPACE, 0, name, NAMESPACE | IMMEDIATE, 0, 0, 0, ( int64 ) containingNs, 0 ) ;
     Namespace * ns = _DataObject_New (NAMESPACE, 0, name, NAMESPACE, 0, 0, 0, ( int64 ) containingNs, 0, 0 , -1) ;
 }
 
@@ -394,8 +391,6 @@ Namespace_FindOrNew_SetUsing ( byte * name, Namespace * containingNs, int64 setU
     Namespace * ns = _Namespace_Find ( name, containingNs, 0 ) ;
     if ( ! ns )
     {
-        //ns = _DataObject_New ( NAMESPACE, 0, name, NAMESPACE | IMMEDIATE, 0, 0, 0, ( int64 ) containingNs, 0 ) ;
-        //ns = _DataObject_New ( NAMESPACE, 0, name, NAMESPACE, 0, 0, 0, ( int64 ) containingNs, 0 ) ;
         ns = Namespace_New ( name, containingNs ) ;
     }
     if ( setUsingFlag ) Namespace_SetState ( ns, USING ) ;
@@ -406,7 +401,7 @@ Namespace *
 _Namespace_FindOrNew_Local ( Stack * nsStack )
 {
 
-    int64 d = Stack_Depth ( nsStack ) ; //, bsd = Stack_Depth ( _Context_->Compiler0->BlockStack ) ;
+    int64 d = Stack_Depth ( nsStack ) ; 
     byte bufferData [ 32 ], *buffer = ( byte* ) bufferData ;
     sprintf ( ( char* ) buffer, "locals_%ld", d ) ;
     Namespace * ns = Namespace_FindOrNew_SetUsing ( buffer, _CfrTil_->Namespaces, 1 ) ;

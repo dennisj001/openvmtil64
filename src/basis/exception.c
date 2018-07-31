@@ -1,6 +1,8 @@
 
 #include "../include/cfrtil64.h"
 
+// ?? the logic of exceptions *definitely* could be reworked ??
+
 int64
 _OpenVmTil_ShowExceptionInfo ( int signal )
 {
@@ -28,14 +30,14 @@ _OpenVmTil_ShowExceptionInfo ( int signal )
                             debugger->w_Word = word ;
                         }
                     }
-                }
-                AlertColors ;
-                debugger->w_Word = _Context_->CurrentlyRunningWord ; //= word ; //_Interpreter_->LastWord ; ;
-                SetState ( debugger, DBG_INFO, true ) ;
-                Debugger_ShowInfo ( debugger, _Q_->ExceptionMessage, _Q_->Signal ) ;
+                    //}
+                    AlertColors ;
+                    debugger->w_Word = _Context_->CurrentlyRunningWord ; //= word ; //_Interpreter_->LastWord ; ;
+                    SetState ( debugger, DBG_INFO, true ) ;
+                    Debugger_ShowInfo ( debugger, _Q_->ExceptionMessage, _Q_->Signal ) ;
 
-                if ( _Q_->Signal != 11 )
-                {
+                    //if ( _Q_->Signal != SIGSEGV )
+                    //{
                     if ( GetState ( debugger, DBG_STEPPING ) ) Debugger_Registers ( debugger ) ;
                     if ( word )
                     {
@@ -173,6 +175,15 @@ OpenVmTil_Pause ( )
 }
 
 void
+OVT_ResetSignals ( int64 signals )
+{
+    sigset_t signal_set ;
+    sigemptyset ( &signal_set ) ;
+    sigaddset ( &signal_set, signals ) ;
+    sigprocmask ( SIG_UNBLOCK, &signal_set, NULL ) ;
+}
+
+void
 _OVT_Throw ( int64 restartCondition, int8 pauseFlag )
 {
     sigjmp_buf * jb ;
@@ -187,26 +198,23 @@ _OVT_Throw ( int64 restartCondition, int8 pauseFlag )
     {
         if ( _Q_->Signal & ( SIGSEGV | SIGBUS ) )
         {
-            sigset_t signal_set ;
-            sigemptyset ( &signal_set ) ;
-            sigaddset ( &signal_set, ( SIGSEGV | SIGBUS ) ) ;
-            sigprocmask ( SIG_UNBLOCK, &signal_set, NULL ) ;
+            OVT_ResetSignals ( _Q_->Signal ) ;
             if ( ++ _Q_->SigSegvs < 2 )
             {
                 jb = & _CfrTil_->JmpBuf0 ;
-                if ( _Q_->Signal != SIGBUS )
+                if ( ! ( _Q_->Signal & ( SIGBUS | SIGSEGV ) ) )
                 {
                     _OpenVmTil_ShowExceptionInfo ( _Q_->Signal ) ;
                     pauseFlag ++ ;
                     _Q_->RestartCondition = ABORT ;
                 }
             }
-            else _Q_->RestartCondition = INITIAL_START ;
+            else _Q_->RestartCondition = ABORT ; //INITIAL_START ;
+            _Q_->ExceptionMessage = "\nAborting : ...\n" ;
         }
-        if ( ( _Q_->SignalExceptionsHandled > 1 ) || ( restartCondition == INITIAL_START ) )
+        if ( ( _Q_->SigSegvs ) && ( ( _Q_->SignalExceptionsHandled > 1 ) || ( restartCondition == INITIAL_START ) ) )
         {
             jb = & _Q_->JmpBuf0 ;
-            _Q_->RestartCondition = INITIAL_START ;
         }
         else jb = & _CfrTil_->JmpBuf0 ;
     }
@@ -216,10 +224,10 @@ _OVT_Throw ( int64 restartCondition, int8 pauseFlag )
         else jb = & _CfrTil_->JmpBuf0 ;
     }
     printf ( "\n%s\n%s %s at %s -> ...", ( _Q_->ExceptionMessage ? _Q_->ExceptionMessage : ( byte* ) "" ),
-        ( jb == & _CfrTil_->JmpBuf0 ) ? "reseting cfrTil" : "fully restarting", ( _Q_->Signal == SIGSEGV ) ? ": SIGSEGV" : "", Context_Location ( ) ) ;
+        ( jb == & _CfrTil_->JmpBuf0 ) ? "reseting cfrTil" : "restarting OpenVmTil", ( _Q_->Signal == SIGSEGV ) ? ": SIGSEGV" : "", Context_Location ( ) ) ;
     fflush ( stdout ) ;
 
-    //if ( ( ! pauseFlag ) && ( _Q_->SignalExceptionsHandled < 2 ) ) _OVT_Pause ( 0, _Q_->SignalExceptionsHandled ) ;
+    if ( ( ! pauseFlag ) && ( _Q_->SignalExceptionsHandled < 2 ) ) _OVT_Pause ( 0, _Q_->SignalExceptionsHandled ) ;
     siglongjmp ( *jb, 1 ) ;
 }
 
@@ -250,17 +258,24 @@ OpenVmTil_SignalAction ( int signal, siginfo_t * si, void * uc )
     if ( ( signal >= SIGCHLD ) || ( signal == SIGTRAP ) ) //||( signal == SIGBUS ))
     {
         if ( ( signal != SIGCHLD ) && ( signal != SIGWINCH ) && ( signal != SIGTRAP ) ) _OpenVmTil_ShowExceptionInfo ( signal ) ;
+        OVT_ResetSignals ( _Q_->Signal ) ;
         _Q_->SigAddress = 0 ; //|| ( signal == SIGWINCH ) ) _Q_->SigAddress = 0 ; // 17 : "CHILD TERMINATED" : ignore; its just back from a shell fork
         _Q_->Signal = 0 ;
     }
     else
     {
         //_Q_->SignalExceptionsHandled ++ ;
-        if ( ( signal != SIGSEGV ) || _Q_->SignalExceptionsHandled < 2 ) _Printf ( ( byte* ) "\nOpenVmTil_SignalAction : address = 0x%016lx : %s", _Q_->SigAddress, _Q_->SigLocation ) ;
-        if ( _Debugger_->DebugAddress )
+        if ( signal != SIGSEGV )
         {
-            _Debugger_Udis_OneInstruction ( _Debugger_, _Debugger_->DebugAddress, "", "" ) ;
-            Debugger_Registers ( _Debugger_ ) ;
+            if ( _Q_->SignalExceptionsHandled < 2 )
+            {
+                _Printf ( ( byte* ) "\nOpenVmTil_SignalAction : address = 0x%016lx : %s", _Q_->SigAddress, _Q_->SigLocation ) ;
+                if ( _Debugger_->DebugAddress )
+                {
+                    _Debugger_Udis_OneInstruction ( _Debugger_, _Debugger_->DebugAddress, "", "" ) ;
+                    Debugger_Registers ( _Debugger_ ) ;
+                }
+            }
         }
         _OVT_Throw ( _Q_->RestartCondition, 0 ) ;
     }
@@ -397,24 +412,5 @@ CfrTil_Exception ( int64 signal, byte * message, int64 restartCondition )
         }
     }
     return ;
-}
-
-// ?? the logic of exceptions could be reworked ??
-
-void
-Error3 ( byte * format, byte * one, byte * two, int64 three )
-{
-
-    char buffer [ 128 ] ;
-    sprintf ( ( char* ) buffer, ( char* ) format, one, two ) ;
-    Error ( ( byte* ) buffer, "", three ) ;
-}
-
-void
-Error2 ( byte * format, byte * one, int64 two )
-{
-    char buffer [ 128 ] ;
-    sprintf ( ( char* ) buffer, ( char* ) format, one ) ;
-    Error ( ( byte* ) buffer, "", two ) ;
 }
 

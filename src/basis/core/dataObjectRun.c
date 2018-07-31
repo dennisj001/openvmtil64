@@ -119,7 +119,7 @@ _Namespace_Do_C_Type ( Namespace * ns )
                     Block_Eval ( beginWord->Definition ) ; //( beginWord ) ;
                     CfrTil_LocalsAndStackVariablesBegin ( ) ;
                     CfrTil_WordList_PushWord ( beginWord ) ;
-                    Word_SetCodingHere_And_ClearPreviousUseOf_This_SCA (beginWord, 0) ;
+                    Word_SetCodingHere_And_ClearPreviousUseOf_Here_SCA (beginWord, 0) ;
 #else                    
                     CfrTil_BeginBlock ( ) ; // nb! before CfrTil_LocalsAndStackVariablesBegin
                     CfrTil_LocalsAndStackVariablesBegin ( ) ;
@@ -321,7 +321,7 @@ _CfrTil_Do_DynamicObject_ToReg ( DObject * dobject0, int8 reg )
         }
         else dobject = ndobject ;
     }
-    Word_SetCodingHere_And_ClearPreviousUseOf_This_SCA (dobject, 0) ;
+    Word_SetCodingHere_And_ClearPreviousUseOf_Here_SCA (dobject, 0) ;
     if ( CompileMode ) _Compile_Move_Literal_Immediate_To_Reg ( reg, ( int64 ) & dobject->W_Value ) ;
     cntx->Interpreter0->CurrentObjectNamespace = TypeNamespace_Get ( dobject ) ; // do this elsewhere when needed
     return dobject ;
@@ -372,6 +372,7 @@ _Do_Variable ( Word * word )
         if ( word->CAttribute & REGISTER_VARIABLE ) 
         {
             SetPreHere_ForDebug ( Here ) ;
+            _Word_CompileAndRecord_PushReg ( word, word->RegToUse ) ;
         }
         else 
         {

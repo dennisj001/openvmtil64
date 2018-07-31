@@ -66,7 +66,7 @@ _Word_Interpret ( Word * word )
 void
 _Word_Compile ( Word * word )
 {
-    Word_SetCodingHere_And_ClearPreviousUseOf_This_SCA (word, 0) ;
+    Word_SetCodingHere_And_ClearPreviousUseOf_Here_SCA (word, 0) ;
     if ( ! word->Definition )
     {
         CfrTil_SetupRecursiveCall ( ) ;

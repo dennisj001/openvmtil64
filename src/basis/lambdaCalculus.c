@@ -932,7 +932,7 @@ _LO_Apply_ArgList ( ListObject * l0, Word * word )
         {
             Compile_MoveImm_To_Reg ( RAX, 0, CELL ) ; // for printf ?? others //System V ABI : "%rax is used to indicate the number of vector arguments passed to a function requiring a variable number of arguments"
         }
-        Word_SetCodingHere_And_ClearPreviousUseOf_This_SCA (word, 0) ;
+        Word_SetCodingHere_And_ClearPreviousUseOf_Here_SCA (word, 0) ;
         Word_Eval ( word ) ;
         if ( word->CAttribute2 & RAX_RETURN ) _Word_CompileAndRecord_PushReg ( word, ACC ) ;
         if ( ! svcm )
@@ -1487,7 +1487,7 @@ _LO_CfrTil ( ListObject * lfirst )
     SetState ( compiler, LISP_MODE, false ) ;
     for ( ldata = _LO_Next ( lfirst ) ; ldata ; ldata = _LO_Next ( ldata ) )
     {
-        Word_SetCodingHere_And_ClearPreviousUseOf_This_SCA (ldata->CfrTilWord, 0) ;
+        Word_SetCodingHere_And_ClearPreviousUseOf_Here_SCA (ldata->CfrTilWord, 0) ;
         if ( ldata->LAttribute & ( LIST_NODE ) )
         {
             _CfrTil_Parse_LocalsAndStackVariables ( 1, 1, ldata, compiler->LocalsCompilingNamespacesStack, 0 ) ;

@@ -108,7 +108,6 @@
       <itemPath>Makefile</itemPath>
       <itemPath>../etc</itemPath>
       <itemPath>../init.cft</itemPath>
-      <itemPath>nbproject/private/launcher.properties</itemPath>
       <itemPath>../m</itemPath>
       <itemPath>../mir</itemPath>
       <itemPath>../namespaces</itemPath>
@@ -250,6 +249,8 @@
         </cTool>
       </item>
       <item path="basis/core/block.c" ex="false" tool="0" flavor2="0">
+        <cTool flags="0">
+        </cTool>
       </item>
       <item path="basis/core/charSet.c" ex="false" tool="0" flavor2="0">
         <cTool flags="0">

@@ -341,8 +341,8 @@ _Compile_X_Group1_Immediate ( int8 code, int8 mod, int8 rm, int64 disp, uint64 i
 void
 Compile_X_Group1 ( Compiler * compiler, int64 op, int64 ttt, int64 n )
 {
-    CompileOptimizeInfo * optInfo = compiler->OptInfo ;
     int64 optFlag = Compiler_CheckOptimize ( compiler, 0 ) ;
+    CompileOptimizeInfo * optInfo = compiler->OptInfo ; //Compiler_CheckOptimize may change the optInfo
     if ( optFlag == OPTIMIZE_DONE ) return ;
     else if ( optFlag )
     {
@@ -365,7 +365,7 @@ Compile_X_Group1 ( Compiler * compiler, int64 op, int64 ttt, int64 n )
         if ( one && one->StackPushRegisterCode ) SetHere ( one->StackPushRegisterCode, 1 ) ;
         else Compile_Pop_To_Acc ( DSP ) ;
         //_Compile_X_Group1 ( int8 code, int64 toRegOrMem, int8 mod, int8 reg, int8 rm, int8 sib, int64 disp, int64 osize )
-        Word_SetCodingHere_And_ClearPreviousUseOf_This_SCA ( optInfo->opWord, 0 ) ;
+        Word_SetCodingHere_And_ClearPreviousUseOf_Here_SCA ( optInfo->opWord, 0 ) ;
         _Compile_X_Group1 ( op, REG, MEM, ACC, DSP, 0, 0, CELL_SIZE ) ; // result is on TOS
         _Word_CompileAndRecord_PushReg ( CfrTil_WordList ( 0 ), ACC ) ; // 0 : ?!? should be the exact variable 
         //DBI_OFF ;
@@ -419,8 +419,8 @@ _Compile_Group5 ( int8 code, int8 mod, int8 rm, int8 sib, int64 disp, int8 size 
 void
 Compile_X_Group5 ( Compiler * compiler, int64 op )
 {
-    CompileOptimizeInfo * optInfo = compiler->OptInfo ;
     int64 optFlag = Compiler_CheckOptimize ( compiler, 0 ) ;
+    CompileOptimizeInfo * optInfo = compiler->OptInfo ; //Compiler_CheckOptimize may change the optInfo
     Word *one = _CfrTil_WordList ( 1 ) ; // assumes two values ( n m ) on the DSP stack 
     if ( optFlag & OPTIMIZE_DONE ) return ;
     else if ( optFlag )
@@ -431,7 +431,7 @@ Compile_X_Group5 ( Compiler * compiler, int64 op )
             optInfo->Optimize_Mod = REG ;
             optInfo->Optimize_Rm = ACC ;
         }
-        Word_SetCodingHere_And_ClearPreviousUseOf_This_SCA ( optInfo->opWord, 0 ) ;
+        Word_SetCodingHere_And_ClearPreviousUseOf_Here_SCA ( optInfo->opWord, 0 ) ;
         _Compile_Group5 ( op, optInfo->Optimize_Mod, optInfo->Optimize_Rm, 0, optInfo->Optimize_Disp, 0 ) ;
     }
     else if ( one && one->CAttribute & ( PARAMETER_VARIABLE | LOCAL_VARIABLE | NAMESPACE_VARIABLE ) ) // *( ( cell* ) ( TOS ) ) += 1 ;

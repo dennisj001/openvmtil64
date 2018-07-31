@@ -212,6 +212,7 @@ MemorySpace_Init ( MemorySpace * ms )
 
     ms->BufferList = _dllist_New ( OPENVMTIL ) ; // put it here to minimize allocating chunks for each node and the list
     ms->RecycledWordList = _dllist_New ( OPENVMTIL ) ; // put it here to minimize allocating chunks for each node and the list
+    ms->RecycledOptInfoList = _dllist_New ( OPENVMTIL ) ; // put it here to minimize allocating chunks for each node and the list
     //ms->RecycledContextList = _dllist_New ( OPENVMTIL ) ; // put it here to minimize allocating chunks for each node and the list
 
     _Q_CodeByteArray = ms->CodeSpace->ba_CurrentByteArray ; //init CompilerSpace ptr
@@ -568,6 +569,12 @@ void
 Word_Recycle ( Word * w )
 {
     if ( w ) dllist_AddNodeToHead ( _Q_->MemorySpace0->RecycledWordList, ( dlnode* ) w ) ;
+}
+
+void
+OptInfo_Recycle ( CompileOptimizeInfo * coi )
+{
+    if ( coi ) dllist_AddNodeToHead ( _Q_->MemorySpace0->RecycledOptInfoList, ( dlnode* ) coi ) ;
 }
 
 void
