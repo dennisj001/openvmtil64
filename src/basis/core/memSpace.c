@@ -88,7 +88,7 @@ _Mem_ChunkAllocate ( int64 size, uint64 allocType )
     dllist_AddNodeToHead ( &_Q_->PermanentMemList, ( dlnode* ) mchunk ) ;
     return ( byte* ) mchunk ;
 }
-
+#if 0
 byte *
 Mem_Allocate ( int64 size, uint64 allocType )
 {
@@ -117,6 +117,37 @@ Mem_Allocate ( int64 size, uint64 allocType )
         default: CfrTil_Exception ( MEMORY_ALLOCATION_ERROR, 0, QUIT ) ;
     }
 }
+#else
+byte *
+Mem_Allocate ( int64 size, uint64 allocType )
+{
+    MemorySpace * ms = _Q_->MemorySpace0 ;
+    switch ( allocType )
+    {
+        case OPENVMTIL: return _Allocate ( size, ms->OpenVmTilSpace ) ;
+        case LISP: case OBJECT_MEMORY: return _Allocate ( size, ms->ObjectSpace ) ;
+        case TEMPORARY: return _Allocate ( size, ms->TempObjectSpace ) ; // used for SourceCode
+        case DICTIONARY: return _Allocate ( size, ms->DictionarySpace ) ;
+        //case TEMPORARY: 
+        case SESSION: return _Allocate ( size, ms->SessionObjectsSpace ) ;
+        case CODE: return _Allocate ( size, ms->CodeSpace ) ;
+        case BUFFER: return _Allocate ( size, ms->BufferSpace ) ;
+        case HISTORY: return _Allocate ( size, ms->HistorySpace ) ;
+        case LISP_TEMP: return _Allocate ( size, ms->LispTempSpace ) ;
+        case CONTEXT: return _Allocate ( size, ms->ContextSpace ) ;
+        case COMPILER_TEMP: return _Allocate ( size, ms->CompilerTempObjectSpace ) ;
+        case CFRTIL: case DATA_STACK: return _Allocate ( size, ms->CfrTilInternalSpace ) ;
+        case STRING_MEMORY: return _Allocate ( size, ms->StringSpace ) ;
+            //case SIZED_ALLOCATE: return Sized_Allocate ( size ) ;
+        case RUNTIME:
+        {
+            _Q_->RunTimeAllocation += size ;
+            return mmap_AllocMem ( size ) ;
+        }
+        default: CfrTil_Exception ( MEMORY_ALLOCATION_ERROR, 0, QUIT ) ;
+    }
+}
+#endif
 
 void
 Mem_FreeItem ( dllist * mList, byte * item )
@@ -188,6 +219,14 @@ MemorySpace_NBA_New ( MemorySpace * memSpace, byte * name, int64 size, int64 all
     NamedByteArray *nba = NamedByteArray_New ( name, size, allocType ) ;
     dllist_AddNodeToHead ( &memSpace->NBAs, ( dlnode* ) & nba->NBA_Symbol ) ;
     return nba ;
+}
+
+void
+OVT_FreeTempMem ( )
+{
+    OVT_MemListFree_CompilerTempObjects ( ) ;
+    OVT_MemListFree_LispTemp ( ) ; // more careful allocation accounting work needs to be done before something like this can be done now
+    OVT_MemListFree_TempObjects ( ) ;
 }
 
 void
@@ -584,7 +623,7 @@ OptInfo_Recycle ( CompileOptimizeInfo * coi )
 void
 _CheckRecycleWord ( Word * w )
 {
-    if ( w && ( w->S_CAttribute & RECYCLABLE_COPY ) ) //&& ( ! ( IsSourceCodeOn ) ) && GetState ( w, W_SOURCE_CODE_MODE ) )
+    if ( w && ( w->CAttribute & RECYCLABLE_COPY ) ) //&& ( ! ( IsSourceCodeOn ) ) && GetState ( w, W_SOURCE_CODE_MODE ) )
     {
         d0 ( _Printf ( ( byte* ) "\nrecycling : %s", w->Name ) ) ;
         Word_Recycle ( w ) ;

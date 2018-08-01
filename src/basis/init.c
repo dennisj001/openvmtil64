@@ -14,7 +14,7 @@ _CfrTil_Init_SessionCore ( CfrTil * cfrTil, int64 cntxDelFlag, int64 promptFlag 
     ReadLine_Init ( cntx->ReadLiner0, _CfrTil_Key ) ;
     Lexer_Init ( cntx->Lexer0, 0, 0, CONTEXT ) ;
     Finder_Init ( cntx->Finder0 ) ;
-    Compiler_Init (cntx->Compiler0, 0 ) ;
+    Compiler_Init ( cntx->Compiler0, 0 ) ;
     Interpreter_Init ( cntx->Interpreter0 ) ;
     CfrTil_ClearTokenList ( ) ;
     if ( cntxDelFlag )
@@ -22,9 +22,7 @@ _CfrTil_Init_SessionCore ( CfrTil * cfrTil, int64 cntxDelFlag, int64 promptFlag 
         int64 stackDepth = Stack_Depth ( cfrTil->ContextDataStack ) ;
         for ( i = 0 ; i < stackDepth ; i ++ ) CfrTil_Context_PopDelete ( cfrTil ) ;
     }
-    OVT_MemListFree_TempObjects ( ) ;
-    OVT_MemListFree_CompilerTempObjects ( ) ;
-    OVT_MemListFree_LispTemp ( ) ; // more careful allocation accounting work needs to be done before something like this can be done now
+    OVT_FreeTempMem ( ) ;
     CfrTil_CheckInitDataStack ( ) ;
     if ( ! _Q_->Verbosity ) _Q_->Verbosity = 1 ;
     _OVT_Ok ( promptFlag ) ;
@@ -36,6 +34,7 @@ _CfrTil_Init_SessionCore ( CfrTil * cfrTil, int64 cntxDelFlag, int64 promptFlag 
     SetBuffersUnused ( 1 ) ;
     d0 ( Buffer_PrintBuffers ( ) ) ;
     DefaultColors ;
+    cfrTil->ScWord = 0 ;
 }
 
 void
@@ -49,7 +48,7 @@ CfrTil_ResetAll_Init ( CfrTil * cfrTil )
 {
     byte * startDirectory = ( byte* ) "namespaces" ;
     if ( ! GetState ( _Q_, OVT_IN_USEFUL_DIRECTORY ) ) startDirectory = ( byte* ) "/usr/local/lib/cfrTil64/namespaces" ;
-    _DataObject_New (NAMESPACE_VARIABLE, 0, ( byte* ) "_startDirectory_", NAMESPACE_VARIABLE, 0, 0, 0, ( int64 ) startDirectory, 0, 0 , -1) ;
+    _DataObject_New ( NAMESPACE_VARIABLE, 0, ( byte* ) "_startDirectory_", NAMESPACE_VARIABLE, 0, 0, 0, ( int64 ) startDirectory, 0, 0, - 1 ) ;
     if ( ( _Q_->RestartCondition >= RESET_ALL ) )
     {
         _Q_->StartIncludeTries = 0 ;

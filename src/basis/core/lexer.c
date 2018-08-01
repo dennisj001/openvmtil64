@@ -195,7 +195,7 @@ Lexer_GetTokenNameFromTokenList ( Lexer * lexer, Boolean peekFlag )
 Symbol *
 Lexer_Token_New ( byte * token )
 {
-    Symbol * tknSym = _Symbol_New ( token, TEMPORARY ) ;
+    Symbol * tknSym = _Symbol_New ( token, SESSION ) ;
     tknSym->S_Value = _Context_->Lexer0->TokenStart_ReadLineIndex ;
     tknSym->S_Value2 = _Context_->Lexer0->TokenEnd_ReadLineIndex ;
     tknSym->S_Value3 = _Context_->Lexer0->LineNumber ;

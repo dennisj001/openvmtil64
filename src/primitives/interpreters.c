@@ -126,7 +126,7 @@ _CfrTil_Interpret_ReadToList ( )
 {
     byte * token ;
     Interpreter * interp = _Context_->Interpreter0 ;
-    interp->InterpList = List_New ( ) ;
+    interp->InterpList = List_New ( SESSION ) ;
     while ( token = Lexer_ReadToken ( _Lexer_ ) )
     {
         if ( String_Equal ( token, ";l" ) ) break ;

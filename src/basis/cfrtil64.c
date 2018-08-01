@@ -51,6 +51,7 @@ CfrTil_RecycleWordList ( Word * scWord )
     {
         DLList_RecycleWordList ( scWord->W_SC_WordList ) ;
         List_Init ( scWord->W_SC_WordList ) ;
+        _CfrTil_->ScWord = 0 ;
     }
     else
     {
@@ -173,7 +174,6 @@ _CfrTil_Init ( CfrTil * cfrTil, Namespace * nss )
     cfrTil->LC_PrintB = _Buffer_NewPermanent ( BUFFER_SIZE ) ;
     cfrTil->LC_DefineB = _Buffer_NewPermanent ( BUFFER_SIZE ) ;
     cfrTil->TokenB = _Buffer_NewPermanent ( BUFFER_SIZE ) ;
-    //cfrTil->PrintfB = _Buffer_NewPermanent ( BUFFER_SIZE ) ;
     cfrTil->ScratchB1 = _Buffer_NewPermanent ( BUFFER_SIZE ) ;
     cfrTil->ScratchB2 = _Buffer_NewPermanent ( BUFFER_SIZE ) ;
     cfrTil->ScratchB3 = _Buffer_NewPermanent ( BUFFER_SIZE ) ;
@@ -193,7 +193,6 @@ _CfrTil_Init ( CfrTil * cfrTil, Namespace * nss )
     cfrTil->OriginalInputLine = Buffer_Data ( cfrTil->OriginalInputLineB ) ;
     cfrTil->SC_Buffer = Buffer_Data ( cfrTil->SourceCodeBuffer ) ;
     cfrTil->LispPrintBuffer = Buffer_Data ( cfrTil->LC_PrintB ) ;
-    //cfrTil->LispDefineBuffer = Buffer_Data ( cfrTil->LC_DefineB ) ;
     cfrTil->TokenBuffer = Buffer_Data ( cfrTil->TokenB ) ;
     SetState ( cfrTil, CFRTIL_RUN | OPTIMIZE_ON | INLINE_ON, true ) ;
 
@@ -201,8 +200,6 @@ _CfrTil_Init ( CfrTil * cfrTil, Namespace * nss )
 
     cfrTil->ContextDataStack = Stack_New ( 256, allocType ) ;
     cfrTil->ObjectStack = Stack_New ( 1 * K, allocType ) ;
-    //cfrTil->DebugStateStack = Stack_New ( 1 * K, allocType ) ;
-    //_Stack_Push ( cfrTil->DebugStateStack, 0 ) ;
     cfrTil->TokenList = _dllist_New ( allocType ) ;
     cfrTil->CompilerWordList = _dllist_New ( allocType ) ;
 
@@ -220,8 +217,6 @@ _CfrTil_Init ( CfrTil * cfrTil, Namespace * nss )
     {
         _CfrTil_NamespacesInit ( cfrTil ) ;
     }
-    //cfrTil->ReturnStack = Stack_New ( 1 * K, CFRTIL ) ;
-    //_Rsp_ = cfrTil->ReturnStack->StackPointer ;
     if ( cfrTil->SaveDsp && cfrTil->DataStack ) // with _Q_->RestartCondition = STOP from Debugger_Stop
     {
         _Dsp_ = cfrTil->SaveDsp ;
@@ -233,7 +228,6 @@ _CfrTil_Init ( CfrTil * cfrTil, Namespace * nss )
         cfrTil->SaveDsp = _Dsp_ ;
     }
     CfrTil_MachineCodePrimitive_AddWords ( cfrTil ) ; // in any case we need to reinit these for eg. debugger->SaveCpuState (), etc.
-    //_CfrTil_SyncStackPointers_ToRegs ( cfrTil ) ;
     cfrTil->StoreWord = Finder_FindWord_AnyNamespace ( _Finder_, ( byte* ) "store" ) ;
     cfrTil->PokeWord = Finder_FindWord_AnyNamespace ( _Finder_, ( byte* ) "poke" ) ;
     cfrTil->LispNamespace = Namespace_Find ( ( byte* ) "Lisp" ) ;

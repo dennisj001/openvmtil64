@@ -245,12 +245,10 @@ _Namespace_Symbol_Print ( Symbol * symbol, int64 printFlag, int64 str )
 byte *
 _CfrTil_UsingToString ( )
 {
-    //Buffer * buffer = Buffer_New ( BUFFER_SIZE ) ;
     byte * b = Buffer_Data ( _CfrTil_->ScratchB1 ) ;
     strcpy ( ( char* ) b, "" ) ;
     Tree_Map_State_2Args ( _CfrTil_->Namespaces->Lo_List, USING, ( MapSymbolFunction2 ) _Namespace_Symbol_Print, 0, ( int64 ) b ) ;
     b = String_New ( ( byte* ) b, TEMPORARY ) ;
-    //Buffer_SetAsUnused ( buffer ) ;
     return b ;
 }
 

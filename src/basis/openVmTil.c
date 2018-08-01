@@ -1,5 +1,5 @@
 #include "../include/cfrtil64.h"
-#define VERSION ((byte*) "0.848.450" ) 
+#define VERSION ((byte*) "0.848.600" ) 
 
 OpenVmTil * _Q_ ; 
 
@@ -23,8 +23,8 @@ _OpenVmTil ( int64 argc, char * argv [ ] )
     while ( 1 )
     {
         OpenVmTil * ovt = _Q_ = _OpenVmTil_New ( _Q_, argc, argv ) ;
-        ovt->SigSegvs = sigSegvs ;
         ovt->RestartCondition = restartCondition ;
+        if ( restartCondition != INITIAL_START ) ovt->SigSegvs = sigSegvs ;
         if ( ! sigsetjmp ( ovt->JmpBuf0, 0 ) )
         {
             _OpenVmTil_Run ( ovt ) ;

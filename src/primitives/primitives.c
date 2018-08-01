@@ -379,6 +379,12 @@ CPrimitive CPrimitives [] = {
     { "addToHistoryOn", 0, 0, OpenVmTil_AddStringToHistoryOn, 0, 0, 0, "OpenVmTil", "Root" },
     { "addToHistoryOff", 0, 0, OpenVmTil_AddStringToHistoryOff, 0, 0, 0, "OpenVmTil", "Root" },
     { "showAllocated", 0, 0, OVT_Mem_ShowAllocated, 0, 0, 0, "OpenVmTil", "Root" },
+    
+    { "freeTemporayMem", 0, 0, OVT_MemListFree_TempObjects, 0, 0, 0, "Memory", "OpenVmTil" },
+    { "freeCompilerTempMem", 0, 0, OVT_MemListFree_CompilerTempObjects, 0, 0, 0, "Memory", "OpenVmTil" },
+    { "freeLispTempMem", 0, 0, OVT_MemListFree_LispTemp, 0, 0, 0, "Memory", "OpenVmTil" },
+    { "freeSessionMem", 0, 0, OVT_MemListFree_Session, 0, 0, 0, "Memory", "OpenVmTil" },
+    { "freeAllTempMem", 0, 0, OVT_FreeTempMem, 0, 0, 0, "Memory", "OpenVmTil" },
 
     { "_dup", 0, 0, CfrTil_Dup, CATEGORY_DUP | CATEGORY_OP_STACK, 0, 0, "Stack", "Root" },
     { "dup", 0, 0, CfrTil_Dup, IMMEDIATE | CATEGORY_DUP | CATEGORY_OP_STACK, 0, 0, "Stack", "Root" },

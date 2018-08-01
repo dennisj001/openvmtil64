@@ -87,6 +87,7 @@ cfrtil64-gdb : include/prototypes.h $(OBJECTS)
 cfrtil64o : $(OBJECTS)
 	$(CC) $(CFLAGS) $(OBJECTS) -o $(OUT) $(LIBS)
 	strip $(OUT)
+	mv $(OUT) ../bin
 
 _cfrtil64_O1 : CFLAGS = $(CFLAGS_CORE) -O1
 _cfrtil64_O1 : OUT = cfrtil64o1

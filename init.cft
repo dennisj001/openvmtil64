@@ -484,18 +484,18 @@ c_syntaxOff
 ' fibBN find wdiss
 20 fibBN dup p 6765 _assert 
 : fibBN ( REG n | REG fn fn1 REG fn2 -- TOS ) 
-    { fn 0 = fn1 0 = fn2 1 = } { n @ 0 > } { n 1 -= } 
+    { fn 0 = fn1 0 = fn2 1 = } { d: n @ 0 > } { n 1 -= } 
     {   
         fn1 fn2 @ = 
         fn2 fn @ = 
-        d: fn fn1 @ fn2 @ + = 
+        fn fn1 @ fn2 @ + = 
     }
     for
     // nl svn @ fprint ":" ps fn @ fprint 
     fn @
 ;
 ' fibBN find wdiss
-20 fibBN dup p 6765 _assert 
+20 d: fibBN dup p 6765 _assert 
 #endif
 #if 1
 : factorial ( n | rec ) rec 1 = { n @ 1 > } { rec @ n @ * rec store n -- } while return rec ;

@@ -127,7 +127,7 @@ inline
 void
 _List_PushNew_ForWordList ( dllist *list, Word * word, int64 inUseFlag )
 {
-    _dllist_PushNew_M_Slot_Node ( list, T_WORD, TEMPORARY, SCN_NUMBER_OF_SLOTS, ( ( int64 ) word ), word->W_SC_Index, inUseFlag ) ;
+    _dllist_PushNew_M_Slot_Node ( list, T_WORD, SESSION, SCN_NUMBER_OF_SLOTS, ( ( int64 ) word ), word->W_SC_Index, inUseFlag ) ;
 }
 
 inline
@@ -320,13 +320,7 @@ dllist_Depth ( dllist * list )
 void
 _dllist_AddNodeToHead ( dllist *list, dlnode * node )
 {
-    if ( list && node )
-    {
-        dlnode_InsertThisAfterANode ( node, list->head ) ; // after Head toward Tail
-        //dlnode_InsertThisAfterANode ( node, (dlnode*) list ) ; // after Head toward Tail
-        //dlnode_InsertThisBeforeANode ( dllist_First ( list ), node ) ; // Insert this Before node : toward the head of the list - "before" the Tail
-        
-    }
+    if ( list && node ) dlnode_InsertThisAfterANode ( node, list->head ) ; // after Head toward Tail
 }
 
 void
@@ -334,7 +328,6 @@ dllist_AddNodeToHead ( dllist *list, dlnode * node )
 {
     if ( node )
     {
-        // prevent trying to add nodes already on the list; this will move it to the beginning
         dlnode_Remove ( node ) ; // if the node is already on a list it will be first removed
         _dllist_AddNodeToHead ( list, node ) ;
         list->n_CurrentNode = 0 ;
@@ -344,12 +337,7 @@ dllist_AddNodeToHead ( dllist *list, dlnode * node )
 void
 _dllist_AddNodeToTail ( dllist *list, dlnode * node )
 {
-    if ( list && node )
-    {
-        // prevent trying to add nodes already on the list; this will move it to the beginning
-        dlnode_InsertThisBeforeANode ( node, list->tail ) ; // before Tail toward Head
-        //dlnode_InsertThisBeforeANode ( node, (dlnode*) list ) ; // before Tail toward Head
-    }
+    if ( list && node ) dlnode_InsertThisBeforeANode ( node, list->tail ) ; // before Tail toward Head
 }
 
 void
@@ -357,8 +345,7 @@ dllist_AddNodeToTail ( dllist *list, dlnode * node )
 {
     if ( list && node )
     {
-        // prevent trying to add nodes already on the list; this will move it to the beginning
-        dlnode_Remove ( node ) ; // prevent trying to add nodes already on the list
+        dlnode_Remove ( node ) ; 
         _dllist_AddNodeToTail ( list, node ) ;
         list->n_CurrentNode = node ;
     }

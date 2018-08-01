@@ -430,6 +430,7 @@ void FreeNba_BaNode(NamedByteArray *nba, dlnode *node);
 void FreeNba_BaList(NamedByteArray *nba);
 void NBA_FreeChunkType(Symbol *s, uint64 allocType, int64 exactFlag);
 NamedByteArray *MemorySpace_NBA_New(MemorySpace *memSpace, byte *name, int64 size, int64 allocType);
+void OVT_FreeTempMem(void);
 void MemorySpace_Init(MemorySpace *ms);
 MemorySpace *MemorySpace_New(void);
 NamedByteArray *_OVT_Find_NBA(byte *name);

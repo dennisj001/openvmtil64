@@ -159,8 +159,9 @@ _Word_Allocate ( uint64 allocType )
 {
     Word * word = 0 ;
     int64 size ;
-    if ( allocType & ( COMPILER_TEMP | LISP_TEMP ) ) allocType = TEMPORARY ;
-    else allocType = DICTIONARY ;
+    //if ( ! ( allocType & ( COMPILER_TEMP | LISP_TEMP ) ) ) //allocType = SESSION ;
+    //else 
+    allocType = DICTIONARY ; //?? needs to be more flexible here 
     word = ( Word* ) OVT_CheckRecycleableAllocate ( _Q_->MemorySpace0->RecycledWordList, sizeof ( Word ) + sizeof ( WordData ) ) ;
     if ( word ) _Q_->MemorySpace0->RecycledWordCount ++ ;
     else word = ( Word* ) Mem_Allocate ( size = ( sizeof ( Word ) + sizeof ( WordData ) ), allocType ) ;

@@ -249,7 +249,7 @@
 #define List_Init( list ) _dllist_Init ( list )
 #define List_DropN( list, n ) _dllist_DropN ( list, n )
 #define List_Pick_N_M( list, n ) List_Get_N_Node_M_Slot( list, n, 0 )  
-#define List_New() _dllist_New ( TEMPORARY ) 
+#define List_New( allocType ) _dllist_New ( allocType ) 
 
 #define _WordList_Pop( list ) _dllist_PopNode ( list )
 #define DebugWordList_Push( dobj ) _dllist_AddNodeToHead ( _CfrTil_->DebugWordList, ( dlnode* ) dobj )

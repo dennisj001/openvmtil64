@@ -38,7 +38,7 @@ CfrTil_IncDec ( int64 op ) // +
             {
                 if ( one ) SetHere (one->Coding, 1) ;
                 // ?? couldn't this stuff be done with _Interpret_C_Until_EitherToken ??
-                dllist * postfixList = List_New ( ) ;
+                dllist * postfixList = List_New ( SESSION ) ;
                 List_Push_1Value_NewNode_T_WORD ( postfixList, (int64) currentWord, COMPILER_TEMP ) ;
                 if ( one ) List_Push_1Value_NewNode_T_WORD ( postfixList, (int64) one, COMPILER_TEMP ) ;
                 List_Push_1Value_NewNode_T_WORD ( compiler->PostfixLists, (int64) postfixList, COMPILER_TEMP ) ;
@@ -64,7 +64,7 @@ CfrTil_IncDec ( int64 op ) // +
                     List_DropN ( _CfrTil_->CompilerWordList, 1 ) ; // the operator; let higher level see the variable
                     SetHere (one->Coding, 1) ;
                     CfrTil_WordList_PushWord ( one ) ;
-                    dllist * postfixList = List_New ( ) ;
+                    dllist * postfixList = List_New ( SESSION ) ;
                     List_Push_1Value_NewNode_T_WORD ( postfixList, (int64) currentWord, COMPILER_TEMP ) ;
                     List_Push_1Value_NewNode_T_WORD ( postfixList, (int64) one, COMPILER_TEMP ) ;
                     List_Push_1Value_NewNode_T_WORD ( compiler->PostfixLists, (int64) postfixList, COMPILER_TEMP ) ;
@@ -106,7 +106,7 @@ CfrTil_IncDec ( int64 op ) // +
                 {
                     int64 i ;
                     Word * word ;
-                    dllist * postfixList = List_New ( ) ;
+                    dllist * postfixList = List_New ( SESSION ) ;
                     List_Push_1Value_NewNode_T_WORD ( postfixList, (int64) currentWord, COMPILER_TEMP ) ; // remember : this will be lifo
                     for ( i = 1 ; word = _CfrTil_WordList (i), ( word->CAttribute & ( CATEGORY_OP_ORDERED | CATEGORY_OP_UNORDERED | CATEGORY_OP_DIVIDE | CATEGORY_OP_EQUAL ) ) ; i ++ ) ;
                     List_Push_1Value_NewNode_T_WORD ( postfixList, (int64) _CfrTil_WordList (i), COMPILER_TEMP ) ;

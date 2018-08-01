@@ -259,13 +259,13 @@ Compiler_Optimizer_2Args_Or_WordArg1_Op ( Compiler * compiler )
         else
         {
             optInfo->Optimize_Reg = ACC | REG_ON_BIT ;
-            if ( optInfo->wordArg1->StackPushRegisterCode )
+            if ( optInfo->wordArg1->CAttribute & REGISTER_VARIABLE )
+            {
+                SetHere ( optInfo->wordArg1->Coding, 1 ) ;
+            }
+            else if ( optInfo->wordArg1->StackPushRegisterCode )
             {
                 _SetHere_To_Word_StackPushRegisterCode ( optInfo->wordArg1, 1 ) ;
-            }
-            else if ( optInfo->wordArg1->CAttribute & REGISTER_VARIABLE )
-            {
-                SetHere ( optInfo->wordArg2->Coding, 1 ) ;
             }
             else
             {

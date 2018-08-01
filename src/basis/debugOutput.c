@@ -146,16 +146,16 @@ _Debugger_Locals_Show ( Debugger * debugger, Word * scWord )
         byte *sc = scWord->W_SourceCode ? scWord->W_SourceCode : String_New ( _CfrTil_->SC_Buffer, TEMPORARY ) ;
         // show value of each local var on Locals list
         dlnode_Remove ( ( dlnode* ) svNamespace ) ; //nb! must! else _Namespace_FindOrNew_Local will find and continue to use it 
-        
+
         _Debugger_ReadLocals ( debugger, lexer, rl, scWord, sc ) ;
         if ( ( sc && debugger->LocalsNamespacesStack ) ) _Debugger_Locals_Show_Loop ( debugger, scWord ) ;
         else _Printf ( ( byte* ) "\nTry stepping a couple of instructions and try again." ) ;
-        
+
         // still problems here ?? make sure *everything* is reset 
         _Namespace_RemoveFromUsingListAndClear ( debugger->LocalsNamespace ) ;
         _Namespace_FreeNamespacesStack ( debugger->LocalsNamespacesStack ) ;
         debugger->LocalsNamespacesStack = 0 ;
-        
+
         compiler->NumberOfArgs = svArgs ;
         compiler->NumberOfLocals = svLocals ;
         compiler->NumberOfRegisterVariables = svRegs ; //nb. prevent increasing the locals offset by adding in repeated calls to this function
@@ -172,7 +172,9 @@ Debugger_Locals_Show ( Debugger * debugger )
 {
     Word * scWord = Compiling ? _CfrTil_->CurrentWordCompiling :
         ( debugger->DebugAddress ? Word_GetFromCodeAddress ( debugger->DebugAddress ) : _Context_->CurrentlyRunningWord ) ;
+    _Compile_Save_C_CpuState ( _CfrTil_, 0 ) ; 
     _Debugger_Locals_Show ( debugger, scWord ) ;
+    _Compile_Restore_C_CpuState ( _CfrTil_, 0 ) ; 
 }
 
 int64

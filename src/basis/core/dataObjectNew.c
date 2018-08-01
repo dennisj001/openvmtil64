@@ -279,17 +279,17 @@ Literal_New ( Lexer * lexer, uint64 uliteral )
     if ( ! ( lexer->TokenType & ( T_STRING | T_RAW_STRING | T_CHAR | KNOWN_OBJECT ) ) )
     {
         snprintf ( ( char* ) _name, 256, "<unknown object type> : %lx", ( uint64 ) uliteral ) ;
-        name = String_New ( _name, Compiling ? STRING_MEM : TEMPORARY ) ;
+        name = String_New ( _name, STRING_MEM ) ;
     }
     else
     {
         if ( lexer->TokenType & ( T_STRING | T_RAW_STRING ) ) 
         {
-            uliteral = ( int64 ) String_New ( lexer->LiteralString, Compiling ? STRING_MEM : TEMPORARY ) ;
+            uliteral = ( int64 ) String_New ( lexer->LiteralString, STRING_MEM ) ;
         }
         name = lexer->OriginalToken ;
     }
-    word = _DObject_New ( name, uliteral, LITERAL | CONSTANT | IMMEDIATE, 0, 0, LITERAL, ( byte* ) _DataObject_Run, 0, 0, 0, TEMPORARY ) ;
+    word = _DObject_New ( name, uliteral, LITERAL | CONSTANT | IMMEDIATE, 0, 0, LITERAL, ( byte* ) _DataObject_Run, 0, 0, 0, OBJECT_MEMORY ) ;
 
     return word ;
 }

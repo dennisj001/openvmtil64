@@ -10,7 +10,7 @@ _CopyDuplicateWord ( Word * word0 )
     Word * wordc = Word_Copy ( word0, DICTIONARY ) ; // use DICTIONARY since we are recycling these anyway
     wordc->W_OriginalWord = Word_GetOriginalWord ( word0 ) ;
     _dlnode_Init ( ( dlnode * ) wordc ) ; // necessary!
-    wordc->S_CAttribute |= ( uint64 ) RECYCLABLE_COPY ;
+    wordc->CAttribute |= ( uint64 ) RECYCLABLE_COPY ;
     Word_SetLocation ( wordc ) ;
     return wordc ;
 }
@@ -29,7 +29,7 @@ _CfrTil_CopyDuplicatesAndPush ( Word * word0 )
 {
     Word * word1, *wordToBePushed ;
     word0->W_OriginalWord = word0 ;
-    word0->S_CAttribute &= ( ~ RECYCLABLE_COPY ) ;
+    word0->CAttribute &= ( ~ RECYCLABLE_COPY ) ;
     if ( word1 = ( Word * ) dllist_Map1_WReturn ( _CfrTil_->CompilerWordList, ( MapFunction1 ) CopyDuplicateWord, ( int64 ) word0 ) )
     {
         wordToBePushed = word1 ;
@@ -214,7 +214,7 @@ Compiler_CompileOptimizeInfo_PushNew ( Compiler * compiler )
     if ( coi )
     {
         List_Push ( compiler->OptimizeInfoList, ( dlnode* ) coi ) ;
-        compiler->OptInfo = coi ;
+        compiler->OptInfo = coi ; // we are using the top of the stack/list
     }
     return coi ;
 }
@@ -238,15 +238,6 @@ CompileoptInfo_Delete ( CompileOptimizeInfo * optInfo )
 {
     Mem_FreeItem ( &_Q_->PermanentMemList, ( byte* ) optInfo ) ;
 }
-
-#if 0
-void
-CfrTil_InitBlockSystem ( Compiler * compiler )
-{
-    Stack_Init ( compiler->BlockStack ) ;
-    Stack_Init ( compiler->CombinatorBlockInfoStack ) ;
-}
-#endif
 
 int64
 Compiler_BlockLevel ( Compiler * compiler )

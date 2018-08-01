@@ -207,7 +207,7 @@ OVT_Throw ( int signal, int64 restartCondition, int8 pauseFlag )
                 _Q_->RestartCondition = ABORT ;
             }
             else _Q_->RestartCondition = INITIAL_START ;
-            if ( _Q_->SigSegvs > 2 ) OVT_Exit ( ) ;
+            if ( _Q_->SigSegvs > 3 ) OVT_Exit ( ) ;
             else if ( ( _Q_->SigSegvs > 1 ) || ( restartCondition == INITIAL_START ) )
             {
                 jb = & _Q_->JmpBuf0 ;

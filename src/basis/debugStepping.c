@@ -41,7 +41,7 @@ Debugger_CompileOneInstruction ( Debugger * debugger, byte * jcAddress, Boolean 
 
     _Compile_Save_Debugger_CpuState ( debugger, showFlag ) ; //showRegsFlag ) ; //&& ( _Q_->Verbosity >= 3 ) ) ; // save our runtime state after the instruction : which we will restore before the next insn
 
-    _Compile_Restore_C_CpuState ( _CfrTil_, showFlag ) ; //&& ( _Q_->Verbosity >= 3 ) ) ; // finally restore our c compiler cpu register state
+    _Compile_Save_C_CpuState ( _CfrTil_, showFlag ) ; //&& ( _Q_->Verbosity >= 3 ) ) ; // save our c compiler cpu register state
 
     _Compile_Return ( ) ;
 
