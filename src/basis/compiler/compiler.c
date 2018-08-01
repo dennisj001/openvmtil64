@@ -239,12 +239,14 @@ CompileoptInfo_Delete ( CompileOptimizeInfo * optInfo )
     Mem_FreeItem ( &_Q_->PermanentMemList, ( byte* ) optInfo ) ;
 }
 
+#if 0
 void
 CfrTil_InitBlockSystem ( Compiler * compiler )
 {
     Stack_Init ( compiler->BlockStack ) ;
     Stack_Init ( compiler->CombinatorBlockInfoStack ) ;
 }
+#endif
 
 int64
 Compiler_BlockLevel ( Compiler * compiler )
@@ -270,8 +272,6 @@ void
 Compiler_Init ( Compiler * compiler, uint64 state )
 {
     compiler->State = state ;
-    _dllist_Init ( compiler->GotoList ) ;
-    CfrTil_InitBlockSystem ( compiler ) ;
     compiler->ContinuePoint = 0 ;
     compiler->BreakPoint = 0 ;
     compiler->InitHere = Here ;
@@ -285,14 +285,18 @@ Compiler_Init ( Compiler * compiler, uint64 state )
     compiler->LocalsFrameSize = 0 ;
     compiler->AccumulatedOffsetPointer = 0 ;
     compiler->ReturnVariableWord = 0 ;
-    Stack_Init ( compiler->PointerToOffset ) ;
-    Stack_Init ( compiler->CombinatorInfoStack ) ;
-    _Compiler_FreeAllLocalsNamespaces ( compiler ) ;
-    Stack_Init ( compiler->InfixOperatorStack ) ;
-    _dllist_Init ( compiler->CurrentSwitchList ) ;
-    _dllist_Init ( compiler->RegisterParameterList ) ;
     compiler->CurrentCreatedWord = 0 ;
     compiler->CurrentWord = 0 ;
+    Stack_Init ( compiler->BlockStack ) ;
+    Stack_Init ( compiler->CombinatorBlockInfoStack ) ;
+    Stack_Init ( compiler->PointerToOffset ) ;
+    Stack_Init ( compiler->CombinatorInfoStack ) ;
+    Stack_Init ( compiler->InfixOperatorStack ) ;
+    Stack_Init ( compiler->LocalsCompilingNamespacesStack ) ;
+    _dllist_Init ( compiler->GotoList ) ;
+    _dllist_Init ( compiler->CurrentSwitchList ) ;
+    _dllist_Init ( compiler->RegisterParameterList ) ;
+    _Compiler_FreeAllLocalsNamespaces ( compiler ) ;
     SetBuffersUnused ( 1 ) ;
     SetState ( compiler, VARIABLE_FRAME, false ) ;
 }
@@ -302,14 +306,14 @@ Compiler_New ( uint64 type )
 {
     Compiler * compiler = ( Compiler * ) Mem_Allocate ( sizeof (Compiler ), type ) ;
     compiler->BlockStack = Stack_New ( 64, type ) ;
-    compiler->PostfixLists = _dllist_New ( type ) ;
-    compiler->CombinatorBlockInfoStack = Stack_New ( 64, type ) ;
-    compiler->GotoList = _dllist_New ( type ) ;
-    compiler->LocalsCompilingNamespacesStack = Stack_New ( 32, type ) ;
-    compiler->NamespacesStack = Stack_New ( 32, type ) ;
-    compiler->PointerToOffset = Stack_New ( 32, type ) ;
     compiler->CombinatorInfoStack = Stack_New ( 64, type ) ;
     compiler->InfixOperatorStack = Stack_New ( 32, type ) ;
+    compiler->PointerToOffset = Stack_New ( 32, type ) ;
+    compiler->CombinatorBlockInfoStack = Stack_New ( 64, type ) ;
+    compiler->LocalsCompilingNamespacesStack = Stack_New ( 32, type ) ;
+    compiler->NamespacesStack = Stack_New ( 32, type ) ; //initialized when using
+    compiler->PostfixLists = _dllist_New ( type ) ;
+    compiler->GotoList = _dllist_New ( type ) ;
     compiler->OptimizeInfoList = _dllist_New ( type ) ;
     Compiler_CompileOptimizeInfo_New ( compiler, type ) ;
     Compiler_Init ( compiler, 0 ) ;

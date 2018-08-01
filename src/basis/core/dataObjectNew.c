@@ -3,14 +3,14 @@
 
 // Dynamic Object New : Word = Namespace = DObject : have a s_Symbol
 
-// runs all new object thru here ; good for debugging and understanding 
+// we run all new objects thru here ; good for debugging and understanding 
 
 Word *
 _DataObject_New (uint64 type, Word * word, byte * name, uint64 ctype, uint64 ctype2, uint64 ltype, int64 index, int64 value, int allocType, int64 tsrli, int64 scwi )
 {
     tsrli = ( tsrli != - 1 ) ? tsrli : _Lexer_->TokenStart_ReadLineIndex ;
     scwi = ( scwi != - 1 ) ? scwi : _Lexer_->SC_Index ;
-    if ( word && ( ! ( type & ( T_LC_NEW ) ) ) ) //&& !(type && (T_LC_NEW | T_LC_LITERAL))) 
+    if ( word && ( ! ( type & ( T_LC_NEW ) ) ) ) 
     {
         Word_Recycle ( word ) ;
     }
@@ -93,7 +93,6 @@ _DataObject_New (uint64 type, Word * word, byte * name, uint64 ctype, uint64 cty
             break ;
         }
     }
-    //if ( word && ( ! word->W_SC_Index ) ) word->W_SC_Index = _CfrTil_->SC_Index ; //word->W_SC_ScratchPadIndex ? word->W_SC_ScratchPadIndex : _CfrTil_->SC_ScratchPadIndex ;
     return word ;
 }
 
@@ -247,12 +246,9 @@ Word *
 _CfrTil_LocalWord ( byte * name, int64 index, int64 ctype, int64 ctype2, int64 ltype ) // svf : flag - whether stack variables are in the frame
 {
     Word *word ;
-    //if ( ! ( word = Finder_FindWord_InOneNamespace ( _Finder_, _CfrTil_Namespace_InNamespaceGet ( ), name ) ) )
     {
-        //word = _DObject_New ( name, 0, ( ctype | IMMEDIATE | CPRIMITIVE ), 0, 0, LOCAL_VARIABLE, ( byte* ) _DataObject_Run, 0, 1, 0, COMPILER_TEMP ) ;
-
         word = _DObject_New ( name, 0, ( ctype | IMMEDIATE ), ctype2, ltype, LOCAL_VARIABLE, ( byte* ) _DataObject_Run, 0, 1, 0, COMPILER_TEMP ) ;
-        word->Index = index ; //( ctype & LOCAL_VARIABLE ) ? _Compiler_->NumberOfLocals : _Compiler_->NumberOfArgs ;
+        word->Index = index ; 
     }
     return word ;
 }
@@ -261,8 +257,6 @@ int64
 ParameterVarOffset ( Word * word )
 {
     int64 offset = ( - ( _Context_->Compiler0->NumberOfArgs - word->Index + 1 ) ) ; //??
-    //int64 offset = ( - ( word->Index ) ) ;
-
     return offset ;
 }
 
@@ -271,10 +265,7 @@ CfrTil_LocalWord ( byte * name, int64 ctype ) // svf : flag - whether stack vari
 {
     _Namespace_FindOrNew_Local ( _Compiler_->LocalsCompilingNamespacesStack ) ;
     Finder_SetQualifyingNamespace ( _Finder_, 0 ) ;
-    //( ctype & LOCAL_VARIABLE ) ? ++ _Compiler_->NumberOfLocals : +_Compiler_->NumberOfArgs ;
-    //Word * word = _DataObject_New ( LOCAL_VARIABLE, 0, name, ( ctype | IMMEDIATE ), ltype, index ? index : ++ _Context_->Compiler0->NumberOfLocals, 0, 0 ) ;
     Word * word = _CfrTil_LocalWord ( name, ( ctype & LOCAL_VARIABLE ) ? ++ _Compiler_->NumberOfLocals : ++ _Compiler_->NumberOfArgs, ctype, 0, 0 ) ; // svf : flag - whether stack variables are in the frame
-
     return word ;
 }
 
@@ -292,7 +283,7 @@ Literal_New ( Lexer * lexer, uint64 uliteral )
     }
     else
     {
-        if ( lexer->TokenType & ( T_STRING | T_RAW_STRING ) )
+        if ( lexer->TokenType & ( T_STRING | T_RAW_STRING ) ) 
         {
             uliteral = ( int64 ) String_New ( lexer->LiteralString, Compiling ? STRING_MEM : TEMPORARY ) ;
         }
@@ -306,9 +297,7 @@ Literal_New ( Lexer * lexer, uint64 uliteral )
 Namespace *
 _Namespace_New ( byte * name, Namespace * containingNs )
 {
-    //Namespace * ns = _DObject_New ( name, 0, ( CPRIMITIVE | NAMESPACE | IMMEDIATE ), 0, 0, NAMESPACE, ( byte* ) _DataObject_Run, 0, 0, containingNs, DICTIONARY ) ;
     Namespace * ns = _DObject_New ( name, 0, ( CPRIMITIVE | NAMESPACE | IMMEDIATE ), 0, 0, NAMESPACE, ( byte* ) _DataObject_Run, 0, 0, containingNs, DICTIONARY ) ;
-
     return ns ;
 }
 

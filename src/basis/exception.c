@@ -45,7 +45,7 @@ OpenVmTil_ShowExceptionInfo ( )
         if ( _Q_->ExceptionMessage ) printf ( "\n%s: %s\n", _Q_->ExceptionMessage, _Q_->ExceptionSpecialMessage ), fflush (stdout) ;
         _DisplaySignal ( _Q_->Signal ) ;
         //if ( ( _Q_->SignalExceptionsHandled ++ < 2 ) && _CfrTil_ && ( _Q_->Signal != SIGSEGV ) ) _OpenVmTil_ShowExceptionInfo ( ) ;
-        if ( ( _Q_->SignalExceptionsHandled ++ < 2 ) && _CfrTil_ ) _OpenVmTil_ShowExceptionInfo ( ) ;
+        if ( (_Q_->Signal != SIGSEGV ) && ( _Q_->SignalExceptionsHandled ++ < 2 ) && _CfrTil_ ) _OpenVmTil_ShowExceptionInfo ( ) ;
     }
     int64 rtrn = OVT_Pause ( 0, _Q_->SignalExceptionsHandled ) ;
     _Q_->Signal = 0 ;
@@ -208,7 +208,7 @@ OVT_Throw ( int signal, int64 restartCondition, int8 pauseFlag )
             }
             else _Q_->RestartCondition = INITIAL_START ;
             if ( _Q_->SigSegvs > 2 ) OVT_Exit ( ) ;
-            else if ( ( _Q_->SigSegvs > 1 ) && ( ( _Q_->SignalExceptionsHandled > 1 ) || ( restartCondition == INITIAL_START ) ) )
+            else if ( ( _Q_->SigSegvs > 1 ) || ( restartCondition == INITIAL_START ) )
             {
                 jb = & _Q_->JmpBuf0 ;
             }

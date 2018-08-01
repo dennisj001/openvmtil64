@@ -372,7 +372,7 @@ Root
 '_doDemo 1 const    
 'todo 0 const    
 dbgOff
-dbgOn 
+//dbgOn 
 #if Is_DebugOn 
 
 #if todo
@@ -388,8 +388,8 @@ demo
 stringMacrosOff
 
 #else
-
 // of course you can trim this file to your needs and put your personal init code here maybe
+#if 0
 lispOff
 List
 _((lambda ( a b) (+ a b)) 3 4 ) dupList eval printList nl printList s lcReset  
@@ -488,7 +488,7 @@ c_syntaxOff
     {   
         fn1 fn2 @ = 
         fn2 fn @ = 
-        fn fn1 @ fn2 @ + = 
+        d: fn fn1 @ fn2 @ + = 
     }
     for
     // nl svn @ fprint ":" ps fn @ fprint 
@@ -507,7 +507,7 @@ c_syntaxOff
 #endif
 //pause
 #endif
-
+#endif
 #endif
 2 + 7  assertStkChk // stack checking
 s

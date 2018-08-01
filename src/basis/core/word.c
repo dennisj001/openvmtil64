@@ -2,6 +2,7 @@
 
 //block CurrentDefinition ;
 #if 0
+
 void
 _Word_Run ( Word * word )
 {
@@ -9,13 +10,14 @@ _Word_Run ( Word * word )
     {
         word->StackPushRegisterCode = 0 ; // nb. used! by the rewriting optInfo
         // keep track in the word itself where the machine code is to go, if this word is compiled or causes compiling code - used for optimization
-        Word_SetCoding (word, Here , 1) ; // if we change it later (eg. in lambda calculus) we must change it there because the rest of the compiler depends on this
+        Word_SetCoding ( word, Here, 1 ) ; // if we change it later (eg. in lambda calculus) we must change it there because the rest of the compiler depends on this
         word->W_InitialRuntimeDsp = _Dsp_ ;
         _Context_->CurrentlyRunningWord = word ;
         Block_Eval ( word->Definition ) ;
     }
 }
 #else
+
 void
 Word_Run ( Word * word )
 {
@@ -25,7 +27,7 @@ Word_Run ( Word * word )
         {
             word->StackPushRegisterCode = 0 ; // nb. used! by the rewriting optInfo
             // keep track in the word itself where the machine code is to go, if this word is compiled or causes compiling code - used for optimization
-            Word_SetCoding (word, Here , 1) ; // if we change it later (eg. in lambda calculus) we must change it there because the rest of the compiler depends on this
+            Word_SetCoding ( word, Here, 1 ) ; // if we change it later (eg. in lambda calculus) we must change it there because the rest of the compiler depends on this
             word->W_InitialRuntimeDsp = _Dsp_ ;
             _Context_->CurrentlyRunningWord = word ;
             Block_Eval ( word->Definition ) ;
@@ -66,7 +68,7 @@ _Word_Interpret ( Word * word )
 void
 _Word_Compile ( Word * word )
 {
-    Word_SetCodingHere_And_ClearPreviousUseOf_Here_SCA (word, 0) ;
+    Word_SetCodingHere_And_ClearPreviousUseOf_Here_SCA ( word, 0 ) ;
     if ( ! word->Definition )
     {
         CfrTil_SetupRecursiveCall ( ) ;
@@ -159,7 +161,7 @@ _Word_Allocate ( uint64 allocType )
     int64 size ;
     if ( allocType & ( COMPILER_TEMP | LISP_TEMP ) ) allocType = TEMPORARY ;
     else allocType = DICTIONARY ;
-    word = ( Word* ) OVT_CheckRecycleableAllocate (_Q_->MemorySpace0->RecycledWordList, sizeof ( Word ) + sizeof ( WordData )) ;
+    word = ( Word* ) OVT_CheckRecycleableAllocate ( _Q_->MemorySpace0->RecycledWordList, sizeof ( Word ) + sizeof ( WordData ) ) ;
     if ( word ) _Q_->MemorySpace0->RecycledWordCount ++ ;
     else word = ( Word* ) Mem_Allocate ( size = ( sizeof ( Word ) + sizeof ( WordData ) ), allocType ) ;
     ( ( DLNode* ) word )->n_Size = size ;
@@ -279,14 +281,19 @@ __Word_ShowSourceCode ( Word * word )
 {
     if ( word && word->S_WordData ) //&& word->W_SourceCode ) //word->CAttribute & ( CPRIMITIVE | BLOCK ) )
     {
-        Buffer *dstb = Buffer_NewLocked ( BUFFER_SIZE ) ;
-        byte * sc = dstb->B_Data ;
-        sc = _String_ConvertStringToBackSlash ( sc, word->W_SourceCode ? word->W_SourceCode : String_New ( _CfrTil_->SC_Buffer, TEMPORARY ) ) ;
-        byte * name = c_gd ( word->Name ) ;
-        byte *scd = c_gd ( String_FilterMultipleSpaces ( sc, TEMPORARY ) ) ;
+        byte * sc, * name, *scd ;
+        if ( ! ( word->CAttribute & CPRIMITIVE ) )
+        {
+            Buffer *dstb = Buffer_NewLocked ( BUFFER_SIZE ) ;
+            sc = dstb->B_Data ;
+            sc = _String_ConvertStringToBackSlash ( sc, word->W_SourceCode ? word->W_SourceCode : String_New ( _CfrTil_->SC_Buffer, TEMPORARY ) ) ;
+            scd = c_gd ( String_FilterMultipleSpaces ( sc, TEMPORARY ) ) ;
+            Buffer_Unlock ( dstb ) ;
+            Buffer_SetAsFree ( dstb, 0 ) ;
+        }
+        else scd = "C Primitive" ;
+        name = c_gd ( word->Name ) ;
         _Printf ( ( byte* ) "\nSourceCode for %s.%s :> \n%s", word->S_ContainingNamespace->Name, name, scd ) ;
-        Buffer_Unlock ( dstb ) ;
-        Buffer_SetAsFree ( dstb, 0 ) ;
     }
 }
 

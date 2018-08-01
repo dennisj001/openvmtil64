@@ -5,7 +5,8 @@ void
 CfrTil_PreProcessor ( )
 {
     Interpreter * interp = _Context_->Interpreter0 ;
-    if ( ! Compiling ) _CfrTil_InitSourceCode_WithName ( _CfrTil_, _Lexer_->OriginalToken ) ;
+    Lexer_SourceCodeOff ( _Lexer_ ) ;
+    //if ( ! Compiling ) _CfrTil_InitSourceCode_WithName ( _CfrTil_, _Lexer_->OriginalToken ) ;
     Finder_SetNamedQualifyingNamespace ( _Finder_, ( byte* ) "PreProcessor" ) ;
     SetState ( interp, PREPROCESSOR_MODE, true ) ;
     _Interpret_ToEndOfLine ( interp ) ;
@@ -178,6 +179,7 @@ SkipPreprocessorCode ( Boolean skipControl )
     Lexer * lexer = cntx->Lexer0 ;
     byte * token ;
     int64 ifLevel = 0 ; 
+    int64 svState = GetState ( lexer, ( ADD_TOKEN_TO_SOURCE | ADD_CHAR_TO_SOURCE ) ) ;
     Lexer_SourceCodeOff ( lexer ) ;
     do
     {
@@ -254,7 +256,8 @@ SkipPreprocessorCode ( Boolean skipControl )
     }
     while ( token ) ;
 done:
-    Lexer_SourceCodeOn ( lexer ) ;
+    //Lexer_SourceCodeOn ( lexer ) ;
+    if ( Compiling ) SetState ( lexer, ( ADD_TOKEN_TO_SOURCE | ADD_CHAR_TO_SOURCE ), svState ) ;
 }
 
 void

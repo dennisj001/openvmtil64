@@ -610,7 +610,7 @@ typedef struct Lexer
     } ;
     uint64 TokenType ;
     Word * TokenWord ;
-    byte TokenInputCharacter ;
+    byte TokenInputByte ;
     byte CurrentTokenDelimiter ;
     int64 TokenStart_ReadLineIndex, TokenEnd_ReadLineIndex, Token_Length, SC_Index ; //Tsrli = TokenStart_ReadLineIndex
     byte * TokenDelimiters ;

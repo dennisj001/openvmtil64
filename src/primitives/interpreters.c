@@ -10,28 +10,34 @@ CfrTil_DoWord ( )
 void
 CfrTil_CommentToEndOfLine ( )
 {
-    _CfrTil_UnAppendTokenFromSourceCode ( _CfrTil_, _Context_->Lexer0->OriginalToken ) ;
+    Lexer * lexer = _Lexer_ ;
+    _CfrTil_UnAppendTokenFromSourceCode ( _CfrTil_, lexer->OriginalToken ) ;
+    int64 svState = GetState ( lexer, ( ADD_TOKEN_TO_SOURCE | ADD_CHAR_TO_SOURCE ) ) ;
     Lexer_SourceCodeOff ( _Lexer_ ) ;
     ReadLiner_CommentToEndOfLine ( _Context_->ReadLiner0 ) ;
     String_RemoveEndWhitespace ( _CfrTil_->SC_Buffer ) ;
     _CfrTil_SC_ScratchPadIndex_Init ( _CfrTil_ ) ;
-    SetState ( _Context_->Lexer0, LEXER_END_OF_LINE, true ) ;
-    Lexer_SourceCodeOn ( _Lexer_ ) ;
+    SetState ( lexer, LEXER_END_OF_LINE, true ) ;
+    //Lexer_SourceCodeOn ( _Lexer_ ) ;
+    if ( Compiling ) SetState ( lexer, ( ADD_TOKEN_TO_SOURCE | ADD_CHAR_TO_SOURCE ), svState ) ;
 }
 
 void
 CfrTil_ParenthesisComment ( )
 {
-    _CfrTil_UnAppendTokenFromSourceCode ( _CfrTil_, _Context_->Lexer0->OriginalToken ) ;
-    Lexer_SourceCodeOff ( _Lexer_ ) ;
+    Lexer * lexer = _Lexer_ ;
+    _CfrTil_UnAppendTokenFromSourceCode ( _CfrTil_, lexer->OriginalToken ) ;
+    int64 svState = GetState ( lexer, ( ADD_TOKEN_TO_SOURCE | ADD_CHAR_TO_SOURCE ) ) ;
+    Lexer_SourceCodeOff ( lexer ) ;
     while ( 1 )
     {
-        int64 inChar = ReadLine_PeekNextChar ( _Context_->ReadLiner0 ) ;
+        int64 inChar = ReadLine_PeekNextChar ( lexer->ReadLiner0 ) ;
         if ( ( inChar == - 1 ) || ( inChar == eof ) ) break ;
-        char * token = ( char* ) Lexer_ReadToken ( _Context_->Lexer0 ) ;
+        char * token = ( char* ) Lexer_ReadToken ( lexer ) ;
         if ( strcmp ( token, "*/" ) == 0 ) return ;
     }
-    Lexer_SourceCodeOn ( _Lexer_ ) ;
+    //Lexer_SourceCodeOn ( _Lexer_ ) ;
+    if ( Compiling ) SetState ( lexer, ( ADD_TOKEN_TO_SOURCE | ADD_CHAR_TO_SOURCE ), svState ) ;
 }
 
 void

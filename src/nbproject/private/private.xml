@@ -7,7 +7,7 @@
         <activeConfTypeElem>0</activeConfTypeElem>
         <activeConfIndexElem>0</activeConfIndexElem>
     </data>
-    <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="33">
+    <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="35">
         <file>
             <url>basis/compiler/blocks.c</url>
             <bookmark id="7">
@@ -64,9 +64,9 @@
         </file>
         <file>
             <url>basis/compiler/optimize.c</url>
-            <bookmark id="32">
+            <bookmark id="34">
                 <name/>
-                <line>222</line>
+                <line>63</line>
                 <key/>
             </bookmark>
             <bookmark id="29">
@@ -79,19 +79,14 @@
                 <line>269</line>
                 <key/>
             </bookmark>
-            <bookmark id="33">
+            <bookmark id="35">
                 <name/>
-                <line>406</line>
-                <key/>
-            </bookmark>
-            <bookmark id="28">
-                <name/>
-                <line>492</line>
+                <line>528</line>
                 <key/>
             </bookmark>
             <bookmark id="31">
                 <name/>
-                <line>545</line>
+                <line>546</line>
                 <key/>
             </bookmark>
         </file>
@@ -99,45 +94,44 @@
             <url>basis/sourceCode.c</url>
             <bookmark id="14">
                 <name/>
-                <line>3</line>
+                <line>40</line>
                 <key/>
             </bookmark>
             <bookmark id="15">
                 <name/>
-                <line>45</line>
+                <line>82</line>
                 <key/>
             </bookmark>
             <bookmark id="16">
                 <name/>
-                <line>47</line>
+                <line>84</line>
                 <key/>
             </bookmark>
             <bookmark id="26">
                 <name/>
-                <line>77</line>
+                <line>114</line>
                 <key/>
             </bookmark>
             <bookmark id="27">
                 <name/>
-                <line>87</line>
+                <line>124</line>
                 <key/>
             </bookmark>
             <bookmark id="13">
                 <name/>
-                <line>94</line>
+                <line>131</line>
                 <key/>
             </bookmark>
         </file>
     </editor-bookmarks>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/media/sdc4/dennisj/openvmtil64/src/basis/compiler/blocks.c</file>
-            <file>file:/media/sdc4/dennisj/openvmtil64/src/basis/compiler/compiler.c</file>
-            <file>file:/media/sdc4/dennisj/openvmtil64/src/basis/compiler/optimize.c</file>
+            <file>file:/media/sdc4/dennisj/openvmtil64/src/basis/core/word.c</file>
             <file>file:/media/sdc4/dennisj/openvmtil64/src/basis/openVmTil.c</file>
             <file>file:/media/sdc4/dennisj/openvmtil64/init.cft</file>
-            <file>file:/media/sdc4/dennisj/openvmtil64/src/basis/compiler/locals.c</file>
-            <file>file:/media/sdc4/dennisj/openvmtil64/src/basis/core/memSpace.c</file>
+            <file>file:/media/sdc4/dennisj/openvmtil64/src/basis/core/block.c</file>
+            <file>file:/media/sdc4/dennisj/openvmtil64/src/basis/debugOutput.c</file>
+            <file>file:/media/sdc4/dennisj/openvmtil64/src/basis/exception.c</file>
         </group>
     </open-files>
 </project-private>

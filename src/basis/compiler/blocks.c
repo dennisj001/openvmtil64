@@ -1,7 +1,7 @@
 
 #include "../../include/cfrtil64.h"
 
-void
+BlockInfo * 
 BI_Block_Copy ( BlockInfo * bi, byte* dstAddress, byte * srcAddress, int64 bsize, int8 optFlag )
 {
     Compiler * compiler = _Compiler_ ;
@@ -59,6 +59,7 @@ BI_Block_Copy ( BlockInfo * bi, byte* dstAddress, byte * srcAddress, int64 bsize
     bi->CopiedToEnd = Here ;
     bi->CopiedSize = bi->CopiedToEnd - bi->CopiedToStart ;
     d0 ( if ( Is_DebugModeOn ) Debugger_Disassemble ( _Debugger_, bi->CopiedToStart, bi->CopiedSize, 1 ) ) ;
+    return bi ;
 }
 
 void

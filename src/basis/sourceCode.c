@@ -461,7 +461,7 @@ CfrTil_InitSourceCode_WithCurrentInputChar ( CfrTil * cfrtil )
 {
     Lexer * lexer = _Context_->Lexer0 ;
     _CfrTil_InitSourceCode ( cfrtil ) ;
-    _Lexer_AppendCharToSourceCode ( lexer, lexer->TokenInputCharacter, 0 ) ;
+    _Lexer_AppendCharToSourceCode ( lexer, lexer->TokenInputByte, 0 ) ;
 }
 
 void
@@ -522,7 +522,6 @@ _CfrTil_UnAppendTokenFromSourceCode ( CfrTil * cfrtil, byte * tkn )
 void
 _CfrTil_AppendCharToSourceCode ( CfrTil * cfrtil, byte c )
 {
-
     cfrtil->SC_Buffer [ cfrtil->SC_Index ++ ] = c ;
     cfrtil->SC_Buffer [ cfrtil->SC_Index ] = 0 ;
 }

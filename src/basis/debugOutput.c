@@ -108,6 +108,29 @@ _Debugger_ReadLocals ( Debugger * debugger, Lexer * lexer, ReadLiner * rl, Word 
 }
 
 void
+_Debugger_Locals_Show_Loop ( Debugger * debugger, Word * scWord )
+{
+    byte buffer [ 256 ] ; // use a debugger buffer instead ??
+    int64 i, n, * fp = ( int64* ) debugger->cs_Cpu->CPU_FP, * dsp = ( int64* ) debugger->cs_Cpu->CPU_DSP ;
+    if ( ( ( uint64 ) fp < 0x7f0000000 ) ) fp = dsp ;
+    _Printf ( ( byte* ) "\n%s.%s.%s : \nFrame Pointer = R15 = <0x%016lx> = 0x%016lx : Stack Pointer = R14 <0x%016lx> = 0x%016lx",
+        scWord->ContainingNamespace ? c_gd ( scWord->ContainingNamespace->Name ) : ( byte* ) "", c_gd ( scWord->Name ), c_gd ( "locals" ),
+        ( uint64 ) fp, fp ? *fp : 0, ( uint64 ) dsp, dsp ? *dsp : 0 ) ;
+    for ( i = 0, n = Stack_Depth ( debugger->LocalsNamespacesStack ) ; i < n ; i ++ )
+    {
+        dlnode * node, *prevNode ;
+        Namespace * ns = ( Namespace* ) _Stack_Pick ( debugger->LocalsNamespacesStack, i ) ;
+
+        for ( node = dllist_Last ( ns->W_List ) ; node ; node = prevNode )
+        {
+            prevNode = dlnode_Previous ( node ) ;
+            scWord = ( Word * ) node ;
+            _Debugger_Locals_ShowALocal ( debugger, scWord, buffer ) ;
+        }
+    }
+}
+
+void
 _Debugger_Locals_Show ( Debugger * debugger, Word * scWord )
 {
     if ( scWord )
@@ -115,54 +138,32 @@ _Debugger_Locals_Show ( Debugger * debugger, Word * scWord )
         Compiler * compiler = _Context_->Compiler0 ;
         Lexer * lexer = Lexer_New ( COMPILER_TEMP ) ;
         ReadLiner * rl = lexer->ReadLiner0 ;
-        int64 i, n, svArgs = compiler->NumberOfArgs ;
+        int64 svArgs = compiler->NumberOfArgs ;
         int64 svLocals = compiler->NumberOfLocals ;
         int64 svRegs = compiler->NumberOfRegisterVariables ; //nb. prevent increasing the locals offset by adding in repeated calls to this function
         Stack * svStack = compiler->LocalsCompilingNamespacesStack ;
         Namespace * svNamespace = compiler->LocalsNamespace, *svInNamespace = _CfrTil_->InNamespace ;
-        byte buffer [ 256 ] ; // use a debugger buffer instead ??
         byte *sc = scWord->W_SourceCode ? scWord->W_SourceCode : String_New ( _CfrTil_->SC_Buffer, TEMPORARY ) ;
         // show value of each local var on Locals list
-        int64 * fp = ( int64* ) debugger->cs_Cpu->CPU_FP, * dsp = ( int64* ) debugger->cs_Cpu->CPU_DSP ;
-        if ( ( ( uint64 ) fp < 0x7f0000000 ) ) fp = dsp ;
         dlnode_Remove ( ( dlnode* ) svNamespace ) ; //nb! must! else _Namespace_FindOrNew_Local will find and continue to use it 
-        //if ( ! Compiling ) 
+        
         _Debugger_ReadLocals ( debugger, lexer, rl, scWord, sc ) ;
-        //else debugger->LocalsNamespacesStack = compiler->LocalsCompilingNamespacesStack ;
-        if ( ( sc && debugger->LocalsNamespacesStack ) ) ///&& ( ( uint64 ) fp > 0xf0000000 ) )
-        {
-            _Printf ( ( byte* ) "\n%s.%s.%s : \nFrame Pointer = R15 = <0x%016lx> = 0x%016lx : Stack Pointer = R14 <0x%016lx> = 0x%016lx",
-                scWord->ContainingNamespace ? c_gd ( scWord->ContainingNamespace->Name ) : ( byte* ) "", c_gd ( scWord->Name ), c_gd ( "locals" ),
-                ( uint64 ) fp, fp ? *fp : 0, ( uint64 ) dsp, dsp ? *dsp : 0 ) ;
-            for ( i = 0, n = Stack_Depth ( debugger->LocalsNamespacesStack ) ; i < n ; i ++ )
-            {
-                dlnode * node, *prevNode ;
-                Namespace * ns = ( Namespace* ) _Stack_Pick ( debugger->LocalsNamespacesStack, i ) ;
-
-                for ( node = dllist_Last ( ns->W_List ) ; node ; node = prevNode )
-                {
-                    prevNode = dlnode_Previous ( node ) ;
-                    scWord = ( Word * ) node ;
-                    _Debugger_Locals_ShowALocal ( debugger, scWord, buffer ) ;
-                }
-            }
-        }
+        if ( ( sc && debugger->LocalsNamespacesStack ) ) _Debugger_Locals_Show_Loop ( debugger, scWord ) ;
         else _Printf ( ( byte* ) "\nTry stepping a couple of instructions and try again." ) ;
+        
         // still problems here ?? make sure *everything* is reset 
-        compiler->NumberOfArgs = svArgs ;
-        compiler->NumberOfLocals = svLocals ;
-        compiler->NumberOfRegisterVariables = svRegs ; //nb. prevent increasing the locals offset by adding in repeated calls to this function
         _Namespace_RemoveFromUsingListAndClear ( debugger->LocalsNamespace ) ;
         _Namespace_FreeNamespacesStack ( debugger->LocalsNamespacesStack ) ;
         debugger->LocalsNamespacesStack = 0 ;
-        //if ( Compiling )
-        {
-            compiler->LocalsCompilingNamespacesStack = svStack ;
-            compiler->LocalsNamespace = svNamespace ;
-            Namespace_SetState ( compiler->LocalsNamespace, USING ) ;
-            _CfrTil_->InNamespace = svInNamespace ;
-            d0 ( _Namespace_PrintWords ( compiler->LocalsNamespace ) ) ;
-        }
+        
+        compiler->NumberOfArgs = svArgs ;
+        compiler->NumberOfLocals = svLocals ;
+        compiler->NumberOfRegisterVariables = svRegs ; //nb. prevent increasing the locals offset by adding in repeated calls to this function
+        compiler->LocalsCompilingNamespacesStack = svStack ;
+        compiler->LocalsNamespace = svNamespace ;
+        Namespace_SetState ( compiler->LocalsNamespace, USING ) ;
+        _CfrTil_->InNamespace = svInNamespace ;
+        d0 ( _Namespace_PrintWords ( compiler->LocalsNamespace ) ) ;
     }
 }
 

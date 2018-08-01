@@ -626,7 +626,7 @@ _ReadLine_GetLine ( ReadLiner * rl, byte c )
         if ( ! c ) ReadLine_Key ( rl ) ;
         else _ReadLine_Key ( rl, c ), c = 0 ;
 
-        if ( AtCommandLine (rl) ) _ReadLine_TabCompletion_Check ( rl ) ;
+        if ( AtCommandLine ( rl ) ) _ReadLine_TabCompletion_Check ( rl ) ;
         _CfrTil_->ReadLine_FunctionTable [ _CfrTil_->ReadLine_CharacterTable [ rl->InputKeyedCharacter ] ] ( rl ) ;
         SetState ( rl, ANSI_ESCAPE, false ) ;
     }
@@ -656,3 +656,11 @@ ReadLine_NextChar ( ReadLiner * rl )
     return nchar ;
 }
 
+byte
+ReadLine_NextNonPunctCharAfterEndOfString ( ReadLiner * rl )
+{
+    byte * rlp = & rl->InputLine [ rl->ReadIndex ] ;
+    while ( *( rlp ++ ) != '"' ) ;
+    while ( IsPunct ( *( rlp ++ ) ) ) ;
+    return *rlp ;
+}

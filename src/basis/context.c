@@ -30,7 +30,7 @@ Context_Location ( )
 Context *
 _Context_Allocate ( )
 {
-    Context * cntx = ( Context* ) OVT_CheckRecycleableAllocate (_Q_->MemorySpace0->RecycledContextList, sizeof ( Context )) ;
+    Context * cntx = ( Context* ) OVT_CheckRecycleableAllocate ( _Q_->MemorySpace0->RecycledContextList, sizeof ( Context ) ) ;
     if ( ! cntx ) cntx = ( Context* ) Mem_Allocate ( sizeof ( Context ), CONTEXT ) ;
     cntx->C_Node.n_InUseFlag = N_LOCKED ;
     cntx->C_Node.n_Size = sizeof ( Context ) ;
@@ -253,20 +253,21 @@ _Context_StringEqual_PeekNextToken ( Context * cntx, byte * check, Boolean evalF
 void
 _Context_DoubleQuoteMacro ( Context * cntx )
 {
+    ReadLiner * rl = _ReadLiner_ ;
     Lexer * lexer = cntx->Lexer0 ;
-#if 1
-    if ( ! GetState ( _CfrTil_, SOURCE_CODE_STARTED ) ) CfrTil_InitSourceCode_WithCurrentInputChar ( _CfrTil_ ) ; // must be here for wdiss and add addToHistory
-#else    
-    if ( ! Compiling ) _CfrTil_InitSourceCode_WithName ( _CfrTil_, _Lexer_->OriginalToken ) ;
-#endif    
+    if ( ! GetState ( _CfrTil_, SOURCE_CODE_STARTED ) )
+    {
+        byte c = ReadLine_NextNonPunctCharAfterEndOfString (rl);
+        if ( c == '(' || c == '{')  CfrTil_InitSourceCode_WithCurrentInputChar ( _CfrTil_ ) ; // must be here for wdiss and add addToHistory
+    }
     do
     {
-        lexer->TokenInputCharacter = ReadLine_NextChar ( cntx->ReadLiner0 ) ;
-        if ( lexer->TokenInputCharacter == '\\' )
+        lexer->TokenInputByte = ReadLine_NextChar ( rl ) ;
+        if ( lexer->TokenInputByte == '\\' )
             _BackSlash ( lexer, 1 ) ;
         else Lexer_Append_ConvertedCharacterToTokenBuffer ( lexer ) ;
     }
-    while ( lexer->TokenInputCharacter != '"' ) ;
+    while ( lexer->TokenInputByte != '"' ) ;
     SetState ( lexer, LEXER_DONE, true ) ;
     if ( GetState ( _CfrTil_, STRING_MACROS_ON ) && GetState ( &_CfrTil_->Sti, STI_INITIALIZED ) )
     {

@@ -400,7 +400,6 @@ Namespace_FindOrNew_SetUsing ( byte * name, Namespace * containingNs, int64 setU
 Namespace *
 _Namespace_FindOrNew_Local ( Stack * nsStack )
 {
-
     int64 d = Stack_Depth ( nsStack ) ; 
     byte bufferData [ 32 ], *buffer = ( byte* ) bufferData ;
     sprintf ( ( char* ) buffer, "locals_%ld", d ) ;
