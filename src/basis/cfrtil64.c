@@ -15,7 +15,6 @@ _CfrTil_Run ( CfrTil * cfrTil, int64 restartCondition )
             if ( cfrTil && _Context_ && _Context_->System0 )
             {
                 DebugOff ;
-                //CfrTil_C_Syntax_Off ( ) ;
                 Ovt_RunInit ( _Q_ ) ;
                 CfrTil_InterpreterRun ( ) ;
                 d0 ( _Pause ( "\n_CfrTil_Run : ??shouldn't reach here??" ) ; ) ; // shouldn't reach here
@@ -44,94 +43,37 @@ _CfrTil_ReStart ( CfrTil * cfrTil, int64 restartCondition )
     }
 }
 
-#if 0
-
 void
-CfrTil_WordList_PushAndAdd_Firs ( )
+CfrTil_RecycleWordList ( Word * scWord )
 {
-    Word * svWord = WordStack ( 0 ) ;
-    if ( svWord )
-    {
-        svWord->W_SC_Index = 0 ; // before pushWord !
-        CfrTil_WordList_PushWord ( svWord ) ; // for source code
-        Word_SetCodingHere_And_ClearPreviousUseOf_Here_SCA (svWord, 0) ;
-    }
-}
-#endif
-
-void
-Word_RecycleWordList ( Word * scWord )
-{
+    scWord = scWord ? scWord : _CfrTil_->ScWord ;
     if ( scWord )
     {
         DLList_RecycleWordList ( scWord->W_SC_WordList ) ;
         List_Init ( scWord->W_SC_WordList ) ;
     }
-    DLList_RecycleWordList ( _CfrTil_->CompilerWordList ) ;
-    List_Init ( _CfrTil_->CompilerWordList ) ;
+    else
+    {
+        DLList_RecycleWordList ( _CfrTil_->CompilerWordList ) ;
+        List_Init ( _CfrTil_->CompilerWordList ) ;
+    }
 }
 
-// recycling : TODO combine CfrTil_WordList_RecycleInit with _CfrTil_Init_Recycling_SourceCodeWordList
 void
-CfrTil_WordList_RecycleInit ( CfrTil * cfrtil, Word * word, Boolean recycle, Boolean force, Boolean saveWord0 )
+CfrTil_WordList_Init ( CfrTil * cfrtil, Word * word, Boolean saveWord0 )
 {
     Word * svWord ;
     if ( saveWord0 ) svWord = WordStack ( 0 ) ;
     else svWord = 0 ;
-    if ( IsSourceCodeOn && word ) cfrtil->LastFinished_DObject = cfrtil->CurrentWordCompiling = cfrtil->ScWord = word ;
-    else cfrtil->ScWord = word ? word : Get_SourceCodeWord ( ) ;
-    if ( ( ! IsSourceCodeOn ) || force )
-    {
-        if ( cfrtil->ScWord ) cfrtil->ScWord->W_SC_WordList = cfrtil->CompilerWordList ;
-        if ( recycle )
-        {
-            DLList_RecycleWordList ( cfrtil->CompilerWordList ) ;
-            List_Init ( cfrtil->CompilerWordList ) ;
-            cfrtil->ScWord = 0 ;
-        }
-        cfrtil->CompilerWordList = _dllist_New ( CFRTIL ) ;
-    }
-    else if ( IsSourceCodeOn )
-    {
-        if ( cfrtil->ScWord ) cfrtil->ScWord->W_SC_WordList = cfrtil->CompilerWordList ;
-        cfrtil->CompilerWordList = _dllist_New ( CFRTIL ) ;
-    }
-    else
-    {
-        DLList_RecycleWordList ( cfrtil->CompilerWordList ) ;
-        List_Init ( cfrtil->CompilerWordList ) ;
-    }
+    if ( ( word ) && ( IsSourceCodeOn ) ) cfrtil->LastFinished_DObject = cfrtil->CurrentWordCompiling = cfrtil->ScWord = word ;
+    else cfrtil->ScWord = Get_SourceCodeWord ( ) ;
+    cfrtil->ScWord->W_SC_WordList = cfrtil->CompilerWordList ;
     if ( svWord )
     {
         svWord->W_SC_Index = 0 ; // before pushWord !
         CfrTil_WordList_PushWord ( svWord ) ; // for source code
-        //Word_Set_SCA ( svWord ) ;
     }
 }
-#if 0
-void
-_CfrTil_Init_Recycling_SourceCodeWordList ( CfrTil * cfrtil, Word * word )
-{
-    if ( IsSourceCodeOn )
-    {
-        if ( word ) cfrtil->LastFinished_DObject = cfrtil->CurrentWordCompiling = cfrtil->ScWord = word ;
-        else word = cfrtil->CurrentWordCompiling ; //cfrtil->LastFinished_DObject ; //cfrtil->CurrentWordCompiling ;
-        if ( word )
-        {
-            word->W_SC_WordList = cfrtil->CompilerWordList ;
-            word->W_SC_MemSpaceRandMarker = _Q_->MemorySpace0->TempObjectSpace->InitFreedRandMarker ; // this insures that memory for this list hasn't been recycled
-        }
-        //cfrtil->WordList = _dllist_New ( DICTIONARY ) ;
-        List_Init ( cfrtil->CompilerWordList ) ;
-    }
-    else
-    {
-        DLList_RecycleWordList ( cfrtil->CompilerWordList ) ;
-        //cfrtil->WordList = _dllist_New ( DICTIONARY ) ;
-        List_Init ( cfrtil->CompilerWordList ) ;
-    }
-}
-#endif
 
 void
 _CfrTil_CpuState_CheckSave ( )
@@ -139,7 +81,7 @@ _CfrTil_CpuState_CheckSave ( )
     if ( ! GetState ( _CfrTil_->cs_Cpu, CPU_SAVED ) )
     {
         _CfrTil_->SaveCpuState ( ) ;
-        SetState ( _CfrTil_->cs_Cpu, CPU_SAVED, true ) ; //->State = 1 ;
+        SetState ( _CfrTil_->cs_Cpu, CPU_SAVED, true ) ; 
     }
 }
 

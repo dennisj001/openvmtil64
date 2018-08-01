@@ -18,8 +18,8 @@ _CopyDuplicateWord ( Word * word0 )
 Word *
 CopyDuplicateWord ( dlnode * anode, Word * word0 )
 {
-    Word * wordn = ( Word* ) dobject_Get_M_Slot ( anode, SCN_WORD ) ;
-    int64 iuoFlag = dobject_Get_M_Slot ( anode, SCN_IN_USE_FLAG ) ;
+    Word * wordn = ( Word* ) dobject_Get_M_Slot ( (dobject*) anode, SCN_T_WORD ) ;
+    int64 iuoFlag = dobject_Get_M_Slot ( (dobject*) anode, SCN_IN_USE_FLAG ) ;
     if ( iuoFlag && ( word0 == wordn ) ) return _CopyDuplicateWord ( word0 ) ;
     else return 0 ;
 }
@@ -53,31 +53,15 @@ Compiler_CopyDuplicatesAndPush ( Word * word0 )
 void
 Compiler_IncrementCurrentAccumulatedOffset ( Compiler * compiler, int64 increment )
 {
-    if ( compiler->AccumulatedOffsetPointer )
-    {
-        ( *( int64* ) ( compiler->AccumulatedOffsetPointer ) ) += ( increment ) ;
-    }
-#if 1   
-    if ( compiler->AccumulatedOptimizeOffsetPointer )
-    {
-        ( *( int64* ) ( compiler->AccumulatedOptimizeOffsetPointer ) ) += ( increment ) ;
-    }
-#endif    
+    if ( compiler->AccumulatedOffsetPointer ) ( *( int64* ) ( compiler->AccumulatedOffsetPointer ) ) += ( increment ) ;
+    if ( compiler->AccumulatedOptimizeOffsetPointer ) ( *( int64* ) ( compiler->AccumulatedOptimizeOffsetPointer ) ) += ( increment ) ;
 }
 
 void
 Compiler_SetCurrentAccumulatedOffsetValue ( Compiler * compiler, int64 value )
 {
-    if ( compiler->AccumulatedOffsetPointer )
-    {
-        ( *( int64* ) ( compiler->AccumulatedOffsetPointer ) ) = ( value ) ;
-    }
-#if 1    
-    if ( compiler->AccumulatedOptimizeOffsetPointer )
-    {
-        ( *( int64* ) ( compiler->AccumulatedOptimizeOffsetPointer ) ) = ( value ) ;
-    }
-#endif    
+    if ( compiler->AccumulatedOffsetPointer ) ( *( int64* ) ( compiler->AccumulatedOffsetPointer ) ) = ( value ) ;
+    if ( compiler->AccumulatedOptimizeOffsetPointer ) ( *( int64* ) ( compiler->AccumulatedOptimizeOffsetPointer ) ) = ( value ) ;
 }
 
 NamedByteArray *
@@ -174,7 +158,7 @@ Compiler_GotoList_Print ( )
 Word *
 _CfrTil_WordList ( int64 n )
 {
-    return ( Word * ) _dllist_Get_N_InUse_Node_M_Slot ( _CfrTil_->CompilerWordList, n, SCN_WORD ) ;
+    return ( Word * ) _dllist_Get_N_InUse_Node_M_Slot ( _CfrTil_->CompilerWordList, n, SCN_T_WORD ) ;
 }
 
 Word *
@@ -186,7 +170,7 @@ CfrTil_WordList ( int64 n )
 void
 _CompileOptimizeInfo_Init ( CompileOptimizeInfo * optInfo )
 {
-    memset ( optInfo, 0, sizeof (CompileOptimizeInfo ) ) ;
+    memset ( (byte*) &optInfo->State, 0, sizeof ( CompileOptimizeInfo ) - sizeof ( DLNode )) ;
 }
 
 void
@@ -195,11 +179,12 @@ CompileOptimizeInfo_Init ( CompileOptimizeInfo * optInfo, uint64 state )
     _CompileOptimizeInfo_Init ( optInfo ) ;
     dlnode * node ;
     int64 i ;
+    // we don't really use optInfo->COIW much 
     for ( i = 0, node = dllist_First ( ( dllist* ) _CfrTil_->CompilerWordList ) ; node ; node = dlnode_Next ( node ) ) // nb. this is a little subtle
     {
-        if ( dobject_Get_M_Slot ( node, SCN_IN_USE_FLAG ) )
+        if ( dobject_Get_M_Slot ( (dobject*) node, SCN_IN_USE_FLAG ) )
         {
-            if ( i < 8 ) optInfo->COIW [ i ++ ] = ( Word * ) dobject_Get_M_Slot ( node, SCN_WORD ) ;
+            if ( i < 8 ) optInfo->COIW [ i ++ ] = ( Word * ) dobject_Get_M_Slot ( (dobject*) node, SCN_T_WORD ) ;
             else break ;
         }
     }
@@ -216,18 +201,21 @@ _CompileOptimizeInfo_New ( uint64 type )
 CompileOptimizeInfo *
 CompileOptimizeInfo_New ( uint64 type )
 {
-    CompileOptimizeInfo * optInfo = 
-        (CompileOptimizeInfo *) OVT_CheckRecyclableAllocate ( _Q_->MemorySpace0->RecycledOptInfoList, sizeof (CompileOptimizeInfo), 0 ) ;
-    if ( ! optInfo )  optInfo = _CompileOptimizeInfo_New ( type ) ;
+    CompileOptimizeInfo * optInfo =
+        ( CompileOptimizeInfo * ) OVT_CheckRecycleableAllocate ( _Q_->MemorySpace0->RecycledOptInfoList, sizeof (CompileOptimizeInfo ) ) ;
+    if ( ! optInfo ) optInfo = _CompileOptimizeInfo_New ( type ) ;
     return optInfo ;
 }
 
 CompileOptimizeInfo *
-Compiler_CompileOptimizeInfo_PushNew ( Compiler * compiler ) 
+Compiler_CompileOptimizeInfo_PushNew ( Compiler * compiler )
 {
     CompileOptimizeInfo * coi = CompileOptimizeInfo_New ( OBJECT_MEMORY ) ;
-    Stack_Push ( compiler->OptimizeInfoStack, (int64) coi ) ;
-    compiler->OptInfo = coi ;
+    if ( coi )
+    {
+        List_Push ( compiler->OptimizeInfoList, ( dlnode* ) coi ) ;
+        compiler->OptInfo = coi ;
+    }
     return coi ;
 }
 
@@ -266,13 +254,15 @@ Compiler_BlockLevel ( Compiler * compiler )
 }
 
 void
-Compiler_RecycleOptInfos ( Compiler * compiler )
+Compiler_RecycleOptInfos ( )
 {
-    CompileOptimizeInfo * coi ; int64 depth ;
-    while ( depth = Stack_Depth ( compiler->OptimizeInfoStack ) ) 
+    Compiler * compiler = _Compiler_ ;
+    CompileOptimizeInfo * coi ;
+    int64 depth ;
+    while ( depth = List_Depth ( compiler->OptimizeInfoList ) )
     {
-        coi = (CompileOptimizeInfo*) Stack_Pop (compiler->OptimizeInfoStack) ;
-        if ( coi != compiler->OptInfo ) OptInfo_Recycle ( coi ) ;
+        coi = ( CompileOptimizeInfo* ) List_Pop ( compiler->OptimizeInfoList ) ;
+        if ( coi && ( coi != compiler->OptInfo ) ) OptInfo_Recycle ( coi ) ;
     }
 }
 
@@ -320,7 +310,7 @@ Compiler_New ( uint64 type )
     compiler->PointerToOffset = Stack_New ( 32, type ) ;
     compiler->CombinatorInfoStack = Stack_New ( 64, type ) ;
     compiler->InfixOperatorStack = Stack_New ( 32, type ) ;
-    compiler->OptimizeInfoStack = Stack_New ( 128, type ) ;
+    compiler->OptimizeInfoList = _dllist_New ( type ) ;
     Compiler_CompileOptimizeInfo_New ( compiler, type ) ;
     Compiler_Init ( compiler, 0 ) ;
     return compiler ;
@@ -352,14 +342,14 @@ Stack_PointerToJmpOffset_Set ( )
 }
 
 void
-_Compiler_CompileAndRecord_Word0_PushReg (int8 reg)
+_Compiler_CompileAndRecord_Word0_PushReg ( int8 reg )
 {
     Word * word = _CfrTil_WordList ( 0 ) ;
     _Word_CompileAndRecord_PushReg ( word, reg ) ;
 }
 
 void
-Compiler_CompileAndRecord_Word0_PushRegToUse ()
+Compiler_CompileAndRecord_Word0_PushRegToUse ( )
 {
     Word * word = _CfrTil_WordList ( 0 ) ;
     _Word_CompileAndRecord_PushReg ( word, word->RegToUse ) ;

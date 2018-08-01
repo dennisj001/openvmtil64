@@ -123,9 +123,9 @@ void
 CfrTil_TurnOnBlockCompiler ( )
 {
     CfrTil_RightBracket ( ) ;
-    CfrTil_WordList_RecycleInit ( _CfrTil_, _CfrTil_->CurrentWordCompiling, 0, 1, 1 ) ;
-    Compiler_RecycleOptInfos ( _Compiler_ ) ;
-    //Word_RecycleWordList ( _CfrTil_->ScWord ) ;
+    //CfrTil_WordList_RecycleInit ( _CfrTil_, _CfrTil_->CurrentWordCompiling, 0, 1, 1 ) ;
+    Compiler_RecycleOptInfos () ;
+    CfrTil_RecycleWordList ( 0 ) ;
 }
 
 // blocks are a notation for subroutines or blocks of code compiled in order,

@@ -58,7 +58,7 @@ GetAccumulatedBlockStatus ( int listStartIndex )
         Ppibs *ppibSstatus ;
         for ( i = listStartIndex ; i <= ( llen - 1 ) ; i ++ ) // -1: 0 based list
         {
-            ppibSstatus = ( Ppibs * ) List_GetN ( _Context_->PreprocessorStackList, i ) ;
+            ppibSstatus = ( Ppibs * ) List_Pick_Value ( _Context_->PreprocessorStackList, i ) ;
             status = status || ( ppibSstatus->IfBlockStatus || ppibSstatus->ElifStatus || ppibSstatus->ElseStatus ) ;
             if ( ! status ) break ;
         }
@@ -70,7 +70,7 @@ int64
 GetElxxStatus ( int64 cond, int64 type )
 {
     int64 llen = List_Length ( _Context_->PreprocessorStackList ) ;
-    Ppibs *top = ( Ppibs * ) List_Top ( _Context_->PreprocessorStackList ) ;
+    Ppibs *top = ( Ppibs * ) List_Top_Value ( _Context_->PreprocessorStackList ) ;
     Boolean status = false, accStatus = GetAccumulatedBlockStatus ( 1 ) ; // 1 ??
     if ( type == PP_ELIF )
     {
@@ -99,15 +99,15 @@ GetElxxStatus ( int64 cond, int64 type )
         top->ElseStatus = status ;
         top->ElifStatus = 0 ; //status ; // so total block status will be the 'else' status
 #else        
-        if ( llen ) current.int64_Ppibs = List_GetN ( _Context_->PreprocessorStackList, llen - 1 ) ; // -1: 0 based list
+        if ( llen ) current.int64_Ppibs = List_Pick_Value ( _Context_->PreprocessorStackList, llen - 1 ) ; // -1: 0 based list
         else SyntaxError ( 1 ) ;
         status = ( ! ( current.IfBlockStatus || current.ElifStatus ) ) ;
         current.ElseStatus = status ;
         current.ElifStatus = 0 ; //status ; // so total block status will be the 'else' status
-        List_SetN ( _Context_->PreprocessorStackList, ( llen - 1 ), current.int64_Ppibs ) ;
+        List_SetN_Value ( _Context_->PreprocessorStackList, ( llen - 1 ), current.int64_Ppibs ) ;
 #endif        
     }
-    List_SetTop ( _Context_->PreprocessorStackList, ( int64 ) top ) ;
+    List_SetTop_Value ( _Context_->PreprocessorStackList, ( int64 ) top ) ;
     dbg ( Ppibs_Print ( top, ( byte* ) ( ( type == PP_ELSE ) ? "Else : ElxxStatus: top of PreprocessorStackList" : "Elif : ElxxStatus" ) ) ) ;
     return status ;
 }
@@ -134,10 +134,11 @@ GetIfStatus ( )
     Boolean accStatus, cond ;
     accStatus = GetAccumulatedBlockStatus ( 0 ) ;
     cond = _GetCondStatus ( ) ;
-    cstatus->IfBlockStatus = cond && accStatus ; // 1 default is to do interpret
+    cstatus->IfBlockStatus = cond && accStatus ; 
     cstatus->Filename = _ReadLiner_->Filename ;
     cstatus->LineNumber = _ReadLiner_->LineNumber ;
-    List_Push ( _Context_->PreprocessorStackList, ( int64 ) cstatus, TEMPORARY ) ;
+    //_List_PushNew_1Value ( dllist *list, int64 type, int64 value, int64 allocType )
+    _List_PushNew_1Value ( _Context_->PreprocessorStackList, T_PREPROCESSOR, ( int64 ) cstatus, TEMPORARY ) ;
     dbg ( Ppibs_Print ( cstatus, ( byte* ) "IfStatus" ) ) ;
     return cstatus->IfBlockStatus ;
 }
@@ -231,11 +232,11 @@ SkipPreprocessorCode ( Boolean skipControl )
                                 endifStatus = _GetEndifStatus ( ) ;
                                 if ( ! endifStatus )
                                 {
-                                    Ppibs *top = ( Ppibs * ) List_GetN ( _Context_->PreprocessorStackList, 0 ) ;
+                                    Ppibs *top = ( Ppibs * ) List_Pick_Value ( _Context_->PreprocessorStackList, 0 ) ;
                                     byte *buffer = Buffer_Data ( _CfrTil_->ScratchB1 ) ;
                                     sprintf ( buffer, ( byte* ) "top : endifStatus = %ld : ifCount = %ld", endifStatus, ifLevel ) ;
                                     dbg ( Ppibs_Print ( top, buffer ) ) ;
-                                    Ppibs *first = ( Ppibs * ) List_GetN ( _Context_->PreprocessorStackList, 1 ) ;
+                                    Ppibs *first = ( Ppibs * ) List_Pick_Value ( _Context_->PreprocessorStackList, 1 ) ;
                                     sprintf ( buffer, ( byte* ) "first : endifStatus = %ld : ifCount = %ld", endifStatus, ifLevel ) ;
                                     dbg ( Ppibs_Print ( first, buffer ) ) ;
                                 }

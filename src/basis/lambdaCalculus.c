@@ -480,7 +480,7 @@ _LO_Define ( ListObject * idNode, ListObject * locals )
     LambdaCalculus * lc = _Q_->OVT_LC ;
     ListObject *value0, *value, *l1 ;
     Word * word = idNode->Lo_CfrTilWord ;
-    CfrTil_WordList_RecycleInit ( _CfrTil_, word, 0, 1, 1 ) ;
+    CfrTil_WordList_Init ( _CfrTil_, word, 1 ) ;
     word->Definition = 0 ; // reset the definition from LO_Read
     value0 = _LO_Next ( idNode ) ;
     _CfrTil_->CurrentWordCompiling = word ;
@@ -859,7 +859,7 @@ _LO_Apply_Arg ( ListObject ** pl1, int64 i )
                 CfrTil_Exception ( OBJECT_SIZE_ERROR, 0, QUIT ) ;
             }
             variableFlag = _CheckArrayDimensionForVariables_And_UpdateCompilerState ( ) ;
-            _WordList_Pop ( _CfrTil_->CompilerWordList, 0 ) ; // pop the initial '['
+            _WordList_Pop ( _CfrTil_->CompilerWordList ) ; // pop the initial '['
             do
             {
                 word = l1 ;

@@ -159,7 +159,7 @@ _Word_Allocate ( uint64 allocType )
     int64 size ;
     if ( allocType & ( COMPILER_TEMP | LISP_TEMP ) ) allocType = TEMPORARY ;
     else allocType = DICTIONARY ;
-    word = ( Word* ) OVT_CheckRecyclableAllocate ( _Q_->MemorySpace0->RecycledWordList, sizeof ( Word ) + sizeof ( WordData ), 0 ) ;
+    word = ( Word* ) OVT_CheckRecycleableAllocate (_Q_->MemorySpace0->RecycledWordList, sizeof ( Word ) + sizeof ( WordData )) ;
     if ( word ) _Q_->MemorySpace0->RecycledWordCount ++ ;
     else word = ( Word* ) Mem_Allocate ( size = ( sizeof ( Word ) + sizeof ( WordData ) ), allocType ) ;
     ( ( DLNode* ) word )->n_Size = size ;

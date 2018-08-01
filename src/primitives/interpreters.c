@@ -130,7 +130,7 @@ _CfrTil_Interpret_ReadToList ( )
 
             _Word_Interpret ( word ) ;
             //List_Push_A_1Value_Node ( interp->InterpList, word ) ;
-            List_Push ( interp->InterpList, word, COMPILER_TEMP ) ;
+            List_PushNew_T_WORD ( interp->InterpList, (int64) word, COMPILER_TEMP ) ;
         }
     }
     return interp->InterpList ;

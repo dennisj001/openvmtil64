@@ -37,7 +37,7 @@ Compile_Init_RegisterParamenterVariables ( Compiler * compiler )
     dlnode * node ;
     for ( node = dllist_First ( ( dllist* ) list ) ; node ; node = dlnode_Next ( node ) )
     {
-        Word * word = ( Word* ) dobject_Get_M_Slot ( node, SCN_WORD ) ;
+        Word * word = ( Word* ) dobject_Get_M_Slot ( (dobject*) node, SCN_T_WORD ) ;
         if ( compiler->NumberOfLocals + compiler->NumberOfArgs )
         {
             _Compile_Move_StackN_To_Reg ( word->RegToUse, FP, LocalParameterVarOffset ( word ) ) ;

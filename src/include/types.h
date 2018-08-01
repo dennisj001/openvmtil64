@@ -645,7 +645,7 @@ typedef struct
 #endif
 typedef struct
 {
-    Symbol COI_Symbol ;
+    DLNode dln_Node ;
     union
     {
         uint64 State ;
@@ -769,7 +769,7 @@ typedef struct
     Stack * BlockStack ;
     Stack * NamespacesStack ;
     Stack * InfixOperatorStack ;
-    Stack * OptimizeInfoStack ;
+    dllist * OptimizeInfoList ;
 } Compiler ;
 typedef struct Interpreter
 {

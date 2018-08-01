@@ -372,7 +372,7 @@ Root
 '_doDemo 1 const    
 'todo 0 const    
 dbgOff
-//dbgOn 
+dbgOn 
 #if Is_DebugOn 
 
 #if todo

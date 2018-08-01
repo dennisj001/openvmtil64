@@ -412,7 +412,7 @@ void
 CfrTil_FullRestart ( )
 {
     _Q_->Signal = 0 ;
-    _OVT_Throw ( INITIAL_START, 0 ) ;
+    OVT_Throw (0, INITIAL_START, 0 ) ;
 }
 
 void

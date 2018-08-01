@@ -683,24 +683,12 @@
 #define SUBSTITUTE 2
 
 // Source Code Node (SCN) dobject slot indices
-#define SCN_WORD  0
-//#define SCN_SC_CADDRESS SCN_WORD
+#define SCN_T_WORD  0
+//#define SCN_SC_CADDRESS SCN_T_WORD
 #define SCN_SC_WORD_INDEX 1
 #define SCN_IN_USE_FLAG 2
 #define SCN_LAST_SLOT SCN_IN_USE_FLAG
 #define SCN_NUMBER_OF_SLOTS (SCN_LAST_SLOT + 1) //1 : remember - 0 indexed array
-
-// gcc 6.x register adjusters : gcc 6 uses ebx for global variables pointer calculation
-#define GCC_7
-#ifdef GCC_7
-#define GCC_REGS_PUSH 
-#define GCC_REGS_POP 
-#else
-#define GCC_REGS_PUSH asm ( "push %ebx ;" "push %edi ;" ) 
-#define GCC_REGS_POP asm ( "pop %edi ;" "pop %ebx ;" ) 
-#endif
-#define DBG_REGS_PUSH asm ( "push %esp ;" "push %ebp ;" ) 
-#define DBG_REGS_POP asm ( "pop %ebp ;" "pop %esp ;" ) 
 
 #define PP_SKIP 0
 #define PP_INTERPRET 1
@@ -727,6 +715,9 @@
 #define TWO_STACK_ARGS          ( (uint8) 1 << 3 )
 #define ONE_REG_ONE_STACK_ARG   ( (uint8) 1 << 4 )
 #define ONE_STACK_ONE_REG_ARG   ( (uint8) 1 << 5 )
+
+#define T_WORD                  ( (uint8) 1 << 0 )
+#define T_PREPROCESSOR          ( (uint8) 1 << 1 )   
 
 #if 0
 // insn op codes for CATEGORY_OP words

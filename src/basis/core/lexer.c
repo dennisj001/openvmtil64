@@ -144,7 +144,7 @@ _Lexer_ConsiderDebugAndCommentTokens ( byte * token, int64 evalFlag, int64 reAdd
 void
 _CfrTil_AddTokenToTailOfTokenList ( byte * token )
 {
-    d0 ( int64 depth = _dllist_Depth ( _CfrTil_->TokenList ) ) ;
+    d0 ( int64 depth = dllist_Depth ( _CfrTil_->TokenList ) ) ;
     d0 ( if ( depth ) { _Printf ( ( byte* ) "\nTokenList depth = %d\n", depth ) ; Pause () ; } ) ;
     if ( token ) dllist_AddNodeToTail ( _CfrTil_->TokenList, ( dlnode* ) Lexer_Token_New ( token ) ) ;
 }
@@ -152,7 +152,7 @@ _CfrTil_AddTokenToTailOfTokenList ( byte * token )
 void
 _CfrTil_PushToken_OnTokenList ( byte * token )
 {
-    d0 ( int64 depth = _dllist_Depth ( _CfrTil_->TokenList ) ) ;
+    d0 ( int64 depth = dllist_Depth ( _CfrTil_->TokenList ) ) ;
     d0 ( if ( depth ) { _Printf ( ( byte* ) "\nTokenList depth = %d\n", depth ) ; Pause () ; } ) ;
     if ( token ) dllist_AddNodeToHead ( _CfrTil_->TokenList, ( dlnode* ) Lexer_Token_New ( token ) ) ;
 }

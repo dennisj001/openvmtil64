@@ -1,12 +1,49 @@
 
 #include "../include/cfrtil64.h"
 
+void
+Debugger_ShowDbgSourceCodeAtAddress ( Debugger * debugger, byte * address )
+{
+    // ...source code source code TP source code source code ... EOL
+    Word * scWord = Get_SourceCodeWord ( ) ;
+    if ( scWord )
+    {
+        dllist * list = ( scWord->W_SC_WordList ) ; //&& ( scWord->W_SC_MemSpaceRandMarker == _Q_->MemorySpace0->TempObjectSpace->InitFreedRandMarker ) ) ? scWord->W_SC_WordList : 0 ; //_CfrTil_->CompilerWordList ;
+        if ( list )
+        {
+            byte *sourceCode = scWord->W_SourceCode ? scWord->W_SourceCode : String_New ( _CfrTil_->SC_Buffer, TEMPORARY ) ;
+            if ( ! String_Equal ( sourceCode, "" ) )
+            {
+                int64 fixed = 0 ;
+                Word * word = DWL_Find ( list, 0, address, 0, 0, 0, 0 ) ;
+                if ( word && ( debugger->LastSourceCodeWord != word ) )
+                {
+                    d0 ( DebugWordList_Show_All ( ) ) ;
+
+                    if ( GetState ( scWord, W_C_SYNTAX ) && String_Equal ( word->Name, "store" ) )
+                    {
+                        word->Name = ( byte* ) "=" ;
+                        fixed = 1 ;
+                    }
+                    byte * buffer = PrepareDbgSourceCodeString ( sourceCode, word ) ;
+                    _Printf ( ( byte* ) "\n%s", buffer ) ;
+                    debugger->LastSourceCodeWord = word ;
+                    if ( fixed )
+                    {
+                        word->Name = ( byte* ) "store" ;
+                    }
+                }
+            }
+        }
+    }
+}
+
 /*
  * 
  * Compiler Word List has nodes (CWLNs) with 2 slots one for the *word and one for a pointer to a Source Code Node (SCN) which has source code index info.
  * CWLN : slot 0 word, slot 1 SCN
  * Source code nodes (SCNs) have three slots for the source code byte index, the code address, and a pointer to the word, they are on the _CfrTil_->DebugWordList.
- * SCN : slot 0 : SCN_WORD, slot 1 : SCN_WORD_SC_INDEX, slot 2 : address is SCN_WORD->Coding = word->Coding
+ * SCN : slot 0 : SCN_T_WORD, slot 1 : SCN_T_WORD_SC_INDEX, slot 2 : address is SCN_T_WORD->Coding = word->Coding
  * So, they each have pointers to each other.
  * 
  */
@@ -24,10 +61,10 @@ DWL_Find ( dllist * list, Word * iword, byte * address, byte* name, int64 takeFi
         for ( i = 0, anode = fromFirstFlag ? dllist_First ( list ) : dllist_Last ( list ) ; anode ;
             anode = fromFirstFlag ? dlnode_Next ( anode ) : dlnode_Previous ( anode ), i ++ )
         {
-            nword = ( Word* ) dobject_Get_M_Slot ( anode, SCN_WORD ) ;
+            nword = ( Word* ) dobject_Get_M_Slot ( (dobject*) anode, SCN_T_WORD ) ;
             naddress = nword->SourceCoding ;
-            scwi = dobject_Get_M_Slot ( anode, SCN_SC_WORD_INDEX ) ; 
-            iuFlag = dobject_Get_M_Slot ( anode, SCN_IN_USE_FLAG ) ;
+            scwi = dobject_Get_M_Slot ( (dobject*) anode, SCN_SC_WORD_INDEX ) ; 
+            iuFlag = dobject_Get_M_Slot ( (dobject*) anode, SCN_IN_USE_FLAG ) ;
             if ( ! iuFlag ) continue ;
             if ( iword && ( nword == iword ) ) return nword ;
             if ( Compiling && ( ! GetState ( _Debugger_, DBG_DISASM_ACC ) ) && _Debugger_->w_Word && ( nword == _Debugger_->w_Word ) ) return nword ;
@@ -117,7 +154,7 @@ WordList_SetCoding ( int64 index, byte * address )
 void
 SC_List_AdjustAddress ( dlnode * node, byte * address, byte * newAddress )
 {
-    Word * nword = ( Word* ) dobject_Get_M_Slot ( node, SCN_WORD ) ;
+    Word * nword = ( Word* ) dobject_Get_M_Slot ( (dobject*) node, SCN_T_WORD ) ;
     //int64 scwi = dobject_Get_M_Slot ( node, SCN_SC_WORD_INDEX ) ; //nword->W_SC_WordIndex ;
     if ( ( nword->Coding == address ) ) //&& ( nword->W_SC_WordIndex != word->W_SC_WordIndex ) )
     {
@@ -135,7 +172,7 @@ SC_List_AdjustAddress ( dlnode * node, byte * address, byte * newAddress )
 void
 SC_ListClearAddress ( dlnode * node, byte * address )
 {
-    Word * nword = ( Word* ) dobject_Get_M_Slot ( node, SCN_WORD ) ;
+    Word * nword = ( Word* ) dobject_Get_M_Slot ( (dobject*) node, SCN_T_WORD ) ;
     //int64 scwi = dobject_Get_M_Slot ( node, SCN_SC_WORD_INDEX ) ; //nword->W_SC_WordIndex ;
     if ( ( nword->SourceCoding == address ) ) //&& ( nword->W_SC_WordIndex != word->W_SC_WordIndex ) )
     {
@@ -182,7 +219,7 @@ _CfrTil_WordList_TopWord ( )
 {
     Word * word = 0 ;
     node * first = _dllist_First ( _CfrTil_->CompilerWordList ) ;
-    if ( first ) word = ( Word* ) dobject_Get_M_Slot ( first, SCN_WORD ) ;
+    if ( first ) word = ( Word* ) dobject_Get_M_Slot ( (dobject*) first, SCN_T_WORD ) ;
     return word ;
 }
 
@@ -241,7 +278,7 @@ DWL_ShowWord ( dlnode * anode, int64 index, int64 inUseOnlyFlag, int64 prefix, i
     if ( anode )
     {
         dobject * dobj = ( dobject * ) anode ;
-        Word * word = ( Word* ) dobject_Get_M_Slot ( dobj, SCN_WORD ) ;
+        Word * word = ( Word* ) dobject_Get_M_Slot ( dobj, SCN_T_WORD ) ;
         int64 iuoFlag = dobject_Get_M_Slot ( dobj, SCN_IN_USE_FLAG ) ;
         if ( word && ( ( ! inUseOnlyFlag ) || ( inUseOnlyFlag && iuoFlag ) ) )
         {
@@ -459,7 +496,7 @@ byte *
 CfrTil_FinishSourceCode ( CfrTil * cfrtil, Word * word )
 {
     _CfrTil_Finish_WordSourceCode ( cfrtil, word ) ;
-    CfrTil_WordList_RecycleInit ( cfrtil, word, 0, 0, 0 ) ;
+    CfrTil_WordList_Init ( cfrtil, word, 0 ) ;
 }
 
 void
@@ -577,43 +614,4 @@ PrepareDbgSourceCodeString ( byte * sc, Word * word ) // sc : source code ; scwi
     }
     return cc_line ;
 }
-
-void
-_Debugger_ShowDbgSourceCodeAtAddress ( Debugger * debugger, byte * address )
-{
-    // ...source code source code TP source code source code ... EOL
-    Word * scWord = Get_SourceCodeWord ( ) ;
-    if ( scWord )
-    {
-        dllist * list = ( scWord->W_SC_WordList ) ; //&& ( scWord->W_SC_MemSpaceRandMarker == _Q_->MemorySpace0->TempObjectSpace->InitFreedRandMarker ) ) ? scWord->W_SC_WordList : 0 ; //_CfrTil_->CompilerWordList ;
-        if ( list )
-        {
-            byte *sourceCode = scWord->W_SourceCode ? scWord->W_SourceCode : String_New ( _CfrTil_->SC_Buffer, TEMPORARY ) ;
-            if ( ! String_Equal ( sourceCode, "" ) )
-            {
-                int64 fixed = 0 ;
-                Word * word = DWL_Find ( list, 0, address, 0, 0, 0, 0 ) ;
-                if ( word && ( debugger->LastSourceCodeWord != word ) )
-                {
-                    d0 ( DebugWordList_Show_All ( ) ) ;
-
-                    if ( GetState ( scWord, W_C_SYNTAX ) && String_Equal ( word->Name, "store" ) )
-                    {
-                        word->Name = ( byte* ) "=" ;
-                        fixed = 1 ;
-                    }
-                    byte * buffer = PrepareDbgSourceCodeString ( sourceCode, word ) ;
-                    _Printf ( ( byte* ) "\n%s", buffer ) ;
-                    debugger->LastSourceCodeWord = word ;
-                    if ( fixed )
-                    {
-                        word->Name = ( byte* ) "store" ;
-                    }
-                }
-            }
-        }
-    }
-}
-
-
 

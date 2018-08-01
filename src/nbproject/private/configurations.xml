@@ -10,7 +10,6 @@
           <in>blocks.c</in>
           <in>combinators.c</in>
           <in>compile.c</in>
-          <in>compiler.back.c</in>
           <in>compiler.c</in>
           <in>cpu.c</in>
           <in>locals.c</in>
@@ -19,7 +18,6 @@
           <in>math.c</in>
           <in>mcPrimitives.c</in>
           <in>memory.c</in>
-          <in>optimize.back.c</in>
           <in>optimize.c</in>
           <in>runtime.c</in>
           <in>stack.c</in>
@@ -116,7 +114,6 @@
         <in>openvmtils.c</in>
         <in>parsers.c</in>
         <in>primitives.c</in>
-        <in>primitives.old.c</in>
         <in>stacks.c</in>
         <in>strings.c</in>
         <in>syntaxes.c</in>

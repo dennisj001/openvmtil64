@@ -1,5 +1,149 @@
 #include "../../include/cfrtil64.h"
 
+dobject *
+_dllist_PushNew_M_Slot_Node ( dllist* list, int64 dobjType, int64 allocType, int64 m_slots, ... )
+{
+    int64 i ;
+    va_list args ;
+    va_start ( args, m_slots ) ;
+    dobject * dobj = _dobject_Allocate ( dobjType, m_slots, allocType ) ;
+    for ( i = 0 ; i < m_slots ; i ++ ) dobj->do_iData[i] = va_arg ( args, int64 ) ;
+    va_end ( args ) ;
+    _dllist_PushNode ( list, ( dlnode* ) dobj ) ;
+
+    return dobj ;
+}
+
+inline
+void
+List_Push ( dllist *list, dlnode * node )
+{
+    _dllist_AddNodeToHead ( list, ( dlnode* ) node ) ;
+}
+
+inline
+dlnode *
+List_Pop ( dllist *list )
+{
+    return _dllist_PopNode ( list ) ;
+}
+
+inline
+int64
+dobject_Get_M_Slot ( dobject* dobj, int64 m )
+{
+    if ( dobj ) return dobj->do_iData [m] ;
+    else return 0 ;
+}
+
+inline
+void
+dobject_Set_M_Slot ( dobject* dobj, int64 m, int64 value )
+{
+    if ( dobj ) dobj->do_iData [m] = value ;
+}
+
+inline
+void
+List_Set_N_Node_M_Slot ( dllist *list, int64 n, int64 m, int64 value )
+{
+    _dllist_Set_N_Node_M_Slot ( list, n, m, value ) ;
+}
+
+inline
+int64
+List_Get_N_Node_M_Slot ( dllist *list, int64 n, int64 m )
+{
+    _dllist_Get_N_Node_M_Slot ( list, n, m ) ;
+}
+
+// first slot of the n node
+
+inline
+int64
+List_GetN_Value ( dllist *list, int64 n )
+{
+    _dllist_Get_N_Node_M_Slot ( list, n, 0 ) ;
+}
+
+inline
+int64
+List_Pick_Value ( dllist *list, int64 n )
+{
+    return List_GetN_Value ( list, n ) ;
+}
+
+inline
+dlnode *
+List_Pick ( dllist *list, int64 n )
+{
+    return _dllist_Get_N_Node ( list, n ) ;
+}
+
+inline
+void
+List_SetN_Value ( dllist *list, int64 n, int64 value )
+{
+    dobject * dobj = ( dobject* ) _dllist_Get_N_Node ( list, n ) ;
+    dobject_Set_M_Slot ( dobj, 0, value ) ;
+}
+
+inline
+void
+List_SetTop_Value ( dllist *list, int64 value )
+{
+    List_SetN_Value ( list, 0, value ) ;
+}
+
+inline
+int64
+List_Top_Value ( dllist *list )
+{
+    return List_GetN_Value ( list, 0 ) ;
+}
+
+inline
+int64
+List_Depth ( dllist *list )
+{
+    return dllist_Depth ( list ) ;
+}
+
+inline
+int64
+List_Length ( dllist *list )
+{
+    return dllist_Depth ( list ) ;
+}
+
+inline
+void
+List_Push_1Value_NewNode_T_WORD ( dllist *list, int64 value, int64 allocType )
+{
+    _dllist_PushNew_M_Slot_Node ( list, T_WORD, allocType, 1, value ) ;
+}
+
+inline
+void
+_List_PushNew_ForWordList ( dllist *list, Word * word, int64 inUseFlag )
+{
+    _dllist_PushNew_M_Slot_Node ( list, T_WORD, TEMPORARY, SCN_NUMBER_OF_SLOTS, ( ( int64 ) word ), word->W_SC_Index, inUseFlag ) ;
+}
+
+inline
+void
+_List_PushNew_1Value ( dllist *list, int64 type, int64 value, int64 allocType )
+{
+    _dllist_PushNew_M_Slot_Node ( list, type, allocType, 1, value ) ;
+}
+
+inline
+void
+List_PushNew_T_WORD ( dllist *list, int64 value, int64 allocType )
+{
+    _List_PushNew_1Value ( list, T_WORD, allocType, value ) ;
+}
+
 void
 _dlnode_Init ( dlnode * node )
 {
@@ -46,28 +190,28 @@ dlnode_Previous ( dlnode * node )
 }
 
 void
-dlnode_InsertThisAfterANode ( dlnode * node, dlnode * anode ) // Insert this After node : toward the tail of the list - "after" the Head
+dlnode_InsertThisAfterANode ( dlnode * thisNode, dlnode * aNode ) // Insert thisNode After aNode : toward the tail of the list - "after" the Head
 {
-    if ( node && anode )
+    if ( thisNode && aNode )
     {
-        D0 ( if ( anode->N_CAttribute & T_TAIL ) Error ( "\nCan't Insert a node after the TailNode!\n", QUIT ) ; ) ;
-        if ( anode->afterNode ) anode->afterNode->beforeNode = node ; // don't overwrite a Head or Tail node 
-        node->afterNode = anode->afterNode ;
-        anode->afterNode = node ; // after the above statement ! obviously
-        node->beforeNode = anode ;
+        D0 ( if ( aNode->N_CAttribute & T_TAIL ) Error ( "\nCan't Insert a node after the TailNode!\n", QUIT ) ; ) ;
+        if ( aNode->afterNode ) aNode->afterNode->beforeNode = thisNode ; // don't overwrite a Head or Tail node 
+        thisNode->afterNode = aNode->afterNode ;
+        aNode->afterNode = thisNode ; // after the above statement ! obviously
+        thisNode->beforeNode = aNode ;
     }
 }
 
 void
-dlnode_InsertThisBeforeANode ( dlnode * node, dlnode * anode ) // Insert this Before node : toward the head of the list - "before" the Tail
+dlnode_InsertThisBeforeANode ( dlnode * thisNode, dlnode * aNode ) // Insert thisNode Before aNode : toward the head of the list - "before" the Tail
 {
-    if ( node && anode )
+    if ( thisNode && aNode )
     {
-        D0 ( if ( anode->N_CAttribute & T_HEAD ) Error ( "\nCan't Insert a node before the HeadNode!\n", QUIT ) ; ) ;
-        if ( anode->beforeNode ) anode->beforeNode->afterNode = node ; // don't overwrite a Head or Tail node
-        node->beforeNode = anode->beforeNode ;
-        anode->beforeNode = node ; // after the above statement ! obviously
-        node->afterNode = anode ;
+        D0 ( if ( aNode->N_CAttribute & T_HEAD ) Error ( "\nCan't Insert a node before the HeadNode!\n", QUIT ) ; ) ;
+        if ( aNode->beforeNode ) aNode->beforeNode->afterNode = thisNode ; // don't overwrite a Head or Tail node
+        thisNode->beforeNode = aNode->beforeNode ;
+        aNode->beforeNode = thisNode ; // after the above statement ! obviously
+        thisNode->afterNode = aNode ;
     }
 }
 
@@ -161,7 +305,7 @@ dllist_ReInit ( dllist * list )
 }
 
 int64
-dllist_Length ( dllist * list )
+dllist_Depth ( dllist * list )
 {
     int64 length ;
     dlnode * node, * nextNode ;
@@ -179,6 +323,9 @@ _dllist_AddNodeToHead ( dllist *list, dlnode * node )
     if ( list && node )
     {
         dlnode_InsertThisAfterANode ( node, list->head ) ; // after Head toward Tail
+        //dlnode_InsertThisAfterANode ( node, (dlnode*) list ) ; // after Head toward Tail
+        //dlnode_InsertThisBeforeANode ( dllist_First ( list ), node ) ; // Insert this Before node : toward the head of the list - "before" the Tail
+        
     }
 }
 
@@ -195,13 +342,24 @@ dllist_AddNodeToHead ( dllist *list, dlnode * node )
 }
 
 void
+_dllist_AddNodeToTail ( dllist *list, dlnode * node )
+{
+    if ( list && node )
+    {
+        // prevent trying to add nodes already on the list; this will move it to the beginning
+        dlnode_InsertThisBeforeANode ( node, list->tail ) ; // before Tail toward Head
+        //dlnode_InsertThisBeforeANode ( node, (dlnode*) list ) ; // before Tail toward Head
+    }
+}
+
+void
 dllist_AddNodeToTail ( dllist *list, dlnode * node )
 {
-    if ( node )
+    if ( list && node )
     {
         // prevent trying to add nodes already on the list; this will move it to the beginning
         dlnode_Remove ( node ) ; // prevent trying to add nodes already on the list
-        dlnode_InsertThisBeforeANode ( node, list->tail ) ; // before Tail toward Head
+        _dllist_AddNodeToTail ( list, node ) ;
         list->n_CurrentNode = node ;
     }
 }
@@ -234,12 +392,6 @@ dllist_First ( dllist * list )
 }
 
 dlnode *
-_dllist_Last ( dllist * list )
-{
-    return dlnode_Previous ( list->tail ) ;
-}
-
-dlnode *
 dllist_Last ( dllist * list )
 {
     if ( ! list ) return 0 ;
@@ -254,17 +406,6 @@ dllist_NodePrevious ( dllist * list, dlnode * node )
         node = _dlnode_Previous ( node ) ;
     }
     if ( ! node ) node = dllist_Head ( list ) ;
-    return node ;
-}
-
-dlnode *
-dllist_NodeNext ( dllist * list, dlnode * node )
-{
-    if ( node )
-    {
-        node = _dlnode_Next ( node ) ;
-    }
-    if ( ! node ) node = dllist_Tail ( list ) ;
     return node ;
 }
 
@@ -308,7 +449,7 @@ dllist_SetCurrentNode_After ( dllist * list )
     return ( dlnode* ) list->n_CurrentNode ;
 }
 
-dlnode *
+void
 _dllist_AddNamedValue ( dllist * list, byte * name, int64 value, uint64 allocType )
 {
     Symbol * sym = _Symbol_New ( name, allocType ) ;
@@ -316,26 +457,12 @@ _dllist_AddNamedValue ( dllist * list, byte * name, int64 value, uint64 allocTyp
     _dllist_AddNodeToHead ( list, ( dlnode* ) sym ) ;
 }
 
-dobject *
+void
 _dllist_PushNode ( dllist* list, dlnode * node )
 {
     _dllist_AddNodeToHead ( list, node ) ;
 }
 
-dobject *
-_dllist_PushNew_M_Slot_Node ( dllist* list, int64 dobjType, int64 allocType, int64 m_slots, ... )
-{
-    int64 i ;
-    va_list args ;
-    va_start ( args, m_slots ) ;
-    dobject * dobj = _dobject_Allocate ( dobjType, m_slots, allocType ) ;
-    for ( i = 0 ; i < m_slots ; i ++ ) dobj->do_iData[i] = va_arg ( args, int64 ) ;
-    va_end ( args ) ;
-    //_dllist_AddNodeToHead ( list, ( dlnode* ) dobj ) ;
-    _dllist_PushNode ( list, ( dlnode* ) dobj ) ;
-
-    return dobj ;
-}
 // use list like a endless stack
 
 dlnode *
@@ -381,11 +508,19 @@ _dllist_RemoveNodes_UntilWord ( dlnode *first, Word * word )
     dlnode * node, *nextNode ;
     for ( node = first ; node ; node = nextNode )
     {
-        Word * word1 = ( Word* ) dobject_Get_M_Slot ( node, SCN_WORD ) ;
+        Word * word1 = ( Word* ) dobject_Get_M_Slot ( ( dobject* ) node, SCN_T_WORD ) ;
         if ( word1 == word ) break ;
         nextNode = dlnode_Next ( node ) ; // before Remove
         dlnode_Remove ( node ) ;
     }
+}
+
+dlnode *
+_dllist_Get_N_Node ( dllist * list, int64 n )
+{
+    dlnode * node ;
+    for ( node = dllist_First ( ( dllist* ) list ) ; node && ( -- n >= 0 ) ; node = dlnode_Next ( node ) ) ; // nb. this is a little subtle
+    return node ;
 }
 
 int64
@@ -394,36 +529,30 @@ _dllist_Get_N_InUse_Node_M_Slot ( dllist * list, int64 n, int64 m )
     dlnode * node ;
     for ( node = dllist_First ( ( dllist* ) list ) ; node ; node = dlnode_Next ( node ) ) // nb. this is a little subtle
     {
-        if ( dobject_Get_M_Slot ( node, SCN_IN_USE_FLAG ) ) n -- ;
+        if ( dobject_Get_M_Slot ( ( dobject* ) node, SCN_IN_USE_FLAG ) ) n -- ;
         if ( n < 0 ) break ;
     }
-    return node ? dobject_Get_M_Slot ( node, m ) : 0 ; // LIST_EMPTY
+    return node ? dobject_Get_M_Slot ( ( dobject* ) node, m ) : 0 ; // LIST_EMPTY
 }
 
 int64
 _dllist_Get_N_Node_M_Slot ( dllist * list, int64 n, int64 m )
 {
     dlnode * node ;
-    for ( node = dllist_First ( ( dllist* ) list ) ; node && ( -- n >= 0 ) ; node = dlnode_Next ( node ) ) ; // nb. this is a little subtle
-    return node ? dobject_Get_M_Slot ( node, m ) : 0 ; // LIST_EMPTY
+    //for ( node = dllist_First ( ( dllist* ) list ) ; node && ( -- n >= 0 ) ; node = dlnode_Next ( node ) ) ; // nb. this is a little subtle
+    node = _dllist_Get_N_Node ( list, n ) ;
+    return node ? dobject_Get_M_Slot ( ( dobject* ) node, m ) : 0 ; // LIST_EMPTY
 }
 
 void
 _dllist_Set_N_Node_M_Slot ( dllist * list, int64 n, int64 m, int64 value )
 {
     dlnode * node ;
-    for ( node = dllist_First ( ( dllist* ) list ) ; node && ( -- n >= 0 ) ; node = dlnode_Next ( node ) ) ; // nb. this is a little subtle
-    if ( node ) dobject_Set_M_Slot ( node, m, value ) ;
+    node = _dllist_Get_N_Node ( list, n ) ;
+    if ( node ) dobject_Set_M_Slot ( ( dobject* ) node, m, value ) ;
 }
 
-int64
-_dllist_Depth ( dllist * list )
-{
-    int64 n ;
-    dlnode * node ;
-    for ( n = 0, node = dllist_First ( ( dllist* ) list ) ; node ; n ++, node = dlnode_Next ( node ) ) ;
-    return n ;
-}
+#if 0
 
 int64
 _dllist_GetTopValue ( dllist * list )
@@ -436,6 +565,7 @@ _dllist_SetTopValue ( dllist * list, int64 value )
 {
     _dllist_Set_N_Node_M_Slot ( list, 0, 0, value ) ;
 }
+#endif
 
 void
 dllist_Map4_FromFirstFlag_Indexed ( dllist * list, Boolean fromFirst, MapFunction4 mf, int64 one, int64 two, int64 three )
@@ -454,7 +584,7 @@ dllist_Map4_FromFirstFlag_Indexed ( dllist * list, Boolean fromFirst, MapFunctio
     }
     else
     {
-        for ( index = _dllist_Depth ( list ), node = dllist_Last ( ( dllist* ) list ) ; node ; node = prevNode, index -- )
+        for ( index = dllist_Depth ( list ), node = dllist_Last ( ( dllist* ) list ) ; node ; node = prevNode, index -- )
         {
             prevNode = dlnode_Previous ( node ) ;
             mf ( node, index, one, two, three ) ;

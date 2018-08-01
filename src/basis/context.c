@@ -30,7 +30,7 @@ Context_Location ( )
 Context *
 _Context_Allocate ( )
 {
-    Context * cntx = ( Context* ) OVT_CheckRecyclableAllocate ( _Q_->MemorySpace0->RecycledContextList, sizeof ( Context ), 1 ) ;
+    Context * cntx = ( Context* ) OVT_CheckRecycleableAllocate (_Q_->MemorySpace0->RecycledContextList, sizeof ( Context )) ;
     if ( ! cntx ) cntx = ( Context* ) Mem_Allocate ( sizeof ( Context ), CONTEXT ) ;
     cntx->C_Node.n_InUseFlag = N_LOCKED ;
     cntx->C_Node.n_Size = sizeof ( Context ) ;
@@ -61,6 +61,7 @@ _Context_Init ( Context * cntx0, Context * cntx )
     cntx->Lexer0->OurInterpreter = cntx->Interpreter0 ;
     cntx->Finder0 = cntx->Interpreter0->Finder0 ;
     cntx->Compiler0 = cntx->Interpreter0->Compiler0 ;
+    cntx->PreprocessorStackList = _dllist_New ( CONTEXT ) ;
     return cntx ;
 }
 
@@ -70,7 +71,6 @@ _Context_New ( CfrTil * cfrTil )
     Context * cntx = _Context_Allocate ( ), *cntx0 = cfrTil->Context0 ;
     _Context_ = cfrTil->Context0 = cntx ;
     _Context_Init ( cntx0, cntx ) ;
-    cntx->PreprocessorStackList = _dllist_New ( CONTEXT ) ;
     cntx->ContextDataStack = cfrTil->DataStack ; // nb. using the same one and only DataStack
     return cntx ;
 }

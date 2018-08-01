@@ -153,7 +153,7 @@ CfrTil_ArrayBegin ( void )
             CfrTil_Exception ( OBJECT_SIZE_ERROR, 0, QUIT ) ;
         }
         variableFlag = _CheckArrayDimensionForVariables_And_UpdateCompilerState ( ) ;
-        _WordList_Pop ( _CfrTil_->CompilerWordList, 0 ) ; // pop the initial '['
+        _WordList_Pop ( _CfrTil_->CompilerWordList ) ; // pop the initial '['
         do
         {
             token = Lexer_ReadToken ( lexer ) ;

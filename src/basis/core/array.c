@@ -31,8 +31,11 @@ _ByteArray_AppendSpace_MakeSure ( ByteArray * ba, int64 size ) // size in bytes
                 {
                     nodeNext = dlnode_Next ( node ) ;
                     ba = Get_BA_Symbol_To_BA ( node ) ;
-                    if ( ba->MemRemaining > largestRemaining ) largestRemaining = ba->MemRemaining ;
-                    if ( ba->MemRemaining >= size ) goto done ;
+                    if ( ba )
+                    {
+                        if ( ba->MemRemaining > largestRemaining ) largestRemaining = ba->MemRemaining ;
+                        if ( ba->MemRemaining >= size ) goto done ;
+                    }
                 }
             }
             _Q_->AllocationRequestLacks ++ ;

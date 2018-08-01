@@ -70,7 +70,7 @@ Compiler_GetOptimizeState ( Compiler * compiler, Word * word )
             optInfo->node ; optInfo->node = optInfo->nextNode )
         {
             optInfo->nextNode = dlnode_Next ( optInfo->node ) ;
-            if ( dobject_Get_M_Slot ( optInfo->node, SCN_IN_USE_FLAG ) ) optInfo->wordn = ( Word* ) dobject_Get_M_Slot ( optInfo->node, SCN_WORD ) ;
+            if ( dobject_Get_M_Slot ( (dobject*) optInfo->node, SCN_IN_USE_FLAG ) ) optInfo->wordn = ( Word* ) dobject_Get_M_Slot ( (dobject*) optInfo->node, SCN_T_WORD ) ;
             else continue ;
             if ( optInfo->wordn->CAttribute2 & ( NO_OP_WORD | LEFT_PAREN ) ) continue ;
             else if ( optInfo->wordn->CAttribute & ( CATEGORY_OP ) )
@@ -520,14 +520,15 @@ Compile_Optimize_OpEqual ( Compiler * compiler )
 Word *
 Compile_Optimize_EqualCheck ( Compiler * compiler )
 {
-    CompileOptimizeInfo * coi = ( COI * ) _Stack_Pick ( compiler->OptimizeInfoStack, 1 ) ;
+    int64 depth = List_Depth ( compiler->OptimizeInfoList ) ;
+    CompileOptimizeInfo * coi = ( COI * ) List_Pick ( compiler->OptimizeInfoList, 1 ) ;
     Word * word ;
     dlnode * node, *nextNode ;
-    if ( coi->NumberOfArgs == 2 )
+    if ( coi && ( coi->NumberOfArgs == 2 ) )
     {
         for ( node = coi->wordArg1Node ; node && ( nextNode = dlnode_Next ( node ) ) ; node = nextNode )
         {
-            word = ( Word* ) dobject_Get_M_Slot ( nextNode, SCN_WORD ) ;
+            word = ( Word* ) dobject_Get_M_Slot ( (dobject*) nextNode, SCN_T_WORD ) ;
             if ( word->CAttribute & ( LOCAL_VARIABLE | PARAMETER_VARIABLE ) )
             {
                 if ( word->CAttribute & REGISTER_VARIABLE )

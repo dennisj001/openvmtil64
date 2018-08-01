@@ -544,60 +544,61 @@ _OVT_ShowMemoryAllocated ( OpenVmTil * ovt )
     Buffer_PrintBuffers ( ) ;
 }
 
+// only check a first node, if no first node the list is empty
 byte *
-OVT_CheckRecyclableAllocate ( dllist * list, int64 size, int8 checkInUseFlag )
+OVT_CheckRecycleableAllocate (dllist * list, int64 size)
 {
     DLNode * node = 0 ;
-    if ( _Q_ && _Q_->MemorySpace0 ) node = ( DLNode* ) dllist_First ( ( dllist* ) list ) ;
-    if ( node )
+    if ( _Q_ && _Q_->MemorySpace0 ) node = ( DLNode* ) dllist_First ( ( dllist* ) list ) ; 
+    if ( node ) 
     {
-#if 0 // not needed for now because we are only recycling and checking for words        
-        if ( checkInUseFlag )
-        {
-            if ( ( node->n_Size != size ) || ( node->n_InUseFlag != N_FREE ) ) return 0 ;
-        }
-#endif        
+        //if ( ( checkFlag ) && ( ( node->n_InUseFlag == N_IN_USE ) || ( node->n_Size != size ) || ( node->n_InUseFlag != N_FREE ) ) ) return 0 ;
         dlnode_Remove ( ( dlnode* ) node ) ; // necessary else we destroy the list!
         Mem_Clear ( ( byte* ) node, size ) ;
-        if ( checkInUseFlag ) node->n_InUseFlag = N_IN_USE ;
+        node->n_InUseFlag = N_IN_USE ;
         return ( byte* ) node ;
     }
     else return 0 ;
 }
 
 void
-Word_Recycle ( Word * w )
+OVT_Recycle ( dllist * list, dlnode * anode )
 {
-    if ( w ) dllist_AddNodeToHead ( _Q_->MemorySpace0->RecycledWordList, ( dlnode* ) w ) ;
+    if ( anode ) dllist_AddNodeToHead ( list, anode ) ;
 }
 
+// put a word on the recycling list
+void
+Word_Recycle ( Word * w )
+{
+    OVT_Recycle ( _Q_->MemorySpace0->RecycledWordList, ( dlnode * ) w ) ;
+}
+
+// put a CompileOptimizeInfo on the recycling list
 void
 OptInfo_Recycle ( CompileOptimizeInfo * coi )
 {
-    if ( coi ) dllist_AddNodeToHead ( _Q_->MemorySpace0->RecycledOptInfoList, ( dlnode* ) coi ) ;
+    OVT_Recycle ( _Q_->MemorySpace0->RecycledOptInfoList, ( dlnode * ) coi ) ;
 }
 
 void
 _CheckRecycleWord ( Word * w )
 {
-    if ( w && ( w->S_CAttribute & RECYCLABLE_COPY ) )
+    if ( w && ( w->S_CAttribute & RECYCLABLE_COPY ) ) //&& ( ! ( IsSourceCodeOn ) ) && GetState ( w, W_SOURCE_CODE_MODE ) )
     {
-        if ( ( ! ( IsSourceCodeOn ) ) && GetState ( w, W_SOURCE_CODE_MODE ) )
-        {
-            d0 ( _Printf ( ( byte* ) "\nrecycling : %s", w->Name ) ) ;
-            d0 ( if ( String_Equal ( w->Name, "(" ) ) _Printf ( "\nRecycle : Got it! : %s\n", w->Name ) ) ;
-            Word_Recycle ( w ) ;
-        }
+        d0 ( _Printf ( ( byte* ) "\nrecycling : %s", w->Name ) ) ;
+        Word_Recycle ( w ) ;
     }
 }
 
 void
 CheckRecycleWord ( Node * node )
 {
-    Word *w = ( Word* ) ( dlnode_Next ( ( dlnode* ) node ) ? dobject_Get_M_Slot ( node, SCN_WORD ) : 0 ) ;
+    Word *w = ( Word* ) dobject_Get_M_Slot ( (dobject*) node, SCN_T_WORD ) ;
     _CheckRecycleWord ( w ) ;
 }
 
+// check a compiler word list for recycleable words and add them to the recycled word list : _Q_->MemorySpace0->RecycledWordList
 void
 DLList_RecycleWordList ( dllist * list )
 {
@@ -618,25 +619,3 @@ CheckCodeSpaceForRoom ( )
     }
 }
 
-#if 0
-
-void
-OVT_ShowPermanentMemList ( )
-{
-    _OVT_ShowPermanentMemList ( 1 ) ;
-}
-
-void
-Calculate_CurrentNbaMemoryAllocationInfo ( )
-{
-    Calculate_TotalNbaAccountedMemAllocated ( 0 ) ;
-}
-
-void
-OVT_MemListFree_Objects ( )
-{
-    OVT_MemList_FreeNBAMemory ( ( byte* ) "ObjectSpace", 20 * M, 0 ) ;
-}
-
-
-#endif

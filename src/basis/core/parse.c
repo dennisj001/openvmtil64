@@ -300,7 +300,7 @@ _CfrTil_Parse_LocalsAndStackVariables ( int64 svf, int64 lispMode, ListObject * 
                         {
                             compiler->RegisterParameterList = _dllist_New ( TEMPORARY ) ;
                         }
-                        _List_PushNew ( compiler->RegisterParameterList, word, 1 ) ;
+                        _List_PushNew_ForWordList ( compiler->RegisterParameterList, word, 1 ) ;
                         compiler->NumberOfRegisterArgs ++ ;
                     }
                     else compiler->NumberOfRegisterLocals ++ ;
