@@ -190,12 +190,12 @@ shell ( )
     SetState ( lexer, END_OF_FILE | END_OF_STRING | LEXER_END_OF_LINE, false ) ;
     do
     {
-        while ( atoken = Lexer_PeekNextNonDebugTokenWord ( lexer, 0 ) )
+        while ( atoken = _Lexer_PeekNextNonDebugTokenWord ( lexer, 0 ) )
         {
             if ( GetState ( lexer, END_OF_FILE | END_OF_STRING | LEXER_END_OF_LINE ) ) 
             {
                 if ( String_Equal ( atoken, ";" ) ) Lexer_ReadToken ( lexer ) ;
-                goto done ;
+                break ; 
             }
             atoken = Lexer_ReadToken ( lexer ) ;
 
