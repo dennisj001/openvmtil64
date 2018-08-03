@@ -210,7 +210,7 @@ CompileOptimizeInfo_New ( uint64 type )
 CompileOptimizeInfo *
 Compiler_CompileOptimizeInfo_PushNew ( Compiler * compiler )
 {
-    CompileOptimizeInfo * coi = CompileOptimizeInfo_New ( OBJECT_MEMORY ) ;
+    CompileOptimizeInfo * coi = CompileOptimizeInfo_New ( OBJECT_MEM ) ;
     if ( coi )
     {
         List_Push ( compiler->OptimizeInfoList, ( dlnode* ) coi ) ;

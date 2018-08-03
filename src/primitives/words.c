@@ -208,7 +208,7 @@ Location *
 Location_New ( )
 {
     ReadLiner * rl = _ReadLiner_ ;
-    Location * loc = ( Location * ) Mem_Allocate ( sizeof ( Location ), OBJECT_MEMORY ) ;
+    Location * loc = ( Location * ) Mem_Allocate ( sizeof ( Location ), OBJECT_MEM ) ;
     loc->Filename = rl->Filename ;
     loc->LineNumber = rl->LineNumber ;
     loc->CursorPosition = _Context_->Lexer0->CurrentReadIndex ; // rl->CursorPosition ;

@@ -35,9 +35,6 @@
 #define _LO_AddToTail( lo, lo1 ) dlnode_InsertThisBeforeANode ( (node*) lo1, ((node*)(lo))->tail ) ; 
 #define LO_AddToHead( lo, lo1 ) dllist_AddNodeToHead ( (( ListObject * ) lo)->Lo_List, ( dlnode* ) (lo1) ) 
 #define LO_New( lType, object ) (ListObject *) _DataObject_New (T_LC_NEW, 0, 0, 0, 0, lType, 0, (int64) object, 0, 0 , -1)
-#define LambdaArgs( proc ) proc->p[0]
-#define LambdaProcedureBody( proc ) proc->p[1]
-#define LambdaVals( proc ) proc->p[2]
 #define LO_ReplaceNode( node, anode) dlnode_Replace ( (dlnode *) node, (dlnode *) anode ) 
 #define LO_PrintWithValue( l0 ) _Printf ( (byte*) "%s", _LO_PrintListToString ( (ListObject *) l0 , 0, 0, 1 ) ) 
 #define _LO_PRINT_TO_STRING(l0) _LO_PrintListToString ( ( ListObject * ) l0, 0, 0, 0 )
@@ -1853,9 +1850,9 @@ _LC_Init ( LambdaCalculus * lc, int64 newFlag )
     lc->SaveStackPointer = 0 ;
     if ( newFlag || ( ! lc->Nil ) )
     {
-        //lc->Nil = _DataObject_New (T_LC_NEW, 0, ( byte* ) "nil", 0, 0, T_NIL, 0, 0, LISP, 0, - 1 ) ;
-        lc->Nil = _DataObject_New ( T_LC_NEW, 0, ( byte* ) "nil", 0, 0, T_NIL, 0, 0, 0, 0, - 1 ) ;
-        lc->True = _DataObject_New ( T_LC_NEW, 0, ( byte* ) "true", 0, 0, 0, 0, ( uint64 ) true, 0, 0, - 1 ) ;
+        lc->Nil = _DataObject_New (T_LC_NEW, 0, ( byte* ) "nil", 0, 0, T_NIL, 0, 0, LISP, 0, - 1 ) ;
+        //lc->Nil = _DataObject_New ( T_LC_NEW, 0, ( byte* ) "nil", 0, 0, T_NIL, 0, 0, 0, 0, - 1 ) ;
+        lc->True = _DataObject_New ( T_LC_NEW, 0, ( byte* ) "true", 0, 0, 0, 0, ( uint64 ) true, LISP, 0, - 1 ) ;
     }
     lc->OurCfrTil = _CfrTil_ ;
     lc->QuoteState = 0 ;

@@ -96,7 +96,7 @@ Mem_Allocate ( int64 size, uint64 allocType )
     switch ( allocType )
     {
         case OPENVMTIL: return _Allocate ( size, ms->OpenVmTilSpace ) ;
-        case LISP: case OBJECT_MEMORY: return _Allocate ( size, ms->ObjectSpace ) ;
+        case LISP: case OBJECT_MEM: return _Allocate ( size, ms->ObjectSpace ) ;
         case TEMPORARY: return _Allocate ( size, ms->TempObjectSpace ) ; // used for SourceCode
         case DICTIONARY: return _Allocate ( size, ms->DictionarySpace ) ;
         case SESSION: return _Allocate ( size, ms->SessionObjectsSpace ) ;
@@ -125,7 +125,7 @@ Mem_Allocate ( int64 size, uint64 allocType )
     switch ( allocType )
     {
         case OPENVMTIL: return _Allocate ( size, ms->OpenVmTilSpace ) ;
-        case LISP: case OBJECT_MEMORY: return _Allocate ( size, ms->ObjectSpace ) ;
+        case LISP: case OBJECT_MEM: return _Allocate ( size, ms->ObjectSpace ) ;
         case TEMPORARY: return _Allocate ( size, ms->TempObjectSpace ) ; // used for SourceCode
         case DICTIONARY: return _Allocate ( size, ms->DictionarySpace ) ;
         //case TEMPORARY: 
@@ -236,7 +236,7 @@ MemorySpace_Init ( MemorySpace * ms )
 
     ms->OpenVmTilSpace = MemorySpace_NBA_New ( ms, ( byte* ) "OpenVmTilSpace", ovt->OpenVmTilSize, OPENVMTIL ) ;
     ms->CfrTilInternalSpace = MemorySpace_NBA_New ( ms, ( byte* ) "CfrTilInternalSpace", ovt->CfrTilSize, CFRTIL ) ;
-    ms->ObjectSpace = MemorySpace_NBA_New ( ms, ( byte* ) "ObjectSpace", ovt->ObjectsSize, OBJECT_MEMORY ) ;
+    ms->ObjectSpace = MemorySpace_NBA_New ( ms, ( byte* ) "ObjectSpace", ovt->ObjectsSize, OBJECT_MEM ) ;
     ms->TempObjectSpace = MemorySpace_NBA_New ( ms, ( byte* ) "TempObjectSpace", ovt->TempObjectsSize, TEMPORARY ) ;
     ms->CompilerTempObjectSpace = MemorySpace_NBA_New ( ms, ( byte* ) "CompilerTempObjectSpace", ovt->CompilerTempObjectsSize, COMPILER_TEMP ) ;
     ms->CodeSpace = MemorySpace_NBA_New ( ms, ( byte* ) "CodeSpace", ovt->MachineCodeSize, CODE ) ;

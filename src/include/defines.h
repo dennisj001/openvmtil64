@@ -408,7 +408,7 @@
 #define CONTEXT ( (uint64) 1 << 10 )
 #define BUFFER ( (uint64) 1 << 12 )
 #define LISP_TEMP ( (uint64) 1 << 13 )
-#define OBJECT_MEMORY ( (uint64) 1 << 14 )
+#define OBJECT_MEM ( (uint64) 1 << 14 )
 #define SL5_MEM ( (uint64) 1 << 14 )
 #define LISP ( (uint64) 1 << 15 )
 #define HISTORY ( (uint64) 1 << 16 )

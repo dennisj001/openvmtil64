@@ -115,8 +115,8 @@ CfrTil_TurnOffBlockCompiler ( )
 {
     Compiler * compiler = _Context_->Compiler0 ;
     if ( ! GetState ( compiler, LISP_MODE ) ) CfrTil_LeftBracket ( ) ;
-    _Compiler_FreeAllLocalsNamespaces ( compiler ) ;
     _CfrTil_RemoveNamespaceFromUsingListAndClear ( ( byte* ) "__labels__" ) ;
+    _Compiler_FreeAllLocalsNamespaces ( compiler ) ;
     SetState ( compiler, VARIABLE_FRAME, false ) ;
 }
 
@@ -124,7 +124,6 @@ void
 CfrTil_TurnOnBlockCompiler ( )
 {
     CfrTil_RightBracket ( ) ;
-    //CfrTil_WordList_RecycleInit ( _CfrTil_, _CfrTil_->CurrentWordCompiling, 0, 1, 1 ) ;
     Compiler_RecycleOptInfos () ;
     CfrTil_RecycleWordList ( 0 ) ;
 }

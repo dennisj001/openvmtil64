@@ -56,7 +56,7 @@ Debugger_ParseFunctionLocalVariables ( Debugger * debugger, Lexer * lexer, Boole
             }
             if ( String_Equal ( token, "var" ) ) aToken = prevToken ;
             else aToken = Lexer_PeekNextNonDebugTokenWord ( _Lexer_, 0 ) ;
-            _CfrTil_LocalWord ( aToken, ++ _Compiler_->NumberOfLocals, LOCAL_VARIABLE, 0, 0 ) ;
+            _CfrTil_LocalWord ( aToken, ++ _Compiler_->NumberOfLocals, LOCAL_VARIABLE, 0, 0, COMPILER_TEMP ) ;
         }
         else if ( String_Equal ( token, "<end>" ) ) return ;
         prevToken = token ;
@@ -172,9 +172,9 @@ Debugger_Locals_Show ( Debugger * debugger )
 {
     Word * scWord = Compiling ? _CfrTil_->CurrentWordCompiling :
         ( debugger->DebugAddress ? Word_GetFromCodeAddress ( debugger->DebugAddress ) : _Context_->CurrentlyRunningWord ) ;
-    _Compile_Save_C_CpuState ( _CfrTil_, 0 ) ; 
+    _Compile_Save_C_CpuState ( _CfrTil_, 0 ) ;
     _Debugger_Locals_Show ( debugger, scWord ) ;
-    _Compile_Restore_C_CpuState ( _CfrTil_, 0 ) ; 
+    _Compile_Restore_C_CpuState ( _CfrTil_, 0 ) ;
 }
 
 int64

@@ -290,7 +290,7 @@ _CfrTil_Parse_LocalsAndStackVariables ( int64 svf, int64 lispMode, ListObject * 
                     if ( ctype & LOCAL_VARIABLE ) compiler->NumberOfLocals -- ;
                     else if ( ctype & PARAMETER_VARIABLE ) compiler->NumberOfArgs -- ;
                 }
-                word = _CfrTil_LocalWord ( token, ( ctype & LOCAL_VARIABLE ) ? ++ compiler->NumberOfLocals : ++ compiler->NumberOfArgs, ctype, ctype2, ltype ) ; // svf : flag - whether stack variables are in the frame
+                word = _CfrTil_LocalWord ( token, ( ctype & LOCAL_VARIABLE ) ? ++ compiler->NumberOfLocals : ++ compiler->NumberOfArgs, ctype, ctype2, ltype, COMPILER_TEMP ) ; // svf : flag - whether stack variables are in the frame
                 if ( regFlag == true )
                 {
                     word->RegToUse = RegOrder ( regToUseIndex ++ ) ;
