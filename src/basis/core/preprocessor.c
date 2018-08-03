@@ -4,13 +4,16 @@
 void
 CfrTil_PreProcessor ( )
 {
+    Lexer * lexer = _Lexer_ ;
     Interpreter * interp = _Context_->Interpreter0 ;
-    Lexer_SourceCodeOff ( _Lexer_ ) ;
-    //if ( ! Compiling ) _CfrTil_InitSourceCode_WithName ( _CfrTil_, _Lexer_->OriginalToken ) ;
+    int64 svState = GetState ( lexer, ( ADD_TOKEN_TO_SOURCE | ADD_CHAR_TO_SOURCE ) ) ;
+    Lexer_SourceCodeOff ( lexer ) ;
+    _CfrTil_UnAppendFromSourceCode_NChars ( _CfrTil_, 1 ) ; // 1 : '#'
     Finder_SetNamedQualifyingNamespace ( _Finder_, ( byte* ) "PreProcessor" ) ;
     SetState ( interp, PREPROCESSOR_MODE, true ) ;
     _Interpret_ToEndOfLine ( interp ) ;
     SetState ( interp, PREPROCESSOR_MODE, false ) ;
+    if ( Compiling ) SetState ( lexer, ( ADD_TOKEN_TO_SOURCE | ADD_CHAR_TO_SOURCE ), svState ) ;
 }
 
 Ppibs *
@@ -256,7 +259,6 @@ SkipPreprocessorCode ( Boolean skipControl )
     }
     while ( token ) ;
 done:
-    //Lexer_SourceCodeOn ( lexer ) ;
     if ( Compiling ) SetState ( lexer, ( ADD_TOKEN_TO_SOURCE | ADD_CHAR_TO_SOURCE ), svState ) ;
 }
 
