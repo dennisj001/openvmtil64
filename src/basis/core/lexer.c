@@ -46,11 +46,8 @@ _Lexer_LexNextToken_WithDelimiters ( Lexer * lexer, byte * delimiters, Boolean c
 void
 Lexer_Init ( Lexer * lexer, byte * delimiters, uint64 state, uint64 allocType )
 {
-    //SetBuffersUnused ( 1 ) ;
     lexer->TokenBuffer = _CfrTil_->TokenBuffer ;
     Mem_Clear ( lexer->TokenBuffer, BUFFER_SIZE ) ;
-    //lexer->TokenBuffer = _Buffer_New_pbyte ( BUFFER_SIZE, B_UNLOCKED ) ; //_CfrTil_->TokenBuffer ;
-    //_CfrTil_->TokenBuffer = lexer->TokenBuffer  ;
     lexer->OriginalToken = 0 ;
     lexer->Literal = 0 ;
     lexer->SC_Index = _CfrTil_->SC_Index ;

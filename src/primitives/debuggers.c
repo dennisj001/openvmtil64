@@ -9,12 +9,6 @@ CfrTil_Debug_AtAddress ( )
 }
 
 void
-CfrTil_LocalsShow ( )
-{
-    Debugger_Locals_Show ( _Debugger_ ) ;
-}
-
-void
 _CfrTil_Debugger_Locals_Show ( )
 {
     Debugger_Locals_Show ( _Debugger_ ) ;

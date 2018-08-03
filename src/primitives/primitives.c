@@ -269,7 +269,7 @@ CPrimitive CPrimitives [] = {
     { "xtDbg", 0, 0, CfrTil_Debug_AtAddress, DEBUG_WORD | INTERPRET_DBG, 0, 0, "Debug", "Root" },
     { "_info", 0, 0, _CfrTil_DebugInfo, DEBUG_WORD, 0, 0, "Debug", "Root" },
     { "info", 0, 0, CfrTil_DebugInfo, DEBUG_WORD, 0, 0, "Debug", "Root" },
-    { "localsShow", 0, 0, CfrTil_LocalsShow, DEBUG_WORD, 0, 0, "Debug", "Root" },
+    { "localsShow", 0, 0, _CfrTil_Debugger_Locals_Show, DEBUG_WORD, 0, 0, "Debug", "Root" },
     { "stop", 0, 0, CfrTil_DebugStop, DEBUG_WORD, 0, 0, "Debug", "Root" },
 
     { "include", 0, 0, CfrTil_IncludeFile, 0, 0, 0, "System", "Root" },

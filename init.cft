@@ -389,6 +389,7 @@ stringMacrosOff
 
 #else
 // of course you can trim this file to your needs and put your personal init code here maybe
+
 #if 0
 lispOff
 List
@@ -488,7 +489,7 @@ c_syntaxOff
     {   
         fn1 fn2 @ = 
         fn2 fn @ = 
-        fn fn1 @ fn2 @ + = 
+        d: fn fn1 @ fn2 @ + = 
     }
     for
     // nl svn @ fprint ":" ps fn @ fprint 
@@ -508,6 +509,7 @@ c_syntaxOff
 //pause
 #endif
 #endif
+
 #endif
 2 + 7  assertStkChk // stack checking
 s

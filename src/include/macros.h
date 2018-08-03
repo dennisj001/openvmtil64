@@ -12,7 +12,6 @@
 #define Here ( _ByteArray_Here ( _Q_CodeByteArray ) )
 #define _SetHere( address )  _ByteArray_SetHere ( _Q_CodeByteArray, address ) 
 #define SetDebuggerPreHere( address ) _Debugger_->PreHere = (address) 
-//#define SetHere( address )  ByteArray_SetHere_AndForDebug (_Q_CodeByteArray, address , 1) 
 #define Set_CompilerSpace( byteArray ) (_Q_CodeByteArray = (byteArray))
 #define Get_CompilerSpace( ) _Q_CodeByteArray
 

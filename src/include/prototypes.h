@@ -705,11 +705,11 @@ void CfrTil_ClassStructureBegin(void);
 void CfrTil_CloneStructureBegin(void);
 /* basis/debugOutput.c */
 void Debugger_Menu(Debugger *debugger);
-void Debugger_ParseFunctionLocalVariables(Debugger *debugger, Lexer *lexer, Boolean c_syntaxFlag);
-void _Debugger_Locals_ShowALocal(Debugger *debugger, Word *localsWord, byte *buffer);
-void _Debugger_ReadLocals(Debugger *debugger, Lexer *lexer, ReadLiner *rl, Word *scWord, byte *sc);
-void _Debugger_Locals_Show_Loop(Debugger *debugger, Word *scWord);
+void Debugger_ParseFunctionLocalVariables(Debugger *debugger, Word *scWord);
+void _Debugger_ReadLocals(Debugger *debugger, Word *scWord);
 void _Debugger_Locals_Show(Debugger *debugger, Word *scWord);
+void _Debugger_Locals_ShowALocal(Debugger *debugger, Word *localsWord);
+void _Debugger_Locals_Show_Loop(Debugger *debugger, Word *scWord);
 void Debugger_Locals_Show(Debugger *debugger);
 int64 Debugger_TerminalLineWidth(Debugger *debugger);
 void Debugger_ShowStackChange(Debugger *debugger, Word *word, byte *insert, byte *achange, int8 stepFlag);
