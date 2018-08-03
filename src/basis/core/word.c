@@ -43,7 +43,7 @@ Word_Eval ( Word * word )
     {
         _Context_->CurrentEvalWord = word ;
         DEBUG_SETUP ( word ) ;
-        if ( ! GetState ( word, STEPPED ) )
+        if ( ! GetState ( word, STEPPED ) ) // set by the debuggger
         {
             if ( ( word->CAttribute & IMMEDIATE ) || ( ! CompileMode ) )
             {

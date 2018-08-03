@@ -390,7 +390,7 @@ stringMacrosOff
 #else
 // of course you can trim this file to your needs and put your personal init code here maybe
 
-#if 0
+#if 1
 lispOff
 List
 _((lambda ( a b) (+ a b)) 3 4 ) dupList eval printList nl printList s lcReset  
