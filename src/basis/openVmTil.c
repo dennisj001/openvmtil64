@@ -1,7 +1,7 @@
 #include "../include/cfrtil64.h"
-#define VERSION ((byte*) "0.849.500" ) 
+#define VERSION ((byte*) "0.849.540" ) 
 
-OpenVmTil * _Q_ ; 
+OpenVmTil * _Q_ ;
 
 int
 main ( int argc, char * argv [ ] )
@@ -12,7 +12,7 @@ main ( int argc, char * argv [ ] )
 void
 openvmtil ( int64 argc, char * argv [ ] )
 {
-    LinuxInit () ;
+    LinuxInit ( ) ;
     _OpenVmTil ( argc, argv ) ;
 }
 
@@ -244,11 +244,17 @@ _OpenVmTil_New ( OpenVmTil * ovt, int64 argc, char * argv [ ] )
         else strcpy ( errorFilename, "Debug Context" ) ;
     }
     else errorFilename [ 0 ] = 0 ;
-    restartCondition = ( ! fullRestart ) && ( startIncludeTries < 2 ) ? ovt->RestartCondition : RESTART ;
+    restartCondition = ( ovt && ( fullRestart || ( startIncludeTries < 2 ) ) ) ? ovt->RestartCondition : RESTART ;
 
     int64 ium = ovt ? ovt->OVT_InitialUnAccountedMemory : 0, ovtv = ovt ? ovt->Verbosity : 0 ;
 
-    OpenVmTil_Delete ( ovt ) ;
+    if ( restartCondition < FULL_RESTART ) OpenVmTil_Delete ( ovt ) ;
+    else if ( ovt )
+    {
+        printf ( ( byte* ) "\nUnable to reliably delete memory from previous system - rebooting into a new system. 'mem' for more detail on memory.\n" ) ;
+        fflush ( stdout ) ;
+        OpenVmTil_Pause ( ) ; // we may crash here
+    }
     d0 ( if ( ovtv > 1 )
     {
         printf ( ( byte* ) "\nTotal Mem Remaining = %9lld : <=: mmap_TotalMemAllocated - mmap_TotalMemFreed - ovt->OVT_InitialUnAccountedMemory", mmap_TotalMemAllocated - mmap_TotalMemFreed - ium ) ;

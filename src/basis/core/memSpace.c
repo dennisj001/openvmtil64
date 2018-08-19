@@ -30,7 +30,7 @@ mmap_AllocMem ( int64 size )
         //OVT_Exit ( ) ;
         CfrTil_FullRestart ( ) ;
     }
-    Kbhit_Pause ( ) ;
+    //Kbhit_Pause ( ) ;
     memset ( mem, 0, size ) ; // ?? : is this necessary??
     return mem ;
 }

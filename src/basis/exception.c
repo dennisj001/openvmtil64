@@ -42,10 +42,10 @@ OpenVmTil_ShowExceptionInfo ( )
 {
     if ( _Q_->Verbosity )
     {
-        if ( _Q_->ExceptionMessage ) printf ( "\n%s: %s\n", _Q_->ExceptionMessage, _Q_->ExceptionSpecialMessage ), fflush (stdout) ;
+        if ( _Q_->ExceptionMessage ) printf ( "\n%s: %s\n", _Q_->ExceptionMessage, _Q_->ExceptionSpecialMessage ), fflush ( stdout ) ;
         _DisplaySignal ( _Q_->Signal ) ;
         //if ( ( _Q_->SignalExceptionsHandled ++ < 2 ) && _CfrTil_ && ( _Q_->Signal != SIGSEGV ) ) _OpenVmTil_ShowExceptionInfo ( ) ;
-        if ( (_Q_->Signal != SIGSEGV ) && ( _Q_->SignalExceptionsHandled ++ < 2 ) && _CfrTil_ ) _OpenVmTil_ShowExceptionInfo ( ) ;
+        if ( ( _Q_->Signal != SIGSEGV ) && ( _Q_->SignalExceptionsHandled ++ < 2 ) && _CfrTil_ ) _OpenVmTil_ShowExceptionInfo ( ) ;
     }
     int64 rtrn = OVT_Pause ( 0, _Q_->SignalExceptionsHandled ) ;
     _Q_->Signal = 0 ;
@@ -56,6 +56,7 @@ int64
 OVT_Pause ( byte * prompt, int64 signalExceptionsHandled )
 {
     int64 rtrn = 0 ;
+    SetState ( _Q_, OVT_PAUSE, true ) ;
     if ( _CfrTil_ && _Context_ )
     {
         if ( _Context_->CurrentlyRunningWord ) _Debugger_->ShowLine = "" ;
@@ -185,6 +186,20 @@ OVT_SetExceptionMessage ( OpenVmTil * ovt )
 }
 
 void
+_OVT_SigLongJump ( sigjmp_buf * jb )
+{
+    siglongjmp ( *jb, 1 ) ;
+}
+
+void
+OVT_SigLongJump ( byte * restartMessage, sigjmp_buf * jb )
+{
+    printf ( "\n%s\n", restartMessage ) ;
+    _OVT_SigLongJump ( jb ) ;
+
+}
+
+void
 OVT_Throw ( int signal, int64 restartCondition, int8 pauseFlag )
 {
     sigjmp_buf * jb ;
@@ -207,7 +222,7 @@ OVT_Throw ( int signal, int64 restartCondition, int8 pauseFlag )
                 _Q_->RestartCondition = ABORT ;
             }
             else _Q_->RestartCondition = INITIAL_START ;
-            if ( _Q_->SigSegvs > 3 ) OVT_Exit ( ) ;
+            if ( _Q_->SigSegvs > 3 ) _OVT_SigLongJump ( & _Q_->JmpBuf0 ) ; //OVT_Exit ( ) ;
             else if ( ( _Q_->SigSegvs > 1 ) || ( restartCondition == INITIAL_START ) )
             {
                 jb = & _Q_->JmpBuf0 ;
@@ -227,7 +242,8 @@ OVT_Throw ( int signal, int64 restartCondition, int8 pauseFlag )
 
     if ( pauseFlag && ( _Q_->SignalExceptionsHandled < 2 ) && ( _Q_->SigSegvs < 2 ) ) OVT_Pause ( 0, _Q_->SignalExceptionsHandled ) ;
 jump:
-    siglongjmp ( *jb, 1 ) ;
+    //siglongjmp ( *jb, 1 ) ;
+    _OVT_SigLongJump ( jb ) ;
 }
 
 void
@@ -261,6 +277,7 @@ OpenVmTil_SignalAction ( int signal, siginfo_t * si, void * uc )
         _Q_->SigAddress = 0 ; //|| ( signal == SIGWINCH ) ) _Q_->SigAddress = 0 ; // 17 : "CHILD TERMINATED" : ignore; its just back from a shell fork
         _Q_->Signal = 0 ;
     }
+    else if ( GetState ( _Q_, OVT_PAUSE ) ) _OVT_SigLongJump ( & _Q_->JmpBuf0 ) ;
     else OVT_Throw ( _Q_->Signal, _Q_->RestartCondition, 0 ) ;
 }
 

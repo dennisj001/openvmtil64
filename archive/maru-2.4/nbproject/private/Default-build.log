@@ -1,0 +1,26 @@
+cc -Wall -ggdb  -o eval eval.c -lm -ldl
+In file included from /usr/include/x86_64-linux-gnu/bits/libc-header-start.h:33:0,
+                 from /usr/include/stdio.h:27,
+                 from eval.c:6:
+/usr/include/features.h:184:3: warning: #warning "_BSD_SOURCE and _SVID_SOURCE are deprecated, use _DEFAULT_SOURCE" [-Wcpp]
+ # warning "_BSD_SOURCE and _SVID_SOURCE are deprecated, use _DEFAULT_SOURCE"
+   ^~~~~~~
+In file included from eval.c:33:0:
+gc.c:27:16: warning: missing terminating " character
+ #include "gc.h""
+                ^
+gc.c:27:16: warning: extra tokens at end of #include directive
+cc -m32 -g -Wall -ggdb  -o eval32 eval.c -lm -ldl
+In file included from /usr/include/bits/libc-header-start.h:33:0,
+                 from /usr/include/stdio.h:27,
+                 from eval.c:6:
+/usr/include/features.h:184:3: warning: #warning "_BSD_SOURCE and _SVID_SOURCE are deprecated, use _DEFAULT_SOURCE" [-Wcpp]
+ # warning "_BSD_SOURCE and _SVID_SOURCE are deprecated, use _DEFAULT_SOURCE"
+   ^~~~~~~
+In file included from eval.c:33:0:
+gc.c:27:16: warning: missing terminating " character
+ #include "gc.h""
+                ^
+gc.c:27:16: warning: extra tokens at end of #include directive
+cc -o mkosdefs mkosdefs.c
+./mkosdefs > osdefs.k

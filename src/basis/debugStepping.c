@@ -269,35 +269,22 @@ Debugger_PreStartStepping ( Debugger * debugger )
     {
         debugger->WordDsp = _Dsp_ ; // by 'eval' we stop debugger->Stepping and //continue thru this word as if we hadn't stepped
         Debugger_CanWeStep ( debugger, word ) ;
+#if 1        
+        // we would at least need to save/restore our registers to step thru native c code
         if ( ! GetState ( debugger, DBG_CAN_STEP ) )
         {
-#if 0            
-            if ( Compiling )
-            {
-                _Printf ( c_ad ( "\nStep :: Stepping is off in Compile mode." ) ) ;
-            }
-            else
-#endif                
-            {
-                _Printf ( "\nStepping turned off for this word : %s%s%s%s : debugger->DebugAddress = 0x%016lx : (e)valuating",
-                    c_ud ( word->S_ContainingNamespace ? word->S_ContainingNamespace->Name : ( byte* ) "<literal> " ),
-                    word->S_ContainingNamespace ? ( byte* ) "." : ( byte* ) "", c_gu ( word->Name ),
-                    GetState ( debugger, DBG_AUTO_MODE ) ? " : automode turned off" : "",
-                    debugger->DebugAddress ) ;
-                //if ( debugger->DebugAddress ) Debugger_UdisOneInstruction ( debugger, debugger->DebugAddress, ( byte* ) "", ( byte* ) "" ) ; // the next instruction
-            }
-#if 0            
-            if ( GetState ( debugger, DBG_RUNTIME_BREAKPOINT ) && String_Equal ( debugger->w_Word->Name, "<dbg>" ) )
-            {
-                debugger->DebugAddress += 5 ;
-            }
-            else
-#endif            
-                Debugger_Eval ( debugger ) ;
+            _Printf ( "\nStepping turned off for this word : %s%s%s%s : debugger->DebugAddress = 0x%016lx : (e)valuating",
+                c_ud ( word->S_ContainingNamespace ? word->S_ContainingNamespace->Name : ( byte* ) "<literal> " ),
+                word->S_ContainingNamespace ? ( byte* ) "." : ( byte* ) "", c_gu ( word->Name ),
+                GetState ( debugger, DBG_AUTO_MODE ) ? " : automode turned off" : "",
+                debugger->DebugAddress ) ;
+            //if ( debugger->DebugAddress ) Debugger_UdisOneInstruction ( debugger, debugger->DebugAddress, ( byte* ) "", ( byte* ) "" ) ; // the next instruction
+            Debugger_Eval ( debugger ) ;
             SetState ( _Debugger_, DBG_AUTO_MODE, false ) ; //if ( GetState ( debugger, DBG_AUTO_MODE ) )
             return ;
         }
         else
+#endif            
         {
             Debugger_SetupStepping ( debugger ) ;
             SetState ( debugger, DBG_NEWLINE | DBG_PROMPT | DBG_INFO, false ) ;

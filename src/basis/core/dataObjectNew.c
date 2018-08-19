@@ -221,9 +221,9 @@ Word *
 _CfrTil_Variable_New ( byte * name, int64 value )
 {
     Word * word ;
-    if ( CompileMode ) //&& ( ! GetState ( _Context_, C_SYNTAX ) ) ) // we're not using this yet but it may be useful to some
+    if ( CompileMode ) 
     {
-        word = CfrTil_LocalWord ( name, LOCAL_VARIABLE, DICTIONARY ) ; // svf : flag - whether stack variables are in the frame
+        word = CfrTil_LocalWord ( name, LOCAL_VARIABLE, DICTIONARY ) ; 
         SetState ( _Compiler_, VARIABLE_FRAME, true ) ;
     }
     else word = _DObject_New ( name, value, ( CPRIMITIVE | NAMESPACE_VARIABLE | IMMEDIATE ), 0, 0, NAMESPACE_VARIABLE, ( byte* ) _DataObject_Run, 0, 1, 0, DICTIONARY ) ;

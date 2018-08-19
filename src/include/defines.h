@@ -653,6 +653,7 @@
 #define LC_READ_ONLY            ( (uint64) 1 << 15 )
 #define LC_READ_LAMBDA_LOCALS   ( (uint64) 1 << 16 )
 #define LC_LAMBDA_COMPILE_MODE  ( (uint64) 1 << 17 )
+#define LC_EVAL_APPLY           ( (uint64) 1 << 18 )
 
 // LambdaBody states
 #define USED ( 1<< 0 )
@@ -672,7 +673,8 @@
 #define _CharSet_IsDelimiter( cset, ch ) cset [ ch ]
 
 // OpenVmTil State defines
-#define OVT_IN_USEFUL_DIRECTORY ( (uint64) 1 << 0 )
+#define OVT_IN_USEFUL_DIRECTORY     ( (uint64) 1 << 0 )
+#define OVT_PAUSE                   ( (uint64) 1 << 1 )
 
 // tree node states
 // #define GONE_DEPTH 

@@ -369,10 +369,10 @@ Root
 'doX64 1 const
 'doScript 1 const
 'doScript2 1 const
-'_doDemo 1 const    
+'_doDemo 0 const    
 'todo 0 const    
 dbgOff
-//dbgOn 
+dbgOn 
 #if Is_DebugOn 
 
 #if todo
@@ -389,126 +389,6 @@ stringMacrosOff
 
 #else
 // of course you can trim this file to your needs and put your personal init code here maybe
-
-#if 1
-lispOff
-List
-_((lambda ( a b) (+ a b)) 3 4 ) dupList eval printList nl printList s lcReset  
-#if 1
-: factorial ( REG n | REG rec ) rec 1 = { n @ 1 > } { rec @ n @ * rec store n -- } while return rec ;
-'factorial find wdiss 
-7 factorial dup p 5040 "factorial" assert1
-c_syntaxOn
-int _fib1c ( n ) { if ( n < 2 ) { n ; } else { _fib1c ( n - 1 ) + _fib1c ( n - 2 ) ; } }
-c_syntaxOff
-' _fib1c find wdiss
-20 _fib1c p //pause
-c_syntaxOff
-#endif
-#if 1
-: fibBN ( n | fn fn1 fn2 -- TOS ) 
-    { fn 0 = fn1 0 = fn2 1 = } { n @ 0 > } { n 1 -= } 
-    {   
-        fn1 fn2 @ = 
-        fn2 fn @ = 
-        fn fn1 @ fn2 @ + = 
-    }
-    for
-    // nl svn @ fprint ":" ps fn @ fprint 
-    return fn
-;
-' fibBN find wdiss
-20 fibBN dup p 6765 _assert 
-: fibBN ( n | fn REG fn1 fn2 -- TOS ) 
-    { fn 0 = fn1 0 = fn2 1 = } { n @ 0 > } { n 1 -= } 
-    {   
-        fn1 fn2 @ = 
-        fn2 fn @ = 
-        fn fn1 @ fn2 @ + = 
-    }
-    for
-    // nl svn @ fprint ":" ps fn @ fprint 
-    fn @
-;
-' fibBN find wdiss
-20 fibBN dup p 6765 _assert 
-: fibBN ( n | fn REG fn1 REG fn2 -- TOS ) 
-    { fn 0 = fn1 0 = fn2 1 = } { n @ 0 > } { n 1 -= } 
-    {   
-        fn1 fn2 @ = 
-        fn2 fn @ = 
-        fn fn1 @ fn2 @ + = 
-    }
-    for
-    // nl svn @ fprint ":" ps fn @ fprint 
-    fn @
-;
-' fibBN find wdiss
-20 fibBN dup p 6765 _assert 
-: fibBN ( n | fn REG fn1 REG fn2 -- TOS ) 
-    { fn 0 = fn1 0 = fn2 1 = } { n @ 0 > } { n 1 -= } 
-    {   
-        fn1 fn2 @ = 
-        fn2 fn @ = 
-        fn fn1 @ fn2 @ + = 
-    }
-    for
-    // nl svn @ fprint ":" ps fn @ fprint 
-    fn @
-;
-' fibBN find wdiss
-20 fibBN dup p 6765 _assert 
-: fibBN ( REG n | fn fn1 REG fn2 -- TOS ) 
-    { fn 0 = fn1 0 = fn2 1 = } { n @ 0 > } { n 1 -= } 
-    {   
-        fn1 fn2 @ = 
-        fn2 fn @ = 
-        fn fn1 @ fn2 @ + = 
-    }
-    for
-    // nl svn @ fprint ":" ps fn @ fprint 
-    fn @
-;
-' fibBN find wdiss
-20 fibBN dup p 6765 _assert 
-: fibBN ( REG n | fn REG fn1 REG fn2 -- TOS ) 
-    { fn 0 = fn1 0 = fn2 1 = } { n @ 0 > } { n 1 -= } 
-    {   
-        fn1 fn2 @ = 
-        fn2 fn @ = 
-        fn fn1 @ fn2 @ + = 
-    }
-    for
-    // nl svn @ fprint ":" ps fn @ fprint 
-    fn @
-;
-' fibBN find wdiss
-20 fibBN dup p 6765 _assert 
-: fibBN ( REG n | REG fn fn1 REG fn2 -- TOS ) 
-    { fn 0 = fn1 0 = fn2 1 = } { d: n @ 0 > } { n 1 -= } 
-    {   
-        fn1 fn2 @ = 
-        fn2 fn @ = 
-        d: fn fn1 @ fn2 @ + = 
-    }
-    for
-    // nl svn @ fprint ":" ps fn @ fprint 
-    fn @
-;
-' fibBN find wdiss
-20 d: fibBN dup p 6765 _assert 
-#endif
-#if 1
-: factorial ( n | rec ) rec 1 = { n @ 1 > } { rec @ n @ * rec store n -- } while return rec ;
-'factorial find wdiss 
-7 factorial dup p 5040 "factorial" assert1
-: factorial ( REG n | REG rec ) rec 1 = { n @ 1 > } { rec @ n @ * rec store n -- } while return rec ;
-'factorial find wdiss 
-7 factorial dup p 5040 "factorial" assert1
-#endif
-//pause
-#endif
-#endif
 
 #endif
 2 + 7  assertStkChk // stack checking

@@ -1,0 +1,31 @@
+called: cc
+	/media/sdc4/dennisj/openvmtil64/archive/maru-2.4
+	cc
+	-Wall
+	-ggdb
+	-o
+	eval
+	eval.c
+	-lm
+	-ldl
+
+called: cc
+	/media/sdc4/dennisj/openvmtil64/archive/maru-2.4
+	cc
+	-m32
+	-g
+	-Wall
+	-ggdb
+	-o
+	eval32
+	eval.c
+	-lm
+	-ldl
+
+called: cc
+	/media/sdc4/dennisj/openvmtil64/archive/maru-2.4
+	cc
+	-o
+	mkosdefs
+	mkosdefs.c
+
