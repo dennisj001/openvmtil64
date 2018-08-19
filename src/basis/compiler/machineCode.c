@@ -601,27 +601,10 @@ Compile_MoveImm ( int8 direction, int8 rm, int8 sib, int64 disp, int64 imm, int8
         }
         else
         {
-            //int8 rex = 0x48 + ( rm > 7 ) ; //( ( rm >= 8 ) ? rm - 8 : rm ) ; ;
-            int8 opCode = 0xb8 + ( rm & 7 ) ; //( ( rm >= 8 ) ? rm - 8 : rm ) ;
-            //_Compile_Write_Instruction_X64 ( int8 rex, int16 opCode, int8 modRm, int16 controlFlags, int8 sib, int64 disp, int8 dispSize, int64 imm, int8 immSize )
-            //_Compile_Write_Instruction_X64 ( rex, opCode, 0, IMM_B, 0, 0, 0, imm, immSize ) ;
+            int8 opCode = 0xb8 + ( rm & 7 ) ; 
             Compile_CalcWrite_Instruction_X64 ( 0, opCode, mod, reg, rm, IMM_B, 0, 0, 0, imm, immSize ) ;
         }
     }
-#if 0    
-    else
-    {
-        if ( immSize > BYTE ) opCode |= 1 ;
-        if ( direction == REG ) mod = 3 ;
-        else
-        {
-            if ( disp == 0 ) mod = 0 ;
-            else if ( disp >= 0x100 ) mod = 2 ;
-            else mod = 1 ;
-        }
-        Compile_CalcWrite_Instruction_X64 ( 0, opCode, mod, reg, rm, controlFlags, sib, disp, 0, imm, immSize ) ;
-    }
-#endif    
 }
 
 void
@@ -629,8 +612,6 @@ Compile_MoveImm_To_Reg ( int8 reg, int64 imm, int8 immSize )
 {
     Compile_MoveImm ( REG, reg, 0, 0, imm, immSize ) ;
 }
-
-// _Compile_MoveImm_To_Mem ( int8 reg, int64 imm, int8 iSize )
 
 void
 Compile_MoveImm_To_Mem ( int8 rm, int64 imm, int8 immSize )
@@ -676,15 +657,8 @@ Calculate_Address_FromOffset_ForCallOrJump ( byte * address )
     }
     else if ( ( ( * ( uint16* ) address ) == 0xff49 ) && ( ( *( address + 2 ) == 0xd1 ) || ( *( address + 2 ) == 0xd0 ) ) ) // call r8/r9
     {
-#if 0        
-        if ( ( ( * ( uint16* ) ( address - 25 ) ) == 0xb949 ) ) iaddress = ( byte* ) ( * ( ( uint64* ) ( address - 23 ) ) ) ; //mov r8, 0xxx in Compile_Call_TestRSP  
-        else if ( ( ( * ( uint16* ) ( address - 37 ) ) == 0xb949 ) ) iaddress = ( byte* ) ( * ( ( uint64* ) ( address - 35 ) ) ) ; //mov r8, 0xxx in Compile_Call_TestRSP
-        else iaddress = ( byte* ) ( * ( ( uint64* ) ( address - CELL ) ) ) ;
-#else
         if ( ( ( * ( uint16* ) ( address - 20 ) ) == 0xb849 ) ) iaddress = ( byte* ) ( * ( ( uint64* ) ( address - 18 ) ) ) ; //mov r8, 0xxx in Compile_Call_TestRSP  
-            //else if ( ( ( * ( uint16* ) ( address - 37 ) ) == 0xb949 ) ) iaddress = ( byte* ) ( * ( ( uint64* ) ( address - 35 ) ) ) ; //mov r8, 0xxx in Compile_Call_TestRSP
         else iaddress = ( byte* ) ( * ( ( uint64* ) ( address - CELL ) ) ) ;
-#endif        
     }
     else if ( ( ( * ( uint16* ) address ) == 0xff48 ) && ( *( address + 2 ) == 0xd0 ) ) // call rax
     {
@@ -728,9 +702,7 @@ _Compile_JumpToAddress ( byte * jmpToAddr ) // runtime
     if ( jmpToAddr != ( Here + 5 ) ) // optimization : don't need to jump to the next instruction
     {
         int32 disp = _CalculateOffsetForCallOrJump ( Here + 1, jmpToAddr, INT32_SIZE ) ;
-        //disp += _Compiler_->DispSpaceRemoved ;
         Compile_CalcWrite_Instruction_X64 ( 0, 0xe9, 0, 0, 0, DISP_B, 0, disp, INT32_SIZE, 0, 0 ) ; // with jmp instruction : disp is compiled an immediate offset
-        //_Compiler_->DispSpaceRemoved = 0 ;
     }
 }
 
@@ -761,7 +733,6 @@ _Compile_JumpWithOffset ( int64 disp ) // runtime
 void
 _Compile_UninitializedCall ( ) // runtime
 {
-    //_Compile_PushReg ( SCRATCH_REG ) ; // push any 8 bytes to align the stack
     _Compile_UninitializedJmpOrCall ( CALLI32 ) ;
 }
 
@@ -785,20 +756,9 @@ Compile_CallThru_AdjustRSP ( int8 reg, int8 regOrMem )
     Compile_ADDI ( REG, RSP, 0, 8, 0 ) ;
 }
 
-#if 0
-
-void
-Compile_Call_ToAddressThruReg ( byte * address, int8 reg )
-{
-    Compile_MoveImm_To_Reg ( reg, ( int64 ) address, CELL ) ;
-    Compile_CallThru_AdjustRSP ( reg, REG ) ;
-}
-#endif
-
 void
 Compile_Call ( byte * address )
 {
-    //Compile_Call_ToAddressThruReg ( callAddr, CALL_THRU_REG ) ; //( GetState ( _Compiler_, LC_ARG_PARSING ) ? OREG : ACC ) ) ;
     Compile_MoveImm_To_Reg ( CALL_THRU_REG, ( int64 ) address, CELL ) ;
     _Compile_CallThru ( CALL_THRU_REG, REG ) ;
 }
@@ -806,19 +766,12 @@ Compile_Call ( byte * address )
 void
 _Compile_Call_ToAddressThruReg_TestAlignRSP ( int8 thruReg )
 {
-#if 1    
-    //DBI_ON ;
-    //Compile_MoveImm_To_Reg ( thruReg, ( int64 ) address, CELL ) ;
     Compile_Move_Reg_To_Reg ( RAX, RSP ) ;
     Compile_TEST_AL_ImmByte ( 0x8 ) ;
     _Compile_Jcc ( NEGFLAG_Z, TTT_ZERO, Here + 22 ) ;
     Compile_CallThru_AdjustRSP ( thruReg, REG ) ;
     _Compile_JumpWithOffset ( 3 ) ; // runtime
     _Compile_CallThru ( thruReg, REG ) ;
-    //DBI_OFF ;
-#else
-    Compile_CallThru_AdjustRSP ( thruReg, REG ) ;
-#endif    
 }
 
 void
@@ -834,38 +787,12 @@ Compile_Call_ToAddressThruR8_TestAlignRSP ( )
     _Compile_Call_ToAddressThruReg_TestAlignRSP ( R8 ) ;
 }
 
-#if 0
-
-void
-Compile_Call_TestRSP ( byte * address )
-{
-    Compile_Call_ToAddressThruReg_TestAlignRSP ( address, CALL_THRU_REG ) ;
-}
-
-#elif 0 // we want to just make this into a regular cfrtil function to reduce the code size 
-
-void
-Compile_Call_TestRSP ( byte * address )
-{
-    Compile_MoveImm_To_Reg ( CALL_THRU_REG, ( int64 ) address, CELL ) ;
-    Compile_Call ( ( byte* ) _CfrTil_->Call_ToAddressThruR8_TestAlignRSP ) ;
-}
-#elif 1 // we want to just make this into a regular cfrtil function to reduce the code size 
-
 void
 Compile_Call_TestRSP ( byte * address )
 {
     Compile_MoveImm_To_Reg ( R8, ( int64 ) address, CELL ) ;
     Compile_Call ( ( byte* ) _CfrTil_->Call_ToAddressThruR8_TestAlignRSP ) ;
 }
-#else
-
-void
-Compile_Call_TestRSP ( byte * address )
-{
-    Compile_Call_ToAddressThruReg_TestAlignRSP ( address, R9 ) ;
-}
-#endif
 
 void
 Compile_Call_X84_ABI_RSP_ADJUST ( byte * address )
@@ -889,9 +816,7 @@ void
 _Compile_PushReg ( int8 reg )
 {
     // only EAX ECX EDX EBX : 0 - 4
-    //DBI_ON ;
     Compile_CalcWrite_Instruction_X64 ( 0, 0x50 + reg, REG, 0, 0, REX_B, 0, 0, 0, 0, 0 ) ;
-    //DBI_OFF ;
 }
 
 // pop from the C esp based stack with the 'pop' instruction
@@ -906,44 +831,31 @@ _Compile_PopToReg ( int8 reg )
 void
 _Compile_PopFD ( )
 {
-    //DBI_ON ;
-    //_Compile_GroupPushPop ( 0x9d, 0, 0, 0, 0, 0 ) ;
     Compile_CalcWrite_Instruction_X64 ( 0, 0x9d, 0, 0, 0, REX_B, 0, 0, 0, 0, 0 ) ;
-    //DBI_OFF ;
 }
 
 void
 _Compile_PushFD ( )
 {
-    //DBI_ON ;
-    //_Compile_GroupPushPop ( 0x9c, 0, 0, 0, 0, 0 ) ;
     Compile_CalcWrite_Instruction_X64 ( 0, 0x9c, 0, 0, 0, REX_B, 0, 0, 0, 0, 0 ) ;
-    //DBI_OFF ;
 }
 
 void
 Compile_TEST_AL_ImmByte ( byte imm )
 {
-    //DBI_ON ;
     Compile_CalcWrite_Instruction_X64 ( 0, 0xa8, 0, 0, 0, IMM_B, 0, 0, 0, imm, BYTE ) ;
-    //DBI_OFF ;
 }
 
 void
 _Compile_INT80 ( )
 {
-    //_Compile_Int8 ( 0xcd ) ;
-    //_Compile_Int8 ( 0x80 ) ;
     Compile_CalcWrite_Instruction_X64 ( 0xcd, 0x80, 0, 0, 0, 0, 0, 0, 0, 0, 0 ) ;
 }
 
 void
 _Compile_Noop ( )
 {
-    //DBI_ON ;
-    //_Compile_Int8 ( 0x90 ) ;
     Compile_CalcWrite_Instruction_X64 ( 0, 0x90, 0, 0, 0, 0, 0, 0, 0, 0, 0 ) ;
-    //DBI_OFF ;
 }
 
 // Zero eXtend from byte to cell
@@ -951,68 +863,12 @@ _Compile_Noop ( )
 void
 _Compile_MOVZX_BYTE_REG ( int8 reg, int8 rm )
 {
-    //DBI_ON ;
     Compile_CalcWrite_Instruction_X64 ( 0x0f, 0xb6, REG, reg, rm, ( REX_B | MODRM_B ), 0, 0, 0, 0, 0 ) ;
-    //DBI_OFF ;
 }
 
 void
 _Compile_Return ( )
 {
-    //DBI_ON ;
-    //_Compile_Int8 ( 0xc3 ) ;
     Compile_CalcWrite_Instruction_X64 ( 0, 0xc3, 0, 0, 0, 0, 0, 0, 0, 0, 0 ) ;
-    //RET ( ) ; // use codegen_x86.h just to include it in
-    //DBI_OFF ;
 }
-
-#if 0 //RSP_ADJUST
-
-void
-Compile_AdjustRSP ( )
-{
-    //DBI_ON ;
-    _Compile_X_Group1_Immediate ( AND, REG, RSP, 0, 0x7ffffffffffffff0, 0 ) ;
-    //_Compile_Return () ;
-    //DBI_OFF ;
-}
-
-void
-Compile_AdjustRSPAndCall ( )
-{
-    //DBI_ON ;
-    _Compile_X_Group1_Immediate ( AND, REG, RSP, 0, 0x7ffffffffffffff0, 0 ) ;
-    _Compile_GetRValue_FromLValue_ToReg ( ACC, ( byte * ) & CurrentDefinition ) ;
-    _Compile_Call_ThruReg ( ACC ) ;
-    //_Compile_Call ( (byte*)&_CfrTil_->RestoreSelectedCpuState, ACC ) ;
-    _Compile_GetRValue_FromLValue_ToReg ( ACC, ( byte* ) & _CfrTil_->RestoreSelectedCpuState ) ;
-    _Compile_Call_ThruReg ( ACC ) ;
-    //_Compile_Return () ;
-    //DBI_OFF ;
-}
-// TEST XCHG
-
-void
-_Compile_Op_Special_Reg_To_Reg ( int8 code, int8 rm, int8 reg ) // toRm = 0 => ( dst is reg, src is rm ) is default
-{
-    int64 opCode ;
-    if ( code == TEST_R_TO_R )
-        opCode = 0x85 ;
-    else if ( code == XCHG_R_TO_R )
-        opCode = 0x87 ;
-    else
-        CfrTil_Exception ( MACHINE_CODE_ERROR, 0, ABORT ) ;
-    // _Compile_InstructionX86 ( opCode, mod, reg, rm, modRmImmDispFlag, sib, disp, imm, immSize )
-    Compile_CalcWrite_Instruction_X64 ( 0, opCode, 3, reg, rm, REX_B | MODRM_B, 0, 0, 0, 0, 0 ) ;
-}
-#endif
-
-#if TURN_DBI_OFF
-#undef DBI_ON
-#undef DBI_OFF
-#define DBI_ON dbion
-#define DBI_OFF dbioff
-#endif
-
-
 

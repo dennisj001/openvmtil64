@@ -85,8 +85,7 @@ ListObject *
 LO_EvalList ( ListObject *l0, ListObject *locals, Boolean * applyFlag )
 {
     LambdaCalculus * lc = _Q_->OVT_LC ;
-    ListObject *lfunction = 0, *largs, *lfirst ;
-start:
+    ListObject *lfunction, *largs, *lfirst ;
     if ( CompileMode )
     {
         LO_CheckEndBlock ( ) ;
@@ -98,20 +97,17 @@ start:
     {
         if ( lfirst->LAttribute & ( T_LISP_SPECIAL | T_LISP_MACRO ) )
         {
-            if ( LO_IsQuoted ( lfirst ) )
-            {
-                l0 = lfirst ;
-                goto done ;
-            }
+            if ( LO_IsQuoted ( lfirst ) ) return lfirst ;
             l0 = LO_SpecialFunction ( l0, locals ) ;
             lc->LispParenLevel -- ;
-            goto done ;
         }
-        lfunction = LO_CopyOne ( _LO_Eval ( lfirst, locals, applyFlag ) ) ;
-        largs = _LO_EvalList ( _LO_Next ( lfirst ), locals, applyFlag ) ;
-        l0 = LO_Apply ( lfirst, lfunction, largs, applyFlag ) ;
+        else
+        {
+            lfunction = LO_CopyOne ( _LO_Eval ( lfirst, locals, applyFlag ) ) ;
+            largs = _LO_EvalList ( _LO_Next ( lfirst ), locals, applyFlag ) ;
+            l0 = LO_Apply ( lfirst, lfunction, largs, applyFlag ) ;
+        }
     }
-done:
     return l0 ;
 }
 
@@ -533,7 +529,10 @@ _LO_MakeLambda ( ListObject *l0 )
     else
     {
         lnew = LO_New ( LIST, 0 ) ;
-        do { _LO_AddToTail ( lnew, _LO_CopyOne ( args, LispAllocType ) ) ; }
+        do
+        {
+            _LO_AddToTail ( lnew, _LO_CopyOne ( args, LispAllocType ) ) ;
+        }
         while ( ( args = _LO_Next ( args ) ) != body0 ) ;
         args = lnew ;
     }
