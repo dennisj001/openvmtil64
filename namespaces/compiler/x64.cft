@@ -69,7 +69,6 @@ dscOn
 : sp ; //stack apause ;
 sp
     
-#if 1
 c_syntaxOn
 int
 CalculateModRegardingDisplacement ( _mod,  disp | rmod ) // _mod/rmod avoid name class with 'mod' function
@@ -78,18 +77,7 @@ CalculateModRegardingDisplacement ( _mod,  disp | rmod ) // _mod/rmod avoid name
     //  00 000 000
     if ( _mod != REG )
     {
-#if 0 // c_syntax/preprocessor tesing
-        if ( disp == 0 ) rmod = 0 ;
-        else 
-        {   
-            if ( disp <= 0xff ) 
-                rmod = 1 ; 
-            else 
-            {
-                rmod = 2 ; 
-            }
-        }
-#elif 0
+#if 0
         //"\npreprocessor else\n" ps apause
         if ( disp == 0 ) 
         {
@@ -107,6 +95,17 @@ CalculateModRegardingDisplacement ( _mod,  disp | rmod ) // _mod/rmod avoid name
                 rmod = 2 ; 
             }
         }
+#elif 1 // c_syntax/preprocessor tesing
+        if ( disp == 0 ) rmod = 0 ;
+        else 
+        {   
+            if ( disp <= 0xff ) 
+                rmod = 1 ; 
+            else 
+            {
+                rmod = 2 ; 
+            }
+        }
 #else
         if ( disp == 0 ) rmod = 0 ;
         else if ( disp <= 0xff ) rmod = 1 ; 
@@ -117,7 +116,7 @@ CalculateModRegardingDisplacement ( _mod,  disp | rmod ) // _mod/rmod avoid name
     return rmod ;
 } prefix
 //'CalculateModRegardingDisplacement find wdiss apause
-scOn
+
 Bits 
 int
 CalculateModRmByte ( _mod, _reg, rm, sib, disp | modRm )
@@ -140,7 +139,7 @@ CalculateModRmByte ( _mod, _reg, rm, sib, disp | modRm )
     modRm = ( _mod << 6 ) + ( ( ( _reg Bits.& 0x7 ) << 3 ) + ( rm Bits.& 0x7 ) ) ; // only use 3 bits of reg/rm
     return modRm ;
 } prefix
-scOff
+
 //'CalculateModRmByte find wdiss apause 
 //-----------------------------------------------------------------------
 //   modRm byte ( bits )  _mod 0 : no disp ; _mod 1 : 1 byte disp : _mod 2 : 4 byte disp ; _mod 3 : just reg value
@@ -309,7 +308,6 @@ Compile_CalcWrite_Instruction_X64 (  rex,  opCode,  _mod,  _reg,  rm, controlFla
     _Compile_Write_Instruction_X64 ( rex, opCode, modRm, controlFlags, sib, disp, dispSize, imm, immSize ) ;
 } prefix
 //'Compile_CalcWrite_Instruction_X64 find wdiss apause
-#endif
 
 void 
 _Compile_Move ( toRegOrMem _mod _reg rm controlFlags disp | opCode ) 
@@ -518,7 +516,7 @@ Asm
     // _Compile_Move ( toRegOrMem _mod _reg rm disp | opCode ) 
     _Compile_Move ( REG, REG, dstReg @, srcReg @, 0 ) 
 ;;
-#endif
+#endif // x64_dbg
  
 infixOff
 

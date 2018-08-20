@@ -179,11 +179,6 @@
 #define Get( obj, field ) obj->field
 #define Set( obj, field, value ) (obj)->(field) = (value) 
 
-// lisp macros
-#define Cons( first, second ) _LO_Cons ( (first), (second), LispAllocType )
-#define Car( sym ) ((ListObject*) sym)->Lo_Car
-#define Cdr( sym ) ((ListObject*) sym)->Lo_Cdr
-
 #define Stringn_Equal( string1, string2, n ) (Strncmp ( (char*) string1, (char*) string2, n ) == 0 )
 #define Stringni_Equal( string1, string2, n ) (Strnicmp ( (char*) string1, (char*) string2, n ) == 0 )
 #define Stringi_Equal( string1, string2 ) (Stricmp ( (char*) string1, (char*) string2 ) == 0 )

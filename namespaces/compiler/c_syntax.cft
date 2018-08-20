@@ -9,7 +9,7 @@ location
 // maybe we're shooting for a "smart syntactic language" that will parse "poetic" syntactic arrangements
 #if 1 // if 0
 optimizeOn inlineOn 
-System Interpreter Combinators C C_Combinators
+System Interpreter Combinators PrefixCombinators
 C String
 "Dlsym" namespace Dlsym "libc" namespace libc
 #if 1 //Zenfone2 @ not

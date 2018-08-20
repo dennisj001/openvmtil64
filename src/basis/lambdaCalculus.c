@@ -12,20 +12,9 @@
 // lisp type lists can maybe be thought of as not rpn - not reverse polish notation,
 // not postfix but prefix - cambridge polish/prefix notation blocks
 
-// sections
-// _LO_Eval
-// _LO_Apply
-// _LO_Read
-// _LO_Print
-// _LO_SpecialFunctions
-// LO_Repl
-// LO_...misc : _L0_New _L0_Copy
-// LC_x
-
-//===================================================================================================================
-//| LO_Eval
-//===================================================================================================================
-// #define EVAL(x)         (isNum(x)? x : isSym(x)? val(x) : evList(x)) // picolisp
+#define Cons( first, second ) _LO_Cons ( (first), (second), LispAllocType )
+#define Car( sym ) ((ListObject*) sym)->Lo_Car
+#define Cdr( sym ) ((ListObject*) sym)->Lo_Cdr
 #define LispAllocType LISP_TEMP
 #define LO_IsQuoted(l0) ((l0->State & QUOTED) || ((l0->State & QUASIQUOTED) && (!(l0->State & (UNQUOTED | UNQUOTE_SPLICE))))) //( ! ( l0->State & ( QUOTED | QUASIQUOTED ) )  || (l1->State & UNQUOTED) ) )
 #define LO_Last(lo) (ListObject *)dllist_Last((dllist *)lo->Lo_List)
@@ -48,12 +37,12 @@
 #define LC_RestoreStackPointer(lc) _LC_ResetStack(lc) //{ if ( lc && lc->SaveStackPointer ) Dsp = lc->SaveStackPointer ; }
 
 ListObject *
-LO_Apply ( ListObject *lfirst, ListObject *lfunction, ListObject *largs, Boolean * applyFlag )
+LO_Apply ( ListObject *lfirst, ListObject *lfunction, ListObject *largs, Boolean applyFlag )
 {
     LambdaCalculus *lc = _Q_->OVT_LC ;
     SetState ( lc, LC_APPLY, false ) ;
     ListObject *l0 ;
-    if ( ( *applyFlag ) && lfunction && ( ( lfunction->CAttribute & ( CPRIMITIVE | CFRTIL_WORD ) ) || ( lfunction->LAttribute & ( T_LISP_COMPILED_WORD ) ) ) )
+    if ( ( applyFlag ) && lfunction && ( ( lfunction->CAttribute & ( CPRIMITIVE | CFRTIL_WORD ) ) || ( lfunction->LAttribute & ( T_LISP_COMPILED_WORD ) ) ) )
     {
         if ( GetState ( lc, LC_DEFINE_MODE ) && ( ! CompileMode ) ) return lfirst ;
         else l0 = _LO_Apply ( lfirst, lfunction, largs ) ;
@@ -82,7 +71,7 @@ LO_Apply ( ListObject *lfirst, ListObject *lfunction, ListObject *largs, Boolean
 }
 
 ListObject *
-LO_EvalList ( ListObject *l0, ListObject *locals, Boolean * applyFlag )
+LO_EvalList ( ListObject *l0, ListObject *locals, Boolean applyFlag )
 {
     LambdaCalculus * lc = _Q_->OVT_LC ;
     ListObject *lfunction, *largs, *lfirst ;
@@ -112,7 +101,7 @@ LO_EvalList ( ListObject *l0, ListObject *locals, Boolean * applyFlag )
 }
 
 ListObject *
-_LO_Eval ( ListObject *l0, ListObject *locals, Boolean * applyFlag )
+_LO_Eval ( ListObject *l0, ListObject *locals, Boolean applyFlag )
 {
     if ( l0 && ( ! LO_IsQuoted ( l0 ) ) )
     {
@@ -136,7 +125,6 @@ _LO_EvalSymbol ( ListObject *l0, ListObject *locals )
         }
         else if ( w->CAttribute & ( CPRIMITIVE | CFRTIL_WORD | LOCAL_VARIABLE | PARAMETER_VARIABLE | T_LISP_COMPILED_WORD ) )
         {
-            //if ( ! lc->DontCopyFlag ) l0 = LO_CopyOne ( l0 ) ;
             l0->Lo_Value = w->W_Value ;
             l0->Lo_CfrTilWord = w ;
             l0->CAttribute |= w->CAttribute ;
@@ -158,7 +146,7 @@ _LO_EvalSymbol ( ListObject *l0, ListObject *locals )
 }
 
 ListObject *
-_LO_EvalList ( ListObject *lorig, ListObject *locals, Boolean * applyFlag )
+_LO_EvalList ( ListObject *lorig, ListObject *locals, Boolean applyFlag )
 {
     ListObject *lnew = 0, *lnode, *lnext, *lce ;
     if ( lorig )
@@ -169,9 +157,7 @@ _LO_EvalList ( ListObject *lorig, ListObject *locals, Boolean * applyFlag )
             lnext = _LO_Next ( lnode ) ;
             // research : why doesn't this work without copy ? copying here wastes time and memory!!
             lce = LO_CopyOne ( _LO_Eval ( lnode, locals, applyFlag ) ) ;
-            d0 ( if ( Is_DebugModeOn ) LO_Debug_ExtraShow ( 0, 0, 0, ( byte * ) "\n_LO_EvalList before LO_AddToTail : lec = %s : lnew = %s", c_gd ( _LO_PRINT_TO_STRING ( lce ) ), c_gd ( _LO_PRINT_TO_STRING ( lnew ) ) ) ) ;
             _LO_AddToTail ( lnew, lce ) ;
-            d0 ( if ( Is_DebugModeOn ) LO_Debug_ExtraShow ( 0, 0, 0, ( byte * ) "\n_LO_EvalList after LO_AddToTail : lec = %s : lnew = %s", c_gd ( _LO_PRINT_TO_STRING ( lce ) ), c_gd ( _LO_PRINT_TO_STRING ( lnew ) ) ) ) ;
         }
     }
     return lnew ;
@@ -184,8 +170,7 @@ _LO_Apply ( ListObject *lfirst, ListObject *lfunction, ListObject *largs )
     SetState ( lc, LC_APPLY, true ) ;
     ListObject *lfdata = _LO_First ( largs ), *vReturn ;
     d0 ( if ( Is_DebugModeOn ) LO_Debug_ExtraShow ( 0, 1, 0, ( byte * ) "\n_LO_Apply : \n\tl0 =%s", _LO_PRINT_TO_STRING ( l0 ) ) ) ;
-    if ( lfunction->LAttribute & LIST_FUNCTION )
-        return (( ListFunction ) lfunction->Lo_CfrTilWord->Definition )( lfirst ) ;
+    if ( lfunction->LAttribute & LIST_FUNCTION ) return (( ListFunction ) lfunction->Lo_CfrTilWord->Definition )( lfirst ) ;
     else if ( lfunction->CAttribute & CFRTIL_WORD ) // this case is hypothetical for now
     {
         if ( lfunction->LAttribute & T_LISP_CFRTIL_COMPILED )
@@ -216,20 +201,14 @@ LO_Substitute ( ListObject *lambdaParameters, ListObject *funcCallValues )
 {
     while ( lambdaParameters && funcCallValues )
     {
-        // ?!? this may not be the right idea but we want it so that we can have transparent lists in the parameters, ie.
-        // no affect with a parenthesized list or just unparaenthesized parameters of the same number
         if ( lambdaParameters->LAttribute & ( LIST | LIST_NODE ) )
         {
-            if ( funcCallValues->LAttribute & ( LIST | LIST_NODE ) )
-                funcCallValues = _LO_First ( funcCallValues ) ;
-            //else Error ( "\nLO_Substitute : funcCallValues list structure doesn't match parameter list", QUIT ) ;
-            lambdaParameters = _LO_First ( lambdaParameters ) ; // can something like this work
+            if ( funcCallValues->LAttribute & ( LIST | LIST_NODE ) ) funcCallValues = _LO_First ( funcCallValues ) ;
+            lambdaParameters = _LO_First ( lambdaParameters ) ; 
         }
         else if ( funcCallValues->LAttribute & ( LIST | LIST_NODE ) )
         {
-            if ( lambdaParameters->LAttribute & ( LIST | LIST_NODE ) )
-                lambdaParameters = _LO_First ( lambdaParameters ) ; // can something like this work
-            //else Error ( "\nLO_Substitute : funcCallValues list structure doesn't match parameter list", QUIT ) ;
+            if ( lambdaParameters->LAttribute & ( LIST | LIST_NODE ) ) lambdaParameters = _LO_First ( lambdaParameters ) ; 
             funcCallValues = _LO_First ( funcCallValues ) ;
         }
         // just preserve the name of the arg for the finder
@@ -494,7 +473,7 @@ _LO_Define ( ListObject *idNode, ListObject *locals )
     SetState ( lc, ( LC_DEFINE_MODE ), true ) ;
     Namespace_DoAddWord ( lc->LispNamespace, word ) ; // put it at the beginning of the list to be found first
     word->CAttribute = NAMESPACE_VARIABLE ; // nb. !
-    value = _LO_Eval ( value0, locals, &applyFlag ) ; // 0 : don't apply
+    value = _LO_Eval ( value0, locals, applyFlag ) ; // 0 : don't apply
     if ( value && ( value->LAttribute & T_LAMBDA ) )
     {
         value->Lo_LambdaFunctionParameters = _LO_Copy ( value->Lo_LambdaFunctionParameters, LISP ) ;
@@ -572,7 +551,7 @@ LO_SpecialFunction ( ListObject *l0, ListObject *locals )
             d0 ( if ( Is_DebugModeOn ) LO_Debug_ExtraShow ( 0, 0, 0, ( byte * ) "\nLO_SpecialFunction : macro eval before : l0 = %s : locals = %s", c_gd ( _LO_PRINT_TO_STRING ( l0 ) ), locals ? _LO_PRINT_TO_STRING ( locals ) : ( byte * ) "" ) ) ;
             macro = lfirst ;
             macro->LAttribute &= ~ T_LISP_MACRO ; // prevent short recursive loop calling of this function thru LO_Eval below
-            l0 = _LO_Eval ( l0, locals, &applyFlag ) ;
+            l0 = _LO_Eval ( l0, locals, applyFlag ) ;
             macro->LAttribute |= T_LISP_MACRO ; // restore to its true type
             lfirst = _LO_First ( l0 ) ;
             macro = 0 ;
@@ -585,7 +564,7 @@ LO_SpecialFunction ( ListObject *l0, ListObject *locals )
         else
         {
             d0 ( if ( Is_DebugModeOn ) LO_Debug_ExtraShow ( 0, 0, 0, ( byte * ) "\nLO_SpecialFunction : final eval before : l0 = %s : locals = %s", c_gd ( _LO_PRINT_TO_STRING ( l0 ) ), locals ? _LO_PRINT_TO_STRING ( locals ) : ( byte * ) "nil" ) ) ;
-            l0 = _LO_Eval ( l0, locals, &applyFlag ) ;
+            l0 = _LO_Eval ( l0, locals, applyFlag ) ;
             d0 ( if ( Is_DebugModeOn ) LO_Debug_ExtraShow ( 0, 0, 0, ( byte * ) "\nLO_SpecialFunction : final eval after : l0 = %s : locals = %s", c_gd ( _LO_PRINT_TO_STRING ( l0 ) ), locals ? _LO_PRINT_TO_STRING ( locals ) : ( byte * ) "nil" ) ) ;
         }
     }
@@ -1030,7 +1009,7 @@ CompileLispBlock ( ListObject *args, ListObject *body )
     word->CAttribute = BLOCK ;
     word->LAttribute |= T_LISP_COMPILED_WORD ;
     SetState ( lc, ( LC_COMPILE_MODE | LC_BLOCK_COMPILE ), true ) ;
-    _LO_Eval ( body, locals, &applyFlag ) ;
+    _LO_Eval ( body, locals, applyFlag ) ;
     if ( GetState ( lc, LC_COMPILE_MODE ) )
     {
         LO_EndBlock ( ) ;
@@ -1364,11 +1343,11 @@ LO_If ( ListObject *l0, ListObject *locals )
     test = _LO_Next ( l0 ) ;
     trueList = _LO_Next ( test ) ;
     elseList = _LO_Next ( trueList ) ;
-    tf = _LO_Eval ( test, locals, &applyFlag ) ;
+    tf = _LO_Eval ( test, locals, applyFlag ) ;
     if ( ( *tf->Lo_PtrToValue ) && ( tf != nil ) )
-        value = _LO_Eval ( trueList, locals, &applyFlag ) ;
+        value = _LO_Eval ( trueList, locals, applyFlag ) ;
     else
-        value = _LO_Eval ( elseList, locals, &applyFlag ) ;
+        value = _LO_Eval ( elseList, locals, applyFlag ) ;
 
     return value ;
 }
@@ -1385,15 +1364,15 @@ LO_Cond ( ListObject *l0, ListObject *locals )
     tf = _LO_Next ( l0 ) ;
     while ( ( trueNode = _LO_Next ( tf ) ) )
     {
-        tf = _LO_Eval ( tf, locals, &applyFlag ) ;
+        tf = _LO_Eval ( tf, locals, applyFlag ) ;
         if ( ( tf != nil ) && ( *tf->Lo_PtrToValue ) )
-            return _LO_Eval ( LO_CopyOne ( trueNode ), locals, &applyFlag ) ;
+            return _LO_Eval ( LO_CopyOne ( trueNode ), locals, applyFlag ) ;
             // nb we have to copy one here else we return the whole rest of the list
             //and we can't remove it else it could break a LambdaBody, etc.
         else
             tf = elseNode = _LO_Next ( trueNode ) ;
     }
-    return _LO_Eval ( elseNode, locals, &applyFlag ) ; // last one no need to copy
+    return _LO_Eval ( elseNode, locals, applyFlag ) ; // last one no need to copy
 }
 
 // lisp 'list' function
@@ -1464,7 +1443,7 @@ LO_Begin ( ListObject *l0, ListObject *locals )
     {
         for ( l0 = _LO_Next ( l0 ) ; l0 ; l0 = _LO_Next ( l0 ) )
         {
-            leval = _LO_Eval ( l0, locals, &applyFlag ) ;
+            leval = _LO_Eval ( l0, locals, applyFlag ) ;
         }
     }
     else
@@ -1871,7 +1850,7 @@ ListObject *
 LO_Eval ( ListObject * l0 )
 {
     Boolean applyFlag = 1 ;
-    _LO_Eval ( l0, 0, &applyFlag ) ;
+    _LO_Eval ( l0, 0, applyFlag ) ;
 }
 
 void

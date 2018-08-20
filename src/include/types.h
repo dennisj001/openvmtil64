@@ -798,7 +798,7 @@ typedef struct _Debugger
     int64 Key ;
     int64 SaveKey ; 
     int64 TokenStart_ReadLineIndex, Esi, Edi ;
-    Word * w_Word, *EntryWord, *LastShowWord, *LastEffectsWord; 
+    Word * w_Word, *EntryWord, *LastShowWord, *LastEffectsWord, *NextEvalWord ; 
     Word *LocalsNamespace, *LastSetupWord, *SteppedWord, *CurrentlyRunningWord, *LastSourceCodeWord ;
     byte * Token ;
     block SaveCpuState ;

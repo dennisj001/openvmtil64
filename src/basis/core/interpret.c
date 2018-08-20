@@ -2,6 +2,19 @@
 #include "../../include/cfrtil64.h"
 
 Word *
+Interpreter_SetupNextWord ( Interpreter * interp )
+{
+    Word * word = 0 ;
+    byte * token = Lexer_ReadToken ( interp->Lexer0 ) ;
+    if ( token )
+    {
+        word = _Interpreter_TokenToWord ( interp, token ) ;
+    }
+    else SetState ( _Context_->Lexer0, LEXER_END_OF_LINE, true ) ;
+    return word ;
+}
+
+Word *
 Interpreter_InterpretAToken ( Interpreter * interp, byte * token, int64 tokenStartReadLineIndex )
 {
     Word * word = 0 ;

@@ -32,6 +32,7 @@ Ppibs_New ( )
 }
 #if DEBUG_SAVE_DONT_DELETE
 #define dbg( x ) x
+
 void
 Ppibs_Print ( Ppibs * ppibs, byte * prefix )
 {
@@ -74,46 +75,41 @@ int64
 GetElxxStatus ( int64 cond, int64 type )
 {
     int64 llen = List_Length ( _Context_->PreprocessorStackList ) ;
-    Ppibs *top = ( Ppibs * ) List_Top_Value ( _Context_->PreprocessorStackList ) ;
-    Boolean status = false, accStatus = GetAccumulatedBlockStatus ( 1 ) ; // 1 ??
-    if ( type == PP_ELIF )
+    if ( llen )
     {
-        if ( ( top->ElseStatus || top->ElifStatus ) ) status = 0 ; // no 'elif 1' after an 'elif 1' or and 'else' in the same block
-        else
+        Ppibs *top = ( Ppibs * ) List_Top_Value ( _Context_->PreprocessorStackList ) ;
+        Boolean status = false, accStatus = GetAccumulatedBlockStatus ( 1 ) ; // 1 ??
+        if ( type == PP_ELIF )
+        {
+            if ( ( top->ElseStatus || top->ElifStatus ) ) status = 0 ; // no 'elif 1' after an 'elif 1' or and 'else' in the same block
+            else
+            {
+                if ( llen > 1 )
+                {
+                    if ( accStatus ) status = ( ! ( top->IfBlockStatus || top->ElseStatus ) ) && cond ;
+                    else status = 0 ;
+                }
+                else status = ( ! ( top->IfBlockStatus || top->ElseStatus ) ) && cond ;
+            }
+            top->ElifStatus = status ;
+            top->ElseStatus = 0 ; // normally elif can't come after else but we make reasonable (?) sense of it here
+        }
+        else if ( type == PP_ELSE )
         {
             if ( llen > 1 )
             {
-                if ( accStatus ) status = ( ! ( top->IfBlockStatus || top->ElseStatus ) ) && cond ;
+                if ( accStatus ) status = ( ! ( top->IfBlockStatus || top->ElifStatus ) ) ;
                 else status = 0 ;
             }
-            else status = ( ! ( top->IfBlockStatus || top->ElseStatus ) ) && cond ;
+            else status = ( ! ( top->IfBlockStatus || top->ElifStatus ) ) ;
+            top->ElseStatus = status ;
+            top->ElifStatus = 0 ; //status ; // so total block status will be the 'else' status
         }
-        top->ElifStatus = status ;
-        top->ElseStatus = 0 ; // normally elif can't come after else but we make reasonable (?) sense of it here
+        List_SetTop_Value ( _Context_->PreprocessorStackList, ( int64 ) top ) ;
+        dbg ( Ppibs_Print ( top, ( byte* ) ( ( type == PP_ELSE ) ? "Else : ElxxStatus: top of PreprocessorStackList" : "Elif : ElxxStatus" ) ) ) ;
+        return status ;
     }
-    else if ( type == PP_ELSE )
-    {
-#if 1        
-        if ( llen > 1 )
-        {
-            if ( accStatus ) status = ( ! ( top->IfBlockStatus || top->ElifStatus ) ) ;
-            else status = 0 ;
-        }
-        else status = ( ! ( top->IfBlockStatus || top->ElifStatus ) ) ;
-        top->ElseStatus = status ;
-        top->ElifStatus = 0 ; //status ; // so total block status will be the 'else' status
-#else        
-        if ( llen ) current.int64_Ppibs = List_Pick_Value ( _Context_->PreprocessorStackList, llen - 1 ) ; // -1: 0 based list
-        else SyntaxError ( 1 ) ;
-        status = ( ! ( current.IfBlockStatus || current.ElifStatus ) ) ;
-        current.ElseStatus = status ;
-        current.ElifStatus = 0 ; //status ; // so total block status will be the 'else' status
-        List_SetN_Value ( _Context_->PreprocessorStackList, ( llen - 1 ), current.int64_Ppibs ) ;
-#endif        
-    }
-    List_SetTop_Value ( _Context_->PreprocessorStackList, ( int64 ) top ) ;
-    dbg ( Ppibs_Print ( top, ( byte* ) ( ( type == PP_ELSE ) ? "Else : ElxxStatus: top of PreprocessorStackList" : "Elif : ElxxStatus" ) ) ) ;
-    return status ;
+    else _SyntaxError ( "#Elxx without #if", 1 ) ; //status = cond ; 
 }
 
 Boolean
@@ -138,11 +134,11 @@ GetIfStatus ( )
     Boolean accStatus, cond ;
     accStatus = GetAccumulatedBlockStatus ( 0 ) ;
     cond = _GetCondStatus ( ) ;
-    cstatus->IfBlockStatus = cond && accStatus ; 
+    cstatus->IfBlockStatus = cond && accStatus ;
     cstatus->Filename = _ReadLiner_->Filename ;
     cstatus->LineNumber = _ReadLiner_->LineNumber ;
     //_List_PushNew_1Value ( dllist *list, int64 type, int64 value, int64 allocType )
-    _List_PushNew_1Value ( _Context_->PreprocessorStackList, T_PREPROCESSOR, ( int64 ) cstatus, TEMPORARY ) ;
+    _List_PushNew_1Value ( _Context_->PreprocessorStackList, T_PREPROCESSOR, ( int64 ) cstatus, SESSION ) ;
     dbg ( Ppibs_Print ( cstatus, ( byte* ) "IfStatus" ) ) ;
     return cstatus->IfBlockStatus ;
 }
@@ -181,7 +177,7 @@ SkipPreprocessorCode ( Boolean skipControl )
     Context * cntx = _Context_ ;
     Lexer * lexer = cntx->Lexer0 ;
     byte * token ;
-    int64 ifLevel = 0 ; 
+    int64 ifLevel = 0 ;
     int64 svState = GetState ( lexer, ( ADD_TOKEN_TO_SOURCE | ADD_CHAR_TO_SOURCE ) ) ;
     Lexer_SourceCodeOff ( lexer ) ;
     do
@@ -218,13 +214,13 @@ SkipPreprocessorCode ( Boolean skipControl )
                     else if ( String_Equal ( token1, "else" ) )
                     {
                         if ( skipControl == 1 ) continue ;
-                        //else if ( ( skipControl == 2 ) && ( ! ifLevel ) ) goto done ;
+                            //else if ( ( skipControl == 2 ) && ( ! ifLevel ) ) goto done ;
                         else if ( GetElseStatus ( ) ) goto done ;
                     }
                     else if ( String_Equal ( token1, "elif" ) )
                     {
                         if ( skipControl == 1 ) continue ;
-                        //else if ( ( skipControl == 2 ) && ( ! ifLevel ) ) goto done ;
+                            //else if ( ( skipControl == 2 ) && ( ! ifLevel ) ) goto done ;
                         else if ( GetElifStatus ( ) ) goto done ;
                     }
                     else if ( String_Equal ( token1, "endif" ) )
@@ -246,6 +242,7 @@ SkipPreprocessorCode ( Boolean skipControl )
                                     dbg ( Ppibs_Print ( first, buffer ) ) ;
                                 }
 #endif                                    
+                                List_Pop ( _Context_->PreprocessorStackList ) ;
                                 goto done ;
                             }
                         }

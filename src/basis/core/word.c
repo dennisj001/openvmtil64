@@ -1,23 +1,5 @@
 #include "../../include/cfrtil64.h"
 
-//block CurrentDefinition ;
-#if 0
-
-void
-_Word_Run ( Word * word )
-{
-    if ( word )
-    {
-        word->StackPushRegisterCode = 0 ; // nb. used! by the rewriting optInfo
-        // keep track in the word itself where the machine code is to go, if this word is compiled or causes compiling code - used for optimization
-        Word_SetCoding ( word, Here, 1 ) ; // if we change it later (eg. in lambda calculus) we must change it there because the rest of the compiler depends on this
-        word->W_InitialRuntimeDsp = _Dsp_ ;
-        _Context_->CurrentlyRunningWord = word ;
-        Block_Eval ( word->Definition ) ;
-    }
-}
-#else
-
 void
 Word_Run ( Word * word )
 {
@@ -34,7 +16,23 @@ Word_Run ( Word * word )
         }
     }
 }
-#endif
+
+void
+_Word_Eval ( Word * word )
+{
+    if ( word )
+    {
+        _Context_->CurrentEvalWord = word ;
+        if ( ( word->CAttribute & IMMEDIATE ) || ( ! CompileMode ) )
+        {
+            Word_Run ( word ) ;
+        }
+        else
+        {
+            _Word_Compile ( word ) ;
+        }
+    }
+}
 
 void
 Word_Eval ( Word * word )
@@ -45,14 +43,7 @@ Word_Eval ( Word * word )
         DEBUG_SETUP ( word ) ;
         if ( ! GetState ( word, STEPPED ) ) // set by the debuggger
         {
-            if ( ( word->CAttribute & IMMEDIATE ) || ( ! CompileMode ) )
-            {
-                Word_Run ( word ) ;
-            }
-            else
-            {
-                _Word_Compile ( word ) ;
-            }
+            _Word_Eval ( word ) ;
         }
         SetState ( word, STEPPED, false ) ;
         DEBUG_SHOW ;
@@ -291,7 +282,7 @@ __Word_ShowSourceCode ( Word * word )
         }
         else scd = "C Primitive" ;
         name = c_gd ( word->Name ) ;
-        _Printf ( ( byte* ) "\nSourceCode for %s.%s :> \n%s", word->S_ContainingNamespace->Name, name, scd ) ;
+        _Printf ( ( byte* ) "\nSourceCode for %s.%s :> \n%s", word->S_ContainingNamespace ? word->S_ContainingNamespace->Name : ( byte* ) "", name, scd ) ;
     }
 }
 

@@ -80,11 +80,11 @@ CPrimitive CPrimitives [] = {
     { "}", 0, 0, CfrTil_TypedefStructEnd, IMMEDIATE | KEYWORD, 0, 0, "C_Typedef", "C_Syntax" },
     { "{", 0, 0, CfrTil_TypedefStructBegin, IMMEDIATE | KEYWORD, 0, 0, "C_Typedef", "C_Syntax" },
 
-    { "if", 0, 0, CfrTil_If_C_Combinator, KEYWORD | COMBINATOR | IMMEDIATE, 0, 0, "C_Combinators", "C" },
-    { "while", 0, 0, CfrTil_While_C_Combinator, KEYWORD | COMBINATOR | IMMEDIATE, 0, 0, "C_Combinators", "C" },
-    { "do", 0, 0, CfrTil_DoWhile_C_Combinator, KEYWORD | COMBINATOR | IMMEDIATE, 0, 0, "C_Combinators", "C" },
-    { "for", 0, 0, CfrTil_For_C_Combinator, KEYWORD | COMBINATOR | IMMEDIATE, 0, 0, "C_Combinators", "C" },
-    { "loop", 0, 0, CfrTil_Loop_C_Combinator, KEYWORD | COMBINATOR | IMMEDIATE, 0, 0, "C_Combinators", "C" },
+    { "if", 0, 0, CfrTil_If_PrefixCombinators, KEYWORD | COMBINATOR | IMMEDIATE, 0, 0, "PrefixCombinators", "C" },
+    { "while", 0, 0, CfrTil_While_PrefixCombinators, KEYWORD | COMBINATOR | IMMEDIATE, 0, 0, "PrefixCombinators", "C" },
+    { "do", 0, 0, CfrTil_DoWhile_PrefixCombinators, KEYWORD | COMBINATOR | IMMEDIATE, 0, 0, "PrefixCombinators", "C" },
+    { "for", 0, 0, CfrTil_For_PrefixCombinators, KEYWORD | COMBINATOR | IMMEDIATE, 0, 0, "PrefixCombinators", "C" },
+    { "loop", 0, 0, CfrTil_Loop_PrefixCombinators, KEYWORD | COMBINATOR | IMMEDIATE, 0, 0, "PrefixCombinators", "C" },
 
     { ":", 0, 0, CfrTil_Colon, IMMEDIATE | KEYWORD, 0, 0, "Infix", "Compiler" },
     { "=", 0, MOV, ( block ) CfrTil_C_Infix_Equal, IMMEDIATE | CATEGORY_OP | CATEGORY_OP_EQUAL | KEYWORD, 0, 0, "Infix", "C" }, //"Infix", "Compiler" },

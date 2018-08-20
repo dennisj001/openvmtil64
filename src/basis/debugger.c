@@ -35,7 +35,7 @@ _Debugger_PreSetup ( Debugger * debugger, Word * word, int8 forceFlag )
             if ( ! word ) word = _Context_->CurrentlyRunningWord ;
             if ( word && ( ! word->W_OriginalWord ) ) word->W_OriginalWord = word ;
             debugger->w_Word = word ;
-            if ( word && word->Name[0] ) 
+            if ( word && word->Name[0] )
             {
                 if ( forceFlag ) debugger->LastShowWord = 0 ;
                 if ( ! word->Name ) word->Name = ( byte* ) "" ;
@@ -116,8 +116,8 @@ _Debugger_Init ( Debugger * debugger, Word * word, byte * address )
     {
         debugger->State = DBG_MENU | DBG_INFO | DBG_PROMPT ;
     }
-    if (( ! GetState ( debugger, DBG_INTERPRET_LOOP_DONE ) ) || (!(debugger->w_Word)))
-    debugger->w_Word = word ;
+    if ( ( ! GetState ( debugger, DBG_INTERPRET_LOOP_DONE ) ) || ( ! ( debugger->w_Word ) ) )
+        debugger->w_Word = word ;
     if ( address )
     {
         debugger->DebugAddress = address ;
@@ -218,7 +218,7 @@ Debugger_FindAny ( Debugger * debugger )
 void
 Debugger_GotoList_Print ( Debugger * debugger )
 {
-    Compiler_GotoList_Print ( ) ;    
+    Compiler_GotoList_Print ( ) ;
 }
 
 void
@@ -258,8 +258,21 @@ Debugger_Eval ( Debugger * debugger )
     {
         Debugger_Continue ( debugger ) ;
     }
+#if 0   
+    else if ( ! GetState ( debugger, DBG_AUTO_MODE ) )
+    {
+        _Word_Eval ( _Context_->CurrentEvalWord ) ;
+        debugger->NextEvalWord = Interpreter_SetupNextWord ( _Interpreter_ ) ;
+    }
+    else
+    {
+        _Interpreter_DoWord ( _Interpreter_, debugger->NextEvalWord, _Lexer_->TokenStart_ReadLineIndex, - 1 ) ;
+        debugger->NextEvalWord = Interpreter_SetupNextWord ( _Interpreter_ ) ;
+    }
+#else    
     SetState_TrueFalse ( debugger, DBG_INTERPRET_LOOP_DONE | DBG_EVAL_AUTO_MODE, DBG_STEPPING ) ;
     if ( GetState ( debugger, DBG_AUTO_MODE ) ) SetState ( debugger, DBG_EVAL_AUTO_MODE, true ) ;
+#endif    
     debugger->PreHere = Here ;
 }
 

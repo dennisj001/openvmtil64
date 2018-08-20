@@ -82,7 +82,7 @@ nl heey1
 
 i2halt
 sp
-"C_Combinators" notUsing
+"PrefixCombinators" notUsing
 infixOff
 sp
 #endif

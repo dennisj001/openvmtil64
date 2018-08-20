@@ -1,6 +1,6 @@
 #include "../include/cfrtil64.h"
 
-// examples of the use of C_Combinators are in interpreter.cft
+// examples of the use of PrefixCombinators are in interpreter.cft
 
 void
 CfrTil_InfixModeOff ( )
@@ -34,7 +34,7 @@ CfrTil_C_Syntax_Off ( )
     Context * cntx = _Context_ ;
     SetState ( cntx, C_SYNTAX | PREFIX_MODE | INFIX_MODE, false ) ;
     //Namespace_SetAsNotUsing ( "C" ) ;
-    Namespace_SetAsNotUsing_MoveToTail ( ( byte* ) "C_Combinators" ) ;
+    Namespace_SetAsNotUsing_MoveToTail ( ( byte* ) "PrefixCombinators" ) ;
     Namespace_SetAsNotUsing_MoveToTail ( ( byte* ) "Infix" ) ;
     Namespace_SetAsNotUsing_MoveToTail ( ( byte* ) "C_Syntax" ) ;
     //Namespace_DoNamespace ( "Bits" ) ; // TODO : must be a better way
@@ -50,7 +50,7 @@ CfrTil_C_Syntax_On ( )
     Compiler_Get_C_BackgroundNamespace ( cntx->Compiler0 ) ;
     SetState ( cntx, C_SYNTAX | PREFIX_MODE | INFIX_MODE, true ) ;
     Namespace_DoNamespace ( ( byte* ) "C" ) ;
-    Namespace_DoNamespace ( ( byte* ) "C_Combinators" ) ;
+    Namespace_DoNamespace ( ( byte* ) "PrefixCombinators" ) ;
     Namespace_DoNamespace ( ( byte* ) "Infix" ) ;
     Namespace_DoNamespace ( ( byte* ) "C_Syntax" ) ;
     Compiler_SetAs_InNamespace_C_BackgroundNamespace ( cntx->Compiler0 ) ;
@@ -125,7 +125,7 @@ CfrTil_C_Infix_Equal ( )
 }
 
 void
-CfrTil_If_C_Combinator ( )
+CfrTil_If_PrefixCombinators ( )
 {
     Compiler * compiler = _Compiler_ ;
     Word * combinatorWord0 = CfrTil_WordList ( 0 ) ;
@@ -150,7 +150,7 @@ CfrTil_If_C_Combinator ( )
 }
 
 void
-CfrTil_DoWhile_C_Combinator ( )
+CfrTil_DoWhile_PrefixCombinators ( )
 {
     Word * currentWord0 = CfrTil_WordList ( 0 ) ;
     currentWord0->W_SC_Index = _Lexer_->SC_Index ;
@@ -170,7 +170,7 @@ CfrTil_DoWhile_C_Combinator ( )
 }
 
 void
-CfrTil_For_C_Combinator ( )
+CfrTil_For_PrefixCombinators ( )
 {
     Word * currentWord0 = CfrTil_WordList ( 0 ) ;
     currentWord0->W_SC_Index = _Lexer_->SC_Index ;
@@ -183,7 +183,7 @@ CfrTil_For_C_Combinator ( )
 }
 
 void
-CfrTil_Loop_C_Combinator ( )
+CfrTil_Loop_PrefixCombinators ( )
 {
     Word * currentWord0 = CfrTil_WordList ( 0 ) ;
     currentWord0->W_SC_Index = _Lexer_->SC_Index ;
@@ -194,7 +194,7 @@ CfrTil_Loop_C_Combinator ( )
 }
 
 void
-CfrTil_While_C_Combinator ( )
+CfrTil_While_PrefixCombinators ( )
 {
     Word * currentWord0 = CfrTil_WordList ( 0 ) ;
     currentWord0->W_SC_Index = _Lexer_->SC_Index ;
