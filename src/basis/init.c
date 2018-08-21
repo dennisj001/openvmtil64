@@ -38,7 +38,7 @@ _CfrTil_Init_SessionCore ( CfrTil * cfrTil, int64 cntxDelFlag, int64 promptFlag 
 }
 
 void
-CfrTil_ContextInit ( )
+CfrTil_SessionInit ( )
 {
     _CfrTil_Init_SessionCore ( _CfrTil_, 0, 1 ) ;
 }

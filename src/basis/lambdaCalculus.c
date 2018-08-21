@@ -1470,13 +1470,6 @@ LO_Cdr ( ListObject *l0 )
     return ( ListObject * ) _LO_Next ( lfirst ) ;
 }
 
-ListObject *
-_LC_Eval ( ListObject *l0 )
-{
-    ListObject *lfirst = _LO_Next ( l0 ) ;
-    return LO_Eval ( lfirst ) ;
-}
-
 void
 _LO_Semi ( Word *word )
 {
@@ -1827,6 +1820,29 @@ LO_Repl ( )
     SetState ( lc, LC_REPL, false ) ;
 }
 
+#if 0  
+void
+LC_List_Interpret ( dllist * list )
+{
+    SetState ( _Context_, LC_INTERPRET, true ) ;
+    dllist_Map ( list, (MapFunction0) _Word_Interpret ) ;
+    //List_Init ( list ) ;
+}
+#endif
+
+ListObject *
+LO_Eval ( ListObject * l0 )
+{
+#if 1   
+    Boolean applyFlag = 1 ;
+    _LO_Eval ( l0, 0, applyFlag ) ;
+#else    
+    //dllist * list = List_New ( LISP_TEMP )  ;
+    //List_Push ( list, (dlnode *) l0 ) ;
+    LC_List_Interpret ( (dllist *) l0 ) ;
+#endif    
+}
+
 //===================================================================================================================
 //| LC_ : lambda calculus
 //===================================================================================================================
@@ -1847,10 +1863,10 @@ LC_Read ( )
 }
 
 ListObject *
-LO_Eval ( ListObject * l0 )
+_LC_Eval ( ListObject *l0 )
 {
-    Boolean applyFlag = 1 ;
-    _LO_Eval ( l0, 0, applyFlag ) ;
+    ListObject *lfirst = _LO_Next ( l0 ) ;
+    return LO_Eval ( lfirst ) ;
 }
 
 void

@@ -42,7 +42,7 @@ OpenVmTil_ShowExceptionInfo ( )
 {
     if ( _Q_->Verbosity )
     {
-        if ( _Q_->ExceptionMessage ) printf ( "\n%s: %s\n", _Q_->ExceptionMessage, _Q_->ExceptionSpecialMessage ), fflush ( stdout ) ;
+        if ( _Q_->ExceptionMessage ) printf ( "\n%s : %s\n", _Q_->ExceptionMessage, _Q_->ExceptionSpecialMessage ), fflush ( stdout ) ;
         _DisplaySignal ( _Q_->Signal ) ;
         //if ( ( _Q_->SignalExceptionsHandled ++ < 2 ) && _CfrTil_ && ( _Q_->Signal != SIGSEGV ) ) _OpenVmTil_ShowExceptionInfo ( ) ;
         if ( ( _Q_->Signal != SIGSEGV ) && ( _Q_->SignalExceptionsHandled ++ < 2 ) && _CfrTil_ ) _OpenVmTil_ShowExceptionInfo ( ) ;
@@ -362,17 +362,17 @@ CfrTil_Exception ( int64 signal, byte * message, int64 restartCondition )
         }
         case LABEL_NOT_FOUND_ERROR:
         {
-            OpenVmTil_Throw ( ( byte* ) "Exception : Word not found. Misssing namespace qualifier?\n", 0, QUIT, 1 ) ;
+            OpenVmTil_Throw ( ( byte* ) "Exception : Word not found. Misssing namespace qualifier?", 0, QUIT, 1 ) ;
             break ;
         }
         case NOT_A_KNOWN_OBJECT:
         {
-            OpenVmTil_Throw ( ( byte* ) "Exception : Not a known object.\n", message, QUIT, 1 ) ;
+            OpenVmTil_Throw ( ( byte* ) "Exception : Not a known object", message, QUIT, 1 ) ;
             break ;
         }
         case ARRAY_DIMENSION_ERROR:
         {
-            OpenVmTil_Throw ( ( byte* ) "Exception : Array has no dimensions!? ", 0, QUIT, 1 ) ;
+            OpenVmTil_Throw ( ( byte* ) "Exception : Array has no dimensions!?", 0, QUIT, 1 ) ;
             break ;
         }
         case INLINE_MULTIPLE_RETURN_ERROR:

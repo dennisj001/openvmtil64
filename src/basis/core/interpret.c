@@ -26,13 +26,21 @@ Interpreter_InterpretAToken ( Interpreter * interp, byte * token, int64 tokenSta
     else SetState ( _Context_->Lexer0, LEXER_END_OF_LINE, true ) ;
     return word ;
 }
-
+#if 1
+void
+Interpreter_InterpretNextToken2 ( Interpreter * interp )
+{
+    Word * word = Interpreter_SetupNextWord ( interp ) ;
+    _Interpreter_DoWord ( interp, word, -1, - 1 ) ;
+}
+//#else
 void
 Interpreter_InterpretNextToken ( Interpreter * interp )
 {
     byte * token = Lexer_ReadToken ( interp->Lexer0 ) ;
     Interpreter_InterpretAToken ( interp, token, - 1 ) ;
 }
+#endif
 
 Word *
 _Interpreter_DoWord_Default ( Interpreter * interp, Word * word0, int64 tsrli, int64 scwi )
@@ -72,7 +80,7 @@ _Interpreter_DoWord ( Interpreter * interp, Word * word, int64 tsrli, int64 scwi
         interp->w_Word = word ;
         if ( ( word->WAttribute == WT_INFIXABLE ) && ( GetState ( cntx, INFIX_MODE ) ) ) // nb. Interpreter must be in INFIX_MODE because it is effective for more than one word
         {
-            doInfix :
+doInfix:
             //DEBUG_SETUP ( word ) ;
             Interpreter_InterpretNextToken ( interp ) ;
             // then continue and interpret this 'word' - just one out of lexical order
@@ -85,7 +93,7 @@ _Interpreter_DoWord ( Interpreter * interp, Word * word, int64 tsrli, int64 scwi
             {
                 Interpreter_DoPrefixWord ( cntx, interp, word ) ;
             }
-            else  if ( word->CAttribute & CATEGORY_OP_1_ARG ) goto doInfix ; 
+            else if ( word->CAttribute & CATEGORY_OP_1_ARG ) goto doInfix ;
             else _SyntaxError ( "Attempting to call a prefix function without following parenthesized args", 1 ) ;
         }
 #endif        
@@ -173,7 +181,8 @@ _Interpreter_IsWordPrefixing ( Interpreter * interp, Word * word )
 Boolean
 Interpreter_IsWordPrefixing ( Interpreter * interp, Word * word )
 {
-    if ( ( GetState ( _Context_, PREFIX_MODE ) ) && ( ! _Q_->OVT_LC ) && ( ! ( word->CAttribute & KEYWORD ) ) && ( ! ( word->WAttribute & WT_C_PREFIX_RTL_ARGS ) ) ) //_Namespace_IsUsing ( _CfrTil_->LispNamespace ) ) )
+    if ( GetState ( _Context_, LC_INTERPRET ) ) return true ;
+    else if ( ( GetState ( _Context_, PREFIX_MODE ) ) && ( ! _Q_->OVT_LC ) && ( ! ( word->CAttribute & KEYWORD ) ) && ( ! ( word->WAttribute & WT_C_PREFIX_RTL_ARGS ) ) ) //_Namespace_IsUsing ( _CfrTil_->LispNamespace ) ) )
     {
         return _Interpreter_IsWordPrefixing ( interp, word ) ;
     }

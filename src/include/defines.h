@@ -599,6 +599,7 @@
 #define CONTEXT_LAST_WORD_IN_QID ( (uint64) 1 << 26 ) 
 #define ADDRESS_OF_MODE ( (uint64) 1 << 27 ) 
 #define AT_COMMAND_LINE ( (uint64) 1 << 28 ) 
+#define LC_INTERPRET     ( (uint64) 1 << 29 ) 
 
 #define NON_INLINABLE ( (uint64) 1 << 0 )
 #define DONE true

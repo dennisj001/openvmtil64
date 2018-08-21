@@ -707,7 +707,7 @@ _CfrTil_StringMacros_Do ( byte * buffer ) // buffer :: the string to which we ap
 }
 
 byte *
-_String_GetStringToEndOfLine ( )
+_String_Get_ReadlineString_ToEndOfLine ( )
 {
     ReadLiner * rl = _Context_->ReadLiner0 ;
     byte * str = String_New ( & rl->InputLine [rl->ReadIndex], TEMPORARY ) ;

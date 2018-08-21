@@ -30,6 +30,8 @@ Ppibs_New ( )
     //Ppibs_Init ( ppibs ) ;
     return ppibs ;
 }
+
+#define DEBUG_SAVE_DONT_DELETE 0
 #if DEBUG_SAVE_DONT_DELETE
 #define dbg( x ) x
 
@@ -138,7 +140,7 @@ GetIfStatus ( )
     cstatus->Filename = _ReadLiner_->Filename ;
     cstatus->LineNumber = _ReadLiner_->LineNumber ;
     //_List_PushNew_1Value ( dllist *list, int64 type, int64 value, int64 allocType )
-    _List_PushNew_1Value ( _Context_->PreprocessorStackList, T_PREPROCESSOR, ( int64 ) cstatus, SESSION ) ;
+    _List_PushNew_1Value ( _Context_->PreprocessorStackList, T_PREPROCESSOR, ( int64 ) cstatus, TEMPORARY ) ; //SESSION ) ;
     dbg ( Ppibs_Print ( cstatus, ( byte* ) "IfStatus" ) ) ;
     return cstatus->IfBlockStatus ;
 }
@@ -229,19 +231,6 @@ SkipPreprocessorCode ( Boolean skipControl )
                         {
                             if ( -- ifLevel < 0 )
                             {
-#if DEBUG_SAVE_DONT_DELETE
-                                endifStatus = _GetEndifStatus ( ) ;
-                                if ( ! endifStatus )
-                                {
-                                    Ppibs *top = ( Ppibs * ) List_Pick_Value ( _Context_->PreprocessorStackList, 0 ) ;
-                                    byte *buffer = Buffer_Data ( _CfrTil_->ScratchB1 ) ;
-                                    sprintf ( buffer, ( byte* ) "top : endifStatus = %ld : ifCount = %ld", endifStatus, ifLevel ) ;
-                                    dbg ( Ppibs_Print ( top, buffer ) ) ;
-                                    Ppibs *first = ( Ppibs * ) List_Pick_Value ( _Context_->PreprocessorStackList, 1 ) ;
-                                    sprintf ( buffer, ( byte* ) "first : endifStatus = %ld : ifCount = %ld", endifStatus, ifLevel ) ;
-                                    dbg ( Ppibs_Print ( first, buffer ) ) ;
-                                }
-#endif                                    
                                 List_Pop ( _Context_->PreprocessorStackList ) ;
                                 goto done ;
                             }

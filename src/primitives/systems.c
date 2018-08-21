@@ -37,14 +37,14 @@ CfrTil_ObjectNew ( ) //int64 size, byte * name, uint64 category, int64 allocType
 {
     int64 allocType = DataStack_Pop ( ) ;
     int64 category = DataStack_Pop ( ) ;
-    byte * name = (byte*) DataStack_Pop ( ) ;
+    byte * name = ( byte* ) DataStack_Pop ( ) ;
     int64 size = DataStack_Pop ( ) ;
-    
+
     byte * obj = _CfrTil_NamelessObjectNew ( size, allocType ) ; //OBJECT_MEMORY ) ;
-    Word * word = _DObject_New (name, ( int64 ) obj, ( OBJECT | IMMEDIATE | category ), 0, 0, OBJECT, ( byte* ) _DataObject_Run, 0, 0, 0, DICTIONARY ) ;
+    Word * word = _DObject_New ( name, ( int64 ) obj, ( OBJECT | IMMEDIATE | category ), 0, 0, OBJECT, ( byte* ) _DataObject_Run, 0, 0, 0, DICTIONARY ) ;
     word->Size = size ;
     //return word ;
-    DataStack_Push ( (uint64) word ) ;
+    DataStack_Push ( ( uint64 ) word ) ;
 }
 #endif
 
@@ -83,9 +83,42 @@ void
 _ShellEscape ( char * str )
 {
     int status = 0 ;
-#if 1   
+#if 1  
+    //signal ( SIGCHLD, SIG_IGN ) ;
     status = system ( str ) ;
-#elif 0  
+#elif 0
+    pid_t pid1 ;
+    pid_t pid2 ;
+
+    if ( pid1 = fork ( ) )
+    {
+        /* parent process A */
+        //waitpid ( pid1, &status, 0) ; //NULL ) ;
+        waitpid ( pid1, &status, WNOHANG ) ;
+    }
+    else if ( ! pid1 )
+    {
+        /* child process B */
+        if ( pid2 = fork ( ) )
+        {
+            exit ( 0 ) ;
+        }
+        else if ( ! pid2 )
+        {
+            /* child process C */
+            //execvp("something");
+            status = system ( str ) ;
+        }
+        else
+        {
+            /* error */
+        }
+    }
+    else
+    {
+        /* error */
+    }
+#elif 0
     char *cmd[] = { str, ( char * ) 0 } ; //{ "ls", "-l", ( char * ) 0 } ;
     char *env[] = { ( char * ) 0 } ; //{ "HOME=/usr/home", "LOGNAME=home", ( char * ) 0 } ;
     status = execve ( "", cmd, env ) ;
@@ -108,26 +141,27 @@ _ShellEscape ( char * str )
     {
         extern char **environ ;
         pid_t pid ;
-        char *argv[] = { ( char* ) "bash", ( char* ) "-c", str, NULL } ;
+        char *argv[] = { "sh", "-c", str, NULL } ;
         d0 ( _Q_->Verbosity = 2 ) ;
         if ( _Q_->Verbosity > 1 ) printf ( "\nposix_spawn :: command = %s\n", str ) ;
         //else printf ("\n") ;
 #if 0
-posix_spawn (pid_t *__restrict __pid,
-			const char *__restrict __path,
-			const posix_spawn_file_actions_t *__restrict
-			__file_actions,
-			const posix_spawnattr_t *__restrict __attrp,
-			char *const __argv[__restrict_arr],
-			char *const __envp[__restrict_arr]);
+        posix_spawn ( pid_t * __restrict __pid,
+            const char *__restrict __path,
+            const posix_spawn_file_actions_t * __restrict
+            __file_actions,
+            const posix_spawnattr_t * __restrict __attrp,
+            char *const __argv[__restrict_arr],
+            char *const __envp[__restrict_arr] ) ;
 #endif        
-        status = posix_spawn ( &pid, "/bin/bash", NULL, NULL, argv, environ ) ;
+        status = posix_spawn ( &pid, "/bin/sh", NULL, NULL, argv, environ ) ;
+        //status = system ( str ) ;
 #if 1        
         if ( status == 0 )
         {
             if ( _Q_->Verbosity > 1 ) printf ( "\nposix_spawn : child : pid = %d\n", pid ) ;
             //if ( wait ( &status ) != -1 ) //( waitpid ( pid, &status, 0 ) != - 1 )
-            if ( waitpid ( pid, &status, 0 ) != - 1 )
+            if ( waitpid ( pid, &status, WNOHANG ) != - 1 )
             {
                 if ( _Q_->Verbosity > 1 ) printf ( "\nposix_spawn : child : pid = %d : %s :: exited with status %d\n", pid, ( char* ) String_ConvertToBackSlash ( ( byte* ) str ), status ) ;
             }
@@ -158,44 +192,37 @@ ShellEscape_Postfix ( )
 #if 0
 
 void
-ShellEscape ( )
+shell ( )
 {
     //ReadLiner * rl = _Context_->ReadLiner0 ;
     //CString str = String_New ( ( CString ) & rl->InputLine [rl->ReadIndex], TEMPORARY ) ;
-    byte * str = _String_GetStringToEndOfLine ( ) ;
+    byte * str = _String_Get_ReadlineString_ToEndOfLine ( ) ;
+    char * semi, *nl ;
+    ReadLine_RunInit ( _ReadLiner_ ) ;
+    SetState ( _Lexer_, END_OF_FILE | END_OF_STRING | LEXER_END_OF_LINE, false ) ;
+    if ( semi = strchr ( str, ';' ) ) *semi = 0 ;
+    if ( nl = strchr ( str, '\n' ) ) *nl = 0 ;
     _ShellEscape ( ( char* ) str ) ;
-    //ReadLiner_CommentToEndOfLine ( rl ) ; //
-    //SetState ( _Context_->Lexer0, LEXER_DONE, true ) ;
-    //SetState ( _Context_->Interpreter0, END_OF_STRING, true ) ;
-    //SetState ( _Context_->Interpreter0, DONE, true ) ; // 
+    SetState ( _Context_->Interpreter0, DONE, true ) ; // 
 }
-#endif
 
-#if 1 // designed to be parallel to '$' in c_syntax.cft to compare the compiler output
-
-typedef struct
-{
-    char buf [ 256 ] ;
-} Buffer0 ;
+#elif 1 // designed to be parallel to '$' in c_syntax.cft to compare the compiler output
 
 void
 shell ( )
 {
+#if 0    
     Lexer * lexer = _Lexer_ ;
-    char * atoken, * buffer ;
-    Buffer0 buffer0 ;
-    buffer = buffer0.buf ;
-    memset ( buffer, 0, sizeof (Buffer0 ) ) ;
     sprintf ( buffer, "%s", "" ) ;
     SetState ( lexer, END_OF_FILE | END_OF_STRING | LEXER_END_OF_LINE, false ) ;
     do
     {
         while ( atoken = _Lexer_PeekNextNonDebugTokenWord ( lexer, 0 ) )
         {
-            if ( GetState ( lexer, END_OF_FILE | END_OF_STRING | LEXER_END_OF_LINE ) ) 
+            if ( GetState ( lexer, END_OF_FILE | END_OF_STRING | LEXER_END_OF_LINE ) )
             {
                 if ( String_Equal ( atoken, ";" ) ) Lexer_ReadToken ( lexer ) ;
-                break ; 
+                break ;
             }
             atoken = Lexer_ReadToken ( lexer ) ;
 
@@ -207,13 +234,23 @@ shell ( )
                     strcat ( buffer, " " ) ;
                 }
             }
-            else break ; 
+            else break ;
         }
         _ShellEscape ( buffer ) ;
     }
     while ( ! GetState ( _Context_->Lexer0, END_OF_FILE | END_OF_STRING | LEXER_END_OF_LINE ) ) ;
-    done :
+done:
     SetState ( lexer, END_OF_FILE | END_OF_STRING | LEXER_END_OF_LINE, false ) ;
+    SetState ( _Interpreter_, INTERPRETER_DONE, true ) ;
+#else
+    char * semi, *nl ;
+    byte * str = _String_Get_ReadlineString_ToEndOfLine ( ) ;
+    if ( semi = strchr ( str, ';' ) ) *semi = 0 ;
+    if ( nl = strchr ( str, '\n' ) ) *nl = 0 ;
+    SetState ( _Interpreter_, INTERPRETER_DONE, true ) ;
+    _ShellEscape ( str ) ;
+
+#endif
 }
 #endif
 
@@ -412,7 +449,7 @@ void
 CfrTil_FullRestart ( )
 {
     _Q_->Signal = 0 ;
-    OVT_Throw (0, INITIAL_START, 0 ) ;
+    OVT_Throw ( 0, INITIAL_START, 0 ) ;
 }
 
 void

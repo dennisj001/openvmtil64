@@ -50,5 +50,5 @@ CfrTil_StrCpy ( )
 void
 String_GetStringToEndOfLine ( )
 {
-    DataStack_Push ( (int64) _String_GetStringToEndOfLine ( ) ) ;
+    DataStack_Push ( (int64) _String_Get_ReadlineString_ToEndOfLine ( ) ) ;
 }

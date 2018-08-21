@@ -77,7 +77,18 @@ CalculateModRegardingDisplacement ( _mod,  disp | rmod ) // _mod/rmod avoid name
     //  00 000 000
     if ( _mod != REG )
     {
-#if 0
+#if 1 // c_syntax/preprocessor tesing
+        if ( disp == 0 ) rmod = 0 ;
+        else 
+        {   
+            if ( disp <= 0xff ) 
+                rmod = 1 ; 
+            else 
+            {
+                rmod = 2 ; 
+            }
+        }
+#elif 0
         //"\npreprocessor else\n" ps apause
         if ( disp == 0 ) 
         {
@@ -92,17 +103,6 @@ CalculateModRegardingDisplacement ( _mod,  disp | rmod ) // _mod/rmod avoid name
             else 
             {
                 //{| "\npreprocessor else\n" ps apause |}
-                rmod = 2 ; 
-            }
-        }
-#elif 1 // c_syntax/preprocessor tesing
-        if ( disp == 0 ) rmod = 0 ;
-        else 
-        {   
-            if ( disp <= 0xff ) 
-                rmod = 1 ; 
-            else 
-            {
                 rmod = 2 ; 
             }
         }
