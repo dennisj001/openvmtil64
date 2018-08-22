@@ -106,6 +106,7 @@
                    projectFiles="false"
                    kind="IMPORTANT_FILES_FOLDER">
       <itemPath>Makefile</itemPath>
+      <itemPath>../archive</itemPath>
       <itemPath>../init.cft</itemPath>
       <itemPath>nbproject/private/launcher.properties</itemPath>
       <itemPath>../m</itemPath>

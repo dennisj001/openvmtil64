@@ -73,6 +73,7 @@
         <in>interpreter.c</in>
         <in>interpreters.c</in>
         <in>lambdaCalculus.c</in>
+        <in>lambdaCalculus.new.c</in>
         <in>linux.c</in>
         <in>lists.c</in>
         <in>openVmTil.c</in>
