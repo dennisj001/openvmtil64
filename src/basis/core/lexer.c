@@ -649,7 +649,7 @@ AtFetch ( Lexer * lexer ) // ';':
 {
     Lexer_Default ( lexer ) ;
 
-    if ( _Q_->OVT_LC && GetState ( _Q_->OVT_LC, LC_READ ) ) Lexer_FinishTokenHere ( lexer ) ;
+    if ( _LC_ && GetState ( _LC_, LC_READ ) ) Lexer_FinishTokenHere ( lexer ) ;
 }
 
 void
@@ -718,29 +718,6 @@ Dot ( Lexer * lexer ) //  '.':
 }
 
 void
-Lexer_DoReplMacro ( Lexer * lexer )
-{
-    ReadLine_UnGetChar ( lexer->ReadLiner0 ) ; // let the repl re-get the char 
-    Lexer_FinishTokenHere ( lexer ) ;
-    LO_ReadEvalPrint ( ) ;
-    SetState ( lexer, LEXER_RETURN_NULL_TOKEN, true ) ;
-
-    return ;
-}
-
-void
-Lexer_CheckMacroRepl ( Lexer * lexer )
-{
-    byte nextChar = ReadLine_PeekNextNonWhitespaceChar ( lexer->ReadLiner0 ) ;
-    if ( ( nextChar == '(' ) ) //|| ( nextChar == ',' ) )
-    {
-        Lexer_DoReplMacro ( lexer ) ;
-
-        return ;
-    }
-}
-
-void
 Comma ( Lexer * lexer )
 {
     if ( GetState ( _Context_, C_SYNTAX | INFIX_MODE ) && lexer->TokenWriteIndex )
@@ -752,7 +729,7 @@ Comma ( Lexer * lexer )
     {
         if ( _Lexer_MacroChar_NamespaceCheck ( lexer, ( byte* ) "Lisp" ) )
         {
-            if ( _Q_->OVT_LC )
+            if ( _LC_ )
             {
                 byte nextChar = ReadLine_PeekNextNonWhitespaceChar ( lexer->ReadLiner0 ) ;
                 if ( nextChar == '@' )

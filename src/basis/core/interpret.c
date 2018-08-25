@@ -182,7 +182,7 @@ Boolean
 Interpreter_IsWordPrefixing ( Interpreter * interp, Word * word )
 {
     if ( GetState ( _Context_, LC_INTERPRET ) ) return true ;
-    else if ( ( GetState ( _Context_, PREFIX_MODE ) ) && ( ! _Q_->OVT_LC ) && ( ! ( word->CAttribute & KEYWORD ) ) && ( ! ( word->WAttribute & WT_C_PREFIX_RTL_ARGS ) ) ) //_Namespace_IsUsing ( _CfrTil_->LispNamespace ) ) )
+    else if ( ( GetState ( _Context_, PREFIX_MODE ) ) && ( ! _LC_ ) && ( ! ( word->CAttribute & KEYWORD ) ) && ( ! ( word->WAttribute & WT_C_PREFIX_RTL_ARGS ) ) ) //_Namespace_IsUsing ( _CfrTil_->LispNamespace ) ) )
     {
         return _Interpreter_IsWordPrefixing ( interp, word ) ;
     }

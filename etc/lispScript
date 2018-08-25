@@ -13,6 +13,7 @@ nl
 (yfacc yfacc 7) nl //pause
 (define fibc (lambda ( n ) (ifElse (< n 2) n (+ (fibc (- n 1)) (fibc (- n 2))))))
 (fibc 20)
+lcReset
 lispOff 
 //pause
 : fac ( n  | rec1 -- TOS ) 

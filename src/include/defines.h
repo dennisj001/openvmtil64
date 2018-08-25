@@ -655,6 +655,7 @@
 #define LC_READ_LAMBDA_LOCALS   ( (uint64) 1 << 16 )
 #define LC_LAMBDA_COMPILE_MODE  ( (uint64) 1 << 17 )
 #define LC_EVAL_APPLY           ( (uint64) 1 << 18 )
+#define LC_DONE                 ( (uint64) 1 << 19 )
 
 // LambdaBody states
 #define USED ( 1<< 0 )

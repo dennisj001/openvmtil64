@@ -372,7 +372,7 @@ Root
 '_doDemo 0 const    
 'todo 0 const    
 dbgOff
-//dbgOn 
+dbgOn 
 #if Is_DebugOn 
 
 #if todo
@@ -391,10 +391,38 @@ stringMacrosOff
 // of course you can trim this file to your needs and put your personal init code here maybe
 Lisp
 '( 1 2 ( 3 4 ) 5 6 ( 7 ( 8 ( 9 ) 10 11 ) ( ( ( ( 12 ) ) 121 ) ) 13 ( 14 ) ) 15 ( 16 ( 17 ( 18 ) ) ) ) nl
-d: '( 1 2 ( 3 4 ) 5 6 ( 7 ( 8 ( 9 ) 10 11 ) ( ( ( ( 12 ) ) 121 ) 122 ) 13 ( 14 ( 141 ) ) 15 ( 16 (161 (162 (163)) ) ( 17 ( 18 ) ) ) ) ) nl
+'( 1 2 ( 3 4 ) 5 6 ( 7 ( 8 ( 9 ) 10 11 ) () ( ( ( ( 12 ) ) 121 ) 122 ) 13 ( 14 ( 141 ) ) 15 ( 16 (161 (162 (163)) ) ( 17 ( 18 ) ) ) ) ) nl
+'( 1 2 ( 3 4 ) 5 6 ( 7 ( 8 ( 9 ) 10 11 ) ( ( ( ( 12 ) ) 121 ) ) 13 ( 14 ) ) 15 ( 16 ( 17 ( 18 ) ) ) ) nl
+'( 1 2 ( 3 4 ) 5 6 ( 7 ( 8 ( 9 ) 10 11 ) () ( ( ( ( 12 ) ) 121 ) 122 ) 13 ( 14 ( 141 ) ) 15 ( 16 (161 (162 (163)) ) ( 17 ( 18 ) ) ) ) ) nl
+( 1 2 )
+( 1 2 ( 3 4 ) 5 6 ( 7 ( 8 ( 9 ) 10 11 ) ( ( ( ( 12 ) ) ) ) 13 ( 14 ) ) 15 ( 16 ( 17 ( 18 ) ) ) ) nl //pause
 ( 1 2 ( 3 4 ) 5 6 ( 7 ( 8 ( 9 ) 10 11 ) ( ( ( ( 12 ) ) ) ) 13 ( 14 ) ) 15 ( 16 ( 17 ( 18 ) ) ) ) nl //pause
 lispOff
 #endif
+//: nl newline location ;
+Lisp
+(fib 20) (fib2 20)
+(define x "let") (define a "the") // 'let' is a special word
+(define x1 'let) (define a1 the)
+sp
+nl ( Its 'a beautiful day don\'t 'let it get away )
+nl '( Its a beautiful day don\'t let it get away )
+nl '( Its a beautiful day don\'t @x1 it get away ) 
+nl `( ,Its ,a ,beautiful ,day ,don\'t ,@x1 ,it ,get ,away )
+nl `( Its ,a beautiful day don\'t ,x it get away ) "\ntesting unquote (',') above line should show : ( Its a beautiful day don't x it get away )" ps
+nl `( Its 'a beautiful day don\'t ,x1 it get away ) "\ntesting unquote (',') above line should show :  ( Its a beautiful day don't x1 it get away )" ps
+nl `( Its a beautiful day don\'t ,@x it get away )
+nl `( Its a beautiful day don\'t ,@x1 it get away )
+(define yfac (lambda (yy n) (if* (< n 2) 1 (* n (yy yy (- n 1)))))) 
+(yfac yfac 10) nl
+(define yfacc (lambda (yyy n1) (if* (< n1 2) (1) (* n1 (yyy yyy (- n1 1)))))) 
+(yfacc yfacc 10) nl
+(yfacc yfacc 7) nl //pause
+(define fibc (lambda ( n ) (ifElse (< n 2) n (+ (fibc (- n 1)) (fibc (- n 2))))))
+(fibc 20)
+sp
+lispOff  
+lcReset
 2 + 7  assertStkChk // stack checking
 Shell
 s

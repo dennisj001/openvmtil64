@@ -99,8 +99,8 @@ _Namespace_Do_C_Type ( Namespace * ns )
             Compiler_Get_C_BackgroundNamespace ( compiler ) ;
             if ( GetState ( cntx, C_SYNTAX ) )
             {
-                LambdaCalculus * svlc = _Q_->OVT_LC ;
-                _Q_->OVT_LC = 0 ;
+                LambdaCalculus * svlc = _LC_ ;
+                _LC_ = 0 ;
                 // ?? parts of this could be screwing up other things and adds an unnecessary level of complexity
                 // for parsing C functions 
                 token1 = _Lexer_NextNonDebugOrCommentTokenWord ( lexer, 1, 0 ) ; // ? peekFlag ?
@@ -178,7 +178,7 @@ _Namespace_Do_C_Type ( Namespace * ns )
                         }
                     }
                 }
-                _Q_->OVT_LC = svlc ;
+                _LC_ = svlc ;
             }
         }
         else _Namespace_DoNamespace ( ns, 1 ) ;
@@ -411,7 +411,7 @@ _CfrTil_Do_Variable ( Word * word )
     Context * cntx = _Context_ ;
     // since we can have multiple uses of the same word in a block we make copies in Compiler_CheckAndCopyDuplicates 
     // so be sure to use the current copy on top of the WordStack
-    if ( CompileMode && GetState ( _CfrTil_, OPTIMIZE_ON ) && ( ! _Q_->OVT_LC ) ) word = CfrTil_WordList ( 0 ) ; //_Context_->CurrentlyRunningWord ; //WordStack ( 0 ) ;
+    if ( CompileMode && GetState ( _CfrTil_, OPTIMIZE_ON ) && ( ! _LC_ ) ) word = CfrTil_WordList ( 0 ) ; //_Context_->CurrentlyRunningWord ; //WordStack ( 0 ) ;
     if ( ! ( word->CAttribute & ( NAMESPACE_VARIABLE ) ) )
     {
         if ( word->CAttribute & ( OBJECT | THIS | QID ) || GetState ( word, QID ) ) //Finder_GetQualifyingNamespace ( cntx->Finder0 ) )

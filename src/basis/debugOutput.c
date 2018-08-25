@@ -150,9 +150,12 @@ _Debugger_Locals_Show ( Debugger * debugger, Word * scWord )
             dlnode_Remove ( ( dlnode* ) svNamespace ) ; //nb! must! else _Namespace_FindOrNew_Local will find and continue to use it 
 
             _Debugger_ReadLocals ( debugger, lexer, rl, scWord, sc ) ;
-            if ( ( sc && debugger->LocalsNamespacesStack ) ) _Debugger_Locals_Show_Loop ( debugger, scWord ) ;
-            else _Printf ( ( byte* ) "\nTry stepping a couple of instructions and try again." ) ;
-
+            Namespace * ns = _Compiler_->LocalsNamespace ;
+            if ( ns )
+            {
+                if ( ( sc && debugger->LocalsNamespacesStack ) ) _Debugger_Locals_Show_Loop ( debugger, scWord ) ;
+                else _Printf ( ( byte* ) "\nTry stepping a couple of instructions and try again." ) ;
+            }
             // still problems here ?? make sure *everything* is reset 
             _Namespace_RemoveFromUsingListAndClear ( debugger->LocalsNamespace ) ;
             _Namespace_FreeNamespacesStack ( debugger->LocalsNamespacesStack ) ;

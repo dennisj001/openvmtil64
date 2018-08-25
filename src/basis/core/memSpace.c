@@ -282,9 +282,8 @@ _OVT_Find_NBA ( byte * name )
 // fuzzy still but haven't yet needed to adjust this one
 
 void
-OVT_MemList_FreeNBAMemory ( byte * name, uint64 moreThan, int64 always )
+_OVT_MemList_FreeNBAMemory ( NamedByteArray *nba, uint64 moreThan, int64 always )
 {
-    NamedByteArray *nba = _OVT_Find_NBA ( name ) ;
     if ( nba && ( always || ( nba->MemAllocated > ( nba->MemInitial + moreThan ) ) ) ) // this logic is fuzzy ?? what is wanted is a way to fine tune mem allocation 
     {
         dlnode * node, *nodeNext ;
@@ -312,6 +311,13 @@ OVT_MemList_FreeNBAMemory ( byte * name, uint64 moreThan, int64 always )
         }
         nba->InitFreedRandMarker = rand ( ) ;
     }
+}
+
+void
+OVT_MemList_FreeNBAMemory ( byte * name, uint64 moreThan, int64 always )
+{
+    NamedByteArray *nba = _OVT_Find_NBA ( name ) ;
+    _OVT_MemList_FreeNBAMemory ( nba, moreThan, always ) ;
 }
 
 void

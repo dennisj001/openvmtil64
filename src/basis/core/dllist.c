@@ -158,9 +158,9 @@ _dlnode_New ( uint64 allocType )
     return node ;
 }
 
-// toward the TailNode
+// toward the TailNode - after
 #define _dlnode_Next( node ) node->afterNode
-// toward the HeadNode
+// toward the HeadNode - before
 #define _dlnode_Previous( node ) node->beforeNode
 
 // toward the TailNode

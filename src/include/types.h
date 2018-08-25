@@ -703,9 +703,9 @@ typedef struct
     int64 rtrn, NumberOfArgs ;
     uint16 ControlFlags ;
     Word *opWord, *wordn, *wordm, *wordArg1, *wordArg2, *xBetweenArg1AndArg2, *wordArg0_ForOpEqual ;
-    dlnode * node, *nodem, *wordNode, *nextNode, *wordArg2Node, *wordArg1Node ; 
+    dlnode * node, *nodem, *wordNode, *nextNode, *wordArg2Node, *wordArg1Node ;
     Boolean rvalue, wordArg1_rvalue, wordArg2_rvalue, wordArg1_literal, wordArg2_literal ;
-    Boolean wordOp, wordArg1_Op, wordArg2_Op ; 
+    Boolean wordOp, wordArg1_Op, wordArg2_Op ;
     // CompileOptimizeInfo State values
 #define ACC_1L                   ( (uint64) 1 << 1 )              
 #define ACC_1R                   ( (uint64) 1 << 2 )              
@@ -779,8 +779,8 @@ typedef struct Interpreter
     Lexer * Lexer0 ;
     Compiler * Compiler0 ;
     byte * Token ;
-    Word *w_Word, *LastWord ; 
-    Word * BaseObject ; 
+    Word *w_Word, *LastWord ;
+    Word * BaseObject ;
     Word *CurrentObjectNamespace, *ThisNamespace ;
     int64 WordType ;
     dllist * InterpList ;
@@ -796,9 +796,9 @@ typedef struct _Debugger
     int64 SaveTOS ;
     int64 SaveStackDepth ;
     int64 Key ;
-    int64 SaveKey ; 
+    int64 SaveKey ;
     int64 TokenStart_ReadLineIndex, Esi, Edi ;
-    Word * w_Word, *EntryWord, *LastShowWord, *LastEffectsWord, *NextEvalWord ; 
+    Word * w_Word, *EntryWord, *LastShowWord, *LastEffectsWord, *NextEvalWord ;
     Word *LocalsNamespace, *LastSetupWord, *SteppedWord, *CurrentlyRunningWord, *LastSourceCodeWord ;
     byte * Token ;
     block SaveCpuState ;
@@ -817,7 +817,7 @@ typedef struct _Debugger
     Stack * LocalsNamespacesStack ;
     dllist * DebugWordList ;
     uint64 LevelBitNamespaceMap ;
-    sigjmp_buf JmpBuf0 ;  
+    sigjmp_buf JmpBuf0 ;
 } Debugger ;
 typedef struct
 {
@@ -864,19 +864,19 @@ typedef struct _CombinatorInfo
         } ;
     } ;
 } CombinatorInfo ;
+
 struct _CfrTil ;
 typedef struct _LambdaCalculus
 {
     uint64 State ;
-    int64 DontCopyFlag, Loop, LispParenLevel ;
+    int64 DontCopyFlag, Loop, ParenLevel ;
     Namespace * LispTemporariesNamespace, *LispNamespace ;
-    ListObject *lFunction, *lArgs, *lFirst, * Nil, *True, *CurrentList, *CurrentLambdaFunction, *LastInterpretedWord ; //, *ListFirst;
+    ListObject *lFunction, *lArgs, *lFirst, * Nil, *True, *List, *LNew, *LParenList, *ReturnList, *CurrentLambdaFunction, *LastInterpretedWord ; //, *ListFirst;
     ByteArray * SavedCodeSpace ;
     uint64 ItemQuoteState, QuoteState ;
     struct _CfrTil * OurCfrTil ;
     Stack * QuoteStateStack ;
     int64 * SaveStackPointer ;
-    struct _LambdaCalculus * SaveLC ;
     byte * LC_SourceCode ;
 } LambdaCalculus ;
 typedef struct
@@ -1071,7 +1071,6 @@ typedef struct
     const char *NameSpace ;
     const char * SuperNamespace ;
 } CPrimitive ;
-
 typedef struct
 {
     const char * ccp_Name ;

@@ -79,7 +79,7 @@ _Compiler_RemoveLocalFrame ( Compiler * compiler )
     Compiler_SetLocalsFrameSize_AtItsCellOffset ( compiler ) ;
     parameterVarsSubAmount = ( ( compiler->NumberOfArgs ) * CELL ) ;
     returnValueFlag = ( _Context_->CurrentlyRunningWord->CAttribute & C_RETURN ) || ( GetState ( compiler, RETURN_TOS | RETURN_ACCUM ) ) || IsWordRecursive || compiler->ReturnVariableWord ;
-    if ( ! _Q_->OVT_LC ) one = WordStack ( 1 ) ;
+    if ( ! _LC_ ) one = WordStack ( 1 ) ;
     else one = 0 ;
     if ( ( ! returnValueFlag ) && GetState ( _Context_, C_SYNTAX ) && ( _CfrTil_->CurrentWordCompiling->S_ContainingNamespace ) && ( ! String_Equal ( _CfrTil_->CurrentWordCompiling->S_ContainingNamespace->Name, "void" ) ) )
     {
