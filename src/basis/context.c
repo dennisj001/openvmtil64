@@ -217,6 +217,7 @@ _Context_IncludeFile ( Context * cntx, byte *filename, int64 interpretFlag )
             ReadLine_ReadFileIntoAString ( rl, file ) ;
             fclose ( file ) ;
 
+            //OVT_MemListFree_LispTemp ( ) ; // more careful allocation accounting work needs to be done before something like this can be done now
             if ( interpretFlag ) Interpret_UntilFlaggedWithInit ( cntx->Interpreter0, END_OF_STRING ) ;
 
             cntx->System0->IncludeFileStackNumber -- ;

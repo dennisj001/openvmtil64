@@ -389,7 +389,11 @@ stringMacrosOff
 
 #else
 // of course you can trim this file to your needs and put your personal init code here maybe
+
+#if 0
 Lisp
+( set zs1 77 abc 7 )
+d: ( set zs1 77 abc 7 )
 '( 1 2 ( 3 4 ) 5 6 ( 7 ( 8 ( 9 ) 10 11 ) ( ( ( ( 12 ) ) 121 ) ) 13 ( 14 ) ) 15 ( 16 ( 17 ( 18 ) ) ) ) nl
 '( 1 2 ( 3 4 ) 5 6 ( 7 ( 8 ( 9 ) 10 11 ) () ( ( ( ( 12 ) ) 121 ) 122 ) 13 ( 14 ( 141 ) ) 15 ( 16 (161 (162 (163)) ) ( 17 ( 18 ) ) ) ) ) nl
 '( 1 2 ( 3 4 ) 5 6 ( 7 ( 8 ( 9 ) 10 11 ) ( ( ( ( 12 ) ) 121 ) ) 13 ( 14 ) ) 15 ( 16 ( 17 ( 18 ) ) ) ) nl
@@ -398,10 +402,6 @@ Lisp
 ( 1 2 ( 3 4 ) 5 6 ( 7 ( 8 ( 9 ) 10 11 ) ( ( ( ( 12 ) ) ) ) 13 ( 14 ) ) 15 ( 16 ( 17 ( 18 ) ) ) ) nl //pause
 ( 1 2 ( 3 4 ) 5 6 ( 7 ( 8 ( 9 ) 10 11 ) ( ( ( ( 12 ) ) ) ) 13 ( 14 ) ) 15 ( 16 ( 17 ( 18 ) ) ) ) nl //pause
 lispOff
-#endif
-//: nl newline location ;
-Lisp
-(fib 20) (fib2 20)
 (define x "let") (define a "the") // 'let' is a special word
 (define x1 'let) (define a1 the)
 sp
@@ -421,8 +421,12 @@ nl `( Its a beautiful day don\'t ,@x1 it get away )
 (define fibc (lambda ( n ) (ifElse (< n 2) n (+ (fibc (- n 1)) (fibc (- n 2))))))
 (fibc 20)
 sp
-lispOff  
 lcReset
+lispOff  
+#endif
+
+#endif
+//: nl newline location ;
 2 + 7  assertStkChk // stack checking
 Shell
 s

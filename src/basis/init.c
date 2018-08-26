@@ -23,6 +23,7 @@ _CfrTil_Init_SessionCore ( CfrTil * cfrTil, int64 cntxDelFlag, int64 promptFlag 
         for ( i = 0 ; i < stackDepth ; i ++ ) CfrTil_Context_PopDelete ( cfrTil ) ;
     }
     OVT_FreeTempMem ( ) ;
+    LC_Reset ( ) ;
     CfrTil_CheckInitDataStack ( ) ;
     if ( ! _Q_->Verbosity ) _Q_->Verbosity = 1 ;
     _OVT_Ok ( promptFlag ) ;
