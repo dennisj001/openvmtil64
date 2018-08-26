@@ -49,7 +49,7 @@ sp
 
 ( set zs1 77 abc 7 )
 sp
-(f4 (f3 zs1) ) 
+TODO ( "(f4 (f3 zs1) )" ) // (f4 (f3 zs1) )
 sp
 (quote zs1)
 

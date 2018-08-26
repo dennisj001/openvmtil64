@@ -286,7 +286,7 @@ dscOn //verbosity 3 =
 : assertStkChk _assertStkChk ; //"\n_assertStkChk : " ps stack pause ; 
 scOff
 //' _assertStkChk find wdiss //pause
-: TODO ( str ) nl nl pdl nl str @ adps location nl pdl nl nl { dbgOnVar @ } { sp } if2 ;; //pause ;;
+: TODO ( str ) nl nl pdl nl str @ adps location nl pdl nl nl { dbgOnVar @ } { sp } if2 pause ;;
 Root
 User 
 : pause nl _pause ;
