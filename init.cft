@@ -420,7 +420,7 @@ nl `( Its a beautiful day don\'t ,@x1 it get away )
 (define fibc (lambda ( n ) (ifElse (< n 2) n (+ (fibc (- n 1)) (fibc (- n 2))))))
 (fibc 20)
 sp
-lcReset
+
 lispOff  
 #endif
 

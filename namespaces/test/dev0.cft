@@ -1,10 +1,12 @@
 
-bnOff dbgOff
+Int 
 5 
-: sp ; //stack pause ;
+bnOff dbgOff
+Root : sp ; //stack pause ;
+C : sp ; //stack pause ;
 dbOn 0 =
-
 User Lisp
+: sp ; //stack pause ;
 1 opOn // this currently requires the optimization to be on to compile correctly 
 // verbosity 2 = 
 // echoOn
@@ -397,22 +399,22 @@ fac5 ( REG n  | REG facc )
 wdiss ( ' fac5 find ) 
 fac5 ( 7 ) dup p 5040 _assert //pause
 dscOff
-c_syntaxOff
 sp
-//verbosity 3 =
-c_syntaxOn
 Root
-int cpow ( base power | out ) for ( out = 1 ; power ; ( power -= 1 ) ) { out = out * base ; } return out ; 
+c_syntaxOn
+int cpow ( base power | out ) { for ( out = 1 ; power ; ( power -= 1 ) ) { out = out * base ; } return out } prefix
 //int cpow ( base power | out ) { for ( out = 1 ; power ; power -= 1 ) { out = out * base ; } return out ; }
-cpow (2 30 ) "2 ^ 30 : " ps p sp
+sp
+cpow (2 30 ) "2 ^ 30 : " ps p 
 c_syntaxOff 
+sp
 s: pow0 ( base power | out ) { out 1 = } { power @ 0 > } { power power @ 1 - = } { out out @ base @ * = } for return out ;s
 s: pow ( base power | out ) { out 1 = } { power @ 0 > } { power 1 -= } { out out @ base @ * = } for return out ;s
 //: pow ( base power | out ) { out 1 = } { power @ 0 > } { power power @ 1 - = } { out out @ base @ * = } for return out ;
 2 30 pow0 p //pause
 2 30 pow p //pause
 scOff
-//pause
+sp
 Lisp
 BigNum
 (define yfac (lambda (yy n) (if* (< n 2) 1 (* n (yy yy (- n 1)))))) // code from : http://www.newlisp.org/index.cgi?Y_Function
@@ -549,6 +551,7 @@ sp
 ' fibBN find wdiss
 20 fibBN dup p 6765 _assert 
 #endif
+
 2 + 7 assertStkChk // stack checking
 
 location "\nending Lisp\n" ps s //ddps s
