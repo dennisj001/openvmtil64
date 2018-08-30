@@ -6,7 +6,7 @@
 #define NEW_LC_COMPILE 0
 
 ListObject *
-LO_Apply (LambdaCalculus * lc, ListObject *lfirst, ListObject *lfunction, ListObject *largs, Boolean applyFlag )
+LO_Apply ( LambdaCalculus * lc, ListObject *lfirst, ListObject *lfunction, ListObject *largs, Boolean applyFlag )
 {
     SetState ( lc, LC_APPLY, true ) ;
     ListObject *l0 ;
@@ -21,7 +21,7 @@ LO_Apply (LambdaCalculus * lc, ListObject *lfirst, ListObject *lfunction, ListOb
         LO_Substitute ( _LO_First ( ( ListObject * ) lfunction->Lo_LambdaFunctionParameters ), _LO_First ( largs ) ) ;
         lc->CurrentLambdaFunction = lfunction ;
         l0 = ( ListObject * ) lfunction->Lo_LambdaFunctionBody ;
-        l0 = LO_EvalList (lc, l0, largs, applyFlag ) ;
+        l0 = LO_EvalList ( lc, l0, largs, applyFlag ) ;
     }
 #if NEW_LC_COMPILE  
     else if ( CompileMode && applyFlag && lfunction && lc->CurrentLambdaFunction && ( lfunction->CAttribute & T_LISP_SYMBOL ) )
@@ -355,6 +355,84 @@ LO_CheckBeginBlock ( )
 }
 
 int64
+_LO_Apply_ArrayArg ( LambdaCalculus * lc, ListObject ** pl1, int64 i )
+{
+    Context * cntx = _Context_ ;
+    ListObject *l1 = * pl1 ;
+    Word * word = l1 ;
+    // nb! this block is just CfrTil_ArrayBegin in arrays.c -- refactor??
+    // ?needs :: Compiler_CopyDuplicatesAndPush somewhere
+    Interpreter * interp = cntx->Interpreter0 ;
+    Word * arrayBaseObject = ( ( Word * ) ( LO_Previous ( l1 ) ) )->Lo_CfrTilWord ;
+    Word *baseObject = interp->BaseObject ;
+    if ( arrayBaseObject )
+    {
+        Compiler *compiler = cntx->Compiler0 ;
+        int64 objSize = 0, increment = 0, variableFlag ;
+        int64 svcm = GetState ( compiler, COMPILE_MODE ) ;
+        if ( ( ! arrayBaseObject->ArrayDimensions ) ) CfrTil_Exception ( ARRAY_DIMENSION_ERROR, 0, QUIT ) ;
+        if ( interp->CurrentObjectNamespace ) objSize = interp->CurrentObjectNamespace->Size ; //_CfrTil_VariableValueGet ( _Context_->Interpreter0->CurrentClassField, ( byte* ) "size" ) ; 
+        if ( ! objSize )
+        {
+            CfrTil_Exception ( OBJECT_SIZE_ERROR, 0, QUIT ) ;
+        }
+        variableFlag = _CheckArrayDimensionForVariables_And_UpdateCompilerState ( ) ;
+        _WordList_Pop ( _CfrTil_->CompilerWordList ) ; // pop the initial '['
+        do
+        {
+            word = l1 ;
+            byte * token = word->Name ;
+            if ( Do_NextArrayWordToken ( word, token, arrayBaseObject, objSize, svcm, &variableFlag ) ) break ;
+        }
+        while ( l1 = LO_Next ( l1 ) ) ;
+        *pl1 = l1 ;
+        compiler->ArrayEnds = 0 ; // reset for next array word in the current word being compiled
+        interp->BaseObject = baseObject ; //arrayBaseObject ; // nb. : _Context_->Interpreter0->baseObject is reset by the interpreter by the types of words between array brackets
+        if ( CompileMode )
+        {
+            if ( ! variableFlag )
+            {
+                SetHere ( baseObject->Coding, 1 ) ;
+                _Compile_GetVarLitObj_LValue_To_Reg ( baseObject, ACC ) ;
+                _Word_CompileAndRecord_PushReg ( baseObject, ACC ) ;
+            }
+            if ( Is_DebugModeOn ) Word_PrintOffset ( word, increment, baseObject->AccumulatedOffset ) ;
+            if ( baseObject->StackPushRegisterCode ) SetHere ( baseObject->StackPushRegisterCode, 1 ) ;
+            Compile_Move_Reg_To_Reg ( RegOrder ( i ++ ), ACC ) ;
+            _Debugger_->PreHere = baseObject->Coding ;
+            _DEBUG_SHOW ( baseObject, 1 ) ;
+        }
+        interp->BaseObject = 0 ;
+    }
+    return i ;
+}
+
+int64
+_LO_Apply_NonMorphismArg ( LambdaCalculus * lc, ListObject ** pl1, int64 i )
+{
+    Context * cntx = _Context_ ;
+    ListObject *l1 = * pl1 ;
+    Word * word = l1 ;
+    word = l1->Lo_CfrTilWord ;
+    word = Compiler_CopyDuplicatesAndPush ( word ) ;
+    word->W_SC_Index = l1->W_SC_Index ;
+    byte * here = Here ;
+    Word_Eval ( word ) ; // ?? move value directly to RegOrder reg
+    Word *baseObject = _Interpreter_->BaseObject ;
+    if ( ( word->Name[0] == '\"' ) || ( ! _Lexer_IsTokenForwardDotted ( cntx->Lexer0, l1->W_RL_Index + Strlen ( word->Name ) - 1 ) ) ) // ( word->Name[0] == '\"' ) : sometimes strings have ".[]" chars within but are still just strings
+    {
+        if ( word->StackPushRegisterCode ) SetHere ( word->StackPushRegisterCode, 1 ) ;
+        else if ( baseObject && baseObject->StackPushRegisterCode ) SetHere ( baseObject->StackPushRegisterCode, 1 ) ;
+        Compile_Move_Reg_To_Reg ( RegOrder ( i ++ ), ACC ) ;
+        if ( baseObject ) _Debugger_->PreHere = baseObject->Coding ;
+        SetState ( cntx, ADDRESS_OF_MODE, false ) ;
+        _Debugger_->PreHere = here ;
+        _DEBUG_SHOW ( word, 1 ) ;
+    }
+    return i ;
+}
+
+int64
 _LO_Apply_Arg ( LambdaCalculus * lc, ListObject ** pl1, int64 i )
 {
     Context * cntx = _Context_ ;
@@ -364,91 +442,17 @@ _LO_Apply_Arg ( LambdaCalculus * lc, ListObject ** pl1, int64 i )
     Set_CompileMode ( true ) ;
     if ( l1->LAttribute & ( LIST | LIST_NODE ) )
     {
-        // ?needs :: Compiler_CopyDuplicatesAndPush somewhere
         Set_CompileMode ( false ) ;
         l2 = LO_Eval ( lc, l1 ) ;
         _Debugger_->PreHere = Here ;
-        if ( ! l2 || ( l2->LAttribute & T_NIL ) )
-        {
-            Compile_MoveImm_To_Reg ( RegOrder ( i ++ ), DataStack_Pop ( ), CELL_SIZE ) ;
-        }
-        else
-        {
-            Compile_MoveImm_To_Reg ( RegOrder ( i ++ ), ( int64 ) * l2->Lo_PtrToValue, CELL_SIZE ) ;
-        }
+        if ( ! l2 || ( l2->LAttribute & T_NIL ) ) Compile_MoveImm_To_Reg ( RegOrder ( i ++ ), DataStack_Pop ( ), CELL_SIZE ) ;
+        else Compile_MoveImm_To_Reg ( RegOrder ( i ++ ), ( int64 ) * l2->Lo_PtrToValue, CELL_SIZE ) ;
         _DEBUG_SHOW ( l2, 1 ) ;
     }
-    //else if ( ( l1->CAttribute2 & T_OBJECT ) || ( l1->CAttribute & NON_MORPHISM_TYPE ) ) // and literals, etc.
-    else if ( ( l1->CAttribute & NON_MORPHISM_TYPE ) ) // and literals, etc.
-    {
-        word = l1->Lo_CfrTilWord ;
-        word = Compiler_CopyDuplicatesAndPush ( word ) ;
-        word->W_SC_Index = l1->W_SC_Index ;
-        byte * here = Here ;
-        Word_Eval ( word ) ; // ?? move value directly to RegOrder reg
-        Word *baseObject = _Interpreter_->BaseObject ;
-        if ( ( word->Name[0] == '\"' ) || ( ! _Lexer_IsTokenForwardDotted ( cntx->Lexer0, l1->W_RL_Index + Strlen ( word->Name ) - 1 ) ) ) // ( word->Name[0] == '\"' ) : sometimes strings have ".[]" chars within but are still just strings
-        {
-            if ( word->StackPushRegisterCode ) SetHere ( word->StackPushRegisterCode, 1 ) ;
-            else if ( baseObject && baseObject->StackPushRegisterCode ) SetHere ( baseObject->StackPushRegisterCode, 1 ) ;
-            Compile_Move_Reg_To_Reg ( RegOrder ( i ++ ), ACC ) ;
-            if ( baseObject ) _Debugger_->PreHere = baseObject->Coding ;
-            SetState ( cntx, ADDRESS_OF_MODE, false ) ;
-            _Debugger_->PreHere = here ;
-            _DEBUG_SHOW ( word, 1 ) ;
-        }
-    }
-    else if ( ( l1->Name [0] == '.' ) || ( l1->Name [0] == '&' ) )
-    {
+    else if ( ( l1->CAttribute & NON_MORPHISM_TYPE ) )  i = _LO_Apply_NonMorphismArg ( lc, pl1, i ) ;
+    else if ( ( l1->Name [0] == '.' ) || ( l1->Name [0] == '&' ) ) 
         _Interpreter_DoWord ( cntx->Interpreter0, l1->Lo_CfrTilWord, l1->W_RL_Index, l1->W_SC_Index ) ;
-    }
-    else if ( ( l1->Name[0] == '[' ) )
-    {
-        // nb! this block is just CfrTil_ArrayBegin in arrays.c -- refactor??
-        // ?needs :: Compiler_CopyDuplicatesAndPush somewhere
-        Interpreter * interp = _Context_->Interpreter0 ;
-        Word * arrayBaseObject = ( ( Word * ) ( LO_Previous ( l1 ) ) )->Lo_CfrTilWord ;
-        Word *baseObject = interp->BaseObject ;
-        if ( arrayBaseObject )
-        {
-            Compiler *compiler = _Context_->Compiler0 ;
-            int64 objSize = 0, increment = 0, variableFlag ;
-            int64 svcm = GetState ( compiler, COMPILE_MODE ) ;
-            if ( ( ! arrayBaseObject->ArrayDimensions ) ) CfrTil_Exception ( ARRAY_DIMENSION_ERROR, 0, QUIT ) ;
-            if ( interp->CurrentObjectNamespace ) objSize = interp->CurrentObjectNamespace->Size ; //_CfrTil_VariableValueGet ( _Context_->Interpreter0->CurrentClassField, ( byte* ) "size" ) ; 
-            if ( ! objSize )
-            {
-                CfrTil_Exception ( OBJECT_SIZE_ERROR, 0, QUIT ) ;
-            }
-            variableFlag = _CheckArrayDimensionForVariables_And_UpdateCompilerState ( ) ;
-            _WordList_Pop ( _CfrTil_->CompilerWordList ) ; // pop the initial '['
-            do
-            {
-                word = l1 ;
-                byte * token = word->Name ;
-                if ( Do_NextArrayWordToken ( word, token, arrayBaseObject, objSize, svcm, &variableFlag ) ) break ;
-            }
-            while ( l1 = LO_Next ( l1 ) ) ;
-            *pl1 = l1 ;
-            compiler->ArrayEnds = 0 ; // reset for next array word in the current word being compiled
-            interp->BaseObject = baseObject ; //arrayBaseObject ; // nb. : _Context_->Interpreter0->baseObject is reset by the interpreter by the types of words between array brackets
-            if ( CompileMode )
-            {
-                if ( ! variableFlag )
-                {
-                    SetHere ( baseObject->Coding, 1 ) ;
-                    _Compile_GetVarLitObj_LValue_To_Reg ( baseObject, ACC ) ;
-                    _Word_CompileAndRecord_PushReg ( baseObject, ACC ) ;
-                }
-                if ( Is_DebugModeOn ) Word_PrintOffset ( word, increment, baseObject->AccumulatedOffset ) ;
-                if ( baseObject->StackPushRegisterCode ) SetHere ( baseObject->StackPushRegisterCode, 1 ) ;
-                Compile_Move_Reg_To_Reg ( RegOrder ( i ++ ), ACC ) ;
-                _Debugger_->PreHere = baseObject->Coding ;
-                _DEBUG_SHOW ( baseObject, 1 ) ;
-            }
-            interp->BaseObject = 0 ;
-        }
-    }
+    else if ( ( l1->Name[0] == '[' ) ) i = _LO_Apply_ArrayArg ( lc, pl1, i ) ;
     else
     {
         word = Compiler_CopyDuplicatesAndPush ( word ) ;
@@ -477,10 +481,7 @@ _LO_Apply_C_LtoR_ArgList ( LambdaCalculus * lc, ListObject * l0, Word * word )
     if ( l0 )
     {
         Set_CompileMode ( true ) ;
-        if ( ! svcm )
-        {
-            CfrTil_BeginBlock ( ) ;
-        }
+        if ( ! svcm ) CfrTil_BeginBlock ( ) ;
         if ( word->CAttribute & ( DLSYM_WORD | C_PREFIX ) ) Set_CompileMode ( true ) ;
         _Debugger_->PreHere = Here ;
         for ( i = 0, l1 = _LO_First ( l0 ) ; l1 ; l1 = LO_Next ( l1 ) ) i = _LO_Apply_Arg ( lc, &l1, i ) ;
@@ -490,10 +491,7 @@ _LO_Apply_C_LtoR_ArgList ( LambdaCalculus * lc, ListObject * l0, Word * word )
         word->W_SC_Index = l0->W_SC_Index ;
         word = Compiler_CopyDuplicatesAndPush ( word ) ;
         cntx->CurrentlyRunningWord = word ;
-        if ( ( String_Equal ( word->Name, "printf" ) || ( String_Equal ( word->Name, "sprintf" ) ) ) )
-        {
-            Compile_MoveImm_To_Reg ( RAX, 0, CELL ) ; // for printf ?? others //System V ABI : "%rax is used to indicate the number of vector arguments passed to a function requiring a variable number of arguments"
-        }
+        if ( ( String_Equal ( word->Name, "printf" ) || ( String_Equal ( word->Name, "sprintf" ) ) ) ) Compile_MoveImm_To_Reg ( RAX, 0, CELL ) ; // for printf ?? others //System V ABI : "%rax is used to indicate the number of vector arguments passed to a function requiring a variable number of arguments"
         Word_SetCodingHere_And_ClearPreviousUseOf_Here_SCA ( word, 0 ) ;
         Word_Eval ( word ) ;
         if ( word->CAttribute2 & RAX_RETURN ) _Word_CompileAndRecord_PushReg ( word, ACC ) ;
@@ -539,7 +537,7 @@ LC_CompileRun_C_ArgList ( Word * word ) // C protocol - x64 : left to right argu
         _LO_Apply_C_LtoR_ArgList ( lc, l0, word ) ;
         LC_RestoreStackPointer ( lc ) ; // ?!? maybe we should do this stuff differently
         _LC_ClearTemporariesNamespace ( lc ) ;
-        LC_LispNamespaceOff () ;
+        LC_LispNamespaceOff ( ) ;
         SetState ( compiler, LC_ARG_PARSING | LC_C_RTL_ARG_PARSING, false ) ;
     }
     Lexer_SetTokenDelimiters ( lexer, svDelimiters, COMPILER_TEMP ) ;
@@ -559,7 +557,7 @@ CompileLispBlock ( ListObject *args, ListObject * body )
     word->CAttribute = BLOCK ;
     word->LAttribute |= T_LISP_COMPILED_WORD ;
     SetState ( lc, ( LC_COMPILE_MODE | LC_BLOCK_COMPILE ), true ) ;
-    _LO_Eval (lc, body, locals, 1 ) ;
+    _LO_Eval ( lc, body, locals, 1 ) ;
     if ( GetState ( lc, LC_COMPILE_MODE ) )
     {
         LO_EndBlock ( ) ;

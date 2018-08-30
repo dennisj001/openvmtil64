@@ -25,7 +25,7 @@ Debugger_ShowDbgSourceCodeAtAddress ( Debugger * debugger, byte * address )
                         word->Name = ( byte* ) "=" ;
                         fixed = 1 ;
                     }
-                    byte * buffer = PrepareDbgSourceCodeString ( sourceCode, word ) ;
+                    byte * buffer = SC_PrepareDbgSourceCodeString ( sourceCode, word ) ;
                     _Printf ( ( byte* ) "\n%s", buffer ) ;
                     debugger->LastSourceCodeWord = word ;
                     if ( fixed )
@@ -568,18 +568,18 @@ Get_SourceCodeWord ( )
 // ...source code source code TP source code source code ... EOL
 
 byte *
-PrepareDbgSourceCodeString ( byte * sc, Word * word ) // sc : source code ; scwi : source code word index
+SC_PrepareDbgSourceCodeString ( byte * sc, Word * word ) // sc : source code ; scwi : source code word index
 {
     byte * cc_line = ( byte* ) "" ;
     if ( sc && word )
     {
         int64 scwi0 = word->W_SC_Index ;
         byte *nvw, * token0 = word->Name, *token1 ;
-        int64 i, tp = 42, lef, leftBorder, ts, rightBorder, ref, slsc, dl, scwsi ; // tp : text point - where we want to start source code text to align with disassembly ; ref : right ellipsis flag
+        int64 i, tp = 42, lef, leftBorder, ts, rightBorder, ref, slsc, scwsi ; // tp : text point - where we want to start source code text to align with disassembly ; ref : right ellipsis flag
         token1 = String_ConvertToBackSlash ( token0 ) ;
         int64 tw = Debugger_TerminalLineWidth ( _Debugger_ ), slt0 = Strlen ( token0 ), slt1 = Strlen ( token1 ) ; // 3 : 0,1,2,3 ; ts : tokenStart
-        dl = slt1 - slt0 ; // check for difference in length - dl
-        if ( dl < 0 ) dl = 0 ;
+        //dl = slt1 - slt0 ; // check for difference in length - dl
+        //if ( dl < 0 ) dl = 0 ;
         slsc = strlen ( sc ) ;
         //int64 scwsi = String_FindStrnCmpIndex ( sc, token0, scwi0, slt0, slsc - scwi0 ) ; //20 ) ; //inc ) ;
         scwsi = String_FindStrnCmpIndex (sc, token1, scwi0, slt1, ((slsc - scwi0) > 100) ? 100 : (slsc - scwi0)) ; 

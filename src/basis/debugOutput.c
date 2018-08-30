@@ -332,7 +332,8 @@ Debugger_ShowSourceCodeLine ( Debugger * debugger, Word * word, byte * token0, i
 {
     ReadLiner * rl = _Context_->ReadLiner0 ;
     Boolean ins = 0 ; //= GetState ( _Debugger_, DBG_OUTPUT_INSERTION ) ;
-    int64 slt = Strlen ( token0 ) ;
+    byte * token = String_ConvertToBackSlash ( token0 ) ;
+    int64 slt = Strlen ( token ) ;
 
     // NB!! : remember the highlighting formatting characters don't add any additional *length* to *visible* the output line
     char * nvw = ( char* ) Buffer_Data_Cleared ( _CfrTil_->DebugB ) ; // nvw : new view window
@@ -346,7 +347,7 @@ Debugger_ShowSourceCodeLine ( Debugger * debugger, Word * word, byte * token0, i
     tvw = tw - ( twAlreayUsed - fel ) ; //subtract the formatting chars which don't add to visible length
     int64 slil = Strlen ( String_RemoveEndWhitespace ( il ) ) ;
     //if ( ! ins ) 
-    ots = String_FindStrnCmpIndex ( il, token0, ots, slt, slil - ots ) ; //20 ) ;
+    ots = String_FindStrnCmpIndex ( il, token, ots, slt, slil - ots ) ; //20 ) ;
     totalBorder = ( tvw - slt ) ; // the borders allow us to slide token within the window of tvw
     // try to get nts relatively the same as ots
     idealBorder = ( totalBorder / 2 ) ;
@@ -374,7 +375,7 @@ Debugger_ShowSourceCodeLine ( Debugger * debugger, Word * word, byte * token0, i
     if ( ins )
     {
         Strncpy ( nvw, &il[nws], ots ) ;
-        strcat ( nvw, token0 ) ;
+        strcat ( nvw, token ) ;
         strcat ( nvw, " " ) ;
         strcat ( nvw, &il[ots] ) ;
     }
@@ -392,7 +393,7 @@ Debugger_ShowSourceCodeLine ( Debugger * debugger, Word * word, byte * token0, i
     }
     else lef = ref = 0 ;
 
-    byte * cc_line = word ? _String_HighlightTokenInputLine ( nvw, lef, leftBorder, nts, token0, rightBorder, ref, 0 ) : ( byte* ) "" ; // nts : new token start is a index into b - the nwv buffer
+    byte * cc_line = word ? _String_HighlightTokenInputLine ( nvw, lef, leftBorder, nts, token, rightBorder, ref, 0 ) : ( byte* ) "" ; // nts : new token start is a index into b - the nwv buffer
 
     return cc_line ;
 }

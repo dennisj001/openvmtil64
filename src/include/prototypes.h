@@ -1224,7 +1224,7 @@ void _CfrTil_UnAppendTokenFromSourceCode(CfrTil *cfrtil, byte *tkn);
 void _CfrTil_AppendCharToSourceCode(CfrTil *cfrtil, byte c);
 void CfrTil_AppendCharToSourceCode(CfrTil *cfrtil, byte c, int64 convertToSpaceFlag);
 Word *Get_SourceCodeWord(void);
-byte *PrepareDbgSourceCodeString(byte *sc, Word *word);
+byte *SC_PrepareDbgSourceCodeString(byte *sc, Word *word);
 /* basis/debugStepping.c */
 void _Debugger_StepOneInstruction(Debugger *debugger);
 byte *Debugger_CompileOneInstruction(Debugger *debugger, byte *jcAddress, Boolean showFlag);
@@ -1539,6 +1539,7 @@ void LO_CheckEndBlock(void);
 int64 _LO_CheckBeginBlock(void);
 int32 _LO_CheckBegunBlock(void);
 int64 LO_CheckBeginBlock(void);
+int64 _LO_Apply_ArrayArg(LambdaCalculus *lc, ListObject **pl1, int64 i);
 int64 _LO_Apply_Arg(LambdaCalculus *lc, ListObject **pl1, int64 i);
 ListObject *_LO_Apply_C_LtoR_ArgList(LambdaCalculus *lc, ListObject *l0, Word *word);
 void LC_CompileRun_C_ArgList(Word *word);
