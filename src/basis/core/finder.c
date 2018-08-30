@@ -258,5 +258,9 @@ CfrTil_Postfix_Find ( )
     DataStack_Push ( ( int64 ) word ) ;
 }
 
-
+void
+CfrTil_TurnOffQualifyingNamespace ( )
+{
+    Finder_SetQualifyingNamespace ( _Finder_, 0 ) ;
+}
 

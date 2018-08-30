@@ -55,6 +55,14 @@
           <in>syntax.c</in>
           <in>word.c</in>
         </df>
+        <df name="lc">
+          <in>apply.c</in>
+          <in>eval.c</in>
+          <in>lambdaCalculus.c</in>
+          <in>print.c</in>
+          <in>read.c</in>
+          <in>special.c</in>
+        </df>
         <in>_debug.c</in>
         <in>atom.c</in>
         <in>attribute.c</in>
@@ -72,7 +80,6 @@
         <in>init.c</in>
         <in>interpreter.c</in>
         <in>interpreters.c</in>
-        <in>lambdaCalculus.c</in>
         <in>linux.c</in>
         <in>lists.c</in>
         <in>openVmTil.c</in>
@@ -87,6 +94,7 @@
         <in>_proto.h</in>
         <in>cfrtil64.h</in>
         <in>defines.h</in>
+        <in>lc.h</in>
         <in>machineCode.h</in>
         <in>machineCodeMacros.h</in>
         <in>macros.h</in>
@@ -186,7 +194,7 @@
           <runcommandpicklistitem>"${OUTPUT_PATH}"</runcommandpicklistitem>
         </runcommandpicklist>
         <runcommand>"${OUTPUT_PATH}"</runcommand>
-        <rundir>/home/dennisj/openvmtil64</rundir>
+        <rundir>.</rundir>
         <buildfirst>false</buildfirst>
         <terminal-type>0</terminal-type>
         <remove-instrumentation>0</remove-instrumentation>

@@ -355,9 +355,15 @@ String_ConvertString_EscapeCharToSpace ( byte * istring )
 }
 
 byte *
-_String_ConvertStringToBackSlash ( byte * dst, byte * src )
+_String_ConvertStringToBackSlash ( byte * dst, byte * src, int64 nchars )
 {
-    int64 i, j, len = src ? Strlen ( ( char* ) src ) : 0, quote = 1 ;
+    int64 i, j, len, quoted = 1 ; // counting the initial standard quote (raw string?)
+    if ( src )
+    {
+        if ( nchars == - 1 ) len = Strlen ( ( char* ) src ) ;
+        else len = nchars ;
+    }
+    else len = 0 ;
     for ( i = 0, j = 0 ; i < len ; i ++ )
     {
         byte c = src [ i ] ;
@@ -366,13 +372,14 @@ _String_ConvertStringToBackSlash ( byte * dst, byte * src )
         {
             if ( i > 0 )
             {
-                if ( ! quote ) quote = 1 ;
-                else quote = 0 ;
+                if ( ! quoted ) quoted = 1 ;
+                else quoted = 0 ;
             }
+            dst [ j ++ ] = c ;
         }
-        if ( c < ' ' )
+        else if ( c < ' ' )
         {
-            if ( quote )
+            if ( quoted )
             {
                 if ( c == '\n' )
                 {
@@ -401,8 +408,8 @@ _String_ConvertStringToBackSlash ( byte * dst, byte * src )
 byte *
 String_ConvertToBackSlash ( byte * str0 )
 {
-    byte * buffer = Buffer_Data ( _CfrTil_->ScratchB1 ) ;
-    byte * str1 = _String_ConvertStringToBackSlash ( buffer, str0 ) ;
+    byte * buffer = Buffer_Data ( _CfrTil_->ScratchB2 ) ;
+    byte * str1 = _String_ConvertStringToBackSlash ( buffer, str0, - 1 ) ;
     if ( str1 )
     {
         byte * nstr = String_New ( str1, TEMPORARY ) ;
@@ -728,7 +735,7 @@ int64
 String_CheckWordSize ( byte * str, int64 wl ) //, Boolean lPunctFlag, Boolean rPunctFlag )
 {
     byte * start, *end ;
-    int64 i, length ; 
+    int64 i, length ;
     Boolean punctFlag = IsPunct ( str [0] ), rPunctFlag = IsPunct ( str [wl - 1] ) ; //punctFlag means first character of word is punctuation 
 
     for ( i = - 1 ; abs ( i ) < ( wl + 1 ) ; i -- ) // go to left of str first
@@ -760,11 +767,11 @@ String_FindStrnCmpIndex ( byte * sc, byte* name0, int64 index0, int64 wl0, int64
 {
     byte * scspp2, *scspp, *scindex ;
     d0 ( scspp = & sc [ index0 ] ) ;
-    int64 i, n, index = index0, slsc = Strlen ( sc ), sln0 = Strlen ( name0 ) ;
-    for ( i = 0, n = wl0 + inc ; ( i <= n ) && ( i <= index ) ; i ++ ) // tokens are parsed in different order with parameter and c rtl args, etc. 
+    int64 i, n, index = index0, slsc = Strlen ( sc ) ;
+    for ( i = 0, n = wl0 + inc ; ( i <= n ) ; i ++ ) // tokens are parsed in different order with parameter and c rtl args, etc. 
     {
         scindex = & sc [ index + i ] ;
-        if ( ( index + i <= slsc ) && ( ! Strncmp ( & sc [ index + i ], name0, wl0 ) ) )//l ) ) //wl0 ) )
+        if ( ( index + i <= slsc ) && ( ! Strncmp ( scindex, name0, wl0 ) ) )
         {
             if ( String_CheckWordSize ( scindex, wl0 ) ) //lPunctuationFlag, rPunctuationFlag ) )
             {
@@ -1151,6 +1158,13 @@ Buffer_New_pbyte ( int64 size )
     //Buffer *b = Buffer_NewLocked ( size ) ;
     Buffer *b = _Buffer_New ( size, N_LOCKED ) ;
     return Buffer_Data ( b ) ;
+}
+
+void
+_MemCpy ( byte *dst, byte *src, int64 size)
+{
+    int64 i ;
+    for ( i= 0 ; i < size ; i++ ) dst [i] = src[i] ;
 }
 
 

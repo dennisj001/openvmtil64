@@ -200,7 +200,7 @@ ReadLine_New ( uint64 type )
 void
 _ReadLine_Copy ( ReadLiner * rl, ReadLiner * rl0, uint64 type )
 {
-    memcpy ( rl, rl0, sizeof (ReadLiner ) ) ;
+    MemCpy ( rl, rl0, sizeof (ReadLiner ) ) ;
     rl->TabCompletionInfo0 = TabCompletionInfo_New ( type ) ;
     rl->TciNamespaceStack = Stack_New ( 64, COMPILER_TEMP ) ;
     //rl->TciDownStack = Stack_New ( 32, SESSION ) ;

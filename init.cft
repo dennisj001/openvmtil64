@@ -159,10 +159,9 @@ BigNum
 bnInit ( 16 16 )
 Root
 : bigNumOff "BigNum" notUsing ;
-'bnoff 'bigNumOff find alias
-: bnon BigNum bnInit ( 16 16 ) ;
-//d: bnon
-bnoff
+'bnOff 'bigNumOff find alias
+: bnOn BigNum bnInit ( 16 16 ) ;
+bnOff
 
 Compiler 
 : var: { token dup ";" strcmp } { _var } while drop ; immediate // nb : no quotation marks around variable names with var: ... ;
@@ -286,7 +285,7 @@ dscOn //verbosity 3 =
 : assertStkChk _assertStkChk ; //"\n_assertStkChk : " ps stack pause ; 
 scOff
 //' _assertStkChk find wdiss //pause
-: TODO ( str ) nl nl pdl nl str @ adps location nl pdl nl nl { dbgOnVar @ } { sp } if2 pause ;;
+: TODO ( str ) nl nl pdl nl str @ adps location nl pdl nl nl { dbgOnVar @ } { sp } if2 ;; //pause ;;
 Root
 User 
 : pause nl _pause ;

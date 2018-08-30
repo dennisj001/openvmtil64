@@ -229,7 +229,7 @@ CompileOptimizeInfo *
 CompileOptInfo_NewCopy ( CompileOptimizeInfo * optInfo, uint64 type )
 {
     CompileOptimizeInfo * copyOptInfo = CompileOptimizeInfo_New ( type ) ;
-    memcpy ( copyOptInfo, optInfo, sizeof (CompileOptimizeInfo ) ) ;
+    MemCpy ( copyOptInfo, optInfo, sizeof (CompileOptimizeInfo ) ) ;
     return copyOptInfo ;
 }
 

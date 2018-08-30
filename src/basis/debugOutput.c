@@ -331,7 +331,7 @@ byte *
 Debugger_ShowSourceCodeLine ( Debugger * debugger, Word * word, byte * token0, int64 twAlreayUsed )
 {
     ReadLiner * rl = _Context_->ReadLiner0 ;
-    Boolean ins = GetState ( _Debugger_, DBG_OUTPUT_INSERTION ) ;
+    Boolean ins = 0 ; //= GetState ( _Debugger_, DBG_OUTPUT_INSERTION ) ;
     int64 slt = Strlen ( token0 ) ;
 
     // NB!! : remember the highlighting formatting characters don't add any additional *length* to *visible* the output line
@@ -344,8 +344,9 @@ Debugger_ShowSourceCodeLine ( Debugger * debugger, Word * word, byte * token0, i
     int64 tw = Debugger_TerminalLineWidth ( debugger ) ; // 139 ; //139 : nice width :: Debugger_TerminalLineWidth ( debugger ) ; 
     d0 ( if ( _Q_->Verbosity > 2 ) _Printf ( ( byte* ) "\nTerminal Width = %d\n", tw ) ) ;
     tvw = tw - ( twAlreayUsed - fel ) ; //subtract the formatting chars which don't add to visible length
-    int64 i = 0, slil = Strlen ( String_RemoveEndWhitespace ( il ) ) ;
-    if ( ! ins ) ots = String_FindStrnCmpIndex ( il, token0, ots, slt, slil - ots ) ; //20 ) ;
+    int64 slil = Strlen ( String_RemoveEndWhitespace ( il ) ) ;
+    //if ( ! ins ) 
+    ots = String_FindStrnCmpIndex ( il, token0, ots, slt, slil - ots ) ; //20 ) ;
     totalBorder = ( tvw - slt ) ; // the borders allow us to slide token within the window of tvw
     // try to get nts relatively the same as ots
     idealBorder = ( totalBorder / 2 ) ;

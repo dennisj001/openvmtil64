@@ -12,7 +12,7 @@ nl
 verbosity 1 =
 Int
 Lisp
-lcReset
+
 (define yfac (lambda (yy n) (if* (< n 2) 1 (* n (yy yy (- n 1)))))) 
 (yfac yfac 10) nl
 (define yfacc (lambda (yyy n1) (if* (< n1 2) (1) (* n1 (yyy yyy (- n1 1)))))) 
@@ -20,7 +20,7 @@ lcReset
 (yfacc yfacc 7) nl //pause
 (define fibc (lambda ( n ) (ifElse (< n 2) n (+ (fibc (- n 1)) (fibc (- n 2))))))
 (fibc 20)
-lcReset
+
 lispOff //pause
 Int
 : fac ( n  | rec1 -- TOS ) 

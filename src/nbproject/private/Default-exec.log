@@ -675,16 +675,6 @@ called: gcc
 	-ggdb
 	-c
 	-o
-	basis/lambdaCalculus.o
-	basis/lambdaCalculus.c
-
-called: gcc
-	/media/sdc4/dennisj/openvmtil64/src
-	gcc
-	-finline-functions
-	-ggdb
-	-c
-	-o
 	primitives/strings.o
 	primitives/strings.c
 
@@ -971,7 +961,12 @@ called: gcc
 	basis/debugger.o
 	basis/interpreter.o
 	basis/_debug.o
-	basis/lambdaCalculus.o
+	basis/lc/lambdaCalculus.o
+	basis/lc/apply.o
+	basis/lc/eval.o
+	basis/lc/read.o
+	basis/lc/print.o
+	basis/lc/special.o
 	primitives/strings.o
 	primitives/bits.o
 	primitives/maths.o

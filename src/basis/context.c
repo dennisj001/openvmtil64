@@ -13,9 +13,13 @@ _Context_Prompt ( int64 control )
 byte *
 _Context_Location ( Context * cntx )
 {
-    byte * buffer = Buffer_Data ( _CfrTil_->StringB ), *str ;
-    sprintf ( ( char* ) buffer, "%s : %ld.%ld", ( char* ) cntx->ReadLiner0->Filename ? ( char* ) cntx->ReadLiner0->Filename : "<command line>", cntx->ReadLiner0->LineNumber, cntx->Lexer0->CurrentReadIndex ) ;
-    cntx->Location = str = String_New ( buffer, TEMPORARY ) ;
+    byte * str = 0 ;
+    if ( cntx )
+    {
+        byte * buffer = Buffer_Data ( _CfrTil_->StringB ) ;
+        sprintf ( ( char* ) buffer, "%s : %ld.%ld", ( char* ) cntx->ReadLiner0->Filename ? ( char* ) cntx->ReadLiner0->Filename : "<command line>", cntx->ReadLiner0->LineNumber, cntx->Lexer0->CurrentReadIndex ) ;
+        str = cntx->Location = String_New ( buffer, TEMPORARY ) ;
+    }
     return str ;
 }
 
@@ -217,20 +221,18 @@ _Context_IncludeFile ( Context * cntx, byte *filename, int64 interpretFlag )
             ReadLine_ReadFileIntoAString ( rl, file ) ;
             fclose ( file ) ;
 
-            //OVT_MemListFree_LispTemp ( ) ; // more careful allocation accounting work needs to be done before something like this can be done now
-            if ( interpretFlag ) Interpret_UntilFlaggedWithInit ( cntx->Interpreter0, END_OF_STRING ) ;
+            if ( interpretFlag ) Interpret_UntilFlaggedWithInit ( cntx->Interpreter0, END_OF_FILE|END_OF_STRING ) ;
 
             cntx->System0->IncludeFileStackNumber -- ;
             if ( ! cntx->System0->IncludeFileStackNumber ) Ovt_AutoVarOff ( ) ;
             if ( _Q_->Verbosity > 2 ) _Printf ( ( byte* ) "\n%s included\n", filename ) ;
-            Interpreter_Init ( cntx->Interpreter0 ) ; // ?? mainly to reset the PreprocessorStackList after the end of every file ??
+            //Interpreter_Init ( cntx->Interpreter0 ) ; // ?? mainly to reset the PreprocessorStackList after the end of every file ??
+            //_dllist_Init ( _Context_->PreprocessorStackList  ) ;      	
         }
         else
         {
-            //byte * buffer = Buffer_New_pbyte ( BUFFER_SIZE ) ;
             _Printf ( ( byte* ) "\nError : _CfrTil_IncludeFile : \"%s\" : not found! :: %s\n", filename,
                 _Context_Location ( ( Context* ) _CfrTil_->ContextDataStack->StackPointer [0] ) ) ;
-            //Error ( buffer, ABORT ) ;
         }
     }
 }
@@ -258,8 +260,8 @@ _Context_DoubleQuoteMacro ( Context * cntx )
     Lexer * lexer = cntx->Lexer0 ;
     if ( ! GetState ( _CfrTil_, SOURCE_CODE_STARTED ) )
     {
-        byte c = ReadLine_NextNonPunctCharAfterEndOfString (rl);
-        if ( c == '(' || c == '{')  CfrTil_InitSourceCode_WithCurrentInputChar ( _CfrTil_ ) ; // must be here for wdiss and add addToHistory
+        byte c = ReadLine_NextNonPunctCharAfterEndOfString ( rl ) ;
+        if ( c == '(' || c == '{' ) CfrTil_InitSourceCode_WithCurrentInputChar ( _CfrTil_ ) ; // must be here for wdiss and add addToHistory
     }
     do
     {

@@ -338,7 +338,7 @@ Lexer_New ( uint64 allocType )
 void
 _Lexer_Copy ( Lexer * lexer, Lexer * lexer0, uint64 allocType )
 {
-    memcpy ( lexer, lexer0, sizeof (Lexer ) ) ;
+    MemCpy ( lexer, lexer0, sizeof (Lexer ) ) ;
     Lexer_Init ( lexer, 0, 0, allocType ) ;
     lexer->NextChar = _Lexer_NextChar ;
 }
@@ -378,7 +378,7 @@ _Lexer_AppendCharToSourceCode ( Lexer * lexer, byte c, int64 convert )
 {
     if ( GetState ( lexer, ADD_CHAR_TO_SOURCE ) )
     {
-        CfrTil_AppendCharToSourceCode ( _CfrTil_, c, 1 ) ;
+        CfrTil_AppendCharToSourceCode ( _CfrTil_, c, 0 ) ;
     }
 }
 
@@ -774,13 +774,15 @@ _EOF ( Lexer * lexer ) // case eof:
 {
     if ( lexer->OurInterpreter ) SetState ( lexer->OurInterpreter, END_OF_FILE, true ) ;
     SetState ( lexer, LEXER_DONE | END_OF_FILE, true ) ;
+    //SetState ( _Interpreter_, END_OF_FILE, true ) ;
 }
 
 void
 _Zero ( Lexer * lexer ) // case 0
 {
     if ( lexer->OurInterpreter ) SetState ( lexer->OurInterpreter, END_OF_STRING, true ) ;
-    SetState ( lexer, LEXER_DONE | END_OF_STRING, true ) ;
+    SetState ( lexer, LEXER_DONE | END_OF_STRING | END_OF_FILE, true ) ;
+    //SetState ( _Interpreter_, END_OF_STRING, true ) ;
 }
 
 int64

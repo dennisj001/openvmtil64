@@ -21,7 +21,7 @@ Stack_Print_AValue_WordName ( Stack * stack, int64 i, byte * stackName, byte * b
     {
         byte wname [ 128 ] ;
         //_String_ConvertStringToBackSlash ( wname, word->Name ) ;
-        sprintf ( ( char* ) buffer, "< %s.%s >", word->ContainingNamespace ? ( char* ) word->ContainingNamespace->Name : "<literal>", c_gd ( _String_ConvertStringToBackSlash ( wname, word->Name ) ) ) ;
+        sprintf ( ( char* ) buffer, "< %s.%s >", word->ContainingNamespace ? ( char* ) word->ContainingNamespace->Name : "<literal>", c_gd ( _String_ConvertStringToBackSlash ( wname, word->Name, -1 ) ) ) ;
         _Printf ( ( byte* ) "\n\t    %s   [ %3ld ] < " UINT_FRMT " > = " UINT_FRMT "\t%s", stackName, i, ( uint64 ) & stackPointer [ - i ], stackPointer [ - i ], word ? ( char* ) buffer : "" ) ;
     }
 }
@@ -362,7 +362,7 @@ Stack *
 Stack_Copy ( Stack * stack, uint64 type )
 {
     Stack * nstack = Stack_New ( stack->StackSize, type ) ;
-    memcpy ( nstack->StackData, stack->StackData, stack->StackSize * sizeof (int64 ) ) ;
+    MemCpy ( nstack->StackData, stack->StackData, stack->StackSize * sizeof (int64 ) ) ;
 
     // ?? -> preserve relative stack pointer
     int64 depth = Stack_Depth ( stack ) ;

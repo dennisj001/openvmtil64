@@ -225,7 +225,7 @@ void
 ByteArray_AppendCopy ( ByteArray * ba, int64 size, byte * data ) // size in bytes
 {
     _ByteArray_AppendSpace ( ba, size ) ; // size in bytes
-    memcpy ( ba->StartIndex, data, size ) ;
+    MemCpy ( ba->StartIndex, data, size ) ;
 }
 
 void

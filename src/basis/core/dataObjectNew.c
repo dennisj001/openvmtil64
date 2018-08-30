@@ -99,6 +99,7 @@ _DataObject_New ( uint64 type, Word * word, byte * name, uint64 ctype, uint64 ct
             break ;
         }
     }
+    if ( word ) word->CAttribute2 |= T_OBJECT ;
     return word ;
 }
 

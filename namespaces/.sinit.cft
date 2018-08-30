@@ -365,7 +365,6 @@ stringMacrosOn
 : ctloc ;
 #endif
 
-lcReset 
 
 2 + 7  assertStkChk // stack checking
 Shell

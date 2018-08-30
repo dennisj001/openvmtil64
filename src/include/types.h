@@ -870,7 +870,7 @@ typedef struct _LambdaCalculus
 {
     uint64 State ;
     int64 DontCopyFlag, Loop, ParenLevel ;
-    Namespace * LispTemporariesNamespace, *LispNamespace ;
+    Namespace * LispTemporariesNamespace, *LispNamespace, *LispInternalNamespace ;
     ListObject *lFunction, *lArgs, *lFirst, * Nil, *True, *List, *LNew, *LParenList, *ReturnList, *CurrentLambdaFunction, *LastInterpretedWord ; //, *ListFirst;
     ByteArray * SavedCodeSpace ;
     uint64 ItemQuoteState, QuoteState ;
@@ -954,6 +954,7 @@ typedef struct
     // long term memory
     NamedByteArray * CodeSpace ;
     NamedByteArray * ObjectSpace ;
+    NamedByteArray * LispSpace ;
     NamedByteArray * DictionarySpace ;
     NamedByteArray * HistorySpace ;
     NamedByteArray * OpenVmTilSpace ;
@@ -1042,6 +1043,7 @@ typedef struct
     int64 LispTempSize ;
     int64 MachineCodeSize ;
     int64 ObjectsSize ;
+    int64 LispSize ;
     int64 ContextSize ;
     int64 TempObjectsSize ;
     int64 CompilerTempObjectsSize ;

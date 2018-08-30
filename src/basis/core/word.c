@@ -88,8 +88,8 @@ void
 _Word_Copy ( Word * word, Word * word0 )
 {
     WordData * swdata = word->S_WordData ;
-    memcpy ( word, word0, sizeof ( Word ) + sizeof ( WordData ) ) ;
-    word->S_WordData = swdata ; // restore the WordData pointer we overwrote by the above memcpy
+    MemCpy ( word, word0, sizeof ( Word ) + sizeof ( WordData ) ) ;
+    word->S_WordData = swdata ; // restore the WordData pointer we overwrote by the above MemCpy
 }
 
 Word *
@@ -193,6 +193,7 @@ _Word_New ( byte * name, uint64 ctype, uint64 ctype2, uint64 ltype, int8 addToIn
     Word * word = _Word_Create ( name, ctype, ctype2, ltype, allocType ) ; // CFRTIL_WORD : cfrTil compiled words as opposed to C compiled words
     _Compiler_->CurrentWord = word ;
     Word_SetLocation ( word ) ;
+    DObject_Finish ( word ) ;
     _Word_Add ( word, addToInNs, addToNs ) ; // add to the head of the list
     return word ;
 }
@@ -275,7 +276,7 @@ __Word_ShowSourceCode ( Word * word )
         {
             Buffer *dstb = Buffer_NewLocked ( BUFFER_SIZE ) ;
             sc = dstb->B_Data ;
-            sc = _String_ConvertStringToBackSlash ( sc, word->W_SourceCode ? word->W_SourceCode : String_New ( _CfrTil_->SC_Buffer, TEMPORARY ) ) ;
+            sc = _String_ConvertStringToBackSlash ( sc, word->W_SourceCode ? word->W_SourceCode : String_New ( _CfrTil_->SC_Buffer, TEMPORARY ), -1 ) ;
             scd = c_gd ( String_FilterMultipleSpaces ( sc, TEMPORARY ) ) ;
             Buffer_Unlock ( dstb ) ;
             Buffer_SetAsFree ( dstb, 0 ) ;

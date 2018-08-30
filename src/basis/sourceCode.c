@@ -20,7 +20,7 @@ Debugger_ShowDbgSourceCodeAtAddress ( Debugger * debugger, byte * address )
                 {
                     d0 ( DebugWordList_Show_All ( ) ) ;
 
-                    if ( GetState ( scWord, W_C_SYNTAX ) && String_Equal ( word->Name, "store" ) )
+                    if ( ( scWord->WAttribute & WT_C_SYNTAX ) && String_Equal ( word->Name, "store" ) )
                     {
                         word->Name = ( byte* ) "=" ;
                         fixed = 1 ;
@@ -361,19 +361,25 @@ CfrTil_DbgSourceCode_End_C_Block ( )
 void
 CfrTil_DbgSourceCodeOff ( )
 {
-    //SetState ( _CfrTil_, DEBUG_SOURCE_CODE_MODE, false ) ;
+    //SetState ( _CfrTil_, GLOBAL_SOURCE_CODE_MODE, false ) ;
 }
 
 void
 CfrTil_DbgSourceCodeOn ( )
 {
-    SetState ( _CfrTil_, DEBUG_SOURCE_CODE_MODE, true ) ;
+    SetState ( _CfrTil_, GLOBAL_SOURCE_CODE_MODE, true ) ;
 }
 
 void
 CfrTil_DbgSourceCodeOn_Global ( )
 {
     SetState ( _CfrTil_, ( DEBUG_SOURCE_CODE_MODE | GLOBAL_SOURCE_CODE_MODE ), true ) ;
+}
+
+void
+CfrTil_DbgSourceCodeOff_Global ( )
+{
+    //SetState ( _CfrTil_, ( DEBUG_SOURCE_CODE_MODE | GLOBAL_SOURCE_CODE_MODE ), false ) ;
 }
 
 // debug source code functions (above)
@@ -569,13 +575,14 @@ PrepareDbgSourceCodeString ( byte * sc, Word * word ) // sc : source code ; scwi
     {
         int64 scwi0 = word->W_SC_Index ;
         byte *nvw, * token0 = word->Name, *token1 ;
-        int64 i, tp = 42, lef, leftBorder, ts, rightBorder, ref ; // tp : text point - where we want to start source code text to align with disassembly ; ref : right ellipsis flag
+        int64 i, tp = 42, lef, leftBorder, ts, rightBorder, ref, slsc, dl, scwsi ; // tp : text point - where we want to start source code text to align with disassembly ; ref : right ellipsis flag
         token1 = String_ConvertToBackSlash ( token0 ) ;
         int64 tw = Debugger_TerminalLineWidth ( _Debugger_ ), slt0 = Strlen ( token0 ), slt1 = Strlen ( token1 ) ; // 3 : 0,1,2,3 ; ts : tokenStart
-        int64 dl = slt1 - slt0 ;
-        dl = dl > 0 ? dl : 0 ;
-        int64 slsc = strlen ( sc ) ;
-        int64 scwsi = String_FindStrnCmpIndex ( sc, token0, scwi0, slt0, slsc - scwi0 ) ; //20 ) ; //inc ) ;
+        dl = slt1 - slt0 ; // check for difference in length - dl
+        if ( dl < 0 ) dl = 0 ;
+        slsc = strlen ( sc ) ;
+        //int64 scwsi = String_FindStrnCmpIndex ( sc, token0, scwi0, slt0, slsc - scwi0 ) ; //20 ) ; //inc ) ;
+        scwsi = String_FindStrnCmpIndex (sc, token1, scwi0, slt1, ((slsc - scwi0) > 100) ? 100 : (slsc - scwi0)) ; 
         d0 ( byte * scspp0 = & sc [ scwi0 ] ) ;
         d0 ( byte * scspp2 = & sc [ scwsi ] ) ;
         nvw = ( char* ) Buffer_New_pbyte ( ( slsc > BUFFER_SIZE ) ? slsc : BUFFER_SIZE ) ;
@@ -584,7 +591,7 @@ PrepareDbgSourceCodeString ( byte * sc, Word * word ) // sc : source code ; scwi
         {
             lef = 4 ;
             leftBorder = ts = tp ;
-            rightBorder = tw - ( ts + slt0 ) ;
+            rightBorder = tw - ( ts + slt1 ) ;
             ref = ( slsc - 4 ) > tw ? 4 : 0 ;
             Strncpy ( nvw, & sc [scwsi - tp], tw - ( lef + ref ) ) ;
         }
@@ -601,14 +608,14 @@ PrepareDbgSourceCodeString ( byte * sc, Word * word ) // sc : source code ; scwi
             ref = ( slsc - 4 ) > tw ? 4 : 0 ;
 
             if ( ( ! ref ) && ( tw > slsc - 4 ) ) ref = 4 ;
-            rightBorder = tw - ( tp + slt0 ) - ref ;
+            rightBorder = tw - ( tp + slt1 ) - ref ;
             Strncat ( nvw, sc, tw - ( lef + pad + ref ) ) ;
         }
         int64 svState = GetState ( _Debugger_, DEBUG_SHTL_OFF ) ;
         SetState ( _Debugger_, DEBUG_SHTL_OFF, false ) ;
         // |ilw...------ inputLine  -----|lef|--- leftBorder ---|---token---|---  rightBorder  ---|ref|------ inputLine -----...ilw| -- ilw : inputLine window
         // |ilw...------ inputLine  -----|lef|pad?|-------------|tp|---token---|---  rightBorder  ---|ref|------ inputLine -----...ilw| -- ilw : inputLine window
-        cc_line = ( word ? _String_HighlightTokenInputLine ( nvw, lef, leftBorder, ts, token1, rightBorder, ref, dl ) : ( byte* ) "" ) ; // nts : new token start is a index into b - the nwv buffer
+        cc_line = _String_HighlightTokenInputLine ( nvw, lef, leftBorder, ts, token1, rightBorder, ref, 0 ) ; // nts : new token start is a index into b - the nwv buffer
         SetState ( _Debugger_, DEBUG_SHTL_OFF, svState ) ;
     }
     return cc_line ;
