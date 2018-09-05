@@ -801,12 +801,12 @@ done:
 // |ilw...------ inputLine  -----|lef|--- leftBorder ---|---token---|---  rightBorder  ---|ref|------ inputLine -----...ilw| -- ilw : inputLine window
 // ref : right ellipsis flag
 // lef : left ellipsis flag
-// dl : diff in length of token and token with highlighting :: dl = slt1 - slt0
+// dl : diff in length of token and token with highlighting :: dl = slt1 - slt0 :: not currently used
 
-byte * // nvw, lef, leftBorder, nts, token0, rightBorder, ref
-_String_HighlightTokenInputLine ( byte * nvw, int8 lef, int64 leftBorder, int64 tokenStart, byte *token, int64 rightBorder, int8 ref, int8 dl )
+byte * 
+_String_HighlightTokenInputLine ( byte * nvw, Boolean lef, int64 leftBorder, int64 tokenStart, byte *token, int64 rightBorder, Boolean ref )
 {
-    int32 slt = Strlen ( token ) ; //, slilw = Strlen ( nvw ) ;
+    int32 slt = Strlen ( token ) ; 
     if ( ! GetState ( _Debugger_, DEBUG_SHTL_OFF ) )
     {
         byte * b2 = Buffer_Data_Cleared ( _CfrTil_->DebugB2 ) ;
@@ -815,27 +815,23 @@ _String_HighlightTokenInputLine ( byte * nvw, int8 lef, int64 leftBorder, int64 
         // we are building our output in b2
         // our scratch buffer is b3
         if ( leftBorder < 0 ) leftBorder = 0 ; // something more precise here with C syntax is needed !?!?
-        if ( ! lef )
-        {
-            strncpy ( ( char* ) b3, ( char* ) nvw, leftBorder ) ;
-        }
-        else
+        if ( lef )
         {
             strncpy ( ( char* ) b3, " .. ", 4 ) ;
             if ( leftBorder > 4 ) strncat ( ( char* ) b3, ( char* ) &nvw[4], leftBorder - 4 ) ; // 3 : [0 1 2 3]  0 indexed array
         }
+        else strncpy ( ( char* ) b3, ( char* ) nvw, leftBorder ) ;
 
         strcpy ( ( char* ) b2, ( char* ) cc ( b3, &_Q_->Debug ) ) ;
         char * ccToken = ( char* ) cc ( token, &_Q_->Notice ) ;
         strcat ( ( char* ) b2, ccToken ) ;
 
-        if ( ! ref ) strcpy ( ( char* ) b3, ( char* ) &nvw[tokenStart + slt - dl] ) ; //, BUFFER_SIZE ) ; // 3 : [0 1 2 3]  0 indexed array
-        else
+        if ( ref ) 
         {
-
-            if ( rightBorder > 4 ) strncpy ( ( char* ) b3, ( char* ) &nvw[tokenStart + slt - dl], rightBorder - 4 ) ; // 4 : strlen " .. " 
+            if ( rightBorder > 4 ) strncpy ( ( char* ) b3, ( char* ) &nvw[tokenStart + slt ], rightBorder - 4 ) ; // 4 : strlen " .. " 
             strcat ( ( char* ) b3, " .. " ) ;
         }
+        else strcpy ( ( char* ) b3, ( char* ) &nvw[tokenStart + slt ] ) ; //, BUFFER_SIZE ) ; // 3 : [0 1 2 3]  0 indexed array
         char * ccR = ( char* ) cc ( b3, &_Q_->Debug ) ;
         strcat ( ( char* ) b2, ccR ) ;
 

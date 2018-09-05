@@ -48,12 +48,28 @@ ListObject *
 _LO_EvalSymbol (LambdaCalculus * lc, ListObject *l0, ListObject *locals )
 {
     Compiler *compiler = _Context_->Compiler0 ;
-    Word *w = LC_FindWord ( l0->Name, locals ) ;
+    ListObject *l1 ;
+    Word *w ;
+    start :
+    w = LC_FindWord ( l0->Name, locals ) ;
     if ( l0 && ( ( ! LO_IsQuoted ( l0 ) ) && w ) )
     {
         if ( w->LAttribute & T_LISP_DEFINE ) // after macro because a macro is also a define
         {
-            l0 = ( ListObject * ) w->Lo_Value ; // created by define
+            l1 = ( ListObject * ) w->Lo_Value ; // created by define
+#if 0            
+            if ( l1 )
+            {
+                int64 state = l0->State ;
+                l1->State = state ;
+                while ( (l1->LAttribute & ( LIST | LIST_NODE ) ) && _LO_First ( l1 ) ) 
+                {
+                    l1 = LO_Eval( lc, l1 ) ;
+                    l1->State = state ;
+                }
+            }
+#endif            
+            l0 = l1 ;
         }
         else if ( w->CAttribute & ( CPRIMITIVE | CFRTIL_WORD | LOCAL_VARIABLE | PARAMETER_VARIABLE | T_LISP_COMPILED_WORD ) )
         {

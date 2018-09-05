@@ -174,8 +174,9 @@ fibPTC2? (20) dup p 6765 _assert //pause //sp
 c_syntaxOff
 sp    
 bnOn
-: tbn ( | n m -- TOS ) n 0 = m 3 = n m @ += n m @ += n m @ += n @ dup p ; tbn 9 _assert " : should be 9" ps
-
+BigNum
+: tbn ( | n m ) n 0 = m 3 = n m @ += n m @ += n m @ += n @ p ; tbn " : should be 9" ps
+// 9 _assert //_assert won't work here, it is not compiled with BigNum
 s: fibBN ( n | svn fn fn1 fn2 -- TOS ) 
     { svn n @ = fn 0 = fn1 0 = fn2 1 = } { n @ 0 > } { n 1 -= } 
     {   
@@ -188,6 +189,7 @@ s: fibBN ( n | svn fn fn1 fn2 -- TOS )
     fn @
 ;s
 sp
+nl 200 dup "\nfib" ps p "=" ps fibBN p //pause
 
 : tfib3 ( n | m )  
     "locals fibBN : " ps 
@@ -197,7 +199,6 @@ sp
 ;
 nl nl 92 tfib3
 nl nl 92 tfib3
-nl 92 dup p fibBN p //pause
 bnOff
 //pause
 
@@ -552,6 +553,7 @@ sp
 20 fibBN dup p 6765 _assert 
 #endif
 
+Int
 2 + 7 assertStkChk // stack checking
 
 location "\nending Lisp\n" ps s //ddps s

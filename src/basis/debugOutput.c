@@ -194,7 +194,7 @@ Debugger_TerminalLineWidth ( Debugger * debugger )
 }
 
 void
-Debugger_ShowStackChange ( Debugger * debugger, Word * word, byte * insert, byte * achange, int8 stepFlag )
+Debugger_ShowStackChange ( Debugger * debugger, Word * word, byte * insert, byte * achange, Boolean stepFlag )
 {
     int64 sl, i = 0, tw ;
     char *name, *location, *b, *b2 = ( char* ) Buffer_Data_Cleared ( _CfrTil_->DebugB2 ) ;
@@ -221,7 +221,7 @@ done:
 }
 
 void
-_Debugger_ShowEffects ( Debugger * debugger, Word * word, int8 stepFlag, int8 force )
+_Debugger_ShowEffects ( Debugger * debugger, Word * word, Boolean stepFlag, Boolean force )
 {
     debugger->w_Word = word ;
     uint64* dsp = _Dsp_ ;
@@ -322,32 +322,28 @@ _Debugger_ShowEffects ( Debugger * debugger, Word * word, int8 stepFlag, int8 fo
 }
 
 void
-Debugger_ShowEffects ( Debugger * debugger, int8 stepFlag, int8 forceFlag )
+Debugger_ShowEffects ( Debugger * debugger, Boolean stepFlag, Boolean forceFlag )
 {
     _Debugger_ShowEffects ( debugger, debugger->w_Word, stepFlag, forceFlag ) ;
 }
 
+// hopefully this can also be used by SC_PrepareDbgSourceCodeString
 byte *
-Debugger_ShowSourceCodeLine ( Debugger * debugger, Word * word, byte * token0, int64 twAlreayUsed )
+_PrepareDbgSourceCodeString (Word * word, byte * il, int64 tvw , int64 tp )
 {
-    ReadLiner * rl = _Context_->ReadLiner0 ;
-    Boolean ins = 0 ; //= GetState ( _Debugger_, DBG_OUTPUT_INSERTION ) ;
-    byte * token = String_ConvertToBackSlash ( token0 ) ;
-    int64 slt = Strlen ( token ) ;
-
-    // NB!! : remember the highlighting formatting characters don't add any additional *length* to *visible* the output line
+    byte * cc_line ;
     char * nvw = ( char* ) Buffer_Data_Cleared ( _CfrTil_->DebugB ) ; // nvw : new view window
-    char * il = ( char* ) String_New ( rl->InputLineString, TEMPORARY ) ; //nb! dont tamper with the input line. eg. removing its newline will affect other code which depends on newline
-    int64 totalBorder, idealBorder, leftBorder, rightBorder, lef, ref, tvw, nws, ots = word->W_RL_Index, nts ;
+    Boolean ins = GetState ( _Debugger_, DBG_OUTPUT_INSERTION ) ;
+    int64 slil, slt, totalBorder, idealBorder, leftBorder, rightBorder, lef, ref, nws, ots, nts, slNvw, wrli, inc ;
+    // NB!! : remember the highlighting formatting characters don't add any additional *visible length* to the output line
     // ots : original token start (index into the source code), nws : new window start ; tvw: targetViewWidth ; nts : new token start
     // lef : left ellipsis flag, ref : right ellipsis flag
-    const int64 fel = 32 - 1 ; //fe : formatingEstimate length : 2 formats with 8/12 chars on each sude - 32/48 :: 1 : a litte leave way
-    int64 tw = Debugger_TerminalLineWidth ( debugger ) ; // 139 ; //139 : nice width :: Debugger_TerminalLineWidth ( debugger ) ; 
-    d0 ( if ( _Q_->Verbosity > 2 ) _Printf ( ( byte* ) "\nTerminal Width = %d\n", tw ) ) ;
-    tvw = tw - ( twAlreayUsed - fel ) ; //subtract the formatting chars which don't add to visible length
-    int64 slil = Strlen ( String_RemoveEndWhitespace ( il ) ) ;
-    //if ( ! ins ) 
-    ots = String_FindStrnCmpIndex ( il, token, ots, slt, slil - ots ) ; //20 ) ;
+    byte * token = String_ConvertToBackSlash ( word->Name ) ;
+    slt = Strlen ( token ) ;
+    wrli = word->W_RL_Index ;
+    slil = Strlen ( String_RemoveEndWhitespace ( il ) ) ;
+    inc = slil - wrli ;
+    ots = wrli ; //  String_FindStrnCmpIndex ( il, token, wrli, slt, (( inc > 30 ) ? 30 : inc) ) ; //20 ) ;// adjust from wrli which is 
     totalBorder = ( tvw - slt ) ; // the borders allow us to slide token within the window of tvw
     // try to get nts relatively the same as ots
     idealBorder = ( totalBorder / 2 ) ;
@@ -372,6 +368,7 @@ Debugger_ShowSourceCodeLine ( Debugger * debugger, Word * word, byte * token0, i
         leftBorder = totalBorder - rightBorder ;
         nts = leftBorder ; //+ (ins ? (slt/2 + 1) : 0 ) ;
     }
+    //else { the defaults above }
     if ( ins )
     {
         Strncpy ( nvw, &il[nws], ots ) ;
@@ -380,7 +377,7 @@ Debugger_ShowSourceCodeLine ( Debugger * debugger, Word * word, byte * token0, i
         strcat ( nvw, &il[ots] ) ;
     }
     else Strncpy ( nvw, &il[nws], tvw ) ; // copy the the new view window to buffer nvw
-    int64 slNvw = Strlen ( nvw ) ;
+    slNvw = Strlen ( nvw ) ;
     if ( slNvw > ( tvw + 8 ) ) // is there a need for ellipsis
     {
         if ( ( ots - leftBorder ) < 4 ) lef = 0, ref = 1 ;
@@ -392,9 +389,29 @@ Debugger_ShowSourceCodeLine ( Debugger * debugger, Word * word, byte * token0, i
         else lef = 1, ref = 0 ; // choose lef as preferable
     }
     else lef = ref = 0 ;
+    cc_line = _String_HighlightTokenInputLine ( nvw, lef, leftBorder, nts, token, rightBorder, ref ) ;
+    String_RemoveEndWhitespace ( cc_line ) ;
+    return cc_line ;
+}
 
-    byte * cc_line = word ? _String_HighlightTokenInputLine ( nvw, lef, leftBorder, nts, token, rightBorder, ref, 0 ) : ( byte* ) "" ; // nts : new token start is a index into b - the nwv buffer
-
+// NB!! : remember the highlighting formatting characters don't add any additional *visible length* to the output line
+// ots : original token start (index into the source code), nws : new window start ; tvw: targetViewWidth ; nts : new token start
+// lef : left ellipsis flag, ref : right ellipsis flag
+byte *
+Debugger_PrepareDbgSourceCodeString ( Debugger * debugger, Word * word, byte * token0, int64 twAlreayUsed )
+{
+    byte * cc_line ;
+    if ( word )
+    {
+        ReadLiner * rl = _Context_->ReadLiner0 ;
+        char * il = ( char* ) String_New ( rl->InputLineString, TEMPORARY ) ; //nb! dont tamper with the input line. eg. removing its newline will affect other code which depends on newline
+        int64 fel, tw, tvw ;
+        fel = 32 - 1 ; //fe : formatingEstimate length : 2 formats with 8/12 chars on each sude - 32/48 :: 1 : a litte leave way
+        tw = Debugger_TerminalLineWidth ( debugger ) ; // 139 ; //139 : nice width :: Debugger_TerminalLineWidth ( debugger ) ; 
+        tvw = tw - ( twAlreayUsed - fel ) ; //subtract the formatting chars which don't add to visible length
+        cc_line = _PrepareDbgSourceCodeString (word, il, tvw, 0) ;
+    }
+    else cc_line = ( byte* ) "" ; // nts : new token start is a index into b - the nwv buffer
     return cc_line ;
 }
 
@@ -460,8 +477,7 @@ next:
                         //( char* ) cc_Token, ( uint64 ) word->Definition ) ; //, _Q_->StartedTimes, _Q_->SignalExceptionsHandled ) ;
                         ( char* ) cc_Token, ( uint64 ) word ) ;
                 }
-                byte * cc_line = Debugger_ShowSourceCodeLine ( debugger, word, token0, ( int64 ) Strlen ( obuffer ) ) ;
-                String_RemoveEndWhitespace ( cc_line ) ;
+                byte * cc_line = Debugger_PrepareDbgSourceCodeString ( debugger, word, token0, ( int64 ) Strlen ( obuffer ) ) ;
                 Strncat ( obuffer, cc_line, BUFFER_SIZE ) ;
                 _Printf ( ( byte* ) "%s", obuffer ) ;
 
@@ -694,7 +710,7 @@ LO_Debug_ExtraShow ( int64 showStackFlag, int64 verbosity, int64 wordList, byte 
 }
 
 void
-_Debugger_PostShow ( Debugger * debugger, Word * word, int8 force )//, byte * token, Word * word )
+_Debugger_PostShow ( Debugger * debugger, Word * word, Boolean force )//, byte * token, Word * word )
 {
     _Debugger_ShowEffects ( debugger, word, GetState ( debugger, DBG_STEPPING ), force ) ;
 }

@@ -1,6 +1,6 @@
 // see readme.txt for a text description
 // TODO : types, database, garbage collection : integration
-typedef char int8 ;
+typedef char Boolean ;
 typedef unsigned char byte ;
 typedef byte uint8 ;
 typedef short int16 ;
@@ -12,7 +12,7 @@ typedef unsigned long uint64 ;
 
 typedef char * CString ;
 typedef byte CharSet ;
-typedef int8 Boolean ;
+typedef Boolean Boolean ;
 typedef void (* VoidFunction ) (void) ;
 typedef void (*vFunction_1_Arg ) ( int64 ) ;
 typedef void (*vFunction_1_UArg ) ( uint64 ) ;
@@ -97,8 +97,8 @@ typedef struct _dobject
     {
         int32 do_Type ;
         int16 do_Size ;
-        int8 do_Slots ;
-        int8 do_InUseFlag ;
+        Boolean do_Slots ;
+        Boolean do_InUseFlag ;
     } ;
     union
     {
@@ -120,8 +120,8 @@ typedef struct
         {
             int32 n_Type ;
             int16 n_Size ;
-            int8 n_Slots ;
-            int8 n_InUseFlag ;
+            Boolean n_Slots ;
+            Boolean n_InUseFlag ;
         } ;
         byte * n_unmap ;
     } ;
@@ -143,8 +143,8 @@ typedef struct
                 {
                     int32 n_Type ;
                     int16 n_Size ;
-                    int8 n_Slots ;
-                    int8 n_InUseFlag ;
+                    Boolean n_Slots ;
+                    Boolean n_InUseFlag ;
                 } ;
                 node * n_CurrentNode ;
                 byte * n_unmap ;
@@ -163,8 +163,8 @@ typedef struct
                 {
                     int32 do_Type ;
                     int16 do_Size ;
-                    int8 do_Slots ;
-                    int8 do_InUseFlag ;
+                    Boolean do_Slots ;
+                    Boolean do_InUseFlag ;
                 } ;
                 byte * do_bData ;
                 int64 * do_iData ;
@@ -350,12 +350,12 @@ typedef struct _WordData
     int64 Offset ; // used by ClassField
     struct
     {
-        int8 RegToUse ;
-        int8 Opt_Rm ;
-        int8 Opt_Reg ; //?? do we need something here
-        int8 SrcReg ;
-        int8 DstReg ;
-        int8 RegFlags ; // future uses available here !!
+        Boolean RegToUse ;
+        Boolean Opt_Rm ;
+        Boolean Opt_Reg ; //?? do we need something here
+        Boolean SrcReg ;
+        Boolean DstReg ;
+        Boolean RegFlags ; // future uses available here !!
         uint8 OpInsnGroup ;
         uint8 OpInsnCode ;
     } ;
@@ -496,8 +496,8 @@ typedef struct
     byte *OriginalActualCodeStart ;
     byte * CopiedFrom, *CopiedToStart, *CopiedToEnd, *CopiedToLogicJccCode, *ActualCopiedToJccCode ;
     int64 CopiedSize ;
-    int8 SetccTtt, JccTtt ;
-    int8 SetccNegFlag, JccNegFlag ;
+    Boolean SetccTtt, JccTtt ;
+    Boolean SetccNegFlag, JccNegFlag ;
     Word * LogicCodeWord ;
     Namespace * LocalsNamespace ;
 } BlockInfo ;
@@ -748,7 +748,7 @@ typedef struct
     int64 ArrayEnds ;
     byte * InitHere ;
     int64 * AccumulatedOptimizeOffsetPointer ;
-    int8 InLParenBlock, SemicolonEndsThisBlock, TakesLParenAsBlock, BeginBlockFlag ;
+    Boolean InLParenBlock, SemicolonEndsThisBlock, TakesLParenAsBlock, BeginBlockFlag ;
     int32 * AccumulatedOffsetPointer ;
     int64 * FrameSizeCellOffset, BlocksBegun ;
     byte * RspSaveOffset ;

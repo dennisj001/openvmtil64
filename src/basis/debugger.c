@@ -26,7 +26,7 @@ _Debugger_InterpreterLoop ( Debugger * debugger )
 }
 
 void
-_Debugger_PreSetup ( Debugger * debugger, Word * word, int8 forceFlag )
+_Debugger_PreSetup ( Debugger * debugger, Word * word, Boolean forceFlag )
 {
     if ( ( Is_DebugModeOn && Is_DebugShowOn ) || forceFlag )
     {

@@ -23,7 +23,7 @@ _dobject_Allocate ( int64 doType, int64 slots, uint64 allocType )
     int64 size = sizeof ( dobject ) + ( slots * sizeof ( int64 ) ) ;
     dobject * dobj = ( dobject * ) _object_Allocate ( size, allocType ) ;
     dobj->do_iData = ( int64* ) ( ( dobject* ) dobj + 1 ) ;
-    dobj->do_Slots = ( int8 ) slots ;
+    dobj->do_Slots = ( Boolean ) slots ;
     dobj->do_Size = ( int16 ) size ;
     dobj->do_Type = ( int32 ) doType ;
     dobj->do_InUseFlag = ( Boolean ) true ;

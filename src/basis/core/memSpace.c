@@ -419,7 +419,7 @@ NBA_Show ( NamedByteArray * nba, int64 flag )
 }
 
 void
-NBA_AccountRemainingAndShow ( NamedByteArray * nba, int8 flag )
+NBA_AccountRemainingAndShow ( NamedByteArray * nba, Boolean flag )
 {
     byte * name = nba->NBA_Symbol.S_Name ;
     nba->MemRemaining = 0 ;
@@ -487,7 +487,7 @@ _OVT_ShowPermanentMemList ( OpenVmTil * ovt )
 }
 
 void
-_Calculate_TotalNbaAccountedMemAllocated ( OpenVmTil * ovt, int8 showFlag )
+_Calculate_TotalNbaAccountedMemAllocated ( OpenVmTil * ovt, Boolean showFlag )
 {
     if ( ovt )
     {
@@ -555,7 +555,7 @@ MLA ( )
 void
 _OVT_ShowMemoryAllocated ( OpenVmTil * ovt )
 {
-    int8 vf = ( ovt->Verbosity > 1 ) ;
+    Boolean vf = ( ovt->Verbosity > 1 ) ;
     if ( ! vf ) _Printf ( ( byte* ) c_gu ( "\nIncrease the verbosity setting to 2 or more for more info here. ( Eg. : verbosity 2 = )" ) ) ;
     int64 leak = ( mmap_TotalMemAllocated - mmap_TotalMemFreed ) - ( ovt->TotalMemAllocated - ovt->TotalMemFreed ) - ovt->OVT_InitialUnAccountedMemory ;
     Calculate_TotalNbaAccountedMemAllocated ( ovt, 1 ) ; //leak || vf ) ;

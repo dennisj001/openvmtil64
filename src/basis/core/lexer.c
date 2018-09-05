@@ -24,7 +24,7 @@ _Lexer_LexNextToken_WithDelimiters ( Lexer * lexer, byte * delimiters, Boolean c
         while ( ( ! Lexer_CheckIfDone ( lexer, LEXER_DONE ) ) )
         {
             byte c = lexer->NextChar ( lexer->ReadLiner0 ) ;
-            _Lexer_GetChar ( lexer, c ) ;
+            Lexer_DoChar ( lexer, c ) ;
         }
         lexer->CurrentTokenDelimiter = lexer->TokenInputByte ;
         if ( lexer->TokenWriteIndex && ( ! GetState ( lexer, LEXER_RETURN_NULL_TOKEN ) ) )
@@ -235,17 +235,17 @@ Lexer_PeekNextNonDebugTokenWord ( Lexer * lexer, int64 evalFlag )
 }
 
 void
-_Lexer_GetChar ( Lexer * lexer, byte c )
+Lexer_DoChar ( Lexer * lexer, byte c )
 {
     lexer->TokenInputByte = c ;
-    Lexer_DoChar ( lexer, c ) ;
+    _Lexer_DoChar ( lexer, c ) ;
     lexer->CurrentReadIndex = lexer->ReadLiner0->ReadIndex ;
 }
 
 void
-Lexer_GetChar ( Lexer * lexer )
+Lexer_DoNextChar ( Lexer * lexer )
 {
-    _Lexer_GetChar ( lexer, lexer->NextChar ( lexer->ReadLiner0 ) ) ;
+    Lexer_DoChar ( lexer, lexer->NextChar ( lexer->ReadLiner0 ) ) ;
 }
 
 void
@@ -806,7 +806,7 @@ Lexer_SetInputFunction ( Lexer * lexer, byte ( *lipf ) ( ReadLiner * ) )
 }
 
 void
-Lexer_DoChar ( Lexer * lexer, byte c )
+_Lexer_DoChar ( Lexer * lexer, byte c )
 {
     _CfrTil_->LexerCharacterFunctionTable [ _CfrTil_->LexerCharacterTypeTable [ c ].CharInfo ] ( lexer ) ;
 }

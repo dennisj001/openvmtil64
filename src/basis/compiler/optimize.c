@@ -251,7 +251,7 @@ Compiler_Optimizer_2Args_Or_WordArg1_Op ( Compiler * compiler )
     if ( optInfo->wordArg2->CAttribute & DOBJECT ) Compile_StandardUnoptimized ( compiler ) ;
     else
     {
-        int8 rm = ( optInfo->wordArg2->CAttribute & REGISTER_VARIABLE ) ? optInfo->wordArg2->RegToUse : OREG ;
+        Boolean rm = ( optInfo->wordArg2->CAttribute & REGISTER_VARIABLE ) ? optInfo->wordArg2->RegToUse : OREG ;
         if ( optInfo->opWord->CAttribute & CATEGORY_OP_OPEQUAL )
         {
             SetHere ( optInfo->wordArg1->Coding, 0 ) ;
@@ -280,7 +280,7 @@ Compiler_Optimizer_2Args_Or_WordArg1_Op ( Compiler * compiler )
 }
 
 void
-Compile_StandardArg ( Word * word, int8 reg, Boolean rvalueFlag, byte * setHere )
+Compile_StandardArg ( Word * word, Boolean reg, Boolean rvalueFlag, byte * setHere )
 {
     if ( setHere ) SetHere ( setHere, 0 ) ;
     Word_SetCodingHere_And_ClearPreviousUseOf_Here_SCA ( word, 1 ) ;
@@ -312,7 +312,7 @@ Compiler_CompileOptimize_IncDec ( Compiler * compiler )
         GetRmDispImm ( optInfo, optInfo->wordArg2, - 1 ) ;
         if ( ! ( optInfo->OptimizeFlag & OPTIMIZE_IMM ) )
         {
-            int8 reg ;
+            Boolean reg ;
             if ( optInfo->wordArg2->CAttribute & REGISTER_VARIABLE ) reg = optInfo->wordArg2->RegToUse ;
             else reg = optInfo->Optimize_Rm ;
             SetHere ( optInfo->wordArg2->Coding, 0 ) ;
@@ -386,8 +386,8 @@ Compile_Optimize_Dup ( Compiler * compiler )
     optInfo->rtrn = OPTIMIZE_DONE ;
 }
 
-int8
-CheckForRegisterVariable ( Compiler * compiler, int8 reg )
+Boolean
+CheckForRegisterVariable ( Compiler * compiler, Boolean reg )
 {
     CompileOptimizeInfo * optInfo = compiler->OptInfo ;
     if ( ( reg == OREG ) && ( optInfo->wordArg2 && optInfo->wordArg2->CAttribute & REGISTER_VARIABLE ) ) reg = optInfo->wordArg2->RegToUse ;
@@ -406,7 +406,7 @@ CheckForRegisterVariable ( Compiler * compiler, int8 reg )
 // if ( optInfo->wordArg2 ) optInfo->wordArg2->RegToUse = optInfo->Optimize_Rm ;
 
 void
-Setup_MachineCodeInsnParameters ( Compiler * compiler, int8 direction, int8 mod, int8 reg, int8 rm, int64 disp, int64 immediate, int8 immSize, int8 forceSet )
+Setup_MachineCodeInsnParameters ( Compiler * compiler, Boolean direction, Boolean mod, Boolean reg, Boolean rm, int64 disp, int64 immediate, Boolean immSize, Boolean forceSet )
 {
     CompileOptimizeInfo * optInfo = compiler->OptInfo ;
     if ( optInfo->rtrn != OPTIMIZE_DONE )
@@ -546,7 +546,7 @@ void
 Compile_Optimize_Equal ( Compiler * compiler )
 {
     CompileOptimizeInfo * optInfo = compiler->OptInfo ;
-    int8 dstReg, srcReg ;
+    Boolean dstReg, srcReg ;
     if ( optInfo->wordArg1 && ( optInfo->wordArg1->CAttribute & REGISTER_VARIABLE ) )
     {
         dstReg = optInfo->wordArg1->RegToUse ;
@@ -598,7 +598,7 @@ void
 Compile_Optimize_Store ( Compiler * compiler )
 {
     CompileOptimizeInfo * optInfo = compiler->OptInfo ;
-    int8 reg = OREG, rm = ACC ;
+    Boolean reg = OREG, rm = ACC ;
     if ( optInfo->wordArg2 && ( optInfo->wordArg2->CAttribute & REGISTER_VARIABLE ) )
     {
         reg = optInfo->wordArg2->RegToUse ;

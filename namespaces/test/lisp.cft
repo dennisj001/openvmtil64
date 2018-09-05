@@ -49,8 +49,12 @@ sp
 
 ( set zs1 77 abc 7 )
 sp
-TODO ( "(f4 (f3 zs1) )" ) // (f4 (f3 zs1) )
-sp
+( define zs1 78 )
+( define f3 ( lambda ( x ) ( + x 8 ) ) ) ( f3 5 )
+( define f4 ( lambda ( y ) ( - y 9 ) ) )
+
+(f4 (f3 zs1) )
+
 (quote zs1)
 
 sp
@@ -118,8 +122,8 @@ nl // s pause
 `( 'x x ,x ,@x ) 
 nl
 (define y `( 'x x ,x ,@x ) )
-`( 'y y ,y ,@y ) 
-// pause
+d: `( 'y y ,y ,@y ) 
+pause
 "\nlisp test\n" ddps location
 (define a 3) (define b 4)
 (define y ( a b 1 2 ))
@@ -127,7 +131,7 @@ nl
 (define y ( 1 2 a b 5 6 )) 
 nl (y) nl (x) 
 `( 'x x ,x ,@x ) nl
-// pause 
+pause 
 '( 1 2 ( 3 4 ) 5 6 ( 7 ( 8 ( 9 ) 10 11 ) ( ( ( ( 12 ) ) 121 ) ) 13 ( 14 ) ) 15 ( 16 ( 17 ( 18 ) ) ) ) nl
 ( 1 2 ( 3 4 ) 5 6 ( 7 ( 8 ( 9 ) 10 11 ) ( ( ( ( 12 ) ) ) ) 13 ( 14 ) ) 15 ( 16 ( 17 ( 18 ) ) ) ) nl
 // tL

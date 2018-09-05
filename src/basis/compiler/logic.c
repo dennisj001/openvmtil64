@@ -4,7 +4,7 @@
 // 'setTtnn' is a notation from the intel manuals
 
 void
-BI_Set_setTtnn ( BlockInfo *bi, int8 setTtn, int8 setNegFlag, int8 jccTtt, int8 jccNegFlag )
+BI_Set_setTtnn ( BlockInfo *bi, Boolean setTtn, Boolean setNegFlag, Boolean jccTtt, Boolean jccNegFlag )
 {
     bi->SetccTtt = setTtn ;
     bi->SetccNegFlag = setNegFlag ;
@@ -14,20 +14,20 @@ BI_Set_setTtnn ( BlockInfo *bi, int8 setTtn, int8 setNegFlag, int8 jccTtt, int8 
 }
 
 void
-Compiler_Set_BI_setTtnn ( Compiler * compiler, int8 setTtn, int8 setNegFlag, int8 jccTtt, int8 jccNegFlag )
+Compiler_Set_BI_setTtnn ( Compiler * compiler, Boolean setTtn, Boolean setNegFlag, Boolean jccTtt, Boolean jccNegFlag )
 {
     BlockInfo *bi = ( BlockInfo * ) _Stack_Top ( compiler->CombinatorBlockInfoStack ) ;
     BI_Set_setTtnn ( bi, setTtn, setNegFlag, jccTtt, jccNegFlag ) ;
 }
 
 void
-_Compile_TestCode ( int8 reg, int8 size )
+_Compile_TestCode ( Boolean reg, Boolean size )
 {
     _Compile_TEST_Reg_To_Reg ( reg, reg, size ) ;
 }
 
 void
-BI_CompileRecord_TestCode_Reg ( BlockInfo *bi, int8 reg, int8 size )
+BI_CompileRecord_TestCode_Reg ( BlockInfo *bi, Boolean reg, Boolean size )
 {
     WordStack_SCHCPUSCA (0, 1) ;
     bi->LogicTestCode = Here ;
@@ -35,23 +35,23 @@ BI_CompileRecord_TestCode_Reg ( BlockInfo *bi, int8 reg, int8 size )
 }
 
 void
-BI_CompileRecord_TestCode_ArgRegNum ( BlockInfo *bi, int8 argRegNum )
+BI_CompileRecord_TestCode_ArgRegNum ( BlockInfo *bi, Boolean argRegNum )
 {
     BI_CompileRecord_TestCode_Reg ( bi, _COI_GetReg ( _Compiler_->OptInfo, argRegNum ), CELL ) ;
 }
 
 BlockInfo *
-Compiler_BI_CompileRecord_TestCode_Reg ( Compiler * compiler, int8 reg, int8 size )
+Compiler_BI_CompileRecord_TestCode_Reg ( Compiler * compiler, Boolean reg, Boolean size )
 {
     BlockInfo *bi = ( BlockInfo * ) _Stack_Top ( compiler->CombinatorBlockInfoStack ) ;
     BI_CompileRecord_TestCode_Reg ( bi, reg, size ) ;
     return bi ;
 }
 
-int8
-_COI_GetReg ( CompileOptimizeInfo * optInfo, int8 regNumber )
+Boolean
+_COI_GetReg ( CompileOptimizeInfo * optInfo, Boolean regNumber )
 {
-    int8 reg = ACC, reg1, reg2 ;
+    Boolean reg = ACC, reg1, reg2 ;
     if ( GetState ( _CfrTil_, OPTIMIZE_ON ) )
     {
         if ( regNumber == 1 )
@@ -70,13 +70,13 @@ _COI_GetReg ( CompileOptimizeInfo * optInfo, int8 regNumber )
 }
 
 void
-Compiler_BI_CompileRecord_TestCode_ArgRegNum ( Compiler * compiler, int8 argRegNum )
+Compiler_BI_CompileRecord_TestCode_ArgRegNum ( Compiler * compiler, Boolean argRegNum )
 {
     Compiler_BI_CompileRecord_TestCode_Reg ( compiler, _COI_GetReg ( compiler->OptInfo, argRegNum ), CELL ) ;
 }
 
 void
-Compiler_BI_CompileRecord_TestCode_Set_setTtnn ( Compiler * compiler, int8 reg, int8 setTtn, int8 setNegFlag, int8 jccTtt, int8 jccNegFlag )
+Compiler_BI_CompileRecord_TestCode_Set_setTtnn ( Compiler * compiler, Boolean reg, Boolean setTtn, Boolean setNegFlag, Boolean jccTtt, Boolean jccNegFlag )
 {
     BlockInfo *bi = Compiler_BI_CompileRecord_TestCode_Reg ( compiler, reg, CELL ) ;
     BI_Set_setTtnn ( bi, setTtn, setNegFlag, jccTtt, jccNegFlag ) ; //ZERO_TTT, setNegFlag ) ;
@@ -95,7 +95,7 @@ _Compile_GetTestLogicFromTOS ( BlockInfo *bi )
 // nb : only blocks with one ret insn can be successfully compiled inline
 
 void
-_Compile_LogicResultForStack ( int64 reg, int8 setTtn, Boolean setNegFlag )
+_Compile_LogicResultForStack ( int64 reg, Boolean setTtn, Boolean setNegFlag )
 {
     _Compile_Jcc ( setNegFlag, setTtn, Here + 21 ) ; // if eax is zero return not(R8) == 1 else return 0
     // return 0 in reg :
@@ -108,7 +108,7 @@ _Compile_LogicResultForStack ( int64 reg, int8 setTtn, Boolean setNegFlag )
 }
 
 BlockInfo *
-Compiler_Set_LogicCode ( Compiler * compiler, int8 setTtn, int8 setNegFlag, int8 jccTtt, int8 jccNegFlag )
+Compiler_Set_LogicCode ( Compiler * compiler, Boolean setTtn, Boolean setNegFlag, Boolean jccTtt, Boolean jccNegFlag )
 {
     BlockInfo *bi = ( BlockInfo * ) _Stack_Top ( compiler->CombinatorBlockInfoStack ) ;
     BI_Set_setTtnn ( bi, setTtn, setNegFlag, jccTtt, jccNegFlag ) ; //setTtn, setNegFlag ) ;
@@ -160,7 +160,7 @@ _Compile_LogicalNot ( Compiler * compiler )
 }
 
 void
-_Compile_SETcc ( int8 setTtn, int8 setNegFlag, int8 reg )
+_Compile_SETcc ( Boolean setTtn, Boolean setNegFlag, Boolean reg )
 {
     //DBI_ON ;
     uint8 opCode0, opCode1, modRm, rex ;
@@ -177,7 +177,7 @@ _Compile_SETcc ( int8 setTtn, int8 setNegFlag, int8 reg )
 // ?!? wanna use TEST insn here to eliminate need for _Compile_MOVZX_REG insn ?!? is that possible
 
 void
-_Compile_SETcc_setTtnn_REG ( Compiler * compiler, int8 setTtn, int8 setNegFlag, int8 jccTtt, int8 jccNegFlag, int8 reg, int8 rm )
+_Compile_SETcc_setTtnn_REG ( Compiler * compiler, Boolean setTtn, Boolean setNegFlag, Boolean jccTtt, Boolean jccNegFlag, Boolean reg, Boolean rm )
 {
     Compiler_Set_BI_setTtnn ( compiler, setTtn, setNegFlag, jccTtt, jccNegFlag ) ; // 6 : 0f9ec0 : setle al ; 480fb6c0 movzx rax, al :: 7 - 1 for initial 'ret' : i've forgotten *how, exactly* this actually works ??          
     _Compile_SETcc ( setTtn, setNegFlag, reg ) ;
@@ -195,7 +195,7 @@ _Compile_SETcc_setTtnn_REG ( Compiler * compiler, int8 setTtn, int8 setNegFlag, 
 // want to use 'test eax, 0' as a 0Branch (cf. jonesforth) basis for all block conditionals like if/else, do/while, for ...
 
 void
-Compile_Cmp_Set_setTtnn_Logic ( Compiler * compiler, int8 setTtn, int8 setNegateFlag, int8 jccTtt, int8 jccNegFlag )
+Compile_Cmp_Set_setTtnn_Logic ( Compiler * compiler, Boolean setTtn, Boolean setNegateFlag, Boolean jccTtt, Boolean jccNegFlag )
 {
     int64 optFlag = Compiler_CheckOptimize ( compiler, 0 ) ;
     if ( optFlag & OPTIMIZE_DONE ) return ;
@@ -238,7 +238,7 @@ Compile_Cmp_Set_setTtnn_Logic ( Compiler * compiler, int8 setTtn, int8 setNegate
         WordList_SetCoding ( 0, Here ) ;
         Compile_CMP ( REG, REG, ACC, OREG, 0, 0, CELL ) ;
     }
-    int8 reg = ACC ; //nb! reg should always be ACC! : immediately after the 'cmp' insn which changes the flags appropriately
+    Boolean reg = ACC ; //nb! reg should always be ACC! : immediately after the 'cmp' insn which changes the flags appropriately
     _Compile_SETcc_setTtnn_REG ( compiler, setTtn, setNegateFlag, jccTtt, jccNegFlag, reg, reg ) ; //nb! should always be ACC! : immediately after the 'cmp' insn which changes the flags appropriately
     _Word_CompileAndRecord_PushReg ( _CfrTil_WordList ( 0 ), reg ) ; //ACC ) ;
 }
@@ -282,14 +282,14 @@ Compile_GreaterThanOrEqual ( Compiler * compiler )
 }
 
 void
-Compile_TestLogicAndStackPush ( Compiler * compiler, int8 reg, int8 setTtn, int8 setNegFlag, int8 jccTtt, int8 jccNegFlag )
+Compile_TestLogicAndStackPush ( Compiler * compiler, Boolean reg, Boolean setTtn, Boolean setNegFlag, Boolean jccTtt, Boolean jccNegFlag )
 {
     Compiler_BI_CompileRecord_TestCode_Set_setTtnn ( compiler, reg, TTT_ZERO, setNegFlag, jccTtt, jccNegFlag ) ;
     Compiler_CompileAndRecord_PushAccum ( compiler ) ;
 }
 
 void
-Compile_Logical_X ( Compiler * compiler, int64 op, int8 setTtn, int8 setNegateFlag, int8 jccTtt, int8 jccNegFlag )
+Compile_Logical_X ( Compiler * compiler, int64 op, Boolean setTtn, Boolean setNegateFlag, Boolean jccTtt, Boolean jccNegFlag )
 {
     int64 optFlag = Compiler_CheckOptimize ( compiler, 0 ) ;
     if ( optFlag == OPTIMIZE_DONE ) return ;
@@ -369,7 +369,7 @@ _BI_Compile_Jcc ( BlockInfo *bi, byte* address ) // , int8 nz
 }
 
 void
-BI_Compile_Jcc ( BlockInfo *bi, int8 setTtn, byte * address ) // , int8 nz
+BI_Compile_Jcc ( BlockInfo *bi, Boolean setTtn, byte * address ) // , int8 nz
 {
     if ( bi->JccLogicCode )
     {
@@ -391,7 +391,7 @@ BI_Compile_Jcc ( BlockInfo *bi, int8 setTtn, byte * address ) // , int8 nz
 }
 
 void
-Compiler_Compile_Jcc ( Compiler * compiler, int64 bindex, int8 setTtn ) // , int8 nz
+Compiler_Compile_Jcc ( Compiler * compiler, int64 bindex, Boolean setTtn ) // , int8 nz
 {
     BlockInfo *bi = ( BlockInfo * ) _Stack_Pick ( compiler->CombinatorBlockInfoStack, bindex ) ; // -1 : remember - stack is zero based ; stack[0] is top
     BI_Compile_Jcc ( bi, setTtn, 0 ) ;

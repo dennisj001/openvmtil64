@@ -362,7 +362,7 @@ Debugger_SetupStepping ( Debugger * debugger )
 }
 
 int64
-_Debugger_SetupReturnStackCopy ( Debugger * debugger, int64 size, int8 showFlag )
+_Debugger_SetupReturnStackCopy ( Debugger * debugger, int64 size, Boolean showFlag )
 {
     if ( _Q_->Verbosity > 3 ) _CfrTil_PrintNReturnStack ( 4 ) ;
     uint64 * rsp = ( uint64* ) _CfrTil_->cs_Cpu->Rsp ; //debugger->DebugESP [- 1] ; //debugger->cs_Cpu->Rsp [1] ; //debugger->cs_Cpu->Rsp ;

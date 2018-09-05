@@ -355,11 +355,12 @@ scOff
 sp 
 : sh _sh ; prefix
 stringMacrosOn
-//: testCfrTil "namespaces/init.cft" <dbg> include ;
+Root
 : testCfrTil "namespaces/init.cft" include ;
+: test testCfrTil ;
 #if 1 //! testPreviousVersion 
 'ctloc 'compileTimeLocation find alias debugWord
-: spl { compileMode } { locationPush compileThisWord } { locationPrint _s _pause } ifElse ; immediate // nb! can only be used withing compiled words not interpreted
+: spl { compileMode } { locationPush compileThisWord } { locationPrint _s _pause } ifElse ; immediate // nb! can only be used within compiled words not interpreted
 #else
 : ctloc ;
 #endif
@@ -380,48 +381,105 @@ dbgOn
 #endif
 scOn
 System 
-testCfrTil // dT0 //demo //dT0
+test // dT0 //demo //dT0
 #if _doDemo 
 demo 
 #endif //dT0
 stringMacrosOff
 
-#else
-// of course you can trim this file to your needs and put your personal init code here maybe
+#else // of course you can trim this file to your needs and put your personal init code here maybe
 
-#if 0
-Lisp
-( set zs1 77 abc 7 )
-d: ( set zs1 77 abc 7 )
-'( 1 2 ( 3 4 ) 5 6 ( 7 ( 8 ( 9 ) 10 11 ) ( ( ( ( 12 ) ) 121 ) ) 13 ( 14 ) ) 15 ( 16 ( 17 ( 18 ) ) ) ) nl
-'( 1 2 ( 3 4 ) 5 6 ( 7 ( 8 ( 9 ) 10 11 ) () ( ( ( ( 12 ) ) 121 ) 122 ) 13 ( 14 ( 141 ) ) 15 ( 16 (161 (162 (163)) ) ( 17 ( 18 ) ) ) ) ) nl
-'( 1 2 ( 3 4 ) 5 6 ( 7 ( 8 ( 9 ) 10 11 ) ( ( ( ( 12 ) ) 121 ) ) 13 ( 14 ) ) 15 ( 16 ( 17 ( 18 ) ) ) ) nl
-'( 1 2 ( 3 4 ) 5 6 ( 7 ( 8 ( 9 ) 10 11 ) () ( ( ( ( 12 ) ) 121 ) 122 ) 13 ( 14 ( 141 ) ) 15 ( 16 (161 (162 (163)) ) ( 17 ( 18 ) ) ) ) ) nl
-( 1 2 )
-( 1 2 ( 3 4 ) 5 6 ( 7 ( 8 ( 9 ) 10 11 ) ( ( ( ( 12 ) ) ) ) 13 ( 14 ) ) 15 ( 16 ( 17 ( 18 ) ) ) ) nl //pause
-( 1 2 ( 3 4 ) 5 6 ( 7 ( 8 ( 9 ) 10 11 ) ( ( ( ( 12 ) ) ) ) 13 ( 14 ) ) 15 ( 16 ( 17 ( 18 ) ) ) ) nl //pause
-lispOff
-(define x "let") (define a "the") // 'let' is a special word
-(define x1 'let) (define a1 the)
-sp
-nl ( Its 'a beautiful day don\'t 'let it get away )
-nl '( Its a beautiful day don\'t let it get away )
-nl '( Its a beautiful day don\'t @x1 it get away ) 
-nl `( ,Its ,a ,beautiful ,day ,don\'t ,@x1 ,it ,get ,away )
-nl `( Its ,a beautiful day don\'t ,x it get away ) "\ntesting unquote (',') above line should show : ( Its a beautiful day don't x it get away )" ps
-nl `( Its 'a beautiful day don\'t ,x1 it get away ) "\ntesting unquote (',') above line should show :  ( Its a beautiful day don't x1 it get away )" ps
-nl `( Its a beautiful day don\'t ,@x it get away )
-nl `( Its a beautiful day don\'t ,@x1 it get away )
-(define yfac (lambda (yy n) (if* (< n 2) 1 (* n (yy yy (- n 1)))))) 
-(yfac yfac 10) nl
-(define yfacc (lambda (yyy n1) (if* (< n1 2) (1) (* n1 (yyy yyy (- n1 1)))))) 
-(yfacc yfacc 10) nl
-(yfacc yfacc 7) nl //pause
-(define fibc (lambda ( n ) (ifElse (< n 2) n (+ (fibc (- n 1)) (fibc (- n 2))))))
-(fibc 20)
-sp
-
-lispOff  
+: fibBN ( n | fn fn1 fn2 -- TOS ) 
+    { fn 0 = fn1 0 = fn2 1 = } { n @ 0 > } { n 1 -= } 
+    {   
+        fn1 fn2 @ = 
+        fn2 fn @ = 
+        fn fn1 @ fn2 @ + = 
+    }
+    for
+    // nl svn @ fprint ":" ps fn @ fprint 
+    return fn
+;
+' fibBN find wdiss
+20 fibBN dup p 6765 _assert 
+: fibBN ( n | fn REG fn1 fn2 -- TOS ) 
+    { fn 0 = fn1 0 = fn2 1 = } { n @ 0 > } { n 1 -= } 
+    {   
+        fn1 fn2 @ = 
+        fn2 fn @ = 
+        fn fn1 @ fn2 @ + = 
+    }
+    for
+    // nl svn @ fprint ":" ps fn @ fprint 
+    fn @
+;
+' fibBN find wdiss
+20 fibBN dup p 6765 _assert 
+: fibBN ( n | fn, REG fn1, REG fn2 -- TOS ) 
+    { fn 0 = fn1 0 = fn2 1 = } { n @ 0 > } { n 1 -= } 
+    {   
+        fn1 fn2 @ = 
+        fn2 fn @ = 
+        fn fn1 @ fn2 @ + = 
+    }
+    for
+    // nl svn @ fprint ":" ps fn @ fprint 
+    fn @
+;
+' fibBN find wdiss
+20 fibBN dup p 6765 _assert 
+: fibBN ( n | REG fn REG fn1 REG fn2 -- TOS ) 
+    { fn 0 = fn1 0 = fn2 1 = } { n @ 0 > } { n 1 -= } 
+    {   
+        fn1 fn2 @ = 
+        fn2 fn @ = 
+        fn fn1 @ fn2 @ + = 
+    }
+    for
+    // nl svn @ fprint ":" ps fn @ fprint 
+    fn @
+;
+' fibBN find wdiss
+20 fibBN dup p 6765 _assert 
+: fibBN ( REG n | fn fn1 REG fn2 -- TOS ) 
+    { fn 0 = fn1 0 = fn2 1 = } { n @ 0 > } { n 1 -= } 
+    {   
+        fn1 fn2 @ = 
+        fn2 fn @ = 
+        fn fn1 @ fn2 @ + = 
+    }
+    for
+    // nl svn @ fprint ":" ps fn @ fprint 
+    fn @
+;
+' fibBN find wdiss
+20 fibBN dup p 6765 _assert 
+: fibBN ( REG n | fn REG fn1 REG fn2 -- TOS ) 
+    { fn 0 = fn1 0 = fn2 1 = } { n @ 0 > } { n 1 -= } 
+    {   
+        fn1 fn2 @ = 
+        fn2 fn @ = 
+        fn fn1 @ fn2 @ + = 
+    }
+    for
+    // nl svn @ fprint ":" ps fn @ fprint 
+    fn @
+;
+' fibBN find wdiss
+20 fibBN dup p 6765 _assert 
+: fibBN ( REG n | REG fn fn1 REG fn2 -- TOS ) 
+    { fn 0 = fn1 0 = fn2 1 = } { n @ 0 > } { n 1 -= } 
+    {   
+        fn1 fn2 @ = 
+        fn2 fn @ = 
+        fn fn1 @ fn2 @ + = 
+    }
+    for
+    // nl svn @ fprint ":" ps fn @ fprint 
+    fn @
+;
+' fibBN find wdiss
+20 fibBN dup p 6765 _assert 
 #endif
 
 #endif

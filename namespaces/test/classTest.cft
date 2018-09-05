@@ -78,7 +78,7 @@ testList DLList.size @ dup p dump //pause
 
 dbgOff 
 #if dbgOnVar @
-testList.HeadNode.AfterReference @ testList.TailNode.BeforeReference  "class init test : "  assert  : hi 1 2 3 4 5 + + + + p ; : hey hi hi hi hi hi ; hey : hi 1 2 3 4 5 + + + + p ; : hey hi hi hi hi hi ; hey // debugger test
+d: testList.HeadNode.AfterReference @ testList.TailNode.BeforeReference  "class init test : "  assert  : hi 1 2 3 4 5 + + + + p ; : hey hi hi hi hi hi ; hey : hi 1 2 3 4 5 + + + + p ; : hey hi hi hi hi hi ; hey // debugger test
 dbgOff
 #else
 testList.HeadNode.AfterReference @ testList.TailNode.BeforeReference  "class init test : " assert 

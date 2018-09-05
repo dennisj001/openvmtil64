@@ -135,7 +135,7 @@ next:
         if ( token )
         {
             l0 = LO_Read_DoToken ( lc, token, qidFlag, scwi ) ;
-            if ( ( l0 == ( ListObject * ) - 1 ) ) break ;
+            if ( l0 == undefined_1 ) break ;
             if ( ! l0 ) goto next ;
             l0->W_SC_Index = scwi ;
             if ( qidFlag ) SetState ( l0, QID, true ) ;

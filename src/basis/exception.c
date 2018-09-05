@@ -200,7 +200,7 @@ OVT_SigLongJump ( byte * restartMessage, sigjmp_buf * jb )
 }
 
 void
-OVT_Throw ( int signal, int64 restartCondition, int8 pauseFlag )
+OVT_Throw ( int signal, int64 restartCondition, Boolean pauseFlag )
 {
     sigjmp_buf * jb ;
     _Q_->RestartCondition = restartCondition ;

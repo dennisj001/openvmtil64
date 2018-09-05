@@ -262,8 +262,8 @@ LC_EvalPrint ( LambdaCalculus * lc, ListObject * l0 )
 {
     ListObject * l1 ;
     l1 = LO_Eval ( lc, l0 ) ;
-    SetState ( _LC_, LC_PRINT_ENTERED, false ) ;
     LO_PrintWithValue ( l1 ) ;
+    SetState ( _LC_, LC_PRINT_ENTERED, false ) ;
     SetBuffersUnused ( 1 ) ;
     _LC_->ParenLevel = 0 ;
     Compiler_Init ( _Context_->Compiler0, 0 ) ; // we could be compiling a cfrTil word as in oldLisp.cft
@@ -273,7 +273,7 @@ ListObject *
 _LC_Read_ListObject ( LambdaCalculus * lc, int64 parenLevel )
 {
     lc->ParenLevel = parenLevel ;
-    SetState ( lc, LC_PRINT_ENTERED, false ) ;
+    SetState ( _LC_, LC_PRINT_ENTERED, false ) ;
     ListObject * l0 = _LO_Read ( lc ) ;
     return l0 ;
 }

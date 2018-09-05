@@ -300,7 +300,7 @@ _Namespace_DoNamespace ( Namespace * ns, int64 immFlag )
 }
 
 DObject *
-_CfrTil_Do_DynamicObject_ToReg ( DObject * dobject0, int8 reg )
+_CfrTil_Do_DynamicObject_ToReg ( DObject * dobject0, Boolean reg )
 {
     Context * cntx = _Context_ ;
     Lexer * lexer = cntx->Lexer0 ;
@@ -328,7 +328,7 @@ _CfrTil_Do_DynamicObject_ToReg ( DObject * dobject0, int8 reg )
 }
 
 void
-CfrTil_Do_DynamicObject ( DObject * dobject0, int8 reg )
+CfrTil_Do_DynamicObject ( DObject * dobject0, Boolean reg )
 {
     DObject * dobject = _CfrTil_Do_DynamicObject_ToReg ( dobject0, reg ) ;
     if ( CompileMode )

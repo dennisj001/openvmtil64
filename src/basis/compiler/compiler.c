@@ -337,7 +337,7 @@ Stack_PointerToJmpOffset_Set ( )
 }
 
 void
-_Compiler_CompileAndRecord_Word0_PushReg ( int8 reg )
+_Compiler_CompileAndRecord_Word0_PushReg ( Boolean reg )
 {
     Word * word = _CfrTil_WordList ( 0 ) ;
     _Word_CompileAndRecord_PushReg ( word, reg ) ;

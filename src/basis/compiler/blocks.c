@@ -2,7 +2,7 @@
 #include "../../include/cfrtil64.h"
 
 BlockInfo * 
-BI_Block_Copy ( BlockInfo * bi, byte* dstAddress, byte * srcAddress, int64 bsize, int8 optFlag )
+BI_Block_Copy ( BlockInfo * bi, byte* dstAddress, byte * srcAddress, int64 bsize, Boolean optFlag )
 {
     Compiler * compiler = _Compiler_ ;
     if ( ! bi ) bi = ( BlockInfo * ) _Stack_Top ( compiler->CombinatorBlockInfoStack ) ;

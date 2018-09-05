@@ -198,7 +198,7 @@ ByteArray_AppendCopyItem ( ByteArray * ba, int64 size, int64 data ) // size in b
         {
             case 1:
             {
-                *( ( int8* ) index ) = ( byte ) data ;
+                *( ( Boolean* ) index ) = ( byte ) data ;
                 break ;
             }
             case 2:
