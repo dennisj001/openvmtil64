@@ -6,7 +6,6 @@ _Repl ( block repl )
     ReadLiner * rl = _Context_->ReadLiner0 ;
 
     byte * snp = rl->NormalPrompt, *sap = rl->AltPrompt ;
-    SetState ( _LC_, LC_REPL, true ) ;
     rl->NormalPrompt = ( byte* ) "<= " ;
     rl->AltPrompt = ( byte* ) "=> " ;
     //SetState ( _Q_->psi_PrintStateInfo, PSI_NEWLINE, true ) ;
@@ -19,7 +18,7 @@ _Repl ( block repl )
             _Printf ( ( byte* ) "<= " ) ;
             //LC_SaveStack ( ) ; // ?!? maybe we should do this stuff differently : literals are pushed on the stack by the interpreter
             ReadLine_GetLine ( rl ) ;
-            if ( strstr ( ( char* ) rl->InputLineString, ".." ) || strstr ( ( char* ) rl->InputLineString, "bye" ) || strstr ( ( char* ) rl->InputLineString, "exit" ) ) goto done ;
+            if ( strstr ( ( char* ) rl->InputLine, ".." ) || strstr ( ( char* ) rl->InputLine, "bye" ) || strstr ( ( char* ) rl->InputLine, "exit" ) ) goto done ;
             repl ( ) ;
             _Printf ( ( byte* ) "\n" ) ;
             //LC_RestoreStack ( ) ; // ?!? maybe we should do this stuff differently : literals are pushed on the stack by the interpreter
@@ -34,7 +33,6 @@ _Repl ( block repl )
 done:
     rl->NormalPrompt = snp ;
     rl->AltPrompt = sap ;
-    SetState ( _LC_, LC_REPL, false ) ;
     //AllowNewlines ;
 }
 

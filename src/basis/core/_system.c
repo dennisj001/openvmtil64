@@ -73,7 +73,7 @@ System_RunInit ( System * system )
 void
 _System_Copy ( System * system, System * system0, uint64 type )
 {
-    MemCpy ( system, system0, sizeof (System ) ) ;
+    memcpy ( system, system0, sizeof (System ) ) ;
 }
 
 System *

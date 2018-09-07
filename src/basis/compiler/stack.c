@@ -4,7 +4,7 @@
 // keep this stack code correlated with core/cstack.c
 
 void
-_Compile_Stack_Drop ( Boolean stackReg )
+_Compile_Stack_Drop ( int8 stackReg )
 {
     //_DBI_ON ;
     Compile_SUBI ( REG, stackReg, 0, sizeof (int64 ), BYTE ) ; // 3 bytes long
@@ -12,7 +12,7 @@ _Compile_Stack_Drop ( Boolean stackReg )
 }
 
 void
-_Compile_Stack_DropN ( Boolean stackReg, int64 n )
+_Compile_Stack_DropN ( int8 stackReg, int64 n )
 {
     Compile_SUBI ( REG, stackReg, 0, n * sizeof ( int64 ), 0 ) ;
 }
@@ -27,14 +27,14 @@ _Compile_DropN_Rsp ( int64 n )
 }
 
 void
-_Compile_SetStackN_WithObject ( Boolean stackReg, int64 n, int64 obj )
+_Compile_SetStackN_WithObject ( int8 stackReg, int64 n, int64 obj )
 {
     //_Compile_MoveImm ( int64 direction, int64 rm, int64 sib, int64 disp, int64 imm, int64 operandSize )
     Compile_MoveImm ( MEM, stackReg, 0, n * CELL, obj, CELL ) ;
 }
 
 void
-_Compile_Stack_Push ( Boolean stackReg, int64 obj ) // runtime
+_Compile_Stack_Push ( int8 stackReg, int64 obj ) // runtime
 {
     Compile_ADDI ( REG, stackReg, 0, sizeof (int64 ), 0 ) ;
     //_Compile_MoveImm ( MEM, stackReg, 0, 0, obj, CELL ) ;
@@ -44,7 +44,7 @@ _Compile_Stack_Push ( Boolean stackReg, int64 obj ) // runtime
 // push a stack at an rvalue using an lvalue
 
 void
-_Compile_StackPtrLValue_PushObj ( uint64 stkPtrLvalue, Boolean tempStkReg, int64 obj ) // c lvalue
+_Compile_StackPtrLValue_PushObj ( uint64 stkPtrLvalue, int8 tempStkReg, int64 obj ) // c lvalue
 {
 #if 0    
     Compile_ADDI ( REG, tempStkReg, 0, sizeof (int64 ), 0 ) ;
@@ -66,7 +66,7 @@ _Compile_StackPtrLValue_PushObj ( uint64 stkPtrLvalue, Boolean tempStkReg, int64
 // pop a stack at an rvalue using an lvalue
 
 void
-_Compile_StackPtrLValue_PopToReg ( uint64 stkPtrLvalue, Boolean tempStkReg, Boolean reg ) // c lvalue
+_Compile_StackPtrLValue_PopToReg ( uint64 stkPtrLvalue, int8 tempStkReg, int8 reg ) // c lvalue
 {
     //_Compile_GetRValue_FromLValue_ToReg ( stackReg, ( byte* ) ptr ) ;
     Compile_MoveImm_To_Reg ( OREG, ( int64 ) stkPtrLvalue, CELL_SIZE ) ; // OREG is lvalue
@@ -80,19 +80,19 @@ _Compile_StackPtrLValue_PopToReg ( uint64 stkPtrLvalue, Boolean tempStkReg, Bool
 }
 
 void
-_Compile_Move_StackN_To_Reg ( Boolean reg, Boolean stackReg, int64 index )
+_Compile_Move_StackN_To_Reg ( int8 reg, int8 stackReg, int64 index )
 {
     Compile_Move_Rm_To_Reg ( reg, stackReg, index * CELL ) ;
 }
 
 void
-_Compile_Move_Reg_To_StackN ( Boolean stackReg, int64 index, Boolean reg )
+_Compile_Move_Reg_To_StackN ( int8 stackReg, int64 index, int8 reg )
 {
     Compile_Move_Reg_To_Rm ( stackReg, reg, index * CELL ) ;
 }
 
 void
-_Compile_Move_StackNRm_To_Reg ( Boolean reg, Boolean stackReg, int64 index )
+_Compile_Move_StackNRm_To_Reg ( int8 reg, int8 stackReg, int64 index )
 {
     _Compile_Move_StackN_To_Reg ( reg, stackReg, index ) ;
     Compile_Move_Rm_To_Reg ( reg, reg, 0 ) ; // *x
@@ -101,7 +101,7 @@ _Compile_Move_StackNRm_To_Reg ( Boolean reg, Boolean stackReg, int64 index )
 //  ( reg sreg n ) mov_reg_to_stacknMemAddr
 
 void
-_Compile_Move_Reg_To_StackNRm_UsingReg ( Boolean stackReg, int64 index, Boolean reg, Boolean ureg )
+_Compile_Move_Reg_To_StackNRm_UsingReg ( int8 stackReg, int64 index, int8 reg, int8 ureg )
 {
     _Compile_Move_StackN_To_Reg ( ureg, stackReg, index ) ;
     Compile_Move_Reg_To_Rm ( ureg, reg, 0 ) ;
@@ -110,52 +110,52 @@ _Compile_Move_Reg_To_StackNRm_UsingReg ( Boolean stackReg, int64 index, Boolean 
 // remember to use a negative number to access an existing stack item
 
 void
-_Compile_Stack_PushReg ( Boolean stackReg, Boolean reg )
+_Compile_Stack_PushReg ( int8 stackReg, int8 reg )
 {
     Compile_ADDI ( REG, stackReg, 0, sizeof (int64 ), 1 ) ;
     _Compile_Move_Reg_To_StackN ( stackReg, 0, reg ) ;
 }
 
 void
-_Compile_Stack_PopToReg ( Boolean stackReg, Boolean reg )
+_Compile_Stack_PopToReg ( int8 stackReg, int8 reg )
 {
     _Compile_Move_StackN_To_Reg ( reg, stackReg, 0 ) ;
     Compile_SUBI ( REG, stackReg, 0, sizeof (int64 ), 1 ) ;
 }
 
 void
-Compile_Stack_PushACCUM ( Boolean stackReg )
+Compile_Stack_PushACCUM ( int8 stackReg )
 {
     _Compile_Stack_PushReg ( stackReg, ACC ) ;
 }
 
 void
-Compile_Move_TOS_To_ACCUM ( Boolean stackReg )
+Compile_Move_TOS_To_ACCUM ( int8 stackReg )
 {
     _Compile_Move_StackN_To_Reg ( ACC, stackReg, 0 ) ;
 }
 
 void
-Compile_Move_ACC_To_TOS ( Boolean stackReg )
+Compile_Move_ACC_To_TOS ( int8 stackReg )
 {
     _Compile_Move_Reg_To_StackN ( stackReg, 0, ACC ) ;
 }
 
 void
-Compile_Pop_To_Acc ( Boolean stackReg )
+Compile_Pop_To_Acc ( int8 stackReg )
 {
     _Compile_Stack_PopToReg ( stackReg, ACC ) ;
 }
 
 void
-Compile_Pop_ToAcc_AndCall ( Boolean stackReg )
+Compile_Pop_ToAcc_AndCall ( int8 stackReg )
 {
     _Compile_Stack_PopToReg ( stackReg, ACC ) ;
     _Compile_Call_Acc ( ) ;
 }
 
 void
-Compile_MoveImm_To_TOS ( Boolean stackReg, int64 imm, Boolean size )
+Compile_MoveImm_To_TOS ( int8 stackReg, int64 imm, int8 size )
 {
     Compile_MoveImm ( MEM, stackReg, 0, 0, imm, size ) ;
 }
@@ -164,7 +164,7 @@ Compile_MoveImm_To_TOS ( Boolean stackReg, int64 imm, Boolean size )
 // for n < 64
 
 void
-_Compile_Stack_NDup ( Boolean stackReg )
+_Compile_Stack_NDup ( int8 stackReg )
 {
     Compile_Move_Rm_To_Reg ( ACC, stackReg, 0 ) ;
     Compile_ADDI ( REG, stackReg, 0, sizeof (int64 ), 0 ) ; // 3 bytes long
@@ -173,7 +173,7 @@ _Compile_Stack_NDup ( Boolean stackReg )
 #endif
 
 void
-_Compile_Stack_Dup ( Boolean stackReg )
+_Compile_Stack_Dup ( int8 stackReg )
 {
     Compiler * compiler = _Context_->Compiler0 ;
     int64 optFlag = Compiler_CheckOptimize ( compiler, 0 ) ;
@@ -208,7 +208,7 @@ _Compile_Stack_Dup ( Boolean stackReg )
 // nb. should not try to optimize because it needs the argument slot for it's result
 
 void
-_Compile_Stack_Pick ( Boolean stackReg ) // pick
+_Compile_Stack_Pick ( int8 stackReg ) // pick
 {
     //DBI_ON ;
     Compile_Move_Rm_To_Reg ( ACC, stackReg, 0 ) ;
@@ -224,7 +224,7 @@ _Compile_Stack_Pick ( Boolean stackReg ) // pick
 }
 
 void
-_Compile_Stack_Swap ( Boolean stackReg )
+_Compile_Stack_Swap ( int8 stackReg )
 {
     Compile_Move_Rm_To_Reg ( OREG, stackReg, 0 ) ;
     Compile_Move_Rm_To_Reg ( RAX, stackReg, - CELL ) ;

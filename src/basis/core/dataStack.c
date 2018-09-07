@@ -1,55 +1,6 @@
 
 #include "../../include/cfrtil64.h"
 
-// these functions are part of the C vm and can't be compiled
-// ! they are should only be called in C functions !
-#if ! DSP_IS_GLOBAL_REGISTER
-
-uint64
-DataStack_Pop ( )
-{
-    _CfrTil_->Set_DataStackPointer_FromDspReg ( ) ;
-    int64 value = _Dsp_ [ 0 ] ; //
-    _Dsp_ -- ;
-    _CfrTil_->Set_DspReg_FromDataStackPointer ( ) ; // update DSP reg
-    return value ;
-}
-
-void
-DataStack_Push ( int64 value )
-{
-    _CfrTil_->Set_DataStackPointer_FromDspReg ( ) ;
-    _Dsp_ ++ ;
-    _Dsp_ [0] = value ;
-    _CfrTil_->Set_DspReg_FromDataStackPointer ( ) ; // update DSP reg
-}
-
-void
-DataStack_Dup ( )
-{
-    _CfrTil_->Set_DataStackPointer_FromDspReg ( ) ;
-    _Dsp_ [ 1 ] = _Dsp_[0] ;
-    _Dsp_ ++ ;
-    _CfrTil_->Set_DspReg_FromDataStackPointer ( ) ; // update DSP reg
-}
-
-void
-DataStack_DropN ( int64 n )
-{
-    _CfrTil_->Set_DataStackPointer_FromDspReg ( ) ;
-    _Dsp_ -= n ;
-    _CfrTil_->Set_DspReg_FromDataStackPointer ( ) ; // update DSP reg
-}
-
-void
-DataStack_Drop ( )
-{
-    _CfrTil_->Set_DataStackPointer_FromDspReg ( ) ;
-    _Dsp_ -- ;
-    _CfrTil_->Set_DspReg_FromDataStackPointer ( ) ; // update DSP reg
-}
-#else
-
 uint64
 DataStack_Pop ( )
 {
@@ -83,7 +34,6 @@ DataStack_Drop ( )
 {
     _Dsp_ -- ;
 }
-#endif
 
 inline int64
 DataStack_Overflow ( )
@@ -144,7 +94,6 @@ CfrTil_PrintDataStack ( )
     _CfrTil_PrintDataStack ( ) ;
 }
 
-
 void
 Set_DataStackPointer_FromDspReg ( )
 {
@@ -158,16 +107,18 @@ Set_DspReg_FromDataStackPointer ( )
     _CfrTil_->Set_DspReg_FromDataStackPointer ( ) ;
 }
 
-
 void
 CfrTil_CheckInitDataStack ( )
 {
     //CfrTil_SetStackPointerFromDsp ( _CfrTil_ ) ;
     if ( Stack_Depth ( _DataStack_ ) < 0 )
     {
-        _Stack_PrintHeader ( _DataStack_, ( byte* ) "DataStack" ) ;
-        _Printf ( ( byte* ) c_ad ( "\n\nError : %s : %s : Stack Underflow!" ), _Context_->CurrentlyRunningWord ? _Context_->CurrentlyRunningWord->Name : ( byte * ) "", _Context_Location ( _Context_ ) ) ;
-        _Printf ( ( byte* ) c_gd ( "\nReseting DataStack.\n" ) ) ;
+        if ( _Q_->Verbosity > 1 )
+        {
+            _Stack_PrintHeader ( _DataStack_, ( byte* ) "DataStack" ) ;
+            _Printf ( ( byte* ) c_ad ( "\n\nError : %s : %s : Stack Underflow!" ), _Context_->CurrentlyRunningWord ? _Context_->CurrentlyRunningWord->Name : ( byte * ) "", _Context_Location ( _Context_ ) ) ;
+            _Printf ( ( byte* ) c_gd ( "\nReseting DataStack.\n" ) ) ;
+        }
         _Stack_Init ( _CfrTil_->DataStack, _Q_->DataStackSize ) ;
         _CfrTil_DataStack_Init ( _CfrTil_ ) ;
         _Stack_PrintHeader ( _DataStack_, ( byte* ) "DataStack" ) ;

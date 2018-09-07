@@ -4,7 +4,6 @@
 
 #define _Q_CodeByteArray _Q_->CodeByteArray
 #define _Q_CodeSpace _Q_->MemorySpace0->CodeSpace
-#define _LC_ _Q_->OVT_LC 
 #define _Compile_Int8( value ) ByteArray_AppendCopyItem ( _Q_CodeByteArray, 1, value )
 #define _Compile_Int16( value ) ByteArray_AppendCopyItem ( _Q_CodeByteArray, 2, value )
 #define _Compile_Int32( value ) ByteArray_AppendCopyItem ( _Q_CodeByteArray, 4, value )
@@ -42,9 +41,9 @@
 #define Debugger_IsNewLine( debugger ) GetState ( debugger, DBG_NEWLINE )
 #define Debugger_SetNewLine( debugger, flag ) SetState ( debugger, DBG_NEWLINE, flag ) 
 
-#define Set_CompileMode( tf ) SetState ( _Context_->Compiler0, COMPILE_MODE, tf ) //; _LC_ ? SetState ( _LC_, LC_COMPILE_MODE, tf ) : 0 ; 
-#define Get_CompileMode() GetState ( _Context_->Compiler0, COMPILE_MODE )  //|| ( _LC_ ? GetState ( _LC_, LC_COMPILE_MODE ) : 0 ) ) 
-#define CompileMode GetState ( _Context_->Compiler0, COMPILE_MODE )  //|| ( _LC_ && GetState ( _LC_, ( LC_COMPILE_MODE ) ) ) ) : 0)
+#define Set_CompileMode( tf ) SetState ( _Context_->Compiler0, COMPILE_MODE, tf ) ; _Q_->OVT_LC ? SetState ( _Q_->OVT_LC, LC_COMPILE_MODE, tf ) : 0 ; 
+#define Get_CompileMode() ( GetState ( _Context_->Compiler0, COMPILE_MODE ) || ( _Q_->OVT_LC ? GetState ( _Q_->OVT_LC, LC_COMPILE_MODE ) : 0 ) ) 
+#define CompileMode (_Context_ ? ( GetState ( _Context_->Compiler0, COMPILE_MODE ) || ( _Q_->OVT_LC && GetState ( _Q_->OVT_LC, ( LC_COMPILE_MODE ) ) ) ) : 0)
 #define Compiling CompileMode
 #define ImmediateWord( word) (word->CAttribute & IMMEDIATE)
 #define CPrimitiveWord( word) (word->CAttribute & CPRIMITIVE)
@@ -184,7 +183,7 @@
 #define Stringni_Equal( string1, string2, n ) (Strnicmp ( (char*) string1, (char*) string2, n ) == 0 )
 #define Stringi_Equal( string1, string2 ) (Stricmp ( (char*) string1, (char*) string2 ) == 0 )
 #define String_Equal( string1, string2 ) (Strcmp ( (char*) string1, (char*) string2 ) == 0 )
-#define sconvbs( d, s ) (byte*) _String_ConvertStringToBackSlash ( d, s, -1 )
+#define sconvbs( d, s ) (byte*) _String_ConvertStringToBackSlash ( d, s )
 #define String_CB( string0 ) String_ConvertToBackSlash ( string0 )
 
 #define DEBUG_PRINTSTACK if ( GetState ( _CfrTil_, DEBUG_MODE )  ) CfrTil_PrintDataStack () ;
@@ -268,8 +267,4 @@
 #define Strlen( s ) ( s ? strlen ( (const char *) s ) : 0 )
 #define Strncpy( dst, src, n ) strncpy ( (char *__restrict) dst, (const char *__restrict) src, (size_t) n )
 #define Map0( dllist, mf ) dllist_Map ( dllist, (MapFunction0) mf )
-
-//#define MemCpy(dst, src, size) memcpy ((byte*)dst, (byte*)src, (int64) size)  //_MemCpy ((byte*)dst, (byte*)src, (int64) size)
-#define MemCpy(dst, src, size) _MemCpy ((byte*)dst, (byte*)src, (int64) size)
-
 

@@ -4,7 +4,6 @@
 Root 
 "Control" namespace
  Bits Control
-'x var
 // d: "agoto" { "here" label { kbhit dup p } { "end" goto } { 1 p "here" goto } ifElse "end" label 2 p } word
 // " agoto { " here label { kbhit dup p } { " end goto } { 1 p " here goto } ifElse " end label 2 p } word
 // "aret" { "here" label { kbhit } { return } { 1 p "here" goto } ifElse 2 p } word
@@ -107,8 +106,7 @@ Compiler Logic User
 : t3 1 2 > if_ 1 p _else_ 2 p _fi ; 
 //: t4 1 2 Asm.test {| N ZERO |} jcc 1 p _else_ 2 p _fi ; 
 //' t4 find wdiss
-nl t0 t1 t3 //pause
-"\nlast line should show : 2 2 2" ps
+t0 t1 t3 //pause
 #endif 
 sp
 2 + 7 assertStkChk // stack checking

@@ -244,11 +244,13 @@ _CfrTil_C_Infix_EqualOp ( Word * opWord )
     d0 ( if ( Is_DebugModeOn ) Compiler_SC_WordList_Show ("\nCfrTil_C_Infix_EqualOp : before op word", 0 , 0) ) ;
     if ( opWord ) rword = opWord ;
     else rword = word0 ; //_Interpreter_DoWord_Default ( interp, opWord ) ;
+    //rword->W_RL_Index = tsrli ;
+    //rword->W_SC_Index = svscwi ;
     svName = rword->Name ;
     rword->Name = "=" ;
     if ( lhsWord ) SetState ( _Debugger_, DBG_OUTPUT_INSERTION, true ) ; // activate this in disassemble source code ??
     _Interpreter_DoWord_Default ( interp, rword, tsrli, svscwi ) ;
-    SetState ( _Debugger_, DBG_OUTPUT_INSERTION, false ) ;
+    SetState ( _Debugger_, DBG_OUTPUT_INSERTION, true ) ;
     rword->Name = svName ;
     if ( GetState ( compiler, C_COMBINATOR_LPAREN ) )
     {
@@ -258,9 +260,12 @@ _CfrTil_C_Infix_EqualOp ( Word * opWord )
     List_InterpretLists ( compiler->PostfixLists ) ;
     compiler->LHS_Word = 0 ;
     if ( ! Compiling ) CfrTil_InitSourceCode ( _CfrTil_ ) ;
-    SetState ( _Debugger_, DEBUG_SHTL_OFF, false ) ;
+    SetState ( _Debugger_, DEBUG_HTIL_OFF, false ) ;
     SetState ( compiler, C_INFIX_EQUAL, false ) ;
-    d0 ( if ( Is_DebugModeOn ) Compiler_SC_WordList_Show ("\nCfrTil_C_Infix_EqualOp : just before return", 0 , 0) ) ;
+    d0 (
+
+    if ( Is_DebugModeOn ) Compiler_SC_WordList_Show ("\nCfrTil_C_Infix_EqualOp : just before return", 0 , 0) ) ;
+    //if ( ! GetState ( cntx, C_SYNTAX ) ) 
     _CfrTil_PushToken_OnTokenList ( token ) ; // so the callee can check use or use
 }
 

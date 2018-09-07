@@ -309,8 +309,6 @@
 #define RT_STEPPING_DEBUG   ( (uint64) 1 << 14 )
 #define ADDRESS_OF_OP       ( (uint64) 1 << 15 )
 #define BLOCK_DELIMITER     ( (uint64) 1 << 16 )
-#define T_OBJECT            ( (uint64) 1 << 17 )
-#define T_MORPHISM          ( (uint64) 1 << 18 )
 
 // _CAttribute for interpreter word types - 4 bits/ 16 possibilities : N_WordAttribute bitfield
 #define WT_PREFIX                 ( (uint64) 1 <<  0 ) 
@@ -318,7 +316,6 @@
 #define WT_C_PREFIX_RTL_ARGS      ( (uint64) 1 <<  2 ) 
 #define WT_POSTFIX                ( (uint64) 1 <<  3 ) 
 #define WT_QID                    ( (uint64) 1 <<  4 ) 
-#define WT_C_SYNTAX               ( (uint64) 1 <<  5 )
 
 // LType - lisp types
 #define T_LAMBDA ( (uint64) 1 << 11 )
@@ -499,7 +496,7 @@
 #define STRING_MACROS_ON ( (uint64) 1 << 9 )
 #define GLOBAL_SOURCE_CODE_MODE ( (uint64) 1 << 10 )
 #define _DEBUG_SHOW_ ( (uint64) 1 << 11 )
-#define DEBUG_SHTL_OFF ( (uint64) 1 << 12 ) // SHTL == _String_HighlightTokenInputLine
+#define DEBUG_HTIL_OFF ( (uint64) 1 << 12 ) // SHTL == _String_HighlightTokenInputLine
 #define SC_FORCE_PUSH ( (uint64) 1 << 13 )
 
 // State Flags --
@@ -658,7 +655,6 @@
 #define LC_READ_LAMBDA_LOCALS   ( (uint64) 1 << 16 )
 #define LC_LAMBDA_COMPILE_MODE  ( (uint64) 1 << 17 )
 #define LC_EVAL_APPLY           ( (uint64) 1 << 18 )
-#define LC_DONE                 ( (uint64) 1 << 19 )
 
 // LambdaBody states
 #define USED ( 1<< 0 )

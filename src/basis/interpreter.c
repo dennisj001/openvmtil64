@@ -6,6 +6,7 @@ Interpreter_Init ( Interpreter * interp )
 {
     _Q_->OVT_Interpreter = interp ;
     interp->State = 0 ;
+    //_dllist_Init ( _Context_->PreprocessorStackList  ) ;      	
 }
 
 Interpreter *
@@ -25,7 +26,7 @@ Interpreter_New ( uint64 type )
 void
 _Interpreter_Copy ( Interpreter * interp, Interpreter * interp0 )
 {
-    MemCpy ( interp, interp0, sizeof (Interpreter ) ) ;
+    memcpy ( interp, interp0, sizeof (Interpreter ) ) ;
 }
 
 Interpreter *

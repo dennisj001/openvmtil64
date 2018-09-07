@@ -37,7 +37,6 @@ d: dlsym: mpfr_printf /usr/local/lib/libmpfr.so ; void_return
 
 Combinators
 BigNum 
-'x var
 bnInit ( 16 16 )
 : sp ; //stack pause ;
 

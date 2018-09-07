@@ -64,5 +64,4 @@ typedef int ( *mpf2andOutFunc) (mpfr_ptr, mpfr_srcptr, mpfr_srcptr, mpfr_rnd_t) 
 #include "machineCodeMacros.h"
 #include "stacks.h"
 #include "prototypes.h"
-#include "lc.h"
 #endif

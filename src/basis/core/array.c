@@ -198,7 +198,7 @@ ByteArray_AppendCopyItem ( ByteArray * ba, int64 size, int64 data ) // size in b
         {
             case 1:
             {
-                *( ( Boolean* ) index ) = ( byte ) data ;
+                *( ( int8* ) index ) = ( byte ) data ;
                 break ;
             }
             case 2:
@@ -225,7 +225,7 @@ void
 ByteArray_AppendCopy ( ByteArray * ba, int64 size, byte * data ) // size in bytes
 {
     _ByteArray_AppendSpace ( ba, size ) ; // size in bytes
-    MemCpy ( ba->StartIndex, data, size ) ;
+    memcpy ( ba->StartIndex, data, size ) ;
 }
 
 void

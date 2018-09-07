@@ -142,7 +142,7 @@ type int32 ; int32.size = 4 ;
 type int64 ; int64.size = 8 ;
 type void ; void.size = 0 ;
 type char ; char.size = 1 ;
-//type word ; word.size = 2 ; // conflicts with Reserved word
+type word ; word.size = 2 ;
 type int ; int.size = 8 ;
 type long ; long.size = 8 ;
 type quad ; quad.size = 16 ;
@@ -365,7 +365,39 @@ stringMacrosOn
 : ctloc ;
 #endif
 
+Root 
+'doX64 1 const
+'doScript 1 const
+'_doDemo 1 const    
+'todo 0 const    
+dbgOff
+//dbgOn 
+#if Is_DebugOn 
+#if todo
+: _TODO ( str ) TODO ( str @ ) ;;
+: TODO ( str ) _TODO ( str @ ) pause ;;
+#endif
+scOn
+System 
+testCfrTil // dT0 //demo //dT0
+#if _doDemo 
+demo 
+#endif //dT0
+stringMacrosOff
 
+#else
+// you can trim this file to your needs and put your personal init code here maybe
+
+#if 0
+d: c_syntaxOn
+Root
+//int cpow ( base power | out ) s{ for ( out = 1 ; power ; ( power -= 1 ) ) { out = out * base ; } return out ; }s 
+int cpow ( base power | out ) { for ( d: out = 1 ; power ; power -= 1 ) { out = out * base ; } return out ; d: }
+'cpow find d: wdiss
+c_syntaxOff
+2 30 d: cpow dup p  1073741824 _assert
+#endif
+
+#endif
 2 + 7  assertStkChk // stack checking
-Shell
 s

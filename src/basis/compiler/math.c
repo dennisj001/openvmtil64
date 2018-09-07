@@ -44,7 +44,7 @@ Compile_Multiply ( Compiler * compiler )
 void
 _Compile_Divide ( Compiler * compiler, uint64 type )
 {
-    Boolean reg ;
+    int8 reg ;
     // dividend in edx:eax, quotient/divisor in eax, remainder in edx
     int64 optFlag = Compiler_CheckOptimize ( compiler, 0 ) ;
     if ( optFlag & OPTIMIZE_DONE ) return ;
@@ -55,7 +55,7 @@ _Compile_Divide ( Compiler * compiler, uint64 type )
 #if 0        
         if ( optInfo->OptimizeFlag & OPTIMIZE_IMM )
         {
-            Boolean reg = optInfo->wordArg1_literal ? ACC : OREG ;
+            int8 reg = optInfo->wordArg1_literal ? ACC : OREG ;
             Compile_MoveImm_To_Reg ( reg, ( int64 ) optInfo->Optimize_Imm, CELL ) ;
             optInfo->Optimize_Rm = ( reg == ACC ) ? OREG : ACC ; //optInfo->wordArg1ACC_literal ? OREG : ACC ; //reg ;
             optInfo->Optimize_Mod = REG ;

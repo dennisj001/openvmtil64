@@ -150,12 +150,9 @@ _Debugger_Locals_Show ( Debugger * debugger, Word * scWord )
             dlnode_Remove ( ( dlnode* ) svNamespace ) ; //nb! must! else _Namespace_FindOrNew_Local will find and continue to use it 
 
             _Debugger_ReadLocals ( debugger, lexer, rl, scWord, sc ) ;
-            Namespace * ns = _Compiler_->LocalsNamespace ;
-            if ( ns )
-            {
-                if ( ( sc && debugger->LocalsNamespacesStack ) ) _Debugger_Locals_Show_Loop ( debugger, scWord ) ;
-                else _Printf ( ( byte* ) "\nTry stepping a couple of instructions and try again." ) ;
-            }
+            if ( ( sc && debugger->LocalsNamespacesStack ) ) _Debugger_Locals_Show_Loop ( debugger, scWord ) ;
+            else _Printf ( ( byte* ) "\nTry stepping a couple of instructions and try again." ) ;
+
             // still problems here ?? make sure *everything* is reset 
             _Namespace_RemoveFromUsingListAndClear ( debugger->LocalsNamespace ) ;
             _Namespace_FreeNamespacesStack ( debugger->LocalsNamespacesStack ) ;
@@ -194,7 +191,7 @@ Debugger_TerminalLineWidth ( Debugger * debugger )
 }
 
 void
-Debugger_ShowStackChange ( Debugger * debugger, Word * word, byte * insert, byte * achange, Boolean stepFlag )
+Debugger_ShowStackChange ( Debugger * debugger, Word * word, byte * insert, byte * achange, int8 stepFlag )
 {
     int64 sl, i = 0, tw ;
     char *name, *location, *b, *b2 = ( char* ) Buffer_Data_Cleared ( _CfrTil_->DebugB2 ) ;
@@ -221,7 +218,7 @@ done:
 }
 
 void
-_Debugger_ShowEffects ( Debugger * debugger, Word * word, Boolean stepFlag, Boolean force )
+_Debugger_ShowEffects ( Debugger * debugger, Word * word, int8 stepFlag, int8 force )
 {
     debugger->w_Word = word ;
     uint64* dsp = _Dsp_ ;
@@ -322,28 +319,30 @@ _Debugger_ShowEffects ( Debugger * debugger, Word * word, Boolean stepFlag, Bool
 }
 
 void
-Debugger_ShowEffects ( Debugger * debugger, Boolean stepFlag, Boolean forceFlag )
+Debugger_ShowEffects ( Debugger * debugger, int8 stepFlag, int8 forceFlag )
 {
     _Debugger_ShowEffects ( debugger, debugger->w_Word, stepFlag, forceFlag ) ;
 }
 
-// hopefully this can also be used by SC_PrepareDbgSourceCodeString
 byte *
-_PrepareDbgSourceCodeString (Word * word, byte * il, int64 tvw , int64 tp )
+Debugger_ShowSourceCodeLine ( Debugger * debugger, Word * word, byte * token0, int64 twAlreayUsed )
 {
-    byte * cc_line ;
-    char * nvw = ( char* ) Buffer_Data_Cleared ( _CfrTil_->DebugB ) ; // nvw : new view window
+    ReadLiner * rl = _Context_->ReadLiner0 ;
     Boolean ins = GetState ( _Debugger_, DBG_OUTPUT_INSERTION ) ;
-    int64 slil, slt, totalBorder, idealBorder, leftBorder, rightBorder, lef, ref, nws, ots, nts, slNvw, wrli, inc ;
-    // NB!! : remember the highlighting formatting characters don't add any additional *visible length* to the output line
+    int64 slt = Strlen ( token0 ) ;
+
+    // NB!! : remember the highlighting formatting characters don't add any additional *length* to *visible* the output line
+    char * nvw = ( char* ) Buffer_Data_Cleared ( _CfrTil_->DebugB ) ; // nvw : new view window
+    char * il = ( char* ) String_New ( rl->InputLineString, TEMPORARY ) ; //nb! dont tamper with the input line. eg. removing its newline will affect other code which depends on newline
+    int64 totalBorder, idealBorder, leftBorder, rightBorder, lef, ref, tvw, nws, ots = word->W_RL_Index, nts ;
     // ots : original token start (index into the source code), nws : new window start ; tvw: targetViewWidth ; nts : new token start
     // lef : left ellipsis flag, ref : right ellipsis flag
-    byte * token = String_ConvertToBackSlash ( word->Name ) ;
-    slt = Strlen ( token ) ;
-    wrli = word->W_RL_Index ;
-    slil = Strlen ( String_RemoveEndWhitespace ( il ) ) ;
-    inc = slil - wrli ;
-    ots = wrli ; //  String_FindStrnCmpIndex ( il, token, wrli, slt, (( inc > 30 ) ? 30 : inc) ) ; //20 ) ;// adjust from wrli which is 
+    const int64 fel = 32 - 1 ; //fe : formatingEstimate length : 2 formats with 8/12 chars on each sude - 32/48 :: 1 : a litte leave way
+    int64 tw = Debugger_TerminalLineWidth ( debugger ) ; // 139 ; //139 : nice width :: Debugger_TerminalLineWidth ( debugger ) ; 
+    d0 ( if ( _Q_->Verbosity > 2 ) _Printf ( ( byte* ) "\nTerminal Width = %d\n", tw ) ) ;
+    tvw = tw - ( twAlreayUsed - fel ) ; //subtract the formatting chars which don't add to visible length
+    int64 i = 0, slil = Strlen ( String_RemoveEndWhitespace ( il ) ) ;
+    if ( ! ins ) ots = String_FindStrnCmpIndex ( il, token0, ots, slt, slil - ots ) ; //20 ) ;
     totalBorder = ( tvw - slt ) ; // the borders allow us to slide token within the window of tvw
     // try to get nts relatively the same as ots
     idealBorder = ( totalBorder / 2 ) ;
@@ -368,16 +367,15 @@ _PrepareDbgSourceCodeString (Word * word, byte * il, int64 tvw , int64 tp )
         leftBorder = totalBorder - rightBorder ;
         nts = leftBorder ; //+ (ins ? (slt/2 + 1) : 0 ) ;
     }
-    //else { the defaults above }
     if ( ins )
     {
         Strncpy ( nvw, &il[nws], ots ) ;
-        strcat ( nvw, token ) ;
+        strcat ( nvw, token0 ) ;
         strcat ( nvw, " " ) ;
         strcat ( nvw, &il[ots] ) ;
     }
     else Strncpy ( nvw, &il[nws], tvw ) ; // copy the the new view window to buffer nvw
-    slNvw = Strlen ( nvw ) ;
+    int64 slNvw = Strlen ( nvw ) ;
     if ( slNvw > ( tvw + 8 ) ) // is there a need for ellipsis
     {
         if ( ( ots - leftBorder ) < 4 ) lef = 0, ref = 1 ;
@@ -389,29 +387,9 @@ _PrepareDbgSourceCodeString (Word * word, byte * il, int64 tvw , int64 tp )
         else lef = 1, ref = 0 ; // choose lef as preferable
     }
     else lef = ref = 0 ;
-    cc_line = _String_HighlightTokenInputLine ( nvw, lef, leftBorder, nts, token, rightBorder, ref ) ;
-    String_RemoveEndWhitespace ( cc_line ) ;
-    return cc_line ;
-}
 
-// NB!! : remember the highlighting formatting characters don't add any additional *visible length* to the output line
-// ots : original token start (index into the source code), nws : new window start ; tvw: targetViewWidth ; nts : new token start
-// lef : left ellipsis flag, ref : right ellipsis flag
-byte *
-Debugger_PrepareDbgSourceCodeString ( Debugger * debugger, Word * word, byte * token0, int64 twAlreayUsed )
-{
-    byte * cc_line ;
-    if ( word )
-    {
-        ReadLiner * rl = _Context_->ReadLiner0 ;
-        char * il = ( char* ) String_New ( rl->InputLineString, TEMPORARY ) ; //nb! dont tamper with the input line. eg. removing its newline will affect other code which depends on newline
-        int64 fel, tw, tvw ;
-        fel = 32 - 1 ; //fe : formatingEstimate length : 2 formats with 8/12 chars on each sude - 32/48 :: 1 : a litte leave way
-        tw = Debugger_TerminalLineWidth ( debugger ) ; // 139 ; //139 : nice width :: Debugger_TerminalLineWidth ( debugger ) ; 
-        tvw = tw - ( twAlreayUsed - fel ) ; //subtract the formatting chars which don't add to visible length
-        cc_line = _PrepareDbgSourceCodeString (word, il, tvw, 0) ;
-    }
-    else cc_line = ( byte* ) "" ; // nts : new token start is a index into b - the nwv buffer
+    byte * cc_line = word ? _String_HighlightTokenInputLine ( nvw, lef, leftBorder, nts, token0, rightBorder, ref, 0 ) : ( byte* ) "" ; // nts : new token start is a index into b - the nwv buffer
+
     return cc_line ;
 }
 
@@ -477,7 +455,8 @@ next:
                         //( char* ) cc_Token, ( uint64 ) word->Definition ) ; //, _Q_->StartedTimes, _Q_->SignalExceptionsHandled ) ;
                         ( char* ) cc_Token, ( uint64 ) word ) ;
                 }
-                byte * cc_line = Debugger_PrepareDbgSourceCodeString ( debugger, word, token0, ( int64 ) Strlen ( obuffer ) ) ;
+                byte * cc_line = Debugger_ShowSourceCodeLine ( debugger, word, token0, ( int64 ) Strlen ( obuffer ) ) ;
+                String_RemoveEndWhitespace ( cc_line ) ;
                 Strncat ( obuffer, cc_line, BUFFER_SIZE ) ;
                 _Printf ( ( byte* ) "%s", obuffer ) ;
 
@@ -710,7 +689,7 @@ LO_Debug_ExtraShow ( int64 showStackFlag, int64 verbosity, int64 wordList, byte 
 }
 
 void
-_Debugger_PostShow ( Debugger * debugger, Word * word, Boolean force )//, byte * token, Word * word )
+_Debugger_PostShow ( Debugger * debugger, Word * word, int8 force )//, byte * token, Word * word )
 {
     _Debugger_ShowEffects ( debugger, word, GetState ( debugger, DBG_STEPPING ), force ) ;
 }

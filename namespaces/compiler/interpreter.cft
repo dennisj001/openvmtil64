@@ -1,7 +1,6 @@
 5 
 C
 : sp ; //stack pause ;
-lispOff
 //optimizeOff
 System Interpreter 
 // these #defines are a bunch of purposefully confusing looking early testing
@@ -21,13 +20,11 @@ System Interpreter
 infixOn
 
 #define xhi0() 1 + 2 p
-
 c_syntaxOn
 #define xhii() p (1 + 2) 
 #define xhi( n ) ps ( "\nxhi = ") ; 1 + 2 + n ; p()
-dscOn
 void
-testc1 ( ) 
+testc1 ( | atoken aword ) 
 {
     int tdbg = 1, tdbg2 = 2, tdbg3 = 3 ; 
     int tdbg4 = 4, tdbg5 = 5, tdbg6 = 6 ; 
@@ -38,16 +35,17 @@ testc1 ( )
     ps ( "\ntdbg5 =" ) ; p ( tdbg5 ) ; 
     ps ( "\ntdbg6 =" ) ; p ( tdbg6 ) ; //_pause () ;
     ps ( "\nxhii =" ) ; xhii () ; xhi0(); xhi1 ; xhi( 4 ); xhi01 ; xhi1 ; xhi2(8) ; xhi2a ( "xhi2a =", 8 ) ; 
-} prefix
+}
 //'testc1 find wdiss //pause 
-testc1 () ;
+testc1 () ; //pause
 #if 1
 C libc
 void
 interpret2 ( | atoken aword ) 
 {
-    testc1 ( ) ; xhi01 ; xhi1( ) ; xhi2 ( 8 ) ; xhi2a ( "xhi2a =", 8 ) ; 
-    nl( ) ; tab ( ) ; ps ( "interpret2 :> " ) ; nl ( ) ;
+    //<dbg>
+    testc1 () ; xhi01 ; xhi1() ; xhi2 ( 8 ) ; xhi2a ( "xhi2a =", 8 ) ; 
+    nl() ; tab () ; ps ( "interpret2 :> " ) ; nl () ;
     while ( 1 )
     {   
         atoken = token () ; 
@@ -90,5 +88,6 @@ sp
 #endif
 
 c_syntaxOff 
+
 2 + 7 assertStkChk // stack checking
 

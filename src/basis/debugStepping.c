@@ -362,7 +362,7 @@ Debugger_SetupStepping ( Debugger * debugger )
 }
 
 int64
-_Debugger_SetupReturnStackCopy ( Debugger * debugger, int64 size, Boolean showFlag )
+_Debugger_SetupReturnStackCopy ( Debugger * debugger, int64 size, int8 showFlag )
 {
     if ( _Q_->Verbosity > 3 ) _CfrTil_PrintNReturnStack ( 4 ) ;
     uint64 * rsp = ( uint64* ) _CfrTil_->cs_Cpu->Rsp ; //debugger->DebugESP [- 1] ; //debugger->cs_Cpu->Rsp [1] ; //debugger->cs_Cpu->Rsp ;
@@ -378,7 +378,7 @@ _Debugger_SetupReturnStackCopy ( Debugger * debugger, int64 size, Boolean showFl
             if ( showFlag ) ( _PrintNStackWindow ( ( int64* ) debugger->CopyRSP, "ReturnStackCopy", "RSCP", 4 ) ) ;
         }
         else rsc = ( uint64 ) ( debugger->CopyRSP - size + pushedWindow ) ;
-        MemCpy ( ( byte* ) rsc, ( ( byte* ) rsp ) - size + pushedWindow, size ) ; // pushedWindow (32) : account for useful current stack
+        memcpy ( ( byte* ) rsc, ( ( byte* ) rsp ) - size + pushedWindow, size ) ; // pushedWindow (32) : account for useful current stack
         if ( showFlag ) ( _PrintNStackWindow ( ( uint64* ) rsp, "ReturnStack", "RSP", 4 ) ) ; //pushedWindow ) ) ;
         if ( showFlag ) ( _PrintNStackWindow ( ( int64* ) debugger->CopyRSP, "ReturnStackCopy", "RSCP", 4 ) ) ; //pushedWindow ) ) ;
         debugger->cs_Cpu->Rsp = ( uint64* ) debugger->CopyRSP ;

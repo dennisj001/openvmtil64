@@ -1,10 +1,10 @@
-Int
+
 5
 "\nstarting lisp.cft\n" ddps
 Lisp
-
 decimal
-: sp ; //stack pause ; sp
+: sp ; //stack pause ;
+sp
 "lambda" tick _lambda find alias immediate
 "/\" tick lambda find alias
 "/." tick lambda find alias
@@ -15,9 +15,8 @@ decimal
 
 (+ 1 6) nl
 '( 1 2 ( 3 4 ) 5 6 ( 7 ( 8 ( 9 ) 10 11 ) ( ( ( ( 12 ) ) 121 ) ) 13 ( 14 ) ) 15 ( 16 ( 17 ( 18 ) ) ) ) nl
-'( 1 2 ( 3 4 ) 5 6 ( 7 ( 8 ( 9 ) 10 11 ) () ( ( ( ( 12 ) ) 121 ) 122 ) 13 ( 14 ( 141 ) ) 15 ( 16 (161 (162 (163)) ) ( 17 ( 18 ) ) ) ) ) nl
-( 1 2 ( 3 4 ) 5 6 ( 7 ( 8 ( 9 ) 10 11 ) ( ( ( ( 12 ) ) ) ) 13 ( 14 ) ) 15 ( 16 ( 17 ( 18 ) ) ) ) nl 
-//pause
+'( 1 2 ( 3 4 ) 5 6 ( 7 ( 8 ( 9 ) 10 11 ) ( ( ( ( 12 ) ) 121 ) 122 ) 13 ( 14 ) ) 15 ( 16 ( 17 ( 18 ) ) ) ) nl
+( 1 2 ( 3 4 ) 5 6 ( 7 ( 8 ( 9 ) 10 11 ) ( ( ( ( 12 ) ) ) ) 13 ( 14 ) ) 15 ( 16 ( 17 ( 18 ) ) ) ) nl // pause
 (+ 1 6) 
 ( - ( + 1 2 ( * 3 4 ) ( / 4 2 ) ( - 9 8 ) 10 770 ) 21 )  // == 777
 ( define f ( lambda x ( + x 1 ) ) ) ( f 6 )
@@ -42,32 +41,21 @@ nl
 ( define f1 ( /\ (z) ( + z 1 ) ) ) 
 tick f1 find wdiss //pause
 ( f1 6 )
-sp
+
 ( begin ( define f2 ( /\ ( x ) ( + x 3 ) ) ) ( f2 4 ) )
 ( begin ( define f3 ( /\ ( x ) ( + x 2 ) ) ) ( f3 5 ) )
 ( define f4 ( /\ ( x ) ( - x 2 ) ) )
-
 ( set zs1 77 abc 7 )
-sp
-( define zs1 78 )
-( define f3 ( lambda ( x ) ( + x 8 ) ) ) ( f3 5 )
-( define f4 ( lambda ( y ) ( - y 9 ) ) )
-
-(f4 (f3 zs1) )
-
+(f4 (f3 zs1) ) 
 (quote zs1)
-
-sp
 ( cond 1 7 0 )
 ( cond 0 0 7 )
+
 ( cond ( + 1 1 ) (+ 1 6 ) (+ 1 2 ) )
 ( cond ( + 0 0 ) ( + 1 2 ) ( + 0 0 ) ( + 1 2 ) ( + 0 0 ) ( + 1 2 ) (+ 1 6 ) )
 ( cond ( + 0 0 ) ( + 1 0 ) (+ 0 0 ) (+ 1 5 ) 7 )
-( cond ( + 0 0 ) ( + 1 2 ) ( + 1 0 ) ( + 1 10 ) ( + 0 0 ) ( + 1 2 ) (+ 1 6 ) )
-"\nshould show 7 7 7 11" ps
-sp
 
-(define g ( /\ (a b c) (a b c) ) )
+d: (define g ( /\ (a b c) (a b c) ) )
 (define h ( /\ (a b c) (a c b) ) ) 
 
 
@@ -75,7 +63,7 @@ tick g find wdiss
 tick h find wdiss
 nl
 
-(g + 3 4 ) (g / 14 2 ) 
+d: (g + 3 4 ) ( g / 14 2 ) 
 nl ( h - 4 11 ) ( h - 5 12 ) ( h - 6 13 ) ( h / 9 63 ) ( h / 3 21 ) 
 (define h1 ( /\ (c b a) (a b c) ) ) 
 (h1 4 11 -) ( h1 5 12 -) ( h1 6 13 -) ( h1 9 63 / ) ( h1 3 21 / ) //pause
@@ -91,7 +79,6 @@ nl
 #if 1
 "\n\nstarting BigNum\n" ddps
 BigNum
-bnOn
 bnInit ( 16 16 )
 nl ( h - 4 5 ) ( h - 5 4 ) ( h - 6 4 ) ( h / 9 3 ) ( h / 3 9 ) 
 ( g + ( g - 8 5 ) ( g + 1 3 ) ) 
@@ -122,8 +109,8 @@ nl // s pause
 `( 'x x ,x ,@x ) 
 nl
 (define y `( 'x x ,x ,@x ) )
-d: `( 'y y ,y ,@y ) 
-pause
+`( 'y y ,y ,@y ) 
+// pause
 "\nlisp test\n" ddps location
 (define a 3) (define b 4)
 (define y ( a b 1 2 ))
@@ -131,7 +118,7 @@ pause
 (define y ( 1 2 a b 5 6 )) 
 nl (y) nl (x) 
 `( 'x x ,x ,@x ) nl
-pause 
+// pause 
 '( 1 2 ( 3 4 ) 5 6 ( 7 ( 8 ( 9 ) 10 11 ) ( ( ( ( 12 ) ) 121 ) ) 13 ( 14 ) ) 15 ( 16 ( 17 ( 18 ) ) ) ) nl
 ( 1 2 ( 3 4 ) 5 6 ( 7 ( 8 ( 9 ) 10 11 ) ( ( ( ( 12 ) ) ) ) 13 ( 14 ) ) 15 ( 16 ( 17 ( 18 ) ) ) ) nl
 // tL
@@ -157,16 +144,19 @@ nl
 
 Int Lisp
 (( lambda ( x y ) ( + x y ) ) 3 4 ) 
-(define yfac (lambda (yy n) (if* (< n 2) (1) (* n (yy yy (- n 1))))))
-(yfac yfac 10) nl
-nl //pause
+d: (define yfac (lambda (yy n) (if* (< n 2) 1 ( * n (yy yy (- n 1))))))
+//tick yfac find wdiss pause
+d: (yfac yfac 10) nl
+(define yfacc (lambda (yyy n1) (if* (< n1 2) (1) (* n1 (yyy yyy (- n1 1)))))) 
+(yfacc yfacc 10) nl //pause
 (yfacc yfacc 7) nl 
 (define fibc (lambda ( n ) (ifElse (< n 2) n (+ (fibc (- n 1)) (fibc (- n 2))))))
 "\nfibc 20 = " ps
 (fibc 20)
-tick fibc find wdiss
+//tick fibc find wdiss
 sp
 
+//pause
 //optimizeOff
 nl
 ( :: : hioo 3 4 + dup p ; : hio 5 6 + dup p ; hio hioo ) 7 _assert 11 _assert s // pause
@@ -249,11 +239,13 @@ Debug Lisp // test comment
 tick goedel8 find wdiss 
 sp
 Lisp
-: sp ;
 nl (list (1 2)) (list 1 2)
 //pause
 
+#endif // lisp '::' problems
+
 lispOff 
+
 sp
 "\nending lisp.cft\n" ddps
 sp 
@@ -261,6 +253,7 @@ sp
 String
 $ls -al /usr/local ; 
 $etc/script ; 
+//pause
 $etc/lispScript ; 
 : hi 1 2 + p ; hi nl
 $ls  -al ;
@@ -270,7 +263,5 @@ verbosity 1 =
 sp
 #endif
 sp
-Int
 2 + 7 assertStkChk // stack checking
-location
-lispOff
+sp

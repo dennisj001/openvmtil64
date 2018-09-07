@@ -43,16 +43,13 @@ CfrTil_ParenthesisComment ( )
 void
 CfrTil_Define ( )
 {
-    Context * cntx = _Context_ ;
-    Interpreter * interp = cntx->Interpreter0 ;
+    Interpreter * interp = _Context_->Interpreter0 ;
     SetState ( interp, PREPROCESSOR_DEFINE, true ) ;
     _CfrTil_Colon ( 0 ) ;
     _Interpret_ToEndOfLine ( interp ) ;
     int64 locals = Stack_Depth ( _Context_->Compiler0->LocalsCompilingNamespacesStack ) ;
     SetState ( interp, PREPROCESSOR_DEFINE, false ) ;
-    //int64 args = cntx->Compiler0->NumberOfArgs, locals = cntx->Compiler0->NumberOfLocals ;
     CfrTil_SemiColon ( ) ;
-    //if (( ! args ) && ( ! locals )) 
     CfrTil_Inline ( ) ;
     if ( locals ) CfrTil_Prefix ( ) ;
     CfrTil_SourceCode_Init ( ) ; //don't leave the define in sc

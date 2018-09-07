@@ -37,7 +37,7 @@ Compile_Init_RegisterParamenterVariables ( Compiler * compiler )
     dlnode * node ;
     for ( node = dllist_First ( ( dllist* ) list ) ; node ; node = dlnode_Next ( node ) )
     {
-        Word * word = ( Word* ) dobject_Get_M_Slot ( (dobject*) node, SCN_T_WORD ) ;
+        Word * word = ( Word* ) dobject_Get_M_Slot ( ( dobject* ) node, SCN_T_WORD ) ;
         if ( compiler->NumberOfLocals + compiler->NumberOfArgs )
         {
             _Compile_Move_StackN_To_Reg ( word->RegToUse, FP, LocalParameterVarOffset ( word ) ) ;
@@ -79,7 +79,7 @@ _Compiler_RemoveLocalFrame ( Compiler * compiler )
     Compiler_SetLocalsFrameSize_AtItsCellOffset ( compiler ) ;
     parameterVarsSubAmount = ( ( compiler->NumberOfArgs ) * CELL ) ;
     returnValueFlag = ( _Context_->CurrentlyRunningWord->CAttribute & C_RETURN ) || ( GetState ( compiler, RETURN_TOS | RETURN_ACCUM ) ) || IsWordRecursive || compiler->ReturnVariableWord ;
-    if ( ! _LC_ ) one = WordStack ( 1 ) ;
+    if ( ! _Q_->OVT_LC ) one = WordStack ( 1 ) ;
     else one = 0 ;
     if ( ( ! returnValueFlag ) && GetState ( _Context_, C_SYNTAX ) && ( _CfrTil_->CurrentWordCompiling->S_ContainingNamespace ) && ( ! String_Equal ( _CfrTil_->CurrentWordCompiling->S_ContainingNamespace->Name, "void" ) ) )
     {
@@ -96,7 +96,12 @@ _Compiler_RemoveLocalFrame ( Compiler * compiler )
             already = true ;
             SetHere ( one->StackPushRegisterCode, 1 ) ;
         }
-        else Compile_Move_TOS_To_ACCUM ( DSP ) ; // save TOS to ACCUM so we can set return it as TOS below
+        else
+        {
+            byte add_r14_0x8__mov_r14_rax [ ] = { 0x49, 0x83, 0xc6, 0x08, 0x49, 0x89, 0x06 } ;
+            if ( ! memcmp ( add_r14_0x8__mov_r14_rax, Here - 7, 7 ) ) _ByteArray_UnAppendSpace ( _Q_CodeByteArray, 7 ) ;
+            else Compile_Move_TOS_To_ACCUM ( DSP ) ; // save TOS to ACCUM so we can set return it as TOS below
+        }
     }
     else if ( GetState ( compiler, RETURN_TOS ) )
     {

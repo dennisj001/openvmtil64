@@ -125,8 +125,7 @@ Mem_Allocate ( int64 size, uint64 allocType )
     switch ( allocType )
     {
         case OPENVMTIL: return _Allocate ( size, ms->OpenVmTilSpace ) ;
-        case OBJECT_MEM: return _Allocate ( size, ms->ObjectSpace ) ;
-        case LISP: return _Allocate ( size, ms->LispSpace ) ;
+        case LISP: case OBJECT_MEM: return _Allocate ( size, ms->ObjectSpace ) ;
         case TEMPORARY: return _Allocate ( size, ms->TempObjectSpace ) ; // used for SourceCode
         case DICTIONARY: return _Allocate ( size, ms->DictionarySpace ) ;
         //case TEMPORARY: 
@@ -226,7 +225,7 @@ void
 OVT_FreeTempMem ( )
 {
     OVT_MemListFree_CompilerTempObjects ( ) ;
-    //OVT_MemListFree_LispTemp ( ) ; // more careful allocation accounting work needs to be done before something like this can be done now
+    OVT_MemListFree_LispTemp ( ) ; // more careful allocation accounting work needs to be done before something like this can be done now
     OVT_MemListFree_TempObjects ( ) ;
 }
 
@@ -238,7 +237,6 @@ MemorySpace_Init ( MemorySpace * ms )
     ms->OpenVmTilSpace = MemorySpace_NBA_New ( ms, ( byte* ) "OpenVmTilSpace", ovt->OpenVmTilSize, OPENVMTIL ) ;
     ms->CfrTilInternalSpace = MemorySpace_NBA_New ( ms, ( byte* ) "CfrTilInternalSpace", ovt->CfrTilSize, CFRTIL ) ;
     ms->ObjectSpace = MemorySpace_NBA_New ( ms, ( byte* ) "ObjectSpace", ovt->ObjectsSize, OBJECT_MEM ) ;
-    ms->LispSpace = MemorySpace_NBA_New ( ms, ( byte* ) "LispSpace", ovt->LispSize, LISP ) ;
     ms->TempObjectSpace = MemorySpace_NBA_New ( ms, ( byte* ) "TempObjectSpace", ovt->TempObjectsSize, TEMPORARY ) ;
     ms->CompilerTempObjectSpace = MemorySpace_NBA_New ( ms, ( byte* ) "CompilerTempObjectSpace", ovt->CompilerTempObjectsSize, COMPILER_TEMP ) ;
     ms->CodeSpace = MemorySpace_NBA_New ( ms, ( byte* ) "CodeSpace", ovt->MachineCodeSize, CODE ) ;
@@ -284,8 +282,9 @@ _OVT_Find_NBA ( byte * name )
 // fuzzy still but haven't yet needed to adjust this one
 
 void
-_OVT_MemList_FreeNBAMemory ( NamedByteArray *nba, uint64 moreThan, int64 always )
+OVT_MemList_FreeNBAMemory ( byte * name, uint64 moreThan, int64 always )
 {
+    NamedByteArray *nba = _OVT_Find_NBA ( name ) ;
     if ( nba && ( always || ( nba->MemAllocated > ( nba->MemInitial + moreThan ) ) ) ) // this logic is fuzzy ?? what is wanted is a way to fine tune mem allocation 
     {
         dlnode * node, *nodeNext ;
@@ -316,13 +315,6 @@ _OVT_MemList_FreeNBAMemory ( NamedByteArray *nba, uint64 moreThan, int64 always 
 }
 
 void
-OVT_MemList_FreeNBAMemory ( byte * name, uint64 moreThan, int64 always )
-{
-    NamedByteArray *nba = _OVT_Find_NBA ( name ) ;
-    _OVT_MemList_FreeNBAMemory ( nba, moreThan, always ) ;
-}
-
-void
 OVT_MemListFree_ContextMemory ( )
 {
     OVT_MemList_FreeNBAMemory ( ( byte* ) "ContextSpace", 1 * M, 1 ) ;
@@ -332,12 +324,6 @@ void
 OVT_MemListFree_TempObjects ( )
 {
     OVT_MemList_FreeNBAMemory ( ( byte* ) "TempObjectSpace", 1 * M, 1 ) ;
-}
-
-void
-OVT_MemListFree_LispSpace ( )
-{
-    OVT_MemList_FreeNBAMemory ( ( byte* ) "LispSpace", 1 * M, 1 ) ;
 }
 
 void
@@ -419,7 +405,7 @@ NBA_Show ( NamedByteArray * nba, int64 flag )
 }
 
 void
-NBA_AccountRemainingAndShow ( NamedByteArray * nba, Boolean flag )
+NBA_AccountRemainingAndShow ( NamedByteArray * nba, int8 flag )
 {
     byte * name = nba->NBA_Symbol.S_Name ;
     nba->MemRemaining = 0 ;
@@ -487,7 +473,7 @@ _OVT_ShowPermanentMemList ( OpenVmTil * ovt )
 }
 
 void
-_Calculate_TotalNbaAccountedMemAllocated ( OpenVmTil * ovt, Boolean showFlag )
+_Calculate_TotalNbaAccountedMemAllocated ( OpenVmTil * ovt, int8 showFlag )
 {
     if ( ovt )
     {
@@ -555,7 +541,7 @@ MLA ( )
 void
 _OVT_ShowMemoryAllocated ( OpenVmTil * ovt )
 {
-    Boolean vf = ( ovt->Verbosity > 1 ) ;
+    int8 vf = ( ovt->Verbosity > 1 ) ;
     if ( ! vf ) _Printf ( ( byte* ) c_gu ( "\nIncrease the verbosity setting to 2 or more for more info here. ( Eg. : verbosity 2 = )" ) ) ;
     int64 leak = ( mmap_TotalMemAllocated - mmap_TotalMemFreed ) - ( ovt->TotalMemAllocated - ovt->TotalMemFreed ) - ovt->OVT_InitialUnAccountedMemory ;
     Calculate_TotalNbaAccountedMemAllocated ( ovt, 1 ) ; //leak || vf ) ;
