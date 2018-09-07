@@ -22,6 +22,7 @@ printf ( "\n%s = %d\n\n", "Hello world!", 42 )
 printf("\n%s\n\t","hello world! - parse this!?")"\n\talso this!" ps
 sp 
 
+C
 User
 Compiler
 : vckf ( n w ) 
@@ -47,7 +48,7 @@ tprintf1 ("\nyes, Hello world! = 0x%08x", 1234 )
 tprintf2 ("\nyes, Hello world! = 0x%08x : %s", 1234, "and more yet" ) 
 //'tprintf find wdiss
 //'tprintf1 find wdiss
-s
+//pause
 sp
 nl
 "xc" var 
@@ -83,7 +84,7 @@ s: $$
 : $ streol _sh ;  
 '$$ find wdiss //pause
 
-bnoff
+bnOff
 
 #if 0 //doScript
 $$ls -al /usr/local ; $$ls -al . ; 
@@ -91,5 +92,6 @@ $etc/script
 $etc/lispScript 
 sp
 #endif
+lispOff
 
 2 + 7 assertStkChk // stack checking

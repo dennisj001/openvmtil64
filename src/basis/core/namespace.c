@@ -351,7 +351,7 @@ _Namespace_Clear ( Namespace * ns )
 {
     if ( ns )
     {
-        //DLList_RecycleWordList (  ns->W_List ) ;
+        //DLList_RecycleWordList (  ns->W_List ) ; // TODO :: fix this !! ??
         _dllist_Init ( ns->W_List ) ;
     }
 }

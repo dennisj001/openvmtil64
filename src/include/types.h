@@ -1,6 +1,6 @@
 // see readme.txt for a text description
 // TODO : types, database, garbage collection : integration
-typedef char int8 ;
+typedef char Boolean ;
 typedef unsigned char byte ;
 typedef byte uint8 ;
 typedef short int16 ;
@@ -12,7 +12,7 @@ typedef unsigned long uint64 ;
 
 typedef char * CString ;
 typedef byte CharSet ;
-typedef int8 Boolean ;
+typedef Boolean Boolean ;
 typedef void (* VoidFunction ) (void) ;
 typedef void (*vFunction_1_Arg ) ( int64 ) ;
 typedef void (*vFunction_1_UArg ) ( uint64 ) ;
@@ -97,8 +97,8 @@ typedef struct _dobject
     {
         int32 do_Type ;
         int16 do_Size ;
-        int8 do_Slots ;
-        int8 do_InUseFlag ;
+        Boolean do_Slots ;
+        Boolean do_InUseFlag ;
     } ;
     union
     {
@@ -120,8 +120,8 @@ typedef struct
         {
             int32 n_Type ;
             int16 n_Size ;
-            int8 n_Slots ;
-            int8 n_InUseFlag ;
+            Boolean n_Slots ;
+            Boolean n_InUseFlag ;
         } ;
         byte * n_unmap ;
     } ;
@@ -143,8 +143,8 @@ typedef struct
                 {
                     int32 n_Type ;
                     int16 n_Size ;
-                    int8 n_Slots ;
-                    int8 n_InUseFlag ;
+                    Boolean n_Slots ;
+                    Boolean n_InUseFlag ;
                 } ;
                 node * n_CurrentNode ;
                 byte * n_unmap ;
@@ -163,8 +163,8 @@ typedef struct
                 {
                     int32 do_Type ;
                     int16 do_Size ;
-                    int8 do_Slots ;
-                    int8 do_InUseFlag ;
+                    Boolean do_Slots ;
+                    Boolean do_InUseFlag ;
                 } ;
                 byte * do_bData ;
                 int64 * do_iData ;
@@ -350,12 +350,12 @@ typedef struct _WordData
     int64 Offset ; // used by ClassField
     struct
     {
-        int8 RegToUse ;
-        int8 Opt_Rm ;
-        int8 Opt_Reg ; //?? do we need something here
-        int8 SrcReg ;
-        int8 DstReg ;
-        int8 RegFlags ; // future uses available here !!
+        Boolean RegToUse ;
+        Boolean Opt_Rm ;
+        Boolean Opt_Reg ; //?? do we need something here
+        Boolean SrcReg ;
+        Boolean DstReg ;
+        Boolean RegFlags ; // future uses available here !!
         uint8 OpInsnGroup ;
         uint8 OpInsnCode ;
     } ;
@@ -496,8 +496,8 @@ typedef struct
     byte *OriginalActualCodeStart ;
     byte * CopiedFrom, *CopiedToStart, *CopiedToEnd, *CopiedToLogicJccCode, *ActualCopiedToJccCode ;
     int64 CopiedSize ;
-    int8 SetccTtt, JccTtt ;
-    int8 SetccNegFlag, JccNegFlag ;
+    Boolean SetccTtt, JccTtt ;
+    Boolean SetccNegFlag, JccNegFlag ;
     Word * LogicCodeWord ;
     Namespace * LocalsNamespace ;
 } BlockInfo ;
@@ -703,9 +703,9 @@ typedef struct
     int64 rtrn, NumberOfArgs ;
     uint16 ControlFlags ;
     Word *opWord, *wordn, *wordm, *wordArg1, *wordArg2, *xBetweenArg1AndArg2, *wordArg0_ForOpEqual ;
-    dlnode * node, *nodem, *wordNode, *nextNode, *wordArg2Node, *wordArg1Node ; 
+    dlnode * node, *nodem, *wordNode, *nextNode, *wordArg2Node, *wordArg1Node ;
     Boolean rvalue, wordArg1_rvalue, wordArg2_rvalue, wordArg1_literal, wordArg2_literal ;
-    Boolean wordOp, wordArg1_Op, wordArg2_Op ; 
+    Boolean wordOp, wordArg1_Op, wordArg2_Op ;
     // CompileOptimizeInfo State values
 #define ACC_1L                   ( (uint64) 1 << 1 )              
 #define ACC_1R                   ( (uint64) 1 << 2 )              
@@ -748,7 +748,7 @@ typedef struct
     int64 ArrayEnds ;
     byte * InitHere ;
     int64 * AccumulatedOptimizeOffsetPointer ;
-    int8 InLParenBlock, SemicolonEndsThisBlock, TakesLParenAsBlock, BeginBlockFlag ;
+    Boolean InLParenBlock, SemicolonEndsThisBlock, TakesLParenAsBlock, BeginBlockFlag ;
     int32 * AccumulatedOffsetPointer ;
     int64 * FrameSizeCellOffset, BlocksBegun ;
     byte * RspSaveOffset ;
@@ -779,8 +779,8 @@ typedef struct Interpreter
     Lexer * Lexer0 ;
     Compiler * Compiler0 ;
     byte * Token ;
-    Word *w_Word, *LastWord ; 
-    Word * BaseObject ; 
+    Word *w_Word, *LastWord ;
+    Word * BaseObject ;
     Word *CurrentObjectNamespace, *ThisNamespace ;
     int64 WordType ;
     dllist * InterpList ;
@@ -796,9 +796,9 @@ typedef struct _Debugger
     int64 SaveTOS ;
     int64 SaveStackDepth ;
     int64 Key ;
-    int64 SaveKey ; 
+    int64 SaveKey ;
     int64 TokenStart_ReadLineIndex, Esi, Edi ;
-    Word * w_Word, *EntryWord, *LastShowWord, *LastEffectsWord, *NextEvalWord ; 
+    Word * w_Word, *EntryWord, *LastShowWord, *LastEffectsWord, *NextEvalWord ;
     Word *LocalsNamespace, *LastSetupWord, *SteppedWord, *CurrentlyRunningWord, *LastSourceCodeWord ;
     byte * Token ;
     block SaveCpuState ;
@@ -817,7 +817,7 @@ typedef struct _Debugger
     Stack * LocalsNamespacesStack ;
     dllist * DebugWordList ;
     uint64 LevelBitNamespaceMap ;
-    sigjmp_buf JmpBuf0 ;  
+    sigjmp_buf JmpBuf0 ;
 } Debugger ;
 typedef struct
 {
@@ -864,20 +864,23 @@ typedef struct _CombinatorInfo
         } ;
     } ;
 } CombinatorInfo ;
+
 struct _CfrTil ;
 typedef struct _LambdaCalculus
 {
     uint64 State ;
-    int64 DontCopyFlag, Loop, LispParenLevel ;
-    Namespace * LispTemporariesNamespace, *LispNamespace ;
-    ListObject *LC_Function, *LC_Body, *LC_Args, *LC_Locals, *lFirst, * Nil, *True, *CurrentList, *CurrentLambdaFunction, *LastInterpretedWord ; //, *ListFirst;
+    int64 DontCopyFlag, Loop, ParenLevel ;
+    Namespace * LispTemporariesNamespace, *LispNamespace, *LispInternalNamespace ;
+    ListObject *lFunction, *lArgs, *lFirst, * Nil, *True, *List, *LNew, *LParenList ; 
+    ListObject *ReturnList, *CurrentLambdaFunction, *LastInterpretedWord ; //, *ListFirst;
     ByteArray * SavedCodeSpace ;
     uint64 ItemQuoteState, QuoteState ;
     struct _CfrTil * OurCfrTil ;
     Stack * QuoteStateStack ;
     int64 * SaveStackPointer ;
-    struct _LambdaCalculus * SaveLC ;
     byte * LC_SourceCode ;
+    Buffer *OutBuffer, *PrintBuffer ;
+    byte * buffer, *outBuffer ;
 } LambdaCalculus ;
 typedef struct
 {
@@ -933,7 +936,6 @@ typedef struct _CfrTil
     byte * TokenBuffer ;
     byte * SC_Buffer ; // nb : keep this here -- if we add this field to Lexer it just makes the lexer bigger and we want the smallest lexer possible
     int64 SC_Index, SC_QuoteMode ; // SC_Index == SC_Buffer Index ;
-    byte * LispPrintBuffer ; // nb : keep this here -- if we add this field to Lexer it just makes the lexer bigger and we want the smallest lexer possible
     dllist *TokenList, * CompilerWordList ;
     sigjmp_buf JmpBuf0 ;
 } CfrTil ;
@@ -954,6 +956,7 @@ typedef struct
     // long term memory
     NamedByteArray * CodeSpace ;
     NamedByteArray * ObjectSpace ;
+    NamedByteArray * LispSpace ;
     NamedByteArray * DictionarySpace ;
     NamedByteArray * HistorySpace ;
     NamedByteArray * OpenVmTilSpace ;
@@ -1042,6 +1045,7 @@ typedef struct
     int64 LispTempSize ;
     int64 MachineCodeSize ;
     int64 ObjectsSize ;
+    int64 LispSize ;
     int64 ContextSize ;
     int64 TempObjectsSize ;
     int64 CompilerTempObjectsSize ;
@@ -1071,7 +1075,6 @@ typedef struct
     const char *NameSpace ;
     const char * SuperNamespace ;
 } CPrimitive ;
-
 typedef struct
 {
     const char * ccp_Name ;

@@ -19,7 +19,7 @@ _DataObject_New ( uint64 type, Word * word, byte * name, uint64 ctype, uint64 ct
     {
         case T_LC_NEW:
         {
-            word = _LO_New ( ltype, ctype, ctype2, ( byte* ) value, word, ( allocType ? allocType : LISP_TEMP ), tsrli, scwi ) ; // all words are symbols
+            word = _LO_New (ltype, ctype, ctype2, name, ( byte* ) value, word, ( allocType ? allocType : LISP_TEMP ), tsrli, scwi ) ; // all words are symbols
             break ;
         }
         case T_LC_LITERAL:
@@ -99,6 +99,7 @@ _DataObject_New ( uint64 type, Word * word, byte * name, uint64 ctype, uint64 ct
             break ;
         }
     }
+    if ( word ) word->CAttribute2 |= T_OBJECT ;
     return word ;
 }
 
@@ -142,7 +143,7 @@ _Class_Object_Init ( Word * word, Namespace * ns )
     }
     while ( ns ) ;
     int64 i ;
-    //SetState ( _Debugger_, DEBUG_HTIL_OFF, true ) ;
+    SetState ( _Debugger_, DEBUG_SHTL_OFF, true ) ;
     for ( i = Stack_Depth ( nsstack ) ; i > 0 ; i -- )
     {
 
@@ -152,7 +153,7 @@ _Class_Object_Init ( Word * word, Namespace * ns )
         Word_Eval ( initWord ) ;
         d0 ( CfrTil_PrintDataStack ( ) ) ;
     }
-    SetState ( _Debugger_, DEBUG_HTIL_OFF, false ) ;
+    SetState ( _Debugger_, DEBUG_SHTL_OFF, false ) ;
     DebugShow_On ;
 }
 

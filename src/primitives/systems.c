@@ -247,7 +247,6 @@ done:
     byte * str = _String_Get_ReadlineString_ToEndOfLine ( ) ;
     if ( semi = strchr ( str, ';' ) ) *semi = 0 ;
     if ( nl = strchr ( str, '\n' ) ) *nl = 0 ;
-    SetState ( _Interpreter_, INTERPRETER_DONE, true ) ;
     _ShellEscape ( str ) ;
 
 #endif
@@ -410,7 +409,7 @@ CfrTil_SystemBreak ( )
 void
 CfrTil_Quit ( )
 {
-    _OpenVmTil_LongJmp_WithMsg ( QUIT, ( byte* ) "Quit : Session Memory, temporaries, and stack, are reset." ) ;
+    _OpenVmTil_LongJmp_WithMsg ( QUIT, ( byte* ) "Quit : Session Memory, temporaries, are reset." ) ;
 }
 
 void

@@ -101,7 +101,7 @@ ReadTable_Tab ( ReadLiner * rl ) // '\t':
 void
 ReadTable_0x03 ( ReadLiner * rl ) //  <CTRL-C>
 {
-    if ( _Q_->OVT_LC && GetState ( _Q_->OVT_LC, LC_REPL ) )
+    if ( _LC_ && GetState ( _LC_, LC_REPL ) )
     {
         ReadTable_Zero ( rl ) ;
     }
@@ -111,7 +111,7 @@ ReadTable_0x03 ( ReadLiner * rl ) //  <CTRL-C>
 void
 ReadTable_0x04 ( ReadLiner * rl ) // <CTRL-D>
 {
-    if ( _Q_->OVT_LC && GetState ( _Q_->OVT_LC, LC_REPL ) )
+    if ( _LC_ && GetState ( _LC_, LC_REPL ) )
     {
         ReadTable_Zero ( rl ) ;
     }
@@ -144,7 +144,7 @@ ReadTable_Newline ( ReadLiner * rl ) // '\n'
 void
 ReadTable_Zero ( ReadLiner * rl ) // eof
 {
-    if ( _Q_->OVT_LC && GetState ( _Q_->OVT_LC, LC_REPL ) )
+    if ( _LC_ && GetState ( _LC_, LC_REPL ) )
     {
         ReadLine_Init ( _Context_->ReadLiner0, _CfrTil_Key ) ;
     }

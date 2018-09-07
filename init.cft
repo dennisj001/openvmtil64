@@ -159,10 +159,9 @@ BigNum
 bnInit ( 16 16 )
 Root
 : bigNumOff "BigNum" notUsing ;
-'bnoff 'bigNumOff find alias
-: bnon BigNum bnInit ( 16 16 ) ;
-//d: bnon
-bnoff
+'bnOff 'bigNumOff find alias
+: bnOn BigNum bnInit ( 16 16 ) ;
+bnOff
 
 Compiler 
 : var: { token dup ";" strcmp } { _var } while drop ; immediate // nb : no quotation marks around variable names with var: ... ;
@@ -356,11 +355,12 @@ scOff
 sp 
 : sh _sh ; prefix
 stringMacrosOn
-//: testCfrTil "namespaces/init.cft" <dbg> include ;
+Root
 : testCfrTil "namespaces/init.cft" include ;
+: test testCfrTil ;
 #if 1 //! testPreviousVersion 
 'ctloc 'compileTimeLocation find alias debugWord
-: spl { compileMode } { locationPush compileThisWord } { locationPrint _s _pause } ifElse ; immediate // nb! can only be used withing compiled words not interpreted
+: spl { compileMode } { locationPush compileThisWord } { locationPrint _s _pause } ifElse ; immediate // nb! can only be used within compiled words not interpreted
 #else
 : ctloc ;
 #endif
@@ -372,7 +372,7 @@ Root
 '_doDemo 0 const    
 'todo 0 const    
 dbgOff
-//dbgOn 
+dbgOn 
 #if Is_DebugOn 
 
 #if todo
@@ -381,21 +381,109 @@ dbgOff
 #endif
 scOn
 System 
-testCfrTil // dT0 //demo //dT0
+test // dT0 //demo //dT0
 #if _doDemo 
 demo 
 #endif //dT0
 stringMacrosOff
 
-#else
-// of course you can trim this file to your needs and put your personal init code here maybe
-Lisp
-d: '( 1 2 ( 3 4 ) 5 6 ( 7 ( 8 ( 9 ) 10 11 ) ( ( ( ( 12 ) ) 121 ) ) 13 ( 14 ) ) 15 ( 16 ( 17 ( 18 ) ) ) ) nl
-'( 1 2 ( 3 4 ) 5 6 ( 7 ( 8 ( 9 ) 10 11 ) ( ( ( ( 12 ) ) 121 ) 122 ) 13 ( 14 ) ) 15 ( 16 ( 17 ( 18 ) ) ) ) nl
-( 1 2 ( 3 4 ) 5 6 ( 7 ( 8 ( 9 ) 10 11 ) ( ( ( ( 12 ) ) ) ) 13 ( 14 ) ) 15 ( 16 ( 17 ( 18 ) ) ) ) nl // pause
-lispOff
+#else // of course you can trim this file to your needs and put your personal init code here maybe
+
+: fibBN ( n | fn fn1 fn2 -- TOS ) 
+    { fn 0 = fn1 0 = fn2 1 = } { n @ 0 > } { n 1 -= } 
+    {   
+        fn1 fn2 @ = 
+        fn2 fn @ = 
+        fn fn1 @ fn2 @ + = 
+    }
+    for
+    // nl svn @ fprint ":" ps fn @ fprint 
+    return fn
+;
+' fibBN find wdiss
+20 fibBN dup p 6765 _assert 
+: fibBN ( n | fn REG fn1 fn2 -- TOS ) 
+    { fn 0 = fn1 0 = fn2 1 = } { n @ 0 > } { n 1 -= } 
+    {   
+        fn1 fn2 @ = 
+        fn2 fn @ = 
+        fn fn1 @ fn2 @ + = 
+    }
+    for
+    // nl svn @ fprint ":" ps fn @ fprint 
+    fn @
+;
+' fibBN find wdiss
+20 fibBN dup p 6765 _assert 
+: fibBN ( n | fn, REG fn1, REG fn2 -- TOS ) 
+    { fn 0 = fn1 0 = fn2 1 = } { n @ 0 > } { n 1 -= } 
+    {   
+        fn1 fn2 @ = 
+        fn2 fn @ = 
+        fn fn1 @ fn2 @ + = 
+    }
+    for
+    // nl svn @ fprint ":" ps fn @ fprint 
+    fn @
+;
+' fibBN find wdiss
+20 fibBN dup p 6765 _assert 
+: fibBN ( n | REG fn REG fn1 REG fn2 -- TOS ) 
+    { fn 0 = fn1 0 = fn2 1 = } { n @ 0 > } { n 1 -= } 
+    {   
+        fn1 fn2 @ = 
+        fn2 fn @ = 
+        fn fn1 @ fn2 @ + = 
+    }
+    for
+    // nl svn @ fprint ":" ps fn @ fprint 
+    fn @
+;
+' fibBN find wdiss
+20 fibBN dup p 6765 _assert 
+: fibBN ( REG n | fn fn1 REG fn2 -- TOS ) 
+    { fn 0 = fn1 0 = fn2 1 = } { n @ 0 > } { n 1 -= } 
+    {   
+        fn1 fn2 @ = 
+        fn2 fn @ = 
+        fn fn1 @ fn2 @ + = 
+    }
+    for
+    // nl svn @ fprint ":" ps fn @ fprint 
+    fn @
+;
+' fibBN find wdiss
+20 fibBN dup p 6765 _assert 
+: fibBN ( REG n | fn REG fn1 REG fn2 -- TOS ) 
+    { fn 0 = fn1 0 = fn2 1 = } { n @ 0 > } { n 1 -= } 
+    {   
+        fn1 fn2 @ = 
+        fn2 fn @ = 
+        fn fn1 @ fn2 @ + = 
+    }
+    for
+    // nl svn @ fprint ":" ps fn @ fprint 
+    fn @
+;
+' fibBN find wdiss
+20 fibBN dup p 6765 _assert 
+: fibBN ( REG n | REG fn fn1 REG fn2 -- TOS ) 
+    { fn 0 = fn1 0 = fn2 1 = } { n @ 0 > } { n 1 -= } 
+    {   
+        fn1 fn2 @ = 
+        fn2 fn @ = 
+        fn fn1 @ fn2 @ + = 
+    }
+    for
+    // nl svn @ fprint ":" ps fn @ fprint 
+    fn @
+;
+' fibBN find wdiss
+20 fibBN dup p 6765 _assert 
+#endif
 
 #endif
+//: nl newline location ;
 2 + 7  assertStkChk // stack checking
 Shell
 s

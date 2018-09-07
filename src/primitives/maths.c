@@ -29,7 +29,7 @@ CfrTil_IncDec ( int64 op ) // +
         byte * nextToken = Lexer_PeekNextNonDebugTokenWord ( cntx->Lexer0, 1 ) ;
         Word * currentWord = _Context_->CurrentlyRunningWord ;
         Word * nextWord = Finder_Word_FindUsing ( cntx->Interpreter0->Finder0, nextToken, 0 ) ;
-        //SetState ( _Debugger_, DEBUG_HTIL_OFF, true ) ;
+        SetState ( _Debugger_, DEBUG_SHTL_OFF, true ) ;
         if ( nextWord && ( nextWord->CAttribute & ( CATEGORY_OP_ORDERED | CATEGORY_OP_UNORDERED | CATEGORY_OP_DIVIDE | CATEGORY_OP_EQUAL ) ) ) // postfix
         {
             List_DropN ( _CfrTil_->CompilerWordList, 1 ) ; // the operator; let higher level see the variable
@@ -118,7 +118,7 @@ CfrTil_IncDec ( int64 op ) // +
         }
     }
     _CfrTil_Do_IncDec ( op ) ;
-    SetState ( _Debugger_, DEBUG_HTIL_OFF, false ) ;
+    SetState ( _Debugger_, DEBUG_SHTL_OFF, false ) ;
 }
 
 void

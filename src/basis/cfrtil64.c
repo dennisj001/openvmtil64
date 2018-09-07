@@ -192,7 +192,6 @@ _CfrTil_Init ( CfrTil * cfrTil, Namespace * nss )
     cfrTil->StrCatBuffer = _Buffer_NewPermanent ( BUFFER_SIZE ) ;
     cfrTil->OriginalInputLine = Buffer_Data ( cfrTil->OriginalInputLineB ) ;
     cfrTil->SC_Buffer = Buffer_Data ( cfrTil->SourceCodeBuffer ) ;
-    cfrTil->LispPrintBuffer = Buffer_Data ( cfrTil->LC_PrintB ) ;
     cfrTil->TokenBuffer = Buffer_Data ( cfrTil->TokenB ) ;
     SetState ( cfrTil, CFRTIL_RUN | OPTIMIZE_ON | INLINE_ON, true ) ;
 

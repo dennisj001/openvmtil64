@@ -1,14 +1,14 @@
 #include "../../include/cfrtil64.h"
 
 void
-_Compile_Set_C_LValue_WithImm_ThruReg ( byte * address, int64 value, int8 rm, byte operandSize )
+_Compile_Set_C_LValue_WithImm_ThruReg ( byte * address, int64 value, Boolean rm, byte operandSize )
 {
     Compile_MoveImm_To_Reg ( rm, (int64) address, CELL ) ;
     Compile_MoveImm_To_Mem ( rm, value, operandSize ) ;
 }
  
 void
-_Compile_Get_C_Value_ToReg ( int8 reg, int64 value )
+_Compile_Get_C_Value_ToReg ( Boolean reg, int64 value )
 {
     Compile_MoveImm_To_Reg ( reg, ( int64 ) value, CELL_SIZE ) ;
 }
@@ -16,13 +16,13 @@ _Compile_Get_C_Value_ToReg ( int8 reg, int64 value )
 // nb. necessary for esp/ebp
 
 void
-_Compile_GetRValue_FromLValue_ToReg ( int8 reg, byte * address )
+_Compile_GetRValue_FromLValue_ToReg ( Boolean reg, byte * address )
 {
     Compile_MoveMemValue_To_Reg ( reg, ( byte* ) address, CELL_SIZE ) ;
 }
 
 void
-_Compile_Get_FromCAddress_ToReg_ThruReg ( int8 reg, byte * address, int8 thruReg )
+_Compile_Get_FromCAddress_ToReg_ThruReg ( Boolean reg, byte * address, Boolean thruReg )
 {
     Compile_MoveMemValue_ToReg_ThruReg ( reg, address, CELL_SIZE, thruReg ) ;
 }
@@ -30,13 +30,13 @@ _Compile_Get_FromCAddress_ToReg_ThruReg ( int8 reg, byte * address, int8 thruReg
 // thru reg is a 'scratch' reg
 
 void
-_Compile_Set_CAddress_WithRegValue_ThruReg ( byte * address, int8 reg, int8 thruReg )
+_Compile_Set_CAddress_WithRegValue_ThruReg ( byte * address, Boolean reg, Boolean thruReg )
 {
     Compile_MoveReg_ToAddress_ThruReg ( reg, address, thruReg ) ;
 }
 
 void
-Compile_Peek ( Compiler * compiler, int8 stackReg ) // @
+Compile_Peek ( Compiler * compiler, Boolean stackReg ) // @
 {
     int64 optFlag = Compiler_CheckOptimize (compiler, 0) ;
     if ( optFlag & OPTIMIZE_DONE ) return ;
@@ -48,7 +48,7 @@ Compile_Peek ( Compiler * compiler, int8 stackReg ) // @
 // '!' ( value address  -- ) // store value at address - dpans94 - address is on top - value was pushed first, leftmost in rpn, then address
 
 void
-Compile_Store ( Compiler * compiler, int8 stackReg ) // !
+Compile_Store ( Compiler * compiler, Boolean stackReg ) // !
 {
     int64 optFlag = Compiler_CheckOptimize (compiler, 0) ;
     if ( optFlag & OPTIMIZE_DONE ) return ;
@@ -85,7 +85,7 @@ Compile_Store ( Compiler * compiler, int8 stackReg ) // !
 // ( addr n -- ) // (*addr) = n
 
 void
-Compile_Poke ( Compiler * compiler, int8 stackReg ) // =
+Compile_Poke ( Compiler * compiler, Boolean stackReg ) // =
 {
     int64 optFlag = Compiler_CheckOptimize (compiler, 0) ;
     if ( optFlag & OPTIMIZE_DONE ) return ;
@@ -123,7 +123,7 @@ Compile_Poke ( Compiler * compiler, int8 stackReg ) // =
 // 
 
 void
-Compile_AtEqual ( int8 stackReg ) // !
+Compile_AtEqual ( Boolean stackReg ) // !
 {
     Compile_Move_Rm_To_Reg ( ACC, stackReg, 0 ) ;
     Compile_Move_Rm_To_Reg ( ACC, ACC, 0 ) ;

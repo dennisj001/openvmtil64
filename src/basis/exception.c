@@ -11,7 +11,7 @@ _OpenVmTil_ShowExceptionInfo ( )
     Word * word = _Q_->ExceptionWord ;
     Debugger * debugger = _Debugger_ ;
     DebugOn ;
-    if ( debugger->w_Word ) _Debugger_Locals_Show ( debugger, debugger->w_Word ) ;
+    //if ( debugger->w_Word ) _Debugger_Locals_Show ( debugger, debugger->w_Word ) ;
     Debugger_Stack ( debugger ) ;
     if ( ! word )
     {
@@ -200,7 +200,7 @@ OVT_SigLongJump ( byte * restartMessage, sigjmp_buf * jb )
 }
 
 void
-OVT_Throw ( int signal, int64 restartCondition, int8 pauseFlag )
+OVT_Throw ( int signal, int64 restartCondition, Boolean pauseFlag )
 {
     sigjmp_buf * jb ;
     _Q_->RestartCondition = restartCondition ;

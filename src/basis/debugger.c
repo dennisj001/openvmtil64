@@ -26,7 +26,7 @@ _Debugger_InterpreterLoop ( Debugger * debugger )
 }
 
 void
-_Debugger_PreSetup ( Debugger * debugger, Word * word, int8 forceFlag )
+_Debugger_PreSetup ( Debugger * debugger, Word * word, Boolean forceFlag )
 {
     if ( ( Is_DebugModeOn && Is_DebugShowOn ) || forceFlag )
     {
@@ -112,20 +112,14 @@ _Debugger_Init ( Debugger * debugger, Word * word, byte * address )
     debugger->SaveTOS = TOS ;
     debugger->Key = 0 ;
 
-    if ( ! GetState ( debugger, DBG_BRK_INIT ) )
-    {
-        debugger->State = DBG_MENU | DBG_INFO | DBG_PROMPT ;
-    }
-    if ( ( ! GetState ( debugger, DBG_INTERPRET_LOOP_DONE ) ) || ( ! ( debugger->w_Word ) ) )
-        debugger->w_Word = word ;
-    if ( address )
-    {
-        debugger->DebugAddress = address ;
-    }
-    else if ( GetState ( debugger, DBG_BRK_INIT ) && debugger->cs_Cpu->Rsp )
+    if ( address ) debugger->DebugAddress = address ;
+    if ( ! GetState ( debugger, DBG_BRK_INIT ) ) debugger->State = DBG_MENU | DBG_INFO | DBG_PROMPT ;
+    else if ( debugger->DebugAddress ) debugger->w_Word = word = Word_GetFromCodeAddress ( debugger->DebugAddress ) ;
+    if ( GetState ( debugger, DBG_BRK_INIT ) && debugger->cs_Cpu->Rsp )
     {
         // remember : _Compile_CpuState_Save ( _Debugger_->cs_Cpu ) ; is called thru _Compile_Debug : <dbg>
-        debugger->DebugAddress = debugger->w_Word ? debugger->w_Word->Coding + 3 : ( byte* ) debugger->cs_Cpu->Rsp[1] ;
+        //debugger->DebugAddress = debugger->w_Word ? debugger->w_Word->Coding + 3 : ( byte* ) debugger->cs_Cpu->Rsp[1] ;
+        debugger->DebugAddress = ( byte* ) debugger->cs_Cpu->Rsp[1] ;
         if ( debugger->DebugAddress && ( ! word ) )
         {
             byte * da ;
@@ -153,6 +147,7 @@ _Debugger_Init ( Debugger * debugger, Word * word, byte * address )
             }
         }
     }
+    if ( word && ( ! GetState ( debugger, DBG_INTERPRET_LOOP_DONE ) ) || ( ! ( debugger->w_Word ) ) ) debugger->w_Word = word ;
     if ( debugger->w_Word ) debugger->Token = debugger->w_Word->Name ;
     else
     {
@@ -529,7 +524,7 @@ _Debugger_State ( Debugger * debugger )
 void
 _Debugger_Copy ( Debugger * debugger, Debugger * debugger0 )
 {
-    memcpy ( debugger, debugger0, sizeof (Debugger ) ) ;
+    MemCpy ( debugger, debugger0, sizeof (Debugger ) ) ;
 }
 
 Debugger *

@@ -23,7 +23,7 @@ _dobject_Allocate ( int64 doType, int64 slots, uint64 allocType )
     int64 size = sizeof ( dobject ) + ( slots * sizeof ( int64 ) ) ;
     dobject * dobj = ( dobject * ) _object_Allocate ( size, allocType ) ;
     dobj->do_iData = ( int64* ) ( ( dobject* ) dobj + 1 ) ;
-    dobj->do_Slots = ( int8 ) slots ;
+    dobj->do_Slots = ( Boolean ) slots ;
     dobj->do_Size = ( int16 ) size ;
     dobj->do_Type = ( int32 ) doType ;
     dobj->do_InUseFlag = ( Boolean ) true ;
@@ -119,7 +119,7 @@ DObject_Finish ( Word * word )
         if ( GetState ( _CfrTil_, OPTIMIZE_ON ) ) SetState ( word, COMPILED_OPTIMIZED, true ) ;
         if ( GetState ( _CfrTil_, INLINE_ON ) ) SetState ( word, COMPILED_INLINE, true ) ;
         if ( GetState ( _Context_, INFIX_MODE ) ) SetState ( word, W_INFIX_MODE, true ) ;
-        if ( GetState ( _Context_, C_SYNTAX ) ) SetState ( word, W_C_SYNTAX, true ) ;
+        if ( GetState ( _Context_, C_SYNTAX ) ) word->WAttribute |= WT_C_SYNTAX ;
         if ( IsSourceCodeOn ) SetState ( word, W_SOURCE_CODE_MODE, true ) ;
     }
     if ( GetState ( _Context_, INFIX_MODE ) ) word->CAttribute |= INFIX_WORD ;

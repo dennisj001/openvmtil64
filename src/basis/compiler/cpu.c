@@ -172,7 +172,7 @@ Compile_CpuState_Restore ( Cpu * cpu )
 Cpu *
 _CpuState_Copy ( Cpu *dst, Cpu * src )
 {
-    memcpy ( dst, src, sizeof ( Cpu ) ) ;
+    MemCpy ( dst, src, sizeof ( Cpu ) ) ;
     return dst ;
 }
 

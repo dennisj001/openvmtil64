@@ -1,7 +1,7 @@
 #include "../include/cfrtil64.h"
 
 CPrimitive CPrimitives [] = { 
-    { "(", 0, 0, ( block ) LO_ReadEvalPrint_AfterAFirstLParen, IMMEDIATE | KEYWORD, LEFT_PAREN, 0, "Lisp", "Root" },
+    { "(", 0, 0, ( block ) LC_ReadEvalPrint_AfterAFirstLParen, IMMEDIATE | KEYWORD, LEFT_PAREN, 0, "Lisp", "Root" },
     { "_(", 0, 0, ( block ) LC_Read, IMMEDIATE | KEYWORD, 0, 0, "Lisp", "Root" },
     { "eval", 0, 0, ( block ) LC_Eval, IMMEDIATE | KEYWORD, 0, 0, "Lisp", "Root" },
     { "print", 0, 0, ( block ) LC_PrintWithValue, 0, 0, 0, "Lisp", "Root" },
@@ -39,7 +39,7 @@ CPrimitive CPrimitives [] = {
     { "_Printf", 0, 0, ( block ) _Printf, LISP_C_RTL_ARGS | LISP_VOID_RETURN, 0, 0, "C", "Root" },
     { "printf", 0, 0, ( block ) _Printf, C_PREFIX_RTL_ARGS, 0, 0, "C", "Root" },
     { "sprintf", 0, 0, ( block ) sprintf, C_PREFIX_RTL_ARGS, 0, 0, "C", "Root" },
-    { "()", 0, 0, CfrTil_NoOp, IMMEDIATE, 0, 0, "C", "Root" },
+    //{ "()", 0, 0, CfrTil_NoOp, IMMEDIATE, 0, 0, "C", "Root" },
     { "(", 0, 0, CfrTil_C_LeftParen, IMMEDIATE | KEYWORD, LEFT_PAREN, 0, "C", "Root" },
     { "(|", 0, 0, CfrTil_LocalVariablesBegin, IMMEDIATE, 0, 0, "C", "Root" },
     { "if{", 0, 0, CfrTil_If, IMMEDIATE, 0, 0, "C", "Root" },
@@ -260,7 +260,7 @@ CPrimitive CPrimitives [] = {
     { "s:", 0, 0, CfrTil_SourceCodeCompileOn_Colon, IMMEDIATE, 0, 0, "Debug", "Root" },
     { ";s", 0, 0, CfrTil_SourceCodeCompileOff_SemiColon, IMMEDIATE, 0, 0, "Debug", "Root" },
     { "dbgSourceCodeOn", 0, 0, CfrTil_DbgSourceCodeOn_Global, IMMEDIATE, 0, 0, "Debug", "Root" },
-    { "dbgSourceCodeOff", 0, 0, CfrTil_DbgSourceCodeOff, IMMEDIATE, 0, 0, "Debug", "Root" },
+    { "dbgSourceCodeOff", 0, 0, CfrTil_DbgSourceCodeOff_Global, IMMEDIATE, 0, 0, "Debug", "Root" },
     { "scOff", 0, 0, CfrTil_DbgSourceCodeOff, 0, 0, 0, "Debug", "Root" },
     { "scOn", 0, 0, CfrTil_DbgSourceCodeOn, 0, 0, 0, "Debug", "Root" },
     { "_dbgOn", 0, 0, CfrTil_DebugOn, DEBUG_WORD | INTERPRET_DBG, 0, 0, "Debug", "Root" },

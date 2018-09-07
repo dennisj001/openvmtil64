@@ -4,7 +4,7 @@
 sp
 optimizeOn inlineOn 
 lispOff
-bnoff 
+bnOff 
 // optimizeOff inlineOff
 // verbosity 2 = 
 Compiler Logic Int C User 
@@ -395,7 +395,7 @@ sp
 ' _fib2 find wdiss
 // 40 fibx3 
 sp
-bnon
+bnOn
 : tbn ( | n m ) n 0 = m 3 = n m @ += n m @ += n m @ += n @ p ; tbn nl "should be 9" ps
 s: fibBN ( n | fn fn1 fn2 -- TOS ) 
     { fn 0 = fn1 0 = fn2 1 = } { n @ 0 > } { n 1 -= } 
@@ -419,7 +419,7 @@ s: fibBN ( n | fn fn1 fn2 -- TOS )
 //nl nl 47 tfib3 //sp pause
 nl nl 92 tfib3 //sp pause
 nl 92 dup p fibBN p //sp
-bnoff //pause
+bnOff //pause
 
 nl
 // verbosity 1 =

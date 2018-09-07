@@ -160,7 +160,7 @@ CharSet_Init ( CharSet *cset, int64 size, byte * initString )
 {
     int64 i ;
     memset ( cset, 0, size ) ;
-    //if ( size >= sizeof (CharTable) ) memcpy ( cset, &CharTable, sizeof( CharTable) ) ;
+    //if ( size >= sizeof (CharTable) ) MemCpy ( cset, &CharTable, sizeof( CharTable) ) ;
     for ( i = 0 ; initString [i] ; i ++ ) cset [ initString [ i ] ] |= CHAR_DELIMITER ;
     cset [0] |= CHAR_DELIMITER ; // default 0 is always a delimiter
     return cset ;

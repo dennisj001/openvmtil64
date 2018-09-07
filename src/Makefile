@@ -14,7 +14,8 @@ SOURCES = basis/compiler/machineCode.c basis/compiler/_compile.c basis/compiler/
 	basis/core/string.c basis/openVmTil.c basis/core/dobject.c basis/core/preprocessor.c\
 	basis/attribute.c basis/lists.c basis/debugDisassembly.c\
 	basis/linux.c basis/exception.c basis/types.c basis/compiler/locals.c\
-	basis/debugger.c basis/interpreter.c basis/_debug.c basis/lambdaCalculus.c \
+	basis/debugger.c basis/interpreter.c basis/_debug.c basis/lc/lambdaCalculus.c \
+	basis/lc/apply.c basis/lc/eval.c basis/lc/read.c basis/lc/print.c basis/lc/special.c \
 	primitives/strings.c primitives/bits.c primitives/maths.c primitives/logics.c primitives/openvmtils.c\
 	primitives/ios.c primitives/parsers.c primitives/interpreters.c primitives/namespaces.c primitives/systems.c\
 	primitives/compilers.c primitives/words.c  primitives/file.c primitives/stacks.c\
@@ -22,8 +23,9 @@ SOURCES = basis/compiler/machineCode.c basis/compiler/_compile.c basis/compiler/
 	primitives/disassembler.c primitives/syntaxes.c primitives/cmaths.c primitives/dataObjectNews.c  #basis/x.c
 
 INCLUDES = include/machineCode.h include/defines.h include/types.h \
-	include/cfrtil64.h include/macros.h \
+	include/cfrtil64.h include/macros.h include/lc.h\
 	include/machineCodeMacros.h include/stacks.h #include/gc.h
+	
 
 OBJECTS = $(SOURCES:%.c=%.o) 
 CC = gcc
@@ -45,7 +47,7 @@ LIBS = -L/usr/local/lib -ludis86 -lrt -lc -ldl -lm  -lmpfr -lgmp #-lpython3.7#-l
 #LIBS = -ludis86 -lgmp -lrt -lc -ldl -lm #-lffi -lgc
 
 oclean : 
-	-rm basis/*.o primitives/*.o basis/compiler/*.o basis/core/*.o 
+	-rm basis/*.o primitives/*.o basis/compiler/*.o basis/core/*.o basis/lc/*.o
 	
 _clean : 
 	make oclean

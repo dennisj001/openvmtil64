@@ -1,5 +1,5 @@
 #include "../include/cfrtil64.h"
-#define VERSION ((byte*) "0.850.200" ) 
+#define VERSION ((byte*) "0.851.510" ) 
 
 OpenVmTil * _Q_ ;
 
@@ -229,26 +229,26 @@ OpenVmTil *
 _OpenVmTil_New ( OpenVmTil * ovt, int64 argc, char * argv [ ] )
 {
     char errorFilename [256] ;
-    int64 fullRestart, restartCondition, startIncludeTries, exceptionsHandled ;
+    int64 restartCondition, startIncludeTries, exceptionsHandled ;
     if ( ! ovt )
     {
-        fullRestart = INITIAL_START ;
+        restartCondition = INITIAL_START ; 
     }
-    else fullRestart = ( ovt->RestartCondition == INITIAL_START ) ;
+    else restartCondition = FULL_RESTART ;
 
-
-    startIncludeTries = ( ovt && ( ! fullRestart ) ) ? ovt->StartIncludeTries : 0 ;
+    startIncludeTries = ovt ? ovt->StartIncludeTries : 0 ;
     if ( startIncludeTries )
     {
-        if ( ovt && ovt->OVT_Context && ovt->OVT_Context->ReadLiner0 && ovt->OVT_Context->ReadLiner0->Filename ) strcpy ( errorFilename, ( char* ) ovt->OVT_Context->ReadLiner0->Filename ) ;
+        if ( ovt && ovt->OVT_Context && ovt->OVT_Context->ReadLiner0 && ovt->OVT_Context->ReadLiner0->Filename ) 
+            strcpy ( errorFilename, ( char* ) ovt->OVT_Context->ReadLiner0->Filename ) ;
         else strcpy ( errorFilename, "Debug Context" ) ;
     }
     else errorFilename [ 0 ] = 0 ;
-    restartCondition = ( ovt && ( fullRestart || ( startIncludeTries < 2 ) ) ) ? ovt->RestartCondition : RESTART ;
+    //restartCondition = ( ovt && ( restartCondition || ( startIncludeTries < 2 ) ) ) ? ovt->RestartCondition : RESTART ;
 
     int64 ium = ovt ? ovt->OVT_InitialUnAccountedMemory : 0, ovtv = ovt ? ovt->Verbosity : 0 ;
 
-    if ( restartCondition < FULL_RESTART ) OpenVmTil_Delete ( ovt ) ;
+    if ( restartCondition < INITIAL_START ) OpenVmTil_Delete ( ovt ) ;
     else if ( ovt )
     {
         printf ( ( byte* ) "\nUnable to reliably delete memory from previous system - rebooting into a new system. 'mem' for more detail on memory.\n" ) ;
@@ -262,7 +262,7 @@ _OpenVmTil_New ( OpenVmTil * ovt, int64 argc, char * argv [ ] )
     } )
     _Q_ = ovt = _OpenVmTil_Allocate ( ) ;
 
-    ovt->RestartCondition = FULL_RESTART ;
+    ovt->RestartCondition = restartCondition ; //FULL_RESTART ;
     ovt->Argc = argc ;
     ovt->Argv = argv ;
     //ovt->SavedTerminalAttributes = savedTerminalAttributes ;
