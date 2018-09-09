@@ -178,7 +178,7 @@ typedef struct
         AttributeInfo n_Attributes ;
         type n_type ; // for future dynamic types and dynamic objects 
     } ;
-} DLNode, Node, listNode, List ;
+} DLNode, Node, listNode, list ;
 
 #define afterNode n_After 
 #define beforeNode n_Before 
@@ -233,7 +233,7 @@ typedef struct _Identifier // _Symbol
     dllist * DebugWordList ;
     struct _Identifier * CfrTilWord ;
     struct _WordData * S_WordData ;
-} Identifier, ID, Word, Namespace, Vocabulary, Class, DynamicObject, DObject, ListObject, Symbol, MemChunk, HistoryStringNode, Buffer ;
+} Identifier, ID, Word, Namespace, List, Vocabulary, Class, DynamicObject, DObject, ListObject, Symbol, MemChunk, HistoryStringNode, Buffer ;
 #define S_Car S_Node.n_Car
 #define S_Cdr S_Node.n_Cdr
 #define S_After S_Cdr

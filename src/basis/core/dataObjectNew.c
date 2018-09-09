@@ -107,11 +107,7 @@ byte *
 _CfrTil_NamelessObjectNew ( int64 size, int64 allocType )
 {
     byte * obj = 0 ;
-    if ( size )
-    {
-
-        obj = Mem_Allocate ( size, allocType ) ;
-    }
+    if ( size ) obj = Mem_Allocate ( size, allocType ) ;
     return obj ;
 }
 
@@ -154,7 +150,7 @@ _Class_Object_Init ( Word * word, Namespace * ns )
         d0 ( CfrTil_PrintDataStack ( ) ) ;
     }
     SetState ( _Debugger_, DEBUG_SHTL_OFF, false ) ;
-    DebugShow_On ;
+    //DebugShow_On ;
 }
 
 // class object new

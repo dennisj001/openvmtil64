@@ -6,12 +6,11 @@
 byte *
 _LO_Print_Lambda_ToString ( LambdaCalculus * lc, ListObject * l0, int64 printValueFlag )
 {
-    //SetState ( lc, LC_PRINT_ENTERED, true ) ;
     lc->buffer [0] = 0 ;
     LC_sprintName ( lc->buffer, l0 ) ;
     LO_strcat ( lc->outBuffer, lc->buffer ) ;
-    _LO_PrintListToString ( lc, ( ListObject * ) l0->Lo_LambdaFunctionParameters, 0, 1, printValueFlag ) ; // 1 : lambdaFlag = 1 
-    _LO_PrintListToString ( lc, ( ListObject * ) l0->Lo_LambdaFunctionBody, 0, 1, printValueFlag ) ; // 1 : lambdaFlag = 1 
+    _LO_PrintListToString (lc, ( ListObject * ) l0->Lo_LambdaFunctionParameters, 1, printValueFlag) ; // 1 : lambdaFlag = 1 
+    _LO_PrintListToString (lc, ( ListObject * ) l0->Lo_LambdaFunctionBody, 1, printValueFlag) ; // 1 : lambdaFlag = 1 
 }
 
 byte *
@@ -40,15 +39,14 @@ _LO_Print_NonLambdaSymbol_ToString ( LambdaCalculus * lc, ListObject * l0, int64
     LO_strcat ( lc->outBuffer, lc->buffer ) ;
 }
 
-byte *
+void
 _LO_PrintOneToString ( LambdaCalculus * lc, ListObject * l0, int64 in_a_LambdaFlag, int64 printValueFlag )
 {
     if ( l0 )
     {
         if ( l0->LAttribute & ( LIST | LIST_NODE ) )
         {
-            _LO_PrintListToString ( lc, l0, 0, in_a_LambdaFlag, printValueFlag ) ;
-            return lc->buffer ;
+            _LO_PrintListToString (lc, l0, in_a_LambdaFlag, printValueFlag) ;
         }
         else if ( ( l0 == nil ) || ( l0->LAttribute == T_NIL ) )
         {
@@ -56,35 +54,31 @@ _LO_PrintOneToString ( LambdaCalculus * lc, ListObject * l0, int64 in_a_LambdaFl
         }
         else if ( l0->LAttribute == true )
         {
-            if ( _AtCommandLine ( ) ) LC_sprintAString ( lc->buffer, " T" ) ;
+            if ( _AtCommandLine ( ) ) LC_sprintAString ( lc->buffer, " true" ) ;
         }
         else if ( l0->LAttribute == T_RAW_STRING ) LC_sprintString ( lc->buffer, l0->Lo_Value ) ;
         else if ( l0->LAttribute & ( T_LISP_DEFINE | T_LISP_COMPILED_WORD ) && ( ! GetState ( lc, LC_DEFINE_MODE ) ) )
         {
-            if ( LO_IsQuoted ( l0 ) ) LC_sprintName ( lc->buffer, l0 ) ;
-#if 0           
-            else if ( l0->Lo_CfrTilWord && l0->Lo_CfrTilWord->W_SourceCode && ( ! GetState ( lc, LC_PRINT_ENTERED ) ) )
-            {
-                LC_sprintString ( lc->buffer, l0->Lo_CfrTilWord->W_SourceCode ) ;
-            }
-#else
+            //if ( LO_IsQuoted ( l0 ) ) LC_sprintName ( lc->buffer, l0 ) ;
+#if 0            
             else if ( l0->Lo_Value && ( ! GetState ( lc, LC_PRINT_ENTERED ) ) )
             {
-                SetState ( lc, LC_PRINT_ENTERED, true ) ;
-                _LO_PrintListToString ( lc, LO_CopyOne ( ( ListObject * ) l0->Lo_Value ), 0, 0, printValueFlag ) ;
+                SetState ( lc, LC_PRINT_ENTERED, true ) ; // prevents recursion thru here
+                _LO_PrintListToString (lc, l0, 0, printValueFlag , 0) ;
                 return lc->buffer ;
             }
 #endif            
-            else LC_sprintName ( lc->buffer, l0 ) ;
+            //else 
+            LC_sprintName ( lc->buffer, l0 ) ;
         }
         else if ( l0->LAttribute & T_LISP_SYMBOL )
         {
             if ( LO_IsQuoted ( l0 ) ) LC_sprintName ( lc->buffer, l0 ) ;
             else if ( ( ! in_a_LambdaFlag ) && l0->Lo_CfrTilWord && ( l0->LAttribute & T_LAMBDA ) )
-                return _LO_Print_Lambda_ToString ( lc, l0, printValueFlag ) ;
-            else return _LO_Print_NonLambdaSymbol_ToString ( lc, l0, printValueFlag ) ;
+                _LO_Print_Lambda_ToString ( lc, l0, printValueFlag ) ;
+            else _LO_Print_NonLambdaSymbol_ToString ( lc, l0, printValueFlag ) ;
         }
-        else if ( l0->LAttribute & T_STRING )
+        else if ( l0->LAttribute & (T_STRING|T_LISP_SYMBOL) )
         {
             if ( l0->State & UNQUOTED ) LC_sprintString ( lc->buffer, l0->Lo_String ) ;
             else LC_sprintf_String ( lc->buffer, " \"%s\"", l0->Lo_String ) ;
@@ -114,32 +108,26 @@ _LO_PrintOneToString ( LambdaCalculus * lc, ListObject * l0, int64 in_a_LambdaFl
     LO_strcat ( lc->outBuffer, lc->buffer ) ;
 }
 
-byte *
-_LO_PrintListToString ( LambdaCalculus * lc, ListObject * l0, byte* buffer, int64 lambdaFlag, int64 printValueFlag )
+void
+_LO_PrintListToString (LambdaCalculus * lc, ListObject * l0, int64 lambdaFlag, int64 printValueFlag)
 {
     ListObject * l1, *lnext ;
-    if ( ! buffer )
-    {
-        buffer = Buffer_New_pbyte ( BUFFER_SIZE ) ;
-        buffer [0] = 0 ;
-    }
     if ( l0 )
     {
         if ( l0->LAttribute & ( LIST | LIST_NODE ) )
         {
-            LC_sprintAString ( buffer, "(" ) ;
-            LO_strcat ( lc->outBuffer, buffer ) ;
+            LC_sprintAString ( lc->buffer, "(" ) ;
+            LO_strcat ( lc->outBuffer, lc->buffer ) ;
         }
         for ( l1 = _LO_First ( l0 ) ; l1 ; l1 = lnext )
         {
             lnext = _LO_Next ( l1 ) ;
-            if ( l1->LAttribute & ( LIST | LIST_NODE ) ) _LO_PrintListToString ( lc, l1, 0, lambdaFlag, printValueFlag ) ;
-            else _LO_PrintOneToString ( lc, l1, lambdaFlag, printValueFlag ) ;
+            _LO_PrintOneToString ( lc, l1, lambdaFlag, printValueFlag ) ;
         }
         if ( l0->LAttribute & ( LIST | LIST_NODE ) )
         {
-            LC_sprintAString ( buffer, ")" ) ;
-            LO_strcat ( lc->outBuffer, buffer ) ;
+            LC_sprintAString ( lc->buffer, ")" ) ;
+            LO_strcat ( lc->outBuffer, lc->buffer ) ;
         }
     }
 }
@@ -149,7 +137,7 @@ LO_PrintListToString ( LambdaCalculus * lc, ListObject * l0, int64 lambdaFlag, i
 {
     Buffer_Init ( lc->PrintBuffer, 0 ) ;
     Buffer_Init ( lc->OutBuffer, 0 ) ;
-    _LO_PrintListToString ( lc, l0, 0, lambdaFlag, printValueFlag ) ;
+    _LO_PrintListToString (lc, l0, lambdaFlag, printValueFlag) ;
     SetState ( lc, LC_PRINT_ENTERED, false ) ;
     return lc->outBuffer ;
 }
@@ -165,7 +153,6 @@ void
 _LO_PrintWithValue ( ListObject * l0, byte * prefix, byte * postfix )
 {
     _LO_Print ( l0, prefix, postfix, 1 ) ;
-    _Printf ( ( byte* ) "%s%s%s", prefix, _LC_->outBuffer, postfix ) ;
 }
 
 void

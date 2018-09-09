@@ -168,7 +168,7 @@ _dlnode_New ( uint64 allocType )
 dlnode *
 dlnode_Next ( dlnode * node )
 {
-    // don't return TailNode return 0
+    // don't return TailNode, return 0
     if ( node && node->afterNode && node->afterNode->afterNode )
     {
         return _dlnode_Next ( node ) ;
@@ -194,10 +194,9 @@ dlnode_InsertThisAfterANode ( dlnode * thisNode, dlnode * aNode ) // Insert this
 {
     if ( thisNode && aNode )
     {
-        D0 ( if ( aNode->N_CAttribute & T_TAIL ) Error ( "\nCan't Insert a node after the TailNode!\n", QUIT ) ; ) ;
         if ( aNode->afterNode ) aNode->afterNode->beforeNode = thisNode ; // don't overwrite a Head or Tail node 
         thisNode->afterNode = aNode->afterNode ;
-        aNode->afterNode = thisNode ; // after the above statement ! obviously
+        aNode->afterNode = thisNode ; // necessarily after the above statement ! 
         thisNode->beforeNode = aNode ;
     }
 }
@@ -207,10 +206,9 @@ dlnode_InsertThisBeforeANode ( dlnode * thisNode, dlnode * aNode ) // Insert thi
 {
     if ( thisNode && aNode )
     {
-        D0 ( if ( aNode->N_CAttribute & T_HEAD ) Error ( "\nCan't Insert a node before the HeadNode!\n", QUIT ) ; ) ;
         if ( aNode->beforeNode ) aNode->beforeNode->afterNode = thisNode ; // don't overwrite a Head or Tail node
         thisNode->beforeNode = aNode->beforeNode ;
-        aNode->beforeNode = thisNode ; // after the above statement ! obviously
+        aNode->beforeNode = thisNode ; // necessarily after the above statement ! 
         thisNode->afterNode = aNode ;
     }
 }
@@ -220,7 +218,6 @@ dlnode_Remove ( dlnode * node )
 {
     if ( node )
     {
-        //D1 ( if ( (int64) (((Node)node)->n_Attribute.T_CAttribute) & ( T_HEAD | T_TAIL ) ) Error ( "\nCan't remove the Head or Tail node!\n", QUIT ) ) ;
         if ( node->beforeNode ) node->beforeNode->afterNode = node->afterNode ;
         if ( node->afterNode ) node->afterNode->beforeNode = node->beforeNode ;
         node->afterNode = 0 ;
@@ -235,7 +232,6 @@ dlnode_ReplaceNodeWithANode ( dlnode * node, dlnode * anode )
     if ( node && anode )
     {
         dlnode * afterNode = node->n_After ;
-        D0 ( if ( afterNode->N_Attribute.T_CAttribute & ( T_HEAD | T_TAIL ) ) Error ( "\nCan't remove the Head or Tail node!\n", QUIT ) ) ;
         dlnode_Remove ( node ) ;
         dlnode_InsertThisBeforeANode ( anode, afterNode ) ;
     }
@@ -246,11 +242,9 @@ dlnode_Replace ( dlnode * replacedNode, dlnode * replacingNode )
 {
     if ( replacedNode && replacingNode )
     {
-        D0 ( if ( replacedNode->N_Attribute.T_CAttribute & ( T_HEAD | T_TAIL ) ) Error ( "\nCan't remove the Head or Tail replacedNode!\n", QUIT ) ) ;
         if ( replacedNode->beforeNode ) replacedNode->beforeNode->afterNode = replacingNode ;
         if ( replacedNode->afterNode ) replacedNode->afterNode->beforeNode = replacingNode ;
     }
-    //return replacingNode ;
 }
 
 void
@@ -262,8 +256,6 @@ _dllist_Init ( dllist * list )
         list->head->beforeNode = ( dlnode * ) 0 ;
         list->tail->afterNode = ( dlnode* ) 0 ;
         list->tail->beforeNode = ( dlnode * ) list->head ;
-        //list->Head->N_Attribute.T_CAttribute = T_HEAD ;
-        //list->Tail->N_Attribute.T_CAttribute = T_TAIL ;
         list->n_CurrentNode = 0 ;
     }
 }

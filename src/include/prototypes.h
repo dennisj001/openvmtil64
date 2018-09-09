@@ -399,8 +399,6 @@ void CfrTil_StringMacrosOn(void);
 void CfrTil_StringMacrosOff(void);
 void CfrTil_InlineOn(void);
 void CfrTil_InlineOff(void);
-void _CfrTil_DebugOff(void);
-void _CfrTil_DebugOn(void);
 /* basis/core/parse.c */
 void _CfrTil_SingleQuote(void);
 int64 _CfrTil_Parse_ClassStructure(int64 cloneFlag);
@@ -1278,6 +1276,8 @@ Boolean Strcmp(byte *str0, byte *str1);
 Boolean Stricmp(byte *str0, byte *str1);
 Boolean Strncmp(byte *str0, byte *str1, int64 n);
 int64 Strnicmp(byte *str0, byte *str1, int64 n);
+int64 Strcpy(byte *dst, byte *src);
+int64 Strncpy(byte *dst, byte *src, int64 n);
 byte *strToLower(byte *dest, byte *str);
 byte *String_RemoveEndWhitespace(byte *string);
 byte *String_FilterMultipleSpaces(byte *istring, int64 allocType);
@@ -1490,11 +1490,6 @@ ListObject *_LO_First(ListObject *l0);
 ListObject *_LO_Last(ListObject *l0);
 ListObject *_LO_Next(ListObject *l0);
 Word *LC_FindWord(byte *name, ListObject *locals);
-ListObject *_LO_AllocCopyOne(ListObject *l0, uint64 allocType);
-void _LO_ListInit(ListObject *l0, uint64 allocType);
-ListObject *_LO_ListNode_Copy(ListObject *l0, uint64 allocType);
-ListObject *_LO_CopyOne(ListObject *l0, uint64 allocType);
-ListObject *_LO_Copy(ListObject *l0, uint64 allocType);
 Boolean LO_strcat(byte *buffer, byte *buffer2);
 void LC_EvalPrint(LambdaCalculus *lc, ListObject *l0);
 ListObject *_LC_Read_ListObject(LambdaCalculus *lc, int64 parenLevel);
@@ -1526,8 +1521,14 @@ LambdaCalculus *_LC_Create(void);
 LambdaCalculus *LC_Init_Runtime(void);
 LambdaCalculus *LC_New(void);
 LambdaCalculus *LC_Reset(void);
+/* basis/lc/copy.c */
+ListObject *_LO_CopyOne(ListObject *l0, uint64 allocType);
+void _LO_ListInit(ListObject *l0, uint64 allocType);
+ListObject *_LO_ListNode_Copy(ListObject *l0, uint64 allocType);
+ListObject *LO_ListNode_New(uint64 allocType);
+ListObject *_LO_Copy(ListObject *l0, uint64 allocType);
 /* basis/lc/apply.c */
-ListObject *LO_Apply(LambdaCalculus *lc, ListObject *lfirst, ListObject *lfunction, ListObject *largs, Boolean applyFlag);
+ListObject *LO_Apply(LambdaCalculus *lc, ListObject *l0, ListObject *lfirst, ListObject *lfunction, ListObject *largs, Boolean applyFlag);
 ListObject *_LO_Apply(ListObject *lfirst, ListObject *lfunction, ListObject *largs);
 void _Interpreter_LC_InterpretWord(Interpreter *interp, ListObject *l0, Boolean functionFlag);
 byte *LC_GetWordDefinition(byte *nsName, byte *name);
@@ -1557,9 +1558,8 @@ ListObject *_LO_EvalList(LambdaCalculus *lc, ListObject *lorig, ListObject *loca
 /* basis/lc/read.c */
 ListObject *_LO_Read_DoWord(LambdaCalculus *lc, Word *word, int64 qidFlag, int64 scwi);
 ListObject *_LO_Read_DoToken(LambdaCalculus *lc, byte *token, int64 qidFlag, int64 scwi);
-ListObject *LO_Read_DoToken(LambdaCalculus *lc, byte *token, int64 qidFlag, int64 scwi);
-ListObject *LO_Read_DoSplice(LambdaCalculus *lc, ListObject *l0, ListObject *lnew);
 ListObject *_LO_Read_DoLParen(LambdaCalculus *lc);
+ListObject *LO_Read_DoToken(LambdaCalculus *lc, byte *token, int64 qidFlag, int64 scwi, ListObject *lnew);
 ListObject *_LO_Read(LambdaCalculus *lc);
 void LO_Quote(void);
 void LO_QuasiQuote(void);
@@ -1570,8 +1570,8 @@ void LO_SpliceAtTail(ListObject *lnew, ListObject *l0);
 /* basis/lc/print.c */
 byte *_LO_Print_Lambda_ToString(LambdaCalculus *lc, ListObject *l0, int64 printValueFlag);
 byte *_LO_Print_NonLambdaSymbol_ToString(LambdaCalculus *lc, ListObject *l0, int64 printValueFlag);
-byte *_LO_PrintOneToString(LambdaCalculus *lc, ListObject *l0, int64 in_a_LambdaFlag, int64 printValueFlag);
-byte *_LO_PrintListToString(LambdaCalculus *lc, ListObject *l0, byte *buffer, int64 lambdaFlag, int64 printValueFlag);
+void _LO_PrintOneToString(LambdaCalculus *lc, ListObject *l0, int64 in_a_LambdaFlag, int64 printValueFlag);
+void _LO_PrintListToString(LambdaCalculus *lc, ListObject *l0, int64 lambdaFlag, int64 printValueFlag);
 byte *LO_PrintListToString(LambdaCalculus *lc, ListObject *l0, int64 lambdaFlag, int64 printValueFlag);
 void _LO_Print(ListObject *l0, byte *prefix, byte *postfix, Boolean valueFlag);
 void _LO_PrintWithValue(ListObject *l0, byte *prefix, byte *postfix);

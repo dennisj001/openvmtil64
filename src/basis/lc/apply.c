@@ -4,12 +4,11 @@
 //===================================================================================================================
 
 #define NEW_LC_COMPILE 0
- 
+
 ListObject *
-LO_Apply ( LambdaCalculus * lc, ListObject *lfirst, ListObject *lfunction, ListObject *largs, Boolean applyFlag )
+LO_Apply ( LambdaCalculus * lc, ListObject * l0, ListObject *lfirst, ListObject *lfunction, ListObject *largs, Boolean applyFlag )
 {
     SetState ( lc, LC_APPLY, true ) ;
-    ListObject *l0 ;
     if ( applyFlag && lfunction && ( ( lfunction->CAttribute & ( CPRIMITIVE | CFRTIL_WORD ) ) || ( lfunction->LAttribute & ( T_LISP_COMPILED_WORD ) ) ) )
     {
         if ( GetState ( lc, LC_DEFINE_MODE ) && ( ! CompileMode ) ) return lfirst ;
@@ -36,7 +35,7 @@ LO_Apply ( LambdaCalculus * lc, ListObject *lfirst, ListObject *lfunction, ListO
     {
         //these cases seems common sense for what these situations should mean and seem to add something positive to the usual lisp/scheme semantics !?
         if ( ! largs ) l0 = lfunction ;
-        else //if ( ( lfirst->LAttribute & ( T_LISP_SPECIAL ) || lc->CurrentLambdaFunction ) ) // CurrentLambdaFunction : if lambda or T_LISP_SPECIAL returns a list 
+        else
         {
             LO_AddToHead ( largs, lfunction ) ;
             l0 = largs ;
@@ -449,8 +448,8 @@ _LO_Apply_Arg ( LambdaCalculus * lc, ListObject ** pl1, int64 i )
         else Compile_MoveImm_To_Reg ( RegOrder ( i ++ ), ( int64 ) * l2->Lo_PtrToValue, CELL_SIZE ) ;
         _DEBUG_SHOW ( l2, 1 ) ;
     }
-    else if ( ( l1->CAttribute & NON_MORPHISM_TYPE ) )  i = _LO_Apply_NonMorphismArg ( lc, pl1, i ) ;
-    else if ( ( l1->Name [0] == '.' ) || ( l1->Name [0] == '&' ) ) 
+    else if ( ( l1->CAttribute & NON_MORPHISM_TYPE ) ) i = _LO_Apply_NonMorphismArg ( lc, pl1, i ) ;
+    else if ( ( l1->Name [0] == '.' ) || ( l1->Name [0] == '&' ) )
         _Interpreter_DoWord ( cntx->Interpreter0, l1->Lo_CfrTilWord, l1->W_RL_Index, l1->W_SC_Index ) ;
     else if ( ( l1->Name[0] == '[' ) ) i = _LO_Apply_ArrayArg ( lc, pl1, i ) ;
     else
@@ -512,8 +511,8 @@ _LO_Apply_C_LtoR_ArgList ( LambdaCalculus * lc, ListObject * l0, Word * word )
 void
 LC_CompileRun_C_ArgList ( Word * word ) // C protocol - x64 : left to right arguments put into registers 
 {
-    LambdaCalculus * lc, *_svLc_ = _LC_ ; 
-    lc = LC_New () ;
+    LambdaCalculus * lc, *_svLc_ = _LC_ ;
+    lc = LC_New ( ) ;
     Context * cntx = _Context_ ;
     Lexer * lexer = cntx->Lexer0 ;
     Compiler * compiler = cntx->Compiler0 ;
@@ -533,14 +532,14 @@ LC_CompileRun_C_ArgList ( Word * word ) // C protocol - x64 : left to right argu
         LC_SaveStackPointer ( lc ) ; // ?!? maybe we should do this stuff differently
         DebugShow_Off ;
         l0 = _LO_Read ( lc ) ;
-        DebugShow_On ;
+        //DebugShow_On ;
         Set_CompileMode ( svcm ) ; // we must have the arguments pushed and not compiled for _LO_Apply_C_Rtl_ArgList which will compile them for a C_Rtl function
         _LO_Apply_C_LtoR_ArgList ( lc, l0, word ) ;
         LC_RestoreStackPointer ( lc ) ; // ?!? maybe we should do this stuff differently
-        _LC_ClearTemporariesNamespace ( lc ) ;
+        //_LC_ClearTemporariesNamespace ( lc ) ;
         LC_LispNamespaceOff ( ) ;
         SetState ( compiler, LC_ARG_PARSING | LC_C_RTL_ARG_PARSING, false ) ;
-    } 
+    }
     _LC_ = _svLc_ ;
     Lexer_SetTokenDelimiters ( lexer, svDelimiters, COMPILER_TEMP ) ;
 }

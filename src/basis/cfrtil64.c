@@ -317,7 +317,6 @@ CfrTil_OptimizeOff ( )
 void
 CfrTil_StringMacrosOn ( )
 {
-
     SetState ( _CfrTil_, STRING_MACROS_ON, true ) ;
     _CfrTil_StringMacros_Init ( ) ;
 }
@@ -325,7 +324,6 @@ CfrTil_StringMacrosOn ( )
 void
 CfrTil_StringMacrosOff ( )
 {
-
     SetState ( _CfrTil_, STRING_MACROS_ON, false ) ;
     SetState ( &_CfrTil_->Sti, STI_INITIALIZED, false ) ;
 }
@@ -333,28 +331,25 @@ CfrTil_StringMacrosOff ( )
 void
 CfrTil_InlineOn ( )
 {
-
     SetState ( _CfrTil_, INLINE_ON, true ) ;
 }
 
 void
 CfrTil_InlineOff ( )
 {
-
     SetState ( _CfrTil_, INLINE_ON, false ) ;
 }
 
+#if 0
 void
 _CfrTil_DebugOff ( )
 {
-
     DebugOff ;
 }
 
 void
 _CfrTil_DebugOn ( )
 {
-
     DebugOn ;
 }
-
+#endif

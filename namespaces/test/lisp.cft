@@ -17,7 +17,6 @@ decimal
 '( 1 2 ( 3 4 ) 5 6 ( 7 ( 8 ( 9 ) 10 11 ) ( ( ( ( 12 ) ) 121 ) ) 13 ( 14 ) ) 15 ( 16 ( 17 ( 18 ) ) ) ) 
 '( 1 2 ( 3 4 ) 5 6 ( 7 ( 8 ( 9 ) 10 11 ) () ( ( ( ( 12 ) ) 121 ) 122 ) 13 ( 14 ( 141 ) ) 15 ( 16 (161 (162 (163)) ) ( 17 ( 18 ) ) ) ) ) 
 ( 1 2 ( 3 4 ) 5 6 ( 7 ( 8 ( 9 ) 10 11 ) ( ( ( ( 12 ) ) ) ) 13 ( 14 ) ) 15 ( 16 ( 17 ( 18 ) ) ) ) 
-//pause
 (+ 1 6) 
 ( - ( + 1 2 ( * 3 4 ) ( / 4 2 ) ( - 9 8 ) 10 770 ) 21 )  // == 777
 ( define f ( lambda x ( + x 1 ) ) ) ( f 6 )
@@ -206,7 +205,7 @@ lispOff
 ;
 //' goedel3 find wdiss pause   
 "goedel3 :: " ps 
-9 goedel3 _assert0  "\ngoedel3 output should read : \n'junk' 2 'junk' 7 'junk' 7 9" ps //pause
+9 goedel3 _assert0  "\ngoedel3 output should read (after ignoring _asserts) : \n'junk' 2 'junk' 7 'junk' 7 9" ps //pause
 Debug Lisp // test comment
 ( :: 
     : goedel6 (| n -- TOS ) 

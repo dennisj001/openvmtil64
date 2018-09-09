@@ -23,23 +23,22 @@ _LO_Define ( ListObject * idNode, ListObject * locals )
         value->Lo_LambdaFunctionParameters = _LO_Copy ( value->Lo_LambdaFunctionParameters, LISP ) ;
         value->Lo_LambdaFunctionBody = _LO_Copy ( value->Lo_LambdaFunctionBody, LISP ) ;
     }
-    else value = LO_CopyOne ( value ) ; // this value object should now become part of LISP non temporary memory
+    else value = _LO_CopyOne ( value, LISP ) ; // this value object should now become part of LISP non temporary memory
     //else value = LO_Copy ( value ) ; // doesn't work ?? LO_Copy is broken :: this value object should now become part of LISP non temporary memory
     //d1 ( if ( _Is_DebugOn ) LO_PrintWithValue ( value ) ) ;
     word->Lo_Value = ( uint64 ) value ; // used by eval
     word->LAttribute |= ( T_LISP_DEFINE | T_LISP_SYMBOL ) ;
     word->State |= LC_DEFINED ;
     // the value was entered into the LISP memory, now we need a temporary carrier for LO_Print
-    l1 = _DataObject_New ( T_LC_NEW, LO_New ( LIST_NODE, word ), 0, word->CAttribute, word->CAttribute2, word->LAttribute, 0, ( int64 ) value, 0, - 1, - 1 ) ; // all words are symbols
+    //l1 = _DataObject_New ( T_LC_NEW, LO_New ( LIST_NODE, word ), 0, word->CAttribute, word->CAttribute2, word->LAttribute, 
+    l1 = _DataObject_New ( T_LC_NEW, 0, word->Name, word->CAttribute, word->CAttribute2, word->LAttribute, 
+        0, ( int64 ) value, 0, - 1, - 1 ) ; // all words are symbols
     l1->LAttribute |= ( T_LISP_DEFINE | T_LISP_SYMBOL ) ;
     SetState ( lc, ( LC_DEFINE_MODE ), false ) ;
     l1->W_SourceCode = word->W_SourceCode = lc->LC_SourceCode ;
     _Word_Finish ( l1 ) ;
     Compiler_Init ( _Context_->Compiler0, 0 ) ; // we could be compiling a cfrTil word as in oldLisp.cft
-
-    _Printf ( ( byte* ) " %s", idNode->Name ) ;
-
-    return l1 ;
+    return l1 ; //LO_CopyOne ( l1 ) ; //lc->True ;
 }
 
 ListObject *
@@ -57,7 +56,7 @@ _LO_MakeLambda ( ListObject * l0 )
         lnew = LO_New ( LIST, 0 ) ;
         do
         {
-            _LO_AddToTail ( lnew, _LO_CopyOne ( args, LISP_TEMP ) ) ;
+            LO_AddToTail ( lnew, _LO_CopyOne ( args, LISP_TEMP ) ) ;
         }
         while ( ( args = _LO_Next ( args ) ) != body0 ) ;
         args = lnew ;
@@ -137,7 +136,7 @@ _LO_Macro ( ListObject * l0, ListObject * locals )
     //l0 = _LO_Define ( ( byte* ) "macro", idNode, locals ) ;
     l0 = _LO_Define ( idNode, locals ) ;
     l0->LAttribute |= T_LISP_MACRO ;
-    l0->Lo_CfrTilWord->LAttribute |= T_LISP_MACRO ;
+    if (l0->Lo_CfrTilWord) l0->Lo_CfrTilWord->LAttribute |= T_LISP_MACRO ;
     if ( GetState ( _CfrTil_, DEBUG_MODE ) ) LO_Print ( l0 ) ;
     return l0 ;
 }
@@ -189,8 +188,8 @@ ListObject *
 _LO_Cons ( ListObject *first, ListObject * second, uint64 allocType )
 {
     ListObject * l0 = LO_New ( LIST, 0 ) ;
-    _LO_AddToTail ( l0->Lo_List, first ) ;
-    _LO_AddToTail ( l0->Lo_List, second ) ;
+    LO_AddToTail ( l0->Lo_List, first ) ;
+    LO_AddToTail ( l0->Lo_List, second ) ;
 
     return l0 ;
 }
@@ -245,44 +244,12 @@ ListObject *
 _LO_List ( LambdaCalculus * lc, ListObject * lfirst )
 {
     ListObject * lnew = LO_New ( LIST, 0 ), *l0, *lnext, *l1 ;
-    if ( GetState ( _CfrTil_, DEBUG_MODE ) )
-    {
-        DebugColors ;
-        _Printf ( ( byte* ) "\n_LO_List : on entering\n\tlfirst = %s", c_gd ( _LO_PRINT_TO_STRING_WITH_VALUE ( lfirst ) ) ) ;
-        DefaultColors ;
-    }
     for ( l0 = lfirst ; l0 ; l0 = lnext )
     {
         lnext = _LO_Next ( l0 ) ;
-        if ( l0->LAttribute & ( LIST | LIST_NODE ) )
-        {
-            l1 = _LO_List ( lc, _LO_First ( l0 ) ) ;
-            l1 = LO_New ( LIST_NODE, l1 ) ;
-        }
-        else
-        {
-            if ( GetState ( _CfrTil_, DEBUG_MODE ) )
-            {
-                DebugColors ;
-                _Printf ( ( byte* ) "\n_LO_List : Before l1 = LO_Eval ( LO_Copy ( l0 ) ) ;\n\tl0 = %s", c_gd ( _LO_PRINT_TO_STRING_WITH_VALUE ( l0 ) ) ) ;
-                DefaultColors ;
-            }
-            l1 = LO_Eval ( lc, LO_CopyOne ( l0 ) ) ;
-            if ( GetState ( _CfrTil_, DEBUG_MODE ) )
-            {
-                DebugColors ;
-                _Printf ( ( byte* ) "\n_LO_List : After l1 = LO_Eval ( LO_Copy ( l0 ) ) ;\n\tl1 = %s", c_gd ( _LO_PRINT_TO_STRING_WITH_VALUE ( l1 ) ) ) ;
-                DefaultColors ;
-            }
-            if ( l1->LAttribute & ( LIST | LIST_NODE ) ) l1 = LO_New ( LIST_NODE, l1 ) ;
-        }
-        _LO_AddToTail ( lnew, l1 ) ;
-    }
-    if ( GetState ( _CfrTil_, DEBUG_MODE ) )
-    {
-        DebugColors ;
-        _Printf ( ( byte* ) "\n_LO_List : on leaving\n\tlnew = %s", c_gd ( _LO_PRINT_TO_STRING_WITH_VALUE ( lnew ) ) ) ;
-        DefaultColors ;
+        if ( l0->LAttribute & ( LIST | LIST_NODE ) ) l1 = _LO_List ( lc, _LO_First ( l0 ) ) ;
+        else l1 = LO_Eval ( lc, LO_CopyOne ( l0 ) ) ;
+        LO_AddToTail ( lnew, l1 ) ;
     }
     return lnew ;
 }
@@ -390,7 +357,7 @@ _LO_CfrTil ( ListObject * lfirst )
     for ( ldata = _LO_Next ( lfirst ) ; ldata ; ldata = _LO_Next ( ldata ) )
     {
         Word_SetCodingHere_And_ClearPreviousUseOf_Here_SCA ( ldata->CfrTilWord, 0 ) ;
-        if ( ldata->LAttribute & ( LIST_NODE ) )
+        if ( ldata->LAttribute & ( LIST|LIST_NODE ) )
         {
             _CfrTil_Parse_LocalsAndStackVariables ( 1, 1, ldata, compiler->LocalsCompilingNamespacesStack, 0 ) ;
         }

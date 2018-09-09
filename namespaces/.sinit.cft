@@ -293,7 +293,7 @@ User
 : opOff optimizeOff inlineOff state ;
 : opOn1 optimizeOn inlineOn { verbosity @ 1 > } { state } if ;
 : vck ( n w ) { verbosity @ n @ != } { verbosity n @ = w @ _find wordRun } if2 ;
-'vck find wdiss //pause
+//'vck find wdiss //pause
 : opOn ( n )
     optimizeOn inlineOn 
 #if 1
@@ -343,7 +343,7 @@ C Compiler Int Lexer
     nl { result file @ input 1 fread = input @ emit } { result @ 1 == } doWhile 
     file @ fclose
 ; prefix
-'ofile find wdiss
+//'ofile find wdiss
 Root
 : license ofile ( "./LICENSE" ) ;
 //license //pause

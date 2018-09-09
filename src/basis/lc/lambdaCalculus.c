@@ -72,14 +72,13 @@ _LO_New_RawStringOrLiteral ( Lexer * lexer, byte * token, int64 qidFlag )
     {
         uint64 ctokenType = qidFlag ? OBJECT : lexer->TokenType | LITERAL ;
         Word * word = _DObject_New ( lexer->OriginalToken, lexer->Literal, ( ctokenType | IMMEDIATE | LITERAL ), 0, ctokenType, ctokenType,
-            //( byte* ) _DataObject_Run, 0, 0, _LC_->LispInternalNamespace, LISP ) ;
             ( byte* ) _DataObject_Run, 0, 0, 0, LISP ) ;
         word->W_RL_Index = lexer->TokenStart_ReadLineIndex ;
         if ( ( ! qidFlag ) && ( lexer->TokenType & ( T_RAW_STRING ) ) )
         {
             // nb. we don't want to do this block with literals it slows down the eval and is wrong
             word->LAttribute |= ( T_LISP_SYMBOL | T_RAW_STRING ) ;
-            _Namespace_DoAddWord ( _LC_->LispInternalNamespace, word, 0 ) ; // nb. here not in _DObject_New :: only for ( ! qidFlag ) && ( lexer->TokenType & T_RAW_STRING ) 
+            //_Namespace_DoAddWord ( _LC_->LispInternalNamespace, word, 0 ) ; // nb. here not in _DObject_New :: only for ( ! qidFlag ) && ( lexer->TokenType & T_RAW_STRING ) 
             word->Lo_Value = ( int64 ) word->Lo_Name ;
         }
         word->Lo_CfrTilWord = word ;
@@ -97,10 +96,8 @@ _LO_New_RawStringOrLiteral ( Lexer * lexer, byte * token, int64 qidFlag )
 ListObject *
 _LO_New ( uint64 ltype, uint64 ctype, uint64 ctype2, byte * name, byte * value, Word * word, uint64 allocType, int64 rl_Index, int64 scwi )
 {
-    scwi = ( scwi != - 1 ) ? scwi : _Lexer_->SC_Index ;
     //_DObject_New ( byte * name, uint64 value, uint64 ctype, uint64 ltype, uint64 ftype, byte * function, int64 arg, int64 addToInNs, Namespace * addToNs, uint64 allocType )
     ListObject * l0 = _DObject_New ( word ? word->Name : name ? name : ( byte* ) "", ( uint64 ) value, ctype, ctype2, ltype,
-        //( ltype & T_LISP_SYMBOL ) ? word ? word->RunType : 0 : 0, 0, 0, 0, _LC_->LispInternalNamespace, LISP ) ;
         ( ltype & T_LISP_SYMBOL ) ? word ? word->RunType : 0 : 0, 0, 0, 0, 0, LISP ) ;
     if ( ltype & LIST ) _LO_ListInit ( l0, allocType ) ;
     else if ( ltype & LIST_NODE ) l0->S_SymbolList = ( dllist* ) value ;
@@ -110,7 +107,7 @@ _LO_New ( uint64 ltype, uint64 ctype, uint64 ctype2, byte * name, byte * value, 
         word->Lo_CfrTilWord = word ;
         l0->W_RL_Index = rl_Index ;
         l0->W_SourceCode = word->W_SourceCode ;
-        l0->W_SC_Index = word->W_SC_Index = scwi ;
+        l0->W_SC_Index = word->W_SC_Index = ( scwi != - 1 ) ? scwi : _Lexer_->SC_Index ;
     }
     return l0 ;
 }
@@ -153,9 +150,9 @@ LC_FindWord ( byte * name, ListObject * locals )
         if ( locals ) word = _Finder_FindWord_InOneNamespace ( _Finder_, locals, name ) ;
         if ( ! word )
         {
-            word = _Finder_FindWord_InOneNamespace ( _Finder_, _LC_->LispTemporariesNamespace, name ) ;
-            if ( ! word )
-            {
+            //word = _Finder_FindWord_InOneNamespace ( _Finder_, _LC_->LispTemporariesNamespace, name ) ;
+            //if ( ! word )
+            //{
                 word = _Finder_FindWord_InOneNamespace ( _Finder_, _LC_->LispInternalNamespace, name ) ;
                 if ( ! word )
                 {
@@ -165,14 +162,26 @@ LC_FindWord ( byte * name, ListObject * locals )
                         word = Finder_Word_FindUsing ( _Context_->Finder0, name, 0 ) ;
                     }
                 }
-            }
+            //}
         }
     }
     return word ;
 }
 
+Boolean
+LO_strcat ( byte * buffer, byte * buffer2 )
+{
+    if ( Strlen ( ( char* ) buffer2 ) + Strlen ( ( char* ) buffer ) >= BUFFER_SIZE )
+    {
+        Error ( "", "LambdaCalculus : LO_strcat : buffer overflow.", QUIT ) ;
+    }
+    else strncat ( ( char* ) buffer, ( char* ) buffer2, BUFFER_SIZE ) ;
+    buffer2 [0] = 0 ;
+    return true ;
+}
+
 ListObject *
-_LO_AllocCopyOne ( ListObject * l0, uint64 allocType )
+_LO_CopyOne ( ListObject * l0, uint64 allocType )
 {
     ListObject * l1 = 0 ;
     if ( l0 )
@@ -189,68 +198,35 @@ _LO_AllocCopyOne ( ListObject * l0, uint64 allocType )
 void
 _LO_ListInit ( ListObject * l0, uint64 allocType )
 {
-    l0->Lo_Head = _dlnode_New ( allocType ) ;
-    l0->Lo_Tail = _dlnode_New ( allocType ) ;
-    _dllist_Init ( ( dllist * ) l0 ) ;
-    l0->Lo_List = ( dllist* ) l0 ;
+    l0->Lo_List = _dllist_New ( allocType ) ;//( dllist* ) l0 ;
     l0->LAttribute |= LIST ; // a LIST_NODE needs to be initialized also to be also a LIST
 }
 
 ListObject *
-_LO_ListNode_Copy ( ListObject * l0, uint64 allocType )
+LO_ListNode_New ( uint64 allocType )
 {
-    ListObject * l1 = _LO_AllocCopyOne ( l0, allocType ) ;
-    _LO_ListInit ( l1, allocType ) ;
-    return l1 ;
-}
-
-ListObject *
-_LO_CopyOne ( ListObject * l0, uint64 allocType )
-{
-    ListObject *l1 = 0 ;
-    if ( l0 )
-    {
-        if ( l0->LAttribute & ( LIST | LIST_NODE ) )
-        {
-            l1 = _LO_Copy ( l0, allocType ) ;
-            if ( l0->LAttribute & LIST_NODE ) l1 = _DataObject_New ( T_LC_NEW, 0, 0, LIST_NODE, 0, LIST_NODE, 0, ( int64 ) l1, 0, - 1, - 1 ) ;
-        }
-        else l1 = _LO_AllocCopyOne ( l0, allocType ) ;
-    }
-    return l1 ;
+    ListObject * l0 = LO_New ( LIST, 0 ) ;
+    _LO_ListInit ( l0, allocType ) ;
+    return l0 ;
 }
 
 // copy a whole list or a single node
-
 ListObject *
 _LO_Copy ( ListObject * l0, uint64 allocType )
 {
-    ListObject * lnew = 0, *l1 ;
+    ListObject * lnew = 0, *l1, *lnext, *lcopy ;
     if ( l0 )
     {
-        if ( l0->LAttribute & ( LIST | LIST_NODE ) ) lnew = _LO_ListNode_Copy ( l0, allocType ) ;
-        for ( l0 = _LO_First ( l0 ) ; l0 ; l0 = _LO_Next ( l0 ) )
+        if ( l0->LAttribute & ( LIST | LIST_NODE ) ) lnew = LO_ListNode_New ( allocType ) ; 
+        for ( l1 = _LO_First ( l0 ) ; l1 ; l1 = lnext )
         {
-            l1 = _LO_CopyOne ( l0, allocType ) ;
-            //d1 ( if ( _Is_DebugOn ) LO_PrintWithValue ( l1 ) ) ; 
-            if ( lnew ) LO_AddToTail ( lnew, l1 ) ;
-            //d1 ( if ( _Is_DebugOn ) LO_PrintWithValue ( lnew ) ) ;
-            else return l1 ;
+            lnext = _LO_Next ( l1 ) ;
+            lcopy = _LO_CopyOne ( l1, allocType ) ;
+            if ( lnew ) LO_AddToTail ( lnew, lcopy ) ;
+            else return lcopy ;
         }
     }
     return lnew ;
-}
-
-Boolean
-LO_strcat ( byte * buffer, byte * buffer2 )
-{
-    if ( Strlen ( ( char* ) buffer2 ) + Strlen ( ( char* ) buffer ) >= BUFFER_SIZE )
-    {
-        Error ( "", "LambdaCalculus : LO_strcat : buffer overflow.", QUIT ) ;
-    }
-    else strcat ( ( char* ) buffer, ( char* ) buffer2 ) ;
-    buffer2 [0] = 0 ;
-    return true ;
 }
 
 //===================================================================================================================
@@ -339,7 +315,6 @@ LO_Repl ( )
     SetState ( compiler, LISP_MODE, true ) ;
     _Printf ( ( byte* ) "\ncfrTil lisp : (type 'exit' or 'bye' to exit)\n including init file :: './namespaces/compiler/lcinit.cft'\n" ) ;
     LC_ReadInitFile ( ( byte* ) "./namespaces/compiler/lcinit.cft" ) ;
-
     _Repl ( ( block ) LC_ReadEvalPrint_ListObject ) ;
 
 }
@@ -355,7 +330,6 @@ LC_QuoteQuasiQuoteRepl ( uint64 state, Boolean doReplFlag )
         lc = LC_New ( ) ;
     }
     lc->ItemQuoteState |= state ;
-    //lc->QuoteState |= state ;
     if ( replFlag && doReplFlag )
     {
         byte nextChar = ReadLine_PeekNextNonWhitespaceChar ( _ReadLiner_ ) ;
@@ -425,27 +399,12 @@ LC_FinishSourceCode ( )
 }
 
 void
-_LC_ClearTemporariesNamespace ( LambdaCalculus * lc )
-{
-    if ( lc )
-    {
-        _Namespace_Clear ( lc->LispTemporariesNamespace ) ;
-    }
-}
-
-void
 _LC_ClearInternalNamespace ( LambdaCalculus * lc )
 {
     if ( lc )
     {
         _Namespace_Clear ( lc->LispInternalNamespace ) ;
     }
-}
-
-void
-LC_ClearTemporaryNamespace ( )
-{
-    _LC_ClearTemporariesNamespace ( _LC_ ) ;
 }
 
 void
@@ -470,7 +429,6 @@ LC_LispNamespaceOn ( )
 LambdaCalculus *
 _LC_Init_Runtime ( LambdaCalculus * lc )
 {
-    LC_ClearTemporaryNamespace ( ) ;
     _Stack_Init ( lc->QuoteStateStack, 256 ) ;
     lc->SavedCodeSpace = 0 ;
     lc->CurrentLambdaFunction = 0 ;
@@ -483,22 +441,20 @@ LambdaCalculus *
 _LC_Init ( LambdaCalculus * lc )
 {
     lc->LispNamespace = Namespace_Find ( ( byte* ) "Lisp" ) ;
-    lc->LispTemporariesNamespace = Namespace_FindOrNew_SetUsing ( ( byte* ) "LispTemporaries", 0, 0 ) ;
+    //lc->LispTemporariesNamespace = Namespace_FindOrNew_SetUsing ( ( byte* ) "LispTemporaries", 0, 0 ) ;
     lc->LispInternalNamespace = Namespace_FindOrNew_SetUsing ( ( byte* ) "LispInternal", 0, 0 ) ;
     _LC_Init_Runtime ( lc ) ;
     lc->QuoteState = 0 ;
     lc->ItemQuoteState = 0 ;
     lc->OurCfrTil = _CfrTil_ ;
-    LC_ClearInternalNamespace ( ) ;
     DebugShow_Off ;
     int64 svdscs = IsSourceCodeOn ;
     CfrTil_DbgSourceCodeOff ( ) ;
     lc->Nil = _DataObject_New ( T_LC_NEW, 0, ( byte* ) "nil", 0, 0, T_NIL, 0, 0, 0, 0, - 1 ) ;
     lc->True = _DataObject_New ( T_LC_NEW, 0, ( byte* ) "true", 0, 0, 0, 0, ( uint64 ) true, 0, 0, - 1 ) ;
     lc->buffer = Buffer_Data ( lc->PrintBuffer ) ;
-    //lc->listBuffer = Buffer_Data ( lc->PrintBuffer2 ) ;
     lc->outBuffer = Buffer_Data ( lc->OutBuffer ) ;
-    DebugShow_On ;
+    //DebugShow_On ;
     SetState ( _CfrTil_, DEBUG_SOURCE_CODE_MODE, svdscs ) ;
     return lc ;
 }
@@ -508,6 +464,7 @@ LC_Delete ( LambdaCalculus * lc )
 {
     if ( lc )
     {
+        LC_ClearInternalNamespace ( ) ;
         OVT_MemListFree_LispTemp ( ) ;
         OVT_MemListFree_LispSpace ( ) ;
     }
@@ -519,7 +476,6 @@ _LC_Create ( )
     LambdaCalculus * lc = ( LambdaCalculus * ) Mem_Allocate ( sizeof (LambdaCalculus ), LISP ) ;
     lc->QuoteStateStack = Stack_New ( 256, LISP ) ; // LISP_TEMP : is recycled by OVT_FreeTempMem in _CfrTil_Init_SessionCore called by _CfrTil_Interpret
     lc->PrintBuffer = Buffer_Create ( BUFFER_SIZE ) ;
-    //lc->PrintBuffer2 = Buffer_Create ( BUFFER_SIZE ) ;
     lc->OutBuffer = Buffer_Create ( BUFFER_SIZE ) ;
     return lc ;
 }
@@ -528,11 +484,8 @@ LambdaCalculus *
 LC_Init_Runtime ( )
 {
     LambdaCalculus * lc = _LC_ ;
-    if ( ! lc )
-    {
-        lc = LC_New ( ) ;
-    }
-    else _LC_Init_Runtime ( lc ) ;
+    if ( ! lc ) lc = LC_New ( ) ;
+     else _LC_Init_Runtime ( lc ) ;
     return lc ;
 }
 

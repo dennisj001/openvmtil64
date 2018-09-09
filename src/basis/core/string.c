@@ -470,6 +470,20 @@ Strnicmp ( byte * str0, byte * str1, int64 n )
     else return - 1 ;
 }
 
+int64
+Strcpy ( byte * dst, byte * src )
+{
+    int64 i ;
+    for ( i = 0 ; src [i] ; i ++ ) dst[i] = src[i] ;
+}
+
+int64
+Strncpy ( byte * dst, byte * src, int64 n )
+{
+    int64 i ;
+    for ( i = 0 ; src [i] && (i < n) ; i ++ ) dst[i] = src[i] ;
+}
+
 byte *
 strToLower ( byte * dest, byte * str )
 {

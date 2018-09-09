@@ -7,7 +7,7 @@ _LO_Eval (LambdaCalculus * lc, ListObject *l0, ListObject *locals, Boolean apply
     SetState ( lc, LC_EVAL, true ) ;
     if ( l0 && ( ! LO_IsQuoted ( l0 ) ) )
     {
-        if ( ( l0->LAttribute & T_LISP_SYMBOL ) ) l0 = _LO_EvalSymbol (lc, l0, locals ) ;
+        if ( l0->LAttribute & T_LISP_SYMBOL ) l0 = _LO_EvalSymbol (lc, l0, locals ) ;
         else if ( l0->LAttribute & ( LIST | LIST_NODE ) ) l0 = LO_EvalList (lc, l0, locals, applyFlag ) ;
     }
     SetState ( lc, LC_EVAL, false ) ;
@@ -38,7 +38,7 @@ LO_EvalList (LambdaCalculus * lc, ListObject *l0, ListObject *locals, Boolean ap
         {
             lfunction = LO_CopyOne ( _LO_Eval (lc, lfirst, locals, applyFlag ) ) ;
             largs = _LO_EvalList (lc, _LO_Next ( lfirst ), locals, applyFlag ) ;
-            l0 = LO_Apply (lc, lfirst, lfunction, largs, applyFlag ) ;
+            l0 = LO_Apply (lc, l0, lfirst, lfunction, largs, applyFlag ) ;
         }
     }
     return l0 ;
@@ -88,7 +88,7 @@ _LO_EvalList (LambdaCalculus * lc, ListObject *lorig, ListObject *locals, Boolea
             // research : why doesn't this work without copy ? copying here wastes time and memory!!
             //d1 ( if ( _Is_DebugOn ) _LO_PrintWithValue ( lnode, "\n_LO_EvalList : lnode ", "" ) ) ;
             lce = LO_CopyOne ( _LO_Eval (lc, lnode, locals, applyFlag ) ) ;
-            _LO_AddToTail ( lnew, lce ) ;
+            LO_AddToTail ( lnew, lce ) ;
         }
     }
     return lnew ;

@@ -54,16 +54,13 @@ nl location "\nstarting Lisp\n stack is ..." ddps s
 
 Lisp 
 ( define g23 ( lambda ( a b c ) ( a b c))) 
-tick g23 find wdiss
 (g23 + 3 4 ) (g23 / 14 2 ) 
 (define q1x0 (lambda (a0) (a0))) 
-tick q1x0 find wdiss
+((q1x0 /) 14 2)
 
-((q1x /) 14 2)
 (define h01 (lambda (a) (a)))
 ((h01 /) 14 2)
-tick h01 find wdiss
-sp
+
 (t+ 1 2 3 1) 
 
 (define average (/\ ( n0 n1 )(/ ( + n0 n1 ) 2 )))
@@ -82,17 +79,17 @@ sp
 (+ 2 5)
 bnOff
 Lisp
+(define g ( /\ (a b c) (a b c) ) )
+(define h ( /\ (a b c) (a c b) ) ) 
 (define g1 (lambda (a1 b1 c1)(a1 b1 c1))) 
 (define g2 (/\(a b c)(a b c)))     
-(g + 3 4 )(g / 14 2 ) 
+(g1 + 3 4 )(g2 / 14 2 ) 
 ( define j ( lambda ( a b c ) ( + a b c)))
 ( define h ( lambda ( a b c ) ( + a b c)))
 ( define k ( lambda ( a b ) ( + a b )))
 nl
 
 // from lisp.cft lines 58-59
-//(define g ( /\ (a b c) (a b c) ) )
-//(define h ( /\ (a b c) (a c b) ) ) 
 ( k ( j 1 2 3 ) ( h 2 3 66 ) ) sp // 77 ...
 ( + ( k ( j 1 2 3 ) ( h 2 3 66 ) ) ( + 698 2 ) ) // 777
 ( + ( k ( j 1 2 3 ) ( h 2 3 59 ) ) 7 ) // 77
@@ -299,14 +296,14 @@ bnOn
 (yfacc yfacc 10) nl
 (yfacc yfacc 20) nl //pause
 (define yfac (lambda (yy n) (if* (< n 2) 1 (* n (yy yy (- n 1)))))) // code from : http://www.newlisp.org/index.cgi?Y_Function
-tick yfac find wdiss
+//tick yfac find wdiss
 (yfac yfac 20) nl //pause
 (define yfacc (lambda (yyy n1) (if* (< n1 2) 1 (* n1 (yyy yyy (- n1 1)))))) 
 // tick yfacc find wdiss
 (yfacc yfacc 10) nl
 (yfacc yfacc 7) nl
 (define yfac (lambda (yy n) (if* (< n 2) 1 (* n (yy yy (- n 1)))))) // code from : http://www.newlisp.org/index.cgi?Y_Function
-tick yfac find wdiss
+//tick yfac find wdiss
 (yfac yfac 20) nl 
 (define yfacc (lambda (yyy n1) (if* (< n1 2) 1 (* n1 (yyy yyy (- n1 1)))))) 
 // tick yfacc find wdiss
@@ -324,7 +321,7 @@ tick yfac find wdiss
 (yfacc yfacc 10) nl
 (yfacc yfacc 7) nl
 (define yfac (lambda (yy n) (if* (< n 2) 1 (* n (yy yy (- n 1)))))) // code from : http://www.newlisp.org/index.cgi?Y_Function
-tick yfac find wdiss
+//tick yfac find wdiss
 (yfac yfac 20) nl //pause
 (define yfacc (lambda (yyy n1) (if* (< n1 2) 1 (* n1 (yyy yyy (- n1 1)))))) 
 // tick yfacc find wdiss
@@ -332,58 +329,60 @@ tick yfac find wdiss
 (yfacc yfacc 7) nl
 (define x "let") (define a "the") // 'let' is a special word
 (define x1 'let) (define a1 the)
-nl ( Its 'a beautiful day don\'t 'let it get away )
-nl '( Its a beautiful day don\'t let it get away )
-nl '( Its a beautiful day don\'t @x1 it get away ) 
-nl `( ,Its ,a ,beautiful ,day ,don\'t ,@x1 ,it ,get ,away )
-nl `( Its ,a beautiful day don\'t ,x it get away )
-nl `( Its 'a beautiful day don\'t ,x1 it get away )
-nl `( Its a beautiful day don\'t ,@x it get away )
-nl `( Its a beautiful day don\'t ,@x1 it get away )
+( Its 'a beautiful day don\'t 'let it get away )
+'( Its a beautiful day don\'t let it get away )
+'( Its a beautiful day don\'t @x1 it get away ) 
+`( ,Its ,a ,beautiful ,day ,don\'t ,@x1 ,it ,get ,away )
+`( Its ,a beautiful day don\'t ,x it get away )
+`( Its 'a beautiful day don\'t ,x1 it get away )
+`( Its a beautiful day don\'t ,@x it get away )
+`( Its a beautiful day don\'t ,@x1 it get away )
+
 (define ff ( lambda (n) (+ n 1)))
 ((/\ (x) (+ x 1)) 6 ) ((/\ (x) (+ x 1)) ((/\ (y) (+ y 2)) 4 ) )
 (ff 6)
-(average 12 2) 
 lispOff 
 Lisp
-(average 12 2) 
 bigNumOff
 sp
 (define h36 (lambda (a b) (a b a b a a b b)))
 (h36 n09 my6 ) 
+"\n should show : ( n09 my6 n09 my6 n09 n09 my6 my6 )\n" ps
 (define n09 kl0 ) (define my6 op9 )
 (h36 n09 my6 )
+"\n should show : ( kl0 op9 kl0 op9 kl0 kl0 op9 op9 )\n" ps
 sp
+( average 12 2 ) 
 
 // macro experiments
 ( define id (lambda ( x y ) ( x x y y )) )
 ( id a b ) 
 ( define id1 ( lambda ( a12 b13 ) ( a12 a12 b13 b13 a12 a12 ) ) )
-nl ( id1 7 ( + 5 6 ) )
-nl (macro swch ( lambda ( i2 b2 ) ( b2 i2 ) ) )
-nl ( swch 7 ( + 5 6 ) )
+( id1 7 ( + 5 6 ) )
+(macro swch ( lambda ( i2 b2 ) ( b2 i2 ) ) )
+( swch 7 ( + 5 6 ) )
 //dbgOn
 ( macro swch2 ( lambda ( i2 b2 ) ( (swch b2 i2) (swch b2 i2 ) ) ) )
-nl ( swch2 7 ( + 5 6 ) ) sp
+( swch2 7 ( + 5 6 ) ) sp
 //dbgOff
 ( macro id2 ( lambda ( i2 b2 ) ( ( swch2 b2 i2 ) ( swch2 b2 i2 ) ) ) )
-nl ( id2 7 ( + 5 6 ) )
+( id2 7 ( + 5 6 ) )
 ( macro id3 ( lambda ( a12 b13 ) ( a12 a12 b13 a12 b13 b13 a12 a12 ) ) ) 
-nl ( id3 7 ( + 5 6 ) )
+( id3 7 ( + 5 6 ) )
 ( macro swch3 ( lambda ( i2 b2 ) ( (swch2 b2 i2) (swch2 b2 i2 ) ) ) )
 ( macro id4 ( lambda ( a12 b13 ) ( a12 a12 (swch3 a12 b13 ) b13 b13 a12 a12 ) ) ) 
-nl ( id4 7 ( + 5 6 ) ) 
+( id4 7 ( + 5 6 ) ) 
 // pause
 (define x (swch2 3 4) ) 
-nl (swch2 3 4) 
+(swch2 3 4) 
 (define x (swch 8 15) )  ( - @x) 
 (define x (swch 8 19) )  ( - @x) 
-nl (car ( 7 8 ) ) ( car 7 8 ) ( cdr ( 6 7 ) ) ( cdr 6 7 )
+(car ( 7 8 ) ) ( car 7 8 ) ( cdr ( 6 7 ) ) ( cdr 6 7 )
 sp
-//pause
+
 lispOff
 List
-_((lambda ( a b) (+ a b)) 3 4 ) dupList eval printList nl printList s lispOff
+_((lambda ( a b) (+ a b)) 3 4 ) dupList eval printList printList s lispOff
 s: bexp3 ( n ) { n @ 1 > } { n @ n @ -- bexp3 *  } { 1 } ifElse ;s
 'bexp3 find wdiss 7 bexp3 p //pause
 c_syntaxOn
@@ -419,41 +418,36 @@ sp
 Lisp
 BigNum
 (define yfac (lambda (yy n) (if* (< n 2) 1 (* n (yy yy (- n 1)))))) // code from : http://www.newlisp.org/index.cgi?Y_Function
-tick yfac find wdiss
-"\nyfac : 50 factorial = " ps (yfac yfac 50) nl 
+"\nyfac : 50 factorial = " ps (yfac yfac 50) 
 bnOff 
 Lisp 
 sp
 (define yfacc (lambda (yyy n1) (if* (< n1 2) 1 (* n1 (yyy yyy (- n1 1)))))) 
-// tick yfacc find wdiss
 (yfacc yfacc 10) nl
 (yfacc yfacc 7) nl
 bnOn //BigNum
 (define yfac (lambda (yy n) (if* (< n 2) 1 (* n (yy yy (- n 1)))))) // code from : http://www.newlisp.org/index.cgi?Y_Function
-tick yfac find wdiss
-(yfac yfac 20) nl 
+(yfac yfac 20) 
 bnOff 
 Lisp //pause
 (define yfacc (lambda (yyy n1) (if* (< n1 2) 1 (* n1 (yyy yyy (- n1 1)))))) 
-// tick yfacc find wdiss
 (yfacc yfacc 10) nl
 (yfacc yfacc 7) nl
 (define fib (lambda (n) ( ifElse (< n 2) n (+ (fib (- n 1)) (fib (- n 2))))))
 (define fib2 (lambda (n) (ifElse (< n 2) n (+ (fib2 (- n 1)) (fib2 (- n 2))))))
-tick fib find wdiss 
 sp
 (fib 20) (fib2 20)
 (define x "let") (define a "the") // 'let' is a special word
 (define x1 'let) (define a1 the)
 sp
-nl ( Its 'a beautiful day don\'t 'let it get away )
-nl '( Its a beautiful day don\'t let it get away )
-nl '( Its a beautiful day don\'t @x1 it get away ) 
-nl `( ,Its ,a ,beautiful ,day ,don\'t ,@x1 ,it ,get ,away )
-nl `( Its ,a beautiful day don\'t ,x it get away ) "\ntesting unquote (',') above line should show : ( Its a beautiful day don't x it get away )" ps
-nl `( Its 'a beautiful day don\'t ,x1 it get away ) "\ntesting unquote (',') above line should show :  ( Its a beautiful day don't x1 it get away )" ps
-nl `( Its a beautiful day don\'t ,@x it get away )
-nl `( Its a beautiful day don\'t ,@x1 it get away )
+( Its 'a beautiful day don\'t 'let it get away )
+'( Its a beautiful day don\'t let it get away )
+'( Its a beautiful day don\'t @x1 it get away ) 
+`( ,Its ,a ,beautiful ,day ,don\'t ,@x1 ,it ,get ,away )
+nl `( Its ,a beautiful day don\'t ,x it get away ) "testing unquote (',') above line should show : ( Its a beautiful day don't x it get away )\n" ps
+nl `( Its 'a beautiful day don\'t ,x1 it get away ) "testing unquote (',') above line should show :  ( Its a beautiful day don't x1 it get away )\n" ps
+`( Its a beautiful day don\'t ,@x it get away )
+`( Its a beautiful day don\'t ,@x1 it get away )
 sp
 lispOff  
 //pause
@@ -468,10 +462,10 @@ sp
         fn fn1 @ fn2 @ + = 
     }
     for
-    // nl svn @ fprint ":" ps fn @ fprint 
+    // svn @ fprint ":" ps fn @ fprint 
     return fn
 ;
-' fibBN find wdiss
+//' fibBN find wdiss
 20 fibBN dup p 6765 _assert 
 : fibBN ( n | fn REG fn1 fn2 -- TOS ) 
     { fn 0 = fn1 0 = fn2 1 = } { n @ 0 > } { n 1 -= } 
@@ -481,10 +475,10 @@ sp
         fn fn1 @ fn2 @ + = 
     }
     for
-    // nl svn @ fprint ":" ps fn @ fprint 
+    // svn @ fprint ":" ps fn @ fprint 
     fn @
 ;
-' fibBN find wdiss
+//' fibBN find wdiss
 20 fibBN dup p 6765 _assert 
 : fibBN ( n | fn, REG fn1, REG fn2 -- TOS ) 
     { fn 0 = fn1 0 = fn2 1 = } { n @ 0 > } { n 1 -= } 
@@ -494,10 +488,10 @@ sp
         fn fn1 @ fn2 @ + = 
     }
     for
-    // nl svn @ fprint ":" ps fn @ fprint 
+    // svn @ fprint ":" ps fn @ fprint 
     fn @
 ;
-' fibBN find wdiss
+//' fibBN find wdiss
 20 fibBN dup p 6765 _assert 
 : fibBN ( n | REG fn REG fn1 REG fn2 -- TOS ) 
     { fn 0 = fn1 0 = fn2 1 = } { n @ 0 > } { n 1 -= } 
@@ -507,10 +501,10 @@ sp
         fn fn1 @ fn2 @ + = 
     }
     for
-    // nl svn @ fprint ":" ps fn @ fprint 
+    // svn @ fprint ":" ps fn @ fprint 
     fn @
 ;
-' fibBN find wdiss
+//' fibBN find wdiss
 20 fibBN dup p 6765 _assert 
 : fibBN ( REG n | fn fn1 REG fn2 -- TOS ) 
     { fn 0 = fn1 0 = fn2 1 = } { n @ 0 > } { n 1 -= } 
@@ -520,10 +514,10 @@ sp
         fn fn1 @ fn2 @ + = 
     }
     for
-    // nl svn @ fprint ":" ps fn @ fprint 
+    // svn @ fprint ":" ps fn @ fprint 
     fn @
 ;
-' fibBN find wdiss
+//' fibBN find wdiss
 20 fibBN dup p 6765 _assert 
 : fibBN ( REG n | fn REG fn1 REG fn2 -- TOS ) 
     { fn 0 = fn1 0 = fn2 1 = } { n @ 0 > } { n 1 -= } 
@@ -533,10 +527,10 @@ sp
         fn fn1 @ fn2 @ + = 
     }
     for
-    // nl svn @ fprint ":" ps fn @ fprint 
+    // svn @ fprint ":" ps fn @ fprint 
     fn @
 ;
-' fibBN find wdiss
+//' fibBN find wdiss
 20 fibBN dup p 6765 _assert 
 : fibBN ( REG n | REG fn fn1 REG fn2 -- TOS ) 
     { fn 0 = fn1 0 = fn2 1 = } { n @ 0 > } { n 1 -= } 
@@ -546,10 +540,10 @@ sp
         fn fn1 @ fn2 @ + = 
     }
     for
-    // nl svn @ fprint ":" ps fn @ fprint 
+    // svn @ fprint ":" ps fn @ fprint 
     fn @
 ;
-' fibBN find wdiss
+//' fibBN find wdiss
 20 fibBN dup p 6765 _assert 
 #endif
 

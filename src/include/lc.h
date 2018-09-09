@@ -3,17 +3,12 @@
 #define LO_Previous( lo ) ( ListObject* ) dlnode_Previous ( ( dlnode* ) lo )
 #define LO_Next( lo ) ( ListObject* ) dlnode_Next ( ( dlnode* ) lo )
 #define LO_AddToTail( lo, lo1 ) dllist_AddNodeToTail ( (( ListObject * ) lo)->Lo_List, ( dlnode* ) (lo1) ) 
-#define _LO_AddToTail( lo, lo1 ) dlnode_InsertThisBeforeANode ( (node*) lo1, ((node*)(lo))->tail ) ; 
-#define _LO_AddToHead( lo, lo1 ) dlnode_InsertThisAfterANode ( (node*) lo1, ((node*)(lo))->head ) ; 
 #define LO_AddToHead( lo, lo1 ) dllist_AddNodeToHead ( (( ListObject * ) lo)->Lo_List, ( dlnode* ) (lo1) ) 
 #define LO_New( lType, object ) (ListObject *) _DataObject_New (T_LC_NEW, 0, 0, 0, 0, lType, 0, (int64) object, 0, 0 , -1)
 #define LambdaArgs( proc ) proc->p[0]
 #define LambdaProcedureBody( proc ) proc->p[1]
 #define LambdaVals( proc ) proc->p[2]
-#define LO_ReplaceNode( node, anode) dlnode_Replace ( (dlnode *) node, (dlnode *) anode ) 
-#define LO_CopyTemp( l0 ) _LO_Copy ( l0, LISP_TEMP )
-//#define LO_Copy( l0 ) _LO_Copy ( l0, LISP ) // use LO_CopyOne
-#define LO_CopyOne( l0 ) _LO_AllocCopyOne ( l0, LISP_TEMP )
+#define LO_CopyOne( l0 ) _LO_CopyOne ( l0, LISP_TEMP )
 #define LO_Eval( lc, l0 ) _LO_Eval ( lc, l0, 0, 1 )
 #define nil (_LC_ ? _LC_->Nil : 0)
 #define LC_SaveStackPointer( lc ) { if ( lc ) lc->SaveStackPointer = (int64*) _Dsp_ ; }

@@ -143,9 +143,10 @@ _DObject_Init ( Word * word, uint64 value, uint64 ftype, byte * function, int64 
 // remember : Word = Namespace = DObject has a s_Symbol
 
 Word *
-_DObject_New ( byte * name, uint64 value, uint64 ctype, uint64 ctype2, uint64 ltype, uint64 ftype, byte * function, int64 arg, int64 addToInNs, Namespace * addToNs, uint64 allocType )
+_DObject_New ( byte * name, uint64 value, uint64 ctype, uint64 ctype2, uint64 ltype, uint64 ftype, byte * function, int64 arg, 
+    int64 addToInNs, Namespace * addToNs, uint64 allocType )
 {
-    Word * word = _Word_New ( name, ctype, ctype2, ltype, addToInNs, addToNs, allocType ) ; //( addToInNs || addToNs ) ? DICTIONARY : allocType ) ;
+    Word * word = _Word_New ( name, ctype, ctype2, ltype, addToInNs, addToNs, allocType ) ;
     _DObject_Init ( word, value, ftype, function, arg ) ;
     _CfrTil_->DObjectCreateCount ++ ;
     return word ;
