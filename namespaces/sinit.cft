@@ -142,7 +142,7 @@ type int32 ; int32.size = 4 ;
 type int64 ; int64.size = 8 ;
 type void ; void.size = 0 ;
 type char ; char.size = 1 ;
-type word ; word.size = 2 ;
+//type word ; word.size = 2 ; // conflicts with Reserved word
 type int ; int.size = 8 ;
 type long ; long.size = 8 ;
 type quad ; quad.size = 16 ;
@@ -274,7 +274,7 @@ dscOn //verbosity 3 =
             debugColors
             str "\n assertStkChk ::" = 
             { n @ m @ == }
-            { nl location ":" ps str @ ps "ok" ps nl sp } 
+            { } //{ nl location ":" ps str @ ps "ok" ps nl sp } 
             { tab nl location ":" ps str @ ps alertColors "\n Error!\n" ps n @ p "!=" ps m @ p sp nl quit } 
             ifElse 
             defaultColors 
@@ -293,7 +293,7 @@ User
 : opOff optimizeOff inlineOff state ;
 : opOn1 optimizeOn inlineOn { verbosity @ 1 > } { state } if ;
 : vck ( n w ) { verbosity @ n @ != } { verbosity n @ = w @ _find wordRun } if2 ;
-'vck find wdiss //pause
+//'vck find wdiss //pause
 : opOn ( n )
     optimizeOn inlineOn 
 #if 1
@@ -343,7 +343,7 @@ C Compiler Int Lexer
     nl { result file @ input 1 fread = input @ emit } { result @ 1 == } doWhile 
     file @ fclose
 ; prefix
-'ofile find wdiss
+//'ofile find wdiss
 Root
 : license ofile ( "./LICENSE" ) ;
 //license //pause
@@ -365,46 +365,7 @@ stringMacrosOn
 : ctloc ;
 #endif
 
-Root 
-'doX64 1 const
-'doScript 1 const
-'_doDemo 0 const    
-dbgOff
-dbgOn 
-#if Is_DebugOn 
-scOn
-System 
-testCfrTil // dT0 //demo //dT0
-#if _doDemo 
-demo 
-#endif //dT0
-stringMacrosOff
 
-#else
-// you can trim this file to your needs and put your personal init code here maybe
-
-#if 1
-Lisp
-
-( define j ( lambda ( a b c ) ( + a b c)))
-(define h ( lambda (a b c) (a c b) ) ) 
-( define h ( lambda ( a b c ) ( + a b c)))
-( define k ( lambda ( a b ) ( + a b )))
-(define g ( lambda (a b c) (a b c) ) )
-
-( k ( j 1 2 3 ) ( h 2 3 66 ) ) sp // 77 ...
-( + ( k ( j 1 2 3 ) ( h 2 3 66 ) ) ( + 698 2 ) ) // 777
-( + ( k ( j 1 2 3 ) ( h 2 3 59 ) ) 7 ) // 77
-( g + ( k ( j 1 2 ( h 2 3 ( k 59 4 ) ) ) 6 ) 0 ) // 77
-( - ( + 1 2 ( * 3 4 ) ( / 4 2 ) ( - 9 8 ) 10 770 787 34 ) 21 787 34 )  // == 777
-
-d: (define fib (lambda (n) ( ifElse (< n 2) n (+ (fib (- n 1)) (fib (- n 2))))))
-tick fib find d: wdiss 
-(fib 20) 
-pause
-lispOff
-#endif
-
-#endif
 2 + 7  assertStkChk // stack checking
+Shell
 s

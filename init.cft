@@ -264,7 +264,8 @@ dscOn //verbosity 3 =
 : _assert2 ( n m str ) { n @ m @ == } { str @ ps "ok" ps nl } { str @ ps "error" ps _info _pause } ifElse ; 
 : assert2 ( n m str ) { n @ m @ == } { nl str @ ps "ok" ps nl } { nl str @ ps "error" ps _info _pause } ifElse ;
 : assert0 ( n m ) { n @ m @ != } { nl "error" ps _info _pause } if ; 
-"assert" ' assert1 find alias
+"assert" ' _assert1 find alias
+"_assert" ' _assert0 find alias
 : _assertStkChk ( n m | str )  
     { verbosity @ 1 > }
     {
@@ -278,7 +279,8 @@ dscOn //verbosity 3 =
             ifElse 
             defaultColors 
         } 
-        { nl sp n @ m @ "assertStkChk" assert }
+        //{ nl sp n @ m @ "assertStkChk" assert1 }
+        { n @ m @ "assertStkChk" _assert1 }
         ifElse
     } if2 
 ; 
@@ -292,7 +294,7 @@ User
 : opOff optimizeOff inlineOff state ;
 : opOn1 optimizeOn inlineOn { verbosity @ 1 > } { state } if ;
 : vck ( n w ) { verbosity @ n @ != } { verbosity n @ = w @ _find wordRun } if2 ;
-'vck find wdiss //pause
+//'vck find wdiss //pause
 : opOn ( n )
     optimizeOn inlineOn 
 #if 1
@@ -304,7 +306,7 @@ User
 #endif
     //pause
 ;
-' opOn find winfo //pause
+//' opOn find winfo //pause
 //2 opOn 1 opOn 
 
 "s" ' stack find alias
@@ -342,7 +344,7 @@ C Compiler Int Lexer
     nl { result file @ input 1 fread = input @ emit } { result @ 1 == } doWhile 
     file @ fclose
 ; prefix
-'ofile find wdiss
+//'ofile find wdiss
 Root
 : license ofile ( "./LICENSE" ) ;
 //license //pause
@@ -372,7 +374,7 @@ Root
 '_doDemo 0 const    
 'todo 0 const    
 dbgOff
-dbgOn 
+//dbgOn 
 #if Is_DebugOn 
 
 #if todo
@@ -389,101 +391,10 @@ stringMacrosOff
 
 #else // of course you can trim this file to your needs and put your personal init code here maybe
 
-: fibBN ( n | fn fn1 fn2 -- TOS ) 
-    { fn 0 = fn1 0 = fn2 1 = } { n @ 0 > } { n 1 -= } 
-    {   
-        fn1 fn2 @ = 
-        fn2 fn @ = 
-        fn fn1 @ fn2 @ + = 
-    }
-    for
-    // nl svn @ fprint ":" ps fn @ fprint 
-    return fn
-;
-' fibBN find wdiss
-20 fibBN dup p 6765 _assert 
-: fibBN ( n | fn REG fn1 fn2 -- TOS ) 
-    { fn 0 = fn1 0 = fn2 1 = } { n @ 0 > } { n 1 -= } 
-    {   
-        fn1 fn2 @ = 
-        fn2 fn @ = 
-        fn fn1 @ fn2 @ + = 
-    }
-    for
-    // nl svn @ fprint ":" ps fn @ fprint 
-    fn @
-;
-' fibBN find wdiss
-20 fibBN dup p 6765 _assert 
-: fibBN ( n | fn, REG fn1, REG fn2 -- TOS ) 
-    { fn 0 = fn1 0 = fn2 1 = } { n @ 0 > } { n 1 -= } 
-    {   
-        fn1 fn2 @ = 
-        fn2 fn @ = 
-        fn fn1 @ fn2 @ + = 
-    }
-    for
-    // nl svn @ fprint ":" ps fn @ fprint 
-    fn @
-;
-' fibBN find wdiss
-20 fibBN dup p 6765 _assert 
-: fibBN ( n | REG fn REG fn1 REG fn2 -- TOS ) 
-    { fn 0 = fn1 0 = fn2 1 = } { n @ 0 > } { n 1 -= } 
-    {   
-        fn1 fn2 @ = 
-        fn2 fn @ = 
-        fn fn1 @ fn2 @ + = 
-    }
-    for
-    // nl svn @ fprint ":" ps fn @ fprint 
-    fn @
-;
-' fibBN find wdiss
-20 fibBN dup p 6765 _assert 
-: fibBN ( REG n | fn fn1 REG fn2 -- TOS ) 
-    { fn 0 = fn1 0 = fn2 1 = } { n @ 0 > } { n 1 -= } 
-    {   
-        fn1 fn2 @ = 
-        fn2 fn @ = 
-        fn fn1 @ fn2 @ + = 
-    }
-    for
-    // nl svn @ fprint ":" ps fn @ fprint 
-    fn @
-;
-' fibBN find wdiss
-20 fibBN dup p 6765 _assert 
-: fibBN ( REG n | fn REG fn1 REG fn2 -- TOS ) 
-    { fn 0 = fn1 0 = fn2 1 = } { n @ 0 > } { n 1 -= } 
-    {   
-        fn1 fn2 @ = 
-        fn2 fn @ = 
-        fn fn1 @ fn2 @ + = 
-    }
-    for
-    // nl svn @ fprint ":" ps fn @ fprint 
-    fn @
-;
-' fibBN find wdiss
-20 fibBN dup p 6765 _assert 
-: fibBN ( REG n | REG fn fn1 REG fn2 -- TOS ) 
-    { fn 0 = fn1 0 = fn2 1 = } { n @ 0 > } { n 1 -= } 
-    {   
-        fn1 fn2 @ = 
-        fn2 fn @ = 
-        fn fn1 @ fn2 @ + = 
-    }
-    for
-    // nl svn @ fprint ":" ps fn @ fprint 
-    fn @
-;
-' fibBN find wdiss
-20 fibBN dup p 6765 _assert 
 #endif
 
-#endif
 //: nl newline location ;
 2 + 7  assertStkChk // stack checking
 Shell
-s
+verbosity 0 =
+// s

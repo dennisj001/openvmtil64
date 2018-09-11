@@ -25,6 +25,7 @@ _CfrTil_Init_SessionCore ( CfrTil * cfrTil, int64 cntxDelFlag, int64 promptFlag 
     OVT_FreeTempMem ( ) ;
     LC_Reset ( ) ;
     CfrTil_CheckInitDataStack ( ) ;
+    OVT_StartupMessage ( ) ;
     if ( ! _Q_->Verbosity ) _Q_->Verbosity = 1 ;
     _OVT_Ok ( promptFlag ) ;
     cfrTil->SC_QuoteMode = 0 ;
@@ -59,7 +60,7 @@ CfrTil_ResetAll_Init ( CfrTil * cfrTil )
         if ( _Q_->StartupFilename )
         {
             _Q_->Verbosity = 0 ;
-            _CfrTil_ContextNew_IncludeFile ( ( byte* ) "./namespaces/.sinit.cft" ) ;
+            _CfrTil_ContextNew_IncludeFile ( ( byte* ) "./namespaces/sinit.cft" ) ;
             _CfrTil_ContextNew_IncludeFile ( _Q_->StartupFilename ) ;
         }
         else
@@ -72,7 +73,7 @@ CfrTil_ResetAll_Init ( CfrTil * cfrTil )
             else if ( _Q_->StartIncludeTries < 3 )
             {
                 AlertColors ;
-                _CfrTil_ContextNew_IncludeFile ( ( byte* ) "./namespaces/.init.cft" ) ;
+                _CfrTil_ContextNew_IncludeFile ( ( byte* ) "./namespaces/init.cft" ) ;
                 if ( _Q_->ErrorFilename )
                 {
                     if ( strcmp ( ( char* ) _Q_->ErrorFilename, "Debug Context" ) )
@@ -89,7 +90,7 @@ CfrTil_ResetAll_Init ( CfrTil * cfrTil )
         _Printf ( ( byte* ) " \nInternal Namespaces have been initialized.  " ) ;
         OVT_ShowMemoryAllocated ( ) ;
     }
-    if ( ( _Q_->InitSessionCoreTimes == 1 ) || ( ! _Q_->Verbosity ) ) _Q_->Verbosity = 1 ;
+    //if ( ( _Q_->InitSessionCoreTimes == 1 ) || ( ! _Q_->Verbosity ) ) _Q_->Verbosity = 1 ;
 }
 
 void

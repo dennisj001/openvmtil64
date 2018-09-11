@@ -32,7 +32,7 @@ _LO_Define ( ListObject * idNode, ListObject * locals )
     // the value was entered into the LISP memory, now we need a temporary carrier for LO_Print
     //l1 = _DataObject_New ( T_LC_NEW, LO_New ( LIST_NODE, word ), 0, word->CAttribute, word->CAttribute2, word->LAttribute, 
     l1 = _DataObject_New ( T_LC_NEW, 0, word->Name, word->CAttribute, word->CAttribute2, word->LAttribute, 
-        0, ( int64 ) value, 0, - 1, - 1 ) ; // all words are symbols
+        0, ( int64 ) value, LISP, - 1, - 1 ) ; // all words are symbols
     l1->LAttribute |= ( T_LISP_DEFINE | T_LISP_SYMBOL ) ;
     SetState ( lc, ( LC_DEFINE_MODE ), false ) ;
     l1->W_SourceCode = word->W_SourceCode = lc->LC_SourceCode ;

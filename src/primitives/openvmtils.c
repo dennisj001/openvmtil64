@@ -130,13 +130,8 @@ OVT_Exit ( )
 }
 
 void
-_OVT_Ok ( int64 promptFlag )
+OVT_StartupMessage ( )
 {
-    if ( _Q_->Verbosity > 3 )
-    {
-        _CfrTil_SystemState_Print ( 0 ) ;
-        _Printf ( ( byte* ) "\n<Esc> - break, <Ctrl-C> - quit, <Ctrl-D> - restart, \'bye\'/\'exit\' - leave." ) ;
-    }
     if ( ( _Q_->Verbosity >  0 ) && ( _Q_->InitSessionCoreTimes ++ == 1 ) )
     {
         DefaultColors ;
@@ -146,6 +141,16 @@ _OVT_Ok ( int64 promptFlag )
         _Printf ( (byte*) "\nType 'testCfrTil' or 'test' <tab><enter> and then 'demo' for starters" ) ;
         _Printf ( (byte*) "\nType 'bye' to exit" ) ;
         //fflush ( stdout ) ;
+    }
+}
+
+void
+_OVT_Ok ( int64 promptFlag )
+{
+    if ( _Q_->Verbosity > 3 )
+    {
+        _CfrTil_SystemState_Print ( 0 ) ;
+        _Printf ( ( byte* ) "\n<Esc> - break, <Ctrl-C> - quit, <Ctrl-D> - restart, \'bye\'/\'exit\' - leave." ) ;
     }
     _Context_Prompt ( _Q_->Verbosity && promptFlag ) ;
 }

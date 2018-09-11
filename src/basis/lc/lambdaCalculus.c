@@ -153,15 +153,15 @@ LC_FindWord ( byte * name, ListObject * locals )
             //word = _Finder_FindWord_InOneNamespace ( _Finder_, _LC_->LispTemporariesNamespace, name ) ;
             //if ( ! word )
             //{
-                word = _Finder_FindWord_InOneNamespace ( _Finder_, _LC_->LispInternalNamespace, name ) ;
+            word = _Finder_FindWord_InOneNamespace ( _Finder_, _LC_->LispInternalNamespace, name ) ;
+            if ( ! word )
+            {
+                word = _Finder_FindWord_InOneNamespace ( _Finder_, _LC_->LispNamespace, name ) ; // prefer Lisp namespace
                 if ( ! word )
                 {
-                    word = _Finder_FindWord_InOneNamespace ( _Finder_, _LC_->LispNamespace, name ) ; // prefer Lisp namespace
-                    if ( ! word )
-                    {
-                        word = Finder_Word_FindUsing ( _Context_->Finder0, name, 0 ) ;
-                    }
+                    word = Finder_Word_FindUsing ( _Context_->Finder0, name, 0 ) ;
                 }
+            }
             //}
         }
     }
@@ -198,7 +198,7 @@ _LO_CopyOne ( ListObject * l0, uint64 allocType )
 void
 _LO_ListInit ( ListObject * l0, uint64 allocType )
 {
-    l0->Lo_List = _dllist_New ( allocType ) ;//( dllist* ) l0 ;
+    l0->Lo_List = _dllist_New ( allocType ) ; //( dllist* ) l0 ;
     l0->LAttribute |= LIST ; // a LIST_NODE needs to be initialized also to be also a LIST
 }
 
@@ -211,13 +211,14 @@ LO_ListNode_New ( uint64 allocType )
 }
 
 // copy a whole list or a single node
+
 ListObject *
 _LO_Copy ( ListObject * l0, uint64 allocType )
 {
     ListObject * lnew = 0, *l1, *lnext, *lcopy ;
     if ( l0 )
     {
-        if ( l0->LAttribute & ( LIST | LIST_NODE ) ) lnew = LO_ListNode_New ( allocType ) ; 
+        if ( l0->LAttribute & ( LIST | LIST_NODE ) ) lnew = LO_ListNode_New ( allocType ) ;
         for ( l1 = _LO_First ( l0 ) ; l1 ; l1 = lnext )
         {
             lnext = _LO_Next ( l1 ) ;
@@ -260,11 +261,7 @@ _LC_ReadEvalPrint_ListObject ( int64 parenLevel, int64 continueFlag )
     LambdaCalculus * lc = _LC_ ;
     Lexer * lexer = _Context_->Lexer0 ;
     Compiler * compiler = _Context_->Compiler0 ;
-    if ( lc && parenLevel ) //&& lc->ItemQuoteState )
-    {
-        lc->QuoteState = lc->ItemQuoteState ;
-        //lc->ItemQuoteState = 0 ;
-    }
+    if ( lc && parenLevel ) lc->QuoteState = lc->ItemQuoteState ;
     else lc = LC_Init_Runtime ( ) ;
     LC_LispNamespaceOn ( ) ;
     byte *svDelimiters = lexer->TokenDelimiters ;
@@ -277,7 +274,6 @@ _LC_ReadEvalPrint_ListObject ( int64 parenLevel, int64 continueFlag )
     LC_EvalPrint ( lc, l0 ) ;
     if ( ! continueFlag )
     {
-        //LC_ClearTemporariesNamespace ( ) ; // 0 : nb. !! very important for variables from previous evals : but fix; meditate on why? temporaries should be clearable
         Lexer_SetTokenDelimiters ( lexer, svDelimiters, 0 ) ;
     }
     SetState ( compiler, LISP_MODE, false ) ;
@@ -438,24 +434,36 @@ _LC_Init_Runtime ( LambdaCalculus * lc )
 }
 
 LambdaCalculus *
+LC_Init_Runtime ( )
+{
+    LambdaCalculus * lc = _LC_ ;
+    if ( ! lc ) lc = LC_New ( ) ;
+    else _LC_Init_Runtime ( lc ) ;
+    return lc ;
+}
+
+LambdaCalculus *
 _LC_Init ( LambdaCalculus * lc )
 {
-    lc->LispNamespace = Namespace_Find ( ( byte* ) "Lisp" ) ;
-    //lc->LispTemporariesNamespace = Namespace_FindOrNew_SetUsing ( ( byte* ) "LispTemporaries", 0, 0 ) ;
-    lc->LispInternalNamespace = Namespace_FindOrNew_SetUsing ( ( byte* ) "LispInternal", 0, 0 ) ;
-    _LC_Init_Runtime ( lc ) ;
-    lc->QuoteState = 0 ;
-    lc->ItemQuoteState = 0 ;
-    lc->OurCfrTil = _CfrTil_ ;
-    DebugShow_Off ;
-    int64 svdscs = IsSourceCodeOn ;
-    CfrTil_DbgSourceCodeOff ( ) ;
-    lc->Nil = _DataObject_New ( T_LC_NEW, 0, ( byte* ) "nil", 0, 0, T_NIL, 0, 0, 0, 0, - 1 ) ;
-    lc->True = _DataObject_New ( T_LC_NEW, 0, ( byte* ) "true", 0, 0, 0, 0, ( uint64 ) true, 0, 0, - 1 ) ;
-    lc->buffer = Buffer_Data ( lc->PrintBuffer ) ;
-    lc->outBuffer = Buffer_Data ( lc->OutBuffer ) ;
-    //DebugShow_On ;
-    SetState ( _CfrTil_, DEBUG_SOURCE_CODE_MODE, svdscs ) ;
+    if ( lc )
+    {
+        lc->LispNamespace = Namespace_Find ( ( byte* ) "Lisp" ) ;
+        lc->LispInternalNamespace = Namespace_FindOrNew_SetUsing ( ( byte* ) "LispInternal", 0, 0 ) ;
+        _LC_Init_Runtime ( lc ) ;
+        lc->QuoteState = 0 ;
+        lc->ItemQuoteState = 0 ;
+        lc->OurCfrTil = _CfrTil_ ;
+        int64 svds = GetState ( _CfrTil_, _DEBUG_SHOW_ ) ;
+        int64 svsco = IsSourceCodeOn ;
+        DebugShow_Off ;
+        CfrTil_DbgSourceCodeOff ( ) ;
+        lc->Nil = _DataObject_New ( T_LC_NEW, 0, ( byte* ) "nil", 0, 0, T_NIL, 0, 0, 0, 0, - 1 ) ;
+        lc->True = _DataObject_New ( T_LC_NEW, 0, ( byte* ) "true", 0, 0, 0, 0, ( uint64 ) true, 0, 0, - 1 ) ;
+        lc->buffer = Buffer_Data ( lc->PrintBuffer ) ;
+        lc->outBuffer = Buffer_Data ( lc->OutBuffer ) ;
+        SetState ( _CfrTil_, DEBUG_SOURCE_CODE_MODE, svsco ) ;
+        SetState ( _CfrTil_, _DEBUG_SHOW_, svds ) ;
+    }
     return lc ;
 }
 
@@ -481,15 +489,6 @@ _LC_Create ( )
 }
 
 LambdaCalculus *
-LC_Init_Runtime ( )
-{
-    LambdaCalculus * lc = _LC_ ;
-    if ( ! lc ) lc = LC_New ( ) ;
-     else _LC_Init_Runtime ( lc ) ;
-    return lc ;
-}
-
-LambdaCalculus *
 LC_New ( )
 {
     LambdaCalculus * lc = _LC_Create ( ) ;
@@ -503,5 +502,11 @@ LC_Reset ( )
 {
     LC_Delete ( _LC_ ) ;
     LC_New ( ) ;
+}
+
+LambdaCalculus *
+LC_Init ( )
+{
+    _LC_Init ( _LC_ ) ;
 }
 

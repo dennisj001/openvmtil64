@@ -11,7 +11,7 @@ _DataObject_New ( uint64 type, Word * word, byte * name, uint64 ctype, uint64 ct
 {
     tsrli = ( tsrli != - 1 ) ? tsrli : _Lexer_->TokenStart_ReadLineIndex ;
     scwi = ( scwi != - 1 ) ? scwi : _Lexer_->SC_Index ;
-    if ( word && ( ! ( type & ( T_LC_NEW ) ) ) )
+    if ( word && ( ! ( type & ( T_LC_NEW|T_LC_LITERAL ) ) ) )
     {
         Word_Recycle ( word ) ;
     }

@@ -413,7 +413,6 @@ Lexer_Default ( Lexer * lexer )
     if ( Lexer_IsCurrentInputCharADelimiter ( lexer ) ) //_IsChar_Delimiter ( lexer->TokenDelimiters, lexer->TokenInputCharacter ) )
     {
         _Lexer_AppendCharToSourceCode ( lexer, lexer->TokenInputByte, 0 ) ;
-        //_Lexer_AppendCharToSourceCode ( lexer, lexer->TokenInputCharacter ) ; //== '\n' ? ' ' : lexer->TokenInputCharacter ) ;
         // must have at least one non-delimiter to make a token
         // else keep going we just have multiple delimiters ( maybe just spaces ) in a row
         if ( lexer->TokenWriteIndex )
@@ -442,7 +441,7 @@ Lexer_MakeItTheNextToken ( Lexer * lexer )
 void
 TerminatingMacro ( Lexer * lexer )
 {
-    if ( ( ! lexer->TokenWriteIndex ) || ( lexer->TokenBuffer [ lexer->TokenWriteIndex - 1 ] == '_' ) ) Lexer_Default ( lexer ) ; // allow for "_(" token 
+    if ( ( ! lexer->TokenWriteIndex ) || ( Lexer_LastChar ( lexer ) == '_' ) ) Lexer_Default ( lexer ) ; // allow for "_(" token 
     else ReadLine_UnGetChar ( lexer->ReadLiner0 ) ; // so NextChar will have this TokenInputCharacter for the next token
     Lexer_FinishTokenHere ( lexer ) ;
     return ;
@@ -488,7 +487,6 @@ Lexer_FinishTokenHere ( Lexer * lexer )
 {
     _AppendCharacterToTokenBuffer ( lexer, 0 ) ;
     SetState ( lexer, LEXER_DONE, true ) ;
-
     return ;
 }
 
@@ -655,14 +653,11 @@ AtFetch ( Lexer * lexer ) // ';':
 void
 Semi ( Lexer * lexer ) // ';':
 {
-    //if ( _CfrTil_AreWeInThisNamespace ( "C_Syntax" ) ) 
-    //if ( GetState ( _Context_, C_SYNTAX ) ) TerminatingMacro ( lexer ) ;
     if ( GetState ( _Context_, C_SYNTAX ) && lexer->TokenWriteIndex )
     {
         Lexer_MakeItTheNextToken ( lexer ) ;
         return ;
     }
-
     else Lexer_Default ( lexer ) ;
 }
 
@@ -881,6 +876,8 @@ CfrTil_LexerTables_Setup ( CfrTil * cfrtl )
     cfrtl->LexerCharacterTypeTable [ ',' ].CharFunctionTableIndex = 10 ;
 
     cfrtl->LexerCharacterTypeTable [ '"' ].CharFunctionTableIndex = 5 ;
+    //cfrtl->LexerCharacterTypeTable [ '{' ].CharFunctionTableIndex = 11 ; 
+    //cfrtl->LexerCharacterTypeTable [ '}' ].CharFunctionTableIndex = 11 ;
     cfrtl->LexerCharacterTypeTable [ '[' ].CharFunctionTableIndex = 11 ;
     cfrtl->LexerCharacterTypeTable [ ']' ].CharFunctionTableIndex = 11 ;
     cfrtl->LexerCharacterTypeTable [ '`' ].CharFunctionTableIndex = 11 ;

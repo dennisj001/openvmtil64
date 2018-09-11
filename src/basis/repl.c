@@ -22,7 +22,6 @@ _Repl ( block repl )
             if ( strstr ( ( char* ) rl->InputLineString, ".." ) || strstr ( ( char* ) rl->InputLineString, "bye" ) || strstr ( ( char* ) rl->InputLineString, "exit" ) ) goto done ;
             repl ( ) ;
             _Printf ( ( byte* ) "\n" ) ;
-            //LC_RestoreStack ( ) ; // ?!? maybe we should do this stuff differently : literals are pushed on the stack by the interpreter
        }
     }
     {

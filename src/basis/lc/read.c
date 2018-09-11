@@ -79,13 +79,13 @@ _LO_Read_DoLParen ( LambdaCalculus * lc )
 }
 
 ListObject *
-LO_Read_DoToken ( LambdaCalculus * lc, byte * token, int64 qidFlag, int64 scwi, ListObject * lnew )
+LO_Read_DoToken ( LambdaCalculus * lc, byte * token, int64 qidFlag, int64 scwi )
 {
     ListObject *l0 = 0 ;
     d1 ( if ( Is_DebugOn ) _Printf ( ( byte * ) "\n_LO_Read : \'%s\' scwi = %d", token, scwi ) ) ;
-    if ( String_Equal ( ( char * ) token, ( byte * ) "/*" ) ) CfrTil_ParenthesisComment ( ) ;
+    if ( String_Equal ( ( char * ) token, ( byte * ) "(" ) ) l0 = _LO_Read_DoLParen ( lc ) ;
+    else if ( String_Equal ( ( char * ) token, ( byte * ) "/*" ) ) CfrTil_ParenthesisComment ( ) ;
     else if ( String_Equal ( ( char * ) token, ( byte * ) "//" ) ) CfrTil_CommentToEndOfLine ( ) ;
-    else if ( String_Equal ( ( char * ) token, ( byte * ) "(" ) ) l0 = _LO_Read_DoLParen ( lc ) ;
     else l0 = _LO_Read_DoToken ( lc, token, qidFlag, scwi ) ;
     return l0 ;
 }
@@ -115,17 +115,25 @@ _LO_Read ( LambdaCalculus * lc )
         qidFlag = GetState ( cntx, CONTEXT_PARSING_QID ) ;
         if ( token )
         {
-            if ( String_Equal ( ( char * ) token, ( byte * ) ")" ) ) break ;
-            else if ( l0 = LO_Read_DoToken ( lc, token, qidFlag, scwi, lnew ) )
+            if ( String_Equal ( ( char * ) token, ( byte * ) ")" ) )
             {
-                if ( ( l0->State & SPLICE ) || ( ( l0->State & UNQUOTE_SPLICE ) && 
-                    ( ! ( l0->State & QUOTED ) ) ) ) LO_SpliceAtTail ( lnew, LO_Eval ( lc, l0 ) ) ;
-                else LO_AddToTail ( lnew, l0 ) ; 
+                lc->ParenLevel -- ;
+                break ;
+            }
+            else if ( l0 = LO_Read_DoToken ( lc, token, qidFlag, scwi ) )
+            {
+                if ( lnew )
+                {
+                    if ( ( l0->State & SPLICE ) || ( ( l0->State & UNQUOTE_SPLICE ) &&
+                        ( ! ( l0->State & QUOTED ) ) ) ) LO_SpliceAtTail ( lnew, LO_Eval ( lc, l0 ) ) ;
+                    else LO_AddToTail ( lnew, l0 ) ;
+                }
+                else lnew = l0 ;
             }
         }
         else _SyntaxError ( "\n_LO_Read : Syntax error : no token?\n", QUIT ) ;
     }
-    while ( 1 ) ; 
+    while ( lc->ParenLevel ) ;
     SetState ( lc, LC_READ, false ) ;
     SetState ( cntx->Finder0, QID, false ) ;
     if ( ( ! lc->ParenLevel ) && ( ! GetState ( _Compiler_, LC_ARG_PARSING ) ) ) LC_FinishSourceCode ( ) ;
