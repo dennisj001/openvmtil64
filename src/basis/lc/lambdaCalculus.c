@@ -430,6 +430,8 @@ _LC_Init_Runtime ( LambdaCalculus * lc )
     lc->CurrentLambdaFunction = 0 ;
     _LC_SaveDsp ( lc ) ;
     lc->ParenLevel = 0 ;
+    lc->QuoteState = 0 ;
+    lc->ItemQuoteState = 0 ;
     return lc ;
 }
 
@@ -450,8 +452,6 @@ _LC_Init ( LambdaCalculus * lc )
         lc->LispNamespace = Namespace_Find ( ( byte* ) "Lisp" ) ;
         lc->LispInternalNamespace = Namespace_FindOrNew_SetUsing ( ( byte* ) "LispInternal", 0, 0 ) ;
         _LC_Init_Runtime ( lc ) ;
-        lc->QuoteState = 0 ;
-        lc->ItemQuoteState = 0 ;
         lc->OurCfrTil = _CfrTil_ ;
         int64 svds = GetState ( _CfrTil_, _DEBUG_SHOW_ ) ;
         int64 svsco = IsSourceCodeOn ;
@@ -483,8 +483,8 @@ _LC_Create ( )
 {
     LambdaCalculus * lc = ( LambdaCalculus * ) Mem_Allocate ( sizeof (LambdaCalculus ), LISP ) ;
     lc->QuoteStateStack = Stack_New ( 256, LISP ) ; // LISP_TEMP : is recycled by OVT_FreeTempMem in _CfrTil_Init_SessionCore called by _CfrTil_Interpret
-    lc->PrintBuffer = Buffer_Create ( BUFFER_SIZE ) ;
-    lc->OutBuffer = Buffer_Create ( BUFFER_SIZE ) ;
+    lc->PrintBuffer = Buffer_NewLocked ( BUFFER_SIZE ) ;
+    lc->OutBuffer = Buffer_NewLocked ( BUFFER_SIZE ) ;
     return lc ;
 }
 
@@ -507,6 +507,9 @@ LC_Reset ( )
 LambdaCalculus *
 LC_Init ( )
 {
-    _LC_Init ( _LC_ ) ;
+    LambdaCalculus * lc ;
+    if ( _LC_ ) lc = _LC_Init_Runtime ( _LC_ ) ;
+    else lc = LC_New ( ) ;
+    return lc ;
 }
 

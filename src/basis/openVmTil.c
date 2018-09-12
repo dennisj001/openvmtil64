@@ -1,5 +1,5 @@
 #include "../include/cfrtil64.h"
-#define VERSION ((byte*) "0.852.100" ) 
+#define VERSION ((byte*) "0.852.300" ) 
 
 OpenVmTil * _Q_ ;
 
@@ -128,7 +128,7 @@ _OpenVmTil_CalculateMemSpaceSizes ( OpenVmTil * ovt, int64 restartCondition, int
     }
     else if ( totalMemSizeTarget > 0 )
     {
-        verbosity = 1 ;
+        verbosity = 0 ;
 
         // volatile mem sizes
         tempObjectsSize = 10 * K ; //TEMP_OBJECTS_SIZE ;
@@ -149,7 +149,7 @@ _OpenVmTil_CalculateMemSpaceSizes ( OpenVmTil * ovt, int64 restartCondition, int
     }
     else // 0 or -1 get default
     {
-        verbosity = 1 ;
+        verbosity = 0 ;
 
         tempObjectsSize = 1 * MB ; //TEMP_OBJECTS_SIZE ;
         sessionObjectsSize = 1 * MB ; // SESSION_OBJECTS_SIZE ;

@@ -38,7 +38,7 @@ _LO_Define ( ListObject * idNode, ListObject * locals )
     l1->W_SourceCode = word->W_SourceCode = lc->LC_SourceCode ;
     _Word_Finish ( l1 ) ;
     Compiler_Init ( _Context_->Compiler0, 0 ) ; // we could be compiling a cfrTil word as in oldLisp.cft
-    return l1 ; //LO_CopyOne ( l1 ) ; //lc->True ;
+    return l1 ; 
 }
 
 ListObject *
@@ -172,10 +172,11 @@ LO_Set ( ListObject * lfirst, ListObject * locals )
         if ( lvalue )
         {
             lset = _LO_Define ( lsymbol, lvalue ) ;
+            LO_Print ( lset ) ;
         }
         else break ;
     }
-    return 0 ; //_LC_->Nil ;
+    return 0 ; 
 }
 
 ListObject *

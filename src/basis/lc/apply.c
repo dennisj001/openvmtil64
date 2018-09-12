@@ -511,8 +511,9 @@ _LO_Apply_C_LtoR_ArgList ( LambdaCalculus * lc, ListObject * l0, Word * word )
 void
 LC_CompileRun_C_ArgList ( Word * word ) // C protocol - x64 : left to right arguments put into registers 
 {
-    LambdaCalculus * lc, *_svLc_ = _LC_ ;
-    lc = LC_New ( ) ;
+    LambdaCalculus * lc ; //, *_svLc_ = _LC_ ;
+    //lc = LC_New ( ) ;
+    lc = LC_Init ( ) ;
     Context * cntx = _Context_ ;
     Lexer * lexer = cntx->Lexer0 ;
     Compiler * compiler = cntx->Compiler0 ;
@@ -540,7 +541,7 @@ LC_CompileRun_C_ArgList ( Word * word ) // C protocol - x64 : left to right argu
         LC_LispNamespaceOff ( ) ;
         SetState ( compiler, LC_ARG_PARSING | LC_C_RTL_ARG_PARSING, false ) ;
     }
-    _LC_ = _svLc_ ;
+    //_LC_ = _svLc_ ;
     Lexer_SetTokenDelimiters ( lexer, svDelimiters, COMPILER_TEMP ) ;
 }
 
