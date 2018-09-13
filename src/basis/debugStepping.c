@@ -181,13 +181,6 @@ doReturn:
             }
             goto end ;
         }
-#if 0        
-        else if ( ( ( * ( uint16* ) debugger->DebugAddress ) == 0xff48 ) && ( *( debugger->DebugAddress + 2 ) == 0xd0 ) ) //if ( ( * ( uint16* ) debugger->DebugAddress ) == 0xff48 ) //untested 9-27-17
-        {
-            jcAddress = ( byte* ) *( uint64* ) ( debugger->DebugAddress - CELL_SIZE ) ;
-            goto doCall ;
-        }
-#endif        
         else if ( ( * debugger->DebugAddress == JMPI32 ) || ( * debugger->DebugAddress == CALLI32 ) )
         {
             jcAddress = JumpCallInstructionAddress ( debugger->DebugAddress ) ;
@@ -208,11 +201,19 @@ doJmpCall:
                 }
             }
         }
-        else if ( ( * debugger->DebugAddress == CALLI32 ) || ( ( ( * ( uint16* ) debugger->DebugAddress ) == 0xff49 ) && ( *( debugger->DebugAddress + 2 ) == 0xd1 ) ) )
+        //else if ( ( * debugger->DebugAddress == CALLI32 ) || ( ( ( * ( uint16* ) debugger->DebugAddress ) == 0xff49 ) && ( *( debugger->DebugAddress + 2 ) == 0xd1 ) ) )
+        else if ( ( ( ( * ( uint16* ) debugger->DebugAddress ) == 0xff49 ) && ( *( debugger->DebugAddress + 2 ) == 0xd1 ) ) )
         {
             jcAddress = JumpCallInstructionAddress_X64ABI ( debugger->DebugAddress ) ;
             goto doJmpCall ;
         }
+#if 0        
+        else if ( ( ( * ( uint16* ) debugger->DebugAddress ) == 0xff48 ) && ( *( debugger->DebugAddress + 2 ) == 0xd0 ) ) //if ( ( * ( uint16* ) debugger->DebugAddress ) == 0xff48 ) //untested 9-27-17
+        {
+            jcAddress = ( byte* ) *( uint64* ) ( debugger->DebugAddress - CELL_SIZE ) ;
+            goto doCall ;
+        }
+#endif        
         else if ( ( * debugger->DebugAddress == CALL_JMP_MOD_RM ) && ( _RM ( debugger->DebugAddress ) == 16 ) ) // inc/dec are also opcode == 0xff
         {
             //jcAddress = JumpCallInsnAddress_ModRm ( debugger->DebugAddress ) ;

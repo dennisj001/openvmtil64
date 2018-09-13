@@ -132,7 +132,7 @@ OVT_Exit ( )
 void
 OVT_StartupMessage ( )
 {
-    if ( ( ++ _Q_->InitSessionCoreTimes == 1 ) && ( _Q_->Verbosity >  0 ) )
+    if ( ( ++ _Q_->InitSessionCoreTimes == 2 ) && ( _Q_->Verbosity >  0 ) ) // 2 : first time is in CfrTil_ResetAll_Init
     {
         DefaultColors ;
         System_Time ( _CfrTil_->Context0->System0, 0, ( char* ) "Startup", 1 ) ; //_Q_->StartedTimes == 1 ) ;
