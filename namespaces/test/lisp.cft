@@ -168,8 +168,8 @@ Int Lisp
 (yfac yfac 7) 
 (define fibc (lambda ( n ) (ifElse (< n 2) n (+ (fibc (- n 1)) (fibc (- n 2))))))
 "\nfibc 20 = " ps
-(fibc 20)
-tick fibc find wdiss
+(fibc 7)
+tick fibc find wdiss //pause
 sp
 
 //optimizeOff

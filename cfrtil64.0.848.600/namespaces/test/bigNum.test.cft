@@ -1,0 +1,54 @@
+Int
+5
+: sp stack pause ;
+dbgOff 
+Combinators
+BigNum 
+decimal
+64 bPrecision 
+bnInit ( 16 16 )
+7.98765 8.98764 * p
+//bno
+d: : qexp { dup 1 >= } { dup -- qexp * } { drop 1 } ifElse d: ;
+// : qexp { dup 1 <= } { drop 1 } { dup -- recurse * } ifElse ;
+"!" ' qexp find alias
+'qexp find wdiss 
+sp
+nl "64 ! = " ps 64 ! p sp // fprint nl 
+x 1000 ! =
+nl "1000 ! = " ps x @ fprint nl
+: aexp { dup 1 <= } { drop 1 } { dup -- aexp * } ifElse ;
+: !!! aexp fprint nl ;
+: bexp ( n ) { n @ 1 <= } { 1 } { n @ dup 1 - bexp * } ifElse ; 
+d: : bexp0 ( n ) { n @ 1 <= } { 1 } { n @ dup -- bexp0 * } ifElse ; 
+'bexp0 find wdiss
+7 d: bexp0 p
+: !! bexp0 fprint nl ;
+: ! bexp0 ;
+d: 7 !! 8 !!
+7 !! 8 !!
+' bexp find wdiss ' bexp0 find wdiss
+//pause
+1000 ! p 
+
+#if 0
+x store
+BigNum
+d: : bexpl ( n | l ) { l x @ = n @ 1 <= } { 1 l @ fprint } { n @ dup 1 - bexpl * } ifElse ; 
+7 d: bexpl //fprint 
+sp 
+: _bassert ( n m ) { n @ m @ != } { nl "error" ps _info pause } if ; 
+5040 _bassert
+#endif
+
+nl "starting BigNum" ps nl
+BigNum
+bnInit ( 16 16 ) 
+1 3 / fprint 
+3 sqrt dup fprint dup * fprint //pause
+sp
+bigNumOff
+Int
+2 + 7 assertStkChk // stack checking
+bno
+ 

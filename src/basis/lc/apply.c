@@ -511,8 +511,7 @@ _LO_Apply_C_LtoR_ArgList ( LambdaCalculus * lc, ListObject * l0, Word * word )
 void
 LC_CompileRun_C_ArgList ( Word * word ) // C protocol - x64 : left to right arguments put into registers 
 {
-    LambdaCalculus * lc ; //, *_svLc_ = _LC_ ;
-    //lc = LC_New ( ) ;
+    LambdaCalculus * lc ; 
     lc = LC_Init ( ) ;
     Context * cntx = _Context_ ;
     Lexer * lexer = cntx->Lexer0 ;
@@ -530,18 +529,17 @@ LC_CompileRun_C_ArgList ( Word * word ) // C protocol - x64 : left to right argu
         SetState ( compiler, LC_ARG_PARSING, true ) ;
         int64 svcm = CompileMode ;
         Set_CompileMode ( false ) ; // we must have the arguments pushed and not compiled for _LO_Apply_C_Rtl_ArgList which will compile them for a C_Rtl function
-        LC_SaveStackPointer ( lc ) ; // ?!? maybe we should do this stuff differently
+        LC_SaveStackPointer ( lc ) ; 
+        int64 svDs = GetState ( _CfrTil_, _DEBUG_SHOW_ ) ;
         DebugShow_Off ;
         l0 = _LO_Read ( lc ) ;
-        //DebugShow_On ;
         Set_CompileMode ( svcm ) ; // we must have the arguments pushed and not compiled for _LO_Apply_C_Rtl_ArgList which will compile them for a C_Rtl function
         _LO_Apply_C_LtoR_ArgList ( lc, l0, word ) ;
-        LC_RestoreStackPointer ( lc ) ; // ?!? maybe we should do this stuff differently
-        //_LC_ClearTemporariesNamespace ( lc ) ;
+        LC_RestoreStackPointer ( lc ) ; 
         LC_LispNamespaceOff ( ) ;
         SetState ( compiler, LC_ARG_PARSING | LC_C_RTL_ARG_PARSING, false ) ;
+        SetState ( _CfrTil_, _DEBUG_SHOW_, svDs ) ;
     }
-    //_LC_ = _svLc_ ;
     Lexer_SetTokenDelimiters ( lexer, svDelimiters, COMPILER_TEMP ) ;
 }
 

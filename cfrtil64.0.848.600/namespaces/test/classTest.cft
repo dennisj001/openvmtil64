@@ -1,0 +1,191 @@
+5
+"\nclassTest.cft" ps //pause
+/*test comment*/ 5  // for stack checking see last lines
+#if "_ClassTest_" defined not // prevent including this file twice
+"_ClassTest_" /*testing comment ...
+testing comment*/ var 
+Int Logic C
+Compiler
+hex
+: sl nl location nl stk _pause ; //sl
+Class
+: sp ; //stack ; //pause ;
+sp
+using
+Class // "class" works like "namespace" so here we switch back to namespace 'Class' else following words would be in class 'Pointer'
+"Pointer" class Pointer.size 8 = // 'size' must be set else it remains 0; whenever a :{ ... }; class declaration doesn't immediately follow the class declaration
+"Integer" namespace // Integer.size 4 = doesn't work because a namespace doesn't have 'size' and 'this' variables automatically created
+//"int16" class int16 size 2 = // 'size' must be declared else it remains 0; ( see above note )
+//Integer "int32" class int32.size 4 = // 'size' must be declared else it remains 0; ( see above note )
+//Integer "int64" class int64 size 8 = // 'size' must be declared else it remains 0; ( see above note )
+decimal
+Integer
+Pointer size @ nl "Pointer.size = " prints print nl
+Integer size @ nl "Integer size = " prints print nl
+int16 size @ nl "int16 size = " prints print nl
+Integer "byte" class
+byte size 1 =
+byte size @ nl "byte size = " prints print nl
+//'int8 'byte find alias
+//Integer "int8" class int8 size 1 =
+sp
+Class
+using
+"Buffer" class :{ byte buf [ 256 ]; };
+// Buffer.size 256 = // for classes with structure size does not need to be set
+"DLLNode" class 
+:{ // comment
+	Pointer AfterReference   // semicolon is optional and ignored when parsing class code
+	Pointer BeforeReference ;
+};
+using
+DLLNode size @ nl "DLLNode size = " prints Io.print nl
+:{ // comment
+	Pointer AfterReference   // semicolon is optional and ignored when parsing class code
+        int16   someJunkForTesting ; // u can reset the structure representing the class
+	Pointer BeforeReference ;
+};
+DLLNode.size @ nl "DLLNode size = " prints Io.print nl
+using
+:{ // // again reset the structure representing the class
+	Pointer AfterReference   // semicolon is optional and ignored when parsing class code
+	Pointer BeforeReference ;
+};
+DLLNode.size @ nl "DLLNode size = " prints Io.print nl
+
+"testNode" DLLNode new 
+testNode.AfterReference 1 =
+testNode.BeforeReference 2 =
+testNode testNode.size @ dup p dump
+DLLNode
+
+"DLList" class
+:{
+    DLLNode HeadNode ;
+    DLLNode TailNode ;
+};
+
+: init ( this )
+    this.HeadNode.AfterReference this.TailNode.BeforeReference =
+    this.TailNode.BeforeReference this.HeadNode.AfterReference =
+    this.HeadNode.BeforeReference 1 =
+    this.TailNode.AfterReference  2 =
+;
+' init find wdiss //pause
+sp
+"testList" DLList new 
+testList DLList.size @ dup p dump //pause
+
+dbgOff 
+#if dbgOnVar @
+testList.HeadNode.AfterReference @ testList.TailNode.BeforeReference  "class init test : "  assert  : hi 1 2 3 4 5 + + + + p ; : hey hi hi hi hi hi ; hey : hi 1 2 3 4 5 + + + + p ; : hey hi hi hi hi hi ; hey // debugger test
+dbgOff
+#else
+testList.HeadNode.AfterReference @ testList.TailNode.BeforeReference  "class init test : " assert 
+#endif
+
+DLList
+using
+"DLListClone" clone // clones DLList class
++:{ // adds to the DLList class structure
+    int64 Category ;
+    Pointer Prototype ;
+    int64 Sum ;
+    int64 Twelve ;
+    int64 Three ;
+    int64 Four ;
+    int64 Accum ;
+}; // add seven elements
+
+//dbgOn
+#if dbgOnVar @
+dscOn
+#endif
+//verbosity 3 =
+: init ( this ) 
+#if dbgOnVar @
+    <dbg> this.Category 12 =
+#else
+    this.Category 12 =
+#endif
+    this.Three 3 = 
+    this.Prototype this.Three @ =
+    this.Prototype @ dup p 3 "init_assert1" assert 
+    this.Prototype @ p 
+    this.Sum 0 =
+    this.Four 4 = 
+    this.Twelve 12 =
+    this.Accum this.Sum @ = 
+    this.Sum this.Category @ 3 + this.Prototype @ & = ctloc this.Sum @ 3 "init_assert2" assert
+    this.Accum this.Three @ this.Four @ * this.Three @ / = 
+    this.Accum @ 4 "\n DLListClone init : this.Accum = :" ps "init_assert3" assert 
+    this.Prototype @ p //pause
+    this.Sum this.Category @ this.Prototype @ * this.Category @ - = // dup 24  "init_assert4" assert = 
+    this.Sum @ dup hex p 24  "init_assert5" assert decimal
+#if dbgOnVar @ 
+    <dbg> this this.size @ dump
+    this.Category @ dup p 12  "init_assert6" assert // 12
+    //this this.size @ dump
+    this.Prototype @ p // 3
+#else
+    this.Category @ dup p 12  "init_assert7" assert // 12
+    this.Prototype @ p // 3
+#endif
+    this.Sum this.Category @ this.Prototype @ * dup "testing yada" ps dup p 36  "init_assert8" assert = // 36
+    this.Sum this.Category @ this.Prototype @ - dup p = // 9
+    this.Sum this.Category @ this.Prototype @ && dup p = // 12 && 3 = 1
+    this.Sum this.Category @ this.Prototype @ & dup p = // 12 & 3 = 0
+    this.Accum this.Prototype @ =
+    this.Sum this.Category @ this.Prototype @ || dup p =
+    this.Sum this.Category @ this.Prototype @ / dup p =
+    this.Category @ dup p 12 _assert // _pause // 12
+    this.Sum @ p // 4
+    this.Prototype @ p // 3
+    "\n 12 3 36 9 1 0 15 4 12 4 3 : output above should read" ddps //_pause
+    hex
+    "\nthis = " ps this p
+    "\nthis @ = " ps this @  p
+    "\nthis.size = " ps this.size @ p
+    this @ dup p this.size @ dump
+    this dup p this.size @ dump
+    this.Accum this.Prototype @ dup p =
+    this this.size @ dump
+    decimal
+    this.Accum @ dup p 3 "\n\nAccum should be 3 assert9\n"  assert // 3
+    this.Category @ dup p 12 "init_assert9" assert //_pause // 12
+;
+
+' init find wdiss 
+"testClone" DLListClone new 
+scOff
+"\nthis = " ps this hex p 
+"\nthis = " ps this hex p //pause
+
+testClone size @ dump
+decimal nl s "DLListClone size =" ps DLListClone size @ dup p nl 88 "Clone size" assert
+testClone.TailNode.BeforeReference @ testClone "DLListClone init test : " assert
+// test 'this' to refer to 'this' in current namespace
+// d: this.TailNode.BeforeReference @ this "DLListClone init test2 : " assert
+
+"\nthis @ size @ p " ps this size @ p drop // sp // pause // for now we have to drop the 'this' pointer. TODO :: 'this' semantics have yet to be solidified
+"\nthis.size = " ps this.size @ p drop // sp //pause
+
+dbgOff
+#if dbgOnVar @
+"\nprintf output = " ps using printf ( "this.size = %d", this.size ) this @ dup hex p size @ dup decimal p dump //pause // 'this' is a pointer to a pointer 
+#else
+// TODO ( % using C "\nprintf output = " ps d: printf ( "this.size = %d", this.size ) this @ dup hex p size @ dup decimal p dump % ) //pause // 'this' is a pointer to a pointer 
+#endif
+sp
+TODO ( "'this' semantics have yet to be solidified" ) 
+sp
+testClone size @ dump
+sp
+nl testClone.Category @ 12 "DLListClone init test4 : " assert //pause
+//nl this.Category @ 12 "DLListClone init test3 : " assert //pause
+sp
+#endif
+2 + 7 assertStkChk // stack checking
+sp
+
+

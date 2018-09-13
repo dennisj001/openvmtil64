@@ -450,7 +450,7 @@ _LC_Init ( LambdaCalculus * lc )
     if ( lc )
     {
         lc->LispNamespace = Namespace_Find ( ( byte* ) "Lisp" ) ;
-        lc->LispInternalNamespace = Namespace_FindOrNew_SetUsing ( ( byte* ) "LispInternal", 0, 0 ) ;
+        lc->LispInternalNamespace = Namespace_FindOrNew_SetUsing ( ( byte* ) "LispInternal", 0, 1 ) ;
         _LC_Init_Runtime ( lc ) ;
         lc->OurCfrTil = _CfrTil_ ;
         int64 svds = GetState ( _CfrTil_, _DEBUG_SHOW_ ) ;

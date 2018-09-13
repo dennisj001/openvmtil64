@@ -1,0 +1,245 @@
+
+#include "../../include/cfrtil64.h"
+
+/* from macros.h
+#define dobject_Get_M_Slot( dobj, m ) (((dobject*) dobj)->do_iData [m]) 
+#define dobject_Set_M_Slot( dobj, m, value ) (((dobject*) dobj)->do_iData [m] = ((int64)value) ) 
+#define List_Set_N_Node_M_Slot( list, n, m, value ) _dllist_Set_N_Node_M_Slot ( list, 0, 0, value ) 
+#define List_Get_N_Node_M_Slot( list, n, m ) _dllist_Get_N_Node_M_Slot ( (dllist * )list, (int64) n, (int64) m )
+ * from dllist.c
+int64 _dllist_Get_N_Node_M_Slot ( dllist * list, int64 n, int64 m )
+void _dllist_Set_N_Node_M_Slot ( dllist * list, int64 n, int64 m, int64 value )
+ */
+
+byte *
+_object_Allocate ( int64 size, int64 allocType )
+{
+    return Mem_Allocate ( size, allocType ) ;
+}
+
+dobject *
+_dobject_Allocate ( int64 doType, int64 slots, uint64 allocType )
+{
+    int64 size = sizeof ( dobject ) + ( slots * sizeof ( int64 ) ) ;
+    dobject * dobj = ( dobject * ) _object_Allocate ( size, allocType ) ;
+    dobj->do_iData = ( int64* ) ( ( dobject* ) dobj + 1 ) ;
+    dobj->do_Slots = ( int8 ) slots ;
+    dobj->do_Size = ( int16 ) size ;
+    dobj->do_Type = ( int32 ) doType ;
+    dobj->do_InUseFlag = ( Boolean ) true ;
+    return dobj ;
+}
+
+#if 0 // keep this it may be useful later
+
+dobject *
+_dobject_New_M_Slot_Node ( int64 allocType, int64 dobjType, int64 m_slots, ... )
+{
+    dobject *dobj ;
+    va_list args ;
+    int64 i ;
+    va_start ( args, m_slots ) ;
+    dobj = _dobject_Allocate ( dobjType, m_slots, allocType ) ;
+    for ( i = 0 ; i < m_slots ; i ++ ) dobj->do_iData[i] = va_arg ( args, int64 ) ;
+    va_end ( args ) ;
+    return dobj ;
+}
+#endif
+
+void
+_dobject_Print ( dobject * dobj )
+{
+    int64 i ;
+    _Printf ( ( byte* ) "\n\ndobject  = 0x%08x : word Name = %s", dobj, dobj->do_iData[2] ? ( ( Word* ) dobj->do_iData[2] )->Name : ( byte* ) "" ) ;
+    _Printf ( ( byte* ) "\nType     = %d", dobj->do_Type ) ;
+    _Printf ( ( byte* ) "\nSlots    = %d", dobj->do_Slots ) ;
+    _Printf ( ( byte* ) "\nSize     = %d", dobj->do_Size ) ;
+    for ( i = 0 ; i < dobj->do_Slots ; i ++ )
+    {
+        _Printf ( ( byte* ) "\nSlot [%d] = 0x%08x", i, dobj->do_iData[i] ) ;
+    }
+    //_Printf ( ( byte* ) "\n" ) ;
+}
+// remember : Word = DynamicObject = DObject = Namespace
+
+void
+_DObject_C_StartupCompiledWords_DefInit ( byte * function, int64 arg )
+{
+    if ( arg == - 1 )
+    {
+        ( ( void ( * )( ) )( function ) ) ( ) ;
+    }
+    else
+    {
+        ( ( void ( * ) ( int64 ) )( function ) ) ( arg ) ;
+    }
+}
+
+void
+_DObject_ValueDefinition_Init ( Word * word, uint64 value, uint64 funcType, byte * function, int64 arg )
+// using a variable that is a type or a function 
+{
+    //if ( GetState ( _Context_->Compiler0, LC_ARG_PARSING | PREFIX_ARG_PARSING ) ) word->W_TokenStart_ReadLineIndex = _Context_->Lexer0->TokenStart_ReadLineIndex ;
+    word->W_PtrToValue = & word->W_Value ; // lvalue
+    if ( funcType & BLOCK )
+    {
+        word->Definition = ( block ) ( function ? function : ( byte* ) value ) ; //_OptimizeJumps ( ( byte* ) value ) ; // this comes to play (only(?)) with unoptimized code
+        word->CodeStart = ( byte* ) word->Definition ;
+        if ( NamedByteArray_CheckAddress ( _Q_CodeSpace, word->CodeStart ) ) word->S_CodeSize = Here - word->CodeStart ;
+        else word->S_CodeSize = 0 ;
+        word->W_Value = ( uint64 ) word->Definition ; // rvalue
+    }
+    else
+    {
+        word->W_Value = value ; // rvalue
+        d0 ( _Printf ( ( byte* ) "\n_DObject_ValueDefinition_Init :" ) ) ;
+        ByteArray * svcs = _Q_CodeByteArray ;
+        int64 sscm = GetState ( _CfrTil_, DEBUG_SOURCE_CODE_MODE ) ;
+        CfrTil_DbgSourceCodeOff ( ) ;
+        _NBA_SetCompilingSpace_MakeSureOfRoom ( _Q_->MemorySpace0->ObjectSpace, 4 * K ) ;
+        //Word_SetCoding ( word, Here ) ;
+        word->CodeStart = Here ;
+        word->Definition = ( block ) Here ;
+        if ( arg ) _DObject_C_StartupCompiledWords_DefInit ( function, arg ) ;
+        else Compile_SetCurrentlyRunningWord_Call_TestRSP ( ( byte* ) _DataObject_Run, word ) ;
+        _Compile_Return ( ) ;
+        d0 ( _Debugger_Disassemble ( _Debugger_, ( byte* ) word->Definition, 64, 1 ) ) ;
+        word->S_CodeSize = Here - word->CodeStart ; // for use by inline
+        Set_CompilerSpace ( svcs ) ;
+        SetState ( _CfrTil_, DEBUG_SOURCE_CODE_MODE, sscm ) ;
+    }
+}
+
+void
+DObject_Finish ( Word * word )
+{
+    uint64 ctype = word->CAttribute ;
+    if ( ! ( ctype & CPRIMITIVE ) )
+    {
+        if ( GetState ( _CfrTil_, OPTIMIZE_ON ) ) SetState ( word, COMPILED_OPTIMIZED, true ) ;
+        if ( GetState ( _CfrTil_, INLINE_ON ) ) SetState ( word, COMPILED_INLINE, true ) ;
+        if ( GetState ( _Context_, INFIX_MODE ) ) SetState ( word, W_INFIX_MODE, true ) ;
+        if ( GetState ( _Context_, C_SYNTAX ) ) SetState ( word, W_C_SYNTAX, true ) ;
+        if ( IsSourceCodeOn ) SetState ( word, W_SOURCE_CODE_MODE, true ) ;
+    }
+    if ( GetState ( _Context_, INFIX_MODE ) ) word->CAttribute |= INFIX_WORD ;
+    word->W_NumberOfArgs = _Context_->Compiler0->NumberOfArgs ;
+    word->W_NumberOfLocals = _Context_->Compiler0->NumberOfLocals ;
+    _CfrTil_->LastFinished_DObject = word ;
+    //word->W_SourceCode = String_New ( _CfrTil_->SC_ScratchPad, STRING_MEM ) ;
+}
+
+Word *
+_DObject_Init ( Word * word, uint64 value, uint64 ftype, byte * function, int64 arg )
+{
+    // remember : Word = Namespace = DObject : each have an s_Symbol
+    _DObject_ValueDefinition_Init ( word, value, ftype, function, arg ) ;
+    DObject_Finish ( word ) ; // don't need to fully finish here ??
+    word->RunType = ftype ;
+    return word ;
+}
+
+// DObject : dynamic object
+// remember : Word = Namespace = DObject has a s_Symbol
+
+Word *
+_DObject_New ( byte * name, uint64 value, uint64 ctype, uint64 ctype2, uint64 ltype, uint64 ftype, byte * function, int64 arg, int64 addToInNs, Namespace * addToNs, uint64 allocType )
+{
+    Word * word = _Word_New ( name, ctype, ctype2, ltype, addToInNs, addToNs, allocType ) ; //( addToInNs || addToNs ) ? DICTIONARY : allocType ) ;
+    _DObject_Init ( word, value, ftype, function, arg ) ;
+    _CfrTil_->DObjectCreateCount ++ ;
+    return word ;
+}
+
+DObject *
+_DObject_FindSlot_BottomUp ( DObject * dobject, byte * name )
+{
+    Word * word ;
+    do
+    {
+        if ( ( word = _Finder_FindWord_InOneNamespace ( _Finder_, dobject, name ) ) ) break ;
+        dobject = dobject->ContainingNamespace ;
+    }
+    while ( dobject ) ;
+
+    return ( DObject * ) word ;
+}
+
+DObject *
+_DObject_SetSlot ( DObject * dobject, byte * name, int64 value )
+{
+    DObject * ndobject = _DObject_FindSlot_BottomUp ( dobject, name ) ;
+    if ( ! ndobject ) return _DObject_NewSlot ( dobject, name, value ) ;
+
+    else return ndobject ;
+}
+
+void
+DObject_SubObjectInit ( DObject * dobject, Word * parent )
+{
+    if ( ! parent ) parent = _CfrTil_Namespace_InNamespaceGet ( ) ;
+    else if ( ! ( parent->CAttribute & NAMESPACE ) )
+    {
+
+        parent->W_List = dllist_New ( ) ;
+        parent->CAttribute |= NAMESPACE ;
+        _Namespace_AddToNamespacesTail ( parent ) ;
+    }
+    if ( parent->S_WAllocType == WORD_COPY_MEM ) parent = Word_Copy ( ( Word* ) parent, DICTIONARY ) ; // nb! : this allows us to
+    Namespace_DoAddWord ( parent, dobject ) ;
+    dobject->CAttribute |= parent->CAttribute ;
+    dobject->Slots = parent->Slots ;
+    Namespace_SetState ( parent, USING ) ;
+}
+
+DObject *
+DObject_Sub_New ( DObject * proto, byte * name, uint64 category )
+{
+    DObject * dobject = _DObject_New ( name, 0, ( category | DOBJECT | IMMEDIATE ), 0, 0, DOBJECT, ( byte* ) _DataObject_Run, 0, 0, 0, DICTIONARY ) ;
+    DObject_SubObjectInit ( dobject, proto ) ;
+    return dobject ;
+}
+
+// types an object as a DOBJECT
+// but all variables and objects are created as DOBJECTs so this is not necessary
+
+void
+CfrTil_SetPropertiesAsDObject ( )
+{
+    DObject * o = ( DObject * ) DataStack_Pop ( ) ;
+    o->CAttribute |= DOBJECT ;
+}
+
+DObject *
+_DObject_NewSlot ( DObject * proto, byte * name, int64 value )
+{
+    DObject * dobject = DObject_Sub_New ( proto, name, DOBJECT ) ;
+    dobject->W_DObjectValue = value ;
+    dobject->W_PtrToValue = & dobject->W_DObjectValue ;
+    proto->Slots ++ ;
+
+    return dobject ;
+}
+
+void
+CfrTil_DObject_Clone ( )
+{
+    DObject * proto = ( DObject * ) DataStack_Pop ( ) ;
+    byte * name = ( byte * ) DataStack_Pop ( ) ;
+    if ( ! ( proto->CAttribute & DOBJECT ) ) Error ( ( byte* ) "Cloning Error : \'%s\' is not a dynamic object.", proto->Name, 1 ) ;
+    DObject_Sub_New ( proto, name, DOBJECT ) ;
+}
+
+void
+DObject_NewClone ( DObject * proto )
+{
+    byte * name = ( byte* ) DataStack_Pop ( ) ;
+    DObject_Sub_New ( proto, name, DOBJECT ) ;
+}
+
+void
+DObject_New ( )
+{
+    DObject_NewClone ( 0 ) ;
+}
+
