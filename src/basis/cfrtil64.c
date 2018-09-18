@@ -237,6 +237,7 @@ _CfrTil_Init ( CfrTil * cfrTil, Namespace * nss )
     cfrTil->SC_QuoteMode = 0 ;
     cfrTil->EndBlockWord = Finder_FindWord_InOneNamespace ( _Finder_, "Reserved", "}" ) ;
     cfrTil->BeginBlockWord = Finder_FindWord_InOneNamespace ( _Finder_, "Reserved", "{" ) ;
+    SetState ( cfrTil, SOURCE_CODE_ON, true ) ;
 }
 
 void

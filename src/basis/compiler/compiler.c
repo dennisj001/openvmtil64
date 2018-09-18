@@ -278,6 +278,7 @@ Compiler_Init ( Compiler * compiler, uint64 state )
     compiler->ReturnVariableWord = 0 ;
     compiler->CurrentCreatedWord = 0 ;
     compiler->CurrentWord = 0 ;
+    compiler->NextBlockStart = 0 ;
     Stack_Init ( compiler->BlockStack ) ;
     Stack_Init ( compiler->CombinatorBlockInfoStack ) ;
     Stack_Init ( compiler->PointerToOffset ) ;
@@ -331,7 +332,7 @@ _Stack_PointerToJmpOffset_Set ( byte * address )
 }
 
 void
-Stack_PointerToJmpOffset_Set ( )
+Stack_Push_PointerToJmpOffset ( )
 {
     _Stack_PointerToJmpOffset_Set ( Here - DISP_SIZE ) ;
 }

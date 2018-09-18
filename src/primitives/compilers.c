@@ -36,7 +36,7 @@ CompileACfrTilWord ( )
 void
 CompileInt64 ( )
 {
-
+#if 0    
     union
     {
         int64 q0 [2 ] ;
@@ -45,6 +45,8 @@ CompileInt64 ( )
     li.q0[1] = DataStack_Pop ( ) ;
     li.q0[0] = DataStack_Pop ( ) ; // little endian - low order bits should be pushed first
     _Compile_Int64 ( li.q ) ;
+#endif    
+    _Compile_Int64 ( DataStack_Pop ( ) ) ;
 
 }
 
@@ -225,11 +227,9 @@ void
 CfrTil_Literal ( )
 {
     int64 value = DataStack_Pop ( ) ;
-    //Word * word = _DataObject_New ( LITERAL, 0, 0, LITERAL, 0, 0, ( uint64 ) _DataStack_Pop ( ), 0 ) ;
     ByteArray * svcs = _Q_CodeByteArray ;
-    //Compiler_SetCompilingSpace_MakeSureOfRoom ( "TempObjectSpace" ) ; 
     _NBA_SetCompilingSpace_MakeSureOfRoom ( _Q_->MemorySpace0->TempObjectSpace, 4 * K ) ;
-    Word * word = _DataObject_New ( LITERAL, 0, "<a literal>", LITERAL | CONSTANT, 0, 0, 0, value, 0, - 1, - 1 ) ;
+    Word * word = _DataObject_New ( LITERAL, 0, "<literal>", LITERAL | CONSTANT, 0, 0, 0, value, 0, - 1, - 1 ) ;
     Set_CompilerSpace ( svcs ) ;
     _Interpreter_DoWord ( _Context_->Interpreter0, word, - 1, - 1 ) ;
 }
@@ -240,18 +240,19 @@ CfrTil_Constant ( )
     int64 value = DataStack_Pop ( ) ;
     byte * name = ( byte* ) DataStack_Pop ( ) ;
     Word * word = _DataObject_New ( CONSTANT, 0, name, LITERAL | CONSTANT, 0, 0, 0, value, 0, - 1, - 1 ) ;
-    byte *buffer = Buffer_Data ( _CfrTil_->ScratchB1 ) ;
-    sprintf ( buffer, ( byte* ) "\'%s %ld const // (hypothetical)", ( char* ) name, value ) ;
-    word->W_SourceCode = String_New_SourceCode ( buffer ) ;
-
-
+    //byte *buffer = Buffer_Data ( _CfrTil_->ScratchB1 ) ;
+    //sprintf ( buffer, ( byte* ) "\'%s %ld const // (hypothetical)", ( char* ) name, value ) ;
+    _CfrTil_Finish_WordSourceCode ( _CfrTil_, word ) ;
+    //word->W_SourceCode = String_New_SourceCode ( buffer ) ;
 }
 
 void
 CfrTil_Variable ( )
 {
     byte * name = ( byte* ) DataStack_Pop ( ) ;
-    _DataObject_New ( NAMESPACE_VARIABLE, 0, name, NAMESPACE_VARIABLE, 0, 0, 0, 0, 0, - 1, - 1 ) ;
+    Word * word = _DataObject_New ( NAMESPACE_VARIABLE, 0, name, NAMESPACE_VARIABLE, 0, 0, 0, 0, 0, - 1, - 1 ) ;
+    _CfrTil_Finish_WordSourceCode ( _CfrTil_, word ) ;
+    //word->W_SourceCode = String_New_SourceCode ( buffer ) ;
 }
 
 // "{|" - exit the Compiler start interpreting

@@ -38,6 +38,7 @@ _CfrTil_Init_SessionCore ( CfrTil * cfrTil, int64 cntxDelFlag, int64 promptFlag 
     d0 ( Buffer_PrintBuffers ( ) ) ;
     DefaultColors ;
     cfrTil->ScWord = 0 ;
+    SetState ( cfrTil, SOURCE_CODE_ON, true ) ;
 }
 
 void

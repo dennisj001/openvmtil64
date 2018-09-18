@@ -39,7 +39,6 @@ Interpret_DoParenthesizedRValue ( )
     Compiler * compiler = cntx->Compiler0 ;
     int64 svcm = GetState ( compiler, COMPILE_MODE ) ;
     byte * token ;
-    //_CfrTil_WordList_PopWords ( 1, 0 ) ; // pop the '('
     while ( 1 )
     {
         token = _Lexer_ReadToken ( cntx->Lexer0, 0 ) ;
@@ -50,10 +49,10 @@ Interpret_DoParenthesizedRValue ( )
 }
 
 void
-Interpret_C_Block_EndBlock ( Word * word, byte * tokenToUse, Boolean insertFlag )
+Interpret_C_Block_EndBlock ( byte * tokenToUse, Boolean insertFlag )
 {
-    Compiler * compiler = _Compiler_ ;
-    BlockInfo * bi = ( BlockInfo* ) _Stack_Top ( compiler->BlockStack ) ;
+    //Compiler * compiler = _Compiler_ ;
+    //BlockInfo * bi = ( BlockInfo* ) _Stack_Top ( compiler->BlockStack ) ;
     //bi->LogicCodeWord = _Compiler_WordList ( compiler, 1 ) ; //word ;
     if ( tokenToUse ) _CfrTil_->EndBlockWord->Name = tokenToUse ;
     if ( insertFlag ) SetState ( _Debugger_, DBG_OUTPUT_INSERTION, true ) ;
@@ -106,7 +105,7 @@ CfrTil_Interpret_C_Blocks ( int64 blocks, Boolean takesAnElseFlag, Boolean semic
         }
         else if ( String_Equal ( ( char* ) token, "}" ) )
         {
-            Interpret_C_Block_EndBlock ( word, "}", 0 ) ;
+            Interpret_C_Block_EndBlock ( "}", 0 ) ;
             blocksParsed ++ ;
         }
         else if ( String_Equal ( ( char* ) token, ")" ) && compiler->InLParenBlock )
@@ -114,7 +113,7 @@ CfrTil_Interpret_C_Blocks ( int64 blocks, Boolean takesAnElseFlag, Boolean semic
             List_InterpretLists ( compiler->PostfixLists ) ;
             compiler->InLParenBlock = false ;
             compiler->TakesLParenAsBlock = false ;
-            Interpret_C_Block_EndBlock ( word, ")", 0 ) ;
+            Interpret_C_Block_EndBlock ( ")", 0 ) ;
             if ( ! _Context_StringEqual_PeekNextToken ( _Context_, ( byte* ) "{", 0 ) )
             {
                 Interpret_C_Block_BeginBlock ( "{", 1 ) ;
@@ -122,12 +121,13 @@ CfrTil_Interpret_C_Blocks ( int64 blocks, Boolean takesAnElseFlag, Boolean semic
             }
             blocksParsed ++ ;
         }
-        else if ( String_Equal ( ( char* ) token, ";" ) )
+        else if ( String_Equal ( ( char* ) token, ";" ) )//|| String_Equal ( ( char* ) token, "," ) )
         {
             List_InterpretLists ( compiler->PostfixLists ) ;
+            //if ( String_Equal ( ( char* ) token, ";" ) && semicolonEndsThisBlock )
             if ( semicolonEndsThisBlock )
             {
-                Interpret_C_Block_EndBlock ( word, ";", 0 ) ;
+                Interpret_C_Block_EndBlock ( ";", 0 ) ;
                 blocksParsed ++ ;
             }
             if ( compiler->InLParenBlock ) Interpret_C_Block_BeginBlock ( "{", 0 ) ;
@@ -151,13 +151,13 @@ CfrTil_Interpret_C_Blocks ( int64 blocks, Boolean takesAnElseFlag, Boolean semic
             word = _Interpreter_TokenToWord ( interp, token ) ;
             if ( word )
             {
-                _Interpreter_DoWord ( interp, word, -1, -1 ) ; //word->W_RL_Index, word->W_SC_Index ) ;
+                _Interpreter_DoWord ( interp, word, - 1, - 1 ) ; //word->W_RL_Index, word->W_SC_Index ) ;
                 if ( word->CAttribute & COMBINATOR )
                 {
                     //Word * lastWord = Compiler_WordList ( 0 ) ;
                     if ( semicolonEndsThisBlock ) //&& ( _CfrTil_->EndBlockWord == lastWord ) ) //String_Equal ( lastWord->Name, ";" ) ) // ??
                     {
-                        Interpret_C_Block_EndBlock ( word, "}", 1 ) ;
+                        Interpret_C_Block_EndBlock ( "}", 1 ) ;
                         blocksParsed ++ ;
                     }
                 }
@@ -180,37 +180,19 @@ void
 CfrTil_C_LeftParen ( )
 {
     Compiler * compiler = _Context_->Compiler0 ;
-#if 0    
-    if ( ( ( ! CompileMode ) && ( ! GetState ( _Context_->Interpreter0, PREPROCESSOR_MODE ) ) ) ||
-        ( ( CompileMode && ( ! GetState ( compiler, VARIABLE_FRAME ) ) ) ||
-        ( ReadLine_PeekNextNonWhitespaceChar ( _Context_->Lexer0->ReadLiner0 ) == '|' ) ) ) //( ! GetState ( _Context_, INFIX_MODE ) ) )
-#elif 1     
     if ( ( GetState ( _Context_->Interpreter0, PREPROCESSOR_MODE ) ) ) // && ( isalnum ( ReadLine_LastReadChar ( _ReadLiner_ ) ) ) )
     {
         // this is for "#define" (which is parsed as '#' 'define', two words)
-        if ( isalnum ( ReadLine_LastReadChar ( _ReadLiner_ ) ) )
-            //if ( ! Compiling) 
-            CfrTil_LocalsAndStackVariablesBegin ( ) ;
+        if ( isalnum ( ReadLine_LastReadChar ( _ReadLiner_ ) ) ) CfrTil_LocalsAndStackVariablesBegin ( ) ;
         else Interpret_DoParenthesizedRValue ( ) ;
     }
-        //else if ( ( CompileMode && ( ! GetState ( compiler, VARIABLE_FRAME ) ) )
     else if ( ( ( ! GetState ( compiler, VARIABLE_FRAME ) ) )
         || ( ReadLine_PeekNextNonWhitespaceChar ( _Context_->Lexer0->ReadLiner0 ) == '|' ) ) //( ! GetState ( _Context_, INFIX_MODE ) ) )
     {
         CfrTil_LocalsAndStackVariablesBegin ( ) ;
     }
     else Interpret_DoParenthesizedRValue ( ) ;
-#else  
-
-    if ( ( GetState ( _Context_->Interpreter0, PREPROCESSOR_MODE ) && isalnum ( ReadLine_LastReadChar ( _ReadLiner_ ) ) ) ||
-        ( ( CompileMode && ( ! GetState ( compiler, VARIABLE_FRAME ) ) )
-        || ( ReadLine_PeekNextNonWhitespaceChar ( _Context_->Lexer0->ReadLiner0 ) == '|' ) ) ) //( ! GetState ( _Context_, INFIX_MODE ) ) )
-    {
-        CfrTil_LocalsAndStackVariablesBegin ( ) ;
-    }
-    else Interpret_DoParenthesizedRValue ( ) ;
-#endif        
-    }
+}
 
 void
 _CfrTil_C_Infix_EqualOp ( Word * opWord )
@@ -223,12 +205,10 @@ _CfrTil_C_Infix_EqualOp ( Word * opWord )
     int64 svscwi = word0 ? word0->W_SC_Index : 0 ;
     byte * svName, * token ;
     SetState ( compiler, C_INFIX_EQUAL, true ) ;
-    d0 ( if ( Is_DebugModeOn ) Compiler_SC_WordList_Show ("\nCfrTil_C_Infix_EqualOp : before pop 2 words", 0 , 0) ) ;
     if ( opWord ) _CfrTil_WordList_PopWords ( 1 ) ;
-    d0 ( if ( Is_DebugModeOn ) Compiler_SC_WordList_Show ("\nCfrTil_C_Infix_Equal0p : before interpret until ',' or ';' :", 0 , 0) ) ;
-    d0 ( if ( Is_DebugOn ) CfrTil_Using ( ) ) ;
-    token = _Interpret_C_Until_EitherToken ( interp, ( byte* ) ";", ( byte* ) ",", ( byte* ) ")", ( byte* ) " \n\r\t" ) ;
-    d0 ( if ( Is_DebugModeOn ) Compiler_SC_WordList_Show ("\nCfrTil_C_Infix_EqualOp : after interpret until ';' :", 0 , 0) ) ;
+    compiler->NextBlockStart = Here ;
+    token = _Interpret_C_Until_Token3 ( interp, ( byte* ) ";", ( byte* ) ",", ( byte* ) ")", ( byte* ) " \n\r\t" ) ;
+    if ( String_Equal ( ( char* ) token, ";" ) || String_Equal ( ( char* ) token, "," ) ) compiler->NextBlockStart = Here ;
     if ( lhsWord )
     {
         int64 svState = cntx->State ;
@@ -241,18 +221,17 @@ _CfrTil_C_Infix_EqualOp ( Word * opWord )
     {
         word0 = _CfrTil_->PokeWord ;
     }
-    d0 ( if ( Is_DebugModeOn ) Compiler_SC_WordList_Show ("\nCfrTil_C_Infix_EqualOp : before op word", 0 , 0) ) ;
+    d0 ( if ( Is_DebugModeOn ) Compiler_SC_WordList_Show ( "\nCfrTil_C_Infix_EqualOp : before op word", 0, 0 ) ) ;
     if ( opWord ) rword = opWord ;
-    else rword = word0 ; //_Interpreter_DoWord_Default ( interp, opWord ) ;
+    else rword = word0 ; 
     svName = rword->Name ;
     rword->Name = "=" ;
-    if ( lhsWord ) SetState ( _Debugger_, DBG_OUTPUT_INSERTION, true ) ; // activate this in disassemble source code ??
     _Interpreter_DoWord_Default ( interp, rword, tsrli, svscwi ) ;
     SetState ( _Debugger_, DBG_OUTPUT_INSERTION, false ) ;
     rword->Name = svName ;
     if ( GetState ( compiler, C_COMBINATOR_LPAREN ) )
     {
-        if ( word0->StackPushRegisterCode ) SetHere (word0->StackPushRegisterCode, 1) ; // this is the usual after '=' in non C syntax; assuming optimizeOn
+        if ( word0->StackPushRegisterCode ) SetHere ( word0->StackPushRegisterCode, 1 ) ; // this is the usual after '=' in non C syntax; assuming optimizeOn
         Compiler_Set_BI_setTtnn ( compiler, TTT_ZERO, NEGFLAG_ON, TTT_ZERO, NEGFLAG_Z ) ; // must set logic flag for Compile_ReConfigureLogicInBlock in Block_Compile_WithLogicFlag
     }
     List_InterpretLists ( compiler->PostfixLists ) ;
@@ -260,7 +239,6 @@ _CfrTil_C_Infix_EqualOp ( Word * opWord )
     if ( ! Compiling ) CfrTil_InitSourceCode ( _CfrTil_ ) ;
     SetState ( _Debugger_, DEBUG_SHTL_OFF, false ) ;
     SetState ( compiler, C_INFIX_EQUAL, false ) ;
-    d0 ( if ( Is_DebugModeOn ) Compiler_SC_WordList_Show ("\nCfrTil_C_Infix_EqualOp : just before return", 0 , 0) ) ;
     _CfrTil_PushToken_OnTokenList ( token ) ; // so the callee can check use or use
 }
 
@@ -272,3 +250,30 @@ CfrTil_SetInNamespaceFromBackground ( )
     else Compiler_SetAs_InNamespace_C_BackgroundNamespace ( cntx->Compiler0 ) ;
 }
 
+void
+CfrTil_C_ConditionalExpression ( )
+{
+    Context * cntx = _Context_ ;
+    Interpreter * interp = cntx->Interpreter0 ;
+    Word * word = CfrTil_WordList ( 1 ) ;
+    if ( word->StackPushRegisterCode )
+    {
+        _SetHere_To_Word_StackPushRegisterCode ( word, 1 ) ;
+        _Compile_TestCode ( word->RegToUse, CELL ) ;
+    }
+    else
+    {
+        _Compile_Stack_PopToReg ( DSP, RAX ) ;
+        _Compile_TestCode ( RAX, CELL ) ;
+    }
+    _Compile_UninitializedJumpEqualZero ( ) ;
+    byte * ptrToOffsetElse = Here - DISP_SIZE ;
+    DEBUG_SHOW ;
+    _Interpret_Until_Token ( interp, ( byte* ) ":", 0 ) ;
+    _Compile_UninitializedJump ( ) ;
+    byte * ptrToOffsetEnd = Here - DISP_SIZE ;
+    _SetOffsetForCallOrJump ( ptrToOffsetElse, Here ) ;
+    byte * token = _Interpret_C_Until_Token3 ( interp, ( byte* ) ";", ( byte* ) ",", ( byte* ) ")", 0 ) ;
+    _SetOffsetForCallOrJump ( ptrToOffsetEnd, Here ) ;
+    _CfrTil_PushToken_OnTokenList ( token ) ;
+}

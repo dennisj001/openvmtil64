@@ -282,7 +282,7 @@ _Compile_Write_Instruction_X64 ( rex, opCode, modRm, controlFlags, sib, disp, di
 int 
 _CalculateRex ( _reg rm rex_w_flag | rex )
 {
-#if 1   
+#if 0 
     //  0100    WRXB
     rex = 0 ;
     if ( rex_w_flag ) rex = 8 ;
@@ -291,13 +291,13 @@ _CalculateRex ( _reg rm rex_w_flag | rex )
     if ( rm > 0x7 ) rex += 1 ;
     if ( rex ) rex |= 0x40 ;
     return rex ;
-#else // original C code
-    int8 rex = ( ( rex_w_flag ? 8 : 0 ) | ( ( reg > 7 ) ? 4 : 0 ) | ( ( index > 7 ) ? 2 : 0 ) | ( ( base > 7 ) ? 1 : 0 ) ) ;
+#else // from original C code
+    rex = ( ( rex_w_flag ? 8 : 0 ) | ( ( _reg > 7 ) ? 4 : 0 ) | ( ( rm > 7 ) ? 1 : 0 ) ) ;
     if ( rex ) rex |= 0x40 ;
     return rex ;
 #endif    
 } prefix // prefix is not automatic with c syntax so they can be used like rpn words
-//'_CalculateRex find wdiss apause
+//'_CalculateRex find wdiss pause
 
 
 void
@@ -468,7 +468,7 @@ User
     _Compile_SUBI_DSP ( CELL ) 
 asm;
 
-' stest find wdiss sp 
+' stest find wdiss //pause
 s
 "\nthis is some purposefully funky code for testing\n" ps
 

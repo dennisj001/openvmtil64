@@ -35,7 +35,7 @@ BI_CompileRecord_TestCode_Reg ( BlockInfo *bi, Boolean reg, Boolean size )
 }
 
 void
-BI_CompileRecord_TestCode_ArgRegNum ( BlockInfo *bi, Boolean argRegNum )
+BI_CompileRecord_TestCode_ArgRegNum ( BlockInfo *bi, uint8 argRegNum )
 {
     BI_CompileRecord_TestCode_Reg ( bi, _COI_GetReg ( _Compiler_->OptInfo, argRegNum ), CELL ) ;
 }
@@ -411,7 +411,7 @@ CfrTil_If ( )
         // ?? an explanation of the relation of the setcc terms with the flags is not clear to me yet (20110801) from the intel literature ?? 
         // but by trial and error this works; the logic i use is given in _Compile_Jcc.
         // ?? if there are problems check this area ?? cf. http://webster.cs.ucr.edu/AoA/Windows/HTML/IntegerArithmetic.html
-        Stack_PointerToJmpOffset_Set ( ) ;
+        Stack_Push_PointerToJmpOffset ( ) ;
     }
     else
     {
@@ -424,7 +424,7 @@ CfrTil_If ( )
             if ( DataStack_Pop ( ) )
             {
                 // interpret until "else" or "endif"
-                byte * token = _Interpret_C_Until_EitherToken ( interp, ( byte* ) "else", ( byte* ) "endif", 0, 0 ) ;
+                byte * token = _Interpret_C_Until_Token3 ( interp, ( byte* ) "else", ( byte* ) "endif", 0, 0 ) ;
                 //if ( ( rtrn == 2 ) || ( rtrn == 0 ) ) return ;
                 if ( ( token == 0 ) || ( String_Equal ( token, "endif" ) ) ) return ;
                 Parse_SkipUntil_Token ( ( byte* ) "endif" ) ;
@@ -449,7 +449,7 @@ CfrTil_Else ( )
     {
         _Compile_UninitializedJump ( ) ; // at the end of the 'if block' we need to jmp over the 'else block'
         CfrTil_CalculateAndSetPreviousJmpOffset_ToHere ( ) ;
-        Stack_PointerToJmpOffset_Set ( ) ;
+        Stack_Push_PointerToJmpOffset ( ) ;
     }
     else
     {

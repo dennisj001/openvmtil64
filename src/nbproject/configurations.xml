@@ -116,6 +116,8 @@
       <itemPath>../etc</itemPath>
       <itemPath>../init.cft</itemPath>
       <itemPath>nbproject/private/launcher.properties</itemPath>
+      <itemPath>../m</itemPath>
+      <itemPath>../mir</itemPath>
       <itemPath>../namespaces</itemPath>
     </logicalFolder>
   </logicalFolder>

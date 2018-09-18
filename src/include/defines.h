@@ -494,6 +494,7 @@
 // CfrTil state flags added to System flags
 #define CFRTIL_RUN ( (uint64) 1 << 0 )
 #define SOURCE_CODE_STARTED  ( (uint64) 1 << 1 )
+#define SOURCE_CODE_ON  ( (uint64) 1 << 2 )
 #define DEBUG_MODE ( (uint64) 1 << 7 )
 #define DEBUG_SOURCE_CODE_MODE ( (uint64) 1 << 8 )
 #define STRING_MACROS_ON ( (uint64) 1 << 9 )
@@ -633,10 +634,6 @@
 #define W_INFIX_MODE ( (uint64) 1 << 17 )
 #define W_SOURCE_CODE_MODE ( (uint64) 1 << 18 )
 #define W_INITIALIZED ( (uint64) 1 << 19 )
-//#define NOT_COMPILED ( (uint64) 1 << 12 )
-//#define QUALIFIED_ID ( (uint64) 1 << 11 )
-//#define TC_START ( (uint64) 1 << 12 )
-//#define TC_VISITED ( (uint64) 1 << 11 )
 
 // Lisp State flags 
 #define LC_PRINT_VALUE          ( (uint64) 1 << 0 )
@@ -727,6 +724,19 @@
 #define T_PREPROCESSOR          ( (uint8) 1 << 1 )   
 
 #if 0
+// abstract types - 't'
+// combinators
+#define ARROW               ( (uint64) 1 << 0 ) // MORPHISM : t '->' t 
+#define CATESIAN_PRODUCT    ( (uint64) 1 << 1 ) // t 'x' t
+#define PRODUCT             CATESIAN_PRODUCT // t 'x' t
+// base types
+#define INT64             ( (uint64) 1 << 2 ) 
+#define INT               INT64 
+#define BOOLEAN           ( (uint64) 1 << 3 ) 
+#define STRING            ( (uint64) 1 << 4 ) 
+#define BIGNUM            ( (uint64) 1 << 5 ) 
+#define FLOAT             ( (uint64) 1 << 6 ) 
+
 // insn op codes for CATEGORY_OP words
 #define OP_PLUS_PLUS                ( (uint64) 1 << 0 )
 #define OP_MINUS_MINUS              ( (uint64) 1 << 0 )

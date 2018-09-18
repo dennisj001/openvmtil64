@@ -258,8 +258,6 @@ Type_Create ( )
     //DataStack_Push ( size ) ;
 }
 
-#if 1
-
 void
 _CfrTil_TypeDef ( )
 {
@@ -311,31 +309,3 @@ _CfrTil_TypeDef ( )
     }
     while ( 1 ) ;
 }
-#else
-
-void
-_CfrTil_TypeDef ( )
-{
-    Context * cntx = _Context_ ;
-    Namespace * ns = CfrTil_Type_New ( ) ;
-    Lexer * lexer = cntx->Lexer0 ;
-    Lexer_SetTokenDelimiters ( lexer, ( byte* ) " ,\n\r\t", COMPILER_TEMP ) ;
-    do
-    {
-        byte * token = Lexer_PeekNextNonDebugTokenWord ( cntx->Lexer0, 1 ) ;
-        //byte c = Lexer_NextNonDelimiterChar ( lexer ) ;
-        token = Lexer_ReadToken ( cntx->Lexer0 ) ; //, ( byte* ) " ,\n\r\t" ) ;
-        if ( ( token [ 0 ] == ';' ) && ( rbracket ) ) break ;
-        if ( token [ 0 ] == '}' )
-        {
-            rbracket ++ ;
-            continue
-        } ;
-        if ( token [ 0 ] == ',' ) continue ;
-        Word * alias = _CfrTil_Alias ( ns, token ) ;
-        alias->Lo_List = ns->Lo_List ;
-        alias->CAttribute |= IMMEDIATE ;
-    }
-    while ( 1 ) ;
-}
-#endif

@@ -61,10 +61,10 @@ DWL_Find ( dllist * list, Word * iword, byte * address, byte* name, int64 takeFi
         for ( i = 0, anode = fromFirstFlag ? dllist_First ( list ) : dllist_Last ( list ) ; anode ;
             anode = fromFirstFlag ? dlnode_Next ( anode ) : dlnode_Previous ( anode ), i ++ )
         {
-            nword = ( Word* ) dobject_Get_M_Slot ( (dobject*) anode, SCN_T_WORD ) ;
+            nword = ( Word* ) dobject_Get_M_Slot ( ( dobject* ) anode, SCN_T_WORD ) ;
             naddress = nword->SourceCoding ;
-            scwi = dobject_Get_M_Slot ( (dobject*) anode, SCN_SC_WORD_INDEX ) ; 
-            iuFlag = dobject_Get_M_Slot ( (dobject*) anode, SCN_IN_USE_FLAG ) ;
+            scwi = dobject_Get_M_Slot ( ( dobject* ) anode, SCN_SC_WORD_INDEX ) ;
+            iuFlag = dobject_Get_M_Slot ( ( dobject* ) anode, SCN_IN_USE_FLAG ) ;
             if ( ! iuFlag ) continue ;
             if ( iword && ( nword == iword ) ) return nword ;
             if ( Compiling && ( ! GetState ( _Debugger_, DBG_DISASM_ACC ) ) && _Debugger_->w_Word && ( nword == _Debugger_->w_Word ) ) return nword ;
@@ -113,7 +113,7 @@ DWL_Find ( dllist * list, Word * iword, byte * address, byte* name, int64 takeFi
         if ( ( foundWord ) && ( _Q_->Verbosity > 2 ) )
         {
             _Printf ( ( byte* ) "\nNumber Found = %d :: minDiffFound = %d : window = %d : Choosen node = %s :", numFound, minDiffFound, fDiff, foundWord->Name ) ;
-            _DWL_ShowWord_Print (foundWord, 0, "CHOSEN", foundWord->Coding, foundWord->SourceCoding, 0, minDiffFound, 1 ) ; //_DWL_ShowWord ( foundWord, "CHOSEN", minDiffFound ) ;
+            _DWL_ShowWord_Print ( foundWord, 0, "CHOSEN", foundWord->Coding, foundWord->SourceCoding, 0, minDiffFound, 1 ) ; //_DWL_ShowWord ( foundWord, "CHOSEN", minDiffFound ) ;
         }
         if ( address ) _Debugger_->LastSourceCodeAddress = address ;
         if ( foundWord ) _Debugger_->LastSourceCodeIndex = foundWord->W_SC_Index ;
@@ -154,7 +154,7 @@ WordList_SetCoding ( int64 index, byte * address )
 void
 SC_List_AdjustAddress ( dlnode * node, byte * address, byte * newAddress )
 {
-    Word * nword = ( Word* ) dobject_Get_M_Slot ( (dobject*) node, SCN_T_WORD ) ;
+    Word * nword = ( Word* ) dobject_Get_M_Slot ( ( dobject* ) node, SCN_T_WORD ) ;
     //int64 scwi = dobject_Get_M_Slot ( node, SCN_SC_WORD_INDEX ) ; //nword->W_SC_WordIndex ;
     if ( ( nword->Coding == address ) ) //&& ( nword->W_SC_WordIndex != word->W_SC_WordIndex ) )
     {
@@ -164,7 +164,7 @@ SC_List_AdjustAddress ( dlnode * node, byte * address, byte * newAddress )
             nword->Name, nword->W_SC_Index, nword->Name, nword->W_SC_Index ) ) ;
         //if ( _Q_->Verbosity > 2 )
         {
-            d0 ( if ( Is_DebugModeOn ) _DWL_ShowWord_Print (nword, 0, "CODING ADJUST", 0, address, newAddress, 0, 1 ) ) ;
+            d0 ( if ( Is_DebugModeOn ) _DWL_ShowWord_Print ( nword, 0, "CODING ADJUST", 0, address, newAddress, 0, 1 ) ) ;
         }
     }
 }
@@ -172,7 +172,7 @@ SC_List_AdjustAddress ( dlnode * node, byte * address, byte * newAddress )
 void
 SC_ListClearAddress ( dlnode * node, byte * address )
 {
-    Word * nword = ( Word* ) dobject_Get_M_Slot ( (dobject*) node, SCN_T_WORD ) ;
+    Word * nword = ( Word* ) dobject_Get_M_Slot ( ( dobject* ) node, SCN_T_WORD ) ;
     //int64 scwi = dobject_Get_M_Slot ( node, SCN_SC_WORD_INDEX ) ; //nword->W_SC_WordIndex ;
     if ( ( nword->SourceCoding == address ) ) //&& ( nword->W_SC_WordIndex != word->W_SC_WordIndex ) )
     {
@@ -219,7 +219,7 @@ _CfrTil_WordList_TopWord ( )
 {
     Word * word = 0 ;
     node * first = _dllist_First ( _CfrTil_->CompilerWordList ) ;
-    if ( first ) word = ( Word* ) dobject_Get_M_Slot ( (dobject*) first, SCN_T_WORD ) ;
+    if ( first ) word = ( Word* ) dobject_Get_M_Slot ( ( dobject* ) first, SCN_T_WORD ) ;
     return word ;
 }
 
@@ -248,7 +248,7 @@ CfrTil_WordLists_PopWord ( )
 // too many showWord functions 
 
 void
-_DWL_ShowWord_Print (Word * word, int64 index, byte * prefix, byte * coding, byte * sourceCoding, byte * newSourceCoding, int64 scwiDiff, Boolean iuoFlag )
+_DWL_ShowWord_Print ( Word * word, int64 index, byte * prefix, byte * coding, byte * sourceCoding, byte * newSourceCoding, int64 scwiDiff, Boolean iuoFlag )
 {
     if ( word )
     {
@@ -282,7 +282,7 @@ DWL_ShowWord ( dlnode * anode, int64 index, int64 inUseOnlyFlag, int64 prefix, i
         int64 iuoFlag = dobject_Get_M_Slot ( dobj, SCN_IN_USE_FLAG ) ;
         if ( word && ( ( ! inUseOnlyFlag ) || ( inUseOnlyFlag && iuoFlag ) ) )
         {
-            _DWL_ShowWord_Print (word, index, ( byte* ) prefix, word->Coding, word->SourceCoding, 0, scwiDiff, iuoFlag ) ;
+            _DWL_ShowWord_Print ( word, index, ( byte* ) prefix, word->Coding, word->SourceCoding, 0, scwiDiff, iuoFlag ) ;
         }
     }
 }
@@ -428,51 +428,70 @@ _CfrTil_SC_ScratchPadIndex_Init ( CfrTil * cfrtil )
 void
 CfrTil_SourceCode_InitEnd ( CfrTil * cfrtil )
 {
-    cfrtil->SC_Buffer [ 0 ] = 0 ;
-    cfrtil->SC_Index = 0 ;
-    SetState ( cfrtil, SOURCE_CODE_STARTED, false ) ;
+    if ( GetState ( _CfrTil_, SOURCE_CODE_ON ) )
+    {
+        cfrtil->SC_Buffer [ 0 ] = 0 ;
+        cfrtil->SC_Index = 0 ;
+        SetState ( cfrtil, SOURCE_CODE_STARTED, false ) ;
+    }
 }
 
 void
 CfrTil_SourceCode_InitStart ( CfrTil * cfrtil )
 {
-    CfrTil_SourceCode_InitEnd ( cfrtil ) ;
-    SetState ( cfrtil, SOURCE_CODE_STARTED, true ) ;
+    if ( GetState ( _CfrTil_, SOURCE_CODE_ON ) )
+    {
+        CfrTil_SourceCode_InitEnd ( cfrtil ) ;
+        SetState ( cfrtil, SOURCE_CODE_STARTED, true ) ;
+    }
 }
 
 void
 _CfrTil_InitSourceCode ( CfrTil * cfrtil )
 {
-    CfrTil_SourceCode_InitStart ( cfrtil ) ;
-    Lexer_SourceCodeOn ( _Context_->Lexer0 ) ;
+    if ( GetState ( _CfrTil_, SOURCE_CODE_ON ) )
+    {
+        CfrTil_SourceCode_InitStart ( cfrtil ) ;
+        Lexer_SourceCodeOn ( _Context_->Lexer0 ) ;
+    }
 }
 
 void
 CfrTil_InitSourceCode ( CfrTil * cfrtil )
 {
-    _CfrTil_InitSourceCode ( cfrtil ) ;
-    _CfrTil_SC_ScratchPadIndex_Init ( cfrtil ) ;
+    if ( GetState ( _CfrTil_, SOURCE_CODE_ON ) )
+    {
+        _CfrTil_InitSourceCode ( cfrtil ) ;
+        _CfrTil_SC_ScratchPadIndex_Init ( cfrtil ) ;
+    }
 }
 
 void
 _CfrTil_InitSourceCode_WithName ( CfrTil * cfrtil, byte * name )
 {
-    _CfrTil_InitSourceCode ( cfrtil ) ;
-    _CfrTil_AddStringToSourceCode ( cfrtil, name ) ;
-    _CfrTil_SC_ScratchPadIndex_Init ( cfrtil ) ;
+    if ( GetState ( _CfrTil_, SOURCE_CODE_ON ) )
+    {
+        _CfrTil_InitSourceCode ( cfrtil ) ;
+        _CfrTil_AddStringToSourceCode ( cfrtil, name ) ;
+        _CfrTil_SC_ScratchPadIndex_Init ( cfrtil ) ;
+    }
 }
 
 void
 CfrTil_InitSourceCode_WithCurrentInputChar ( CfrTil * cfrtil )
 {
-    Lexer * lexer = _Context_->Lexer0 ;
-    _CfrTil_InitSourceCode ( cfrtil ) ;
-    _Lexer_AppendCharToSourceCode ( lexer, lexer->TokenInputByte, 0 ) ;
+    if ( GetState ( _CfrTil_, SOURCE_CODE_ON ) )
+    {
+        Lexer * lexer = _Context_->Lexer0 ;
+        _CfrTil_InitSourceCode ( cfrtil ) ;
+        _Lexer_AppendCharToSourceCode ( lexer, lexer->TokenInputByte, 0 ) ;
+    }
 }
 
 void
 CfrTil_SourceCode_Init ( )
 {
+
     Word * word = _Interpreter_->w_Word ;
     _CfrTil_InitSourceCode_WithName ( _CfrTil_, word ? word->Name : 0 ) ;
 }
@@ -487,12 +506,14 @@ byte *
 _CfrTil_GetSourceCode ( )
 {
     byte * sc = String_New_SourceCode ( _CfrTil_->SC_Buffer ) ;
+
     return sc ;
 }
 
 byte *
 _CfrTil_Finish_WordSourceCode ( CfrTil * cfrtil, Word * word )
 {
+
     if ( ! word->W_SourceCode ) word->W_SourceCode = _CfrTil_GetSourceCode ( ) ;
     Lexer_SourceCodeOff ( _Lexer_ ) ;
     CfrTil_SourceCode_InitEnd ( cfrtil ) ;
@@ -501,6 +522,7 @@ _CfrTil_Finish_WordSourceCode ( CfrTil * cfrtil, Word * word )
 byte *
 CfrTil_FinishSourceCode ( CfrTil * cfrtil, Word * word )
 {
+
     _CfrTil_Finish_WordSourceCode ( cfrtil, word ) ;
     CfrTil_WordList_Init ( cfrtil, word, 0 ) ;
 }
@@ -511,6 +533,7 @@ _CfrTil_UnAppendFromSourceCode_NChars ( CfrTil * cfrtil, int64 nchars )
     int64 plen = Strlen ( ( CString ) cfrtil->SC_Buffer ) ;
     if ( plen >= nchars )
     {
+
         cfrtil->SC_Buffer [ Strlen ( ( CString ) cfrtil->SC_Buffer ) - nchars ] = 0 ;
     }
     _CfrTil_SC_ScratchPadIndex_Init ( cfrtil ) ;
@@ -521,6 +544,7 @@ _CfrTil_UnAppendTokenFromSourceCode ( CfrTil * cfrtil, byte * tkn )
 {
     if ( GetState ( _Lexer_, ( ADD_TOKEN_TO_SOURCE | ADD_CHAR_TO_SOURCE ) ) )
     {
+
         _CfrTil_UnAppendFromSourceCode_NChars ( cfrtil, Strlen ( ( CString ) tkn ) + 1 ) ;
     }
 }
@@ -528,6 +552,7 @@ _CfrTil_UnAppendTokenFromSourceCode ( CfrTil * cfrtil, byte * tkn )
 void
 _CfrTil_AppendCharToSourceCode ( CfrTil * cfrtil, byte c )
 {
+
     cfrtil->SC_Buffer [ cfrtil->SC_Index ++ ] = c ;
     cfrtil->SC_Buffer [ cfrtil->SC_Index ] = 0 ;
 }
@@ -553,6 +578,7 @@ CfrTil_AppendCharToSourceCode ( CfrTil * cfrtil, byte c, int64 convertToSpaceFla
         }
         else
         {
+
             _String_AppendConvertCharToBackSlashAtIndex ( cfrtil->SC_Buffer, c, &cfrtil->SC_Index, cfrtil->SC_QuoteMode ) ;
         }
     }
@@ -562,11 +588,13 @@ Word *
 Get_SourceCodeWord ( )
 {
     Word * scWord = _CfrTil_->ScWord ? _CfrTil_->ScWord : Compiling ? _CfrTil_->CurrentWordCompiling : _CfrTil_->LastFinished_DObject ;
+
     return scWord ;
 }
 
 // ...source code source code TP source code source code ... EOL
 #if 0
+
 byte *
 SC_PrepareDbgSourceCodeString ( byte * sc, Word * word ) // sc : source code ; scwi : source code word index
 {
@@ -577,10 +605,10 @@ SC_PrepareDbgSourceCodeString ( byte * sc, Word * word ) // sc : source code ; s
         int64 scwi0, i, tw, slt, tp, lef, leftBorder, ts, rightBorder, ref, slsc, scwci, pad ; // ts : tokenStart ; tp : text point - where we want to start source code text to align with disassembly ; ref : right ellipsis flag
         token = String_ConvertToBackSlash ( token0 ) ;
         tw = Debugger_TerminalLineWidth ( _Debugger_ ) ;
-        slt = Strlen ( token ) ; 
+        slt = Strlen ( token ) ;
         slsc = strlen ( sc ) ;
         scwi0 = word->W_SC_Index ;
-        scwci = String_FindStrnCmpIndex (sc, token, scwi0, slt, ((slsc - scwi0) > 30) ? 30 : (slsc - scwi0)) ; 
+        scwci = String_FindStrnCmpIndex ( sc, token, scwi0, slt, ( ( slsc - scwi0 ) > 30 ) ? 30 : ( slsc - scwi0 ) ) ;
         d0 ( byte * scspp0 = & sc [ scwi0 ] ) ;
         d0 ( byte * scspp2 = & sc [ scwci ] ) ;
         nvw = ( char* ) Buffer_New_pbyte ( ( slsc > BUFFER_SIZE ) ? slsc : BUFFER_SIZE ) ;
@@ -615,6 +643,7 @@ SC_PrepareDbgSourceCodeString ( byte * sc, Word * word ) // sc : source code ; s
     return cc_line ;
 }
 #else
+
 byte *
 SC_PrepareDbgSourceCodeString ( byte * sc, Word * word ) // sc : source code ; scwi : source code word index
 {
@@ -625,10 +654,10 @@ SC_PrepareDbgSourceCodeString ( byte * sc, Word * word ) // sc : source code ; s
         int64 scwi0, i, tw, slt, tp, lef, leftBorder, ts, rightBorder, ref, slsc, scwci, pad ; // ts : tokenStart ; tp : text point - where we want to start source code text to align with disassembly ; ref : right ellipsis flag
         token = String_ConvertToBackSlash ( token0 ) ;
         tw = Debugger_TerminalLineWidth ( _Debugger_ ) ;
-        slt = Strlen ( token ) ; 
+        slt = Strlen ( token ) ;
         slsc = strlen ( sc ) ;
         scwi0 = word->W_SC_Index ;
-        scwci = String_FindStrnCmpIndex (sc, token, scwi0, slt, ((slsc - scwi0) > 30) ? 30 : (slsc - scwi0)) ; 
+        scwci = String_FindStrnCmpIndex ( sc, token, scwi0, slt, ( ( slsc - scwi0 ) > 30 ) ? 30 : ( slsc - scwi0 ) ) ;
         d0 ( byte * scspp0 = & sc [ scwi0 ] ) ;
         d0 ( byte * scspp2 = & sc [ scwci ] ) ;
         nvw = ( char* ) Buffer_New_pbyte ( ( slsc > BUFFER_SIZE ) ? slsc : BUFFER_SIZE ) ;
@@ -661,7 +690,7 @@ SC_PrepareDbgSourceCodeString ( byte * sc, Word * word ) // sc : source code ; s
         cc_line = _String_HighlightTokenInputLine ( nvw, lef, leftBorder, ts, token, rightBorder, ref ) ; // nts : new token start is a index into b - the nwv buffer
         SetState ( _Debugger_, DEBUG_SHTL_OFF, svState ) ;
     }
-    else cc_line = ( byte* ) "" ; 
+    else cc_line = ( byte* ) "" ;
     return cc_line ;
 }
 #endif

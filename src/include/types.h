@@ -84,7 +84,7 @@ typedef struct _dllist
 #define tail before_ptr
 enum types
 {
-    BOOL, BYTE, INTEGER, STRING, POINTER, XCODE, WORD, WORD_LOCATION
+    BOOL, BYTE, INTEGER, STRING, BIGNUM, FLOAT, POINTER, XCODE, WORD, WORD_LOCATION, ARROW, PRODUCT
 } ;
 typedef struct _dobject
 {
@@ -746,7 +746,7 @@ typedef struct
     int64 ParenLevel ;
     int64 GlobalParenLevel, OptimizeForcedReturn ;
     int64 ArrayEnds ;
-    byte * InitHere ;
+    byte * InitHere, *NextBlockStart ;
     int64 * AccumulatedOptimizeOffsetPointer ;
     Boolean InLParenBlock, SemicolonEndsThisBlock, TakesLParenAsBlock, BeginBlockFlag ;
     int32 * AccumulatedOffsetPointer ;
@@ -1103,3 +1103,4 @@ typedef struct ppibs
     int64 LineNumber ;
 }
 PreProcessorIfBlockStatus, Ppibs ;
+

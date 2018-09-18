@@ -60,19 +60,12 @@ void
 _Word_Compile ( Word * word )
 {
     Word_SetCodingHere_And_ClearPreviousUseOf_Here_SCA ( word, 0 ) ;
-    if ( ! word->Definition )
-    {
-        CfrTil_SetupRecursiveCall ( ) ;
-    }
+    if ( ! word->Definition ) CfrTil_SetupRecursiveCall ( ) ;
     else if ( ( GetState ( _CfrTil_, INLINE_ON ) ) && ( word->CAttribute & INLINE ) && ( word->S_CodeSize ) )
     {
         _Compile_WordInline ( word ) ;
     }
-    else
-    {
-        Compile_CallWord_X84_ABI_RSP_ADJUST ( word ) ;
-    }
-
+    else Compile_CallWord_X84_ABI_RSP_ADJUST ( word ) ;
 }
 
 Namespace *

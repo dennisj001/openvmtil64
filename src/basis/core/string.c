@@ -481,7 +481,7 @@ int64
 Strncpy ( byte * dst, byte * src, int64 n )
 {
     int64 i ;
-    for ( i = 0 ; src [i] && (i < n) ; i ++ ) dst[i] = src[i] ;
+    for ( i = 0 ; src [i] && ( i < n ) ; i ++ ) dst[i] = src[i] ;
 }
 
 byte *
@@ -765,7 +765,7 @@ String_CheckWordSize ( byte * str, int64 wl ) //, Boolean lPunctFlag, Boolean rP
     {
         if ( rPunctFlag )
         {
-            if ( ! IsPunct ( str[i] ) ) break ;
+            if ( ( i >= wl ) && ( ! IsPunct ( str[i] ) ) ) break ;
         }
         else if ( IsPunct ( str[i] ) || ( str[i] == ' ' ) ) break ;
     }

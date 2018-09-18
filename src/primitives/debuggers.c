@@ -54,9 +54,10 @@ CfrTil_DebugOff ( )
 }
 
 void
-CfrTil_DebugRuntimeBreakpoint ( )
+_CfrTil_DebugRuntimeBreakpoint ( Boolean debugOnOnlyFlag )
 {
     Debugger * debugger = _Debugger_ ;
+    if ( debugOnOnlyFlag && ( ! Is_DebugShowOn ) ) return ;
     if ( ( ! CompileMode ) )
     {
         if ( ! GetState ( debugger, ( DBG_BRK_INIT ) ) )
@@ -72,7 +73,11 @@ CfrTil_DebugRuntimeBreakpoint ( )
                     DBG_INTERPRET_LOOP_DONE | DBG_PRE_DONE | DBG_CONTINUE | DBG_NEWLINE | DBG_PROMPT | DBG_INFO | DBG_MENU ) ;
             }
         }
-        else { debugger->DebugAddress += 3 ;  SetState ( _Debugger_, ( DBG_AUTO_MODE | DBG_AUTO_MODE_ONCE ), false ) ; } // 3 : sizeof call rax insn
+        else
+        {
+            debugger->DebugAddress += 3 ;
+            SetState ( _Debugger_, ( DBG_AUTO_MODE | DBG_AUTO_MODE_ONCE ), false ) ;
+        } // 3 : sizeof call rax insn
         _Debugger_InterpreterLoop ( debugger ) ;
         SetState ( debugger, DBG_BRK_INIT | DBG_RUNTIME_BREAKPOINT | DEBUG_SHTL_OFF, false ) ;
         // we just stepped this word and used it's arguments in the source code ; if we just return the interpreter will attempt to interpret the arguments
@@ -86,4 +91,14 @@ CfrTil_DebugRuntimeBreakpoint ( )
     }
 }
 
+void
+CfrTil_DebugRuntimeBreakpoint ()
+{
+    _CfrTil_DebugRuntimeBreakpoint ( 0 ) ;
+}
 
+void
+CfrTil_DebugRuntimeBreakpoint_dso ()
+{
+    _CfrTil_DebugRuntimeBreakpoint ( 1 ) ;
+}

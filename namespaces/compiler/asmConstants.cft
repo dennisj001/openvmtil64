@@ -1,5 +1,6 @@
 5 
 : sp ; //stack pause ; 
+c_syntaxOff
 'true 1 const
 'false 0 const
 'on true const

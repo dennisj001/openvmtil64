@@ -119,7 +119,7 @@ DObject_Finish ( Word * word )
         if ( GetState ( _CfrTil_, OPTIMIZE_ON ) ) SetState ( word, COMPILED_OPTIMIZED, true ) ;
         if ( GetState ( _CfrTil_, INLINE_ON ) ) SetState ( word, COMPILED_INLINE, true ) ;
         if ( GetState ( _Context_, INFIX_MODE ) ) SetState ( word, W_INFIX_MODE, true ) ;
-        if ( GetState ( _Context_, C_SYNTAX ) ) word->WAttribute |= WT_C_SYNTAX ;
+        if ( GetState ( _Context_, C_SYNTAX ) ) { SetState ( word, W_C_SYNTAX, true ) ; word->WAttribute |= WT_C_SYNTAX ; }
         if ( IsSourceCodeOn ) SetState ( word, W_SOURCE_CODE_MODE, true ) ;
     }
     if ( GetState ( _Context_, INFIX_MODE ) ) word->CAttribute |= INFIX_WORD ;

@@ -117,7 +117,7 @@ _Debugger_Init ( Debugger * debugger, Word * word, byte * address )
     else if ( debugger->DebugAddress ) debugger->w_Word = word = Word_GetFromCodeAddress ( debugger->DebugAddress ) ;
     if ( GetState ( debugger, DBG_BRK_INIT ) && debugger->cs_Cpu->Rsp )
     {
-        // remember : _Compile_CpuState_Save ( _Debugger_->cs_Cpu ) ; is called thru _Compile_Debug : <dbg>
+        // remember : _Compile_CpuState_Save ( _Debugger_->cs_Cpu ) ; is called thru _Compile_Debug : <dbg>/<dso>
         //debugger->DebugAddress = debugger->w_Word ? debugger->w_Word->Coding + 3 : ( byte* ) debugger->cs_Cpu->Rsp[1] ;
         debugger->DebugAddress = ( byte* ) debugger->cs_Cpu->Rsp[1] ;
         if ( debugger->DebugAddress && ( ! word ) )
@@ -265,7 +265,7 @@ Debugger_Eval ( Debugger * debugger )
         debugger->NextEvalWord = Interpreter_SetupNextWord ( _Interpreter_ ) ;
     }
 #else    
-    SetState_TrueFalse ( debugger, DBG_INTERPRET_LOOP_DONE | DBG_EVAL_AUTO_MODE, DBG_STEPPING ) ;
+        SetState_TrueFalse ( debugger, DBG_INTERPRET_LOOP_DONE | DBG_EVAL_AUTO_MODE, DBG_STEPPING ) ;
     if ( GetState ( debugger, DBG_AUTO_MODE ) ) SetState ( debugger, DBG_EVAL_AUTO_MODE, true ) ;
 #endif    
     debugger->PreHere = Here ;
@@ -419,7 +419,8 @@ void
 Debugger_Escape ( Debugger * debugger )
 {
     uint64 saveSystemState = _Context_->System0->State ;
-    uint64 saveDebuggerState = debugger->State ;
+    uint64 saveDebuggerState = debugger->State, svScState = GetState ( _CfrTil_, SOURCE_CODE_ON )  ;
+    SetState ( _CfrTil_, SOURCE_CODE_ON, false ) ;
     SetState ( _Context_->System0, ADD_READLINE_TO_HISTORY, true ) ;
     SetState_TrueFalse ( debugger, DBG_COMMAND_LINE | DBG_ESCAPED, DBG_ACTIVE ) ;
     _Debugger_ = Debugger_Copy ( debugger, TEMPORARY ) ;
@@ -441,6 +442,7 @@ Debugger_Escape ( Debugger * debugger )
     debugger->State = saveDebuggerState ;
     _Context_->System0->State = saveSystemState ;
     SetState_TrueFalse ( debugger, DBG_ACTIVE | DBG_INFO, DBG_STEPPED | DBG_AUTO_MODE | DBG_AUTO_MODE_ONCE | DBG_INTERPRET_LOOP_DONE | DBG_COMMAND_LINE | DBG_ESCAPED ) ;
+    SetState ( _CfrTil_, SOURCE_CODE_ON, svScState ) ;
     if ( GetState ( debugger, DBG_STEPPING ) ) SetState ( debugger, DBG_START_STEPPING, true ) ;
 }
 

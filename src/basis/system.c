@@ -431,7 +431,7 @@ _CfrTil_Source ( Word *word, int64 addToHistoryFlag )
             {
                 _Printf ( ( byte* ) "\nCompiled with : %s%s%s%s",
                     GetState ( word, COMPILED_OPTIMIZED ) ? "optimizeOn" : "optimizeOff", GetState ( word, COMPILED_INLINE ) ? ", inlineOn" : ", inlineOff",
-                    GetState ( word, W_C_SYNTAX ) ? ", c_syntaxOn" : "", GetState ( word, W_INFIX_MODE ) ? ", infixOn" : "" ) ;
+                    ((word->WAttribute & WT_C_SYNTAX) || GetState ( word, W_C_SYNTAX )) ? ", c_syntaxOn" : "", GetState ( word, W_INFIX_MODE ) ? ", infixOn" : "" ) ;
                 Boolean dsc = GetState ( _CfrTil_, DEBUG_SOURCE_CODE_MODE ) ;
                 _Printf ( ( byte* ) "\nDebug Source Code %s", dsc ? "on" : "off" ) ;
                 Boolean bno = Namespace_IsUsing ( "BigNum" ) ;
@@ -439,13 +439,10 @@ _CfrTil_Source ( Word *word, int64 addToHistoryFlag )
                 Boolean lo = Namespace_IsUsing ( "Lisp" ) ;
                 _Printf ( ( byte* ) " : Lisp %s", lo ? "on" : "off" ) ;
                 Boolean wsc = GetState ( word, W_SOURCE_CODE_MODE ) ;
-                //_Printf ( ( byte* ) "%s", ", sourceCodeOn" ) ;
                 _Printf ( ( byte* ) " : Word Source Code %s", wsc ? "on" : "off" ) ;
             }
             if ( word->Definition && word->S_CodeSize ) _Printf ( ( byte* ) "\nstarting at address : 0x%x -- code size = %d bytes", word->Definition, word->S_CodeSize ) ;
-            //else _Printf ( ( byte* ) " -- starting at address : 0x%x", word->Definition ) ;
         }
-        //_Printf ( ( byte* ) "\n" ) ;
     }
 }
 

@@ -70,11 +70,22 @@ Compiler_GetOptimizeState ( Compiler * compiler, Word * word )
             optInfo->node ; optInfo->node = optInfo->nextNode )
         {
             optInfo->nextNode = dlnode_Next ( optInfo->node ) ;
-            if ( dobject_Get_M_Slot ( (dobject*) optInfo->node, SCN_IN_USE_FLAG ) ) optInfo->wordn = ( Word* ) dobject_Get_M_Slot ( (dobject*) optInfo->node, SCN_T_WORD ) ;
+            if ( dobject_Get_M_Slot ( ( dobject* ) optInfo->node, SCN_IN_USE_FLAG ) ) optInfo->wordn = ( Word* ) dobject_Get_M_Slot ( ( dobject* ) optInfo->node, SCN_T_WORD ) ;
             else continue ;
+#if 1            
+            if ( optInfo->wordn->CAttribute2 & ( RIGHT_PAREN ) )
+            {
+                //if ( GetState ( compiler, DOING_A_PREFIX_WORD ) ) 
+                //if ( ( word->WAttribute == WT_INFIXABLE ) && ( GetState ( _Context_, INFIX_MODE ) ) )
+                    goto doOp ;
+                //else continue ;
+            }
+            else
+#endif            
             if ( optInfo->wordn->CAttribute2 & ( NO_OP_WORD | LEFT_PAREN ) ) continue ;
             else if ( optInfo->wordn->CAttribute & ( CATEGORY_OP ) )
             {
+doOp:
                 if ( optInfo->wordn->Definition == CfrTil_DoubleQuoteMacro ) continue ;
                 else if ( optInfo->wordn->CAttribute & ( CATEGORY_OP_LOAD ) )
                 {
@@ -506,7 +517,7 @@ Compile_Optimize_OpEqual ( Compiler * compiler )
         _Word_SCH_CPUSCA ( optInfo->opWord, 1 ) ;
         Block_Eval ( def ) ;
         Word_Check_SetHere_To_StackPushRegisterCode ( optInfo->opWord, 0 ) ;
-        if ( ! ( optInfo->wordArg1->CAttribute & REGISTER_VARIABLE ) ) Compile_Move_Reg_To_Rm ( OREG2, optInfo->wordArg1->RegToUse, 0 ) ;
+        if ( optInfo->wordArg1 && ( ! ( optInfo->wordArg1->CAttribute & REGISTER_VARIABLE ) ) ) Compile_Move_Reg_To_Rm ( OREG2, optInfo->wordArg1->RegToUse, 0 ) ;
         compiler->OptimizeForcedReturn = 0 ;
         compiler->OptInfo = svOptInfo ;
         svOptInfo->rtrn = OPTIMIZE_DONE ;
@@ -528,7 +539,7 @@ Compile_Optimize_EqualCheck ( Compiler * compiler )
     {
         for ( node = coi->wordArg1Node ; node && ( nextNode = dlnode_Next ( node ) ) ; node = nextNode )
         {
-            word = ( Word* ) dobject_Get_M_Slot ( (dobject*) nextNode, SCN_T_WORD ) ;
+            word = ( Word* ) dobject_Get_M_Slot ( ( dobject* ) nextNode, SCN_T_WORD ) ;
             if ( word->CAttribute & ( LOCAL_VARIABLE | PARAMETER_VARIABLE ) )
             {
                 if ( word->CAttribute & REGISTER_VARIABLE )
@@ -539,9 +550,10 @@ Compile_Optimize_EqualCheck ( Compiler * compiler )
             }
         }
     }
-    return 0 ; 
+    return 0 ;
 }
 #define STACK_PUSH_REGISTER_CODE_SIZE 7 // bytes
+
 void
 Compile_Optimize_Equal ( Compiler * compiler )
 {
@@ -576,7 +588,7 @@ Compile_Optimize_Equal ( Compiler * compiler )
     if ( ( optInfo->NumberOfArgs == 1 ) && optInfo->wordArg2_Op )
     {
         Word * word = compiler->OptInfo->wordArg0_ForOpEqual ;
-        if ( word ) 
+        if ( word )
         {
             Compile_Move_Reg_To_Reg ( word->RegToUse, optInfo->wordArg2->RegToUse ) ; // & 0xf turn off REG_ON_BIT
             if ( word->StackPushRegisterCode )

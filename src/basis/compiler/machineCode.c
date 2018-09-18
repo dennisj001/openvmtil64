@@ -601,7 +601,7 @@ Compile_MoveImm ( Boolean direction, Boolean rm, Boolean sib, int64 disp, int64 
         }
         else
         {
-            Boolean opCode = 0xb8 + ( rm & 7 ) ; 
+            Boolean opCode = 0xb8 + ( rm & 7 ) ;
             Compile_CalcWrite_Instruction_X64 ( 0, opCode, mod, reg, rm, IMM_B, 0, 0, 0, imm, immSize ) ;
         }
     }
@@ -692,8 +692,11 @@ CalculateAddressFromOffset ( byte * compileAtAddress, int32 offset )
 void
 _SetOffsetForCallOrJump ( byte * compileAtAddress, byte * jmpToAddr )
 {
-    int32 offset = _CalculateOffsetForCallOrJump ( compileAtAddress, jmpToAddr, INT32_SIZE ) ;
-    * ( ( int32* ) compileAtAddress ) = offset ;
+    if ( compileAtAddress )
+    {
+        int32 offset = _CalculateOffsetForCallOrJump ( compileAtAddress, jmpToAddr, INT32_SIZE ) ;
+        * ( ( int32* ) compileAtAddress ) = offset ;
+    }
 }
 
 void

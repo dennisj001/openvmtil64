@@ -49,7 +49,7 @@ _DataObject_New ( uint64 type, Word * word, byte * name, uint64 ctype, uint64 ct
         }
         case CONSTANT:
         {
-            word = _DObject_New ( name, value, ( CONSTANT | IMMEDIATE | CPRIMITIVE ), ctype2, 0, CONSTANT, ( byte* ) _DataObject_Run, 0, 1, 0, DICTIONARY ) ;
+            word = _DObject_New ( name, value, ( CONSTANT | IMMEDIATE ), ctype2, 0, CONSTANT, ( byte* ) _DataObject_Run, 0, 1, 0, DICTIONARY ) ;
             break ;
         }
         case OBJECT:

@@ -1,7 +1,7 @@
 
 #include "../../include/cfrtil64.h"
 
-BlockInfo * 
+BlockInfo *
 BI_Block_Copy ( BlockInfo * bi, byte* dstAddress, byte * srcAddress, int64 bsize, Boolean optFlag )
 {
     Compiler * compiler = _Compiler_ ;
@@ -100,7 +100,7 @@ Block_CopyCompile ( byte * srcAddress, int64 bindex, Boolean jccFlag )
     {
         Compile_BlockLogicTest ( bi ) ;
         _BI_Compile_Jcc ( bi, 0 ) ;
-        Stack_PointerToJmpOffset_Set ( ) ;
+        Stack_Push_PointerToJmpOffset ( ) ;
         bi->CopiedToEnd = Here ;
         bi->CopiedSize = bi->CopiedToEnd - bi->CopiedToStart ;
         d0 ( if ( Is_DebugModeOn ) Debugger_Disassemble ( _Debugger_, ( byte* ) bi->CopiedToStart, bi->CopiedSize, 1 ) ) ;
@@ -124,7 +124,7 @@ void
 CfrTil_TurnOnBlockCompiler ( )
 {
     CfrTil_RightBracket ( ) ;
-    Compiler_RecycleOptInfos () ;
+    Compiler_RecycleOptInfos ( ) ;
     CfrTil_RecycleWordList ( 0 ) ;
 }
 
@@ -136,7 +136,7 @@ CfrTil_TurnOnBlockCompiler ( )
 // some combinators take more than one block on the stack
 
 BlockInfo *
-_CfrTil_BeginBlock0 ( )
+_CfrTil_BeginBlock0 ( Boolean compileJumpFlag, byte * here )
 {
     Context * cntx = _Context_ ;
     Compiler * compiler = cntx->Compiler0 ;
@@ -146,12 +146,15 @@ _CfrTil_BeginBlock0 ( )
         _CfrTil_->CurrentWordCompiling = compiler->CurrentCreatedWord ;
         CfrTil_TurnOnBlockCompiler ( ) ;
     }
-    bi->OriginalActualCodeStart = Here ;
-    _Compile_UninitializedJump ( ) ;
-    bi->JumpOffset = Here - INT32_SIZE ; // before CfrTil_CheckCompileLocalFrame after CompileUninitializedJump
-    Stack_PointerToJmpOffset_Set ( ) ;
+    bi->OriginalActualCodeStart = here ? here : Here ;
+    if ( compileJumpFlag )
+    {
+        _Compile_UninitializedJump ( ) ;
+    }
+    bi->JumpOffset = here ? here - INT32_SIZE : Here - INT32_SIZE ; // before CfrTil_CheckCompileLocalFrame after CompileUninitializedJump
+    Stack_Push_PointerToJmpOffset ( ) ;
     WordStack_SCHCPUSCA ( 0, 0 ) ; // after the jump! -- the jump is optimized out
-    bi->bp_First = Here ; // after the jump for inlining
+    bi->bp_First = here ? here : Here ; // after the jump for inlining
 
     return bi ;
 }
@@ -183,12 +186,18 @@ _CfrTil_BeginBlock2 ( BlockInfo * bi )
 }
 
 void
-CfrTil_BeginBlock ( )
+_CfrTil_BeginBlock ( Boolean compileJumpFlag, byte * here )
 {
     CheckCodeSpaceForRoom ( ) ;
-    BlockInfo * bi = _CfrTil_BeginBlock0 ( ) ;
+    BlockInfo * bi = _CfrTil_BeginBlock0 ( compileJumpFlag, here ) ;
     _CfrTil_BeginBlock1 ( bi ) ;
     _CfrTil_BeginBlock2 ( bi ) ;
+}
+
+void
+CfrTil_BeginBlock ( )
+{
+    _CfrTil_BeginBlock ( 1, 0 ) ;
 }
 
 Boolean

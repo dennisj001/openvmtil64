@@ -29,20 +29,6 @@ Context_Location ( )
     return _Context_Location ( _Context_ ) ;
 }
 
-#if 0
-
-Context *
-_Context_Allocate ( )
-{
-    Context * cntx = ( Context* ) OVT_CheckRecycleableAllocate ( _Q_->MemorySpace0->RecycledContextList, sizeof ( Context ) ) ;
-    if ( ! cntx ) cntx = ( Context* ) Mem_Allocate ( sizeof ( Context ), CONTEXT ) ;
-    cntx->C_Node.n_InUseFlag = N_LOCKED ;
-    cntx->C_Node.n_Size = sizeof ( Context ) ;
-    dllist_AddNodeToHead ( _Q_->MemorySpace0->RecycledContextList, ( dlnode* ) cntx ) ;
-    return cntx ;
-}
-#else
-
 Context *
 _Context_Allocate ( )
 {
@@ -52,7 +38,6 @@ _Context_Allocate ( )
     cntx->ContextNba = nba ;
     return cntx ;
 }
-#endif
 
 Context *
 _Context_Init ( Context * cntx0, Context * cntx )
@@ -104,29 +89,6 @@ CfrTil_Context_PushNew ( CfrTil * cfrTil )
     Context * cntx = _Context_New ( cfrTil ) ;
     return cntx ;
 }
-#if 0
-
-void
-Context_Recycle ( Context * cntx )
-{
-    if ( cntx )
-    {
-        cntx->C_Node.n_InUseFlag = N_FREE ;
-        //cntx->C_Node.n_Size = sizeof ( Context ) ;
-    }
-}
-
-void
-CfrTil_Context_PopDelete ( CfrTil * cfrTil )
-{
-    //NBA * cnba = cfrTil->Context0->ContextNba ;
-    Context * cntx0 = cfrTil->Context0 ;
-    Context * cntx = ( Context* ) _Stack_Pop ( cfrTil->ContextStack ) ;
-    _Context_ = cfrTil->Context0 = cntx ;
-    Context_Recycle ( cntx0 ) ;
-}
-#else
-
 void
 CfrTil_Context_PopDelete ( CfrTil * cfrTil )
 {
@@ -136,7 +98,6 @@ CfrTil_Context_PopDelete ( CfrTil * cfrTil )
     _Q_->MemorySpace0->ContextSpace = cntx->ContextNba ;
     NamedByteArray_Delete ( cnba ) ;
 }
-#endif
 
 void
 _CfrTil_Contex_NewRun_1 ( CfrTil * cfrTil, ContextFunction_1 contextFunction, byte *arg )
@@ -260,8 +221,10 @@ _Context_DoubleQuoteMacro ( Context * cntx )
     Lexer * lexer = cntx->Lexer0 ;
     if ( ! GetState ( _CfrTil_, SOURCE_CODE_STARTED ) )
     {
-        byte c = ReadLine_NextNonPunctCharAfterEndOfString ( rl ) ;
-        if ( c == '(' || c == '{' ) CfrTil_InitSourceCode_WithCurrentInputChar ( _CfrTil_ ) ; // must be here for wdiss and add addToHistory
+        //byte c = ReadLine_NextNonPunctCharAfterEndOfString ( rl ) ;
+        //if ( c == '(' || c == '{' ) 
+        CfrTil_InitSourceCode_WithCurrentInputChar ( _CfrTil_ ) ; // must be here for wdiss and add addToHistory
+        //else _CfrTil_InitSourceCode ( _CfrTil_ ) ;
     }
     do
     {
