@@ -789,22 +789,24 @@ String_FindStrnCmpIndex ( byte * sc, byte* name0, int64 index0, int64 wl0, int64
         scindex = & sc [ index + i ] ;
         if ( ( index + i <= slsc ) && ( ! Strncmp ( scindex, name0, wl0 ) ) )
         {
-            if ( String_CheckWordSize ( scindex, wl0 ) ) //lPunctuationFlag, rPunctuationFlag ) )
+            if ( String_CheckWordSize ( scindex, wl0 ) ) 
             {
                 index += i ;
                 goto done ;
             }
-        }
+        } 
+    }
+    for ( i = 0, n = wl0 + inc ; ( i <= n ) ; i ++ ) // tokens are parsed in different order with parameter and c rtl args, etc. 
+    {
         scindex = & sc [ index - i ] ;
         if ( ( ( index - 1 ) >= 0 ) && ( ! Strncmp ( scindex, name0, wl0 ) ) )
         {
-            if ( String_CheckWordSize ( scindex, wl0 ) ) //lPunctuationFlag, rPunctuationFlag ) )
+            if ( String_CheckWordSize ( scindex, wl0 ) ) 
             {
                 index -= i ;
                 goto done ;
             }
         }
-        d0 ( if ( ( i > 12 ) && ( i < 20 ) ) _Printf ( ( byte* ) "\n&sc[index - i] = %20s :: name0 = %20s\n", & sc [ index - i ], name0 ) ) ;
     }
     index = index0 ;
 done:

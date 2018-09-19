@@ -54,10 +54,9 @@ CfrTil_DebugOff ( )
 }
 
 void
-_CfrTil_DebugRuntimeBreakpoint ( Boolean debugOnOnlyFlag )
+_CfrTil_DebugRuntimeBreakpoint (  )
 {
     Debugger * debugger = _Debugger_ ;
-    if ( debugOnOnlyFlag && ( ! Is_DebugShowOn ) ) return ;
     if ( ( ! CompileMode ) )
     {
         if ( ! GetState ( debugger, ( DBG_BRK_INIT ) ) )
@@ -94,11 +93,11 @@ _CfrTil_DebugRuntimeBreakpoint ( Boolean debugOnOnlyFlag )
 void
 CfrTil_DebugRuntimeBreakpoint ()
 {
-    _CfrTil_DebugRuntimeBreakpoint ( 0 ) ;
+    _CfrTil_DebugRuntimeBreakpoint ( ) ;
 }
 
 void
 CfrTil_DebugRuntimeBreakpoint_dso ()
 {
-    _CfrTil_DebugRuntimeBreakpoint ( 1 ) ;
+    if ( Is_DebugShowOn ) _CfrTil_DebugRuntimeBreakpoint ( ) ;
 }

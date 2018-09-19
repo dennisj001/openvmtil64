@@ -47,7 +47,7 @@ CfrTil_Define ( )
     Interpreter * interp = cntx->Interpreter0 ;
     SetState ( interp, PREPROCESSOR_DEFINE, true ) ;
     _CfrTil_Colon ( 0 ) ;
-    _Interpret_ToEndOfLine ( interp ) ;
+    Interpret_ToEndOfLine ( interp ) ;
     int64 locals = Stack_Depth ( _Context_->Compiler0->LocalsCompilingNamespacesStack ) ;
     SetState ( interp, PREPROCESSOR_DEFINE, false ) ;
     //int64 args = cntx->Compiler0->NumberOfArgs, locals = cntx->Compiler0->NumberOfLocals ;
@@ -93,13 +93,13 @@ CfrTil_InterpretPromptedLine ( )
 {
     CfrTil_DoPrompt ( ) ;
     //Context_Interpret ( _CfrTil_->Context0 ) ;
-    _Interpret_ToEndOfLine ( _Interpreter_ ) ;
+    Interpret_ToEndOfLine ( _Interpreter_ ) ;
 }
 
 void
 CfrTil_InterpretString ( )
 {
-    _Interpret_String ( ( byte* ) DataStack_Pop ( ) ) ;
+    Interpret_String ( ( byte* ) DataStack_Pop ( ) ) ;
 }
 
 void

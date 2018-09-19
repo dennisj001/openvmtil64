@@ -424,7 +424,7 @@ CfrTil_If ( )
             if ( DataStack_Pop ( ) )
             {
                 // interpret until "else" or "endif"
-                byte * token = _Interpret_C_Until_Token3 ( interp, ( byte* ) "else", ( byte* ) "endif", 0, 0 ) ;
+                byte * token = Interpret_C_Until_Token3 ( interp, ( byte* ) "else", ( byte* ) "endif", 0, 0 ) ;
                 //if ( ( rtrn == 2 ) || ( rtrn == 0 ) ) return ;
                 if ( ( token == 0 ) || ( String_Equal ( token, "endif" ) ) ) return ;
                 Parse_SkipUntil_Token ( ( byte* ) "endif" ) ;
@@ -434,7 +434,7 @@ CfrTil_If ( )
             {
                 // skip until "else"
                 Parse_SkipUntil_Token ( ( byte* ) "else" ) ;
-                _Interpret_Until_Token ( interp, ( byte* ) "endif", 0 ) ;
+                Interpret_Until_Token ( interp, ( byte* ) "endif", 0 ) ;
             }
         }
     }
@@ -456,7 +456,7 @@ CfrTil_Else ( )
         if ( String_IsPreviousCharA_ ( _Context_->ReadLiner0->InputLine, _Context_->Lexer0->TokenStart_ReadLineIndex - 1, '#' ) ) CfrTil_Else_ConditionalInterpret ( ) ;
         else
         {
-            _Interpret_Until_Token ( _Context_->Interpreter0, ( byte* ) "endif", 0 ) ;
+            Interpret_Until_Token ( _Context_->Interpreter0, ( byte* ) "endif", 0 ) ;
         }
     }
 }

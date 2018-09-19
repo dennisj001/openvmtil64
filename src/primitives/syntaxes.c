@@ -105,7 +105,7 @@ CfrTil_Begin_C_Block ( )
         if ( GetState ( _Compiler_, C_COMBINATOR_PARSING ) ) CfrTil_BeginBlock ( ) ;
         else
         {
-            _Interpret_Until_Token ( _Interpreter_, "}", 0 ) ;
+            Interpret_Until_Token ( _Interpreter_, "}", 0 ) ;
         }
     }
 }

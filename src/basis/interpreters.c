@@ -3,13 +3,13 @@
 
 
 void
-_Interpret_String ( byte *str )
+Interpret_String ( byte *str )
 {
     _CfrTil_ContextNew_InterpretString ( _CfrTil_, str ) ;
 }
 
 byte *
-_Interpret_C_Until_Token3 ( Interpreter * interp, byte * end1, byte * end2, byte* end3, byte * delimiters )
+Interpret_C_Until_Token3 ( Interpreter * interp, byte * end1, byte * end2, byte* end3, byte * delimiters )
 {
     byte * token = 0 ;
     while ( 1 )
@@ -24,14 +24,14 @@ _Interpret_C_Until_Token3 ( Interpreter * interp, byte * end1, byte * end2, byte
             break ;
         }
         else if ( GetState ( _Context_, C_SYNTAX ) && ( String_Equal ( token, "," ) || String_Equal ( token, ";" ) ) ) break ;
-        else Interpreter_InterpretAToken ( interp, token, - 1 ) ;
+        else Interpreter_InterpretAToken ( interp, token, - 1 ) ; //token = 0 ; }
     }
-    //CfrTil_WordList_PushToken ( token ) ;
+    //if ( token ) _CfrTil_PushToken_OnTokenList ( token ) ;
     return token ;
 }
 
 byte *
-_Interpret_Until_Token ( Interpreter * interp, byte * end, byte * delimiters )
+Interpret_Until_Token ( Interpreter * interp, byte * end, byte * delimiters )
 {
     byte * token ;
     while ( 1 )
@@ -47,7 +47,7 @@ _Interpret_Until_Token ( Interpreter * interp, byte * end, byte * delimiters )
                 }
                 break ;
             }
-            if ( GetState ( _Context_, C_SYNTAX ) && String_Equal ( token, ";" ) && GetState ( _Compiler_, C_COMBINATOR_PARSING ) )
+            if ( String_Equal ( token, ";" ) && GetState ( _Context_, C_SYNTAX ) && GetState ( _Compiler_, C_COMBINATOR_PARSING ) )
             {
                 _CfrTil_PushToken_OnTokenList ( token ) ;
                 break ;
@@ -60,16 +60,16 @@ _Interpret_Until_Token ( Interpreter * interp, byte * end, byte * delimiters )
 }
 
 void
-_Interpret_PrefixFunction_Until_Token ( Interpreter * interp, Word * prefixFunction, byte * end, byte * delimiters )
+Interpret_PrefixFunction_Until_Token ( Interpreter * interp, Word * prefixFunction, byte * end, byte * delimiters )
 {
     int64 svscwi = _CfrTil_->SC_Index ;
-    _Interpret_Until_Token ( interp, end, delimiters ) ;
+    Interpret_Until_Token ( interp, end, delimiters ) ;
     SetState ( _Context_->Compiler0, PREFIX_ARG_PARSING, false ) ;
     if ( prefixFunction ) _Interpreter_DoWord_Default (interp, prefixFunction, -1, svscwi ) ;
 }
 
 void
-_Interpret_PrefixFunction_Until_RParen ( Interpreter * interp, Word * prefixFunction )
+Interpret_PrefixFunction_Until_RParen ( Interpreter * interp, Word * prefixFunction )
 {
     if ( prefixFunction )
     {
@@ -97,7 +97,7 @@ _Interpret_PrefixFunction_Until_RParen ( Interpreter * interp, Word * prefixFunc
         d0 ( if ( Is_DebugModeOn ) Compiler_SC_WordList_Show ("\n_Interpret_PrefixFunction_Until_RParen", 0, 0) ) ;
         SetState ( compiler, PREFIX_ARG_PARSING, true ) ;
         if ( flag ) Interpreter_InterpretAToken ( interp, token, - 1 ) ;
-        else _Interpret_Until_Token ( interp, ( byte* ) ")", ( byte* ) " ,\n\r\t" ) ;
+        else Interpret_Until_Token ( interp, ( byte* ) ")", ( byte* ) " ,\n\r\t" ) ;
         SetState ( compiler, PREFIX_ARG_PARSING, false ) ;
         _Interpreter_DoWord_Default (interp, prefixFunction, -1, svscwi ) ;
         if ( GetState ( _Context_, C_SYNTAX ) ) SetState ( _Context_, C_RHS, svs_c_rhs ) ;
@@ -106,7 +106,7 @@ _Interpret_PrefixFunction_Until_RParen ( Interpreter * interp, Word * prefixFunc
 }
 
 void
-_Interpret_UntilFlagged ( Interpreter * interp, int64 doneFlags )
+Interpret_UntilFlagged ( Interpreter * interp, int64 doneFlags )
 {
     while ( ( ! Interpreter_IsDone ( interp, doneFlags | INTERPRETER_DONE ) ) )
     {
@@ -115,7 +115,7 @@ _Interpret_UntilFlagged ( Interpreter * interp, int64 doneFlags )
 }
 
 void
-_Interpret_ToEndOfLine ( Interpreter * interp )
+Interpret_ToEndOfLine ( Interpreter * interp )
 {
     int64 i ;
     ReadLiner * rl = interp->ReadLiner0 ;
@@ -132,7 +132,7 @@ void
 Interpret_UntilFlaggedWithInit ( Interpreter * interp, int64 doneFlags )
 {
     Interpreter_Init ( interp ) ;
-    _Interpret_UntilFlagged ( interp, doneFlags ) ;
+    Interpret_UntilFlagged ( interp, doneFlags ) ;
 }
 
 void

@@ -127,7 +127,7 @@ OVT_Pause ( byte * prompt, int64 signalExceptionsHandled )
                 ReadLine_Init ( _Context_->ReadLiner0, _CfrTil_Key ) ;
                 OpenVmTil_AddStringToHistoryOn ( ) ;
                 SetState ( _Context_, AT_COMMAND_LINE, true ) ;
-                _Interpret_ToEndOfLine ( _Interpreter_ ) ;
+                Interpret_ToEndOfLine ( _Interpreter_ ) ;
                 ReadLine_SetRawInputFunction ( _Context_->ReadLiner0, ReadLine_GetNextCharFromString ) ;
             }
             else //if ( key >= ' ' )
@@ -141,7 +141,7 @@ OVT_Pause ( byte * prompt, int64 signalExceptionsHandled )
                 {
                     if ( key == '\\' ) key = 0 ;
                     _ReadLine_GetLine ( cntx->ReadLiner0, key ) ;
-                    _Interpret_ToEndOfLine ( _Interpreter_ ) ; // just one line in a new context
+                    Interpret_ToEndOfLine ( _Interpreter_ ) ; // just one line in a new context
                 }
                 SetState ( cntx, AT_COMMAND_LINE, false ) ;
                 CfrTil_Context_PopDelete ( _CfrTil_ ) ;

@@ -292,12 +292,13 @@ _CalculateRex ( _reg rm rex_w_flag | rex )
     if ( rex ) rex |= 0x40 ;
     return rex ;
 #else // from original C code
-    rex = ( ( rex_w_flag ? 8 : 0 ) | ( ( _reg > 7 ) ? 4 : 0 ) | ( ( rm > 7 ) ? 1 : 0 ) ) ;
+    //rex = ( ( rex_w_flag ? 8 : 0 ) | ( ( _reg > 7 ) ? 4 : 0 ) | ( ( rm > 7 ) ? 1 : 0 ) ) ;
+    rex = ( rex_w_flag ? 8 : 0 ) | ( ( _reg > 7 ) ? 4 : 0 ) | ( ( rm > 7 ) ? 1 : 0 ) ;
     if ( rex ) rex |= 0x40 ;
     return rex ;
 #endif    
 } prefix // prefix is not automatic with c syntax so they can be used like rpn words
-'_CalculateRex find wdiss //pause
+//'_CalculateRex find wdiss pause
 
 
 void
@@ -468,7 +469,7 @@ User
     _Compile_SUBI_DSP ( CELL ) 
 asm;
 
-' stest find wdiss //pause
+//' stest find wdiss pause
 s
 "\nthis is some purposefully funky code for testing\n" ps
 

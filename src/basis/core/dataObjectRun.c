@@ -153,7 +153,7 @@ _Namespace_Do_C_Type ( Namespace * ns )
                         Compiler_Get_C_BackgroundNamespace ( compiler ) ;
                         while ( 1 )
                         {
-                            byte * token = _Interpret_C_Until_Token3 ( cntx->Interpreter0, ( byte* ) ",", ( byte* ) ";", 0, 0 ) ;
+                            byte * token = Interpret_C_Until_Token3 ( cntx->Interpreter0, ( byte* ) ",", ( byte* ) ";", 0, 0 ) ;
                             if ( ! token ) break ;
                             if ( ( String_Equal ( token, "," ) ) )
                             {

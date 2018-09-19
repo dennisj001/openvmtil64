@@ -74,11 +74,14 @@ Compiler_GetOptimizeState ( Compiler * compiler, Word * word )
             else continue ;
             if ( optInfo->wordn->CAttribute2 & ( RIGHT_PAREN ) )
             {
-                if ( GetState ( compiler, DOING_AN_INFIX_WORD ) ) continue ; // temporary fix aka hack
-                else goto doOp ;
+#if 1               
+                if ( GetState ( compiler, DOING_AN_INFIX_WORD ) ) continue ; // more precise logic is needed here ??
+                else 
+#endif                    
+                goto doOp ; // treat parenthesized value as an op
             }
             else if ( optInfo->wordn->CAttribute2 & ( NO_OP_WORD | LEFT_PAREN ) ) continue ;
-            else if ( optInfo->wordn->CAttribute & ( CATEGORY_OP ) )
+            else if ( optInfo->wordn->CAttribute & ( CATEGORY_OP ) ) // or anything unknown on the stack
             {
 doOp:
                 if ( optInfo->wordn->Definition == CfrTil_DoubleQuoteMacro ) continue ;
@@ -140,6 +143,7 @@ doOp:
             }
         }
         Compiler_OptimizeForOp ( compiler ) ;
+        done :
         SetState ( _CfrTil_, IN_OPTIMIZER, false ) ;
         return optInfo->rtrn ;
     }
@@ -179,7 +183,7 @@ Compiler_SetupArgsToStandardLocations ( Compiler * compiler )
     else if ( optInfo->wordArg2_Op || optInfo->xBetweenArg1AndArg2 ) Compiler_Optimizer_WordArg2Op_Or_xBetweenArg1AndArg2 ( compiler ) ;
     else if ( ( optInfo->NumberOfArgs == 2 ) || optInfo->wordArg1_Op ) Compiler_Optimizer_2Args_Or_WordArg1_Op ( compiler ) ;
     else if ( optInfo->NumberOfArgs == 1 ) Compiler_Optimizer_1Arg ( compiler ) ;
-    else if ( optInfo->NumberOfArgs == 0 ) Compiler_Optimizer_0Args ( compiler ) ;
+    else Compiler_Optimizer_0Args ( compiler ) ;
 }
 
 void
@@ -234,7 +238,7 @@ Compiler_Optimizer_WordArg2Op_Or_xBetweenArg1AndArg2 ( Compiler * compiler )
             else Word_Check_SetHere_To_StackPushRegisterCode ( optInfo->wordArg2, 1 ) ; // the rest of the code will be handled in Compile_Optimize_Equal
         }
     }
-    else Compile_StandardUnoptimized ( compiler ) ;
+    else if (optInfo->NumberOfArgs) Compile_StandardUnoptimized ( compiler ) ;
 }
 
 void
@@ -302,7 +306,6 @@ Compile_StandardArg ( Word * word, Boolean reg, Boolean rvalueFlag, byte * setHe
 void
 Compile_StandardUnoptimized ( Compiler * compiler )
 {
-
     CompileOptimizeInfo * optInfo = compiler->OptInfo ;
     _Compile_Move_StackN_To_Reg ( OREG, DSP, 0 ), optInfo->Optimize_Rm = OREG ;
     _Compile_Move_StackN_To_Reg ( ACC, DSP, - 1 ), optInfo->Optimize_Reg = ACC | REG_ON_BIT ;
@@ -517,7 +520,6 @@ Compile_Optimize_OpEqual ( Compiler * compiler )
         compiler->OptInfo = svOptInfo ;
         svOptInfo->rtrn = OPTIMIZE_DONE ;
     }
-
     else optInfo->rtrn = 0 ;
 }
 

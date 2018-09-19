@@ -124,7 +124,6 @@ CfrTil_Interpret_C_Blocks ( int64 blocks, Boolean takesAnElseFlag, Boolean semic
         else if ( String_Equal ( ( char* ) token, ";" ) )//|| String_Equal ( ( char* ) token, "," ) )
         {
             List_InterpretLists ( compiler->PostfixLists ) ;
-            //if ( String_Equal ( ( char* ) token, ";" ) && semicolonEndsThisBlock )
             if ( semicolonEndsThisBlock )
             {
                 Interpret_C_Block_EndBlock ( ";", 0 ) ;
@@ -151,11 +150,10 @@ CfrTil_Interpret_C_Blocks ( int64 blocks, Boolean takesAnElseFlag, Boolean semic
             word = _Interpreter_TokenToWord ( interp, token ) ;
             if ( word )
             {
-                _Interpreter_DoWord ( interp, word, - 1, - 1 ) ; //word->W_RL_Index, word->W_SC_Index ) ;
+                _Interpreter_DoWord ( interp, word, - 1, - 1 ) ; 
                 if ( word->CAttribute & COMBINATOR )
                 {
-                    //Word * lastWord = Compiler_WordList ( 0 ) ;
-                    if ( semicolonEndsThisBlock ) //&& ( _CfrTil_->EndBlockWord == lastWord ) ) //String_Equal ( lastWord->Name, ";" ) ) // ??
+                    if ( semicolonEndsThisBlock ) 
                     {
                         Interpret_C_Block_EndBlock ( "}", 1 ) ;
                         blocksParsed ++ ;
@@ -180,14 +178,13 @@ void
 CfrTil_C_LeftParen ( )
 {
     Compiler * compiler = _Context_->Compiler0 ;
-    if ( ( GetState ( _Context_->Interpreter0, PREPROCESSOR_MODE ) ) ) // && ( isalnum ( ReadLine_LastReadChar ( _ReadLiner_ ) ) ) )
+    if ( ( GetState ( _Context_->Interpreter0, PREPROCESSOR_MODE ) ) ) 
     {
         // this is for "#define" (which is parsed as '#' 'define', two words)
         if ( isalnum ( ReadLine_LastReadChar ( _ReadLiner_ ) ) ) CfrTil_LocalsAndStackVariablesBegin ( ) ;
         else Interpret_DoParenthesizedRValue ( ) ;
     }
-    else if ( ( ( ! GetState ( compiler, VARIABLE_FRAME ) ) )
-        || ( ReadLine_PeekNextNonWhitespaceChar ( _Context_->Lexer0->ReadLiner0 ) == '|' ) ) //( ! GetState ( _Context_, INFIX_MODE ) ) )
+    else if ( ( ( ! GetState ( compiler, VARIABLE_FRAME ) ) ) || ( ReadLine_PeekNextNonWhitespaceChar ( _Context_->Lexer0->ReadLiner0 ) == '|' ) )
     {
         CfrTil_LocalsAndStackVariablesBegin ( ) ;
     }
@@ -207,7 +204,7 @@ _CfrTil_C_Infix_EqualOp ( Word * opWord )
     SetState ( compiler, C_INFIX_EQUAL, true ) ;
     if ( opWord ) _CfrTil_WordList_PopWords ( 1 ) ;
     compiler->NextBlockStart = Here ;
-    token = _Interpret_C_Until_Token3 ( interp, ( byte* ) ";", ( byte* ) ",", ( byte* ) ")", ( byte* ) " \n\r\t" ) ;
+    token = Interpret_C_Until_Token3 ( interp, ( byte* ) ";", ( byte* ) ",", ( byte* ) ")", ( byte* ) " \n\r\t" ) ;
     if ( String_Equal ( ( char* ) token, ";" ) || String_Equal ( ( char* ) token, "," ) ) compiler->NextBlockStart = Here ;
     if ( lhsWord )
     {
@@ -269,12 +266,13 @@ CfrTil_C_ConditionalExpression ( )
     _Compile_UninitializedJumpEqualZero ( ) ;
     byte * ptrToOffsetElse = Here - DISP_SIZE ;
     DEBUG_SHOW ;
-    _Interpret_Until_Token ( interp, ( byte* ) ":", 0 ) ;
+    Interpret_Until_Token ( interp, ( byte* ) ":", 0 ) ;
     _Compile_UninitializedJump ( ) ;
     byte * ptrToOffsetEnd = Here - DISP_SIZE ;
     _SetOffsetForCallOrJump ( ptrToOffsetElse, Here ) ;
-    byte * token = _Interpret_C_Until_Token3 ( interp, ( byte* ) ";", ( byte* ) ",", ( byte* ) ")", 0 ) ;
+    byte * token = Interpret_C_Until_Token3 ( interp, ( byte* ) ";", ( byte* ) ",", ( byte* ) ")", 0 ) ;
     _SetOffsetForCallOrJump ( ptrToOffsetEnd, Here ) ;
     DEBUG_SHOW ;
+    //if ( String_Equal ( token, ")" ) ) 
     _CfrTil_PushToken_OnTokenList ( token ) ; // maybe conditionally push ??
 }

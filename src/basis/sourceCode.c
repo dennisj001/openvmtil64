@@ -606,7 +606,7 @@ SC_PrepareDbgSourceCodeString ( byte * sc, Word * word ) // sc : source code ; s
         slt = Strlen ( token ) ;
         slsc = strlen ( sc ) ;
         scwi0 = word->W_SC_Index ;
-        scwci = String_FindStrnCmpIndex ( sc, token, scwi0, slt, ( ( slsc - scwi0 ) > 30 ) ? 30 : ( slsc - scwi0 ) ) ;
+        scwci = String_FindStrnCmpIndex ( sc, token, scwi0, slt, slsc ) ; //( ( slsc - scwi0 ) > 30 ) ? 30 : ( slsc - scwi0 ) ) ;
         d0 ( byte * scspp0 = & sc [ scwi0 ] ) ;
         d0 ( byte * scspp2 = & sc [ scwci ] ) ;
         nvw = ( char* ) Buffer_New_pbyte ( ( slsc > BUFFER_SIZE ) ? slsc : BUFFER_SIZE ) ;

@@ -166,7 +166,7 @@ Compile_MultiplyEqual ( Compiler * compiler )
             Compile_MUL ( optInfo->Optimize_Mod, optInfo->Optimize_Rm, REX_B | MODRM_B | DISP_B, 0,
                 optInfo->Optimize_Disp, 0, CELL_SIZE ) ;
         }
-        if ( optInfo->wordArg1->CAttribute & REGISTER_VARIABLE )
+        if ( optInfo->wordArg1 && ( optInfo->wordArg1->CAttribute & REGISTER_VARIABLE ) )
         {
             if ( optInfo->wordArg1->RegToUse != ACC ) Compile_Move_Reg_To_Reg ( optInfo->wordArg1->RegToUse, RAX ) ;
         }

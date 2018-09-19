@@ -56,12 +56,12 @@ _Interpreter_DoWord_Default ( Interpreter * interp, Word * word0, int64 tsrli, i
 void
 Interpreter_DoInfixWord ( Interpreter * interp, Word * word, int64 tsrli, int64 scwi )
 {
-    //DEBUG_SETUP ( word ) ;
+    //int64 svState = GetState ( _Compiler_, DOING_AN_INFIX_WORD ) ;
     SetState ( _Compiler_, DOING_AN_INFIX_WORD, true ) ;
     Interpreter_InterpretNextToken ( interp ) ;
     // then continue and interpret this 'word' - just one out of lexical order
     _Interpreter_DoWord_Default ( interp, word, tsrli, scwi ) ;
-    SetState ( _Compiler_, DOING_AN_INFIX_WORD, false ) ;
+    SetState ( _Compiler_, DOING_AN_INFIX_WORD, false ) ; //svState ) ;
 }
 
 void
@@ -69,7 +69,7 @@ _Interpreter_DoPrefixWord ( Context * cntx, Interpreter * interp, Word * word )
 {
     DEBUG_SETUP ( word ) ;
     SetState ( cntx->Compiler0, DOING_A_PREFIX_WORD, true ) ;
-    _Interpret_PrefixFunction_Until_RParen ( interp, word ) ;
+    Interpret_PrefixFunction_Until_RParen ( interp, word ) ;
     SetState ( cntx->Compiler0, DOING_A_PREFIX_WORD, false ) ;
 }
 

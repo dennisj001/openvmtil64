@@ -11,7 +11,7 @@ CfrTil_PreProcessor ( )
     _CfrTil_UnAppendFromSourceCode_NChars ( _CfrTil_, 1 ) ; // 1 : '#'
     Finder_SetNamedQualifyingNamespace ( _Finder_, ( byte* ) "PreProcessor" ) ;
     SetState ( interp, PREPROCESSOR_MODE, true ) ;
-    _Interpret_ToEndOfLine ( interp ) ;
+    Interpret_ToEndOfLine ( interp ) ;
     SetState ( interp, PREPROCESSOR_MODE, false ) ;
     if ( Compiling ) SetState ( lexer, ( ADD_TOKEN_TO_SOURCE | ADD_CHAR_TO_SOURCE ), svState ) ;
 }
@@ -121,7 +121,7 @@ _GetCondStatus ( )
     Boolean status, svcm = GetState ( cntx->Compiler0, COMPILE_MODE ), svcs = GetState ( cntx, C_SYNTAX ) ;
     SetState ( cntx->Compiler0, COMPILE_MODE, false ) ;
     SetState ( cntx, C_SYNTAX, false ) ;
-    _Interpret_ToEndOfLine ( cntx->Interpreter0 ) ;
+    Interpret_ToEndOfLine ( cntx->Interpreter0 ) ;
     SetState ( cntx->Compiler0, COMPILE_MODE, svcm ) ;
     SetState ( cntx, C_SYNTAX, svcs ) ;
     status = DataStack_Pop ( ) ;
