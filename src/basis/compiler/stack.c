@@ -121,6 +121,7 @@ _Compile_Stack_PopToReg ( Boolean stackReg, Boolean reg )
 {
     _Compile_Move_StackN_To_Reg ( reg, stackReg, 0 ) ;
     Compile_SUBI ( REG, stackReg, 0, sizeof (int64 ), 1 ) ;
+    PeepHole_Optimize_ForStackPopToReg ( ) ; // this happens at least some times
 }
 
 void

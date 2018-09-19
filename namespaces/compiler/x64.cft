@@ -297,7 +297,7 @@ _CalculateRex ( _reg rm rex_w_flag | rex )
     return rex ;
 #endif    
 } prefix // prefix is not automatic with c syntax so they can be used like rpn words
-//'_CalculateRex find wdiss pause
+'_CalculateRex find wdiss //pause
 
 
 void

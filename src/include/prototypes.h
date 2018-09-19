@@ -302,6 +302,7 @@ Word *Compile_Optimize_EqualCheck(Compiler *compiler);
 void Compile_Optimize_Equal(Compiler *compiler);
 void Compile_Optimize_Store(Compiler *compiler);
 void Do_OptimizeOp2Literals(Compiler *compiler);
+void PeepHole_Optimize_ForStackPopToReg(void);
 void PeepHole_Optimize(void);
 void GetRmDispImm(CompileOptimizeInfo *optInfo, Word *word, int64 suggestedReg);
 /* basis/compiler/bits.c */
@@ -720,7 +721,7 @@ int64 Debugger_TerminalLineWidth(Debugger *debugger);
 void Debugger_ShowStackChange(Debugger *debugger, Word *word, byte *insert, byte *achange, Boolean stepFlag);
 void _Debugger_ShowEffects(Debugger *debugger, Word *word, Boolean stepFlag, Boolean force);
 void Debugger_ShowEffects(Debugger *debugger, Boolean stepFlag, Boolean forceFlag);
-byte *_PrepareDbgSourceCodeString(Word *word, byte *il, int64 tvw, int64 tp);
+byte *_PrepareDbgSourceCodeString(Word *word, byte *il, int64 tvw);
 byte *Debugger_PrepareDbgSourceCodeString(Debugger *debugger, Word *word, int64 twAlreayUsed);
 void _CfrTil_ShowInfo(Debugger *debugger, byte *prompt, int64 signal, int64 force);
 void Debugger_ShowInfo(Debugger *debugger, byte *prompt, int64 signal);

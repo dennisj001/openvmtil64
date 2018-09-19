@@ -328,7 +328,7 @@ Debugger_ShowEffects ( Debugger * debugger, Boolean stepFlag, Boolean forceFlag 
 // hopefully this can also be used by SC_PrepareDbgSourceCodeString
 
 byte *
-_PrepareDbgSourceCodeString ( Word * word, byte * il, int64 tvw, int64 tp )
+_PrepareDbgSourceCodeString (Word * word, byte * il, int64 tvw)
 {
     byte * cc_line ;
     char * nvw = ( char* ) Buffer_Data_Cleared ( _CfrTil_->DebugB ) ; // nvw : new view window
@@ -342,7 +342,7 @@ _PrepareDbgSourceCodeString ( Word * word, byte * il, int64 tvw, int64 tp )
     wrli = word->W_RL_Index ;
     slil = Strlen ( String_RemoveEndWhitespace ( il ) ) ;
     inc = slil - wrli ;
-    ots = String_FindStrnCmpIndex ( il, token, wrli, slt, (( inc > 30 ) ? 30 : inc) ) ; //20 ) ;// adjust from wrli which is 
+    ots = String_FindStrnCmpIndex ( il, token, wrli, slt, slil ) ; //(( inc > 30 ) ? 30 : inc) ) ; //20 ) ;// adjust from wrli which is 
     totalBorder = ( tvw - slt ) ; // the borders allow us to slide token within the window of tvw
     // try to get nts relatively the same as ots
     idealBorder = ( totalBorder / 2 ) ;
@@ -409,7 +409,7 @@ Debugger_PrepareDbgSourceCodeString (Debugger * debugger, Word * word, int64 twA
         fel = 32 - 1 ; //fe : formatingEstimate length : 2 formats with 8/12 chars on each sude - 32/48 :: 1 : a litte leave way
         tw = Debugger_TerminalLineWidth ( debugger ) ; // 139 ; //139 : nice width :: Debugger_TerminalLineWidth ( debugger ) ; 
         tvw = tw - ( twAlreayUsed - fel ) ; //subtract the formatting chars which don't add to visible length
-        cc_line = _PrepareDbgSourceCodeString ( word, il, tvw, 0 ) ;
+        cc_line = _PrepareDbgSourceCodeString (word, il, tvw) ;
     }
     else cc_line = ( byte* ) "" ; // nts : new token start is a index into b - the nwv buffer
     return cc_line ;

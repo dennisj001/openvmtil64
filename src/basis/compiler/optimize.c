@@ -72,17 +72,12 @@ Compiler_GetOptimizeState ( Compiler * compiler, Word * word )
             optInfo->nextNode = dlnode_Next ( optInfo->node ) ;
             if ( dobject_Get_M_Slot ( ( dobject* ) optInfo->node, SCN_IN_USE_FLAG ) ) optInfo->wordn = ( Word* ) dobject_Get_M_Slot ( ( dobject* ) optInfo->node, SCN_T_WORD ) ;
             else continue ;
-#if 1            
             if ( optInfo->wordn->CAttribute2 & ( RIGHT_PAREN ) )
             {
-                //if ( GetState ( compiler, DOING_A_PREFIX_WORD ) ) 
-                //if ( ( word->WAttribute == WT_INFIXABLE ) && ( GetState ( _Context_, INFIX_MODE ) ) )
-                    goto doOp ;
-                //else continue ;
+                if ( GetState ( compiler, DOING_AN_INFIX_WORD ) ) continue ; // temporary fix aka hack
+                else goto doOp ;
             }
-            else
-#endif            
-            if ( optInfo->wordn->CAttribute2 & ( NO_OP_WORD | LEFT_PAREN ) ) continue ;
+            else if ( optInfo->wordn->CAttribute2 & ( NO_OP_WORD | LEFT_PAREN ) ) continue ;
             else if ( optInfo->wordn->CAttribute & ( CATEGORY_OP ) )
             {
 doOp:
@@ -484,7 +479,7 @@ void
 Compile_Optimize_OpEqual ( Compiler * compiler )
 {
     CompileOptimizeInfo * optInfo = compiler->OptInfo ;
-    if ( optInfo->NumberOfArgs && ( ! optInfo->xBetweenArg1AndArg2 ) )
+    if ( optInfo->NumberOfArgs && ( ! optInfo->xBetweenArg1AndArg2 ) && ( ! optInfo->wordArg2_Op ) )
     {
         block def = 0 ;
         if ( optInfo->opWord->Definition == CfrTil_MultiplyEqual ) def = CfrTil_Multiply ;
@@ -667,6 +662,20 @@ Do_OptimizeOp2Literals ( Compiler * compiler )
 }
 
 // skip back WordStack words for the args of an op parameter in GetOptimizeState
+
+void
+PeepHole_Optimize_ForStackPopToReg ( )
+{
+    if ( GetState ( _CfrTil_, OPTIMIZE_ON ) )
+    {
+        byte * here = _Q_CodeByteArray->EndIndex ;
+        byte add_r14_0x8__mov_r14_rax__mov_rax_r14__sub_r14_0x8 [ ] = { 0x49, 0x83, 0xc6, 0x08, 0x49, 0x89, 0x06, 0x49, 0x8b, 0x06, 0x49, 0x83, 0xee, 0x08 } ;
+        if ( ! memcmp ( add_r14_0x8__mov_r14_rax__mov_rax_r14__sub_r14_0x8, here - 14, 14 ) )
+        {
+            _ByteArray_UnAppendSpace ( _Q_CodeByteArray, 14 ) ;
+        }
+    }
+}
 
 void
 PeepHole_Optimize ( )

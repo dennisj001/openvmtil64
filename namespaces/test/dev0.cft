@@ -397,6 +397,7 @@ fac5 ( REG n  | REG facc )
     return facc ;
 }
 wdiss ( ' fac5 find ) 
+
 fac5 ( 7 ) dup p 5040 _assert //pause
 dscOff
 sp

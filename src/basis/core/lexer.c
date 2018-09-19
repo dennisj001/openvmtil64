@@ -378,7 +378,7 @@ _Lexer_AppendCharToSourceCode ( Lexer * lexer, byte c, int64 convert )
 {
     if ( GetState ( _CfrTil_, SOURCE_CODE_ON ) && GetState ( lexer, ADD_CHAR_TO_SOURCE ) )
     {
-        CfrTil_AppendCharToSourceCode ( _CfrTil_, c, 0 ) ;
+        CfrTil_AppendCharToSourceCode ( _CfrTil_, c, 1 ) ;
     }
 }
 

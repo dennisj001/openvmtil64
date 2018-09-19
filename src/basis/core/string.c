@@ -752,13 +752,15 @@ String_CheckWordSize ( byte * str, int64 wl ) //, Boolean lPunctFlag, Boolean rP
     int64 i, length ;
     Boolean punctFlag = IsPunct ( str [0] ), rPunctFlag = IsPunct ( str [wl - 1] ) ; //punctFlag means first character of word is punctuation 
 
-    for ( i = - 1 ; abs ( i ) < ( wl + 1 ) ; i -- ) // go to left of str first
+    for ( i = -1 ; abs ( i ) < ( wl + 1 ) ; i -- ) // go to left of str first
     {
         if ( punctFlag )
         {
-            if ( ! IsPunct ( str[i] ) ) break ;
+            //if ( ! IsPunct ( str[ i ] ) ) break ;
+            //if ( str[ i ] != str [0] ) 
+            break ;
         }
-        else if ( IsPunct ( str[i] ) || ( str[i] == ' ' ) ) break ;
+        else if ( IsPunct ( str[ i ] ) || ( str[ i ] == ' ' ) ) break ;
     }
     start = & str [i + 1] ;
     for ( i = 1 ; abs ( i ) < ( wl + 1 ) ; i ++ ) // ... then to the right side of str

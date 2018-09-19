@@ -588,11 +588,7 @@
 #define C_COMBINATOR_PARSING ( (uint64) 1 << 25 )
 #define INFIX_LIST_INTERPRET ( (uint64) 1 << 26 )
 #define COMPILER_WRAP_ON ( (uint64) 1 << 27 )
-//#define C_BLOCK_PARSING ( (uint64) 1 << 28 )
-//#define C_FIRST_BLOCK ( (uint64) 1 << 20 )
-//#define MINUS_MINUS_MODE ( (uint64) 1 << 20 )
-//#define PLUS_PLUS_MODE ( (uint64) 1 << 21 )
-//#define INFIX_MODE_ONE_OFF ( (uint64) 1 << 23 )
+#define DOING_AN_INFIX_WORD ( (uint64) 1 << 28 )
 
 // Context flags
 #define C_SYNTAX ( (uint64) 1 << 20 )

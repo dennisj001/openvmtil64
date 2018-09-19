@@ -21,7 +21,7 @@ int factoriali ( REG n | REG res )
 #if 0
         res *= n-- ; 
 #elif 1
-        res *= d: (n--) ; 
+        res *= (n--) ; 
 #else
         res = res * (n--) ;
 #endif

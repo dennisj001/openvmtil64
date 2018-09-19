@@ -53,7 +53,7 @@ Word_Eval ( Word * word )
 void
 _Word_Interpret ( Word * word )
 {
-    _Interpreter_DoWord ( _Interpreter_, word, - 1, - 1 ) ;
+    _Interpreter_DoWord ( _Interpreter_, word, word->W_RL_Index, word->W_SC_Index ) ;
 }
 
 void

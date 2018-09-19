@@ -371,7 +371,7 @@ Root
 'doX64 1 const
 'doScript 1 const
 'doScript2 1 const
-'_doDemo 0 const    
+'_doDemo 1 const    
 'todo 0 const    
 dbgOff
 dbgOn 

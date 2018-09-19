@@ -57,9 +57,11 @@ void
 Interpreter_DoInfixWord ( Interpreter * interp, Word * word, int64 tsrli, int64 scwi )
 {
     //DEBUG_SETUP ( word ) ;
+    SetState ( _Compiler_, DOING_AN_INFIX_WORD, true ) ;
     Interpreter_InterpretNextToken ( interp ) ;
     // then continue and interpret this 'word' - just one out of lexical order
     _Interpreter_DoWord_Default ( interp, word, tsrli, scwi ) ;
+    SetState ( _Compiler_, DOING_AN_INFIX_WORD, false ) ;
 }
 
 void
