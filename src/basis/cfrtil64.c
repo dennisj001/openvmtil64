@@ -68,7 +68,7 @@ CfrTil_WordList_Init ( CfrTil * cfrtil, Word * word, Boolean saveWord0 )
     else svWord = 0 ;
     if ( ( word ) && ( IsSourceCodeOn ) ) cfrtil->LastFinished_DObject = cfrtil->CurrentWordCompiling = cfrtil->ScWord = word ;
     else cfrtil->ScWord = Get_SourceCodeWord ( ) ;
-    cfrtil->ScWord->W_SC_WordList = cfrtil->CompilerWordList ;
+    if ( cfrtil->ScWord ) cfrtil->ScWord->W_SC_WordList = cfrtil->CompilerWordList ;
     if ( svWord )
     {
         svWord->W_SC_Index = 0 ; // before pushWord !
@@ -141,7 +141,7 @@ CfrTil_PrintReturnStackWindow ( )
 void
 _CfrTil_NamespacesInit ( CfrTil * cfrTil )
 {
-    Namespace * ns = _DataObject_New ( NAMESPACE, 0, ( byte* ) "Namespaces", 0, 0, 0, 0, 0, 0, 0, - 1 ) ;
+    Namespace * ns = DataObject_New ( NAMESPACE, 0, ( byte* ) "Namespaces", 0, 0, 0, 0, 0, 0, 0, - 1 ) ;
     ns->State |= USING ; // nb. _Namespace_SetState ( ns, USING ) ; // !! can't be used with "Namespaces"
     cfrTil->Namespaces = ns ;
     CfrTil_AddCPrimitives ( ) ;

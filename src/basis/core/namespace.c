@@ -211,7 +211,11 @@ void
 _Namespace_VariableValueSet ( Namespace * ns, byte * name, int64 value )
 {
     Word * word = _CfrTil_VariableGet ( ns, name ) ;
-    if ( word ) word->W_Value = value ; // value of variable
+    if ( word ) 
+    {
+        word->W_Value = value ; // value of variable
+        word->W_PtrToValue = &word->W_Value ;
+    }
 }
 
 Namespace *
@@ -380,7 +384,7 @@ _Namespace_FreeNamespacesStack ( Stack * stack )
 Namespace *
 Namespace_New ( byte * name, Namespace * containingNs )
 {
-    Namespace * ns = _DataObject_New (NAMESPACE, 0, name, NAMESPACE, 0, 0, 0, ( int64 ) containingNs, 0, 0 , -1) ;
+    Namespace * ns = DataObject_New (NAMESPACE, 0, name, NAMESPACE, 0, 0, 0, ( int64 ) containingNs, 0, 0 , -1) ;
 }
 
 Namespace *

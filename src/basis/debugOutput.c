@@ -68,6 +68,7 @@ Debugger_ParseFunctionLocalVariables ( Debugger * debugger, Lexer * lexer, Boole
     Boolean lasvf = false ;
     byte * token, *prevToken = 0, *aToken ;
     Compiler * compiler = _Compiler_ ;
+    Word * word ;
     compiler->NumberOfArgs = 0 ;
     compiler->NumberOfLocals = 0 ;
     compiler->NumberOfRegisterVariables = 0 ; //nb. prevent increasing the locals offset by adding in repeated calls to this function
@@ -87,6 +88,8 @@ Debugger_ParseFunctionLocalVariables ( Debugger * debugger, Lexer * lexer, Boole
         }
         else if ( ( String_Equal ( token, "(" ) ) && ( lasvf == false ) ) //|| String_Equal ( token, "(|" ) //not necessary the lexer will see only the '('
         {
+            word = Finder_Word_FindUsing ( _Finder_, prevToken, 0 ) ;
+            if ( word->CAttribute & PREFIX ) continue ;
             if ( ! ( debugger->LevelBitNamespaceMap & ( ( uint64 ) 1 << ( levelBit ) ) ) )
             {
                 debugger->LocalsNamespace = _CfrTil_Parse_LocalsAndStackVariables ( 1, 0, 0, debugger->LocalsNamespacesStack, 0 ) ;
@@ -103,7 +106,7 @@ Debugger_ParseFunctionLocalVariables ( Debugger * debugger, Lexer * lexer, Boole
             }
             if ( String_Equal ( token, "var" ) ) aToken = prevToken ;
             else aToken = Lexer_PeekNextNonDebugTokenWord ( _Lexer_, 0 ) ;
-            _CfrTil_LocalWord ( aToken, ++ _Compiler_->NumberOfLocals, LOCAL_VARIABLE, 0, 0, COMPILER_TEMP ) ;
+            _CfrTil_LocalWord (aToken, LOCAL_VARIABLE, 0, 0, COMPILER_TEMP ) ;
         }
         else if ( String_Equal ( token, "<end>" ) ) return ;
         prevToken = token ;
@@ -224,13 +227,12 @@ _Debugger_ShowEffects ( Debugger * debugger, Word * word, Boolean stepFlag, Bool
     debugger->w_Word = word ;
     uint64* dsp = _Dsp_ ;
     if ( ! dsp ) CfrTil_Exception ( STACK_ERROR, 0, QUIT ) ;
-    if ( Is_DebugOn && ( force || stepFlag || ( debugger->w_Word != debugger->LastEffectsWord ) ) )
+    if ( Is_DebugOn && ( force || stepFlag || ( word != debugger->LastEffectsWord ) ) )
     {
-        Word * word = debugger->w_Word ;
         if ( force || ( ( stepFlag ) || ( word ) && ( word != debugger->LastEffectsWord ) ) )
         {
             DebugColors ;
-            if ( ( word->CAttribute & OBJECT_FIELD ) && ( ! ( word->CAttribute & DOT ) ) )
+            if ( word && ( word->CAttribute & OBJECT_FIELD ) && ( ! ( word->CAttribute & DOT ) ) )
             {
                 if ( strcmp ( ( char* ) word->Name, "[" ) && strcmp ( ( char* ) word->Name, "]" ) ) // this block is repeated in arrays.c : make it into a function - TODO
                 {
@@ -251,7 +253,7 @@ _Debugger_ShowEffects ( Debugger * debugger, Word * word, Boolean stepFlag, Bool
                 debugger->WordDsp = _Dsp_ ;
             }
             depthChange = DataStack_Depth ( ) - debugger->SaveStackDepth ;
-            if ( ( debugger->WordDsp && ( GetState ( debugger, DBG_SHOW_STACK_CHANGE ) ) || ( change ) || ( debugger->SaveTOS != TOS ) || ( depthChange ) ) )
+            if ( word && ( debugger->WordDsp && ( GetState ( debugger, DBG_SHOW_STACK_CHANGE ) ) || ( change ) || ( debugger->SaveTOS != TOS ) || ( depthChange ) ) )
             {
                 byte * name, pb_change [ 256 ] ;
                 char * b = ( char* ) Buffer_Data ( _CfrTil_->DebugB ), *op ;
@@ -424,7 +426,7 @@ _CfrTil_ShowInfo ( Debugger * debugger, byte * prompt, int64 signal, int64 force
         byte *location ;
         byte signalAscii [ 128 ] ;
         ReadLiner * rl = cntx->ReadLiner0 ;
-        char * compileOrInterpret = ( char* ) ( CompileMode ? "[c] " : "[i] " ), buffer [32] ;
+        char * compileOrInterpret = ( char* ) ( CompileMode ? "[c] " : "[i] " ), buffer [32], *cc_line ;
 
         DebugColors ;
         if ( ! ( cntx && cntx->Lexer0 ) )
@@ -473,7 +475,7 @@ next:
                         word->ContainingNamespace ? ( char* ) word->ContainingNamespace->Name : ( char* ) "<literal>",
                         ( char* ) cc_Token, ( uint64 ) word ) ;
                 }
-                byte * cc_line = Debugger_PrepareDbgSourceCodeString (debugger, word, ( int64 ) Strlen ( obuffer ) ) ;
+                cc_line = Debugger_PrepareDbgSourceCodeString (debugger, word, ( int64 ) Strlen ( obuffer ) ) ;
                 Strncat ( obuffer, cc_line, BUFFER_SIZE ) ;
                 _Printf ( ( byte* ) "%s", obuffer ) ;
 
@@ -487,7 +489,7 @@ next:
         }
         else
         {
-            char * cc_line = ( char* ) Buffer_Data ( _CfrTil_->DebugB ) ;
+            cc_line = ( char* ) Buffer_Data ( _CfrTil_->DebugB ) ;
             strcpy ( cc_line, ( char* ) rl->InputLine ) ;
             String_RemoveEndWhitespace ( ( byte* ) cc_line ) ;
 

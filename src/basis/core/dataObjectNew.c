@@ -6,7 +6,7 @@
 // we run all new objects thru here ; good for debugging and understanding 
 
 Word *
-_DataObject_New ( uint64 type, Word * word, byte * name, uint64 ctype, uint64 ctype2, uint64 ltype,
+DataObject_New ( uint64 type, Word * word, byte * name, uint64 ctype, uint64 ctype2, uint64 ltype,
     int64 index, int64 value, int allocType, int64 tsrli, int64 scwi )
 {
     tsrli = ( tsrli != - 1 ) ? tsrli : _Lexer_->TokenStart_ReadLineIndex ;
@@ -88,14 +88,14 @@ _DataObject_New ( uint64 type, Word * word, byte * name, uint64 ctype, uint64 ct
             _CfrTil_TypeDef ( ) ;
             break ;
         }
-        case PARAMETER_VARIABLE: case LOCAL_VARIABLE: 
+        case PARAMETER_VARIABLE: case LOCAL_VARIABLE: case (PARAMETER_VARIABLE|REGISTER_VARIABLE) : case (LOCAL_VARIABLE|REGISTER_VARIABLE): 
         {
-            word = CfrTil_LocalWord ( name, type, COMPILER_TEMP ) ;
+            word = _CfrTil_LocalWord (name, ctype, 0, 0, COMPILER_TEMP ) ;
             break ;
         }
         default: case (T_LISP_SYMBOL | PARAMETER_VARIABLE) : case (T_LISP_SYMBOL | LOCAL_VARIABLE): // REGISTER_VARIABLE combinations with others in this case
         {
-            word = CfrTil_LocalWord ( name, type, 0 ) ; //COMPILER_TEMP ) ;
+            word = CfrTil_LocalWord ( name, type, COMPILER_TEMP ) ;
             break ;
         }
     }
@@ -124,7 +124,6 @@ _CfrTil_ObjectNew ( int64 size, byte * name, uint64 category, int64 allocType )
 void
 _Class_Object_Init ( Word * word, Namespace * ns )
 {
-    DebugShow_Off ;
     Stack * nsstack = _Context_->Compiler0->NamespacesStack ;
     Stack_Init ( nsstack ) ; // !! ?? put this in Compiler ?? !!
     // init needs to be done by the most super class first successively down to the current class 
@@ -140,6 +139,7 @@ _Class_Object_Init ( Word * word, Namespace * ns )
     while ( ns ) ;
     int64 i ;
     SetState ( _Debugger_, DEBUG_SHTL_OFF, true ) ;
+    //DebugShow_Off ;
     for ( i = Stack_Depth ( nsstack ) ; i > 0 ; i -- )
     {
 
@@ -220,7 +220,7 @@ _CfrTil_Variable_New ( byte * name, int64 value )
     Word * word ;
     if ( CompileMode ) 
     {
-        word = CfrTil_LocalWord ( name, LOCAL_VARIABLE, DICTIONARY ) ; 
+        word = CfrTil_LocalWord ( name, LOCAL_VARIABLE, COMPILER_TEMP ) ; 
         SetState ( _Compiler_, VARIABLE_FRAME, true ) ;
     }
     else word = _DObject_New ( name, value, ( CPRIMITIVE | NAMESPACE_VARIABLE | IMMEDIATE ), 0, 0, NAMESPACE_VARIABLE, ( byte* ) _DataObject_Run, 0, 1, 0, DICTIONARY ) ;
@@ -246,12 +246,12 @@ _CfrTil_Label ( byte * lname )
 }
 
 Word *
-_CfrTil_LocalWord ( byte * name, int64 index, int64 ctype, int64 ctype2, int64 ltype, int64 allocType ) // svf : flag - whether stack variables are in the frame
+_CfrTil_LocalWord (byte * name, int64 ctype, int64 ctype2, int64 ltype, int64 allocType ) // svf : flag - whether stack variables are in the frame
 {
     Word *word ;
     {
-        word = _DObject_New ( name, 0, ( ctype | IMMEDIATE ), ctype2, ltype, LOCAL_VARIABLE, ( byte* ) _DataObject_Run, 0, 1, 0, DICTIONARY ) ; //SESSION ) ; //COMPILER_TEMP ) ;
-        word->Index = index ;
+        word = _DObject_New ( name, 0, ( ctype | IMMEDIATE ), ctype2, ltype, LOCAL_VARIABLE, ( byte* ) _DataObject_Run, 0, 1, 0, allocType ) ; //SESSION ) ; //COMPILER_TEMP ) ;
+        word->Index = ( ctype & LOCAL_VARIABLE ) ? ++ _Compiler_->NumberOfLocals : ++ _Compiler_->NumberOfArgs ; //index ;
     }
     return word ;
 }
@@ -268,8 +268,7 @@ CfrTil_LocalWord ( byte * name, int64 ctype, int64 allocType ) // svf : flag - w
 {
     _Namespace_FindOrNew_Local ( _Compiler_->LocalsCompilingNamespacesStack ) ;
     Finder_SetQualifyingNamespace ( _Finder_, 0 ) ;
-    Word * word = _CfrTil_LocalWord ( name, ( ctype & LOCAL_VARIABLE ) ? ++ _Compiler_->NumberOfLocals : ++ _Compiler_->NumberOfArgs, 
-        ctype, 0, 0, allocType ) ; // svf : flag - whether stack variables are in the frame
+    Word * word = _CfrTil_LocalWord (name, ctype, 0, 0, allocType ) ; // svf : flag - whether stack variables are in the frame
     return word ;
 }
 

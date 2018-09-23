@@ -745,8 +745,10 @@ IsPunct ( byte b )
     else return false ;
 }
 
+#if 0
+// ?? necessary ; works ??
 int64
-String_CheckWordSize ( byte * str, int64 wl ) //, Boolean lPunctFlag, Boolean rPunctFlag )
+String_CheckWordSize ( byte * str, int64 wl ) 
 {
     byte * start, *end ;
     int64 i, length ;
@@ -756,18 +758,16 @@ String_CheckWordSize ( byte * str, int64 wl ) //, Boolean lPunctFlag, Boolean rP
     {
         if ( punctFlag )
         {
-            //if ( ! IsPunct ( str[ i ] ) ) break ;
-            //if ( str[ i ] != str [0] ) 
             break ;
         }
         else if ( IsPunct ( str[ i ] ) || ( str[ i ] == ' ' ) ) break ;
     }
     start = & str [i + 1] ;
-    for ( i = 1 ; abs ( i ) < ( wl + 1 ) ; i ++ ) // ... then to the right side of str
+    for ( i = wl ; i < ( wl + 1 ) ; i ++ ) // ... then to the right side of str
     {
         if ( rPunctFlag )
         {
-            if ( ( i >= wl ) && ( ! IsPunct ( str[i] ) ) ) break ;
+            if ( ( i >= wl ) && ( ! IsPunct ( str[i] ) ) ) break ; // assumes
         }
         else if ( IsPunct ( str[i] ) || ( str[i] == ' ' ) ) break ;
     }
@@ -775,6 +775,8 @@ String_CheckWordSize ( byte * str, int64 wl ) //, Boolean lPunctFlag, Boolean rP
     length = end - start + 1 ;
     return length == wl ;
 }
+#endif
+
 // this code is also used in PrepareSourceCodeString in cfrtil.c 
 // it makes or attempts to make sure that that tokenStart (ts) is correct for any string
 
@@ -789,7 +791,7 @@ String_FindStrnCmpIndex ( byte * sc, byte* name0, int64 index0, int64 wl0, int64
         scindex = & sc [ index + i ] ;
         if ( ( index + i <= slsc ) && ( ! Strncmp ( scindex, name0, wl0 ) ) )
         {
-            if ( String_CheckWordSize ( scindex, wl0 ) ) 
+            //if ( String_CheckWordSize ( scindex, wl0 ) ) 
             {
                 index += i ;
                 goto done ;
@@ -801,7 +803,7 @@ String_FindStrnCmpIndex ( byte * sc, byte* name0, int64 index0, int64 wl0, int64
         scindex = & sc [ index - i ] ;
         if ( ( ( index - 1 ) >= 0 ) && ( ! Strncmp ( scindex, name0, wl0 ) ) )
         {
-            if ( String_CheckWordSize ( scindex, wl0 ) ) 
+            //if ( String_CheckWordSize ( scindex, wl0 ) ) 
             {
                 index -= i ;
                 goto done ;

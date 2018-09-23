@@ -201,10 +201,7 @@ _CfrTil_Do_ClassField ( Word * word )
     {
         Compiler_IncrementCurrentAccumulatedOffset ( compiler, word->Offset ) ;
     }
-    if ( ( CompileMode ) || GetState ( compiler, LC_ARG_PARSING ) )
-    {
-    }
-    else
+    if ( ! (( CompileMode ) || GetState ( compiler, LC_ARG_PARSING ) ))
     {
         accumulatedAddress = ( byte* ) TOS ; //_DataStack_Pop ( ) ;
         accumulatedAddress += word->Offset ;
@@ -234,7 +231,6 @@ CfrTil_Dot ( ) // .
     {
         SetState ( cntx, CONTEXT_PARSING_QID, true ) ;
         d0 ( if ( Is_DebugModeOn ) Compiler_SC_WordList_Show ("\nCfrTil_Dot", 0 , 0) ) ;
-
         Word * word = Compiler_PreviousNonDebugWord ( 0 ) ; // 0 : rem: we just popped the WordStack above
         if ( word )
         {
@@ -244,6 +240,7 @@ CfrTil_Dot ( ) // .
             }
             else
             {
+                //Compiler_Init_AccumulatedOffsetPointers ( cntx->Compiler0, word ) ;
                 cntx->Interpreter0->BaseObject = word ;
             }
         }
@@ -417,25 +414,16 @@ _CfrTil_Do_Variable ( Word * word )
         if ( word->CAttribute & ( OBJECT | THIS | QID ) || GetState ( word, QID ) ) //Finder_GetQualifyingNamespace ( cntx->Finder0 ) )
         {
             word->AccumulatedOffset = 0 ;
-            Word_SetCoding (word, Here , 1) ;
             cntx->Interpreter0->BaseObject = word ;
             cntx->Interpreter0->CurrentObjectNamespace = TypeNamespace_Get ( word ) ;
-            cntx->Compiler0->AccumulatedOffsetPointer = 0 ;
-            cntx->Compiler0->AccumulatedOptimizeOffsetPointer = & word->AccumulatedOffset ;
+            Compiler_Init_AccumulatedOffsetPointers ( cntx->Compiler0, word ) ;
             word->CAttribute |= OBJECT ;
-            if ( word->CAttribute & THIS )
-            {
-                word->S_ContainingNamespace = _Context_->Interpreter0->ThisNamespace ;
-            }
+            if ( word->CAttribute & THIS ) word->S_ContainingNamespace = _Context_->Interpreter0->ThisNamespace ;
         }
     }
-    if ( CompileMode )
-    {
-        _Do_Variable ( word ) ;
-    }
+    if ( CompileMode ) _Do_Variable ( word ) ;
     else
     {
-
         if ( word->CAttribute & ( OBJECT | THIS ) )
         {
             if ( cntx->Compiler0->AccumulatedOffsetPointer )
@@ -460,10 +448,7 @@ _CfrTil_Do_Variable ( Word * word )
                 else value = ( int64 ) * word->W_PtrToValue ;
             }
             else value = ( int64 ) word->W_PtrToValue ;
-            if ( cntx->Interpreter0->BaseObject )
-            {
-                TOS = value ;
-            }
+            if ( cntx->Interpreter0->BaseObject ) TOS = value ;
             else DataStack_Push ( value ) ;
         }
     }

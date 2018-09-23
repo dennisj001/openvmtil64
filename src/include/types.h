@@ -1039,7 +1039,7 @@ typedef struct
     // variables accessible from cfrTil
     int64 Verbosity ;
     int64 StartIncludeTries ;
-    int64 StartedTimes, InitSessionCoreTimes, SigSegvs, AllocationRequestLacks ;
+    int64 StartedTimes, Restarts, InitSessionCoreTimes, SigSegvs, AllocationRequestLacks ;
 
     int64 DictionarySize ;
     int64 LispTempSize ;

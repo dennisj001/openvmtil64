@@ -311,6 +311,8 @@
 #define BLOCK_DELIMITER     ( (uint64) 1 << 16 )
 #define T_OBJECT            ( (uint64) 1 << 17 )
 #define T_MORPHISM          ( (uint64) 1 << 18 )
+#define RIGHT_BRACKET       ( (uint64) 1 << 19 )
+#define LEFT_BRACKET        ( (uint64) 1 << 20 )
 
 // _CAttribute for interpreter word types - 4 bits/ 16 possibilities : N_WordAttribute bitfield
 #define WT_PREFIX                 ( (uint64) 1 <<  0 ) 
@@ -564,7 +566,7 @@
 #define COMPILE_MODE ( (uint64) 1 << 0 )
 #define BLOCK_MODE COMPILE_MODE
 #define ADD_FRAME ( (uint64) 1 << 1 )
-#define LEFT_BRACKET ( (uint64) 1 << 2 )
+#define COMPILER_LEFT_BRACKET ( (uint64) 1 << 2 )
 #define SAVE_Rsp ( (uint64) 1 << 3 ) 
 #define RETURN_NONE ( (uint64) 1 << 5 ) 
 #define RETURN_TOS ( (uint64) 1 << 6 )

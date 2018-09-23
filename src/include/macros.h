@@ -2,6 +2,20 @@
 //#define myprintf(a, b, rest...) printf (a, b, ## rest)
 #define Exception( type, response ) CfrTil_Exception (type, 0, response )
 
+#define _Context_ _Q_->OVT_Context
+#define _CfrTil_ _Q_->OVT_CfrTil
+#define _Compiler_ _Context_->Compiler0
+#define _Interpreter_ _Context_->Interpreter0
+#define _ReadLiner_ _Context_->ReadLiner0
+#define _Lexer_ _Context_->Lexer0
+#define _Finder_ _Context_->Finder0
+#define _DataStack_ _CfrTil_->DataStack
+#define _DataStackPointer_ _DataStack_->StackPointer
+#define _DSP_ _DataStackPointer_ 
+#define _ReturnStack_ _CfrTil_->ReturnStack
+#define _ReturnStack_ _CfrTil_->ReturnStack
+#define _ReturnStackPointer_ _ReturnStack_->StackPointer
+#define _RSP_ _ReturnStackPointer_ 
 #define _Q_CodeByteArray _Q_->CodeByteArray
 #define _Q_CodeSpace _Q_->MemorySpace0->CodeSpace
 #define _LC_ _Q_->OVT_LC 
@@ -42,9 +56,9 @@
 #define Debugger_IsNewLine( debugger ) GetState ( debugger, DBG_NEWLINE )
 #define Debugger_SetNewLine( debugger, flag ) SetState ( debugger, DBG_NEWLINE, flag ) 
 
-#define Set_CompileMode( tf ) SetState ( _Context_->Compiler0, COMPILE_MODE, tf ) //; _LC_ ? SetState ( _LC_, LC_COMPILE_MODE, tf ) : 0 ; 
-#define Get_CompileMode() GetState ( _Context_->Compiler0, COMPILE_MODE )  //|| ( _LC_ ? GetState ( _LC_, LC_COMPILE_MODE ) : 0 ) ) 
-#define CompileMode GetState ( _Context_->Compiler0, COMPILE_MODE )  //|| ( _LC_ && GetState ( _LC_, ( LC_COMPILE_MODE ) ) ) ) : 0)
+#define Set_CompileMode( tf ) SetState ( _Compiler_, COMPILE_MODE, tf ) //; _LC_ ? SetState ( _LC_, LC_COMPILE_MODE, tf ) : 0 ; 
+#define Get_CompileMode() GetState ( _Compiler_, COMPILE_MODE )  //|| ( _LC_ ? GetState ( _LC_, LC_COMPILE_MODE ) : 0 ) ) 
+#define CompileMode GetState ( _Compiler_, COMPILE_MODE )  //|| ( _LC_ && GetState ( _LC_, ( LC_COMPILE_MODE ) ) ) ) : 0)
 #define Compiling CompileMode
 #define ImmediateWord( word) (word->CAttribute & IMMEDIATE)
 #define CPrimitiveWord( word) (word->CAttribute & CPRIMITIVE)
@@ -71,8 +85,6 @@
 #define Attribute_FromWord( word ) (( Attribute * ) (word)->This )
 
 // formatting
-//#define AllowNewlines //if (_Q_) SetState ( _Q_->psi_PrintStateInfo, PSI_NEWLINE, false ) 
-//#define ConserveNewlines //if (_Q_) SetState ( _Q_->psi_PrintStateInfo, PSI_NEWLINE, true ) 
 // ansi/vt102 escape code
 #define ClearLine _ReadLine_PrintfClearTerminalLine ( )
 #define Cursor_Up( n ) _Printf ( (byte*) "%c[%dA", ESC, n )
@@ -121,20 +133,6 @@
 #define c_u( s ) cc ( (byte*) s, &_Q_->User ) 
 #define c_n( s ) cc ( (byte*) s, &_Q_->Notice ) 
 
-#define _Context_ _Q_->OVT_Context
-#define _CfrTil_ _Q_->OVT_CfrTil
-#define _Compiler_ _Context_->Compiler0
-#define _Interpreter_ _Context_->Interpreter0
-#define _ReadLiner_ _Context_->ReadLiner0
-#define _Lexer_ _Context_->Lexer0
-#define _Finder_ _Context_->Finder0
-#define _DataStack_ _CfrTil_->DataStack
-#define _DataStackPointer_ _DataStack_->StackPointer
-#define _DSP_ _DataStackPointer_ 
-#define _ReturnStack_ _CfrTil_->ReturnStack
-#define _ReturnStack_ _CfrTil_->ReturnStack
-#define _ReturnStackPointer_ _ReturnStack_->StackPointer
-#define _RSP_ _ReturnStackPointer_ 
 #define TemporaryString_New( string ) String_New ( string, TEMPORARY ) 
 #define IsWordRecursive CfrTil_CheckForGotoPoints ( GI_RECURSE )
 #define AppendCharToSourceCode( c ) //_Lexer_AppendCharToSourceCode ( lexer, c ) 

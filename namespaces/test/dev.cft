@@ -29,7 +29,7 @@ int factoriali ( REG n | REG res )
     return res;
 } prefix
 c_syntaxOff 
-'factoriali find wdiss pause
+'factoriali find wdiss //pause
 factoriali (7) dup p 5040 _assert //pause //sp
 //dscOff
 : factorial ( n  | fac -- TOS ) 
@@ -257,10 +257,18 @@ _fibn0 ( n | fib )
 }
 //' _fibn0 find d: wdiss sp _fibn0 ( 20 ) dup p 6765 _assert //sp
 dscOn 
+#if 1 // should work both ways
+TODO ( "fix dev.cft arg problem with C syntax" )
+int
+fibPTC? ( n | fn, fn1, fn2 ) 
+{
+    //int fn, fn1, fn2 ;
+#else
 int
 fibPTC? ( n ) //| fn, fn1, fn2 ) 
 {
-    int fn, fn1, fn2 ;
+    d: int fn, fn1, fn2 ;
+#endif
     for ( fn = 0, fn1 = 0, fn2 = 1 ; n ; n -- ) 
     {   
         fn1 = fn2 ;
@@ -268,9 +276,9 @@ fibPTC? ( n ) //| fn, fn1, fn2 )
         fn = fn1 + fn2 ; 
     }
     return fn ;
-}
+} prefix
 ' int.fibPTC? find wdiss
-int.fibPTC? (20) dup p 6765 _assert sp
+d: fibPTC? (20) dup p 6765 _assert sp
 dscOff
 int
 fibPTC2? ( REG n | REG fn, REG fn1, REG fn2 )

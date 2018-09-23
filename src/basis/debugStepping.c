@@ -238,7 +238,7 @@ doJmpCall:
             SetState ( debugger, DBG_JCC_INSN, false ) ;
             goto end ;
         }
-        else if ( ( ( ( byte* ) debugger->DebugAddress )[0] >> 4 ) == 7 ) // callcc ?
+        else if ( ( ( ( byte* ) debugger->DebugAddress )[0] >> 4 ) == 7 ) 
         {
             SetState ( debugger, DBG_JCC_INSN, true ) ;
             jcAddress = Debugger_DoJcc ( debugger, 1 ) ;
@@ -246,12 +246,10 @@ doJmpCall:
             SetState ( debugger, DBG_JCC_INSN, false ) ;
             goto end ;
         }
-doIt:
-        _Debugger_CompileAndStepOneInstruction ( debugger, jcAddress ) ; //? jcAddress : debugger->DebugAddress ) ;
+        _Debugger_CompileAndStepOneInstruction ( debugger, jcAddress ) ; 
 end:
         if ( debugger->DebugAddress )
         {
-            //Debugger_UdisOneInstruction ( debugger, debugger->DebugAddress, ( byte* ) "", ( byte* ) "" ) ; // the next instruction
             // keep eip - instruction pointer - up to date ..
             debugger->cs_Cpu->Rip = ( uint64 * ) debugger->DebugAddress ;
         }

@@ -14,12 +14,6 @@ CfrTil_Kbhit ( void )
 }
 
 void
-_CfrTil_PrintString ( byte * string ) //  '."'
-{
-    _Printf ( ( byte* ) string ) ;
-}
-
-void
 CfrTil_PrintString ( )
 {
     _CfrTil_PrintString ( ( byte* ) DataStack_Pop ( ) ) ;
@@ -28,29 +22,25 @@ CfrTil_PrintString ( )
 void
 CfrTil_NewLine ( )
 {
-    //ConserveNewlines ;
-    //int64 sstate = GetState ( _Q_->psi_PrintStateInfo, PSI_NEWLINE ) ;
-    //AllowNewlines ;
-    _Printf ( ( byte* ) "\n" ) ;
-    //_Q_->psi_PrintStateInfo->State = sstate ;
+    _CfrTil_PrintChar ( '\n' ) ;
 }
 
 void
 CfrTil_CarriageReturn ( )
 {
-    _Printf ( ( byte* ) "\r" ) ;
+    _CfrTil_PrintChar ( '\r' ) ;
 }
 
 void
 CfrTil_SPACE ( ) // '.'
 {
-    _CfrTil_PrintString ( ( byte* ) " " ) ;
+    _CfrTil_PrintChar ( ' ' ) ;
 }
 
 void
 CfrTil_TAB ( ) // '.'
 {
-    _CfrTil_PrintString ( ( byte* ) "\t" ) ;
+    _CfrTil_PrintChar ( '\t' ) ;
 }
 
 void
@@ -118,7 +108,7 @@ PrintfInt ( int64 n )
     if ( _Context_->System0->NumberBase == 10 ) sprintf ( ( char* ) buffer, INT_FRMT, n ) ;
     else if ( _Context_->System0->NumberBase == 2 )
     {
-        Print_Binary ( n ) ; //, 4, 46 ) ;
+        Print_Binary ( n ) ; 
         return ;
     }
     else /* if ( _Context->System0->NumberBase == 16 ) */ sprintf ( ( char* ) buffer, UINT_FRMT_0x016, n ) ; // hex
@@ -145,8 +135,8 @@ void
 CfrTil_Emit ( )
 {
     int64 c = DataStack_Pop ( ) ;
-    if ( ( c >= 0 ) && ( c < 256 ) ) _Printf ( ( byte* ) "%c", c ) ;
-    else Emit ( c ) ; //_Printf ( ( byte* ) "%c", ( ( CString ) c )[0] ) ;
+    if ( ( c >= 0 ) && ( c < 256 ) ) _CfrTil_PrintChar ( c ) ;
+    else _CfrTil_PrintChar ( c ) ; //_Printf ( ( byte* ) "%c", ( ( CString ) c )[0] ) ;
 }
 
 void

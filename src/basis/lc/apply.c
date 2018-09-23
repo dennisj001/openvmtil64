@@ -70,7 +70,7 @@ _LO_Apply ( ListObject *lfirst, ListObject *lfunction, ListObject *largs )
         // like an rpn word but we have the list of words that make it up already and processed by eval
         CompileArgs ( not LO_PushArgs ( largs ) ; )
         CompileFunction lfunction->Lo_CfrTilWord->Definition ( ) ;
-        vReturn = _DataObject_New ( T_LC_NEW, 0, 0, 0, 0, LITERAL, 0, DataStack_Pop ( ), 0, - 1, 0 ) ;
+        vReturn = DataObject_New ( T_LC_NEW, 0, 0, 0, 0, LITERAL, 0, DataStack_Pop ( ), 0, - 1, 0 ) ;
         //LC_RestoreStack ( ) ;
     }
 #endif    
@@ -266,7 +266,7 @@ LO_PrepareReturnObject ( )
         Namespace * ns = _CfrTil_InNamespace ( ) ;
         name = ns->Name ;
         if ( Namespace_IsUsing ( "BigNum" ) ) type = T_BIG_NUM ;
-        return _DataObject_New ( T_LC_NEW, 0, 0, LITERAL | type, 0, LITERAL | type, 0, DataStack_Pop ( ), 0, 0, - 1 ) ;
+        return DataObject_New ( T_LC_NEW, 0, 0, LITERAL | type, 0, LITERAL | type, 0, DataStack_Pop ( ), 0, 0, - 1 ) ;
     }
     else return nil ;
 }
@@ -533,12 +533,12 @@ LC_CompileRun_C_ArgList ( Word * word ) // C protocol - x64 : left to right argu
         int64 svDs = GetState ( _CfrTil_, _DEBUG_SHOW_ ) ;
         DebugShow_Off ;
         l0 = _LO_Read ( lc ) ;
+        SetState ( _CfrTil_, _DEBUG_SHOW_, svDs ) ;
         Set_CompileMode ( svcm ) ; // we must have the arguments pushed and not compiled for _LO_Apply_C_Rtl_ArgList which will compile them for a C_Rtl function
         _LO_Apply_C_LtoR_ArgList ( lc, l0, word ) ;
         LC_RestoreStackPointer ( lc ) ; 
         LC_LispNamespaceOff ( ) ;
         SetState ( compiler, LC_ARG_PARSING | LC_C_RTL_ARG_PARSING, false ) ;
-        SetState ( _CfrTil_, _DEBUG_SHOW_, svDs ) ;
     }
     Lexer_SetTokenDelimiters ( lexer, svDelimiters, COMPILER_TEMP ) ;
 }

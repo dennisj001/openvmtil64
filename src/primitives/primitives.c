@@ -138,8 +138,8 @@ CPrimitive CPrimitives [] = {
     { "class", 0, 0, CfrTil_Class_New, 0, 0, 0, "Class", "Root" },
     { "new", 0, 0, ( block ) CfrTil_Class_Value_New, 0, 0, 0, "Class", "Root" },
     { "clone", 0, 0, CfrTil_Class_Clone, 0, 0, 0, "Class", "Root" },
-    { "]", 0, 0, CfrTil_ArrayEnd, ( IMMEDIATE | OBJECT_OPERATOR ), 0, 0, "Class", "Root" },
-    { "[", 0, 0, CfrTil_ArrayBegin, ( IMMEDIATE | OBJECT_OPERATOR ), 0, 0, "Class", "Root" },
+    { "]", 0, 0, CfrTil_ArrayEnd, ( IMMEDIATE | OBJECT_OPERATOR ), RIGHT_BRACKET, 0, "Class", "Root" },
+    { "[", 0, 0, CfrTil_ArrayBegin, ( IMMEDIATE | OBJECT_OPERATOR ), COMPILER_LEFT_BRACKET, 0, "Class", "Root" },
     { ".", 0, 0, CfrTil_Dot, ( IMMEDIATE | OBJECT_OPERATOR ), NO_CODING, 0, "Class", "Root" },
 
     { "pWidth", 0, 0, BigNum_Set_PrintfWidth, 0, 0, 0, "BigNum", "Class" },

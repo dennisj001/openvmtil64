@@ -156,7 +156,7 @@ CfrTil_Word ( )
 {
     block b = ( block ) DataStack_Pop ( ) ;
     byte * name = ( byte* ) DataStack_Pop ( ) ;
-    _DataObject_New ( CFRTIL_WORD, 0, name, 0, 0, 0, 0, ( int64 ) b, 0, 0, - 1 ) ;
+    DataObject_New ( CFRTIL_WORD, 0, name, 0, 0, 0, 0, ( int64 ) b, 0, 0, - 1 ) ;
 }
 
 void

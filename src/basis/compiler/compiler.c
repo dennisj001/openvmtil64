@@ -18,8 +18,8 @@ _CopyDuplicateWord ( Word * word0 )
 Word *
 CopyDuplicateWord ( dlnode * anode, Word * word0 )
 {
-    Word * wordn = ( Word* ) dobject_Get_M_Slot ( (dobject*) anode, SCN_T_WORD ) ;
-    int64 iuoFlag = dobject_Get_M_Slot ( (dobject*) anode, SCN_IN_USE_FLAG ) ;
+    Word * wordn = ( Word* ) dobject_Get_M_Slot ( ( dobject* ) anode, SCN_T_WORD ) ;
+    int64 iuoFlag = dobject_Get_M_Slot ( ( dobject* ) anode, SCN_IN_USE_FLAG ) ;
     if ( iuoFlag && ( word0 == wordn ) ) return _CopyDuplicateWord ( word0 ) ;
     else return 0 ;
 }
@@ -170,7 +170,7 @@ CfrTil_WordList ( int64 n )
 void
 _CompileOptimizeInfo_Init ( CompileOptimizeInfo * optInfo )
 {
-    memset ( (byte*) &optInfo->State, 0, sizeof ( CompileOptimizeInfo ) - sizeof ( DLNode )) ;
+    memset ( ( byte* ) & optInfo->State, 0, sizeof ( CompileOptimizeInfo ) - sizeof ( DLNode ) ) ;
 }
 
 void
@@ -182,9 +182,9 @@ CompileOptimizeInfo_Init ( CompileOptimizeInfo * optInfo, uint64 state )
     // we don't really use optInfo->COIW much 
     for ( i = 0, node = dllist_First ( ( dllist* ) _CfrTil_->CompilerWordList ) ; node ; node = dlnode_Next ( node ) ) // nb. this is a little subtle
     {
-        if ( dobject_Get_M_Slot ( (dobject*) node, SCN_IN_USE_FLAG ) )
+        if ( dobject_Get_M_Slot ( ( dobject* ) node, SCN_IN_USE_FLAG ) )
         {
-            if ( i < 8 ) optInfo->COIW [ i ++ ] = ( Word * ) dobject_Get_M_Slot ( (dobject*) node, SCN_T_WORD ) ;
+            if ( i < 8 ) optInfo->COIW [ i ++ ] = ( Word * ) dobject_Get_M_Slot ( ( dobject* ) node, SCN_T_WORD ) ;
             else break ;
         }
     }
@@ -257,6 +257,14 @@ Compiler_RecycleOptInfos ( )
         coi = ( CompileOptimizeInfo* ) List_Pop ( compiler->OptimizeInfoList ) ;
         if ( coi && ( coi != compiler->OptInfo ) ) OptInfo_Recycle ( coi ) ;
     }
+}
+
+void
+Compiler_Init_AccumulatedOffsetPointers ( Compiler * compiler, Word * word )
+{
+    compiler->AccumulatedOffsetPointer = 0 ;
+    if ( word ) compiler->AccumulatedOptimizeOffsetPointer = & word->AccumulatedOffset ;
+    else compiler->AccumulatedOptimizeOffsetPointer = 0 ;
 }
 
 void

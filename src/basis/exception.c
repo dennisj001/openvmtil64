@@ -100,8 +100,7 @@ OVT_Pause ( byte * prompt, int64 signalExceptionsHandled )
                 if ( Is_DebugOn )
                 {
                     Debugger * debugger = _Debugger_ ;
-                    SetState ( debugger, DBG_AUTO_MODE, false ) ;
-                    SetState ( debugger, DBG_EVAL_AUTO_MODE, false ) ;
+                    SetState ( debugger, DBG_AUTO_MODE | DBG_AUTO_MODE_ONCE, false ) ; // stop auto mode and get next key command code
                     _Debugger_InterpreterLoop ( debugger ) ;
                 }
                 else

@@ -135,11 +135,11 @@ _Compile_GetVarLitObj_RValue_To_Reg ( Word * word, int64 reg )
         if ( word->RegToUse == reg ) return ;
         else Compile_Move_Reg_To_Reg ( reg, word->RegToUse ) ;
     }
-    else if ( word->CAttribute & ( LOCAL_VARIABLE | PARAMETER_VARIABLE ) )
+    else if ( word->CAttribute & ( LOCAL_VARIABLE | PARAMETER_VARIABLE | THIS ) )
     {
         _Compile_Move_StackN_To_Reg ( reg, FP, LocalParameterVarOffset ( word ) ) ; // 2 : account for saved fp and return slot
     }
-    else if ( word->CAttribute & NAMESPACE_VARIABLE )
+    else if ( word->CAttribute & ( NAMESPACE_VARIABLE | OBJECT ) )
     {
         _Compile_Move_Literal_Immediate_To_Reg ( reg, ( int64 ) word->W_PtrToValue ) ;
         Compile_Move_Rm_To_Reg ( reg, reg, 0 ) ;
@@ -153,11 +153,6 @@ _Compile_GetVarLitObj_RValue_To_Reg ( Word * word, int64 reg )
         _CfrTil_Do_DynamicObject_ToReg ( word, reg ) ;
         Compile_Move_Rm_To_Reg ( reg, reg, 0 ) ;
     }
-    else if ( word->CAttribute & ( OBJECT | THIS ) )
-    {
-        _Compile_Move_Literal_Immediate_To_Reg ( reg, ( int64 ) word->W_PtrToValue ) ;
-        Compile_Move_Rm_To_Reg ( reg, reg, 0 ) ;
-    }
     else if ( word->CAttribute & ( CPRIMITIVE ) ) ; // do nothing here
     else SyntaxError ( QUIT ) ;
 }
@@ -167,10 +162,8 @@ Do_ObjectOffset ( Word * word, int64 reg )
 {
     Compiler * compiler = _Context_->Compiler0 ;
     int64 offset = word->AccumulatedOffset ;
-#if 1  
     if ( ( offset == 0 ) && GetState ( _CfrTil_, IN_OPTIMIZER ) ) return ;
     else
-#endif        
     {
         Compile_ADDI ( REG, reg, 0, offset, INT32_SIZE ) ; // only a 32 bit offset ??
         compiler->AccumulatedOffsetPointer = ( int32* ) ( Here - INT32_SIZE ) ; // offset will be calculated as we go along by ClassFields and Array accesses

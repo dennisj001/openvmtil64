@@ -72,13 +72,11 @@ Compiler_GetOptimizeState ( Compiler * compiler, Word * word )
             optInfo->nextNode = dlnode_Next ( optInfo->node ) ;
             if ( dobject_Get_M_Slot ( ( dobject* ) optInfo->node, SCN_IN_USE_FLAG ) ) optInfo->wordn = ( Word* ) dobject_Get_M_Slot ( ( dobject* ) optInfo->node, SCN_T_WORD ) ;
             else continue ;
-            if ( optInfo->wordn->CAttribute2 & ( RIGHT_PAREN ) )
+            //if (( optInfo->wordn->CAttribute2 & ( RIGHT_BRACKET ) ) || ( optInfo->wordn->CAttribute & OBJECT_FIELD ) )
+            if ( ( optInfo->wordn->CAttribute2 & ( RIGHT_PAREN ))) //| RIGHT_BRACKET ) ) || ( optInfo->wordn->CAttribute & OBJECT_FIELD ) )
             {
-#if 1               
-                if ( GetState ( compiler, DOING_AN_INFIX_WORD ) ) continue ; // more precise logic is needed here ??
-                else 
-#endif                    
-                goto doOp ; // treat parenthesized value as an op
+                if ( GetState ( compiler, DOING_AN_INFIX_WORD ) ) continue ; // more precise logic probably needed here ??
+                else goto doOp ; // treat parenthesized value as an op
             }
             else if ( optInfo->wordn->CAttribute2 & ( NO_OP_WORD | LEFT_PAREN ) ) continue ;
             else if ( optInfo->wordn->CAttribute & ( CATEGORY_OP ) ) // or anything unknown on the stack
@@ -109,10 +107,7 @@ doOp:
             }
             else if ( IS_MORPHISM_TYPE ( optInfo->wordn ) )
             {
-                if ( optInfo->wordArg2 )
-                {
-                    optInfo->xBetweenArg1AndArg2 = optInfo->wordn ;
-                }
+                if ( optInfo->wordArg2 ) optInfo->xBetweenArg1AndArg2 = optInfo->wordn ;
                 else optInfo->wordArg2 = optInfo->wordn ;
                 break ; // no optimization possible if ( ( ! optInfo->wordArg2 ) && ( IS_MORPHISM_TYPE ( optInfo->wordn ) ) )
             }
@@ -143,7 +138,7 @@ doOp:
             }
         }
         Compiler_OptimizeForOp ( compiler ) ;
-        done :
+done:
         SetState ( _CfrTil_, IN_OPTIMIZER, false ) ;
         return optInfo->rtrn ;
     }
@@ -163,10 +158,13 @@ Compiler_OptimizeForOp ( Compiler * compiler )
 {
     CompileOptimizeInfo * optInfo = compiler->OptInfo ;
     Compiler_SetStandardPreHere_ForDebugDisassembly ( compiler ) ;
-    Compiler_SetupArgsToStandardLocations ( compiler ) ;
-    if ( optInfo->opWord->CAttribute & ( CATEGORY_OP_STORE ) ) Compile_Optimize_Store ( compiler ) ;
-    else if ( optInfo->opWord->CAttribute & ( CATEGORY_OP_EQUAL ) ) Compile_Optimize_Equal ( compiler ) ;
-    else if ( optInfo->opWord->CAttribute & ( CATEGORY_OP_OPEQUAL ) ) Compile_Optimize_OpEqual ( compiler ) ;
+    //if ( optInfo->opWord->CAttribute & ( CATEGORY_OP_STORE | CATEGORY_OP_EQUAL | CATEGORY_OP_OPEQUAL ) )
+    //{
+        Compiler_SetupArgsToStandardLocations ( compiler ) ;
+        if ( optInfo->opWord->CAttribute & ( CATEGORY_OP_STORE ) ) Compile_Optimize_Store ( compiler ) ;
+        else if ( optInfo->opWord->CAttribute & ( CATEGORY_OP_EQUAL ) ) Compile_Optimize_Equal ( compiler ) ;
+        else if ( optInfo->opWord->CAttribute & ( CATEGORY_OP_OPEQUAL ) ) Compile_Optimize_OpEqual ( compiler ) ;
+    //}
     else if ( ! optInfo->rtrn ) Setup_MachineCodeInsnParameters ( compiler, REG, REG, ACC, OREG, 0, 0, 0, 0 ) ;
 }
 
@@ -210,7 +208,7 @@ Compiler_Optimizer_0Args ( Compiler * compiler )
         }
         else Word_Check_SetHere_To_StackPushRegisterCode ( optInfo->opWord, 0 ) ;
     }
-    else Compile_StandardUnoptimized ( compiler ) ;
+    else Compile_StackArgsToStandardRegs ( compiler ) ;
 }
 
 void
@@ -238,7 +236,7 @@ Compiler_Optimizer_WordArg2Op_Or_xBetweenArg1AndArg2 ( Compiler * compiler )
             else Word_Check_SetHere_To_StackPushRegisterCode ( optInfo->wordArg2, 1 ) ; // the rest of the code will be handled in Compile_Optimize_Equal
         }
     }
-    else if (optInfo->NumberOfArgs) Compile_StandardUnoptimized ( compiler ) ;
+    else if ( optInfo->NumberOfArgs ) Compile_StackArgsToStandardRegs ( compiler ) ;
 }
 
 void
@@ -258,7 +256,7 @@ Compiler_Optimizer_2Args_Or_WordArg1_Op ( Compiler * compiler )
     // we know ( ! ( optInfo->wordArg2_Op || optInfo->xBetweenArg1AndArg2 ) ) because we already handled that above
     CompileOptimizeInfo * optInfo = compiler->OptInfo ;
     // can this be optimized ??            
-    if ( optInfo->wordArg2->CAttribute & DOBJECT ) Compile_StandardUnoptimized ( compiler ) ;
+    if ( optInfo->wordArg2->CAttribute & DOBJECT ) Compile_StackArgsToStandardRegs ( compiler ) ;
     else
     {
         Boolean rm = ( optInfo->wordArg2->CAttribute & REGISTER_VARIABLE ) ? optInfo->wordArg2->RegToUse : OREG ;
@@ -304,7 +302,7 @@ Compile_StandardArg ( Word * word, Boolean reg, Boolean rvalueFlag, byte * setHe
 }
 
 void
-Compile_StandardUnoptimized ( Compiler * compiler )
+Compile_StackArgsToStandardRegs ( Compiler * compiler )
 {
     CompileOptimizeInfo * optInfo = compiler->OptInfo ;
     _Compile_Move_StackN_To_Reg ( OREG, DSP, 0 ), optInfo->Optimize_Rm = OREG ;
@@ -528,7 +526,7 @@ Compile_Optimize_OpEqual ( Compiler * compiler )
 Word *
 Compile_Optimize_EqualCheck ( Compiler * compiler )
 {
-    int64 depth = List_Depth ( compiler->OptimizeInfoList ) ;
+    //int64 depth = List_Depth ( compiler->OptimizeInfoList ) ;
     CompileOptimizeInfo * coi = ( COI * ) List_Pick ( compiler->OptimizeInfoList, 1 ) ;
     Word * word ;
     dlnode * node, *nextNode ;

@@ -1,5 +1,5 @@
 #include "../include/cfrtil64.h"
-#define VERSION ((byte*) "0.854.306" ) 
+#define VERSION ((byte*) "0.854.410" ) 
 
 OpenVmTil * _Q_ ;
 
@@ -19,12 +19,12 @@ openvmtil ( int64 argc, char * argv [ ] )
 void
 _OpenVmTil ( int64 argc, char * argv [ ] )
 {
-    int64 restartCondition = INITIAL_START, sigSegvs = 0 ;
+    int64 restartCondition = INITIAL_START, restarts = 0, sigSegvs ;
     while ( 1 )
     {
-        if ( _Q_ ) sigSegvs = _Q_->SigSegvs ;
         OpenVmTil * ovt = _Q_ = _OpenVmTil_New ( _Q_, argc, argv ) ;
         ovt->RestartCondition = restartCondition ;
+        ovt->SigSegvs = sigSegvs ;
         if ( restartCondition != INITIAL_START ) ovt->SigSegvs = sigSegvs ;
         if ( ! sigsetjmp ( ovt->JmpBuf0, 0 ) )
         {
@@ -32,6 +32,7 @@ _OpenVmTil ( int64 argc, char * argv [ ] )
         }
         restartCondition = ovt->RestartCondition ;
         sigSegvs = ovt->SigSegvs ;
+        ovt->Restarts = restarts ++ ;
     }
 }
 
@@ -111,7 +112,6 @@ _OpenVmTil_CalculateMemSpaceSizes ( OpenVmTil * ovt, int64 restartCondition, int
         verbosity = ovt->Verbosity ;
         // preserve values across partial restarts
         sessionObjectsSize = ovt->SessionObjectsSize ;
-        //sessionCodeSize = ovt->SessionCodeSize ;
         dictionarySize = ovt->DictionarySize ;
         lispTempSize = ovt->LispTempSize ;
         codeSize = ovt->MachineCodeSize ;
@@ -134,7 +134,6 @@ _OpenVmTil_CalculateMemSpaceSizes ( OpenVmTil * ovt, int64 restartCondition, int
         // volatile mem sizes
         tempObjectsSize = 10 * K ; //TEMP_OBJECTS_SIZE ;
         sessionObjectsSize = 50 * K ; //SESSION_OBJECTS_SIZE ;
-        //sessionCodeSize = 50 * K ; //SESSION_OBJECTS_SIZE ;
         lispTempSize = 10 * K ; //LISP_TEMP_SIZE ;
         compilerTempObjectsSize = 10 * K ; //COMPILER_TEMP_OBJECTS_SIZE ;
         historySize = 1 * K ; //HISTORY_SIZE ;
@@ -154,12 +153,10 @@ _OpenVmTil_CalculateMemSpaceSizes ( OpenVmTil * ovt, int64 restartCondition, int
 
         tempObjectsSize = 1 * MB ; //TEMP_OBJECTS_SIZE ;
         sessionObjectsSize = 1 * MB ; // SESSION_OBJECTS_SIZE ;
-        //sessionCodeSize = 1 * MB ; // SESSION_CODE_SIZE ;
         lispTempSize = 1 * MB ; // LISP_TEMP_SIZE ;
         compilerTempObjectsSize = 1 * MB ; //COMPILER_TEMP_OBJECTS_SIZE ;
         contextSize = 5 * K ; // CONTEXT_SIZE ;
         bufferSpaceSize = 35 * ( sizeof ( Buffer ) + BUFFER_SIZE ) ;
-        ; //1 * MB ; //BUFFER_SPACE_SIZE ;
         stringSpaceSize = 1 * MB ; //BUFFER_SPACE_SIZE ;
         historySize = 1 * MB ; //HISTORY_SIZE ;
 
@@ -178,7 +175,6 @@ _OpenVmTil_CalculateMemSpaceSizes ( OpenVmTil * ovt, int64 restartCondition, int
     objectsSize = ( int64 ) ( 0.333 * ( ( double ) coreMemTargetSize ) ) ; // we can easily allocate more object and dictionary space but not code space
     dictionarySize = ( int64 ) ( 0.333 * ( ( double ) coreMemTargetSize ) ) ;
     codeSize = ( int64 ) ( 0.333 * ( ( double ) coreMemTargetSize ) ) ;
-    //codeSize = ( codeSize > ( 500 * K ) ) ? codeSize : 100 * K ;
     codeSize = ( codeSize < ( 500 * K ) ) ? 500 * K : codeSize ;
 
     ovt->SignalExceptionsHandled = exceptionsHandled ;
@@ -188,7 +184,6 @@ _OpenVmTil_CalculateMemSpaceSizes ( OpenVmTil * ovt, int64 restartCondition, int
     ovt->ObjectsSize = objectsSize ;
     ovt->TempObjectsSize = tempObjectsSize ;
     ovt->SessionObjectsSize = sessionObjectsSize ;
-    //ovt->SessionCodeSize = sessionCodeSize ;
     ovt->DataStackSize = dataStackSize ;
     ovt->HistorySize = historySize ;
     ovt->LispTempSize = lispTempSize ;
@@ -237,8 +232,8 @@ _OpenVmTil_New ( OpenVmTil * ovt, int64 argc, char * argv [ ] )
     }
     else restartCondition = FULL_RESTART ;
 
-    startIncludeTries = ovt ? ovt->StartIncludeTries : 0 ;
-    if ( startIncludeTries )
+    startIncludeTries = ovt ? ovt->StartIncludeTries ++ : 0 ;
+    if ( startIncludeTries < 2 )
     {
         if ( ovt && ovt->OVT_Context && ovt->OVT_Context->ReadLiner0 && ovt->OVT_Context->ReadLiner0->Filename ) 
             strcpy ( errorFilename, ( char* ) ovt->OVT_Context->ReadLiner0->Filename ) ;
@@ -249,12 +244,12 @@ _OpenVmTil_New ( OpenVmTil * ovt, int64 argc, char * argv [ ] )
 
     int64 ium = ovt ? ovt->OVT_InitialUnAccountedMemory : 0, ovtv = ovt ? ovt->Verbosity : 0 ;
 
-    if ( restartCondition < INITIAL_START ) OpenVmTil_Delete ( ovt ) ;
+    if ( ovt && ( restartCondition < INITIAL_START ) && ( ovt->Restarts < 2 )) OpenVmTil_Delete ( ovt ) ;
     else if ( ovt )
     {
         printf ( ( byte* ) "\nUnable to reliably delete memory from previous system - rebooting into a new system. 'mem' for more detail on memory.\n" ) ;
         fflush ( stdout ) ;
-        OpenVmTil_Pause ( ) ; // we may crash here
+        if ( ovt->Restarts < 2 ) OpenVmTil_Pause ( ) ; // we may crash here
     }
     d0 ( if ( ovtv > 1 )
     {

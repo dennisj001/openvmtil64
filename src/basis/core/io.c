@@ -87,14 +87,27 @@ Key ( )
 byte
 _CfrTil_Key ( ReadLiner * rl )
 {
-    //return getc ( rl->InputFile ) ;
     return _Key ( rl->InputFile ) ;
+}
+
+void
+_CfrTil_PrintString ( byte * string ) //  '."'
+{
+    printf ( "%s", string ) ;
+    fflush (stdout) ;
+}
+
+void
+_CfrTil_PrintChar ( byte c ) //  '."'
+{
+    printf ( "%c", c ) ;
+    fflush (stdout) ;
 }
 
 void
 Emit ( byte c )
 {
-    _Printf ( (byte*) "%c", c ) ;
+    _CfrTil_PrintChar ( c ) ;
 }
 
 void

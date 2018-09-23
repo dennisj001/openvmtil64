@@ -115,7 +115,7 @@ CfrTil_C_Class_New ( void )
 {
     byte * name = ( byte* ) DataStack_Pop ( ) ;
 
-    return _DataObject_New ( C_CLASS, 0, name, 0, 0, 0, 0, 0, 0, 0, - 1 ) ;
+    return DataObject_New ( C_CLASS, 0, name, 0, 0, 0, 0, 0, 0, 0, - 1 ) ;
 }
 
 void
@@ -302,7 +302,7 @@ _CfrTil_TypeDef ( )
             }
             else 
             {
-                ns = _DataObject_New ( C_TYPE, 0, token, 0, 0, 0, 0, 0, 0, 0, - 1 ) ;
+                ns = DataObject_New ( C_TYPE, 0, token, 0, 0, 0, 0, 0, 0, 0, - 1 ) ;
                 _Namespace_VariableValueSet ( ns, ( byte* ) "size", size ) ;
             }
         }

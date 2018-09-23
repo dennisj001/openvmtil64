@@ -72,6 +72,7 @@ DWL_Find ( dllist * list, Word * iword, byte * address, byte* name, int64 takeFi
             {
                 numFound ++ ;
                 aFoundWord = nword ;
+#if 0                
                 if ( foundWord )
                 {
                     // remember there are probably many words with this compiled at address because we don't remove when we rewrite code
@@ -98,6 +99,11 @@ DWL_Find ( dllist * list, Word * iword, byte * address, byte* name, int64 takeFi
                     foundWord = aFoundWord ;
                     fwDiff = fDiff = scwi ;
                 }
+#else
+                foundWord = aFoundWord ;
+                if ( foundWord ) fDiff = abs ( scwi - foundWord->W_SC_Index ) ;
+                else fwDiff = fDiff = scwi ;
+#endif                
                 if ( ( ! minDiffFound ) || ( fDiff < minDiffFound ) ) minDiffFound = fDiff ;
                 if ( ( _Q_->Verbosity > 2 ) )
                 {
@@ -135,6 +141,8 @@ void
 CfrTil_WordList_PushWord ( Word * word )
 {
     CompilerWordList_Push ( word, ( ! ( word->CAttribute & ( NAMESPACE | OBJECT_OPERATOR | OBJECT_FIELD ) ) ) || ( word->CAttribute & ( DOBJECT ) ) ) ; //_List_PushNew ( _CfrTil_->CompilerWordList, word ) ;
+    //CompilerWordList_Push ( word, ( ! ( word->CAttribute & ( NAMESPACE | OBJECT_OPERATOR ) ) ) ) ; //_List_PushNew ( _CfrTil_->CompilerWordList, word ) ;
+    //CompilerWordList_Push ( word, ( ! ( word->CAttribute & ( NAMESPACE | OBJECT_FIELD ) ) ) || ( word->CAttribute & ( DOBJECT ) ) ) ; //_List_PushNew ( _CfrTil_->CompilerWordList, word ) ;
 }
 
 void
@@ -155,10 +163,8 @@ void
 SC_List_AdjustAddress ( dlnode * node, byte * address, byte * newAddress )
 {
     Word * nword = ( Word* ) dobject_Get_M_Slot ( ( dobject* ) node, SCN_T_WORD ) ;
-    //int64 scwi = dobject_Get_M_Slot ( node, SCN_SC_WORD_INDEX ) ; //nword->W_SC_WordIndex ;
     if ( ( nword->Coding == address ) ) //&& ( nword->W_SC_WordIndex != word->W_SC_WordIndex ) )
     {
-        //dllist_Map1_FromEnd ( _CfrTil_->CompilerWordList, ( MapFunction1 ) SC_ListClearAddress, ( int64 ) address ) ;
         Word_SetCoding ( nword, newAddress, 1 ) ;
         d0 ( if ( Is_DebugModeOn ) _Printf ( ( byte* ) "\nnword %s with scwi %d :: cleared for word %s with scwi %d",
             nword->Name, nword->W_SC_Index, nword->Name, nword->W_SC_Index ) ) ;
@@ -173,7 +179,6 @@ void
 SC_ListClearAddress ( dlnode * node, byte * address )
 {
     Word * nword = ( Word* ) dobject_Get_M_Slot ( ( dobject* ) node, SCN_T_WORD ) ;
-    //int64 scwi = dobject_Get_M_Slot ( node, SCN_SC_WORD_INDEX ) ; //nword->W_SC_WordIndex ;
     if ( ( nword->SourceCoding == address ) ) //&& ( nword->W_SC_WordIndex != word->W_SC_WordIndex ) )
     {
         Word_SetCoding ( nword, 0, 0 ) ;
@@ -491,7 +496,6 @@ CfrTil_InitSourceCode_WithCurrentInputChar ( CfrTil * cfrtil )
 void
 CfrTil_SourceCode_Init ( )
 {
-
     Word * word = _Interpreter_->w_Word ;
     _CfrTil_InitSourceCode_WithName ( _CfrTil_, word ? word->Name : 0 ) ;
 }
@@ -506,14 +510,12 @@ byte *
 _CfrTil_GetSourceCode ( )
 {
     byte * sc = String_New_SourceCode ( _CfrTil_->SC_Buffer ) ;
-
     return sc ;
 }
 
 byte *
 _CfrTil_Finish_WordSourceCode ( CfrTil * cfrtil, Word * word )
 {
-
     if ( ! word->W_SourceCode ) word->W_SourceCode = _CfrTil_GetSourceCode ( ) ;
     Lexer_SourceCodeOff ( _Lexer_ ) ;
     CfrTil_SourceCode_InitEnd ( cfrtil ) ;
@@ -522,7 +524,6 @@ _CfrTil_Finish_WordSourceCode ( CfrTil * cfrtil, Word * word )
 byte *
 CfrTil_FinishSourceCode ( CfrTil * cfrtil, Word * word )
 {
-
     _CfrTil_Finish_WordSourceCode ( cfrtil, word ) ;
     CfrTil_WordList_Init ( cfrtil, word, 0 ) ;
 }
@@ -531,22 +532,14 @@ void
 _CfrTil_UnAppendFromSourceCode_NChars ( CfrTil * cfrtil, int64 nchars )
 {
     int64 plen = Strlen ( ( CString ) cfrtil->SC_Buffer ) ;
-    if ( plen >= nchars )
-    {
-
-        cfrtil->SC_Buffer [ Strlen ( ( CString ) cfrtil->SC_Buffer ) - nchars ] = 0 ;
-    }
+    if ( plen >= nchars ) cfrtil->SC_Buffer [ Strlen ( ( CString ) cfrtil->SC_Buffer ) - nchars ] = 0 ;
     _CfrTil_SC_ScratchPadIndex_Init ( cfrtil ) ;
 }
 
 void
 _CfrTil_UnAppendTokenFromSourceCode ( CfrTil * cfrtil, byte * tkn )
 {
-    if ( GetState ( _Lexer_, ( ADD_TOKEN_TO_SOURCE | ADD_CHAR_TO_SOURCE ) ) )
-    {
-
-        _CfrTil_UnAppendFromSourceCode_NChars ( cfrtil, Strlen ( ( CString ) tkn ) + 1 ) ;
-    }
+    if ( GetState ( _Lexer_, ( ADD_TOKEN_TO_SOURCE | ADD_CHAR_TO_SOURCE ) ) ) _CfrTil_UnAppendFromSourceCode_NChars ( cfrtil, Strlen ( ( CString ) tkn ) + 1 ) ;
 }
 
 void
@@ -571,24 +564,16 @@ CfrTil_AppendCharToSourceCode ( CfrTil * cfrtil, byte c, int64 convertToSpaceFla
         else if ( convertToSpaceFlag )
         {
             c = String_ConvertEscapeCharToSpace ( c ) ;
-            if ( ! ( ( c == ' ' ) && ( cfrtil->SC_Buffer [ cfrtil->SC_Index - 1 ] == ' ' ) ) )
-            {
-                _CfrTil_AppendCharToSourceCode ( cfrtil, c ) ;
-            }
+            if ( ! ( ( c == ' ' ) && ( cfrtil->SC_Buffer [ cfrtil->SC_Index - 1 ] == ' ' ) ) ) _CfrTil_AppendCharToSourceCode ( cfrtil, c ) ;
         }
-        else
-        {
-
-            _String_AppendConvertCharToBackSlashAtIndex ( cfrtil->SC_Buffer, c, &cfrtil->SC_Index, cfrtil->SC_QuoteMode ) ;
-        }
+        else _String_AppendConvertCharToBackSlashAtIndex ( cfrtil->SC_Buffer, c, &cfrtil->SC_Index, cfrtil->SC_QuoteMode ) ;
     }
 }
 
 Word *
 Get_SourceCodeWord ( )
 {
-    Word * scWord = _CfrTil_->ScWord ? _CfrTil_->ScWord : Compiling ? _CfrTil_->CurrentWordCompiling : _CfrTil_->LastFinished_DObject ;
-
+    Word * scWord = _CfrTil_->ScWord ; //? _CfrTil_->ScWord : Compiling ? _CfrTil_->CurrentWordCompiling : _CfrTil_->LastFinished_DObject ;
     return scWord ;
 }
 

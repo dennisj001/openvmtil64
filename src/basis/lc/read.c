@@ -18,7 +18,7 @@ _LO_Read_DoWord ( LambdaCalculus * lc, Word * word, int64 qidFlag, int64 scwi )
         Word_Eval ( word ) ;
         if ( word->LAttribute & T_LISP_SPECIAL )
         {
-            l0 = _DataObject_New ( T_LC_NEW, word, 0, word->CAttribute, word->CAttribute2,
+            l0 = DataObject_New ( T_LC_NEW, word, 0, word->CAttribute, word->CAttribute2,
                 T_LISP_SYMBOL | word->LAttribute, 0, word->Lo_Value, 0, - 1, scwi ) ;
         }
     }
@@ -28,13 +28,13 @@ _LO_Read_DoWord ( LambdaCalculus * lc, Word * word, int64 qidFlag, int64 scwi )
         Word_Eval ( word ) ;
         token1 = ( byte * ) DataStack_Pop ( ) ;
         SetState ( lc, ( LC_READ ), true ) ;
-        l0 = _DataObject_New ( T_LC_LITERAL, 0, token1, LITERAL, word->CAttribute2, word->LAttribute, 0, 0, 0, - 1, scwi ) ;
+        l0 = DataObject_New ( T_LC_LITERAL, 0, token1, LITERAL, word->CAttribute2, word->LAttribute, 0, 0, 0, - 1, scwi ) ;
     }
     else
     {
         DEBUG_SETUP ( word ) ;
         if ( word->CAttribute & NAMESPACE_TYPE ) _DataObject_Run ( word ) ;
-        l0 = _DataObject_New ( T_LC_NEW, word, 0, word->CAttribute, word->CAttribute2,
+        l0 = DataObject_New ( T_LC_NEW, word, 0, word->CAttribute, word->CAttribute2,
             ( T_LISP_SYMBOL | word->LAttribute ), 0, word->Lo_Value, 0, - 1, scwi ) ;
     }
     return l0 ;
@@ -54,7 +54,7 @@ _LO_Read_DoToken ( LambdaCalculus * lc, byte * token, int64 qidFlag, int64 scwi 
     else
     {
         Lexer_ParseObject ( lexer, token ) ;
-        l0 = _DataObject_New ( T_LC_LITERAL, 0, token, 0, 0, 0, qidFlag, 0, 0, - 1, scwi ) ;
+        l0 = DataObject_New ( T_LC_LITERAL, 0, token, 0, 0, 0, qidFlag, 0, 0, - 1, scwi ) ;
     }
     if ( l0 )
     {
