@@ -181,7 +181,8 @@ CfrTil_ArrayBegin ( void )
                 _Compile_GetVarLitObj_LValue_To_Reg ( baseObject, ACC ) ;
                 _Word_CompileAndRecord_PushReg ( baseObject, ACC ) ;
             }
-            else CfrTil_OptimizeOff ( ) ;
+            else //arrayBaseObject->StackPushRegisterCode = 0 ; // this must be an alternative to optimizeOff
+                CfrTil_OptimizeOff ( ) ;
             compiler->ArrayEnds = 0 ; // reset for next array word in the current word being compiled
         }
         if ( ( ! Lexer_IsTokenForwardDotted ( cntx->Lexer0 ) ) && ( ! GetState ( cntx->Compiler0, LC_ARG_PARSING ) ) ) cntx->Interpreter0->BaseObject = 0 ;

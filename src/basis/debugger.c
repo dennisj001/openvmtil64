@@ -119,7 +119,7 @@ _Debugger_Init ( Debugger * debugger, Word * word, byte * address )
     {
         // remember : _Compile_CpuState_Save ( _Debugger_->cs_Cpu ) ; is called thru _Compile_Debug : <dbg>/<dso>
         //debugger->DebugAddress = debugger->w_Word ? debugger->w_Word->Coding + 3 : ( byte* ) debugger->cs_Cpu->Rsp[1] ;
-        debugger->DebugAddress = ( byte* ) debugger->cs_Cpu->Rsp[1] ;
+        debugger->DebugAddress = ( byte* ) debugger->cs_Cpu->Rsp[2] ;
         if ( debugger->DebugAddress && ( ! word ) )
         {
             byte * da ;

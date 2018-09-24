@@ -210,7 +210,8 @@ a6.ar[2][2][1] @ 0x89 _assert //pause
     "a.ar =" ps a.ar hp nl 
     a.ar [x @][y @ ][z @] 256 dump 
 ;;
-: a9 ( Ar9 a zBreakPoint | x y z )
+'adump find wdiss
+: a9 ( Ar9 a | x y z )
     x 0 = y 0 = z 0 =  
     { z @ 256 < }
     {
@@ -219,23 +220,22 @@ a6.ar[2][2][1] @ 0x89 _assert //pause
             { x @ 256 < }
             {
                 a.ar [x @][y @][z @] x @ =
-                d: x ++  
+                x ++  
             }
             while 
             x 0 =
-            adump ( x @, y @, z @, a )
             y ++ 
         }
         while
-        z ++ 
-        { z @ zBreakPoint @ == } { break } if2 
         x 0 =
         y 0 =
+        z ++ 
     }
     while
 ;
-' a9 find wdiss pause
-"arr9" Ar9 new arr9 1 a9
+' a9 find wdiss //pause
+"arr9" Ar9 new arr9 a9
+adump ( 0 246 67 arr9 ) 
 //s pause
 #endif
 2 + 7 assertStkChk // stack checking

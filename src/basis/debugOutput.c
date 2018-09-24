@@ -77,7 +77,7 @@ Debugger_ParseFunctionLocalVariables ( Debugger * debugger, Lexer * lexer, Boole
     while ( ( token = _Lexer_ReadToken ( lexer, ( byte* ) " ,\n\r\t" ) ) )
     {
         word = Finder_Word_FindUsing ( _Finder_, token, 0 ) ;
-        if ( word && debugger->LocalsNamespace && ( word->CAttribute & ( C_TYPE | C_CLASS | NAMESPACE ) ))
+        if ( word && debugger->LocalsNamespace && ( word->CAttribute & ( C_TYPE | C_CLASS | NAMESPACE ) ) )
         {
             while ( ( token = _Lexer_ReadToken ( lexer, ( byte* ) " ,\n\r\t" ) ) )
             {
@@ -98,7 +98,7 @@ Debugger_ParseFunctionLocalVariables ( Debugger * debugger, Lexer * lexer, Boole
         else if ( ( String_Equal ( token, "(" ) ) && ( lasvf == false ) ) //|| String_Equal ( token, "(|" ) //not necessary the lexer will see only the '('
         {
             word = Finder_Word_FindUsing ( _Finder_, prevToken, 0 ) ;
-            if ( word && (word->CAttribute & PREFIX ) ) continue ;
+            if ( word && ( word->CAttribute & PREFIX ) && ( ! ( lexer->ReadLiner0->InputLineString[0] == ':' ) ) ) continue ; // not a C syntax word with internal local variables
             if ( ! ( debugger->LevelBitNamespaceMap & ( ( uint64 ) 1 << ( levelBit ) ) ) )
             {
                 debugger->LocalsNamespace = _CfrTil_Parse_LocalsAndStackVariables ( 1, 0, 0, debugger->LocalsNamespacesStack, 0 ) ;
@@ -115,7 +115,7 @@ Debugger_ParseFunctionLocalVariables ( Debugger * debugger, Lexer * lexer, Boole
             }
             if ( String_Equal ( token, "var" ) ) aToken = prevToken ;
             else aToken = Lexer_PeekNextNonDebugTokenWord ( _Lexer_, 0 ) ;
-            _CfrTil_LocalWord (aToken, LOCAL_VARIABLE, 0, 0, COMPILER_TEMP ) ;
+            _CfrTil_LocalWord ( aToken, LOCAL_VARIABLE, 0, 0, COMPILER_TEMP ) ;
         }
         else if ( String_Equal ( token, "<end>" ) ) return ;
         prevToken = token ;
@@ -339,7 +339,7 @@ Debugger_ShowEffects ( Debugger * debugger, Boolean stepFlag, Boolean forceFlag 
 // hopefully this can also be used by SC_PrepareDbgSourceCodeString
 
 byte *
-_PrepareDbgSourceCodeString (Word * word, byte * il, int64 tvw)
+_PrepareDbgSourceCodeString ( Word * word, byte * il, int64 tvw )
 {
     byte * cc_line ;
     char * nvw = ( char* ) Buffer_Data_Cleared ( _CfrTil_->DebugB ) ; // nvw : new view window
@@ -409,7 +409,7 @@ _PrepareDbgSourceCodeString (Word * word, byte * il, int64 tvw)
 // lef : left ellipsis flag, ref : right ellipsis flag
 
 byte *
-Debugger_PrepareDbgSourceCodeString (Debugger * debugger, Word * word, int64 twAlreayUsed )
+Debugger_PrepareDbgSourceCodeString ( Debugger * debugger, Word * word, int64 twAlreayUsed )
 {
     byte * cc_line ;
     if ( word )
@@ -420,7 +420,7 @@ Debugger_PrepareDbgSourceCodeString (Debugger * debugger, Word * word, int64 twA
         fel = 32 - 1 ; //fe : formatingEstimate length : 2 formats with 8/12 chars on each sude - 32/48 :: 1 : a litte leave way
         tw = Debugger_TerminalLineWidth ( debugger ) ; // 139 ; //139 : nice width :: Debugger_TerminalLineWidth ( debugger ) ; 
         tvw = tw - ( twAlreayUsed - fel ) ; //subtract the formatting chars which don't add to visible length
-        cc_line = _PrepareDbgSourceCodeString (word, il, tvw) ;
+        cc_line = _PrepareDbgSourceCodeString ( word, il, tvw ) ;
     }
     else cc_line = ( byte* ) "" ; // nts : new token start is a index into b - the nwv buffer
     return cc_line ;
@@ -484,7 +484,7 @@ next:
                         word->ContainingNamespace ? ( char* ) word->ContainingNamespace->Name : ( char* ) "<literal>",
                         ( char* ) cc_Token, ( uint64 ) word ) ;
                 }
-                cc_line = Debugger_PrepareDbgSourceCodeString (debugger, word, ( int64 ) Strlen ( obuffer ) ) ;
+                cc_line = Debugger_PrepareDbgSourceCodeString ( debugger, word, ( int64 ) Strlen ( obuffer ) ) ;
                 Strncat ( obuffer, cc_line, BUFFER_SIZE ) ;
                 _Printf ( ( byte* ) "%s", obuffer ) ;
 
