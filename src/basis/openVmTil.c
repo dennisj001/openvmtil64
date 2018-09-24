@@ -1,5 +1,5 @@
 #include "../include/cfrtil64.h"
-#define VERSION ((byte*) "0.855.000" ) 
+#define VERSION ((byte*) "0.855.100" ) 
 
 OpenVmTil * _Q_ ;
 

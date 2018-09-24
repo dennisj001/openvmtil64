@@ -33,7 +33,6 @@ CfrTil_IncDec ( int64 op ) // +
         if ( nextWord && ( nextWord->CAttribute & ( CATEGORY_OP_ORDERED | CATEGORY_OP_UNORDERED | CATEGORY_OP_DIVIDE | CATEGORY_OP_EQUAL ) ) ) // postfix
         {
             List_DropN ( _CfrTil_->CompilerWordList, 1 ) ; // the operator; let higher level see the variable
-            //Interpreter_InterpretNextToken ( cntx->Interpreter0 ) ;
             if ( GetState ( compiler, C_INFIX_EQUAL ) && GetState ( _CfrTil_, OPTIMIZE_ON ) && CompileMode )
             {
                 if ( one ) SetHere (one->Coding, 1) ;
@@ -58,7 +57,7 @@ CfrTil_IncDec ( int64 op ) // +
         if ( one && one->CAttribute & ( PARAMETER_VARIABLE | LOCAL_VARIABLE | NAMESPACE_VARIABLE ) )
         {
             //if ( ( ! ( two->CAttribute & ( KEYWORD ) ) ) && GetState ( _Context_, C_SYNTAX ) )
-            if ( GetState ( _Context_, C_SYNTAX ) )
+            //if ( GetState ( _Context_, C_SYNTAX ) )
             {
                 if ( ! GetState ( compiler, INFIX_LIST_INTERPRET ) )
                 {
@@ -76,11 +75,6 @@ CfrTil_IncDec ( int64 op ) // +
         }
         else if ( nextWord && ( nextWord->CAttribute & ( PARAMETER_VARIABLE | LOCAL_VARIABLE | NAMESPACE_VARIABLE ) ) ) // prefix
         {
-            //List_DropN ( _CfrTil_->CompilerWordList, 1 ) ; // the operator; let higher level see the variable
-            //_Interpreter_DoWord ( cntx->Interpreter0, nextWord, - 1 ) ;
-            //_Compiler_CopyDuplicatesAndPush ( compiler, currentWord ) ; // the operator
-            //_Interpreter_DoWord ( cntx->Interpreter0, currentWord, - 1 ) ;
-            //_Compile_GetVarLitObj_RValue_To_Reg ( nextWord, R8D ) ;
             if ( String_Equal ( currentWord->Name, "++" ) ) op = INC ;
             else op = DEC ;
             if ( nextWord->CAttribute & ( PARAMETER_VARIABLE | LOCAL_VARIABLE ) )
@@ -89,14 +83,12 @@ CfrTil_IncDec ( int64 op ) // +
             }
             else // crash ; FIXME!!
             {
-                //_Compile_GetVarLitObj_RValue_To_Reg ( nextWord, R8D ) ;
                 _Compile_Move_Literal_Immediate_To_Reg ( THRU_REG, ( int64 ) nextWord->W_PtrToValue ) ;
                 Compile_Move_Rm_To_Reg ( ACC, THRU_REG, 0 ) ;
                 _Compile_Group5 ( op, REG, ACC, 0, 0, 0 ) ;
                 Compile_Move_Reg_To_Rm ( THRU_REG, ACC, 0 ) ;
 
             }
-            //_Word_CompileAndRecord_PushReg ( nextWord, R8D ) ;
             return ;
         }
         else

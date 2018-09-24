@@ -8,14 +8,16 @@ _CheckArrayDimensionForVariables_And_UpdateCompilerState ( )
     else return false ;
 }
 
-// ?!?
 // offset is calculated using this formula :
 // d1 + d2*(D1) + d3*(D2*D1) + d4*(D3*D2*D1) ...
 // where d1, d2, d3, ... are the dimension variables and D1, D2, D3, ... are the Dimension sizes
-// ?!? this formula needs a correctness proof but it has been working ?!?
 
 /*
- * This is pretty compilicated so comments are necessary ...
+ * nb. CURRENTLY USING 'LITTLE ENDIAN ARRAYS'
+ * d1 + d2*(D1) + d3*(D2*D1) + d4*(D3*D2*D1) ...
+ * where d1, d2, d3, ... are the dimension variables and D1, D2, D3, ... are the Dimension sizes :: eg. :: declared as : array [D1][D2][D3]... ; in use as : array [d1][d2][d3]...
+
+ *  * This is pretty compilicated so comments are necessary ...
  * What must be dealt with in ArrayBegin :
  * CompileMode or not; Variables in array dimensions or not => 4 combinations
  *      - each dimension produces an offset which is added to any previous AccumulatedOffset (in R8) which is finally added to the object reference pointer
@@ -46,6 +48,9 @@ _CheckArrayDimensionForVariables_And_UpdateCompilerState ( )
  *      SetCurrentAccumulatedOffset ( totalIncrement ) ;
  *  }
 
+ * nb. CURRENTLY USING 'LITTLE ENDIAN ARRAYS'
+ * d1 + d2*(D1) + d3*(D2*D1) + d4*(D3*D2*D1) ...
+ * where d1, d2, d3, ... are the dimension variables and D1, D2, D3, ... are the Dimension sizes :: eg. :: declared as : array [D1][D2][D3]... ; in use as : array [d1][d2][d3]...
  * versions > 0.854.312 : 20180920
  * could switch from little endian arrays to big endian arrays where first, left to right variable refers to
  * the largest Dimension, etc. So offset from array pointer is (for a four dimensional array) : d4*(D3*D2*D1) + d3*(D2*D1) d2*(D1) + d1 
@@ -140,6 +145,7 @@ CfrTil_ArrayBegin ( void )
     Word * baseObject = interp->BaseObject ;
     int64 saveCompileMode = GetState ( compiler, COMPILE_MODE ), svOpState = GetState ( _CfrTil_, OPTIMIZE_ON ), objSize = 0,
         variableFlag, result ;
+    SetState ( compiler, ARRAY_COMPILING, true ) ;
     if ( baseObject )
     {
         Word * arrayBaseObject = 0 ;

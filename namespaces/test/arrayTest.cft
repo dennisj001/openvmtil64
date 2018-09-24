@@ -129,7 +129,6 @@ arr1 arr2 // should print decimal 0x89
 ;
 ' a3 find wdiss //pause
 1 arr1 a3
-TODO ( "fix optimized arrays; reorganize array.c" ) //pause
 arr1.ar[2] @ 0x89 _assert
 
 "Ar2" class :{ int64 ar [4][4] };
@@ -175,7 +174,7 @@ nl "a6 : " ps location a6.ar[1][2] 16 dump
 : a8 ( Ar3 a ) 
     a.ar[1][2][1] a.ar[2][2][1] @ = 
     nl "a8.a : " ps location a size @ dump
-#if 0 // this should work !?
+#if 1 // this should work !?
     a.ar[1][2][1] dup hp @ dup hp 0x89 _assert 
     a.ar[2][2][1] dup hp @ dup hp 0x89 _assert 
 #else
@@ -199,7 +198,7 @@ a6 a8
 a6.ar[2][2][1] @ 0x89 _assert //pause
 "a6 : " ps location a6.ar[2][2][1] 16 dump //pause
 0 2 1 a6 a7
-//a7(0,2,1,a6)
+//a7(0,2,1,a6) // not a prefix function
 "a6 : " ps location a6 72 dump //pause
 "Ar9" class :{ byte ar [256][256][256] };
 : adump ( x y z Ar9 a )
@@ -220,22 +219,22 @@ a6.ar[2][2][1] @ 0x89 _assert //pause
             { x @ 256 < }
             {
                 a.ar [x @][y @][z @] x @ =
-                x ++ drop // nb. drop must be here if not c_syntax 
+                d: x ++  
             }
             while 
             x 0 =
             adump ( x @, y @, z @, a )
-            y ++ drop           
+            y ++ 
         }
         while
-        z ++ drop
+        z ++ 
         { z @ zBreakPoint @ == } { break } if2 
         x 0 =
         y 0 =
     }
     while
 ;
-' a9 find wdiss
+' a9 find wdiss pause
 "arr9" Ar9 new arr9 1 a9
 //s pause
 #endif
