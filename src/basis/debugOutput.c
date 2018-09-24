@@ -76,8 +76,17 @@ Debugger_ParseFunctionLocalVariables ( Debugger * debugger, Lexer * lexer, Boole
     debugger->LevelBitNamespaceMap = 0 ;
     while ( ( token = _Lexer_ReadToken ( lexer, ( byte* ) " ,\n\r\t" ) ) )
     {
-        Word * word = Finder_Word_FindUsing ( _Interpreter_->Finder0, token, 0 ) ;
-        if ( String_Equal ( token, "{" ) ) levelBit ++ ;
+        word = Finder_Word_FindUsing ( _Finder_, token, 0 ) ;
+        if ( word && debugger->LocalsNamespace && ( word->CAttribute & ( C_TYPE | C_CLASS | NAMESPACE ) ))
+        {
+            while ( ( token = _Lexer_ReadToken ( lexer, ( byte* ) " ,\n\r\t" ) ) )
+            {
+                if ( String_Equal ( token, ";" ) ) break ;
+                Word * lword = _CfrTil_LocalWord ( token, LOCAL_VARIABLE, 0, 0, COMPILER_TEMP ) ; //_CfrTil_LocalWord (token, LOCAL_VARIABLE, 0, 0, COMPILER_TEMP ) ;
+                Namespace_DoAddWord ( debugger->LocalsNamespace, lword ) ;
+            }
+        }
+        else if ( String_Equal ( token, "{" ) ) levelBit ++ ;
         else if ( String_Equal ( token, "}" ) )
         {
             if ( -- levelBit <= 0 )
@@ -89,7 +98,7 @@ Debugger_ParseFunctionLocalVariables ( Debugger * debugger, Lexer * lexer, Boole
         else if ( ( String_Equal ( token, "(" ) ) && ( lasvf == false ) ) //|| String_Equal ( token, "(|" ) //not necessary the lexer will see only the '('
         {
             word = Finder_Word_FindUsing ( _Finder_, prevToken, 0 ) ;
-            if ( word->CAttribute & PREFIX ) continue ;
+            if ( word && (word->CAttribute & PREFIX ) ) continue ;
             if ( ! ( debugger->LevelBitNamespaceMap & ( ( uint64 ) 1 << ( levelBit ) ) ) )
             {
                 debugger->LocalsNamespace = _CfrTil_Parse_LocalsAndStackVariables ( 1, 0, 0, debugger->LocalsNamespacesStack, 0 ) ;
@@ -135,7 +144,7 @@ _Debugger_Locals_Show ( Debugger * debugger, Word * scWord )
 {
     if ( scWord )
     {
-        if ( ! Compiling ) // stepping
+        //if ( ! Compiling ) // stepping
         {
             _Compile_Save_C_CpuState ( _CfrTil_, 0 ) ;
             Compiler * compiler = _Context_->Compiler0 ;
@@ -173,7 +182,7 @@ _Debugger_Locals_Show ( Debugger * debugger, Word * scWord )
             d0 ( _Namespace_PrintWords ( compiler->LocalsNamespace ) ) ;
             _Compile_Restore_C_CpuState ( _CfrTil_, 0 ) ;
         }
-        else _Debugger_Locals_Show_Loop ( debugger, scWord ) ;
+        //else _Debugger_Locals_Show_Loop ( debugger, scWord ) ;
     }
 }
 

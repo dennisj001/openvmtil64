@@ -374,7 +374,7 @@ Root
 '_doDemo 1 const    
 'todo 0 const    
 dbgOff
-//dbgOn 
+dbgOn 
 #if Is_DebugOn 
 
 #if todo
@@ -390,23 +390,6 @@ demo
 stringMacrosOff
 
 #else // of course you can trim this file to your needs and put your personal init code here maybe
-
-#if 0
-: fibBN ( n | fn, REG fn1, REG fn2 -- TOS ) 
-    { fn 0 = fn1 0 = fn2 1 = } { n @ 0 > } { n 1 -= } 
-    {   
-        fn1 fn2 @ = 
-        fn2 fn @ = 
-        fn fn1 @ fn2 @ + = 
-    }
-    for
-    // svn @ fprint ":" ps fn @ fprint 
-    fn @
-    //dup <dbg> nl p
-;
-//' fibBN find wdiss
-20 fibBN dup p 6765 _assert 
-#endif
 
 #endif
 

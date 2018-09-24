@@ -8,7 +8,7 @@ Debugger_ShowDbgSourceCodeAtAddress ( Debugger * debugger, byte * address )
     Word * scWord = Get_SourceCodeWord ( ) ;
     if ( scWord )
     {
-        dllist * list = scWord->W_SC_WordList ; //? scWord->W_SC_WordList : _CfrTil_->CompilerWordList ; //&& ( scWord->W_SC_MemSpaceRandMarker == _Q_->MemorySpace0->TempObjectSpace->InitFreedRandMarker ) ) ? scWord->W_SC_WordList : 0 ; //_CfrTil_->CompilerWordList ;
+        dllist * list = scWord->W_SC_WordList ? scWord->W_SC_WordList : _CfrTil_->CompilerWordList ; //&& ( scWord->W_SC_MemSpaceRandMarker == _Q_->MemorySpace0->TempObjectSpace->InitFreedRandMarker ) ) ? scWord->W_SC_WordList : 0 ; //_CfrTil_->CompilerWordList ;
         if ( list )
         {
             byte *sourceCode = scWord->W_SourceCode ? scWord->W_SourceCode : String_New ( _CfrTil_->SC_Buffer, TEMPORARY ) ;
@@ -573,7 +573,7 @@ CfrTil_AppendCharToSourceCode ( CfrTil * cfrtil, byte c, int64 convertToSpaceFla
 Word *
 Get_SourceCodeWord ( )
 {
-    Word * scWord = _CfrTil_->ScWord ; //? _CfrTil_->ScWord : Compiling ? _CfrTil_->CurrentWordCompiling : _CfrTil_->LastFinished_DObject ;
+    Word * scWord = _CfrTil_->ScWord ? _CfrTil_->ScWord : Compiling ? _CfrTil_->CurrentWordCompiling : _CfrTil_->LastFinished_DObject ;
     return scWord ;
 }
 

@@ -68,13 +68,13 @@ Compile_ArrayDimensionOffset ( Word * word, int64 dimSize, int64 objSize )
         {
             SetHere ( word->StackPushRegisterCode, 1 ) ;
             //_Compile_IMULI ( int64 mod, int64 reg, int64 rm, int64 sib, int64 disp, int64 imm, int64 size )
-            if ( size ) Compile_IMULI ( REG, ACC, ACC, 0, 0, size ) ;
+            if ( size > 1 ) Compile_IMULI ( REG, ACC, ACC, 0, 0, size ) ;
             //Compile_ADD( toRegOrMem, mod, reg, rm, sib, disp, isize ) 
             Compile_ADD ( MEM, MEM, ACC, DSP, 0, 0, CELL ) ;
         }
         else
         {
-            if ( size ) Compile_IMULI ( MEM, ACC, DSP, 0, 0, size ) ;
+            if ( size > 1 ) Compile_IMULI ( MEM, ACC, DSP, 0, 0, size ) ;
             _Compile_Stack_DropN ( DSP, 1 ) ; // drop the array index
             Compile_ADD ( MEM, MEM, ACC, DSP, 0, 0, CELL ) ;
         }

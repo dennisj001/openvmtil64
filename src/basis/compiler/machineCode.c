@@ -454,6 +454,7 @@ Compile_X_Group5 ( Compiler * compiler, int64 op )
         _Compile_Group5 ( op, MEM, DSP, 0, 0, 0 ) ;
     }
     Compiler_Set_BI_setTtnn ( _Context_->Compiler0, TTT_ZERO, NEGFLAG_NZ, TTT_ZERO, NEGFLAG_Z ) ;
+    //if ( ( op != INC ) && ( op != DEC ) ) 
     _Word_CompileAndRecord_PushReg ( CfrTil_WordList ( 0 ), optInfo->Optimize_Reg ) ; // 0 : ?!? should be the exact variable 
 }
 

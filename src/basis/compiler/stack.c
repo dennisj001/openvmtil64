@@ -182,7 +182,8 @@ _Compile_Stack_Dup ( Boolean stackReg )
     else
     {
         Word * one = CfrTil_WordList ( 1 ) ;
-        if ( one->StackPushRegisterCode )
+        //if ( one->StackPushRegisterCode ) // for now an object may have an array offset that needs to be considered
+        if ( (! (one->CAttribute & OBJECT)) && one->StackPushRegisterCode ) // for now an object may have an array offset that needs to be considered
         {
             SetHere (one->StackPushRegisterCode, 1) ;
             Compile_ADDI ( REG, DSP, 0, 2 * CELL, 0 ) ;

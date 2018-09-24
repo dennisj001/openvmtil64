@@ -58,6 +58,7 @@ CfrTil_IncDec ( int64 op ) // +
         if ( one && one->CAttribute & ( PARAMETER_VARIABLE | LOCAL_VARIABLE | NAMESPACE_VARIABLE ) )
         {
             //if ( ( ! ( two->CAttribute & ( KEYWORD ) ) ) && GetState ( _Context_, C_SYNTAX ) )
+            if ( GetState ( _Context_, C_SYNTAX ) )
             {
                 if ( ! GetState ( compiler, INFIX_LIST_INTERPRET ) )
                 {

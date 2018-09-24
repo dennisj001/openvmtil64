@@ -69,14 +69,8 @@ CfrTil_PokeRegAtAddress ( ) // @
 void
 CfrTil_Peek ( ) // @
 {
-    if ( CompileMode )
-    {
-        Compile_Peek ( _Context_->Compiler0, DSP ) ;
-    }
-    else
-    {
-        TOS = * ( int64* ) TOS ;
-    }
+    if ( CompileMode ) Compile_Peek ( _Context_->Compiler0, DSP ) ;
+    else TOS = * ( int64* ) TOS ;
 }
 
 // ( addr n -- ) // (*addr) = n
@@ -84,10 +78,7 @@ CfrTil_Peek ( ) // @
 void
 CfrTil_Poke ( ) // = 
 {
-    if ( CompileMode )
-    {
-        Compile_Poke ( _Context_->Compiler0, DSP ) ;
-    }
+    if ( CompileMode ) Compile_Poke ( _Context_->Compiler0, DSP ) ;
     else
     {
         uint64 * tos = ( uint64 * ) TOS ;
@@ -101,10 +92,7 @@ CfrTil_Poke ( ) // =
 void
 CfrTil_AtEqual ( ) // !
 {
-    if ( CompileMode )
-    {
-        Compile_AtEqual ( DSP ) ;
-    }
+    if ( CompileMode ) Compile_AtEqual ( DSP ) ;
     else
     {
         *( int64* ) _Dsp_ [ - 1 ] = * ( int64* ) TOS ;
@@ -118,10 +106,7 @@ CfrTil_AtEqual ( ) // !
 void
 CfrTil_Store ( ) // !
 {
-    if ( CompileMode )
-    {
-        Compile_Store ( _Context_->Compiler0, DSP ) ;
-    }
+    if ( CompileMode ) Compile_Store ( _Context_->Compiler0, DSP ) ;
     else
     {
         * ( int64* ) ( TOS ) = _Dsp_ [ - 1 ] ;

@@ -45,15 +45,8 @@ _CfrTil_Push ( int64 value )
 void
 CfrTil_Dup ( )
 {
-    if ( CompileMode )
-    {
-        _Compile_Stack_Dup ( DSP ) ;
-    }
-    else
-    {
-
-        DataStack_Dup ( ) ;
-    }
+    if ( CompileMode ) _Compile_Stack_Dup ( DSP ) ;
+    else DataStack_Dup ( ) ;
 }
 #if 0
 void

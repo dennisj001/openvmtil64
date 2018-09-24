@@ -208,9 +208,10 @@ a6.ar[2][2][1] @ 0x89 _assert //pause
     ": x =" ps x @ p 
     "y =" ps y @ p 
     "z =" ps z @ p nl 
-    a.ar [x @][y @ ][z @] 256 dump
+    "a.ar =" ps a.ar hp nl 
+    a.ar [x @][y @ ][z @] 256 dump 
 ;;
-: a9 ( Ar9 a | x y z )
+: a9 ( Ar9 a zBreakPoint | x y z )
     x 0 = y 0 = z 0 =  
     { z @ 256 < }
     {
@@ -218,25 +219,24 @@ a6.ar[2][2][1] @ 0x89 _assert //pause
         {
             { x @ 256 < }
             {
-                a.ar [x @][y @][z @] x @ = 
-                x ++
+                a.ar [x @][y @][z @] x @ =
+                x ++ drop // nb. drop must be here if not c_syntax 
             }
             while 
             x 0 =
-            adump ( x @, y @, z @, a.ar )
-            y ++
-            //{ y @ 64 == } { break } if2 // ?? we have a memory allocation problem if we try to go to conclusion ??
+            adump ( x @, y @, z @, a )
+            y ++ drop           
         }
         while
-        z ++
-        { z @ 1 == } { break } if2 // ?? we have a memory allocation problem if we try to go to conclusion ??
+        z ++ drop
+        { z @ zBreakPoint @ == } { break } if2 
         x 0 =
         y 0 =
     }
     while
 ;
 ' a9 find wdiss
-//"arr9" Ar9 new arr9 a9
+"arr9" Ar9 new arr9 1 a9
 //s pause
 #endif
 2 + 7 assertStkChk // stack checking

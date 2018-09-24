@@ -10,22 +10,17 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/home/dennisj/openvmtil64/src/basis/lc/apply.c</file>
-            <file>file:/home/dennisj/openvmtil64/src/basis/core/block.c</file>
-            <file>file:/home/dennisj/openvmtil64/src/basis/lc/special.c</file>
-            <file>file:/home/dennisj/openvmtil64/src/primitives/debuggers.c</file>
-            <file>file:/home/dennisj/openvmtil64/src/basis/core/interpret.c</file>
-            <file>file:/home/dennisj/openvmtil64/src/basis/exception.c</file>
-            <file>file:/home/dennisj/openvmtil64/src/basis/colors.c</file>
-            <file>file:/home/dennisj/openvmtil64/src/basis/openVmTil.c</file>
-            <file>file:/home/dennisj/openvmtil64/src/basis/lc/eval.c</file>
-            <file>file:/home/dennisj/openvmtil64/src/basis/lc/lambdaCalculus.c</file>
-            <file>file:/home/dennisj/openvmtil64/src/basis/core/cstack.c</file>
+            <file>file:/home/dennisj/openvmtil64/src/primitives/stacks.c</file>
             <file>file:/home/dennisj/openvmtil64/src/basis/debugger.c</file>
-            <file>file:/home/dennisj/openvmtil64/src/basis/core/dataObjectRun.c</file>
+            <file>file:/home/dennisj/openvmtil64/src/basis/sourceCode.c</file>
+            <file>file:/home/dennisj/openvmtil64/src/basis/core/dataObjectNew.c</file>
+            <file>file:/home/dennisj/openvmtil64/src/primitives/debuggers.c</file>
+            <file>file:/home/dennisj/openvmtil64/src/basis/compiler/stack.c</file>
             <file>file:/home/dennisj/openvmtil64/src/basis/debugOutput.c</file>
-            <file>file:/home/dennisj/openvmtil64/src/basis/core/word.c</file>
-            <file>file:/home/dennisj/openvmtil64/src/basis/core/dllist.c</file>
+            <file>file:/home/dennisj/openvmtil64/src/basis/debugStepping.c</file>
+            <file>file:/home/dennisj/openvmtil64/src/basis/compiler/arrays.c</file>
+            <file>file:/home/dennisj/openvmtil64/src/basis/compiler/blocks.c</file>
+            <file>file:/home/dennisj/openvmtil64/src/basis/openVmTil.c</file>
         </group>
     </open-files>
 </project-private>
