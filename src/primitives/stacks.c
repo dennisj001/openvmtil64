@@ -137,7 +137,7 @@ CfrTil_PrintRspRegStack ( )
 void
 CfrTil_PrintReturnStack ( )
 {
-    _CfrTil_PrintNReturnStack ( 8 ) ;
+    _CfrTil_PrintNReturnStack ( 8, 1 ) ;
     CfrTil_NewLine ( ) ;
 
 }
@@ -149,7 +149,7 @@ CfrTil_PrintNReturnStack ( )
     // Intel SoftwareDevelopersManual-253665.pdf section 6.2 : a push decrements ESP, a pop increments ESP
     // therefore TOS is in lower mem addresses, bottom of stack is in higher memory addresses
     int64 size = DataStack_Pop ( ) ;
-    _CfrTil_PrintNReturnStack ( size ) ;
+    _CfrTil_PrintNReturnStack ( size, 1 ) ;
     CfrTil_NewLine () ;
 }
 

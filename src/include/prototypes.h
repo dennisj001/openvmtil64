@@ -705,7 +705,7 @@ void Stack_Init(Stack *stack);
 Stack *Stack_New(int64 slots, uint64 type);
 Stack *Stack_Copy(Stack *stack, uint64 type);
 void _PrintNStackWindow(uint64 *reg, byte *name, byte *regName, int64 size);
-void _CfrTil_PrintNReturnStack(int64 size);
+void _CfrTil_PrintNReturnStack(int64 size, Boolean useExistingFlag);
 void _CfrTil_PrintNDataStack(int64 size);
 /* basis/core/classes.c */
 void CfrTil_ClassStructureEnd(void);
@@ -1424,6 +1424,7 @@ void _Debugger_PreSetup(Debugger *debugger, Word *word, Boolean forceFlag);
 void Debugger_On(Debugger *debugger);
 void _Debugger_Off(Debugger *debugger);
 void Debugger_Off(Debugger *debugger, int64 debugOffFlag);
+byte *Debugger_GetDbgAddressFromRsp(Debugger *debugger);
 void _Debugger_Init(Debugger *debugger, Word *word, byte *address);
 byte *Debugger_GetStateString(Debugger *debugger);
 void Debugger_NextToken(Debugger *debugger);

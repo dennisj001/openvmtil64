@@ -392,10 +392,10 @@ _PrintNStackWindow ( uint64 * reg, byte * name, byte * regName, int64 size )
 }
 
 void
-_CfrTil_PrintNReturnStack ( int64 size )
+_CfrTil_PrintNReturnStack ( int64 size, Boolean useExistingFlag )
 {
     Debugger * debugger = _Debugger_ ;
-    if ( GetState ( debugger, DBG_STEPPING ) && debugger->CopyRSP )
+    if ( useExistingFlag && GetState ( debugger, DBG_STEPPING ) && debugger->CopyRSP )
     {
         _PrintNStackWindow ( ( uint64* ) debugger->CopyRSP, ( byte * ) "ReturnStackCopy", ( byte * ) "RSCP", size ) ;
     }
@@ -405,7 +405,7 @@ _CfrTil_PrintNReturnStack ( int64 size )
         _PrintNStackWindow ( ( uint64* ) _CfrTil_->cs_Cpu->Rsp, ( byte * ) "CpuState->Rsp", ( byte * ) "CpuState->Rsp", size ) ;
     }
 #endif
-    else if ( debugger->cs_Cpu->Rsp ) //debugger->DebugESP )
+    else if ( useExistingFlag && debugger->cs_Cpu->Rsp ) //debugger->DebugESP )
     {
         //_PrintNStackWindow ( ( uint64* ) debugger->DebugESP, ( byte * ) "Return Stack", ( byte * ) "DebugRsp", size ) ;
         _PrintNStackWindow ( ( uint64* ) debugger->cs_Cpu->Rsp, ( byte * ) "Return Stack", ( byte * ) "Rsp (RSP)", size ) ;

@@ -103,6 +103,28 @@ Debugger_Off ( Debugger * debugger, int64 debugOffFlag )
     }
 }
 
+// Debugger_GetDbgAddressFromRsp needs work
+byte *
+Debugger_GetDbgAddressFromRsp ( Debugger * debugger )
+{
+    int64 i ;
+    for ( i = 1 ; (i<10) ; i ++ )
+    {
+        debugger->DebugAddress = (( byte* ) debugger->cs_Cpu->Rsp[i]) ; 
+        debugger->w_Word = Word_GetFromCodeAddress ( debugger->DebugAddress ) ;
+        if ( debugger->w_Word == _Context_->CurrentlyRunningWord ) 
+        {
+            if ( i > 2 ) 
+            {
+                debugger->DebugAddress = (( byte* ) debugger->cs_Cpu->Rsp[i-1]) ;
+                debugger->w_Word = Word_GetFromCodeAddress ( debugger->DebugAddress ) ;
+            }
+            break ;
+        }
+    }
+    return debugger->DebugAddress ; 
+}
+
 void
 _Debugger_Init ( Debugger * debugger, Word * word, byte * address )
 {
@@ -119,13 +141,15 @@ _Debugger_Init ( Debugger * debugger, Word * word, byte * address )
     {
         // remember : _Compile_CpuState_Save ( _Debugger_->cs_Cpu ) ; is called thru _Compile_Debug : <dbg>/<dso>
         //debugger->DebugAddress = debugger->w_Word ? debugger->w_Word->Coding + 3 : ( byte* ) debugger->cs_Cpu->Rsp[1] ;
-        debugger->DebugAddress = ( byte* ) debugger->cs_Cpu->Rsp[2] ;
-        if ( debugger->DebugAddress && ( ! word ) )
+        debugger->DebugAddress = Debugger_GetDbgAddressFromRsp ( debugger ) ; //( byte* ) debugger->cs_Cpu->Rsp[1] ;
+        if ( debugger->DebugAddress && ( ! debugger->w_Word ) )
         {
             byte * da ;
+#if 0            
             debugger->w_Word = word = Word_GetFromCodeAddress ( debugger->DebugAddress ) ;
+#endif            
             byte * offsetAddress = Calculate_Address_FromOffset_ForCallOrJump ( debugger->DebugAddress ) ;
-            if ( ! word )
+            if ( ! debugger->w_Word )
             {
                 da = debugger->DebugAddress ;
                 debugger->w_Word = word = Word_GetFromCodeAddress ( offsetAddress ) ;
@@ -135,7 +159,7 @@ _Debugger_Init ( Debugger * debugger, Word * word, byte * address )
                 if ( ! word )
                 {
                     AlertColors ;
-                    _CfrTil_PrintNReturnStack ( 8 ) ;
+                    _CfrTil_PrintNReturnStack ( 8, 1 ) ;
                     debugger->w_Word = _Context_->CurrentlyRunningWord ;
                     debugger->DebugAddress = debugger->w_Word->CodeStart ; //Definition ; //CodeAddress ;
                     _Printf ( ( byte* ) "\n\n%s : Can't find a word at this address : 0x%016lx : or it offset adress : 0x%016lx :  "
@@ -143,7 +167,7 @@ _Debugger_Init ( Debugger * debugger, Word * word, byte * address )
                         Context_Location ( ), da, offsetAddress, debugger->w_Word->Name, debugger->DebugAddress, debugger->DebugRSP ? debugger->DebugRSP [1] : 0 ) ; //but here is some disassembly at the considered \"EIP address\" : \n" ) ;
                     DebugColors ;
                 }
-                _CfrTil_PrintNReturnStack ( 4 ) ;
+                _CfrTil_PrintNReturnStack ( 4, 1 ) ;
             }
         }
     }
@@ -419,7 +443,7 @@ void
 Debugger_Escape ( Debugger * debugger )
 {
     uint64 saveSystemState = _Context_->System0->State ;
-    uint64 saveDebuggerState = debugger->State, svScState = GetState ( _CfrTil_, SOURCE_CODE_ON )  ;
+    uint64 saveDebuggerState = debugger->State, svScState = GetState ( _CfrTil_, SOURCE_CODE_ON ) ;
     SetState ( _CfrTil_, SOURCE_CODE_ON, false ) ;
     SetState ( _Context_->System0, ADD_READLINE_TO_HISTORY, true ) ;
     SetState_TrueFalse ( debugger, DBG_COMMAND_LINE | DBG_ESCAPED, DBG_ACTIVE ) ;
