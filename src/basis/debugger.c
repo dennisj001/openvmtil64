@@ -22,6 +22,11 @@ _Debugger_InterpreterLoop ( Debugger * debugger )
     if ( GetState ( debugger, DBG_STEPPED ) )
     {
         if ( debugger->w_Word ) SetState ( debugger->w_Word, STEPPED, true ) ;
+        if ( ( ! debugger->w_Word ) || GetState ( debugger->w_Word, STEPPED ) )
+        {
+            Debugger_Off ( debugger, 1 ) ;
+            siglongjmp ( _Context_->JmpBuf0, 1 ) ; //in Word_Run
+        }
     }
 }
 
@@ -106,22 +111,30 @@ Debugger_Off ( Debugger * debugger, int64 debugOffFlag )
 byte *
 Debugger_GetDbgAddressFromRsp ( Debugger * debugger )
 {
+    Word * word ;
+    byte * addr ;
     int64 i ;
-    for ( i = 1 ; i < 10 ; i ++ )
+    Stack * retStack = Stack_New ( 10, COMPILER_TEMP ) ;
+    if ( _Q_->Verbosity > 1 ) CfrTil_PrintReturnStack ( ) ;
+    Stack_Init ( debugger->ReturnStack ) ;
+    for ( i = 1 ; i < 10 ; i ++ ) // Rsp[1] is current 
     {
-        debugger->DebugAddress = ( ( byte* ) debugger->cs_Cpu->Rsp[i] ) ;
-        debugger->w_Word = Word_GetFromCodeAddress ( debugger->DebugAddress ) ;
-        if ( debugger->w_Word == _Context_->CurrentlyRunningWord )
+        addr = ( ( byte* ) debugger->cs_Cpu->Rsp[i] ) ;
+        word = Word_GetFromCodeAddress ( addr ) ;
+        if ( word )
         {
-            if ( i > 2 )
-            {
-                debugger->DebugAddress = ( ( byte* ) debugger->cs_Cpu->Rsp[i - 1] ) ;
-                debugger->w_Word = Word_GetFromCodeAddress ( debugger->DebugAddress ) ;
-            }
-            return debugger->DebugAddress ;
+            Stack_Push ( retStack, debugger->cs_Cpu->Rsp[i] ) ;
+            if ( word == _Context_->CurrentlyRunningWord ) break ;
         }
     }
-    return ( byte* ) debugger->cs_Cpu->Rsp[1]  ; // default but shouldn't come here
+    for ( i = Stack_Depth ( retStack ) ; i > 0 ; i -- )
+    {
+        byte * retAddr = (byte *) _Stack_Pop ( retStack ) ;
+        Stack_Push ( debugger->ReturnStack, (uint64) retAddr ) ;
+    }
+    debugger->DebugAddress = (byte*) Stack_Pop ( debugger->ReturnStack ) ; //( ( byte* ) debugger->cs_Cpu->Rsp[1] ) ;
+    debugger->w_Word = Word_GetFromCodeAddress ( debugger->DebugAddress ) ;
+    return debugger->DebugAddress ;
 }
 
 void
@@ -132,6 +145,7 @@ _Debugger_Init ( Debugger * debugger, Word * word, byte * address )
     debugger->SaveDsp = _Dsp_ ;
     debugger->SaveTOS = TOS ;
     debugger->Key = 0 ;
+    Stack_Init ( debugger->ReturnStack ) ;
 
     if ( address ) debugger->DebugAddress = address ;
     if ( ! GetState ( debugger, DBG_BRK_INIT ) ) debugger->State = DBG_MENU | DBG_INFO | DBG_PROMPT ;
@@ -180,7 +194,6 @@ _Debugger_Init ( Debugger * debugger, Word * word, byte * address )
     debugger->CopyRSP = 0 ;
     SetState ( debugger, ( DBG_STACK_OLD ), true ) ;
     SetState ( debugger, DBG_STEPPING, false ) ;
-    Stack_Init ( debugger->ReturnStack ) ;
 }
 
 byte *

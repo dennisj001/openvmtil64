@@ -137,7 +137,7 @@ Do_NextArrayWordToken ( Word * word, byte * token, Word * arrayBaseObject, int64
 }
 
 void
-CfrTil_ArrayBegin ( void )
+CfrTil_ArrayBegin ( )
 {
     Context * cntx = _Context_ ;
     Compiler *compiler = cntx->Compiler0 ;
@@ -200,6 +200,6 @@ void
 CfrTil_ArrayEnd ( void )
 {
     //SetState ( _Context_->Interpreter0->BaseObject, OPTIMIZE_OFF, false ) ; // possibly set in ArrayBegin
-    CfrTil_OptimizeOn ( ) ;
+    //CfrTil_OptimizeOn ( ) ;
 }
 

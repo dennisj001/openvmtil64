@@ -162,6 +162,7 @@ Debugger_CompileAndStepOneInstruction ( Debugger * debugger )
             {
                 debugger->DebugAddress = ( byte* ) _Stack_Pop ( debugger->ReturnStack ) ;
                 Debugger_GetWordFromAddress ( debugger ) ;
+                Set_DataStackPointer_FromDebuggerDspReg () ; 
             }
             else
             {
