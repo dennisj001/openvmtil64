@@ -144,6 +144,11 @@ CfrTil_PrintDataStack ( )
     _CfrTil_PrintDataStack ( ) ;
 }
 
+void
+Set_DataStackPointer_FromDebuggerDspReg ( )
+{
+    _Dsp_ = _Debugger_->cs_Cpu->R14d ;
+}
 
 void
 Set_DataStackPointer_FromDspReg ( )

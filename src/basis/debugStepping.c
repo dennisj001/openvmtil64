@@ -268,7 +268,6 @@ Debugger_PreStartStepping ( Debugger * debugger )
     {
         debugger->WordDsp = _Dsp_ ; // by 'eval' we stop debugger->Stepping and //continue thru this word as if we hadn't stepped
         Debugger_CanWeStep ( debugger, word ) ;
-#if 1        
         // we would at least need to save/restore our registers to step thru native c code
         if ( ! GetState ( debugger, DBG_CAN_STEP ) )
         {
@@ -277,13 +276,11 @@ Debugger_PreStartStepping ( Debugger * debugger )
                 word->S_ContainingNamespace ? ( byte* ) "." : ( byte* ) "", c_gu ( word->Name ),
                 GetState ( debugger, DBG_AUTO_MODE ) ? " : automode turned off" : "",
                 debugger->DebugAddress ) ;
-            //if ( debugger->DebugAddress ) Debugger_UdisOneInstruction ( debugger, debugger->DebugAddress, ( byte* ) "", ( byte* ) "" ) ; // the next instruction
             Debugger_Eval ( debugger ) ;
             SetState ( _Debugger_, DBG_AUTO_MODE, false ) ; //if ( GetState ( debugger, DBG_AUTO_MODE ) )
             return ;
         }
         else
-#endif            
         {
             Debugger_SetupStepping ( debugger ) ;
             SetState ( debugger, DBG_NEWLINE | DBG_PROMPT | DBG_INFO, false ) ;
@@ -311,22 +308,15 @@ Debugger_Step ( Debugger * debugger )
 void
 Debugger_AfterStep ( Debugger * debugger )
 {
-    //if ( ( _Q_->Verbosity > 3 ) && ( debugger->cs_Cpu->Rsp != debugger->LastRsp ) ) Debugger_PrintReturnStackWindow ( ) ;
     debugger->LastRsp = debugger->cs_Cpu->Rsp ;
-
-    //_Debugger_SyncStackPointersFromCpuState ( debugger ) ;
-
     if ( ( int64 ) debugger->DebugAddress ) // set by StepOneInstruction
     {
         debugger->SteppedWord = debugger->w_Word ;
-        //debugger->w_Word = Debugger_GetWordFromAddress ( debugger ) ;
         SetState_TrueFalse ( debugger, DBG_STEPPING, ( DBG_INFO | DBG_MENU | DBG_PROMPT ) ) ;
     }
     else
     {
         SetState_TrueFalse ( debugger, DBG_PRE_DONE | DBG_STEPPED | DBG_NEWLINE | DBG_PROMPT | DBG_INFO, DBG_STEPPING ) ;
-        //if ( GetState ( debugger, DBG_DONE ) ) SetState ( _CfrTil_, DEBUG_MODE, false ) ;
-
         return ;
     }
 }
@@ -343,13 +333,11 @@ _Debugger_SetupStepping ( Debugger * debugger, Word * word, byte * address, byte
     SetState_TrueFalse ( debugger, DBG_STEPPING, DBG_NEWLINE | DBG_PROMPT | DBG_INFO | DBG_MENU ) ;
     debugger->DebugAddress = address ;
     debugger->w_Word = word ;
-    //if ( ! GetState ( debugger, ( DBG_BRK_INIT ) ) ) Debugger_CheckSaveCpuState ( debugger ) ;
     if ( ! GetState ( debugger, DBG_BRK_INIT ) ) SetState ( debugger->cs_Cpu, CPU_SAVED, false ) ;
     SetState ( _CfrTil_->cs_Cpu, CPU_SAVED, false ) ;
     _Debugger_CpuState_CheckSave ( debugger ) ;
     _CfrTil_CpuState_CheckSave ( ) ;
     debugger->LevelBitNamespaceMap = 0 ;
-    //Stack_Init ( debugger->LocalsNamespacesStack ) ;
     SetState ( debugger, DBG_START_STEPPING, true ) ;
     CfrTil_NewLine ( ) ;
 }

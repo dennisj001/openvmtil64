@@ -14,6 +14,7 @@ Word_Run ( Word * word )
             _Context_->CurrentlyRunningWord = word ;
             Block_Eval ( word->Definition ) ;
         }
+        else  Set_DataStackPointer_FromDebuggerDspReg () ; // back from _CfrTil_DebugRuntimeBreakpoint
     }
 }
 

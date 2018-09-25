@@ -208,7 +208,7 @@ a6.ar[2][2][1] @ 0x89 _assert //pause
     "y =" ps y @ p 
     "z =" ps z @ p nl 
     "a.ar =" ps a.ar hp nl 
-    a.ar [x @][y @ ][z @] 256 <dbg> dump 
+    a.ar [x @][y @ ][z @] 256 dump 
 ;;
 'adump find wdiss
 : a9 ( Ar9 a | x y z )
@@ -229,14 +229,13 @@ a6.ar[2][2][1] @ 0x89 _assert //pause
         while
         x 0 =
         y 0 =
-        ++ z 
+        z ++
     }
     while
-    <dbg> adump ( 0 246 67 a )
 ;
 ' a9 find wdiss //pause
 "arr9" Ar9 new arr9 a9
-//adump ( 0 246 67 arr9 ) 
-s pause
+adump ( 0 246 67 arr9 ) 
+//s pause
 #endif
 2 + 7 assertStkChk // stack checking

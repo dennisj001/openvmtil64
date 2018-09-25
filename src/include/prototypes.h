@@ -883,6 +883,7 @@ void CpuState_Set_CpuStateDsp_WithDataStackPointer(Cpu *cpu);
 void _Debugger_Set_DataStackPointer_WithCpuStateDsp(Debugger *debugger);
 void _CfrTil_PrintDataStack(void);
 void CfrTil_PrintDataStack(void);
+void Set_DataStackPointer_FromDebuggerDspReg(void);
 void Set_DataStackPointer_FromDspReg(void);
 void Set_DspReg_FromDataStackPointer(void);
 void CfrTil_CheckInitDataStack(void);

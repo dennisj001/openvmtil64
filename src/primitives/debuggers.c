@@ -54,7 +54,7 @@ CfrTil_DebugOff ( )
 }
 
 void
-_CfrTil_DebugRuntimeBreakpoint (  )
+_CfrTil_DebugRuntimeBreakpoint ( )
 {
     Debugger * debugger = _Debugger_ ;
     if ( ( ! CompileMode ) )
@@ -80,24 +80,24 @@ _CfrTil_DebugRuntimeBreakpoint (  )
         _Debugger_InterpreterLoop ( debugger ) ;
         SetState ( debugger, DBG_BRK_INIT | DBG_RUNTIME_BREAKPOINT | DEBUG_SHTL_OFF, false ) ;
         // we just stepped this word and used it's arguments in the source code ; if we just return the interpreter will attempt to interpret the arguments
-#if 1  // this is only accurate if we called into a leaf function with <dbg> from C
+        // this is only accurate if we called into a leaf function with <dbg> from C
         Word * word = debugger->w_Word ;
         if ( ( ! word ) || GetState ( word, STEPPED ) )
         {
+            Debugger_Off ( debugger, 1 ) ;
             siglongjmp ( _Context_->JmpBuf0, 1 ) ; //in Word_Run
         }
-#endif            
     }
 }
 
 void
-CfrTil_DebugRuntimeBreakpoint ()
+CfrTil_DebugRuntimeBreakpoint ( )
 {
     _CfrTil_DebugRuntimeBreakpoint ( ) ;
 }
 
 void
-CfrTil_DebugRuntimeBreakpoint_dso ()
+CfrTil_DebugRuntimeBreakpoint_dso ( )
 {
     if ( Is_DebugShowOn ) _CfrTil_DebugRuntimeBreakpoint ( ) ;
 }

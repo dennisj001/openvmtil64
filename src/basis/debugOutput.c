@@ -98,7 +98,8 @@ Debugger_ParseFunctionLocalVariables ( Debugger * debugger, Lexer * lexer, Boole
         else if ( ( String_Equal ( token, "(" ) ) && ( lasvf == false ) ) //|| String_Equal ( token, "(|" ) //not necessary the lexer will see only the '('
         {
             word = Finder_Word_FindUsing ( _Finder_, prevToken, 0 ) ;
-            if ( word && ( word->CAttribute & PREFIX ) && ( ! ( lexer->ReadLiner0->InputLineString[0] == ':' ) ) ) continue ; // not a C syntax word with internal local variables
+            //if ( word && ( word->CAttribute & PREFIX ) && ( ! ( lexer->ReadLiner0->InputLineString[0] == ':' ) ) ) continue ; // not a C syntax word with internal local variables
+            if ( word && ( word->CAttribute & PREFIX ) ) continue ; // not a C syntax word with internal local variables
             if ( ! ( debugger->LevelBitNamespaceMap & ( ( uint64 ) 1 << ( levelBit ) ) ) )
             {
                 debugger->LocalsNamespace = _CfrTil_Parse_LocalsAndStackVariables ( 1, 0, 0, debugger->LocalsNamespacesStack, 0 ) ;

@@ -103,26 +103,25 @@ Debugger_Off ( Debugger * debugger, int64 debugOffFlag )
     }
 }
 
-// Debugger_GetDbgAddressFromRsp needs work
 byte *
 Debugger_GetDbgAddressFromRsp ( Debugger * debugger )
 {
     int64 i ;
-    for ( i = 1 ; (i<10) ; i ++ )
+    for ( i = 1 ; i < 10 ; i ++ )
     {
-        debugger->DebugAddress = (( byte* ) debugger->cs_Cpu->Rsp[i]) ; 
+        debugger->DebugAddress = ( ( byte* ) debugger->cs_Cpu->Rsp[i] ) ;
         debugger->w_Word = Word_GetFromCodeAddress ( debugger->DebugAddress ) ;
-        if ( debugger->w_Word == _Context_->CurrentlyRunningWord ) 
+        if ( debugger->w_Word == _Context_->CurrentlyRunningWord )
         {
-            if ( i > 2 ) 
+            if ( i > 2 )
             {
-                debugger->DebugAddress = (( byte* ) debugger->cs_Cpu->Rsp[i-1]) ;
+                debugger->DebugAddress = ( ( byte* ) debugger->cs_Cpu->Rsp[i - 1] ) ;
                 debugger->w_Word = Word_GetFromCodeAddress ( debugger->DebugAddress ) ;
             }
-            break ;
+            return debugger->DebugAddress ;
         }
     }
-    return debugger->DebugAddress ; 
+    return ( byte* ) debugger->cs_Cpu->Rsp[1]  ; // default but shouldn't come here
 }
 
 void
