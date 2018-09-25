@@ -152,7 +152,6 @@ CfrTil_ArrayBegin ( void )
         Word * word = 0 ; // word is used in DEBUG_*
         Lexer * lexer = cntx->Lexer0 ;
         byte * token = lexer->OriginalToken ;
-        baseObject->CAttribute2 |= ARRAY_TYPE ;
         CfrTil_OptimizeOn ( ) ; // internal to arrays optimize must be on
 
         arrayBaseObject = interp->LastWord ;
@@ -181,8 +180,12 @@ CfrTil_ArrayBegin ( void )
                 _Compile_GetVarLitObj_LValue_To_Reg ( baseObject, ACC ) ;
                 _Word_CompileAndRecord_PushReg ( baseObject, ACC ) ;
             }
-            else //arrayBaseObject->StackPushRegisterCode = 0 ; // this must be an alternative to optimizeOff
-                CfrTil_OptimizeOff ( ) ;
+            else
+            {
+                CfrTil_OptimizeOff ( ) ; // can't really be optimized any more anyway and optimize is turned back on after an =/store anyway
+                //baseObject->CAttribute2 |= ARRAY_TYPE ;
+                //baseObject->StackPushRegisterCode = 0 ;
+            }
             compiler->ArrayEnds = 0 ; // reset for next array word in the current word being compiled
         }
         if ( ( ! Lexer_IsTokenForwardDotted ( cntx->Lexer0 ) ) && ( ! GetState ( cntx->Compiler0, LC_ARG_PARSING ) ) ) cntx->Interpreter0->BaseObject = 0 ;
