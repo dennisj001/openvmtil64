@@ -94,7 +94,7 @@ Do_NextArrayToken ( byte * token, Word * arrayBaseObject, int64 objSize, Boolean
 {
     Context * cntx = _Context_ ;
     Interpreter * interp = cntx->Interpreter0 ;
-    Word * baseObject = interp->BaseObject ;
+    //Word * baseObject = interp->BaseObject ;
     Compiler *compiler = cntx->Compiler0 ;
     int64 arrayIndex, increment ;
     Word * word = Finder_Word_FindUsing ( cntx->Finder0, token, 0 ) ;
@@ -106,6 +106,7 @@ Do_NextArrayToken ( byte * token, Word * arrayBaseObject, int64 objSize, Boolean
     }
     else if ( token [0] == ']' ) // ']' == an "array end"
     {
+        // nb. this method produces a 'little endian array' where the earlier dimensions are smaller and increasing with dimNumber
         int64 dimNumber = compiler->ArrayEnds, dimSize = 1 ;
         while ( ( -- dimNumber ) >= 0 ) // -- : zero based ns->ArrayDimensions
         {
@@ -123,10 +124,10 @@ Do_NextArrayToken ( byte * token, Word * arrayBaseObject, int64 objSize, Boolean
             increment = arrayIndex * dimSize * objSize ; // keep a running total of 
             Compiler_IncrementCurrentAccumulatedOffset ( compiler, increment ) ;
             if ( ! CompileMode ) _DataStack_SetTop ( _DataStack_GetTop ( ) + increment ) ; // after each dimension : in the end we have one lvalue remaining on the stack
-            if ( Is_DebugModeOn ) Word_PrintOffset ( word, increment, baseObject->AccumulatedOffset ) ;
+            //if ( Is_DebugModeOn ) Word_PrintOffset ( word, increment, baseObject->AccumulatedOffset ) ;
         }
         if ( ! _Context_StringEqual_PeekNextToken ( cntx, ( byte* ) "[", 0 ) ) return 1 ; // breaks the calling function
-        DEBUG_SHOW ;
+        //DEBUG_SHOW ;
         return 0 ;
     }
     if ( *variableFlag ) Set_CompileMode ( true ) ;
@@ -139,13 +140,13 @@ Do_NextArrayToken ( byte * token, Word * arrayBaseObject, int64 objSize, Boolean
 }
 
 void
-Arrays_DoLoop_NonLisp ( Lexer * lexer, byte * token, Word * arrayBaseObject, int64 objSize, Boolean saveCompileMode, Boolean variableFlag )
+Arrays_DoArrayArgs_NonLisp ( Lexer * lexer, byte * token, Word * arrayBaseObject, int64 objSize, Boolean saveCompileMode, Boolean *variableFlag )
 {
     int64 result ;
     do
     {
         token = Lexer_ReadToken ( lexer ) ;
-        result = Do_NextArrayToken ( token, arrayBaseObject, objSize, saveCompileMode, &variableFlag ) ;
+        result = Do_NextArrayToken ( token, arrayBaseObject, objSize, saveCompileMode, variableFlag ) ;
     }
     while ( ! result ) ;
 }
@@ -160,7 +161,7 @@ _CfrTil_ArrayBegin ( Boolean lispMode, Word **pl1, int64 i )
     Word * baseObject = interp->BaseObject, *l1, * arrayBaseObject ;
     Boolean saveCompileMode = GetState ( compiler, COMPILE_MODE ), svOpState = GetState ( _CfrTil_, OPTIMIZE_ON ) ;
     int64 objSize = 0 ;
-    Boolean variableFlag ;
+    Boolean variableFlag = 0 ;
     byte * token ;
     SetState ( compiler, ARRAY_COMPILING, true ) ;
     if ( lispMode )
@@ -171,8 +172,8 @@ _CfrTil_ArrayBegin ( Boolean lispMode, Word **pl1, int64 i )
     }
     else
     {
-        token = lexer->OriginalToken ;
         arrayBaseObject = interp->LastWord ;
+        token = lexer->OriginalToken ;
     }
     if ( arrayBaseObject )
     {
@@ -183,9 +184,10 @@ _CfrTil_ArrayBegin ( Boolean lispMode, Word **pl1, int64 i )
         if ( ! objSize ) CfrTil_Exception ( OBJECT_SIZE_ERROR, 0, QUIT ) ;
         variableFlag = _CheckArrayDimensionForVariables_And_UpdateCompilerState ( ) ;
         _WordList_Pop ( _CfrTil_->CompilerWordList ) ; // pop the initial '['
-        if ( lispMode ) Arrays_DoLoop_Lisp ( pl1, l1, arrayBaseObject, objSize, saveCompileMode, variableFlag ) ;
-        else Arrays_DoLoop_NonLisp ( lexer, token, arrayBaseObject, objSize, saveCompileMode, variableFlag ) ;
-        if ( CompileMode )
+        DEBUG_SETUP ( baseObject ) ;
+        if ( lispMode ) Arrays_DoArrayArgs_Lisp ( pl1, l1, arrayBaseObject, objSize, saveCompileMode, &variableFlag ) ;
+        else Arrays_DoArrayArgs_NonLisp ( lexer, token, arrayBaseObject, objSize, saveCompileMode, &variableFlag ) ;
+        if ( CompileMode ) // update the baseObject offset 
         {
             if ( ! variableFlag )
             {
@@ -194,13 +196,12 @@ _CfrTil_ArrayBegin ( Boolean lispMode, Word **pl1, int64 i )
                 _Debugger_->StartHere = Here ; // for Debugger_DisassembleAccumulated
                 _Debugger_->EntryWord = baseObject ; // for Debugger_DisassembleAccumulated
                 _Compile_GetVarLitObj_LValue_To_Reg ( baseObject, ACC ) ;
-                _Word_CompileAndRecord_PushReg ( baseObject, ACC ) ;
                 if ( lispMode )
                 {
-                    if ( baseObject->StackPushRegisterCode ) SetHere ( baseObject->StackPushRegisterCode, 1 ) ;
                     Compile_Move_Reg_To_Reg ( RegOrder ( i ++ ), ACC ) ;
                     _Debugger_->PreHere = baseObject->Coding ;
                 }
+                else _Word_CompileAndRecord_PushReg ( baseObject, ACC ) ;
                 _DEBUG_SHOW ( baseObject, 1 ) ;
             }
             else CfrTil_OptimizeOff ( ) ; // can't really be optimized any more anyway and optimize is turned back on after an =/store anyway
@@ -227,7 +228,6 @@ CfrTil_ArrayBegin ( )
 void
 CfrTil_ArrayEnd ( void )
 {
-    //SetState ( _Context_->Interpreter0->BaseObject, OPTIMIZE_OFF, false ) ; // possibly set in ArrayBegin
-    //CfrTil_OptimizeOn ( ) ;
+    //noop
 }
 

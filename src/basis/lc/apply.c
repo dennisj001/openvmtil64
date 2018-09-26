@@ -354,73 +354,21 @@ LO_CheckBeginBlock ( )
 }
 
 void
-Arrays_DoLoop_Lisp ( Word ** pl1, Word * l1, Word * arrayBaseObject, int64 objSize, Boolean saveCompileMode, Boolean variableFlag )
+Arrays_DoArrayArgs_Lisp ( Word ** pl1, Word * l1, Word * arrayBaseObject, int64 objSize, Boolean saveCompileMode, Boolean *variableFlag )
 {
     do
     {
-        if ( Do_NextArrayToken ( l1->Name, arrayBaseObject, objSize, saveCompileMode, &variableFlag ) ) break ;
+        if ( Do_NextArrayToken ( l1->Name, arrayBaseObject, objSize, saveCompileMode, variableFlag ) ) break ;
     }
     while ( l1 = LO_Next ( l1 ) ) ;
     *pl1 = l1 ;
 }
-
-#if 0
-int64
-_LO_Apply_ArrayArg (ListObject ** pl1, int64 i )
-{
-    Context * cntx = _Context_ ;
-    ListObject *l1 = * pl1 ;
-    // nb! this block is just CfrTil_ArrayBegin in arrays.c -- refactor??
-    // ?needs :: Compiler_CopyDuplicatesAndPush somewhere
-    Interpreter * interp = cntx->Interpreter0 ;
-    Word * arrayBaseObject = ( ( Word * ) ( LO_Previous ( l1 ) ) )->Lo_CfrTilWord ;
-    Word *baseObject = interp->BaseObject ;
-    if ( arrayBaseObject )
-    {
-        Compiler *compiler = cntx->Compiler0 ;
-        int64 objSize = 0 ;
-        Boolean variableFlag, svcm = GetState ( compiler, COMPILE_MODE ) ;
-        if ( ( ! arrayBaseObject->ArrayDimensions ) ) CfrTil_Exception ( ARRAY_DIMENSION_ERROR, 0, QUIT ) ;
-        if ( interp->CurrentObjectNamespace ) objSize = interp->CurrentObjectNamespace->ObjectSize ; //_CfrTil_VariableValueGet ( _Context_->Interpreter0->CurrentClassField, ( byte* ) "size" ) ; 
-        if ( ! objSize )
-        {
-            CfrTil_Exception ( OBJECT_SIZE_ERROR, 0, QUIT ) ;
-        }
-        variableFlag = _CheckArrayDimensionForVariables_And_UpdateCompilerState ( ) ;
-        _WordList_Pop ( _CfrTil_->CompilerWordList ) ; // pop the initial '['
-        do
-        {
-            if ( Do_NextArrayToken ( l1->Name, arrayBaseObject, objSize, svcm, &variableFlag ) ) break ;
-        }
-        while ( l1 = LO_Next ( l1 ) ) ;
-        *pl1 = l1 ;
-        compiler->ArrayEnds = 0 ; // reset for next array word in the current word being compiled
-        interp->BaseObject = baseObject ; //arrayBaseObject ; // nb. : _Context_->Interpreter0->baseObject is reset by the interpreter by the types of words between array brackets
-        if ( CompileMode )
-        {
-            if ( ! variableFlag )
-            {
-                SetHere ( baseObject->Coding, 1 ) ;
-                _Compile_GetVarLitObj_LValue_To_Reg ( baseObject, ACC ) ;
-                _Word_CompileAndRecord_PushReg ( baseObject, ACC ) ;
-            }
-            if ( baseObject->StackPushRegisterCode ) SetHere ( baseObject->StackPushRegisterCode, 1 ) ;
-            Compile_Move_Reg_To_Reg ( RegOrder ( i ++ ), ACC ) ;
-            _Debugger_->PreHere = baseObject->Coding ;
-            _DEBUG_SHOW ( baseObject, 1 ) ;
-        }
-        interp->BaseObject = 0 ;
-    }
-    return i ;
-}
-#else
 
 int64
 _LO_Apply_ArrayArg (ListObject ** pl1, int64 i )
 {
     return _CfrTil_ArrayBegin ( 1, pl1, i ) ;
 }
-#endif
 
 int64
 _LO_Apply_NonMorphismArg ( LambdaCalculus * lc, ListObject ** pl1, int64 i )
@@ -442,7 +390,7 @@ _LO_Apply_NonMorphismArg ( LambdaCalculus * lc, ListObject ** pl1, int64 i )
         if ( baseObject ) _Debugger_->PreHere = baseObject->Coding ;
         SetState ( cntx, ADDRESS_OF_MODE, false ) ;
         _Debugger_->PreHere = here ;
-        _DEBUG_SHOW ( word, 1 ) ;
+        //_DEBUG_SHOW ( word, 1 ) ; // covered in Word_Eval
     }
     return i ;
 }
