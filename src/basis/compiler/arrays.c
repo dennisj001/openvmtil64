@@ -90,13 +90,15 @@ Compile_ArrayDimensionOffset ( Word * word, int64 dimSize, int64 objSize )
 // v.0.775.840
 
 int64
-Do_NextArrayWordToken ( Word * word, byte * token, Word * arrayBaseObject, int64 objSize, int64 saveCompileMode, int64 *variableFlag )
+Do_NextArrayToken ( byte * token, Word * arrayBaseObject, int64 objSize, Boolean saveCompileMode, Boolean *variableFlag )
 {
     Context * cntx = _Context_ ;
     Interpreter * interp = cntx->Interpreter0 ;
     Word * baseObject = interp->BaseObject ;
     Compiler *compiler = cntx->Compiler0 ;
     int64 arrayIndex, increment ;
+    Word * word = Finder_Word_FindUsing ( cntx->Finder0, token, 0 ) ;
+    if ( word && ( ! GetState ( cntx->Compiler0, LC_ARG_PARSING ) ) ) word->W_RL_Index = cntx->Lexer0->TokenStart_ReadLineIndex ;
     if ( token [0] == '[' ) // '[' == an "array begin"
     {
         *variableFlag = _CheckArrayDimensionForVariables_And_UpdateCompilerState ( ) ;
@@ -137,38 +139,52 @@ Do_NextArrayWordToken ( Word * word, byte * token, Word * arrayBaseObject, int64
 }
 
 void
-CfrTil_ArrayBegin ( )
+Arrays_DoLoop_NonLisp ( Lexer * lexer, byte * token, Word * arrayBaseObject, int64 objSize, Boolean saveCompileMode, Boolean variableFlag )
+{
+    int64 result ;
+    do
+    {
+        token = Lexer_ReadToken ( lexer ) ;
+        result = Do_NextArrayToken ( token, arrayBaseObject, objSize, saveCompileMode, &variableFlag ) ;
+    }
+    while ( ! result ) ;
+}
+
+int64
+_CfrTil_ArrayBegin ( Boolean lispMode, Word **pl1, int64 i )
 {
     Context * cntx = _Context_ ;
     Compiler *compiler = cntx->Compiler0 ;
     Interpreter * interp = cntx->Interpreter0 ;
-    Word * baseObject = interp->BaseObject ;
-    int64 saveCompileMode = GetState ( compiler, COMPILE_MODE ), svOpState = GetState ( _CfrTil_, OPTIMIZE_ON ), objSize = 0,
-        variableFlag, result ;
+    Lexer * lexer = cntx->Lexer0 ;
+    Word * baseObject = interp->BaseObject, *l1, * arrayBaseObject ;
+    Boolean saveCompileMode = GetState ( compiler, COMPILE_MODE ), svOpState = GetState ( _CfrTil_, OPTIMIZE_ON ) ;
+    int64 objSize = 0 ;
+    Boolean variableFlag ;
+    byte * token ;
     SetState ( compiler, ARRAY_COMPILING, true ) ;
-    if ( baseObject )
+    if ( lispMode )
     {
-        Word * arrayBaseObject = 0 ;
-        Word * word = 0 ; // word is used in DEBUG_*
-        Lexer * lexer = cntx->Lexer0 ;
-        byte * token = lexer->OriginalToken ;
+        l1 = * pl1 ;
+        arrayBaseObject = ( ( Word * ) ( LO_Previous ( l1 ) ) )->Lo_CfrTilWord ;
+        token = l1->Name ;
+    }
+    else
+    {
+        token = lexer->OriginalToken ;
+        arrayBaseObject = interp->LastWord ;
+    }
+    if ( arrayBaseObject )
+    {
         CfrTil_OptimizeOn ( ) ; // internal to arrays optimize must be on
 
-        arrayBaseObject = interp->LastWord ;
-        //Compiler_Init_AccumulatedOffsetPointers ( compiler, arrayBaseObject ) ; //baseObject ) ;
         if ( ! arrayBaseObject->ArrayDimensions ) CfrTil_Exception ( ARRAY_DIMENSION_ERROR, 0, QUIT ) ;
-        if ( interp->CurrentObjectNamespace ) objSize = interp->CurrentObjectNamespace->Size ; //_CfrTil_VariableValueGet ( cntx->Interpreter0->CurrentClassField, ( byte* ) "size" ) ; 
+        if ( interp->CurrentObjectNamespace ) objSize = interp->CurrentObjectNamespace->ObjectSize ; //_CfrTil_VariableValueGet ( cntx->Interpreter0->CurrentClassField, ( byte* ) "size" ) ; 
         if ( ! objSize ) CfrTil_Exception ( OBJECT_SIZE_ERROR, 0, QUIT ) ;
         variableFlag = _CheckArrayDimensionForVariables_And_UpdateCompilerState ( ) ;
         _WordList_Pop ( _CfrTil_->CompilerWordList ) ; // pop the initial '['
-        do
-        {
-            token = Lexer_ReadToken ( lexer ) ;
-            word = Finder_Word_FindUsing ( cntx->Finder0, token, 0 ) ;
-            if ( word && ( ! GetState ( cntx->Compiler0, LC_ARG_PARSING ) ) ) word->W_RL_Index = cntx->Lexer0->TokenStart_ReadLineIndex ;
-            result = Do_NextArrayWordToken ( word, token, interp->BaseObject = arrayBaseObject, objSize, saveCompileMode, &variableFlag ) ;
-        }
-        while ( ! result ) ;
+        if ( lispMode ) Arrays_DoLoop_Lisp ( pl1, l1, arrayBaseObject, objSize, saveCompileMode, variableFlag ) ;
+        else Arrays_DoLoop_NonLisp ( lexer, token, arrayBaseObject, objSize, saveCompileMode, variableFlag ) ;
         if ( CompileMode )
         {
             if ( ! variableFlag )
@@ -179,21 +195,33 @@ CfrTil_ArrayBegin ( )
                 _Debugger_->EntryWord = baseObject ; // for Debugger_DisassembleAccumulated
                 _Compile_GetVarLitObj_LValue_To_Reg ( baseObject, ACC ) ;
                 _Word_CompileAndRecord_PushReg ( baseObject, ACC ) ;
+                if ( lispMode )
+                {
+                    if ( baseObject->StackPushRegisterCode ) SetHere ( baseObject->StackPushRegisterCode, 1 ) ;
+                    Compile_Move_Reg_To_Reg ( RegOrder ( i ++ ), ACC ) ;
+                    _Debugger_->PreHere = baseObject->Coding ;
+                }
+                _DEBUG_SHOW ( baseObject, 1 ) ;
             }
-            else
-            {
-                CfrTil_OptimizeOff ( ) ; // can't really be optimized any more anyway and optimize is turned back on after an =/store anyway
-                //baseObject->CAttribute2 |= ARRAY_TYPE ;
-                //baseObject->StackPushRegisterCode = 0 ;
-            }
+            else CfrTil_OptimizeOff ( ) ; // can't really be optimized any more anyway and optimize is turned back on after an =/store anyway
             compiler->ArrayEnds = 0 ; // reset for next array word in the current word being compiled
         }
-        if ( ( ! Lexer_IsTokenForwardDotted ( cntx->Lexer0 ) ) && ( ! GetState ( cntx->Compiler0, LC_ARG_PARSING ) ) ) cntx->Interpreter0->BaseObject = 0 ;
-        DEBUG_SHOW ;
-        _dllist_RemoveNodes_UntilWord ( dllist_First ( ( dllist* ) _CfrTil_->CompilerWordList ), baseObject ) ;
-        SetState ( compiler, COMPILE_MODE, saveCompileMode ) ;
+        if ( lispMode ) interp->BaseObject = 0 ;
+        else
+        {
+            if ( ( ! Lexer_IsTokenForwardDotted ( cntx->Lexer0 ) ) && ( ! GetState ( cntx->Compiler0, LC_ARG_PARSING ) ) ) interp->BaseObject = 0 ;
+            _dllist_RemoveNodes_UntilWord ( dllist_First ( ( dllist* ) _CfrTil_->CompilerWordList ), baseObject ) ;
+            SetState ( compiler, COMPILE_MODE, saveCompileMode ) ;
+        }
     }
     if ( ! variableFlag ) SetState ( _CfrTil_, OPTIMIZE_ON, svOpState ) ;
+    return i ;
+}
+
+void
+CfrTil_ArrayBegin ( )
+{
+    _CfrTil_ArrayBegin ( 0, 0, 0 ) ;
 }
 
 void

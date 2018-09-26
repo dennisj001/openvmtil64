@@ -353,12 +353,23 @@ LO_CheckBeginBlock ( )
     return false ;
 }
 
+void
+Arrays_DoLoop_Lisp ( Word ** pl1, Word * l1, Word * arrayBaseObject, int64 objSize, Boolean saveCompileMode, Boolean variableFlag )
+{
+    do
+    {
+        if ( Do_NextArrayToken ( l1->Name, arrayBaseObject, objSize, saveCompileMode, &variableFlag ) ) break ;
+    }
+    while ( l1 = LO_Next ( l1 ) ) ;
+    *pl1 = l1 ;
+}
+
+#if 0
 int64
-_LO_Apply_ArrayArg ( LambdaCalculus * lc, ListObject ** pl1, int64 i )
+_LO_Apply_ArrayArg (ListObject ** pl1, int64 i )
 {
     Context * cntx = _Context_ ;
     ListObject *l1 = * pl1 ;
-    Word * word = l1 ;
     // nb! this block is just CfrTil_ArrayBegin in arrays.c -- refactor??
     // ?needs :: Compiler_CopyDuplicatesAndPush somewhere
     Interpreter * interp = cntx->Interpreter0 ;
@@ -367,10 +378,10 @@ _LO_Apply_ArrayArg ( LambdaCalculus * lc, ListObject ** pl1, int64 i )
     if ( arrayBaseObject )
     {
         Compiler *compiler = cntx->Compiler0 ;
-        int64 objSize = 0, increment = 0, variableFlag ;
-        int64 svcm = GetState ( compiler, COMPILE_MODE ) ;
+        int64 objSize = 0 ;
+        Boolean variableFlag, svcm = GetState ( compiler, COMPILE_MODE ) ;
         if ( ( ! arrayBaseObject->ArrayDimensions ) ) CfrTil_Exception ( ARRAY_DIMENSION_ERROR, 0, QUIT ) ;
-        if ( interp->CurrentObjectNamespace ) objSize = interp->CurrentObjectNamespace->Size ; //_CfrTil_VariableValueGet ( _Context_->Interpreter0->CurrentClassField, ( byte* ) "size" ) ; 
+        if ( interp->CurrentObjectNamespace ) objSize = interp->CurrentObjectNamespace->ObjectSize ; //_CfrTil_VariableValueGet ( _Context_->Interpreter0->CurrentClassField, ( byte* ) "size" ) ; 
         if ( ! objSize )
         {
             CfrTil_Exception ( OBJECT_SIZE_ERROR, 0, QUIT ) ;
@@ -379,9 +390,7 @@ _LO_Apply_ArrayArg ( LambdaCalculus * lc, ListObject ** pl1, int64 i )
         _WordList_Pop ( _CfrTil_->CompilerWordList ) ; // pop the initial '['
         do
         {
-            word = l1 ;
-            byte * token = word->Name ;
-            if ( Do_NextArrayWordToken ( word, token, arrayBaseObject, objSize, svcm, &variableFlag ) ) break ;
+            if ( Do_NextArrayToken ( l1->Name, arrayBaseObject, objSize, svcm, &variableFlag ) ) break ;
         }
         while ( l1 = LO_Next ( l1 ) ) ;
         *pl1 = l1 ;
@@ -395,7 +404,6 @@ _LO_Apply_ArrayArg ( LambdaCalculus * lc, ListObject ** pl1, int64 i )
                 _Compile_GetVarLitObj_LValue_To_Reg ( baseObject, ACC ) ;
                 _Word_CompileAndRecord_PushReg ( baseObject, ACC ) ;
             }
-            if ( Is_DebugModeOn ) Word_PrintOffset ( word, increment, baseObject->AccumulatedOffset ) ;
             if ( baseObject->StackPushRegisterCode ) SetHere ( baseObject->StackPushRegisterCode, 1 ) ;
             Compile_Move_Reg_To_Reg ( RegOrder ( i ++ ), ACC ) ;
             _Debugger_->PreHere = baseObject->Coding ;
@@ -405,6 +413,14 @@ _LO_Apply_ArrayArg ( LambdaCalculus * lc, ListObject ** pl1, int64 i )
     }
     return i ;
 }
+#else
+
+int64
+_LO_Apply_ArrayArg (ListObject ** pl1, int64 i )
+{
+    return _CfrTil_ArrayBegin ( 1, pl1, i ) ;
+}
+#endif
 
 int64
 _LO_Apply_NonMorphismArg ( LambdaCalculus * lc, ListObject ** pl1, int64 i )
@@ -451,7 +467,7 @@ _LO_Apply_Arg ( LambdaCalculus * lc, ListObject ** pl1, int64 i )
     else if ( ( l1->CAttribute & NON_MORPHISM_TYPE ) ) i = _LO_Apply_NonMorphismArg ( lc, pl1, i ) ;
     else if ( ( l1->Name [0] == '.' ) || ( l1->Name [0] == '&' ) )
         _Interpreter_DoWord ( cntx->Interpreter0, l1->Lo_CfrTilWord, l1->W_RL_Index, l1->W_SC_Index ) ;
-    else if ( ( l1->Name[0] == '[' ) ) i = _LO_Apply_ArrayArg ( lc, pl1, i ) ;
+    else if ( ( l1->Name[0] == '[' ) ) i = _LO_Apply_ArrayArg ( pl1, i ) ;
     else
     {
         word = Compiler_CopyDuplicatesAndPush ( word ) ;
@@ -511,7 +527,7 @@ _LO_Apply_C_LtoR_ArgList ( LambdaCalculus * lc, ListObject * l0, Word * word )
 void
 LC_CompileRun_C_ArgList ( Word * word ) // C protocol - x64 : left to right arguments put into registers 
 {
-    LambdaCalculus * lc ; 
+    LambdaCalculus * lc ;
     lc = LC_Init ( ) ;
     Context * cntx = _Context_ ;
     Lexer * lexer = cntx->Lexer0 ;
@@ -529,14 +545,14 @@ LC_CompileRun_C_ArgList ( Word * word ) // C protocol - x64 : left to right argu
         SetState ( compiler, LC_ARG_PARSING, true ) ;
         int64 svcm = CompileMode ;
         Set_CompileMode ( false ) ; // we must have the arguments pushed and not compiled for _LO_Apply_C_Rtl_ArgList which will compile them for a C_Rtl function
-        LC_SaveStackPointer ( lc ) ; 
+        LC_SaveStackPointer ( lc ) ;
         int64 svDs = GetState ( _CfrTil_, _DEBUG_SHOW_ ) ;
         DebugShow_Off ;
         l0 = _LO_Read ( lc ) ;
         SetState ( _CfrTil_, _DEBUG_SHOW_, svDs ) ;
         Set_CompileMode ( svcm ) ; // we must have the arguments pushed and not compiled for _LO_Apply_C_Rtl_ArgList which will compile them for a C_Rtl function
         _LO_Apply_C_LtoR_ArgList ( lc, l0, word ) ;
-        LC_RestoreStackPointer ( lc ) ; 
+        LC_RestoreStackPointer ( lc ) ;
         LC_LispNamespaceOff ( ) ;
         SetState ( compiler, LC_ARG_PARSING | LC_C_RTL_ARG_PARSING, false ) ;
     }

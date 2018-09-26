@@ -197,7 +197,11 @@ Boolean( *BoolMapFunction_1 ) ( dlnode * ) ;
 typedef struct _Identifier // _Symbol
 {
     DLNode S_Node ;
-    int64 Slots ; // number of slots in Object
+    union
+    {
+        int64 Slots ; // number of slots in Object
+        int64 ObjectSize ; // number of slots in Object
+    } ;
     byte * S_Name ;
     uint64 State ;
     union
@@ -278,10 +282,10 @@ typedef struct _Identifier // _Symbol
 #define Lo_Name Name
 #define Lo_Car S_Car
 #define Lo_Cdr S_Cdr
-#define Lo_Size Size
+#define Lo_Size ObjectSize
 #define Lo_Head Lo_Car
 #define Lo_Tail Lo_Cdr
-#define Lo_NumberOfSlots Size
+#define Lo_NumberOfSlots Slots
 #define Lo_CfrTilWord CfrTilWord 
 #define Lo_List S_SymbolList 
 #define Lo_Value S_Value
@@ -871,7 +875,7 @@ typedef struct _LambdaCalculus
     uint64 State ;
     int64 DontCopyFlag, Loop, ParenLevel ;
     Namespace *LispNamespace, *LispInternalNamespace ;
-    ListObject *lFunction, *lArgs, * Nil, *True ; 
+    ListObject *lFunction, *lArgs, * Nil, *True ;
     ListObject *CurrentLambdaFunction, *LastInterpretedWord ; //, *ListFirst;
     ByteArray * SavedCodeSpace ;
     uint64 ItemQuoteState, QuoteState ;

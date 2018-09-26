@@ -116,7 +116,7 @@ _CfrTil_ObjectNew ( int64 size, byte * name, uint64 category, int64 allocType )
 {
     byte * obj = _CfrTil_NamelessObjectNew ( size, allocType ) ; //OBJECT_MEMORY ) ;
     Word * word = _DObject_New ( name, ( int64 ) obj, ( OBJECT | IMMEDIATE | CPRIMITIVE | category ), 0, 0, OBJECT, ( byte* ) _DataObject_Run, 0, 0, 0, DICTIONARY ) ;
-    word->Size = size ;
+    word->ObjectSize = size ;
 
     return word ;
 }
@@ -193,7 +193,7 @@ _Class_New ( byte * name, uint64 type, int64 cloneFlag )
     }
     else
     {
-        _Printf ( ( byte* ) "\nNamespace Error ? : \'%s\' already exists! : %s : size = %d\n", ns->Name, _Word_SourceCodeLocation_pbyte ( ns ), ns->Size ) ;
+        _Printf ( ( byte* ) "\nNamespace Error ? : \'%s\' already exists! : %s : size = %d\n", ns->Name, _Word_SourceCodeLocation_pbyte ( ns ), ns->ObjectSize ) ;
         _Namespace_DoNamespace ( ns, 1 ) ;
     }
     CfrTil_WordList_Init ( _CfrTil_, 0, 0 ) ;
@@ -206,7 +206,7 @@ _CfrTil_ClassField_New ( byte * token, Class * aclass, int64 size, int64 offset 
 {
     Word * word = _DObject_New ( token, 0, ( IMMEDIATE | OBJECT_FIELD | CPRIMITIVE ), 0, 0, OBJECT_FIELD, ( byte* ) _DataObject_Run, 0, 1, 0, DICTIONARY ) ;
     word->ClassFieldTypeNamespace = aclass ;
-    word->Size = size ;
+    word->ObjectSize = size ;
     word->Offset = offset ;
 
     return word ;

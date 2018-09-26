@@ -60,13 +60,15 @@ printf ( "%s", x7 ) ;
 
 sprintf ( &chey.chars, "%s", "well" ) ;
 dump ( &chey, cobj.size ) ; 
-sprintf ( &chey.chars [ 24 ], "%s", "well" ) ;
+sprintf ( &chey.chars [ 24 ], "%s", "don't" ) ;
+dump ( &chey, cobj.size ) ; 
+sprintf ( &chey.chars, "%s", "well don't hoot" ) ;
 dump ( &chey, cobj.size ) ; 
 
 printf ( "\n\t%s\n", &chey.chars [ 24 ] ) ;
 printf ( "\n\t%s\n", "hoot" ) ; //&chey.chars [ 24 ] ) ;
 dump ( &chey, cobj.size ) ; // add '&' within parentheses for lvalue
-
+//pause
 scOn
 void
 chi ( chey0, d | a b c )
