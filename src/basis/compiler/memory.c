@@ -92,9 +92,9 @@ Compile_Store ( Compiler * compiler, Boolean stackReg ) // !
         Compile_SUBI ( REG, stackReg, 0, ( ( word && word->StackPushRegisterCode ) ? 1 : 2 ) * CELL_SIZE, 0 ) ;
         //DBI_OFF ;
     }
-    if ( GetState ( compiler, ARRAY_COMPILING ) )
+    if ( GetState ( compiler, ARRAY_MODE ) )
     {
-        SetState ( compiler, ARRAY_COMPILING, false ) ;
+        SetState ( compiler, ARRAY_MODE, false ) ;
         CfrTil_OptimizeOn ( ) ;
     }
 }
@@ -134,9 +134,9 @@ Compile_Poke ( Compiler * compiler, Boolean stackReg ) // =
         //if ( ! GetState ( _Context_, C_SYNTAX ) ) 
         Compile_SUBI ( REG, stackReg, 0, 2 * CELL_SIZE, BYTE ) ;
     }
-    if ( GetState ( compiler, ARRAY_COMPILING ) )
+    if ( GetState ( compiler, ARRAY_MODE ) )
     {
-        SetState ( compiler, ARRAY_COMPILING, false ) ;
+        SetState ( compiler, ARRAY_MODE, false ) ;
         CfrTil_OptimizeOn ( ) ;
     }
 }
@@ -153,9 +153,9 @@ Compile_AtEqual ( Boolean stackReg ) // !
     Compile_Move_Rm_To_Reg ( OREG, stackReg, - CELL_SIZE ) ;
     Compile_Move_Reg_To_Rm ( OREG, ACC, 0 ) ;
     Compile_SUBI ( REG, stackReg, 0, CELL_SIZE * 2, BYTE ) ;
-    if ( GetState ( _Compiler_, ARRAY_COMPILING ) )
+    if ( GetState ( _Compiler_, ARRAY_MODE ) )
     {
-        SetState ( _Compiler_, ARRAY_COMPILING, false ) ;
+        SetState ( _Compiler_, ARRAY_MODE, false ) ;
         CfrTil_OptimizeOn ( ) ;
     }
 }

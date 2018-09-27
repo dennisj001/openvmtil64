@@ -90,34 +90,35 @@ Compile_ArrayDimensionOffset ( Word * word, int64 dimSize, int64 objSize )
 int64
 CalculateArrayDimensionSize ( Word * arrayBaseObject, int64 dimNumber )
 {
-    int64 dimSize ;
-#define BIG_ENDIAN_ARRAYS 1 // still some problems with this ??
+#define BIG_ENDIAN_ARRAYS 1 
 #define LITTLE_ENDIAN_ARRAYS (! BIG_ENDIAN_ARRAYS)
 #if LITTLE_ENDIAN_ARRAYS   
-/*
- * nb. CURRENTLY USING 'LITTLE ENDIAN ARRAYS'
- * d1 + d2*(D1) + d3*(D2*D1) + d4*(D3*D2*D1) ...
- * where d1, d2, d3, ... are the dimension variables and D1, D2, D3, ... are the Dimension sizes :: eg. :: declared as : array [D1][D2][D3]... ; 
- * in use as : array [d1][d2][d3]...
- */
+    /*
+     * nb. CURRENTLY USING 'LITTLE ENDIAN ARRAYS'
+     * d1 + d2*(D1) + d3*(D2*D1) + d4*(D3*D2*D1) ...
+     * where d1, d2, d3, ... are the dimension variables and D1, D2, D3, ... are the Dimension sizes :: eg. :: declared as : array [D1][D2][D3]... ; 
+     * in use as : array [d1][d2][d3]...
+     */
+    int64 dimSize ;
     // nb. this method produces a 'little endian array' where the earlier dimensions are smaller and increasing with dimNumber
     //while ( ( -- dimNumber ) >= 0 ) // -- : zero based ns->ArrayDimensions
-    for ( dimSize = 1 ; dimNumber > 0 ; dimNumber -- )    
+    for ( dimSize = 1 ; dimNumber > 0 ; dimNumber -- )
     {
         dimSize *= arrayBaseObject->ArrayDimensions [ dimNumber ] ; // the parser created and populated this array in _CfrTil_Parse_ClassStructure 
     }
 #else
-/*
- * the switch from little endian arrays to big endian arrays where first, left to right variable refers to
- * the largest Dimension, etc. So offset from array pointer is (for a four dimensional array) : d4*(D3*D2*D1) + d3*(D2*D1) d2*(D1) + d1 
- * where d1, d2, d3, ... are the dimension variables and D1, D2, D3, ... are the Dimension sizes
- * for an array a[3][3][3] with 27 total positions a[2][0][0] would refer to 2*3*3 = 18th position ; a[2][0][1] 19th; 
- * a[2][1][1] (2*3*3) + (1*3) + 1 = 22 ; a[2][2][1] (2*3*3) + (2*3) + 1 = 25 ; a[2][2][2] (2*3*3) + (2*3) + 2 = 26 + 0 indexed item = 27 ; 
- * remember 0 indexed arrays 
- * so total is 27.
- */
-    
-    for ( dimSize = 1 ; dimNumber < (arrayBaseObject->ArrayNumberOfDimensions - 1) ; dimNumber ++ )
+    /*
+     * the switch from little endian arrays to big endian arrays where first, left to right variable refers to
+     * the largest Dimension, etc. So offset from array pointer is (for a four dimensional array) : d4*(D3*D2*D1) + d3*(D2*D1) d2*(D1) + d1 
+     * where d1, d2, d3, ... are the dimension variables and D1, D2, D3, ... are the Dimension sizes
+     * for an array a[3][3][3] with 27 total positions a[2][0][0] would refer to 2*3*3 = 18th position ; a[2][0][1] 19th; 
+     * a[2][1][1] (2*3*3) + (1*3) + 1 = 22 ; a[2][2][1] (2*3*3) + (2*3) + 1 = 25 ; a[2][2][2] (2*3*3) + (2*3) + 2 = 26 + 0 indexed item = 27 ; 
+     * remember 0 indexed arrays 
+     * so total is 27.
+     */
+    // D0, D1, D2, ... Dn : d0, d1, d2 ... dn => dn*(1*D(n-1)*D1*D2*..D(n-1)) 
+    int64 dimSize ;
+    for ( dimSize = 1 ; dimNumber < ( arrayBaseObject->ArrayNumberOfDimensions - 1 ) ; dimNumber ++ )
     {
         dimSize *= arrayBaseObject->ArrayDimensions [ dimNumber ] ; // the parser created and populated this array in _CfrTil_Parse_ClassStructure 
     }
@@ -137,27 +138,18 @@ Do_NextArrayToken ( byte * token, Word * arrayBaseObject, int64 objSize, Boolean
     Word * word = Finder_Word_FindUsing ( cntx->Finder0, token, 0 ) ;
     if ( word && ( ! GetState ( cntx->Compiler0, LC_ARG_PARSING ) ) ) word->W_RL_Index = cntx->Lexer0->TokenStart_ReadLineIndex ;
     if ( token [0] == '[' ) // '[' == an "array begin"
-    {
-        *variableFlag = _CheckArrayDimensionForVariables_And_UpdateCompilerState ( ) ;
+    { 
+        //once we have a variable any place in an array reference the flag must remain until the end of the array 
+        if ( ! (*variableFlag ) ) *variableFlag = _CheckArrayDimensionForVariables_And_UpdateCompilerState ( ) ;
         return 0 ;
     }
     else if ( token [0] == ']' ) // ']' == an "array end"
     {
-#if 0        
-        // nb. this method produces a 'little endian array' where the earlier dimensions are smaller and increasing with dimNumber
-        int64 dimNumber = compiler->ArrayEnds, dimSize = 1 ;
-        while ( ( -- dimNumber ) >= 0 ) // -- : zero based ns->ArrayDimensions
-        {
-            dimSize *= arrayBaseObject->ArrayDimensions [ dimNumber ] ; // the parser created and populated this array in _CfrTil_Parse_ClassStructure 
-        }
-        compiler->ArrayEnds ++ ;
-#else        
         int64 dimNumber = compiler->ArrayEnds ; // dimNumber is used as an array index so it is also zero base indexed
         int64 dimSize = CalculateArrayDimensionSize ( arrayBaseObject, dimNumber ) ; // dimNumber is used as an array index so it is also zero base indexed
         compiler->ArrayEnds ++ ; // after, because arrayBaseObject->ArrayDimensions is a zero based array
-#endif        
 
-        if ( Is_DebugModeOn ) _Printf ( "\ndimSize = %d", dimSize ) ;
+        //if ( Is_DebugModeOn ) _Printf ( "\ndimSize = %d", dimSize ) ;
         DEBUG_SETUP ( word ) ;
         if ( *variableFlag ) Compile_ArrayDimensionOffset ( cntx->CurrentlyRunningWord, dimSize, objSize ) ;
         else
@@ -208,7 +200,7 @@ _CfrTil_ArrayBegin ( Boolean lispMode, Word **pl1, int64 i )
     int64 objSize = 0 ;
     Boolean variableFlag = 0 ;
     byte * token ;
-    SetState ( compiler, ARRAY_COMPILING, true ) ;
+    SetState ( compiler, ARRAY_MODE, true ) ;
     if ( lispMode )
     {
         l1 = * pl1 ;

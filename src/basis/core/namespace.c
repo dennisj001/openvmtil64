@@ -407,6 +407,7 @@ _Namespace_FindOrNew_Local ( Stack * nsStack )
     int64 d = Stack_Depth ( nsStack ) ; 
     byte bufferData [ 32 ], *buffer = ( byte* ) bufferData ;
     sprintf ( ( char* ) buffer, "locals_%ld", d ) ;
+    //if ( String_Equal ( buffer, "locals_2") ) _Printf ((byte*) "\ngot it") ;
     Namespace * ns = Namespace_FindOrNew_SetUsing ( buffer, _CfrTil_->Namespaces, 1 ) ;
     _Namespace_ActivateAsPrimary ( ns ) ;
     Stack_Push ( nsStack, ( int64 ) ns ) ;

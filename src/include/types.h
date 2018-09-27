@@ -12,7 +12,7 @@ typedef unsigned long uint64 ;
 
 typedef char * CString ;
 typedef byte CharSet ;
-typedef Boolean Boolean ;
+typedef Boolean boolean ;
 typedef void (* VoidFunction ) (void) ;
 typedef void (*vFunction_1_Arg ) ( int64 ) ;
 typedef void (*vFunction_1_UArg ) ( uint64 ) ;

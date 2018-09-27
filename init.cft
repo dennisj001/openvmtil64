@@ -137,6 +137,7 @@ C
 : ;; semi _prefix ; immediate syntactic
 c_syntaxOn //using
 type int8 ; int8.size = 1 ;
+type byte ; byte.size = 1 ;
 type int16 ; int16.size = 2 ;
 type int32 ; int32.size = 4 ;
 type int64 ; int64.size = 8 ;

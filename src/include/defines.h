@@ -591,7 +591,7 @@
 #define INFIX_LIST_INTERPRET ( (uint64) 1 << 26 )
 #define COMPILER_WRAP_ON ( (uint64) 1 << 27 )
 #define DOING_AN_INFIX_WORD ( (uint64) 1 << 28 )
-#define ARRAY_COMPILING ( (uint64) 1 << 29 )
+#define ARRAY_MODE ( (uint64) 1 << 29 )
 
 // Context flags
 #define C_SYNTAX ( (uint64) 1 << 20 )

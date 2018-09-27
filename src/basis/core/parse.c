@@ -77,7 +77,7 @@ _CfrTil_Parse_ClassStructure ( int64 cloneFlag )
     int64 size = 0, offset = 0, sizeOf = 0, i, arrayDimensionSize ;
     Namespace *ns, *classNs = _CfrTil_Namespace_InNamespaceGet ( ), *arrayBaseObject ;
     byte * token ;
-    int64 arrayDimensions [ 32 ] ;
+    int64 arrayDimensions [ 32 ] ; // 32 : max dimensions for now
     memset ( arrayDimensions, 0, sizeof (arrayDimensions ) ) ;
     if ( cloneFlag )
     {

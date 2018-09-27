@@ -70,7 +70,7 @@ void _Compile_Return(void);
 void _Compile_Call_Acc(void);
 void Compile_DataStack_PopAndCall(void);
 void Compile_Call_From_C_Address(uint64 bptr);
-void Compile_CallCFunctionWithParameter_TestAlignRSP(byte *address, Word *word);
+void Compile_CallCFunctionWithParameter_TestAlignRSP(byte *cFunction, Word *word);
 void Compile_Call_CurrentBlock(void);
 void _Compile_RspReg_To(void);
 void _Compile_RspReg_Drop(void);
@@ -321,6 +321,7 @@ int64 _Udis_Disassemble(ud_t *ud, byte *iaddress, int64 number, int64 cflag);
 /* basis/compiler/arrays.c */
 int64 _CheckArrayDimensionForVariables_And_UpdateCompilerState(void);
 void Compile_ArrayDimensionOffset(Word *word, int64 dimSize, int64 objSize);
+int64 CalculateArrayDimensionSize(Word *arrayBaseObject, int64 dimNumber);
 int64 Do_NextArrayToken(byte *token, Word *arrayBaseObject, int64 objSize, Boolean saveCompileMode, Boolean *variableFlag);
 void Arrays_DoArrayArgs_NonLisp(Lexer *lexer, byte *token, Word *arrayBaseObject, int64 objSize, Boolean saveCompileMode, Boolean *variableFlag);
 int64 _CfrTil_ArrayBegin(Boolean lispMode, Word **pl1, int64 i);

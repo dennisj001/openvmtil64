@@ -849,7 +849,7 @@ _Lexer_IsTokenForwardDotted ( Lexer * lexer, int64 end )
         else if ( rl->InputLine [ i ] == '[' ) return true ;
         else if ( rl->InputLine [ i ] == ']' ) return true ;
         else if ( rl->InputLine [ i ] == ' ' ) space ++ ;
-        else if ( space && ( isgraph ( rl->InputLine [ i ] ) ) ) break ;
+        else if ( space && ( isalnum ( rl->InputLine [ i ] ) ) ) break ;
     }
     return false ;
 }

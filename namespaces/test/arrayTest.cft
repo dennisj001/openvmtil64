@@ -244,5 +244,24 @@ verbosity 2 =
 "arr9" Ar9 new arr9 a9
 adump ( 0 123 234 arr9 ) 
 //s pause
+"ct" class :{ byte ar [3][3][3] ; };
+"ab" ct new
+ab.ar [0][0][0] hp
+ab.ar [0][0][1] hp
+ab.ar [1][0][0] hp
+ab.ar [2][2][2] ab.ar [0][0][0] - p
+ab.ar [0][0][0] 263 = 
+ab.ar [0][0][0] @ p
+: tct ( y ct a )
+    a.ar [0][0][0] 77 = 
+    a.ar [0][y @][0] a.ar [0][0][0] @ =
+    a.ar [y @][y @][0] a.ar [0][0][0] @ =
+    //a.ar [y @ 1 +][y @][y @] dup nl hp a.ar [0][0][0] @ = // if y == 2 this is an array out of bounds reference :: not checked for yet ??
+    //a.ar [y @][y @][y @ 1 +] dup nl hp a.ar [0][0][0] @ =
+    TODO ( "array out of bounds checking with variables?!" )
+    a.ar 32 dump
+;
+"ac" ct new 
+2 ac tct //pause
 #endif
 2 + 7 assertStkChk // stack checking
