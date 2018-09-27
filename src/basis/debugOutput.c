@@ -66,9 +66,9 @@ Debugger_ParseFunctionLocalVariables ( Debugger * debugger, Lexer * lexer, Boole
 {
     int64 levelBit = 0 ;
     Boolean lasvf = false ;
-    byte * token, *prevToken = 0, *aToken ;
+    byte * token, *prevToken = 0, *prevPrevToken = 0, *aToken ;
     Compiler * compiler = _Compiler_ ;
-    Word * word ;
+    Word * prevWord, *prevPrevWord ;
     compiler->NumberOfArgs = 0 ;
     compiler->NumberOfLocals = 0 ;
     compiler->NumberOfRegisterVariables = 0 ; //nb. prevent increasing the locals offset by adding in repeated calls to this function
@@ -76,8 +76,8 @@ Debugger_ParseFunctionLocalVariables ( Debugger * debugger, Lexer * lexer, Boole
     debugger->LevelBitNamespaceMap = 0 ;
     while ( ( token = _Lexer_ReadToken ( lexer, ( byte* ) " ,\n\r\t" ) ) )
     {
-        word = Finder_Word_FindUsing ( _Finder_, token, 0 ) ;
-        if ( word && debugger->LocalsNamespace && ( word->CAttribute & ( C_TYPE | C_CLASS | NAMESPACE ) ) )
+        prevWord = Finder_Word_FindUsing ( _Finder_, token, 0 ) ;
+        if ( prevWord && debugger->LocalsNamespace && ( prevWord->CAttribute & ( C_TYPE | C_CLASS | NAMESPACE ) ) )
         {
             while ( ( token = _Lexer_ReadToken ( lexer, ( byte* ) " ,\n\r\t" ) ) )
             {
@@ -97,9 +97,12 @@ Debugger_ParseFunctionLocalVariables ( Debugger * debugger, Lexer * lexer, Boole
         }
         else if ( ( String_Equal ( token, "(" ) ) && ( lasvf == false ) ) //|| String_Equal ( token, "(|" ) //not necessary the lexer will see only the '('
         {
-            word = Finder_Word_FindUsing ( _Finder_, prevToken, 0 ) ;
-            //if ( word && ( word->CAttribute & PREFIX ) && ( ! ( lexer->ReadLiner0->InputLineString[0] == ':' ) ) ) continue ; // not a C syntax word with internal local variables
-            if ( word && ( word->CAttribute & PREFIX ) ) continue ; // not a C syntax word with internal local variables
+            if ( prevPrevToken )
+            {
+                prevWord = Finder_Word_FindUsing ( _Finder_, prevToken, 0 ) ;
+                prevPrevWord = Finder_Word_FindUsing ( _Finder_, prevPrevToken, 0 ) ;
+                if ( prevWord && ( prevWord->CAttribute & PREFIX ) && prevPrevWord && ( prevPrevWord->Name[0] != ':' ) && (!(prevPrevWord->CAttribute & NAMESPACE)) ) continue ; //  ! ( lexer->ReadLiner0->InputLineString[0] == ':' ) ) ) continue ; // not a C syntax word with internal local variables
+            }
             if ( ! ( debugger->LevelBitNamespaceMap & ( ( uint64 ) 1 << ( levelBit ) ) ) )
             {
                 debugger->LocalsNamespace = _CfrTil_Parse_LocalsAndStackVariables ( 1, 0, 0, debugger->LocalsNamespacesStack, 0 ) ;
@@ -107,7 +110,7 @@ Debugger_ParseFunctionLocalVariables ( Debugger * debugger, Lexer * lexer, Boole
             }
             if ( c_syntaxFlag ) lasvf = true ;
         }
-        else if ( String_Equal ( token, "var" ) || ( word && ( word->CAttribute & CLASS ) ) )
+        else if ( String_Equal ( token, "var" ) || ( prevWord && ( prevWord->CAttribute & CLASS ) ) )
         {
             if ( ! ( debugger->LevelBitNamespaceMap & ( ( uint64 ) 1 << ( levelBit ) ) ) )
             {
@@ -119,6 +122,7 @@ Debugger_ParseFunctionLocalVariables ( Debugger * debugger, Lexer * lexer, Boole
             _CfrTil_LocalWord ( aToken, LOCAL_VARIABLE, 0, 0, COMPILER_TEMP ) ;
         }
         else if ( String_Equal ( token, "<end>" ) ) return ;
+        prevPrevToken = prevToken ;
         prevToken = token ;
     }
 }
@@ -145,45 +149,41 @@ _Debugger_Locals_Show ( Debugger * debugger, Word * scWord )
 {
     if ( scWord )
     {
-        //if ( ! Compiling ) // stepping
+        _Compile_Save_C_CpuState ( _CfrTil_, 0 ) ;
+        Compiler * compiler = _Context_->Compiler0 ;
+        Lexer * lexer = Lexer_New ( COMPILER_TEMP ) ;
+        ReadLiner * rl = lexer->ReadLiner0 ;
+        int64 svArgs = compiler->NumberOfArgs ;
+        int64 svLocals = compiler->NumberOfLocals ;
+        int64 svRegs = compiler->NumberOfRegisterVariables ; //nb. prevent increasing the locals offset by adding in repeated calls to this function
+        Stack * svStack = compiler->LocalsCompilingNamespacesStack ;
+        Namespace * svNamespace = compiler->LocalsNamespace, *svInNamespace = _CfrTil_->InNamespace ;
+        byte *sc = scWord->W_SourceCode ? scWord->W_SourceCode : String_New ( _CfrTil_->SC_Buffer, TEMPORARY ) ;
+        // show value of each local var on Locals list
+        dlnode_Remove ( ( dlnode* ) svNamespace ) ; //nb! must! else _Namespace_FindOrNew_Local will find and continue to use it 
+
+        _Debugger_ReadLocals ( debugger, lexer, rl, scWord, sc ) ;
+        Namespace * ns = _Compiler_->LocalsNamespace ;
+        if ( ns )
         {
-            _Compile_Save_C_CpuState ( _CfrTil_, 0 ) ;
-            Compiler * compiler = _Context_->Compiler0 ;
-            Lexer * lexer = Lexer_New ( COMPILER_TEMP ) ;
-            ReadLiner * rl = lexer->ReadLiner0 ;
-            int64 svArgs = compiler->NumberOfArgs ;
-            int64 svLocals = compiler->NumberOfLocals ;
-            int64 svRegs = compiler->NumberOfRegisterVariables ; //nb. prevent increasing the locals offset by adding in repeated calls to this function
-            Stack * svStack = compiler->LocalsCompilingNamespacesStack ;
-            Namespace * svNamespace = compiler->LocalsNamespace, *svInNamespace = _CfrTil_->InNamespace ;
-            byte *sc = scWord->W_SourceCode ? scWord->W_SourceCode : String_New ( _CfrTil_->SC_Buffer, TEMPORARY ) ;
-            // show value of each local var on Locals list
-            dlnode_Remove ( ( dlnode* ) svNamespace ) ; //nb! must! else _Namespace_FindOrNew_Local will find and continue to use it 
-
-            _Debugger_ReadLocals ( debugger, lexer, rl, scWord, sc ) ;
-            Namespace * ns = _Compiler_->LocalsNamespace ;
-            if ( ns )
-            {
-                if ( ( sc && debugger->LocalsNamespacesStack ) ) _Debugger_Locals_Show_Loop ( debugger, scWord ) ;
-                else _Printf ( ( byte* ) "\nTry stepping a couple of instructions and try again." ) ;
-            }
-            // still problems here ?? make sure *everything* is reset 
-            _Namespace_RemoveFromUsingListAndClear ( debugger->LocalsNamespace ) ;
-            _Namespace_FreeNamespacesStack ( debugger->LocalsNamespacesStack ) ;
-            debugger->LocalsNamespacesStack = 0 ;
-
-            compiler->NumberOfArgs = svArgs ;
-            compiler->NumberOfLocals = svLocals ;
-            compiler->NumberOfRegisterVariables = svRegs ; //nb. prevent increasing the locals offset by adding in repeated calls to this function
-            compiler->LocalsCompilingNamespacesStack = svStack ;
-            compiler->LocalsNamespace = svNamespace ;
-            //Namespace_SetState ( compiler->LocalsNamespace, USING ) ;
-            _CfrTil_->InNamespace = svInNamespace ;
-            SetState ( compiler, VARIABLE_FRAME, false ) ;
-            d0 ( _Namespace_PrintWords ( compiler->LocalsNamespace ) ) ;
-            _Compile_Restore_C_CpuState ( _CfrTil_, 0 ) ;
+            if ( ( sc && debugger->LocalsNamespacesStack ) ) _Debugger_Locals_Show_Loop ( debugger, scWord ) ;
+            else _Printf ( ( byte* ) "\nTry stepping a couple of instructions and try again." ) ;
         }
-        //else _Debugger_Locals_Show_Loop ( debugger, scWord ) ;
+        // still problems here ?? make sure *everything* is reset 
+        _Namespace_RemoveFromUsingListAndClear ( debugger->LocalsNamespace ) ;
+        _Namespace_FreeNamespacesStack ( debugger->LocalsNamespacesStack ) ;
+        debugger->LocalsNamespacesStack = 0 ;
+
+        compiler->NumberOfArgs = svArgs ;
+        compiler->NumberOfLocals = svLocals ;
+        compiler->NumberOfRegisterVariables = svRegs ; //nb. prevent increasing the locals offset by adding in repeated calls to this function
+        compiler->LocalsCompilingNamespacesStack = svStack ;
+        compiler->LocalsNamespace = svNamespace ;
+        //Namespace_SetState ( compiler->LocalsNamespace, USING ) ;
+        _CfrTil_->InNamespace = svInNamespace ;
+        SetState ( compiler, VARIABLE_FRAME, false ) ;
+        d0 ( _Namespace_PrintWords ( compiler->LocalsNamespace ) ) ;
+        _Compile_Restore_C_CpuState ( _CfrTil_, 0 ) ;
     }
 }
 

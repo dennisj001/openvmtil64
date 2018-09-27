@@ -145,6 +145,7 @@ gotNextToken:
                     //arrayBaseObject->CAttribute |= VARIABLE ;
                     arrayBaseObject->ArrayDimensions = ( int64 * ) Mem_Allocate ( i * sizeof (int64 ), DICTIONARY ) ;
                     MemCpy ( arrayBaseObject->ArrayDimensions, arrayDimensions, i * sizeof (int64 ) ) ;
+                    arrayBaseObject->ArrayNumberOfDimensions = i ;
                 }
                 if ( token ) goto gotNextToken ;
                 else break ;

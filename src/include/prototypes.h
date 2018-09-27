@@ -70,7 +70,7 @@ void _Compile_Return(void);
 void _Compile_Call_Acc(void);
 void Compile_DataStack_PopAndCall(void);
 void Compile_Call_From_C_Address(uint64 bptr);
-void Compile_SetCurrentlyRunningWord_Call_TestRSP(byte *address, Word *word);
+void Compile_CallCFunctionWithParameter_TestAlignRSP(byte *address, Word *word);
 void Compile_Call_CurrentBlock(void);
 void _Compile_RspReg_To(void);
 void _Compile_RspReg_Drop(void);

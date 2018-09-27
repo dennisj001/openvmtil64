@@ -51,11 +51,10 @@ testna4.nodes [ 3 ] [ 2 ].BeforeReference @ testna4.nodes [ 3 ] [ 2 ].AfterRefer
 : tna
 	testnarr2.nodes [ 1 ].AfterReference 1 = 
 	testnarr2.nodes [ 1 ]. BeforeReference 2 = 
-	testnarr2 32 dump 
+	testnarr2.nodes [ 1 ] 32 dump 
 ;
 ' tna find wdiss
 tna
-
 testnarr2.nodes[1].AfterReference @ 1 _assert
 testnarr2.nodes[1].BeforeReference @ 2 _assert
 
@@ -215,7 +214,7 @@ verbosity 2 =
     "y =" ps y @ p 
     "z =" ps z @ p nl 
     "a.ar =" ps a.ar hp nl 
-    a.ar [x @][y @ ][z @] 256 _adump 
+    a.ar [z @][y @ ][x @] 256 _adump 
 ;;
 //'adump find wdiss
 : a9 ( Ar9 a | x y z )
@@ -226,7 +225,7 @@ verbosity 2 =
         {
             { x @ 256 < }
             {
-                a.ar [x @][y @][z @] x @ =
+                a.ar [z @][y @][x @] x @ =
                 x ++  
             }
             while 
@@ -239,7 +238,7 @@ verbosity 2 =
         z ++
     }
     while
-    adump ( 0 246 67 a ) 
+    adump ( 0 246 67 a  ) 
 ;
 //' a9 find wdiss //pause
 "arr9" Ar9 new arr9 a9

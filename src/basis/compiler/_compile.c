@@ -25,10 +25,10 @@ Compile_Call_From_C_Address ( uint64 bptr )
 // c ffi : foreign function interface
 
 void
-Compile_SetCurrentlyRunningWord_Call_TestRSP ( byte * address, Word * word )
+Compile_CallCFunctionWithParameter_TestAlignRSP ( byte * cFunction, Word * word )
 {
-    Compile_MoveImm_To_Reg ( RDI, ( int64 ) word, CELL ) ;
-    Compile_Call_ToAddressThruReg_TestAlignRSP ( address, CALL_THRU_REG ) ;
+    Compile_MoveImm_To_Reg ( RDI, ( int64 ) word, CELL ) ; // RDI is x64 abi first parameter 
+    Compile_Call_ToAddressThruReg_TestAlignRSP ( cFunction, CALL_THRU_REG ) ; // compile call cFunction with RDI value as arg
 }
 
 void

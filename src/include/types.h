@@ -370,9 +370,10 @@ typedef struct _WordData
     } ;
     union
     {
-        int64 * ArrayDimensions ;
+        int64 * WD_ArrayDimensions ;
         byte *WD_SourceCode ; // arrays don't have source code
     } ;
+    int64 WD_ArrayNumberOfDimensions ;
     union
     {
         ListObject * LambdaBody ;
@@ -416,7 +417,8 @@ typedef struct _WordData
 #define Opt_Reg S_WordData->Opt_Reg
 #define RmReg S_WordData->RmReg
 #define RegFlags S_WordData->RegFlags
-#define ArrayDimensions S_WordData->ArrayDimensions
+#define ArrayDimensions S_WordData->WD_ArrayDimensions
+#define ArrayNumberOfDimensions S_WordData->WD_ArrayNumberOfDimensions
 #define W_AliasOf S_WordData->AliasOf
 #define TypeNamespace S_WordData->TypeNamespace 
 #define Lo_ListProc S_WordData->ListProc
