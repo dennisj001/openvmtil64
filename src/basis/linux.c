@@ -15,7 +15,8 @@ _DisplaySignal ( int64 signal )
         {
             case SIGSEGV:
             {
-                _Printf ( ( byte* ) "\nSIGSEGV : memory access violation - %s", location ) ;
+                printf ( ( byte* ) "\nSIGSEGV : memory access violation : address = 0x%016lx : %s", (uint64) _Q_->SigAddress, location ) ;
+                fflush ( stdout ) ;
                 break ;
             }
             case SIGFPE:

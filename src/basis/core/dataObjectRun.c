@@ -375,7 +375,7 @@ _Do_Variable ( Word * word )
             }
             else
             {
-                if ( GetState ( _Context_, ADDRESS_OF_MODE ) )
+                if ( GetState ( _Context_, ADDRESS_OF_MODE ) ) //|| ( word->CAttribute & ( OBJECT | THIS | QID ) ) || GetState ( word, QID ) )
                 {
                     _Compile_GetVarLitObj_LValue_To_Reg ( word, ACC ) ;
                 }
