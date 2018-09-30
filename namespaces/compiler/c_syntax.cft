@@ -100,10 +100,10 @@ chi ( chey0, d | a b c )
     d #x12345678 _assert
     printf ( "\n%x\n", cobj.chey0.hey ) ;
     sprintf ( &chey0.chars [ 24 ], "%s", "hoot" ) ;
-    dump ( &cobj.chey0, cobj.size ) ; 
+    dump ( &chey0, cobj.size ) ; 
 } prefix
 wdiss ( ' chi find )
-chi ( chey, 7 ) //pause
+chi ( chey, 7 ) 
 scOff
 //s pause
 #if 1 // if 1
@@ -173,11 +173,10 @@ fac4 ( n  | facc -- TOS )
     }
     return ( facc ) ;
 }
-wdiss ( ' fac4 find ) ; 
 fac4 ( 7 ) dup p 5040 _assert //s pause
-
-User
 c_syntaxOff
+' fac4 find wdiss
+User
 'interpret3 'interpret2 find alias
 interpret3 words // i2halt code to exit interpret2
 

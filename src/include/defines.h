@@ -303,16 +303,16 @@
 #define ARRAY_TYPE          ( (uint64) 1 <<  8 ) 
 #define VARIABLE            ( (uint64) 1 <<  9 ) 
 #define LISP_CFRTIL         ( (uint64) 1 << 10 )
-#define LEFT_PAREN          ( (uint64) 1 << 11 )
-#define RIGHT_PAREN         ( (uint64) 1 << 12 )
+#define LEFT_PAREN          ( (uint64) 1 << 11 ) // '('
+#define RIGHT_PAREN         ( (uint64) 1 << 12 ) // ')'
 #define OP_RAX_PLUS_1ARG    ( (uint64) 1 << 13 )
 #define RT_STEPPING_DEBUG   ( (uint64) 1 << 14 )
 #define ADDRESS_OF_OP       ( (uint64) 1 << 15 )
 #define BLOCK_DELIMITER     ( (uint64) 1 << 16 )
 #define T_OBJECT            ( (uint64) 1 << 17 )
 #define T_MORPHISM          ( (uint64) 1 << 18 )
-#define RIGHT_BRACKET       ( (uint64) 1 << 19 )
-#define LEFT_BRACKET        ( (uint64) 1 << 20 )
+#define RIGHT_BRACKET       ( (uint64) 1 << 19 ) // ']'
+#define LEFT_BRACKET        ( (uint64) 1 << 20 ) // '['
 
 // _CAttribute for interpreter word types - 4 bits/ 16 possibilities : N_WordAttribute bitfield
 #define WT_PREFIX                 ( (uint64) 1 <<  0 ) 

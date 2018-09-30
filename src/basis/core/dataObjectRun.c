@@ -84,7 +84,8 @@ _Namespace_Do_C_Type ( Namespace * ns )
     Context * cntx = _Context_ ;
     Lexer * lexer = cntx->Lexer0 ;
     Compiler * compiler = cntx->Compiler0 ;
-    byte * token1, *token2 ; Word * beginWord ;
+    byte * token1, *token2 ;
+    Word * beginWord ;
     if ( ! GetState ( compiler, DOING_C_TYPE ) )
     {
         SetState ( compiler, DOING_C_TYPE, true ) ;
@@ -119,7 +120,7 @@ _Namespace_Do_C_Type ( Namespace * ns )
                     Block_Eval ( beginWord->Definition ) ; //( beginWord ) ;
                     CfrTil_LocalsAndStackVariablesBegin ( ) ;
                     CfrTil_WordList_PushWord ( beginWord ) ;
-                    Word_SetCodingHere_And_ClearPreviousUseOf_Here_SCA (beginWord, 0) ;
+                    Word_SetCodingHere_And_ClearPreviousUseOf_Here_SCA ( beginWord, 0 ) ;
 #else                    
                     CfrTil_BeginBlock ( ) ; // nb! before CfrTil_LocalsAndStackVariablesBegin
                     CfrTil_LocalsAndStackVariablesBegin ( ) ;
@@ -201,7 +202,7 @@ _CfrTil_Do_ClassField ( Word * word )
     {
         Compiler_IncrementCurrentAccumulatedOffset ( compiler, word->Offset ) ;
     }
-    if ( ! (( CompileMode ) || GetState ( compiler, LC_ARG_PARSING ) ))
+    if ( ! ( ( CompileMode ) || GetState ( compiler, LC_ARG_PARSING ) ) )
     {
         accumulatedAddress = ( byte* ) TOS ; //_DataStack_Pop ( ) ;
         accumulatedAddress += word->Offset ;
@@ -230,7 +231,7 @@ CfrTil_Dot ( ) // .
     if ( ! cntx->Interpreter0->BaseObject )
     {
         SetState ( cntx, CONTEXT_PARSING_QID, true ) ;
-        d0 ( if ( Is_DebugModeOn ) Compiler_SC_WordList_Show ("\nCfrTil_Dot", 0 , 0) ) ;
+        d0 ( if ( Is_DebugModeOn ) Compiler_SC_WordList_Show ( "\nCfrTil_Dot", 0, 0 ) ) ;
         Word * word = Compiler_PreviousNonDebugWord ( 0 ) ; // 0 : rem: we just popped the WordStack above
         if ( word )
         {
@@ -318,7 +319,7 @@ _CfrTil_Do_DynamicObject_ToReg ( DObject * dobject0, Boolean reg )
         }
         else dobject = ndobject ;
     }
-    Word_SetCodingHere_And_ClearPreviousUseOf_Here_SCA (dobject, 0) ;
+    Word_SetCodingHere_And_ClearPreviousUseOf_Here_SCA ( dobject, 0 ) ;
     if ( CompileMode ) _Compile_Move_Literal_Immediate_To_Reg ( reg, ( int64 ) & dobject->W_Value ) ;
     cntx->Interpreter0->CurrentObjectNamespace = TypeNamespace_Get ( dobject ) ; // do this elsewhere when needed
     return dobject ;
@@ -344,34 +345,56 @@ void
 _Do_Variable ( Word * word )
 {
     Context * cntx = _Context_ ;
-    if ( GetState ( cntx, C_SYNTAX | INFIX_MODE ) || GetState ( cntx->Compiler0, LC_ARG_PARSING ) )
+    Compiler * compiler = cntx->Compiler0 ;
+    if ( GetState ( cntx, C_SYNTAX | INFIX_MODE ) || GetState ( compiler, LC_ARG_PARSING ) )
     {
-        if ( Is_LValue ( word ) )
+        // this logic and code needs to be integrated with the rest of this block     
+        if ( GetState ( compiler, ARRAY_MODE ) ) // ARRAY_MODE is a problem in its uses ??
         {
-            cntx->Compiler0->LHS_Word = word ;
-            Word_SetCoding (word, Here , 1) ;
-        }
-        else
-        {
-            if ( GetState ( _Context_, ADDRESS_OF_MODE ) )
+            if ( ( GetState ( _Context_, ADDRESS_OF_MODE ) ) || ( word->CAttribute & ( OBJECT | THIS | QID ) ) || GetState ( word, QID ) )
             {
                 _Compile_GetVarLitObj_LValue_To_Reg ( word, ACC ) ;
             }
-            else if ( ! ( word->CAttribute & REGISTER_VARIABLE ) )
-            {
-                Compile_GetVarLitObj_RValue_To_Reg ( word, ACC ) ;
-            }
+            else Compile_GetVarLitObj_RValue_To_Reg ( word, ACC ) ;
             _Word_CompileAndRecord_PushReg ( word, ( word->CAttribute & REGISTER_VARIABLE ) ? word->RegToUse : ACC ) ;
+            return ;
+        }
+        else
+        {
+            Boolean isLvalue = Is_LValue ( word ) ;
+            if ( ( isLvalue && ( ! compiler->LHS_Word ) ) || GetState ( compiler, ARRAY_MODE ) )
+            {
+                compiler->LHS_Word = word ;
+                Word_SetCoding ( word, Here, 1 ) ;
+                if ( ( word->CAttribute & ( OBJECT | THIS | QID ) ) || GetState ( word, QID ) )
+                {
+                    _Compile_GetVarLitObj_LValue_To_Reg ( word, ACC ) ;
+                    _Word_CompileAndRecord_PushReg ( word, ( word->CAttribute & REGISTER_VARIABLE ) ? word->RegToUse : ACC ) ;
+                }
+                // else no code for this case
+            }
+            else
+            {
+                if ( GetState ( _Context_, ADDRESS_OF_MODE ) )
+                {
+                    _Compile_GetVarLitObj_LValue_To_Reg ( word, ACC ) ;
+                }
+                else if ( ( ! ( word->CAttribute & REGISTER_VARIABLE ) ) )
+                {
+                    Compile_GetVarLitObj_RValue_To_Reg ( word, ACC ) ;
+                }
+                _Word_CompileAndRecord_PushReg ( word, ( word->CAttribute & REGISTER_VARIABLE ) ? word->RegToUse : ACC ) ;
+            }
         }
     }
     else
     {
-        if ( word->CAttribute & REGISTER_VARIABLE ) 
+        if ( word->CAttribute & REGISTER_VARIABLE )
         {
             SetPreHere_ForDebug ( Here ) ;
             _Word_CompileAndRecord_PushReg ( word, word->RegToUse ) ;
         }
-        else 
+        else
         {
             _Compile_GetVarLitObj_LValue_To_Reg ( word, ACC ) ;
             _Word_CompileAndRecord_PushReg ( word, ACC ) ;

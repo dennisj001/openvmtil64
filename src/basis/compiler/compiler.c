@@ -270,7 +270,7 @@ Compiler_Init_AccumulatedOffsetPointers ( Compiler * compiler, Word * word )
 void
 Compiler_Init ( Compiler * compiler, uint64 state )
 {
-    compiler->State = state ;
+    compiler->State = state & (!ARRAY_MODE);
     compiler->ContinuePoint = 0 ;
     compiler->BreakPoint = 0 ;
     compiler->InitHere = Here ;

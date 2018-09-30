@@ -61,6 +61,26 @@ _Debugger_Locals_Show_Loop ( Debugger * debugger, Word * scWord )
     }
 }
 
+Boolean
+_C_Syntax_AreWeParsingACFunctionCall ( byte * nc )
+{
+    while ( *nc++ != ')' ) ;
+    while ( *nc )
+    {
+        if ( *nc == ';' ) return true ; // we have an rvalue
+        else if ( *nc == '{' ) return false ; // we have an rvalue
+        nc ++ ;
+    }
+    return true ;
+}
+
+Boolean
+C_Syntax_AreWeParsingACFunctionCall ( Lexer * lexer )
+{
+    int64 tokenStartReadLineIndex = _Context_->Lexer0->TokenStart_ReadLineIndex ;
+    return _C_Syntax_AreWeParsingACFunctionCall ( & _Context_->ReadLiner0->InputLine [ tokenStartReadLineIndex ] ) ; //word->W_StartCharRlIndex ] ) ;
+}
+
 void
 Debugger_ParseFunctionLocalVariables ( Debugger * debugger, Lexer * lexer, Boolean c_syntaxFlag )
 {
@@ -97,12 +117,17 @@ Debugger_ParseFunctionLocalVariables ( Debugger * debugger, Lexer * lexer, Boole
         }
         else if ( ( String_Equal ( token, "(" ) ) && ( lasvf == false ) ) //|| String_Equal ( token, "(|" ) //not necessary the lexer will see only the '('
         {
+#if 0            
             if ( prevPrevToken )
             {
                 prevWord = Finder_Word_FindUsing ( _Finder_, prevToken, 0 ) ;
                 prevPrevWord = Finder_Word_FindUsing ( _Finder_, prevPrevToken, 0 ) ;
-                if ( prevWord && ( prevWord->CAttribute & PREFIX ) && prevPrevWord && ( prevPrevWord->Name[0] != ':' ) && (!(prevPrevWord->CAttribute & NAMESPACE)) ) continue ; //  ! ( lexer->ReadLiner0->InputLineString[0] == ':' ) ) ) continue ; // not a C syntax word with internal local variables
+                if ( prevWord && ( prevWord->CAttribute & (PREFIX|C_RETURN | C_PREFIX_RTL_ARGS|VOID_RETURN) ) && prevPrevWord && ( prevPrevWord->Name[0] != ':' ) && (!(prevPrevWord->CAttribute & NAMESPACE)) ) continue ; //  ! ( lexer->ReadLiner0->InputLineString[0] == ':' ) ) ) continue ; // not a C syntax word with internal local variables
+                 ;
             }
+#else
+            if ( C_Syntax_AreWeParsingACFunctionCall (lexer) ) continue ;
+#endif            
             if ( ! ( debugger->LevelBitNamespaceMap & ( ( uint64 ) 1 << ( levelBit ) ) ) )
             {
                 debugger->LocalsNamespace = _CfrTil_Parse_LocalsAndStackVariables ( 1, 0, 0, debugger->LocalsNamespacesStack, 0 ) ;
@@ -354,7 +379,7 @@ _PrepareDbgSourceCodeString ( Word * word, byte * il, int64 tvw )
     wrli = word->W_RL_Index ;
     slil = Strlen ( String_RemoveEndWhitespace ( il ) ) ;
     inc = slil - wrli ;
-    ots = String_FindStrnCmpIndex ( il, token, wrli, slt, slil ) ; //(( inc > 30 ) ? 30 : inc) ) ; //20 ) ;// adjust from wrli which is 
+    ots = String_FindStrnCmpIndex ( il, token, wrli, slt, 10 ) ; //slil ) ; //(( inc > 30 ) ? 30 : inc) ) ; //20 ) ;// adjust from wrli which is 
     totalBorder = ( tvw - slt ) ; // the borders allow us to slide token within the window of tvw
     // try to get nts relatively the same as ots
     idealBorder = ( totalBorder / 2 ) ;

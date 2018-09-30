@@ -20,7 +20,7 @@ Debugger_ShowDbgSourceCodeAtAddress ( Debugger * debugger, byte * address )
                 {
                     d0 ( DebugWordList_Show_All ( ) ) ;
 
-                    if ( ( scWord->WAttribute & WT_C_SYNTAX ) && String_Equal ( word->Name, "store" ) )
+                    if ( ( scWord->WAttribute & WT_C_SYNTAX ) && (String_Equal ( word->Name, "store" ) || String_Equal ( word->Name, "poke" ) ))
                     {
                         word->Name = ( byte* ) "=" ;
                         fixed = 1 ;
@@ -138,11 +138,18 @@ _CfrTil_AdjustDbgSourceCodeAddress ( byte * address, byte * newAddress )
 }
 
 void
+_CfrTil_WordList_PushWord ( Word * word, Boolean inUseFlag )
+{
+    CompilerWordList_Push ( word, inUseFlag) ; 
+}
+
+void
 CfrTil_WordList_PushWord ( Word * word )
 {
-    CompilerWordList_Push ( word, ( ! ( word->CAttribute & ( NAMESPACE | OBJECT_OPERATOR | OBJECT_FIELD ) ) ) || ( word->CAttribute & ( DOBJECT ) ) ) ; //_List_PushNew ( _CfrTil_->CompilerWordList, word ) ;
+    //CompilerWordList_Push ( word, ( ! ( word->CAttribute & ( NAMESPACE | OBJECT_OPERATOR | OBJECT_FIELD ) ) ) || ( word->CAttribute & ( DOBJECT ) ) ) ; //_List_PushNew ( _CfrTil_->CompilerWordList, word ) ;
     //CompilerWordList_Push ( word, ( ! ( word->CAttribute & ( NAMESPACE | OBJECT_OPERATOR ) ) ) ) ; //_List_PushNew ( _CfrTil_->CompilerWordList, word ) ;
     //CompilerWordList_Push ( word, ( ! ( word->CAttribute & ( NAMESPACE | OBJECT_FIELD ) ) ) || ( word->CAttribute & ( DOBJECT ) ) ) ; //_List_PushNew ( _CfrTil_->CompilerWordList, word ) ;
+    _CfrTil_WordList_PushWord ( word, ( ! ( word->CAttribute & ( NAMESPACE | OBJECT_OPERATOR | OBJECT_FIELD ) ) ) || ( word->CAttribute & ( DOBJECT ) ) ) ;
 }
 
 void
@@ -591,7 +598,7 @@ SC_PrepareDbgSourceCodeString ( byte * sc, Word * word ) // sc : source code ; s
         slt = Strlen ( token ) ;
         slsc = strlen ( sc ) ;
         scwi0 = word->W_SC_Index ;
-        scwci = String_FindStrnCmpIndex ( sc, token, scwi0, slt, slsc ) ; //( ( slsc - scwi0 ) > 30 ) ? 30 : ( slsc - scwi0 ) ) ;
+        scwci = String_FindStrnCmpIndex ( sc, token, scwi0, slt, 10 ) ; //slsc ) ; //( ( slsc - scwi0 ) > 30 ) ? 30 : ( slsc - scwi0 ) ) ;
         d0 ( byte * scspp0 = & sc [ scwi0 ] ) ;
         d0 ( byte * scspp2 = & sc [ scwci ] ) ;
         nvw = ( char* ) Buffer_New_pbyte ( ( slsc > BUFFER_SIZE ) ? slsc : BUFFER_SIZE ) ;

@@ -1,7 +1,7 @@
 // see readme.txt for a text description
 // TODO : types, database, garbage collection : integration
-typedef char Boolean ;
 typedef unsigned char byte ;
+typedef byte Boolean ;
 typedef byte uint8 ;
 typedef short int16 ;
 typedef unsigned short uint16 ;
@@ -929,7 +929,7 @@ typedef struct _CfrTil
     block Set_DspReg_FromDataStackPointer, Set_DataStackPointer_FromDspReg ; //, PeekReg, PokeReg ;
     block PopDspToR8AndCall, CallReg_TestRSP, Call_ToAddressThruR8_TestAlignRSP ; //adjustRSPAndCall, adjustRSP ;
     ByteArray * PeekPokeByteArray ;
-    Word * LastFinished_DObject, * LastFinished_Word, *StoreWord, *PokeWord, *ScoOcCrw, * CurrentWordCompiling ;
+    Word * LastFinished_DObject, * LastFinished_Word, *StoreWord, *PokeWord, *RightBracket, *ScoOcCrw, * CurrentWordCompiling ;
     Word *ScWord, *DebugWordListWord, *EndBlockWord, *BeginBlockWord, *InfixNamespace ;
     byte ReadLine_CharacterTable [ 256 ] ;
     ReadLineFunction ReadLine_FunctionTable [ 24 ] ;

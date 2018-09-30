@@ -236,7 +236,7 @@
 #define Is_DebugOn_DBI ( Is_DebugOn ? DBI : 0 )
 #define DBI_N( n ) (GetState ( _Debugger_, DBG_ASM_SHOW_ON ) && ( _Q_->Verbosity > n ) )
 
-#define Is_LValue( word ) ( GetState ( _Context_->Compiler0, LC_ARG_PARSING ) ? 0 : Interpret_CheckEqualBeforeSemi_LValue ( word ))
+#define Is_LValue( word ) ( GetState ( _Context_->Compiler0, (LC_ARG_PARSING)) ? 0 : Interpret_CheckEqualBeforeSemi_LValue ( word ))
 #define IS_INCLUDING_FILES _Context_->System0->IncludeFileStackNumber
 
 #define List_Init( list ) _dllist_Init ( list )

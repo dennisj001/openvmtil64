@@ -201,7 +201,7 @@ a6.ar[2][2][1] @ 0x89 _assert //pause
 "a6 : " ps location a6 72 dump //pause
 "Ar9" class :{ byte ar [256][256][256] };
 
-verbosity 2 =
+//verbosity 2 =
 : _adump ( addr size )
     //addr @ size @ <dbg> dump
     addr @ size @ dump
@@ -263,5 +263,38 @@ ab.ar [0][0][0] @ p
 ;
 "ac" ct new 
 2 ac tct //pause
+
+#if 1
+"cta" class :{ byte ar [3][3][3] ; };
+"aba" cta new
+scOn
+//void
+: tcta ( y cta a )
+    a.ar [0][y @ 1 +][0] dup nl hp 77 =
+    a.ar [y @][y @ 1 +][0] dup nl hp a.ar [0][y @ 1 +][0] dup nl hp @ = 
+    aba.ar 32 dump 
+;
+2 aba tcta //pause
+: cadump ( addr size )
+    //addr @ size @ <dbg> dump
+    addr @ size @ dump
+; prefix
+c_syntaxOn
+void
+ctcta ( y cta a )
+{
+    a.ar [0][y + 1][0] = 77 ;
+    a.ar [y ][y + 1][0] = a.ar [0][y + 1][0] ; 
+    hp ( &a.ar ) ;
+    cadump ( &a.ar 32 ) ; 
+} prefix
+c_syntaxOff
+' ctcta find wdiss
+"caba" cta new
+ctcta ( 2 caba ) 
+//pause
+#endif
+
+
 #endif
 2 + 7 assertStkChk // stack checking

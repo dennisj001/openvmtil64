@@ -64,8 +64,10 @@ _CheckArrayDimensionForVariables_And_UpdateCompilerState ( )
 void
 Compile_ArrayDimensionOffset ( Word * word, int64 dimSize, int64 objSize )
 {
-    if ( word->W_Value ) // if ! zero else 
+    //if ( word && word->W_Value ) // if ! zero else 
+    if ( word && ( ( word->CAttribute & LITERAL ) ? word->W_Value : 1 ) ) // if ! zero else 
     {
+        _Word_SCH_CPUSCA ( word, 1 ) ;
         int64 size = dimSize * objSize ;
         // assume arrayIndex has just been pushed to TOS
         // nb. if size is zero this complete processing of an array dimension adding its amount to the pointer-offset on the stack
@@ -136,11 +138,18 @@ Do_NextArrayToken ( byte * token, Word * arrayBaseObject, int64 objSize, Boolean
     Compiler *compiler = cntx->Compiler0 ;
     int64 arrayIndex, increment ;
     Word * word = Finder_Word_FindUsing ( cntx->Finder0, token, 0 ) ;
-    if ( word && ( ! GetState ( cntx->Compiler0, LC_ARG_PARSING ) ) ) word->W_RL_Index = cntx->Lexer0->TokenStart_ReadLineIndex ;
+    if ( word )
+    {
+        //if ( ! GetState ( cntx->Compiler0, LC_ARG_PARSING ) ) 
+        word->W_RL_Index = _Lexer_->TokenStart_ReadLineIndex ;
+        word->W_SC_Index = _Lexer_->SC_Index ;
+        _Word_SCH_CPUSCA ( word, 1 ) ;
+    }
+    SetState ( compiler, ARRAY_MODE, true ) ;
     if ( token [0] == '[' ) // '[' == an "array begin"
-    { 
+    {
         //once we have a variable any place in an array reference the flag must remain until the end of the array 
-        if ( ! (*variableFlag ) ) *variableFlag = _CheckArrayDimensionForVariables_And_UpdateCompilerState ( ) ;
+        if ( ! ( *variableFlag ) ) *variableFlag = _CheckArrayDimensionForVariables_And_UpdateCompilerState ( ) ;
         return 0 ;
     }
     else if ( token [0] == ']' ) // ']' == an "array end"
@@ -169,7 +178,7 @@ Do_NextArrayToken ( byte * token, Word * arrayBaseObject, int64 objSize, Boolean
     }
     if ( *variableFlag ) Set_CompileMode ( true ) ;
     else Set_CompileMode ( false ) ;
-    if ( word ) _Interpreter_DoWord ( interp, word, word->W_RL_Index, word->W_SC_Index ) ;
+    if ( word ) _Interpreter_DoWord ( interp, word, -1, -1 ) ; //word->W_RL_Index, word->W_SC_Index ) ;
     else Interpreter_InterpretAToken ( interp, token, - 1 ) ;
     Set_CompileMode ( saveCompileMode ) ;
     SetState ( compiler, COMPILE_MODE, saveCompileMode ) ;
@@ -200,7 +209,6 @@ _CfrTil_ArrayBegin ( Boolean lispMode, Word **pl1, int64 i )
     int64 objSize = 0 ;
     Boolean variableFlag = 0 ;
     byte * token ;
-    SetState ( compiler, ARRAY_MODE, true ) ;
     if ( lispMode )
     {
         l1 = * pl1 ;
@@ -220,10 +228,11 @@ _CfrTil_ArrayBegin ( Boolean lispMode, Word **pl1, int64 i )
         if ( interp->CurrentObjectNamespace ) objSize = interp->CurrentObjectNamespace->ObjectSize ; //_CfrTil_VariableValueGet ( cntx->Interpreter0->CurrentClassField, ( byte* ) "size" ) ; 
         if ( ! objSize ) CfrTil_Exception ( OBJECT_SIZE_ERROR, 0, QUIT ) ;
         variableFlag = _CheckArrayDimensionForVariables_And_UpdateCompilerState ( ) ;
-        _WordList_Pop ( _CfrTil_->CompilerWordList ) ; // pop the initial '['
-        DEBUG_SETUP ( baseObject ) ;
+        //_WordList_Pop ( _CfrTil_->CompilerWordList ) ; // pop the initial '['
+        //DEBUG_SETUP ( baseObject ) ;
         if ( lispMode ) Arrays_DoArrayArgs_Lisp ( pl1, l1, arrayBaseObject, objSize, saveCompileMode, &variableFlag ) ;
         else Arrays_DoArrayArgs_NonLisp ( lexer, token, arrayBaseObject, objSize, saveCompileMode, &variableFlag ) ;
+        _CfrTil_WordList_PushWord ( _CfrTil_->RightBracket, 1 ) ; // for the optimizer
         if ( CompileMode ) // update the baseObject offset 
         {
             if ( ! variableFlag )
@@ -239,17 +248,19 @@ _CfrTil_ArrayBegin ( Boolean lispMode, Word **pl1, int64 i )
                     _Debugger_->PreHere = baseObject->Coding ;
                 }
                 else _Word_CompileAndRecord_PushReg ( baseObject, ACC ) ;
-                _DEBUG_SHOW ( baseObject, 1 ) ;
             }
             else CfrTil_OptimizeOff ( ) ; // can't really be optimized any more anyway and optimize is turned back on after an =/store anyway
+            _DEBUG_SHOW ( baseObject, 1 ) ;
             compiler->ArrayEnds = 0 ; // reset for next array word in the current word being compiled
         }
         if ( lispMode ) interp->BaseObject = 0 ;
         else
         {
             if ( ( ! Lexer_IsTokenForwardDotted ( cntx->Lexer0 ) ) && ( ! GetState ( cntx->Compiler0, LC_ARG_PARSING ) ) ) interp->BaseObject = 0 ;
-            _dllist_RemoveNodes_UntilWord ( dllist_First ( ( dllist* ) _CfrTil_->CompilerWordList ), baseObject ) ;
+            if ( ! ( GetState ( cntx, C_SYNTAX | INFIX_MODE ) || GetState ( compiler, LC_ARG_PARSING ) ) )
+                _dllist_RemoveNodes_UntilWord ( dllist_First ( ( dllist* ) _CfrTil_->CompilerWordList ), baseObject ) ;
             SetState ( compiler, COMPILE_MODE, saveCompileMode ) ;
+            //SetState ( compiler, ARRAY_MODE, false ) ;
         }
     }
     if ( ! variableFlag ) SetState ( _CfrTil_, OPTIMIZE_ON, svOpState ) ;
@@ -266,5 +277,15 @@ void
 CfrTil_ArrayEnd ( void )
 {
     //noop
+}
+
+void
+CfrTil_ArrayModeOff ( void )
+{
+    if ( GetState ( _Compiler_, ARRAY_MODE ) )
+    {
+        SetState ( _Compiler_, ARRAY_MODE, false ) ;
+        CfrTil_OptimizeOn ( ) ;
+    }
 }
 

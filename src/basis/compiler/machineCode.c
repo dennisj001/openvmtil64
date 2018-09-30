@@ -247,7 +247,7 @@ _Compile_Write_Instruction_X64 ( Boolean rex, uint8 opCode0, uint8 opCode1, Bool
 }
 
 void
-Compile_CalcWrite_Instruction_X64 ( uint8 opCode0, uint8 opCode1, Boolean mod, Boolean reg, Boolean rm, int16 controlFlags, Boolean sib, int64 disp, Boolean dispSize, uint64 imm, Boolean immSize )
+Compile_CalcWrite_Instruction_X64 ( uint8 opCode0, uint8 opCode1, Boolean mod, uint8 reg, Boolean rm, uint16 controlFlags, Boolean sib, uint64 disp, uint8 dispSize, uint64 imm, uint8 immSize )
 {
     Boolean rex = Calculate_Rex ( reg, rm, ( immSize == 8 ) || ( controlFlags & REX_B ) ) ;
     uint8 modRm = CalculateModRmByte ( mod, reg, rm, sib, disp ) ;
@@ -498,14 +498,16 @@ _Compile_IMUL ( Boolean mod, Boolean reg, Boolean rm, Boolean sib, int64 disp, u
 }
 
 void
-Compile_IMULI ( Boolean mod, Boolean reg, Boolean rm, Boolean sib, int64 disp, int64 imm )
+Compile_IMULI ( Boolean mod, Boolean reg, Boolean rm, Boolean sib, int64 disp, uint64 imm )
 {
-    int64 opCode = 0x69 ;
-    if ( imm < 256 )
+    int64 opCode = 0x69,  immSize ;
+    if ( imm < 128 )
     {
         opCode |= 2 ;
+        immSize = 1 ;
     }
-    Compile_CalcWrite_Instruction_X64 ( 0, opCode, mod, reg, rm, REX_B | MODRM_B | IMM_B, sib, disp, 0, imm, 0 ) ; //size ) ;
+    else immSize = 4 ;
+    Compile_CalcWrite_Instruction_X64 ( 0, opCode, mod, reg, rm, REX_B | MODRM_B | IMM_B, sib, disp, 0, imm, immSize ) ; //size ) ;
 }
 
 void

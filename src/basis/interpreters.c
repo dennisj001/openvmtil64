@@ -1,7 +1,6 @@
 
 #include "../include/cfrtil64.h"
 
-
 void
 Interpret_String ( byte *str )
 {
@@ -23,7 +22,11 @@ Interpret_C_Until_Token3 ( Interpreter * interp, byte * end1, byte * end2, byte*
             if ( ! Compiling ) _Compiler_FreeAllLocalsNamespaces ( _Compiler_ ) ;
             break ;
         }
-        else if ( GetState ( _Context_, C_SYNTAX ) && ( String_Equal ( token, "," ) || String_Equal ( token, ";" ) ) ) break ;
+        else if ( GetState ( _Context_, C_SYNTAX ) && ( String_Equal ( token, "," ) || String_Equal ( token, ";" ) ) )
+        {
+            CfrTil_ArrayModeOff ( ) ;
+            break ;
+        }
         else Interpreter_InterpretAToken ( interp, token, - 1 ) ; //token = 0 ; }
     }
     //if ( token ) _CfrTil_PushToken_OnTokenList ( token ) ;
@@ -50,6 +53,7 @@ Interpret_Until_Token ( Interpreter * interp, byte * end, byte * delimiters )
             if ( String_Equal ( token, ";" ) && GetState ( _Context_, C_SYNTAX ) && GetState ( _Compiler_, C_COMBINATOR_PARSING ) )
             {
                 _CfrTil_PushToken_OnTokenList ( token ) ;
+                CfrTil_ArrayModeOff ( ) ;
                 break ;
             }
             else Interpreter_InterpretAToken ( interp, token, - 1 ) ;
@@ -65,7 +69,7 @@ Interpret_PrefixFunction_Until_Token ( Interpreter * interp, Word * prefixFuncti
     int64 svscwi = _CfrTil_->SC_Index ;
     Interpret_Until_Token ( interp, end, delimiters ) ;
     SetState ( _Context_->Compiler0, PREFIX_ARG_PARSING, false ) ;
-    if ( prefixFunction ) _Interpreter_DoWord_Default (interp, prefixFunction, -1, svscwi ) ;
+    if ( prefixFunction ) _Interpreter_DoWord_Default ( interp, prefixFunction, - 1, svscwi ) ;
 }
 
 void
@@ -94,12 +98,12 @@ Interpret_PrefixFunction_Until_RParen ( Interpreter * interp, Word * prefixFunct
             }
             else break ;
         }
-        d0 ( if ( Is_DebugModeOn ) Compiler_SC_WordList_Show ("\n_Interpret_PrefixFunction_Until_RParen", 0, 0) ) ;
+        d0 ( if ( Is_DebugModeOn ) Compiler_SC_WordList_Show ( "\n_Interpret_PrefixFunction_Until_RParen", 0, 0 ) ) ;
         SetState ( compiler, PREFIX_ARG_PARSING, true ) ;
         if ( flag ) Interpreter_InterpretAToken ( interp, token, - 1 ) ;
         else Interpret_Until_Token ( interp, ( byte* ) ")", ( byte* ) " ,\n\r\t" ) ;
         SetState ( compiler, PREFIX_ARG_PARSING, false ) ;
-        _Interpreter_DoWord_Default (interp, prefixFunction, -1, svscwi ) ;
+        _Interpreter_DoWord_Default ( interp, prefixFunction, - 1, svscwi ) ;
         if ( GetState ( _Context_, C_SYNTAX ) ) SetState ( _Context_, C_RHS, svs_c_rhs ) ;
         if ( ! Compiling ) _Compiler_FreeAllLocalsNamespaces ( compiler ) ;
     }

@@ -73,10 +73,10 @@ Compiler_GetOptimizeState ( Compiler * compiler, Word * word )
             if ( dobject_Get_M_Slot ( ( dobject* ) optInfo->node, SCN_IN_USE_FLAG ) ) optInfo->wordn = ( Word* ) dobject_Get_M_Slot ( ( dobject* ) optInfo->node, SCN_T_WORD ) ;
             else continue ;
             //if (( optInfo->wordn->CAttribute2 & ( RIGHT_BRACKET ) ) || ( optInfo->wordn->CAttribute & OBJECT_FIELD ) )
-            if ( ( optInfo->wordn->CAttribute2 & ( RIGHT_PAREN ) ) ) //| RIGHT_BRACKET ) ) || ( optInfo->wordn->CAttribute & OBJECT_FIELD ) )
+            if ( ( optInfo->wordn->CAttribute2 & ( RIGHT_PAREN | RIGHT_BRACKET ) ) )
             {
                 if ( GetState ( compiler, DOING_AN_INFIX_WORD ) ) continue ; // more precise logic probably needed here ??
-                else goto doOp ; // treat parenthesized value as an op
+                else goto doOp ; // treat parenthesized/array value as an op
             }
             else if ( optInfo->wordn->CAttribute2 & ( NO_OP_WORD | LEFT_PAREN ) ) continue ;
             else if ( ( optInfo->wordn->CAttribute & ( CATEGORY_OP ) ) ) //|| ( optInfo->wordn->CAttribute2 & ( ARRAY_TYPE ) ) ) // or anything unknown on the stack
@@ -230,7 +230,17 @@ Compiler_Optimizer_WordArg2Op_Or_xBetweenArg1AndArg2 ( Compiler * compiler )
             else Word_Check_SetHere_To_StackPushRegisterCode ( optInfo->wordArg2, 1 ) ; // the rest of the code will be handled in Compile_Optimize_Equal
         }
     }
-    else if ( optInfo->NumberOfArgs ) Compile_StackArgsToStandardRegs ( compiler ) ;
+    else if ( optInfo->NumberOfArgs )
+    {
+        if ( ( optInfo->wordArg2->CAttribute2 & ( RIGHT_BRACKET ) ) && ( ( GetState ( _Context_, C_SYNTAX | INFIX_MODE ) || GetState ( compiler, LC_ARG_PARSING ) ) ) )
+        {
+            Compile_Move_Rm_To_Reg ( OREG, DSP, 0 ) ;
+            Compile_Move_Rm_To_Reg ( OREG, OREG, 0 ) ;
+            _Compile_Move_StackN_To_Reg ( ACC, DSP, - 1 ), optInfo->Optimize_Reg = ACC | REG_ON_BIT ;
+            Compile_SUBI ( REG, DSP, 0, 2 * CELL, 0 ) ;
+        }
+        else Compile_StackArgsToStandardRegs ( compiler ) ;
+    }
 }
 
 void
@@ -299,23 +309,9 @@ void
 Compile_StackArgsToStandardRegs ( Compiler * compiler )
 {
     CompileOptimizeInfo * optInfo = compiler->OptInfo ;
-#if 0    
-    if ( optInfo->NumberOfArgs == 2 )
-    {
-        _Compile_Move_StackN_To_Reg ( OREG, DSP, 0 ), optInfo->Optimize_Rm = OREG ;
-        _Compile_Move_StackN_To_Reg ( ACC, DSP, - 1 ), optInfo->Optimize_Reg = ACC | REG_ON_BIT ;
-        Compile_SUBI ( REG, DSP, 0, 2 * CELL, 0 ) ;
-    }
-    else if ( optInfo->NumberOfArgs == 1 )
-    {
-        _Compile_Move_StackN_To_Reg ( ACC, DSP, 0 ), optInfo->Optimize_Rm = OREG ;
-        Compile_SUBI ( REG, DSP, 0, CELL, 0 ) ;
-    }
-#else
     _Compile_Move_StackN_To_Reg ( OREG, DSP, 0 ), optInfo->Optimize_Rm = OREG ;
     _Compile_Move_StackN_To_Reg ( ACC, DSP, - 1 ), optInfo->Optimize_Reg = ACC | REG_ON_BIT ;
     Compile_SUBI ( REG, DSP, 0, 2 * CELL, 0 ) ;
-#endif    
 }
 
 void

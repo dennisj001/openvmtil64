@@ -150,10 +150,10 @@ CfrTil_Interpret_C_Blocks ( int64 blocks, Boolean takesAnElseFlag, Boolean semic
             word = _Interpreter_TokenToWord ( interp, token ) ;
             if ( word )
             {
-                _Interpreter_DoWord ( interp, word, - 1, - 1 ) ; 
+                _Interpreter_DoWord ( interp, word, - 1, - 1 ) ;
                 if ( word->CAttribute & COMBINATOR )
                 {
-                    if ( semicolonEndsThisBlock ) 
+                    if ( semicolonEndsThisBlock )
                     {
                         Interpret_C_Block_EndBlock ( "}", 1 ) ;
                         blocksParsed ++ ;
@@ -178,7 +178,7 @@ void
 CfrTil_C_LeftParen ( )
 {
     Compiler * compiler = _Context_->Compiler0 ;
-    if ( ( GetState ( _Context_->Interpreter0, PREPROCESSOR_MODE ) ) ) 
+    if ( ( GetState ( _Context_->Interpreter0, PREPROCESSOR_MODE ) ) )
     {
         // this is for "#define" (which is parsed as '#' 'define', two words)
         if ( isalnum ( ReadLine_LastReadChar ( _ReadLiner_ ) ) ) CfrTil_LocalsAndStackVariablesBegin ( ) ;
@@ -202,27 +202,30 @@ _CfrTil_C_Infix_EqualOp ( Word * opWord )
     int64 svscwi = word0 ? word0->W_SC_Index : 0 ;
     byte * svName, * token ;
     SetState ( compiler, C_INFIX_EQUAL, true ) ;
-    if ( opWord ) _CfrTil_WordList_PopWords ( 1 ) ;
+    //if ( opWord ) 
+    _CfrTil_WordList_PopWords ( 1 ) ;
     compiler->NextBlockStart = Here ;
     token = Interpret_C_Until_Token3 ( interp, ( byte* ) ";", ( byte* ) ",", ( byte* ) ")", ( byte* ) " \n\r\t" ) ;
     if ( String_Equal ( ( char* ) token, ";" ) || String_Equal ( ( char* ) token, "," ) ) compiler->NextBlockStart = Here ;
     if ( lhsWord )
     {
-        int64 svState = cntx->State ;
-        SetState ( cntx, C_SYNTAX | INFIX_MODE, false ) ; // we don't want to just set compiler->LHS_Word
-        _Interpreter_DoWord_Default ( interp, lhsWord, - 1, lhsWord->W_SC_Index ) ;
-        cntx->State = svState ;
-        word0 = _CfrTil_->StoreWord ;
+        if ( ! ( lhsWord->CAttribute & ( OBJECT | THIS | QID ) ) || GetState ( lhsWord, QID ) )
+        {
+            int64 svState = cntx->State ;
+            SetState ( cntx, C_SYNTAX | INFIX_MODE, false ) ; // we don't want to just set compiler->LHS_Word
+            _Interpreter_DoWord_Default ( interp, lhsWord, - 1, lhsWord->W_SC_Index ) ;
+            cntx->State = svState ;
+            word0 = _CfrTil_->StoreWord ;
+        }
+        else word0 = _CfrTil_->PokeWord ;
     }
-    else
-    {
-        word0 = _CfrTil_->PokeWord ;
-    }
+    else word0 = _CfrTil_->PokeWord ;
     d0 ( if ( Is_DebugModeOn ) Compiler_SC_WordList_Show ( "\nCfrTil_C_Infix_EqualOp : before op word", 0, 0 ) ) ;
     if ( opWord ) rword = opWord ;
-    else rword = word0 ; 
+    else rword = word0 ;
     svName = rword->Name ;
     rword->Name = "=" ;
+    CfrTil_ArrayModeOff ( ) ;
     _Interpreter_DoWord_Default ( interp, rword, tsrli, svscwi ) ;
     SetState ( _Debugger_, DBG_OUTPUT_INSERTION, false ) ;
     rword->Name = svName ;
@@ -233,10 +236,12 @@ _CfrTil_C_Infix_EqualOp ( Word * opWord )
     }
     List_InterpretLists ( compiler->PostfixLists ) ;
     compiler->LHS_Word = 0 ;
+
     if ( ! Compiling ) CfrTil_InitSourceCode ( _CfrTil_ ) ;
     SetState ( _Debugger_, DEBUG_SHTL_OFF, false ) ;
     SetState ( compiler, C_INFIX_EQUAL, false ) ;
     _CfrTil_PushToken_OnTokenList ( token ) ; // so the callee can check use or use
+    CfrTil_ArrayModeOff ( ) ;
 }
 
 void
@@ -244,6 +249,7 @@ CfrTil_SetInNamespaceFromBackground ( )
 {
     Context * cntx = _Context_ ;
     if ( cntx->Compiler0->C_FunctionBackgroundNamespace ) _CfrTil_Namespace_InNamespaceSet ( cntx->Compiler0->C_FunctionBackgroundNamespace ) ;
+
     else Compiler_SetAs_InNamespace_C_BackgroundNamespace ( cntx->Compiler0 ) ;
 }
 
