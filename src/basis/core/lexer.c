@@ -16,6 +16,7 @@
 byte *
 _Lexer_LexNextToken_WithDelimiters ( Lexer * lexer, byte * delimiters, Boolean checkListFlag, Boolean peekFlag, int reAddPeeked, uint64 state )
 {
+    ReadLiner * rl = lexer->ReadLiner0 ;
     if ( ( ! checkListFlag ) || ( ! ( lexer->OriginalToken = Lexer_GetTokenNameFromTokenList ( lexer, peekFlag ) ) ) ) // ( ! checkListFlag ) : allows us to peek multiple tokens ahead if we     {
     {
         Lexer_Init ( lexer, delimiters, lexer->State, CONTEXT ) ;
@@ -36,8 +37,10 @@ _Lexer_LexNextToken_WithDelimiters ( Lexer * lexer, byte * delimiters, Boolean c
         {
             lexer->OriginalToken = ( byte * ) 0 ; // why not goto restartToken ? -- to allow user to hit newline and get response
         }
-        lexer->Token_Length = lexer->OriginalToken ? Strlen ( ( char* ) lexer->OriginalToken ) : 0 ;
+        lexer->Token_Length = Strlen ( ( char* ) lexer->OriginalToken ) ;
         lexer->TokenEnd_ReadLineIndex = lexer->TokenStart_ReadLineIndex + lexer->Token_Length ;
+        //lexer->TokenStart_FileIndex = rl->LineStartFileIndex + rl->ReadIndex - lexer->Token_Length ;
+        lexer->TokenStart_FileIndex = rl->LineStartFileIndex + lexer->TokenStart_ReadLineIndex ; //- lexer->Token_Length ;
         if ( peekFlag && reAddPeeked ) _CfrTil_PushToken_OnTokenList ( lexer->OriginalToken ) ;
     }
     return lexer->OriginalToken ;
@@ -92,7 +95,7 @@ Lexer_ObjectToken_New ( Lexer * lexer, byte * token ) //, int64 parseFlag )
             {
                 _Q_->ExceptionToken = token ;
                 byte *buffer = Buffer_Data ( _CfrTil_->ScratchB1 ) ;
-                sprintf ( buffer, ( byte* ) "\n%s ?\n", ( char* ) token ) ;
+                sprintf ( buffer, ( byte* ) "%s ?\n", ( char* ) token ) ;
                 CfrTil_Exception ( NOT_A_KNOWN_OBJECT, buffer, QUIT ) ;
             }
         }
@@ -271,7 +274,11 @@ Lexer_ReadToken ( Lexer * lexer )
 void
 _Lexer_AppendByteToTokenBuffer ( Lexer * lexer, byte c )
 {
-    if ( lexer->TokenStart_ReadLineIndex == - 1 ) lexer->TokenStart_ReadLineIndex = lexer->ReadLiner0->ReadIndex - 1 ;
+    ReadLiner * rl = lexer->ReadLiner0 ;
+    if ( lexer->TokenStart_ReadLineIndex == - 1 ) // -1 : Lexer_Init marker
+    {
+        lexer->TokenStart_ReadLineIndex = rl->ReadIndex - 1 ;
+    }
     lexer->TokenBuffer [ lexer->TokenWriteIndex ++ ] = c ;
     lexer->TokenBuffer [ lexer->TokenWriteIndex ] = 0 ;
 }
@@ -285,7 +292,7 @@ Lexer_AppendByteToTokenBuffer ( Lexer * lexer )
 void
 Lexer_Append_ConvertedCharacterToTokenBuffer ( Lexer * lexer )
 {
-    _String_AppendConvertCharToBackSlash ( TokenBuffer_AppendPoint ( lexer ), lexer->TokenInputByte ) ;
+    _String_AppendConvertCharToBackSlash ( TokenBuffer_AppendPoint ( lexer ), lexer->TokenInputByte, 0 ) ;
     _Lexer_AppendCharToSourceCode ( lexer, lexer->TokenInputByte, 0 ) ;
     lexer->TokenWriteIndex ++ ;
 }
@@ -378,7 +385,7 @@ _Lexer_AppendCharToSourceCode ( Lexer * lexer, byte c, int64 convert )
 {
     if ( GetState ( _CfrTil_, SOURCE_CODE_ON ) && GetState ( lexer, ADD_CHAR_TO_SOURCE ) )
     {
-        CfrTil_AppendCharToSourceCode ( _CfrTil_, c, 1 ) ;
+        CfrTil_AppendCharToSourceCode ( _CfrTil_, c ) ;
     }
 }
 
@@ -919,20 +926,105 @@ CfrTil_LexerTables_Setup ( CfrTil * cfrtl )
     //cfrtl->LexerCharacterFunctionTable [ 19 ] = SingleQuote ;
 }
 
-
-#if 0
-
-byte *
-Lexer_StrTok ( Lexer * lexer )
+int64
+IsLValue_String_CheckForwardToStatementEnd ( byte * nc )
 {
-    byte * buffer = 0 ;
-    byte * nextChar = _ReadLine_pb_NextChar ( lexer->ReadLiner0 ) ;
-    if ( nextChar )
+    while ( *nc )
     {
-        buffer = Buffer_Data ( _CfrTil_->StringB ) ;
-        _StrTok ( _ReadLine_pb_NextChar ( lexer->ReadLiner0 ), buffer, lexer->DelimiterCharSet ) ;
+        if ( *nc == '=' ) //break ;
+#if 1        
+        {
+            if ( * ( nc + 1 ) == '=' ) break ;
+            else if ( ispunct ( * ( nc - 1 ) ) ) break ; // op equal
+            else return true ; // we have an lvalue
+        }
+#endif        
+        else if ( *nc == ';' ) break ; // we have an lvalue
+        else if ( *nc == ',' ) break ; // we have an lvalue
+        else if ( *nc == '"' ) break ; // we have an rvalue
+        else if ( *nc == '.' ) break ; // we have an rvalue
+        else if ( *nc == '[' ) break ; // we have an rvalue
+        else if ( *nc == '(' ) break ; // we have an rvalue
+        else if ( *nc == '{' ) break ;  // we have an rvalue
+        else if ( *nc == '}' ) break ;  // syntax error : we have an rvalue
+        //else if ( *nc == '&' ) break ;  // we have an rvalue
+        nc ++ ;
     }
-    return buffer ;
+    return false ;
 }
-#endif
 
+int64
+Lexer_ConvertLineIndexToFileIndex ( Lexer * lexer, int64 index )
+{
+    return lexer->TokenStart_FileIndex = lexer->ReadLiner0->LineStartFileIndex + index ; //- lexer->Token_Length ;
+}
+
+int64
+Lexer_CheckForwardToStatementEnd_LValue ( Lexer * lexer, Word * word )
+{
+    int64 tokenStartReadLineIndex = ( ( int64 ) word == - 1 ) ? lexer->TokenStart_ReadLineIndex : word->W_RL_Index ;
+    int64 fileIndex = Lexer_ConvertLineIndexToFileIndex ( lexer, tokenStartReadLineIndex ) ;
+    return IsLValue_String_CheckForwardToStatementEnd ( & lexer->ReadLiner0->InputStringOriginal [fileIndex] ) ; //word->W_StartCharRlIndex ] ) ;
+}
+
+// assuming no comments
+Boolean
+Lexer_IsLValue_CheckBackToLastSemiForParenOrBracket ( Lexer * lexer, Word * word )
+{
+    ReadLiner * rl = lexer->ReadLiner0 ;
+    byte * nc = & rl->InputStringOriginal [lexer->TokenStart_FileIndex] ; //& rl->InputStringOriginal [Lexer_ConvertLineIndexToFileIndex ( lexer, word->W_RL_Index - Strlen (word->Name))] ;
+    Boolean equal = false ;
+    while ( ( *nc != ';' ) && ( *nc != ',' ) && ( *nc != '}' ) && ( *nc != '{' ) )
+    {
+        if ( ( *nc == ')' ) || ( *nc == '(' ) )
+            return Lexer_CheckForwardToStatementEnd_LValue ( lexer, word ) ;
+        else if ( *nc == '[' ) return false ;
+        else if ( *nc == '=' ) return false ;
+        nc -- ;
+    }
+    return (! equal ) ;
+}
+// assuming no comments
+
+Boolean
+Lexer_IsLValue_CheckForwardToNextSemiForArrayVariable ( Lexer * lexer, Word * word )
+{
+    if ( ( word->CAttribute & ( OBJECT | THIS | QID ) ) || GetState ( word, QID ) )
+    {
+        ReadLiner * rl = lexer->ReadLiner0 ;
+        byte * nc = & rl->InputStringOriginal [lexer->TokenStart_FileIndex] ;
+        Boolean space = false, inArray = false ;
+        while ( ( *nc != ';' ) && ( *nc != ',' ) && ( *nc != '}' ) && ( *nc != '{' ) )
+        {
+            if ( ( ! inArray ) && space && isalnum ( *nc ) ) return false ; // false means word is to be an rvalue
+            else if ( inArray && isalpha ( *nc ) ) // true means we have an array varible with this object
+                return true ;
+            else if ( *nc == ' ' ) space = true ;
+            else if ( *nc == '[' ) inArray = true, space = false ;
+            else if ( *nc == ']' ) inArray = false, space = false ;
+            nc ++ ;
+        }
+        return true ;
+    }
+    else return false ;
+}
+
+Boolean
+Is_LValue ( Context * cntx, Word * word )
+{
+    Boolean isLValue = false ; // generally 
+    Compiler * compiler = cntx->Compiler0 ;
+    if ( GetState ( _Context_, ADDRESS_OF_MODE ) ) isLValue = true ;
+    else if GetState ( compiler, ( LC_ARG_PARSING ) ) isLValue = false ;
+    else if ( GetState ( cntx, C_SYNTAX | INFIX_MODE ) )
+    {
+        if ( GetState ( _Context_, ADDRESS_OF_MODE ) ) isLValue = true ;
+        else
+        {
+            if ( ( word->CAttribute & ( OBJECT | THIS | QID ) ) || GetState ( word, QID ) )
+                isLValue = Lexer_IsLValue_CheckForwardToNextSemiForArrayVariable ( cntx->Lexer0, word ) ;
+            else isLValue = Lexer_CheckForwardToStatementEnd_LValue ( cntx->Lexer0, word ) ; 
+        }
+    }
+    return isLValue ;
+}

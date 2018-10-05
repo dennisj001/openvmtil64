@@ -138,6 +138,7 @@ Do_NextArrayToken ( byte * token, Word * arrayBaseObject, int64 objSize, Boolean
     Compiler *compiler = cntx->Compiler0 ;
     int64 arrayIndex, increment ;
     Word * word = Finder_Word_FindUsing ( cntx->Finder0, token, 0 ) ;
+#if 1    
     if ( word )
     {
         //if ( ! GetState ( cntx->Compiler0, LC_ARG_PARSING ) ) 
@@ -145,6 +146,7 @@ Do_NextArrayToken ( byte * token, Word * arrayBaseObject, int64 objSize, Boolean
         word->W_SC_Index = _Lexer_->SC_Index ;
         _Word_SCH_CPUSCA ( word, 1 ) ;
     }
+#endif    
     SetState ( compiler, ARRAY_MODE, true ) ;
     if ( token [0] == '[' ) // '[' == an "array begin"
     {
@@ -168,8 +170,9 @@ Do_NextArrayToken ( byte * token, Word * arrayBaseObject, int64 objSize, Boolean
             arrayIndex = DataStack_Pop ( ) ;
             if ( arrayIndex >= arrayBaseObject->ArrayDimensions [ dimNumber ] ) Error ( "Array index out of bounds.", "", ABORT ) ;
             increment = arrayIndex * dimSize * objSize ; // keep a running total of 
-            Compiler_IncrementCurrentAccumulatedOffset ( compiler, increment ) ;
-            if ( ! CompileMode ) _DataStack_SetTop ( _DataStack_GetTop ( ) + increment ) ; // after each dimension : in the end we have one lvalue remaining on the stack
+            if ( CompileMode ) Compiler_IncrementCurrentAccumulatedOffset ( compiler, increment ) ;
+            //if ( ! CompileMode ) 
+            else _DataStack_SetTop ( _DataStack_GetTop ( ) + increment ) ; // after each dimension : in the end we have one lvalue remaining on the stack
             if ( Is_DebugModeOn ) Word_PrintOffset ( word, increment, baseObject->AccumulatedOffset ) ;
         }
         DEBUG_SHOW ;

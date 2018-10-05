@@ -1,37 +1,6 @@
 
 #include "../../include/cfrtil64.h"
 
-int64
-_Interpret_CheckEqualBeforeSemi_LValue ( byte * nc )
-{
-    //if ( GetState ( _Context_, ADDRESS_OF_MODE ) ) return true ;
-    while ( *nc )
-    {
-        if ( *nc == '=' )
-        {
-            if ( * ( nc + 1 ) == '=' ) return false ;
-                // else if ( ispunct ( * ( nc - 1 ) ) && ( ( * ( nc - 1 ) != ' ' ) ) ) return false ;
-            else if ( ispunct ( * ( nc - 1 ) ) ) return false ;
-            else return true ; // we have an lvalue
-        }
-        else if ( *nc == ';' ) return false ; // we have an rvalue
-            //else if ( *nc == '"' ) return false ; // we have an rvalue
-        else if ( *nc == ')' ) return false ; // we have an rvalue
-        else if ( *nc == '(' ) return false ; // we have an rvalue
-        else if ( *nc == '{' ) return false ; // we have an rvalue
-        else if ( *nc == '}' ) return false ; // we have an rvalue
-        nc ++ ;
-    }
-    return false ;
-}
-
-int64
-Interpret_CheckEqualBeforeSemi_LValue ( Word * word )
-{
-    int64 tokenStartReadLineIndex = ( ( int64 ) word == - 1 ) ? _Context_->Lexer0->TokenStart_ReadLineIndex : word->W_RL_Index ;
-    return _Interpret_CheckEqualBeforeSemi_LValue ( & _Context_->ReadLiner0->InputLine [ tokenStartReadLineIndex ] ) ; //word->W_StartCharRlIndex ] ) ;
-}
-
 void
 Interpret_DoParenthesizedRValue ( )
 {
@@ -51,15 +20,11 @@ Interpret_DoParenthesizedRValue ( )
 void
 Interpret_C_Block_EndBlock ( byte * tokenToUse, Boolean insertFlag )
 {
-    //Compiler * compiler = _Compiler_ ;
-    //BlockInfo * bi = ( BlockInfo* ) _Stack_Top ( compiler->BlockStack ) ;
-    //bi->LogicCodeWord = _Compiler_WordList ( compiler, 1 ) ; //word ;
     if ( tokenToUse ) _CfrTil_->EndBlockWord->Name = tokenToUse ;
     if ( insertFlag ) SetState ( _Debugger_, DBG_OUTPUT_INSERTION, true ) ;
     _CfrTil_->EndBlockWord->W_RL_Index = _Lexer_->TokenStart_ReadLineIndex ;
     _Interpreter_DoWord_Default ( _Interpreter_, _CfrTil_->EndBlockWord, - 1, _CfrTil_->SC_Index ) ;
     _CfrTil_->EndBlockWord->Name = "}" ;
-    //CfrTil_ClearTokenList ( ) ;
     SetState ( _Debugger_, DBG_OUTPUT_INSERTION, false ) ;
 }
 
@@ -197,7 +162,7 @@ _CfrTil_C_Infix_EqualOp ( Word * opWord )
     Context * cntx = _Context_ ;
     Interpreter * interp = cntx->Interpreter0 ;
     Compiler *compiler = cntx->Compiler0 ;
-    Word * word0 = CfrTil_WordList ( 0 ), *lhsWord = compiler->LHS_Word, *rword ;
+    Word * word0 = CfrTil_WordList ( 0 ), *lhsWord = CompileMode ? compiler->LHS_Word : 0, *rword ;
     int64 tsrli = word0 ? word0->W_RL_Index : 0 ;
     int64 svscwi = word0 ? word0->W_SC_Index : 0 ;
     byte * svName, * token ;

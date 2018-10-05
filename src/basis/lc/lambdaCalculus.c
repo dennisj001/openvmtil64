@@ -71,14 +71,14 @@ _LO_New_RawStringOrLiteral ( Lexer * lexer, byte * token, int64 qidFlag )
     if ( GetState ( lexer, KNOWN_OBJECT ) )
     {
         uint64 ctokenType = qidFlag ? OBJECT : lexer->TokenType | LITERAL ;
-        Word * word = _DObject_New ( lexer->OriginalToken, lexer->Literal, ( ctokenType | IMMEDIATE | LITERAL ), 0, ctokenType, ctokenType,
-            ( byte* ) _DataObject_Run, 0, 0, 0, LISP ) ;
-        word->W_RL_Index = lexer->TokenStart_ReadLineIndex ;
+        Word * word = _DObject_New ( lexer->OriginalToken, lexer->Literal, ( ctokenType | IMMEDIATE | LITERAL ),
+            0, ctokenType, ctokenType, ( byte* ) _DataObject_Run, 0, 0, 0, LISP ) ; //_LC_->LispTempNamespace, LISP ) ;
+        //word->W_RL_Index = lexer->TokenStart_ReadLineIndex ;
         if ( ( ! qidFlag ) && ( lexer->TokenType & ( T_RAW_STRING ) ) )
         {
             // nb. we don't want to do this block with literals it slows down the eval and is wrong
             word->LAttribute |= ( T_LISP_SYMBOL | T_RAW_STRING ) ;
-            //_Namespace_DoAddWord ( _LC_->LispInternalNamespace, word, 0 ) ; // nb. here not in _DObject_New :: only for ( ! qidFlag ) && ( lexer->TokenType & T_RAW_STRING ) 
+            //_Namespace_DoAddWord ( _LC_->LispDefinesNamespace, word, 0 ) ; // nb. here not in _DObject_New :: only for ( ! qidFlag ) && ( lexer->TokenType & T_RAW_STRING ) 
             word->Lo_Value = ( int64 ) word->Lo_Name ;
         }
         word->Lo_CfrTilWord = word ;
@@ -94,20 +94,21 @@ _LO_New_RawStringOrLiteral ( Lexer * lexer, byte * token, int64 qidFlag )
 }
 
 ListObject *
-_LO_New ( uint64 ltype, uint64 ctype, uint64 ctype2, byte * name, byte * value, Word * word, uint64 allocType, int64 rl_Index, int64 scwi )
+_LO_New ( uint64 ltype, uint64 ctype, uint64 ctype2, byte * name, byte * value, Word * word, uint64 allocType, Namespace * addToNs, int64 rl_Index, int64 scwi )
 {
     //_DObject_New ( byte * name, uint64 value, uint64 ctype, uint64 ltype, uint64 ftype, byte * function, int64 arg, int64 addToInNs, Namespace * addToNs, uint64 allocType )
     ListObject * l0 = _DObject_New ( word ? word->Name : name ? name : ( byte* ) "", ( uint64 ) value, ctype, ctype2, ltype,
-        ( ltype & T_LISP_SYMBOL ) ? word ? word->RunType : 0 : 0, 0, 0, 0, 0, LISP ) ;
+        ( ltype & T_LISP_SYMBOL ) ? word ? word->RunType : 0 : 0, 0, 0, 0, 0, LISP ) ; //addToNs, LISP ) ;
     if ( ltype & LIST ) _LO_ListInit ( l0, allocType ) ;
     else if ( ltype & LIST_NODE ) l0->S_SymbolList = ( dllist* ) value ;
     if ( word )
     {
         l0->Lo_CfrTilWord = word ;
         word->Lo_CfrTilWord = word ;
-        l0->W_RL_Index = rl_Index ;
         l0->W_SourceCode = word->W_SourceCode ;
-        l0->W_SC_Index = word->W_SC_Index = ( scwi != - 1 ) ? scwi : _Lexer_->SC_Index ;
+        //l0->W_SC_Index = word->W_SC_Index = ( scwi != - 1 ) ? scwi : _Lexer_->SC_Index ;
+        //l0->W_RL_Index = rl_Index ;
+        //Word_Set_ScIndex_RlIndex ( word, -1, -1 ) ;
     }
     return l0 ;
 }
@@ -153,7 +154,7 @@ LC_FindWord ( byte * name, ListObject * locals )
             //word = _Finder_FindWord_InOneNamespace ( _Finder_, _LC_->LispTemporariesNamespace, name ) ;
             //if ( ! word )
             //{
-            word = _Finder_FindWord_InOneNamespace ( _Finder_, _LC_->LispInternalNamespace, name ) ;
+            word = _Finder_FindWord_InOneNamespace ( _Finder_, _LC_->LispDefinesNamespace, name ) ;
             if ( ! word )
             {
                 word = _Finder_FindWord_InOneNamespace ( _Finder_, _LC_->LispNamespace, name ) ; // prefer Lisp namespace
@@ -272,6 +273,7 @@ _LC_ReadEvalPrint_ListObject ( int64 parenLevel, int64 continueFlag )
     ListObject * l0 = _LC_Read_ListObject ( lc, parenLevel ) ; //0 ) ;
     d0 ( if ( Is_DebugOn ) LO_PrintWithValue ( l0 ) ) ;
     LC_EvalPrint ( lc, l0 ) ;
+    LC_ClearTempNamespace ( ) ;
     if ( ! continueFlag )
     {
         Lexer_SetTokenDelimiters ( lexer, svDelimiters, 0 ) ;
@@ -395,23 +397,34 @@ LC_FinishSourceCode ( )
 }
 
 void
-_LC_ClearInternalNamespace ( LambdaCalculus * lc )
+_LC_ClearDefinesNamespace ( LambdaCalculus * lc )
 {
-    if ( lc )
-    {
-        _Namespace_Clear ( lc->LispInternalNamespace ) ;
-    }
+    if ( lc ) _Namespace_Clear ( lc->LispDefinesNamespace ) ;
 }
 
 void
-LC_ClearInternalNamespace ( )
+LC_ClearDefinesNamespace ( )
 {
-    _LC_ClearInternalNamespace ( _LC_ ) ;
+    _LC_ClearDefinesNamespace ( _LC_ ) ;
 }
 
 void
-LC_LispNamespaceOff ( )
+_LC_ClearTempNamespace ( LambdaCalculus * lc )
 {
+    if ( lc ) _Namespace_Clear ( lc->LispTempNamespace ) ;
+}
+
+void
+LC_ClearTempNamespace ( )
+{
+    _LC_ClearTempNamespace ( _LC_ ) ;
+}
+
+void
+LC_LispNamespacesOff ( )
+{
+    Namespace_SetAsNotUsing ( ( byte* ) "LispTemp" ) ;
+    Namespace_SetAsNotUsing ( ( byte* ) "LispDefines" ) ;
     Namespace_SetAsNotUsing ( ( byte* ) "Lisp" ) ;
     CfrTil_TurnOffQualifyingNamespace ( ) ;
 }
@@ -425,7 +438,8 @@ LC_LispNamespaceOn ( )
 LambdaCalculus *
 _LC_Init_Runtime ( LambdaCalculus * lc )
 {
-    _Stack_Init ( lc->QuoteStateStack, 256 ) ;
+    if ( lc->QuoteStateStack ) _Stack_Init ( lc->QuoteStateStack, 256 ) ;
+    LC_ClearTempNamespace ( ) ;
     lc->SavedCodeSpace = 0 ;
     lc->CurrentLambdaFunction = 0 ;
     _LC_SaveDsp ( lc ) ;
@@ -450,15 +464,16 @@ _LC_Init ( LambdaCalculus * lc )
     if ( lc )
     {
         lc->LispNamespace = Namespace_Find ( ( byte* ) "Lisp" ) ;
-        lc->LispInternalNamespace = Namespace_FindOrNew_SetUsing ( ( byte* ) "LispInternal", 0, 1 ) ;
         _LC_Init_Runtime ( lc ) ;
+        lc->LispDefinesNamespace = Namespace_FindOrNew_SetUsing ( ( byte* ) "LispDefines", 0, 1 ) ;
+        lc->LispTempNamespace = Namespace_FindOrNew_SetUsing ( ( byte* ) "LispTemp", 0, 1 ) ;
         lc->OurCfrTil = _CfrTil_ ;
         int64 svds = GetState ( _CfrTil_, _DEBUG_SHOW_ ) ;
         int64 svsco = IsSourceCodeOn ;
         DebugShow_Off ;
         CfrTil_DbgSourceCodeOff ( ) ;
-        lc->Nil = DataObject_New ( T_LC_NEW, 0, ( byte* ) "nil", 0, 0, T_NIL, 0, 0, 0, 0, - 1 ) ;
-        lc->True = DataObject_New ( T_LC_NEW, 0, ( byte* ) "true", 0, 0, 0, 0, ( uint64 ) true, 0, 0, - 1 ) ;
+        lc->Nil = DataObject_New ( T_LC_DEFINE, 0, ( byte* ) "nil", 0, 0, T_NIL, 0, 0, 0, 0, - 1 ) ;
+        lc->True = DataObject_New ( T_LC_DEFINE, 0, ( byte* ) "true", 0, 0, 0, 0, ( uint64 ) true, 0, 0, - 1 ) ;
         lc->buffer = Buffer_Data ( lc->PrintBuffer ) ;
         lc->outBuffer = Buffer_Data ( lc->OutBuffer ) ;
         SetState ( _CfrTil_, DEBUG_SOURCE_CODE_MODE, svsco ) ;
@@ -472,10 +487,12 @@ LC_Delete ( LambdaCalculus * lc )
 {
     if ( lc )
     {
-        LC_ClearInternalNamespace ( ) ;
+        LC_ClearTempNamespace ( ) ;
+        LC_ClearDefinesNamespace ( ) ;
         OVT_MemListFree_LispTemp ( ) ;
         OVT_MemListFree_LispSpace ( ) ;
     }
+    _LC_ = 0 ;
 }
 
 LambdaCalculus *
@@ -491,17 +508,19 @@ _LC_Create ( )
 LambdaCalculus *
 LC_New ( )
 {
-    LambdaCalculus * lc = _LC_Create ( ) ;
-    _LC_ = lc ;
+    LambdaCalculus * lc = _LC_ ;
+    if ( lc ) LC_Delete ( lc ) ; //LC_ClearDefinesNamespace ( ) ;
+    lc = _LC_Create ( ) ;
     lc = _LC_Init ( lc ) ;
+    _LC_ = lc ;
     return lc ;
 }
 
 LambdaCalculus *
 LC_Reset ( )
 {
-    LC_Delete ( _LC_ ) ;
     LC_New ( ) ;
+    LC_LispNamespacesOff ( ) ;
 }
 
 LambdaCalculus *

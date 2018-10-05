@@ -379,7 +379,7 @@ _PrepareDbgSourceCodeString ( Word * word, byte * il, int64 tvw )
     wrli = word->W_RL_Index ;
     slil = Strlen ( String_RemoveEndWhitespace ( il ) ) ;
     inc = slil - wrli ;
-    ots = String_FindStrnCmpIndex ( il, token, wrli, slt, 10 ) ; //slil ) ; //(( inc > 30 ) ? 30 : inc) ) ; //20 ) ;// adjust from wrli which is 
+    ots = String_FindStrnCmpIndex ( il, token, wrli, slt, slil ) ; //(( inc > 30 ) ? 30 : inc) ) ; //20 ) ;// adjust from wrli which is 
     totalBorder = ( tvw - slt ) ; // the borders allow us to slide token within the window of tvw
     // try to get nts relatively the same as ots
     idealBorder = ( totalBorder / 2 ) ;
@@ -559,7 +559,8 @@ Debugger_ShowInfo ( Debugger * debugger, byte * prompt, int64 signal )
         Debugger_FindUsing ( debugger ) ;
     }
     else if ( debugger->w_Word ) debugger->Token = debugger->w_Word->Name ;
-    if ( ( signal != SIGSEGV ) && GetState ( debugger, DBG_STEPPING ) )
+    //if ( ( signal != SIGSEGV ) && GetState ( debugger, DBG_STEPPING ) )
+    if ( ( _Q_->SigSegvs < 2 ) && GetState ( debugger, DBG_STEPPING ) )
     {
         _Printf ( ( byte* ) "\nDebug Stepping Address : 0x%016lx", ( uint64 ) debugger->DebugAddress ) ;
         Debugger_UdisOneInstruction ( debugger, debugger->DebugAddress, ( byte* ) "", ( byte* ) "" ) ; // the next instruction

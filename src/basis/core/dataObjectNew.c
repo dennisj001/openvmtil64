@@ -19,7 +19,14 @@ DataObject_New ( uint64 type, Word * word, byte * name, uint64 ctype, uint64 cty
     {
         case T_LC_NEW:
         {
-            word = _LO_New ( ltype, ctype, ctype2, name, ( byte* ) value, word, ( allocType ? allocType : LISP_TEMP ), tsrli, scwi ) ; // all words are symbols
+            //word = _LO_New ( ltype, ctype, ctype2, name, ( byte* ) value, word, ( allocType ? allocType : LISP_TEMP ), _LC_->LispTempNamespace, tsrli, scwi ) ; // all words are symbols
+            word = _LO_New ( ltype, ctype, ctype2, name, ( byte* ) value, word, ( allocType ? allocType : LISP_TEMP ), 0, tsrli, scwi ) ; // all words are symbols
+            break ;
+        }
+        case T_LC_DEFINE:
+        {
+            //word = _LO_New ( ltype, ctype, ctype2, name, ( byte* ) value, word, LISP, _LC_->LispDefinesNamespace, tsrli, scwi ) ; // all words are symbols
+            word = _LO_New ( ltype, ctype, ctype2, name, ( byte* ) value, word, LISP, 0, tsrli, scwi ) ; // all words are symbols
             break ;
         }
         case T_LC_LITERAL:

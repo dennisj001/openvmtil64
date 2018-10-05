@@ -165,6 +165,7 @@ _Word_Create ( byte * name, uint64 ctype, uint64 ctype2, uint64 ltype, uint64 al
     if ( Is_NamespaceType ( word ) ) word->Lo_List = dllist_New ( ) ;
     _Compiler_->CurrentCreatedWord = word ;
     _CfrTil_->WordCreateCount ++ ;
+    Word_Set_ScIndex_RlIndex ( word, -1, -1 ) ; // default values
     return word ;
 }
 

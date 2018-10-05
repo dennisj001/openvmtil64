@@ -618,7 +618,8 @@ typedef struct Lexer
     Word * TokenWord ;
     byte TokenInputByte ;
     byte CurrentTokenDelimiter ;
-    int64 TokenStart_ReadLineIndex, TokenEnd_ReadLineIndex, Token_Length, SC_Index ; //Tsrli = TokenStart_ReadLineIndex
+    int64 TokenStart_ReadLineIndex, TokenEnd_ReadLineIndex; 
+    int64 TokenStart_FileIndex, TokenEnd_FileIndex, Token_Length, SC_Index ; //Tsrli = TokenStart_ReadLineIndex
     byte * TokenDelimiters ;
     byte * DelimiterCharSet ;
     byte * BasicTokenDelimiters ;
@@ -876,7 +877,7 @@ typedef struct _LambdaCalculus
 {
     uint64 State ;
     int64 DontCopyFlag, Loop, ParenLevel ;
-    Namespace *LispNamespace, *LispInternalNamespace ;
+    Namespace *LispNamespace, *LispDefinesNamespace, *LispTempNamespace, *BackgroundNamespace ;
     ListObject *lFunction, *lArgs, * Nil, *True ;
     ListObject *CurrentLambdaFunction, *LastInterpretedWord ; //, *ListFirst;
     ByteArray * SavedCodeSpace ;

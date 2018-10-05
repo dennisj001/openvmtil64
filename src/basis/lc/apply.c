@@ -365,7 +365,7 @@ Arrays_DoArrayArgs_Lisp ( Word ** pl1, Word * l1, Word * arrayBaseObject, int64 
 }
 
 int64
-_LO_Apply_ArrayArg (ListObject ** pl1, int64 i )
+_LO_Apply_ArrayArg ( ListObject ** pl1, int64 i )
 {
     return _CfrTil_ArrayBegin ( 1, pl1, i ) ;
 }
@@ -419,6 +419,7 @@ _LO_Apply_Arg ( LambdaCalculus * lc, ListObject ** pl1, int64 i )
     else
     {
         word = Compiler_CopyDuplicatesAndPush ( word ) ;
+        word->W_SC_Index = l1->W_SC_Index ;
         _DEBUG_SETUP ( word, 1 ) ;
         Compile_MoveImm_To_Reg ( RegOrder ( i ++ ), DataStack_Pop ( ), CELL_SIZE ) ;
         _DEBUG_SHOW ( word, 1 ) ;
@@ -451,11 +452,10 @@ _LO_Apply_C_LtoR_ArgList ( LambdaCalculus * lc, ListObject * l0, Word * word )
         Set_CompileMode ( true ) ;
         _Debugger_->PreHere = Here ;
         Word_SetCoding ( word, Here, 1 ) ;
-        word->W_SC_Index = l0->W_SC_Index ;
         word = Compiler_CopyDuplicatesAndPush ( word ) ;
         cntx->CurrentlyRunningWord = word ;
         if ( ( String_Equal ( word->Name, "printf" ) || ( String_Equal ( word->Name, "sprintf" ) ) ) ) Compile_MoveImm_To_Reg ( RAX, 0, CELL ) ; // for printf ?? others //System V ABI : "%rax is used to indicate the number of vector arguments passed to a function requiring a variable number of arguments"
-        Word_SetCodingHere_And_ClearPreviousUseOf_Here_SCA ( word, 0 ) ;
+        Word_SetCodingHere_And_ClearPreviousUseOf_Here_SCA ( word, 1 ) ;
         Word_Eval ( word ) ;
         if ( word->CAttribute2 & RAX_RETURN ) _Word_CompileAndRecord_PushReg ( word, ACC ) ;
         if ( ! svcm )
@@ -475,8 +475,9 @@ _LO_Apply_C_LtoR_ArgList ( LambdaCalculus * lc, ListObject * l0, Word * word )
 void
 LC_CompileRun_C_ArgList ( Word * word ) // C protocol - x64 : left to right arguments put into registers 
 {
-    LambdaCalculus * lc ;
-    lc = LC_Init ( ) ;
+    LambdaCalculus *lc, * svLc = _LC_ ;
+    Namespace * backgroundNamespace = _CfrTil_Namespace_InNamespaceGet ( ) ;
+    lc = LC_New ( ) ;
     Context * cntx = _Context_ ;
     Lexer * lexer = cntx->Lexer0 ;
     Compiler * compiler = cntx->Compiler0 ;
@@ -501,9 +502,12 @@ LC_CompileRun_C_ArgList ( Word * word ) // C protocol - x64 : left to right argu
         Set_CompileMode ( svcm ) ; // we must have the arguments pushed and not compiled for _LO_Apply_C_Rtl_ArgList which will compile them for a C_Rtl function
         _LO_Apply_C_LtoR_ArgList ( lc, l0, word ) ;
         LC_RestoreStackPointer ( lc ) ;
-        LC_LispNamespaceOff ( ) ;
+        LC_LispNamespacesOff ( ) ;
         SetState ( compiler, LC_ARG_PARSING | LC_C_RTL_ARG_PARSING, false ) ;
     }
+    LC_Delete ( lc ) ;
+    _LC_ = svLc ;
+    _CfrTil_Namespace_InNamespaceSet ( backgroundNamespace ) ;
     Lexer_SetTokenDelimiters ( lexer, svDelimiters, COMPILER_TEMP ) ;
 }
 

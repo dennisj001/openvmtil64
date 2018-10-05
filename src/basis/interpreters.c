@@ -79,7 +79,7 @@ Interpret_PrefixFunction_Until_RParen ( Interpreter * interp, Word * prefixFunct
     {
         Word * word ;
         byte * token ;
-        int64 svs_c_rhs, flag = 0, svscwi = _CfrTil_->SC_Index ;
+        int64 svs_c_rhs, flag = 0 ; //, svscwi = _CfrTil_->SC_Index ;
         Compiler * compiler = _Context_->Compiler0 ;
         while ( 1 )
         {
@@ -103,7 +103,7 @@ Interpret_PrefixFunction_Until_RParen ( Interpreter * interp, Word * prefixFunct
         if ( flag ) Interpreter_InterpretAToken ( interp, token, - 1 ) ;
         else Interpret_Until_Token ( interp, ( byte* ) ")", ( byte* ) " ,\n\r\t" ) ;
         SetState ( compiler, PREFIX_ARG_PARSING, false ) ;
-        _Interpreter_DoWord_Default ( interp, prefixFunction, - 1, svscwi ) ;
+        _Interpreter_DoWord_Default ( interp, prefixFunction, prefixFunction->W_RL_Index, prefixFunction->W_SC_Index ) ;
         if ( GetState ( _Context_, C_SYNTAX ) ) SetState ( _Context_, C_RHS, svs_c_rhs ) ;
         if ( ! Compiling ) _Compiler_FreeAllLocalsNamespaces ( compiler ) ;
     }

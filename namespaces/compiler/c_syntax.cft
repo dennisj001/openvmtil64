@@ -1,7 +1,7 @@
 
 5 
 User
-: sp ; //stack pause ;
+: sp stack pause ;
 location
 //dbgOn 
 //verbosity 4 =
@@ -31,26 +31,34 @@ typedef _CObj
 } cobj, CObj ;
 Class
 "CObj.size =" ps p ( CObj.size ) ;
-"chey" CObj new 
-CObj
+"chey" CObj new ;
+CObj 
 chey.hi = 1234 ;
-chey.chars [2] = 255 ;
-chey.heey = #x0123456789abcdef ; // doesn't work : still 32 bit limited ints
 dump ( chey, chey.size ) ;
-chey chey.size dump
-chey.heey1 = #x12345678 ;
-chey.heey2 = chey.heey1 ; // #x12345678 ; 
-chey.hey = chey.heey2 ; // #x12345678 ;
+printf ( "\n\tchey.hi = %d", chey.hi ) ; 
+//pause
+chey.chars [2] = 255 ;
+chey.heey = #x0123456789abcdef ; 
+dump ( chey, chey.size ) ;
+printf ( "\n\tchey.heey = %lx", chey.heey ) ; //pause
+dump ( chey, chey.size ) ;
+chey.heey1 = chey.heey ;
+chey.heey2 = chey.heey1 ; // #x0123456789abcdef ; 
+chey.hey = chey.heey2 ; // #x0123456789abcdef ;
+dump ( chey, chey.size ) ;
+printf ( "\n\tchey.hey = %lx", chey.hey ) ; 
+//pause
 chey.chars [23] = 255 ;
 chey.chars [18] = #b10110 ; // #x16
-chey.hey = #x12345678 ;
+//chey.hey = #x12345678 ;
 dump ( chey, cobj.size ) ; 
 
 p ( cobj.size ) ; 
 ' chey hex p
 //logOn sl using
-p ( chey.hey ) ;
-p ( & chey.hey ) ;
+p ( chey.hey ) ; 
+p ( &chey.hey ) ;
+//pause
 
 decimal
 var ( "x7" ) ;
@@ -59,17 +67,17 @@ sprintf ( x7, "%s", "\n\thoot" ) ;
 printf ( "%s", x7 ) ;
 
 sprintf ( &chey.chars, "%s", "well" ) ;
-dump ( &chey, cobj.size ) ; 
+dump ( chey, cobj.size ) ; 
 //d: sprintf ( &chey.chars [ 24 ], "%s", "do or don't" ) ;
 sprintf ( &chey.chars [ 24 ], "%s", "don't" ) ;
-dump ( &chey, cobj.size ) ; 
+dump ( chey, cobj.size ) ; 
 //sprintf ( &chey.chars, "%s", "well, do or don't hoot" ) ;
 sprintf ( &chey.chars, "%s", "hoot" ) ;
-dump ( &chey, cobj.size ) ; 
+dump ( chey, cobj.size ) ; 
 
 printf ( "\n\t%s\n", &chey.chars [ 24 ] ) ;
 printf ( "\n\t%s\n", "hoot" ) ; //&chey.chars [ 24 ] ) ;
-dump ( &chey, cobj.size ) ; // add '&' within parentheses for lvalue
+dump ( chey, cobj.size ) ; // add '&' within parentheses for lvalue
 //pause
 scOn
 void
@@ -97,10 +105,10 @@ chi ( chey0, d | a b c )
     d = cobj.chey0.hey ;
     printf ( "\n%lx\n", d ) ;
     printf ( "\n chi : d = %lx\n", d ) ;
-    d #x12345678 _assert
+    _assert ( d,  #x0123456789abcdef ) ;
     printf ( "\n%x\n", cobj.chey0.hey ) ;
     sprintf ( &chey0.chars [ 24 ], "%s", "hoot" ) ;
-    dump ( &chey0, cobj.size ) ; 
+    dump ( chey0, cobj.size ) ; 
 } prefix
 wdiss ( ' chi find )
 chi ( chey, 7 ) 
@@ -272,7 +280,7 @@ $ ( | atoken, buffer, CBuffer buffer0 )
         }
     }
 } 
-'void.$ find wdiss sp
+'void.$ find wdiss //sp
 
 #if doScript2 
 "\n\nnew $ test\n" ps
@@ -293,5 +301,5 @@ infixOff
 1 opOn
 s: hi ( a b | c ) c a @ b @ + = printf ("\nshould read 3 : %d", c ) ;s 1 2 hi //pause
 2 + 7 assertStkChk // stack checking
-
+//s pause
 

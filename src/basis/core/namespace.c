@@ -182,7 +182,7 @@ void
 Namespace_SetAsNotUsing ( byte * name )
 {
     Namespace * ns = Namespace_Find ( name ) ;
-    SetState_TrueFalse ( ns, NOT_USING, USING ) ;
+    if ( ns ) SetState_TrueFalse ( ns, NOT_USING, USING ) ;
 }
 
 void
@@ -356,6 +356,7 @@ _Namespace_Clear ( Namespace * ns )
     if ( ns )
     {
         //DLList_RecycleWordList (  ns->W_List ) ; // TODO :: fix this !! ??
+        DLList_RemoveWords ( ns->W_List ) ;
         _dllist_Init ( ns->W_List ) ;
     }
 }
@@ -406,6 +407,7 @@ _Namespace_FindOrNew_Local ( Stack * nsStack )
 {
     int64 d = Stack_Depth ( nsStack ) ; 
     byte bufferData [ 32 ], *buffer = ( byte* ) bufferData ;
+    if ( d > 3 ) _Printf ( (byte*)"\nlocals = %d\n", d), Pause () ;
     sprintf ( ( char* ) buffer, "locals_%ld", d ) ;
     //if ( String_Equal ( buffer, "locals_2") ) _Printf ((byte*) "\ngot it") ;
     Namespace * ns = Namespace_FindOrNew_SetUsing ( buffer, _CfrTil_->Namespaces, 1 ) ;

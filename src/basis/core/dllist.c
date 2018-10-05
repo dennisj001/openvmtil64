@@ -337,7 +337,7 @@ dllist_AddNodeToTail ( dllist *list, dlnode * node )
 {
     if ( list && node )
     {
-        dlnode_Remove ( node ) ; 
+        dlnode_Remove ( node ) ;
         _dllist_AddNodeToTail ( list, node ) ;
         list->n_CurrentNode = node ;
     }
@@ -716,7 +716,8 @@ Tree_Map_OneNamespace ( Word * word, MapFunction_1 mf, int64 one )
     for ( ; word ; word = nextWord )
     {
         nextWord = ( Word* ) dlnode_Next ( ( node* ) word ) ;
-        d0 ( _CfrTil_->FindWordCount ++ ) ;
+        //if ( Is_DebugOn ) _Printf ( ( byte* ) " %s.%s", word->ContainingNamespace ? word->ContainingNamespace->Name : (byte*) "", word->Name ) ;
+        //d0 ( _CfrTil_->FindWordCount ++ ) ;
         if ( mf ( ( Symbol* ) word, one ) ) return word ;
     }
     return 0 ;
@@ -751,7 +752,8 @@ Tree_Map_State_OneArg ( uint64 state, MapFunction_1 mf, int64 one )
             {
                 if ( ( word->State & state ) )
                 {
-                    if ( ( word2 = Tree_Map_OneNamespace ( ( Word* ) dllist_First ( ( dllist* ) word->W_List ), mf, one ) ) ) return word2 ;
+                    if ( ( word2 = Tree_Map_OneNamespace ( ( Word* ) dllist_First ( ( dllist* ) word->W_List ), mf, one ) ) )
+                        return word2 ;
                 }
             }
         }

@@ -57,7 +57,7 @@ _LO_PrintOneToString ( LambdaCalculus * lc, ListObject * l0, int64 in_a_LambdaFl
             if ( _AtCommandLine ( ) ) LC_sprintAString ( lc->buffer, " true" ) ;
         }
         else if ( l0->LAttribute == T_RAW_STRING ) LC_sprintString ( lc->buffer, l0->Lo_Value ) ;
-        else if ( l0->LAttribute & ( T_LISP_DEFINE | T_LISP_COMPILED_WORD ) && ( ! GetState ( lc, LC_DEFINE_MODE ) ) )
+        else if ( l0->LAttribute & ( T_LC_DEFINE | T_LISP_COMPILED_WORD ) && ( ! GetState ( lc, LC_DEFINE_MODE ) ) )
         {
             //if ( LO_IsQuoted ( l0 ) ) LC_sprintName ( lc->buffer, l0 ) ;
 #if 0            
@@ -112,6 +112,7 @@ void
 _LO_PrintListToString (LambdaCalculus * lc, ListObject * l0, int64 lambdaFlag, int64 printValueFlag)
 {
     ListObject * l1, *lnext ;
+    //lc->outBuffer[0] = 0 ;
     if ( l0 )
     {
         if ( l0->LAttribute & ( LIST | LIST_NODE ) )

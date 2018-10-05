@@ -348,7 +348,7 @@ BigNum_LessThan ( )
 void
 BigNum_LessThanOrEqual ( )
 {
-    DataStack_Push ( BigNum_Cmp ( ) <= 0 ? 1 : 0 ) ;
+    DataStack_Push ( (BigNum_Cmp ( ) <= 0) ? 1 : 0 ) ;
 }
 
 // op1 > op2 => (op1 - op2 > 0 )

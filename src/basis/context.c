@@ -226,6 +226,7 @@ _Context_DoubleQuoteMacro ( Context * cntx )
         CfrTil_InitSourceCode_WithCurrentInputChar ( _CfrTil_ ) ; // must be here for wdiss and add addToHistory
         //else _CfrTil_InitSourceCode ( _CfrTil_ ) ;
     }
+    _CfrTil_->SC_QuoteMode = true ;
     do
     {
         lexer->TokenInputByte = ReadLine_NextChar ( rl ) ;
@@ -234,6 +235,7 @@ _Context_DoubleQuoteMacro ( Context * cntx )
         else Lexer_Append_ConvertedCharacterToTokenBuffer ( lexer ) ;
     }
     while ( lexer->TokenInputByte != '"' ) ;
+    _CfrTil_->SC_QuoteMode = false ;
     SetState ( lexer, LEXER_DONE, true ) ;
     if ( GetState ( _CfrTil_, STRING_MACROS_ON ) && GetState ( &_CfrTil_->Sti, STI_INITIALIZED ) )
     {

@@ -44,12 +44,20 @@ OpenVmTil_ShowExceptionInfo ( )
     {
         if ( _Q_->ExceptionMessage ) printf ( "\n%s : %s\n", _Q_->ExceptionMessage, _Q_->ExceptionSpecialMessage ), fflush ( stdout ) ;
         _DisplaySignal ( _Q_->Signal ) ;
-        //if ( ( _Q_->SignalExceptionsHandled ++ < 2 ) && _CfrTil_ && ( _Q_->Signal != SIGSEGV ) ) _OpenVmTil_ShowExceptionInfo ( ) ;
-        if ( ( _Q_->Signal != SIGSEGV ) && ( _Q_->SignalExceptionsHandled ++ < 2 ) && _CfrTil_ ) _OpenVmTil_ShowExceptionInfo ( ) ;
+        //if ( ( _Q_->Signal != SIGSEGV ) && ( _Q_->SignalExceptionsHandled ++ < 2 ) && _CfrTil_ ) _OpenVmTil_ShowExceptionInfo ( ) ;
+        if ( ( _Q_->SigSegvs < 2 ) && ( _Q_->SignalExceptionsHandled ++ < 2 ) && _CfrTil_ ) _OpenVmTil_ShowExceptionInfo ( ) ;
     }
     int64 rtrn = OVT_Pause ( 0, _Q_->SignalExceptionsHandled ) ;
     _Q_->Signal = 0 ;
     return rtrn ;
+}
+
+void
+OVT_SimpleFinalPause ( )
+{
+    printf ( "\n!!Serious Error : hit any key to continue full restart!!\n:!!> " ) ;
+    fflush ( stdout ) ;
+    Key ( ) ;
 }
 
 int64
@@ -276,7 +284,11 @@ OpenVmTil_SignalAction ( int signal, siginfo_t * si, void * uc )
         _Q_->SigAddress = 0 ; //|| ( signal == SIGWINCH ) ) _Q_->SigAddress = 0 ; // 17 : "CHILD TERMINATED" : ignore; its just back from a shell fork
         _Q_->Signal = 0 ;
     }
-    else if ( GetState ( _Q_, OVT_PAUSE ) ) _OVT_SigLongJump ( & _Q_->JmpBuf0 ) ;
+    else if ( _Q_->SigSegvs )
+    {
+        OVT_SimpleFinalPause ( ) ;
+        _OVT_SigLongJump ( & _Q_->JmpBuf0 ) ;
+    }
     else OVT_Throw ( _Q_->Signal, _Q_->RestartCondition, 0 ) ;
 }
 

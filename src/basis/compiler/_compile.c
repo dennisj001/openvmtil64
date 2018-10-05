@@ -234,7 +234,7 @@ _Compile_GetVarLitObj_LValue_To_Reg ( Word * word, int64 reg )
     else if ( word->CAttribute & NAMESPACE_VARIABLE )
     {
         int64 value ;
-        if ( GetState ( _Context_->Compiler0, LC_ARG_PARSING ) || ( GetState ( _Context_, C_SYNTAX ) && ( ! Is_LValue ( word ) ) ) )//GetState ( _Context_, C_RHS ) )
+        if ( GetState ( _Context_->Compiler0, LC_ARG_PARSING ) || ( GetState ( _Context_, C_SYNTAX ) && ( ! Is_LValue ( _Context_, word ) ) ) )//GetState ( _Context_, C_RHS ) )
         {
             value = ( int64 ) word->W_Value ;
         }

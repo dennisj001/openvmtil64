@@ -324,8 +324,8 @@ __CfrTil_Dump ( byte * address, int64 number, int64 dumpMod )
     {
         byte * nformat ;
         int64 i, n ;
-        if ( _Context_->System0->NumberBase == 16 ) nformat = ( byte* ) "\nDump : Address = " UINT_FRMT " : Number = " UINT_FRMT " : (little endian)" ;
-        else nformat = ( byte* ) "\nDump : Address = " UINT_FRMT " : Number = " INT_FRMT " - (little endian)" ;
+        if ( _Context_->System0->NumberBase == 16 ) nformat = ( byte* ) "\nDump : Address = " UINT_FRMT " : Number = " UINT_FRMT " :: (little endian dump)" ;
+        else nformat = ( byte* ) "\nDump : Address = " UINT_FRMT " : Number = " INT_FRMT " :: (little endian dump)" ;
         _Printf ( nformat, ( int64 ) address, number ) ;
         for ( i = 0 ; i < number ; )
         {
@@ -406,7 +406,7 @@ _CfrTil_Source ( Word *word, int64 addToHistoryFlag )
         {
             _Printf ( ( byte* ) "%s <:> %s", name, "cfrTil compiled word" ) ;
         }
-        else if ( word->LAttribute & T_LISP_DEFINE )
+        else if ( word->LAttribute & T_LC_DEFINE )
         {
             _Printf ( ( byte* ) "%s <:> %s", name, "lambdaCalculus defined word" ) ;
         }
@@ -426,7 +426,7 @@ _CfrTil_Source ( Word *word, int64 addToHistoryFlag )
             __Word_ShowSourceCode ( word ) ; // source code has newlines for multiline history
             if ( addToHistoryFlag ) _OpenVmTil_AddStringToHistoryList ( word->W_SourceCode ) ;
             if ( word->S_WordData->Filename ) _Printf ( ( byte* ) "\nSource code file location of %s : \"%s\" : %d.%d :: we are now at : %s", name, word->S_WordData->Filename, word->S_WordData->LineNumber, word->W_TokenEnd_ReadLineIndex, Context_IsInFile ( _Context_ ) ? Context_Location ( ) : ( byte* ) "command line" ) ;
-            if ( ( word->LAttribute & T_LISP_DEFINE ) && ( ! ( word->LAttribute & T_LISP_COMPILED_WORD ) ) ) _Printf ( ( byte* ) "\nLambda Calculus word : interpreted not compiled" ) ; // do nothing here
+            if ( ( word->LAttribute & T_LC_DEFINE ) && ( ! ( word->LAttribute & T_LISP_COMPILED_WORD ) ) ) _Printf ( ( byte* ) "\nLambda Calculus word : interpreted not compiled" ) ; // do nothing here
             else if ( ! ( category & CPRIMITIVE ) )
             {
                 _Printf ( ( byte* ) "\nCompiled with : %s%s%s%s",

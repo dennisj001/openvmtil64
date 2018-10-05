@@ -15,7 +15,7 @@ _LO_Define ( ListObject * idNode, ListObject * locals )
     _CfrTil_->CurrentWordCompiling = word ;
     word->Lo_CfrTilWord = word ;
     SetState ( lc, ( LC_DEFINE_MODE ), true ) ;
-    Namespace_DoAddWord ( lc->LispInternalNamespace, word ) ; // put it at the beginning of the list to be found first
+    Namespace_DoAddWord ( lc->LispDefinesNamespace, word ) ; // put it at the beginning of the list to be found first
     word->CAttribute = NAMESPACE_VARIABLE ; // nb. !
     value = _LO_Eval ( lc, value0, locals, 0 ) ; // 0 : don't apply
     if ( value && ( value->LAttribute & T_LAMBDA ) )
@@ -27,13 +27,13 @@ _LO_Define ( ListObject * idNode, ListObject * locals )
     //else value = LO_Copy ( value ) ; // doesn't work ?? LO_Copy is broken :: this value object should now become part of LISP non temporary memory
     //d1 ( if ( _Is_DebugOn ) LO_PrintWithValue ( value ) ) ;
     word->Lo_Value = ( uint64 ) value ; // used by eval
-    word->LAttribute |= ( T_LISP_DEFINE | T_LISP_SYMBOL ) ;
+    word->LAttribute |= ( T_LC_DEFINE | T_LISP_SYMBOL ) ;
     word->State |= LC_DEFINED ;
     // the value was entered into the LISP memory, now we need a temporary carrier for LO_Print
     //l1 = _DataObject_New ( T_LC_NEW, LO_New ( LIST_NODE, word ), 0, word->CAttribute, word->CAttribute2, word->LAttribute, 
     l1 = DataObject_New ( T_LC_NEW, 0, word->Name, word->CAttribute, word->CAttribute2, word->LAttribute, 
         0, ( int64 ) value, LISP, - 1, - 1 ) ; // all words are symbols
-    l1->LAttribute |= ( T_LISP_DEFINE | T_LISP_SYMBOL ) ;
+    l1->LAttribute |= ( T_LC_DEFINE | T_LISP_SYMBOL ) ;
     SetState ( lc, ( LC_DEFINE_MODE ), false ) ;
     l1->W_SourceCode = word->W_SourceCode = lc->LC_SourceCode ;
     _Word_Finish ( l1 ) ;

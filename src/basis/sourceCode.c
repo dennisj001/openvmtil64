@@ -62,6 +62,7 @@ DWL_Find ( dllist * list, Word * iword, byte * address, byte* name, int64 takeFi
             anode = fromFirstFlag ? dlnode_Next ( anode ) : dlnode_Previous ( anode ), i ++ )
         {
             nword = ( Word* ) dobject_Get_M_Slot ( ( dobject* ) anode, SCN_T_WORD ) ;
+            if ( ! nword->S_WordData ) continue ;
             naddress = nword->SourceCoding ;
             scwi = dobject_Get_M_Slot ( ( dobject* ) anode, SCN_SC_WORD_INDEX ) ;
             iuFlag = dobject_Get_M_Slot ( ( dobject* ) anode, SCN_IN_USE_FLAG ) ;
@@ -170,7 +171,7 @@ void
 SC_List_AdjustAddress ( dlnode * node, byte * address, byte * newAddress )
 {
     Word * nword = ( Word* ) dobject_Get_M_Slot ( ( dobject* ) node, SCN_T_WORD ) ;
-    if ( ( nword->Coding == address ) ) //&& ( nword->W_SC_WordIndex != word->W_SC_WordIndex ) )
+    if ( nword->S_WordData && ( nword->Coding == address ) ) //&& ( nword->W_SC_WordIndex != word->W_SC_WordIndex ) )
     {
         Word_SetCoding ( nword, newAddress, 1 ) ;
         d0 ( if ( Is_DebugModeOn ) _Printf ( ( byte* ) "\nnword %s with scwi %d :: cleared for word %s with scwi %d",
@@ -186,7 +187,7 @@ void
 SC_ListClearAddress ( dlnode * node, byte * address )
 {
     Word * nword = ( Word* ) dobject_Get_M_Slot ( ( dobject* ) node, SCN_T_WORD ) ;
-    if ( ( nword->SourceCoding == address ) ) //&& ( nword->W_SC_WordIndex != word->W_SC_WordIndex ) )
+    if ( nword->S_WordData && ( nword->SourceCoding == address ) ) //&& ( nword->W_SC_WordIndex != word->W_SC_WordIndex ) )
     {
         Word_SetCoding ( nword, 0, 0 ) ;
         d0 ( if ( Is_DebugModeOn ) _Printf ( ( byte* ) "\nnword %s with scwi %d :: cleared for word %s with scwi %d",
@@ -558,7 +559,7 @@ _CfrTil_AppendCharToSourceCode ( CfrTil * cfrtil, byte c )
 }
 
 void
-CfrTil_AppendCharToSourceCode ( CfrTil * cfrtil, byte c, int64 convertToSpaceFlag )
+CfrTil_AppendCharToSourceCode ( CfrTil * cfrtil, byte c )
 {
     if ( cfrtil->SC_Index < ( SOURCE_CODE_BUFFER_SIZE - 1 ) )
     {
@@ -568,12 +569,7 @@ CfrTil_AppendCharToSourceCode ( CfrTil * cfrtil, byte c, int64 convertToSpaceFla
             else cfrtil->SC_QuoteMode = 1 ;
             _CfrTil_AppendCharToSourceCode ( cfrtil, c ) ;
         }
-        else if ( convertToSpaceFlag )
-        {
-            c = String_ConvertEscapeCharToSpace ( c ) ;
-            if ( ! ( ( c == ' ' ) && ( cfrtil->SC_Buffer [ cfrtil->SC_Index - 1 ] == ' ' ) ) ) _CfrTil_AppendCharToSourceCode ( cfrtil, c ) ;
-        }
-        else _String_AppendConvertCharToBackSlashAtIndex ( cfrtil->SC_Buffer, c, &cfrtil->SC_Index, cfrtil->SC_QuoteMode ) ;
+        else _String_AppendConvertCharToBackSlash ( cfrtil->SC_Buffer, c, &cfrtil->SC_Index ) ;
     }
 }
 
@@ -581,7 +577,7 @@ Word *
 Get_SourceCodeWord ( )
 {
     Word * scWord = _CfrTil_->ScWord ? _CfrTil_->ScWord : Compiling ? _CfrTil_->CurrentWordCompiling : _CfrTil_->LastFinished_DObject ;
-    return scWord ;
+    return (scWord && scWord->S_WordData) ? scWord : 0 ;
 }
 
 // ...source code source code TP source code source code ... EOL
@@ -598,7 +594,7 @@ SC_PrepareDbgSourceCodeString ( byte * sc, Word * word ) // sc : source code ; s
         slt = Strlen ( token ) ;
         slsc = strlen ( sc ) ;
         scwi0 = word->W_SC_Index ;
-        scwci = String_FindStrnCmpIndex ( sc, token, scwi0, slt, 10 ) ; //slsc ) ; //( ( slsc - scwi0 ) > 30 ) ? 30 : ( slsc - scwi0 ) ) ;
+        scwci = String_FindStrnCmpIndex ( sc, token, scwi0, slt, slsc ) ; //( ( slsc - scwi0 ) > 30 ) ? 30 : ( slsc - scwi0 ) ) ;
         d0 ( byte * scspp0 = & sc [ scwi0 ] ) ;
         d0 ( byte * scspp2 = & sc [ scwci ] ) ;
         nvw = ( char* ) Buffer_New_pbyte ( ( slsc > BUFFER_SIZE ) ? slsc : BUFFER_SIZE ) ;

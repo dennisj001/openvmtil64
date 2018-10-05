@@ -46,7 +46,9 @@ factoriali (7) dup p 5040 _assert //pause //sp
 : bexp3 ( n ) { n @ 1 > } { n @ n @ -- bexp3 *  } { 1 } ifElse ;
 7 bexp3 dup p 5040 _assert //sp
 'bexp3 find wdiss //pause
+
 c_syntaxOn
+#if 1
 int
 faccs3 ( n | rec -- TOS ) 
 {
@@ -54,10 +56,12 @@ faccs3 ( n | rec -- TOS )
     { 
         rec = rec * n ; 
     } 
-    //return rec ;
+    //return facc ;
 }
 ' faccs3 find wdiss
 faccs3 ( 7 ) dup p 5040 _assert //sp
+#endif
+
 int
 fac5 ( REG n  | REG facc -- RAX ) 
 { 

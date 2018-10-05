@@ -88,36 +88,7 @@ _Mem_ChunkAllocate ( int64 size, uint64 allocType )
     dllist_AddNodeToHead ( &_Q_->PermanentMemList, ( dlnode* ) mchunk ) ;
     return ( byte* ) mchunk ;
 }
-#if 0
-byte *
-Mem_Allocate ( int64 size, uint64 allocType )
-{
-    MemorySpace * ms = _Q_->MemorySpace0 ;
-    switch ( allocType )
-    {
-        case OPENVMTIL: return _Allocate ( size, ms->OpenVmTilSpace ) ;
-        case LISP: case OBJECT_MEM: return _Allocate ( size, ms->ObjectSpace ) ;
-        case TEMPORARY: return _Allocate ( size, ms->TempObjectSpace ) ; // used for SourceCode
-        case DICTIONARY: return _Allocate ( size, ms->DictionarySpace ) ;
-        case SESSION: return _Allocate ( size, ms->SessionObjectsSpace ) ;
-        case CODE: return _Allocate ( size, ms->CodeSpace ) ;
-        case BUFFER: return _Allocate ( size, ms->BufferSpace ) ;
-        case HISTORY: return _Allocate ( size, ms->HistorySpace ) ;
-        case LISP_TEMP: return _Allocate ( size, ms->LispTempSpace ) ;
-        case CONTEXT: return _Allocate ( size, ms->ContextSpace ) ;
-        case COMPILER_TEMP: return _Allocate ( size, ms->CompilerTempObjectSpace ) ;
-        case CFRTIL: case DATA_STACK: return _Allocate ( size, ms->CfrTilInternalSpace ) ;
-        case STRING_MEMORY: return _Allocate ( size, ms->StringSpace ) ;
-            //case SIZED_ALLOCATE: return Sized_Allocate ( size ) ;
-        case RUNTIME:
-        {
-            _Q_->RunTimeAllocation += size ;
-            return mmap_AllocMem ( size ) ;
-        }
-        default: CfrTil_Exception ( MEMORY_ALLOCATION_ERROR, 0, QUIT ) ;
-    }
-}
-#else
+
 byte *
 Mem_Allocate ( int64 size, uint64 allocType )
 {
@@ -129,7 +100,6 @@ Mem_Allocate ( int64 size, uint64 allocType )
         case LISP: return _Allocate ( size, ms->LispSpace ) ;
         case TEMPORARY: return _Allocate ( size, ms->TempObjectSpace ) ; // used for SourceCode
         case DICTIONARY: return _Allocate ( size, ms->DictionarySpace ) ;
-        //case TEMPORARY: 
         case SESSION: return _Allocate ( size, ms->SessionObjectsSpace ) ;
         case CODE: return _Allocate ( size, ms->CodeSpace ) ;
         case BUFFER: return _Allocate ( size, ms->BufferSpace ) ;
@@ -139,7 +109,6 @@ Mem_Allocate ( int64 size, uint64 allocType )
         case COMPILER_TEMP: return _Allocate ( size, ms->CompilerTempObjectSpace ) ;
         case CFRTIL: case DATA_STACK: return _Allocate ( size, ms->CfrTilInternalSpace ) ;
         case STRING_MEMORY: return _Allocate ( size, ms->StringSpace ) ;
-            //case SIZED_ALLOCATE: return Sized_Allocate ( size ) ;
         case RUNTIME:
         {
             _Q_->RunTimeAllocation += size ;
@@ -148,7 +117,6 @@ Mem_Allocate ( int64 size, uint64 allocType )
         default: CfrTil_Exception ( MEMORY_ALLOCATION_ERROR, 0, QUIT ) ;
     }
 }
-#endif
 
 void
 Mem_FreeItem ( dllist * mList, byte * item )
@@ -655,6 +623,13 @@ void
 DLList_RecycleWordList ( dllist * list )
 {
     dllist_Map ( list, ( MapFunction0 ) CheckRecycleWord ) ;
+}
+
+// check a compiler word list for recycleable words and add them to the recycled word list : _Q_->MemorySpace0->RecycledWordList
+void
+DLList_RemoveWords ( dllist * list )
+{
+    dllist_Map ( list, ( MapFunction0 ) dlnode_Remove ) ;
 }
 
 void

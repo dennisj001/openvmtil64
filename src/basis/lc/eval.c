@@ -52,7 +52,7 @@ _LO_EvalSymbol (LambdaCalculus * lc, ListObject *l0, ListObject *locals )
     w = LC_FindWord ( l0->Name, locals ) ;
     if ( l0 && ( ( ! LO_IsQuoted ( l0 ) ) && w ) )
     {
-        if ( w->LAttribute & T_LISP_DEFINE ) l0 = ( ListObject * ) w->Lo_Value ; // created by define
+        if ( w->LAttribute & T_LC_DEFINE ) l0 = ( ListObject * ) w->Lo_Value ; // created by define
         else if ( w->CAttribute & ( CPRIMITIVE | CFRTIL_WORD | LOCAL_VARIABLE | PARAMETER_VARIABLE | T_LISP_COMPILED_WORD ) )
         {
             l0->Lo_Value = w->W_Value ;

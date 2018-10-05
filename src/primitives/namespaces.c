@@ -267,7 +267,7 @@ _Namespace_RemoveFromUsingListAndClear ( Namespace * ns )
 {
     if ( ns )
     {
-        if ( ns == _CfrTil_->InNamespace ) _CfrTil_->InNamespace = ( Namespace* ) dlnode_Next ( ( dlnode* ) ns ) ; //dllist_First ( (dllist*) _Q_->CfrTil->Namespaces->Lo_List ) ;
+        if ( ns == _CfrTil_->InNamespace ) _CfrTil_->InNamespace = 0 ; //( Namespace* ) dlnode_Next ( ( dlnode* ) ns ) ; //dllist_First ( (dllist*) _Q_->CfrTil->Namespaces->Lo_List ) ;
         if ( ns == _Context_->Finder0->QualifyingNamespace ) Finder_SetQualifyingNamespace ( _Context_->Finder0, 0 ) ;
         _Namespace_Clear ( ns ) ;
         dlnode_Remove ( ( dlnode* ) ns ) ;

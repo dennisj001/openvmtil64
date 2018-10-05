@@ -68,15 +68,11 @@ CfrTil_C_Semi ( )
 {
     Context * cntx = _Context_ ;
     Compiler * compiler = cntx->Compiler0 ;
+    compiler->LHS_Word = 0 ;
     if ( ! Compiling )
     {
         CfrTil_InitSourceCode ( _CfrTil_ ) ;
         Compiler_Init ( compiler, 0 ) ;
-    }
-    else
-    {
-        compiler->LHS_Word = 0 ;
-        //if ( compiler->C_BackgroundNamespace ) _CfrTil_Namespace_InNamespaceSet ( compiler->C_BackgroundNamespace ) ;
     }
 }
 

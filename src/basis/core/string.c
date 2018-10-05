@@ -202,13 +202,13 @@ String_ReadLineToken_HighLight ( byte * token )
 
 // ?? use pointers with these string functions ??
 
-byte *
-_String_AppendConvertCharToBackSlashAtIndex ( byte * dst, byte c, int64 * index, int64 quoteMode )
+void
+_String_AppendConvertCharToBackSlash ( byte * dst, byte c, int64 * index ) //, int64 quoteMode )
 {
-    int64 i = * index ;
+    int64 i = index ? (* index) : 0 ;
     if ( c < ' ' )
     {
-        if ( quoteMode )
+        if ( _CfrTil_->SC_QuoteMode )
         {
             if ( c == '\n' )
             {
@@ -226,44 +226,47 @@ _String_AppendConvertCharToBackSlashAtIndex ( byte * dst, byte c, int64 * index,
                 dst [ i ++ ] = 't' ;
             }
         }
-        else dst [ i ++ ] = ' ' ;
+        else dst [ i ++ ] = ' ' ; // ignore unquoted escape chars
     }
     else
     {
-        if ( ! ( ( c == ' ' ) && ( dst [i - 1] == ' ' ) ) ) dst [ i ++ ] = c ;
+        if ( ! ( ( c == ' ' ) && ( dst [i - 1] == ' ' ) ) ) dst [ i ++ ] = c ; // remove extra spaces
     }
     dst [ i ] = 0 ;
-    *index = i ;
-    return &dst [ i ] ;
+    if ( index ) *index = i ;
+    //return &dst [ i ] ;
 }
-
-byte *
+#if 0
+void
 _String_AppendConvertCharToBackSlash ( byte * dst, byte c )
 {
     int64 i = 0 ;
     if ( ( c < ' ' ) )
     {
-        if ( c == '\n' )
+        if ( _CfrTil_->SC_QuoteMode )
         {
-            dst [ i ++ ] = '\\' ;
-            dst [ i ++ ] = 'n' ;
-        }
-        else if ( c == '\r' )
-        {
-            dst [ i ++ ] = '\\' ;
-            dst [ i ++ ] = 'r' ;
-        }
-        else if ( c == '\t' )
-        {
-            dst [ i ++ ] = '\\' ;
-            dst [ i ++ ] = 't' ;
+            if ( c == '\n' )
+            {
+                dst [ i ++ ] = '\\' ;
+                dst [ i ++ ] = 'n' ;
+            }
+            else if ( c == '\r' )
+            {
+                dst [ i ++ ] = '\\' ;
+                dst [ i ++ ] = 'r' ;
+            }
+            else if ( c == '\t' )
+            {
+                dst [ i ++ ] = '\\' ;
+                dst [ i ++ ] = 't' ;
+            }
         }
     }
     else dst [ i ++ ] = c ;
     dst [ i ] = 0 ;
-    return &dst [ i ] ;
+    //return &dst [ i ] ;
 }
-
+#endif
 byte *
 _String_ConvertStringFromBackSlash ( byte * dst, byte * src )
 {
@@ -747,14 +750,15 @@ IsPunct ( byte b )
 
 #if 0
 // ?? necessary ; works ??
+
 int64
-String_CheckWordSize ( byte * str, int64 wl ) 
+String_CheckWordSize ( byte * str, int64 wl )
 {
     byte * start, *end ;
     int64 i, length ;
     Boolean punctFlag = IsPunct ( str [0] ), rPunctFlag = IsPunct ( str [wl - 1] ) ; //punctFlag means first character of word is punctuation 
 
-    for ( i = -1 ; abs ( i ) < ( wl + 1 ) ; i -- ) // go to left of str first
+    for ( i = - 1 ; abs ( i ) < ( wl + 1 ) ; i -- ) // go to left of str first
     {
         if ( punctFlag )
         {
@@ -796,7 +800,7 @@ String_FindStrnCmpIndex ( byte * sc, byte* name0, int64 index0, int64 wl0, int64
                 index += i ;
                 goto done ;
             }
-        } 
+        }
     }
     for ( i = 0, n = wl0 + inc ; ( i <= n ) ; i ++ ) // tokens are parsed in different order with parameter and c rtl args, etc. 
     {
@@ -838,7 +842,7 @@ _String_HighlightTokenInputLine ( byte * nvw, Boolean lef, int64 leftBorder, int
         if ( lef )
         {
             strncpy ( ( char* ) b3, " .. ", 4 ) ;
-            if ( leftBorder > 4 ) strncat ( ( char* ) b3, ( char* ) &nvw[4], leftBorder - 4 ) ; // 3 : [0 1 2 3]  0 indexed array
+            if ( leftBorder > 4 ) strncat ( ( char* ) b3, ( char* ) &nvw [ 4 ], leftBorder - 4 ) ; // 4 : strlen " .. " 
         }
         else strncpy ( ( char* ) b3, ( char* ) nvw, leftBorder ) ;
 
@@ -848,10 +852,10 @@ _String_HighlightTokenInputLine ( byte * nvw, Boolean lef, int64 leftBorder, int
 
         if ( ref )
         {
-            if ( rightBorder > 4 ) strncpy ( ( char* ) b3, ( char* ) &nvw[tokenStart + slt ], rightBorder - 4 ) ; // 4 : strlen " .. " 
+            if ( rightBorder > 4 ) strncpy ( ( char* ) b3, ( char* ) &nvw [ tokenStart + slt ], rightBorder - 4 ) ; // 4 : strlen " .. " 
             strcat ( ( char* ) b3, " .. " ) ;
         }
-        else strcpy ( ( char* ) b3, ( char* ) &nvw[tokenStart + slt ] ) ; //, BUFFER_SIZE ) ; // 3 : [0 1 2 3]  0 indexed array
+        else strcpy ( ( char* ) b3, ( char* ) &nvw [ tokenStart + slt ] ) ; //, BUFFER_SIZE ) ; // 3 : [0 1 2 3]  0 indexed array
         char * ccR = ( char* ) cc ( b3, &_Q_->Debug ) ;
         strcat ( ( char* ) b2, ccR ) ;
 
