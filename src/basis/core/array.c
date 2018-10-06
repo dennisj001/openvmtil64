@@ -16,8 +16,6 @@ Byte_PtrCall ( byte * bptr )
 ByteArray *
 _ByteArray_AppendSpace_MakeSure ( ByteArray * ba, int64 size ) // size in bytes
 {
-    //if ( ( ba == _Q_CodeByteArray ) && Compiling ) CfrTil_Exception ( OUT_OF_CODE_MEMORY, INITIAL_START ) ;
-
     NamedByteArray * nba = ba->OurNBA ;
     if ( nba )
     {
@@ -39,9 +37,8 @@ _ByteArray_AppendSpace_MakeSure ( ByteArray * ba, int64 size ) // size in bytes
                 }
             }
             _Q_->AllocationRequestLacks ++ ;
-            nba->NBA_DataSize += ( (( nba->CheckTimes ++) * (1 * M)) + size ) ; //( 2 * K ) ) + size ;
-            if ( ba == _Q_CodeByteArray ) nba->NBA_DataSize += 5 * K ; // make sure we have enough code space
-            //nba->NBA_DataSize += size ;
+            nba->NBA_DataSize += ( ( ( nba->CheckTimes ++ ) * ( 1 * M ) ) + size ) ; //( 2 * K ) ) + size ;
+            //if ( ba == _Q_CodeByteArray ) nba->NBA_DataSize += 5 * K ; // make sure we have enough code space
             if ( _Q_->Verbosity > 3 )
             {
                 printf ( "\n%s size requested = %ld :: adding size = %ld :: largest remaining = %ld :: Nba total remaining = %ld :: checkTimes = %ld\n",
@@ -52,6 +49,7 @@ _ByteArray_AppendSpace_MakeSure ( ByteArray * ba, int64 size ) // size in bytes
     }
     else Error_Abort ( "_ByteArray_AppendSpace_MakeSure", ( byte* ) "\n_ByteArray_AppendSpace_MakeSure : no nba?!\n" ) ;
 done:
+    nba->ba_CurrentByteArray = ba ;
     return ba ;
 }
 
@@ -247,6 +245,7 @@ _NBA_SetCompilingSpace_MakeSureOfRoom ( NamedByteArray * nba, int64 room )
         Set_CompilerSpace ( nba->ba_CurrentByteArray ) ;
         ByteArray * ba = _ByteArray_AppendSpace_MakeSure ( nba->ba_CurrentByteArray, room ) ;
         if ( ! ba ) Error_Abort ( "\n_NBA_SetCompilingSpace_MakeSureOfRoom :", "no ba?!\n" ) ;
+        Set_CompilerSpace ( ba ) ;
     }
 }
 

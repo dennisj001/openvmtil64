@@ -4,7 +4,7 @@
 #if BN_DBG_OFF
 #define d1m(x) 
 #endif
-
+#if 0
 mpfr_t *
 _BigNum_New ( byte * token )
 {
@@ -34,11 +34,37 @@ _BigNum_New ( byte * token )
 doDefaultZeroValue:
     mpfr_init_set_si ( *bfr, ( long ) 0, MPFR_RNDN ) ;
 retrn:
-    d0 ( _CfrTil_->SaveSelectedCpuState ( ) ) ;
-    //d1m ( _CfrTil_->SaveCpuState ( ) ) ;
     return bfr ;
 }
 
+#else
+mpfr_t *
+_BigNum_New ( byte * token )
+{
+    double bf ;
+    long i, bi ;
+    mpfr_t *bfr = ( mpfr_t* ) Mem_Allocate ( sizeof ( mpfr_t ), OBJECT_MEM ) ;
+    if ( token )
+    {
+        for ( i = 0 ; token [i] ; i ++ )
+        {
+            if ( token [i] == '.' )
+            {
+                if ( sscanf ( ( char* ) token, "%lf", &bf ) )
+                {
+                    mpfr_init_set_d ( *bfr, bf, MPFR_RNDN ) ;
+                    return bfr ;
+                }
+                else { mpfr_init_set_si ( *bfr, ( long ) 0, MPFR_RNDN ) ; return bfr ; }
+            }
+        }
+        if ( sscanf ( ( char* ) token, "%ld", &bi ) ) mpfr_init_set_si ( *bfr, bi, MPFR_RNDN ) ;
+        else mpfr_init_set_si ( *bfr, ( long ) 0, MPFR_RNDN ) ;
+    }
+    else mpfr_init_set_si ( *bfr, ( long ) 0, MPFR_RNDN ) ;
+    return bfr ;
+}
+#endif
 //"For a, A, e, E, f and F specifiers: this is the number of digits to be printed after the decimal point" 
 
 mpfr_t *
@@ -348,7 +374,7 @@ BigNum_LessThan ( )
 void
 BigNum_LessThanOrEqual ( )
 {
-    DataStack_Push ( (BigNum_Cmp ( ) <= 0) ? 1 : 0 ) ;
+    DataStack_Push ( ( BigNum_Cmp ( ) <= 0 ) ? 1 : 0 ) ;
 }
 
 // op1 > op2 => (op1 - op2 > 0 )
