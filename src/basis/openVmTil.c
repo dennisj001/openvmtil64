@@ -1,5 +1,5 @@
 #include "../include/cfrtil64.h"
-#define VERSION ((byte*) "0.862.000" ) 
+#define VERSION ((byte*) "0.862.100" ) 
 
 OpenVmTil * _Q_ ;
 
@@ -98,7 +98,7 @@ OpenVmTil_Delete ( OpenVmTil * ovt )
     }
     _Q_ = 0 ;
 }
-#define _CFRTIL_SIZE (24 * K)
+#define _CFRTIL_SIZE (82 * K) // data stack included here
 
 void
 _OpenVmTil_CalculateMemSpaceSizes ( OpenVmTil * ovt, int64 restartCondition, int64 totalMemSizeTarget )
@@ -161,7 +161,7 @@ _OpenVmTil_CalculateMemSpaceSizes ( OpenVmTil * ovt, int64 restartCondition, int
         historySize = 1 * MB ; //HISTORY_SIZE ;
 
         dataStackSize = 8 * KB ; //STACK_SIZE ;
-        openVmTilSize = 2 * KB ; //OPENVMTIL_SIZE ;
+        openVmTilSize = 15 * KB ; //OPENVMTIL_SIZE ;
         cfrTilSize = _CFRTIL_SIZE ; //( dataStackSize * sizeof (int64 ) ) + ( 5 * KB ) ; //CFRTIL_SIZE ;
 
         exceptionsHandled = 0 ;
@@ -172,7 +172,7 @@ _OpenVmTil_CalculateMemSpaceSizes ( OpenVmTil * ovt, int64 restartCondition, int
     minimalCoreMemorySize = 150 * K, coreMemTargetSize = totalMemSizeTarget - minStaticMemSize ;
     coreMemTargetSize = ( coreMemTargetSize > minimalCoreMemorySize ) ? coreMemTargetSize : minimalCoreMemorySize ;
     // core memory
-    objectsSize = ( int64 ) ( 0.333 * ( ( double ) coreMemTargetSize ) ) ; // we can easily allocate more object and dictionary space but not code space
+    objectsSize = 1 * M ; //( int64 ) ( 0.333 * ( ( double ) coreMemTargetSize ) ) ; // we can easily allocate more object and dictionary space but not code space
     dictionarySize = ( int64 ) ( 0.333 * ( ( double ) coreMemTargetSize ) ) ;
     codeSize = ( int64 ) ( 0.333 * ( ( double ) coreMemTargetSize ) ) ;
     codeSize = ( codeSize < ( 500 * K ) ) ? 500 * K : codeSize ;
@@ -267,7 +267,7 @@ _OpenVmTil_New ( OpenVmTil * ovt, int64 argc, char * argv [ ] )
     int64 MIN_TotalMemSizeTarget = ( 300 * K ) ;
     if ( ovt->TotalMemSizeTarget < MIN_TotalMemSizeTarget ) ovt->TotalMemSizeTarget = MIN_TotalMemSizeTarget ;
     int64 totalMemSizeTarget = ( ovt->TotalMemSizeTarget < 5 * M ) ? ovt->TotalMemSizeTarget : - 1 ; // 0 or -1 : gets default values     
-    _OpenVmTil_CalculateMemSpaceSizes ( ovt, restartCondition, totalMemSizeTarget ) ;
+    _OpenVmTil_CalculateMemSpaceSizes ( ovt, restartCondition, -1) ; //totalMemSizeTarget ) ;
 
     _OpenVmTil_Init ( ovt, exceptionsHandled > 1 ) ; // try to keep history if we can
     Linux_SetupSignals ( &ovt->JmpBuf0, 1 ) ;

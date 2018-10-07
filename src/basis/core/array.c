@@ -37,8 +37,7 @@ _ByteArray_AppendSpace_MakeSure ( ByteArray * ba, int64 size ) // size in bytes
                 }
             }
             _Q_->AllocationRequestLacks ++ ;
-            nba->NBA_DataSize += ( ( ( nba->CheckTimes ++ ) * ( 1 * M ) ) + size ) ; //( 2 * K ) ) + size ;
-            //if ( ba == _Q_CodeByteArray ) nba->NBA_DataSize += 5 * K ; // make sure we have enough code space
+            nba->NBA_DataSize += ( ( ( ++ nba->CheckTimes ) * ( 1 * M ) ) + size ) ; 
             if ( _Q_->Verbosity > 3 )
             {
                 printf ( "\n%s size requested = %ld :: adding size = %ld :: largest remaining = %ld :: Nba total remaining = %ld :: checkTimes = %ld\n",

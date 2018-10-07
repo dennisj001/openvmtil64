@@ -296,8 +296,12 @@ ctcta ( y cta a )
 } prefix
 c_syntaxOff
 ' ctcta find wdiss
+
+#if bigArrayTest 
 "caba" cta new
 ctcta ( 1 caba ) 
+#endif
+
 //pause
 #endif
 
