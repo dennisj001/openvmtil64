@@ -292,9 +292,9 @@ _Stack_IntegrityCheck ( Stack * stack )
         return true ;
     }
     byte * errorString ;
-    if ( _Stack_Overflow ( stack ) ) errorString = "\nStack Integrity Error : Stack Overflow" ;
-    else errorString = "\nStack Integrity Error : Stack Underflow" ;
-    CfrTil_Exception ( 0, c_da ( errorString ), QUIT ) ;
+    if ( _Stack_Overflow ( stack ) ) CfrTil_Exception ( STACK_OVERFLOW, c_da ( errorString ), QUIT ) ; //errorString = "\nStack Integrity Error : Stack Overflow" ;
+    else CfrTil_Exception ( STACK_UNDERFLOW, c_da ( errorString ), QUIT ) ;  //errorString = "\nStack Integrity Error : Stack Underflow" ;
+    //CfrTil_Exception ( STACK_ERROR, c_da ( errorString ), QUIT ) ;
     return false ;
 }
 

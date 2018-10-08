@@ -170,7 +170,7 @@ _Class_Object_New ( byte * name, uint64 category )
     Word * word ;
     Namespace * ns = _CfrTil_Namespace_InNamespaceGet ( ) ;
     size = _Namespace_VariableValueGet ( ns, ( byte* ) "size" ) ;
-    word = _CfrTil_ObjectNew ( size, name, category, OBJECT_MEM ) ;
+    word = _CfrTil_ObjectNew ( size, name, category, CompileMode ? DICTIONARY : OBJECT_MEM ) ;
     _Class_Object_Init ( word, ns ) ;
     _Namespace_VariableValueSet ( ns, ( byte* ) "this", ( int64 ) object ) ;
     _Word_Add ( word, 0, ns ) ;
@@ -273,11 +273,11 @@ ParameterVarOffset ( Word * word )
 Word *
 CfrTil_LocalWord ( byte * name, int64 ctype, int64 allocType ) // svf : flag - whether stack variables are in the frame
 {
-    if ( ! GetState ( _Compiler_, DOING_C_TYPE ) )
+    if ( ! GetState ( _Compiler_, DOING_C_TYPE ) && ( ! GetState ( _LC_, LC_BLOCK_COMPILE )) )
     {
         _Namespace_FindOrNew_Local ( _Compiler_->LocalsCompilingNamespacesStack ) ;
         Finder_SetQualifyingNamespace ( _Finder_, 0 ) ;
-    }
+    } 
     Word * word = _CfrTil_LocalWord ( name, ctype, 0, 0, allocType ) ; // svf : flag - whether stack variables are in the frame
     return word ;
 }
@@ -302,7 +302,7 @@ Literal_New ( Lexer * lexer, uint64 uliteral )
         }
         name = lexer->OriginalToken ;
     }
-    word = _DObject_New ( name, uliteral, LITERAL | CONSTANT | IMMEDIATE, 0, 0, LITERAL, ( byte* ) _DataObject_Run, 0, 0, 0, OBJECT_MEM ) ;
+    word = _DObject_New ( name, uliteral, LITERAL | CONSTANT | IMMEDIATE, 0, 0, LITERAL, ( byte* ) _DataObject_Run, 0, 0, 0, (CompileMode ? INTERNAL_OBJECT_MEM : OBJECT_MEM) ) ;
 
     return word ;
 }

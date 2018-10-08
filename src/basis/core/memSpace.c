@@ -97,6 +97,7 @@ Mem_Allocate ( int64 size, uint64 allocType )
     {
         case OPENVMTIL: return _Allocate ( size, ms->OpenVmTilSpace ) ;
         case OBJECT_MEM: return _Allocate ( size, ms->ObjectSpace ) ;
+        case INTERNAL_OBJECT_MEM: return _Allocate ( size, ms->InternalObjectSpace ) ;
         case LISP: return _Allocate ( size, ms->LispSpace ) ;
         case TEMPORARY: return _Allocate ( size, ms->TempObjectSpace ) ; // used for SourceCode
         case DICTIONARY: return _Allocate ( size, ms->DictionarySpace ) ;
@@ -205,6 +206,7 @@ MemorySpace_Init ( MemorySpace * ms )
     ms->OpenVmTilSpace = MemorySpace_NBA_New ( ms, ( byte* ) "OpenVmTilSpace", ovt->OpenVmTilSize, OPENVMTIL ) ;
     ms->CfrTilInternalSpace = MemorySpace_NBA_New ( ms, ( byte* ) "CfrTilInternalSpace", ovt->CfrTilSize, CFRTIL ) ;
     ms->ObjectSpace = MemorySpace_NBA_New ( ms, ( byte* ) "ObjectSpace", ovt->ObjectsSize, OBJECT_MEM ) ;
+    ms->InternalObjectSpace = MemorySpace_NBA_New ( ms, ( byte* ) "InternalObjectSpace", ovt->InternalObjectsSize, OBJECT_MEM ) ;
     ms->LispSpace = MemorySpace_NBA_New ( ms, ( byte* ) "LispSpace", ovt->LispSize, LISP ) ;
     ms->TempObjectSpace = MemorySpace_NBA_New ( ms, ( byte* ) "TempObjectSpace", ovt->TempObjectsSize, TEMPORARY ) ;
     ms->CompilerTempObjectSpace = MemorySpace_NBA_New ( ms, ( byte* ) "CompilerTempObjectSpace", ovt->CompilerTempObjectsSize, COMPILER_TEMP ) ;
@@ -565,12 +567,13 @@ _OVT_ShowMemoryAllocated ( OpenVmTil * ovt )
 }
 
 // only check a first node, if no first node the list is empty
+
 byte *
-OVT_CheckRecycleableAllocate (dllist * list, int64 size)
+OVT_CheckRecycleableAllocate ( dllist * list, int64 size )
 {
     DLNode * node = 0 ;
-    if ( _Q_ && _Q_->MemorySpace0 ) node = ( DLNode* ) dllist_First ( ( dllist* ) list ) ; 
-    if ( node ) 
+    if ( _Q_ && _Q_->MemorySpace0 ) node = ( DLNode* ) dllist_First ( ( dllist* ) list ) ;
+    if ( node )
     {
         //if ( ( checkFlag ) && ( ( node->n_InUseFlag == N_IN_USE ) || ( node->n_Size != size ) || ( node->n_InUseFlag != N_FREE ) ) ) return 0 ;
         dlnode_Remove ( ( dlnode* ) node ) ; // necessary else we destroy the list!
@@ -588,6 +591,7 @@ OVT_Recycle ( dllist * list, dlnode * anode )
 }
 
 // put a word on the recycling list
+
 void
 Word_Recycle ( Word * w )
 {
@@ -595,6 +599,7 @@ Word_Recycle ( Word * w )
 }
 
 // put a CompileOptimizeInfo on the recycling list
+
 void
 OptInfo_Recycle ( CompileOptimizeInfo * coi )
 {
@@ -606,7 +611,8 @@ _CheckRecycleWord ( Word * w )
 {
     if ( w && ( w->CAttribute & RECYCLABLE_COPY ) ) //&& ( ! ( IsSourceCodeOn ) ) && GetState ( w, W_SOURCE_CODE_MODE ) )
     {
-        d0 ( _Printf ( ( byte* ) "\nrecycling : %s", w->Name ) ) ;
+        //if ( Is_DebugOn ) ( 
+        //_Printf ( ( byte* ) "\n_CheckRecycleWord : recycling : %s", w->Name ) ; //, Pause () ;
         Word_Recycle ( w ) ;
     }
 }
@@ -614,18 +620,36 @@ _CheckRecycleWord ( Word * w )
 void
 CheckRecycleWord ( Node * node )
 {
-    Word *w = ( Word* ) dobject_Get_M_Slot ( (dobject*) node, SCN_T_WORD ) ;
+    Word *w = ( Word* ) dobject_Get_M_Slot ( ( dobject* ) node, SCN_T_WORD ) ;
     _CheckRecycleWord ( w ) ;
 }
 
-// check a compiler word list for recycleable words and add them to the recycled word list : _Q_->MemorySpace0->RecycledWordList
+
 void
-DLList_RecycleWordList ( dllist * list )
+CheckRecycleNamespaceWord ( Node * node )
 {
-    dllist_Map ( list, ( MapFunction0 ) CheckRecycleWord ) ;
+    _CheckRecycleWord ( (Word *) node ) ;
 }
 
 // check a compiler word list for recycleable words and add them to the recycled word list : _Q_->MemorySpace0->RecycledWordList
+
+void
+DLList_Recycle_WordList ( dllist * list )
+{
+    dllist_Map ( list, ( MapFunction0 ) CheckRecycleWord ) ;
+    //if ( Is_DebugOn ) _Printf ( ( byte* ) "\nDLList_RecycleWordList" ), Pause () ;
+}
+
+
+void
+DLList_Recycle_NamespaceList ( dllist * list )
+{
+    dllist_Map ( list, ( MapFunction0 ) CheckRecycleNamespaceWord ) ;
+    //if ( Is_DebugOn ) _Printf ( ( byte* ) "\nDLList_RecycleWordList" ), Pause () ;
+}
+
+// check a compiler word list for recycleable words and add them to the recycled word list : _Q_->MemorySpace0->RecycledWordList
+
 void
 DLList_RemoveWords ( dllist * list )
 {

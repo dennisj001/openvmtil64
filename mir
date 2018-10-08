@@ -1,6 +1,5 @@
 cd src
-//make oclean
-make default
+make 
 make static
 strip -o ../bin/cfrtil64 ../bin/cfrtil64-gdb
 //make cfrtil64o3

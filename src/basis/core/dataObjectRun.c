@@ -85,7 +85,6 @@ _Namespace_Do_C_Type ( Namespace * ns )
     Lexer * lexer = cntx->Lexer0 ;
     Compiler * compiler = cntx->Compiler0 ;
     byte * token1, *token2 ;
-    Word * beginWord ;
     if ( ! GetState ( compiler, DOING_C_TYPE ) )
     {
         SetState ( compiler, DOING_C_TYPE, true ) ;

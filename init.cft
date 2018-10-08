@@ -311,6 +311,7 @@ User
 //2 opOn 1 opOn 
 
 "s" ' stack find alias
+//'sd ' stackDepthPrint find alias
 // : s stack location pause ;
 // : s stack dbg ;
 "istring" ' interpretString find alias 
@@ -359,7 +360,7 @@ sp
 : sh _sh ; prefix
 stringMacrosOn
 Root
-: testCfrTil "namespaces/init.cft" include ;
+: testCfrTil "namespaces/ninit.cft" include ;
 : test testCfrTil ;
 #if 1 //! testPreviousVersion 
 'ctloc 'compileTimeLocation find alias debugWord
@@ -372,11 +373,11 @@ Root
 'doX64 1 const
 'doScript 1 const
 'doScript2 1 const
-'_doDemo 1 const    
+'_doDemo 0 const    
 'todo 0 const  
 'bigArrayTest 0 const
 dbgOff
-//dbgOn 
+dbgOn 
 #if Is_DebugOn 
 
 #if todo

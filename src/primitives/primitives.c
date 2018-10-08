@@ -33,6 +33,7 @@ CPrimitive CPrimitives [] = {
     { ",@", 0, 0, ( block ) LO_UnQuoteSplicing, 0, 0, T_LISP_UNQUOTE_SPLICING | T_LISP_READ_MACRO, "Lisp", "Root" },
     { "::", 0, 0, ( block ) _LO_CfrTil, 0, 0, T_LISP_CFRTIL | T_LISP_SPECIAL | T_LISP_IMMEDIATE, "Lisp", "Root" },
     { "lcReset", 0, 0, ( block ) LC_Reset, 0, 0, 0, "Lisp", "Root" },
+    { "lcClearDefines", 0, 0, ( block ) LC_ClearDefinesNamespace, 0, 0, 0, "Lisp", "Root" },
 
     { "'", 0, 0, CfrTil_SingleQuote, IMMEDIATE | KEYWORD, 0, 0, "Forth", "Root" },
     { ",", 0, 0, CompileInt32, 0, 0, 0, "Forth", "Root" },
@@ -259,6 +260,7 @@ CPrimitive CPrimitives [] = {
     { "source", 0, 0, CfrTil_Source_AddToHistory, 0, 0, 0, "Debug", "Root" },
     { "sourceDontAdd", 0, 0, CfrTil_Source_DontAddToHistory, 0, 0, 0, "Debug", "Root" },
     { "stack", 0, 0, CfrTil_PrintDataStack, 0, 0, 0, "Debug", "Root" },
+    { "stackDepthPrint", 0, 0, CfrTil_PrintStackDepth, 0, 0, 0, "Debug", "Root" },
     { "rstack", 0, 0, CfrTil_PrintReturnStack, 0, 0, 0, "Debug", "Root" },
     { "nrstack", 0, 0, CfrTil_PrintNReturnStack, 0, 0, 0, "Debug", "Root" },
     { "dstack", 0, 0, CfrTil_PrintNDataStack_8, 0, 0, 0, "Debug", "Root" },
@@ -410,7 +412,7 @@ CPrimitive CPrimitives [] = {
     { "eval", 0, 0, ( block ) LC_Eval, IMMEDIATE | KEYWORD, 0, 0, "List", "Root" },
     { "printList", 0, 0, ( block ) LC_PrintWithValue, 0, 0, 0, "List", "Root" },
     { "dupList", 0, 0, ( block ) LC_DupList, 0, 0, 0, "List", "Root" },
-    { "lcReset", 0, 0, ( block ) LC_RestoreStack, 0, 0, 0, "List", "Root" },
+    { "lcRestoreStack", 0, 0, ( block ) LC_RestoreStack, 0, 0, 0, "List", "Root" },
 
     { "compileMode", 0, 0, CfrTil_CompileMode, 0, 0, 0, "Interpreter", "Root" },
     { "compileModeOn", 0, 0, CfrTil_RightBracket, 0, 0, 0, "Interpreter", "Root" },

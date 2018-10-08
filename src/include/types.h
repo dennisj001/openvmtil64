@@ -963,6 +963,7 @@ typedef struct
     // long term memory
     NamedByteArray * CodeSpace ;
     NamedByteArray * ObjectSpace ;
+    NamedByteArray * InternalObjectSpace ;
     NamedByteArray * LispSpace ;
     NamedByteArray * DictionarySpace ;
     NamedByteArray * HistorySpace ;
@@ -1026,8 +1027,7 @@ typedef struct
     byte *ExceptionSpecialMessage ;
     byte * ExceptionToken ;
     Word * ExceptionWord ;
-    int64 RestartCondition ;
-    int64 Signal ;
+    int64 RestartCondition, Signal, ExceptionCode ;
 
     int64 Argc ;
     char ** Argv ;
@@ -1044,28 +1044,11 @@ typedef struct
     int64 Mmap_RemainingMemoryAllocated, OVT_InitialUnAccountedMemory, RunTimeAllocation, TotalMemFreed, TotalMemAllocated, NumberOfByteArrays ;
 
     // variables accessible from cfrTil
-    int64 Verbosity ;
-    int64 StartIncludeTries ;
-    int64 StartedTimes, Restarts, InitSessionCoreTimes, SigSegvs, AllocationRequestLacks ;
+    int64 Verbosity, StartIncludeTries, StartedTimes, Restarts, InitSessionCoreTimes, SigSegvs, AllocationRequestLacks ;
 
-    int64 DictionarySize ;
-    int64 LispTempSize ;
-    int64 MachineCodeSize ;
-    int64 ObjectsSize ;
-    int64 LispSize ;
-    int64 ContextSize ;
-    int64 TempObjectsSize ;
-    int64 CompilerTempObjectsSize ;
-    int64 SessionObjectsSize ;
-    //int64 SessionCodeSize ;
-    int64 DataStackSize ;
-    int64 HistorySize ;
-    int64 OpenVmTilSize ;
-    int64 CfrTilSize ;
-    int64 BufferSpaceSize ;
-    int64 StringSpaceSize ;
-
-    int64 Thrown ;
+    int64 DictionarySize, LispTempSize, MachineCodeSize, ObjectsSize, InternalObjectsSize, LispSize, ContextSize ;
+    int64 TempObjectsSize, CompilerTempObjectsSize, SessionObjectsSize, DataStackSize, HistorySize, OpenVmTilSize ;
+    int64 CfrTilSize, BufferSpaceSize, StringSpaceSize, Thrown ;
     sigjmp_buf JmpBuf0 ;
 } OpenVmTil ;
 

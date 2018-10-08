@@ -145,6 +145,12 @@ CfrTil_PrintDataStack ( )
 }
 
 void
+CfrTil_PrintStackDepth ( )
+{
+    _Printf ( (byte*) "\nDataStack : depth = %d", Stack_Depth ( _DataStack_ ) ) ; 
+}
+
+void
 Set_DataStackPointer_FromDebuggerDspReg ( )
 {
     _Dsp_ = _Debugger_->cs_Cpu->R14d ;
@@ -153,7 +159,6 @@ Set_DataStackPointer_FromDebuggerDspReg ( )
 void
 Set_DataStackPointer_FromDspReg ( )
 {
-    //_DSP_ = _Dsp_ ;
     _CfrTil_->Set_DataStackPointer_FromDspReg ( ) ;
 }
 

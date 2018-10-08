@@ -37,7 +37,9 @@ _ByteArray_AppendSpace_MakeSure ( ByteArray * ba, int64 size ) // size in bytes
                 }
             }
             _Q_->AllocationRequestLacks ++ ;
-            nba->NBA_DataSize += ( ( ( ++ nba->CheckTimes ) * ( 1 * M ) ) + size ) ; 
+            //nba->NBA_DataSize += ( ( ( ++ nba->CheckTimes ) * ( 1 * M ) ) + size ) ; 
+            //nba->NBA_DataSize += ( ( ( ++ nba->CheckTimes ) * ( 10 * K ) ) + size ) ; 
+            nba->NBA_DataSize += size ; 
             if ( _Q_->Verbosity > 3 )
             {
                 printf ( "\n%s size requested = %ld :: adding size = %ld :: largest remaining = %ld :: Nba total remaining = %ld :: checkTimes = %ld\n",
@@ -241,7 +243,6 @@ _NBA_SetCompilingSpace_MakeSureOfRoom ( NamedByteArray * nba, int64 room )
 {
     if ( nba )
     {
-        Set_CompilerSpace ( nba->ba_CurrentByteArray ) ;
         ByteArray * ba = _ByteArray_AppendSpace_MakeSure ( nba->ba_CurrentByteArray, room ) ;
         if ( ! ba ) Error_Abort ( "\n_NBA_SetCompilingSpace_MakeSureOfRoom :", "no ba?!\n" ) ;
         Set_CompilerSpace ( ba ) ;

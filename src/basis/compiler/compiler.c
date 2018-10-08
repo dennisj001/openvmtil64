@@ -25,7 +25,7 @@ CopyDuplicateWord ( dlnode * anode, Word * word0 )
 }
 
 Word *
-_CfrTil_CopyDuplicatesAndPush ( Word * word0 )
+_CfrTil_CopyDuplicates ( Word * word0 )
 {
     Word * word1, *wordToBePushed ;
     word0->W_OriginalWord = word0 ;
@@ -44,7 +44,7 @@ Compiler_CopyDuplicatesAndPush ( Word * word0 )
     if ( ( word0->CAttribute & ( DEBUG_WORD | INTERPRET_DBG ) ) || ( word0->LAttribute & ( W_COMMENT | W_PREPROCESSOR ) ) ) return word0 ;
     if ( word0 && CompileMode )
     {
-        word0 = _CfrTil_CopyDuplicatesAndPush ( word0 ) ;
+        word0 = _CfrTil_CopyDuplicates ( word0 ) ;
     }
     CfrTil_WordList_PushWord ( word0 ) ;
     return word0 ;
@@ -210,7 +210,7 @@ CompileOptimizeInfo_New ( uint64 type )
 CompileOptimizeInfo *
 Compiler_CompileOptimizeInfo_PushNew ( Compiler * compiler )
 {
-    CompileOptimizeInfo * coi = CompileOptimizeInfo_New ( OBJECT_MEM ) ;
+    CompileOptimizeInfo * coi = CompileOptimizeInfo_New ( COMPILER_TEMP ) ;
     if ( coi )
     {
         List_Push ( compiler->OptimizeInfoList, ( dlnode* ) coi ) ;

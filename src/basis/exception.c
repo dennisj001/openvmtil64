@@ -12,7 +12,7 @@ _OpenVmTil_ShowExceptionInfo ( )
     Debugger * debugger = _Debugger_ ;
     DebugOn ;
     //if ( debugger->w_Word ) _Debugger_Locals_Show ( debugger, debugger->w_Word ) ;
-    Debugger_Stack ( debugger ) ;
+    if ( ! (_Q_->ExceptionCode & (STACK_ERROR|STACK_OVERFLOW|STACK_UNDERFLOW) ) ) Debugger_Stack ( debugger ) ;
     if ( ! word )
     {
         word = Finder_Word_FindUsing ( _Finder_, _Q_->ExceptionToken, 1 ) ;
@@ -42,9 +42,13 @@ OpenVmTil_ShowExceptionInfo ( )
 {
     if ( _Q_->Verbosity )
     {
-        if ( _Q_->ExceptionMessage ) printf ( "\n%s : %s\n", _Q_->ExceptionMessage, _Q_->ExceptionSpecialMessage ), fflush ( stdout ) ;
+        if ( _Q_->ExceptionMessage ) 
+        {
+            printf ( "\n%s : %s\n", 
+            _Q_->ExceptionMessage, _Q_->ExceptionSpecialMessage ? _Q_->ExceptionSpecialMessage : Context_Location () ) ; 
+            fflush ( stdout ) ;
+        }
         _DisplaySignal ( _Q_->Signal ) ;
-        //if ( ( _Q_->Signal != SIGSEGV ) && ( _Q_->SignalExceptionsHandled ++ < 2 ) && _CfrTil_ ) _OpenVmTil_ShowExceptionInfo ( ) ;
         if ( ( _Q_->SigSegvs < 2 ) && ( _Q_->SignalExceptionsHandled ++ < 2 ) && _CfrTil_ ) _OpenVmTil_ShowExceptionInfo ( ) ;
     }
     int64 rtrn = OVT_Pause ( 0, _Q_->SignalExceptionsHandled ) ;
@@ -293,11 +297,12 @@ OpenVmTil_SignalAction ( int signal, siginfo_t * si, void * uc )
 }
 
 void
-CfrTil_Exception ( int64 signal, byte * message, int64 restartCondition )
+CfrTil_Exception ( int64 exceptionCode, byte * message, int64 restartCondition )
 {
     byte * b = Buffer_Data ( _CfrTil_->ScratchB1 ) ;
     AlertColors ;
-    switch ( signal )
+    _Q_->ExceptionCode = exceptionCode ;
+    switch ( exceptionCode )
     {
         case CASE_NOT_LITERAL_ERROR:
         {

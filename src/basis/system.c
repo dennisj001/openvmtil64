@@ -332,22 +332,12 @@ __CfrTil_Dump ( byte * address, int64 number, int64 dumpMod )
             _Printf ( ( byte* ) "\n" UINT_FRMT " : ", address + i ) ;
             if ( ! ( i % dumpMod ) )
             {
-                for ( n = 0 ; n < dumpMod ; n += CELL_SIZE )
-                {
-                    _Printf ( ( byte* ) UINT_FRMT " ", *( int64* ) ( address + i + n ) ) ;
-                }
+                for ( n = 0 ; n < dumpMod ; n += CELL_SIZE ) _Printf ( ( byte* ) UINT_FRMT " ", *( int64* ) ( address + i + n ) ) ;
                 _Printf ( ( byte* ) " " ) ;
-                for ( n = 0 ; n < dumpMod ; n += CELL_SIZE )
-                {
-                    CfrTil_NByteDump ( ( byte* ) ( address + i + n ), CELL_SIZE ) ;
-                }
-                for ( n = 0 ; n < dumpMod ; n += CELL_SIZE )
-                {
-                    CfrTil_CharacterDump ( ( byte* ) ( address + i + n ), CELL_SIZE ) ;
-                }
+                for ( n = 0 ; n < dumpMod ; n += CELL_SIZE ) CfrTil_NByteDump ( ( byte* ) ( address + i + n ), CELL_SIZE ) ;
+                for ( n = 0 ; n < dumpMod ; n += CELL_SIZE ) CfrTil_CharacterDump ( ( byte* ) ( address + i + n ), CELL_SIZE ) ;
                 i += dumpMod ;
             }
-
             else i ++ ;
         }
     }

@@ -150,7 +150,9 @@ CfrTil_WordList_PushWord ( Word * word )
     //CompilerWordList_Push ( word, ( ! ( word->CAttribute & ( NAMESPACE | OBJECT_OPERATOR | OBJECT_FIELD ) ) ) || ( word->CAttribute & ( DOBJECT ) ) ) ; //_List_PushNew ( _CfrTil_->CompilerWordList, word ) ;
     //CompilerWordList_Push ( word, ( ! ( word->CAttribute & ( NAMESPACE | OBJECT_OPERATOR ) ) ) ) ; //_List_PushNew ( _CfrTil_->CompilerWordList, word ) ;
     //CompilerWordList_Push ( word, ( ! ( word->CAttribute & ( NAMESPACE | OBJECT_FIELD ) ) ) || ( word->CAttribute & ( DOBJECT ) ) ) ; //_List_PushNew ( _CfrTil_->CompilerWordList, word ) ;
-    _CfrTil_WordList_PushWord ( word, ( ! ( word->CAttribute & ( NAMESPACE | OBJECT_OPERATOR | OBJECT_FIELD ) ) ) || ( word->CAttribute & ( DOBJECT ) ) ) ;
+    //if ( Compiling ) // why won't this work ??
+    _CfrTil_WordList_PushWord ( word, ( ! ( word->CAttribute & ( NAMESPACE | OBJECT_OPERATOR | OBJECT_FIELD ) ) ) || 
+        ( word->CAttribute & ( DOBJECT ) ) ) ;
 }
 
 void
@@ -527,6 +529,42 @@ _CfrTil_Finish_WordSourceCode ( CfrTil * cfrtil, Word * word )
     if ( ! word->W_SourceCode ) word->W_SourceCode = _CfrTil_GetSourceCode ( ) ;
     Lexer_SourceCodeOff ( _Lexer_ ) ;
     CfrTil_SourceCode_InitEnd ( cfrtil ) ;
+}
+
+void
+CfrTil_RecycleWordList ( Word * scWord )
+{
+    scWord = scWord ? scWord : _CfrTil_->ScWord ;
+    //scWord = _CfrTil_->ScWord ;
+    if ( scWord )
+    {
+        DLList_Recycle_WordList ( scWord->W_SC_WordList ) ;
+        List_Init ( scWord->W_SC_WordList ) ;
+        _CfrTil_->ScWord = 0 ;
+    }
+    else
+    {
+        DLList_Recycle_WordList ( _CfrTil_->CompilerWordList ) ;
+        List_Init ( _CfrTil_->CompilerWordList ) ;
+    }
+}
+
+// there may be problems here ??
+void
+CfrTil_WordList_Init ( CfrTil * cfrtil, Word * word, Boolean saveWord0 )
+{
+    Word * svWord ;
+    if ( saveWord0 ) svWord = WordStack ( 0 ) ;
+    else svWord = 0 ;
+    CfrTil_RecycleWordList ( word ) ;
+    if ( ( word ) && ( IsSourceCodeOn ) ) cfrtil->LastFinished_DObject = cfrtil->CurrentWordCompiling = cfrtil->ScWord = word ;
+    else cfrtil->ScWord = Get_SourceCodeWord ( ) ;
+    if ( cfrtil->ScWord ) cfrtil->ScWord->W_SC_WordList = cfrtil->CompilerWordList ;
+    if ( svWord )
+    {
+        svWord->W_SC_Index = 0 ; // before pushWord !
+        CfrTil_WordList_PushWord ( svWord ) ; // for source code
+    }
 }
 
 byte *

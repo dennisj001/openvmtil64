@@ -211,10 +211,10 @@ void
 _Namespace_VariableValueSet ( Namespace * ns, byte * name, int64 value )
 {
     Word * word = _CfrTil_VariableGet ( ns, name ) ;
-    if ( word ) 
+    if ( word )
     {
         word->W_Value = value ; // value of variable
-        word->W_PtrToValue = &word->W_Value ;
+        word->W_PtrToValue = & word->W_Value ;
     }
 }
 
@@ -355,9 +355,25 @@ _Namespace_Clear ( Namespace * ns )
 {
     if ( ns )
     {
-        //DLList_RecycleWordList (  ns->W_List ) ; // TODO :: fix this !! ??
+#if 0        
+        //if ( Is_DebugModeOn )
+        {
+            _Printf ( ( byte* ) "\n\n_Namespace_Clear : before : name = %s\n", ns->Name ) ;
+            _List_PrintNames ( ns->W_List, -1, 0 ) ;
+        }
+#endif        
+        if ( String_Equal ( ns->Name, "LispDefinesNamespace" )) _Printf ( (byte*)"\n got it\n" ), Pause () ;
+        DLList_Recycle_NamespaceList (  ns->W_List ) ; // TODO :: fix this !! ??
         DLList_RemoveWords ( ns->W_List ) ;
         _dllist_Init ( ns->W_List ) ;
+#if 0        
+        //if ( Is_DebugModeOn )
+        {
+            _Printf ( ( byte* ) "\n\n_Namespace_Clear : after : name = %s\n", ns->Name ) ;
+            _List_PrintNames ( ns->W_List, -1, 0 ) ;
+            //Pause ( ) ;
+        }
+#endif        
     }
 }
 
@@ -385,7 +401,7 @@ _Namespace_FreeNamespacesStack ( Stack * stack )
 Namespace *
 Namespace_New ( byte * name, Namespace * containingNs )
 {
-    Namespace * ns = DataObject_New (NAMESPACE, 0, name, NAMESPACE, 0, 0, 0, ( int64 ) containingNs, 0, 0 , -1) ;
+    Namespace * ns = DataObject_New ( NAMESPACE, 0, name, NAMESPACE, 0, 0, 0, ( int64 ) containingNs, 0, 0, - 1 ) ;
 }
 
 Namespace *
@@ -405,11 +421,10 @@ Namespace_FindOrNew_SetUsing ( byte * name, Namespace * containingNs, int64 setU
 Namespace *
 _Namespace_FindOrNew_Local ( Stack * nsStack )
 {
-    int64 d = Stack_Depth ( nsStack ) ; 
+    int64 d = Stack_Depth ( nsStack ) ;
     byte bufferData [ 32 ], *buffer = ( byte* ) bufferData ;
-    if ( d > 3 ) _Printf ( (byte*)"\nlocals = %d\n", d), Pause () ;
+    if ( d > 3 ) _Printf ( ( byte* ) "\nlocals = %d\n", d ), Pause ( ) ;
     sprintf ( ( char* ) buffer, "locals_%ld", d ) ;
-    //if ( String_Equal ( buffer, "locals_2") ) _Printf ((byte*) "\ngot it") ;
     Namespace * ns = Namespace_FindOrNew_SetUsing ( buffer, _CfrTil_->Namespaces, 1 ) ;
     _Namespace_ActivateAsPrimary ( ns ) ;
     Stack_Push ( nsStack, ( int64 ) ns ) ;

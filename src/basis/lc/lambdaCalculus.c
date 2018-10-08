@@ -157,9 +157,23 @@ LC_FindWord ( byte * name, ListObject * locals )
             word = _Finder_FindWord_InOneNamespace ( _Finder_, _LC_->LispDefinesNamespace, name ) ;
             if ( ! word )
             {
+#if 0        
+                if ( Is_DebugModeOn )
+                {
+                    _Printf ( ( byte* ) "\n\nLC_FindWord : LispDefinesNamespace : can't find : name = %s\n", name ) ;
+                    LC_Print_LispDefinesNamespace ( ) ;
+                }
+#endif        
                 word = _Finder_FindWord_InOneNamespace ( _Finder_, _LC_->LispNamespace, name ) ; // prefer Lisp namespace
                 if ( ! word )
                 {
+#if 0        
+                    if ( Is_DebugModeOn )
+                    {
+                        _Printf ( ( byte* ) "\n\nLC_FindWord : LispNamespace : can't find : name = %s\n", name ) ;
+                        LC_Print_LispNamespace ( ) ;
+                    }
+#endif        
                     word = Finder_Word_FindUsing ( _Context_->Finder0, name, 0 ) ;
                 }
             }
@@ -409,6 +423,22 @@ LC_ClearDefinesNamespace ( )
 }
 
 void
+LC_Print_LispDefinesNamespace ( )
+{
+    _Printf ( ( byte* ) "\n LC_Print_LispDefinesNamespace : printing ...\n" ) ;
+    _List_PrintNames ( _LC_->LispDefinesNamespace->W_List, - 1, 0 ) ;
+    _Printf ( ( byte* ) "\n" ) ;
+}
+
+void
+LC_Print_LispNamespace ( )
+{
+    _Printf ( ( byte* ) "\n LC_Print_LispNamespace : printing ...\n" ) ;
+    _List_PrintNames ( _LC_->LispNamespace->W_List, - 1, 0 ) ;
+    _Printf ( ( byte* ) "\n" ) ;
+}
+
+void
 _LC_ClearTempNamespace ( LambdaCalculus * lc )
 {
     if ( lc ) _Namespace_Clear ( lc->LispTempNamespace ) ;
@@ -485,6 +515,7 @@ _LC_Init ( LambdaCalculus * lc )
 void
 LC_Delete ( LambdaCalculus * lc )
 {
+    CfrTil_RecycleWordList ( 0 ) ;
     if ( lc )
     {
         LC_ClearTempNamespace ( ) ;
@@ -520,7 +551,6 @@ LambdaCalculus *
 LC_Reset ( )
 {
     LC_New ( ) ;
-    LC_LispNamespacesOff ( ) ;
 }
 
 LambdaCalculus *

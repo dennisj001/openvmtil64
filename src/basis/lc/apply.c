@@ -475,9 +475,8 @@ _LO_Apply_C_LtoR_ArgList ( LambdaCalculus * lc, ListObject * l0, Word * word )
 void
 LC_CompileRun_C_ArgList ( Word * word ) // C protocol - x64 : left to right arguments put into registers 
 {
-    LambdaCalculus *lc, * svLc = _LC_ ;
     Namespace * backgroundNamespace = _CfrTil_Namespace_InNamespaceGet ( ) ;
-    lc = LC_New ( ) ;
+    LambdaCalculus * lc = LC_Init_Runtime ( ) ;
     Context * cntx = _Context_ ;
     Lexer * lexer = cntx->Lexer0 ;
     Compiler * compiler = cntx->Compiler0 ;
@@ -505,8 +504,6 @@ LC_CompileRun_C_ArgList ( Word * word ) // C protocol - x64 : left to right argu
         LC_LispNamespacesOff ( ) ;
         SetState ( compiler, LC_ARG_PARSING | LC_C_RTL_ARG_PARSING, false ) ;
     }
-    LC_Delete ( lc ) ;
-    _LC_ = svLc ;
     _CfrTil_Namespace_InNamespaceSet ( backgroundNamespace ) ;
     Lexer_SetTokenDelimiters ( lexer, svDelimiters, COMPILER_TEMP ) ;
 }
@@ -521,10 +518,10 @@ CompileLispBlock ( ListObject *args, ListObject * body )
     byte * here = Here ;
     Word * word = _CfrTil_->CurrentWordCompiling ;
     LO_BeginBlock ( ) ; // must have a block before local variables if there are register variables because _CfrTil_Parse_LocalsAndStackVariables will compile something
+    SetState ( lc, ( LC_COMPILE_MODE | LC_BLOCK_COMPILE ), true ) ; // before _CfrTil_Parse_LocalsAndStackVariables
     Namespace * locals = _CfrTil_Parse_LocalsAndStackVariables ( 1, 1, args, 0, 0 ) ;
     word->CAttribute = BLOCK ;
     word->LAttribute |= T_LISP_COMPILED_WORD ;
-    SetState ( lc, ( LC_COMPILE_MODE | LC_BLOCK_COMPILE ), true ) ;
     _LO_Eval ( lc, body, locals, 1 ) ;
     if ( GetState ( lc, LC_COMPILE_MODE ) )
     {
@@ -545,6 +542,7 @@ CompileLispBlock ( ListObject *args, ListObject * body )
         }
     }
     _Word_DefinitionStore ( word, ( block ) code ) ; // not _Word_InitFinal because this is already _CfrTil_->CurrentWordCompiling with W_SourceCode, etc.
+    SetState ( lc, ( LC_BLOCK_COMPILE ), false ) ; // necessary !!
     return code ;
 }
 

@@ -44,39 +44,6 @@ _CfrTil_ReStart ( CfrTil * cfrTil, int64 restartCondition )
 }
 
 void
-CfrTil_RecycleWordList ( Word * scWord )
-{
-    scWord = scWord ? scWord : _CfrTil_->ScWord ;
-    if ( scWord )
-    {
-        DLList_RecycleWordList ( scWord->W_SC_WordList ) ;
-        List_Init ( scWord->W_SC_WordList ) ;
-        _CfrTil_->ScWord = 0 ;
-    }
-    else
-    {
-        DLList_RecycleWordList ( _CfrTil_->CompilerWordList ) ;
-        List_Init ( _CfrTil_->CompilerWordList ) ;
-    }
-}
-
-void
-CfrTil_WordList_Init ( CfrTil * cfrtil, Word * word, Boolean saveWord0 )
-{
-    Word * svWord ;
-    if ( saveWord0 ) svWord = WordStack ( 0 ) ;
-    else svWord = 0 ;
-    if ( ( word ) && ( IsSourceCodeOn ) ) cfrtil->LastFinished_DObject = cfrtil->CurrentWordCompiling = cfrtil->ScWord = word ;
-    else cfrtil->ScWord = Get_SourceCodeWord ( ) ;
-    if ( cfrtil->ScWord ) cfrtil->ScWord->W_SC_WordList = cfrtil->CompilerWordList ;
-    if ( svWord )
-    {
-        svWord->W_SC_Index = 0 ; // before pushWord !
-        CfrTil_WordList_PushWord ( svWord ) ; // for source code
-    }
-}
-
-void
 _CfrTil_CpuState_CheckSave ( )
 {
     if ( ! GetState ( _CfrTil_->cs_Cpu, CPU_SAVED ) )

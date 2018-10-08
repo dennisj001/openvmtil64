@@ -256,7 +256,7 @@ xz :
 	make _xz
 
 copy :
-	-cp ../.init.cft ../namespaces/
+	-cp ../init.cft.back ../namespaces/
 	-cp ../*.tar.xz ~/backup/archive/
 	-cp ../*.tar.xz ~/Public/
 	-cp ../*.tar.xz ~/ubackup/

@@ -48,8 +48,6 @@ Word *
 _Interpreter_DoWord_Default ( Interpreter * interp, Word * word0, int64 tsrli, int64 scwi )
 {
     Word * word = Compiler_CopyDuplicatesAndPush ( word0 ) ;
-    //word->W_SC_Index = ( scwi != - 1 ) ? scwi : _Lexer_->SC_Index ;
-    //word->W_RL_Index = ( tsrli != - 1 ) ? tsrli : _Lexer_->TokenStart_ReadLineIndex ;
     Word_Set_ScIndex_RlIndex ( word, tsrli, scwi ) ;
     interp->w_Word = word ;
     Word_Eval ( word ) ;

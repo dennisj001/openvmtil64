@@ -449,8 +449,10 @@ sp
 '( Its a beautiful day don\'t let it get away )
 '( Its a beautiful day don\'t @x1 it get away ) 
 `( ,Its ,a ,beautiful ,day ,don\'t ,@x1 ,it ,get ,away )
-nl `( Its ,a beautiful day don\'t ,x it get away ) "testing unquote (',') above line should show : ( Its a beautiful day don't x it get away )\n" ps
-nl `( Its 'a beautiful day don\'t ,x1 it get away ) "testing unquote (',') above line should show :  ( Its a beautiful day don't x1 it get away )\n" ps
+nl `( Its ,a beautiful day don\'t ,x it get away ) 
+"testing unquote (',') above line should show : ( Its a beautiful day don't x it get away )\n" ps
+`( Its 'a beautiful day don\'t ,x1 it get away ) 
+"testing unquote (',') above line should show :  ( Its a beautiful day don't x1 it get away )\n" ps
 `( Its a beautiful day don\'t ,@x it get away )
 `( Its a beautiful day don\'t ,@x1 it get away )
 sp

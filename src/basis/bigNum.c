@@ -8,7 +8,7 @@
 mpfr_t *
 _BigNum_New ( byte * token )
 {
-    mpfr_t *bfr = ( mpfr_t* ) Mem_Allocate ( sizeof ( mpfr_t ), OBJECT_MEM ) ;
+    mpfr_t *bfr = ( mpfr_t* ) Mem_Allocate ( sizeof ( mpfr_t ), CompileMode ? DICTIONARY : OBJECT_MEM ) ;
     double bf ;
     long i, bi ;
     if ( token )
@@ -43,7 +43,7 @@ _BigNum_New ( byte * token )
 {
     double bf ;
     long i, bi ;
-    mpfr_t *bfr = ( mpfr_t* ) Mem_Allocate ( sizeof ( mpfr_t ), OBJECT_MEM ) ;
+    mpfr_t *bfr = ( mpfr_t* ) Mem_Allocate ( sizeof ( mpfr_t ), (CompileMode ? INTERNAL_OBJECT_MEM : OBJECT_MEM) ) ;
     if ( token )
     {
         for ( i = 0 ; token [i] ; i ++ )

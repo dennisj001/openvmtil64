@@ -187,8 +187,7 @@ _Context_IncludeFile ( Context * cntx, byte *filename, int64 interpretFlag )
             cntx->System0->IncludeFileStackNumber -- ;
             if ( ! cntx->System0->IncludeFileStackNumber ) Ovt_AutoVarOff ( ) ;
             if ( _Q_->Verbosity > 2 ) _Printf ( ( byte* ) "\n%s included\n", filename ) ;
-            //Interpreter_Init ( cntx->Interpreter0 ) ; // ?? mainly to reset the PreprocessorStackList after the end of every file ??
-            //_dllist_Init ( _Context_->PreprocessorStackList  ) ;      	
+            OVT_MemList_FreeNBAMemory ( ( byte* ) "ObjectSpace", 1 * M, 1 ) ; // not able to do this yet ??
         }
         else
         {

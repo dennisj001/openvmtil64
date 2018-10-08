@@ -15,6 +15,7 @@ _Debugger_InterpreterLoop ( Debugger * debugger )
         }
         SetState ( _Debugger_, DBG_AUTO_MODE_ONCE, false ) ;
         debugger->CharacterFunctionTable [ debugger->CharacterTable [ debugger->Key ] ] ( debugger ) ;
+        //if ( _LC_ && _LC_->State && _LC_->LispTempNamespace ) ;
     }
     while ( GetState ( debugger, DBG_STEPPING ) || ( ! GetState ( debugger, DBG_INTERPRET_LOOP_DONE ) ) ||
         ( ( GetState ( debugger, DBG_AUTO_MODE ) ) && ( ! ( GetState ( debugger, DBG_EVAL_AUTO_MODE ) ) ) ) ) ;
@@ -129,10 +130,10 @@ Debugger_GetDbgAddressFromRsp ( Debugger * debugger )
     }
     for ( i = Stack_Depth ( retStack ) ; i > 0 ; i -- )
     {
-        byte * retAddr = (byte *) _Stack_Pop ( retStack ) ;
-        Stack_Push ( debugger->ReturnStack, (uint64) retAddr ) ;
+        byte * retAddr = ( byte * ) _Stack_Pop ( retStack ) ;
+        Stack_Push ( debugger->ReturnStack, ( uint64 ) retAddr ) ;
     }
-    debugger->DebugAddress = (byte*) Stack_Pop ( debugger->ReturnStack ) ; //( ( byte* ) debugger->cs_Cpu->Rsp[1] ) ;
+    debugger->DebugAddress = ( byte* ) Stack_Pop ( debugger->ReturnStack ) ; //( ( byte* ) debugger->cs_Cpu->Rsp[1] ) ;
     debugger->w_Word = Word_GetFromCodeAddress ( debugger->DebugAddress ) ;
     return debugger->DebugAddress ;
 }
@@ -250,6 +251,12 @@ void
 Debugger_GotoList_Print ( Debugger * debugger )
 {
     Compiler_GotoList_Print ( ) ;
+}
+
+void
+Debugger_Print_LispDefinesNamespace ( Debugger * debugger )
+{
+    LC_Print_LispDefinesNamespace ( ) ;
 }
 
 void
@@ -675,6 +682,7 @@ Debugger_TableSetup ( Debugger * debugger )
     debugger->CharacterTable [ 'O' ] = 32 ;
     debugger->CharacterTable [ 'Q' ] = 33 ;
     debugger->CharacterTable [ 'L' ] = 34 ;
+    debugger->CharacterTable [ 'X' ] = 35 ;
 
     // debugger : system related
     debugger->CharacterFunctionTable [ 0 ] = Debugger_Default ;
@@ -713,6 +721,7 @@ Debugger_TableSetup ( Debugger * debugger )
     debugger->CharacterFunctionTable [ 32 ] = DebugWordList_Show_InUse ;
     debugger->CharacterFunctionTable [ 33 ] = Debugger_CfrTilRegisters ;
     debugger->CharacterFunctionTable [ 34 ] = Debugger_GotoList_Print ;
+    debugger->CharacterFunctionTable [ 35 ] = Debugger_Print_LispDefinesNamespace ;
 }
 
 

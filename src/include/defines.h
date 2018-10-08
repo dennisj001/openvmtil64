@@ -414,7 +414,6 @@
 #define BUFFER ( (uint64) 1 << 12 )
 #define LISP_TEMP ( (uint64) 1 << 13 )
 #define OBJECT_MEM ( (uint64) 1 << 14 )
-#define SL5_MEM ( (uint64) 1 << 14 )
 #define LISP ( (uint64) 1 << 15 )
 #define HISTORY ( (uint64) 1 << 16 )
 #define CODE ( (uint64) 1 << 17 )
@@ -426,8 +425,7 @@
 #define STRING_MEM STRING_MEMORY
 #define WORD_COPY_MEM ( (uint64) 1 << 20 )
 #define SESSION_CODE ( (uint64) 1 << 21 )
-//#define TINY ( (uint64) 1 << 14 )
-//#define DEBUG ( (uint64) 1 << 12 )
+#define INTERNAL_OBJECT_MEM ( (uint64) 1 << 22 )
 //#define ALL      ( INTERNAL | EXTERNAL | CFRTIL | TEMPORARY | DATA_STACK | SESSION )
 
 #define OPTIMIZE_RM ( (uint64) 1 << 0 )

@@ -4,6 +4,7 @@
 BlockInfo *
 BI_Block_Copy ( BlockInfo * bi, byte* dstAddress, byte * srcAddress, int64 bsize, Boolean optFlag )
 {
+    //if ( Is_DebugOn && ( bsize > 1000 ) ) _Printf ((byte*)"\nBI_Block_Copy : bsize = %ld\n", bsize ), Pause () ;
     Compiler * compiler = _Compiler_ ;
     if ( ! bi ) bi = ( BlockInfo * ) _Stack_Top ( compiler->CombinatorBlockInfoStack ) ;
     byte * saveHere = Here, * saveAddress = srcAddress ;
