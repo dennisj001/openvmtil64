@@ -181,7 +181,8 @@ tick fibc find wdiss //pause
 
 ( :: : hioo 3 4 + dup p ; : hio 5 6 + dup p ; hio hioo ) 7 _assert 11 _assert s // pause
 ( hioo ) ( hio ) 11 _assert 7 _assert hio hioo 7 _assert 11 _assert 
-tick hioo find wdiss //pause
+tick hioo find wdiss 
+tick hio find wdiss //pause
 lispOff
 C
 : bexp43 ( n ) { n @ 1 > } { n @ n @ -- bexp43 * } { 1 } ifElse ;
@@ -204,7 +205,9 @@ lispOff
         //{ (| n ) n @ p n 3 = <dbg> n @ 4 + dup p 7 "goedel3_assert" assert } ix  // test comment //level 2
         n @ 6 + 8 "goedel3_assert4" assert 
     } ix
-    { (| n ) n @ p 
+    { 
+        (| n ) 
+        n @ p 
         n 3 = 
         n dup @ 4 + = 
         n @ dup p 7 "goedel3_assert5" assert

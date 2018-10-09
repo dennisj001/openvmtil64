@@ -112,6 +112,9 @@ _Interpreter_LC_InterpretWord ( Interpreter *interp, ListObject *l0, Boolean fun
     }
 }
 
+#if NEW_LC_COMPILE
+#if 0
+
 byte *
 LC_GetWordDefinition ( byte *nsName, byte * name )
 {
@@ -119,9 +122,6 @@ LC_GetWordDefinition ( byte *nsName, byte * name )
     if ( word ) return ( byte* ) word->Definition ;
     else return 0 ;
 }
-
-#if NEW_LC_COMPILE
-#if 0
 
 void
 _LO_Compile_Runtime_LispSymbol_Function ( ListObject *lfunction )
@@ -170,9 +170,10 @@ _LO_CompileOrInterpret_One ( ListObject *l0, int64 functionFlag )
     // nil means that it doesn't need to be interpreted any more
 #if 0 //NEW_LC_COMPILE    
     if ( CompileMode && functionFlag ) _LO_Compile_Runtime_LispSymbol_Function ( l0 ) ;
-    else
+    //else
 #endif    
-        if ( l0 && ( ! ( l0->LAttribute & ( LIST | LIST_NODE | T_NIL ) ) ) ) _Interpreter_LC_InterpretWord ( _Interpreter_, l0, functionFlag ) ;
+    if ( l0 && ( ! ( l0->LAttribute & ( LIST | LIST_NODE | T_NIL ) ) ) ) 
+        _Interpreter_LC_InterpretWord ( _Interpreter_, l0, functionFlag ) ;
 }
 
 void
@@ -190,6 +191,9 @@ void
 _LO_CompileOrInterpret ( ListObject *lfunction, ListObject *largs )
 {
     ListObject *lfword = lfunction->Lo_CfrTilWord ;
+    lfword->W_RL_Index = lfunction->W_RL_Index ;
+    lfword->W_SC_Index = lfunction->W_SC_Index ;
+
     if ( largs && lfword && ( lfword->CAttribute & ( CATEGORY_OP_ORDERED | CATEGORY_OP_UNORDERED ) ) ) // ?!!? 2 arg op with multi-args : this is not a precise distinction yet : need more types ?!!?
     {
         _LO_CompileOrInterpret_One ( largs, 0 ) ;

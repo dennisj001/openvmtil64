@@ -39,7 +39,7 @@ _ByteArray_AppendSpace_MakeSure ( ByteArray * ba, int64 size ) // size in bytes
             _Q_->AllocationRequestLacks ++ ;
             //nba->NBA_DataSize += ( ( ( ++ nba->CheckTimes ) * ( 1 * M ) ) + size ) ; 
             //nba->NBA_DataSize += ( ( ( ++ nba->CheckTimes ) * ( 10 * K ) ) + size ) ; 
-            nba->NBA_DataSize += size ; 
+            nba->NBA_DataSize += size ; // has to at least have this size available
             if ( _Q_->Verbosity > 3 )
             {
                 printf ( "\n%s size requested = %ld :: adding size = %ld :: largest remaining = %ld :: Nba total remaining = %ld :: checkTimes = %ld\n",

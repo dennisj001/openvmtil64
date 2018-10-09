@@ -39,6 +39,7 @@ CfrTil_BeginCombinator ( int64 quotesUsed )
 {
     Compiler * compiler = _Context_->Compiler0 ;
     BlockInfo *bi = ( BlockInfo * ) _Stack_Pick ( compiler->CombinatorBlockInfoStack, quotesUsed - 1 ) ; // -1 : remember - stack is zero based ; stack[0] is top
+    //_NBA_SetCompilingSpace_MakeSureOfRoom ( _Q_->MemorySpace0->CodeSpace, 8 * K ) ;
     // optimize out jmps such that the jmp from first block is to Here the start of the combinator code
     bi->CombinatorStartsAt = Here ;
     _SetOffsetForCallOrJump ( bi->JumpOffset, bi->CombinatorStartsAt ) ;

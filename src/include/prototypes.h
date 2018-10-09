@@ -1106,7 +1106,7 @@ CompileOptimizeInfo *Compiler_CompileOptimizeInfo_New(Compiler *compiler, uint64
 CompileOptimizeInfo *CompileOptInfo_NewCopy(CompileOptimizeInfo *optInfo, uint64 type);
 void CompileoptInfo_Delete(CompileOptimizeInfo *optInfo);
 int64 Compiler_BlockLevel(Compiler *compiler);
-void Compiler_RecycleOptInfos(void);
+void Compiler_RecycleOptInfos(Compiler *compiler);
 void Compiler_Init_AccumulatedOffsetPointers(Compiler *compiler, Word *word);
 void Compiler_Init(Compiler *compiler, uint64 state);
 Compiler *Compiler_New(uint64 type);
@@ -1558,7 +1558,6 @@ LambdaCalculus *LC_Init(void);
 ListObject *LO_Apply(LambdaCalculus *lc, ListObject *l0, ListObject *lfirst, ListObject *lfunction, ListObject *largs, Boolean applyFlag);
 ListObject *_LO_Apply(ListObject *lfirst, ListObject *lfunction, ListObject *largs);
 void _Interpreter_LC_InterpretWord(Interpreter *interp, ListObject *l0, Boolean functionFlag);
-byte *LC_GetWordDefinition(byte *nsName, byte *name);
 void _LO_CompileOrInterpret_One(ListObject *l0, int64 functionFlag);
 void LO_CompileOrInterpretArgs(ListObject *largs);
 void _LO_CompileOrInterpret(ListObject *lfunction, ListObject *largs);

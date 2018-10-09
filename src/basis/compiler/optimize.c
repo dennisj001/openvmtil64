@@ -59,7 +59,7 @@ Compiler_GetOptimizeState ( Compiler * compiler, Word * word )
 {
     if ( word )
     {
-        CompileOptimizeInfo * optInfo ;
+        CompileOptimizeInfo * optInfo ; //, *svOptInfo = compiler->OptInfo ;
         int64 state = compiler->OptInfo->State ;
         compiler->OptInfo = Compiler_CompileOptimizeInfo_PushNew ( compiler ) ;
         optInfo = compiler->OptInfo ;

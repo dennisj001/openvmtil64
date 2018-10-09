@@ -572,7 +572,7 @@ byte *
 OVT_CheckRecycleableAllocate ( dllist * list, int64 size )
 {
     DLNode * node = 0 ;
-    if ( _Q_ && _Q_->MemorySpace0 ) node = ( DLNode* ) dllist_First ( ( dllist* ) list ) ;
+    if ( list ) node = ( DLNode* ) dllist_First ( ( dllist* ) list ) ;
     if ( node )
     {
         //if ( ( checkFlag ) && ( ( node->n_InUseFlag == N_IN_USE ) || ( node->n_Size != size ) || ( node->n_InUseFlag != N_FREE ) ) ) return 0 ;

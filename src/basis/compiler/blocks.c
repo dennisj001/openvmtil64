@@ -4,7 +4,8 @@
 BlockInfo *
 BI_Block_Copy ( BlockInfo * bi, byte* dstAddress, byte * srcAddress, int64 bsize, Boolean optFlag )
 {
-    //if ( Is_DebugOn && ( bsize > 1000 ) ) _Printf ((byte*)"\nBI_Block_Copy : bsize = %ld\n", bsize ), Pause () ;
+    //if ( bsize > 8000 ) _Printf ((byte*)"\nBI_Block_Copy : bsize = %ld\n", bsize ), Pause () ;
+    //if ( Is_DebugOn ) _Printf ((byte*)"\nBI_Block_Copy : bsize = %ld\n", bsize ), Pause () ;
     Compiler * compiler = _Compiler_ ;
     if ( ! bi ) bi = ( BlockInfo * ) _Stack_Top ( compiler->CombinatorBlockInfoStack ) ;
     byte * saveHere = Here, * saveAddress = srcAddress ;
@@ -125,8 +126,7 @@ void
 CfrTil_TurnOnBlockCompiler ( )
 {
     CfrTil_RightBracket ( ) ;
-    Compiler_RecycleOptInfos ( ) ;
-    CfrTil_RecycleWordList ( 0 ) ;
+    //CfrTil_RecycleWordList ( 0 ) ;
 }
 
 // blocks are a notation for subroutines or blocks of code compiled in order,
