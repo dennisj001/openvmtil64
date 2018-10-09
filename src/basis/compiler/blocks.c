@@ -126,7 +126,7 @@ void
 CfrTil_TurnOnBlockCompiler ( )
 {
     CfrTil_RightBracket ( ) ;
-    //CfrTil_RecycleWordList ( 0 ) ;
+    CfrTil_RecycleWordList ( 0 ) ;
 }
 
 // blocks are a notation for subroutines or blocks of code compiled in order,
