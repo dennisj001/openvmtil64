@@ -652,7 +652,7 @@ typedef struct
 #endif
 typedef struct
 {
-    DLNode dln_Node ;
+    DLNode S_Node ;
     union
     {
         uint64 State ;

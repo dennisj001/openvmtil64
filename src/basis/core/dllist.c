@@ -29,6 +29,13 @@ List_Pop ( dllist *list )
 }
 
 inline
+dlnode *
+List_Top ( dllist *list )
+{
+    return _dllist_First ( list ) ;
+}
+
+inline
 int64
 dobject_Get_M_Slot ( dobject* dobj, int64 m )
 {

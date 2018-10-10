@@ -24,6 +24,7 @@ _CfrTil_Init_SessionCore ( CfrTil * cfrTil, int64 cntxDelFlag, int64 promptFlag 
     }
     OVT_FreeTempMem ( ) ;
     LC_New ( ) ;
+    LC_LispNamespacesOff () ;
     //LC_Init_Runtime ( ) ;
     CfrTil_CheckInitDataStack ( ) ;
     OVT_StartupMessage ( ) ;

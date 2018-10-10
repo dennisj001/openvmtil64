@@ -599,12 +599,13 @@ Word_Recycle ( Word * w )
 }
 
 // put a CompileOptimizeInfo on the recycling list
-
+#if 0
 void
 OptInfo_Recycle ( CompileOptimizeInfo * coi )
 {
     OVT_Recycle ( _Q_->MemorySpace0->RecycledOptInfoList, ( dlnode * ) coi ) ;
 }
+#endif
 
 void
 _CheckRecycleWord ( Word * w )

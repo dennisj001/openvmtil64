@@ -183,6 +183,7 @@ Namespace_SetAsNotUsing ( byte * name )
 {
     Namespace * ns = Namespace_Find ( name ) ;
     if ( ns ) SetState_TrueFalse ( ns, NOT_USING, USING ) ;
+    if ( _CfrTil_->InNamespace == ns ) _CfrTil_->InNamespace = 0 ;
 }
 
 void

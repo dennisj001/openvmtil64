@@ -195,6 +195,7 @@ CompileOptimizeInfo *
 _CompileOptimizeInfo_New ( uint64 type )
 {
     CompileOptimizeInfo * optInfo = ( CompileOptimizeInfo * ) Mem_Allocate ( sizeof (CompileOptimizeInfo ), type ) ;
+    optInfo->InUseFlag = N_LOCKED ;
     return optInfo ;
 }
 
@@ -202,7 +203,7 @@ CompileOptimizeInfo *
 CompileOptimizeInfo_New ( uint64 type )
 {
     CompileOptimizeInfo * optInfo =
-        ( CompileOptimizeInfo * ) OVT_CheckRecycleableAllocate ( _Q_->MemorySpace0->RecycledOptInfoList, 
+        ( CompileOptimizeInfo * ) OVT_CheckRecycleableAllocate ( _Q_->MemorySpace0->RecycledOptInfoList,
         sizeof (CompileOptimizeInfo ) ) ;
     if ( ! optInfo ) optInfo = _CompileOptimizeInfo_New ( type ) ;
     return optInfo ;
@@ -211,7 +212,7 @@ CompileOptimizeInfo_New ( uint64 type )
 CompileOptimizeInfo *
 Compiler_CompileOptimizeInfo_PushNew ( Compiler * compiler )
 {
-    CompileOptimizeInfo * coi = CompileOptimizeInfo_New ( OBJECT_MEM ) ;
+    CompileOptimizeInfo * coi = CompileOptimizeInfo_New ( OBJECT_MEM ) ; //COMPILER_TEMP ) ;
     if ( coi )
     {
         List_Push ( compiler->OptimizeInfoList, ( dlnode* ) coi ) ;
@@ -221,11 +222,12 @@ Compiler_CompileOptimizeInfo_PushNew ( Compiler * compiler )
 }
 
 #if 0
+
 void
 Compiler_CompileOptimizeInfo_PopDelete ( Compiler * compiler )
 {
     CompileOptimizeInfo * coi = ( CompileOptimizeInfo* ) List_Pop ( compiler->OptimizeInfoList ) ;
-    compiler->OptInfo = coi ; 
+    compiler->OptInfo = coi ;
     OptInfo_Recycle ( coi ) ;
 }
 #endif
@@ -243,12 +245,14 @@ CompileOptInfo_NewCopy ( CompileOptimizeInfo * optInfo, uint64 type )
     MemCpy ( copyOptInfo, optInfo, sizeof (CompileOptimizeInfo ) ) ;
     return copyOptInfo ;
 }
+#if 0
 
 void
 CompileoptInfo_Delete ( CompileOptimizeInfo * optInfo )
 {
     Mem_FreeItem ( &_Q_->PermanentMemList, ( byte* ) optInfo ) ;
 }
+#endif
 
 int64
 Compiler_BlockLevel ( Compiler * compiler )
@@ -257,17 +261,27 @@ Compiler_BlockLevel ( Compiler * compiler )
     return depth ;
 }
 
+#if 0
 void
 Compiler_RecycleOptInfos ( Compiler * compiler )
 {
     CompileOptimizeInfo * coi ;
-    int64 depth ;
-    for ( depth = List_Depth ( compiler->OptimizeInfoList ) ; depth ; depth -- )
+    dlnode * node, * nextNode ;
+    //int64 depth ;
+    //for ( depth = List_Depth ( compiler->OptimizeInfoList ) ; depth ; depth -- )
+    for ( node = dllist_First ( ( dllist* ) compiler->OptimizeInfoList ) ; node ; node = nextNode )
     {
-        coi = ( CompileOptimizeInfo* ) List_Pop ( compiler->OptimizeInfoList ) ;
-        if ( coi && ( coi != compiler->OptInfo ) ) OptInfo_Recycle ( coi ) ;
+        nextNode = dlnode_Next ( node ) ;
+        coi = ( CompileOptimizeInfo * ) node ;
+        //coi = ( CompileOptimizeInfo* ) List_Top ( compiler->OptimizeInfoList ) ;
+        if ( coi && ( coi != compiler->OptInfo ) && ( coi->InUseFlag != N_LOCKED ) )
+        {
+            List_Pop ( compiler->OptimizeInfoList ) ;
+            OptInfo_Recycle ( coi ) ;
+        }
     }
 }
+#endif
 
 void
 Compiler_Init_AccumulatedOffsetPointers ( Compiler * compiler, Word * word )
@@ -280,7 +294,7 @@ Compiler_Init_AccumulatedOffsetPointers ( Compiler * compiler, Word * word )
 void
 Compiler_Init ( Compiler * compiler, uint64 state )
 {
-    compiler->State = state & (!ARRAY_MODE);
+    compiler->State = state & ( ! ARRAY_MODE ) ;
     compiler->ContinuePoint = 0 ;
     compiler->BreakPoint = 0 ;
     compiler->InitHere = Here ;
@@ -309,7 +323,9 @@ Compiler_Init ( Compiler * compiler, uint64 state )
     _dllist_Init ( compiler->OptimizeInfoList ) ;
     _Compiler_FreeAllLocalsNamespaces ( compiler ) ;
     //CfrTil_RecycleWordList ( 0 ) ;
-    Compiler_RecycleOptInfos ( compiler ) ;
+    //Compiler_RecycleOptInfos ( compiler ) ;
+    //Compiler_CompileOptimizeInfo_PushNew ( compiler ) ;
+    //Compiler_CompileOptimizeInfo_New ( compiler, type ) ;
     SetBuffersUnused ( 1 ) ;
     SetState ( compiler, VARIABLE_FRAME, false ) ;
 }
@@ -328,9 +344,9 @@ Compiler_New ( uint64 type )
     compiler->PostfixLists = _dllist_New ( type ) ;
     compiler->GotoList = _dllist_New ( type ) ;
     compiler->OptimizeInfoList = _dllist_New ( type ) ;
-    //Compiler_CompileOptimizeInfo_New ( compiler, type ) ;
-    Compiler_CompileOptimizeInfo_PushNew ( compiler ) ;
     Compiler_Init ( compiler, 0 ) ;
+    Compiler_CompileOptimizeInfo_New ( compiler, type ) ;
+    //Compiler_CompileOptimizeInfo_PushNew ( compiler ) ;
     return compiler ;
 }
 
