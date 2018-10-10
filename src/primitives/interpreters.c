@@ -19,7 +19,8 @@ CfrTil_CommentToEndOfLine ( )
     _CfrTil_SC_ScratchPadIndex_Init ( _CfrTil_ ) ;
     SetState ( lexer, LEXER_END_OF_LINE, true ) ;
     //Lexer_SourceCodeOn ( _Lexer_ ) ;
-    if ( Compiling ) SetState ( lexer, ( ADD_TOKEN_TO_SOURCE | ADD_CHAR_TO_SOURCE ), svState ) ;
+    //if ( Compiling ) 
+    SetState ( lexer, ( ADD_TOKEN_TO_SOURCE | ADD_CHAR_TO_SOURCE ), svState ) ;
 }
 
 void

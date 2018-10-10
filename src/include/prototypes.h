@@ -1510,7 +1510,7 @@ void _Compile_DebugRuntimeBreakpoint(void);
 void _Compile_DebugRuntimeBreakpoint_dso(void);
 void _Compile_WordCompiledAt_Location(void);
 /* basis/lc/lambdaCalculus.c */
-ListObject *_LO_New_RawStringOrLiteral(Lexer *lexer, byte *token, int64 qidFlag);
+ListObject *_LO_New_RawStringOrLiteral(Lexer *lexer, byte *token, int64 qidFlag, int64 tsrli, int64 scwi);
 ListObject *_LO_New(uint64 ltype, uint64 ctype, uint64 ctype2, byte *name, byte *value, Word *word, uint64 allocType, Namespace *addToNs, int64 rl_Index, int64 scwi);
 ListObject *_LO_First(ListObject *l0);
 ListObject *_LO_Last(ListObject *l0);

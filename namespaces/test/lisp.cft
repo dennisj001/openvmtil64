@@ -239,6 +239,7 @@ Debug Lisp // test comment
     9 goedel6 "goedel6_0_assert" assert
     "\ngoedel6 :: goedel6 output should read : \n'junk' 2 'junk' 7 7 'junk' 9" ps //pause
 )
+scOn
 ( ::
     "\ngoedel8 output : " ps  
     : goedel8 (| n -- TOS ) 

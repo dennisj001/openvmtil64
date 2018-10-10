@@ -591,7 +591,6 @@ _CfrTil_UnAppendTokenFromSourceCode ( CfrTil * cfrtil, byte * tkn )
 void
 _CfrTil_AppendCharToSourceCode ( CfrTil * cfrtil, byte c )
 {
-
     cfrtil->SC_Buffer [ cfrtil->SC_Index ++ ] = c ;
     cfrtil->SC_Buffer [ cfrtil->SC_Index ] = 0 ;
 }

@@ -31,7 +31,7 @@ DataObject_New ( uint64 type, Word * word, byte * name, uint64 ctype, uint64 cty
         }
         case T_LC_LITERAL:
         {
-            word = _LO_New_RawStringOrLiteral ( _Context_->Lexer0, name, index ) ;
+            word = _LO_New_RawStringOrLiteral ( _Context_->Lexer0, name, index, tsrli, scwi ) ;
             break ;
         }
         case CFRTIL_WORD:

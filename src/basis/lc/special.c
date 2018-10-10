@@ -31,14 +31,14 @@ _LO_Define ( ListObject * idNode, ListObject * locals )
     word->State |= LC_DEFINED ;
     // the value was entered into the LISP memory, now we need a temporary carrier for LO_Print
     //l1 = _DataObject_New ( T_LC_NEW, LO_New ( LIST_NODE, word ), 0, word->CAttribute, word->CAttribute2, word->LAttribute, 
-    l1 = DataObject_New ( T_LC_NEW, 0, word->Name, word->CAttribute, word->CAttribute2, word->LAttribute, 
+    l1 = DataObject_New ( T_LC_NEW, 0, word->Name, word->CAttribute, word->CAttribute2, word->LAttribute,
         0, ( int64 ) value, LISP, - 1, - 1 ) ; // all words are symbols
     l1->LAttribute |= ( T_LC_DEFINE | T_LISP_SYMBOL ) ;
     SetState ( lc, ( LC_DEFINE_MODE ), false ) ;
     l1->W_SourceCode = word->W_SourceCode = lc->LC_SourceCode ;
     _Word_Finish ( l1 ) ;
     Compiler_Init ( _Context_->Compiler0, 0 ) ; // we could be compiling a cfrTil word as in oldLisp.cft
-    return l1 ; 
+    return l1 ;
 }
 
 ListObject *
@@ -136,7 +136,7 @@ _LO_Macro ( ListObject * l0, ListObject * locals )
     //l0 = _LO_Define ( ( byte* ) "macro", idNode, locals ) ;
     l0 = _LO_Define ( idNode, locals ) ;
     l0->LAttribute |= T_LISP_MACRO ;
-    if (l0->Lo_CfrTilWord) l0->Lo_CfrTilWord->LAttribute |= T_LISP_MACRO ;
+    if ( l0->Lo_CfrTilWord ) l0->Lo_CfrTilWord->LAttribute |= T_LISP_MACRO ;
     if ( GetState ( _CfrTil_, DEBUG_MODE ) ) LO_Print ( l0 ) ;
     return l0 ;
 }
@@ -176,7 +176,7 @@ LO_Set ( ListObject * lfirst, ListObject * locals )
         }
         else break ;
     }
-    return 0 ; 
+    return 0 ;
 }
 
 ListObject *
@@ -346,7 +346,7 @@ _LO_CfrTil ( ListObject * lfirst )
     Context * cntx = _Context_ ;
     Compiler * compiler = cntx->Compiler0 ;
     LambdaCalculus * lc = 0 ;
-    ListObject *ldata, *word = 0 ;
+    ListObject *ldata, *word = 0, *word1 ;
     if ( _LC_ )
     {
         SetState ( _LC_, LC_INTERP_MODE, true ) ;
@@ -358,7 +358,7 @@ _LO_CfrTil ( ListObject * lfirst )
     for ( ldata = _LO_Next ( lfirst ) ; ldata ; ldata = _LO_Next ( ldata ) )
     {
         Word_SetCodingHere_And_ClearPreviousUseOf_Here_SCA ( ldata->CfrTilWord, 0 ) ;
-        if ( ldata->LAttribute & ( LIST|LIST_NODE ) )
+        if ( ldata->LAttribute & ( LIST | LIST_NODE ) )
         {
             _CfrTil_Parse_LocalsAndStackVariables ( 1, 1, ldata, compiler->LocalsCompilingNamespacesStack, 0 ) ;
         }
@@ -395,7 +395,11 @@ _LO_CfrTil ( ListObject * lfirst )
             _LO_Semi ( word ) ;
             word->W_SourceCode = lc->LC_SourceCode ;
         }
-        else Interpreter_InterpretAToken ( cntx->Interpreter0, ldata->Name, ldata->W_RL_Index ) ;
+        else
+        {
+            word1 = _Interpreter_TokenToWord ( cntx->Interpreter0, ldata->Name ) ;
+            _Interpreter_DoWord ( cntx->Interpreter0, word1, ldata->W_RL_Index, ldata->W_SC_Index ) ;
+        }
     }
     SetState ( compiler, LC_CFRTIL, false ) ;
     if ( lc )

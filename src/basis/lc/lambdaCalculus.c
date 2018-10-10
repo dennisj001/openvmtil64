@@ -66,7 +66,7 @@ Lexer_CheckMacroRepl ( Lexer * lexer )
 //===================================================================================================================
 
 ListObject *
-_LO_New_RawStringOrLiteral ( Lexer * lexer, byte * token, int64 qidFlag )
+_LO_New_RawStringOrLiteral ( Lexer * lexer, byte * token, int64 qidFlag, int64 tsrli, int64 scwi )
 {
     if ( GetState ( lexer, KNOWN_OBJECT ) )
     {
@@ -83,6 +83,8 @@ _LO_New_RawStringOrLiteral ( Lexer * lexer, byte * token, int64 qidFlag )
         }
         word->Lo_CfrTilWord = word ;
         if ( qidFlag ) word->CAttribute &= ~ T_LISP_SYMBOL ;
+        word->W_SC_Index = scwi ; 
+        word->W_RL_Index = tsrli ;
         return word ;
     }
     else
@@ -101,13 +103,13 @@ _LO_New ( uint64 ltype, uint64 ctype, uint64 ctype2, byte * name, byte * value, 
         ( ltype & T_LISP_SYMBOL ) ? word ? word->RunType : 0 : 0, 0, 0, 0, 0, LISP ) ; //addToNs, LISP ) ;
     if ( ltype & LIST ) _LO_ListInit ( l0, allocType ) ;
     else if ( ltype & LIST_NODE ) l0->S_SymbolList = ( dllist* ) value ;
+    l0->W_SC_Index = scwi ;
+    l0->W_RL_Index = rl_Index ;
     if ( word )
     {
         l0->Lo_CfrTilWord = word ;
         word->Lo_CfrTilWord = word ;
         l0->W_SourceCode = word->W_SourceCode ;
-        //l0->W_SC_Index = word->W_SC_Index = ( scwi != - 1 ) ? scwi : _Lexer_->SC_Index ;
-        //l0->W_RL_Index = rl_Index ;
         //Word_Set_ScIndex_RlIndex ( word, -1, -1 ) ;
     }
     return l0 ;

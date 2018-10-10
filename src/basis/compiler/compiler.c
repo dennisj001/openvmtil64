@@ -308,6 +308,7 @@ Compiler_Init ( Compiler * compiler, uint64 state )
     _dllist_Init ( compiler->RegisterParameterList ) ;
     _dllist_Init ( compiler->OptimizeInfoList ) ;
     _Compiler_FreeAllLocalsNamespaces ( compiler ) ;
+    //CfrTil_RecycleWordList ( 0 ) ;
     Compiler_RecycleOptInfos ( compiler ) ;
     SetBuffersUnused ( 1 ) ;
     SetState ( compiler, VARIABLE_FRAME, false ) ;
