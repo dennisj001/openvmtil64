@@ -124,7 +124,7 @@ _Compile_LogicalAnd ( Compiler * compiler )
     Compiler_BI_CompileRecord_TestCode_Set_setTtnn ( compiler, ACC, TTT_ZERO, NEGFLAG_NZ, TTT_ZERO, NEGFLAG_Z ) ;
     _Compile_LogicResultForStack ( ACC, TTT_ZERO, NEGFLAG_NZ ) ; // jnz
     Compiler_Set_LogicCode ( compiler, TTT_ZERO, NEGFLAG_NZ, TTT_ZERO, NEGFLAG_Z ) ;
-    _Compiler_CompileAndRecord_Word0_PushReg (ACC) ;
+    CfrTil_CompileAndRecord_Word0_PushReg (ACC) ;
 }
 
 void
@@ -155,7 +155,7 @@ _Compile_LogicalNot ( Compiler * compiler )
     //_Set_JccLogicCodeForNot ( compiler ) ;
     _Compile_LogicResultForStack ( ACC, TTT_ZERO, NEGFLAG_Z ) ;
     Compiler_Set_LogicCode ( compiler, TTT_ZERO, NEGFLAG_Z, TTT_ZERO, NEGFLAG_NZ ) ;
-    _Compiler_CompileAndRecord_Word0_PushReg (ACC) ;
+    CfrTil_CompileAndRecord_Word0_PushReg (ACC) ;
     //DBI_OFF ;
 }
 
@@ -285,7 +285,7 @@ void
 Compile_TestLogicAndStackPush ( Compiler * compiler, Boolean reg, Boolean setTtn, Boolean setNegFlag, Boolean jccTtt, Boolean jccNegFlag )
 {
     Compiler_BI_CompileRecord_TestCode_Set_setTtnn ( compiler, reg, TTT_ZERO, setNegFlag, jccTtt, jccNegFlag ) ;
-    Compiler_CompileAndRecord_PushAccum ( compiler ) ;
+    CfrTil_CompileAndRecord_PushAccum () ;
 }
 
 void

@@ -12,8 +12,8 @@ _OpenVmTil_ShowExceptionInfo ( )
     Debugger * debugger = _Debugger_ ;
     DebugOn ;
     //if ( debugger->w_Word ) _Debugger_Locals_Show ( debugger, debugger->w_Word ) ;
-    if ( ! (_Q_->ExceptionCode & (STACK_ERROR|STACK_OVERFLOW|STACK_UNDERFLOW) ) ) Debugger_Stack ( debugger ) ;
-    if ( ! word )
+    if (( _Q_->ExceptionCode ) && ( ! ( _Q_->ExceptionCode & ( STACK_ERROR | STACK_OVERFLOW | STACK_UNDERFLOW ) ) )) Debugger_Stack ( debugger ) ;
+    if (( ! word ) && _Q_->ExceptionToken )
     {
         word = Finder_Word_FindUsing ( _Finder_, _Q_->ExceptionToken, 1 ) ;
         if ( ! word )
@@ -42,14 +42,17 @@ OpenVmTil_ShowExceptionInfo ( )
 {
     if ( _Q_->Verbosity )
     {
-        if ( _Q_->ExceptionMessage ) 
+        if ( _Q_->ExceptionMessage )
         {
-            printf ( "\n%s : %s\n", 
-            _Q_->ExceptionMessage, _Q_->ExceptionSpecialMessage ? _Q_->ExceptionSpecialMessage : Context_Location () ) ; 
+            printf ( "\n%s : %s\n",
+                _Q_->ExceptionMessage, _Q_->ExceptionSpecialMessage ? _Q_->ExceptionSpecialMessage : Context_Location ( ) ) ;
             fflush ( stdout ) ;
         }
-        _DisplaySignal ( _Q_->Signal ) ;
-        if ( ( _Q_->SigSegvs < 2 ) && ( _Q_->SignalExceptionsHandled ++ < 2 ) && _CfrTil_ ) _OpenVmTil_ShowExceptionInfo ( ) ;
+        if ( ( _Q_->SigSegvs < 2 ) && ( _Q_->SignalExceptionsHandled ++ < 2 ) && _CfrTil_ )
+        {
+            _DisplaySignal ( _Q_->Signal ) ;
+            _OpenVmTil_ShowExceptionInfo ( ) ;
+        }
     }
     int64 rtrn = OVT_Pause ( 0, _Q_->SignalExceptionsHandled ) ;
     _Q_->Signal = 0 ;
@@ -59,7 +62,7 @@ OpenVmTil_ShowExceptionInfo ( )
 void
 OVT_SimpleFinalPause ( )
 {
-    printf ( "\n!!Serious Error : hit any key to continue full restart!!\n:!!> " ) ;
+    printf ( "\n!!Serious Error : SIGSEGV while handling a SIGSEGV : hit any key to continue full restart!!\n:!!> " ) ;
     fflush ( stdout ) ;
     Key ( ) ;
 }
@@ -223,7 +226,7 @@ OVT_Throw ( int signal, int64 restartCondition, Boolean pauseFlag )
             _Q_->RestartCondition = INITIAL_START ;
             goto jump ; //siglongjmp ( *jb, 1 ) ;
         }
-        else if ( ( restartCondition > QUIT ) && ( ( _Q_->Signal & ( SIGSEGV | SIGILL ) ) ) )
+        else if ( ( restartCondition > QUIT ) || ( ( _Q_->Signal & ( SIGSEGV | SIGILL ) ) ) )
         {
             if ( ++ _Q_->SigSegvs < 2 )
             {

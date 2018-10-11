@@ -55,7 +55,7 @@ Compile_X_Group3 ( Compiler * compiler, int64 code ) //OP_1_ARG
         {
             if ( compiler->OptInfo->Optimize_Rm != ACC ) Compile_Move_Rm_To_Reg ( ACC, compiler->OptInfo->Optimize_Rm,
                 compiler->OptInfo->Optimize_Disp ) ;
-            Compiler_CompileAndRecord_PushAccum ( compiler ) ;
+            CfrTil_CompileAndRecord_PushAccum () ;
         }
     }
     else
@@ -90,7 +90,7 @@ Compile_X_Shift ( Compiler * compiler, int64 op, Boolean stackFlag, Boolean opEq
         {
             if ( compiler->OptInfo->Optimize_Rm != ACC ) 
             Compile_Move_Rm_To_Reg ( ACC, compiler->OptInfo->Optimize_Rm, compiler->OptInfo->Optimize_Disp ) ;
-            Compiler_CompileAndRecord_PushAccum ( compiler ) ;
+            CfrTil_CompileAndRecord_PushAccum () ;
         }
         //DBI_OFF ;
     }

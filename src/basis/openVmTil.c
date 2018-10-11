@@ -1,5 +1,5 @@
 #include "../include/cfrtil64.h"
-#define VERSION ((byte*) "0.863.100" ) 
+#define VERSION ((byte*) "0.864.200" ) 
 
 OpenVmTil * _Q_ ;
 
@@ -264,13 +264,14 @@ _OpenVmTil_New ( OpenVmTil * ovt, int64 argc, char * argv [ ] )
     //ovt->SavedTerminalAttributes = savedTerminalAttributes ;
 
     OVT_GetStartupOptions ( ovt ) ;
-#if 1    
+#if 0   
     int64 MIN_TotalMemSizeTarget = ( 300 * K ) ;
     if ( ovt->TotalMemSizeTarget < MIN_TotalMemSizeTarget ) ovt->TotalMemSizeTarget = MIN_TotalMemSizeTarget ;
     int64 totalMemSizeTarget = ( ovt->TotalMemSizeTarget < 5 * M ) ? ovt->TotalMemSizeTarget : - 1 ; // 0 or -1 : gets default values     
     _OpenVmTil_CalculateMemSpaceSizes ( ovt, restartCondition, -1) ; //totalMemSizeTarget ) ;
 #else    
     ovt->MachineCodeSize = 200 * K ;
+    ovt->DictionarySize = 100 * K ;
 #endif    
 
     _OpenVmTil_Init ( ovt, exceptionsHandled > 1 ) ; // try to keep history if we can

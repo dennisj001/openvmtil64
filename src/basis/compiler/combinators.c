@@ -29,6 +29,7 @@ CfrTil_EndCombinator ( int64 quotesUsed, int64 moveFlag, int64 jccBlockIndex, Bo
         _Stack_Pop ( compiler->CombinatorInfoStack ) ;
         if ( ! Stack_Depth ( compiler->CombinatorInfoStack ) ) SetState ( compiler, LISP_COMBINATOR_MODE, false ) ;
     }
+    WordStack_SCHCPUSCA( 0, 0 ) ;
 }
 
 // Combinators are first created after the original code using 'Here' in CfrTil_BeginCombinator 

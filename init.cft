@@ -219,7 +219,6 @@ Word
 
 C
 System
-//dscOn //verbosity 3 =
 : location filename ps space decimal lineNumber _p "." _ps charNumber _p ;
 : pdl  "-----------------------------" ps ;
 : pel  "=============================" ps ;
@@ -235,8 +234,6 @@ System
     nl pel decimal 
     nl "::> 'wdiss' was called at" _ps location "<::" ps nl
 ;;
-//scOff
-//: wdiss ( pword ) _wdiss ( 1 pword @ ) ; //debugWord    // add wdiss words to history list
 : wdiss ( pword ) _wdiss ( 0 pword @ ) ; //debugWord      // don't add wdiss words to history list
 : wdissl ( pword ) logOn _wdiss ( 0 pword @ ) logOff ; //debugWord      // don't add wdiss words to history list
 "winfo" ' wdiss find alias
@@ -285,9 +282,8 @@ dscOn //verbosity 3 =
         ifElse
     } if2 
 ; 
+//' _assertStkChk find wdiss 
 : assertStkChk _assertStkChk ; //"\n_assertStkChk : " ps stack pause ; 
-scOff
-//' _assertStkChk find wdiss //pause
 : TODO ( str ) nl nl pdl nl str @ adps location nl pdl nl nl { dbgOnVar @ } { sp } if2 ;; //pause ;;
 Root
 User 
@@ -354,7 +350,6 @@ OpenVmTil
 : lispOff "Lisp" notUsing "LispTemp" notUsing "LispDefines" notUsing ; //lcReset ;
 
 c_syntaxOff
-scOff
 
 sp 
 : sh _sh ; prefix

@@ -14,7 +14,7 @@ byte *
 _Context_Location ( Context * cntx )
 {
     byte * str = 0 ;
-    if ( cntx )
+    if ( cntx && cntx->ReadLiner0 )
     {
         byte * buffer = Buffer_Data ( _CfrTil_->StringB ) ;
         sprintf ( ( char* ) buffer, "%s : %ld.%ld", ( char* ) cntx->ReadLiner0->Filename ? ( char* ) cntx->ReadLiner0->Filename : "<command line>", cntx->ReadLiner0->LineNumber, cntx->Lexer0->CurrentReadIndex ) ;
@@ -44,6 +44,7 @@ _Context_Init ( Context * cntx0, Context * cntx )
 {
     if ( cntx0 && cntx0->System0 ) cntx->System0 = System_Copy ( cntx0->System0, CONTEXT ) ; // nb : in this case System is copied -- DataStack is shared
     else cntx->System0 = System_New ( CONTEXT ) ;
+    List_Init ( _CfrTil_->CompilerWordList ) ;
     cntx->Interpreter0 = Interpreter_New ( CONTEXT ) ;
     cntx->Lexer0 = cntx->Interpreter0->Lexer0 ;
     cntx->ReadLiner0 = cntx->Interpreter0->ReadLiner0 ;

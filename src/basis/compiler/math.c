@@ -67,7 +67,7 @@ _Compile_Divide ( Compiler * compiler, uint64 type )
         if ( type == MODULO ) reg = RDX ;
         else reg = ACC ;
         if ( reg != ACC ) Compile_Move_Reg_To_Reg ( ACC, reg ) ; // for consistency finally use RAX so optInfo can always count on rax as the pushed reg
-        _Compiler_CompileAndRecord_Word0_PushReg ( ACC ) ;
+        CfrTil_CompileAndRecord_Word0_PushReg ( ACC ) ;
     }
     else
     {

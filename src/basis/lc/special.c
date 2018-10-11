@@ -8,7 +8,9 @@ _LO_Define ( ListObject * idNode, ListObject * locals )
 {
     LambdaCalculus * lc = _LC_ ;
     ListObject *value0, *value, *l1 ;
-    Word * word = idNode->Lo_CfrTilWord ;
+    Word * word0 = idNode->Lo_CfrTilWord, *word ;
+    word =  DataObject_New ( T_LC_DEFINE, 0, ( byte* ) word0->Name, 0, 0, 0, 0, 0, LISP, word0->W_RL_Index, word0->W_SC_Index ) ; //word0 was allocated COMPILER_TEMP or LISP_TEMP
+
     CfrTil_WordList_Init ( _CfrTil_, word, 1 ) ;
     word->Definition = 0 ; // reset the definition from LO_Read
     value0 = _LO_Next ( idNode ) ;

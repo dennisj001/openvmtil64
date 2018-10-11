@@ -37,6 +37,7 @@ Interpreter_InterpretNextToken ( Interpreter * interp )
     byte * token = Lexer_ReadToken ( interp->Lexer0 ) ;
     Interpreter_InterpretAToken ( interp, token, - 1 ) ;
 }
+
 void
 Word_Set_ScIndex_RlIndex ( Word * word, int64 tsrli, int64 scwi )
 {
@@ -101,6 +102,7 @@ Interpreter_C_PREFIX_RTL_ARGS_Word ( Word * word, int64 tsrli, int64 scwi )
 // 3. infix which takes one (or more) following 'args' and then becomes regular rpn : here only one arg is currently accepted
 // 4. C arg lists which are left to right but are evaluated right to left, ie. the rightmost operand goes on the stack first then the next rightmost and so on such that topmost is the left operand
 // we just rearrange the functions and args such that they all become regular rpn - forth like
+
 void
 _Interpreter_DoWord ( Interpreter * interp, Word * word, int64 tsrli, int64 scwi )
 {
@@ -139,6 +141,7 @@ _Interpreter_NewWord ( Interpreter * interp, byte * token )
                 }
             }
             word->W_SC_Index = _Lexer_->SC_Index ;
+            word->W_RL_Index = _Lexer_->TokenStart_ReadLineIndex ;
             return interp->w_Word = word ;
         }
     }

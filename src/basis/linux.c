@@ -9,8 +9,9 @@ _DisplaySignal ( int64 signal )
 {
     if ( signal )
     {
-        //byte * location = _Context_->Location ;
-        byte * location = ( byte* ) Context_Location ( ) ;
+        byte * location ; 
+        if ( _Q_->SigSegvs < 2 ) location = ( byte* ) Context_Location ( ) ;
+        else location = "" ;
         switch ( signal )
         {
             case SIGSEGV:

@@ -88,7 +88,7 @@ Debugger_ParseFunctionLocalVariables ( Debugger * debugger, Lexer * lexer, Boole
     Boolean lasvf = false ;
     byte * token, *prevToken = 0, *prevPrevToken = 0, *aToken ;
     Compiler * compiler = _Compiler_ ;
-    Word * prevWord, *prevPrevWord ;
+    Word * prevWord ;
     compiler->NumberOfArgs = 0 ;
     compiler->NumberOfLocals = 0 ;
     compiler->NumberOfRegisterVariables = 0 ; //nb. prevent increasing the locals offset by adding in repeated calls to this function

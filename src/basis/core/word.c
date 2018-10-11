@@ -184,7 +184,7 @@ Word_SetLocation ( Word * word )
 Word *
 _Word_New ( byte * name, uint64 ctype, uint64 ctype2, uint64 ltype, Boolean addToInNs, Namespace * addToNs, uint64 allocType )
 {
-    CheckCodeSpaceForRoom ( ) ;
+    //CheckCodeSpaceForRoom ( ) ;
     Word * word = _Word_Create ( name, ctype, ctype2, ltype, allocType ) ; // CFRTIL_WORD : cfrTil compiled words as opposed to C compiled words
     _Compiler_->CurrentWord = word ;
     Word_SetLocation ( word ) ;

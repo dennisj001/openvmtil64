@@ -126,7 +126,7 @@ void
 CfrTil_TurnOnBlockCompiler ( )
 {
     CfrTil_RightBracket ( ) ;
-    CfrTil_RecycleWordList ( 0 ) ;
+    //CfrTil_RecycleWordList ( 0 ) ;
 }
 
 // blocks are a notation for subroutines or blocks of code compiled in order,
@@ -144,7 +144,9 @@ _CfrTil_BeginBlock0 ( Boolean compileJumpFlag, byte * here )
     BlockInfo *bi = ( BlockInfo * ) Mem_Allocate ( sizeof (BlockInfo ), COMPILER_TEMP ) ;
     if ( ( ! CompileMode ) || ( ! Compiler_BlockLevel ( compiler ) ) )// first block
     {
+        CheckCodeSpaceForRoom ( ) ;
         _CfrTil_->CurrentWordCompiling = compiler->CurrentCreatedWord ;
+        CfrTil_RecycleWordList ( 0 ) ;
         CfrTil_TurnOnBlockCompiler ( ) ;
     }
     bi->OriginalActualCodeStart = here ? here : Here ;
@@ -189,7 +191,6 @@ _CfrTil_BeginBlock2 ( BlockInfo * bi )
 void
 _CfrTil_BeginBlock ( Boolean compileJumpFlag, byte * here )
 {
-    CheckCodeSpaceForRoom ( ) ;
     BlockInfo * bi = _CfrTil_BeginBlock0 ( compileJumpFlag, here ) ;
     _CfrTil_BeginBlock1 ( bi ) ;
     _CfrTil_BeginBlock2 ( bi ) ;
@@ -213,6 +214,7 @@ _CfrTil_EndBlock1 ( BlockInfo * bi )
     Compiler * compiler = _Context_->Compiler0 ;
     if ( ! Compiler_BlockLevel ( compiler ) )
     {
+        WordStack_SCHCPUSCA ( 0, 0 ) ;
         _CfrTil_InstallGotoCallPoints_Keyed ( bi, GI_RETURN ) ;
         if ( _Compiler_IsFrameNecessary ( compiler ) && ( ! GetState ( compiler, DONT_REMOVE_STACK_VARIABLES ) ) )
         {

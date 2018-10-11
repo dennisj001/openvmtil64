@@ -271,7 +271,7 @@
 #define KEYWORD ( (uint64) 1 << 44 )
 #define TEXT_MACRO ( (uint64) 1 << 45 )
 #define STRING_MACRO ( (uint64) 1 << 46 )
-#define RECYCLABLE_COPY ( (uint64) 1 << 47 )
+//#define RECYCLABLE_COPY ( (uint64) 1 << 47 )
 #define DEBUG_WORD ( (uint64) 1 << 48 )
 //#define RT_STACK_OP ( (uint64) 1 << 49 ) // Run Time stack operation
 #define BIT_SHIFT        ( (uint64) 1 << 49 ) 
@@ -313,6 +313,8 @@
 #define T_MORPHISM          ( (uint64) 1 << 18 )
 #define RIGHT_BRACKET       ( (uint64) 1 << 19 ) // ']'
 #define LEFT_BRACKET        ( (uint64) 1 << 20 ) // '['
+#define RECYCLABLE_COPY     ( (uint64) 1 << 21 )
+#define RECYCLABLE_LOCAL    ( (uint64) 1 << 22 )
 
 // _CAttribute for interpreter word types - 4 bits/ 16 possibilities : N_WordAttribute bitfield
 #define WT_PREFIX                 ( (uint64) 1 <<  0 ) 

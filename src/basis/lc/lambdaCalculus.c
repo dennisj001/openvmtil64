@@ -73,12 +73,10 @@ _LO_New_RawStringOrLiteral ( Lexer * lexer, byte * token, int64 qidFlag, int64 t
         uint64 ctokenType = qidFlag ? OBJECT : lexer->TokenType | LITERAL ;
         Word * word = _DObject_New ( lexer->OriginalToken, lexer->Literal, ( ctokenType | IMMEDIATE | LITERAL ),
             0, ctokenType, ctokenType, ( byte* ) _DataObject_Run, 0, 0, 0, LISP ) ; //_LC_->LispTempNamespace, LISP ) ;
-        //word->W_RL_Index = lexer->TokenStart_ReadLineIndex ;
         if ( ( ! qidFlag ) && ( lexer->TokenType & ( T_RAW_STRING ) ) )
         {
             // nb. we don't want to do this block with literals it slows down the eval and is wrong
             word->LAttribute |= ( T_LISP_SYMBOL | T_RAW_STRING ) ;
-            //_Namespace_DoAddWord ( _LC_->LispDefinesNamespace, word, 0 ) ; // nb. here not in _DObject_New :: only for ( ! qidFlag ) && ( lexer->TokenType & T_RAW_STRING ) 
             word->Lo_Value = ( int64 ) word->Lo_Name ;
         }
         word->Lo_CfrTilWord = word ;
@@ -96,7 +94,7 @@ _LO_New_RawStringOrLiteral ( Lexer * lexer, byte * token, int64 qidFlag, int64 t
 }
 
 ListObject *
-_LO_New ( uint64 ltype, uint64 ctype, uint64 ctype2, byte * name, byte * value, Word * word, uint64 allocType, Namespace * addToNs, int64 rl_Index, int64 scwi )
+_LO_New ( uint64 ltype, uint64 ctype, uint64 ctype2, byte * name, byte * value, Word * word, uint64 allocType, Namespace * addToNs, int64 tsrli, int64 scwi )
 {
     //_DObject_New ( byte * name, uint64 value, uint64 ctype, uint64 ltype, uint64 ftype, byte * function, int64 arg, int64 addToInNs, Namespace * addToNs, uint64 allocType )
     ListObject * l0 = _DObject_New ( word ? word->Name : name ? name : ( byte* ) "", ( uint64 ) value, ctype, ctype2, ltype,
@@ -104,13 +102,14 @@ _LO_New ( uint64 ltype, uint64 ctype, uint64 ctype2, byte * name, byte * value, 
     if ( ltype & LIST ) _LO_ListInit ( l0, allocType ) ;
     else if ( ltype & LIST_NODE ) l0->S_SymbolList = ( dllist* ) value ;
     l0->W_SC_Index = scwi ;
-    l0->W_RL_Index = rl_Index ;
+    l0->W_RL_Index = tsrli ;
     if ( word )
     {
         l0->Lo_CfrTilWord = word ;
         word->Lo_CfrTilWord = word ;
         l0->W_SourceCode = word->W_SourceCode ;
-        //Word_Set_ScIndex_RlIndex ( word, -1, -1 ) ;
+        word->W_SC_Index = scwi ;
+        word->W_RL_Index = tsrli ;
     }
     return l0 ;
 }
@@ -495,6 +494,7 @@ _LC_Init ( LambdaCalculus * lc )
 {
     if ( lc )
     {
+        _LC_ = lc ;
         lc->LispNamespace = Namespace_Find ( ( byte* ) "Lisp" ) ;
         _LC_Init_Runtime ( lc ) ;
         lc->LispDefinesNamespace = Namespace_FindOrNew_SetUsing ( ( byte* ) "LispDefines", 0, 1 ) ;
@@ -545,7 +545,6 @@ LC_New ( )
     if ( lc ) LC_Delete ( lc ) ; //LC_ClearDefinesNamespace ( ) ;
     lc = _LC_Create ( ) ;
     lc = _LC_Init ( lc ) ;
-    _LC_ = lc ;
     return lc ;
 }
 

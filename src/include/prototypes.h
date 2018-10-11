@@ -463,13 +463,13 @@ void _OVT_ShowMemoryAllocated(OpenVmTil *ovt);
 byte *OVT_CheckRecycleableAllocate(dllist *list, int64 size);
 void OVT_Recycle(dllist *list, dlnode *anode);
 void Word_Recycle(Word *w);
-void OptInfo_Recycle(CompileOptimizeInfo *coi);
 void _CheckRecycleWord(Word *w);
 void CheckRecycleWord(Node *node);
 void CheckRecycleNamespaceWord(Node *node);
 void DLList_Recycle_WordList(dllist *list);
 void DLList_Recycle_NamespaceList(dllist *list);
 void DLList_RemoveWords(dllist *list);
+void _CheckCodeSpaceForRoom(int64 memDesired);
 void CheckCodeSpaceForRoom(void);
 /* basis/init.c */
 void _CfrTil_Init_SessionCore(CfrTil *cfrTil, int64 cntxDelFlag, int64 promptFlag);
@@ -1106,7 +1106,6 @@ CompileOptimizeInfo *Compiler_CompileOptimizeInfo_PushNew(Compiler *compiler);
 CompileOptimizeInfo *Compiler_CompileOptimizeInfo_New(Compiler *compiler, uint64 type);
 CompileOptimizeInfo *CompileOptInfo_NewCopy(CompileOptimizeInfo *optInfo, uint64 type);
 int64 Compiler_BlockLevel(Compiler *compiler);
-void Compiler_RecycleOptInfos(Compiler *compiler);
 void Compiler_Init_AccumulatedOffsetPointers(Compiler *compiler, Word *word);
 void Compiler_Init(Compiler *compiler, uint64 state);
 Compiler *Compiler_New(uint64 type);
@@ -1114,9 +1113,9 @@ void Compiler_CalculateAndSetPreviousJmpOffset(Compiler *compiler, byte *jmpToAd
 void CfrTil_CalculateAndSetPreviousJmpOffset_ToHere(void);
 void _Stack_PointerToJmpOffset_Set(byte *address);
 void Stack_Push_PointerToJmpOffset(void);
-void _Compiler_CompileAndRecord_Word0_PushReg(Boolean reg);
-void Compiler_CompileAndRecord_Word0_PushRegToUse(void);
-void Compiler_CompileAndRecord_PushAccum(Compiler *compiler);
+void CfrTil_CompileAndRecord_Word0_PushReg(Boolean reg);
+void CfrTil_CompileAndRecord_Word0_PushRegToUse(void);
+void CfrTil_CompileAndRecord_PushAccum(void);
 /* basis/core/dllnodes.c */
 /* basis/core/finder.c */
 Symbol *DLList_FindName_InOneNamespaceList(dllist *list, byte *name);
@@ -1511,7 +1510,7 @@ void _Compile_DebugRuntimeBreakpoint_dso(void);
 void _Compile_WordCompiledAt_Location(void);
 /* basis/lc/lambdaCalculus.c */
 ListObject *_LO_New_RawStringOrLiteral(Lexer *lexer, byte *token, int64 qidFlag, int64 tsrli, int64 scwi);
-ListObject *_LO_New(uint64 ltype, uint64 ctype, uint64 ctype2, byte *name, byte *value, Word *word, uint64 allocType, Namespace *addToNs, int64 rl_Index, int64 scwi);
+ListObject *_LO_New(uint64 ltype, uint64 ctype, uint64 ctype2, byte *name, byte *value, Word *word, uint64 allocType, Namespace *addToNs, int64 tsrli, int64 scwi);
 ListObject *_LO_First(ListObject *l0);
 ListObject *_LO_Last(ListObject *l0);
 ListObject *_LO_Next(ListObject *l0);

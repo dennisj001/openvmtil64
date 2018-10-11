@@ -271,7 +271,7 @@ _Do_Literal ( int64 value )
     if ( CompileMode )
     {
         Compile_MoveImm_To_Reg ( ACC, value, CELL ) ;
-        Compiler_CompileAndRecord_PushAccum ( _Context_->Compiler0 ) ; // does word == top of word stack always
+        CfrTil_CompileAndRecord_PushAccum () ; // does word == top of word stack always
     }
     else DataStack_Push ( value ) ;
 }

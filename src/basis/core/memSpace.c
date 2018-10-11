@@ -600,6 +600,7 @@ Word_Recycle ( Word * w )
 
 // put a CompileOptimizeInfo on the recycling list
 #if 0
+
 void
 OptInfo_Recycle ( CompileOptimizeInfo * coi )
 {
@@ -610,7 +611,7 @@ OptInfo_Recycle ( CompileOptimizeInfo * coi )
 void
 _CheckRecycleWord ( Word * w )
 {
-    if ( w && ( w->CAttribute & RECYCLABLE_COPY ) ) //&& ( ! ( IsSourceCodeOn ) ) && GetState ( w, W_SOURCE_CODE_MODE ) )
+    if ( w && ( w->CAttribute2 & ( RECYCLABLE_COPY | RECYCLABLE_LOCAL ) ) ) //&& ( ! ( IsSourceCodeOn ) ) && GetState ( w, W_SOURCE_CODE_MODE ) )
     {
         //if ( Is_DebugOn ) ( 
         //_Printf ( ( byte* ) "\n_CheckRecycleWord : recycling : %s", w->Name ) ; //, Pause () ;
@@ -625,11 +626,10 @@ CheckRecycleWord ( Node * node )
     _CheckRecycleWord ( w ) ;
 }
 
-
 void
 CheckRecycleNamespaceWord ( Node * node )
 {
-    _CheckRecycleWord ( (Word *) node ) ;
+    _CheckRecycleWord ( ( Word * ) node ) ;
 }
 
 // check a compiler word list for recycleable words and add them to the recycled word list : _Q_->MemorySpace0->RecycledWordList
@@ -640,7 +640,6 @@ DLList_Recycle_WordList ( dllist * list )
     dllist_Map ( list, ( MapFunction0 ) CheckRecycleWord ) ;
     //if ( Is_DebugOn ) _Printf ( ( byte* ) "\nDLList_RecycleWordList" ), Pause () ;
 }
-
 
 void
 DLList_Recycle_NamespaceList ( dllist * list )
@@ -658,16 +657,26 @@ DLList_RemoveWords ( dllist * list )
 }
 
 void
-CheckCodeSpaceForRoom ( )
+_CheckCodeSpaceForRoom ( int64 memDesired )
 {
-    if ( _Q_CodeByteArray->OurNBA->ba_CurrentByteArray->MemRemaining < ( 4 * K ) )
+#if 0    
+    if ( ( _Q_CodeByteArray == _Q_CodeSpace->ba_CurrentByteArray ) && ( _Q_CodeByteArray->OurNBA->ba_CurrentByteArray->MemRemaining < ( memDesired ) ) )
     {
         if ( Compiling )
         {
-            _Printf ( ( byte* ) "\nLess than 4K of MachineCodeSize remaining : this will probably mean you have to increase codeSize size in openvmtil.c\n" ) ;
+            _Printf ( ( byte* ) "\nLess than %ld of code space remaining : this will may want to increase the 'codeSize' variable in openvmtil.c\n", memDesired ) ;
             Pause ( ) ;
         }
-        _Q_CodeByteArray = _ByteArray_AppendSpace_MakeSure ( _Q_CodeByteArray, 4 * K ) ;
+        _Q_CodeByteArray = _ByteArray_AppendSpace_MakeSure ( _Q_CodeByteArray, memDesired ) ;
     }
+#else
+    _Q_CodeByteArray = _ByteArray_AppendSpace_MakeSure ( _Q_CodeByteArray, memDesired ) ;
+#endif    
+}
+
+void
+CheckCodeSpaceForRoom ( )
+{
+    _CheckCodeSpaceForRoom ( 10 * K ) ;
 }
 
