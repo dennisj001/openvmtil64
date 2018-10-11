@@ -271,17 +271,13 @@ Compiler_Optimizer_2Args_Or_WordArg1_Op ( Compiler * compiler )
         else
         {
             optInfo->Optimize_Reg = ACC | REG_ON_BIT ;
-            if ( optInfo->wordArg1->CAttribute & REGISTER_VARIABLE )
-            {
-                SetHere ( optInfo->wordArg1->Coding, 1 ) ;
-            }
+            if ( optInfo->wordArg1->CAttribute & REGISTER_VARIABLE ) SetHere ( optInfo->wordArg1->Coding, 1 ) ;
             else if ( optInfo->wordArg1->StackPushRegisterCode )
             {
-
                 _SetHere_To_Word_StackPushRegisterCode ( optInfo->wordArg1, 1 ) ;
-                if ( ( GetState ( _Context_, C_SYNTAX | INFIX_MODE ) || GetState ( compiler, LC_ARG_PARSING ) ) && 
-                    String_Equal (optInfo->opWord->Name, "=" ) && 
-                    (( optInfo->wordArg1->CAttribute & ( OBJECT | THIS | QID ) ) || GetState ( optInfo->wordArg1, QID ) ) )
+                if ( ( GetState ( _Context_, C_SYNTAX | INFIX_MODE ) || GetState ( compiler, LC_ARG_PARSING ) ) &&
+                    String_Equal ( optInfo->opWord->Name, "=" ) &&
+                    ( ( optInfo->wordArg1->CAttribute & ( OBJECT | THIS | QID ) ) || GetState ( optInfo->wordArg1, QID ) ) )
                 {
                     Compile_Move_Rm_To_Reg ( ACC, ACC, 0 ) ;
                 }
@@ -369,6 +365,12 @@ Compiler_CompileOptimizedLoad ( Compiler * compiler )
             }
             Word_Set_StackPushRegisterCode_To_Here ( optInfo->opWord ) ; // for EndBlock and LogicCodeWord with '@'
             _Word_CompileAndRecord_PushReg ( optInfo->wordArg2, ACC ) ;
+        }
+        else
+        {
+            Compile_Move_Rm_To_Reg ( ACC, DSP, 0 ) ;
+            Compile_Move_Rm_To_Reg ( ACC, ACC, 0 ) ;
+            Compile_Move_Reg_To_Rm ( DSP, ACC, 0 ) ;
         }
     }
     else

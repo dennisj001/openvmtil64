@@ -33,7 +33,6 @@ CfrTil_LessThanOrEqual ( ) // <
         top = DataStack_Pop ( ) ;
         b = _DataStack_GetTop ( ) ;
         _DataStack_SetTop ( ( int64 ) ( b <= top ) ) ;
-        //_DataStack_SetTop ( Dsp, _DataStack_Pop () < _DataStack_GetTop ( Dsp ) ) ;
     }
 }
 
@@ -52,7 +51,6 @@ CfrTil_GreaterThan ( ) // >
         top = DataStack_Pop ( ) ;
         b = _DataStack_GetTop ( ) ;
         _DataStack_SetTop ( ( int64 ) ( b > top ) ) ;
-        //_DataStack_SetTop ( Dsp, _DataStack_Pop () > _DataStack_GetTop ( Dsp ) ) ;
     }
 }
 

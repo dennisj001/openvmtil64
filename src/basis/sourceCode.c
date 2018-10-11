@@ -55,8 +55,7 @@ DWL_Find ( dllist * list, Word * iword, byte * address, byte* name, int64 takeFi
     dlnode * anode = 0 ;
     int64 numFound = 0, i ;
     uint64 fDiff = 0, minDiffFound = 0, scwi ;
-    //_Q_->Verbosity = 3 ;
-    //if ( 0x7ffff7a6afe7 == (uint64) address ) Pause () ;
+    //_Q_->Verbosity = 3 ; if ( 0x7ffff7a79796 == (uint64) address ) Pause () ;
     if ( list && ( iword || name || address ) )
     {
         for ( i = 0, anode = fromFirstFlag ? dllist_First ( list ) : dllist_Last ( list ) ; anode ;
@@ -73,14 +72,17 @@ DWL_Find ( dllist * list, Word * iword, byte * address, byte* name, int64 takeFi
             {
                 numFound ++ ;
                 fDiff = abs ( scwi - (_Debugger_->LastSourceCodeWord ? _Debugger_->LastSourceCodeWord->W_SC_Index : 0 ) ) ;
-                if ( ( * address == 0x0f ) && ( aFoundWord->Name [0] == '}') ) return aFoundWord ;
-                if (( ! foundWord ) && (aFoundWord->Name[0] != '{'))
+                if ( ( * address == 0x0f ) && ( aFoundWord->Name [0] == '}') ) return aFoundWord ; // ( * address == 0x0f ) : jcc insn prefix
+                if ( ! foundWord ) // && (aFoundWord->Name[0] != '{') && (aFoundWord->Name[0] != '}')) 
                 {
                     foundWord = aFoundWord ;
                     minDiffFound = fDiff ;
                 }
-                else if ( foundWord && ( foundWord->CAttribute & COMBINATOR )) foundWord = aFoundWord ;
-                else if (( fDiff < minDiffFound ) && (aFoundWord->Name[0] != '{') && ( ! ( aFoundWord->CAttribute & COMBINATOR ) ) )
+                else if ( foundWord )
+                {
+                    if ( (foundWord->Name[0] == '{') || (foundWord->Name[0] == '}') || ( foundWord->CAttribute & COMBINATOR ) ) foundWord = aFoundWord ;
+                }
+                else if ( foundWord && ( fDiff < minDiffFound ) && (aFoundWord->Name[0] != '{') && (aFoundWord->Name[0] != '}') && ( ! ( aFoundWord->CAttribute & COMBINATOR ) ) )
                 {
                     foundWord = aFoundWord ;
                     minDiffFound = fDiff ;

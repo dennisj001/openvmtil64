@@ -265,7 +265,7 @@ dscOn //verbosity 3 =
 "assert" ' _assert1 find alias
 "_assert" ' _assert0 find alias
 : _assertStkChk ( n m | str )  
-    { verbosity @ 1 > }
+    { verbosity @ 1 d: > }
     {
         { DebugFlag @ } 
         { 
@@ -282,7 +282,7 @@ dscOn //verbosity 3 =
         ifElse
     } if2 
 ; 
-//' _assertStkChk find wdiss 
+' _assertStkChk find wdiss 
 : assertStkChk _assertStkChk ; //"\n_assertStkChk : " ps stack pause ; 
 : TODO ( str ) nl nl pdl nl str @ adps location nl pdl nl nl { dbgOnVar @ } { sp } if2 ;; //pause ;;
 Root

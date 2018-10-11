@@ -190,7 +190,7 @@ _Class_New ( byte * name, uint64 type, int64 cloneFlag )
         {
             size = _Namespace_VariableValueGet ( sns, ( byte* ) "size" ) ;
         }
-        ns = _DObject_New ( name, 0, CPRIMITIVE | CLASS | IMMEDIATE | type, 0, 0, type, ( byte* ) _DataObject_Run, 0, 0, sns, DICTIONARY ) ;
+        ns = _DObject_New ( name, 0, CLASS | IMMEDIATE | type, 0, 0, type, ( byte* ) _DataObject_Run, 0, 0, sns, DICTIONARY ) ;
         _Namespace_DoNamespace ( ns, 1 ) ; // before "size", "this"
         Word *ws = _CfrTil_Variable_New ( ( byte* ) "size", size ) ; // start with size of the prototype for clone
         //ws->CAttribute |= NAMESPACE_VARIABLE ;
@@ -230,7 +230,7 @@ _CfrTil_Variable_New ( byte * name, int64 value )
         word = CfrTil_LocalWord ( name, LOCAL_VARIABLE, DICTIONARY ) ;
         SetState ( _Compiler_, VARIABLE_FRAME, true ) ;
     }
-    else word = _DObject_New ( name, value, ( CPRIMITIVE | NAMESPACE_VARIABLE | IMMEDIATE ), 0, 0, NAMESPACE_VARIABLE, ( byte* ) _DataObject_Run, 0, 1, 0, DICTIONARY ) ;
+    else word = _DObject_New ( name, value, ( NAMESPACE_VARIABLE | IMMEDIATE ), 0, 0, NAMESPACE_VARIABLE, ( byte* ) _DataObject_Run, 0, 1, 0, DICTIONARY ) ;
 
     return word ;
 }
@@ -311,7 +311,7 @@ Literal_New ( Lexer * lexer, uint64 uliteral )
 Namespace *
 _Namespace_New ( byte * name, Namespace * containingNs )
 {
-    Namespace * ns = _DObject_New ( name, 0, ( CPRIMITIVE | NAMESPACE | IMMEDIATE ), 0, 0, NAMESPACE, ( byte* ) _DataObject_Run, 0, 0, containingNs, DICTIONARY ) ;
+    Namespace * ns = _DObject_New ( name, 0, ( NAMESPACE | IMMEDIATE ), 0, 0, NAMESPACE, ( byte* ) _DataObject_Run, 0, 0, containingNs, DICTIONARY ) ;
     return ns ;
 }
 
