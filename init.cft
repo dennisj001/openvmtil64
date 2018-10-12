@@ -265,7 +265,7 @@ dscOn //verbosity 3 =
 "assert" ' _assert1 find alias
 "_assert" ' _assert0 find alias
 : _assertStkChk ( n m | str )  
-    { verbosity @ 1 d: > }
+    { verbosity @ 1 > }
     {
         { DebugFlag @ } 
         { 
@@ -372,7 +372,7 @@ Root
 'todo 0 const  
 'bigArrayTest 0 const
 dbgOff
-//dbgOn 
+dbgOn 
 #if Is_DebugOn 
 
 #if todo

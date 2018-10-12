@@ -342,6 +342,7 @@ LC_QuoteQuasiQuoteRepl ( uint64 state, Boolean doReplFlag )
         replFlag = true ;
         lc = LC_New ( ) ;
     }
+    if ( ! GetState ( _Compiler_, LISP_MODE ) ) replFlag = true ;
     lc->ItemQuoteState |= state ;
     if ( replFlag && doReplFlag )
     {
