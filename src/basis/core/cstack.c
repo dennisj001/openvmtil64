@@ -1,17 +1,6 @@
 
 #include "../../include/cfrtil64.h"
 
-/*
-struct _Stack
-{
-        cell_t				*StackPointer ;
-        cell_t				*StackMin ;
-        cell_t				*StackMax ;
-        cell_t				StackData 			[  ] ;
-}; 
-typedef struct _Stack 			Stack ;
-
- */
 void
 Stack_Print_AValue_WordName ( Stack * stack, int64 i, byte * stackName, byte * buffer )
 {
@@ -20,7 +9,6 @@ Stack_Print_AValue_WordName ( Stack * stack, int64 i, byte * stackName, byte * b
     if ( word )
     {
         byte wname [ 128 ] ;
-        //_String_ConvertStringToBackSlash ( wname, word->Name ) ;
         sprintf ( ( char* ) buffer, "< %s.%s >", word->ContainingNamespace ? ( char* ) word->ContainingNamespace->Name : "<literal>", c_gd ( _String_ConvertStringToBackSlash ( wname, word->Name, -1 ) ) ) ;
         _Printf ( ( byte* ) "\n\t    %s   [ %3ld ] < " UINT_FRMT " > = " UINT_FRMT "\t%s", stackName, i, ( uint64 ) & stackPointer [ - i ], stackPointer [ - i ], word ? ( char* ) buffer : "" ) ;
     }
@@ -48,30 +36,17 @@ _Stack_PrintHeader ( Stack * stack, byte * name )
     int64 size = Stack_Depth ( stack ) ;
     uint64 * sp = stack->StackPointer ; // 0 based stack
     byte * location = c_gd ( Context_Location ( ) ) ;
-    _Printf ( ( byte* ) "\nStack at : %s :\n%s depth =%4d : %s = Top = " UINT_FRMT ", InitialTos = " UINT_FRMT
-        //" Max = " UINT_FRMT ", Min = " UINT_FRMT ", Size = " UINT_FRMT, location,
-        ", Size = " UINT_FRMT, location,
-        //name, size, stack == _DataStack_ ? "Dsp (R14)" : "", ( int64 ) sp, ( int64 ) stack->InitialTosPointer, ( int64 ) stack->StackMax, ( int64 ) stack->StackMin, stack->StackMax - stack->StackMin + 1 ) ;
+    _Printf ( ( byte* ) "\nStack at : %s :\n%s depth =%4d : %s = Top = " UINT_FRMT ", InitialTos = " UINT_FRMT ", Size = " UINT_FRMT, location,
         name, size, stack == _DataStack_ ? "Dsp (R14)" : _ReturnStack_ ? "CfrTilRsp (Rbx)" : "", ( int64 ) sp, ( int64 ) stack->InitialTosPointer, stack->StackMax - stack->StackMin + 1 ) ;
 }
 
 void
 _Stack_PrintValues ( byte * name, uint64 * stackPointer, int64 depth )
 {
-    int64 i ; //, stackDepth = _Stack_Depth ( stack ), * stackPointer = stack->StackPointer ; // 0 based stack
+    int64 i ; 
     byte * buffer = Buffer_New_pbyte ( BUFFER_SIZE ) ;
-    if ( depth >= 0 )
-    {
-        for ( i = 0 ; depth -- > 0 ; i -- )
-        {
-            Stack_Print_AValue ( stackPointer, i, name, buffer ) ;
-        }
-    }
-    else //if ( stackDepth < 0 )
-    {
-        CfrTil_Exception ( STACK_UNDERFLOW, 0, QUIT ) ;
-    }
-    //_Printf ( ( byte* ) "\n" ) ;
+    if ( depth >= 0 ) for ( i = 0 ; depth -- > 0 ; i -- ) Stack_Print_AValue ( stackPointer, i, name, buffer ) ;
+    else CfrTil_Exception ( STACK_UNDERFLOW, 0, QUIT ) ;
 }
 
 void
@@ -79,32 +54,6 @@ Stack_PrintValues ( byte * name, Stack *stack, int64 depth )
 {
     _Stack_PrintValues ( name, stack->StackPointer, depth ) ;
 }
-
-#if 0 // save
-
-void
-_Stack_Show_Word_Name_AtN ( Stack * stack, int64 i, byte * stackName, byte * buffer )
-{
-    Stack_Print_AValue_WordName ( stack, i, stackName, buffer ) ;
-}
-
-void
-_Stack_Show_N_Word_Names ( Stack * stack, uint64 n, byte * stackName, int64 dbgFlag )
-{
-    uint64 i ;
-    int64 depth = Stack_Depth ( stack ) ;
-    byte * buffer = Buffer_New_pbyte ( BUFFER_SIZE ) ;
-    if ( dbgFlag ) NoticeColors ;
-    _Stack_PrintHeader ( stack, stackName ) ;
-    for ( i = 0 ; ( n > i ) && ( i < depth ) ; i ++ )
-    {
-        if ( Stack_N ( stack, - i ) ) _Stack_Show_Word_Name_AtN ( stack, i, stackName, buffer ) ;
-        else break ;
-    }
-    //_Stack_Print ( stack, stackName ) ;
-    if ( dbgFlag ) DefaultColors ;
-}
-#endif
 
 void
 _Stack_Print ( Stack * stack, byte * name, int64 depth )
@@ -283,27 +232,23 @@ Stack_Dup ( Stack * stack )
 int64
 _Stack_IntegrityCheck ( Stack * stack )
 {
+    byte * errorString ;
     // first a simple integrity check of the stack info struct
-    //Set_StackPointerFromDsp ( _CfrTil_ ) ;
     if ( ( stack->StackMin == & ( stack->StackData [ 0 ] ) ) &&
         ( stack->StackMax == & ( stack->StackData [ stack->StackSize - 1 ] ) ) && // -1 : zero based array
         ( stack->InitialTosPointer == & stack->StackData [ - 1 ] ) )
     {
         return true ;
     }
-    byte * errorString ;
     if ( _Stack_Overflow ( stack ) ) CfrTil_Exception ( STACK_OVERFLOW, c_da ( errorString ), QUIT ) ; //errorString = "\nStack Integrity Error : Stack Overflow" ;
     else CfrTil_Exception ( STACK_UNDERFLOW, c_da ( errorString ), QUIT ) ;  //errorString = "\nStack Integrity Error : Stack Underflow" ;
-    //CfrTil_Exception ( STACK_ERROR, c_da ( errorString ), QUIT ) ;
     return false ;
 }
 
 int64
 _Stack_Depth ( Stack * stack )
 {
-    int64 depth = stack->StackPointer - stack->InitialTosPointer ; // + 1 :: zero based array - include the zero in depth 
-    //if ( depth <= stack->StackSize ) return depth ;
-    //return ( 0 ) ;
+    int64 depth = stack->StackPointer - stack->InitialTosPointer ; //+ 1 ; //1 :: zero based array - include the zero in depth 
     return ( depth ) ; //+ 1 ) ;// + 1 :: zero based array - include the zero in depth 
 }
 
@@ -399,15 +344,8 @@ _CfrTil_PrintNReturnStack ( int64 size, Boolean useExistingFlag )
     {
         _PrintNStackWindow ( ( uint64* ) debugger->CopyRSP, ( byte * ) "ReturnStackCopy", ( byte * ) "RSCP", size ) ;
     }
-#if 0    
-    else if ( _CfrTil_->cs_Cpu->Rsp )
-    {
-        _PrintNStackWindow ( ( uint64* ) _CfrTil_->cs_Cpu->Rsp, ( byte * ) "CpuState->Rsp", ( byte * ) "CpuState->Rsp", size ) ;
-    }
-#endif
     else if ( useExistingFlag && debugger->cs_Cpu->Rsp ) //debugger->DebugESP )
     {
-        //_PrintNStackWindow ( ( uint64* ) debugger->DebugESP, ( byte * ) "Return Stack", ( byte * ) "DebugRsp", size ) ;
         _PrintNStackWindow ( ( uint64* ) debugger->cs_Cpu->Rsp, ( byte * ) "Return Stack", ( byte * ) "Rsp (RSP)", size ) ;
         _Stack_PrintValues ( ( byte* ) "DebugStack ", debugger->ReturnStack->StackPointer, Stack_Depth ( debugger->ReturnStack ) ) ;
     }
@@ -424,41 +362,4 @@ _CfrTil_PrintNDataStack ( int64 size )
 {
     _PrintNStackWindow ( _Dsp_, ( byte* ) "Data Stack", ( byte* ) "Dsp (DSP:R14)", size ) ;
 }
-
-#if 0
-
-void
-_CfrTil_SyncStackPointers_ToRegs ( CfrTil * cfrtil )
-{
-    //cfrtil->Set_CfrTilRspReg_FromReturnStackPointer ( ) ;
-    cfrtil->Set_DspReg_FromDataStackPointer ( ) ;
-}
-
-void
-CfrTil_SyncStackPointers_ToRegs ( CfrTil * cfrtil )
-{
-    if ( cfrtil )
-    {
-        //if ( cfrtil->ReturnStack ) cfrtil->Set_CfrTilRspReg_FromReturnStackPointer ( ) ;
-        if ( cfrtil->DataStack ) cfrtil->Set_DspReg_FromDataStackPointer ( ) ;
-    }
-}
-
-void
-_CfrTil_SyncStackPointers_FromRegs ( CfrTil * cfrtil )
-{
-    //cfrtil->Set_ReturnStackPointer_FromCfrTilRspReg ( ) ;
-    cfrtil->Set_DataStackPointer_FromDspReg ( ) ;
-}
-
-void
-CfrTil_SyncStackPointers_FromRegs ( CfrTil * cfrtil )
-{
-    if ( cfrtil )
-    {
-        //if ( cfrtil->ReturnStack ) cfrtil->Set_ReturnStackPointer_FromCfrTilRspReg ( ) ;
-        if ( cfrtil->DataStack ) cfrtil->Set_DataStackPointer_FromDspReg ( ) ;
-    }
-}
-#endif
 

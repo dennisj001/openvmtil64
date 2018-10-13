@@ -12,7 +12,7 @@ _OpenVmTil_ShowExceptionInfo ( )
     Debugger * debugger = _Debugger_ ;
     DebugOn ;
     //if ( debugger->w_Word ) _Debugger_Locals_Show ( debugger, debugger->w_Word ) ;
-    if (( _Q_->ExceptionCode ) && ( ! ( _Q_->ExceptionCode & ( STACK_ERROR | STACK_OVERFLOW | STACK_UNDERFLOW ) ) )) Debugger_Stack ( debugger ) ;
+    if (( ! ( _Q_->ExceptionCode & ( STACK_ERROR | STACK_OVERFLOW | STACK_UNDERFLOW ) ) )) Debugger_Stack ( debugger ) ;
     if (( ! word ) && _Q_->ExceptionToken )
     {
         word = Finder_Word_FindUsing ( _Finder_, _Q_->ExceptionToken, 1 ) ;

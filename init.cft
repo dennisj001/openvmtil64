@@ -151,9 +151,9 @@ c_syntaxOff
 BigNum
 : fprint space _fprint ;
 : eprint space _eprint ;
-// pWidth : "Minimum number of characters to be printed. If the value to be printed is shorter than this number, 
+// pPrecision : this sets the number of digits to be printed after the decimal point" 
+// pWidth : sets the "Minimum number of characters to be printed. If the value to be printed is shorter than this number, 
 // the result is padded with blank spaces. The value is not truncated even if the result is larger."
-// pPrecision : this is the number of digits to be printed after the decimal point" 
 : bnInit ( precision width ) precision @ pPrecision width @ pWidth ;; 
 //'bnInit find wdis
 'p 'fprint find alias
@@ -216,7 +216,7 @@ C
 
 Word 
 : code definition ;
-
+//verbosity 2 =
 C
 System
 : location filename ps space decimal lineNumber _p "." _ps charNumber _p ;
@@ -235,6 +235,7 @@ System
     nl "::> 'wdiss' was called at" _ps location "<::" ps nl
 ;;
 : wdiss ( pword ) _wdiss ( 0 pword @ ) ; //debugWord      // don't add wdiss words to history list
+//: wdiss ( pword ) 0 pword @ _wdiss ; //debugWord      // don't add wdiss words to history list
 : wdissl ( pword ) logOn _wdiss ( 0 pword @ ) logOff ; //debugWord      // don't add wdiss words to history list
 "winfo" ' wdiss find alias
 //' wdiss find _wdiss
@@ -265,7 +266,7 @@ dscOn //verbosity 3 =
 "assert" ' _assert1 find alias
 "_assert" ' _assert0 find alias
 : _assertStkChk ( n m | str )  
-    { verbosity @ 1 > }
+    { verbosity @ }
     {
         { DebugFlag @ } 
         { 
@@ -282,7 +283,7 @@ dscOn //verbosity 3 =
         ifElse
     } if2 
 ; 
-' _assertStkChk find wdiss 
+//' _assertStkChk find wdiss //pause
 : assertStkChk _assertStkChk ; //"\n_assertStkChk : " ps stack pause ; 
 : TODO ( str ) nl nl pdl nl str @ adps location nl pdl nl nl { dbgOnVar @ } { sp } if2 ;; //pause ;;
 Root
@@ -372,7 +373,7 @@ Root
 'todo 0 const  
 'bigArrayTest 0 const
 dbgOff
-dbgOn 
+//dbgOn 
 #if Is_DebugOn 
 
 #if todo

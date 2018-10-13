@@ -593,7 +593,6 @@ Compile_MoveImm ( Boolean direction, Boolean rm, Boolean sib, int64 disp, int64 
 {
     Boolean reg = 0, mod = direction ;
     //if ( ( immSize == 8 ) || ( imm > 0xffffffff ) )
-    // 
     {
         if ( direction != TO_REG )
         {

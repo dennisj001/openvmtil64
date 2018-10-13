@@ -240,7 +240,7 @@ a6.ar[2][2][1] @ 0x89 _assert //pause
     while
     adump ( 0 246 67 a  ) 
 ;
-//' a9 find wdiss //pause
+//' a9 find wdiss pause
 "arr9" Ar9 new arr9 a9
 adump ( 0 123 234 arr9 ) 
 //s pause

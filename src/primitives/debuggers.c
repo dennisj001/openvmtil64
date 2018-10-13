@@ -64,12 +64,15 @@ _CfrTil_DebugRuntimeBreakpoint ( )
             if ( GetState ( debugger, DBG_INTERPRET_LOOP_DONE ) )//|| GetState ( debugger, DBG_CONTINUE_MODE|DBG_AUTO_MODE ) )
             {
                 // getRsp and debugger->SaveCpuState ( ) has been called by _Compile_Debug1 which calls this function
-                SetState ( debugger, ( DBG_BRK_INIT ), true ) ;
-                Debugger_On ( debugger ) ;
-                debugger->StartHere = Here ;
-                Debugger_SetupStepping ( debugger ) ;
-                SetState_TrueFalse ( debugger, DBG_RUNTIME | DBG_RESTORE_REGS | DBG_ACTIVE | DBG_RUNTIME_BREAKPOINT | DEBUG_SHTL_OFF,
-                    DBG_INTERPRET_LOOP_DONE | DBG_PRE_DONE | DBG_CONTINUE | DBG_NEWLINE | DBG_PROMPT | DBG_INFO | DBG_MENU ) ;
+                SetState ( debugger, ( DBG_BRK_INIT | DBG_RUNTIME_BREAKPOINT ), true ) ;
+                if ( ! GetState ( debugger, ( DBG_STEPPING | DBG_AUTO_MODE ) ) )
+                {
+                    Debugger_On ( debugger ) ;
+                    debugger->StartHere = Here ;
+                    Debugger_SetupStepping ( debugger ) ;
+                    SetState_TrueFalse ( debugger, DBG_RUNTIME | DBG_RESTORE_REGS | DBG_ACTIVE | DBG_RUNTIME_BREAKPOINT | DEBUG_SHTL_OFF,
+                        DBG_INTERPRET_LOOP_DONE | DBG_PRE_DONE | DBG_CONTINUE | DBG_NEWLINE | DBG_PROMPT | DBG_INFO | DBG_MENU ) ;
+                }
             }
         }
         else
@@ -84,8 +87,9 @@ _CfrTil_DebugRuntimeBreakpoint ( )
         Word * word = debugger->w_Word ;
         if ( ( ! word ) || GetState ( word, STEPPED ) )
         {
+            SetState ( _Context_->CurrentEvalWord, STEPPED, true ) ;
             Debugger_Off ( debugger, 1 ) ;
-            siglongjmp ( _Context_->JmpBuf0, 1 ) ; //in Word_Run
+            //siglongjmp ( _Context_->JmpBuf0, 1 ) ; //in Word_Run
         }
     }
 }

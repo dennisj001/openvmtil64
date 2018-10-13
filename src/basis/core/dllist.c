@@ -1,12 +1,12 @@
 #include "../../include/cfrtil64.h"
 
 dobject *
-_dllist_PushNew_M_Slot_Node ( dllist* list, int64 dobjType, int64 allocType, int64 m_slots, ... )
+_dllist_PushNew_M_Slot_Node ( dllist* list, int64 typeCode, int64 allocType, int64 m_slots, ... )
 {
     int64 i ;
     va_list args ;
     va_start ( args, m_slots ) ;
-    dobject * dobj = _dobject_Allocate ( dobjType, m_slots, allocType ) ;
+    dobject * dobj = _dobject_Allocate ( typeCode, m_slots, allocType ) ;
     for ( i = 0 ; i < m_slots ; i ++ ) dobj->do_iData[i] = va_arg ( args, int64 ) ;
     va_end ( args ) ;
     _dllist_PushNode ( list, ( dlnode* ) dobj ) ;
@@ -81,6 +81,15 @@ List_Pick_Value ( dllist *list, int64 n )
 }
 
 inline
+int64
+List_Pop_1Value ( dllist *list )
+{
+    //return List_GetN_Value ( list, n ) ;
+    dobject* dobj = (dobject *) _dllist_PopNode ( list ) ;
+    return dobj->do_iData [0] ;
+}
+
+inline
 dlnode *
 List_Pick ( dllist *list, int64 n )
 {
@@ -139,9 +148,9 @@ _List_PushNew_ForWordList ( dllist *list, Word * word, int64 inUseFlag )
 
 inline
 void
-_List_PushNew_1Value ( dllist *list, int64 type, int64 value, int64 allocType )
+_List_PushNew_1Value ( dllist *list, int64 typeCode, int64 value, int64 allocType )
 {
-    _dllist_PushNew_M_Slot_Node ( list, type, allocType, 1, value ) ;
+    _dllist_PushNew_M_Slot_Node ( list, typeCode, allocType, 1, value ) ;
 }
 
 inline

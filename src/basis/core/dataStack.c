@@ -120,18 +120,6 @@ DataStack_Depth ( )
 // safe form with stack checking
 
 void
-CpuState_Set_CpuStateDsp_WithDataStackPointer ( Cpu * cpu )
-{
-    cpu->CPU_DSP = _Dsp_ ;
-}
-
-void
-_Debugger_Set_DataStackPointer_WithCpuStateDsp ( Debugger * debugger )
-{
-    _Dsp_ = debugger->cs_Cpu->CPU_DSP ;
-}
-
-void
 _CfrTil_PrintDataStack ( )
 {
     Stack_Print ( _DataStack_, ( byte* ) "DataStack" ) ;
@@ -151,9 +139,34 @@ CfrTil_PrintStackDepth ( )
 }
 
 void
-Set_DataStackPointer_FromDebuggerDspReg ( )
+CpuState_Set_CpuStateDsp_WithDataStackPointer ( Cpu * cpu )
+{
+    cpu->CPU_DSP = _Dsp_ ;
+}
+
+void
+_Debugger_Set_DataStackPointer_WithCpuStateDsp ( Debugger * debugger )
+{
+    _Dsp_ = debugger->cs_Cpu->CPU_DSP ;
+}
+
+void
+Set_DebuggerDspReg_FromDspReg ( )
+{
+    _Debugger_->cs_Cpu->R14d = _Dsp_ ;
+}
+
+void
+Set_DspReg_FromDebuggerDspReg ( )
 {
     _Dsp_ = _Debugger_->cs_Cpu->R14d ;
+}
+
+void
+Set_DataStackPointers_FromDebuggerDspReg ( )
+{
+    _Dsp_ = _Debugger_->cs_Cpu->R14d ;
+    _CfrTil_->DataStack->StackPointer = _Dsp_ ;
 }
 
 void
@@ -165,9 +178,9 @@ Set_DataStackPointer_FromDspReg ( )
 void
 Set_DspReg_FromDataStackPointer ( )
 {
+    _Debugger_->cs_Cpu->R14d = _Dsp_ ;
     _CfrTil_->Set_DspReg_FromDataStackPointer ( ) ;
 }
-
 
 void
 CfrTil_CheckInitDataStack ( )

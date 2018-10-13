@@ -8,20 +8,9 @@ _Debugger_StepOneInstruction ( Debugger * debugger )
     debugger->PreHere = Here ;
     debugger->SaveStackDepth = DataStack_Depth ( ) ;
     ( ( VoidFunction ) debugger->StepInstructionBA->BA_Data ) ( ) ;
-    _Debugger_Set_DataStackPointer_WithCpuStateDsp ( debugger ) ;
+    Set_DataStackPointers_FromDebuggerDspReg ( ) ;
 }
 
-#if 0
-
-void
-Debugger_StepOneInstruction ( Debugger * debugger )
-{
-    //if ( ! sigsetjmp ( debugger->JmpBuf0, 0 ) )
-    {
-        _Debugger_StepOneInstruction ( debugger ) ;
-    }
-}
-#endif
 // Debugger_CompileOneInstruction ::
 // this function should not affect the C registers at all 
 // we save them before we call our stuff and restore them after
@@ -94,20 +83,20 @@ _Debugger_CompileOneInstruction ( Debugger * debugger, byte * jcAddress )
         }
         else if ( ( ! word ) || ( ! Debugger_CanWeStep ( debugger, word ) ) )//( jcAddress < ( byte* ) svcs->BA_Data ) || ( jcAddress > ( byte* ) svcs->bp_Last ) )
         {
-            _Printf ( ( byte* ) "\ncalling thru - a non-native (C) subroutine : %s : .... :>", word ? ( char* ) c_gd ( word->Name ) : "" ) ;
+            _Printf ( ( byte* ) "\ncalling thru - a non-native (C) subroutine : %s : .... :> %s", word ? ( char* ) c_gd ( word->Name ) : "", Context_Location ( ) ) ;
             Compile_Call_X84_ABI_RSP_ADJUST ( jcAddress ) ; // this will call jcAddress subroutine and return to our code to be compiled next
             // so that newDebugAddress, below, will be our next stepping insn
             newDebugAddress = debugger->DebugAddress + size ;
         }
         else if ( ( debugger->Key == 'h' ) || ( debugger->Key == 'o' ) )// step 't(h)ru'/(o)ver the native code like a non-native subroutine
         {
-            _Printf ( ( byte* ) "\ncalling t(h)ru - a subroutine : %s : .... :>", word ? ( char* ) c_gd ( word->Name ) : "" ) ;
+            _Printf ( ( byte* ) "\ncalling t(h)ru - a subroutine : %s : .... :> %s", word ? ( char* ) c_gd ( word->Name ) : "", Context_Location ( ) ) ;
             Compile_Call_X84_ABI_RSP_ADJUST ( jcAddress ) ;
             newDebugAddress = debugger->DebugAddress + size ;
         }
         else if ( debugger->Key == 'u' ) // step o(u)t of the native code like a non-native subroutine
         {
-            _Printf ( ( byte* ) "\nstepping thru and 'o(u)t' of a \"native\" subroutine : %s : .... :>", word ? ( char* ) c_gd ( word->Name ) : "" ) ;
+            _Printf ( ( byte* ) "\nstepping thru and 'o(u)t' of a \"native\" subroutine : %s : .... :> %s", word ? ( char* ) c_gd ( word->Name ) : "", Context_Location ( ) ) ;
             //Compile_Call_X84_ABI_RSP_ADJUST ( debugger->DebugAddress ) ;
             Compile_Call_X84_ABI_RSP_ADJUST ( jcAddress ) ;
             if ( Stack_Depth ( debugger->ReturnStack ) ) newDebugAddress = ( byte* ) _Stack_Pop ( debugger->ReturnStack ) ;
@@ -120,7 +109,7 @@ into:
             if ( ( * debugger->DebugAddress == CALLI32 ) || ( ( ( * ( uint16* ) debugger->DebugAddress ) == 0xff49 ) && ( *( debugger->DebugAddress + 2 ) == 0xd1 ) ) )
             {
                 if ( _Q_->Verbosity > 1 ) _Word_ShowSourceCode ( word ) ;
-                _Printf ( ( byte* ) "\nstepping into a cfrtil compiled function : %s : .... :>", word ? ( char* ) c_gd ( word->Name ) : "" ) ;
+                _Printf ( ( byte* ) "\nstepping into a cfrtil compiled function : %s : .... :> %s", word ? ( char* ) c_gd ( word->Name ) : "", Context_Location ( ) ) ;
                 _Stack_Push ( debugger->ReturnStack, ( int64 ) ( debugger->DebugAddress + size ) ) ; // the return address
                 // push the return address this time around; next time code at newDebugAddress will be processed
                 // when ret is the insn Debugger_StepOneInstruction will handle it 
@@ -131,7 +120,7 @@ into:
     }
     else if ( debugger->Key == 'u' ) // step o(u)t of the native code like a non-native subroutine
     {
-        _Printf ( ( byte* ) "\nstepping thru and out of a \"native\" subroutine : %s : .... :>", word ? ( char* ) c_gd ( word->Name ) : "" ) ;
+        _Printf ( ( byte* ) "\nstepping thru and out of a \"native\" subroutine : %s : .... :> %s", word ? ( char* ) c_gd ( word->Name ) : "", Context_Location ( ) ) ;
         debugger->Key = 's' ;
         SetState ( debugger, DBG_CONTINUE_MODE | DBG_AUTO_MODE, true ) ;
         goto doDefault ;
@@ -158,15 +147,18 @@ Debugger_CompileAndStepOneInstruction ( Debugger * debugger )
         Word * word ;
         if ( * debugger->DebugAddress == _RET )
         {
-            if ( Stack_Depth ( debugger->ReturnStack ) )
+            if ( Stack_Depth ( debugger->ReturnStack ) ) //> 2 ) // 2 : why 2 ?? but it works for now ??
             {
-                debugger->DebugAddress = ( byte* ) _Stack_Pop ( debugger->ReturnStack ) ;
+                debugger->DebugAddress = ( byte* ) Stack_Pop ( debugger->ReturnStack ) ;
                 Debugger_GetWordFromAddress ( debugger ) ;
-                Set_DataStackPointer_FromDebuggerDspReg () ; 
+                if ( debugger->w_Word == _Context_->CurrentlyRunningWord ) 
+                    goto done ; 
             }
             else
             {
-doReturn:
+                done :
+                //if ( ! GetState ( debugger, DBG_BRK_INIT ) ) 
+                Set_DataStackPointers_FromDebuggerDspReg ( ) ;
                 SetState ( debugger, DBG_STACK_OLD, true ) ;
                 debugger->CopyRSP = 0 ;
                 if ( GetState ( debugger, DBG_BRK_INIT ) ) SetState_TrueFalse ( debugger, DBG_INTERPRET_LOOP_DONE | DBG_STEPPED, DBG_ACTIVE | DBG_BRK_INIT | DBG_STEPPING ) ;
@@ -187,34 +179,21 @@ doReturn:
             jcAddress = JumpCallInstructionAddress ( debugger->DebugAddress ) ;
 doJmpCall:
             word = Word_GetFromCodeAddress ( jcAddress ) ;
-            if ( word )
+            if ( word && ( word->CAttribute & ( DEBUG_WORD ) ) &&
+                ( word->CAttribute2 & ( RT_STEPPING_DEBUG ) ) )
             {
-                if ( ( word->CAttribute & ( DEBUG_WORD ) ) )
-                {
-                    if ( word->CAttribute2 & ( RT_STEPPING_DEBUG ) )
-                    {
-                        //SetState ( debugger, ( DBG_CONTINUE_MODE | DBG_AUTO_MODE ), false ) ;
-                        // we are already stepping here and now so skip
-                        _Printf ( ( byte* ) "\nskipping over a rt breakpoint debug word : %s : at 0x%-8x", word ? ( char* ) c_gd ( word->Name ) : "", debugger->DebugAddress ) ;
-                        debugger->DebugAddress += 3 ;
-                        goto end ;
-                    }
-                }
+                SetState ( debugger, DBG_AUTO_MODE, false ) ;
+                // we are already stepping here and now so skip
+                _Printf ( ( byte* ) "\nskipping over a rt breakpoint debug word : %s : at 0x%-8x", ( char* ) c_gd ( word->Name ), debugger->DebugAddress ) ;
+                debugger->DebugAddress += 3 ;
+                goto end ;
             }
         }
-        //else if ( ( * debugger->DebugAddress == CALLI32 ) || ( ( ( * ( uint16* ) debugger->DebugAddress ) == 0xff49 ) && ( *( debugger->DebugAddress + 2 ) == 0xd1 ) ) )
         else if ( ( ( ( * ( uint16* ) debugger->DebugAddress ) == 0xff49 ) && ( *( debugger->DebugAddress + 2 ) == 0xd1 ) ) )
         {
             jcAddress = JumpCallInstructionAddress_X64ABI ( debugger->DebugAddress ) ;
             goto doJmpCall ;
         }
-#if 0        
-        else if ( ( ( * ( uint16* ) debugger->DebugAddress ) == 0xff48 ) && ( *( debugger->DebugAddress + 2 ) == 0xd0 ) ) //if ( ( * ( uint16* ) debugger->DebugAddress ) == 0xff48 ) //untested 9-27-17
-        {
-            jcAddress = ( byte* ) *( uint64* ) ( debugger->DebugAddress - CELL_SIZE ) ;
-            goto doCall ;
-        }
-#endif        
         else if ( ( * debugger->DebugAddress == CALL_JMP_MOD_RM ) && ( _RM ( debugger->DebugAddress ) == 16 ) ) // inc/dec are also opcode == 0xff
         {
             //jcAddress = JumpCallInsnAddress_ModRm ( debugger->DebugAddress ) ;
@@ -239,7 +218,7 @@ doJmpCall:
             SetState ( debugger, DBG_JCC_INSN, false ) ;
             goto end ;
         }
-        else if ( ( ( ( byte* ) debugger->DebugAddress )[0] >> 4 ) == 7 ) 
+        else if ( ( ( ( byte* ) debugger->DebugAddress )[0] >> 4 ) == 7 )
         {
             SetState ( debugger, DBG_JCC_INSN, true ) ;
             jcAddress = Debugger_DoJcc ( debugger, 1 ) ;
@@ -247,7 +226,7 @@ doJmpCall:
             SetState ( debugger, DBG_JCC_INSN, false ) ;
             goto end ;
         }
-        _Debugger_CompileAndStepOneInstruction ( debugger, jcAddress ) ; 
+        _Debugger_CompileAndStepOneInstruction ( debugger, jcAddress ) ;
 end:
         if ( debugger->DebugAddress )
         {
@@ -288,7 +267,6 @@ Debugger_PreStartStepping ( Debugger * debugger )
         }
     }
     else SetState_TrueFalse ( debugger, DBG_NEWLINE, DBG_STEPPING ) ;
-
     return ;
 }
 
@@ -315,11 +293,7 @@ Debugger_AfterStep ( Debugger * debugger )
         debugger->SteppedWord = debugger->w_Word ;
         SetState_TrueFalse ( debugger, DBG_STEPPING, ( DBG_INFO | DBG_MENU | DBG_PROMPT ) ) ;
     }
-    else
-    {
-        SetState_TrueFalse ( debugger, DBG_PRE_DONE | DBG_STEPPED | DBG_NEWLINE | DBG_PROMPT | DBG_INFO, DBG_STEPPING ) ;
-        return ;
-    }
+    else SetState_TrueFalse ( debugger, DBG_PRE_DONE | DBG_STEPPED | DBG_NEWLINE | DBG_PROMPT | DBG_INFO, DBG_STEPPING ) ;
 }
 
 void
@@ -334,7 +308,9 @@ _Debugger_SetupStepping ( Debugger * debugger, Word * word, byte * address, byte
     SetState_TrueFalse ( debugger, DBG_STEPPING, DBG_NEWLINE | DBG_PROMPT | DBG_INFO | DBG_MENU ) ;
     debugger->DebugAddress = address ;
     debugger->w_Word = word ;
-    if ( ! GetState ( debugger, DBG_BRK_INIT ) ) SetState ( debugger->cs_Cpu, CPU_SAVED, false ) ;
+
+    //if ( ! GetState ( debugger, DBG_BRK_INIT ) ) 
+    SetState ( debugger->cs_Cpu, CPU_SAVED, false ) ;
     SetState ( _CfrTil_->cs_Cpu, CPU_SAVED, false ) ;
     _Debugger_CpuState_CheckSave ( debugger ) ;
     _CfrTil_CpuState_CheckSave ( ) ;

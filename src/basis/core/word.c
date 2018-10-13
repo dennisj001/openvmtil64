@@ -7,14 +7,14 @@ Word_Run ( Word * word )
     {
         if ( ! sigsetjmp ( _Context_->JmpBuf0, 0 ) ) // used by CfrTil_DebugRuntimeBreakpoint
         {
+            word->W_InitialRuntimeDsp = _Dsp_ ;
             word->StackPushRegisterCode = 0 ; // nb. used! by the rewriting optInfo
             // keep track in the word itself where the machine code is to go, if this word is compiled or causes compiling code - used for optimization
             Word_SetCoding ( word, Here, 1 ) ; // if we change it later (eg. in lambda calculus) we must change it there because the rest of the compiler depends on this
-            word->W_InitialRuntimeDsp = _Dsp_ ;
             _Context_->CurrentlyRunningWord = word ;
             Block_Eval ( word->Definition ) ;
         }
-        else  Set_DataStackPointer_FromDebuggerDspReg () ; // back from _CfrTil_DebugRuntimeBreakpoint
+        //else  Set_DataStackPointers_FromDebuggerDspReg () ; // back from _CfrTil_DebugRuntimeBreakpoint
     }
 }
 
@@ -24,14 +24,8 @@ _Word_Eval ( Word * word )
     if ( word )
     {
         _Context_->CurrentEvalWord = word ;
-        if ( ( word->CAttribute & IMMEDIATE ) || ( ! CompileMode ) )
-        {
-            Word_Run ( word ) ;
-        }
-        else
-        {
-            _Word_Compile ( word ) ;
-        }
+        if ( ( word->CAttribute & IMMEDIATE ) || ( ! CompileMode ) ) Word_Run ( word ) ;
+        else _Word_Compile ( word ) ;
     }
 }
 

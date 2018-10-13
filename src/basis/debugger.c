@@ -4,7 +4,6 @@
 void
 _Debugger_InterpreterLoop ( Debugger * debugger )
 {
-    Set_DataStackPointer_FromDspReg ( ) ;
     do
     {
         _Debugger_DoState ( debugger ) ;
@@ -15,7 +14,6 @@ _Debugger_InterpreterLoop ( Debugger * debugger )
         }
         SetState ( _Debugger_, DBG_AUTO_MODE_ONCE, false ) ;
         debugger->CharacterFunctionTable [ debugger->CharacterTable [ debugger->Key ] ] ( debugger ) ;
-        //if ( _LC_ && _LC_->State && _LC_->LispTempNamespace ) ;
     }
     while ( GetState ( debugger, DBG_STEPPING ) || ( ! GetState ( debugger, DBG_INTERPRET_LOOP_DONE ) ) ||
         ( ( GetState ( debugger, DBG_AUTO_MODE ) ) && ( ! ( GetState ( debugger, DBG_EVAL_AUTO_MODE ) ) ) ) ) ;
@@ -23,10 +21,11 @@ _Debugger_InterpreterLoop ( Debugger * debugger )
     if ( GetState ( debugger, DBG_STEPPED ) )
     {
         if ( debugger->w_Word ) SetState ( debugger->w_Word, STEPPED, true ) ;
+        SetState ( _Context_->CurrentEvalWord, STEPPED, true ) ;
         if ( ( ! debugger->w_Word ) || GetState ( debugger->w_Word, STEPPED ) )
         {
             Debugger_Off ( debugger, 1 ) ;
-            siglongjmp ( _Context_->JmpBuf0, 1 ) ; //in Word_Run
+            //if ( GetState ( debugger, DBG_RUNTIME_BREAKPOINT ) ) siglongjmp ( _Context_->JmpBuf0, 1 ) ; //back to Word_Run
         }
     }
 }
@@ -102,37 +101,50 @@ void
 Debugger_Off ( Debugger * debugger, int64 debugOffFlag )
 {
     _Debugger_Off ( debugger ) ;
-    if ( debugOffFlag )
-    {
-        DebugOff ;
-        //Debugger_SyncStackPointersFromCpuState ( debugger ) ;
-    }
+    if ( debugOffFlag ) DebugOff ;
 }
 
+// Debugger_GetDbgAddressFromRsp :: may be unnecessarily convoluted ??
 byte *
 Debugger_GetDbgAddressFromRsp ( Debugger * debugger )
 {
-    Word * word ;
-    byte * addr ;
-    int64 i ;
-    Stack * retStack = Stack_New ( 10, COMPILER_TEMP ) ;
-    if ( _Q_->Verbosity > 1 ) CfrTil_PrintReturnStack ( ) ;
-    Stack_Init ( debugger->ReturnStack ) ;
-    for ( i = 1 ; i < 10 ; i ++ ) // Rsp[1] is current 
+    Word * word, *lastWord ;
+    byte * addr, *retAddr ;
+    int64 i, d ;
+    List * retStackList = List_New ( COMPILER_TEMP ) ;
+    Stack * retStack ; 
+    //_Q_->Verbosity = 2 ;
+    if ( _Q_->Verbosity > 1 )  CfrTil_PrintReturnStack ( ) ;
+    for ( i = 1 ; i < 30 ; i ++ ) // Rsp[1] is current 
     {
         addr = ( ( byte* ) debugger->cs_Cpu->Rsp[i] ) ;
         word = Word_GetFromCodeAddress ( addr ) ;
+        if ( word->W_AliasOf ) word = word->W_AliasOf ;//_Context_->CurrentlyRunningWord
         if ( word )
         {
-            Stack_Push ( retStack, debugger->cs_Cpu->Rsp[i] ) ;
+            //_List_PushNew_1Value ( dllist *list, int64 type, int64 value, int64 allocType )
+            _List_PushNew_1Value ( retStackList, 0, debugger->cs_Cpu->Rsp[i], COMPILER_TEMP ) ;
             if ( word == _Context_->CurrentlyRunningWord ) break ;
         }
     }
-    for ( i = Stack_Depth ( retStack ) ; i > 0 ; i -- )
+    d = List_Depth ( retStackList ) ;
+    retStack = Stack_New ( d, COMPILER_TEMP ) ;
+    for ( i = d ; i > 0 ; i -- )
     {
-        byte * retAddr = ( byte * ) _Stack_Pop ( retStack ) ;
+        retAddr = ( byte * ) List_Pick_Value ( retStackList, i ) ; //List_Pop_1Value ( retStackList ) ;
+        Stack_Push ( retStack, ( uint64 ) retAddr ) ;
+    }
+    Stack_Init ( debugger->ReturnStack ) ;
+    for ( i = 1 ; i < d ; i ++ )
+    {
+        retAddr = ( byte * ) Stack_Pop ( retStack ) ;
+        word = Word_GetFromCodeAddress ( retAddr ) ;
+        if ( word == lastWord ) continue ;
+        lastWord = word ;
         Stack_Push ( debugger->ReturnStack, ( uint64 ) retAddr ) ;
     }
+    d = Stack_Depth ( debugger->ReturnStack ) ;
+    if ( _Q_->Verbosity > 1 ) _Stack_PrintValues ( ( byte* ) "debugger->ReturnStack ", debugger->ReturnStack->StackPointer, d ) ;
     debugger->DebugAddress = ( byte* ) Stack_Pop ( debugger->ReturnStack ) ; //( ( byte* ) debugger->cs_Cpu->Rsp[1] ) ;
     debugger->w_Word = Word_GetFromCodeAddress ( debugger->DebugAddress ) ;
     return debugger->DebugAddress ;
@@ -154,7 +166,6 @@ _Debugger_Init ( Debugger * debugger, Word * word, byte * address )
     if ( GetState ( debugger, DBG_BRK_INIT ) && debugger->cs_Cpu->Rsp )
     {
         // remember : _Compile_CpuState_Save ( _Debugger_->cs_Cpu ) ; is called thru _Compile_Debug : <dbg>/<dso>
-        //debugger->DebugAddress = debugger->w_Word ? debugger->w_Word->Coding + 3 : ( byte* ) debugger->cs_Cpu->Rsp[1] ;
         debugger->DebugAddress = Debugger_GetDbgAddressFromRsp ( debugger ) ; //( byte* ) debugger->cs_Cpu->Rsp[1] ;
         if ( debugger->DebugAddress && ( ! debugger->w_Word ) )
         {
@@ -268,7 +279,7 @@ Debugger_FindUsing ( Debugger * debugger )
 void
 _Debugger_PrintDataStack ( int64 depth )
 {
-    Set_DataStackPointer_FromDspReg ( ) ;
+    //Set_DataStackPointer_FromDspReg ( ) ;
     _Stack_Print ( _DataStack_, ( byte* ) "DataStack", depth ) ;
     //if (depth < Stack_Depth (_DataStack_) ) _Printf ( ( byte* ) "\t\t    ........." ) ;
 }
@@ -291,26 +302,9 @@ Debugger_Eval ( Debugger * debugger )
 {
     debugger->SaveStackDepth = DataStack_Depth ( ) ;
     debugger->WordDsp = _Dsp_ ;
-
-    if ( Debugger_IsStepping ( debugger ) )
-    {
-        Debugger_Continue ( debugger ) ;
-    }
-#if 0   
-    else if ( ! GetState ( debugger, DBG_AUTO_MODE ) )
-    {
-        _Word_Eval ( _Context_->CurrentEvalWord ) ;
-        debugger->NextEvalWord = Interpreter_SetupNextWord ( _Interpreter_ ) ;
-    }
-    else
-    {
-        _Interpreter_DoWord ( _Interpreter_, debugger->NextEvalWord, _Lexer_->TokenStart_ReadLineIndex, - 1 ) ;
-        debugger->NextEvalWord = Interpreter_SetupNextWord ( _Interpreter_ ) ;
-    }
-#else    
-        SetState_TrueFalse ( debugger, DBG_INTERPRET_LOOP_DONE | DBG_EVAL_AUTO_MODE, DBG_STEPPING ) ;
+    if ( Debugger_IsStepping ( debugger ) ) Debugger_Continue ( debugger ) ;
+    SetState_TrueFalse ( debugger, DBG_INTERPRET_LOOP_DONE | DBG_EVAL_AUTO_MODE, DBG_STEPPING ) ;
     if ( GetState ( debugger, DBG_AUTO_MODE ) ) SetState ( debugger, DBG_EVAL_AUTO_MODE, true ) ;
-#endif    
     debugger->PreHere = Here ;
 }
 

@@ -556,8 +556,4 @@ sp
 
 Int
 2 + 7 assertStkChk // stack checking
-
-location "\nending Lisp\n" ps s //ddps s
-// opOff
-// demo d: "bexp3" ffx
-//pause
+nl location "\nending Lisp\n" ps s //ddps s

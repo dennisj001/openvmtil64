@@ -78,11 +78,12 @@ DWL_Find ( dllist * list, Word * iword, byte * address, byte* name, int64 takeFi
                     foundWord = aFoundWord ;
                     minDiffFound = fDiff ;
                 }
-                else if ( foundWord )
+                else if ( foundWord ) // if we have a choice between a keyword
                 {
-                    if ( (foundWord->Name[0] == '{') || (foundWord->Name[0] == '}') || ( foundWord->CAttribute & COMBINATOR ) ) foundWord = aFoundWord ;
+                    if ( (foundWord->Name[0] == '{') || (foundWord->Name[0] == '}') || ( foundWord->CAttribute & (COMBINATOR|KEYWORD) ) ) foundWord = aFoundWord ;
                 }
-                else if ( foundWord && ( fDiff < minDiffFound ) && (aFoundWord->Name[0] != '{') && (aFoundWord->Name[0] != '}') && ( ! ( aFoundWord->CAttribute & COMBINATOR ) ) )
+                else if ( foundWord && ( fDiff < minDiffFound ) && (aFoundWord->Name[0] != '{') && (aFoundWord->Name[0] != '}') 
+                    && ( ! ( aFoundWord->CAttribute & (COMBINATOR|KEYWORD) ) ) )
                 {
                     foundWord = aFoundWord ;
                     minDiffFound = fDiff ;

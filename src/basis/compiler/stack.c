@@ -37,7 +37,6 @@ void
 _Compile_Stack_Push ( Boolean stackReg, int64 obj ) // runtime
 {
     Compile_ADDI ( REG, stackReg, 0, sizeof (int64 ), 0 ) ;
-    //_Compile_MoveImm ( MEM, stackReg, 0, 0, obj, CELL ) ;
     _Compile_SetStackN_WithObject ( stackReg, 0, obj ) ;
 }
 
@@ -46,21 +45,11 @@ _Compile_Stack_Push ( Boolean stackReg, int64 obj ) // runtime
 void
 _Compile_StackPtrLValue_PushObj ( uint64 stkPtrLvalue, Boolean tempStkReg, int64 obj ) // c lvalue
 {
-#if 0    
-    Compile_ADDI ( REG, tempStkReg, 0, sizeof (int64 ), 0 ) ;
-    Compile_MoveReg_ToAddress_ThruReg ( tempStkReg, ( byte* ) stkPtrLvalue, OREG ) ;
-    _Compile_SetStackN_WithObject ( tempStkReg, 0, obj ) ;
-#else
-    //_Compile_GetRValue_FromLValue_ToReg ( reg, ( byte* ) address ) ;
     Compile_MoveImm_To_Reg ( OREG, ( int64 ) stkPtrLvalue, CELL_SIZE ) ; // OREG is lvalue
     Compile_Move_Rm_To_Reg ( tempStkReg, OREG, 0 ) ; // tempStkReg is rvalue
-    //_Compile_MoveImm_To_Reg ( tempStkReg, ( int64 ) address, CELL_SIZE ) ;
     Compile_ADDI ( REG, tempStkReg, 0, sizeof (int64 ), 0 ) ;
     _Compile_SetStackN_WithObject ( tempStkReg, 0, obj ) ;
-    //_Compile_MoveReg_ToAddress_ThruReg ( reg, ( byte* ) lvalue, OREG ) ;
-    //_Compile_MoveImm_To_Reg ( OREG, ( int64 ) lvalue, CELL_SIZE ) ;
     Compile_Move_Reg_To_Rm ( OREG, tempStkReg, 0 ) ; //OREG remained as lvalue set as before 
-#endif    
 }
 
 // pop a stack at an rvalue using an lvalue
@@ -68,14 +57,10 @@ _Compile_StackPtrLValue_PushObj ( uint64 stkPtrLvalue, Boolean tempStkReg, int64
 void
 _Compile_StackPtrLValue_PopToReg ( uint64 stkPtrLvalue, Boolean tempStkReg, Boolean reg ) // c lvalue
 {
-    //_Compile_GetRValue_FromLValue_ToReg ( stackReg, ( byte* ) ptr ) ;
     Compile_MoveImm_To_Reg ( OREG, ( int64 ) stkPtrLvalue, CELL_SIZE ) ; // OREG is lvalue
     Compile_Move_Rm_To_Reg ( tempStkReg, OREG, 0 ) ; // OREG is rvalue stack ptr
-    //_Compile_MoveImm_To_Reg ( stackReg, ( int64 ) ptr, CELL_SIZE ) ;
     _Compile_Move_StackN_To_Reg ( reg, tempStkReg, 0 ) ; // pop our rvalue stack ptr
     Compile_SUBI ( REG, tempStkReg, 0, sizeof (int64 ), 0 ) ;
-    //_Compile_MoveReg_ToAddress_ThruReg ( reg, ( byte* ) lvalue, OREG ) ;
-    //_Compile_MoveImm_To_Reg ( thruReg, ( int64 ) lvalue, CELL_SIZE ) ;
     Compile_Move_Reg_To_Rm ( OREG, tempStkReg, 0 ) ; // move the new rvalue back to its lvalue - OREG
 }
 
@@ -161,18 +146,6 @@ Compile_MoveImm_To_TOS ( Boolean stackReg, int64 imm, Boolean size )
     Compile_MoveImm ( MEM, stackReg, 0, 0, imm, size ) ;
 }
 
-#if 0
-// for n < 64
-
-void
-_Compile_Stack_NDup ( Boolean stackReg )
-{
-    Compile_Move_Rm_To_Reg ( ACC, stackReg, 0 ) ;
-    Compile_ADDI ( REG, stackReg, 0, sizeof (int64 ), 0 ) ; // 3 bytes long
-    Compile_Move_Reg_To_Rm ( stackReg, ACC, 0 ) ;
-}
-#endif
-
 void
 _Compile_Stack_Dup ( Boolean stackReg )
 {
@@ -182,10 +155,9 @@ _Compile_Stack_Dup ( Boolean stackReg )
     else
     {
         Word * one = CfrTil_WordList ( 1 ) ;
-        //if ( one->StackPushRegisterCode ) // for now an object may have an array offset that needs to be considered
-        if ( (! (one->CAttribute & OBJECT)) && one->StackPushRegisterCode ) // for now an object may have an array offset that needs to be considered
+        if ( ( ! ( one->CAttribute & OBJECT ) ) && one->StackPushRegisterCode ) // for now an object may have an array offset that needs to be considered
         {
-            SetHere (one->StackPushRegisterCode, 1) ;
+            SetHere ( one->StackPushRegisterCode, 1 ) ;
             Compile_ADDI ( REG, DSP, 0, 2 * CELL, 0 ) ;
             _Compile_Move_Reg_To_StackN ( DSP, 0, ACC ) ;
             _Compile_Move_Reg_To_StackN ( DSP, - 1, ACC ) ;
@@ -215,12 +187,7 @@ _Compile_Stack_Pick ( Boolean stackReg ) // pick
     //DBI_ON ;
     Compile_Move_Rm_To_Reg ( ACC, stackReg, 0 ) ;
     Compile_NOT ( REG, ACC, 0, 0, 0 ) ; // negate acc
-    //_Compile_InstructionX64 ( int8 rex, int16 opCode, int8 modRm, int64 controlFlag, int8 sib, int64 disp, int8 dispSize, int64 imm, int8 immSize )
-    //_Calculate_Rex_Sib ( int8 reg, int8 rm, int8 scale, int8 index, int8 base, int8 rex_w_flag ) ;
-    //int8 rex = _Calculate_Rex_With_Sib ( ACC, SCALE_8, ACC, DSP, CELL_SIZE ) ;
-    //_Compile_Move ( rex, REG, ACC, stackReg, CalculateSib ( SCALE_CELL, ACC, DSP ), 0 ) ; // move ACC, [DSP + ACC * 4 ] ; but remember eax is now a negative number
     Compile_Move_WithSib ( 0x48, REG, ACC, DSP, REX_W_B, SCALE_CELL, ACC, DSP ) ;
-
     Compile_Move_Reg_To_Rm ( stackReg, ACC, 0 ) ;
     //DBI_OFF ;
 }
@@ -252,24 +219,8 @@ void
 Compile_DspPop_RspPush ( )
 {
     _Compile_Stack_PopToReg ( DSP, ACC ) ;
-    // _Compile_Stack_Push_Reg ( ESP, ECX ) ; // no such op
     _Compile_PushReg ( ACC ) ;
 }
-
-#define DEBUG_RETURN 0
-#if DEBUG_RETURN
-
-void
-DebugReturn ( )
-{
-    if ( Stack_Depth ( _CfrTil_->ReturnStack ) > 1 )
-    {
-        CfrTil_PrintReturnStack ( ) ;
-        _Printf ( ( byte* ) "\nDebugReturn : at %s", Context_Location ( ) ) ;
-        Pause ( ) ;
-    }
-}
-#endif
 
 void
 Compile_Set_DspReg_FromDataStackPointer ( )

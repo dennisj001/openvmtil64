@@ -366,19 +366,9 @@ Compiler_CompileOptimizedLoad ( Compiler * compiler )
             Word_Set_StackPushRegisterCode_To_Here ( optInfo->opWord ) ; // for EndBlock and LogicCodeWord with '@'
             _Word_CompileAndRecord_PushReg ( optInfo->wordArg2, ACC ) ;
         }
-        else
-        {
-            Compile_Move_Rm_To_Reg ( ACC, DSP, 0 ) ;
-            Compile_Move_Rm_To_Reg ( ACC, ACC, 0 ) ;
-            Compile_Move_Reg_To_Rm ( DSP, ACC, 0 ) ;
-        }
+        else CompileOptimizedLoad_TOS ( ) ;
     }
-    else
-    {
-        Compile_Move_Rm_To_Reg ( ACC, DSP, 0 ) ;
-        Compile_Move_Rm_To_Reg ( ACC, ACC, 0 ) ;
-        Compile_Move_Reg_To_Rm ( DSP, ACC, 0 ) ;
-    }
+    else CompileOptimizedLoad_TOS ( ) ;
     optInfo->rtrn = OPTIMIZE_DONE ;
 }
 
@@ -396,7 +386,6 @@ Compile_Optimize_Dup ( Compiler * compiler )
     }
     else
     {
-
         Compile_Move_Rm_To_Reg ( ACC, DSP, 0 ) ;
         Compile_ADDI ( REG, DSP, 0, sizeof (int64 ), 0 ) ;
         Compile_Move_Reg_To_Rm ( DSP, ACC, 0 ) ;
@@ -775,3 +764,10 @@ GetRmDispImm ( CompileOptimizeInfo * optInfo, Word * word, int64 suggestedReg )
     }
 }
 
+void
+CompileOptimizedLoad_TOS ( )
+{
+    Compile_Move_Rm_To_Reg ( ACC, DSP, 0 ) ;
+    Compile_Move_Rm_To_Reg ( ACC, ACC, 0 ) ;
+    Compile_Move_Reg_To_Rm ( DSP, ACC, 0 ) ;
+}

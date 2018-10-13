@@ -21,7 +21,8 @@ CfrTil_EndCombinator ( int64 quotesUsed, int64 moveFlag, int64 jccBlockIndex, Bo
     compiler->BreakPoint = Here ;
     _CfrTil_InstallGotoCallPoints_Keyed ( ( BlockInfo* ) bi, GI_CONTINUE | GI_BREAK ) ;
     bi->CombinatorEndsAt = Here ;
-    if ( moveFlag && Compiling ) BI_Block_Copy ( bi, bi->OriginalActualCodeStart, bi->CombinatorStartsAt, bi->CombinatorEndsAt - bi->CombinatorStartsAt, 0 ) ;
+    if ( moveFlag && Compiling ) BI_Block_Copy ( bi, bi->OriginalActualCodeStart, 
+        bi->CombinatorStartsAt, bi->CombinatorEndsAt - bi->CombinatorStartsAt, 0 ) ; // 0 : can't generally peephole optimize (arrayTest.cft problems) ??
     //_CfrTil_InstallGotoCallPoints_Keyed ( ( BlockInfo* ) bi, GI_GOTO | GI_RETURN | GI_RECURSE ) ; // done in a final EndBlock not here
     _Stack_DropN ( compiler->CombinatorBlockInfoStack, quotesUsed ) ;
     if ( GetState ( compiler, LISP_COMBINATOR_MODE ) )
