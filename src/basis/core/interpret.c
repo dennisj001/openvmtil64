@@ -155,6 +155,7 @@ _Interpreter_TokenToWord ( Interpreter * interp, byte * token )
     {
         interp->Token = token ;
         word = Finder_Word_FindUsing ( interp->Finder0, token, 0 ) ;
+        //if ( word && word->W_AliasOf ) word = word->W_AliasOf ;
         if ( ! word ) word = _Interpreter_NewWord ( interp, token ) ;
     }
     return interp->w_Word = word ;

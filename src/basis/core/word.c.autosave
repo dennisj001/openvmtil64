@@ -5,7 +5,7 @@ Word_Run ( Word * word )
 {
     if ( word )
     {
-        //if ( ! sigsetjmp ( _Context_->JmpBuf0, 0 ) ) // used by CfrTil_DebugRuntimeBreakpoint
+        if ( ! sigsetjmp ( _Context_->JmpBuf0, 0 ) ) // used by CfrTil_DebugRuntimeBreakpoint
         {
             word->W_InitialRuntimeDsp = _Dsp_ ;
             word->StackPushRegisterCode = 0 ; // nb. used! by the rewriting optInfo

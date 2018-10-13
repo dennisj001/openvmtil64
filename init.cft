@@ -278,7 +278,6 @@ dscOn //verbosity 3 =
             ifElse 
             defaultColors 
         } 
-        //{ nl sp n @ m @ "assertStkChk" assert1 }
         { n @ m @ "assertStkChk" _assert1 }
         ifElse
     } if2 
@@ -291,26 +290,15 @@ User
 : pause nl _pause ;
 : opOff optimizeOff inlineOff state ;
 : opOn1 optimizeOn inlineOn { verbosity @ 1 > } { state } if ;
-: vck ( n w ) { verbosity @ n @ != } { verbosity n @ = w @ _find wordRun } if2 ;
+: vck ( n w ) { verbosity @ n @ != } { verbosity n @ = w @ _find wordRun } if2 ; // for testing
 //'vck find wdiss //pause
 : opOn ( n )
     optimizeOn inlineOn 
-#if 1
-    n @ ' state literal vck  // literal pops the stack and turns 'state into a string
-#elif 1 // same functionally
-    n @  "state" vck  // literal turns 'state into a string
-#elif 0 // doesn't work
-    n @ 'state vck  // literal turns 'state into a string
-#endif
-    //pause
+    n @ ' state literal vck  // literal pops the stack and turns 'state into a string -- for testing
 ;
-//' opOn find winfo //pause
-//2 opOn 1 opOn 
+//' opOn find winfo //pause 2 opOn 1 opOn 
 
 "s" ' stack find alias
-//'sd ' stackDepthPrint find alias
-// : s stack location pause ;
-// : s stack dbg ;
 "istring" ' interpretString find alias 
 "def" ' word find alias 
 Compiler
@@ -318,17 +306,11 @@ Compiler
 
 Root C
 "allot" ' allocateMem find alias
-// : include location s include location s pause ;
-// : include location nl include ;
 
 : include1 _dup debugColors "\n'include'" ps ps " :: at :" ps location nl defaultColors sp include  ;
 Debug
 #if ( DebugFlag @ )
 : s stack alertColors location defaultColors ;
-// : s stack alertColors location defaultColors ;
-// : include 1 timerInit info stack include stack 1 time ; 
-// : include include stack ;
-// : include ( f ) vb3 alertColors decimal nl location nl "Entering : " ps f @ ps nl s f @ include defaultColors ;
 : include include1 debugColors "location :" ps location nl defaultColors ;
 vb3
 #endif

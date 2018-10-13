@@ -115,11 +115,11 @@ Debugger_GetDbgAddressFromRsp ( Debugger * debugger )
     Stack * retStack ; 
     //_Q_->Verbosity = 2 ;
     if ( _Q_->Verbosity > 1 )  CfrTil_PrintReturnStack ( ) ;
-    for ( i = 1 ; i < 30 ; i ++ ) // Rsp[1] is current 
+    for ( i = 1 ; i < 32 ; i ++ ) // Rsp[1] is current 
     {
         addr = ( ( byte* ) debugger->cs_Cpu->Rsp[i] ) ;
         word = Word_GetFromCodeAddress ( addr ) ;
-        if ( word->W_AliasOf ) word = word->W_AliasOf ;//_Context_->CurrentlyRunningWord
+        if ( word && word->W_AliasOf ) word = word->W_AliasOf ;
         if ( word )
         {
             //_List_PushNew_1Value ( dllist *list, int64 type, int64 value, int64 allocType )
