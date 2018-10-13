@@ -71,8 +71,8 @@ DWL_Find ( dllist * list, Word * iword, byte * address, byte* name, int64 takeFi
             else if ( address && ( address == naddress ) && ( address == aFoundWord->Coding ) )
             {
                 numFound ++ ;
-                fDiff = abs ( scwi - (_Debugger_->LastSourceCodeWord ? _Debugger_->LastSourceCodeWord->W_SC_Index : 0 ) ) ;
-                if ( ( * address == 0x0f ) && ( aFoundWord->Name [0] == '}') ) return aFoundWord ; // ( * address == 0x0f ) : jcc insn prefix
+                fDiff = abs ( scwi - ( _Debugger_->LastSourceCodeWord ? _Debugger_->LastSourceCodeWord->W_SC_Index : 0 ) ) ;
+                if ( ( * address == 0x0f ) && ( aFoundWord->Name [0] == '}' ) ) return aFoundWord ; // ( * address == 0x0f ) : jcc insn prefix
                 if ( ! foundWord ) // && (aFoundWord->Name[0] != '{') && (aFoundWord->Name[0] != '}')) 
                 {
                     foundWord = aFoundWord ;
@@ -80,10 +80,10 @@ DWL_Find ( dllist * list, Word * iword, byte * address, byte* name, int64 takeFi
                 }
                 else if ( foundWord ) // if we have a choice between a keyword
                 {
-                    if ( (foundWord->Name[0] == '{') || (foundWord->Name[0] == '}') || ( foundWord->CAttribute & (COMBINATOR|KEYWORD) ) ) foundWord = aFoundWord ;
+                    if ( ( foundWord->Name[0] == '{' ) || ( foundWord->Name[0] == '}' ) || ( foundWord->CAttribute & ( COMBINATOR | KEYWORD ) ) ) foundWord = aFoundWord ;
                 }
-                else if ( foundWord && ( fDiff < minDiffFound ) && (aFoundWord->Name[0] != '{') && (aFoundWord->Name[0] != '}') 
-                    && ( ! ( aFoundWord->CAttribute & (COMBINATOR|KEYWORD) ) ) )
+                else if ( foundWord && ( fDiff < minDiffFound ) && ( aFoundWord->Name[0] != '{' ) && ( aFoundWord->Name[0] != '}' )
+                    && ( ! ( aFoundWord->CAttribute & ( COMBINATOR | KEYWORD ) ) ) )
                 {
                     foundWord = aFoundWord ;
                     minDiffFound = fDiff ;
@@ -125,7 +125,7 @@ _CfrTil_WordList_PushWord ( Word * word, Boolean inUseFlag )
 void
 CfrTil_WordList_PushWord ( Word * word )
 {
-    _CfrTil_WordList_PushWord ( word, 
+    _CfrTil_WordList_PushWord ( word,
         ( ! ( word->CAttribute & ( NAMESPACE | OBJECT_OPERATOR | OBJECT_FIELD ) ) ) || ( word->CAttribute & ( DOBJECT ) ) ) ;
 }
 
@@ -456,9 +456,9 @@ CfrTil_InitSourceCode ( CfrTil * cfrtil )
 }
 
 void
-_CfrTil_InitSourceCode_WithName ( CfrTil * cfrtil, byte * name )
+CfrTil_InitSourceCode_WithName ( CfrTil * cfrtil, byte * name, Boolean force )
 {
-    if ( GetState ( _CfrTil_, SOURCE_CODE_ON ) )
+    if ( force || ( GetState ( _CfrTil_, SOURCE_CODE_ON ) && ( ! ( GetState ( cfrtil, SOURCE_CODE_STARTED ) ) ) ) )
     {
         _CfrTil_InitSourceCode ( cfrtil ) ;
         _CfrTil_AddStringToSourceCode ( cfrtil, name ) ;
@@ -467,9 +467,9 @@ _CfrTil_InitSourceCode_WithName ( CfrTil * cfrtil, byte * name )
 }
 
 void
-CfrTil_InitSourceCode_WithCurrentInputChar ( CfrTil * cfrtil )
+CfrTil_InitSourceCode_WithCurrentInputChar ( CfrTil * cfrtil, Boolean force )
 {
-    if ( GetState ( _CfrTil_, SOURCE_CODE_ON ) )
+    if ( force || ( GetState ( _CfrTil_, SOURCE_CODE_ON ) && ( ! ( GetState ( cfrtil, SOURCE_CODE_STARTED ) ) ) ) )
     {
         Lexer * lexer = _Context_->Lexer0 ;
         _CfrTil_InitSourceCode ( cfrtil ) ;
@@ -481,7 +481,7 @@ void
 CfrTil_SourceCode_Init ( )
 {
     Word * word = _Interpreter_->w_Word ;
-    _CfrTil_InitSourceCode_WithName ( _CfrTil_, word ? word->Name : 0 ) ;
+    CfrTil_InitSourceCode_WithName ( _CfrTil_, word ? word->Name : 0, 1 ) ;
 }
 
 void

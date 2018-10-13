@@ -105,48 +105,52 @@ Debugger_Off ( Debugger * debugger, int64 debugOffFlag )
 }
 
 // Debugger_GetDbgAddressFromRsp :: may be unnecessarily convoluted ??
+
 byte *
 Debugger_GetDbgAddressFromRsp ( Debugger * debugger )
 {
-    Word * word, *lastWord ;
+    Word * word, *lastWord = 0, *currentlyRunning = Word_UnAlias ( _Context_->CurrentlyRunningWord ) ;
     byte * addr, *retAddr ;
     int64 i, d ;
     List * retStackList = List_New ( COMPILER_TEMP ) ;
-    Stack * retStack ; 
+    Stack * retStack ;
     //_Q_->Verbosity = 2 ;
-    if ( _Q_->Verbosity > 1 )  CfrTil_PrintReturnStack ( ) ;
+    if ( _Q_->Verbosity > 1 ) CfrTil_PrintReturnStack ( ) ;
     for ( i = 1 ; i < 32 ; i ++ ) // Rsp[1] is current 
     {
         addr = ( ( byte* ) debugger->cs_Cpu->Rsp[i] ) ;
-        word = Word_GetFromCodeAddress ( addr ) ;
-        if ( word && word->W_AliasOf ) word = word->W_AliasOf ;
+        word = Word_UnAlias ( Word_GetFromCodeAddress ( addr ) ) ;
         if ( word )
         {
             //_List_PushNew_1Value ( dllist *list, int64 type, int64 value, int64 allocType )
             _List_PushNew_1Value ( retStackList, 0, debugger->cs_Cpu->Rsp[i], COMPILER_TEMP ) ;
-            if ( word == _Context_->CurrentlyRunningWord ) break ;
+            if ( word == currentlyRunning )
+                break ;
         }
     }
-    d = List_Depth ( retStackList ) ;
-    retStack = Stack_New ( d, COMPILER_TEMP ) ;
-    for ( i = d ; i > 0 ; i -- )
+    if ( ( d = List_Depth ( retStackList ) ) > 1 )
     {
-        retAddr = ( byte * ) List_Pick_Value ( retStackList, i ) ; //List_Pop_1Value ( retStackList ) ;
-        Stack_Push ( retStack, ( uint64 ) retAddr ) ;
+        retStack = Stack_New ( d, COMPILER_TEMP ) ;
+        for ( i = d ; i > 0 ; i -- )
+        {
+            retAddr = ( byte * ) List_Pick_Value ( retStackList, i ) ; //List_Pop_1Value ( retStackList ) ;
+            Stack_Push ( retStack, ( uint64 ) retAddr ) ;
+        }
+        Stack_Init ( debugger->ReturnStack ) ;
+        for ( i = 1 ; i < d ; i ++ )
+        {
+            retAddr = ( byte * ) Stack_Pop ( retStack ) ;
+            word = Word_UnAlias ( Word_GetFromCodeAddress ( retAddr ) ) ;
+            if ( word == lastWord ) continue ;
+            lastWord = word ;
+            Stack_Push ( debugger->ReturnStack, ( uint64 ) retAddr ) ;
+        }
+        d = Stack_Depth ( debugger->ReturnStack ) ;
+        if ( _Q_->Verbosity > 1 ) _Stack_PrintValues ( ( byte* ) "debugger->ReturnStack ", debugger->ReturnStack->StackPointer, d ) ;
+        debugger->DebugAddress = ( byte* ) Stack_Pop ( debugger->ReturnStack ) ; //( ( byte* ) debugger->cs_Cpu->Rsp[1] ) ;
+        debugger->w_Word = Word_UnAlias ( Word_GetFromCodeAddress ( debugger->DebugAddress ) ) ;
     }
-    Stack_Init ( debugger->ReturnStack ) ;
-    for ( i = 1 ; i < d ; i ++ )
-    {
-        retAddr = ( byte * ) Stack_Pop ( retStack ) ;
-        word = Word_GetFromCodeAddress ( retAddr ) ;
-        if ( word == lastWord ) continue ;
-        lastWord = word ;
-        Stack_Push ( debugger->ReturnStack, ( uint64 ) retAddr ) ;
-    }
-    d = Stack_Depth ( debugger->ReturnStack ) ;
-    if ( _Q_->Verbosity > 1 ) _Stack_PrintValues ( ( byte* ) "debugger->ReturnStack ", debugger->ReturnStack->StackPointer, d ) ;
-    debugger->DebugAddress = ( byte* ) Stack_Pop ( debugger->ReturnStack ) ; //( ( byte* ) debugger->cs_Cpu->Rsp[1] ) ;
-    debugger->w_Word = Word_GetFromCodeAddress ( debugger->DebugAddress ) ;
+    else debugger->DebugAddress = ( byte* ) debugger->cs_Cpu->Rsp[1] ;
     return debugger->DebugAddress ;
 }
 
@@ -350,7 +354,7 @@ void
 Debugger_Source ( Debugger * debugger )
 {
     Word * scWord = Compiling ? _CfrTil_->CurrentWordCompiling : GetState ( debugger, DBG_STEPPING ) ?
-        Debugger_GetWordFromAddress ( debugger ) : _Context_->CurrentlyRunningWord ;
+        Word_UnAlias ( Debugger_GetWordFromAddress ( debugger ) ) : _Context_->CurrentlyRunningWord ;
     _CfrTil_Source ( scWord, 0 ) ; //debugger->w_Word ? debugger->w_Word : _CfrTil_->DebugWordListWord, 0 ) ;
     SetState ( debugger, DBG_INFO, true ) ;
 }

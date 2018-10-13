@@ -247,3 +247,25 @@ CfrTil_C_ConditionalExpression ( )
     //if ( String_Equal ( token, ")" ) ) 
     _CfrTil_PushToken_OnTokenList ( token ) ; // maybe conditionally push ??
 }
+
+Boolean
+_C_Syntax_AreWeParsingACFunctionCall ( byte * nc )
+{
+    while ( *nc++ != ')' ) ;
+    while ( *nc )
+    {
+        if ( *nc == ';' ) return true ; // we have an rvalue
+        else if ( *nc == '{' ) return false ; // we have an rvalue
+        nc ++ ;
+    }
+    return true ;
+}
+
+Boolean
+C_Syntax_AreWeParsingACFunctionCall ( Lexer * lexer )
+{
+    if ( ! GetState ( _Context_, C_SYNTAX | INFIX_MODE ) ) return false ;
+    int64 tokenStartReadLineIndex = lexer->TokenStart_ReadLineIndex ;
+    return _C_Syntax_AreWeParsingACFunctionCall ( & _Context_->ReadLiner0->InputLine [ tokenStartReadLineIndex ] ) ; //word->W_StartCharRlIndex ] ) ;
+}
+

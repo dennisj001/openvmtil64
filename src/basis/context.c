@@ -219,13 +219,7 @@ _Context_DoubleQuoteMacro ( Context * cntx )
 {
     ReadLiner * rl = _ReadLiner_ ;
     Lexer * lexer = cntx->Lexer0 ;
-    if ( ! GetState ( _CfrTil_, SOURCE_CODE_STARTED ) )
-    {
-        //byte c = ReadLine_NextNonPunctCharAfterEndOfString ( rl ) ;
-        //if ( c == '(' || c == '{' ) 
-        CfrTil_InitSourceCode_WithCurrentInputChar ( _CfrTil_ ) ; // must be here for wdiss and add addToHistory
-        //else _CfrTil_InitSourceCode ( _CfrTil_ ) ;
-    }
+    if ( ! GetState ( _CfrTil_, SOURCE_CODE_STARTED ) ) CfrTil_InitSourceCode_WithCurrentInputChar (_CfrTil_, 0) ; // must be here for wdiss and add addToHistory
     _CfrTil_->SC_QuoteMode = true ;
     do
     {

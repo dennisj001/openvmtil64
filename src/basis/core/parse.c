@@ -43,7 +43,7 @@ done:
     }
     else
     {
-        if ( ! Compiling ) _CfrTil_InitSourceCode_WithName ( _CfrTil_, lexer->OriginalToken ) ;
+        if ( ! Compiling ) CfrTil_InitSourceCode_WithName (_CfrTil_, lexer->OriginalToken , 0) ;
         byte * token = ( byte* ) "" ;
         while ( 1 )
         {
@@ -63,7 +63,7 @@ done:
             }
             else break ;
         }
-        if ( ( ! AtCommandLine ( rl ) ) && ( ! GetState ( _CfrTil_, SOURCE_CODE_STARTED ) ) ) _CfrTil_InitSourceCode_WithName ( _CfrTil_, lexer->OriginalToken ) ;
+        if ( ( ! AtCommandLine ( rl ) ) && ( ! GetState ( _CfrTil_, SOURCE_CODE_STARTED ) ) ) CfrTil_InitSourceCode_WithName (_CfrTil_, lexer->OriginalToken , 0) ;
         CfrTil_Token ( ) ;
     }
 }

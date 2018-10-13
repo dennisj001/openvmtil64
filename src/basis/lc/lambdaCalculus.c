@@ -284,7 +284,7 @@ _LC_ReadEvalPrint_ListObject ( int64 parenLevel, int64 continueFlag )
     SetState ( compiler, LISP_MODE, true ) ;
     compiler->InitHere = Here ;
     if ( ! parenLevel ) CfrTil_InitSourceCode ( _CfrTil_ ) ;
-    else CfrTil_InitSourceCode_WithCurrentInputChar ( _CfrTil_ ) ;
+    else CfrTil_InitSourceCode_WithCurrentInputChar (_CfrTil_, 1) ;
     ListObject * l0 = _LC_Read_ListObject ( lc, parenLevel ) ; //0 ) ;
     d0 ( if ( Is_DebugOn ) LO_PrintWithValue ( l0 ) ) ;
     LC_EvalPrint ( lc, l0 ) ;

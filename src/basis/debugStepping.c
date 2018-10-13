@@ -444,6 +444,7 @@ Debugger_DoJcc ( Debugger * debugger, int64 numOfBytes )
         else if ( ( n == 1 ) && ( ( uint64 ) debugger->cs_Cpu->RFlags & ZERO_FLAG ) )  jcAddress = 0 ;
     }
     else if ( ttt == TTT_BE ) // ttt 011 :  below or equal
+    // the below code needs to be rewritten :: re. '|' and '^' :: TODO ??
     {
         if ( ( n == 0 ) && ! ( ( ( uint64 ) debugger->cs_Cpu->RFlags & CARRY_FLAG ) | ( ( uint64 ) debugger->cs_Cpu->RFlags & ZERO_FLAG ) ) )
         {
@@ -460,7 +461,8 @@ Debugger_DoJcc ( Debugger * debugger, int64 numOfBytes )
         {
             jcAddress = 0 ;
         }
-        else if ( ( n == 1 ) && ( ( ( uint64 ) debugger->cs_Cpu->RFlags & SIGN_FLAG ) ^ ( ( uint64 ) debugger->cs_Cpu->RFlags & OVERFLOW_FLAG ) ) )
+        else if ( ( n == 1 ) && ( ( ( uint64 ) debugger->cs_Cpu->RFlags & SIGN_FLAG ) 
+            ^ ( ( uint64 ) debugger->cs_Cpu->RFlags & OVERFLOW_FLAG ) ) )
         {
             jcAddress = 0 ;
         }
@@ -468,12 +470,14 @@ Debugger_DoJcc ( Debugger * debugger, int64 numOfBytes )
     else if ( ttt == TTT_LE ) // ttt 111
     {
         if ( ( n == 0 ) &&
-            ! ( ( ( ( uint64 ) debugger->cs_Cpu->RFlags & SIGN_FLAG ) ^ ( ( uint64 ) debugger->cs_Cpu->RFlags & OVERFLOW_FLAG ) ) | ( ( uint64 ) debugger->cs_Cpu->RFlags & ZERO_FLAG ) ) )
+            ! ( ( ( ( uint64 ) debugger->cs_Cpu->RFlags & SIGN_FLAG ) 
+            ^ ( ( uint64 ) debugger->cs_Cpu->RFlags & OVERFLOW_FLAG ) ) | ( ( uint64 ) debugger->cs_Cpu->RFlags & ZERO_FLAG ) ) )
         {
             jcAddress = 0 ;
         }
         if ( ( n == 1 ) &&
-            ( ( ( ( uint64 ) debugger->cs_Cpu->RFlags & SIGN_FLAG ) ^ ( ( uint64 ) debugger->cs_Cpu->RFlags & OVERFLOW_FLAG ) ) | ( ( uint64 ) debugger->cs_Cpu->RFlags & ZERO_FLAG ) ) )
+            ( ( ( ( uint64 ) debugger->cs_Cpu->RFlags & SIGN_FLAG ) 
+            ^ ( ( uint64 ) debugger->cs_Cpu->RFlags & OVERFLOW_FLAG ) ) | ( ( uint64 ) debugger->cs_Cpu->RFlags & ZERO_FLAG ) ) )
         {
 
             jcAddress = 0 ;
@@ -485,22 +489,12 @@ Debugger_DoJcc ( Debugger * debugger, int64 numOfBytes )
 int64
 Debugger_CanWeStep ( Debugger * debugger, Word * word )
 {
-    if ( ( ! word ) || ( ! word->CodeStart ) || ( ! NamedByteArray_CheckAddress ( _Q_CodeSpace, word->CodeStart ) ) )
-    {
-        SetState ( debugger, DBG_CAN_STEP, false ) ; // debugger->State flag = false ;
-        return false ;
-    }
-        //else if ( word && ( Compiling || ( word->CAttribute & ( CPRIMITIVE | DLSYM_WORD ) ) || ( word->LAttribute & T_LISP_DEFINE ) ) )
-    else if ( word && ( word->CAttribute & ( CPRIMITIVE | DLSYM_WORD ) ) ) //|| ( word->LAttribute & T_LISP_DEFINE ) )
-    {
-        return false ;
-    }
-    else
-    {
-        SetState ( debugger, DBG_CAN_STEP, true ) ;
-
-        return true ;
-    }
+    int64 result ;
+    if ( ( ! word ) || ( ! word->CodeStart ) || ( ! NamedByteArray_CheckAddress ( _Q_CodeSpace, word->CodeStart ) ) ) result = false ;
+    else if ( word && ( word->CAttribute & ( CPRIMITIVE | DLSYM_WORD ) ) ) result = false ;
+    else result = true ;
+    SetState ( debugger, DBG_CAN_STEP, result ) ;
+    return result ;
 }
 
 void

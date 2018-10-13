@@ -392,7 +392,7 @@ _LO_CfrTil ( ListObject * lfirst )
             word->W_SourceCode = String_New_SourceCode ( _CfrTil_->SC_Buffer ) ;
             if ( ldata1 && String_Equal ( ldata1->Name, ( byte * ) ":" ) )
             {
-                _CfrTil_InitSourceCode_WithName ( _CfrTil_, "(" ) ;
+                CfrTil_InitSourceCode_WithName (_CfrTil_, "(" , 1) ;
             }
             _LO_Semi ( word ) ;
             word->W_SourceCode = lc->LC_SourceCode ;
