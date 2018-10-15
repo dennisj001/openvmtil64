@@ -927,33 +927,6 @@ CfrTil_LexerTables_Setup ( CfrTil * cfrtl )
 }
 
 int64
-IsLValue_String_CheckForwardToStatementEnd ( byte * nc )
-{
-    while ( *nc )
-    {
-        if ( *nc == '=' ) //break ;
-#if 1        
-        {
-            if ( * ( nc + 1 ) == '=' ) break ;
-            else if ( ispunct ( * ( nc - 1 ) ) ) break ; // op equal
-            else return true ; // we have an lvalue
-        }
-#endif        
-        else if ( *nc == ';' ) break ; // we have an lvalue
-        else if ( *nc == ',' ) break ; // we have an lvalue
-        else if ( *nc == '"' ) break ; // we have an rvalue
-        else if ( *nc == '.' ) break ; // we have an rvalue
-        else if ( *nc == '[' ) break ; // we have an rvalue
-        else if ( *nc == '(' ) break ; // we have an rvalue
-        else if ( *nc == '{' ) break ;  // we have an rvalue
-        else if ( *nc == '}' ) break ;  // syntax error : we have an rvalue
-        //else if ( *nc == '&' ) break ;  // we have an rvalue
-        nc ++ ;
-    }
-    return false ;
-}
-
-int64
 Lexer_ConvertLineIndexToFileIndex ( Lexer * lexer, int64 index )
 {
     return lexer->TokenStart_FileIndex = lexer->ReadLiner0->LineStartFileIndex + index ; //- lexer->Token_Length ;

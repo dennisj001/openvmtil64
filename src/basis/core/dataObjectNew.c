@@ -152,9 +152,10 @@ _Class_Object_Init ( Word * word, Namespace * ns )
 
         Word * initWord = ( Word* ) _Stack_Pop ( nsstack ) ;
         DataStack_Push ( ( int64 ) word->W_Object ) ;
-        d0 ( CfrTil_PrintDataStack ( ) ) ;
+        //if ( Is_DebugOn ) CfrTil_PrintDataStack ( ) ;
         Word_Eval ( initWord ) ;
-        d0 ( CfrTil_PrintDataStack ( ) ) ;
+        //if ( Is_DebugOn ) Stack_Print ( _Debugger_->ReturnStack, ( byte* ) "debugger->ReturnStack " ) ;
+        //if ( Is_DebugOn ) CfrTil_PrintDataStack ( ) ;
     }
     SetState ( _Debugger_, DEBUG_SHTL_OFF, false ) ;
     //DebugShow_On ;

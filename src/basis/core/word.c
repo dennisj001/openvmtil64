@@ -1,11 +1,18 @@
 #include "../../include/cfrtil64.h"
 
+Word *
+Word_UnAlias ( Word * word )
+{
+    if ( word ) while ( word->W_AliasOf ) word = word->W_AliasOf ;
+    return word ;
+}
+
 void
 Word_Run ( Word * word )
 {
     if ( word )
     {
-        //if ( ! sigsetjmp ( _Context_->JmpBuf0, 0 ) ) // used by CfrTil_DebugRuntimeBreakpoint
+        if ( ! sigsetjmp ( _Context_->JmpBuf0, 0 ) ) // used by CfrTil_DebugRuntimeBreakpoint
         {
             word->W_InitialRuntimeDsp = _Dsp_ ;
             word->StackPushRegisterCode = 0 ; // nb. used! by the rewriting optInfo
@@ -14,18 +21,7 @@ Word_Run ( Word * word )
             _Context_->CurrentlyRunningWord = word ;
             Block_Eval ( word->Definition ) ;
         }
-        //else  Set_DataStackPointers_FromDebuggerDspReg () ; // back from _CfrTil_DebugRuntimeBreakpoint
-    }
-}
-
-void
-_Word_Eval ( Word * word )
-{
-    if ( word )
-    {
-        _Context_->CurrentEvalWord = word ;
-        if ( ( word->CAttribute & IMMEDIATE ) || ( ! CompileMode ) ) Word_Run ( word ) ;
-        else _Word_Compile ( word ) ;
+        else Set_DataStackPointers_FromDebuggerDspReg ( ) ; // back from _CfrTil_DebugRuntimeBreakpoint
     }
 }
 
@@ -38,7 +34,8 @@ Word_Eval ( Word * word )
         DEBUG_SETUP ( word ) ;
         if ( ! GetState ( word, STEPPED ) ) // set by the debuggger
         {
-            _Word_Eval ( word ) ;
+            if ( ( word->CAttribute & IMMEDIATE ) || ( ! CompileMode ) ) Word_Run ( word ) ;
+            else _Word_Compile ( word ) ;
         }
         SetState ( word, STEPPED, false ) ;
         DEBUG_SHOW ;
@@ -159,7 +156,7 @@ _Word_Create ( byte * name, uint64 ctype, uint64 ctype2, uint64 ltype, uint64 al
     if ( Is_NamespaceType ( word ) ) word->Lo_List = dllist_New ( ) ;
     _Compiler_->CurrentCreatedWord = word ;
     _CfrTil_->WordCreateCount ++ ;
-    Word_Set_ScIndex_RlIndex ( word, -1, -1 ) ; // default values
+    Word_Set_ScIndex_RlIndex ( word, - 1, - 1 ) ; // default values
     return word ;
 }
 
@@ -265,7 +262,7 @@ __Word_ShowSourceCode ( Word * word )
         {
             Buffer *dstb = Buffer_NewLocked ( BUFFER_SIZE ) ;
             sc = dstb->B_Data ;
-            sc = _String_ConvertStringToBackSlash ( sc, word->W_SourceCode ? word->W_SourceCode : String_New ( _CfrTil_->SC_Buffer, TEMPORARY ), -1 ) ;
+            sc = _String_ConvertStringToBackSlash ( sc, word->W_SourceCode ? word->W_SourceCode : String_New ( _CfrTil_->SC_Buffer, TEMPORARY ), - 1 ) ;
             scd = c_gd ( String_FilterMultipleSpaces ( sc, TEMPORARY ) ) ;
             Buffer_Unlock ( dstb ) ;
             Buffer_SetAsFree ( dstb, 0 ) ;
@@ -328,7 +325,7 @@ _CfrTil_Alias ( Word * word, byte * name )
     if ( word && word->Definition )
     {
         Word * alias = _Word_New ( name, word->CAttribute | ALIAS, word->CAttribute2, word->LAttribute, 1, 0, DICTIONARY ) ; // inherit type from original word
-        while ( word->W_AliasOf ) word = word->W_AliasOf ;
+        word = Word_UnAlias ( word ) ;
         Word_InitFinal ( alias, ( byte* ) word->Definition ) ;
         alias->S_CodeSize = word->S_CodeSize ;
         alias->W_AliasOf = word ;

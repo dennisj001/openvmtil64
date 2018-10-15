@@ -7,7 +7,7 @@ BI_Block_Copy ( BlockInfo * bi, byte* dstAddress, byte * srcAddress, int64 bsize
     //if ( bsize > 8000 ) _Printf ((byte*)"\nBI_Block_Copy : bsize = %ld\n", bsize ), Pause () ;
     //if ( Is_DebugOn ) _Printf ((byte*)"\nBI_Block_Copy : bsize = %ld\n", bsize ), Pause () ;
     Compiler * compiler = _Compiler_ ;
-    if ( ! bi ) bi = ( BlockInfo * ) _Stack_Top ( compiler->CombinatorBlockInfoStack ) ;
+    if ( ! bi ) bi = ( BlockInfo * ) Stack_Top ( compiler->CombinatorBlockInfoStack ) ;
     byte * saveHere = Here, * saveAddress = srcAddress ;
     ud_t * ud = Debugger_UdisInit ( _Debugger_ ) ;
     int64 isize, left ;

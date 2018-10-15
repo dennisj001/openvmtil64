@@ -44,7 +44,7 @@ dscOn
  	//nl "startHey2" prints
 	m @ o store     m @ o @ _assert
 	n @ q store     n @ q @ _assert
-        n @ m @ hey 
+        n @ m @ hey1 
 	n @ m @ + o @ + q @ + 1 + dup p 7 _assert
         //" afterHey2" prints
 ;

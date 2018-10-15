@@ -268,6 +268,5 @@
 
 //#define MemCpy(dst, src, size) memcpy ((byte*)dst, (byte*)src, (int64) size)  //_MemCpy ((byte*)dst, (byte*)src, (int64) size)
 #define MemCpy(dst, src, size) _MemCpy ((byte*)dst, (byte*)src, (int64) size)
-#define Word_UnAlias( word ) (word && word->W_AliasOf ? word->W_AliasOf : word )
 
 

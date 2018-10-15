@@ -65,6 +65,8 @@ DLLNode
     DLLNode TailNode ;
 };
 
+scOn
+
 : init ( this )
     this.HeadNode.AfterReference this.TailNode.BeforeReference =
     this.TailNode.BeforeReference this.HeadNode.AfterReference =
@@ -73,17 +75,21 @@ DLLNode
 ;
 ' init find wdiss //pause
 sp
+#if dbgTest
+"testList" DLList new stack //pause
+#else
 "testList" DLList new 
+#endif
 testList DLList.size @ dup p dump //pause
 
 dbgOff 
 #if dbgOnVar @
-d: testList.HeadNode.AfterReference @ testList.TailNode.BeforeReference  "class init test : "  assert  : hi 1 2 3 4 5 + + + + p ; : hey hi hi hi hi hi ; hey : hi 1 2 3 4 5 + + + + p ; : hey hi hi hi hi hi ; hey // debugger test
+testList.HeadNode.AfterReference @ testList.TailNode.BeforeReference  "class init test : "  assert  : hi 1 2 3 4 5 + + + + p ; : hey hi hi hi hi hi ; hey : hi 1 2 3 4 5 + + + + p ; : hey hi hi hi hi hi ; hey // debugger test
 dbgOff
 #else
 testList.HeadNode.AfterReference @ testList.TailNode.BeforeReference  "class init test : " assert 
 #endif
-
+//stack pause
 DLList
 using
 "DLListClone" clone // clones DLList class
@@ -97,10 +103,6 @@ using
     int64 Accum ;
 }; // add seven elements
 
-//dbgOn
-#if dbgOnVar @
-dscOn
-#endif
 //verbosity 3 =
 : init ( this ) 
 #if dbgOnVar @
@@ -154,9 +156,13 @@ dscOn
     this.Accum @ dup p 3 "\n\nAccum should be 3 assert9\n"  assert // 3
     this.Category @ dup p 12 "init_assert9" assert //_pause // 12
 ;
-
-' init find wdiss 
+' init find wdiss //pause
+#if dbgTest
+stack "testClone" DLListClone d: new 
+#else
 "testClone" DLListClone new 
+#endif
+//stack pause
 scOff
 "\nthis = " ps this hex p 
 "\nthis = " ps this hex p //pause

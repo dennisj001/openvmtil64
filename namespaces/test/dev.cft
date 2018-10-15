@@ -307,7 +307,7 @@ sp
     }fi 
 ;
 20 _fib p //sp
-: _fib2 dup 2 < ?< >:< dup -- _fib2 swap 2 - _fib2 + >; ; 20 _fib2 p //sp
+: _fib2 dup 2 < ?< >:< dup -- _fib2 swap 2 - _fib2 + >; ; 20 _fib2 nl p //pause //sp
 ' _fib2 find wdiss 
 
 : _fib3 

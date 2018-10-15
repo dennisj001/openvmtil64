@@ -318,7 +318,7 @@ void
 Namespace_RemoveFromUsingList ( byte * name )
 {
     Namespace * ns = Namespace_Find ( name ) ;
-    if ( String_Equal ( ns->Name, "System" ) ) _Printf ( ( byte* ) "\n\nSystem namespace being cleared %s", _Context_Location ( _Context_ ) ) ;
+    if ( String_Equal ( ns->Name, "System" ) ) _Printf ( ( byte* ) "\n\nSystem namespace being cleared %s", Context_Location () ) ;
     if ( ns ) _Namespace_RemoveFromUsingList ( ns ) ;
 }
 // this is simple, for more complete use _Namespace_RemoveFromSearchList
@@ -429,7 +429,7 @@ _Namespace_FindOrNew_Local ( Stack * nsStack )
     Namespace * ns = Namespace_FindOrNew_SetUsing ( buffer, _CfrTil_->Namespaces, 1 ) ;
     _Namespace_ActivateAsPrimary ( ns ) ;
     Stack_Push ( nsStack, ( int64 ) ns ) ;
-    BlockInfo * bi = ( BlockInfo * ) _Stack_Top ( _Context_->Compiler0->BlockStack ) ;
+    BlockInfo * bi = ( BlockInfo * ) Stack_Top ( _Context_->Compiler0->BlockStack ) ;
     bi->LocalsNamespace = ns ;
     return ns ;
 }

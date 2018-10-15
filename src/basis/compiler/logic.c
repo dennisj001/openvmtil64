@@ -16,7 +16,7 @@ BI_Set_setTtnn ( BlockInfo *bi, Boolean setTtn, Boolean setNegFlag, Boolean jccT
 void
 Compiler_Set_BI_setTtnn ( Compiler * compiler, Boolean setTtn, Boolean setNegFlag, Boolean jccTtt, Boolean jccNegFlag )
 {
-    BlockInfo *bi = ( BlockInfo * ) _Stack_Top ( compiler->CombinatorBlockInfoStack ) ;
+    BlockInfo *bi = ( BlockInfo * ) Stack_Top ( compiler->CombinatorBlockInfoStack ) ;
     BI_Set_setTtnn ( bi, setTtn, setNegFlag, jccTtt, jccNegFlag ) ;
 }
 
@@ -43,7 +43,7 @@ BI_CompileRecord_TestCode_ArgRegNum ( BlockInfo *bi, uint8 argRegNum )
 BlockInfo *
 Compiler_BI_CompileRecord_TestCode_Reg ( Compiler * compiler, Boolean reg, Boolean size )
 {
-    BlockInfo *bi = ( BlockInfo * ) _Stack_Top ( compiler->CombinatorBlockInfoStack ) ;
+    BlockInfo *bi = ( BlockInfo * ) Stack_Top ( compiler->CombinatorBlockInfoStack ) ;
     BI_CompileRecord_TestCode_Reg ( bi, reg, size ) ;
     return bi ;
 }
@@ -110,7 +110,7 @@ _Compile_LogicResultForStack ( int64 reg, Boolean setTtn, Boolean setNegFlag )
 BlockInfo *
 Compiler_Set_LogicCode ( Compiler * compiler, Boolean setTtn, Boolean setNegFlag, Boolean jccTtt, Boolean jccNegFlag )
 {
-    BlockInfo *bi = ( BlockInfo * ) _Stack_Top ( compiler->CombinatorBlockInfoStack ) ;
+    BlockInfo *bi = ( BlockInfo * ) Stack_Top ( compiler->CombinatorBlockInfoStack ) ;
     BI_Set_setTtnn ( bi, setTtn, setNegFlag, jccTtt, jccNegFlag ) ; //setTtn, setNegFlag ) ;
     return bi ;
 }

@@ -117,7 +117,7 @@ OpenVmTil_Print_DataSizeofInfo ( int64 flag )
 }
 
 void
-OVT_ShowMemoryAllocated ()
+OVT_ShowMemoryAllocated ( )
 {
     _OVT_ShowMemoryAllocated ( _Q_ ) ;
 }
@@ -132,15 +132,17 @@ OVT_Exit ( )
 void
 OVT_StartupMessage ( )
 {
-    if ( ( ++ _Q_->InitSessionCoreTimes == 2 ) && ( _Q_->Verbosity >  0 ) ) // 2 : first time is in CfrTil_ResetAll_Init
+    if ( ( ++ _Q_->InitSessionCoreTimes == 2 ) && ( _Q_->Verbosity > 0 ) ) // 2 : first time is in CfrTil_ResetAll_Init
     {
         DefaultColors ;
         System_Time ( _CfrTil_->Context0->System0, 0, ( char* ) "Startup", 1 ) ; //_Q_->StartedTimes == 1 ) ;
         _CfrTil_Version ( 0 ) ;
-        _Printf ( (byte*) "\nOpenVmTil : cfrTil comes with ABSOLUTELY NO WARRANTY; for details type `license' in the source directory." ) ;
-        _Printf ( (byte*) "\nType 'testCfrTil' or 'test' <tab><enter> and then 'demo' for starters" ) ;
-        _Printf ( (byte*) "\nType 'bye' to exit" ) ;
-        //fflush ( stdout ) ;
+        if ( _Q_->Verbosity > 1 )
+        {
+            _Printf ( ( byte* ) "\nOpenVmTil : cfrTil comes with ABSOLUTELY NO WARRANTY; for details type `license' in the source directory." ) ;
+            _Printf ( ( byte* ) "\nType 'testCfrTil' or 'test' <tab><enter> and then 'demo' for starters" ) ;
+            _Printf ( ( byte* ) "\nType 'bye' to exit" ) ;
+        }
     }
 }
 

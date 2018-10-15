@@ -249,19 +249,6 @@ CfrTil_C_ConditionalExpression ( )
 }
 
 Boolean
-_C_Syntax_AreWeParsingACFunctionCall ( byte * nc )
-{
-    while ( *nc++ != ')' ) ;
-    while ( *nc )
-    {
-        if ( *nc == ';' ) return true ; // we have an rvalue
-        else if ( *nc == '{' ) return false ; // we have an rvalue
-        nc ++ ;
-    }
-    return true ;
-}
-
-Boolean
 C_Syntax_AreWeParsingACFunctionCall ( Lexer * lexer )
 {
     if ( ! GetState ( _Context_, C_SYNTAX | INFIX_MODE ) ) return false ;

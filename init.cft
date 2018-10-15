@@ -255,15 +255,23 @@ System
 #if Is_DebugOn
 dscOn //verbosity 3 =
 #endif
-: _assert0 ( n m ) { n @ m @ != } { nl location hex n @ p "!=" ps m @ p "<:" ps "Error!" adps _info _pause } { } ifElse ; //{ " ok" ps nl } ifElse ; // no "ok" with this word
-: _assert ( n m ) nl  nl "_assert ::" ps { n @ m @ != } { n @ p "!=" ps m @ p "<:" ps "Error!" adps _info _pause } { " ok" ps nl } ifElse ;
+'dbgTest 0 const
+#if dbgTest
+: debugTest3 1 2 + p <dbg> stack ;
+//' debugTest3 find wdiss
+: debugTest2 1 2 + p debugTest3 ;
+: debugTest1 1 2 + p debugTest2 ;
+: debugTest 1 2 + p debugTest1 ;
+: _assert1 ( n m str ) { debugTest n @ m @ != } { str @ ps "error" ps _info _pause } if ;
+#else
 : _assert1 ( n m str ) { n @ m @ != } { str @ ps "error" ps _info _pause } if ;
-: assert1 ( n m str ) { n @ m @ != } { nl str @ ps ":> got : " ps n @ p "!=" ps m @ p " : expected <:" ps "Error!" adps _info _pause } { str @ ps "ok\n" ps } ifElse ;
+#endif
+: _assert0 ( n m ) { n @ m @ != } { nl location hex n @ p "!=" ps m @ p "<:" ps "Error!" adps _info _pause } { } ifElse ; //{ str @ ps " : ok\n" ps nl } ifElse ; // no "ok" with this word
+: _assert ( n m ) nl  nl "_assert ::" ps { n @ m @ != } { n @ p "!=" ps m @ p "<:" ps "Error!" adps _info _pause } { " ok\n" ps nl } ifElse ;
 : assert1s ( s1 s2 str ) { s1 @ s2 @ strcmp } { nl str @ ps "error" ps _info _pause } if ;
-: _assert2 ( n m str ) { n @ m @ == } { str @ ps "ok" ps nl } { str @ ps "error" ps _info _pause } ifElse ; 
-: assert2 ( n m str ) { n @ m @ == } { nl str @ ps "ok" ps nl } { nl str @ ps "error" ps _info _pause } ifElse ;
 : assert0 ( n m ) { n @ m @ != } { nl "error" ps _info _pause } if ; 
 "assert" ' _assert1 find alias
+"assert1" ' _assert1 find alias
 "_assert" ' _assert0 find alias
 : _assertStkChk ( n m | str )  
     { verbosity @ }
@@ -379,4 +387,6 @@ bnOff
 2 + 7  assertStkChk // stack checking
 Shell
 //verbosity 0 =
+#if Is_DebugOn
 s
+#endif

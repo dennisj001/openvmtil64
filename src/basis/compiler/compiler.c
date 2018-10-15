@@ -212,7 +212,7 @@ CompileOptimizeInfo_New ( uint64 type )
 CompileOptimizeInfo *
 Compiler_CompileOptimizeInfo_PushNew ( Compiler * compiler )
 {
-    CompileOptimizeInfo * coi = CompileOptimizeInfo_New ( OBJECT_MEM ) ; //COMPILER_TEMP ) ;
+    CompileOptimizeInfo * coi = CompileOptimizeInfo_New ( COMPILER_TEMP ) ; //COMPILER_TEMP ) ;
     if ( coi )
     {
         List_Push ( compiler->OptimizeInfoList, ( dlnode* ) coi ) ;
@@ -342,7 +342,7 @@ Compiler_New ( uint64 type )
     compiler->GotoList = _dllist_New ( type ) ;
     compiler->OptimizeInfoList = _dllist_New ( type ) ;
     Compiler_Init ( compiler, 0 ) ;
-    Compiler_CompileOptimizeInfo_New ( compiler, type ) ;
+    Compiler_CompileOptimizeInfo_New ( compiler, COMPILER_TEMP ) ;
     return compiler ;
 }
 

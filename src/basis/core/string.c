@@ -205,7 +205,7 @@ String_ReadLineToken_HighLight ( byte * token )
 void
 _String_AppendConvertCharToBackSlash ( byte * dst, byte c, int64 * index ) //, int64 quoteMode )
 {
-    int64 i = index ? (* index) : 0 ;
+    int64 i = index ? ( * index ) : 0 ;
     if ( c < ' ' )
     {
         if ( _CfrTil_->SC_QuoteMode )
@@ -237,6 +237,7 @@ _String_AppendConvertCharToBackSlash ( byte * dst, byte c, int64 * index ) //, i
     //return &dst [ i ] ;
 }
 #if 0
+
 void
 _String_AppendConvertCharToBackSlash ( byte * dst, byte c )
 {
@@ -267,6 +268,7 @@ _String_AppendConvertCharToBackSlash ( byte * dst, byte c )
     //return &dst [ i ] ;
 }
 #endif
+
 byte *
 _String_ConvertStringFromBackSlash ( byte * dst, byte * src )
 {
@@ -485,6 +487,40 @@ Strncpy ( byte * dst, byte * src, int64 n )
 {
     int64 i ;
     for ( i = 0 ; src [i] && ( i < n ) ; i ++ ) dst[i] = src[i] ;
+}
+
+int64
+IsLValue_String_CheckForwardToStatementEnd ( byte * nc )
+{
+    while ( *nc )
+    {
+        switch ( *nc )
+        {
+            case '=':
+            {
+                if ( * ( nc + 1 ) == '=' ) return false ;
+                else if ( ispunct ( * ( nc - 1 ) ) ) return false ; // op equal
+                else return true ; // we have an lvalue
+            }
+            case ';': case ',': case '"': case '.': case '[': case '(': case '{': case '}': return false ;
+            default : ;
+        }
+        nc ++ ;
+    }
+    return false ;
+}
+
+Boolean
+_C_Syntax_AreWeParsingACFunctionCall ( byte * nc )
+{
+    while ( *nc ++ != ')' ) ;
+    while ( *nc )
+    {
+        if ( *nc == ';' ) return true ; // we have an rvalue
+        else if ( *nc == '{' ) return false ; // we have an rvalue
+        nc ++ ;
+    }
+    return true ;
 }
 
 byte *

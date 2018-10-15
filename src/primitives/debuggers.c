@@ -77,20 +77,11 @@ _CfrTil_DebugRuntimeBreakpoint ( )
         }
         else
         {
-            debugger->DebugAddress += 3 ;
+            debugger->DebugAddress += 3 ; // 3 : sizeof call rax insn
             SetState ( _Debugger_, ( DBG_AUTO_MODE | DBG_AUTO_MODE_ONCE ), false ) ;
-        } // 3 : sizeof call rax insn
+        } 
         _Debugger_InterpreterLoop ( debugger ) ;
         SetState ( debugger, DBG_BRK_INIT | DBG_RUNTIME_BREAKPOINT | DEBUG_SHTL_OFF, false ) ;
-        // we just stepped this word and used it's arguments in the source code ; if we just return the interpreter will attempt to interpret the arguments
-        // this is only accurate if we called into a leaf function with <dbg> from C
-        Word * word = debugger->w_Word ;
-        if ( ( ! word ) || GetState ( word, STEPPED ) )
-        {
-            SetState ( _Context_->CurrentEvalWord, STEPPED, true ) ;
-            Debugger_Off ( debugger, 1 ) ;
-            //siglongjmp ( _Context_->JmpBuf0, 1 ) ; //in Word_Run
-        }
     }
 }
 

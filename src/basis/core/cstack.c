@@ -9,7 +9,7 @@ Stack_Print_AValue_WordName ( Stack * stack, int64 i, byte * stackName, byte * b
     if ( word )
     {
         byte wname [ 128 ] ;
-        sprintf ( ( char* ) buffer, "< %s.%s >", word->ContainingNamespace ? ( char* ) word->ContainingNamespace->Name : "<literal>", c_gd ( _String_ConvertStringToBackSlash ( wname, word->Name, -1 ) ) ) ;
+        sprintf ( ( char* ) buffer, "< %s.%s >", word->ContainingNamespace ? ( char* ) word->ContainingNamespace->Name : "<literal>", c_gd ( _String_ConvertStringToBackSlash ( wname, word->Name, - 1 ) ) ) ;
         _Printf ( ( byte* ) "\n\t    %s   [ %3ld ] < " UINT_FRMT " > = " UINT_FRMT "\t%s", stackName, i, ( uint64 ) & stackPointer [ - i ], stackPointer [ - i ], word ? ( char* ) buffer : "" ) ;
     }
 }
@@ -43,7 +43,7 @@ _Stack_PrintHeader ( Stack * stack, byte * name )
 void
 _Stack_PrintValues ( byte * name, uint64 * stackPointer, int64 depth )
 {
-    int64 i ; 
+    int64 i ;
     byte * buffer = Buffer_New_pbyte ( BUFFER_SIZE ) ;
     if ( depth >= 0 ) for ( i = 0 ; depth -- > 0 ; i -- ) Stack_Print_AValue ( stackPointer, i, name, buffer ) ;
     else CfrTil_Exception ( STACK_UNDERFLOW, 0, QUIT ) ;
@@ -144,7 +144,7 @@ _Stack_PopOrTop ( Stack * stack )
 {
     int64 sd = Stack_Depth ( stack ) ;
     if ( sd <= 0 ) CfrTil_Exception ( STACK_UNDERFLOW, 0, QUIT ) ;
-    else if ( sd == 1 ) return _Stack_Top ( stack ) ;
+    else if ( sd == 1 ) return Stack_Top ( stack ) ;
     else return __Stack_Pop ( stack ) ;
 }
 
@@ -155,7 +155,7 @@ _Stack_DropN ( Stack * stack, int64 n )
 }
 
 int64
-_Stack_Top ( Stack * stack )
+Stack_Top ( Stack * stack )
 {
     return *stack->StackPointer ;
 }
@@ -241,7 +241,7 @@ _Stack_IntegrityCheck ( Stack * stack )
         return true ;
     }
     if ( _Stack_Overflow ( stack ) ) CfrTil_Exception ( STACK_OVERFLOW, c_da ( errorString ), QUIT ) ; //errorString = "\nStack Integrity Error : Stack Overflow" ;
-    else CfrTil_Exception ( STACK_UNDERFLOW, c_da ( errorString ), QUIT ) ;  //errorString = "\nStack Integrity Error : Stack Underflow" ;
+    else CfrTil_Exception ( STACK_UNDERFLOW, c_da ( errorString ), QUIT ) ; //errorString = "\nStack Integrity Error : Stack Underflow" ;
     return false ;
 }
 
@@ -340,14 +340,17 @@ void
 _CfrTil_PrintNReturnStack ( int64 size, Boolean useExistingFlag )
 {
     Debugger * debugger = _Debugger_ ;
-    if ( useExistingFlag && GetState ( debugger, DBG_STEPPING ) && debugger->CopyRSP )
+    if ( useExistingFlag )
     {
-        _PrintNStackWindow ( ( uint64* ) debugger->CopyRSP, ( byte * ) "ReturnStackCopy", ( byte * ) "RSCP", size ) ;
-    }
-    else if ( useExistingFlag && debugger->cs_Cpu->Rsp ) //debugger->DebugESP )
-    {
-        _PrintNStackWindow ( ( uint64* ) debugger->cs_Cpu->Rsp, ( byte * ) "Return Stack", ( byte * ) "Rsp (RSP)", size ) ;
-        _Stack_PrintValues ( ( byte* ) "DebugStack ", debugger->ReturnStack->StackPointer, Stack_Depth ( debugger->ReturnStack ) ) ;
+        if ( GetState ( debugger, DBG_STEPPING ) && debugger->CopyRSP )
+        {
+            _PrintNStackWindow ( ( uint64* ) debugger->CopyRSP, ( byte * ) "ReturnStackCopy", ( byte * ) "RSCP", size ) ;
+        }
+        else if ( debugger->cs_Cpu->Rsp ) //debugger->DebugESP )
+        {
+            _PrintNStackWindow ( ( uint64* ) debugger->cs_Cpu->Rsp, ( byte * ) "Return Stack", ( byte * ) "Rsp (RSP)", size ) ;
+            _Stack_PrintValues ( ( byte* ) "DebugStack ", debugger->ReturnStack->StackPointer, Stack_Depth ( debugger->ReturnStack ) ) ;
+        }
     }
     else
     {

@@ -288,7 +288,7 @@ LO_EndBlock ( )
     Compiler * compiler = _Context_->Compiler0 ;
     if ( _LC_ && _LC_->SavedCodeSpace )
     {
-        BlockInfo * bi = ( BlockInfo * ) _Stack_Top ( compiler->BlockStack ) ;
+        BlockInfo * bi = ( BlockInfo * ) Stack_Top ( compiler->BlockStack ) ;
         CfrTil_EndBlock ( ) ;
         if ( ! GetState ( _LC_, LC_COMPILE_MODE ) )
         {
@@ -306,7 +306,7 @@ LO_CheckEndBlock ( )
     Compiler * compiler = _Context_->Compiler0 ;
     if ( GetState ( compiler, LISP_COMBINATOR_MODE ) )
     {
-        int64 cii = _Stack_Top ( compiler->CombinatorInfoStack ) ;
+        int64 cii = Stack_Top ( compiler->CombinatorInfoStack ) ;
         CombinatorInfo ci ; // remember sizeof of CombinatorInfo = 4 bytes
         ci.CI_i32_Info = cii ;
         if ( ( lc->ParenLevel == ci.ParenLevel ) && ( Compiler_BlockLevel ( compiler ) > ci.BlockLevel ) )
@@ -321,7 +321,7 @@ _LO_CheckBeginBlock ( )
 {
     LambdaCalculus * lc = _LC_ ;
     Compiler * compiler = _Context_->Compiler0 ;
-    int64 cii = _Stack_Top ( compiler->CombinatorInfoStack ) ;
+    int64 cii = Stack_Top ( compiler->CombinatorInfoStack ) ;
     CombinatorInfo ci ; // remember sizeof of CombinatorInfo = 4 bytes
     ci.CI_i32_Info = cii ;
     if ( ( GetState ( compiler, LISP_COMBINATOR_MODE ) ) && ( lc->ParenLevel == ci.ParenLevel ) && ( Compiler_BlockLevel ( compiler ) == ci.BlockLevel ) )
@@ -336,7 +336,7 @@ _LO_CheckBegunBlock ( )
 {
     LambdaCalculus * lc = _LC_ ;
     Compiler * compiler = _Context_->Compiler0 ;
-    int32 cii = _Stack_Top ( compiler->CombinatorInfoStack ) ;
+    int32 cii = Stack_Top ( compiler->CombinatorInfoStack ) ;
     CombinatorInfo ci ; // remember sizeof of CombinatorInfo = 4 bytes
     ci.CI_i32_Info = cii ;
     if ( ( GetState ( compiler, LISP_COMBINATOR_MODE ) ) && ( lc->ParenLevel == ci.ParenLevel ) && ( Compiler_BlockLevel ( compiler ) > ci.BlockLevel ) )

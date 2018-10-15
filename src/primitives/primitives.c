@@ -550,8 +550,8 @@ CPrimitive CPrimitives [] = {
 
 MachineCodePrimitive MachineCodePrimitives [] = {
     { "_cwLocation", CPRIMITIVE | INTERPRET_DBG, 0, 0, ( byte* ) _Compile_WordCompiledAt_Location, - 1, "Debug", "Root" },
-    { "<dbg>", CPRIMITIVE, RT_STEPPING_DEBUG, 0, ( byte* ) _Compile_DebugRuntimeBreakpoint, - 1, "Debug", "Root" },
-    { "<dso>", CPRIMITIVE, RT_STEPPING_DEBUG, 0, ( byte* ) _Compile_DebugRuntimeBreakpoint_dso, - 1, "Debug", "Root" },
+    { "<dbg>", (CPRIMITIVE|DEBUG_WORD), RT_STEPPING_DEBUG, 0, ( byte* ) _Compile_DebugRuntimeBreakpoint, - 1, "Debug", "Root" },
+    { "<dso>", (CPRIMITIVE|DEBUG_WORD), RT_STEPPING_DEBUG, 0, ( byte* ) _Compile_DebugRuntimeBreakpoint_dso, - 1, "Debug", "Root" },
     { "rspReg", CPRIMITIVE, 0, 0, ( byte* ) _Compile_RspReg_Get, - 1, "System", "Root" },
     { "rspReg@", CPRIMITIVE, 0, 0, ( byte* ) _Compile_RspReg_Fetch, - 1, "System", "Root" },
     { ">rspReg", CPRIMITIVE, 0, 0, ( byte* ) _Compile_RspReg_To, - 1, "System", "Root" },

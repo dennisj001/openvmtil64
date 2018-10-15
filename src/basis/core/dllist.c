@@ -1,7 +1,7 @@
 #include "../../include/cfrtil64.h"
 
 dobject *
-_dllist_PushNew_M_Slot_Node ( dllist* list, int64 typeCode, int64 allocType, int64 m_slots, ... )
+_dllist_PushNew_M_Slot_Node (dllist* list, int64 allocType, int64 typeCode, int64 m_slots, ... )
 {
     int64 i ;
     va_list args ;
@@ -13,6 +13,21 @@ _dllist_PushNew_M_Slot_Node ( dllist* list, int64 typeCode, int64 allocType, int
 
     return dobj ;
 }
+
+#if 0
+dobject *
+_dllist_AddToTail_New_M_Slot_Node ( dllist* list, int64 typeCode, int64 allocType, int64 m_slots, ... )
+{
+    int64 i ;
+    va_list args ;
+    va_start ( args, m_slots ) ;
+    dobject * dobj = _dobject_Allocate ( typeCode, m_slots, allocType ) ;
+    for ( i = 0 ; i < m_slots ; i ++ ) dobj->do_iData[i] = va_arg ( args, int64 ) ;
+    va_end ( args ) ;
+    dllist_AddNodeToTail ( list, ( dlnode* ) dobj ) ;
+    return dobj ;
+}
+#endif
 
 inline
 void
@@ -136,28 +151,28 @@ inline
 void
 List_Push_1Value_NewNode_T_WORD ( dllist *list, int64 value, int64 allocType )
 {
-    _dllist_PushNew_M_Slot_Node ( list, T_WORD, allocType, 1, value ) ;
+    _dllist_PushNew_M_Slot_Node (list, allocType, T_WORD, 1, value ) ;
 }
 
 inline
 void
 _List_PushNew_ForWordList ( dllist *list, Word * word, int64 inUseFlag )
 {
-    _dllist_PushNew_M_Slot_Node ( list, T_WORD, SESSION, SCN_NUMBER_OF_SLOTS, ( ( int64 ) word ), word->W_SC_Index, inUseFlag ) ;
+    _dllist_PushNew_M_Slot_Node (list, COMPILER_TEMP, T_WORD, SCN_NUMBER_OF_SLOTS, ( ( int64 ) word ), word->W_SC_Index, inUseFlag ) ;
 }
 
 inline
 void
-_List_PushNew_1Value ( dllist *list, int64 typeCode, int64 value, int64 allocType )
+_List_PushNew_1Value (dllist *list, int64 allocType , int64 typeCode, int64 value)
 {
-    _dllist_PushNew_M_Slot_Node ( list, typeCode, allocType, 1, value ) ;
+    _dllist_PushNew_M_Slot_Node (list, allocType, typeCode, 1, value ) ;
 }
 
 inline
 void
 List_PushNew_T_WORD ( dllist *list, int64 value, int64 allocType )
 {
-    _List_PushNew_1Value ( list, T_WORD, allocType, value ) ;
+    _List_PushNew_1Value (list, value , T_WORD, allocType) ;
 }
 
 void

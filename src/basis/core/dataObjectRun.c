@@ -27,14 +27,8 @@ _DataObject_Run ( Word * word0 )
         if ( ! GetState ( cntx->Compiler0, LC_CFRTIL ) ) _CfrTil_Do_LispSymbol ( word ) ;
         else _CfrTil_Do_Variable ( word ) ;
     }
-    else if ( word->CAttribute & DOBJECT )
-    {
-        CfrTil_Do_DynamicObject ( word, ACC ) ;
-    }
-    else if ( word->CAttribute & ( LITERAL | CONSTANT ) )
-    {
-        _CfrTil_Do_Literal ( word ) ;
-    }
+    else if ( word->CAttribute & DOBJECT ) CfrTil_Do_DynamicObject ( word, ACC ) ;
+    else if ( word->CAttribute & ( LITERAL | CONSTANT ) ) _CfrTil_Do_Literal ( word ) ;
     else if ( word->CAttribute & OBJECT_FIELD )
     {
         _CfrTil_Do_ClassField ( word ) ;
@@ -45,18 +39,12 @@ _DataObject_Run ( Word * word0 )
         _CfrTil_Do_Variable ( word ) ;
         if ( ( ! Lexer_IsTokenForwardDotted ( cntx->Lexer0 ) ) && ( ! GetState ( cntx->Compiler0, LC_ARG_PARSING ) ) ) cntx->Interpreter0->BaseObject = 0 ;
     }
-    else if ( word->CAttribute & ( C_TYPE | C_CLASS ) )
-    {
-        _Namespace_Do_C_Type ( word ) ;
-    }
+    else if ( word->CAttribute & ( C_TYPE | C_CLASS ) ) _Namespace_Do_C_Type ( word ) ;
     else if ( ns->CAttribute & ( NAMESPACE ) ) //| CLASS | CLASS_CLONE ) )
     {
         _Namespace_DoNamespace ( ns, 1 ) ; // namespaces are the only word that needs to run the word set DObject Compile_SetCurrentlyRunningWord_Call_TestRSP created word ??
     }
-    else if ( word->CAttribute & ( CLASS | CLASS_CLONE ) )
-    {
-        _Namespace_DoNamespace ( word, 0 ) ;
-    }
+    else if ( word->CAttribute & ( CLASS | CLASS_CLONE ) ) _Namespace_DoNamespace ( word, 0 ) ;
 }
 
 void
@@ -114,16 +102,8 @@ _Namespace_Do_C_Type ( Namespace * ns )
                     _Namespace_ActivateAsPrimary ( ns ) ;
                     Word * word = Word_New ( token1 ) ; // "("
                     DataStack_Push ( ( int64 ) word ) ;
-#if 0                    
-                    beginWord = _CfrTil_->BeginBlockWord ;
-                    Block_Eval ( beginWord->Definition ) ; //( beginWord ) ;
-                    CfrTil_LocalsAndStackVariablesBegin ( ) ;
-                    CfrTil_WordList_PushWord ( beginWord ) ;
-                    Word_SetCodingHere_And_ClearPreviousUseOf_Here_SCA ( beginWord, 0 ) ;
-#else                    
                     CfrTil_BeginBlock ( ) ; // nb! before CfrTil_LocalsAndStackVariablesBegin
                     CfrTil_LocalsAndStackVariablesBegin ( ) ;
-#endif                    
                     Ovt_AutoVarOn ( ) ;
                     do
                     {
@@ -197,27 +177,16 @@ _CfrTil_Do_ClassField ( Word * word )
     compiler->ArrayEnds = 0 ;
     byte * accumulatedAddress ;
 
-    if ( word->Offset )
-    {
-        Compiler_IncrementCurrentAccumulatedOffset ( compiler, word->Offset ) ;
-    }
+    if ( word->Offset ) Compiler_IncrementCurrentAccumulatedOffset ( compiler, word->Offset ) ;
     if ( ! ( ( CompileMode ) || GetState ( compiler, LC_ARG_PARSING ) ) )
     {
         accumulatedAddress = ( byte* ) TOS ; //_DataStack_Pop ( ) ;
         accumulatedAddress += word->Offset ;
-        //TOS += word->Offset ;
-#if 1       
-        //if ( GetState ( cntx, C_SYNTAX ) && ( (!compiler->LHS_Word) && (!(Is_LValue ( cntx, word ) )) ) && ( ! GetState ( cntx, ADDRESS_OF_MODE ) ) )
-        //if ( GetState ( cntx, C_SYNTAX ) && (!compiler->LHS_Word) && (!Lexer_IsLValue_CheckBackToLastSemiForParenOrBracket ( _Lexer_, word ) )&& ( ! GetState ( cntx, ADDRESS_OF_MODE ) ) )
         if ( GetState ( cntx, C_SYNTAX ) && ( ! Lexer_IsLValue_CheckBackToLastSemiForParenOrBracket ( _Lexer_, word ) ) && ( ! GetState ( cntx, ADDRESS_OF_MODE ) ) )
         {
             TOS = ( * ( int64* ) accumulatedAddress ) ; // C rlvalue
         }
-        else
-        {
-            TOS = ( uint64 ) accumulatedAddress ; // C lvalue
-        }
-#endif        
+        else TOS = ( uint64 ) accumulatedAddress ; // C lvalue
     }
     if ( Lexer_IsTokenForwardDotted ( cntx->Lexer0 ) ) Finder_SetQualifyingNamespace ( cntx->Finder0, word->ClassFieldTypeNamespace ) ;
 }
@@ -235,15 +204,8 @@ CfrTil_Dot ( ) // .
         Word * word = Compiler_PreviousNonDebugWord ( 0 ) ; // 0 : rem: we just popped the WordStack above
         if ( word )
         {
-            if ( word->CAttribute & NAMESPACE_TYPE )
-            {
-                Finder_SetQualifyingNamespace ( cntx->Finder0, word ) ;
-            }
-            else
-            {
-                //Compiler_Init_AccumulatedOffsetPointers ( cntx->Compiler0, word ) ;
-                cntx->Interpreter0->BaseObject = word ;
-            }
+            if ( word->CAttribute & NAMESPACE_TYPE ) Finder_SetQualifyingNamespace ( cntx->Finder0, word ) ;
+            else cntx->Interpreter0->BaseObject = word ;
         }
     }
 }
@@ -286,14 +248,8 @@ _Namespace_DoNamespace ( Namespace * ns, int64 immFlag )
     {
         _Compile_C_Call_1_Arg ( ( byte* ) _Namespace_DoNamespace, ( int64 ) ns ) ;
     }
-    if ( ! Lexer_IsTokenForwardDotted ( cntx->Lexer0 ) )
-    {
-        _Namespace_ActivateAsPrimary ( ns ) ;
-    }
-    else
-    {
-        Finder_SetQualifyingNamespace ( cntx->Finder0, ns ) ;
-    }
+    if ( ! Lexer_IsTokenForwardDotted ( cntx->Lexer0 ) ) _Namespace_ActivateAsPrimary ( ns ) ;
+    else Finder_SetQualifyingNamespace ( cntx->Finder0, ns ) ;
     cntx->Interpreter0->BaseObject = 0 ;
 }
 
@@ -329,16 +285,8 @@ void
 CfrTil_Do_DynamicObject ( DObject * dobject0, Boolean reg )
 {
     DObject * dobject = _CfrTil_Do_DynamicObject_ToReg ( dobject0, reg ) ;
-    if ( CompileMode )
-    {
-        //CfrTil_WordLists_PopWord ( ) ;
-        //dobject0 = Compiler_CopyDuplicatesAndPush ( dobject ) ;
-        _Word_CompileAndRecord_PushReg ( dobject0, reg ) ;
-    }
-    else
-    {
-        DataStack_Push ( ( int64 ) & dobject->W_Value ) ; //& dobject->W_DObjectValue ) ; //dobject ) ;
-    }
+    if ( CompileMode ) _Word_CompileAndRecord_PushReg ( dobject0, reg ) ;
+    else DataStack_Push ( ( int64 ) & dobject->W_Value ) ; //& dobject->W_DObjectValue ) ; //dobject ) ;
 }
 
 void
