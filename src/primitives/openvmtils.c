@@ -144,6 +144,7 @@ OVT_StartupMessage ( )
             _Printf ( ( byte* ) "\nType 'bye' to exit" ) ;
         }
     }
+    if ( ! _Q_->Verbosity ) _Q_->Verbosity = 1 ;
 }
 
 void

@@ -153,11 +153,20 @@ Compiler_SetStandardPreHere_ForDebugDisassembly ( Compiler * compiler )
     else if ( optInfo->wordArg2 ) SetPreHere_ForDebug ( optInfo->wordArg2->Coding ) ;
 }
 
+#if 0
+void
+Compiler_Typecheck ( Compiler * compiler )
+{
+    CompileOptimizeInfo * optInfo = compiler->OptInfo ;
+}
+#endif
+
 void
 Compiler_OptimizeForOp ( Compiler * compiler )
 {
     CompileOptimizeInfo * optInfo = compiler->OptInfo ;
     Compiler_SetStandardPreHere_ForDebugDisassembly ( compiler ) ;
+    // Compiler_Typecheck ( compiler ) ;
     Compiler_SetupArgsToStandardLocations ( compiler ) ;
     if ( optInfo->opWord->CAttribute & ( CATEGORY_OP_STORE ) ) Compile_Optimize_Store ( compiler ) ;
     else if ( optInfo->opWord->CAttribute & ( CATEGORY_OP_EQUAL ) ) Compile_Optimize_Equal ( compiler ) ;

@@ -113,11 +113,9 @@ Emit ( byte c )
 void
 Context_DoPrompt ( Context * cntx )
 {
-#if 1   
     int x = 0, y = 0 ;
     getCursor ( &x, &y ) ;
     if ( x > Strlen ( ( char* ) _ReadLiner_->Prompt ) ) _Printf ( (byte*) "\n" ) ;
-#endif    
     _Printf ( ( byte* ) "%s", ( char* ) cntx->ReadLiner0->NormalPrompt ) ; // for when including files
 }
 

@@ -34,19 +34,25 @@ void
 _Stack_PrintHeader ( Stack * stack, byte * name )
 {
     int64 size = Stack_Depth ( stack ) ;
-    uint64 * sp = stack->StackPointer ; // 0 based stack
-    byte * location = c_gd ( Context_Location ( ) ) ;
-    _Printf ( ( byte* ) "\nStack at : %s :\n%s depth =%4d : %s = Top = " UINT_FRMT ", InitialTos = " UINT_FRMT ", Size = " UINT_FRMT, location,
-        name, size, stack == _DataStack_ ? "Dsp (R14)" : _ReturnStack_ ? "CfrTilRsp (Rbx)" : "", ( int64 ) sp, ( int64 ) stack->InitialTosPointer, stack->StackMax - stack->StackMin + 1 ) ;
+    if ( size )
+    {
+        uint64 * sp = stack->StackPointer ; // 0 based stack
+        byte * location = c_gd ( Context_Location ( ) ) ;
+        _Printf ( ( byte* ) "\nStack at : %s :\n%s depth =%4d : %s = Top = " UINT_FRMT ", InitialTos = " UINT_FRMT ", Size = " UINT_FRMT, location,
+            name, size, stack == _DataStack_ ? "Dsp (R14)" : _ReturnStack_ ? "CfrTilRsp (Rbx)" : "", ( int64 ) sp, ( int64 ) stack->InitialTosPointer, stack->StackMax - stack->StackMin + 1 ) ;
+    }
 }
 
 void
 _Stack_PrintValues ( byte * name, uint64 * stackPointer, int64 depth )
 {
-    int64 i ;
-    byte * buffer = Buffer_New_pbyte ( BUFFER_SIZE ) ;
-    if ( depth >= 0 ) for ( i = 0 ; depth -- > 0 ; i -- ) Stack_Print_AValue ( stackPointer, i, name, buffer ) ;
-    else CfrTil_Exception ( STACK_UNDERFLOW, 0, QUIT ) ;
+    if ( depth )
+    {
+        int64 i ;
+        byte * buffer = Buffer_New_pbyte ( BUFFER_SIZE ) ;
+        if ( depth >= 0 ) for ( i = 0 ; depth -- > 0 ; i -- ) Stack_Print_AValue ( stackPointer, i, name, buffer ) ;
+        else CfrTil_Exception ( STACK_UNDERFLOW, 0, QUIT ) ;
+    }
 }
 
 void
@@ -60,7 +66,7 @@ _Stack_Print ( Stack * stack, byte * name, int64 depth )
 {
     _Stack_PrintHeader ( stack, name ) ;
     Stack_PrintValues ( name, stack, depth ) ;
-    CfrTil_NewLine ( ) ;
+    if ( depth ) CfrTil_NewLine ( ) ;
 }
 
 void

@@ -84,7 +84,7 @@ typedef struct _dllist
 #define tail before_ptr
 enum types
 {
-    BOOL, BYTE, INTEGER, STRING, BIGNUM, FLOAT, POINTER, XCODE, WORD, WORD_LOCATION, ARROW, PRODUCT
+    BOOL, BYTE, INTEGER, STRING, BIGNUM, FLOAT, POINTER, X64CODE, WORD, WORD_LOCATION, ARROW, PRODUCT
 } ;
 typedef struct _dobject
 {
@@ -178,6 +178,7 @@ typedef struct
         AttributeInfo n_Attributes ;
         type n_type ; // for future dynamic types and dynamic objects 
     } ;
+    uint64 n_SimpleType ;
 } DLNode, Node, listNode, list ;
 
 #define afterNode n_After 

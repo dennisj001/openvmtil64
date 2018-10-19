@@ -139,8 +139,13 @@ BigNum_StateShow ( )
 void
 BigNum_Init ( )
 {
+#if 16    
     BN_SetDefaultBitPrecision ( 16 ) ;
     _Context_->System0->BigNum_Printf_Width = 16 ;
+#else
+    BN_SetDefaultBitPrecision ( 0 ) ;
+    _Context_->System0->BigNum_Printf_Width = 0 ;
+#endif    
 }
 #if 0
 

@@ -386,7 +386,7 @@ stringMacrosOff
 bnOff
 2 + 7  assertStkChk // stack checking
 Shell
-//verbosity 0 =
 #if Is_DebugOn
 s
 #endif
+//verbosity 0 =

@@ -178,80 +178,34 @@ _ShellEscape ( char * str )
     }
 #endif    
     if ( _Q_->Verbosity > 1 ) printf ( ( char* ) c_gd ( "\n_ShellEscape : command = \"%s\" : returned %d.\n" ), str, status ) ;
+    fflush (stdout) ;
+}
+
+void
+ShellEscape ( byte * str )
+{
+    //byte * str = ( byte* ) DataStack_Pop ( ) ;
+    _ShellEscape ( ( char* ) str ) ;
+    NewLine ( _Context_->Lexer0 ) ;
+    SetState ( _Context_->Lexer0, LEXER_DONE, true ) ;
 }
 
 void
 ShellEscape_Postfix ( )
 {
     byte * str = ( byte* ) DataStack_Pop ( ) ;
-    _ShellEscape ( ( char* ) str ) ;
-    NewLine ( _Context_->Lexer0 ) ;
-    SetState ( _Context_->Lexer0, LEXER_DONE, true ) ;
+    ShellEscape ( ( char* ) str ) ;
 }
-
-#if 0
 
 void
 shell ( )
 {
-    //ReadLiner * rl = _Context_->ReadLiner0 ;
-    //CString str = String_New ( ( CString ) & rl->InputLine [rl->ReadIndex], TEMPORARY ) ;
-    byte * str = _String_Get_ReadlineString_ToEndOfLine ( ) ;
-    char * semi, *nl ;
-    ReadLine_RunInit ( _ReadLiner_ ) ;
-    SetState ( _Lexer_, END_OF_FILE | END_OF_STRING | LEXER_END_OF_LINE, false ) ;
-    if ( semi = strchr ( str, ';' ) ) *semi = 0 ;
-    if ( nl = strchr ( str, '\n' ) ) *nl = 0 ;
-    _ShellEscape ( ( char* ) str ) ;
-    SetState ( _Context_->Interpreter0, DONE, true ) ; // 
-}
-
-#elif 1 // designed to be parallel to '$' in c_syntax.cft to compare the compiler output
-
-void
-shell ( )
-{
-#if 0    
-    Lexer * lexer = _Lexer_ ;
-    sprintf ( buffer, "%s", "" ) ;
-    SetState ( lexer, END_OF_FILE | END_OF_STRING | LEXER_END_OF_LINE, false ) ;
-    do
-    {
-        while ( atoken = _Lexer_PeekNextNonDebugTokenWord ( lexer, 0 ) )
-        {
-            if ( GetState ( lexer, END_OF_FILE | END_OF_STRING | LEXER_END_OF_LINE ) )
-            {
-                if ( String_Equal ( atoken, ";" ) ) Lexer_ReadToken ( lexer ) ;
-                break ;
-            }
-            atoken = Lexer_ReadToken ( lexer ) ;
-
-            if ( ! String_Equal ( atoken, ";" ) )
-            {
-                strcat ( buffer, atoken ) ;
-                if ( strcmp ( atoken, "." ) )
-                {
-                    strcat ( buffer, " " ) ;
-                }
-            }
-            else break ;
-        }
-        _ShellEscape ( buffer ) ;
-    }
-    while ( ! GetState ( _Context_->Lexer0, END_OF_FILE | END_OF_STRING | LEXER_END_OF_LINE ) ) ;
-done:
-    SetState ( lexer, END_OF_FILE | END_OF_STRING | LEXER_END_OF_LINE, false ) ;
-    SetState ( _Interpreter_, INTERPRETER_DONE, true ) ;
-#else
     char * semi, *nl ;
     byte * str = _String_Get_ReadlineString_ToEndOfLine ( ) ;
     if ( semi = strchr ( str, ';' ) ) *semi = 0 ;
     if ( nl = strchr ( str, '\n' ) ) *nl = 0 ;
-    _ShellEscape ( str ) ;
-
-#endif
+    ShellEscape ( str ) ;
 }
-#endif
 
 void
 CfrTil_Filename ( )

@@ -291,7 +291,7 @@ _CalculateRex ( _reg rm rex_w_flag | rex )
     if ( rm > 0x7 ) rex += 1 ;
     if ( rex ) rex |= 0x40 ;
     return rex ;
-#else // from original C code
+#else // from original C code and testing new '?' conditional expression
     //rex = ( ( rex_w_flag ? 8 : 0 ) | ( ( _reg > 7 ) ? 4 : 0 ) | ( ( rm > 7 ) ? 1 : 0 ) ) ;
     rex = ( rex_w_flag ? 8 : 0 ) | ( ( _reg > 7 ) ? 4 : 0 ) | ( ( rm > 7 ) ? 1 : 0 ) ;
     if ( rex ) rex |= 0x40 ;

@@ -1,5 +1,5 @@
 #include "../include/cfrtil64.h"
-#define VERSION ((byte*) "0.866.430" ) 
+#define VERSION ((byte*) "0.866.500" ) 
 
 OpenVmTil * _Q_ ;
 
@@ -98,6 +98,7 @@ OpenVmTil_Delete ( OpenVmTil * ovt )
     }
     _Q_ = 0 ;
 }
+#if 0
 #define _CFRTIL_SIZE (82 * K) // data stack included here
 
 void
@@ -194,6 +195,7 @@ _OpenVmTil_CalculateMemSpaceSizes ( OpenVmTil * ovt, int64 restartCondition, int
     ovt->StringSpaceSize = stringSpaceSize ;
     ovt->OpenVmTilSize = openVmTilSize ;
 }
+#endif
 
 void
 OVT_GetStartupOptions ( OpenVmTil * ovt )
@@ -224,14 +226,16 @@ OVT_GetStartupOptions ( OpenVmTil * ovt )
 OpenVmTil *
 _OpenVmTil_New ( OpenVmTil * ovt, int64 argc, char * argv [ ] )
 {
-    char errorFilename [256] ;
-    int64 restartCondition, startIncludeTries, exceptionsHandled ;
+    //char errorFilename [256] ;
+    int64 restartCondition, exceptionsHandled ; //, startIncludeTries
     if ( ! ovt )
     {
         restartCondition = INITIAL_START ; 
     }
     else restartCondition = FULL_RESTART ;
 
+
+#if 0
     startIncludeTries = ovt ? ovt->StartIncludeTries ++ : 0 ;
     if ( startIncludeTries < 2 )
     {
@@ -241,9 +245,7 @@ _OpenVmTil_New ( OpenVmTil * ovt, int64 argc, char * argv [ ] )
     }
     else errorFilename [ 0 ] = 0 ;
     //restartCondition = ( ovt && ( restartCondition || ( startIncludeTries < 2 ) ) ) ? ovt->RestartCondition : RESTART ;
-
     int64 ium = ovt ? ovt->OVT_InitialUnAccountedMemory : 0, ovtv = ovt ? ovt->Verbosity : 0 ;
-
     if ( ovt && ( restartCondition < INITIAL_START ) && ( ovt->Restarts < 2 )) OpenVmTil_Delete ( ovt ) ;
     else if ( ovt )
     {
@@ -256,9 +258,12 @@ _OpenVmTil_New ( OpenVmTil * ovt, int64 argc, char * argv [ ] )
         printf ( ( byte* ) "\nTotal Mem Remaining = %9lld : <=: mmap_TotalMemAllocated - mmap_TotalMemFreed - ovt->OVT_InitialUnAccountedMemory", mmap_TotalMemAllocated - mmap_TotalMemFreed - ium ) ;
             fflush ( stdout ) ;
     } )
+#else
+    if ( ovt ) OpenVmTil_Delete ( ovt ) ;
+#endif        
     _Q_ = ovt = _OpenVmTil_Allocate ( ) ;
 
-    ovt->RestartCondition = restartCondition ; //FULL_RESTART ;
+    ovt->RestartCondition = restartCondition ; 
     ovt->Argc = argc ;
     ovt->Argv = argv ;
     //ovt->SavedTerminalAttributes = savedTerminalAttributes ;
@@ -276,7 +281,7 @@ _OpenVmTil_New ( OpenVmTil * ovt, int64 argc, char * argv [ ] )
 
     _OpenVmTil_Init ( ovt, exceptionsHandled > 1 ) ; // try to keep history if we can
     Linux_SetupSignals ( &ovt->JmpBuf0, 1 ) ;
-    if ( startIncludeTries ) ovt->ErrorFilename = String_New ( ( byte* ) errorFilename, STRING_MEM ) ;
+    //if ( startIncludeTries ) ovt->ErrorFilename = String_New ( ( byte* ) errorFilename, STRING_MEM ) ;
     return ovt ;
 }
 

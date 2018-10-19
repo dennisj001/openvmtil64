@@ -536,11 +536,12 @@ _dllist_Get_N_Node ( dllist * list, int64 n )
 int64
 _dllist_Get_N_InUse_Node_M_Slot ( dllist * list, int64 n, int64 m )
 {
-    dlnode * node ;
-    for ( node = dllist_First ( ( dllist* ) list ) ; node ; node = dlnode_Next ( node ) ) // nb. this is a little subtle
+    dlnode * node, *nextNode ;
+    for ( node = dllist_First ( ( dllist* ) list ) ; node ; node = nextNode ) // nb. this is a little subtle
     {
+        nextNode = dlnode_Next ( node ) ;
         if ( dobject_Get_M_Slot ( ( dobject* ) node, SCN_IN_USE_FLAG ) ) n -- ;
-        if ( n < 0 ) break ;
+        if ( ( n < 0 ) || ( node == nextNode ) ) break ;
     }
     return node ? dobject_Get_M_Slot ( ( dobject* ) node, m ) : 0 ; // LIST_EMPTY
 }

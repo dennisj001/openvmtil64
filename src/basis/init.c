@@ -28,7 +28,6 @@ _CfrTil_Init_SessionCore ( CfrTil * cfrTil, int64 cntxDelFlag, int64 promptFlag 
     OVT_FreeTempMem ( ) ;
     CfrTil_CheckInitDataStack ( ) ;
     OVT_StartupMessage ( ) ;
-    if ( ! _Q_->Verbosity ) _Q_->Verbosity = 1 ;
     _OVT_Ok ( promptFlag ) ;
     cfrTil->SC_QuoteMode = 0 ;
     SC_Global_Off ;
