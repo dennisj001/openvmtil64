@@ -245,14 +245,6 @@ CompileOptInfo_NewCopy ( CompileOptimizeInfo * optInfo, uint64 type )
     MemCpy ( copyOptInfo, optInfo, sizeof (CompileOptimizeInfo ) ) ;
     return copyOptInfo ;
 }
-#if 0
-
-void
-CompileoptInfo_Delete ( CompileOptimizeInfo * optInfo )
-{
-    Mem_FreeItem ( &_Q_->PermanentMemList, ( byte* ) optInfo ) ;
-}
-#endif
 
 int64
 Compiler_BlockLevel ( Compiler * compiler )
@@ -322,7 +314,8 @@ Compiler_Init ( Compiler * compiler, uint64 state )
     _dllist_Init ( compiler->RegisterParameterList ) ;
     _dllist_Init ( compiler->OptimizeInfoList ) ;
     _Compiler_FreeAllLocalsNamespaces ( compiler ) ;
-    // CfrTil_RecycleWordList ( 0 ) ;
+    //Compiler_CompileOptimizeInfo_New ( compiler, COMPILER_TEMP ) ;
+    Compiler_CompileOptimizeInfo_PushNew ( compiler ) ;
     SetBuffersUnused ( 1 ) ;
     SetState ( compiler, VARIABLE_FRAME, false ) ;
 }
@@ -342,7 +335,6 @@ Compiler_New ( uint64 type )
     compiler->GotoList = _dllist_New ( type ) ;
     compiler->OptimizeInfoList = _dllist_New ( type ) ;
     Compiler_Init ( compiler, 0 ) ;
-    Compiler_CompileOptimizeInfo_New ( compiler, COMPILER_TEMP ) ;
     return compiler ;
 }
 

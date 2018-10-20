@@ -82,6 +82,7 @@ Word *
 Lexer_ObjectToken_New ( Lexer * lexer, byte * token ) //, int64 parseFlag )
 {
     Word * word = 0 ;
+    byte * token2 ;
     if ( token )
     {
         Lexer_ParseObject ( lexer, token ) ;
@@ -90,6 +91,11 @@ Lexer_ObjectToken_New ( Lexer * lexer, byte * token ) //, int64 parseFlag )
             if ( GetState ( _Q_, AUTO_VAR ) ) // make it a 'variable' 
             {
                 word = DataObject_New ( NAMESPACE_VARIABLE, 0, token, NAMESPACE_VARIABLE, 0, 0, 0, 0, 0, 0, - 1 ) ;
+                if ( Compiling && GetState ( _Context_, C_SYNTAX ) )
+                {
+                    token2 = Lexer_PeekNextNonDebugTokenWord ( lexer, 1 ) ;
+                    if ( ! String_Equal ( token2, "=" ) ) return 0 ; // don't interpret this word
+                }
             }
             else
             {
@@ -102,6 +108,11 @@ Lexer_ObjectToken_New ( Lexer * lexer, byte * token ) //, int64 parseFlag )
         else
         {
             word = DataObject_New ( LITERAL, 0, token, 0, 0, 0, 0, lexer->Literal, 0, 0, - 1 ) ;
+        }
+        if ( word )
+        {
+            word->W_SC_Index = lexer->SC_Index ;
+            word->W_RL_Index = lexer->TokenStart_ReadLineIndex ;
         }
         lexer->TokenWord = word ;
     }
@@ -941,6 +952,7 @@ Lexer_CheckForwardToStatementEnd_LValue ( Lexer * lexer, Word * word )
 }
 
 // assuming no comments
+
 Boolean
 Lexer_IsLValue_CheckBackToLastSemiForParenOrBracket ( Lexer * lexer, Word * word )
 {
@@ -996,7 +1008,7 @@ Is_LValue ( Context * cntx, Word * word )
         {
             if ( ( word->CAttribute & ( OBJECT | THIS | QID ) ) || GetState ( word, QID ) )
                 isLValue = Lexer_IsLValue_CheckForwardToNextSemiForArrayVariable ( cntx->Lexer0, word ) ;
-            else isLValue = Lexer_CheckForwardToStatementEnd_LValue ( cntx->Lexer0, word ) ; 
+            else isLValue = Lexer_CheckForwardToStatementEnd_LValue ( cntx->Lexer0, word ) ;
         }
     }
     return isLValue ;

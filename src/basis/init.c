@@ -10,6 +10,7 @@ _CfrTil_Init_SessionCore ( CfrTil * cfrTil, int64 cntxDelFlag, int64 promptFlag 
     int64 i ;
     CfrTil_LogOff ( ) ;
     CfrTil_DbgSourceCodeOff ( ) ;
+    OVT_FreeTempMem ( ) ;
     _System_Init ( cntx->System0 ) ;
     ReadLine_Init ( cntx->ReadLiner0, _CfrTil_Key ) ;
     Lexer_Init ( cntx->Lexer0, 0, 0, CONTEXT ) ;
@@ -22,10 +23,9 @@ _CfrTil_Init_SessionCore ( CfrTil * cfrTil, int64 cntxDelFlag, int64 promptFlag 
         int64 stackDepth = Stack_Depth ( cfrTil->ContextDataStack ) ;
         for ( i = 0 ; i < stackDepth ; i ++ ) CfrTil_Context_PopDelete ( cfrTil ) ;
     }
-   // LC_New ( ) ;
     LC_Init_Runtime ( ) ;
     LC_LispNamespacesOff () ;
-    OVT_FreeTempMem ( ) ;
+    //OVT_FreeTempMem ( ) ; // -> above, before inits
     CfrTil_CheckInitDataStack ( ) ;
     OVT_StartupMessage ( ) ;
     _OVT_Ok ( promptFlag ) ;

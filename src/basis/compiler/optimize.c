@@ -59,7 +59,7 @@ Compiler_GetOptimizeState ( Compiler * compiler, Word * word )
 {
     if ( word )
     {
-        CompileOptimizeInfo * optInfo ; //, *svOptInfo = compiler->OptInfo ;
+        CompileOptimizeInfo * optInfo ; 
         int64 state = compiler->OptInfo->State ;
         compiler->OptInfo = Compiler_CompileOptimizeInfo_PushNew ( compiler ) ;
         optInfo = compiler->OptInfo ;
@@ -154,6 +154,7 @@ Compiler_SetStandardPreHere_ForDebugDisassembly ( Compiler * compiler )
 }
 
 #if 0
+
 void
 Compiler_Typecheck ( Compiler * compiler )
 {
@@ -533,22 +534,25 @@ Compile_Optimize_OpEqual ( Compiler * compiler )
 Word *
 Compile_Optimize_EqualCheck ( Compiler * compiler )
 {
-    //int64 depth = List_Depth ( compiler->OptimizeInfoList ) ;
-    CompileOptimizeInfo * coi = ( COI * ) List_Pick ( compiler->OptimizeInfoList, 1 ) ;
-    Word * word ;
-    dlnode * node, *nextNode ;
-    if ( coi && ( coi->NumberOfArgs == 2 ) )
+    int64 depth = List_Depth ( compiler->OptimizeInfoList ) ;
+    if ( depth )
     {
-        for ( node = coi->wordArg1Node ; node && ( nextNode = dlnode_Next ( node ) ) ; node = nextNode )
+        CompileOptimizeInfo * coi = ( COI * ) List_Pick ( compiler->OptimizeInfoList, 1 ) ;
+        Word * word ;
+        dlnode * node, *nextNode ;
+        if ( coi && ( coi->NumberOfArgs == 2 ) )
         {
-            word = ( Word* ) dobject_Get_M_Slot ( ( dobject* ) nextNode, SCN_T_WORD ) ;
-            if ( word->CAttribute & ( LOCAL_VARIABLE | PARAMETER_VARIABLE ) )
+            for ( node = coi->wordArg1Node ; node && ( nextNode = dlnode_Next ( node ) ) ; node = nextNode )
             {
-                if ( word->CAttribute & REGISTER_VARIABLE )
+                word = ( Word* ) dobject_Get_M_Slot ( ( dobject* ) nextNode, SCN_T_WORD ) ;
+                if ( word->CAttribute & ( LOCAL_VARIABLE | PARAMETER_VARIABLE ) )
                 {
-                    return compiler->OptInfo->wordArg0_ForOpEqual = word ;
+                    if ( word->CAttribute & REGISTER_VARIABLE )
+                    {
+                        return compiler->OptInfo->wordArg0_ForOpEqual = word ;
+                    }
+                    break ;
                 }
-                break ;
             }
         }
     }

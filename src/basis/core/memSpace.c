@@ -659,19 +659,7 @@ DLList_RemoveWords ( dllist * list )
 void
 _CheckCodeSpaceForRoom ( int64 memDesired )
 {
-#if 0    
-    if ( ( _Q_CodeByteArray == _Q_CodeSpace->ba_CurrentByteArray ) && ( _Q_CodeByteArray->OurNBA->ba_CurrentByteArray->MemRemaining < ( memDesired ) ) )
-    {
-        if ( Compiling )
-        {
-            _Printf ( ( byte* ) "\nLess than %ld of code space remaining : this will may want to increase the 'codeSize' variable in openvmtil.c\n", memDesired ) ;
-            Pause ( ) ;
-        }
-        _Q_CodeByteArray = _ByteArray_AppendSpace_MakeSure ( _Q_CodeByteArray, memDesired ) ;
-    }
-#else
     _Q_CodeByteArray = _ByteArray_AppendSpace_MakeSure ( _Q_CodeByteArray, memDesired ) ;
-#endif    
 }
 
 void

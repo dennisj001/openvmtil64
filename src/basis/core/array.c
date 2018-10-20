@@ -35,11 +35,13 @@ _ByteArray_AppendSpace_MakeSure ( ByteArray * ba, int64 size ) // size in bytes
                         if ( ba->MemRemaining >= size ) goto done ;
                     }
                 }
+#if 0                
                 if ( ( _Q_CodeByteArray == ba ) && Compiling )
                 {
                     _Printf ( ( byte* ) "\nOnly %d code space remaining : increase the 'codeSize' variable in openvmtil.c\n", largestRemaining ) ;
                     Pause ( ) ;
                 }
+#endif                
             }
             _Q_->AllocationRequestLacks ++ ;
             //nba->NBA_DataSize += ( ( ( ++ nba->CheckTimes ) * ( 1 * M ) ) + size ) ; 

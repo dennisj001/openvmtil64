@@ -235,13 +235,13 @@ _Context_DoubleQuoteMacro ( Context * cntx )
     {
         _CfrTil_StringMacros_Do ( lexer->TokenBuffer ) ;
     }
-    Word * word = _Interpreter_NewWord ( cntx->Interpreter0, String_New ( lexer->TokenBuffer, STRING_MEM ) ) ;
+    Word * word = Lexer_ObjectToken_New ( lexer, String_New ( lexer->TokenBuffer, STRING_MEM ) ) ; 
     if ( ! GetState ( cntx->Compiler0, LC_ARG_PARSING ) )  
     {
         SetHere ( CfrTil_WordList (0)->Coding, 1 ) ; 
         CfrTil_WordLists_PopWord ( ) ;
     }
-    _Interpreter_DoWord ( cntx->Interpreter0, word, - 1, - 1 ) ; //lexer->TokenStart_ReadLineIndex ) ;
+    _Interpreter_DoWord ( cntx->Interpreter0, word, - 1, - 1 ) ; 
 }
 
 void

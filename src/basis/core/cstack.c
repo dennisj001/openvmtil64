@@ -34,7 +34,7 @@ void
 _Stack_PrintHeader ( Stack * stack, byte * name )
 {
     int64 size = Stack_Depth ( stack ) ;
-    if ( size )
+    //if ( size )
     {
         uint64 * sp = stack->StackPointer ; // 0 based stack
         byte * location = c_gd ( Context_Location ( ) ) ;

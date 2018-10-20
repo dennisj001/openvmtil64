@@ -199,10 +199,12 @@ _dlnode_New ( uint64 allocType )
 dlnode *
 dlnode_Next ( dlnode * node )
 {
+    dlnode * nextNode ;
     // don't return TailNode, return 0
-    if ( node && node->afterNode && node->afterNode->afterNode )
+    if ( node && ( nextNode = node->afterNode ) && node->afterNode->afterNode )
     {
-        return _dlnode_Next ( node ) ;
+        //nextNode = _dlnode_Next ( node ) ;
+        if ( nextNode != node ) return nextNode ; // why do we need this???
     }
     return 0 ;
 }

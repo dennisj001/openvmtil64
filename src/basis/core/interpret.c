@@ -125,29 +125,6 @@ _Interpreter_DoWord ( Interpreter * interp, Word * word, int64 tsrli, int64 scwi
 // objects and morphismsm - terms from category theory
 
 Word *
-_Interpreter_NewWord ( Interpreter * interp, byte * token )
-{
-    if ( token )
-    {
-        Word * word = Lexer_ObjectToken_New ( interp->Lexer0, token ) ;
-        if ( word )
-        {
-            if ( ( interp->Lexer0->TokenType & T_RAW_STRING ) && ( GetState ( _Q_, AUTO_VAR ) ) ) // this logic needs to be simplified with Lexer_ObjectToken_New
-            {
-                if ( Compiling && GetState ( _Context_, C_SYNTAX ) )
-                {
-                    byte * token2 = Lexer_PeekNextNonDebugTokenWord ( _Lexer_, 1 ) ;
-                    if ( ! String_Equal ( token2, "=" ) ) return 0 ; // it was already 'interpreted' by Lexer_ObjectToken_New
-                }
-            }
-            word->W_SC_Index = _Lexer_->SC_Index ;
-            word->W_RL_Index = _Lexer_->TokenStart_ReadLineIndex ;
-            return interp->w_Word = word ;
-        }
-    }
-}
-
-Word *
 _Interpreter_TokenToWord ( Interpreter * interp, byte * token )
 {
     Word * word = 0 ;
@@ -155,9 +132,9 @@ _Interpreter_TokenToWord ( Interpreter * interp, byte * token )
     {
         interp->Token = token ;
         word = Finder_Word_FindUsing ( interp->Finder0, token, 0 ) ;
-        if ( ! word ) word = _Interpreter_NewWord ( interp, token ) ;
+        if ( ! word ) word = Lexer_ObjectToken_New ( interp->Lexer0, token ) ;
     }
-    return interp->w_Word = word ;
+    return word ;
 }
 
 Word *

@@ -363,7 +363,7 @@ _Namespace_Clear ( Namespace * ns )
             _List_PrintNames ( ns->W_List, -1, 0 ) ;
         }
 #endif        
-        if ( String_Equal ( ns->Name, "LispDefinesNamespace" )) _Printf ( (byte*)"\n got it\n" ), Pause () ;
+        //if ( String_Equal ( ns->Name, "LispDefinesNamespace" )) _Printf ( (byte*)"\n got it\n" ), Pause () ;
         DLList_Recycle_NamespaceList (  ns->W_List ) ; 
         DLList_RemoveWords ( ns->W_List ) ;
         _dllist_Init ( ns->W_List ) ;
@@ -424,7 +424,7 @@ _Namespace_FindOrNew_Local ( Stack * nsStack )
 {
     int64 d = Stack_Depth ( nsStack ) ;
     byte bufferData [ 32 ], *buffer = ( byte* ) bufferData ;
-    if ( d > 3 ) _Printf ( ( byte* ) "\nlocals = %d\n", d ), Pause ( ) ;
+    //if ( d > 3 ) _Printf ( ( byte* ) "\nlocals = %d\n", d ), Pause ( ) ;
     sprintf ( ( char* ) buffer, "locals_%ld", d ) ;
     Namespace * ns = Namespace_FindOrNew_SetUsing ( buffer, _CfrTil_->Namespaces, 1 ) ;
     _Namespace_ActivateAsPrimary ( ns ) ;

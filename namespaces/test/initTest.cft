@@ -62,6 +62,7 @@ Int User
 : demo! sOn 5 itest ;
 : odemo sOff 5 itest ;
 : demo _TestDone_ @ not { itest } if1 dT ; //dT0 ; 
+: tdemo ( n ) { n @ } { demo n -- } while ; 
 //' demo wdiss pause
 // : demo dT ;
 : test0 x64 dT ; inline

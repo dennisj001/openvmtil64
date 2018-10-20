@@ -1,5 +1,5 @@
 #include "../include/cfrtil64.h"
-#define VERSION ((byte*) "0.866.500" ) 
+#define VERSION ((byte*) "0.867.300" ) 
 
 OpenVmTil * _Q_ ;
 
@@ -275,7 +275,7 @@ _OpenVmTil_New ( OpenVmTil * ovt, int64 argc, char * argv [ ] )
     int64 totalMemSizeTarget = ( ovt->TotalMemSizeTarget < 5 * M ) ? ovt->TotalMemSizeTarget : - 1 ; // 0 or -1 : gets default values     
     _OpenVmTil_CalculateMemSpaceSizes ( ovt, restartCondition, -1) ; //totalMemSizeTarget ) ;
 #else    
-    ovt->MachineCodeSize = 200 * K ;
+    ovt->MachineCodeSize = 300 * K ;
     ovt->DictionarySize = 100 * K ;
 #endif    
 
