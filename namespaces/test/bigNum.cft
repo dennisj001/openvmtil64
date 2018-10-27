@@ -26,16 +26,17 @@ c_syntaxOff
 'C.int.factorial find wdiss 
 7 C.int.factorial dup p 5040 _assert sp //pause
 sp
-#if 0
-BigNum 
-//d: dlsym: mpfr_printf /usr/local/lib/libmpfr.so ; void_return
-d: dlsym: mpfr_sum /usr/local/lib/libmpfr.so ; void_return
-d: dlsym: mpfr_printf /usr/local/lib/libmpfr.so ; void_return
-//: mpfrp ( value ) mpfr_printf ( "%*.*Rf", 0, 0, value ) ;
-//: !! qexp mpfrp nl ;
-#endif
 
 Combinators
+#if 0
+BigNum 
+//dlsym: mpfr_sum /usr/local/lib/libmpfr.so ; void_return
+dlsym: mpfr_printf /usr/local/lib/libmpfr.so ; void_return
+: mpfrp ( value ) mpfr_printf ( "%*.*Rf", 16, 16, value ) ;
+: p mpfrp ;
+: !! qexp p nl ;
+d: 7 !! pause
+#endif
 BigNum 
 'x var
 bnInit ( 16 16 )

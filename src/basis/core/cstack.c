@@ -1,80 +1,6 @@
 
 #include "../../include/cfrtil64.h"
 
-void
-Stack_Print_AValue_WordName ( Stack * stack, int64 i, byte * stackName, byte * buffer )
-{
-    uint64 * stackPointer = stack->StackPointer ;
-    Word * word = ( Word * ) ( stackPointer [ - i ] ) ;
-    if ( word )
-    {
-        byte wname [ 128 ] ;
-        sprintf ( ( char* ) buffer, "< %s.%s >", word->ContainingNamespace ? ( char* ) word->ContainingNamespace->Name : "<literal>", c_gd ( _String_ConvertStringToBackSlash ( wname, word->Name, - 1 ) ) ) ;
-        _Printf ( ( byte* ) "\n\t    %s   [ %3ld ] < " UINT_FRMT " > = " UINT_FRMT "\t%s", stackName, i, ( uint64 ) & stackPointer [ - i ], stackPointer [ - i ], word ? ( char* ) buffer : "" ) ;
-    }
-}
-
-void
-Stack_Print_AValue ( uint64 * stackPointer, int64 i, byte * stackName, byte * buffer )
-{
-    Word * word ;
-    byte * string = 0 ;
-    word = Word_GetFromCodeAddress ( ( byte* ) ( stackPointer [ i ] ) ) ;
-    if ( word )
-    {
-        if ( IS_NON_MORPHISM_TYPE ( word ) ) sprintf ( ( char* ) buffer, "< word : %s.%s : value = 0x%016lx >", word->ContainingNamespace->Name, c_gd ( word->Name ), ( uint64 ) word->S_Value ) ;
-        else sprintf ( ( char* ) buffer, "< word : %s.%s : definition = 0x%016lx >", word->ContainingNamespace->Name, c_gd ( word->Name ), ( uint64 ) word->Definition ) ;
-    }
-    else string = String_CheckForAtAdddress ( ( byte* ) ( ( byte* ) ( stackPointer[i] ) ) ) ;
-    _Printf ( ( byte* ) "\n\t    %s   [ %3ld ] < " UINT_FRMT " > = " UINT_FRMT "\t%s",
-        stackName, i, ( uint64 ) & stackPointer [ i ], stackPointer [ i ], word ? buffer : string ? string : ( byte* ) "" ) ;
-}
-
-void
-_Stack_PrintHeader ( Stack * stack, byte * name )
-{
-    int64 size = Stack_Depth ( stack ) ;
-    //if ( size )
-    {
-        uint64 * sp = stack->StackPointer ; // 0 based stack
-        byte * location = c_gd ( Context_Location ( ) ) ;
-        _Printf ( ( byte* ) "\nStack at : %s :\n%s depth =%4d : %s = Top = " UINT_FRMT ", InitialTos = " UINT_FRMT ", Size = " UINT_FRMT, location,
-            name, size, stack == _DataStack_ ? "Dsp (R14)" : _ReturnStack_ ? "CfrTilRsp (Rbx)" : "", ( int64 ) sp, ( int64 ) stack->InitialTosPointer, stack->StackMax - stack->StackMin + 1 ) ;
-    }
-}
-
-void
-_Stack_PrintValues ( byte * name, uint64 * stackPointer, int64 depth )
-{
-    if ( depth )
-    {
-        int64 i ;
-        byte * buffer = Buffer_New_pbyte ( BUFFER_SIZE ) ;
-        if ( depth >= 0 ) for ( i = 0 ; depth -- > 0 ; i -- ) Stack_Print_AValue ( stackPointer, i, name, buffer ) ;
-        else CfrTil_Exception ( STACK_UNDERFLOW, 0, QUIT ) ;
-    }
-}
-
-void
-Stack_PrintValues ( byte * name, Stack *stack, int64 depth )
-{
-    _Stack_PrintValues ( name, stack->StackPointer, depth ) ;
-}
-
-void
-_Stack_Print ( Stack * stack, byte * name, int64 depth )
-{
-    _Stack_PrintHeader ( stack, name ) ;
-    Stack_PrintValues ( name, stack, depth ) ;
-    if ( depth ) CfrTil_NewLine ( ) ;
-}
-
-void
-Stack_Print ( Stack * stack, byte * name )
-{
-    _Stack_Print ( stack, name, Stack_Depth ( stack ) ) ;
-}
-
 int64
 _Stack_Overflow ( Stack * stack )
 {
@@ -324,6 +250,81 @@ Stack_Copy ( Stack * stack, uint64 type )
 }
 
 void
+Stack_Print_AValue_WordName ( Stack * stack, int64 i, byte * stackName, byte * buffer )
+{
+    uint64 * stackPointer = stack->StackPointer ;
+    Word * word = ( Word * ) ( stackPointer [ - i ] ) ;
+    if ( word )
+    {
+        byte wname [ 128 ] ;
+        sprintf ( ( char* ) buffer, "< %s.%s >", word->ContainingNamespace ? ( char* ) word->ContainingNamespace->Name : "<literal>", c_gd ( _String_ConvertStringToBackSlash ( wname, word->Name, - 1 ) ) ) ;
+        _Printf ( ( byte* ) "\n\t    %s   [ %3ld ] < " UINT_FRMT " > = " UINT_FRMT "\t%s", stackName, i, ( uint64 ) & stackPointer [ - i ], stackPointer [ - i ], word ? ( char* ) buffer : "" ) ;
+    }
+}
+
+void
+Stack_Print_AValue ( uint64 * stackPointer, int64 i, byte * stackName, byte * buffer, Boolean isWordAlreadyFlag )
+{
+    Word * word ;
+    byte * string = 0, tsb [32], *ts = 0;
+    if ( isWordAlreadyFlag ) 
+    {
+        word = ( Word* ) ( stackPointer [ i ] ) ;
+        ts = Word_TypeSignature ( word, tsb ) ;
+    }
+    else word = Word_GetFromCodeAddress ( ( byte* ) ( stackPointer [ i ] ) ) ;
+    if ( word )
+    {
+        if ( IS_NON_MORPHISM_TYPE ( word ) ) sprintf ( ( char* ) buffer, "< word : %s.%s : value = 0x%016lx > : %s", 
+            word->ContainingNamespace ? word->ContainingNamespace->Name : ( byte* ) "", c_gd ( word->Name ), ( uint64 ) word->S_Value, ts ? c_gd (ts) : (byte*)"") ;
+        else sprintf ( ( char* ) buffer, "< word : %s.%s : definition = 0x%016lx >", 
+            word->ContainingNamespace ? word->ContainingNamespace->Name : ( byte* ) "", c_gd ( word->Name ), ( uint64 ) word->Definition ) ;
+    }
+    else string = String_CheckForAtAdddress ( ( byte* ) ( ( byte* ) ( stackPointer[i] ) ) ) ;
+    _Printf ( ( byte* ) "\n\t    %s   [ %3ld ] < " UINT_FRMT " > = " UINT_FRMT "\t%s",
+        stackName, i, ( uint64 ) & stackPointer [ i ], stackPointer [ i ], word ? buffer : string ? string : ( byte* ) "" ) ;
+}
+
+void
+_Stack_PrintHeader ( Stack * stack, byte * name )
+{
+    int64 depth = Stack_Depth ( stack ) ;
+    //if ( size )
+    {
+        uint64 * sp = stack->StackPointer ; // 0 based stack
+        byte * location = c_gd ( Context_Location ( ) ) ;
+        _Printf ( ( byte* ) "\n%s at : %s :\n%s depth =%4d : %s = Top = " UINT_FRMT ", InitialTos = " UINT_FRMT ", Size = " UINT_FRMT, name, location,
+            name, depth, stack == _DataStack_ ? "Dsp (R14)" : _ReturnStack_ ? "CfrTilRsp (Rbx)" : "", ( int64 ) sp, ( int64 ) stack->InitialTosPointer, stack->StackMax - stack->StackMin + 1 ) ;
+    }
+}
+
+void
+_Stack_PrintValues ( byte * name, uint64 * stackPointer, int64 depth, Boolean isWordAlreadyFlag )
+{
+    if ( depth )
+    {
+        int64 i ;
+        byte * buffer = Buffer_New_pbyte ( BUFFER_SIZE ) ;
+        if ( depth >= 0 ) for ( i = 0 ; depth -- > 0 ; i -- ) Stack_Print_AValue ( stackPointer, i, name, buffer, isWordAlreadyFlag ) ;
+        else CfrTil_Exception ( STACK_UNDERFLOW, 0, QUIT ) ;
+    }
+}
+
+void
+_Stack_Print ( Stack * stack, byte * name, int64 depth, Boolean isWordAlreadyFlag )
+{
+    _Stack_PrintHeader ( stack, name ) ;
+    _Stack_PrintValues ( name, stack->StackPointer, depth, isWordAlreadyFlag ) ;
+    if ( depth ) CfrTil_NewLine ( ) ;
+}
+
+void
+Stack_Print ( Stack * stack, byte * name )
+{
+    _Stack_Print ( stack, name, Stack_Depth ( stack ), 0 ) ;
+}
+
+void
 _PrintNStackWindow ( uint64 * reg, byte * name, byte * regName, int64 size )
 {
     // Intel SoftwareDevelopersManual-253665.pdf section 6.2 : a push decrements ESP, a pop increments ESP
@@ -336,9 +337,9 @@ _PrintNStackWindow ( uint64 * reg, byte * name, byte * regName, int64 size )
         // print return stack in reverse of usual order first
         while ( size -- > 1 )
         {
-            Stack_Print_AValue ( reg, size, name, buffer ) ;
+            Stack_Print_AValue ( reg, size, name, buffer, 0 ) ;
         }
-        _Stack_PrintValues ( ( byte* ) name, reg, saveSize ) ;
+        _Stack_PrintValues ( ( byte* ) name, reg, saveSize, 0 ) ;
     }
 }
 
@@ -355,7 +356,7 @@ _CfrTil_PrintNReturnStack ( int64 size, Boolean useExistingFlag )
         else if ( debugger->cs_Cpu->Rsp ) //debugger->DebugESP )
         {
             _PrintNStackWindow ( ( uint64* ) debugger->cs_Cpu->Rsp, ( byte * ) "Return Stack", ( byte * ) "Rsp (RSP)", size ) ;
-            _Stack_PrintValues ( ( byte* ) "DebugStack ", debugger->ReturnStack->StackPointer, Stack_Depth ( debugger->ReturnStack ) ) ;
+            _Stack_PrintValues ( ( byte* ) "DebugStack ", debugger->ReturnStack->StackPointer, Stack_Depth ( debugger->ReturnStack ), 0 ) ;
         }
     }
     else

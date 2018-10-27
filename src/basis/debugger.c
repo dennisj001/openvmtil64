@@ -282,7 +282,7 @@ void
 _Debugger_PrintDataStack ( int64 depth )
 {
     //Set_DataStackPointer_FromDspReg ( ) ;
-    _Stack_Print ( _DataStack_, ( byte* ) "DataStack", depth ) ;
+    _Stack_Print ( _DataStack_, ( byte* ) "DataStack", depth, 0 ) ;
     //if (depth < Stack_Depth (_DataStack_) ) _Printf ( ( byte* ) "\t\t    ........." ) ;
 }
 
@@ -648,7 +648,7 @@ Debugger_TableSetup ( Debugger * debugger )
     debugger->CharacterTable [ 'd' ] = 4 ;
     debugger->CharacterTable [ 'I' ] = 5 ;
     debugger->CharacterTable [ 'm' ] = 6 ;
-    debugger->CharacterTable [ 'T' ] = 7 ;
+    //debugger->CharacterTable [ 'T' ] = 7 ;
     debugger->CharacterTable [ 't' ] = 7 ;
     debugger->CharacterTable [ 'Z' ] = 8 ;
     debugger->CharacterTable [ 'U' ] = 9 ;
@@ -681,6 +681,7 @@ Debugger_TableSetup ( Debugger * debugger )
     debugger->CharacterTable [ 'Q' ] = 33 ;
     debugger->CharacterTable [ 'L' ] = 34 ;
     debugger->CharacterTable [ 'X' ] = 35 ;
+    debugger->CharacterTable [ 'T' ] = 36 ;
 
     // debugger : system related
     debugger->CharacterFunctionTable [ 0 ] = Debugger_Default ;
@@ -720,6 +721,7 @@ Debugger_TableSetup ( Debugger * debugger )
     debugger->CharacterFunctionTable [ 33 ] = Debugger_CfrTilRegisters ;
     debugger->CharacterFunctionTable [ 34 ] = Debugger_GotoList_Print ;
     debugger->CharacterFunctionTable [ 35 ] = Debugger_Print_LispDefinesNamespace ;
+    debugger->CharacterFunctionTable [ 36 ] = Debugger_ShowTypeWordStack ;
 }
 
 

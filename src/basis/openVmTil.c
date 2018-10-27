@@ -1,5 +1,5 @@
 #include "../include/cfrtil64.h"
-#define VERSION ((byte*) "0.867.300" ) 
+#define VERSION ((byte*) "0.869.200" ) 
 
 OpenVmTil * _Q_ ;
 
@@ -98,9 +98,10 @@ OpenVmTil_Delete ( OpenVmTil * ovt )
     }
     _Q_ = 0 ;
 }
-#if 0
+#define USE_OpenVmTil_CalculateMemSpaceSizes 0
 #define _CFRTIL_SIZE (82 * K) // data stack included here
-
+#if USE_OpenVmTil_CalculateMemSpaceSizes
+// _OpenVmTil_CalculateMemSpaceSizes is convoluted and needs rework
 void
 _OpenVmTil_CalculateMemSpaceSizes ( OpenVmTil * ovt, int64 restartCondition, int64 totalMemSizeTarget )
 {
@@ -269,7 +270,7 @@ _OpenVmTil_New ( OpenVmTil * ovt, int64 argc, char * argv [ ] )
     //ovt->SavedTerminalAttributes = savedTerminalAttributes ;
 
     OVT_GetStartupOptions ( ovt ) ;
-#if 0   
+#if USE_OpenVmTil_CalculateMemSpaceSizes 
     int64 MIN_TotalMemSizeTarget = ( 300 * K ) ;
     if ( ovt->TotalMemSizeTarget < MIN_TotalMemSizeTarget ) ovt->TotalMemSizeTarget = MIN_TotalMemSizeTarget ;
     int64 totalMemSizeTarget = ( ovt->TotalMemSizeTarget < 5 * M ) ? ovt->TotalMemSizeTarget : - 1 ; // 0 or -1 : gets default values     
@@ -277,6 +278,8 @@ _OpenVmTil_New ( OpenVmTil * ovt, int64 argc, char * argv [ ] )
 #else    
     ovt->MachineCodeSize = 300 * K ;
     ovt->DictionarySize = 100 * K ;
+    ovt->CfrTilSize = (82 * K) ;
+    ovt->OpenVmTilSize = (6 * K) ;
 #endif    
 
     _OpenVmTil_Init ( ovt, exceptionsHandled > 1 ) ; // try to keep history if we can

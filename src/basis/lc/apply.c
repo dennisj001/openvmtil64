@@ -33,7 +33,8 @@ LO_Apply ( LambdaCalculus * lc, ListObject * l0, ListObject *lfirst, ListObject 
 #endif
     else
     {
-        //these cases seems common sense for what these situations should mean and seem to add something positive to the usual lisp/scheme semantics !?
+//these cases seems common sense for what these situations should mean and seem to add something positive to the usual lisp/scheme semantics !?
+        //SetState ( _CfrTil_, TYPECHECK_OFF, true ) ;        
         if ( ! largs ) l0 = lfunction ;
         else
         {
@@ -41,6 +42,7 @@ LO_Apply ( LambdaCalculus * lc, ListObject * l0, ListObject *lfirst, ListObject 
             l0 = largs ;
         }
         SetState ( lc, LC_COMPILE_MODE, false ) ;
+        //SetState ( _CfrTil_, TYPECHECK_OFF, false ) ;        
     }
     SetState ( lc, LC_APPLY, false ) ;
     return l0 ;
@@ -90,8 +92,6 @@ _LO_Apply ( ListObject *lfirst, ListObject *lfunction, ListObject *largs )
 void
 _Interpreter_LC_InterpretWord ( Interpreter *interp, ListObject *l0, Boolean functionFlag )
 {
-    int64 tsrli = l0->W_RL_Index ;
-    int64 scwi = l0->W_SC_Index ;
     Word * word ;
 #if NEW_LC_COMPILE
     if ( ( l0->LAttribute & T_LISP_SYMBOL ) && functionFlag ) //( ( l0->LAttribute & T_LAMBDA ) ) )
@@ -106,8 +106,7 @@ _Interpreter_LC_InterpretWord ( Interpreter *interp, ListObject *l0, Boolean fun
     {
         word = l0->Lo_CfrTilWord ;
         if ( ! word ) word = l0 ;
-        //if ( tsrli == lexer->TokenStart_ReadLineIndex ) SetState ( _Debugger_, DEBUG_SHTL_OFF, true ) ;
-        _Interpreter_DoWord ( interp, word, word->W_RL_Index, word->W_SC_Index ) ; //scwi ) ;
+        _Interpreter_DoWord ( interp, word, word->W_RL_Index, word->W_SC_Index ) ; 
         //SetState ( _Debugger_, DEBUG_SHTL_OFF, false ) ;
     }
 }
@@ -172,8 +171,7 @@ _LO_CompileOrInterpret_One ( ListObject *l0, int64 functionFlag )
     if ( CompileMode && functionFlag ) _LO_Compile_Runtime_LispSymbol_Function ( l0 ) ;
     //else
 #endif    
-    if ( l0 && ( ! ( l0->LAttribute & ( LIST | LIST_NODE | T_NIL ) ) ) ) 
-        _Interpreter_LC_InterpretWord ( _Interpreter_, l0, functionFlag ) ;
+    if ( l0 && ( ! ( l0->LAttribute & ( LIST | LIST_NODE | T_NIL ) ) ) ) _Interpreter_LC_InterpretWord ( _Interpreter_, l0, functionFlag ) ;
 }
 
 void
@@ -196,12 +194,14 @@ _LO_CompileOrInterpret ( ListObject *lfunction, ListObject *largs )
 
     if ( largs && lfword && ( lfword->CAttribute & ( CATEGORY_OP_ORDERED | CATEGORY_OP_UNORDERED ) ) ) // ?!!? 2 arg op with multi-args : this is not a precise distinction yet : need more types ?!!?
     {
+        SetState ( _CfrTil_, TYPECHECK_OFF, true ) ; // sometimes ok but for now off here
         _LO_CompileOrInterpret_One ( largs, 0 ) ;
         while ( ( largs = _LO_Next ( largs ) ) )
         {
             _LO_CompileOrInterpret_One ( largs, 0 ) ; // two args first then op, then after each arg the operator : nb. assumes word can take unlimited args 2 at a time
             _LO_CompileOrInterpret_One ( lfword, 0 ) ;
         }
+        SetState ( _CfrTil_, TYPECHECK_OFF, false ) ;
     }
     else
     {

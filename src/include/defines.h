@@ -216,14 +216,14 @@
 #define PSI_NEWLINE ( (uint64) 1 << 15 )
 #define PSI_PROMPT  ( (uint64) 1 << 16 )
 
-// CAttribute - LType -shared in common 
+// CAttribute & LType -shared in common 
 #define CPRIMITIVE ( (uint64) 1 << 0 )
 #define CFRTIL_WORD ( (uint64) 1 << 1 )
 #define T_RAW_STRING ( (uint64) 1 << 2 )
 #define T_STRING ( (uint64) 1 << 3 )
 #define T_INT ( (uint64) 1 << 4 )
 #define T_FLOAT ( (uint64) 1 << 5 )
-#define T_BIG_INT ( (uint64) 1 << 6 )
+#define T_BOOLEAN ( (uint64) 1 << 6 )
 #define T_BIG_NUM ( (uint64) 1 << 7 )
 #define T_CHAR ( (uint64) 1 << 8 )
 #define T_HEAD ( (uint64) 1 << 8 )
@@ -504,6 +504,8 @@
 #define _DEBUG_SHOW_ ( (uint64) 1 << 11 )
 #define DEBUG_SHTL_OFF ( (uint64) 1 << 12 ) // SHTL == _String_HighlightTokenInputLine
 #define SC_FORCE_PUSH ( (uint64) 1 << 13 )
+#define TYPESTACK_RESET_OFF ( (uint64) 1 << 14 )
+#define TYPECHECK_OFF ( (uint64) 1 << 15 )
 
 // State Flags --
 // ? sytem flags ?? -- not all -- todo here
@@ -727,7 +729,7 @@
 // combinators
 #define ARROW               ( (uint64) 1 << 0 ) // MORPHISM : t '->' t 
 #define CATESIAN_PRODUCT    ( (uint64) 1 << 1 ) // t 'x' t
-#define PRODUCT             CATESIAN_PRODUCT // t 'x' t
+#define CARTESIAN_PRODUCT             CATESIAN_PRODUCT // t 'x' t
 // base types
 #define INT64             ( (uint64) 1 << 2 ) 
 #define INT               INT64 

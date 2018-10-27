@@ -189,22 +189,22 @@ _dlnode_New ( uint64 allocType )
     return node ;
 }
 
-// toward the TailNode - after
+// toward the TailNode - after - next
 #define _dlnode_Next( node ) node->afterNode
-// toward the HeadNode - before
+// toward the HeadNode - before - previous
 #define _dlnode_Previous( node ) node->beforeNode
 
 // toward the TailNode
-
 dlnode *
 dlnode_Next ( dlnode * node )
 {
     dlnode * nextNode ;
     // don't return TailNode, return 0
-    if ( node && ( nextNode = node->afterNode ) && node->afterNode->afterNode )
+    //if ( node && ( nextNode = node->afterNode ) && node->afterNode->afterNode )
+    if ( node && ( nextNode = _dlnode_Next ( node ) ) && _dlnode_Next ( nextNode ) )
     {
-        //nextNode = _dlnode_Next ( node ) ;
-        if ( nextNode != node ) return nextNode ; // why do we need this???
+        //if ( nextNode != node ) // nb. this had found an important use at one point for some old still unknown past bug ??
+        return nextNode ; 
     }
     return 0 ;
 }

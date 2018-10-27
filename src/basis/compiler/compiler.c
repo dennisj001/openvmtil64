@@ -254,6 +254,7 @@ Compiler_BlockLevel ( Compiler * compiler )
 }
 
 #if 0
+
 void
 Compiler_RecycleOptInfos ( Compiler * compiler )
 {
@@ -314,8 +315,8 @@ Compiler_Init ( Compiler * compiler, uint64 state )
     _dllist_Init ( compiler->RegisterParameterList ) ;
     _dllist_Init ( compiler->OptimizeInfoList ) ;
     _Compiler_FreeAllLocalsNamespaces ( compiler ) ;
-    //Compiler_CompileOptimizeInfo_New ( compiler, COMPILER_TEMP ) ;
     Compiler_CompileOptimizeInfo_PushNew ( compiler ) ;
+    CfrTil_TypeStackReset ( ) ;
     SetBuffersUnused ( 1 ) ;
     SetState ( compiler, VARIABLE_FRAME, false ) ;
 }
@@ -378,7 +379,7 @@ CfrTil_CompileAndRecord_Word0_PushRegToUse ( )
 }
 
 void
-CfrTil_CompileAndRecord_PushAccum ()
+CfrTil_CompileAndRecord_PushAccum ( )
 {
     Word * word = _CfrTil_WordList ( 0 ) ;
     _Word_CompileAndRecord_PushReg ( word, ACC ) ;

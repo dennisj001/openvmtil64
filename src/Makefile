@@ -12,8 +12,8 @@ SOURCES = basis/compiler/machineCode.c basis/compiler/_compile.c basis/compiler/
 	basis/compiler/compiler.c basis/core/dllnodes.c basis/core/finder.c basis/interpreters.c\
 	basis/tabCompletion.c basis/colors.c basis/sourceCode.c basis/debugStepping.c\
 	basis/core/string.c basis/openVmTil.c basis/core/dobject.c basis/core/preprocessor.c\
-	basis/attribute.c basis/lists.c basis/debugDisassembly.c\
-	basis/linux.c basis/exception.c basis/types.c basis/compiler/locals.c\
+	basis/attribute.c basis/lists.c basis/debugDisassembly.c basis/types.c\
+	basis/linux.c basis/exception.c basis/compiler/locals.c\
 	basis/debugger.c basis/interpreter.c basis/_debug.c basis/lc/lambdaCalculus.c \
 	basis/lc/apply.c basis/lc/eval.c basis/lc/read.c basis/lc/print.c basis/lc/special.c \
 	primitives/strings.c primitives/bits.c primitives/maths.c primitives/logics.c primitives/openvmtils.c\

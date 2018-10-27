@@ -37,6 +37,7 @@ void
 CompileInt64 ( )
 {
 #if 0    
+
     union
     {
         int64 q0 [2 ] ;
@@ -187,7 +188,7 @@ CfrTil_Return ( )
         }
     }
 #if 0    
-    else if ( ! _Readline_Is_AtEndOfBlock ( _Context_->ReadLiner0 ) )
+else if ( ! _Readline_Is_AtEndOfBlock ( _Context_->ReadLiner0 ) )
     {
         _CfrTil_CompileCallGoto ( 0, GI_RETURN ) ;
     }
@@ -237,13 +238,13 @@ CfrTil_Literal ( )
 void
 CfrTil_Constant ( )
 {
+    Word *tword, *cword ;
     int64 value = DataStack_Pop ( ) ;
+    tword = ( Word * ) Stack_Pop ( _CfrTil_->TypeWordStack ) ;
     byte * name = ( byte* ) DataStack_Pop ( ) ;
-    Word * word = DataObject_New ( CONSTANT, 0, name, LITERAL | CONSTANT, 0, 0, 0, value, 0, - 1, - 1 ) ;
-    //byte *buffer = Buffer_Data ( _CfrTil_->ScratchB1 ) ;
-    //sprintf ( buffer, ( byte* ) "\'%s %ld const // (hypothetical)", ( char* ) name, value ) ;
-    _CfrTil_Finish_WordSourceCode ( _CfrTil_, word ) ;
-    //word->W_SourceCode = String_New_SourceCode ( buffer ) ;
+    cword = DataObject_New ( CONSTANT, 0, name, ( LITERAL | CONSTANT ), 0, 0, 0, value, 0, - 1, - 1 ) ;
+    cword->CAttribute |= tword->CAttribute ;
+    _CfrTil_Finish_WordSourceCode ( _CfrTil_, cword ) ;
 }
 
 void
@@ -252,7 +253,6 @@ CfrTil_Variable ( )
     byte * name = ( byte* ) DataStack_Pop ( ) ;
     Word * word = DataObject_New ( NAMESPACE_VARIABLE, 0, name, NAMESPACE_VARIABLE, 0, 0, 0, 0, 0, - 1, - 1 ) ;
     _CfrTil_Finish_WordSourceCode ( _CfrTil_, word ) ;
-    //word->W_SourceCode = String_New_SourceCode ( buffer ) ;
 }
 
 // "{|" - exit the Compiler start interpreting

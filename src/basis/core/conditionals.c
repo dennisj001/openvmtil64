@@ -72,15 +72,12 @@ CfrTil_Switch ( )
         // try to build table
         // setup SwitchAccessFunction 
         // call SwitchAccessFunction 
-        //_Compile_PushLiteral ( ( int64 ) _Context_->Compiler0->CurrentSwitchList ) ;
-        _Do_Literal ( ( int64 ) _Context_->Compiler0->CurrentSwitchList ) ;
+        _Do_LiteralValue ( ( int64 ) _Context_->Compiler0->CurrentSwitchList ) ;
         Compile_Call_TestRSP ( ( byte* ) SwitchAccessFunction ) ;
     }
     else
     {
         //cell switchValue = TOS ;
-        //_CfrTil_DropN ( 1 ) ;
-        //dllist_Map1 ( _Context->Compiler0->CurrentSwitchList, Switch_MapFunction, switchValue ) ;
         dllist_Map1 ( _Context_->Compiler0->CurrentSwitchList, (MapFunction1) Switch_MapFunction, TOS ) ;
         DataStack_DropN ( 1 ) ;
     }

@@ -49,7 +49,7 @@ _CfrTil_CpuState_CheckSave ( )
     if ( ! GetState ( _CfrTil_->cs_Cpu, CPU_SAVED ) )
     {
         _CfrTil_->SaveCpuState ( ) ;
-        SetState ( _CfrTil_->cs_Cpu, CPU_SAVED, true ) ; 
+        SetState ( _CfrTil_->cs_Cpu, CPU_SAVED, true ) ;
     }
 }
 
@@ -165,7 +165,8 @@ _CfrTil_Init ( CfrTil * cfrTil, Namespace * nss )
     if ( _Q_->Verbosity > 2 ) _Printf ( ( byte* ) "\nSystem Memory is being reallocated.  " ) ;
 
     cfrTil->ContextDataStack = Stack_New ( 256, allocType ) ;
-    cfrTil->ObjectStack = Stack_New ( 1 * K, allocType ) ;
+    //cfrTil->ObjectStack = Stack_New ( 1 * K, allocType ) ;
+    cfrTil->TypeWordStack = Stack_New ( 64, allocType ) ;
     cfrTil->TokenList = _dllist_New ( allocType ) ;
     cfrTil->CompilerWordList = _dllist_New ( allocType ) ;
 
@@ -197,7 +198,6 @@ _CfrTil_Init ( CfrTil * cfrTil, Namespace * nss )
     cfrTil->StoreWord = Finder_FindWord_AnyNamespace ( _Finder_, ( byte* ) "store" ) ;
     cfrTil->PokeWord = Finder_FindWord_AnyNamespace ( _Finder_, ( byte* ) "poke" ) ;
     cfrTil->RightBracket = Finder_FindWord_AnyNamespace ( _Finder_, ( byte* ) "]" ) ;
-    cfrTil->LispNamespace = Namespace_Find ( ( byte* ) "Lisp" ) ;
     cfrTil->InfixNamespace = Namespace_Find ( "Infix" ) ;
     CfrTil_ReadTables_Setup ( cfrTil ) ;
     CfrTil_LexerTables_Setup ( cfrTil ) ;
@@ -310,6 +310,7 @@ CfrTil_InlineOff ( )
 }
 
 #if 0
+
 void
 _CfrTil_DebugOff ( )
 {

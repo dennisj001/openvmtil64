@@ -806,7 +806,7 @@ Compile_Call_X84_ABI_RSP_ADJUST ( byte * address )
 }
 
 void
-Compile_CallWord_X84_ABI_RSP_ADJUST ( Word * word )
+Compile_CallWord_Check_X84_ABI_RSP_ADJUST ( Word * word )
 {
     if ( word->CAttribute & CPRIMITIVE )
     {

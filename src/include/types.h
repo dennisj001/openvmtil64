@@ -84,7 +84,7 @@ typedef struct _dllist
 #define tail before_ptr
 enum types
 {
-    BOOL, BYTE, INTEGER, STRING, BIGNUM, FLOAT, POINTER, X64CODE, WORD, WORD_LOCATION, ARROW, PRODUCT
+    BOOL, BYTE, INTEGER, STRING, BIGNUM, FLOAT, POINTER, X64CODE, WORD, WORD_LOCATION, ARROW, CARTESIAN_PRODUCT
 } ;
 typedef struct _dobject
 {
@@ -366,6 +366,12 @@ typedef struct _WordData
     } ;
     union
     {
+        byte * pb_TypeSignature ;
+        byte TypeSignature [8] ;
+        uint64 uint64_TypeSignature ;
+    };
+    union
+    {
         dllist * LocalNamespaces ;
         Location * OurLocation ;
     } ;
@@ -436,6 +442,9 @@ typedef struct _WordData
 #define W_SC_MemSpaceRandMarker S_WordData->SourceCodeMemSpaceRandMarker
 #define W_OpInsnCode S_WordData->OpInsnCode 
 #define W_OpInsnGroup S_WordData->OpInsnGroup
+#define W_uint64_TypeSignature S_WordData->uint64_TypeSignature
+#define W_TypeSignature S_WordData->TypeSignature
+#define W_pb_TypeSignature S_WordData->pb_TypeSignature
 typedef struct
 {
     Symbol P_Symbol ;
@@ -820,7 +829,7 @@ typedef struct _Debugger
     int64 LastSourceCodeIndex, TerminalLineWidth, ReadIndex ;
     ByteArray * StepInstructionBA ;
     byte CharacterTable [ 128 ] ;
-    DebuggerFunction CharacterFunctionTable [ 36 ] ;
+    DebuggerFunction CharacterFunctionTable [ 40 ] ;
     ud_t * Udis ;
     Stack * LocalsNamespacesStack ;
     dllist * DebugWordList ;
@@ -917,10 +926,9 @@ typedef struct _CfrTil
     Stack *ReturnStack, * DataStack ;
     Namespace * Namespaces ;
     Context * Context0 ;
-    Stack * ContextDataStack ;
+    Stack * ContextDataStack, * TypeWordStack ;
     Debugger * Debugger0 ;
-    Stack * ObjectStack, *DebugStateStack ;
-    Namespace * InNamespace, *LispNamespace ; //, *CfrTilWordCreateTemp ;
+    Namespace * InNamespace ;
     LambdaCalculus * LC ;
     FILE * LogFILE ;
     int64 LogFlag, WordsAdded, FindWordCount, FindWordMaxCount, WordCreateCount, DObjectCreateCount ;
@@ -1057,6 +1065,12 @@ typedef struct
 typedef struct
 {
     const char * ccp_Name ;
+    union
+    {
+        byte * pb_TypeSignature ;
+        byte TypeSignature [8] ;
+        uint64 uint64_TypeSignature ;
+    };
     uint8 OpInsnCodeGroup ;
     uint8 OpInsnCode ;
     block blk_Definition ;

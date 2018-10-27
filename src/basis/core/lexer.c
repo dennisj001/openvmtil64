@@ -11,7 +11,57 @@
 
 #define TokenBuffer_AppendPoint( lexer ) &lexer->TokenBuffer [ lexer->TokenWriteIndex ]
 #define _AppendCharacterToTokenBuffer( lex, character ) lexer->TokenBuffer [ lex->TokenWriteIndex ] = character
-#define SourceCode_AppendPoint &_CfrTil_->SC_ScratchPad [ Strlen ( ( CString ) _CfrTil_->SC_ScratchPad ) ]
+//#define SourceCode_AppendPoint &_CfrTil_->SC_ScratchPad [ Strlen ( ( CString ) _CfrTil_->SC_ScratchPad ) ]
+
+Word *
+Lexer_ObjectToken_New ( Lexer * lexer, byte * token ) //, int64 parseFlag )
+{
+    Word * word = 0 ;
+    byte * token2 ;
+    if ( token )
+    {
+        Lexer_ParseObject ( lexer, token ) ;
+        if ( lexer->TokenType & T_RAW_STRING )
+        {
+            if ( GetState ( _Q_, AUTO_VAR ) ) // make it a 'variable' 
+            {
+                word = DataObject_New ( NAMESPACE_VARIABLE, 0, token, NAMESPACE_VARIABLE, 0, 0, 0, 0, 0, 0, - 1 ) ;
+                if ( Compiling && GetState ( _Context_, C_SYNTAX ) )
+                {
+                    token2 = Lexer_PeekNextNonDebugTokenWord ( lexer, 1 ) ;
+                    if ( ! String_Equal ( token2, "=" ) ) return 0 ; // don't interpret this word
+                }
+            }
+            else
+            {
+                _Q_->ExceptionToken = token ;
+                byte *buffer = Buffer_Data ( _CfrTil_->ScratchB1 ) ;
+                sprintf ( buffer, ( byte* ) "%s ?\n", ( char* ) token ) ;
+                CfrTil_Exception ( NOT_A_KNOWN_OBJECT, buffer, QUIT ) ;
+            }
+        }
+        else
+        {
+            word = DataObject_New ( LITERAL, 0, token, lexer->TokenType, 0, 0, 0, lexer->Literal, 0, 0, - 1 ) ;
+        }
+        // this is done in Word_Create 
+        //Lexer_Set_ScIndex_RlIndex ( lexer, word, lexer->TokenStart_ReadLineIndex, lexer->SC_Index ) ;
+        lexer->TokenWord = word ;
+    }
+    return word ;
+}
+
+// this function is called more than necessary ???
+
+void
+Lexer_Set_ScIndex_RlIndex ( Lexer * lexer, Word * word, int64 tsrli, int64 scwi )
+{
+    if ( word )
+    {
+        word->W_SC_Index = ( scwi != - 1 ) ? scwi : lexer->SC_Index ;
+        word->W_RL_Index = ( tsrli != - 1 ) ? tsrli : lexer->TokenStart_ReadLineIndex ;
+    }
+}
 
 byte *
 _Lexer_LexNextToken_WithDelimiters ( Lexer * lexer, byte * delimiters, Boolean checkListFlag, Boolean peekFlag, int reAddPeeked, uint64 state )
@@ -76,47 +126,6 @@ byte
 Lexer_NextNonDelimiterChar ( Lexer * lexer )
 {
     return _String_NextNonDelimiterChar ( _ReadLine_pb_NextChar ( lexer->ReadLiner0 ), lexer->DelimiterCharSet ) ;
-}
-
-Word *
-Lexer_ObjectToken_New ( Lexer * lexer, byte * token ) //, int64 parseFlag )
-{
-    Word * word = 0 ;
-    byte * token2 ;
-    if ( token )
-    {
-        Lexer_ParseObject ( lexer, token ) ;
-        if ( lexer->TokenType & T_RAW_STRING )
-        {
-            if ( GetState ( _Q_, AUTO_VAR ) ) // make it a 'variable' 
-            {
-                word = DataObject_New ( NAMESPACE_VARIABLE, 0, token, NAMESPACE_VARIABLE, 0, 0, 0, 0, 0, 0, - 1 ) ;
-                if ( Compiling && GetState ( _Context_, C_SYNTAX ) )
-                {
-                    token2 = Lexer_PeekNextNonDebugTokenWord ( lexer, 1 ) ;
-                    if ( ! String_Equal ( token2, "=" ) ) return 0 ; // don't interpret this word
-                }
-            }
-            else
-            {
-                _Q_->ExceptionToken = token ;
-                byte *buffer = Buffer_Data ( _CfrTil_->ScratchB1 ) ;
-                sprintf ( buffer, ( byte* ) "%s ?\n", ( char* ) token ) ;
-                CfrTil_Exception ( NOT_A_KNOWN_OBJECT, buffer, QUIT ) ;
-            }
-        }
-        else
-        {
-            word = DataObject_New ( LITERAL, 0, token, 0, 0, 0, 0, lexer->Literal, 0, 0, - 1 ) ;
-        }
-        if ( word )
-        {
-            word->W_SC_Index = lexer->SC_Index ;
-            word->W_RL_Index = lexer->TokenStart_ReadLineIndex ;
-        }
-        lexer->TokenWord = word ;
-    }
-    return word ;
 }
 
 int64

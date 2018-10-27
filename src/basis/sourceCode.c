@@ -316,6 +316,12 @@ DebugWordList_Show_InUse ( Debugger * debugger )
 }
 
 void
+Debugger_ShowTypeWordStack ( Debugger * debugger )
+{
+    Stack_Print ( _CfrTil_->TypeWordStack, "TypeWordStack" ) ;
+}
+
+void
 CfrTil_DbgSourceCodeBeginBlock ( )
 {
     SetState ( _CfrTil_, DEBUG_SOURCE_CODE_MODE, true ) ;

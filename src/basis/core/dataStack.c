@@ -66,6 +66,14 @@ DataStack_Push ( int64 value )
 }
 
 void
+DataStack_Push_TypeStackPush ( Word * word, int64 value )
+{
+    DataStack_Push ( value ) ;
+    //if ( GetState ( _CfrTil_, OPTIMIZE_ON ) ) 
+    CfrTil_TypeStackPush ( word ) ;
+}
+
+void
 DataStack_Dup ( )
 {
     _Dsp_ [ 1 ] = _Dsp_[0] ;
@@ -135,7 +143,7 @@ CfrTil_PrintDataStack ( )
 void
 CfrTil_PrintStackDepth ( )
 {
-    _Printf ( (byte*) "\nDataStack : depth = %d", Stack_Depth ( _DataStack_ ) ) ; 
+    _Printf ( ( byte* ) "\nDataStack : depth = %d", Stack_Depth ( _DataStack_ ) ) ;
 }
 
 void

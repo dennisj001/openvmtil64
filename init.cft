@@ -363,7 +363,7 @@ Root
 'todo 0 const  
 'bigArrayTest 0 const
 dbgOff
-//dbgOn 
+dbgOn 
 #if Is_DebugOn 
 
 #if todo
@@ -386,7 +386,5 @@ stringMacrosOff
 bnOff
 2 + 7  assertStkChk // stack checking
 Shell
-#if Is_DebugOn
 s
-#endif
 //verbosity 0 =

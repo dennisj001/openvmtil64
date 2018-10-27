@@ -290,10 +290,10 @@ Literal_New ( Lexer * lexer, uint64 uliteral )
     // nb.! : remember the compiler optimizes with the WordStack so everything has to be converted to a Word
     // _DObject_New : calls _Do_Literal which pushes the literal on the data stack or compiles a push ...
     Word * word ;
-    byte _name [ 256 ], *name ;
+    byte _name [ 64 ], *name ;
     if ( ! ( lexer->TokenType & ( T_STRING | T_RAW_STRING | T_CHAR | KNOWN_OBJECT ) ) )
     {
-        snprintf ( ( char* ) _name, 256, "<unknown object type> : %lx", ( uint64 ) uliteral ) ;
+        snprintf ( ( char* ) _name, 64, "<unknown object type> : %lx", ( uint64 ) uliteral ) ;
         name = String_New ( _name, STRING_MEM ) ;
     }
     else
@@ -304,7 +304,7 @@ Literal_New ( Lexer * lexer, uint64 uliteral )
         }
         name = lexer->OriginalToken ;
     }
-    word = _DObject_New ( name, uliteral, LITERAL | CONSTANT | IMMEDIATE, 0, 0, LITERAL, ( byte* ) _DataObject_Run, 0, 0, 0, (CompileMode ? INTERNAL_OBJECT_MEM : OBJECT_MEM) ) ;
+    word = _DObject_New ( name, uliteral, (LITERAL | CONSTANT | IMMEDIATE| lexer->TokenType), 0, 0, LITERAL, ( byte* ) _DataObject_Run, 0, 0, 0, (CompileMode ? INTERNAL_OBJECT_MEM : OBJECT_MEM) ) ;
 
     return word ;
 }

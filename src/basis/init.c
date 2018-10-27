@@ -27,6 +27,7 @@ _CfrTil_Init_SessionCore ( CfrTil * cfrTil, int64 cntxDelFlag, int64 promptFlag 
     LC_LispNamespacesOff () ;
     //OVT_FreeTempMem ( ) ; // -> above, before inits
     CfrTil_CheckInitDataStack ( ) ;
+    Stack_Init ( cfrTil->TypeWordStack ) ;
     OVT_StartupMessage ( ) ;
     _OVT_Ok ( promptFlag ) ;
     cfrTil->SC_QuoteMode = 0 ;
@@ -110,7 +111,7 @@ _CfrTil_InitialAddWordToNamespace ( Word * word, byte * containingNamespaceName,
 }
 
 void
-_CfrTil_CPrimitiveNewAdd ( const char * name, uint64 opInsnGroup, uint64 opInsCode, block b, uint64 ctype, uint64 ctype2, uint64 ltype, const char *nameSpace, const char * superNamespace )
+_CfrTil_CPrimitiveNewAdd ( const char * name, byte * pb_TypeSignature, uint64 opInsnGroup, uint64 opInsCode, block b, uint64 ctype, uint64 ctype2, uint64 ltype, const char *nameSpace, const char * superNamespace )
 {
     Word * word = _Word_New ( ( byte* ) name, CPRIMITIVE | ctype, ctype2, ltype, 1, 0, DICTIONARY ) ;
     _DObject_ValueDefinition_Init ( word, ( int64 ) b, BLOCK, 0, 0 ) ;
@@ -122,6 +123,7 @@ _CfrTil_CPrimitiveNewAdd ( const char * name, uint64 opInsnGroup, uint64 opInsCo
     word->CAttribute2 = ctype2 ;
     word->W_OpInsnCode = opInsCode ;
     word->W_OpInsnGroup = opInsnGroup ;
+    if (pb_TypeSignature) strncpy ( (char*)&word->W_TypeSignature, (char*) pb_TypeSignature, 8 ) ; 
 }
 
 void
@@ -131,7 +133,7 @@ CfrTil_AddCPrimitives ( )
     for ( i = 0 ; CPrimitives [ i ].ccp_Name ; i ++ )
     {
         CPrimitive p = CPrimitives [ i ] ;
-        _CfrTil_CPrimitiveNewAdd ( p.ccp_Name, p.OpInsnCodeGroup, p.OpInsnCode, p.blk_Definition, p.ui64_CAttribute, p.ui64_CAttribute2, p.ui64_LAttribute, ( char* ) p.NameSpace, ( char* ) p.SuperNamespace ) ;
+        _CfrTil_CPrimitiveNewAdd ( p.ccp_Name, p.pb_TypeSignature, p.OpInsnCodeGroup, p.OpInsnCode, p.blk_Definition, p.ui64_CAttribute, p.ui64_CAttribute2, p.ui64_LAttribute, ( char* ) p.NameSpace, ( char* ) p.SuperNamespace ) ;
     }
     //_CfrTil_CPrimitiveNewAdd ( p.ccp_Name, p.blk_Definition, p.ui64_CAttribute, p.ui64_CAttribute2, p.ui64_LAttribute, ( char* ) p.NameSpace, ( char* ) p.SuperNamespace ) ;
 }

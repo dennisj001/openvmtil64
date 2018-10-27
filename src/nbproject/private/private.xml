@@ -20,7 +20,7 @@
             <url>basis/core/dataObjectRun.c</url>
             <bookmark id="1">
                 <name/>
-                <line>319</line>
+                <line>308</line>
                 <key/>
             </bookmark>
         </file>
@@ -35,20 +35,16 @@
     </editor-bookmarks>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/home/dennisj/openvmtil64/src/basis/core/block.c</file>
-            <file>file:/home/dennisj/openvmtil64/src/primitives/primitives.c</file>
-            <file>file:/home/dennisj/openvmtil64/src/basis/bigNum.c</file>
-            <file>file:/home/dennisj/openvmtil64/src/primitives/debuggers.c</file>
-            <file>file:/home/dennisj/openvmtil64/src/basis/context.c</file>
-            <file>file:/home/dennisj/openvmtil64/src/basis/core/interpret.c</file>
-            <file>file:/home/dennisj/openvmtil64/src/basis/debugStepping.c</file>
-            <file>file:/home/dennisj/openvmtil64/init.cft</file>
+            <file>file:/home/dennisj/openvmtil64/src/basis/debugger.c</file>
+            <file>file:/home/dennisj/openvmtil64/src/basis/core/dataStack.c</file>
+            <file>file:/home/dennisj/openvmtil64/src/basis/core/dataObjectRun.c</file>
+            <file>file:/home/dennisj/openvmtil64/src/basis/sourceCode.c</file>
+            <file>file:/home/dennisj/openvmtil64/src/basis/init.c</file>
+            <file>file:/home/dennisj/openvmtil64/src/basis/cfrtil64.c</file>
+            <file>file:/home/dennisj/openvmtil64/src/basis/compiler/optimize.c</file>
+            <file>file:/home/dennisj/openvmtil64/src/basis/core/memSpace.c</file>
             <file>file:/home/dennisj/openvmtil64/src/basis/openVmTil.c</file>
             <file>file:/home/dennisj/openvmtil64/src/include/types.h</file>
-            <file>file:/home/dennisj/openvmtil64/src/basis/core/lexer.c</file>
-            <file>file:/home/dennisj/openvmtil64/src/basis/debugger.c</file>
-            <file>file:/home/dennisj/openvmtil64/src/basis/core/cstack.c</file>
-            <file>file:/home/dennisj/openvmtil64/src/basis/core/word.c</file>
         </group>
     </open-files>
 </project-private>

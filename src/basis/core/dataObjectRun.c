@@ -28,7 +28,7 @@ _DataObject_Run ( Word * word0 )
         else _CfrTil_Do_Variable ( word ) ;
     }
     else if ( word->CAttribute & DOBJECT ) CfrTil_Do_DynamicObject ( word, ACC ) ;
-    else if ( word->CAttribute & ( LITERAL | CONSTANT ) ) _CfrTil_Do_Literal ( word ) ;
+    else if ( word->CAttribute & ( LITERAL | CONSTANT ) ) _CfrTil_Do_LiteralWord ( word ) ;
     else if ( word->CAttribute & OBJECT_FIELD )
     {
         _CfrTil_Do_ClassField ( word ) ;
@@ -227,17 +227,6 @@ _Word_CompileAndRecord_PushReg ( Word * word, int64 reg )
     }
 }
 
-void
-_Do_Literal ( int64 value )
-{
-    if ( CompileMode )
-    {
-        Compile_MoveImm_To_Reg ( ACC, value, CELL ) ;
-        CfrTil_CompileAndRecord_PushAccum () ; // does word == top of word stack always
-    }
-    else DataStack_Push ( value ) ;
-}
-
 // a constant is, of course, a literal
 
 void
@@ -339,7 +328,18 @@ _Do_Variable ( Word * word )
 }
 
 void
-_CfrTil_Do_Literal ( Word * word )
+_Do_LiteralValue ( int64 value )
+{
+    if ( CompileMode )
+    {
+        Compile_MoveImm_To_Reg ( ACC, value, CELL ) ;
+        CfrTil_CompileAndRecord_PushAccum () ; // does word == top of word stack always
+    }
+    else DataStack_Push ( value ) ;
+}
+
+void
+_CfrTil_Do_LiteralWord ( Word * word )
 {
     if ( CompileMode )
     {
@@ -348,8 +348,10 @@ _CfrTil_Do_Literal ( Word * word )
     }
     else
     {
-        if ( word->CAttribute & ( T_STRING | T_RAW_STRING ) ) DataStack_Push ( ( uint64 ) word->W_BytePtr ) ;
-        else DataStack_Push ( word->W_Value ) ;
+        uint64 value ; 
+        if ( word->CAttribute & ( T_STRING | T_RAW_STRING ) ) value = ( uint64 ) word->W_BytePtr ; //DataStack_Push ( ( uint64 ) word->W_BytePtr ) ;
+        else value = word->W_Value ; //DataStack_Push ( word->W_Value ) ; 
+        DataStack_Push_TypeStackPush ( word, value ) ;
     }
 }
 
@@ -410,7 +412,8 @@ _CfrTil_Do_Variable ( Word * word )
             }
             else value = ( int64 ) word->W_PtrToValue ;
             if ( cntx->Interpreter0->BaseObject ) TOS = value ;
-            else DataStack_Push ( value ) ;
+            //else DataStack_Push ( value ) ;
+            else DataStack_Push_TypeStackPush ( word, value ) ;
         }
     }
 }

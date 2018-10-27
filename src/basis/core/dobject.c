@@ -126,7 +126,6 @@ DObject_Finish ( Word * word )
     word->W_NumberOfArgs = _Context_->Compiler0->NumberOfArgs ;
     word->W_NumberOfLocals = _Context_->Compiler0->NumberOfLocals ;
     _CfrTil_->LastFinished_DObject = word ;
-    //word->W_SourceCode = String_New ( _CfrTil_->SC_ScratchPad, STRING_MEM ) ;
 }
 
 Word *

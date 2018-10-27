@@ -264,6 +264,7 @@ CfrTil_Immediate ( void )
     if ( word ) word->CAttribute |= IMMEDIATE ;
 }
 
+#if 0
 void
 CfrTil_StackVariable ( void )
 {
@@ -274,6 +275,7 @@ CfrTil_StackVariable ( void )
         word->CAttribute |= STACK_VARIABLE ;
     }
 }
+#endif
 
 void
 CfrTil_Syntactic ( void )

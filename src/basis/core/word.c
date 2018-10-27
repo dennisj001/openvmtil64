@@ -19,7 +19,13 @@ Word_Run ( Word * word )
             // keep track in the word itself where the machine code is to go, if this word is compiled or causes compiling code - used for optimization
             Word_SetCoding ( word, Here, 1 ) ; // if we change it later (eg. in lambda calculus) we must change it there because the rest of the compiler depends on this
             _Context_->CurrentlyRunningWord = word ;
-            Block_Eval ( word->Definition ) ;
+            if ( IS_MORPHISM_TYPE ( word ) ) 
+            {
+                CfrTil_Typecheck (word, 0)  ;
+                Block_Eval ( word->Definition ) ;
+                CfrTil_TypeStackReset ( ) ; //after for words like 'constant'
+            }
+            else Block_Eval ( word->Definition ) ;
         }
         else Set_DataStackPointers_FromDebuggerDspReg ( ) ; // back from _CfrTil_DebugRuntimeBreakpoint
     }
@@ -52,12 +58,10 @@ void
 _Word_Compile ( Word * word )
 {
     Word_SetCodingHere_And_ClearPreviousUseOf_Here_SCA ( word, 0 ) ;
+    if ( word->W_TypeSignature ) CfrTil_Typecheck ( word, 1 ) ;
     if ( ! word->Definition ) CfrTil_SetupRecursiveCall ( ) ;
-    else if ( ( GetState ( _CfrTil_, INLINE_ON ) ) && ( word->CAttribute & INLINE ) && ( word->S_CodeSize ) )
-    {
-        _Compile_WordInline ( word ) ;
-    }
-    else Compile_CallWord_X84_ABI_RSP_ADJUST ( word ) ;
+    else if ( ( GetState ( _CfrTil_, INLINE_ON ) ) && ( word->CAttribute & INLINE ) && ( word->S_CodeSize ) ) _Compile_WordInline ( word ) ;
+    else Compile_CallWord_Check_X84_ABI_RSP_ADJUST ( word ) ;
 }
 
 Namespace *
@@ -156,7 +160,7 @@ _Word_Create ( byte * name, uint64 ctype, uint64 ctype2, uint64 ltype, uint64 al
     if ( Is_NamespaceType ( word ) ) word->Lo_List = dllist_New ( ) ;
     _Compiler_->CurrentCreatedWord = word ;
     _CfrTil_->WordCreateCount ++ ;
-    Word_Set_ScIndex_RlIndex ( word, - 1, - 1 ) ; // default values
+    Lexer_Set_ScIndex_RlIndex ( _Lexer_, word, - 1, - 1 ) ; // default values
     return word ;
 }
 
@@ -291,6 +295,15 @@ Word_GetLocalsSourceCodeString ( Word * word, byte * buffer )
         }
     }
     return buffer ;
+}
+
+byte *
+Word_TypeSignature ( Word * word, byte * buffer )
+{
+    if ( word->CAttribute & T_INT ) strcat ( buffer, "Integer " ) ;
+    else if ( word->CAttribute & T_STRING ) strcat ( buffer, "String " ) ;
+    else if ( word->CAttribute & T_BIG_NUM ) strcat ( buffer, "BigNum " ) ;
+    else if ( word->CAttribute & T_BOOLEAN ) strcat ( buffer, "Boolean " ) ;
 }
 
 void
