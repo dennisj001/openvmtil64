@@ -1438,13 +1438,6 @@ void OpenVmTil_Throw(byte *excptMessage, byte *specialMessage, int64 restartCond
 void _OpenVmTil_LongJmp_WithMsg(int64 restartCondition, byte *msg);
 void OpenVmTil_SignalAction(int signal, siginfo_t *si, void *uc);
 void CfrTil_Exception(int64 exceptionCode, byte *message, int64 restartCondition);
-/* basis/types.c */
-byte *CfrTil_ExpandTypeSignature(Word *opWord, byte *buffer);
-void CfrTil_TypeError(Word *opWord, int64 stackDepth);
-void CfrTil_TypeStackReset(void);
-Boolean _CfrTil_TypeCheckAndInfer(Word *opWord, int64 stackDepth);
-void CfrTil_Typecheck(Word *opWord, Boolean resetStackFlag);
-void CfrTil_TypeStackPush(Word *word);
 /* basis/compiler/locals.c */
 void Compile_Init_RegisterParamenterVariables(Compiler *compiler);
 void _Compiler_AddLocalFrame(Compiler *compiler);
@@ -1454,7 +1447,7 @@ void CfrTil_LocalsAndStackVariablesBegin(void);
 void CfrTil_LocalVariablesBegin(void);
 /* basis/debugger.c */
 void _Debugger_InterpreterLoop(Debugger *debugger);
-void _Debugger_PreSetup(Debugger *debugger, Word *word, Boolean forceFlag);
+void _Debugger_PreSetup(Debugger *debugger, Word *word, byte *token, Boolean forceFlag);
 void Debugger_On(Debugger *debugger);
 void _Debugger_Off(Debugger *debugger);
 void Debugger_Off(Debugger *debugger, int64 debugOffFlag);

@@ -223,7 +223,8 @@
 #define Is_DebugShowOn ( _CfrTil_ && GetState ( _CfrTil_, _DEBUG_SHOW_ ) ) 
 #define _Is_DebugOn GetState ( _CfrTil_, _DEBUG_SHOW_ )
 #define Is_DebugOn (Is_DebugShowOn && Is_DebugModeOn)
-#define _DEBUG_SETUP( word, forceFlag ) if ( (word && Is_DebugModeOn)) _Debugger_PreSetup ( _Debugger_, word, forceFlag ) ;
+#define _DEBUG_SETUP( word, forceFlag ) if ( (word && Is_DebugModeOn)) _Debugger_PreSetup (_Debugger_, word, 0, forceFlag ) ;
+#define _DEBUG_SETUP_TOKEN( token, forceFlag ) if ( (word && Is_DebugModeOn)) _Debugger_PreSetup (_Debugger_, 0, token, forceFlag ) ;
 #define DEBUG_SETUP( word ) _DEBUG_SETUP( word, 0 )
 #define _DEBUG_SHOW( word, force ) _Debugger_PostShow ( _Debugger_, word, force ) ; //, token, word ) ;
 #define DEBUG_SHOW Debugger_PostShow ( _Debugger_ ) ; //, token, word ) ;

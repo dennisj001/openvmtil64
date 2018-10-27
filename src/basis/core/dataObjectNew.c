@@ -274,11 +274,11 @@ ParameterVarOffset ( Word * word )
 Word *
 CfrTil_LocalWord ( byte * name, int64 ctype, int64 allocType ) // svf : flag - whether stack variables are in the frame
 {
-    if ( ! GetState ( _Compiler_, DOING_C_TYPE ) && ( ! GetState ( _LC_, LC_BLOCK_COMPILE )) )
+    if ( ! GetState ( _Compiler_, DOING_C_TYPE ) && ( ! GetState ( _LC_, LC_BLOCK_COMPILE ) ) )
     {
         _Namespace_FindOrNew_Local ( _Compiler_->LocalsCompilingNamespacesStack ) ;
         Finder_SetQualifyingNamespace ( _Finder_, 0 ) ;
-    } 
+    }
     Word * word = _CfrTil_LocalWord ( name, ctype, 0, 0, allocType ) ; // svf : flag - whether stack variables are in the frame
     word->CAttribute2 |= RECYCLABLE_LOCAL ;
     return word ;
@@ -304,7 +304,7 @@ Literal_New ( Lexer * lexer, uint64 uliteral )
         }
         name = lexer->OriginalToken ;
     }
-    word = _DObject_New ( name, uliteral, (LITERAL | CONSTANT | IMMEDIATE| lexer->TokenType), 0, 0, LITERAL, ( byte* ) _DataObject_Run, 0, 0, 0, (CompileMode ? INTERNAL_OBJECT_MEM : OBJECT_MEM) ) ;
+    word = _DObject_New ( name, uliteral, ( LITERAL | CONSTANT | IMMEDIATE | lexer->TokenType ), 0, 0, LITERAL, ( byte* ) _DataObject_Run, 0, 0, 0, ( CompileMode ? INTERNAL_OBJECT_MEM : OBJECT_MEM ) ) ;
 
     return word ;
 }

@@ -20,6 +20,7 @@ Lexer_ObjectToken_New ( Lexer * lexer, byte * token ) //, int64 parseFlag )
     byte * token2 ;
     if ( token )
     {
+        _DEBUG_SETUP_TOKEN ( token, 0 ) ;
         Lexer_ParseObject ( lexer, token ) ;
         if ( lexer->TokenType & T_RAW_STRING )
         {
@@ -47,6 +48,7 @@ Lexer_ObjectToken_New ( Lexer * lexer, byte * token ) //, int64 parseFlag )
         // this is done in Word_Create 
         //Lexer_Set_ScIndex_RlIndex ( lexer, word, lexer->TokenStart_ReadLineIndex, lexer->SC_Index ) ;
         lexer->TokenWord = word ;
+        DEBUG_SHOW ;
     }
     return word ;
 }

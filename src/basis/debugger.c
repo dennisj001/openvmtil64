@@ -33,7 +33,7 @@ _Debugger_InterpreterLoop ( Debugger * debugger )
 }
 
 void
-_Debugger_PreSetup ( Debugger * debugger, Word * word, Boolean forceFlag )
+_Debugger_PreSetup (Debugger * debugger, Word * word, byte * token, Boolean forceFlag )
 {
     if ( ( Is_DebugModeOn && Is_DebugShowOn ) || forceFlag )
     {
@@ -42,18 +42,17 @@ _Debugger_PreSetup ( Debugger * debugger, Word * word, Boolean forceFlag )
             if ( ! word ) word = _Context_->CurrentlyRunningWord ;
             if ( word && ( ! word->W_OriginalWord ) ) word->W_OriginalWord = word ;
             debugger->w_Word = word ;
-            if ( word && word->Name[0] )
+            if ( ( word && word->Name[0] ) || token ) 
             {
                 if ( forceFlag ) debugger->LastShowWord = 0 ;
-                if ( ! word->Name ) word->Name = ( byte* ) "" ;
                 SetState ( debugger, DBG_COMPILE_MODE, CompileMode ) ;
                 SetState_TrueFalse ( debugger, DBG_ACTIVE | DBG_INFO | DBG_PROMPT, DBG_INTERPRET_LOOP_DONE | DBG_PRE_DONE | DBG_CONTINUE | DBG_STEPPING | DBG_STEPPED ) ;
-                debugger->TokenStart_ReadLineIndex = word->W_RL_Index ;
+                if ( word ) debugger->TokenStart_ReadLineIndex = word->W_RL_Index ;
                 debugger->SaveDsp = _Dsp_ ;
                 if ( ! debugger->StartHere ) debugger->StartHere = Here ;
                 debugger->WordDsp = _Dsp_ ;
                 debugger->SaveTOS = TOS ;
-                debugger->Token = word->Name ;
+                debugger->Token = word->Name ? word->Name : token ;
                 debugger->PreHere = Here ;
                 _Namespace_FreeNamespacesStack ( debugger->LocalsNamespacesStack ) ;
                 DebugColors ;
