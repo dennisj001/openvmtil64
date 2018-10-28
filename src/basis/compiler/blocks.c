@@ -150,10 +150,7 @@ _CfrTil_BeginBlock0 ( Boolean compileJumpFlag, byte * here )
         CfrTil_TurnOnBlockCompiler ( ) ;
     }
     bi->OriginalActualCodeStart = here ? here : Here ;
-    if ( compileJumpFlag )
-    {
-        _Compile_UninitializedJump ( ) ;
-    }
+    if ( compileJumpFlag ) _Compile_UninitializedJump ( ) ;
     bi->JumpOffset = here ? here - INT32_SIZE : Here - INT32_SIZE ; // before CfrTil_CheckCompileLocalFrame after CompileUninitializedJump
     Stack_Push_PointerToJmpOffset ( ) ;
     WordStack_SCHCPUSCA ( 0, 0 ) ; // after the jump! -- the jump is optimized out
@@ -226,10 +223,7 @@ _CfrTil_EndBlock1 ( BlockInfo * bi )
             if ( compiler->NumberOfRegisterVariables >= ( compiler->NumberOfArgs + compiler->NumberOfLocals ) ) bi->bp_First = bi->AfterLocalFrame ;
             if ( compiler->ReturnVariableWord )
             {
-                if ( compiler->ReturnVariableWord->CAttribute & REGISTER_VARIABLE )
-                {
-                    _Compile_Move_Reg_To_StackN ( DSP, 0, compiler->ReturnVariableWord->RegToUse ) ;
-                }
+                if ( compiler->ReturnVariableWord->CAttribute & REGISTER_VARIABLE ) _Compile_Move_Reg_To_StackN ( DSP, 0, compiler->ReturnVariableWord->RegToUse ) ;
                 else
                 {
                     Compile_GetVarLitObj_RValue_To_Reg ( compiler->ReturnVariableWord, ACC ) ;
@@ -257,7 +251,7 @@ _CfrTil_EndBlock2 ( BlockInfo * bi )
     if ( ! Compiler_BlockLevel ( compiler ) )
     {
         _CfrTil_InstallGotoCallPoints_Keyed ( bi, GI_GOTO | GI_RECURSE ) ;
-#if 0
+#if 0 // especially for peephole optimization 
         int64 size = bi->bp_Last - first ;
         d1 ( if ( Is_DebugModeOn ) Debugger_Disassemble ( _Debugger_, ( byte* ) first, size, 1 ) ) ;
         BI_Block_Copy ( bi, Here, first, size, 1 ) ;
@@ -268,10 +262,7 @@ _CfrTil_EndBlock2 ( BlockInfo * bi )
         CfrTil_TurnOffBlockCompiler ( ) ;
         Compiler_Init ( compiler, 0 ) ;
     }
-    else
-    {
-        _Namespace_RemoveFromUsingListAndClear ( bi->LocalsNamespace ) ; //_Compiler_FreeBlockInfoLocalsNamespace ( bi, compiler ) ;
-    }
+    else _Namespace_RemoveFromUsingListAndClear ( bi->LocalsNamespace ) ; //_Compiler_FreeBlockInfoLocalsNamespace ( bi, compiler ) ;
     return first ;
 }
 

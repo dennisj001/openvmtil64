@@ -166,7 +166,7 @@ _CfrTil_Init ( CfrTil * cfrTil, Namespace * nss )
 
     cfrTil->ContextDataStack = Stack_New ( 256, allocType ) ;
     //cfrTil->ObjectStack = Stack_New ( 1 * K, allocType ) ;
-    cfrTil->TypeWordStack = Stack_New ( 64, allocType ) ;
+    cfrTil->TypeWordStack = Stack_New ( 1 * K, allocType ) ;
     cfrTil->TokenList = _dllist_New ( allocType ) ;
     cfrTil->CompilerWordList = _dllist_New ( allocType ) ;
 

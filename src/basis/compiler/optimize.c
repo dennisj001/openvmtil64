@@ -137,7 +137,8 @@ doOp:
                 if ( optInfo->opWord->CAttribute & ( CATEGORY_OP_1_ARG | CATEGORY_OP_STACK | CATEGORY_OP_LOAD ) ) break ;
             }
         }
-        CfrTil_Typecheck (word, 1) ;
+        //if ( ! ( word->CAttribute & ( CATEGORY_OP_LOAD ) ) ) 
+        CfrTil_Typecheck (word, 0 ) ;
         Compiler_OptimizeForOp ( compiler ) ;
 done:
         SetState ( _CfrTil_, IN_OPTIMIZER, false ) ;

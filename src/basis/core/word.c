@@ -19,13 +19,16 @@ Word_Run ( Word * word )
             // keep track in the word itself where the machine code is to go, if this word is compiled or causes compiling code - used for optimization
             Word_SetCoding ( word, Here, 1 ) ; // if we change it later (eg. in lambda calculus) we must change it there because the rest of the compiler depends on this
             _Context_->CurrentlyRunningWord = word ;
+#if 1            
             if ( IS_MORPHISM_TYPE ( word ) ) 
             {
                 CfrTil_Typecheck (word, 0)  ;
                 Block_Eval ( word->Definition ) ;
-                CfrTil_TypeStackReset ( ) ; //after for words like 'constant'
+                if ( ! GetState ( _Compiler_, ARRAY_MODE ) ) CfrTil_TypeStackReset ( ) ; //after for words like 'constant'
             }
-            else Block_Eval ( word->Definition ) ;
+            else 
+#endif            
+            Block_Eval ( word->Definition ) ;
         }
         else Set_DataStackPointers_FromDebuggerDspReg ( ) ; // back from _CfrTil_DebugRuntimeBreakpoint
     }

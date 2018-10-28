@@ -130,7 +130,7 @@ void
 _Compile_GetVarLitObj_RValue_To_Reg ( Word * word, int64 reg )
 {
     Word_SetCodingHere_And_ClearPreviousUseOf_Here_SCA ( word, 0 ) ;
-    CfrTil_TypeStackPush ( word ) ;
+    //CfrTil_TypeStackPush ( word ) ;
     if ( word->CAttribute & REGISTER_VARIABLE )
     {
         if ( word->RegToUse == reg ) return ;
@@ -211,7 +211,7 @@ void
 _Compile_GetVarLitObj_LValue_To_Reg ( Word * word, int64 reg )
 {
     Word_SetCodingHere_And_ClearPreviousUseOf_Here_SCA ( word, 0 ) ;
-    if ( ! ( word->CAttribute & ( OBJECT | THIS ) || ( word->WAttribute & WT_QID ) ) ) CfrTil_TypeStackPush ( word ) ; // to be pushed in _Compile_GetVarLitObj_RValue_To_Reg
+    //if ( ! ( word->CAttribute & ( OBJECT | THIS ) || ( word->WAttribute & WT_QID ) ) ) CfrTil_TypeStackPush ( word ) ; // to be pushed in _Compile_GetVarLitObj_RValue_To_Reg
     if ( word->CAttribute & REGISTER_VARIABLE )
     {
         if ( word->RegToUse == reg ) return ;

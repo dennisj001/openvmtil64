@@ -267,6 +267,7 @@ Stack_Print_AValue ( uint64 * stackPointer, int64 i, byte * stackName, byte * bu
 {
     Word * word ;
     byte * string = 0, tsb [32], *ts = 0;
+    tsb[0] = 0 ;
     if ( isWordAlreadyFlag ) 
     {
         word = ( Word* ) ( stackPointer [ i ] ) ;

@@ -81,7 +81,7 @@ _Namespace_Do_C_Type ( Namespace * ns )
             if ( ( ! Compiling ) )
             {
                 Compiler_Init ( compiler, 0 ) ; //compiler->State ) ;
-                CfrTil_InitSourceCode_WithName (_CfrTil_, ns->Name, 1) ;
+                CfrTil_InitSourceCode_WithName ( _CfrTil_, ns->Name, 1 ) ;
             }
             CfrTil_WordList_Init ( _CfrTil_, 0, 1 ) ;
             Compiler_Get_C_BackgroundNamespace ( compiler ) ;
@@ -189,6 +189,7 @@ _CfrTil_Do_ClassField ( Word * word )
         else TOS = ( uint64 ) accumulatedAddress ; // C lvalue
     }
     if ( Lexer_IsTokenForwardDotted ( cntx->Lexer0 ) ) Finder_SetQualifyingNamespace ( cntx->Finder0, word->ClassFieldTypeNamespace ) ;
+    _Stack_SetTop ( _CfrTil_->TypeWordStack, ( int64 ) word ) ;
 }
 
 // nb. 'word' is the previous word to the '.' (dot) cf. CfrTil_Dot so it can be recompiled, a little different maybe, as an object
@@ -301,6 +302,7 @@ _Do_C_Syntax_Variable ( Word * word )
     else if ( ( ! ( word->CAttribute & REGISTER_VARIABLE ) ) ) Compile_GetVarLitObj_RValue_To_Reg ( word, ACC ) ;
     if ( Is_DebugOn ) _Printf ( ( byte * ) "\n_Do_C_Syntax_Variable : word = %s :: %s compiled", word->Name, isLValue ? "lvalue" : "rvalue" ) ;
     _Word_CompileAndRecord_PushReg ( word, ( word->CAttribute & REGISTER_VARIABLE ) ? word->RegToUse : ACC ) ;
+    CfrTil_TypeStackPush ( word ) ;
 }
 
 void
@@ -324,6 +326,7 @@ _Do_Variable ( Word * word )
             _Compile_GetVarLitObj_LValue_To_Reg ( word, ACC ) ;
             _Word_CompileAndRecord_PushReg ( word, ACC ) ;
         }
+        CfrTil_TypeStackPush ( word ) ;
     }
 }
 
@@ -333,7 +336,7 @@ _Do_LiteralValue ( int64 value )
     if ( CompileMode )
     {
         Compile_MoveImm_To_Reg ( ACC, value, CELL ) ;
-        CfrTil_CompileAndRecord_PushAccum () ; // does word == top of word stack always
+        CfrTil_CompileAndRecord_PushAccum ( ) ; // does word == top of word stack always
     }
     else DataStack_Push ( value ) ;
 }
@@ -348,11 +351,12 @@ _CfrTil_Do_LiteralWord ( Word * word )
     }
     else
     {
-        uint64 value ; 
+        uint64 value ;
         if ( word->CAttribute & ( T_STRING | T_RAW_STRING ) ) value = ( uint64 ) word->W_BytePtr ; //DataStack_Push ( ( uint64 ) word->W_BytePtr ) ;
-        else value = word->W_Value ; //DataStack_Push ( word->W_Value ) ; 
-        DataStack_Push_TypeStackPush ( word, value ) ;
+        else value = word->W_Value ; 
+        DataStack_Push ( value ) ; 
     }
+    CfrTil_TypeStackPush ( word ) ;
 }
 
 void
@@ -412,9 +416,10 @@ _CfrTil_Do_Variable ( Word * word )
             }
             else value = ( int64 ) word->W_PtrToValue ;
             if ( cntx->Interpreter0->BaseObject ) TOS = value ;
-            //else DataStack_Push ( value ) ;
-            else DataStack_Push_TypeStackPush ( word, value ) ;
+            else DataStack_Push ( value ) ;
+            //else DataStack_Push_TypeStackPush ( word, value ) ;
         }
+        CfrTil_TypeStackPush ( word ) ;
     }
 }
 
