@@ -196,7 +196,7 @@ _CfrTil_Init ( CfrTil * cfrTil, Namespace * nss )
     }
     CfrTil_MachineCodePrimitive_AddWords ( cfrTil ) ; // in any case we need to reinit these for eg. debugger->SaveCpuState (), etc.
     cfrTil->StoreWord = Finder_FindWord_AnyNamespace ( _Finder_, ( byte* ) "store" ) ;
-    cfrTil->PokeWord = Finder_FindWord_AnyNamespace ( _Finder_, ( byte* ) "poke" ) ;
+    cfrTil->PokeWord = Finder_FindWord_AnyNamespace ( _Finder_, ( byte* ) "=" ) ;
     cfrTil->RightBracket = Finder_FindWord_AnyNamespace ( _Finder_, ( byte* ) "]" ) ;
     cfrTil->InfixNamespace = Namespace_Find ( "Infix" ) ;
     CfrTil_ReadTables_Setup ( cfrTil ) ;
@@ -260,10 +260,7 @@ _CfrTil_New ( CfrTil * cfrTil )
         }
         CfrTil_ResetMemory ( cfrTil ) ;
     }
-    else
-    {
-        nss = 0 ;
-    }
+    else nss = 0 ;
     _Context_ = 0 ;
     cfrTil = ( CfrTil* ) Mem_Allocate ( sizeof ( CfrTil ), OPENVMTIL ) ;
     _CfrTil_Init ( cfrTil, nss ) ;

@@ -150,12 +150,14 @@ SC_List_AdjustAddress ( dlnode * node, byte * address, byte * newAddress )
     if ( nword->S_WordData && ( nword->Coding == address ) ) //&& ( nword->W_SC_WordIndex != word->W_SC_WordIndex ) )
     {
         Word_SetCoding ( nword, newAddress, 1 ) ;
+#if 0        
         d0 ( if ( Is_DebugModeOn ) _Printf ( ( byte* ) "\nnword %s with scwi %d :: cleared for word %s with scwi %d",
             nword->Name, nword->W_SC_Index, nword->Name, nword->W_SC_Index ) ) ;
         //if ( _Q_->Verbosity > 2 )
         {
             d0 ( if ( Is_DebugModeOn ) _DWL_ShowWord_Print ( nword, 0, "CODING ADJUST", 0, address, newAddress, 0, 1 ) ) ;
         }
+#endif    
     }
 }
 
@@ -318,7 +320,7 @@ DebugWordList_Show_InUse ( Debugger * debugger )
 void
 Debugger_ShowTypeWordStack ( Debugger * debugger )
 {
-    Stack_Print ( _CfrTil_->TypeWordStack, "TypeWordStack" ) ;
+    Stack_Print ( _CfrTil_->TypeWordStack, "TypeWordStack", 1 ) ;
 }
 
 void
@@ -506,6 +508,7 @@ _CfrTil_GetSourceCode ( )
 byte *
 _CfrTil_Finish_WordSourceCode ( CfrTil * cfrtil, Word * word )
 {
+    _CfrTil_->ScWord = word ;
     if ( ! word->W_SourceCode ) word->W_SourceCode = _CfrTil_GetSourceCode ( ) ;
     Lexer_SourceCodeOff ( _Lexer_ ) ;
     CfrTil_SourceCode_InitEnd ( cfrtil ) ;
@@ -538,8 +541,8 @@ CfrTil_WordList_Init ( CfrTil * cfrtil, Word * word, Boolean saveWord0 )
     Word * svWord ;
     if ( saveWord0 ) svWord = WordStack ( 0 ) ;
     else svWord = 0 ;
-    //CfrTil_RecycleWordList ( word ) ;
-    if ( ( word ) && ( IsSourceCodeOn ) ) cfrtil->LastFinished_DObject = cfrtil->CurrentWordCompiling = cfrtil->ScWord = word ;
+    //if ( ( word ) && ( IsSourceCodeOn ) ) cfrtil->LastFinished_Word = cfrtil->CurrentWordBeingCompiled = cfrtil->ScWord = word ;
+    if ( ( word ) && ( IsSourceCodeOn ) ) cfrtil->ScWord = word ;
     else cfrtil->ScWord = Get_SourceCodeWord ( ) ;
     if ( cfrtil->ScWord ) cfrtil->ScWord->W_SC_WordList = cfrtil->CompilerWordList ;
     if ( svWord )
@@ -553,7 +556,6 @@ byte *
 CfrTil_FinishSourceCode ( CfrTil * cfrtil, Word * word )
 {
     _CfrTil_Finish_WordSourceCode ( cfrtil, word ) ;
-    CfrTil_WordList_Init ( cfrtil, word, 0 ) ;
 }
 
 void
@@ -595,7 +597,7 @@ CfrTil_AppendCharToSourceCode ( CfrTil * cfrtil, byte c )
 Word *
 Get_SourceCodeWord ( )
 {
-    Word * scWord = _CfrTil_->ScWord ? _CfrTil_->ScWord : Compiling ? _CfrTil_->CurrentWordCompiling : _CfrTil_->LastFinished_DObject ;
+    Word * scWord = Compiling ? _CfrTil_->CurrentWordBeingCompiled : _CfrTil_->ScWord ? _CfrTil_->ScWord : _CfrTil_->LastFinished_Word ;
     return (scWord && scWord->S_WordData ) ? scWord : 0 ;
 }
 

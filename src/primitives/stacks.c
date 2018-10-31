@@ -47,6 +47,7 @@ CfrTil_Dup ( )
 {
     if ( CompileMode ) _Compile_Stack_Dup ( DSP ) ;
     else DataStack_Dup ( ) ;
+    CfrTil_TypeStack_Dup ( ) ;
 }
 #if 0
 void

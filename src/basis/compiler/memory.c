@@ -34,7 +34,7 @@ _Compile_Set_CAddress_WithRegValue_ThruReg ( byte * address, Boolean reg, Boolea
 {
     Compile_MoveReg_ToAddress_ThruReg ( reg, address, thruReg ) ;
 }
-
+#define ARRAY_MODE_CHECK 1
 void
 Compile_Peek ( Compiler * compiler, Boolean stackReg ) // @
 {
@@ -92,7 +92,7 @@ Compile_Store ( Compiler * compiler, Boolean stackReg ) // !
         Compile_SUBI ( REG, stackReg, 0, ( ( word && word->StackPushRegisterCode ) ? 1 : 2 ) * CELL_SIZE, 0 ) ;
         //DBI_OFF ;
     } 
-#if 1    
+#if ARRAY_MODE_CHECK   
     CfrTil_ArrayModeOff ( ) ;
 #endif    
 }
@@ -132,7 +132,7 @@ Compile_Poke ( Compiler * compiler, Boolean stackReg ) // =
         //if ( ! GetState ( _Context_, C_SYNTAX ) ) 
         Compile_SUBI ( REG, stackReg, 0, 2 * CELL_SIZE, BYTE ) ;
     }
-#if 1    
+#if ARRAY_MODE_CHECK  
     CfrTil_ArrayModeOff ( ) ;
 #endif    
 }
@@ -149,7 +149,7 @@ Compile_AtEqual ( Boolean stackReg ) // !
     Compile_Move_Rm_To_Reg ( OREG, stackReg, - CELL_SIZE ) ;
     Compile_Move_Reg_To_Rm ( OREG, ACC, 0 ) ;
     Compile_SUBI ( REG, stackReg, 0, CELL_SIZE * 2, BYTE ) ;
-#if 1    
+#if ARRAY_MODE_CHECK    
     CfrTil_ArrayModeOff ( ) ;
 #endif    
 }

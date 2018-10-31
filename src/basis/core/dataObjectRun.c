@@ -85,6 +85,7 @@ _Namespace_Do_C_Type ( Namespace * ns )
             }
             CfrTil_WordList_Init ( _CfrTil_, 0, 1 ) ;
             Compiler_Get_C_BackgroundNamespace ( compiler ) ;
+            //CfrTil_TypeStackPush ( ns ) ;
             if ( GetState ( cntx, C_SYNTAX ) )
             {
                 LambdaCalculus * svlc = _LC_ ;
@@ -189,7 +190,7 @@ _CfrTil_Do_ClassField ( Word * word )
         else TOS = ( uint64 ) accumulatedAddress ; // C lvalue
     }
     if ( Lexer_IsTokenForwardDotted ( cntx->Lexer0 ) ) Finder_SetQualifyingNamespace ( cntx->Finder0, word->ClassFieldTypeNamespace ) ;
-    _Stack_SetTop ( _CfrTil_->TypeWordStack, ( int64 ) word ) ;
+    CfrTil_TypeStack_SetTop ( word ) ;
 }
 
 // nb. 'word' is the previous word to the '.' (dot) cf. CfrTil_Dot so it can be recompiled, a little different maybe, as an object
@@ -353,8 +354,8 @@ _CfrTil_Do_LiteralWord ( Word * word )
     {
         uint64 value ;
         if ( word->CAttribute & ( T_STRING | T_RAW_STRING ) ) value = ( uint64 ) word->W_BytePtr ; //DataStack_Push ( ( uint64 ) word->W_BytePtr ) ;
-        else value = word->W_Value ; 
-        DataStack_Push ( value ) ; 
+        else value = word->W_Value ;
+        DataStack_Push ( value ) ;
     }
     CfrTil_TypeStackPush ( word ) ;
 }

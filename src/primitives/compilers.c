@@ -176,7 +176,15 @@ CfrTil_Return ( )
         if ( word && ( word->CAttribute & ( NAMESPACE_VARIABLE | LOCAL_VARIABLE | PARAMETER_VARIABLE ) ) )
         {
             _Compiler_->ReturnVariableWord = word ;
-            //if ( word->CAttribute & REGISTER_VARIABLE ) 
+            if ( GetState ( _CfrTil_, TYPECHECK_ON ) )
+            {
+                Word * cwbc = _CfrTil_->CurrentWordBeingCompiled ;
+                if ( ( word->CAttribute & LOCAL_VARIABLE ) && cwbc )
+                {
+                    cwbc->W_TypeSignature [_Compiler_->NumberOfArgs] = '.' ;
+                    cwbc->W_TypeSignature [_Compiler_->NumberOfArgs + 1] = CfrTil_Convert_Word_TypeAttributeToTypeCode ( word ) ;
+                }
+            }
             Lexer_ReadToken ( _Context_->Lexer0 ) ; // don't compile anything let end block or locals deal with the return
         }
         else
@@ -238,12 +246,12 @@ CfrTil_Literal ( )
 void
 CfrTil_Constant ( )
 {
-    Word *tword, *cword ;
+    Word *tword = 0, *cword ;
     int64 value = DataStack_Pop ( ) ;
-    tword = ( Word * ) Stack_Pop ( _CfrTil_->TypeWordStack ) ;
+    tword = CfrTil_TypeStack_Pop ( ) ;
     byte * name = ( byte* ) DataStack_Pop ( ) ;
     cword = DataObject_New ( CONSTANT, 0, name, ( LITERAL | CONSTANT ), 0, 0, 0, value, 0, - 1, - 1 ) ;
-    cword->CAttribute |= tword->CAttribute ;
+    if ( tword ) cword->CAttribute |= tword->CAttribute ;
     _CfrTil_Finish_WordSourceCode ( _CfrTil_, cword ) ;
 }
 

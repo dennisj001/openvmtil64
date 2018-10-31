@@ -285,7 +285,7 @@ CfrTil_ArrayEnd ( void )
 void
 CfrTil_ArrayModeOff ( void )
 {
-    if ( GetState ( _Compiler_, ARRAY_MODE ) )
+    if ( GetState ( _Compiler_, ARRAY_MODE ) ) 
     {
         SetState ( _Compiler_, ARRAY_MODE, false ) ;
         CfrTil_OptimizeOn ( ) ;

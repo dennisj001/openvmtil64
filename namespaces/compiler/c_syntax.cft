@@ -105,7 +105,7 @@ chi ( chey0, d | a b c )
     d = cobj.chey0.hey ;
     printf ( "\n%lx\n", d ) ;
     printf ( "\n chi : d = %lx\n", d ) ;
-    _assert ( d,  #x0123456789abcdef ) ;
+    _assert ( d #x0123456789abcdef ) ; 
     printf ( "\n%x\n", cobj.chey0.hey ) ;
     sprintf ( &chey0.chars [ 24 ], "%s", "hoot" ) ;
     dump ( chey0, cobj.size ) ; 
@@ -193,7 +193,7 @@ interpret3 words // i2halt code to exit interpret2
 : heey1 hey1 hey1 hey1 ;
 nl heey1 
 
-#if 1 // if 2
+#if 1 
 c_syntaxOn
 int
 faccs2 ( n | rec ) 

@@ -110,7 +110,7 @@ void
 Debugger_DisassembleTotalAccumulated ( Debugger * debugger )
 {
     byte * address = _Context_->Compiler0->InitHere ;
-    Word * word = _CfrTil_->CurrentWordCompiling ;
+    Word * word = _CfrTil_->CurrentWordBeingCompiled ;
     if ( ! ( Here - address ) )
     {
         address = ( byte* ) _CfrTil_->LastFinished_DObject->Definition ;

@@ -97,12 +97,12 @@ DataObject_New ( uint64 type, Word * word, byte * name, uint64 ctype, uint64 cty
         }
         case PARAMETER_VARIABLE: case LOCAL_VARIABLE: case (PARAMETER_VARIABLE | REGISTER_VARIABLE ): case (LOCAL_VARIABLE | REGISTER_VARIABLE ):
         {
-            word = _CfrTil_LocalWord ( name, ctype, 0, 0, DICTIONARY ) ;
+            word = _Compiler_LocalWord (_Compiler_, name, ctype, 0, 0, DICTIONARY ) ;
             break ;
         }
         default: case (T_LISP_SYMBOL | PARAMETER_VARIABLE ): case (T_LISP_SYMBOL | LOCAL_VARIABLE ): // REGISTER_VARIABLE combinations with others in this case
         {
-            word = CfrTil_LocalWord ( name, type, DICTIONARY ) ;
+            word = Compiler_LocalWord (_Compiler_, name, type, DICTIONARY ) ;
             break ;
         }
     }
@@ -228,7 +228,7 @@ _CfrTil_Variable_New ( byte * name, int64 value )
     Word * word ;
     if ( CompileMode )
     {
-        word = CfrTil_LocalWord ( name, LOCAL_VARIABLE, DICTIONARY ) ;
+        word = Compiler_LocalWord (_Compiler_, name, LOCAL_VARIABLE, DICTIONARY ) ;
         SetState ( _Compiler_, VARIABLE_FRAME, true ) ;
     }
     else word = _DObject_New ( name, value, ( NAMESPACE_VARIABLE | IMMEDIATE ), 0, 0, NAMESPACE_VARIABLE, ( byte* ) _DataObject_Run, 0, 1, 0, DICTIONARY ) ;
@@ -254,12 +254,18 @@ _CfrTil_Label ( byte * lname )
 }
 
 Word *
-_CfrTil_LocalWord ( byte * name, int64 ctype, int64 ctype2, int64 ltype, int64 allocType ) // svf : flag - whether stack variables are in the frame
+_Compiler_LocalWord (Compiler * compiler, byte * name, int64 ctype, int64 ctype2, int64 ltype, int64 allocType ) // svf : flag - whether stack variables are in the frame
 {
     Word *word ;
     {
         word = _DObject_New ( name, 0, ( ctype | IMMEDIATE ), ctype2, ltype, LOCAL_VARIABLE, ( byte* ) _DataObject_Run, 0, 1, 0, allocType ) ; //COMPILER_TEMP ) ; //allocType ) ; //SESSION ) ; //COMPILER_TEMP ) ;
-        word->Index = ( ctype & LOCAL_VARIABLE ) ? ++ _Compiler_->NumberOfLocals : ++ _Compiler_->NumberOfArgs ; //index ;
+        if ( ctype & REGISTER_VARIABLE ) 
+        {
+            compiler->NumberOfRegisterVariables ++ ; // ?? do in parse.c
+            if ( ctype & LOCAL_VARIABLE ) ++ compiler->NumberOfRegisterLocals ; else ++ compiler->NumberOfRegisterArgs ; 
+        }
+        else word->Index = ( ctype & LOCAL_VARIABLE ) ? ++ compiler->NumberOfNonRegisterLocals : ++ compiler->NumberOfNonRegisterArgs ; 
+        if ( ctype & LOCAL_VARIABLE ) ++ compiler->NumberOfLocals ; else ++ compiler->NumberOfArgs ; 
     }
     return word ;
 }
@@ -267,19 +273,19 @@ _CfrTil_LocalWord ( byte * name, int64 ctype, int64 ctype2, int64 ltype, int64 a
 int64
 ParameterVarOffset ( Word * word )
 {
-    int64 offset = ( - ( _Context_->Compiler0->NumberOfArgs - word->Index + 1 ) ) ; //??
+    int64 offset = ( - ( _Context_->Compiler0->NumberOfNonRegisterArgs - word->Index + 1 ) ) ; //??
     return offset ;
 }
 
 Word *
-CfrTil_LocalWord ( byte * name, int64 ctype, int64 allocType ) // svf : flag - whether stack variables are in the frame
+Compiler_LocalWord ( Compiler * compiler, byte * name, int64 ctype, int64 allocType ) // svf : flag - whether stack variables are in the frame
 {
-    if ( ! GetState ( _Compiler_, DOING_C_TYPE ) && ( ! GetState ( _LC_, LC_BLOCK_COMPILE ) ) )
+    if ( ! GetState ( compiler, DOING_C_TYPE ) && ( ! GetState ( _LC_, LC_BLOCK_COMPILE ) ) )
     {
-        _Namespace_FindOrNew_Local ( _Compiler_->LocalsCompilingNamespacesStack ) ;
+        _Namespace_FindOrNew_Local ( compiler->LocalsCompilingNamespacesStack ) ;
         Finder_SetQualifyingNamespace ( _Finder_, 0 ) ;
     }
-    Word * word = _CfrTil_LocalWord ( name, ctype, 0, 0, allocType ) ; // svf : flag - whether stack variables are in the frame
+    Word * word = _Compiler_LocalWord ( compiler, name, ctype, 0, 0, allocType ) ; // svf : flag - whether stack variables are in the frame
     word->CAttribute2 |= RECYCLABLE_LOCAL ;
     return word ;
 }

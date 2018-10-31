@@ -69,8 +69,8 @@ Debugger_ParseFunctionLocalVariables ( Debugger * debugger, Lexer * lexer, Boole
     byte * token, *prevToken = 0, *prevPrevToken = 0, *aToken ;
     Compiler * compiler = _Compiler_ ;
     Word * prevWord ;
-    compiler->NumberOfArgs = 0 ;
-    compiler->NumberOfLocals = 0 ;
+    compiler->NumberOfNonRegisterArgs = 0 ;
+    compiler->NumberOfNonRegisterLocals = 0 ;
     compiler->NumberOfRegisterVariables = 0 ; //nb. prevent increasing the locals offset by adding in repeated calls to this function
     levelBit = 0 ;
     debugger->LevelBitNamespaceMap = 0 ;
@@ -82,7 +82,7 @@ Debugger_ParseFunctionLocalVariables ( Debugger * debugger, Lexer * lexer, Boole
             while ( ( token = _Lexer_ReadToken ( lexer, ( byte* ) " ,\n\r\t" ) ) )
             {
                 if ( String_Equal ( token, ";" ) ) break ;
-                Word * lword = _CfrTil_LocalWord ( token, LOCAL_VARIABLE, 0, 0, COMPILER_TEMP ) ; //_CfrTil_LocalWord (token, LOCAL_VARIABLE, 0, 0, COMPILER_TEMP ) ;
+                Word * lword = _Compiler_LocalWord ( _Compiler_, token, LOCAL_VARIABLE, 0, 0, COMPILER_TEMP ) ; //_CfrTil_LocalWord (token, LOCAL_VARIABLE, 0, 0, COMPILER_TEMP ) ;
                 Namespace_DoAddWord ( debugger->LocalsNamespace, lword ) ;
             }
         }
@@ -97,7 +97,7 @@ Debugger_ParseFunctionLocalVariables ( Debugger * debugger, Lexer * lexer, Boole
         }
         else if ( ( String_Equal ( token, "(" ) ) && ( lasvf == false ) ) //|| String_Equal ( token, "(|" ) //not necessary the lexer will see only the '('
         {
-            if ( C_Syntax_AreWeParsingACFunctionCall (lexer) ) continue ;
+            if ( C_Syntax_AreWeParsingACFunctionCall ( lexer ) ) continue ;
             if ( ! ( debugger->LevelBitNamespaceMap & ( ( uint64 ) 1 << ( levelBit ) ) ) )
             {
                 debugger->LocalsNamespace = _CfrTil_Parse_LocalsAndStackVariables ( 1, 0, 0, debugger->LocalsNamespacesStack, 0 ) ;
@@ -114,7 +114,7 @@ Debugger_ParseFunctionLocalVariables ( Debugger * debugger, Lexer * lexer, Boole
             }
             if ( String_Equal ( token, "var" ) ) aToken = prevToken ;
             else aToken = Lexer_PeekNextNonDebugTokenWord ( _Lexer_, 0 ) ;
-            _CfrTil_LocalWord ( aToken, LOCAL_VARIABLE, 0, 0, COMPILER_TEMP ) ;
+            _Compiler_LocalWord ( _Compiler_, aToken, LOCAL_VARIABLE, 0, 0, COMPILER_TEMP ) ;
         }
         else if ( String_Equal ( token, "<end>" ) ) return ;
         prevPrevToken = prevToken ;
@@ -148,8 +148,8 @@ _Debugger_Locals_Show ( Debugger * debugger, Word * scWord )
         Compiler * compiler = _Context_->Compiler0 ;
         Lexer * lexer = Lexer_New ( COMPILER_TEMP ) ;
         ReadLiner * rl = lexer->ReadLiner0 ;
-        int64 svArgs = compiler->NumberOfArgs ;
-        int64 svLocals = compiler->NumberOfLocals ;
+        int64 svArgs = compiler->NumberOfNonRegisterArgs ;
+        int64 svLocals = compiler->NumberOfNonRegisterLocals ;
         int64 svRegs = compiler->NumberOfRegisterVariables ; //nb. prevent increasing the locals offset by adding in repeated calls to this function
         Stack * svStack = compiler->LocalsCompilingNamespacesStack ;
         Namespace * svNamespace = compiler->LocalsNamespace, *svInNamespace = _CfrTil_->InNamespace ;
@@ -169,8 +169,8 @@ _Debugger_Locals_Show ( Debugger * debugger, Word * scWord )
         _Namespace_FreeNamespacesStack ( debugger->LocalsNamespacesStack ) ;
         debugger->LocalsNamespacesStack = 0 ;
 
-        compiler->NumberOfArgs = svArgs ;
-        compiler->NumberOfLocals = svLocals ;
+        compiler->NumberOfNonRegisterArgs = svArgs ;
+        compiler->NumberOfNonRegisterLocals = svLocals ;
         compiler->NumberOfRegisterVariables = svRegs ; //nb. prevent increasing the locals offset by adding in repeated calls to this function
         compiler->LocalsCompilingNamespacesStack = svStack ;
         compiler->LocalsNamespace = svNamespace ;
@@ -185,8 +185,8 @@ _Debugger_Locals_Show ( Debugger * debugger, Word * scWord )
 void
 Debugger_Locals_Show ( Debugger * debugger )
 {
-    Word * scWord = Compiling ? _CfrTil_->CurrentWordCompiling :
-        ( debugger->DebugAddress ? Word_UnAlias (Word_GetFromCodeAddress ( debugger->DebugAddress )) : _Context_->CurrentlyRunningWord ) ;
+    Word * scWord = Compiling ? _CfrTil_->CurrentWordBeingCompiled :
+        ( debugger->DebugAddress ? Word_UnAlias ( Word_GetFromCodeAddress ( debugger->DebugAddress ) ) : _Context_->CurrentlyRunningWord ) ;
     _Debugger_Locals_Show ( debugger, scWord ) ;
 }
 
@@ -337,24 +337,31 @@ Debugger_ShowEffects ( Debugger * debugger, Boolean stepFlag, Boolean forceFlag 
 byte *
 _PrepareDbgSourceCodeString ( Word * word, byte * il, int64 tvw )
 {
-    byte * cc_line ;
+    byte * cc_line, *token, *subsToken ;
     char * nvw = ( char* ) Buffer_Data_Cleared ( _CfrTil_->DebugB ) ; // nvw : new view window
     Boolean ins = GetState ( _Debugger_, DBG_OUTPUT_INSERTION ) ;
+    Boolean subs = GetState ( _Debugger_, DBG_OUTPUT_SUBSTITUTION ) ;
     int64 slil, slt, totalBorder, idealBorder, leftBorder, rightBorder, lef, ref, nws, ots, nts, slNvw, wrli, inc ;
     // NB!! : remember the highlighting formatting characters don't add any additional *visible length* to the output line
     // ots : original token start (index into the source code), nws : new window start ; tvw: targetViewWidth ; nts : new token start
     // lef : left ellipsis flag, ref : right ellipsis flag
-    byte * token = String_ConvertToBackSlash ( word->Name ) ;
+    token = String_ConvertToBackSlash ( word->Name ) ;
+    if ( subs )
+    {
+        subsToken = _Debugger_->SubstitutedWord->Name ;
+        if ( String_Equal ( subsToken, subsToken ) ) subs = 0 ;
+        else token = subsToken ;
+    }
     slt = Strlen ( token ) ;
     wrli = word->W_RL_Index ;
     slil = Strlen ( String_RemoveEndWhitespace ( il ) ) ;
     inc = slil - wrli ;
-    ots = String_FindStrnCmpIndex ( il, token, wrli, slt, slil ) ; //(( inc > 30 ) ? 30 : inc) ) ; //20 ) ;// adjust from wrli which is 
+    ots = String_FindStrnCmpIndex ( il, word->Name, wrli, strlen ( word->Name ), slil ) ; //(( inc > 30 ) ? 30 : inc) ) ; //20 ) ;// adjust from wrli which is 
     totalBorder = ( tvw - slt ) ; // the borders allow us to slide token within the window of tvw
     // try to get nts relatively the same as ots
     idealBorder = ( totalBorder / 2 ) ;
     leftBorder = rightBorder = idealBorder ; // tentatively set leftBorder/rightBorder as ideally equal
-    nws = ots - idealBorder - ( ins ? ( slt / 2 ) + 1 : 0 ) ;
+    nws = ots - idealBorder - ( ins ? ( slt / 2 ) + 1 : ( subs ? ( ( strlen ( subsToken )) / 2 ) : 0 ) ) ;
     nts = idealBorder ;
     if ( nws < 0 )
     {
@@ -381,6 +388,13 @@ _PrepareDbgSourceCodeString ( Word * word, byte * il, int64 tvw )
         strcat ( nvw, token ) ;
         strcat ( nvw, " " ) ;
         strcat ( nvw, &il[ots] ) ;
+    }
+    if ( subs )
+    {
+        Strncpy ( nvw, &il[nws], ots ) ;
+        strcat ( nvw, subsToken ) ;
+        strcat ( nvw, " " ) ;
+        strcat ( nvw, &il[ots + strlen ( subsToken ) ] ) ; // 2 : '=' + ' ' :: assuming subs is only done with an '=' in _CfrTil_C_Infix_EqualOp
     }
     else Strncpy ( nvw, &il[nws], tvw ) ; // copy the the new view window to buffer nvw
     slNvw = Strlen ( nvw ) ;
@@ -423,7 +437,7 @@ Debugger_PrepareDbgSourceCodeString ( Debugger * debugger, Word * word, int64 tw
 }
 
 void
-_CfrTil_ShowInfo ( Debugger * debugger, byte * prompt, int64 signal, int64 force )
+_Debugger_ShowInfo ( Debugger * debugger, byte * prompt, int64 signal, int64 force )
 {
     if ( force || ( ! debugger->LastShowWord ) || ( debugger->w_Word != debugger->LastShowWord ) )
     {
@@ -483,7 +497,6 @@ next:
                 cc_line = Debugger_PrepareDbgSourceCodeString ( debugger, word, ( int64 ) Strlen ( obuffer ) ) ;
                 Strncat ( obuffer, cc_line, BUFFER_SIZE ) ;
                 _Printf ( ( byte* ) "%s", obuffer ) ;
-
             }
             else
             {
@@ -497,7 +510,6 @@ next:
             cc_line = ( char* ) Buffer_Data ( _CfrTil_->DebugB ) ;
             strcpy ( cc_line, ( char* ) rl->InputLine ) ;
             String_RemoveEndWhitespace ( ( byte* ) cc_line ) ;
-
             _Printf ( ( byte* ) "\n%s %s:: %s : %03d.%03d :> %s", // <:: " INT_FRMT "." INT_FRMT,
                 prompt, signal ? signalAscii : ( byte* ) "", location, rl->LineNumber, rl->ReadIndex,
                 cc_line ) ;
@@ -509,13 +521,20 @@ next:
 }
 
 void
+CfrTil_ShowInfo ( Word * word, byte * prompt, int64 signal )
+{
+    _Debugger_->w_Word = word ;
+    _Debugger_ShowInfo ( _Debugger_, prompt, signal, 1 ) ;
+}
+
+void
 Debugger_ShowInfo ( Debugger * debugger, byte * prompt, int64 signal )
 {
     Context * cntx = _Context_ ;
     int64 sif = 0 ;
     if ( ( GetState ( debugger, DBG_INFO ) ) || GetState ( debugger, DBG_STEPPING ) )
     {
-        _CfrTil_ShowInfo ( debugger, prompt, signal, 1 ) ;
+        _Debugger_ShowInfo ( debugger, prompt, signal, 1 ) ;
         sif = 1 ;
     }
     if ( ! ( cntx && cntx->Lexer0 ) )
@@ -535,7 +554,7 @@ Debugger_ShowInfo ( Debugger * debugger, byte * prompt, int64 signal )
         _Printf ( ( byte* ) "\nDebug Stepping Address : 0x%016lx", ( uint64 ) debugger->DebugAddress ) ;
         Debugger_UdisOneInstruction ( debugger, debugger->DebugAddress, ( byte* ) "", ( byte* ) "" ) ; // the next instruction
     }
-    if ( ( ! sif ) && ( ! GetState ( debugger, DBG_STEPPING ) ) && ( GetState ( debugger, DBG_INFO ) ) ) _CfrTil_ShowInfo ( debugger, prompt, signal, 1 ) ;
+    if ( ( ! sif ) && ( ! GetState ( debugger, DBG_STEPPING ) ) && ( GetState ( debugger, DBG_INFO ) ) ) _Debugger_ShowInfo ( debugger, prompt, signal, 1 ) ;
     if ( prompt == _Q_->ExceptionMessage ) _Q_->ExceptionMessage = 0 ;
 }
 

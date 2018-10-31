@@ -27,7 +27,7 @@ _CfrTil_Init_SessionCore ( CfrTil * cfrTil, int64 cntxDelFlag, int64 promptFlag 
     LC_LispNamespacesOff () ;
     //OVT_FreeTempMem ( ) ; // -> above, before inits
     CfrTil_CheckInitDataStack ( ) ;
-    Stack_Init ( cfrTil->TypeWordStack ) ;
+    //_CfrTil_TypeStackReset ( ) ;
     OVT_StartupMessage ( ) ;
     _OVT_Ok ( promptFlag ) ;
     cfrTil->SC_QuoteMode = 0 ;

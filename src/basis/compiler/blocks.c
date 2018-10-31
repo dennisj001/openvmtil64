@@ -84,6 +84,19 @@ Compile_BlockLogicTest ( BlockInfo * bi ) // , byte * start )
             bi->CopiedToLogicJccCode = Here ;
             BI_Set_setTtnn ( bi, TTT_ZERO, NEGFLAG_ON, TTT_ZERO, NEGFLAG_OFF ) ;
         }
+#if 1        
+        else if (( bi->LogicCodeWord->CAttribute & CATEGORY_OP_1_ARG ) && ( bi->LogicCodeWord->CAttribute2 & LOGIC_NEGATE ))
+        {
+            SetHere ( bi->LogicCodeWord->Coding, 1 ) ;
+            Word_SetCodingHere_And_ClearPreviousUseOf_Here_SCA ( bi->LogicCodeWord, 0 ) ;
+            _Compile_TestCode ( bi->LogicCodeWord->RegToUse, CELL ) ;
+            bi->CopiedToLogicJccCode = Here ;
+            BI_Set_setTtnn ( bi, TTT_ZERO, NEGFLAG_ON, TTT_ZERO, NEGFLAG_ON ) ;
+            //BI_Set_setTtnn ( bi, TTT_ZERO, NEGFLAG_ON, TTT_ZERO, NEGFLAG_OFF ) ;
+        }
+        //if ( ! ( bi->LogicCodeWord->CAttribute2 & LOGIC_NEGATE ) ) BI_Set_setTtnn ( bi, TTT_ZERO, NEGFLAG_ON, TTT_ZERO, NEGFLAG_OFF ) ;
+        //else BI_Set_setTtnn ( bi, TTT_ZERO, NEGFLAG_ON, TTT_ZERO, NEGFLAG_ON ) ;
+#endif        
     }
     else
     {
@@ -105,7 +118,7 @@ Block_CopyCompile ( byte * srcAddress, int64 bindex, Boolean jccFlag )
         Stack_Push_PointerToJmpOffset ( ) ;
         bi->CopiedToEnd = Here ;
         bi->CopiedSize = bi->CopiedToEnd - bi->CopiedToStart ;
-        d1 ( if ( Is_DebugModeOn ) Debugger_Disassemble ( _Debugger_, ( byte* ) bi->CopiedToStart, bi->CopiedSize, 1 ) ) ;
+        //d1 ( if ( Is_DebugModeOn ) Debugger_Disassemble ( _Debugger_, ( byte* ) bi->CopiedToStart, bi->CopiedSize, 1 ) ) ;
     }
 }
 
@@ -145,8 +158,8 @@ _CfrTil_BeginBlock0 ( Boolean compileJumpFlag, byte * here )
     if ( ( ! CompileMode ) || ( ! Compiler_BlockLevel ( compiler ) ) )// first block
     {
         CheckCodeSpaceForRoom ( ) ;
-        _CfrTil_->CurrentWordCompiling = compiler->CurrentCreatedWord ;
-        CfrTil_RecycleWordList ( 0 ) ;
+        _CfrTil_->CurrentWordBeingCompiled = compiler->CurrentCreatedWord ;
+        //CfrTil_RecycleWordList ( 0 ) ;
         CfrTil_TurnOnBlockCompiler ( ) ;
     }
     bi->OriginalActualCodeStart = here ? here : Here ;
@@ -199,12 +212,6 @@ CfrTil_BeginBlock ( )
     _CfrTil_BeginBlock ( 1, 0 ) ;
 }
 
-Boolean
-_Compiler_IsFrameNecessary ( Compiler * compiler )
-{
-    return ( compiler->NumberOfLocals + compiler->NumberOfArgs ) > 0 ; //( compiler->NumberOfRegisterLocals + compiler->NumberOfRegisterArgs ) ;
-}
-
 void
 _CfrTil_EndBlock1 ( BlockInfo * bi )
 {
@@ -213,14 +220,14 @@ _CfrTil_EndBlock1 ( BlockInfo * bi )
     {
         WordStack_SCHCPUSCA ( 0, 0 ) ;
         _CfrTil_InstallGotoCallPoints_Keyed ( bi, GI_RETURN ) ;
-        if ( _Compiler_IsFrameNecessary ( compiler ) && ( ! GetState ( compiler, DONT_REMOVE_STACK_VARIABLES ) ) )
+        if ( Compiler_IsFrameNecessary ( compiler ) && ( ! GetState ( compiler, DONT_REMOVE_STACK_VARIABLES ) ) )
         {
             _Compiler_RemoveLocalFrame ( compiler ) ;
             bi->bp_First = bi->LocalFrameStart ; // include _Compile_Rsp_Save code
         }
         else if ( compiler->NumberOfRegisterVariables )
         {
-            if ( compiler->NumberOfRegisterVariables >= ( compiler->NumberOfArgs + compiler->NumberOfLocals ) ) bi->bp_First = bi->AfterLocalFrame ;
+            if ( compiler->NumberOfRegisterVariables >= ( compiler->NumberOfNonRegisterArgs + compiler->NumberOfNonRegisterLocals ) ) bi->bp_First = bi->AfterLocalFrame ;
             if ( compiler->ReturnVariableWord )
             {
                 if ( compiler->ReturnVariableWord->CAttribute & REGISTER_VARIABLE ) _Compile_Move_Reg_To_StackN ( DSP, 0, compiler->ReturnVariableWord->RegToUse ) ;

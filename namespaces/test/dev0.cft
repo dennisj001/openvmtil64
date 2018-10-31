@@ -2,11 +2,11 @@
 Int 
 5 
 bnOff dbgOff
-Root : sp ; //stack pause ;
-C : sp ; //stack pause ;
+Root : sp ; // stack pause ;
+C : sp ; // stack pause ;
 dbOn 0 =
 User Lisp
-: sp ; //stack pause ;
+: sp ; // stack pause ;
 1 opOn // this currently requires the optimization to be on to compile correctly 
 // verbosity 2 = 
 // echoOn
@@ -202,67 +202,6 @@ bnOff
 #endif
 
 
-sp
-decimal
-: test1 ( n -- TOS ) n n @ 3 + = n @ ; //'test1 find wdiss 
-4 test1 7 _assert0 //pause
-: test1 ( n -- TOS ) n n @ 3 - = n @ ; //'test1 find wdiss 
-10 test1 7 _assert0 //pause
-: test1 ( n -- TOS ) n n @ 3 * = n @ ; //'test1 find wdiss 
-10 test1 30 _assert0 //pause
-: test1 ( n -- TOS ) n n @ 2 / = n @ ; //'test1 find wdiss 
-10 test1 5 _assert0 //pause
-: test1 ( n -- TOS ) n n @ 3 mod = n @ ; //'test1 find wdiss 
-5 test1 2 _assert0 //pause
-: test1 ( n -- TOS ) n n @ 3 & = n @ ; //'test1 find wdiss 
-7 test1 3 _assert0 //pause
-: test1 ( n -- TOS ) n n @ 3 | = n @ ; //'test1 find wdiss 
-4 test1 7 _assert0 //pause
-: test1 ( n -- TOS ) n n @ 3 << = n @ ; //'test1 find wdiss 
-1 test1 8 _assert0 //pause
-: test1 ( n -- TOS ) n n @ 3 >> = n @ ; //'test1 find wdiss 
-8 test1 1 _assert0 //pause
-: test1 ( n m -- TOS ) n n @ m @ + = n @ ; //'test1 find wdiss 
-6 2 test1 8 _assert0 //pause
-: test1 ( n m | a -- TOS ) a n @ m @ + = a @ ; //'test1 find wdiss 
-6 2 test1 8 _assert0 //pause
-: test1 ( n m -- TOS ) n n @ m @ - = n @ ; //'test1 find wdiss 
-9 2 test1 7 _assert0 //pause
-: test1 ( n m | a -- TOS ) a n @ m @ - = a @ ; //'test1 find wdiss 
-9 2 test1 7 _assert0 //pause
-: test1 ( n m -- TOS ) n n @ m @ + = n @ ; //'test1 find wdiss 
-6 2 test1 8 _assert0 //pause
-: test1 ( n m | a -- TOS ) a n @ m @ + = a @ ; //'test1 find wdiss 
-6 2 test1 8 _assert0 //pause
-: test1 ( n m -- TOS ) n n @ m @ * = n @ ; //'test1 find wdiss 
-6 2 test1 12 _assert0 //pause
-: test1 ( n m -- TOS ) n n @ m @ << = n @ ; //'test1 find wdiss 
-1 3 test1 8 _assert0 //pause
-: test1 ( n m -- TOS ) n n @ m @ >> = n @ ; //'test1 find wdiss 
-8 3 test1 1 _assert0 //pause
-: test1 ( n m | a -- TOS ) a n @ m @ * = a @ ; //'test1 find wdiss 
-6 2 test1 12 _assert0 //pause
-: test1 ( n m -- TOS ) n n @ m @ | = n @ ; //'test1 find wdiss 
-6 1 test1 7 _assert0 //pause
-: test1 ( n m | a -- TOS ) a n @ m @ | = a @ ; //'test1 find wdiss 
-6 1 test1 7 _assert0 //pause
-: test1 ( n m -- TOS ) n n @ m @ & = n @ ; //'test1 find wdiss 
-6 2 test1 2 _assert0 //pause
-: test1 ( n m | a -- TOS ) a n @ m @ & = a @ ; //'test1 find wdiss 
-6 2 test1 2 _assert0 //pause
-: test1 ( n m -- TOS ) n n @ m @ / = n @ ; //'test1 find wdiss 
-6 2 test1 3 _assert0 //pause
-: test1 ( n m | a -- TOS ) a n @ m @ / = a @ ; //'test1 find wdiss 
-6 2 test1 3 _assert0 //pause
-: test1 ( n m -- TOS ) n n @ m @ mod = n @ ; //'test1 find wdiss 
-5 3 test1 2 _assert0 //pause
-: test1 ( n m | a -- TOS ) a n @ m @ mod = a @ ; //'test1 find wdiss 
-5 3 test1 2 _assert0 //pause
-: test1 ( n m | a -- TOS ) a n @ m @ << = a @ ; //'test1 find wdiss 
-1 5 test1 32 _assert0 //pause
-: test1 ( n m | a -- TOS ) a n @ m @ >> = a @ ; //'test1 find wdiss 
-8 1 test1 4 _assert0 //pause
- 
 Int
 Lisp
 (define fibc2 ( lambda ( n ) ( ifElse ( < n 2 ) n ( + ( fibc2 ( - n 1 ) ) ( fibc2 ( - n 2 ) ) ) ) ) )
@@ -461,6 +400,7 @@ lispOff
 sp  
 
 #if 1 // REG testing
+: sp ; //stack pause ;
 : fibBN ( n | fn fn1 fn2 -- TOS ) 
     { fn 0 = fn1 0 = fn2 1 = } { n @ 0 > } { n 1 -= } 
     {   
@@ -473,7 +413,7 @@ sp
     return fn
 ;
 //' fibBN find wdiss
-20 fibBN dup p 6765 _assert 
+20 fibBN dup p 6765 _assert //sp
 : fibBN ( n | fn REG fn1 fn2 -- TOS ) 
     { fn 0 = fn1 0 = fn2 1 = } { n @ 0 > } { n 1 -= } 
     {   
@@ -486,7 +426,7 @@ sp
     fn @
 ;
 //' fibBN find wdiss
-20 fibBN dup p 6765 _assert 
+20 fibBN dup p 6765 _assert //sp
 : fibBN ( n | fn, REG fn1, REG fn2 -- TOS ) 
     { fn 0 = fn1 0 = fn2 1 = } { n @ 0 > } { n 1 -= } 
     {   
@@ -499,7 +439,8 @@ sp
     fn @
 ;
 //' fibBN find wdiss
-20 fibBN dup p 6765 _assert 
+20 fibBN dup p 6765 _assert //sp
+
 : fibBN ( n | REG fn REG fn1 REG fn2 -- TOS ) 
     { fn 0 = fn1 0 = fn2 1 = } { n @ 0 > } { n 1 -= } 
     {   
@@ -512,7 +453,8 @@ sp
     fn @
 ;
 //' fibBN find wdiss
-20 fibBN dup p 6765 _assert 
+20 fibBN dup p 6765 _assert sp
+
 : fibBN ( REG n | fn fn1 REG fn2 -- TOS ) 
     { fn 0 = fn1 0 = fn2 1 = } { n @ 0 > } { n 1 -= } 
     {   
@@ -524,8 +466,8 @@ sp
     // svn @ fprint ":" ps fn @ fprint 
     fn @
 ;
-//' fibBN find wdiss
-20 fibBN dup p 6765 _assert 
+' fibBN find wdiss
+20 fibBN dup p 6765 _assert sp
 : fibBN ( REG n | fn REG fn1 REG fn2 -- TOS ) 
     { fn 0 = fn1 0 = fn2 1 = } { n @ 0 > } { n 1 -= } 
     {   
@@ -538,7 +480,7 @@ sp
     fn @
 ;
 //' fibBN find wdiss
-20 fibBN dup p 6765 _assert 
+20 fibBN dup p 6765 _assert sp
 : fibBN ( REG n | REG fn fn1 REG fn2 -- TOS ) 
     { fn 0 = fn1 0 = fn2 1 = } { n @ 0 > } { n 1 -= } 
     {   
@@ -551,7 +493,7 @@ sp
     fn @
 ;
 //' fibBN find wdiss
-20 fibBN dup p 6765 _assert 
+20 fibBN dup p 6765 _assert sp
 #endif
 
 Int

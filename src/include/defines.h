@@ -246,7 +246,7 @@
 #define INFIXABLE ( (uint64) 1 << 21 )
 #define OBJECT ( (uint64) 1 << 22 )
 #define CONSTANT ( (uint64) 1 << 23 )
-#define CATEGORY_STACK ( (uint64) 1 << 24 )
+#define T_UNDEFINED ( (uint64) 1 << 24 )
 #define REGISTER_VARIABLE ( (uint64) 1 << 25 )
 #define THIS ( (uint64) 1 << 26 )
 #define OBJECT_FIELD ( (uint64) 1 << 27 )
@@ -271,9 +271,8 @@
 #define KEYWORD ( (uint64) 1 << 44 )
 #define TEXT_MACRO ( (uint64) 1 << 45 )
 #define STRING_MACRO ( (uint64) 1 << 46 )
-//#define RECYCLABLE_COPY ( (uint64) 1 << 47 )
+#define T_VOID ( (uint64) 1 << 47 )
 #define DEBUG_WORD ( (uint64) 1 << 48 )
-//#define RT_STACK_OP ( (uint64) 1 << 49 ) // Run Time stack operation
 #define BIT_SHIFT        ( (uint64) 1 << 49 ) 
 #define WORD_CREATE ( (uint64) 1 << 50 ) 
 #define INTERPRET_DBG ( (uint64) 1 << 51 ) 
@@ -315,6 +314,11 @@
 #define LEFT_BRACKET        ( (uint64) 1 << 20 ) // '['
 #define RECYCLABLE_COPY     ( (uint64) 1 << 21 )
 #define RECYCLABLE_LOCAL    ( (uint64) 1 << 22 )
+#define T_TYPE_VARIABLE     ( (uint64) 1 << 23 )
+#define T_ANY_FIXED_TYPE    ( (uint64) 1 << 24 )
+#define T_ANY               T_ANY_FIXED_TYPE    
+#define LOGIC_NEGATE        ( (uint64) 1 << 25 )
+#define C_INFIX_OP_EQUAL    ( (uint64) 1 << 26 )
 
 // _CAttribute for interpreter word types - 4 bits/ 16 possibilities : N_WordAttribute bitfield
 #define WT_PREFIX                 ( (uint64) 1 <<  0 ) 
@@ -490,6 +494,7 @@
 #define DBG_DISASM_ACC ( (uint64) 1 << 34 )
 #define DBG_START_STEPPING ( (uint64) 1 << 35 )
 #define DBG_OUTPUT_INSERTION ( (uint64) 1 << 36 )
+#define DBG_OUTPUT_SUBSTITUTION ( (uint64) 1 << 37 )
 
 #define SIZEOF_AddressAfterJmpCallStack 16
 // TODO : nb. flags need to be edited !!!!! for right category, overlap, use/non-use, etc.
@@ -504,8 +509,8 @@
 #define _DEBUG_SHOW_ ( (uint64) 1 << 11 )
 #define DEBUG_SHTL_OFF ( (uint64) 1 << 12 ) // SHTL == _String_HighlightTokenInputLine
 #define SC_FORCE_PUSH ( (uint64) 1 << 13 )
-#define TYPESTACK_RESET_OFF ( (uint64) 1 << 14 )
-#define TYPECHECK_OFF ( (uint64) 1 << 15 )
+//#define TYPESTACK_RESET_OFF ( (uint64) 1 << 14 )
+//#define TYPECHECK_OFF ( (uint64) 1 << 15 )
 
 // State Flags --
 // ? sytem flags ?? -- not all -- todo here
@@ -528,6 +533,7 @@
 #define READLINE_ECHO_ON ( (uint64) 1 << 27 )
 #define IN_OPTIMIZER ( (uint64) 1 << 28 )
 #define SCA_ON ( (uint64) 1 << 29 )
+#define TYPECHECK_ON ( (uint64) 1 << 30 )
 
 // interpreter flags
 #define INTERPRETER_DONE ( (uint64) 1 << 28 )

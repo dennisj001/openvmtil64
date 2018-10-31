@@ -587,7 +587,7 @@ OVT_CheckRecycleableAllocate ( dllist * list, int64 size )
 void
 OVT_Recycle ( dllist * list, dlnode * anode )
 {
-    if ( anode ) dllist_AddNodeToHead ( list, anode ) ;
+    if ( anode ) dllist_AddNodeToTail ( list, anode ) ;
 }
 
 // put a word on the recycling list

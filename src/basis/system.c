@@ -113,12 +113,13 @@ _Dlsym ( byte * sym, byte * lib )
     return functionPointer ;
 }
 
-void
+Word *
 Dlsym ( byte * sym, byte * lib )
 {
     block b = ( block ) _Dlsym ( sym, lib ) ;
     Word * word = DataObject_New ( CFRTIL_WORD, 0, sym, CPRIMITIVE | DLSYM_WORD | C_PREFIX | C_RETURN | C_PREFIX_RTL_ARGS, 0, 0, 0, ( int64 ) b, 0, 0, - 1 ) ;
     word->WAttribute |= WT_C_PREFIX_RTL_ARGS ;
+    return word ;
 }
 
 // lib sym | addr
@@ -148,7 +149,8 @@ CfrTil_Dlsym ( )
     byte * sym = Lexer_ReadToken ( _Context_->Lexer0 ) ;
     byte * lib = _Lexer_LexNextToken_WithDelimiters ( _Context_->Lexer0, 0, 1, 0, 1, LEXER_ALLOW_DOT ) ;
     byte * semi = Lexer_ReadToken ( _Context_->Lexer0 ) ; // drop the semi
-    Dlsym ( sym, lib ) ;
+    Word * word = Dlsym ( sym, lib ) ;
+    _Word_Finish ( word ) ;
 }
 
 // callNumber | errno

@@ -268,7 +268,6 @@ ab.ar [0][0][0] @ dup p 263 _assert
 "cta" class :{ byte ar [3][3][3] ; };
 "aba" cta new
 scOn
-//void
 : tcta ( y cta a )
     a.ar [0][y @ 1 +][0] dup nl hp 77 =
     a.ar [y @][y @ 1 +][0] dup nl hp a.ar [0][y @ 1 +][0] dup nl hp @ = 
@@ -283,7 +282,7 @@ c_syntaxOn
 void
 ctcta ( y cta a )
 {
-    a.ar [0][y + 1][0] = 77 ; // 'M'
+    a.ar [0][y + 1][0] = 'M' ; // a.ar [0][y + 1][0] = 77 ; 
     a.ar [y ][y + 1][0] = a.ar [0][y + 1][0] ; 
     a.ar [y ][y + 1][1] = a.ar [y ][y + 1][0] ; 
     a.ar [y + 1][y + 1][0] = a.ar [y ][y + 1][1] ; 
@@ -297,10 +296,8 @@ ctcta ( y cta a )
 c_syntaxOff
 ' ctcta find wdiss
 
-#if bigArrayTest 
 "caba" cta new
 ctcta ( 1 caba ) 
-#endif
 
 //pause
 #endif

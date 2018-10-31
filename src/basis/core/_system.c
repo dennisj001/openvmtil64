@@ -37,37 +37,21 @@ System_Time ( System * system, uint64 timer, char * string, int64 tflag )
 {
     byte buffer [ 64 ] ;
     _System_Time ( system, timer, ( char* ) "%ld.%09ld", buffer ) ;
-    if ( tflag && ( _Q_->Verbosity ) ) _Printf ( ( byte* ) "%s [ %d ] : elapsed time = %s seconds", string, timer, buffer ) ;
-    //if ( tflag ) _Printf ( ( byte* ) "\n%s [ %d ] : elapsed time = %s seconds", string, timer, buffer ) ;
+    if ( tflag && ( _Q_->Verbosity ) ) _Printf ( ( byte* ) "\n%s [ %d ] : elapsed time = %s seconds", string, timer, buffer ) ;
 }
 
 void
 System_InitTime ( System * system )
 {
     int64 i ;
-    for ( i = 0 ; i < 8 ; i ++ )
-    {
-        _System_TimerInit ( system, i ) ;
-    }
+    for ( i = 0 ; i < 8 ; i ++ ) _System_TimerInit ( system, i ) ;
 }
 
 void
 System_RunInit ( System * system )
 {
-    //ConserveNewlines  ;
-    if ( _Q_->Signal > QUIT )
-    {
-        CfrTil_DataStack_Init () ;
-    }
-    else
-    {
-        //CfrTil_InitDspFromStackPointer ( _CfrTil_ ) ; // for preserving stack on "quit"
-        //_Set_DspReg_FromDataStackPointer () ;
-        if ( DataStack_Underflow ( ) || ( DataStack_Overflow ( ) ) )
-        {
-            CfrTil_PrintDataStack ( ) ;
-        }
-    }
+    if ( _Q_->Signal > QUIT ) CfrTil_DataStack_Init () ;
+    else if ( DataStack_Underflow ( ) || ( DataStack_Overflow ( ) ) ) CfrTil_PrintDataStack ( ) ;
 }
 
 void
@@ -83,14 +67,6 @@ System_Copy ( System * system0, uint64 type )
     _System_Copy ( system, system0, type ) ;
     return system ;
 }
-
-#if 0
-void
-System_Delete ( System * system )
-{
-    Mem_FreeItem ( _Q_->PermanentMemList, ( byte* ) system ) ;
-}
-#endif
 
 // BigNumWidth is a parameter to mpfr_printf; it works like printf and sets minimum number of characters to print
 void
@@ -118,5 +94,4 @@ System_New ( uint64 type )
     return system ;
 }
 
-// ( address number -- )
 

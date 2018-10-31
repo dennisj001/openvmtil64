@@ -72,17 +72,17 @@ Root
 sp
 
 String Shell C
-s: $$ 
+: $$ 
     ""
     { token dup ";" strcmp } 
     { 
         { dup "." strcmp } { strcat " " strcat } { strcat } if3
     } 
     while drop location "$$" ps dup ps _sh return
-;s  // allows more than one shell command on a ';' separated line 
+;  // allows more than one shell command on a ';' separated line 
+'$$ find wdiss //pause
 "streol" 'getStringToEndOfLine find alias
 : $ streol _sh ;  
-'$$ find wdiss //pause
 
 bnOff
 

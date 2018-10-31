@@ -137,8 +137,6 @@ doOp:
                 if ( optInfo->opWord->CAttribute & ( CATEGORY_OP_1_ARG | CATEGORY_OP_STACK | CATEGORY_OP_LOAD ) ) break ;
             }
         }
-        //if ( ! ( word->CAttribute & ( CATEGORY_OP_LOAD ) ) ) 
-        CfrTil_Typecheck (word, 0 ) ;
         Compiler_OptimizeForOp ( compiler ) ;
 done:
         SetState ( _CfrTil_, IN_OPTIMIZER, false ) ;
@@ -653,7 +651,8 @@ Do_OptimizeOp2Literals ( Compiler * compiler )
     DataStack_Push ( ( int64 ) * optInfo_0_one->W_PtrToValue ) ;
     SetState ( compiler, COMPILE_MODE, false ) ;
     SetState ( _CfrTil_, OPTIMIZE_ON, false ) ; //prevent recursion here
-    Word_Run ( optInfo_0_zero ) ;
+    //Word_Run ( optInfo_0_zero ) ;
+    Block_Eval ( optInfo_0_zero->Definition ) ; // no type checking
     SetState ( compiler, COMPILE_MODE, true ) ;
     SetState ( _CfrTil_, OPTIMIZE_ON, true ) ; //prevent recursion here
     value = DataStack_Pop ( ) ;

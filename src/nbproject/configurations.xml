@@ -81,7 +81,7 @@
         <in>sourceCode.c</in>
         <in>system.c</in>
         <in>tabCompletion.c</in>
-        <in>types.c</in>
+        <in>typeCheck.c</in>
       </df>
       <df name="primitives">
         <in>bits.c</in>
@@ -445,7 +445,7 @@
         <cTool flags="0">
         </cTool>
       </item>
-      <item path="basis/types.c" ex="false" tool="0" flavor2="0">
+      <item path="basis/typeCheck.c" ex="false" tool="0" flavor2="0">
         <cTool flags="0">
         </cTool>
       </item>

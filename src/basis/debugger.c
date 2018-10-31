@@ -143,7 +143,7 @@ Debugger_GetDbgAddressFromRsp ( Debugger * debugger )
             }
             Stack_Push ( debugger->ReturnStack, ( uint64 ) retAddr ) ;
         }
-        if ( _Q_->Verbosity > 1 ) Stack_Print ( debugger->ReturnStack, ( byte* ) "debugger->ReturnStack " ) ;
+        if ( _Q_->Verbosity > 1 ) Stack_Print ( debugger->ReturnStack, ( byte* ) "debugger->ReturnStack ", 0 ) ;
         debugger->DebugAddress = ( byte* ) Stack_Top ( debugger->ReturnStack ) ;
     }
     else debugger->DebugAddress = ( byte* ) debugger->cs_Cpu->Rsp[1] ;
@@ -351,7 +351,7 @@ Debugger_ReturnStack ( Debugger * debugger )
 void
 Debugger_Source ( Debugger * debugger )
 {
-    Word * scWord = Compiling ? _CfrTil_->CurrentWordCompiling : GetState ( debugger, DBG_STEPPING ) ?
+    Word * scWord = Compiling ? _CfrTil_->CurrentWordBeingCompiled : GetState ( debugger, DBG_STEPPING ) ?
         Word_UnAlias ( Debugger_GetWordFromAddress ( debugger ) ) : _Context_->CurrentlyRunningWord ;
     _CfrTil_Source ( scWord, 0 ) ; //debugger->w_Word ? debugger->w_Word : _CfrTil_->DebugWordListWord, 0 ) ;
     SetState ( debugger, DBG_INFO, true ) ;

@@ -14,7 +14,7 @@ _LO_Define ( ListObject * idNode, ListObject * locals )
     CfrTil_WordList_Init ( _CfrTil_, word, 1 ) ;
     word->Definition = 0 ; // reset the definition from LO_Read
     value0 = _LO_Next ( idNode ) ;
-    _CfrTil_->CurrentWordCompiling = word ;
+    _CfrTil_->CurrentWordBeingCompiled = word ;
     word->Lo_CfrTilWord = word ;
     SetState ( lc, ( LC_DEFINE_MODE ), true ) ;
     Namespace_DoAddWord ( lc->LispDefinesNamespace, word ) ; // put it at the beginning of the list to be found first
@@ -48,7 +48,7 @@ _LO_MakeLambda ( ListObject * l0 )
 {
     ListObject *args, *body, *word, *lnew, *body0 ;
     // allow args to be optionally an actual parenthesized list or just vars after the lambda
-    if ( GetState ( _LC_, LC_DEFINE_MODE ) ) word = _CfrTil_->CurrentWordCompiling ;
+    if ( GetState ( _LC_, LC_DEFINE_MODE ) ) word = _CfrTil_->CurrentWordBeingCompiled ;
     else word = _Word_New ( ( byte* ) "<lambda>", WORD_CREATE, 0, 0, 0, 0, DICTIONARY ) ; // don't _Word_Add : must *not* be "lambda" else it will wrongly replace the lambda T_SPECIAL_FUNCTION word in LO_Find
     args = l0 ;
     body0 = _LO_Next ( l0 ) ;

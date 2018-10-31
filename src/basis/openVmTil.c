@@ -1,5 +1,5 @@
 #include "../include/cfrtil64.h"
-#define VERSION ((byte*) "0.869.510" ) 
+#define VERSION ((byte*) "0.871.210" ) 
 
 OpenVmTil * _Q_ ;
 
@@ -278,8 +278,8 @@ _OpenVmTil_New ( OpenVmTil * ovt, int64 argc, char * argv [ ] )
 #else    
     ovt->MachineCodeSize = 300 * K ;
     ovt->DictionarySize = 100 * K ;
-    ovt->CfrTilSize = (82 * K) ;
-    ovt->OpenVmTilSize = (6 * K) ;
+    ovt->CfrTilSize = (23 * K) ;
+    ovt->OpenVmTilSize = (9 * K) ;
 #endif    
 
     _OpenVmTil_Init ( ovt, exceptionsHandled > 1 ) ; // try to keep history if we can

@@ -80,10 +80,16 @@ _Stack_PopOrTop ( Stack * stack )
     else return __Stack_Pop ( stack ) ;
 }
 
-int64
+void
 _Stack_DropN ( Stack * stack, int64 n )
 {
-    return * ( stack->StackPointer -= n ) ;
+    if ( n ) stack->StackPointer -= n ;
+}
+
+void
+_Stack_Drop ( Stack * stack )
+{
+    stack->StackPointer -- ;
 }
 
 int64
@@ -122,16 +128,16 @@ _Stack_SetTop ( Stack * stack, int64 value )
     *stack->StackPointer = value ;
 }
 
+void
+Stack_SetTop ( Stack * stack, int64 value )
+{
+    if ( Stack_Depth ( stack ) ) *stack->StackPointer = value ;
+}
+
 int64
 _Stack_NOS ( Stack * stack )
 {
     return *( stack->StackPointer - 1 ) ;
-}
-
-void
-_Stack_Drop ( Stack * stack )
-{
-    stack->StackPointer -- ;
 }
 
 void
@@ -249,6 +255,7 @@ Stack_Copy ( Stack * stack, uint64 type )
     return nstack ;
 }
 
+#if 0
 void
 Stack_Print_AValue_WordName ( Stack * stack, int64 i, byte * stackName, byte * buffer )
 {
@@ -257,10 +264,13 @@ Stack_Print_AValue_WordName ( Stack * stack, int64 i, byte * stackName, byte * b
     if ( word )
     {
         byte wname [ 128 ] ;
-        sprintf ( ( char* ) buffer, "< %s.%s >", word->ContainingNamespace ? ( char* ) word->ContainingNamespace->Name : "<literal>", c_gd ( _String_ConvertStringToBackSlash ( wname, word->Name, - 1 ) ) ) ;
-        _Printf ( ( byte* ) "\n\t    %s   [ %3ld ] < " UINT_FRMT " > = " UINT_FRMT "\t%s", stackName, i, ( uint64 ) & stackPointer [ - i ], stackPointer [ - i ], word ? ( char* ) buffer : "" ) ;
+        sprintf ( ( char* ) buffer, "< %s.%s >", word->ContainingNamespace ? ( char* ) word->ContainingNamespace->Name : "<literal>", 
+            c_gd ( _String_ConvertStringToBackSlash ( wname, word->Name, - 1 ) ) ) ;
+        _Printf ( ( byte* ) "\n\t    %s   [ %3ld ] < " UINT_FRMT " > = " UINT_FRMT "\t%s", stackName, i, 
+            ( uint64 ) & stackPointer [ - i ], stackPointer [ - i ], word ? ( char* ) buffer : "" ) ;
     }
 }
+#endif
 
 void
 Stack_Print_AValue ( uint64 * stackPointer, int64 i, byte * stackName, byte * buffer, Boolean isWordAlreadyFlag )
@@ -277,9 +287,10 @@ Stack_Print_AValue ( uint64 * stackPointer, int64 i, byte * stackName, byte * bu
     if ( word )
     {
         if ( IS_NON_MORPHISM_TYPE ( word ) ) sprintf ( ( char* ) buffer, "< word : %s.%s : value = 0x%016lx > : %s", 
-            word->ContainingNamespace ? word->ContainingNamespace->Name : ( byte* ) "", c_gd ( word->Name ), ( uint64 ) word->S_Value, ts ? c_gd (ts) : (byte*)"") ;
+            word->ContainingNamespace ? word->ContainingNamespace->Name : ( byte* ) "<literal>", c_gd ( String_ConvertToBackSlash ( word->Name )), 
+            ( uint64 ) word->S_Value, ts ? c_gd (ts) : (byte*)"Undefined") ;
         else sprintf ( ( char* ) buffer, "< word : %s.%s : definition = 0x%016lx >", 
-            word->ContainingNamespace ? word->ContainingNamespace->Name : ( byte* ) "", c_gd ( word->Name ), ( uint64 ) word->Definition ) ;
+            word->ContainingNamespace ? word->ContainingNamespace->Name : ( byte* ) "<literal>", c_gd ( word->Name ), ( uint64 ) word->Definition ) ;
     }
     else string = String_CheckForAtAdddress ( ( byte* ) ( ( byte* ) ( stackPointer[i] ) ) ) ;
     _Printf ( ( byte* ) "\n\t    %s   [ %3ld ] < " UINT_FRMT " > = " UINT_FRMT "\t%s",
@@ -320,9 +331,9 @@ _Stack_Print ( Stack * stack, byte * name, int64 depth, Boolean isWordAlreadyFla
 }
 
 void
-Stack_Print ( Stack * stack, byte * name )
+Stack_Print ( Stack * stack, byte * name, Boolean isWordAlreadyFlag )
 {
-    _Stack_Print ( stack, name, Stack_Depth ( stack ), 0 ) ;
+    _Stack_Print ( stack, name, Stack_Depth ( stack ), isWordAlreadyFlag ) ;
 }
 
 void

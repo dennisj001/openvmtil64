@@ -753,11 +753,7 @@ typedef struct
     byte *ContinuePoint ; // used by 'continue'
     byte * BreakPoint ;
     byte * StartPoint ;
-    int64 NumberOfLocals ;
-    int64 NumberOfArgs ;
-    int64 NumberOfRegisterLocals ;
-    int64 NumberOfRegisterArgs ;
-    int64 NumberOfRegisterVariables ;
+    int64 NumberOfNonRegisterLocals, NumberOfLocals, NumberOfNonRegisterArgs, NumberOfArgs, NumberOfRegisterLocals, NumberOfRegisterArgs, NumberOfRegisterVariables ;
     int64 LocalsFrameSize ;
     int64 SaveCompileMode, SaveOptimizeState ; //, SaveScratchPadIndex ;
     int64 ParenLevel ;
@@ -816,7 +812,7 @@ typedef struct _Debugger
     int64 SaveKey ;
     int64 TokenStart_ReadLineIndex, Esi, Edi ;
     Word * w_Word, *EntryWord, *LastShowWord, *LastEffectsWord, *NextEvalWord ;
-    Word *LocalsNamespace, *LastSetupWord, *SteppedWord, *CurrentlyRunningWord, *LastSourceCodeWord ;
+    Word *LocalsNamespace, *LastSetupWord, *SteppedWord, *CurrentlyRunningWord, *LastSourceCodeWord, *SubstitutedWord ;
     byte * Token ;
     block SaveCpuState ;
     block RestoreCpuState ;
@@ -939,7 +935,7 @@ typedef struct _CfrTil
     block Set_DspReg_FromDataStackPointer, Set_DataStackPointer_FromDspReg ; //, PeekReg, PokeReg ;
     block PopDspToR8AndCall, CallReg_TestRSP, Call_ToAddressThruR8_TestAlignRSP ; //adjustRSPAndCall, adjustRSP ;
     ByteArray * PeekPokeByteArray ;
-    Word * LastFinished_DObject, * LastFinished_Word, *StoreWord, *PokeWord, *RightBracket, *ScoOcCrw, * CurrentWordCompiling ;
+    Word * LastFinished_DObject, * LastFinished_Word, *StoreWord, *PokeWord, *RightBracket, *ScoOcCrw, * CurrentWordBeingCompiled ;
     Word *ScWord, *DebugWordListWord, *EndBlockWord, *BeginBlockWord, *InfixNamespace ;
     byte ReadLine_CharacterTable [ 256 ] ;
     ReadLineFunction ReadLine_FunctionTable [ 24 ] ;

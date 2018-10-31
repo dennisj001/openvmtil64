@@ -7,7 +7,6 @@ void
 CfrTil_PeekReg ( ) // @
 {
     //DBI_ON ;
-    //uint64 reg = _DataStack_Top () ;
     ByteArray * svcs = _Q_CodeByteArray, *ba = _CfrTil_->PeekPokeByteArray ;
     _ByteArray_DataClear ( ba ) ;
     Set_CompilerSpace ( ba ) ; // now compile to this space
@@ -29,10 +28,8 @@ CfrTil_PokeRegWithValue ( ) // @
     ByteArray * svcs = _Q_CodeByteArray, *ba = _CfrTil_->PeekPokeByteArray ;
     _ByteArray_DataClear ( ba ) ;
     Set_CompilerSpace ( ba ) ; // now compile to this space
-    //byte * here = Here ;
     Compile_MoveImm ( REG, reg, 0, 0, ( uint64 ) value, CELL ) ;
     _Compile_Return ( ) ;
-    //int64 size = Here - here ;
     Set_CompilerSpace ( svcs ) ; // now compile to this space
     ( ( VoidFunction ) ba->BA_Data ) ( ) ;
     //DBI_OFF ;
@@ -42,29 +39,19 @@ CfrTil_PokeRegWithValue ( ) // @
 void
 CfrTil_PokeRegAtAddress ( ) // @
 {
-    //DBI_ON ;
     uint64 reg = DataStack_Pop ( ) ;
     uint64 address = DataStack_Pop ( ) ;
     ByteArray * svcs = _Q_CodeByteArray, *ba = _CfrTil_->PeekPokeByteArray ;
     _ByteArray_Init ( ba ) ;
     Set_CompilerSpace ( ba ) ; // now compile to this space
-    //byte * here = Here ;
     _Compile_PushReg ( ACC ) ;
     Compile_MoveImm ( REG, ACC, 0, 0, ( uint64 ) address, CELL ) ;
     Compile_Move_Reg_To_Rm ( ACC, reg, 0 ) ;
     _Compile_PopToReg ( ACC ) ;
     _Compile_Return ( ) ;
-    //int64 size = Here - here ;
     Set_CompilerSpace ( svcs ) ; // now compile to this space
     ( ( VoidFunction ) ba->BA_Data ) ( ) ;
-    //DBI_OFF ;
 }
-#if TURN_DBI_OFF
-#undef DBI_ON
-#undef DBI_OFF
-#define DBI_ON dbion
-#define DBI_OFF dbioff
-#endif
 
 void
 CfrTil_Peek ( ) // @
@@ -85,7 +72,6 @@ CfrTil_Poke ( ) // =
         uint64 * nos = ( uint64* ) _Dsp_ [ - 1 ] ;
         * nos = ( uint64 ) tos ;
         _Dsp_ -= 2 ;
-        //_CfrTil_->Set_DspReg_FromDataStackPointer ( ) ; // update DSP reg
     }
 }
 
@@ -97,7 +83,6 @@ CfrTil_AtEqual ( ) // !
     {
         *( int64* ) _Dsp_ [ - 1 ] = * ( int64* ) TOS ;
         _Dsp_ -= 2 ;
-        //_CfrTil_->Set_DspReg_FromDataStackPointer ( ) ; // update DSP reg
     }
 }
 
@@ -111,7 +96,6 @@ CfrTil_Store ( ) // !
     {
         * ( int64* ) ( TOS ) = _Dsp_ [ - 1 ] ;
         _Dsp_ -= 2 ;
-        //_CfrTil_->Set_DspReg_FromDataStackPointer ( ) ; // update DSP reg
     }
 }
 

@@ -5,13 +5,16 @@
 // this information is used by the compiler, optimizer and the debugger
 
 Word *
-_CopyDuplicateWord ( Word * word0 )
+_CopyDuplicateWord ( Word * word0, Boolean complete )
 {
     Word * wordc = Word_Copy ( word0, DICTIONARY ) ; // use DICTIONARY since we are recycling these anyway
-    wordc->W_OriginalWord = Word_GetOriginalWord ( word0 ) ;
     _dlnode_Init ( ( dlnode * ) wordc ) ; // necessary!
     wordc->CAttribute2 |= ( uint64 ) RECYCLABLE_COPY ;
-    Word_SetLocation ( wordc ) ;
+    if ( complete )
+    {
+        wordc->W_OriginalWord = Word_GetOriginalWord ( word0 ) ;
+        Word_SetLocation ( wordc ) ;
+    }
     return wordc ;
 }
 
@@ -20,7 +23,7 @@ CopyDuplicateWord ( dlnode * anode, Word * word0 )
 {
     Word * wordn = ( Word* ) dobject_Get_M_Slot ( ( dobject* ) anode, SCN_T_WORD ) ;
     int64 iuoFlag = dobject_Get_M_Slot ( ( dobject* ) anode, SCN_IN_USE_FLAG ) ;
-    if ( iuoFlag && ( word0 == wordn ) ) return _CopyDuplicateWord ( word0 ) ;
+    if ( iuoFlag && ( word0 == wordn ) ) return _CopyDuplicateWord ( word0, 1 ) ;
     else return 0 ;
 }
 
@@ -293,8 +296,10 @@ Compiler_Init ( Compiler * compiler, uint64 state )
     compiler->InitHere = Here ;
     compiler->ParenLevel = 0 ;
     compiler->ArrayEnds = 0 ;
+    compiler->NumberOfNonRegisterLocals = 0 ;
     compiler->NumberOfLocals = 0 ;
     compiler->NumberOfArgs = 0 ;
+    compiler->NumberOfNonRegisterArgs = 0 ;
     compiler->NumberOfRegisterLocals = 0 ;
     compiler->NumberOfRegisterArgs = 0 ;
     compiler->NumberOfRegisterVariables = 0 ;

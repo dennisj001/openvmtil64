@@ -194,14 +194,15 @@ _LO_CompileOrInterpret ( ListObject *lfunction, ListObject *largs )
 
     if ( largs && lfword && ( lfword->CAttribute & ( CATEGORY_OP_ORDERED | CATEGORY_OP_UNORDERED ) ) ) // ?!!? 2 arg op with multi-args : this is not a precise distinction yet : need more types ?!!?
     {
-        SetState ( _CfrTil_, TYPECHECK_OFF, true ) ; // sometimes ok but for now off here
+        Boolean svTcs = GetState ( _CfrTil_, TYPECHECK_ON ) ; // sometimes ok but for now off here
+        SetState ( _CfrTil_, TYPECHECK_ON, false ) ; // sometimes ok but for now off here
         _LO_CompileOrInterpret_One ( largs, 0 ) ;
         while ( ( largs = _LO_Next ( largs ) ) )
         {
             _LO_CompileOrInterpret_One ( largs, 0 ) ; // two args first then op, then after each arg the operator : nb. assumes word can take unlimited args 2 at a time
             _LO_CompileOrInterpret_One ( lfword, 0 ) ;
         }
-        SetState ( _CfrTil_, TYPECHECK_OFF, false ) ;
+        SetState ( _CfrTil_, TYPECHECK_ON, svTcs ) ;
     }
     else
     {
@@ -520,7 +521,7 @@ CompileLispBlock ( ListObject *args, ListObject * body )
     LambdaCalculus * lc = _LC_ ;
     block code ;
     byte * here = Here ;
-    Word * word = _CfrTil_->CurrentWordCompiling ;
+    Word * word = _CfrTil_->CurrentWordBeingCompiled ;
     LO_BeginBlock ( ) ; // must have a block before local variables if there are register variables because _CfrTil_Parse_LocalsAndStackVariables will compile something
     SetState ( lc, ( LC_COMPILE_MODE | LC_BLOCK_COMPILE ), true ) ; // before _CfrTil_Parse_LocalsAndStackVariables
     Namespace * locals = _CfrTil_Parse_LocalsAndStackVariables ( 1, 1, args, 0, 0 ) ;

@@ -271,8 +271,14 @@ CfrTil_TrueFalseCombinator3 ( )
 
 //  ( q q q -- )
 
-void
+inline void
 CfrTil_IfElseCombinator ( )
+{
+    CfrTil_TrueFalseCombinator3 ( ) ;
+}
+
+inline void
+CfrTil_If3Combinator ( )
 {
     CfrTil_TrueFalseCombinator3 ( ) ;
 }

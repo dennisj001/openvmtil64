@@ -89,7 +89,7 @@ OVT_Pause ( byte * prompt, int64 signalExceptionsHandled )
         {
             if ( _Debugger_->w_Word = _Context_->CurrentlyRunningWord )
             {
-                _CfrTil_ShowInfo ( _Debugger_, "\r", _Q_->Signal, 0 ) ;
+                _Debugger_ShowInfo ( _Debugger_, "\r", _Q_->Signal, 0 ) ;
                 _Debugger_->w_Word = 0 ;
             }
             _Printf ( ( byte* ) "%s", buffer ) ;

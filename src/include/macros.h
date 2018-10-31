@@ -169,6 +169,7 @@
 #define Error( emsg, smsg, state ) { AlertColors; if ((state) & PAUSE ) Pause () ; if ((state) >= QUIT ) Throw ( emsg, smsg, state ) ; }
 #define Error_1( msg, arg, state ) AlertColors; if (state & PAUSE ) Pause () ; if (state >= QUIT ) Throw ( (byte*) msg, state ) ; 
 #define Warning2( msg, str ) _Printf ( (byte*)"\n%s : %s", (byte*) msg, str ) ; 
+#define Warning( msg, str, pauseFlag ) _Printf ( (byte*)"\n%s : %s", (byte*) msg, str ) ; if ( pauseFlag ) Pause () ;
 #define ErrorWithContinuation( msg, continuation ) Throw ( (byte*) msg, continuation )
 #define Error_Quit( msg ) ErrorWithContinuation( msg, QUIT )
 #define ErrorN( n ) Throw ( (byte*) "", n )

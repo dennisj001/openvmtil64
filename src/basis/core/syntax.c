@@ -190,9 +190,11 @@ _CfrTil_C_Infix_EqualOp ( Word * opWord )
     else rword = word0 ;
     svName = rword->Name ;
     rword->Name = "=" ;
+    SetState ( _Debugger_, DBG_OUTPUT_SUBSTITUTION, true ) ;
+    _Debugger_->SubstitutedWord = rword ;
     CfrTil_ArrayModeOff ( ) ;
     _Interpreter_DoWord_Default ( interp, rword, tsrli, svscwi ) ;
-    SetState ( _Debugger_, DBG_OUTPUT_INSERTION, false ) ;
+    SetState ( _Debugger_, ( DEBUG_SHTL_OFF | DBG_OUTPUT_INSERTION | DBG_OUTPUT_SUBSTITUTION ), false ) ;
     rword->Name = svName ;
     if ( GetState ( compiler, C_COMBINATOR_LPAREN ) )
     {
@@ -203,7 +205,6 @@ _CfrTil_C_Infix_EqualOp ( Word * opWord )
     compiler->LHS_Word = 0 ;
 
     if ( ! Compiling ) CfrTil_InitSourceCode ( _CfrTil_ ) ;
-    SetState ( _Debugger_, DEBUG_SHTL_OFF, false ) ;
     SetState ( compiler, C_INFIX_EQUAL, false ) ;
     _CfrTil_PushToken_OnTokenList ( token ) ; // so the callee can check use or use
     CfrTil_ArrayModeOff ( ) ;

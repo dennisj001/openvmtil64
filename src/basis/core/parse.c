@@ -12,13 +12,16 @@ _CfrTil_SingleQuote ( )
 
     //if ( ! Compiling ) _CfrTil_InitSourceCode_WithName ( _CfrTil_, lexer->OriginalToken ) ;
     // remember : _ReadLine_PeekIndexedChar ( rl, 0 ) is the *next* char to be read
-    if ( sqWord && sqWord->Name[0] == '\'' && ( ( ( c1 = _ReadLine_PeekIndexedChar ( rl, 1 ) ) == '\'' ) || ( ( c0 = _ReadLine_PeekIndexedChar ( rl, 0 ) ) == '\\' ) ) )// parse a char type, eg. 'c' 
+    //if ( sqWord && sqWord->Name[0] == '\'' && ( ( ( c1 = _ReadLine_PeekIndexedChar ( rl, 1 ) ) == '\'' ) || ( ( c0 = _ReadLine_PeekIndexedChar ( rl, 0 ) ) == '\\' ) ) )// parse a char type, eg. 'c' 
+    c0 = _ReadLine_PeekIndexedChar ( rl, 0 ) ;// parse a char type, eg. 'c' 
+    c1 = _ReadLine_PeekIndexedChar ( rl, 1 ) ;
+    if ( sqWord && sqWord->Name[0] == '\'' && ( c1 == '\'') || ( c0 == '\\' ) ) // parse a char type, eg. 'c' 
     {
         // notation :: c0 = original ' ; c1 = next char, etc.
-        buffer[0] = '\'' ;
-        buffer[1] = c0 ;
         c0 = _ReadLine_GetNextChar ( rl ) ;
         c1 = _ReadLine_GetNextChar ( rl ) ;
+        buffer[0] = '\'' ;
+        buffer[1] = c0 ;
         if ( c0 == '\\' )
         {
             c2 = _ReadLine_GetNextChar ( rl ) ; // the closing '\''
@@ -193,7 +196,7 @@ _CfrTil_Parse_LocalsAndStackVariables ( int64 svf, int64 lispMode, ListObject * 
     CfrTil_DbgSourceCodeOff ( ) ;
     byte * svDelimiters = lexer->TokenDelimiters ;
     Word * word ;
-    int64 ctype = 0, ltype = 0 ;
+    int64 ctype = 0, ltype = 0, numberOfRegisterVariables = 0 ;
     int64 svff = 0, addWords, getReturn = 0, getReturnFlag = 0, regToUseIndex = 0 ;
     Boolean regFlag = false ;
     byte *token, *returnVariable = 0 ;
@@ -250,7 +253,7 @@ _CfrTil_Parse_LocalsAndStackVariables ( int64 svf, int64 lispMode, ListObject * 
             {
                 break ;
             }
-            if ( String_Equal ( ( char* ) token, "REG" ) || String_Equal ( ( char* ) token, "REGISTER" ) )
+            if ( Stringi_Equal ( ( char* ) token, "REG" ) || String_Equal ( ( char* ) token, "REGISTER" ) )
             {
                 regFlag = true ;
                 continue ;
@@ -264,10 +267,10 @@ _CfrTil_Parse_LocalsAndStackVariables ( int64 svf, int64 lispMode, ListObject * 
             if ( getReturnFlag )
             {
                 addWords = 0 ;
-                if ( String_Equal ( token, ( byte* ) "ACC" ) ) getReturn |= RETURN_ACCUM ;
-                else if ( String_Equal ( token, ( byte* ) "EAX" ) ) getReturn |= RETURN_ACCUM ;
-                else if ( String_Equal ( token, ( byte* ) "RAX" ) ) getReturn |= RETURN_ACCUM ;
-                else if ( String_Equal ( token, ( byte* ) "TOS" ) ) getReturn |= RETURN_TOS ;
+                if ( Stringi_Equal ( token, ( byte* ) "ACC" ) ) getReturn |= RETURN_ACCUM ;
+                else if ( Stringi_Equal ( token, ( byte* ) "EAX" ) ) getReturn |= RETURN_ACCUM ;
+                else if ( Stringi_Equal ( token, ( byte* ) "RAX" ) ) getReturn |= RETURN_ACCUM ;
+                else if ( Stringi_Equal ( token, ( byte* ) "TOS" ) ) getReturn |= RETURN_TOS ;
                 else if ( String_Equal ( token, ( byte* ) "0" ) ) getReturn |= DONT_REMOVE_STACK_VARIABLES ;
                 else returnVariable = token ;
                 continue ;
@@ -287,9 +290,9 @@ _CfrTil_Parse_LocalsAndStackVariables ( int64 svf, int64 lispMode, ListObject * 
                 if ( regFlag == true )
                 {
                     ctype |= REGISTER_VARIABLE ;
-                    compiler->NumberOfRegisterVariables ++ ;
-                    if ( ctype & LOCAL_VARIABLE ) compiler->NumberOfLocals -- ;
-                    else if ( ctype & PARAMETER_VARIABLE ) compiler->NumberOfArgs -- ;
+                    numberOfRegisterVariables ++ ; 
+                    //if ( ctype & LOCAL_VARIABLE ) compiler->NumberOfRegisterLocals ++ ;
+                    //else if ( ctype & PARAMETER_VARIABLE ) compiler->NumberOfRegisterArgs ++ ;
                 }
                 //word = _CfrTil_LocalWord ( token, ( ctype & LOCAL_VARIABLE ) ? ++ compiler->NumberOfLocals : ++ compiler->NumberOfArgs, ctype, ctype2, ltype, COMPILER_TEMP ) ; // svf : flag - whether stack variables are in the frame
                 word = DataObject_New ( ctype, 0, token, ctype, 0, 0, 0, 0, DICTIONARY, - 1, - 1 ) ;
@@ -303,9 +306,9 @@ _CfrTil_Parse_LocalsAndStackVariables ( int64 svf, int64 lispMode, ListObject * 
                             compiler->RegisterParameterList = _dllist_New ( TEMPORARY ) ;
                         }
                         _List_PushNew_ForWordList ( compiler->RegisterParameterList, word, 1 ) ;
-                        compiler->NumberOfRegisterArgs ++ ;
+                        //compiler->NumberOfArgs ++ ;
                     }
-                    else compiler->NumberOfRegisterLocals ++ ;
+                    //else compiler->NumberOfLocals ++ ;
                 }
                 regFlag = false ;
                 if ( typeNamespace )
@@ -321,7 +324,7 @@ _CfrTil_Parse_LocalsAndStackVariables ( int64 svf, int64 lispMode, ListObject * 
     compiler->State |= getReturn ;
 
     // we support nested locals and may have locals in other blocks so the indexes are cumulative
-    if ( compiler->NumberOfRegisterVariables ) Compile_Init_RegisterParamenterVariables ( compiler ) ;
+    if ( numberOfRegisterVariables ) Compile_Init_RegisterParamenterVariables ( compiler ) ;
     if ( returnVariable ) compiler->ReturnVariableWord = _Finder_FindWord_InOneNamespace ( _Finder_, localsNs, returnVariable ) ;
 
     _CfrTil_->InNamespace = saveInNs ;

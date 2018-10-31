@@ -115,7 +115,7 @@ _Interpreter_DoWord ( Interpreter * interp, Word * word, int64 tsrli, int64 scwi
 }
 // interpret with find after parse for known objects
 // !! this version eliminates the possiblity of numbers being used as words !!
-// objects and morphismsm - terms from category theory
+// objects and morphisms - terms from category theory
 
 Word *
 _Interpreter_TokenToWord ( Interpreter * interp, byte * token )

@@ -7,6 +7,7 @@ Word_UnAlias ( Word * word )
     return word ;
 }
 
+//TYPE_CHECK (Word * word)  ifGetState ( _CfrTil_, TYPECHECK_ON ) && word->W_TypeSignature[0] ) //&& (word->CAttribute & CFRTIL_WORD) ) //IS_MORPHISM_TYPE ( word ) ) 
 void
 Word_Run ( Word * word )
 {
@@ -19,16 +20,13 @@ Word_Run ( Word * word )
             // keep track in the word itself where the machine code is to go, if this word is compiled or causes compiling code - used for optimization
             Word_SetCoding ( word, Here, 1 ) ; // if we change it later (eg. in lambda calculus) we must change it there because the rest of the compiler depends on this
             _Context_->CurrentlyRunningWord = word ;
-#if 1            
-            if ( IS_MORPHISM_TYPE ( word ) ) 
+            if (( GetState ( _CfrTil_, TYPECHECK_ON ) && word->W_TypeSignature[0] )) 
             {
-                CfrTil_Typecheck (word, 0)  ;
+                if ( ! GetState ( _Compiler_, DOING_AN_INFIX_WORD|DOING_A_PREFIX_WORD ) )
+                CfrTil_Typecheck ( word ) ; 
                 Block_Eval ( word->Definition ) ;
-                if ( ! GetState ( _Compiler_, ARRAY_MODE ) ) CfrTil_TypeStackReset ( ) ; //after for words like 'constant'
             }
-            else 
-#endif            
-            Block_Eval ( word->Definition ) ;
+            else Block_Eval ( word->Definition ) ;
         }
         else Set_DataStackPointers_FromDebuggerDspReg ( ) ; // back from _CfrTil_DebugRuntimeBreakpoint
     }
@@ -61,7 +59,7 @@ void
 _Word_Compile ( Word * word )
 {
     Word_SetCodingHere_And_ClearPreviousUseOf_Here_SCA ( word, 0 ) ;
-    if ( word->W_TypeSignature ) CfrTil_Typecheck ( word, 1 ) ;
+    CfrTil_Typecheck ( word ) ;
     if ( ! word->Definition ) CfrTil_SetupRecursiveCall ( ) ;
     else if ( ( GetState ( _CfrTil_, INLINE_ON ) ) && ( word->CAttribute & INLINE ) && ( word->S_CodeSize ) ) _Compile_WordInline ( word ) ;
     else Compile_CallWord_Check_X84_ABI_RSP_ADJUST ( word ) ;
@@ -97,6 +95,8 @@ void
 _Word_Finish ( Word * word )
 {
     CfrTil_FinishSourceCode ( _CfrTil_, word ) ;
+    _CfrTil_->LastFinished_Word = word ;
+    CfrTil_TypeStackReset ( ) ;
 }
 
 void
@@ -345,6 +345,7 @@ _CfrTil_Alias ( Word * word, byte * name )
         Word_InitFinal ( alias, ( byte* ) word->Definition ) ;
         alias->S_CodeSize = word->S_CodeSize ;
         alias->W_AliasOf = word ;
+        strncpy ( alias->W_TypeSignature, word->W_TypeSignature, 7 ) ;
         return alias ;
     }
     else Exception ( USEAGE_ERROR, ABORT ) ;

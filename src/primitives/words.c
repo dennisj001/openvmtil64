@@ -253,34 +253,21 @@ Word_Namespace ( )
 void
 CfrTil_Keyword ( void )
 {
-    Word * word = _CfrTil_->LastFinished_DObject ;
+    Word * word = _CfrTil_->LastFinished_Word ;
     if ( word ) word->CAttribute |= KEYWORD ;
 }
 
 void
 CfrTil_Immediate ( void )
 {
-    Word * word = _CfrTil_->LastFinished_DObject ;
+    Word * word = _CfrTil_->LastFinished_Word ;
     if ( word ) word->CAttribute |= IMMEDIATE ;
 }
-
-#if 0
-void
-CfrTil_StackVariable ( void )
-{
-    Word * word = _CfrTil_->LastFinished_DObject ;
-    if ( word )
-    {
-        word->CAttribute2 |= VARIABLE ;
-        word->CAttribute |= STACK_VARIABLE ;
-    }
-}
-#endif
 
 void
 CfrTil_Syntactic ( void )
 {
-    Word * word = _CfrTil_->LastFinished_DObject ;
+    Word * word = _CfrTil_->LastFinished_Word ;
     if ( word ) word->CAttribute2 |= SYNTACTIC ;
 }
 
@@ -299,14 +286,22 @@ CfrTil_IsImmediate ( void )
 void
 CfrTil_Inline ( void )
 {
-    Word * word = _CfrTil_->LastFinished_DObject ;
+    Word * word = _CfrTil_->LastFinished_Word ;
     if ( word ) word->CAttribute |= INLINE ;
+}
+
+void
+CfrTil_Set_TypeSignature ( void )
+{
+    byte * typeSignature = ( byte* ) DataStack_Pop ( ) ;
+    Word * word = _CfrTil_->LastFinished_Word ; // nb! must be LastFinished_Word because the signature is a literal and it is the LastFinished_DObject
+    if ( word ) strncpy ( word->W_TypeSignature, typeSignature, 7 ) ;
 }
 
 void
 CfrTil_Prefix ( void )
 {
-    Word * word = _CfrTil_->LastFinished_DObject ;
+    Word * word = _CfrTil_->LastFinished_Word ;
     if ( word )
     {
         //word->CAttribute |= PREFIX ;
@@ -317,7 +312,7 @@ CfrTil_Prefix ( void )
 void
 CfrTil_C_Prefix ( void )
 {
-    Word * word = _CfrTil_->LastFinished_DObject ;
+    Word * word = _CfrTil_->LastFinished_Word ;
     if ( word )
     {
         word->CAttribute |= C_PREFIX | C_PREFIX_RTL_ARGS ;
@@ -328,7 +323,7 @@ CfrTil_C_Prefix ( void )
 void
 CfrTil_C_Return ( void )
 {
-    Word * word = _CfrTil_->LastFinished_DObject ;
+    Word * word = _CfrTil_->LastFinished_Word ;
     if ( word )
     {
         word->CAttribute |= C_RETURN | C_PREFIX_RTL_ARGS ;
@@ -339,7 +334,7 @@ CfrTil_C_Return ( void )
 void
 CfrTil_Void_Return ( void )
 {
-    Word * word = _CfrTil_->LastFinished_DObject ;
+    Word * word = _CfrTil_->LastFinished_Word ;
     if ( word )
     {
         word->CAttribute &= ~ C_RETURN ;
@@ -355,7 +350,7 @@ CfrTil_Void_Return ( void )
 void
 CfrTil_RAX_Return ( void )
 {
-    Word * word = _CfrTil_->LastFinished_DObject ;
+    Word * word = _CfrTil_->LastFinished_Word ;
     if ( word )
     {
         word->CAttribute &= ~ C_RETURN ;
@@ -366,7 +361,7 @@ CfrTil_RAX_Return ( void )
 void
 CfrTil_DebugWord ( void )
 {
-    Word * word = _CfrTil_->LastFinished_DObject ;
+    Word * word = _CfrTil_->LastFinished_Word ;
     if ( word ) word->CAttribute |= DEBUG_WORD ;
 }
 
