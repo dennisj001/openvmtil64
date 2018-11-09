@@ -136,7 +136,7 @@ Class
 '_new 'new find alias prefix
 C
 : ;; semi _prefix ; immediate syntactic
-c_syntaxOn //using
+c_syntaxOn 
 type int8 ; int8.size = 1 ;
 type byte ; byte.size = 1 ;
 type int16 ; int16.size = 2 ;
@@ -144,7 +144,6 @@ type int32 ; int32.size = 4 ;
 type int64 ; int64.size = 8 ;
 type void ; void.size = 0 ;
 type char ; char.size = 1 ;
-//type word ; word.size = 2 ; // conflicts with Reserved word
 type int ; int.size = 8 ;
 type long ; long.size = 8 ;
 type quad ; quad.size = 16 ;
@@ -266,7 +265,7 @@ dscOn //verbosity 3 =
 : debugTest 1 2 + p debugTest1 ;
 : _assert1 ( n m str ) { debugTest n @ m @ != } { str @ ps "error" ps _info _pause } if ;
 #else
-: _assert1 ( n m str ) { n @ m @ != } { str @ ps "error" ps _info _pause } if ;
+: _assert1 ( n m str ) { n @ m @ != } { str @ ps "error" ps _info stack _pause } if ;
 ' _assert1 find wdiss //pause
 #endif
 : _assert0 ( n m ) { n @ m @ != } { nl location hex n @ p "!=" ps m @ p "<:" ps "Error!" adps _info _pause } { } ifElse ; //{ str @ ps " : ok\n" ps nl } ifElse ; // no "ok" with this word

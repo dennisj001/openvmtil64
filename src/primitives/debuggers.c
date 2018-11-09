@@ -21,6 +21,12 @@ CfrTil_Debugger_Locals_Show ( )
     if ( GetState ( _Debugger_, DBG_AUTO_MODE ) ) _CfrTil_Debugger_Locals_Show ( ) ;
 }
 
+void
+_CfrTil_DebugInfo ( )
+{
+    Debugger_ShowInfo ( _Debugger_, ( byte* ) "\ninfo", 0 ) ;
+}
+
 // put this '<dbg>' into cfrtil code for a runtime break into the debugger
 
 void

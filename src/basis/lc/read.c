@@ -11,7 +11,7 @@ _LO_Read_DoWord ( LambdaCalculus * lc, Word * word, int64 qidFlag, int64 scwi )
     Lexer *lexer = cntx->Lexer0 ;
     ListObject *l0 = 0 ;
     byte *token1 ;
-    word->W_RL_Index = lexer->TokenStart_ReadLineIndex ;
+    _Lexer_Set_ScIndex_RlIndex ( lexer, word ) ;
     SetState ( word, QID, qidFlag ) ;
     if ( ( word->LAttribute & ( T_LISP_READ_MACRO | T_LISP_IMMEDIATE ) ) && ( ! GetState ( _LC_, LC_READ_MACRO_OFF ) ) )
     {
@@ -32,7 +32,8 @@ _LO_Read_DoWord ( LambdaCalculus * lc, Word * word, int64 qidFlag, int64 scwi )
     }
     else
     {
-        DEBUG_SETUP ( word ) ;
+        //DEBUG_SETUP ( word ) ;
+        if ( word && Is_DebugModeOn ) if ( _Debugger_PreSetup ( _Debugger_, word, 0, 1 ) ) return nil ;
         if ( word->CAttribute & NAMESPACE_TYPE ) _DataObject_Run ( word ) ;
         l0 = DataObject_New ( T_LC_NEW, word, 0, word->CAttribute, word->CAttribute2,
             ( T_LISP_SYMBOL | word->LAttribute ), 0, word->Lo_Value, 0, - 1, scwi ) ;

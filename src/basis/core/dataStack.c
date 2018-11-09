@@ -3,53 +3,6 @@
 
 // these functions are part of the C vm and can't be compiled
 // ! they are should only be called in C functions !
-#if ! DSP_IS_GLOBAL_REGISTER
-
-uint64
-DataStack_Pop ( )
-{
-    _CfrTil_->Set_DataStackPointer_FromDspReg ( ) ;
-    int64 value = _Dsp_ [ 0 ] ; //
-    _Dsp_ -- ;
-    _CfrTil_->Set_DspReg_FromDataStackPointer ( ) ; // update DSP reg
-    return value ;
-}
-
-void
-DataStack_Push ( int64 value )
-{
-    _CfrTil_->Set_DataStackPointer_FromDspReg ( ) ;
-    _Dsp_ ++ ;
-    _Dsp_ [0] = value ;
-    _CfrTil_->Set_DspReg_FromDataStackPointer ( ) ; // update DSP reg
-}
-
-void
-DataStack_Dup ( )
-{
-    _CfrTil_->Set_DataStackPointer_FromDspReg ( ) ;
-    _Dsp_ [ 1 ] = _Dsp_[0] ;
-    _Dsp_ ++ ;
-    _CfrTil_->Set_DspReg_FromDataStackPointer ( ) ; // update DSP reg
-}
-
-void
-DataStack_DropN ( int64 n )
-{
-    _CfrTil_->Set_DataStackPointer_FromDspReg ( ) ;
-    _Dsp_ -= n ;
-    _CfrTil_->Set_DspReg_FromDataStackPointer ( ) ; // update DSP reg
-}
-
-void
-DataStack_Drop ( )
-{
-    _CfrTil_->Set_DataStackPointer_FromDspReg ( ) ;
-    _Dsp_ -- ;
-    _CfrTil_->Set_DspReg_FromDataStackPointer ( ) ; // update DSP reg
-}
-#else
-
 uint64
 DataStack_Pop ( )
 {
@@ -64,16 +17,6 @@ DataStack_Push ( int64 value )
     _Dsp_ ++ ;
     _Dsp_ [0] = value ;
 }
-
-#if 0
-void
-DataStack_Push_TypeStackPush ( Word * word, int64 value )
-{
-    DataStack_Push ( value ) ;
-    //if ( GetState ( _CfrTil_, OPTIMIZE_ON ) ) 
-    CfrTil_TypeStackPush ( word ) ;
-}
-#endif
 
 void
 DataStack_Dup ( )
@@ -93,7 +36,6 @@ DataStack_Drop ( )
 {
     _Dsp_ -- ;
 }
-#endif
 
 inline int64
 DataStack_Overflow ( )

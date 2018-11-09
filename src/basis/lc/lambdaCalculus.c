@@ -81,8 +81,7 @@ _LO_New_RawStringOrLiteral ( Lexer * lexer, byte * token, int64 qidFlag, int64 t
         }
         word->Lo_CfrTilWord = word ;
         if ( qidFlag ) word->CAttribute &= ~ T_LISP_SYMBOL ;
-        word->W_SC_Index = scwi ; 
-        word->W_RL_Index = tsrli ;
+        Word_SetTsrliScwi ( word, tsrli, scwi ) ;
         return word ;
     }
     else
@@ -98,18 +97,16 @@ _LO_New ( uint64 ltype, uint64 ctype, uint64 ctype2, byte * name, byte * value, 
 {
     //_DObject_New ( byte * name, uint64 value, uint64 ctype, uint64 ltype, uint64 ftype, byte * function, int64 arg, int64 addToInNs, Namespace * addToNs, uint64 allocType )
     ListObject * l0 = _DObject_New ( word ? word->Name : name ? name : ( byte* ) "", ( uint64 ) value, ctype, ctype2, ltype,
-        ( ltype & T_LISP_SYMBOL ) ? word ? word->RunType : 0 : 0, 0, 0, 0, 0, LISP ) ; //addToNs, LISP ) ;
+        ( ltype & T_LISP_SYMBOL ) ? word ? word->RunType : 0 : 0, 0, 0, 0, addToNs, LISP ) ; //addToNs, LISP ) ;
     if ( ltype & LIST ) _LO_ListInit ( l0, allocType ) ;
     else if ( ltype & LIST_NODE ) l0->S_SymbolList = ( dllist* ) value ;
-    l0->W_SC_Index = scwi ;
-    l0->W_RL_Index = tsrli ;
+    _Word_SetTsrliScwi( l0, tsrli, scwi ) ;
     if ( word )
     {
         l0->Lo_CfrTilWord = word ;
         word->Lo_CfrTilWord = word ;
         l0->W_SourceCode = word->W_SourceCode ;
-        word->W_SC_Index = scwi ;
-        word->W_RL_Index = tsrli ;
+        Word_SetTsrliScwi ( word, tsrli, scwi ) ;
     }
     return l0 ;
 }
@@ -260,7 +257,7 @@ LC_EvalPrint ( LambdaCalculus * lc, ListObject * l0 )
     SetState ( lc, LC_PRINT_ENTERED, false ) ;
     SetBuffersUnused ( 1 ) ;
     _LC_->ParenLevel = 0 ;
-    Compiler_Init ( _Context_->Compiler0, 0 ) ; // we could be compiling a cfrTil word as in oldLisp.cft
+    Compiler_Init ( _Context_->Compiler0, 0, 1 ) ; // we could be compiling a cfrTil word as in oldLisp.cft
 }
 
 ListObject *
@@ -284,7 +281,7 @@ _LC_ReadEvalPrint_ListObject ( int64 parenLevel, int64 continueFlag )
     SetState ( compiler, LISP_MODE, true ) ;
     compiler->InitHere = Here ;
     if ( ! parenLevel ) CfrTil_InitSourceCode ( _CfrTil_ ) ;
-    else CfrTil_InitSourceCode_WithCurrentInputChar (_CfrTil_, 1) ;
+    else CfrTil_InitSourceCode_WithCurrentInputChar ( _CfrTil_, 1 ) ;
     ListObject * l0 = _LC_Read_ListObject ( lc, parenLevel ) ; //0 ) ;
     d0 ( if ( Is_DebugOn ) LO_PrintWithValue ( l0 ) ) ;
     LC_EvalPrint ( lc, l0 ) ;
@@ -518,7 +515,7 @@ _LC_Init ( LambdaCalculus * lc )
 void
 LC_Delete ( LambdaCalculus * lc )
 {
-    CfrTil_RecycleWordList ( 0 ) ;
+    CfrTil_RecycleInitWordList ( 0 ) ;
     if ( lc )
     {
         LC_ClearTempNamespace ( ) ;

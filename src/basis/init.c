@@ -15,7 +15,7 @@ _CfrTil_Init_SessionCore ( CfrTil * cfrTil, int64 cntxDelFlag, int64 promptFlag 
     ReadLine_Init ( cntx->ReadLiner0, _CfrTil_Key ) ;
     Lexer_Init ( cntx->Lexer0, 0, 0, CONTEXT ) ;
     Finder_Init ( cntx->Finder0 ) ;
-    Compiler_Init ( cntx->Compiler0, 0 ) ;
+    Compiler_Init ( cntx->Compiler0, 0, 1 ) ;
     Interpreter_Init ( cntx->Interpreter0 ) ;
     CfrTil_ClearTokenList ( ) ;
     if ( cntxDelFlag )
@@ -24,7 +24,7 @@ _CfrTil_Init_SessionCore ( CfrTil * cfrTil, int64 cntxDelFlag, int64 promptFlag 
         for ( i = 0 ; i < stackDepth ; i ++ ) CfrTil_Context_PopDelete ( cfrTil ) ;
     }
     LC_Init_Runtime ( ) ;
-    LC_LispNamespacesOff () ;
+    LC_LispNamespacesOff ( ) ;
     //OVT_FreeTempMem ( ) ; // -> above, before inits
     CfrTil_CheckInitDataStack ( ) ;
     //_CfrTil_TypeStackReset ( ) ;
@@ -123,7 +123,7 @@ _CfrTil_CPrimitiveNewAdd ( const char * name, byte * pb_TypeSignature, uint64 op
     word->CAttribute2 = ctype2 ;
     word->W_OpInsnCode = opInsCode ;
     word->W_OpInsnGroup = opInsnGroup ;
-    if (pb_TypeSignature) strncpy ( (char*)&word->W_TypeSignature, (char*) pb_TypeSignature, 8 ) ; 
+    if ( pb_TypeSignature ) strncpy ( ( char* ) &word->W_TypeSignature, ( char* ) pb_TypeSignature, 8 ) ;
 }
 
 void

@@ -1,7 +1,7 @@
 
 5 
 User
-: sp stack pause ;
+: sp stack pause ; 
 location
 //dbgOn 
 //verbosity 4 =
@@ -17,6 +17,10 @@ libc.printf ("\nhello %d\n", 7) //pause
 #endif
 C
 User
+Class
+: sp ; //stack pause ; 
+//verbosity 3 =
+
 c_syntaxOn
 libc
 typedef _CObj
@@ -29,14 +33,12 @@ typedef _CObj
     int64 heey ;
     int64 heey1 ;
 } cobj, CObj ;
-Class
 "CObj.size =" ps p ( CObj.size ) ;
 "chey" CObj new ;
 CObj 
 chey.hi = 1234 ;
 dump ( chey, chey.size ) ;
 printf ( "\n\tchey.hi = %d", chey.hi ) ; 
-//pause
 chey.chars [2] = 255 ;
 chey.heey = #x0123456789abcdef ; 
 dump ( chey, chey.size ) ;
@@ -68,7 +70,7 @@ printf ( "%s", x7 ) ;
 
 sprintf ( &chey.chars, "%s", "well" ) ;
 dump ( chey, cobj.size ) ; 
-//d: sprintf ( &chey.chars [ 24 ], "%s", "do or don't" ) ;
+//sprintf ( &chey.chars [ 24 ], "%s", "do or don't" ) ;
 sprintf ( &chey.chars [ 24 ], "%s", "don't" ) ;
 dump ( chey, cobj.size ) ; 
 //sprintf ( &chey.chars, "%s", "well, do or don't hoot" ) ;
@@ -112,17 +114,15 @@ chi ( chey0, d | a b c )
 } prefix
 wdiss ( ' chi find )
 chi ( chey, 7 ) 
-scOff
-//s pause
-#if 1 // if 1
-optimizeOff
+
+#if 0 // if 1
 void
 interpret2 ( | atoken aword ) 
 {
     nl tab () ; ps ( "interpret2 :> " ) ; nl
     while ( 1 )
     {   
-        atoken = token () ; 
+        d: atoken = token () ; 
         if ( ! ( strcmp ( atoken, "i2halt" ) ) ) 
         { 
             return ; 
@@ -144,46 +144,44 @@ void
 interpret2 ( | atoken aword ) 
 {
     //testc1 () ; pause () ;
-    //nl() ; tab () ; 
+    //nl () ; tab () ; 
     ps ( "interpret2 :> " ) ; nl () ;
     while ( 1 )
     {   
         atoken = token () ; 
         //printf ( "\n\ttoken = %s", atoken ) ; 
-        if ( ! ( strcmp ( atoken, "i2halt" ) ) ) 
-        { 
-            return ; 
-        }
-        else
-        {
-            if ( atoken )
-            {       
-                aword = tokenToWord ( atoken ) ;
-                doWord ( aword ) ;
-            }       
-        }
+        if ( ! ( strcmp ( atoken, "i2halt" ) ) ) { sp () ; return ; }
+        else if ( atoken )
+        {       
+            aword = tokenToWord ( atoken ) ;
+            doWord ( aword ) ;
+        }       
     }
 }
 #endif // if 1 : endif
 
-wdiss ( ' interpret2 find ) ;
-optimizeOff
+wdiss ( ' interpret2 find ) ; 
+//pause () ;
+//optimizeOff
 #if 1 // if 1
+//verbosity = 3 ;
 interpret2 
 using
+#if 1
 int
 fac4 ( n  | facc -- TOS ) 
 { 
     int facc = 1 ;
-    while ( n > 1 ) 
-    {
-        facc = n -- * facc ;
-    }
-    return ( facc ) ;
-}
-fac4 ( 7 ) dup p 5040 _assert //s pause
+    while ( n > 1 ) facc = n -- * facc ;
+    return facc ;
+} prefix
+wdiss ( ' fac4 find ) ; 
+sp 
+fac4 ( 7 ) dup p 5040 _assert 
 c_syntaxOff
 ' fac4 find wdiss
+#endif
+
 User
 'interpret3 'interpret2 find alias
 interpret3 words // i2halt code to exit interpret2
@@ -281,24 +279,24 @@ $ ( | atoken, buffer, CBuffer buffer0 )
     }
 } 
 'void.$ find wdiss //sp
-
+c_syntaxOff 
 #if doScript2 
 "\n\nnew $ test\n" ps
 void
 $ls -al . ;
 $ etc/script ; 
 $ etc/lispScript ; 
-$$ls -al /usr/local ; $$ls -al . ;
-sp
+$$ls -al /usr/local ; 
+$$ls -al . ;
 #endif
 
-c_syntaxOff
-//pause
+//stack pause
 verbosity 1 =
-sp
+//sp
 dbgOff 
 infixOff
 1 opOn
+//stack pause
 s: hi ( a b | c ) c a @ b @ + = printf ("\nshould read 3 : %d", c ) ;s 1 2 hi //pause
 2 + 7 assertStkChk // stack checking
 //s pause

@@ -40,6 +40,7 @@ CfrTil_C_Syntax_Off ( )
     //Namespace_DoNamespace ( "Bits" ) ; // TODO : must be a better way
     CfrTil_SetInNamespaceFromBackground ( ) ;
     //if ( cntx->Compiler0->C_BackgroundNamespace ) _CfrTil_Namespace_InNamespaceSet ( cntx->Compiler0->C_BackgroundNamespace ) ;
+    Context_SetDefaultTokenDelimiters ( cntx, ( byte* ) " \n\r\t", CONTEXT ) ;
     Ovt_AutoVarOff ( ) ;
 }
 
@@ -54,7 +55,7 @@ CfrTil_C_Syntax_On ( )
     Namespace_DoNamespace ( ( byte* ) "Infix" ) ;
     Namespace_DoNamespace ( ( byte* ) "C_Syntax" ) ;
     Compiler_SetAs_InNamespace_C_BackgroundNamespace ( cntx->Compiler0 ) ;
-    Lexer_SetBasicTokenDelimiters ( cntx->Lexer0, ( byte* ) " \n\r\t", COMPILER_TEMP ) ;
+    Context_SetDefaultTokenDelimiters ( cntx, ( byte* ) " ,\n\r\t", CONTEXT ) ;
 }
 
 void
@@ -72,7 +73,7 @@ CfrTil_C_Semi ( )
     if ( ! Compiling )
     {
         CfrTil_InitSourceCode ( _CfrTil_ ) ;
-        Compiler_Init ( compiler, 0 ) ;
+        Compiler_Init ( compiler, 0, 1 ) ;
     }
 }
 
@@ -161,7 +162,7 @@ CfrTil_DoWhile_PrefixCombinators ( )
     _Context_->SC_CurrentCombinator = currentWord0 ;
     if ( ! CfrTil_DoWhileCombinator ( ) )
     {
-        SetHere (start, 1) ;
+        SetHere ( start, 1 ) ;
     }
 }
 
@@ -201,7 +202,7 @@ CfrTil_While_PrefixCombinators ( )
     _Context_->SC_CurrentCombinator = currentWord0 ;
     if ( ! CfrTil_WhileCombinator ( ) ) // TODO : has this idea been fully applied to the rest of the code?
     {
-        SetHere (start, 1) ;
+        SetHere ( start, 1 ) ;
     }
 }
 
@@ -261,7 +262,8 @@ _CfrTil_TypeDef ( )
     Namespace * ns = CfrTil_Type_New ( ) ;
     Lexer * lexer = cntx->Lexer0 ;
     Word * alias ;
-    Boolean typeFlag = false ; int64 size = 0 ;
+    Boolean typeFlag = false ;
+    int64 size = 0 ;
     Lexer_SetTokenDelimiters ( lexer, ( byte* ) " ,\n\r\t", COMPILER_TEMP ) ;
     do
     {
@@ -296,7 +298,7 @@ _CfrTil_TypeDef ( )
                 alias->Lo_List = ns->Lo_List ;
                 alias->CAttribute |= IMMEDIATE ;
             }
-            else 
+            else
             {
                 ns = DataObject_New ( C_TYPE, 0, token, 0, 0, 0, 0, 0, 0, 0, - 1 ) ;
                 _Namespace_VariableValueSet ( ns, ( byte* ) "size", size ) ;

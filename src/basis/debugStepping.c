@@ -253,7 +253,8 @@ Debugger_PreStartStepping ( Debugger * debugger )
                 word->S_ContainingNamespace ? ( byte* ) "." : ( byte* ) "", c_gu ( word->Name ),
                 GetState ( debugger, DBG_AUTO_MODE ) ? " : automode turned off" : "",
                 debugger->DebugAddress ) ;
-            Debugger_Eval ( debugger ) ;
+            debugger->DebugAddress = 0 ;
+            _Debugger_Eval ( debugger, 0 ) ;
             SetState ( _Debugger_, DBG_AUTO_MODE, false ) ; //if ( GetState ( debugger, DBG_AUTO_MODE ) )
             return ;
         }

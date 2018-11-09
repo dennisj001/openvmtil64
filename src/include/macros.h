@@ -224,8 +224,8 @@
 #define Is_DebugShowOn ( _CfrTil_ && GetState ( _CfrTil_, _DEBUG_SHOW_ ) ) 
 #define _Is_DebugOn GetState ( _CfrTil_, _DEBUG_SHOW_ )
 #define Is_DebugOn (Is_DebugShowOn && Is_DebugModeOn)
-#define _DEBUG_SETUP( word, forceFlag ) if ( (word && Is_DebugModeOn)) _Debugger_PreSetup (_Debugger_, word, 0, forceFlag ) ;
-#define _DEBUG_SETUP_TOKEN( token, forceFlag ) if ( (word && Is_DebugModeOn)) _Debugger_PreSetup (_Debugger_, 0, token, forceFlag ) ;
+#define _DEBUG_SETUP( word, token ) if ( (word || token) && Is_DebugModeOn ) _Debugger_PreSetup ( _Debugger_, word, token, 0 ) ;
+#define DEBUG_SETUP_TOKEN( token ) _DEBUG_SETUP( 0, token ) ;
 #define DEBUG_SETUP( word ) _DEBUG_SETUP( word, 0 )
 #define _DEBUG_SHOW( word, force ) _Debugger_PostShow ( _Debugger_, word, force ) ; //, token, word ) ;
 #define DEBUG_SHOW Debugger_PostShow ( _Debugger_ ) ; //, token, word ) ;
@@ -253,8 +253,8 @@
 #define _IsSourceCodeOn ( GetState ( _CfrTil_, DEBUG_SOURCE_CODE_MODE ) )
 #define IsSourceCodeOn ( _IsSourceCodeOn || IsGlobalsSourceCodeOn )
 #define IsSourceCodeOff (!IsSourceCodeOn) //( GetState ( _CfrTil_, DEBUG_SOURCE_CODE_MODE ) || IsGlobalsSourceCodeOn ))
-#define _Word_SCH_CPUSCA( word, clearFlag ) Word_SetCodingHere_And_ClearPreviousUseOf_Here_SCA ( word, clearFlag) 
-#define WordStack_SCHCPUSCA( index, clearFlag ) _Word_SCH_CPUSCA (CfrTil_WordList ( index ), clearFlag) 
+#define Word_SCH_CPUSCA( word, clearFlag ) Word_SetCodingHere_And_ClearPreviousUseOf_Here_SCA ( word, clearFlag) 
+#define WordStack_SCHCPUSCA( index, clearFlag ) Word_SCH_CPUSCA (CfrTil_WordList ( index ), clearFlag) 
 #define _SC_Global_On SetState ( _CfrTil_, GLOBAL_SOURCE_CODE_MODE, true )
 #define SC_Global_On if ( GetState ( _CfrTil_, DEBUG_SOURCE_CODE_MODE ) ) { _SC_Global_On ; }
 #define SC_Global_Off SetState ( _CfrTil_, GLOBAL_SOURCE_CODE_MODE, false )
@@ -262,6 +262,19 @@
 #define _Block_SCA_Clear _Block_SCA( -1 ) ;
 #define L_SCI _Lexer_->SC_Index
 #define Compiler_OptimizerWordList_Reset( compiler ) List_Init ( _CfrTil_->CompilerWordList ) 
+#define _Word_SetTsrliScwi( word, tsrli, scwi ) \
+    if ( word )\
+    {\
+        word->W_RL_Index = tsrli ;\
+        word->W_SC_Index = scwi ;\
+    }
+#define Word_SetTsrliScwi( word, tsrli, scwi ) \
+    if ( word )\
+    {\
+        word->W_RL_Index = tsrli = (( tsrli != - 1 ) ? tsrli : _Lexer_->TokenStart_ReadLineIndex) ;\
+        word->W_SC_Index = scwi = (( scwi != - 1 ) ? scwi : _Lexer_->SC_Index) ;\
+    }
+
 
 #define Strncat( dst, src, n ) strncat ( (char *__restrict) dst, (const char *__restrict) src, (size_t) n )
 #define Strlen( s ) ( s ? strlen ( (const char *) s ) : 0 )

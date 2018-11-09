@@ -114,18 +114,17 @@ tick fibcc find wdiss // have to use 'tick' not ' - remember we are in the Lisp 
 
 sp
 lispOff
-//doDemo @
 Compiler C 
-: _fib1 ( n ) { n @ 2 < } { n @  } { n @ -- _fib1 n @ 2 - _fib1 + } ifElse ;
+: _fib1 ( n -- TOS ) { n @ 2 < } { n @ } { n @ -- _fib1 n @ 2 - _fib1 + } ifElse ;
 // ' _fib1 find wdiss
- 20 _fib1 p
+ 20 _fib1 dup p 6765 _assert0 
 c_syntaxOn
 int _fib1c ( n ) { if ( n < 2 ) { n ; } else { _fib1c ( n - 1 ) + _fib1c ( n - 2 ) ; } }
 c_syntaxOff
-' _fib1c find wdiss
-20 _fib1c p //pause
-dscOn //verbosity 3 =
-: fibPTC? ( n | fn fn1 fn2 -- TOS) 
+//' _fib1c find wdiss
+20 _fib1c dup p 6765 _assert0 
+dscOn 
+: fibPTC? ( n | fn fn1 fn2 -- TOS ) 
     { fn 0 = fn1 0 = fn2 1 = } { n @ } { n n @ 1 - = } 
     {   
         fn1 fn2 @ = 
@@ -133,10 +132,10 @@ dscOn //verbosity 3 =
         fn fn1 @ fn2 @ + = 
     }
     for
-    fn @ 
+    fn @
 ;
 ' fibPTC? find wdiss 
-20 fibPTC? dup p 6765 _assert0 verbosity 1 = //pause
+20 fibPTC? dup p 6765 _assert0 
 dscOff
 sp
 : fibPTC3? ( n | svn fn fn1 fn2 ) 
@@ -152,11 +151,11 @@ sp
 sp
 c_syntaxOn
 int
-fibPTC2? ( REG n | REG fn, REG fn1, REG fn2 )
+//fibPTC2? ( REG n | REG fn, REG fn1, REG fn2 )
 //fibPTC2? ( n | fn, fn1, fn2 )
-//fibPTC2? ( n ) //| fn, fn1, fn2 )
+fibPTC2? ( n ) //| fn, fn1, fn2 )
 {
-    //int fn, fn1, fn2 ;
+    int fn, fn1, fn2 ;
     for ( fn = 0, fn1 = 0, fn2 = 1 ; n ; n -- ) 
     {   
         fn1 = fn2 ;
@@ -164,7 +163,7 @@ fibPTC2? ( REG n | REG fn, REG fn1, REG fn2 )
         fn = fn1 + fn2 ; 
     }
     return fn ;
-}
+} //prefix
 ' fibPTC2? find wdiss
 fibPTC2? (20) dup p 6765 _assert 
 c_syntaxOff
@@ -414,7 +413,7 @@ sp
 ;
 //' fibBN find wdiss
 20 fibBN dup p 6765 _assert //sp
-: fibBN ( n | fn REG fn1 fn2 -- TOS ) 
+: fibBN ( n | fn REG fn1 fn2 ) 
     { fn 0 = fn1 0 = fn2 1 = } { n @ 0 > } { n 1 -= } 
     {   
         fn1 fn2 @ = 
@@ -423,11 +422,11 @@ sp
     }
     for
     // svn @ fprint ":" ps fn @ fprint 
-    fn @
+    return fn
 ;
 //' fibBN find wdiss
 20 fibBN dup p 6765 _assert //sp
-: fibBN ( n | fn, REG fn1, REG fn2 -- TOS ) 
+: fibBN ( n | fn, REG fn1, REG fn2 ) 
     { fn 0 = fn1 0 = fn2 1 = } { n @ 0 > } { n 1 -= } 
     {   
         fn1 fn2 @ = 
@@ -436,12 +435,12 @@ sp
     }
     for
     // svn @ fprint ":" ps fn @ fprint 
-    fn @
+    return fn
 ;
 //' fibBN find wdiss
 20 fibBN dup p 6765 _assert //sp
 
-: fibBN ( n | REG fn REG fn1 REG fn2 -- TOS ) 
+: fibBN ( n | REG fn REG fn1 REG fn2 ) 
     { fn 0 = fn1 0 = fn2 1 = } { n @ 0 > } { n 1 -= } 
     {   
         fn1 fn2 @ = 
@@ -450,7 +449,7 @@ sp
     }
     for
     // svn @ fprint ":" ps fn @ fprint 
-    fn @
+    return fn
 ;
 //' fibBN find wdiss
 20 fibBN dup p 6765 _assert sp

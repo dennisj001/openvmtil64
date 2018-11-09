@@ -502,7 +502,8 @@ IsLValue_String_CheckForwardToStatementEnd ( byte * nc )
                 else if ( ispunct ( * ( nc - 1 ) ) ) return false ; // op equal
                 else return true ; // we have an lvalue
             }
-            case ';': case ',': case '"': case '.': case '[': case '(': case '{': case '}': return false ;
+            //case ';': case ',': case '"': case '.': case '[': case ']': case '(': case ')': case '{': case '}': return false ;
+            case ';': case ',': case '"': case ']': case ')': case '{': case '}': return false ;
             default : ;
         }
         nc ++ ;

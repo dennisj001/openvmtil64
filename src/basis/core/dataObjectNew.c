@@ -14,6 +14,7 @@ DataObject_New ( uint64 type, Word * word, byte * name, uint64 ctype, uint64 cty
     if ( word && ( ! ( type & ( T_LC_NEW | T_LC_LITERAL ) ) ) )
     {
         Word_Recycle ( word ) ;
+        //_CheckRecycleWord ( word ) ;
     }
     switch ( type )
     {
@@ -205,7 +206,6 @@ _Class_New ( byte * name, uint64 type, int64 cloneFlag )
         _Namespace_DoNamespace ( ns, 1 ) ;
     }
     CfrTil_WordList_Init ( _CfrTil_, 0, 0 ) ;
-
     return ns ;
 }
 

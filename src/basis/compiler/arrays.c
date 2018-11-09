@@ -67,7 +67,7 @@ Compile_ArrayDimensionOffset ( Word * word, int64 dimSize, int64 objSize )
     //if ( word && word->W_Value ) // if ! zero else 
     if ( word && ( ( word->CAttribute & LITERAL ) ? word->W_Value : 1 ) ) // if ! zero else 
     {
-        _Word_SCH_CPUSCA ( word, 1 ) ;
+        Word_SCH_CPUSCA ( word, 1 ) ;
         int64 size = dimSize * objSize ;
         // assume arrayIndex has just been pushed to TOS
         // nb. if size is zero this complete processing of an array dimension adding its amount to the pointer-offset on the stack
@@ -144,7 +144,7 @@ Do_NextArrayToken ( byte * token, Word * arrayBaseObject, int64 objSize, Boolean
         //if ( ! GetState ( cntx->Compiler0, LC_ARG_PARSING ) ) 
         word->W_RL_Index = _Lexer_->TokenStart_ReadLineIndex ;
         word->W_SC_Index = _Lexer_->SC_Index ;
-        _Word_SCH_CPUSCA ( word, 1 ) ;
+        Word_SCH_CPUSCA ( word, 1 ) ;
     }
 #endif    
     SetState ( compiler, ARRAY_MODE, true ) ;
@@ -161,7 +161,8 @@ Do_NextArrayToken ( byte * token, Word * arrayBaseObject, int64 objSize, Boolean
         compiler->ArrayEnds ++ ; // after, because arrayBaseObject->ArrayDimensions is a zero based array
 
         //if ( Is_DebugModeOn ) _Printf ( "\ndimSize = %d", dimSize ) ;
-        DEBUG_SETUP ( word ) ;
+        //DEBUG_SETUP ( word ) ;
+        _Debugger_PreSetup (_Debugger_, word, 0, 0 ) ;
         if ( *variableFlag ) Compile_ArrayDimensionOffset ( cntx->CurrentlyRunningWord, dimSize, objSize ) ;
         else
         {
@@ -175,14 +176,14 @@ Do_NextArrayToken ( byte * token, Word * arrayBaseObject, int64 objSize, Boolean
             else _DataStack_SetTop ( _DataStack_GetTop ( ) + increment ) ; // after each dimension : in the end we have one lvalue remaining on the stack
             if ( Is_DebugModeOn ) Word_PrintOffset ( word, increment, baseObject->AccumulatedOffset ) ;
         }
-        DEBUG_SHOW ;
         if ( ! _Context_StringEqual_PeekNextToken ( cntx, ( byte* ) "[", 0 ) ) return 1 ; // breaks the calling function
         return 0 ;
     }
     if ( *variableFlag ) Set_CompileMode ( true ) ;
     else Set_CompileMode ( false ) ;
-    if ( word ) _Interpreter_DoWord ( interp, word, -1, -1 ) ; //word->W_RL_Index, word->W_SC_Index ) ;
+    if ( word ) Interpreter_DoWord ( interp, word, -1, -1 ) ; //word->W_RL_Index, word->W_SC_Index ) ;
     else Interpreter_InterpretAToken ( interp, token, - 1 ) ;
+    DEBUG_SHOW ;
     Set_CompileMode ( saveCompileMode ) ;
     SetState ( compiler, COMPILE_MODE, saveCompileMode ) ;
     return 0 ;

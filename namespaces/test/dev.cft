@@ -3,6 +3,7 @@
 : sp ; //s pause ; 
 sp
 optimizeOn inlineOn 
+typecheckOn
 lispOff
 bnOff 
 // optimizeOff inlineOff
@@ -68,11 +69,12 @@ fac5 ( REG n  | REG facc -- RAX )
     facc = 1 ;
     while ( n > 1 ) 
     {
-        facc = facc * n -- ;
+        facc = facc * ( n -- ) ; // parenthesis a must for now ??
     }
     return facc ;
 }
 wdiss ( ' fac5 find ) ; 
+//pause ;
 fac5 ( 7 ) dup p 5040 _assert //sp
 
 int
@@ -94,7 +96,7 @@ fac5 ( REG n  | REG facc )
     facc = 1 ;
     while ( n > 1 ) 
     {
-        facc = facc * n -- ;
+        facc = facc * (n --) ; // parenthesis a must for now ??
     }
     return facc ;
 }
@@ -180,6 +182,7 @@ fibPTC2? ( REG n | REG fn, REG fn1, REG fn2 )
 }
 c_syntaxOff
 User
+typecheckOff
 #if 1
 reps 20000 =
 "factorial" ffx
@@ -235,7 +238,7 @@ c_syntaxOff
 : pow ( base power | out ) { out 1 = } { power @ 0 > } { power power @ 1 - = } { out out @ base @ * = } for return out ;
 "pow" ffx2
 //"cpow" ffx2
-
+typecheckOff
 Int
 "**" ffx2
 "pow_03" ffx2
@@ -332,7 +335,7 @@ sp
 Locals
 "fib1" ( n ) { 1 ti n @ _fib1 p 1 time } word 
 sp
-C
+C 
 'cfib2_O3 find wdiss //sp
 #if 1
 : fib  ( n ) 1 ti n @ _fib  p 1 time ;
@@ -344,7 +347,7 @@ C
 : Cfib ( n ) 1 ti n @ cfib  p 1 time ;
 : Cfib_O3 ( n ) 1 ti n @ cfib_O3  p 1 time ;
 : fibPTC ( n ) 1 ti n @ fibPTC?  p 1 time ;
-: fibPTC2 ( n ) 1 ti n @ fibPTC2?  p 1 time ;
+: fibPTC2 ( n ) 1 ti n @ User.fibPTC2? p 1 time ;
 : tfib ( n )  
     nl hex dsp p decimal nl "The fibonacci sequence" ps n @ p ":" ps nl 
     "C -O3 : " ps n @ Cfib_O3 nl 
@@ -354,13 +357,13 @@ C
     "locals fib1    : " ps n @ Locals.fib1 nl 
     "no locals fib2 : " ps n @ fib2 nl
     "no locals fib3 : " ps n @ fib3 nl
-#endif        
+#endif    
     "fibPTC?        : " ps n @ fibPTC nl
     "fibPTC2?        : " ps n @ fibPTC2
 ;
 sp
 15 tfib 30 tfib //40 tfib //45 tfib 
-sp
+//stack pause
 : tfib1 ( n | m )  
     nl "The fibonacci sequence:: first :" ps n @ p "..." ps nl 
     "Cfib_O3         : " ps 1 ti m 1 = { m @ n @ < } { m @ cfib_O3 p m ++ } while 1 time nl nl
@@ -374,7 +377,7 @@ sp
     "no locals _fib3 : " ps 1 ti m 1 = { m @ n @ < } { m @ _fib3   p m ++ } while 1 time nl nl
     "no locals _fib4 : " ps 1 ti m 1 = { m @ n @ < } { m @ _fib4   p m ++ } while 1 time nl nl
     "fibPTC?  : " ps 1 ti m 1 = { m @ n @ < } { m @ fibPTC? p m ++ } while 1 time nl nl
-    "fibPTC2?  : " ps 1 ti m 1 = { m @ n @ < } { m @ fibPTC2? p m ++ } while 1 time nl nl
+    "fibPTC2?  : " ps 1 ti m 1 = { m @ n @ < } { m @ User.fibPTC2? p m ++ } while 1 time nl nl
 ;
 
 : tfib2 ( n | m )  

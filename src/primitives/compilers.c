@@ -240,7 +240,7 @@ CfrTil_Literal ( )
     _NBA_SetCompilingSpace_MakeSureOfRoom ( _Q_->MemorySpace0->TempObjectSpace, 4 * K ) ;
     Word * word = DataObject_New ( LITERAL, 0, "<literal>", LITERAL | CONSTANT, 0, 0, 0, value, 0, - 1, - 1 ) ;
     Set_CompilerSpace ( svcs ) ;
-    _Interpreter_DoWord ( _Context_->Interpreter0, word, - 1, - 1 ) ;
+    Interpreter_DoWord ( _Context_->Interpreter0, word, - 1, - 1 ) ;
 }
 
 void

@@ -33,7 +33,7 @@ LO_Apply ( LambdaCalculus * lc, ListObject * l0, ListObject *lfirst, ListObject 
 #endif
     else
     {
-//these cases seems common sense for what these situations should mean and seem to add something positive to the usual lisp/scheme semantics !?
+        //these cases seems common sense for what these situations should mean and seem to add something positive to the usual lisp/scheme semantics !?
         //SetState ( _CfrTil_, TYPECHECK_OFF, true ) ;        
         if ( ! largs ) l0 = lfunction ;
         else
@@ -60,7 +60,7 @@ _LO_Apply ( ListObject *lfirst, ListObject *lfunction, ListObject *largs )
     {
         if ( lfunction->LAttribute & T_LISP_CFRTIL_COMPILED )
         {
-            _Interpreter_DoWord ( _Context_->Interpreter0, lfunction->Lo_CfrTilWord, lfunction->W_RL_Index, lfunction->W_SC_Index ) ;
+            Interpreter_DoWord ( _Context_->Interpreter0, lfunction->Lo_CfrTilWord, lfunction->W_RL_Index, lfunction->W_SC_Index ) ;
             vReturn = nil ;
         }
         else vReturn = _LO_Do_FunctionBlock ( lfunction, largs ) ;
@@ -106,7 +106,7 @@ _Interpreter_LC_InterpretWord ( Interpreter *interp, ListObject *l0, Boolean fun
     {
         word = l0->Lo_CfrTilWord ;
         if ( ! word ) word = l0 ;
-        _Interpreter_DoWord ( interp, word, word->W_RL_Index, word->W_SC_Index ) ; 
+        Interpreter_DoWord ( interp, word, word->W_RL_Index, word->W_SC_Index ) ;
         //SetState ( _Debugger_, DEBUG_SHTL_OFF, false ) ;
     }
 }
@@ -189,8 +189,7 @@ void
 _LO_CompileOrInterpret ( ListObject *lfunction, ListObject *largs )
 {
     ListObject *lfword = lfunction->Lo_CfrTilWord ;
-    lfword->W_RL_Index = lfunction->W_RL_Index ;
-    lfword->W_SC_Index = lfunction->W_SC_Index ;
+    _Word_SetTsrliScwi( lfword, lfunction->W_RL_Index, lfunction->W_SC_Index ) ;
 
     if ( largs && lfword && ( lfword->CAttribute & ( CATEGORY_OP_ORDERED | CATEGORY_OP_UNORDERED ) ) ) // ?!!? 2 arg op with multi-args : this is not a precise distinction yet : need more types ?!!?
     {
@@ -376,14 +375,16 @@ _LO_Apply_ArrayArg ( ListObject ** pl1, int64 i )
 }
 
 int64
-_LO_Apply_NonMorphismArg ( LambdaCalculus * lc, ListObject ** pl1, int64 i )
+_LO_Apply_NonMorphismArg ( ListObject ** pl1, int64 i )
 {
     Context * cntx = _Context_ ;
     ListObject *l1 = * pl1 ;
     Word * word = l1 ;
     word = l1->Lo_CfrTilWord ;
     word = Compiler_CopyDuplicatesAndPush ( word ) ;
-    word->W_SC_Index = l1->W_SC_Index ;
+    //_Word_SetTsrliScwi ( word, l1->W_RL_Index, l1->W_SC_Index ) ;
+    //_Word_SetTsrliScwi ( l1, l1->W_RL_Index, l1->W_SC_Index ) ;
+    //Word_SCH_CPUSCA( word, 1 ) ;
     byte * here = Here ;
     Word_Eval ( word ) ; // ?? move value directly to RegOrder reg
     Word *baseObject = _Interpreter_->BaseObject ;
@@ -417,15 +418,16 @@ _LO_Apply_Arg ( LambdaCalculus * lc, ListObject ** pl1, int64 i )
         else Compile_MoveImm_To_Reg ( RegOrder ( i ++ ), ( int64 ) * l2->Lo_PtrToValue, CELL_SIZE ) ;
         _DEBUG_SHOW ( l2, 1 ) ;
     }
-    else if ( ( l1->CAttribute & NON_MORPHISM_TYPE ) ) i = _LO_Apply_NonMorphismArg ( lc, pl1, i ) ;
+    else if ( ( l1->CAttribute & NON_MORPHISM_TYPE ) ) i = _LO_Apply_NonMorphismArg ( pl1, i ) ;
     else if ( ( l1->Name [0] == '.' ) || ( l1->Name [0] == '&' ) )
-        _Interpreter_DoWord ( cntx->Interpreter0, l1->Lo_CfrTilWord, l1->W_RL_Index, l1->W_SC_Index ) ;
+        Interpreter_DoWord ( cntx->Interpreter0, l1->Lo_CfrTilWord, l1->W_RL_Index, l1->W_SC_Index ) ;
+        //_Interpreter_DoWord ( cntx->Interpreter0, l1->Lo_CfrTilWord, l1->Lo_CfrTilWord->W_RL_Index, l1->Lo_CfrTilWord->W_SC_Index ) ;
     else if ( ( l1->Name[0] == '[' ) ) i = _LO_Apply_ArrayArg ( pl1, i ) ;
     else
     {
         word = Compiler_CopyDuplicatesAndPush ( word ) ;
         word->W_SC_Index = l1->W_SC_Index ;
-        _DEBUG_SETUP ( word, 1 ) ;
+        _Debugger_PreSetup ( _Debugger_, word, 0, 1 ) ;
         Compile_MoveImm_To_Reg ( RegOrder ( i ++ ), DataStack_Pop ( ), CELL_SIZE ) ;
         _DEBUG_SHOW ( word, 1 ) ;
     }
@@ -468,7 +470,8 @@ _LO_Apply_C_LtoR_ArgList ( LambdaCalculus * lc, ListObject * l0, Word * word )
             CfrTil_EndBlock ( ) ;
             Set_CompileMode ( svcm ) ;
             Set_CompilerSpace ( scs ) ;
-            _DEBUG_SETUP ( word, 1 ) ;
+            //_DEBUG_SETUP ( word, 1 ) ;
+            if ( word && Is_DebugModeOn ) if ( _Debugger_PreSetup ( _Debugger_, word, 0, 1 ) ) return nil ;
             CfrTil_BlockRun ( ) ;
         }
         d0 ( if ( Is_DebugModeOn ) LO_Debug_ExtraShow ( 0, 2, 0, ( byte* ) "\nLeaving _LO_Apply_ArgList..." ) ) ;

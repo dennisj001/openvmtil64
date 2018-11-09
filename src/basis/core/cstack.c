@@ -134,10 +134,16 @@ Stack_SetTop ( Stack * stack, int64 value )
     if ( Stack_Depth ( stack ) ) *stack->StackPointer = value ;
 }
 
+inline int64
+_Stack_N ( Stack * stack, int64 n )
+{
+    return *( stack->StackPointer - n ) ;
+}
+
 int64
 _Stack_NOS ( Stack * stack )
 {
-    return *( stack->StackPointer - 1 ) ;
+    return _Stack_N ( stack, 1 ) ; //*( stack->StackPointer - 1 ) ;
 }
 
 void

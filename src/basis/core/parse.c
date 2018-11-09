@@ -42,7 +42,7 @@ _CfrTil_SingleQuote ( )
 done:
         CfrTil_WordLists_PopWord ( ) ; // pop the "'" token
         word = _DObject_New ( buffer, charLiteral, LITERAL | CONSTANT | IMMEDIATE, 0, 0, LITERAL, ( byte* ) _DataObject_Run, 0, 0, 0, DICTIONARY ) ;
-        _Interpreter_DoWord ( _Interpreter_, word, - 1, - 1 ) ; //_Lexer_->TokenStart_ReadLineIndex ) ;
+        Interpreter_DoWord ( _Interpreter_, word, - 1, - 1 ) ; //_Lexer_->TokenStart_ReadLineIndex ) ;
     }
     else
     {

@@ -12,7 +12,7 @@ _CopyDuplicateWord ( Word * word0, Boolean complete )
     wordc->CAttribute2 |= ( uint64 ) RECYCLABLE_COPY ;
     if ( complete )
     {
-        wordc->W_OriginalWord = Word_GetOriginalWord ( word0 ) ;
+        wordc->W_WordListOriginalWord = Word_GetOriginalWord ( word0 ) ;
         Word_SetLocation ( wordc ) ;
     }
     return wordc ;
@@ -31,7 +31,7 @@ Word *
 _CfrTil_CopyDuplicates ( Word * word0 )
 {
     Word * word1, *wordToBePushed ;
-    word0->W_OriginalWord = word0 ;
+    word0->W_WordListOriginalWord = word0 ;
     word0->CAttribute2 &= ( ~ RECYCLABLE_COPY ) ;
     if ( word1 = ( Word * ) dllist_Map1_WReturn ( _CfrTil_->CompilerWordList, ( MapFunction1 ) CopyDuplicateWord, ( int64 ) word0 ) )
     {
@@ -288,7 +288,7 @@ Compiler_Init_AccumulatedOffsetPointers ( Compiler * compiler, Word * word )
 }
 
 void
-Compiler_Init ( Compiler * compiler, uint64 state )
+Compiler_Init ( Compiler * compiler, uint64 state, int64 flags )
 {
     compiler->State = state & ( ! ARRAY_MODE ) ;
     compiler->ContinuePoint = 0 ;
@@ -308,7 +308,6 @@ Compiler_Init ( Compiler * compiler, uint64 state )
     compiler->ReturnVariableWord = 0 ;
     compiler->CurrentCreatedWord = 0 ;
     compiler->CurrentWord = 0 ;
-    compiler->NextBlockStart = 0 ;
     Stack_Init ( compiler->BlockStack ) ;
     Stack_Init ( compiler->CombinatorBlockInfoStack ) ;
     Stack_Init ( compiler->PointerToOffset ) ;
@@ -321,7 +320,7 @@ Compiler_Init ( Compiler * compiler, uint64 state )
     _dllist_Init ( compiler->OptimizeInfoList ) ;
     _Compiler_FreeAllLocalsNamespaces ( compiler ) ;
     Compiler_CompileOptimizeInfo_PushNew ( compiler ) ;
-    CfrTil_TypeStackReset ( ) ;
+    if ( flags ) CfrTil_TypeStackReset ( ) ;
     SetBuffersUnused ( 1 ) ;
     SetState ( compiler, VARIABLE_FRAME, false ) ;
 }
@@ -340,7 +339,7 @@ Compiler_New ( uint64 type )
     compiler->PostfixLists = _dllist_New ( type ) ;
     compiler->GotoList = _dllist_New ( type ) ;
     compiler->OptimizeInfoList = _dllist_New ( type ) ;
-    Compiler_Init ( compiler, 0 ) ;
+    Compiler_Init ( compiler, 0, 1 ) ;
     return compiler ;
 }
 

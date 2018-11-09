@@ -598,23 +598,12 @@ Word_Recycle ( Word * w )
     OVT_Recycle ( _Q_->MemorySpace0->RecycledWordList, ( dlnode * ) w ) ;
 }
 
-// put a CompileOptimizeInfo on the recycling list
-#if 0
-
-void
-OptInfo_Recycle ( CompileOptimizeInfo * coi )
-{
-    OVT_Recycle ( _Q_->MemorySpace0->RecycledOptInfoList, ( dlnode * ) coi ) ;
-}
-#endif
-
 void
 _CheckRecycleWord ( Word * w )
 {
     if ( w && ( w->CAttribute2 & ( RECYCLABLE_COPY | RECYCLABLE_LOCAL ) ) ) //&& ( ! ( IsSourceCodeOn ) ) && GetState ( w, W_SOURCE_CODE_MODE ) )
     {
-        //if ( Is_DebugOn ) ( 
-        //_Printf ( ( byte* ) "\n_CheckRecycleWord : recycling : %s", w->Name ) ; //, Pause () ;
+        //if ( Is_DebugOn ) _Printf ( ( byte* ) "\n_CheckRecycleWord : recycling : %s", w->Name ) ; //, Pause () ;
         Word_Recycle ( w ) ;
     }
 }

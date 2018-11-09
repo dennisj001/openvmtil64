@@ -11,7 +11,6 @@ _OpenVmTil_ShowExceptionInfo ( )
     Word * word = _Q_->ExceptionWord ;
     Debugger * debugger = _Debugger_ ;
     DebugOn ;
-    //if ( debugger->w_Word ) _Debugger_Locals_Show ( debugger, debugger->w_Word ) ;
     if (( ! ( _Q_->ExceptionCode & ( STACK_ERROR | STACK_OVERFLOW | STACK_UNDERFLOW ) ) )) Debugger_Stack ( debugger ) ;
     if (( ! word ) && _Q_->ExceptionToken )
     {
@@ -59,6 +58,7 @@ OpenVmTil_ShowExceptionInfo ( )
     return rtrn ;
 }
 
+#if 0
 void
 OVT_SimpleFinalPause ( )
 {
@@ -66,6 +66,7 @@ OVT_SimpleFinalPause ( )
     fflush ( stdout ) ;
     Key ( ) ;
 }
+#endif
 
 int64
 OVT_Pause ( byte * prompt, int64 signalExceptionsHandled )
@@ -293,7 +294,7 @@ OpenVmTil_SignalAction ( int signal, siginfo_t * si, void * uc )
     }
     else if ( _Q_->SigSegvs )
     {
-        OVT_SimpleFinalPause ( ) ;
+        //OVT_SimpleFinalPause ( ) ;
         _OVT_SigLongJump ( & _Q_->JmpBuf0 ) ;
     }
     else OVT_Throw ( _Q_->Signal, _Q_->RestartCondition, 0 ) ;

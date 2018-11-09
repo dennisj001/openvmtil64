@@ -32,7 +32,7 @@
 //#define ReturnSlotOffset( bi ) ( FrameSize (bi) - 1 )
 
 
-#define _Compile_DataStack_Push( obj ) _Compile_Stack_Push( DSP, obj )
+//#define _Compile_DataStack_Push( obj ) _Compile_Stack_Push( DSP, ACC, obj )
 #define _Compile_Move_LocalNRm_To_Reg( reg, n ) _Compile_Move_StackNRm_To_Reg ( reg, FP, n )
 #define _Compile_Move_LocalN_To_Reg( reg, n ) _Compile_Move_StackN_To_Reg ( reg, FP, n )
 #define _Compile_Move_Reg_To_LocalN( n, reg ) _Compile_Move_Reg_To_StackN ( FP, n, reg )

@@ -59,8 +59,8 @@ hex
 Logic Bits Combinators X64 
 
 'x64_dbg 1 const  
-'DBI 0 const
-//#define x64_dbg 1
+'DBI 1 const
+#define x64_dbg 1
 #if x64_dbg    
 dscOn 
 //verbosity 3 =
@@ -282,7 +282,7 @@ _Compile_Write_Instruction_X64 ( rex, opCode, modRm, controlFlags, sib, disp, di
 int 
 _CalculateRex ( _reg rm rex_w_flag | rex )
 {
-#if 0 
+#if 1
     //  0100    WRXB
     rex = 0 ;
     if ( rex_w_flag ) rex = 8 ;
@@ -432,7 +432,7 @@ sp
                                                 //c3                      ret      
 asm; 
 
-' iax find wdiss // pause // sp 
+' iax find wdiss //pause // sp 
 
 : _Compile_Test_Imm (  _mod, rm, disp, imm )
     _Compile_Test ( _mod @, rm @, IMM_B, disp @, imm @ )
@@ -469,7 +469,7 @@ User
     _Compile_SUBI_DSP ( CELL ) 
 asm;
 
-//' stest find wdiss pause
+' stest find wdiss //pause
 s
 "\nthis is some purposefully funky code for testing\n" ps
 

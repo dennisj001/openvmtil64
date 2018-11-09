@@ -29,6 +29,7 @@ CfrTil_DropN ( )
     else DataStack_DropN ( TOS + 1 ) ;
 }
 
+#if 0 // ??not needed 
 void
 _CfrTil_Push ( int64 value )
 {
@@ -41,6 +42,7 @@ _CfrTil_Push ( int64 value )
         DataStack_Push ( value ) ;
     }
 }
+#endif
 
 void
 CfrTil_Dup ( )

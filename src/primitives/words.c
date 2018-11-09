@@ -219,7 +219,7 @@ void
 Location_PushNew ( )
 {
     Location * loc = Location_New ( ) ;
-    _Compile_DataStack_Push ( ( int64 ) loc ) ;
+    _Compile_Stack_Push ( DSP, ACC,  ( int64 ) loc ) ;
 }
 
 void

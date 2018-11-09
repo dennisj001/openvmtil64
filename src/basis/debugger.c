@@ -32,40 +32,53 @@ _Debugger_InterpreterLoop ( Debugger * debugger )
     }
 }
 
-void
-_Debugger_PreSetup (Debugger * debugger, Word * word, byte * token, Boolean forceFlag )
+Boolean
+_Debugger_PreSetup ( Debugger * debugger, Word * word, byte * token, Boolean forceFlag )
 {
     if ( ( Is_DebugModeOn && Is_DebugShowOn ) || forceFlag )
     {
         if ( forceFlag || GetState ( debugger, DBG_EVAL_AUTO_MODE ) || ( ! GetState ( debugger, DBG_AUTO_MODE | DBG_STEPPING ) ) )
         {
             if ( ! word ) word = _Context_->CurrentlyRunningWord ;
-            if ( word && ( ! word->W_OriginalWord ) ) word->W_OriginalWord = word ;
-            debugger->w_Word = word ;
-            if ( ( word && word->Name[0] ) || token ) 
+            if ( word && ( ! word->W_WordListOriginalWord ) ) word->W_WordListOriginalWord = word ;
+            if ( ( ! debugger->LastSetupWord ) || ( ( debugger->LastSetupWord != word ) && ( word && ( ! String_Equal ( debugger->LastSetupWord->Name, word->Name ) ) ) ) )
             {
-                if ( forceFlag ) debugger->LastShowWord = 0 ;
-                SetState ( debugger, DBG_COMPILE_MODE, CompileMode ) ;
-                SetState_TrueFalse ( debugger, DBG_ACTIVE | DBG_INFO | DBG_PROMPT, DBG_INTERPRET_LOOP_DONE | DBG_PRE_DONE | DBG_CONTINUE | DBG_STEPPING | DBG_STEPPED ) ;
-                if ( word ) debugger->TokenStart_ReadLineIndex = word->W_RL_Index ;
-                debugger->SaveDsp = _Dsp_ ;
-                if ( ! debugger->StartHere ) debugger->StartHere = Here ;
-                debugger->WordDsp = _Dsp_ ;
-                debugger->SaveTOS = TOS ;
-                debugger->Token = word->Name ? word->Name : token ;
-                debugger->PreHere = Here ;
-                _Namespace_FreeNamespacesStack ( debugger->LocalsNamespacesStack ) ;
-                DebugColors ;
-                _Debugger_InterpreterLoop ( debugger ) ; // core of this function
-                DefaultColors ;
+                debugger->w_Word = word ;
+                if ( ( word && word->Name[0] ) || token )
+                {
+                    if ( ! sigsetjmp ( _Context_->JmpBuf0, 0 ) ) // used by CfrTil_DebugRuntimeBreakpoint
+                    {
+                        if ( forceFlag ) debugger->LastShowWord = 0 ;
+                        SetState ( debugger, DBG_COMPILE_MODE, CompileMode ) ;
+                        SetState_TrueFalse ( debugger, DBG_ACTIVE | DBG_INFO | DBG_PROMPT, DBG_INTERPRET_LOOP_DONE | DBG_PRE_DONE | DBG_CONTINUE | DBG_STEPPING | DBG_STEPPED ) ;
+                        if ( word ) debugger->TokenStart_ReadLineIndex = word->W_RL_Index ;
+                        debugger->SaveDsp = _Dsp_ ;
+                        if ( ! debugger->StartHere ) debugger->StartHere = Here ;
+                        debugger->WordDsp = _Dsp_ ;
+                        debugger->SaveTOS = TOS ;
+                        debugger->Token = word->Name ? word->Name : token ;
+                        debugger->PreHere = Here ;
+                        _Namespace_FreeNamespacesStack ( debugger->LocalsNamespacesStack ) ;
 
-                debugger->ReadIndex = _ReadLiner_->ReadIndex ;
-                debugger->DebugAddress = 0 ;
-                SetState ( debugger, DBG_MENU, false ) ;
-                debugger->LastSetupWord = word ;
+                        DebugColors ;
+                        _Debugger_InterpreterLoop ( debugger ) ; // core of this function
+                        DefaultColors ;
+
+                        debugger->ReadIndex = _ReadLiner_->ReadIndex ;
+                        debugger->DebugAddress = 0 ;
+                        SetState ( debugger, DBG_MENU, false ) ;
+                        debugger->LastSetupWord = word ;
+                    }
+                    else
+                    {
+                        Set_DataStackPointers_FromDebuggerDspReg ( ) ; // back from _CfrTil_DebugRuntimeBreakpoint
+                        return true ; // true == done
+                    }
+                }
             }
         }
     }
+    return false ;
 }
 
 void
@@ -299,14 +312,20 @@ Debugger_Using ( Debugger * debugger )
 // by 'eval' we stop debugger->Stepping and //continue thru this word as if we hadn't stepped
 
 void
-Debugger_Eval ( Debugger * debugger )
+_Debugger_Eval ( Debugger * debugger, Boolean continueFlag )
 {
     debugger->SaveStackDepth = DataStack_Depth ( ) ;
     debugger->WordDsp = _Dsp_ ;
-    if ( Debugger_IsStepping ( debugger ) ) Debugger_Continue ( debugger ) ;
+    if ( continueFlag && Debugger_IsStepping ( debugger ) ) Debugger_Continue ( debugger ) ;
     SetState_TrueFalse ( debugger, DBG_INTERPRET_LOOP_DONE | DBG_EVAL_AUTO_MODE, DBG_STEPPING ) ;
     if ( GetState ( debugger, DBG_AUTO_MODE ) ) SetState ( debugger, DBG_EVAL_AUTO_MODE, true ) ;
     debugger->PreHere = Here ;
+}
+
+void
+Debugger_Eval ( Debugger * debugger )
+{
+    _Debugger_Eval ( debugger, 1 ) ;
 }
 
 void
@@ -599,12 +618,6 @@ _Debugger_New ( uint64 type )
     debugger->TerminalLineWidth = 120 ; // (tw > 145) ? tw : 145 ;
 
     return debugger ;
-}
-
-void
-_CfrTil_DebugInfo ( )
-{
-    Debugger_ShowInfo ( _Debugger_, ( byte* ) "\ninfo", 0 ) ;
 }
 
 // nb! : not test for a while

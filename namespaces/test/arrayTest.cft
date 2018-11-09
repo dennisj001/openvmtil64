@@ -279,16 +279,17 @@ scOn
     addr @ size @ dump
 ; prefix
 c_syntaxOn
+ 
 void
 ctcta ( y cta a )
 {
     a.ar [0][y + 1][0] = 'M' ; // a.ar [0][y + 1][0] = 77 ; 
-    a.ar [y ][y + 1][0] = a.ar [0][y + 1][0] ; 
+    a.ar [y ][y + 1][ 0] = a.ar [0][y + 1][0] ; 
     a.ar [y ][y + 1][1] = a.ar [y ][y + 1][0] ; 
-    a.ar [y + 1][y + 1][0] = a.ar [y ][y + 1][1] ; 
+    a.ar [y + 1][y + 1][ 0 ] = a.ar [y ][y + 1][1] ; 
     hp ( a.ar [y ][y + 1][1] ) ; //pause () ;
     a.ar [y + 1][y + 1][1] = a.ar [y + 1][y + 1][0] ; 
-    a.ar [y + 1][y + 1][y] = a.ar [y + 1][y + 1][1] ; 
+    a.ar [y + 1][y + 1][ y ] = a.ar [y + 1][y + 1][1] ; 
     a.ar [y + 1][y + 1][y + 1] = a.ar [y + 1][y + 1][y] ; 
     hp ( &a.ar ) ;
     cadump ( &a.ar 27 ) ; 
@@ -297,9 +298,7 @@ c_syntaxOff
 ' ctcta find wdiss
 
 "caba" cta new
-ctcta ( 1 caba ) 
-
-//pause
+ctcta ( 1 caba ) //pause
 #endif
 
 

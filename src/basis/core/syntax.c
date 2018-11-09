@@ -23,7 +23,7 @@ Interpret_C_Block_EndBlock ( byte * tokenToUse, Boolean insertFlag )
     if ( tokenToUse ) _CfrTil_->EndBlockWord->Name = tokenToUse ;
     if ( insertFlag ) SetState ( _Debugger_, DBG_OUTPUT_INSERTION, true ) ;
     _CfrTil_->EndBlockWord->W_RL_Index = _Lexer_->TokenStart_ReadLineIndex ;
-    _Interpreter_DoWord_Default ( _Interpreter_, _CfrTil_->EndBlockWord, - 1, _CfrTil_->SC_Index ) ;
+    Interpreter_DoWord_Default ( _Interpreter_, _CfrTil_->EndBlockWord, - 1, _CfrTil_->SC_Index ) ;
     _CfrTil_->EndBlockWord->Name = "}" ;
     SetState ( _Debugger_, DBG_OUTPUT_INSERTION, false ) ;
 }
@@ -37,7 +37,7 @@ Interpret_C_Block_BeginBlock ( byte * tokenToUse, Boolean insertFlag )
     if ( tokenToUse ) _CfrTil_->BeginBlockWord->Name = tokenToUse ;
     if ( insertFlag ) SetState ( _Debugger_, DBG_OUTPUT_INSERTION, true ) ;
     _CfrTil_->BeginBlockWord->W_RL_Index = _Lexer_->TokenStart_ReadLineIndex ;
-    _Interpreter_DoWord_Default ( _Interpreter_, _CfrTil_->BeginBlockWord, - 1, _CfrTil_->SC_Index ) ;
+    Interpreter_DoWord_Default ( _Interpreter_, _CfrTil_->BeginBlockWord, - 1, _CfrTil_->SC_Index ) ;
     _CfrTil_->BeginBlockWord->Name = "{" ;
     compiler->BeginBlockFlag = false ;
     SetState ( _Debugger_, DBG_OUTPUT_INSERTION, false ) ;
@@ -58,7 +58,7 @@ CfrTil_Interpret_C_Blocks ( int64 blocks, Boolean takesAnElseFlag, Boolean semic
         token = Lexer_ReadToken ( cntx->Lexer0 ) ;
         if ( String_Equal ( ( char* ) token, "(" ) && compiler->TakesLParenAsBlock && ( ! compiler->InLParenBlock ) )
         {
-            // interpret a (possible 'for') c parenthesis expression
+            // interpret a (possible) 'for' c parenthesis expression
             compiler->InLParenBlock = true ;
             Interpret_C_Block_BeginBlock ( "(", 0 ) ;
             compiler->TakesLParenAsBlock = false ; // after the first block
@@ -79,6 +79,7 @@ CfrTil_Interpret_C_Blocks ( int64 blocks, Boolean takesAnElseFlag, Boolean semic
             compiler->InLParenBlock = false ;
             compiler->TakesLParenAsBlock = false ;
             Interpret_C_Block_EndBlock ( ")", 0 ) ;
+            //CfrTil_TypeStack_Pop ( ) ; // the logic word
             if ( ! _Context_StringEqual_PeekNextToken ( _Context_, ( byte* ) "{", 0 ) )
             {
                 Interpret_C_Block_BeginBlock ( "{", 1 ) ;
@@ -115,7 +116,7 @@ CfrTil_Interpret_C_Blocks ( int64 blocks, Boolean takesAnElseFlag, Boolean semic
             word = _Interpreter_TokenToWord ( interp, token ) ;
             if ( word )
             {
-                _Interpreter_DoWord ( interp, word, - 1, - 1 ) ;
+                Interpreter_DoWord ( interp, word, - 1, - 1 ) ;
                 if ( word->CAttribute & COMBINATOR )
                 {
                     if ( semicolonEndsThisBlock )
@@ -162,27 +163,34 @@ _CfrTil_C_Infix_EqualOp ( Word * opWord )
     Context * cntx = _Context_ ;
     Interpreter * interp = cntx->Interpreter0 ;
     Compiler *compiler = cntx->Compiler0 ;
-    Word * word0 = CfrTil_WordList ( 0 ), *lhsWord = CompileMode ? compiler->LHS_Word : 0, *rword ;
+    Word * word0 = CfrTil_WordList ( 0 ) ;
+    Word *lhsWord = CompileMode ? compiler->LHS_Word : 0, *word0a, *rword ;
     int64 tsrli = word0 ? word0->W_RL_Index : 0 ;
     int64 svscwi = word0 ? word0->W_SC_Index : 0 ;
-    byte * svName, * token ;
+    byte * svName ;
     SetState ( compiler, C_INFIX_EQUAL, true ) ;
-    //if ( opWord ) 
     _CfrTil_WordList_PopWords ( 1 ) ;
-    compiler->NextBlockStart = Here ;
-    token = Interpret_C_Until_Token3 ( interp, ( byte* ) ";", ( byte* ) ",", ( byte* ) ")", ( byte* ) " \n\r\t" ) ;
-    if ( String_Equal ( ( char* ) token, ";" ) || String_Equal ( ( char* ) token, "," ) ) compiler->NextBlockStart = Here ;
+    word0a = CfrTil_WordList ( 0 ) ;
     if ( lhsWord )
     {
-        if ( ! ( lhsWord->CAttribute & ( OBJECT | THIS | QID ) ) || GetState ( lhsWord, QID ) )
+        if ( ! ( lhsWord->CAttribute & ( OBJECT | THIS | QID ) || GetState ( lhsWord, QID ) ) )
         {
             int64 svState = cntx->State ;
             SetState ( cntx, C_SYNTAX | INFIX_MODE, false ) ; // we don't want to just set compiler->LHS_Word
-            _Interpreter_DoWord_Default ( interp, lhsWord, - 1, lhsWord->W_SC_Index ) ;
+            Interpreter_DoWord_Default ( interp, lhsWord, lhsWord->W_RL_Index, lhsWord->W_SC_Index ) ;
             cntx->State = svState ;
             word0 = _CfrTil_->StoreWord ;
         }
-        else word0 = _CfrTil_->PokeWord ;
+        else
+        {
+            if ( ! ( word0a->CAttribute & ( ( LITERAL | NAMESPACE_VARIABLE | THIS | OBJECT | LOCAL_VARIABLE | PARAMETER_VARIABLE ) ) ) )
+            {
+                Compile_Move_Rm_To_Reg ( ACC, DSP, 0 ) ;
+                Compile_Move_Rm_To_Reg ( ACC, ACC, 0 ) ;
+                Compile_Move_Reg_To_Rm ( DSP, ACC, 0 ) ;
+            }
+            word0 = _CfrTil_->PokeWord ;
+        }
     }
     else word0 = _CfrTil_->PokeWord ;
     d0 ( if ( Is_DebugModeOn ) Compiler_SC_WordList_Show ( "\nCfrTil_C_Infix_EqualOp : before op word", 0, 0 ) ) ;
@@ -192,9 +200,8 @@ _CfrTil_C_Infix_EqualOp ( Word * opWord )
     rword->Name = "=" ;
     SetState ( _Debugger_, DBG_OUTPUT_SUBSTITUTION, true ) ;
     _Debugger_->SubstitutedWord = rword ;
-    CfrTil_ArrayModeOff ( ) ;
-    _Interpreter_DoWord_Default ( interp, rword, tsrli, svscwi ) ;
-    SetState ( _Debugger_, ( DEBUG_SHTL_OFF | DBG_OUTPUT_INSERTION | DBG_OUTPUT_SUBSTITUTION ), false ) ;
+    Interpreter_DoWord_Default ( interp, rword, tsrli, svscwi ) ;
+    SetState ( _Debugger_, ( DBG_OUTPUT_SUBSTITUTION ), false ) ;
     rword->Name = svName ;
     if ( GetState ( compiler, C_COMBINATOR_LPAREN ) )
     {
@@ -206,8 +213,6 @@ _CfrTil_C_Infix_EqualOp ( Word * opWord )
 
     if ( ! Compiling ) CfrTil_InitSourceCode ( _CfrTil_ ) ;
     SetState ( compiler, C_INFIX_EQUAL, false ) ;
-    _CfrTil_PushToken_OnTokenList ( token ) ; // so the callee can check use or use
-    CfrTil_ArrayModeOff ( ) ;
 }
 
 void
@@ -242,7 +247,7 @@ CfrTil_C_ConditionalExpression ( )
     _Compile_UninitializedJump ( ) ;
     byte * ptrToOffsetEnd = Here - DISP_SIZE ;
     _SetOffsetForCallOrJump ( ptrToOffsetElse, Here ) ;
-    byte * token = Interpret_C_Until_Token3 ( interp, ( byte* ) ";", ( byte* ) ",", ( byte* ) ")", 0 ) ;
+    byte * token = Interpret_C_Until_Token4 ( interp, ( byte* ) ";", ( byte* ) ",", ( byte* ) ")", 0, 0 ) ;
     _SetOffsetForCallOrJump ( ptrToOffsetEnd, Here ) ;
     DEBUG_SHOW ;
     //if ( String_Equal ( token, ")" ) ) 
@@ -254,6 +259,6 @@ C_Syntax_AreWeParsingACFunctionCall ( Lexer * lexer )
 {
     if ( ! GetState ( _Context_, C_SYNTAX | INFIX_MODE ) ) return false ;
     int64 tokenStartReadLineIndex = lexer->TokenStart_ReadLineIndex ;
-    return _C_Syntax_AreWeParsingACFunctionCall ( & _Context_->ReadLiner0->InputLine [ tokenStartReadLineIndex ] ) ; //word->W_StartCharRlIndex ] ) ;
+    return _C_Syntax_AreWeParsingACFunctionCall ( & lexer->ReadLiner0->InputLine [ tokenStartReadLineIndex ] ) ; //word->W_StartCharRlIndex ] ) ;
 }
 

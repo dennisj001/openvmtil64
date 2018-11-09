@@ -39,12 +39,20 @@ _Context_Allocate ( )
     return cntx ;
 }
 
+void
+Context_SetDefaultTokenDelimiters ( Context * cntx, byte * delimiters, uint64 allocType )
+{
+    cntx->DefaultDelimiterCharSet = CharSet_New ( delimiters, allocType ) ;
+    cntx->DefaultTokenDelimiters = delimiters ;
+}
+
 Context *
 _Context_Init ( Context * cntx0, Context * cntx )
 {
     if ( cntx0 && cntx0->System0 ) cntx->System0 = System_Copy ( cntx0->System0, CONTEXT ) ; // nb : in this case System is copied -- DataStack is shared
     else cntx->System0 = System_New ( CONTEXT ) ;
     List_Init ( _CfrTil_->CompilerWordList ) ;
+    Context_SetDefaultTokenDelimiters ( cntx, ( byte* ) " \n\r\t", CONTEXT ) ;
     cntx->Interpreter0 = Interpreter_New ( CONTEXT ) ;
     cntx->Lexer0 = cntx->Interpreter0->Lexer0 ;
     cntx->ReadLiner0 = cntx->Interpreter0->ReadLiner0 ;
@@ -241,7 +249,7 @@ _Context_DoubleQuoteMacro ( Context * cntx )
         SetHere ( CfrTil_WordList (0)->Coding, 1 ) ; 
         CfrTil_WordLists_PopWord ( ) ;
     }
-    _Interpreter_DoWord ( cntx->Interpreter0, word, - 1, - 1 ) ; 
+    Interpreter_DoWord ( cntx->Interpreter0, word, - 1, - 1 ) ; 
 }
 
 void

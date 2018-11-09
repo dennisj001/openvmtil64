@@ -9,7 +9,7 @@ _LO_Define ( ListObject * idNode, ListObject * locals )
     LambdaCalculus * lc = _LC_ ;
     ListObject *value0, *value, *l1 ;
     Word * word0 = idNode->Lo_CfrTilWord, *word ;
-    word =  DataObject_New ( T_LC_DEFINE, 0, ( byte* ) word0->Name, 0, 0, 0, 0, 0, LISP, word0->W_RL_Index, word0->W_SC_Index ) ; //word0 was allocated COMPILER_TEMP or LISP_TEMP
+    word = DataObject_New ( T_LC_DEFINE, 0, ( byte* ) word0->Name, 0, 0, 0, 0, 0, LISP, word0->W_RL_Index, word0->W_SC_Index ) ; //word0 was allocated COMPILER_TEMP or LISP_TEMP
 
     CfrTil_WordList_Init ( _CfrTil_, word, 1 ) ;
     word->Definition = 0 ; // reset the definition from LO_Read
@@ -39,7 +39,7 @@ _LO_Define ( ListObject * idNode, ListObject * locals )
     SetState ( lc, ( LC_DEFINE_MODE ), false ) ;
     l1->W_SourceCode = word->W_SourceCode = lc->LC_SourceCode ;
     _Word_Finish ( l1 ) ;
-    Compiler_Init ( _Context_->Compiler0, 0 ) ; // we could be compiling a cfrTil word as in oldLisp.cft
+    Compiler_Init ( _Context_->Compiler0, 0, 1 ) ; // we could be compiling a cfrTil word as in oldLisp.cft
     return l1 ;
 }
 
@@ -392,7 +392,7 @@ _LO_CfrTil ( ListObject * lfirst )
             word->W_SourceCode = String_New_SourceCode ( _CfrTil_->SC_Buffer ) ;
             if ( ldata1 && String_Equal ( ldata1->Name, ( byte * ) ":" ) )
             {
-                CfrTil_InitSourceCode_WithName (_CfrTil_, "(" , 1) ;
+                CfrTil_InitSourceCode_WithName ( _CfrTil_, "(", 1 ) ;
             }
             _LO_Semi ( word ) ;
             word->W_SourceCode = lc->LC_SourceCode ;
@@ -400,7 +400,7 @@ _LO_CfrTil ( ListObject * lfirst )
         else
         {
             word1 = _Interpreter_TokenToWord ( cntx->Interpreter0, ldata->Name ) ;
-            _Interpreter_DoWord ( cntx->Interpreter0, word1, ldata->W_RL_Index, ldata->W_SC_Index ) ;
+            Interpreter_DoWord ( cntx->Interpreter0, word1, ldata->W_RL_Index, ldata->W_SC_Index ) ;
         }
     }
     SetState ( compiler, LC_CFRTIL, false ) ;

@@ -20,7 +20,7 @@ Lexer_ObjectToken_New ( Lexer * lexer, byte * token ) //, int64 parseFlag )
     byte * token2 ;
     if ( token )
     {
-        _DEBUG_SETUP_TOKEN ( token, 0 ) ;
+        //DEBUG_SETUP_TOKEN ( token ) ;
         Lexer_ParseObject ( lexer, token ) ;
         if ( lexer->TokenType & T_RAW_STRING )
         {
@@ -56,12 +56,22 @@ Lexer_ObjectToken_New ( Lexer * lexer, byte * token ) //, int64 parseFlag )
 // this function is called more than necessary ???
 
 void
+_Lexer_Set_ScIndex_RlIndex ( Lexer * lexer, Word * word )
+{
+    if ( word )
+    {
+        word->W_SC_Index = lexer->SC_Index ;
+        word->W_RL_Index = lexer->TokenStart_ReadLineIndex ;
+    }
+}
+
+void
 Lexer_Set_ScIndex_RlIndex ( Lexer * lexer, Word * word, int64 tsrli, int64 scwi )
 {
     if ( word )
     {
-        word->W_SC_Index = ( scwi != - 1 ) ? scwi : lexer->SC_Index ;
         word->W_RL_Index = ( tsrli != - 1 ) ? tsrli : lexer->TokenStart_ReadLineIndex ;
+        word->W_SC_Index = ( scwi != - 1 ) ? scwi : lexer->SC_Index ;
     }
 }
 
@@ -106,12 +116,13 @@ Lexer_Init ( Lexer * lexer, byte * delimiters, uint64 state, uint64 allocType )
     lexer->OriginalToken = 0 ;
     lexer->Literal = 0 ;
     lexer->SC_Index = _CfrTil_->SC_Index ;
-    Lexer_SetBasicTokenDelimiters ( lexer, ( byte* ) " \n\r\t", allocType ) ;
     if ( delimiters ) Lexer_SetTokenDelimiters ( lexer, delimiters, allocType ) ;
     else
     {
-        lexer->DelimiterCharSet = lexer->BasicDelimiterCharSet ; //Lexer_SetTokenDelimiters ( lexer, " \n\r\t", allocType ) ;
-        lexer->TokenDelimiters = lexer->BasicTokenDelimiters ;
+        //if ( ! _Context_->DefaultDelimiterCharSet ) // ?? 
+        Context_SetDefaultTokenDelimiters ( _Context_, ( byte* ) " \n\r\t", CONTEXT ) ;
+        lexer->DelimiterCharSet = _Context_->DefaultDelimiterCharSet ; 
+        lexer->TokenDelimiters = _Context_->DefaultTokenDelimiters ;
     }
     lexer->State = state & ( ~ LEXER_RETURN_NULL_TOKEN ) ;
     SetState ( lexer, KNOWN_OBJECT | LEXER_DONE | END_OF_FILE | END_OF_STRING | LEXER_END_OF_LINE, false ) ;
@@ -225,14 +236,14 @@ Lexer_Token_New ( byte * token )
 }
 
 byte *
-_Lexer_NextNonDebugOrCommentTokenWord ( Lexer * lexer, Boolean evalFlag, Boolean peekFlag )
+_Lexer_NextNonDebugOrCommentTokenWord (Lexer * lexer, byte * delimiters, Boolean evalFlag, Boolean peekFlag )
 {
     byte * token ;
     Boolean debugOrComment ;
     do
     {
         //_Lexer_LexNextToken_WithDelimiters (Lexer * lexer, byte * delimiters, Boolean checkListFlag, Boolean peekFlag, int reAddPeeked, uint64 state )
-        token = _Lexer_LexNextToken_WithDelimiters ( lexer, 0, 1, peekFlag, 0, 0 ) ; // ?? the logic here ??
+        token = _Lexer_LexNextToken_WithDelimiters ( lexer, delimiters, 1, peekFlag, 0, 0 ) ; // ?? the logic here ??
         debugOrComment = _Lexer_ConsiderDebugAndCommentTokens ( token, evalFlag, 0 ) ;
     }
     while ( debugOrComment ) ;
@@ -240,9 +251,9 @@ _Lexer_NextNonDebugOrCommentTokenWord ( Lexer * lexer, Boolean evalFlag, Boolean
 }
 
 byte *
-_Lexer_PeekNextNonDebugTokenWord ( Lexer * lexer, int64 evalFlag )
+_Lexer_PeekNextNonDebugTokenWord (Lexer * lexer, byte * delimiters, int64 evalFlag )
 {
-    byte * token = _Lexer_NextNonDebugOrCommentTokenWord ( lexer, evalFlag, 0 ) ; // 0 : peekFlag off because we are reAdding it below
+    byte * token = _Lexer_NextNonDebugOrCommentTokenWord (lexer, delimiters, evalFlag, 0 ) ; // 0 : peekFlag off because we are reAdding it below
     _CfrTil_PushToken_OnTokenList ( token ) ; // TODO ; list should instead be a stack
     return token ;
 }
@@ -254,7 +265,7 @@ Lexer_PeekNextNonDebugTokenWord ( Lexer * lexer, int64 evalFlag )
     if ( _AtCommandLine ( ) && Lexer_CheckIfDone ( lexer, LEXER_DONE ) ) return 0 ;
     else
     {
-        token = _Lexer_PeekNextNonDebugTokenWord ( lexer, evalFlag ) ;
+        token = _Lexer_PeekNextNonDebugTokenWord (lexer, 0, evalFlag ) ;
     }
     return token ;
 }
@@ -344,13 +355,6 @@ Lexer_SetTokenDelimiters ( Lexer * lexer, byte * delimiters, uint64 allocType )
     if ( lexer->DelimiterCharSet ) CharSet_Init ( lexer->DelimiterCharSet, 128, delimiters ) ;
     else lexer->DelimiterCharSet = CharSet_New ( delimiters, allocType ) ;
     lexer->TokenDelimiters = delimiters ;
-}
-
-void
-Lexer_SetBasicTokenDelimiters ( Lexer * lexer, byte * delimiters, uint64 allocType )
-{
-    lexer->BasicDelimiterCharSet = CharSet_New ( delimiters, allocType ) ;
-    lexer->BasicTokenDelimiters = delimiters ;
 }
 
 Lexer *

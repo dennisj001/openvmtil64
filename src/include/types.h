@@ -436,7 +436,7 @@ typedef struct _WordData
 #define Prototype S_Prototype
 #define W_SearchNumber W_Value2
 #define W_FoundMarker W_Value3
-#define W_OriginalWord S_WordData->OriginalWord
+#define W_WordListOriginalWord S_WordData->OriginalWord
 #define W_SC_Index S_WordData->SC_WordIndex 
 #define W_SC_WordList S_WordData->SourceCodeWordList 
 #define W_SC_MemSpaceRandMarker S_WordData->SourceCodeMemSpaceRandMarker
@@ -632,8 +632,6 @@ typedef struct Lexer
     int64 TokenStart_FileIndex, TokenEnd_FileIndex, Token_Length, SC_Index ; //Tsrli = TokenStart_ReadLineIndex
     byte * TokenDelimiters ;
     byte * DelimiterCharSet ;
-    byte * BasicTokenDelimiters ;
-    byte * BasicDelimiterCharSet ;
     byte * TokenDelimitersAndDot ;
     byte * DelimiterOrDotCharSet, *Filename ;
     int64 CurrentReadIndex, TokenWriteIndex, LineNumber ;
@@ -759,7 +757,7 @@ typedef struct
     int64 ParenLevel ;
     int64 GlobalParenLevel, OptimizeForcedReturn ;
     int64 ArrayEnds ;
-    byte * InitHere, *NextBlockStart ;
+    byte * InitHere ;
     int64 * AccumulatedOptimizeOffsetPointer ;
     Boolean InLParenBlock, SemicolonEndsThisBlock, TakesLParenAsBlock, BeginBlockFlag ;
     int32 * AccumulatedOffsetPointer ;
@@ -855,6 +853,8 @@ typedef struct
     System * System0 ;
     Stack * ContextDataStack ;
     byte * Location ;
+    byte * DefaultTokenDelimiters ;
+    byte * DefaultDelimiterCharSet ;
     Word * CurrentlyRunningWord, *CurrentEvalWord, *NlsWord, *SC_CurrentCombinator, *SourceCodeWord, *CurrentDisassemblyWord ;
     block CurrentlyRunningWordDefinition ;
     dllist * PreprocessorStackList ;

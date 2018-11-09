@@ -162,6 +162,7 @@ _CfrTil_BeginBlock0 ( Boolean compileJumpFlag, byte * here )
         //CfrTil_RecycleWordList ( 0 ) ;
         CfrTil_TurnOnBlockCompiler ( ) ;
     }
+    compiler->LHS_Word = 0 ;
     bi->OriginalActualCodeStart = here ? here : Here ;
     if ( compileJumpFlag ) _Compile_UninitializedJump ( ) ;
     bi->JumpOffset = here ? here - INT32_SIZE : Here - INT32_SIZE ; // before CfrTil_CheckCompileLocalFrame after CompileUninitializedJump
@@ -241,6 +242,7 @@ _CfrTil_EndBlock1 ( BlockInfo * bi )
         }
         else bi->bp_First = bi->AfterLocalFrame ;
     }
+    compiler->LHS_Word = 0 ;
     WordStack_SCHCPUSCA ( 0, 0 ) ;
     _Compile_Return ( ) ;
     DataStack_Push ( ( int64 ) bi->bp_First ) ;
@@ -267,7 +269,7 @@ _CfrTil_EndBlock2 ( BlockInfo * bi )
         d1 ( if ( Is_DebugModeOn ) Debugger_Disassemble ( _Debugger_, ( byte* ) first, bi->CopiedSize, 1 ) ) ;
 #endif        
         CfrTil_TurnOffBlockCompiler ( ) ;
-        Compiler_Init ( compiler, 0 ) ;
+        Compiler_Init (compiler, 0 , 0) ;
     }
     else _Namespace_RemoveFromUsingListAndClear ( bi->LocalsNamespace ) ; //_Compiler_FreeBlockInfoLocalsNamespace ( bi, compiler ) ;
     return first ;

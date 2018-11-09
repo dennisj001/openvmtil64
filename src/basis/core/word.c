@@ -1,44 +1,32 @@
 #include "../../include/cfrtil64.h"
 
-Word *
-Word_UnAlias ( Word * word )
-{
-    if ( word ) while ( word->W_AliasOf ) word = word->W_AliasOf ;
-    return word ;
-}
-
-//TYPE_CHECK (Word * word)  ifGetState ( _CfrTil_, TYPECHECK_ON ) && word->W_TypeSignature[0] ) //&& (word->CAttribute & CFRTIL_WORD) ) //IS_MORPHISM_TYPE ( word ) ) 
 void
 Word_Run ( Word * word )
 {
     if ( word )
     {
-        if ( ! sigsetjmp ( _Context_->JmpBuf0, 0 ) ) // used by CfrTil_DebugRuntimeBreakpoint
+        word->W_InitialRuntimeDsp = _Dsp_ ;
+        word->StackPushRegisterCode = 0 ; // nb. used! by the rewriting optInfo
+        // keep track in the word itself where the machine code is to go, if this word is compiled or causes compiling code - used for optimization
+        Word_SetCoding ( word, Here, 1 ) ; // if we change it later (eg. in lambda calculus) we must change it there because the rest of the compiler depends on this
+        _Context_->CurrentlyRunningWord = word ;
+        if ( ( GetState ( _CfrTil_, TYPECHECK_ON ) && word->W_TypeSignature[0] ) ) //&& ( ! ( GetState ( _Compiler_, ARRAY_MODE ) ) ) ) 
         {
-            word->W_InitialRuntimeDsp = _Dsp_ ;
-            word->StackPushRegisterCode = 0 ; // nb. used! by the rewriting optInfo
-            // keep track in the word itself where the machine code is to go, if this word is compiled or causes compiling code - used for optimization
-            Word_SetCoding ( word, Here, 1 ) ; // if we change it later (eg. in lambda calculus) we must change it there because the rest of the compiler depends on this
-            _Context_->CurrentlyRunningWord = word ;
-            if (( GetState ( _CfrTil_, TYPECHECK_ON ) && word->W_TypeSignature[0] )) 
-            {
-                if ( ! GetState ( _Compiler_, DOING_AN_INFIX_WORD|DOING_A_PREFIX_WORD ) )
-                CfrTil_Typecheck ( word ) ; 
-                Block_Eval ( word->Definition ) ;
-            }
-            else Block_Eval ( word->Definition ) ;
+            if ( ! GetState ( _Compiler_, ( DOING_BEFORE_AN_INFIX_WORD | DOING_BEFORE_A_PREFIX_WORD ) ) ) CfrTil_Typecheck ( word ) ;
+            Block_Eval ( word->Definition ) ;
         }
-        else Set_DataStackPointers_FromDebuggerDspReg ( ) ; // back from _CfrTil_DebugRuntimeBreakpoint
+        else Block_Eval ( word->Definition ) ;
     }
 }
 
-void
+int64
 Word_Eval ( Word * word )
 {
     if ( word )
     {
         _Context_->CurrentEvalWord = word ;
         DEBUG_SETUP ( word ) ;
+        //if ( word && Is_DebugModeOn ) if ( _Debugger_PreSetup ( _Debugger_, word, 0, 0 ) ) return 0 ;
         if ( ! GetState ( word, STEPPED ) ) // set by the debuggger
         {
             if ( ( word->CAttribute & IMMEDIATE ) || ( ! CompileMode ) ) Word_Run ( word ) ;
@@ -52,7 +40,7 @@ Word_Eval ( Word * word )
 void
 _Word_Interpret ( Word * word )
 {
-    _Interpreter_DoWord ( _Interpreter_, word, word->W_RL_Index, word->W_SC_Index ) ;
+    Interpreter_DoWord ( _Interpreter_, word, word->W_RL_Index, word->W_SC_Index ) ;
 }
 
 void
@@ -383,9 +371,16 @@ Word *
 Word_GetOriginalWord ( Word * word )
 {
     Word * ow1, *ow0 ;
-    for ( ow0 = word, ow1 = ow0->W_OriginalWord ; ow1 && ( ow1 != ow1->W_OriginalWord ) ; ow0 = ow1, ow1 = ow0->W_OriginalWord ) ;
+    for ( ow0 = word, ow1 = ow0->W_WordListOriginalWord ; ow1 && ( ow1 != ow1->W_WordListOriginalWord ) ; ow0 = ow1, ow1 = ow0->W_WordListOriginalWord ) ;
     if ( ! ow0 ) ow0 = word ;
     return ow0 ;
+}
+
+Word *
+Word_UnAlias ( Word * word )
+{
+    if ( word ) while ( word->W_AliasOf ) word = word->W_AliasOf ;
+    return word ;
 }
 
 
