@@ -1,6 +1,6 @@
 #include "../../include/cfrtil64.h"
 
-void 
+inline void 
 _Block_Eval ( block blck )
 {
     ( ( block ) blck ) ( ) ;
@@ -12,6 +12,7 @@ Block_Eval ( block blck )
     if ( blck )
     {
         ( ( block ) blck ) ( ) ;
+        //_Block_Eval ( blck ) ;
     }
 }
 

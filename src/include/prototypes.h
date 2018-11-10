@@ -88,6 +88,7 @@ void Compile_GetVarLitObj_RValue_To_Reg(Word *word, int64 reg);
 void _Compile_SetVarLitObj_With_Reg(Word *word, int64 reg, int64 thruReg);
 void _Compile_GetVarLitObj_LValue_To_Reg(Word *word, int64 reg);
 /* basis/compiler/memory.c */
+void Compile_TosRmToTOS(void);
 void _Compile_Set_C_LValue_WithImm_ThruReg(byte *address, int64 value, Boolean rm, byte operandSize);
 void _Compile_Get_C_Value_ToReg(Boolean reg, int64 value);
 void _Compile_GetRValue_FromLValue_ToReg(Boolean reg, byte *address);
@@ -1414,9 +1415,10 @@ void Debugger_DisassembleTotalAccumulated(Debugger *debugger);
 /* basis/typeCheck.c */
 Boolean CfrTil_TypeCheck_DoASignatureCode(Word *word, Word *compilingWord, uint64 attribute, byte signatureCode);
 Boolean CfrTil_TypeCheck_DoTypeVariable(Word *word0, Word *word1, Word *compilingWord);
-void UpdateBuffers(Word *word, byte *expandedTypeCodeBuffer, byte *actualTypeRecorded);
+void UpdateBuffers(Word *word, byte *expandedTypeCodeBuffer, byte *actualTypeRecorded, Boolean separatorFlag);
 byte *_CfrTil_TypeCheckAndInfer(Word *opWord, int64 stackDepth, byte *buffer);
 void CfrTil_Typecheck(Word *opWord);
+void CfrTil_TypeStatus_Print(Word *word, byte *actualTypeRecorded);
 void CfrTil_TypeError(Word *word, byte *actualTypeRecorded);
 void _CfrTil_TypeStackReset(void);
 byte CfrTil_ConvertTypeAttributeToTypeLetterCode(uint64 attribute);

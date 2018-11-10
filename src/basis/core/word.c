@@ -10,7 +10,7 @@ Word_Run ( Word * word )
         // keep track in the word itself where the machine code is to go, if this word is compiled or causes compiling code - used for optimization
         Word_SetCoding ( word, Here, 1 ) ; // if we change it later (eg. in lambda calculus) we must change it there because the rest of the compiler depends on this
         _Context_->CurrentlyRunningWord = word ;
-        if ( ( GetState ( _CfrTil_, TYPECHECK_ON ) && word->W_TypeSignature[0] ) ) //&& ( ! ( GetState ( _Compiler_, ARRAY_MODE ) ) ) ) 
+        if ( ( GetState ( _CfrTil_, TYPECHECK_ON ) ) ) //&& word->W_TypeSignature[0] ) ) //&& ( ! ( GetState ( _Compiler_, ARRAY_MODE ) ) ) ) 
         {
             if ( ! GetState ( _Compiler_, ( DOING_BEFORE_AN_INFIX_WORD | DOING_BEFORE_A_PREFIX_WORD ) ) ) CfrTil_Typecheck ( word ) ;
             Block_Eval ( word->Definition ) ;

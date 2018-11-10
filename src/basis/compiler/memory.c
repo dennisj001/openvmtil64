@@ -1,6 +1,14 @@
 #include "../../include/cfrtil64.h"
 
 void
+Compile_TosRmToTOS ( )
+{
+    Compile_Move_Rm_To_Reg ( ACC, DSP, 0 ) ;
+    Compile_Move_Rm_To_Reg ( ACC, ACC, 0 ) ;
+    Compile_Move_Reg_To_Rm ( DSP, ACC, 0 ) ;
+}
+
+void
 _Compile_Set_C_LValue_WithImm_ThruReg ( byte * address, int64 value, Boolean rm, byte operandSize )
 {
     Compile_MoveImm_To_Reg ( rm, ( int64 ) address, CELL ) ;
@@ -35,6 +43,7 @@ _Compile_Set_CAddress_WithRegValue_ThruReg ( byte * address, Boolean reg, Boolea
     Compile_MoveReg_ToAddress_ThruReg ( reg, address, thruReg ) ;
 }
 #define ARRAY_MODE_CHECK 1
+
 void
 Compile_Peek ( Compiler * compiler, Boolean stackReg ) // @
 {
@@ -91,7 +100,7 @@ Compile_Store ( Compiler * compiler, Boolean stackReg ) // !
         Compile_Move_Reg_To_Rm ( ( ( word && word->StackPushRegisterCode ) ? word->RegToUse : ACC ), OREG, 0 ) ;
         Compile_SUBI ( REG, stackReg, 0, ( ( word && word->StackPushRegisterCode ) ? 1 : 2 ) * CELL_SIZE, 0 ) ;
         //DBI_OFF ;
-    } 
+    }
 #if ARRAY_MODE_CHECK   
     CfrTil_ArrayModeOff ( ) ;
 #endif    

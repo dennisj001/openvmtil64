@@ -71,7 +71,6 @@ Interpreter_DoInfixWord ( Interpreter * interp, Word * word )
 void
 _Interpreter_DoPrefixWord ( Context * cntx, Interpreter * interp, Word * word )
 {
-    //Lexer_Set_ScIndex_RlIndex ( interp->Lexer0, word, tsrli, scwi ) ;
     SetState ( cntx->Compiler0, ( DOING_A_PREFIX_WORD | DOING_BEFORE_A_PREFIX_WORD ), true ) ;
     Interpret_PrefixFunction_Until_RParen ( interp, word ) ;
     SetState ( cntx->Compiler0, DOING_A_PREFIX_WORD, false ) ;
@@ -91,7 +90,6 @@ Interpreter_DoPrefixWord ( Context * cntx, Interpreter * interp, Word * word )
 void
 Interpreter_C_PREFIX_RTL_ARGS_Word ( Word * word )
 {
-    //Word_SetTsrliScwi ( word, tsrli, scwi ) ;
     LC_CompileRun_C_ArgList ( word ) ;
 }
 
@@ -165,43 +163,10 @@ Interpreter_IsWordPrefixing ( Interpreter * interp, Word * word )
 {
     if ( GetState ( _Context_, LC_INTERPRET ) ) return true ;
     else if ( ( GetState ( _Context_, PREFIX_MODE ) ) && ( ! ( word->CAttribute & KEYWORD ) ) && ( ! ( word->WAttribute & WT_C_PREFIX_RTL_ARGS ) ) ) //_Namespace_IsUsing ( _CfrTil_->LispNamespace ) ) )
-    //else if ( ( ! ( word->CAttribute & KEYWORD ) ) && ( ! ( word->WAttribute & WT_C_PREFIX_RTL_ARGS ) ) ) //_Namespace_IsUsing ( _CfrTil_->LispNamespace ) ) )
     {
         return _Interpreter_IsWordPrefixing ( interp, word ) ;
     }
     return false ;
 }
 
-
-#if 0
-
-void
-IsIt_C_LeftParen ( Word * word )
-{
-    if ( String_Equal ( word->Name, "(" ) && String_Equal ( word->S_ContainingNamespace->Name, "C" ) )
-    {
-        _Printf ( "\nCompiler_CopyDuplicatesAndPush : \'%s.%s\' : %s\n", word->S_ContainingNamespace->Name, word->Name, Context_Location ( ) ) ;
-        Pause ( ) ;
-    }
-}
-
-void
-Find_C_LeftParen ( )
-{
-    Word * word = _Finder_FindWord_InOneNamespace ( _Finder_, Namespace_Find ( "C" ), "(" ) ;
-    if ( word )
-    {
-        //if (String_Equal ( word->Name, "(" ) && String_Equal ( word->S_ContainingNamespace->Name, "C" ) )
-        {
-            //_Printf ( "\nFind_C_LeftParen : \'%s.%s\' : %s\n", word->S_ContainingNamespace->Name, word->Name, Context_Location ( ) ) ;
-            //Pause ( ) ;
-        }
-    }
-    else
-    {
-        _Printf ( "\nFind_C_LeftParen : can't find it at : %s\n", Context_Location ( ) ) ;
-        Pause ( ) ;
-    }
-}
-#endif
 

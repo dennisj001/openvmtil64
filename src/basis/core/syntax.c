@@ -163,7 +163,7 @@ _CfrTil_C_Infix_EqualOp ( Word * opWord )
     Context * cntx = _Context_ ;
     Interpreter * interp = cntx->Interpreter0 ;
     Compiler *compiler = cntx->Compiler0 ;
-    Word * word0 = CfrTil_WordList ( 0 ) ;
+    Word * wordr, *word0 = CfrTil_WordList ( 0 ) ;
     Word *lhsWord = CompileMode ? compiler->LHS_Word : 0, *word0a, *rword ;
     int64 tsrli = word0 ? word0->W_RL_Index : 0 ;
     int64 svscwi = word0 ? word0->W_SC_Index : 0 ;
@@ -179,23 +179,18 @@ _CfrTil_C_Infix_EqualOp ( Word * opWord )
             SetState ( cntx, C_SYNTAX | INFIX_MODE, false ) ; // we don't want to just set compiler->LHS_Word
             Interpreter_DoWord_Default ( interp, lhsWord, lhsWord->W_RL_Index, lhsWord->W_SC_Index ) ;
             cntx->State = svState ;
-            word0 = _CfrTil_->StoreWord ;
+            wordr = _CfrTil_->StoreWord ;
         }
         else
         {
-            if ( ! ( word0a->CAttribute & ( ( LITERAL | NAMESPACE_VARIABLE | THIS | OBJECT | LOCAL_VARIABLE | PARAMETER_VARIABLE ) ) ) )
-            {
-                Compile_Move_Rm_To_Reg ( ACC, DSP, 0 ) ;
-                Compile_Move_Rm_To_Reg ( ACC, ACC, 0 ) ;
-                Compile_Move_Reg_To_Rm ( DSP, ACC, 0 ) ;
-            }
-            word0 = _CfrTil_->PokeWord ;
+            if ( ! ( word0a->CAttribute & ( ( LITERAL | NAMESPACE_VARIABLE | THIS | OBJECT | LOCAL_VARIABLE | PARAMETER_VARIABLE ) ) ) ) Compile_TosRmToTOS ( ) ;
+            wordr = _CfrTil_->PokeWord ;
         }
     }
-    else word0 = _CfrTil_->PokeWord ;
+    else wordr = _CfrTil_->PokeWord ;
     d0 ( if ( Is_DebugModeOn ) Compiler_SC_WordList_Show ( "\nCfrTil_C_Infix_EqualOp : before op word", 0, 0 ) ) ;
     if ( opWord ) rword = opWord ;
-    else rword = word0 ;
+    else rword = wordr ;
     svName = rword->Name ;
     rword->Name = "=" ;
     SetState ( _Debugger_, DBG_OUTPUT_SUBSTITUTION, true ) ;
@@ -205,7 +200,7 @@ _CfrTil_C_Infix_EqualOp ( Word * opWord )
     rword->Name = svName ;
     if ( GetState ( compiler, C_COMBINATOR_LPAREN ) )
     {
-        if ( word0->StackPushRegisterCode ) SetHere ( word0->StackPushRegisterCode, 1 ) ; // this is the usual after '=' in non C syntax; assuming optimizeOn
+        if ( wordr->StackPushRegisterCode ) SetHere ( wordr->StackPushRegisterCode, 1 ) ; // this is the usual after '=' in non C syntax; assuming optimizeOn
         Compiler_Set_BI_setTtnn ( compiler, TTT_ZERO, NEGFLAG_ON, TTT_ZERO, NEGFLAG_Z ) ; // must set logic flag for Compile_ReConfigureLogicInBlock in Block_Compile_WithLogicFlag
     }
     List_InterpretLists ( compiler->PostfixLists ) ;

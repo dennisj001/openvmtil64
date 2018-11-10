@@ -3,7 +3,7 @@
 : sp ; //s pause ; 
 sp
 optimizeOn inlineOn 
-typecheckOn
+//typecheckOn
 lispOff
 bnOff 
 // optimizeOff inlineOff
