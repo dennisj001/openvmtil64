@@ -198,7 +198,7 @@ _Class_New ( byte * name, uint64 type, int64 cloneFlag )
         //ws->CAttribute |= NAMESPACE_VARIABLE ;
         _Context_->Interpreter0->ThisNamespace = ns ;
         Word *wt = _CfrTil_Variable_New ( ( byte* ) "this", size ) ; // start with size of the prototype for clone
-        wt->CAttribute |= THIS ;
+        wt->CAttribute |= THIS|OBJECT ;
     }
     else
     {

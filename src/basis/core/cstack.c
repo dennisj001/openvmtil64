@@ -281,25 +281,28 @@ Stack_Print_AValue_WordName ( Stack * stack, int64 i, byte * stackName, byte * b
 void
 Stack_Print_AValue ( uint64 * stackPointer, int64 i, byte * stackName, byte * buffer, Boolean isWordAlreadyFlag )
 {
-    Word * word ;
+    Word * word = 0 ;
     byte * string = 0, tsb [32], *ts = 0;
     tsb[0] = 0 ;
     if ( isWordAlreadyFlag ) 
     {
         word = ( Word* ) ( stackPointer [ i ] ) ;
-        ts = Word_TypeSignature ( word, tsb ) ;
+        int64 tsl = Word_TypeSignatureLength ( word ) ;
+        if ( tsl > 1 ) ts = Word_ExpandTypeLetterSignature (word, 0) ; 
+        else ts = Word_TypeSignature ( word, tsb ) ;
     }
     else word = Word_GetFromCodeAddress ( ( byte* ) ( stackPointer [ i ] ) ) ;
     if ( word )
     {
-        if ( IS_NON_MORPHISM_TYPE ( word ) ) sprintf ( ( char* ) buffer, "< word : %s.%s : value = 0x%016lx > : %s", 
+        //if ( IS_NON_MORPHISM_TYPE ( word ) ) sprintf ( ( char* ) buffer, "< word : %s.%s : value = 0x%016lx > : %s", 
+        if ( word ) sprintf ( ( char* ) buffer, "< word : %s.%s : value = 0x%016lx > : %s", 
             word->ContainingNamespace ? word->ContainingNamespace->Name : ( byte* ) "<literal>", c_gd ( String_ConvertToBackSlash ( word->Name )), 
-            ( uint64 ) word->S_Value, ts ? c_gd (ts) : (byte*)"Undefined") ;
+            ( uint64 ) word->S_Value, c_gd (ts) ) ;
         else sprintf ( ( char* ) buffer, "< word : %s.%s : definition = 0x%016lx >", 
             word->ContainingNamespace ? word->ContainingNamespace->Name : ( byte* ) "<literal>", c_gd ( word->Name ), ( uint64 ) word->Definition ) ;
     }
     else string = String_CheckForAtAdddress ( ( byte* ) ( ( byte* ) ( stackPointer[i] ) ) ) ;
-    _Printf ( ( byte* ) "\n\t    %s   [ %3ld ] < " UINT_FRMT " > = " UINT_FRMT "\t%s",
+    _Printf ( ( byte* ) "\n  %s   [ %3ld ] < " UINT_FRMT " > = " UINT_FRMT "\t%s",
         stackName, i, ( uint64 ) & stackPointer [ i ], stackPointer [ i ], word ? buffer : string ? string : ( byte* ) "" ) ;
 }
 

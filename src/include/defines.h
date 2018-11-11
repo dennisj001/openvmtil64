@@ -315,7 +315,7 @@
 #define RECYCLABLE_COPY     ( (uint64) 1 << 21 )
 #define RECYCLABLE_LOCAL    ( (uint64) 1 << 22 )
 #define T_TYPE_VARIABLE     ( (uint64) 1 << 23 )
-#define T_ANY_FIXED_TYPE    ( (uint64) 1 << 24 )
+#define T_ANY_FIXED_TYPE    ( (uint64) 1 << 28 )
 #define T_ANY               T_ANY_FIXED_TYPE    
 #define LOGIC_NEGATE        ( (uint64) 1 << 25 )
 #define C_INFIX_OP_EQUAL    ( (uint64) 1 << 26 )

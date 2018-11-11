@@ -369,7 +369,7 @@ typedef struct _WordData
         byte * pb_TypeSignature ;
         byte TypeSignature [8] ;
         uint64 uint64_TypeSignature ;
-    };
+    } ;
     union
     {
         dllist * LocalNamespaces ;
@@ -628,7 +628,7 @@ typedef struct Lexer
     Word * TokenWord ;
     byte TokenInputByte ;
     byte CurrentTokenDelimiter ;
-    int64 TokenStart_ReadLineIndex, TokenEnd_ReadLineIndex; 
+    int64 TokenStart_ReadLineIndex, TokenEnd_ReadLineIndex ;
     int64 TokenStart_FileIndex, TokenEnd_FileIndex, Token_Length, SC_Index ; //Tsrli = TokenStart_ReadLineIndex
     byte * TokenDelimiters ;
     byte * DelimiterCharSet ;
@@ -1066,7 +1066,7 @@ typedef struct
         byte * pb_TypeSignature ;
         byte TypeSignature [8] ;
         uint64 uint64_TypeSignature ;
-    };
+    } ;
     uint8 OpInsnCodeGroup ;
     uint8 OpInsnCode ;
     block blk_Definition ;
@@ -1104,4 +1104,13 @@ typedef struct ppibs
     int64 LineNumber ;
 }
 PreProcessorIfBlockStatus, Ppibs ;
+typedef struct typeStatusInfo
+{
+    Stack * TypeWordStack ;
+    Word * OpWord, *WordBeingCompiled ;
+    int64 TypeStackDepth, OpWordTypeSignatureLength ;
+    byte *OpWordTypeSignature, ExpandedTypeCodeBuffer [32], ActualTypeStackRecordingBuffer [128] ;
+    Boolean TypeErrorStatus, OpWord_ReturnsACodedValue_Flag ;
+    byte OpWordReturnSignatureLetterCode ;
+} TypeStatusInfo, TSI ;
 

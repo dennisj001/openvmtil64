@@ -237,6 +237,8 @@
 #define DBI ( Is_DebugOn & _DBI )
 #define Is_DebugOn_DBI ( Is_DebugOn ? DBI : 0 )
 #define DBI_N( n ) (GetState ( _Debugger_, DBG_ASM_SHOW_ON ) && ( _Q_->Verbosity > n ) )
+#define TYPECHECK( word ) if ( ( GetState ( _CfrTil_, TYPECHECK_ON ) ) && ( ! GetState ( _Compiler_, ( DOING_BEFORE_AN_INFIX_WORD | DOING_BEFORE_A_PREFIX_WORD ) ) ) ) CfrTil_Typecheck ( word ) ;
+
 
 #define IS_INCLUDING_FILES _Context_->System0->IncludeFileStackNumber
 

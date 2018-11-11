@@ -316,7 +316,7 @@ _CfrTil_SystemState_Print ( int64 pflag )
     _Printf ( ( byte* ) " : BigNum %s", bno ? "on" : "off" ) ;
     Boolean lo = Namespace_IsUsing ( "Lisp" ) ;
     _Printf ( ( byte* ) " : Lisp %s", lo ? "on" : "off" ) ;
-    _Printf ( ( byte* ) "\n%s : at %s", Compiling ? "compiling" : "interpreting", Context_Location () ) ;
+    _Printf ( ( byte* ) "\n%s : at %s", Compiling ? "compiling" : "interpreting", Context_Location ( ) ) ;
 }
 
 void
@@ -350,7 +350,7 @@ _CfrTil_Source ( Word *word, int64 addToHistoryFlag )
 {
     if ( word )
     {
-        byte * name = c_gd ( word->Name ) ;
+        byte * name = c_gd ( word->Name ), buffer [128] ;
         uint64 category = word->CAttribute ;
         if ( word->ContainingNamespace ) _Printf ( ( byte* ) "\n%s.", word->ContainingNamespace->Name ) ;
         if ( category & OBJECT )
@@ -423,7 +423,7 @@ _CfrTil_Source ( Word *word, int64 addToHistoryFlag )
             {
                 _Printf ( ( byte* ) "\nCompiled with : %s%s%s%s",
                     GetState ( word, COMPILED_OPTIMIZED ) ? "optimizeOn" : "optimizeOff", GetState ( word, COMPILED_INLINE ) ? ", inlineOn" : ", inlineOff",
-                    ((word->WAttribute & WT_C_SYNTAX) || GetState ( word, W_C_SYNTAX )) ? ", c_syntaxOn" : "", GetState ( word, W_INFIX_MODE ) ? ", infixOn" : "" ) ;
+                    ( ( word->WAttribute & WT_C_SYNTAX ) || GetState ( word, W_C_SYNTAX ) ) ? ", c_syntaxOn" : "", GetState ( word, W_INFIX_MODE ) ? ", infixOn" : "" ) ;
                 Boolean dsc = GetState ( _CfrTil_, DEBUG_SOURCE_CODE_MODE ) ;
                 _Printf ( ( byte* ) "\nDebug Source Code %s", dsc ? "on" : "off" ) ;
                 Boolean bno = Namespace_IsUsing ( "BigNum" ) ;
@@ -434,6 +434,7 @@ _CfrTil_Source ( Word *word, int64 addToHistoryFlag )
                 _Printf ( ( byte* ) " : Word Source Code %s", wsc ? "on" : "off" ) ;
             }
             if ( word->Definition && word->S_CodeSize ) _Printf ( ( byte* ) "\nstarting at address : 0x%x -- code size = %d bytes", word->Definition, word->S_CodeSize ) ;
+            if ( word->W_TypeSignature[0] ) _Printf ( ( byte* ) "\nTypeSignature : %s", Word_ExpandTypeLetterSignature (word, 0) ) ;
         }
     }
 }

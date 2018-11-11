@@ -10,12 +10,15 @@ Word_Run ( Word * word )
         // keep track in the word itself where the machine code is to go, if this word is compiled or causes compiling code - used for optimization
         Word_SetCoding ( word, Here, 1 ) ; // if we change it later (eg. in lambda calculus) we must change it there because the rest of the compiler depends on this
         _Context_->CurrentlyRunningWord = word ;
+#if 0        
         if ( ( GetState ( _CfrTil_, TYPECHECK_ON ) ) ) //&& word->W_TypeSignature[0] ) ) //&& ( ! ( GetState ( _Compiler_, ARRAY_MODE ) ) ) ) 
         {
             if ( ! GetState ( _Compiler_, ( DOING_BEFORE_AN_INFIX_WORD | DOING_BEFORE_A_PREFIX_WORD ) ) ) CfrTil_Typecheck ( word ) ;
             Block_Eval ( word->Definition ) ;
         }
-        else Block_Eval ( word->Definition ) ;
+        //else 
+#endif        
+        Block_Eval ( word->Definition ) ;
     }
 }
 
@@ -26,9 +29,9 @@ Word_Eval ( Word * word )
     {
         _Context_->CurrentEvalWord = word ;
         DEBUG_SETUP ( word ) ;
-        //if ( word && Is_DebugModeOn ) if ( _Debugger_PreSetup ( _Debugger_, word, 0, 0 ) ) return 0 ;
         if ( ! GetState ( word, STEPPED ) ) // set by the debuggger
         {
+            TYPECHECK( word ) ;
             if ( ( word->CAttribute & IMMEDIATE ) || ( ! CompileMode ) ) Word_Run ( word ) ;
             else _Word_Compile ( word ) ;
         }
@@ -47,7 +50,7 @@ void
 _Word_Compile ( Word * word )
 {
     Word_SetCodingHere_And_ClearPreviousUseOf_Here_SCA ( word, 0 ) ;
-    CfrTil_Typecheck ( word ) ;
+    //CfrTil_Typecheck ( word ) ;
     if ( ! word->Definition ) CfrTil_SetupRecursiveCall ( ) ;
     else if ( ( GetState ( _CfrTil_, INLINE_ON ) ) && ( word->CAttribute & INLINE ) && ( word->S_CodeSize ) ) _Compile_WordInline ( word ) ;
     else Compile_CallWord_Check_X84_ABI_RSP_ADJUST ( word ) ;
@@ -286,15 +289,6 @@ Word_GetLocalsSourceCodeString ( Word * word, byte * buffer )
         }
     }
     return buffer ;
-}
-
-byte *
-Word_TypeSignature ( Word * word, byte * buffer )
-{
-    if ( word->CAttribute & T_INT ) strcat ( buffer, "Integer " ) ;
-    else if ( word->CAttribute & T_STRING ) strcat ( buffer, "String " ) ;
-    else if ( word->CAttribute & T_BIG_NUM ) strcat ( buffer, "BigNum " ) ;
-    else if ( word->CAttribute & T_BOOLEAN ) strcat ( buffer, "Boolean " ) ;
 }
 
 void

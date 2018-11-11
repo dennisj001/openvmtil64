@@ -400,8 +400,8 @@ CPrimitive CPrimitives [] = {
     { "freeSessionMem", 0, 0, 0, OVT_MemListFree_Session, 0, 0, 0, "Memory", "OpenVmTil" },
     { "freeAllTempMem", 0, 0, 0, OVT_FreeTempMem, 0, 0, 0, "Memory", "OpenVmTil" },
 
-    { "_dup", 0, 0, 0, CfrTil_Dup, CATEGORY_DUP | CATEGORY_OP_STACK, 0, 0, "Stack", "Root" },
-    { "dup", 0, 0, 0, CfrTil_Dup, IMMEDIATE | CATEGORY_DUP | CATEGORY_OP_STACK, 0, 0, "Stack", "Root" },
+    { "_dup", "A.AA", 0, 0, CfrTil_Dup, CATEGORY_DUP | T_ANY | CATEGORY_OP_STACK, 0, 0, "Stack", "Root" },
+    { "dup", "A.AA", 0, 0, CfrTil_Dup, IMMEDIATE | T_ANY | CATEGORY_DUP | CATEGORY_OP_STACK, 0, 0, "Stack", "Root" },
     { "ndup", 0, 0, 0, CfrTil_NDup, CATEGORY_OP_STACK, 0, 0, "Stack", "Root" },
     { "drop", 0, 0, 0, CfrTil_Drop, IMMEDIATE | CATEGORY_OP_STACK, 0, 0, "Stack", "Root" },
     { "dropN", 0, 0, 0, CfrTil_DropN, IMMEDIATE | CATEGORY_OP_STACK, 0, 0, "Stack", "Root" },
