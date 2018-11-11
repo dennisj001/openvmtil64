@@ -33,7 +33,7 @@ _CfrTil_CopyDuplicates ( Word * word0 )
     Word * word1, *wordToBePushed ;
     word0->W_WordListOriginalWord = word0 ;
     word0->CAttribute2 &= ( ~ RECYCLABLE_COPY ) ;
-    if ( word1 = ( Word * ) dllist_Map1_WReturn ( _CfrTil_->CompilerWordList, ( MapFunction1 ) CopyDuplicateWord, ( int64 ) word0 ) )
+    if ( word1 = ( Word * ) dllist_Map1_WReturn ( _CfrTil_->Compiler_N_M_Node_WordList, ( MapFunction1 ) CopyDuplicateWord, ( int64 ) word0 ) )
     {
         wordToBePushed = word1 ;
     }
@@ -161,7 +161,7 @@ Compiler_GotoList_Print ( )
 Word *
 _CfrTil_WordList ( int64 n )
 {
-    return ( Word * ) _dllist_Get_N_InUse_Node_M_Slot ( _CfrTil_->CompilerWordList, n, SCN_T_WORD ) ;
+    return ( Word * ) _dllist_Get_N_InUse_Node_M_Slot ( _CfrTil_->Compiler_N_M_Node_WordList, n, SCN_T_WORD ) ;
 }
 
 Word *
@@ -183,7 +183,7 @@ CompileOptimizeInfo_Init ( CompileOptimizeInfo * optInfo, uint64 state )
     dlnode * node ;
     int64 i ;
     // we don't really use optInfo->COIW much 
-    for ( i = 0, node = dllist_First ( ( dllist* ) _CfrTil_->CompilerWordList ) ; node ; node = dlnode_Next ( node ) ) // nb. this is a little subtle
+    for ( i = 0, node = dllist_First ( ( dllist* ) _CfrTil_->Compiler_N_M_Node_WordList ) ; node ; node = dlnode_Next ( node ) ) // nb. this is a little subtle
     {
         if ( dobject_Get_M_Slot ( ( dobject* ) node, SCN_IN_USE_FLAG ) )
         {

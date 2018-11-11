@@ -22,7 +22,7 @@ Root
 
 "log" variable 
 "User" namespace 
-Io
+Io Int
 : _ps printString ; inline
 : ps space _ps ; "S.V" typeSignature
 : prints _ps ;

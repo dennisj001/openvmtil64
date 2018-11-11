@@ -241,7 +241,7 @@ _CfrTil_Do_IncDec ( int64 op )
     else
     {
         WordStack_SCHCPUSCA (0, 0) ;
-        int64 sd = List_Depth ( _CfrTil_->CompilerWordList ) ;
+        int64 sd = List_Depth ( _CfrTil_->Compiler_N_M_Node_WordList ) ;
         Word *one = ( Word* ) _CfrTil_WordList ( 1 ) ; // the operand
         if ( op == INC )
         {
@@ -270,7 +270,7 @@ CfrTil_IncDec ( int64 op ) // +
 {
     Context * cntx = _Context_ ;
     Compiler * compiler = cntx->Compiler0 ;
-    int64 sd = List_Depth ( _CfrTil_->CompilerWordList ) ;
+    int64 sd = List_Depth ( _CfrTil_->Compiler_N_M_Node_WordList ) ;
     if ( ( sd > 1 ) && ( ! GetState ( compiler, LC_CFRTIL ) ) ) //|INFIX_LIST_INTERPRET ) )
     {
         //Word *zero = ( Word* ) _CfrTil_WordList (0) ; //, *three = Compiler_WordList ( 3 ) ; // the operand
@@ -281,7 +281,7 @@ CfrTil_IncDec ( int64 op ) // +
         //SetState ( _Debugger_, DEBUG_SHTL_OFF, true ) ;
         if ( nextWord && ( nextWord->CAttribute & ( CATEGORY_OP_ORDERED | CATEGORY_OP_UNORDERED | CATEGORY_OP_DIVIDE | CATEGORY_OP_EQUAL ) ) ) // postfix
         {
-            List_DropN ( _CfrTil_->CompilerWordList, 1 ) ; // the operator; let higher level see the variable
+            List_DropN ( _CfrTil_->Compiler_N_M_Node_WordList, 1 ) ; // the operator; let higher level see the variable
             if ( GetState ( compiler, C_INFIX_EQUAL ) && GetState ( _CfrTil_, OPTIMIZE_ON ) && CompileMode )
             {
                 //if ( one ) SetHere (one->Coding, 1) ;
@@ -310,14 +310,14 @@ CfrTil_IncDec ( int64 op ) // +
             {
                 if ( ! GetState ( compiler, INFIX_LIST_INTERPRET ) )
                 {
-                    List_DropN ( _CfrTil_->CompilerWordList, 1 ) ; // the operator; let higher level see the variable
+                    List_DropN ( _CfrTil_->Compiler_N_M_Node_WordList, 1 ) ; // the operator; let higher level see the variable
                     SetHere (one->Coding, 1) ;
                     CfrTil_WordList_PushWord ( one ) ;
                     dllist * postfixList = List_New ( SESSION ) ;
                     List_Push_1Value_NewNode_T_WORD ( postfixList, (int64) currentWord, COMPILER_TEMP ) ;
                     List_Push_1Value_NewNode_T_WORD ( postfixList, (int64) one, COMPILER_TEMP ) ;
                     List_Push_1Value_NewNode_T_WORD ( compiler->PostfixLists, (int64) postfixList, COMPILER_TEMP ) ;
-                    List_DropN ( _CfrTil_->CompilerWordList, 1 ) ; // the operator; let higher level see the variable for optimization
+                    List_DropN ( _CfrTil_->Compiler_N_M_Node_WordList, 1 ) ; // the operator; let higher level see the variable for optimization
                     return ;
                 }
             }
@@ -353,7 +353,7 @@ CfrTil_IncDec ( int64 op ) // +
                     for ( i = 1 ; word = _CfrTil_WordList (i), ( word->CAttribute & ( CATEGORY_OP_ORDERED | CATEGORY_OP_UNORDERED | CATEGORY_OP_DIVIDE | CATEGORY_OP_EQUAL ) ) ; i ++ ) ;
                     List_Push_1Value_NewNode_T_WORD ( postfixList, (int64) _CfrTil_WordList (i), COMPILER_TEMP ) ;
                     List_Push_1Value_NewNode_T_WORD ( compiler->PostfixLists, (int64) postfixList, COMPILER_TEMP ) ;
-                    List_DropN ( _CfrTil_->CompilerWordList, 1 ) ; // the operator; let higher level see the variable for optimization
+                    List_DropN ( _CfrTil_->Compiler_N_M_Node_WordList, 1 ) ; // the operator; let higher level see the variable for optimization
                     return ;
                 }
             }

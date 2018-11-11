@@ -262,7 +262,7 @@ _CfrTil_ArrayBegin ( Boolean lispMode, Word **pl1, int64 i )
         {
             if ( ( ! Lexer_IsTokenForwardDotted ( cntx->Lexer0 ) ) && ( ! GetState ( cntx->Compiler0, LC_ARG_PARSING ) ) ) interp->BaseObject = 0 ;
             if ( ! ( GetState ( cntx, C_SYNTAX | INFIX_MODE ) || GetState ( compiler, LC_ARG_PARSING ) ) )
-                _dllist_RemoveNodes_UntilWord ( dllist_First ( ( dllist* ) _CfrTil_->CompilerWordList ), baseObject ) ;
+                _dllist_RemoveNodes_UntilWord ( dllist_First ( ( dllist* ) _CfrTil_->Compiler_N_M_Node_WordList ), baseObject ) ;
             SetState ( compiler, COMPILE_MODE, saveCompileMode ) ;
             //SetState ( compiler, ARRAY_MODE, false ) ;
         }

@@ -190,9 +190,9 @@ _dlnode_New ( uint64 allocType )
 }
 
 // toward the TailNode - after - next
-#define _dlnode_Next( node ) node->afterNode
+#define _dlnode_Next( node ) node ? node->afterNode : 0
 // toward the HeadNode - before - previous
-#define _dlnode_Previous( node ) node->beforeNode
+#define _dlnode_Previous( node ) node ? node->beforeNode : 0 
 
 // toward the TailNode
 dlnode *
@@ -203,7 +203,7 @@ dlnode_Next ( dlnode * node )
     //if ( node && ( nextNode = node->afterNode ) && node->afterNode->afterNode )
     if ( node && ( nextNode = _dlnode_Next ( node ) ) && _dlnode_Next ( nextNode ) )
     {
-        //if ( nextNode != node ) // nb. this had found an important use at one point for some old still unknown past bug ??
+        if ( node == nextNode ) return 0 ; // nb. this had found an important use at one point for some old still unknown past bug ??
         return nextNode ; 
     }
     return 0 ;
@@ -215,8 +215,10 @@ dlnode *
 dlnode_Previous ( dlnode * node )
 {
     // don't return HeadNode return 0
-    if ( node && node->beforeNode && node->beforeNode->beforeNode )
+    dlnode * prevNode ;
+    if ( node && (prevNode = _dlnode_Previous( node ))  && _dlnode_Previous( prevNode )  )
     {
+        if ( node == prevNode ) return 0 ; 
         return _dlnode_Previous ( node ) ;
     }
     return 0 ;
