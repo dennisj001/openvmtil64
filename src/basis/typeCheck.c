@@ -9,8 +9,8 @@ TSI_TypeCheck_NonTypeVariableSigCode ( TSI * tsi, Word * word, byte sigCode )
     {
         if ( ( word->CAttribute & ( PARAMETER_VARIABLE | NAMESPACE_VARIABLE | LOCAL_VARIABLE | REGISTER_VARIABLE | T_LISP_SYMBOL ) ) //| OBJECT_FIELD ) )
             || ( ! ( word->CAttribute & ( T_INT | T_BIG_NUM | T_STRING | T_BOOLEAN | OBJECT | T_VOID ) ) )
-            || ( sigCode == 'A' ) || ( sigCode == '_' ) || ( sigCode == 'U' ) 
-            || (( sigCode == 'I' ) && (word->CAttribute & (OBJECT|T_BOOLEAN)))) // same type "kind"
+            || ( sigCode == 'A' ) || ( sigCode == '_' ) || ( sigCode == 'U' )
+            || ( ( sigCode == 'I' ) && ( word->CAttribute & ( OBJECT | T_BOOLEAN ) ) ) ) // same type "kind"
         {
             // infering that ...
             word->CAttribute |= attribute ;
@@ -263,23 +263,28 @@ Word_TypeSignature ( Word * word, byte * buffer )
 }
 
 byte *
-Word_ExpandTypeLetterSignature ( Word * word, Boolean returnValueOffFlag )
+Word_ExpandTypeLetterSignature ( Word * word, Boolean showReturnValue )
 {
     byte tsLetterCode, *ts = word->W_TypeSignature, abuffer [64] ;
-    byte *buffer = Buffer_Data_Cleared ( _CfrTil_->StrCatBuffer ) ; // expanded type signature letter code
+    byte *buffer = Buffer_Data_Cleared ( _CfrTil_->StrCatBuffer ) ;
     int64 i, tsl = Word_TypeSignatureLength ( word ) ;
-    Boolean returnValueFlag ;
+    //Boolean showFollowingDot = true ;
     buffer [0] = 0 ; // init
-    for ( returnValueFlag = false, i = 0 ; i < tsl ; i ++ )
+    for ( i = 0 ; i < tsl ; i ++ )
     {
         tsLetterCode = ts [i] ;
         Tsi_ExpandTypeLetterCode ( tsLetterCode, abuffer ) ;
         if ( ( tsLetterCode != '_' ) && abuffer[0] )
         {
-            if ( String_Equal ( abuffer, "-> " ) ) returnValueFlag = true ;
-            if ( returnValueFlag && returnValueOffFlag ) break ;
+            if ( String_Equal ( abuffer, "-> " ) )
+            {
+                if ( showReturnValue ) strcat ( buffer, abuffer ) ;
+                //showFollowingDot = false ;
+                continue ;
+            }
             strcat ( buffer, abuffer ) ;
-            if ( (( ! returnValueFlag ) && ( returnValueOffFlag )) && ( ts [i + 1] != '.' ) && ( ts [i + 1] != '_' ) ) strcat ( buffer, ". " ) ; // cartesian product symbol
+            if ( ((i + 1) == tsl ) || ( ( ts [i + 1] == '.' ) || ( ts [i + 1] == '_' ) ) ) continue ;
+            else strcat ( buffer, ". " ) ; // == cartesian product symbol
         }
         else break ;
     }

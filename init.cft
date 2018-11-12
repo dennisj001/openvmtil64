@@ -378,12 +378,13 @@ test // dT0 //demo //dT0
 demo 
 #endif //dT0
 stringMacrosOff
-#else // of course you can trim this file to your needs and put your personal init code here maybe
-
+#else 
+// of course you can trim this file to your needs and put your personal init code here maybe
+// ...
 #endif
 
 //: nl newline location ;
-//lispOff
+lispOff
 bnOff
 2 + 7  assertStkChk // stack checking
 Shell

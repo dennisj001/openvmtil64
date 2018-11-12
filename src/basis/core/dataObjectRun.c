@@ -5,7 +5,7 @@ void
 _DataObject_Run ( Word * word0 )
 {
     Context * cntx = _Context_ ;
-    Word * word = cntx->CurrentlyRunningWord ; // = word0 : set CurrentlyRunningWord with the DObject Compile_SetCurrentlyRunningWord_Call_TestRSP created word
+    Word * word = _Context_CurrentWord ( cntx ) ; // = word0 : set CurrentlyRunningWord with the DObject Compile_SetCurrentlyRunningWord_Call_TestRSP created word
     Word * ns = word0 ; // set CurrentlyRunningWord with the DObject Compile_SetCurrentlyRunningWord_Call_TestRSP created word
     cntx->Interpreter0->w_Word = word ; // for ArrayBegin : all literals are run here
     if ( word->LAttribute & LOCAL_OBJECT )

@@ -276,7 +276,7 @@ CfrTil_IncDec ( int64 op ) // +
         //Word *zero = ( Word* ) _CfrTil_WordList (0) ; //, *three = Compiler_WordList ( 3 ) ; // the operand
         Word *one = ( Word* ) _CfrTil_WordList (1) ; //, *three = Compiler_WordList ( 3 ) ; // the operand
         byte * nextToken = Lexer_PeekNextNonDebugTokenWord ( cntx->Lexer0, 1 ) ;
-        Word * currentWord = _Context_->CurrentlyRunningWord ;
+        Word * currentWord = _Context_CurrentWord ( cntx ) ;
         Word * nextWord = Finder_Word_FindUsing ( cntx->Interpreter0->Finder0, nextToken, 0 ) ;
         //SetState ( _Debugger_, DEBUG_SHTL_OFF, true ) ;
         if ( nextWord && ( nextWord->CAttribute & ( CATEGORY_OP_ORDERED | CATEGORY_OP_UNORDERED | CATEGORY_OP_DIVIDE | CATEGORY_OP_EQUAL ) ) ) // postfix

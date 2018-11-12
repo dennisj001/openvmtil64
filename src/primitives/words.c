@@ -223,6 +223,12 @@ Location_PushNew ( )
 }
 
 void
+Word_Compile_CurrentRunningWord ( )
+{
+    Compile_Call ( ( byte* ) Context_CurrentWord ()->Definition ) ;
+}
+
+void
 CompileTime_Location ( )
 {
     if ( Compiling )
@@ -235,12 +241,6 @@ CompileTime_Location ( )
     {
         CfrTil_Location_Printf ( ) ;
     }
-}
-
-void
-Word_Compile_CurrentRunningWord ( )
-{
-    Compile_Call ( ( byte* ) _Context_->CurrentlyRunningWord->Definition ) ;
 }
 
 void

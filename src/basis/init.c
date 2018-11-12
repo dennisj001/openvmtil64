@@ -25,9 +25,7 @@ _CfrTil_Init_SessionCore ( CfrTil * cfrTil, int64 cntxDelFlag, int64 promptFlag 
     }
     LC_Init_Runtime ( ) ;
     LC_LispNamespacesOff ( ) ;
-    //OVT_FreeTempMem ( ) ; // -> above, before inits
     CfrTil_CheckInitDataStack ( ) ;
-    //_CfrTil_TypeStackReset ( ) ;
     OVT_StartupMessage ( ) ;
     _OVT_Ok ( promptFlag ) ;
     cfrTil->SC_QuoteMode = 0 ;
@@ -40,7 +38,9 @@ _CfrTil_Init_SessionCore ( CfrTil * cfrTil, int64 cntxDelFlag, int64 promptFlag 
     DefaultColors ;
     cfrTil->ScWord = 0 ;
     SetState ( cfrTil, SOURCE_CODE_ON, true ) ;
-    CfrTil_RecycleInit_Compiler_N_M_Node_WordList ( ) ; // why is this necessary here ?? this list is sometimes corrupt ?? crashes without this on : tbn ( u v ) u @ v @ Int + p ; 1 2 tbn
+    _CfrTil_TypeStackReset ( ) ;
+    //_CfrTil_RecycleInit_Compiler_N_M_Node_WordList ( 0 ) ; 
+    List_Init ( _CfrTil_->Compiler_N_M_Node_WordList ) ; // we *should* be able to recycle ?? why not ??
 }
 
 void

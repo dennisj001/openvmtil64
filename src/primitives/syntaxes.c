@@ -87,7 +87,7 @@ CfrTil_End_C_Block ( )
     else
     {
         // we're still compiling so ... ??
-        Word * word = cntx->CurrentlyRunningWord ;
+        Word * word = _Context_CurrentWord ( cntx ) ;
         word->W_NumberOfArgs = compiler->NumberOfArgs ;
         word->W_NumberOfLocals = compiler->NumberOfLocals ;
     }

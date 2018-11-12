@@ -1,5 +1,7 @@
 #include "../../include/cfrtil64.h"
 
+// i don't like not have C access to a structure but i want object allocation in init to 
+// be robustly tested for cfrtil use
 dobject *
 _dllist_PushNew_M_Slot_Node (dllist* list, int64 allocType, int64 typeCode, int64 m_slots, ... )
 {
@@ -200,10 +202,9 @@ dlnode_Next ( dlnode * node )
 {
     dlnode * nextNode ;
     // don't return TailNode, return 0
-    //if ( node && ( nextNode = node->afterNode ) && node->afterNode->afterNode )
     if ( node && ( nextNode = _dlnode_Next ( node ) ) && _dlnode_Next ( nextNode ) )
     {
-        if ( node == nextNode ) return 0 ; // nb. this had found an important use at one point for some old still unknown past bug ??
+        //if ( node == nextNode ) return 0 ; // nb. this had found an important use at one point for some old still unknown past bug ??
         return nextNode ; 
     }
     return 0 ;
@@ -218,7 +219,7 @@ dlnode_Previous ( dlnode * node )
     dlnode * prevNode ;
     if ( node && (prevNode = _dlnode_Previous( node ))  && _dlnode_Previous( prevNode )  )
     {
-        if ( node == prevNode ) return 0 ; 
+        //if ( node == prevNode ) return 0 ; 
         return _dlnode_Previous ( node ) ;
     }
     return 0 ;

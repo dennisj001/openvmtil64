@@ -347,7 +347,6 @@ typedef struct _WordData
     int64 SC_WordIndex ;
     int64 NumberOfArgs ;
     int64 NumberOfLocals ;
-    uint64 * InitialRuntimeDsp ;
 
     byte * ObjectCode ; // used by objects/class words
     byte * StackPushRegisterCode ; // used by the optInfo
@@ -855,7 +854,7 @@ typedef struct
     byte * Location ;
     byte * DefaultTokenDelimiters ;
     byte * DefaultDelimiterCharSet ;
-    Word * CurrentlyRunningWord, *CurrentEvalWord, *NlsWord, *SC_CurrentCombinator, *SourceCodeWord, *CurrentDisassemblyWord ;
+    Word * CurrentlyRunningWord, *LastRunWord, *CurrentTokenWord, *CurrentEvalWord, *NlsWord, *SC_CurrentCombinator, *SourceCodeWord, *CurrentDisassemblyWord ;
     block CurrentlyRunningWordDefinition ;
     dllist * PreprocessorStackList ;
     NBA * ContextNba ;

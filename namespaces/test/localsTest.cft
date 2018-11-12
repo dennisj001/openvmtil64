@@ -3,6 +3,7 @@
 #if 1 //_TestDone_ @ not // prevent including twice
 decimal
 User
+ : hi ( a b ) a @ b @ + p ; : hey ( a b ) a @ b @ hi a @ b @ hi a @ b @ hi ; 1 2 hey       
 C
 // demonstrate calling order of local variables
 dscOn //verbosity 3 =

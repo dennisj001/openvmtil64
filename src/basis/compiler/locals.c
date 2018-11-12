@@ -83,7 +83,7 @@ _Compiler_RemoveLocalFrame ( Compiler * compiler )
     WordStack_SCHCPUSCA ( 0, 1 ) ;
     Compiler_SetLocalsFrameSize_AtItsCellOffset ( compiler ) ;
     parameterVarsSubAmount = ( ( compiler->NumberOfNonRegisterArgs ) * CELL ) ;
-    returnValueFlag = ( _Context_->CurrentlyRunningWord->CAttribute & C_RETURN ) || 
+    returnValueFlag = ( Context_CurrentWord ()->CAttribute & C_RETURN ) || 
         ( GetState ( compiler, RETURN_TOS | RETURN_ACCUM ) ) || IsWordRecursive || compiler->ReturnVariableWord ;
     if ( GetState ( compiler, LISP_MODE ) ) one = 0 ;
     else one = WordStack ( 1 ) ;

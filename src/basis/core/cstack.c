@@ -282,13 +282,13 @@ void
 Stack_Print_AValue ( uint64 * stackPointer, int64 i, byte * stackName, byte * buffer, Boolean isWordAlreadyFlag )
 {
     Word * word = 0 ;
-    byte * string = 0, tsb [32], *ts = 0;
-    tsb[0] = 0 ;
+    byte * string = 0, tsb [32], *ts = 0; // typeSignature
+    tsb[0] = 0 ; 
     if ( isWordAlreadyFlag ) 
     {
         word = ( Word* ) ( stackPointer [ i ] ) ;
         int64 tsl = Word_TypeSignatureLength ( word ) ;
-        if ( tsl > 1 ) ts = Word_ExpandTypeLetterSignature (word, 0) ; 
+        if ( tsl > 1 ) ts = Word_ExpandTypeLetterSignature (word, 1) ; 
         else ts = Word_TypeSignature ( word, tsb ) ;
     }
     else word = Word_GetFromCodeAddress ( ( byte* ) ( stackPointer [ i ] ) ) ;

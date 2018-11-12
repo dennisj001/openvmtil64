@@ -29,6 +29,18 @@ Context_Location ( )
     return _Context_Location ( _Context_ ) ;
 }
 
+Word *
+_Context_CurrentWord ( Context * cntx )
+{
+    return cntx->CurrentlyRunningWord ?  cntx->CurrentlyRunningWord : _Context_->LastRunWord ? _Context_->LastRunWord : cntx->CurrentTokenWord ;
+}
+
+Word *
+Context_CurrentWord ( )
+{
+    return _Context_CurrentWord ( _Context_ ) ;
+}
+
 Context *
 _Context_Allocate ( )
 {

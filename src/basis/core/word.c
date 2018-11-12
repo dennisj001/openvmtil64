@@ -5,20 +5,13 @@ Word_Run ( Word * word )
 {
     if ( word )
     {
-        word->W_InitialRuntimeDsp = _Dsp_ ;
         word->StackPushRegisterCode = 0 ; // nb. used! by the rewriting optInfo
         // keep track in the word itself where the machine code is to go, if this word is compiled or causes compiling code - used for optimization
         Word_SetCoding ( word, Here, 1 ) ; // if we change it later (eg. in lambda calculus) we must change it there because the rest of the compiler depends on this
         _Context_->CurrentlyRunningWord = word ;
-#if 0        
-        if ( ( GetState ( _CfrTil_, TYPECHECK_ON ) ) ) //&& word->W_TypeSignature[0] ) ) //&& ( ! ( GetState ( _Compiler_, ARRAY_MODE ) ) ) ) 
-        {
-            if ( ! GetState ( _Compiler_, ( DOING_BEFORE_AN_INFIX_WORD | DOING_BEFORE_A_PREFIX_WORD ) ) ) CfrTil_Typecheck ( word ) ;
-            Block_Eval ( word->Definition ) ;
-        }
-        //else 
-#endif        
         Block_Eval ( word->Definition ) ;
+        _Context_->CurrentlyRunningWord = 0 ;
+        _Context_->LastRunWord = word ;
     }
 }
 
@@ -37,6 +30,7 @@ Word_Eval ( Word * word )
         }
         SetState ( word, STEPPED, false ) ;
         DEBUG_SHOW ;
+        _Context_->CurrentEvalWord = 0 ;
     }
 }
 
@@ -88,7 +82,7 @@ _Word_Finish ( Word * word )
     CfrTil_FinishSourceCode ( _CfrTil_, word ) ;
     _CfrTil_->LastFinished_Word = word ;
     CfrTil_TypeStackReset ( ) ;
-    if ( ! GetState ( _CfrTil_, GLOBAL_SOURCE_CODE_MODE ) ) CfrTil_WordList_Init ( _CfrTil_, 0, 0 ) ;
+    CfrTil_WordList_Init ( _CfrTil_, 0, 0 ) ;
 }
 
 void

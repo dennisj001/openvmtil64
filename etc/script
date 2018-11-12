@@ -18,6 +18,7 @@ Lisp
 (define yfacc (lambda (yyy n1) (if* (< n1 2) (1) (* n1 (yyy yyy (- n1 1)))))) 
 (yfacc yfacc 10) nl
 (yfacc yfacc 7) nl //pause
+mem
 (define fibc (lambda ( n ) (ifElse (< n 2) n (+ (fibc (- n 1)) (fibc (- n 2))))))
 (fibc 20)
 

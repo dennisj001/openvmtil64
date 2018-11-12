@@ -320,7 +320,8 @@ Compiler_Init ( Compiler * compiler, uint64 state, int64 flags )
     _dllist_Init ( compiler->OptimizeInfoList ) ;
     _Compiler_FreeAllLocalsNamespaces ( compiler ) ;
     Compiler_CompileOptimizeInfo_PushNew ( compiler ) ;
-    if ( flags ) CfrTil_TypeStackReset ( ) ;
+    if ( flags ) CfrTil_TypeStackReset ( ) ;    
+    _CfrTil_RecycleInit_Compiler_N_M_Node_WordList ( 0 ) ;
     SetBuffersUnused ( 1 ) ;
     SetState ( compiler, VARIABLE_FRAME, false ) ;
 }

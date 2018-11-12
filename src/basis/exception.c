@@ -88,7 +88,7 @@ OVT_Pause ( byte * prompt, int64 signalExceptionsHandled )
             _Q_->RestartCondition ) ;
         do
         {
-            if ( _Debugger_->w_Word = _Context_->CurrentlyRunningWord )
+            if ( _Debugger_->w_Word = Context_CurrentWord () )
             {
                 _Debugger_ShowInfo ( _Debugger_, "\r", _Q_->Signal, 0 ) ;
                 _Debugger_->w_Word = 0 ;

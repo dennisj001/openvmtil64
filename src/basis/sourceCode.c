@@ -117,7 +117,7 @@ _CfrTil_AdjustDbgSourceCodeAddress ( byte * address, byte * newAddress )
 void
 _CfrTil_WordList_PushWord ( Word * word, Boolean inUseFlag )
 {
-    CompilerWordList_Push ( word, inUseFlag ) ;
+    CfrTil_WordList_Push ( word, inUseFlag ) ;
 }
 
 void
@@ -513,10 +513,13 @@ _CfrTil_Finish_WordSourceCode ( CfrTil * cfrtil, Word * word )
 }
 
 void
-CfrTil_RecycleInit_Compiler_N_M_Node_WordList ( )
+_CfrTil_RecycleInit_Compiler_N_M_Node_WordList ( Boolean force )
 {
-    DLList_Recycle_WordList ( _CfrTil_->Compiler_N_M_Node_WordList ) ;
-    List_Init ( _CfrTil_->Compiler_N_M_Node_WordList ) ;
+    if ( force || ( ! GetState ( _CfrTil_, GLOBAL_SOURCE_CODE_MODE ) ))
+    {
+        DLList_Recycle_WordList ( _CfrTil_->Compiler_N_M_Node_WordList ) ;
+        List_Init ( _CfrTil_->Compiler_N_M_Node_WordList ) ;
+    }
 }
 
 void
@@ -530,8 +533,7 @@ CfrTil_RecycleInit_SourceCode_WordList ( Word * scWord )
         _CfrTil_->ScWord = 0 ;
         _Debugger_->LastSourceCodeWord = 0 ;
     }
-    //else
-    CfrTil_RecycleInit_Compiler_N_M_Node_WordList ( ) ;
+    _CfrTil_RecycleInit_Compiler_N_M_Node_WordList ( 0 ) ;
 }
 
 // there may be problems here ??
@@ -543,7 +545,6 @@ CfrTil_WordList_Init ( CfrTil * cfrtil, Word * word, Boolean saveWord0 )
     if ( saveWord0 ) svWord = WordStack ( 0 ) ;
     else svWord = 0 ;
     CfrTil_RecycleInit_SourceCode_WordList ( 0 ) ;
-    //if ( ( word ) && ( IsSourceCodeOn ) ) cfrtil->LastFinished_Word = cfrtil->CurrentWordBeingCompiled = cfrtil->ScWord = word ;
     if ( word && IsSourceCodeOn ) cfrtil->ScWord = word ;
     else cfrtil->ScWord = Get_SourceCodeWord ( ) ;
     if ( cfrtil->ScWord )

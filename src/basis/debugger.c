@@ -39,7 +39,7 @@ _Debugger_PreSetup ( Debugger * debugger, Word * word, byte * token, Boolean for
     {
         if ( forceFlag || GetState ( debugger, DBG_EVAL_AUTO_MODE ) || ( ! GetState ( debugger, DBG_AUTO_MODE | DBG_STEPPING ) ) )
         {
-            if ( ! word ) word = _Context_->CurrentlyRunningWord ;
+            if ( ! word ) word = Context_CurrentWord () ;
             if ( word && ( ! word->W_WordListOriginalWord ) ) word->W_WordListOriginalWord = word ;
             if ( ( ! debugger->LastSetupWord ) || ( ( debugger->LastSetupWord != word ) && ( word && ( ! String_Equal ( debugger->LastSetupWord->Name, word->Name ) ) ) ) )
             {

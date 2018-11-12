@@ -134,6 +134,7 @@ _Interpreter_TokenToWord ( Interpreter * interp, byte * token )
         if ( ! word ) word = Lexer_ObjectToken_New ( interp->Lexer0, token ) ;
         int64 tsrli = - 1, scwi = - 1 ;
         Word_SetTsrliScwi ( word, tsrli, scwi ) ;
+        _Context_->CurrentTokenWord = word ;
         DEBUG_SETUP ( word ) ;
     }
     return word ;
