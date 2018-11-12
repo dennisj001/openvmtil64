@@ -88,7 +88,7 @@ _Word_Finish ( Word * word )
     CfrTil_FinishSourceCode ( _CfrTil_, word ) ;
     _CfrTil_->LastFinished_Word = word ;
     CfrTil_TypeStackReset ( ) ;
-    CfrTil_WordList_Init ( _CfrTil_, 0, 0 ) ;
+    if ( ! GetState ( _CfrTil_, GLOBAL_SOURCE_CODE_MODE ) ) CfrTil_WordList_Init ( _CfrTil_, 0, 0 ) ;
 }
 
 void
