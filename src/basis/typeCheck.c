@@ -348,10 +348,11 @@ void
 _CfrTil_TypeStackReset ( )
 {
 #if 0 // while not this ??
-    int64 i, i0 = Stack_Depth ( tsi->TypeWordStack ) ;
-    while ( i = Stack_Depth ( tsi->TypeWordStack ) )
+    Stack * stack = _CfrTil_->TypeWordStack ;
+    int64 i, i0 = Stack_Depth ( stack ) ;
+    while ( i = Stack_Depth ( stack ) )
     {
-        Word * tword = ( Word * ) Stack_Pop ( tsi->TypeWordStack ) ;
+        Word * tword = ( Word * ) Stack_Pop ( stack ) ;
         _CheckRecycleWord ( tword ) ;
     }
 #endif    

@@ -31,7 +31,7 @@
 #if 0  // if 6
 #else // t
 "\npreprocessor test ok1\n" ps apause
-ppx dup @ 1 d: + =
+ppx dup @ 1 + =
 #endif // if 6 endif
 
 #if 0 // if 7

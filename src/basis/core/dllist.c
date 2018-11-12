@@ -2,8 +2,9 @@
 
 // i don't like not have C access to a structure but i want object allocation in init to 
 // be robustly tested for cfrtil use
+
 dobject *
-_dllist_PushNew_M_Slot_Node (dllist* list, int64 allocType, int64 typeCode, int64 m_slots, ... )
+_dllist_PushNew_M_Slot_Node ( dllist* list, int64 allocType, int64 typeCode, int64 m_slots, ... )
 {
     int64 i ;
     va_list args ;
@@ -17,6 +18,7 @@ _dllist_PushNew_M_Slot_Node (dllist* list, int64 allocType, int64 typeCode, int6
 }
 
 #if 0
+
 dobject *
 _dllist_AddToTail_New_M_Slot_Node ( dllist* list, int64 typeCode, int64 allocType, int64 m_slots, ... )
 {
@@ -102,7 +104,7 @@ int64
 List_Pop_1Value ( dllist *list )
 {
     //return List_GetN_Value ( list, n ) ;
-    dobject* dobj = (dobject *) _dllist_PopNode ( list ) ;
+    dobject* dobj = ( dobject * ) _dllist_PopNode ( list ) ;
     return dobj->do_iData [0] ;
 }
 
@@ -153,28 +155,28 @@ inline
 void
 List_Push_1Value_NewNode_T_WORD ( dllist *list, int64 value, int64 allocType )
 {
-    _dllist_PushNew_M_Slot_Node (list, allocType, T_WORD, 1, value ) ;
+    _dllist_PushNew_M_Slot_Node ( list, allocType, T_WORD, 1, value ) ;
 }
 
 inline
 void
 _List_PushNew_ForWordList ( dllist *list, Word * word, int64 inUseFlag )
 {
-    _dllist_PushNew_M_Slot_Node (list, COMPILER_TEMP, T_WORD, SCN_NUMBER_OF_SLOTS, ( ( int64 ) word ), word->W_SC_Index, inUseFlag ) ;
+    _dllist_PushNew_M_Slot_Node ( list, COMPILER_TEMP, T_WORD, SCN_NUMBER_OF_SLOTS, ( ( int64 ) word ), word->W_SC_Index, inUseFlag ) ;
 }
 
 inline
 void
-_List_PushNew_1Value (dllist *list, int64 allocType , int64 typeCode, int64 value)
+_List_PushNew_1Value ( dllist *list, int64 allocType, int64 typeCode, int64 value )
 {
-    _dllist_PushNew_M_Slot_Node (list, allocType, typeCode, 1, value ) ;
+    _dllist_PushNew_M_Slot_Node ( list, allocType, typeCode, 1, value ) ;
 }
 
 inline
 void
 List_PushNew_T_WORD ( dllist *list, int64 value, int64 allocType )
 {
-    _List_PushNew_1Value (list, value , T_WORD, allocType) ;
+    _List_PushNew_1Value ( list, value, T_WORD, allocType ) ;
 }
 
 void
@@ -195,17 +197,24 @@ _dlnode_New ( uint64 allocType )
 #define _dlnode_Next( node ) node ? node->afterNode : 0
 // toward the HeadNode - before - previous
 #define _dlnode_Previous( node ) node ? node->beforeNode : 0 
+#define Is_NotHeadOrTailNode( node ) ( node && _dlnode_Next ( node ) && _dlnode_Previous ( node ) ) ? node : 0
+#define Is_NotHeadNode( node ) ( node && _dlnode_Previous ( node ) ) ? node : 0
+#define Is_NotTailNode( node ) ( node && _dlnode_Next ( node ) ) ? node : 0
 
 // toward the TailNode
+
 dlnode *
 dlnode_Next ( dlnode * node )
 {
     dlnode * nextNode ;
     // don't return TailNode, return 0
-    if ( node && ( nextNode = _dlnode_Next ( node ) ) && _dlnode_Next ( nextNode ) )
+    if ( node )
     {
-        //if ( node == nextNode ) return 0 ; // nb. this had found an important use at one point for some old still unknown past bug ??
-        return nextNode ; 
+        if ( nextNode = _dlnode_Next ( node ))
+        {
+            //if ( _dlnode_Next ( nextNode ) ) return nextNode ;
+            return Is_NotTailNode( nextNode ) ;
+        }
     }
     return 0 ;
 }
@@ -217,10 +226,13 @@ dlnode_Previous ( dlnode * node )
 {
     // don't return HeadNode return 0
     dlnode * prevNode ;
-    if ( node && (prevNode = _dlnode_Previous( node ))  && _dlnode_Previous( prevNode )  )
+    if ( node )
     {
-        //if ( node == prevNode ) return 0 ; 
-        return _dlnode_Previous ( node ) ;
+        if ( prevNode = _dlnode_Previous ( node )) 
+        {
+            //if ( _dlnode_Previous ( prevNode ) ) return prevNode ;
+            return Is_NotHeadNode( prevNode ) ;
+        }
     }
     return 0 ;
 }
@@ -228,9 +240,10 @@ dlnode_Previous ( dlnode * node )
 void
 dlnode_InsertThisAfterANode ( dlnode * thisNode, dlnode * aNode ) // Insert thisNode After aNode : toward the tail of the list - "after" the Head
 {
-    if ( thisNode && aNode )
+    if ( thisNode && ( aNode = Is_NotTailNode ( aNode ) ) )
     {
-        if ( aNode->afterNode ) aNode->afterNode->beforeNode = thisNode ; // don't overwrite a Head or Tail node 
+        //if ( aNode->afterNode ) 
+        aNode->afterNode->beforeNode = thisNode ; // don't overwrite a Head or Tail node 
         thisNode->afterNode = aNode->afterNode ;
         aNode->afterNode = thisNode ; // necessarily after the above statement ! 
         thisNode->beforeNode = aNode ;
@@ -240,26 +253,28 @@ dlnode_InsertThisAfterANode ( dlnode * thisNode, dlnode * aNode ) // Insert this
 void
 dlnode_InsertThisBeforeANode ( dlnode * thisNode, dlnode * aNode ) // Insert thisNode Before aNode : toward the head of the list - "before" the Tail
 {
-    if ( thisNode && aNode )
+    if ( thisNode && ( aNode = Is_NotHeadNode ( aNode ) ) )
     {
-        if ( aNode->beforeNode ) aNode->beforeNode->afterNode = thisNode ; // don't overwrite a Head or Tail node
+        //if ( aNode->beforeNode ) 
+        aNode->beforeNode->afterNode = thisNode ; // don't overwrite a Head or Tail node
         thisNode->beforeNode = aNode->beforeNode ;
         aNode->beforeNode = thisNode ; // necessarily after the above statement ! 
         thisNode->afterNode = aNode ;
     }
 }
 
-dlnode *
+void
 dlnode_Remove ( dlnode * node )
 {
-    if ( node )
+    if ( node = Is_NotHeadOrTailNode ( node ) )
     {
-        if ( node->beforeNode ) node->beforeNode->afterNode = node->afterNode ;
-        if ( node->afterNode ) node->afterNode->beforeNode = node->beforeNode ;
+        //if ( node->beforeNode ) 
+        node->beforeNode->afterNode = node->afterNode ;
+        //if ( node->afterNode ) 
+        node->afterNode->beforeNode = node->beforeNode ;
         node->afterNode = 0 ;
         node->beforeNode = 0 ;
     }
-    return node ;
 }
 
 void

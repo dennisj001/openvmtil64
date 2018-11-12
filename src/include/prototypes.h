@@ -541,7 +541,7 @@ dlnode *dlnode_Next(dlnode *node);
 dlnode *dlnode_Previous(dlnode *node);
 void dlnode_InsertThisAfterANode(dlnode *thisNode, dlnode *aNode);
 void dlnode_InsertThisBeforeANode(dlnode *thisNode, dlnode *aNode);
-dlnode *dlnode_Remove(dlnode *node);
+void dlnode_Remove(dlnode *node);
 void dlnode_ReplaceNodeWithANode(dlnode *node, dlnode *anode);
 void dlnode_Replace(dlnode *replacedNode, dlnode *replacingNode);
 void _dllist_Init(dllist *list);
