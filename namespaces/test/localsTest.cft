@@ -5,7 +5,7 @@ decimal
 User
 C
 // demonstrate calling order of local variables
-dscOn verbosity 3 =
+dscOn //verbosity 3 =
 : hi ( m x | n -- n ) n m @ = n @ p ; : hey ( m x | n -- n ) n m @ = n @ 1 hi p n @ 1 hi p n @ 1 hi p ; 
 : heey ( m x | n -- n ) n m @ = n @ 1 hey p n @ 1 hey p n @ 1 hey p ; 
 7 1 heey dup p 7 _assert verbosity 1 = //pause

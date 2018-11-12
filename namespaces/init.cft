@@ -1,0 +1,13 @@
+5
+: sp ; //stack pause ;    
+sp
+Root User 
+doLisp 1 =
+doDemo 1 =
+dbgOff
+: demo0 "namespaces/test/initTest.cft" include ;
+doDemo @ { demo0 } if1
+sp
+lispOff
+sp 
+2 + 7 assertStkChk // stack checking

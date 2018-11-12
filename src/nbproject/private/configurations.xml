@@ -67,6 +67,7 @@
         <in>atom.c</in>
         <in>attribute.c</in>
         <in>bigNum.c</in>
+        <in>bigNum.gmp.c</in>
         <in>cfrtil64.c</in>
         <in>colors.c</in>
         <in>context.c</in>
@@ -87,6 +88,7 @@
         <in>system.c</in>
         <in>tabCompletion.c</in>
         <in>typeCheck.c</in>
+        <in>types.c</in>
         <in>x.c</in>
       </df>
       <df name="include">
@@ -153,8 +155,6 @@
         <gdb_interceptlist>
           <gdbinterceptoptions gdb_all="false" gdb_unhandled="true" gdb_unexpected="true"/>
         </gdb_interceptlist>
-        <gdb_signals>
-        </gdb_signals>
         <gdb_options>
           <DebugOptions>
           </DebugOptions>
