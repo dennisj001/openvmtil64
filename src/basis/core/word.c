@@ -44,7 +44,6 @@ void
 _Word_Compile ( Word * word )
 {
     Word_SetCodingHere_And_ClearPreviousUseOf_Here_SCA ( word, 0 ) ;
-    //CfrTil_Typecheck ( word ) ;
     if ( ! word->Definition ) CfrTil_SetupRecursiveCall ( ) ;
     else if ( ( GetState ( _CfrTil_, INLINE_ON ) ) && ( word->CAttribute & INLINE ) && ( word->S_CodeSize ) ) _Compile_WordInline ( word ) ;
     else Compile_CallWord_Check_X84_ABI_RSP_ADJUST ( word ) ;
@@ -82,7 +81,6 @@ _Word_Finish ( Word * word )
     CfrTil_FinishSourceCode ( _CfrTil_, word ) ;
     _CfrTil_->LastFinished_Word = word ;
     CfrTil_TypeStackReset ( ) ;
-    CfrTil_WordList_Init ( _CfrTil_, 0, 0 ) ;
 }
 
 void
@@ -168,7 +166,6 @@ Word_SetLocation ( Word * word )
 Word *
 _Word_New ( byte * name, uint64 ctype, uint64 ctype2, uint64 ltype, Boolean addToInNs, Namespace * addToNs, uint64 allocType )
 {
-    //CheckCodeSpaceForRoom ( ) ;
     Word * word = _Word_Create ( name, ctype, ctype2, ltype, allocType ) ; // CFRTIL_WORD : cfrTil compiled words as opposed to C compiled words
     _Compiler_->CurrentWord = word ;
     Word_SetLocation ( word ) ;
@@ -180,6 +177,7 @@ _Word_New ( byte * name, uint64 ctype, uint64 ctype2, uint64 ltype, Boolean addT
 Word *
 Word_New ( byte * name )
 {
+    CfrTil_WordList_Init ( 0, 0 ) ;
     Word * word = _Word_New ( name, CFRTIL_WORD | WORD_CREATE, 0, 0, 1, 0, DICTIONARY ) ;
     return word ;
 }

@@ -509,7 +509,7 @@
 #define _DEBUG_SHOW_ ( (uint64) 1 << 11 )
 #define DEBUG_SHTL_OFF ( (uint64) 1 << 12 ) // SHTL == _String_HighlightTokenInputLine
 #define SC_FORCE_PUSH ( (uint64) 1 << 13 )
-//#define TYPESTACK_RESET_OFF ( (uint64) 1 << 14 )
+#define DBG_TYPESTACK_ON ( (uint64) 1 << 14 )
 //#define TYPECHECK_OFF ( (uint64) 1 << 15 )
 
 // State Flags --

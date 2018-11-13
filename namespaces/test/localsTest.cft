@@ -162,7 +162,7 @@ nl "goedel2 :: " ps goedel2 sp
         n @ p n @ 7 "goedel4_4_assert" assert // 7
     } ix 
     n @ dup p // 9
-;
+; ".I" typeSignature
 "\ngoedel4 :: output should read : \n'junk' 2 'junk' 7 'junk' 7 7 9" ps //pause
 ' goedel4 find wdiss     
 9 goedel4 "goedel4_0_assert" assert //pause
@@ -181,7 +181,7 @@ nl "goedel2 :: " ps goedel2 sp
         n @ dup p 7 "goedel5_4_assert" assert // 7
     } ix // n should be garbage here
     n @ dup p
-;
+; ".I" typeSignature
 9 goedel5 "goedel5_0_assert" assert 
 "\ngoedel5 :: output should read : junk' 2 'junk' 7 7 9" ps //pause
 //s pause
@@ -200,7 +200,7 @@ nl "goedel2 :: " ps goedel2 sp
         n @ dup p 7 "goedel6_4_assert" assert 
     } ix // n should be garbage here
     n @ dup p
-;
+; ".I" typeSignature
 //' goedel6 find wdiss pause   
 9 goedel6 "goedel6_0_assert" assert
 "\ngoedel6 :: goedel6 output should read : \n'junk' 2 'junk' 7 7 'junk' 9" ps //pause
@@ -219,7 +219,7 @@ nl "goedel2 :: " ps goedel2 sp
         n 7 += 
     } ix 
     n @ 8 + dup p
-;
+; ".I" typeSignature
 //' goedel7 find wdiss pause   
 nl "goedel7 :: " ps nl
 18 goedel7 "goedel7_0_assert" assert 

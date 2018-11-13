@@ -177,7 +177,7 @@ _Word_Clear_PreviousUseOf_A_SCA ( Word * word, byte * coding )
     if ( Compiling && word )
     {
         dllist_Map1_FromEnd ( _CfrTil_->Compiler_N_M_Node_WordList, ( MapFunction1 ) SC_ListClearAddress, ( int64 ) coding ) ;
-        Word_SetCoding ( word, coding, 1 ) ;
+        //Word_SetCoding ( word, coding, 1 ) ;
     }
 }
 
@@ -193,7 +193,7 @@ _Word_SetCoding_And_ClearPreviousUseOf_A_SCA ( Word * word, byte * index, Boolea
     if ( Compiling && word )
     {
         if ( clearPreviousFlag ) _Word_Clear_PreviousUseOf_A_SCA ( word, index ) ; //dllist_Map1_FromEnd ( _CfrTil_->CompilerWordList, ( MapFunction1 ) SC_ListClearAddress, ( int64 ) Here ) ; //( int64 ) word, ( int64 ) Here ) ;
-        else Word_SetCoding ( word, index, 1 ) ;
+        Word_SetCoding ( word, index, 1 ) ;
     }
 }
 
@@ -336,22 +336,17 @@ CfrTil_DbgSourceCodeEndBlock ( )
     CfrTil_DbgSourceCodeOff ( ) ;
 }
 
-#if 0
-
 void
-CfrTil_DbgSourceCode_Begin_C_Block ( )
+CfrTil_DbgTypecheckOff ( )
 {
-    SetState ( _CfrTil_, DEBUG_SOURCE_CODE_MODE, true ) ;
-    _SC_Global_On ;
+    SetState ( _CfrTil_, DBG_TYPESTACK_ON, false ) ;
 }
 
 void
-CfrTil_DbgSourceCode_End_C_Block ( )
+CfrTil_DbgTypecheckOn ( )
 {
-    CfrTil_End_C_Block ( ) ;
-    CfrTil_DbgSourceCodeOff ( ) ;
+    SetState ( _CfrTil_, DBG_TYPESTACK_ON, true ) ;
 }
-#endif
 
 void
 CfrTil_DbgSourceCodeOff ( )
@@ -512,6 +507,8 @@ _CfrTil_Finish_WordSourceCode ( CfrTil * cfrtil, Word * word )
     CfrTil_SourceCode_InitEnd ( cfrtil ) ;
 }
 
+// the logic needs to be reworked with recycling in these functions
+
 void
 _CfrTil_RecycleInit_Compiler_N_M_Node_WordList ( Boolean force )
 {
@@ -522,6 +519,7 @@ _CfrTil_RecycleInit_Compiler_N_M_Node_WordList ( Boolean force )
     }
 }
 
+#if 0
 void
 CfrTil_RecycleInit_SourceCode_WordList ( Word * scWord )
 {
@@ -537,20 +535,24 @@ CfrTil_RecycleInit_SourceCode_WordList ( Word * scWord )
 }
 
 // there may be problems here ??
-
+#endif
 void
-CfrTil_WordList_Init ( CfrTil * cfrtil, Word * word, Boolean saveWord0 )
+CfrTil_WordList_Init ( Word * word, Boolean saveWord0 )
 {
     Word * svWord ;
-    if ( saveWord0 ) svWord = WordStack ( 0 ) ;
+    if ( word ) svWord = word ;
+    else if ( saveWord0 ) svWord = WordStack ( 0 ) ;
     else svWord = 0 ;
-    CfrTil_RecycleInit_SourceCode_WordList ( 0 ) ;
+#if 0    
     if ( word && IsSourceCodeOn ) cfrtil->ScWord = word ;
     else cfrtil->ScWord = Get_SourceCodeWord ( ) ;
     if ( cfrtil->ScWord )
     {
         cfrtil->ScWord->W_SC_WordList = cfrtil->Compiler_N_M_Node_WordList ;
     }
+    else CfrTil_RecycleInit_SourceCode_WordList ( 0 ) ;
+#endif    
+    _CfrTil_RecycleInit_Compiler_N_M_Node_WordList ( 1 ) ;
     if ( svWord )
     {
         svWord->W_SC_Index = 0 ; // before pushWord !
@@ -622,7 +624,7 @@ SC_PrepareDbgSourceCodeString ( byte * sc, Word * word ) // sc : source code ; s
         slt = Strlen ( token ) ;
         slsc = strlen ( sc ) ;
         scwi0 = word->W_SC_Index ;
-        scwci = String_FindStrnCmpIndex ( sc, token, scwi0, slt, slt + 2 ) ; //( ( slsc - scwi0 ) > 30 ) ? 30 : ( slsc - scwi0 ) ) ;
+        scwci = String_FindStrnCmpIndex ( sc, token, scwi0, slt, slt/2 ) ; //( ( slsc - scwi0 ) > 30 ) ? 30 : ( slsc - scwi0 ) ) ;
         d0 ( byte * scspp0 = & sc [ scwi0 ] ) ;
         d0 ( byte * scspp2 = & sc [ scwci ] ) ;
         nvw = ( char* ) Buffer_New_pbyte ( ( slsc > BUFFER_SIZE ) ? slsc : BUFFER_SIZE ) ;

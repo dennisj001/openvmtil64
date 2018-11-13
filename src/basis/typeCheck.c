@@ -10,6 +10,7 @@ TSI_TypeCheck_NonTypeVariableSigCode ( TSI * tsi, Word * word, byte sigCode )
         if ( ( word->CAttribute & ( PARAMETER_VARIABLE | NAMESPACE_VARIABLE | LOCAL_VARIABLE | REGISTER_VARIABLE | T_LISP_SYMBOL ) ) //| OBJECT_FIELD ) )
             || ( ! ( word->CAttribute & ( T_INT | T_BIG_NUM | T_STRING | T_BOOLEAN | OBJECT | T_VOID ) ) )
             || ( sigCode == 'A' ) || ( sigCode == '_' ) || ( sigCode == 'U' )
+            || ( word->CAttribute & (T_ANY|T_UNDEFINED) )
             || ( ( sigCode == 'I' ) && ( word->CAttribute & ( OBJECT | T_BOOLEAN ) ) ) ) // same type "kind"
         {
             // infering that ...
@@ -153,7 +154,7 @@ TSI_ShowTypeErrorStatus ( TSI *tsi )
 {
     CfrTil_ShowInfo ( tsi->OpWord, "apparent type mismatch", 0 ) ;
     TSI_TypeStatus_Print ( tsi ) ;
-    if ( _Q_->Verbosity > 1 )
+    if (( _Q_->Verbosity > 1 ) || GetState ( _CfrTil_, DBG_TYPESTACK_ON )) 
     {
         CfrTil_TypeStackPrint ( ) ;
         Pause ( ) ;
@@ -380,6 +381,15 @@ CfrTil_TypeStack_Pop ( )
         return tword ;
     }
 
+}
+
+Word *
+CfrTil_TypeStack_Drop ( )
+{
+    if ( GetState ( _CfrTil_, TYPECHECK_ON ) && Stack_Depth ( _CfrTil_->TypeWordStack ) )
+    {
+        _Stack_Drop ( _CfrTil_->TypeWordStack ) ;    
+    }
 }
 
 void

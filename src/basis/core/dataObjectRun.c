@@ -84,7 +84,7 @@ _Namespace_Do_C_Type ( Namespace * ns )
                 Compiler_Init ( compiler, 0, 0 ) ; //compiler->State ) ;
                 CfrTil_InitSourceCode_WithName ( _CfrTil_, ns->Name, 1 ) ;
             }
-            CfrTil_WordList_Init ( _CfrTil_, 0, 1 ) ;
+            CfrTil_WordList_Init ( 0, 1 ) ;
             Compiler_Get_C_BackgroundNamespace ( compiler ) ;
             if ( GetState ( cntx, C_SYNTAX ) )
             {

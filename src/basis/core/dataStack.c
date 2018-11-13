@@ -23,6 +23,7 @@ DataStack_Dup ( )
 {
     _Dsp_ [ 1 ] = _Dsp_[0] ;
     _Dsp_ ++ ;
+    CfrTil_TypeStack_Dup ( ) ;
 }
 
 void
@@ -35,6 +36,7 @@ void
 DataStack_Drop ( )
 {
     _Dsp_ -- ;
+    CfrTil_TypeStack_Drop ( ) ;
 }
 
 inline int64

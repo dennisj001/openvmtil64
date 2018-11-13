@@ -39,8 +39,7 @@ _CfrTil_Init_SessionCore ( CfrTil * cfrTil, int64 cntxDelFlag, int64 promptFlag 
     cfrTil->ScWord = 0 ;
     SetState ( cfrTil, SOURCE_CODE_ON, true ) ;
     _CfrTil_TypeStackReset ( ) ;
-    ///_CfrTil_RecycleInit_Compiler_N_M_Node_WordList ( 0 ) ; // we *should* be able to recycle ?? why not ??
-    List_Init ( _CfrTil_->Compiler_N_M_Node_WordList ) ; // we *should* be able to recycle ?? why not ??
+    _CfrTil_RecycleInit_Compiler_N_M_Node_WordList ( 1 ) ;
 }
 
 void

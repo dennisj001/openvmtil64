@@ -40,7 +40,7 @@ sp
 : lt10 ( n ) n not p ;
 sp  
 1 lt10 0 lt10
-: tnot ( n -- n ) n @ not dup n store n @ p ;
+: tnot ( n -- n ) n @ not dup n store n @ p ; "I.I" typeSignature
 ' tnot find wdiss //pause
 1 not 0 "tnot1_assert" assert
 0 not 1 "tnot2_assert" assert

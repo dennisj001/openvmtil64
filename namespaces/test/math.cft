@@ -83,11 +83,11 @@ nl 2 3 moe3 2 "moe3_assert1" assert nl 5 7 moe3 5 "moe3_assert2" assert
 #endif
 sp
 nl : t64bitAdd ( n m -- TOS ) n @ m @ + ; hex 0x100000000 2 t64bitAdd 0x100000002 _assert
-: t64bitAdd2 ( n m -- TOS ) 0x100000000 n @ + m @ + ; 
+: t64bitAdd2 ( n m -- TOS ) 0x100000000 n @ + m @ + ; "II.I" typeSignature
 't64bitAdd2 find wdiss
 hex 1 2 t64bitAdd2 0x100000003 "t64bitAdd2_assert" assert 
 nl : t64bitSub ( n m -- TOS ) n @ m @ - dup p ; hex 0x100000002 0x100000000 t64bitSub 2 _assert
-: t64bitSub2 ( n m -- TOS ) 0x100000003 n @ - m @ - ; 
+: t64bitSub2 ( n m -- TOS ) 0x100000003 n @ - m @ - ; "II.I" typeSignature
 't64bitSub2 find wdiss 
 2 1 t64bitSub2 0x100000000 hex "t64bitSub2_assert" assert 
 : t64bitSub3 ( n m -- TOS ) 0x100000004 n @ - m @ - ; 

@@ -4,6 +4,7 @@
 sp
 optimizeOn inlineOn 
 //typecheckOn
+t:
 lispOff
 bnOff 
 // optimizeOff inlineOff
@@ -182,7 +183,8 @@ fibPTC2? ( REG n | REG fn, REG fn1, REG fn2 )
 }
 c_syntaxOff
 User
-typecheckOff
+//typecheckOff
+
 #if 1
 reps 20000 =
 "factorial" ffx
@@ -238,7 +240,7 @@ c_syntaxOff
 : pow ( base power | out ) { out 1 = } { power @ 0 > } { power power @ 1 - = } { out out @ base @ * = } for return out ;
 "pow" ffx2
 //"cpow" ffx2
-typecheckOff
+//typecheckOff
 Int
 "**" ffx2
 "pow_03" ffx2

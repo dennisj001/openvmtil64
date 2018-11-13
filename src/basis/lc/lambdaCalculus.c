@@ -515,7 +515,8 @@ _LC_Init ( LambdaCalculus * lc )
 void
 LC_Delete ( LambdaCalculus * lc )
 {
-    CfrTil_RecycleInit_SourceCode_WordList ( 0 ) ;
+    //CfrTil_RecycleInit_SourceCode_WordList ( 0 ) ;
+    CfrTil_WordList_Init ( 0, 0 ) ;
     if ( lc )
     {
         LC_ClearTempNamespace ( ) ;
