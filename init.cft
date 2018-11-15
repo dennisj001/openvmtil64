@@ -1,12 +1,12 @@
 5 // stack checking marker
-typecheckOn
+typecheckOn 
 : sp ; //stack pause ; 
 //verbosity 0 = 
 // logOn
 verbosity 1 = 
 Debug
 : d: _dbgOn dbgSourceCodeOn ; immediate debugWord // a debugWord has special behavior : doesn't interfere with optimization
-: t: dbgTypecheckOn ;
+: t: dbgTypecheckOn ; //t: 
 : ;t dbgTypecheckOff ;
 "OptimizeOn" variable
 OptimizeOn 1 = 
@@ -267,7 +267,7 @@ dscOn //verbosity 3 =
 : debugTest 1 2 + p debugTest1 ;
 : _assert1 ( n m str ) { debugTest n @ m @ != } { str @ ps "error" ps _info _pause } if ;
 #else
-d: : _assert1 ( n m str ) { n @ m @ != } { str @ ps "error" ps _info stack _pause } d: if ;
+: _assert1 ( n m str ) { n @ m @ != } { str @ ? ( ps ) : ( drop ) "error" ps _info stack _pause } if ;
 ' _assert1 find wdiss //pause
 #endif
 : _assert0 ( n m ) { n @ m @ != } { nl location hex n @ p "!=" ps m @ p "<:" ps "Error!" adps _info _pause } { } ifElse ; //{ str @ ps " : ok\n" ps nl } ifElse ; // no "ok" with this word

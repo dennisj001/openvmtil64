@@ -267,7 +267,7 @@ Compiler_Optimizer_2Args_Or_WordArg1_Op ( Compiler * compiler )
     {
         Boolean rm = ( optInfo->wordArg2->CAttribute & REGISTER_VARIABLE ) ? optInfo->wordArg2->RegToUse : OREG ;
         if ( optInfo->opWord->CAttribute & CATEGORY_OP_OPEQUAL )
-        //if ( ( optInfo->opWord->CAttribute & ( CATEGORY_OP_STORE | CATEGORY_OP_EQUAL | CATEGORY_OP_OPEQUAL ) ) )
+            //if ( ( optInfo->opWord->CAttribute & ( CATEGORY_OP_STORE | CATEGORY_OP_EQUAL | CATEGORY_OP_OPEQUAL ) ) )
         {
             SetHere ( optInfo->wordArg1->Coding, 0 ) ;
             //setHere = optInfo->wordArg1->Coding ;
@@ -428,7 +428,7 @@ Setup_MachineCodeInsnParameters ( Compiler * compiler, Boolean direction, Boolea
         if ( ( optInfo->Optimize_Reg & REG_ON_BIT ) && ( ! forceSet ) ) optInfo->Optimize_Reg = ( optInfo->Optimize_Reg & 0xf ) ;
         optInfo->Optimize_Mod = mod ;
         optInfo->Optimize_Dest_RegOrMem = direction ;
-        if (( optInfo->opWord->CAttribute & CATEGORY_OP_1_ARG ) && (!(optInfo->wordArg2->CAttribute & REGISTER_VARIABLE))) rm = ACC ;
+        if ( ( optInfo->opWord->CAttribute & CATEGORY_OP_1_ARG ) && ( ! ( optInfo->wordArg2->CAttribute & REGISTER_VARIABLE ) ) ) rm = ACC ;
         optInfo->Optimize_Rm = CheckForRegisterVariable ( compiler, rm ) ;
         if ( ( optInfo->Optimize_Rm & REG_ON_BIT ) && ( ! forceSet ) ) optInfo->Optimize_Rm = ( optInfo->Optimize_Rm & 0xf ) ;
         optInfo->Optimize_Disp = disp ;

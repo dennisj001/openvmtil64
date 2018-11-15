@@ -145,6 +145,7 @@ CfrTil_Word_Create ( )
 {
     byte * name = ( byte* ) DataStack_Pop ( ) ;
     Word * word = Word_New ( name ) ;
+    CfrTil_WordList_Init ( word, 0 ) ; //nb! so we need to use source code debug before creating a new word
     DataStack_Push ( ( int64 ) word ) ;
 }
 

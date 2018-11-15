@@ -85,8 +85,11 @@ _CfrTil_DebugRuntimeBreakpoint ( )
         {
             debugger->DebugAddress += 3 ; // 3 : sizeof call rax insn
             SetState ( _Debugger_, ( DBG_AUTO_MODE | DBG_AUTO_MODE_ONCE ), false ) ;
-        } 
-        _Debugger_InterpreterLoop ( debugger ) ;
+        }
+        if ( ! sigsetjmp ( _Context_->JmpBuf0, 0 ) ) // used by CfrTil_DebugRuntimeBreakpoint
+        {
+            _Debugger_InterpreterLoop ( debugger ) ;
+        }
         SetState ( debugger, DBG_BRK_INIT | DBG_RUNTIME_BREAKPOINT | DEBUG_SHTL_OFF, false ) ;
     }
 }

@@ -51,7 +51,7 @@ _Compile_Divide ( Compiler * compiler, uint64 type )
     else if ( optFlag )
     {
         CompileOptimizeInfo * optInfo = compiler->OptInfo ; //Compiler_CheckOptimize may change the optInfo
-        Compile_MoveImm ( REG, RDX, 0, 0, 0, CELL ) ;
+        Compile_MoveImm (REG, RDX, 0, 0, CELL ) ;
 #if 0        
         if ( optInfo->OptimizeFlag & OPTIMIZE_IMM )
         {
@@ -74,7 +74,7 @@ _Compile_Divide ( Compiler * compiler, uint64 type )
         // 64 bit dividend EDX:R8 / srcReg
         // EDX holds high order bits
         _Compile_Move_StackN_To_Reg ( ACC, DSP, - 1 ) ;
-        Compile_MoveImm ( REG, RDX, 0, 0, 0, CELL ) ;
+        Compile_MoveImm (REG, RDX, 0, 0, CELL ) ;
         Compile_IDIV ( MEM, DSP, 0, 0, 0, 0, 0 ) ;
         _Compile_Stack_DropN ( DSP, 1 ) ;
         if ( type == MODULO ) reg = RDX ;
@@ -200,12 +200,12 @@ Compile_DivideEqual ( Compiler * compiler )
         if ( optFlag & OPTIMIZE_DONE ) return ;
         else if ( optFlag )
         {
-            Compile_MoveImm ( REG, RDX, 0, 0, 0, CELL ) ;
+            Compile_MoveImm (REG, RDX, 0, 0, CELL ) ;
             // Compile_IDIV( mod, rm, sib, disp, imm, size )
             if ( optInfo->OptimizeFlag & OPTIMIZE_IMM )
             {
                 //Compile_MoveImm ( int8 direction, int8 rm, int8 sib, int64 disp, int64 imm, int8 immSize )
-                Compile_MoveImm ( REG, OREG, 0, 0, optInfo->Optimize_Imm, CELL ) ;
+                Compile_MoveImm (REG, OREG, 0, optInfo->Optimize_Imm, CELL ) ;
                 //Compile_IDIV ( REG, R9D, 0, 0, 0, 0, 0 ) ;
                 Compile_IDIV ( REG, OREG, 0, 0, 0, 0, 0 ) ;
             }
@@ -220,7 +220,7 @@ Compile_DivideEqual ( Compiler * compiler )
         else
         {
             _Compile_Move_StackNRm_To_Reg ( ACC, DSP, - 1 ) ; // address of dividend is second on stack
-            Compile_MoveImm ( REG, RDX, 0, 0, 0, CELL ) ;
+            Compile_MoveImm (REG, RDX, 0, 0, CELL ) ;
             WordStack_SCHCPUSCA (0, 0) ;
             Compile_IDIV ( MEM, DSP, 0, 0, 0, 0, 0 ) ; // divisor is tos
             _Compile_Stack_Drop ( DSP ) ;

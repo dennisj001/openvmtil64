@@ -256,11 +256,13 @@ _Context_DoubleQuoteMacro ( Context * cntx )
         _CfrTil_StringMacros_Do ( lexer->TokenBuffer ) ;
     }
     Word * word = Lexer_ObjectToken_New ( lexer, String_New ( lexer->TokenBuffer, STRING_MEM ) ) ; 
+#if 0    
     if ( ! GetState ( cntx->Compiler0, LC_ARG_PARSING ) )  
     {
         SetHere ( CfrTil_WordList (0)->Coding, 1 ) ; 
         CfrTil_WordLists_PopWord ( ) ;
     }
+#endif    
     Interpreter_DoWord ( cntx->Interpreter0, word, - 1, - 1 ) ; 
 }
 

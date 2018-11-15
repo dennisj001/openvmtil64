@@ -30,7 +30,7 @@ void
 _Compile_SetStackN_WithObject ( Boolean stackReg, int64 n, int64 obj )
 {
     //_Compile_MoveImm ( int64 direction, int64 rm, int64 sib, int64 disp, int64 imm, int64 operandSize )
-    Compile_MoveImm ( MEM, stackReg, 0, n * CELL, obj, CELL ) ;
+    Compile_MoveImm (MEM, stackReg, n * CELL, obj, CELL ) ;
 }
 #if 1
 void
@@ -147,7 +147,7 @@ Compile_Pop_ToAcc_AndCall ( Boolean stackReg )
 void
 Compile_MoveImm_To_TOS ( Boolean stackReg, int64 imm, Boolean size )
 {
-    Compile_MoveImm ( MEM, stackReg, 0, 0, imm, size ) ;
+    Compile_MoveImm (MEM, stackReg, 0, imm, size ) ;
 }
 
 void

@@ -5,6 +5,56 @@
 //===================================================================================================================
 
 ListObject *
+_LO_Read ( LambdaCalculus * lc )
+{
+    Context * cntx = _Context_ ;
+    Lexer * lexer = cntx->Lexer0 ;
+    ListObject *l0, *lnew ;
+    byte * token ;
+    int64 scwi, qidFlag ;
+    if ( lc->ParenLevel ) // if ParenLevel == 0 we let LParen set up the list
+    {
+        lnew = LO_New ( LIST, 0 ) ;
+        lnew->State = lc->QuoteState ;
+    }
+    else lnew = 0 ;
+    SetState ( lc, LC_READ, true ) ;
+    d0 ( if ( Is_DebugModeOn ) LO_Debug_ExtraShow ( 0, 2, 0, ( byte* ) "\nEntering _LO_Read..." ) ) ;
+    do
+    {
+        token = _Lexer_ReadToken ( lexer, ( byte* ) " ,\n\r\t" ) ;
+        scwi = lexer->SC_Index ;
+        if ( Lexer_IsTokenQualifiedID ( lexer ) ) SetState ( cntx, CONTEXT_PARSING_QID, true ) ;
+        else SetState ( cntx, CONTEXT_PARSING_QID, false ) ;
+        qidFlag = GetState ( cntx, CONTEXT_PARSING_QID ) ;
+        if ( token )
+        {
+            if ( String_Equal ( ( char * ) token, ( byte * ) ")" ) )
+            {
+                lc->ParenLevel -- ;
+                break ;
+            }
+            else if ( l0 = LO_Read_DoToken ( lc, token, qidFlag, scwi ) )
+            {
+                if ( lnew )
+                {
+                    if ( ( l0->State & SPLICE ) || ( ( l0->State & UNQUOTE_SPLICE ) &&
+                        ( ! ( l0->State & QUOTED ) ) ) ) LO_SpliceAtTail ( lnew, LO_Eval ( lc, l0 ) ) ;
+                    else LO_AddToTail ( lnew, l0 ) ;
+                }
+                else lnew = l0 ;
+            }
+        }
+        else _SyntaxError ( "\n_LO_Read : Syntax error : no token?\n", QUIT ) ;
+    }
+    while ( lc->ParenLevel ) ;
+    SetState ( lc, LC_READ, false ) ;
+    SetState ( cntx->Finder0, QID, false ) ;
+    if ( ( ! lc->ParenLevel ) && ( ! GetState ( _Compiler_, LC_ARG_PARSING ) ) ) LC_FinishSourceCode ( ) ;
+    return lnew ;
+}
+
+ListObject *
 _LO_Read_DoWord ( LambdaCalculus * lc, Word * word, int64 qidFlag, int64 scwi )
 {
     Context *cntx = _Context_ ;
@@ -33,7 +83,7 @@ _LO_Read_DoWord ( LambdaCalculus * lc, Word * word, int64 qidFlag, int64 scwi )
     else
     {
         //DEBUG_SETUP ( word ) ;
-        if ( word && Is_DebugModeOn ) if ( _Debugger_PreSetup ( _Debugger_, word, 0, 1 ) ) return nil ;
+        //if ( word && Is_DebugModeOn ) if ( _Debugger_PreSetup ( _Debugger_, word, 0, 1 ) ) return nil ;
         if ( word->CAttribute & NAMESPACE_TYPE ) _DataObject_Run ( word ) ;
         l0 = DataObject_New ( T_LC_NEW, word, 0, word->CAttribute, word->CAttribute2,
             ( T_LISP_SYMBOL | word->LAttribute ), 0, word->Lo_Value, 0, - 1, scwi ) ;
@@ -83,7 +133,7 @@ ListObject *
 LO_Read_DoToken ( LambdaCalculus * lc, byte * token, int64 qidFlag, int64 scwi )
 {
     ListObject *l0 = 0 ;
-    d1 ( if ( Is_DebugOn ) _Printf ( ( byte * ) "\n_LO_Read : \'%s\' scwi = %d", token, scwi ) ) ;
+    //if ( Is_DebugOn ) _Printf ( ( byte * ) "\n_LO_Read : \'%s\' scwi = %d", token, scwi ) ;
     if ( String_Equal ( ( char * ) token, ( byte * ) "(" ) ) l0 = _LO_Read_DoLParen ( lc ) ;
     else if ( String_Equal ( ( char * ) token, ( byte * ) "/*" ) ) CfrTil_ParenthesisComment ( ) ;
     else if ( String_Equal ( ( char * ) token, ( byte * ) "//" ) ) CfrTil_CommentToEndOfLine ( ) ;
@@ -91,55 +141,6 @@ LO_Read_DoToken ( LambdaCalculus * lc, byte * token, int64 qidFlag, int64 scwi )
     return l0 ;
 }
 
-ListObject *
-_LO_Read ( LambdaCalculus * lc )
-{
-    Context * cntx = _Context_ ;
-    Lexer * lexer = cntx->Lexer0 ;
-    ListObject *l0, *lnew ;
-    byte * token ;
-    int64 scwi, qidFlag ;
-    if ( lc->ParenLevel ) // if ParenLevel == 0 we let LParen set up the list
-    {
-        lnew = LO_New ( LIST, 0 ) ;
-        lnew->State = lc->QuoteState ;
-    }
-    else lnew = 0 ;
-    SetState ( lc, LC_READ, true ) ;
-    d0 ( if ( Is_DebugModeOn ) LO_Debug_ExtraShow ( 0, 2, 0, ( byte* ) "\nEntering _LO_Read..." ) ) ;
-    do
-    {
-        token = _Lexer_ReadToken ( lexer, ( byte* ) " ,\n\r\t" ) ;
-        scwi = lexer->SC_Index ;
-        if ( Lexer_IsTokenQualifiedID ( lexer ) ) SetState ( cntx, CONTEXT_PARSING_QID, true ) ;
-        else SetState ( cntx, CONTEXT_PARSING_QID, false ) ;
-        qidFlag = GetState ( cntx, CONTEXT_PARSING_QID ) ;
-        if ( token )
-        {
-            if ( String_Equal ( ( char * ) token, ( byte * ) ")" ) )
-            {
-                lc->ParenLevel -- ;
-                break ;
-            }
-            else if ( l0 = LO_Read_DoToken ( lc, token, qidFlag, scwi ) )
-            {
-                if ( lnew )
-                {
-                    if ( ( l0->State & SPLICE ) || ( ( l0->State & UNQUOTE_SPLICE ) &&
-                        ( ! ( l0->State & QUOTED ) ) ) ) LO_SpliceAtTail ( lnew, LO_Eval ( lc, l0 ) ) ;
-                    else LO_AddToTail ( lnew, l0 ) ;
-                }
-                else lnew = l0 ;
-            }
-        }
-        else _SyntaxError ( "\n_LO_Read : Syntax error : no token?\n", QUIT ) ;
-    }
-    while ( lc->ParenLevel ) ;
-    SetState ( lc, LC_READ, false ) ;
-    SetState ( cntx->Finder0, QID, false ) ;
-    if ( ( ! lc->ParenLevel ) && ( ! GetState ( _Compiler_, LC_ARG_PARSING ) ) ) LC_FinishSourceCode ( ) ;
-    return lnew ;
-}
 // remember a Word is a ListObject 
 
 void

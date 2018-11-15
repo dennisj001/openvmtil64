@@ -177,7 +177,6 @@ _Word_New ( byte * name, uint64 ctype, uint64 ctype2, uint64 ltype, Boolean addT
 Word *
 Word_New ( byte * name )
 {
-    CfrTil_WordList_Init ( 0, 0 ) ;
     Word * word = _Word_New ( name, CFRTIL_WORD | WORD_CREATE, 0, 0, 1, 0, DICTIONARY ) ;
     return word ;
 }

@@ -5,6 +5,8 @@ void
 _DataObject_Run ( Word * word0 )
 {
     Context * cntx = _Context_ ;
+    //uint64 * dsp = _Dsp_, *tsp = _CfrTil_->TypeWordStack->StackPointer ;
+    
     Word * word = _Context_CurrentWord ( cntx ) ; // = word0 : set CurrentlyRunningWord with the DObject Compile_SetCurrentlyRunningWord_Call_TestRSP created word
     Word * ns = word0 ; // set CurrentlyRunningWord with the DObject Compile_SetCurrentlyRunningWord_Call_TestRSP created word
     cntx->Interpreter0->w_Word = word ; // for ArrayBegin : all literals are run here
@@ -45,6 +47,7 @@ _DataObject_Run ( Word * word0 )
         _Namespace_DoNamespace ( ns, 1 ) ; // namespaces are the only word that needs to run the word set DObject Compile_SetCurrentlyRunningWord_Call_TestRSP created word ??
     }
     else if ( word->CAttribute & ( CLASS | CLASS_CLONE ) ) _Namespace_DoNamespace ( word, 0 ) ;
+    //if (( _Dsp_ > dsp ) && (_CfrTil_->TypeWordStack->StackPointer <= tsp )) CfrTil_TypeStackPush ( word ) ;
 }
 
 void
@@ -281,6 +284,7 @@ CfrTil_Do_DynamicObject ( DObject * dobject0, Boolean reg )
     DObject * dobject = _CfrTil_Do_DynamicObject_ToReg ( dobject0, reg ) ;
     if ( CompileMode ) _Word_CompileAndRecord_PushReg ( dobject0, reg ) ;
     else DataStack_Push ( ( int64 ) & dobject->W_Value ) ; //& dobject->W_DObjectValue ) ; //dobject ) ;
+    CfrTil_TypeStackPush ( dobject ) ;
 }
 
 void
@@ -369,6 +373,7 @@ _CfrTil_Do_LispSymbol ( Word * word )
     // rvalue - rhs for stack var
     _Compile_Move_StackN_To_Reg ( ACC, FP, ParameterVarOffset ( word ) ) ;
     _Word_CompileAndRecord_PushReg ( word, ACC ) ;
+    CfrTil_TypeStackPush ( word ) ;
 }
 
 void

@@ -31,7 +31,7 @@ void Compile_Move_WithSib(Boolean rex, Boolean mod, Boolean reg, Boolean rm, Boo
 void Compile_Move_Reg_To_Rm(Boolean dstRmReg, Boolean srcReg, int64 rmRegDisp);
 void Compile_Move_Rm_To_Reg(Boolean dstReg, Boolean srcRmReg, int64 disp);
 void Compile_Move_Reg_To_Reg(Boolean dstReg, int64 srcReg);
-void Compile_MoveImm(Boolean direction, Boolean rm, Boolean sib, int64 disp, int64 imm, Boolean immSize);
+void Compile_MoveImm(Boolean direction, Boolean rm, int64 disp, int64 imm, Boolean immSize);
 void Compile_MoveImm_To_Reg(Boolean reg, int64 imm, Boolean immSize);
 void Compile_MoveImm_To_Mem(Boolean rm, int64 imm, Boolean immSize);
 void Compile_MoveMemValue_To_Reg(Boolean reg, byte *address, Boolean iSize);
@@ -1249,7 +1249,6 @@ void CfrTil_Lexer_SourceCodeOn(void);
 byte *_CfrTil_GetSourceCode(void);
 byte *_CfrTil_Finish_WordSourceCode(CfrTil *cfrtil, Word *word);
 void _CfrTil_RecycleInit_Compiler_N_M_Node_WordList(Boolean force);
-void CfrTil_RecycleInit_SourceCode_WordList(Word *scWord);
 void CfrTil_WordList_Init(Word *word, Boolean saveWord0);
 byte *CfrTil_FinishSourceCode(CfrTil *cfrtil, Word *word);
 void _CfrTil_UnAppendFromSourceCode_NChars(CfrTil *cfrtil, int64 nchars);

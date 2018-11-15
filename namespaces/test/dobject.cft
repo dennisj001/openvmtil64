@@ -17,7 +17,7 @@ o3.x @ 123 "object clone test3 : " assert1
 "o4" 'o3 find clone 
 o4.x @ 123 "object clone test4 : " assert1
 o4.ay @ 2 "object clone test5 : " assert1
-: ott o1.x.zzz 456 = o1.x.zzz @ ;
+: ott o1.x.zzz 456 = o1.x.zzz @ ; d: ".I" typeSignature
 ott 456 "object compile test6 : " assert1
 : ott2 ( n -- TOS ) o1.x.xxy n @ =  o1.x.zzx o1.x.xxy @ = o1.x.zzx @  ;
 987 dup ott2 "object compile test7 : " assert1    

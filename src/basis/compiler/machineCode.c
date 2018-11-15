@@ -500,7 +500,7 @@ _Compile_IMUL ( Boolean mod, Boolean reg, Boolean rm, Boolean sib, int64 disp, u
 void
 Compile_IMULI ( Boolean mod, Boolean reg, Boolean rm, Boolean sib, int64 disp, uint64 imm )
 {
-    int64 opCode = 0x69,  immSize ;
+    int64 opCode = 0x69, immSize ;
     if ( imm < 128 )
     {
         opCode |= 2 ;
@@ -589,22 +589,34 @@ Compile_Move_Reg_To_Reg ( Boolean dstReg, int64 srcReg )
 // reg : is address in case of MEMORY else it is the register (reg) value
 
 void
-Compile_MoveImm ( Boolean direction, Boolean rm, Boolean sib, int64 disp, int64 imm, Boolean immSize )
+Compile_MoveImm ( Boolean direction, Boolean rm, int64 disp, int64 imm, Boolean immSize )
 {
     Boolean reg = 0, mod = direction ;
     //if ( ( immSize == 8 ) || ( imm > 0xffffffff ) )
     {
-        if ( direction != TO_REG )
+        if ( direction == TO_REG )
         {
-            // there is no x64 instruction to move imm64 to mem directly
-            Boolean thruReg = THRU_REG ;
-            Compile_MoveImm_To_Reg ( thruReg, imm, immSize ) ; // thruReg : R8D : needs to be a parameter
-            Compile_Move_Reg_To_Rm ( rm, thruReg, disp ) ;
+            uint8 opCode = 0xb8 + ( rm & 7 ) ;
+            Compile_CalcWrite_Instruction_X64 ( 0, opCode, mod, reg, rm, IMM_B, 0, 0, 0, imm, immSize ) ;
         }
         else
         {
-            Boolean opCode = 0xb8 + ( rm & 7 ) ;
-            Compile_CalcWrite_Instruction_X64 ( 0, opCode, mod, reg, rm, IMM_B, 0, 0, 0, imm, immSize ) ;
+#if 1            
+            if ( ( immSize != CELL ) && ( imm < 0x100000000 ) ) //32 bit or less
+            {
+                DBI_ON ; 
+                //Compile_CalcWrite_Instruction_X64 ( uint8 opCode0, uint8 opCode1, Boolean mod, uint8 reg, Boolean rm, uint16 controlFlags, Boolean sib, uint64 disp, uint8 dispSize, uint64 imm, uint8 immSize )
+                Compile_CalcWrite_Instruction_X64 ( 0, 0xc7, MEM, 0, rm, (DISP_B | MODRM_B | IMM_B), 0, disp, 0, imm, 4 ) ;
+                DBI_OFF ;
+            }
+            else
+#endif                
+            {
+                // there is no x64 instruction to move imm64 to mem directly
+                Boolean thruReg = THRU_REG ;
+                Compile_MoveImm_To_Reg ( thruReg, imm, immSize ) ; // thruReg : R8D : needs to be a parameter
+                Compile_Move_Reg_To_Rm ( rm, thruReg, disp ) ;
+            }
         }
     }
 }
@@ -612,13 +624,13 @@ Compile_MoveImm ( Boolean direction, Boolean rm, Boolean sib, int64 disp, int64 
 void
 Compile_MoveImm_To_Reg ( Boolean reg, int64 imm, Boolean immSize )
 {
-    Compile_MoveImm ( REG, reg, 0, 0, imm, immSize ) ;
+    Compile_MoveImm ( REG, reg, 0, imm, immSize ) ;
 }
 
 void
 Compile_MoveImm_To_Mem ( Boolean rm, int64 imm, Boolean immSize )
 {
-    Compile_MoveImm ( MEM, rm, 0, 0, imm, immSize ) ;
+    Compile_MoveImm ( MEM, rm, 0, imm, immSize ) ;
 }
 
 void

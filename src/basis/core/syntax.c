@@ -241,12 +241,19 @@ CfrTil_C_ConditionalExpression ( )
     Interpret_Until_Token ( interp, ( byte* ) ":", 0 ) ;
     _Compile_UninitializedJump ( ) ;
     byte * ptrToOffsetEnd = Here - DISP_SIZE ;
-    _SetOffsetForCallOrJump ( ptrToOffsetElse, Here ) ;
-    byte * token = Interpret_C_Until_Token4 ( interp, ( byte* ) ";", ( byte* ) ",", ( byte* ) ")", 0, 0 ) ;
+    if ( GetState ( cntx, C_SYNTAX ) )
+    {
+        _SetOffsetForCallOrJump ( ptrToOffsetElse, Here ) ;
+        byte * token = Interpret_C_Until_Token4 ( interp, ( byte* ) ";", ( byte* ) ",", ( byte* ) ")", 0, 0 ) ;
+        DEBUG_SHOW ;
+        _CfrTil_PushToken_OnTokenList ( token ) ; // maybe conditionally push ??
+    }
+    else
+    {
+        _SetOffsetForCallOrJump ( ptrToOffsetElse, Here ) ;
+        Interpreter_InterpretNextToken ( interp ) ;
+    }
     _SetOffsetForCallOrJump ( ptrToOffsetEnd, Here ) ;
-    DEBUG_SHOW ;
-    //if ( String_Equal ( token, ")" ) ) 
-    _CfrTil_PushToken_OnTokenList ( token ) ; // maybe conditionally push ??
 }
 
 Boolean

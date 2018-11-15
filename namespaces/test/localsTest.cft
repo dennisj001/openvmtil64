@@ -141,6 +141,7 @@ decimal
 'goedel find wdiss
 nl "goedel :: " ps goedel sp
 : goedel2 { (| n ) n 2 = n @ 5 + dup 7 "goedel2_1_assert" assert p } ix { (| n ) n @ p n 3 = n @ 4 + dup p 7 "goedel2_2_assert" assert } ix ;
+'goedel2 find wdiss
 nl "goedel2 :: " ps goedel2 sp
 : sp s pause ;
 
@@ -163,9 +164,9 @@ nl "goedel2 :: " ps goedel2 sp
     } ix 
     n @ dup p // 9
 ; ".I" typeSignature
-"\ngoedel4 :: output should read : \n'junk' 2 'junk' 7 'junk' 7 7 9" ps //pause
 ' goedel4 find wdiss     
 9 goedel4 "goedel4_0_assert" assert //pause
+"\ngoedel4 :: output should have read : \n'junk' 2 'junk' 7 'junk' 7 7 9" ps //pause
 : goedel5 (| n -- TOS ) 
     nl "goedel5 :: " ps nl
     n 9 =
