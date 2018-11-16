@@ -119,7 +119,7 @@ CPrimitive CPrimitives [] = {
     { "_", 0, 0, 0, CfrTil_DropBlock, COMBINATOR | IMMEDIATE, 0, 0, "Combinators", "Root" },
     { "loop", 0, 0, 0, CfrTil_LoopCombinator, COMBINATOR | IMMEDIATE, 0, 0, "Combinators", "Root" },
     { "for", 0, 0, 0, CfrTil_ForCombinator, COMBINATOR | IMMEDIATE, 0, 0, "Combinators", "Root" },
-    { "?", 0, 0, 0, CfrTil_C_ConditionalExpression, IMMEDIATE, 0, 0, "Combinators", "Root" },
+    { "?", 0, 0, 0, CfrTil_C_ConditionalExpression, COMBINATOR | IMMEDIATE, 0, 0, "Combinators", "Root" },
 
     { "in", 0, 0, 0, CfrTil_PrintInNamespace, 0, 0, 0, "Namespace", "Root" },
     { "using", 0, 0, 0, CfrTil_Using, 0, 0, 0, "Namespace", "Root" },

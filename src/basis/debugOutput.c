@@ -473,7 +473,7 @@ _Debugger_ShowInfo ( Debugger * debugger, byte * prompt, int64 signal, int64 for
         if ( ( location == debugger->Filename ) && ( GetState ( debugger, DBG_FILENAME_LOCATION_SHOWN ) ) ) location = ( byte * ) "..." ;
         SetState ( debugger, DBG_FILENAME_LOCATION_SHOWN, true ) ;
         //Word * word = (debugger->LastShowWord == debugger->w_Word) ? debugger->w_Word : _Context_->CurrentEvalWord ; //_Context_->CurrentlyRunningWord ;
-        Word * word = _Context_->CurrentEvalWord ? _Context_->CurrentEvalWord : debugger->w_Word ? debugger->w_Word : Context_CurrentWord () ;
+        Word * word = debugger->w_Word ? debugger->w_Word : _Context_->CurrentEvalWord ? _Context_->CurrentEvalWord : Context_CurrentWord () ;
         byte * token0 = word ? word->Name : debugger->Token, *token1 ;
         if ( ( signal == 11 ) || _Q_->SigAddress )
         {

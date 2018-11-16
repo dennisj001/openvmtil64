@@ -32,7 +32,7 @@ Context_Location ( )
 Word *
 _Context_CurrentWord ( Context * cntx )
 {
-    return cntx->CurrentlyRunningWord ?  cntx->CurrentlyRunningWord : _Context_->LastRunWord ? _Context_->LastRunWord : cntx->CurrentTokenWord ;
+    return cntx->CurrentlyRunningWord ?  cntx->CurrentlyRunningWord : _Context_->CurrentEvalWord ? _Context_->CurrentEvalWord : _Context_->LastRunWord ? _Context_->LastRunWord : cntx->CurrentTokenWord ;
 }
 
 Word *
@@ -244,8 +244,7 @@ _Context_DoubleQuoteMacro ( Context * cntx )
     do
     {
         lexer->TokenInputByte = ReadLine_NextChar ( rl ) ;
-        if ( lexer->TokenInputByte == '\\' )
-            _BackSlash ( lexer, 1 ) ;
+        if ( lexer->TokenInputByte == '\\' ) _BackSlash ( lexer, 1 ) ;
         else Lexer_Append_ConvertedCharacterToTokenBuffer ( lexer ) ;
     }
     while ( lexer->TokenInputByte != '"' ) ;
