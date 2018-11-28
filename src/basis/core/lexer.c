@@ -474,9 +474,18 @@ Lexer_MakeItTheNextToken ( Lexer * lexer )
 void
 TerminatingMacro ( Lexer * lexer )
 {
+#if 0
+    if ( Lexer_LastChar ( lexer ) == 't' )
+    {
+        Lexer_Default ( lexer ) ;
+        Lexer_FinishTokenHere ( lexer ) ;
+        return ;
+    }
+    if ( ( ReadLine_PeekNextChar ( lexer->ReadLiner0 ) == 't' ) && (lexer->TokenInputByte == ')') ) { Lexer_Default ( lexer ) ; return ; }
+#endif    
     if ( ( ! lexer->TokenWriteIndex ) || ( Lexer_LastChar ( lexer ) == '_' ) ) Lexer_Default ( lexer ) ; // allow for "_(" token 
     else ReadLine_UnGetChar ( lexer->ReadLiner0 ) ; // so NextChar will have this TokenInputCharacter for the next token
-    Lexer_FinishTokenHere ( lexer ) ;
+    Lexer_FinishTokenHere ( lexer ) ; // after appending the terminating macro char
     return ;
 }
 
@@ -904,13 +913,13 @@ CfrTil_LexerTables_Setup ( CfrTil * cfrtl )
     cfrtl->LexerCharacterTypeTable [ '-' ].CharFunctionTableIndex = 2 ;
     cfrtl->LexerCharacterTypeTable [ '>' ].CharFunctionTableIndex = 3 ;
     cfrtl->LexerCharacterTypeTable [ '.' ].CharFunctionTableIndex = 4 ;
+    cfrtl->LexerCharacterTypeTable [ '"' ].CharFunctionTableIndex = 5 ;
     cfrtl->LexerCharacterTypeTable [ '\n' ].CharFunctionTableIndex = 6 ;
     cfrtl->LexerCharacterTypeTable [ '\\' ].CharFunctionTableIndex = 7 ;
     cfrtl->LexerCharacterTypeTable [ eof ].CharFunctionTableIndex = 8 ;
     cfrtl->LexerCharacterTypeTable [ '\r' ].CharFunctionTableIndex = 9 ;
     cfrtl->LexerCharacterTypeTable [ ',' ].CharFunctionTableIndex = 10 ;
 
-    cfrtl->LexerCharacterTypeTable [ '"' ].CharFunctionTableIndex = 5 ;
     //cfrtl->LexerCharacterTypeTable [ '{' ].CharFunctionTableIndex = 11 ; 
     //cfrtl->LexerCharacterTypeTable [ '}' ].CharFunctionTableIndex = 11 ;
     cfrtl->LexerCharacterTypeTable [ '[' ].CharFunctionTableIndex = 11 ;
@@ -925,6 +934,7 @@ CfrTil_LexerTables_Setup ( CfrTil * cfrtl )
 
     cfrtl->LexerCharacterTypeTable [ '$' ].CharFunctionTableIndex = 12 ;
     cfrtl->LexerCharacterTypeTable [ '#' ].CharFunctionTableIndex = 12 ;
+    
     cfrtl->LexerCharacterTypeTable [ '/' ].CharFunctionTableIndex = 14 ;
     cfrtl->LexerCharacterTypeTable [ ';' ].CharFunctionTableIndex = 15 ;
     cfrtl->LexerCharacterTypeTable [ '&' ].CharFunctionTableIndex = 16 ;
@@ -945,7 +955,7 @@ CfrTil_LexerTables_Setup ( CfrTil * cfrtl )
 
     cfrtl->LexerCharacterFunctionTable [ 11 ] = TerminatingMacro ;
     cfrtl->LexerCharacterFunctionTable [ 12 ] = NonTerminatingMacro ;
-    cfrtl->LexerCharacterFunctionTable [ 13 ] = SingleEscape ;
+    //cfrtl->LexerCharacterFunctionTable [ 13 ] = SingleEscape ;
     cfrtl->LexerCharacterFunctionTable [ 14 ] = ForwardSlash ;
     cfrtl->LexerCharacterFunctionTable [ 15 ] = Semi ;
     cfrtl->LexerCharacterFunctionTable [ 16 ] = AddressOf ;

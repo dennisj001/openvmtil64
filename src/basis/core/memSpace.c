@@ -373,7 +373,7 @@ void
 NBA_Show ( NamedByteArray * nba, int64 flag )
 {
     byte * name = nba->NBA_Symbol.S_Name ;
-    if ( _Q_->Verbosity > 1 ) _Printf ( ( byte* ) "\n%-27s type = %8lu Used = " INT_FRMT_9 " : Unused = " INT_FRMT_9, name, ( uint64 ) nba->NBA_AAttribute, nba->MemAllocated - nba->MemRemaining, nba->MemRemaining ) ;
+    if ( _Q_->Verbosity > 1 ) _Printf ( ( byte* ) "\n%-27s type = %8lu InUse = " INT_FRMT_9 " : Unused = " INT_FRMT_9, name, ( uint64 ) nba->NBA_AAttribute, nba->MemAllocated - nba->MemRemaining, nba->MemRemaining ) ;
     else _Printf ( ( byte* ) "\n%-43s Used = " INT_FRMT_9 " : Unused = " INT_FRMT_9, name, nba->MemAllocated - nba->MemRemaining, nba->MemRemaining ) ;
     if ( flag )
     {
@@ -403,8 +403,8 @@ NBA_AccountRemainingAndShow ( NamedByteArray * nba, Boolean flag )
     }
     if ( flag )
     {
-        if ( _Q_->Verbosity > 1 ) _Printf ( ( byte* ) "\n%-27s type = %8lu Used = " INT_FRMT_9 " : Unused = " INT_FRMT_9, name, ( uint64 ) nba->NBA_AAttribute, nba->MemAllocated - nba->MemRemaining, nba->MemRemaining ) ;
-        else _Printf ( ( byte* ) "\n%-43s Used = " INT_FRMT_9 " : Unused = " INT_FRMT_9, name, nba->MemAllocated - nba->MemRemaining, nba->MemRemaining ) ;
+        if ( _Q_->Verbosity > 1 ) _Printf ( ( byte* ) "\n%-27s type = %8lu InUse = " INT_FRMT_9 " : Unused = " INT_FRMT_9, name, ( uint64 ) nba->NBA_AAttribute, nba->MemAllocated - nba->MemRemaining, nba->MemRemaining ) ;
+        else _Printf ( ( byte* ) "\n%-43s InUse = " INT_FRMT_9 " : Unused = " INT_FRMT_9, name, nba->MemAllocated - nba->MemRemaining, nba->MemRemaining ) ;
     }
 }
 
@@ -486,9 +486,9 @@ Calculate_TotalNbaAccountedMemAllocated ( OpenVmTil * ovt, int64 flag )
     {
         int64 dsu = DataStack_Depth ( ) * sizeof (int64 ) ;
         int64 dsa = ( STACK_SIZE * sizeof (int64 ) ) - dsu ;
-        _Printf ( ( byte* ) "\nData Stack                                  Used = %9d : Unused = %9d", dsu, dsa ) ;
+        _Printf ( ( byte* ) "\nData Stack                                  InUse = %9d : Unused = %9d", dsu, dsa ) ;
     }
-    printf ( "\nTotal Accounted Mem                         Used = %9ld : Unused = %9ld",
+    printf ( "\nTotal Accounted Mem                         InUse = %9ld : Unused = %9ld",
         ovt->TotalNbaAccountedMemAllocated - ovt->TotalNbaAccountedMemRemaining, ovt->TotalNbaAccountedMemRemaining ) ;
     fflush ( stdout ) ;
 }
@@ -558,11 +558,11 @@ _OVT_ShowMemoryAllocated ( OpenVmTil * ovt )
     }
     else
     {
-        _Printf ( ( byte* ) "\nTotal Memory Allocated                           = %9d"
-            "\nTotal Memory leaks                               = %9d", ovt->TotalNbaAccountedMemAllocated, leak ) ;
+        _Printf ( ( byte* ) "\nTotal Memory Allocated                            = %9d"
+            "\nTotal Memory leaks                                = %9d", ovt->TotalNbaAccountedMemAllocated, leak ) ;
     }
     int64 wordSize = ( sizeof ( Word ) + sizeof ( WordData ) ) ;
-    _Printf ( ( byte* ) "\nRecycledWordCount = %5d x %3d bytes : Recycled = %9d", _Q_->MemorySpace0->RecycledWordCount, wordSize, _Q_->MemorySpace0->RecycledWordCount * wordSize ) ;
+    _Printf ( ( byte* ) "\nRecycledWordCount = %5d x %3d bytes : Recycled  = %9d", _Q_->MemorySpace0->RecycledWordCount, wordSize, _Q_->MemorySpace0->RecycledWordCount * wordSize ) ;
     Buffer_PrintBuffers ( ) ;
 }
 

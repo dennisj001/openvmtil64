@@ -337,18 +337,6 @@ CfrTil_DbgSourceCodeEndBlock ( )
 }
 
 void
-CfrTil_DbgTypecheckOff ( )
-{
-    SetState ( _CfrTil_, DBG_TYPECHECK_ON, false ) ;
-}
-
-void
-CfrTil_DbgTypecheckOn ( )
-{
-    SetState ( _CfrTil_, DBG_TYPECHECK_ON, true ) ;
-}
-
-void
 CfrTil_DbgSourceCodeOff ( )
 {
     //SetState ( _CfrTil_, GLOBAL_SOURCE_CODE_MODE, false ) ;

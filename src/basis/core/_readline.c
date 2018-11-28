@@ -97,14 +97,12 @@ void
 ReadLine_PushChar ( ReadLiner * rl, byte c )
 {
     rl->InputLine [ rl->ReadIndex ] = c ;
-    //rl->InputLine [ rl->ReadIndex ] = 0 ;
 }
 
 void
 _ReadLine_ShowCharacter ( ReadLiner * rl, byte chr )
 {
-    if ( GetState ( rl, CHAR_ECHO ) ) 
-        putc ( ( char ) chr, rl->OutputFile ) ;
+    if ( GetState ( rl, CHAR_ECHO ) ) putc ( ( char ) chr, rl->OutputFile ) ;
 }
 
 void
@@ -116,12 +114,7 @@ ReadLine_ShowCharacter ( ReadLiner * rl )
 void
 _ReadLine_SetMaxEndPosition ( ReadLiner * rl )
 {
-    //if ( overrideFlag ) rl->MaxEndPosition = rl->EndPosition ;
-    if ( rl->EndPosition > rl->MaxEndPosition )
-    {
-        rl->MaxEndPosition = rl->EndPosition ;
-    }
-    //if ( rl->MaxEndPosition > 80 ) rl->MaxEndPosition = 80 ; // 80 : should be console char width
+    if ( rl->EndPosition > rl->MaxEndPosition ) rl->MaxEndPosition = rl->EndPosition ;
 }
 
 void

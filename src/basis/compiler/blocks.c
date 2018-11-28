@@ -185,6 +185,7 @@ _CfrTil_BeginBlock1 ( BlockInfo * bi )
         bi->LocalFrameStart = Here ; // before _Compile_AddLocalFrame
         _Compiler_AddLocalFrame ( compiler ) ; // cf EndBlock : if frame is not needed we use BI_Start else BI_FrameStart -- ?? could waste some code space ??
         if ( compiler->NumberOfRegisterArgs ) Compile_Init_RegisterParamenterVariables ( compiler ) ; // this function is called twice to deal with words that have locals before the first block and regular colon words
+        CfrTil_TypeStackReset ( ) ;
     }
     bi->AfterLocalFrame = Here ; // after _Compiler_AddLocalFrame and Compile_InitRegisterVariables
     return bi ;
@@ -272,7 +273,7 @@ _CfrTil_EndBlock2 ( BlockInfo * bi )
         Compiler_Init ( compiler, 0, 0 ) ;
     }
     else _Namespace_RemoveFromUsingListAndClear ( bi->LocalsNamespace ) ; //_Compiler_FreeBlockInfoLocalsNamespace ( bi, compiler ) ;
-    CfrTil_TypeStackReset ( ) ;    
+    CfrTil_TypeStackReset ( ) ;
     return first ;
 }
 

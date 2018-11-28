@@ -29,4 +29,4 @@ ott 456 "object compile test6 : " assert1
 123987 dup ott3 "object compile test8 : " assert1   
 sp 
 "DO_Experimental" notUsing
-2 + 7 assertStkChk // stack checking
+2 t{ + }t 7 assertStkChk // stack checking

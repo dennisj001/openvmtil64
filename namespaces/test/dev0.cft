@@ -74,7 +74,7 @@ tick fib find wdiss
 (define fib2 (lambda (n) (ifElse (< n 2) n (+ (fib2 (- n 1)) (fib2 (- n 2))))))
 (fib2 20)
 sp
-(if* 1 7 2)
+(if* 1 7 2) (if* 0 2 7)
 (+ 2 5)
 Lisp
 (define g ( /\ (a b c) (a b c) ) )
@@ -293,7 +293,6 @@ sp
 (h36 n09 my6 )
 "\n should show : ( kl0 op9 kl0 op9 kl0 kl0 op9 op9 )\n" ps
 sp
-( average 12 2 ) 
 
 // macro experiments
 ( define id (lambda ( x y ) ( x x y y )) )

@@ -83,5 +83,5 @@ bnInit ( 16 16 )
 sp
 bigNumOff
 Int
-2 + 7 assertStkChk // stack checking
+2 t{ + }t 7 assertStkChk // stack checking
 //pause

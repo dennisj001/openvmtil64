@@ -188,7 +188,7 @@ LO_Let ( ListObject * lfirst, ListObject * locals )
 }
 
 ListObject *
-_LO_Cons ( ListObject *first, ListObject * second, uint64 allocType )
+_LO_Cons ( ListObject *first, ListObject * second ) //, uint64 allocType )
 {
     ListObject * l0 = LO_New ( LIST, 0 ) ;
     LO_AddToTail ( l0->Lo_List, first ) ;
@@ -228,16 +228,16 @@ LO_Cond ( ListObject * l0, ListObject * locals )
         tfTestNode = _LO_Eval ( lc, tfTestNode, locals, 1 ) ;
         if ( ( tfTestNode != nil ) && ( *tfTestNode->Lo_PtrToValue ) )
         {
-            return _LO_Eval ( lc, trueNode, locals, 1 ) ;
+            return _LO_Eval ( lc, LO_CopyOne (trueNode), locals, 1 ) ;
         }
-            // nb we have to copy one here else we return the whole rest of the list 
+            // nb we have to LO_CopyOne here else we return the whole rest of the list 
             // and we can't remove it else it could break a LambdaBody, etc.
         else
         {
             tfTestNode = elseNode = _LO_Next ( trueNode ) ;
         }
     }
-    return _LO_Eval ( lc, elseNode, locals, 1 ) ; // last one no need to copy
+    return _LO_Eval ( lc, LO_CopyOne (elseNode), locals, 1 ) ; // last one no need to copy
 }
 
 // lisp 'list' function

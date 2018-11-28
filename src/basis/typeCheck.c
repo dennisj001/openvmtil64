@@ -189,7 +189,8 @@ TSI_ShowTypeErrorStatus ( TSI *tsi )
     if ( GetState ( _CfrTil_, DBG_TYPECHECK_ON ) )
     {
         CfrTil_TypeStackPrint ( ) ;
-        if ( _Q_->Verbosity > 1 ) Pause ( ) ;
+        //if ( _Q_->Verbosity > 1 ) 
+        Pause ( ) ;
         Warning ( "Apparent TypeMismatch : ", Context_Location ( ), 0 ) ;
     }
     //CfrTil_TypeStackReset ( ) ;
@@ -476,5 +477,17 @@ CfrTil_TypeCheckOff ( )
 {
     CfrTil_TypeStackReset ( ) ;
     SetState ( _CfrTil_, TYPECHECK_ON, false ) ;
+}
+
+void
+CfrTil_DbgTypecheckOff ( )
+{
+    SetState ( _CfrTil_, DBG_TYPECHECK_ON, false ) ;
+}
+
+void
+CfrTil_DbgTypecheckOn ( )
+{
+    SetState ( _CfrTil_, DBG_TYPECHECK_ON, true ) ;
 }
 

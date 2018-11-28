@@ -1,5 +1,5 @@
 #include "../include/cfrtil64.h"
-#define VERSION ((byte*) "0.876.200" ) 
+#define VERSION ((byte*) "0.877.000" ) 
 
 OpenVmTil * _Q_ ;
 
@@ -102,6 +102,7 @@ OpenVmTil_Delete ( OpenVmTil * ovt )
 #define _CFRTIL_SIZE (82 * K) // data stack included here
 #if USE_OpenVmTil_CalculateMemSpaceSizes
 // _OpenVmTil_CalculateMemSpaceSizes is convoluted and needs rework
+
 void
 _OpenVmTil_CalculateMemSpaceSizes ( OpenVmTil * ovt, int64 restartCondition, int64 totalMemSizeTarget )
 {
@@ -199,6 +200,16 @@ _OpenVmTil_CalculateMemSpaceSizes ( OpenVmTil * ovt, int64 restartCondition, int
 #endif
 
 void
+OVT_PrintStartupOptions ( OpenVmTil * ovt )
+{
+    _Printf ( ( byte* ) "\n\nOVT_GetStartupOptions :: ovt->Argv [0] = %s\n\n", ovt->Argv [0] ) ;
+    _Printf ( ( byte* ) "\n\nOVT_GetStartupOptions :: ovt->Argv [1] = %s\n\n", ovt->Argv [1] ) ;
+    _Printf ( ( byte* ) "\n\nOVT_GetStartupOptions :: ovt->Argv [2] = %s\n\n", ovt->Argv [2] ) ;
+    _Printf ( ( byte* ) "\n\nOVT_GetStartupOptions :: ovt->StartupFilename = %s\n\n", ovt->StartupFilename ) ;
+    //if ( ovt->Verbosity > 1 ) Pause ( ) ;
+}
+
+void
 OVT_GetStartupOptions ( OpenVmTil * ovt )
 {
     int64 i ;
@@ -215,13 +226,6 @@ OVT_GetStartupOptions ( OpenVmTil * ovt )
         }
         else if ( String_Equal ( "-e", ovt->Argv [ i ] ) ) ovt->StartupString = ( byte* ) ovt->Argv [ ++ i ] ;
     }
-    d0 (
-        _Printf ( ( byte* ) "\n\nOVT_GetStartupOptions :: ovt->Argv [0] = %s\n\n", ovt->Argv [0] ) ;
-        _Printf ( ( byte* ) "\n\nOVT_GetStartupOptions :: ovt->Argv [1] = %s\n\n", ovt->Argv [1] ) ;
-        _Printf ( ( byte* ) "\n\nOVT_GetStartupOptions :: ovt->Argv [2] = %s\n\n", ovt->Argv [2] ) ;
-        _Printf ( ( byte* ) "\n\nOVT_GetStartupOptions :: ovt->StartupFilename = %s\n\n", ovt->StartupFilename ) ;
-        Pause ( ) ;
-        ) ;
 }
 
 OpenVmTil *
@@ -231,23 +235,21 @@ _OpenVmTil_New ( OpenVmTil * ovt, int64 argc, char * argv [ ] )
     int64 restartCondition, exceptionsHandled ; //, startIncludeTries
     if ( ! ovt )
     {
-        restartCondition = INITIAL_START ; 
+        restartCondition = INITIAL_START ;
     }
     else restartCondition = FULL_RESTART ;
-
-
 #if 0
     startIncludeTries = ovt ? ovt->StartIncludeTries ++ : 0 ;
     if ( startIncludeTries < 2 )
     {
-        if ( ovt && ovt->OVT_Context && ovt->OVT_Context->ReadLiner0 && ovt->OVT_Context->ReadLiner0->Filename ) 
+        if ( ovt && ovt->OVT_Context && ovt->OVT_Context->ReadLiner0 && ovt->OVT_Context->ReadLiner0->Filename )
             strcpy ( errorFilename, ( char* ) ovt->OVT_Context->ReadLiner0->Filename ) ;
         else strcpy ( errorFilename, "Debug Context" ) ;
     }
     else errorFilename [ 0 ] = 0 ;
     //restartCondition = ( ovt && ( restartCondition || ( startIncludeTries < 2 ) ) ) ? ovt->RestartCondition : RESTART ;
     int64 ium = ovt ? ovt->OVT_InitialUnAccountedMemory : 0, ovtv = ovt ? ovt->Verbosity : 0 ;
-    if ( ovt && ( restartCondition < INITIAL_START ) && ( ovt->Restarts < 2 )) OpenVmTil_Delete ( ovt ) ;
+    if ( ovt && ( restartCondition < INITIAL_START ) && ( ovt->Restarts < 2 ) ) OpenVmTil_Delete ( ovt ) ;
     else if ( ovt )
     {
         printf ( ( byte* ) "\nUnable to reliably delete memory from previous system - rebooting into a new system. 'mem' for more detail on memory.\n" ) ;
@@ -264,7 +266,7 @@ _OpenVmTil_New ( OpenVmTil * ovt, int64 argc, char * argv [ ] )
 #endif        
     _Q_ = ovt = _OpenVmTil_Allocate ( ) ;
 
-    ovt->RestartCondition = restartCondition ; 
+    ovt->RestartCondition = restartCondition ;
     ovt->Argc = argc ;
     ovt->Argv = argv ;
     //ovt->SavedTerminalAttributes = savedTerminalAttributes ;
@@ -274,14 +276,14 @@ _OpenVmTil_New ( OpenVmTil * ovt, int64 argc, char * argv [ ] )
     int64 MIN_TotalMemSizeTarget = ( 300 * K ) ;
     if ( ovt->TotalMemSizeTarget < MIN_TotalMemSizeTarget ) ovt->TotalMemSizeTarget = MIN_TotalMemSizeTarget ;
     int64 totalMemSizeTarget = ( ovt->TotalMemSizeTarget < 5 * M ) ? ovt->TotalMemSizeTarget : - 1 ; // 0 or -1 : gets default values     
-    _OpenVmTil_CalculateMemSpaceSizes ( ovt, restartCondition, -1) ; //totalMemSizeTarget ) ;
+    _OpenVmTil_CalculateMemSpaceSizes ( ovt, restartCondition, - 1 ) ; //totalMemSizeTarget ) ;
 #else    
     ovt->BufferSpaceSize = 100 * K ; //35 * ( sizeof ( Buffer ) + BUFFER_SIZE ) ;
     ovt->StringSpaceSize = 100 * K ;
     ovt->MachineCodeSize = 300 * K ;
     ovt->DictionarySize = 100 * K ;
-    ovt->CfrTilSize = (23 * K) ;
-    ovt->OpenVmTilSize = (9 * K) ;
+    ovt->CfrTilSize = ( 23 * K ) ;
+    ovt->OpenVmTilSize = ( 9 * K ) ;
 #endif    
 
     _OpenVmTil_Init ( ovt, exceptionsHandled > 1 ) ; // try to keep history if we can
