@@ -383,7 +383,7 @@ CPrimitive CPrimitives [] = {
     { "inlineOn", 0, 0, 0, CfrTil_InlineOn, 0, 0, 0, "OpenVmTil", "Root" },
     { "debugOff", 0, 0, 0, CfrTil_DebugOff, 0, 0, 0, "OpenVmTil", "Root" },
     { "debugOn", 0, 0, 0, CfrTil_DebugOn, 0, 0, 0, "OpenVmTil", "Root" },
-    { "verbosity", ".I", 0, 0, OpenVmTil_Verbosity, IMMEDIATE|NAMESPACE_VARIABLE|T_INT, 0, 0, "OpenVmTil", "Root" },
+    { "verbosity", "V.I", 0, 0, OpenVmTil_Verbosity, IMMEDIATE|NAMESPACE_VARIABLE|T_INT, 0, 0, "OpenVmTil", "Root" },
     { "codeSize", 0, 0, 0, OpenVmTil_CodeSize, 0, 0, 0, "OpenVmTil", "Root" },
     { "objectsSize", 0, 0, 0, OpenVmTil_ObjectsSize, 0, 0, 0, "OpenVmTil", "Root" },
     { "compilerTempObjectsSize", 0, 0, 0, OpenVmTil_CompilerTempObjectsSize, 0, 0, 0, "OpenVmTil", "Root" },
@@ -514,7 +514,7 @@ CPrimitive CPrimitives [] = {
     { "_literal", 0, 0, 0, CfrTil_Literal, 0, 0, 0, "Compiler", "Root" },
     { "_end", 0, 0, 0, CfrTil_EndBlock, 0, BLOCK_DELIMITER, 0, "Compiler", "Root" },
     { "begin", 0, 0, 0, ( block ) CfrTil_BeginBlock, 0, BLOCK_DELIMITER, 0, "Compiler", "Root" },
-    { "Here", ".I", 0, 0, CfrTil_Here, CATEGORY_OP_STACK|T_INT, 0, 0, "Compiler", "Root" }, //anything that pushes it result onto the stack should be CATEGORY_OP !?
+    { "Here", "V.I", 0, 0, CfrTil_Here, CATEGORY_OP_STACK|T_INT, 0, 0, "Compiler", "Root" }, //anything that pushes it result onto the stack should be CATEGORY_OP !?
     { "code", 0, 0, 0, CfrTil_Code, 0, 0, 0, "Compiler", "Root" },
     { "_immediate", 0, 0, 0, CfrTil_Immediate, 0, 0, 0, "Compiler", "Root" },
     { "?immediate", 0, 0, 0, CfrTil_IsImmediate, INFIXABLE, 0, 0, "Compiler", "Root" },

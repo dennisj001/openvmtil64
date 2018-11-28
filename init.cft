@@ -345,11 +345,10 @@ OpenVmTil
 : lispOff "Lisp" notUsing "LispTemp" notUsing "LispDefines" notUsing ; //lcReset ;
 
 c_syntaxOff
-
+Root
 sp 
 : sh _sh ; prefix
 stringMacrosOn
-Root
 : testCfrTil "namespaces/ninit.cft" include ;
 : test testCfrTil ;
 #if 1 //! testPreviousVersion 
@@ -366,7 +365,7 @@ Root
 '_doDemo 0 const    
 'todo 0 const  
 dbgOff
-//dbgOn 
+dbgOn 
 #if Is_DebugOn 
 
 #if todo

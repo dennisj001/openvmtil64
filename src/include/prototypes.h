@@ -1429,6 +1429,7 @@ void TSI_ShowTypeErrorStatus(TSI *tsi);
 void TSI_UpdateActualTypeStackRecordingBuffer(TSI *tsi, Word *word, Boolean prefixWithSeparatorFlag);
 byte *Tsi_ExpandTypeLetterCode(byte typeCode, byte *buffer);
 void Word_TypeChecking_SetInfoForAnObject(Word *word);
+byte Word_DoesTypeSignatureShowAReturnValue(Word *word);
 int64 Word_TypeSignatureLength(Word *word, Boolean numberOfParametersOnly);
 byte *Word_TypeSignature(Word *word, byte *buffer);
 byte *Word_ExpandTypeLetterSignature(Word *word, Boolean parametersOnly);

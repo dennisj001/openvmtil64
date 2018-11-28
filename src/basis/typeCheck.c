@@ -166,7 +166,8 @@ CfrTil_Typecheck ( Word * opWord )
             TSI_TypeCheckAndInfer ( tsi ) ;
             if ( tsi->TypeErrorStatus ) TSI_ShowTypeErrorStatus ( tsi ) ;
         }
-        else if ( opWord->W_TypeSignatureString[0] == '.' ) CfrTil_TypeStackPush ( Context_CurrentWord ( ) ) ;
+        //else if ( ( opWord->W_TypeSignatureString[0] == '.' ) && ( opWord->W_TypeSignatureString[0] != 'V' ) ) CfrTil_TypeStackPush ( Context_CurrentWord ( ) ) ;
+        if ( Word_DoesTypeSignatureShowAReturnValue ( opWord ) ) CfrTil_TypeStackPush ( opWord ) ; //Context_CurrentWord ( ) ) ;
     }
 }
 
@@ -284,6 +285,18 @@ Word_TypeChecking_SetInfoForAnObject ( Word * word )
     Word * cwbc = _CfrTil_->CurrentWordBeingCompiled ;
     cwbc->W_TypeSignatureString [word->Index - 1] = 'O' ;
     cwbc->W_TypeObjectsNamespaces [word->Index - 1] = word->TypeNamespace ;
+}
+
+byte
+Word_DoesTypeSignatureShowAReturnValue ( Word * word )
+{
+    byte * ts = word->W_TypeSignatureString ;
+    int64 i, slts = Strlen ( ts ) ;
+    for ( i = 0 ; ( i > slts ) ; i ++ ) // -1 : 0 indexing byte array 
+    {
+        if ( ( ts[i] == '.' ) && ( ts[i+1] )  ) return ts[i+1] ; 
+    }
+    return false ;
 }
 
 int64
