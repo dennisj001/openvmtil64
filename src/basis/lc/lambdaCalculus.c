@@ -494,9 +494,10 @@ _LC_Init ( LambdaCalculus * lc )
     {
         _LC_ = lc ;
         lc->LispNamespace = Namespace_Find ( ( byte* ) "Lisp" ) ;
-        _LC_Init_Runtime ( lc ) ;
         lc->LispDefinesNamespace = Namespace_FindOrNew_SetUsing ( ( byte* ) "LispDefines", 0, 1 ) ;
         lc->LispTempNamespace = Namespace_FindOrNew_SetUsing ( ( byte* ) "LispTemp", 0, 1 ) ;
+        _LC_Init_Runtime ( lc ) ;
+        LC_ClearDefinesNamespace ( ) ;
         lc->OurCfrTil = _CfrTil_ ;
         int64 svds = GetState ( _CfrTil_, _DEBUG_SHOW_ ) ;
         int64 svsco = IsSourceCodeOn ;

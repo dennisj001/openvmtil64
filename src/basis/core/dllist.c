@@ -194,12 +194,29 @@ _dlnode_New ( uint64 allocType )
 }
 
 // toward the TailNode - after - next
-#define _dlnode_Next( node ) node ? node->afterNode : 0
 // toward the HeadNode - before - previous
 #define _dlnode_Previous( node ) node ? node->beforeNode : 0 
 #define Is_NotHeadOrTailNode( node ) ( node && _dlnode_Next ( node ) && _dlnode_Previous ( node ) ) ? node : 0
 #define Is_NotHeadNode( node ) ( node && _dlnode_Previous ( node ) ) ? node : 0
+#if 0
 #define Is_NotTailNode( node ) ( node && _dlnode_Next ( node ) ) ? node : 0
+#define _dlnode_Next( node ) node ? node->afterNode : 0
+#else
+
+dlnode *
+_dlnode_Next ( dlnode * anode )
+{
+    if ( anode && anode->afterNode ) return anode->afterNode ;
+    return 0 ;
+}
+
+dlnode *
+Is_NotTailNode ( dlnode * anode )
+{
+    if ( anode && _dlnode_Next ( anode ) ) return anode ;
+    return 0 ;
+}
+#endif
 
 // toward the TailNode
 
@@ -210,10 +227,10 @@ dlnode_Next ( dlnode * node )
     // don't return TailNode, return 0
     if ( node )
     {
-        if ( nextNode = _dlnode_Next ( node ))
+        if ( nextNode = _dlnode_Next ( node ) )
         {
             //if ( _dlnode_Next ( nextNode ) ) return nextNode ;
-            return Is_NotTailNode( nextNode ) ;
+            return Is_NotTailNode ( nextNode ) ;
         }
     }
     return 0 ;
@@ -228,10 +245,10 @@ dlnode_Previous ( dlnode * node )
     dlnode * prevNode ;
     if ( node )
     {
-        if ( prevNode = _dlnode_Previous ( node )) 
+        if ( prevNode = _dlnode_Previous ( node ) )
         {
             //if ( _dlnode_Previous ( prevNode ) ) return prevNode ;
-            return Is_NotHeadNode( prevNode ) ;
+            return Is_NotHeadNode ( prevNode ) ;
         }
     }
     return 0 ;
@@ -312,7 +329,7 @@ _dllist_Init ( dllist * list )
 }
 
 void
-dllist_Init ( dllist * list, dlnode * head, dlnode *tail )
+dllist_Init ( dllist * list, dlnode * head, dlnode * tail )
 {
     list->head = head ;
     list->tail = tail ;

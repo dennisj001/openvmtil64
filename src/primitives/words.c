@@ -296,7 +296,7 @@ CfrTil_Set_TypeSignature ( void )
 {
     byte * typeSignature = ( byte* ) DataStack_Pop ( ) ;
     Word * word = _CfrTil_->LastFinished_Word ; // nb! must be LastFinished_Word because the signature is a literal and it is the LastFinished_DObject
-    if ( word ) strncpy ( word->W_TypeSignature, typeSignature, 7 ) ;
+    if ( word ) strncpy ( word->W_TypeSignatureString, typeSignature, 7 ) ;
 }
 
 void

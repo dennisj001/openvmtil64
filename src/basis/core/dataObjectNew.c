@@ -98,12 +98,12 @@ DataObject_New ( uint64 type, Word * word, byte * name, uint64 ctype, uint64 cty
         }
         case PARAMETER_VARIABLE: case LOCAL_VARIABLE: case (PARAMETER_VARIABLE | REGISTER_VARIABLE ): case (LOCAL_VARIABLE | REGISTER_VARIABLE ):
         {
-            word = _Compiler_LocalWord (_Compiler_, name, ctype, 0, 0, DICTIONARY ) ;
+            word = _Compiler_LocalWord ( _Compiler_, name, ctype, 0, 0, DICTIONARY ) ;
             break ;
         }
         default: case (T_LISP_SYMBOL | PARAMETER_VARIABLE ): case (T_LISP_SYMBOL | LOCAL_VARIABLE ): // REGISTER_VARIABLE combinations with others in this case
         {
-            word = Compiler_LocalWord (_Compiler_, name, type, DICTIONARY ) ;
+            word = Compiler_LocalWord ( _Compiler_, name, type, DICTIONARY ) ;
             break ;
         }
     }
@@ -198,7 +198,7 @@ _Class_New ( byte * name, uint64 type, int64 cloneFlag )
         //ws->CAttribute |= NAMESPACE_VARIABLE ;
         _Context_->Interpreter0->ThisNamespace = ns ;
         Word *wt = _CfrTil_Variable_New ( ( byte* ) "this", size ) ; // start with size of the prototype for clone
-        wt->CAttribute |= THIS|OBJECT ;
+        wt->CAttribute |= THIS | OBJECT ;
     }
     else
     {
@@ -213,7 +213,7 @@ Word *
 _CfrTil_ClassField_New ( byte * token, Class * aclass, int64 size, int64 offset )
 {
     Word * word = _DObject_New ( token, 0, ( IMMEDIATE | OBJECT_FIELD | CPRIMITIVE ), 0, 0, OBJECT_FIELD, ( byte* ) _DataObject_Run, 0, 1, 0, DICTIONARY ) ;
-    word->ClassFieldTypeNamespace = aclass ;
+    word->TypeNamespace = aclass ;
     word->ObjectSize = size ;
     word->Offset = offset ;
 
@@ -228,7 +228,7 @@ _CfrTil_Variable_New ( byte * name, int64 value )
     Word * word ;
     if ( CompileMode )
     {
-        word = Compiler_LocalWord (_Compiler_, name, LOCAL_VARIABLE, DICTIONARY ) ;
+        word = Compiler_LocalWord ( _Compiler_, name, LOCAL_VARIABLE, DICTIONARY ) ;
         SetState ( _Compiler_, VARIABLE_FRAME, true ) ;
     }
     else word = _DObject_New ( name, value, ( NAMESPACE_VARIABLE | IMMEDIATE ), 0, 0, NAMESPACE_VARIABLE, ( byte* ) _DataObject_Run, 0, 1, 0, DICTIONARY ) ;
@@ -254,19 +254,19 @@ _CfrTil_Label ( byte * lname )
 }
 
 Word *
-_Compiler_LocalWord (Compiler * compiler, byte * name, int64 ctype, int64 ctype2, int64 ltype, int64 allocType ) // svf : flag - whether stack variables are in the frame
+_Compiler_LocalWord ( Compiler * compiler, byte * name, int64 ctype, int64 ctype2, int64 ltype, int64 allocType ) // svf : flag - whether stack variables are in the frame
 {
     Word *word ;
+    word = _DObject_New ( name, 0, ( ctype | IMMEDIATE ), ctype2, ltype, LOCAL_VARIABLE, ( byte* ) _DataObject_Run, 0, 1, 0, allocType ) ; //COMPILER_TEMP ) ; //allocType ) ; //SESSION ) ; //COMPILER_TEMP ) ;
+    if ( ctype & REGISTER_VARIABLE )
     {
-        word = _DObject_New ( name, 0, ( ctype | IMMEDIATE ), ctype2, ltype, LOCAL_VARIABLE, ( byte* ) _DataObject_Run, 0, 1, 0, allocType ) ; //COMPILER_TEMP ) ; //allocType ) ; //SESSION ) ; //COMPILER_TEMP ) ;
-        if ( ctype & REGISTER_VARIABLE ) 
-        {
-            compiler->NumberOfRegisterVariables ++ ; // ?? do in parse.c
-            if ( ctype & LOCAL_VARIABLE ) ++ compiler->NumberOfRegisterLocals ; else ++ compiler->NumberOfRegisterArgs ; 
-        }
-        else word->Index = ( ctype & LOCAL_VARIABLE ) ? ++ compiler->NumberOfNonRegisterLocals : ++ compiler->NumberOfNonRegisterArgs ; 
-        if ( ctype & LOCAL_VARIABLE ) ++ compiler->NumberOfLocals ; else ++ compiler->NumberOfArgs ; 
+        compiler->NumberOfRegisterVariables ++ ; // ?? do in parse.c
+        if ( ctype & LOCAL_VARIABLE ) ++ compiler->NumberOfRegisterLocals ;
+        else ++ compiler->NumberOfRegisterArgs ;
     }
+    else word->Index = ( ctype & LOCAL_VARIABLE ) ? ++ compiler->NumberOfNonRegisterLocals : ++ compiler->NumberOfNonRegisterArgs ;
+    if ( ctype & LOCAL_VARIABLE ) ++ compiler->NumberOfLocals ;
+    else ++ compiler->NumberOfArgs ;
     return word ;
 }
 

@@ -48,7 +48,7 @@ bnInit ( 16 16 )
 nl "64 ! = " ps 64 ! p nl 
 x 1000 ! =
 nl "1000 ! = " ps x @ fprint nl
-: aexp { dup 1 <= } { drop 1 } { dup -- aexp * } ifElse ;
+: aexp ( -t N.N ) { dup 1 <= } { drop 1 } { dup -- aexp * } ifElse ;
 'aexp find wdiss //sp
 : bexp ( n -- TOS ) { n @ 1 <= } { 1 } { n @ dup 1 - bexp * } ifElse ; 
 : bexp0 ( n -- TOS ) { n @ 1 <= } { 1 } { n @ dup -- bexp0 * } ifElse ; 

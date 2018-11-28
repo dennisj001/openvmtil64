@@ -160,7 +160,7 @@ gotNextToken:
 }
 
 void
-Compiler_TypedObjectInit ( Namespace * typeNamespace, Word * word )
+Compiler_TypedObjectInit (Word * word, Namespace * typeNamespace)
 {
     word->TypeNamespace = typeNamespace ;
     word->CAttribute |= typeNamespace->CAttribute ;
@@ -239,6 +239,12 @@ _CfrTil_Parse_LocalsAndStackVariables ( int64 svf, int64 lispMode, ListObject * 
                 svff = 0 ; // set stack variable flag to off -- no more stack variables ; begin local variables
                 continue ; // don't add a node to our temporary list for this token
             }
+            if ( String_Equal ( ( char* ) token, "-t" ) ) // for setting W_TypeSignatureString
+            {
+                token = _Lexer_LexNextToken_WithDelimiters ( lexer, 0, 1, 0, 1, LEXER_ALLOW_DOT ) ;
+                strncpy ( _CfrTil_->CurrentWordBeingCompiled->W_TypeSignatureString, token, 8 ) ;
+                continue ; // don't add a node to our temporary list for this token
+            }
             if ( String_Equal ( ( char* ) token, "--" ) ) // || ( String_Equal ( ( char* ) token, "|-" ) == 0 ) || ( String_Equal ( ( char* ) token, "|--" ) == 0 ) )
             {
                 if ( ! svf ) break ;
@@ -249,10 +255,7 @@ _CfrTil_Parse_LocalsAndStackVariables ( int64 svf, int64 lispMode, ListObject * 
                     continue ;
                 }
             }
-            if ( String_Equal ( ( char* ) token, ")" ) )
-            {
-                break ;
-            }
+            if ( String_Equal ( ( char* ) token, ")" ) ) break ;
             if ( Stringi_Equal ( ( char* ) token, "REG" ) || String_Equal ( ( char* ) token, "REGISTER" ) )
             {
                 regFlag = true ;
@@ -301,10 +304,7 @@ _CfrTil_Parse_LocalsAndStackVariables ( int64 svf, int64 lispMode, ListObject * 
                     word->RegToUse = RegOrder ( regToUseIndex ++ ) ;
                     if ( word->CAttribute & PARAMETER_VARIABLE )
                     {
-                        if ( ! compiler->RegisterParameterList )
-                        {
-                            compiler->RegisterParameterList = _dllist_New ( TEMPORARY ) ;
-                        }
+                        if ( ! compiler->RegisterParameterList ) compiler->RegisterParameterList = _dllist_New ( TEMPORARY ) ;
                         _List_PushNew_ForWordList ( compiler->RegisterParameterList, word, 1 ) ;
                         //compiler->NumberOfArgs ++ ;
                     }
@@ -313,7 +313,8 @@ _CfrTil_Parse_LocalsAndStackVariables ( int64 svf, int64 lispMode, ListObject * 
                 regFlag = false ;
                 if ( typeNamespace )
                 {
-                    Compiler_TypedObjectInit ( typeNamespace, word ) ;
+                    Compiler_TypedObjectInit (word, typeNamespace) ;
+                    Word_TypeChecking_SetInfoForAnObject ( word ) ;
                 }
                 typeNamespace = 0 ;
                 if ( String_Equal ( token, "this" ) ) word->CAttribute |= THIS ;
@@ -328,7 +329,6 @@ _CfrTil_Parse_LocalsAndStackVariables ( int64 svf, int64 lispMode, ListObject * 
     if ( returnVariable ) compiler->ReturnVariableWord = _Finder_FindWord_InOneNamespace ( _Finder_, localsNs, returnVariable ) ;
 
     _CfrTil_->InNamespace = saveInNs ;
-    //Compiler_WordList_RecycleInit ( compiler ) ;
     finder->FoundWord = 0 ;
     Lexer_SetTokenDelimiters ( lexer, svDelimiters, COMPILER_TEMP ) ;
     SetState ( compiler, VARIABLE_FRAME, true ) ;

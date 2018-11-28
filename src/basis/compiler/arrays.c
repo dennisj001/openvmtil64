@@ -170,6 +170,7 @@ Do_NextArrayToken ( byte * token, Word * arrayBaseObject, int64 objSize, Boolean
             else _DataStack_SetTop ( _DataStack_GetTop ( ) + increment ) ; // after each dimension : in the end we have one lvalue remaining on the stack
             if ( Is_DebugModeOn ) Word_PrintOffset ( word, increment, baseObject->AccumulatedOffset ) ;
         }
+        CfrTil_TypeStack_Pop ( ) ; // pop the index ; we want the object field type 
         if ( ! _Context_StringEqual_PeekNextToken ( cntx, ( byte* ) "[", 0 ) ) return 1 ; // breaks the calling function
         return 0 ;
     }

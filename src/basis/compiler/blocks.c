@@ -85,7 +85,7 @@ Compile_BlockLogicTest ( BlockInfo * bi ) // , byte * start )
             BI_Set_setTtnn ( bi, TTT_ZERO, NEGFLAG_ON, TTT_ZERO, NEGFLAG_OFF ) ;
         }
 #if 1        
-        else if (( bi->LogicCodeWord->CAttribute & CATEGORY_OP_1_ARG ) && ( bi->LogicCodeWord->CAttribute2 & LOGIC_NEGATE ))
+        else if ( ( bi->LogicCodeWord->CAttribute & CATEGORY_OP_1_ARG ) && ( bi->LogicCodeWord->CAttribute2 & LOGIC_NEGATE ) )
         {
             SetHere ( bi->LogicCodeWord->Coding, 1 ) ;
             Word_SetCodingHere_And_ClearPreviousUseOf_Here_SCA ( bi->LogicCodeWord, 0 ) ;
@@ -269,9 +269,10 @@ _CfrTil_EndBlock2 ( BlockInfo * bi )
         d1 ( if ( Is_DebugModeOn ) Debugger_Disassemble ( _Debugger_, ( byte* ) first, bi->CopiedSize, 1 ) ) ;
 #endif        
         CfrTil_TurnOffBlockCompiler ( ) ;
-        Compiler_Init (compiler, 0 , 0) ;
+        Compiler_Init ( compiler, 0, 0 ) ;
     }
     else _Namespace_RemoveFromUsingListAndClear ( bi->LocalsNamespace ) ; //_Compiler_FreeBlockInfoLocalsNamespace ( bi, compiler ) ;
+    CfrTil_TypeStackReset ( ) ;    
     return first ;
 }
 

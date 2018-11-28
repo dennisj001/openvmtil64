@@ -3,7 +3,7 @@
 : sp ; //s pause ; 
 sp
 optimizeOn inlineOn 
-//typecheckOn
+//typecheckOn 
 t:
 lispOff
 bnOff 
@@ -234,7 +234,7 @@ c_syntaxOff
 
 #if 1
 //s: pow ( base power | out -- TOS ) { out 1 = } { power @ 0 > } { power power @ 1 - = } { out out @ base @ * = } for return out @ ;s
-: pow ( base power | out ) { out 1 = } { power @ 0 > } { power power @ 1 - = } { out out @ base @ * = } for return out ;
+: pow ( base power | out -t II.I ) { out 1 = } { power @ 0 > } { power power @ 1 - = } { out out @ base @ * = } for return out ; //"II.I" typeSignature
 'pow find wdiss
 2 30 pow dup p  1073741824 _assert 
 : pow ( base power | out ) { out 1 = } { power @ 0 > } { power power @ 1 - = } { out out @ base @ * = } for return out ;

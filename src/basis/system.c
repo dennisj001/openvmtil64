@@ -434,7 +434,7 @@ _CfrTil_Source ( Word *word, int64 addToHistoryFlag )
                 _Printf ( ( byte* ) " : Word Source Code %s", wsc ? "on" : "off" ) ;
             }
             if ( word->Definition && word->S_CodeSize ) _Printf ( ( byte* ) "\nstarting at address : 0x%x -- code size = %d bytes", word->Definition, word->S_CodeSize ) ;
-            if ( word->W_TypeSignature[0] ) _Printf ( ( byte* ) "\nTypeSignature : %s", Word_ExpandTypeLetterSignature (word, 0) ) ;
+            if ( word->W_TypeSignatureString[0] ) _Printf ( ( byte* ) "\nTypeSignature : %s", Word_ExpandTypeLetterSignature (word, 0) ) ;
         }
     }
 }

@@ -188,6 +188,7 @@ DObject_SubObjectInit ( DObject * dobject, Word * parent )
     if ( parent->S_WAllocType == WORD_COPY_MEM ) parent = Word_Copy ( ( Word* ) parent, DICTIONARY ) ; // nb! : this allows us to
     Namespace_DoAddWord ( parent, dobject ) ;
     dobject->CAttribute |= parent->CAttribute ;
+    dobject->CAttribute2 |= T_ANY ;
     dobject->Slots = parent->Slots ;
     Namespace_SetState ( parent, USING ) ;
 }
@@ -195,7 +196,7 @@ DObject_SubObjectInit ( DObject * dobject, Word * parent )
 DObject *
 DObject_Sub_New ( DObject * proto, byte * name, uint64 category )
 {
-    DObject * dobject = _DObject_New ( name, 0, ( category | DOBJECT | IMMEDIATE ), 0, 0, DOBJECT, ( byte* ) _DataObject_Run, 0, 0, 0, DICTIONARY ) ;
+    DObject * dobject = _DObject_New ( name, 0, ( category | DOBJECT | IMMEDIATE ), T_ANY, 0, DOBJECT, ( byte* ) _DataObject_Run, 0, 0, 0, DICTIONARY ) ;
     DObject_SubObjectInit ( dobject, proto ) ;
     return dobject ;
 }
@@ -208,6 +209,7 @@ CfrTil_SetPropertiesAsDObject ( )
 {
     DObject * o = ( DObject * ) DataStack_Pop ( ) ;
     o->CAttribute |= DOBJECT ;
+    o->CAttribute2 |= T_ANY ;
 }
 
 DObject *

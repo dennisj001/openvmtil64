@@ -6,7 +6,6 @@ OpenVmTil_Verbosity ( )
 {
     if ( Compiling ) _Compile_Stack_Push ( DSP, ACC, ( int64 ) & _Q_->Verbosity ) ; //CfrTil_CompileAndRecord_Word0_PushReg ( ACC ) ; //_Compile_Stack_Push ( DSP, ( int64 ) & _Q_->Verbosity ) ;
     else DataStack_Push ( ( int64 ) & _Q_->Verbosity ) ;
-    CfrTil_TypeStackPush ( Context_CurrentWord ( ) ) ;
 }
 
 void

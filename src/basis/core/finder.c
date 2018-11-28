@@ -139,7 +139,7 @@ Finder_FindQualifiedIDWord ( Finder * finder, byte * token )
         }
         else if ( word->CAttribute & ( OBJECT_FIELD ) )
         {
-            Finder_SetQualifyingNamespace ( finder, word->ClassFieldTypeNamespace ) ;
+            Finder_SetQualifyingNamespace ( finder, word->TypeNamespace ) ;
         }
         else return word ;
         if ( Lexer_IsTokenForwardDotted ( _Context_->Lexer0 ) )

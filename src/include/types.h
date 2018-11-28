@@ -77,7 +77,7 @@ typedef struct _dllist
         dlnode * n_Before ;
     } ;
     node * n_CurrentNode ;
-} dllist, List ;
+} dllist ; //, list ;
 #define after_ptr n_After
 #define before_ptr n_Before
 #define head after_ptr
@@ -125,7 +125,7 @@ typedef struct
         } ;
         byte * n_unmap ;
     } ;
-} _DLNode, _Node, _listNode, _List ; // size : 3 x 64 bits
+} _DLNode, _Node, _ListNode, _DLList ; // size : 3 x 64 bits
 typedef struct
 {
     union
@@ -173,13 +173,8 @@ typedef struct
         _DLNode n_DLNode ;
         dobject n_dobject ;
     } ;
-    union
-    {
-        AttributeInfo n_Attributes ;
-        type n_type ; // for future dynamic types and dynamic objects 
-    } ;
-    uint64 n_SimpleType ;
-} DLNode, Node, listNode, list ;
+    AttributeInfo n_Attributes ;
+} DLNode, Node, ListNode, DLList, List ;
 
 #define afterNode n_After 
 #define beforeNode n_Before 
@@ -217,7 +212,6 @@ typedef struct _Identifier // _Symbol
     union // leave this here so we can add a ListObject to a namespace
     {
         struct _Identifier * S_ContainingNamespace ;
-        struct _Identifier * S_ClassFieldTypeNamespace ;
         struct _Identifier * S_ContainingList ;
         struct _Identifier * S_Prototype ;
     } ;
@@ -334,6 +328,13 @@ typedef struct location
     Word * LocationWord ;
     byte * LocationAddress ;
 } Location ;
+
+typedef union 
+{
+        byte TypeSignatureCodes [8] ;
+        Word * TypeNamespace ;
+} TypeSignatureInfo ;
+
 typedef struct _WordData
 {
     uint64 RunType ;
@@ -354,21 +355,17 @@ typedef struct _WordData
     int64 Offset ; // used by ClassField
     struct
     {
-        Boolean RegToUse ;
-        Boolean Opt_Rm ;
-        Boolean Opt_Reg ; //?? do we need something here
-        Boolean SrcReg ;
-        Boolean DstReg ;
-        Boolean RegFlags ; // future uses available here !!
+        uint8 RegToUse ;
+        uint8 Opt_Rm ;
+        uint8 Opt_Reg ; 
+        uint8 SrcReg ;
+        uint8 DstReg ;
+        uint8 RegFlags ; // future uses available here !!
         uint8 OpInsnGroup ;
         uint8 OpInsnCode ;
     } ;
-    union
-    {
-        byte * pb_TypeSignature ;
-        byte TypeSignature [8] ;
-        uint64 uint64_TypeSignature ;
-    } ;
+    byte TypeSignature [8] ;
+    Namespace * TypeObjectsNamespaces [7] ; // 7 : increase if need more than 7 objects as args
     union
     {
         dllist * LocalNamespaces ;
@@ -430,7 +427,6 @@ typedef struct _WordData
 #define Lo_ListProc S_WordData->ListProc
 #define Lo_ListFirst S_WordData->ListFirst
 #define ContainingNamespace S_ContainingNamespace
-#define ClassFieldTypeNamespace S_ClassFieldTypeNamespace
 #define ContainingList S_ContainingList
 #define Prototype S_Prototype
 #define W_SearchNumber W_Value2
@@ -441,9 +437,8 @@ typedef struct _WordData
 #define W_SC_MemSpaceRandMarker S_WordData->SourceCodeMemSpaceRandMarker
 #define W_OpInsnCode S_WordData->OpInsnCode 
 #define W_OpInsnGroup S_WordData->OpInsnGroup
-#define W_uint64_TypeSignature S_WordData->uint64_TypeSignature
-#define W_TypeSignature S_WordData->TypeSignature
-#define W_pb_TypeSignature S_WordData->pb_TypeSignature
+#define W_TypeSignatureString S_WordData->TypeSignature
+#define W_TypeObjectsNamespaces S_WordData->TypeObjectsNamespaces
 typedef struct
 {
     Symbol P_Symbol ;
@@ -1107,7 +1102,7 @@ typedef struct typeStatusInfo
 {
     Stack * TypeWordStack ;
     Word * OpWord, *WordBeingCompiled ;
-    int64 TypeStackDepth, OpWordTypeSignatureLength ;
+    int64 TypeStackDepth, OpWordFunctionTypeSignatureLength ;
     byte *OpWordTypeSignature, ExpandedTypeCodeBuffer [32], ActualTypeStackRecordingBuffer [128] ;
     Boolean TypeErrorStatus, OpWord_ReturnsACodedValue_Flag ;
     byte OpWordReturnSignatureLetterCode ;

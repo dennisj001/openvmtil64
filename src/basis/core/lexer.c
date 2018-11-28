@@ -121,7 +121,7 @@ Lexer_Init ( Lexer * lexer, byte * delimiters, uint64 state, uint64 allocType )
     {
         //if ( ! _Context_->DefaultDelimiterCharSet ) // ?? 
         Context_SetDefaultTokenDelimiters ( _Context_, ( byte* ) " \n\r\t", CONTEXT ) ;
-        lexer->DelimiterCharSet = _Context_->DefaultDelimiterCharSet ; 
+        lexer->DelimiterCharSet = _Context_->DefaultDelimiterCharSet ;
         lexer->TokenDelimiters = _Context_->DefaultTokenDelimiters ;
     }
     lexer->State = state & ( ~ LEXER_RETURN_NULL_TOKEN ) ;
@@ -236,7 +236,7 @@ Lexer_Token_New ( byte * token )
 }
 
 byte *
-_Lexer_NextNonDebugOrCommentTokenWord (Lexer * lexer, byte * delimiters, Boolean evalFlag, Boolean peekFlag )
+_Lexer_NextNonDebugOrCommentTokenWord ( Lexer * lexer, byte * delimiters, Boolean evalFlag, Boolean peekFlag )
 {
     byte * token ;
     Boolean debugOrComment ;
@@ -251,9 +251,9 @@ _Lexer_NextNonDebugOrCommentTokenWord (Lexer * lexer, byte * delimiters, Boolean
 }
 
 byte *
-_Lexer_PeekNextNonDebugTokenWord (Lexer * lexer, byte * delimiters, int64 evalFlag )
+_Lexer_PeekNextNonDebugTokenWord ( Lexer * lexer, byte * delimiters, int64 evalFlag )
 {
-    byte * token = _Lexer_NextNonDebugOrCommentTokenWord (lexer, delimiters, evalFlag, 0 ) ; // 0 : peekFlag off because we are reAdding it below
+    byte * token = _Lexer_NextNonDebugOrCommentTokenWord ( lexer, delimiters, evalFlag, 0 ) ; // 0 : peekFlag off because we are reAdding it below
     _CfrTil_PushToken_OnTokenList ( token ) ; // TODO ; list should instead be a stack
     return token ;
 }
@@ -265,7 +265,7 @@ Lexer_PeekNextNonDebugTokenWord ( Lexer * lexer, int64 evalFlag )
     if ( _AtCommandLine ( ) && Lexer_CheckIfDone ( lexer, LEXER_DONE ) ) return 0 ;
     else
     {
-        token = _Lexer_PeekNextNonDebugTokenWord (lexer, 0, evalFlag ) ;
+        token = _Lexer_PeekNextNonDebugTokenWord ( lexer, 0, evalFlag ) ;
     }
     return token ;
 }
@@ -717,6 +717,7 @@ Dot ( Lexer * lexer ) //  '.':
 {
     if ( ( Lexer_LastChar ( lexer ) != '/' ) && ( ! GetState ( lexer, LEXER_ALLOW_DOT ) ) ) //allow for lisp special char sequence "/." as a substitution for lambda
     {
+        SetState ( lexer, LEXER_ALLOW_DOT, false ) ;
         int64 i ;
         if ( ( ! GetState ( lexer, PARSING_STRING ) ) ) //&& ( ! GetState ( _Context_, CONTEXT_PARSING_QUALIFIED_ID ) ) ) // if we are not parsing a String ?
         {
@@ -727,19 +728,20 @@ Dot ( Lexer * lexer ) //  '.':
                     if ( ! isdigit ( lexer->TokenBuffer [ i ] ) )
                     {
                         ReadLine_UnGetChar ( lexer->ReadLiner0 ) ; // allow to read '.' as next token
-                        //_CfrTil_UnAppendFromSourceCode ( _CfrTil_, 1 ) ;
-                        SetState ( lexer, LEXER_DONE, true ) ;
-                        return ;
+                        //SetState ( lexer, LEXER_DONE, true ) ;
+                        //return ;
+                        break ;
                     }
                 }
             }
             else if ( ! isdigit ( ReadLine_PeekNextChar ( lexer->ReadLiner0 ) ) )
             {
                 Lexer_AppendCharacterToTokenBuffer ( lexer ) ;
-                SetState ( lexer, LEXER_DONE, true ) ;
-
-                return ;
+                //SetState ( lexer, LEXER_DONE, true ) ;
+                //return ;
             }
+            SetState ( lexer, LEXER_DONE, true ) ;
+            return ;
         }
     }
     Lexer_AppendCharacterToTokenBuffer ( lexer ) ;

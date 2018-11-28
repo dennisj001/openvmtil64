@@ -55,14 +55,14 @@ sp
 ' tnot3 find wdiss
 1 tnot3 0 _assert 
 sp
-: tAnd ( n m -- TOS ) n @ m @ && dup p ; 
+: tAnd ( n m -- TOS ) n @ m @ && dup p ; "II.I" typeSignature
 ' tAnd find wdiss
 1 0 tAnd 0 "1 0" assert 
 1 1 tAnd 1 "1 1" assert 
 0 0 tAnd 0 "0 0" assert 
 0 1 tAnd 0 "0 1" assert 
 sp
-: tNotAnd ( n m -- TOS ) n @ m @ not && dup p ; 
+: tNotAnd ( n m -- TOS ) n @ m @ not && dup p ; "II.I" typeSignature
 ' tNotAnd find wdiss
 1 0 tNotAnd 1 "tNotAnd1 1 0" assert 
 1 1 tNotAnd 0 "tNotAnd2 1 1" assert 

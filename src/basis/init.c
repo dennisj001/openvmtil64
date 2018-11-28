@@ -123,7 +123,7 @@ _CfrTil_CPrimitiveNewAdd ( const char * name, byte * pb_TypeSignature, uint64 op
     word->CAttribute2 = ctype2 ;
     word->W_OpInsnCode = opInsCode ;
     word->W_OpInsnGroup = opInsnGroup ;
-    if ( pb_TypeSignature ) strncpy ( ( char* ) &word->W_TypeSignature, ( char* ) pb_TypeSignature, 8 ) ;
+    if ( pb_TypeSignature ) strncpy ( ( char* ) &word->W_TypeSignatureString, ( char* ) pb_TypeSignature, 8 ) ;
 }
 
 void

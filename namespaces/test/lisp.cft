@@ -234,7 +234,7 @@ Debug Lisp // test comment
             n @ dup p 7 "goedel6_4_assert" assert 
         } ix // n should be garbage here
         n @ dup p
-    ;
+    ; ".I" typeSignature
     //' goedel6 find wdiss pause   
     9 goedel6 "goedel6_0_assert" assert
     "\ngoedel6 :: goedel6 output should read : \n'junk' 2 'junk' 7 7 'junk' 9" ps //pause

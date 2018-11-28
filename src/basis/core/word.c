@@ -24,7 +24,7 @@ Word_Eval ( Word * word )
         DEBUG_SETUP ( word ) ;
         if ( ! GetState ( word, STEPPED ) ) // set by the debuggger
         {
-            TYPECHECK( word ) ;
+            CfrTil_Typecheck ( word ) ;
             if ( ( word->CAttribute & IMMEDIATE ) || ( ! CompileMode ) ) Word_Run ( word ) ;
             else _Word_Compile ( word ) ;
         }
@@ -319,7 +319,7 @@ _CfrTil_Alias ( Word * word, byte * name )
         Word_InitFinal ( alias, ( byte* ) word->Definition ) ;
         alias->S_CodeSize = word->S_CodeSize ;
         alias->W_AliasOf = word ;
-        strncpy ( alias->W_TypeSignature, word->W_TypeSignature, 7 ) ;
+        strncpy ( alias->W_TypeSignatureString, word->W_TypeSignatureString, 7 ) ;
         return alias ;
     }
     else Exception ( USEAGE_ERROR, ABORT ) ;

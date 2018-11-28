@@ -181,8 +181,8 @@ CfrTil_Return ( )
                 Word * cwbc = _CfrTil_->CurrentWordBeingCompiled ;
                 if ( ( word->CAttribute & LOCAL_VARIABLE ) && cwbc )
                 {
-                    cwbc->W_TypeSignature [_Compiler_->NumberOfArgs] = '.' ;
-                    cwbc->W_TypeSignature [_Compiler_->NumberOfArgs + 1] = Tsi_Convert_Word_TypeAttributeToTypeCode ( word ) ;
+                    cwbc->W_TypeSignatureString [_Compiler_->NumberOfArgs] = '.' ;
+                    cwbc->W_TypeSignatureString [_Compiler_->NumberOfArgs + 1] = Tsi_Convert_Word_TypeAttributeToTypeLetterCode ( word ) ;
                 }
             }
             Lexer_ReadToken ( _Context_->Lexer0 ) ; // don't compile anything let end block or locals deal with the return

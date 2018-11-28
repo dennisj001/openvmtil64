@@ -124,7 +124,7 @@ Debugger_GetDbgAddressFromRsp ( Debugger * debugger )
     Word * word, *lastWord = 0, *currentlyRunning = Word_UnAlias ( _Context_->CurrentlyRunningWord ) ;
     byte * addr, *retAddr ;
     int64 i, d ;
-    List * retStackList = List_New ( COMPILER_TEMP ) ;
+    dllist * retStackList = List_New ( COMPILER_TEMP ) ;
     //if ( Is_DebugOn ) _Q_->Verbosity = 2 ;
     if ( _Q_->Verbosity > 1 ) CfrTil_PrintReturnStack ( ) ;
     for ( i = 1 ; i < 255 ; i ++ ) // Rsp[1] is current // 255 sizeof ReturnStack

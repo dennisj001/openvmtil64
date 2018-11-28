@@ -339,13 +339,13 @@ CfrTil_DbgSourceCodeEndBlock ( )
 void
 CfrTil_DbgTypecheckOff ( )
 {
-    SetState ( _CfrTil_, DBG_TYPESTACK_ON, false ) ;
+    SetState ( _CfrTil_, DBG_TYPECHECK_ON, false ) ;
 }
 
 void
 CfrTil_DbgTypecheckOn ( )
 {
-    SetState ( _CfrTil_, DBG_TYPESTACK_ON, true ) ;
+    SetState ( _CfrTil_, DBG_TYPECHECK_ON, true ) ;
 }
 
 void

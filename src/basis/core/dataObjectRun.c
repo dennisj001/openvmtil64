@@ -195,7 +195,7 @@ _CfrTil_Do_ClassField ( Word * word )
         }
         else TOS = ( uint64 ) accumulatedAddress ; // C lvalue
     }
-    if ( Lexer_IsTokenForwardDotted ( cntx->Lexer0 ) ) Finder_SetQualifyingNamespace ( cntx->Finder0, word->ClassFieldTypeNamespace ) ;
+    if ( Lexer_IsTokenForwardDotted ( cntx->Lexer0 ) ) Finder_SetQualifyingNamespace ( cntx->Finder0, word->TypeNamespace ) ;
     CfrTil_TypeStack_SetTop ( word ) ;
 }
 
@@ -251,7 +251,7 @@ _Namespace_DoNamespace ( Namespace * ns, int64 immFlag )
 }
 
 DObject *
-_CfrTil_Do_DynamicObject_ToReg ( DObject * dobject0, Boolean reg )
+_CfrTil_Do_DynamicObject_ToReg ( DObject * dobject0, uint8 reg )
 {
     Context * cntx = _Context_ ;
     Lexer * lexer = cntx->Lexer0 ;
