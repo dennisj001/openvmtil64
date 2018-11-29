@@ -43,7 +43,6 @@ GetC ( )
     write ( STDOUT_FILENO, buffer, 1 ) ;
     return buffer [0] ;
 }
-#endif
 
 // from : http://stackoverflow.com/questions/16026858/reading-the-device-status-report-ansi-escape-sequence-reply
 
@@ -53,7 +52,9 @@ getCursor ( int* x, int* y )
     _Printf ( ( byte* ) "\033[6n" ) ;
     int out = scanf ( "\033[%d;%dR", x, y ) ;
     //fflush ( stdout ) ; 
+    //fflush ( stdin ) ; 
 }
+#endif
 
 #define KEY() getc ( stdin )
 
@@ -115,9 +116,10 @@ Context_DoPrompt ( Context * cntx )
 {
     if ( ReadLiner_GetLastChar() != '\n' )
     {
-        int x = 0, y = 0 ;
-        getCursor ( &x, &y ) ;
-        if ( x > Strlen ( ( char* ) _ReadLiner_->Prompt ) ) _Printf ( ( byte* ) "\n" ) ;
+        //int x = 0, y = 0 ;
+        //getCursor ( &x, &y ) ;
+        //if ( x > Strlen ( ( char* ) _ReadLiner_->Prompt ) ) 
+        _CfrTil_PrintChar ( '\n' ) ; //_Printf ( ( byte* ) "\n" ) ;
     }
     _Printf ( ( byte* ) "%s", ( char* ) cntx->ReadLiner0->NormalPrompt ) ; // for when including files
 }
@@ -143,8 +145,7 @@ _Printf ( byte *format, ... )
         va_end ( args ) ;
         fflush ( stdout ) ;
     }
-    //_ReadLiner_->InputKeyedCharacter = 0 ;
-    ReadLiner_SetLastChar( 0 ) ;
+    ReadLiner_SetLastChar ( 0 ) ; //
 }
 #if 0
 // try not to (don't) print extra newlines

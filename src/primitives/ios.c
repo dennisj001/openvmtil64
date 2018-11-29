@@ -23,8 +23,7 @@ void
 CfrTil_NewLine ( )
 {
     _CfrTil_PrintChar ( '\n' ) ;
-    //_ReadLiner_->InputKeyedCharacter = '\n' ;
-    ReadLiner_SetLastChar( '\n' ) ;
+    ReadLiner_SetLastChar ( '\n' ) ;
 }
 
 void

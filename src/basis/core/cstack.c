@@ -318,8 +318,9 @@ _Stack_PrintHeader ( Stack * stack, byte * name )
     {
         uint64 * sp = stack->StackPointer ; // 0 based stack
         byte * location = c_gd ( Context_Location ( ) ) ;
-        _Printf ( ( byte* ) "\n%s at : %s :\n%s depth =%4d : %s = Top = " UINT_FRMT ", InitialTos = " UINT_FRMT ", Size = " UINT_FRMT, name, location,
-            name, depth, stack == _DataStack_ ? "Dsp (R14)" : _ReturnStack_ ? "CfrTilRsp (Rbx)" : "", ( int64 ) sp, ( int64 ) stack->InitialTosPointer, stack->StackMax - stack->StackMin + 1 ) ;
+        _Printf ( ( byte* ) "\n%s at : %s :\n%s depth =%4d : %s = Top = " UINT_FRMT ", InitialTos = " UINT_FRMT ", Size = " UINT_FRMT, 
+            name, location, name, depth, stack == _DataStack_ ? "Dsp (R14)" : _ReturnStack_ ? "CfrTilRsp (Rbx)" : "", ( int64 ) sp, 
+            ( int64 ) stack->InitialTosPointer, stack->StackMax - stack->StackMin + 1 ) ;
     }
 }
 
@@ -340,7 +341,8 @@ _Stack_Print ( Stack * stack, byte * name, int64 depth, Boolean isWordAlreadyFla
 {
     _Stack_PrintHeader ( stack, name ) ;
     _Stack_PrintValues ( name, stack->StackPointer, depth, isWordAlreadyFlag ) ;
-    if ( depth ) CfrTil_NewLine ( ) ;
+    //if ( depth ) 
+    CfrTil_NewLine ( ) ;
 }
 
 void

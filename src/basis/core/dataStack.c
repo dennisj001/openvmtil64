@@ -42,7 +42,7 @@ DataStack_Drop ( )
 inline int64
 DataStack_Overflow ( )
 {
-    return ( _Dsp_ >= _DataStack_->StackMax ) ;
+    return ( _Dsp_ > _DataStack_->StackMax ) ;
 }
 
 inline int64

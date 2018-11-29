@@ -37,7 +37,7 @@ System_Time ( System * system, uint64 timer, char * string, int64 tflag )
 {
     byte buffer [ 64 ] ;
     _System_Time ( system, timer, ( char* ) "%ld.%09ld", buffer ) ;
-    if ( tflag && ( _Q_->Verbosity ) ) _Printf ( ( byte* ) "\n%s [ %d ] : elapsed time = %s seconds", string, timer, buffer ) ;
+    if ( tflag && ( _Q_->Verbosity ) ) _Printf ( ( byte* ) "%s [ %d ] : elapsed time = %s seconds", string, timer, buffer ) ;
 }
 
 void
@@ -55,7 +55,7 @@ System_RunInit ( System * system )
 }
 
 void
-_System_Copy ( System * system, System * system0, uint64 type )
+_System_Copy ( System * system, System * system0 )
 {
     MemCpy ( system, system0, sizeof (System ) ) ;
 }
@@ -64,7 +64,7 @@ System *
 System_Copy ( System * system0, uint64 type )
 {
     System * system = ( System * ) Mem_Allocate ( sizeof ( System ), type ) ;
-    _System_Copy ( system, system0, type ) ;
+    _System_Copy ( system, system0 ) ;
     return system ;
 }
 

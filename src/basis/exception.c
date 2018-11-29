@@ -196,8 +196,8 @@ OVT_ResetSignals ( int64 signals )
 void
 OVT_SetExceptionMessage ( OpenVmTil * ovt )
 {
-    if ( ovt->RestartCondition == INITIAL_START ) ovt->ExceptionMessage = "\nFull Initial Re-Start : ...\n" ;
-    else if ( ovt->RestartCondition == ABORT ) ovt->ExceptionMessage = "\nAborting : ...\n" ;
+    if ( ovt->RestartCondition == INITIAL_START ) ovt->ExceptionMessage = "Full Initial Re-Start : ..." ;
+    else if ( ovt->RestartCondition == ABORT ) ovt->ExceptionMessage = "Aborting : ..." ;
 }
 
 void

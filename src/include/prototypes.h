@@ -274,7 +274,7 @@ void _System_Time(System *system, uint64 timer, char *format, byte *toString);
 void System_Time(System *system, uint64 timer, char *string, int64 tflag);
 void System_InitTime(System *system);
 void System_RunInit(System *system);
-void _System_Copy(System *system, System *system0, uint64 type);
+void _System_Copy(System *system, System *system0);
 System *System_Copy(System *system0, uint64 type);
 void _System_Init(System *system);
 void System_Init(System *system);
@@ -335,7 +335,6 @@ void CfrTil_ArrayModeOff(void);
 /* basis/core/io.c */
 int64 GetTerminalWidth(void);
 char kbhit(void);
-void getCursor(int *x, int *y);
 int64 _Key(FILE *f);
 int64 Kbhit_Pause(void);
 int64 Key_Kbhit(FILE *f);

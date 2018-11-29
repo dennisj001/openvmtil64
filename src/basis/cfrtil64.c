@@ -32,10 +32,7 @@ _CfrTil_ReStart ( CfrTil * cfrTil, int64 restartCondition )
         case INITIAL_START:
         case FULL_RESTART:
         case RESTART:
-        case RESET_ALL:
-        {
-            CfrTil_ResetAll_Init ( cfrTil ) ;
-        }
+        case RESET_ALL: CfrTil_ResetAll_Init ( cfrTil ) ;
         case ABORT: Set_DataStackPointer_FromDspReg ( ) ;
         default:
         case QUIT:

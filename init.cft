@@ -389,5 +389,5 @@ lispOff
 bnOff
 2 + 7  assertStkChk // stack checking
 Shell
-s
+//s
 //verbosity 0 =
