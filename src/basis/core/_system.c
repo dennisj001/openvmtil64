@@ -48,13 +48,6 @@ System_InitTime ( System * system )
 }
 
 void
-System_RunInit ( System * system )
-{
-    if ( _Q_->Signal > QUIT ) CfrTil_DataStack_Init () ;
-    else if ( DataStack_Underflow ( ) || ( DataStack_Overflow ( ) ) ) CfrTil_PrintDataStack ( ) ;
-}
-
-void
 _System_Copy ( System * system, System * system0 )
 {
     MemCpy ( system, system0, sizeof (System ) ) ;

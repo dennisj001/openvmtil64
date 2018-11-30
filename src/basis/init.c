@@ -40,6 +40,7 @@ _CfrTil_Init_SessionCore ( CfrTil * cfrTil, int64 cntxDelFlag, int64 promptFlag 
     SetState ( cfrTil, SOURCE_CODE_ON, true ) ;
     _CfrTil_TypeStackReset ( ) ;
     _CfrTil_RecycleInit_Compiler_N_M_Node_WordList ( 1 ) ;
+    cfrTil->InitSessionCoreTimes ++ ;
 }
 
 void

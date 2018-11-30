@@ -1,6 +1,7 @@
 #include "../include/cfrtil64.h"
-#define VERSION ((byte*) "0.877.040" ) 
-
+#define VERSION ((byte*) "0.877.210" ) 
+// LclRpnPdaTm : loclrpt/foclrpt : Logic/Foml (Foundations of Mathematical Logic by Haskell Curry) Oop (Object Oriented Programming ) 
+//C Lisp Rpn/Lag Pda Tm : Reverse Polish Notation, (Left Associative Grammar), Push Down Automata, Turing Machine :: [a compiler compiler that for ultimately]
 OpenVmTil * _Q_ ;
 
 int
@@ -13,11 +14,11 @@ void
 openvmtil ( int64 argc, char * argv [ ] )
 {
     LinuxInit ( ) ;
-    _OpenVmTil ( argc, argv ) ;
+    OpenVmTil_Run ( argc, argv ) ;
 }
 
 void
-_OpenVmTil ( int64 argc, char * argv [ ] )
+OpenVmTil_Run ( int64 argc, char * argv [ ] )
 {
     int64 restartCondition = INITIAL_START, restarts = 0, sigSegvs = 0 ;
     while ( 1 )
@@ -25,21 +26,15 @@ _OpenVmTil ( int64 argc, char * argv [ ] )
         OpenVmTil * ovt = _Q_ = _OpenVmTil_New ( _Q_, argc, argv ) ;
         ovt->RestartCondition = restartCondition ;
         ovt->SigSegvs = sigSegvs ;
-        if ( restartCondition != INITIAL_START ) ovt->SigSegvs = sigSegvs ;
+        //if ( restartCondition != INITIAL_START ) ovt->SigSegvs = sigSegvs ;
         if ( ! sigsetjmp ( ovt->JmpBuf0, 0 ) )
         {
-            _OpenVmTil_Run ( ovt ) ;
+            CfrTil_Run ( ovt->OVT_CfrTil, ovt->RestartCondition ) ;
         }
         restartCondition = ovt->RestartCondition ;
         sigSegvs = ovt->SigSegvs ;
         ovt->Restarts = restarts ++ ;
     }
-}
-
-void
-_OpenVmTil_Run ( OpenVmTil * ovt )
-{
-    _CfrTil_Run ( ovt->OVT_CfrTil, ovt->RestartCondition ) ;
 }
 
 OpenVmTil *
@@ -215,15 +210,9 @@ OVT_GetStartupOptions ( OpenVmTil * ovt )
     int64 i ;
     for ( i = 0 ; i < ovt->Argc ; i ++ )
     {
-        if ( String_Equal ( "-m", ovt->Argv [ i ] ) )
-        {
-            ovt->TotalMemSizeTarget = ( atoi ( ovt->Argv [ ++ i ] ) * MB ) ;
-        }
-            // -s : a script file with "#! cfrTil -s" -- as first line includes the script file, the #! whole line is treated as a comment
-        else if ( String_Equal ( "-f", ovt->Argv [ i ] ) || ( String_Equal ( "-s", ovt->Argv [ i ] ) ) )
-        {
-            ovt->StartupFilename = ( byte* ) ovt->Argv [ ++ i ] ;
-        }
+        if ( String_Equal ( "-m", ovt->Argv [ i ] ) ) ovt->TotalMemSizeTarget = ( atoi ( ovt->Argv [ ++ i ] ) * MB ) ;
+        // -s : a script file with "#! cfrTil -s" -- as first line includes the script file, the #! whole line is treated as a comment
+        else if ( String_Equal ( "-f", ovt->Argv [ i ] ) || ( String_Equal ( "-s", ovt->Argv [ i ] ) ) ) ovt->StartupFilename = ( byte* ) ovt->Argv [ ++ i ] ;
         else if ( String_Equal ( "-e", ovt->Argv [ i ] ) ) ovt->StartupString = ( byte* ) ovt->Argv [ ++ i ] ;
     }
 }
@@ -232,11 +221,8 @@ OpenVmTil *
 _OpenVmTil_New ( OpenVmTil * ovt, int64 argc, char * argv [ ] )
 {
     //char errorFilename [256] ;
-    int64 restartCondition, exceptionsHandled ; //, startIncludeTries
-    if ( ! ovt )
-    {
-        restartCondition = INITIAL_START ;
-    }
+    int64 restartCondition, exceptionsHandled, startedTimes = 0 ; //, startIncludeTries
+    if ( ! ovt ) restartCondition = INITIAL_START ;
     else restartCondition = FULL_RESTART ;
 #if 0
     startIncludeTries = ovt ? ovt->StartIncludeTries ++ : 0 ;
@@ -262,13 +248,14 @@ _OpenVmTil_New ( OpenVmTil * ovt, int64 argc, char * argv [ ] )
             fflush ( stdout ) ;
     } )
 #else
-    if ( ovt ) OpenVmTil_Delete ( ovt ) ;
+    if ( ovt ) startedTimes = ovt->StartedTimes, OpenVmTil_Delete ( ovt ) ;
 #endif        
     _Q_ = ovt = _OpenVmTil_Allocate ( ) ;
 
     ovt->RestartCondition = restartCondition ;
     ovt->Argc = argc ;
     ovt->Argv = argv ;
+    ovt->StartedTimes = startedTimes ;
     //ovt->SavedTerminalAttributes = savedTerminalAttributes ;
 
     OVT_GetStartupOptions ( ovt ) ;

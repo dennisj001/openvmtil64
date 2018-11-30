@@ -1,6 +1,12 @@
 #include "../include/cfrtil64.h"
 
 CPrimitive CPrimitives [] = { 
+#if EXPERIMENTAL    
+    { "locationPush", 0, 0, 0, Location_PushNew, 0, 0, 0, "Experimental", "Root" },
+    { "locationPrint", 0, 0, 0, CfrTil_Location_Printf, 0, 0, 0, "Experimental", "Root" },
+    { "does>", 0, 0, 0, CfrTil_Does, IMMEDIATE, 0, 0, "Experimental", "Root" },
+#endif    
+    
     { "(", 0, 0, 0, ( block ) LC_ReadEvalPrint_AfterAFirstLParen, IMMEDIATE | KEYWORD, LEFT_PAREN, 0, "Lisp", "Root" },
     { "_(", 0, 0, 0, ( block ) LC_Read, IMMEDIATE | KEYWORD, 0, 0, "Lisp", "Root" },
     { "eval", 0, 0, 0, ( block ) LC_Eval, IMMEDIATE | KEYWORD, 0, 0, "Lisp", "Root" },
@@ -464,9 +470,6 @@ CPrimitive CPrimitives [] = {
     { "name", 0, 0, 0, Word_Name, CATEGORY_OP_STACK, 0, 0, "Word", "Root" },
     { "create", 0, 0, 0, CfrTil_Word_Create, 0, 0, 0, "Word", "Root" },
     { "wNamespace", 0, 0, 0, Word_Namespace, CATEGORY_OP_STACK, 0, 0, "Word", "Root" },
-    { "compileTimeLocation", 0, 0, 0, CompileTime_Location, IMMEDIATE, DO_DOES, 0, "Word", "Root" },
-    { "locationPush", 0, 0, 0, Location_PushNew, 0, 0, 0, "Word", "Root" },
-    { "locationPrint", 0, 0, 0, CfrTil_Location_Printf, 0, 0, 0, "Word", "Root" },
     { "wordEval", 0, 0, 0, CfrTil_Word_Eval, 0, 0, 0, "Word", "Root" },
     { "wordRun", 0, 0, 0, CfrTil_Word_Run, 0, 0, 0, "Word", "Root" },
     { "definition", 0, 0, 0, Word_Definition, CATEGORY_OP_STACK, 0, 0, "Word", "Root" },
@@ -550,8 +553,8 @@ CPrimitive CPrimitives [] = {
     { "compileByte", 0, 0, 0, CompileByte, 0, 0, 0, "Compiling", "Compiler" },
     { "_compileCall", 0, 0, 0, CompileCall, 0, 0, 0, "Compiling", "Compiler" },
     { "_compileWord", 0, 0, 0, CompileACfrTilWord, 0, 0, 0, "Compiling", "Compiler" },
-    { "_compileThisWord", 0, 0, 0, Word_Compile_CurrentRunningWord, 0, 0, 0, "Compiling", "Compiler" },
-    { "compileThisWord", 0, 0, 0, Word_Compile_CurrentRunningWord, IMMEDIATE, 0, 0, "Compiling", "Compiler" },
+    //{ "_compileThisWord", 0, 0, 0, Word_Compile_CurrentRunningWord, 0, 0, 0, "Compiling", "Compiler" },
+    //{ "compileThisWord", 0, 0, 0, Word_Compile_CurrentRunningWord, IMMEDIATE, 0, 0, "Compiling", "Compiler" },
     { "peekReg", 0, 0, 0, CfrTil_PeekReg, 0, 0, 0, "Compiling", "Compiler" },
     { "pokeRegWithValue", 0, 0, 0, CfrTil_PokeRegWithValue, 0, 0, 0, "Compiling", "Compiler" },
     { "pokeRegAtAddress", 0, 0, 0, CfrTil_PokeRegAtAddress, 0, 0, 0, "Compiling", "Compiler" },
@@ -560,7 +563,7 @@ CPrimitive CPrimitives [] = {
 } ;
 
 MachineCodePrimitive MachineCodePrimitives [] = {
-    { "_cwLocation", CPRIMITIVE | INTERPRET_DBG, 0, 0, ( byte* ) _Compile_WordCompiledAt_Location, - 1, "Debug", "Root" },
+    //{ "_cwLocation", CPRIMITIVE | INTERPRET_DBG, 0, 0, ( byte* ) _Compile_WordCompiledAt_Location, - 1, "Debug", "Root" },
     { "<dbg>", (CPRIMITIVE|DEBUG_WORD), RT_STEPPING_DEBUG, 0, ( byte* ) _Compile_DebugRuntimeBreakpoint, - 1, "Debug", "Root" },
     { "<dso>", (CPRIMITIVE|DEBUG_WORD), RT_STEPPING_DEBUG, 0, ( byte* ) _Compile_DebugRuntimeBreakpoint_dso, - 1, "Debug", "Root" },
     { "rspReg", CPRIMITIVE, 0, 0, ( byte* ) _Compile_RspReg_Get, - 1, "System", "Root" },

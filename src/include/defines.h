@@ -7,12 +7,9 @@
 #define NO_GLOBAL_REGISTERS 1 
 #else
 #define NO_GLOBAL_REGISTERS 0
-#endif
-#define NEW_CALL_RETURN 0
 #define DSP_IS_GLOBAL_REGISTER 1 
-#define X84_ABI_RSP_ADJUST true
-#define NEW_CPU_PIPELINE_STATE true
-#define NEW_OPTIMIZER true
+#endif
+#define EXPERIMENTAL true
 
 #if DEBUG 
 #define D( x ) x

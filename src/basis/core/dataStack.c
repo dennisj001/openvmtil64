@@ -139,7 +139,6 @@ Set_DspReg_FromDataStackPointer ( )
 void
 CfrTil_CheckInitDataStack ( )
 {
-    //CfrTil_SetStackPointerFromDsp ( _CfrTil_ ) ;
     if ( Stack_Depth ( _DataStack_ ) < 0 )
     {
         _Stack_PrintHeader ( _DataStack_, ( byte* ) "DataStack" ) ;
@@ -149,7 +148,6 @@ CfrTil_CheckInitDataStack ( )
         _CfrTil_DataStack_Init ( _CfrTil_ ) ;
         _Stack_PrintHeader ( _DataStack_, ( byte* ) "DataStack" ) ;
     }
-    //_Set_DspReg_FromDataStackPointer ( ) ;
 }
 
 void

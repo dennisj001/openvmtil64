@@ -781,7 +781,7 @@ Compile_Call ( byte * address )
 }
 
 void
-_Compile_Call_ToAddressThruReg_TestAlignRSP ( Boolean thruReg )
+_Compile_Call_ThruReg_TestAlignRSP ( Boolean thruReg )
 {
     Compile_Move_Reg_To_Reg ( RAX, RSP ) ;
     Compile_TEST_AL_ImmByte ( 0x8 ) ;
@@ -795,13 +795,13 @@ void
 Compile_Call_ToAddressThruReg_TestAlignRSP ( byte * address, Boolean thruReg )
 {
     Compile_MoveImm_To_Reg ( thruReg, ( int64 ) address, CELL ) ;
-    _Compile_Call_ToAddressThruReg_TestAlignRSP ( thruReg ) ;
+    _Compile_Call_ThruReg_TestAlignRSP ( thruReg ) ;
 }
 
 void
 Compile_Call_ToAddressThruR8_TestAlignRSP ( )
 {
-    _Compile_Call_ToAddressThruReg_TestAlignRSP ( R8 ) ;
+    _Compile_Call_ThruReg_TestAlignRSP ( R8 ) ;
 }
 
 void

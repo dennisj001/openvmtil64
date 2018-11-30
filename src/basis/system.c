@@ -58,19 +58,6 @@ main ( int64 argc, char **argv )
 
 #endif
 
-void
-_Location_Printf ( Location * loc )
-{
-    if ( loc ) _Printf ( ( byte* ) "\nRun Time Location : %s %d.%d", loc->Filename, loc->LineNumber, loc->CursorPosition ) ;
-}
-
-void
-CfrTil_Location_Printf ( )
-{
-    Location * loc = ( Location* ) DataStack_Pop ( ) ;
-    _Location_Printf ( loc ) ;
-}
-
 // lib : full library path
 
 #define RTLD_DEFAULT ((void *) 0)
@@ -307,7 +294,7 @@ _CfrTil_SystemState_Print ( int64 pflag )
     _Printf ( ( byte* ) buf ) ;
     buf = _CfrTil_GetSystemState_String1 ( buf ) ;
     _Printf ( ( byte* ) buf ) ;
-    if ( pflag && ( _Q_->Verbosity > 2 ) ) OpenVmTil_Print_DataSizeofInfo ( pflag ) ;
+    if ( pflag || ( _Q_->Verbosity > 2 ) ) OpenVmTil_Print_DataSizeofInfo ( pflag ) ;
     _CfrTil_WordAccounting_Print ( ( byte* ) "_CfrTil_SystemState_Print" ) ;
     BigNum_StateShow ( ) ;
     Boolean dsc = GetState ( _CfrTil_, DEBUG_SOURCE_CODE_MODE ) ;

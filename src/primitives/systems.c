@@ -236,10 +236,11 @@ CfrTil_LineCharacterNumber ( )
 void
 _CfrTil_Version ( int64 flag )
 {
-    if ( flag || ( ( _Q_->Verbosity ) && ( _Q_->StartedTimes == 1 ) ) )
+    //if ( flag || ( ( _Q_->Verbosity ) && ( _Q_->StartedTimes == 1 ) ) && (_CfrTil_->InitSessionCoreTimes == 1) )
+    if ( flag || (_CfrTil_->InitSessionCoreTimes == 1) )
     {
-        //AllowNewlines ;
-        _Printf ( ( byte* ) "\ncfrTil64 %s", _Q_->VersionString ) ;
+        //_Printf ( ( byte* ) "\ncfrTil64 %s", _Q_->VersionString ) ;
+        _Printf ( ( byte* ) "\nversion %s", _Q_->VersionString ) ;
     }
 }
 

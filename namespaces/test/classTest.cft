@@ -118,7 +118,7 @@ using
     this.Four 4 = 
     this.Twelve 12 =
     this.Accum this.Sum @ = 
-    this.Sum this.Category @ 3 + this.Prototype @ & = ctloc this.Sum @ 3 "init_assert2" assert
+    this.Sum this.Category @ 3 + this.Prototype @ & = this.Sum @ 3 "init_assert2" ctloc assert
     this.Accum this.Three @ this.Four @ * this.Three @ / = 
     this.Accum @ 4 "\n DLListClone init : this.Accum = :" ps "init_assert3" assert 
     this.Prototype @ p //pause

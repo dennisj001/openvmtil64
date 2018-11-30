@@ -206,13 +206,13 @@ Stack_Depth ( Stack * stack )
     }
     return ( 0 ) ;
 }
-
+#if 0
 void
 Stack_SetStackMax ( Stack * stack, int64 value )
 {
     stack->StackData [ stack->StackSize - 1 ] = value ;
 }
-
+#endif
 // Stack_Clear => Stack_Init
 
 void

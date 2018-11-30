@@ -34,13 +34,13 @@ _Compile_SetStackN_WithObject ( Boolean stackReg, int64 n, int64 obj )
 }
 #if 1
 void
-_Compile_Stack_Push ( Boolean stackReg, int64 reg, int64 obj ) // runtime
+_Compile_Stack_Push ( uint8 stackReg, uint8 thruReg, int64 obj ) 
 {
     //Compile_ADDI ( REG, stackReg, 0, sizeof (int64 ), 0 ) ;
     //_Compile_SetStackN_WithObject ( stackReg, 0, obj ) ;
     //Compile_MoveImm ( REG, reg, 0, n * CELL, obj, CELL ) ;
-    Compile_MoveImm_To_Reg ( reg, obj, CELL ) ;
-    _Compile_Stack_PushReg ( stackReg, reg ) ;
+    Compile_MoveImm_To_Reg ( thruReg, obj, CELL ) ;
+    _Compile_Stack_PushReg ( stackReg, thruReg ) ;
 
 }
 #endif

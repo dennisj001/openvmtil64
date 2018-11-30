@@ -5,11 +5,11 @@ void
 _CfrTil_Colon ( Boolean initSC )
 {
     //CfrTil_RightBracket ( ) ;
-    if ( initSC) CfrTil_SourceCode_Init ( ) ;
+    if ( initSC ) CfrTil_SourceCode_Init ( ) ;
     CfrTil_Token ( ) ;
     CfrTil_Word_Create ( ) ;
     CfrTil_BeginBlock ( ) ;
-    
+
     byte * token = Lexer_PeekNextNonDebugTokenWord ( _Lexer_, 0 ) ;
     if ( ( String_Equal ( token, "(" ) ) && ( ! GetState ( _Context_->Interpreter0, PREPROCESSOR_DEFINE ) ) )
     {
@@ -194,22 +194,13 @@ Word_Name ( )
     Word * word = ( Word* ) DataStack_Pop ( ) ;
     DataStack_Push ( ( int64 ) word->Name ) ;
 }
-#if 0
 
-void
-Word_Location ( )
-{
-    Word * word = ( Word* ) DataStack_Pop ( ) ;
-    _Location_Printf ( word ) ;
-}
-dllist *wcall = 0 ; // wordCompiledAt_LocationList
-#endif
-
+#if EXPERIMENTAL
 Location *
 Location_New ( )
 {
     ReadLiner * rl = _ReadLiner_ ;
-    Location * loc = ( Location * ) Mem_Allocate ( sizeof ( Location ), (CompileMode ? INTERNAL_OBJECT_MEM : OBJECT_MEM) ) ;
+    Location * loc = ( Location * ) Mem_Allocate ( sizeof ( Location ), ( CompileMode ? INTERNAL_OBJECT_MEM : OBJECT_MEM ) ) ;
     loc->Filename = rl->Filename ;
     loc->LineNumber = rl->LineNumber ;
     loc->CursorPosition = _Context_->Lexer0->CurrentReadIndex ; // rl->CursorPosition ;
@@ -217,32 +208,92 @@ Location_New ( )
 }
 
 void
+_Location_Printf ( Location * loc )
+{
+    if ( loc ) _Printf ( ( byte* ) "\nRun Time Location : %s %d.%d", loc->Filename, loc->LineNumber, loc->CursorPosition ) ;
+}
+
+void
+_CfrTil_Location_Printf ( )
+{
+    Location * loc = ( Location* ) DataStack_Pop ( ) ;
+    _Location_Printf ( loc ) ;
+}
+
+void
+CfrTil_Location_Printf ( )
+{
+    if ( ! CompileMode ) _CfrTil_Location_Printf ( ) ;
+    else Compile_Call_TestRSP ( ( byte* ) CfrTil_Location_Printf ) ;
+}
+
+void
 Location_PushNew ( )
 {
-    Location * loc = Location_New ( ) ;
-    _Compile_Stack_Push ( DSP, ACC,  ( int64 ) loc ) ;
-}
-
-void
-Word_Compile_CurrentRunningWord ( )
-{
-    Compile_Call ( ( byte* ) Context_CurrentWord ()->Definition ) ;
-}
-
-void
-CompileTime_Location ( )
-{
-    if ( Compiling )
+    Location * loc ;
+    if ( CompileMode )
     {
-        Location_PushNew ( ) ;
-        Word_Compile_CurrentRunningWord ( ) ;
-        _Context_->CurrentlyRunningWord->CAttribute |= IMMEDIATE ;
-    }
-    else
-    {
-        CfrTil_Location_Printf ( ) ;
+        loc = Location_New ( ) ;
+        _Compile_Stack_Push ( DSP, RAX, ( int64 ) loc ) ;
     }
 }
+
+#if 1
+
+void
+CfrTil_Does ( )
+{
+    _Compiler_->CurrentWord->CAttribute |= IMMEDIATE ;
+}
+
+#else
+
+void
+CfrTil_Does ( )
+{
+    CfrTil_CompileMode ( ) ;
+    _Compile_UninitializedJump ( ) ; // at the end of the 'if block' we need to jmp over the 'else block'
+    CfrTil_CalculateAndSetPreviousJmpOffset_ToHere ( ) ;
+    Stack_Push_PointerToJmpOffset ( ) ;
+    if ( CompileMode ) return ;
+}
+
+// do> does>
+// do> [if COMPILE_MODE] does> [if runtime]
+
+void
+CfrTil_Do ( )
+{
+    Context * cntx = _Context_ ;
+    Interpreter * interp = cntx->Interpreter0 ;
+    //_Compiler_->CurrentWord->CAttribute |= INLINE ;
+    Compile_MoveImm_To_Reg ( ACC, ( int64 ) & _Context_->Compiler0->State, CELL ) ;
+    Compile_Move_Rm_To_Reg ( ACC, ACC, 0 ) ;
+    //Compile_ANDI( mod, operandReg, offset, immediateData, size )  
+    Compile_ANDI ( REG, ACC, 0, COMPILE_MODE, 1 ) ;
+    _Compile_TestCode ( RAX, CELL ) ; // if not COMPILE_MODE jmp to after does> 
+    //_Compile_UninitializedJumpEqualZero ( ) ;
+    _Compile_Jcc ( NOT_ZERO, TTT_ZERO, 0 ) ;
+    byte * ptrToOffsetElse = Here - DISP_SIZE ;
+    DEBUG_SHOW ;
+    //Set_CompileMode ( true ) ;
+    Interpret_Until_Token ( interp, ( byte* ) "does>", 0 ) ;
+    _Compile_UninitializedJump ( ) ;
+    byte * ptrToOffsetEnd = Here - DISP_SIZE ;
+    //Set_CompileMode ( true ) ;
+    _SetOffsetForCallOrJump ( ptrToOffsetElse, Here ) ;
+    byte * token = Interpret_C_Until_Token4 ( interp, ( byte* ) ";", ( byte* ) "<does", 0, 0, 0 ) ;
+    _SetOffsetForCallOrJump ( ptrToOffsetEnd, Here ) ;
+    token = Lexer_ReadToken ( interp->Lexer0 ) ;
+    if ( ! String_Equal ( token, "<does" ) )
+    {
+        DEBUG_SHOW ;
+        Interpreter_InterpretAToken ( interp, token, - 1 ) ;
+    }
+}
+
+#endif
+#endif
 
 void
 Word_Namespace ( )

@@ -110,7 +110,7 @@ Mem_Allocate ( int64 size, uint64 allocType )
         case COMPILER_TEMP: return _Allocate ( size, ms->CompilerTempObjectSpace ) ;
         case CFRTIL: case DATA_STACK: return _Allocate ( size, ms->CfrTilInternalSpace ) ;
         case STRING_MEMORY: return _Allocate ( size, ms->StringSpace ) ;
-        case RUNTIME:
+        case RUNTIME: // not used??
         {
             _Q_->RunTimeAllocation += size ;
             return mmap_AllocMem ( size ) ;

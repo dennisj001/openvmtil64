@@ -636,22 +636,6 @@ typedef struct Lexer
     byte * TokenBuffer ;
 } Lexer ;
 
-#if NEW_CPU_PIPELINE_STATE    
-typedef struct
-{
-    union
-    {
-        uint64 uint64_CPState ;
-        struct
-        {
-            uint8 State ;
-            uint8 FirstArgReg ;
-            uint8 SecondArgReg ;
-        } ;
-    } ;
-
-} CpuPipelineState ;
-#endif
 typedef struct
 {
     DLNode S_Node ;
@@ -921,7 +905,7 @@ typedef struct _CfrTil
     Namespace * InNamespace ;
     LambdaCalculus * LC ;
     FILE * LogFILE ;
-    int64 LogFlag, WordsAdded, FindWordCount, FindWordMaxCount, WordCreateCount, DObjectCreateCount ;
+    int64 InitSessionCoreTimes, LogFlag, WordsAdded, FindWordCount, FindWordMaxCount, WordCreateCount, DObjectCreateCount ;
     uint64 * SaveDsp ;
     Cpu * cs_Cpu ;
     Cpu * cs_Cpu2 ;
@@ -1043,7 +1027,7 @@ typedef struct
     int64 Mmap_RemainingMemoryAllocated, OVT_InitialUnAccountedMemory, RunTimeAllocation, TotalMemFreed, TotalMemAllocated, NumberOfByteArrays ;
 
     // variables accessible from cfrTil
-    int64 Verbosity, StartIncludeTries, StartedTimes, Restarts, InitSessionCoreTimes, SigSegvs, AllocationRequestLacks ;
+    int64 Verbosity, StartIncludeTries, StartedTimes, Restarts, SigSegvs, AllocationRequestLacks ;
 
     int64 DictionarySize, LispTempSize, MachineCodeSize, ObjectsSize, InternalObjectsSize, LispSize, ContextSize ;
     int64 TempObjectsSize, CompilerTempObjectsSize, SessionObjectsSize, DataStackSize, HistorySize, OpenVmTilSize ;

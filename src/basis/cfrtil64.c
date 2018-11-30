@@ -2,30 +2,31 @@
 #include "../include/cfrtil64.h"
 
 void
-_CfrTil_Run ( CfrTil * cfrTil, int64 restartCondition )
+CfrTil_Run ( CfrTil * cfrTil, int64 restartCondition )
 {
     while ( 1 )
     {
         cfrTil = _CfrTil_New ( cfrTil ) ;
         if ( ! sigsetjmp ( cfrTil->JmpBuf0, 0 ) )
         {
-            System_RunInit ( _Context_->System0 ) ;
             _CfrTil_ReStart ( cfrTil, restartCondition ) ;
-            // check if reset is ok ...
-            if ( cfrTil && _Context_ && _Context_->System0 )
-            {
-                DebugOff ;
-                Ovt_RunInit ( _Q_ ) ;
-                CfrTil_InterpreterRun ( ) ;
-                d0 ( _Pause ( "\n_CfrTil_Run : ??shouldn't reach here??" ) ; ) ; // shouldn't reach here
-            }
+            Ovt_RunInit ( _Q_ ) ;
+            CfrTil_InterpreterRun ( ) ;
         }
     }
 }
 
 void
+CfrTil_RunInit ( )
+{
+    if ( _Q_->Signal > QUIT ) CfrTil_DataStack_Init ( ) ;
+    else if ( DataStack_Underflow ( ) || ( DataStack_Overflow ( ) ) ) CfrTil_PrintDataStack ( ) ;
+}
+
+void
 _CfrTil_ReStart ( CfrTil * cfrTil, int64 restartCondition )
 {
+    CfrTil_RunInit ( ) ;
     switch ( restartCondition )
     {
         case 0:
@@ -115,7 +116,6 @@ void
 _CfrTil_DataStack_Init ( CfrTil * cfrTil )
 {
     _Stack_Init ( _CfrTil_->DataStack, _Q_->DataStackSize ) ;
-    //_Set_DspReg_FromDataStackPointer () ;
     cfrTil->SaveDsp = _Dsp_ ;
 }
 

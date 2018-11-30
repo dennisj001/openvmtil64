@@ -95,7 +95,7 @@ OpenVmTil_Print_DataSizeofInfo ( int64 flag )
         _Printf ( ( byte* ) "DLNode size : %d bytes, ", sizeof ( DLNode ) ) ;
         _Printf ( ( byte* ) "PropInfo size : %d bytes, ", sizeof (AttributeInfo ) ) ;
         //_Printf ( ( byte* ) "\nCAttribute0 size : %d bytes, ", sizeof (struct _T_CAttribute0 ) ) ;
-        _Printf ( ( byte* ) "CfrTil size : %d bytes, ", sizeof (CfrTil ) ) ;
+        _Printf ( ( byte* ) "\nCfrTil size : %d bytes, ", sizeof (CfrTil ) ) ;
         _Printf ( ( byte* ) "Context size : %d bytes, ", sizeof (Context ) ) ;
         _Printf ( ( byte* ) "System size : %d bytes, ", sizeof (System ) ) ;
         _Printf ( ( byte* ) "Debugger size : %d bytes, ", sizeof (Debugger ) ) ;
@@ -133,10 +133,11 @@ OVT_Exit ( )
 void
 OVT_StartupMessage ( )
 {
-    if ( ( ++ _Q_->InitSessionCoreTimes == 2 ) && ( _Q_->Verbosity > 0 ) ) // 2 : first time is in CfrTil_ResetAll_Init
+    if ( _Q_->Verbosity > 0 ) 
     {
         DefaultColors ;
-        System_Time ( _CfrTil_->Context0->System0, 0, ( char* ) "Startup", 1 ) ; //_Q_->StartedTimes == 1 ) ;
+        if ( _Q_->StartedTimes > 1 ) CfrTil_NewLine () ;
+        System_Time ( _CfrTil_->Context0->System0, 0, ( char* ) "Startup", 1 ) ; 
         _CfrTil_Version ( 0 ) ;
         if ( _Q_->Verbosity > 1 )
         {

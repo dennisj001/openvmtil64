@@ -267,9 +267,9 @@ dscOn //verbosity 3 =
 : debugTest 1 2 + p debugTest1 ;
 : _assert1 ( n m str ) { debugTest n @ m @ != } { str @ ps "error" ps _info _pause } if ;
 #else
-: _assert1 ( n m str ) { n @ m @ != } { str @ ? ( ps ) : ( drop ) "error" ps _info stack _pause } if ;
-//' _assert1 find wdiss //pause
+: _assert1 ( n m str ) { n @ m @ != } { str @ ? ( ps ) : ( drop ) "error" ps _info stack _pause } if ; 
 #endif
+: ctloc locationPush does> locationPrint ; // compile time location
 : _assert0 ( n m ) { n @ m @ != } { nl location hex n @ p "!=" ps m @ p "<:" ps "Error!" adps _info _pause } { } ifElse ; //{ str @ ps " : ok\n" ps nl } ifElse ; // no "ok" with this word
 : _assert ( n m ) nl  nl "_assert ::" ps { n @ m @ != } { n @ p "!=" ps m @ p "<:" ps "Error!" adps _info _pause } { " ok\n" ps nl } ifElse ;
 : assert1s ( s1 s2 str ) { s1 @ s2 @ strcmp } { nl str @ ps "error" ps _info _pause } if ;
@@ -351,30 +351,24 @@ sp
 stringMacrosOn
 : testCfrTil "namespaces/ninit.cft" include ;
 : test testCfrTil ;
-#if 1 //! testPreviousVersion 
-'ctloc 'compileTimeLocation find alias debugWord
-: spl { compileMode } { locationPush compileThisWord } { locationPrint _s _pause } ifElse ; immediate // nb! can only be used within compiled words not interpreted
-#else
-: ctloc ;
-#endif
 
 Root 
+dbgOff
+//dbgOn 
+'todo 1 const  
 'doX64 1 const
 'doScript 1 const
 'doScript2 1 const
 '_doDemo 0 const    
-'todo 0 const  
-dbgOff
-//dbgOn 
-#if Is_DebugOn 
 
+#if Is_DebugOn 
 #if todo
 : _TODO ( str ) TODO ( str @ ) ;;
 : TODO ( str ) _TODO ( str @ ) pause ;;
 #endif
 scOn
 System 
-test // dT0 //demo //dT0
+test 
 #if _doDemo 
 demo 
 #endif //dT0

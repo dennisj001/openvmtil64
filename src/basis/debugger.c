@@ -22,13 +22,16 @@ _Debugger_InterpreterLoop ( Debugger * debugger )
     {
         Set_DataStackPointers_FromDebuggerDspReg ( ) ;
         if ( debugger->w_Word ) SetState ( debugger->w_Word, STEPPED, true ) ;
-        if ( ! Stack_Depth ( debugger->ReturnStack ) )
+        if ( _Context_->CurrentEvalWord )
         {
-            Debugger_Off ( debugger, 1 ) ;
-            SetState ( _Context_->CurrentEvalWord, STEPPED, true ) ;
-            siglongjmp ( _Context_->JmpBuf0, 1 ) ; //in Word_Run
+            if ( ! Stack_Depth ( debugger->ReturnStack ) )
+            {
+                Debugger_Off ( debugger, 1 ) ;
+                SetState ( _Context_->CurrentEvalWord, STEPPED, true ) ;
+                siglongjmp ( _Context_->JmpBuf0, 1 ) ; //in Word_Run
+            }
+            else if ( ( ! debugger->w_Word ) || GetState ( debugger->w_Word, STEPPED ) ) SetState ( _Context_->CurrentEvalWord, STEPPED, true ) ;
         }
-        else if ( ( ! debugger->w_Word ) || GetState ( debugger->w_Word, STEPPED ) ) SetState ( _Context_->CurrentEvalWord, STEPPED, true ) ;
     }
 }
 
@@ -39,7 +42,7 @@ _Debugger_PreSetup ( Debugger * debugger, Word * word, byte * token, Boolean for
     {
         if ( forceFlag || GetState ( debugger, DBG_EVAL_AUTO_MODE ) || ( ! GetState ( debugger, DBG_AUTO_MODE | DBG_STEPPING ) ) )
         {
-            if ( ! word ) word = Context_CurrentWord () ;
+            if ( ! word ) word = Context_CurrentWord ( ) ;
             if ( word && ( ! word->W_WordListOriginalWord ) ) word->W_WordListOriginalWord = word ;
             if ( ( ! debugger->LastSetupWord ) || ( ( debugger->LastSetupWord != word ) && ( word && ( ! String_Equal ( debugger->LastSetupWord->Name, word->Name ) ) ) ) )
             {

@@ -358,13 +358,6 @@ sp
 stringMacrosOn
 //: testCfrTil "namespaces/init.cft" <dbg> include ;
 : testCfrTil "namespaces/init.cft" include ;
-#if 1 //! testPreviousVersion 
-'ctloc 'compileTimeLocation find alias debugWord
-: spl { compileMode } { locationPush compileThisWord } { locationPrint _s _pause } ifElse ; immediate // nb! can only be used withing compiled words not interpreted
-#else
-: ctloc ;
-#endif
-
 
 2 + 7  assertStkChk // stack checking
 Shell

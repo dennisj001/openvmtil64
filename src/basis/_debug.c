@@ -151,14 +151,14 @@ _Compile_DebugRuntimeBreakpoint_dso ( ) // where we want the acquired pointer
     Compile_Call_TestRSP ( ( byte* ) CfrTil_DebugRuntimeBreakpoint_dso ) ;
 }
 
+#if 0
+
 void
 _Compile_WordCompiledAt_Location ( ) // where we want the acquired pointer
 {
     Compile_CpuState_Save ( _Debugger_->cs_Cpu ) ;
-    Compile_Call_TestRSP ( ( byte* ) CompileTime_Location ) ;
+    Compile_Call_TestRSP ( ( byte* ) CfrTil_Location ) ;
 }
-
-#if 0
 
 uint64
 GetRsp ( )

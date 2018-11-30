@@ -1,7 +1,7 @@
 #include "../../include/cfrtil64.h"
 
 inline void 
-_Block_Eval ( block blck )
+Eval ( block blck )
 {
     ( ( block ) blck ) ( ) ;
 }
