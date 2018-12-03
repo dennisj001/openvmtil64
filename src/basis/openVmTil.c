@@ -1,7 +1,7 @@
 #include "../include/cfrtil64.h"
-#define VERSION ((byte*) "0.877.210" ) 
-// LclRpnPdaTm : loclrpt/foclrpt : Logic/Foml (Foundations of Mathematical Logic by Haskell Curry) Oop (Object Oriented Programming ) 
-//C Lisp Rpn/Lag Pda Tm : Reverse Polish Notation, (Left Associative Grammar), Push Down Automata, Turing Machine :: [a compiler compiler that for ultimately]
+#define VERSION ((byte*) "0.877.220" ) 
+// Logic/Foml (Foundations of Mathematical Logic by Haskell Curry) Oop (Object Oriented Programming ) 
+//C Lisp Rpn/Lag Pda Tm : Reverse Polish Notation, (Left Associative Grammar), Push Down Automata, Turing Machine :: [a compiler compiler base in all that for ultimately]
 OpenVmTil * _Q_ ;
 
 int
@@ -26,7 +26,6 @@ OpenVmTil_Run ( int64 argc, char * argv [ ] )
         OpenVmTil * ovt = _Q_ = _OpenVmTil_New ( _Q_, argc, argv ) ;
         ovt->RestartCondition = restartCondition ;
         ovt->SigSegvs = sigSegvs ;
-        //if ( restartCondition != INITIAL_START ) ovt->SigSegvs = sigSegvs ;
         if ( ! sigsetjmp ( ovt->JmpBuf0, 0 ) )
         {
             CfrTil_Run ( ovt->OVT_CfrTil, ovt->RestartCondition ) ;
@@ -265,6 +264,8 @@ _OpenVmTil_New ( OpenVmTil * ovt, int64 argc, char * argv [ ] )
     int64 totalMemSizeTarget = ( ovt->TotalMemSizeTarget < 5 * M ) ? ovt->TotalMemSizeTarget : - 1 ; // 0 or -1 : gets default values     
     _OpenVmTil_CalculateMemSpaceSizes ( ovt, restartCondition, - 1 ) ; //totalMemSizeTarget ) ;
 #else    
+    ovt->InternalObjectsSize = 1 * M ; 
+    ovt->ObjectsSize = 1 * M ; 
     ovt->BufferSpaceSize = 100 * K ; //35 * ( sizeof ( Buffer ) + BUFFER_SIZE ) ;
     ovt->StringSpaceSize = 100 * K ;
     ovt->MachineCodeSize = 300 * K ;

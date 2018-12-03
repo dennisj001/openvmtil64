@@ -286,8 +286,8 @@ void Compiler_SetStandardPreHere_ForDebugDisassembly(Compiler *compiler);
 void Compiler_OptimizeForOp(Compiler *compiler);
 void Compiler_SetupArgsToStandardLocations(Compiler *compiler);
 void Compiler_Optimizer_0Args(Compiler *compiler);
-void Compiler_Optimizer_WordArg2Op_Or_xBetweenArg1AndArg2(Compiler *compiler);
 void Compiler_Optimizer_1Arg(Compiler *compiler);
+void Compiler_Optimizer_WordArg2Op_Or_xBetweenArg1AndArg2(Compiler *compiler);
 void Compiler_Optimizer_2Args_Or_WordArg1_Op(Compiler *compiler);
 void Compile_StandardArg(Word *word, Boolean reg, Boolean rvalueFlag, byte *setHere);
 void Compile_StackArgsToStandardRegs(Compiler *compiler);
@@ -355,6 +355,8 @@ Symbol *Symbol_NewValue(int64 value, uint64 allocType);
 Symbol *Symbol_CompareName2(Symbol *symbol, byte *name, Namespace *ns);
 Symbol *_Symbol_CompareName(Symbol *symbol, byte *name);
 Symbol *Symbol_CompareName(Symbol *symbol, byte *name);
+void Symbol_Print(Symbol *symbol);
+void Symbol_List_Print(dllist *list);
 /* basis/repl.c */
 void _Repl(block repl);
 /* basis/core/syntax.c */
@@ -1897,7 +1899,6 @@ void _Location_Printf(Location *loc);
 void _CfrTil_Location_Printf(void);
 void CfrTil_Location_Printf(void);
 void Location_PushNew(void);
-void CfrTil_Do(void);
 void CfrTil_Does(void);
 void Word_Namespace(void);
 void CfrTil_Keyword(void);

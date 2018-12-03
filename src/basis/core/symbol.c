@@ -91,3 +91,4 @@ Symbol_CompareName ( Symbol * symbol, byte * name )
     }
     return 0 ;
 }
+

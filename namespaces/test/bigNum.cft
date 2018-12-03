@@ -38,6 +38,8 @@ dlsym: mpfr_printf /usr/local/lib/libmpfr.so ; void_return
 : !! qexp p nl ;
 d: 7 !! pause
 #endif
+
+
 BigNum 
 'x var
 bnInit ( 16 16 )
@@ -47,7 +49,7 @@ bnInit ( 16 16 )
 "!" ' qexp find alias
 nl "64 ! = " ps 64 ! p nl 
 x 1000 ! =
-nl "1000 ! = " ps x @ fprint nl
+nl "1000 ! = " ps x @ fprint nl 
 : aexp ( -t N.N ) { dup 1 <= } { drop 1 } { dup -- aexp * } ifElse ;
 'aexp find wdiss //sp
 : bexp ( n -- TOS ) { n @ 1 <= } { 1 } { n @ dup 1 - bexp * } ifElse ; 
@@ -63,10 +65,12 @@ nl 7 ! p
 '!! find wdiss
 7 !! 8 !! 8 !!   // this is not right still
 sp
+1000 ! p
 //pause
 1000 ! 
 x store
-x @ p
+x @ p 
+//pause
 //: bexpl ( n | l ) { l x @ = n @ 1 <= } { 1 l @ p } { n @ dup 1 - bexpl * } ifElse ; 
 //: bexpl ( n -- TOS ) { n @ 1 <= } { 1 } { n @ dup 1 - bexpl * } ifElse ; 
 : bexpl ( n -- TOS ) { n @ 1 <= } { 1 } { n @ dup 1 - bexpl * } ifElse ; 

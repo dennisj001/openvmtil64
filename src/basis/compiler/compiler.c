@@ -206,16 +206,19 @@ CompileOptimizeInfo *
 CompileOptimizeInfo_New ( uint64 type )
 {
     CompileOptimizeInfo * optInfo =
+#if 0    
         ( CompileOptimizeInfo * ) OVT_CheckRecycleableAllocate ( _Q_->MemorySpace0->RecycledOptInfoList,
         sizeof (CompileOptimizeInfo ) ) ;
-    if ( ! optInfo ) optInfo = _CompileOptimizeInfo_New ( type ) ;
+    if ( ! optInfo ) 
+#endif        
+    optInfo = _CompileOptimizeInfo_New ( type ) ;
     return optInfo ;
 }
 
 CompileOptimizeInfo *
 Compiler_CompileOptimizeInfo_PushNew ( Compiler * compiler )
 {
-    CompileOptimizeInfo * coi = CompileOptimizeInfo_New ( COMPILER_TEMP ) ; //COMPILER_TEMP ) ;
+    CompileOptimizeInfo * coi = CompileOptimizeInfo_New ( COMPILER_TEMP ) ; 
     if ( coi )
     {
         List_Push ( compiler->OptimizeInfoList, ( dlnode* ) coi ) ;

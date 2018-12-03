@@ -220,6 +220,7 @@ _CfrTil_Location_Printf ( )
     _Location_Printf ( loc ) ;
 }
 
+// some pretty shifty code
 void
 CfrTil_Location_Printf ( )
 {
@@ -239,7 +240,7 @@ Location_PushNew ( )
 }
 
 #if 1
-
+// not really like but only related to forth does>
 void
 CfrTil_Does ( )
 {
@@ -415,6 +416,19 @@ CfrTil_DebugWord ( void )
 {
     Word * word = _CfrTil_->LastFinished_Word ;
     if ( word ) word->CAttribute |= DEBUG_WORD ;
+}
+
+void
+Symbol_Print ( Symbol * symbol ) 
+{
+    _Printf ( "%s", symbol->Name ) ;
+}
+
+void
+Symbol_List_Print ( dllist * list )
+{
+   _Printf ( "\nSymbol List : " ) ;
+   dllist_Map ( list, (MapFunction0) Symbol_Print ) ; 
 }
 
 void

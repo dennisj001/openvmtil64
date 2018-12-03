@@ -178,12 +178,14 @@ void
 _CfrTil_AddTokenToTailOfTokenList ( byte * token )
 {
     if ( token ) dllist_AddNodeToTail ( _CfrTil_->TokenList, ( dlnode* ) Lexer_Token_New ( token ) ) ;
+    //if ( Is_DebugOn ) Symbol_List_Print ( _CfrTil_->TokenList ) ;
 }
 
 void
 _CfrTil_PushToken_OnTokenList ( byte * token )
 {
     if ( token ) dllist_AddNodeToHead ( _CfrTil_->TokenList, ( dlnode* ) Lexer_Token_New ( token ) ) ;
+    //if ( Is_DebugOn ) Symbol_List_Print ( _CfrTil_->TokenList ) ;
 }
 
 void

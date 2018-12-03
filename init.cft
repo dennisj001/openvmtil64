@@ -373,10 +373,24 @@ test
 demo 
 #endif //dT0
 stringMacrosOff
-#else 
-// of course you can trim this file to your needs and put your personal init code here maybe
+#else // of course you can trim this file to your needs and put your personal init code here maybe
 // ...
+
+#if 0
+//: bnt "namespaces/test/bigNum.test.cft" include ; // d: bnt
+BigNum 
+'x var
+bnInit ( 16 16 )
+: sp ; //stack pause ;
+
+: qexp { dup 1 >= } { dup -- qexp * } { drop 1 } ifElse ;
+"!" ' qexp find alias
+nl "64 ! = " ps 64 ! p nl 
+x 1000 d: ! =
+nl "1000 ! = " ps x @ fprint nl 
 #endif
+
+#endif // ... of course
 
 //: nl newline location ;
 lispOff
@@ -385,3 +399,4 @@ bnOff
 Shell
 //s
 //verbosity 0 =
+
