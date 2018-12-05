@@ -1,5 +1,5 @@
 #include "../include/cfrtil64.h"
-#define VERSION ((byte*) "0.877.220" ) 
+#define VERSION ((byte*) "0.877.250" ) 
 // Logic/Foml (Foundations of Mathematical Logic by Haskell Curry) Oop (Object Oriented Programming ) 
 //C Lisp Rpn/Lag Pda Tm : Reverse Polish Notation, (Left Associative Grammar), Push Down Automata, Turing Machine :: [a compiler compiler base in all that for ultimately]
 OpenVmTil * _Q_ ;
@@ -272,6 +272,7 @@ _OpenVmTil_New ( OpenVmTil * ovt, int64 argc, char * argv [ ] )
     ovt->DictionarySize = 100 * K ;
     ovt->CfrTilSize = ( 23 * K ) ;
     ovt->OpenVmTilSize = ( 9 * K ) ;
+    ovt->DataStackSize = 8 * KB ;
 #endif    
 
     _OpenVmTil_Init ( ovt, exceptionsHandled > 1 ) ; // try to keep history if we can

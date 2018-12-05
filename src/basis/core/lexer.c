@@ -253,13 +253,15 @@ _Lexer_NextNonDebugOrCommentTokenWord ( Lexer * lexer, byte * delimiters, Boolea
 }
 
 byte *
-_Lexer_PeekNextNonDebugTokenWord ( Lexer * lexer, byte * delimiters, int64 evalFlag )
+//Lexer_PeekNextNonDebugTokenWord ( Lexer * lexer, byte * delimiters, int64 evalFlag )
+Lexer_PeekNextNonDebugTokenWord ( Lexer * lexer, Boolean evalFlag )
 {
-    byte * token = _Lexer_NextNonDebugOrCommentTokenWord ( lexer, delimiters, evalFlag, 0 ) ; // 0 : peekFlag off because we are reAdding it below
+    byte * token = _Lexer_NextNonDebugOrCommentTokenWord ( lexer, 0, evalFlag, 0 ) ; // 0 : peekFlag off because we are reAdding it below
     _CfrTil_PushToken_OnTokenList ( token ) ; // TODO ; list should instead be a stack
     return token ;
 }
 
+#if 0
 byte *
 Lexer_PeekNextNonDebugTokenWord ( Lexer * lexer, int64 evalFlag )
 {
@@ -267,10 +269,11 @@ Lexer_PeekNextNonDebugTokenWord ( Lexer * lexer, int64 evalFlag )
     if ( _AtCommandLine ( ) && Lexer_CheckIfDone ( lexer, LEXER_DONE ) ) return 0 ;
     else
     {
-        token = _Lexer_PeekNextNonDebugTokenWord ( lexer, 0, evalFlag ) ;
+        token = Lexer_PeekNextNonDebugTokenWord ( lexer, 0, evalFlag ) ;
     }
     return token ;
 }
+#endif
 
 void
 Lexer_DoChar ( Lexer * lexer, byte c )
@@ -976,8 +979,12 @@ int64
 Lexer_CheckForwardToStatementEnd_LValue ( Lexer * lexer, Word * word )
 {
     int64 tokenStartReadLineIndex = ( ( int64 ) word == - 1 ) ? lexer->TokenStart_ReadLineIndex : word->W_RL_Index ;
-    int64 fileIndex = Lexer_ConvertLineIndexToFileIndex ( lexer, tokenStartReadLineIndex ) ;
-    return IsLValue_String_CheckForwardToStatementEnd ( & lexer->ReadLiner0->InputStringOriginal [fileIndex] ) ; //word->W_StartCharRlIndex ] ) ;
+    int64 index = Lexer_ConvertLineIndexToFileIndex ( lexer, tokenStartReadLineIndex ) ;
+    byte * inputPtr ;
+    if ( ! AtCommandLine ( lexer->ReadLiner0 ) ) inputPtr = & lexer->ReadLiner0->InputStringOriginal [index] ;
+    else inputPtr = &lexer->ReadLiner0->InputLine[index] ;
+    return IsLValue_String_CheckForwardToStatementEnd ( inputPtr ) ;
+    
 }
 
 // assuming no comments

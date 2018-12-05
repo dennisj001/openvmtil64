@@ -1,0 +1,8 @@
+\ generate fa (tools + screen editor)
+
+blockfile ff.blk
+120 132 thru    \ stuff
+181 load        \ blkmm
+blockfile ff.blk
+create screen-editor
+9 load

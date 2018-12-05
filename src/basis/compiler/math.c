@@ -174,8 +174,8 @@ Compile_MultiplyEqual ( Compiler * compiler )
     }
     else
     {
+        //if ( ! GetState ( _Context_, C_SYNTAX ) ) 
         _Compile_Move_StackNRm_To_Reg ( ACC, DSP, - 1 ) ;
-        //_Compile_IMUL ( MEM, ACC, DSP, REX_B | MODRM_B | DISP_B, 0, 0 ) ;
         WordStack_SCHCPUSCA (0, 0) ;
         Compile_MUL ( MEM, DSP, REX_B | MODRM_B | DISP_B, 0, 0, 0, CELL_SIZE ) ;
         _Compile_Stack_Drop ( DSP ) ;
@@ -311,7 +311,7 @@ CfrTil_IncDec ( int64 op ) // +
                 if ( ! GetState ( compiler, INFIX_LIST_INTERPRET ) )
                 {
                     List_DropN ( _CfrTil_->Compiler_N_M_Node_WordList, 1 ) ; // the operator; let higher level see the variable
-                    SetHere (one->Coding, 1) ;
+                    if ( GetState ( _CfrTil_, OPTIMIZE_ON ) ) SetHere (one->Coding, 1) ;
                     CfrTil_WordList_PushWord ( one ) ;
                     dllist * postfixList = List_New ( SESSION ) ;
                     List_Push_1Value_NewNode_T_WORD ( postfixList, (int64) currentWord, COMPILER_TEMP ) ;

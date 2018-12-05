@@ -116,6 +116,7 @@ void
 _CfrTil_DataStack_Init ( CfrTil * cfrTil )
 {
     _Stack_Init ( _CfrTil_->DataStack, _Q_->DataStackSize ) ;
+    _Dsp_ = _CfrTil_->DataStack->StackPointer ;
     cfrTil->SaveDsp = _Dsp_ ;
 }
 
@@ -245,8 +246,10 @@ _CfrTil_New ( CfrTil * cfrTil )
 {
     // nb. not all of this logic has really been needed or used or tested; it should be reworked according to need
     Namespace * nss = 0 ;
+    int64 inits = 0 ;
     if ( cfrTil )
     {
+        inits = cfrTil->InitSessionCoreTimes ;
         if ( _Q_->RestartCondition < RESET_ALL )
         {
             nss = cfrTil->Namespaces ; // in this case (see also below) only preserve Namespaces, all else is recycled and reinitialized
@@ -261,6 +264,7 @@ _CfrTil_New ( CfrTil * cfrTil )
     _Context_ = 0 ;
     cfrTil = ( CfrTil* ) Mem_Allocate ( sizeof ( CfrTil ), OPENVMTIL ) ;
     _CfrTil_Init ( cfrTil, nss ) ;
+    cfrTil->InitSessionCoreTimes = inits ;
     Linux_SetupSignals ( &cfrTil->JmpBuf0, 1 ) ;
     return cfrTil ;
 }

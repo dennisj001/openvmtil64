@@ -1,0 +1,230 @@
+#!/bin/sh
+#
+# compile core system and generate executable, optionally for specific
+# target architecture
+
+set -e
+
+arch=`sh arch.sh`
+os=`sh os.sh`
+targetarch=$arch
+targetos=$os
+forth=boot/ff-$arch-$os
+endian=little
+output=
+heapsize="4 k k"
+format=elf
+baseaddr=
+n32=
+wsize=4
+archextra=
+startup=startup
+extradefs=
+textradefs=
+noutf=
+
+usage() {
+    echo "usage: metacompile [-help] [-arch ARCH] [-os OS] [-forth FORTH]" >&2
+    echo "                   [-o OUTPUT] [-heapsize SIZE] [-format FMT]" >&2
+    echo "                   [-base ADDR] [-startup STARTUP] [-define WORD]" >&2
+    echo "                   [-no-utf]" >&2
+    echo >&2
+    exit $1
+}
+
+while test -n "$1"; do
+    case "$1" in
+        -h|-help|--help) usage 0;;
+        -arch) 
+            shift
+            targetarch=$1;;
+        -os)
+            shift 
+            targetos=$1;;
+        -forth)
+            shift
+            forth=$1;;
+        -o)
+            shift
+            output=$1;;
+        -heapsize)
+            shift
+            heapsize=$1;;
+        -format)
+            shift
+            format=$1;;
+        -base)
+            shift
+            baseaddr=$1;;
+        -startup)
+            shift
+            startup=$1;;
+        -define)
+            shift   
+            extradefs="$extradefs  create $1"
+            textradefs="$textradefs  create target-$1";;
+        -no-utf)
+            noutf=1;;
+        *) usage 1;;
+    esac
+    shift
+done
+
+rtargetarch=$targetarch
+etargetarch=$targetarch
+
+case $targetarch in
+    sparc|mips)
+        endian=big;;
+    mipsel)
+        targetarch=mips
+        etargetarch=mipsel;;
+    mipsn32el)
+        targetarch=mips
+        etargetarch=mipsel
+        n32="create N32";;
+    mipsn32)
+        targetarch=mips
+        n32="create N32"
+        etargetarch=mips
+        endian=big;;
+    ppc)
+        endian=big;;
+    armeb)
+        targetarch=arm
+        endian=big;;
+    x86_64)
+        wsize=8;;
+    m68k)
+        endian=big;;
+    riscv32)
+        targetarch=riscv
+        etargetarch=riscv32;;
+    riscv64)
+        wsize=8
+        targetarch=riscv
+        etargetarch=riscv64;;
+    coldfire)
+        endian=big
+        archextra="create target-coldfire"
+        targetarch=m68k;
+        etargetarch=m68k;;
+esac
+
+targetosfile=$targetarch/$targetos
+
+if test $targetos = "none"; then
+    targetosfile=bare
+fi
+
+case $targetos in
+    *bsd)
+        ostype="create target-bsd";;
+    darwin)
+        if test "$format" = elf; then
+            format=macho
+        fi
+        ostype="create target-bsd  create target-darwin";;        
+esac
+
+if test \! -f "$targetosfile.f"; then
+    echo "arch/OS combination not supported" >&2
+    exit 1
+fi
+
+if test -z "$baseaddr"; then
+    baseaddr="${format}baseaddr"
+fi
+
+if test -z "$output"; then
+    output=ff-$rtargetarch-$targetos
+fi
+
+if test -z "$noutf"; then
+    extradefs="$extradefs  create unicode"
+    textradefs="$textradefs  create target-unicode"
+fi
+
+echo "compiling: $output with $forth"
+echo "   format: $format  baseaddr: $baseaddr"
+
+$forth <<EOF
+include stuff.f
+' noop is prompt    :noname 1 halt ; is abort
+only forth definitions
+: k  1024 * ;
+256 k constant /cbuffer
+$heapsize constant heapsize
+2 k constant stacksize
+256 constant rstacksize
+/cbuffer buffer: cbuffer
+cbuffer /cbuffer erase
+include endian.f
+warnings off        \ meta.f redefines many words
+include meta.f
+also meta also forth
+\ feature selection
+include $format.f
+$wsize wordsize
+$endian  cr report-endianness  cr
+\ configuration words, in meta dictionary
+create target-$endian-endian   create target-$targetarch
+create target-$targetos        $ostype
+create target-$format          $textradefs
+$n32    $archextra
+\ setup ELF/Mach-O configuration, if needed
+[defined] target-elf  [if]
+  select-$targetos  $etargetarch-elf
+  minkernel elfaligned kernelsize !
+[else]
+  [defined] target-macho  [if]
+    $etargetarch-macho
+    minkernel machoaligned kernelsize !
+  [else]
+    minkernel kernelsize !
+  [then] 
+[then]
+\ setup metacompilation
+only forth  also meta definitions  also forth
+$baseaddr constant cbase
+include generic.f
+also generic definitions  also forth
+include $targetarch/generic.f
+cbase cbuffer metacompile  
+only forth  also target definitions  also meta 
+cr .( compiling kernel: ) cr cr
+mh @ 
+include kernel.f
+include $targetosfile.f
+cr cr .( kernel code size: ) mh @ swap - . 
+.(   aligned: ) kernelsize @ . cr cr
+\ create these once again, but in target dictionary
+create $endian-endian   create $targetarch
+create $targetos        create $format
+$extradefs
+cr cr .( compiling core: ) cr cr
+include core.f
+cr cr .( compiling startup: ) cr cr
+include $startup.f
+only forth  also meta  warnings on  hex
+\ the code below depends on meta-tick
+heapsize cbuffer finalize
+' _start unreloc w@ dup entrypoint !  
+cr .( entry point is 0x) .
+cr .( patching variables ) cr
+mdp @ reloc dup ' dp unreloc tcell+ w!   \ dp: last header
+  .( dp: 0x) .
+mh @ reloc dup ' h unreloc tcell+ w!     \ h: heapstart
+  .(  h: 0x) . 
+bssaddr @ bsssize @ + dup ' s0 unreloc tcell+ w!  \ s0: end of heap
+  dup  .(  s0: 0x) .
+stacksize rstacksize + tcells - dup ' r0 unreloc  \ r0: stack-start
+  tcell+ w!  .(  r0: 0x) .
+cr .( generating binary image )
+genimage
+cr .( writing file ") " $output" type 
+.( " of size ) imagesize decimal .
+" $output" writeimage
+cr .( done ) cr
+bye
+EOF

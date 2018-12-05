@@ -65,6 +65,7 @@ Interpreter_DoInfixWord ( Interpreter * interp, Word * word )
     SetState ( compiler, DOING_BEFORE_AN_INFIX_WORD, false ) ; //svState ) ;
     Interpreter_DoWord_Default ( interp, word, word->W_RL_Index, word->W_SC_Index ) ;
     if ( token ) Interpreter_InterpretAToken ( interp, token, -1 ) ;
+    //List_InterpretLists ( _Compiler_->PostfixLists ) ; 
     SetState ( compiler, ( DOING_AN_INFIX_WORD | C_INFIX_EQUAL ), false ) ; //svState ) ;
 }
 
@@ -111,12 +112,11 @@ Interpreter_DoWord ( Interpreter * interp, Word * word, int64 tsrli, int64 scwi 
         interp->w_Word = word ;
         if ( ( word->WAttribute == WT_INFIXABLE ) && ( GetState ( cntx, INFIX_MODE ) ) ) // nb. Interpreter must be in INFIX_MODE because it is effective for more than one word
             Interpreter_DoInfixWord ( interp, word ) ;
-        else if ( word->CAttribute & PREFIX ) _Interpreter_DoPrefixWord ( cntx, interp, word ) ; //, tsrli, scwi ) ;
-        else if ( Interpreter_IsWordPrefixing ( interp, word ) ) _Interpreter_DoPrefixWord ( cntx, interp, word ) ; //, tsrli, scwi ) ;
+        else if ( ( word->CAttribute & PREFIX ) || Interpreter_IsWordPrefixing ( interp, word ) ) _Interpreter_DoPrefixWord ( cntx, interp, word ) ; //, tsrli, scwi ) ;
         else if ( word->WAttribute == WT_C_PREFIX_RTL_ARGS ) Interpreter_C_PREFIX_RTL_ARGS_Word ( word ) ;
         else Interpreter_DoWord_Default ( interp, word, tsrli, scwi ) ; //  case WT_POSTFIX: case WT_INFIXABLE: // cf. also _Interpreter_SetupFor_MorphismWord
         if ( ! ( word->CAttribute & DEBUG_WORD ) ) interp->LastWord = word ;
-        if ( ! GetState ( _Context_, ( C_SYNTAX ) ) ) List_InterpretLists ( _Compiler_->PostfixLists ) ;
+        if ( ! GetState ( _Context_, ( C_SYNTAX ) ) ) List_InterpretLists ( _Compiler_->PostfixLists ) ; // with C_SYNTAX this is done in by _CfrTil_C_Infix_EqualOp or CfrTil_Interpret_C_Blocks
     }
 }
 // interpret with find after parse for known objects

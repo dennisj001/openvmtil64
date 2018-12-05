@@ -136,8 +136,8 @@ OVT_StartupMessage ( )
     if ( _Q_->Verbosity > 0 ) 
     {
         DefaultColors ;
-        if ( _Q_->StartedTimes > 1 ) CfrTil_NewLine () ;
-        System_Time ( _CfrTil_->Context0->System0, 0, ( char* ) "Startup", 1 ) ; 
+        //if ( _CfrTil_->InitSessionCoreTimes > 1 ) CfrTil_NewLine () ;
+        if ( _CfrTil_->InitSessionCoreTimes == 1 ) System_Time ( _CfrTil_->Context0->System0, 0, ( char* ) "Startup", 1 ) ; 
         _CfrTil_Version ( 0 ) ;
         if ( _Q_->Verbosity > 1 )
         {

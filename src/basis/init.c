@@ -23,8 +23,8 @@ _CfrTil_Init_SessionCore ( CfrTil * cfrTil, int64 cntxDelFlag, int64 promptFlag 
         int64 stackDepth = Stack_Depth ( cfrTil->ContextDataStack ) ;
         for ( i = 0 ; i < stackDepth ; i ++ ) CfrTil_Context_PopDelete ( cfrTil ) ;
     }
-    //LC_LispNamespacesOff ( ) ;
     LC_Init_Runtime ( ) ;
+    LC_LispNamespacesOff ( ) ;
     CfrTil_CheckInitDataStack ( ) ;
     OVT_StartupMessage ( ) ;
     _OVT_Ok ( promptFlag ) ;

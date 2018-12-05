@@ -355,7 +355,7 @@ stringMacrosOn
 Root 
 dbgOff
 //dbgOn 
-'todo 1 const  
+'todo 0 const  
 'doX64 1 const
 'doScript 1 const
 'doScript2 1 const

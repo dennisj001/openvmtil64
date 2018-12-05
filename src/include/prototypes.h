@@ -355,8 +355,6 @@ Symbol *Symbol_NewValue(int64 value, uint64 allocType);
 Symbol *Symbol_CompareName2(Symbol *symbol, byte *name, Namespace *ns);
 Symbol *_Symbol_CompareName(Symbol *symbol, byte *name);
 Symbol *Symbol_CompareName(Symbol *symbol, byte *name);
-void Symbol_Print(Symbol *symbol);
-void Symbol_List_Print(dllist *list);
 /* basis/repl.c */
 void _Repl(block repl);
 /* basis/core/syntax.c */
@@ -620,8 +618,7 @@ Symbol *Lexer_GetTokenFromTokenList(Lexer *lexer, Boolean peekFlag);
 byte *Lexer_GetTokenNameFromTokenList(Lexer *lexer, Boolean peekFlag);
 Symbol *Lexer_Token_New(byte *token);
 byte *_Lexer_NextNonDebugOrCommentTokenWord(Lexer *lexer, byte *delimiters, Boolean evalFlag, Boolean peekFlag);
-byte *_Lexer_PeekNextNonDebugTokenWord(Lexer *lexer, byte *delimiters, int64 evalFlag);
-byte *Lexer_PeekNextNonDebugTokenWord(Lexer *lexer, int64 evalFlag);
+byte *Lexer_PeekNextNonDebugTokenWord(Lexer *lexer, Boolean evalFlag);
 void Lexer_DoChar(Lexer *lexer, byte c);
 void Lexer_DoNextChar(Lexer *lexer);
 void Lexer_LexNextToken_WithDelimiters(Lexer *lexer, byte *delimiters);
@@ -1913,6 +1910,8 @@ void CfrTil_C_Return(void);
 void CfrTil_Void_Return(void);
 void CfrTil_RAX_Return(void);
 void CfrTil_DebugWord(void);
+void Symbol_Print(Symbol *symbol);
+void Symbol_List_Print(dllist *list);
 void _PrintWord(dlnode *node, int64 *n);
 void _Words(Symbol *symbol, MapFunction1 mf, int64 n);
 void _DoWords(Symbol *symbol, int64 *n);

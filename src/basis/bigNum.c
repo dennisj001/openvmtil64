@@ -43,7 +43,7 @@ _BigNum_New ( byte * token )
 {
     double bf ;
     long i, bi ;
-    mpfr_t *bfr = ( mpfr_t* ) Mem_Allocate ( sizeof ( mpfr_t ), (CompileMode ? INTERNAL_OBJECT_MEM : OBJECT_MEM) ) ;
+    mpfr_t *bfr = ( mpfr_t* ) Mem_Allocate ( sizeof ( mpfr_t ), (CompileMode ? INTERNAL_OBJECT_MEM : COMPILER_TEMP )) ; //OBJECT_MEM) ) ;
     if ( token )
     {
         for ( i = 0 ; token [i] ; i ++ )

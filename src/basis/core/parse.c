@@ -258,7 +258,7 @@ _CfrTil_Parse_LocalsAndStackVariables ( int64 svf, int64 lispMode, ListObject * 
             if ( String_Equal ( ( char* ) token, ")" ) ) break ;
             if ( Stringi_Equal ( ( char* ) token, "REG" ) || String_Equal ( ( char* ) token, "REGISTER" ) )
             {
-                regFlag = true ;
+                if ( GetState ( _CfrTil_, OPTIMIZE_ON ) ) regFlag = true ;
                 continue ;
             }
             if ( ( ( ! GetState ( _Context_, C_SYNTAX ) ) && ( ! GetState ( word, W_C_SYNTAX ) ) ) &&
