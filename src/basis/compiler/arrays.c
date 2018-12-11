@@ -248,7 +248,7 @@ _CfrTil_ArrayBegin ( Boolean lispMode, Word **pl1, int64 i )
                 }
                 else _Word_CompileAndRecord_PushReg ( baseObject, ACC ) ;
             }
-            else CfrTil_OptimizeOff ( ) ; // can't really be optimized any more anyway and optimize is turned back on after an =/store anyway
+            else _CfrTil_OptimizeOff ( ) ; // can't really be optimized any more anyway and optimize is turned back on after an =/store anyway
             _DEBUG_SHOW ( baseObject, 1 ) ;
             compiler->ArrayEnds = 0 ; // reset for next array word in the current word being compiled
         }

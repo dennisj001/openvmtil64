@@ -49,7 +49,7 @@ CfrTil_PokeRegAtAddress ( ) // @
     Compile_Move_Reg_To_Rm ( ACC, reg, 0 ) ;
     _Compile_PopToReg ( ACC ) ;
     _Compile_Return ( ) ;
-    Set_CompilerSpace ( svcs ) ; // now compile to this space
+    Set_CompilerSpace ( svcs ) ; // reset compiler space pointer
     ( ( VoidFunction ) ba->BA_Data ) ( ) ;
 }
 

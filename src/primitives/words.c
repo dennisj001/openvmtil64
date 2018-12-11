@@ -240,7 +240,7 @@ Location_PushNew ( )
 }
 
 #if 1
-// not really like but only related to forth does>
+// currently not really like but only related to forth does>
 void
 CfrTil_Does ( )
 {

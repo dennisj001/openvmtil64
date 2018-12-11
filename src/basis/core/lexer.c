@@ -978,11 +978,19 @@ Lexer_ConvertLineIndexToFileIndex ( Lexer * lexer, int64 index )
 int64
 Lexer_CheckForwardToStatementEnd_LValue ( Lexer * lexer, Word * word )
 {
-    int64 tokenStartReadLineIndex = ( ( int64 ) word == - 1 ) ? lexer->TokenStart_ReadLineIndex : word->W_RL_Index ;
-    int64 index = Lexer_ConvertLineIndexToFileIndex ( lexer, tokenStartReadLineIndex ) ;
     byte * inputPtr ;
-    if ( ! AtCommandLine ( lexer->ReadLiner0 ) ) inputPtr = & lexer->ReadLiner0->InputStringOriginal [index] ;
-    else inputPtr = &lexer->ReadLiner0->InputLine[index] ;
+    int64 index ;
+    int64 tokenStartReadLineIndex = ( ( int64 ) word == - 1 ) ? lexer->TokenStart_ReadLineIndex : word->W_RL_Index ;
+    if ( AtCommandLine ( lexer->ReadLiner0 ) ) 
+    {
+        index = tokenStartReadLineIndex ;
+        inputPtr = &lexer->ReadLiner0->InputLine[index] ;
+    }
+    else 
+    {
+        index = Lexer_ConvertLineIndexToFileIndex ( lexer, tokenStartReadLineIndex ) ;
+        inputPtr = & lexer->ReadLiner0->InputStringOriginal [index] ;
+    }
     return IsLValue_String_CheckForwardToStatementEnd ( inputPtr ) ;
     
 }

@@ -75,7 +75,6 @@ User
 : mp ; //mem pause ;
 : sp ; //stack pause ;
 #endif
-mp
 
 Combinators
 "ix" ' call find alias immediate
@@ -134,8 +133,6 @@ Interpreter
 //'word find wdis //pause
 ":" { compileModeOn sourceCodeInit token create begin } word // immediate // begin is not an immediate word
 
-Class
-'_new 'new find alias prefix
 C
 : ;; semi _prefix ; immediate syntactic
 c_syntaxOn 
@@ -150,6 +147,7 @@ type int ; int.size = 8 ;
 type long ; long.size = 8 ;
 type quad ; quad.size = 16 ;
 c_syntaxOff
+
 BigNum
 : fprint space _fprint ;
 'p 'fprint find alias
@@ -172,9 +170,6 @@ Compiler
 var: DebugFlag classTestRead streamLine doInit1 doDemo doTest doLisp COMBINATOR_TOOKIT doLisp testing testLisp x Zenfone2 ; // _TestDone_ ; 
 : nstrcat: "" { token dup ";" strcmp } { strcat " " strcat } while drop ; immediate // nb : no quotation marks around names
 "mod" 'modulo find alias
-// "Preprocessor" class
-//Lisp
-//"lambda" "_lambda" find alias // nb! : can't use C/Compiler/Forth ' (tick) in Lisp namespace - it has another meaning there! : this construction also has same meaning
 
 Namespace
 : using: { token dup ";" strcmp } { usingFirst } while drop ; // eg - "using: User Lisp ;"
@@ -197,7 +192,6 @@ System
 Root
 "fr" 'fullRestart find alias
 "ri" 'restartInit find alias
-//'q 'quit find alias
 System
 "true" 1 const
 "false" 0 const
@@ -392,7 +386,7 @@ nl "1000 ! = " ps x @ fprint nl
 
 #endif // ... of course
 
-//: nl newline location ;
+c_syntaxOff
 lispOff
 bnOff
 2 + 7  assertStkChk // stack checking

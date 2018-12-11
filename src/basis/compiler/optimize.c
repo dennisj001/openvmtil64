@@ -661,8 +661,8 @@ Do_OptimizeOp2Literals ( Compiler * compiler )
     SetState ( _CfrTil_, OPTIMIZE_ON, false ) ; //prevent recursion here
     //Word_Run ( optInfo_0_zero ) ;
     Block_Eval ( optInfo_0_zero->Definition ) ; // no type checking
+    SetState ( _CfrTil_, OPTIMIZE_ON, true ) ; // restore state ; OPTIMIZE_ON had to be true/on else we wouldn't have entered _Compiler_CheckOptimize
     SetState ( compiler, COMPILE_MODE, true ) ;
-    SetState ( _CfrTil_, OPTIMIZE_ON, true ) ; //prevent recursion here
     value = DataStack_Pop ( ) ;
     SetHere ( optInfo_0_two->Coding, 0 ) ;
     Word_SetCodingHere_And_ClearPreviousUseOf_Here_SCA ( optInfo_0_two, 1 ) ;

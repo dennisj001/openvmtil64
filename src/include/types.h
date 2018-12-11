@@ -896,7 +896,7 @@ typedef struct _StringTokenInfo
 #define STI_INITIALIZED     ( 1 << 0 )
 typedef struct _CfrTil
 {
-    uint64 State ;
+    uint64 State, SavedState ;
     Stack *ReturnStack, * DataStack ;
     Namespace * Namespaces ;
     Context * Context0 ;

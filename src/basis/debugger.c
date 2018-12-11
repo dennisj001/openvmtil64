@@ -536,8 +536,7 @@ void
 Debugger_OptimizeToggle ( Debugger * debugger )
 {
     if ( GetState ( _CfrTil_, OPTIMIZE_ON ) ) SetState ( _CfrTil_, OPTIMIZE_ON, false ) ;
-
-    else SetState ( _CfrTil_, OPTIMIZE_ON, true ) ;
+    else CfrTil_OptimizeOn ( ) ;
     _CfrTil_SystemState_Print ( 0 ) ;
 }
 

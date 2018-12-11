@@ -18,12 +18,12 @@ int
 factorial ( n | rec )
 {
        rec = 1;
-       while ( n > 1 ) rec *= ( d: n--) ;
+       while ( n > 1 ) rec *= (n--) ;
        return rec ;
 } 
 c_syntaxOff
 'factorial find wdiss 
-7 d: factorial dup p 5040 _assert sp //pause
+7 factorial dup p 5040 _assert sp //pause
 'C.int.factorial find wdiss 
 7 C.int.factorial dup p 5040 _assert sp //pause
 sp

@@ -130,6 +130,7 @@ _Compile_optInfo_X_Group1 ( Compiler * compiler, int64 op )
 void
 Compile_Group1_X_OpEqual ( Compiler * compiler, int64 op ) // +=/-= operationCode
 {
+    //CfrTil_OptimizeOn ( ) ;
     int64 optFlag = Compiler_CheckOptimize ( compiler, 0 ) ;
     if ( optFlag & OPTIMIZE_DONE ) return ;
     else if ( optFlag )
@@ -148,6 +149,8 @@ Compile_Group1_X_OpEqual ( Compiler * compiler, int64 op ) // +=/-= operationCod
 void
 Compile_MultiplyEqual ( Compiler * compiler )
 {
+    //CfrTil_OptimizeOn ( ) ; //nb! must be on in most cases to compile correctly
+    SaveAndSetState ( _CfrTil_, OPTIMIZE_ON, true ) ;
     int64 optFlag = Compiler_CheckOptimize ( compiler, 0 ) ;
     if ( optFlag & OPTIMIZE_DONE ) return ;
     else if ( optFlag )
@@ -175,17 +178,19 @@ Compile_MultiplyEqual ( Compiler * compiler )
     else
     {
         //if ( ! GetState ( _Context_, C_SYNTAX ) ) 
-        _Compile_Move_StackNRm_To_Reg ( ACC, DSP, - 1 ) ;
         WordStack_SCHCPUSCA (0, 0) ;
+        _Compile_Move_StackNRm_To_Reg ( ACC, DSP, - 1 ) ;
         Compile_MUL ( MEM, DSP, REX_B | MODRM_B | DISP_B, 0, 0, 0, CELL_SIZE ) ;
         _Compile_Stack_Drop ( DSP ) ;
         _Compile_Move_Reg_To_StackNRm_UsingReg ( DSP, 0, ACC, OREG ) ;
     }
+    RestoreSavedState ( _CfrTil_, OPTIMIZE_ON ) ;
 }
 
 void
 Compile_DivideEqual ( Compiler * compiler )
 {
+    SaveAndSetState ( _CfrTil_, OPTIMIZE_ON, true ) ;
     if ( ( GetState ( _Context_, C_SYNTAX ) ) && ( ! GetState ( compiler, C_INFIX_EQUAL ) ) )
     {
         Word * zero = _CfrTil_WordList ( 0 ) ;
@@ -227,6 +232,7 @@ Compile_DivideEqual ( Compiler * compiler )
             _Compile_Move_Reg_To_StackNRm_UsingReg ( DSP, 0, ACC, THRU_REG ) ;
         }
     }
+    RestoreSavedState ( _CfrTil_, OPTIMIZE_ON ) ;
 }
 
 void

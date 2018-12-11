@@ -276,9 +276,17 @@ CfrTil_OptimizeOn ( )
 }
 
 void
-CfrTil_OptimizeOff ( )
+_CfrTil_OptimizeOff ( )
 {
     SetState ( _CfrTil_, OPTIMIZE_ON, false ) ;
+}
+
+void
+CfrTil_OptimizeOff ( )
+{
+    _CfrTil_OptimizeOff ( ) ;
+    //_Printf ( (byte*) "\nCurrently optimize cannot be turned off else c syntax will not compile correctly in some cases, other problems may be there also." ) ;
+    //Pause () ;
 }
 
 void

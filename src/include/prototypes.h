@@ -403,6 +403,7 @@ void _CfrTil_Init(CfrTil *cfrTil, Namespace *nss);
 void CfrTil_ResetMemory(CfrTil *cfrTil);
 CfrTil *_CfrTil_New(CfrTil *cfrTil);
 void CfrTil_OptimizeOn(void);
+void _CfrTil_OptimizeOff(void);
 void CfrTil_OptimizeOff(void);
 void CfrTil_StringMacrosOn(void);
 void CfrTil_StringMacrosOff(void);

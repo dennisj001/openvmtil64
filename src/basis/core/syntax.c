@@ -63,16 +63,6 @@ CfrTil_Interpret_C_Blocks ( int64 blocks, Boolean takesAnElseFlag, Boolean semic
             Interpret_C_Block_BeginBlock ( "(", 0 ) ;
             compiler->TakesLParenAsBlock = false ; // after the first block
         }
-        else if ( String_Equal ( ( char* ) token, "{" ) )
-        {
-            Interpret_C_Block_BeginBlock ( "{", 0 ) ;
-            semicolonEndsThisBlock = false ;
-        }
-        else if ( String_Equal ( ( char* ) token, "}" ) )
-        {
-            Interpret_C_Block_EndBlock ( "}", 0 ) ;
-            blocksParsed ++ ;
-        }
         else if ( String_Equal ( ( char* ) token, ")" ) && compiler->InLParenBlock )
         {
             List_InterpretLists ( compiler->PostfixLists ) ;
@@ -85,6 +75,16 @@ CfrTil_Interpret_C_Blocks ( int64 blocks, Boolean takesAnElseFlag, Boolean semic
                 Interpret_C_Block_BeginBlock ( "{", 1 ) ;
                 semicolonEndsThisBlock = true ;
             }
+            blocksParsed ++ ;
+        }
+        else if ( String_Equal ( ( char* ) token, "{" ) )
+        {
+            Interpret_C_Block_BeginBlock ( "{", 0 ) ;
+            semicolonEndsThisBlock = false ;
+        }
+        else if ( String_Equal ( ( char* ) token, "}" ) )
+        {
+            Interpret_C_Block_EndBlock ( "}", 0 ) ;
             blocksParsed ++ ;
         }
         else if ( String_Equal ( ( char* ) token, ";" ) )//|| String_Equal ( ( char* ) token, "," ) )
@@ -215,7 +215,6 @@ CfrTil_SetInNamespaceFromBackground ( )
 {
     Context * cntx = _Context_ ;
     if ( cntx->Compiler0->C_FunctionBackgroundNamespace ) _CfrTil_Namespace_InNamespaceSet ( cntx->Compiler0->C_FunctionBackgroundNamespace ) ;
-
     else Compiler_SetAs_InNamespace_C_BackgroundNamespace ( cntx->Compiler0 ) ;
 }
 
@@ -260,7 +259,6 @@ Boolean
 C_Syntax_AreWeParsingACFunctionCall ( Lexer * lexer )
 {
     if ( ! GetState ( _Context_, C_SYNTAX | INFIX_MODE ) ) return false ;
-    int64 tokenStartReadLineIndex = lexer->TokenStart_ReadLineIndex ;
-    return _C_Syntax_AreWeParsingACFunctionCall ( & lexer->ReadLiner0->InputLine [ tokenStartReadLineIndex ] ) ; //word->W_StartCharRlIndex ] ) ;
+    return _C_Syntax_AreWeParsingACFunctionCall ( & lexer->ReadLiner0->InputLine [ lexer->TokenStart_ReadLineIndex ] ) ; 
 }
 
