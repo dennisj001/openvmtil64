@@ -67,7 +67,7 @@ _BigNum_New ( byte * token )
 #endif
 //"For a, A, e, E, f and F specifiers: this is the number of digits to be printed after the decimal point" 
 
-mpfr_t *
+void
 BigNum_GetPrintfPrecision_BigNum ( )
 {
     DataStack_Push ( _Context_->System0->BigNum_Printf_Precision ) ; // this precision is used by BigNum_FPrint like printf
@@ -180,13 +180,13 @@ void
 _BigNum_FPrint ( mpfr_t * value )
 {
     Context * cntx = _Context_ ;
-    char * format ;
+    byte * format ;
     if ( _Q_->Verbosity )
     {
-        if ( cntx->System0->NumberBase == 10 ) format = "%*.*Rf" ;
-        else if ( cntx->System0->NumberBase == 2 ) format = "%*.*Rb" ;
-        else if ( cntx->System0->NumberBase == 16 ) format = "%*.*Rx" ;
-        mpfr_printf ( format, _Context_->System0->BigNum_Printf_Width, _Context_->System0->BigNum_Printf_Precision, *value ) ;
+        if ( cntx->System0->NumberBase == 10 ) format = (byte*) "%*.*Rf" ;
+        else if ( cntx->System0->NumberBase == 2 ) format = (byte*) "%*.*Rb" ;
+        else if ( cntx->System0->NumberBase == 16 ) format = (byte*) "%*.*Rx" ;
+        mpfr_printf ( (char*) format, _Context_->System0->BigNum_Printf_Width, _Context_->System0->BigNum_Printf_Precision, *value ) ;
     }
     fflush ( stdout ) ;
 }
@@ -313,7 +313,7 @@ BigNum_PlusPlus ( )
 {
     //Set_SCA ( 0 ) ; // this is not compiled
     mpfr_t *sum = _BigNum_New ( 0 ) ;
-    mpfr_t * op1 = ( mpfr_t* ) _DataStack_GetTop ( ), *op2 = ( mpfr_t* ) _BigNum_New ( "1" ) ;
+    mpfr_t * op1 = ( mpfr_t* ) _DataStack_GetTop ( ), *op2 = ( mpfr_t* ) _BigNum_New ( (byte*) "1" ) ;
     mpfr_add ( *sum, *op1, *op2, MPFR_RNDN ) ;
     _DataStack_SetTop ( ( int64 ) sum ) ;
 }
@@ -323,7 +323,7 @@ BigNum_MinusMinus ( )
 {
     //Set_SCA ( 0 ) ; // this is not compiled
     mpfr_t *sum = _BigNum_New ( 0 ) ;
-    mpfr_t * op1 = ( mpfr_t* ) _DataStack_GetTop ( ), *op2 = ( mpfr_t* ) _BigNum_New ( "1" ) ;
+    mpfr_t * op1 = ( mpfr_t* ) _DataStack_GetTop ( ), *op2 = ( mpfr_t* ) _BigNum_New ( (byte*) "1" ) ;
     mpfr_sub ( *sum, *op1, *op2, MPFR_RNDN ) ;
     _DataStack_SetTop ( ( int64 ) sum ) ;
 }

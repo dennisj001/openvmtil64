@@ -111,7 +111,8 @@ GetElxxStatus ( int64 cond, int64 type )
         dbg ( Ppibs_Print ( top, ( byte* ) ( ( type == PP_ELSE ) ? "Else : ElxxStatus: top of PreprocessorStackList" : "Elif : ElxxStatus" ) ) ) ;
         return status ;
     }
-    else _SyntaxError ( "#Elxx without #if", 1 ) ; //status = cond ; 
+    else _SyntaxError ( ( byte* ) "#Elxx without #if", 1 ) ; 
+    return 0 ;
 }
 
 Boolean
@@ -237,7 +238,7 @@ SkipPreprocessorCode ( Boolean skipControl )
                         }
                         else if ( GetEndifStatus ( ) ) goto done ;
                     }
-                    else _SyntaxError ( "Stray '#' in code!", 1 ) ;
+                    else _SyntaxError ( ( byte* ) "Stray '#' in code!", 1 ) ;
                 }
                 else goto done ;
             }

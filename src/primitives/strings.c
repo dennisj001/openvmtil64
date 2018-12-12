@@ -16,7 +16,7 @@ CfrTil_Strlen ( )
 void
 CfrTil_Strcmp ( )
 {
-    DataStack_Push ( (int64) Strcmp ( (char*) DataStack_Pop ( ), (char*) DataStack_Pop ( ) ) ) ;
+    DataStack_Push ( (int64) Strcmp ( (byte*) DataStack_Pop ( ), (byte*) DataStack_Pop ( ) ) ) ;
 }
 
 void

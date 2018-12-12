@@ -39,7 +39,7 @@ _Debugger_Disassemble ( Debugger * debugger, byte* address, int64 number, int64 
     return size ;
 }
 
-int64
+void
 Debugger_Disassemble ( Debugger * debugger, byte* address, int64 number, int64 cflag )
 {
     CfrTil_NewLine ( ) ;

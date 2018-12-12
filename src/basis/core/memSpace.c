@@ -117,6 +117,7 @@ Mem_Allocate ( int64 size, uint64 allocType )
         }
         default: CfrTil_Exception ( MEMORY_ALLOCATION_ERROR, 0, QUIT ) ;
     }
+    return 0 ;
 }
 
 void
@@ -530,8 +531,8 @@ _OVT_ShowMemoryAllocated ( OpenVmTil * ovt )
     Calculate_TotalNbaAccountedMemAllocated ( ovt, 1 ) ; //leak || vf ) ;
     _OVT_ShowPermanentMemList ( ovt ) ;
     int64 memDiff2 = ovt->Mmap_RemainingMemoryAllocated - ovt->PermanentMemListRemainingAccounted ;
-    byte * memDiff2s = "\nCurrent Unaccounted Diff (leak?)                 = %9d : <=: ovt->Mmap_RemainingMemoryAllocated - ovt->PermanentMemListAccounted" ;
-    byte * leaks = "\nleak?                                            = %9d : <=  (mmap_TotalMemAllocated - mmap_TotalMemFreed) - (ovt->TotalMemAllocated - ovt->TotalMemFreed) "
+    byte * memDiff2s = (byte*) "\nCurrent Unaccounted Diff (leak?)                 = %9d : <=: ovt->Mmap_RemainingMemoryAllocated - ovt->PermanentMemListAccounted" ;
+    byte * leaks = (byte*) "\nleak?                                            = %9d : <=  (mmap_TotalMemAllocated - mmap_TotalMemFreed) - (ovt->TotalMemAllocated - ovt->TotalMemFreed) "
         "\n                                                                    - ovt->OVT_InitialUnAccountedMemory" ;
     if ( memDiff2 ) _Printf ( ( byte* ) c_ad ( memDiff2s ), memDiff2 ) ;
     else if ( vf ) _Printf ( ( byte* ) c_ud ( memDiff2s ), memDiff2 ) ;

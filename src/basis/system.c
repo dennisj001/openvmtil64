@@ -299,9 +299,9 @@ _CfrTil_SystemState_Print ( int64 pflag )
     BigNum_StateShow ( ) ;
     Boolean dsc = GetState ( _CfrTil_, DEBUG_SOURCE_CODE_MODE ) ;
     _Printf ( ( byte* ) "\nDebug Source Code %s", dsc ? "on" : "off" ) ;
-    Boolean bno = Namespace_IsUsing ( "BigNum" ) ;
+    Boolean bno = Namespace_IsUsing ( (byte*) "BigNum" ) ;
     _Printf ( ( byte* ) " : BigNum %s", bno ? "on" : "off" ) ;
-    Boolean lo = Namespace_IsUsing ( "Lisp" ) ;
+    Boolean lo = Namespace_IsUsing ( (byte*) "Lisp" ) ;
     _Printf ( ( byte* ) " : Lisp %s", lo ? "on" : "off" ) ;
     _Printf ( ( byte* ) "\n%s : at %s", Compiling ? "compiling" : "interpreting", Context_Location ( ) ) ;
 }
@@ -413,9 +413,9 @@ _CfrTil_Source ( Word *word, int64 addToHistoryFlag )
                     ( ( word->WAttribute & WT_C_SYNTAX ) || GetState ( word, W_C_SYNTAX ) ) ? ", c_syntaxOn" : "", GetState ( word, W_INFIX_MODE ) ? ", infixOn" : "" ) ;
                 Boolean dsc = GetState ( _CfrTil_, DEBUG_SOURCE_CODE_MODE ) ;
                 _Printf ( ( byte* ) "\nDebug Source Code %s", dsc ? "on" : "off" ) ;
-                Boolean bno = Namespace_IsUsing ( "BigNum" ) ;
+                Boolean bno = Namespace_IsUsing ( (byte*) "BigNum" ) ;
                 _Printf ( ( byte* ) " : BigNum %s", bno ? "on" : "off" ) ;
-                Boolean lo = Namespace_IsUsing ( "Lisp" ) ;
+                Boolean lo = Namespace_IsUsing ( (byte*) "Lisp" ) ;
                 _Printf ( ( byte* ) " : Lisp %s", lo ? "on" : "off" ) ;
                 Boolean wsc = GetState ( word, W_SOURCE_CODE_MODE ) ;
                 _Printf ( ( byte* ) " : Word Source Code %s", wsc ? "on" : "off" ) ;

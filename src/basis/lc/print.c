@@ -3,7 +3,7 @@
 //| LO_Print
 //===================================================================================================================
 
-byte *
+void
 _LO_Print_Lambda_ToString ( LambdaCalculus * lc, ListObject * l0, int64 printValueFlag )
 {
     lc->buffer [0] = 0 ;
@@ -13,7 +13,7 @@ _LO_Print_Lambda_ToString ( LambdaCalculus * lc, ListObject * l0, int64 printVal
     _LO_PrintListToString (lc, ( ListObject * ) l0->Lo_LambdaFunctionBody, 1, printValueFlag) ; // 1 : lambdaFlag = 1 
 }
 
-byte *
+void
 _LO_Print_NonLambdaSymbol_ToString ( LambdaCalculus * lc, ListObject * l0, int64 printValueFlag )
 {
     lc->buffer [0] = 0 ;
@@ -92,7 +92,7 @@ _LO_PrintOneToString ( LambdaCalculus * lc, ListObject * l0, int64 in_a_LambdaFl
         }
         else if ( l0->LAttribute & LITERAL )
         {
-            if ( Namespace_IsUsing ( "BigNum" ) ) _BigNum_FPrint ( ( mpfr_t * ) l0->W_Value ) ;
+            if ( Namespace_IsUsing ( (byte*) "BigNum" ) ) _BigNum_FPrint ( ( mpfr_t * ) l0->W_Value ) ;
             else if ( ( l0->Lo_Integer < 0 ) || ( _Context_->System0->NumberBase == 16 ) )
                 LC_snprintf1 ( lc->buffer, " 0x%016lx", ( uint64 ) l0->Lo_UInteger ) ;
             else LC_snprintf1 ( lc->buffer, ( ( l0->Lo_Integer < 0 ) ? " 0x%016lx" : " %ld" ), l0->Lo_Integer ) ;
@@ -159,7 +159,7 @@ _LO_PrintWithValue ( ListObject * l0, byte * prefix, byte * postfix )
 void
 LO_PrintWithValue ( ListObject * l0 )
 {
-    _LO_PrintWithValue ( l0, "", "" ) ;
+    _LO_PrintWithValue ( l0, (byte*) "", (byte*) "" ) ;
 }
 
 void
@@ -185,6 +185,6 @@ void
 LO_Print ( ListObject * l0 )
 {
     DefaultColors ;
-    _LO_Print ( l0, "", "", 1 ) ;
+    _LO_Print ( l0, (byte*) "", (byte*) "", 1 ) ;
 }
 

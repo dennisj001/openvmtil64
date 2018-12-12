@@ -269,7 +269,7 @@ LO_PrepareReturnObject ( )
     {
         Namespace * ns = _CfrTil_InNamespace ( ) ;
         name = ns->Name ;
-        if ( Namespace_IsUsing ( "BigNum" ) ) type = T_BIG_NUM ;
+        if ( Namespace_IsUsing ( (byte*) "BigNum" ) ) type = T_BIG_NUM ;
         return DataObject_New ( T_LC_NEW, 0, 0, LITERAL | type, 0, LITERAL | type, 0, DataStack_Pop ( ), 0, 0, - 1 ) ;
     }
     else return nil ;

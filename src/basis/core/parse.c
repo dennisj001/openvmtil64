@@ -6,7 +6,7 @@ _CfrTil_SingleQuote ( )
     ReadLiner * rl = _ReadLiner_ ;
     Lexer * lexer = _Lexer_ ;
     Word *word, * sqWord = _CfrTil_WordList_TopWord ( ) ; //single quote word
-    char buffer [5] ;
+    byte buffer [5] ;
     byte c0, c1, c2 ;
     uint64 charLiteral = 0 ;
 
@@ -123,7 +123,7 @@ gotNextToken:
         else
         {
             byte * buffer = Buffer_Clear ( _CfrTil_->ScratchB1 ) ;
-            sprintf ( buffer, "\n_CfrTil_Parse_ClassStructure : can't find namespace : \'%s\'", token ) ;
+            sprintf ( (char*) buffer, "\n_CfrTil_Parse_ClassStructure : can't find namespace : \'%s\'", token ) ;
             _SyntaxError ( ( byte* ) buffer, 1 ) ; // else structure component size error
         }
         for ( i = 0 ; 1 ; )
@@ -242,7 +242,7 @@ _CfrTil_Parse_LocalsAndStackVariables ( int64 svf, int64 lispMode, ListObject * 
             if ( String_Equal ( ( char* ) token, "-t" ) ) // for setting W_TypeSignatureString
             {
                 token = _Lexer_LexNextToken_WithDelimiters ( lexer, 0, 1, 0, 1, LEXER_ALLOW_DOT ) ;
-                strncpy ( _CfrTil_->CurrentWordBeingCompiled->W_TypeSignatureString, token, 8 ) ;
+                strncpy ( (char*) _CfrTil_->CurrentWordBeingCompiled->W_TypeSignatureString, (char*) token, 8 ) ;
                 continue ; // don't add a node to our temporary list for this token
             }
             if ( String_Equal ( ( char* ) token, "--" ) ) // || ( String_Equal ( ( char* ) token, "|-" ) == 0 ) || ( String_Equal ( ( char* ) token, "|--" ) == 0 ) )
@@ -345,7 +345,7 @@ Lexer_ParseAsAString ( Lexer * lexer )
         lexer->TokenType = ( T_STRING | KNOWN_OBJECT ) ;
         lexer->LiteralString = _String_UnBox ( lexer->OriginalToken ) ;
     }
-    else if ( ( lexer->OriginalToken [ 0 ] == '\'' ) && ( strlen ( lexer->OriginalToken ) > 1 ) )
+    else if ( ( lexer->OriginalToken [ 0 ] == (byte) '\'' ) && ( strlen ( (char*) lexer->OriginalToken ) > 1 ) )
     {
         //char buffer [4] ; buffer[0]= '\'' ; buffer[1]= lexer->OriginalToken [ 1 ] ; buffer[2]= '\'' ; buffer[3]= 0 ;
         lexer->TokenType = ( T_CHAR | KNOWN_OBJECT ) ;
@@ -399,7 +399,7 @@ Lexer_ParseBinary ( Lexer * lexer, byte * token, int64 offset )
 void
 Lexer_ParseBigNum ( Lexer * lexer, byte * token )
 {
-    if ( Namespace_IsUsing ( "BigNum" ) ) //String_Equal ( ( char* ) name, "BigNum" ) )
+    if ( Namespace_IsUsing ( (byte*) "BigNum" ) ) //String_Equal ( ( char* ) name, "BigNum" ) )
     {
         mpfr_t *bfr = ( mpfr_t* ) _BigNum_New ( token ) ;
         lexer->Literal = ( int64 ) bfr ;

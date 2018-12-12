@@ -52,13 +52,13 @@ Stack_Pop_WithExceptionFlag ( Stack * stack, int64 exceptionOnEmptyFlag )
 int64
 Stack_Pop_WithZeroOnEmpty ( Stack * stack )
 {
-    Stack_Pop_WithExceptionFlag ( stack, 0 ) ;
+    return Stack_Pop_WithExceptionFlag ( stack, 0 ) ;
 }
 
 int64
 Stack_Pop_WithExceptionOnEmpty ( Stack * stack )
 {
-    Stack_Pop_WithExceptionFlag ( stack, 1 ) ;
+    return Stack_Pop_WithExceptionFlag ( stack, 1 ) ;
 }
 
 int64
@@ -77,7 +77,7 @@ _Stack_PopOrTop ( Stack * stack )
     int64 sd = Stack_Depth ( stack ) ;
     if ( sd <= 0 ) CfrTil_Exception ( STACK_UNDERFLOW, 0, QUIT ) ;
     else if ( sd == 1 ) return Stack_Top ( stack ) ;
-    else return __Stack_Pop ( stack ) ;
+    return __Stack_Pop ( stack ) ;
 }
 
 void

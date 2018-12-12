@@ -551,7 +551,7 @@ LC_New ( )
 LambdaCalculus *
 LC_Reset ( )
 {
-    LC_New ( ) ;
+    return LC_New ( ) ;
 }
 
 LambdaCalculus *

@@ -238,7 +238,7 @@ CfrTil_Literal ( )
     int64 value = DataStack_Pop ( ) ;
     ByteArray * svcs = _Q_CodeByteArray ;
     _NBA_SetCompilingSpace_MakeSureOfRoom ( _Q_->MemorySpace0->TempObjectSpace, 4 * K ) ;
-    Word * word = DataObject_New ( LITERAL, 0, "<literal>", LITERAL | CONSTANT, 0, 0, 0, value, 0, - 1, - 1 ) ;
+    Word * word = DataObject_New ( LITERAL, 0, (byte*) "<literal>", LITERAL | CONSTANT, 0, 0, 0, value, 0, - 1, - 1 ) ;
     Set_CompilerSpace ( svcs ) ;
     Interpreter_DoWord ( _Context_->Interpreter0, word, - 1, - 1 ) ;
 }

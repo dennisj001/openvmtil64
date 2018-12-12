@@ -59,8 +59,8 @@ CfrTil_ResetAll_Init ( CfrTil * cfrTil )
     {
         _Q_->StartIncludeTries = 0 ;
         _CfrTil_Init_SessionCore ( cfrTil, 1, 0 ) ;
-        _CfrTil_Namespace_NotUsing ( "BigNum" ) ;
-        _CfrTil_Namespace_NotUsing ( "Lisp" ) ;
+        _CfrTil_Namespace_NotUsing ( (byte*) "BigNum" ) ;
+        _CfrTil_Namespace_NotUsing ( (byte*) "Lisp" ) ;
         if ( _Q_->StartupFilename )
         {
             _Q_->Verbosity = 0 ;
@@ -134,7 +134,7 @@ CfrTil_AddCPrimitives ( )
     for ( i = 0 ; CPrimitives [ i ].ccp_Name ; i ++ )
     {
         CPrimitive p = CPrimitives [ i ] ;
-        _CfrTil_CPrimitiveNewAdd ( p.ccp_Name, p.pb_TypeSignature, p.OpInsnCodeGroup, p.OpInsnCode, p.blk_Definition, p.ui64_CAttribute, p.ui64_CAttribute2, p.ui64_LAttribute, ( char* ) p.NameSpace, ( char* ) p.SuperNamespace ) ;
+        _CfrTil_CPrimitiveNewAdd ( p.ccp_Name, (byte*) p.pb_TypeSignature, p.OpInsnCodeGroup, p.OpInsnCode, p.blk_Definition, p.ui64_CAttribute, p.ui64_CAttribute2, p.ui64_LAttribute, ( char* ) p.NameSpace, ( char* ) p.SuperNamespace ) ;
     }
     //_CfrTil_CPrimitiveNewAdd ( p.ccp_Name, p.blk_Definition, p.ui64_CAttribute, p.ui64_CAttribute2, p.ui64_LAttribute, ( char* ) p.NameSpace, ( char* ) p.SuperNamespace ) ;
 }

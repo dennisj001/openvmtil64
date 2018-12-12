@@ -108,7 +108,7 @@ HistorySpace_Delete ( )
     OVT_MemListFree_HistorySpace ( ) ;
 }
 
-HistorySpace *
+void
 _HistorySpace_Init ( OpenVmTil * ovt, int64 reset )
 {
     if ( ovt )

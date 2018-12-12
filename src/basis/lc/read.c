@@ -45,7 +45,7 @@ _LO_Read ( LambdaCalculus * lc )
                 else lnew = l0 ;
             }
         }
-        else _SyntaxError ( "\n_LO_Read : Syntax error : no token?\n", QUIT ) ;
+        else _SyntaxError ( (byte*) "\n_LO_Read : Syntax error : no token?\n", QUIT ) ;
     }
     while ( lc->ParenLevel ) ;
     SetState ( lc, LC_READ, false ) ;

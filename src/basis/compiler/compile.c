@@ -174,7 +174,7 @@ _CfrTil_AdjustGotoPoint ( int64 originalAddress )
 }
 #endif
 
-int64
+void
 _CfrTil_AdjustLabels ( byte * srcAddress )
 {
     dllist_Map1 ( _Context_->Compiler0->GotoList, ( MapFunction1 ) AdjustLabel, ( int64 ) ( srcAddress ) ) ;

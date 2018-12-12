@@ -248,7 +248,7 @@ Debugger_PreStartStepping ( Debugger * debugger )
         // we would at least need to save/restore our registers to step thru native c code
         if ( ! GetState ( debugger, DBG_CAN_STEP ) )
         {
-            _Printf ( "\nStepping turned off for this word : %s%s%s%s : debugger->DebugAddress = 0x%016lx : (e)valuating",
+            _Printf ( ( byte* ) "\nStepping turned off for this word : %s%s%s%s : debugger->DebugAddress = 0x%016lx : (e)valuating",
                 c_ud ( word->S_ContainingNamespace ? word->S_ContainingNamespace->Name : ( byte* ) "<literal> " ),
                 word->S_ContainingNamespace ? ( byte* ) "." : ( byte* ) "", c_gu ( word->Name ),
                 GetState ( debugger, DBG_AUTO_MODE ) ? " : automode turned off" : "",
@@ -333,12 +333,12 @@ _Debugger_SetupReturnStackCopy ( Debugger * debugger, int64 size, Boolean showFl
             rsc0 = ( uint64 ) Mem_Allocate ( size, COMPILER_TEMP ) ;
             rsc = ( rsc0 + 0xf ) & ( uint64 ) 0xfffffffffffffff0 ; // 16 byte alignment
             debugger->CopyRSP = ( byte* ) rsc + size - pushedWindow ;
-            if ( showFlag ) ( _PrintNStackWindow ( ( int64* ) debugger->CopyRSP, "ReturnStackCopy", "RSCP", 4 ) ) ;
+            if ( showFlag ) ( _PrintNStackWindow ( ( uint64* ) debugger->CopyRSP, ( byte* ) "ReturnStackCopy", ( byte* ) "RSCP", 4 ) ) ;
         }
         else rsc = ( uint64 ) ( debugger->CopyRSP - size + pushedWindow ) ;
         MemCpy ( ( byte* ) rsc, ( ( byte* ) rsp ) - size + pushedWindow, size ) ; // pushedWindow (32) : account for useful current stack
-        if ( showFlag ) ( _PrintNStackWindow ( ( uint64* ) rsp, "ReturnStack", "RSP", 4 ) ) ; //pushedWindow ) ) ;
-        if ( showFlag ) ( _PrintNStackWindow ( ( int64* ) debugger->CopyRSP, "ReturnStackCopy", "RSCP", 4 ) ) ; //pushedWindow ) ) ;
+        if ( showFlag ) ( _PrintNStackWindow ( ( uint64* ) rsp, ( byte* ) "ReturnStack", ( byte* ) "RSP", 4 ) ) ; //pushedWindow ) ) ;
+        if ( showFlag ) ( _PrintNStackWindow ( ( uint64* ) debugger->CopyRSP, ( byte* ) "ReturnStackCopy", ( byte* ) "RSCP", 4 ) ) ; //pushedWindow ) ) ;
         debugger->cs_Cpu->Rsp = ( uint64* ) debugger->CopyRSP ;
         SetState ( debugger, DBG_STACK_OLD, false ) ;
         return true ;
@@ -350,7 +350,7 @@ _Debugger_SetupReturnStackCopy ( Debugger * debugger, int64 size, Boolean showFl
 void
 Debugger_PrintReturnStackWindow ( )
 {
-    _PrintNStackWindow ( ( int64* ) _Debugger_->cs_Cpu->Rsp, "Debugger ReturnStack (RSP)", "RSP", 4 ) ;
+    _PrintNStackWindow ( ( uint64* ) _Debugger_->cs_Cpu->Rsp, ( byte* ) "Debugger ReturnStack (RSP)", ( byte* ) "RSP", 4 ) ;
 }
 
 // restore the 'internal running cfrTil' cpu state which was saved after the last instruction : debugger->cs_CpuState is the 'internal running cfrTil' cpu state
@@ -505,12 +505,12 @@ Debug_ExtraShow ( int64 size, Boolean force )
     {
         if ( force || ( _Q_->Verbosity > 4 ) )
         {
-            _Printf ( "\n\ndebugger->SaveCpuState" ) ;
+            _Printf ( ( byte* ) "\n\ndebugger->SaveCpuState" ) ;
             _Debugger_Disassemble ( debugger, ( byte* ) debugger->SaveCpuState, 1000, 1 ) ; //137, 1 ) ;
-            _Printf ( "\n\ndebugger->RestoreCpuState" ) ;
+            _Printf ( ( byte* ) "\n\ndebugger->RestoreCpuState" ) ;
             _Debugger_Disassemble ( debugger, ( byte* ) debugger->RestoreCpuState, 1000, 2 ) ; //100, 0 ) ;
         }
-        _Printf ( "\n\ndebugger->StepInstructionBA->BA_Data" ) ;
+        _Printf ( ( byte* ) "\n\ndebugger->StepInstructionBA->BA_Data" ) ;
         _Debugger_Disassemble ( debugger, ( byte* ) debugger->StepInstructionBA->BA_Data, size, 0 ) ;
     }
 }

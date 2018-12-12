@@ -37,7 +37,7 @@ Lexer_ObjectToken_New ( Lexer * lexer, byte * token ) //, int64 parseFlag )
             {
                 _Q_->ExceptionToken = token ;
                 byte *buffer = Buffer_Data ( _CfrTil_->ScratchB1 ) ;
-                sprintf ( buffer, ( byte* ) "%s ?\n", ( char* ) token ) ;
+                sprintf ( (char*) buffer, "%s ?\n", ( char* ) token ) ;
                 CfrTil_Exception ( NOT_A_KNOWN_OBJECT, buffer, QUIT ) ;
             }
         }

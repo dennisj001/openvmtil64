@@ -11,7 +11,7 @@
 #define LO_CopyOne( l0 ) _LO_CopyOne ( l0, LISP_TEMP )
 #define LO_Eval( lc, l0 ) _LO_Eval ( lc, l0, 0, 1 )
 #define nil (_LC_ ? _LC_->Nil : 0)
-#define LC_SaveStackPointer( lc ) { if ( lc ) lc->SaveStackPointer = (int64*) _Dsp_ ; }
+#define LC_SaveStackPointer( lc ) { if ( lc ) lc->SaveStackPointer = _Dsp_ ; }
 #define LC_RestoreStackPointer( lc ) _LC_ResetStack ( lc ) //{ if ( lc && lc->SaveStackPointer ) Dsp = lc->SaveStackPointer ; }
 
 #define LC_snprintf2( buffer, format, value1, value2 ) snprintf ( ( char* ) buffer, BUFFER_SIZE, ((char*) (format)), value1, value2 ) 

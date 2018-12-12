@@ -439,7 +439,7 @@ ReadLine_FirstCharOfToken_FromLastChar ( ReadLiner * rl, int64 pos )
 int64
 ReadLine_IsThereADotSeparator ( ReadLiner * rl, int64 pos )
 {
-    String_IsThereADotSeparatorBackFromPosToLastNonDelmiter ( rl->InputLine, pos ) ;
+    return String_IsThereADotSeparatorBackFromPosToLastNonDelmiter ( rl->InputLine, pos ) ;
 }
 
 int64
@@ -463,7 +463,7 @@ ReadLine_BeginningOfLastToken ( ReadLiner * rl )
 Boolean
 ReadLine_IsReverseTokenQualifiedID ( ReadLiner * rl )
 {
-    String_IsReverseTokenQualifiedID ( rl->InputLine, rl->ReadIndex ) ; //int64 pos ) ;
+    return String_IsReverseTokenQualifiedID ( rl->InputLine, rl->ReadIndex ) ; //int64 pos ) ;
 }
 
 void

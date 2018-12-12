@@ -100,7 +100,7 @@ CfrTil_Debugger_SaveCpuState ( )
 void
 CfrTil_PrintReturnStackWindow ( )
 {
-    _PrintNStackWindow ( ( int64* ) _CfrTil_->cs_Cpu->Rsp, "CfrTil C ReturnStack (RSP)", "RSP", 4 ) ;
+    _PrintNStackWindow ( ( uint64* ) _CfrTil_->cs_Cpu->Rsp, (byte*) "CfrTil C ReturnStack (RSP)", (byte*) "RSP", 4 ) ;
 }
 
 void
@@ -194,15 +194,15 @@ _CfrTil_Init ( CfrTil * cfrTil, Namespace * nss )
     }
     CfrTil_MachineCodePrimitive_AddWords ( cfrTil ) ; // in any case we need to reinit these for eg. debugger->SaveCpuState (), etc.
     cfrTil->StoreWord = Finder_FindWord_AnyNamespace ( _Finder_, ( byte* ) "store" ) ;
-    cfrTil->PokeWord = Finder_FindWord_InOneNamespace ( _Finder_, "Compiler", "=" ) ; //Finder_FindWord_AnyNamespace ( _Finder_, ( byte* ) "=" ) ;
+    cfrTil->PokeWord = Finder_FindWord_InOneNamespace ( _Finder_, (byte*) "Compiler", (byte*) "=" ) ; //Finder_FindWord_AnyNamespace ( _Finder_, ( byte* ) "=" ) ;
     cfrTil->RightBracket = Finder_FindWord_AnyNamespace ( _Finder_, ( byte* ) "]" ) ;
-    cfrTil->InfixNamespace = Namespace_Find ( "Infix" ) ;
+    cfrTil->InfixNamespace = Namespace_Find ( (byte*) "Infix" ) ;
     CfrTil_ReadTables_Setup ( cfrTil ) ;
     CfrTil_LexerTables_Setup ( cfrTil ) ;
     cfrTil->LC = 0 ;
     cfrTil->SC_QuoteMode = 0 ;
-    cfrTil->EndBlockWord = Finder_FindWord_InOneNamespace ( _Finder_, "Reserved", "}" ) ;
-    cfrTil->BeginBlockWord = Finder_FindWord_InOneNamespace ( _Finder_, "Reserved", "{" ) ;
+    cfrTil->EndBlockWord = Finder_FindWord_InOneNamespace ( _Finder_, (byte*) "Reserved", (byte*) "}" ) ;
+    cfrTil->BeginBlockWord = Finder_FindWord_InOneNamespace ( _Finder_, (byte*) "Reserved", (byte*) "{" ) ;
     SetState ( cfrTil, SOURCE_CODE_ON, true ) ;
 }
 

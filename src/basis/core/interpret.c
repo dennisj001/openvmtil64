@@ -85,7 +85,7 @@ Interpreter_DoPrefixWord ( Context * cntx, Interpreter * interp, Word * word )
         _Interpreter_DoPrefixWord ( cntx, interp, word ) ;
     }
     else if ( word->CAttribute & CATEGORY_OP_1_ARG ) Interpreter_DoInfixWord ( interp, word ) ; //goto doInfix ;
-    else _SyntaxError ( "Attempting to call a prefix function without following parenthesized args", 1 ) ;
+    else _SyntaxError ( (byte*) "Attempting to call a prefix function without following parenthesized args", 1 ) ;
 }
 
 void

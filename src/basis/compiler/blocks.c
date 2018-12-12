@@ -191,7 +191,7 @@ _CfrTil_BeginBlock1 ( BlockInfo * bi )
     return bi ;
 }
 
-BlockInfo *
+void
 _CfrTil_BeginBlock2 ( BlockInfo * bi )
 {
     Compiler * compiler = _Context_->Compiler0 ;

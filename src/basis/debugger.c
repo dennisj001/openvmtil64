@@ -474,7 +474,7 @@ Debugger_InterpretLine_WithStartString ( byte * str )
 void
 Debugger_InterpretLine ( )
 {
-    Debugger_InterpretLine_WithStartString ( "" ) ;
+    Debugger_InterpretLine_WithStartString ( (byte*) "" ) ;
 }
 
 void
@@ -491,11 +491,11 @@ Debugger_Escape ( Debugger * debugger )
     int64 svcm = Get_CompileMode ( ) ;
     Set_CompileMode ( false ) ;
     byte * lexerTokenBuffer = _Buffer_New_pbyte ( BUFFER_SIZE, N_UNLOCKED ) ;
-    strcpy ( lexerTokenBuffer, _CfrTil_->TokenBuffer ) ;
+    strcpy ( (char*) lexerTokenBuffer, (char*) _CfrTil_->TokenBuffer ) ;
 
     Debugger_InterpretLine ( ) ;
 
-    strcpy ( _CfrTil_->TokenBuffer, lexerTokenBuffer ) ;
+    strcpy ( (char*) _CfrTil_->TokenBuffer, (char*) lexerTokenBuffer ) ;
     Set_CompileMode ( svcm ) ;
     DebugOn ;
     DebugColors ;

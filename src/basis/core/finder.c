@@ -49,6 +49,7 @@ _Finder_CompareDefinitionAddress_NoAlias ( Symbol * symbol, byte * address )
 {
     Word * word = ( Word * ) symbol ;
     if ( ( ! ( word->CAttribute & ALIAS ) ) ) return _Finder_CompareDefinitionAddress ( symbol, address ) ;
+    else return 0 ;
 }
 
 Word *
@@ -56,6 +57,7 @@ Finder_FindWordFromAddress_InOneNamespace ( Finder * finder, Namespace * ns, byt
 {
     if ( ns ) return finder->FoundWord = Tree_Map_OneNamespace ( ( Word* ) dllist_First ( ( dllist* ) ns->S_SymbolList ),
         ( MapFunction_1 ) _Finder_CompareDefinitionAddress, ( int64 ) address ) ;
+    else return 0 ;
 }
 
 Word *
@@ -63,7 +65,7 @@ Finder_FindWordFromAddress_AnyNamespace ( Finder * finder, byte * address )
 {
     finder->FoundWord = Tree_Map_State_OneArg ( USING | NOT_USING,
         ( MapFunction_1 ) _Finder_CompareDefinitionAddress, ( int64 ) address ) ;
-    CfrTil_WordAccounting ( "Finder_Address_FindAny" ) ;
+    CfrTil_WordAccounting ( (byte*) "Finder_Address_FindAny" ) ;
     return finder->FoundWord ;
 }
 
@@ -117,7 +119,7 @@ Finder_Word_FindUsing ( Finder * finder, byte * name, int64 saveQns )
         }
         if ( ! word ) word = Finder_FindWord_UsedNamespaces ( _Finder_, name ) ;
     }
-    CfrTil_WordAccounting ( "Finder_Word_FindUsing" ) ;
+    CfrTil_WordAccounting ( (byte*) "Finder_Word_FindUsing" ) ;
 
     return word ;
 }

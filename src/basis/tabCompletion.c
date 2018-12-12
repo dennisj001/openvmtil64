@@ -36,23 +36,23 @@ ReadLiner_GenerateFullNamespaceQualifiedName ( ReadLiner * rl, Word * w )
         }
         _Stack_Push ( nsStk, ( int64 ) ( ( ns->State & NOT_USING ) ? c_ud ( ns->Name ) : ( ns->Name ) ) ) ;
     }
-    if ( notUsing ) c_udDot = ( CString ) c_ud ( "." ) ;
+    if ( notUsing ) c_udDot = (byte*) c_ud ( "." ) ;
     for ( i = Stack_Depth ( nsStk ) ; i ; i -- )
     {
         nsName = ( byte* ) _Stack_Pop ( nsStk ) ;
         if ( nsName )
         {
-            strcat ( ( CString ) b0, nsName ) ; //( CString ) notUsing ? c_dd ( nsName ) : nsName ) ;
+            strcat ( (char*) b0, (char*) nsName ) ; //( CString ) notUsing ? c_dd ( nsName ) : nsName ) ;
             if ( i > 1 )
             {
-                strcat ( ( CString ) b0, "." ) ; //( CString ) notUsing ? ( CString ) c_ddDot : ( CString ) "." ) ;
+                strcat ( (char*) b0, "." ) ; //( CString ) notUsing ? ( CString ) c_ddDot : ( CString ) "." ) ;
             }
         }
     }
     if ( ! String_Equal ( nsName, w->Name ) )
     {
         if ( ! dot ) strcat ( ( CString ) b0, ( CString ) notUsing ? ( CString ) c_udDot : ( CString ) "." ) ;
-        strcat ( ( CString ) b0, ( CString ) notUsing ? c_ud ( w->Name ) : w->Name ) ; // namespaces are all added above
+        strcat ( (char*) b0, notUsing ? (char*) c_ud ( w->Name ) : (char*) w->Name ) ; // namespaces are all added above
     }
     return b0 ;
 }
@@ -236,7 +236,7 @@ _TabCompletionInfo_GetAPreviousIdentifier ( ReadLiner *rl, int64 start )
     tci->TokenLastChar = ReadLine_LastCharOfLastToken_FromPos ( rl, start ) ;
     tci->TokenFirstChar = ReadLine_FirstCharOfToken_FromLastChar ( rl, tci->TokenLastChar ) ;
     tci->TokenLength = tci->TokenLastChar - tci->TokenFirstChar + 1 ; // zero array start
-    Strncpy ( ( CString ) b, ( CString ) & rl->InputLine [ tci->TokenFirstChar ], tci->TokenLength ) ;
+    Strncpy ( ( byte * ) b, ( byte * ) & rl->InputLine [ tci->TokenFirstChar ], tci->TokenLength ) ;
     b [ tci->TokenLength ] = 0 ;
     return TemporaryString_New ( b ) ;
 }

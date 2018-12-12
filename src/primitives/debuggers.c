@@ -42,7 +42,7 @@ CfrTil_DebugInfo ( )
 void
 CfrTil_DebugOn ( )
 {
-    if ( _Q_->Verbosity > 1 ) _Printf ( "\nCfrTil_DebugOn : at %s", Context_Location ( ) ) ;
+    if ( _Q_->Verbosity > 1 ) _Printf ( (byte*) "\nCfrTil_DebugOn : at %s", Context_Location ( ) ) ;
     Context * cntx = _Context_ ;
     Debugger * debugger = _Debugger_ ;
     debugger->DebugRSP = 0 ;

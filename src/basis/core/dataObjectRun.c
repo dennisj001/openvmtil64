@@ -435,7 +435,7 @@ _CfrTil_Do_Variable ( Word * word )
 void
 _Do_LocalObject_AllocateInit ( Namespace * typeNamespace, byte ** value, int64 size )
 {
-    Word * word = _CfrTil_ObjectNew ( size, "<object>", 0, TEMPORARY ) ;
+    Word * word = _CfrTil_ObjectNew ( size, (byte*) "<object>", 0, TEMPORARY ) ;
     _Class_Object_Init ( word, typeNamespace ) ;
     * value = ( byte* ) word->W_Value ;
 }

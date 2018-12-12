@@ -78,7 +78,7 @@ _Compiler_SetCompilingSpace ( byte * name )
 byte *
 _Compiler_GetCodeSpaceHere ( )
 {
-    NamedByteArray *nba = _OVT_Find_NBA ( "CodeSpace" ) ;
+    NamedByteArray *nba = _OVT_Find_NBA ( (byte*) "CodeSpace" ) ;
     byte * here = _ByteArray_Here ( nba->ba_CurrentByteArray ) ;
     return here ;
 }
@@ -146,7 +146,7 @@ void
 GotoInfo_Print ( dlnode * node )
 {
     GotoInfo * gi = ( GotoInfo * ) node ;
-    _Printf ( "\nLabelName = %s : Type = %3d : CompileAtAddress = 0x%016lx : LabeledAddress = 0x%016lx : JmpOffsetPointer = : 0x%016lx",
+    _Printf ( (byte*) "\nLabelName = %s : Type = %3d : CompileAtAddress = 0x%016lx : LabeledAddress = 0x%016lx : JmpOffsetPointer = : 0x%016lx",
         gi->pb_LabelName, gi->GI_CAttribute, gi->CompileAtAddress, gi->LabeledAddress, gi->pb_JmpOffsetPointer ) ;
 }
 
@@ -154,7 +154,7 @@ void
 Compiler_GotoList_Print ( )
 {
     Compiler * compiler = _Context_->Compiler0 ;
-    _Printf ( "\nTypes : GI_BREAK = 1 : GI_RETURN = 2 : GI_CONTINUE = 4 : GI_GOTO = 8 : GI_RECURSE = 16 : GI_LABEL = 64 : GI_GOTO_LABEL = 128" ) ;
+    _Printf ( (byte*) "\nTypes : GI_BREAK = 1 : GI_RETURN = 2 : GI_CONTINUE = 4 : GI_GOTO = 8 : GI_RECURSE = 16 : GI_LABEL = 64 : GI_GOTO_LABEL = 128" ) ;
     dllist_Map ( compiler->GotoList, ( MapFunction0 ) GotoInfo_Print ) ;
 }
 
@@ -242,6 +242,7 @@ CompileOptimizeInfo *
 Compiler_CompileOptimizeInfo_New ( Compiler * compiler, uint64 type )
 {
     compiler->OptInfo = _CompileOptimizeInfo_New ( type ) ;
+    return compiler->OptInfo ;
 }
 
 CompileOptimizeInfo *

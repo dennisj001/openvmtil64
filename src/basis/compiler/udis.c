@@ -71,13 +71,13 @@ _Debugger_Udis_OneInstruction ( Debugger * debugger, byte * address, byte * pref
 int64
 _Udis_Disassemble ( ud_t *ud, byte* iaddress, int64 number, int64 cflag )
 {
+    int64 isize, size = 0 ;
     if ( iaddress )
     {
         char * iasm ;
         byte * address = 0 ;
         ud_set_input_buffer ( ud, ( byte* ) iaddress, number ) ;
         ud_set_pc ( ud, ( uint64 ) iaddress ) ;
-        int64 isize, size = 0 ;
         do
         {
             isize = ud_disassemble ( ud ) ;
@@ -96,7 +96,7 @@ _Udis_Disassemble ( ud_t *ud, byte* iaddress, int64 number, int64 cflag )
         }
         while ( ( isize && ( number > 0 ) ) ) ;
         size = address - iaddress ;
-        return (( size > 0 ) ? size : 0 ) ;
     }
+    return (( size > 0 ) ? size : 0 ) ;
 }
 

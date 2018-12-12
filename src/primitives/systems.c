@@ -194,7 +194,7 @@ void
 ShellEscape_Postfix ( )
 {
     byte * str = ( byte* ) DataStack_Pop ( ) ;
-    ShellEscape ( ( char* ) str ) ;
+    ShellEscape ( (byte*) str ) ;
 }
 
 void
@@ -202,8 +202,8 @@ shell ( )
 {
     char * semi, *nl ;
     byte * str = _String_Get_ReadlineString_ToEndOfLine ( ) ;
-    if ( semi = strchr ( str, ';' ) ) *semi = 0 ;
-    if ( nl = strchr ( str, '\n' ) ) *nl = 0 ;
+    if ( semi = strchr ( (char*) str, ';' ) ) *semi = 0 ;
+    if ( nl = strchr ( (char*) str, '\n' ) ) *nl = 0 ;
     ShellEscape ( str ) ;
 }
 

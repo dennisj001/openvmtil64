@@ -80,7 +80,7 @@ inline
 int64
 List_Get_N_Node_M_Slot ( dllist *list, int64 n, int64 m )
 {
-    _dllist_Get_N_Node_M_Slot ( list, n, m ) ;
+    return _dllist_Get_N_Node_M_Slot ( list, n, m ) ;
 }
 
 // first slot of the n node
@@ -89,7 +89,7 @@ inline
 int64
 List_GetN_Value ( dllist *list, int64 n )
 {
-    _dllist_Get_N_Node_M_Slot ( list, n, 0 ) ;
+    return _dllist_Get_N_Node_M_Slot ( list, n, 0 ) ;
 }
 
 inline

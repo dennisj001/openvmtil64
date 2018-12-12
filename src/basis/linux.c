@@ -11,12 +11,12 @@ _DisplaySignal ( int64 signal )
     {
         byte * location ; 
         if ( _Q_->SigSegvs < 2 ) location = ( byte* ) Context_Location ( ) ;
-        else location = "" ;
+        else location = (byte*) "" ;
         switch ( signal )
         {
             case SIGSEGV:
             {
-                printf ( ( byte* ) "\nSIGSEGV : memory access violation : address = 0x%016lx : %s", (uint64) _Q_->SigAddress, location ) ;
+                printf ( "\nSIGSEGV : memory access violation : address = 0x%016lx : %s", (uint64) _Q_->SigAddress, location ) ;
                 fflush ( stdout ) ;
                 break ;
             }

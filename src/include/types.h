@@ -7,8 +7,8 @@ typedef short int16 ;
 typedef unsigned short uint16 ;
 typedef int int32 ;
 typedef unsigned int uint32 ;
-typedef long int64 ;
-typedef unsigned long uint64 ;
+typedef long int int64 ;
+typedef unsigned long int uint64 ;
 
 typedef char * CString ;
 typedef byte CharSet ;
@@ -868,7 +868,7 @@ typedef struct _LambdaCalculus
     uint64 ItemQuoteState, QuoteState ;
     struct _CfrTil * OurCfrTil ;
     Stack * QuoteStateStack ;
-    int64 * SaveStackPointer ;
+    uint64 * SaveStackPointer ;
     byte * LC_SourceCode ;
     Buffer *OutBuffer, *PrintBuffer ;
     byte * buffer, *outBuffer ;
@@ -1041,8 +1041,8 @@ typedef struct
     const char * ccp_Name ;
     union
     {
-        byte * pb_TypeSignature ;
-        byte TypeSignature [8] ;
+        const char * pb_TypeSignature ;
+        char TypeSignature [8] ;
         uint64 uint64_TypeSignature ;
     } ;
     uint8 OpInsnCodeGroup ;

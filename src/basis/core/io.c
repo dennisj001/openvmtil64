@@ -65,7 +65,7 @@ _Key ( FILE * f )
     return key ;
 }
 
-int64
+void
 Kbhit_Pause ( )
 {
     if ( kbhit ( ) == ESC ) OpenVmTil_Pause ( ) ;

@@ -348,7 +348,7 @@ CfrTil_Set_TypeSignature ( void )
 {
     byte * typeSignature = ( byte* ) DataStack_Pop ( ) ;
     Word * word = _CfrTil_->LastFinished_Word ; // nb! must be LastFinished_Word because the signature is a literal and it is the LastFinished_DObject
-    if ( word ) strncpy ( word->W_TypeSignatureString, typeSignature, 7 ) ;
+    if ( word ) Strncpy ( word->W_TypeSignatureString, typeSignature, 7 ) ;
 }
 
 void
@@ -421,13 +421,13 @@ CfrTil_DebugWord ( void )
 void
 Symbol_Print ( Symbol * symbol ) 
 {
-    _Printf ( "%s", symbol->Name ) ;
+    _Printf ( (byte*) "%s", symbol->Name ) ;
 }
 
 void
 Symbol_List_Print ( dllist * list )
 {
-   _Printf ( "\nSymbol List : " ) ;
+   _Printf ( (byte*) "\nSymbol List : " ) ;
    dllist_Map ( list, (MapFunction0) Symbol_Print ) ; 
 }
 
@@ -556,6 +556,6 @@ CfrTil_AllWords ( )
     _Printf ( ( byte* ) "\n" INT_FRMT " total words", n + m ) ;
     int64 notUsingWords = _CfrTil_->FindWordCount ;
     _CfrTil_->FindWordCount = usingWords + notUsingWords ;
-    CfrTil_WordAccounting ( "CfrTil_AllWords" ) ;
+    CfrTil_WordAccounting ( (byte*) "CfrTil_AllWords" ) ;
 }
 

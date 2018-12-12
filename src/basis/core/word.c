@@ -15,7 +15,7 @@ Word_Run ( Word * word )
     }
 }
 
-int64
+void
 Word_Eval ( Word * word )
 {
     if ( word )
@@ -257,7 +257,7 @@ __Word_ShowSourceCode ( Word * word )
             Buffer_Unlock ( dstb ) ;
             Buffer_SetAsFree ( dstb, 0 ) ;
         }
-        else scd = "C Primitive" ;
+        else scd = (byte*) "C Primitive" ;
         name = c_gd ( word->Name ) ;
         _Printf ( ( byte* ) "\nSourceCode for %s.%s :> \n%s", word->S_ContainingNamespace ? word->S_ContainingNamespace->Name : ( byte* ) "", name, scd ) ;
     }
@@ -276,7 +276,7 @@ Word_GetLocalsSourceCodeString ( Word * word, byte * buffer )
         for ( e = s ; sc [ e ] && sc [ e ] != ')' ; e ++ ) ; // end = & sc [ e ] ;
         if ( sc [ e ] )
         {
-            Strncpy ( ( char* ) buffer, ( char* ) start, e - s + 1 ) ;
+            Strncpy ( buffer, start, e - s + 1 ) ;
             buffer [ e - s + 1 ] = 0 ;
         }
     }
@@ -312,17 +312,18 @@ _CfrTil_WordName_Run ( byte * name )
 Word *
 _CfrTil_Alias ( Word * word, byte * name )
 {
+    Word * alias = 0 ;
     if ( word && word->Definition )
     {
-        Word * alias = _Word_New ( name, word->CAttribute | ALIAS, word->CAttribute2, word->LAttribute, 1, 0, DICTIONARY ) ; // inherit type from original word
+        alias = _Word_New ( name, word->CAttribute | ALIAS, word->CAttribute2, word->LAttribute, 1, 0, DICTIONARY ) ; // inherit type from original word
         word = Word_UnAlias ( word ) ;
         Word_InitFinal ( alias, ( byte* ) word->Definition ) ;
         alias->S_CodeSize = word->S_CodeSize ;
         alias->W_AliasOf = word ;
-        strncpy ( alias->W_TypeSignatureString, word->W_TypeSignatureString, 7 ) ;
-        return alias ;
+        Strncpy ( alias->W_TypeSignatureString, word->W_TypeSignatureString, 7 ) ;
     }
     else Exception ( USEAGE_ERROR, ABORT ) ;
+    return alias ;
 }
 
 void

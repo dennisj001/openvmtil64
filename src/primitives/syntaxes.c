@@ -13,7 +13,7 @@ void
 CfrTil_InfixModeOn ( )
 {
     SetState ( _Context_, INFIX_MODE, true ) ;
-    Namespace_DoNamespace ( "Infix" ) ;
+    Namespace_DoNamespace ( (byte*) "Infix" ) ;
 }
 
 void
@@ -102,7 +102,7 @@ CfrTil_Begin_C_Block ( )
         if ( GetState ( _Compiler_, C_COMBINATOR_PARSING ) ) CfrTil_BeginBlock ( ) ;
         else
         {
-            Interpret_Until_Token ( _Interpreter_, "}", 0 ) ;
+            Interpret_Until_Token ( _Interpreter_, (byte*) "}", 0 ) ;
         }
     }
 }

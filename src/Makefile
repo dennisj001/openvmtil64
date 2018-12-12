@@ -28,7 +28,7 @@ INCLUDES = include/machineCode.h include/defines.h include/types.h \
 	
 
 OBJECTS = $(SOURCES:%.c=%.o) 
-CC = gcc
+CC = g++ #gcc
 OUT = cfrtil64-gdb
 
 #all : default

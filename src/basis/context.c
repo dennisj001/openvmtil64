@@ -44,7 +44,7 @@ Context_CurrentWord ( )
 Context *
 _Context_Allocate ( )
 {
-    NBA * nba = MemorySpace_NBA_New ( _Q_->MemorySpace0, ( byte* ) String_New ( "ContextSpace", STRING_MEM ), 10 * K, OPENVMTIL ) ;
+    NBA * nba = MemorySpace_NBA_New ( _Q_->MemorySpace0, ( byte* ) String_New ( (byte*) "ContextSpace", STRING_MEM ), 10 * K, OPENVMTIL ) ;
     _Q_->MemorySpace0->ContextSpace = nba ;
     Context * cntx = ( Context* ) Mem_Allocate ( sizeof ( Context ), OPENVMTIL ) ;
     cntx->ContextNba = nba ;

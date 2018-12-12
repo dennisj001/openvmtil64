@@ -24,7 +24,7 @@ Interpret_C_Block_EndBlock ( byte * tokenToUse, Boolean insertFlag )
     if ( insertFlag ) SetState ( _Debugger_, DBG_OUTPUT_INSERTION, true ) ;
     _CfrTil_->EndBlockWord->W_RL_Index = _Lexer_->TokenStart_ReadLineIndex ;
     Interpreter_DoWord_Default ( _Interpreter_, _CfrTil_->EndBlockWord, - 1, _CfrTil_->SC_Index ) ;
-    _CfrTil_->EndBlockWord->Name = "}" ;
+    _CfrTil_->EndBlockWord->Name = (byte*) "}" ;
     SetState ( _Debugger_, DBG_OUTPUT_INSERTION, false ) ;
 }
 
@@ -38,7 +38,7 @@ Interpret_C_Block_BeginBlock ( byte * tokenToUse, Boolean insertFlag )
     if ( insertFlag ) SetState ( _Debugger_, DBG_OUTPUT_INSERTION, true ) ;
     _CfrTil_->BeginBlockWord->W_RL_Index = _Lexer_->TokenStart_ReadLineIndex ;
     Interpreter_DoWord_Default ( _Interpreter_, _CfrTil_->BeginBlockWord, - 1, _CfrTil_->SC_Index ) ;
-    _CfrTil_->BeginBlockWord->Name = "{" ;
+    _CfrTil_->BeginBlockWord->Name = (byte*) "{" ;
     compiler->BeginBlockFlag = false ;
     SetState ( _Debugger_, DBG_OUTPUT_INSERTION, false ) ;
 }
@@ -60,7 +60,7 @@ CfrTil_Interpret_C_Blocks ( int64 blocks, Boolean takesAnElseFlag, Boolean semic
         {
             // interpret a (possible) 'for' c parenthesis expression
             compiler->InLParenBlock = true ;
-            Interpret_C_Block_BeginBlock ( "(", 0 ) ;
+            Interpret_C_Block_BeginBlock ( (byte*) "(", 0 ) ;
             compiler->TakesLParenAsBlock = false ; // after the first block
         }
         else if ( String_Equal ( ( char* ) token, ")" ) && compiler->InLParenBlock )
@@ -68,23 +68,23 @@ CfrTil_Interpret_C_Blocks ( int64 blocks, Boolean takesAnElseFlag, Boolean semic
             List_InterpretLists ( compiler->PostfixLists ) ;
             compiler->InLParenBlock = false ;
             compiler->TakesLParenAsBlock = false ;
-            Interpret_C_Block_EndBlock ( ")", 0 ) ;
+            Interpret_C_Block_EndBlock ( (byte*) ")", 0 ) ;
             //CfrTil_TypeStack_Pop ( ) ; // the logic word
             if ( ! _Context_StringEqual_PeekNextToken ( _Context_, ( byte* ) "{", 0 ) )
             {
-                Interpret_C_Block_BeginBlock ( "{", 1 ) ;
+                Interpret_C_Block_BeginBlock ( (byte*) "{", 1 ) ;
                 semicolonEndsThisBlock = true ;
             }
             blocksParsed ++ ;
         }
         else if ( String_Equal ( ( char* ) token, "{" ) )
         {
-            Interpret_C_Block_BeginBlock ( "{", 0 ) ;
+            Interpret_C_Block_BeginBlock ( (byte*) "{", 0 ) ;
             semicolonEndsThisBlock = false ;
         }
         else if ( String_Equal ( ( char* ) token, "}" ) )
         {
-            Interpret_C_Block_EndBlock ( "}", 0 ) ;
+            Interpret_C_Block_EndBlock ( (byte*) "}", 0 ) ;
             blocksParsed ++ ;
         }
         else if ( String_Equal ( ( char* ) token, ";" ) )//|| String_Equal ( ( char* ) token, "," ) )
@@ -92,10 +92,10 @@ CfrTil_Interpret_C_Blocks ( int64 blocks, Boolean takesAnElseFlag, Boolean semic
             List_InterpretLists ( compiler->PostfixLists ) ;
             if ( semicolonEndsThisBlock )
             {
-                Interpret_C_Block_EndBlock ( ";", 0 ) ;
+                Interpret_C_Block_EndBlock ( (byte*) ";", 0 ) ;
                 blocksParsed ++ ;
             }
-            if ( compiler->InLParenBlock ) Interpret_C_Block_BeginBlock ( "{", 0 ) ;
+            if ( compiler->InLParenBlock ) Interpret_C_Block_BeginBlock ( (byte*) "{", 0 ) ;
         }
         else if ( String_Equal ( ( char* ) token, "else" ) )
         {
@@ -104,7 +104,7 @@ CfrTil_Interpret_C_Blocks ( int64 blocks, Boolean takesAnElseFlag, Boolean semic
                 takesAnElseFlag = false ;
                 if ( ! _Context_StringEqual_PeekNextToken ( _Context_, ( byte* ) "{", 0 ) )
                 {
-                    Interpret_C_Block_BeginBlock ( "{", 1 ) ;
+                    Interpret_C_Block_BeginBlock ( (byte*) "{", 1 ) ;
                     semicolonEndsThisBlock = true ;
                 }
             }
@@ -121,7 +121,7 @@ CfrTil_Interpret_C_Blocks ( int64 blocks, Boolean takesAnElseFlag, Boolean semic
                 {
                     if ( semicolonEndsThisBlock )
                     {
-                        Interpret_C_Block_EndBlock ( "}", 1 ) ;
+                        Interpret_C_Block_EndBlock ( (byte*) "}", 1 ) ;
                         blocksParsed ++ ;
                     }
                 }
@@ -192,7 +192,7 @@ _CfrTil_C_Infix_EqualOp ( Word * opWord )
     if ( opWord ) rword = opWord ;
     else rword = wordr ;
     svName = rword->Name ;
-    rword->Name = "=" ;
+    rword->Name = (byte*) "=" ;
     SetState ( _Debugger_, DBG_OUTPUT_SUBSTITUTION, true ) ;
     _Debugger_->SubstitutedWord = rword ;
     Interpreter_DoWord_Default ( interp, rword, tsrli, svscwi ) ;

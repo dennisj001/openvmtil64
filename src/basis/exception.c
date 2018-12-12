@@ -5,7 +5,7 @@
 
 // this block needs to be rethought but it may be ok for now
 
-int64
+void
 _OpenVmTil_ShowExceptionInfo ( )
 {
     Word * word = _Q_->ExceptionWord ;
@@ -30,7 +30,7 @@ _OpenVmTil_ShowExceptionInfo ( )
     if ( GetState ( debugger, DBG_STEPPING ) && debugger->DebugAddress )
     {
         Debugger_Registers ( debugger ) ;
-        _Debugger_Udis_OneInstruction ( debugger, debugger->DebugAddress, "", "" ) ;
+        _Debugger_Udis_OneInstruction ( debugger, debugger->DebugAddress, (byte*) "", (byte*) "" ) ;
     }
     if ( word ) _CfrTil_Source ( word, 0 ) ;
     _Printf ( ( byte* ) "\nOpenVmTil_SignalAction : address = 0x%016lx : %s", _Q_->SigAddress, _Q_->SigLocation ) ;
@@ -75,22 +75,22 @@ OVT_Pause ( byte * prompt, int64 signalExceptionsHandled )
     SetState ( _Q_, OVT_PAUSE, true ) ;
     if ( _CfrTil_ && _Context_ )
     {
-        if ( _Context_->CurrentlyRunningWord ) _Debugger_->ShowLine = "" ;
+        if ( _Context_->CurrentlyRunningWord ) _Debugger_->ShowLine = (byte*) "" ;
         byte buffer [512], *defaultPrompt =
             ( byte * ) "\n%s\n%s : at %s :: %s'd' (d)ebugger, 't' s(t)ack, c' (c)ontinue, 'q' (q)uit, 'x' e(x)it, 'i' '\\' or <key> (i)interpret, <return> loop%s" ;
-        snprintf ( ( char* ) buffer, 512, ( char* ) prompt ? prompt : defaultPrompt, _Q_->ExceptionMessage ? _Q_->ExceptionMessage : ( byte* ) "\r",
+        snprintf ( ( char* ) buffer, 512, prompt ? (char*) prompt : (char*) defaultPrompt, _Q_->ExceptionMessage ? (char*) _Q_->ExceptionMessage : "\r",
             c_gd ( "pause" ), _Context_Location ( _Context_ ), c_gd ( _Debugger_->ShowLine ? _Debugger_->ShowLine : _Context_->ReadLiner0->InputLine ),
             c_gd ( "\n-> " ) ) ;
         DebugColors ;
         int64 tlw = Strlen ( defaultPrompt ) ;
         if ( tlw > _Debugger_->TerminalLineWidth ) _Debugger_->TerminalLineWidth = tlw ;
-        if ( signalExceptionsHandled ) _Printf ( "\n_OVT_Pause : Signals Handled = %d : signal = %d : restart condition = %d\n", signalExceptionsHandled, _Q_->Signal,
+        if ( signalExceptionsHandled ) _Printf ( (byte*) "\n_OVT_Pause : Signals Handled = %d : signal = %d : restart condition = %d\n", signalExceptionsHandled, _Q_->Signal,
             _Q_->RestartCondition ) ;
         do
         {
             if ( _Debugger_->w_Word = Context_CurrentWord () )
             {
-                _Debugger_ShowInfo ( _Debugger_, "\r", _Q_->Signal, 0 ) ;
+                _Debugger_ShowInfo ( _Debugger_, (byte*) "\r", _Q_->Signal, 0 ) ;
                 //_Debugger_->w_Word = 0 ;
             }
             _Printf ( ( byte* ) "%s", buffer ) ;
@@ -196,8 +196,8 @@ OVT_ResetSignals ( int64 signals )
 void
 OVT_SetExceptionMessage ( OpenVmTil * ovt )
 {
-    if ( ovt->RestartCondition == INITIAL_START ) ovt->ExceptionMessage = "Full Initial Re-Start : ..." ;
-    else if ( ovt->RestartCondition == ABORT ) ovt->ExceptionMessage = "Aborting : ..." ;
+    if ( ovt->RestartCondition == INITIAL_START ) ovt->ExceptionMessage = (byte*) "Full Initial Re-Start : ..." ;
+    else if ( ovt->RestartCondition == ABORT ) ovt->ExceptionMessage = (byte*) "Aborting : ..." ;
 }
 
 void

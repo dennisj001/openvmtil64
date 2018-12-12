@@ -403,6 +403,7 @@ Namespace *
 Namespace_New ( byte * name, Namespace * containingNs )
 {
     Namespace * ns = DataObject_New ( NAMESPACE, 0, name, NAMESPACE, 0, 0, 0, ( int64 ) containingNs, 0, 0, - 1 ) ;
+    return ns ;
 }
 
 Namespace *

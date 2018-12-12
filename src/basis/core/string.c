@@ -139,7 +139,7 @@ _String_UnBox ( byte * token )
     byte * start ;
     if ( token [ 0 ] == '"' )
     {
-        char * s = Buffer_Data ( _CfrTil_->TokenB ) ;
+        char * s = ( char* ) Buffer_Data ( _CfrTil_->TokenB ) ;
         strcpy ( ( char* ) s, ( char* ) token ) ; // preserve token - this string is used by the Interpreter for SourceCode
         int64 length = Strlen ( ( char* ) s ) ;
         if ( s [ length - 1 ] == '"' )
@@ -184,7 +184,7 @@ _String_Insert_AtIndexWithColors ( byte * token, int64 ndx, Colors * c )
     preTokenLen = ndx - Strlen ( ( char* ) token ) ;
     if ( preTokenLen < 0 ) preTokenLen = 0 ;
 
-    Strncpy ( ( char* ) tbuffer, ( char* ) buffer, preTokenLen ) ; // copy upto start of token
+    Strncpy ( tbuffer, buffer, preTokenLen ) ; // copy upto start of token
     tbuffer [ preTokenLen ] = 0 ; // Strncpy does not necessarily null delimit
     String_ShowColors ( &tbuffer [ Strlen ( ( char* ) tbuffer ) ], c ) ; // new foreground, new background
     strcat ( ( char* ) tbuffer, ( char* ) token ) ;
@@ -475,14 +475,14 @@ Strnicmp ( byte * str0, byte * str1, int64 n )
     else return - 1 ;
 }
 
-int64
+void
 Strcpy ( byte * dst, byte * src )
 {
     int64 i ;
     for ( i = 0 ; src [i] ; i ++ ) dst[i] = src[i] ;
 }
 
-int64
+void
 Strncpy ( byte * dst, byte * src, int64 n )
 {
     int64 i ;
@@ -631,7 +631,7 @@ String_N_New ( byte * string, int64 n, uint64 allocType )
     if ( string )
     {
         newString = Mem_Allocate ( n + 1, ( allocType == TEMPORARY ) ? TEMPORARY : STRING_MEM ) ;
-        Strncpy ( ( char* ) newString, ( char* ) string, n ) ;
+        Strncpy ( newString, string, n ) ;
 
         return newString ;
     }
@@ -728,7 +728,7 @@ StringMacro_Run ( byte * pb_namespaceName, byte * str )
     return 0 ;
 }
 
-byte *
+void
 _CfrTil_StringMacros_Init ( )
 {
     StrTokInfo * sti = & _CfrTil_->Sti ;
@@ -755,7 +755,7 @@ _CfrTil_StringMacros_Init ( )
 // in the initialized Namespace and substitute/insert it into the original string - 'buffer' : (in place - 
 // string must have room for expansion) 
 
-byte *
+void
 _CfrTil_StringMacros_Do ( byte * buffer ) // buffer :: the string to which we apply any set macros also cf. .init.cft beginning for how to initialize 
 {
     StrTokInfo * sti = & _CfrTil_->Sti ;
@@ -993,7 +993,7 @@ String_DelimitSourceCodeStartForLispCfrTil ( char * sc )
         sc ++ ;
     }
 next:
-    start = sc ;
+    start = (byte*) sc ;
     while ( *sc )
     {
         switch ( *sc )
@@ -1099,14 +1099,14 @@ Buffer_Data_Cleared ( Buffer * b )
     return Buffer_Data ( b ) ; //b->B_Data ;
 }
 
-Buffer *
+void
 Buffer_Init ( Buffer * b, int64 flag )
 {
     Mem_Clear ( b->B_Data, b->B_Size ) ;
     b->InUseFlag = flag ;
 }
 
-Buffer *
+void
 Buffer_Add ( Buffer * b, int64 flag )
 {
     if ( flag & N_PERMANENT ) dllist_AddNodeToTail ( _Q_->MemorySpace0->BufferList, ( dlnode* ) b ) ;
@@ -1199,7 +1199,7 @@ Buffer_PrintBuffers ( )
             total ++ ;
         }
     }
-    if ( _Q_->Verbosity > 1 ) _Printf ( "\nBuffer_PrintBuffers : total = %d : free = %d : unlocked = %d : locked = %d : permanent = %d", total, free, unlocked, locked, permanent ) ;
+    if ( _Q_->Verbosity > 1 ) _Printf ( ( byte* ) "\nBuffer_PrintBuffers : total = %d : free = %d : unlocked = %d : locked = %d : permanent = %d", total, free, unlocked, locked, permanent ) ;
 }
 
 Buffer *
