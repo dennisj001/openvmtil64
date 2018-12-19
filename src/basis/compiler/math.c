@@ -336,7 +336,7 @@ CfrTil_IncDec ( int64 op ) // +
             else op = DEC ;
             if ( nextWord->CAttribute & ( PARAMETER_VARIABLE | LOCAL_VARIABLE ) )
             {
-                _Compile_Group5 ( op, MEM, FP, 0, LocalVarIndex_WordDisp ( nextWord ), 0 ) ;
+                _Compile_Group5 ( op, MEM, FP, 0, LocalOrParameterVar_Disp ( nextWord ), 0 ) ;
             }
             else // crash ; FIXME!!
             {

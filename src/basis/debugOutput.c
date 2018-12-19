@@ -16,7 +16,7 @@ void
 _Debugger_Locals_ShowALocal ( Debugger * debugger, Word * localsWord ) // use a debugger buffer instead ??
 {
     int64 varOffset ;
-    varOffset = LocalOrParameterVarOffset ( localsWord ) ;
+    varOffset = LocalOrParameterVar_Offset ( localsWord ) ;
     uint64 * fp = ( uint64* ) debugger->cs_Cpu->CPU_FP ;
     if ( fp < ( uint64* ) 0x7f000000 ) fp = 0 ;
     byte * address = ( byte* ) ( fp ? fp [ varOffset ] : 0 ) ;

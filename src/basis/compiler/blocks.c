@@ -184,7 +184,7 @@ _CfrTil_BeginBlock1 ( BlockInfo * bi )
         // we always add a frame and if not needed we move the blocks to overwrite the extra code
         bi->LocalFrameStart = Here ; // before _Compile_AddLocalFrame
         _Compiler_AddLocalFrame ( compiler ) ; // cf EndBlock : if frame is not needed we use BI_Start else BI_FrameStart -- ?? could waste some code space ??
-        if ( compiler->NumberOfRegisterArgs ) Compile_Init_RegisterParamenterVariables ( compiler ) ; // this function is called twice to deal with words that have locals before the first block and regular colon words
+        if ( compiler->NumberOfRegisterArgs ) Compile_Init_LocalRegisterParamenterVariables ( compiler ) ; // this function is called twice to deal with words that have locals before the first block and regular colon words
         CfrTil_TypeStackReset ( ) ;
     }
     bi->AfterLocalFrame = Here ; // after _Compiler_AddLocalFrame and Compile_InitRegisterVariables
@@ -212,6 +212,25 @@ void
 CfrTil_BeginBlock ( )
 {
     _CfrTil_BeginBlock ( 1, 0 ) ;
+}
+
+void
+CfrTil_FinalizeBlocks ( BlockInfo * bi )
+{
+    Compiler * compiler = _Context_->Compiler0 ;
+    WordStack_SCHCPUSCA ( 0, 0 ) ;
+    _CfrTil_InstallGotoCallPoints_Keyed ( bi, GI_RETURN ) ;
+    if ( Compiler_IsFrameNecessary ( compiler ) )
+    {
+        Compiler_SetLocalsFrameSize_AtItsCellOffset ( compiler ) ;
+        Compiler_RemoveLocalFrame ( compiler ) ;
+        bi->bp_First = bi->LocalFrameStart ; // default 
+    }
+    else
+    {
+        if ( compiler->NumberOfRegisterVariables ) Compiler_RemoveLocalFrame ( compiler ) ;
+        bi->bp_First = bi->AfterLocalFrame ;
+    }
 }
 
 void

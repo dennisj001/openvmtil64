@@ -1,0 +1,10 @@
+called: g++
+	/media/sdc4/dennisj/openvmtil64
+	g++
+	-finline-functions
+	-ggdb
+	-c
+	-o
+	src/basis/compiler/machineCode.o
+	src/basis/compiler/machineCode.c
+

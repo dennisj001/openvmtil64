@@ -1,5 +1,5 @@
 #include "../include/cfrtil64.h"
-#define VERSION ((byte*) "0.879.100" ) 
+#define VERSION ((byte*) "0.879.230" ) 
 // Logic/Foml (Foundations of Mathematical Logic by Haskell Curry), Oop (Object Oriented Programming ), 
 //C, Lisp, Rpn/Lag : Reverse Polish Notation, (Left Associative Grammar), Pda : Push Down Automata, Tm : Turing Machine :: [a compiler compiler base in all this]
 OpenVmTil * _Q_ ;

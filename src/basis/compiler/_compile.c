@@ -138,7 +138,7 @@ _Compile_GetVarLitObj_RValue_To_Reg ( Word * word, int64 reg )
     }
     else if ( word->CAttribute & ( LOCAL_VARIABLE | PARAMETER_VARIABLE | THIS ) )
     {
-        _Compile_Move_StackN_To_Reg ( reg, FP, LocalOrParameterVarOffset ( word ) ) ; // 2 : account for saved fp and return slot
+        _Compile_Move_StackN_To_Reg ( reg, FP, LocalOrParameterVar_Offset ( word ) ) ; // 2 : account for saved fp and return slot
     }
     else if ( word->CAttribute & ( NAMESPACE_VARIABLE | OBJECT ) )
     {
@@ -197,7 +197,7 @@ _Compile_SetVarLitObj_With_Reg ( Word * word, int64 reg, int64 thruReg )
     }
     else if ( word->CAttribute & ( LOCAL_VARIABLE | PARAMETER_VARIABLE ) )
     {
-        _Compile_Move_Reg_To_StackN ( FP, LocalOrParameterVarOffset ( word ), reg ) ;
+        _Compile_Move_Reg_To_StackN ( FP, LocalOrParameterVar_Offset ( word ), reg ) ;
     }
     else if ( word->CAttribute & NAMESPACE_VARIABLE )
     {
@@ -223,7 +223,7 @@ _Compile_GetVarLitObj_LValue_To_Reg ( Word * word, int64 reg )
     }
     else if ( word->CAttribute & ( LOCAL_VARIABLE | PARAMETER_VARIABLE ) )
     {
-        _Compile_LEA ( reg, FP, 0, LocalVarIndex_WordDisp ( word ) ) ;
+        _Compile_LEA ( reg, FP, 0, LocalOrParameterVar_Disp ( word ) ) ;
     }
     else if ( word->CAttribute & ( LITERAL | CONSTANT ) ) // literals and constants don't have lvalues only rvalues
     {

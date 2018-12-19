@@ -1,4 +1,4 @@
-/* basis/compiler/machineCode.c */
+/* src/basis/compiler/machineCode.c */
 Boolean RegOrder(Boolean n);
 Boolean CalculateModRegardingDisplacement(Boolean mod, int64 disp);
 uint8 CalculateModRmByte(Boolean mod, Boolean reg, Boolean rm, Boolean sib, int64 disp);
@@ -66,7 +66,7 @@ void _Compile_INT80(void);
 void _Compile_Noop(void);
 void _Compile_MOVZX_BYTE_REG(Boolean reg, Boolean rm);
 void _Compile_Return(void);
-/* basis/compiler/_compile.c */
+/* src/basis/compiler/_compile.c */
 void _Compile_Call_Acc(void);
 void Compile_DataStack_PopAndCall(void);
 void Compile_Call_From_C_Address(uint64 bptr);
@@ -87,7 +87,7 @@ void Do_ObjectOffset(Word *word, int64 reg);
 void Compile_GetVarLitObj_RValue_To_Reg(Word *word, int64 reg);
 void _Compile_SetVarLitObj_With_Reg(Word *word, int64 reg, int64 thruReg);
 void _Compile_GetVarLitObj_LValue_To_Reg(Word *word, int64 reg);
-/* basis/compiler/memory.c */
+/* src/basis/compiler/memory.c */
 void Compile_TosRmToTOS(void);
 void _Compile_Set_C_LValue_WithImm_ThruReg(byte *address, int64 value, Boolean rm, byte operandSize);
 void _Compile_Get_C_Value_ToReg(Boolean reg, int64 value);
@@ -98,7 +98,7 @@ void Compile_Peek(Compiler *compiler, Boolean stackReg);
 void Compile_Store(Compiler *compiler, Boolean stackReg);
 void Compile_Poke(Compiler *compiler, Boolean stackReg);
 void Compile_AtEqual(Boolean stackReg);
-/* basis/compiler/combinators.c */
+/* src/basis/compiler/combinators.c */
 void CfrTil_EndCombinator(int64 quotesUsed, int64 moveFlag, int64 jccBlockIndex, Boolean jccBlockFlag);
 BlockInfo *CfrTil_BeginCombinator(int64 quotesUsed);
 void CfrTil_DropBlock(void);
@@ -114,7 +114,7 @@ void CfrTil_IfElseCombinator(void);
 void CfrTil_If3Combinator(void);
 void CfrTil_DoWhileDoCombinator(void);
 void CfrTil_ForCombinator(void);
-/* basis/compiler/math.c */
+/* src/basis/compiler/math.c */
 int64 Abs(int64 x);
 void Compile_Minus(Compiler *compiler);
 void Compile_Plus(Compiler *compiler);
@@ -128,7 +128,7 @@ void Compile_MultiplyEqual(Compiler *compiler);
 void Compile_DivideEqual(Compiler *compiler);
 void _CfrTil_Do_IncDec(int64 op);
 void CfrTil_IncDec(int64 op);
-/* basis/compiler/cpu.c */
+/* src/basis/compiler/cpu.c */
 void _CpuState_Show(Cpu *cpu);
 void _Compile_CpuState_SaveSelected(Cpu *cpu);
 void _Compile_CpuState_RestoreSelected(Cpu *cpu);
@@ -144,7 +144,7 @@ Cpu *Debugger_CpuState_SaveCopyCurrent(void);
 void _CpuState_Restore(Cpu *cpu);
 void CpuState_Save(void);
 void CpuState_Restore(void);
-/* basis/compiler/stack.c */
+/* src/basis/compiler/stack.c */
 void _Compile_Stack_Drop(Boolean stackReg);
 void _Compile_Stack_DropN(Boolean stackReg, int64 n);
 void _Compile_DropN_Rsp(int64 n);
@@ -172,7 +172,7 @@ void _Compile_RspReg_Push(int64 value);
 void Compile_DspPop_RspPush(void);
 void Compile_Set_DspReg_FromDataStackPointer(void);
 void Compile_Set_DataStackPointer_FromDspReg(void);
-/* basis/compiler/logic.c */
+/* src/basis/compiler/logic.c */
 void BI_Set_setTtnn(BlockInfo *bi, Boolean setTtn, Boolean setNegFlag, Boolean jccTtt, Boolean jccNegFlag);
 void Compiler_Set_BI_setTtnn(Compiler *compiler, Boolean setTtn, Boolean setNegFlag, Boolean jccTtt, Boolean jccNegFlag);
 void _Compile_TestCode(Boolean reg, Boolean size);
@@ -207,7 +207,7 @@ void Compiler_Compile_Jcc(Compiler *compiler, int64 bindex, Boolean setTtn);
 void CfrTil_If(void);
 void CfrTil_Else(void);
 void CfrTil_EndIf(void);
-/* basis/core/dataObjectRun.c */
+/* src/basis/core/dataObjectRun.c */
 void _DataObject_Run(Word *word0);
 void DataObject_Run(void);
 void Compiler_Get_C_BackgroundNamespace(Compiler *compiler);
@@ -226,10 +226,10 @@ void _CfrTil_Do_LiteralWord(Word *word);
 void _CfrTil_Do_LispSymbol(Word *word);
 void _CfrTil_Do_Variable(Word *word);
 void _Do_LocalObject_AllocateInit(Namespace *typeNamespace, byte **value, int64 size);
-/* basis/core/block.c */
+/* src/basis/core/block.c */
 void Eval(block blck);
 void Block_Eval(block blck);
-/* basis/compiler/blocks.c */
+/* src/basis/compiler/blocks.c */
 BlockInfo *BI_Block_Copy(BlockInfo *bi, byte *dstAddress, byte *srcAddress, int64 bsize, Boolean optFlag);
 void Compile_BlockLogicTest(BlockInfo *bi);
 void Block_CopyCompile(byte *srcAddress, int64 bindex, Boolean jccFlag);
@@ -240,18 +240,19 @@ BlockInfo *_CfrTil_BeginBlock1(BlockInfo *bi);
 void _CfrTil_BeginBlock2(BlockInfo *bi);
 void _CfrTil_BeginBlock(Boolean compileJumpFlag, byte *here);
 void CfrTil_BeginBlock(void);
+void CfrTil_FinalizeBlocks(BlockInfo *bi);
 void _CfrTil_EndBlock1(BlockInfo *bi);
 byte *_CfrTil_EndBlock2(BlockInfo *bi);
 byte *_CfrTil_EndBlock(void);
 void CfrTil_EndBlock(void);
-/* basis/core/conditionals.c */
+/* src/basis/core/conditionals.c */
 CaseNode *_CaseNode_New(uint64 type, block block, int64 value);
 void _CfrTil_Case(uint64 allocType);
 void CfrTil_Case(void);
 void Switch_MapFunction(dlnode *node, uint64 switchValue);
 void SwitchAccessFunction(void);
 void CfrTil_Switch(void);
-/* basis/compiler/compile.c */
+/* src/basis/compiler/compile.c */
 void _Compile_C_Call_1_Arg(byte *function, int64 arg);
 void _CompileN(byte *data, int64 size);
 void _CompileFromUptoRET(byte *data);
@@ -269,7 +270,7 @@ void _CfrTil_InstallGotoCallPoints_Keyed(BlockInfo *bi, int64 key);
 void _CfrTil_AdjustLabels(byte *srcAddress);
 int64 CfrTil_CheckForGotoPoints(int64 key);
 int64 CfrTil_RemoveGotoPoints(int64 key);
-/* basis/core/_system.c */
+/* src/basis/core/_system.c */
 void _System_TimerInit(System *system, int64 i);
 void _System_Time(System *system, uint64 timer, char *format, byte *toString);
 void System_Time(System *system, uint64 timer, char *string, int64 tflag);
@@ -279,7 +280,7 @@ System *System_Copy(System *system0, uint64 type);
 void _System_Init(System *system);
 void System_Init(System *system);
 System *System_New(uint64 type);
-/* basis/compiler/optimize.c */
+/* src/basis/compiler/optimize.c */
 int64 _Compiler_CheckOptimize(Compiler *compiler, Word *word, int64 _specialReturn);
 int64 Compiler_CheckOptimize(Compiler *compiler, int64 specialReturn);
 int64 Compiler_GetOptimizeState(Compiler *compiler, Word *word);
@@ -309,20 +310,20 @@ void PeepHole_Optimize_ForStackPopToReg(void);
 void PeepHole_Optimize(void);
 void GetRmDispImm(CompileOptimizeInfo *optInfo, Word *word, int64 suggestedReg);
 void CompileOptimizedLoad_TOS(void);
-/* basis/compiler/bits.c */
+/* src/basis/compiler/bits.c */
 void Compile_X_Group3(Compiler *compiler, int64 code);
 void Compile_X_Shift(Compiler *compiler, int64 op, Boolean stackFlag, Boolean opEqualFlag);
 void Compile_BitWise_NOT(Compiler *compiler);
 void Compile_BitWise_NEG(Compiler *compiler);
 void Compile_ShiftLeft(void);
 void Compile_ShiftRight(void);
-/* basis/compiler/udis.c */
+/* src/basis/compiler/udis.c */
 void _Udis_PrintInstruction(ud_t *ud, byte *address, byte *prefix, byte *postfix);
 int64 _Udis_GetInstructionSize(ud_t *ud, byte *address);
 ud_t *_Udis_Init(ud_t *ud);
 int64 _Debugger_Udis_OneInstruction(Debugger *debugger, byte *address, byte *prefix, byte *postfix);
 int64 _Udis_Disassemble(ud_t *ud, byte *iaddress, int64 number, int64 cflag);
-/* basis/compiler/arrays.c */
+/* src/basis/compiler/arrays.c */
 int64 _CheckArrayDimensionForVariables_And_UpdateCompilerState(void);
 void Compile_ArrayDimensionOffset(Word *word, int64 dimSize, int64 objSize);
 int64 CalculateArrayDimensionSize(Word *arrayBaseObject, int64 dimNumber);
@@ -332,7 +333,7 @@ int64 _CfrTil_ArrayBegin(Boolean lispMode, Word **pl1, int64 i);
 void CfrTil_ArrayBegin(void);
 void CfrTil_ArrayEnd(void);
 void CfrTil_ArrayModeOff(void);
-/* basis/core/io.c */
+/* src/basis/core/io.c */
 int64 GetTerminalWidth(void);
 char kbhit(void);
 int64 _Key(FILE *f);
@@ -346,7 +347,7 @@ void Emit(byte c);
 void Context_DoPrompt(Context *cntx);
 void CfrTil_DoPrompt(void);
 void _Printf(byte *format, ...);
-/* basis/core/symbol.c */
+/* src/basis/core/symbol.c */
 void _Symbol_NameInit(Symbol *symbol, byte *name);
 void _Symbol_Init_AllocName(Symbol *symbol, byte *name, uint64 allocType);
 Symbol *__Symbol_New(uint64 allocType);
@@ -356,9 +357,9 @@ Symbol *Symbol_NewValue(int64 value, uint64 allocType);
 Symbol *Symbol_CompareName2(Symbol *symbol, byte *name, Namespace *ns);
 Symbol *_Symbol_CompareName(Symbol *symbol, byte *name);
 Symbol *Symbol_CompareName(Symbol *symbol, byte *name);
-/* basis/repl.c */
+/* src/basis/repl.c */
 void _Repl(block repl);
-/* basis/core/syntax.c */
+/* src/basis/core/syntax.c */
 void Interpret_DoParenthesizedRValue(void);
 void Interpret_C_Block_EndBlock(byte *tokenToUse, Boolean insertFlag);
 void Interpret_C_Block_BeginBlock(byte *tokenToUse, Boolean insertFlag);
@@ -368,7 +369,7 @@ void _CfrTil_C_Infix_EqualOp(Word *opWord);
 void CfrTil_SetInNamespaceFromBackground(void);
 void CfrTil_C_ConditionalExpression(void);
 Boolean C_Syntax_AreWeParsingACFunctionCall(Lexer *lexer);
-/* basis/core/dataObjectNew.c */
+/* src/basis/core/dataObjectNew.c */
 Word *DataObject_New(uint64 type, Word *word, byte *name, uint64 ctype, uint64 ctype2, uint64 ltype, int64 index, int64 value, int allocType, int64 tsrli, int64 scwi);
 byte *_CfrTil_NamelessObjectNew(int64 size, int64 allocType);
 Word *_CfrTil_ObjectNew(int64 size, byte *name, uint64 category, int64 allocType);
@@ -382,7 +383,7 @@ Word *Compiler_LocalWord(Compiler *compiler, byte *name, int64 ctype, int64 allo
 Word *Literal_New(Lexer *lexer, uint64 uliteral);
 Namespace *_Namespace_New(byte *name, Namespace *containingNs);
 void _CfrTil_MachineCodePrimitive_NewAdd(const char *name, uint64 cType, int64 ctype2, block *callHook, byte *function, int64 functionArg, const char *nameSpace, const char *superNamespace);
-/* basis/cfrtil64.c */
+/* src/basis/cfrtil64.c */
 void CfrTil_Run(CfrTil *cfrTil, int64 restartCondition);
 void CfrTil_RunInit(void);
 void _CfrTil_ReStart(CfrTil *cfrTil, int64 restartCondition);
@@ -408,7 +409,7 @@ void CfrTil_StringMacrosOn(void);
 void CfrTil_StringMacrosOff(void);
 void CfrTil_InlineOn(void);
 void CfrTil_InlineOff(void);
-/* basis/core/parse.c */
+/* src/basis/core/parse.c */
 void _CfrTil_SingleQuote(void);
 int64 _CfrTil_Parse_ClassStructure(int64 cloneFlag);
 void Compiler_TypedObjectInit(Word *word, Namespace *typeNamespace);
@@ -421,7 +422,7 @@ void _Lexer_ParseHex(Lexer *lexer, byte *token);
 void _Lexer_ParseDecimal(Lexer *lexer, byte *token);
 void Lexer_ParseObject(Lexer *lexer, byte *token);
 byte *Parse_Macro(int64 type);
-/* basis/core/memSpace.c */
+/* src/basis/core/memSpace.c */
 byte *_mmap_AllocMem(int64 size);
 void mmap_FreeMem(byte *chunk, int64 size);
 byte *mmap_AllocMem(int64 size);
@@ -474,7 +475,7 @@ void DLList_Recycle_NamespaceList(dllist *list);
 void DLList_RemoveWords(dllist *list);
 void _CheckCodeSpaceForRoom(int64 memDesired);
 void CheckCodeSpaceForRoom(void);
-/* basis/init.c */
+/* src/basis/init.c */
 void _CfrTil_Init_SessionCore(CfrTil *cfrTil, int64 cntxDelFlag, int64 promptFlag);
 void CfrTil_SessionInit(void);
 void CfrTil_ResetAll_Init(CfrTil *cfrTil);
@@ -482,7 +483,7 @@ void _CfrTil_InitialAddWordToNamespace(Word *word, byte *containingNamespaceName
 void _CfrTil_CPrimitiveNewAdd(const char *name, byte *pb_TypeSignature, uint64 opInsnGroup, uint64 opInsCode, block b, uint64 ctype, uint64 ctype2, uint64 ltype, const char *nameSpace, const char *superNamespace);
 void CfrTil_AddCPrimitives(void);
 void CfrTil_MachineCodePrimitive_AddWords(CfrTil *cfrTil);
-/* basis/system.c */
+/* src/basis/system.c */
 void *_dlsym(byte *sym, byte *lib);
 void *_Dlsym(byte *sym, byte *lib);
 Word *Dlsym(byte *sym, byte *lib);
@@ -501,7 +502,7 @@ void _CfrTil_Source(Word *word, int64 addToHistoryFlag);
 void _CfrTil_Dump(int64 dumpMod);
 Boolean _AtCommandLine(void);
 Boolean AtCommandLine(ReadLiner *rl);
-/* basis/core/charSet.c */
+/* src/basis/core/charSet.c */
 Boolean CharTable_IsCharType(byte c, uint64 type);
 int64 CharSet_IsDelimiter(CharSet *cset, byte ch);
 void CharSet_SetChar(CharSet *cset, byte ch);
@@ -510,7 +511,7 @@ CharSet *CharSet_Init(CharSet *cset, int64 size, byte *initString);
 CharSet *CharSet_Allocate(int64 size, uint64 allocType);
 CharSet *_CharSet_New(byte *initString, int64 size, uint64 allocType);
 CharSet *CharSet_New(byte *initString, uint64 allocType);
-/* basis/core/dllist.c */
+/* src/basis/core/dllist.c */
 dobject *_dllist_PushNew_M_Slot_Node(dllist *list, int64 allocType, int64 typeCode, int64 m_slots, ...);
 void List_Push(dllist *list, dlnode *node);
 dlnode *List_Pop(dllist *list);
@@ -589,7 +590,7 @@ Word *Tree_Map_OneNamespace(Word *word, MapFunction_1 mf, int64 one);
 Word *Tree_Map_OneNamespace_TwoArgs(Namespace *ns, MapFunction_2 mf2, int64 one, int64 two);
 Word *Tree_Map_State_OneArg(uint64 state, MapFunction_1 mf, int64 one);
 Word *TC_Tree_Map(TabCompletionInfo *tci, MapFunction mf, Word *wordi);
-/* basis/core/interpret.c */
+/* src/basis/core/interpret.c */
 Word *Interpreter_SetupNextWord(Interpreter *interp);
 Word *Interpreter_InterpretAToken(Interpreter *interp, byte *token, int64 tokenStartReadLineIndex);
 void Interpreter_InterpretNextToken2(Interpreter *interp);
@@ -604,7 +605,7 @@ Word *_Interpreter_TokenToWord(Interpreter *interp, byte *token);
 Word *Interpreter_ReadNextTokenToWord(Interpreter *interp);
 Boolean _Interpreter_IsWordPrefixing(Interpreter *interp, Word *word);
 Boolean Interpreter_IsWordPrefixing(Interpreter *interp, Word *word);
-/* basis/core/lexer.c */
+/* src/basis/core/lexer.c */
 Word *Lexer_ObjectToken_New(Lexer *lexer, byte *token);
 void _Lexer_Set_ScIndex_RlIndex(Lexer *lexer, Word *word);
 void Lexer_Set_ScIndex_RlIndex(Lexer *lexer, Word *word, int64 tsrli, int64 scwi);
@@ -679,7 +680,7 @@ int64 Lexer_CheckForwardToStatementEnd_LValue(Lexer *lexer, Word *word);
 Boolean Lexer_IsLValue_CheckBackToLastSemiForParenOrBracket(Lexer *lexer, Word *word);
 Boolean Lexer_IsLValue_CheckForwardToNextSemiForArrayVariable(Lexer *lexer, Word *word);
 Boolean Is_LValue(Context *cntx, Word *word);
-/* basis/core/cstack.c */
+/* src/basis/core/cstack.c */
 int64 _Stack_Overflow(Stack *stack);
 int64 _Stack_IsEmpty(Stack *stack);
 void _Stack_Push(Stack *stack, int64 value);
@@ -720,11 +721,11 @@ void Stack_Print(Stack *stack, byte *name, Boolean isWordAlreadyFlag);
 void _PrintNStackWindow(uint64 *reg, byte *name, byte *regName, int64 size);
 void _CfrTil_PrintNReturnStack(int64 size, Boolean useExistingFlag);
 void _CfrTil_PrintNDataStack(int64 size);
-/* basis/core/classes.c */
+/* src/basis/core/classes.c */
 void CfrTil_ClassStructureEnd(void);
 void CfrTil_ClassStructureBegin(void);
 void CfrTil_CloneStructureBegin(void);
-/* basis/debugOutput.c */
+/* src/basis/debugOutput.c */
 void Debugger_Menu(Debugger *debugger);
 void _Debugger_Locals_ShowALocal(Debugger *debugger, Word *localsWord);
 void _Debugger_Locals_Show_Loop(Debugger *debugger, Word *scWord);
@@ -748,7 +749,7 @@ void _Debugger_DoState(Debugger *debugger);
 void LO_Debug_ExtraShow(int64 showStackFlag, int64 verbosity, int64 wordList, byte *format, ...);
 void _Debugger_PostShow(Debugger *debugger, Word *word, Boolean force);
 void Debugger_PostShow(Debugger *debugger);
-/* basis/core/namespace.c */
+/* src/basis/core/namespace.c */
 void _Namespace_SetAsInNamespace(Namespace *ns);
 void _Namespace_ResetFromInNamespace(Namespace *ns);
 void _Namespace_DoAddSymbol(Namespace *ns, Symbol *symbol);
@@ -797,7 +798,7 @@ Namespace *_Namespace_FindOrNew_Local(Stack *nsStack);
 void _Namespace_PrintWords(Namespace *ns);
 void _Namespace_MapAny_2Args(MapSymbolFunction2 msf2, int64 one, int64 two);
 void _Namespace_MapUsing_2Args(MapSymbolFunction2 msf2, int64 one, int64 two);
-/* basis/history.c */
+/* src/basis/history.c */
 HistoryStringNode *HistoryStringNode_New(byte *hstring);
 HistoryStringNode *HistorySymbolList_Find(byte *hstring);
 void ReadLine_ShowHistoryNode(ReadLiner *rl);
@@ -809,7 +810,7 @@ void HistorySpace_Delete(void);
 void _HistorySpace_Init(OpenVmTil *ovt, int64 reset);
 void _HistorySpace_New(OpenVmTil *ovt, int64 resetFlag);
 void HistorySpace_Reset(void);
-/* basis/core/readline.c */
+/* src/basis/core/readline.c */
 void _ReadLine_NullDelimitInputBuffer(ReadLiner *rl);
 void _ReadLine_QuickAppendCharacter(ReadLiner *rl, byte chr);
 void _ReadLine_SetOutputLineCharacterNumber(ReadLiner *rl);
@@ -883,7 +884,7 @@ void _ReadLine_GetLine(ReadLiner *rl, byte c);
 void ReadLine_GetLine(ReadLiner *rl);
 byte ReadLine_NextChar(ReadLiner *rl);
 byte ReadLine_NextNonPunctCharAfterEndOfString(ReadLiner *rl);
-/* basis/core/dataStack.c */
+/* src/basis/core/dataStack.c */
 uint64 DataStack_Pop(void);
 void DataStack_Push(int64 value);
 void DataStack_Dup(void);
@@ -905,7 +906,7 @@ void Set_DataStackPointer_FromDspReg(void);
 void Set_DspReg_FromDataStackPointer(void);
 void CfrTil_CheckInitDataStack(void);
 void CfrTil_DataStack_Size(void);
-/* basis/context.c */
+/* src/basis/context.c */
 void _Context_Prompt(int64 control);
 byte *_Context_Location(Context *cntx);
 byte *Context_Location(void);
@@ -933,7 +934,7 @@ void _Context_DoubleQuoteMacro(Context *cntx);
 void CfrTil_DoubleQuoteMacro(void);
 void Context_Interpret(Context *cntx);
 byte *Context_IsInFile(Context *cntx);
-/* basis/core/word.c */
+/* src/basis/core/word.c */
 void Word_Run(Word *word);
 void Word_Eval(Word *word);
 void _Word_Interpret(Word *word);
@@ -968,7 +969,7 @@ void Do_StringMacro(void);
 void _CfrTil_Macro(int64 mtype, byte *function);
 Word *Word_GetOriginalWord(Word *word);
 Word *Word_UnAlias(Word *word);
-/* basis/core/readTable.c */
+/* src/basis/core/readTable.c */
 void CfrTil_ReadTables_Setup(CfrTil *cfrl);
 void ReadTable_Default(ReadLiner *rl);
 void ReadTable_LParen(ReadLiner *rl);
@@ -993,7 +994,7 @@ void ReadTable_1(ReadLiner *rl);
 void ReadTable_O(ReadLiner *rl);
 void ReadTable_Tilde(ReadLiner *rl);
 void ReadTable_BackSpace(ReadLiner *rl);
-/* basis/bigNum.c */
+/* src/basis/bigNum.c */
 mpfr_t *_BigNum_New(byte *token);
 void BigNum_GetPrintfPrecision_BigNum(void);
 void BigNum_GetPrintfWidth(void);
@@ -1030,7 +1031,7 @@ void BigNum_GreaterThan(void);
 void BigNum_GreaterThanOrEqual(void);
 void BigNum_LogicalEquals(void);
 void BigNum_LogicalDoesNotEqual(void);
-/* basis/core/_readline.c */
+/* src/basis/core/_readline.c */
 byte *_ReadLine_pb_NextChar(ReadLiner *rl);
 byte _ReadLine_NextChar(ReadLiner *rl);
 byte _ReadLine_PeekIndexedChar(ReadLiner *rl, int64 offset);
@@ -1055,7 +1056,7 @@ void _ReadLine_CursorToEnd(ReadLiner *rl);
 void _ReadLine_CursorToStart(ReadLiner *rl);
 void _ReadLine_CursorRight(ReadLiner *rl);
 void _ReadLine_CursorLeft(ReadLiner *rl);
-/* basis/core/array.c */
+/* src/basis/core/array.c */
 ByteArray *_ByteArray_AppendSpace_MakeSure(ByteArray *ba, int64 size);
 byte *_ByteArray_AppendSpace(ByteArray *ba, int64 size);
 void _ByteArray_UnAppendSpace(ByteArray *ba, int64 size);
@@ -1085,7 +1086,7 @@ void _NamedByteArray_Init(NamedByteArray *nba, byte *name, int64 size, int64 aty
 void NamedByteArray_Delete(NamedByteArray *nba);
 NamedByteArray *NamedByteArray_New(byte *name, int64 size, int64 atype);
 int64 NamedByteArray_CheckAddress(NamedByteArray *nba, byte *address);
-/* basis/compiler/compiler.c */
+/* src/basis/compiler/compiler.c */
 Word *_CopyDuplicateWord(Word *word0, Boolean complete);
 Word *CopyDuplicateWord(dlnode *anode, Word *word0);
 Word *_CfrTil_CopyDuplicates(Word *word0);
@@ -1121,8 +1122,8 @@ void Stack_Push_PointerToJmpOffset(void);
 void CfrTil_CompileAndRecord_Word0_PushReg(Boolean reg);
 void CfrTil_CompileAndRecord_Word0_PushRegToUse(void);
 void CfrTil_CompileAndRecord_PushAccum(void);
-/* basis/core/dllnodes.c */
-/* basis/core/finder.c */
+/* src/basis/core/dllnodes.c */
+/* src/basis/core/finder.c */
 Symbol *DLList_FindName_InOneNamespaceList(dllist *list, byte *name);
 Symbol *DLList_FindName_InOneNamespace(Namespace *ns, byte *name);
 Word *Finder_Word_Find(Finder *finder, uint64 state, byte *name);
@@ -1151,7 +1152,7 @@ void CfrTil_Token_Find(void);
 void CfrTil_Find(void);
 void CfrTil_Postfix_Find(void);
 void CfrTil_TurnOffQualifyingNamespace(void);
-/* basis/interpreters.c */
+/* src/basis/interpreters.c */
 void Interpret_String(byte *str);
 byte *Interpret_C_Until_Token4(Interpreter *interp, byte *end1, byte *end2, byte *end3, byte *end4, byte *delimiters);
 byte *Interpret_Until_Token(Interpreter *interp, byte *end, byte *delimiters);
@@ -1162,7 +1163,7 @@ void Interpret_ToEndOfLine(Interpreter *interp);
 void Interpret_UntilFlaggedWithInit(Interpreter *interp, int64 doneFlags);
 void _CfrTil_Interpret(CfrTil *cfrTil);
 void CfrTil_InterpreterRun(void);
-/* basis/tabCompletion.c */
+/* src/basis/tabCompletion.c */
 void RL_TabCompletion_Run(ReadLiner *rl, Word *rword);
 TabCompletionInfo *TabCompletionInfo_New(uint64 allocType);
 byte *ReadLiner_GenerateFullNamespaceQualifiedName(ReadLiner *rl, Word *w);
@@ -1171,7 +1172,7 @@ int64 _TC_FindPrevious_NamespaceQualifiedIdentifierStart(TabCompletionInfo *tci,
 void RL_TC_StringInsert_AtCursor(ReadLiner *rl, byte *strToInsert);
 byte *_TabCompletionInfo_GetAPreviousIdentifier(ReadLiner *rl, int64 start);
 void RL_TabCompletionInfo_Init(ReadLiner *rl);
-/* basis/colors.c */
+/* src/basis/colors.c */
 void _OpenVmTil_ColorsInit(OpenVmTil *ovt);
 void Console(void);
 void _ShowRGB(int64 fr, int64 fg, int64 fb, int64 br, int64 bg, int64 bb);
@@ -1199,7 +1200,7 @@ void CfrTil_SetUserRGB(void);
 void CfrTil_SetAlertRGB(void);
 void CfrTil_SetDebugRGB(void);
 void CfrTil_SetNoticeRGB(void);
-/* basis/sourceCode.c */
+/* src/basis/sourceCode.c */
 void Debugger_ShowDbgSourceCodeAtAddress(Debugger *debugger, byte *address);
 Word *DWL_Find(dllist *list, Word *iword, byte *address, byte *name, int64 takeFirstFind, byte *newAddress, int64 fromFirstFlag);
 void _CfrTil_AdjustDbgSourceCodeAddress(byte *address, byte *newAddress);
@@ -1251,7 +1252,7 @@ void _CfrTil_AppendCharToSourceCode(CfrTil *cfrtil, byte c);
 void CfrTil_AppendCharToSourceCode(CfrTil *cfrtil, byte c);
 Word *Get_SourceCodeWord(void);
 byte *SC_PrepareDbgSourceCodeString(byte *sc, Word *word);
-/* basis/debugStepping.c */
+/* src/basis/debugStepping.c */
 void _Debugger_StepOneInstruction(Debugger *debugger);
 byte *Debugger_CompileOneInstruction(Debugger *debugger, byte *jcAddress, Boolean showFlag);
 void _Debugger_CompileAndStepOneInstruction(Debugger *debugger, byte *jcAddress);
@@ -1274,7 +1275,7 @@ Word *Debugger_GetWordFromAddress(Debugger *debugger);
 byte *Debugger_DoJcc(Debugger *debugger, int64 numOfBytes);
 int64 Debugger_CanWeStep(Debugger *debugger, Word *word);
 void Debug_ExtraShow(int64 size, Boolean force);
-/* basis/core/string.c */
+/* src/basis/core/string.c */
 Boolean IsChar_Dot(byte character);
 Boolean IsChar_Whitespace(byte character);
 Boolean IsChar_DelimiterOrDot(byte character);
@@ -1344,7 +1345,7 @@ Buffer *_Buffer_NewPermanent(int64 size);
 byte *_Buffer_New_pbyte(int64 size, int64 flag);
 byte *Buffer_New_pbyte(int64 size);
 void _MemCpy(byte *dst, byte *src, int64 size);
-/* basis/openVmTil.c */
+/* src/basis/openVmTil.c */
 int main(int argc, char *argv[ ]);
 void openvmtil(int64 argc, char *argv[ ]);
 void OpenVmTil_Run(int64 argc, char *argv[ ]);
@@ -1355,7 +1356,7 @@ void OpenVmTil_Delete(OpenVmTil *ovt);
 void OVT_PrintStartupOptions(OpenVmTil *ovt);
 void OVT_GetStartupOptions(OpenVmTil *ovt);
 OpenVmTil *_OpenVmTil_New(OpenVmTil *ovt, int64 argc, char *argv[ ]);
-/* basis/core/dobject.c */
+/* src/basis/core/dobject.c */
 byte *_object_Allocate(int64 size, int64 allocType);
 dobject *_dobject_Allocate(int64 doType, int64 slots, uint64 allocType);
 void _dobject_Print(dobject *dobj);
@@ -1373,7 +1374,7 @@ DObject *_DObject_NewSlot(DObject *proto, byte *name, int64 value);
 void CfrTil_DObject_Clone(void);
 void DObject_NewClone(DObject *proto);
 void DObject_New(void);
-/* basis/core/preprocessor.c */
+/* src/basis/core/preprocessor.c */
 void CfrTil_PreProcessor(void);
 Ppibs *Ppibs_Init(Ppibs *ppibs);
 Ppibs *Ppibs_New(void);
@@ -1390,15 +1391,15 @@ void CfrTil_If_ConditionalInterpret(void);
 void CfrTil_Elif_ConditionalInterpret(void);
 void CfrTil_Else_ConditionalInterpret(void);
 void CfrTil_Endif_ConditionalInterpret(void);
-/* basis/attribute.c */
-/* basis/lists.c */
+/* src/basis/attribute.c */
+/* src/basis/lists.c */
 void _Interpret_ListNode(dlnode *node);
 void List_Interpret(dllist *list);
 void List_InterpretLists(dllist *list);
 void List_CheckInterpretLists_OnVariable(dllist *list, byte *token);
 void _List_PrintNames(dllist *list, int64 count, int64 flag);
 void _List_Show_N_Word_Names(dllist *list, uint64 n, int64 showBeforeAfterFlag, int64 dbgFlag);
-/* basis/debugDisassembly.c */
+/* src/basis/debugDisassembly.c */
 ud_t *Debugger_UdisInit(Debugger *debugger);
 int64 Debugger_Udis_GetInstructionSize(Debugger *debugger);
 Boolean Debugger_ShowSourceCodeAtAddress(Debugger *debugger, byte *address);
@@ -1409,7 +1410,7 @@ void Debugger_Dis(Debugger *debugger);
 void _Debugger_DisassembleWrittenCode(Debugger *debugger);
 void Debugger_DisassembleAccumulated(Debugger *debugger);
 void Debugger_DisassembleTotalAccumulated(Debugger *debugger);
-/* basis/typeCheck.c */
+/* src/basis/typeCheck.c */
 Boolean TSI_TypeCheck_NonTypeVariableSigCode(TSI *tsi, Word *stackWord, int64 ti);
 Boolean TSI_TypeCheck_TypeVariableSigCode(TSI *tsi, Word *stackWord0, Word *stackWord1);
 Boolean TSI_TypeCheckAndInfer(TSI *tsi);
@@ -1439,14 +1440,14 @@ void CfrTil_TypeCheckOn(void);
 void CfrTil_TypeCheckOff(void);
 void CfrTil_DbgTypecheckOff(void);
 void CfrTil_DbgTypecheckOn(void);
-/* basis/linux.c */
+/* src/basis/linux.c */
 void _DisplaySignal(int64 signal);
 void Linux_SetupSignals(sigjmp_buf *sjb, int64 startTimes);
 void Linux_RestoreTerminalAttributes(void);
 void Linux_SetInputMode(struct termios *savedTerminalAttributes);
 void _LinuxInit(struct termios *savedTerminalAttributes);
 void LinuxInit(void);
-/* basis/exception.c */
+/* src/basis/exception.c */
 void _OpenVmTil_ShowExceptionInfo(void);
 int64 OpenVmTil_ShowExceptionInfo(void);
 int64 OVT_Pause(byte *prompt, int64 signalExceptionsHandled);
@@ -1461,24 +1462,24 @@ void OpenVmTil_Throw(byte *excptMessage, byte *specialMessage, int64 restartCond
 void _OpenVmTil_LongJmp_WithMsg(int64 restartCondition, byte *msg);
 void OpenVmTil_SignalAction(int signal, siginfo_t *si, void *uc);
 void CfrTil_Exception(int64 exceptionCode, byte *message, int64 restartCondition);
-/* basis/compiler/locals.c */
+/* src/basis/compiler/locals.c */
 Word *_Compiler_LocalWord(Compiler *compiler, byte *name, int64 ctype, int64 ctype2, int64 ltype, int64 allocType);
-int64 _ParameterVarOffset(Compiler *compiler, Word *word, Boolean frameFlag);
-int64 ParameterVarOffset(Compiler *compiler, Word *word);
-int64 LocalVar_FpOffset(Word *word);
-int64 LocalOrParameterVarOffset(Word *word);
-int64 LocalVarIndex_Disp(int64 i);
-int64 LocalVarIndex_WordDisp(Word *word);
 Boolean Compiler_IsFrameNecessary(Compiler *compiler);
-void Compile_Init_RegisterParamenterVariables(Compiler *compiler);
+void Compile_Init_LocalRegisterParamenterVariables(Compiler *compiler);
 void _Compiler_AddLocalFrame(Compiler *compiler);
 void Compiler_SetLocalsFrameSize_AtItsCellOffset(Compiler *compiler);
-void _Compiler_RemoveLocalFrame(Compiler *compiler);
 void Compiler_RemoveLocalFrame(Compiler *compiler);
-void CfrTil_FinalizeBlocks(BlockInfo *bi);
+int64 _ParameterVarOffset(Compiler *compiler, Word *word, Boolean frameFlag);
+int64 ParameterVarOffset(Compiler *compiler, Word *word);
+int64 LocalVarIndex_Disp(int64 i);
+int64 LocalVar_FpOffset(Word *word);
+int64 LocalVar_FpDisp(Word *word);
+int64 ParameterVar_Disp(Word *word);
+int64 LocalOrParameterVar_Offset(Word *word);
+int64 LocalOrParameterVar_Disp(Word *word);
 void CfrTil_LocalsAndStackVariablesBegin(void);
 void CfrTil_LocalVariablesBegin(void);
-/* basis/debugger.c */
+/* src/basis/debugger.c */
 void _Debugger_InterpreterLoop(Debugger *debugger);
 Boolean _Debugger_PreSetup(Debugger *debugger, Word *word, byte *token, Boolean forceFlag);
 void Debugger_On(Debugger *debugger);
@@ -1531,13 +1532,13 @@ Debugger *_Debugger_New(uint64 type);
 void _CfrTil_Debug_AtAddress(byte *address);
 void _CfrTil_DebugContinue(int64 autoFlagOff);
 void Debugger_TableSetup(Debugger *debugger);
-/* basis/interpreter.c */
+/* src/basis/interpreter.c */
 void Interpreter_Init(Interpreter *interp);
 Interpreter *Interpreter_New(uint64 type);
 void _Interpreter_Copy(Interpreter *interp, Interpreter *interp0);
 Interpreter *Interpreter_Copy(Interpreter *interp0, uint64 type);
 int64 Interpreter_IsDone(Interpreter *interp, int64 flags);
-/* basis/_debug.c */
+/* src/basis/_debug.c */
 byte *JccInstructionAddress_2Byte(byte *address);
 byte *JccInstructionAddress_1Byte(byte *address);
 byte *JumpCallInstructionAddress(byte *address);
@@ -1550,7 +1551,7 @@ byte *GetPostfix(byte *address, byte *postfix, byte *buffer);
 void Compile_Debug_GetRSP(void);
 void _Compile_DebugRuntimeBreakpoint(void);
 void _Compile_DebugRuntimeBreakpoint_dso(void);
-/* basis/lc/lambdaCalculus.c */
+/* src/basis/lc/lambdaCalculus.c */
 ListObject *_LO_New_RawStringOrLiteral(Lexer *lexer, byte *token, int64 qidFlag, int64 tsrli, int64 scwi);
 ListObject *_LO_New(uint64 ltype, uint64 ctype, uint64 ctype2, byte *name, byte *value, Word *word, uint64 allocType, Namespace *addToNs, int64 tsrli, int64 scwi);
 ListObject *_LO_First(ListObject *l0);
@@ -1595,7 +1596,7 @@ LambdaCalculus *_LC_Create(void);
 LambdaCalculus *LC_New(void);
 LambdaCalculus *LC_Reset(void);
 LambdaCalculus *LC_Init(void);
-/* basis/lc/apply.c */
+/* src/basis/lc/apply.c */
 ListObject *LO_Apply(LambdaCalculus *lc, ListObject *l0, ListObject *lfirst, ListObject *lfunction, ListObject *largs, Boolean applyFlag);
 ListObject *_LO_Apply(ListObject *lfirst, ListObject *lfunction, ListObject *largs);
 void _Interpreter_LC_InterpretWord(Interpreter *interp, ListObject *l0, Boolean functionFlag);
@@ -1618,12 +1619,12 @@ int64 _LO_Apply_Arg(LambdaCalculus *lc, ListObject **pl1, int64 i);
 ListObject *_LO_Apply_C_LtoR_ArgList(LambdaCalculus *lc, ListObject *l0, Word *word);
 void LC_CompileRun_C_ArgList(Word *word);
 block CompileLispBlock(ListObject *args, ListObject *body);
-/* basis/lc/eval.c */
+/* src/basis/lc/eval.c */
 ListObject *_LO_Eval(LambdaCalculus *lc, ListObject *l0, ListObject *locals, Boolean applyFlag);
 ListObject *LO_EvalList(LambdaCalculus *lc, ListObject *l0, ListObject *locals, Boolean applyFlag);
 ListObject *_LO_EvalSymbol(LambdaCalculus *lc, ListObject *l0, ListObject *locals);
 ListObject *_LO_EvalList(LambdaCalculus *lc, ListObject *lorig, ListObject *locals, Boolean applyFlag);
-/* basis/lc/read.c */
+/* src/basis/lc/read.c */
 ListObject *_LO_Read(LambdaCalculus *lc);
 ListObject *_LO_Read_DoWord(LambdaCalculus *lc, Word *word, int64 qidFlag, int64 scwi);
 ListObject *_LO_Read_DoToken(LambdaCalculus *lc, byte *token, int64 qidFlag, int64 scwi);
@@ -1635,7 +1636,7 @@ void LO_UnQuoteSplicing(void);
 void LO_Splice(void);
 void LO_UnQuote(void);
 void LO_SpliceAtTail(ListObject *lnew, ListObject *l0);
-/* basis/lc/print.c */
+/* src/basis/lc/print.c */
 void _LO_Print_Lambda_ToString(LambdaCalculus *lc, ListObject *l0, int64 printValueFlag);
 void _LO_Print_NonLambdaSymbol_ToString(LambdaCalculus *lc, ListObject *l0, int64 printValueFlag);
 void _LO_PrintOneToString(LambdaCalculus *lc, ListObject *l0, int64 in_a_LambdaFlag, int64 printValueFlag);
@@ -1648,7 +1649,7 @@ void LC_PrintWithValue(void);
 byte *_LO_PRINT_TO_STRING(ListObject *l0);
 byte *_LO_PRINT_TO_STRING_WITH_VALUE(ListObject *l0);
 void LO_Print(ListObject *l0);
-/* basis/lc/special.c */
+/* src/basis/lc/special.c */
 ListObject *_LO_Define(ListObject *idNode, ListObject *locals);
 ListObject *_LO_MakeLambda(ListObject *l0);
 ListObject *LO_SpecialFunction(LambdaCalculus *lc, ListObject *l0, ListObject *locals);
@@ -1670,7 +1671,7 @@ ListObject *_LC_Eval(ListObject *l0);
 void _LO_Semi(Word *word);
 Word *_LO_Colon(ListObject *lfirst);
 ListObject *_LO_CfrTil(ListObject *lfirst);
-/* primitives/strings.c */
+/* src/primitives/strings.c */
 void MultipleEscape(void);
 void CfrTil_Strlen(void);
 void CfrTil_Strcmp(void);
@@ -1678,7 +1679,7 @@ void CfrTil_Stricmp(void);
 void CfrTil_StrCat(void);
 void CfrTil_StrCpy(void);
 void String_GetStringToEndOfLine(void);
-/* primitives/bits.c */
+/* src/primitives/bits.c */
 void CfrTil_JMP(void);
 void CfrTil_Compile_Jcc(void);
 void CfrTil_Jcc_Label(void);
@@ -1695,7 +1696,7 @@ void CfrTil_ShiftLeft(void);
 void CfrTil_ShiftRight(void);
 void CfrTil_ShiftLeft_Equal(void);
 void CfrTil_ShiftRight_Equal(void);
-/* primitives/maths.c */
+/* src/primitives/maths.c */
 void CfrTil_Plus(void);
 void CfrTil_PlusPlus(void);
 void CfrTil_MinusMinus(void);
@@ -1707,7 +1708,7 @@ void CfrTil_Minus(void);
 void CfrTil_Multiply(void);
 void CfrTil_Divide(void);
 void CfrTil_Mod(void);
-/* primitives/logics.c */
+/* src/primitives/logics.c */
 void CfrTil_LessThan(void);
 void CfrTil_LessThanOrEqual(void);
 void CfrTil_GreaterThan(void);
@@ -1718,7 +1719,7 @@ void CfrTil_LogicalNot(void);
 void CfrTil_LogicalAnd(void);
 void CfrTil_LogicalOr(void);
 void CfrTil_LogicalXor(void);
-/* primitives/openvmtils.c */
+/* src/primitives/openvmtils.c */
 void OpenVmTil_Verbosity(void);
 void Ovt_Optimize(void);
 void Ovt_Inlining(void);
@@ -1738,7 +1739,7 @@ void OVT_Exit(void);
 void OVT_StartupMessage(void);
 void _OVT_Ok(int64 promptFlag);
 void OVT_Ok(void);
-/* primitives/ios.c */
+/* src/primitives/ios.c */
 void Fflush(void);
 void CfrTil_Kbhit(void);
 void CfrTil_PrintString(void);
@@ -1758,13 +1759,13 @@ void CfrTil_LogOn(void);
 void CfrTil_LogAppend(void);
 void CfrTil_LogWrite(void);
 void CfrTil_LogOff(void);
-/* primitives/parsers.c */
+/* src/primitives/parsers.c */
 void CfrTil_Token(void);
 void CfrTil_SingleQuote(void);
 void CfrTil_Tick(void);
 void Parse_SkipUntil_Token(byte *end);
 void CfrTil_Parse(void);
-/* primitives/interpreters.c */
+/* src/primitives/interpreters.c */
 void CfrTil_DoWord(void);
 void CfrTil_CommentToEndOfLine(void);
 void CfrTil_ParenthesisComment(void);
@@ -1782,7 +1783,7 @@ void CfrTil_InterpreterStop(void);
 dllist *_CfrTil_Interpret_ReadToList(void);
 void CfrTil_Interpret_ReadToList(void);
 void CfrTil_Interpret_List(void);
-/* primitives/namespaces.c */
+/* src/primitives/namespaces.c */
 void Do_Namespace_WithStatus_2(dlnode *node, MapFunction2 nsf, int64 nsStateFlag, int64 one, int64 two);
 void _CfrTil_TreeMap(MapSymbolFunction2 msf2, uint64 state, int64 one, int64 two);
 void _CfrTil_NamespacesMap(MapSymbolFunction2 msf2, uint64 state, int64 one, int64 two);
@@ -1805,7 +1806,7 @@ byte *_CfrTil_UsingToString(void);
 void CfrTil_Using(void);
 void _Namespace_RemoveFromUsingListAndClear(Namespace *ns);
 void _CfrTil_RemoveNamespaceFromUsingListAndClear(byte *name);
-/* primitives/systems.c */
+/* src/primitives/systems.c */
 void CfrTil_InitTime(void);
 void CfrTil_TimerInit(void);
 void CfrTil_Time(void);
@@ -1845,7 +1846,7 @@ void CfrTil_WarmInit(void);
 void CfrTil_ReturnFromFile(void);
 void CfrTil_ShellEscape(void);
 void OVT_Mem_ShowAllocated(void);
-/* primitives/compilers.c */
+/* src/primitives/compilers.c */
 void CfrTil_Here(void);
 void CfrTil_Code(void);
 void CompileCall(void);
@@ -1876,7 +1877,7 @@ void CfrTil_Variable(void);
 void CfrTil_LeftBracket(void);
 void CfrTil_RightBracket(void);
 void CfrTil_CompileMode(void);
-/* primitives/words.c */
+/* src/primitives/words.c */
 void _CfrTil_Colon(Boolean initSC);
 void CfrTil_Colon(void);
 Word *_CfrTil_InitFinal(void);
@@ -1934,7 +1935,7 @@ void CfrTil_Variables(void);
 void _CfrTil_NamespaceWords(void);
 void CfrTil_NamespaceWords(void);
 void CfrTil_AllWords(void);
-/* primitives/file.c */
+/* src/primitives/file.c */
 void CfrTil_IncludeFile(void);
 int64 _File_Size(FILE *file);
 int64 _File_Exists(byte *fname);
@@ -1949,7 +1950,7 @@ void File_Seek(void);
 void File_Tell(void);
 void File_Size(void);
 void File_Exists(void);
-/* primitives/stacks.c */
+/* src/primitives/stacks.c */
 void CfrTil_Dsp(void);
 void CfrTil_Drop(void);
 void CfrTil_DropN(void);
@@ -1961,7 +1962,7 @@ void CfrTil_PrintNDataStack(void);
 void CfrTil_PrintReturnStack(void);
 void CfrTil_PrintNReturnStack(void);
 void CfrTil_PrintNDataStack_8(void);
-/* primitives/debuggers.c */
+/* src/primitives/debuggers.c */
 void CfrTil_Debug_AtAddress(void);
 void _CfrTil_Debugger_Locals_Show(void);
 void CfrTil_Debugger_Locals_Show(void);
@@ -1972,7 +1973,7 @@ void CfrTil_DebugOff(void);
 void _CfrTil_DebugRuntimeBreakpoint(void);
 void CfrTil_DebugRuntimeBreakpoint(void);
 void CfrTil_DebugRuntimeBreakpoint_dso(void);
-/* primitives/memorys.c */
+/* src/primitives/memorys.c */
 void CfrTil_PeekReg(void);
 void CfrTil_PokeRegWithValue(void);
 void CfrTil_PokeRegAtAddress(void);
@@ -1980,16 +1981,16 @@ void CfrTil_Peek(void);
 void CfrTil_Poke(void);
 void CfrTil_AtEqual(void);
 void CfrTil_Store(void);
-/* primitives/primitives.c */
-/* primitives/contexts.c */
+/* src/primitives/primitives.c */
+/* src/primitives/contexts.c */
 void CfrTil_Contex_New_RunWord(void);
-/* primitives/disassembler.c */
+/* src/primitives/disassembler.c */
 void Word_Disassemble(Word *word);
 void _CfrTil_Word_Disassemble(Word *word);
 void CfrTil_Word_Disassemble(void);
 void Debugger_WDis(Debugger *debugger);
 void CfrTil_Disassemble(void);
-/* primitives/syntaxes.c */
+/* src/primitives/syntaxes.c */
 void CfrTil_InfixModeOff(void);
 void CfrTil_InfixModeOn(void);
 void CfrTil_PrefixModeOff(void);
@@ -2013,7 +2014,7 @@ void CfrTil_TypedefStructEnd(void);
 int64 _Type_Create(byte *token);
 void Type_Create(void);
 void _CfrTil_TypeDef(void);
-/* primitives/cmaths.c */
+/* src/primitives/cmaths.c */
 void CfrTil_Power_03(void);
 int64 _CFib_O3(int64 n);
 void CFib_O3(void);
@@ -2031,7 +2032,7 @@ int64 _CFactorial(int64 n);
 void CFactorial2(void);
 void CFactorial3(void);
 void ctct(void);
-/* primitives/dataObjectNews.c */
+/* src/primitives/dataObjectNews.c */
 void CfrTil_Class_New(void);
 void CfrTil_Class_Value_New(void);
 void CfrTil_Class_Clone(void);

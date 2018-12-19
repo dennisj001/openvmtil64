@@ -370,27 +370,6 @@ demo
 stringMacrosOff
 #else // of course you can trim this file to your needs and put your init code maybe here if you like
 
-#if 0
-: sp stack pause ; sp
-: powReg ( REG base REG power | REG out -t II.I ) { out 1 = } { power @ 0 > } { power power @ 1 - = } { out out @ base @ * = } for return out d: ;
-'powReg find wdiss
-2 30 powReg dup p  1073741824 _assert sp
-: sp ; //stack pause ; sp
-#else
-: pow ( base power | out -t II.I ) { out 1 = } { power @ 0 > } { power power @ 1 - = } { out out @ base @ * = } for return out ;
-2 30 pow dup p  1073741824 _assert sp
-: powReg ( REG base REG power | REG out -t II.I ) { out 1 = } { power @ 0 > } { power power @ 1 - = } { out out @ base @ * = } for return out ;
-2 30 powReg dup p  1073741824 _assert sp
-: powReg2 ( base REG power | REG out -t II.I ) { out 1 = } { power @ 0 > } { power power @ 1 - = } { out out @ base @ * = } for return out ;
-2 30 powReg2 dup p  1073741824 _assert sp
-: powReg3 ( REG base power | REG out -t II.I ) { out 1 = } { power @ 0 > } { power power @ 1 - = } { out out @ base @ * = } for return out ;
-//'powReg3 find wdiss
-2 30 powReg3 dup p  1073741824 _assert sp
-: powReg4 ( REG base power | out -t II.I ) { out 1 = } { power @ 0 > } { power power @ 1 - = } { out out @ base @ * = } for return out ;
-//'powReg4 find wdiss
-2 30 powReg4 dup p  1073741824 _assert sp
-#endif
-
 #endif // of course ...
 
 c_syntaxOff

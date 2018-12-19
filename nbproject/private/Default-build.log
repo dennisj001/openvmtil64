@@ -1,0 +1,7 @@
+g++  -finline-functions   -ggdb    -c -o src/basis/compiler/machineCode.o src/basis/compiler/machineCode.c
+In file included from src/basis/compiler/machineCode.c:1:
+src/basis/compiler/../../include/cfrtil64.h:63:10: fatal error: /home/openvmtil64/src/include/machineCode.h: No such file or directory
+ #include "/home/openvmtil64/src/include/machineCode.h"
+          ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+compilation terminated.
+make: *** [<builtin>: src/basis/compiler/machineCode.o] Error 1

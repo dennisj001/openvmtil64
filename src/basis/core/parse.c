@@ -323,7 +323,7 @@ _CfrTil_Parse_LocalsAndStackVariables ( int64 svf, int64 lispMode, ListObject * 
     compiler->State |= getReturn ;
 
     // we support nested locals and may have locals in other blocks so the indexes are cumulative
-    if ( numberOfRegisterVariables && (!debugFlag)) Compile_Init_RegisterParamenterVariables ( compiler ) ; 
+    if ( numberOfRegisterVariables && (!debugFlag)) Compile_Init_LocalRegisterParamenterVariables ( compiler ) ; 
     if ( returnVariable ) compiler->ReturnVariableWord = _Finder_FindWord_InOneNamespace ( _Finder_, localsNs, returnVariable ) ;
 
     _CfrTil_->InNamespace = saveInNs ;

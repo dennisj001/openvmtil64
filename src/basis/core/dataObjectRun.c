@@ -16,7 +16,7 @@ _DataObject_Run ( Word * word0 )
         {
             int64 size = _Namespace_VariableValueGet ( word->TypeNamespace, ( byte* ) "size" ) ;
             Compile_MoveImm_To_Reg ( RDI, ( int64 ) word->TypeNamespace, CELL ) ;
-            _Compile_LEA ( RSI, FP, 0, LocalVarIndex_Disp ( LocalVar_FpOffset ( word ) ) ) ;
+            _Compile_LEA ( RSI, FP, 0, LocalVar_FpDisp ( word ) ) ;
             //_Compile_Move_Rm_To_Reg ( RSI, RSI, 0 ) ;
             Compile_MoveImm_To_Reg ( RDX, ( int64 ) size, CELL ) ;
             Compile_Call_TestRSP ( ( byte* ) _Do_LocalObject_AllocateInit ) ; // we want to only allocate this object once and only at run time; and not at compile time
