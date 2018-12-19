@@ -6,7 +6,7 @@ bnOff
 Lisp
 //lcReset
 decimal
-: sp ; //stack ; //pause ; sp 
+: sp ; //stack pause ; sp 
 "lambda" tick _lambda find alias immediate
 "/\" tick lambda find alias
 "/." tick lambda find alias
@@ -186,8 +186,8 @@ tick hio find wdiss //pause
 lispOff
 C
 : bexp43 ( n ) { n @ 1 > } { n @ n @ -- bexp43 * } { 1 } ifElse ;
+'bexp43 find wdiss //pause
 7 C bexp43 dup 5040 "C : bexp43_assert" assert p 
-tick bexp43 find wdiss //pause
 sp
 Lisp
 ( :: C : bexp44 ( n ) { n @ 1 > } { n @ n @ -- bexp44 * } { 1 } ifElse ; )
@@ -265,14 +265,15 @@ scOn
 tick goedel8 find wdiss 
 sp
 Lisp
-: sp ;
+//: sp ;
 (list (1 2)) (list 1 2)
 //pause
 
 lispOff 
-sp
+C
+: sp ; //stack pause ; sp
 "\nending lisp.cft\n" ddps
-sp 
+
 #if doScript
 String
 $ls -al /usr/local ; 
@@ -285,9 +286,11 @@ s: hi ( a b | c ) c a @ b @ + = printf ("\n%d", c ) ;s 1 2 hi nl //pause
 verbosity 1 =
 sp
 #endif
+C
 sp
 Int
 2 + 7 assertStkChk // stack checking
-location
+location 
+sp
 
 

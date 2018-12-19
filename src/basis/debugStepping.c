@@ -180,11 +180,14 @@ doJmpCall:
             if ( word && ( word->CAttribute & ( DEBUG_WORD ) ) &&
                 ( word->CAttribute2 & ( RT_STEPPING_DEBUG ) ) )
             {
-                SetState ( debugger, DBG_AUTO_MODE, false ) ;
-                // we are already stepping here and now so skip
-                _Printf ( ( byte* ) "\nskipping over a rt breakpoint debug word : %s : at 0x%-8x", ( char* ) c_gd ( word->Name ), debugger->DebugAddress ) ;
-                debugger->DebugAddress += 3 ; // 3 : sizeof call reg insn
-                goto end ; // skip it
+                if ( ! GetState ( debugger, DBG_CONTINUE_MODE ) )
+                {
+                    SetState ( debugger, DBG_AUTO_MODE, false ) ;
+                    // we are already stepping here and now so skip
+                    _Printf ( ( byte* ) "\nskipping over a rt breakpoint debug word : %s : at 0x%-8x", ( char* ) c_gd ( word->Name ), debugger->DebugAddress ) ;
+                    debugger->DebugAddress += 3 ; // 3 : sizeof call reg insn
+                    goto end ; // skip it
+                }
             }
         }
         else if ( ( ( ( * ( uint16* ) debugger->DebugAddress ) == 0xff49 ) && ( *( debugger->DebugAddress + 2 ) == 0xd1 ) ) )
@@ -310,6 +313,7 @@ _Debugger_SetupStepping ( Debugger * debugger, Word * word, byte * address, byte
     _CfrTil_CpuState_CheckSave ( ) ;
     debugger->LevelBitNamespaceMap = 0 ;
     SetState ( debugger, DBG_START_STEPPING, true ) ;
+    _Debugger_->LastSourceCodeWord = 0 ;
     CfrTil_NewLine ( ) ;
 }
 

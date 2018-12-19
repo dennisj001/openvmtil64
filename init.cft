@@ -235,6 +235,7 @@ System
 //: wdiss ( pword ) 0 pword @ _wdiss ; //debugWord      // don't add wdiss words to history list
 : wdissl ( pword ) logOn _wdiss ( 0 pword @ ) logOff ; //debugWord      // don't add wdiss words to history list
 "winfo" ' wdiss find alias
+'wi ' wdiss find alias
 //' wdiss find _wdiss
 : sys mem namespaces words stack using in ; 
 'aw 'allWords find alias
@@ -343,7 +344,7 @@ Root
 sp 
 : sh _sh ; prefix
 stringMacrosOn
-: testCfrTil "namespaces/ninit.cft" include ;
+: testCfrTil "namespaces/ninit.cft" include ; // namespaces init
 : test testCfrTil ;
 
 Root 
@@ -367,24 +368,30 @@ test
 demo 
 #endif //dT0
 stringMacrosOff
-#else // of course you can trim this file to your needs and put your personal init code here maybe
-// ...
+#else // of course you can trim this file to your needs and put your init code maybe here if you like
 
 #if 0
-//: bnt "namespaces/test/bigNum.test.cft" include ; // d: bnt
-BigNum 
-'x var
-bnInit ( 16 16 )
-: sp ; //stack pause ;
-
-: qexp { dup 1 >= } { dup -- qexp * } { drop 1 } ifElse ;
-"!" ' qexp find alias
-nl "64 ! = " ps 64 ! p nl 
-x 1000 d: ! =
-nl "1000 ! = " ps x @ fprint nl 
+: sp stack pause ; sp
+: powReg ( REG base REG power | REG out -t II.I ) { out 1 = } { power @ 0 > } { power power @ 1 - = } { out out @ base @ * = } for return out d: ;
+'powReg find wdiss
+2 30 powReg dup p  1073741824 _assert sp
+: sp ; //stack pause ; sp
+#else
+: pow ( base power | out -t II.I ) { out 1 = } { power @ 0 > } { power power @ 1 - = } { out out @ base @ * = } for return out ;
+2 30 pow dup p  1073741824 _assert sp
+: powReg ( REG base REG power | REG out -t II.I ) { out 1 = } { power @ 0 > } { power power @ 1 - = } { out out @ base @ * = } for return out ;
+2 30 powReg dup p  1073741824 _assert sp
+: powReg2 ( base REG power | REG out -t II.I ) { out 1 = } { power @ 0 > } { power power @ 1 - = } { out out @ base @ * = } for return out ;
+2 30 powReg2 dup p  1073741824 _assert sp
+: powReg3 ( REG base power | REG out -t II.I ) { out 1 = } { power @ 0 > } { power power @ 1 - = } { out out @ base @ * = } for return out ;
+//'powReg3 find wdiss
+2 30 powReg3 dup p  1073741824 _assert sp
+: powReg4 ( REG base power | out -t II.I ) { out 1 = } { power @ 0 > } { power power @ 1 - = } { out out @ base @ * = } for return out ;
+//'powReg4 find wdiss
+2 30 powReg4 dup p  1073741824 _assert sp
 #endif
 
-#endif // ... of course
+#endif // of course ...
 
 c_syntaxOff
 lispOff

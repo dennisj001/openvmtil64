@@ -1,4 +1,4 @@
-1 #if // old stuff 
+#if 1 // old stuff 
 C Compiler Logic User
 
 : caseSwitchExample ( n ) 
@@ -18,7 +18,7 @@ attx
 ' attx3 wdiss
 attx3 1 == { nl "math optimization ok" ps nl } if1
 
-: attx2 d: ( n m ) 
+: attx2 ( n m ) 
     nl "m = " ps m @ p 
     nl "n = " ps n @ p nl
     m @ n @ / dup p
@@ -73,34 +73,12 @@ attx3 1 == { nl "math optimization ok" ps nl } if1
     case ( OP_VAR << ( 2 * O_BITS ) | OP_FETCH << ( 1 * O_BITS ) | OP_ORDERED ):
     case ( OP_VAR << ( 2 * O_BITS ) | OP_FETCH << ( 1 * O_BITS ) | OP_LOGIC ):
 */
-{ (| n ) 1 n 1 = n @ + p } i 
-{ (| n ) 1 n 1 = n @ - p } i
-{ (| n ) 1 n 1 = n + p } i 
-{ (| n ) 1 n 1 = n - p } i
+{ (| n ) 1 n 1 = n @ + p } iax 
+{ (| n ) 1 n 1 = n @ - p } iax
+{ (| n ) 1 n 1 = n + p } iax 
+{ (| n ) 1 n 1 = n - p } iax
 #endif
-: atx (| n ) n 1 = n 3 <<= n @ p ; ' atx wdiss atx 
-: atx (| n ) n 1 = n 1 << p ; ' atx wdiss atx 
-: atx (| n ) n 1 = n 5 <<= n @ 3 >> p ; ' atx wdiss atx 
-
-var: JOY LINREC ;
-JOY @ #if "7 [null] [succ] [dup pred] [*] linrec." _joy ps nl #endif
-LINREC @ #if // there's a bug still in the internal linrec combinator
-t: null dup 0 == ;
-t: succ ++ ;
-t: pred -- ;
-7 { null } { succ } { dup pred } { * } linrec p
-7 { dup 0 == } { ++ } { dup -- } { * } linrec p 
-: fac { null } { succ } { dup pred } { * } linrec ;
-7 fac p
-: fac2 { dup 0 == } { ++ } { dup -- } { * } linrec ;
-7 fac2 p
-: fac { null } { succ } { dup pred } { * } linrec ;
-7 { null } { succ } { dup pred } { * } linrec p
-JOY @ #if "7 [null] [succ] [dup pred] [*] linrec." _joy ps #endif
-: fac2 { dup 0 == } { ++ } { dup -- } { * } linrec ;
-7 { dup 0 == } { ++ } { dup -- } { * } linrec p 
-7 { dup 0 == } { ++ } { dup -- } { * } linrec p 
-7 fac p 7 fac2 p
-// "qexp" ' fac2 alias
-// "fac2" ffx
-#endif
+: atx (| n ) n 1 = n 3 <<= n @ p ; ' atx find wdiss atx 
+: atx (| n ) n 1 = n 1 <<= n @ p ; ' atx find wdiss atx 
+: atx (| n ) n 1 = n 5 <<= n @ 3 >> p ; ' atx find wdiss d: atx 
+d: s

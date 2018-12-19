@@ -254,30 +254,6 @@ _CfrTil_Label ( byte * lname )
 }
 
 Word *
-_Compiler_LocalWord ( Compiler * compiler, byte * name, int64 ctype, int64 ctype2, int64 ltype, int64 allocType ) // svf : flag - whether stack variables are in the frame
-{
-    Word *word ;
-    word = _DObject_New ( name, 0, ( ctype | IMMEDIATE ), ctype2, ltype, LOCAL_VARIABLE, ( byte* ) _DataObject_Run, 0, 1, 0, allocType ) ; //COMPILER_TEMP ) ; //allocType ) ; //SESSION ) ; //COMPILER_TEMP ) ;
-    if ( ctype & REGISTER_VARIABLE )
-    {
-        compiler->NumberOfRegisterVariables ++ ; // ?? do in parse.c
-        if ( ctype & LOCAL_VARIABLE ) ++ compiler->NumberOfRegisterLocals ;
-        else ++ compiler->NumberOfRegisterArgs ;
-    }
-    else word->Index = ( ctype & LOCAL_VARIABLE ) ? ++ compiler->NumberOfNonRegisterLocals : ++ compiler->NumberOfNonRegisterArgs ;
-    if ( ctype & LOCAL_VARIABLE ) ++ compiler->NumberOfLocals ;
-    else ++ compiler->NumberOfArgs ;
-    return word ;
-}
-
-int64
-ParameterVarOffset ( Word * word )
-{
-    int64 offset = ( - ( _Context_->Compiler0->NumberOfNonRegisterArgs - word->Index + 1 ) ) ; //??
-    return offset ;
-}
-
-Word *
 Compiler_LocalWord ( Compiler * compiler, byte * name, int64 ctype, int64 allocType ) // svf : flag - whether stack variables are in the frame
 {
     if ( ! GetState ( compiler, DOING_C_TYPE ) && ( ! GetState ( _LC_, LC_BLOCK_COMPILE ) ) )

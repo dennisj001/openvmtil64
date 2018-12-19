@@ -1,6 +1,6 @@
 5 
 C
-: sp ; //stack pause ;
+: sp ; //stack pause ; sp
 lispOff
 //optimizeOff
 System Interpreter 
@@ -83,6 +83,7 @@ nl heey1
 #endif
 
 i2halt
+C
 sp
 "PrefixCombinators" notUsing
 infixOff
@@ -91,4 +92,5 @@ sp
 
 c_syntaxOff 
 2 t{ + }t 7 assertStkChk // stack checking
+//stack pause
 

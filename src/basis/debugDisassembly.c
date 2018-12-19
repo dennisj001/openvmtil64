@@ -113,7 +113,7 @@ Debugger_DisassembleTotalAccumulated ( Debugger * debugger )
     Word * word = _CfrTil_->CurrentWordBeingCompiled ;
     if ( ! ( Here - address ) )
     {
-        address = ( byte* ) _CfrTil_->LastFinished_DObject->Definition ;
+        address = (byte*) (_CfrTil_->LastFinished_Word ? _CfrTil_->LastFinished_Word->Definition : _CfrTil_->LastFinished_DObject->Definition) ;
     }
     int64 size = Here - address ;
     size = (size > 0) ? size : 128 ;

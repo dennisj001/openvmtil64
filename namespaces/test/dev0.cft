@@ -2,8 +2,8 @@
 Int 
 5 
 bnOff dbgOff
-Root : sp ; // stack pause ;
-C : sp ; // stack pause ;
+Root : sp ; //stack pause ;
+C : sp ; //stack pause ;
 dbOn 0 =
 User Lisp
 : sp ; // stack pause ;
@@ -399,6 +399,7 @@ sp
 
 #if 1 // REG testing
 : sp ; //stack pause ;
+//: _assert _assert0 stack pause ;
 : fibBN ( n | fn fn1 fn2 -- TOS ) 
     { fn 0 = fn1 0 = fn2 1 = } { n @ 0 > } { n 1 -= } 
     {   

@@ -729,7 +729,9 @@ typedef struct
     byte *ContinuePoint ; // used by 'continue'
     byte * BreakPoint ;
     byte * StartPoint ;
-    int64 NumberOfNonRegisterLocals, NumberOfLocals, NumberOfNonRegisterArgs, NumberOfArgs, NumberOfRegisterLocals, NumberOfRegisterArgs, NumberOfRegisterVariables ;
+    int64 NumberOfNonRegisterLocals, NumberOfRegisterLocals, NumberOfLocals ;
+    int64 NumberOfNonRegisterVariables, NumberOfRegisterVariables, NumberOfVariables ; 
+    int64 NumberOfNonRegisterArgs, NumberOfRegisterArgs, NumberOfArgs ;
     int64 LocalsFrameSize ;
     int64 SaveCompileMode, SaveOptimizeState ; //, SaveScratchPadIndex ;
     int64 ParenLevel ;
@@ -785,7 +787,7 @@ typedef struct _Debugger
     int64 SaveTOS ;
     int64 SaveStackDepth ;
     int64 Key ;
-    int64 SaveKey ;
+    int64 SaveKey, LastScwi ;
     int64 TokenStart_ReadLineIndex, Esi, Edi ;
     Word * w_Word, *EntryWord, *LastShowWord, *LastEffectsWord, *NextEvalWord ;
     Word *LocalsNamespace, *LastSetupWord, *SteppedWord, *CurrentlyRunningWord, *LastSourceCodeWord, *SubstitutedWord ;
@@ -798,7 +800,7 @@ typedef struct _Debugger
     Cpu * cs_Cpu ;
     byte* DebugAddress, *CopyRSP, *CopyRBP, *LastSourceCodeAddress ;
     uint64 * DebugRSP, *DebugRBP, *DebugRSI, *DebugRDI, * LastRsp ; //, *SavedIncomingESP, *SavedIncomingEBP ; //, SavedRunningESP, SavedRunningEBP;
-    int64 LastSourceCodeIndex, TerminalLineWidth, ReadIndex ;
+    int64 TerminalLineWidth, ReadIndex ;
     ByteArray * StepInstructionBA ;
     byte CharacterTable [ 128 ] ;
     DebuggerFunction CharacterFunctionTable [ 40 ] ;

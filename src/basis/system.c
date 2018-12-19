@@ -402,7 +402,7 @@ _CfrTil_Source ( Word *word, int64 addToHistoryFlag )
         if ( category & INFIXABLE ) _Printf ( ( byte* ) ", %s", "infixable" ) ;
         if ( word->S_WordData )
         {
-            __Word_ShowSourceCode ( word ) ; // source code has newlines for multiline history
+            _Word_ShowSourceCode ( word ) ; // source code has newlines for multiline history
             if ( addToHistoryFlag ) _OpenVmTil_AddStringToHistoryList ( word->W_SourceCode ) ;
             if ( word->S_WordData->Filename ) _Printf ( ( byte* ) "\nSource code file location of %s : \"%s\" : %d.%d :: we are now at : %s", name, word->S_WordData->Filename, word->S_WordData->LineNumber, word->W_TokenEnd_ReadLineIndex, Context_IsInFile ( _Context_ ) ? Context_Location ( ) : ( byte* ) "command line" ) ;
             if ( ( word->LAttribute & T_LC_DEFINE ) && ( ! ( word->LAttribute & T_LISP_COMPILED_WORD ) ) ) _Printf ( ( byte* ) "\nLambda Calculus word : interpreted not compiled" ) ; // do nothing here

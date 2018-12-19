@@ -33,22 +33,21 @@ _CfrTil_CopyDuplicates ( Word * word0 )
     Word * word1, *wordToBePushed ;
     word0->W_WordListOriginalWord = word0 ;
     word0->CAttribute2 &= ( ~ RECYCLABLE_COPY ) ;
-    if ( word1 = ( Word * ) dllist_Map1_WReturn ( _CfrTil_->Compiler_N_M_Node_WordList, ( MapFunction1 ) CopyDuplicateWord, ( int64 ) word0 ) )
-    {
-        wordToBePushed = word1 ;
-    }
+    word1 = ( Word * ) dllist_Map1_WReturn ( _CfrTil_->Compiler_N_M_Node_WordList, ( MapFunction1 ) CopyDuplicateWord, ( int64 ) word0 ) ;
+    if ( word1 ) wordToBePushed = word1 ;
     else wordToBePushed = word0 ;
     return wordToBePushed ;
 }
 
 Word *
-Compiler_CopyDuplicatesAndPush ( Word * word0 )
+Compiler_CopyDuplicatesAndPush ( Word * word0, int64 tsrli, int64 scwi )
 {
     if ( ( word0->CAttribute & ( DEBUG_WORD | INTERPRET_DBG ) ) || ( word0->LAttribute & ( W_COMMENT | W_PREPROCESSOR ) ) ) return word0 ;
     if ( word0 && CompileMode )
     {
         word0 = _CfrTil_CopyDuplicates ( word0 ) ;
     }
+    Lexer_Set_ScIndex_RlIndex ( _Lexer_, word0, tsrli, scwi ) ;
     CfrTil_WordList_PushWord ( word0 ) ;
     return word0 ;
 }
@@ -78,7 +77,7 @@ _Compiler_SetCompilingSpace ( byte * name )
 byte *
 _Compiler_GetCodeSpaceHere ( )
 {
-    NamedByteArray *nba = _OVT_Find_NBA ( (byte*) "CodeSpace" ) ;
+    NamedByteArray *nba = _OVT_Find_NBA ( ( byte* ) "CodeSpace" ) ;
     byte * here = _ByteArray_Here ( nba->ba_CurrentByteArray ) ;
     return here ;
 }
@@ -146,7 +145,7 @@ void
 GotoInfo_Print ( dlnode * node )
 {
     GotoInfo * gi = ( GotoInfo * ) node ;
-    _Printf ( (byte*) "\nLabelName = %s : Type = %3d : CompileAtAddress = 0x%016lx : LabeledAddress = 0x%016lx : JmpOffsetPointer = : 0x%016lx",
+    _Printf ( ( byte* ) "\nLabelName = %s : Type = %3d : CompileAtAddress = 0x%016lx : LabeledAddress = 0x%016lx : JmpOffsetPointer = : 0x%016lx",
         gi->pb_LabelName, gi->GI_CAttribute, gi->CompileAtAddress, gi->LabeledAddress, gi->pb_JmpOffsetPointer ) ;
 }
 
@@ -154,7 +153,7 @@ void
 Compiler_GotoList_Print ( )
 {
     Compiler * compiler = _Context_->Compiler0 ;
-    _Printf ( (byte*) "\nTypes : GI_BREAK = 1 : GI_RETURN = 2 : GI_CONTINUE = 4 : GI_GOTO = 8 : GI_RECURSE = 16 : GI_LABEL = 64 : GI_GOTO_LABEL = 128" ) ;
+    _Printf ( ( byte* ) "\nTypes : GI_BREAK = 1 : GI_RETURN = 2 : GI_CONTINUE = 4 : GI_GOTO = 8 : GI_RECURSE = 16 : GI_LABEL = 64 : GI_GOTO_LABEL = 128" ) ;
     dllist_Map ( compiler->GotoList, ( MapFunction0 ) GotoInfo_Print ) ;
 }
 
@@ -209,16 +208,16 @@ CompileOptimizeInfo_New ( uint64 type )
 #if 0    
         ( CompileOptimizeInfo * ) OVT_CheckRecycleableAllocate ( _Q_->MemorySpace0->RecycledOptInfoList,
         sizeof (CompileOptimizeInfo ) ) ;
-    if ( ! optInfo ) 
+    if ( ! optInfo )
 #endif        
-    optInfo = _CompileOptimizeInfo_New ( type ) ;
+        optInfo = _CompileOptimizeInfo_New ( type ) ;
     return optInfo ;
 }
 
 CompileOptimizeInfo *
 Compiler_CompileOptimizeInfo_PushNew ( Compiler * compiler )
 {
-    CompileOptimizeInfo * coi = CompileOptimizeInfo_New ( COMPILER_TEMP ) ; 
+    CompileOptimizeInfo * coi = CompileOptimizeInfo_New ( COMPILER_TEMP ) ;
     if ( coi )
     {
         List_Push ( compiler->OptimizeInfoList, ( dlnode* ) coi ) ;
@@ -322,7 +321,7 @@ Compiler_Init ( Compiler * compiler, uint64 state, int64 flags )
     _dllist_Init ( compiler->CurrentSwitchList ) ;
     _dllist_Init ( compiler->RegisterParameterList ) ;
     _dllist_Init ( compiler->OptimizeInfoList ) ;
-    if ( flags ) CfrTil_TypeStackReset ( ) ;    
+    if ( flags ) CfrTil_TypeStackReset ( ) ;
     _Compiler_FreeAllLocalsNamespaces ( compiler ) ;
     Compiler_CompileOptimizeInfo_PushNew ( compiler ) ;
     _CfrTil_RecycleInit_Compiler_N_M_Node_WordList ( 0 ) ;

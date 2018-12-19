@@ -65,7 +65,7 @@ _CfrTil_DebugRuntimeBreakpoint ( )
     Debugger * debugger = _Debugger_ ;
     if ( ( ! CompileMode ) )
     {
-        if ( ! GetState ( debugger, ( DBG_BRK_INIT ) ) )
+        if ( ! GetState ( debugger, ( DBG_BRK_INIT|DBG_CONTINUE_MODE ) ) )
         {
             if ( GetState ( debugger, DBG_INTERPRET_LOOP_DONE ) )//|| GetState ( debugger, DBG_CONTINUE_MODE|DBG_AUTO_MODE ) )
             {
@@ -83,13 +83,11 @@ _CfrTil_DebugRuntimeBreakpoint ( )
         }
         else
         {
-            debugger->DebugAddress += 3 ; // 3 : sizeof call rax insn
+            debugger->DebugAddress += 3 ; // 3 : sizeof call rax insn :: skip the call else we would recurse to here
             SetState ( _Debugger_, ( DBG_AUTO_MODE | DBG_AUTO_MODE_ONCE ), false ) ;
+            if ( GetState ( debugger, ( DBG_CONTINUE_MODE ) ) ) SetState ( debugger, ( DBG_BRK_INIT | DBG_RUNTIME_BREAKPOINT ), true ) ;
         }
-        if ( ! sigsetjmp ( _Context_->JmpBuf0, 0 ) ) // used by CfrTil_DebugRuntimeBreakpoint
-        {
-            _Debugger_InterpreterLoop ( debugger ) ;
-        }
+        _Debugger_InterpreterLoop ( debugger ) ;
         SetState ( debugger, DBG_BRK_INIT | DBG_RUNTIME_BREAKPOINT | DEBUG_SHTL_OFF, false ) ;
     }
 }

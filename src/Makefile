@@ -24,7 +24,7 @@ SOURCES = basis/compiler/machineCode.c basis/compiler/_compile.c basis/compiler/
 
 INCLUDES = include/machineCode.h include/defines.h include/types.h \
 	include/cfrtil64.h include/macros.h include/lc.h\
-	include/machineCodeMacros.h include/stacks.h #include/gc.h
+	include/machineCodeMacros.h 
 	
 
 OBJECTS = $(SOURCES:%.c=%.o) 
@@ -69,7 +69,7 @@ cfrtil64 : include/prototypes.h $(OBJECTS) _cfrtil64_O3
 	strip -o cfrtil64 cfrtil64o3
 	mv cfrtil64 ../bin/
 	
-cfrtil64s : CFLAGS = $(CFLAGS_CORE)
+cfrtil64s : CFLAGS = $(CFLAGS_CORE) -03
 cfrtil64s : include/prototypes.h $(OBJECTS)
 	$(CC) -static $(CFLAGS) $(OBJECTS) -O3 -o cfrtil64s $(LIBS)
 	strip cfrtil64s
@@ -77,7 +77,7 @@ cfrtil64s : include/prototypes.h $(OBJECTS)
 	
 static : CFLAGS = $(CFLAGS_CORE)
 static : include/prototypes.h $(OBJECTS)
-	$(CC) -static $(CFLAGS) $(OBJECTS) -O3 -o cfrtil64s $(LIBS)
+	$(CC) -static $(CFLAGS) $(OBJECTS) -o cfrtil64s $(LIBS)
 	strip cfrtil64s
 	mv cfrtil64s ../bin/
 
@@ -102,10 +102,10 @@ _cfrtil64_O2 : cfrtil64o
 _cfrtil64_O3 : CFLAGS = $(CFLAGS_CORE) -O3
 _cfrtil64_O3 : OUT = cfrtil64o3
 _cfrtil64_O3 : cfrtil64o
-	mv cfrtil64o3 ../bin
+	cp ../bin/cfrtil64o3 ../bin/cfrtil64
 
 _cfrtil64o :  include/prototypes.h $(OBJECTS)
-	$(CC) $(CFLAGS) basis/compiler/*.o basis/*.o primitives/*.o -o $(OUT) $(LIBS)
+	$(CC) $(CFLAGS) $(OBJECTS) -o $(OUT) $(LIBS)
 
 primitives/cmaths.o : primitives/cmaths.c
 	$(CC) $(CFLAGS) -O3 -c primitives/cmaths.c -o primitives/cmaths.o
@@ -161,13 +161,13 @@ optimize2 : oclean _cfrtil64_O2
 optimize3 : oclean _cfrtil64_O3
 
 optimize : 
-	make optimize1
-	make optimize2
+	-rm ../bin/cfrtil64*
+	#make optimize1
+	#make optimize2
 	make optimize3
 	make clean
 	make
-	-rm bin/cfrtil64o*
-	mv cfrtil64 cfrtil64* ../bin
+	cp ../bin/cfrtil64o3 ../bin/cfrtil64
 
 editorClean :
 	rm *.*~ basis/*.*~ basis/compiler/*.*~ primitives/*.*~ include/*.*~
@@ -276,7 +276,7 @@ _install_1 : # we are in src directory
 	-sudo cp -r ../ /usr/local/lib/cfrTil64/
 	-sudo cp -r ../etc /usr/local/
 	-sudo cp ../lib/lib*.* /usr/lib
-#	-sudo rm -r /usr/local/lib/cfrTil/nbproject
+	-cp ../bin/cfrtil64o3 ../bin/cfrtil64
 	sudo cp ../bin/* /usr/local/bin
 	-mv ../../backup/.git ..
 	-sudo ldconfig

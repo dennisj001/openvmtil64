@@ -16,7 +16,7 @@ _DataObject_Run ( Word * word0 )
         {
             int64 size = _Namespace_VariableValueGet ( word->TypeNamespace, ( byte* ) "size" ) ;
             Compile_MoveImm_To_Reg ( RDI, ( int64 ) word->TypeNamespace, CELL ) ;
-            _Compile_LEA ( RSI, FP, 0, LocalVarIndex_Disp ( LocalVarOffset ( word ) ) ) ;
+            _Compile_LEA ( RSI, FP, 0, LocalVarIndex_Disp ( LocalVar_FpOffset ( word ) ) ) ;
             //_Compile_Move_Rm_To_Reg ( RSI, RSI, 0 ) ;
             Compile_MoveImm_To_Reg ( RDX, ( int64 ) size, CELL ) ;
             Compile_Call_TestRSP ( ( byte* ) _Do_LocalObject_AllocateInit ) ; // we want to only allocate this object once and only at run time; and not at compile time
@@ -91,6 +91,7 @@ _Namespace_Do_C_Type ( Namespace * ns )
             Compiler_Get_C_BackgroundNamespace ( compiler ) ;
             if ( GetState ( cntx, C_SYNTAX ) )
             {
+                _Namespace_DoNamespace ( ns, 1 ) ;
                 LambdaCalculus * svlc = _LC_ ;
                 _LC_ = 0 ;
                 // ?? parts of this could be screwing up other things and adds an unnecessary level of complexity
@@ -130,7 +131,6 @@ _Namespace_Do_C_Type ( Namespace * ns )
                 else
                 {
                     if ( Compiling ) Ovt_AutoVarOn ( ) ;
-                    _Namespace_DoNamespace ( ns, 1 ) ;
                     // remember : we have already gotten a token
                     word = Finder_Word_FindUsing ( cntx->Finder0, token1, 0 ) ;
                     Interpreter_InterpretAToken ( cntx->Interpreter0, token1, t1_tsrli ) ;
@@ -371,7 +371,7 @@ void
 _CfrTil_Do_LispSymbol ( Word * word )
 {
     // rvalue - rhs for stack var
-    _Compile_Move_StackN_To_Reg ( ACC, FP, ParameterVarOffset ( word ) ) ;
+    _Compile_Move_StackN_To_Reg ( ACC, FP, ParameterVarOffset (_Compiler_, word ) ) ;
     _Word_CompileAndRecord_PushReg ( word, ACC ) ;
     CfrTil_TypeStackPush ( word ) ;
 }

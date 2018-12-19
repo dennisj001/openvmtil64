@@ -62,7 +62,6 @@ typedef int ( *mpf2andOutFunc) (mpfr_ptr, mpfr_srcptr, mpfr_srcptr, mpfr_rnd_t) 
 //#include "codegen_x86.h" // i want to make sure i have this - not using much now but probably later on
 #include "machineCode.h"
 #include "machineCodeMacros.h"
-#include "stacks.h"
 #include "prototypes.h"
 #include "lc.h"
 #endif

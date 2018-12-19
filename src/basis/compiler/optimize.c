@@ -307,8 +307,9 @@ Compile_StandardArg ( Word * word, Boolean reg, Boolean rvalueFlag, byte * setHe
     Word_SetCodingHere_And_ClearPreviousUseOf_Here_SCA ( word, 1 ) ;
     if ( rvalueFlag -- )
     {
-        Compile_GetVarLitObj_RValue_To_Reg ( word, reg ) ;
-        while ( rvalueFlag -- ) Compile_Move_Rm_To_Reg ( ACC, ACC, 0 ) ;
+        if ( word->CAttribute & REGISTER_VARIABLE ) reg = word->RegToUse ;
+        else Compile_GetVarLitObj_RValue_To_Reg ( word, reg ) ;
+        while ( rvalueFlag -- ) Compile_Move_Rm_To_Reg ( reg, reg, 0 ) ;
     }
     else _Compile_GetVarLitObj_LValue_To_Reg ( word, reg ) ;
     word->StackPushRegisterCode = Here ; // we are not pushing this but in case we are just rewriting the code in the next arg ?
@@ -437,10 +438,9 @@ Setup_MachineCodeInsnParameters ( Compiler * compiler, Boolean direction, Boolea
         if ( optInfo->opWord->CAttribute & BIT_SHIFT ) optInfo->Optimize_Rm = RAX ;
         optInfo->rtrn = 1 ;
         // standard arg arrangement
-        //if ( optInfo->wordArg1 && (!optInfo->wordArg1->RegToUse)) optInfo->wordArg1->RegToUse = optInfo->Optimize_Reg ;
-        //if ( optInfo->wordArg2 && (!optInfo->wordArg2->RegToUse)) optInfo->wordArg2->RegToUse = optInfo->Optimize_Rm ;
         if ( optInfo->wordArg1 ) optInfo->wordArg1->RegToUse = optInfo->Optimize_Reg ;
         if ( optInfo->wordArg2 ) optInfo->wordArg2->RegToUse = optInfo->Optimize_Rm ;
+        Word_SCH_CPUSCA ( optInfo->opWord, 1 ) ;
     }
 }
 
@@ -748,13 +748,13 @@ GetRmDispImm ( CompileOptimizeInfo * optInfo, Word * word, int64 suggestedReg )
     else if ( word->CAttribute & LOCAL_VARIABLE )
     {
         optInfo->Optimize_Rm = FP ;
-        optInfo->Optimize_Disp = LocalVarIndex_Disp ( LocalVarOffset ( word ) ) ;
+        optInfo->Optimize_Disp = LocalVarIndex_Disp ( LocalVar_FpOffset ( word ) ) ;
         optInfo->OptimizeFlag |= OPTIMIZE_RM ;
     }
     else if ( word->CAttribute & PARAMETER_VARIABLE )
     {
         optInfo->Optimize_Rm = FP ;
-        optInfo->Optimize_Disp = LocalVarIndex_Disp ( ParameterVarOffset ( word ) ) ;
+        optInfo->Optimize_Disp = LocalVarIndex_Disp ( ParameterVarOffset (_Compiler_, word ) ) ;
         optInfo->OptimizeFlag |= OPTIMIZE_RM ;
     }
     else if ( word->CAttribute & ( LITERAL | CONSTANT ) )

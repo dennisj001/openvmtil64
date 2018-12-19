@@ -381,7 +381,7 @@ _LO_Apply_NonMorphismArg ( ListObject ** pl1, int64 i )
     ListObject *l1 = * pl1 ;
     Word * word = l1 ;
     word = l1->Lo_CfrTilWord ;
-    word = Compiler_CopyDuplicatesAndPush ( word ) ;
+    word = Compiler_CopyDuplicatesAndPush (word, -1, -1) ;
     //_Word_SetTsrliScwi ( word, l1->W_RL_Index, l1->W_SC_Index ) ;
     //_Word_SetTsrliScwi ( l1, l1->W_RL_Index, l1->W_SC_Index ) ;
     //Word_SCH_CPUSCA( word, 1 ) ;
@@ -425,7 +425,7 @@ _LO_Apply_Arg ( LambdaCalculus * lc, ListObject ** pl1, int64 i )
     else if ( ( l1->Name[0] == '[' ) ) i = _LO_Apply_ArrayArg ( pl1, i ) ;
     else
     {
-        word = Compiler_CopyDuplicatesAndPush ( word ) ;
+        word = Compiler_CopyDuplicatesAndPush (word, -1, -1) ;
         word->W_SC_Index = l1->W_SC_Index ;
         _Debugger_PreSetup ( _Debugger_, word, 0, 1 ) ;
         Compile_MoveImm_To_Reg ( RegOrder ( i ++ ), DataStack_Pop ( ), CELL_SIZE ) ;
@@ -459,7 +459,7 @@ _LO_Apply_C_LtoR_ArgList ( LambdaCalculus * lc, ListObject * l0, Word * word )
         Set_CompileMode ( true ) ;
         _Debugger_->PreHere = Here ;
         Word_SetCoding ( word, Here, 1 ) ;
-        word = Compiler_CopyDuplicatesAndPush ( word ) ;
+        word = Compiler_CopyDuplicatesAndPush (word, -1, -1) ;
         //cntx->CurrentlyRunningWord = word ;
         if ( ( String_Equal ( word->Name, "printf" ) || ( String_Equal ( word->Name, "sprintf" ) ) ) ) Compile_MoveImm_To_Reg ( RAX, 0, CELL ) ; // for printf ?? others //System V ABI : "%rax is used to indicate the number of vector arguments passed to a function requiring a variable number of arguments"
         Word_SetCodingHere_And_ClearPreviousUseOf_Here_SCA ( word, 1 ) ;
@@ -527,7 +527,7 @@ CompileLispBlock ( ListObject *args, ListObject * body )
     Word * word = _CfrTil_->CurrentWordBeingCompiled ;
     LO_BeginBlock ( ) ; // must have a block before local variables if there are register variables because _CfrTil_Parse_LocalsAndStackVariables will compile something
     SetState ( lc, ( LC_COMPILE_MODE | LC_BLOCK_COMPILE ), true ) ; // before _CfrTil_Parse_LocalsAndStackVariables
-    Namespace * locals = _CfrTil_Parse_LocalsAndStackVariables ( 1, 1, args, 0, 0 ) ;
+    Namespace * locals = _CfrTil_Parse_LocalsAndStackVariables (1, 1, args, 0, 0 , false) ;
     word->CAttribute = BLOCK ;
     word->LAttribute |= T_LISP_COMPILED_WORD ;
     _LO_Eval ( lc, body, locals, 1 ) ;

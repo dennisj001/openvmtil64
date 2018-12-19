@@ -218,31 +218,7 @@ void
 _CfrTil_EndBlock1 ( BlockInfo * bi )
 {
     Compiler * compiler = _Context_->Compiler0 ;
-    if ( ! Compiler_BlockLevel ( compiler ) )
-    {
-        WordStack_SCHCPUSCA ( 0, 0 ) ;
-        _CfrTil_InstallGotoCallPoints_Keyed ( bi, GI_RETURN ) ;
-        if ( Compiler_IsFrameNecessary ( compiler ) && ( ! GetState ( compiler, DONT_REMOVE_STACK_VARIABLES ) ) )
-        {
-            _Compiler_RemoveLocalFrame ( compiler ) ;
-            bi->bp_First = bi->LocalFrameStart ; // include _Compile_Rsp_Save code
-        }
-        else if ( compiler->NumberOfRegisterVariables )
-        {
-            if ( compiler->NumberOfRegisterVariables >= ( compiler->NumberOfNonRegisterArgs + compiler->NumberOfNonRegisterLocals ) ) bi->bp_First = bi->AfterLocalFrame ;
-            if ( compiler->ReturnVariableWord )
-            {
-                if ( compiler->ReturnVariableWord->CAttribute & REGISTER_VARIABLE ) _Compile_Move_Reg_To_StackN ( DSP, 0, compiler->ReturnVariableWord->RegToUse ) ;
-                else
-                {
-                    Compile_GetVarLitObj_RValue_To_Reg ( compiler->ReturnVariableWord, ACC ) ;
-                    Compile_Move_ACC_To_TOS ( DSP ) ;
-                }
-            }
-            else if ( GetState ( compiler, RETURN_ACCUM ) || GetState ( compiler, RETURN_TOS ) ) Compile_Move_ACC_To_TOS ( DSP ) ;
-        }
-        else bi->bp_First = bi->AfterLocalFrame ;
-    }
+    if ( ! Compiler_BlockLevel ( compiler ) ) CfrTil_FinalizeBlocks ( bi ) ;
     compiler->LHS_Word = 0 ;
     WordStack_SCHCPUSCA ( 0, 0 ) ;
     _Compile_Return ( ) ;

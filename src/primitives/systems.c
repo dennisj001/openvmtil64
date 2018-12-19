@@ -69,7 +69,7 @@ void
 CfrTil_Time ( )
 {
     int64 timer = DataStack_Pop ( ) ;
-    System_Time ( _Context_->System0, timer, ( char* ) "Timer", 1 ) ;
+    System_Time ( _Context_->System0, timer, ( char* ) "\nTimer", 1 ) ;
 }
 
 void

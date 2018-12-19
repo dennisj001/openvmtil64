@@ -166,7 +166,7 @@ User
 
 nl "ffx ... " ps nl
 
-: ffx ( wn | d ) 1 ti d wn @ _find = d @ wdiss 3 d @ _ffx nl wn @ ps ":" ps 1 time nl ;
+: ffx ( wn | w ) 1 ti w wn @ _find = w @ wdiss 3 w @ _ffx nl wn @ ps ":" ps 1 time nl ;
 : ffx2 ( wn | w ) 1 ti w wn @ _find = w @ wdiss w @ 3 _ffx2 1 time nl ;
 c_syntaxOn
 User
@@ -235,18 +235,28 @@ c_syntaxOff
 #if 1
 //s: pow ( base power | out -- TOS ) { out 1 = } { power @ 0 > } { power power @ 1 - = } { out out @ base @ * = } for return out @ ;s
 : pow ( base power | out -t II.I ) { out 1 = } { power @ 0 > } { power power @ 1 - = } { out out @ base @ * = } for return out ; //"II.I" typeSignature
-'pow find wdiss
+//'pow find wdiss
 2 30 pow dup p  1073741824 _assert 
-: pow ( base power | out ) { out 1 = } { power @ 0 > } { power power @ 1 - = } { out out @ base @ * = } for return out ;
-"pow" ffx2
-//"cpow" ffx2
-//typecheckOff
+"pow" ffx2 
+: powReg ( REG base REG power | REG out -t II.I ) { out 1 = } { power @ 0 > } { power power @ 1 - = } { out out @ base @ * = } for return out ;
+2 30 powReg dup p  1073741824 _assert 
+"powReg" ffx2 
+: powReg2 ( base REG power | REG out -t II.I ) { out 1 = } { power @ 0 > } { power power @ 1 - = } { out out @ base @ * = } for return out ;
+2 30 powReg2 dup p  1073741824 _assert 
+"powReg2" ffx2 
+: powReg3 ( REG base power | REG out -t II.I ) { out 1 = } { power @ 0 > } { power power @ 1 - = } { out out @ base @ * = } for return out ;
+//'powReg3 find wdiss
+2 30 powReg3 dup p  1073741824 _assert 
+"powReg3" ffx2 
+: powReg4 ( REG base power | out -t II.I ) { out 1 = } { power @ 0 > } { power power @ 1 - = } { out out @ base @ * = } for return out ;
+//'powReg4 find wdiss
+2 30 powReg4 dup p  1073741824 _assert 
+"powReg4" ffx2 
 Int
 "**" ffx2
 "pow_03" ffx2
-//sp
 sp
-//pause
+pause
 
 C
 : tt ( | t ) t 6 = t ++ t @ p ;

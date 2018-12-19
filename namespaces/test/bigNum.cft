@@ -59,11 +59,14 @@ nl "1000 ! = " ps x @ fprint nl
 7 ! p 8 ! p 8 ! p
 nl 7 ! p
 
-"!" ' qexp find alias
+//"!" ' qexp find alias
+//"!" ' aexp find alias
+//"!" ' bexp find alias
+"!" ' bexp0 find alias
 7 ! p 8 ! p
-: !! qexp p nl ;
+: !! ! p nl ;
 '!! find wdiss
-7 !! 8 !! 8 !!   // this is not right still
+7 !! 8 !! 8 !!   
 sp
 1000 ! p
 //pause
@@ -73,11 +76,12 @@ x @ p
 //pause
 //: bexpl ( n | l ) { l x @ = n @ 1 <= } { 1 l @ p } { n @ dup 1 - bexpl * } ifElse ; 
 //: bexpl ( n -- TOS ) { n @ 1 <= } { 1 } { n @ dup 1 - bexpl * } ifElse ; 
-: bexpl ( n -- TOS ) { n @ 1 <= } { 1 } { n @ dup 1 - bexpl * } ifElse ; 
+: bexpl ( n -- TOS ) { n @ 1 <= } { 1 } { n @ dup 1 - bexpl * } ifElse ;
+'bexpl find wdiss
 7 bexpl dup p 
 : _bassert ( n m ) { n @ m @ != } { nl "error" ps _info pause } if ; 
 5040 _bassert
-sp //pause
+//sp pause
 
 nl "starting BigNum" ps nl
 BigNum

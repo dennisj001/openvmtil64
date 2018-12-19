@@ -362,7 +362,7 @@ _LO_CfrTil ( ListObject * lfirst )
         Word_SetCodingHere_And_ClearPreviousUseOf_Here_SCA ( ldata->CfrTilWord, 0 ) ;
         if ( ldata->LAttribute & ( LIST | LIST_NODE ) )
         {
-            _CfrTil_Parse_LocalsAndStackVariables ( 1, 1, ldata, compiler->LocalsCompilingNamespacesStack, 0 ) ;
+            _CfrTil_Parse_LocalsAndStackVariables ( 1, 1, ldata, compiler->LocalsCompilingNamespacesStack, 0, false ) ;
         }
         else if ( String_Equal ( ldata->Name, ( byte * ) "tick" ) || String_Equal ( ldata->Name, ( byte * ) "'" ) )
         {

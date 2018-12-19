@@ -2,6 +2,8 @@
 
 // X variable op compile for group 5 opCodes - inc/dec - ia32 
 
+inline int64 Abs ( int64 x ) { return ((int64) (((x) >= 0) ? (x) : (-(x)))) ; }
+
 void
 Compile_Minus ( Compiler * compiler )
 {

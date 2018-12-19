@@ -13,9 +13,9 @@ _CfrTil_SingleQuote ( )
     //if ( ! Compiling ) _CfrTil_InitSourceCode_WithName ( _CfrTil_, lexer->OriginalToken ) ;
     // remember : _ReadLine_PeekIndexedChar ( rl, 0 ) is the *next* char to be read
     //if ( sqWord && sqWord->Name[0] == '\'' && ( ( ( c1 = _ReadLine_PeekIndexedChar ( rl, 1 ) ) == '\'' ) || ( ( c0 = _ReadLine_PeekIndexedChar ( rl, 0 ) ) == '\\' ) ) )// parse a char type, eg. 'c' 
-    c0 = _ReadLine_PeekIndexedChar ( rl, 0 ) ;// parse a char type, eg. 'c' 
+    c0 = _ReadLine_PeekIndexedChar ( rl, 0 ) ; // parse a char type, eg. 'c' 
     c1 = _ReadLine_PeekIndexedChar ( rl, 1 ) ;
-    if ( sqWord && sqWord->Name[0] == '\'' && ( c1 == '\'') || ( c0 == '\\' ) ) // parse a char type, eg. 'c' 
+    if ( sqWord && sqWord->Name[0] == '\'' && ( c1 == '\'' ) || ( c0 == '\\' ) ) // parse a char type, eg. 'c' 
     {
         // notation :: c0 = original ' ; c1 = next char, etc.
         c0 = _ReadLine_GetNextChar ( rl ) ;
@@ -46,7 +46,7 @@ done:
     }
     else
     {
-        if ( ! Compiling ) CfrTil_InitSourceCode_WithName (_CfrTil_, lexer->OriginalToken , 0) ;
+        if ( ! Compiling ) CfrTil_InitSourceCode_WithName ( _CfrTil_, lexer->OriginalToken, 0 ) ;
         byte * token = ( byte* ) "" ;
         while ( 1 )
         {
@@ -66,7 +66,7 @@ done:
             }
             else break ;
         }
-        if ( ( ! AtCommandLine ( rl ) ) && ( ! GetState ( _CfrTil_, SOURCE_CODE_STARTED ) ) ) CfrTil_InitSourceCode_WithName (_CfrTil_, lexer->OriginalToken , 0) ;
+        if ( ( ! AtCommandLine ( rl ) ) && ( ! GetState ( _CfrTil_, SOURCE_CODE_STARTED ) ) ) CfrTil_InitSourceCode_WithName ( _CfrTil_, lexer->OriginalToken, 0 ) ;
         CfrTil_Token ( ) ;
     }
 }
@@ -123,7 +123,7 @@ gotNextToken:
         else
         {
             byte * buffer = Buffer_Clear ( _CfrTil_->ScratchB1 ) ;
-            sprintf ( (char*) buffer, "\n_CfrTil_Parse_ClassStructure : can't find namespace : \'%s\'", token ) ;
+            sprintf ( ( char* ) buffer, "\n_CfrTil_Parse_ClassStructure : can't find namespace : \'%s\'", token ) ;
             _SyntaxError ( ( byte* ) buffer, 1 ) ; // else structure component size error
         }
         for ( i = 0 ; 1 ; )
@@ -160,7 +160,7 @@ gotNextToken:
 }
 
 void
-Compiler_TypedObjectInit (Word * word, Namespace * typeNamespace)
+Compiler_TypedObjectInit ( Word * word, Namespace * typeNamespace )
 {
     word->TypeNamespace = typeNamespace ;
     word->CAttribute |= typeNamespace->CAttribute ;
@@ -185,7 +185,7 @@ Compiler_TypedObjectInit (Word * word, Namespace * typeNamespace)
 // the slot address on the DataStack
 
 Namespace *
-_CfrTil_Parse_LocalsAndStackVariables ( int64 svf, int64 lispMode, ListObject * args, Stack * nsStack, Namespace * localsNs ) // stack variables flag
+_CfrTil_Parse_LocalsAndStackVariables ( int64 svf, int64 lispMode, ListObject * args, Stack * nsStack, Namespace * localsNs, Boolean debugFlag ) // stack variables flag
 {
     // number of stack variables, number of locals, stack variable flag
     Context * cntx = _Context_ ;
@@ -229,9 +229,7 @@ _CfrTil_Parse_LocalsAndStackVariables ( int64 svf, int64 lispMode, ListObject * 
                 if ( ( iword = Finder_FindWord_InOneNamespace ( _Finder_, word, ( byte* ) "init" ) )
                     || ( _Namespace_VariableValueGet ( word, ( byte* ) "size" ) > 8 ) )
 #endif                
-                {
-                    typeNamespace = word ;
-                }
+                typeNamespace = word ;
                 continue ;
             }
             if ( String_Equal ( ( char* ) token, "|" ) )
@@ -242,7 +240,7 @@ _CfrTil_Parse_LocalsAndStackVariables ( int64 svf, int64 lispMode, ListObject * 
             if ( String_Equal ( ( char* ) token, "-t" ) ) // for setting W_TypeSignatureString
             {
                 token = _Lexer_LexNextToken_WithDelimiters ( lexer, 0, 1, 0, 1, LEXER_ALLOW_DOT ) ;
-                strncpy ( (char*) _CfrTil_->CurrentWordBeingCompiled->W_TypeSignatureString, (char*) token, 8 ) ;
+                strncpy ( ( char* ) _CfrTil_->CurrentWordBeingCompiled->W_TypeSignatureString, ( char* ) token, 8 ) ;
                 continue ; // don't add a node to our temporary list for this token
             }
             if ( String_Equal ( ( char* ) token, "--" ) ) // || ( String_Equal ( ( char* ) token, "|-" ) == 0 ) || ( String_Equal ( ( char* ) token, "|--" ) == 0 ) )
@@ -274,7 +272,7 @@ _CfrTil_Parse_LocalsAndStackVariables ( int64 svf, int64 lispMode, ListObject * 
                 else if ( Stringi_Equal ( token, ( byte* ) "EAX" ) ) getReturn |= RETURN_ACCUM ;
                 else if ( Stringi_Equal ( token, ( byte* ) "RAX" ) ) getReturn |= RETURN_ACCUM ;
                 else if ( Stringi_Equal ( token, ( byte* ) "TOS" ) ) getReturn |= RETURN_TOS ;
-                else if ( String_Equal ( token, ( byte* ) "0" ) ) getReturn |= DONT_REMOVE_STACK_VARIABLES ;
+                    //else if ( String_Equal ( token, ( byte* ) "0" ) ) getReturn |= DONT_REMOVE_STACK_VARIABLES ;
                 else returnVariable = token ;
                 continue ;
             }
@@ -293,7 +291,7 @@ _CfrTil_Parse_LocalsAndStackVariables ( int64 svf, int64 lispMode, ListObject * 
                 if ( regFlag == true )
                 {
                     ctype |= REGISTER_VARIABLE ;
-                    numberOfRegisterVariables ++ ; 
+                    numberOfRegisterVariables ++ ;
                     //if ( ctype & LOCAL_VARIABLE ) compiler->NumberOfRegisterLocals ++ ;
                     //else if ( ctype & PARAMETER_VARIABLE ) compiler->NumberOfRegisterArgs ++ ;
                 }
@@ -309,11 +307,11 @@ _CfrTil_Parse_LocalsAndStackVariables ( int64 svf, int64 lispMode, ListObject * 
                         //compiler->NumberOfArgs ++ ;
                     }
                     //else compiler->NumberOfLocals ++ ;
+                    regFlag = false ;
                 }
-                regFlag = false ;
                 if ( typeNamespace )
                 {
-                    Compiler_TypedObjectInit (word, typeNamespace) ;
+                    Compiler_TypedObjectInit ( word, typeNamespace ) ;
                     Word_TypeChecking_SetInfoForAnObject ( word ) ;
                 }
                 typeNamespace = 0 ;
@@ -325,7 +323,7 @@ _CfrTil_Parse_LocalsAndStackVariables ( int64 svf, int64 lispMode, ListObject * 
     compiler->State |= getReturn ;
 
     // we support nested locals and may have locals in other blocks so the indexes are cumulative
-    if ( numberOfRegisterVariables ) Compile_Init_RegisterParamenterVariables ( compiler ) ;
+    if ( numberOfRegisterVariables && (!debugFlag)) Compile_Init_RegisterParamenterVariables ( compiler ) ; 
     if ( returnVariable ) compiler->ReturnVariableWord = _Finder_FindWord_InOneNamespace ( _Finder_, localsNs, returnVariable ) ;
 
     _CfrTil_->InNamespace = saveInNs ;
@@ -345,7 +343,7 @@ Lexer_ParseAsAString ( Lexer * lexer )
         lexer->TokenType = ( T_STRING | KNOWN_OBJECT ) ;
         lexer->LiteralString = _String_UnBox ( lexer->OriginalToken ) ;
     }
-    else if ( ( lexer->OriginalToken [ 0 ] == (byte) '\'' ) && ( strlen ( (char*) lexer->OriginalToken ) > 1 ) )
+    else if ( ( lexer->OriginalToken [ 0 ] == ( byte ) '\'' ) && ( strlen ( ( char* ) lexer->OriginalToken ) > 1 ) )
     {
         //char buffer [4] ; buffer[0]= '\'' ; buffer[1]= lexer->OriginalToken [ 1 ] ; buffer[2]= '\'' ; buffer[3]= 0 ;
         lexer->TokenType = ( T_CHAR | KNOWN_OBJECT ) ;
@@ -399,7 +397,7 @@ Lexer_ParseBinary ( Lexer * lexer, byte * token, int64 offset )
 void
 Lexer_ParseBigNum ( Lexer * lexer, byte * token )
 {
-    if ( Namespace_IsUsing ( (byte*) "BigNum" ) ) //String_Equal ( ( char* ) name, "BigNum" ) )
+    if ( Namespace_IsUsing ( ( byte* ) "BigNum" ) ) //String_Equal ( ( char* ) name, "BigNum" ) )
     {
         mpfr_t *bfr = ( mpfr_t* ) _BigNum_New ( token ) ;
         lexer->Literal = ( int64 ) bfr ;

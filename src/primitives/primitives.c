@@ -393,7 +393,7 @@ CPrimitive CPrimitives [] = {
     { "inlineOn", 0, 0, 0, CfrTil_InlineOn, 0, 0, 0, "OpenVmTil", "Root" },
     { "debugOff", 0, 0, 0, CfrTil_DebugOff, 0, 0, 0, "OpenVmTil", "Root" },
     { "debugOn", 0, 0, 0, CfrTil_DebugOn, 0, 0, 0, "OpenVmTil", "Root" },
-    { "verbosity", "V.I", 0, 0, OpenVmTil_Verbosity, IMMEDIATE|NAMESPACE_VARIABLE|T_INT, 0, 0, "OpenVmTil", "Root" },
+    { "verbosity", "I.V", 0, 0, OpenVmTil_Verbosity, IMMEDIATE|NAMESPACE_VARIABLE|T_INT, 0, 0, "OpenVmTil", "Root" },
     { "codeSize", 0, 0, 0, OpenVmTil_CodeSize, 0, 0, 0, "OpenVmTil", "Root" },
     { "objectsSize", 0, 0, 0, OpenVmTil_ObjectsSize, 0, 0, 0, "OpenVmTil", "Root" },
     { "compilerTempObjectsSize", 0, 0, 0, OpenVmTil_CompilerTempObjectsSize, 0, 0, 0, "OpenVmTil", "Root" },

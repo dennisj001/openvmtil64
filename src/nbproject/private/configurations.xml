@@ -100,7 +100,6 @@
         <in>machineCodeMacros.h</in>
         <in>macros.h</in>
         <in>prototypes.h</in>
-        <in>stacks.h</in>
         <in>types.h</in>
         <in>udis86.h</in>
       </df>

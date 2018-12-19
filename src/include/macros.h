@@ -30,7 +30,7 @@
 #define Set_CompilerSpace( byteArray ) (_Q_CodeByteArray = (byteArray))
 #define Get_CompilerSpace( ) _Q_CodeByteArray
 
-#define abs( x ) ((x) >= 0 ? (x) : (-x))
+//#define abs( x ) ((int64) (((x) >= 0) ? (x) : (-x))) 
 #define TOS _Dsp_[0]
 #define _TOS_ ( _Dsp_ ? _Dsp_ [ 0 ] : CfrTil_Exception (STACK_ERROR, 0, QUIT ), (uint64)-1 )
 #define DSP_Top( ) TOS 

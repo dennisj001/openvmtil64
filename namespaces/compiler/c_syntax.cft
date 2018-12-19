@@ -1,7 +1,8 @@
 
 5 
 User
-: sp stack pause ; 
+C
+: sp ; //stack pause ; sp
 location
 //dbgOn 
 //verbosity 4 =
@@ -289,8 +290,8 @@ $ etc/lispScript ;
 $$ls -al /usr/local ; 
 $$ls -al . ;
 #endif
-
-//stack pause
+C
+sp
 verbosity 1 =
 //sp
 dbgOff 
@@ -298,6 +299,6 @@ infixOff
 1 opOn
 //stack pause
 s: hi ( a b | c ) c a @ b @ + = printf ("\nshould read 3 : %d", c ) ;s 1 2 hi //pause
+sp
 2 + 7 assertStkChk // stack checking
-//s pause
-
+sp

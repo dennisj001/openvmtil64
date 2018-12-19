@@ -112,8 +112,9 @@ shellOff
 #endif // end if 1
 #endif // end if 0
 nl "_TestDone_ =" ps _TestDone_ @ p nl
+//stack pause
 { _TestDone_ @ not } { pause } if2 
-sp
+//stack pause
 2 + 7 assertStkChk // stack checking
 //"\nending initTest.cft\nstack is...\n" ddps sp
 

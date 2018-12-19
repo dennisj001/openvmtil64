@@ -169,38 +169,32 @@ CfrTil_Label_Prefix ( )
 void
 CfrTil_Return ( )
 {
-    //if ( GetState ( _Context_, C_SYNTAX ) )
+    WordStack_SCHCPUSCA ( 0, 1 ) ;
+    byte * token = Lexer_PeekNextNonDebugTokenWord ( _Lexer_, 0 ) ;
+    Word * word = Finder_Word_FindUsing ( _Finder_, token, 0 ) ;
+    if ( word && ( word->CAttribute & ( NAMESPACE_VARIABLE | LOCAL_VARIABLE | PARAMETER_VARIABLE ) ) )
     {
-        byte * token = Lexer_PeekNextNonDebugTokenWord ( _Lexer_, 0 ) ;
-        Word * word = Finder_Word_FindUsing ( _Finder_, token, 0 ) ;
-        if ( word && ( word->CAttribute & ( NAMESPACE_VARIABLE | LOCAL_VARIABLE | PARAMETER_VARIABLE ) ) )
+        _Compiler_->ReturnVariableWord = word ;
+        if ( GetState ( _CfrTil_, TYPECHECK_ON ) )
         {
-            _Compiler_->ReturnVariableWord = word ;
-            if ( GetState ( _CfrTil_, TYPECHECK_ON ) )
+            Word * cwbc = _CfrTil_->CurrentWordBeingCompiled ;
+            if ( ( word->CAttribute & LOCAL_VARIABLE ) && cwbc )
             {
-                Word * cwbc = _CfrTil_->CurrentWordBeingCompiled ;
-                if ( ( word->CAttribute & LOCAL_VARIABLE ) && cwbc )
-                {
-                    cwbc->W_TypeSignatureString [_Compiler_->NumberOfArgs] = '.' ;
-                    cwbc->W_TypeSignatureString [_Compiler_->NumberOfArgs + 1] = Tsi_Convert_Word_TypeAttributeToTypeLetterCode ( word ) ;
-                }
-            }
-            Lexer_ReadToken ( _Context_->Lexer0 ) ; // don't compile anything let end block or locals deal with the return
-        }
-        else
-        {
-            if ( ! _Readline_Is_AtEndOfBlock ( _Context_->ReadLiner0 ) )
-            {
-                _CfrTil_CompileCallGoto ( 0, GI_RETURN ) ;
+                cwbc->W_TypeSignatureString [_Compiler_->NumberOfArgs] = '.' ;
+                cwbc->W_TypeSignatureString [_Compiler_->NumberOfArgs + 1] = Tsi_Convert_Word_TypeAttributeToTypeLetterCode ( word ) ;
             }
         }
+        Lexer_ReadToken ( _Context_->Lexer0 ) ; // don't compile anything let end block or locals deal with the return
+        //Word_SCH_CPUSCA( word, 1 ) ;
     }
-#if 0    
-else if ( ! _Readline_Is_AtEndOfBlock ( _Context_->ReadLiner0 ) )
+    else
     {
-        _CfrTil_CompileCallGoto ( 0, GI_RETURN ) ;
+        if ( ! _Readline_Is_AtEndOfBlock ( _Context_->ReadLiner0 ) )
+        {
+            //WordStack_SCHCPUSCA ( 0, 1 ) ;
+            _CfrTil_CompileCallGoto ( 0, GI_RETURN ) ;
+        }
     }
-#endif    
 }
 
 void
@@ -238,7 +232,7 @@ CfrTil_Literal ( )
     int64 value = DataStack_Pop ( ) ;
     ByteArray * svcs = _Q_CodeByteArray ;
     _NBA_SetCompilingSpace_MakeSureOfRoom ( _Q_->MemorySpace0->TempObjectSpace, 4 * K ) ;
-    Word * word = DataObject_New ( LITERAL, 0, (byte*) "<literal>", LITERAL | CONSTANT, 0, 0, 0, value, 0, - 1, - 1 ) ;
+    Word * word = DataObject_New ( LITERAL, 0, ( byte* ) "<literal>", LITERAL | CONSTANT, 0, 0, 0, value, 0, - 1, - 1 ) ;
     Set_CompilerSpace ( svcs ) ;
     Interpreter_DoWord ( _Context_->Interpreter0, word, - 1, - 1 ) ;
 }

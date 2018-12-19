@@ -22,12 +22,14 @@ _Debugger_InterpreterLoop ( Debugger * debugger )
     {
         Set_DataStackPointers_FromDebuggerDspReg ( ) ;
         if ( debugger->w_Word ) SetState ( debugger->w_Word, STEPPED, true ) ;
-        if ( _Context_->CurrentEvalWord )
+        if ( _Context_->CurrentEvalWord || GetState ( debugger, ( DBG_CONTINUE_MODE ) ) )
         {
             if ( ! Stack_Depth ( debugger->ReturnStack ) )
             {
                 Debugger_Off ( debugger, 1 ) ;
-                SetState ( _Context_->CurrentEvalWord, STEPPED, true ) ;
+                if ( _Context_->CurrentEvalWord ) SetState ( _Context_->CurrentEvalWord, STEPPED, true ) ;
+                //if ( _Context_->CurrentTokenWord ) SetState ( _Context_->CurrentTokenWord, STEPPED, true ) ;
+                _Context_->CurrentTokenWord = 0 ; // prevent interpreting this word
                 siglongjmp ( _Context_->JmpBuf0, 1 ) ; //in Word_Run
             }
             else if ( ( ! debugger->w_Word ) || GetState ( debugger->w_Word, STEPPED ) ) SetState ( _Context_->CurrentEvalWord, STEPPED, true ) ;
@@ -90,7 +92,7 @@ Debugger_On ( Debugger * debugger )
     _Debugger_Init ( debugger, 0, 0 ) ;
     SetState_TrueFalse ( _Debugger_, DBG_MENU | DBG_INFO, DBG_STEPPING | DBG_AUTO_MODE | DBG_PRE_DONE | DBG_INTERPRET_LOOP_DONE ) ;
     debugger->LastSetupWord = 0 ;
-    debugger->LastSourceCodeIndex = 0 ;
+    debugger->LastScwi = 0 ;
     debugger->PreHere = 0 ;
     if ( ! Is_DebugModeOn ) debugger->StartHere = Here ;
     DebugOn ;
@@ -296,7 +298,7 @@ Debugger_FindUsing ( Debugger * debugger )
 void
 _Debugger_PrintDataStack ( int64 depth )
 {
-    //Set_DataStackPointer_FromDspReg ( ) ;
+    Set_DataStackPointer_FromDspReg ( ) ;
     _Stack_Print ( _DataStack_, ( byte* ) "DataStack", depth, 0 ) ;
     //if (depth < Stack_Depth (_DataStack_) ) _Printf ( ( byte* ) "\t\t    ........." ) ;
 }

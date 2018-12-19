@@ -5,12 +5,15 @@ Logic Bits
 : sp ; //stack pause ;
 
 sp
-: lt 1 2 < p ; lt 
-: lt2 1 2 > p ; lt2
+: lt 1 2 < dup p ; lt 1 _assert sp
+: lt2 1 2 > dup p ; lt2 0 _assert sp
 // ' lt2 find wdiss
 
-: lnt ( n -- TOS ) n @ 7 < dup p ; ' lnt find wdiss 1 lnt 1 _assert  7 lnt 0 _assert 8 lnt 0 _assert
-: lnt2 ( n m -- TOS ) n @ m @ < dup p ; 1 2 lnt2 1 _assert 2 2 lnt2 0 _assert 2 1 lnt2 0 _assert
+: lnt ( n -- TOS ) n @ 7 < dup p ; 
+' lnt find wdiss 
+1 lnt 1 _assert sp 7 lnt 0 _assert 8 sp lnt 0 _assert sp
+: lnt2 ( n m -- TOS ) n @ m @ < dup p ; 
+1 2 lnt2 1 _assert sp 2 2 lnt2 0 _assert sp 2 1 lnt2 0 _assert sp
 // ' lnt find wdiss
 sp
 : lnt3 ( n -- TOS ) n @ 2 == dup p ; 1 lnt3 0 _assert 2 lnt3 1 _assert

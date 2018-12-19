@@ -41,8 +41,8 @@ Interpreter_InterpretNextToken ( Interpreter * interp )
 Word *
 Interpreter_DoWord_Default ( Interpreter * interp, Word * word0, int64 tsrli, int64 scwi )
 {
-    Word * word = Compiler_CopyDuplicatesAndPush ( word0 ) ;
-    Lexer_Set_ScIndex_RlIndex ( interp->Lexer0, word, tsrli, scwi ) ;
+    Word * word = Compiler_CopyDuplicatesAndPush (word0, tsrli, scwi ) ;
+    //Lexer_Set_ScIndex_RlIndex ( interp->Lexer0, word, tsrli, scwi ) ;
     interp->w_Word = word ;
     Word_Eval ( word ) ;
     if ( IS_MORPHISM_TYPE ( word ) ) SetState ( _Context_, ADDRESS_OF_MODE, false ) ;
@@ -126,18 +126,18 @@ Interpreter_DoWord ( Interpreter * interp, Word * word, int64 tsrli, int64 scwi 
 Word *
 _Interpreter_TokenToWord ( Interpreter * interp, byte * token )
 {
-    Word * word = 0 ;
+    _Context_->CurrentTokenWord = 0 ;
     if ( token )
     {
         interp->Token = token ;
-        word = Finder_Word_FindUsing ( interp->Finder0, token, 0 ) ;
+        Word * word = Finder_Word_FindUsing ( interp->Finder0, token, 0 ) ;
         if ( ! word ) word = Lexer_ObjectToken_New ( interp->Lexer0, token ) ;
         int64 tsrli = - 1, scwi = - 1 ;
         Word_SetTsrliScwi ( word, tsrli, scwi ) ;
         _Context_->CurrentTokenWord = word ;
         DEBUG_SETUP ( word ) ;
     }
-    return word ;
+    return _Context_->CurrentTokenWord ; // allow DEBUG_SETUP to set this to 0 to skip it when it is 'stepped'
 }
 
 Word *

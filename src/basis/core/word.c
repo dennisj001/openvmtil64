@@ -243,7 +243,7 @@ _Word_Print ( Word * word )
 }
 
 void
-__Word_ShowSourceCode ( Word * word )
+_Word_ShowSourceCode ( Word * word )
 {
     if ( word && word->S_WordData ) //&& word->W_SourceCode ) //word->CAttribute & ( CPRIMITIVE | BLOCK ) )
     {
@@ -284,7 +284,7 @@ Word_GetLocalsSourceCodeString ( Word * word, byte * buffer )
 }
 
 void
-_Word_ShowSourceCode ( Word * word )
+Word_ShowSourceCode ( Word * word )
 {
     _CfrTil_Source ( word, 0 ) ;
 }

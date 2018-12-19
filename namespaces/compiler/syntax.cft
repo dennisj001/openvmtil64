@@ -1,9 +1,9 @@
 5
 : _assert1 _assert s ;
 User Compiler
-: sp ; //stack pause ;
+: sp ; //stack pause ; sp
 infixOn 
-: hi ( | x -- x ) x = ( 2 + ( 3 * 4 ) ), x p ; // x p : infix mode 
+: hi ( | x -- TOS ) x = ( 2 + ( 3 * 4 ) ), x dup p ; // x p : infix mode 
 ' hi find wdiss
 hi 14 _assert1
 sp
