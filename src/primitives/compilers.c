@@ -169,7 +169,7 @@ CfrTil_Label_Prefix ( )
 void
 CfrTil_Return ( )
 {
-    WordStack_SCHCPUSCA ( 0, 1 ) ;
+    Compiler_WordStack_SCHCPUSCA ( 0, 1 ) ;
     byte * token = Lexer_PeekNextNonDebugTokenWord ( _Lexer_, 0 ) ;
     Word * word = Finder_Word_FindUsing ( _Finder_, token, 0 ) ;
     if ( word && ( word->CAttribute & ( NAMESPACE_VARIABLE | LOCAL_VARIABLE | PARAMETER_VARIABLE ) ) )

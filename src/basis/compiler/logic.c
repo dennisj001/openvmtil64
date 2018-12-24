@@ -29,7 +29,7 @@ _Compile_TestCode ( Boolean reg, Boolean size )
 void
 BI_CompileRecord_TestCode_Reg ( BlockInfo *bi, Boolean reg, Boolean size )
 {
-    WordStack_SCHCPUSCA (0, 1) ;
+    Compiler_WordStack_SCHCPUSCA (0, 1) ;
     bi->LogicTestCode = Here ;
     _Compile_TestCode ( reg, size ) ;
 }
@@ -118,7 +118,7 @@ Compiler_Set_LogicCode ( Compiler * compiler, Boolean setTtn, Boolean setNegFlag
 void
 _Compile_LogicalAnd ( Compiler * compiler )
 {
-    WordStack_SCHCPUSCA (0, 1) ;
+    Compiler_WordStack_SCHCPUSCA (0, 1) ;
     Compiler_BI_CompileRecord_TestCode_Set_setTtnn ( compiler, OREG, TTT_ZERO, NEGFLAG_Z, TTT_ZERO, NEGFLAG_NZ ) ; // jz
     _Compile_Jcc ( NEGFLAG_Z, TTT_ZERO, Here + 15 ) ; // if eax is zero return not(R8) == 1 else return 0
     Compiler_BI_CompileRecord_TestCode_Set_setTtnn ( compiler, ACC, TTT_ZERO, NEGFLAG_NZ, TTT_ZERO, NEGFLAG_Z ) ;
@@ -150,7 +150,7 @@ void
 _Compile_LogicalNot ( Compiler * compiler )
 {
     //_DBI_ON ;
-    WordStack_SCHCPUSCA (0, 1) ;
+    Compiler_WordStack_SCHCPUSCA (0, 1) ;
     Compiler_BI_CompileRecord_TestCode_Set_setTtnn ( compiler, ACC, TTT_ZERO, NEGFLAG_Z, TTT_ZERO, NEGFLAG_NZ ) ;
     //_Set_JccLogicCodeForNot ( compiler ) ;
     _Compile_LogicResultForStack ( ACC, TTT_ZERO, NEGFLAG_Z ) ;

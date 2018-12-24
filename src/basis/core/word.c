@@ -7,7 +7,7 @@ Word_Run ( Word * word )
     {
         word->StackPushRegisterCode = 0 ; // nb. used! by the rewriting optInfo
         // keep track in the word itself where the machine code is to go, if this word is compiled or causes compiling code - used for optimization
-        Word_SetCoding ( word, Here, 1 ) ; // if we change it later (eg. in lambda calculus) we must change it there because the rest of the compiler depends on this
+        Word_SetCodingAndSourceCoding ( word, Here ) ; // if we change it later (eg. in lambda calculus) we must change it there because the rest of the compiler depends on this
         _Context_->CurrentlyRunningWord = word ;
         Block_Eval ( word->Definition ) ;
         _Context_->CurrentlyRunningWord = 0 ;
@@ -43,7 +43,7 @@ _Word_Interpret ( Word * word )
 void
 _Word_Compile ( Word * word )
 {
-    Word_SetCodingHere_And_ClearPreviousUseOf_Here_SCA ( word, 0 ) ;
+    Compiler_Word_SetCodingHere_And_ClearPreviousUseOf_Here_SCA ( word, 0 ) ;
     if ( ! word->Definition ) CfrTil_SetupRecursiveCall ( ) ;
     else if ( ( GetState ( _CfrTil_, INLINE_ON ) ) && ( word->CAttribute & INLINE ) && ( word->S_CodeSize ) ) _Compile_WordInline ( word ) ;
     else Compile_CallWord_Check_X84_ABI_RSP_ADJUST ( word ) ;

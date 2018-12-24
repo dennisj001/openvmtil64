@@ -44,11 +44,8 @@ LIBS = -L/usr/local/lib -ludis86 -lrt -lc -ldl -lm  -lmpfr -lgmp #-lpython3.7#-l
 oclean : 
 	-rm src/basis/*.o src/primitives/*.o src/basis/compiler/*.o src/basis/core/*.o src/basis/lc/*.o
 	
-_clean : 
-	make oclean
-	
 clean : 
-	make _clean
+	make oclean
 	touch src/include/defines.h
 	make src/include/prototypes.h
 
@@ -56,7 +53,6 @@ src/include/prototypes.h : $(INCLUDES)
 	cp src/include/_proto.h src/include/prototypes.h
 	bin/cproto -o proto.h $(SOURCES)
 	mv proto.h src/include/prototypes.h
-	make _clean
 
 cfrtil64 : CFLAGS = $(CFLAGS_CORE)
 cfrtil64 : src/include/prototypes.h $(OBJECTS) _cfrtil64_O3
@@ -81,7 +77,7 @@ cfrtil64-gdb : src/include/prototypes.h $(OBJECTS)
 	$(CC) $(CFLAGS) $(OBJECTS) -o cfrtil64-gdb $(LIBS)
 	mv cfrtil64-gdb bin
 
-cfrtil64o : $(OBJECTS)
+cfrtil64o : oclean $(OBJECTS)
 	$(CC) $(CFLAGS) $(OBJECTS) -o $(OUT) $(LIBS)
 	strip $(OUT)
 	mv $(OUT) bin
@@ -147,7 +143,7 @@ optimize :
 	#make optimize1
 	#make optimize2
 	make optimize3
-	make clean
+	make oclean
 	make
 	-sudo cp bin/cfrtil64o3 /usr/local/bin/cfrtil64
 	cp bin/cfrtil64o3 bin/cfrtil64
@@ -155,7 +151,7 @@ optimize :
 editorClean :
 	rm *.*~ src/basis/*.*~ src/basis/compiler/*.*~ src/primitives/*.*~ src/include/*.*~
 
-realClean : _clean editorClean
+realClean : oclean editorClean
 	rm cfrtil64 cfrtil64-gdb
 
 udis :

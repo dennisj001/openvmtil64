@@ -458,11 +458,11 @@ _LO_Apply_C_LtoR_ArgList ( LambdaCalculus * lc, ListObject * l0, Word * word )
         for ( i = 0, l1 = _LO_First ( l0 ) ; l1 ; l1 = LO_Next ( l1 ) ) i = _LO_Apply_Arg ( lc, &l1, i ) ;
         Set_CompileMode ( true ) ;
         _Debugger_->PreHere = Here ;
-        Word_SetCoding ( word, Here, 1 ) ;
+        Word_SetCodingAndSourceCoding ( word, Here ) ;
         word = Compiler_CopyDuplicatesAndPush (word, -1, -1) ;
         //cntx->CurrentlyRunningWord = word ;
         if ( ( String_Equal ( word->Name, "printf" ) || ( String_Equal ( word->Name, "sprintf" ) ) ) ) Compile_MoveImm_To_Reg ( RAX, 0, CELL ) ; // for printf ?? others //System V ABI : "%rax is used to indicate the number of vector arguments passed to a function requiring a variable number of arguments"
-        Word_SetCodingHere_And_ClearPreviousUseOf_Here_SCA ( word, 1 ) ;
+        Compiler_Word_SetCodingHere_And_ClearPreviousUseOf_Here_SCA ( word, 1 ) ;
         Word_Eval ( word ) ;
         if ( word->CAttribute2 & RAX_RETURN ) _Word_CompileAndRecord_PushReg ( word, ACC ) ;
         if ( ! svcm )

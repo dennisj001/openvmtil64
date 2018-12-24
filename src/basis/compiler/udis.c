@@ -52,7 +52,7 @@ _Udis_Init ( ud_t * ud )
 }
 
 int64
-_Debugger_Udis_OneInstruction ( Debugger * debugger, byte * address, byte * prefix, byte * postfix )
+Debugger_UdisOneInstruction ( Debugger * debugger, byte * address, byte * prefix, byte * postfix )
 {
     ud_t * ud = debugger->Udis ;
     if ( address )

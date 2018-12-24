@@ -26,12 +26,6 @@ Debugger_ShowSourceCodeAtAddress ( Debugger * debugger, byte * address )
 }
 
 int64
-Debugger_UdisOneInstruction ( Debugger * debugger, byte * address, byte * prefix, byte * postfix )
-{
-    return _Debugger_Udis_OneInstruction ( debugger, address, prefix, postfix ) ;
-}
-
-int64
 _Debugger_Disassemble ( Debugger * debugger, byte* address, int64 number, int64 cflag )
 {
     int64 size = _Udis_Disassemble ( Debugger_UdisInit ( debugger ), address, ( ( number > ( 3 * K ) ) ? ( 3 * K ) : number ), cflag ) ;

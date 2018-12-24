@@ -1,7 +1,97 @@
 g++  -finline-functions   -ggdb    -c -o src/basis/compiler/machineCode.o src/basis/compiler/machineCode.c
-In file included from src/basis/compiler/machineCode.c:1:
-src/basis/compiler/../../include/cfrtil64.h:63:10: fatal error: /home/openvmtil64/src/include/machineCode.h: No such file or directory
- #include "/home/openvmtil64/src/include/machineCode.h"
-          ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-compilation terminated.
-make: *** [<builtin>: src/basis/compiler/machineCode.o] Error 1
+g++  -finline-functions   -ggdb    -c -o src/basis/compiler/_compile.o src/basis/compiler/_compile.c
+g++  -finline-functions   -ggdb    -c -o src/basis/compiler/memory.o src/basis/compiler/memory.c
+g++  -finline-functions   -ggdb    -c -o src/basis/compiler/combinators.o src/basis/compiler/combinators.c
+g++  -finline-functions   -ggdb    -c -o src/basis/compiler/math.o src/basis/compiler/math.c
+g++  -finline-functions   -ggdb    -c -o src/basis/compiler/cpu.o src/basis/compiler/cpu.c
+g++  -finline-functions   -ggdb    -c -o src/basis/compiler/stack.o src/basis/compiler/stack.c
+g++  -finline-functions   -ggdb    -c -o src/basis/compiler/logic.o src/basis/compiler/logic.c
+g++  -finline-functions   -ggdb    -c -o src/basis/core/dataObjectRun.o src/basis/core/dataObjectRun.c
+g++  -finline-functions   -ggdb    -c -o src/basis/core/block.o src/basis/core/block.c
+g++  -finline-functions   -ggdb    -c -o src/basis/compiler/blocks.o src/basis/compiler/blocks.c
+g++  -finline-functions   -ggdb    -c -o src/basis/core/conditionals.o src/basis/core/conditionals.c
+g++  -finline-functions   -ggdb    -c -o src/basis/compiler/compile.o src/basis/compiler/compile.c
+g++  -finline-functions   -ggdb    -c -o src/basis/core/_system.o src/basis/core/_system.c
+g++  -finline-functions   -ggdb    -c -o src/basis/compiler/optimize.o src/basis/compiler/optimize.c
+g++  -finline-functions   -ggdb    -c -o src/basis/compiler/bits.o src/basis/compiler/bits.c
+g++  -finline-functions   -ggdb    -c -o src/basis/compiler/udis.o src/basis/compiler/udis.c
+g++  -finline-functions   -ggdb    -c -o src/basis/compiler/arrays.o src/basis/compiler/arrays.c
+g++  -finline-functions   -ggdb    -c -o src/basis/core/io.o src/basis/core/io.c
+g++  -finline-functions   -ggdb    -c -o src/basis/core/symbol.o src/basis/core/symbol.c
+g++  -finline-functions   -ggdb    -c -o src/basis/repl.o src/basis/repl.c
+g++  -finline-functions   -ggdb    -c -o src/basis/core/syntax.o src/basis/core/syntax.c
+g++  -finline-functions   -ggdb    -c -o src/basis/core/dataObjectNew.o src/basis/core/dataObjectNew.c
+g++  -finline-functions   -ggdb    -c -o src/basis/cfrtil64.o src/basis/cfrtil64.c
+g++  -finline-functions   -ggdb    -c -o src/basis/core/parse.o src/basis/core/parse.c
+g++  -finline-functions   -ggdb    -c -o src/basis/core/memSpace.o src/basis/core/memSpace.c
+g++  -finline-functions   -ggdb    -c -o src/basis/init.o src/basis/init.c
+g++  -finline-functions   -ggdb    -c -o src/basis/system.o src/basis/system.c
+g++  -finline-functions   -ggdb    -c -o src/basis/core/charSet.o src/basis/core/charSet.c
+g++  -finline-functions   -ggdb    -c -o src/basis/core/dllist.o src/basis/core/dllist.c
+g++  -finline-functions   -ggdb    -c -o src/basis/core/interpret.o src/basis/core/interpret.c
+g++  -finline-functions   -ggdb    -c -o src/basis/core/lexer.o src/basis/core/lexer.c
+g++  -finline-functions   -ggdb    -c -o src/basis/core/cstack.o src/basis/core/cstack.c
+g++  -finline-functions   -ggdb    -c -o src/basis/core/classes.o src/basis/core/classes.c
+g++  -finline-functions   -ggdb    -c -o src/basis/debugOutput.o src/basis/debugOutput.c
+g++  -finline-functions   -ggdb    -c -o src/basis/core/namespace.o src/basis/core/namespace.c
+g++  -finline-functions   -ggdb    -c -o src/basis/history.o src/basis/history.c
+g++  -finline-functions   -ggdb    -c -o src/basis/core/readline.o src/basis/core/readline.c
+g++  -finline-functions   -ggdb    -c -o src/basis/core/dataStack.o src/basis/core/dataStack.c
+g++  -finline-functions   -ggdb    -c -o src/basis/context.o src/basis/context.c
+g++  -finline-functions   -ggdb    -c -o src/basis/core/word.o src/basis/core/word.c
+g++  -finline-functions   -ggdb    -c -o src/basis/core/readTable.o src/basis/core/readTable.c
+g++  -finline-functions   -ggdb    -c -o src/basis/bigNum.o src/basis/bigNum.c
+g++  -finline-functions   -ggdb    -c -o src/basis/core/_readline.o src/basis/core/_readline.c
+g++  -finline-functions   -ggdb    -c -o src/basis/core/array.o src/basis/core/array.c
+g++  -finline-functions   -ggdb    -c -o src/basis/compiler/compiler.o src/basis/compiler/compiler.c
+g++  -finline-functions   -ggdb    -c -o src/basis/core/dllnodes.o src/basis/core/dllnodes.c
+g++  -finline-functions   -ggdb    -c -o src/basis/core/finder.o src/basis/core/finder.c
+g++  -finline-functions   -ggdb    -c -o src/basis/interpreters.o src/basis/interpreters.c
+g++  -finline-functions   -ggdb    -c -o src/basis/tabCompletion.o src/basis/tabCompletion.c
+g++  -finline-functions   -ggdb    -c -o src/basis/colors.o src/basis/colors.c
+g++  -finline-functions   -ggdb    -c -o src/basis/sourceCode.o src/basis/sourceCode.c
+g++  -finline-functions   -ggdb    -c -o src/basis/debugStepping.o src/basis/debugStepping.c
+g++  -finline-functions   -ggdb    -c -o src/basis/core/string.o src/basis/core/string.c
+g++  -finline-functions   -ggdb    -c -o src/basis/openVmTil.o src/basis/openVmTil.c
+g++  -finline-functions   -ggdb    -c -o src/basis/core/dobject.o src/basis/core/dobject.c
+g++  -finline-functions   -ggdb    -c -o src/basis/core/preprocessor.o src/basis/core/preprocessor.c
+g++  -finline-functions   -ggdb    -c -o src/basis/attribute.o src/basis/attribute.c
+g++  -finline-functions   -ggdb    -c -o src/basis/lists.o src/basis/lists.c
+g++  -finline-functions   -ggdb    -c -o src/basis/debugDisassembly.o src/basis/debugDisassembly.c
+g++  -finline-functions   -ggdb    -c -o src/basis/typeCheck.o src/basis/typeCheck.c
+g++  -finline-functions   -ggdb    -c -o src/basis/linux.o src/basis/linux.c
+g++  -finline-functions   -ggdb    -c -o src/basis/exception.o src/basis/exception.c
+g++  -finline-functions   -ggdb    -c -o src/basis/compiler/locals.o src/basis/compiler/locals.c
+g++  -finline-functions   -ggdb    -c -o src/basis/debugger.o src/basis/debugger.c
+g++  -finline-functions   -ggdb    -c -o src/basis/interpreter.o src/basis/interpreter.c
+g++  -finline-functions   -ggdb    -c -o src/basis/_debug.o src/basis/_debug.c
+g++  -finline-functions   -ggdb    -c -o src/basis/lc/lambdaCalculus.o src/basis/lc/lambdaCalculus.c
+g++  -finline-functions   -ggdb    -c -o src/basis/lc/apply.o src/basis/lc/apply.c
+g++  -finline-functions   -ggdb    -c -o src/basis/lc/eval.o src/basis/lc/eval.c
+g++  -finline-functions   -ggdb    -c -o src/basis/lc/read.o src/basis/lc/read.c
+g++  -finline-functions   -ggdb    -c -o src/basis/lc/print.o src/basis/lc/print.c
+g++  -finline-functions   -ggdb    -c -o src/basis/lc/special.o src/basis/lc/special.c
+g++  -finline-functions   -ggdb    -c -o src/primitives/strings.o src/primitives/strings.c
+g++  -finline-functions   -ggdb    -c -o src/primitives/bits.o src/primitives/bits.c
+g++  -finline-functions   -ggdb    -c -o src/primitives/maths.o src/primitives/maths.c
+g++  -finline-functions   -ggdb    -c -o src/primitives/logics.o src/primitives/logics.c
+g++  -finline-functions   -ggdb    -c -o src/primitives/openvmtils.o src/primitives/openvmtils.c
+g++  -finline-functions   -ggdb    -c -o src/primitives/ios.o src/primitives/ios.c
+g++  -finline-functions   -ggdb    -c -o src/primitives/parsers.o src/primitives/parsers.c
+g++  -finline-functions   -ggdb    -c -o src/primitives/interpreters.o src/primitives/interpreters.c
+g++  -finline-functions   -ggdb    -c -o src/primitives/namespaces.o src/primitives/namespaces.c
+g++  -finline-functions   -ggdb    -c -o src/primitives/systems.o src/primitives/systems.c
+g++  -finline-functions   -ggdb    -c -o src/primitives/compilers.o src/primitives/compilers.c
+g++  -finline-functions   -ggdb    -c -o src/primitives/words.o src/primitives/words.c
+g++  -finline-functions   -ggdb    -c -o src/primitives/file.o src/primitives/file.c
+g++  -finline-functions   -ggdb    -c -o src/primitives/stacks.o src/primitives/stacks.c
+g++  -finline-functions   -ggdb    -c -o src/primitives/debuggers.o src/primitives/debuggers.c
+g++  -finline-functions   -ggdb    -c -o src/primitives/memorys.o src/primitives/memorys.c
+g++  -finline-functions   -ggdb    -c -o src/primitives/primitives.o src/primitives/primitives.c
+g++  -finline-functions   -ggdb    -c -o src/primitives/contexts.o src/primitives/contexts.c
+g++  -finline-functions   -ggdb    -c -o src/primitives/disassembler.o src/primitives/disassembler.c
+g++  -finline-functions   -ggdb    -c -o src/primitives/syntaxes.o src/primitives/syntaxes.c
+g++  -finline-functions   -ggdb  -O3 -c src/primitives/cmaths.c -o src/primitives/cmaths.o
+g++  -finline-functions   -ggdb    -c -o src/primitives/dataObjectNews.o src/primitives/dataObjectNews.c
+g++  -finline-functions   -ggdb  src/basis/compiler/machineCode.o src/basis/compiler/_compile.o src/basis/compiler/memory.o src/basis/compiler/combinators.o src/basis/compiler/math.o src/basis/compiler/cpu.o src/basis/compiler/stack.o src/basis/compiler/logic.o src/basis/core/dataObjectRun.o src/basis/core/block.o src/basis/compiler/blocks.o src/basis/core/conditionals.o src/basis/compiler/compile.o src/basis/core/_system.o src/basis/compiler/optimize.o src/basis/compiler/bits.o src/basis/compiler/udis.o src/basis/compiler/arrays.o src/basis/core/io.o src/basis/core/symbol.o src/basis/repl.o src/basis/core/syntax.o src/basis/core/dataObjectNew.o src/basis/cfrtil64.o src/basis/core/parse.o src/basis/core/memSpace.o src/basis/init.o src/basis/system.o src/basis/core/charSet.o src/basis/core/dllist.o src/basis/core/interpret.o src/basis/core/lexer.o src/basis/core/cstack.o src/basis/core/classes.o src/basis/debugOutput.o src/basis/core/namespace.o src/basis/history.o src/basis/core/readline.o src/basis/core/dataStack.o src/basis/context.o src/basis/core/word.o src/basis/core/readTable.o src/basis/bigNum.o src/basis/core/_readline.o src/basis/core/array.o src/basis/compiler/compiler.o src/basis/core/dllnodes.o src/basis/core/finder.o src/basis/interpreters.o src/basis/tabCompletion.o src/basis/colors.o src/basis/sourceCode.o src/basis/debugStepping.o src/basis/core/string.o src/basis/openVmTil.o src/basis/core/dobject.o src/basis/core/preprocessor.o src/basis/attribute.o src/basis/lists.o src/basis/debugDisassembly.o src/basis/typeCheck.o src/basis/linux.o src/basis/exception.o src/basis/compiler/locals.o src/basis/debugger.o src/basis/interpreter.o src/basis/_debug.o src/basis/lc/lambdaCalculus.o src/basis/lc/apply.o src/basis/lc/eval.o src/basis/lc/read.o src/basis/lc/print.o src/basis/lc/special.o src/primitives/strings.o src/primitives/bits.o src/primitives/maths.o src/primitives/logics.o src/primitives/openvmtils.o src/primitives/ios.o src/primitives/parsers.o src/primitives/interpreters.o src/primitives/namespaces.o src/primitives/systems.o src/primitives/compilers.o src/primitives/words.o src/primitives/file.o src/primitives/stacks.o src/primitives/debuggers.o src/primitives/memorys.o src/primitives/primitives.o src/primitives/contexts.o src/primitives/disassembler.o src/primitives/syntaxes.o src/primitives/cmaths.o src/primitives/dataObjectNews.o  -o cfrtil64-gdb -L/usr/local/lib -ludis86 -lrt -lc -ldl -lm  -lmpfr -lgmp 
+mv cfrtil64-gdb bin

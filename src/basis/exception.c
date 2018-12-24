@@ -30,7 +30,7 @@ _OpenVmTil_ShowExceptionInfo ( )
     if ( GetState ( debugger, DBG_STEPPING ) && debugger->DebugAddress )
     {
         Debugger_Registers ( debugger ) ;
-        _Debugger_Udis_OneInstruction ( debugger, debugger->DebugAddress, (byte*) "", (byte*) "" ) ;
+        Debugger_UdisOneInstruction ( debugger, debugger->DebugAddress, (byte*) "", (byte*) "" ) ;
     }
     if ( word ) _CfrTil_Source ( word, 0 ) ;
     _Printf ( ( byte* ) "\nOpenVmTil_SignalAction : address = 0x%016lx : %s", _Q_->SigAddress, _Q_->SigLocation ) ;

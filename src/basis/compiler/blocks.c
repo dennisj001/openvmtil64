@@ -18,8 +18,8 @@ BI_Block_Copy ( BlockInfo * bi, byte* dstAddress, byte * srcAddress, int64 bsize
         if ( optFlag ) PeepHole_Optimize ( ) ;
         isize = _Udis_GetInstructionSize ( ud, srcAddress ) ;
         left -= isize ;
-        _CfrTil_AdjustDbgSourceCodeAddress ( srcAddress, Here ) ;
-        _CfrTil_AdjustLabels ( srcAddress ) ;
+        CfrTil_AdjustDbgSourceCodeAddress ( srcAddress, Here ) ;
+        CfrTil_AdjustLabels ( srcAddress ) ;
         if ( * srcAddress == _RET )
         {
             if ( ( left > 0 ) && ( ( * srcAddress + 1 ) != NOOP ) ) //  noop from our logic overwrite
@@ -79,7 +79,7 @@ Compile_BlockLogicTest ( BlockInfo * bi ) // , byte * start )
         if ( ( ! ( bi->LogicCodeWord->CAttribute & CATEGORY_LOGIC ) ) )
         {
             SetHere ( bi->CopiedToLogicJccCode, 1 ) ;
-            Word_SetCodingHere_And_ClearPreviousUseOf_Here_SCA ( bi->LogicCodeWord, 0 ) ;
+            Compiler_Word_SetCodingHere_And_ClearPreviousUseOf_Here_SCA ( bi->LogicCodeWord, 0 ) ;
             _Compile_TestCode ( bi->LogicCodeWord->RegToUse, CELL ) ;
             bi->CopiedToLogicJccCode = Here ;
             BI_Set_setTtnn ( bi, TTT_ZERO, NEGFLAG_ON, TTT_ZERO, NEGFLAG_OFF ) ;
@@ -88,7 +88,7 @@ Compile_BlockLogicTest ( BlockInfo * bi ) // , byte * start )
         else if ( ( bi->LogicCodeWord->CAttribute & CATEGORY_OP_1_ARG ) && ( bi->LogicCodeWord->CAttribute2 & LOGIC_NEGATE ) )
         {
             SetHere ( bi->LogicCodeWord->Coding, 1 ) ;
-            Word_SetCodingHere_And_ClearPreviousUseOf_Here_SCA ( bi->LogicCodeWord, 0 ) ;
+            Compiler_Word_SetCodingHere_And_ClearPreviousUseOf_Here_SCA ( bi->LogicCodeWord, 0 ) ;
             _Compile_TestCode ( bi->LogicCodeWord->RegToUse, CELL ) ;
             bi->CopiedToLogicJccCode = Here ;
             BI_Set_setTtnn ( bi, TTT_ZERO, NEGFLAG_ON, TTT_ZERO, NEGFLAG_ON ) ;
@@ -167,7 +167,7 @@ _CfrTil_BeginBlock0 ( Boolean compileJumpFlag, byte * here )
     if ( compileJumpFlag ) _Compile_UninitializedJump ( ) ;
     bi->JumpOffset = here ? here - INT32_SIZE : Here - INT32_SIZE ; // before CfrTil_CheckCompileLocalFrame after CompileUninitializedJump
     Stack_Push_PointerToJmpOffset ( ) ;
-    WordStack_SCHCPUSCA ( 0, 0 ) ; // after the jump! -- the jump is optimized out
+    //Compiler_WordStack_SCHCPUSCA ( 0, 0 ) ; // after the jump! -- the jump is optimized out
     bi->bp_First = here ? here : Here ; // after the jump for inlining
 
     return bi ;
@@ -218,7 +218,7 @@ void
 CfrTil_FinalizeBlocks ( BlockInfo * bi )
 {
     Compiler * compiler = _Context_->Compiler0 ;
-    WordStack_SCHCPUSCA ( 0, 0 ) ;
+    //Compiler_WordStack_SCHCPUSCA ( 0, 0 ) ;
     _CfrTil_InstallGotoCallPoints_Keyed ( bi, GI_RETURN ) ;
     if ( Compiler_IsFrameNecessary ( compiler ) )
     {
@@ -239,7 +239,7 @@ _CfrTil_EndBlock1 ( BlockInfo * bi )
     Compiler * compiler = _Context_->Compiler0 ;
     if ( ! Compiler_BlockLevel ( compiler ) ) CfrTil_FinalizeBlocks ( bi ) ;
     compiler->LHS_Word = 0 ;
-    WordStack_SCHCPUSCA ( 0, 0 ) ;
+    //Compiler_WordStack_SCHCPUSCA ( 0, 0 ) ;
     _Compile_Return ( ) ;
     DataStack_Push ( ( int64 ) bi->bp_First ) ;
     bi->bp_Last = Here ;

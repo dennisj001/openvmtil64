@@ -735,6 +735,17 @@ dllist_Map2 ( dllist * list, MapFunction2 mf, int64 one, int64 two )
 }
 
 void
+dllist_Map2_WithBreak ( dllist * list, MapFunction2 mf, int64 one, int64 two )
+{
+    dlnode * node, *nextNode ;
+    for ( node = dllist_First ( ( dllist* ) list ) ; node ; node = nextNode )
+    {
+        nextNode = dlnode_Next ( node ) ;
+        if ( mf ( node, one, two ) ) break ;
+    }
+}
+
+void
 dllist_Map2_FromLast ( dllist * list, MapFunction2 mf, int64 one, int64 two )
 {
     dlnode * node, *prevNode ;

@@ -53,6 +53,22 @@ Compiler_CopyDuplicatesAndPush ( Word * word0, int64 tsrli, int64 scwi )
 }
 
 void
+Compiler_Word_SetCoding_And_ClearPreviousUseOf_A_SCA ( Word * word, byte * coding, Boolean clearPreviousFlag )
+{
+    if ( Compiling && word )
+    {
+        if ( clearPreviousFlag ) dllist_Map1_FromEnd ( _CfrTil_->Compiler_N_M_Node_WordList, ( MapFunction1 ) SC_ListClearAddress, ( int64 ) coding ) ; //dllist_Map1_FromEnd ( _CfrTil_->CompilerWordList, ( MapFunction1 ) SC_ListClearAddress, ( int64 ) Here ) ; //( int64 ) word, ( int64 ) Here ) ;
+        Word_SetCodingAndSourceCoding ( word, coding ) ;
+    }
+}
+
+void
+Compiler_Word_SetCodingHere_And_ClearPreviousUseOf_Here_SCA ( Word * word, Boolean clearPreviousFlag )
+{
+    Compiler_Word_SetCoding_And_ClearPreviousUseOf_A_SCA ( word, Here, clearPreviousFlag ) ;
+}
+
+void
 Compiler_IncrementCurrentAccumulatedOffset ( Compiler * compiler, int64 increment )
 {
     if ( compiler->AccumulatedOffsetPointer ) ( *( int64* ) ( compiler->AccumulatedOffsetPointer ) ) += ( increment ) ;

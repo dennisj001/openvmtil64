@@ -272,7 +272,7 @@ _CfrTil_Do_DynamicObject_ToReg ( DObject * dobject0, uint8 reg )
         }
         else dobject = ndobject ;
     }
-    Word_SetCodingHere_And_ClearPreviousUseOf_Here_SCA ( dobject, 0 ) ;
+    Compiler_Word_SetCodingHere_And_ClearPreviousUseOf_Here_SCA ( dobject, 0 ) ;
     if ( CompileMode ) _Compile_Move_Literal_Immediate_To_Reg ( reg, ( int64 ) & dobject->W_Value ) ;
     cntx->Interpreter0->CurrentObjectNamespace = TypeNamespace_Get ( dobject ) ; // do this elsewhere when needed
     return dobject ;
@@ -298,12 +298,12 @@ _Do_C_Syntax_Variable ( Word * word )
         if ( ( ! compiler->LHS_Word ) || ( compiler->LHS_Word == word ) || GetState ( compiler, ARRAY_MODE ) )
         {
             compiler->LHS_Word = word ;
-            Word_SetCoding ( word, Here, 1 ) ;
+            Word_SetCodingAndSourceCoding ( word, Here ) ;
             if ( ( word->CAttribute & ( OBJECT | THIS | QID ) ) || GetState ( word, QID ) )
             {
                 _Compile_GetVarLitObj_LValue_To_Reg ( word, ACC ) ;
             }
-            else { Word_SetCoding ( word, 0, 1 ) ; return ; } //no code for this case
+            else { Word_SetCodingAndSourceCoding ( word, 0 ) ; return ; } //no code for this case
         }
         else _Compile_GetVarLitObj_LValue_To_Reg ( word, ACC ) ;
     }

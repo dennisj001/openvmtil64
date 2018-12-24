@@ -699,6 +699,7 @@
 #define SCN_IN_USE_FLAG 2
 #define SCN_LAST_SLOT SCN_IN_USE_FLAG
 #define SCN_NUMBER_OF_SLOTS (SCN_LAST_SLOT + 1) //1 : remember - 0 indexed array
+#define SCN_IN_USE_FLAG_NOT_USED_FOR_SC 3 
 
 #define PP_SKIP 0
 #define PP_INTERPRET 1

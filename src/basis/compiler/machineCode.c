@@ -226,8 +226,6 @@ void
 _Compile_Write_Instruction_X64 ( Boolean rex, uint8 opCode0, uint8 opCode1, Boolean modRm, int16 controlFlags, Boolean sib, int64 disp, Boolean dispSize, int64 imm, Boolean immSize )
 {
     d1 ( byte * here = Here ) ;
-    //Set_SCA (0) ;
-    //if ( controlFlags & REX_B ) rex |= 0x40 ; 
     if ( rex ) _Compile_Int8 ( rex ) ;
     if ( opCode0 ) _Compile_Int8 ( ( byte ) opCode0 ) ;
     if ( opCode1 ) _Compile_Int8 ( ( byte ) opCode1 ) ;
@@ -235,12 +233,8 @@ _Compile_Write_Instruction_X64 ( Boolean rex, uint8 opCode0, uint8 opCode1, Bool
     if ( sib && ( controlFlags & SIB_B ) ) _Compile_Int8 ( sib ) ;
     if ( disp || ( controlFlags & DISP_B ) ) _Compile_ImmDispData ( disp, dispSize, 0 ) ;
     if ( imm || ( controlFlags & IMM_B ) ) _Compile_ImmDispData ( imm, immSize, ( controlFlags & IMM_B ) ) ;
-    if ( _DBI ) //Is_DebugOn ) //
+    if ( _DBI ) 
     {
-        //d1 ( Word * currentWord = Compiling ? _Compiler_->CurrentWord : _Interpreter_->w_Word ) ;
-        //d1 ( Word * currentWord = _Interpreter_->w_Word ) ;
-        //d1 ( _Printf ( ( byte* ) "\n_Compile_InstructionX64 :: CurrentWord = %s :: location : %s :",
-        //    currentWord ? ( currentWord->Name ? String_ConvertToBackSlash ( currentWord->Name ) : ( byte* ) "" ) : ( byte* ) "", Context_Location ( ) ) ) ;
         d1 ( Debugger_UdisOneInstruction ( _Debugger_, here, ( byte* ) "", ( byte* ) "" ) ; ) ;
         d0 ( _Debugger_Disassemble ( _Debugger_, ( byte* ) here, Here - here, 1 ) ) ;
     }
@@ -265,11 +259,11 @@ _Compile_X_Group1 ( Boolean code, Boolean toRegOrMem, Boolean mod, Boolean reg, 
 {
     int64 opCode = code << 3 ;
     if ( osize > BYTE ) opCode |= 1 ;
-    if ( toRegOrMem == REG ) opCode |= 2 ;
+    if ( toRegOrMem == TO_REG ) opCode |= 2 ;
     // we need to be able to set the size so we can know how big the instruction will be in eg. CompileVariable
     // otherwise it could be optimally deduced but let caller control by keeping operandSize parameter
     // some times we need cell_t where bytes would work
-    WordStack_SCHCPUSCA ( 0, 1 ) ;
+    //Compiler_WordStack_SCHCPUSCA ( 0, 1 ) ;
     Compile_CalcWrite_Instruction_X64 ( 0, opCode, mod, reg, rm, DISP_B | REX_B | MODRM_B, sib, disp, 0, 0, osize ) ;
 }
 
@@ -282,7 +276,7 @@ _Compile_X_Group1 ( Boolean code, Boolean toRegOrMem, Boolean mod, Boolean reg, 
 void
 _Compile_X_Group1_Reg_To_Reg ( Boolean code, Boolean dstReg, int64 srcReg )
 {
-    _Compile_X_Group1 ( code, TO_MEM, REG, srcReg, dstReg, 0, 0, CELL ) ;
+    _Compile_X_Group1 ( code, TO_REG, REG, srcReg, dstReg, 0, 0, CELL ) ;
 }
 
 // opCode group 1 - 0x80-0x83 : ADD OR ADC SBB AND_OPCODE SUB XOR CMP
@@ -365,7 +359,7 @@ Compile_X_Group1 ( Compiler * compiler, int64 op, int64 ttt, int64 n )
         if ( one && one->StackPushRegisterCode ) SetHere ( one->StackPushRegisterCode, 1 ) ;
         else Compile_Pop_To_Acc ( DSP ) ;
         //_Compile_X_Group1 ( int8 code, int64 toRegOrMem, int8 mod, int8 reg, int8 rm, int8 sib, int64 disp, int64 osize )
-        Word_SetCodingHere_And_ClearPreviousUseOf_Here_SCA ( optInfo->opWord, 0 ) ;
+        //Compiler_Word_SetCodingHere_And_ClearPreviousUseOf_Here_SCA ( optInfo->opWord, 0 ) ;
         _Compile_X_Group1 ( op, REG, MEM, ACC, DSP, 0, 0, CELL_SIZE ) ; // result is on TOS
         _Word_CompileAndRecord_PushReg ( CfrTil_WordList ( 0 ), ACC ) ; // 0 : ?!? should be the exact variable 
         //DBI_OFF ;
@@ -431,7 +425,7 @@ Compile_X_Group5 ( Compiler * compiler, int64 op )
             optInfo->Optimize_Mod = REG ;
             optInfo->Optimize_Rm = ACC ;
         }
-        Word_SetCodingHere_And_ClearPreviousUseOf_Here_SCA ( optInfo->opWord, 0 ) ;
+        //Compiler_Word_SetCodingHere_And_ClearPreviousUseOf_Here_SCA ( optInfo->opWord, 0 ) ;
         _Compile_Group5 ( op, optInfo->Optimize_Mod, optInfo->Optimize_Rm, 0, optInfo->Optimize_Disp, 0 ) ;
     }
     else if ( one && one->CAttribute & ( PARAMETER_VARIABLE | LOCAL_VARIABLE | NAMESPACE_VARIABLE ) ) // *( ( cell* ) ( TOS ) ) += 1 ;
@@ -442,7 +436,7 @@ Compile_X_Group5 ( Compiler * compiler, int64 op )
         {
             Compile_GetVarLitObj_RValue_To_Reg ( one, ACC ) ;
             //_Compile_Group5 ( int8 code, int8 mod, int8 rm, int8 sib, int64 disp, int8 size )
-            WordStack_SCHCPUSCA ( 0, 0 ) ;
+            Compiler_WordStack_SCHCPUSCA ( 0, 0 ) ;
             _Compile_Group5 ( op, REG, ACC, 0, 0, 0 ) ;
             // ++ == += :: -- == -= so :
             _Compile_SetVarLitObj_With_Reg ( one, ACC, OREG ) ;

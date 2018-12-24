@@ -26,7 +26,7 @@ Compile_Multiply ( Compiler * compiler )
         CompileOptimizeInfo * optInfo = compiler->OptInfo ; //Compiler_CheckOptimize may change the optInfo
         //_Compile_IMUL ( int8 mod, int8 reg, int8 rm, int8 sib, int64 disp, uint64 imm )
         //optInfo->Optimize_Reg = ACC ; // emulate MUL
-        Word_SetCodingHere_And_ClearPreviousUseOf_Here_SCA (optInfo->opWord, 0) ;
+        //Compiler_Word_SetCodingHere_And_ClearPreviousUseOf_Here_SCA (optInfo->opWord, 0) ;
         _Compile_IMUL ( optInfo->Optimize_Mod, optInfo->Optimize_Reg, optInfo->Optimize_Rm, 0, optInfo->Optimize_Disp, 0 ) ;
         if ( optInfo->Optimize_Rm == DSP ) _Compile_Move_Reg_To_StackN ( DSP, 0, optInfo->Optimize_Reg ) ;
         else _Word_CompileAndRecord_PushReg ( _CfrTil_WordList ( 0 ), optInfo->Optimize_Reg ) ;
@@ -64,7 +64,7 @@ _Compile_Divide ( Compiler * compiler, uint64 type )
         }
 #endif        
         // Compile_IDIV( mod, rm, controlFlag, sib, disp, imm, size )
-        Word_SetCodingHere_And_ClearPreviousUseOf_Here_SCA (optInfo->opWord, 0) ;
+        //Compiler_Word_SetCodingHere_And_ClearPreviousUseOf_Here_SCA (optInfo->opWord, 0) ;
         Compile_IDIV ( optInfo->Optimize_Mod, optInfo->Optimize_Rm, ( ( optInfo->Optimize_Disp != 0 ) ? DISP_B : 0 ), 0, optInfo->Optimize_Disp, 0, 0 ) ;
         if ( type == MODULO ) reg = RDX ;
         else reg = ACC ;
@@ -109,7 +109,7 @@ _Compile_optInfo_X_Group1 ( Compiler * compiler, int64 op )
     {
         int64 imm = optInfo->Optimize_Imm ;
         // Compile_SUBI( mod, operandReg, offset, immediateData, size )
-        Word_SetCodingHere_And_ClearPreviousUseOf_Here_SCA (optInfo->opWord, 1) ;
+        //Compiler_Word_SetCodingHere_And_ClearPreviousUseOf_Here_SCA (optInfo->opWord, 1) ;
         _Compile_X_Group1_Immediate ( op, optInfo->Optimize_Mod,
             optInfo->Optimize_Rm, optInfo->Optimize_Disp,
             optInfo->Optimize_Imm, ( imm >= 0x100000000 ) ? CELL : ( ( imm >= 0x100 ) ? 4 : 1 ) ) ;
@@ -117,7 +117,7 @@ _Compile_optInfo_X_Group1 ( Compiler * compiler, int64 op )
     else
     {
         // _Compile_Group1 ( int64 code, int64 toRegOrMem, int64 mod, int8 reg, int8 rm, int8 sib, int64 disp, int64 osize )
-        Word_SetCodingHere_And_ClearPreviousUseOf_Here_SCA (optInfo->opWord, 0) ;
+        //Compiler_Word_SetCodingHere_And_ClearPreviousUseOf_Here_SCA (optInfo->opWord, 0) ;
         _Compile_X_Group1 ( op, optInfo->Optimize_Dest_RegOrMem, optInfo->Optimize_Mod,
             optInfo->Optimize_Reg, optInfo->Optimize_Rm, 0,
             optInfo->Optimize_Disp, CELL_SIZE ) ;
@@ -167,7 +167,7 @@ Compile_MultiplyEqual ( Compiler * compiler )
         else
         {
             //_Compile_IMUL_Reg ( cell mod, cell reg, cell rm, cell sib, cell disp )
-            Word_SetCodingHere_And_ClearPreviousUseOf_Here_SCA (optInfo->opWord, 0) ;
+            //Compiler_Word_SetCodingHere_And_ClearPreviousUseOf_Here_SCA (optInfo->opWord, 0) ;
             Compile_MUL ( optInfo->Optimize_Mod, optInfo->Optimize_Rm, REX_B | MODRM_B | DISP_B, 0,
                 optInfo->Optimize_Disp, 0, CELL_SIZE ) ;
         }
@@ -180,7 +180,7 @@ Compile_MultiplyEqual ( Compiler * compiler )
     else
     {
         //if ( ! GetState ( _Context_, C_SYNTAX ) ) 
-        WordStack_SCHCPUSCA (0, 0) ;
+        Compiler_WordStack_SCHCPUSCA (0, 0) ;
         _Compile_Move_StackNRm_To_Reg ( ACC, DSP, - 1 ) ;
         Compile_MUL ( MEM, DSP, REX_B | MODRM_B | DISP_B, 0, 0, 0, CELL_SIZE ) ;
         _Compile_Stack_Drop ( DSP ) ;
@@ -218,7 +218,7 @@ Compile_DivideEqual ( Compiler * compiler )
             }
             else
             {
-                Word_SetCodingHere_And_ClearPreviousUseOf_Here_SCA (optInfo->opWord, 0) ;
+                //Compiler_Word_SetCodingHere_And_ClearPreviousUseOf_Here_SCA (optInfo->opWord, 0) ;
                 Compile_DIV ( optInfo->Optimize_Mod, optInfo->Optimize_Rm, REX_B | MODRM_B | DISP_B, 0,
                     optInfo->Optimize_Disp, 0, CELL_SIZE ) ;
             }
@@ -228,7 +228,7 @@ Compile_DivideEqual ( Compiler * compiler )
         {
             _Compile_Move_StackNRm_To_Reg ( ACC, DSP, - 1 ) ; // address of dividend is second on stack
             Compile_MoveImm (REG, RDX, 0, 0, CELL ) ;
-            WordStack_SCHCPUSCA (0, 0) ;
+            Compiler_WordStack_SCHCPUSCA (0, 0) ;
             Compile_IDIV ( MEM, DSP, 0, 0, 0, 0, 0 ) ; // divisor is tos
             _Compile_Stack_Drop ( DSP ) ;
             _Compile_Move_Reg_To_StackNRm_UsingReg ( DSP, 0, ACC, THRU_REG ) ;
@@ -248,7 +248,7 @@ _CfrTil_Do_IncDec ( int64 op )
     }
     else
     {
-        WordStack_SCHCPUSCA (0, 0) ;
+        Compiler_WordStack_SCHCPUSCA (0, 0) ;
         int64 sd = List_Depth ( _CfrTil_->Compiler_N_M_Node_WordList ) ;
         Word *one = ( Word* ) _CfrTil_WordList ( 1 ) ; // the operand
         if ( op == INC )
