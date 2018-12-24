@@ -4,8 +4,6 @@
 BlockInfo *
 BI_Block_Copy ( BlockInfo * bi, byte* dstAddress, byte * srcAddress, int64 bsize, Boolean optFlag )
 {
-    //if ( bsize > 8000 ) _Printf ((byte*)"\nBI_Block_Copy : bsize = %ld\n", bsize ), Pause () ;
-    //if ( Is_DebugOn ) _Printf ((byte*)"\nBI_Block_Copy : bsize = %ld\n", bsize ), Pause () ;
     Compiler * compiler = _Compiler_ ;
     if ( ! bi ) bi = ( BlockInfo * ) Stack_Top ( compiler->CombinatorBlockInfoStack ) ;
     byte * saveHere = Here, * saveAddress = srcAddress ;
@@ -13,6 +11,7 @@ BI_Block_Copy ( BlockInfo * bi, byte* dstAddress, byte * srcAddress, int64 bsize
     int64 isize, left ;
     if ( dstAddress ) SetHere ( dstAddress, 1 ) ;
     bi->CopiedToStart = Here ;
+    CfrTil_AdjustDbgSourceCode_InUseFalse ( ) ;
     for ( left = bsize ; ( left > 0 ) ; srcAddress += isize )
     {
         if ( optFlag ) PeepHole_Optimize ( ) ;
@@ -56,7 +55,7 @@ BI_Block_Copy ( BlockInfo * bi, byte* dstAddress, byte * srcAddress, int64 bsize
             if ( offset ) dllist_Map1 ( compiler->GotoList, ( MapFunction1 ) AdjustJmpOffsetPointer, ( int64 ) ( srcAddress + 1 ) ) ;
             else dllist_Map1 ( compiler->GotoList, ( MapFunction1 ) _AdjustGotoInfo, ( int64 ) srcAddress ) ; //, ( int64 ) end ) ;
         }
-        _CompileN ( srcAddress, isize ) ; // MemCpy ( dstAddress, address, size ) ;
+        _CompileN ( srcAddress, isize ) ; 
     }
     bi->CopiedToEnd = Here ;
     bi->CopiedSize = bi->CopiedToEnd - bi->CopiedToStart ;

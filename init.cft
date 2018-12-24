@@ -370,6 +370,26 @@ demo
 stringMacrosOff
 #else // of course you can trim this file to your needs and put your init code maybe here if you like
 
+#if 1
+// : _fib2 ( dup 2 < ) d: ? ( ) : ( dup -- _fib2 swap 2 - _fib2 + ) ; ' _fib2 find wdiss 20 _fib2 p //sp
+: _fib3 
+    dup 2 < 
+    ?< >:< 
+        dup -- _fib3 swap 2 - _fib3 + 
+    >; 
+;
+' _fib3 find d: wdiss 
+20 _fib3 p //sp
+: _fib4 
+    { dup 2 >= }
+    { 
+        dup -- _fib4 swap 2 - _fib4 + 
+    } if2 
+;
+' _fib4 find wdiss
+20 _fib4 p 
+#endif
+
 #endif // of course ...
 
 c_syntaxOff

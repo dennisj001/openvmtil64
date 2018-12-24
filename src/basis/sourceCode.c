@@ -70,7 +70,7 @@ DWL_Find ( dllist * list, Word * iword, byte * address, byte* name, int64 takeFi
         {
             aFoundWord = ( Word* ) dobject_Get_M_Slot ( ( dobject* ) anode, SCN_T_WORD ) ;
             iuFlag = dobject_Get_M_Slot ( ( dobject* ) anode, SCN_IN_USE_FLAG ) ;
-            if ( ( ! aFoundWord->S_WordData ) || ( iuFlag == SCN_IN_USE_FLAG_NOT_USED_FOR_SC ) ) continue ;
+            if ( ( ! aFoundWord->S_WordData ) || ( iuFlag != true ) ) continue ;
             scwi = dobject_Get_M_Slot ( ( dobject* ) anode, SCN_SC_WORD_INDEX ) ;
             naddress = aFoundWord->SourceCoding ;
             if ( iword && ( aFoundWord == iword ) ) return aFoundWord ;
@@ -79,6 +79,7 @@ DWL_Find ( dllist * list, Word * iword, byte * address, byte* name, int64 takeFi
             {
                 numFound ++ ;
                 fDiff = abs ( scwi - lastScwi ) ;
+                aFoundWord->W_SC_Index = scwi ; // not sure why this is necessary but it is important for now
                 if ( ( _Q_->Verbosity > 2 ) ) DWL_ShowWord ( anode, i, 0, ( int64 ) "FOUND", fDiff ) ;
                 if ( ( * address == 0x0f ) && ( aFoundWord->Name [0] == '}' ) ) return aFoundWord ; // ( * address == 0x0f ) : jcc insn prefix
                 if ( ! foundWord )
@@ -117,7 +118,19 @@ DWL_Find ( dllist * list, Word * iword, byte * address, byte* name, int64 takeFi
     return 0 ;
 }
 
-// DWL - DebugWordList : _CfrTil_->DebugWordList 
+Boolean
+SC_List_AdjustAddress ( dlnode * node, byte * address, byte * newAddress )
+{
+    Word * nword = ( Word* ) dobject_Get_M_Slot ( ( dobject* ) node, SCN_T_WORD ) ;
+    if ( nword->S_WordData && ( nword->Coding == address ) )
+    {
+        Word_SetCoding ( nword, newAddress ) ;
+        if ( nword->SourceCoding ) Word_SetSourceCoding ( nword, newAddress ) ;
+        dobject_Set_M_Slot ( ( dobject* ) node, SCN_IN_USE_FLAG, true ) ; // reset after CfrTil_AdjustDbgSourceCode_InUseFalse
+        return true ;
+    }
+    return false ;
+}
 
 void
 CfrTil_AdjustDbgSourceCodeAddress ( byte * address, byte * newAddress )
@@ -126,7 +139,13 @@ CfrTil_AdjustDbgSourceCodeAddress ( byte * address, byte * newAddress )
     if ( list ) dllist_Map2 ( list, ( MapFunction2 ) SC_List_AdjustAddress, ( int64 ) address, ( int64 ) newAddress ) ;
 }
 
-#if 0
+#if 1
+
+void
+SC_List_Set_NotInUseForSC ( dlnode * node )
+{
+    dobject_Set_M_Slot ( ( dobject* ) node, SCN_IN_USE_FLAG, SCN_IN_USE_FLAG_NOT_USED_FOR_SC ) ; 
+}
 
 void
 CfrTil_AdjustDbgSourceCode_InUseFalse ( )
@@ -180,20 +199,6 @@ WordList_SetCoding ( int64 index, byte * address )
 {
     Word * word = WordStack ( index ) ;
     Word_SetCodingAndSourceCoding ( word, address ) ;
-}
-
-Boolean
-SC_List_AdjustAddress ( dlnode * node, byte * address, byte * newAddress )
-{
-    Word * nword = ( Word* ) dobject_Get_M_Slot ( ( dobject* ) node, SCN_T_WORD ) ;
-    if ( nword->S_WordData && ( nword->Coding == address ) )
-    {
-        Word_SetCoding ( nword, newAddress ) ;
-        if ( nword->SourceCoding ) Word_SetSourceCoding ( nword, newAddress ) ;
-        dobject_Set_M_Slot ( ( dobject* ) node, SCN_IN_USE_FLAG, true ) ; // reset after CfrTil_AdjustDbgSourceCode_InUseFalse
-        return true ;
-    }
-    return false ;
 }
 
 void
