@@ -37,15 +37,6 @@ Compile_Call_CurrentBlock ( )
     Compile_Call_From_C_Address ( ( uint64 ) & _CfrTil_->CurrentBlock ) ;
 }
 
-#if 0
-
-void
-Compile_SetEaxToZero ( void )
-{
-    Compile_MoveImm_To_Reg ( RAX, 0, CELL ) ; // for printf ?? others //System V ABI : "%rax is used to indicate the number of vector arguments passed to a function requiring a variable number of arguments"
-}
-#endif
-
 // >R - Rsp to
 
 void
@@ -130,7 +121,6 @@ void
 _Compile_GetVarLitObj_RValue_To_Reg ( Word * word, int64 reg )
 {
     Compiler_Word_SetCodingHere_And_ClearPreviousUseOf_Here_SCA ( word, 0 ) ;
-    //CfrTil_TypeStackPush ( word ) ;
     if ( word->CAttribute & REGISTER_VARIABLE )
     {
         if ( word->RegToUse == reg ) return ;
@@ -178,7 +168,6 @@ Compile_GetVarLitObj_RValue_To_Reg ( Word * word, int64 reg )
     if ( word->CAttribute & ( OBJECT | THIS ) )
     {
         Do_ObjectOffset ( word, reg ) ;
-        //if ( ! ( word->LAttribute & LOCAL_OBJECT ) ) _Compile_Move_Rm_To_Reg ( reg, reg, 0 ) ; // ?? this for LOCAL_OBJECT seems like we need to better integrate LOCAL_OBJECT
         Compile_Move_Rm_To_Reg ( reg, reg, 0 ) ;
     }
 }
@@ -188,8 +177,6 @@ Compile_GetVarLitObj_RValue_To_Reg ( Word * word, int64 reg )
 void
 _Compile_SetVarLitObj_With_Reg ( Word * word, int64 reg, int64 thruReg )
 {
-    //_Set_SCA ( word ) ;
-    // we don't need the word's code if compiling -- this is an optimization though
     if ( word->CAttribute & REGISTER_VARIABLE )
     {
         if ( word->RegToUse == reg ) return ;
@@ -201,8 +188,6 @@ _Compile_SetVarLitObj_With_Reg ( Word * word, int64 reg, int64 thruReg )
     }
     else if ( word->CAttribute & NAMESPACE_VARIABLE )
     {
-        //_Compile_Move_Literal_Immediate_To_Reg ( thruReg, ( int64 ) word->W_PtrToValue ) ;
-        //_Compile_Move_Reg_To_Rm ( thruReg, reg, 0 ) ;
         _Compile_SetAtAddress_WithReg ( ( int64* ) word->W_PtrToValue, reg, thruReg ) ;
     }
 }
@@ -211,7 +196,6 @@ void
 _Compile_GetVarLitObj_LValue_To_Reg ( Word * word, int64 reg )
 {
     Compiler_Word_SetCodingHere_And_ClearPreviousUseOf_Here_SCA ( word, 0 ) ;
-    //if ( ! ( word->CAttribute & ( OBJECT | THIS ) || ( word->WAttribute & WT_QID ) ) ) CfrTil_TypeStackPush ( word ) ; // to be pushed in _Compile_GetVarLitObj_RValue_To_Reg
     if ( word->CAttribute & REGISTER_VARIABLE )
     {
         if ( word->RegToUse == reg ) return ;

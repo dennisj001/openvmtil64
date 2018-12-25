@@ -1205,10 +1205,11 @@ void CfrTil_SetDebugRGB(void);
 void CfrTil_SetNoticeRGB(void);
 /* src/basis/sourceCode.c */
 void Debugger_ShowDbgSourceCodeAtAddress(Debugger *debugger, byte *address);
-Boolean SC_IsWordBlockOrCombinator(Word *word);
+Boolean SC_IsWord_IncorrectBlockOrCombinator(Word *word);
 Word *DWL_Find(dllist *list, Word *iword, byte *address, byte *name, int64 takeFirstFind, byte *newAddress, int64 fromFirstFlag);
 Boolean SC_List_AdjustAddress(dlnode *node, byte *address, byte *newAddress);
 void CfrTil_AdjustDbgSourceCodeAddress(byte *address, byte *newAddress);
+void SC_List_Set_NotInUseForSC(dlnode *node);
 void CfrTil_AdjustDbgSourceCode_InUseFalse(void);
 void _CfrTil_WordList_PushWord(Word *word, Boolean inUseFlag);
 void CfrTil_WordList_PushWord(Word *word);

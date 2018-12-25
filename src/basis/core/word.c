@@ -171,6 +171,8 @@ _Word_New ( byte * name, uint64 ctype, uint64 ctype2, uint64 ltype, Boolean addT
     Word_SetLocation ( word ) ;
     DObject_Finish ( word ) ;
     _Word_Add ( word, addToInNs, addToNs ) ; // add to the head of the list
+    //CfrTil_WordList_PushWord ( word ) ;
+    //Compiler_Word_SCH_CPUSCA ( word, 0 ) ;
     return word ;
 }
 
@@ -257,7 +259,7 @@ _Word_ShowSourceCode ( Word * word )
             Buffer_Unlock ( dstb ) ;
             Buffer_SetAsFree ( dstb, 0 ) ;
         }
-        else scd = (byte*) "C Primitive" ;
+        else scd = ( byte* ) "C Primitive" ;
         name = c_gd ( word->Name ) ;
         _Printf ( ( byte* ) "\nSourceCode for %s.%s :> \n%s", word->S_ContainingNamespace ? word->S_ContainingNamespace->Name : ( byte* ) "", name, scd ) ;
     }

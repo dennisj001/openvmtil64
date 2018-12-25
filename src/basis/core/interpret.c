@@ -80,10 +80,7 @@ _Interpreter_DoPrefixWord ( Context * cntx, Interpreter * interp, Word * word )
 void
 Interpreter_DoPrefixWord ( Context * cntx, Interpreter * interp, Word * word )
 {
-    if ( _Interpreter_IsWordPrefixing ( interp, word ) )
-    {
-        _Interpreter_DoPrefixWord ( cntx, interp, word ) ;
-    }
+    if ( _Interpreter_IsWordPrefixing ( interp, word ) ) _Interpreter_DoPrefixWord ( cntx, interp, word ) ;
     else if ( word->CAttribute & CATEGORY_OP_1_ARG ) Interpreter_DoInfixWord ( interp, word ) ; //goto doInfix ;
     else _SyntaxError ( (byte*) "Attempting to call a prefix function without following parenthesized args", 1 ) ;
 }

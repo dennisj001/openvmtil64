@@ -84,7 +84,7 @@ _Namespace_Do_C_Type ( Namespace * ns )
         {
             if ( ( ! Compiling ) )
             {
-                Compiler_Init ( compiler, 0, 0 ) ; //compiler->State ) ;
+                Compiler_Init ( compiler, 0, 0 ) ; 
                 CfrTil_InitSourceCode_WithName ( _CfrTil_, ns->Name, 1 ) ;
             }
             CfrTil_WordList_Init ( 0, 1 ) ;
@@ -103,10 +103,10 @@ _Namespace_Do_C_Type ( Namespace * ns )
                 {
                     compiler->C_FunctionBackgroundNamespace = compiler->C_BackgroundNamespace ;
                     SetState ( _Compiler_, C_COMBINATOR_PARSING, true ) ;
-                    //Namespace_DoNamespace ( ( byte* ) "C_Syntax" ) ;
-                    //_Namespace_ActivateAsPrimary ( ns ) ;
                     CfrTil_C_Syntax_On ( ) ;
                     Word * word = Word_New ( token1 ) ; // "("
+                    CfrTil_WordList_PushWord ( word ) ;
+                    Compiler_Word_SCH_CPUSCA ( word, 1 ) ;
                     DataStack_Push ( ( int64 ) word ) ;
                     CfrTil_BeginBlock ( ) ; // nb! before CfrTil_LocalsAndStackVariablesBegin
                     CfrTil_LocalsAndStackVariablesBegin ( ) ;

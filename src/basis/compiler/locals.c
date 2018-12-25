@@ -31,9 +31,9 @@
  */
 
 Word *
-_Compiler_LocalWord ( Compiler * compiler, byte * name, int64 ctype, int64 ctype2, int64 ltype, int64 allocType ) 
+_Compiler_LocalWord ( Compiler * compiler, byte * name, int64 ctype, int64 ctype2, int64 ltype, int64 allocType )
 {
-    Word *word = _DObject_New ( name, 0, ( ctype | IMMEDIATE ), ctype2, ltype, LOCAL_VARIABLE, ( byte* ) _DataObject_Run, 0, 1, 0, allocType ) ; 
+    Word *word = _DObject_New ( name, 0, ( ctype | IMMEDIATE ), ctype2, ltype, LOCAL_VARIABLE, ( byte* ) _DataObject_Run, 0, 1, 0, allocType ) ;
     compiler->NumberOfVariables ++ ;
     if ( ctype & REGISTER_VARIABLE )
     {
@@ -88,6 +88,7 @@ Compile_Init_LocalRegisterParamenterVariables ( Compiler * compiler )
 void
 _Compiler_AddLocalFrame ( Compiler * compiler )
 {
+    Compiler_WordStack_SCHCPUSCA ( 0, 0 ) ;
     _Compile_Move_Reg_To_StackN ( DSP, 1, FP ) ; // save pre fp
     _Compile_LEA ( FP, DSP, 0, LocalVarIndex_Disp ( 1 ) ) ; // set new fp
     Compile_ADDI ( REG, DSP, 0, 1 * CELL, INT32_SIZE ) ; // 1 : fp - add stack frame -- this value is going to be reset 
@@ -117,7 +118,8 @@ Compiler_RemoveLocalFrame ( Compiler * compiler )
         ( ! String_Equal ( _CfrTil_->CurrentWordBeingCompiled->S_ContainingNamespace->Name, "void" ) ) )
         SetState ( compiler, RETURN_TOS, true ) ;
     // nb. these variables have no lasting lvalue - they exist on the stack - we can only return their rvalue
-    if ( compiler->ReturnVariableWord ) Compile_GetVarLitObj_RValue_To_Reg ( compiler->ReturnVariableWord, ACC ) ;
+    if ( compiler->ReturnVariableWord ) Compile_GetVarLitObj_RValue_To_Reg (
+        Compiler_CopyDuplicatesAndPush ( compiler->ReturnVariableWord, - 1, - 1 ), ACC ) ; // need to copy because ReturnVariableWord may have been used within the word already
     else if ( GetState ( compiler, RETURN_TOS ) || ( compiler->NumberOfNonRegisterArgs && returnValueFlag && ( ! GetState ( compiler, RETURN_ACCUM ) ) ) )
     {
         Word * one = 0 ;
@@ -132,6 +134,7 @@ Compiler_RemoveLocalFrame ( Compiler * compiler )
     if ( compiler->NumberOfNonRegisterLocals || compiler->NumberOfNonRegisterArgs )
     {
         // remove the incoming parameters -- like in C
+        Compiler_WordStack_SCHCPUSCA ( compiler->ReturnVariableWord ? 1 : 0, 0 ) ;
         _Compile_LEA ( DSP, FP, 0, - LocalVarIndex_Disp ( 1 ) ) ; // restore sp - release locals stack frame
         _Compile_Move_StackN_To_Reg ( FP, DSP, 1 ) ; // restore the saved pre fp - cf AddLocalsFrame
     }
@@ -148,7 +151,11 @@ Compiler_RemoveLocalFrame ( Compiler * compiler )
         if ( compiler->ReturnVariableWord->CAttribute & REGISTER_VARIABLE ) _Compile_Move_Reg_To_StackN ( DSP, 0, compiler->ReturnVariableWord->RegToUse ) ;
     }
     // nb : stack was already adjusted accordingly for this above by reducing the SUBI subAmount or adding if there weren't any parameter variables
-    if ( ( returnValueFlag || IsWordRecursive ) && ( ! GetState ( compiler, RETURN_ACCUM ) ) ) Compile_Move_ACC_To_TOS ( DSP ) ;
+    if ( ( returnValueFlag || IsWordRecursive ) && ( ! GetState ( compiler, RETURN_ACCUM ) ) )
+    {
+        if ( compiler->ReturnVariableWord ) Compiler_WordStack_SCHCPUSCA ( 0, 0 ) ;
+        Compile_Move_ACC_To_TOS ( DSP ) ;
+    }
 }
 
 int64
@@ -180,13 +187,13 @@ LocalVar_FpOffset ( Word * word )
 inline int64
 LocalVar_FpDisp ( Word * word )
 {
-    return ( word->Index * CELL );
+    return ( word->Index * CELL ) ;
 }
 
 inline int64
 ParameterVar_Disp ( Word * word )
 {
-    return ( ParameterVarOffset ( _Compiler_, word ) * CELL );
+    return ( ParameterVarOffset ( _Compiler_, word ) * CELL ) ;
 }
 
 inline int64

@@ -55,7 +55,7 @@ BI_Block_Copy ( BlockInfo * bi, byte* dstAddress, byte * srcAddress, int64 bsize
             if ( offset ) dllist_Map1 ( compiler->GotoList, ( MapFunction1 ) AdjustJmpOffsetPointer, ( int64 ) ( srcAddress + 1 ) ) ;
             else dllist_Map1 ( compiler->GotoList, ( MapFunction1 ) _AdjustGotoInfo, ( int64 ) srcAddress ) ; //, ( int64 ) end ) ;
         }
-        _CompileN ( srcAddress, isize ) ; 
+        _CompileN ( srcAddress, isize ) ;
     }
     bi->CopiedToEnd = Here ;
     bi->CopiedSize = bi->CopiedToEnd - bi->CopiedToStart ;
@@ -167,6 +167,7 @@ _CfrTil_BeginBlock0 ( Boolean compileJumpFlag, byte * here )
     bi->JumpOffset = here ? here - INT32_SIZE : Here - INT32_SIZE ; // before CfrTil_CheckCompileLocalFrame after CompileUninitializedJump
     Stack_Push_PointerToJmpOffset ( ) ;
     //Compiler_WordStack_SCHCPUSCA ( 0, 0 ) ; // after the jump! -- the jump is optimized out
+    //WordList_SetSourceCoding ( 0, 0 ) ; // no source coding for BeginBlock
     bi->bp_First = here ? here : Here ; // after the jump for inlining
 
     return bi ;
