@@ -75,6 +75,7 @@ Compiler_IsFrameNecessary ( Compiler * compiler )
 void
 Compile_Init_LocalRegisterParamenterVariables ( Compiler * compiler )
 {
+    Compiler_WordStack_SCHCPUSCA ( 0, 0 ) ;
     dllist * list = compiler->RegisterParameterList ;
     dlnode * node ;
     Boolean frameFlag = Compiler_IsFrameNecessary ( compiler ) ; // compiler->NumberOfNonRegisterLocals ; 
@@ -106,7 +107,6 @@ Compiler_SetLocalsFrameSize_AtItsCellOffset ( Compiler * compiler )
 
 // Compiler_RemoveLocalFrame : the logic definitely needs to be simplified???
 // Compiler_RemoveLocalFrame has "organically evolved" it need to be logically simplified??
-
 void
 Compiler_RemoveLocalFrame ( Compiler * compiler )
 {
@@ -118,8 +118,11 @@ Compiler_RemoveLocalFrame ( Compiler * compiler )
         ( ! String_Equal ( _CfrTil_->CurrentWordBeingCompiled->S_ContainingNamespace->Name, "void" ) ) )
         SetState ( compiler, RETURN_TOS, true ) ;
     // nb. these variables have no lasting lvalue - they exist on the stack - we can only return their rvalue
-    if ( compiler->ReturnVariableWord ) Compile_GetVarLitObj_RValue_To_Reg (
-        Compiler_CopyDuplicatesAndPush ( compiler->ReturnVariableWord, - 1, - 1 ), ACC ) ; // need to copy because ReturnVariableWord may have been used within the word already
+    if ( compiler->ReturnVariableWord ) 
+    {
+        compiler->ReturnVariableWord = Compiler_CopyDuplicatesAndPush ( compiler->ReturnVariableWord, - 1, - 1 ) ;
+        if ( ! ( compiler->ReturnVariableWord->CAttribute & REGISTER_VARIABLE ) ) Compile_GetVarLitObj_RValue_To_Reg ( compiler->ReturnVariableWord, ACC ) ; // need to copy because ReturnVariableWord may have been used within the word already
+    }
     else if ( GetState ( compiler, RETURN_TOS ) || ( compiler->NumberOfNonRegisterArgs && returnValueFlag && ( ! GetState ( compiler, RETURN_ACCUM ) ) ) )
     {
         Word * one = 0 ;
@@ -146,14 +149,18 @@ Compiler_RemoveLocalFrame ( Compiler * compiler )
         else if ( ( ! compiler->NumberOfNonRegisterArgs ) && ( parameterVarsSubAmount == 0 ) && GetState ( compiler, RETURN_TOS ) ) //&& ( ! IsWordRecursive ) ) 
             Compile_ADDI ( REG, DSP, 0, CELL, 0 ) ;
     }
-    if ( compiler->ReturnVariableWord )
-    {
-        if ( compiler->ReturnVariableWord->CAttribute & REGISTER_VARIABLE ) _Compile_Move_Reg_To_StackN ( DSP, 0, compiler->ReturnVariableWord->RegToUse ) ;
-    }
     // nb : stack was already adjusted accordingly for this above by reducing the SUBI subAmount or adding if there weren't any parameter variables
-    if ( ( returnValueFlag || IsWordRecursive ) && ( ! GetState ( compiler, RETURN_ACCUM ) ) )
+    if ( returnValueFlag || ( IsWordRecursive && ( ! GetState ( compiler, RETURN_ACCUM ) ) ) )
     {
-        if ( compiler->ReturnVariableWord ) Compiler_WordStack_SCHCPUSCA ( 0, 0 ) ;
+        if ( compiler->ReturnVariableWord ) 
+        {
+            Compiler_Word_SCH_CPUSCA( compiler->ReturnVariableWord, 0 )  ;
+            if ( compiler->ReturnVariableWord->CAttribute & REGISTER_VARIABLE ) 
+            {
+                _Compile_Move_Reg_To_StackN ( DSP, 0, compiler->ReturnVariableWord->RegToUse ) ;
+                return ;
+            }
+        }
         Compile_Move_ACC_To_TOS ( DSP ) ;
     }
 }

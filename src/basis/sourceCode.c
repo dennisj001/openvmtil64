@@ -46,7 +46,7 @@ SC_IsWord_IncorrectBlockOrCombinator ( Word * word )
         //if ( ( word->Name[0] == '{' ) || ( word->Name[0] == '}' ) || ( word->CAttribute & ( COMBINATOR | KEYWORD ) ) ) return true ;
         if ( ( ( word->Name[0] == '{' ) || ( word->Name[0] == '}' ) || ( word->CAttribute & ( COMBINATOR ) ) ) )
         {
-            if ( word->SourceCoding [0] == 0xe9 ) return false ;
+            if ( word->SourceCoding [0] == 0xe9 ) return false ; // 0xe9 jmp ins 
             else return true ;
         }
     }

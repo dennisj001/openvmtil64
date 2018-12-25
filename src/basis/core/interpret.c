@@ -129,8 +129,9 @@ _Interpreter_TokenToWord ( Interpreter * interp, byte * token )
         interp->Token = token ;
         Word * word = Finder_Word_FindUsing ( interp->Finder0, token, 0 ) ;
         if ( ! word ) word = Lexer_ObjectToken_New ( interp->Lexer0, token ) ;
-        int64 tsrli = - 1, scwi = - 1 ;
-        Word_SetTsrliScwi ( word, tsrli, scwi ) ;
+        //int64 tsrli = - 1, scwi = - 1 ;
+        //Word_SetTsrliScwi ( word, -1, -1 ) ;
+        Lexer_Set_ScIndex_RlIndex ( interp->Lexer0, word, -1, -1 ) ;
         _Context_->CurrentTokenWord = word ;
         DEBUG_SETUP ( word ) ;
     }

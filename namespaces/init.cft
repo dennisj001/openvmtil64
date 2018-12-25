@@ -354,6 +354,7 @@ dbgOff
 'doX64 1 const
 'doScript 1 const
 'doScript2 1 const
+'doInitTest 0 const
 '_doDemo 0 const    
 
 #if Is_DebugOn 
@@ -370,9 +371,9 @@ demo
 stringMacrosOff
 #else // of course you can trim this file to your needs and put your init code maybe here if you like
 
-: powReg5 ( base REG power | out -t II.I ) { out 1 = } { power @ 0 > } { power power @ 1 - = } { out out @ base @ * = } for return out ;
-2 30 powReg5 dup p  1073741824 _assert 
-'powReg5 find wdiss
+#if doInitTest
+#endif
+
 #endif // of course ...
 
 c_syntaxOff

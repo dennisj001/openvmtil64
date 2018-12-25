@@ -1222,7 +1222,7 @@ void SC_ListClearAddress(dlnode *node, byte *address);
 Word *_CfrTil_WordList_TopWord(void);
 Word *_CfrTil_WordList_PopWords(int64 n);
 Word *CfrTil_WordLists_PopWord(void);
-void _DWL_ShowWord_Print(Word *word, int64 index, byte *prefix, byte *coding, byte *sourceCoding, byte *newSourceCoding, int64 scwi, int64 scwiDiff, Boolean iuoFlag);
+void _DWL_ShowWord_Print(Word *word, int64 index, byte *prefix, byte *coding, byte *sourceCoding, byte *newSourceCoding, int64 scwi, int64 scwiDiff, Boolean iuFlag);
 void DWL_ShowWord(dlnode *anode, int64 index, int64 inUseOnlyFlag, int64 prefix, int64 scwiDiff);
 void SC_WordList_Show(dllist *list, Word *scWord, Boolean fromFirstFlag, Boolean inUseOnlyFlag, byte *listName);
 void Compiler_SC_WordList_Show(byte *prefix, Boolean inUseOnlyFlag, Boolean showInDebugColors);

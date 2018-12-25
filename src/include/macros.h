@@ -265,6 +265,7 @@
 #define _Block_SCA_Clear _Block_SCA( -1 ) ;
 #define L_SCI _Lexer_->SC_Index
 #define Compiler_OptimizerWordList_Reset( compiler ) List_Init ( _CfrTil_->CompilerWordList ) 
+#if 0
 #define _Word_SetTsrliScwi( word, tsrli, scwi ) \
     if ( word )\
     {\
@@ -274,10 +275,13 @@
 #define Word_SetTsrliScwi( word, tsrli, scwi ) \
     if ( word )\
     {\
-        word->W_RL_Index = tsrli = (( tsrli != - 1 ) ? tsrli : _Lexer_->TokenStart_ReadLineIndex) ;\
-        word->W_SC_Index = scwi = (( scwi != - 1 ) ? scwi : _Lexer_->SC_Index) ;\
+        word->W_RL_Index = (( tsrli != - 1 ) ? tsrli : _Lexer_->TokenStart_ReadLineIndex) ;\
+        word->W_SC_Index = (( scwi != - 1 ) ? scwi : _Lexer_->SC_Index) ;\
     }
-
+#else
+#define _Word_SetTsrliScwi( word, tsrli, scwi ) Lexer_Set_ScIndex_RlIndex ( _Lexer_, word, (tsrli), (scwi) ) 
+#define Word_SetTsrliScwi( word, tsrli, scwi ) Lexer_Set_ScIndex_RlIndex ( _Lexer_, word, (tsrli), (scwi) ) 
+#endif
 
 #define Strncat( dst, src, n ) strncat ( (char *__restrict) dst, (const char *__restrict) src, (size_t) n )
 #define Strlen( s ) ( s ? strlen ( (const char *) s ) : 0 )
