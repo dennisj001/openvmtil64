@@ -72,7 +72,8 @@ interpret2 ( | atoken aword )
 sp
 
 interpret2 
-using
+using 
+//pause
 c_syntaxOff sp
 User
 #if 1
@@ -93,4 +94,5 @@ sp
 c_syntaxOff 
 2 t{ + }t 7 assertStkChk // stack checking
 //stack pause
+1 ? "hi" ps : "error" ps
 

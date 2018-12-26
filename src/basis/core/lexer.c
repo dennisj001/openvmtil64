@@ -25,6 +25,19 @@ Lexer_ObjectToken_New ( Lexer * lexer, byte * token ) //, int64 parseFlag )
         if ( lexer->TokenType & T_RAW_STRING )
         {
             if ( GetState ( _Q_, AUTO_VAR ) ) // make it a 'variable' 
+#if 1                
+            {
+                if ( Compiling && GetState ( _Context_, C_SYNTAX ) )
+                {
+                    _Namespace_ActivateAsPrimary ( _Compiler_->LocalsNamespace ) ;
+
+                    word = DataObject_New ( LOCAL_VARIABLE, 0, token, LOCAL_VARIABLE, 0, 0, 0, 0, DICTIONARY, - 1, - 1 ) ;
+                    token2 = Lexer_PeekNextNonDebugTokenWord ( lexer, 1 ) ;
+                    if ( ! String_Equal ( token2, "=" ) ) return 0 ; // don't interpret this word
+                }
+                else word = DataObject_New ( NAMESPACE_VARIABLE, 0, token, NAMESPACE_VARIABLE, 0, 0, 0, 0, 0, 0, - 1 ) ;
+            }
+#else
             {
                 word = DataObject_New ( NAMESPACE_VARIABLE, 0, token, NAMESPACE_VARIABLE, 0, 0, 0, 0, 0, 0, - 1 ) ;
                 if ( Compiling && GetState ( _Context_, C_SYNTAX ) )
@@ -33,18 +46,16 @@ Lexer_ObjectToken_New ( Lexer * lexer, byte * token ) //, int64 parseFlag )
                     if ( ! String_Equal ( token2, "=" ) ) return 0 ; // don't interpret this word
                 }
             }
+#endif            
             else
             {
                 _Q_->ExceptionToken = token ;
                 byte *buffer = Buffer_Data ( _CfrTil_->ScratchB1 ) ;
-                sprintf ( (char*) buffer, "%s ?\n", ( char* ) token ) ;
+                sprintf ( ( char* ) buffer, "%s ?\n", ( char* ) token ) ;
                 CfrTil_Exception ( NOT_A_KNOWN_OBJECT, buffer, QUIT ) ;
             }
         }
-        else
-        {
-            word = DataObject_New ( LITERAL, 0, token, lexer->TokenType, 0, 0, 0, lexer->Literal, 0, 0, - 1 ) ;
-        }
+        else word = DataObject_New ( LITERAL, 0, token, lexer->TokenType, 0, 0, 0, lexer->Literal, 0, 0, - 1 ) ;
         // this is done in Word_Create 
         //Lexer_Set_ScIndex_RlIndex ( lexer, word, lexer->TokenStart_ReadLineIndex, lexer->SC_Index ) ;
         lexer->TokenWord = word ;
@@ -79,6 +90,7 @@ byte *
 _Lexer_LexNextToken_WithDelimiters ( Lexer * lexer, byte * delimiters, Boolean checkListFlag, Boolean peekFlag, int reAddPeeked, uint64 state )
 {
     ReadLiner * rl = lexer->ReadLiner0 ;
+    byte inChar ;
     if ( ( ! checkListFlag ) || ( ! ( lexer->OriginalToken = Lexer_GetTokenNameFromTokenList ( lexer, peekFlag ) ) ) ) // ( ! checkListFlag ) : allows us to peek multiple tokens ahead if we     {
     {
         Lexer_Init ( lexer, delimiters, lexer->State, CONTEXT ) ;
@@ -86,8 +98,10 @@ _Lexer_LexNextToken_WithDelimiters ( Lexer * lexer, byte * delimiters, Boolean c
         lexer->SC_Index = _CfrTil_->SC_Index ;
         while ( ( ! Lexer_CheckIfDone ( lexer, LEXER_DONE ) ) )
         {
-            byte c = lexer->NextChar ( lexer->ReadLiner0 ) ;
-            Lexer_DoChar ( lexer, c ) ;
+            //inChar = ReadLine_PeekNextChar ( _Context_->ReadLiner0 ) ;
+            //if ( ( inChar == 0 ) || ( inChar == - 1 ) || ( inChar == eof ) ) break ;
+            inChar = lexer->NextChar ( lexer->ReadLiner0 ) ;
+            Lexer_DoChar ( lexer, inChar ) ;
         }
         lexer->CurrentTokenDelimiter = lexer->TokenInputByte ;
         if ( lexer->TokenWriteIndex && ( ! GetState ( lexer, LEXER_RETURN_NULL_TOKEN ) ) )
@@ -262,6 +276,7 @@ Lexer_PeekNextNonDebugTokenWord ( Lexer * lexer, Boolean evalFlag )
 }
 
 #if 0
+
 byte *
 Lexer_PeekNextNonDebugTokenWord ( Lexer * lexer, int64 evalFlag )
 {
@@ -486,7 +501,11 @@ TerminatingMacro ( Lexer * lexer )
         Lexer_FinishTokenHere ( lexer ) ;
         return ;
     }
-    if ( ( ReadLine_PeekNextChar ( lexer->ReadLiner0 ) == 't' ) && (lexer->TokenInputByte == ')') ) { Lexer_Default ( lexer ) ; return ; }
+    if ( ( ReadLine_PeekNextChar ( lexer->ReadLiner0 ) == 't' ) && ( lexer->TokenInputByte == ')' ) )
+    {
+        Lexer_Default ( lexer ) ;
+        return ;
+    }
 #endif    
     if ( ( ! lexer->TokenWriteIndex ) || ( Lexer_LastChar ( lexer ) == '_' ) ) Lexer_Default ( lexer ) ; // allow for "_(" token 
     else ReadLine_UnGetChar ( lexer->ReadLiner0 ) ; // so NextChar will have this TokenInputCharacter for the next token
@@ -939,7 +958,7 @@ CfrTil_LexerTables_Setup ( CfrTil * cfrtl )
 
     cfrtl->LexerCharacterTypeTable [ '$' ].CharFunctionTableIndex = 12 ;
     cfrtl->LexerCharacterTypeTable [ '#' ].CharFunctionTableIndex = 12 ;
-    
+
     cfrtl->LexerCharacterTypeTable [ '/' ].CharFunctionTableIndex = 14 ;
     cfrtl->LexerCharacterTypeTable [ ';' ].CharFunctionTableIndex = 15 ;
     cfrtl->LexerCharacterTypeTable [ '&' ].CharFunctionTableIndex = 16 ;
@@ -981,18 +1000,18 @@ Lexer_CheckForwardToStatementEnd_LValue ( Lexer * lexer, Word * word )
     byte * inputPtr ;
     int64 index ;
     int64 tokenStartReadLineIndex = ( ( int64 ) word == - 1 ) ? lexer->TokenStart_ReadLineIndex : word->W_RL_Index ;
-    if ( AtCommandLine ( lexer->ReadLiner0 ) ) 
+    if ( AtCommandLine ( lexer->ReadLiner0 ) )
     {
         index = tokenStartReadLineIndex ;
-        inputPtr = &lexer->ReadLiner0->InputLine[index] ;
+        inputPtr = & lexer->ReadLiner0->InputLine[index] ;
     }
-    else 
+    else
     {
         index = Lexer_ConvertLineIndexToFileIndex ( lexer, tokenStartReadLineIndex ) ;
         inputPtr = & lexer->ReadLiner0->InputStringOriginal [index] ;
     }
     return IsLValue_String_CheckForwardToStatementEnd ( inputPtr ) ;
-    
+
 }
 
 // assuming no comments

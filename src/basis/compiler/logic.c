@@ -29,7 +29,7 @@ _Compile_TestCode ( Boolean reg, Boolean size )
 void
 BI_CompileRecord_TestCode_Reg ( BlockInfo *bi, Boolean reg, Boolean size )
 {
-    Compiler_WordStack_SCHCPUSCA (0, 1) ;
+    Compiler_WordStack_SCHCPUSCA ( 0, 1 ) ;
     bi->LogicTestCode = Here ;
     _Compile_TestCode ( reg, size ) ;
 }
@@ -118,13 +118,13 @@ Compiler_Set_LogicCode ( Compiler * compiler, Boolean setTtn, Boolean setNegFlag
 void
 _Compile_LogicalAnd ( Compiler * compiler )
 {
-    Compiler_WordStack_SCHCPUSCA (0, 1) ;
+    Compiler_WordStack_SCHCPUSCA ( 0, 1 ) ;
     Compiler_BI_CompileRecord_TestCode_Set_setTtnn ( compiler, OREG, TTT_ZERO, NEGFLAG_Z, TTT_ZERO, NEGFLAG_NZ ) ; // jz
     _Compile_Jcc ( NEGFLAG_Z, TTT_ZERO, Here + 15 ) ; // if eax is zero return not(R8) == 1 else return 0
     Compiler_BI_CompileRecord_TestCode_Set_setTtnn ( compiler, ACC, TTT_ZERO, NEGFLAG_NZ, TTT_ZERO, NEGFLAG_Z ) ;
     _Compile_LogicResultForStack ( ACC, TTT_ZERO, NEGFLAG_NZ ) ; // jnz
     Compiler_Set_LogicCode ( compiler, TTT_ZERO, NEGFLAG_NZ, TTT_ZERO, NEGFLAG_Z ) ;
-    CfrTil_CompileAndRecord_Word0_PushReg (ACC) ;
+    CfrTil_CompileAndRecord_Word0_PushReg ( ACC ) ;
 }
 
 void
@@ -138,8 +138,8 @@ Compile_LogicalAnd ( Compiler * compiler )
     }
     else
     {
-        Word *one = _CfrTil_WordList (1) ; // assumes two values ( n m ) on the DSP stack 
-        if ( one->StackPushRegisterCode && ( one->RegToUse == ACC ) ) SetHere (one->StackPushRegisterCode, 1) ;
+        Word *one = _CfrTil_WordList ( 1 ) ; // assumes two values ( n m ) on the DSP stack 
+        if ( one->StackPushRegisterCode && ( one->RegToUse == ACC ) ) SetHere ( one->StackPushRegisterCode, 1 ) ;
         else _Compile_Stack_PopToReg ( DSP, ACC ) ;
         _Compile_Stack_PopToReg ( DSP, OREG ) ;
         _Compile_LogicalAnd ( compiler ) ;
@@ -150,12 +150,12 @@ void
 _Compile_LogicalNot ( Compiler * compiler )
 {
     //_DBI_ON ;
-    Compiler_WordStack_SCHCPUSCA (0, 1) ;
+    Compiler_WordStack_SCHCPUSCA ( 0, 1 ) ;
     Compiler_BI_CompileRecord_TestCode_Set_setTtnn ( compiler, ACC, TTT_ZERO, NEGFLAG_Z, TTT_ZERO, NEGFLAG_NZ ) ;
     //_Set_JccLogicCodeForNot ( compiler ) ;
     _Compile_LogicResultForStack ( ACC, TTT_ZERO, NEGFLAG_Z ) ;
     Compiler_Set_LogicCode ( compiler, TTT_ZERO, NEGFLAG_Z, TTT_ZERO, NEGFLAG_NZ ) ;
-    CfrTil_CompileAndRecord_Word0_PushReg (ACC) ;
+    CfrTil_CompileAndRecord_Word0_PushReg ( ACC ) ;
     //DBI_OFF ;
 }
 
@@ -205,7 +205,7 @@ Compile_Cmp_Set_setTtnn_Logic ( Compiler * compiler, Boolean setTtn, Boolean set
         {
             if ( ( setTtn == TTT_EQUAL ) && ( compiler->OptInfo->Optimize_Imm == 0 ) ) //Compile_TEST ( compiler->OptInfo->Optimize_Mod, compiler->OptInfo->Optimize_Rm, 0, compiler->OptInfo->Optimize_Disp, compiler->OptInfo->Optimize_Imm, CELL ) ;
             {
-                if ( compiler->OptInfo->COIW [2]->StackPushRegisterCode ) SetHere (compiler->OptInfo->COIW [2]->StackPushRegisterCode, 1) ; // leave optInfo_0_two value in ACCUM we don't need to push it
+                if ( compiler->OptInfo->COIW [2]->StackPushRegisterCode ) SetHere ( compiler->OptInfo->COIW [2]->StackPushRegisterCode, 1 ) ; // leave optInfo_0_two value in ACCUM we don't need to push it
                 Compiler_BI_CompileRecord_TestCode_ArgRegNum ( compiler, 1 ) ;
             }
             else
@@ -285,7 +285,7 @@ void
 Compile_TestLogicAndStackPush ( Compiler * compiler, Boolean reg, Boolean setTtn, Boolean setNegFlag, Boolean jccTtt, Boolean jccNegFlag )
 {
     Compiler_BI_CompileRecord_TestCode_Set_setTtnn ( compiler, reg, TTT_ZERO, setNegFlag, jccTtt, jccNegFlag ) ;
-    CfrTil_CompileAndRecord_PushAccum () ;
+    CfrTil_CompileAndRecord_PushAccum ( ) ;
 }
 
 void
@@ -315,7 +315,7 @@ Compile_Logical_X ( Compiler * compiler, int64 op, Boolean setTtn, Boolean setNe
 void
 Compile_LogicalNot ( Compiler * compiler )
 {
-    Word *one = _CfrTil_WordList (1) ; // assumes two values ( n m ) on the DSP stack 
+    Word *one = _CfrTil_WordList ( 1 ) ; // assumes two values ( n m ) on the DSP stack 
     int64 optFlag = Compiler_CheckOptimize ( compiler, 0 ) ; // check especially for cases that optimize literal ops
     if ( optFlag & OPTIMIZE_DONE ) return ;
         // just need to get to valued to be operated on ( not'ed ) in eax
@@ -327,7 +327,7 @@ Compile_LogicalNot ( Compiler * compiler )
         }
         else if ( compiler->OptInfo->Optimize_Rm == DSP )
         {
-            if ( one->StackPushRegisterCode ) SetHere (one->StackPushRegisterCode, 1) ;
+            if ( one->StackPushRegisterCode ) SetHere ( one->StackPushRegisterCode, 1 ) ;
             else _Compile_Move_StackN_To_Reg ( ACC, DSP, 0 ) ;
         }
         else if ( compiler->OptInfo->Optimize_Rm != ACC )
@@ -337,7 +337,7 @@ Compile_LogicalNot ( Compiler * compiler )
     }
     else
     {
-        if ( one->StackPushRegisterCode ) SetHere (one->StackPushRegisterCode, 1) ; // PREFIX_PARSING : nb! could be a prefix function 
+        if ( one->StackPushRegisterCode ) SetHere ( one->StackPushRegisterCode, 1 ) ; // PREFIX_PARSING : nb! could be a prefix function 
         else if ( one->CAttribute2 & RAX_RETURN ) ; // do nothing
         else _Compile_Stack_PopToReg ( DSP, ACC ) ;
         //int64 a, b, c= 0, d ; a = 1; b = !a, d= !c ; _Printf ( "a = %d b = %d c =%d ~d = %d", a, b, c, d ) ;
@@ -362,8 +362,8 @@ _Compile_Jcc ( int64 setNegFlag, int64 setTtn, byte * jmpToAddr )
 void
 _BI_Compile_Jcc ( BlockInfo *bi, byte* address ) // , int8 nz
 {
-    if ( bi->CopiedToLogicJccCode ) SetHere (bi->CopiedToLogicJccCode, 1) ;
-    else SetHere (bi->JccLogicCode, 1) ;
+    if ( bi->CopiedToLogicJccCode ) SetHere ( bi->CopiedToLogicJccCode, 1 ) ;
+    else SetHere ( bi->JccLogicCode, 1 ) ;
     bi->ActualCopiedToJccCode = Here ;
     _Compile_Jcc ( bi->JccNegFlag, bi->JccTtt, address ) ; // we do need to store and get this logic set by various conditions by the compiler : _Compile_SET_setTtnn_REG
 }
@@ -399,7 +399,7 @@ Compiler_Compile_Jcc ( Compiler * compiler, int64 bindex, Boolean setTtn ) // , 
 // non-combinator 'if'
 
 void
-CfrTil_If ( )
+CfrTil_If_ConditionalExpression ( )
 {
     if ( CompileMode )
     {
@@ -415,25 +415,26 @@ CfrTil_If ( )
     }
     else
     {
-        if ( String_IsPreviousCharA_ ( _Context_->ReadLiner0->InputLine, _Context_->Lexer0->TokenStart_ReadLineIndex - 1, '}' ) ) CfrTil_If2Combinator ( ) ;
-        else if ( String_IsPreviousCharA_ ( _Context_->ReadLiner0->InputLine, _Context_->Lexer0->TokenStart_ReadLineIndex - 1, '#' ) ) CfrTil_If_ConditionalInterpret ( ) ;
+        if ( String_IsPreviousCharA_ ( _Context_->ReadLiner0->InputLine, _Context_->Lexer0->TokenStart_ReadLineIndex - 1, '}' ) )
+            CfrTil_If2Combinator ( ) ;
+        else if ( String_IsPreviousCharA_ ( _Context_->ReadLiner0->InputLine, _Context_->Lexer0->TokenStart_ReadLineIndex - 1, '#' ) )
+            CfrTil_If_ConditionalInterpret ( ) ;
         else if ( GetState ( _Context_, C_SYNTAX | PREFIX_MODE | INFIX_MODE ) ) CfrTil_If_PrefixCombinators ( ) ;
         else
         {
             Interpreter * interp = _Context_->Interpreter0 ;
             if ( DataStack_Pop ( ) )
             {
-                // interpret until "else" or "endif"
-                byte * token = Interpret_C_Until_Token4 (interp, ( byte* ) "else", ( byte* ) "endif", 0, 0, 0 ) ;
-                //if ( ( rtrn == 2 ) || ( rtrn == 0 ) ) return ;
+                byte * token ;
+                // interpret until ":", "else" or "endif"
+                token = Interpret_C_Until_Token4 ( interp, ( byte* ) "else", ( byte* ) "endif", ":", 0, 0 ) ;
                 if ( ( token == 0 ) || ( String_Equal ( token, "endif" ) ) ) return ;
-                Parse_SkipUntil_Token ( ( byte* ) "endif" ) ;
-
+                Parse_SkipUntil_EitherToken ( ( byte* ) "endif", 0 ) ;
             }
             else
             {
-                // skip until "else"
-                Parse_SkipUntil_Token ( ( byte* ) "else" ) ;
+                // skip until ":" or "else"
+                Parse_SkipUntil_EitherToken ( ( byte* ) ":", "else" ) ;
                 Interpret_Until_Token ( interp, ( byte* ) "endif", 0 ) ;
             }
         }

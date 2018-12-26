@@ -95,7 +95,7 @@ chi ( chey0, d | a b c )
     p ( c ) ; c 3 "c should be 3" assert // 3
     p ( b ) ; b 5 "b should be 5" assert // 5
     p ( a ) ; a 8 "a should be 8" assert // 8
-    dump ( cobj.chey0, cobj.size ) ; 
+    dump ( chey0, cobj.size ) ; 
     d = cobj.chey0.hey ;
     hex p ( d ) ;
     printf ( "\n chi : d = %lx\n", d ) ;

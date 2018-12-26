@@ -11,7 +11,7 @@ Interpret_DoParenthesizedRValue ( )
     while ( 1 )
     {
         token = _Lexer_ReadToken ( cntx->Lexer0, 0 ) ;
-        Interpreter_InterpretAToken ( cntx->Interpreter0, token, - 1 ) ;
+        Interpreter_InterpretAToken ( cntx->Interpreter0, token, - 1, - 1 ) ;
         if ( String_Equal ( ( char* ) token, ")" ) ) break ;
     }
     SetState ( compiler, COMPILE_MODE, svcm ) ;
@@ -23,9 +23,9 @@ Interpret_C_Block_EndBlock ( byte * tokenToUse, Boolean insertFlag )
     if ( tokenToUse ) _CfrTil_->EndBlockWord->Name = tokenToUse ;
     if ( insertFlag ) SetState ( _Debugger_, DBG_OUTPUT_INSERTION, true ) ;
     //_CfrTil_->EndBlockWord->W_RL_Index = _Lexer_->TokenStart_ReadLineIndex ;
-    Lexer_Set_ScIndex_RlIndex ( _Lexer_, _CfrTil_->EndBlockWord, -1, -1 ) ;
-    Interpreter_DoWord_Default ( _Interpreter_, _CfrTil_->EndBlockWord, - 1, -1 ) ;
-    _CfrTil_->EndBlockWord->Name = (byte*) "}" ;
+    Lexer_Set_ScIndex_RlIndex ( _Lexer_, _CfrTil_->EndBlockWord, - 1, - 1 ) ;
+    Interpreter_DoWord_Default ( _Interpreter_, _CfrTil_->EndBlockWord, - 1, - 1 ) ;
+    _CfrTil_->EndBlockWord->Name = ( byte* ) "}" ;
     SetState ( _Debugger_, DBG_OUTPUT_INSERTION, false ) ;
 }
 
@@ -38,9 +38,9 @@ Interpret_C_Block_BeginBlock ( byte * tokenToUse, Boolean insertFlag )
     if ( tokenToUse ) _CfrTil_->BeginBlockWord->Name = tokenToUse ;
     if ( insertFlag ) SetState ( _Debugger_, DBG_OUTPUT_INSERTION, true ) ;
     //_CfrTil_->BeginBlockWord->W_RL_Index = _Lexer_->TokenStart_ReadLineIndex ;
-    Lexer_Set_ScIndex_RlIndex ( _Lexer_, _CfrTil_->BeginBlockWord, -1, -1 ) ;
-    Interpreter_DoWord_Default ( _Interpreter_, _CfrTil_->BeginBlockWord, - 1, -1 ) ;
-    _CfrTil_->BeginBlockWord->Name = (byte*) "{" ;
+    Lexer_Set_ScIndex_RlIndex ( _Lexer_, _CfrTil_->BeginBlockWord, - 1, - 1 ) ;
+    Interpreter_DoWord_Default ( _Interpreter_, _CfrTil_->BeginBlockWord, - 1, - 1 ) ;
+    _CfrTil_->BeginBlockWord->Name = ( byte* ) "{" ;
     compiler->BeginBlockFlag = false ;
     SetState ( _Debugger_, DBG_OUTPUT_INSERTION, false ) ;
 }
@@ -62,7 +62,7 @@ CfrTil_Interpret_C_Blocks ( int64 blocks, Boolean takesAnElseFlag, Boolean semic
         {
             // interpret a (possible) 'for' c parenthesis expression
             compiler->InLParenBlock = true ;
-            Interpret_C_Block_BeginBlock ( (byte*) "(", 0 ) ;
+            Interpret_C_Block_BeginBlock ( ( byte* ) "(", 0 ) ;
             compiler->TakesLParenAsBlock = false ; // after the first block
         }
         else if ( String_Equal ( ( char* ) token, ")" ) && compiler->InLParenBlock )
@@ -70,11 +70,11 @@ CfrTil_Interpret_C_Blocks ( int64 blocks, Boolean takesAnElseFlag, Boolean semic
             List_InterpretLists ( compiler->PostfixLists ) ;
             compiler->InLParenBlock = false ;
             compiler->TakesLParenAsBlock = false ;
-            Interpret_C_Block_EndBlock ( (byte*) ")", 0 ) ;
+            Interpret_C_Block_EndBlock ( ( byte* ) ")", 0 ) ;
             //CfrTil_TypeStack_Pop ( ) ; // the logic word
             if ( ! _Context_StringEqual_PeekNextToken ( _Context_, ( byte* ) "{", 0 ) )
             {
-                Interpret_C_Block_BeginBlock ( (byte*) "{", 1 ) ;
+                Interpret_C_Block_BeginBlock ( ( byte* ) "{", 1 ) ;
                 semicolonEndsThisBlock = true ;
             }
             blocksParsed ++ ;
@@ -94,10 +94,10 @@ CfrTil_Interpret_C_Blocks ( int64 blocks, Boolean takesAnElseFlag, Boolean semic
             List_InterpretLists ( compiler->PostfixLists ) ;
             if ( semicolonEndsThisBlock )
             {
-                Interpret_C_Block_EndBlock ( (byte*) ";", 0 ) ;
+                Interpret_C_Block_EndBlock ( ( byte* ) ";", 0 ) ;
                 blocksParsed ++ ;
             }
-            if ( compiler->InLParenBlock ) Interpret_C_Block_BeginBlock ( (byte*) "{", 1 ) ;
+            if ( compiler->InLParenBlock ) Interpret_C_Block_BeginBlock ( ( byte* ) "{", 1 ) ;
         }
         else if ( String_Equal ( ( char* ) token, "else" ) )
         {
@@ -106,7 +106,7 @@ CfrTil_Interpret_C_Blocks ( int64 blocks, Boolean takesAnElseFlag, Boolean semic
                 takesAnElseFlag = false ;
                 if ( ! _Context_StringEqual_PeekNextToken ( _Context_, ( byte* ) "{", 0 ) )
                 {
-                    Interpret_C_Block_BeginBlock ( (byte*) "{", 1 ) ;
+                    Interpret_C_Block_BeginBlock ( ( byte* ) "{", 1 ) ;
                     semicolonEndsThisBlock = true ;
                 }
             }
@@ -115,7 +115,7 @@ CfrTil_Interpret_C_Blocks ( int64 blocks, Boolean takesAnElseFlag, Boolean semic
         }
         else
         {
-            word = _Interpreter_TokenToWord ( interp, token ) ;
+            word = _Interpreter_TokenToWord ( interp, token, - 1, - 1 ) ;
             if ( word )
             {
                 Interpreter_DoWord ( interp, word, - 1, - 1 ) ;
@@ -123,7 +123,7 @@ CfrTil_Interpret_C_Blocks ( int64 blocks, Boolean takesAnElseFlag, Boolean semic
                 {
                     if ( semicolonEndsThisBlock )
                     {
-                        Interpret_C_Block_EndBlock ( (byte*) "}", String_Equal ( token, ";") ) ;
+                        Interpret_C_Block_EndBlock ( ( byte* ) "}", String_Equal ( token, ";" ) ) ;
                         //Interpret_C_Block_EndBlock ( 0, 0 ) ;
                         blocksParsed ++ ;
                     }
@@ -195,7 +195,7 @@ _CfrTil_C_Infix_EqualOp ( Word * opWord )
     if ( opWord ) rword = opWord ;
     else rword = wordr ;
     svName = rword->Name ;
-    rword->Name = (byte*) "=" ;
+    rword->Name = ( byte* ) "=" ;
     SetState ( _Debugger_, DBG_OUTPUT_SUBSTITUTION, true ) ;
     _Debugger_->SubstitutedWord = rword ;
     Interpreter_DoWord_Default ( interp, rword, tsrli, svscwi ) ;
@@ -220,6 +220,8 @@ CfrTil_SetInNamespaceFromBackground ( )
     if ( cntx->Compiler0->C_FunctionBackgroundNamespace ) _CfrTil_Namespace_InNamespaceSet ( cntx->Compiler0->C_FunctionBackgroundNamespace ) ;
     else Compiler_SetAs_InNamespace_C_BackgroundNamespace ( cntx->Compiler0 ) ;
 }
+
+#if 0 // maybe better with blocks ... below ..
 
 void
 CfrTil_C_ConditionalExpression ( )
@@ -257,11 +259,48 @@ CfrTil_C_ConditionalExpression ( )
     }
     _SetOffsetForCallOrJump ( ptrToOffsetEnd, Here ) ;
 }
+#elif 1
+
+void
+CfrTil_C_ConditionalExpression ( )
+{
+    Context * cntx = _Context_ ;
+    Interpreter * interp = cntx->Interpreter0 ;
+    CfrTil_If_ConditionalExpression ( ) ;
+    if ( CompileMode )
+    {
+        //Interpret_Until_Token ( interp, ( byte* ) ":", 0 ) ;
+        byte * token = Interpret_C_Until_Token4 ( interp, ( byte* ) ":", ( byte* ) ",", ( byte* ) ")", "}", 0 ) ;
+        if ( String_Equal ( token, ":" ) )
+        {
+            Lexer_ReadToken ( _Lexer_ ) ;
+            CfrTil_Else ( ) ;
+            Interpret_C_Until_Token4 ( interp, ( byte* ) ";", ( byte* ) ",", ( byte* ) ")", "}", 0 ) ;
+            CfrTil_EndIf ( ) ;
+        }
+    }
+}
+#else
+
+void
+CfrTil_C_ConditionalExpression ( )
+{
+    Context * cntx = _Context_ ;
+    Interpreter * interp = cntx->Interpreter0 ;
+    CfrTil_BeginBlock ( ) ;
+    Interpret_Until_Token ( interp, ( byte* ) ":", 0 ) ;
+    CfrTil_EndBlock ( ) ;
+    CfrTil_BeginBlock ( ) ;
+    Interpret_C_Until_Token4 ( interp, ( byte* ) ";", ( byte* ) ",", ( byte* ) ")", "}", 0 ) ;
+    CfrTil_EndBlock ( ) ;
+    CfrTil_TrueFalseCombinator2 ( ) ;
+}
+#endif
 
 Boolean
 C_Syntax_AreWeParsingACFunctionCall ( Lexer * lexer )
 {
     if ( ! GetState ( _Context_, C_SYNTAX | INFIX_MODE ) ) return false ;
-    return _C_Syntax_AreWeParsingACFunctionCall ( & lexer->ReadLiner0->InputLine [ lexer->TokenStart_ReadLineIndex ] ) ; 
+    return _C_Syntax_AreWeParsingACFunctionCall ( & lexer->ReadLiner0->InputLine [ lexer->TokenStart_ReadLineIndex ] ) ;
 }
 

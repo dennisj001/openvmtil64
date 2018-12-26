@@ -317,11 +317,13 @@ Compiler_Init ( Compiler * compiler, uint64 state, int64 flags )
     compiler->ArrayEnds = 0 ;
     compiler->NumberOfNonRegisterLocals = 0 ;
     compiler->NumberOfLocals = 0 ;
+    compiler->NumberOfRegisterLocals = 0 ;
     compiler->NumberOfArgs = 0 ;
     compiler->NumberOfNonRegisterArgs = 0 ;
-    compiler->NumberOfRegisterLocals = 0 ;
     compiler->NumberOfRegisterArgs = 0 ;
+    compiler->NumberOfVariables = 0 ;
     compiler->NumberOfRegisterVariables = 0 ;
+    compiler->NumberOfNonRegisterVariables = 0 ;
     compiler->LocalsFrameSize = 0 ;
     compiler->AccumulatedOffsetPointer = 0 ;
     compiler->ReturnVariableWord = 0 ;
@@ -355,7 +357,7 @@ Compiler_New ( uint64 type )
     compiler->PointerToOffset = Stack_New ( 32, type ) ;
     compiler->CombinatorBlockInfoStack = Stack_New ( 64, type ) ;
     compiler->LocalsCompilingNamespacesStack = Stack_New ( 32, type ) ;
-    compiler->NamespacesStack = Stack_New ( 32, type ) ; //initialized when using
+    compiler->SpecialNamespacesStack = Stack_New ( 32, type ) ; //initialized when using
     compiler->PostfixLists = _dllist_New ( type ) ;
     compiler->GotoList = _dllist_New ( type ) ;
     compiler->OptimizeInfoList = _dllist_New ( type ) ;

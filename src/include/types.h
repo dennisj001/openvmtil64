@@ -509,7 +509,7 @@ typedef struct
     Boolean SetccTtt, JccTtt ;
     Boolean SetccNegFlag, JccNegFlag ;
     Word * LogicCodeWord ;
-    Namespace * LocalsNamespace ;
+    Namespace * BI_LocalsNamespace ;
 } BlockInfo ;
 typedef struct
 {
@@ -758,7 +758,7 @@ typedef struct
     Stack * LocalsCompilingNamespacesStack ;
     Stack * CombinatorBlockInfoStack ;
     Stack * BlockStack ;
-    Stack * NamespacesStack ;
+    Stack * SpecialNamespacesStack ;
     Stack * InfixOperatorStack ;
     dllist * OptimizeInfoList ;
 } Compiler ;

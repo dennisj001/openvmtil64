@@ -56,7 +56,7 @@ done:
             {
                 token = Lexer_ReadToken ( lexer ) ;
                 if ( String_Equal ( ".", ( char* ) token ) ) continue ;
-                word = _Interpreter_TokenToWord ( _Interpreter_, token ) ;
+                word = _Interpreter_TokenToWord ( _Interpreter_, token, - 1, - 1 ) ;
                 if ( word && ( word->CAttribute & ( C_TYPE | C_CLASS | NAMESPACE ) ) ) Finder_SetQualifyingNamespace ( _Finder_, word ) ;
                 else
                 {
@@ -201,7 +201,7 @@ _CfrTil_Parse_LocalsAndStackVariables ( int64 svf, int64 lispMode, ListObject * 
     Boolean regFlag = false ;
     byte *token, *returnVariable = 0 ;
     Namespace *typeNamespace = 0, *saveInNs = _CfrTil_->InNamespace ;
-    if ( ! localsNs ) localsNs = _Namespace_FindOrNew_Local ( nsStack ? nsStack : compiler->LocalsCompilingNamespacesStack ) ;
+    if ( ! localsNs ) localsNs = Namespace_FindOrNew_Local ( nsStack ? nsStack : compiler->LocalsCompilingNamespacesStack ) ;
 
     CfrTil_WordLists_PopWord ( ) ; // stop source code
     if ( svf ) svff = 1 ;
@@ -229,7 +229,7 @@ _CfrTil_Parse_LocalsAndStackVariables ( int64 svf, int64 lispMode, ListObject * 
                 if ( ( iword = Finder_FindWord_InOneNamespace ( _Finder_, word, ( byte* ) "init" ) )
                     || ( _Namespace_VariableValueGet ( word, ( byte* ) "size" ) > 8 ) )
 #endif                
-                typeNamespace = word ;
+                    typeNamespace = word ;
                 continue ;
             }
             if ( String_Equal ( ( char* ) token, "|" ) )
@@ -239,7 +239,14 @@ _CfrTil_Parse_LocalsAndStackVariables ( int64 svf, int64 lispMode, ListObject * 
             }
             if ( String_Equal ( ( char* ) token, "-t" ) ) // for setting W_TypeSignatureString
             {
-                token = _Lexer_LexNextToken_WithDelimiters ( lexer, 0, 1, 0, 1, LEXER_ALLOW_DOT ) ;
+                if ( lispMode )
+                {
+                    args = _LO_Next ( args ) ;
+                    if ( args->LAttribute & ( LIST | LIST_NODE ) ) args = _LO_First ( args ) ;
+                    token = ( byte* ) args->Lo_Name ;
+                    CfrTil_AddStringToSourceCode ( _CfrTil_, token ) ;
+                }
+                else token = _Lexer_LexNextToken_WithDelimiters ( lexer, 0, 1, 0, 1, LEXER_ALLOW_DOT ) ;
                 strncpy ( ( char* ) _CfrTil_->CurrentWordBeingCompiled->W_TypeSignatureString, ( char* ) token, 8 ) ;
                 continue ; // don't add a node to our temporary list for this token
             }
@@ -272,15 +279,15 @@ _CfrTil_Parse_LocalsAndStackVariables ( int64 svf, int64 lispMode, ListObject * 
                 else if ( Stringi_Equal ( token, ( byte* ) "EAX" ) ) getReturn |= RETURN_ACCUM ;
                 else if ( Stringi_Equal ( token, ( byte* ) "RAX" ) ) getReturn |= RETURN_ACCUM ;
                 else if ( Stringi_Equal ( token, ( byte* ) "TOS" ) ) getReturn |= RETURN_TOS ;
-                    //else if ( String_Equal ( token, ( byte* ) "0" ) ) getReturn |= DONT_REMOVE_STACK_VARIABLES ;
-                else returnVariable = token ;
+                else returnVariable = token ; //nb. if there is a return variable it must have already been declared as a parameter of local variable else it is an error
                 continue ;
             }
             if ( addWords )
             {
+add:
                 if ( svff )
                 {
-                    ctype = PARAMETER_VARIABLE ; // aka Arg
+                    ctype = PARAMETER_VARIABLE ; // aka an arg
                     if ( lispMode ) ctype |= T_LISP_SYMBOL ;
                 }
                 else
@@ -292,10 +299,7 @@ _CfrTil_Parse_LocalsAndStackVariables ( int64 svf, int64 lispMode, ListObject * 
                 {
                     ctype |= REGISTER_VARIABLE ;
                     numberOfRegisterVariables ++ ;
-                    //if ( ctype & LOCAL_VARIABLE ) compiler->NumberOfRegisterLocals ++ ;
-                    //else if ( ctype & PARAMETER_VARIABLE ) compiler->NumberOfRegisterArgs ++ ;
                 }
-                //word = _CfrTil_LocalWord ( token, ( ctype & LOCAL_VARIABLE ) ? ++ compiler->NumberOfLocals : ++ compiler->NumberOfArgs, ctype, ctype2, ltype, COMPILER_TEMP ) ; // svf : flag - whether stack variables are in the frame
                 word = DataObject_New ( ctype, 0, token, ctype, 0, 0, 0, 0, DICTIONARY, - 1, - 1 ) ;
                 if ( regFlag == true )
                 {
@@ -304,9 +308,7 @@ _CfrTil_Parse_LocalsAndStackVariables ( int64 svf, int64 lispMode, ListObject * 
                     {
                         if ( ! compiler->RegisterParameterList ) compiler->RegisterParameterList = _dllist_New ( TEMPORARY ) ;
                         _List_PushNew_ForWordList ( compiler->RegisterParameterList, word, 1 ) ;
-                        //compiler->NumberOfArgs ++ ;
                     }
-                    //else compiler->NumberOfLocals ++ ;
                     regFlag = false ;
                 }
                 if ( typeNamespace )
@@ -323,15 +325,15 @@ _CfrTil_Parse_LocalsAndStackVariables ( int64 svf, int64 lispMode, ListObject * 
     compiler->State |= getReturn ;
 
     // we support nested locals and may have locals in other blocks so the indexes are cumulative
-    if ( numberOfRegisterVariables && (!debugFlag)) Compile_Init_LocalRegisterParamenterVariables ( compiler ) ; 
+    if ( numberOfRegisterVariables && ( ! debugFlag ) ) Compile_Init_LocalRegisterParamenterVariables ( compiler ) ;
     if ( returnVariable ) compiler->ReturnVariableWord = _Finder_FindWord_InOneNamespace ( _Finder_, localsNs, returnVariable ) ;
 
     _CfrTil_->InNamespace = saveInNs ;
     finder->FoundWord = 0 ;
     Lexer_SetTokenDelimiters ( lexer, svDelimiters, COMPILER_TEMP ) ;
+    compiler->LocalsNamespace = localsNs ;
     SetState ( compiler, VARIABLE_FRAME, true ) ;
     SetState ( _CfrTil_, DEBUG_SOURCE_CODE_MODE, scm ) ;
-    compiler->LocalsNamespace = localsNs ;
     return localsNs ;
 }
 

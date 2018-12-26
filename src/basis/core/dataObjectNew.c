@@ -11,11 +11,7 @@ DataObject_New ( uint64 type, Word * word, byte * name, uint64 ctype, uint64 cty
 {
     tsrli = ( tsrli != - 1 ) ? tsrli : _Lexer_->TokenStart_ReadLineIndex ;
     scwi = ( scwi != - 1 ) ? scwi : _Lexer_->SC_Index ;
-    if ( word && ( ! ( type & ( T_LC_NEW | T_LC_LITERAL ) ) ) )
-    {
-        Word_Recycle ( word ) ;
-        //_CheckRecycleWord ( word ) ;
-    }
+    if ( word && ( ! ( type & ( T_LC_NEW | T_LC_LITERAL ) ) ) ) Word_Recycle ( word ) ;
     switch ( type )
     {
         case T_LC_NEW:
@@ -98,12 +94,12 @@ DataObject_New ( uint64 type, Word * word, byte * name, uint64 ctype, uint64 cty
         }
         case PARAMETER_VARIABLE: case LOCAL_VARIABLE: case (PARAMETER_VARIABLE | REGISTER_VARIABLE ): case (LOCAL_VARIABLE | REGISTER_VARIABLE ):
         {
-            word = _Compiler_LocalWord ( _Compiler_, name, ctype, 0, 0, DICTIONARY ) ;
+            word = _Compiler_LocalWord ( _Compiler_, name, ctype, ctype2, ltype, DICTIONARY ) ;
             break ;
         }
         default: case (T_LISP_SYMBOL | PARAMETER_VARIABLE ): case (T_LISP_SYMBOL | LOCAL_VARIABLE ): // REGISTER_VARIABLE combinations with others in this case
         {
-            word = Compiler_LocalWord ( _Compiler_, name, type, DICTIONARY ) ;
+            word = Compiler_LocalWord ( _Compiler_, name, type, ctype2, ltype, DICTIONARY ) ;
             break ;
         }
     }
@@ -132,7 +128,7 @@ _CfrTil_ObjectNew ( int64 size, byte * name, uint64 category, int64 allocType )
 void
 _Class_Object_Init ( Word * word, Namespace * ns )
 {
-    Stack * nsstack = _Context_->Compiler0->NamespacesStack ;
+    Stack * nsstack = _Context_->Compiler0->SpecialNamespacesStack ;
     Stack_Init ( nsstack ) ; // !! ?? put this in Compiler ?? !!
     // init needs to be done by the most super class first successively down to the current class 
     do
@@ -228,7 +224,7 @@ _CfrTil_Variable_New ( byte * name, int64 value )
     Word * word ;
     if ( CompileMode )
     {
-        word = Compiler_LocalWord ( _Compiler_, name, LOCAL_VARIABLE, DICTIONARY ) ;
+        word = Compiler_LocalWord ( _Compiler_, name, LOCAL_VARIABLE, 0, 0, DICTIONARY ) ;
         SetState ( _Compiler_, VARIABLE_FRAME, true ) ;
     }
     else word = _DObject_New ( name, value, ( NAMESPACE_VARIABLE | IMMEDIATE ), 0, 0, NAMESPACE_VARIABLE, ( byte* ) _DataObject_Run, 0, 1, 0, DICTIONARY ) ;
@@ -251,19 +247,6 @@ _CfrTil_Label ( byte * lname )
     Word * word = _DObject_New ( lname, ( int64 ) gotoInfo, CONSTANT | IMMEDIATE, 0, 0, CONSTANT, ( byte* ) _DataObject_Run, 0, 0, ns, DICTIONARY ) ;
 
     return word->Name ;
-}
-
-Word *
-Compiler_LocalWord ( Compiler * compiler, byte * name, int64 ctype, int64 allocType ) // svf : flag - whether stack variables are in the frame
-{
-    if ( ! GetState ( compiler, DOING_C_TYPE ) && ( ! GetState ( _LC_, LC_BLOCK_COMPILE ) ) )
-    {
-        _Namespace_FindOrNew_Local ( compiler->LocalsCompilingNamespacesStack ) ;
-        Finder_SetQualifyingNamespace ( _Finder_, 0 ) ;
-    }
-    Word * word = _Compiler_LocalWord ( compiler, name, ctype, 0, 0, allocType ) ; // svf : flag - whether stack variables are in the frame
-    word->CAttribute2 |= RECYCLABLE_LOCAL ;
-    return word ;
 }
 
 Word *

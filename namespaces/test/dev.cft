@@ -334,9 +334,9 @@ sp
     }fi 
 ;
 20 _fib dup p 6765 assert0 
-: _fib2 dup 2 < ?< >:< dup -- _fib2 swap 2 - _fib2 + >; ; 20 _fib2 nl p //pause //sp
+: _fib2 dup 2 < ?< >:< dup -- _fib2 swap 2 - _fib2 + >; ; 
 ' _fib2 find wdiss 
-20 _fib2 dup p 6765 assert0 
+20 _fib2 nl dup p 6765 assert0 //pause
 : _fib3 
     dup 2 < 
     ?< >:< 

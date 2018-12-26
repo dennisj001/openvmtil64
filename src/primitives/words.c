@@ -289,7 +289,7 @@ CfrTil_Do ( )
     if ( ! String_Equal ( token, "<does" ) )
     {
         DEBUG_SHOW ;
-        Interpreter_InterpretAToken ( interp, token, - 1 ) ;
+        Interpreter_InterpretAToken (interp, token, - 1 , -1) ;
     }
 }
 

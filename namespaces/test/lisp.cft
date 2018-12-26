@@ -242,28 +242,26 @@ Debug Lisp // test comment
 scOn
 ( ::
     "\ngoedel8 output : " ps  
-    : goedel8 (| n -- TOS ) 
+    : goedel8 (| n -- TOS -t "V.I"  ) 
         n 1 =
         { 
             'n var n @ p 
-            n 2 = n @ dup p 2 _assert0 // first n should be garbage here; second n 2
-            //{ 'n var n @ p n 3 = n @ 4 + dup p 7 _assert0 } ix // first n should be garbage here; second 7
-            { 'n var n @ p n 3 = n @ 4 + dup p 7 _assert0 } ix // first n should be garbage here; second 7
-            n @ 6 + 8 _assert0 
+            n 2 = n @ dup p 2 "goedel8_1_assert" assert  // first n should be garbage here; second n 2
+            //{ 'n var n @ p n 3 = n @ 4 + dup p 7 "goedel8_2_assert" assert } ix // first n should be garbage here; second 7
+            { 'n var n @ p n 3 = n @ 4 + dup p 7 "goedel8_3_assert" assert } ix // first n should be garbage here; second 7
+            n @ 6 + 8 "goedel8_4_assert" assert 
         } ix
         { 
             'n var n @ p 
             n 3 = 
             n dup @ 7 + = 
-            n @ dup p 10 _assert0 
+            n @ dup p 10 "goedel8_5_assert" assert 
         } ix // first n should be garbage here; second 7
         n @ 8 + dup p
     ;
-    goedel8 9 _assert0 "\ngoedel8 output should read : \n'junk' 2 'junk' 7 'junk' 10 9" ps //pause
+    goedel8 9 "goedel8_6_assert" assert1 "\ngoedel8 output should read : \n'junk' 2 'junk' 7 'junk' 10 9" ps //pause
 ) 
-//pause
-tick goedel8 find wdiss 
-sp
+tick goedel8 find wdiss //pause sp
 Lisp
 //: sp ;
 (list (1 2)) (list 1 2)

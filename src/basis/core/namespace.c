@@ -135,7 +135,8 @@ void
 _Namespace_AddToUsingList ( Namespace * ns )
 {
     int64 i ;
-    Stack * stack = _Context_->Compiler0->NamespacesStack ;
+    Namespace * svNs = ns ;
+    Stack * stack = _Context_->Compiler0->SpecialNamespacesStack ;
     Stack_Init ( stack ) ;
     do
     {
@@ -150,6 +151,7 @@ _Namespace_AddToUsingList ( Namespace * ns )
         if ( ns->W_WordListOriginalWord ) ns = ns->W_WordListOriginalWord ; //_Namespace_Find ( ns->Name, 0, 0 ) ; // this is needed because of Compiler_PushCheckAndCopyDuplicates
         Namespace_SetState ( ns, USING ) ;
     }
+    //Namespace_SetState ( svNs, USING ) ;
 }
 
 void
@@ -318,7 +320,7 @@ void
 Namespace_RemoveFromUsingList ( byte * name )
 {
     Namespace * ns = Namespace_Find ( name ) ;
-    if ( String_Equal ( ns->Name, "System" ) ) _Printf ( ( byte* ) "\n\nSystem namespace being cleared %s", Context_Location () ) ;
+    if ( String_Equal ( ns->Name, "System" ) ) _Printf ( ( byte* ) "\n\nSystem namespace being cleared %s", Context_Location ( ) ) ;
     if ( ns ) _Namespace_RemoveFromUsingList ( ns ) ;
 }
 // this is simple, for more complete use _Namespace_RemoveFromSearchList
@@ -360,18 +362,18 @@ _Namespace_Clear ( Namespace * ns )
         //if ( Is_DebugModeOn )
         {
             _Printf ( ( byte* ) "\n\n_Namespace_Clear : before : name = %s\n", ns->Name ) ;
-            _List_PrintNames ( ns->W_List, -1, 0 ) ;
+            _List_PrintNames ( ns->W_List, - 1, 0 ) ;
         }
 #endif        
         //if ( String_Equal ( ns->Name, "LispDefinesNamespace" )) _Printf ( (byte*)"\n got it\n" ), Pause () ;
-        DLList_Recycle_NamespaceList (  ns->W_List ) ; 
+        DLList_Recycle_NamespaceList ( ns->W_List ) ;
         DLList_RemoveWords ( ns->W_List ) ;
         _dllist_Init ( ns->W_List ) ;
 #if 0        
         //if ( Is_DebugModeOn )
         {
             _Printf ( ( byte* ) "\n\n_Namespace_Clear : after : name = %s\n", ns->Name ) ;
-            _List_PrintNames ( ns->W_List, -1, 0 ) ;
+            _List_PrintNames ( ns->W_List, - 1, 0 ) ;
             //Pause ( ) ;
         }
 #endif        
@@ -409,29 +411,24 @@ Namespace_New ( byte * name, Namespace * containingNs )
 Namespace *
 Namespace_FindOrNew_SetUsing ( byte * name, Namespace * containingNs, int64 setUsingFlag )
 {
-    //if ( ! isprint ( name [0] ) ) Error_Abort ( "\nNamespace must begin with printable character!" ) ;
     if ( ! containingNs ) containingNs = _CfrTil_->Namespaces ;
     Namespace * ns = _Namespace_Find ( name, containingNs, 0 ) ;
-    if ( ! ns )
-    {
-        ns = Namespace_New ( name, containingNs ) ;
-    }
+    if ( ! ns ) ns = Namespace_New ( name, containingNs ) ;
     if ( setUsingFlag ) Namespace_SetState ( ns, USING ) ;
     return ns ;
 }
 
 Namespace *
-_Namespace_FindOrNew_Local ( Stack * nsStack )
+Namespace_FindOrNew_Local ( Stack * nsStack )
 {
     int64 d = Stack_Depth ( nsStack ) ;
     byte bufferData [ 32 ], *buffer = ( byte* ) bufferData ;
-    //if ( d > 3 ) _Printf ( ( byte* ) "\nlocals = %d\n", d ), Pause ( ) ;
     sprintf ( ( char* ) buffer, "locals_%ld", d ) ;
     Namespace * ns = Namespace_FindOrNew_SetUsing ( buffer, _CfrTil_->Namespaces, 1 ) ;
     _Namespace_ActivateAsPrimary ( ns ) ;
-    Stack_Push ( nsStack, ( int64 ) ns ) ;
+    Stack_Push ( nsStack, ( int64 ) ns ) ; // nb. this is where the the depth increase
     BlockInfo * bi = ( BlockInfo * ) Stack_Top ( _Context_->Compiler0->BlockStack ) ;
-    bi->LocalsNamespace = ns ;
+    bi->BI_LocalsNamespace = ns ;
     return ns ;
 }
 

@@ -177,7 +177,7 @@ Do_NextArrayToken ( byte * token, Word * arrayBaseObject, int64 objSize, Boolean
     if ( *variableFlag ) Set_CompileMode ( true ) ;
     else Set_CompileMode ( false ) ;
     if ( word ) Interpreter_DoWord ( interp, word, -1, -1 ) ; //word->W_RL_Index, word->W_SC_Index ) ;
-    else Interpreter_InterpretAToken ( interp, token, - 1 ) ;
+    else Interpreter_InterpretAToken (interp, token, - 1 , -1) ;
     DEBUG_SHOW ;
     Set_CompileMode ( saveCompileMode ) ;
     SetState ( compiler, COMPILE_MODE, saveCompileMode ) ;

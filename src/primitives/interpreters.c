@@ -37,7 +37,6 @@ CfrTil_ParenthesisComment ( )
         char * token = ( char* ) Lexer_ReadToken ( lexer ) ;
         if ( strcmp ( token, "*/" ) == 0 ) return ;
     }
-    //Lexer_SourceCodeOn ( _Lexer_ ) ;
     if ( Compiling ) SetState ( lexer, ( ADD_TOKEN_TO_SOURCE | ADD_CHAR_TO_SOURCE ), svState ) ;
 }
 
@@ -51,9 +50,7 @@ CfrTil_Define ( )
     Interpret_ToEndOfLine ( interp ) ;
     int64 locals = Stack_Depth ( _Context_->Compiler0->LocalsCompilingNamespacesStack ) ;
     SetState ( interp, PREPROCESSOR_DEFINE, false ) ;
-    //int64 args = cntx->Compiler0->NumberOfArgs, locals = cntx->Compiler0->NumberOfLocals ;
     CfrTil_SemiColon ( ) ;
-    //if (( ! args ) && ( ! locals )) 
     CfrTil_Inline ( ) ;
     if ( locals ) CfrTil_Prefix ( ) ;
     CfrTil_SourceCode_Init ( ) ; //don't leave the define in sc
@@ -114,7 +111,7 @@ void
 CfrTil_TokenToWord ( )
 {
     byte * token = ( byte* ) DataStack_Pop ( ) ;
-    DataStack_Push ( ( int64 ) _Interpreter_TokenToWord ( _Context_->Interpreter0, token ) ) ;
+    DataStack_Push ( ( int64 ) _Interpreter_TokenToWord (_Context_->Interpreter0, token , -1, -1) ) ;
 }
 
 void
@@ -134,7 +131,7 @@ _CfrTil_Interpret_ReadToList ( )
     while ( token = Lexer_ReadToken ( _Lexer_ ) )
     {
         if ( String_Equal ( token, ";l" ) ) break ;
-        Word * word = _Interpreter_TokenToWord ( interp, token ) ;
+        Word * word = _Interpreter_TokenToWord (interp, token , -1, -1) ;
         if ( word )
         {
 

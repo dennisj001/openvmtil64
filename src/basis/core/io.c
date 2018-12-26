@@ -114,7 +114,7 @@ Emit ( byte c )
 void
 Context_DoPrompt ( Context * cntx )
 {
-    if ( ReadLiner_GetLastChar() != '\n' )
+    if ( ( ReadLiner_GetLastChar() != '\n' ) || ( ! IS_INCLUDING_FILES ) || ( GetState ( _Debugger_, DBG_ACTIVE ) ) )
     {
         //int x = 0, y = 0 ;
         //getCursor ( &x, &y ) ;

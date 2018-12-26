@@ -228,7 +228,7 @@ LO_Cond ( ListObject * l0, ListObject * locals )
         tfTestNode = _LO_Eval ( lc, tfTestNode, locals, 1 ) ;
         if ( ( tfTestNode != nil ) && ( *tfTestNode->Lo_PtrToValue ) )
         {
-            return _LO_Eval ( lc, LO_CopyOne (trueNode), locals, 1 ) ;
+            return _LO_Eval ( lc, LO_CopyOne ( trueNode ), locals, 1 ) ;
         }
             // nb we have to LO_CopyOne here else we return the whole rest of the list 
             // and we can't remove it else it could break a LambdaBody, etc.
@@ -237,7 +237,7 @@ LO_Cond ( ListObject * l0, ListObject * locals )
             tfTestNode = elseNode = _LO_Next ( trueNode ) ;
         }
     }
-    return _LO_Eval ( lc, LO_CopyOne (elseNode), locals, 1 ) ; // last one no need to copy
+    return _LO_Eval ( lc, LO_CopyOne ( elseNode ), locals, 1 ) ; // last one no need to copy
 }
 
 // lisp 'list' function
@@ -392,14 +392,14 @@ _LO_CfrTil ( ListObject * lfirst )
             word->W_SourceCode = String_New_SourceCode ( _CfrTil_->SC_Buffer ) ;
             if ( ldata1 && String_Equal ( ldata1->Name, ( byte * ) ":" ) )
             {
-                CfrTil_InitSourceCode_WithName ( _CfrTil_, (byte*) "(", 1 ) ;
+                CfrTil_InitSourceCode_WithName ( _CfrTil_, ( byte* ) "(", 1 ) ;
             }
             _LO_Semi ( word ) ;
             word->W_SourceCode = lc->LC_SourceCode ;
         }
-        else
+        else //if ( ldata )
         {
-            word1 = _Interpreter_TokenToWord ( cntx->Interpreter0, ldata->Name ) ;
+            word1 = _Interpreter_TokenToWord ( cntx->Interpreter0, ldata->Name, ldata->W_RL_Index, ldata->W_SC_Index ) ;
             Interpreter_DoWord ( cntx->Interpreter0, word1, ldata->W_RL_Index, ldata->W_SC_Index ) ;
         }
     }

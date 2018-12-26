@@ -176,7 +176,7 @@ TSI_TypeStatus_Print ( TSI *tsi )
 {
     byte buffer [128] ;
     buffer [0] = 0 ;
-    _Printf ( ( byte* ) "\n%s :: opWord : %s.%s :: type expected : %s :: type recorded : %s : at %s", tsi->TypeErrorStatus ? "apparent type mismatch" : "type match",
+    _Printf ( ( byte* ) "\n%s :: opWord : %s.%s :: type expected : %s :: type recorded : %s\n\t : at %s", tsi->TypeErrorStatus ? "apparent type mismatch" : "type match",
         tsi->OpWord->S_ContainingNamespace ? tsi->OpWord->S_ContainingNamespace->Name : ( byte* ) "<literal>",
         tsi->OpWord->Name, Word_ExpandTypeLetterSignature ( tsi->OpWord, 1 ), tsi->ActualTypeStackRecordingBuffer, Context_Location ( ) ) ;
 }

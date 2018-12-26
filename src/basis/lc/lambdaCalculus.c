@@ -72,7 +72,7 @@ _LO_New_RawStringOrLiteral ( Lexer * lexer, byte * token, int64 qidFlag, int64 t
     {
         uint64 ctokenType = qidFlag ? OBJECT : lexer->TokenType | LITERAL ;
         Word * word = _DObject_New ( lexer->OriginalToken, lexer->Literal, ( ctokenType | IMMEDIATE | LITERAL ),
-            0, ctokenType, ctokenType, ( byte* ) _DataObject_Run, 0, 0, 0, LISP ) ; //_LC_->LispTempNamespace, LISP ) ;
+            0, ctokenType, ctokenType, ( byte* ) _DataObject_Run, 0, 0, 0, LISP ) ; 
         if ( ( ! qidFlag ) && ( lexer->TokenType & ( T_RAW_STRING ) ) )
         {
             // nb. we don't want to do this block with literals it slows down the eval and is wrong

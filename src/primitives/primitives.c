@@ -56,14 +56,14 @@ CPrimitive CPrimitives [] = {
     //{ "()", 0, 0, 0, CfrTil_NoOp, IMMEDIATE, 0, 0, "C", "Root" },
     { "(", 0, 0, 0, CfrTil_C_LeftParen, IMMEDIATE | KEYWORD, LEFT_PAREN, 0, "C", "Root" },
     { "(|", 0, 0, 0, CfrTil_LocalVariablesBegin, IMMEDIATE, 0, 0, "C", "Root" },
-    { "if{", 0, 0, 0, CfrTil_If, IMMEDIATE, 0, 0, "C", "Root" },
+    { "if{", 0, 0, 0, CfrTil_If_ConditionalExpression, IMMEDIATE, 0, 0, "C", "Root" },
     { "}else{", 0, 0, 0, CfrTil_Else, IMMEDIATE, 0, 0, "C", "Root" },
     { "}fi", 0, 0, 0, CfrTil_EndIf, IMMEDIATE, 0, 0, "C", "Root" },
     { "case", 0, 0, 0, CfrTil_Case, IMMEDIATE, 0, 0, "C", "Root" },
     { "switch", 0, 0, 0, CfrTil_Switch, IMMEDIATE, 0, 0, "C", "Root" },
     { ">?", 0, 0, 0, CfrTil_EndIf, IMMEDIATE, 0, 0, "C", "Root" },
     { ">:<", 0, 0, 0, CfrTil_Else, IMMEDIATE, 0, 0, "C", "Root" },
-    { "?<", 0, 0, 0, CfrTil_If, IMMEDIATE, 0, 0, "C", "Root" },
+    { "?<", 0, 0, 0, CfrTil_If_ConditionalExpression, IMMEDIATE, 0, 0, "C", "Root" },
     { "++", "I.I", 5, INC, CfrTil_PlusPlus, IMMEDIATE | CATEGORY_OP | CATEGORY_OP_1_ARG | CATEGORY_PLUS_PLUS_MINUS_MINUS, 0, 0, "C", "Root" },
     { "--", "I.I", 5, DEC, CfrTil_MinusMinus, IMMEDIATE | CATEGORY_OP | CATEGORY_OP_1_ARG | CATEGORY_PLUS_PLUS_MINUS_MINUS, 0, 0, "C", "Root" },
     { "cfib", 0, 0, 0, CFib, 0, 0, 0, "C", "Root" },
@@ -229,7 +229,7 @@ CPrimitive CPrimitives [] = {
 
     { "_fi", 0, 0, 0, CfrTil_EndIf, IMMEDIATE, 0, 0, "Asm", "Root" },
     { "_else_", 0, 0, 0, CfrTil_Else, IMMEDIATE, 0, 0, "Asm", "Root" },
-    { "if_", 0, 0, 0, CfrTil_If, IMMEDIATE, 0, 0, "Asm", "Root" },
+    { "if_", 0, 0, 0, CfrTil_If_ConditionalExpression, IMMEDIATE, 0, 0, "Asm", "Root" },
     { "Jmp", 0, 0, 0, CfrTil_JMP, IMMEDIATE, 0, 0, "Asm", "Root" },
     { "jmpHere", 0, 0, 0, CfrTil_JmpToHere, IMMEDIATE, 0, 0, "Asm", "Root" },
     { "Jcc", 0, 0, 0, CfrTil_Compile_Jcc, IMMEDIATE, 0, 0, "Asm", "Root" },
@@ -344,7 +344,7 @@ CPrimitive CPrimitives [] = {
     { "pause", 0, 0, 0, OpenVmTil_Pause, 0, 0, 0, "System", "Root" },
     { "_pause", 0, 0, 0, OpenVmTil_Pause, 0, 0, 0, "System", "Root" },
     { "registers", 0, 0, 0, _Debugger_CpuState_Show, 0, 0, 0, "System", "Root" },
-    { "if", 0, 0, 0, CfrTil_If, IMMEDIATE, 0, 0, "Shell", "Root" },
+    { "if", 0, 0, 0, CfrTil_If_ConditionalExpression, IMMEDIATE, 0, 0, "Shell", "Root" },
     { "else", 0, 0, 0, CfrTil_Else, IMMEDIATE, 0, 0, "Shell", "Root" },
     { "endif", 0, 0, 0, CfrTil_EndIf, IMMEDIATE, 0, 0, "Shell", "Root" },
     { "_sh", 0, 0, 0, ShellEscape_Postfix, 0, 0, 0, "Shell", "Root" },
@@ -492,7 +492,7 @@ CPrimitive CPrimitives [] = {
     { ":", 0, 0, 0, CfrTil_Colon, IMMEDIATE | KEYWORD, 0, 0, "Reserved", "Compiler" },
     { "semi", 0, 0, 0, CfrTil_SemiColon, KEYWORD, 0, 0, "Reserved", "Compiler" },
     { ";", 0, 0, 0, CfrTil_SemiColon, IMMEDIATE | KEYWORD, SYNTACTIC, 0, "Reserved", "Compiler" },
-    { "}", 0, 0, 0, CfrTil_EndBlock, IMMEDIATE | KEYWORD, BLOCK_DELIMITER, 0, "Reserved", "Compiler" }, // moved to init.cft and renamed below
+    { "}", 0, 0, 0, ( block ) CfrTil_EndBlock, IMMEDIATE | KEYWORD, BLOCK_DELIMITER, 0, "Reserved", "Compiler" }, // moved to init.cft and renamed below
     { "{", 0, 0, 0, ( block ) CfrTil_BeginBlock, IMMEDIATE | KEYWORD, BLOCK_DELIMITER, 0, "Reserved", "Compiler" }, // moved to init.cft and renamed below
     { "end", 0, 0, 0, CfrTil_EndBlock, IMMEDIATE | KEYWORD, BLOCK_DELIMITER, 0, "Reserved", "Compiler" },
     { "immediate", 0, 0, 0, CfrTil_Immediate, IMMEDIATE | KEYWORD, 0, 0, "Reserved", "Compiler" },

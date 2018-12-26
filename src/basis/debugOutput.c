@@ -117,10 +117,11 @@ Debugger_ParseFunctionLocalVariables ( Debugger * debugger, Lexer * lexer, Boole
         {
             if ( ! ( debugger->LevelBitNamespaceMap & ( ( uint64 ) 1 << ( levelBit ) ) ) )
             {
-                _Namespace_FindOrNew_Local ( debugger->LocalsNamespacesStack ) ;
+                Namespace_FindOrNew_Local ( debugger->LocalsNamespacesStack ) ;
                 debugger->LevelBitNamespaceMap |= ( ( uint64 ) 1 << ( levelBit ) ) ;
             }
             if ( String_Equal ( token, "var" ) ) aToken = prevToken ;
+#if 0            
             else
             {
                 while ( 1 )
@@ -130,6 +131,7 @@ Debugger_ParseFunctionLocalVariables ( Debugger * debugger, Lexer * lexer, Boole
                     _Compiler_LocalWord ( _Compiler_, aToken, LOCAL_VARIABLE, 0, 0, COMPILER_TEMP ) ;
                 }
             }
+#endif            
         }
         else if ( String_Equal ( token, "<end>" ) ) return ;
         prevPrevToken = prevToken ;
@@ -194,7 +196,7 @@ _Debugger_Locals_Show ( Debugger * debugger, Word * scWord )
         compiler->NumberOfRegisterArgs = svRArgs ;
         compiler->LocalsCompilingNamespacesStack = svStack ;
         compiler->LocalsNamespace = svNamespace ;
-        //Namespace_SetState ( compiler->LocalsNamespace, USING ) ;
+        Namespace_SetState ( compiler->LocalsNamespace, USING ) ;
         _CfrTil_->InNamespace = svInNamespace ;
         SetState ( compiler, VARIABLE_FRAME, false ) ;
         d0 ( _Namespace_PrintWords ( compiler->LocalsNamespace ) ) ;

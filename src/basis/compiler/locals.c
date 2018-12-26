@@ -33,7 +33,9 @@
 Word *
 _Compiler_LocalWord ( Compiler * compiler, byte * name, int64 ctype, int64 ctype2, int64 ltype, int64 allocType )
 {
-    Word *word = _DObject_New ( name, 0, ( ctype | IMMEDIATE ), ctype2, ltype, LOCAL_VARIABLE, ( byte* ) _DataObject_Run, 0, 1, 0, allocType ) ;
+    BlockInfo * bi = ( BlockInfo * ) Stack_Top ( compiler->BlockStack ) ;
+    Word *word = _DObject_New ( name, 0, ( ctype | IMMEDIATE ), ctype2, ltype, LOCAL_VARIABLE, ( byte* ) _DataObject_Run, 0, 1, bi->BI_LocalsNamespace, allocType ) ;
+    //Word *word = _DObject_New ( name, 0, ( ctype | IMMEDIATE ), ctype2, ltype, LOCAL_VARIABLE, ( byte* ) _DataObject_Run, 0, 1, 0, allocType ) ;
     compiler->NumberOfVariables ++ ;
     if ( ctype & REGISTER_VARIABLE )
     {
@@ -63,6 +65,27 @@ _Compiler_LocalWord ( Compiler * compiler, byte * name, int64 ctype, int64 ctype
             ++ compiler->NumberOfNonRegisterArgs ;
         }
     }
+    return word ;
+}
+
+Word *
+Compiler_LocalWord ( Compiler * compiler, byte * name, int64 ctype, int64 ctype2, int64 ltype, int64 allocType ) // svf : flag - whether stack variables are in the frame
+{
+#if 0    
+    if ( ! GetState ( compiler, DOING_C_TYPE ) && ( ! GetState ( _LC_, LC_BLOCK_COMPILE ) ) )
+    {
+        Finder_SetQualifyingNamespace ( _Finder_, 0 ) ;
+        Namespace_FindOrNew_Local ( compiler->LocalsCompilingNamespacesStack ) ;
+    }
+#endif    
+    //if ( ( ( ! compiler->LocalsNamespace ) || ( ! bi->LocalsNamespace ) ) && ( ! GetState ( compiler, DOING_C_TYPE ) && ( ! GetState ( _LC_, LC_BLOCK_COMPILE ) ) ) )
+    if ( ( ! GetState ( compiler, DOING_C_TYPE ) && ( ! GetState ( _LC_, LC_BLOCK_COMPILE ) ) ) )
+    {
+        Namespace_FindOrNew_Local ( compiler->LocalsCompilingNamespacesStack ) ;
+        Finder_SetQualifyingNamespace ( _Finder_, 0 ) ;
+    }
+    Word * word = _Compiler_LocalWord ( compiler, name, ctype, 0, 0, allocType ) ; // svf : flag - whether stack variables are in the frame
+    word->CAttribute2 |= RECYCLABLE_LOCAL ;
     return word ;
 }
 
@@ -107,6 +130,7 @@ Compiler_SetLocalsFrameSize_AtItsCellOffset ( Compiler * compiler )
 
 // Compiler_RemoveLocalFrame : the logic definitely needs to be simplified???
 // Compiler_RemoveLocalFrame has "organically evolved" it need to be logically simplified??
+
 void
 Compiler_RemoveLocalFrame ( Compiler * compiler )
 {
@@ -118,7 +142,7 @@ Compiler_RemoveLocalFrame ( Compiler * compiler )
         ( ! String_Equal ( _CfrTil_->CurrentWordBeingCompiled->S_ContainingNamespace->Name, "void" ) ) )
         SetState ( compiler, RETURN_TOS, true ) ;
     // nb. these variables have no lasting lvalue - they exist on the stack - we can only return their rvalue
-    if ( compiler->ReturnVariableWord ) 
+    if ( compiler->ReturnVariableWord )
     {
         compiler->ReturnVariableWord = Compiler_CopyDuplicatesAndPush ( compiler->ReturnVariableWord, - 1, - 1 ) ;
         if ( ! ( compiler->ReturnVariableWord->CAttribute & REGISTER_VARIABLE ) ) Compile_GetVarLitObj_RValue_To_Reg ( compiler->ReturnVariableWord, ACC ) ; // need to copy because ReturnVariableWord may have been used within the word already
@@ -152,10 +176,10 @@ Compiler_RemoveLocalFrame ( Compiler * compiler )
     // nb : stack was already adjusted accordingly for this above by reducing the SUBI subAmount or adding if there weren't any parameter variables
     if ( returnValueFlag || ( IsWordRecursive && ( ! GetState ( compiler, RETURN_ACCUM ) ) ) )
     {
-        if ( compiler->ReturnVariableWord ) 
+        if ( compiler->ReturnVariableWord )
         {
-            Compiler_Word_SCH_CPUSCA( compiler->ReturnVariableWord, 0 )  ;
-            if ( compiler->ReturnVariableWord->CAttribute & REGISTER_VARIABLE ) 
+            Compiler_Word_SCH_CPUSCA ( compiler->ReturnVariableWord, 0 ) ;
+            if ( compiler->ReturnVariableWord->CAttribute & REGISTER_VARIABLE )
             {
                 _Compile_Move_Reg_To_StackN ( DSP, 0, compiler->ReturnVariableWord->RegToUse ) ;
                 return ;

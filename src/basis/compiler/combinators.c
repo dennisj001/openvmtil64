@@ -13,7 +13,7 @@
 // nb : can't fully optimize if there is code between blocks
 // check if there is any code between blocks if so we can't optimize fully
 void
-CfrTil_EndCombinator ( int64 quotesUsed, int64 moveFlag, int64 jccBlockIndex, Boolean jccBlockFlag )
+CfrTil_EndCombinator (int64 quotesUsed, int64 moveFlag)
 {
     Compiler * compiler = _Context_->Compiler0 ;
     BlockInfo *bi = ( BlockInfo * ) _Stack_Pick ( compiler->CombinatorBlockInfoStack, quotesUsed - 1 ) ; // -1 : remember - stack is zero based ; stack[0] is top
@@ -59,7 +59,7 @@ CfrTil_DropBlock ( )
     {
         CfrTil_BeginCombinator ( 1 ) ;
         //Block_CopyCompile ( ( byte* ) dropBlock, 0, 0 ) ; // in case there are control labels
-        CfrTil_EndCombinator ( 1, 0, 0, 0 ) ;
+        CfrTil_EndCombinator (1, 0) ;
     }
 }
 
@@ -72,7 +72,7 @@ CfrTil_BlockRun ( )
     {
         CfrTil_BeginCombinator ( 1 ) ;
         Block_CopyCompile ( ( byte* ) doBlock, 0, 0 ) ;
-        CfrTil_EndCombinator ( 1, 1, 0, 0 ) ; // 0 : don't copy
+        CfrTil_EndCombinator (1, 1) ; // 0 : don't copy
     }
     else
     {
@@ -95,7 +95,7 @@ CfrTil_LoopCombinator ( )
         compiler->ContinuePoint = start ;
         Block_CopyCompile ( ( byte* ) loopBlock, 0, 0 ) ;
         _Compile_JumpToAddress ( start ) ;
-        CfrTil_EndCombinator ( 1, 1, 0, 0 ) ;
+        CfrTil_EndCombinator (1, 1) ;
     }
     else
     {
@@ -121,7 +121,7 @@ CfrTil_WhileCombinator ( )
         Block_CopyCompile ( ( byte* ) trueBlock, 0, 0 ) ;
         _Compile_JumpToAddress ( start ) ;
         CfrTil_CalculateAndSetPreviousJmpOffset_ToHere ( ) ;
-        CfrTil_EndCombinator ( 2, 1, 1, 1 ) ;
+        CfrTil_EndCombinator (2, 1) ;
     }
     else
     {
@@ -150,7 +150,7 @@ CfrTil_DoWhileCombinator ( )
         Block_CopyCompile ( ( byte* ) testBlock, 0, 1 ) ;
         _Compile_JumpToAddress ( start ) ;
         CfrTil_CalculateAndSetPreviousJmpOffset_ToHere ( ) ;
-        CfrTil_EndCombinator ( 2, 1, 0, 1 ) ;
+        CfrTil_EndCombinator (2, 1) ;
     }
     else
     {
@@ -180,7 +180,7 @@ CfrTil_If1Combinator ( )
         Stack_Push_PointerToJmpOffset ( ) ;
         Block_CopyCompile ( ( byte* ) doBlock, 0, 0 ) ;
         CfrTil_CalculateAndSetPreviousJmpOffset_ToHere ( ) ;
-        CfrTil_EndCombinator ( 1, 1, 0, 0 ) ;
+        CfrTil_EndCombinator (1, 1) ;
         //DBI_OFF ;
     }
     else
@@ -202,7 +202,7 @@ CfrTil_If2Combinator ( )
         Block_CopyCompile ( ( byte* ) testBlock, 1, 1 ) ;
         Block_CopyCompile ( ( byte* ) doBlock, 0, 0 ) ;
         CfrTil_CalculateAndSetPreviousJmpOffset_ToHere ( ) ;
-        CfrTil_EndCombinator ( 2, 1, 1, 1 ) ;
+        CfrTil_EndCombinator (2, 1) ;
     }
     else
     {
@@ -223,18 +223,15 @@ CfrTil_TrueFalseCombinator2 ( )
     DataStack_DropN ( 2 ) ;
     if ( CompileMode )
     {
-        CfrTil_BeginCombinator ( 2 ) ;
-
-        Compile_BlockLogicTest ( 0 ) ;
+        BlockInfo * bi = CfrTil_BeginCombinator ( 2 ) ;
+        Compile_BlockLogicTest ( bi ) ;
         _Compile_UninitializedJumpEqualZero ( ) ;
         Stack_Push_PointerToJmpOffset ( ) ;
-
         Block_CopyCompile ( ( byte* ) trueBlock, 1, 0 ) ;
-        CfrTil_Else ( ) ;
+        CfrTil_CalculateAndSetPreviousJmpOffset_ToHere ( ) ;
         Block_CopyCompile ( ( byte* ) falseBlock, 0, 0 ) ;
         CfrTil_EndIf ( ) ;
-
-        CfrTil_EndCombinator ( 2, 1, 0, 0 ) ;
+        CfrTil_EndCombinator (2, 1) ;
     }
     else
     {
@@ -259,7 +256,7 @@ CfrTil_TrueFalseCombinator3 ( )
         CfrTil_Else ( ) ;
         Block_CopyCompile ( ( byte* ) falseBlock, 0, 0 ) ;
         CfrTil_EndIf ( ) ;
-        CfrTil_EndCombinator ( 3, 1, 2, 1 ) ;
+        CfrTil_EndCombinator (3, 1) ;
     }
     else
     {
@@ -303,7 +300,7 @@ CfrTil_DoWhileDoCombinator ( )
         Block_CopyCompile ( ( byte* ) doBlock2, 0, 0 ) ;
         _Compile_JumpToAddress ( start ) ; // runtime
         CfrTil_CalculateAndSetPreviousJmpOffset_ToHere ( ) ;
-        CfrTil_EndCombinator ( 3, 1, 1, 1 ) ;
+        CfrTil_EndCombinator (3, 1) ;
     }
     else
     {
@@ -346,7 +343,7 @@ CfrTil_ForCombinator ( )
         _Compile_JumpToAddress ( start ) ;
         CfrTil_CalculateAndSetPreviousJmpOffset_ToHere ( ) ;
 
-        CfrTil_EndCombinator ( 4, 1, 2, 1 ) ;
+        CfrTil_EndCombinator (4, 1) ;
     }
     else
     {

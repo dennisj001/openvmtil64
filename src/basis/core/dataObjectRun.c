@@ -6,7 +6,7 @@ _DataObject_Run ( Word * word0 )
 {
     Context * cntx = _Context_ ;
     //uint64 * dsp = _Dsp_, *tsp = _CfrTil_->TypeWordStack->StackPointer ;
-    
+
     Word * word = _Context_CurrentWord ( cntx ) ; // = word0 : set CurrentlyRunningWord with the DObject Compile_SetCurrentlyRunningWord_Call_TestRSP created word
     Word * ns = word0 ; // set CurrentlyRunningWord with the DObject Compile_SetCurrentlyRunningWord_Call_TestRSP created word
     cntx->Interpreter0->w_Word = word ; // for ArrayBegin : all literals are run here
@@ -75,7 +75,7 @@ _Namespace_Do_C_Type ( Namespace * ns )
     Context * cntx = _Context_ ;
     Lexer * lexer = cntx->Lexer0 ;
     Compiler * compiler = cntx->Compiler0 ;
-    byte * token1, *token2 ;
+    byte *token, * token1, *token2 ;
     Word * word ;
     if ( ! GetState ( compiler, DOING_C_TYPE ) )
     {
@@ -84,7 +84,7 @@ _Namespace_Do_C_Type ( Namespace * ns )
         {
             if ( ( ! Compiling ) )
             {
-                Compiler_Init ( compiler, 0, 0 ) ; 
+                Compiler_Init ( compiler, 0, 0 ) ;
                 CfrTil_InitSourceCode_WithName ( _CfrTil_, ns->Name, 1 ) ;
             }
             CfrTil_WordList_Init ( 0, 1 ) ;
@@ -96,8 +96,8 @@ _Namespace_Do_C_Type ( Namespace * ns )
                 _LC_ = 0 ;
                 // ?? parts of this could be screwing up other things and adds an unnecessary level of complexity
                 // for parsing C functions 
-                token1 = _Lexer_NextNonDebugOrCommentTokenWord (lexer, 0, 1, 0 ) ; // ? peekFlag ?
-                int64 t1_tsrli = lexer->TokenStart_ReadLineIndex ;
+                int64 t1_tsrli = lexer->TokenStart_ReadLineIndex, t1_scwi = lexer->SC_Index ;
+                token1 = _Lexer_NextNonDebugOrCommentTokenWord ( lexer, 0, 1, 0 ) ; // ? peekFlag ?
                 token2 = Lexer_PeekNextNonDebugTokenWord ( lexer, 1 ) ;
                 if ( token2 [0] == '(' )
                 {
@@ -116,13 +116,10 @@ _Namespace_Do_C_Type ( Namespace * ns )
                         byte * token = Lexer_ReadToken ( lexer ) ;
                         if ( String_Equal ( token, "s{" ) )
                         {
-                            Interpreter_InterpretAToken ( _Interpreter_, token, - 1 ) ;
+                            Interpreter_InterpretAToken ( _Interpreter_, token, - 1, - 1 ) ;
                             break ;
                         }
-                        else if ( token [ 0 ] == '{' )
-                        {
-                            break ; // take nothing else (would be Syntax Error ) -- we have already done CfrTil_BeginBlock
-                        }
+                        else if ( token [ 0 ] == '{' ) break ; // take nothing else (would be Syntax Error ) -- we have already done CfrTil_BeginBlock
                         else _Lexer_ConsiderDebugAndCommentTokens ( token, 1, 0 ) ;
                     }
                     while ( 1 ) ;
@@ -131,27 +128,25 @@ _Namespace_Do_C_Type ( Namespace * ns )
                 else
                 {
                     if ( Compiling ) Ovt_AutoVarOn ( ) ;
-                    // remember : we have already gotten a token
+                    // remember : we have already gotten a token and we are not in a C function
                     word = Finder_Word_FindUsing ( cntx->Finder0, token1, 0 ) ;
-                    Interpreter_InterpretAToken ( cntx->Interpreter0, token1, t1_tsrli ) ;
-                    //if ( word ) goto rtrn ;//else Interpreter_DoWord ( cntx->Interpreter0, word, -1, - 1 ) ;
-                    if ( (! word) && Compiling )
+                    Interpreter_InterpretAToken ( cntx->Interpreter0, token1, t1_tsrli, t1_scwi ) ;
+                    if ( ( ! word ) && Compiling )
                     {
-                        Compiler_Get_C_BackgroundNamespace ( compiler ) ;
-                        while ( 1 )
+                        while ( token = Interpret_C_Until_Token4 ( cntx->Interpreter0, ( byte* ) ",", ( byte* ) ";", "}", 0, 0 ) )
                         {
-                            byte * token = Interpret_C_Until_Token4 (cntx->Interpreter0, ( byte* ) ",", ( byte* ) ";", 0, 0, 0 ) ;
-                            if ( ! token ) break ;
+                            Compiler_Get_C_BackgroundNamespace ( compiler ) ;
                             if ( ( String_Equal ( token, "," ) ) )
                             {
+                                Lexer_ReadToken ( _Lexer_ ) ;
                                 compiler->LHS_Word = 0 ;
-                                break ;
                             }
-                            if ( ( String_Equal ( token, ";" ) ) )
+                            else if ( ( String_Equal ( token, ";" ) ) )
                             {
-                                _CfrTil_PushToken_OnTokenList ( token ) ;
-                                //compiler->LHS_Word = 0 ;
-                                break ;
+                                //_CfrTil_PushToken_OnTokenList ( token ) ;
+                                Lexer_ReadToken ( _Lexer_ ) ;
+                                compiler->LHS_Word = 0 ;
+                                //break ;
                             }
                             else
                             {
@@ -164,6 +159,7 @@ _Namespace_Do_C_Type ( Namespace * ns )
                             }
                         }
                     }
+                    if ( Compiling ) Ovt_AutoVarOff ( ) ;
                 }
                 _LC_ = svlc ;
             }
@@ -303,7 +299,11 @@ _Do_C_Syntax_Variable ( Word * word )
             {
                 _Compile_GetVarLitObj_LValue_To_Reg ( word, ACC ) ;
             }
-            else { Word_SetCodingAndSourceCoding ( word, 0 ) ; return ; } //no code for this case
+            else
+            {
+                Word_SetCodingAndSourceCoding ( word, 0 ) ;
+                return ;
+            } //no code for this case
         }
         else _Compile_GetVarLitObj_LValue_To_Reg ( word, ACC ) ;
     }
@@ -371,7 +371,7 @@ void
 _CfrTil_Do_LispSymbol ( Word * word )
 {
     // rvalue - rhs for stack var
-    _Compile_Move_StackN_To_Reg ( ACC, FP, ParameterVarOffset (_Compiler_, word ) ) ;
+    _Compile_Move_StackN_To_Reg ( ACC, FP, ParameterVarOffset ( _Compiler_, word ) ) ;
     _Word_CompileAndRecord_PushReg ( word, ACC ) ;
     CfrTil_TypeStackPush ( word ) ;
 }
@@ -435,7 +435,7 @@ _CfrTil_Do_Variable ( Word * word )
 void
 _Do_LocalObject_AllocateInit ( Namespace * typeNamespace, byte ** value, int64 size )
 {
-    Word * word = _CfrTil_ObjectNew ( size, (byte*) "<object>", 0, TEMPORARY ) ;
+    Word * word = _CfrTil_ObjectNew ( size, ( byte* ) "<object>", 0, TEMPORARY ) ;
     _Class_Object_Init ( word, typeNamespace ) ;
     * value = ( byte* ) word->W_Value ;
 }
