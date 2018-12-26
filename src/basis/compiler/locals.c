@@ -71,14 +71,6 @@ _Compiler_LocalWord ( Compiler * compiler, byte * name, int64 ctype, int64 ctype
 Word *
 Compiler_LocalWord ( Compiler * compiler, byte * name, int64 ctype, int64 ctype2, int64 ltype, int64 allocType ) // svf : flag - whether stack variables are in the frame
 {
-#if 0    
-    if ( ! GetState ( compiler, DOING_C_TYPE ) && ( ! GetState ( _LC_, LC_BLOCK_COMPILE ) ) )
-    {
-        Finder_SetQualifyingNamespace ( _Finder_, 0 ) ;
-        Namespace_FindOrNew_Local ( compiler->LocalsCompilingNamespacesStack ) ;
-    }
-#endif    
-    //if ( ( ( ! compiler->LocalsNamespace ) || ( ! bi->LocalsNamespace ) ) && ( ! GetState ( compiler, DOING_C_TYPE ) && ( ! GetState ( _LC_, LC_BLOCK_COMPILE ) ) ) )
     if ( ( ! GetState ( compiler, DOING_C_TYPE ) && ( ! GetState ( _LC_, LC_BLOCK_COMPILE ) ) ) )
     {
         Namespace_FindOrNew_Local ( compiler->LocalsCompilingNamespacesStack ) ;

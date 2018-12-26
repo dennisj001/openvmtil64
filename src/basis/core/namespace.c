@@ -151,7 +151,12 @@ _Namespace_AddToUsingList ( Namespace * ns )
         if ( ns->W_WordListOriginalWord ) ns = ns->W_WordListOriginalWord ; //_Namespace_Find ( ns->Name, 0, 0 ) ; // this is needed because of Compiler_PushCheckAndCopyDuplicates
         Namespace_SetState ( ns, USING ) ;
     }
-    //Namespace_SetState ( svNs, USING ) ;
+    if ( ns != svNs ) 
+    {
+        //CfrTil_Using () ;
+        Namespace_SetState ( svNs, USING ) ;
+        //CfrTil_Using () ;
+    }
 }
 
 void

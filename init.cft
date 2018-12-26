@@ -349,7 +349,7 @@ stringMacrosOn
 
 Root 
 dbgOff
-dbgOn 
+//dbgOn 
 'todo 0 const  
 'doX64 1 const
 'doScript 1 const
@@ -372,12 +372,6 @@ stringMacrosOff
 
 'doInitTest 0 const
 #if doInitTest
-: _fib2 dup 2 < ?< >:< dup -- _fib2 swap 2 - _fib2 + >; ; 
-' _fib2 find wdiss 
-20 _fib2 nl dup p 6765 assert0 //pause
-: _fib2 dup 2 < ? : dup -- _fib2 swap 2 - _fib2 + ; 
-' _fib2 find wdiss 
-20 _fib2 nl dup p 6765 assert0 //pause
 #endif
 
 #endif // of course ...

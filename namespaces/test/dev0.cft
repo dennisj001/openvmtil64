@@ -115,6 +115,9 @@ tick fibcc find wdiss // have to use 'tick' not ' - remember we are in the Lisp 
 sp
 lispOff
 Compiler C 
+: _fib2 dup 2 < ? : dup -- _fib2 swap 2 - _fib2 + ; 
+' _fib2 find wdiss 
+20 _fib2 nl dup p 6765 assert0 //pause
 : _fib1 ( n -- TOS ) { n @ 2 < } { n @ } { n @ -- _fib1 n @ 2 - _fib1 + } ifElse ;
 // ' _fib1 find wdiss
  20 _fib1 dup p 6765 _assert0 

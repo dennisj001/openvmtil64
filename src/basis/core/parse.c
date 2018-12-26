@@ -284,7 +284,6 @@ _CfrTil_Parse_LocalsAndStackVariables ( int64 svf, int64 lispMode, ListObject * 
             }
             if ( addWords )
             {
-add:
                 if ( svff )
                 {
                     ctype = PARAMETER_VARIABLE ; // aka an arg
