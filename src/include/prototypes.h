@@ -612,13 +612,13 @@ void Lexer_Set_ScIndex_RlIndex(Lexer *lexer, Word *word, int64 tsrli, int64 scwi
 byte *_Lexer_LexNextToken_WithDelimiters(Lexer *lexer, byte *delimiters, Boolean checkListFlag, Boolean peekFlag, int reAddPeeked, uint64 state);
 void Lexer_Init(Lexer *lexer, byte *delimiters, uint64 state, uint64 allocType);
 byte Lexer_NextNonDelimiterChar(Lexer *lexer);
-int64 _Lexer_ConsiderDebugAndCommentTokens(byte *token, int64 evalFlag, int64 reAddDebugWordsFlag);
 void _CfrTil_AddTokenToTailOfTokenList(byte *token);
-void _CfrTil_PushToken_OnTokenList(byte *token);
+void CfrTil_PushToken_OnTokenList(byte *token);
 void CfrTil_ClearTokenList(void);
 Symbol *Lexer_GetTokenFromTokenList(Lexer *lexer, Boolean peekFlag);
 byte *Lexer_GetTokenNameFromTokenList(Lexer *lexer, Boolean peekFlag);
 Symbol *Lexer_Token_New(byte *token);
+int64 _Lexer_ConsiderDebugAndCommentTokens(byte *token, int64 evalFlag);
 byte *_Lexer_NextNonDebugOrCommentTokenWord(Lexer *lexer, byte *delimiters, Boolean evalFlag, Boolean peekFlag);
 byte *Lexer_PeekNextNonDebugTokenWord(Lexer *lexer, Boolean evalFlag);
 void Lexer_DoChar(Lexer *lexer, byte c);
@@ -1632,7 +1632,7 @@ ListObject *_LO_EvalSymbol(LambdaCalculus *lc, ListObject *l0, ListObject *local
 ListObject *_LO_EvalList(LambdaCalculus *lc, ListObject *lorig, ListObject *locals, Boolean applyFlag);
 /* src/basis/lc/read.c */
 ListObject *_LO_Read(LambdaCalculus *lc);
-ListObject *_LO_Read_DoWord(LambdaCalculus *lc, Word *word, int64 qidFlag, int64 scwi);
+ListObject *_LO_Read_DoWord(LambdaCalculus *lc, Word *word, int64 qidFlag, int64 tsrli, int64 scwi);
 ListObject *_LO_Read_DoToken(LambdaCalculus *lc, byte *token, int64 qidFlag, int64 scwi);
 ListObject *_LO_Read_DoLParen(LambdaCalculus *lc);
 ListObject *LO_Read_DoToken(LambdaCalculus *lc, byte *token, int64 qidFlag, int64 scwi);

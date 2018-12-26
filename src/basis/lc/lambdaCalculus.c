@@ -100,7 +100,7 @@ _LO_New ( uint64 ltype, uint64 ctype, uint64 ctype2, byte * name, byte * value, 
         ( ltype & T_LISP_SYMBOL ) ? word ? word->RunType : 0 : 0, 0, 0, 0, addToNs, LISP ) ; //addToNs, LISP ) ;
     if ( ltype & LIST ) _LO_ListInit ( l0, allocType ) ;
     else if ( ltype & LIST_NODE ) l0->S_SymbolList = ( dllist* ) value ;
-    _Word_SetTsrliScwi( l0, tsrli, scwi ) ;
+    Word_SetTsrliScwi( l0, tsrli, scwi ) ;
     if ( word )
     {
         l0->Lo_CfrTilWord = word ;

@@ -9,8 +9,7 @@ Word *
 DataObject_New ( uint64 type, Word * word, byte * name, uint64 ctype, uint64 ctype2, uint64 ltype,
     int64 index, int64 value, int allocType, int64 tsrli, int64 scwi )
 {
-    tsrli = ( tsrli != - 1 ) ? tsrli : _Lexer_->TokenStart_ReadLineIndex ;
-    scwi = ( scwi != - 1 ) ? scwi : _Lexer_->SC_Index ;
+    Word_SetTsrliScwi( word, tsrli, scwi ) 
     if ( word && ( ! ( type & ( T_LC_NEW | T_LC_LITERAL ) ) ) ) Word_Recycle ( word ) ;
     switch ( type )
     {

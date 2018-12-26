@@ -259,10 +259,10 @@ _Compile_ImmDispData (  immDisp,  immSize,  forceFlag )
 //                      REX_B  IMM_B  DISP_B SIB_B   MODRM_B
 
 void
-_Compile_Write_Instruction_X64 ( rex, opCode, modRm, controlFlags, sib, disp, dispSize, imm, immSize | _here )
+_Compile_Write_Instruction_X64 ( rex, opCode, modRm, controlFlags, sib, disp, dispSize, imm, immSize )
 {
 #if DBI
-    int nbytes ;
+    int nbytes, _here  ;
     _here = Here ;
 #endif
     if ( rex ) compile1 ( rex ) ; 

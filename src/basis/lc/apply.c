@@ -189,7 +189,7 @@ void
 _LO_CompileOrInterpret ( ListObject *lfunction, ListObject *largs )
 {
     ListObject *lfword = lfunction->Lo_CfrTilWord ;
-    _Word_SetTsrliScwi( lfword, lfunction->W_RL_Index, lfunction->W_SC_Index ) ;
+    Word_SetTsrliScwi( lfword, lfunction->W_RL_Index, lfunction->W_SC_Index ) ;
 
     if ( largs && lfword && ( lfword->CAttribute & ( CATEGORY_OP_ORDERED | CATEGORY_OP_UNORDERED ) ) ) // ?!!? 2 arg op with multi-args : this is not a precise distinction yet : need more types ?!!?
     {
@@ -381,10 +381,9 @@ _LO_Apply_NonMorphismArg ( ListObject ** pl1, int64 i )
     ListObject *l1 = * pl1 ;
     Word * word = l1 ;
     word = l1->Lo_CfrTilWord ;
-    word = Compiler_CopyDuplicatesAndPush (word, -1, -1) ;
-    //_Word_SetTsrliScwi ( word, l1->W_RL_Index, l1->W_SC_Index ) ;
-    //_Word_SetTsrliScwi ( l1, l1->W_RL_Index, l1->W_SC_Index ) ;
-    //Word_SCH_CPUSCA( word, 1 ) ;
+    //int64 tsrli = -1, scwi = -1; 
+    //Word_SetTsrliScwi( word, tsrli, scwi ) ;
+    word = Compiler_CopyDuplicatesAndPush (word, word->W_RL_Index, word->W_SC_Index ) ;
     byte * here = Here ;
     Word_Eval ( word ) ; // ?? move value directly to RegOrder reg
     Word *baseObject = _Interpreter_->BaseObject ;
@@ -458,9 +457,10 @@ _LO_Apply_C_LtoR_ArgList ( LambdaCalculus * lc, ListObject * l0, Word * word )
         for ( i = 0, l1 = _LO_First ( l0 ) ; l1 ; l1 = LO_Next ( l1 ) ) i = _LO_Apply_Arg ( lc, &l1, i ) ;
         Set_CompileMode ( true ) ;
         _Debugger_->PreHere = Here ;
+        //int64 tsrli = -1, scwi = -1; 
+        //Word_SetTsrliScwi( word, tsrli, scwi ) ;
         Word_SetCodingAndSourceCoding ( word, Here ) ;
-        word = Compiler_CopyDuplicatesAndPush (word, -1, -1) ;
-        //cntx->CurrentlyRunningWord = word ;
+        word = Compiler_CopyDuplicatesAndPush (word, word->W_RL_Index, word->W_SC_Index ) ;
         if ( ( String_Equal ( word->Name, "printf" ) || ( String_Equal ( word->Name, "sprintf" ) ) ) ) Compile_MoveImm_To_Reg ( RAX, 0, CELL ) ; // for printf ?? others //System V ABI : "%rax is used to indicate the number of vector arguments passed to a function requiring a variable number of arguments"
         Compiler_Word_SetCodingHere_And_ClearPreviousUseOf_Here_SCA ( word, 1 ) ;
         Word_Eval ( word ) ;

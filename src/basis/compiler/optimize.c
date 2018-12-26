@@ -287,7 +287,7 @@ Compiler_Optimizer_2Args_Or_WordArg1_Op ( Compiler * compiler )
             else
             {
                 SetHere ( optInfo->wordArg2->Coding, 0 ) ;
-                Compiler_Word_SCH_CPUSCA ( optInfo->wordArg2, 0 ) ;
+                Compiler_Word_SCHCPUSCA ( optInfo->wordArg2, 0 ) ;
                 _Compile_Stack_PopToReg ( DSP, ACC ) ;
             }
         }
@@ -437,7 +437,7 @@ Setup_MachineCodeInsnParameters ( Compiler * compiler, Boolean direction, Boolea
         // standard arg arrangement
         if ( optInfo->wordArg1 ) optInfo->wordArg1->RegToUse = optInfo->Optimize_Reg ;
         if ( optInfo->wordArg2 ) optInfo->wordArg2->RegToUse = optInfo->Optimize_Rm ;
-        Compiler_Word_SCH_CPUSCA ( optInfo->opWord, 1 ) ;
+        Compiler_Word_SCHCPUSCA ( optInfo->opWord, 1 ) ;
     }
 }
 
@@ -513,7 +513,7 @@ Compile_Optimize_OpEqual ( Compiler * compiler )
             optInfo->Optimize_Rm = OREG ;
         }
         compiler->OptimizeForcedReturn = 1 ;
-        Compiler_Word_SCH_CPUSCA ( optInfo->opWord, 1 ) ;
+        Compiler_Word_SCHCPUSCA ( optInfo->opWord, 1 ) ;
         Block_Eval ( def ) ;
         Word_Check_SetHere_To_StackPushRegisterCode ( optInfo->opWord, 0 ) ;
         if ( optInfo->wordArg1 && ( ! ( optInfo->wordArg1->CAttribute & REGISTER_VARIABLE ) ) ) Compile_Move_Reg_To_Rm ( OREG2, optInfo->wordArg1->RegToUse, 0 ) ;

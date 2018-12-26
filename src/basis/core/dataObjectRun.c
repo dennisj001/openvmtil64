@@ -106,7 +106,7 @@ _Namespace_Do_C_Type ( Namespace * ns )
                     CfrTil_C_Syntax_On ( ) ;
                     Word * word = Word_New ( token1 ) ; // "("
                     CfrTil_WordList_PushWord ( word ) ;
-                    Compiler_Word_SCH_CPUSCA ( word, 1 ) ;
+                    Compiler_Word_SCHCPUSCA ( word, 1 ) ;
                     DataStack_Push ( ( int64 ) word ) ;
                     CfrTil_BeginBlock ( ) ; // nb! before CfrTil_LocalsAndStackVariablesBegin
                     CfrTil_LocalsAndStackVariablesBegin ( ) ;
@@ -120,7 +120,7 @@ _Namespace_Do_C_Type ( Namespace * ns )
                             break ;
                         }
                         else if ( token [ 0 ] == '{' ) break ; // take nothing else (would be Syntax Error ) -- we have already done CfrTil_BeginBlock
-                        else _Lexer_ConsiderDebugAndCommentTokens ( token, 1, 0 ) ;
+                        else _Lexer_ConsiderDebugAndCommentTokens ( token, 1 ) ;
                     }
                     while ( 1 ) ;
                     goto rtrn ;
@@ -152,7 +152,7 @@ _Namespace_Do_C_Type ( Namespace * ns )
                             {
                                 if ( ( String_Equal ( token, ")" ) ) )
                                 {
-                                    if ( GetState ( compiler, DOING_A_PREFIX_WORD ) ) _CfrTil_PushToken_OnTokenList ( token ) ; // add ahead of token2 :: ?? this could be screwing up other things and adds an unnecessary level of complexity
+                                    if ( GetState ( compiler, DOING_A_PREFIX_WORD ) ) CfrTil_PushToken_OnTokenList ( token ) ; // add ahead of token2 :: ?? this could be screwing up other things and adds an unnecessary level of complexity
                                 }
                                 compiler->LHS_Word = 0 ;
                                 break ;

@@ -22,9 +22,9 @@ Interpret_C_Block_EndBlock ( byte * tokenToUse, Boolean insertFlag )
 {
     if ( tokenToUse ) _CfrTil_->EndBlockWord->Name = tokenToUse ;
     if ( insertFlag ) SetState ( _Debugger_, DBG_OUTPUT_INSERTION, true ) ;
-    //_CfrTil_->EndBlockWord->W_RL_Index = _Lexer_->TokenStart_ReadLineIndex ;
-    Lexer_Set_ScIndex_RlIndex ( _Lexer_, _CfrTil_->EndBlockWord, - 1, - 1 ) ;
-    Interpreter_DoWord_Default ( _Interpreter_, _CfrTil_->EndBlockWord, - 1, - 1 ) ;
+    int64 tsrli = -1, scwi = -1; 
+    Word_SetTsrliScwi( _CfrTil_->EndBlockWord, tsrli, scwi ) ;
+    Interpreter_DoWord_Default ( _Interpreter_, _CfrTil_->EndBlockWord, tsrli, scwi ) ;
     _CfrTil_->EndBlockWord->Name = ( byte* ) "}" ;
     SetState ( _Debugger_, DBG_OUTPUT_INSERTION, false ) ;
 }
@@ -37,9 +37,9 @@ Interpret_C_Block_BeginBlock ( byte * tokenToUse, Boolean insertFlag )
     // ? source code adjustments ?
     if ( tokenToUse ) _CfrTil_->BeginBlockWord->Name = tokenToUse ;
     if ( insertFlag ) SetState ( _Debugger_, DBG_OUTPUT_INSERTION, true ) ;
-    //_CfrTil_->BeginBlockWord->W_RL_Index = _Lexer_->TokenStart_ReadLineIndex ;
-    Lexer_Set_ScIndex_RlIndex ( _Lexer_, _CfrTil_->BeginBlockWord, - 1, - 1 ) ;
-    Interpreter_DoWord_Default ( _Interpreter_, _CfrTil_->BeginBlockWord, - 1, - 1 ) ;
+    int64 tsrli = -1, scwi = -1; 
+    Word_SetTsrliScwi( _CfrTil_->BeginBlockWord, tsrli, scwi ) ;
+    Interpreter_DoWord_Default ( _Interpreter_, _CfrTil_->BeginBlockWord, tsrli, scwi ) ;
     _CfrTil_->BeginBlockWord->Name = ( byte* ) "{" ;
     compiler->BeginBlockFlag = false ;
     SetState ( _Debugger_, DBG_OUTPUT_INSERTION, false ) ;
@@ -250,7 +250,7 @@ CfrTil_C_ConditionalExpression ( )
         _SetOffsetForCallOrJump ( ptrToOffsetElse, Here ) ;
         byte * token = Interpret_C_Until_Token4 ( interp, ( byte* ) ";", ( byte* ) ",", ( byte* ) ")", 0, 0 ) ;
         DEBUG_SHOW ;
-        _CfrTil_PushToken_OnTokenList ( token ) ; // maybe conditionally push ??
+        CfrTil_PushToken_OnTokenList ( token ) ; // maybe conditionally push ??
     }
     else
     {

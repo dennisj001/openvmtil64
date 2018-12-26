@@ -158,8 +158,6 @@ CfrTil_AdjustDbgSourceCodeAddress ( byte * address, byte * newAddress )
     if ( list ) dllist_Map2 ( list, ( MapFunction2 ) SC_List_AdjustAddress, ( int64 ) address, ( int64 ) newAddress ) ;
 }
 
-#if 1
-
 void
 SC_List_Set_NotInUseForSC ( dlnode * node )
 {
@@ -172,7 +170,6 @@ CfrTil_AdjustDbgSourceCode_InUseFalse ( )
     dllist * list = _CfrTil_->Compiler_N_M_Node_WordList ;
     if ( list ) dllist_Map ( list, ( MapFunction0 ) SC_List_Set_NotInUseForSC ) ;
 }
-#endif
 
 void
 _CfrTil_WordList_PushWord ( Word * word, Boolean inUseFlag )

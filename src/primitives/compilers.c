@@ -172,8 +172,12 @@ CfrTil_Return ( )
     Compiler_WordStack_SCHCPUSCA ( 0, 1 ) ;
     byte * token = Lexer_PeekNextNonDebugTokenWord ( _Lexer_, 0 ) ;
     Word * word = Finder_Word_FindUsing ( _Finder_, token, 0 ) ;
+    int64 tsrli = - 1, scwi = - 1 ;
+    Word_SetTsrliScwi ( word, tsrli, scwi ) ;
     if ( word && ( word->CAttribute & ( NAMESPACE_VARIABLE | LOCAL_VARIABLE | PARAMETER_VARIABLE ) ) )
     {
+        Lexer_ReadToken ( _Lexer_ ) ;
+        CfrTil_WordList_PushWord ( word ) ;
         _Compiler_->ReturnVariableWord = word ;
         if ( GetState ( _CfrTil_, TYPECHECK_ON ) )
         {
@@ -184,8 +188,7 @@ CfrTil_Return ( )
                 cwbc->W_TypeSignatureString [_Compiler_->NumberOfArgs + 1] = Tsi_Convert_Word_TypeAttributeToTypeLetterCode ( word ) ;
             }
         }
-        Lexer_ReadToken ( _Context_->Lexer0 ) ; // don't compile anything let end block or locals deal with the return
-        //Word_SCH_CPUSCA( word, 1 ) ;
+        //Lexer_ReadToken ( _Context_->Lexer0 ) ; // don't compile anything let end block or locals deal with the return
     }
     else
     {

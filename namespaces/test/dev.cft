@@ -228,9 +228,10 @@ c_syntaxOn
 Root
 //int cpow ( base power | out ) s{ for ( out = 1 ; power ; ( power -= 1 ) ) { out = out * base ; } return out ; }s 
 int cpow ( base power | out ) { for ( out = 1 ; power ; power -= 1 ) { out = out * base ; } return out ; }
+//verbosity 3 =
 'cpow find wdiss
 c_syntaxOff
-2 30 cpow dup p  1073741824 _assert
+2 30 cpow dup p  1073741824 _assert //pause
 
 #if 1
 : sp ; //stack pause ;
@@ -456,6 +457,11 @@ bnOff //pause
 nl
 // verbosity 1 =
 namespaceTreeWithWords
+
+1 ? "hi" ps
+1 ? "hi" ps : "er" ps
+0 ? "er" ps : "hi" ps
+{ 0 ? "er" ps : "hi" ps } run
 
 2 + 7 assertStkChk // stack checking
 s

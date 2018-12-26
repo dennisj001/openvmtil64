@@ -35,7 +35,7 @@ Interpret_C_Until_Token4 ( Interpreter * interp, byte * end1, byte * end2, byte*
         if ( ( inChar == 0 ) || ( inChar == - 1 ) || ( inChar == eof ) ) token = 0 ;
     }
     while ( token ) ;
-    if ( token ) _CfrTil_PushToken_OnTokenList ( token ) ;
+    if ( token ) CfrTil_PushToken_OnTokenList ( token ) ;
     return token ;
 }
 
@@ -49,12 +49,12 @@ Interpret_Until_Token ( Interpreter * interp, byte * end, byte * delimiters )
         token = _Lexer_ReadToken ( _Lexer_, delimiters ) ;
         if ( String_Equal ( token, end ) )
         {
-            if ( GetState ( _Compiler_, C_COMBINATOR_LPAREN ) && ( String_Equal ( token, ";" ) ) ) _CfrTil_PushToken_OnTokenList ( token ) ;
+            if ( GetState ( _Compiler_, C_COMBINATOR_LPAREN ) && ( String_Equal ( token, ";" ) ) ) CfrTil_PushToken_OnTokenList ( token ) ;
             break ;
         }
         if ( String_Equal ( token, ";" ) && GetState ( _Context_, C_SYNTAX ) && GetState ( _Compiler_, C_COMBINATOR_PARSING ) )
         {
-            _CfrTil_PushToken_OnTokenList ( token ) ;
+            CfrTil_PushToken_OnTokenList ( token ) ;
             CfrTil_ArrayModeOff ( ) ;
             break ;
         }

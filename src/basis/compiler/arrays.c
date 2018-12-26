@@ -67,7 +67,7 @@ Compile_ArrayDimensionOffset ( Word * word, int64 dimSize, int64 objSize )
     //if ( word && word->W_Value ) // if ! zero else 
     if ( word && ( ( word->CAttribute & LITERAL ) ? word->W_Value : 1 ) ) // if ! zero else 
     {
-        Compiler_Word_SCH_CPUSCA ( word, 1 ) ;
+        Compiler_Word_SCHCPUSCA ( word, 1 ) ;
         int64 size = dimSize * objSize ;
         // assume arrayIndex has just been pushed to TOS
         // nb. if size is zero this complete processing of an array dimension adding its amount to the pointer-offset on the stack
@@ -142,7 +142,7 @@ Do_NextArrayToken ( byte * token, Word * arrayBaseObject, int64 objSize, Boolean
     {
         word->W_RL_Index = _Lexer_->TokenStart_ReadLineIndex ;
         word->W_SC_Index = _Lexer_->SC_Index ;
-        Compiler_Word_SCH_CPUSCA ( word, 1 ) ;
+        Compiler_Word_SCHCPUSCA ( word, 1 ) ;
     }
     SetState ( compiler, ARRAY_MODE, true ) ;
     if ( token [0] == '[' ) // '[' == an "array begin"

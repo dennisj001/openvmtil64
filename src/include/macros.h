@@ -256,8 +256,8 @@
 #define _IsSourceCodeOn ( GetState ( _CfrTil_, DEBUG_SOURCE_CODE_MODE ) )
 #define IsSourceCodeOn ( _IsSourceCodeOn || IsGlobalsSourceCodeOn )
 #define IsSourceCodeOff (!IsSourceCodeOn) //( GetState ( _CfrTil_, DEBUG_SOURCE_CODE_MODE ) || IsGlobalsSourceCodeOn ))
-#define Compiler_Word_SCH_CPUSCA( word, clearFlag ) Compiler_Word_SetCodingHere_And_ClearPreviousUseOf_Here_SCA ( word, clearFlag) 
-#define Compiler_WordStack_SCHCPUSCA( index, clearFlag ) Compiler_Word_SCH_CPUSCA (CfrTil_WordList ( index ), clearFlag) 
+#define Compiler_Word_SCHCPUSCA( word, clearFlag ) Compiler_Word_SetCodingHere_And_ClearPreviousUseOf_Here_SCA ( word, clearFlag) 
+#define Compiler_WordStack_SCHCPUSCA( index, clearFlag ) Compiler_Word_SCHCPUSCA (CfrTil_WordList ( index ), clearFlag) 
 #define _SC_Global_On SetState ( _CfrTil_, GLOBAL_SOURCE_CODE_MODE, true )
 #define SC_Global_On if ( GetState ( _CfrTil_, DEBUG_SOURCE_CODE_MODE ) ) { _SC_Global_On ; }
 #define SC_Global_Off SetState ( _CfrTil_, GLOBAL_SOURCE_CODE_MODE, false )
@@ -265,18 +265,12 @@
 #define _Block_SCA_Clear _Block_SCA( -1 ) ;
 #define L_SCI _Lexer_->SC_Index
 #define Compiler_OptimizerWordList_Reset( compiler ) List_Init ( _CfrTil_->CompilerWordList ) 
-#if 0
-#define _Word_SetTsrliScwi( word, tsrli, scwi ) \
-    if ( word )\
-    {\
-        word->W_RL_Index = tsrli ;\
-        word->W_SC_Index = scwi ;\
-    }
+#if 1
 #define Word_SetTsrliScwi( word, tsrli, scwi ) \
     if ( word )\
     {\
-        word->W_RL_Index = (( tsrli != - 1 ) ? tsrli : _Lexer_->TokenStart_ReadLineIndex) ;\
-        word->W_SC_Index = (( scwi != - 1 ) ? scwi : _Lexer_->SC_Index) ;\
+    word->W_RL_Index = tsrli = ( tsrli != - 1 ) ? tsrli : _Lexer_->TokenStart_ReadLineIndex ;\
+    word->W_SC_Index = scwi = ( scwi != - 1 ) ? scwi : _Lexer_->SC_Index ;\
     }
 #else
 #define _Word_SetTsrliScwi( word, tsrli, scwi ) Lexer_Set_ScIndex_RlIndex ( _Lexer_, word, (tsrli), (scwi) ) 

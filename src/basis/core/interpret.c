@@ -6,7 +6,7 @@ Interpreter_SetupNextWord ( Interpreter * interp )
 {
     Word * word = 0 ;
     byte * token = Lexer_ReadToken ( interp->Lexer0 ) ;
-    if ( token ) word = _Interpreter_TokenToWord ( interp, token, - 1, - 1 ) ;
+    if ( token ) word = _Interpreter_TokenToWord ( interp, token, _Lexer_->TokenStart_ReadLineIndex, _Lexer_->SC_Index ) ;
     else SetState ( _Context_->Lexer0, LEXER_END_OF_LINE, true ) ;
     return word ;
 }
@@ -35,7 +35,7 @@ void
 Interpreter_InterpretNextToken ( Interpreter * interp )
 {
     byte * token = Lexer_ReadToken ( interp->Lexer0 ) ;
-    Interpreter_InterpretAToken ( interp, token, - 1, - 1 ) ;
+    Interpreter_InterpretAToken ( interp, token, _Lexer_->TokenStart_ReadLineIndex, _Lexer_->SC_Index ) ;
 }
 
 Word *
@@ -135,7 +135,7 @@ _Interpreter_TokenToWord ( Interpreter * interp, byte * token, int64 tsrli, int6
 #endif        
         Word * word = Finder_Word_FindUsing ( interp->Finder0, token, 0 ) ;
         if ( ! word ) word = Lexer_ObjectToken_New ( interp->Lexer0, token ) ;
-        Lexer_Set_ScIndex_RlIndex ( interp->Lexer0, word, tsrli, scwi ) ;
+        Word_SetTsrliScwi ( word, tsrli, scwi ) ;
         _Context_->CurrentTokenWord = word ;
         DEBUG_SETUP ( word ) ;
     }
