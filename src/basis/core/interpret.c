@@ -2,16 +2,6 @@
 #include "../../include/cfrtil64.h"
 
 Word *
-Interpreter_SetupNextWord ( Interpreter * interp )
-{
-    Word * word = 0 ;
-    byte * token = Lexer_ReadToken ( interp->Lexer0 ) ;
-    if ( token ) word = _Interpreter_TokenToWord ( interp, token, _Lexer_->TokenStart_ReadLineIndex, _Lexer_->SC_Index ) ;
-    else SetState ( _Context_->Lexer0, LEXER_END_OF_LINE, true ) ;
-    return word ;
-}
-
-Word *
 Interpreter_InterpretAToken ( Interpreter * interp, byte * token, int64 tsrli, int64 scwi )
 {
     Word * word = 0 ;
@@ -22,13 +12,6 @@ Interpreter_InterpretAToken ( Interpreter * interp, byte * token, int64 tsrli, i
     }
     else SetState ( _Context_->Lexer0, LEXER_END_OF_LINE, true ) ;
     return word ;
-}
-
-void
-Interpreter_InterpretNextToken2 ( Interpreter * interp )
-{
-    Word * word = Interpreter_SetupNextWord ( interp ) ;
-    Interpreter_DoWord ( interp, word, - 1, - 1 ) ;
 }
 
 void
@@ -102,6 +85,7 @@ Interpreter_DoWord ( Interpreter * interp, Word * word, int64 tsrli, int64 scwi 
 {
     if ( word )
     {
+        if ( ( word->W_RL_Index != _Lexer_->TokenStart_ReadLineIndex ) || ( word->W_SC_Index != _Lexer_->SC_Index ) )
         Word_SetTsrliScwi ( word, tsrli, scwi ) ;
         DEBUG_SETUP ( word ) ;
         Context * cntx = _Context_ ;
@@ -126,13 +110,6 @@ _Interpreter_TokenToWord ( Interpreter * interp, byte * token, int64 tsrli, int6
     if ( token )
     {
         interp->Token = token ;
-#if 0        
-        if ( Is_DebugOn )
-        {
-            CfrTil_Using ( ) ;
-            _Namespace_PrintWords ( Namespace_Find ( "locals_0" ) ) ;
-        }
-#endif        
         Word * word = Finder_Word_FindUsing ( interp->Finder0, token, 0 ) ;
         if ( ! word ) word = Lexer_ObjectToken_New ( interp->Lexer0, token ) ;
         Word_SetTsrliScwi ( word, tsrli, scwi ) ;
@@ -172,4 +149,22 @@ Interpreter_IsWordPrefixing ( Interpreter * interp, Word * word )
     return false ;
 }
 
+#if 0
 
+Word *
+Interpreter_SetupNextWord ( Interpreter * interp )
+{
+    Word * word = 0 ;
+    byte * token = Lexer_ReadToken ( interp->Lexer0 ) ;
+    if ( token ) word = _Interpreter_TokenToWord ( interp, token, _Lexer_->TokenStart_ReadLineIndex, _Lexer_->SC_Index ) ;
+    else SetState ( _Context_->Lexer0, LEXER_END_OF_LINE, true ) ;
+    return word ;
+}
+
+void
+Interpreter_InterpretNextToken2 ( Interpreter * interp )
+{
+    Word * word = Interpreter_SetupNextWord ( interp ) ;
+    Interpreter_DoWord ( interp, word, - 1, - 1 ) ;
+}
+#endif

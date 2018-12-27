@@ -39,16 +39,24 @@ Debugger_ShowDbgSourceCodeAtAddress ( Debugger * debugger, byte * address )
 }
 
 Boolean
-SC_IsWord_IncorrectBlockOrCombinator ( Word * word )
+SC_IsWord_BlockOrCombinator ( Word * word )
+{
+    if ( word && ( ( word->Name[0] == '{' ) || ( word->Name[0] == '}' )
+        || ( word->CAttribute & ( COMBINATOR ) ) || ( word->CAttribute2 & ( SYNTACTIC ) ) ) ) return true ;
+    return false ;
+}
+
+Boolean
+SC_IsWord_MatchCorrectConsideringBlockOrCombinator ( Word * word )
 {
     if ( word )
     {
-        //if ( ( word->Name[0] == '{' ) || ( word->Name[0] == '}' ) || ( word->CAttribute & ( COMBINATOR | KEYWORD ) ) ) return true ;
-        if ( ( ( word->Name[0] == '{' ) || ( word->Name[0] == '}' ) || ( word->CAttribute & ( COMBINATOR ) ) ) )
+        if ( SC_IsWord_BlockOrCombinator ( word ) )
         {
-            if ( word->SourceCoding [0] == 0xe9 ) return false ; // 0xe9 jmp ins 
-            else return true ;
+            if ( word->SourceCoding [0] == 0xe9 ) return true ; // 0xe9 jmp ins 
+            else return false ;
         }
+        else return true ;
     }
     return false ;
 }
@@ -66,7 +74,7 @@ Word *
 DWL_Find ( dllist * list, Word * iword, byte * address, byte* name, int64 takeFirstFind, byte * newAddress, int64 fromFirstFlag ) // nb fromTop is from the end of the list because it is the top 'push'
 {
     byte * naddress, iuFlag ;
-    Word *aFoundWord = 0, *foundWord = 0 ;
+    Word *aFoundWord = 0, *foundWord = 0, *maybeFoundWord = 0 ;
     dlnode * anode = 0 ;
     int64 numFound = 0, i ;
     int64 fDiff = 0, minDiffFound = 0, scwi, lastScwi = _Debugger_->LastScwi ? _Debugger_->LastScwi : 0 ;
@@ -85,35 +93,38 @@ DWL_Find ( dllist * list, Word * iword, byte * address, byte* name, int64 takeFi
                 && ( aFoundWord == _Debugger_->w_Word ) ) return aFoundWord ;
             else if ( address && ( address == aFoundWord->SourceCoding ) )
             {
+                //if ( address == ( byte* ) 0x7ffff7627702 ) _Printf ( ( byte* ) "" ) ;
                 numFound ++ ;
                 fDiff = abs ( scwi - lastScwi ) ;
                 aFoundWord->W_SC_Index = scwi ; // not sure exactly why this is necessary but it is important for now??
                 if ( ( _Q_->Verbosity > 2 ) ) DWL_ShowWord ( anode, i, 0, ( int64 ) "FOUND", fDiff ) ;
-                //if ( ( aFoundWord->Name [0] == '}' ) && ( aFoundWord->Coding[0] == 0x0f ) ) return aFoundWord ; // ( * address == 0x0f ) : jcc insn prefix
-#if 0               
-                if ( ! foundWord )
+                if ( ( aFoundWord->CAttribute & LITERAL ) && ( aFoundWord->Coding[1] == 0xb9 ) )
                 {
                     foundWord = aFoundWord ;
                     minDiffFound = fDiff ;
                 }
-                else if ( foundWord ) // if we have a choice between a keyword and another word don't choose the keyword
-#endif                    
+                else if ( ( aFoundWord->CAttribute & CATEGORY_PLUS_PLUS_MINUS_MINUS ) && ( aFoundWord->Coding[1] == 0xff ) )
                 {
-                    if ( ( aFoundWord->CAttribute & LITERAL ) && ( aFoundWord->Coding[1] == 0xb9 ) )
-                    {
-                        foundWord = aFoundWord ;
-                        minDiffFound = fDiff ;
-                        //break ;
-                    }
-                    else if ( ( fDiff < minDiffFound ) || SC_IsWord_IncorrectBlockOrCombinator ( foundWord ) || ( ! SC_IsWord_IncorrectBlockOrCombinator ( aFoundWord ) ) )
-                    {
-                        foundWord = aFoundWord ;
-                        minDiffFound = fDiff ;
-                    }
-                    if ( takeFirstFind ) break ;
+                    foundWord = aFoundWord ;
+                    break ;
                 }
+#if 1               
+                else if ( SC_IsWord_MatchCorrectConsideringBlockOrCombinator ( aFoundWord ) )
+                {
+                    foundWord = aFoundWord ;
+                    minDiffFound = fDiff ;
+                }
+#endif                
+                else if ( ( fDiff < minDiffFound ) && SC_IsWord_MatchCorrectConsideringBlockOrCombinator ( aFoundWord ) )//|| SC_IsWord_MatchCorrectConsideringBlockOrCombinator ( foundWord ) || ( ! SC_IsWord_MatchCorrectConsideringBlockOrCombinator ( aFoundWord ) ) )
+                {
+                    foundWord = aFoundWord ;
+                    minDiffFound = fDiff ;
+                }
+                else if ( ! foundWord ) maybeFoundWord = aFoundWord ;
+                if ( takeFirstFind ) break ;
             }
         }
+        if ( ( ! foundWord ) && maybeFoundWord ) foundWord = maybeFoundWord ;
     }
     if ( ( ! newAddress ) && ( numFound ) )
     {
