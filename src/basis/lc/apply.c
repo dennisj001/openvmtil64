@@ -106,7 +106,9 @@ _Interpreter_LC_InterpretWord ( Interpreter *interp, ListObject *l0, Boolean fun
     {
         word = l0->Lo_CfrTilWord ;
         if ( ! word ) word = l0 ;
-        Interpreter_DoWord ( interp, word, l0->W_RL_Index, l0->W_SC_Index ) ;
+        // source code is not good for lisp ??!??
+        Interpreter_DoWord ( interp, word, functionFlag ? word->W_RL_Index : l0->W_RL_Index, functionFlag ? word->W_SC_Index : l0->W_SC_Index ) ;
+        //Interpreter_DoWord ( interp, word, word->W_RL_Index, word->W_SC_Index ) ;
         //SetState ( _Debugger_, DEBUG_SHTL_OFF, false ) ;
     }
 }

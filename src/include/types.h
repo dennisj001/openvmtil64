@@ -414,7 +414,6 @@ typedef struct _WordData
 #define W_SourceCode S_WordData->WD_SourceCode 
 #define W_TokenEnd_ReadLineIndex S_WordData->CursorPosition 
 #define W_CursorPosition S_WordData->CursorPosition 
-#define W_RL_Index S_WordData->StartCharRlIndex
 #define S_FunctionTypesArray S_WordData->FunctionTypesArray
 #define RegToUse S_WordData->RegToUse
 #define Opt_Rm S_WordData->Opt_Rm
@@ -433,6 +432,7 @@ typedef struct _WordData
 #define W_SearchNumber W_Value2
 #define W_FoundMarker W_Value3
 #define W_WordListOriginalWord S_WordData->OriginalWord
+#define W_RL_Index S_WordData->StartCharRlIndex
 #define W_SC_Index S_WordData->SC_WordIndex 
 #define W_SC_WordList S_WordData->SourceCodeWordList 
 #define W_SC_MemSpaceRandMarker S_WordData->SourceCodeMemSpaceRandMarker

@@ -74,10 +74,10 @@ SC_IsWord_MatchCorrectConsideringBlockOrCombinator ( Word * word )
 Word *
 DWL_Find ( dllist * list, Word * iword, byte * address, byte* name, int64 takeFirstFind, byte * newAddress, int64 fromFirstFlag ) // nb fromTop is from the end of the list because it is the top 'push'
 {
-    byte * naddress, iuFlag ;
+    byte * naddress ;
     Word *aFoundWord = 0, *foundWord = 0, *maybeFoundWord = 0 ;
     dlnode * anode = 0 ;
-    int64 numFound = 0, i ;
+    int64 numFound = 0, i, iuFlag ;
     int64 fDiff = 0, minDiffFound = 0, scwi, lastScwi = _Debugger_->LastScwi ? _Debugger_->LastScwi : 0 ;
     if ( list && ( iword || name || address ) )
     {
@@ -157,7 +157,7 @@ SC_List_AdjustAddress ( dlnode * node, byte * address, byte * newAddress )
 #endif        
         Word_SetCoding ( nword, newAddress ) ;
         if ( nword->SourceCoding ) Word_SetSourceCoding ( nword, newAddress ) ;
-        dobject_Set_M_Slot ( ( dobject* ) node, SCN_IN_USE_FLAG, true ) ; // reset after CfrTil_AdjustDbgSourceCode_InUseFalse
+        dobject_Set_M_Slot ( ( dobject* ) node, SCN_IN_USE_FLAG, SCN_IN_USE_FLAG_ALL ) ; // reset after CfrTil_AdjustDbgSourceCode_InUseFalse
         return true ;
     }
     return false ;
@@ -186,15 +186,20 @@ CfrTil_AdjustDbgSourceCode_InUseFalse ( )
 void
 _CfrTil_WordList_PushWord ( Word * word, int64 inUseFlag )
 {
-    CfrTil_WordList_Push ( word, inUseFlag ) ;
+    CfrTil_WordList_Push ( word, inUseFlag ? SCN_IN_USE_FLAG_ALL : 0 ) ;
 }
 
 void
 CfrTil_WordList_PushWord ( Word * word )
 {
+#if 1
+    _CfrTil_WordList_PushWord ( word,
+        ( ! ( word->CAttribute & ( NAMESPACE | OBJECT_OPERATOR | OBJECT_FIELD ) ) ) || ( word->CAttribute & ( DOBJECT ) ) ) ;
+#else    
     _CfrTil_WordList_PushWord ( word,
         (( ! ( word->CAttribute & ( NAMESPACE | OBJECT_OPERATOR | OBJECT_FIELD ) ) ) 
         || ( word->CAttribute & ( DOBJECT ) ) ) ? SCN_IN_USE_FLAG_ALL : 0 ) ;
+#endif    
 }
 
 inline void

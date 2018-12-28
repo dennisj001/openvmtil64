@@ -349,7 +349,7 @@ stringMacrosOn
 
 Root 
 dbgOff
-//dbgOn 
+dbgOn 
 'todo 0 const  
 'doX64 1 const
 'doScript 1 const

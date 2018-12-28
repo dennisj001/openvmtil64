@@ -140,7 +140,6 @@ Do_NextArrayToken ( byte * token, Word * arrayBaseObject, int64 objSize, Boolean
     {
         word->W_RL_Index = _Lexer_->TokenStart_ReadLineIndex ;
         word->W_SC_Index = _Lexer_->SC_Index ;
-        Compiler_Word_SCHCPUSCA ( word, 1 ) ;
     }
     SetState ( compiler, ARRAY_MODE, true ) ;
     if ( token [0] == '[' ) // '[' == an "array begin"
@@ -254,7 +253,8 @@ _CfrTil_ArrayBegin ( Boolean lispMode, Word **pl1, int64 i )
         {
             if ( ( ! Lexer_IsTokenForwardDotted ( cntx->Lexer0 ) ) && ( ! GetState ( cntx->Compiler0, LC_ARG_PARSING ) ) ) interp->BaseObject = 0 ;
             //if ( ! ( GetState ( cntx, C_SYNTAX | INFIX_MODE ) || GetState ( compiler, LC_ARG_PARSING ) ) )
-            if ( ! variableFlag ) _dllist_MapNodes_UntilWord ( dllist_First ( ( dllist* ) _CfrTil_->Compiler_N_M_Node_WordList ), 
+            if ( ! variableFlag ) 
+                _dllist_MapNodes_UntilWord ( dllist_First ( ( dllist* ) _CfrTil_->Compiler_N_M_Node_WordList ), 
                     (VMapNodeFunction) SCN_Set_NotInUseForOptimization, baseObject ) ; // old version : SCN_Set_NotInUse but now keep use for source code
             SetState ( compiler, COMPILE_MODE, saveCompileMode ) ;
             //SetState ( compiler, ARRAY_MODE, false ) ;

@@ -107,6 +107,7 @@ _LO_New ( uint64 ltype, uint64 ctype, uint64 ctype2, byte * name, byte * value, 
         word->Lo_CfrTilWord = word ;
         l0->W_SourceCode = word->W_SourceCode ;
         Word_SetTsrliScwi ( word, tsrli, scwi ) ;
+        Word_SetTsrliScwi ( l0, tsrli, scwi ) ;
     }
     return l0 ;
 }

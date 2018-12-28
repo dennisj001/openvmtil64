@@ -60,8 +60,8 @@ extern block CurrentDefinition ;
 typedef int ( *mpf2andOutFunc) (mpfr_ptr, mpfr_srcptr, mpfr_srcptr, mpfr_rnd_t) ;
 
 //#include "codegen_x86.h" // i want to make sure i have this - not using much now but probably later on
-#include "/home/dennisj/openvmtil64/src/include/machineCode.h"
-#include "/home/dennisj/openvmtil64/src/include/machineCodeMacros.h"
-#include "/home/dennisj/openvmtil64/src/include/prototypes.h"
-#include "/home/dennisj/openvmtil64/src/include/lc.h"
+#include "machineCode.h"
+#include "machineCodeMacros.h"
+#include "prototypes.h"
+#include "lc.h"
 #endif

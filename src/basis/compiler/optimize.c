@@ -352,7 +352,7 @@ void
 Compiler_CompileOptimizedLoad ( Compiler * compiler )
 {
     CompileOptimizeInfo * optInfo = compiler->OptInfo ;
-    Compiler_Word_SetCodingHere_And_ClearPreviousUseOf_Here_SCA ( optInfo->opWord, 0 ) ;
+    //Compiler_Word_SCHCPUSCA ( optInfo->opWord, 0 ) ;
     if ( optInfo->wordArg2 )
     {
         if ( optInfo->wordArg2->StackPushRegisterCode )
@@ -514,7 +514,7 @@ Compile_Optimize_OpEqual ( Compiler * compiler )
             optInfo->Optimize_Rm = OREG ;
         }
         compiler->OptimizeForcedReturn = 1 ;
-        Compiler_Word_SCHCPUSCA ( optInfo->opWord, 1 ) ;
+        //Compiler_Word_SCHCPUSCA ( optInfo->opWord, 1 ) ;
         Block_Eval ( def ) ;
         Word_Check_SetHere_To_StackPushRegisterCode ( optInfo->opWord, 0 ) ;
         if ( optInfo->wordArg1 && ( ! ( optInfo->wordArg1->CAttribute & REGISTER_VARIABLE ) ) ) Compile_Move_Reg_To_Rm ( OREG2, optInfo->wordArg1->RegToUse, 0 ) ;

@@ -1633,9 +1633,9 @@ ListObject *_LO_EvalList(LambdaCalculus *lc, ListObject *lorig, ListObject *loca
 /* src/basis/lc/read.c */
 ListObject *_LO_Read(LambdaCalculus *lc);
 ListObject *_LO_Read_DoWord(LambdaCalculus *lc, Word *word, int64 qidFlag, int64 tsrli, int64 scwi);
-ListObject *_LO_Read_DoToken(LambdaCalculus *lc, byte *token, int64 qidFlag, int64 scwi);
+ListObject *_LO_Read_DoToken(LambdaCalculus *lc, byte *token, int64 qidFlag, int64 tsrli, int64 scwi);
 ListObject *_LO_Read_DoLParen(LambdaCalculus *lc);
-ListObject *LO_Read_DoToken(LambdaCalculus *lc, byte *token, int64 qidFlag, int64 scwi);
+ListObject *LO_Read_DoToken(LambdaCalculus *lc, byte *token, int64 qidFlag, int64 tsrli, int64 scwi);
 void LO_Quote(void);
 void LO_QuasiQuote(void);
 void LO_UnQuoteSplicing(void);
