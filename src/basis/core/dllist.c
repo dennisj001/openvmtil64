@@ -549,19 +549,6 @@ _dllist_RemoveNodes ( dlnode *first, dlnode * last )
     }
 }
 
-void
-_dllist_RemoveNodes_UntilWord ( dlnode *first, Word * word )
-{
-    dlnode * node, *nextNode ;
-    for ( node = first ; node ; node = nextNode )
-    {
-        Word * word1 = ( Word* ) dobject_Get_M_Slot ( ( dobject* ) node, SCN_T_WORD ) ;
-        if ( word1 == word ) break ;
-        nextNode = dlnode_Next ( node ) ; // before Remove
-        dlnode_Remove ( node ) ;
-    }
-}
-
 dlnode *
 _dllist_Get_N_Node ( dllist * list, int64 n )
 {
@@ -614,6 +601,19 @@ _dllist_SetTopValue ( dllist * list, int64 value )
     _dllist_Set_N_Node_M_Slot ( list, 0, 0, value ) ;
 }
 #endif
+
+void
+_dllist_MapNodes_UntilWord ( dlnode *first, VMapNodeFunction mf, Word * word )
+{
+    dlnode * node, *nextNode ;
+    for ( node = first ; node ; node = nextNode )
+    {
+        Word * word1 = ( Word* ) dobject_Get_M_Slot ( ( dobject* ) node, SCN_T_WORD ) ;
+        if ( word1 == word ) break ;
+        nextNode = dlnode_Next ( node ) ; // before Remove
+        mf ( node ) ;
+    }
+}
 
 void
 dllist_Map4_FromFirstFlag_Indexed ( dllist * list, Boolean fromFirst, MapFunction4 mf, int64 one, int64 two, int64 three )

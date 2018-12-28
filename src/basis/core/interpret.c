@@ -85,8 +85,8 @@ Interpreter_DoWord ( Interpreter * interp, Word * word, int64 tsrli, int64 scwi 
 {
     if ( word )
     {
-        if ( ( word->W_RL_Index != _Lexer_->TokenStart_ReadLineIndex ) || ( word->W_SC_Index != _Lexer_->SC_Index ) )
-        Word_SetTsrliScwi ( word, tsrli, scwi ) ;
+        if ( ( word->W_RL_Index != _Lexer_->TokenStart_ReadLineIndex ) || ( word->W_SC_Index != _Lexer_->SC_Index ) ) 
+            Word_SetTsrliScwi ( word, tsrli, scwi ) ; // some of this maybe too much
         DEBUG_SETUP ( word ) ;
         Context * cntx = _Context_ ;
         interp->w_Word = word ;

@@ -318,6 +318,7 @@ typedef int64( *MapFunction_Word ) ( Symbol *, Word * ) ;
 typedef
 int64( *MapFunction_2 ) ( Symbol *, int64, int64 ) ;
 typedef void ( *MapSymbolFunction ) ( Symbol * ) ;
+typedef void ( *VMapNodeFunction ) ( dlnode * ) ;
 typedef void ( *MapSymbolFunction2 ) ( Symbol *, int64, int64 ) ;
 typedef Word* ( *MapNodeFunction ) ( dlnode * node ) ;
 typedef struct location

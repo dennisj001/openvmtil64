@@ -126,6 +126,7 @@ Compiler_SetLocalsFrameSize_AtItsCellOffset ( Compiler * compiler )
 void
 Compiler_RemoveLocalFrame ( Compiler * compiler )
 {
+    Compiler_WordStack_SCHCPUSCA ( 0, 0 ) ;
     int64 parameterVarsSubAmount = 0 ;
     Boolean returnValueFlag, already = false ;
     returnValueFlag = ( Context_CurrentWord ( )->CAttribute & C_RETURN ) || ( GetState ( compiler, RETURN_TOS | RETURN_ACCUM ) ) || compiler->ReturnVariableWord ;

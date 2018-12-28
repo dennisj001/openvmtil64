@@ -133,7 +133,7 @@ _Namespace_Do_C_Type ( Namespace * ns )
                     Interpreter_InterpretAToken ( cntx->Interpreter0, token1, t1_tsrli, t1_scwi ) ;
                     if ( ( ! word ) && Compiling )
                     {
-                        while ( token = Interpret_C_Until_Token4 ( cntx->Interpreter0, ( byte* ) ",", ( byte* ) ";", "}", 0, 0 ) )
+                        while ( token = Interpret_C_Until_Token4 ( cntx->Interpreter0, ( byte* ) ",", ( byte* ) ";", (byte*) "}", 0, 0 ) )
                         {
                             Compiler_Get_C_BackgroundNamespace ( compiler ) ;
                             if ( ( String_Equal ( token, "," ) ) )

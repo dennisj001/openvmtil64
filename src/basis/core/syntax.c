@@ -269,13 +269,12 @@ CfrTil_C_ConditionalExpression ( )
     CfrTil_If_ConditionalExpression ( ) ;
     if ( CompileMode )
     {
-        //Interpret_Until_Token ( interp, ( byte* ) ":", 0 ) ;
-        byte * token = Interpret_C_Until_Token4 ( interp, ( byte* ) ":", ( byte* ) ",", ( byte* ) ")", "}", 0 ) ;
+        byte * token = Interpret_C_Until_Token4 ( interp, ( byte* ) ":", ( byte* ) ",", ( byte* ) ")", (byte*) "}", 0 ) ;
         if ( String_Equal ( token, ":" ) )
         {
             Lexer_ReadToken ( _Lexer_ ) ;
             CfrTil_Else ( ) ;
-            Interpret_C_Until_Token4 ( interp, ( byte* ) ";", ( byte* ) ",", ( byte* ) ")", "}", 0 ) ;
+            Interpret_C_Until_Token4 ( interp, ( byte* ) ";", ( byte* ) ",", ( byte* ) ")", (byte*) "}", 0 ) ;
             CfrTil_EndIf ( ) ;
         }
     }

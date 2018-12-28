@@ -427,14 +427,14 @@ CfrTil_If_ConditionalExpression ( )
             {
                 byte * token ;
                 // interpret until ":", "else" or "endif"
-                token = Interpret_C_Until_Token4 ( interp, ( byte* ) "else", ( byte* ) "endif", ":", 0, 0 ) ;
+                token = Interpret_C_Until_Token4 ( interp, ( byte* ) "else", ( byte* ) "endif", (byte*) ":", 0, 0 ) ;
                 if ( ( token == 0 ) || ( String_Equal ( token, "endif" ) ) ) return ;
                 Parse_SkipUntil_EitherToken ( ( byte* ) "endif", 0 ) ;
             }
             else
             {
                 // skip until ":" or "else"
-                Parse_SkipUntil_EitherToken ( ( byte* ) ":", "else" ) ;
+                Parse_SkipUntil_EitherToken ( ( byte* ) ":", (byte*) "else" ) ;
                 Interpret_Until_Token ( interp, ( byte* ) "endif", 0 ) ;
             }
         }

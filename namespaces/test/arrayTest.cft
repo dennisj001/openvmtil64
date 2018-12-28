@@ -217,6 +217,7 @@ a6.ar[2][2][1] @ 0x89 _assert //pause
     a.ar [z @][y @ ][x @] 256 _adump 
 ;;
 //'adump find wdiss
+//verbosity 3 =
 : a9 ( Ar9 a | x y z )
     x 0 = y 0 = z 0 =  
     { z @ 256 < }
@@ -225,7 +226,7 @@ a6.ar[2][2][1] @ 0x89 _assert //pause
         {
             { x @ 256 < }
             {
-                a.ar [z @][y @][x @] x @ =
+                a.ar [z @][y @][x @ ] x @ =
                 x ++  
             }
             while 
@@ -243,7 +244,7 @@ a6.ar[2][2][1] @ 0x89 _assert //pause
 //' a9 find wdiss pause
 "arr9" Ar9 new arr9 a9
 adump ( 0 123 234 arr9 ) 
-//s pause
+s //pause
 "ct" class :{ byte ar [3][3][3] ; };
 "ab" ct new
 ab.ar [0][0][0] hp

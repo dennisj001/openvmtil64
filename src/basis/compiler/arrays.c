@@ -64,10 +64,8 @@ _CheckArrayDimensionForVariables_And_UpdateCompilerState ( )
 void
 Compile_ArrayDimensionOffset ( Word * word, int64 dimSize, int64 objSize )
 {
-    //if ( word && word->W_Value ) // if ! zero else 
     if ( word && ( ( word->CAttribute & LITERAL ) ? word->W_Value : 1 ) ) // if ! zero else 
     {
-        Compiler_Word_SCHCPUSCA ( word, 1 ) ;
         int64 size = dimSize * objSize ;
         // assume arrayIndex has just been pushed to TOS
         // nb. if size is zero this complete processing of an array dimension adding its amount to the pointer-offset on the stack
@@ -157,12 +155,14 @@ Do_NextArrayToken ( byte * token, Word * arrayBaseObject, int64 objSize, Boolean
         int64 dimSize = CalculateArrayDimensionSize ( arrayBaseObject, dimNumber ) ; // dimNumber is used as an array index so it is also zero base indexed
         compiler->ArrayEnds ++ ; // after, because arrayBaseObject->ArrayDimensions is a zero based array
 
-        _Debugger_PreSetup (_Debugger_, word, 0, 0 ) ;
+        _Debugger_PreSetup ( _Debugger_, word, 0, 0 ) ;
         if ( *variableFlag ) Compile_ArrayDimensionOffset ( _Context_CurrentWord ( cntx ), dimSize, objSize ) ;
         else
         {
-            // 'little endian' arrays (to maybe coin a term) : first index refers to lowest addresses
-            // d1 + d2*(D1) + d3*(D2*D1) + d4*(D3*D2*D1) ... : D1, D2 ... dimension sizes
+            // big endian arrays where first, left to right variable refers to
+            // the largest Dimension, etc. So offset from array pointer is (for a four dimensional array) : d4*(D3*D2*D1) + d3*(D2*D1) d2*(D1) + d1 
+            // where d1, d2, d3, ... are the dimension variables and D1, D2, D3, ... are the Dimension sizes
+            // D0, D1, D2, ... Dn : d0, d1, d2 ... dn => dn*(1*D(n-1)*D1*D2*..D(n-1)) 
             arrayIndex = DataStack_Pop ( ) ;
             if ( arrayIndex >= arrayBaseObject->ArrayDimensions [ dimNumber ] ) Error ( "Array index out of bounds.", "", ABORT ) ;
             increment = arrayIndex * dimSize * objSize ; // keep a running total of 
@@ -176,11 +176,10 @@ Do_NextArrayToken ( byte * token, Word * arrayBaseObject, int64 objSize, Boolean
     }
     if ( *variableFlag ) Set_CompileMode ( true ) ;
     else Set_CompileMode ( false ) ;
-    if ( word ) Interpreter_DoWord ( interp, word, -1, -1 ) ; //word->W_RL_Index, word->W_SC_Index ) ;
-    else Interpreter_InterpretAToken (interp, token, - 1 , -1) ;
+    if ( word ) Interpreter_DoWord ( interp, word, word->W_RL_Index, word->W_SC_Index ) ;
+    else Interpreter_InterpretAToken ( interp, token, - 1, - 1 ) ;
     DEBUG_SHOW ;
     Set_CompileMode ( saveCompileMode ) ;
-    SetState ( compiler, COMPILE_MODE, saveCompileMode ) ;
     return 0 ;
 }
 
@@ -227,8 +226,6 @@ _CfrTil_ArrayBegin ( Boolean lispMode, Word **pl1, int64 i )
         if ( interp->CurrentObjectNamespace ) objSize = interp->CurrentObjectNamespace->ObjectSize ; //_CfrTil_VariableValueGet ( cntx->Interpreter0->CurrentClassField, ( byte* ) "size" ) ; 
         if ( ! objSize ) CfrTil_Exception ( OBJECT_SIZE_ERROR, 0, QUIT ) ;
         variableFlag = _CheckArrayDimensionForVariables_And_UpdateCompilerState ( ) ;
-        //_WordList_Pop ( _CfrTil_->CompilerWordList ) ; // pop the initial '['
-        //DEBUG_SETUP ( baseObject ) ;
         if ( lispMode ) Arrays_DoArrayArgs_Lisp ( pl1, l1, arrayBaseObject, objSize, saveCompileMode, &variableFlag ) ;
         else Arrays_DoArrayArgs_NonLisp ( lexer, token, arrayBaseObject, objSize, saveCompileMode, &variableFlag ) ;
         _CfrTil_WordList_PushWord ( _CfrTil_->RightBracket, 1 ) ; // for the optimizer
@@ -257,7 +254,7 @@ _CfrTil_ArrayBegin ( Boolean lispMode, Word **pl1, int64 i )
         {
             if ( ( ! Lexer_IsTokenForwardDotted ( cntx->Lexer0 ) ) && ( ! GetState ( cntx->Compiler0, LC_ARG_PARSING ) ) ) interp->BaseObject = 0 ;
             if ( ! ( GetState ( cntx, C_SYNTAX | INFIX_MODE ) || GetState ( compiler, LC_ARG_PARSING ) ) )
-                _dllist_RemoveNodes_UntilWord ( dllist_First ( ( dllist* ) _CfrTil_->Compiler_N_M_Node_WordList ), baseObject ) ;
+                _dllist_MapNodes_UntilWord ( dllist_First ( ( dllist* ) _CfrTil_->Compiler_N_M_Node_WordList ), (VMapNodeFunction) SCN_Set_NotInUse, baseObject ) ;
             SetState ( compiler, COMPILE_MODE, saveCompileMode ) ;
             //SetState ( compiler, ARRAY_MODE, false ) ;
         }
@@ -281,7 +278,7 @@ CfrTil_ArrayEnd ( void )
 void
 CfrTil_ArrayModeOff ( void )
 {
-    if ( GetState ( _Compiler_, ARRAY_MODE ) ) 
+    if ( GetState ( _Compiler_, ARRAY_MODE ) )
     {
         SetState ( _Compiler_, ARRAY_MODE, false ) ;
         CfrTil_OptimizeOn ( ) ;

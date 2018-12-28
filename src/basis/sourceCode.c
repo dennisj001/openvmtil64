@@ -26,6 +26,7 @@ Debugger_ShowDbgSourceCodeAtAddress ( Debugger * debugger, byte * address )
                         word->Name = ( byte* ) "=" ;
                         fixed = 1 ;
                     }
+                   
                     byte * buffer = SC_PrepareDbgSourceCodeString ( sourceCode, word ) ;
                     _Printf ( ( byte* ) "\n%s", buffer ) ;
                     if ( fixed )
@@ -93,7 +94,7 @@ DWL_Find ( dllist * list, Word * iword, byte * address, byte* name, int64 takeFi
                 && ( aFoundWord == _Debugger_->w_Word ) ) return aFoundWord ;
             else if ( address && ( address == aFoundWord->SourceCoding ) )
             {
-                //if ( address == ( byte* ) 0x7ffff7627702 ) _Printf ( ( byte* ) "" ) ;
+                //if ( address == ( byte* ) 0x7ffff72fa09c ) _Printf ( ( byte* ) "" ) ;
                 numFound ++ ;
                 fDiff = abs ( scwi - lastScwi ) ;
                 aFoundWord->W_SC_Index = scwi ; // not sure exactly why this is necessary but it is important for now??
@@ -534,6 +535,11 @@ _CfrTil_Finish_WordSourceCode ( CfrTil * cfrtil, Word * word )
     CfrTil_SourceCode_InitEnd ( cfrtil ) ;
 }
 
+void
+SCN_Set_NotInUse ( dlnode * node )
+{
+    dobject_Set_M_Slot ( (dobject*) node, SCN_IN_USE_FLAG, 0 ) ;
+}
 // the logic needs to be reworked with recycling in these functions
 
 void
@@ -653,7 +659,7 @@ SC_PrepareDbgSourceCodeString ( byte * sc, Word * word ) // sc : source code ; s
         slt = Strlen ( token ) ;
         slsc = strlen ( ( char* ) sc ) ;
         scwi0 = word->W_SC_Index ;
-        scwci = String_FindStrnCmpIndex ( sc, token, scwi0, slt, slt / 2 ) ; //( ( slsc - scwi0 ) > 30 ) ? 30 : ( slsc - scwi0 ) ) ;
+        scwci = String_FindStrnCmpIndex ( sc, token, scwi0, slt, slt ) ; //( ( slsc - scwi0 ) > 30 ) ? 30 : ( slsc - scwi0 ) ) ;
         d0 ( byte * scspp0 = & sc [ scwi0 ] ) ;
         d0 ( byte * scspp2 = & sc [ scwci ] ) ;
         nvw = Buffer_New_pbyte ( ( slsc > BUFFER_SIZE ) ? slsc : BUFFER_SIZE ) ;

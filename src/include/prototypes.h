@@ -568,11 +568,11 @@ void _dllist_PushNode(dllist *list, dlnode *node);
 dlnode *_dllist_PopNode(dllist *list);
 void _dllist_DropN(dllist *list, int64 n);
 void _dllist_RemoveNodes(dlnode *first, dlnode *last);
-void _dllist_RemoveNodes_UntilWord(dlnode *first, Word *word);
 dlnode *_dllist_Get_N_Node(dllist *list, int64 n);
 int64 _dllist_Get_N_InUse_Node_M_Slot(dllist *list, int64 n, int64 m);
 int64 _dllist_Get_N_Node_M_Slot(dllist *list, int64 n, int64 m);
 void _dllist_Set_N_Node_M_Slot(dllist *list, int64 n, int64 m, int64 value);
+void _dllist_MapNodes_UntilWord(dlnode *first, VMapNodeFunction mf, Word *word);
 void dllist_Map4_FromFirstFlag_Indexed(dllist *list, Boolean fromFirst, MapFunction4 mf, int64 one, int64 two, int64 three);
 void dllist_Map2_FromFirstFlag(dllist *list, MapFunction2 mf, int64 one, int64 two, int64 fromFirstFlag);
 void dllist_Map(dllist *list, MapFunction0 mf);
@@ -591,9 +591,7 @@ Word *Tree_Map_OneNamespace_TwoArgs(Namespace *ns, MapFunction_2 mf2, int64 one,
 Word *Tree_Map_State_OneArg(uint64 state, MapFunction_1 mf, int64 one);
 Word *TC_Tree_Map(TabCompletionInfo *tci, MapFunction mf, Word *wordi);
 /* src/basis/core/interpret.c */
-Word *Interpreter_SetupNextWord(Interpreter *interp);
 Word *Interpreter_InterpretAToken(Interpreter *interp, byte *token, int64 tsrli, int64 scwi);
-void Interpreter_InterpretNextToken2(Interpreter *interp);
 void Interpreter_InterpretNextToken(Interpreter *interp);
 Word *Interpreter_DoWord_Default(Interpreter *interp, Word *word0, int64 tsrli, int64 scwi);
 void Interpreter_DoInfixWord(Interpreter *interp, Word *word);
@@ -607,7 +605,6 @@ Boolean _Interpreter_IsWordPrefixing(Interpreter *interp, Word *word);
 Boolean Interpreter_IsWordPrefixing(Interpreter *interp, Word *word);
 /* src/basis/core/lexer.c */
 Word *Lexer_ObjectToken_New(Lexer *lexer, byte *token);
-void _Lexer_Set_ScIndex_RlIndex(Lexer *lexer, Word *word);
 void Lexer_Set_ScIndex_RlIndex(Lexer *lexer, Word *word, int64 tsrli, int64 scwi);
 byte *_Lexer_LexNextToken_WithDelimiters(Lexer *lexer, byte *delimiters, Boolean checkListFlag, Boolean peekFlag, int reAddPeeked, uint64 state);
 void Lexer_Init(Lexer *lexer, byte *delimiters, uint64 state, uint64 allocType);
@@ -1204,6 +1201,7 @@ void CfrTil_SetDebugRGB(void);
 void CfrTil_SetNoticeRGB(void);
 /* src/basis/sourceCode.c */
 void Debugger_ShowDbgSourceCodeAtAddress(Debugger *debugger, byte *address);
+Boolean SC_IsWord_BlockOrCombinator(Word *word);
 Boolean SC_IsWord_MatchCorrectConsideringBlockOrCombinator(Word *word);
 Word *DWL_Find(dllist *list, Word *iword, byte *address, byte *name, int64 takeFirstFind, byte *newAddress, int64 fromFirstFlag);
 Boolean SC_List_AdjustAddress(dlnode *node, byte *address, byte *newAddress);
@@ -1249,6 +1247,7 @@ void CfrTil_SourceCode_Init(void);
 void CfrTil_Lexer_SourceCodeOn(void);
 byte *_CfrTil_GetSourceCode(void);
 void _CfrTil_Finish_WordSourceCode(CfrTil *cfrtil, Word *word);
+void SCN_Set_NotInUse(dlnode *node);
 void _CfrTil_RecycleInit_Compiler_N_M_Node_WordList(Boolean force);
 void CfrTil_WordList_Init(Word *word, Boolean saveWord0);
 void CfrTil_FinishSourceCode(CfrTil *cfrtil, Word *word);

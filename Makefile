@@ -28,7 +28,7 @@ INCLUDES = src/include/machineCode.h src/include/defines.h src/include/types.h \
 	
 
 OBJECTS = $(SOURCES:%.c=%.o) 
-CC = gcc
+CC = g++ #gcc
 OUT = cfrtil64-gdb
 
 default : debug
@@ -164,7 +164,7 @@ udis :
 	sudo ldconfig
 	
 _gmp : 
-	wget https://ftp.gnu.org/gnu/gmp/gmp-6.1.2.tar.xz 
+	wget https://gmplib.org/download/gmp/gmp-6.1.2.tar.xz 
 	tar -xvf gmp-6.1.2.tar.xz
 	cd gmp-6.1.2 && \
 	./configure --enable-shared && \
@@ -173,9 +173,9 @@ _gmp :
 	sudo ldconfig
 	
 _mpfr :	
-	wget http://www.mpfr.org/mpfr-current/mpfr-4.0.0.tar.xz
-	tar xvf mpfr-4.0.0.tar.xz
-	cd mpfr-4.0.0 && \
+	wget https://www.mpfr.org/mpfr-current/mpfr-4.0.1.tar.xz 
+	tar xvf mpfr-4.0.1.tar.xz
+	cd mpfr-4.0.1 && \
 	./configure --enable-shared && \
 	make && \
 	sudo make install && \
@@ -184,9 +184,9 @@ mpfr :
 	sudo apt-get install libmpfr4 libmpfr-dev
 	
 _mpc :	_mpfr
-	wget ftp://ftp.gnu.org/gnu/mpc/mpc-1.0.3.tar.gz
-	tar xzf mpc-1.0.3.tar.gz
-	cd mpc-1.0.3 && \
+	wget https://ftp.gnu.org/gnu/mpc/mpc-1.1.0.tar.gz.sig 
+	tar xzf mpc-1.1.0.tar.gz
+	cd mpc-1.1.0 && \
 	./configure --enable-shared && \
 	make && \
 	sudo make install && \
