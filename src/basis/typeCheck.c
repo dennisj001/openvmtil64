@@ -52,12 +52,14 @@ TSI_TypeCheck_TypeVariableSigCode ( TSI * tsi, Word * stackWord0, Word * stackWo
     // word1 was parsed and pushed before word0
     // in the case of equal ('=' : word1 = word0 , word1 word0 = , word0 word1 store) word1 can be a type variable and word0 can be any fixed type
     //CfrTil_TypeStatus_Print ( word, tsi->actualTypeRecorded ) ;
+    uint64 stackWord0_CAttribute ;
     if ( stackWord1 && stackWord0 && stackWord1->Name && stackWord0->Name )
     {
-        uint64 stackWord0_CAttribute = ( stackWord0->CAttribute & ( T_INT | T_BIG_NUM | T_STRING | T_BOOLEAN | OBJECT | T_ANY | T_UNDEFINED | T_VOID ) ) ;
+        stackWord0_CAttribute = ( stackWord0->CAttribute & ( T_BYTE | T_INT | T_BIG_NUM | T_STRING | T_BOOLEAN | OBJECT | T_ANY | T_UNDEFINED | T_VOID ) ) ;
         if ( stackWord0_CAttribute )
         {
-            if ( ( stackWord1->CAttribute2 & T_ANY ) || ( ! ( stackWord1->CAttribute & ( T_INT | T_BIG_NUM | T_STRING | T_BOOLEAN | OBJECT | T_VOID ) ) ) )
+            if ( ( stackWord1->CAttribute2 & (T_ANY|T_TYPE_VARIABLE|T_UNDEFINED) ) 
+                || ( ! ( stackWord1->CAttribute & ( T_BYTE | T_INT | T_BIG_NUM | T_STRING | T_BOOLEAN | OBJECT | T_VOID ) ) ) )
             {
                 // we infer that ...
                 stackWord1->CAttribute |= stackWord0_CAttribute ;
@@ -174,9 +176,7 @@ CfrTil_Typecheck ( Word * opWord )
 void
 TSI_TypeStatus_Print ( TSI *tsi )
 {
-    byte buffer [128] ;
-    buffer [0] = 0 ;
-    _Printf ( ( byte* ) "\n%s :: opWord : %s.%s :: type expected : %s :: type recorded : %s\n\t : at %s", tsi->TypeErrorStatus ? "apparent type mismatch" : "type match",
+    _Printf ( ( byte* ) "\n%s :: %s.%s :: type expected : %s :: type recorded : %s : %s", tsi->TypeErrorStatus ? "apparent type mismatch" : "type match",
         tsi->OpWord->S_ContainingNamespace ? tsi->OpWord->S_ContainingNamespace->Name : ( byte* ) "<literal>",
         tsi->OpWord->Name, Word_ExpandTypeLetterSignature ( tsi->OpWord, 1 ), tsi->ActualTypeStackRecordingBuffer, Context_Location ( ) ) ;
 }

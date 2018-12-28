@@ -86,7 +86,7 @@ DWL_Find ( dllist * list, Word * iword, byte * address, byte* name, int64 takeFi
         {
             aFoundWord = ( Word* ) dobject_Get_M_Slot ( ( dobject* ) anode, SCN_T_WORD ) ;
             iuFlag = dobject_Get_M_Slot ( ( dobject* ) anode, SCN_IN_USE_FLAG ) ;
-            if ( ( ! aFoundWord->S_WordData ) || ( ! iuFlag ) ) continue ; //iuFlag != true ) ) continue ;
+            if ( ( ! aFoundWord->S_WordData ) || ( ! ( iuFlag & SCN_IN_USE_FOR_SOURCE_CODE ) ) ) continue ; 
             scwi = dobject_Get_M_Slot ( ( dobject* ) anode, SCN_SC_WORD_INDEX ) ;
             naddress = aFoundWord->SourceCoding ;
             if ( iword && ( aFoundWord == iword ) ) return aFoundWord ;
@@ -173,7 +173,7 @@ CfrTil_AdjustDbgSourceCodeAddress ( byte * address, byte * newAddress )
 void
 SC_List_Set_NotInUseForSC ( dlnode * node )
 {
-    dobject_Set_M_Slot ( ( dobject* ) node, SCN_IN_USE_FLAG, SCN_IN_USE_FLAG_NOT_USED_FOR_SC ) ;
+    dobject_Set_M_Slot ( ( dobject* ) node, SCN_IN_USE_FLAG, SCN_IN_USE_FOR_OPTIMIZATION ) ;
 }
 
 void
@@ -184,7 +184,7 @@ CfrTil_AdjustDbgSourceCode_InUseFalse ( )
 }
 
 void
-_CfrTil_WordList_PushWord ( Word * word, Boolean inUseFlag )
+_CfrTil_WordList_PushWord ( Word * word, int64 inUseFlag )
 {
     CfrTil_WordList_Push ( word, inUseFlag ) ;
 }
@@ -193,7 +193,8 @@ void
 CfrTil_WordList_PushWord ( Word * word )
 {
     _CfrTil_WordList_PushWord ( word,
-        ( ! ( word->CAttribute & ( NAMESPACE | OBJECT_OPERATOR | OBJECT_FIELD ) ) ) || ( word->CAttribute & ( DOBJECT ) ) ) ;
+        (( ! ( word->CAttribute & ( NAMESPACE | OBJECT_OPERATOR | OBJECT_FIELD ) ) ) 
+        || ( word->CAttribute & ( DOBJECT ) ) ) ? SCN_IN_USE_FLAG_ALL : 0 ) ;
 }
 
 inline void
@@ -539,6 +540,12 @@ void
 SCN_Set_NotInUse ( dlnode * node )
 {
     dobject_Set_M_Slot ( (dobject*) node, SCN_IN_USE_FLAG, 0 ) ;
+}
+
+void
+SCN_Set_NotInUseForOptimization ( dlnode * node )
+{
+    dobject_Set_M_Slot ( (dobject*) node, SCN_IN_USE_FLAG, SCN_IN_USE_FOR_SOURCE_CODE ) ;
 }
 // the logic needs to be reworked with recycling in these functions
 

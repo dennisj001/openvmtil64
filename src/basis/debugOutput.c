@@ -373,7 +373,7 @@ _PrepareDbgSourceCodeString ( Word * word, byte * il, int64 tvw )
     wrli = word->W_RL_Index ;
     slil = Strlen ( String_RemoveEndWhitespace ( il ) ) ;
     inc = slil - wrli ;
-    ots = String_FindStrnCmpIndex ( il, word->Name, wrli, strlen ( ( char* ) word->Name ), slt + 2 ) ; //(( inc > 30 ) ? 30 : inc) ) ; //20 ) ;// adjust from wrli which is 
+    ots = String_FindStrnCmpIndex ( il, word->Name, wrli, strlen ( ( char* ) word->Name ), slt ) ; //(( inc > 30 ) ? 30 : inc) ) ; //20 ) ;// adjust from wrli which is 
     totalBorder = ( tvw - slt ) ; // the borders allow us to slide token within the window of tvw
     // try to get nts relatively the same as ots
     idealBorder = ( totalBorder / 2 ) ;

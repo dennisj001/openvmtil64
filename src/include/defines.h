@@ -218,11 +218,13 @@
 #define CFRTIL_WORD ( (uint64) 1 << 1 )
 #define T_RAW_STRING ( (uint64) 1 << 2 )
 #define T_STRING ( (uint64) 1 << 3 )
-#define T_INT ( (uint64) 1 << 4 )
+#define T_INT64 ( (uint64) 1 << 4 )
+#define T_INT T_INT64
 #define T_FLOAT ( (uint64) 1 << 5 )
 #define T_BOOLEAN ( (uint64) 1 << 6 )
 #define T_BIG_NUM ( (uint64) 1 << 7 )
-#define T_CHAR ( (uint64) 1 << 8 )
+#define T_BYTE ( (uint64) 1 << 8 )
+#define T_CHAR T_BYTE
 #define T_HEAD ( (uint64) 1 << 8 )
 #define T_TAIL ( (uint64) 1 << 9 )
 #define LITERAL ( (uint64) 1 << 10 )
@@ -699,7 +701,9 @@
 #define SCN_IN_USE_FLAG 2
 #define SCN_LAST_SLOT SCN_IN_USE_FLAG
 #define SCN_NUMBER_OF_SLOTS (SCN_LAST_SLOT + 1) //1 : remember - 0 indexed array
-#define SCN_IN_USE_FLAG_NOT_USED_FOR_SC 3 
+#define SCN_IN_USE_FOR_OPTIMIZATION 1
+#define SCN_IN_USE_FOR_SOURCE_CODE 2 
+#define SCN_IN_USE_FLAG_ALL 3
 
 #define PP_SKIP 0
 #define PP_INTERPRET 1

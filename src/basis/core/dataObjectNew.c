@@ -207,9 +207,13 @@ _Class_New ( byte * name, uint64 type, int64 cloneFlag )
 Word *
 _CfrTil_ClassField_New ( byte * token, Class * aclass, int64 size, int64 offset )
 {
+    int64 attribute = 0 ;
     Word * word = _DObject_New ( token, 0, ( IMMEDIATE | OBJECT_FIELD | CPRIMITIVE ), 0, 0, OBJECT_FIELD, ( byte* ) _DataObject_Run, 0, 1, 0, DICTIONARY ) ;
     word->TypeNamespace = aclass ;
     word->ObjectSize = size ;
+    if ( size == 1 ) attribute = T_BYTE ; 
+    else if ( size == 8 ) attribute = T_INT64 ;
+    word->CAttribute |= attribute ;
     word->Offset = offset ;
 
     return word ;

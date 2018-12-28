@@ -191,14 +191,14 @@ a6 a8
     a.ar[n @ 1 +][m @][o @] a.ar[n @ 2 +][m @][o @] @ = 
     nl "a7.a : " ps location a.ar[n @ 1 +][m @][o @] 16 dump
     // a.ar[n @ 2 +][m @][o @] @ dup p 0x89 s _assert 
-    a.ar[n @ 1 +][m @][o @] @ dup p 0x89 s _assert //pause
-;
+    a.ar[n @ 1 +][m @][o @] @ dup hp 0x89 s _assert //pause
+;;
 ' a7 find wdiss
 a6.ar[2][2][1] @ 0x89 _assert //pause
 "a6 : " ps location a6.ar[2][2][1] 16 dump //pause
-0 2 1 a6 a7
-//a7(0,2,1,a6) // not a prefix function
-"a6 : " ps location a6 72 dump //pause
+//0 2 1 a6 a7 // as not a prefix function
+a7(0,2,1,a6) // as a prefix function : lexer test, note dense lexeme packing is possible here
+"a6 : " ps location a6 a6.size @ dump //pause
 "Ar9" class :{ byte ar [256][256][256] };
 
 //verbosity 2 =
@@ -244,7 +244,7 @@ a6.ar[2][2][1] @ 0x89 _assert //pause
 //' a9 find wdiss pause
 "arr9" Ar9 new arr9 a9
 adump ( 0 123 234 arr9 ) 
-s //pause
+s pause
 "ct" class :{ byte ar [3][3][3] ; };
 "ab" ct new
 ab.ar [0][0][0] hp
@@ -263,6 +263,7 @@ ab.ar [0][0][0] @ dup p 263 _assert
     a.ar 32 dump
 ;
 "ac" ct new 
+'tct find wdiss
 2 ac tct //pause
 
 #if 1

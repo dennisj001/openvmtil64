@@ -70,7 +70,8 @@ Compiler_GetOptimizeState ( Compiler * compiler, Word * word )
             optInfo->node ; optInfo->node = optInfo->nextNode )
         {
             optInfo->nextNode = dlnode_Next ( optInfo->node ) ;
-            if ( dobject_Get_M_Slot ( ( dobject* ) optInfo->node, SCN_IN_USE_FLAG ) ) optInfo->wordn = ( Word* ) dobject_Get_M_Slot ( ( dobject* ) optInfo->node, SCN_T_WORD ) ;
+            if ( dobject_Get_M_Slot ( ( dobject* ) optInfo->node, SCN_IN_USE_FLAG ) & SCN_IN_USE_FOR_OPTIMIZATION ) 
+                optInfo->wordn = ( Word* ) dobject_Get_M_Slot ( ( dobject* ) optInfo->node, SCN_T_WORD ) ;
             else continue ;
             //if (( optInfo->wordn->CAttribute2 & ( RIGHT_BRACKET ) ) || ( optInfo->wordn->CAttribute & OBJECT_FIELD ) )
             if ( ( optInfo->wordn->CAttribute2 & ( RIGHT_PAREN | RIGHT_BRACKET ) ) )

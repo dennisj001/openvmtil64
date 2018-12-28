@@ -228,7 +228,7 @@ _CfrTil_ArrayBegin ( Boolean lispMode, Word **pl1, int64 i )
         variableFlag = _CheckArrayDimensionForVariables_And_UpdateCompilerState ( ) ;
         if ( lispMode ) Arrays_DoArrayArgs_Lisp ( pl1, l1, arrayBaseObject, objSize, saveCompileMode, &variableFlag ) ;
         else Arrays_DoArrayArgs_NonLisp ( lexer, token, arrayBaseObject, objSize, saveCompileMode, &variableFlag ) ;
-        _CfrTil_WordList_PushWord ( _CfrTil_->RightBracket, 1 ) ; // for the optimizer
+        _CfrTil_WordList_PushWord ( _CfrTil_->RightBracket, SCN_IN_USE_FLAG_ALL ) ; // for the optimizer
         if ( CompileMode ) // update the baseObject offset 
         {
             if ( ! variableFlag )
@@ -253,8 +253,9 @@ _CfrTil_ArrayBegin ( Boolean lispMode, Word **pl1, int64 i )
         else
         {
             if ( ( ! Lexer_IsTokenForwardDotted ( cntx->Lexer0 ) ) && ( ! GetState ( cntx->Compiler0, LC_ARG_PARSING ) ) ) interp->BaseObject = 0 ;
-            if ( ! ( GetState ( cntx, C_SYNTAX | INFIX_MODE ) || GetState ( compiler, LC_ARG_PARSING ) ) )
-                _dllist_MapNodes_UntilWord ( dllist_First ( ( dllist* ) _CfrTil_->Compiler_N_M_Node_WordList ), (VMapNodeFunction) SCN_Set_NotInUse, baseObject ) ;
+            //if ( ! ( GetState ( cntx, C_SYNTAX | INFIX_MODE ) || GetState ( compiler, LC_ARG_PARSING ) ) )
+            if ( ! variableFlag ) _dllist_MapNodes_UntilWord ( dllist_First ( ( dllist* ) _CfrTil_->Compiler_N_M_Node_WordList ), 
+                    (VMapNodeFunction) SCN_Set_NotInUseForOptimization, baseObject ) ; // old version : SCN_Set_NotInUse but now keep use for source code
             SetState ( compiler, COMPILE_MODE, saveCompileMode ) ;
             //SetState ( compiler, ARRAY_MODE, false ) ;
         }
