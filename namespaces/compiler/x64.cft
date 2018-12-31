@@ -36,7 +36,7 @@
 // note : rm : _reg memory - the _register which contains the memory address in _mod instructions
 
 // cfrTil uses intel syntax convention
-logOn
+//logOn
 C 
 Compiler Compiling C Asm
 : :asm compileModeOn sourceCodeInit token create begin ' {| find compileWord sourceCodeOn ; immediate  
@@ -524,5 +524,5 @@ infixOff
 
 sp 
 2 + 7 assertStkChk // stack checking
-logOff
+//logOff
     

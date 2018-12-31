@@ -158,7 +158,6 @@ BigNum
 : bnInit ( precision width ) precision @ pPrecision width @ pWidth ;; 
 //'bnInit find wdis 
 bnInit ( 16 16 )
-//d: 16 16 bnInit
 Root
 : bigNumOff "BigNum" notUsing ;
 'bnOff 'bigNumOff find alias
