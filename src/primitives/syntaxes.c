@@ -13,7 +13,7 @@ void
 CfrTil_InfixModeOn ( )
 {
     SetState ( _Context_, INFIX_MODE, true ) ;
-    Namespace_DoNamespace ( (byte*) "Infix" ) ;
+    Namespace_DoNamespace_Name ( (byte*) "Infix" ) ;
 }
 
 void
@@ -50,10 +50,10 @@ CfrTil_C_Syntax_On ( )
     Context * cntx = _Context_ ;
     Compiler_Get_C_BackgroundNamespace ( cntx->Compiler0 ) ;
     SetState ( cntx, C_SYNTAX | PREFIX_MODE | INFIX_MODE, true ) ;
-    Namespace_DoNamespace ( ( byte* ) "C" ) ;
-    Namespace_DoNamespace ( ( byte* ) "PrefixCombinators" ) ;
-    Namespace_DoNamespace ( ( byte* ) "Infix" ) ;
-    Namespace_DoNamespace ( ( byte* ) "C_Syntax" ) ;
+    Namespace_DoNamespace_Name ( ( byte* ) "C" ) ;
+    Namespace_DoNamespace_Name ( ( byte* ) "PrefixCombinators" ) ;
+    Namespace_DoNamespace_Name ( ( byte* ) "Infix" ) ;
+    Namespace_DoNamespace_Name ( ( byte* ) "C_Syntax" ) ;
     Compiler_SetAs_InNamespace_C_BackgroundNamespace ( cntx->Compiler0 ) ;
     Context_SetDefaultTokenDelimiters ( cntx, ( byte* ) " ,\n\r\t", CONTEXT ) ;
 }

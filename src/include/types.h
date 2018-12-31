@@ -230,6 +230,8 @@ typedef struct _Identifier // _Symbol
 
     block Definition ;
     dllist * DebugWordList ;
+    int64 StartCharRlIndex ;
+    int64 SC_WordIndex ;
     struct _Identifier * CfrTilWord ;
     struct _WordData * S_WordData ;
 } Identifier, ID, Word, Namespace, Vocabulary, Class, DynamicObject, DObject, ListObject, Symbol, MemChunk, HistoryStringNode, Buffer ;
@@ -345,8 +347,6 @@ typedef struct _WordData
     byte * Filename ; // ?? should be made a part of a accumulated string table ??
     int64 LineNumber ;
     int64 CursorPosition ;
-    int64 StartCharRlIndex ;
-    int64 SC_WordIndex ;
     int64 NumberOfArgs ;
     int64 NumberOfLocals ;
 
@@ -432,8 +432,8 @@ typedef struct _WordData
 #define W_SearchNumber W_Value2
 #define W_FoundMarker W_Value3
 #define W_WordListOriginalWord S_WordData->OriginalWord
-#define W_RL_Index S_WordData->StartCharRlIndex
-#define W_SC_Index S_WordData->SC_WordIndex 
+#define W_RL_Index StartCharRlIndex
+#define W_SC_Index SC_WordIndex 
 #define W_SC_WordList S_WordData->SourceCodeWordList 
 #define W_SC_MemSpaceRandMarker S_WordData->SourceCodeMemSpaceRandMarker
 #define W_OpInsnCode S_WordData->OpInsnCode 

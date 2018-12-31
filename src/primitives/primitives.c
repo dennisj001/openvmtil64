@@ -41,6 +41,7 @@ CPrimitive CPrimitives [] = {
     { "lcReset", 0, 0, 0, ( block ) LC_Reset, 0, 0, 0, "Lisp", "Root" },
     { "lcClearDefines", 0, 0, 0, ( block ) LC_ClearDefinesNamespace, 0, 0, 0, "Lisp", "Root" },
     { "lcOff", 0, 0, 0, ( block ) LC_LispNamespacesOff, 0, 0, 0, "Lisp", "Root" },
+    { "lcOn", 0, 0, 0, ( block ) LC_New, 0, 0, 0, "Lisp", "Root" },
 
     { "'", 0, 0, 0, CfrTil_SingleQuote, IMMEDIATE | KEYWORD, 0, 0, "Forth", "Root" },
     { ",", 0, 0, 0, CompileInt32, 0, 0, 0, "Forth", "Root" },

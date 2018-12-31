@@ -41,6 +41,7 @@ LO_EvalList (LambdaCalculus * lc, ListObject *l0, ListObject *locals, Boolean ap
             l0 = LO_Apply (lc, l0, lfirst, lfunction, largs, applyFlag ) ;
         }
     }
+    //if ( Is_DebugOn ) Compiler_SC_WordList_Show ( 0, 0, 0 ) ;
     return l0 ;
 }
 

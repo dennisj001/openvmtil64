@@ -115,7 +115,12 @@
                    projectFiles="false"
                    kind="IMPORTANT_FILES_FOLDER">
       <itemPath>Makefile</itemPath>
+      <itemPath>README.txt</itemPath>
+      <itemPath>etc</itemPath>
+      <itemPath>init.cft</itemPath>
       <itemPath>nbproject/private/launcher.properties</itemPath>
+      <itemPath>mir</itemPath>
+      <itemPath>namespaces</itemPath>
     </logicalFolder>
   </logicalFolder>
   <sourceFolderFilter>^(nbproject)$</sourceFolderFilter>

@@ -60,7 +60,7 @@ cfrtil64 : src/include/prototypes.h $(OBJECTS) _cfrtil64_O3
 	strip -o cfrtil64 cfrtil64o3
 	mv cfrtil64 bin/
 	
-cfrtil64s : CFLAGS = $(CFLAGS_CORE) -03
+cfrtil64s : CFLAGS = $(CFLAGS_CORE) -O3
 cfrtil64s : src/include/prototypes.h $(OBJECTS)
 	$(CC) -static $(CFLAGS) $(OBJECTS) -O3 -o cfrtil64s $(LIBS)
 	strip cfrtil64s
@@ -143,6 +143,7 @@ optimize :
 	#make optimize1
 	#make optimize2
 	make optimize3
+	make cfrtil64s
 	make oclean
 	make
 	-sudo cp bin/cfrtil64o3 /usr/local/bin/cfrtil64

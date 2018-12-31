@@ -178,6 +178,8 @@ _Class_Object_New ( byte * name, uint64 category )
 Namespace *
 _Class_New ( byte * name, uint64 type, int64 cloneFlag )
 {
+    if ( String_Equal ( name, "a")) 
+        _Printf ((byte*) "") ;
     Namespace * ns = _Namespace_Find ( name, 0, 0 ), * sns ;
     int64 size = 0 ;
     if ( ! ns )
@@ -188,7 +190,7 @@ _Class_New ( byte * name, uint64 type, int64 cloneFlag )
             size = _Namespace_VariableValueGet ( sns, ( byte* ) "size" ) ;
         }
         ns = _DObject_New ( name, 0, CLASS | IMMEDIATE | type, 0, 0, type, ( byte* ) _DataObject_Run, 0, 0, sns, DICTIONARY ) ;
-        _Namespace_DoNamespace ( ns, 1 ) ; // before "size", "this"
+        Namespace_DoNamespace ( ns ) ; // before "size", "this"
         Word *ws = _CfrTil_Variable_New ( ( byte* ) "size", size ) ; // start with size of the prototype for clone
         //ws->CAttribute |= NAMESPACE_VARIABLE ;
         _Context_->Interpreter0->ThisNamespace = ns ;
@@ -198,7 +200,7 @@ _Class_New ( byte * name, uint64 type, int64 cloneFlag )
     else
     {
         _Printf ( ( byte* ) "\nNamespace Error ? : \'%s\' already exists! : %s : size = %d\n", ns->Name, _Word_SourceCodeLocation_pbyte ( ns ), ns->ObjectSize ) ;
-        _Namespace_DoNamespace ( ns, 1 ) ;
+        Namespace_DoNamespace ( ns ) ;
     }
     CfrTil_WordList_Init ( 0, 0 ) ;
     return ns ;
@@ -281,6 +283,7 @@ Namespace *
 _Namespace_New ( byte * name, Namespace * containingNs )
 {
     Namespace * ns = _DObject_New ( name, 0, ( NAMESPACE | IMMEDIATE ), 0, 0, NAMESPACE, ( byte* ) _DataObject_Run, 0, 0, containingNs, DICTIONARY ) ;
+    //Namespace * ns = _DObject_New ( name, 0, ( NAMESPACE ), 0, 0, NAMESPACE, ( byte* ) _DataObject_Run, 0, 0, containingNs, DICTIONARY ) ;
     return ns ;
 }
 

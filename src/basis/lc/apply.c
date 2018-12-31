@@ -106,9 +106,10 @@ _Interpreter_LC_InterpretWord ( Interpreter *interp, ListObject *l0, Boolean fun
     {
         word = l0->Lo_CfrTilWord ;
         if ( ! word ) word = l0 ;
+        else { word->W_RL_Index = l0->W_RL_Index ; word->W_SC_Index = l0->W_SC_Index ; }
         // source code is not good for lisp ??!??
-        Interpreter_DoWord ( interp, word, functionFlag ? word->W_RL_Index : l0->W_RL_Index, functionFlag ? word->W_SC_Index : l0->W_SC_Index ) ;
-        //Interpreter_DoWord ( interp, word, word->W_RL_Index, word->W_SC_Index ) ;
+        //Interpreter_DoWord ( interp, word, functionFlag ? word->W_RL_Index : l0->W_RL_Index, functionFlag ? word->W_SC_Index : l0->W_SC_Index ) ;
+        Interpreter_DoWord ( interp, word, l0->W_RL_Index, l0->W_SC_Index ) ;
         //SetState ( _Debugger_, DEBUG_SHTL_OFF, false ) ;
     }
 }
@@ -191,7 +192,7 @@ void
 _LO_CompileOrInterpret ( ListObject *lfunction, ListObject *largs )
 {
     ListObject *lfword = lfunction->Lo_CfrTilWord ;
-    Word_SetTsrliScwi( lfword, lfunction->W_RL_Index, lfunction->W_SC_Index ) ;
+    //Word_SetTsrliScwi( lfword, lfunction->W_RL_Index, lfunction->W_SC_Index ) ;
 
     if ( largs && lfword && ( lfword->CAttribute & ( CATEGORY_OP_ORDERED | CATEGORY_OP_UNORDERED ) ) ) // ?!!? 2 arg op with multi-args : this is not a precise distinction yet : need more types ?!!?
     {

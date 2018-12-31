@@ -158,7 +158,6 @@ BigNum
 : bnInit ( precision width ) precision @ pPrecision width @ pWidth ;; 
 //'bnInit find wdis 
 bnInit ( 16 16 )
-//d: 16 16 bnInit
 Root
 : bigNumOff "BigNum" notUsing ;
 'bnOff 'bigNumOff find alias
@@ -336,9 +335,10 @@ C Compiler Int Lexer
 Root
 : license ofile ( "./LICENSE" ) ;
 //license //pause
-OpenVmTil
+Lisp OpenVmTil
 : lispOff "Lisp" notUsing "LispTemp" notUsing "LispDefines" notUsing ; //lcReset ;
-'lispOn 'lisp find alias
+: lispOn lcOn ;
+lispOff
 c_syntaxOff
 Root
 sp 
@@ -362,7 +362,7 @@ dbgOn
 : TODO ( str ) _TODO ( str @ ) pause ;;
 #endif
 scOn
-System 
+System C
 test 
 #if _doDemo 
 demo 
@@ -370,7 +370,7 @@ demo
 stringMacrosOff
 #else // of course you can trim this file to your needs and put your init code maybe here if you like
 
-'doInitTest 0 const
+'doInitTest 1 const
 #if doInitTest
 #endif
 

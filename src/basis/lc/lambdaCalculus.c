@@ -81,7 +81,8 @@ _LO_New_RawStringOrLiteral ( Lexer * lexer, byte * token, int64 qidFlag, int64 t
         }
         word->Lo_CfrTilWord = word ;
         if ( qidFlag ) word->CAttribute &= ~ T_LISP_SYMBOL ;
-        Word_SetTsrliScwi ( word, tsrli, scwi ) ;
+        word->W_SC_Index = scwi ;
+        word->W_RL_Index = tsrli ;
         return word ;
     }
     else
@@ -100,14 +101,15 @@ _LO_New ( uint64 ltype, uint64 ctype, uint64 ctype2, byte * name, byte * value, 
         ( ltype & T_LISP_SYMBOL ) ? word ? word->RunType : 0 : 0, 0, 0, 0, addToNs, LISP ) ; //addToNs, LISP ) ;
     if ( ltype & LIST ) _LO_ListInit ( l0, allocType ) ;
     else if ( ltype & LIST_NODE ) l0->S_SymbolList = ( dllist* ) value ;
-    Word_SetTsrliScwi( l0, tsrli, scwi ) ;
     if ( word )
     {
         l0->Lo_CfrTilWord = word ;
         word->Lo_CfrTilWord = word ;
         l0->W_SourceCode = word->W_SourceCode ;
-        Word_SetTsrliScwi ( word, tsrli, scwi ) ;
-        Word_SetTsrliScwi ( l0, tsrli, scwi ) ;
+        word->W_SC_Index = scwi ;
+        word->W_RL_Index = tsrli ;
+        l0->W_SC_Index = scwi ;
+        l0->W_RL_Index = tsrli ;
     }
     return l0 ;
 }
@@ -200,8 +202,10 @@ _LO_CopyOne ( ListObject * l0, uint64 allocType )
     ListObject * l1 = 0 ;
     if ( l0 )
     {
-        l1 = ( ListObject * ) _object_Allocate ( sizeof ( ListObject ), allocType ) ; //Mem_Allocate ( ( sizeof (ListObject ) + ((slots-1) * CELL), AllocType ) ;
-        MemCpy ( l1, l0, sizeof ( ListObject ) ) ;
+        //l1 = ( ListObject * ) _object_Allocate ( sizeof ( ListObject ), allocType ) ; 
+        //if (l0 == (ListObject *) 0x7ffff71321d8 ) _Printf ((byte*) "" ) ;
+        //MemCpy ( l1, l0, sizeof ( ListObject ) ) ;
+        l1 = Word_Copy ( l0, allocType ) ;
         // nb. since we are coping the car/cdr are the same as the original so we must clear them else when try to add to the list and remove first it will try to remove from a wrong list so ...
         l1->Lo_Car = 0 ;
         l1->Lo_Cdr = 0 ;
@@ -327,7 +331,7 @@ LO_Repl ( )
     _Printf ( ( byte* ) "\ncfrTil lisp : (type 'exit' or 'bye' to exit)\n including init file :: './namespaces/compiler/lcinit.cft'\n" ) ;
     LC_ReadInitFile ( ( byte* ) "./namespaces/compiler/lcinit.cft" ) ;
     _Repl ( ( block ) LC_ReadEvalPrint_ListObject ) ;
-
+    SetState ( compiler, LISP_MODE, false ) ;
 }
 
 void

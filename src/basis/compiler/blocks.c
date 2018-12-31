@@ -11,7 +11,7 @@ BI_Block_Copy ( BlockInfo * bi, byte* dstAddress, byte * srcAddress, int64 bsize
     int64 isize, left ;
     if ( dstAddress ) SetHere ( dstAddress, 1 ) ;
     bi->CopiedToStart = Here ;
-    CfrTil_AdjustDbgSourceCode_InUseFalse ( ) ;
+    CfrTil_AdjustDbgSourceCode_ScInUseFalse ( srcAddress ) ;
     for ( left = bsize ; ( left > 0 ) ; srcAddress += isize )
     {
         if ( optFlag ) PeepHole_Optimize ( ) ;
@@ -131,9 +131,12 @@ void
 CfrTil_TurnOffBlockCompiler ( )
 {
     Compiler * compiler = _Context_->Compiler0 ;
-    if ( ! GetState ( compiler, LISP_MODE ) ) CfrTil_LeftBracket ( ) ;
-    _CfrTil_RemoveNamespaceFromUsingListAndClear ( ( byte* ) "__labels__" ) ;
+    if ( ! GetState ( compiler, LISP_MODE ) )
+    {
+        CfrTil_LeftBracket ( ) ;
+    }
     _Compiler_FreeAllLocalsNamespaces ( compiler ) ;
+    _CfrTil_RemoveNamespaceFromUsingListAndClear ( ( byte* ) "__labels__" ) ;
     SetState ( compiler, VARIABLE_FRAME, false ) ;
 }
 
@@ -156,7 +159,7 @@ _CfrTil_BeginBlock0 ( Boolean compileJumpFlag, byte * here )
 {
     Context * cntx = _Context_ ;
     Compiler * compiler = cntx->Compiler0 ;
-    BlockInfo *bi = BlockInfo_New () ;
+    BlockInfo *bi = BlockInfo_New ( ) ;
     if ( ( ! CompileMode ) || ( ! Compiler_BlockLevel ( compiler ) ) )// first block
     {
         CheckCodeSpaceForRoom ( ) ;
@@ -287,7 +290,7 @@ CfrTil_EndBlock ( )
 }
 
 BlockInfo *
-BlockInfo_New ()
+BlockInfo_New ( )
 {
     BlockInfo *bi = ( BlockInfo * ) Mem_Allocate ( sizeof (BlockInfo ), COMPILER_TEMP ) ;
     return bi ;

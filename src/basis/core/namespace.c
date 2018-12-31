@@ -91,6 +91,8 @@ Namespace_IsUsing ( byte * name )
 void
 _Namespace_SetState ( Namespace * ns, uint64 state )
 {
+    //if ( String_Equal ( ns->Name, "a")) 
+    //    _Printf ((byte*) "") ;
     ns->State = state ;
 }
 
@@ -151,7 +153,7 @@ _Namespace_AddToUsingList ( Namespace * ns )
         if ( ns->W_WordListOriginalWord ) ns = ns->W_WordListOriginalWord ; //_Namespace_Find ( ns->Name, 0, 0 ) ; // this is needed because of Compiler_PushCheckAndCopyDuplicates
         Namespace_SetState ( ns, USING ) ;
     }
-    if ( ns != svNs ) 
+    if ( ns != svNs )
     {
         //CfrTil_Using () ;
         Namespace_SetState ( svNs, USING ) ;
@@ -272,9 +274,9 @@ _CfrTil_IsContainingNamespace ( byte * wordName, byte * namespaceName )
 }
 
 void
-Namespace_DoNamespace ( byte * name )
+Namespace_DoNamespace_Name ( byte * name )
 {
-    _Namespace_DoNamespace ( Namespace_Find ( name ), 1 ) ;
+    Namespace_DoNamespace ( Namespace_Find ( name ) ) ;
 }
 
 void
@@ -336,7 +338,7 @@ _RemoveSubNamespacesFromUsingList ( Symbol * symbol, Namespace * ns )
 {
     Namespace * ns1 = ( Namespace* ) symbol ;
     // if ns contains ns1 => ns1 is dependent on ns ; we are removing ns => we have to remove ns1
-    if ( ns1->ContainingNamespace == ns )
+    if ( ( ns1->CAttribute & NAMESPACE_TYPE ) && ( ns1->ContainingNamespace == ns ) )
     {
         _Namespace_RemoveFromUsingList ( ns1 ) ;
     }

@@ -26,7 +26,7 @@ Debugger_ShowDbgSourceCodeAtAddress ( Debugger * debugger, byte * address )
                         word->Name = ( byte* ) "=" ;
                         fixed = 1 ;
                     }
-                   
+
                     byte * buffer = SC_PrepareDbgSourceCodeString ( sourceCode, word ) ;
                     _Printf ( ( byte* ) "\n%s", buffer ) ;
                     if ( fixed )
@@ -86,7 +86,7 @@ DWL_Find ( dllist * list, Word * iword, byte * address, byte* name, int64 takeFi
         {
             aFoundWord = ( Word* ) dobject_Get_M_Slot ( ( dobject* ) anode, SCN_T_WORD ) ;
             iuFlag = dobject_Get_M_Slot ( ( dobject* ) anode, SCN_IN_USE_FLAG ) ;
-            if ( ( ! aFoundWord->S_WordData ) || ( ! ( iuFlag & SCN_IN_USE_FOR_SOURCE_CODE ) ) ) continue ; 
+            if ( ( ! aFoundWord->S_WordData ) || ( ! ( iuFlag & SCN_IN_USE_FOR_SOURCE_CODE ) ) ) continue ;
             scwi = dobject_Get_M_Slot ( ( dobject* ) anode, SCN_SC_WORD_INDEX ) ;
             naddress = aFoundWord->SourceCoding ;
             if ( iword && ( aFoundWord == iword ) ) return aFoundWord ;
@@ -148,11 +148,7 @@ SC_List_AdjustAddress ( dlnode * node, byte * address, byte * newAddress )
     if ( nword->S_WordData && ( nword->Coding == address ) )
     {
 #if 0        
-        if ( ( Is_DebugOn ) && ( address == ( byte* ) 0x7ffff7627660 ) )
-            _Printf ( ( byte* ) "" ) ;
-        if ( ( Is_DebugOn ) && ( address == ( byte* ) 0x7ffff76276d0 ) )
-            _Printf ( ( byte* ) "" ) ;
-        if ( ( Is_DebugOn ) && ( address == ( byte* ) 0x7ffff762765b ) )
+        if ( ( Is_DebugOn ) && ( address == ( byte* ) 0x7ffff72f56c6 ) )
             _Printf ( ( byte* ) "" ) ;
 #endif        
         Word_SetCoding ( nword, newAddress ) ;
@@ -171,16 +167,17 @@ CfrTil_AdjustDbgSourceCodeAddress ( byte * address, byte * newAddress )
 }
 
 void
-SC_List_Set_NotInUseForSC ( dlnode * node )
+SC_List_Set_NotInUseForSC ( dlnode * node, byte * address )
 {
-    dobject_Set_M_Slot ( ( dobject* ) node, SCN_IN_USE_FLAG, SCN_IN_USE_FOR_OPTIMIZATION ) ;
+    Word * word = ( Word* ) dobject_Get_M_Slot ( ( dobject* ) node, SCN_T_WORD ) ;
+    if ( word->SourceCoding >= address ) dobject_Set_M_Slot ( ( dobject* ) node, SCN_IN_USE_FLAG, SCN_IN_USE_FOR_OPTIMIZATION ) ;
 }
 
 void
-CfrTil_AdjustDbgSourceCode_InUseFalse ( )
+CfrTil_AdjustDbgSourceCode_ScInUseFalse ( byte * address )
 {
     dllist * list = _CfrTil_->Compiler_N_M_Node_WordList ;
-    if ( list ) dllist_Map ( list, ( MapFunction0 ) SC_List_Set_NotInUseForSC ) ;
+    if ( list ) dllist_Map1 ( list, ( MapFunction1 ) SC_List_Set_NotInUseForSC, (int64) address ) ;
 }
 
 void
@@ -197,7 +194,7 @@ CfrTil_WordList_PushWord ( Word * word )
         ( ! ( word->CAttribute & ( NAMESPACE | OBJECT_OPERATOR | OBJECT_FIELD ) ) ) || ( word->CAttribute & ( DOBJECT ) ) ) ;
 #else    
     _CfrTil_WordList_PushWord ( word,
-        (( ! ( word->CAttribute & ( NAMESPACE | OBJECT_OPERATOR | OBJECT_FIELD ) ) ) 
+        ( ( ! ( word->CAttribute & ( NAMESPACE | OBJECT_OPERATOR | OBJECT_FIELD ) ) )
         || ( word->CAttribute & ( DOBJECT ) ) ) ? SCN_IN_USE_FLAG_ALL : 0 ) ;
 #endif    
 }
@@ -294,17 +291,17 @@ _DWL_ShowWord_Print ( Word * word, int64 index, byte * prefix, byte * coding, by
         byte * name = String_ConvertToBackSlash ( word->Name ), *biuFlag = iuFlag ? ( byte* ) "true" : ( byte* ) "false" ;
         if ( newSourceCoding )
         {
-            _Printf ( ( byte* ) "\n %s :: word = 0x%08x : \'%-20s\' : coding  = 0x%08x : oldCoding  = 0x%08x : newCoding = 0x%08x : lastScwi = %03d : scwi = %03d, inUse = %s",
+            _Printf ( ( byte* ) "\n %s :: word = 0x%08x : \'%-12s\' : coding  = 0x%08x : oldCoding  = 0x%08x : newCoding = 0x%08x : lastScwi = %03d : scwi = %03d, inUse = %s",
                 prefix, word, name, coding, sourceCoding, newSourceCoding, lastScwi, scwi, biuFlag ) ;
         }
         else if ( index )
         {
-            _Printf ( ( byte* ) "\n WordList : index %2d : word = 0x%08x : \'%-20s\' : sourceCoding = 0x%08x : lastScwi = %03d : scwi = %03d, scwiDiff = %03d : inUse = %s",
+            _Printf ( ( byte* ) "\n WordList : index %3d : word = 0x%08x : \'%-12s\' : sourceCoding = 0x%08x : lastScwi = %03d : scwi = %03d, scwiDiff = %03d : inUse = %s",
                 index, word, name, sourceCoding, lastScwi, scwi, scwiDiff, biuFlag ) ;
         }
         else //if ( scwiDiff )
         {
-            _Printf ( ( byte* ) "\n %s :: \'%-20s\' : sourceCoding  = 0x%08x : lastScwi = %03d : scwi = %03d, scwiDiff = %03d : inUse = %s",
+            _Printf ( ( byte* ) "\n %s :: \'%-12s\' : sourceCoding  = 0x%08x : lastScwi = %03d : scwi = %03d, scwiDiff = %03d : inUse = %s",
                 prefix, name, sourceCoding, lastScwi, scwi, scwiDiff, biuFlag ) ;
         }
     }
@@ -544,13 +541,13 @@ _CfrTil_Finish_WordSourceCode ( CfrTil * cfrtil, Word * word )
 void
 SCN_Set_NotInUse ( dlnode * node )
 {
-    dobject_Set_M_Slot ( (dobject*) node, SCN_IN_USE_FLAG, 0 ) ;
+    dobject_Set_M_Slot ( ( dobject* ) node, SCN_IN_USE_FLAG, 0 ) ;
 }
 
 void
 SCN_Set_NotInUseForOptimization ( dlnode * node )
 {
-    dobject_Set_M_Slot ( (dobject*) node, SCN_IN_USE_FLAG, SCN_IN_USE_FOR_SOURCE_CODE ) ;
+    dobject_Set_M_Slot ( ( dobject* ) node, SCN_IN_USE_FLAG, SCN_IN_USE_FOR_SOURCE_CODE ) ;
 }
 // the logic needs to be reworked with recycling in these functions
 

@@ -36,8 +36,8 @@
 // note : rm : _reg memory - the _register which contains the memory address in _mod instructions
 
 // cfrTil uses intel syntax convention
-
-//C : sp stack pause ; 
+logOn
+C 
 Compiler Compiling C Asm
 : :asm compileModeOn sourceCodeInit token create begin ' {| find compileWord sourceCodeOn ; immediate  
 //: :asm compileModeOn sourceCodeInit token create begin ' {| find compileWord ; immediate  
@@ -66,7 +66,7 @@ dscOn
 //verbosity 3 =
 #endif    
 : apause ; // pause ;
-: sp ; //stack apause ;
+: sp ; //stack using pause ; 
 sp
     
 c_syntaxOn
@@ -392,6 +392,7 @@ _Compile_TEST_Reg_To_Reg ( dstReg, srcReg )
 #define Compile_DEC( mod, rm, sib, disp ) _Compile_Group5 ( DEC, mod, rm, sib, disp, 0  )
 c_syntaxOff
 infixOn
+C X64
 sp
 : _Compile_Stack_PopToReg ( _reg ) 
     _Compile_Move_DataStackN_ToReg ( _reg @, 0 ) // 4d8b06                  mov r8, [r14]
@@ -419,7 +420,7 @@ c_syntaxOff
 'Compile_PopDspToR8AndCall find wdiss
 #endif
 
-
+C X64
 #if x64_dbg
 //verbosity 3 =
 Combinators
@@ -523,5 +524,5 @@ infixOff
 
 sp 
 2 + 7 assertStkChk // stack checking
-
+logOff
     

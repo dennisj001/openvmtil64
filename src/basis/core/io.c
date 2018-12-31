@@ -139,11 +139,16 @@ _Printf ( byte *format, ... )
     if ( _Q_->Verbosity ) //GetState ( _ReadLiner_, CHAR_ECHO ) )
     {
         va_list args ;
+        
         va_start ( args, ( char* ) format ) ;
         vprintf ( ( char* ) format, args ) ;
-        if ( _CfrTil_ && _CfrTil_->LogFlag && _CfrTil_->LogFILE ) vfprintf ( _CfrTil_->LogFILE, ( char* ) format, args ) ;
         va_end ( args ) ;
         fflush ( stdout ) ;
+        
+        va_start ( args, ( char* ) format ) ;
+        if ( _CfrTil_ && _CfrTil_->LogFlag && _CfrTil_->LogFILE ) vfprintf ( _CfrTil_->LogFILE, ( char* ) format, args ) ;
+        va_end ( args ) ;
+        fflush ( _CfrTil_->LogFILE ) ;
     }
     ReadLiner_SetLastChar ( 0 ) ; //
 }

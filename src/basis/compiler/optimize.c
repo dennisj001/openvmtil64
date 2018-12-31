@@ -139,6 +139,7 @@ doOp:
             }
         }
         Compiler_OptimizeForOp ( compiler ) ;
+        //if ( Is_DebugOn ) Compiler_SC_WordList_Show ( 0, 0, 0 ) ;
 done:
         SetState ( _CfrTil_, IN_OPTIMIZER, false ) ;
         //if ( optInfo->rtrn && optInfo->rtrn != OPTIMIZE_DONE ) Compiler_Word_SCH_CPUSCA ( optInfo->opWord, 1 ) ;
@@ -301,7 +302,7 @@ void
 Compile_StandardArg ( Word * word, Boolean reg, Boolean rvalueFlag, byte * setHere )
 {
     if ( setHere ) SetHere ( setHere, 0 ) ;
-    Compiler_Word_SetCodingHere_And_ClearPreviousUseOf_Here_SCA ( word, 1 ) ;
+    Compiler_Word_SetCodingHere_And_ClearPreviousUseOf_Here_SCA ( word, 0 ) ;
     if ( rvalueFlag -- )
     {
         if ( word->CAttribute & REGISTER_VARIABLE ) reg = word->RegToUse ;

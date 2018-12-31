@@ -126,7 +126,7 @@ Compiler_SetLocalsFrameSize_AtItsCellOffset ( Compiler * compiler )
 void
 Compiler_RemoveLocalFrame ( Compiler * compiler )
 {
-    Compiler_WordStack_SCHCPUSCA ( 0, 0 ) ;
+    if ( ! GetState ( _Compiler_, LISP_MODE ) ) Compiler_WordStack_SCHCPUSCA ( 0, 0 ) ;
     int64 parameterVarsSubAmount = 0 ;
     Boolean returnValueFlag, already = false ;
     returnValueFlag = ( Context_CurrentWord ( )->CAttribute & C_RETURN ) || ( GetState ( compiler, RETURN_TOS | RETURN_ACCUM ) ) || compiler->ReturnVariableWord ;
@@ -158,7 +158,7 @@ Compiler_RemoveLocalFrame ( Compiler * compiler )
     if ( compiler->NumberOfNonRegisterLocals || compiler->NumberOfNonRegisterArgs )
     {
         // remove the incoming parameters -- like in C
-        Compiler_WordStack_SCHCPUSCA ( compiler->ReturnVariableWord ? 1 : 0, 0 ) ;
+        if ( ! GetState ( _Compiler_, LISP_MODE ) ) Compiler_WordStack_SCHCPUSCA ( 0, 0 ) ;
         _Compile_LEA ( DSP, FP, 0, - LocalVarIndex_Disp ( 1 ) ) ; // restore sp - release locals stack frame
         _Compile_Move_StackN_To_Reg ( FP, DSP, 1 ) ; // restore the saved pre fp - cf AddLocalsFrame
     }
@@ -191,7 +191,6 @@ int64
 _ParameterVarOffset ( Compiler * compiler, Word * word, Boolean frameFlag )
 {
     int64 offset = - ( compiler->NumberOfArgs - word->Index + ( frameFlag ? 1 : 0 ) ) ;
-
     return offset ;
 }
 
@@ -199,42 +198,36 @@ int64
 ParameterVarOffset ( Compiler * compiler, Word * word )
 {
     int64 offset = _ParameterVarOffset ( compiler, word, Compiler_IsFrameNecessary ( compiler ) ) ;
-
     return offset ;
 }
 
 inline int64
 LocalVarIndex_Disp ( int64 i )
 {
-
     return ( i * CELL ) ;
 }
 
 inline int64
 LocalVar_FpOffset ( Word * word )
 {
-
     return word->Index ;
 }
 
 inline int64
 LocalVar_FpDisp ( Word * word )
 {
-
     return ( word->Index * CELL ) ;
 }
 
 inline int64
 ParameterVar_Disp ( Word * word )
 {
-
     return ( ParameterVarOffset ( _Compiler_, word ) * CELL ) ;
 }
 
 inline int64
 LocalOrParameterVar_Offset ( Word * word )
 {
-
     return ( ( word->CAttribute & LOCAL_VARIABLE ) ? ( LocalVar_FpOffset ( word ) ) : ( ParameterVarOffset ( _Compiler_, word ) ) ) ;
 }
 
@@ -242,14 +235,12 @@ inline int64
 LocalOrParameterVar_Disp ( Word * word )
 {
     int64 offset = LocalOrParameterVar_Offset ( word ) ;
-
     return ( offset * CELL_SIZE ) ;
 }
 
 void
 CfrTil_LocalsAndStackVariablesBegin ( )
 {
-
     _CfrTil_Parse_LocalsAndStackVariables ( 1, 0, 0, 0, 0, false ) ;
 }
 

@@ -59,7 +59,7 @@ _LO_Read_DoWord (LambdaCalculus * lc, Word * word, int64 qidFlag, int64 tsrli, i
 {
     ListObject *l0 = 0 ;
     byte *token1 ;
-    Word_SetTsrliScwi( word, tsrli, scwi ) ;
+    //Word_SetTsrliScwi( word, tsrli, scwi ) ;
     SetState ( word, QID, qidFlag ) ;
     if ( ( word->LAttribute & ( T_LISP_READ_MACRO | T_LISP_IMMEDIATE ) ) && ( ! GetState ( _LC_, LC_READ_MACRO_OFF ) ) )
     {
@@ -80,9 +80,7 @@ _LO_Read_DoWord (LambdaCalculus * lc, Word * word, int64 qidFlag, int64 tsrli, i
     }
     else
     {
-        //DEBUG_SETUP ( word ) ;
-        //if ( word && Is_DebugModeOn ) if ( _Debugger_PreSetup ( _Debugger_, word, 0, 1 ) ) return nil ;
-        if ( word->CAttribute & NAMESPACE_TYPE ) _DataObject_Run ( word ) ;
+        if ( ( word->CAttribute & NAMESPACE_TYPE ) && Lexer_IsTokenForwardDotted ( _Context_->Lexer0 ) ) _DataObject_Run ( word ) ;
         l0 = DataObject_New ( T_LC_NEW, word, 0, word->CAttribute, word->CAttribute2,
             ( T_LISP_SYMBOL | word->LAttribute ), 0, word->Lo_Value, 0, tsrli, scwi ) ;
     }
@@ -109,8 +107,6 @@ _LO_Read_DoToken (LambdaCalculus * lc, byte * token, int64 qidFlag, int64 tsrli,
     {
         l0->State |= ( lc->ItemQuoteState | lc->QuoteState ) ;
         lc->ItemQuoteState = 0 ;
-        l0->W_SC_Index = scwi ;
-        l0->W_RL_Index = tsrli ;
     }
     return l0 ;
 }

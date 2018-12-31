@@ -140,6 +140,7 @@ void
 BigNum_Init ( )
 {
 #if 16    
+    mpfr_free_cache (); 
     BN_SetDefaultBitPrecision ( 16 ) ;
     _Context_->System0->BigNum_Printf_Width = 16 ;
 #else

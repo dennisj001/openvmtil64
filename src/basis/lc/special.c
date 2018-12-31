@@ -26,13 +26,10 @@ _LO_Define ( ListObject * idNode, ListObject * locals )
         value->Lo_LambdaFunctionBody = _LO_Copy ( value->Lo_LambdaFunctionBody, LISP ) ;
     }
     else value = _LO_CopyOne ( value, LISP ) ; // this value object should now become part of LISP non temporary memory
-    //else value = LO_Copy ( value ) ; // doesn't work ?? LO_Copy is broken :: this value object should now become part of LISP non temporary memory
-    //d1 ( if ( _Is_DebugOn ) LO_PrintWithValue ( value ) ) ;
     word->Lo_Value = ( uint64 ) value ; // used by eval
     word->LAttribute |= ( T_LC_DEFINE | T_LISP_SYMBOL ) ;
     word->State |= LC_DEFINED ;
     // the value was entered into the LISP memory, now we need a temporary carrier for LO_Print
-    //l1 = _DataObject_New ( T_LC_NEW, LO_New ( LIST_NODE, word ), 0, word->CAttribute, word->CAttribute2, word->LAttribute, 
     l1 = DataObject_New ( T_LC_NEW, 0, word->Name, word->CAttribute, word->CAttribute2, word->LAttribute,
         0, ( int64 ) value, LISP, - 1, - 1 ) ; // all words are symbols
     l1->LAttribute |= ( T_LC_DEFINE | T_LISP_SYMBOL ) ;
@@ -411,7 +408,7 @@ _LO_CfrTil ( ListObject * lfirst )
         SetState ( _LC_, LC_READ_MACRO_OFF, false ) ;
         //LC_RestoreStack ( ) ;
     }
-    Namespace_DoNamespace ( ( byte * ) "Lisp" ) ;
+    Namespace_DoNamespace_Name ( ( byte * ) "Lisp" ) ;
     return nil ;
 }
 

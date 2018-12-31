@@ -42,11 +42,11 @@ _DataObject_Run ( Word * word0 )
         if ( ( ! Lexer_IsTokenForwardDotted ( cntx->Lexer0 ) ) && ( ! GetState ( cntx->Compiler0, LC_ARG_PARSING ) ) ) cntx->Interpreter0->BaseObject = 0 ;
     }
     else if ( word->CAttribute & ( C_TYPE | C_CLASS ) ) _Namespace_Do_C_Type ( word ) ;
-    else if ( ns->CAttribute & ( NAMESPACE ) ) //| CLASS | CLASS_CLONE ) )
+    else if ( ns->CAttribute & ( NAMESPACE | CLASS | CLASS_CLONE ) )
     {
-        _Namespace_DoNamespace ( ns, 1 ) ; // namespaces are the only word that needs to run the word set DObject Compile_SetCurrentlyRunningWord_Call_TestRSP created word ??
+        Namespace_DoNamespace ( ns ) ; // namespaces are the only word that needs to run the word set DObject Compile_SetCurrentlyRunningWord_Call_TestRSP created word ??
     }
-    else if ( word->CAttribute & ( CLASS | CLASS_CLONE ) ) _Namespace_DoNamespace ( word, 0 ) ;
+    //else if ( word->CAttribute & ( CLASS | CLASS_CLONE ) )  Namespace_DoNamespace ( word ) ;
     //if (( _Dsp_ > dsp ) && (_CfrTil_->TypeWordStack->StackPointer <= tsp )) CfrTil_TypeStackPush ( word ) ;
 }
 
@@ -91,7 +91,7 @@ _Namespace_Do_C_Type ( Namespace * ns )
             Compiler_Get_C_BackgroundNamespace ( compiler ) ;
             if ( GetState ( cntx, C_SYNTAX ) )
             {
-                _Namespace_DoNamespace ( ns, 1 ) ;
+                Namespace_DoNamespace ( ns ) ;
                 LambdaCalculus * svlc = _LC_ ;
                 _LC_ = 0 ;
                 // ?? parts of this could be screwing up other things and adds an unnecessary level of complexity
@@ -133,7 +133,7 @@ _Namespace_Do_C_Type ( Namespace * ns )
                     Interpreter_InterpretAToken ( cntx->Interpreter0, token1, t1_tsrli, t1_scwi ) ;
                     if ( ( ! word ) && Compiling )
                     {
-                        while ( token = Interpret_C_Until_Token4 ( cntx->Interpreter0, ( byte* ) ",", ( byte* ) ";", (byte*) "}", 0, 0 ) )
+                        while ( token = Interpret_C_Until_Token4 ( cntx->Interpreter0, ( byte* ) ",", ( byte* ) ";", ( byte* ) "}", 0, 0 ) )
                         {
                             Compiler_Get_C_BackgroundNamespace ( compiler ) ;
                             if ( ( String_Equal ( token, "," ) ) )
@@ -164,7 +164,7 @@ _Namespace_Do_C_Type ( Namespace * ns )
                 _LC_ = svlc ;
             }
         }
-        else _Namespace_DoNamespace ( ns, 1 ) ;
+        else Namespace_DoNamespace ( ns ) ;
 rtrn:
         if ( ! Compiling ) Compiler_SetAs_InNamespace_C_BackgroundNamespace ( compiler ) ;
         SetState ( compiler, DOING_C_TYPE, false ) ;
@@ -234,7 +234,18 @@ _Word_CompileAndRecord_PushReg ( Word * word, int64 reg )
 // a constant is, of course, a literal
 
 void
-_Namespace_DoNamespace ( Namespace * ns, int64 immFlag )
+_Namespace_DoNamespace ( Namespace * ns )
+{
+    Context * cntx = _Context_ ;
+    if ( ! Lexer_IsTokenForwardDotted ( cntx->Lexer0 ) ) _Namespace_ActivateAsPrimary ( ns ) ;
+    else Finder_SetQualifyingNamespace ( cntx->Finder0, ns ) ;
+    cntx->Interpreter0->BaseObject = 0 ;
+}
+
+#if 0
+
+void
+Namespace_DoNamespace ( Namespace * ns, int64 immFlag )
 {
     Context * cntx = _Context_ ;
     if ( ( ! immFlag ) && CompileMode && ( Lexer_NextNonDelimiterChar ( cntx->Lexer0 ) != '.' ) && ( ! GetState ( cntx->Compiler0, LC_ARG_PARSING ) ) )
@@ -245,6 +256,24 @@ _Namespace_DoNamespace ( Namespace * ns, int64 immFlag )
     else Finder_SetQualifyingNamespace ( cntx->Finder0, ns ) ;
     cntx->Interpreter0->BaseObject = 0 ;
 }
+#else
+
+void
+Namespace_DoNamespace ( Namespace * ns )
+{
+    Context * cntx = _Context_ ;
+    if ( ( ! CompileMode ) || GetState ( cntx, C_SYNTAX|LISP_MODE ) ) 
+    {
+        if ( ! Lexer_IsTokenForwardDotted ( cntx->Lexer0 ) ) _Namespace_ActivateAsPrimary ( ns ) ;
+        else Finder_SetQualifyingNamespace ( cntx->Finder0, ns ) ;
+        cntx->Interpreter0->BaseObject = 0 ;
+    }
+    else if ( ( Lexer_NextNonDelimiterChar ( cntx->Lexer0 ) != '.' ) && ( ! GetState ( cntx->Compiler0, LC_ARG_PARSING ) ) )
+    {
+        _Compile_C_Call_1_Arg ( ( byte* ) _Namespace_DoNamespace, ( int64 ) ns ) ;
+    }
+}
+#endif
 
 DObject *
 _CfrTil_Do_DynamicObject_ToReg ( DObject * dobject0, uint8 reg )

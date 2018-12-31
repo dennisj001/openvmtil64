@@ -208,7 +208,7 @@
 // memory allocation
 #define _Allocate( size, nba ) _ByteArray_AppendSpace ( nba->ba_CurrentByteArray, size ) 
 #define object_Allocate( type, slots, allocType ) (type *) _object_Allocate ( sizeof ( type ) * slots, allocType ) 
-#define _listObject_Allocate( nodeType, slotType, slots, allocType ) (type *) _object_Allocate ( sizeof ( nodeType ) + (sizeof ( slotType ) * slots), allocType ) 
+#define _listObject_Allocate( nodeType, slotType, slots, allocType ) (type *) object_Allocate ( sizeof ( nodeType ) + (sizeof ( slotType ) * slots), allocType ) 
 
 #define Get_NBA_Symbol_To_NBA( s )  ( NamedByteArray* ) ( ( ( Symbol* ) s )->S_pb_Data2 ) 
 #define Get_NBA_Node_To_NBA( node )  ( NamedByteArray* ) ( ( ( Symbol* ) node )->S_pb_Data2 ) 
@@ -261,9 +261,9 @@
 #define _SC_Global_On SetState ( _CfrTil_, GLOBAL_SOURCE_CODE_MODE, true )
 #define SC_Global_On if ( GetState ( _CfrTil_, DEBUG_SOURCE_CODE_MODE ) ) { _SC_Global_On ; }
 #define SC_Global_Off SetState ( _CfrTil_, GLOBAL_SOURCE_CODE_MODE, false )
-#define _Block_SCA( index ) _CfrTil_Block_SetSourceCodeAddress( index )
-#define _Block_SCA_Clear _Block_SCA( -1 ) ;
-#define L_SCI _Lexer_->SC_Index
+//#define _Block_SCA( index ) _CfrTil_Block_SetSourceCodeAddress( index )
+//#define _Block_SCA_Clear _Block_SCA( -1 ) ;
+//#define L_SCI _Lexer_->SC_Index
 #define Compiler_OptimizerWordList_Reset( compiler ) List_Init ( _CfrTil_->CompilerWordList ) 
 #if 1
 #define Word_SetTsrliScwi( word, tsrli, scwi ) \

@@ -9,7 +9,7 @@ _dllist_PushNew_M_Slot_Node ( dllist* list, int64 allocType, int64 typeCode, int
     int64 i ;
     va_list args ;
     va_start ( args, m_slots ) ;
-    dobject * dobj = _dobject_Allocate ( typeCode, m_slots, allocType ) ;
+    dobject * dobj = dobject_Allocate ( typeCode, m_slots, allocType ) ;
     for ( i = 0 ; i < m_slots ; i ++ ) dobj->do_iData[i] = va_arg ( args, int64 ) ;
     va_end ( args ) ;
     _dllist_PushNode ( list, ( dlnode* ) dobj ) ;
@@ -25,7 +25,7 @@ _dllist_AddToTail_New_M_Slot_Node ( dllist* list, int64 typeCode, int64 allocTyp
     int64 i ;
     va_list args ;
     va_start ( args, m_slots ) ;
-    dobject * dobj = _dobject_Allocate ( typeCode, m_slots, allocType ) ;
+    dobject * dobj = dobject_Allocate ( typeCode, m_slots, allocType ) ;
     for ( i = 0 ; i < m_slots ; i ++ ) dobj->do_iData[i] = va_arg ( args, int64 ) ;
     va_end ( args ) ;
     dllist_AddNodeToTail ( list, ( dlnode* ) dobj ) ;

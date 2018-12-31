@@ -55,6 +55,7 @@ Compiler_CopyDuplicatesAndPush ( Word * word0, int64 tsrli, int64 scwi )
 void
 Compiler_Word_SetCoding_And_ClearPreviousUseOf_A_SCA ( Word * word, byte * coding, Boolean clearPreviousFlag )
 {
+    //if ( GetState ( _Compiler_, LISP_MODE ) && ( ! GetState ( _LC_, LC_COMPILE_MODE ) ) ) return ; 
     if ( Compiling && word )
     {
         if ( clearPreviousFlag ) dllist_Map1_FromEnd ( _CfrTil_->Compiler_N_M_Node_WordList, ( MapFunction1 ) SC_ListClearAddress, ( int64 ) coding ) ; //dllist_Map1_FromEnd ( _CfrTil_->CompilerWordList, ( MapFunction1 ) SC_ListClearAddress, ( int64 ) Here ) ; //( int64 ) word, ( int64 ) Here ) ;

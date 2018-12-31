@@ -18,7 +18,7 @@ _object_Allocate ( int64 size, int64 allocType )
 }
 
 dobject *
-_dobject_Allocate ( int64 doType, int64 slots, uint64 allocType )
+dobject_Allocate ( int64 doType, int64 slots, uint64 allocType )
 {
     int64 size = sizeof ( dobject ) + ( slots * sizeof ( int64 ) ) ;
     dobject * dobj = ( dobject * ) _object_Allocate ( size, allocType ) ;
@@ -39,7 +39,7 @@ _dobject_New_M_Slot_Node ( int64 allocType, int64 dobjType, int64 m_slots, ... )
     va_list args ;
     int64 i ;
     va_start ( args, m_slots ) ;
-    dobj = _dobject_Allocate ( dobjType, m_slots, allocType ) ;
+    dobj = dobject_Allocate ( dobjType, m_slots, allocType ) ;
     for ( i = 0 ; i < m_slots ; i ++ ) dobj->do_iData[i] = va_arg ( args, int64 ) ;
     va_end ( args ) ;
     return dobj ;

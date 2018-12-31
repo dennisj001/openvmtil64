@@ -107,7 +107,7 @@ void
 CfrTil_Namespace_New ( )
 {
     Namespace * ns = Namespace_FindOrNew_SetUsing ( ( byte* ) DataStack_Pop ( ), _CfrTil_Namespace_InNamespaceGet ( ), 1 ) ;
-    _Namespace_DoNamespace ( ns, 1 ) ;
+    Namespace_DoNamespace ( ns ) ;
 
 }
 
