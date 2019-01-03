@@ -349,23 +349,30 @@ Compiler_Init ( Compiler * compiler, uint64 state, int64 flags )
 }
 
 Compiler *
-Compiler_New ( uint64 type )
+Compiler_New ( uint64 allocType )
 {
-    Compiler * compiler = ( Compiler * ) Mem_Allocate ( sizeof (Compiler ), type ) ;
-    compiler->BlockStack = Stack_New ( 64, type ) ;
-    compiler->CombinatorInfoStack = Stack_New ( 64, type ) ;
-    compiler->InfixOperatorStack = Stack_New ( 32, type ) ;
-    compiler->PointerToOffset = Stack_New ( 32, type ) ;
-    compiler->CombinatorBlockInfoStack = Stack_New ( 64, type ) ;
-    compiler->LocalsCompilingNamespacesStack = Stack_New ( 32, type ) ;
-    compiler->SpecialNamespacesStack = Stack_New ( 32, type ) ; //initialized when using
-    compiler->PostfixLists = _dllist_New ( type ) ;
-    compiler->GotoList = _dllist_New ( type ) ;
-    compiler->OptimizeInfoList = _dllist_New ( type ) ;
+    Compiler * compiler = ( Compiler * ) Mem_Allocate ( sizeof (Compiler ), allocType ) ;
+    compiler->BlockStack = Stack_New ( 64, allocType ) ;
+    compiler->CombinatorInfoStack = Stack_New ( 64, allocType ) ;
+    compiler->InfixOperatorStack = Stack_New ( 32, allocType ) ;
+    compiler->PointerToOffset = Stack_New ( 32, allocType ) ;
+    compiler->CombinatorBlockInfoStack = Stack_New ( 64, allocType ) ;
+    compiler->LocalsCompilingNamespacesStack = Stack_New ( 32, allocType ) ;
+    compiler->InternalNamespacesStack = Stack_New ( 32, allocType ) ; //initialized when using
+    compiler->PostfixLists = _dllist_New ( allocType ) ;
+    compiler->GotoList = _dllist_New ( allocType ) ;
+    compiler->OptimizeInfoList = _dllist_New ( allocType ) ;
     Compiler_Init ( compiler, 0, 1 ) ;
     return compiler ;
 }
 
+Compiler *
+Compiler_Copy ( Compiler * compiler, uint64 allocType )
+{
+    Compiler * compilerCopy = ( Compiler * ) Mem_Allocate ( sizeof (Compiler ), allocType ) ;
+    memcpy ( compilerCopy, compiler, sizeof (Compiler)) ;
+    return compilerCopy ;
+}
 void
 Compiler_CalculateAndSetPreviousJmpOffset ( Compiler * compiler, byte * jmpToAddress )
 {

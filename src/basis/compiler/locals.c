@@ -34,8 +34,8 @@ Word *
 _Compiler_LocalWord ( Compiler * compiler, byte * name, int64 ctype, int64 ctype2, int64 ltype, int64 allocType )
 {
     BlockInfo * bi = ( BlockInfo * ) Stack_Top ( compiler->BlockStack ) ;
-    Word *word = _DObject_New ( name, 0, ( ctype | IMMEDIATE ), ctype2, ltype, LOCAL_VARIABLE, ( byte* ) _DataObject_Run, 0, 1, bi->BI_LocalsNamespace, allocType ) ;
-    //Word *word = _DObject_New ( name, 0, ( ctype | IMMEDIATE ), ctype2, ltype, LOCAL_VARIABLE, ( byte* ) _DataObject_Run, 0, 1, 0, allocType ) ;
+    //Word *word = _DObject_New ( name, 0, ( ctype | IMMEDIATE ), ctype2, ltype, LOCAL_VARIABLE, ( byte* ) _DataObject_Run, 0, 1, bi->BI_LocalsNamespace, allocType ) ;
+    Word *word = _DObject_New ( name, 0, ( ctype | IMMEDIATE ), ctype2, ltype, LOCAL_VARIABLE, ( byte* ) _DataObject_Run, 0, 1, 0, allocType ) ;
     compiler->NumberOfVariables ++ ;
     if ( ctype & REGISTER_VARIABLE )
     {
@@ -72,7 +72,7 @@ _Compiler_LocalWord ( Compiler * compiler, byte * name, int64 ctype, int64 ctype
 void
 Compiler_LocalsNamespace_New ( Compiler * compiler )
 {
-    Namespace_FindOrNew_Local ( compiler->LocalsCompilingNamespacesStack ) ;
+    Namespace_FindOrNew_Local (compiler->LocalsCompilingNamespacesStack, 0) ;
     Finder_SetQualifyingNamespace ( _Finder_, 0 ) ;
 }
 
@@ -250,6 +250,6 @@ CfrTil_LocalsAndStackVariablesBegin ( )
 void
 CfrTil_LocalVariablesBegin ( )
 {
-    _CfrTil_Parse_LocalsAndStackVariables ( 0, 0, 0, _Compiler_->LocalsCompilingNamespacesStack, 0, false ) ;
+    _CfrTil_Parse_LocalsAndStackVariables ( 0, 0, 0, 0, 0, false ) ;
 }
 

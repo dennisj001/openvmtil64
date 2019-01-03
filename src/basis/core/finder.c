@@ -208,19 +208,13 @@ Finder_New ( uint64 allocationType )
 Word *
 _Finder_FindWord_InOneNamespace ( Finder * finder, Namespace * ns, byte * name )
 {
-    if ( ns && name )
-    {
-        //return finder->FoundWord = DLList_FindName_InOneNamespaceList ( ( dllist* ) ns->W_List, name ) ;
-
-        return finder->FoundWord = DLList_FindName_InOneNamespace ( ns, name ) ;
-    }
+    if ( ns && name ) return finder->FoundWord = DLList_FindName_InOneNamespace ( ns, name ) ;
     return 0 ;
 }
 
 Word *
 Finder_FindWord_InOneNamespace ( Finder * finder, byte *nsName, byte * name )
 {
-
     return _Finder_FindWord_InOneNamespace ( finder, Namespace_Find ( nsName ), name ) ;
 }
 

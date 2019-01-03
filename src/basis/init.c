@@ -104,10 +104,10 @@ _CfrTil_InitialAddWordToNamespace ( Word * word, byte * containingNamespaceName,
     Namespace *ns, *sns = _CfrTil_->Namespaces ;
     if ( superNamespaceName )
     {
-        sns = Namespace_FindOrNew_SetUsing ( superNamespaceName, sns, 1 ) ;
+        sns = Namespace_FindOrNew_SetUsing (superNamespaceName, sns, 1 ) ;
         sns->State |= USING ;
     }
-    ns = Namespace_FindOrNew_SetUsing ( containingNamespaceName, sns, 1 ) ; // find new namespace or create anew
+    ns = Namespace_FindOrNew_SetUsing (containingNamespaceName, sns, 1 ) ; // find new namespace or create anew
     Namespace_DoAddWord ( ns, word ) ; // add word to new namespace
 }
 

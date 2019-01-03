@@ -759,7 +759,7 @@ typedef struct
     Stack * LocalsCompilingNamespacesStack ;
     Stack * CombinatorBlockInfoStack ;
     Stack * BlockStack ;
-    Stack * SpecialNamespacesStack ;
+    Stack * InternalNamespacesStack ;
     Stack * InfixOperatorStack ;
     dllist * OptimizeInfoList ;
 } Compiler ;
@@ -806,7 +806,6 @@ typedef struct _Debugger
     byte CharacterTable [ 128 ] ;
     DebuggerFunction CharacterFunctionTable [ 40 ] ;
     ud_t * Udis ;
-    Stack * LocalsNamespacesStack ;
     dllist * DebugWordList ;
     uint64 LevelBitNamespaceMap ;
     sigjmp_buf JmpBuf0 ;

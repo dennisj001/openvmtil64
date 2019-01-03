@@ -127,7 +127,7 @@ _CfrTil_ObjectNew ( int64 size, byte * name, uint64 category, int64 allocType )
 void
 _Class_Object_Init ( Word * word, Namespace * ns )
 {
-    Stack * nsstack = _Context_->Compiler0->SpecialNamespacesStack ;
+    Stack * nsstack = _Context_->Compiler0->InternalNamespacesStack ;
     Stack_Init ( nsstack ) ; // !! ?? put this in Compiler ?? !!
     // init needs to be done by the most super class first successively down to the current class 
     do
@@ -242,7 +242,7 @@ _CfrTil_Label ( byte * lname )
 {
     GotoInfo * gotoInfo = GotoInfo_New ( lname, GI_LABEL ) ;
     gotoInfo->LabeledAddress = Here ;
-    Namespace * ns = Namespace_FindOrNew_SetUsing ( ( byte* ) "__labels__", _CfrTil_->Namespaces, 1 ) ;
+    Namespace * ns = Namespace_FindOrNew_SetUsing (( byte* ) "__labels__", _CfrTil_->Namespaces, 1 ) ;
     if ( _Finder_FindWord_InOneNamespace ( _Finder_, ns, lname ) )
     {
         byte bufferData [ 32 ] ;

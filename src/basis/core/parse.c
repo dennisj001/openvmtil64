@@ -202,7 +202,7 @@ _CfrTil_Parse_LocalsAndStackVariables ( int64 svf, int64 lispMode, ListObject * 
     Boolean regFlag = false ;
     byte *token, *returnVariable = 0 ;
     Namespace *typeNamespace = 0, *saveInNs = _CfrTil_->InNamespace ;
-    if ( ! localsNs ) localsNs = Namespace_FindOrNew_Local ( nsStack ? nsStack : compiler->LocalsCompilingNamespacesStack ) ;
+    if ( ! localsNs ) localsNs = Namespace_FindOrNew_Local (nsStack ? nsStack : compiler->LocalsCompilingNamespacesStack, ! debugFlag ) ;
 
     CfrTil_WordLists_PopWord ( ) ; // stop source code
     if ( svf ) svff = 1 ;
@@ -211,6 +211,7 @@ _CfrTil_Parse_LocalsAndStackVariables ( int64 svf, int64 lispMode, ListObject * 
 
     while ( ( lispMode ? ( int64 ) _LO_Next ( args ) : 1 ) )
     {
+        //if ( debugFlag ) word = 0 ;
         if ( lispMode )
         {
             args = _LO_Next ( args ) ;
@@ -267,12 +268,15 @@ _CfrTil_Parse_LocalsAndStackVariables ( int64 svf, int64 lispMode, ListObject * 
                 if ( GetState ( _CfrTil_, OPTIMIZE_ON ) ) regFlag = true ;
                 continue ;
             }
+#if 1            
             if ( ( ( ! GetState ( _Context_, C_SYNTAX ) ) && ( ! GetState ( word, W_C_SYNTAX ) ) ) &&
                 ( ( String_Equal ( ( char* ) token, "{" ) ) || ( String_Equal ( ( char* ) token, ";" ) ) ) )
             {
-                _Printf ( ( byte* ) "\nLocal variables syntax error : no closing parenthesis ')' found" ) ;
-                CfrTil_Exception ( SYNTAX_ERROR, 0, 1 ) ;
+                //_Printf ( ( byte* ) "\nLocal variables syntax error : no closing parenthesis ')' found" ) ;
+                //CfrTil_Exception ( SYNTAX_ERROR, 0, 1 ) ;
+                break ;
             }
+#endif            
             if ( getReturnFlag )
             {
                 addWords = 0 ;
@@ -300,7 +304,12 @@ _CfrTil_Parse_LocalsAndStackVariables ( int64 svf, int64 lispMode, ListObject * 
                     ctype |= REGISTER_VARIABLE ;
                     numberOfRegisterVariables ++ ;
                 }
-                word = DataObject_New ( ctype, 0, token, ctype, 0, 0, 0, 0, DICTIONARY, - 1, - 1 ) ;
+                if ( debugFlag ) 
+                {
+                    word = _Finder_FindWord_InOneNamespace ( _Finder_, compiler->LocalsNamespace, token ) ;
+                    if ( ! word ) word = DataObject_New ( ctype, 0, token, ctype, 0, 0, 0, 0, DICTIONARY, - 1, - 1 ) ;
+                }
+                else word = DataObject_New ( ctype, 0, token, ctype, 0, 0, 0, 0, DICTIONARY, - 1, - 1 ) ;
                 if ( regFlag == true )
                 {
                     word->RegToUse = RegOrder ( regToUseIndex ++ ) ;

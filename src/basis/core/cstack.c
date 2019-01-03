@@ -192,7 +192,8 @@ _Stack_IntegrityCheck ( Stack * stack )
 int64
 _Stack_Depth ( Stack * stack )
 {
-    int64 depth = stack->StackPointer - stack->InitialTosPointer ; //+ 1 ; //1 :: zero based array - include the zero in depth 
+    int64 depth = 0 ;
+    if ( stack ) depth = stack->StackPointer - stack->InitialTosPointer ; //+ 1 ; //1 :: zero based array - include the zero in depth 
     return ( depth ) ; //+ 1 ) ;// + 1 :: zero based array - include the zero in depth 
 }
 
@@ -200,7 +201,7 @@ int64
 Stack_Depth ( Stack * stack )
 {
     // first a simple integrity check of the stack info struct
-    if ( _Stack_IntegrityCheck ( stack ) )
+    if ( stack && _Stack_IntegrityCheck ( stack ) )
     {
         return _Stack_Depth ( stack ) ;
     }

@@ -63,7 +63,6 @@ _Debugger_PreSetup ( Debugger * debugger, Word * word, byte * token, Boolean for
                         debugger->SaveTOS = TOS ;
                         debugger->Token = word->Name ? word->Name : token ;
                         debugger->PreHere = Here ;
-                        _Namespace_FreeNamespacesStack ( debugger->LocalsNamespacesStack ) ;
 
                         DebugColors ;
                         _Debugger_InterpreterLoop ( debugger ) ; // core of this function

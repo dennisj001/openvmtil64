@@ -106,7 +106,7 @@ Namespace_PrettyPrint ( Namespace* ns, int64 indentFlag, int64 indentLevel )
 void
 CfrTil_Namespace_New ( )
 {
-    Namespace * ns = Namespace_FindOrNew_SetUsing ( ( byte* ) DataStack_Pop ( ), _CfrTil_Namespace_InNamespaceGet ( ), 1 ) ;
+    Namespace * ns = Namespace_FindOrNew_SetUsing (( byte* ) DataStack_Pop ( ), _CfrTil_Namespace_InNamespaceGet ( ), 1 ) ;
     Namespace_DoNamespace ( ns ) ;
 
 }
@@ -133,10 +133,7 @@ void
 CfrTil_Namespace_UsingFirst ( )
 {
     Namespace * ns = Namespace_Find ( ( byte* ) DataStack_Pop ( ) ) ;
-    if ( ns )
-    {
-        _Namespace_AddToUsingList ( ns ) ;
-    }
+    if ( ns ) _Namespace_AddToUsingList ( ns ) ;
 }
 
 void

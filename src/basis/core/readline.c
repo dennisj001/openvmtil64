@@ -205,7 +205,7 @@ _ReadLine_Copy ( ReadLiner * rl, ReadLiner * rl0, uint64 type )
     rl->TciNamespaceStack = Stack_New ( 64, COMPILER_TEMP ) ;
     //rl->TciDownStack = Stack_New ( 32, SESSION ) ;
     //ReadLine_Init ( rl, rl0->Key, type ) ; //_CfrTil_GetC ) ;
-    //strcpy ( ( char* ) rl->InputLine, ( char* ) rl0->InputLine ) ;
+    strcpy ( ( char* ) rl->InputLine, ( char* ) rl0->InputLine ) ;
     //rl->InputStringOriginal = rl0->InputStringOriginal ;
     //rl->State = rl0->State ;
 }

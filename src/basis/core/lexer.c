@@ -357,6 +357,8 @@ _Lexer_Copy ( Lexer * lexer, Lexer * lexer0, uint64 allocType )
 {
     MemCpy ( lexer, lexer0, sizeof (Lexer ) ) ;
     Lexer_Init ( lexer, 0, 0, allocType ) ;
+    ReadLiner * rl = ReadLine_Copy ( lexer0->ReadLiner0, allocType ) ;
+    lexer->ReadLiner0 = rl ;
     lexer->NextChar = _Lexer_NextChar ;
 }
 

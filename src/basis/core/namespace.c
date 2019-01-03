@@ -138,7 +138,7 @@ _Namespace_AddToUsingList ( Namespace * ns )
 {
     int64 i ;
     Namespace * svNs = ns ;
-    Stack * stack = _Context_->Compiler0->SpecialNamespacesStack ;
+    Stack * stack = _Compiler_->InternalNamespacesStack ;
     Stack_Init ( stack ) ;
     do
     {
@@ -302,7 +302,7 @@ void
 Namespace_DoNamespace ( Namespace * ns )
 {
     Context * cntx = _Context_ ;
-    if ( ( ! CompileMode ) || GetState ( cntx, C_SYNTAX|LISP_MODE ) ) 
+    if ( ( ! CompileMode ) || GetState ( cntx, C_SYNTAX | LISP_MODE ) )
     {
         if ( ! Lexer_IsTokenForwardDotted ( cntx->Lexer0 ) ) _Namespace_ActivateAsPrimary ( ns ) ;
         else Finder_SetQualifyingNamespace ( cntx->Finder0, ns ) ;
@@ -468,7 +468,7 @@ Namespace_FindOrNew_SetUsing ( byte * name, Namespace * containingNs, int64 setU
 }
 
 Namespace *
-Namespace_FindOrNew_Local ( Stack * nsStack )
+_Namespace_FindOrNew_Local ( Stack * nsStack )
 {
     int64 d = Stack_Depth ( nsStack ) ;
     byte bufferData [ 32 ], *buffer = ( byte* ) bufferData ;
@@ -476,8 +476,18 @@ Namespace_FindOrNew_Local ( Stack * nsStack )
     Namespace * ns = Namespace_FindOrNew_SetUsing ( buffer, _CfrTil_->Namespaces, 1 ) ;
     _Namespace_ActivateAsPrimary ( ns ) ;
     Stack_Push ( nsStack, ( int64 ) ns ) ; // nb. this is where the the depth increase
-    BlockInfo * bi = ( BlockInfo * ) Stack_Top ( _Context_->Compiler0->BlockStack ) ;
-    bi->BI_LocalsNamespace = ns ;
+    return ns ;
+}
+
+Namespace *
+Namespace_FindOrNew_Local ( Stack * nsStack, Boolean setBlockFlag )
+{
+    Namespace * ns = _Namespace_FindOrNew_Local ( nsStack ) ;
+    if ( setBlockFlag )
+    {
+        BlockInfo * bi = ( BlockInfo * ) Stack_Top ( _Context_->Compiler0->BlockStack ) ;
+        bi->BI_LocalsNamespace = ns ;
+    }
     return ns ;
 }
 
