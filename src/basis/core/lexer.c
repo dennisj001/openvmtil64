@@ -29,7 +29,7 @@ Lexer_ObjectToken_New ( Lexer * lexer, byte * token ) //, int64 parseFlag )
                 {
                     _Namespace_ActivateAsPrimary ( _Compiler_->LocalsNamespace ) ;
                     word = DataObject_New ( LOCAL_VARIABLE, 0, token, LOCAL_VARIABLE, 0, 0, 0, 0, DICTIONARY, - 1, - 1 ) ;
-                    token2 = Lexer_PeekNextNonDebugTokenWord ( lexer, 1 ) ;
+                    token2 = Lexer_Peek_Next_NonDebugTokenWord ( lexer, 1 ) ;
                     if ( ! String_Equal ( token2, "=" ) ) return lexer->TokenWord = 0 ; // don't interpret this word
                 }
                 else word = DataObject_New ( NAMESPACE_VARIABLE, 0, token, NAMESPACE_VARIABLE, 0, 0, 0, 0, 0, 0, - 1 ) ;
@@ -218,7 +218,7 @@ _Lexer_ConsiderDebugAndCommentTokens ( byte * token, int64 evalFlag )
 }
 
 byte *
-_Lexer_NextNonDebugOrCommentTokenWord ( Lexer * lexer, byte * delimiters, Boolean evalFlag, Boolean peekFlag )
+_Lexer_Next_NonDebugOrCommentTokenWord ( Lexer * lexer, byte * delimiters, Boolean evalFlag, Boolean peekFlag )
 {
     byte * token ;
     Boolean debugOrComment ;
@@ -232,9 +232,9 @@ _Lexer_NextNonDebugOrCommentTokenWord ( Lexer * lexer, byte * delimiters, Boolea
 }
 
 byte *
-Lexer_PeekNextNonDebugTokenWord ( Lexer * lexer, Boolean evalFlag )
+Lexer_Peek_Next_NonDebugTokenWord ( Lexer * lexer, Boolean evalFlag )
 {
-    byte * token = _Lexer_NextNonDebugOrCommentTokenWord ( lexer, 0, evalFlag, 0 ) ; // 0 : peekFlag off because we are reAdding it below
+    byte * token = _Lexer_Next_NonDebugOrCommentTokenWord ( lexer, 0, evalFlag, 0 ) ; // 0 : peekFlag off because we are reAdding it below
     CfrTil_PushToken_OnTokenList ( token ) ; // TODO ; list should instead be a stack
     return token ;
 }
@@ -242,13 +242,13 @@ Lexer_PeekNextNonDebugTokenWord ( Lexer * lexer, Boolean evalFlag )
 #if 0
 
 byte *
-Lexer_PeekNextNonDebugTokenWord ( Lexer * lexer, int64 evalFlag )
+Lexer_Peek_Next_NonDebugTokenWord ( Lexer * lexer, int64 evalFlag )
 {
     byte * token = 0 ;
     if ( _AtCommandLine ( ) && Lexer_CheckIfDone ( lexer, LEXER_DONE ) ) return 0 ;
     else
     {
-        token = Lexer_PeekNextNonDebugTokenWord ( lexer, 0, evalFlag ) ;
+        token = Lexer_Peek_Next_NonDebugTokenWord ( lexer, 0, evalFlag ) ;
     }
     return token ;
 }

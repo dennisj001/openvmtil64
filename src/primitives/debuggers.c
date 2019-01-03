@@ -47,7 +47,7 @@ CfrTil_DebugOn ( )
     Debugger * debugger = _Debugger_ ;
     debugger->DebugRSP = 0 ;
     Debugger_On ( debugger ) ;
-    byte * nextToken = Lexer_PeekNextNonDebugTokenWord ( cntx->Lexer0, 0 ) ;
+    byte * nextToken = Lexer_Peek_Next_NonDebugTokenWord ( cntx->Lexer0, 0 ) ;
     debugger->EntryWord = Finder_Word_FindUsing ( cntx->Interpreter0->Finder0, nextToken, 0 ) ;
     debugger->StartHere = Here ;
     _Context_->SourceCodeWord = debugger->EntryWord ;

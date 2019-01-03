@@ -37,10 +37,10 @@ TSI_TypeCheck_NonTypeVariableSigCode ( TSI * tsi, Word * stackWord, int64 ti )
                 //return false ; // it will fall thru to return false
             }
                 //else if ( ( word->CAttribute & OBJECT_FIELD ) ) {} // pass for now - return false = no type error
-            else return true ; // type error
+            else return tsi->TypeErrorStatus = true ; ; // type error
         }
     }
-    return false ;
+    return tsi->TypeErrorStatus = false ;
 }
 
 Boolean
@@ -70,10 +70,11 @@ TSI_TypeCheck_TypeVariableSigCode ( TSI * tsi, Word * stackWord0, Word * stackWo
                         tsi->WordBeingCompiled->W_TypeObjectsNamespaces [stackWord1->Index - 1] = stackWord0->TypeNamespace ; // ??
                 }
             }
-            else if ( ( ! ( stackWord1->CAttribute & stackWord0_CAttribute ) ) && ( ! ( stackWord0->CAttribute & ( T_ANY | T_UNDEFINED ) ) ) ) return true ;
+            else if ( ( ! ( stackWord1->CAttribute & stackWord0_CAttribute ) ) && ( ! ( stackWord0->CAttribute & ( T_ANY | T_UNDEFINED ) ) ) ) 
+                tsi->TypeErrorStatus = true ;
         }
     }
-    return false ;
+    return tsi->TypeErrorStatus = false ; ;
 }
 
 Boolean
@@ -114,11 +115,11 @@ TSI_TypeCheckAndInfer ( TSI * tsi )
                     stackWord0 = ( Word * ) tsi->TypeWordStack->StackPointer [ 0 ], stackWord1 = ( Word * ) tsi->TypeWordStack->StackPointer [ - 1 ] ; // this idea seems right ??
                 }
                 else stackWord1 = ( Word * ) tsi->TypeWordStack->StackPointer [ 0 ], stackWord0 = ( Word * ) tsi->TypeWordStack->StackPointer [ - 1 ] ; // this idea seems right ??
-                if ( TSI_TypeCheck_TypeVariableSigCode ( tsi, stackWord0, stackWord1 ) ) tsi->TypeErrorStatus = true ;
+                TSI_TypeCheck_TypeVariableSigCode ( tsi, stackWord0, stackWord1 ) ;
             }
             else //  case 'A': case 'N': case 'I': case 'S': case 'B': case 'O': case 'V': case '_':
                 //if ( TSI_TypeCheck_NonTypeVariableSigCode ( tsi, stackWord, tsi->OpWordTypeSignature [ti] ) ) tsi->TypeErrorStatus = true ;
-                if ( TSI_TypeCheck_NonTypeVariableSigCode ( tsi, stackWord, ti ) ) tsi->TypeErrorStatus = true ;
+                TSI_TypeCheck_NonTypeVariableSigCode ( tsi, stackWord, ti ) ;
         }
     }
     if ( Is_DebugOn ) TSI_TypeStatus_Print ( tsi ) ;

@@ -1,12 +1,12 @@
 #include "../include/cfrtil64.h"
 
 CPrimitive CPrimitives [] = { 
-#if EXPERIMENTAL    
     { "locationPush", 0, 0, 0, Location_PushNew, 0, 0, 0, "Experimental", "Root" },
     { "locationPrint", 0, 0, 0, CfrTil_Location_Printf, 0, 0, 0, "Experimental", "Root" },
+    { "do>", 0, 0, 0, CfrTil_Do, IMMEDIATE, 0, 0, "Experimental", "Root" },
     { "does>", 0, 0, 0, CfrTil_Does, IMMEDIATE, 0, 0, "Experimental", "Root" },
-#endif    
-    
+    { "<do", 0, 0, 0, CfrTil_NoOp, IMMEDIATE, 0, 0, "Experimental", "Root" },
+   
     { "(", 0, 0, 0, ( block ) LC_ReadEvalPrint_AfterAFirstLParen, IMMEDIATE | KEYWORD, LEFT_PAREN, 0, "Lisp", "Root" },
     { "_(", 0, 0, 0, ( block ) LC_Read, IMMEDIATE | KEYWORD, 0, 0, "Lisp", "Root" },
     { "eval", 0, 0, 0, ( block ) LC_Eval, IMMEDIATE | KEYWORD, 0, 0, "Lisp", "Root" },

@@ -274,6 +274,48 @@ _CfrTil_IsContainingNamespace ( byte * wordName, byte * namespaceName )
 }
 
 void
+_Namespace_DoNamespace ( Namespace * ns )
+{
+    Context * cntx = _Context_ ;
+    if ( ! Lexer_IsTokenForwardDotted ( cntx->Lexer0 ) ) _Namespace_ActivateAsPrimary ( ns ) ;
+    else Finder_SetQualifyingNamespace ( cntx->Finder0, ns ) ;
+    cntx->Interpreter0->BaseObject = 0 ;
+}
+
+#if 0
+
+void
+Namespace_DoNamespace ( Namespace * ns, int64 immFlag )
+{
+    Context * cntx = _Context_ ;
+    if ( ( ! immFlag ) && CompileMode && ( Lexer_NextNonDelimiterChar ( cntx->Lexer0 ) != '.' ) && ( ! GetState ( cntx->Compiler0, LC_ARG_PARSING ) ) )
+    {
+        _Compile_C_Call_1_Arg ( ( byte* ) _Namespace_DoNamespace, ( int64 ) ns ) ;
+    }
+    if ( ! Lexer_IsTokenForwardDotted ( cntx->Lexer0 ) ) _Namespace_ActivateAsPrimary ( ns ) ;
+    else Finder_SetQualifyingNamespace ( cntx->Finder0, ns ) ;
+    cntx->Interpreter0->BaseObject = 0 ;
+}
+#else
+
+void
+Namespace_DoNamespace ( Namespace * ns )
+{
+    Context * cntx = _Context_ ;
+    if ( ( ! CompileMode ) || GetState ( cntx, C_SYNTAX|LISP_MODE ) ) 
+    {
+        if ( ! Lexer_IsTokenForwardDotted ( cntx->Lexer0 ) ) _Namespace_ActivateAsPrimary ( ns ) ;
+        else Finder_SetQualifyingNamespace ( cntx->Finder0, ns ) ;
+        cntx->Interpreter0->BaseObject = 0 ;
+    }
+    else if ( ( Lexer_NextNonDelimiterChar ( cntx->Lexer0 ) != '.' ) && ( ! GetState ( cntx->Compiler0, LC_ARG_PARSING ) ) )
+    {
+        _Compile_C_Call_1_Arg ( ( byte* ) _Namespace_DoNamespace, ( int64 ) ns ) ;
+    }
+}
+#endif
+
+void
 Namespace_DoNamespace_Name ( byte * name )
 {
     Namespace_DoNamespace ( Namespace_Find ( name ) ) ;

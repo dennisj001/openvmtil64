@@ -250,7 +250,7 @@ void
 Type_Create ( )
 {
     Context * cntx = _Context_ ;
-    byte * token = Lexer_PeekNextNonDebugTokenWord ( cntx->Lexer0, 1 ) ;
+    byte * token = Lexer_Peek_Next_NonDebugTokenWord ( cntx->Lexer0, 1 ) ;
     int64 size = _Type_Create ( token ) ;
     //DataStack_Push ( size ) ;
 }
@@ -267,7 +267,7 @@ _CfrTil_TypeDef ( )
     Lexer_SetTokenDelimiters ( lexer, ( byte* ) " ,\n\r\t", COMPILER_TEMP ) ;
     do
     {
-        byte * token = Lexer_PeekNextNonDebugTokenWord ( cntx->Lexer0, 1 ) ;
+        byte * token = Lexer_Peek_Next_NonDebugTokenWord ( cntx->Lexer0, 1 ) ;
         if ( token [ 0 ] == ';' )
         {
             Lexer_ReadToken ( cntx->Lexer0 ) ;

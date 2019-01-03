@@ -121,13 +121,18 @@ Debugger_ParseFunctionLocalVariables ( Debugger * debugger, Lexer * lexer, Boole
                 debugger->LevelBitNamespaceMap |= ( ( uint64 ) 1 << ( levelBit ) ) ;
             }
             if ( String_Equal ( token, "var" ) ) aToken = prevToken ;
-            else // parse a C local variable declaration
+            else
             {
                 while ( 1 )
                 {
-                    aToken = _Lexer_ReadToken ( lexer, ( byte* ) " ,\n\r\t" ) ; //_Lexer_PeekNextNonDebugTokenWord ( _Lexer_, ( byte* ) " ,\n\r\t", 0 ) ;
-                    if ( String_Equal ( aToken, ";" ) ) break ;
-                    _Compiler_LocalWord ( _Compiler_, aToken, LOCAL_VARIABLE, 0, 0, COMPILER_TEMP ) ;
+                    aToken = Lexer_ReadToken ( lexer ) ;
+                    if ( String_Equal ( aToken, ";" ) || String_Equal ( aToken, "{" ) ) break ;
+                    else
+                    {
+                        Lexer_ParseObject ( lexer, aToken ) ;
+                        if ( ( ! String_Equal ( aToken, "=" ) ) && ( lexer->TokenType & T_RAW_STRING ) )
+                            _Compiler_LocalWord ( _Compiler_, aToken, LOCAL_VARIABLE, 0, 0, COMPILER_TEMP ) ;
+                    }
                 }
             }
         }

@@ -65,19 +65,22 @@ _Compiler_LocalWord ( Compiler * compiler, byte * name, int64 ctype, int64 ctype
             ++ compiler->NumberOfNonRegisterArgs ;
         }
     }
+    word->CAttribute2 |= RECYCLABLE_LOCAL ;
     return word ;
 }
 
-Word *
-Compiler_LocalWord ( Compiler * compiler, byte * name, int64 ctype, int64 ctype2, int64 ltype, int64 allocType ) // svf : flag - whether stack variables are in the frame
+void
+Compiler_LocalsNamespace_New ( Compiler * compiler )
 {
-    if ( ( ! GetState ( compiler, DOING_C_TYPE ) && ( ! GetState ( _LC_, LC_BLOCK_COMPILE ) ) ) )
-    {
-        Namespace_FindOrNew_Local ( compiler->LocalsCompilingNamespacesStack ) ;
-        Finder_SetQualifyingNamespace ( _Finder_, 0 ) ;
-    }
-    Word * word = _Compiler_LocalWord ( compiler, name, ctype, 0, 0, allocType ) ; // svf : flag - whether stack variables are in the frame
-    word->CAttribute2 |= RECYCLABLE_LOCAL ;
+    Namespace_FindOrNew_Local ( compiler->LocalsCompilingNamespacesStack ) ;
+    Finder_SetQualifyingNamespace ( _Finder_, 0 ) ;
+}
+
+Word *
+Compiler_LocalWord ( Compiler * compiler, byte * name, int64 ctype, int64 ctype2, int64 ltype, int64 allocType )
+{
+    if ( ( ! GetState ( compiler, DOING_C_TYPE ) && ( ! GetState ( _LC_, LC_BLOCK_COMPILE ) ) ) ) Compiler_LocalsNamespace_New ( compiler ) ;
+    Word * word = _Compiler_LocalWord ( compiler, name, ctype, ctype2, ltype, allocType ) ;
     return word ;
 }
 

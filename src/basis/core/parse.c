@@ -112,7 +112,7 @@ gotNextToken:
         {
             token = Lexer_ReadToken ( _Context_->Lexer0 ) ;
             arrayBaseObject = _CfrTil_ClassField_New ( token, ns, size, offset ) ; // nb! : in case there is an array so it will be there for ArrayDimensions
-            token = Lexer_PeekNextNonDebugTokenWord ( _Context_->Lexer0, 1 ) ;
+            token = Lexer_Peek_Next_NonDebugTokenWord ( _Context_->Lexer0, 1 ) ;
             if ( token [0] != '[' )
             {
                 offset += size ;
@@ -166,6 +166,7 @@ Compiler_TypedObjectInit ( Word * word, Namespace * typeNamespace )
     word->CAttribute |= typeNamespace->CAttribute ;
     if ( typeNamespace->CAttribute & CLASS ) word->CAttribute |= OBJECT ;
     word->LAttribute |= LOCAL_OBJECT ;
+    word->Size = _Namespace_VariableValueGet ( word, ( byte* ) "size" ) ;
     //_DObject_Init ( Word * word, uint64 value, uint64 ftype, byte * function, int64 arg )
     _DObject_Init ( word, ( int64 ) 0, LOCAL_OBJECT, ( byte* ) _DataObject_Run, 0 ) ;
     _Word_Add ( word, 1, 0 ) ;

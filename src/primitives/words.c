@@ -10,7 +10,7 @@ _CfrTil_Colon ( Boolean initSC )
     CfrTil_Word_Create ( ) ;
     CfrTil_BeginBlock ( ) ;
 
-    byte * token = Lexer_PeekNextNonDebugTokenWord ( _Lexer_, 0 ) ;
+    byte * token = Lexer_Peek_Next_NonDebugTokenWord ( _Lexer_, 0 ) ;
     if ( ( String_Equal ( token, "(" ) ) && ( ! GetState ( _Context_->Interpreter0, PREPROCESSOR_DEFINE ) ) )
     {
         Lexer_ReadToken ( _Lexer_ ) ;
@@ -195,7 +195,6 @@ Word_Name ( )
     DataStack_Push ( ( int64 ) word->Name ) ;
 }
 
-#if EXPERIMENTAL
 Location *
 Location_New ( )
 {
@@ -214,87 +213,40 @@ _Location_Printf ( Location * loc )
 }
 
 void
-_CfrTil_Location_Printf ( )
+CfrTil_Location_Printf ( )
 {
     Location * loc = ( Location* ) DataStack_Pop ( ) ;
     _Location_Printf ( loc ) ;
 }
 
-// some pretty shifty code
-void
-CfrTil_Location_Printf ( )
-{
-    if ( ! CompileMode ) _CfrTil_Location_Printf ( ) ;
-    else Compile_Call_TestRSP ( ( byte* ) CfrTil_Location_Printf ) ;
-}
-
 void
 Location_PushNew ( )
 {
-    Location * loc ;
-    if ( CompileMode )
-    {
-        loc = Location_New ( ) ;
-        _Compile_Stack_Push ( DSP, RAX, ( int64 ) loc ) ;
-    }
+    Location * loc = Location_New ( ) ;
+    _Compile_Stack_Push ( DSP, RAX, ( int64 ) loc ) ;
 }
 
-#if 1
-// currently not really like but only related to forth does>
-void
-CfrTil_Does ( )
-{
-    _Compiler_->CurrentWord->CAttribute |= IMMEDIATE ;
-}
-
-#else
-
-void
-CfrTil_Does ( )
-{
-    CfrTil_CompileMode ( ) ;
-    _Compile_UninitializedJump ( ) ; // at the end of the 'if block' we need to jmp over the 'else block'
-    CfrTil_CalculateAndSetPreviousJmpOffset_ToHere ( ) ;
-    Stack_Push_PointerToJmpOffset ( ) ;
-    if ( CompileMode ) return ;
-}
-
-// do> does>
-// do> [if COMPILE_MODE] does> [if runtime]
+// related to forth does>
+// do> does> <do
 
 void
 CfrTil_Do ( )
 {
-    Context * cntx = _Context_ ;
-    Interpreter * interp = cntx->Interpreter0 ;
-    //_Compiler_->CurrentWord->CAttribute |= INLINE ;
-    Compile_MoveImm_To_Reg ( ACC, ( int64 ) & _Context_->Compiler0->State, CELL ) ;
-    Compile_Move_Rm_To_Reg ( ACC, ACC, 0 ) ;
-    //Compile_ANDI( mod, operandReg, offset, immediateData, size )  
-    Compile_ANDI ( REG, ACC, 0, COMPILE_MODE, 1 ) ;
-    _Compile_TestCode ( RAX, CELL ) ; // if not COMPILE_MODE jmp to after does> 
-    //_Compile_UninitializedJumpEqualZero ( ) ;
-    _Compile_Jcc ( NOT_ZERO, TTT_ZERO, 0 ) ;
-    byte * ptrToOffsetElse = Here - DISP_SIZE ;
-    DEBUG_SHOW ;
-    //Set_CompileMode ( true ) ;
-    Interpret_Until_Token ( interp, ( byte* ) "does>", 0 ) ;
-    _Compile_UninitializedJump ( ) ;
-    byte * ptrToOffsetEnd = Here - DISP_SIZE ;
-    //Set_CompileMode ( true ) ;
-    _SetOffsetForCallOrJump ( ptrToOffsetElse, Here ) ;
-    byte * token = Interpret_C_Until_Token4 ( interp, ( byte* ) ";", ( byte* ) "<does", 0, 0, 0 ) ;
-    _SetOffsetForCallOrJump ( ptrToOffsetEnd, Here ) ;
-    token = Lexer_ReadToken ( interp->Lexer0 ) ;
-    if ( ! String_Equal ( token, "<does" ) )
-    {
-        DEBUG_SHOW ;
-        Interpreter_InterpretAToken (interp, token, - 1 , -1) ;
-    }
+    //_Context_->CurrentlyRunningWord->CAttribute |= IMMEDIATE ;
+    CfrTil_LeftBracket ( ) ; // interpret mode
 }
 
-#endif
-#endif
+void
+CfrTil_Does ( )
+{
+    CfrTil_RightBracket ( ) ; // back to compile mode
+    CfrTil_BeginBlock ( ) ;
+    //byte * token = 
+    Interpret_C_Until_Token4 ( _Interpreter_, ( byte* ) "<do", ( byte* ) ";", ( byte* ) "}", ( byte* ) ",", 0 ) ;
+    //if ( String_Equal ( token, "<do" ) ) Lexer_ReadToken ( _Lexer_ ) ;
+    CfrTil_EndBlock ( ) ;
+    CfrTil_BlockRun ( ) ;
+}
 
 void
 Word_Namespace ( )
@@ -419,16 +371,16 @@ CfrTil_DebugWord ( void )
 }
 
 void
-Symbol_Print ( Symbol * symbol ) 
+Symbol_Print ( Symbol * symbol )
 {
-    _Printf ( (byte*) "%s", symbol->Name ) ;
+    _Printf ( ( byte* ) "%s", symbol->Name ) ;
 }
 
 void
 Symbol_List_Print ( dllist * list )
 {
-   _Printf ( (byte*) "\nSymbol List : " ) ;
-   dllist_Map ( list, (MapFunction0) Symbol_Print ) ; 
+    _Printf ( ( byte* ) "\nSymbol List : " ) ;
+    dllist_Map ( list, ( MapFunction0 ) Symbol_Print ) ;
 }
 
 void
@@ -556,6 +508,6 @@ CfrTil_AllWords ( )
     _Printf ( ( byte* ) "\n" INT_FRMT " total words", n + m ) ;
     int64 notUsingWords = _CfrTil_->FindWordCount ;
     _CfrTil_->FindWordCount = usingWords + notUsingWords ;
-    CfrTil_WordAccounting ( (byte*) "CfrTil_AllWords" ) ;
+    CfrTil_WordAccounting ( ( byte* ) "CfrTil_AllWords" ) ;
 }
 

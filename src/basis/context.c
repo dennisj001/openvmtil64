@@ -227,7 +227,7 @@ _CfrTil_ContextNew_IncludeFile ( byte * filename )
 int64
 _Context_StringEqual_PeekNextToken ( Context * cntx, byte * check, Boolean evalFlag )
 {
-    byte *token = Lexer_PeekNextNonDebugTokenWord ( cntx->Lexer0, evalFlag ) ;
+    byte *token = Lexer_Peek_Next_NonDebugTokenWord ( cntx->Lexer0, evalFlag ) ;
     if ( token ) return String_Equal ( ( char* ) token, ( char* ) check ) ;
     else return 0 ;
 }
