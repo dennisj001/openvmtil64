@@ -96,7 +96,6 @@ Debugger_ParseFunctionLocalVariables ( Debugger * debugger, Compiler * compiler,
             if ( ! ( debugger->LevelBitNamespaceMap & ( ( uint64 ) 1 << ( levelBit ) ) ) )
             {
                 compiler->LocalsNamespace = _CfrTil_Parse_LocalsAndStackVariables ( 1, 0, 0, compiler->LocalsCompilingNamespacesStack, 0, true ) ;
-                //_CfrTil_Parse_LocalsAndStackVariables ( 1, 0, 0, compiler->LocalsCompilingNamespacesStack, 0, true ) ;
                 debugger->LevelBitNamespaceMap |= ( ( uint64 ) 1 << ( levelBit ) ) ;
                 levelBit ++ ;
                 //_Namespace_PrintWords ( compiler->LocalsNamespace ) ;
@@ -152,32 +151,17 @@ _Debugger_Locals_Show ( Debugger * debugger, Word * scWord )
     {
         //_Compile_Save_C_CpuState ( _CfrTil_, 0 ) ;
         Compiler * compiler = _Compiler_, *compilerCopy ;
-        Namespace *svNamespace = compiler->LocalsNamespace, *svInNamespace = _CfrTil_->InNamespace ;
-        Stack * svStack = compiler->LocalsCompilingNamespacesStack ;
-        //Stack * svStack = Stack_Copy ( compiler->LocalsCompilingNamespacesStack, COMPILER_TEMP ) ;
         compilerCopy = Compiler_Copy ( compiler, COMPILER_TEMP ) ;
         Lexer * svLexer = _Lexer_ ;
         Lexer * lexer = Lexer_New ( COMPILER_TEMP ) ;
         _Lexer_ = lexer ;
         byte *sc = scWord->W_SourceCode ? scWord->W_SourceCode : String_New ( _CfrTil_->SC_Buffer, TEMPORARY ) ;
-
+        
         _Debugger_ReadLocals ( debugger, compilerCopy, lexer, scWord, sc ) ;
         if ( compilerCopy->LocalsCompilingNamespacesStack && sc ) _Debugger_Locals_Show_Loop ( debugger, compilerCopy, scWord ) ;
         else _Printf ( ( byte* ) "\nTry stepping a couple of instructions and try again." ) ;
 
-        compiler->LocalsNamespace = svNamespace ;
-        compiler->LocalsCompilingNamespacesStack = svStack ;
-        compiler->NumberOfNonRegisterLocals = compilerCopy->NumberOfNonRegisterLocals ; // nb! very important !!
-        compiler->NumberOfNonRegisterArgs = compilerCopy->NumberOfNonRegisterArgs ; // nb! very important !!
-        compiler->NumberOfLocals = compilerCopy->NumberOfLocals ;
-        compiler->NumberOfRegisterArgs = compilerCopy->NumberOfRegisterArgs ;
-        compiler->NumberOfRegisterLocals = compilerCopy->NumberOfRegisterLocals ;
-        compiler->NumberOfArgs = compilerCopy->NumberOfArgs ;
         _Lexer_ = svLexer ;
-        SetState ( compiler, VARIABLE_FRAME, false ) ;
-        _CfrTil_->InNamespace = svInNamespace ;
-        Namespace_SetState ( compiler->LocalsNamespace, USING ) ;
-        _Namespace_ActivateAsPrimary ( svInNamespace ) ;
         //_Compile_Restore_C_CpuState ( _CfrTil_, 0 ) ;
         //_Namespace_PrintWords ( compiler->LocalsNamespace ) ;
     }

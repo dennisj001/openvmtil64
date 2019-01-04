@@ -204,7 +204,7 @@ _CfrTil_Parse_LocalsAndStackVariables ( int64 svf, int64 lispMode, ListObject * 
     Namespace *typeNamespace = 0, *saveInNs = _CfrTil_->InNamespace ;
     if ( ! localsNs ) localsNs = Namespace_FindOrNew_Local (nsStack ? nsStack : compiler->LocalsCompilingNamespacesStack, ! debugFlag ) ;
 
-    CfrTil_WordLists_PopWord ( ) ; // stop source code
+    if ( ! debugFlag ) CfrTil_WordLists_PopWord ( ) ; // stop source code
     if ( svf ) svff = 1 ;
     addWords = 1 ;
     if ( lispMode ) args = ( ListObject * ) args->Lo_List->head ;
