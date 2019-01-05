@@ -154,6 +154,7 @@ _Class_Object_Init ( Word * word, Namespace * ns )
         //if ( Is_DebugOn ) CfrTil_PrintDataStack ( ) ;
     }
     SetState ( _Debugger_, DEBUG_SHTL_OFF, false ) ;
+    word->TypeNamespace = ns ;
     //DebugShow_On ;
 }
 

@@ -372,7 +372,7 @@ void CfrTil_C_LeftParen(void);
 void _CfrTil_C_Infix_EqualOp(Word *opWord);
 void CfrTil_SetInNamespaceFromBackground(void);
 void CfrTil_C_ConditionalExpression(void);
-Boolean C_Syntax_AreWeParsingACFunctionCall(Lexer *lexer);
+Boolean Syntax_AreWeParsingACFunctionCall(Lexer *lexer);
 /* src/basis/core/dataObjectNew.c */
 Word *DataObject_New(uint64 type, Word *word, byte *name, uint64 ctype, uint64 ctype2, uint64 ltype, int64 index, int64 value, int allocType, int64 tsrli, int64 scwi);
 byte *_CfrTil_NamelessObjectNew(int64 size, int64 allocType);
@@ -608,7 +608,7 @@ Word *Interpreter_ReadNextTokenToWord(Interpreter *interp);
 Boolean _Interpreter_IsWordPrefixing(Interpreter *interp, Word *word);
 Boolean Interpreter_IsWordPrefixing(Interpreter *interp, Word *word);
 /* src/basis/core/lexer.c */
-Word *Lexer_ObjectToken_New(Lexer *lexer, byte *token);
+Word *Lexer_ObjectToken_New(Lexer *lexer, byte *token, int64 tsrli, int64 scwi);
 void Lexer_Set_ScIndex_RlIndex(Lexer *lexer, Word *word, int64 tsrli, int64 scwi);
 byte *_Lexer_LexNextToken_WithDelimiters(Lexer *lexer, byte *delimiters, Boolean checkListFlag, Boolean peekFlag, int reAddPeeked, uint64 state);
 void Lexer_Init(Lexer *lexer, byte *delimiters, uint64 state, uint64 allocType);
@@ -1337,6 +1337,7 @@ void _CfrTil_StringMacros_Init(void);
 void _CfrTil_StringMacros_Do(byte *buffer);
 byte *_String_Get_ReadlineString_ToEndOfLine(void);
 Boolean IsPunct(byte b);
+int64 String_CheckWordSize(byte *str, int64 wl);
 int64 String_FindStrnCmpIndex(byte *sc, byte *name0, int64 index0, int64 wl0, int64 inc);
 byte *_String_HighlightTokenInputLine(byte *nvw, Boolean lef, int64 leftBorder, int64 tokenStart, byte *token, int64 rightBorder, Boolean ref);
 int64 _IsString(byte *address, int64 maxLength);

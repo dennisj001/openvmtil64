@@ -297,7 +297,7 @@ CfrTil_C_ConditionalExpression ( )
 #endif
 
 Boolean
-C_Syntax_AreWeParsingACFunctionCall ( Lexer * lexer )
+Syntax_AreWeParsingACFunctionCall ( Lexer * lexer )
 {
     if ( ! GetState ( _Context_, C_SYNTAX | INFIX_MODE ) ) return false ;
     return _C_Syntax_AreWeParsingACFunctionCall ( & lexer->ReadLiner0->InputLine [ lexer->TokenStart_ReadLineIndex ] ) ;

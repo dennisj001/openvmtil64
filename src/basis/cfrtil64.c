@@ -197,6 +197,12 @@ _CfrTil_Init ( CfrTil * cfrTil, Namespace * nss )
     cfrTil->PokeWord = Finder_FindWord_InOneNamespace ( _Finder_, (byte*) "Compiler", (byte*) "=" ) ; //Finder_FindWord_AnyNamespace ( _Finder_, ( byte* ) "=" ) ;
     cfrTil->RightBracket = Finder_FindWord_AnyNamespace ( _Finder_, ( byte* ) "]" ) ;
     cfrTil->InfixNamespace = Namespace_Find ( (byte*) "Infix" ) ;
+    cfrTil->StringNamespace = Namespace_Find ( (byte*) "String" ) ;
+    cfrTil->BigNumNamespace = Namespace_Find ( (byte*) "BigNum" ) ;
+    cfrTil->IntegerNamespace = Namespace_Find ( (byte*) "Integer" ) ;
+    //cfrTil->RawStringNamespace = Namespace_Find ( (byte*) "RawString" ) ;
+    //cfrTil->CharNamespace = Namespace_Find ( (byte*) "Char" ) ;
+    //cfrTil->FloatNamespace = Namespace_Find ( (byte*) "Float" ) ;
     CfrTil_ReadTables_Setup ( cfrTil ) ;
     CfrTil_LexerTables_Setup ( cfrTil ) ;
     cfrTil->LC = 0 ;

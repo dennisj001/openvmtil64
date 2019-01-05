@@ -386,7 +386,7 @@ _dllist_AddNodeToHead ( dllist *list, dlnode * node )
 void
 dllist_AddNodeToHead ( dllist *list, dlnode * node )
 {
-    if ( node )
+    if ( list && node )
     {
         dlnode_Remove ( node ) ; // if the node is already on a list it will be first removed
         _dllist_AddNodeToHead ( list, node ) ;

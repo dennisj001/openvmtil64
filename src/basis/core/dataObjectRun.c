@@ -6,7 +6,7 @@ _DataObject_Run ( Word * word0 )
 {
     Context * cntx = _Context_ ;
     Word * word = _Context_CurrentWord ( cntx ) ; // = word0 ; //?? fix me re. x64.cft
-    Word * ns = word0 ; 
+    Word * ns = word0 ;
     cntx->Interpreter0->w_Word = word ; // for ArrayBegin : all literals are run here
     if ( word->LAttribute & LOCAL_OBJECT ) Do_LocalObject ( word ) ;
     else if ( word->CAttribute & T_LISP_SYMBOL )
@@ -93,6 +93,8 @@ Compile_C_FunctionDeclaration ( byte * token1 )
 }
 
 // this is currently kinda rough
+// this also interprets the rest of a c function after a type declaration
+
 void
 _Compile_C_TypeDeclaration ( )
 {
@@ -100,8 +102,17 @@ _Compile_C_TypeDeclaration ( )
     Compiler * compiler = cntx->Compiler0 ;
     byte * token ;
     while ( token = Interpret_C_Until_Token4 ( cntx->Interpreter0,
-        ( byte* ) ",", ( byte* ) ";", ( byte* ) "{", ( GetState ( cntx, C_SYNTAX ) ? 0 : ( byte* ) "=" ), 0 ) )
+        ( byte* ) ",", ( byte* ) ";", ( byte* ) "{", ( GetState ( cntx, C_SYNTAX ) ? ( byte* ) "}" : ( byte* ) "=" ), 0 ) )
     {
+#if 0  // rather than this we stay in this interpreter until the end of the C function      
+        if ( String_Equal ( token, ";" ) )
+        {
+            Lexer_ReadToken ( _Lexer_ ) ;
+            if ( GetState ( cntx, C_SYNTAX ) ) Compiler_Get_C_BackgroundNamespace ( compiler ) ;
+            compiler->LHS_Word = 0 ;
+            break ;
+        } //|| ( ( ! GetState ( cntx, C_SYNTAX ) ) && String_Equal ( token, "=" ) ) )
+#endif        
         if ( String_Equal ( token, "," ) || String_Equal ( token, ";" ) || ( ( ! GetState ( cntx, C_SYNTAX ) ) && String_Equal ( token, "=" ) ) )
             Lexer_ReadToken ( _Lexer_ ) ;
         else
@@ -139,7 +150,12 @@ _Namespace_Do_C_Type ( Namespace * ns )
     token1 = _Lexer_Next_NonDebugOrCommentTokenWord ( _Lexer_, 0, 1, 0 ) ;
     token2 = Lexer_Peek_Next_NonDebugTokenWord ( _Lexer_, 1 ) ;
     if ( token2 [0] == '(' ) Compile_C_FunctionDeclaration ( token1 ) ;
-    else Compile_C_TypeDeclaration ( token1 ) ;
+    else
+    {
+        if ( Compiling ) _Compiler_->AutoVarTypeNamespace = ns ;
+        Compile_C_TypeDeclaration ( token1 ) ;
+        _Compiler_->AutoVarTypeNamespace = 0 ;
+    }
 }
 
 void
@@ -164,10 +180,10 @@ Namespace_Do_C_Type ( Namespace * ns )
                 if ( GetState ( cntx, C_SYNTAX ) ) Compiler_Get_C_BackgroundNamespace ( compiler ) ;
                 _Namespace_Do_C_Type ( ns ) ;
             }
+            SetState ( compiler, DOING_C_TYPE, false ) ;
         }
         else Namespace_DoNamespace ( ns ) ;
         if ( ( ! Compiling ) && GetState ( cntx, C_SYNTAX ) ) Compiler_SetAs_InNamespace_C_BackgroundNamespace ( compiler ) ;
-        SetState ( compiler, DOING_C_TYPE, false ) ;
     }
 }
 

@@ -748,7 +748,7 @@ typedef struct
     Word * ReturnVariableWord ;
     Word * CurrentWord, *CurrentCreatedWord ;
     Word * LHS_Word ;
-    Namespace *C_BackgroundNamespace, *C_FunctionBackgroundNamespace, *LocalsNamespace ; //, ** FunctionTypesArray ;
+    Namespace *C_BackgroundNamespace, *C_FunctionBackgroundNamespace, *LocalsNamespace, *AutoVarTypeNamespace ; //, ** FunctionTypesArray ;
     dllist * GotoList ;
     dllist * CurrentSwitchList ;
     dllist * RegisterParameterList ;
@@ -904,7 +904,7 @@ typedef struct _CfrTil
     Context * Context0 ;
     Stack * ContextDataStack, * TypeWordStack ;
     Debugger * Debugger0 ;
-    Namespace * InNamespace ;
+    Namespace * InNamespace, *BigNumNamespace, *IntegerNamespace, *StringNamespace, *RawStringNamespace ;
     LambdaCalculus * LC ;
     FILE * LogFILE ;
     int64 InitSessionCoreTimes, LogFlag, WordsAdded, FindWordCount, FindWordMaxCount, WordCreateCount, DObjectCreateCount ;

@@ -785,7 +785,7 @@ IsPunct ( byte b )
     else return false ;
 }
 
-#if 0
+#if 1
 // ?? necessary ; works ??
 
 int64
@@ -827,24 +827,24 @@ String_FindStrnCmpIndex ( byte * sc, byte* name0, int64 index0, int64 wl0, int64
     byte * scspp2, *scspp, *scindex ;
     d0 ( scspp = & sc [ index0 ] ) ;
     int64 i, n, index = index0, slsc = Strlen ( sc ) ;
-    for ( i = 0, n = wl0 + inc ; ( i <= n ) ; i ++ ) // tokens are parsed in different order with parameter and c rtl args, etc. 
+    for ( i = 0, n = inc + 1 ; ( i <= n ) ; i ++ ) // tokens are parsed in different order with parameter and c rtl args, etc. 
     {
         scindex = & sc [ index + i ] ;
         if ( ( index + i <= slsc ) && ( ! Strncmp ( scindex, name0, wl0 ) ) )
         {
-            //if ( String_CheckWordSize ( scindex, wl0 ) ) 
+            if ( String_CheckWordSize ( scindex, wl0 ) ) 
             {
                 index += i ;
                 goto done ;
             }
         }
     }
-    for ( i = 0, n = wl0 + inc ; ( i <= n ) ; i ++ ) // tokens are parsed in different order with parameter and c rtl args, etc. 
+    for ( i = 0, n = inc + 1 ; ( i <= n ) ; i ++ ) // tokens are parsed in different order with parameter and c rtl args, etc. 
     {
         scindex = & sc [ index - i ] ;
         if ( ( ( index - 1 ) >= 0 ) && ( ! Strncmp ( scindex, name0, wl0 ) ) )
         {
-            //if ( String_CheckWordSize ( scindex, wl0 ) ) 
+            if ( String_CheckWordSize ( scindex, wl0 ) ) 
             {
                 index -= i ;
                 goto done ;

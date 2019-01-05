@@ -69,110 +69,11 @@ _Debugger_Locals_Show_Loop ( Debugger * debugger, Compiler * compiler, Word * sc
 }
 
 void
-Debugger_ParseFunctionLocalVariables ( Debugger * debugger, Compiler * compiler, Lexer * lexer, Boolean c_syntaxFlag )
-{
-    int64 levelBit = 0 ;
-    Boolean lasvf = false ;
-    byte * token, *prevToken = 0, *aToken ;
-    Word * currentWord ;
-    debugger->LevelBitNamespaceMap = 0 ;
-    compiler->LocalsCompilingNamespacesStack = Stack_New ( 32, COMPILER_TEMP ) ;
-    while ( ( token = _Lexer_ReadToken ( lexer, ( byte* ) " ,\n\r\t" ) ) )
-    {
-        if ( String_Equal ( token, "<end>" ) ) return ;
-        currentWord = Finder_Word_FindUsing ( _Finder_, token, 0 ) ;
-        if ( String_Equal ( token, "{" ) ) levelBit ++ ;
-        else if ( String_Equal ( token, "}" ) )
-        {
-            if ( -- levelBit <= 0 )
-            {
-                debugger->LevelBitNamespaceMap = 0 ;
-                levelBit = 0 ;
-            }
-        }
-        else if ( ( String_Equal ( token, "(" ) ) && ( lasvf == false ) )
-        {
-            if ( C_Syntax_AreWeParsingACFunctionCall ( lexer ) ) continue ;
-            if ( ! ( debugger->LevelBitNamespaceMap & ( ( uint64 ) 1 << ( levelBit ) ) ) )
-            {
-                compiler->LocalsNamespace = _CfrTil_Parse_LocalsAndStackVariables ( 1, 0, 0, compiler->LocalsCompilingNamespacesStack, 0, true ) ;
-                debugger->LevelBitNamespaceMap |= ( ( uint64 ) 1 << ( levelBit ) ) ;
-                levelBit ++ ;
-                //_Namespace_PrintWords ( compiler->LocalsNamespace ) ;
-            }
-            if ( c_syntaxFlag ) lasvf = true ;
-        }
-        else if ( String_Equal ( token, "var" ) || ( currentWord && ( currentWord->CAttribute & CLASS ) ) )
-        {
-            if ( ! ( debugger->LevelBitNamespaceMap & ( ( uint64 ) 1 << ( levelBit ) ) ) )
-            {
-                compiler->LocalsNamespace = Namespace_FindOrNew_Local ( compiler->LocalsCompilingNamespacesStack, 0 ) ;
-                debugger->LevelBitNamespaceMap |= ( ( uint64 ) 1 << ( levelBit ) ) ;
-            }
-            if ( String_Equal ( token, "var" ) ) aToken = prevToken ;
-            else
-            {
-                while ( 1 )
-                {
-                    aToken = Lexer_ReadToken ( lexer ) ;
-                    if ( String_Equal ( aToken, ";" ) || String_Equal ( aToken, "{" ) 
-                        || String_Equal ( aToken, "<end>" )  || String_Equal ( aToken, "d:" ) ) return ;
-                    Lexer_ParseObject ( lexer, aToken ) ;
-                    if ( ( ! String_Equal ( aToken, "=" ) ) && ( ! String_Equal ( aToken, "<end>" ) ) && ( lexer->TokenType & T_RAW_STRING ) )
-                    {
-                        if ( ! _Finder_FindWord_InOneNamespace ( _Finder_, compiler->LocalsNamespace, aToken ) )
-                            _Compiler_LocalWord ( compiler, aToken, LOCAL_VARIABLE, 0, 0, COMPILER_TEMP ) ;
-                    }
-                }
-                //_Namespace_PrintWords ( compiler->LocalsNamespace ) ;
-            }
-        }
-        prevToken = token ;
-    }
-}
-
-void
-_Debugger_ReadLocals ( Debugger * debugger, Compiler * compiler, Lexer * lexer, Word * scWord, byte * sc )
-{
-    ReadLiner * rl = lexer->ReadLiner0 ;
-    byte * b = Buffer_New_pbyte ( BUFFER_SIZE ) ;
-    strncpy ( ( char* ) b, ( char* ) sc, BUFFER_SIZE ) ;
-    sc = String_DelimitSourceCodeStartForLispCfrTil ( ( char* ) b ) ;
-    strncpy ( ( char* ) rl->InputLineString, ( char* ) sc, BUFFER_SIZE - 16 ) ;
-    strncat ( ( char* ) rl->InputLineString, " <end> ", 8 ) ; //signal end of input
-    Debugger_ParseFunctionLocalVariables ( debugger, compiler, lexer, ( ( scWord->WAttribute & WT_C_SYNTAX )
-        || ( GetState ( _Context_, C_SYNTAX ) ) || ( GetState ( scWord, W_C_SYNTAX ) ) ) ) ;
-}
-
-void
-_Debugger_Locals_Show ( Debugger * debugger, Word * scWord )
-{
-    if ( scWord )
-    {
-        //_Compile_Save_C_CpuState ( _CfrTil_, 0 ) ;
-        Compiler * compiler = _Compiler_, *compilerCopy ;
-        compilerCopy = Compiler_Copy ( compiler, COMPILER_TEMP ) ;
-        Lexer * svLexer = _Lexer_ ;
-        Lexer * lexer = Lexer_New ( COMPILER_TEMP ) ;
-        _Lexer_ = lexer ;
-        byte *sc = scWord->W_SourceCode ? scWord->W_SourceCode : String_New ( _CfrTil_->SC_Buffer, TEMPORARY ) ;
-        
-        _Debugger_ReadLocals ( debugger, compilerCopy, lexer, scWord, sc ) ;
-        if ( compilerCopy->LocalsCompilingNamespacesStack && sc ) _Debugger_Locals_Show_Loop ( debugger, compilerCopy, scWord ) ;
-        else _Printf ( ( byte* ) "\nTry stepping a couple of instructions and try again." ) ;
-
-        _Lexer_ = svLexer ;
-        //_Compile_Restore_C_CpuState ( _CfrTil_, 0 ) ;
-        //_Namespace_PrintWords ( compiler->LocalsNamespace ) ;
-    }
-}
-
-void
 Debugger_Locals_Show ( Debugger * debugger )
 {
     Word * scWord = Compiling ? _CfrTil_->CurrentWordBeingCompiled :
         ( debugger->DebugAddress ? Word_UnAlias ( Word_GetFromCodeAddress ( debugger->DebugAddress ) ) : _Context_->CurrentlyRunningWord ) ;
-    _Debugger_Locals_Show ( debugger, scWord ) ;
+    if ( scWord ) _Debugger_Locals_Show_Loop ( debugger, _Compiler_, scWord ) ;
 }
 
 int64
@@ -285,20 +186,11 @@ _Debugger_ShowEffects ( Debugger * debugger, Word * word, Boolean stepFlag, Bool
             }
             if ( GetState ( _Context_->Lexer0, KNOWN_OBJECT ) )
             {
-                if ( dsp > debugger->SaveDsp )
-                {
-                    _Printf ( ( byte* ) "\nLiteral :> 0x%016lx <: was pushed onto the stack ...", TOS ) ;
-                }
-                else if ( dsp < debugger->SaveDsp )
-                {
-                    _Printf ( ( byte* ) "\n%s popped %d value off the stack.", insert, ( debugger->SaveDsp - dsp ) ) ;
-                }
+                if ( dsp > debugger->SaveDsp ) _Printf ( ( byte* ) "\nLiteral :> 0x%016lx <: was pushed onto the stack ...", TOS ) ;
+                else if ( dsp < debugger->SaveDsp ) _Printf ( ( byte* ) "\n%s popped %d value off the stack.", insert, ( debugger->SaveDsp - dsp ) ) ;
                 DefaultColors ;
             }
-            if ( ( ! ( achange [0] ) ) && ( ( change > 1 ) || ( change < - 1 ) || ( _Q_->Verbosity > 1 ) ) )
-            {
-                _Debugger_PrintDataStack ( change + 1 ) ;
-            }
+            if ( ( ! ( achange [0] ) ) && ( ( change > 1 ) || ( change < - 1 ) || ( _Q_->Verbosity > 1 ) ) ) _Debugger_PrintDataStack ( change + 1 ) ;
         }
         DebugColors ;
         debugger->LastEffectsWord = word ;
@@ -715,4 +607,111 @@ Debugger_PostShow ( Debugger * debugger )
 {
     _Debugger_PostShow ( debugger, debugger->w_Word, 0 ) ;
 }
+
+#if 0
+void
+Debugger_ParseFunctionLocalVariables ( Debugger * debugger, Compiler * compiler, Lexer * lexer, Boolean c_syntaxFlag )
+{
+    int64 levelBit = 0 ;
+    Boolean lasvf = false ;
+    byte * token, *prevToken = 0, *aToken ;
+    Word * currentWord ;
+    debugger->LevelBitNamespaceMap = 0 ;
+    compiler->LocalsCompilingNamespacesStack = Stack_New ( 32, COMPILER_TEMP ) ;
+    compiler->LocalsNamespace = 0 ;
+    while ( ( token = _Lexer_ReadToken ( lexer, ( byte* ) " ,\n\r\t" ) ) )
+    {
+        if ( String_Equal ( token, "<end>" ) ) return ;
+        currentWord = Finder_Word_FindUsing ( _Finder_, token, 0 ) ;
+        if ( compiler->LocalsNamespace && String_Equal ( token, "{" ) ) levelBit ++ ;
+        else if ( String_Equal ( token, "}" ) )
+        {
+            if ( -- levelBit <= 0 )
+            {
+                debugger->LevelBitNamespaceMap = 0 ;
+                levelBit = 0 ;
+            }
+        }
+        else if ( ( String_Equal ( token, "(" ) ) && ( lasvf == false ) )
+        {
+            if ( Syntax_AreWeParsingACFunctionCall ( lexer ) ) continue ;
+            if ( ! ( debugger->LevelBitNamespaceMap & ( ( uint64 ) 1 << ( levelBit ) ) ) )
+            {
+                compiler->LocalsNamespace = _CfrTil_Parse_LocalsAndStackVariables ( 1, 0, 0, compiler->LocalsCompilingNamespacesStack, 0, true ) ;
+                debugger->LevelBitNamespaceMap |= ( ( uint64 ) 1 << ( levelBit ) ) ;
+                //levelBit ++ ;
+                //_Namespace_PrintWords ( compiler->LocalsNamespace ) ;
+            }
+            if ( c_syntaxFlag ) lasvf = true ;
+        }
+        else if ( String_Equal ( token, "var" ) || ( currentWord && ( currentWord->CAttribute & CLASS ) ) )
+        {
+            if ( ! ( debugger->LevelBitNamespaceMap & ( ( uint64 ) 1 << ( levelBit ) ) ) )
+            {
+                int64 d = Stack_Depth ( compiler->LocalsCompilingNamespacesStack ) ;
+                compiler->LocalsNamespace = Namespace_FindOrNew_Local ( compiler->LocalsCompilingNamespacesStack, 0 ) ;
+                debugger->LevelBitNamespaceMap |= ( ( uint64 ) 1 << ( levelBit ) ) ;
+            }
+            if ( String_Equal ( token, "var" ) ) aToken = prevToken ;
+            else
+            {
+                while ( 1 )
+                {
+                    aToken = Lexer_ReadToken ( lexer ) ;
+                    if ( String_Equal ( aToken, ";" ) || String_Equal ( aToken, "{" ) ) break ; 
+                    else if ( String_Equal ( aToken, "<end>" )  || String_Equal ( aToken, "d:" ) ) return ;
+#if 0                    
+                    //Lexer_ParseObject ( lexer, token ) ;
+                    //= Finder_Word_FindUsing ( _Finder_, aToken, 0 ) ;
+                    Word * word = _Finder_FindWord_InOneNamespace ( _Finder_, compiler->LocalsNamespace, aToken ) )
+                    if ( ( ! String_Equal ( aToken, "=" ) ) && ( ! String_Equal ( aToken, "<end>" ) ) ) //&& ( lexer->TokenType & T_RAW_STRING ) )
+                    {
+                            _Compiler_LocalWord ( compiler, aToken, LOCAL_VARIABLE, 0, 0, COMPILER_TEMP ) ;
+                    }
+#endif                    
+                }
+                //_Namespace_PrintWords ( compiler->LocalsNamespace ) ;
+            }
+        }
+        prevToken = token ;
+    }
+}
+
+void
+_Debugger_ReadLocals ( Debugger * debugger, Compiler * compiler, Lexer * lexer, Word * scWord, byte * sc )
+{
+    ReadLiner * rl = lexer->ReadLiner0 ;
+    byte * b = Buffer_New_pbyte ( BUFFER_SIZE ) ;
+    strncpy ( ( char* ) b, ( char* ) sc, BUFFER_SIZE ) ;
+    sc = String_DelimitSourceCodeStartForLispCfrTil ( ( char* ) b ) ;
+    strncpy ( ( char* ) rl->InputLineString, ( char* ) sc, BUFFER_SIZE - 16 ) ;
+    strncat ( ( char* ) rl->InputLineString, " <end> ", 8 ) ; //signal end of input
+    Debugger_ParseFunctionLocalVariables ( debugger, compiler, lexer, ( ( scWord->WAttribute & WT_C_SYNTAX )
+        || ( GetState ( _Context_, C_SYNTAX ) ) || ( GetState ( scWord, W_C_SYNTAX ) ) ) ) ;
+}
+void
+_Debugger_Locals_Show ( Debugger * debugger, Word * scWord )
+{
+    if ( scWord )
+    {
+        //_Compile_Save_C_CpuState ( _CfrTil_, 0 ) ;
+        //Compiler * compiler = _Compiler_, *compilerCopy ;
+        //compilerCopy = Compiler_Copy ( compiler, COMPILER_TEMP ) ;
+        //Lexer * svLexer = _Lexer_ ;
+        //Lexer * lexer = Lexer_New ( COMPILER_TEMP ) ;
+        //_Lexer_ = lexer ;
+        //byte *sc = scWord->W_SourceCode ? scWord->W_SourceCode : String_New ( _CfrTil_->SC_Buffer, TEMPORARY ) ;
+        
+        //_Debugger_ReadLocals ( debugger, compilerCopy, lexer, scWord, sc ) ;
+        //if ( compilerCopy->LocalsCompilingNamespacesStack && sc ) 
+        _Debugger_Locals_Show_Loop ( debugger, _Compiler_, scWord ) ;
+        //else _Printf ( ( byte* ) "\nTry stepping a couple of instructions and try again." ) ;
+
+        //_Lexer_ = svLexer ;
+        //_Compile_Restore_C_CpuState ( _CfrTil_, 0 ) ;
+        //_Namespace_PrintWords ( compiler->LocalsNamespace ) ;
+    }
+}
+
+#endif
 

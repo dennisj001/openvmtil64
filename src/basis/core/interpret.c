@@ -37,7 +37,7 @@ Interpreter_DoInfixWord ( Interpreter * interp, Word * word )
     byte * token = 0 ;
     Compiler * compiler = _Compiler_ ;
     SetState ( compiler, ( DOING_AN_INFIX_WORD | DOING_BEFORE_AN_INFIX_WORD ), true ) ;
-    if ( GetState ( _Context_, C_SYNTAX ) && ( word->CAttribute & ( CATEGORY_OP_EQUAL | CATEGORY_OP_OPEQUAL ) ) )
+    if ( GetState ( _Context_, C_SYNTAX ) && ( word->CAttribute & ( CATEGORY_OP_EQUAL | CATEGORY_OP_OPEQUAL ) ) ) //&& ( ! GetState ( compiler, DOING_C_TYPE ) ) )
     {
         if ( ( word->CAttribute2 & C_INFIX_OP_EQUAL ) ) SetState ( compiler, C_INFIX_EQUAL, true ) ;
         token = Interpret_C_Until_Token4 ( interp, ( byte* ) ";", ( byte* ) ",", ( byte* ) ")", ( byte* ) "]", ( byte* ) " \n\r\t" ) ;
@@ -106,12 +106,14 @@ Interpreter_DoWord ( Interpreter * interp, Word * word, int64 tsrli, int64 scwi 
 Word *
 _Interpreter_TokenToWord ( Interpreter * interp, byte * token, int64 tsrli, int64 scwi )
 {
+    Word * word ;
     _Context_->CurrentTokenWord = 0 ;
     if ( token )
     {
         interp->Token = token ;
-        Word * word = Finder_Word_FindUsing ( interp->Finder0, token, 0 ) ;
-        if ( ! word ) word = Lexer_ObjectToken_New ( interp->Lexer0, token ) ;
+        word = Finder_Word_FindUsing ( interp->Finder0, token, 0 ) ;
+        if ( word && interp->Compiler0->AutoVarTypeNamespace && ( word->CAttribute & NAMESPACE_VARIABLE ) ) word = 0 ;
+        if ( ! word ) word = Lexer_ObjectToken_New (interp->Lexer0, token, tsrli, scwi ) ;
         Word_SetTsrliScwi ( word, tsrli, scwi ) ;
         _Context_->CurrentTokenWord = word ;
         DEBUG_SETUP ( word ) ;

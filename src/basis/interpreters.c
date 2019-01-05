@@ -12,18 +12,18 @@ Interpret_C_Until_Token4 ( Interpreter * interp, byte * end1, byte * end2, byte*
 {
     byte * token ;
     int64 inChar ;
-    Word * word ;
+    Lexer * lexer = _Lexer_ ;
     do
     {
-        token = _Lexer_ReadToken ( _Lexer_, delimiters ) ;
+        token = _Lexer_ReadToken ( lexer, delimiters ) ;
         List_CheckInterpretLists_OnVariable ( _Compiler_->PostfixLists, token ) ;
-        if ( String_Equal ( token, end1 ) || String_Equal ( token, end2 )
+        if ( String_Equal ( token, "#" ) ) break ; 
+        else if ( String_Equal ( token, end1 ) || String_Equal ( token, end2 )
             || ( end3 ? String_Equal ( token, end3 ) : 0 ) || ( end4 ? String_Equal ( token, end4 ) : 0 ) ) break ;
         else if ( GetState ( _Compiler_, DOING_A_PREFIX_WORD ) && String_Equal ( token, ")" ) )
         {
-            Interpreter_InterpretAToken ( interp, token, - 1, - 1 ) ;
-            if ( ! Compiling )
-                _Compiler_FreeAllLocalsNamespaces ( _Compiler_ ) ;
+            Interpreter_InterpretAToken ( interp, token, lexer->TokenStart_ReadLineIndex, lexer->SC_Index ) ;
+            if ( ! Compiling ) _Compiler_FreeAllLocalsNamespaces ( _Compiler_ ) ;
             break ;
         }
         else if ( GetState ( _Context_, C_SYNTAX ) && ( String_Equal ( token, "," ) || String_Equal ( token, ";" ) ) )
@@ -31,15 +31,7 @@ Interpret_C_Until_Token4 ( Interpreter * interp, byte * end1, byte * end2, byte*
             CfrTil_ArrayModeOff ( ) ;
             break ;
         }
-#if 0        
-        else
-        {
-            word = Finder_Word_FindUsing ( interp->Finder0, token, 0 ) ;
-            if ( word && ( word->CAttribute & DEBUG_WORD ) ) break ;
-            else Interpreter_InterpretAToken ( interp, token, - 1, - 1 ) ;
-        }
-#endif        
-        else Interpreter_InterpretAToken ( interp, token, - 1, - 1 ) ;
+        else Interpreter_InterpretAToken ( interp, token, lexer->TokenStart_ReadLineIndex, lexer->SC_Index ) ;
         inChar = ReadLine_PeekNextChar ( _Context_->ReadLiner0 ) ;
         if ( ( inChar == 0 ) || ( inChar == - 1 ) || ( inChar == eof ) ) token = 0 ;
     }
@@ -53,9 +45,10 @@ Interpret_Until_Token ( Interpreter * interp, byte * end, byte * delimiters )
 {
     byte * token ;
     int64 inChar ;
+    Lexer * lexer = _Lexer_ ;
     do
     {
-        token = _Lexer_ReadToken ( _Lexer_, delimiters ) ;
+        token = _Lexer_ReadToken ( lexer, delimiters ) ;
         if ( String_Equal ( token, end ) )
         {
             if ( GetState ( _Compiler_, C_COMBINATOR_LPAREN ) && ( String_Equal ( token, ";" ) ) ) CfrTil_PushToken_OnTokenList ( token ) ;
@@ -67,7 +60,7 @@ Interpret_Until_Token ( Interpreter * interp, byte * end, byte * delimiters )
             CfrTil_ArrayModeOff ( ) ;
             break ;
         }
-        else Interpreter_InterpretAToken ( interp, token, - 1, - 1 ) ;
+        else Interpreter_InterpretAToken ( interp, token, lexer->TokenStart_ReadLineIndex, lexer->SC_Index ) ;
         inChar = ReadLine_PeekNextChar ( _Context_->ReadLiner0 ) ;
         if ( ( inChar == 0 ) || ( inChar == - 1 ) || ( inChar == eof ) ) token = 0 ;
     }

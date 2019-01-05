@@ -254,7 +254,7 @@ _Context_DoubleQuoteMacro ( Context * cntx )
     {
         _CfrTil_StringMacros_Do ( lexer->TokenBuffer ) ;
     }
-    Word * word = Lexer_ObjectToken_New ( lexer, String_New ( lexer->TokenBuffer, STRING_MEM ) ) ; 
+    Word * word = Lexer_ObjectToken_New (lexer, String_New ( lexer->TokenBuffer, STRING_MEM ) , -1, -1) ; 
 #if 0    
     if ( ! GetState ( cntx->Compiler0, LC_ARG_PARSING ) )  
     {

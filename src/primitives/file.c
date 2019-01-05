@@ -21,14 +21,9 @@ int64
 _File_Exists ( byte * fname )
 {
     struct stat sbuf ;
-    if ( ! stat ( ( char* ) fname, &sbuf ) ) 
-    {
-        return true ; // nb. this logic is the reverse of the system call
-    }
-    else { return false ; }
+    if ( ! stat ( ( char* ) fname, &sbuf ) )  return true ; // nb. this logic is the reverse of the system call
+    else return false ;
 }
-
-#if 1
 
 byte *
 _File_ReadToString_ ( FILE * file )
@@ -58,8 +53,6 @@ File_ReadToString ( )
     str = _File_ReadToString ( filename ) ;
     DataStack_Push ( ( int64 ) str ) ;
 }
-
-#endif
 
 void
 File_Open ( )
