@@ -277,3 +277,19 @@ _CfrTil_RemoveNamespaceFromUsingListAndClear ( byte * name )
     _Namespace_RemoveFromUsingListAndClear ( Namespace_Find ( name ) ) ;
 }
 
+void
+Namespace_FreeNamespacesStack ( Stack * stack )
+{
+    if ( stack )
+    {
+        int64 n ;
+        for ( n = Stack_Depth ( stack ) ; n ; n -- )
+        {
+            Namespace * ns = ( Namespace* ) Stack_Pop ( stack ) ;
+            if ( ns ) _Namespace_RemoveFromUsingListAndClear ( ns ) ;
+        }
+        Stack_Init ( stack ) ;
+    }
+}
+
+

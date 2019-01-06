@@ -28,7 +28,7 @@ _Debugger_InterpreterLoop ( Debugger * debugger )
             {
                 Debugger_Off ( debugger, 1 ) ;
                 if ( _Context_->CurrentEvalWord ) SetState ( _Context_->CurrentEvalWord, STEPPED, true ) ;
-                //if ( _Context_->CurrentTokenWord ) SetState ( _Context_->CurrentTokenWord, STEPPED, true ) ;
+                if ( _Context_->CurrentTokenWord ) SetState ( _Context_->CurrentTokenWord, STEPPED, true ) ;
                 _Context_->CurrentTokenWord = 0 ; // prevent interpreting this word
                 siglongjmp ( _Context_->JmpBuf0, 1 ) ; //in Word_Run
             }

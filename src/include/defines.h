@@ -533,6 +533,7 @@
 #define IN_OPTIMIZER ( (uint64) 1 << 28 )
 #define SCA_ON ( (uint64) 1 << 29 )
 #define TYPECHECK_ON ( (uint64) 1 << 30 )
+#define RT_DEBUG_ON ( (uint64) 1 << 31 ) // Runtime Debug
 
 // interpreter flags
 #define INTERPRETER_DONE ( (uint64) 1 << 28 )

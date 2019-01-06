@@ -131,11 +131,7 @@ void
 CfrTil_TurnOffBlockCompiler ( )
 {
     Compiler * compiler = _Context_->Compiler0 ;
-    if ( ! GetState ( compiler, LISP_MODE ) )
-    {
-        CfrTil_LeftBracket ( ) ;
-    }
-    _Compiler_FreeAllLocalsNamespaces ( compiler ) ;
+    if ( ! GetState ( compiler, LISP_MODE ) ) CfrTil_LeftBracket ( ) ;
     _CfrTil_RemoveNamespaceFromUsingListAndClear ( ( byte* ) "__labels__" ) ;
     SetState ( compiler, VARIABLE_FRAME, false ) ;
 }
@@ -144,7 +140,6 @@ void
 CfrTil_TurnOnBlockCompiler ( )
 {
     CfrTil_RightBracket ( ) ;
-    //CfrTil_RecycleWordList ( 0 ) ;
 }
 
 // blocks are a notation for subroutines or blocks of code compiled in order,

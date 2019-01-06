@@ -14,7 +14,7 @@
 //#define SourceCode_AppendPoint &_CfrTil_->SC_ScratchPad [ Strlen ( ( CString ) _CfrTil_->SC_ScratchPad ) ]
 
 Word *
-Lexer_ObjectToken_New (Lexer * lexer, byte * token , int64 tsrli, int64 scwi) //, int64 parseFlag )
+Lexer_ObjectToken_New ( Lexer * lexer, byte * token, int64 tsrli, int64 scwi ) //, int64 parseFlag )
 {
     Word * word = 0 ;
     byte * token2 ;
@@ -44,40 +44,46 @@ Lexer_ObjectToken_New (Lexer * lexer, byte * token , int64 tsrli, int64 scwi) //
             }
         }
         else word = DataObject_New ( LITERAL, 0, token, lexer->TokenType, 0, 0, 0, lexer->Literal, 0, tsrli, scwi ) ;
-        if ( _Compiler_->AutoVarTypeNamespace ) word->TypeNamespace = _Compiler_->AutoVarTypeNamespace ;
-        else
-        {
-            switch ( lexer->TokenType )
-            {
-                case (T_INT | KNOWN_OBJECT ):
-                {
-                    word->TypeNamespace = _CfrTil_->IntegerNamespace ;
-                    break ;
-                }
-                case ( T_BIG_NUM | KNOWN_OBJECT ):
-                {
-                    word->TypeNamespace = _CfrTil_->BigNumNamespace ;
-                    break ;
-                }
-                case ( T_STRING | KNOWN_OBJECT ):
-                {
-                    word->TypeNamespace = _CfrTil_->StringNamespace ;
-                    break ;
-                }
-                case ( T_RAW_STRING | KNOWN_OBJECT ):
-                {
-                    word->TypeNamespace = _CfrTil_->RawStringNamespace ;
-                    break ;
-                }
-                default : break ;
-            }
-        }
+        Lexer_Word_SetTypeNamespace ( lexer, word ) ; 
         // this ... is done in Word_Create 
         //Lexer_Set_ScIndex_RlIndex ( lexer, word, lexer->TokenStart_ReadLineIndex, lexer->SC_Index ) ;
         lexer->TokenWord = word ;
         DEBUG_SHOW ;
     }
     return word ;
+}
+
+void
+Lexer_Word_SetTypeNamespace ( Lexer * lexer, Word * word )
+{
+    if ( _Compiler_->AutoVarTypeNamespace ) word->TypeNamespace = _Compiler_->AutoVarTypeNamespace ;
+    else
+    {
+        switch ( lexer->TokenType )
+        {
+            case (T_INT | KNOWN_OBJECT ):
+            {
+                word->TypeNamespace = _CfrTil_->IntegerNamespace ;
+                break ;
+            }
+            case ( T_BIG_NUM | KNOWN_OBJECT ):
+            {
+                word->TypeNamespace = _CfrTil_->BigNumNamespace ;
+                break ;
+            }
+            case ( T_STRING | KNOWN_OBJECT ):
+            {
+                word->TypeNamespace = _CfrTil_->StringNamespace ;
+                break ;
+            }
+            case ( T_RAW_STRING | KNOWN_OBJECT ):
+            {
+                word->TypeNamespace = _CfrTil_->RawStringNamespace ;
+                break ;
+            }
+            default: break ;
+        }
+    }
 }
 
 void

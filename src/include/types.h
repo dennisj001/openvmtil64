@@ -797,7 +797,7 @@ typedef struct _Debugger
     block RestoreCpuState ;
     block getRsp ;
     byte * PreHere, *StartHere, *LastDisStart, *ShowLine, * Filename ;
-    Stack *ReturnStack ;
+    Stack *ReturnStack, *LocalsCompilingNamespacesStack ;
     Cpu * cs_Cpu ;
     byte* DebugAddress, *CopyRSP, *CopyRBP, *LastSourceCodeAddress ;
     uint64 * DebugRSP, *DebugRBP, *DebugRSI, *DebugRDI, * LastRsp ; //, *SavedIncomingESP, *SavedIncomingEBP ; //, SavedRunningESP, SavedRunningEBP;

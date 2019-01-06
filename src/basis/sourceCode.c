@@ -177,7 +177,7 @@ void
 CfrTil_AdjustDbgSourceCode_ScInUseFalse ( byte * address )
 {
     dllist * list = _CfrTil_->Compiler_N_M_Node_WordList ;
-    if ( list ) dllist_Map1 ( list, ( MapFunction1 ) SC_List_Set_NotInUseForSC, (int64) address ) ;
+    if ( list ) dllist_Map1 ( list, ( MapFunction1 ) SC_List_Set_NotInUseForSC, ( int64 ) address ) ;
 }
 
 void

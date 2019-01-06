@@ -141,7 +141,7 @@ _Compile_DebugRuntimeBreakpoint ( ) // where we want the acquired pointer
 {
     Compile_CpuState_Save ( _Debugger_->cs_Cpu ) ;
     //Compile_Call_TestRSP ( ( byte* ) CfrTil_PrintReturnStack ) ;
-    Compile_Call_TestRSP ( ( byte* ) CfrTil_DebugRuntimeBreakpoint ) ;
+    Compile_Call_TestRSP ( ( byte* ) RT_DebugRuntimeBreakpoint ) ;
 }
 
 void
@@ -149,6 +149,19 @@ _Compile_DebugRuntimeBreakpoint_dso ( ) // where we want the acquired pointer
 {
     Compile_CpuState_Save ( _Debugger_->cs_Cpu ) ;
     Compile_Call_TestRSP ( ( byte* ) CfrTil_DebugRuntimeBreakpoint_dso ) ;
+}
+
+void
+RT_DebugRuntimeBreakpoint ( )
+{
+    _CfrTil_DebugRuntimeBreakpoint ( ) ;
+}
+
+void
+CfrTil_DebugRuntimeBreakpoint ( ) // where we want the acquired pointer
+{
+    SetState ( _CfrTil_, RT_DEBUG_ON, true ) ;
+    _Word_Compile ( Finder_Word_FindUsing ( _Finder_, (byte*) "<rt-dbg>", 0 ) ) ;
 }
 
 #if 0

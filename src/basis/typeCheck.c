@@ -97,7 +97,6 @@ TSI_TypeCheck_TypeVariableSigCode ( TSI * tsi, Word * stackWord0, Word * stackWo
         }
     }
     return tsi->TypeErrorStatus = false ;
-    ;
 }
 
 Boolean

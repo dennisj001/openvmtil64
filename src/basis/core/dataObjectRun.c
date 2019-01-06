@@ -104,14 +104,14 @@ _Compile_C_TypeDeclaration ( )
     while ( token = Interpret_C_Until_Token4 ( cntx->Interpreter0,
         ( byte* ) ",", ( byte* ) ";", ( byte* ) "{", ( GetState ( cntx, C_SYNTAX ) ? ( byte* ) "}" : ( byte* ) "=" ), 0 ) )
     {
-#if 0  // rather than this we stay in this interpreter until the end of the C function      
+#if 0  // this idea seems more reasonable but it takes some adjustments so for now we stay in this interpreter until the end of the C function      
         if ( String_Equal ( token, ";" ) )
         {
             Lexer_ReadToken ( _Lexer_ ) ;
             if ( GetState ( cntx, C_SYNTAX ) ) Compiler_Get_C_BackgroundNamespace ( compiler ) ;
             compiler->LHS_Word = 0 ;
             break ;
-        } //|| ( ( ! GetState ( cntx, C_SYNTAX ) ) && String_Equal ( token, "=" ) ) )
+        } 
 #endif        
         if ( String_Equal ( token, "," ) || String_Equal ( token, ";" ) || ( ( ! GetState ( cntx, C_SYNTAX ) ) && String_Equal ( token, "=" ) ) )
             Lexer_ReadToken ( _Lexer_ ) ;

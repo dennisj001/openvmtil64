@@ -267,7 +267,6 @@
           <in>system.c</in>
           <in>tabCompletion.c</in>
           <in>typeCheck.c</in>
-          <in>types.c</in>
           <in>x.c</in>
         </df>
         <df name="include">

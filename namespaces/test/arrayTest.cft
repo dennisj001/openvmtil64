@@ -218,7 +218,7 @@ a7(0,2,1,a6) // as a prefix function : lexer test, note dense lexeme packing is 
 ;;
 //'adump find wdiss
 //verbosity 3 =
-#if 1
+#if 0
 : a9 ( Ar9 a | x y z )
     x 0 = y 0 = z 0 =
 #else

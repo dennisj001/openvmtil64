@@ -132,9 +132,9 @@ Compiler_PreviousNonDebugWord ( int64 startIndex )
 }
 
 void
-_Compiler_FreeAllLocalsNamespaces ( Compiler * compiler )
+Compiler_FreeAllLocalsNamespaces ( Compiler * compiler )
 {
-    _Namespace_FreeNamespacesStack ( compiler->LocalsCompilingNamespacesStack ) ;
+    Namespace_FreeNamespacesStack ( compiler->LocalsCompilingNamespacesStack ) ;
 }
 
 #if 0
@@ -335,13 +335,13 @@ Compiler_Init ( Compiler * compiler, uint64 state, int64 flags )
     Stack_Init ( compiler->PointerToOffset ) ;
     Stack_Init ( compiler->CombinatorInfoStack ) ;
     Stack_Init ( compiler->InfixOperatorStack ) ;
-    Stack_Init ( compiler->LocalsCompilingNamespacesStack ) ;
     _dllist_Init ( compiler->GotoList ) ;
     _dllist_Init ( compiler->CurrentSwitchList ) ;
     _dllist_Init ( compiler->RegisterParameterList ) ;
     _dllist_Init ( compiler->OptimizeInfoList ) ;
     if ( flags ) CfrTil_TypeStackReset ( ) ;
-    _Compiler_FreeAllLocalsNamespaces ( compiler ) ;
+    if ( ! GetState ( _CfrTil_, RT_DEBUG_ON ) ) Compiler_FreeAllLocalsNamespaces ( compiler ) ;
+    SetState ( _CfrTil_, RT_DEBUG_ON, false ) ;
     Compiler_CompileOptimizeInfo_PushNew ( compiler ) ;
     _CfrTil_RecycleInit_Compiler_N_M_Node_WordList ( 0 ) ;
     SetBuffersUnused ( 1 ) ;
