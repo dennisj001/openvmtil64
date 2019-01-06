@@ -95,5 +95,5 @@ _CfrTil_DebugRuntimeBreakpoint ( )
 void
 CfrTil_DebugRuntimeBreakpoint_dso ( )
 {
-    if ( Is_DebugShowOn ) _CfrTil_DebugRuntimeBreakpoint ( ) ;
+    if ( Is_DebugShowOn ) CfrTil_DebugRuntimeBreakpoint ( ) ;
 }

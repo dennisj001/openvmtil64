@@ -218,7 +218,7 @@ a7(0,2,1,a6) // as a prefix function : lexer test, note dense lexeme packing is 
 ;;
 //'adump find wdiss
 //verbosity 3 =
-#if 0
+#if 1
 : a9 ( Ar9 a | x y z )
     x 0 = y 0 = z 0 =
 #else
@@ -247,7 +247,7 @@ a7(0,2,1,a6) // as a prefix function : lexer test, note dense lexeme packing is 
     adump ( 0 246 67 a  ) 
 ;
 ' a9 find wdiss //pause
-"arr9" Ar9 new arr9 a9
+"arr9" Ar9 new arr9 a9 //pause
 adump ( 0 123 234 arr9 ) 
 s //pause
 "ct" class :{ byte ar [3][3][3] ; };

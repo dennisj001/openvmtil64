@@ -66,9 +66,9 @@ cfrtil64s : src/include/prototypes.h $(OBJECTS)
 	strip cfrtil64s
 	mv cfrtil64s bin/
 	
-static : CFLAGS = $(CFLAGS_CORE)
+static : CFLAGS = $(CFLAGS_CORE) -O3
 static : src/include/prototypes.h $(OBJECTS)
-	$(CC) -static $(CFLAGS) $(OBJECTS) -o cfrtil64s $(LIBS)
+	$(CC) -static $(CFLAGS) $(OBJECTS) -O3 -o cfrtil64s $(LIBS)
 	strip cfrtil64s
 	mv cfrtil64s bin/
 

@@ -141,7 +141,7 @@ _Compile_DebugRuntimeBreakpoint ( ) // where we want the acquired pointer
 {
     Compile_CpuState_Save ( _Debugger_->cs_Cpu ) ;
     //Compile_Call_TestRSP ( ( byte* ) CfrTil_PrintReturnStack ) ;
-    Compile_Call_TestRSP ( ( byte* ) RT_DebugRuntimeBreakpoint ) ;
+    Compile_Call_TestRSP ( ( byte* ) _CfrTil_DebugRuntimeBreakpoint ) ;
 }
 
 void
@@ -152,79 +152,11 @@ _Compile_DebugRuntimeBreakpoint_dso ( ) // where we want the acquired pointer
 }
 
 void
-RT_DebugRuntimeBreakpoint ( )
-{
-    _CfrTil_DebugRuntimeBreakpoint ( ) ;
-}
-
-void
 CfrTil_DebugRuntimeBreakpoint ( ) // where we want the acquired pointer
 {
     SetState ( _CfrTil_, RT_DEBUG_ON, true ) ;
-    _Word_Compile ( Finder_Word_FindUsing ( _Finder_, (byte*) "<rt-dbg>", 0 ) ) ;
+    Compile_Call ( (byte*) _Debugger_->SaveCpuState ) ;
+    //Compile_Call_TestRSP ( ( byte* ) CfrTil_PrintReturnStack ) ;
+    Compile_Call_TestRSP ( ( byte* ) _CfrTil_DebugRuntimeBreakpoint ) ;
 }
 
-#if 0
-
-void
-_Compile_WordCompiledAt_Location ( ) // where we want the acquired pointer
-{
-    Compile_CpuState_Save ( _Debugger_->cs_Cpu ) ;
-    Compile_Call_TestRSP ( ( byte* ) CfrTil_Location ) ;
-}
-
-uint64
-GetRsp ( )
-{
-    _CfrTil_->SaveSelectedCpuState ( ) ;
-    return ( uint64 ) _CfrTil_->cs_Cpu->Rsp ;
-}
-
-uint64
-_GetTestRsp ( )
-{
-    uint64 rsp = GetRsp ( ) ;
-    return rsp ;
-    //if ( rsp & ( uint64 ) 0x8 ) return rsp ;
-    //else return 0 ;
-}
-
-void
-_GetTestRsp_ ( byte * src )
-{
-    uint64 rsp = _GetTestRsp ( ) ;
-    if ( rsp & 0x8 )
-        _Printf ( ( byte* ) "\n%s : %s : rsp = %llx", src, Context_Location ( ), rsp ) ;
-}
-
-void
-GetTestRsp_Word ( )
-{
-    _GetTestRsp_ ( ( byte* ) "Word" ) ;
-}
-
-void
-GetTestRsp_Block ( )
-{
-    _GetTestRsp_ ( ( byte* ) "Block" ) ;
-}
-
-void
-Compile_PopDspToR8AndCall ( )
-{
-    // from x64.cft
-    //Compile_Stack_Pop_R8D ( ) ;
-    //_Compile_CALL_Reg ( R8D ) ;
-    _Compile_Stack_PopToReg ( DSP, R8 ) ;
-    _Compile_Call_ThruReg ( R8 ) ;
-}
-
-void
-_Compile_Pause ( )
-{
-    _Compile_Debug_getRsp ( ( int64* ) & _Debugger_->DebugESP ) ;
-    Compile_Call ( ( byte* ) _Debugger_->SaveCpuState ) ;
-    Compile_Call ( ( byte* ) _CfrTil_->SaveCpuState ) ;
-    Compile_Call ( ( byte* ) OpenVmTil_Pause ) ;
-}
-#endif

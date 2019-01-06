@@ -163,7 +163,7 @@ Debugger_GetDbgAddressFromRsp ( Debugger * debugger )
         if ( _Q_->Verbosity > 1 ) Stack_Print ( debugger->ReturnStack, ( byte* ) "debugger->ReturnStack ", 0 ) ;
         debugger->DebugAddress = ( byte* ) Stack_Top ( debugger->ReturnStack ) ;
     }
-    else debugger->DebugAddress = ( byte* ) debugger->cs_Cpu->Rsp[1] ;
+    else debugger->DebugAddress = ( byte* ) debugger->cs_Cpu->Rsp[0] ;
     debugger->w_Word = Word_UnAlias ( Word_GetFromCodeAddress ( debugger->DebugAddress ) ) ; // 21 : code size back to <dbg>
     return debugger->DebugAddress ;
 }
