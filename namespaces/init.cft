@@ -254,11 +254,13 @@ dscOn //verbosity 3 =
 #endif
 'dbgTest 0 const
 #if dbgTest
+verbosity 3 =
 : debugTest3 1 2 + p <dbg> stack ;
-//' debugTest3 find wdiss
+' debugTest3 find wdiss
 : debugTest2 1 2 + p debugTest3 ;
 : debugTest1 1 2 + p debugTest2 ;
 : debugTest 1 2 + p debugTest1 ;
+: _assert1 ( n m str ) { n @ m @ != } { str @ ? ps : drop "error" ps _info stack _pause } { debugTest } ifElse ; 
 #else
 : _assert1 ( n m str ) { n @ m @ != } { str @ ? ps : drop "error" ps _info stack _pause } if ; 
 //: _assert1 ( n m str ) { n @ m @ != } { str @ ps "error" ps _info _pause } if ;

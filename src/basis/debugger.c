@@ -131,18 +131,14 @@ Debugger_GetDbgAddressFromRsp ( Debugger * debugger )
     dllist * retStackList = List_New ( COMPILER_TEMP ) ;
     //if ( Is_DebugOn ) _Q_->Verbosity = 2 ;
     if ( _Q_->Verbosity > 1 ) CfrTil_PrintReturnStack ( ) ;
-    for ( i = 1 ; i < 255 ; i ++ ) // Rsp[1] is current // 255 sizeof ReturnStack
+    for ( i = 0 ; i < 255 ; i ++ ) // Rsp[1] is current // 255 sizeof ReturnStack
     {
         addr = ( ( byte* ) debugger->cs_Cpu->Rsp[i] ) ;
         word = Word_UnAlias ( Word_GetFromCodeAddress ( addr ) ) ;
         if ( word )
         {
             _List_PushNew_1Value ( retStackList, COMPILER_TEMP, 0, debugger->cs_Cpu->Rsp[i] ) ;
-            if ( word == currentlyRunning )
-            {
-                //_List_PushNew_1Value ( retStackList, COMPILER_TEMP, 0, 0 ) ; // end marker
-                break ;
-            }
+            if ( word == currentlyRunning ) break ;
         }
     }
     d = List_Depth ( retStackList ) ;
