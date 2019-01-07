@@ -237,6 +237,7 @@ Stack_Delete ( Stack * stack )
 void
 Stack_Init ( Stack * stack )
 {
+    //if ( stack == (Stack *) 0x7ffff71a99a0 ) _Printf ((byte*)"" ) ;
     _Stack_Init ( stack, stack->StackSize ) ;
 }
 
@@ -363,10 +364,7 @@ _PrintNStackWindow ( uint64 * reg, byte * name, byte * regName, int64 size )
     {
         _Printf ( ( byte* ) "\n%s   :%3i  : %s = " UINT_FRMT " : Top = " UINT_FRMT "", name, size, regName, ( uint64 ) reg, ( uint64 ) reg ) ;
         // print return stack in reverse of usual order first
-        while ( size -- > 1 )
-        {
-            Stack_Print_AValue ( reg, size, name, buffer, 0 ) ;
-        }
+        while ( size -- > 1 ) Stack_Print_AValue ( reg, size, name, buffer, 0 ) ;
         _Stack_PrintValues ( ( byte* ) name, reg, saveSize, 0 ) ;
     }
 }

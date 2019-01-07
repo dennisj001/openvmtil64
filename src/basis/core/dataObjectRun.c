@@ -9,7 +9,7 @@ _DataObject_Run ( Word * word0 )
     Word * ns = word0 ;
     cntx->Interpreter0->w_Word = word ; // for ArrayBegin : all literals are run here
     if ( word->LAttribute & LOCAL_OBJECT ) Do_LocalObject ( word ) ;
-    else if ( word->CAttribute & T_LISP_SYMBOL )
+    else if ( Compiling && ( word->CAttribute & T_LISP_SYMBOL ) )
     {
         if ( ! GetState ( cntx->Compiler0, LC_CFRTIL ) ) _CfrTil_Do_LispSymbol ( word ) ;
         else _CfrTil_Do_Variable ( word ) ;
@@ -111,7 +111,7 @@ _Compile_C_TypeDeclaration ( )
             if ( GetState ( cntx, C_SYNTAX ) ) Compiler_Get_C_BackgroundNamespace ( compiler ) ;
             compiler->LHS_Word = 0 ;
             break ;
-        } 
+        }
 #endif        
         if ( String_Equal ( token, "," ) || String_Equal ( token, ";" ) || ( ( ! GetState ( cntx, C_SYNTAX ) ) && String_Equal ( token, "=" ) ) )
             Lexer_ReadToken ( _Lexer_ ) ;
@@ -366,9 +366,12 @@ void
 _CfrTil_Do_LispSymbol ( Word * word )
 {
     // rvalue - rhs for stack var
-    _Compile_Move_StackN_To_Reg ( ACC, FP, ParameterVarOffset ( _Compiler_, word ) ) ;
-    _Word_CompileAndRecord_PushReg ( word, ACC ) ;
-    CfrTil_TypeStackPush ( word ) ;
+    if ( Compiling )
+    {
+        _Compile_Move_StackN_To_Reg ( ACC, FP, ParameterVarOffset ( _Compiler_, word ) ) ;
+        _Word_CompileAndRecord_PushReg ( word, ACC ) ;
+        CfrTil_TypeStackPush ( word ) ;
+    }
 }
 
 void

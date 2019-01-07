@@ -285,6 +285,6 @@
 //#define MemCpy(dst, src, size) memcpy ((byte*)dst, (byte*)src, (int64) size)  //_MemCpy ((byte*)dst, (byte*)src, (int64) size)
 #define MemCpy(dst, src, size) _MemCpy ((byte*)dst, (byte*)src, (int64) size)
 #define ReadLiner_GetLastChar() _ReadLiner_->InputKeyedCharacter
-#define ReadLiner_SetLastChar( chr ) _ReadLiner_->InputKeyedCharacter = chr
+#define ReadLiner_SetLastChar( chr ) if (_ReadLiner_) _ReadLiner_->InputKeyedCharacter = chr
 
 

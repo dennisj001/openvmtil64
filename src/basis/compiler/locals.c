@@ -84,10 +84,14 @@ Compiler_LocalWord ( Compiler * compiler, byte * name, int64 ctype, int64 ctype2
     return word ;
 }
 
+//nb. correct only if Compiling !!
 inline Boolean
 Compiler_IsFrameNecessary ( Compiler * compiler )
 {
-    return ( compiler->NumberOfNonRegisterLocals || compiler->NumberOfNonRegisterArgs ) ;
+    //if ( Compiling ) 
+    return (( compiler->NumberOfNonRegisterLocals || compiler->NumberOfNonRegisterArgs ) ? true : false ) ;
+    //else Error ( "'Compiler_IsFrameNecessary' can be called only when Compiling!", "", ABORT ) ;
+    //return false ;
 }
 
 void

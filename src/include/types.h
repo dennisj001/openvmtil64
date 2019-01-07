@@ -23,6 +23,16 @@ typedef int64( *cFunction_2_Arg ) ( int64, int64 ) ;
 typedef VoidFunction block ; // code block
 typedef byte AsciiCharSet [ 256 ] ;
 
+typedef struct
+{
+    int64 StackSize ;
+    uint64 *StackPointer ;
+    uint64 *StackMin ;
+    uint64 *StackMax ;
+    uint64 *InitialTosPointer ;
+    uint64 StackData [] ;
+} Stack ;
+
 typedef byte * function, * object, * type, * slot ;
 typedef struct
 {
@@ -337,7 +347,6 @@ typedef union
         byte TypeSignatureCodes [8] ;
         Word * TypeNamespace ;
 } TypeSignatureInfo ;
-
 typedef struct _WordData
 {
     uint64 RunType ;
@@ -378,6 +387,7 @@ typedef struct _WordData
         byte *WD_SourceCode ; // arrays don't have source code
     } ;
     int64 WD_ArrayNumberOfDimensions ;
+    Stack * WD_NamespaceStack ; // arrays don't have runtime debug code
     union
     {
         ListObject * LambdaBody ;
@@ -440,6 +450,7 @@ typedef struct _WordData
 #define W_OpInsnGroup S_WordData->OpInsnGroup
 #define W_TypeSignatureString S_WordData->TypeSignature
 #define W_TypeObjectsNamespaces S_WordData->TypeObjectsNamespaces
+#define NamespaceStack S_WordData->WD_NamespaceStack
 typedef struct
 {
     Symbol P_Symbol ;
@@ -546,15 +557,6 @@ typedef struct
         uint64 * Registers [ 18 ] ;
     } ;
 } Cpu ;
-typedef struct
-{
-    int64 StackSize ;
-    uint64 *StackPointer ;
-    uint64 *StackMin ;
-    uint64 *StackMax ;
-    uint64 *InitialTosPointer ;
-    uint64 StackData [] ;
-} Stack ;
 typedef struct TCI
 {
     uint64 State ;
@@ -745,9 +747,7 @@ typedef struct
     int64 * FrameSizeCellOffset, BlocksBegun ;
     byte * RspSaveOffset ;
     byte * RspRestoreOffset ;
-    Word * ReturnVariableWord ;
-    Word * CurrentWord, *CurrentCreatedWord ;
-    Word * LHS_Word ;
+    Word * ReturnVariableWord, * CurrentWord, *CurrentCreatedWord, * LHS_Word ;
     Namespace *C_BackgroundNamespace, *C_FunctionBackgroundNamespace, *LocalsNamespace, *AutoVarTypeNamespace ; //, ** FunctionTypesArray ;
     dllist * GotoList ;
     dllist * CurrentSwitchList ;

@@ -29,10 +29,7 @@ Debugger_ShowDbgSourceCodeAtAddress ( Debugger * debugger, byte * address )
 
                     byte * buffer = SC_PrepareDbgSourceCodeString ( sourceCode, word ) ;
                     _Printf ( ( byte* ) "\n%s", buffer ) ;
-                    if ( fixed )
-                    {
-                        word->Name = ( byte* ) "store" ;
-                    }
+                    if ( fixed ) word->Name = ( byte* ) "store" ;
                 }
             }
         }
@@ -556,6 +553,8 @@ _CfrTil_RecycleInit_Compiler_N_M_Node_WordList ( Boolean force )
 {
     if ( force || ( ! GetState ( _CfrTil_, GLOBAL_SOURCE_CODE_MODE ) ) )
     {
+        //if ( _CfrTil_->Compiler_N_M_Node_WordList == (dllist *) 0x7ffff7fc3a60 ) _Printf ((byte*)"" ) ;
+        
         DLList_Recycle_WordList ( _CfrTil_->Compiler_N_M_Node_WordList ) ;
         List_Init ( _CfrTil_->Compiler_N_M_Node_WordList ) ;
     }

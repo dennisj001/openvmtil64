@@ -102,7 +102,7 @@ DataObject_New ( uint64 type, Word * word, byte * name, uint64 ctype, uint64 cty
             break ;
         }
     }
-    if ( word ) word->CAttribute2 |= T_OBJECT ;
+    if ( word ) word->CAttribute2 |= T_OBJECT ; //??
     return word ;
 }
 
@@ -179,8 +179,7 @@ _Class_Object_New ( byte * name, uint64 category )
 Namespace *
 _Class_New ( byte * name, uint64 type, int64 cloneFlag )
 {
-    if ( String_Equal ( name, "a")) 
-        _Printf ((byte*) "") ;
+    //if ( String_Equal ( name, "a")) _Printf ((byte*) "") ;
     Namespace * ns = _Namespace_Find ( name, 0, 0 ), * sns ;
     int64 size = 0 ;
     if ( ! ns )

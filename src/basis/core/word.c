@@ -245,6 +245,13 @@ _Word_Print ( Word * word )
 }
 
 void
+Word_N_M_Node_Print ( dlnode * node )
+{
+    Word * word = ( Word* ) dobject_Get_M_Slot ( ( dobject* ) node, SCN_T_WORD ) ;    
+    _Word_Print ( word ) ;
+}
+
+void
 _Word_ShowSourceCode ( Word * word )
 {
     if ( word && word->S_WordData ) //&& word->W_SourceCode ) //word->CAttribute & ( CPRIMITIVE | BLOCK ) )

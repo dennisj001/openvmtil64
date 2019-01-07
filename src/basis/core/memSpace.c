@@ -596,6 +596,8 @@ OVT_Recycle ( dllist * list, dlnode * anode )
 void
 Word_Recycle ( Word * w )
 {
+    //if ( w == (Word *) 0x7ffff71fe7e8 ) _Printf ((byte*)"" ) ;
+    
     OVT_Recycle ( _Q_->MemorySpace0->RecycledWordList, ( dlnode * ) w ) ;
 }
 

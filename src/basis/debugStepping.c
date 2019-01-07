@@ -4,6 +4,7 @@
 void
 _Debugger_StepOneInstruction ( Debugger * debugger )
 {
+    //Set_DebuggerDspReg_FromDspReg ( ) ;
     debugger->SaveTOS = TOS ;
     debugger->PreHere = Here ;
     debugger->SaveStackDepth = DataStack_Depth ( ) ;
@@ -151,8 +152,10 @@ Debugger_CompileAndStepOneInstruction ( Debugger * debugger )
         int64 d ;
         if ( * debugger->DebugAddress == _RET )
         {
-            Set_DataStackPointers_FromDebuggerDspReg ( ) ;
-            if ( Stack_Depth ( debugger->ReturnStack ) )// 2 : why 2 ?? but it works for now ??
+            //Set_DataStackPointers_FromDebuggerDspReg ( ) ;
+            //Debugger_Registers ( debugger ) ;
+            //Debugger_Stack ( debugger ) ;
+            if ( Stack_Depth ( debugger->ReturnStack ) )
             {
                 debugger->DebugAddress = ( byte* ) Stack_Pop ( debugger->ReturnStack ) ;
                 if ( _Q_->Verbosity > 1 ) Stack_Print ( debugger->ReturnStack, ( byte* ) "debugger->ReturnStack ", 0 ) ;
@@ -327,7 +330,7 @@ int64
 _Debugger_SetupReturnStackCopy ( Debugger * debugger, int64 size, Boolean showFlag )
 {
     if ( _Q_->Verbosity > 3 ) _CfrTil_PrintNReturnStack ( 4, 1 ) ;
-    uint64 * rsp = ( uint64* ) _CfrTil_->cs_Cpu->Rsp ; //debugger->DebugESP [- 1] ; //debugger->cs_Cpu->Rsp [1] ; //debugger->cs_Cpu->Rsp ;
+    uint64 * rsp = ( uint64* ) debugger->cs_Cpu->Rsp ; //debugger->DebugESP [- 1] ; //debugger->cs_Cpu->Rsp [1] ; //debugger->cs_Cpu->Rsp ;
     if ( rsp )
     {
         uint64 rsc, rsc0 ;

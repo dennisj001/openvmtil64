@@ -268,6 +268,7 @@ _CfrTil_EndBlock2 ( BlockInfo * bi )
         CfrTil_TurnOffBlockCompiler ( ) ;
         Compiler_Init ( compiler, 0, 0 ) ;
     }
+    //else if ( ! GetState ( _CfrTil_, RT_DEBUG_ON ) ) _Namespace_RemoveFromUsingListAndClear ( bi->BI_LocalsNamespace ) ; 
     else _Namespace_RemoveFromUsingListAndClear ( bi->BI_LocalsNamespace ) ; 
     CfrTil_TypeStackReset ( ) ;
     return first ;

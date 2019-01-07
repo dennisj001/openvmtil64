@@ -246,8 +246,8 @@ a7(0,2,1,a6) // as a prefix function : lexer test, note dense lexeme packing is 
     while
     adump ( 0 246 67 a  ) 
 ;
-' a9 find wdiss //pause
-"arr9" Ar9 new arr9 a9 //pause
+' a9 find wdiss s //pause
+"arr9" Ar9 new arr9 a9 s //pause
 adump ( 0 123 234 arr9 ) 
 s //pause
 "ct" class :{ byte ar [3][3][3] ; };

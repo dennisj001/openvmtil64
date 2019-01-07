@@ -897,3 +897,10 @@ doReturn:
     }
     return rword ;
 }
+
+void
+List_N_M_Node_PrintWords ( dllist * alist )
+{
+    dllist_Map1_FromEnd ( alist, ( MapFunction1 ) Word_N_M_Node_Print, 0 ) ;
+}
+

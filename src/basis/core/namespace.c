@@ -415,6 +415,8 @@ _Namespace_Clear ( Namespace * ns )
         }
 #endif        
         //if ( String_Equal ( ns->Name, "LispDefinesNamespace" )) _Printf ( (byte*)"\n got it\n" ), Pause () ;
+        //if ( ns->W_List == (dllist *) 0x7ffff71fe7b0 ) _Printf ((byte*)"" ) ;
+        
         DLList_Recycle_NamespaceList ( ns->W_List ) ;
         DLList_RemoveWords ( ns->W_List ) ;
         _dllist_Init ( ns->W_List ) ;

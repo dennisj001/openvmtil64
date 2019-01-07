@@ -254,10 +254,11 @@ dscOn //verbosity 3 =
 #endif
 'dbgTest 0 const
 #if dbgTest
-verbosity 3 =
-: debugTest3 1 2 + p <dbg> stack ;
+//verbosity 2 =
+: debugTest3 ( n ) n @ 1 2 + + p <dbg> stack ;
+//: debugTest3 1 2 + p <dbg> stack ;
 ' debugTest3 find wdiss
-: debugTest2 1 2 + p debugTest3 ;
+: debugTest2 1 2 + p 4 debugTest3 ;
 : debugTest1 1 2 + p debugTest2 ;
 : debugTest 1 2 + p debugTest1 ;
 : _assert1 ( n m str ) { n @ m @ != } { str @ ? ps : drop "error" ps _info stack _pause } { debugTest } ifElse ; 
@@ -351,7 +352,7 @@ stringMacrosOn
 
 Root 
 dbgOff
-//dbgOn 
+dbgOn 
 'todo 0 const  
 'doX64 1 const
 'doScript 1 const
@@ -381,7 +382,7 @@ stringMacrosOff
 c_syntaxOff
 lispOff
 bnOff
-2 + 7  assertStkChk // stack checking
+2 + 7 assertStkChk // stack checking
 Shell
 //s
 //verbosity 0 =

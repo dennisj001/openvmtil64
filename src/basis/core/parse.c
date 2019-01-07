@@ -122,7 +122,7 @@ gotNextToken:
         }
         else
         {
-            byte * buffer = Buffer_Clear ( _CfrTil_->ScratchB1 ) ;
+            byte * buffer = Buffer_Data_Cleared ( _CfrTil_->ScratchB1 ) ;
             sprintf ( ( char* ) buffer, "\n_CfrTil_Parse_ClassStructure : can't find namespace : \'%s\'", token ) ;
             _SyntaxError ( ( byte* ) buffer, 1 ) ; // else structure component size error
         }

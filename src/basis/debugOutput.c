@@ -13,56 +13,62 @@ Debugger_Menu ( Debugger * debugger )
 }
 
 void
-_Debugger_Locals_ShowALocal ( Debugger * debugger, Word * localsWord ) // use a debugger buffer instead ??
+_Debugger_Locals_ShowALocal ( Cpu * cpu, Word * localsWord ) // use a debugger buffer instead ??
 {
-    int64 varOffset ;
-    varOffset = LocalOrParameterVar_Offset ( localsWord ) ;
-    uint64 * fp = ( uint64* ) debugger->cs_Cpu->CPU_FP ;
-    if ( fp < ( uint64* ) 0x7f000000 ) fp = 0 ;
-    byte * address = ( byte* ) ( fp ? fp [ varOffset ] : 0 ) ;
-    byte * stringValue = String_CheckForAtAdddress ( address ) ;
-    byte * buffer = Buffer_Data_Cleared ( _CfrTil_->DebugB ) ; // nvw : new view window
-
     Word * word2 = 0 ;
-    if ( address ) word2 = Word_GetFromCodeAddress ( ( byte* ) ( address ) ) ;
+    byte * buffer = Buffer_Data_Cleared ( _CfrTil_->DebugB ) ; // nvw : new view window
+    uint64 * fp = ( uint64* ) cpu->CPU_FP ;
+    if ( fp < ( uint64* ) 0x7f000000 ) fp = 0 ;
+    int64 localVarFlag = ( localsWord->CAttribute & LOCAL_VARIABLE ) ; // nb! not a Boolean with '='
+    int64 varOffset = localVarFlag ? localsWord->Index : -localsWord->Index ; //LocalOrParameterVar_Offset ( localsWord ) ;
+    byte * address = ( byte* ) (uint64) (fp ? fp [ varOffset ] : 0) ; //( fp ? fp [ varOffset ] : 0 ) ;
 
+    byte * stringValue = String_CheckForAtAdddress ( address ) ;
+    if ( address && (!stringValue )) word2 = Word_GetFromCodeAddress ( ( byte* ) ( address ) ) ;
     if ( word2 ) sprintf ( ( char* ) buffer, "< %s.%s >", word2->ContainingNamespace->Name, c_u ( word2->Name ) ) ;
+    
     if ( localsWord->CAttribute & REGISTER_VARIABLE )
     {
         char * registerNames [ 16 ] = { ( char* ) "RAX", ( char* ) "RCX", ( char* ) "RDX", ( char* ) "RBX",
             ( char* ) "RBP", ( char* ) "RSP", ( char* ) "RSI", ( char* ) "RDI", ( char* ) "R8", ( char* ) "R9",
             ( char* ) "R10", ( char* ) "R11", ( char* ) "R12", ( char* ) "R13", ( char* ) "R14", ( char* ) "R15" } ;
         _Printf ( ( byte* ) "\n%-018s : index = [%3s:%d   ]  : <register  location> = 0x%016lx : %16s.%-16s : %s",
-            "Register Variable", registerNames [ localsWord->RegToUse ], localsWord->RegToUse, debugger->cs_Cpu->Registers [ localsWord->RegToUse ],
+            "Register Variable", registerNames [ localsWord->RegToUse ], localsWord->RegToUse, cpu->Registers [ localsWord->RegToUse ],
             localsWord->S_ContainingNamespace->Name, c_u ( localsWord->Name ), word2 ? buffer : stringValue ? stringValue : ( byte* ) "" ) ;
     }
     else _Printf ( ( byte* ) "\n%-018s : index = [r15%s0x%02x]  : <0x%016lx> = 0x%016lx : %16s.%-16s : %s",
-        ( localsWord->CAttribute & LOCAL_VARIABLE ) ? "LocalVariable" : "Parameter Variable", ( localsWord->CAttribute & LOCAL_VARIABLE ) ? "+" : "-",
-        Abs ( varOffset * CELL ), fp + varOffset, fp ? fp [ varOffset ] : 0, localsWord->S_ContainingNamespace->Name, c_u ( localsWord->Name ), word2 ? buffer : stringValue ? stringValue : ( byte* ) "" ) ;
+        localVarFlag ? "LocalVariable" : "Parameter Variable", localVarFlag ? "+" : "-", Abs ( varOffset * CELL ), 
+        fp + varOffset, (uint64) (fp ? fp [ varOffset ] : 0), localsWord->S_ContainingNamespace->Name, 
+        c_u ( localsWord->Name ), word2 ? buffer : stringValue ? stringValue : ( byte* ) "" ) ;
 }
 
 void
-_Debugger_Locals_Show_Loop ( Debugger * debugger, Stack * stack, Word * scWord )
+_Debugger_Locals_Show_Loop ( Cpu * cpu, Stack * stack, Word * scWord )
 {
     int64 n, i ;
-    _Word_ShowSourceCode ( scWord ) ;
-    if ( ! Compiling )
+    if ( stack )
     {
-        int64 * fp = ( int64* ) debugger->cs_Cpu->CPU_FP, * dsp = ( int64* ) debugger->cs_Cpu->CPU_DSP ;
-        if ( ( ( uint64 ) fp < 0x7f0000000 ) ) fp = dsp ;
-        _Printf ( ( byte* ) "\n%s.%s.%s : \nFrame Pointer = R15 = <0x%016lx> = 0x%016lx : Stack Pointer = R14 <0x%016lx> = 0x%016lx",
-            scWord->ContainingNamespace ? c_gd ( scWord->ContainingNamespace->Name ) : ( byte* ) "", c_gd ( scWord->Name ), c_gd ( "locals" ),
-            ( uint64 ) fp, fp ? *fp : 0, ( uint64 ) dsp, dsp ? *dsp : 0 ) ;
-    }
-    for ( i = 0, n = Stack_Depth ( stack ) ; i < n ; i ++ )
-    {
-        Namespace * ns = ( Namespace* ) _Stack_N ( stack, i ) ; //Stack_Pop ( stack ) ;
-        dlnode * node, *prevNode ;
-        for ( node = dllist_Last ( ns->W_List ) ; node ; node = prevNode )
+        _Word_ShowSourceCode ( scWord ) ;
+        if ( ! Compiling )
         {
-            prevNode = dlnode_Previous ( node ) ;
-            scWord = ( Word * ) node ;
-            _Debugger_Locals_ShowALocal ( debugger, scWord ) ;
+            int64 * fp = ( int64* ) cpu->CPU_FP, * dsp = ( int64* ) cpu->CPU_DSP ;
+            if ( ( ( uint64 ) fp < 0x7f0000000 ) ) fp = dsp ;
+            _Printf ( ( byte* ) "\n%s.%s.%s : \nFrame Pointer = R15 = <0x%016lx> = 0x%016lx : Stack Pointer = R14 <0x%016lx> = 0x%016lx",
+                scWord->ContainingNamespace ? c_gd ( scWord->ContainingNamespace->Name ) : ( byte* ) "", c_gd ( scWord->Name ), c_gd ( "locals" ),
+                ( uint64 ) fp, fp ? *fp : 0, ( uint64 ) dsp, dsp ? *dsp : 0 ) ;
+        }
+        //Namespace_NamespacesStack_PrintWords ( stack ) ;
+        for ( i = 0, n = Stack_Depth ( stack ) ; i < n ; i ++ )
+        {
+            Namespace * ns = ( Namespace* ) _Stack_N ( stack, i ) ; //Stack_Pop ( stack ) ;
+            //_Namespace_PrintWords ( ns ) ;
+            dlnode * node, *prevNode ;
+            for ( node = dllist_Last ( ns->W_List ) ; node ; node = prevNode )
+            {
+                prevNode = dlnode_Previous ( node ) ;
+                scWord = ( Word * ) node ;
+                _Debugger_Locals_ShowALocal ( cpu, scWord ) ;
+            }
         }
     }
 }
@@ -72,7 +78,7 @@ Debugger_Locals_Show ( Debugger * debugger )
 {
     Word * scWord = Compiling ? _CfrTil_->CurrentWordBeingCompiled :
         ( debugger->DebugAddress ? Word_UnAlias ( Word_GetFromCodeAddress ( debugger->DebugAddress ) ) : _Context_->CurrentlyRunningWord ) ;
-    if ( scWord ) _Debugger_Locals_Show_Loop ( debugger, _Compiler_->LocalsCompilingNamespacesStack, scWord ) ;
+    if ( scWord ) _Debugger_Locals_Show_Loop ( debugger->cs_Cpu, scWord->NamespaceStack ? scWord->NamespaceStack : _Compiler_->LocalsCompilingNamespacesStack, scWord ) ;
 }
 
 int64

@@ -306,7 +306,7 @@ Compiler_Init_AccumulatedOffsetPointers ( Compiler * compiler, Word * word )
     if ( word ) compiler->AccumulatedOptimizeOffsetPointer = & word->AccumulatedOffset ;
     else compiler->AccumulatedOptimizeOffsetPointer = 0 ;
 }
-
+#if 0
 void
 Compiler_Init ( Compiler * compiler, uint64 state, int64 flags )
 {
@@ -347,6 +347,60 @@ Compiler_Init ( Compiler * compiler, uint64 state, int64 flags )
     SetBuffersUnused ( 1 ) ;
     SetState ( compiler, VARIABLE_FRAME, false ) ;
 }
+#else
+void
+Compiler_Init ( Compiler * compiler, uint64 state, int64 flags )
+{
+    compiler->State = state & ( ! ARRAY_MODE ) ;
+    compiler->ContinuePoint = 0 ;
+    compiler->BreakPoint = 0 ;
+    compiler->InitHere = Here ;
+    compiler->ParenLevel = 0 ;
+    compiler->ArrayEnds = 0 ;
+    compiler->NumberOfNonRegisterLocals = 0 ;
+    compiler->NumberOfLocals = 0 ;
+    compiler->NumberOfRegisterLocals = 0 ;
+    compiler->NumberOfArgs = 0 ;
+    compiler->NumberOfNonRegisterArgs = 0 ;
+    compiler->NumberOfRegisterArgs = 0 ;
+    compiler->NumberOfVariables = 0 ;
+    compiler->NumberOfRegisterVariables = 0 ;
+    compiler->NumberOfNonRegisterVariables = 0 ;
+    compiler->LocalsFrameSize = 0 ;
+    compiler->AccumulatedOffsetPointer = 0 ;
+    compiler->ReturnVariableWord = 0 ;
+    compiler->CurrentWord = 0 ;
+    compiler->CurrentCreatedWord = 0 ;
+    Stack_Init ( compiler->BlockStack ) ;
+    Stack_Init ( compiler->CombinatorBlockInfoStack ) ;
+    Stack_Init ( compiler->PointerToOffset ) ;
+    Stack_Init ( compiler->CombinatorInfoStack ) ;
+    Stack_Init ( compiler->InfixOperatorStack ) ;
+    _dllist_Init ( compiler->GotoList ) ;
+    _dllist_Init ( compiler->CurrentSwitchList ) ;
+    _dllist_Init ( compiler->RegisterParameterList ) ;
+    _dllist_Init ( compiler->OptimizeInfoList ) ;
+    if ( flags ) CfrTil_TypeStackReset ( ) ;
+    if ( GetState ( _CfrTil_, RT_DEBUG_ON ) ) 
+    {
+        _CfrTil_->CurrentWordBeingCompiled->NamespaceStack = Stack_Copy ( compiler->LocalsCompilingNamespacesStack, CONTEXT ) ;
+        Namespace_RemoveNamespacesStack ( compiler->LocalsCompilingNamespacesStack ) ;
+        //Stack_Init ( compiler->LocalsCompilingNamespacesStack ) ;
+        _CfrTil_->CurrentWordBeingCompiled->W_SC_WordList = _CfrTil_->Compiler_N_M_Node_WordList ;
+        _CfrTil_->Compiler_N_M_Node_WordList = _dllist_New ( CFRTIL ) ;
+        Namespace_NamespacesStack_PrintWords ( _CfrTil_->CurrentWordBeingCompiled->NamespaceStack ) ;
+    }
+    else
+    {
+        Compiler_FreeAllLocalsNamespaces ( compiler ) ;
+        _CfrTil_RecycleInit_Compiler_N_M_Node_WordList ( 0 ) ;
+    }
+    SetState ( _CfrTil_, RT_DEBUG_ON, false ) ;
+    Compiler_CompileOptimizeInfo_PushNew ( compiler ) ;
+    SetBuffersUnused ( 1 ) ;
+    SetState ( compiler, VARIABLE_FRAME, false ) ;
+}
+#endif
 
 Compiler *
 Compiler_New ( uint64 allocType )
@@ -370,9 +424,10 @@ Compiler *
 Compiler_Copy ( Compiler * compiler, uint64 allocType )
 {
     Compiler * compilerCopy = ( Compiler * ) Mem_Allocate ( sizeof (Compiler ), allocType ) ;
-    memcpy ( compilerCopy, compiler, sizeof (Compiler)) ;
+    memcpy ( compilerCopy, compiler, sizeof (Compiler ) ) ;
     return compilerCopy ;
 }
+
 void
 Compiler_CalculateAndSetPreviousJmpOffset ( Compiler * compiler, byte * jmpToAddress )
 {

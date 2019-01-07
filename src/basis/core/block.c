@@ -16,6 +16,7 @@ Block_Eval ( block blck )
             ( ( block ) blck ) ( ) ;
             //_Block_Eval ( blck ) ;
         }
+        else Set_DataStackPointers_FromDebuggerDspReg ( ) ;
     }
 }
 

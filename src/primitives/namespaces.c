@@ -278,6 +278,24 @@ _CfrTil_RemoveNamespaceFromUsingListAndClear ( byte * name )
 }
 
 void
+Namespace_RemoveNamespacesStack ( Stack * stack )
+{
+    if ( stack )
+    {
+        int64 i, n ;
+        for ( i = 0, n = Stack_Depth ( stack ) ; n ; n --, i++ )
+        {
+            //Namespace * ns = ( Namespace* ) Stack_Pop ( stack ) ;
+            Namespace * ns = ( Namespace* ) stack->StackPointer [i] ;
+            if ( ns == _CfrTil_->InNamespace ) _CfrTil_->InNamespace = 0 ; //( Namespace* ) dlnode_Next ( ( dlnode* ) ns ) ; //dllist_First ( (dllist*) _Q_->CfrTil->Namespaces->Lo_List ) ;
+            if ( ns == _Context_->Finder0->QualifyingNamespace ) Finder_SetQualifyingNamespace ( _Context_->Finder0, 0 ) ;
+            if ( ns ) dlnode_Remove ( ( dlnode* ) ns ) ;
+        }
+        Stack_Init ( stack ) ;
+    }
+}
+
+void
 Namespace_FreeNamespacesStack ( Stack * stack )
 {
     if ( stack )
@@ -289,6 +307,21 @@ Namespace_FreeNamespacesStack ( Stack * stack )
             if ( ns ) _Namespace_RemoveFromUsingListAndClear ( ns ) ;
         }
         Stack_Init ( stack ) ;
+    }
+}
+
+
+void
+Namespace_NamespacesStack_PrintWords ( Stack * stack )
+{
+    if ( stack )
+    {
+        int64 i, n ;
+        for ( i = 0, n = Stack_Depth ( stack ) ; n ; n --, i++ )
+        {
+            Namespace * ns = ( Namespace* ) stack->StackPointer [i] ;
+            if ( ns ) _Namespace_PrintWords ( ns ) ;
+        }
     }
 }
 

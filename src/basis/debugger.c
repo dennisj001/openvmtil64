@@ -20,7 +20,7 @@ _Debugger_InterpreterLoop ( Debugger * debugger )
     SetState ( debugger, DBG_STACK_OLD, true ) ;
     if ( GetState ( debugger, DBG_STEPPED ) )
     {
-        Set_DataStackPointers_FromDebuggerDspReg ( ) ;
+        //Set_DataStackPointers_FromDebuggerDspReg ( ) ;
         if ( debugger->w_Word ) SetState ( debugger->w_Word, STEPPED, true ) ;
         if ( _Context_->CurrentEvalWord || GetState ( debugger, ( DBG_CONTINUE_MODE ) ) )
         {
@@ -88,7 +88,7 @@ _Debugger_PreSetup ( Debugger * debugger, Word * word, byte * token, Boolean for
 void
 Debugger_On ( Debugger * debugger )
 {
-    _Debugger_Init ( debugger, 0, 0 ) ;
+    _Debugger_Init (debugger, debugger->cs_Cpu, 0, 0 ) ;
     SetState_TrueFalse ( _Debugger_, DBG_MENU | DBG_INFO, DBG_STEPPING | DBG_AUTO_MODE | DBG_PRE_DONE | DBG_INTERPRET_LOOP_DONE ) ;
     debugger->LastSetupWord = 0 ;
     debugger->LastScwi = 0 ;
@@ -123,21 +123,20 @@ Debugger_Off ( Debugger * debugger, int64 debugOffFlag )
 }
 
 byte *
-Debugger_GetDbgAddressFromRsp ( Debugger * debugger )
+Debugger_GetDbgAddressFromRsp (Debugger * debugger, Cpu * cpu)
 {
     Word * word, *lastWord = 0, *currentlyRunning = Word_UnAlias ( _Context_->CurrentlyRunningWord ) ;
     byte * addr, *retAddr ;
     int64 i, d ;
     dllist * retStackList = List_New ( COMPILER_TEMP ) ;
-    //if ( Is_DebugOn ) _Q_->Verbosity = 2 ;
     if ( _Q_->Verbosity > 1 ) CfrTil_PrintReturnStack ( ) ;
-    for ( i = 0 ; i < 255 ; i ++ ) // Rsp[1] is current // 255 sizeof ReturnStack
+    for ( i = 0 ; i < 255 ; i ++ ) // 255 sizeof ReturnStack
     {
-        addr = ( ( byte* ) debugger->cs_Cpu->Rsp[i] ) ;
+        addr = ( ( byte* ) cpu->Rsp[i] ) ;
         word = Word_UnAlias ( Word_GetFromCodeAddress ( addr ) ) ;
         if ( word )
         {
-            _List_PushNew_1Value ( retStackList, COMPILER_TEMP, 0, debugger->cs_Cpu->Rsp[i] ) ;
+            _List_PushNew_1Value ( retStackList, COMPILER_TEMP, 0, cpu->Rsp[i] ) ;
             if ( word == currentlyRunning ) break ;
         }
     }
@@ -158,14 +157,15 @@ Debugger_GetDbgAddressFromRsp ( Debugger * debugger )
         }
         if ( _Q_->Verbosity > 1 ) Stack_Print ( debugger->ReturnStack, ( byte* ) "debugger->ReturnStack ", 0 ) ;
         debugger->DebugAddress = ( byte* ) Stack_Top ( debugger->ReturnStack ) ;
+        Stack_Pop ( debugger->ReturnStack ) ; // don't return to the current function on first RET
     }
-    else debugger->DebugAddress = ( byte* ) debugger->cs_Cpu->Rsp[0] ;
+    else debugger->DebugAddress = ( byte* ) cpu->Rsp[0] ;
     debugger->w_Word = Word_UnAlias ( Word_GetFromCodeAddress ( debugger->DebugAddress ) ) ; // 21 : code size back to <dbg>
     return debugger->DebugAddress ;
 }
 
 void
-_Debugger_Init ( Debugger * debugger, Word * word, byte * address )
+_Debugger_Init (Debugger * debugger, Cpu * cpu, Word * word, byte * address )
 {
     DebugColors ;
     Debugger_UdisInit ( debugger ) ;
@@ -177,16 +177,13 @@ _Debugger_Init ( Debugger * debugger, Word * word, byte * address )
     if ( address ) debugger->DebugAddress = address ;
     if ( ! GetState ( debugger, DBG_BRK_INIT ) ) debugger->State = DBG_MENU | DBG_INFO | DBG_PROMPT ;
     else if ( debugger->DebugAddress ) debugger->w_Word = word = Word_GetFromCodeAddress ( debugger->DebugAddress ) ;
-    if ( GetState ( debugger, DBG_BRK_INIT ) && debugger->cs_Cpu->Rsp )
+    if ( GetState ( debugger, DBG_BRK_INIT ) && cpu->Rsp )
     {
         // remember : _Compile_CpuState_Save ( _Debugger_->cs_Cpu ) ; is called thru _Compile_Debug : <dbg>/<dso>
-        debugger->DebugAddress = Debugger_GetDbgAddressFromRsp ( debugger ) ; //( byte* ) debugger->cs_Cpu->Rsp[1] ;
+        debugger->DebugAddress = Debugger_GetDbgAddressFromRsp (debugger, cpu) ; //( byte* ) debugger->cs_Cpu->Rsp[1] ;
         if ( debugger->DebugAddress && ( ! debugger->w_Word ) )
         {
             byte * da ;
-#if 0            
-            debugger->w_Word = word = Word_GetFromCodeAddress ( debugger->DebugAddress ) ;
-#endif            
             byte * offsetAddress = Calculate_Address_FromOffset_ForCallOrJump ( debugger->DebugAddress ) ;
             if ( ! debugger->w_Word )
             {
@@ -626,7 +623,7 @@ _CfrTil_Debug_AtAddress ( byte * address )
 {
     if ( ! GetState ( _Debugger_, DBG_ACTIVE ) )
     {
-        _Debugger_Init ( _Debugger_, 0, address ) ;
+        _Debugger_Init (_Debugger_, 0, 0, address ) ;
     }
     else
     {

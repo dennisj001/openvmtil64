@@ -155,8 +155,9 @@ void
 CfrTil_DebugRuntimeBreakpoint ( ) // where we want the acquired pointer
 {
     SetState ( _CfrTil_, RT_DEBUG_ON, true ) ;
+    //Compile_Call ( (byte*) _CfrTil_->SaveCpu2State ) ;
     Compile_Call ( (byte*) _Debugger_->SaveCpuState ) ;
-    Compile_Call_TestRSP ( ( byte* ) CfrTil_PrintReturnStack ) ;
+    //Compile_Call_TestRSP ( ( byte* ) CfrTil_PrintReturnStack ) ;
     Compile_Call_TestRSP ( ( byte* ) _CfrTil_DebugRuntimeBreakpoint ) ;
 }
 
