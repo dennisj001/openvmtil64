@@ -192,7 +192,7 @@ sp
 Lisp
 ( :: C : bexp44 ( n ) { n @ 1 > } { n @ n @ -- bexp44 * } { 1 } ifElse ; )
 tick bexp44 find wdiss //pause
-7 C bexp44 dup 5040 "C : bexp43_assert" assert p 
+7 C bexp44 dup 5040 "C : bexp43_assert" assert p //pause
 
 s
 lispOff

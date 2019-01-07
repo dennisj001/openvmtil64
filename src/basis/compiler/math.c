@@ -26,7 +26,7 @@ Compile_Multiply ( Compiler * compiler )
         CompileOptimizeInfo * optInfo = compiler->OptInfo ; //Compiler_CheckOptimize may change the optInfo
         //_Compile_IMUL ( int8 mod, int8 reg, int8 rm, int8 sib, int64 disp, uint64 imm )
         //optInfo->Optimize_Reg = ACC ; // emulate MUL
-        //Compiler_Word_SetCodingHere_And_ClearPreviousUseOf_Here_SCA (optInfo->opWord, 0) ;
+        Compiler_Word_SetCodingHere_And_ClearPreviousUseOf_Here_SCA (optInfo->opWord, 1) ;
         _Compile_IMUL ( optInfo->Optimize_Mod, optInfo->Optimize_Reg, optInfo->Optimize_Rm, 0, optInfo->Optimize_Disp, 0 ) ;
         if ( optInfo->Optimize_Rm == DSP ) _Compile_Move_Reg_To_StackN ( DSP, 0, optInfo->Optimize_Reg ) ;
         else _Word_CompileAndRecord_PushReg ( _CfrTil_WordList ( 0 ), optInfo->Optimize_Reg ) ;
@@ -35,6 +35,7 @@ Compile_Multiply ( Compiler * compiler )
     {
         Compile_Pop_To_Acc ( DSP ) ;
         //Compile_IMUL ( cell mod, cell reg, cell rm, sib, disp, imm, size )
+        Compiler_WordStack_SCHCPUSCA( 0, 1 ) ;
         Compile_MUL ( MEM, DSP, REX_B | MODRM_B | DISP_B, 0, 0, 0, CELL_SIZE ) ;
         _CfrTil_WordList ( 0 )->StackPushRegisterCode = Here ;
         Compile_Move_ACC_To_TOS ( DSP ) ;

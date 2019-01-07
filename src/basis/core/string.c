@@ -852,6 +852,7 @@ String_FindStrnCmpIndex ( byte * sc, byte* name0, int64 index0, int64 wl0, int64
         }
     }
     index = index0 ;
+    return -1 ;
 done:
     d0 ( scspp2 = & sc [ index ] ) ;
     return index ;

@@ -9,7 +9,7 @@ _DataObject_Run ( Word * word0 )
     Word * ns = word0 ;
     cntx->Interpreter0->w_Word = word ; // for ArrayBegin : all literals are run here
     if ( word->LAttribute & LOCAL_OBJECT ) Do_LocalObject ( word ) ;
-    else if ( Compiling && ( word->CAttribute & T_LISP_SYMBOL ) )
+    else if ( ( word->LAttribute & T_LISP_SYMBOL ) || ( Compiling && ( word->CAttribute & T_LISP_SYMBOL ) ) ) //lambda variables are parsed as CAttribute & T_LISP_SYMBOL
     {
         if ( ! GetState ( cntx->Compiler0, LC_CFRTIL ) ) _CfrTil_Do_LispSymbol ( word ) ;
         else _CfrTil_Do_Variable ( word ) ;

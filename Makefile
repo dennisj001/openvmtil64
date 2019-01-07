@@ -56,7 +56,7 @@ src/include/prototypes.h : $(INCLUDES)
 
 cfrtil64 : CFLAGS = $(CFLAGS_CORE)
 cfrtil64 : src/include/prototypes.h $(OBJECTS) _cfrtil64_O3
-	$(CC) $(CFLAGS) $(OBJECTS) -o cfrtil64o3 $(LIBS)
+	$(CC) $(CFLAGS) $(OBJECTS) -O3 -o cfrtil64o3 $(LIBS)
 	strip -o cfrtil64 cfrtil64o3
 	mv cfrtil64 bin/
 	
@@ -101,33 +101,6 @@ _cfrtil64o :  src/include/prototypes.h $(OBJECTS)
 src/primitives/cmaths.o : src/primitives/cmaths.c
 	$(CC) $(CFLAGS) -O3 -c src/primitives/cmaths.c -o src/primitives/cmaths.o
 	
-src/primitives/sl5.o : src/primitives/sl5.c
-	$(CC) $(CFLAGS_CORE) -ggdb -w -fpermissive -c src/primitives/sl5.c -o src/primitives/sl5.o
-	
-src/primitives/boot-eval.o : src/primitives/boot-eval.c
-	$(CC) $(CFLAGS_CORE) -ggdb -w -fpermissive -c src/primitives/boot-eval.c -o src/primitives/boot-eval.o
-	
-src/primitives/eval.o : src/primitives/eval.c
-	$(CC) $(CFLAGS_CORE) -ggdb -w -fpermissive -c src/primitives/eval.c -o src/primitives/eval.o
-	
-src/primitives/eval1.o : src/primitives/eval1.c
-	$(CC) $(CFLAGS_CORE) -ggdb -w -fpermissive -c src/primitives/eval1.c -o src/primitives/eval1.o
-	
-src/primitives/eval2.o : src/primitives/eval2.c
-	$(CC) $(CFLAGS_CORE) -ggdb -w -fpermissive -c src/primitives/eval2.c -o src/primitives/eval2.o
-	
-src/primitives/wcs.o : src/primitives/wcs.c
-	$(CC) $(CFLAGS_CORE) -w -fpermissive -c src/primitives/wcs.c -o src/primitives/wcs.o
-	
-src/primitives/libgc.o : src/primitives/libgc.c
-	$(CC) $(CFLAGS_CORE) -w -fpermissive -c src/primitives/libgc.c -o src/primitives/libgc.o
-	
-src/primitives/gc.o : src/primitives/gc.c
-	$(CC) $(CFLAGS) -w -fpermissive -c src/primitives/gc.c -o src/primitives/gc.o
-	
-tags :
-	ctags -R --c++-types=+px --excmd=pattern --exclude=Makefile --exclude=. ~/projects/workspace/cfrtil64
-
 proto:
 	touch src/include/defines.h
 	make src/include/prototypes.h
@@ -200,7 +173,6 @@ _cproto :
 	wget https://launchpad.net/ubuntu/+archive/primary/+files/cproto_4.7m.orig.tar.gz 
 	tar -xvf cproto_4.7m.orig.tar.gz
 	cd cproto-4.7m && \
-	#./configure CFLAGS=-m32 ABI=32 --enable-shared && \
 	./configure --enable-shared && \
 	make && \
 	sudo make install
@@ -208,14 +180,6 @@ _cproto :
 cproto : 
 	sudo apt-get install cproto
 	
-# suffix for zipfiles
-suffix = *.[cfht^~]*
-sfx = *.[a-np-wz]*
-zip : 
-	-mv nbproject ../backup
-	zip  cfrtil64.zip */$(sfx) */*/$(sfx) *.htm* Makefile m r script* netbeansReset *.cft* retroImage $(sfx)			    
-	-mv ../backup/nbproject .
-
 tar.xz :	
 	tar -c --xz --exclude=nbproject --exclude=objects --exclude=mpfr* --exclude=.git --exclude=*.png --exclude=cfrtil64-gdb  --exclude=*.o --exclude *.kdev* -f ../backup/cfrtil64.tar.xz * *.*
 

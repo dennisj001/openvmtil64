@@ -28,7 +28,7 @@ Debugger_ShowDbgSourceCodeAtAddress ( Debugger * debugger, byte * address )
                     }
 
                     byte * buffer = SC_PrepareDbgSourceCodeString ( sourceCode, word ) ;
-                    _Printf ( ( byte* ) "\n%s", buffer ) ;
+                    if ( buffer ) _Printf ( ( byte* ) "\n%s", buffer ) ;
                     if ( fixed ) word->Name = ( byte* ) "store" ;
                 }
             }
@@ -668,6 +668,7 @@ SC_PrepareDbgSourceCodeString ( byte * sc, Word * word ) // sc : source code ; s
         slsc = strlen ( ( char* ) sc ) ;
         scwi0 = word->W_SC_Index ;
         scwci = String_FindStrnCmpIndex ( sc, token, scwi0, slt, slt ) ; //( ( slsc - scwi0 ) > 30 ) ? 30 : ( slsc - scwi0 ) ) ;
+        if ( scwci == -1 ) return 0 ;
         d0 ( byte * scspp0 = & sc [ scwi0 ] ) ;
         d0 ( byte * scspp2 = & sc [ scwci ] ) ;
         nvw = Buffer_New_pbyte ( ( slsc > BUFFER_SIZE ) ? slsc : BUFFER_SIZE ) ;
