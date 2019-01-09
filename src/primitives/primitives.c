@@ -44,6 +44,7 @@ CPrimitive CPrimitives [] = {
     { "lcOn", 0, 0, 0, ( block ) LC_New, 0, 0, 0, "Lisp", "Root" },
 
     { "'", 0, 0, 0, CfrTil_SingleQuote, IMMEDIATE | KEYWORD, 0, 0, "Forth", "Root" },
+    { "postfix", 0, 0, 0, CfrTil_Postfix, IMMEDIATE | KEYWORD, 0, 0, "Forth", "Root" },
     { ",", 0, 0, 0, CompileInt32, 0, 0, 0, "Forth", "Root" },
     { "4,", 0, 0, 0, CompileInt32, 0, 0, 0, "Forth", "Root" },
     { "8,", 0, 0, 0, CompileInt64, 0, 0, 0, "Forth", "Root" },
@@ -103,7 +104,7 @@ CPrimitive CPrimitives [] = {
     { "for", 0, 0, 0, CfrTil_For_PrefixCombinators, KEYWORD | COMBINATOR | IMMEDIATE, 0, 0, "PrefixCombinators", "C" },
     { "loop", 0, 0, 0, CfrTil_Loop_PrefixCombinators, KEYWORD | COMBINATOR | IMMEDIATE, 0, 0, "PrefixCombinators", "C" },
 
-    { ":", 0, 0, 0, CfrTil_Colon, IMMEDIATE | KEYWORD, 0, 0, "Infix", "Compiler" },
+    //{ ":", 0, 0, 0, CfrTil_Colon, IMMEDIATE | KEYWORD, 0, 0, "Infix", "Compiler" },
     { "=", "XA.V", 0, MOV, ( block ) CfrTil_C_Infix_Equal, IMMEDIATE | CATEGORY_OP | INFIXABLE | CATEGORY_OP_EQUAL | KEYWORD, C_INFIX_OP_EQUAL, 0, "Infix", "C" }, //"Infix", "Compiler" },
     //{ "=", "XA.V", 0, MOV, ( block ) CfrTil_C_Infix_Equal, IMMEDIATE | CATEGORY_OP | CATEGORY_OP_EQUAL | KEYWORD, C_INFIX_OP_EQUAL, 0, "Infix", "C" }, //"Infix", "Compiler" },
 

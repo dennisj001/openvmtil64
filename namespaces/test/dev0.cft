@@ -6,7 +6,7 @@ scOn
 Root : sp ; //stack pause ;
 C : sp ; //stack pause ;
 dbOn 0 =
-User Lisp
+User 
 : sp ; // stack pause ;
 1 opOn // this currently requires the optimization to be on to compile correctly 
 // verbosity 2 = 
@@ -44,7 +44,7 @@ c_syntaxOff
     { n @ 1 > } { n @ rec @ * rec store n -- } while 
     rec @ 
 ;
-' fac find wdiss
+' fac find wdiss 
 7 fac dup p 5040 _assert //pause
 C
 : factorial ( REG n | REG rec ) rec 1 = { n @ 1 > } { rec @ n @ * rec store n -- } while return rec ;

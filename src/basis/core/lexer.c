@@ -23,12 +23,14 @@ Lexer_ObjectToken_New ( Lexer * lexer, byte * token, int64 tsrli, int64 scwi ) /
         Lexer_ParseObject ( lexer, token ) ;
         if ( lexer->TokenType & T_RAW_STRING )
         {
-            if ( GetState ( _Q_, AUTO_VAR ) ) // make it a 'variable' 
+            Context * cntx = _Context_ ;
+            Compiler * compiler = cntx->Compiler0 ;
+            if ( GetState ( _Q_, AUTO_VAR ) && ( ! GetState ( compiler, ( DOING_A_PREFIX_WORD | DOING_BEFORE_A_PREFIX_WORD ) ) ) )// make it a 'variable' 
             {
-                if ( Compiling && GetState ( _Context_, C_SYNTAX ) )
+                if ( Compiling && GetState ( cntx, C_SYNTAX ) )
                 {
                     //if ( ! _Compiler_->AutoVarTypeNamespace ) 
-                    _Namespace_ActivateAsPrimary ( _Compiler_->LocalsNamespace ) ;
+                    _Namespace_ActivateAsPrimary ( compiler->LocalsNamespace ) ;
                     word = DataObject_New ( LOCAL_VARIABLE, 0, token, LOCAL_VARIABLE, 0, 0, 0, 0, DICTIONARY, tsrli, scwi ) ;
                     token2 = Lexer_Peek_Next_NonDebugTokenWord ( lexer, 1 ) ;
                     if ( ! String_Equal ( token2, "=" ) ) return lexer->TokenWord = 0 ; // don't interpret this word
@@ -44,7 +46,7 @@ Lexer_ObjectToken_New ( Lexer * lexer, byte * token, int64 tsrli, int64 scwi ) /
             }
         }
         else word = DataObject_New ( LITERAL, 0, token, lexer->TokenType, 0, 0, 0, lexer->Literal, 0, tsrli, scwi ) ;
-        Lexer_Word_SetTypeNamespace ( lexer, word ) ; 
+        Word_SetTypeNamespace ( word, lexer->TokenType ) ;
         // this ... is done in Word_Create 
         //Lexer_Set_ScIndex_RlIndex ( lexer, word, lexer->TokenStart_ReadLineIndex, lexer->SC_Index ) ;
         lexer->TokenWord = word ;
@@ -54,36 +56,13 @@ Lexer_ObjectToken_New ( Lexer * lexer, byte * token, int64 tsrli, int64 scwi ) /
 }
 
 void
-Lexer_Word_SetTypeNamespace ( Lexer * lexer, Word * word )
+Word_SetTypeNamespace ( Word * word, int64 attribute )
 {
     if ( _Compiler_->AutoVarTypeNamespace ) word->TypeNamespace = _Compiler_->AutoVarTypeNamespace ;
-    else
-    {
-        switch ( lexer->TokenType )
-        {
-            case (T_INT | KNOWN_OBJECT ):
-            {
-                word->TypeNamespace = _CfrTil_->IntegerNamespace ;
-                break ;
-            }
-            case ( T_BIG_NUM | KNOWN_OBJECT ):
-            {
-                word->TypeNamespace = _CfrTil_->BigNumNamespace ;
-                break ;
-            }
-            case ( T_STRING | KNOWN_OBJECT ):
-            {
-                word->TypeNamespace = _CfrTil_->StringNamespace ;
-                break ;
-            }
-            case ( T_RAW_STRING | KNOWN_OBJECT ):
-            {
-                word->TypeNamespace = _CfrTil_->RawStringNamespace ;
-                break ;
-            }
-            default: break ;
-        }
-    }
+    else if ( attribute & T_INT ) word->TypeNamespace = _CfrTil_->IntegerNamespace ;
+    else if ( attribute & T_STRING ) word->TypeNamespace = _CfrTil_->StringNamespace ;
+    else if ( attribute & T_BIG_NUM ) word->TypeNamespace = _CfrTil_->BigNumNamespace ;
+    else if ( attribute & T_RAW_STRING ) word->TypeNamespace = _CfrTil_->RawStringNamespace ;
 }
 
 void

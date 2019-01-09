@@ -47,3 +47,7 @@ Important points/words (in primitives.c) :
 
 'cfrtil64s' is the static version which needs only libc to run independent of other linked libraries
 'cfrtil64o3' is the -03 optimized version
+
+Type 'test' and then 'demo' (without the single quotes, of course) for some examples.
+"init.cft" is the startup initialization file. Follow what it does and you will be led to all the internals of the program.
+I use netbeans (cpp) for debugging.

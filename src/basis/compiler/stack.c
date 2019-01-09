@@ -30,11 +30,12 @@ void
 _Compile_SetStackN_WithObject ( Boolean stackReg, int64 n, int64 obj )
 {
     //_Compile_MoveImm ( int64 direction, int64 rm, int64 sib, int64 disp, int64 imm, int64 operandSize )
-    Compile_MoveImm (MEM, stackReg, n * CELL, obj, CELL ) ;
+    Compile_MoveImm ( MEM, stackReg, n * CELL, obj, CELL ) ;
 }
 #if 1
+
 void
-_Compile_Stack_Push ( uint8 stackReg, uint8 thruReg, int64 obj ) 
+_Compile_Stack_Push ( uint8 stackReg, uint8 thruReg, int64 obj )
 {
     //Compile_ADDI ( REG, stackReg, 0, sizeof (int64 ), 0 ) ;
     //_Compile_SetStackN_WithObject ( stackReg, 0, obj ) ;
@@ -147,7 +148,7 @@ Compile_Pop_ToAcc_AndCall ( Boolean stackReg )
 void
 Compile_MoveImm_To_TOS ( Boolean stackReg, int64 imm, Boolean size )
 {
-    Compile_MoveImm (MEM, stackReg, 0, imm, size ) ;
+    Compile_MoveImm ( MEM, stackReg, 0, imm, size ) ;
 }
 
 void
@@ -190,8 +191,8 @@ _Compile_Stack_Pick ( Boolean stackReg ) // pick
 {
     //DBI_ON ;
     Compile_Move_Rm_To_Reg ( ACC, stackReg, 0 ) ;
-    Compile_NOT ( REG, ACC, 0, 0, 0 ) ; // negate acc
-    Compile_Move_WithSib ( 0x48, REG, ACC, DSP, REX_W_B, SCALE_CELL, ACC, DSP ) ;
+    Compile_NOT ( REG, ACC, 0, 0, 0 ) ; // bitwise negate acc : we want the negative of TOS
+    Compile_Move_WithSib ( REG, 0, ACC, DSP, SCALE_CELL, ACC, DSP ) ;
     Compile_Move_Reg_To_Rm ( stackReg, ACC, 0 ) ;
     //DBI_OFF ;
 }
@@ -202,7 +203,6 @@ _Compile_Stack_Swap ( Boolean stackReg )
     Compile_Move_Rm_To_Reg ( OREG, stackReg, 0 ) ;
     Compile_Move_Rm_To_Reg ( RAX, stackReg, - CELL ) ;
     Compile_Move_Reg_To_Rm ( stackReg, OREG, - CELL ) ;
-    //SetHere ( WordStack ( 0 )->StackPushRegisterCode ) ;
     Compile_Move_Reg_To_Rm ( stackReg, RAX, 0 ) ;
 }
 

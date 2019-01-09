@@ -394,7 +394,7 @@ _LO_Apply_NonMorphismArg ( ListObject ** pl1, int64 i )
     {
         if ( word->StackPushRegisterCode ) SetHere ( word->StackPushRegisterCode, 1 ) ;
         else if ( baseObject && baseObject->StackPushRegisterCode ) SetHere ( baseObject->StackPushRegisterCode, 1 ) ;
-        Compile_Move_Reg_To_Reg ( RegOrder ( i ++ ), ACC ) ;
+        Compile_Move_Reg_To_Reg ( RegParameterOrder ( i ++ ), ACC ) ;
         if ( baseObject ) _Debugger_->PreHere = baseObject->Coding ;
         SetState ( cntx, ADDRESS_OF_MODE, false ) ;
         _Debugger_->PreHere = here ;
@@ -416,8 +416,8 @@ _LO_Apply_Arg ( LambdaCalculus * lc, ListObject ** pl1, int64 i )
         Set_CompileMode ( false ) ;
         l2 = LO_Eval ( lc, l1 ) ;
         _Debugger_->PreHere = Here ;
-        if ( ! l2 || ( l2->LAttribute & T_NIL ) ) Compile_MoveImm_To_Reg ( RegOrder ( i ++ ), DataStack_Pop ( ), CELL_SIZE ) ;
-        else Compile_MoveImm_To_Reg ( RegOrder ( i ++ ), ( int64 ) * l2->Lo_PtrToValue, CELL_SIZE ) ;
+        if ( ! l2 || ( l2->LAttribute & T_NIL ) ) Compile_MoveImm_To_Reg ( RegParameterOrder ( i ++ ), DataStack_Pop ( ), CELL_SIZE ) ;
+        else Compile_MoveImm_To_Reg ( RegParameterOrder ( i ++ ), ( int64 ) * l2->Lo_PtrToValue, CELL_SIZE ) ;
         _DEBUG_SHOW ( l2, 1 ) ;
     }
     else if ( ( l1->CAttribute & NON_MORPHISM_TYPE ) ) i = _LO_Apply_NonMorphismArg ( pl1, i ) ;
@@ -430,7 +430,7 @@ _LO_Apply_Arg ( LambdaCalculus * lc, ListObject ** pl1, int64 i )
         word = Compiler_CopyDuplicatesAndPush (word, -1, -1) ;
         word->W_SC_Index = l1->W_SC_Index ;
         _Debugger_PreSetup ( _Debugger_, word, 0, 1 ) ;
-        Compile_MoveImm_To_Reg ( RegOrder ( i ++ ), DataStack_Pop ( ), CELL_SIZE ) ;
+        Compile_MoveImm_To_Reg ( RegParameterOrder ( i ++ ), DataStack_Pop ( ), CELL_SIZE ) ;
         _DEBUG_SHOW ( word, 1 ) ;
     }
 done:

@@ -137,10 +137,14 @@ C
 : ;; semi _prefix ; immediate syntactic
 c_syntaxOn 
 type int8 ; int8.size = 1 ;
+type uint8 ; uint8.size = 1 ;
 type byte ; byte.size = 1 ;
 type int16 ; int16.size = 2 ;
+type uint16 ; uint16.size = 2 ;
 type int32 ; int32.size = 4 ;
+type uint32 ; uint32.size = 4 ;
 type int64 ; int64.size = 8 ;
+type uint64 ; uint64.size = 8 ;
 type void ; void.size = 0 ;
 type char ; char.size = 1 ;
 type int ; int.size = 8 ;
@@ -341,8 +345,7 @@ Root
 Lisp OpenVmTil
 : lispOff "Lisp" notUsing "LispTemp" notUsing "LispDefines" notUsing ; //lcReset ;
 : lispOn lcOn ;
-lispOff
-c_syntaxOff
+postfix 
 Root
 sp 
 : sh _sh ; prefix
@@ -352,7 +355,7 @@ stringMacrosOn
 
 Root 
 dbgOff
-dbgOn 
+//dbgOn 
 'todo 0 const  
 'doX64 1 const
 'doScript 1 const
@@ -376,11 +379,11 @@ stringMacrosOff
 'doInitTest 1 const
 #if doInitTest
 #endif
+: tx64 "namespaces/compiler/x64.back.cft" include ;
+tx64
+#endif 
 
-#endif // of course ...
-
-c_syntaxOff
-lispOff
+postfix 
 bnOff
 2 + 7 assertStkChk // stack checking
 Shell

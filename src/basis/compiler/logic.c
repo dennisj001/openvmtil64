@@ -356,7 +356,7 @@ _Compile_Jcc ( int64 setNegFlag, int64 setTtn, byte * jmpToAddr )
         disp = _CalculateOffsetForCallOrJump ( Here + 2, jmpToAddr, INT32_SIZE ) ;
     }
     else disp = 0 ; // allow this function to be used to have a delayed compile of the actual address
-    Compile_CalcWrite_Instruction_X64 ( 0x0f, ( 0x8 << 4 | setTtn << 1 | setNegFlag ), 0, 0, 0, DISP_B, 0, disp, INT32_SIZE, 0, 0 ) ;
+    Compile_CalculateWrite_Instruction_X64 ( 0x0f, ( 0x8 << 4 | setTtn << 1 | setNegFlag ), 0, 0, 0, DISP_B, 0, disp, INT32_SIZE, 0, 0 ) ;
 }
 
 void

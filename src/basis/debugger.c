@@ -46,7 +46,7 @@ _Debugger_PreSetup ( Debugger * debugger, Word * word, byte * token, Boolean for
         {
             if ( ! word ) word = Context_CurrentWord ( ) ;
             if ( word && ( ! word->W_WordListOriginalWord ) ) word->W_WordListOriginalWord = word ;
-            if ( ( ! debugger->LastSetupWord ) || ( ( debugger->LastSetupWord != word ) && ( word && ( ! String_Equal ( debugger->LastSetupWord->Name, word->Name ) ) ) ) )
+            if ( ( ! debugger->LastSetupWord ) || ( word != debugger->LastSetupWord ) || ( word && ( ! String_Equal ( debugger->LastSetupWord->Name, word->Name ) ) ) )
             {
                 debugger->w_Word = word ;
                 if ( ( word && word->Name[0] ) || token )

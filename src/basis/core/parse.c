@@ -263,7 +263,7 @@ _CfrTil_Parse_LocalsAndStackVariables ( int64 svf, int64 lispMode, ListObject * 
                 }
             }
             if ( String_Equal ( ( char* ) token, ")" ) ) break ;
-            if ( Stringi_Equal ( ( char* ) token, "REG" ) || String_Equal ( ( char* ) token, "REGISTER" ) )
+            if ( String_Equal ( ( char* ) token, "REG" ) || String_Equal ( ( char* ) token, "REGISTER" ) )
             {
                 if ( GetState ( _CfrTil_, OPTIMIZE_ON ) ) regFlag = true ;
                 continue ;
@@ -312,7 +312,7 @@ _CfrTil_Parse_LocalsAndStackVariables ( int64 svf, int64 lispMode, ListObject * 
                 else word = DataObject_New ( ctype, 0, token, ctype, 0, 0, 0, 0, DICTIONARY, - 1, - 1 ) ;
                 if ( regFlag == true )
                 {
-                    word->RegToUse = RegOrder ( regToUseIndex ++ ) ;
+                    word->RegToUse = RegParameterOrder ( regToUseIndex ++ ) ;
                     if ( word->CAttribute & PARAMETER_VARIABLE )
                     {
                         if ( ! compiler->RegisterParameterList ) compiler->RegisterParameterList = _dllist_New ( TEMPORARY ) ;

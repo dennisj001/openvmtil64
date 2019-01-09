@@ -84,6 +84,7 @@ TSI_TypeCheck_TypeVariableSigCode ( TSI * tsi, Word * stackWord0, Word * stackWo
                 {
                     // we infer that ...
                     stackWord1->CAttribute |= stackWord0_CAttribute ;
+                    Word_SetTypeNamespace ( stackWord1, stackWord1->CAttribute ) ;
                     if ( stackWord1->Name && tsi->WordBeingCompiled && ( stackWord1->CAttribute & PARAMETER_VARIABLE ) )
                     {
                         tsi->WordBeingCompiled->W_TypeSignatureString [stackWord1->Index - 1] = Tsi_Convert_Word_TypeAttributeToTypeLetterCode ( stackWord0 ) ;

@@ -102,21 +102,6 @@ _CfrTil_VariableValueGet ( byte* nameSpace, byte * name )
     return _Namespace_VariableValueGet ( Namespace_Find ( nameSpace ), name ) ;
 }
 
-// set the value at address to reg - value in reg
-
-void
-_Compile_SetAtAddress_WithReg ( int64 * address, int64 reg, int64 thruReg )
-{
-    _Compile_Move_Literal_Immediate_To_Reg ( thruReg, ( int64 ) address ) ;
-    Compile_Move_Reg_To_Rm ( thruReg, reg, 0 ) ;
-}
-
-void
-_Compile_Move_Literal_Immediate_To_Reg ( int64 reg, int64 value )
-{
-    Compile_MoveImm_To_Reg ( reg, value, CELL ) ;
-}
-
 void
 _Compile_GetVarLitObj_RValue_To_Reg ( Word * word, int64 reg )
 {

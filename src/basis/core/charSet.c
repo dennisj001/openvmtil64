@@ -97,7 +97,7 @@ byte CharTable []= { // from maru
   /*  5c  \  */	CHAR_PRINT | CHAR_LETTER,
   /*  5d  ]  */	CHAR_PRINT,
   /*  5e  ^  */	CHAR_PRINT | CHAR_LETTER,
-  /*  5f  _  */	CHAR_PRINT | CHAR_LETTER,
+  /*  5f  _  */	CHAR_PRINT | CHAR_LETTER | CHAR_ALPHA,
   /*  60  `  */	CHAR_PRINT,
   /*  61  a  */	CHAR_PRINT | CHAR_LETTER | CHAR_ALPHA | CHAR_DIGIT16,
   /*  62  b  */	CHAR_PRINT | CHAR_LETTER | CHAR_ALPHA | CHAR_DIGIT16,

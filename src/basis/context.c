@@ -250,18 +250,9 @@ _Context_DoubleQuoteMacro ( Context * cntx )
     while ( lexer->TokenInputByte != '"' ) ;
     _CfrTil_->SC_QuoteMode = false ;
     SetState ( lexer, LEXER_DONE, true ) ;
-    if ( GetState ( _CfrTil_, STRING_MACROS_ON ) && GetState ( &_CfrTil_->Sti, STI_INITIALIZED ) )
-    {
-        _CfrTil_StringMacros_Do ( lexer->TokenBuffer ) ;
-    }
+    if ( GetState ( _CfrTil_, STRING_MACROS_ON ) && GetState ( &_CfrTil_->Sti, STI_INITIALIZED ) ) _CfrTil_StringMacros_Do ( lexer->TokenBuffer ) ;
     Word * word = Lexer_ObjectToken_New (lexer, String_New ( lexer->TokenBuffer, STRING_MEM ) , -1, -1) ; 
-#if 0    
-    if ( ! GetState ( cntx->Compiler0, LC_ARG_PARSING ) )  
-    {
-        SetHere ( CfrTil_WordList (0)->Coding, 1 ) ; 
-        CfrTil_WordLists_PopWord ( ) ;
-    }
-#endif    
+    //Debugger_On ( _Debugger_ ) ;
     Interpreter_DoWord ( cntx->Interpreter0, word, - 1, - 1 ) ; 
 }
 

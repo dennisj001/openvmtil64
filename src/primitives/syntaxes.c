@@ -44,6 +44,16 @@ CfrTil_C_Syntax_Off ( )
     Ovt_AutoVarOff ( ) ;
 }
 
+// switch to the default forth, postfix mode
+void
+CfrTil_Postfix ()
+{
+    CfrTil_C_Syntax_Off ( ) ;
+    Namespace_SetAsNotUsing_MoveToTail ( ( byte* ) "Lisp"  ) ;
+    Namespace_SetAsNotUsing_MoveToTail ( ( byte* ) "LispTemp"  ) ;
+    Namespace_SetAsNotUsing_MoveToTail ( ( byte* ) "LispDefines"  ) ;
+}
+
 void
 CfrTil_C_Syntax_On ( )
 {

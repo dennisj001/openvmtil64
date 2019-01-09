@@ -221,46 +221,6 @@ CfrTil_SetInNamespaceFromBackground ( )
     else Compiler_SetAs_InNamespace_C_BackgroundNamespace ( cntx->Compiler0 ) ;
 }
 
-#if 0 // maybe better with blocks ... below ..
-
-void
-CfrTil_C_ConditionalExpression ( )
-{
-    Context * cntx = _Context_ ;
-    Interpreter * interp = cntx->Interpreter0 ;
-    Word * word = CfrTil_WordList ( 1 ) ;
-    if ( word->StackPushRegisterCode )
-    {
-        _SetHere_To_Word_StackPushRegisterCode ( word, 1 ) ;
-        _Compile_TestCode ( word->RegToUse, CELL ) ;
-    }
-    else
-    {
-        _Compile_Stack_PopToReg ( DSP, RAX ) ;
-        _Compile_TestCode ( RAX, CELL ) ;
-    }
-    _Compile_UninitializedJumpEqualZero ( ) ;
-    byte * ptrToOffsetElse = Here - DISP_SIZE ;
-    DEBUG_SHOW ;
-    Interpret_Until_Token ( interp, ( byte* ) ":", 0 ) ;
-    _Compile_UninitializedJump ( ) ;
-    byte * ptrToOffsetEnd = Here - DISP_SIZE ;
-    if ( GetState ( cntx, C_SYNTAX ) )
-    {
-        _SetOffsetForCallOrJump ( ptrToOffsetElse, Here ) ;
-        byte * token = Interpret_C_Until_Token4 ( interp, ( byte* ) ";", ( byte* ) ",", ( byte* ) ")", 0, 0 ) ;
-        DEBUG_SHOW ;
-        CfrTil_PushToken_OnTokenList ( token ) ; // maybe conditionally push ??
-    }
-    else
-    {
-        _SetOffsetForCallOrJump ( ptrToOffsetElse, Here ) ;
-        Interpreter_InterpretNextToken ( interp ) ;
-    }
-    _SetOffsetForCallOrJump ( ptrToOffsetEnd, Here ) ;
-}
-#elif 1
-
 void
 CfrTil_C_ConditionalExpression ( )
 {
@@ -279,22 +239,6 @@ CfrTil_C_ConditionalExpression ( )
         }
     }
 }
-#else
-
-void
-CfrTil_C_ConditionalExpression ( )
-{
-    Context * cntx = _Context_ ;
-    Interpreter * interp = cntx->Interpreter0 ;
-    CfrTil_BeginBlock ( ) ;
-    Interpret_Until_Token ( interp, ( byte* ) ":", 0 ) ;
-    CfrTil_EndBlock ( ) ;
-    CfrTil_BeginBlock ( ) ;
-    Interpret_C_Until_Token4 ( interp, ( byte* ) ";", ( byte* ) ",", ( byte* ) ")", "}", 0 ) ;
-    CfrTil_EndBlock ( ) ;
-    CfrTil_TrueFalseCombinator2 ( ) ;
-}
-#endif
 
 Boolean
 Syntax_AreWeParsingACFunctionCall ( Lexer * lexer )
