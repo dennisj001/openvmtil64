@@ -197,7 +197,8 @@ _Class_New ( byte * name, uint64 type, int64 cloneFlag )
     }
     else
     {
-        _Printf ( ( byte* ) "\nNamespace Error ? : \'%s\' already exists! : %s : size = %d\n", ns->Name, _Word_SourceCodeLocation_pbyte ( ns ), ns->ObjectSize ) ;
+        _Printf ( ( byte* ) "\nNamespace Error at %s ? : \'%s\' already exists! : %s : size = %d\n", 
+            Context_Location (), ns->Name, _Word_SourceCodeLocation_pbyte ( ns ), ns->ObjectSize ) ;
         Namespace_DoNamespace ( ns ) ;
     }
     CfrTil_WordList_Init ( 0, 0 ) ;

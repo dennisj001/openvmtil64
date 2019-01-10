@@ -69,20 +69,6 @@ dscOn
 : sp ; //stack using pause ; 
 sp
 c_syntaxOn 
-type int8 ; int8.size = 1 ;
-type uint8 ; uint8.size = 1 ;
-type byte ; byte.size = 1 ;
-type int16 ; int16.size = 2 ;
-type uint16 ; uint16.size = 2 ;
-type int32 ; int32.size = 4 ;
-type uint32 ; uint32.size = 4 ;
-type int64 ; int64.size = 8 ;
-type uint64 ; uint64.size = 8 ;
-type void ; void.size = 0 ;
-type char ; char.size = 1 ;
-type int ; int.size = 8 ;
-type long ; long.size = 8 ;
-type quad ; quad.size = 16 ;
 
 int
 CalculateModRegardingDisplacement ( _mod,  disp | rmod ) // _mod/rmod avoid name class with 'mod' function
@@ -333,11 +319,11 @@ _Compile_Move ( toRegOrMem _mod reg rm controlFlags disp | opCode )
     Compile_CalculateWrite_Instruction_X64 ( 0, opCode, _mod, reg, rm, controlFlags, 0, disp, 0, 0, 0 ) ;
 } prefix
 '_Compile_Move find wdiss //pause
-
+scOn
 void
-Compile_Move ( uint8 direction, uint8 mod, uint8 reg, uint8 rm, uint8 operandSize, uint8 sib, int64 disp, uint8 dispSize, int64 imm, uint8 immSize )
+Compile_Move ( direction, mod, reg, rm, operandSize, sib, disp, dispSize, imm, immSize | opCode controlFlags )
 {
-    uint8 opCode ; uint16 controlFlags = ( disp ? DISP_B : 0 ) | ( sib ? SIB_B : 0 ) ;
+    d: controlFlags = ( disp ? DISP_B : 0 ) | ( sib ? SIB_B : 0 ) ;
     if ( imm || immSize )
     {
         reg = 0 ;
@@ -360,8 +346,8 @@ Compile_Move ( uint8 direction, uint8 mod, uint8 reg, uint8 rm, uint8 operandSiz
         controlFlags |= (REX_B | MODRM_B) ;
     }
     Compile_CalculateWrite_Instruction_X64 ( 0, opCode, mod, reg, rm, controlFlags, sib, disp, dispSize, imm, immSize ) ;
-} prefix
-'Compile_Move find wdiss //pause
+d: } prefix
+'Compile_Move find wdiss //pause 
 
 //                                          _Compile_Move ( toRegOrMem _mod reg rm controlFlags disp | opCode ) 
 //void _Compile_Move_DataStackN_ToReg ( reg n ) { _Compile_Move ( REG, MEM, reg, DSP, (REX_B | MODRM_B | DISP_B), n * CELL ) ; } prefix 
@@ -456,7 +442,7 @@ Compile_PopDspToR8AndCall ()
     _Compile_CallThruReg ( R8D ) ;
 }
 c_syntaxOff
-'Compile_PopDspToR8AndCall find wdiss pause
+'Compile_PopDspToR8AndCall find wdiss //pause
 #endif
 
 C X64

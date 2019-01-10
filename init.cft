@@ -380,7 +380,7 @@ stringMacrosOff
 #if doInitTest
 #endif
 : tx64 "namespaces/compiler/x64.back.cft" include ;
-tx64
+//tx64
 #endif 
 
 postfix 

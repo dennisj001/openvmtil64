@@ -374,8 +374,8 @@ typedef struct _WordData
         uint8 OpInsnGroup ;
         uint8 OpInsnCode ;
     } ;
-    byte TypeSignature [8] ;
-    Namespace * TypeObjectsNamespaces [7] ; // 7 : increase if need more than 7 objects as args
+    byte TypeSignature [16] ;
+    Namespace * TypeObjectsNamespaces [16] ; // 16 : increase if need more than 7 objects as args
     union
     {
         dllist * LocalNamespaces ;

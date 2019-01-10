@@ -385,10 +385,10 @@ Compiler_Init ( Compiler * compiler, uint64 state, int64 flags )
     {
         _CfrTil_->CurrentWordBeingCompiled->NamespaceStack = Stack_Copy ( compiler->LocalsCompilingNamespacesStack, CONTEXT ) ;
         Namespace_RemoveNamespacesStack ( compiler->LocalsCompilingNamespacesStack ) ;
-        //Stack_Init ( compiler->LocalsCompilingNamespacesStack ) ;
+        Stack_Init ( compiler->LocalsCompilingNamespacesStack ) ;
         _CfrTil_->CurrentWordBeingCompiled->W_SC_WordList = _CfrTil_->Compiler_N_M_Node_WordList ;
         _CfrTil_->Compiler_N_M_Node_WordList = _dllist_New ( CFRTIL ) ;
-        Namespace_NamespacesStack_PrintWords ( _CfrTil_->CurrentWordBeingCompiled->NamespaceStack ) ;
+        //Namespace_NamespacesStack_PrintWords ( _CfrTil_->CurrentWordBeingCompiled->NamespaceStack ) ;
     }
     else
     {

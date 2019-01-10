@@ -291,7 +291,7 @@ Namespace_RemoveNamespacesStack ( Stack * stack )
             if ( ns == _Context_->Finder0->QualifyingNamespace ) Finder_SetQualifyingNamespace ( _Context_->Finder0, 0 ) ;
             if ( ns ) dlnode_Remove ( ( dlnode* ) ns ) ;
         }
-        Stack_Init ( stack ) ;
+        //Stack_Init ( stack ) ;
     }
 }
 

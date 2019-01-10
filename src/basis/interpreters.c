@@ -24,7 +24,7 @@ Interpret_C_Until_Token4 ( Interpreter * interp, byte * end1, byte * end2, byte*
         {
             Interpreter_InterpretAToken ( interp, token, lexer->TokenStart_ReadLineIndex, lexer->SC_Index ) ;
             //if ( ! Compiling ) Compiler_FreeAllLocalsNamespaces ( _Compiler_ ) ;
-            break ;
+            //break ;
         }
         else if ( GetState ( _Context_, C_SYNTAX ) && ( String_Equal ( token, "," ) || String_Equal ( token, ";" ) ) )
         {
