@@ -87,11 +87,11 @@ _CfrTil_Parse_ClassStructure ( int64 cloneFlag )
         offset = _Namespace_VariableValueGet ( classNs, ( byte* ) "size" ) ; // allows for cloning - prototyping
         sizeOf = offset ;
     }
+    //Namespace_AddToNamespaces_SetUsing ( Namespace_Find ( (byte*) "C_Typedef" ), 1, USING ) ;
     while ( 1 )
     {
         // each name/word is an increasing offset from object address on stack
         // first name is at 0 offset
-        // token = Lexer_NextToken ( _Context_->Lexer0 ) ;
         _CfrTil_Namespace_InNamespaceSet ( classNs ) ; // parsing arrays changes namespace so reset it here
         token = _Lexer_ReadToken ( _Context_->Lexer0, ( byte* ) " ,\n\r\t" ) ;
 gotNextToken:
@@ -122,9 +122,14 @@ gotNextToken:
         }
         else
         {
-            byte * buffer = Buffer_Data_Cleared ( _CfrTil_->ScratchB1 ) ;
-            sprintf ( ( char* ) buffer, "\n_CfrTil_Parse_ClassStructure : can't find namespace : \'%s\'", token ) ;
-            _SyntaxError ( ( byte* ) buffer, 1 ) ; // else structure component size error
+            Word * word = Finder_Word_FindUsing ( _Finder_, token, 0 ) ;
+            if ( word && word->CAttribute & DEBUG_WORD ) Interpreter_DoWord ( _Interpreter_, word, _Lexer_->TokenStart_ReadLineIndex, _Lexer_->SC_Index ) ;
+            else
+            {
+                byte * buffer = Buffer_Data_Cleared ( _CfrTil_->ScratchB1 ) ;
+                sprintf ( ( char* ) buffer, "\n_CfrTil_Parse_ClassStructure : can't find namespace : \'%s\'", token ) ;
+                _SyntaxError ( ( byte* ) buffer, 1 ) ; // else structure component size error
+            }
         }
         for ( i = 0 ; 1 ; )
         {
@@ -156,6 +161,8 @@ gotNextToken:
         }
     }
     _Namespace_VariableValueSet ( classNs, ( byte* ) "size", sizeOf ) ;
+    classNs->CAttribute2 |= STRUCTURE ;
+    //Namespace_AddToNamespaces_SetUsing (  Namespace_Find ( (byte*) "C_Typedef" ), 0, NOT_USING ) ;
     return sizeOf ;
 }
 
@@ -202,7 +209,7 @@ _CfrTil_Parse_LocalsAndStackVariables ( int64 svf, int64 lispMode, ListObject * 
     Boolean regFlag = false ;
     byte *token, *returnVariable = 0 ;
     Namespace *typeNamespace = 0, *saveInNs = _CfrTil_->InNamespace ;
-    if ( ! localsNs ) localsNs = Namespace_FindOrNew_Local (nsStack ? nsStack : compiler->LocalsCompilingNamespacesStack, ! debugFlag ) ;
+    if ( ! localsNs ) localsNs = Namespace_FindOrNew_Local ( nsStack ? nsStack : compiler->LocalsCompilingNamespacesStack, ! debugFlag ) ;
 
     if ( ! debugFlag ) CfrTil_WordLists_PopWord ( ) ; // stop source code
     if ( svf ) svff = 1 ;
@@ -231,7 +238,8 @@ _CfrTil_Parse_LocalsAndStackVariables ( int64 svf, int64 lispMode, ListObject * 
                 if ( ( iword = Finder_FindWord_InOneNamespace ( _Finder_, word, ( byte* ) "init" ) )
                     || ( _Namespace_VariableValueGet ( word, ( byte* ) "size" ) > 8 ) )
 #endif                
-                    typeNamespace = word ;
+                    if ( word->CAttribute2 & STRUCTURE )
+                        typeNamespace = word ;
                 continue ;
             }
             if ( String_Equal ( ( char* ) token, "|" ) )
@@ -304,7 +312,7 @@ _CfrTil_Parse_LocalsAndStackVariables ( int64 svf, int64 lispMode, ListObject * 
                     ctype |= REGISTER_VARIABLE ;
                     numberOfRegisterVariables ++ ;
                 }
-                if ( debugFlag ) 
+                if ( debugFlag )
                 {
                     word = _Finder_FindWord_InOneNamespace ( _Finder_, compiler->LocalsNamespace, token ) ;
                     if ( ! word ) word = DataObject_New ( ctype, 0, token, ctype, 0, 0, 0, 0, DICTIONARY, - 1, - 1 ) ;

@@ -9,7 +9,7 @@ Compiler
 hex
 : sl nl location nl stk _pause ; //sl
 Class
-: sp ; //stack ; //pause ;
+: sp ; //stack pause ;
 sp
 using
 Class // "class" works like "namespace" so here we switch back to namespace 'Class' else following words would be in class 'Pointer'
@@ -169,13 +169,12 @@ scOff
 "\nthis = " ps this hex p //pause
 
 testClone size @ dump
-decimal nl s "DLListClone size =" ps DLListClone size @ dup p nl 88 "Clone size" assert
-testClone.TailNode.BeforeReference @ testClone "DLListClone init test : " assert
+decimal nl s "DLListClone size =" ps DLListClone size @ dup p nl 88 "Clone size" assert sp
+testClone.TailNode.BeforeReference @ testClone "DLListClone init test : " assert sp
 // test 'this' to refer to 'this' in current namespace
 // d: this.TailNode.BeforeReference @ this "DLListClone init test2 : " assert
-
-"\nthis @ size @ p " ps this size @ p drop // sp // pause // for now we have to drop the 'this' pointer. TODO :: 'this' semantics have yet to be solidified
-"\nthis.size = " ps this.size @ p drop // sp //pause
+"\nthis @ size @ p " ps this size @ p // sp // pause // for now we have to drop the 'this' pointer. TODO :: 'this' semantics have yet to be solidified
+"\nthis.size = " ps this.size @ p // sp //pause
 
 dbgOff
 #if dbgOnVar @
@@ -194,5 +193,5 @@ sp
 #endif
 2 + 7 assertStkChk // stack checking
 sp
-
+//s pause
 

@@ -489,28 +489,6 @@ Strncpy ( byte * dst, byte * src, int64 n )
     for ( i = 0 ; src [i] && ( i < n ) ; i ++ ) dst[i] = src[i] ;
 }
 
-int64
-IsLValue_String_CheckForwardToStatementEnd ( byte * nc )
-{
-    while ( *nc )
-    {
-        switch ( *nc )
-        {
-            case '=':
-            {
-                if ( * ( nc + 1 ) == '=' ) return false ;
-                else if ( ispunct ( * ( nc - 1 ) ) ) return false ; // op equal
-                else return true ; // we have an lvalue
-            }
-            //case ';': case ',': case '"': case '.': case '[': case ']': case '(': case ')': case '{': case '}': return false ;
-            case ';': case ',': case '"': case ']': case ')': case '{': case '}': return false ;
-            default : ;
-        }
-        nc ++ ;
-    }
-    return false ;
-}
-
 Boolean
 _C_Syntax_AreWeParsingACFunctionCall ( byte * nc )
 {
@@ -785,36 +763,41 @@ IsPunct ( byte b )
     else return false ;
 }
 
-#if 1
+#if 0
+// don't remember why this was needed and it doesn't seem to be needed now
+// but i modified it somewhat even though so ... 
 // ?? necessary ; works ??
 
 int64
 String_CheckWordSize ( byte * str, int64 wl )
 {
     byte * start, *end ;
-    int64 i, length ;
-    Boolean punctFlag = IsPunct ( str [0] ), rPunctFlag = IsPunct ( str [wl - 1] ) ; //punctFlag means first character of word is punctuation 
+    int64 i = - 1, length ;
+    if ( wl > 1 )
+    {
+        Boolean lPunctFlag = IsPunct ( str [0] ), rPunctFlag = IsPunct ( str [wl - 1] ) ; // an xPunctFlag means first/last character of word is a punctuation char
 
-    for ( i = - 1 ; abs ( i ) < ( wl + 1 ) ; i -- ) // go to left of str first
-    {
-        if ( punctFlag )
+        if ( ! lPunctFlag )
         {
-            break ;
+            for ( i = - 1 ; abs ( i ) < ( wl + 1 ) ; i -- ) // go to left of str first
+            {
+                if ( IsPunct ( str[ i ] ) || ( str[ i ] == ' ' ) ) break ;
+            }
         }
-        else if ( IsPunct ( str[ i ] ) || ( str[ i ] == ' ' ) ) break ;
-    }
-    start = & str [i + 1] ;
-    for ( i = wl ; i < ( wl + 1 ) ; i ++ ) // ... then to the right side of str
-    {
-        if ( rPunctFlag )
+        start = & str [i + 1] ;
+        for ( i = wl ; i < ( wl + 1 ) ; i ++ ) // ... then to the right side of str
         {
-            if ( ( i >= wl ) && ( ! IsPunct ( str[i] ) ) ) break ; // assumes
+            if ( rPunctFlag )
+            {
+                if ( ( i >= wl ) && ( ! IsPunct ( str[i] ) ) ) break ; // assumes
+            }
+            else if ( IsPunct ( str[i] ) || ( str[i] == ' ' ) ) break ;
         }
-        else if ( IsPunct ( str[i] ) || ( str[i] == ' ' ) ) break ;
+        end = & str [i - 1] ;
+        length = end - start + 1 ;
+        return length == wl ;
     }
-    end = & str [i - 1] ;
-    length = end - start + 1 ;
-    return length == wl ;
+    return true ;
 }
 #endif
 
@@ -832,7 +815,7 @@ String_FindStrnCmpIndex ( byte * sc, byte* name0, int64 index0, int64 wl0, int64
         scindex = & sc [ index + i ] ;
         if ( ( index + i <= slsc ) && ( ! Strncmp ( scindex, name0, wl0 ) ) )
         {
-            if ( String_CheckWordSize ( scindex, wl0 ) ) 
+            //if ( String_CheckWordSize ( scindex, wl0 ) ) 
             {
                 index += i ;
                 goto done ;
@@ -844,7 +827,7 @@ String_FindStrnCmpIndex ( byte * sc, byte* name0, int64 index0, int64 wl0, int64
         scindex = & sc [ index - i ] ;
         if ( ( ( index - 1 ) >= 0 ) && ( ! Strncmp ( scindex, name0, wl0 ) ) )
         {
-            if ( String_CheckWordSize ( scindex, wl0 ) ) 
+            //if ( String_CheckWordSize ( scindex, wl0 ) ) 
             {
                 index -= i ;
                 goto done ;
@@ -852,7 +835,7 @@ String_FindStrnCmpIndex ( byte * sc, byte* name0, int64 index0, int64 wl0, int64
         }
     }
     index = index0 ;
-    return -1 ;
+    //return -1 ;
 done:
     d0 ( scspp2 = & sc [ index ] ) ;
     return index ;

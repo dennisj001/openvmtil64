@@ -187,6 +187,8 @@ void
 CfrTil_WordList_PushWord ( Word * word )
 {
 #if 1
+    if ( word == (Word*) 0x7ffff5958e88 ) //0x7ffff595be88
+        _Printf ( (byte*) "\nGot it = %s", word->Name ) ;
     _CfrTil_WordList_PushWord ( word,
         ( ! ( word->CAttribute & ( NAMESPACE | OBJECT_OPERATOR | OBJECT_FIELD ) ) ) || ( word->CAttribute & ( DOBJECT ) ) ) ;
 #else    
@@ -194,6 +196,44 @@ CfrTil_WordList_PushWord ( Word * word )
         ( ( ! ( word->CAttribute & ( NAMESPACE | OBJECT_OPERATOR | OBJECT_FIELD ) ) )
         || ( word->CAttribute & ( DOBJECT ) ) ) ? SCN_IN_USE_FLAG_ALL : 0 ) ;
 #endif    
+}
+
+void
+CheckRecycleWord ( Node * node )
+{
+    Word *w = ( Word* ) dobject_Get_M_Slot ( ( dobject* ) node, SCN_T_WORD ) ;
+    _CheckRecycleWord ( w ) ;
+}
+
+void
+DLList_Recycle_WordList ( dllist * list )
+{
+    dllist_Map ( list, ( MapFunction0 ) CheckRecycleWord ) ;
+}
+
+void
+_CfrTil_RecycleInit_Compiler_N_M_Node_WordList ( Boolean force )
+{
+    if ( force || ( ! GetState ( _CfrTil_, GLOBAL_SOURCE_CODE_MODE ) ) )
+    {
+        DLList_Recycle_WordList ( _CfrTil_->Compiler_N_M_Node_WordList ) ;
+        List_Init ( _CfrTil_->Compiler_N_M_Node_WordList ) ;
+    }
+}
+
+void
+CfrTil_WordList_Init ( Word * word, Boolean saveWord0 )
+{
+    Word * svWord ;
+    if ( word ) svWord = word ;
+    else if ( saveWord0 ) svWord = WordStack ( 0 ) ;
+    else svWord = 0 ;
+    _CfrTil_RecycleInit_Compiler_N_M_Node_WordList ( 1 ) ;
+    if ( svWord )
+    {
+        svWord->W_SC_Index = 0 ; // before pushWord !
+        CfrTil_WordList_PushWord ( svWord ) ; // for source code
+    }
 }
 
 inline void
@@ -547,61 +587,6 @@ SCN_Set_NotInUseForOptimization ( dlnode * node )
     dobject_Set_M_Slot ( ( dobject* ) node, SCN_IN_USE_FLAG, SCN_IN_USE_FOR_SOURCE_CODE ) ;
 }
 // the logic needs to be reworked with recycling in these functions
-
-void
-_CfrTil_RecycleInit_Compiler_N_M_Node_WordList ( Boolean force )
-{
-    if ( force || ( ! GetState ( _CfrTil_, GLOBAL_SOURCE_CODE_MODE ) ) )
-    {
-        //if ( _CfrTil_->Compiler_N_M_Node_WordList == (dllist *) 0x7ffff7fc3a60 ) _Printf ((byte*)"" ) ;
-        
-        DLList_Recycle_WordList ( _CfrTil_->Compiler_N_M_Node_WordList ) ;
-        List_Init ( _CfrTil_->Compiler_N_M_Node_WordList ) ;
-    }
-}
-
-#if 0
-
-void
-CfrTil_RecycleInit_SourceCode_WordList ( Word * scWord )
-{
-    scWord = scWord ? scWord : _CfrTil_->ScWord ;
-    if ( scWord && scWord->W_SC_WordList )
-    {
-        DLList_Recycle_WordList ( scWord->W_SC_WordList ) ;
-        List_Init ( scWord->W_SC_WordList ) ;
-        _CfrTil_->ScWord = 0 ;
-        _Debugger_->LastSourceCodeWord = 0 ;
-    }
-    _CfrTil_RecycleInit_Compiler_N_M_Node_WordList ( 0 ) ;
-}
-
-// there may be problems here ??
-#endif
-
-void
-CfrTil_WordList_Init ( Word * word, Boolean saveWord0 )
-{
-    Word * svWord ;
-    if ( word ) svWord = word ;
-    else if ( saveWord0 ) svWord = WordStack ( 0 ) ;
-    else svWord = 0 ;
-#if 0    
-    if ( word && IsSourceCodeOn ) cfrtil->ScWord = word ;
-    else cfrtil->ScWord = Get_SourceCodeWord ( ) ;
-    if ( cfrtil->ScWord )
-    {
-        cfrtil->ScWord->W_SC_WordList = cfrtil->Compiler_N_M_Node_WordList ;
-    }
-    else CfrTil_RecycleInit_SourceCode_WordList ( 0 ) ;
-#endif    
-    _CfrTil_RecycleInit_Compiler_N_M_Node_WordList ( 1 ) ;
-    if ( svWord )
-    {
-        svWord->W_SC_Index = 0 ; // before pushWord !
-        CfrTil_WordList_PushWord ( svWord ) ; // for source code
-    }
-}
 
 void
 CfrTil_FinishSourceCode ( CfrTil * cfrtil, Word * word )

@@ -215,11 +215,8 @@ _Compile_ImmDispData (  immDisp,  immSize,  forceFlag )
     if ( immSize > 0 )
     {
         if ( immSize == BYTE ) compile1 (immDisp)  ; 
-        else 
-        { 
-            if ( immSize == 4 ) compile4 (immDisp)  ; 
-            else if ( immSize == CELL ) compile8 (immDisp) ; 
-        }    
+        else if ( immSize == 4 ) compile4 (immDisp)  ; 
+        else if ( immSize == CELL ) compile8 (immDisp) ; 
     }
     else // with operandSize == 0 let the compiler use the minimal size ; nb. can't be imm == 0
     {
@@ -277,7 +274,7 @@ _Compile_Write_Instruction_X64 ( rex, opCode, modRm, controlFlags, sib, disp, di
     printf ( "\n_Compile_Write_Instruction_X64 : %lx : %d bytes : ...", _here, nbytes ) ; dis ( _here, nbytes ) ; //pause () ; nl ; nl ; 
 #endif
 } prefix
-//'_Compile_Write_Instruction_X64 find wdiss pause
+'_Compile_Write_Instruction_X64 find wdiss //pause
 
 int 
 _CalculateRex ( reg rm rex_w_flag | rex )

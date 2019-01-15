@@ -300,7 +300,7 @@ Compile_Move ( uint8 direction, uint8 mod, uint8 reg, uint8 rm, uint8 operandSiz
 void
 Compile_Move_WithSib ( uint8 direction, Boolean mod, Boolean reg, Boolean rm, Boolean scale, Boolean index, Boolean base )
 {
-    Compile_Move ( direction, mod, reg, rm, 0, CalculateSib ( scale, index, base ), 0, 0, 0, 0 ) ;
+    Compile_Move ( direction, mod, reg, rm, 8, CalculateSib ( scale, index, base ), 0, 0, 0, 0 ) ;
 }
 
 void

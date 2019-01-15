@@ -294,6 +294,7 @@ dscOn //verbosity 3 =
         { n @ m @ "assertStkChk" _assert1 }
         ifElse
     } if2 
+    //stack pause
 ; 
 //' _assertStkChk find wdiss //pause
 : assertStkChk _assertStkChk ; //"\n_assertStkChk : " ps stack pause ; 

@@ -852,52 +852,6 @@ Tree_Map_State_OneArg ( uint64 state, MapFunction_1 mf, int64 one )
     return 0 ;
 }
 
-Word *
-TC_Tree_Map ( TabCompletionInfo * tci, MapFunction mf, Word * wordi )
-{
-    Word *word = wordi, *nextWord, *ns, *nextNs, *rword = 0 ; //return word
-start:
-    if ( word )
-    {
-        ns = word->S_ContainingNamespace ;
-        nextNs = ( Word* ) dlnode_Next ( ( node* ) ns ) ;
-        goto checkWord ;
-    }
-    for ( ns = ( Word * ) dllist_First ( _CfrTil_->Namespaces->W_List ) ; ns ; ns = nextNs )
-    {
-        nextNs = ( Word* ) dlnode_Next ( ( node* ) ns ) ;
-        for ( word = ( Word * ) dllist_First ( ns->S_SymbolList ) ; word ; word = nextWord )
-        {
-checkWord:
-            nextWord = ( Word* ) dlnode_Next ( ( node* ) word ) ;
-            if ( kbhit ( ) ) return 0 ; //must be here else could loop forever !?
-            if ( mf ( ( Symbol* ) word ) )
-            {
-                if ( nextWord )
-                {
-                    rword = nextWord ;
-                }
-                else if ( nextNs ) rword = ( Word* ) dllist_First ( nextNs->S_SymbolList ) ;
-                else rword = 0 ;
-                goto doReturn ;
-            }
-        }
-    }
-doReturn:
-    if ( ! rword )
-    {
-        if ( ++ tci->WordWrapCount > 6 ) // 5 : there are five cases in the switch in _TabCompletion_Compare
-        {
-            tci->FoundMarker = rand ( ) ;
-            tci->WordWrapCount = 0 ;
-            //word = 0 ; 
-        }
-        word = 0 ; //tci->OriginalRunWord ;
-        goto start ;
-    }
-    return rword ;
-}
-
 void
 List_N_M_Node_PrintWords ( dllist * alist )
 {

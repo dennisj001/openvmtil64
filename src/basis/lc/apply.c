@@ -106,7 +106,11 @@ _Interpreter_LC_InterpretWord ( Interpreter *interp, ListObject *l0, Boolean fun
     {
         word = l0->Lo_CfrTilWord ;
         if ( ! word ) word = l0 ;
-        else { word->W_RL_Index = l0->W_RL_Index ; word->W_SC_Index = l0->W_SC_Index ; }
+        else
+        {
+            word->W_RL_Index = l0->W_RL_Index ;
+            word->W_SC_Index = l0->W_SC_Index ;
+        }
         // source code is not good for lisp ??!??
         //Interpreter_DoWord ( interp, word, functionFlag ? word->W_RL_Index : l0->W_RL_Index, functionFlag ? word->W_SC_Index : l0->W_SC_Index ) ;
         Interpreter_DoWord ( interp, word, l0->W_RL_Index, l0->W_SC_Index ) ;
@@ -272,7 +276,7 @@ LO_PrepareReturnObject ( )
     {
         Namespace * ns = _CfrTil_InNamespace ( ) ;
         name = ns->Name ;
-        if ( Namespace_IsUsing ( (byte*) "BigNum" ) ) type = T_BIG_NUM ;
+        if ( Namespace_IsUsing ( ( byte* ) "BigNum" ) ) type = T_BIG_NUM ;
         return DataObject_New ( T_LC_NEW, 0, 0, LITERAL | type, 0, LITERAL | type, 0, DataStack_Pop ( ), 0, 0, - 1 ) ;
     }
     else return nil ;
@@ -365,7 +369,7 @@ Arrays_DoArrayArgs_Lisp ( Word ** pl1, Word * l1, Word * arrayBaseObject, int64 
 {
     do
     {
-        if ( Do_NextArrayToken ( l1->Name, arrayBaseObject, objSize, saveCompileMode, variableFlag ) ) break ;
+        if ( Do_NextArrayToken ( l1, l1->Name, arrayBaseObject, objSize, saveCompileMode, variableFlag ) ) break ;
     }
     while ( l1 = LO_Next ( l1 ) ) ;
     *pl1 = l1 ;
@@ -384,11 +388,9 @@ _LO_Apply_NonMorphismArg ( ListObject ** pl1, int64 i )
     ListObject *l1 = * pl1 ;
     Word * word = l1 ;
     word = l1->Lo_CfrTilWord ;
-    //int64 tsrli = -1, scwi = -1; 
-    //Word_SetTsrliScwi( word, tsrli, scwi ) ;
-    word = Compiler_CopyDuplicatesAndPush (word, word->W_RL_Index, word->W_SC_Index ) ;
+    word = Compiler_CopyDuplicatesAndPush ( word, l1->W_RL_Index, l1->W_SC_Index ) ;
     byte * here = Here ;
-    Word_Eval ( word ) ; // ?? move value directly to RegOrder reg
+    Word_Eval ( word ) ; 
     Word *baseObject = _Interpreter_->BaseObject ;
     if ( ( word->Name[0] == '\"' ) || ( ! _Lexer_IsTokenForwardDotted ( cntx->Lexer0, l1->W_RL_Index + Strlen ( word->Name ) - 1 ) ) ) // ( word->Name[0] == '\"' ) : sometimes strings have ".[]" chars within but are still just strings
     {
@@ -423,12 +425,10 @@ _LO_Apply_Arg ( LambdaCalculus * lc, ListObject ** pl1, int64 i )
     else if ( ( l1->CAttribute & NON_MORPHISM_TYPE ) ) i = _LO_Apply_NonMorphismArg ( pl1, i ) ;
     else if ( ( l1->Name [0] == '.' ) || ( l1->Name [0] == '&' ) )
         Interpreter_DoWord ( cntx->Interpreter0, l1->Lo_CfrTilWord, l1->W_RL_Index, l1->W_SC_Index ) ;
-        //_Interpreter_DoWord ( cntx->Interpreter0, l1->Lo_CfrTilWord, l1->Lo_CfrTilWord->W_RL_Index, l1->Lo_CfrTilWord->W_SC_Index ) ;
     else if ( ( l1->Name[0] == '[' ) ) i = _LO_Apply_ArrayArg ( pl1, i ) ;
     else
     {
-        word = Compiler_CopyDuplicatesAndPush (word, -1, -1) ;
-        word->W_SC_Index = l1->W_SC_Index ;
+        word = Compiler_CopyDuplicatesAndPush ( word, l1->W_RL_Index, l1->W_SC_Index ) ;
         _Debugger_PreSetup ( _Debugger_, word, 0, 1 ) ;
         Compile_MoveImm_To_Reg ( RegParameterOrder ( i ++ ), DataStack_Pop ( ), CELL_SIZE ) ;
         _DEBUG_SHOW ( word, 1 ) ;
@@ -463,7 +463,7 @@ _LO_Apply_C_LtoR_ArgList ( LambdaCalculus * lc, ListObject * l0, Word * word )
         //int64 tsrli = -1, scwi = -1; 
         //Word_SetTsrliScwi( word, tsrli, scwi ) ;
         Word_SetCodingAndSourceCoding ( word, Here ) ;
-        word = Compiler_CopyDuplicatesAndPush (word, word->W_RL_Index, word->W_SC_Index ) ;
+        word = Compiler_CopyDuplicatesAndPush ( word, word->W_RL_Index, word->W_SC_Index ) ;
         if ( ( String_Equal ( word->Name, "printf" ) || ( String_Equal ( word->Name, "sprintf" ) ) ) ) Compile_MoveImm_To_Reg ( RAX, 0, CELL ) ; // for printf ?? others //System V ABI : "%rax is used to indicate the number of vector arguments passed to a function requiring a variable number of arguments"
         Compiler_Word_SetCodingHere_And_ClearPreviousUseOf_Here_SCA ( word, 1 ) ;
         Word_Eval ( word ) ;
@@ -530,7 +530,7 @@ CompileLispBlock ( ListObject *args, ListObject * body )
     Word * word = _CfrTil_->CurrentWordBeingCompiled ;
     LO_BeginBlock ( ) ; // must have a block before local variables if there are register variables because _CfrTil_Parse_LocalsAndStackVariables will compile something
     SetState ( lc, ( LC_COMPILE_MODE | LC_BLOCK_COMPILE ), true ) ; // before _CfrTil_Parse_LocalsAndStackVariables
-    Namespace * locals = _CfrTil_Parse_LocalsAndStackVariables (1, 1, args, 0, 0 , false) ;
+    Namespace * locals = _CfrTil_Parse_LocalsAndStackVariables ( 1, 1, args, 0, 0, false ) ;
     word->CAttribute = BLOCK ;
     word->LAttribute |= T_LISP_COMPILED_WORD ;
     _LO_Eval ( lc, body, locals, 1 ) ;

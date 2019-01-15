@@ -586,9 +586,9 @@ OVT_CheckRecycleableAllocate ( dllist * list, int64 size )
 }
 
 void
-OVT_Recycle ( dllist * list, dlnode * anode )
+OVT_Recycle ( dlnode * anode )
 {
-    if ( anode ) dllist_AddNodeToTail ( list, anode ) ;
+    if ( anode ) dllist_AddNodeToTail ( _Q_->MemorySpace0->RecycledWordList, anode ) ;
 }
 
 // put a word on the recycling list
@@ -598,7 +598,7 @@ Word_Recycle ( Word * w )
 {
     //if ( w == (Word *) 0x7ffff71fe7e8 ) _Printf ((byte*)"" ) ;
     
-    OVT_Recycle ( _Q_->MemorySpace0->RecycledWordList, ( dlnode * ) w ) ;
+    OVT_Recycle ( ( dlnode * ) w ) ;
 }
 
 void
@@ -612,13 +612,6 @@ _CheckRecycleWord ( Word * w )
 }
 
 void
-CheckRecycleWord ( Node * node )
-{
-    Word *w = ( Word* ) dobject_Get_M_Slot ( ( dobject* ) node, SCN_T_WORD ) ;
-    _CheckRecycleWord ( w ) ;
-}
-
-void
 CheckRecycleNamespaceWord ( Node * node )
 {
     _CheckRecycleWord ( ( Word * ) node ) ;
@@ -627,17 +620,9 @@ CheckRecycleNamespaceWord ( Node * node )
 // check a compiler word list for recycleable words and add them to the recycled word list : _Q_->MemorySpace0->RecycledWordList
 
 void
-DLList_Recycle_WordList ( dllist * list )
-{
-    dllist_Map ( list, ( MapFunction0 ) CheckRecycleWord ) ;
-    //if ( Is_DebugOn ) _Printf ( ( byte* ) "\nDLList_RecycleWordList" ), Pause () ;
-}
-
-void
 DLList_Recycle_NamespaceList ( dllist * list )
 {
     dllist_Map ( list, ( MapFunction0 ) CheckRecycleNamespaceWord ) ;
-    //if ( Is_DebugOn ) _Printf ( ( byte* ) "\nDLList_RecycleWordList" ), Pause () ;
 }
 
 // check a compiler word list for recycleable words and add them to the recycled word list : _Q_->MemorySpace0->RecycledWordList

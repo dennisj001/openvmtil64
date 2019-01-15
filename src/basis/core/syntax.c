@@ -22,8 +22,8 @@ Interpret_C_Block_EndBlock ( byte * tokenToUse, Boolean insertFlag )
 {
     if ( tokenToUse ) _CfrTil_->EndBlockWord->Name = tokenToUse ;
     if ( insertFlag ) SetState ( _Debugger_, DBG_OUTPUT_INSERTION, true ) ;
-    int64 tsrli = -1, scwi = -1; 
-    Word_SetTsrliScwi( _CfrTil_->EndBlockWord, tsrli, scwi ) ;
+    int64 tsrli = - 1, scwi = - 1 ;
+    Word_SetTsrliScwi ( _CfrTil_->EndBlockWord, tsrli, scwi ) ;
     Interpreter_DoWord_Default ( _Interpreter_, _CfrTil_->EndBlockWord, tsrli, scwi ) ;
     _CfrTil_->EndBlockWord->Name = ( byte* ) "}" ;
     SetState ( _Debugger_, DBG_OUTPUT_INSERTION, false ) ;
@@ -37,8 +37,8 @@ Interpret_C_Block_BeginBlock ( byte * tokenToUse, Boolean insertFlag )
     // ? source code adjustments ?
     if ( tokenToUse ) _CfrTil_->BeginBlockWord->Name = tokenToUse ;
     if ( insertFlag ) SetState ( _Debugger_, DBG_OUTPUT_INSERTION, true ) ;
-    int64 tsrli = -1, scwi = -1; 
-    Word_SetTsrliScwi( _CfrTil_->BeginBlockWord, tsrli, scwi ) ;
+    int64 tsrli = - 1, scwi = - 1 ;
+    Word_SetTsrliScwi ( _CfrTil_->BeginBlockWord, tsrli, scwi ) ;
     Interpreter_DoWord_Default ( _Interpreter_, _CfrTil_->BeginBlockWord, tsrli, scwi ) ;
     _CfrTil_->BeginBlockWord->Name = ( byte* ) "{" ;
     compiler->BeginBlockFlag = false ;
@@ -167,7 +167,7 @@ _CfrTil_C_Infix_EqualOp ( Word * opWord )
     Interpreter * interp = cntx->Interpreter0 ;
     Compiler *compiler = cntx->Compiler0 ;
     Word * wordr, *word0 = CfrTil_WordList ( 0 ) ;
-    Word *lhsWord = CompileMode ? compiler->LHS_Word : 0, *word0a, *rword ;
+    Word *lhsWord = compiler->LHS_Word, *word0a, *rword ;
     int64 tsrli = word0 ? word0->W_RL_Index : 0 ;
     int64 svscwi = word0 ? word0->W_SC_Index : 0 ;
     byte * svName ;
@@ -176,18 +176,18 @@ _CfrTil_C_Infix_EqualOp ( Word * opWord )
     word0a = CfrTil_WordList ( 0 ) ;
     if ( lhsWord )
     {
-        if ( ! ( lhsWord->CAttribute & ( OBJECT | THIS | QID ) || GetState ( lhsWord, QID ) ) )
+        if ( ( lhsWord->CAttribute & ( OBJECT | THIS | QID ) || GetState ( lhsWord, QID ) ) )
+        {
+            if ( ! ( word0a->CAttribute & ( ( LITERAL | NAMESPACE_VARIABLE | THIS | OBJECT | LOCAL_VARIABLE | PARAMETER_VARIABLE ) ) ) ) Compile_TosRmToTOS ( ) ;
+            wordr = _CfrTil_->PokeWord ;
+        }
+        else
         {
             int64 svState = cntx->State ;
             SetState ( cntx, C_SYNTAX | INFIX_MODE, false ) ; // we don't want to just set compiler->LHS_Word
             Interpreter_DoWord_Default ( interp, lhsWord, lhsWord->W_RL_Index, lhsWord->W_SC_Index ) ;
             cntx->State = svState ;
             wordr = _CfrTil_->StoreWord ;
-        }
-        else
-        {
-            if ( ! ( word0a->CAttribute & ( ( LITERAL | NAMESPACE_VARIABLE | THIS | OBJECT | LOCAL_VARIABLE | PARAMETER_VARIABLE ) ) ) ) Compile_TosRmToTOS ( ) ;
-            wordr = _CfrTil_->PokeWord ;
         }
     }
     else wordr = _CfrTil_->PokeWord ;
@@ -229,12 +229,12 @@ CfrTil_C_ConditionalExpression ( )
     CfrTil_If_ConditionalExpression ( ) ;
     if ( CompileMode )
     {
-        byte * token = Interpret_C_Until_Token4 ( interp, ( byte* ) ":", ( byte* ) ",", ( byte* ) ")", (byte*) "}", 0 ) ;
+        byte * token = Interpret_C_Until_Token4 ( interp, ( byte* ) ":", ( byte* ) ",", ( byte* ) ")", ( byte* ) "}", 0 ) ;
         if ( String_Equal ( token, ":" ) )
         {
             Lexer_ReadToken ( _Lexer_ ) ;
             CfrTil_Else ( ) ;
-            Interpret_C_Until_Token4 ( interp, ( byte* ) ";", ( byte* ) ",", ( byte* ) ")", (byte*) "}", 0 ) ;
+            Interpret_C_Until_Token4 ( interp, ( byte* ) ";", ( byte* ) ",", ( byte* ) ")", ( byte* ) "}", 0 ) ;
             CfrTil_EndIf ( ) ;
         }
     }
@@ -247,3 +247,138 @@ Syntax_AreWeParsingACFunctionCall ( Lexer * lexer )
     return _C_Syntax_AreWeParsingACFunctionCall ( & lexer->ReadLiner0->InputLine [ lexer->TokenStart_ReadLineIndex ] ) ;
 }
 
+int64
+IsLValue_String_CheckForwardToStatementEnd ( byte * nc )
+{
+    int64 leftBracket = 0 ;
+    while ( *nc )
+    {
+        switch ( *nc )
+        {
+            case '=':
+            {
+                if ( * ( nc + 1 ) == '=' ) return false ;
+                else if ( ispunct ( * ( nc - 1 ) ) ) return false ; // op equal
+                else return true ; // we have an lvalue
+            }
+            case '[':
+            {
+                leftBracket ++ ;
+                break ;
+            }
+            case ']':
+            {
+                if ( ( -- leftBracket ) && GetState ( _Compiler_, ARRAY_MODE ) ) return false ;
+                else break ;
+            }
+                //case '.' : if ( ! _Finder_->QualifyingNamespace ) return true ;
+                //case '(' : return false ;
+            case ';': case ',': case '"': case ')': case '{': case '}': case '\n': return false ;
+            default: ;
+        }
+        nc ++ ;
+    }
+    return false ;
+}
+
+int64
+Lexer_CheckForwardToStatementEnd_Is_LValue ( Lexer * lexer, Word * word )
+{
+    byte * inputPtr ;
+    int64 index ;
+    int64 tokenStartReadLineIndex = ( ( int64 ) word == - 1 ) ? lexer->TokenStart_ReadLineIndex : word->W_RL_Index ;
+    if ( AtCommandLine ( lexer->ReadLiner0 ) )
+    {
+        index = tokenStartReadLineIndex ;
+        inputPtr = & lexer->ReadLiner0->InputLine[index] ;
+    }
+    else
+    {
+        index = Lexer_ConvertLineIndexToFileIndex ( lexer, tokenStartReadLineIndex ) ;
+        inputPtr = & lexer->ReadLiner0->InputStringOriginal [index] ;
+    }
+    return IsLValue_String_CheckForwardToStatementEnd ( inputPtr ) ;
+
+}
+
+// assuming no comments
+
+Boolean
+Lexer_IsLValue_CheckBackToLastSemiForParenOrBracket ( Lexer * lexer, Word * word )
+{
+    ReadLiner * rl = lexer->ReadLiner0 ;
+    byte * nc = & rl->InputStringOriginal [lexer->TokenStart_FileIndex] ; //& rl->InputStringOriginal [Lexer_ConvertLineIndexToFileIndex ( lexer, word->W_RL_Index - Strlen (word->Name))] ;
+    Boolean equal = false ;
+    while ( ( *nc != ';' ) && ( *nc != ',' ) && ( *nc != '}' ) && ( *nc != '{' ) )
+    {
+        if ( ( *nc == ')' ) || ( *nc == '(' ) )
+            return Lexer_CheckForwardToStatementEnd_Is_LValue ( lexer, word ) ;
+            //else if ( *nc == '[' ) return false ;
+        else if ( *nc == '=' ) return false ;
+        else if ( *nc == '\n' ) return false ;
+        else if ( *nc == '&' ) return true ;
+        nc -- ;
+    }
+    return (! equal ) ;
+}
+// assuming no comments
+
+Boolean
+Lexer_IsLValue_CheckForwardToNextSemiForArrayVariable ( Lexer * lexer, Word * word )
+{
+    if ( ( word->CAttribute & ( OBJECT | THIS | QID ) ) || GetState ( word, QID ) )
+    {
+        ReadLiner * rl = lexer->ReadLiner0 ;
+        byte * nc = & rl->InputStringOriginal [lexer->TokenStart_FileIndex] ;
+        Boolean space = false, inArray = false ;
+        while ( ( *nc != ';' ) && ( *nc != ',' ) && ( *nc != '}' ) && ( *nc != '{' ) )
+        {
+            if ( *nc == '.' ) return true ;
+            else if ( ( ! inArray ) && space && isalnum ( *nc ) ) return false ; // false means word is to be an rvalue
+            else if ( inArray && isalpha ( *nc ) ) // true means we have an array varible with this object
+                return true ;
+            else if ( *nc == ' ' ) space = true ;
+            else if ( *nc == ')' ) return false ;
+            else if ( *nc == '[' ) inArray = true, space = false ;
+            else if ( *nc == ']' ) inArray = false, space = false ;
+            nc ++ ;
+        }
+        return true ;
+    }
+    else return false ;
+}
+
+#if 0
+
+Boolean
+Is_LValue ( Context * cntx, Word * word )
+{
+    Boolean isLValue = false, addressModeLValue = false ; // generally 
+    Compiler * compiler = cntx->Compiler0 ;
+    if ( GetState ( cntx, ADDRESS_OF_MODE ) ) addressModeLValue = true ;
+    if ( GetState ( cntx, C_SYNTAX | INFIX_MODE ) ) // lvalue is a C syntax concept
+    {
+        if ( GetState ( compiler, ARRAY_MODE ) ) isLValue = Lexer_IsLValue_CheckForwardToNextSemiForArrayVariable ( cntx->Lexer0, word ) ;
+        else isLValue = Lexer_CheckForwardToStatementEnd_Is_LValue ( cntx->Lexer0, word ) ;
+    }
+    if ( isLValue ) SetState ( _Context_, ADDRESS_OF_MODE, false ) ;
+
+    return (addressModeLValue || isLValue ) ;
+}
+#else
+Boolean
+Is_LValue ( Context * cntx, Word * word )
+{
+    Boolean isLValue = false ; // generally 
+    Compiler * compiler = cntx->Compiler0 ;
+    if ( GetState ( cntx, ADDRESS_OF_MODE ) ) isLValue = true ;
+    else if ( GetState ( cntx, C_SYNTAX | INFIX_MODE ) ) // lvalue is a C syntax concept
+    {
+        if ( GetState ( compiler, ARRAY_MODE ) ) isLValue = Lexer_IsLValue_CheckForwardToNextSemiForArrayVariable ( cntx->Lexer0, word ) ;
+        else isLValue = Lexer_CheckForwardToStatementEnd_Is_LValue ( cntx->Lexer0, word ) ;
+    }
+    SetState ( _Context_, ADDRESS_OF_MODE, false ) ;
+    return isLValue ;
+}
+
+#endif

@@ -62,6 +62,17 @@ _Namespace_AddToNamespacesHead_SetAsInNamespace ( Namespace * ns )
 }
 
 void
+Namespace_AddToNamespaces_SetUsing ( Namespace * ns, Boolean headFlag, Boolean usingFlag )
+{
+    if ( ns )
+    {
+        if ( headFlag ) _Namespace_AddToNamespacesHead ( ns ) ;
+        else _Namespace_AddToNamespacesTail ( ns ) ;
+        _Namespace_SetState ( ns, usingFlag ? USING : NOT_USING ) ;
+    }
+}
+
+void
 _Namespace_AddToNamespacesTail ( Namespace * ns )
 {
     dllist_AddNodeToTail ( _CfrTil_->Namespaces->W_List, ( dlnode* ) ns ) ;
@@ -302,13 +313,15 @@ void
 Namespace_DoNamespace ( Namespace * ns )
 {
     Context * cntx = _Context_ ;
+    Boolean isForwardDotted = Lexer_IsTokenForwardDotted ( cntx->Lexer0 ) ;
     if ( ( ! CompileMode ) || GetState ( cntx, C_SYNTAX | LISP_MODE ) )
     {
-        if ( ! Lexer_IsTokenForwardDotted ( cntx->Lexer0 ) ) _Namespace_ActivateAsPrimary ( ns ) ;
+        if ( ! isForwardDotted ) _Namespace_ActivateAsPrimary ( ns ) ;
         else Finder_SetQualifyingNamespace ( cntx->Finder0, ns ) ;
         cntx->Interpreter0->BaseObject = 0 ;
     }
-    else if ( ( Lexer_NextNonDelimiterChar ( cntx->Lexer0 ) != '.' ) && ( ! GetState ( cntx->Compiler0, LC_ARG_PARSING ) ) )
+    else if ( ( ! isForwardDotted ) && ( ! GetState ( cntx->Compiler0, LC_ARG_PARSING ) ) )
+    //else if ( ( Lexer_NextNonDelimiterChar ( cntx->Lexer0 ) != '.' ) && ( ! GetState ( cntx->Compiler0, LC_ARG_PARSING ) ) )
     {
         _Compile_C_Call_1_Arg ( ( byte* ) _Namespace_DoNamespace, ( int64 ) ns ) ;
     }
@@ -416,7 +429,7 @@ _Namespace_Clear ( Namespace * ns )
 #endif        
         //if ( String_Equal ( ns->Name, "LispDefinesNamespace" )) _Printf ( (byte*)"\n got it\n" ), Pause () ;
         //if ( ns->W_List == (dllist *) 0x7ffff71fe7b0 ) _Printf ((byte*)"" ) ;
-        
+
         DLList_Recycle_NamespaceList ( ns->W_List ) ;
         DLList_RemoveWords ( ns->W_List ) ;
         _dllist_Init ( ns->W_List ) ;
@@ -457,11 +470,17 @@ Namespace_FindOrNew_SetUsing ( byte * name, Namespace * containingNs, int64 setU
 Namespace *
 _Namespace_FindOrNew_Local ( Stack * nsStack )
 {
-    int64 d = Stack_Depth ( nsStack ) ;
-    byte bufferData [ 32 ], *buffer = ( byte* ) bufferData ;
-    sprintf ( ( char* ) buffer, "locals_%ld", d ) ;
-    Namespace * ns = Namespace_FindOrNew_SetUsing ( buffer, _CfrTil_->Namespaces, 1 ) ;
-    Stack_Push ( nsStack, ( int64 ) ns ) ; // nb. this is where the the depth increase
+    int64 d = Stack_Depth ( _Context_->Compiler0->BlockStack ) ; //nsStack ) ;
+    byte bufferData [ 32 ], *name = ( byte* ) bufferData ;
+    sprintf ( ( char* ) name, "locals_%ld", d ) ;
+    //Namespace * ns = Namespace_FindOrNew_SetUsing ( buffer, _CfrTil_->Namespaces, 1 ) ;
+    Namespace * ns = _Namespace_Find ( name, _CfrTil_->Namespaces, 0 ) ;
+    if ( ! ns )
+    {
+        ns = Namespace_New ( name, _CfrTil_->Namespaces ) ;
+        Stack_Push ( nsStack, ( int64 ) ns ) ; // nb. this is where the the depth increase
+    }
+    Namespace_SetState ( ns, USING ) ;
     _Namespace_ActivateAsPrimary ( ns ) ;
     return ns ;
 }
@@ -482,6 +501,13 @@ void
 _Namespace_PrintWords ( Namespace * ns )
 {
     dllist_Map1 ( ns->Lo_List, ( MapFunction1 ) _Word_Print, 0 ) ;
+}
+
+void
+Namespace_PrintWords ( byte * name )
+{
+    Namespace * ns ;
+    if ( ns = Namespace_Find ( name ) ) dllist_Map1 ( ns->Lo_List, ( MapFunction1 ) _Word_Print, 0 ) ;
 }
 
 void

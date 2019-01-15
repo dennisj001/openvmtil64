@@ -318,6 +318,8 @@
 #define T_ANY               T_ANY_FIXED_TYPE    
 #define LOGIC_NEGATE        ( (uint64) 1 << 25 )
 #define C_INFIX_OP_EQUAL    ( (uint64) 1 << 26 )
+#define STRUCTURE           ( (uint64) 1 << 27 )
+#define STRUCT              STRUCTURE         
 
 // _CAttribute for interpreter word types - 4 bits/ 16 possibilities : N_WordAttribute bitfield
 #define WT_PREFIX                 ( (uint64) 1 <<  0 ) 

@@ -266,12 +266,7 @@ Compiler_Optimizer_2Args_Or_WordArg1_Op ( Compiler * compiler )
     else
     {
         Boolean rm = ( optInfo->wordArg2->CAttribute & REGISTER_VARIABLE ) ? optInfo->wordArg2->RegToUse : OREG ;
-        if ( optInfo->opWord->CAttribute & CATEGORY_OP_OPEQUAL )
-            //if ( ( optInfo->opWord->CAttribute & ( CATEGORY_OP_STORE | CATEGORY_OP_EQUAL | CATEGORY_OP_OPEQUAL ) ) )
-        {
-            SetHere ( optInfo->wordArg1->Coding, 0 ) ;
-            //setHere = optInfo->wordArg1->Coding ;
-        }
+        if ( optInfo->opWord->CAttribute & CATEGORY_OP_OPEQUAL ) SetHere ( optInfo->wordArg1->Coding, 0 ) ;
         else
         {
             optInfo->Optimize_Reg = ACC | REG_ON_BIT ;
@@ -279,12 +274,13 @@ Compiler_Optimizer_2Args_Or_WordArg1_Op ( Compiler * compiler )
             else if ( optInfo->wordArg1->StackPushRegisterCode )
             {
                 _SetHere_To_Word_StackPushRegisterCode ( optInfo->wordArg1, 1 ) ;
+#if 0                
                 if ( ( GetState ( _Context_, C_SYNTAX | INFIX_MODE ) || GetState ( compiler, LC_ARG_PARSING ) ) &&
-                    String_Equal ( optInfo->opWord->Name, "=" ) &&
-                    ( ( optInfo->wordArg1->CAttribute & ( OBJECT | THIS | QID ) ) || GetState ( optInfo->wordArg1, QID ) ) )
+                    String_Equal ( optInfo->opWord->Name, "=" ) && ( ( optInfo->wordArg1->CAttribute & ( OBJECT | THIS | QID ) ) || GetState ( optInfo->wordArg1, QID ) ) )
                 {
                     Compile_Move_Rm_To_Reg ( ACC, ACC, 0 ) ;
                 }
+#endif                
             }
             else
             {

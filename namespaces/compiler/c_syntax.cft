@@ -23,8 +23,8 @@ Class
 //verbosity 3 =
 
 c_syntaxOn
-libc
-typedef _CObj
+libc C
+typedef struct _CObj
 {
     int64 hi ;
     char chars [ 32 ] ;
@@ -38,16 +38,21 @@ typedef _CObj
 "chey" CObj new ;
 CObj 
 chey.hi = 1234 ;
+_assert0 ( chey.hi 1234 ) ;
 dump ( chey, chey.size ) ;
 printf ( "\n\tchey.hi = %d", chey.hi ) ; 
 chey.chars [2] = 255 ;
 chey.heey = #x0123456789abcdef ; 
 dump ( chey, chey.size ) ;
 printf ( "\n\tchey.heey = %lx", chey.heey ) ; //pause
+chey.heey #x0123456789abcdef _assert0
 dump ( chey, chey.size ) ;
 chey.heey1 = chey.heey ;
+chey.heey = chey.heey1 ; // #x0123456789abcdef ;
 chey.heey2 = chey.heey1 ; // #x0123456789abcdef ; 
-chey.hey = chey.heey2 ; // #x0123456789abcdef ;
+chey.heey2 = chey.heey1 ; // #x0123456789abcdef ;
+chey.hey = chey.heey1 ; // #x0123456789abcdef ;
+chey.hey chey.heey1 _assert0
 dump ( chey, chey.size ) ;
 printf ( "\n\tchey.hey = %lx", chey.hey ) ; 
 //pause
@@ -56,11 +61,12 @@ chey.chars [18] = #b10110 ; // #x16
 //chey.hey = #x12345678 ;
 dump ( chey, cobj.size ) ; 
 
-p ( cobj.size ) ; 
-' chey hex p
-//logOn sl using
-p ( chey.hey ) ; 
-p ( &chey.hey ) ;
+printf ( "\ncobj.size = %d",cobj.size ) ; 
+printf ( "\n%s%lx", "\nchey = ", &chey ) ;
+printf ( "\n%s%lx", "\nchey.hey = ", chey.hey ) ;
+printf ( "\n%s%lx", "\n&chey.hey = ", &chey.hey ) ;
+hp ( chey.hey ) ; 
+hp ( &chey.hey ) ;
 //pause
 
 decimal
@@ -75,7 +81,8 @@ dump ( chey, cobj.size ) ;
 sprintf ( &chey.chars [ 24 ], "%s", "don't" ) ;
 dump ( chey, cobj.size ) ; 
 //sprintf ( &chey.chars, "%s", "well, do or don't hoot" ) ;
-sprintf ( &chey.chars, "%s", "hoot" ) ;
+sprintf ( &chey.chars, "%s", "ok! don't hoot" ) ;
+//sprintf ( &chey.chars, "%s", "hoot" ) ;
 dump ( chey, cobj.size ) ; 
 
 printf ( "\n\t%s\n", &chey.chars [ 24 ] ) ;
@@ -83,11 +90,10 @@ printf ( "\n\t%s\n", "hoot" ) ; //&chey.chars [ 24 ] ) ;
 dump ( chey, cobj.size ) ; // add '&' within parentheses for lvalue
 //pause
 scOn
+libc
 void
-chi ( chey0, d | a b c )
+chi ( CObj chey0, d | a b c )
 {
-    libc
-    //<dbg> c = 1 + 2 ;
     c = 1 + 2 ;
     b = c + 2 ;
     a = b + c ;
@@ -95,7 +101,7 @@ chi ( chey0, d | a b c )
     p ( c ) ; c 3 "c should be 3" assert // 3
     p ( b ) ; b 5 "b should be 5" assert // 5
     p ( a ) ; a 8 "a should be 8" assert // 8
-    dump ( chey0, cobj.size ) ; 
+    dump ( &chey0, cobj.size ) ; 
     d = cobj.chey0.hey ;
     hex p ( d ) ;
     printf ( "\n chi : d = %lx\n", d ) ;
@@ -111,10 +117,10 @@ chi ( chey0, d | a b c )
     _assert ( d #x0123456789abcdef ) ; 
     printf ( "\n%x\n", cobj.chey0.hey ) ;
     sprintf ( &chey0.chars [ 24 ], "%s", "hoot" ) ;
-    dump ( chey0, cobj.size ) ; 
+    dump ( &chey0, cobj.size ) ; 
 } prefix
-wdiss ( ' chi find )
-chi ( chey, 7 ) 
+wdiss ( ' chi find ) ;
+chi ( chey, 7 ) ;
 
 #if 0 // if 1
 void
@@ -178,7 +184,7 @@ fac4 ( n  | facc -- TOS )
 } prefix
 wdiss ( ' fac4 find ) ; 
 sp 
-fac4 ( 7 ) dup p 5040 _assert 
+fac4 ( 7 ) ; dup p 5040 _assert 
 c_syntaxOff
 ' fac4 find wdiss
 #endif
@@ -254,7 +260,7 @@ i2halt // for third interpret4
 
 c_syntaxOn
 C String libc
-typedef struct { byte buf [ 256 ]; } CBuffer ;
+typedef _CBuffer { byte buf [ 256 ]; } CBuffer ;
 void
 $ ( | atoken, buffer, CBuffer buffer0 ) 
 {

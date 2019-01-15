@@ -318,12 +318,14 @@ _Compile_Move ( toRegOrMem _mod reg rm controlFlags disp | opCode )
     //Compile_CalculateWrite_Instruction_X64 ( rex,  opCode,  _mod,  reg,  rm, controlFlags,  sib,  disp,  dispSize,  imm,  immSize | modRm )
     Compile_CalculateWrite_Instruction_X64 ( 0, opCode, _mod, reg, rm, controlFlags, 0, disp, 0, 0, 0 ) ;
 } prefix
-'_Compile_Move find wdiss //pause
+//'_Compile_Move find wdiss //pause
 scOn
 void
-Compile_Move ( direction, mod, reg, rm, operandSize, sib, disp, dispSize, imm, immSize | opCode controlFlags )
+Compile_Move ( uint8 direction, uint8 mod, uint8 reg, uint8 rm, uint8 operandSize, uint8 sib, int64 disp, uint8 dispSize, int64 imm, uint8 immSize )
+//Compile_Move ( direction, mod, reg, rm, operandSize, sib, disp, dispSize, imm, immSize | opCode controlFlags )
 {
-    d: controlFlags = ( disp ? DISP_B : 0 ) | ( sib ? SIB_B : 0 ) ;
+    //controlFlags = ( disp ? DISP_B : 0 ) | ( sib ? SIB_B : 0 ) ;
+    d: uint8 opCode ; uint16 controlFlags = ( disp ? DISP_B : 0 ) | ( sib ? SIB_B : 0 ) ;
     if ( imm || immSize )
     {
         reg = 0 ;
@@ -347,7 +349,7 @@ Compile_Move ( direction, mod, reg, rm, operandSize, sib, disp, dispSize, imm, i
     }
     Compile_CalculateWrite_Instruction_X64 ( 0, opCode, mod, reg, rm, controlFlags, sib, disp, dispSize, imm, immSize ) ;
 d: } prefix
-'Compile_Move find wdiss //pause 
+'Compile_Move find wdiss pause 
 
 //                                          _Compile_Move ( toRegOrMem _mod reg rm controlFlags disp | opCode ) 
 //void _Compile_Move_DataStackN_ToReg ( reg n ) { _Compile_Move ( REG, MEM, reg, DSP, (REX_B | MODRM_B | DISP_B), n * CELL ) ; } prefix 

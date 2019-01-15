@@ -143,7 +143,7 @@ _Stack_N ( Stack * stack, int64 n )
 int64
 _Stack_NOS ( Stack * stack )
 {
-    return _Stack_N ( stack, 1 ) ; //*( stack->StackPointer - 1 ) ;
+    return _Stack_N ( stack, 1 ) ; 
 }
 
 void
@@ -193,28 +193,17 @@ int64
 _Stack_Depth ( Stack * stack )
 {
     int64 depth = 0 ;
-    if ( stack ) depth = stack->StackPointer - stack->InitialTosPointer ; //+ 1 ; //1 :: zero based array - include the zero in depth 
-    return ( depth ) ; //+ 1 ) ;// + 1 :: zero based array - include the zero in depth 
+    if ( stack ) depth = stack->StackPointer - stack->InitialTosPointer ; 
+    return ( depth ) ; 
 }
 
 int64
 Stack_Depth ( Stack * stack )
 {
     // first a simple integrity check of the stack info struct
-    if ( stack && _Stack_IntegrityCheck ( stack ) )
-    {
-        return _Stack_Depth ( stack ) ;
-    }
+    if ( stack && _Stack_IntegrityCheck ( stack ) ) return _Stack_Depth ( stack ) ;
     return ( 0 ) ;
 }
-#if 0
-void
-Stack_SetStackMax ( Stack * stack, int64 value )
-{
-    stack->StackData [ stack->StackSize - 1 ] = value ;
-}
-#endif
-// Stack_Clear => Stack_Init
 
 void
 _Stack_Init ( Stack * stack, int64 slots )
@@ -223,7 +212,6 @@ _Stack_Init ( Stack * stack, int64 slots )
     stack->StackSize = slots ; // re-init size after memset cleared it
     stack->StackMin = & stack->StackData [ 0 ] ; // 
     stack->StackMax = & stack->StackData [ stack->StackSize - 1 ] ;
-
     stack->InitialTosPointer = & stack->StackData [ - 1 ] ; // first push goes to stack->StackData [ 0 ]
     stack->StackPointer = stack->InitialTosPointer ;
 }
@@ -237,7 +225,6 @@ Stack_Delete ( Stack * stack )
 void
 Stack_Init ( Stack * stack )
 {
-    //if ( stack == (Stack *) 0x7ffff71a99a0 ) _Printf ((byte*)"" ) ;
     _Stack_Init ( stack, stack->StackSize ) ;
 }
 
@@ -262,24 +249,6 @@ Stack_Copy ( Stack * stack, uint64 type )
 
     return nstack ;
 }
-
-#if 0
-
-void
-Stack_Print_AValue_WordName ( Stack * stack, int64 i, byte * stackName, byte * buffer )
-{
-    uint64 * stackPointer = stack->StackPointer ;
-    Word * word = ( Word * ) ( stackPointer [ - i ] ) ;
-    if ( word )
-    {
-        byte wname [ 128 ] ;
-        sprintf ( ( char* ) buffer, "< %s.%s >", word->ContainingNamespace ? ( char* ) word->ContainingNamespace->Name : "<literal>",
-            c_gd ( _String_ConvertStringToBackSlash ( wname, word->Name, - 1 ) ) ) ;
-        _Printf ( ( byte* ) "\n\t    %s   [ %3ld ] < " UINT_FRMT " > = " UINT_FRMT "\t%s", stackName, i,
-            ( uint64 ) & stackPointer [ - i ], stackPointer [ - i ], word ? ( char* ) buffer : "" ) ;
-    }
-}
-#endif
 
 void
 Stack_Print_AValue ( uint64 * stackPointer, int64 i, byte * stackName, byte * buffer, Boolean isWordAlreadyFlag )

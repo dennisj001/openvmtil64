@@ -563,7 +563,7 @@ typedef struct TCI
     int64 TokenFirstChar, TokenLastChar, EndDottedPos, DotSeparator, TokenLength, FoundCount, MaxFoundCount ;
     int64 FoundWrapCount, WordCount, WordWrapCount, LastWordWrapCount, FoundMarker, StartFlag, ShownWrap ;
     byte *SearchToken, * PreviousIdentifier, *Identifier ;
-    Word * TrialWord, * OriginalWord, *RunWord, *OriginalRunWord, *NextWord, *ObjectExtWord ;
+    Word * TrialWord, * OriginalWord, *RunWord, *OriginalRunWord, *NextWord, *ObjectExtWord, * LastFoundWord ;
     Namespace * OriginalContainingNamespace, * MarkNamespace ;
 } TabCompletionInfo, TCI ;
 
@@ -637,6 +637,7 @@ typedef struct Lexer
     ReadLiner * ReadLiner0 ;
     byte( *NextChar ) ( ReadLiner * rl ) ;
     byte * TokenBuffer ;
+    dllist * TokenList ;
 } Lexer ;
 
 typedef struct
@@ -928,7 +929,7 @@ typedef struct _CfrTil
     byte * TokenBuffer ;
     byte * SC_Buffer ; // nb : keep this here -- if we add this field to Lexer it just makes the lexer bigger and we want the smallest lexer possible
     int64 SC_Index, SC_QuoteMode ; // SC_Index == SC_Buffer Index ;
-    dllist *TokenList, * Compiler_N_M_Node_WordList ;
+    dllist * Compiler_N_M_Node_WordList ; //, *TokenList,  ;
     sigjmp_buf JmpBuf0 ;
 } CfrTil ;
 typedef struct

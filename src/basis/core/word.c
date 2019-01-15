@@ -125,10 +125,10 @@ Word *
 _Word_Allocate ( uint64 allocType )
 {
     Word * word = 0 ;
-    int64 size ;
-    word = ( Word* ) OVT_CheckRecycleableAllocate ( _Q_->MemorySpace0->RecycledWordList, sizeof ( Word ) + sizeof ( WordData ) ) ;
+    int64 size = ( sizeof ( Word ) + sizeof ( WordData ) ) ;
+    word = ( Word* ) OVT_CheckRecycleableAllocate ( _Q_->MemorySpace0->RecycledWordList, size ) ;
     if ( word ) _Q_->MemorySpace0->RecycledWordCount ++ ;
-    else word = ( Word* ) Mem_Allocate ( size = ( sizeof ( Word ) + sizeof ( WordData ) ), allocType ) ;
+    else word = ( Word* ) Mem_Allocate ( size, allocType ) ;
     ( ( DLNode* ) word )->n_Size = size ;
     word->S_WordData = ( WordData * ) ( word + 1 ) ; // nb. "pointer arithmetic"
     return word ;
@@ -138,6 +138,8 @@ Word *
 _Word_Create ( byte * name, uint64 ctype, uint64 ctype2, uint64 ltype, uint64 allocType )
 {
     Word * word = _Word_Allocate ( allocType ? allocType : DICTIONARY ) ;
+    if ( word == ( Word * ) 0x7ffff6eb81c8 )
+        _Printf ( ( byte* ) "got it" ) ;
     if ( allocType & ( EXISTING ) ) _Symbol_NameInit ( ( Symbol * ) word, name ) ;
     else _Symbol_Init_AllocName ( ( Symbol* ) word, name, STRING_MEM ) ;
     word->WAllocType = allocType ;
@@ -247,7 +249,7 @@ _Word_Print ( Word * word )
 void
 Word_N_M_Node_Print ( dlnode * node )
 {
-    Word * word = ( Word* ) dobject_Get_M_Slot ( ( dobject* ) node, SCN_T_WORD ) ;    
+    Word * word = ( Word* ) dobject_Get_M_Slot ( ( dobject* ) node, SCN_T_WORD ) ;
     _Word_Print ( word ) ;
 }
 

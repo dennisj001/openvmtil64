@@ -36,156 +36,25 @@ ReadLiner_GenerateFullNamespaceQualifiedName ( ReadLiner * rl, Word * w )
         }
         _Stack_Push ( nsStk, ( int64 ) ( ( ns->State & NOT_USING ) ? c_ud ( ns->Name ) : ( ns->Name ) ) ) ;
     }
-    if ( notUsing ) c_udDot = (byte*) c_ud ( "." ) ;
+    if ( notUsing ) c_udDot = ( byte* ) c_ud ( "." ) ;
     for ( i = Stack_Depth ( nsStk ) ; i ; i -- )
     {
         nsName = ( byte* ) _Stack_Pop ( nsStk ) ;
         if ( nsName )
         {
-            strcat ( (char*) b0, (char*) nsName ) ; //( CString ) notUsing ? c_dd ( nsName ) : nsName ) ;
+            strcat ( ( char* ) b0, ( char* ) nsName ) ; //( CString ) notUsing ? c_dd ( nsName ) : nsName ) ;
             if ( i > 1 )
             {
-                strcat ( (char*) b0, "." ) ; //( CString ) notUsing ? ( CString ) c_ddDot : ( CString ) "." ) ;
+                strcat ( ( char* ) b0, "." ) ; //( CString ) notUsing ? ( CString ) c_ddDot : ( CString ) "." ) ;
             }
         }
     }
     if ( ! String_Equal ( nsName, w->Name ) )
     {
         if ( ! dot ) strcat ( ( CString ) b0, ( CString ) notUsing ? ( CString ) c_udDot : ( CString ) "." ) ;
-        strcat ( (char*) b0, notUsing ? (char*) c_ud ( w->Name ) : (char*) w->Name ) ; // namespaces are all added above
+        strcat ( ( char* ) b0, notUsing ? ( char* ) c_ud ( w->Name ) : ( char* ) w->Name ) ; // namespaces are all added above
     }
     return b0 ;
-}
-
-Boolean
-_TabCompletion_Compare ( Word * word )
-{
-    ReadLiner * rl = _Context_->ReadLiner0 ;
-    TabCompletionInfo * tci = rl->TabCompletionInfo0 ;
-    byte * searchToken ;
-    int64 gotOne = 0, slst, sltwn, strOpRes = - 1 ;
-    tci->WordCount ++ ;
-    if ( word )
-    {
-        searchToken = tci->SearchToken ;
-        Word * tw = tci->TrialWord = word ;
-        byte * twn = tw->Name, *fqn ;
-        if ( twn )
-        {
-            d0 ( if ( String_Equal ( twn, "rsp" ) ) _Printf ( ( byte* ) "got it" ) ) ;
-            slst = Strlen ( ( CString ) searchToken ), sltwn = Strlen ( twn ) ;
-            if ( ! slst ) // we match anything when user ends with a dot ( '.' ) ...
-            {
-                // except .. We don't want to jump down into a lower namespace here.
-                if ( ( tw->ContainingNamespace == tci->OriginalContainingNamespace ) ) // || ( tw->ContainingNamespace == _Q_->CfrTil->Namespaces ) )
-                {
-                    gotOne = true ; //1 ;
-                }
-                else return false ;
-            }
-            else
-            {
-#if 1               
-                //tci->WordWrapCount = 8 ;
-                switch ( tci->WordWrapCount )
-                {
-                        // this arrangement allows us to see some word matches before others
-                    case 0: //case 1:
-                    {
-                        strOpRes = String_Equal ( twn, searchToken ) ;
-                        if ( ( strOpRes ) && ( slst == sltwn ) )
-                        {
-                            gotOne = true ;
-                        }
-                        break ;
-                    }
-                    case 1: case 2:
-                    {
-                        strOpRes = Stringn_Equal ( twn, searchToken, slst ) ;
-                        if ( strOpRes )
-                        {
-                            gotOne = true ;
-                        }
-                        break ;
-                    }
-#if 1                    
-                    case 3: // in case of uppercase tokens (?)
-                    {
-                        strOpRes = ( int64 ) strstr ( ( CString ) twn, ( CString ) searchToken ) ;
-                        if ( strOpRes )
-                        {
-                            gotOne = true ;
-                        }
-                        break ;
-                    }
-                        //case 3 : case 4:
-#endif                    
-                    case 4:
-                    {
-                        strOpRes = Stringni_Equal ( twn, searchToken, slst ) ;
-                        if ( strOpRes )
-                        {
-                            gotOne = true ;
-                        }
-                        break ;
-                    }
-                    case 5:
-                    {
-                        strOpRes = ( int64 ) strstr ( ( CString ) twn, ( CString ) searchToken ) ;
-                        if ( strOpRes )
-                        {
-                            gotOne = true ;
-                        }
-                        break ;
-                    }
-                    case 6: default:
-#endif                        
-                    {
-                        byte bufw [128], bufo[128] ;
-                        strToLower ( bufw, twn ) ;
-                        strToLower ( bufo, searchToken ) ;
-                        strOpRes = ( int64 ) strstr ( ( CString ) bufw, ( CString ) bufo ) ;
-                        if ( strOpRes )
-                        {
-                            gotOne = true ;
-                        }
-                        //break ;
-                    }
-                }
-            }
-            if ( gotOne )
-            {
-                if ( word->W_FoundMarker == tci->FoundMarker )
-                {
-#if 0                   
-                    tci->FoundMarker = rand ( ) ;
-                    tci->FoundWrapCount ++ ;
-                    tci->FoundCount = 0 ;
-                    if ( ++ tci->WordWrapCount > 6 ) // 5 : there are five cases in the switch in _TabCompletion_Compare
-                    {
-                        tci->WordWrapCount = 0 ;
-                    }
-#endif                    
-                    return false ;
-                }
-                word->W_FoundMarker = tci->FoundMarker ;
-                fqn = ReadLiner_GenerateFullNamespaceQualifiedName ( rl, tw ) ;
-                RL_TC_StringInsert_AtCursor ( rl, fqn ) ;
-                tci->FoundCount ++ ;
-                if ( tci->FoundCount > tci->MaxFoundCount ) tci->MaxFoundCount = tci->FoundCount ;
-                if ( _Q_->Verbosity > 2 )
-                {
-                    //if ( tci->FoundWrapCount )
-                    {
-                        _Printf ( ( byte* ) " [ Search = \'%s\' : FoundWrapCount = %d : WordWrapCount = %d : WordCount = %d : Found List Length = %d : Max List Length = %d ]",
-                            ( tci->RunWord ? tci->RunWord->Name : tci->Identifier ), tci->FoundWrapCount, tci->WordWrapCount, tci->WordCount, tci->FoundCount, tci->MaxFoundCount ) ;
-                    }
-                }
-                return true ;
-            }
-        }
-    }
-    return false ;
 }
 
 // added 0.756.541
@@ -309,6 +178,164 @@ RL_TabCompletionInfo_Init ( ReadLiner * rl )
     tci->FoundWrapCount = 0 ;
     _Context_->NlsWord = 0 ;
     tci->NextWord = tci->RunWord ;
+}
+
+Boolean
+_TabCompletion_Compare ( Word * word )
+{
+    ReadLiner * rl = _Context_->ReadLiner0 ;
+    TabCompletionInfo * tci = rl->TabCompletionInfo0 ;
+    byte * searchToken ;
+    int64 gotOne = 0, slst, sltwn, strOpRes = - 1 ;
+    tci->WordCount ++ ;
+    if ( word )
+    {
+        searchToken = tci->SearchToken ;
+        Word * tw = tci->TrialWord = word ;
+        byte * twn = tw->Name, *fqn ;
+        if ( twn )
+        {
+            d0 ( if ( String_Equal ( twn, "rsp" ) ) _Printf ( ( byte* ) "got it" ) ) ;
+            slst = Strlen ( ( CString ) searchToken ), sltwn = Strlen ( twn ) ;
+            if ( ! slst ) // we match anything when user ends with a dot ( '.' ) ...
+            {
+                // except .. We don't want to jump down into a lower namespace here.
+                if ( ( tw->ContainingNamespace == tci->OriginalContainingNamespace ) ) // || ( tw->ContainingNamespace == _Q_->CfrTil->Namespaces ) )
+                {
+                    gotOne = true ; //1 ;
+                }
+                else return false ;
+            }
+            else
+            {
+#if 1               
+                //tci->WordWrapCount = 8 ;
+                switch ( tci->WordWrapCount )
+                {
+                        // this arrangement allows us to see some word matches before others
+                    case 0: //case 1:
+                    {
+                        strOpRes = String_Equal ( twn, searchToken ) ;
+                        if ( ( strOpRes ) && ( slst == sltwn ) ) gotOne = true ;
+                        break ;
+                    }
+                    case 1: case 2:
+                    {
+                        strOpRes = Stringn_Equal ( twn, searchToken, slst ) ;
+                        if ( strOpRes ) gotOne = true ;
+                        break ;
+                    }
+#if 1                    
+                    case 3: // in case of uppercase tokens (?)
+                    {
+                        strOpRes = ( int64 ) strstr ( ( CString ) twn, ( CString ) searchToken ) ;
+                        if ( strOpRes ) gotOne = true ;
+                        break ;
+                    }
+                        //case 3 : case 4:
+#endif                    
+                    case 4:
+                    {
+                        strOpRes = Stringni_Equal ( twn, searchToken, slst ) ;
+                        if ( strOpRes ) gotOne = true ;
+                        break ;
+                    }
+                    case 5:
+                    {
+                        strOpRes = ( int64 ) strstr ( ( CString ) twn, ( CString ) searchToken ) ;
+                        if ( strOpRes ) gotOne = true ;
+                        break ;
+                    }
+                    case 6: default:
+#endif                        
+                    {
+                        byte bufw [128], bufo[128] ;
+                        strToLower ( bufw, twn ) ;
+                        strToLower ( bufo, searchToken ) ;
+                        strOpRes = ( int64 ) strstr ( ( CString ) bufw, ( CString ) bufo ) ;
+                        if ( strOpRes ) gotOne = true ;
+                        break ;
+                    }
+                }
+            }
+            if ( gotOne )
+            {
+                if ( word->W_FoundMarker == tci->FoundMarker )
+                {
+#if 0                   
+                    tci->FoundWrapCount ++ ;
+                    tci->FoundCount = 0 ;
+                    if ( ++ tci->WordWrapCount > 6 ) // 6 : there are 6 cases in the switch in _TabCompletion_Compare
+                    {
+                        tci->FoundMarker = rand ( ) ;
+                        tci->WordWrapCount = 0 ;
+                    }
+#endif                    
+                    return false ;
+                }
+                word->W_FoundMarker = tci->FoundMarker ;
+                fqn = ReadLiner_GenerateFullNamespaceQualifiedName ( rl, tw ) ;
+                RL_TC_StringInsert_AtCursor ( rl, fqn ) ;
+                tci->FoundCount ++ ;
+                if ( tci->FoundCount > tci->MaxFoundCount ) tci->MaxFoundCount = tci->FoundCount ;
+                if ( _Q_->Verbosity > 2 )
+                {
+                    //if ( tci->FoundWrapCount )
+                    {
+                        _Printf ( ( byte* ) " [ Search = \'%s\' : FoundWrapCount = %d : WordWrapCount = %d : WordCount = %d : Found List Length = %d : Max List Length = %d ]",
+                            ( tci->RunWord ? tci->RunWord->Name : tci->Identifier ), tci->FoundWrapCount, tci->WordWrapCount, tci->WordCount, tci->FoundCount, tci->MaxFoundCount ) ;
+                    }
+                }
+                return true ;
+            }
+        }
+    }
+    return false ;
+}
+
+Word *
+TC_Tree_Map ( TabCompletionInfo * tci, MapFunction mf, Word * wordi )
+{
+    Word *word = wordi, *rword = 0 ; //return word
+    while ( 1 )
+    {
+        Word *nextWord, *ns, *nextNs ; //return word
+        if ( word )
+        {
+            ns = word->S_ContainingNamespace ;
+            nextNs = ( Word* ) dlnode_Next ( ( node* ) ns ) ;
+        }
+        else ns = ( Word * ) dllist_First ( _CfrTil_->Namespaces->W_List ) ;
+        while ( ns )
+        {
+            nextNs = ( Word* ) dlnode_Next ( ( node* ) ns ) ;
+            for ( word = ( Word * ) dllist_First ( ns->S_SymbolList ) ; word ; word = nextWord )
+            {
+                nextWord = ( Word* ) dlnode_Next ( ( node* ) word ) ;
+                if ( kbhit ( ) ) return 0 ; //must be here else could loop forever !?
+                if ( mf ( ( Symbol* ) word ) )
+                {
+                    if ( nextWord ) rword = nextWord ;
+                    goto doReturn ;
+                }
+            }
+            if ( mf ( ( Symbol* ) ns ) ) break ;
+            ns = nextNs ;
+        }
+doReturn:
+        if ( ! rword )
+        {
+            if ( nextWord ) rword = nextWord ;
+            else if ( nextNs ) rword = nextNs ; //( Word* ) dllist_First ( nextNs->S_SymbolList ) ;
+            if ( ( ! rword ) && ++ tci->WordWrapCount > 6 ) // 6 : there are six cases in the switch in _TabCompletion_Compare
+            {
+                tci->FoundMarker = rand ( ) ;
+                tci->WordWrapCount = 0 ;
+            }
+        }
+        if ( rword != tci->LastFoundWord ) break ;
+    }
+    return rword ;
 }
 
 

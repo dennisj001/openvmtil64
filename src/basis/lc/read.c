@@ -34,7 +34,7 @@ _LO_Read ( LambdaCalculus * lc )
                 lc->ParenLevel -- ;
                 break ;
             }
-            else if ( l0 = LO_Read_DoToken (lc, token, qidFlag, lexer->TokenStart_ReadLineIndex, lexer->SC_Index ) )
+            else if ( l0 = LO_Read_DoToken ( lc, token, qidFlag, lexer->TokenStart_ReadLineIndex, lexer->SC_Index ) )
             {
                 if ( lnew )
                 {
@@ -45,7 +45,7 @@ _LO_Read ( LambdaCalculus * lc )
                 else lnew = l0 ;
             }
         }
-        else _SyntaxError ( (byte*) "\n_LO_Read : Syntax error : no token?\n", QUIT ) ;
+        else _SyntaxError ( ( byte* ) "\n_LO_Read : Syntax error : no token?\n", QUIT ) ;
     }
     while ( lc->ParenLevel ) ;
     SetState ( lc, LC_READ, false ) ;
@@ -55,7 +55,7 @@ _LO_Read ( LambdaCalculus * lc )
 }
 
 ListObject *
-_LO_Read_DoWord (LambdaCalculus * lc, Word * word, int64 qidFlag, int64 tsrli, int64 scwi )
+_LO_Read_DoWord ( LambdaCalculus * lc, Word * word, int64 qidFlag, int64 tsrli, int64 scwi )
 {
     ListObject *l0 = 0 ;
     byte *token1 ;
@@ -80,7 +80,12 @@ _LO_Read_DoWord (LambdaCalculus * lc, Word * word, int64 qidFlag, int64 tsrli, i
     }
     else
     {
-        if ( ( word->CAttribute & NAMESPACE_TYPE ) && Lexer_IsTokenForwardDotted ( _Context_->Lexer0 ) ) _DataObject_Run ( word ) ;
+        if ( ( word->CAttribute2 & STRUCT ) || Lexer_IsTokenForwardDotted ( _Context_->Lexer0 ) )
+        {
+            Set_CompileMode ( true ) ;
+            Object_Run ( word ) ;
+            Set_CompileMode ( true ) ;
+        }
         l0 = DataObject_New ( T_LC_NEW, word, 0, word->CAttribute, word->CAttribute2,
             ( T_LISP_SYMBOL | word->LAttribute ), 0, word->Lo_Value, 0, tsrli, scwi ) ;
     }
@@ -88,7 +93,7 @@ _LO_Read_DoWord (LambdaCalculus * lc, Word * word, int64 qidFlag, int64 tsrli, i
 }
 
 ListObject *
-_LO_Read_DoToken (LambdaCalculus * lc, byte * token, int64 qidFlag, int64 tsrli, int64 scwi )
+_LO_Read_DoToken ( LambdaCalculus * lc, byte * token, int64 qidFlag, int64 tsrli, int64 scwi )
 {
     Context *cntx = _Context_ ;
     Lexer *lexer = cntx->Lexer0 ;
@@ -97,7 +102,7 @@ _LO_Read_DoToken (LambdaCalculus * lc, byte * token, int64 qidFlag, int64 tsrli,
     if ( qidFlag ) SetState ( cntx->Finder0, QID, true ) ;
     word = LC_FindWord ( token, 0 ) ;
     if ( qidFlag ) SetState ( cntx->Finder0, QID, false ) ;
-    if ( word ) l0 = _LO_Read_DoWord (lc, word, qidFlag, tsrli, scwi ) ;
+    if ( word ) l0 = _LO_Read_DoWord ( lc, word, qidFlag, tsrli, scwi ) ;
     else
     {
         Lexer_ParseObject ( lexer, token ) ;
@@ -125,14 +130,14 @@ _LO_Read_DoLParen ( LambdaCalculus * lc )
 }
 
 ListObject *
-LO_Read_DoToken (LambdaCalculus * lc, byte * token, int64 qidFlag, int64 tsrli, int64 scwi )
+LO_Read_DoToken ( LambdaCalculus * lc, byte * token, int64 qidFlag, int64 tsrli, int64 scwi )
 {
     ListObject *l0 = 0 ;
     //if ( Is_DebugOn ) _Printf ( ( byte * ) "\n_LO_Read : \'%s\' scwi = %d", token, scwi ) ;
     if ( String_Equal ( ( char * ) token, ( byte * ) "(" ) ) l0 = _LO_Read_DoLParen ( lc ) ;
     else if ( String_Equal ( ( char * ) token, ( byte * ) "/*" ) ) CfrTil_ParenthesisComment ( ) ;
     else if ( String_Equal ( ( char * ) token, ( byte * ) "//" ) ) CfrTil_CommentToEndOfLine ( ) ;
-    else l0 = _LO_Read_DoToken (lc, token, qidFlag, tsrli, scwi ) ;
+    else l0 = _LO_Read_DoToken ( lc, token, qidFlag, tsrli, scwi ) ;
     return l0 ;
 }
 

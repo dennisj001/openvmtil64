@@ -128,18 +128,27 @@ CalculateArrayDimensionSize ( Word * arrayBaseObject, int64 dimNumber )
 // v.0.775.840
 
 int64
-Do_NextArrayToken ( byte * token, Word * arrayBaseObject, int64 objSize, Boolean saveCompileMode, Boolean *variableFlag )
+Do_NextArrayToken ( Word * tokenWord, byte * token, Word * arrayBaseObject, int64 objSize, Boolean saveCompileMode, Boolean *variableFlag )
 {
     Context * cntx = _Context_ ;
     Interpreter * interp = cntx->Interpreter0 ;
     Word * baseObject = interp->BaseObject ;
     Compiler *compiler = cntx->Compiler0 ;
+    Word * word ;
     int64 arrayIndex, increment ;
-    Word * word = Finder_Word_FindUsing ( cntx->Finder0, token, 0 ) ;
-    if ( word )
+    if ( tokenWord ) 
     {
-        word->W_RL_Index = _Lexer_->TokenStart_ReadLineIndex ;
-        word->W_SC_Index = _Lexer_->SC_Index ;
+        word = tokenWord ;
+        word = Compiler_CopyDuplicatesAndPush ( word, word->W_RL_Index, word->W_SC_Index ) ;
+    }
+    else
+    {
+        word = Finder_Word_FindUsing ( cntx->Finder0, token, 0 ) ;
+        if ( word )
+        {
+            word->W_RL_Index = _Lexer_->TokenStart_ReadLineIndex ;
+            word->W_SC_Index = _Lexer_->SC_Index ;
+        }
     }
     SetState ( compiler, ARRAY_MODE, true ) ;
     if ( token [0] == '[' ) // '[' == an "array begin"
@@ -166,6 +175,15 @@ Do_NextArrayToken ( byte * token, Word * arrayBaseObject, int64 objSize, Boolean
             if ( arrayIndex >= arrayBaseObject->ArrayDimensions [ dimNumber ] ) Error ( "Array index out of bounds.", "", ABORT ) ;
             increment = arrayIndex * dimSize * objSize ; // keep a running total of 
             if ( CompileMode ) Compiler_IncrementCurrentAccumulatedOffset ( compiler, increment ) ;
+#if 1           
+            else if ( compiler->LHS_Word == baseObject )
+            {
+                //increment = DataStack_Pop ( ) ;
+                Compiler_IncrementCurrentAccumulatedOffset ( compiler, increment ) ;
+                //CfrTil_Do_AccumulatedAddress ( word, (byte*) compiler->AccumulatedOptimizeOffsetPointer, increment ) ;
+                Do_AccumulatedAddress ( ( byte* ) compiler->AccumulatedOptimizeOffsetPointer, increment, 0 ) ;
+            }
+#endif            
             else _DataStack_SetTop ( _DataStack_GetTop ( ) + increment ) ; // after each dimension : in the end we have one lvalue remaining on the stack
             if ( Is_DebugModeOn ) Word_PrintOffset ( word, increment, baseObject->AccumulatedOffset ) ;
         }
@@ -176,7 +194,7 @@ Do_NextArrayToken ( byte * token, Word * arrayBaseObject, int64 objSize, Boolean
     if ( *variableFlag ) Set_CompileMode ( true ) ;
     else Set_CompileMode ( false ) ;
     if ( word ) Interpreter_DoWord ( interp, word, word->W_RL_Index, word->W_SC_Index ) ;
-    else Interpreter_InterpretAToken ( interp, token, - 1, - 1 ) ;
+    else Interpreter_InterpretAToken ( interp, token, _Lexer_->TokenStart_ReadLineIndex, _Lexer_->SC_Index ) ;
     DEBUG_SHOW ;
     Set_CompileMode ( saveCompileMode ) ;
     return 0 ;
@@ -189,7 +207,7 @@ Arrays_DoArrayArgs_NonLisp ( Lexer * lexer, byte * token, Word * arrayBaseObject
     do
     {
         token = Lexer_ReadToken ( lexer ) ;
-        result = Do_NextArrayToken ( token, arrayBaseObject, objSize, saveCompileMode, variableFlag ) ;
+        result = Do_NextArrayToken ( 0, token, arrayBaseObject, objSize, saveCompileMode, variableFlag ) ;
     }
     while ( ! result ) ;
 }
@@ -253,9 +271,9 @@ _CfrTil_ArrayBegin ( Boolean lispMode, Word **pl1, int64 i )
         {
             if ( ( ! Lexer_IsTokenForwardDotted ( cntx->Lexer0 ) ) && ( ! GetState ( cntx->Compiler0, LC_ARG_PARSING ) ) ) interp->BaseObject = 0 ;
             //if ( ! ( GetState ( cntx, C_SYNTAX | INFIX_MODE ) || GetState ( compiler, LC_ARG_PARSING ) ) )
-            if ( ! variableFlag ) 
-                _dllist_MapNodes_UntilWord ( dllist_First ( ( dllist* ) _CfrTil_->Compiler_N_M_Node_WordList ), 
-                    (VMapNodeFunction) SCN_Set_NotInUseForOptimization, baseObject ) ; // old version : SCN_Set_NotInUse but now keep use for source code
+            if ( ! variableFlag )
+                _dllist_MapNodes_UntilWord ( dllist_First ( ( dllist* ) _CfrTil_->Compiler_N_M_Node_WordList ),
+                ( VMapNodeFunction ) SCN_Set_NotInUseForOptimization, baseObject ) ; // old version : SCN_Set_NotInUse but now keep use for source code
             SetState ( compiler, COMPILE_MODE, saveCompileMode ) ;
             //SetState ( compiler, ARRAY_MODE, false ) ;
         }

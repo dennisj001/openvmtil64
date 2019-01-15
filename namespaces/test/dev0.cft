@@ -4,7 +4,8 @@ Int
 bnOff dbgOff 
 scOn
 Root : sp ; //stack pause ;
-C : sp ; //stack pause ;
+C 
+: sp ; //stack pause ;
 dbOn 0 =
 User 
 : sp ; // stack pause ;

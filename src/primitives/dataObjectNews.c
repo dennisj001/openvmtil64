@@ -37,17 +37,18 @@ CfrTil_Type_New ( )
     Namespace * ns = 0 ;
     CfrTil_Token ( ) ;
     name = ( byte* ) DataStack_Pop ( ) ;
-    if ( ! ( ( String_Equal ( "struct", name ) ) || ( String_Equal ( "class", name ) ) ) )
+    if ( ( String_Equal ( "struct", name ) ) || ( String_Equal ( "class", name ) ) )
     {
-        ns = DataObject_New ( C_TYPE, 0, name, 0, 0, 0, 0, 0, 0, 0, - 1 ) ;
+        CfrTil_Token ( ) ;
+        name = ( byte* ) DataStack_Pop ( ) ;
     }
+    ns = DataObject_New ( C_TYPE, 0, name, 0, 0, 0, 0, 0, 0, 0, - 1 ) ;
     return ns ;
 }
 
 void
 CfrTil_Typedef ( )
 {
-    //_CfrTil_Attributedef ( ) ;
     DataObject_New ( C_TYPEDEF, 0, 0, 0, 0, 0, 0, 0, 0, 0, - 1 ) ;
 }
 

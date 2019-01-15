@@ -9,7 +9,8 @@ Word *
 DataObject_New ( uint64 type, Word * word, byte * name, uint64 ctype, uint64 ctype2, uint64 ltype,
     int64 index, int64 value, int allocType, int64 tsrli, int64 scwi )
 {
-    Word_SetTsrliScwi( word, tsrli, scwi ) 
+    Context * cntx = _Context_ ;
+    Word_SetTsrliScwi ( word, tsrli, scwi )
     if ( word && ( ! ( type & ( T_LC_NEW | T_LC_LITERAL ) ) ) ) Word_Recycle ( word ) ;
     switch ( type )
     {
@@ -82,6 +83,7 @@ DataObject_New ( uint64 type, Word * word, byte * name, uint64 ctype, uint64 cty
         {
             word = _Class_New ( name, C_TYPE, 0 ) ;
             Type_Create ( ) ;
+            if ( GetState ( cntx, C_SYNTAX ) ) Compiler_SetAs_InNamespace_C_BackgroundNamespace ( cntx->Compiler0 ) ;
             break ;
         }
         case C_TYPEDEF:
@@ -123,8 +125,9 @@ _CfrTil_ObjectNew ( int64 size, byte * name, uint64 category, int64 allocType )
 }
 
 void
-_Class_Object_Init ( Word * word, Namespace * ns )
+_Class_Object_Init ( Word * word, Namespace * ins )
 {
+    Namespace * ns = ins ;
     Stack * nsstack = _Context_->Compiler0->InternalNamespacesStack ;
     Stack_Init ( nsstack ) ; // !! ?? put this in Compiler ?? !!
     // init needs to be done by the most super class first successively down to the current class 
@@ -152,7 +155,8 @@ _Class_Object_Init ( Word * word, Namespace * ns )
         //if ( Is_DebugOn ) CfrTil_PrintDataStack ( ) ;
     }
     SetState ( _Debugger_, DEBUG_SHTL_OFF, false ) ;
-    word->TypeNamespace = ns ;
+    word->TypeNamespace = ins ;
+    if ( ins->CAttribute2 & STRUCT ) word->CAttribute2 |= STRUCT ;
     //DebugShow_On ;
 }
 
@@ -177,7 +181,8 @@ _Class_Object_New ( byte * name, uint64 category )
 Namespace *
 _Class_New ( byte * name, uint64 type, int64 cloneFlag )
 {
-    //if ( String_Equal ( name, "a")) _Printf ((byte*) "") ;
+    Context * cntx = _Context_ ;
+    if ( GetState ( cntx, C_SYNTAX ) ) Compiler_Get_C_BackgroundNamespace ( cntx->Compiler0 ) ;
     Namespace * ns = _Namespace_Find ( name, 0, 0 ), * sns ;
     int64 size = 0 ;
     if ( ! ns )
@@ -197,8 +202,8 @@ _Class_New ( byte * name, uint64 type, int64 cloneFlag )
     }
     else
     {
-        _Printf ( ( byte* ) "\nNamespace Error at %s ? : \'%s\' already exists! : %s : size = %d\n", 
-            Context_Location (), ns->Name, _Word_SourceCodeLocation_pbyte ( ns ), ns->ObjectSize ) ;
+        _Printf ( ( byte* ) "\nNamespace Error at %s ? : \'%s\' already exists! : %s : size = %d\n",
+            Context_Location ( ), ns->Name, _Word_SourceCodeLocation_pbyte ( ns ), ns->ObjectSize ) ;
         Namespace_DoNamespace ( ns ) ;
     }
     CfrTil_WordList_Init ( 0, 0 ) ;
@@ -212,7 +217,7 @@ _CfrTil_ClassField_New ( byte * token, Class * aclass, int64 size, int64 offset 
     Word * word = _DObject_New ( token, 0, ( IMMEDIATE | OBJECT_FIELD | CPRIMITIVE ), 0, 0, OBJECT_FIELD, ( byte* ) _DataObject_Run, 0, 1, 0, DICTIONARY ) ;
     word->TypeNamespace = aclass ;
     word->ObjectSize = size ;
-    if ( size == 1 ) attribute = T_BYTE ; 
+    if ( size == 1 ) attribute = T_BYTE ;
     else if ( size == 8 ) attribute = T_INT64 ;
     word->CAttribute |= attribute ;
     word->Offset = offset ;
@@ -241,7 +246,7 @@ _CfrTil_Label ( byte * lname )
 {
     GotoInfo * gotoInfo = GotoInfo_New ( lname, GI_LABEL ) ;
     gotoInfo->LabeledAddress = Here ;
-    Namespace * ns = Namespace_FindOrNew_SetUsing (( byte* ) "__labels__", _CfrTil_->Namespaces, 1 ) ;
+    Namespace * ns = Namespace_FindOrNew_SetUsing ( ( byte* ) "__labels__", _CfrTil_->Namespaces, 1 ) ;
     if ( _Finder_FindWord_InOneNamespace ( _Finder_, ns, lname ) )
     {
         byte bufferData [ 32 ] ;

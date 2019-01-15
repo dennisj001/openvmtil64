@@ -294,6 +294,7 @@ dscOn //verbosity 3 =
         { n @ m @ "assertStkChk" _assert1 }
         ifElse
     } if2 
+    //stack pause
 ; 
 //' _assertStkChk find wdiss //pause
 : assertStkChk _assertStkChk ; //"\n_assertStkChk : " ps stack pause ; 
@@ -355,7 +356,7 @@ stringMacrosOn
 
 Root 
 dbgOff
-//dbgOn 
+dbgOn 
 'todo 0 const  
 'doX64 1 const
 'doScript 1 const
@@ -380,7 +381,7 @@ stringMacrosOff
 #if doInitTest
 #endif
 : tx64 "namespaces/compiler/x64.back.cft" include ;
-tx64
+//tx64
 #endif 
 
 postfix 

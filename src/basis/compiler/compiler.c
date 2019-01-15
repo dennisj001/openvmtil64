@@ -35,21 +35,24 @@ _CfrTil_CopyDuplicates ( Word * word0 )
     word0->CAttribute2 &= ( ~ RECYCLABLE_COPY ) ;
     word1 = ( Word * ) dllist_Map1_WReturn ( _CfrTil_->Compiler_N_M_Node_WordList, ( MapFunction1 ) CopyDuplicateWord, ( int64 ) word0 ) ;
     if ( word1 ) wordToBePushed = word1 ;
-    else wordToBePushed = word0 ;
+    else wordToBePushed = word0 ; // no duplicate found push word0
     return wordToBePushed ;
 }
 
 Word *
 Compiler_CopyDuplicatesAndPush ( Word * word0, int64 tsrli, int64 scwi )
 {
+    Word *wordp ;
     if ( ( word0->CAttribute & ( DEBUG_WORD | INTERPRET_DBG ) ) || ( word0->LAttribute & ( W_COMMENT | W_PREPROCESSOR ) ) ) return word0 ;
     if ( word0 && CompileMode )
     {
-        word0 = _CfrTil_CopyDuplicates ( word0 ) ;
+        wordp = _CfrTil_CopyDuplicates ( word0 ) ;
+        //if ( wordp == word0 ) _Printf ( ( byte* ) "\nGot it = %s", wordp->Name ) ;
     }
-    Lexer_Set_ScIndex_RlIndex ( _Lexer_, word0, tsrli, scwi ) ;
-    CfrTil_WordList_PushWord ( word0 ) ;
-    return word0 ;
+    else wordp = word0 ;
+    Lexer_Set_ScIndex_RlIndex ( _Lexer_, wordp, tsrli, scwi ) ;
+    CfrTil_WordList_PushWord ( wordp ) ;
+    return wordp ;
 }
 
 void
@@ -307,6 +310,7 @@ Compiler_Init_AccumulatedOffsetPointers ( Compiler * compiler, Word * word )
     else compiler->AccumulatedOptimizeOffsetPointer = 0 ;
 }
 #if 0
+
 void
 Compiler_Init ( Compiler * compiler, uint64 state, int64 flags )
 {
@@ -348,6 +352,7 @@ Compiler_Init ( Compiler * compiler, uint64 state, int64 flags )
     SetState ( compiler, VARIABLE_FRAME, false ) ;
 }
 #else
+
 void
 Compiler_Init ( Compiler * compiler, uint64 state, int64 flags )
 {
@@ -381,7 +386,7 @@ Compiler_Init ( Compiler * compiler, uint64 state, int64 flags )
     _dllist_Init ( compiler->RegisterParameterList ) ;
     _dllist_Init ( compiler->OptimizeInfoList ) ;
     if ( flags ) CfrTil_TypeStackReset ( ) ;
-    if ( GetState ( _CfrTil_, RT_DEBUG_ON ) ) 
+    if ( GetState ( _CfrTil_, RT_DEBUG_ON ) ) //|| ( _CfrTil_->CurrentWordBeingCompiled && ( ( ! flags ) || GetState ( _CfrTil_, GLOBAL_SOURCE_CODE_MODE ) ) ) )
     {
         _CfrTil_->CurrentWordBeingCompiled->NamespaceStack = Stack_Copy ( compiler->LocalsCompilingNamespacesStack, CONTEXT ) ;
         Namespace_RemoveNamespacesStack ( compiler->LocalsCompilingNamespacesStack ) ;
@@ -393,7 +398,7 @@ Compiler_Init ( Compiler * compiler, uint64 state, int64 flags )
     else
     {
         Compiler_FreeAllLocalsNamespaces ( compiler ) ;
-        _CfrTil_RecycleInit_Compiler_N_M_Node_WordList ( 0 ) ;
+        _CfrTil_RecycleInit_Compiler_N_M_Node_WordList ( flags ) ; //flags ) ;
     }
     SetState ( _CfrTil_, RT_DEBUG_ON, false ) ;
     Compiler_CompileOptimizeInfo_PushNew ( compiler ) ;
