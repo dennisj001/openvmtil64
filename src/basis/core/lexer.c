@@ -219,7 +219,7 @@ _Lexer_ConsiderDebugAndCommentTokens ( byte * token, int64 evalFlag )
         Word_Eval ( word ) ;
         return true ;
     }
-#if 0  // this needs to be re-thought  
+#if 0  // this needs to be re-considered
     else if ( word && ( word->CAttribute & DEBUG_WORD ) )
     {
         if ( evalFlag ) Word_Eval ( word ) ;

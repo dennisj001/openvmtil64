@@ -258,7 +258,7 @@ void
 _Debugger_FindAny ( Debugger * debugger )
 {
 
-    if ( debugger->Token ) debugger->w_Word = _CfrTil_FindInAnyNamespace ( debugger->Token ) ;
+    if ( debugger->Token ) debugger->w_Word = CfrTil_FindInAnyNamespace ( debugger->Token ) ;
 }
 
 void

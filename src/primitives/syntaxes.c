@@ -81,10 +81,9 @@ CfrTil_C_Semi ( )
     _Compiler_->LHS_Word = 0 ;
     if ( ! Compiling )
     {
-        //CfrTil_InitSourceCode ( _CfrTil_ ) ;
-        //Namespace_RemoveNamespacesStack ( _Compiler_->LocalsCompilingNamespacesStack ) ;
-        //Compiler_DeleteDebugInfo ( _Compiler_ ) ;
-        Compiler_Init ( _Compiler_, 0, 1 ) ;
+        CfrTil_InitSourceCode ( _CfrTil_ ) ;
+        //Compiler_Init ( _Compiler_, 0, 1 ) ;
+        Compiler_DeleteDebugInfo ( _Compiler_ ) ;
     }
 }
 

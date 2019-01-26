@@ -231,18 +231,6 @@ _CfrTil_Parse_LocalsAndStackVariables ( int64 svf, int64 lispMode, ListObject * 
         if ( token )
         {
             if ( String_Equal ( token, "(" ) ) continue ;
-            word = Finder_Word_FindUsing ( finder, token, 1 ) ; // ?? find after Literal - eliminate making strings or numbers words ??
-            if ( word && ( word->CAttribute & ( NAMESPACE | CLASS ) ) && ( CharTable_IsCharType ( ReadLine_PeekNextChar ( lexer->ReadLiner0 ), CHAR_ALPHA ) ) )
-            {
-#if 0                
-                Word * iword ;
-                if ( ( iword = Finder_FindWord_InOneNamespace ( _Finder_, word, ( byte* ) "init" ) )
-                    || ( _Namespace_VariableValueGet ( word, ( byte* ) "size" ) > 8 ) )
-#endif                
-                    if ( word->CAttribute2 & STRUCTURE )
-                        typeNamespace = word ;
-                continue ;
-            }
             if ( String_Equal ( ( char* ) token, "|" ) )
             {
                 svff = 0 ; // set stack variable flag to off -- no more stack variables ; begin local variables
@@ -286,6 +274,18 @@ _CfrTil_Parse_LocalsAndStackVariables ( int64 svf, int64 lispMode, ListObject * 
                 break ;
             }
 #endif            
+            word = Finder_Word_FindUsing ( finder, token, 1 ) ; // ?? find after Literal - eliminate making strings or numbers words ??
+            if ( word && ( word->CAttribute & ( NAMESPACE | CLASS ) ) && ( CharTable_IsCharType ( ReadLine_PeekNextChar ( lexer->ReadLiner0 ), CHAR_ALPHA ) ) )
+            {
+#if 0                
+                Word * iword ;
+                if ( ( iword = Finder_FindWord_InOneNamespace ( _Finder_, word, ( byte* ) "init" ) )
+                    || ( _Namespace_VariableValueGet ( word, ( byte* ) "size" ) > 8 ) )
+#endif                
+                    if ( word->CAttribute2 & STRUCTURE )
+                        typeNamespace = word ;
+                continue ;
+            }
             if ( getReturnFlag )
             {
                 addWords = 0 ;

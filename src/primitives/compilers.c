@@ -223,7 +223,7 @@ CfrTil_Variable ( )
 {
     byte * name = ( byte* ) DataStack_Pop ( ) ;
     Word * word = DataObject_New ( NAMESPACE_VARIABLE, 0, name, NAMESPACE_VARIABLE, 0, 0, 0, 0, 0, - 1, - 1 ) ;
-    _CfrTil_Finish_WordSourceCode ( _CfrTil_, word ) ;
+    if ( ! Compiling ) _CfrTil_Finish_WordSourceCode ( _CfrTil_, word ) ;
 }
 
 // "{|" - exit the Compiler start interpreting

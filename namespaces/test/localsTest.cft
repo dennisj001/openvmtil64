@@ -15,12 +15,13 @@ taa ( one two three )
 {
     int64 four, five ;
     four = one + two + three ;
-    five = four + four ;
+    five = one + two + three + four ;
     p ( one ) ;
     p ( two ) ;
     p ( three ) ;
     p ( five ) ;
     nl () ;
+    <dbg>
 }
 taa ( 1 2 3 ) ;
 c_syntaxOff
@@ -34,8 +35,35 @@ c_syntaxOff
     three @ p 
     five @ p 
     nl
+    //<dbg>
 ;
 1 2 3 tbb
+sp
+: hi ( a b ) a @ b @ + p ; : hey ( a b ) a @ b @ hi a @ b @ hi a @ b @ hi ; 1 2 hey nl     
+C
+dscOn //verbosity 3 =
+: hi ( m x | n -- n ) n m @ = n @ p ; 
+: hey ( m x | n -- n ) n m @ = n @ 1 hi p n @ 1 hi p n @ 1 hi p ; 
+: heey ( m x | n -- n ) n m @ = n @ 1 hey p n @ 1 hey p n @ 1 hey p ; 
+7 1 heey dup p 7 _assert verbosity 1 = //pause
+nl
+// demonstrate calling order of local variables
+: a123 ( one two three )
+
+    one @ p
+    two @ p
+    three @ p
+;
+1 2 3 a123 nl
+: a1234 ( one two three four )
+
+    one @ p
+    two @ p
+    three @ p
+    four @ p
+    //<dbg>
+;;
+a1234 ( 1 2 3 4 )
 sp
 : hi ( a b ) a @ b @ + p ; : hey ( a b ) a @ b @ hi a @ b @ hi a @ b @ hi ; 1 2 hey       
 C

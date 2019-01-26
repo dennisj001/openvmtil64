@@ -18,6 +18,7 @@ optimizeOff inlineOff
 Root 
 : ' _tick ; immediate
 : find _find ; immediate
+: findAny _findAny ; immediate
 //_dbgOn 'tick ' _tick find alias immediate
 'tick ' _tick find alias immediate
 'ndrop '_ndrop find alias immediate 
@@ -281,7 +282,7 @@ dscOn //verbosity 3 =
 : _assertStkChk ( n m | str )  
     { verbosity @ }
     {
-        { 1 } //DebugFlag @ } 
+        { DebugFlag @ } 
         { 
             debugColors
             str "\n assertStkChk ::" = 
@@ -292,7 +293,7 @@ dscOn //verbosity 3 =
             defaultColors 
         } 
         { 
-            "\nassertStkChk : " ps n @ p m @ p 
+            //"\nassertStkChk : " ps n @ p m @ p 
             n @ m @ "assertStkChk" _assert1 
         }
         ifElse
@@ -367,12 +368,12 @@ stringMacrosOn
 
 Root 
 dbgOff
-dbgOn 
+//dbgOn 
 'todo 0 const  
 'doX64 1 const
 'doScript 1 const
 'doScript2 1 const
-'_doDemo 0 const    
+'_doDemo 1 const    
 
 #if Is_DebugOn 
 
@@ -393,65 +394,10 @@ stringMacrosOff
 
 #else // of course you can trim this file to your needs and put your init code maybe here if you like
 
-'doInitTest 1 const
+'doInitTest 0 const
 #if doInitTest
 #endif
 //tx64
-c_syntaxOn
-int64
-taa ( one two three )
-{
-    int64 four, five ;
-    four = one + two + three ;
-    five = four + four ;
-    p ( one ) ;
-    p ( two ) ;
-    p ( three ) ;
-    p ( five ) ;
-    nl () ;
-    <dbg>
-}
-taa ( 1 2 3 ) ;
-c_syntaxOff
-//: tbb ( one two three | four five )
-: tbb ( one two three )
-    'four var  'five var
-    four one @ two @ three @ + + = 
-    five four @ four @ + = 
-    one @ p 
-    two @ p 
-    three @ p 
-    five @ p 
-    nl
-    <dbg>
-;
-1 2 3 tbb
-sp
-: hi ( a b ) a @ b @ + p ; : hey ( a b ) a @ b @ hi a @ b @ hi a @ b @ hi ; 1 2 hey nl     
-C
-dscOn //verbosity 3 =
-: hi ( m x | n -- n ) n m @ = n @ p ; 
-: hey ( m x | n -- n ) n m @ = n @ 1 hi p n @ 1 hi p n @ 1 hi p ; 
-: heey ( m x | n -- n ) n m @ = n @ 1 hey p n @ 1 hey p n @ 1 hey p ; 
-7 1 heey dup p 7 _assert verbosity 1 = //pause
-nl
-// demonstrate calling order of local variables
-: a123 ( one two three )
-
-    one @ p
-    two @ p
-    three @ p
-;
-1 2 3 a123 nl
-: a1234 ( one two three four )
-
-    one @ p
-    two @ p
-    three @ p
-    four @ p
-    <dbg>
-;;
-a1234 ( 1 2 3 4 )
 #endif 
 
 postfix 

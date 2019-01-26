@@ -277,9 +277,9 @@ _CfrTil_InNamespace ( )
 }
 
 Boolean
-_CfrTil_IsContainingNamespace ( byte * wordName, byte * namespaceName )
+_CfrTil_IsContainingNamespace ( byte * name, byte * namespaceName )
 {
-    Word * word = Finder_FindWord_UsedNamespaces ( _Finder_, ( byte* ) wordName ) ;
+    Word * word = _Finder_Word_Find ( _Finder_, USING, name ) ; 
     if ( word && String_Equal ( ( char* ) word->ContainingNamespace->Name, namespaceName ) ) return true ;
     else return false ;
 }
@@ -296,7 +296,7 @@ _Namespace_DoNamespace ( Namespace * ns )
 #if 0
 
 void
-Namespace_DoNamespace ( Namespace * ns, int64 immFlag )
+Namespace_DoNamespace (Namespace * ns, 0)
 {
     Context * cntx = _Context_ ;
     if ( ( ! immFlag ) && CompileMode && ( Lexer_NextNonDelimiterChar ( cntx->Lexer0 ) != '.' ) && ( ! GetState ( cntx->Compiler0, LC_ARG_PARSING ) ) )
@@ -310,10 +310,9 @@ Namespace_DoNamespace ( Namespace * ns, int64 immFlag )
 #else
 
 void
-Namespace_DoNamespace ( Namespace * ns )
+Namespace_DoNamespace (Namespace * ns, Boolean isForwardDotted)
 {
     Context * cntx = _Context_ ;
-    Boolean isForwardDotted = Lexer_IsTokenForwardDotted ( cntx->Lexer0 ) ;
     if ( ( ! CompileMode ) || GetState ( cntx, C_SYNTAX | LISP_MODE ) )
     {
         if ( ! isForwardDotted ) _Namespace_ActivateAsPrimary ( ns ) ;
@@ -331,7 +330,7 @@ Namespace_DoNamespace ( Namespace * ns )
 void
 Namespace_DoNamespace_Name ( byte * name )
 {
-    Namespace_DoNamespace ( Namespace_Find ( name ) ) ;
+    Namespace_DoNamespace (Namespace_Find ( name ), 0) ;
 }
 
 void

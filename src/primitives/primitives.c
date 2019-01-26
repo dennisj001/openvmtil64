@@ -145,6 +145,7 @@ CPrimitive CPrimitives [] = {
     { "namespace", 0, 0, 0, CfrTil_Namespace_New, 0, 0, 0, "Namespace", "Root" },
     //{ "sealed", 0, 0, 0, CfrTil_NamespaceSealed, 0, 0, 0, "Namespace", "Root" },
     { "_find", 0, 0, 0, CfrTil_Postfix_Find, 0, 0, 0, "Namespace", "Root" },
+    { "_findAny", 0, 0, 0, CfrTil_Postfix_FindAny, 0, 0, 0, "Namespace", "Root" },
 
     { "};", 0, 0, 0, CfrTil_ClassStructureEnd, 0, 0, 0, "Class", "Root" },
     { "+:{", 0, 0, 0, CfrTil_CloneStructureBegin, 0, 0, 0, "Class", "Root" },

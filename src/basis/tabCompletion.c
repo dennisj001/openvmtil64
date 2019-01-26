@@ -135,7 +135,7 @@ RL_TabCompletionInfo_Init ( ReadLiner * rl )
     if ( tci->DotSeparator )
     {
         tci->PreviousIdentifier = _TabCompletionInfo_GetAPreviousIdentifier ( rl, tci->DotSeparator - 1 ) ; // TokenStart refers to start of 'Identifier'
-        if ( tci->PreviousIdentifier && ( piw = _CfrTil_FindInAnyNamespace ( tci->PreviousIdentifier ) ) )
+        if ( tci->PreviousIdentifier && ( piw = CfrTil_FindInAnyNamespace ( tci->PreviousIdentifier ) ) )
         {
             if ( Is_NamespaceType ( piw ) )
             {
@@ -154,7 +154,7 @@ RL_TabCompletionInfo_Init ( ReadLiner * rl )
     else
     {
         if ( ( tci->OriginalWord = _Finder_FindWord_InOneNamespace ( _Finder_, _CfrTil_Namespace_InNamespaceGet ( ), tci->Identifier ) ) ||
-            ( tci->OriginalWord = _CfrTil_FindInAnyNamespace ( tci->Identifier ) ) )
+            ( tci->OriginalWord = CfrTil_FindInAnyNamespace ( tci->Identifier ) ) )
         {
             if ( Is_NamespaceType ( tci->OriginalWord ) && ( tci->EndDottedPos ) )
             {

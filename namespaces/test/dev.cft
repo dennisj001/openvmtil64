@@ -3,14 +3,14 @@
 : sp ; //s pause ; 
 sp
 optimizeOn inlineOn 
-//typecheckOn 
-t:
+typecheckOn 
+
 lispOff
 bnOff 
 // optimizeOff inlineOff
 // verbosity 2 = 
 Compiler Logic Int C User 
-: sp ; //stack pause ;
+: sp ;
 var: facTest fibTest Dsp ;
 
 // tail recursion from http://c2.com/cgi/wiki?TailCallOptimization
@@ -32,7 +32,7 @@ int factoriali ( REG n | REG res )
 } prefix
 c_syntaxOff 
 'factoriali find wdiss //pause
-factoriali (7) dup p 5040 _assert //pause //sp
+C_Syntax.factoriali (7) dup p 5040 _assert //pause //sp
 //dscOff
 : factorial ( n  | fac -- TOS ) 
     fac 1 = 
@@ -48,9 +48,9 @@ factoriali (7) dup p 5040 _assert //pause //sp
 : bexp3 ( n ) { n @ 1 > } { n @ n @ -- bexp3 *  } { 1 } ifElse ;
 7 bexp3 dup p 5040 _assert //sp
 'bexp3 find wdiss //pause
-
+C 
+: sp ; //stack pause ;
 c_syntaxOn
-#if 1
 int
 faccs3 ( n | rec -- TOS ) 
 {
@@ -61,8 +61,9 @@ faccs3 ( n | rec -- TOS )
     //return facc ;
 }
 ' faccs3 find wdiss
-faccs3 ( 7 ) dup p 5040 _assert //sp
-#endif
+faccs3 ( 7 ) dup p 5040 _assert 
+
+sp
 
 int
 fac5 ( REG n  | REG facc -- RAX ) 
@@ -70,13 +71,14 @@ fac5 ( REG n  | REG facc -- RAX )
     facc = 1 ;
     while ( n > 1 ) 
     {
+        //facc = facc * n -- ; 
         facc = facc * ( n -- ) ; // parenthesis a must for now ??
     }
     return facc ;
 }
 wdiss ( ' fac5 find ) ; 
-//pause ;
-fac5 ( 7 ) dup p 5040 _assert //sp
+fac5 ( 7 ) dup p 5040 _assert 
+sp
 
 int
 faccs ( REG n | REG rec -- RAX ) 
@@ -89,7 +91,8 @@ faccs ( REG n | REG rec -- RAX )
     return rec ;
 }
 ' faccs find wdiss
-faccs ( 7 ) dup p 5040 _assert //sp
+faccs ( 7 ) dup p 5040 _assert 
+sp
 
 int
 fac5 ( REG n  | REG facc ) 
@@ -102,8 +105,8 @@ fac5 ( REG n  | REG facc )
     return facc ;
 }
 //wdiss ( ' fac5 find ) 
-fac5 ( 7 ) dup p 5040 _assert  // pause
-
+fac5 ( 7 ) dup p 5040 _assert  
+sp
 int
 faccs2 ( REG n | REG rec ) 
 {
@@ -115,8 +118,9 @@ faccs2 ( REG n | REG rec )
 }
 ' faccs2 find wdiss
 faccs2 ( 7 ) dup p 5040 _assert 
+sp
 c_syntaxOff
-
+Locals
 : fac ( n  | res -- TOS ) 
     res 1 = 
     { n @ 1 > } { res n @ res @ * = n -- } while 
@@ -166,8 +170,8 @@ User
 
 nl "ffx ... " ps nl
 
-: ffx ( wn | w ) 1 ti w wn @ _find = w @ wdiss 3 w @ _ffx nl wn @ ps ":" ps 1 time nl ;
-: ffx2 ( wn | w ) 1 ti w wn @ _find = w @ wdiss w @ 3 _ffx2 1 time nl ;
+: ffx ( wn | w ) 1 ti w wn @ _findAny = w @ wdiss 3 w @ _ffx nl wn @ ps ":" ps 1 time nl ;
+: ffx2 ( wn | w ) 1 ti w wn @ _findAny = w @ wdiss w @ 3 _ffx2 1 time nl ;
 c_syntaxOn
 User
 int
@@ -211,11 +215,12 @@ User
 "cfactorial_O3" ffx
 "cfactorial2_O3" ffx
 "cfactorial3_O3" ffx
-using  
+using 
 "factorial" ffx
 "faccs" ffx
 "fac5" ffx
 "fac4" ffx
+sp
 #else
 : _ffx_fib ( n w | t ) nl 7 w @ wordRun decimal p nl { t 0 = } { t @ n @ < } { t ++ } { 1 w @ iFactorialX } for ;
 : ffx_fib ( wn | d ) 1 ti d fibPTC2? = d @ wdiss 1 d @ _ffx_fib nl wn @ ps ":" ps 1 time nl ;
@@ -231,7 +236,7 @@ int cpow ( base power | out ) { for ( out = 1 ; power ; power -= 1 ) { out = out
 //verbosity 3 =
 'cpow find wdiss
 c_syntaxOff
-2 30 cpow dup p  1073741824 _assert //pause
+2 30 C_Syntax.cpow dup p  1073741824 _assert //pause
 
 #if 1
 : sp ; //stack pause ;
@@ -320,13 +325,14 @@ fibPTC2? ( REG n | REG fn, REG fn1, REG fn2 )
 20 int.fibPTC2? dup p 6765 _assert sp 
 c_syntaxOff
 //"fibPTC?" ffx 
+: sp ;
 sp
 
 : _fibn1 ( n -- TOS ) { n @ 2 < } { n @ } { n -- n @ _fibn1 n -- n @  _fibn1 + } ifElse ;
 ' _fibn1 find wdiss 20 _fibn1 p // sp
 : _fib1 ( n ) { n @ 2 < } { n @ } { n @ -- _fib1 n @ 2 - _fib1 + } ifElse ;
 sp
-: sp stack pause ;    
+: sp ;    
 : _fib 
     dup 2 <  
     if{ 
@@ -354,12 +360,11 @@ sp
 ;
 ' _fib4 find wdiss
 20 _fib4 dup p 6765 assert0 
-: sp ;
 sp
 Locals
 "fib1" ( n ) { 1 ti n @ _fib1 p 1 time } word 
-sp
 C 
+: sp ;
 'cfib2_O3 find wdiss //sp
 #if 1
 : fib  ( n ) 1 ti n @ _fib  p 1 time ;
@@ -367,6 +372,8 @@ C
 : fib3 ( n ) 1 ti n @ _fib3 p 1 time ;
 : fib4 ( n ) 1 ti n @ _fib4 p 1 time ;
 #endif
+C_Syntax Interpreter
+: sp ;
 : fibn0 ( n ) 1 ti n @ _fibn0 p 1 time ;
 : Cfib ( n ) 1 ti n @ cfib  p 1 time ;
 : Cfib_O3 ( n ) 1 ti n @ cfib_O3  p 1 time ;
@@ -430,6 +437,8 @@ sp
 // 40 fibx3 
 sp
 bnOn
+: sp ;
+sp
 : tbn ( | n m ) n 0 = m 3 = n m @ += n m @ += n m @ += n @ p ; tbn nl "should be 9" ps
 s: fibBN ( n | fn fn1 fn2 -- TOS ) 
     { fn 0 = fn1 0 = fn2 1 = } { n @ 0 > } { n 1 -= } 
@@ -444,6 +453,7 @@ s: fibBN ( n | fn fn1 fn2 -- TOS )
 ;s
 ' fibBN find wdiss
 20 fibBN p 
+sp
 : tfib3 ( n | m )  
     "locals fibBN : " ps 
     { m 1 = } { m @ n @ <= } { m 1 +=  } 
@@ -454,7 +464,7 @@ s: fibBN ( n | fn fn1 fn2 -- TOS )
 nl nl 92 tfib3 //sp pause
 nl 92 dup p fibBN p //sp
 bnOff //pause
-
+: sp ;
 nl
 // verbosity 1 =
 namespaceTreeWithWords
@@ -463,6 +473,6 @@ namespaceTreeWithWords
 1 ? "hi" ps : "er" ps
 0 ? "er" ps : "hi" ps
 { 0 ? "er" ps : "hi" ps } run
-
+sp
 2 + 7 assertStkChk // stack checking
 s

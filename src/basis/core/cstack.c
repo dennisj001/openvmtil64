@@ -27,15 +27,9 @@ _Stack_Dup ( Stack * stack )
 }
 
 int64
-__Stack_Pop ( Stack * stack )
-{
-    return *( stack->StackPointer -- ) ;
-}
-
-int64
 _Stack_Pop ( Stack * stack )
 {
-    return __Stack_Pop ( stack ) ;
+    return *( stack->StackPointer -- ) ;
 }
 
 int64
@@ -77,7 +71,7 @@ _Stack_PopOrTop ( Stack * stack )
     int64 sd = Stack_Depth ( stack ) ;
     if ( sd <= 0 ) CfrTil_Exception ( STACK_UNDERFLOW, 0, QUIT ) ;
     else if ( sd == 1 ) return Stack_Top ( stack ) ;
-    return __Stack_Pop ( stack ) ;
+    return _Stack_Pop ( stack ) ;
 }
 
 void
@@ -177,6 +171,7 @@ int64
 _Stack_IntegrityCheck ( Stack * stack )
 {
     byte * errorString ;
+    int64 flag ;
     // first a simple integrity check of the stack info struct
     if ( ( stack->StackMin == & ( stack->StackData [ 0 ] ) ) &&
         ( stack->StackMax == & ( stack->StackData [ stack->StackSize - 1 ] ) ) && // -1 : zero based array
@@ -184,8 +179,9 @@ _Stack_IntegrityCheck ( Stack * stack )
     {
         return true ;
     }
-    if ( _Stack_Overflow ( stack ) ) CfrTil_Exception ( STACK_OVERFLOW, c_da ( errorString ), QUIT ) ; //errorString = "\nStack Integrity Error : Stack Overflow" ;
-    else CfrTil_Exception ( STACK_UNDERFLOW, c_da ( errorString ), QUIT ) ; //errorString = "\nStack Integrity Error : Stack Underflow" ;
+    if ( _Stack_Overflow ( stack ) ) flag = STACK_OVERFLOW, errorString = (byte*) "\nStack Integrity Error : Stack Onverflow" ;
+    else flag = STACK_UNDERFLOW, errorString = (byte*) "\nStack Integrity Error : Stack Underflow" ;
+    CfrTil_Exception ( flag, c_da ( errorString ), QUIT ) ; //errorString = "\nStack Integrity Error : Stack Underflow" ;
     return false ;
 }
 

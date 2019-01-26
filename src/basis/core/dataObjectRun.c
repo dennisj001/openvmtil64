@@ -7,7 +7,6 @@ void
 Object_Run ( Word * word )
 {
     Context * cntx = _Context_ ;
-    Word * ns = word ;
     Boolean rvalueFlag, isForwardDotted, isReverseDotted ;
     cntx->Interpreter0->w_Word = word ; // for ArrayBegin : all literals are run here
     if ( word->CAttribute & ( LITERAL | CONSTANT ) ) CfrTil_Do_LiteralWord ( word ) ;
@@ -30,8 +29,8 @@ Object_Run ( Word * word )
         else if ( word->CAttribute & OBJECT_FIELD ) CfrTil_Do_ClassField ( word, isForwardDotted ) ;
         else if ( word->CAttribute & ( NAMESPACE_VARIABLE | THIS | OBJECT | LOCAL_VARIABLE | PARAMETER_VARIABLE ) )
             CfrTil_Do_Variable ( word, rvalueFlag, isForwardDotted, isReverseDotted ) ;
-        else if ( word->CAttribute & ( C_TYPE | C_CLASS ) ) Namespace_Do_C_Type ( word ) ;
-        else if ( ns->CAttribute & ( NAMESPACE | CLASS | CLASS_CLONE ) ) Namespace_DoNamespace ( ns ) ; // namespaces are the only word that needs to run the word set DObject Compile_SetCurrentlyRunningWord_Call_TestRSP created word ??
+        else if ( word->CAttribute & ( C_TYPE | C_CLASS ) ) Namespace_Do_C_Type (word, isForwardDotted) ;
+        else if ( word->CAttribute & ( NAMESPACE | CLASS | CLASS_CLONE ) ) Namespace_DoNamespace ( word, isForwardDotted ) ; // namespaces are the only word that needs to run the word set DObject Compile_SetCurrentlyRunningWord_Call_TestRSP created word ??
     }
     DEBUG_SHOW ;
     //SetState ( _Context_, ADDRESS_OF_MODE, false ) ;
@@ -77,6 +76,7 @@ Do_Variable ( Word * word, Boolean rvalueFlag, Boolean isForwardDotted )
                 if ( rvalueFlag ) value = ( int64 ) word->W_Value ;
                 value = ( int64 ) word->W_PtrToValue ;
             }
+            else
             //value = ( int64 ) ( * ( int64* ) word->W_PtrToValue ) ; //( int64 ) word->W_PtrToValue ;
             //if ( rvalueFlag ) value = ( int64 ) word->W_Value ;
             value = ( int64 ) word->W_Value ;
@@ -88,16 +88,14 @@ Do_Variable ( Word * word, Boolean rvalueFlag, Boolean isForwardDotted )
                 if ( rvalueFlag ) value = ( int64 ) * word->W_PtrToValue ;
                 else
                 {
-                    if ( ! compiler->LHS_Word ) compiler->LHS_Word = word ; // LHS_Word : delayed compile by _CfrTil_C_Infix_EqualOp
-                    goto done ;
+                    if ( ! compiler->LHS_Word ) compiler->LHS_Word = word ;
+                    goto done ; // LHS_Word : delayed compile by _CfrTil_C_Infix_EqualOp
                     //else value = ( int64 ) word->W_PtrToValue ;
                 }
             }
             else if ( rvalueFlag ) value = word->W_Value ;
             else value = ( int64 ) word->W_PtrToValue ;
         }
-        //if ( GetState ( compiler, ARRAY_MODE ) && cntx->Interpreter0->BaseObject ) TOS = value ; //?? maybe needs more precise state logic
-        //if ( cntx->Interpreter0->BaseObject ) TOS = value ; //?? maybe needs more precise state logic
         if ( cntx->Interpreter0->BaseObject && ( cntx->Interpreter0->BaseObject != word ) && ( ! GetState ( compiler, C_INFIX_EQUAL ) ) ) TOS = value ; //?? maybe needs more precise state logic
         else DataStack_Push ( value ) ;
     }
@@ -291,9 +289,9 @@ _Namespace_Do_C_Type ( Namespace * ns )
 }
 
 void
-Namespace_Do_C_Type ( Namespace * ns )
+Namespace_Do_C_Type (Namespace * ns, Boolean isForwardDotted)
 {
-    if ( ! Lexer_IsTokenForwardDotted ( _Context_->Lexer0 ) )
+    if ( ! isForwardDotted )
     {
         Context * cntx = _Context_ ;
         Compiler * compiler = cntx->Compiler0 ;
@@ -319,7 +317,7 @@ Namespace_Do_C_Type ( Namespace * ns )
 
         if ( GetState ( cntx, C_SYNTAX ) ) Compiler_SetAs_InNamespace_C_BackgroundNamespace ( compiler ) ;
     }
-    Namespace_DoNamespace ( ns ) ;
+    Namespace_DoNamespace ( ns, isForwardDotted ) ;
 }
 
 void

@@ -107,7 +107,7 @@ void
 CfrTil_Namespace_New ( )
 {
     Namespace * ns = Namespace_FindOrNew_SetUsing ( ( byte* ) DataStack_Pop ( ), _CfrTil_Namespace_InNamespaceGet ( ), 1 ) ;
-    Namespace_DoNamespace ( ns ) ;
+    Namespace_DoNamespace ( ns, 0 ) ;
 
 }
 
@@ -281,28 +281,48 @@ _CfrTil_RemoveNamespaceFromUsingListAndClear ( byte * name )
 //keep the stack intack just remove the namespace from the Namespaces list and set them as not using
 
 void
-Namespace_RemoveNamespacesStack (Stack * stack)
+Namespace_RemoveNamespacesStack ( Stack * stack )
 {
+#if 1    
     if ( stack )
     {
-        int64 i, n ;
-        for ( i = 0, n = Stack_Depth ( stack ) ; n ; n --, i ++ )
+        int64 i = 0, n = Stack_Depth ( stack ) ;
+        do
         {
             Namespace * ns = ( Namespace* ) stack->StackPointer [i] ;
             if ( ns )
             {
                 if ( ns == _CfrTil_->InNamespace ) _CfrTil_->InNamespace = 0 ;
-                if ( ns == _Context_->Finder0->QualifyingNamespace ) Finder_SetQualifyingNamespace ( _Context_->Finder0, 0 ) ;
+                if ( _Finder_ && ( ns == _Finder_->QualifyingNamespace ) ) Finder_SetQualifyingNamespace ( _Context_->Finder0, 0 ) ;
+                _Namespace_SetState ( ns, NOT_USING ) ;
+                dlnode_Remove ( ( dlnode* ) ns ) ;
+            }
+            n -- ;
+        }
+        while ( n >= 0 ) ;
+    }
+#else    
+    if ( stack )
+    {
+        int64 n ;
+        for ( n = Stack_Depth ( stack ) ; n ; n -- )
+        {
+            Namespace * ns = ( Namespace* ) Stack_Pop ( stack ) ;
+            if ( ns )
+            {
+                if ( ns == _CfrTil_->InNamespace ) _CfrTil_->InNamespace = 0 ;
+                if ( _Finder_ && ( ns == _Finder_->QualifyingNamespace ) ) Finder_SetQualifyingNamespace ( _Context_->Finder0, 0 ) ;
                 _Namespace_SetState ( ns, NOT_USING ) ;
                 dlnode_Remove ( ( dlnode* ) ns ) ;
             }
         }
-        //Stack_Init ( stack ) ;
+        Stack_Init ( stack ) ;
     }
+#endif        
 }
 
 void
-Namespace_FreeNamespacesStack ( Stack * stack )
+Namespace_RemoveAndClearNamespacesStack ( Stack * stack )
 {
     if ( stack )
     {
@@ -321,12 +341,14 @@ Namespace_NamespacesStack_PrintWords ( Stack * stack )
 {
     if ( stack )
     {
-        int64 i, n ;
-        for ( i = 0, n = Stack_Depth ( stack ) ; n ; n --, i ++ )
+        int64 i = 0, n = Stack_Depth ( stack ) ;
+        do
         {
             Namespace * ns = ( Namespace* ) stack->StackPointer [i] ;
-            if ( ns ) _Namespace_PrintWords ( ns ) ;
+            if ( ns ) _Namespace_RemoveFromUsingListAndClear ( ns ) ;
+            n -- ;
         }
+        while ( n >= 0 ) ;
     }
 }
 

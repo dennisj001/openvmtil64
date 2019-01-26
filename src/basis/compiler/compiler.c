@@ -137,7 +137,7 @@ Compiler_PreviousNonDebugWord ( int64 startIndex )
 void
 Compiler_FreeAllLocalsNamespaces ( Compiler * compiler )
 {
-    Namespace_FreeNamespacesStack ( compiler->LocalsCompilingNamespacesStack ) ;
+    Namespace_RemoveAndClearNamespacesStack ( compiler->LocalsCompilingNamespacesStack ) ;
 }
 
 #if 0
@@ -292,7 +292,7 @@ void
 Compiler_SaveDebugInfo ( Compiler * compiler )
 {
     _CfrTil_->CurrentWordBeingCompiled->NamespaceStack = Stack_Copy ( compiler->LocalsCompilingNamespacesStack, CFRTIL ) ; //CONTEXT ) ;
-    Namespace_RemoveNamespacesStack (compiler->LocalsCompilingNamespacesStack) ;
+    if ( compiler->NumberOfVariables ) Namespace_RemoveNamespacesStack ( compiler->LocalsCompilingNamespacesStack ) ;
     Stack_Init ( compiler->LocalsCompilingNamespacesStack ) ;
     _CfrTil_->CurrentWordBeingCompiled->W_SC_WordList = _CfrTil_->Compiler_N_M_Node_WordList ;
     _CfrTil_->Compiler_N_M_Node_WordList = _dllist_New ( CFRTIL ) ;
@@ -302,13 +302,19 @@ Compiler_SaveDebugInfo ( Compiler * compiler )
 void
 Compiler_DeleteDebugInfo ( Compiler * compiler )
 {
-    Compiler_FreeAllLocalsNamespaces ( compiler ) ;
+    if ( compiler->NumberOfVariables ) 
+    {
+        Compiler_FreeAllLocalsNamespaces ( compiler ) ;
+        _Namespace_RemoveFromUsingListAndClear ( compiler->LocalsNamespace ) ;
+    }
     _CfrTil_RecycleInit_Compiler_N_M_Node_WordList ( 1 ) ; //flags ) ;
 }
 
 void
-Compiler_Init (Compiler * compiler, uint64 state , Boolean flag)
+Compiler_Init ( Compiler * compiler, uint64 state, Boolean flag )
 {
+    if ( flag ) Compiler_DeleteDebugInfo ( compiler ) ;
+    else if ( compiler->NumberOfVariables ) Namespace_RemoveNamespacesStack ( compiler->LocalsCompilingNamespacesStack ) ;
     compiler->State = state & ( ! ARRAY_MODE ) ;
     compiler->ContinuePoint = 0 ;
     compiler->BreakPoint = 0 ;
@@ -338,15 +344,7 @@ Compiler_Init (Compiler * compiler, uint64 state , Boolean flag)
     _dllist_Init ( compiler->CurrentSwitchList ) ;
     _dllist_Init ( compiler->RegisterParameterList ) ;
     _dllist_Init ( compiler->OptimizeInfoList ) ;
-    //if ( flags ) 
     CfrTil_TypeStackReset ( ) ;
-#if 0   
-    if ( _CfrTil_->CurrentWordBeingCompiled && ( GetState ( _CfrTil_, RT_DEBUG_ON ) || Is_DebugOn || GetState ( _CfrTil_, GLOBAL_SOURCE_CODE_MODE ) ) ) //|| ( _CfrTil_->CurrentWordBeingCompiled && ( ( ! flags ) || GetState ( _CfrTil_, GLOBAL_SOURCE_CODE_MODE ) ) ) )
-        Compiler_SaveDebugInfo ( compiler ) ;
-    else
-#endif        
-    if ( flag ) Compiler_DeleteDebugInfo ( compiler ) ;
-    else Namespace_RemoveNamespacesStack (compiler->LocalsCompilingNamespacesStack) ;   
     SetState ( _CfrTil_, RT_DEBUG_ON, false ) ;
     Compiler_CompileOptimizeInfo_PushNew ( compiler ) ;
     SetBuffersUnused ( 1 ) ;
@@ -367,7 +365,7 @@ Compiler_New ( uint64 allocType )
     compiler->PostfixLists = _dllist_New ( allocType ) ;
     compiler->GotoList = _dllist_New ( allocType ) ;
     compiler->OptimizeInfoList = _dllist_New ( allocType ) ;
-    Compiler_Init (compiler, 0 , 0) ;
+    Compiler_Init ( compiler, 0, 0 ) ;
     return compiler ;
 }
 

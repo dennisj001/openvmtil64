@@ -144,8 +144,7 @@ Word *
 _Word_Create ( byte * name, uint64 ctype, uint64 ctype2, uint64 ltype, uint64 allocType )
 {
     Word * word = _Word_Allocate ( allocType ? allocType : DICTIONARY ) ;
-    if ( word == (Word*) 0x7ffff5990e88) 
-        _Printf ((byte*)"") ;
+    //if ( word == (Word*) 0x7ffff5990e88) _Printf ((byte*)"") ;
     if ( allocType & ( EXISTING ) ) _Symbol_NameInit ( ( Symbol * ) word, name ) ;
     else _Symbol_Init_AllocName ( ( Symbol* ) word, name, STRING_MEM ) ;
     word->WAllocType = allocType ;

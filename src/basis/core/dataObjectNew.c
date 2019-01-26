@@ -117,10 +117,9 @@ _CfrTil_NamelessObjectNew ( int64 size, int64 allocType )
 Word *
 _CfrTil_ObjectNew ( int64 size, byte * name, uint64 category, int64 allocType )
 {
-    byte * obj = _CfrTil_NamelessObjectNew ( size, allocType ) ; //OBJECT_MEMORY ) ;
+    byte * obj = _CfrTil_NamelessObjectNew ( size, allocType ) ; 
     Word * word = _DObject_New ( name, ( int64 ) obj, ( OBJECT | IMMEDIATE | CPRIMITIVE | category ), 0, 0, OBJECT, ( byte* ) _DataObject_Run, 0, 0, 0, DICTIONARY ) ;
     word->ObjectSize = size ;
-
     return word ;
 }
 
@@ -167,6 +166,7 @@ _Class_Object_New ( byte * name, uint64 category )
     Namespace * ns = _CfrTil_Namespace_InNamespaceGet ( ) ;
     size = _Namespace_VariableValueGet ( ns, ( byte* ) "size" ) ;
     word = _CfrTil_ObjectNew ( size, name, category, CompileMode ? DICTIONARY : OBJECT_MEM ) ;
+    object = (byte*) word->W_Value ;
     _Class_Object_Init ( word, ns ) ;
     _Namespace_VariableValueSet ( ns, ( byte* ) "this", ( int64 ) object ) ;
     _Word_Add ( word, 0, ns ) ;
@@ -189,7 +189,7 @@ _Class_New ( byte * name, uint64 type, int64 cloneFlag )
             size = _Namespace_VariableValueGet ( sns, ( byte* ) "size" ) ;
         }
         ns = _DObject_New ( name, 0, CLASS | IMMEDIATE | type, 0, 0, type, ( byte* ) _DataObject_Run, 0, 0, sns, DICTIONARY ) ;
-        Namespace_DoNamespace ( ns ) ; // before "size", "this"
+        Namespace_DoNamespace (ns, 0) ; // before "size", "this"
         Word *ws = _CfrTil_Variable_New ( ( byte* ) "size", size ) ; // start with size of the prototype for clone
         _Context_->Interpreter0->ThisNamespace = ns ;
         Word *wt = _CfrTil_Variable_New ( ( byte* ) "this", size ) ; // start with size of the prototype for clone
@@ -199,7 +199,7 @@ _Class_New ( byte * name, uint64 type, int64 cloneFlag )
     {
         _Printf ( ( byte* ) "\nNamespace Error at %s ? : \'%s\' already exists! : %s : size = %d\n",
             Context_Location ( ), ns->Name, _Word_SourceCodeLocation_pbyte ( ns ), ns->ObjectSize ) ;
-        Namespace_DoNamespace ( ns ) ;
+        Namespace_DoNamespace (ns, 0) ;
     }
     CfrTil_WordList_Init ( 0, 0 ) ;
     return ns ;
