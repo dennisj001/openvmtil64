@@ -21,7 +21,7 @@ taa ( one two three )
     p ( three ) ;
     p ( five ) ;
     nl () ;
-    <dbg>
+    //<dbg>
 }
 taa ( 1 2 3 ) ;
 c_syntaxOff

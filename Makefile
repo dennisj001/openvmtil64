@@ -120,8 +120,8 @@ optimize :
 	make cfrtil64s
 	make oclean
 	make
-	-sudo cp bin/cfrtil64o3 /usr/local/bin/cfrtil64
-	cp bin/cfrtil64o3 bin/cfrtil64
+	#-sudo cp bin/cfrtil64o3 /usr/local/bin/cfrtil64
+	#cp bin/cfrtil64o3 bin/cfrtil64
 
 editorClean :
 	rm *.*~ src/basis/*.*~ src/basis/compiler/*.*~ src/primitives/*.*~ src/include/*.*~
