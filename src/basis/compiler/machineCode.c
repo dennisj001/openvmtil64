@@ -584,6 +584,7 @@ Compile_X_Group5 ( Compiler * compiler, int64 op )
             _Compile_Group5 ( op, REG, ACC, 0, 0, 0 ) ;
             // ++ == += :: -- == -= so :
             _Compile_SetVarLitObj_With_Reg ( one, ACC, OREG ) ;
+            return ;
         }
     }
     else

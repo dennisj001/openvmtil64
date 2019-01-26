@@ -95,6 +95,7 @@ RL_TC_StringInsert_AtCursor ( ReadLiner * rl, byte * strToInsert )
     }
     ReadLine_SetCursorPosition ( rl, newCursorPos ) ;
     _ReadLine_InsertStringIntoInputLineSlotAndShow ( rl, slotStart, startCursorPos, ( byte* ) strToInsert ) ; // 1 : TokenLastChar is the last char of the identifier
+    ReadLine_Set_ReadIndex ( rl, rl->CursorPosition ) ;
 }
 
 byte *
@@ -313,11 +314,7 @@ TC_Tree_Map ( TabCompletionInfo * tci, MapFunction mf, Word * wordi )
             {
                 nextWord = ( Word* ) dlnode_Next ( ( node* ) word ) ;
                 if ( kbhit ( ) ) return 0 ; //must be here else could loop forever !?
-                if ( mf ( ( Symbol* ) word ) )
-                {
-                    if ( nextWord ) rword = nextWord ;
-                    goto doReturn ;
-                }
+                if ( mf ( ( Symbol* ) word ) ) goto doReturn ;
             }
             if ( mf ( ( Symbol* ) ns ) ) break ;
             ns = nextNs ;

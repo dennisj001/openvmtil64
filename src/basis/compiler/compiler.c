@@ -44,7 +44,7 @@ Compiler_CopyDuplicatesAndPush ( Word * word0, int64 tsrli, int64 scwi )
 {
     Word *wordp ;
     if ( ( word0->CAttribute & ( DEBUG_WORD | INTERPRET_DBG ) ) || ( word0->LAttribute & ( W_COMMENT | W_PREPROCESSOR ) ) ) return word0 ;
-    if ( word0 && CompileMode )
+    if ( word0 && CompileMode ) // don't we want to copy in non-compile mode too ??
     {
         wordp = _CfrTil_CopyDuplicates ( word0 ) ;
         //if ( wordp == word0 ) _Printf ( ( byte* ) "\nGot it = %s", wordp->Name ) ;
@@ -279,82 +279,35 @@ Compiler_BlockLevel ( Compiler * compiler )
     return depth ;
 }
 
-#if 0
-
-void
-Compiler_RecycleOptInfos ( Compiler * compiler )
-{
-    CompileOptimizeInfo * coi ;
-    dlnode * node, * nextNode ;
-    //int64 depth ;
-    //for ( depth = List_Depth ( compiler->OptimizeInfoList ) ; depth ; depth -- )
-    for ( node = dllist_First ( ( dllist* ) compiler->OptimizeInfoList ) ; node ; node = nextNode )
-    {
-        nextNode = dlnode_Next ( node ) ;
-        coi = ( CompileOptimizeInfo * ) node ;
-        //coi = ( CompileOptimizeInfo* ) List_Top ( compiler->OptimizeInfoList ) ;
-        if ( coi && ( coi != compiler->OptInfo ) && ( coi->InUseFlag != N_LOCKED ) )
-        {
-            List_Pop ( compiler->OptimizeInfoList ) ;
-            OptInfo_Recycle ( coi ) ;
-        }
-    }
-}
-#endif
-
 void
 Compiler_Init_AccumulatedOffsetPointers ( Compiler * compiler, Word * word )
 {
     compiler->AccumulatedOffsetPointer = 0 ;
+    word->AccumulatedOffset = 0 ;
     if ( word ) compiler->AccumulatedOptimizeOffsetPointer = & word->AccumulatedOffset ;
     else compiler->AccumulatedOptimizeOffsetPointer = 0 ;
 }
-#if 0
 
 void
-Compiler_Init ( Compiler * compiler, uint64 state, int64 flags )
+Compiler_SaveDebugInfo ( Compiler * compiler )
 {
-    compiler->State = state & ( ! ARRAY_MODE ) ;
-    compiler->ContinuePoint = 0 ;
-    compiler->BreakPoint = 0 ;
-    compiler->InitHere = Here ;
-    compiler->ParenLevel = 0 ;
-    compiler->ArrayEnds = 0 ;
-    compiler->NumberOfNonRegisterLocals = 0 ;
-    compiler->NumberOfLocals = 0 ;
-    compiler->NumberOfRegisterLocals = 0 ;
-    compiler->NumberOfArgs = 0 ;
-    compiler->NumberOfNonRegisterArgs = 0 ;
-    compiler->NumberOfRegisterArgs = 0 ;
-    compiler->NumberOfVariables = 0 ;
-    compiler->NumberOfRegisterVariables = 0 ;
-    compiler->NumberOfNonRegisterVariables = 0 ;
-    compiler->LocalsFrameSize = 0 ;
-    compiler->AccumulatedOffsetPointer = 0 ;
-    compiler->ReturnVariableWord = 0 ;
-    compiler->CurrentCreatedWord = 0 ;
-    compiler->CurrentWord = 0 ;
-    Stack_Init ( compiler->BlockStack ) ;
-    Stack_Init ( compiler->CombinatorBlockInfoStack ) ;
-    Stack_Init ( compiler->PointerToOffset ) ;
-    Stack_Init ( compiler->CombinatorInfoStack ) ;
-    Stack_Init ( compiler->InfixOperatorStack ) ;
-    _dllist_Init ( compiler->GotoList ) ;
-    _dllist_Init ( compiler->CurrentSwitchList ) ;
-    _dllist_Init ( compiler->RegisterParameterList ) ;
-    _dllist_Init ( compiler->OptimizeInfoList ) ;
-    if ( flags ) CfrTil_TypeStackReset ( ) ;
-    if ( ! GetState ( _CfrTil_, RT_DEBUG_ON ) ) Compiler_FreeAllLocalsNamespaces ( compiler ) ;
-    SetState ( _CfrTil_, RT_DEBUG_ON, false ) ;
-    Compiler_CompileOptimizeInfo_PushNew ( compiler ) ;
-    _CfrTil_RecycleInit_Compiler_N_M_Node_WordList ( 0 ) ;
-    SetBuffersUnused ( 1 ) ;
-    SetState ( compiler, VARIABLE_FRAME, false ) ;
+    _CfrTil_->CurrentWordBeingCompiled->NamespaceStack = Stack_Copy ( compiler->LocalsCompilingNamespacesStack, CFRTIL ) ; //CONTEXT ) ;
+    Namespace_RemoveNamespacesStack (compiler->LocalsCompilingNamespacesStack) ;
+    Stack_Init ( compiler->LocalsCompilingNamespacesStack ) ;
+    _CfrTil_->CurrentWordBeingCompiled->W_SC_WordList = _CfrTil_->Compiler_N_M_Node_WordList ;
+    _CfrTil_->Compiler_N_M_Node_WordList = _dllist_New ( CFRTIL ) ;
+    //Namespace_NamespacesStack_PrintWords ( _CfrTil_->CurrentWordBeingCompiled->NamespaceStack ) ;
 }
-#else
 
 void
-Compiler_Init ( Compiler * compiler, uint64 state, int64 flags )
+Compiler_DeleteDebugInfo ( Compiler * compiler )
+{
+    Compiler_FreeAllLocalsNamespaces ( compiler ) ;
+    _CfrTil_RecycleInit_Compiler_N_M_Node_WordList ( 1 ) ; //flags ) ;
+}
+
+void
+Compiler_Init (Compiler * compiler, uint64 state , Boolean flag)
 {
     compiler->State = state & ( ! ARRAY_MODE ) ;
     compiler->ContinuePoint = 0 ;
@@ -385,27 +338,20 @@ Compiler_Init ( Compiler * compiler, uint64 state, int64 flags )
     _dllist_Init ( compiler->CurrentSwitchList ) ;
     _dllist_Init ( compiler->RegisterParameterList ) ;
     _dllist_Init ( compiler->OptimizeInfoList ) ;
-    if ( flags ) CfrTil_TypeStackReset ( ) ;
-    if ( GetState ( _CfrTil_, RT_DEBUG_ON ) ) //|| ( _CfrTil_->CurrentWordBeingCompiled && ( ( ! flags ) || GetState ( _CfrTil_, GLOBAL_SOURCE_CODE_MODE ) ) ) )
-    {
-        _CfrTil_->CurrentWordBeingCompiled->NamespaceStack = Stack_Copy ( compiler->LocalsCompilingNamespacesStack, CONTEXT ) ;
-        Namespace_RemoveNamespacesStack ( compiler->LocalsCompilingNamespacesStack ) ;
-        Stack_Init ( compiler->LocalsCompilingNamespacesStack ) ;
-        _CfrTil_->CurrentWordBeingCompiled->W_SC_WordList = _CfrTil_->Compiler_N_M_Node_WordList ;
-        _CfrTil_->Compiler_N_M_Node_WordList = _dllist_New ( CFRTIL ) ;
-        //Namespace_NamespacesStack_PrintWords ( _CfrTil_->CurrentWordBeingCompiled->NamespaceStack ) ;
-    }
+    //if ( flags ) 
+    CfrTil_TypeStackReset ( ) ;
+#if 0   
+    if ( _CfrTil_->CurrentWordBeingCompiled && ( GetState ( _CfrTil_, RT_DEBUG_ON ) || Is_DebugOn || GetState ( _CfrTil_, GLOBAL_SOURCE_CODE_MODE ) ) ) //|| ( _CfrTil_->CurrentWordBeingCompiled && ( ( ! flags ) || GetState ( _CfrTil_, GLOBAL_SOURCE_CODE_MODE ) ) ) )
+        Compiler_SaveDebugInfo ( compiler ) ;
     else
-    {
-        Compiler_FreeAllLocalsNamespaces ( compiler ) ;
-        _CfrTil_RecycleInit_Compiler_N_M_Node_WordList ( flags ) ; //flags ) ;
-    }
+#endif        
+    if ( flag ) Compiler_DeleteDebugInfo ( compiler ) ;
+    else Namespace_RemoveNamespacesStack (compiler->LocalsCompilingNamespacesStack) ;   
     SetState ( _CfrTil_, RT_DEBUG_ON, false ) ;
     Compiler_CompileOptimizeInfo_PushNew ( compiler ) ;
     SetBuffersUnused ( 1 ) ;
     SetState ( compiler, VARIABLE_FRAME, false ) ;
 }
-#endif
 
 Compiler *
 Compiler_New ( uint64 allocType )
@@ -413,15 +359,15 @@ Compiler_New ( uint64 allocType )
     Compiler * compiler = ( Compiler * ) Mem_Allocate ( sizeof (Compiler ), allocType ) ;
     compiler->BlockStack = Stack_New ( 64, allocType ) ;
     compiler->CombinatorInfoStack = Stack_New ( 64, allocType ) ;
-    compiler->InfixOperatorStack = Stack_New ( 32, allocType ) ;
-    compiler->PointerToOffset = Stack_New ( 32, allocType ) ;
+    compiler->InfixOperatorStack = Stack_New ( 64, allocType ) ;
+    compiler->PointerToOffset = Stack_New ( 64, allocType ) ;
     compiler->CombinatorBlockInfoStack = Stack_New ( 64, allocType ) ;
-    compiler->LocalsCompilingNamespacesStack = Stack_New ( 32, allocType ) ;
-    compiler->InternalNamespacesStack = Stack_New ( 32, allocType ) ; //initialized when using
+    compiler->LocalsCompilingNamespacesStack = Stack_New ( 64, allocType ) ;
+    compiler->InternalNamespacesStack = Stack_New ( 64, allocType ) ; //initialized when using
     compiler->PostfixLists = _dllist_New ( allocType ) ;
     compiler->GotoList = _dllist_New ( allocType ) ;
     compiler->OptimizeInfoList = _dllist_New ( allocType ) ;
-    Compiler_Init ( compiler, 0, 1 ) ;
+    Compiler_Init (compiler, 0 , 0) ;
     return compiler ;
 }
 

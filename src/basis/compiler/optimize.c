@@ -744,7 +744,7 @@ GetRmDispImm ( CompileOptimizeInfo * optInfo, Word * word, int64 suggestedReg )
     else if ( word->CAttribute & LOCAL_VARIABLE )
     {
         optInfo->Optimize_Rm = FP ;
-        optInfo->Optimize_Disp = LocalVar_FpDisp ( word ) ;
+        optInfo->Optimize_Disp = LocalVar_Disp ( word ) ;
         optInfo->OptimizeFlag |= OPTIMIZE_RM ;
     }
     else if ( word->CAttribute & PARAMETER_VARIABLE )

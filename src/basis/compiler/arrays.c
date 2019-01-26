@@ -136,7 +136,7 @@ Do_NextArrayToken ( Word * tokenWord, byte * token, Word * arrayBaseObject, int6
     Compiler *compiler = cntx->Compiler0 ;
     Word * word ;
     int64 arrayIndex, increment ;
-    if ( tokenWord ) 
+    if ( tokenWord )
     {
         word = tokenWord ;
         word = Compiler_CopyDuplicatesAndPush ( word, word->W_RL_Index, word->W_SC_Index ) ;
@@ -163,8 +163,8 @@ Do_NextArrayToken ( Word * tokenWord, byte * token, Word * arrayBaseObject, int6
         int64 dimSize = CalculateArrayDimensionSize ( arrayBaseObject, dimNumber ) ; // dimNumber is used as an array index so it is also zero base indexed
         compiler->ArrayEnds ++ ; // after, because arrayBaseObject->ArrayDimensions is a zero based array
 
-        _Debugger_PreSetup ( _Debugger_, word, 0, 0 ) ;
-        if ( *variableFlag ) Compile_ArrayDimensionOffset ( _Context_CurrentWord ( cntx ), dimSize, objSize ) ;
+        Debugger_PreSetup (_Debugger_, word, 0, 0, 0 ) ;
+        if ( CompileMode && * variableFlag ) Compile_ArrayDimensionOffset ( _Context_CurrentWord ( cntx ), dimSize, objSize ) ;
         else
         {
             // big endian arrays where first, left to right variable refers to
@@ -173,22 +173,17 @@ Do_NextArrayToken ( Word * tokenWord, byte * token, Word * arrayBaseObject, int6
             // D0, D1, D2, ... Dn : d0, d1, d2 ... dn => dn*(1*D(n-1)*D1*D2*..D(n-1)) 
             arrayIndex = DataStack_Pop ( ) ;
             if ( arrayIndex >= arrayBaseObject->ArrayDimensions [ dimNumber ] ) Error ( "Array index out of bounds.", "", ABORT ) ;
-            increment = arrayIndex * dimSize * objSize ; // keep a running total of 
-            if ( CompileMode ) Compiler_IncrementCurrentAccumulatedOffset ( compiler, increment ) ;
-#if 1           
-            else if ( compiler->LHS_Word == baseObject )
-            {
-                //increment = DataStack_Pop ( ) ;
-                Compiler_IncrementCurrentAccumulatedOffset ( compiler, increment ) ;
-                //CfrTil_Do_AccumulatedAddress ( word, (byte*) compiler->AccumulatedOptimizeOffsetPointer, increment ) ;
-                Do_AccumulatedAddress ( ( byte* ) compiler->AccumulatedOptimizeOffsetPointer, increment, 0 ) ;
-            }
-#endif            
-            else _DataStack_SetTop ( _DataStack_GetTop ( ) + increment ) ; // after each dimension : in the end we have one lvalue remaining on the stack
-            if ( Is_DebugModeOn ) Word_PrintOffset ( word, increment, baseObject->AccumulatedOffset ) ;
+            increment = arrayIndex * dimSize * objSize ; 
+            Compiler_IncrementCurrentAccumulatedOffset ( compiler, increment ) ;
+            if ( ! CompileMode ) Array_Do_AccumulatedAddress ( baseObject->AccumulatedOffset ) ; 
         }
+        if ( Is_DebugModeOn && baseObject ) Word_PrintOffset ( word, increment, baseObject->AccumulatedOffset ) ;
         CfrTil_TypeStack_Pop ( ) ; // pop the index ; we want the object field type 
-        if ( ! _Context_StringEqual_PeekNextToken ( cntx, ( byte* ) "[", 0 ) ) return 1 ; // breaks the calling function
+        if ( ! _Context_StringEqual_PeekNextToken ( cntx, ( byte* ) "[", 0 ) )
+        {
+            SetState ( compiler, ARRAY_MODE, false ) ;
+            return 1 ; // breaks the calling function
+        } 
         return 0 ;
     }
     if ( *variableFlag ) Set_CompileMode ( true ) ;
@@ -197,6 +192,7 @@ Do_NextArrayToken ( Word * tokenWord, byte * token, Word * arrayBaseObject, int6
     else Interpreter_InterpretAToken ( interp, token, _Lexer_->TokenStart_ReadLineIndex, _Lexer_->SC_Index ) ;
     DEBUG_SHOW ;
     Set_CompileMode ( saveCompileMode ) ;
+
     return 0 ;
 }
 
@@ -240,7 +236,7 @@ _CfrTil_ArrayBegin ( Boolean lispMode, Word **pl1, int64 i )
         CfrTil_OptimizeOn ( ) ; // internal to arrays optimize must be on
 
         if ( ! arrayBaseObject->ArrayDimensions ) CfrTil_Exception ( ARRAY_DIMENSION_ERROR, 0, QUIT ) ;
-        if ( interp->CurrentObjectNamespace ) objSize = interp->CurrentObjectNamespace->ObjectSize ; //_CfrTil_VariableValueGet ( cntx->Interpreter0->CurrentClassField, ( byte* ) "size" ) ; 
+        if ( interp->CurrentObjectNamespace ) objSize = interp->CurrentObjectNamespace->ObjectSize ; 
         if ( ! objSize ) CfrTil_Exception ( OBJECT_SIZE_ERROR, 0, QUIT ) ;
         variableFlag = _CheckArrayDimensionForVariables_And_UpdateCompilerState ( ) ;
         if ( lispMode ) Arrays_DoArrayArgs_Lisp ( pl1, l1, arrayBaseObject, objSize, saveCompileMode, &variableFlag ) ;
@@ -269,22 +265,24 @@ _CfrTil_ArrayBegin ( Boolean lispMode, Word **pl1, int64 i )
         if ( lispMode ) interp->BaseObject = 0 ;
         else
         {
-            if ( ( ! Lexer_IsTokenForwardDotted ( cntx->Lexer0 ) ) && ( ! GetState ( cntx->Compiler0, LC_ARG_PARSING ) ) ) interp->BaseObject = 0 ;
-            //if ( ! ( GetState ( cntx, C_SYNTAX | INFIX_MODE ) || GetState ( compiler, LC_ARG_PARSING ) ) )
             if ( ! variableFlag )
+            {
                 _dllist_MapNodes_UntilWord ( dllist_First ( ( dllist* ) _CfrTil_->Compiler_N_M_Node_WordList ),
-                ( VMapNodeFunction ) SCN_Set_NotInUseForOptimization, baseObject ) ; // old version : SCN_Set_NotInUse but now keep use for source code
+                    ( VMapNodeFunction ) SCN_Set_NotInUseForOptimization, baseObject ) ; // old version : SCN_Set_NotInUse but now keep use for source code
+            }
             SetState ( compiler, COMPILE_MODE, saveCompileMode ) ;
             //SetState ( compiler, ARRAY_MODE, false ) ;
         }
     }
     if ( ! variableFlag ) SetState ( _CfrTil_, OPTIMIZE_ON, svOpState ) ;
+
     return i ;
 }
 
 void
 CfrTil_ArrayBegin ( )
 {
+
     _CfrTil_ArrayBegin ( 0, 0, 0 ) ;
 }
 

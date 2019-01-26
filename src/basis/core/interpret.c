@@ -40,7 +40,7 @@ Interpreter_DoInfixWord ( Interpreter * interp, Word * word )
     if ( GetState ( _Context_, C_SYNTAX ) && ( word->CAttribute & ( CATEGORY_OP_EQUAL | CATEGORY_OP_OPEQUAL ) ) ) //&& ( ! GetState ( compiler, DOING_C_TYPE ) ) )
     {
         if ( ( word->CAttribute2 & C_INFIX_OP_EQUAL ) ) SetState ( compiler, C_INFIX_EQUAL, true ) ;
-        token = Interpret_C_Until_Token4 ( interp, ( byte* ) ";", ( byte* ) ",", ( byte* ) ")", ( byte* ) "]", ( byte* ) " \n\r\t" ) ;
+        token = Interpret_C_Until_Token4 (interp, ( byte* ) ";", ( byte* ) ",", ( byte* ) ")", ( byte* ) "]", ( byte* ) " \n\r\t" , 0) ;
     }
     else Interpreter_InterpretNextToken ( interp ) ;
     // then continue and interpret this 'word' - just one out of lexical order
@@ -62,7 +62,7 @@ _Interpreter_DoPrefixWord ( Context * cntx, Interpreter * interp, Word * word )
 void
 Interpreter_DoPrefixWord ( Context * cntx, Interpreter * interp, Word * word )
 {
-    if ( _Interpreter_IsWordPrefixing ( interp, word ) ) _Interpreter_DoPrefixWord ( cntx, interp, word ) ;
+    if ( Lexer_IsNextWordLeftParen (interp->Lexer0) ) _Interpreter_DoPrefixWord ( cntx, interp, word ) ;
     else if ( word->CAttribute & CATEGORY_OP_1_ARG ) Interpreter_DoInfixWord ( interp, word ) ; //goto doInfix ;
     else _SyntaxError ( ( byte* ) "Attempting to call a prefix function without following parenthesized args", 1 ) ;
 }
@@ -92,7 +92,7 @@ Interpreter_DoWord ( Interpreter * interp, Word * word, int64 tsrli, int64 scwi 
         interp->w_Word = word ;
         if ( ( word->WAttribute == WT_INFIXABLE ) && ( GetState ( cntx, INFIX_MODE ) ) ) // nb. Interpreter must be in INFIX_MODE because it is effective for more than one word
             Interpreter_DoInfixWord ( interp, word ) ;
-        else if ( ( word->CAttribute & PREFIX ) || Interpreter_IsWordPrefixing ( interp, word ) ) _Interpreter_DoPrefixWord ( cntx, interp, word ) ; //, tsrli, scwi ) ;
+        else if ( ( word->CAttribute & PREFIX ) || Lexer_IsWordPrefixing (0, word ) ) _Interpreter_DoPrefixWord ( cntx, interp, word ) ; //, tsrli, scwi ) ;
         else if ( word->WAttribute == WT_C_PREFIX_RTL_ARGS ) Interpreter_C_PREFIX_RTL_ARGS_Word ( word ) ;
         else Interpreter_DoWord_Default ( interp, word, tsrli, scwi ) ; //  case WT_POSTFIX: case WT_INFIXABLE: // cf. also _Interpreter_SetupFor_MorphismWord
         if ( ! ( word->CAttribute & DEBUG_WORD ) ) interp->LastWord = word ;
@@ -129,26 +129,6 @@ Interpreter_ReadNextTokenToWord ( Interpreter * interp )
     if ( token = Lexer_ReadToken ( interp->Lexer0 ) ) word = _Interpreter_TokenToWord ( interp, token, - 1, - 1 ) ;
     else SetState ( _Context_->Lexer0, LEXER_END_OF_LINE, true ) ;
     return word ;
-}
-
-Boolean
-_Interpreter_IsWordPrefixing ( Interpreter * interp, Word * word )
-{
-    // with this any postfix word that is not a keyword or a c rtl arg word can now be used prefix with parentheses 
-    byte c = Lexer_NextNonDelimiterChar ( interp->Lexer0 ) ;
-    if ( ( c == '(' ) ) return true ;
-    else return false ;
-}
-
-Boolean
-Interpreter_IsWordPrefixing ( Interpreter * interp, Word * word )
-{
-    if ( GetState ( _Context_, LC_INTERPRET ) ) return true ;
-    else if ( ( GetState ( _Context_, PREFIX_MODE ) ) && ( ! ( word->CAttribute & KEYWORD ) ) && ( ! ( word->WAttribute & WT_C_PREFIX_RTL_ARGS ) ) ) //_Namespace_IsUsing ( _CfrTil_->LispNamespace ) ) )
-    {
-        return _Interpreter_IsWordPrefixing ( interp, word ) ;
-    }
-    return false ;
 }
 
 #if 0

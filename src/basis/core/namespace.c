@@ -181,7 +181,7 @@ _Namespace_ActivateAsPrimary ( Namespace * ns )
         _Namespace_AddToUsingList ( ns ) ;
         _CfrTil_->InNamespace = ns ;
         _Context_->Interpreter0->BaseObject = 0 ;
-    }
+     }
 }
 
 void
@@ -290,7 +290,7 @@ _Namespace_DoNamespace ( Namespace * ns )
     Context * cntx = _Context_ ;
     if ( ! Lexer_IsTokenForwardDotted ( cntx->Lexer0 ) ) _Namespace_ActivateAsPrimary ( ns ) ;
     else Finder_SetQualifyingNamespace ( cntx->Finder0, ns ) ;
-    cntx->Interpreter0->BaseObject = 0 ;
+    if ( ! GetState ( cntx->Compiler0, (LC_ARG_PARSING|ARRAY_MODE) ) ) cntx->Interpreter0->BaseObject = 0 ;
 }
 
 #if 0
@@ -318,7 +318,7 @@ Namespace_DoNamespace ( Namespace * ns )
     {
         if ( ! isForwardDotted ) _Namespace_ActivateAsPrimary ( ns ) ;
         else Finder_SetQualifyingNamespace ( cntx->Finder0, ns ) ;
-        cntx->Interpreter0->BaseObject = 0 ;
+        if ( ! GetState ( cntx->Compiler0, (LC_ARG_PARSING|ARRAY_MODE) ) ) cntx->Interpreter0->BaseObject = 0 ;
     }
     else if ( ( ! isForwardDotted ) && ( ! GetState ( cntx->Compiler0, LC_ARG_PARSING ) ) )
     //else if ( ( Lexer_NextNonDelimiterChar ( cntx->Lexer0 ) != '.' ) && ( ! GetState ( cntx->Compiler0, LC_ARG_PARSING ) ) )
@@ -472,14 +472,14 @@ _Namespace_FindOrNew_Local ( Stack * nsStack )
 {
     int64 d = Stack_Depth ( _Context_->Compiler0->BlockStack ) ; //nsStack ) ;
     byte bufferData [ 32 ], *name = ( byte* ) bufferData ;
-    sprintf ( ( char* ) name, "locals_%ld", d ) ;
-    //Namespace * ns = Namespace_FindOrNew_SetUsing ( buffer, _CfrTil_->Namespaces, 1 ) ;
+    sprintf ( ( char* ) name, "locals_%ld", d - 1 ) ; // 1 : BlockStack starts at 1 
     Namespace * ns = _Namespace_Find ( name, _CfrTil_->Namespaces, 0 ) ;
     if ( ! ns )
     {
         ns = Namespace_New ( name, _CfrTil_->Namespaces ) ;
         Stack_Push ( nsStack, ( int64 ) ns ) ; // nb. this is where the the depth increase
     }
+    //if ( ns == (Namespace*) 0x00007ffff70a50b8) _Printf ((byte*)"") ;
     Namespace_SetState ( ns, USING ) ;
     _Namespace_ActivateAsPrimary ( ns ) ;
     return ns ;

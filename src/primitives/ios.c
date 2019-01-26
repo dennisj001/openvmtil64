@@ -144,7 +144,7 @@ void
 CfrTil_Key ( )
 {
 #if 0    
-    ReadLine_Key ( _Context_->ReadLiner0 ) ;
+    ReadLine_Get_Key ( _Context_->ReadLiner0 ) ;
     DataStack_Push ( _Context_->ReadLiner0->InputKeyedCharacter ) ;
 #else
     DataStack_Push ( Key ( ) ) ;

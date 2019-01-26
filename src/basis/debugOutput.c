@@ -20,13 +20,14 @@ _Debugger_Locals_ShowALocal ( Cpu * cpu, Word * localsWord ) // use a debugger b
     uint64 * fp = ( uint64* ) cpu->CPU_FP ;
     if ( fp < ( uint64* ) 0x7f000000 ) fp = 0 ;
     int64 localVarFlag = ( localsWord->CAttribute & LOCAL_VARIABLE ) ; // nb! not a Boolean with '='
-    int64 varOffset = localVarFlag ? localsWord->Index : -localsWord->Index ; //LocalOrParameterVar_Offset ( localsWord ) ;
-    byte * address = ( byte* ) (uint64) (fp ? fp [ varOffset ] : 0) ; //( fp ? fp [ varOffset ] : 0 ) ;
+    //int64 varOffset = localVarFlag ? localsWord->Index : -localsWord->Index ; 
+    int64 varOffset = LocalOrParameterVar_Offset ( localsWord ) ;
+    byte * address = ( byte* ) ( uint64 ) ( fp ? fp [ varOffset ] : 0 ) ; //( fp ? fp [ varOffset ] : 0 ) ;
 
     byte * stringValue = String_CheckForAtAdddress ( address ) ;
-    if ( address && (!stringValue )) word2 = Word_GetFromCodeAddress ( ( byte* ) ( address ) ) ;
+    if ( address && ( ! stringValue ) ) word2 = Word_GetFromCodeAddress ( ( byte* ) ( address ) ) ;
     if ( word2 ) sprintf ( ( char* ) buffer, "< %s.%s >", word2->ContainingNamespace->Name, c_u ( word2->Name ) ) ;
-    
+
     if ( localsWord->CAttribute & REGISTER_VARIABLE )
     {
         char * registerNames [ 16 ] = { ( char* ) "RAX", ( char* ) "RCX", ( char* ) "RDX", ( char* ) "RBX",
@@ -37,8 +38,8 @@ _Debugger_Locals_ShowALocal ( Cpu * cpu, Word * localsWord ) // use a debugger b
             localsWord->S_ContainingNamespace->Name, c_u ( localsWord->Name ), word2 ? buffer : stringValue ? stringValue : ( byte* ) "" ) ;
     }
     else _Printf ( ( byte* ) "\n%-018s : index = [r15%s0x%02x]  : <0x%016lx> = 0x%016lx : %16s.%-16s : %s",
-        localVarFlag ? "LocalVariable" : "Parameter Variable", localVarFlag ? "+" : "-", Abs ( varOffset * CELL ), 
-        fp + varOffset, (uint64) (fp ? fp [ varOffset ] : 0), localsWord->S_ContainingNamespace->Name, 
+        localVarFlag ? "LocalVariable" : "Parameter Variable", localVarFlag ? "+" : "-", Abs ( varOffset * CELL ),
+        fp + varOffset, ( uint64 ) ( fp ? fp [ varOffset ] : 0 ), localsWord->S_ContainingNamespace->Name,
         c_u ( localsWord->Name ), word2 ? buffer : stringValue ? stringValue : ( byte* ) "" ) ;
 }
 
@@ -128,7 +129,7 @@ _Debugger_ShowEffects ( Debugger * debugger, Word * word, Boolean stepFlag, Bool
         DebugColors ;
         if ( word && ( word->CAttribute & OBJECT_FIELD ) && ( ! ( word->CAttribute & DOT ) ) )
         {
-            if ( strcmp ( ( char* ) word->Name, "[" ) && strcmp ( ( char* ) word->Name, "]" ) ) // this block is repeated in arrays.c : make it into a function - TODO
+            if ( ( ! String_Equal ( ( char* ) word->Name, "[" ) ) && ( ! String_Equal ( ( char* ) word->Name, "]" ) ) ) // this block is repeated in arrays.c : make it into a function - TODO
             {
                 Word_PrintOffset ( word, 0, 0 ) ;
             }
@@ -573,6 +574,7 @@ _Debugger_DoState ( Debugger * debugger )
         Debugger_UdisOneInstruction ( debugger, debugger->DebugAddress, ( byte* ) "\r", ( byte* ) "" ) ;
     }
     debugger->PreHere = Here ;
+    //if ( debugger->w_Word ) 
 }
 
 void

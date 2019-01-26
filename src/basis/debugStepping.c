@@ -152,15 +152,11 @@ Debugger_CompileAndStepOneInstruction ( Debugger * debugger )
         int64 d ;
         if ( * debugger->DebugAddress == _RET )
         {
-            //Set_DataStackPointers_FromDebuggerDspReg ( ) ;
-            //Debugger_Registers ( debugger ) ;
-            //Debugger_Stack ( debugger ) ;
             if ( Stack_Depth ( debugger->ReturnStack ) )
             {
                 debugger->DebugAddress = ( byte* ) Stack_Pop ( debugger->ReturnStack ) ;
                 if ( _Q_->Verbosity > 1 ) Stack_Print ( debugger->ReturnStack, ( byte* ) "debugger->ReturnStack ", 0 ) ;
                 Debugger_GetWordFromAddress ( debugger ) ;
-                //if ( debugger->w_Word == _Context_->CurrentlyRunningWord ) goto done ;
             }
             else
             {
@@ -179,7 +175,6 @@ Debugger_CompileAndStepOneInstruction ( Debugger * debugger )
             jcAddress = JumpCallInstructionAddress ( debugger->DebugAddress ) ;
 doJmpCall:
             word = Word_UnAlias ( Word_GetFromCodeAddress ( jcAddress ) ) ;
-            //if (String_Equal ( word->Name, "dbrk") || String_Equal ( word->Name, "<dbg>") ) Pause () ;
             if ( word && ( word->CAttribute & ( DEBUG_WORD ) ) &&
                 ( word->CAttribute2 & ( RT_STEPPING_DEBUG ) ) )
             {
@@ -304,7 +299,7 @@ _Debugger_SetupStepping ( Debugger * debugger, Word * word, byte * address, byte
     if ( word )
     {
         _CfrTil_Source ( debugger->w_Word, 0 ) ;
-        if ( ( ! address ) || ( ! GetState ( debugger, ( DBG_BRK_INIT ) ) ) ) address = ( byte* ) word->Definition ;
+        if ( ( ! address ) || ( ! GetState ( debugger, ( DBG_BRK_INIT|DBG_SETUP_ADDRESS ) ) ) ) address = ( byte* ) word->Definition ;
     }
     SetState_TrueFalse ( debugger, DBG_STEPPING, DBG_NEWLINE | DBG_PROMPT | DBG_INFO | DBG_MENU ) ;
     debugger->DebugAddress = address ;
@@ -496,10 +491,12 @@ Debugger_DoJcc ( Debugger * debugger, int64 numOfBytes )
 int64
 Debugger_CanWeStep ( Debugger * debugger, Word * word )
 {
-    int64 result ;
-    if ( ( ! word ) || ( ! word->CodeStart ) || ( ! NamedByteArray_CheckAddress ( _Q_CodeSpace, word->CodeStart ) ) ) result = false ;
-    else if ( word && ( word->CAttribute & ( CPRIMITIVE | DLSYM_WORD ) ) ) result = false ;
-    else result = true ;
+    int64 result = true ;
+    if ( ( ! debugger->DebugAddress ) || ( ! GetState ( debugger, DBG_SETUP_ADDRESS ) ) )
+    {
+        if ( ( ! word ) || ( ! word->CodeStart ) ) result = false ;
+        else if ( ( word && ( word->CAttribute & ( CPRIMITIVE | DLSYM_WORD ) ) ) || ( ! NamedByteArray_CheckAddress ( _Q_CodeSpace, word->CodeStart ) ) ) result = false ;
+    }
     SetState ( debugger, DBG_CAN_STEP, result ) ;
     return result ;
 }

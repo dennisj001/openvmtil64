@@ -129,8 +129,8 @@ _Class_Object_Init ( Word * word, Namespace * ins )
 {
     Namespace * ns = ins ;
     Stack * nsstack = _Context_->Compiler0->InternalNamespacesStack ;
-    Stack_Init ( nsstack ) ; // !! ?? put this in Compiler ?? !!
-    // init needs to be done by the most super class first successively down to the current class 
+    Stack_Init ( nsstack ) ; 
+    // init needs to be done by the most super/internal class first successively down to the current/sub class 
     do
     {
         Word * initWord ;
@@ -142,17 +142,13 @@ _Class_Object_Init ( Word * word, Namespace * ins )
     }
     while ( ns ) ;
     int64 i ;
-    SetState ( _Debugger_, DEBUG_SHTL_OFF, true ) ;
+    //SetState ( _Debugger_, DEBUG_SHTL_OFF, true ) ;
     //DebugShow_Off ;
     for ( i = Stack_Depth ( nsstack ) ; i > 0 ; i -- )
     {
-
         Word * initWord = ( Word* ) _Stack_Pop ( nsstack ) ;
-        DataStack_Push ( ( int64 ) word->W_Object ) ;
-        //if ( Is_DebugOn ) CfrTil_PrintDataStack ( ) ;
-        Word_Eval ( initWord ) ;
-        //if ( Is_DebugOn ) Stack_Print ( _Debugger_->ReturnStack, ( byte* ) "debugger->ReturnStack " ) ;
-        //if ( Is_DebugOn ) CfrTil_PrintDataStack ( ) ;
+        DataStack_Push ( ( int64 ) word->W_Value ) ;
+        Word_Run ( initWord ) ;
     }
     SetState ( _Debugger_, DEBUG_SHTL_OFF, false ) ;
     word->TypeNamespace = ins ;
@@ -195,7 +191,6 @@ _Class_New ( byte * name, uint64 type, int64 cloneFlag )
         ns = _DObject_New ( name, 0, CLASS | IMMEDIATE | type, 0, 0, type, ( byte* ) _DataObject_Run, 0, 0, sns, DICTIONARY ) ;
         Namespace_DoNamespace ( ns ) ; // before "size", "this"
         Word *ws = _CfrTil_Variable_New ( ( byte* ) "size", size ) ; // start with size of the prototype for clone
-        //ws->CAttribute |= NAMESPACE_VARIABLE ;
         _Context_->Interpreter0->ThisNamespace = ns ;
         Word *wt = _CfrTil_Variable_New ( ( byte* ) "this", size ) ; // start with size of the prototype for clone
         wt->CAttribute |= THIS | OBJECT ;

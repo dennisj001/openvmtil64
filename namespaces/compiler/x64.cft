@@ -38,6 +38,11 @@
 // cfrTil uses intel syntax convention
 //logOn
 C 
+: apause ; // pause ;
+: sp ; //stack pause ; 
+User
+: sp ; //stack pause ;
+sp
 Compiler Compiling C Asm
 : :asm compileModeOn sourceCodeInit token create begin ' {| find compileWord sourceCodeOn ; immediate  
 //: :asm compileModeOn sourceCodeInit token create begin ' {| find compileWord ; immediate  
@@ -65,11 +70,10 @@ Logic Bits Combinators X64
 dscOn 
 //verbosity 3 =
 #endif    
-: apause ; // pause ;
-: sp ; //stack using pause ; 
-sp
     
 c_syntaxOn
+Logic Bits Combinators X64 C
+
 int
 CalculateModRegardingDisplacement ( _mod,  disp | rmod ) // _mod/rmod avoid name class with 'mod' function
 {
@@ -353,7 +357,7 @@ _Compile_CallThruReg ( reg )
 {
     _Compile_Group5 ( CALL, REG, reg, 0, 0, 0 ) ;
 } prefix
-
+sp
 //                          _Compile_Group1_Immediate ( code toRegOrMem _mod rm disp imm immSize | opCode controlFlags )
 void _Compile_SUBI_DSP ( imm ) { _Compile_Group1_Immediate ( SUB, REG, DSP, 0, imm, 1 ) ; } prefix
 
@@ -390,6 +394,7 @@ c_syntaxOff
 infixOn
 C X64
 sp
+C_Syntax
 : _Compile_Stack_PopToReg ( reg ) 
     _Compile_Move_DataStackN_ToReg ( reg @, 0 ) // 4d8b06                  mov r8, [r14]
     //"\nshould show :     4d8b06                  mov r8, [r14]" ps
@@ -415,7 +420,7 @@ c3                      ret
 c_syntaxOff
 'Compile_PopDspToR8AndCall find wdiss
 #endif
-
+sp
 C X64
 #if x64_dbg
 //verbosity 3 =
@@ -429,7 +434,7 @@ sp
                                                 //c3                      ret      
 asm; 
 
-' iax find wdiss //pause // sp 
+' iax find wdiss sp 
 
 : _Compile_Test_Imm (  _mod, rm, disp, imm )
     _Compile_Test ( _mod @, rm @, IMM_B, disp @, imm @ )
@@ -452,12 +457,13 @@ asm;
     _Compile_Movereg_To_StackN ( DSP, 0, R8D ) 
 ;; 
 
-User
-: sp ; 
+Interpreter User 
+: sp ; //stack pause ; 
 : qeval
     stk iax
 ;
-' qeval find wdiss // sp
+' qeval find wdiss 
+sp
 
 :asm stest
     _Compile_MoveTOS_To_R8D ( ) 
@@ -465,9 +471,9 @@ User
     Compile_Stack_Push_R8D ( ) 
     _Compile_SUBI_DSP ( CELL ) 
 asm;
-
+sp
 ' stest find wdiss //pause
-s
+sp
 "\nthis is some purposefully funky code for testing\n" ps
 
 #if 1 

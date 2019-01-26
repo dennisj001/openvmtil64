@@ -100,7 +100,7 @@ Finder_Word_FindUsing ( Finder * finder, byte * name, int64 saveQns )
     Word * word = 0 ;
     if ( name )
     {
-        // the InNamespace takes precedence with this one exception is this best logic ??               
+        // the InNamespace takes precedence with this one exception but is this the best logic ??               
         if ( finder->QualifyingNamespace )
         {
             if ( String_Equal ( ".", ( char* ) name ) ) //|| String_Equal ( "find", ( char* ) name ) ) 
@@ -269,7 +269,7 @@ CfrTil_Postfix_Find ( )
 }
 
 void
-CfrTil_TurnOffQualifyingNamespace ( )
+CfrTil_UnsetQualifyingNamespace ( )
 {
     Finder_SetQualifyingNamespace ( _Finder_, 0 ) ;
 }

@@ -390,7 +390,7 @@ _LO_Apply_NonMorphismArg ( ListObject ** pl1, int64 i )
     word = l1->Lo_CfrTilWord ;
     word = Compiler_CopyDuplicatesAndPush ( word, l1->W_RL_Index, l1->W_SC_Index ) ;
     byte * here = Here ;
-    Word_Eval ( word ) ; 
+    Word_Eval ( word ) ;
     Word *baseObject = _Interpreter_->BaseObject ;
     if ( ( word->Name[0] == '\"' ) || ( ! _Lexer_IsTokenForwardDotted ( cntx->Lexer0, l1->W_RL_Index + Strlen ( word->Name ) - 1 ) ) ) // ( word->Name[0] == '\"' ) : sometimes strings have ".[]" chars within but are still just strings
     {
@@ -429,7 +429,7 @@ _LO_Apply_Arg ( LambdaCalculus * lc, ListObject ** pl1, int64 i )
     else
     {
         word = Compiler_CopyDuplicatesAndPush ( word, l1->W_RL_Index, l1->W_SC_Index ) ;
-        _Debugger_PreSetup ( _Debugger_, word, 0, 1 ) ;
+        Debugger_PreSetup ( _Debugger_, word, 0, 0, 1 ) ;
         Compile_MoveImm_To_Reg ( RegParameterOrder ( i ++ ), DataStack_Pop ( ), CELL_SIZE ) ;
         _DEBUG_SHOW ( word, 1 ) ;
     }
@@ -449,6 +449,7 @@ _LO_Apply_C_LtoR_ArgList ( LambdaCalculus * lc, ListObject * l0, Word * word )
     ByteArray * scs = _Q_CodeByteArray ;
     Compiler * compiler = cntx->Compiler0 ;
     int64 i, svcm = CompileMode ;
+    Word * worde ;
 
     d0 ( if ( Is_DebugModeOn ) LO_Debug_ExtraShow ( 0, 2, 0, ( byte* ) "\nEntering _LO_Apply_ArgList..." ) ) ;
     if ( l0 )
@@ -460,8 +461,6 @@ _LO_Apply_C_LtoR_ArgList ( LambdaCalculus * lc, ListObject * l0, Word * word )
         for ( i = 0, l1 = _LO_First ( l0 ) ; l1 ; l1 = LO_Next ( l1 ) ) i = _LO_Apply_Arg ( lc, &l1, i ) ;
         Set_CompileMode ( true ) ;
         _Debugger_->PreHere = Here ;
-        //int64 tsrli = -1, scwi = -1; 
-        //Word_SetTsrliScwi( word, tsrli, scwi ) ;
         Word_SetCodingAndSourceCoding ( word, Here ) ;
         word = Compiler_CopyDuplicatesAndPush ( word, word->W_RL_Index, word->W_SC_Index ) ;
         if ( ( String_Equal ( word->Name, "printf" ) || ( String_Equal ( word->Name, "sprintf" ) ) ) ) Compile_MoveImm_To_Reg ( RAX, 0, CELL ) ; // for printf ?? others //System V ABI : "%rax is used to indicate the number of vector arguments passed to a function requiring a variable number of arguments"
@@ -471,11 +470,13 @@ _LO_Apply_C_LtoR_ArgList ( LambdaCalculus * lc, ListObject * l0, Word * word )
         if ( ! svcm )
         {
             CfrTil_EndBlock ( ) ;
+            block b = ( block ) DataStack_Pop ( ) ;
+            worde = DataObject_New ( CFRTIL_WORD, 0, ( byte* ) "apply:<anonymous>", 0, 0, 0, 0, ( int64 ) b, 0, 0, - 1 ) ;
             Set_CompileMode ( svcm ) ;
             Set_CompilerSpace ( scs ) ;
-            //_DEBUG_SETUP ( word, 1 ) ;
-            if ( word && Is_DebugModeOn ) if ( _Debugger_PreSetup ( _Debugger_, word, 0, 1 ) ) return nil ;
-            CfrTil_BlockRun ( ) ;
+            Word_Run ( worde ) ;
+            if ( worde && Is_DebugModeOn ) if ( Debugger_PreSetup ( _Debugger_, word, 0, 0, 1 ) ) return nil ;
+            Word_Recycle ( worde ) ;
         }
         d0 ( if ( Is_DebugModeOn ) LO_Debug_ExtraShow ( 0, 2, 0, ( byte* ) "\nLeaving _LO_Apply_ArgList..." ) ) ;
         SetState ( compiler, LC_ARG_PARSING, false ) ;
@@ -493,6 +494,7 @@ LC_CompileRun_C_ArgList ( Word * word ) // C protocol - x64 : left to right argu
     Compiler * compiler = cntx->Compiler0 ;
     byte *svDelimiters = lexer->TokenDelimiters ;
     ListObject * l0 ;
+
     byte * token = _Lexer_ReadToken ( lexer, ( byte* ) " ,;\n\r\t" ) ;
     if ( word->CAttribute & ( C_PREFIX | C_PREFIX_RTL_ARGS ) )
     {
@@ -501,22 +503,22 @@ LC_CompileRun_C_ArgList ( Word * word ) // C protocol - x64 : left to right argu
     lc->ParenLevel = 1 ;
     if ( word->CAttribute & ( C_PREFIX | C_PREFIX_RTL_ARGS ) )
     {
+        if ( ! Compiling ) Compiler_Init ( compiler, 0, 0 ) ;
         SetState ( compiler, LC_ARG_PARSING, true ) ;
         int64 svcm = CompileMode ;
         Set_CompileMode ( false ) ; // we must have the arguments pushed and not compiled for _LO_Apply_C_Rtl_ArgList which will compile them for a C_Rtl function
-        LC_SaveStackPointer ( lc ) ;
         int64 svDs = GetState ( _CfrTil_, _DEBUG_SHOW_ ) ;
         DebugShow_Off ;
         l0 = _LO_Read ( lc ) ;
         SetState ( _CfrTil_, _DEBUG_SHOW_, svDs ) ;
         Set_CompileMode ( svcm ) ; // we must have the arguments pushed and not compiled for _LO_Apply_C_Rtl_ArgList which will compile them for a C_Rtl function
         _LO_Apply_C_LtoR_ArgList ( lc, l0, word ) ;
-        LC_RestoreStackPointer ( lc ) ;
         LC_LispNamespacesOff ( ) ;
         SetState ( compiler, LC_ARG_PARSING | LC_C_RTL_ARG_PARSING, false ) ;
     }
     _CfrTil_Namespace_InNamespaceSet ( backgroundNamespace ) ;
     Lexer_SetTokenDelimiters ( lexer, svDelimiters, COMPILER_TEMP ) ;
+    LC_RestoreStackPointer ( lc ) ;
 }
 
 // assumes list contains only one application 

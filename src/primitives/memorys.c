@@ -58,6 +58,7 @@ CfrTil_Peek ( ) // @
 {
     if ( CompileMode ) Compile_Peek ( _Context_->Compiler0, DSP ) ;
     else TOS = * ( int64* ) TOS ;
+    //_Context_->Interpreter0->BaseObject = 0 ;
 }
 
 // ( addr n -- ) // (*addr) = n
@@ -73,6 +74,7 @@ CfrTil_Poke ( ) // =
         * nos = ( uint64 ) tos ;
         _Dsp_ -= 2 ;
     }
+    //_Context_->Interpreter0->BaseObject = 0 ;
 }
 
 void

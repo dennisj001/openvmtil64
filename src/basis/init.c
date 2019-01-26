@@ -15,7 +15,7 @@ _CfrTil_Init_SessionCore ( CfrTil * cfrTil, int64 cntxDelFlag, int64 promptFlag 
     ReadLine_Init ( cntx->ReadLiner0, _CfrTil_Key ) ;
     Lexer_Init ( cntx->Lexer0, 0, 0, CONTEXT ) ;
     Finder_Init ( cntx->Finder0 ) ;
-    Compiler_Init ( cntx->Compiler0, 0, 1 ) ;
+    Compiler_Init (cntx->Compiler0, 0, 0) ;
     Interpreter_Init ( cntx->Interpreter0 ) ;
     //CfrTil_ClearTokenList ( ) ;
     if ( cntxDelFlag )
@@ -146,8 +146,6 @@ CfrTil_MachineCodePrimitive_AddWords ( CfrTil * cfrTil )
     block * callHook ;
     Debugger * debugger = _Debugger_ ;
     // this form (below) can and should replace the above form for adding here
-    _CfrTil_MachineCodePrimitive_NewAdd ( "getRsp", CPRIMITIVE, 0, & debugger->getRsp, ( byte* ) Compile_Debug_GetRSP, - 1, "System", "Root" ) ;
-
     _CfrTil_MachineCodePrimitive_NewAdd ( "restoreCpuState", CPRIMITIVE, 0, & debugger->RestoreCpuState, ( byte* ) Compile_CpuState_Restore, ( int64 ) debugger->cs_Cpu, "Debug", "Root" ) ;
     _CfrTil_MachineCodePrimitive_NewAdd ( "saveCpuState", CPRIMITIVE, 0, & debugger->SaveCpuState, ( byte* ) Compile_CpuState_Save, ( int64 ) debugger->cs_Cpu, "Debug", "Root" ) ;
 
@@ -155,9 +153,10 @@ CfrTil_MachineCodePrimitive_AddWords ( CfrTil * cfrTil )
     _CfrTil_MachineCodePrimitive_NewAdd ( "saveCpuState", CPRIMITIVE, 0, & cfrTil->SaveCpuState, ( byte* ) Compile_CpuState_Save, ( int64 ) cfrTil->cs_Cpu, "System", "Root" ) ;
     _CfrTil_MachineCodePrimitive_NewAdd ( "restoreCpu2State", CPRIMITIVE, 0, & cfrTil->RestoreCpu2State, ( byte* ) Compile_CpuState_Restore, ( int64 ) cfrTil->cs_Cpu2, "System", "Root" ) ;
     _CfrTil_MachineCodePrimitive_NewAdd ( "saveCpu2State", CPRIMITIVE, 0, & cfrTil->SaveCpu2State, ( byte* ) Compile_CpuState_Save, ( int64 ) cfrTil->cs_Cpu2, "System", "Root" ) ;
-
     _CfrTil_MachineCodePrimitive_NewAdd ( "restoreSelectedCpuState", CPRIMITIVE, 0, & cfrTil->RestoreSelectedCpuState, ( byte* ) _Compile_CpuState_RestoreSelected, ( int64 ) cfrTil->cs_Cpu, "System", "Root" ) ;
     _CfrTil_MachineCodePrimitive_NewAdd ( "saveSelectedCpuState", CPRIMITIVE, 0, & cfrTil->SaveSelectedCpuState, ( byte* ) _Compile_CpuState_SaveSelected, ( int64 ) cfrTil->cs_Cpu, "System", "Root" ) ;
+#if 1    
+    _CfrTil_MachineCodePrimitive_NewAdd ( "getRsp", CPRIMITIVE, 0, & debugger->getRsp, ( byte* ) Compile_Debug_GetRSP, - 1, "System", "Root" ) ;
     _CfrTil_MachineCodePrimitive_NewAdd ( "callCurrentBlock", CPRIMITIVE, 0, & cfrTil->CallCurrentBlock, ( byte* ) Compile_Call_CurrentBlock, - 1, "System", "Root" ) ;
     _CfrTil_MachineCodePrimitive_NewAdd ( "set_DataStackPointer_FromDspReg", CPRIMITIVE, 0, & cfrTil->Set_DataStackPointer_FromDspReg, ( byte* ) Compile_Set_DataStackPointer_FromDspReg, - 1, "System", "Root" ) ;
     _CfrTil_MachineCodePrimitive_NewAdd ( "set_DspReg_FromDataStackPointer", CPRIMITIVE, 0, & cfrTil->Set_DspReg_FromDataStackPointer, ( byte* ) Compile_Set_DspReg_FromDataStackPointer, - 1, "System", "Root" ) ;
@@ -170,6 +169,7 @@ CfrTil_MachineCodePrimitive_AddWords ( CfrTil * cfrTil )
 #endif    
     //_CfrTil_MachineCodePrimitive_NewAdd ( "adjustRSPAndCall", CPRIMITIVE, (block*)& cfrTil->adjustRSPAndCall, ( byte* ) Compile_AdjustRSPAndCall, -1, "System", "Root" ) ;
     //_CfrTil_MachineCodePrimitive_NewAdd ( "adjustRSP", CPRIMITIVE, (block*)& cfrTil->adjustRSP, ( byte* ) Compile_AdjustRSP, -1, "System", "Root" ) ;
+#endif    
 #if 1  
     for ( i = 0 ; MachineCodePrimitives [ i ].ccp_Name ; i ++ )
     {

@@ -12,8 +12,9 @@
 
 // nb : can't fully optimize if there is code between blocks
 // check if there is any code between blocks if so we can't optimize fully
+
 void
-CfrTil_EndCombinator (int64 quotesUsed, int64 moveFlag)
+CfrTil_EndCombinator ( int64 quotesUsed, int64 moveFlag )
 {
     Compiler * compiler = _Context_->Compiler0 ;
     BlockInfo *bi = ( BlockInfo * ) _Stack_Pick ( compiler->CombinatorBlockInfoStack, quotesUsed - 1 ) ; // -1 : remember - stack is zero based ; stack[0] is top
@@ -21,7 +22,7 @@ CfrTil_EndCombinator (int64 quotesUsed, int64 moveFlag)
     compiler->BreakPoint = Here ;
     _CfrTil_InstallGotoCallPoints_Keyed ( ( BlockInfo* ) bi, GI_CONTINUE | GI_BREAK ) ;
     bi->CombinatorEndsAt = Here ;
-    if ( moveFlag && Compiling ) BI_Block_Copy ( bi, bi->OriginalActualCodeStart, 
+    if ( moveFlag && Compiling ) BI_Block_Copy ( bi, bi->OriginalActualCodeStart,
         bi->CombinatorStartsAt, bi->CombinatorEndsAt - bi->CombinatorStartsAt, 0 ) ; // 0 : can't generally peephole optimize (arrayTest.cft problems) ??
     //_CfrTil_InstallGotoCallPoints_Keyed ( ( BlockInfo* ) bi, GI_GOTO | GI_RETURN | GI_RECURSE ) ; // done in a final EndBlock not here
     _Stack_DropN ( compiler->CombinatorBlockInfoStack, quotesUsed ) ;
@@ -59,7 +60,7 @@ CfrTil_DropBlock ( )
     {
         CfrTil_BeginCombinator ( 1 ) ;
         //Block_CopyCompile ( ( byte* ) dropBlock, 0, 0 ) ; // in case there are control labels
-        CfrTil_EndCombinator (1, 0) ;
+        CfrTil_EndCombinator ( 1, 0 ) ;
     }
 }
 
@@ -72,10 +73,11 @@ CfrTil_BlockRun ( )
     {
         CfrTil_BeginCombinator ( 1 ) ;
         Block_CopyCompile ( ( byte* ) doBlock, 0, 0 ) ;
-        CfrTil_EndCombinator (1, 1) ; // 0 : don't copy
+        CfrTil_EndCombinator ( 1, 1 ) ; // 0 : don't copy
     }
     else
     {
+        DEBUG_SETUP_ADDRESS ( (byte*) doBlock, 1 ) ;
         Block_Eval ( doBlock ) ;
     }
 }
@@ -88,14 +90,14 @@ CfrTil_LoopCombinator ( )
     Compiler * compiler = _Context_->Compiler0 ;
     block loopBlock = ( block ) TOS ;
     DataStack_DropN ( 1 ) ;
-    if ( CompileMode ) 
+    if ( CompileMode )
     {
         CfrTil_BeginCombinator ( 1 ) ;
         byte * start = Here ;
         compiler->ContinuePoint = start ;
         Block_CopyCompile ( ( byte* ) loopBlock, 0, 0 ) ;
         _Compile_JumpToAddress ( start ) ;
-        CfrTil_EndCombinator (1, 1) ;
+        CfrTil_EndCombinator ( 1, 1 ) ;
     }
     else
     {
@@ -116,12 +118,12 @@ CfrTil_WhileCombinator ( )
         CfrTil_BeginCombinator ( 2 ) ;
         byte * start = Here ;
         compiler->ContinuePoint = Here ;
-        d0 ( if ( Is_DebugModeOn ) Compiler_SC_WordList_Show (( byte* ) "\nCheckOptimize : after optimize :", 0 , 0) ) ;
+        d0 ( if ( Is_DebugModeOn ) Compiler_SC_WordList_Show ( ( byte* ) "\nCheckOptimize : after optimize :", 0, 0 ) ) ;
         Block_CopyCompile ( ( byte* ) testBlock, 1, 1 ) ;
         Block_CopyCompile ( ( byte* ) trueBlock, 0, 0 ) ;
         _Compile_JumpToAddress ( start ) ;
         CfrTil_CalculateAndSetPreviousJmpOffset_ToHere ( ) ;
-        CfrTil_EndCombinator (2, 1) ;
+        CfrTil_EndCombinator ( 2, 1 ) ;
     }
     else
     {
@@ -150,7 +152,7 @@ CfrTil_DoWhileCombinator ( )
         Block_CopyCompile ( ( byte* ) testBlock, 0, 1 ) ;
         _Compile_JumpToAddress ( start ) ;
         CfrTil_CalculateAndSetPreviousJmpOffset_ToHere ( ) ;
-        CfrTil_EndCombinator (2, 1) ;
+        CfrTil_EndCombinator ( 2, 1 ) ;
     }
     else
     {
@@ -180,7 +182,7 @@ CfrTil_If1Combinator ( )
         Stack_Push_PointerToJmpOffset ( ) ;
         Block_CopyCompile ( ( byte* ) doBlock, 0, 0 ) ;
         CfrTil_CalculateAndSetPreviousJmpOffset_ToHere ( ) ;
-        CfrTil_EndCombinator (1, 1) ;
+        CfrTil_EndCombinator ( 1, 1 ) ;
         //DBI_OFF ;
     }
     else
@@ -202,7 +204,7 @@ CfrTil_If2Combinator ( )
         Block_CopyCompile ( ( byte* ) testBlock, 1, 1 ) ;
         Block_CopyCompile ( ( byte* ) doBlock, 0, 0 ) ;
         CfrTil_CalculateAndSetPreviousJmpOffset_ToHere ( ) ;
-        CfrTil_EndCombinator (2, 1) ;
+        CfrTil_EndCombinator ( 2, 1 ) ;
     }
     else
     {
@@ -231,7 +233,7 @@ CfrTil_TrueFalseCombinator2 ( )
         CfrTil_CalculateAndSetPreviousJmpOffset_ToHere ( ) ;
         Block_CopyCompile ( ( byte* ) falseBlock, 0, 0 ) ;
         CfrTil_EndIf ( ) ;
-        CfrTil_EndCombinator (2, 1) ;
+        CfrTil_EndCombinator ( 2, 1 ) ;
     }
     else
     {
@@ -256,7 +258,7 @@ CfrTil_TrueFalseCombinator3 ( )
         CfrTil_Else ( ) ;
         Block_CopyCompile ( ( byte* ) falseBlock, 0, 0 ) ;
         CfrTil_EndIf ( ) ;
-        CfrTil_EndCombinator (3, 1) ;
+        CfrTil_EndCombinator ( 3, 1 ) ;
     }
     else
     {
@@ -300,7 +302,7 @@ CfrTil_DoWhileDoCombinator ( )
         Block_CopyCompile ( ( byte* ) doBlock2, 0, 0 ) ;
         _Compile_JumpToAddress ( start ) ; // runtime
         CfrTil_CalculateAndSetPreviousJmpOffset_ToHere ( ) ;
-        CfrTil_EndCombinator (3, 1) ;
+        CfrTil_EndCombinator ( 3, 1 ) ;
     }
     else
     {
@@ -337,13 +339,13 @@ CfrTil_ForCombinator ( )
 
         Block_CopyCompile ( ( byte* ) doBlock, 0, 0 ) ;
 
-        d0 ( Compiler_SC_WordList_Show (( byte* ) "for combinator : before doPostBlock", 0 , 0) ) ;
+        d0 ( Compiler_SC_WordList_Show ( ( byte* ) "for combinator : before doPostBlock", 0, 0 ) ) ;
         Block_CopyCompile ( ( byte* ) doPostBlock, 1, 0 ) ;
 
         _Compile_JumpToAddress ( start ) ;
         CfrTil_CalculateAndSetPreviousJmpOffset_ToHere ( ) ;
 
-        CfrTil_EndCombinator (4, 1) ;
+        CfrTil_EndCombinator ( 4, 1 ) ;
     }
     else
     {

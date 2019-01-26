@@ -127,7 +127,8 @@ gotNextToken:
             else
             {
                 byte * buffer = Buffer_Data_Cleared ( _CfrTil_->ScratchB1 ) ;
-                sprintf ( ( char* ) buffer, "\n_CfrTil_Parse_ClassStructure : can't find namespace : \'%s\'", token ) ;
+                byte * msg = word ? ( byte* ) "namespace has no size" : ( byte* ) "can't find namespace" ;
+                sprintf ( ( char* ) buffer, "\n_CfrTil_Parse_ClassStructure : %s : \'%s\'", ( char* ) msg, token ) ;
                 _SyntaxError ( ( byte* ) buffer, 1 ) ; // else structure component size error
             }
         }
@@ -209,7 +210,7 @@ _CfrTil_Parse_LocalsAndStackVariables ( int64 svf, int64 lispMode, ListObject * 
     Boolean regFlag = false ;
     byte *token, *returnVariable = 0 ;
     Namespace *typeNamespace = 0, *saveInNs = _CfrTil_->InNamespace ;
-    if ( ! localsNs ) localsNs = Namespace_FindOrNew_Local ( nsStack ? nsStack : compiler->LocalsCompilingNamespacesStack, ! debugFlag ) ;
+    if ( ! CompileMode ) Compiler_Init ( compiler, 0, 0 ) ;
 
     if ( ! debugFlag ) CfrTil_WordLists_PopWord ( ) ; // stop source code
     if ( svf ) svff = 1 ;
@@ -297,6 +298,7 @@ _CfrTil_Parse_LocalsAndStackVariables ( int64 svf, int64 lispMode, ListObject * 
             }
             if ( addWords )
             {
+                if ( ! localsNs ) localsNs = Namespace_FindOrNew_Local ( nsStack ? nsStack : compiler->LocalsCompilingNamespacesStack, ! debugFlag ) ;
                 if ( svff )
                 {
                     ctype = PARAMETER_VARIABLE ; // aka an arg

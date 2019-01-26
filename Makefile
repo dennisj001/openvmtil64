@@ -28,18 +28,18 @@ INCLUDES = src/include/machineCode.h src/include/defines.h src/include/types.h \
 	
 
 OBJECTS = $(SOURCES:%.c=%.o) 
-CC = g++ #gcc
+CC = g++ #gcc #tcc
 OUT = cfrtil64-gdb
 
 default : debug
 
-debug : cfrtil64-gdb 
+debug : bin/cfrtil64-gdb 
 run : cfrtil64
 all: cfrtil64 cfrtil64-gdb #cfrtil64s
 	
-CFLAGS_CORE = -finline-functions  
+#CFLAGS_CORE = -finline-functions -fno-use-cxa-atexit 
 CFLAGS = $(CFLAGS_CORE) -Wall 
-LIBS = -L/usr/local/lib -ludis86 -lrt -lc -ldl -lm  -lmpfr -lgmp #-lpython3.7#-lFOX-1.6  -lX11
+LIBS = -L/usr/local/lib -ludis86 -lrt -lc -ldl -lm  -lmpfr -lgmp #-ltcc #-lpython3.7#-lFOX-1.6  -lX11
 
 oclean : 
 	-rm src/basis/*.o src/primitives/*.o src/basis/compiler/*.o src/basis/core/*.o src/basis/lc/*.o
@@ -66,16 +66,17 @@ cfrtil64s : src/include/prototypes.h $(OBJECTS)
 	strip cfrtil64s
 	mv cfrtil64s bin/
 	
-static : CFLAGS = $(CFLAGS_CORE) -O3
+static : CFLAGS = $(CFLAGS_CORE)
 static : src/include/prototypes.h $(OBJECTS)
-	$(CC) -static $(CFLAGS) $(OBJECTS) -O3 -o cfrtil64s $(LIBS)
+	$(CC) -static $(CFLAGS) $(OBJECTS) -o cfrtil64s $(LIBS)
 	strip cfrtil64s
 	mv cfrtil64s bin/
 
-cfrtil64-gdb : CFLAGS = $(CFLAGS_CORE) -ggdb 
-cfrtil64-gdb : src/include/prototypes.h $(OBJECTS) 
-	$(CC) $(CFLAGS) $(OBJECTS) -o cfrtil64-gdb $(LIBS)
-	mv cfrtil64-gdb bin
+bin/cfrtil64-gdb : CFLAGS = $(CFLAGS_CORE) -ggdb 
+bin/cfrtil64-gdb : src/include/prototypes.h $(OBJECTS) 
+	$(CC) $(CFLAGS) $(OBJECTS) -o bin/cfrtil64-gdb $(LIBS)
+	strip -o bin/cftil64 bin/cfrtil64-gdb
+	
 
 cfrtil64o : oclean $(OBJECTS)
 	$(CC) $(CFLAGS) $(OBJECTS) -o $(OUT) $(LIBS)

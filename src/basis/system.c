@@ -330,6 +330,7 @@ __CfrTil_Dump ( byte * address, int64 number, int64 dumpMod )
             else i ++ ;
         }
     }
+    //_Compiler_->LHS_Word = 0 ;
 }
 
 void

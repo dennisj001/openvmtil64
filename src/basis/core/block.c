@@ -11,12 +11,8 @@ Block_Eval ( block blck )
 {
     if ( blck )
     {
-        if ( ! sigsetjmp ( _Context_->JmpBuf0, 0 ) ) // from _Debugger_InterpreterLoop
-        {
-            ( ( block ) blck ) ( ) ;
-            //_Block_Eval ( blck ) ;
-        }
-        else Set_DataStackPointers_FromDebuggerDspReg ( ) ;
+        ( ( block ) blck ) ( ) ;
+        //_Block_Eval ( blck ) ;
     }
 }
 

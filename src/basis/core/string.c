@@ -640,15 +640,14 @@ String_New_SourceCode ( byte * string )
 byte
 _String_NextNonDelimiterChar ( byte * str0, byte * cset )
 {
-    if ( str0 )
+    byte * str = str0 ;
+    if ( str )
     {
-        for ( ; *str0 ; str0 ++ )
-        {
-
-            if ( ! _CharSet_IsDelimiter ( cset, *str0 ) ) break ;
-        }
+        //if ( !_CharSet_IsDelimiter ( cset, *str ) ) while ( !_CharSet_IsDelimiter ( cset, *(++str) ) ) ;
+        //if ( _CharSet_IsDelimiter ( cset, *str ) ) while ( _CharSet_IsDelimiter ( cset, *(++str) ) )  ;
+        for ( ; *str ; str ++ ) if ( ! _CharSet_IsDelimiter ( cset, *str ) ) break ;
     }
-    return str0 ? *str0 : 0 ;
+    return str ? *str : 0 ;
 }
 
 int64

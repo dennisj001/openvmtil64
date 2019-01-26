@@ -87,7 +87,7 @@ _CfrTil_ForAllNamespaces ( MapSymbolFunction2 msf2 )
     _CfrTil_NamespacesMap ( msf2, NOT_USING, 1, 1 ) ;
     int64 notUsingWords = _CfrTil_->FindWordCount ;
     _CfrTil_->FindWordCount = usingWords + notUsingWords ;
-    CfrTil_WordAccounting ( (byte*) "_CfrTil_ForAllNamespaces" ) ;
+    CfrTil_WordAccounting ( ( byte* ) "_CfrTil_ForAllNamespaces" ) ;
 }
 
 void
@@ -106,7 +106,7 @@ Namespace_PrettyPrint ( Namespace* ns, int64 indentFlag, int64 indentLevel )
 void
 CfrTil_Namespace_New ( )
 {
-    Namespace * ns = Namespace_FindOrNew_SetUsing (( byte* ) DataStack_Pop ( ), _CfrTil_Namespace_InNamespaceGet ( ), 1 ) ;
+    Namespace * ns = Namespace_FindOrNew_SetUsing ( ( byte* ) DataStack_Pop ( ), _CfrTil_Namespace_InNamespaceGet ( ), 1 ) ;
     Namespace_DoNamespace ( ns ) ;
 
 }
@@ -268,6 +268,7 @@ _Namespace_RemoveFromUsingListAndClear ( Namespace * ns )
         if ( ns == _Context_->Finder0->QualifyingNamespace ) Finder_SetQualifyingNamespace ( _Context_->Finder0, 0 ) ;
         _Namespace_Clear ( ns ) ;
         dlnode_Remove ( ( dlnode* ) ns ) ;
+        Word_Recycle ( ns ) ;
     }
 }
 
@@ -277,19 +278,24 @@ _CfrTil_RemoveNamespaceFromUsingListAndClear ( byte * name )
     _Namespace_RemoveFromUsingListAndClear ( Namespace_Find ( name ) ) ;
 }
 
+//keep the stack intack just remove the namespace from the Namespaces list and set them as not using
+
 void
-Namespace_RemoveNamespacesStack ( Stack * stack )
+Namespace_RemoveNamespacesStack (Stack * stack)
 {
     if ( stack )
     {
         int64 i, n ;
-        for ( i = 0, n = Stack_Depth ( stack ) ; n ; n --, i++ )
+        for ( i = 0, n = Stack_Depth ( stack ) ; n ; n --, i ++ )
         {
-            //Namespace * ns = ( Namespace* ) Stack_Pop ( stack ) ;
             Namespace * ns = ( Namespace* ) stack->StackPointer [i] ;
-            if ( ns == _CfrTil_->InNamespace ) _CfrTil_->InNamespace = 0 ; //( Namespace* ) dlnode_Next ( ( dlnode* ) ns ) ; //dllist_First ( (dllist*) _Q_->CfrTil->Namespaces->Lo_List ) ;
-            if ( ns == _Context_->Finder0->QualifyingNamespace ) Finder_SetQualifyingNamespace ( _Context_->Finder0, 0 ) ;
-            if ( ns ) dlnode_Remove ( ( dlnode* ) ns ) ;
+            if ( ns )
+            {
+                if ( ns == _CfrTil_->InNamespace ) _CfrTil_->InNamespace = 0 ;
+                if ( ns == _Context_->Finder0->QualifyingNamespace ) Finder_SetQualifyingNamespace ( _Context_->Finder0, 0 ) ;
+                _Namespace_SetState ( ns, NOT_USING ) ;
+                dlnode_Remove ( ( dlnode* ) ns ) ;
+            }
         }
         //Stack_Init ( stack ) ;
     }
@@ -310,14 +316,13 @@ Namespace_FreeNamespacesStack ( Stack * stack )
     }
 }
 
-
 void
 Namespace_NamespacesStack_PrintWords ( Stack * stack )
 {
     if ( stack )
     {
         int64 i, n ;
-        for ( i = 0, n = Stack_Depth ( stack ) ; n ; n --, i++ )
+        for ( i = 0, n = Stack_Depth ( stack ) ; n ; n --, i ++ )
         {
             Namespace * ns = ( Namespace* ) stack->StackPointer [i] ;
             if ( ns ) _Namespace_PrintWords ( ns ) ;

@@ -8,7 +8,7 @@ Interpret_String ( byte *str )
 }
 
 byte *
-Interpret_C_Until_Token4 ( Interpreter * interp, byte * end1, byte * end2, byte* end3, byte* end4, byte * delimiters )
+Interpret_C_Until_Token4 ( Interpreter * interp, byte * end1, byte * end2, byte* end3, byte* end4, byte * delimiters, Boolean newlineBreakFlag )
 {
     byte * token ;
     int64 inChar ;
@@ -17,9 +17,9 @@ Interpret_C_Until_Token4 ( Interpreter * interp, byte * end1, byte * end2, byte*
     {
         token = _Lexer_ReadToken ( lexer, delimiters ) ;
         List_CheckInterpretLists_OnVariable ( _Compiler_->PostfixLists, token ) ;
-        if ( String_Equal ( token, "#" ) ) break ; 
+        if ( String_Equal ( token, "#" ) ) break ;
         else if ( String_Equal ( token, end1 ) || String_Equal ( token, end2 )
-            || ( end3 ? String_Equal ( token, end3 ) : 0 ) || ( end4 ? String_Equal ( token, end4 ) : 0 ) ) break ;
+            || String_Equal ( token, end3 ) || String_Equal ( token, end4 ) ) break ;
         else if ( GetState ( _Compiler_, DOING_A_PREFIX_WORD ) && String_Equal ( token, ")" ) )
         {
             Interpreter_InterpretAToken ( interp, token, lexer->TokenStart_ReadLineIndex, lexer->SC_Index ) ;
@@ -34,6 +34,11 @@ Interpret_C_Until_Token4 ( Interpreter * interp, byte * end1, byte * end2, byte*
         else Interpreter_InterpretAToken ( interp, token, lexer->TokenStart_ReadLineIndex, lexer->SC_Index ) ;
         inChar = ReadLine_PeekNextChar ( _Context_->ReadLiner0 ) ;
         if ( ( inChar == 0 ) || ( inChar == - 1 ) || ( inChar == eof ) ) token = 0 ;
+        if ( newlineBreakFlag )
+        {
+            int64 i = ReadLiner_PeekSkipSpaces ( _ReadLiner_ ) ;
+            if ( _ReadLine_PeekIndexedChar ( _ReadLiner_, i ) == '\n' ) break ;
+        }
     }
     while ( token ) ;
     if ( token ) CfrTil_PushToken_OnTokenList ( token ) ;
@@ -133,7 +138,7 @@ Interpret_ToEndOfLine ( Interpreter * interp )
     while ( 1 )
     {
         Interpreter_InterpretNextToken ( interp ) ;
-        if ( GetState ( _Context_->Lexer0, LEXER_END_OF_LINE ) ) break ; // either the lexer with get a newline or the readLiner
+        if ( GetState ( interp->Lexer0, LEXER_END_OF_LINE ) ) break ; // either the lexer with get a newline or the readLiner
         i = ReadLiner_PeekSkipSpaces ( rl ) ;
         if ( _ReadLine_PeekIndexedChar ( rl, i ) == '\n' ) break ;
     }

@@ -60,18 +60,6 @@ ReadLine_DoCursorMoveInput ( ReadLiner * rl, int64 newCursorPosition )
     ReadLine_ShowCursor ( rl ) ;
 }
 
-#if 0
-
-int64
-ReadLine_PositionCursor ( ReadLiner * rl )
-{
-    int64 pos = rl->i32_CursorPosition ;
-    while ( ( pos >= 0 ) && ( rl->InputLine [ pos ] == 0 ) )
-        rl->InputLine [ -- pos ] = ' ' ;
-    return rl->i32_CursorPosition ; //= pos >= 0 ? pos : 0 ;
-}
-#endif
-
 void
 ReadLine_SetCursorPosition ( ReadLiner * rl, int64 pos )
 {
@@ -82,7 +70,7 @@ ReadLine_SetCursorPosition ( ReadLiner * rl, int64 pos )
 void
 ReadLiner_CommentToEndOfLine ( ReadLiner * rl )
 {
-    rl->ReadIndex = BUFFER_SIZE ; // cf. _ReadLine_GetNextChar
+    ReadLine_Set_ReadIndex ( rl, BUFFER_SIZE ) ;
     ReadLiner_Done ( rl ) ;
 }
 
@@ -151,7 +139,7 @@ ReadLine_InputLine_Init ( ReadLiner * rl )
 {
     ReadLine_InputLine_Clear ( rl ) ;
     //rl->InputLineCharacterNumber = 0 ;
-    rl->ReadIndex = 0 ;
+    ReadLine_Set_ReadIndex ( rl, 0 ) ;
     rl->InputLineString = rl->InputLine ;
     SetState ( rl, READLINER_DONE, false ) ;
 }
@@ -203,11 +191,7 @@ _ReadLine_Copy ( ReadLiner * rl, ReadLiner * rl0, uint64 type )
     MemCpy ( rl, rl0, sizeof (ReadLiner ) ) ;
     rl->TabCompletionInfo0 = TabCompletionInfo_New ( type ) ;
     rl->TciNamespaceStack = Stack_New ( 64, COMPILER_TEMP ) ;
-    //rl->TciDownStack = Stack_New ( 32, SESSION ) ;
-    //ReadLine_Init ( rl, rl0->Key, type ) ; //_CfrTil_GetC ) ;
     strcpy ( ( char* ) rl->InputLine, ( char* ) rl0->InputLine ) ;
-    //rl->InputStringOriginal = rl0->InputStringOriginal ;
-    //rl->State = rl0->State ;
 }
 
 ReadLiner *
@@ -221,10 +205,7 @@ ReadLine_Copy ( ReadLiner * rl0, uint64 type )
 void
 ReadLine_TabWordCompletion ( ReadLiner * rl )
 {
-    if ( ! GetState ( rl, TAB_WORD_COMPLETION ) )
-    {
-        RL_TabCompletionInfo_Init ( rl ) ;
-    }
+    if ( ! GetState ( rl, TAB_WORD_COMPLETION ) ) RL_TabCompletionInfo_Init ( rl ) ;
     RL_TabCompletion_Run ( rl, rl->TabCompletionInfo0->NextWord ) ; //? rl->TabCompletionInfo0->NextWord : rl->TabCompletionInfo0->RunWord ) ; // the main workhorse here
 }
 
@@ -409,7 +390,6 @@ ReadLiner_InsertTextMacro ( ReadLiner * rl, Word * word )
 void
 ReadLine_DeleteChar ( ReadLiner * rl )
 {
-    //Buffer * buffer = Buffer_New ( BUFFER_SIZE ) ;
     byte * b = Buffer_Data ( _CfrTil_->ScratchB2 ) ;
     if ( -- rl->EndPosition < 0 ) rl->EndPosition = 0 ;
     if ( rl->CursorPosition > rl->EndPosition )// shouldn't ever be greater but this will be more robust
@@ -421,7 +401,6 @@ ReadLine_DeleteChar ( ReadLiner * rl )
     strcpy ( ( char* ) b, ( char* ) & rl->InputLine [ rl->CursorPosition + 1 ] ) ;
     if ( rl->CursorPosition < rl->EndPosition ) strcat ( ( char* ) rl->InputLine, ( char* ) b ) ;
     ReadLine_ClearAndShowLineWithCursor ( rl ) ;
-    //Buffer_SetAsUnused ( buffer ) ;
 }
 
 int64
@@ -469,7 +448,7 @@ ReadLine_IsReverseTokenQualifiedID ( ReadLiner * rl )
 void
 Readline_Setup_OneStringInterpret ( ReadLiner * rl, byte * str )
 {
-    rl->ReadIndex = 0 ;
+    ReadLine_Set_ReadIndex ( rl, 0 ) ;
     SetState ( rl, STRING_MODE, true ) ;
     ReadLine_SetInputLine ( rl, str ) ;
 }
@@ -506,40 +485,25 @@ _Readline_Is_AtEndOfBlock ( ReadLiner * rl0 )
     Word * word = CfrTil_WordList ( 0 ) ;
     int64 iz, ib, index = word->W_RL_Index + Strlen ( word->Name ), sd = _Stack_Depth ( _Context_->Compiler0->BlockStack ) ;
     byte c ;
-    //if ( GetState ( _Context_, C_SYNTAX ) )
+    for ( ib = false, iz = false ; 1 ; iz = false )
     {
-        for ( ib = false, iz = false ; 1 ; iz = false )
+        c = rl->InputLine [ index ++ ] ;
+        if ( ! c ) return false ;
+        if ( ( c == ';' ) && ( ! GetState ( _Context_, C_SYNTAX ) ) ) return true ;
+        if ( c == '}' )
         {
-            c = rl->InputLine [ index ++ ] ;
-            if ( ! c )
-            {
-#if 0                
-                if ( iz ) return false ; // two '0' chars in a row returns false 
-                ReadLine_GetLine ( rl ) ;
-                index = 0 ;
-                iz = true ; // z : zero
-                continue ;
-#else
-                return false ;
-#endif                
-            }
-            if ( ( c == ';' ) && ( ! GetState ( _Context_, C_SYNTAX ) ) ) return true ;
-            if ( c == '}' )
-            {
-                if ( -- sd <= 1 ) return true ;
-                ib = 1 ; // b : bracket
-                continue ;
-            }
-
-            if ( ( c == '/' ) && ( rl->InputLine [ index ] == '/' ) ) CfrTil_CommentToEndOfLine ( ) ;
-            else if ( ib && ( c > ' ' ) && ( c != ';' ) ) return false ;
+            if ( -- sd <= 1 ) return true ;
+            ib = 1 ; // b : bracket
+            continue ;
         }
+        if ( ( c == '/' ) && ( rl->InputLine [ index ] == '/' ) ) CfrTil_CommentToEndOfLine ( ) ;
+        else if ( ib && ( c > ' ' ) && ( c != ';' ) ) return false ;
     }
     return false ;
 }
 
 byte
-_ReadLine_Key ( ReadLiner * rl, byte c )
+ReadLine_Set_Key ( ReadLiner * rl, byte c )
 {
     rl->InputKeyedCharacter = c ;
     //rl->InputLineCharacterNumber ++ ;
@@ -548,9 +512,9 @@ _ReadLine_Key ( ReadLiner * rl, byte c )
 }
 
 byte
-ReadLine_Key ( ReadLiner * rl )
+ReadLine_Get_Key ( ReadLiner * rl )
 {
-    return _ReadLine_Key ( rl, rl->Key ( rl ) ) ;
+    return ReadLine_Set_Key ( rl, rl->Key ( rl ) ) ;
 }
 
 byte
@@ -607,14 +571,17 @@ _ReadLine_TabCompletion_Check ( ReadLiner * rl )
             {
                 TabCompletionInfo * tci = rl->TabCompletionInfo0 ;
                 RL_TC_StringInsert_AtCursor ( rl, tci->TrialWord->Name ) ;
+                ReadLiner_SetLastChar ( ' ' ) ; // _Printf does a ReadLiner_SetLastChar ( 0 )
+                //_ReadLine_AppendAndShowCharacter ( rl, rl->InputKeyedCharacter ) ;
+                //_ReadLine_QuickAppendCharacter ( rl, rl->InputKeyedCharacter ) ;
+
             }
-                //else if ( rl->InputKeyedCharacter == '\r' ) rl->InputKeyedCharacter = ' ' ; // leave line as is and append a space instead of '\r'
             else if ( rl->InputKeyedCharacter == '\r' ) rl->InputKeyedCharacter = '\n' ; // leave line as is and append a space instead of '\r'
         }
     }
 }
 
-void
+byte
 _ReadLine_GetLine ( ReadLiner * rl, byte c )
 // we're here until we get a newline char ( '\n' or '\r' ), a eof or a buffer overflow
 // note : ReadLinePad [ 0 ] starts after the prompt ( "-: " | "> " ) and doesn't include them
@@ -623,27 +590,27 @@ _ReadLine_GetLine ( ReadLiner * rl, byte c )
     rl->LineStartFileIndex = rl->InputStringIndex ;
     while ( ! ReadLiner_IsDone ( rl ) )
     {
-        if ( ! c ) ReadLine_Key ( rl ) ;
-        else _ReadLine_Key ( rl, c ), c = 0 ;
+        if ( ! c ) ReadLine_Get_Key ( rl ) ;
+        else ReadLine_Set_Key ( rl, c ), c = 0 ;
 
         if ( AtCommandLine ( rl ) ) _ReadLine_TabCompletion_Check ( rl ) ;
         _CfrTil_->ReadLine_FunctionTable [ _CfrTil_->ReadLine_CharacterTable [ rl->InputKeyedCharacter ] ] ( rl ) ;
         SetState ( rl, ANSI_ESCAPE, false ) ;
     }
+    return rl->InputKeyedCharacter ;
 }
 
-void
+byte
 ReadLine_GetLine ( ReadLiner * rl )
 {
-    _ReadLine_GetLine ( rl, 0 ) ;
+    return _ReadLine_GetLine ( rl, 0 ) ;
 }
 
 byte
 ReadLine_NextChar ( ReadLiner * rl )
 {
     byte nchar = _ReadLine_GetNextChar ( rl ) ;
-    if ( nchar ) return nchar ;
-    else
+    if ( ! nchar )
     {
         if ( GetState ( rl, STRING_MODE ) )
         {
@@ -651,8 +618,8 @@ ReadLine_NextChar ( ReadLiner * rl )
             return nchar ;
         }
         else ReadLine_GetLine ( rl ) ; // get a line of characters
+        nchar = _ReadLine_GetNextChar ( rl ) ;
     }
-    nchar = _ReadLine_GetNextChar ( rl ) ;
     return nchar ;
 }
 

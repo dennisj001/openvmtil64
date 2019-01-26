@@ -1,6 +1,11 @@
 #ifndef __CFRTIL_H__
 #define __CFRTIL_H__
 
+#define TCC 0
+#if TCC
+const void *const __dso_handle __attribute__ ((__visibility__ ("hidden")))
+  = &__dso_handle;
+#endif
 #define LINUX 1
 
 #include <sys/types.h>

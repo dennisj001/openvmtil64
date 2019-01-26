@@ -178,7 +178,8 @@ _CfrTil_C_Infix_EqualOp ( Word * opWord )
     {
         if ( ( lhsWord->CAttribute & ( OBJECT | THIS | QID ) || GetState ( lhsWord, QID ) ) )
         {
-            if ( ! ( word0a->CAttribute & ( ( LITERAL | NAMESPACE_VARIABLE | THIS | OBJECT | LOCAL_VARIABLE | PARAMETER_VARIABLE ) ) ) ) Compile_TosRmToTOS ( ) ;
+            if ( ( ! String_Equal ( word0a->Name, "]" ) ) &&
+                ( ! ( word0a->CAttribute & ( ( LITERAL | NAMESPACE_VARIABLE | THIS | OBJECT | LOCAL_VARIABLE | PARAMETER_VARIABLE ) ) ) ) ) Compile_TosRmToTOS ( ) ;
             wordr = _CfrTil_->PokeWord ;
         }
         else
@@ -229,12 +230,12 @@ CfrTil_C_ConditionalExpression ( )
     CfrTil_If_ConditionalExpression ( ) ;
     if ( CompileMode )
     {
-        byte * token = Interpret_C_Until_Token4 ( interp, ( byte* ) ":", ( byte* ) ",", ( byte* ) ")", ( byte* ) "}", 0 ) ;
+        byte * token = Interpret_C_Until_Token4 ( interp, ( byte* ) ":", ( byte* ) ",", ( byte* ) ")", ( byte* ) "}", 0, 0 ) ;
         if ( String_Equal ( token, ":" ) )
         {
             Lexer_ReadToken ( _Lexer_ ) ;
             CfrTil_Else ( ) ;
-            Interpret_C_Until_Token4 ( interp, ( byte* ) ";", ( byte* ) ",", ( byte* ) ")", ( byte* ) "}", 0 ) ;
+            Interpret_C_Until_Token4 ( interp, ( byte* ) ";", ( byte* ) ",", ( byte* ) ")", ( byte* ) "}", ( byte* ) " \n\r\t", 0 ) ;
             CfrTil_EndIf ( ) ;
         }
     }
@@ -255,6 +256,7 @@ IsLValue_String_CheckForwardToStatementEnd ( byte * nc )
     {
         switch ( *nc )
         {
+            case ';': case ',': case '"': case ')': case '{': case '}': case '\n': return false ;
             case '=':
             {
                 if ( * ( nc + 1 ) == '=' ) return false ;
@@ -268,13 +270,10 @@ IsLValue_String_CheckForwardToStatementEnd ( byte * nc )
             }
             case ']':
             {
-                if ( ( -- leftBracket ) && GetState ( _Compiler_, ARRAY_MODE ) ) return false ;
+                if ( ( -- leftBracket ) && GetState ( _Compiler_, ARRAY_MODE ) ) return false ; // ??
                 else break ;
             }
-                //case '.' : if ( ! _Finder_->QualifyingNamespace ) return true ;
-                //case '(' : return false ;
-            case ';': case ',': case '"': case ')': case '{': case '}': case '\n': return false ;
-            default: ;
+            default: break ;
         }
         nc ++ ;
     }
@@ -307,20 +306,21 @@ Boolean
 Lexer_IsLValue_CheckBackToLastSemiForParenOrBracket ( Lexer * lexer, Word * word )
 {
     ReadLiner * rl = lexer->ReadLiner0 ;
-    byte * nc = & rl->InputStringOriginal [lexer->TokenStart_FileIndex] ; //& rl->InputStringOriginal [Lexer_ConvertLineIndexToFileIndex ( lexer, word->W_RL_Index - Strlen (word->Name))] ;
-    Boolean equal = false ;
-    while ( ( *nc != ';' ) && ( *nc != ',' ) && ( *nc != '}' ) && ( *nc != '{' ) )
+    byte * nc = & rl->InputStringOriginal [lexer->TokenStart_FileIndex] ;
+    while ( 1 )
     {
-        if ( ( *nc == ')' ) || ( *nc == '(' ) )
-            return Lexer_CheckForwardToStatementEnd_Is_LValue ( lexer, word ) ;
-            //else if ( *nc == '[' ) return false ;
-        else if ( *nc == '=' ) return false ;
-        else if ( *nc == '\n' ) return false ;
-        else if ( *nc == '&' ) return true ;
+        switch ( *nc )
+        {
+            case ';': case ',': case '}': case '{': case '&': return true ;
+            case '=': case '\n': return false ;
+            case ')': case '(': return Lexer_CheckForwardToStatementEnd_Is_LValue ( lexer, word ) ;
+            default: break ;
+        }
         nc -- ;
     }
-    return (! equal ) ;
+    return true ;
 }
+
 // assuming no comments
 
 Boolean
@@ -331,16 +331,24 @@ Lexer_IsLValue_CheckForwardToNextSemiForArrayVariable ( Lexer * lexer, Word * wo
         ReadLiner * rl = lexer->ReadLiner0 ;
         byte * nc = & rl->InputStringOriginal [lexer->TokenStart_FileIndex] ;
         Boolean space = false, inArray = false ;
-        while ( ( *nc != ';' ) && ( *nc != ',' ) && ( *nc != '}' ) && ( *nc != '{' ) )
+        while ( 1 )
         {
-            if ( *nc == '.' ) return true ;
-            else if ( ( ! inArray ) && space && isalnum ( *nc ) ) return false ; // false means word is to be an rvalue
-            else if ( inArray && isalpha ( *nc ) ) // true means we have an array varible with this object
+            switch ( *nc )
+            {
+                case ';': case ',': case '}': case '{': case '.': case ')': case ' ': case 0: case (byte ) ( uint8 ) EOF: return true ;
+                case '=':
+                {
+                    if ( * ( nc + 1 ) == '=' ) return false ;
+                    else if ( ispunct ( * ( nc - 1 ) ) ) return false ; // op equal
+                    else return true ; // we have an lvalue
+                }
+                case '[': inArray = true, space = false ;
+                case ']': inArray = false, space = false ;
+                default: break ;
+            }
+            if ( ( ! inArray ) && space && isalnum ( *nc ) ) return false ; // false means word is to be an rvalue
+            if ( inArray && isalpha ( *nc ) ) // true means we have an array varible with this object
                 return true ;
-            else if ( *nc == ' ' ) space = true ;
-            else if ( *nc == ')' ) return false ;
-            else if ( *nc == '[' ) inArray = true, space = false ;
-            else if ( *nc == ']' ) inArray = false, space = false ;
             nc ++ ;
         }
         return true ;
@@ -348,28 +356,10 @@ Lexer_IsLValue_CheckForwardToNextSemiForArrayVariable ( Lexer * lexer, Word * wo
     else return false ;
 }
 
-#if 0
-
 Boolean
 Is_LValue ( Context * cntx, Word * word )
 {
-    Boolean isLValue = false, addressModeLValue = false ; // generally 
-    Compiler * compiler = cntx->Compiler0 ;
-    if ( GetState ( cntx, ADDRESS_OF_MODE ) ) addressModeLValue = true ;
-    if ( GetState ( cntx, C_SYNTAX | INFIX_MODE ) ) // lvalue is a C syntax concept
-    {
-        if ( GetState ( compiler, ARRAY_MODE ) ) isLValue = Lexer_IsLValue_CheckForwardToNextSemiForArrayVariable ( cntx->Lexer0, word ) ;
-        else isLValue = Lexer_CheckForwardToStatementEnd_Is_LValue ( cntx->Lexer0, word ) ;
-    }
-    if ( isLValue ) SetState ( _Context_, ADDRESS_OF_MODE, false ) ;
-
-    return (addressModeLValue || isLValue ) ;
-}
-#else
-Boolean
-Is_LValue ( Context * cntx, Word * word )
-{
-    Boolean isLValue = false ; // generally 
+    Boolean isLValue = true ; // in postfix generally 
     Compiler * compiler = cntx->Compiler0 ;
     if ( GetState ( cntx, ADDRESS_OF_MODE ) ) isLValue = true ;
     else if ( GetState ( cntx, C_SYNTAX | INFIX_MODE ) ) // lvalue is a C syntax concept
@@ -381,4 +371,105 @@ Is_LValue ( Context * cntx, Word * word )
     return isLValue ;
 }
 
-#endif
+// char sets would be better here ??
+
+Boolean
+Lexer_IsTokenReverseDotted ( Lexer * lexer )
+{
+    ReadLiner * rl = lexer->ReadLiner0 ;
+    int64 i, space = 0, start = lexer->TokenStart_ReadLineIndex - 1 ;
+    byte * nc = & rl->InputLineString [ start ] ;
+    while ( 1 )
+    {
+        //byte * current = & rl->InputLineString [ i ] ;
+        switch ( *nc )
+        {
+            case ']': case '[': return true ;
+            case '\n': case ',': case ';': case '(': case ')': case '\'': return false ;
+            case '.':
+            {
+                if ( *( nc + 1 ) != '.' ) // watch for (double/triple) dot ellipsis
+                    return true ;
+                break ;
+            }
+            case '"':
+            {
+                if ( i < start ) return false ;
+                break ;
+            }
+            case ' ':
+            {
+                space ++ ;
+                break ;
+            }
+            default:
+            {
+                if ( ( ! GetState ( _Compiler_, ARRAY_MODE ) ) && space && isgraph ( *nc ) ) return false ;
+                else
+                {
+                    space = 0 ;
+                    break ;
+                }
+            }
+        }
+        nc -- ;
+    }
+    return false ;
+}
+
+// char sets would be better here ??
+
+Boolean
+ReadLiner_IsTokenForwardDotted ( ReadLiner * rl, int64 index )
+{
+    int64 i, space = 0 ;
+    byte * nc = & rl->InputLineString [ index ] ;
+    while ( 1 )
+    {
+        switch ( *nc )
+        {
+            case ']': case '[': return true ;
+            case ',': case ';': case '(': case ')': case '\n': case '\'': return false ;
+            case '.':
+            {
+                if ( *( nc + 1 ) != '.' ) // watch for (double/triple) dot ellipsis
+                    return true ;
+                break ;
+            }
+            case '"':
+            {
+                if ( i > index ) return false ;
+                break ;
+            }
+            case ' ':
+            {
+                space ++ ;
+                break ;
+            }
+            default:
+            {
+                if ( ( ! GetState ( _Compiler_, ARRAY_MODE ) ) && space && isgraph ( *nc ) ) return false ;
+                else
+                {
+                    space = 0 ;
+                    break ;
+                }
+            }
+        }
+        nc ++ ;
+    }
+    return false ;
+}
+
+Boolean
+_Lexer_IsTokenForwardDotted ( Lexer * lexer, int64 end )
+{
+    return ReadLiner_IsTokenForwardDotted ( lexer->ReadLiner0, end ? end - 1 : lexer->TokenStart_ReadLineIndex ) ;
+}
+
+Boolean
+Lexer_IsTokenForwardDotted ( Lexer * lexer )
+{
+    return _Lexer_IsTokenForwardDotted ( lexer, 0 ) ;
+}
+

@@ -185,12 +185,12 @@ fac4 ( n  | facc -- TOS )
 wdiss ( ' fac4 find ) ; 
 sp 
 fac4 ( 7 ) ; dup p 5040 _assert 
+'interpret3 'interpret2 find alias
 c_syntaxOff
 ' fac4 find wdiss
 #endif
 
 User
-'interpret3 'interpret2 find alias
 interpret3 words // i2halt code to exit interpret2
 
 : hi1 1 2 + p ;  
@@ -286,10 +286,10 @@ $ ( | atoken, buffer, CBuffer buffer0 )
     }
 } 
 'void.$ find wdiss //sp
+void
 c_syntaxOff 
 #if doScript2 
 "\n\nnew $ test\n" ps
-void
 $ls -al . ;
 $ etc/script ; 
 $ etc/lispScript ; 

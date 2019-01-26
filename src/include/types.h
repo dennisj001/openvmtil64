@@ -397,7 +397,7 @@ typedef struct _WordData
     {
         ListObject * LambdaArgs ;
         int64 Index ; // used by Variable and LocalWord
-        byte * LogicTestCode ;
+        //byte * LogicTestCode ;
     } ;
     dllist * SourceCodeWordList ;
     byte * SourceCoding ; //
@@ -802,7 +802,7 @@ typedef struct _Debugger
     Cpu * cs_Cpu ;
     byte* DebugAddress, *CopyRSP, *CopyRBP, *LastSourceCodeAddress ;
     uint64 * DebugRSP, *DebugRBP, *DebugRSI, *DebugRDI, * LastRsp ; //, *SavedIncomingESP, *SavedIncomingEBP ; //, SavedRunningESP, SavedRunningEBP;
-    int64 TerminalLineWidth, ReadIndex ;
+    int64 TerminalLineWidth, ReadIndex, SC_Index ;
     ByteArray * StepInstructionBA ;
     byte CharacterTable [ 128 ] ;
     DebuggerFunction CharacterFunctionTable [ 40 ] ;

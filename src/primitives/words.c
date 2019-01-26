@@ -4,7 +4,7 @@
 void
 _CfrTil_Colon ( Boolean initSC )
 {
-    //CfrTil_RightBracket ( ) ;
+    CfrTil_RightBracket ( ) ;
     if ( initSC ) CfrTil_SourceCode_Init ( ) ;
     CfrTil_Token ( ) ;
     CfrTil_Word_Create ( ) ;
@@ -239,11 +239,9 @@ CfrTil_Do ( )
 void
 CfrTil_Does ( )
 {
-    CfrTil_RightBracket ( ) ; // back to compile mode
+    //_CfrTil_RightBracket ( ) ; // back to compile mode
     CfrTil_BeginBlock ( ) ;
-    //byte * token = 
-    Interpret_C_Until_Token4 ( _Interpreter_, ( byte* ) "<do", ( byte* ) ";", ( byte* ) "}", ( byte* ) ",", 0 ) ;
-    //if ( String_Equal ( token, "<do" ) ) Lexer_ReadToken ( _Lexer_ ) ;
+    Interpret_C_Until_Token4 (_Interpreter_, ( byte* ) "<do", ( byte* ) ";", ( byte* ) "}", ( byte* ) ",", 0 , 0) ;
     CfrTil_EndBlock ( ) ;
     CfrTil_BlockRun ( ) ;
 }
@@ -307,11 +305,7 @@ void
 CfrTil_Prefix ( void )
 {
     Word * word = _CfrTil_->LastFinished_Word ;
-    if ( word )
-    {
-        //word->CAttribute |= PREFIX ;
-        word->CAttribute |= PREFIX ;
-    }
+    if ( word ) word->CAttribute |= PREFIX ;
 }
 
 void

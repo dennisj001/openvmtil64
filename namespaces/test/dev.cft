@@ -14,7 +14,7 @@ Compiler Logic Int C User
 var: facTest fibTest Dsp ;
 
 // tail recursion from http://c2.com/cgi/wiki?TailCallOptimization
-c_syntaxOn dscOn
+c_syntaxOn scOn
 int factoriali ( REG n | REG res )
 {
     res = 1;

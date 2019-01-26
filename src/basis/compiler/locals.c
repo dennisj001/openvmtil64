@@ -30,11 +30,49 @@
  *                                  sp = DSP = Dsp = R14 //32 bit = ESI
  */
 
+int64
+ParameterVar_Offset ( Word * word )
+{
+    int64 offset ;
+    offset = - ( _Compiler_->NumberOfArgs - word->Index + ( Compiler_IsFrameNecessary ( _Compiler_ ) ? 1 : 0 ) ) ;
+    //offset = - word->Index ;
+    return offset ;
+}
+
+inline int64
+LocalVar_FpOffset ( Word * word )
+{
+    return word->Index ;
+}
+
+inline int64
+LocalVar_Disp ( Word * word )
+{
+    return ( word->Index * CELL ) ;
+}
+
+inline int64
+ParameterVar_Disp ( Word * word )
+{
+    return ( ParameterVar_Offset ( word ) * CELL ) ;
+}
+
+inline int64
+LocalOrParameterVar_Offset ( Word * word )
+{
+    return ( ( word->CAttribute & LOCAL_VARIABLE ) ? ( LocalVar_FpOffset ( word ) ) : ( ParameterVar_Offset ( word ) ) ) ;
+}
+
+inline int64
+LocalOrParameterVar_Disp ( Word * word )
+{
+    int64 offset = LocalOrParameterVar_Offset ( word ) ;
+    return ( offset * CELL_SIZE ) ;
+}
+
 Word *
 _Compiler_LocalWord ( Compiler * compiler, byte * name, int64 ctype, int64 ctype2, int64 ltype, int64 allocType )
 {
-    BlockInfo * bi = ( BlockInfo * ) Stack_Top ( compiler->BlockStack ) ;
-    //Word *word = _DObject_New ( name, 0, ( ctype | IMMEDIATE ), ctype2, ltype, LOCAL_VARIABLE, ( byte* ) _DataObject_Run, 0, 1, bi->BI_LocalsNamespace, allocType ) ;
     Word *word = _DObject_New ( name, 0, ( ctype | IMMEDIATE ), ctype2, ltype, LOCAL_VARIABLE, ( byte* ) _DataObject_Run, 0, 1, 0, allocType ) ;
     compiler->NumberOfVariables ++ ;
     if ( ctype & REGISTER_VARIABLE )
@@ -72,7 +110,7 @@ _Compiler_LocalWord ( Compiler * compiler, byte * name, int64 ctype, int64 ctype
 void
 Compiler_LocalsNamespace_New ( Compiler * compiler )
 {
-    Namespace_FindOrNew_Local (compiler->LocalsCompilingNamespacesStack, 0) ;
+    Namespace_FindOrNew_Local ( compiler->LocalsCompilingNamespacesStack, 1 ) ;
     Finder_SetQualifyingNamespace ( _Finder_, 0 ) ;
 }
 
@@ -85,13 +123,11 @@ Compiler_LocalWord ( Compiler * compiler, byte * name, int64 ctype, int64 ctype2
 }
 
 //nb. correct only if Compiling !!
+
 inline Boolean
 Compiler_IsFrameNecessary ( Compiler * compiler )
 {
-    //if ( Compiling ) 
-    return (( compiler->NumberOfNonRegisterLocals || compiler->NumberOfNonRegisterArgs ) ? true : false ) ;
-    //else Error ( "'Compiler_IsFrameNecessary' can be called only when Compiling!", "", ABORT ) ;
-    //return false ;
+    return ( ( compiler->NumberOfNonRegisterLocals || compiler->NumberOfNonRegisterArgs ) ? true : false ) ;
 }
 
 void
@@ -104,7 +140,7 @@ Compile_Init_LocalRegisterParamenterVariables ( Compiler * compiler )
     for ( node = dllist_First ( ( dllist* ) list ) ; node ; node = dlnode_Next ( node ) ) //, i -- )
     {
         Word * word = ( Word* ) dobject_Get_M_Slot ( ( dobject* ) node, SCN_T_WORD ) ;
-        _Compile_Move_StackN_To_Reg ( word->RegToUse, ( frameFlag ? FP : DSP ), _ParameterVarOffset ( compiler, word, frameFlag ) ) ;
+        _Compile_Move_StackN_To_Reg ( word->RegToUse, ( frameFlag ? FP : DSP ), ParameterVar_Offset ( word ) ) ;
     }
 }
 
@@ -113,7 +149,7 @@ _Compiler_AddLocalFrame ( Compiler * compiler )
 {
     Compiler_WordStack_SCHCPUSCA ( 0, 0 ) ;
     _Compile_Move_Reg_To_StackN ( DSP, 1, FP ) ; // save pre fp
-    _Compile_LEA ( FP, DSP, 0, LocalVarIndex_Disp ( 1 ) ) ; // set new fp
+    _Compile_LEA ( FP, DSP, 0, CELL ) ; // set new fp
     Compile_ADDI ( REG, DSP, 0, 1 * CELL, INT32_SIZE ) ; // 1 : fp - add stack frame -- this value is going to be reset 
     compiler->FrameSizeCellOffset = ( int64* ) ( Here - INT32_SIZE ) ; // in case we have to add to the framesize with nested locals
     d0 ( if ( Is_DebugOn ) Compile_Call_TestRSP ( ( byte* ) CfrTil_Debugger_Locals_Show ) ) ;
@@ -138,18 +174,17 @@ Compiler_RemoveLocalFrame ( Compiler * compiler )
     Boolean returnValueFlag, already = false ;
     returnValueFlag = ( Context_CurrentWord ( )->CAttribute & C_RETURN ) || ( GetState ( compiler, RETURN_TOS | RETURN_ACCUM ) ) || compiler->ReturnVariableWord ;
     if ( compiler->NumberOfArgs ) parameterVarsSubAmount = ( compiler->NumberOfArgs - returnValueFlag ) * CELL ;
+#if 0    
     if ( ( ! returnValueFlag ) && GetState ( _Context_, C_SYNTAX ) && ( _CfrTil_->CurrentWordBeingCompiled->S_ContainingNamespace ) &&
         ( ! String_Equal ( _CfrTil_->CurrentWordBeingCompiled->S_ContainingNamespace->Name, "void" ) ) )
     {
         SetState ( compiler, RETURN_TOS, true ) ;
     }
+#endif    
     // nb. these variables have no lasting lvalue - they exist on the stack - we can only return their rvalue
     if ( compiler->ReturnVariableWord )
     {
-        if ( ! ( compiler->ReturnVariableWord->CAttribute & REGISTER_VARIABLE ) )
-        {
-            Compile_GetVarLitObj_RValue_To_Reg ( compiler->ReturnVariableWord, ACC ) ; // need to copy because ReturnVariableWord may have been used within the word already
-        }
+        if ( ! ( compiler->ReturnVariableWord->CAttribute & REGISTER_VARIABLE ) ) Compile_GetVarLitObj_RValue_To_Reg ( compiler->ReturnVariableWord, ACC ) ; // need to copy because ReturnVariableWord may have been used within the word already
     }
     else if ( GetState ( compiler, RETURN_TOS ) || ( compiler->NumberOfNonRegisterArgs && returnValueFlag && ( ! GetState ( compiler, RETURN_ACCUM ) ) ) )
     {
@@ -166,7 +201,7 @@ Compiler_RemoveLocalFrame ( Compiler * compiler )
     {
         // remove the incoming parameters -- like in C
         if ( ! GetState ( _Compiler_, LISP_MODE ) ) Compiler_WordStack_SCHCPUSCA ( 0, 0 ) ;
-        _Compile_LEA ( DSP, FP, 0, - LocalVarIndex_Disp ( 1 ) ) ; // restore sp - release locals stack frame
+        _Compile_LEA ( DSP, FP, 0, - CELL ) ; // restore sp - release locals stack frame
         _Compile_Move_StackN_To_Reg ( FP, DSP, 1 ) ; // restore the saved pre fp - cf AddLocalsFrame
     }
     if ( ( parameterVarsSubAmount > 0 ) && ( ! IsWordRecursive ) ) Compile_SUBI ( REG, DSP, 0, parameterVarsSubAmount, 0 ) ; // remove stack variables
@@ -186,63 +221,11 @@ Compiler_RemoveLocalFrame ( Compiler * compiler )
             if ( compiler->ReturnVariableWord->CAttribute & REGISTER_VARIABLE )
             {
                 _Compile_Move_Reg_To_StackN ( DSP, 0, compiler->ReturnVariableWord->RegToUse ) ;
-
                 return ;
             }
         }
         Compile_Move_ACC_To_TOS ( DSP ) ;
     }
-}
-
-int64
-_ParameterVarOffset ( Compiler * compiler, Word * word, Boolean frameFlag )
-{
-    int64 offset = - ( compiler->NumberOfArgs - word->Index + ( frameFlag ? 1 : 0 ) ) ;
-    return offset ;
-}
-
-int64
-ParameterVarOffset ( Compiler * compiler, Word * word )
-{
-    int64 offset = _ParameterVarOffset ( compiler, word, Compiler_IsFrameNecessary ( compiler ) ) ;
-    return offset ;
-}
-
-inline int64
-LocalVarIndex_Disp ( int64 i )
-{
-    return ( i * CELL ) ;
-}
-
-inline int64
-LocalVar_FpOffset ( Word * word )
-{
-    return word->Index ;
-}
-
-inline int64
-LocalVar_FpDisp ( Word * word )
-{
-    return ( word->Index * CELL ) ;
-}
-
-inline int64
-ParameterVar_Disp ( Word * word )
-{
-    return ( ParameterVarOffset ( _Compiler_, word ) * CELL ) ;
-}
-
-inline int64
-LocalOrParameterVar_Offset ( Word * word )
-{
-    return ( ( word->CAttribute & LOCAL_VARIABLE ) ? ( LocalVar_FpOffset ( word ) ) : ( ParameterVarOffset ( _Compiler_, word ) ) ) ;
-}
-
-inline int64
-LocalOrParameterVar_Disp ( Word * word )
-{
-    int64 offset = LocalOrParameterVar_Offset ( word ) ;
-    return ( offset * CELL_SIZE ) ;
 }
 
 void

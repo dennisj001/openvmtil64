@@ -32,7 +32,7 @@ Context_Location ( )
 Word *
 _Context_CurrentWord ( Context * cntx )
 {
-    return cntx->CurrentlyRunningWord ?  cntx->CurrentlyRunningWord : _Context_->CurrentEvalWord ? _Context_->CurrentEvalWord : _Context_->LastRunWord ? _Context_->LastRunWord : cntx->CurrentTokenWord ;
+    return cntx->CurrentlyRunningWord ? cntx->CurrentlyRunningWord : _Context_->CurrentEvalWord ? _Context_->CurrentEvalWord : _Context_->LastRunWord ? _Context_->LastRunWord : cntx->CurrentTokenWord ;
 }
 
 Word *
@@ -44,7 +44,7 @@ Context_CurrentWord ( )
 Context *
 _Context_Allocate ( )
 {
-    NBA * nba = MemorySpace_NBA_New ( _Q_->MemorySpace0, ( byte* ) String_New ( (byte*) "ContextSpace", STRING_MEM ), 10 * K, OPENVMTIL ) ;
+    NBA * nba = MemorySpace_NBA_New ( _Q_->MemorySpace0, ( byte* ) String_New ( ( byte* ) "ContextSpace", STRING_MEM ), 10 * K, OPENVMTIL ) ;
     _Q_->MemorySpace0->ContextSpace = nba ;
     Context * cntx = ( Context* ) Mem_Allocate ( sizeof ( Context ), OPENVMTIL ) ;
     cntx->ContextNba = nba ;
@@ -110,11 +110,13 @@ CfrTil_Context_PushNew ( CfrTil * cfrTil )
     Context * cntx = _Context_New ( cfrTil ) ;
     return cntx ;
 }
+
 void
 CfrTil_Context_PopDelete ( CfrTil * cfrTil )
 {
     NBA * cnba = cfrTil->Context0->ContextNba ;
     Context * cntx = ( Context* ) _Stack_Pop ( cfrTil->ContextDataStack ) ;
+    //Compiler_DeleteDebugInfo ( cntx->Compiler0 ) ;
     _Context_ = cfrTil->Context0 = cntx ;
     _Q_->MemorySpace0->ContextSpace = cntx->ContextNba ;
     NamedByteArray_Delete ( cnba ) ;
@@ -203,7 +205,7 @@ _Context_IncludeFile ( Context * cntx, byte *filename, int64 interpretFlag )
             ReadLine_ReadFileIntoAString ( rl, file ) ;
             fclose ( file ) ;
 
-            if ( interpretFlag ) Interpret_UntilFlaggedWithInit ( cntx->Interpreter0, END_OF_FILE|END_OF_STRING ) ;
+            if ( interpretFlag ) Interpret_UntilFlaggedWithInit ( cntx->Interpreter0, END_OF_FILE | END_OF_STRING ) ;
 
             cntx->System0->IncludeFileStackNumber -- ;
             if ( ! cntx->System0->IncludeFileStackNumber ) Ovt_AutoVarOff ( ) ;
@@ -239,7 +241,7 @@ _Context_DoubleQuoteMacro ( Context * cntx )
 {
     ReadLiner * rl = _ReadLiner_ ;
     Lexer * lexer = cntx->Lexer0 ;
-    if ( ! GetState ( _CfrTil_, SOURCE_CODE_STARTED ) ) CfrTil_InitSourceCode_WithCurrentInputChar (_CfrTil_, 0) ; // must be here for wdiss and add addToHistory
+    if ( ! GetState ( _CfrTil_, SOURCE_CODE_STARTED ) ) CfrTil_InitSourceCode_WithCurrentInputChar ( _CfrTil_, 0 ) ; // must be here for wdiss and add addToHistory
     _CfrTil_->SC_QuoteMode = true ;
     do
     {
@@ -250,10 +252,12 @@ _Context_DoubleQuoteMacro ( Context * cntx )
     while ( lexer->TokenInputByte != '"' ) ;
     _CfrTil_->SC_QuoteMode = false ;
     SetState ( lexer, LEXER_DONE, true ) ;
+    //if ( Is_DebugModeOn ) CfrTil_PrintDataStack ( ) ;
     if ( GetState ( _CfrTil_, STRING_MACROS_ON ) && GetState ( &_CfrTil_->Sti, STI_INITIALIZED ) ) _CfrTil_StringMacros_Do ( lexer->TokenBuffer ) ;
-    Word * word = Lexer_ObjectToken_New (lexer, String_New ( lexer->TokenBuffer, STRING_MEM ) , -1, -1) ; 
+    Word * word = Lexer_ObjectToken_New ( lexer, String_New ( lexer->TokenBuffer, STRING_MEM ), - 1, - 1 ) ;
     //Debugger_On ( _Debugger_ ) ;
-    Interpreter_DoWord ( cntx->Interpreter0, word, - 1, - 1 ) ; 
+    Interpreter_DoWord ( cntx->Interpreter0, word, - 1, - 1 ) ;
+    //if ( Is_DebugModeOn ) CfrTil_PrintDataStack ( ) ;
 }
 
 void

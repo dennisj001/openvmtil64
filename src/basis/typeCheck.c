@@ -422,6 +422,16 @@ Tsi_Convert_Word_TypeAttributeToTypeLetterCode ( Word * word )
 }
 
 void
+Word_SetTypeNamespace ( Word * word, int64 attribute )
+{
+    if ( _Compiler_->AutoVarTypeNamespace ) word->TypeNamespace = _Compiler_->AutoVarTypeNamespace ;
+    else if ( attribute & T_INT ) word->TypeNamespace = _CfrTil_->IntegerNamespace ;
+    else if ( attribute & T_STRING ) word->TypeNamespace = _CfrTil_->StringNamespace ;
+    else if ( attribute & T_BIG_NUM ) word->TypeNamespace = _CfrTil_->BigNumNamespace ;
+    else if ( attribute & T_RAW_STRING ) word->TypeNamespace = _CfrTil_->RawStringNamespace ;
+}
+
+void
 CfrTil_TypeStackPush ( Word * word )
 {
     if ( GetState ( _CfrTil_, TYPECHECK_ON ) ) Stack_Push ( _CfrTil_->TypeWordStack, ( int64 ) word ) ;

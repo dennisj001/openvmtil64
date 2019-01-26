@@ -1,6 +1,5 @@
                    
 5 
-: sp ; //stack pause ;
 
 #if _TestDone_ @ not // prevent including twice
 dbgOff
@@ -8,23 +7,47 @@ lispOff
 decimal
 Int Class DLLNode
 "DLLNodeAlloc" class :{ DLLNode nodes [ 32 ] };
+: sp ; //stack pause ;
 
 "testna" DLLNodeAlloc new
 "DLLNode size = " prints DLLNode size @ Io.print nl 
 "DLLNodeAlloc size = " prints DLLNodeAlloc size @ Io.print nl 
-testna.nodes [ 1 2 + ].AfterReference  1 =
+testna.nodes [ 1 2 + ].AfterReference 1 =
 testna.nodes [ 2 ].BeforeReference  2 =
-testna 48 dump
+testna 64 dump
 testna.nodes [ 3 ].AfterReference @ 1 _assert
-
+sp
 "DLLNodeAlloc4" class :{ DLLNode nodes [ 32 ] [ 4 ] };
 "DLLNodeAlloc4 size = " prints DLLNodeAlloc4 size @ Io.print nl 
 "testna4" DLLNodeAlloc4 new
-// mem pause
 // test just using a object but not as a local variable 
 // nb. doesn't work as a local variable yet
 //verbosity 3 =
-: testna5
+"\ntestna4 = " ps testna4 hp
+: testna5 ( DLLNodeAlloc4 dlna4o )
+    "\ndlna4o = " ps dlna4o hp
+    dlna4o.nodes [ 1 ] [ 0 ].AfterReference 1 =
+    dlna4o.nodes [ 1 ] [ 0 ].BeforeReference 2 =
+    dlna4o.nodes [ 1 ] [ 0 ] 32 dump
+    dlna4o.nodes [ 2 ] [ 1 ].AfterReference 1 =
+    dlna4o.nodes [ 2 ] [ 1 ].BeforeReference 2 =
+    "\njust before : dlna4o.nodes [ 2 ] [ 1 ] 32 dump" ps 
+    dlna4o.nodes [ 2 ] [ 1 ] 32 dump
+    dlna4o.nodes [ 3 ] [ 2 ].AfterReference  1 =
+    dlna4o.nodes [ 3 ] [ 2 ].BeforeReference  2 =
+    "\njust before : dlna4o.nodes [ 3 ] [ 2 ] 32 dump" ps 
+    dlna4o.nodes [ 3 ] [ 2 ] 32 dump
+    dlna4o.nodes [ 3 ] [ 2 ].AfterReference  dlna4o.nodes [ 3 ] [ 2 ].BeforeReference =
+    dlna4o.nodes [ 3 ] [ 2 ].BeforeReference  dlna4o.nodes [ 3 ] [ 2 ].AfterReference =
+    "\njust before : dlna4o.nodes [ 3 ] [ 2 ] 32 dump" ps 
+    dlna4o.nodes [ 3 ] [ 2 ] 32 dump
+    "dlna4o = " ps dlna4o hp
+;
+' testna5 find wdiss
+
+testna4 testna5 //pause
+: testna5 
+    "\ntestna4 = " ps testna4 hp
     testna4.nodes [ 1 ] [ 0 ].AfterReference 1 =
     testna4.nodes [ 1 ] [ 0 ].BeforeReference 2 =
     testna4.nodes [ 1 ] [ 0 ] 32 dump
@@ -40,18 +63,22 @@ testna.nodes [ 3 ].AfterReference @ 1 _assert
     testna4.nodes [ 3 ] [ 2 ].BeforeReference  testna4.nodes [ 3 ] [ 2 ].AfterReference =
     "\njust before : testna4.nodes [ 3 ] [ 2 ] 32 dump" ps 
     testna4.nodes [ 3 ] [ 2 ] 32 dump
+    "testna4 = " ps testna4 hp
 ;
 ' testna5 find wdiss
 
 testna5 //pause
 
+"\ntestna4 = " ps testna4 hp
 testna4.nodes [ 3 ] [ 2 ].BeforeReference @ testna4.nodes [ 3 ] [ 2 ].AfterReference _assert
+//pause
 
 "testnarr2" DLLNodeAlloc new 
 : tna
-	testnarr2.nodes [ 1 ].AfterReference 1 = 
-	testnarr2.nodes [ 1 ]. BeforeReference 2 = 
-	testnarr2.nodes [ 1 ] 32 dump 
+    testnarr2.nodes [ 1 ] 32 dump 
+    testnarr2.nodes [ 1 ].AfterReference 1 = 
+    testnarr2.nodes [ 1 ]. BeforeReference 2 = 
+    testnarr2.nodes [ 1 ] 32 dump 
 ;
 ' tna find wdiss
 tna
@@ -85,7 +112,7 @@ testn4.nodes[2].BeforeReference @ 2 _assert
 	this.nodes [ 2 ].BeforeReference 2 =
 	this this.size @ dump
 ;
-
+sp
 "testn5" new
 testn5 tna3 //pause
 
@@ -129,7 +156,7 @@ arr1 arr2 // should print decimal 0x89
 ' a3 find wdiss //pause
 1 arr1 a3
 arr1.ar[2] @ 0x89 _assert
-
+sp
 "Ar2" class :{ int64 ar [4][4] };
 "a4" Ar2 new
 "a4 : " ps location a4 size @ dump
@@ -145,20 +172,20 @@ a4.ar[3][2] @ 0x89 _assert
 1 2 a4 a5 s
 "a4 : " ps location a4 128 dump //pause
 "Ar3" class :{ int64 ar [3][3][2] };
-"a6" Ar3 s new s
+"a6" Ar3 s new sp
 //"a6 : " ps location a6.size @ dump
-'a6x var 
+'a6x var sp
 a6x a6.ar[2][2][1] =
 a6.ar[2][2][1] dup hp 0x89 =
 a6x @ dup hp @ dup hp 0x89 _assert
-
+sp
 a6.ar[2][2][1] dup hp @ dup hp 0x89 _assert 
-"a6 : " ps location a6 a6.size @ dump 
-nl a6x @ @ hp 
-
+"a6 : " ps location a6 a6.size @ dump sp
+nl a6x @ hp 
+sp
 a6.ar[2][2][1] dup hp @ dup hp 0x89 _assert  
 nl a6.ar[1][2][1] dup hp a6.ar[2][2][1] s @ = sp
-a6x @ @ hp sp
+a6x @ hp sp
 a6.ar[2][2][1] dup hp @ dup hp 0x89 _assert sp
 nl "a6 : " ps location a6 size @ dump
 a6.ar[1][2][1] @ dup p 0x89 _assert 
@@ -169,7 +196,7 @@ a6.ar[1][2][1] dup hp dup @ hp 0 =
 sp
 a6.ar[1][2][1] dup hp @ dup hp 0 sp _assert 
 nl "a6 : " ps location a6.ar[1][2] 16 dump
-
+sp
 : a8 ( Ar3 a ) 
     a.ar[1][2][1] a.ar[2][2][1] @ = 
     nl "a8.a : " ps location a size @ dump
@@ -182,7 +209,7 @@ nl "a6 : " ps location a6.ar[1][2] 16 dump
 #endif
 ;
 ' a8 find wdiss
-
+sp
 a6.ar[2][2][1] dup hp @ dup p 0x89 _assert 
 "a6 : " ps location a6.ar[2][2][1] 16 dump //pause
 a6 a8
@@ -200,7 +227,7 @@ a6.ar[2][2][1] @ 0x89 _assert //pause
 a7(0,2,1,a6) // as a prefix function : lexer test, note dense lexeme packing is possible here
 "a6 : " ps location a6 a6.size @ dump //pause
 "Ar9" class :{ byte ar [256][256][256] };
-
+sp
 //verbosity 2 =
 : _adump ( addr size )
     //addr @ size @ <dbg> dump
@@ -247,9 +274,9 @@ a7(0,2,1,a6) // as a prefix function : lexer test, note dense lexeme packing is 
     adump ( 0 246 67 a  ) 
 ;
 ' a9 find wdiss s //pause
-"arr9" Ar9 new arr9 a9 s //pause
+"arr9" Ar9 new arr9 a9 sp //pause
 adump ( 0 123 234 arr9 ) 
-s //pause
+sp //pause
 "ct" class :{ byte ar [3][3][3] ; };
 "ab" ct new
 ab.ar [0][0][0] hp
@@ -270,8 +297,7 @@ ab.ar [0][0][0] @ dup p 263 _assert
 "ac" ct new 
 'tct find wdiss
 2 ac tct //pause
-
-#if 1
+sp
 "cta" class :{ byte ar [3][3][3] ; };
 "aba" cta new
 scOn
@@ -285,6 +311,7 @@ scOn
     //addr @ size @ <dbg> dump
     addr @ size @ dump
 ; prefix
+"caba" cta new
 c_syntaxOn
  
 void
@@ -301,13 +328,10 @@ ctcta ( y cta a )
     hp ( &a.ar ) ;
     cadump ( &a.ar 27 ) ; 
 } prefix
+
+ctcta ( 1 caba ) ; //pause
 c_syntaxOff
 ' ctcta find wdiss
-
-"caba" cta new
-ctcta ( 1 caba ) //pause
-#endif
-
 
 #endif
 2 + 7 assertStkChk // stack checking

@@ -1,6 +1,5 @@
-5
-"\nclassTest.cft" ps //pause
 /*test comment*/ 5  // for stack checking see last lines
+"\nclassTest.cft" ps //pause
 #if "_ClassTest_" defined not // prevent including this file twice
 "_ClassTest_" /*testing comment ...
 testing comment*/ var 
@@ -52,19 +51,19 @@ using
 	Pointer BeforeReference ;
 };
 DLLNode.size @ nl "DLLNode size = " prints Io.print nl
-
+sp
 "testNode" DLLNode new 
 testNode.AfterReference 1 =
 testNode.BeforeReference 2 =
-testNode testNode.size @ dup p dump
+testNode testNode.size @ dup p dump sp
 DLLNode
-
+sp
 "DLList" class
 :{
     DLLNode HeadNode ;
     DLLNode TailNode ;
 };
-
+sp
 scOn
 
 : init ( this )
@@ -105,11 +104,7 @@ using
 
 //verbosity 3 =
 : init ( this ) 
-#if dbgOnVar @
-    <dbg> this.Category 12 =
-#else
     this.Category 12 =
-#endif
     this.Three 3 = 
     this.Prototype this.Three @ =
     this.Prototype @ dup p 3 "init_assert1" assert 
@@ -118,22 +113,15 @@ using
     this.Four 4 = 
     this.Twelve 12 =
     this.Accum this.Sum @ = 
-    //this.Sum this.Category @ 3 + this.Prototype @ & = this.Sum @ 3 "init_assert2" d: ctloc assert
     this.Sum this.Category @ 3 + this.Prototype @ & = this.Sum @ 3 "init_assert2" do> locationPush does> locationPrint <do assert
     this.Accum this.Three @ this.Four @ * this.Three @ / = 
     this.Accum @ 4 "\n DLListClone init : this.Accum = :" ps "init_assert3" assert 
     this.Prototype @ p //pause
     this.Sum this.Category @ this.Prototype @ * this.Category @ - = // dup 24  "init_assert4" assert = 
-    this.Sum @ dup hex p 24  "init_assert5" assert decimal
-#if dbgOnVar @ 
-    <dbg> this this.size @ dump
-    this.Category @ dup p 12  "init_assert6" assert // 12
-    //this this.size @ dump
-    this.Prototype @ p // 3
-#else
+    this.Sum @ dup hex p 24  "init_assert5" assert decimal 
+    nl
     this.Category @ dup p 12  "init_assert7" assert // 12
     this.Prototype @ p // 3
-#endif
     this.Sum this.Category @ this.Prototype @ * dup "testing yada" ps dup p 36  "init_assert8" assert = // 36
     this.Sum this.Category @ this.Prototype @ - dup p = // 9
     this.Sum this.Category @ this.Prototype @ && dup p = // 12 && 3 = 1
@@ -144,7 +132,7 @@ using
     this.Category @ dup p 12 _assert // _pause // 12
     this.Sum @ p // 4
     this.Prototype @ p // 3
-    "\n 12 3 36 9 1 0 15 4 12 4 3 : output above should read" ddps //_pause
+    "\n 12 3 testing yada 36 9 1 0 15 4 12 4 3 : output above should read" ddps //_pause
     hex
     "\nthis = " ps this p
     "\nthis @ = " ps this @  p
@@ -158,14 +146,8 @@ using
     this.Category @ dup p 12 "init_assert9" assert //_pause // 12
 ;
 ' init find wdiss //pause
-#if dbgTest
-stack "testClone" DLListClone d: new 
-#else
 "testClone" DLListClone new 
-#endif
-//stack pause
 scOff
-"\nthis = " ps this hex p 
 "\nthis = " ps this hex p //pause
 
 testClone size @ dump
@@ -173,19 +155,16 @@ decimal nl s "DLListClone size =" ps DLListClone size @ dup p nl 88 "Clone size"
 testClone.TailNode.BeforeReference @ testClone "DLListClone init test : " assert sp
 // test 'this' to refer to 'this' in current namespace
 // d: this.TailNode.BeforeReference @ this "DLListClone init test2 : " assert
-"\nthis @ size @ p " ps this size @ p // sp // pause // for now we have to drop the 'this' pointer. TODO :: 'this' semantics have yet to be solidified
-"\nthis.size = " ps this.size @ p // sp //pause
+"\nthis @ size @ p " ps this.size @ p // sp // pause // for now we have to drop the 'this' pointer. TODO :: 'this' semantics have yet to be solidified
+"\nthis.size = " ps this.size @ p 
+sp //pause
 
-dbgOff
-#if dbgOnVar @
-"\nprintf output = " ps using printf ( "this.size = %d", this.size ) this @ dup hex p size @ dup decimal p dump //pause // 'this' is a pointer to a pointer 
-#else
-// TODO ( % using C "\nprintf output = " ps d: printf ( "this.size = %d", this.size ) this @ dup hex p size @ dup decimal p dump % ) //pause // 'this' is a pointer to a pointer 
-#endif
+"\nprintf output = " ps using printf ( "this.size = %d", this.size ) 
+sp
+this @ dup hex p this.size @ dup decimal p dump //pause // 'this' is a pointer to a pointer 
 sp
 TODO ( "'this' semantics have yet to be solidified" ) 
-sp
-testClone size @ dump
+testClone testClone.size @ dump
 sp
 nl testClone.Category @ 12 "DLListClone init test4 : " assert //pause
 //nl this.Category @ 12 "DLListClone init test3 : " assert //pause
@@ -193,5 +172,4 @@ sp
 #endif
 2 + 7 assertStkChk // stack checking
 sp
-//s pause
 

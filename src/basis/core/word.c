@@ -9,7 +9,18 @@ Word_Run ( Word * word )
         // keep track in the word itself where the machine code is to go, if this word is compiled or causes compiling code - used for optimization
         Word_SetCodingAndSourceCoding ( word, Here ) ; // if we change it later (eg. in lambda calculus) we must change it there because the rest of the compiler depends on this
         _Context_->CurrentlyRunningWord = word ;
-        Block_Eval ( word->Definition ) ;
+        DEBUG_SETUP ( word ) ;
+        if ( ! GetState ( word, STEPPED ) ) // set by the debuggger
+        {
+            if ( ! sigsetjmp ( _Context_->JmpBuf0, 0 ) ) // from _Debugger_InterpreterLoop
+            {
+                Block_Eval ( word->Definition ) ;
+            }
+            else Set_DataStackPointers_FromDebuggerDspReg ( ) ;
+        }
+        SetState ( word, STEPPED, false ) ;
+        _DEBUG_SHOW ( word, 0 ) ;
+        if ( IS_MORPHISM_TYPE ( word ) ) SetState ( _Context_, ADDRESS_OF_MODE, false ) ;
         _Context_->CurrentlyRunningWord = 0 ;
         _Context_->LastRunWord = word ;
     }
@@ -21,15 +32,9 @@ Word_Eval ( Word * word )
     if ( word )
     {
         _Context_->CurrentEvalWord = word ;
-        DEBUG_SETUP ( word ) ;
-        if ( ! GetState ( word, STEPPED ) ) // set by the debuggger
-        {
-            CfrTil_Typecheck ( word ) ;
-            if ( ( word->CAttribute & IMMEDIATE ) || ( ! CompileMode ) ) Word_Run ( word ) ;
-            else _Word_Compile ( word ) ;
-        }
-        SetState ( word, STEPPED, false ) ;
-        DEBUG_SHOW ;
+        CfrTil_Typecheck ( word ) ;
+        if ( ( word->CAttribute & IMMEDIATE ) || ( ! CompileMode ) ) Word_Run ( word ) ;
+        else _Word_Compile ( word ) ;
         _Context_->CurrentEvalWord = 0 ;
     }
 }
@@ -106,7 +111,8 @@ _Word_Add ( Word * word, int64 addToInNs, Namespace * addToNs )
     {
         if ( ! ( word->CAttribute & ( LITERAL ) ) )
         {
-            Namespace * ins = _CfrTil_Namespace_InNamespaceGet ( ) ;
+            //Namespace * ins = _CfrTil_Namespace_InNamespaceGet ( ) ;
+            Namespace * ins = _CfrTil_InNamespace ( ) ; //_CfrTil_Namespace_InNamespaceGet ( ) ;
             Namespace_DoAddWord ( ins, word ) ;
         }
     }
@@ -138,8 +144,8 @@ Word *
 _Word_Create ( byte * name, uint64 ctype, uint64 ctype2, uint64 ltype, uint64 allocType )
 {
     Word * word = _Word_Allocate ( allocType ? allocType : DICTIONARY ) ;
-    if ( word == ( Word * ) 0x7ffff6eb81c8 )
-        _Printf ( ( byte* ) "got it" ) ;
+    if ( word == (Word*) 0x7ffff5990e88) 
+        _Printf ((byte*)"") ;
     if ( allocType & ( EXISTING ) ) _Symbol_NameInit ( ( Symbol * ) word, name ) ;
     else _Symbol_Init_AllocName ( ( Symbol* ) word, name, STRING_MEM ) ;
     word->WAllocType = allocType ;
@@ -186,23 +192,25 @@ Word_New ( byte * name )
 }
 
 void
-Word_PrintOffset ( Word * word, int64 increment, int64 totalIncrement )
+Word_PrintOffset ( Word * word, int64 offset, int64 totalOffset )
 {
     Context * cntx = _Context_ ;
     if ( Is_DebugModeOn ) NoticeColors ;
     byte * name = String_ConvertToBackSlash ( word->Name ) ;
-    if ( String_Equal ( "]", name ) )
+    if ( String_Equal ( "]", name ) && cntx->Interpreter0->BaseObject )
     {
-        _Printf ( ( byte* ) "\n\'%s\' = array end :: base object \'%s\' : increment = %d : total totalIncrement = %d", name,
-            cntx->Interpreter0->BaseObject->Name, increment, totalIncrement ) ;
+        _Printf ( ( byte* ) "\n\'%s\' = array end :: base object \'%s\' = 0x%lx : offset = 0x%lx : total offset = 0x%lx => address = 0x%lx",
+            name, cntx->Interpreter0->BaseObject->Name, cntx->Interpreter0->BaseObject->W_Value, offset, totalOffset, ( ( byte* ) cntx->Interpreter0->BaseObject->W_PtrToValue ) + totalOffset ) ;
     }
     else
     {
-        _Printf ( ( byte* ) "\n\'%s\' = object field :: type = %s : size = %d : base object \'%s\' : offset = %d : total offset = %d", name,
-            word->ContainingNamespace ? word->ContainingNamespace->Name : ( byte* ) "",
+        totalOffset = cntx->Compiler0->AccumulatedOptimizeOffsetPointer ? *cntx->Compiler0->AccumulatedOptimizeOffsetPointer : - 1 ;
+        _Printf ( ( byte* ) "\n\'%s\' = object field :: type = %s : size = 0x%lx : base object \'%s\' = 0x%lx : offset = 0x%lx : total offset = 0x%lx : address = 0x%lx",
+            name, cntx->Interpreter0->BaseObject ? cntx->Interpreter0->BaseObject->Name : ( byte* ) "",
             TypeNamespace_Get ( word ) ? ( int64 ) _CfrTil_VariableValueGet ( TypeNamespace_Get ( word )->Name, ( byte* ) "size" ) : 0,
             cntx->Interpreter0->BaseObject ? String_ConvertToBackSlash ( cntx->Interpreter0->BaseObject->Name ) : ( byte* ) "",
-            word->Offset, cntx->Compiler0->AccumulatedOptimizeOffsetPointer ? *cntx->Compiler0->AccumulatedOptimizeOffsetPointer : - 1 ) ;
+            cntx->Interpreter0->BaseObject ? cntx->Interpreter0->BaseObject->W_Value : 0,
+            word->Offset, totalOffset, cntx->Interpreter0->BaseObject ? ( ( ( byte* ) cntx->Interpreter0->BaseObject->W_Value ) + totalOffset ) : ( byte* ) - 1 ) ;
     }
     if ( Is_DebugModeOn ) DefaultColors ;
 }

@@ -36,7 +36,7 @@ _LO_Define ( ListObject * idNode, ListObject * locals )
     SetState ( lc, ( LC_DEFINE_MODE ), false ) ;
     l1->W_SourceCode = word->W_SourceCode = lc->LC_SourceCode ;
     _Word_Finish ( l1 ) ;
-    Compiler_Init ( _Context_->Compiler0, 0, 1 ) ; // we could be compiling a cfrTil word as in oldLisp.cft
+    Compiler_Init (_Context_->Compiler0, 0, 0) ; // we could be compiling a cfrTil word as in oldLisp.cft
     return l1 ;
 }
 
@@ -324,9 +324,10 @@ _LO_Colon ( ListObject * lfirst )
     lname = _LO_Next ( lcolon ) ;
     ldata = _LO_Next ( lname ) ;
     _CfrTil_Namespace_NotUsing ( ( byte* ) "Lisp" ) ; // nb. don't use Lisp words when compiling cfrTil
-    //CfrTil_RightBracket ( ) ;
+    CfrTil_RightBracket ( ) ;
     Word * word = Word_New ( lname->Name ) ;
     SetState ( cntx->Compiler0, COMPILE_MODE, true ) ;
+    CfrTil_InitSourceCode_WithName ( _CfrTil_, lname->Name, 1 ) ;
     CfrTil_BeginBlock ( ) ;
 
     return word ;

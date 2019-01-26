@@ -46,13 +46,13 @@ CfrTil_Define ( )
     Context * cntx = _Context_ ;
     Interpreter * interp = cntx->Interpreter0 ;
     SetState ( interp, PREPROCESSOR_DEFINE, true ) ;
-    _CfrTil_Colon ( 0 ) ;
+    CfrTil_Colon () ;
     Interpret_ToEndOfLine ( interp ) ;
-    int64 locals = Stack_Depth ( _Context_->Compiler0->LocalsCompilingNamespacesStack ) ;
+    int64 locals = Compiler_IsFrameNecessary ( _Compiler_ ) ;
     SetState ( interp, PREPROCESSOR_DEFINE, false ) ;
     CfrTil_SemiColon ( ) ;
+    if ( locals ) CfrTil_Prefix ( ) ; // if we have local variables make it a prefix word ; maybe : if ( GetState ( _Context_, C_SYNTAX ) ) 
     CfrTil_Inline ( ) ;
-    if ( locals ) CfrTil_Prefix ( ) ;
     CfrTil_SourceCode_Init ( ) ; //don't leave the define in sc
 }
 

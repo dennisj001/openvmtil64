@@ -13,7 +13,7 @@ void
 CfrTil_InfixModeOn ( )
 {
     SetState ( _Context_, INFIX_MODE, true ) ;
-    Namespace_DoNamespace_Name ( (byte*) "Infix" ) ;
+    Namespace_DoNamespace_Name ( ( byte* ) "Infix" ) ;
 }
 
 void
@@ -45,13 +45,14 @@ CfrTil_C_Syntax_Off ( )
 }
 
 // switch to the default forth, postfix mode
+
 void
-CfrTil_Postfix ()
+CfrTil_Postfix ( )
 {
     CfrTil_C_Syntax_Off ( ) ;
-    Namespace_SetAsNotUsing_MoveToTail ( ( byte* ) "Lisp"  ) ;
-    Namespace_SetAsNotUsing_MoveToTail ( ( byte* ) "LispTemp"  ) ;
-    Namespace_SetAsNotUsing_MoveToTail ( ( byte* ) "LispDefines"  ) ;
+    Namespace_SetAsNotUsing_MoveToTail ( ( byte* ) "Lisp" ) ;
+    Namespace_SetAsNotUsing_MoveToTail ( ( byte* ) "LispTemp" ) ;
+    Namespace_SetAsNotUsing_MoveToTail ( ( byte* ) "LispDefines" ) ;
 }
 
 void
@@ -77,13 +78,13 @@ CfrTil_AddressOf ( )
 void
 CfrTil_C_Semi ( )
 {
-    Context * cntx = _Context_ ;
-    Compiler * compiler = cntx->Compiler0 ;
-    compiler->LHS_Word = 0 ;
+    _Compiler_->LHS_Word = 0 ;
     if ( ! Compiling )
     {
-        CfrTil_InitSourceCode ( _CfrTil_ ) ;
-        Compiler_Init ( compiler, 0, 1 ) ;
+        //CfrTil_InitSourceCode ( _CfrTil_ ) ;
+        //Namespace_RemoveNamespacesStack ( _Compiler_->LocalsCompilingNamespacesStack ) ;
+        //Compiler_DeleteDebugInfo ( _Compiler_ ) ;
+        Compiler_Init ( _Compiler_, 0, 1 ) ;
     }
 }
 
@@ -97,6 +98,7 @@ CfrTil_End_C_Block ( )
     else
     {
         // we're still compiling so ... ??
+
         Word * word = _Context_CurrentWord ( cntx ) ;
         word->W_NumberOfArgs = compiler->NumberOfArgs ;
         word->W_NumberOfLocals = compiler->NumberOfLocals ;
@@ -110,10 +112,7 @@ CfrTil_Begin_C_Block ( )
     if ( Compiling && GetState ( _Context_, C_SYNTAX ) )
     {
         if ( GetState ( _Compiler_, C_COMBINATOR_PARSING ) ) CfrTil_BeginBlock ( ) ;
-        else
-        {
-            Interpret_Until_Token ( _Interpreter_, (byte*) "}", 0 ) ;
-        }
+        else Interpret_Until_Token ( _Interpreter_, ( byte* ) "}", 0 ) ;
     }
 }
 
@@ -121,7 +120,6 @@ Namespace *
 CfrTil_C_Class_New ( void )
 {
     byte * name = ( byte* ) DataStack_Pop ( ) ;
-
     return DataObject_New ( C_CLASS, 0, name, 0, 0, 0, 0, 0, 0, 0, - 1 ) ;
 }
 
@@ -143,17 +141,13 @@ CfrTil_If_PrefixCombinators ( )
     compiler->BeginBlockFlag = false ;
     int64 blocksParsed = CfrTil_Interpret_C_Blocks ( 2, 1, 0 ) ;
     _Context_->SC_CurrentCombinator = combinatorWord0 ;
-    if ( blocksParsed > 2 )
-    {
-        CfrTil_TrueFalseCombinator3 ( ) ;
-    }
+    if ( blocksParsed > 2 ) CfrTil_TrueFalseCombinator3 ( ) ;
     else
     {
         d0 ( if ( Is_DebugOn ) _Printf ( ( byte* ) "\n\nbefore CfrTil_If2Combinator : blockStack depth = %d : %s : %s\n\n", _Stack_Depth ( compiler->BlockStack ), _Context_->CurrentlyRunningWord->Name, Context_Location ( ) ) ) ;
         CfrTil_If2Combinator ( ) ;
     }
     SetState ( compiler, C_COMBINATOR_PARSING, svscp ) ;
-    d1 ( if ( Is_DebugOn ) CfrTil_PrintDataStack ( ) ) ;
 }
 
 void
@@ -170,10 +164,7 @@ CfrTil_DoWhile_PrefixCombinators ( )
     _Compiler_->BeginBlockFlag = false ;
     CfrTil_Interpret_C_Blocks ( 1, 0, 0 ) ;
     _Context_->SC_CurrentCombinator = currentWord0 ;
-    if ( ! CfrTil_DoWhileCombinator ( ) )
-    {
-        SetHere ( start, 1 ) ;
-    }
+    if ( ! CfrTil_DoWhileCombinator ( ) ) SetHere ( start, 1 ) ;
 }
 
 void
@@ -210,10 +201,7 @@ CfrTil_While_PrefixCombinators ( )
     _Compiler_->BeginBlockFlag = false ;
     CfrTil_Interpret_C_Blocks ( 2, 0, 0 ) ;
     _Context_->SC_CurrentCombinator = currentWord0 ;
-    if ( ! CfrTil_WhileCombinator ( ) ) // TODO : has this idea been fully applied to the rest of the code?
-    {
-        SetHere ( start, 1 ) ;
-    }
+    if ( ! CfrTil_WhileCombinator ( ) ) SetHere ( start, 1 ) ;
 }
 
 int64
@@ -259,6 +247,7 @@ _Type_Create ( byte * token )
 void
 Type_Create ( )
 {
+
     Context * cntx = _Context_ ;
     byte * token = Lexer_Peek_Next_NonDebugTokenWord ( cntx->Lexer0, 1 ) ;
     int64 size = _Type_Create ( token ) ;

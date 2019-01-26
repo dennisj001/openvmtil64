@@ -12,15 +12,6 @@ CfrTil_Code ( )
     DataStack_Push ( ( int64 ) _Q_CodeByteArray ) ;
 }
 
-#if 0
-
-void
-CfrTil_Rsp ( )
-{
-    DataStack_Push ( ( int64 ) & _Rsp_ ) ;
-}
-#endif
-
 void
 CompileCall ( )
 {
@@ -36,19 +27,7 @@ CompileACfrTilWord ( )
 void
 CompileInt64 ( )
 {
-#if 0    
-
-    union
-    {
-        int64 q0 [2 ] ;
-        int64 q ;
-    } li ;
-    li.q0[1] = DataStack_Pop ( ) ;
-    li.q0[0] = DataStack_Pop ( ) ; // little endian - low order bits should be pushed first
-    _Compile_Int64 ( li.q ) ;
-#endif    
     _Compile_Int64 ( DataStack_Pop ( ) ) ;
-
 }
 
 void
@@ -56,7 +35,6 @@ CompileInt32 ( )
 {
     int64 l = DataStack_Pop ( ) ;
     _Compile_Int32 ( l ) ;
-
 }
 
 void
@@ -64,7 +42,6 @@ CompileInt16 ( )
 {
     int64 w = DataStack_Pop ( ) ;
     _Compile_Int16 ( ( short ) w ) ;
-
 }
 
 void
@@ -218,17 +195,6 @@ CfrTil_SetupRecursiveCall ( )
     _CfrTil_CompileCallGoto ( 0, GI_RECURSE ) ;
 }
 
-#if 0
-
-void
-CfrTil_Tail ( )
-{
-    _Printf ( ( byte* ) "\nTailCall not implemented yet. Fix me!\n" ) ;
-    return ;
-    _CfrTil_CompileCallGoto ( GI_TAIL_CALL ) ;
-}
-#endif
-
 void
 CfrTil_Literal ( )
 {
@@ -275,11 +241,18 @@ CfrTil_LeftBracket ( )
 // named following the forth word ']'
 
 void
-CfrTil_RightBracket ( )
+_CfrTil_RightBracket ( )
 {
     Compiler * compiler = _Compiler_ ;
     SetState ( compiler, COMPILE_MODE, true ) ;
     compiler->SaveOptimizeState = GetState ( _CfrTil_, OPTIMIZE_ON ) ;
+}
+
+void
+CfrTil_RightBracket ( )
+{
+    Compiler_Init ( _Compiler_, 0, 1 ) ;
+    _CfrTil_RightBracket ( ) ;
 }
 
 void

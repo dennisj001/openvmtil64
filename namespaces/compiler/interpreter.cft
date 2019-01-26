@@ -1,17 +1,19 @@
 5 
 C
+scOn
 : sp ; //stack pause ; sp
 lispOff
 //optimizeOff
+
 System Interpreter 
-// these #defines are purposefully unnecessarily complex (confusing looking) for testing
+// these #defines are purposefully unnecessarily complex (and confusing looking) for testing
 #define xhe0 "xhi1 ="  
 #define xhe1() nl ps 
-#define xhe12( s ) s nl ps 
-#define xhi2( n ) xhe12 ( xhe0 @ ) 1 2 \
+#define xhe12( str ) str @ nl ps 
+#define xhi2( n ) xhe12 ( xhe0 ) 1 2 \
             + n @ \
             + p // backslash also works like in a C #define 
-#define xhi2a( s n ) xhe1( s @ ) 1 2 \
+#define xhi2a( str n ) xhe12 ( str @ ) 1 2 \
             + n @ \
             + p 
 #define xhi01 xhe0 xhe1()
@@ -23,11 +25,11 @@ infixOn
 #define xhi0() 1 + 2 p
 
 c_syntaxOn
-#define xhii() p (1 + 2) 
-#define xhi( n ) ps ( "\nxhi = ") ; 1 + 2 + n ; p()
-dscOn
+#define xhii() p (1 + 2) ;
+#define xhi( n ) ps ( "\nxhi = " ) ; p ( 1 + 2 + n ) ;
+
 void
-testc1 ( ) 
+testc1 () 
 {
     int tdbg = 1, tdbg2 = 2, tdbg3 = 3 ; 
     int tdbg4 = 4, tdbg5 = 5, tdbg6 = 6 ; 
@@ -37,10 +39,10 @@ testc1 ( )
     ps ( "\ntdbg4 =" ) ; p ( tdbg4 ) ; 
     ps ( "\ntdbg5 =" ) ; p ( tdbg5 ) ; 
     ps ( "\ntdbg6 =" ) ; p ( tdbg6 ) ; //_pause () ;
-    ps ( "\nxhii =" ) ; xhii () ; xhi0(); xhi1 ; xhi( 4 ); xhi01 ; xhi1 ; xhi2(8) ; xhi2a ( "xhi2a =", 8 ) ; 
+    ps ( "\nxhii =" ) ; xhii () ; xhi0(); xhi1 () ; xhi( 4 ); xhi01 ; xhi1 ; xhi2(8) ; xhi2a ( "xhi2a =", 8 ) ; 
 } prefix
-//'testc1 find wdiss //pause 
-testc1 () ;
+'testc1 find wdiss sp
+testc1 () ; sp 
 #if 1
 C libc
 void
@@ -94,5 +96,5 @@ sp
 c_syntaxOff 
 2 t{ + }t 7 assertStkChk // stack checking
 //stack pause
-1 ? "hi" ps : "error" ps
-
+1 ? "hi" ps : "error" ps ;
+//stack pause

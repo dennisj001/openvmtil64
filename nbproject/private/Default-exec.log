@@ -1,7 +1,6 @@
 called: g++
 	/media/sdc4/dennisj/openvmtil64
 	g++
-	-finline-functions
 	-ggdb
 	-c
 	-o
@@ -11,7 +10,6 @@ called: g++
 called: g++
 	/media/sdc4/dennisj/openvmtil64
 	g++
-	-finline-functions
 	-ggdb
 	-c
 	-o
@@ -21,7 +19,6 @@ called: g++
 called: g++
 	/media/sdc4/dennisj/openvmtil64
 	g++
-	-finline-functions
 	-ggdb
 	-c
 	-o
@@ -31,7 +28,6 @@ called: g++
 called: g++
 	/media/sdc4/dennisj/openvmtil64
 	g++
-	-finline-functions
 	-ggdb
 	-c
 	-o
@@ -41,7 +37,6 @@ called: g++
 called: g++
 	/media/sdc4/dennisj/openvmtil64
 	g++
-	-finline-functions
 	-ggdb
 	-c
 	-o
@@ -51,7 +46,6 @@ called: g++
 called: g++
 	/media/sdc4/dennisj/openvmtil64
 	g++
-	-finline-functions
 	-ggdb
 	-c
 	-o
@@ -61,7 +55,6 @@ called: g++
 called: g++
 	/media/sdc4/dennisj/openvmtil64
 	g++
-	-finline-functions
 	-ggdb
 	-c
 	-o
@@ -71,7 +64,6 @@ called: g++
 called: g++
 	/media/sdc4/dennisj/openvmtil64
 	g++
-	-finline-functions
 	-ggdb
 	-c
 	-o
@@ -81,7 +73,6 @@ called: g++
 called: g++
 	/media/sdc4/dennisj/openvmtil64
 	g++
-	-finline-functions
 	-ggdb
 	-c
 	-o
@@ -91,7 +82,6 @@ called: g++
 called: g++
 	/media/sdc4/dennisj/openvmtil64
 	g++
-	-finline-functions
 	-ggdb
 	-c
 	-o
@@ -101,7 +91,6 @@ called: g++
 called: g++
 	/media/sdc4/dennisj/openvmtil64
 	g++
-	-finline-functions
 	-ggdb
 	-c
 	-o
@@ -111,7 +100,6 @@ called: g++
 called: g++
 	/media/sdc4/dennisj/openvmtil64
 	g++
-	-finline-functions
 	-ggdb
 	-c
 	-o
@@ -121,7 +109,6 @@ called: g++
 called: g++
 	/media/sdc4/dennisj/openvmtil64
 	g++
-	-finline-functions
 	-ggdb
 	-c
 	-o
@@ -131,7 +118,6 @@ called: g++
 called: g++
 	/media/sdc4/dennisj/openvmtil64
 	g++
-	-finline-functions
 	-ggdb
 	-c
 	-o
@@ -141,7 +127,6 @@ called: g++
 called: g++
 	/media/sdc4/dennisj/openvmtil64
 	g++
-	-finline-functions
 	-ggdb
 	-c
 	-o
@@ -151,7 +136,6 @@ called: g++
 called: g++
 	/media/sdc4/dennisj/openvmtil64
 	g++
-	-finline-functions
 	-ggdb
 	-c
 	-o
@@ -161,7 +145,6 @@ called: g++
 called: g++
 	/media/sdc4/dennisj/openvmtil64
 	g++
-	-finline-functions
 	-ggdb
 	-c
 	-o
@@ -171,7 +154,6 @@ called: g++
 called: g++
 	/media/sdc4/dennisj/openvmtil64
 	g++
-	-finline-functions
 	-ggdb
 	-c
 	-o
@@ -181,7 +163,6 @@ called: g++
 called: g++
 	/media/sdc4/dennisj/openvmtil64
 	g++
-	-finline-functions
 	-ggdb
 	-c
 	-o
@@ -191,7 +172,6 @@ called: g++
 called: g++
 	/media/sdc4/dennisj/openvmtil64
 	g++
-	-finline-functions
 	-ggdb
 	-c
 	-o
@@ -201,7 +181,6 @@ called: g++
 called: g++
 	/media/sdc4/dennisj/openvmtil64
 	g++
-	-finline-functions
 	-ggdb
 	-c
 	-o
@@ -211,7 +190,6 @@ called: g++
 called: g++
 	/media/sdc4/dennisj/openvmtil64
 	g++
-	-finline-functions
 	-ggdb
 	-c
 	-o
@@ -221,7 +199,6 @@ called: g++
 called: g++
 	/media/sdc4/dennisj/openvmtil64
 	g++
-	-finline-functions
 	-ggdb
 	-c
 	-o
@@ -231,7 +208,6 @@ called: g++
 called: g++
 	/media/sdc4/dennisj/openvmtil64
 	g++
-	-finline-functions
 	-ggdb
 	-c
 	-o
@@ -241,7 +217,6 @@ called: g++
 called: g++
 	/media/sdc4/dennisj/openvmtil64
 	g++
-	-finline-functions
 	-ggdb
 	-c
 	-o
@@ -251,7 +226,6 @@ called: g++
 called: g++
 	/media/sdc4/dennisj/openvmtil64
 	g++
-	-finline-functions
 	-ggdb
 	-c
 	-o
@@ -261,7 +235,6 @@ called: g++
 called: g++
 	/media/sdc4/dennisj/openvmtil64
 	g++
-	-finline-functions
 	-ggdb
 	-c
 	-o
@@ -271,7 +244,6 @@ called: g++
 called: g++
 	/media/sdc4/dennisj/openvmtil64
 	g++
-	-finline-functions
 	-ggdb
 	-c
 	-o
@@ -281,7 +253,6 @@ called: g++
 called: g++
 	/media/sdc4/dennisj/openvmtil64
 	g++
-	-finline-functions
 	-ggdb
 	-c
 	-o
@@ -291,7 +262,6 @@ called: g++
 called: g++
 	/media/sdc4/dennisj/openvmtil64
 	g++
-	-finline-functions
 	-ggdb
 	-c
 	-o
@@ -301,7 +271,6 @@ called: g++
 called: g++
 	/media/sdc4/dennisj/openvmtil64
 	g++
-	-finline-functions
 	-ggdb
 	-c
 	-o
@@ -311,7 +280,6 @@ called: g++
 called: g++
 	/media/sdc4/dennisj/openvmtil64
 	g++
-	-finline-functions
 	-ggdb
 	-c
 	-o
@@ -321,7 +289,6 @@ called: g++
 called: g++
 	/media/sdc4/dennisj/openvmtil64
 	g++
-	-finline-functions
 	-ggdb
 	-c
 	-o
@@ -331,7 +298,6 @@ called: g++
 called: g++
 	/media/sdc4/dennisj/openvmtil64
 	g++
-	-finline-functions
 	-ggdb
 	-c
 	-o
@@ -341,7 +307,6 @@ called: g++
 called: g++
 	/media/sdc4/dennisj/openvmtil64
 	g++
-	-finline-functions
 	-ggdb
 	-c
 	-o
@@ -351,7 +316,6 @@ called: g++
 called: g++
 	/media/sdc4/dennisj/openvmtil64
 	g++
-	-finline-functions
 	-ggdb
 	-c
 	-o
@@ -361,7 +325,6 @@ called: g++
 called: g++
 	/media/sdc4/dennisj/openvmtil64
 	g++
-	-finline-functions
 	-ggdb
 	-c
 	-o
@@ -371,7 +334,6 @@ called: g++
 called: g++
 	/media/sdc4/dennisj/openvmtil64
 	g++
-	-finline-functions
 	-ggdb
 	-c
 	-o
@@ -381,7 +343,6 @@ called: g++
 called: g++
 	/media/sdc4/dennisj/openvmtil64
 	g++
-	-finline-functions
 	-ggdb
 	-c
 	-o
@@ -391,7 +352,6 @@ called: g++
 called: g++
 	/media/sdc4/dennisj/openvmtil64
 	g++
-	-finline-functions
 	-ggdb
 	-c
 	-o
@@ -401,7 +361,6 @@ called: g++
 called: g++
 	/media/sdc4/dennisj/openvmtil64
 	g++
-	-finline-functions
 	-ggdb
 	-c
 	-o
@@ -411,7 +370,6 @@ called: g++
 called: g++
 	/media/sdc4/dennisj/openvmtil64
 	g++
-	-finline-functions
 	-ggdb
 	-c
 	-o
@@ -421,7 +379,6 @@ called: g++
 called: g++
 	/media/sdc4/dennisj/openvmtil64
 	g++
-	-finline-functions
 	-ggdb
 	-c
 	-o
@@ -431,7 +388,6 @@ called: g++
 called: g++
 	/media/sdc4/dennisj/openvmtil64
 	g++
-	-finline-functions
 	-ggdb
 	-c
 	-o
@@ -441,7 +397,6 @@ called: g++
 called: g++
 	/media/sdc4/dennisj/openvmtil64
 	g++
-	-finline-functions
 	-ggdb
 	-c
 	-o
@@ -451,7 +406,6 @@ called: g++
 called: g++
 	/media/sdc4/dennisj/openvmtil64
 	g++
-	-finline-functions
 	-ggdb
 	-c
 	-o
@@ -461,7 +415,6 @@ called: g++
 called: g++
 	/media/sdc4/dennisj/openvmtil64
 	g++
-	-finline-functions
 	-ggdb
 	-c
 	-o
@@ -471,7 +424,6 @@ called: g++
 called: g++
 	/media/sdc4/dennisj/openvmtil64
 	g++
-	-finline-functions
 	-ggdb
 	-c
 	-o
@@ -481,7 +433,6 @@ called: g++
 called: g++
 	/media/sdc4/dennisj/openvmtil64
 	g++
-	-finline-functions
 	-ggdb
 	-c
 	-o
@@ -491,7 +442,6 @@ called: g++
 called: g++
 	/media/sdc4/dennisj/openvmtil64
 	g++
-	-finline-functions
 	-ggdb
 	-c
 	-o
@@ -501,7 +451,6 @@ called: g++
 called: g++
 	/media/sdc4/dennisj/openvmtil64
 	g++
-	-finline-functions
 	-ggdb
 	-c
 	-o
@@ -511,7 +460,6 @@ called: g++
 called: g++
 	/media/sdc4/dennisj/openvmtil64
 	g++
-	-finline-functions
 	-ggdb
 	-c
 	-o
@@ -521,7 +469,6 @@ called: g++
 called: g++
 	/media/sdc4/dennisj/openvmtil64
 	g++
-	-finline-functions
 	-ggdb
 	-c
 	-o
@@ -531,7 +478,6 @@ called: g++
 called: g++
 	/media/sdc4/dennisj/openvmtil64
 	g++
-	-finline-functions
 	-ggdb
 	-c
 	-o
@@ -541,7 +487,6 @@ called: g++
 called: g++
 	/media/sdc4/dennisj/openvmtil64
 	g++
-	-finline-functions
 	-ggdb
 	-c
 	-o
@@ -551,7 +496,6 @@ called: g++
 called: g++
 	/media/sdc4/dennisj/openvmtil64
 	g++
-	-finline-functions
 	-ggdb
 	-c
 	-o
@@ -561,7 +505,6 @@ called: g++
 called: g++
 	/media/sdc4/dennisj/openvmtil64
 	g++
-	-finline-functions
 	-ggdb
 	-c
 	-o
@@ -571,7 +514,6 @@ called: g++
 called: g++
 	/media/sdc4/dennisj/openvmtil64
 	g++
-	-finline-functions
 	-ggdb
 	-c
 	-o
@@ -581,7 +523,6 @@ called: g++
 called: g++
 	/media/sdc4/dennisj/openvmtil64
 	g++
-	-finline-functions
 	-ggdb
 	-c
 	-o
@@ -591,7 +532,6 @@ called: g++
 called: g++
 	/media/sdc4/dennisj/openvmtil64
 	g++
-	-finline-functions
 	-ggdb
 	-c
 	-o
@@ -601,7 +541,6 @@ called: g++
 called: g++
 	/media/sdc4/dennisj/openvmtil64
 	g++
-	-finline-functions
 	-ggdb
 	-c
 	-o
@@ -611,7 +550,6 @@ called: g++
 called: g++
 	/media/sdc4/dennisj/openvmtil64
 	g++
-	-finline-functions
 	-ggdb
 	-c
 	-o
@@ -621,7 +559,6 @@ called: g++
 called: g++
 	/media/sdc4/dennisj/openvmtil64
 	g++
-	-finline-functions
 	-ggdb
 	-c
 	-o
@@ -631,7 +568,6 @@ called: g++
 called: g++
 	/media/sdc4/dennisj/openvmtil64
 	g++
-	-finline-functions
 	-ggdb
 	-c
 	-o
@@ -641,7 +577,6 @@ called: g++
 called: g++
 	/media/sdc4/dennisj/openvmtil64
 	g++
-	-finline-functions
 	-ggdb
 	-c
 	-o
@@ -651,7 +586,6 @@ called: g++
 called: g++
 	/media/sdc4/dennisj/openvmtil64
 	g++
-	-finline-functions
 	-ggdb
 	-c
 	-o
@@ -661,7 +595,6 @@ called: g++
 called: g++
 	/media/sdc4/dennisj/openvmtil64
 	g++
-	-finline-functions
 	-ggdb
 	-c
 	-o
@@ -671,7 +604,6 @@ called: g++
 called: g++
 	/media/sdc4/dennisj/openvmtil64
 	g++
-	-finline-functions
 	-ggdb
 	-c
 	-o
@@ -681,7 +613,6 @@ called: g++
 called: g++
 	/media/sdc4/dennisj/openvmtil64
 	g++
-	-finline-functions
 	-ggdb
 	-c
 	-o
@@ -691,7 +622,6 @@ called: g++
 called: g++
 	/media/sdc4/dennisj/openvmtil64
 	g++
-	-finline-functions
 	-ggdb
 	-c
 	-o
@@ -701,7 +631,6 @@ called: g++
 called: g++
 	/media/sdc4/dennisj/openvmtil64
 	g++
-	-finline-functions
 	-ggdb
 	-c
 	-o
@@ -711,7 +640,6 @@ called: g++
 called: g++
 	/media/sdc4/dennisj/openvmtil64
 	g++
-	-finline-functions
 	-ggdb
 	-c
 	-o
@@ -721,7 +649,6 @@ called: g++
 called: g++
 	/media/sdc4/dennisj/openvmtil64
 	g++
-	-finline-functions
 	-ggdb
 	-c
 	-o
@@ -731,7 +658,6 @@ called: g++
 called: g++
 	/media/sdc4/dennisj/openvmtil64
 	g++
-	-finline-functions
 	-ggdb
 	-c
 	-o
@@ -741,7 +667,6 @@ called: g++
 called: g++
 	/media/sdc4/dennisj/openvmtil64
 	g++
-	-finline-functions
 	-ggdb
 	-c
 	-o
@@ -751,7 +676,6 @@ called: g++
 called: g++
 	/media/sdc4/dennisj/openvmtil64
 	g++
-	-finline-functions
 	-ggdb
 	-c
 	-o
@@ -761,7 +685,6 @@ called: g++
 called: g++
 	/media/sdc4/dennisj/openvmtil64
 	g++
-	-finline-functions
 	-ggdb
 	-c
 	-o
@@ -771,7 +694,6 @@ called: g++
 called: g++
 	/media/sdc4/dennisj/openvmtil64
 	g++
-	-finline-functions
 	-ggdb
 	-c
 	-o
@@ -781,7 +703,6 @@ called: g++
 called: g++
 	/media/sdc4/dennisj/openvmtil64
 	g++
-	-finline-functions
 	-ggdb
 	-c
 	-o
@@ -791,7 +712,6 @@ called: g++
 called: g++
 	/media/sdc4/dennisj/openvmtil64
 	g++
-	-finline-functions
 	-ggdb
 	-c
 	-o
@@ -801,7 +721,6 @@ called: g++
 called: g++
 	/media/sdc4/dennisj/openvmtil64
 	g++
-	-finline-functions
 	-ggdb
 	-c
 	-o
@@ -811,7 +730,6 @@ called: g++
 called: g++
 	/media/sdc4/dennisj/openvmtil64
 	g++
-	-finline-functions
 	-ggdb
 	-c
 	-o
@@ -821,7 +739,6 @@ called: g++
 called: g++
 	/media/sdc4/dennisj/openvmtil64
 	g++
-	-finline-functions
 	-ggdb
 	-c
 	-o
@@ -831,7 +748,6 @@ called: g++
 called: g++
 	/media/sdc4/dennisj/openvmtil64
 	g++
-	-finline-functions
 	-ggdb
 	-c
 	-o
@@ -841,7 +757,6 @@ called: g++
 called: g++
 	/media/sdc4/dennisj/openvmtil64
 	g++
-	-finline-functions
 	-ggdb
 	-c
 	-o
@@ -851,7 +766,6 @@ called: g++
 called: g++
 	/media/sdc4/dennisj/openvmtil64
 	g++
-	-finline-functions
 	-ggdb
 	-c
 	-o
@@ -861,7 +775,6 @@ called: g++
 called: g++
 	/media/sdc4/dennisj/openvmtil64
 	g++
-	-finline-functions
 	-ggdb
 	-c
 	-o
@@ -871,7 +784,6 @@ called: g++
 called: g++
 	/media/sdc4/dennisj/openvmtil64
 	g++
-	-finline-functions
 	-ggdb
 	-c
 	-o
@@ -881,7 +793,6 @@ called: g++
 called: g++
 	/media/sdc4/dennisj/openvmtil64
 	g++
-	-finline-functions
 	-ggdb
 	-c
 	-o
@@ -891,7 +802,6 @@ called: g++
 called: g++
 	/media/sdc4/dennisj/openvmtil64
 	g++
-	-finline-functions
 	-ggdb
 	-c
 	-o
@@ -901,7 +811,6 @@ called: g++
 called: g++
 	/media/sdc4/dennisj/openvmtil64
 	g++
-	-finline-functions
 	-ggdb
 	-c
 	-o
@@ -911,7 +820,6 @@ called: g++
 called: g++
 	/media/sdc4/dennisj/openvmtil64
 	g++
-	-finline-functions
 	-ggdb
 	-c
 	-o
@@ -921,7 +829,6 @@ called: g++
 called: g++
 	/media/sdc4/dennisj/openvmtil64
 	g++
-	-finline-functions
 	-ggdb
 	-c
 	-o
@@ -931,7 +838,6 @@ called: g++
 called: g++
 	/media/sdc4/dennisj/openvmtil64
 	g++
-	-finline-functions
 	-ggdb
 	-O3
 	-c
@@ -942,7 +848,6 @@ called: g++
 called: g++
 	/media/sdc4/dennisj/openvmtil64
 	g++
-	-finline-functions
 	-ggdb
 	-c
 	-o
@@ -952,7 +857,6 @@ called: g++
 called: g++
 	/media/sdc4/dennisj/openvmtil64
 	g++
-	-finline-functions
 	-ggdb
 	src/basis/compiler/machineCode.o
 	src/basis/compiler/_compile.o
@@ -1050,7 +954,7 @@ called: g++
 	src/primitives/cmaths.o
 	src/primitives/dataObjectNews.o
 	-o
-	cfrtil64-gdb
+	bin/cfrtil64-gdb
 	-L/usr/local/lib
 	-ludis86
 	-lrt
@@ -1059,6 +963,7 @@ called: g++
 	-lm
 	-lmpfr
 	-lgmp
+	-ltcc
 
 called: /usr/bin/ld
 	/media/sdc4/dennisj/openvmtil64
@@ -1066,7 +971,7 @@ called: /usr/bin/ld
 	-plugin
 	/usr/lib/gcc/x86_64-linux-gnu/8/liblto_plugin.so
 	-plugin-opt=/usr/lib/gcc/x86_64-linux-gnu/8/lto-wrapper
-	-plugin-opt=-fresolution=/tmp/ccOstMfi.res
+	-plugin-opt=-fresolution=/tmp/ccOPD48H.res
 	-plugin-opt=-pass-through=-lgcc_s
 	-plugin-opt=-pass-through=-lgcc
 	-plugin-opt=-pass-through=-lc
@@ -1087,7 +992,7 @@ called: /usr/bin/ld
 	-z
 	relro
 	-o
-	cfrtil64-gdb
+	bin/cfrtil64-gdb
 	/usr/lib/gcc/x86_64-linux-gnu/8/../../../x86_64-linux-gnu/Scrt1.o
 	/usr/lib/gcc/x86_64-linux-gnu/8/../../../x86_64-linux-gnu/crti.o
 	/usr/lib/gcc/x86_64-linux-gnu/8/crtbeginS.o
@@ -1200,6 +1105,7 @@ called: /usr/bin/ld
 	-ldl
 	-lmpfr
 	-lgmp
+	-ltcc
 	-lstdc++
 	-lm
 	-lc

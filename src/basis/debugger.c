@@ -14,9 +14,11 @@ _Debugger_InterpreterLoop ( Debugger * debugger )
         }
         SetState ( _Debugger_, DBG_AUTO_MODE_ONCE, false ) ;
         debugger->CharacterFunctionTable [ debugger->CharacterTable [ debugger->Key ] ] ( debugger ) ;
+        debugger->SC_Index = _Lexer_->SC_Index ;
     }
     while ( GetState ( debugger, DBG_STEPPING ) || ( ! GetState ( debugger, DBG_INTERPRET_LOOP_DONE ) ) ||
         ( ( GetState ( debugger, DBG_AUTO_MODE ) ) && ( ! ( GetState ( debugger, DBG_EVAL_AUTO_MODE ) ) ) ) ) ;
+    debugger->LastSetupWord = debugger->w_Word ;
     SetState ( debugger, DBG_STACK_OLD, true ) ;
     if ( GetState ( debugger, DBG_STEPPED ) )
     {
@@ -38,46 +40,45 @@ _Debugger_InterpreterLoop ( Debugger * debugger )
 }
 
 Boolean
-_Debugger_PreSetup ( Debugger * debugger, Word * word, byte * token, Boolean forceFlag )
+Debugger_PreSetup ( Debugger * debugger, Word * word, byte * token, byte * address, Boolean forceFlag )
 {
+    if ( ! word ) word = Context_CurrentWord ( ) ;
+    debugger->w_Word = word ;
     if ( ( Is_DebugModeOn && Is_DebugShowOn ) || forceFlag )
     {
         if ( forceFlag || GetState ( debugger, DBG_EVAL_AUTO_MODE ) || ( ! GetState ( debugger, DBG_AUTO_MODE | DBG_STEPPING ) ) )
         {
             if ( ! word ) word = Context_CurrentWord ( ) ;
-            if ( word && ( ! word->W_WordListOriginalWord ) ) word->W_WordListOriginalWord = word ;
-            if ( ( ! debugger->LastSetupWord ) || ( word != debugger->LastSetupWord ) || ( word && ( ! String_Equal ( debugger->LastSetupWord->Name, word->Name ) ) ) )
+            //if ( word && ( ! word->W_WordListOriginalWord ) ) word->W_WordListOriginalWord = word ;
+            if ( forceFlag || ( word != debugger->LastSetupWord ) || ( debugger->SC_Index != _Lexer_->SC_Index ) ) //( word != debugger->LastSetupWord ) ) //|| ( word && ( ! String_Equal ( debugger->LastSetupWord->Name, word->Name ) ) ) )
             {
-                debugger->w_Word = word ;
-                if ( ( word && word->Name[0] ) || token )
+                if ( forceFlag || ( word && word->Name[0] ) || token )
                 {
-                    if ( ! sigsetjmp ( _Context_->JmpBuf0, 0 ) ) // used by CfrTil_DebugRuntimeBreakpoint
+                    debugger->w_Word = word ;
+                    if ( forceFlag ) debugger->LastShowWord = 0 ;
+                    SetState ( debugger, DBG_COMPILE_MODE, CompileMode ) ;
+                    SetState_TrueFalse ( debugger, DBG_ACTIVE | DBG_INFO | DBG_PROMPT, DBG_INTERPRET_LOOP_DONE | DBG_PRE_DONE | DBG_CONTINUE | DBG_STEPPING | DBG_STEPPED ) ;
+                    if ( word ) debugger->TokenStart_ReadLineIndex = word->W_RL_Index ;
+                    debugger->SaveDsp = _Dsp_ ;
+                    if ( ! debugger->StartHere ) debugger->StartHere = Here ;
+                    debugger->WordDsp = _Dsp_ ;
+                    debugger->SaveTOS = TOS ;
+                    debugger->Token = word->Name ? word->Name : token ;
+                    debugger->PreHere = Here ;
+                    if ( address )
                     {
-                        if ( forceFlag ) debugger->LastShowWord = 0 ;
-                        SetState ( debugger, DBG_COMPILE_MODE, CompileMode ) ;
-                        SetState_TrueFalse ( debugger, DBG_ACTIVE | DBG_INFO | DBG_PROMPT, DBG_INTERPRET_LOOP_DONE | DBG_PRE_DONE | DBG_CONTINUE | DBG_STEPPING | DBG_STEPPED ) ;
-                        if ( word ) debugger->TokenStart_ReadLineIndex = word->W_RL_Index ;
-                        debugger->SaveDsp = _Dsp_ ;
-                        if ( ! debugger->StartHere ) debugger->StartHere = Here ;
-                        debugger->WordDsp = _Dsp_ ;
-                        debugger->SaveTOS = TOS ;
-                        debugger->Token = word->Name ? word->Name : token ;
-                        debugger->PreHere = Here ;
-
-                        DebugColors ;
-                        _Debugger_InterpreterLoop ( debugger ) ; // core of this function
-                        DefaultColors ;
-
-                        debugger->ReadIndex = _ReadLiner_->ReadIndex ;
-                        debugger->DebugAddress = 0 ;
-                        SetState ( debugger, DBG_MENU, false ) ;
-                        debugger->LastSetupWord = word ;
+                        SetState ( debugger, DBG_SETUP_ADDRESS, true ) ;
+                        debugger->DebugAddress = address ;
                     }
-                    else
-                    {
-                        Set_DataStackPointers_FromDebuggerDspReg ( ) ; // back from _CfrTil_DebugRuntimeBreakpoint
-                        return true ; // true == done
-                    }
+
+                    DebugColors ;
+                    _Debugger_InterpreterLoop ( debugger ) ; // core of this function
+                    DefaultColors ;
+
+                    debugger->ReadIndex = _ReadLiner_->ReadIndex ;
+                    debugger->DebugAddress = 0 ;
+                    SetState ( debugger, DBG_MENU, false ) ;
+                    return true ;
                 }
             }
         }
@@ -88,7 +89,7 @@ _Debugger_PreSetup ( Debugger * debugger, Word * word, byte * token, Boolean for
 void
 Debugger_On ( Debugger * debugger )
 {
-    _Debugger_Init (debugger, debugger->cs_Cpu, 0, 0 ) ;
+    _Debugger_Init ( debugger, debugger->cs_Cpu, 0, 0 ) ;
     SetState_TrueFalse ( _Debugger_, DBG_MENU | DBG_INFO, DBG_STEPPING | DBG_AUTO_MODE | DBG_PRE_DONE | DBG_INTERPRET_LOOP_DONE ) ;
     debugger->LastSetupWord = 0 ;
     debugger->LastScwi = 0 ;
@@ -123,7 +124,7 @@ Debugger_Off ( Debugger * debugger, int64 debugOffFlag )
 }
 
 byte *
-Debugger_GetDbgAddressFromRsp (Debugger * debugger, Cpu * cpu)
+Debugger_GetDbgAddressFromRsp ( Debugger * debugger, Cpu * cpu )
 {
     Word * word, *lastWord = 0, *currentlyRunning = Word_UnAlias ( _Context_->CurrentlyRunningWord ) ;
     byte * addr, *retAddr ;
@@ -165,7 +166,7 @@ Debugger_GetDbgAddressFromRsp (Debugger * debugger, Cpu * cpu)
 }
 
 void
-_Debugger_Init (Debugger * debugger, Cpu * cpu, Word * word, byte * address )
+_Debugger_Init ( Debugger * debugger, Cpu * cpu, Word * word, byte * address )
 {
     DebugColors ;
     Debugger_UdisInit ( debugger ) ;
@@ -180,7 +181,7 @@ _Debugger_Init (Debugger * debugger, Cpu * cpu, Word * word, byte * address )
     if ( GetState ( debugger, DBG_BRK_INIT ) && cpu->Rsp )
     {
         // remember : _Compile_CpuState_Save ( _Debugger_->cs_Cpu ) ; is called thru _Compile_Debug : <dbg>/<dso>
-        debugger->DebugAddress = Debugger_GetDbgAddressFromRsp (debugger, cpu) ; //( byte* ) debugger->cs_Cpu->Rsp[1] ;
+        debugger->DebugAddress = Debugger_GetDbgAddressFromRsp ( debugger, cpu ) ; //( byte* ) debugger->cs_Cpu->Rsp[1] ;
         if ( debugger->DebugAddress && ( ! debugger->w_Word ) )
         {
             byte * da ;
@@ -292,7 +293,7 @@ _Debugger_PrintDataStack ( int64 depth )
 {
     Set_DataStackPointer_FromDspReg ( ) ;
     _Stack_Print ( _DataStack_, ( byte* ) "DataStack", depth, 0 ) ;
-    //if (depth < Stack_Depth (_DataStack_) ) _Printf ( ( byte* ) "\t\t    ........." ) ;
+    //CfrTil_PrintDataStack ( ) ;
 }
 
 void
@@ -348,14 +349,18 @@ Debugger_DoMenu ( Debugger * debugger )
 void
 Debugger_Stack ( Debugger * debugger )
 {
+#if 0    
     if ( GetState ( debugger, DBG_STEPPING ) || GetState ( debugger->cs_Cpu, CPU_SAVED ) )
     {
-        Set_DataStackPointers_FromDebuggerDspReg ( ) ;
+        //Set_DataStackPointers_FromDebuggerDspReg ( ) ;
         _Debugger_PrintDataStack ( Stack_Depth ( _DataStack_ ) ) ; // stack has been adjusted 
         _Printf ( ( byte* ) "\n" ) ;
         SetState ( debugger, DBG_INFO, true ) ;
     }
     else _Debugger_PrintDataStack ( Stack_Depth ( _DataStack_ ) ) ;
+#else
+    CfrTil_PrintDataStack ( ) ; 
+#endif    
 }
 
 void
@@ -468,7 +473,7 @@ Debugger_InterpretLine_WithStartString ( byte * str )
 void
 Debugger_InterpretLine ( )
 {
-    Debugger_InterpretLine_WithStartString ( (byte*) "" ) ;
+    Debugger_InterpretLine_WithStartString ( ( byte* ) "" ) ;
 }
 
 void
@@ -485,11 +490,11 @@ Debugger_Escape ( Debugger * debugger )
     int64 svcm = Get_CompileMode ( ) ;
     Set_CompileMode ( false ) ;
     byte * lexerTokenBuffer = _Buffer_New_pbyte ( BUFFER_SIZE, N_UNLOCKED ) ;
-    strcpy ( (char*) lexerTokenBuffer, (char*) _CfrTil_->TokenBuffer ) ;
+    strcpy ( ( char* ) lexerTokenBuffer, ( char* ) _CfrTil_->TokenBuffer ) ;
 
     Debugger_InterpretLine ( ) ;
 
-    strcpy ( (char*) _CfrTil_->TokenBuffer, (char*) lexerTokenBuffer ) ;
+    strcpy ( ( char* ) _CfrTil_->TokenBuffer, ( char* ) lexerTokenBuffer ) ;
     Set_CompileMode ( svcm ) ;
     DebugOn ;
     DebugColors ;
@@ -623,7 +628,7 @@ _CfrTil_Debug_AtAddress ( byte * address )
 {
     if ( ! GetState ( _Debugger_, DBG_ACTIVE ) )
     {
-        _Debugger_Init (_Debugger_, 0, 0, address ) ;
+        _Debugger_Init ( _Debugger_, 0, 0, address ) ;
     }
     else
     {

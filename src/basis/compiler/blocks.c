@@ -133,13 +133,15 @@ CfrTil_TurnOffBlockCompiler ( )
     Compiler * compiler = _Context_->Compiler0 ;
     if ( ! GetState ( compiler, LISP_MODE ) ) CfrTil_LeftBracket ( ) ;
     _CfrTil_RemoveNamespaceFromUsingListAndClear ( ( byte* ) "__labels__" ) ;
+    Namespace_RemoveNamespacesStack ( compiler->LocalsCompilingNamespacesStack ) ;   
+    //Compiler_Init ( compiler, 0, 0 ) ;
     SetState ( compiler, VARIABLE_FRAME, false ) ;
 }
 
 void
 CfrTil_TurnOnBlockCompiler ( )
 {
-    CfrTil_RightBracket ( ) ;
+    _CfrTil_RightBracket ( ) ;
 }
 
 // blocks are a notation for subroutines or blocks of code compiled in order,
@@ -159,7 +161,6 @@ _CfrTil_BeginBlock0 ( Boolean compileJumpFlag, byte * here )
     {
         CheckCodeSpaceForRoom ( ) ;
         _CfrTil_->CurrentWordBeingCompiled = compiler->CurrentCreatedWord ;
-        //CfrTil_RecycleWordList ( 0 ) ;
         CfrTil_TurnOnBlockCompiler ( ) ;
     }
     compiler->LHS_Word = 0 ;
@@ -167,10 +168,7 @@ _CfrTil_BeginBlock0 ( Boolean compileJumpFlag, byte * here )
     if ( compileJumpFlag ) _Compile_UninitializedJump ( ) ;
     bi->JumpOffset = here ? here - INT32_SIZE : Here - INT32_SIZE ; // before CfrTil_CheckCompileLocalFrame after CompileUninitializedJump
     Stack_Push_PointerToJmpOffset ( ) ;
-    //Compiler_WordStack_SCHCPUSCA ( 0, 0 ) ; // after the jump! -- the jump is optimized out
-    //WordList_SetSourceCoding ( 0, 0 ) ; // no source coding for BeginBlock
     bi->bp_First = here ? here : Here ; // after the jump for inlining
-
     return bi ;
 }
 
@@ -198,7 +196,7 @@ _CfrTil_BeginBlock2 ( BlockInfo * bi )
     Compiler * compiler = _Context_->Compiler0 ;
     _Stack_Push ( compiler->BlockStack, ( int64 ) bi ) ; // _Context->CompileSpace->IndexStart before set frame size after turn on
     _Stack_Push ( compiler->CombinatorBlockInfoStack, ( int64 ) bi ) ; // _Context->CompileSpace->IndexStart before set frame size after turn on
-    compiler->LHS_Word = 0 ;
+    //compiler->LHS_Word = 0 ;
 }
 
 void
@@ -219,7 +217,6 @@ void
 CfrTil_FinalizeBlocks ( BlockInfo * bi )
 {
     Compiler * compiler = _Context_->Compiler0 ;
-    //Compiler_WordStack_SCHCPUSCA ( 0, 0 ) ;
     _CfrTil_InstallGotoCallPoints_Keyed ( bi, GI_RETURN ) ;
     if ( Compiler_IsFrameNecessary ( compiler ) )
     {
@@ -240,7 +237,6 @@ _CfrTil_EndBlock1 ( BlockInfo * bi )
     Compiler * compiler = _Context_->Compiler0 ;
     if ( ! Compiler_BlockLevel ( compiler ) ) CfrTil_FinalizeBlocks ( bi ) ;
     compiler->LHS_Word = 0 ;
-    //Compiler_WordStack_SCHCPUSCA ( 0, 0 ) ;
     _Compile_Return ( ) ;
     DataStack_Push ( ( int64 ) bi->bp_First ) ;
     bi->bp_Last = Here ;
@@ -257,19 +253,9 @@ _CfrTil_EndBlock2 ( BlockInfo * bi )
     if ( ! Compiler_BlockLevel ( compiler ) )
     {
         _CfrTil_InstallGotoCallPoints_Keyed ( bi, GI_GOTO | GI_RECURSE ) ;
-#if 0 // especially for peephole optimization 
-        int64 size = bi->bp_Last - first ;
-        d1 ( if ( Is_DebugModeOn ) Debugger_Disassemble ( _Debugger_, ( byte* ) first, size, 1 ) ) ;
-        BI_Block_Copy ( bi, Here, first, size, 1 ) ;
-        d1 ( if ( Is_DebugModeOn ) Debugger_Disassemble ( _Debugger_, ( byte* ) bi->CopiedToStart, bi->CopiedSize, 1 ) ) ;
-        BI_Block_Copy ( bi, first, bi->CopiedToStart, bi->CopiedSize, 1 ) ;
-        d1 ( if ( Is_DebugModeOn ) Debugger_Disassemble ( _Debugger_, ( byte* ) first, bi->CopiedSize, 1 ) ) ;
-#endif        
         CfrTil_TurnOffBlockCompiler ( ) ;
-        Compiler_Init ( compiler, 0, 0 ) ;
     }
-    //else if ( ! GetState ( _CfrTil_, RT_DEBUG_ON ) ) _Namespace_RemoveFromUsingListAndClear ( bi->BI_LocalsNamespace ) ; 
-    else _Namespace_RemoveFromUsingListAndClear ( bi->BI_LocalsNamespace ) ; 
+    else _Namespace_RemoveFromUsingListAndClear ( bi->BI_LocalsNamespace ) ;
     CfrTil_TypeStackReset ( ) ;
     return first ;
 }

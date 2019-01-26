@@ -262,7 +262,7 @@ LC_EvalPrint ( LambdaCalculus * lc, ListObject * l0 )
     SetState ( lc, LC_PRINT_ENTERED, false ) ;
     SetBuffersUnused ( 1 ) ;
     _LC_->ParenLevel = 0 ;
-    Compiler_Init ( _Context_->Compiler0, 0, 1 ) ; // we could be compiling a cfrTil word as in oldLisp.cft
+    Compiler_Init (_Context_->Compiler0, 0, 0) ; // we could be compiling a cfrTil word as in oldLisp.cft
 }
 
 ListObject *
@@ -460,7 +460,7 @@ LC_LispNamespacesOff ( )
     Namespace_SetAsNotUsing ( ( byte* ) "LispTemp" ) ;
     Namespace_SetAsNotUsing ( ( byte* ) "LispDefines" ) ;
     Namespace_SetAsNotUsing ( ( byte* ) "Lisp" ) ;
-    CfrTil_TurnOffQualifyingNamespace ( ) ;
+    CfrTil_UnsetQualifyingNamespace ( ) ;
 }
 
 void
@@ -480,6 +480,7 @@ _LC_Init_Runtime ( LambdaCalculus * lc )
     lc->ParenLevel = 0 ;
     lc->QuoteState = 0 ;
     lc->ItemQuoteState = 0 ;
+    LC_SaveStackPointer ( lc ) ;
     return lc ;
 }
 

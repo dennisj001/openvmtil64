@@ -170,7 +170,7 @@ _CfrTil_Init ( CfrTil * cfrTil, Namespace * nss )
 
     _Context_ = cfrTil->Context0 = _Context_New ( cfrTil ) ;
 
-    cfrTil->Debugger0 = _Debugger_New ( allocType ) ; // nb : must be after System_NamespacesInit
+    cfrTil->Debugger0 = _Debugger_New ( allocType ) ; 
     cfrTil->cs_Cpu = CpuState_New ( allocType ) ;
     cfrTil->cs_Cpu2 = CpuState_New ( allocType ) ;
     cfrTil->PeekPokeByteArray = ByteArray_AllocateNew ( 32, allocType ) ;

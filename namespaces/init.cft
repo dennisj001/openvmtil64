@@ -81,9 +81,9 @@ Combinators
 "qEval" ' call find alias immediate
 "ifte" ' tf3 find alias
 "ifElse" ' tf3 find alias
-
+'startupMacros 1 constant
 User
-#if 1
+#if startupMacros
 : _SMN_ "StartupMacros" ;                           // _SMN_ : string startup macros namespace 
 "StartupMacros" namespace                           // create a namespace for string macros to be used 
 StartupMacros                                       // switch to that namespace
@@ -281,19 +281,22 @@ dscOn //verbosity 3 =
 : _assertStkChk ( n m | str )  
     { verbosity @ }
     {
-        { DebugFlag @ } 
+        { 1 } //DebugFlag @ } 
         { 
             debugColors
             str "\n assertStkChk ::" = 
             { n @ m @ == }
-            { nl location ":" ps str @ ps "ok" ps nl sp } 
-            { tab nl location ":" ps str @ ps alertColors "\n Error!\n" ps n @ p "!=" ps m @ p sp nl quit } 
+            { nl location ":" ps str @ ps "ok : " ps n @ p "==" ps m @ p nl } //stack pause } 
+            { tab nl location ":" ps str @ ps alertColors "\n Error!\n" ps n @ p "!=" ps m @ p nl stack pause nl } //quit } 
             ifElse 
             defaultColors 
         } 
-        { n @ m @ "assertStkChk" _assert1 }
+        { 
+            "\nassertStkChk : " ps n @ p m @ p 
+            n @ m @ "assertStkChk" _assert1 
+        }
         ifElse
-    } if2 
+    } if2
     //stack pause
 ; 
 //' _assertStkChk find wdiss //pause
@@ -350,9 +353,17 @@ postfix
 Root
 sp 
 : sh _sh ; prefix
+
+//================================================================================
+
+#if startupMacros
 stringMacrosOn
+#endif
+
 : testCfrTil "namespaces/ninit.cft" include ; // namespaces init
 : test testCfrTil ;
+: tx64 "namespaces/compiler/x64.back.cft" include ;
+: bx "namespaces/test/bigNum.test.cft" include ;
 
 Root 
 dbgOff
@@ -364,24 +375,83 @@ dbgOn
 '_doDemo 0 const    
 
 #if Is_DebugOn 
+
 #if todo
 : _TODO ( str ) TODO ( str @ ) ;;
 : TODO ( str ) _TODO ( str @ ) pause ;;
 #endif
+
 scOn
 System C
 test 
+
 #if _doDemo 
 demo 
 #endif //dT0
+
 stringMacrosOff
+
 #else // of course you can trim this file to your needs and put your init code maybe here if you like
 
 'doInitTest 1 const
 #if doInitTest
 #endif
-: tx64 "namespaces/compiler/x64.back.cft" include ;
 //tx64
+c_syntaxOn
+int64
+taa ( one two three )
+{
+    int64 four, five ;
+    four = one + two + three ;
+    five = four + four ;
+    p ( one ) ;
+    p ( two ) ;
+    p ( three ) ;
+    p ( five ) ;
+    nl () ;
+    <dbg>
+}
+taa ( 1 2 3 ) ;
+c_syntaxOff
+//: tbb ( one two three | four five )
+: tbb ( one two three )
+    'four var  'five var
+    four one @ two @ three @ + + = 
+    five four @ four @ + = 
+    one @ p 
+    two @ p 
+    three @ p 
+    five @ p 
+    nl
+    <dbg>
+;
+1 2 3 tbb
+sp
+: hi ( a b ) a @ b @ + p ; : hey ( a b ) a @ b @ hi a @ b @ hi a @ b @ hi ; 1 2 hey nl     
+C
+dscOn //verbosity 3 =
+: hi ( m x | n -- n ) n m @ = n @ p ; 
+: hey ( m x | n -- n ) n m @ = n @ 1 hi p n @ 1 hi p n @ 1 hi p ; 
+: heey ( m x | n -- n ) n m @ = n @ 1 hey p n @ 1 hey p n @ 1 hey p ; 
+7 1 heey dup p 7 _assert verbosity 1 = //pause
+nl
+// demonstrate calling order of local variables
+: a123 ( one two three )
+
+    one @ p
+    two @ p
+    three @ p
+;
+1 2 3 a123 nl
+: a1234 ( one two three four )
+
+    one @ p
+    two @ p
+    three @ p
+    four @ p
+    <dbg>
+;;
+a1234 ( 1 2 3 4 )
 #endif 
 
 postfix 

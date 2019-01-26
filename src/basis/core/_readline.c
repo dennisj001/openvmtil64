@@ -1,5 +1,11 @@
 #include "../../include/cfrtil64.h"
 
+void
+ReadLine_Set_ReadIndex ( ReadLiner * rl, int64 pos )
+{
+    rl->ReadIndex = pos ;
+}
+
 byte *
 _ReadLine_pb_NextChar ( ReadLiner * rl )
 {
@@ -38,7 +44,7 @@ _ReadLine_GetNextChar ( ReadLiner * rl )
 void
 _ReadLine_EndThisLine ( ReadLiner * rl )
 {
-    rl->ReadIndex = -1 ;
+    ReadLine_Set_ReadIndex ( rl, -1 ) ;
 }
 
 byte

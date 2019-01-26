@@ -22,6 +22,7 @@ _LO_Read ( LambdaCalculus * lc )
     d0 ( if ( Is_DebugModeOn ) LO_Debug_ExtraShow ( 0, 2, 0, ( byte* ) "\nEntering _LO_Read..." ) ) ;
     do
     {
+        //if ( Is_DebugModeOn ) CfrTil_PrintDataStack ( ) ;
         token = _Lexer_ReadToken ( lexer, ( byte* ) " ,\n\r\t" ) ;
         //scwi = lexer->SC_Index ;
         if ( Lexer_IsTokenQualifiedID ( lexer ) ) SetState ( cntx, CONTEXT_PARSING_QID, true ) ;
@@ -46,6 +47,7 @@ _LO_Read ( LambdaCalculus * lc )
             }
         }
         else _SyntaxError ( ( byte* ) "\n_LO_Read : Syntax error : no token?\n", QUIT ) ;
+        //if ( Is_DebugModeOn ) CfrTil_PrintDataStack ( ) ;
     }
     while ( lc->ParenLevel ) ;
     SetState ( lc, LC_READ, false ) ;
@@ -84,7 +86,7 @@ _LO_Read_DoWord ( LambdaCalculus * lc, Word * word, int64 qidFlag, int64 tsrli, 
         {
             Set_CompileMode ( true ) ;
             Object_Run ( word ) ;
-            Set_CompileMode ( true ) ;
+            Set_CompileMode ( false ) ;
         }
         l0 = DataObject_New ( T_LC_NEW, word, 0, word->CAttribute, word->CAttribute2,
             ( T_LISP_SYMBOL | word->LAttribute ), 0, word->Lo_Value, 0, tsrli, scwi ) ;
@@ -99,6 +101,7 @@ _LO_Read_DoToken ( LambdaCalculus * lc, byte * token, int64 qidFlag, int64 tsrli
     Lexer *lexer = cntx->Lexer0 ;
     ListObject *l0 = 0 ;
     Word *word ;
+    //if ( Is_DebugModeOn ) CfrTil_PrintDataStack ( ) ;
     if ( qidFlag ) SetState ( cntx->Finder0, QID, true ) ;
     word = LC_FindWord ( token, 0 ) ;
     if ( qidFlag ) SetState ( cntx->Finder0, QID, false ) ;
@@ -113,6 +116,7 @@ _LO_Read_DoToken ( LambdaCalculus * lc, byte * token, int64 qidFlag, int64 tsrli
         l0->State |= ( lc->ItemQuoteState | lc->QuoteState ) ;
         lc->ItemQuoteState = 0 ;
     }
+    //if ( Is_DebugModeOn ) CfrTil_PrintDataStack ( ) ;
     return l0 ;
 }
 

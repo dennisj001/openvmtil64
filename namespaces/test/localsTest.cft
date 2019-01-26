@@ -3,14 +3,49 @@
 #if 1 //_TestDone_ @ not // prevent including twice
 decimal
 User
- : hi ( a b ) a @ b @ + p ; : hey ( a b ) a @ b @ hi a @ b @ hi a @ b @ hi ; 1 2 hey       
+: sp ; //stack pause ;
 C
-// demonstrate calling order of local variables
+: sp ; //stack pause ;
+Class
+: sp ; //stack pause ;
+sp
+c_syntaxOn
+int64
+taa ( one two three )
+{
+    int64 four, five ;
+    four = one + two + three ;
+    five = four + four ;
+    p ( one ) ;
+    p ( two ) ;
+    p ( three ) ;
+    p ( five ) ;
+    nl () ;
+}
+taa ( 1 2 3 ) ;
+c_syntaxOff
+//: tbb ( one two three | four five )
+: tbb ( one two three )
+    'four var  'five var
+    four one @ two @ three @ + + = 
+    five four @ four @ + = 
+    one @ p 
+    two @ p 
+    three @ p 
+    five @ p 
+    nl
+;
+1 2 3 tbb
+sp
+: hi ( a b ) a @ b @ + p ; : hey ( a b ) a @ b @ hi a @ b @ hi a @ b @ hi ; 1 2 hey       
+C
 dscOn //verbosity 3 =
-: hi ( m x | n -- n ) n m @ = n @ p ; : hey ( m x | n -- n ) n m @ = n @ 1 hi p n @ 1 hi p n @ 1 hi p ; 
+: hi ( m x | n -- n ) n m @ = n @ p ; 
+: hey ( m x | n -- n ) n m @ = n @ 1 hi p n @ 1 hi p n @ 1 hi p ; 
 : heey ( m x | n -- n ) n m @ = n @ 1 hey p n @ 1 hey p n @ 1 hey p ; 
 7 1 heey dup p 7 _assert verbosity 1 = //pause
 dscOff
+// demonstrate calling order of local variables
 : a123 ( one two three )
 
     one @ p
@@ -49,7 +84,8 @@ dscOn
 	n @ m @ + o @ + q @ + 1 + dup p 7 _assert
         //" afterHey2" prints
 ;
-1 2 hey2 sp
+1 2 hey2 
+sp
 
 nl "beforeHeey" prints nl
 
@@ -61,7 +97,7 @@ nl "beforeHeey" prints nl
 1 2 heey2 
 1 2 heeeey2 
 nl "afterHeey" prints //pause
-decimal
+sp
 
 hex
 Class DLLNode
@@ -80,11 +116,12 @@ DLLNodeAlloc
 	this.nodes [ 7 ].BeforeReference 7 =
 	t1 @ DLLNode.size @ 8 * dump 
 ;
-"testA1" DLLNodeAlloc new
-"testB1" DLLNodeAlloc new
+"testA1" DLLNodeAlloc new sp
+"testB1" DLLNodeAlloc new sp
 nl "testA1 = " prints testA1 dup print nl tna2x //pause
-
+sp
 Class DLLNode
+: sp ; //stack pause ;
 DLLNodeAlloc
 "testA2" DLLNodeAlloc new
 "testB2" DLLNodeAlloc new
@@ -95,7 +132,7 @@ testA2.nodes [ 1 ].AfterReference 3 =
 testA2.nodes [ 3 ].BeforeReference 4 =
 testA2.nodes [ 1 ].AfterReference @ p
 testA2.nodes [ 3 ].BeforeReference @ p
-
+sp
 "before test" nl ps nl
 testA2.nodes [ 3 ].BeforeReference @ 4 using Logic.== { nl "array test ok" ps } { nl "array test error" ps } tf2 nl p
 
@@ -105,11 +142,10 @@ testB2.nodes [ 3 ].BeforeReference 6 =
 testB2 32 dump
 "testD" DLLNodeAlloc new
 'testD find dobject
-
 testD.a112.b113 77 =
 "testC" 'testD find DObject.clone 
 testC.a112.b113 @ dup p 77 _assert
-
+sp
 User
 hex
 : _localsT ( t | t1 )
@@ -133,17 +169,18 @@ hex
 ;
 
 1 localsT
-
+sp
 Combinators User
 decimal
 "\n\ntesting nested locals" ps nl
+sp
 : goedel { (| n ) n 1 = n @ 6 + dup 7 _assert p } ix { (| m ) m 3 = m @ 4 + dup 7 _assert p } ix ; 
+sp
 'goedel find wdiss
-nl "goedel :: " ps goedel sp
+nl "goedel :: " ps sp goedel sp
 : goedel2 { (| n ) n 2 = n @ 5 + dup 7 "goedel2_1_assert" assert p } ix { (| n ) n @ p n 3 = n @ 4 + dup p 7 "goedel2_2_assert" assert } ix ;
 'goedel2 find wdiss
-nl "goedel2 :: " ps goedel2 sp
-: sp s pause ;
+nl "goedel2 :: " ps sp goedel2 sp
 
 : goedel4 (| n -- TOS ) 
     nl "goedel4 :: " ps nl
@@ -165,7 +202,7 @@ nl "goedel2 :: " ps goedel2 sp
     n @ dup p // 9
 ; ".I" typeSignature
 ' goedel4 find wdiss     
-9 goedel4 "goedel4_0_assert" assert //pause
+sp 9 goedel4 sp "goedel4_0_assert" assert //pause
 "\ngoedel4 :: output should have read : \n'junk' 2 'junk' 7 'junk' 7 7 9" ps //pause
 : goedel5 (| n -- TOS ) 
     nl "goedel5 :: " ps nl
@@ -183,7 +220,7 @@ nl "goedel2 :: " ps goedel2 sp
     } ix // n should be garbage here
     n @ dup p
 ; ".I" typeSignature
-9 goedel5 "goedel5_0_assert" assert 
+9 sp goedel5 sp "goedel5_0_assert" assert 
 "\ngoedel5 :: output should read : junk' 2 'junk' 7 7 9" ps //pause
 //s pause
 : goedel6 (| n -- TOS ) 
@@ -203,7 +240,7 @@ nl "goedel2 :: " ps goedel2 sp
     n @ dup p
 ; ".I" typeSignature
 //' goedel6 find wdiss pause   
-9 goedel6 "goedel6_0_assert" assert
+9 sp goedel6 sp "goedel6_0_assert" assert
 "\ngoedel6 :: goedel6 output should read : \n'junk' 2 'junk' 7 7 'junk' 9" ps //pause
 
 : goedel7 (| n -- TOS ) 
@@ -223,7 +260,7 @@ nl "goedel2 :: " ps goedel2 sp
 ; ".I" typeSignature
 //' goedel7 find wdiss pause   
 nl "goedel7 :: " ps nl
-18 goedel7 "goedel7_0_assert" assert 
+18 sp goedel7 sp "goedel7_0_assert" assert 
 "\ngoedel7 :: goedel7 output should read : \n'junk' 2 'junk' 7 18" ps //pause
 #endif
 

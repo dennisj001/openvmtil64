@@ -7,36 +7,8 @@
         <activeConfTypeElem>0</activeConfTypeElem>
         <activeConfIndexElem>0</activeConfIndexElem>
     </data>
-    <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="2">
-        <file>
-            <url>src/basis/debugOutput.c</url>
-            <bookmark id="2">
-                <name/>
-                <line>74</line>
-                <key/>
-            </bookmark>
-            <bookmark id="1">
-                <name/>
-                <line>609</line>
-                <key/>
-            </bookmark>
-        </file>
-    </editor-bookmarks>
+    <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
-        <group>
-            <file>file:/home/dennisj/openvmtil64/src/basis/core/block.c</file>
-            <file>file:/home/dennisj/openvmtil64/src/basis/core/string.c</file>
-            <file>file:/home/dennisj/openvmtil64/src/basis/sourceCode.c</file>
-            <file>file:/home/dennisj/openvmtil64/src/basis/interpreters.c</file>
-            <file>file:/home/dennisj/openvmtil64/src/basis/core/interpret.c</file>
-            <file>file:/home/dennisj/openvmtil64/src/basis/core/memSpace.c</file>
-            <file>file:/home/dennisj/openvmtil64/src/basis/compiler/arrays.c</file>
-            <file>file:/home/dennisj/openvmtil64/src/basis/openVmTil.c</file>
-            <file>file:/home/dennisj/openvmtil64/src/basis/core/lexer.c</file>
-            <file>file:/home/dennisj/openvmtil64/src/primitives/memorys.c</file>
-            <file>file:/home/dennisj/openvmtil64/namespaces/compiler/c_syntax.cft</file>
-            <file>file:/home/dennisj/openvmtil64/src/basis/core/syntax.c</file>
-            <file>file:/home/dennisj/openvmtil64/src/basis/compiler/compiler.c</file>
-        </group>
+        <group/>
     </open-files>
 </project-private>

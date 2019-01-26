@@ -56,16 +56,6 @@ Lexer_ObjectToken_New ( Lexer * lexer, byte * token, int64 tsrli, int64 scwi ) /
 }
 
 void
-Word_SetTypeNamespace ( Word * word, int64 attribute )
-{
-    if ( _Compiler_->AutoVarTypeNamespace ) word->TypeNamespace = _Compiler_->AutoVarTypeNamespace ;
-    else if ( attribute & T_INT ) word->TypeNamespace = _CfrTil_->IntegerNamespace ;
-    else if ( attribute & T_STRING ) word->TypeNamespace = _CfrTil_->StringNamespace ;
-    else if ( attribute & T_BIG_NUM ) word->TypeNamespace = _CfrTil_->BigNumNamespace ;
-    else if ( attribute & T_RAW_STRING ) word->TypeNamespace = _CfrTil_->RawStringNamespace ;
-}
-
-void
 Lexer_Set_ScIndex_RlIndex ( Lexer * lexer, Word * word, int64 tsrli, int64 scwi )
 {
     if ( word )
@@ -87,8 +77,6 @@ _Lexer_LexNextToken_WithDelimiters ( Lexer * lexer, byte * delimiters, Boolean c
         lexer->SC_Index = _CfrTil_->SC_Index ;
         while ( ( ! Lexer_CheckIfDone ( lexer, LEXER_DONE ) ) )
         {
-            //inChar = ReadLine_PeekNextChar ( _Context_->ReadLiner0 ) ;
-            //if ( ( inChar == 0 ) || ( inChar == - 1 ) || ( inChar == eof ) ) break ;
             inChar = lexer->NextChar ( lexer->ReadLiner0 ) ;
             Lexer_DoChar ( lexer, inChar ) ;
         }
@@ -98,13 +86,9 @@ _Lexer_LexNextToken_WithDelimiters ( Lexer * lexer, byte * delimiters, Boolean c
             _AppendCharacterToTokenBuffer ( lexer, 0 ) ; // null terminate TokenBuffer
             lexer->OriginalToken = String_New ( lexer->TokenBuffer, SESSION ) ; // not TEMPORARY or strings on the stack are deleted at each newline after startup
         }
-        else
-        {
-            lexer->OriginalToken = ( byte * ) 0 ; // why not goto restartToken ? -- to allow user to hit newline and get response
-        }
+        else lexer->OriginalToken = ( byte * ) 0 ; // why not goto restartToken ? -- to allow user to hit newline and get response
         lexer->Token_Length = Strlen ( ( char* ) lexer->OriginalToken ) ;
         lexer->TokenEnd_ReadLineIndex = lexer->TokenStart_ReadLineIndex + lexer->Token_Length ;
-        //lexer->TokenStart_FileIndex = rl->LineStartFileIndex + rl->ReadIndex - lexer->Token_Length ;
         lexer->TokenStart_FileIndex = rl->LineStartFileIndex + lexer->TokenStart_ReadLineIndex ; //- lexer->Token_Length ;
         if ( peekFlag && reAddPeeked ) CfrTil_PushToken_OnTokenList ( lexer->OriginalToken ) ;
     }
@@ -138,12 +122,23 @@ Lexer_Init ( Lexer * lexer, byte * delimiters, uint64 state, uint64 allocType )
     Lexer_RestartToken ( lexer ) ;
 }
 
+#if 0
+
 byte
 Lexer_NextNonDelimiterChar ( Lexer * lexer )
 {
     return _String_NextNonDelimiterChar ( _ReadLine_pb_NextChar ( lexer->ReadLiner0 ), lexer->DelimiterCharSet ) ;
 }
+#else
 
+byte
+Lexer_NextNonDelimiterChar ( Lexer * lexer )
+{
+    //return _String_NextNonDelimiterChar ( &lexer->ReadLiner0->InputLine [lexer->TokenEnd_ReadLineIndex - 1], lexer->DelimiterCharSet ) ;
+    //return _String_NextNonDelimiterChar ( &_ReadLiner_->InputLine [lexer->TokenEnd_ReadLineIndex - 1], lexer->DelimiterCharSet ) ;
+    return _String_NextNonDelimiterChar ( _ReadLine_pb_NextChar ( lexer->ReadLiner0 ) - 1, lexer->DelimiterCharSet ) ;
+}
+#endif
 //----------------------------------------------------------------------------------------|
 //              get from/ add to head  |              | get from head      add to tail    |      
 // TokenList Tail <--> TokenList Head  |<interpreter> | PeekList Head <--> PeekList Tail  |
@@ -248,6 +243,26 @@ _Lexer_Next_NonDebugOrCommentTokenWord ( Lexer * lexer, byte * delimiters, Boole
     return token ;
 }
 
+Boolean
+Lexer_IsNextWordLeftParen ( Lexer * lexer )
+{
+    // with this any postfix word that is not a keyword or a c rtl arg word can now be used prefix with parentheses 
+    byte c = Lexer_NextNonDelimiterChar ( lexer ) ;
+    if ( ( c == '(' ) ) return true ;
+    else return false ;
+}
+
+Boolean
+Lexer_IsWordPrefixing ( Lexer * lexer, Word * word )
+{
+    if ( GetState ( _Context_, LC_INTERPRET ) ) return true ;
+    else if ( ( GetState ( _Context_, PREFIX_MODE ) ) && ( ! ( word->CAttribute & KEYWORD ) ) && ( ! ( word->WAttribute & WT_C_PREFIX_RTL_ARGS ) ) ) //_Namespace_IsUsing ( _CfrTil_->LispNamespace ) ) )
+    {
+        return Lexer_IsNextWordLeftParen ( _Lexer_ ) ;
+    }
+    return false ;
+}
+
 byte *
 Lexer_Peek_Next_NonDebugTokenWord ( Lexer * lexer, Boolean evalFlag )
 {
@@ -255,21 +270,6 @@ Lexer_Peek_Next_NonDebugTokenWord ( Lexer * lexer, Boolean evalFlag )
     CfrTil_PushToken_OnTokenList ( token ) ; // TODO ; list should instead be a stack
     return token ;
 }
-
-#if 0
-
-byte *
-Lexer_Peek_Next_NonDebugTokenWord ( Lexer * lexer, int64 evalFlag )
-{
-    byte * token = 0 ;
-    if ( _AtCommandLine ( ) && Lexer_CheckIfDone ( lexer, LEXER_DONE ) ) return 0 ;
-    else
-    {
-        token = Lexer_Peek_Next_NonDebugTokenWord ( lexer, 0, evalFlag ) ;
-    }
-    return token ;
-}
-#endif
 
 void
 Lexer_DoChar ( Lexer * lexer, byte c )
@@ -311,7 +311,7 @@ _Lexer_AppendByteToTokenBuffer ( Lexer * lexer, byte c )
     ReadLiner * rl = lexer->ReadLiner0 ;
     if ( lexer->TokenStart_ReadLineIndex == - 1 ) // -1 : Lexer_Init marker
     {
-        lexer->TokenStart_ReadLineIndex = rl->ReadIndex - 1 ;
+        lexer->TokenStart_ReadLineIndex = rl->ReadIndex - 1 ; // -1 : ReadIndex has already been incremented for the next char so this char is -1
     }
     lexer->TokenBuffer [ lexer->TokenWriteIndex ++ ] = c ;
     lexer->TokenBuffer [ lexer->TokenWriteIndex ] = 0 ;
@@ -687,8 +687,8 @@ AddressOf ( Lexer * lexer ) // ';':
 {
     //if ( GetState ( _Context_, C_SYNTAX ) && ( ReadLine_PeekNextChar ( lexer->ReadLiner ) != '&' ) ) TerminatingMacro ( lexer ) ;
     //if ( ( CharTable_IsCharType ( ReadLine_PeekNextChar ( lexer->ReadLiner ), CHAR_ALPHA ) && ( ReadLine_LastChar ( lexer->ReadLiner ) != '&' ) ) ) TerminatingMacro ( lexer ) ;
-    if ( GetState ( _Context_, C_SYNTAX ) && CharTable_IsCharType ( ReadLine_PeekNextChar ( lexer->ReadLiner0 ), CHAR_ALPHA ) ) TerminatingMacro ( lexer ) ;
-
+    //if ( GetState ( _Context_, C_SYNTAX ) && 
+    if ( CharTable_IsCharType ( ReadLine_PeekNextChar ( lexer->ReadLiner0 ), CHAR_ALPHA ) ) TerminatingMacro ( lexer ) ;
     else Lexer_Default ( lexer ) ;
 }
 
@@ -863,53 +863,6 @@ Lexer_IsTokenQualifiedID ( Lexer * lexer )
 {
     if ( Lexer_IsTokenReverseDotted ( lexer ) ) return true ;
     else return Lexer_IsTokenForwardDotted ( lexer ) ;
-}
-
-Boolean
-Lexer_IsTokenReverseDotted ( Lexer * lexer )
-{
-    ReadLiner * rl = lexer->ReadLiner0 ;
-    int64 i, start = lexer->TokenStart_ReadLineIndex - 1 ;
-    for ( i = start ; i >= 0 ; i -- )
-    {
-        if ( rl->InputLine [ i ] == '.' )
-        {
-            if ( rl->InputLine [ -- i ] != '.' ) // watch for (double/triple) dot ellipsis
-                return true ;
-        }
-        if ( rl->InputLine [ i ] == ']' ) return true ;
-        if ( rl->InputLine [ i ] == '[' ) return true ;
-
-        if ( isgraph ( rl->InputLine [ i ] ) ) break ;
-    }
-    return false ;
-}
-
-Boolean
-_Lexer_IsTokenForwardDotted ( Lexer * lexer, int64 end )
-{
-    ReadLiner * rl = lexer->ReadLiner0 ;
-    int64 i, space ;
-    end = end ? end - 1 : lexer->TokenStart_ReadLineIndex ;
-    for ( space = 0, i = end ; i < rl->MaxEndPosition ; i ++ )
-    {
-        if ( rl->InputLine [ i ] == '.' )
-        {
-            if ( rl->InputLine [ ++ i ] != '.' ) // watch for (double/triple) dot ellipsis
-                return true ;
-        }
-        else if ( rl->InputLine [ i ] == '[' ) return true ;
-        else if ( rl->InputLine [ i ] == ']' ) return true ;
-        else if ( rl->InputLine [ i ] == ' ' ) space ++ ;
-        else if ( space && ( isgraph ( rl->InputLine [ i ] ) ) ) break ;
-    }
-    return false ;
-}
-
-Boolean
-Lexer_IsTokenForwardDotted ( Lexer * lexer )
-{
-    return _Lexer_IsTokenForwardDotted ( lexer, 0 ) ;
 }
 
 void

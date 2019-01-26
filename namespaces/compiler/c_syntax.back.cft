@@ -1,0 +1,322 @@
+
+5 
+User
+C
+: sp ; //stack pause ; sp
+location
+//dbgOn 
+//verbosity 4 =
+
+// maybe we're shooting for a "smart syntactic language" that will parse "poetic" syntactic arrangements
+#if 1 // if 0
+optimizeOn inlineOn 
+System Interpreter Combinators PrefixCombinators
+C String
+"Dlsym" namespace Dlsym "libc" namespace libc
+#if 1 //Zenfone2 @ not
+libc.printf ("\nhello %d\n", 7) //pause
+#endif
+C
+User
+Class
+: sp ; //stack pause ; 
+//verbosity 3 =
+
+c_syntaxOn
+libc C
+d: typedef struct _CObj
+{
+    int64 hi ;
+    char chars [ 32 ] ;
+    int64 hey ;
+    int64 heey2 ;
+    char chars2 [ 32 ] ;
+    int64 heey ;
+    int64 heey1 ;
+} cobj, CObj ;
+"CObj.size =" ps p ( CObj.size ) ;
+"chey" CObj new ;
+CObj 
+chey.hi = 1234 ;
+_assert0 ( chey.hi 1234 ) ;
+dump ( chey, chey.size ) ;
+printf ( "\n\tchey.hi = %d", chey.hi ) ; 
+chey.chars [2] = 255 ;
+chey.heey = #x0123456789abcdef ; 
+dump ( chey, chey.size ) ;
+printf ( "\n\tchey.heey = %lx", chey.heey ) ; //pause
+chey.heey #x0123456789abcdef _assert0
+sp
+dump ( chey, chey.size ) ;
+chey.heey1 = chey.heey ;
+chey.heey = chey.heey1 ; // #x0123456789abcdef ;
+chey.heey2 = chey.heey1 ; // #x0123456789abcdef ; 
+chey.heey2 = chey.heey1 ; // #x0123456789abcdef ;
+chey.hey = chey.heey1 ; // #x0123456789abcdef ;
+chey.hey chey.heey1 _assert0
+dump ( chey, chey.size ) ;
+printf ( "\n\tchey.hey = %lx", chey.hey ) ; 
+sp
+chey.chars [23] = 255 ;
+chey.chars [18] = #b10110 ; // #x16
+//chey.hey = #x12345678 ;
+dump ( chey, cobj.size ) ; 
+sp
+printf ( "\ncobj.size = %d",cobj.size ) ; 
+printf ( "\n%s%lx", "\nchey = ", &chey ) ;
+printf ( "\n%s%lx", "\nchey.hey = ", chey.hey ) ;
+printf ( "\n%s%lx", "\n&chey.hey = ", &chey.hey ) ;
+hp ( chey.hey ) ; 
+hp ( &chey.hey ) ;
+sp
+
+decimal
+var ( "x7" ) ;
+x7 = &chey.chars [ 18 ] ;
+ps ( "\nx7 = " ) ; hp ( x7 ) ; ps ( x7 ) ;
+sprintf ( x7, "%s", "\n\thoot" ) ;
+printf ( "%s", &x7 ) ;
+dump ( &chey, cobj.size ) ; 
+sp
+
+sprintf ( &chey.chars, "%s", "well" ) ; sp
+dump ( &chey, cobj.size ) ; sp
+//sprintf ( &chey.chars [ 24 ], "%s", "do or don't" ) ;
+sprintf ( &chey.chars [ 24 ], "%s", "don't" ) ; sp
+dump ( &chey, cobj.size ) ; 
+//sprintf ( &chey.chars, "%s", "well, do or don't hoot" ) ;
+sprintf ( &chey.chars, "%s", "ok! don't hoot" ) ;
+//sprintf ( &chey.chars, "%s", "hoot" ) ;
+dump ( &chey, cobj.size ) ; 
+printf ( "\n\t%s\n", &chey.chars [ 24 ] ) ; 
+sp
+printf ( "\n\t%s\n", "hoot" ) ; //&chey.chars [ 24 ] ) ;
+dump ( &chey, cobj.size ) ; // add '&' within parentheses for lvalue
+sp
+scOn
+libc
+void
+chi ( CObj chey0, d | a b c )
+{
+    c = 1 + 2 ;
+    b = c + 2 ;
+    a = b + c ;
+    nl
+    p ( c ) ; c 3 "c should be 3" assert // 3
+    p ( b ) ; b 5 "b should be 5" assert // 5
+    p ( a ) ; a 8 "a should be 8" assert // 8
+    dump ( &chey0, cobj.size ) ; 
+    d = cobj.chey0.hey ;
+    hex p ( d ) ;
+    printf ( "\n chi : d = %lx\n", d ) ;
+    sprintf ( &cobj.chey0.chars, "\n\t\they = %lx", d ) ; // add '&' within parentheses for lvalue
+    printf ( "\n chi : d = %lx\n", d ) ;
+    sprintf ( &cobj.chey0.chars2, "\n\t\they hey = %lx", cobj.chey0.hey ) ;
+    printf ( "\n cobj.chey0.chars = %s\n", &cobj.chey0.chars ) ;
+    printf ( "\n cobj.chey0.chars2 = %s\n", &cobj.chey0.chars2 ) ;
+    printf ( "\n chi : d = %lx\n", d ) ;
+    d = cobj.chey0.hey ;
+    printf ( "\n%lx\n", d ) ;
+    printf ( "\n chi : d = %lx\n", d ) ;
+    _assert ( d #x0123456789abcdef ) ; 
+    printf ( "\n%x\n", cobj.chey0.hey ) ;
+    sprintf ( &chey0.chars [ 24 ], "%s", "hoot" ) ;
+    dump ( &chey0, cobj.size ) ; 
+} prefix
+wdiss ( ' chi find ) ;
+chi ( chey, 7 ) ;
+
+#if 0 // if 1
+void
+interpret2 ( | atoken aword ) 
+{
+    nl tab () ; ps ( "interpret2 :> " ) ; nl
+    while ( 1 )
+    {   
+        atoken = token () ; 
+        if ( ! ( strcmp ( atoken, "i2halt" ) ) ) 
+        { 
+            printf ( "%s", "\n\n\tinterpret2_0 exiting ..." ) ; 
+            return ; 
+        }
+        // test comment here
+        else
+        // test comment here
+        {
+            if ( atoken )
+            {       
+                aword = tokenToWord ( atoken ) ;
+                doWord ( aword ) ;
+            }       
+        }
+    }
+}
+#else
+void
+interpret2 ( | atoken aword ) 
+{
+    //testc1 () ; pause () ;
+    //nl () ; tab () ; 
+    ps ( "interpret2 :> " ) ; nl () ;
+    while ( 1 )
+    {   
+        atoken = token () ; 
+        printf ( "\n\tinterpret2 : token = %s", atoken ) ; 
+        if ( ! ( strcmp ( atoken, "i2halt" ) ) ) 
+        {
+            printf ( "%s", "\n\n\tinterpret2_1 exiting ..." ) ; 
+            return ; 
+        }
+        else if ( atoken )
+        {       
+            aword = tokenToWord ( atoken ) ;
+            doWord ( aword ) ;
+        }       
+    }
+}
+#endif // if 1 : endif
+
+wdiss ( ' interpret2 find ) ; 
+//pause () ;
+//optimizeOff
+#if 1 // if 1
+//verbosity = 3 ;
+interpret2 
+using
+#if 1
+int
+fac4 ( n  | facc -- TOS ) 
+{ 
+    int facc = 1 ;
+    while ( n > 1 ) facc = n -- * facc ;
+    return facc ;
+} prefix
+wdiss ( ' fac4 find ) ; 
+sp 
+fac4 ( 7 ) ; dup p 5040 _assert 
+c_syntaxOff
+' fac4 find wdiss
+#endif
+
+C_Syntax User
+'interpret3 'interpret2 find alias
+interpret3 words // i2halt code to exit interpret2
+
+: hi1 1 2 + p ;  
+: hey1 hi1 hi1 ; 
+: heey1 hey1 hey1 hey1 ;
+nl heey1 
+
+#if 1 
+c_syntaxOn
+int
+faccs2 ( n | rec ) 
+{
+    for ( rec = 1 ; n > 1 ; n-- )
+    { 
+        rec = rec * n ; 
+    } 
+    return rec ;
+} prefix
+' faccs2 find wdiss
+faccs2 ( 7 ) dup p 5040 _assert0 apause
+// sp
+optimizeOff
+void
+interpret4 ( | atoken aword ) 
+{
+    nl() ; tab () ; ps ( "interpret4 :> " ) ; nl () ;
+    while ( 1 )
+    {   
+        atoken = token () ; 
+        printf ( "\n\tinterpret4 : token = %s", atoken ) ; 
+        if ( ! ( strcmp ( atoken, "i2halt" ) ) ) 
+        { 
+            printf ( "%s", "\n\n\tinterpret4 exiting ..." ) ; 
+            return ; 
+        }
+        else
+        {
+            if ( atoken )
+            {       
+                aword = tokenToWord ( atoken ) ;
+                doWord ( aword ) ;
+            }       
+        }
+    }
+}
+
+d: interpret4 ;
+int
+faccs3 ( n | rec ) 
+{
+    for ( rec = 1 ; n > 1 ; n-- )
+    { 
+        rec = rec * n ; 
+    } 
+    return rec ;
+}
+' faccs3 find wdiss
+faccs3 ( 7 ) p //pause
+c_syntaxOff
+//verbosity 2 = //verbosity @ p pause
+#endif // if 2 : endif
+
+i2halt
+i2halt // see above in interpret2
+//i2halt // for second interpret3 
+//i2halt // for second interpret3 
+d: #endif // if 1 : endif
+#endif // if 0 : endif
+
+c_syntaxOn
+String libc C
+d: typedef struct _CBuffer { byte buf [ 256 ]; } CBuffer ;
+void
+$ ( | atoken, buffer, CBuffer buffer0 ) 
+{
+    buffer = &buffer0.buf ;
+    memset ( buffer, 0, CBuffer.size ) ; 
+    while ( atoken = token () ) 
+    {   
+        printf ( "\n\ttoken = %s\n", atoken ) ; //pause () ;
+        if ( ! strcmp ( atoken, ";" ) ) 
+        { 
+            printf ( "\n\tbuffer = %s\n", buffer ) ; //pause () ;
+            sh ( buffer ) ;
+            break ; 
+        }
+        else 
+        { 
+            if ( strcmp ( atoken, "." ) )
+            {
+                strcat ( buffer, " " ) ; // for shell '.' which means current directory - needs the space after
+            }
+            strcat ( buffer, atoken ) ;
+        }
+    }
+} 
+'void.$ find wdiss //sp
+c_syntaxOff 
+#if doScript2 
+"\n\nnew $ test\n" ps
+pause 
+d: void
+$ls -al . ;
+$ etc/script ; 
+$ etc/lispScript ; 
+$$ls -al /usr/local ; 
+$$ls -al . ;
+#endif
+C
+sp
+verbosity 1 =
+//sp
+dbgOff 
+infixOff
+1 opOn
+//stack pause
+s: hi ( a b | c ) c a @ b @ + = printf ("\nshould read 3 : %d", c ) ;s 1 2 hi //pause
+sp
+2 + 7 assertStkChk // stack checking
+sp

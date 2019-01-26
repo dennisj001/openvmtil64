@@ -150,7 +150,7 @@ _Printf ( byte *format, ... )
         va_end ( args ) ;
         fflush ( _CfrTil_->LogFILE ) ;
     }
-    ReadLiner_SetLastChar ( 0 ) ; //
+    //ReadLiner_SetLastChar ( 0 ) ; //
 }
 #if 0
 // try not to (don't) print extra newlines
@@ -226,7 +226,7 @@ Getc ( FILE * f )
 {
     ReadLiner * rl = _Context_->ReadLiner0 ;
     if ( f != stdin ) return fgetc ( f ) ;
-    if ( Maru_RawReadFlag ) return ReadLine_Key ( rl ) ;
+    if ( Maru_RawReadFlag ) return ReadLine_Get_Key ( rl ) ;
     else return ( int64 ) ReadLine_NextChar ( rl ) ;
 }
 
