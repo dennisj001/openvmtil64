@@ -4,10 +4,7 @@
 void
 _Context_Prompt ( int64 control )
 {
-    if ( ( control && ( ! IS_INCLUDING_FILES ) ) || ( GetState ( _Debugger_, DBG_ACTIVE ) ) )
-    {
-        CfrTil_DoPrompt ( ) ;
-    }
+    if ( ( control && ( ! IS_INCLUDING_FILES ) ) || ( GetState ( _Debugger_, DBG_ACTIVE ) ) ) CfrTil_DoPrompt ( ) ;
 }
 
 byte *

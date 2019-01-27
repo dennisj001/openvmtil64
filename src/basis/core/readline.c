@@ -618,6 +618,7 @@ ReadLine_NextChar ( ReadLiner * rl )
             return nchar ;
         }
         else ReadLine_GetLine ( rl ) ; // get a line of characters
+        ReadLine_Set_ReadIndex ( rl, 0 ) ;
         nchar = _ReadLine_GetNextChar ( rl ) ;
     }
     return nchar ;

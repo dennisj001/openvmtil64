@@ -815,8 +815,10 @@
         </ccTool>
       </item>
       <item path="src/basis/openVmTil.c" ex="false" tool="1" flavor2="3">
-        <ccTool>
+        <ccTool flags="1">
           <incDir>
+            <pElem>src/basis</pElem>
+            <pElem>src/include</pElem>
             <pElem>.</pElem>
           </incDir>
         </ccTool>
