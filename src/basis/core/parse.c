@@ -112,7 +112,7 @@ gotNextToken:
         {
             token = Lexer_ReadToken ( _Context_->Lexer0 ) ;
             arrayBaseObject = _CfrTil_ClassField_New ( token, ns, size, offset ) ; // nb! : in case there is an array so it will be there for ArrayDimensions
-            token = Lexer_Peek_Next_NonDebugTokenWord ( _Context_->Lexer0, 1 ) ;
+            token = Lexer_Peek_Next_NonDebugTokenWord (_Context_->Lexer0, 1 , 0) ;
             if ( token [0] != '[' )
             {
                 offset += size ;
@@ -431,6 +431,7 @@ Lexer_ParseBigNum ( Lexer * lexer, byte * token )
 void
 _Lexer_ParseHex ( Lexer * lexer, byte * token )
 {
+    int64 scrap ;
     // use 0d format for decimal numbers with hex NumberBase state
     if ( sscanf ( ( char* ) token, INT_FRMT_FOR_HEX, ( int64* ) & lexer->Literal ) )
     {
@@ -438,7 +439,7 @@ _Lexer_ParseHex ( Lexer * lexer, byte * token )
         SetState ( lexer, KNOWN_OBJECT, true ) ;
         Lexer_ParseBigNum ( lexer, token ) ;
     }
-    else if ( sscanf ( ( char* ) token, HEX_INT_FRMT, ( uint64* ) & lexer->Literal ) )
+    else if ( sscanf ( ( char* ) token, HEX_INT_FRMT, ( uint64* ) & lexer->Literal ) && sscanf ( ( char* ) &token[1], HEX_INT_FRMT, ( int64* ) & scrap ))
     {
         lexer->TokenType = ( T_INT | KNOWN_OBJECT ) ;
         SetState ( lexer, KNOWN_OBJECT, true ) ;

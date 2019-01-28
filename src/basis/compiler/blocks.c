@@ -64,40 +64,34 @@ BI_Block_Copy ( BlockInfo * bi, byte* dstAddress, byte * srcAddress, int64 bsize
 }
 
 void
-Compile_BlockLogicTest ( BlockInfo * bi ) // , byte * start )
+Compile_BlockLogicTest ( BlockInfo * bi ) 
 {
     int64 diff ;
     if ( bi )
     {
         if ( ( bi->JccLogicCode || ( bi->LogicCodeWord && bi->LogicCodeWord->StackPushRegisterCode ) ) )
         {
-            if ( ! bi->JccLogicCode )
-            {
-                bi->JccLogicCode = bi->LogicCodeWord->StackPushRegisterCode ;
-            }
+            if ( ! bi->JccLogicCode ) bi->JccLogicCode = bi->LogicCodeWord->StackPushRegisterCode ;
             diff = bi->JccLogicCode - bi->bp_First ; // find its diff position in original block
             bi->CopiedToLogicJccCode = bi->CopiedToStart + diff ; // use diff in copied block
-            if ( ( ! ( bi->LogicCodeWord->CAttribute & CATEGORY_LOGIC ) ) )
+            if ( bi->LogicCodeWord && ( ! ( bi->LogicCodeWord->CAttribute & CATEGORY_LOGIC ) ) )
             {
                 SetHere ( bi->CopiedToLogicJccCode, 1 ) ;
                 Compiler_Word_SetCodingHere_And_ClearPreviousUseOf_Here_SCA ( bi->LogicCodeWord, 0 ) ;
                 _Compile_TestCode ( bi->LogicCodeWord->RegToUse, CELL ) ;
                 bi->CopiedToLogicJccCode = Here ;
                 BI_Set_setTtnn ( bi, TTT_ZERO, NEGFLAG_ON, TTT_ZERO, NEGFLAG_OFF ) ;
+                //return ;
             }
-#if 1        
-            else if ( ( bi->LogicCodeWord->CAttribute & CATEGORY_OP_1_ARG ) && ( bi->LogicCodeWord->CAttribute2 & LOGIC_NEGATE ) )
+            else if ( bi->LogicCodeWord && ( bi->LogicCodeWord->CAttribute & CATEGORY_OP_1_ARG ) && ( bi->LogicCodeWord->CAttribute2 & LOGIC_NEGATE ) )
             {
                 SetHere ( bi->LogicCodeWord->Coding, 1 ) ;
                 Compiler_Word_SetCodingHere_And_ClearPreviousUseOf_Here_SCA ( bi->LogicCodeWord, 0 ) ;
                 _Compile_TestCode ( bi->LogicCodeWord->RegToUse, CELL ) ;
                 bi->CopiedToLogicJccCode = Here ;
                 BI_Set_setTtnn ( bi, TTT_ZERO, NEGFLAG_ON, TTT_ZERO, NEGFLAG_ON ) ;
-                //BI_Set_setTtnn ( bi, TTT_ZERO, NEGFLAG_ON, TTT_ZERO, NEGFLAG_OFF ) ;
+                //return ;
             }
-            //if ( ! ( bi->LogicCodeWord->CAttribute2 & LOGIC_NEGATE ) ) BI_Set_setTtnn ( bi, TTT_ZERO, NEGFLAG_ON, TTT_ZERO, NEGFLAG_OFF ) ;
-            //else BI_Set_setTtnn ( bi, TTT_ZERO, NEGFLAG_ON, TTT_ZERO, NEGFLAG_ON ) ;
-#endif        
         }
         else
         {
@@ -133,8 +127,8 @@ CfrTil_TurnOffBlockCompiler ( )
     Compiler * compiler = _Context_->Compiler0 ;
     if ( ! GetState ( compiler, LISP_MODE ) ) CfrTil_LeftBracket ( ) ;
     _CfrTil_RemoveNamespaceFromUsingListAndClear ( ( byte* ) "__labels__" ) ;
-    Namespace_RemoveNamespacesStack ( compiler->LocalsCompilingNamespacesStack ) ;   
-    SetState ( compiler, COMPILE_MODE|VARIABLE_FRAME, false ) ;
+    Namespace_RemoveNamespacesStack ( compiler->LocalsCompilingNamespacesStack ) ;
+    SetState ( compiler, COMPILE_MODE | VARIABLE_FRAME, false ) ;
 }
 
 void
@@ -167,7 +161,7 @@ _CfrTil_BeginBlock0 ( Boolean compileJumpFlag, byte * here )
     }
     compiler->LHS_Word = 0 ;
     bi->OriginalActualCodeStart = here ? here : Here ;
-    if ( compileJumpFlag ) _Compile_UninitializedJump ( ) ;
+    if ( compileJumpFlag ) Compile_UninitializedJump ( ) ;
     bi->JumpOffset = here ? here - INT32_SIZE : Here - INT32_SIZE ; // before CfrTil_CheckCompileLocalFrame after CompileUninitializedJump
     Stack_Push_PointerToJmpOffset ( ) ;
     bi->bp_First = here ? here : Here ; // after the jump for inlining

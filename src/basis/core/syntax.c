@@ -228,9 +228,27 @@ CfrTil_C_ConditionalExpression ( )
     Context * cntx = _Context_ ;
     Interpreter * interp = cntx->Interpreter0 ;
     Compiler * compiler = cntx->Compiler0 ;
-    if ( ( ! Compiling ) && ( !GetState ( compiler, C_CONDITIONAL_IN ) ) ) Compiler_Init ( _Compiler_, 0, 1 ) ; 
+    Word * word1 ;
+    if ( ( ! Compiling ) && ( ! GetState ( compiler, C_CONDITIONAL_IN ) ) ) Compiler_Init ( _Compiler_, 0, 1 ) ;
     SetState ( compiler, C_CONDITIONAL_IN, true ) ;
-    CfrTil_If_ConditionalExpression ( ) ;
+    if ( CompileMode ) 
+    {
+        word1 = _CfrTil_WordList ( 1 ) ;
+        if ( word1 && word1->StackPushRegisterCode )
+        {
+            // nb. there is only one block so don't use BlockInfo code ; we may have nested conditionals
+            SetHere ( word1->StackPushRegisterCode, 1 ) ;
+            _Compile_TestCode ( word1->RegToUse, CELL ) ;
+        }
+        else
+        {
+            Compile_Pop_To_Acc ( DSP ) ;
+            _Compile_TestCode ( ACC, CELL ) ;
+        }
+        Compile_UninitializedJumpEqualZero ( ) ;
+        Stack_Push_PointerToJmpOffset ( ) ;
+    }
+    else CfrTil_If_ConditionalExpression ( ) ;
     if ( CompileMode )
     {
         byte * token = Interpret_C_Until_Token4 ( interp, ( byte* ) ":", ( byte* ) ",", ( byte* ) ")", ( byte* ) "}", 0, 0 ) ;
@@ -238,7 +256,7 @@ CfrTil_C_ConditionalExpression ( )
         {
             Lexer_ReadToken ( _Lexer_ ) ;
             CfrTil_Else ( ) ;
-            Interpret_C_Until_Token4 ( interp, ( byte* ) ";", ( byte* ) ",", ( byte* ) ")", ( byte* ) "}", (byte*) " ", 0 ) ; //( byte* ) "}", ( byte* ) " \n\r\t", 0 ) ;
+            Interpret_C_Until_Token4 ( interp, ( byte* ) ";", ( byte* ) ",", ( byte* ) ")", ( byte* ) "}", ( byte* ) " ", 0 ) ; //( byte* ) "}", ( byte* ) " \n\r\t", 0 ) ;
             CfrTil_EndIf ( ) ;
         }
     }

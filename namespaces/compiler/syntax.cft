@@ -56,6 +56,21 @@ nl
 1 ? "hi2" ps : "er2" ps 
 0 ? "er" ps : "hi3" ps  
 { 0 ? "er" ps : "hi42" ps } call
+nl
+0 ? "hi1" ps : 0 ? "hi2" ps : 0 ? "hi3" ps : 1 ? "hi42\n" ps : "err" ps 
+c_syntaxOn
+void thi41 () { 0 ? "hi1" ps : 0 ? "hi2" ps : 0 ? "hi3" ps : 1 ? "hi42\n" ps : "err" ps ; } // not yet??
+c_syntaxOff
+C_Syntax
+//'thi41 find wdiss
+thi41
+c_syntaxOn
+void thi42 ( n ) { n == 1 ? "hi1" ps : n == 2 ? "hi2" ps : n == 3 ? "hi3" ps : n == 4 ? "hi42" ps : "err" ps ; } 
+c_syntaxOff
+C_Syntax
+//'thi42 find wdiss
+4 thi42 
+c_syntaxOff
 //pause
 2 + 7 assertStkChk // stack checking
 sp

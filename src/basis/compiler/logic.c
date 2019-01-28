@@ -4,13 +4,19 @@
 // 'setTtnn' is a notation from the intel manuals
 
 void
-BI_Set_setTtnn ( BlockInfo *bi, Boolean setTtn, Boolean setNegFlag, Boolean jccTtt, Boolean jccNegFlag )
+_BI_Set_setTtnn ( BlockInfo *bi, Boolean setTtn, Boolean setNegFlag, Boolean jccTtt, Boolean jccNegFlag, byte * jccLogicCode )
 {
     bi->SetccTtt = setTtn ;
     bi->SetccNegFlag = setNegFlag ;
     bi->JccLogicCode = Here ; // used by combinators
     bi->JccTtt = jccTtt ;
     bi->JccNegFlag = jccNegFlag ;
+}
+
+void
+BI_Set_setTtnn ( BlockInfo *bi, Boolean setTtn, Boolean setNegFlag, Boolean jccTtt, Boolean jccNegFlag )
+{
+    _BI_Set_setTtnn ( bi, setTtn, setNegFlag, jccTtt, jccNegFlag, Here ) ;
 }
 
 void
@@ -298,7 +304,6 @@ Compile_Logical_X ( Compiler * compiler, int64 op, Boolean setTtn, Boolean setNe
         // TODO : this optimization somehow is *very* little used, why is that ?!? 
         // assumes we have unordered operands in eax, ecx
         _Compile_X_Group1 ( op, REG, REG, ACC, OREG, 0, 0, CELL ) ;
-        //Compile_TestLogicAndStackPush ( compiler, ACC, NEGFLAG_NZ ) ;
     }
     else
     {
@@ -307,7 +312,6 @@ Compile_Logical_X ( Compiler * compiler, int64 op, Boolean setTtn, Boolean setNe
         //_Compile_Group1 ( int64 code, int64 toRegOrMem, int64 mod, int64 reg, int64 rm, int64 sib, int64 disp, int64 osize )
         _Compile_X_Group1 ( op, REG, MEM, ACC, DSP, 0, CELL, CELL ) ;
         _Compile_Stack_DropN ( DSP, 2 ) ;
-        //Compile_TestLogicAndStackPush ( compiler, ACC, NEGFLAG_NZ ) ;
     }
     Compile_TestLogicAndStackPush ( compiler, ACC, setTtn, setNegateFlag, jccTtt, jccNegFlag ) ; //NEGFLAG_NZ, TTT_ZERO, NEGFLAG_Z ) ;
 }
@@ -321,26 +325,19 @@ Compile_LogicalNot ( Compiler * compiler )
         // just need to get to valued to be operated on ( not'ed ) in eax
     else if ( optFlag )
     {
-        if ( compiler->OptInfo->OptimizeFlag & OPTIMIZE_IMM )
-        {
-            Compile_MoveImm_To_Reg ( ACC, compiler->OptInfo->Optimize_Imm, CELL ) ;
-        }
+        if ( compiler->OptInfo->OptimizeFlag & OPTIMIZE_IMM ) Compile_MoveImm_To_Reg ( ACC, compiler->OptInfo->Optimize_Imm, CELL ) ;
         else if ( compiler->OptInfo->Optimize_Rm == DSP )
         {
             if ( one->StackPushRegisterCode ) SetHere ( one->StackPushRegisterCode, 1 ) ;
             else _Compile_Move_StackN_To_Reg ( ACC, DSP, 0 ) ;
         }
-        else if ( compiler->OptInfo->Optimize_Rm != ACC )
-        {
-            Compile_GetVarLitObj_RValue_To_Reg ( one, ACC ) ;
-        }
+        else if ( compiler->OptInfo->Optimize_Rm != ACC ) Compile_GetVarLitObj_RValue_To_Reg ( one, ACC ) ;
     }
     else
     {
         if ( one->StackPushRegisterCode ) SetHere ( one->StackPushRegisterCode, 1 ) ; // PREFIX_PARSING : nb! could be a prefix function 
         else if ( one->CAttribute2 & RAX_RETURN ) ; // do nothing
         else _Compile_Stack_PopToReg ( DSP, ACC ) ;
-        //int64 a, b, c= 0, d ; a = 1; b = !a, d= !c ; _Printf ( "a = %d b = %d c =%d ~d = %d", a, b, c, d ) ;
     }
     _Compile_LogicalNot ( compiler ) ;
 }
@@ -351,32 +348,24 @@ void
 _Compile_Jcc ( int64 setNegFlag, int64 setTtn, byte * jmpToAddr )
 {
     uint64 disp ;
-    if ( jmpToAddr )
-    {
-        disp = _CalculateOffsetForCallOrJump ( Here + 2, jmpToAddr, INT32_SIZE ) ;
-    }
+    if ( jmpToAddr ) disp = _CalculateOffsetForCallOrJump ( Here + 2, jmpToAddr, INT32_SIZE ) ;
     else disp = 0 ; // allow this function to be used to have a delayed compile of the actual address
     Compile_CalculateWrite_Instruction_X64 ( 0x0f, ( 0x8 << 4 | setTtn << 1 | setNegFlag ), 0, 0, 0, DISP_B, 0, disp, INT32_SIZE, 0, 0 ) ;
 }
 
 void
-_BI_Compile_Jcc ( BlockInfo *bi, byte* address ) // , int8 nz
+_BI_Compile_Jcc ( BlockInfo *bi, byte* jmpToAddress ) // , int8 nz
 {
     if ( bi->CopiedToLogicJccCode ) SetHere ( bi->CopiedToLogicJccCode, 1 ) ;
     else SetHere ( bi->JccLogicCode, 1 ) ;
     bi->ActualCopiedToJccCode = Here ;
-    _Compile_Jcc ( bi->JccNegFlag, bi->JccTtt, address ) ; // we do need to store and get this logic set by various conditions by the compiler : _Compile_SET_setTtnn_REG
+    _Compile_Jcc ( bi->JccNegFlag, bi->JccTtt, jmpToAddress ) ; // we do need to store and get this logic set by various conditions by the compiler : _Compile_SET_setTtnn_REG
 }
 
 void
-BI_Compile_Jcc ( BlockInfo *bi, Boolean setTtn, byte * address ) // , int8 nz
+BI_Compile_Jcc ( BlockInfo *bi, Boolean setTtn, byte * jmpToAddress ) // , int8 nz
 {
-    if ( bi->JccLogicCode )
-    {
-        //_Compile_Jcc ( ! bi->SetccNegFlag, bi->SetccTtt, 0 ) ; // we do need to store and get this logic set by various conditions by the compiler : _Compile_SET_setTtnn_REG
-        //_Compile_Jcc ( bi->JccNegFlag, bi->JccTtt, 0 ) ; // we do need to store and get this logic set by various conditions by the compiler : _Compile_SET_setTtnn_REG
-        _BI_Compile_Jcc ( bi, address ) ; // , int8 nz
-    }
+    if ( bi->JccLogicCode ) _BI_Compile_Jcc ( bi, jmpToAddress ) ;
     else
     {
         Compile_BlockLogicTest ( bi ) ; // after cmp we test our condition with setcc. if cc is true a 1 will be sign extended in R8 and pushed on the stack 
@@ -427,15 +416,15 @@ CfrTil_If_ConditionalExpression ( )
             {
                 byte * token ;
                 // interpret until ":", "else" or "endif"
-                token = Interpret_C_Until_Token4 (interp, ( byte* ) "else", ( byte* ) "endif", (byte*) ":", 0, (byte*) " " , 1) ;
+                token = Interpret_C_Until_Token4 ( interp, ( byte* ) "else", ( byte* ) "endif", ( byte* ) ":", 0, ( byte* ) " ", 1 ) ;
                 if ( ( token == 0 ) || ( String_Equal ( token, "endif" ) ) ) return ;
                 Parse_SkipUntil_EitherToken_OrNewline ( ( byte* ) "endif", 0 ) ;
             }
             else
             {
                 // skip until ":" or "else"
-                Parse_SkipUntil_EitherToken_OrNewline ( ( byte* ) ":", (byte*) "else" ) ;
-                Interpret_C_Until_Token4 (interp, ( byte* ) ";", ( byte* ) ",", ( byte* ) "endif", ( byte* ) "}", (byte*) " " , 1) ;
+                Parse_SkipUntil_EitherToken_OrNewline ( ( byte* ) ":", ( byte* ) "else" ) ;
+                Interpret_C_Until_Token4 ( interp, ( byte* ) ";", ( byte* ) ",", ( byte* ) "endif", ( byte* ) "}", ( byte* ) " ", 1 ) ;
             }
         }
     }
@@ -448,7 +437,7 @@ CfrTil_Else ( )
 {
     if ( CompileMode )
     {
-        _Compile_UninitializedJump ( ) ; // at the end of the 'if block' we need to jmp over the 'else block'
+        Compile_UninitializedJump ( ) ; // at the end of the 'if block' we need to jmp over the 'else block'
         CfrTil_CalculateAndSetPreviousJmpOffset_ToHere ( ) ;
         Stack_Push_PointerToJmpOffset ( ) ;
     }

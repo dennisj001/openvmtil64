@@ -315,7 +315,7 @@ Compiler_Init ( Compiler * compiler, uint64 state, Boolean flag )
 {
     if ( flag ) Compiler_DeleteDebugInfo ( compiler ) ;
     else if ( compiler->NumberOfVariables ) Namespace_RemoveNamespacesStack ( compiler->LocalsCompilingNamespacesStack ) ;
-    compiler->State = state & ( ! ARRAY_MODE ) ;
+    compiler->State = ( state &= ( ~ARRAY_MODE ) ) ;
     compiler->ContinuePoint = 0 ;
     compiler->BreakPoint = 0 ;
     compiler->InitHere = Here ;
@@ -337,7 +337,7 @@ Compiler_Init ( Compiler * compiler, uint64 state, Boolean flag )
     compiler->CurrentCreatedWord = 0 ;
     Stack_Init ( compiler->BlockStack ) ;
     Stack_Init ( compiler->CombinatorBlockInfoStack ) ;
-    Stack_Init ( compiler->PointerToOffset ) ;
+    Stack_Init ( compiler->PointerToOffsetStack ) ;
     Stack_Init ( compiler->CombinatorInfoStack ) ;
     Stack_Init ( compiler->InfixOperatorStack ) ;
     _dllist_Init ( compiler->GotoList ) ;
@@ -358,7 +358,7 @@ Compiler_New ( uint64 allocType )
     compiler->BlockStack = Stack_New ( 64, allocType ) ;
     compiler->CombinatorInfoStack = Stack_New ( 64, allocType ) ;
     compiler->InfixOperatorStack = Stack_New ( 64, allocType ) ;
-    compiler->PointerToOffset = Stack_New ( 64, allocType ) ;
+    compiler->PointerToOffsetStack = Stack_New ( 64, allocType ) ;
     compiler->CombinatorBlockInfoStack = Stack_New ( 64, allocType ) ;
     compiler->LocalsCompilingNamespacesStack = Stack_New ( 64, allocType ) ;
     compiler->InternalNamespacesStack = Stack_New ( 64, allocType ) ; //initialized when using
@@ -381,7 +381,7 @@ void
 Compiler_CalculateAndSetPreviousJmpOffset ( Compiler * compiler, byte * jmpToAddress )
 {
     // we now can not compile blocks (cf. _Compile_Block_WithLogicFlag ) if their logic is not called so depth check is necessary
-    if ( _Stack_Depth ( compiler->PointerToOffset ) ) _SetOffsetForCallOrJump ( ( byte* ) Stack_Pop ( compiler->PointerToOffset ), jmpToAddress ) ;
+    if ( _Stack_Depth ( compiler->PointerToOffsetStack ) ) _SetOffsetForCallOrJump ( ( byte* ) Stack_Pop ( compiler->PointerToOffsetStack ), jmpToAddress ) ;
 }
 
 void
@@ -393,7 +393,7 @@ CfrTil_CalculateAndSetPreviousJmpOffset_ToHere ( )
 void
 _Stack_PointerToJmpOffset_Set ( byte * address )
 {
-    Stack_Push ( _Context_->Compiler0->PointerToOffset, ( int64 ) address ) ;
+    Stack_Push ( _Context_->Compiler0->PointerToOffsetStack, ( int64 ) address ) ;
 }
 
 void

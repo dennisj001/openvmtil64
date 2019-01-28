@@ -756,7 +756,7 @@ typedef struct
     CompileOptimizeInfo * OptInfo ;
     dllist *PostfixLists ;
     Stack * CombinatorInfoStack ;
-    Stack * PointerToOffset ;
+    Stack * PointerToOffsetStack ;
     Stack * LocalsCompilingNamespacesStack ;
     Stack * CombinatorBlockInfoStack ;
     Stack * BlockStack ;

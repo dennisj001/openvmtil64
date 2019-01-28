@@ -300,8 +300,7 @@ register int64 *Fp              asm ("r15" ) ;
 #define NEGFLAG_OFF NEGFLAG_FALSE //NEGFLAG_Z
 // ttt : condition codes
 // remember these are left shifted one
-//#define OVERFLOW 0
-//#define NO_OVERFLOW 1
+#define TTT_OVERFLOW 0
 #define TTT_BELOW 1
 #define TTT_EQUAL 2    
 #define TTT_ZERO 2

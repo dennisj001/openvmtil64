@@ -363,9 +363,9 @@ stringMacrosOn
 #endif
 
 // rtw : recycle some test/debug words 
-: rtw "test1" purge "hi" purge "hey" purge "heey" purge "hey1" purge "hey2" purge "heey1" purge "heey2" purge "sp" purge ;
+: rtw "test1" purge "hi" purge "hey" purge "heey" purge "hey1" purge "hey2" purge "heey1" purge "heey2" purge "sp" purge "moe" purge ;
 : testCfrTil "namespaces/ninit.cft" include ; // namespaces init
-: test testCfrTil ;
+: test testCfrTil rtw ;
 : tx64 "namespaces/compiler/x64.back.cft" include ;
 : bx "namespaces/test/bigNum.test.cft" include ;
 
@@ -400,10 +400,9 @@ stringMacrosOff
 
 #else // of course you can trim this file to your needs and put your init code maybe here if you like
 
-'doInitTest 0 const
-#if doInitTest
-#endif
+'doInitTest 1 const
 //tx64
+#if doInitTest
 #endif 
 
 postfix 

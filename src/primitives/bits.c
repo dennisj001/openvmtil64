@@ -7,7 +7,7 @@ CfrTil_JMP ( )
 {
     if ( CompileMode )
     {
-        _Compile_UninitializedJump ( ) ; // at the end of the 'if block' we need to jmp over the 'else block'
+        Compile_UninitializedJump ( ) ; // at the end of the 'if block' we need to jmp over the 'else block'
         CfrTil_CalculateAndSetPreviousJmpOffset_ToHere ( ) ;
         Stack_Push_PointerToJmpOffset ( ) ;
     }

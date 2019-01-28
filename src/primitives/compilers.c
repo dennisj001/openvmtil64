@@ -99,7 +99,7 @@ _CfrTil_CompileCallGoto ( byte * name, uint64 type )
     {
         _Compile_UninitializedCall ( ) ;
     }
-    else _Compile_UninitializedJump ( ) ;
+    else Compile_UninitializedJump ( ) ;
     GotoInfo_New ( name, type ) ;
 }
 
@@ -147,7 +147,7 @@ void
 CfrTil_Return ( )
 {
     Compiler_WordStack_SCHCPUSCA ( 0, 0 ) ;
-    byte * token = Lexer_Peek_Next_NonDebugTokenWord ( _Lexer_, 0 ) ;
+    byte * token = Lexer_Peek_Next_NonDebugTokenWord (_Lexer_, 0 , 0) ;
     Word * word = Finder_Word_FindUsing ( _Finder_, token, 0 ) ;
     int64 tsrli = - 1, scwi = - 1 ;
     Word_SetTsrliScwi ( word, tsrli, scwi ) ;

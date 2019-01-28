@@ -179,7 +179,7 @@ CfrTil_If1Combinator ( )
         //DBI_ON ;
         BlockInfo * bi = CfrTil_BeginCombinator ( 1 ) ;
         Compile_BlockLogicTest ( bi ) ;
-        _Compile_UninitializedJumpEqualZero ( ) ;
+        Compile_UninitializedJumpEqualZero ( ) ;
         Stack_Push_PointerToJmpOffset ( ) ;
         Block_CopyCompile ( ( byte* ) doBlock, 0, 0 ) ;
         CfrTil_CalculateAndSetPreviousJmpOffset_ToHere ( ) ;
@@ -228,7 +228,7 @@ CfrTil_TrueFalseCombinator2 ( )
     {
         BlockInfo * bi = CfrTil_BeginCombinator ( 2 ) ;
         Compile_BlockLogicTest ( bi ) ;
-        _Compile_UninitializedJumpEqualZero ( ) ;
+        Compile_UninitializedJumpEqualZero ( ) ;
         Stack_Push_PointerToJmpOffset ( ) ;
         Block_CopyCompile ( ( byte* ) trueBlock, 1, 0 ) ;
         CfrTil_CalculateAndSetPreviousJmpOffset_ToHere ( ) ;

@@ -34,11 +34,11 @@ CfrTil_C_Syntax_Off ( )
     Context * cntx = _Context_ ;
     SetState ( cntx, C_SYNTAX | PREFIX_MODE | INFIX_MODE, false ) ;
     //Namespace_SetAsNotUsing ( "C" ) ;
+    CfrTil_SetInNamespaceFromBackground ( ) ; // before below Namespace_SetAsNotUsing_MoveToTail in case one of them is the background namespace
     Namespace_SetAsNotUsing_MoveToTail ( ( byte* ) "PrefixCombinators" ) ;
     Namespace_SetAsNotUsing_MoveToTail ( ( byte* ) "Infix" ) ;
     Namespace_SetAsNotUsing_MoveToTail ( ( byte* ) "C_Syntax" ) ;
     //Namespace_DoNamespace ( "Bits" ) ; // TODO : must be a better way
-    CfrTil_SetInNamespaceFromBackground ( ) ;
     //if ( cntx->Compiler0->C_BackgroundNamespace ) _CfrTil_Namespace_InNamespaceSet ( cntx->Compiler0->C_BackgroundNamespace ) ;
     Context_SetDefaultTokenDelimiters ( cntx, ( byte* ) " \n\r\t", CONTEXT ) ;
     Ovt_AutoVarOff ( ) ;
@@ -248,7 +248,7 @@ Type_Create ( )
 {
 
     Context * cntx = _Context_ ;
-    byte * token = Lexer_Peek_Next_NonDebugTokenWord ( cntx->Lexer0, 1 ) ;
+    byte * token = Lexer_Peek_Next_NonDebugTokenWord (cntx->Lexer0, 1 , 0) ;
     int64 size = _Type_Create ( token ) ;
     //DataStack_Push ( size ) ;
 }
@@ -265,7 +265,7 @@ _CfrTil_TypeDef ( )
     Lexer_SetTokenDelimiters ( lexer, ( byte* ) " ,\n\r\t", COMPILER_TEMP ) ;
     do
     {
-        byte * token = Lexer_Peek_Next_NonDebugTokenWord ( cntx->Lexer0, 1 ) ;
+        byte * token = Lexer_Peek_Next_NonDebugTokenWord (cntx->Lexer0, 1 , 0) ;
         if ( token [ 0 ] == ';' )
         {
             Lexer_ReadToken ( cntx->Lexer0 ) ;

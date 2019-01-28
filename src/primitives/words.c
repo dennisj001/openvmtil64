@@ -10,7 +10,7 @@ _CfrTil_Colon ( Boolean initSC )
     CfrTil_Word_Create ( ) ;
     CfrTil_BeginBlock ( ) ;
 
-    byte * token = Lexer_Peek_Next_NonDebugTokenWord ( _Lexer_, 0 ) ;
+    byte * token = Lexer_Peek_Next_NonDebugTokenWord (_Lexer_, 0 , 0) ;
     if ( ( String_Equal ( token, "(" ) ) && ( ! GetState ( _Context_->Interpreter0, PREPROCESSOR_DEFINE ) ) )
     {
         Lexer_ReadToken ( _Lexer_ ) ;

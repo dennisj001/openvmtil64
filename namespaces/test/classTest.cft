@@ -21,10 +21,10 @@ decimal
 Integer
 Pointer size @ nl "Pointer.size = " prints print nl
 Integer size @ nl "Integer size = " prints print nl
-int16 size @ nl "int16 size = " prints print nl
+int16.size @ nl "Integer.int16.size = " prints print nl
 Integer "byte" class
 byte size 1 =
-byte size @ nl "byte size = " prints print nl
+byte.size @ nl "Integer.byte.size = " prints print nl
 //'int8 'byte find alias
 //Integer "int8" class int8 size 1 =
 sp

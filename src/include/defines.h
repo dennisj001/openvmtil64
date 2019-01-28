@@ -606,6 +606,7 @@
 #define ARRAY_MODE ( (uint64) 1 << 30 )
 #define DOING_BEFORE_A_PREFIX_WORD ( (uint64) 1 << 31 )
 #define C_CONDITIONAL_IN ( (uint64) 1 << 32 )
+#define C_TYPEDEC_WITH_EQUAL ( (uint64) 1 << 33 )
 
 // Context flags
 #define C_SYNTAX ( (uint64) 1 << 20 )

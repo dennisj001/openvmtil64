@@ -325,7 +325,7 @@ Compile_Move ( uint8 direction, uint8 mod, uint8 reg, uint8 rm, uint8 operandSiz
 //Compile_Move ( direction, mod, reg, rm, operandSize, sib, disp, dispSize, imm, immSize | opCode controlFlags )
 {
     //controlFlags = ( disp ? DISP_B : 0 ) | ( sib ? SIB_B : 0 ) ;
-    d: uint8 opCode ; uint16 controlFlags = ( disp ? DISP_B : 0 ) | ( sib ? SIB_B : 0 ) ;
+    uint8 opCode ; d: uint16 controlFlags = ( disp ? DISP_B : 0 ) | ( sib ? SIB_B : 0 ) ;
     if ( imm || immSize )
     {
         reg = 0 ;

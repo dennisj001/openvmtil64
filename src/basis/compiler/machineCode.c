@@ -740,7 +740,7 @@ _Compile_JumpToReg ( Boolean reg ) // runtime
 }
 
 void
-_Compile_UninitializedJumpEqualZero ( )
+Compile_UninitializedJumpEqualZero ( )
 {
     _Compile_Jcc ( NEGFLAG_Z, TTT_ZERO, 0 ) ;
 }
@@ -764,7 +764,7 @@ _Compile_UninitializedCall ( ) // runtime
 }
 
 void
-_Compile_UninitializedJump ( ) // runtime
+Compile_UninitializedJump ( ) // runtime
 {
     _Compile_UninitializedJmpOrCall ( JMPI32 ) ;
 }

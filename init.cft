@@ -400,10 +400,9 @@ stringMacrosOff
 
 #else // of course you can trim this file to your needs and put your init code maybe here if you like
 
-'doInitTest 0 const
-#if doInitTest
-#endif
+'doInitTest 1 const
 //tx64
+#if doInitTest
 #endif 
 
 postfix 
