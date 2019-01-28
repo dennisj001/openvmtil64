@@ -196,6 +196,7 @@ System
 Root
 "fr" 'fullRestart find alias
 "ri" 'restartInit find alias
+'purge 'purgeWordName find alias
 System
 "true" 1 const
 "false" 0 const
@@ -361,11 +362,14 @@ sp
 stringMacrosOn
 #endif
 
+// rtw : recycle some test/debug words 
+: rtw "test1" purge "hi" purge "hey" purge "heey" purge "hey1" purge "hey2" purge "heey1" purge "heey2" purge "sp" purge "moe" purge ;
 : testCfrTil "namespaces/ninit.cft" include ; // namespaces init
-: test testCfrTil ;
+: test testCfrTil rtw ;
 : tx64 "namespaces/compiler/x64.back.cft" include ;
 : bx "namespaces/test/bigNum.test.cft" include ;
 
+// === controls ===
 Root 
 dbgOff
 //dbgOn 
@@ -374,6 +378,7 @@ dbgOff
 'doScript 1 const
 'doScript2 1 const
 '_doDemo 1 const    
+// === controls ===
 
 #if Is_DebugOn 
 
@@ -389,6 +394,7 @@ test
 #if _doDemo 
 demo 
 #endif //dT0
+rtw
 
 stringMacrosOff
 
@@ -402,9 +408,11 @@ stringMacrosOff
 
 postfix 
 bnOff
-2 + 7 assertStkChk // stack checking
+2 t{ + }t 7 assertStkChk // stack checking
 Shell
-//s
+
+#endif
+rtw
 //verbosity 0 =
 //pause
 

@@ -632,3 +632,11 @@ ReadLine_NextNonPunctCharAfterEndOfString ( ReadLiner * rl )
     while ( IsPunct ( *( rlp ++ ) ) ) ;
     return *rlp ;
 }
+
+Boolean
+ReadLine_AreWeAtNewlineAfterSpaces ( ReadLiner * rl )
+{
+    int64 i = ReadLiner_PeekSkipSpaces ( _ReadLiner_ ) ;
+    if ( _ReadLine_PeekIndexedChar ( _ReadLiner_, i ) == '\n' ) return true ;
+    return false ;
+}

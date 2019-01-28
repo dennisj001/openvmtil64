@@ -79,6 +79,7 @@ CfrTil_BlockRun ( )
     {
         DEBUG_SETUP_ADDRESS ( (byte*) doBlock, 1 ) ;
         Block_Eval ( doBlock ) ;
+        //Set_DataStackPointer_FromDspReg ( ) ;
     }
 }
 

@@ -469,11 +469,7 @@ bnOff //pause
 nl
 // verbosity 1 =
 namespaceTreeWithWords
-
-1 ? "hi" ps
-1 ? "hi" ps : "er" ps
-0 ? "er" ps : "hi" ps
-{ 0 ? "er" ps : "hi" ps } run
+Interpreter
 sp
 2 + 7 assertStkChk // stack checking
 s

@@ -140,7 +140,10 @@ CfrTil_TurnOffBlockCompiler ( )
 void
 CfrTil_TurnOnBlockCompiler ( )
 {
+    //Compiler * compiler = _Context_->Compiler0 ;
     _CfrTil_RightBracket ( ) ;
+    //compiler->NumberOfNonRegisterLocals = 0 ;
+    //compiler->NumberOfNonRegisterArgs = 0 ;
 }
 
 // blocks are a notation for subroutines or blocks of code compiled in order,

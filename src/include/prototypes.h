@@ -458,6 +458,7 @@ void MemorySpace_Init(MemorySpace *ms);
 MemorySpace *MemorySpace_New(void);
 NamedByteArray *_OVT_Find_NBA(byte *name);
 void _OVT_MemList_FreeNBAMemory(NamedByteArray *nba, uint64 moreThan, int64 always);
+void OVT_MemList_DeleteNBAMemory(byte *name);
 void OVT_MemList_FreeNBAMemory(byte *name, uint64 moreThan, int64 always);
 void OVT_MemListFree_ContextMemory(void);
 void OVT_MemListFree_TempObjects(void);
@@ -887,6 +888,7 @@ byte _ReadLine_GetLine(ReadLiner *rl, byte c);
 byte ReadLine_GetLine(ReadLiner *rl);
 byte ReadLine_NextChar(ReadLiner *rl);
 byte ReadLine_NextNonPunctCharAfterEndOfString(ReadLiner *rl);
+Boolean ReadLine_AreWeAtNewlineAfterSpaces(ReadLiner *rl);
 /* src/basis/core/dataStack.c */
 uint64 DataStack_Pop(void);
 void DataStack_Push(int64 value);
@@ -1781,7 +1783,7 @@ void CfrTil_LogOff(void);
 void CfrTil_Token(void);
 void CfrTil_SingleQuote(void);
 void CfrTil_Tick(void);
-void Parse_SkipUntil_EitherToken(byte *end1, byte *end2);
+void Parse_SkipUntil_EitherToken_OrNewline(byte *end1, byte *end2);
 void CfrTil_Parse(void);
 /* src/primitives/interpreters.c */
 void CfrTil_DoWord(void);

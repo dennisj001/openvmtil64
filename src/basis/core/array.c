@@ -309,14 +309,17 @@ NamedByteArray_Delete ( NamedByteArray * nba )
 {
     ByteArray * ba ;
     dlnode * node, *nodeNext ;
-    dlnode_Remove ( ( dlnode* ) & nba->NBA_Symbol ) ;
-    for ( node = dllist_First ( ( dllist* ) & nba->NBA_BaList ) ; node ; node = nodeNext )
+    if ( nba )
     {
-        nodeNext = dlnode_Next ( node ) ;
-        ba = Get_BA_Symbol_To_BA ( node ) ;
-        _Mem_ChunkFree ( ( MemChunk * ) ba ) ;
+        dlnode_Remove ( ( dlnode* ) & nba->NBA_Symbol ) ;
+        for ( node = dllist_First ( ( dllist* ) & nba->NBA_BaList ) ; node ; node = nodeNext )
+        {
+            nodeNext = dlnode_Next ( node ) ;
+            ba = Get_BA_Symbol_To_BA ( node ) ;
+            _Mem_ChunkFree ( ( MemChunk * ) ba ) ;
+        }
+        _Mem_ChunkFree ( ( MemChunk * ) nba ) ; // mchunk )
     }
-    _Mem_ChunkFree ( ( MemChunk * ) nba ) ; // mchunk )
 }
 
 NamedByteArray *

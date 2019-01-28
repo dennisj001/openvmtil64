@@ -114,6 +114,19 @@ Set_DataStackPointers_FromDebuggerDspReg ( )
 void
 Set_DataStackPointer_FromDspReg ( )
 {
+    _CfrTil_->DataStack->StackPointer = _Dsp_ ;
+}
+
+void
+Set_DspReg_FromDataStackPointer ( )
+{
+    _Dsp_ = _CfrTil_->DataStack->StackPointer ;
+}
+
+#if 0
+void
+Set_DataStackPointer_FromDspReg ( )
+{
     _CfrTil_->Set_DataStackPointer_FromDspReg ( ) ;
 }
 
@@ -123,6 +136,7 @@ Set_DspReg_FromDataStackPointer ( )
     _Debugger_->cs_Cpu->R14d = _Dsp_ ;
     _CfrTil_->Set_DspReg_FromDataStackPointer ( ) ;
 }
+#endif
 
 void
 CfrTil_CheckInitDataStack ( )

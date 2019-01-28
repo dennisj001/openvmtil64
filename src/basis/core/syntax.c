@@ -227,6 +227,9 @@ CfrTil_C_ConditionalExpression ( )
 {
     Context * cntx = _Context_ ;
     Interpreter * interp = cntx->Interpreter0 ;
+    Compiler * compiler = cntx->Compiler0 ;
+    if ( ( ! Compiling ) && ( !GetState ( compiler, C_CONDITIONAL_IN ) ) ) Compiler_Init ( _Compiler_, 0, 1 ) ; 
+    SetState ( compiler, C_CONDITIONAL_IN, true ) ;
     CfrTil_If_ConditionalExpression ( ) ;
     if ( CompileMode )
     {
@@ -235,10 +238,11 @@ CfrTil_C_ConditionalExpression ( )
         {
             Lexer_ReadToken ( _Lexer_ ) ;
             CfrTil_Else ( ) ;
-            Interpret_C_Until_Token4 ( interp, ( byte* ) ";", ( byte* ) ",", ( byte* ) ")", ( byte* ) "}", ( byte* ) " \n\r\t", 0 ) ;
+            Interpret_C_Until_Token4 ( interp, ( byte* ) ";", ( byte* ) ",", ( byte* ) ")", ( byte* ) "}", (byte*) " ", 0 ) ; //( byte* ) "}", ( byte* ) " \n\r\t", 0 ) ;
             CfrTil_EndIf ( ) ;
         }
     }
+    SetState ( compiler, C_CONDITIONAL_IN, false ) ;
 }
 
 Boolean

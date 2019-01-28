@@ -21,17 +21,18 @@ CfrTil_Tick ( )
 
 
 void
-Parse_SkipUntil_EitherToken ( byte * end1, byte* end2 )
+Parse_SkipUntil_EitherToken_OrNewline ( byte * end1, byte* end2 )
 {
     byte * token ; int64 inChar ;
+    ReadLiner * rl = _Context_->ReadLiner0 ;
     do
     {
         if ( ( token = Lexer_ReadToken ( _Context_->Lexer0 ) ) )
         {
             if ( ( end1 && String_Equal ( token, end1 ) ) || ( end2 && String_Equal ( token, end2 ) ) ) break ;
         }
-        inChar = ReadLine_PeekNextChar ( _Context_->ReadLiner0 ) ;
-        if ( ( inChar == 0 ) || ( inChar == - 1 ) || ( inChar == eof ) ) token = 0 ;
+        inChar = ReadLine_PeekNextChar ( rl ) ;
+        if ( ( inChar == 0 ) || ( inChar == - 1 ) || ( inChar == eof ) || ReadLine_AreWeAtNewlineAfterSpaces ( rl ) ) break ;
     }
     while ( token ) ;
 }

@@ -428,11 +428,13 @@ Strcmp ( byte * str0, byte * str1 )
 {
     int64 i ;
     Boolean result = 0 ;
-    if ( str0 && str1 )
+    if ( str0 == str1 ) return 0 ;
+    if ( ( ! str0 ) || ( ! str1 ) ) return 1 ;
+    else
     {
         for ( i = 0 ; ( str0 [ i ] || str1 [ i ] ) && ( ! result ) ; i ++ )
         {
-            result = str0 [ i ] != str1 [ i ] ;
+            result = str0 [ i ] - str1 [ i ] ;
         }
     }
     return result ;

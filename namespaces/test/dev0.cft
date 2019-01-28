@@ -503,3 +503,4 @@ scOn
 Int
 2 + 7 assertStkChk // stack checking
 nl location "\nending Lisp\n" ps s //ddps s
+"test1" purgeWordName

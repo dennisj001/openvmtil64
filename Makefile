@@ -119,7 +119,7 @@ optimize :
 	make optimize3
 	make cfrtil64s
 	make oclean
-	make
+	#make
 	#-sudo cp bin/cfrtil64o3 /usr/local/bin/cfrtil64
 	#cp bin/cfrtil64o3 bin/cfrtil64
 

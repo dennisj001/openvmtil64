@@ -164,15 +164,18 @@ CfrTil_Namespaces ( )
 int64
 Word_RemoveIfStringEqualName ( Symbol * symbol, byte * name )
 {
-    if ( String_Equal ( symbol->Name, name ) ) dlnode_Remove ( (dlnode*) symbol ) ;
+    if ( String_Equal ( symbol->Name, name ) )
+    {
+        dlnode_Remove ( (dlnode*) symbol ) ;
+        Word_Recycle ( (Word *) symbol ) ;
+    }
     return 0 ;
 }
 
 void
 _CfrTil_Namespaces_PurgeWordName ( byte * name )
 {
-    Tree_Map_State_OneArg ( USING | NOT_USING,
-        ( MapFunction_1 ) Word_RemoveIfStringEqualName, ( int64 ) name ) ;
+    Tree_Map_State_OneArg ( USING | NOT_USING, ( MapFunction_1 ) Word_RemoveIfStringEqualName, ( int64 ) name ) ;
 }
 
 void

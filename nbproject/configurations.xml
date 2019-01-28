@@ -296,8 +296,6 @@
       <folder path="0/src/basis/lc">
         <cTool>
           <incDir>
-            <pElem>src/basis/lc</pElem>
-            <pElem>src/include</pElem>
             <pElem>.</pElem>
           </incDir>
         </cTool>
@@ -308,6 +306,13 @@
             <pElem>.</pElem>
           </incDir>
         </ccTool>
+      </folder>
+      <folder path="0/src/primitives">
+        <cTool>
+          <incDir>
+            <pElem>.</pElem>
+          </incDir>
+        </cTool>
       </folder>
       <item path="src/basis/_debug.c" ex="false" tool="1" flavor2="3">
         <ccTool flags="1">

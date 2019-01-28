@@ -286,6 +286,14 @@ _OVT_MemList_FreeNBAMemory ( NamedByteArray *nba, uint64 moreThan, int64 always 
 }
 
 void
+OVT_MemList_DeleteNBAMemory ( byte * name )
+{
+    NamedByteArray *nba = _OVT_Find_NBA ( name ) ;
+    NamedByteArray_Delete ( nba ) ;
+}
+
+
+void
 OVT_MemList_FreeNBAMemory ( byte * name, uint64 moreThan, int64 always )
 {
     NamedByteArray *nba = _OVT_Find_NBA ( name ) ;

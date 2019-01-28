@@ -147,6 +147,7 @@ _Debugger_ShowEffects ( Debugger * debugger, Word * word, Boolean stepFlag, Bool
             change = dsp - debugger->WordDsp ;
             debugger->WordDsp = dsp ;
         }
+        //if ( GetState ( debugger, DBG_STEPPING ) ) Set_DataStackPointers_FromDebuggerDspReg ( ) ;        
         depthChange = DataStack_Depth ( ) - debugger->SaveStackDepth ;
         if ( word && ( debugger->WordDsp && ( GetState ( debugger, DBG_SHOW_STACK_CHANGE ) ) || ( change ) || ( debugger->SaveTOS != TOS ) || ( depthChange ) ) )
         {
