@@ -377,7 +377,7 @@ Compiler_SC_WordList_Show ( byte * prefix, Boolean inUseOnlyFlag, Boolean showIn
     if ( Is_DebugModeOn || showInDebugColors ) NoticeColors ;
     //if ( prefix ) _Printf ( "\n%s : %s", prefix, scWord->Name ) ;
     byte *buffer = Buffer_Data ( _CfrTil_->ScratchB1 ) ;
-    sprintf ( ( char* ) buffer, "Word = %s :: %s : %s", ( char* ) scWord->Name,
+    sprintf ( ( char* ) buffer, "%sWord = %s :: %s : %s", prefix ? prefix : (byte*) "", ( char* ) scWord->Name,
         ( list == _CfrTil_->Compiler_N_M_Node_WordList ) ? "CfrTil WordList" : "source code word list for the word", inUseOnlyFlag ? "in use only" : "all" ) ;
     SC_WordList_Show ( list, scWord, 0, inUseOnlyFlag, buffer ) ;
     if ( Is_DebugModeOn || showInDebugColors ) DefaultColors ;

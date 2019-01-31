@@ -37,6 +37,7 @@ typedef struct _CObj
 "CObj.size =" ps p ( CObj.size ) ;
 "chey" CObj new ;
 CObj 
+C_Syntax
 chey.hi = 1234 ;
 _assert0 ( chey.hi 1234 ) ;
 dump ( chey, chey.size ) ;

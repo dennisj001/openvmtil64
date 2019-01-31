@@ -197,6 +197,7 @@ Root
 "fr" 'fullRestart find alias
 "ri" 'restartInit find alias
 'purge 'purgeWordName find alias
+'purgeAll 'purgeWordIfContainsName find alias
 System
 "true" 1 const
 "false" 0 const
@@ -363,9 +364,9 @@ stringMacrosOn
 #endif
 
 // rtw : recycle some test/debug words 
-: rtw "test1" purge "hi" purge "hey" purge "heey" purge "hey1" purge "hey2" purge "heey1" purge "heey2" purge "sp" purge "moe" purge ;
-: testCfrTil "namespaces/ninit.cft" include ; // namespaces init
-: test testCfrTil rtw ;
+: rtw "test" purgeAll "hi" purge "hey" purge "heey" purgeAll "hey1" purge "hey2" purge "heey1" purge "heey2" purge "sp" purge "moe" purge ;
+: tCfrTil "namespaces/ninit.cft" include ; // namespaces init
+: tc tCfrTil rtw ;
 : tx64 "namespaces/compiler/x64.back.cft" include ;
 : bx "namespaces/test/bigNum.test.cft" include ;
 
@@ -377,7 +378,7 @@ dbgOff
 'doX64 1 const
 'doScript 1 const
 'doScript2 1 const
-'_doDemo 1 const    
+'_doDemo 0 const    
 // === controls ===
 
 #if Is_DebugOn 
@@ -389,7 +390,8 @@ dbgOff
 
 scOn
 System C
-test 
+s pause
+tc
 
 #if _doDemo 
 demo 
@@ -401,8 +403,8 @@ stringMacrosOff
 #else // of course you can trim this file to your needs and put your init code maybe here if you like
 
 'doInitTest 1 const
-//tx64
 #if doInitTest
+//tx64
 #endif 
 
 postfix 
@@ -414,4 +416,5 @@ Shell
 rtw
 //verbosity 0 =
 //pause
+//s
 

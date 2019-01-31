@@ -487,7 +487,8 @@ CPrimitive CPrimitives [] = {
     { "codeStart", 0, 0, 0, Word_CodeStart, 0, 0, 0, "Word", "Root" },
     { "codeSize", 0, 0, 0, Word_CodeSize, 0, 0, 0, "Word", "Root" },
     { "addrToWord", 0, 0, 0, AddressToWord, 0, 0, 0, "Word", "Root" },
-    { "purgeWordName", 0, 0, 0, CfrTil_Namespaces_PurgeWordName, 0, 0, 0, "Word", "Root" },
+    { "purgeWordName", 0, 0, 0, CfrTil_Namespaces_PurgeWordExactName, 0, 0, 0, "Word", "Root" },
+    { "purgeWordIfContainsName", 0, 0, 0, CfrTil_Namespaces_PurgeWordIfContainsName, 0, 0, 0, "Word", "Root" },
 
     // Dynamic Object - DObject
     { "dobject", 0, 0, 0, CfrTil_SetPropertiesAsDObject, 0, 0, 0, "DObject", "Root" },

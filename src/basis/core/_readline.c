@@ -10,6 +10,7 @@ byte *
 _ReadLine_pb_NextChar ( ReadLiner * rl )
 {
     if ( rl->ReadIndex < BUFFER_SIZE ) return &rl->InputLine [ rl->ReadIndex ] ;
+    //if ( rl->ReadIndex < BUFFER_SIZE ) return &rl->InputStringCurrent [rl->InputStringIndex] ; 
     else return 0 ;
 }
 

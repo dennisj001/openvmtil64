@@ -224,7 +224,7 @@ _Compile_ImmDispData (  immDisp,  immSize,  forceFlag )
     }
     else // with operandSize == 0 let the compiler use the minimal size ; nb. can't be imm == 0
     {
-        if ( immDisp >= 0x100000000 ) compile8 (immDisp)  ;
+        d: <dbg> if ( immDisp >= 0x100000000 ) compile8 (immDisp)  ;
         else 
         {
             if ( immDisp >= 0x100 ) compile4 (immDisp)  ;
@@ -232,7 +232,7 @@ _Compile_ImmDispData (  immDisp,  immSize,  forceFlag )
         }
     }
 } prefix
-//'_Compile_ImmDispData find wdiss pause
+'_Compile_ImmDispData find wdiss pause
 #endif
 
 // Intel - InstructionSet-A-M-253666.pdf - section 2.1 :
@@ -262,6 +262,7 @@ _Compile_ImmDispData (  immDisp,  immSize,  forceFlag )
 void
 _Compile_Write_Instruction_X64 ( rex, opCode, modRm, controlFlags, sib, disp, dispSize, imm, immSize )
 {
+//<dbg>
 #if DBI
     int nbytes, _here  ;
     _here = Here ;
@@ -278,7 +279,7 @@ _Compile_Write_Instruction_X64 ( rex, opCode, modRm, controlFlags, sib, disp, di
     printf ( "\n_Compile_Write_Instruction_X64 : %lx : %d bytes : ...", _here, nbytes ) ; dis ( _here, nbytes ) ; //pause () ; nl ; nl ; 
 #endif
 } prefix
-'_Compile_Write_Instruction_X64 find wdiss //pause
+//'_Compile_Write_Instruction_X64 find wdiss //pause
 
 int 
 _CalculateRex ( reg rm rex_w_flag | rex )
@@ -318,10 +319,10 @@ _Compile_Move ( toRegOrMem _mod reg rm controlFlags disp | opCode )
     //Compile_CalcWrite_Instruction_X64 ( rex,  opCode,  _mod,  reg,  rm, controlFlags,  sib,  disp,  dispSize,  imm,  immSize | modRm )
     Compile_CalcWrite_Instruction_X64 ( 0, opCode, _mod, reg, rm, controlFlags, 0, disp, 0, 0, 0 ) ;
 } prefix
-'_Compile_Move find wdiss //pause
+//'_Compile_Move find wdiss //pause
 
 //                                          _Compile_Move ( toRegOrMem _mod reg rm controlFlags disp | opCode ) 
-void _Compile_Move_DataStackN_ToReg ( reg n ) { _Compile_Move ( REG, MEM, reg, DSP, (REX_B | MODRM_B | DISP_B), n * CELL ) ; } prefix 
+void _Compile_Move_DataStackN_ToReg ( reg n ) { <dbg> _Compile_Move ( REG, MEM, reg, DSP, (REX_B | MODRM_B | DISP_B), n * CELL ) ; } prefix 
 
 // group1 : ADD OR ADC SBB AND_OPCODE SUB XOR CMP : with immediate data
 void 
@@ -402,24 +403,7 @@ C_Syntax
     //"\nshould show :     4983ee08                sub r14, 0x8" ps
 ;; 
 sp
-//'_Compile_Stack_PopToReg find wdiss //pause
-#if 0
-c_syntaxOn
-void
-Compile_PopDspToR8AndCall ()
-{
-    _Compile_Stack_PopToReg ( DSP, R8 ) ;
-    _Compile_CallThruReg ( R8 ) ;
-}
-#if 0
-4d8b06                  mov r8, [r14]                                          
-4983ee08                sub r14, 0x8                                           
-49ffd0                  call r8                                                
-c3                      ret      
-#endif
-c_syntaxOff
-'Compile_PopDspToR8AndCall find wdiss
-#endif
+'_Compile_Stack_PopToReg find wdiss //pause
 sp
 C X64
 #if x64_dbg
@@ -428,7 +412,7 @@ Combinators
 
 sp
 :asm iax
-    _Compile_Stack_PopToReg ( R8D )             //4d8b06                  mov r8, [r14]       
+    d: _Compile_Stack_PopToReg ( R8D )             //4d8b06                  mov r8, [r14]       
     _Compile_CallThruReg ( R8D )                //4983ee08                sub r14, 0x8
                                                 //49ffd0                  call r8  
                                                 //c3                      ret      

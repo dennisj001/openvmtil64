@@ -45,10 +45,10 @@ sp
 // test shift op equal
 : moe ( n m -- TOS) n m @ <<= n @ ; 
 ' moe find wdiss
-2 6 moe 128 "moe_assert1" assert 1 16 moe 65536 "moe_assert2" assert  "\nshould show 128 65536\n" ps 
+2 6 moe 128 "moe_assert1" assert 1 16 moe 65536 "moe_assert2" assert  
 : moe ( n m -- TOS) n m @ >>= n @ ;
 //' moe find wdiss
-128 6 moe 2 "moe_assert3" assert 65536 16 moe 1 "moe_assert3" assert "\nshould show 2 1\n" ps 
+128 6 moe 2 "moe_assert3" assert 65536 16 moe 1 "moe_assert3" assert 
 infixOn
 nl
 sp

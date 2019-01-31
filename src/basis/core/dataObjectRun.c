@@ -83,7 +83,7 @@ Do_Variable ( Word * word, Boolean rvalueFlag, Boolean isForwardDotted )
         }
         else
         {
-            if ( GetState ( cntx, C_SYNTAX ) )
+            if ( GetState ( cntx, ( C_SYNTAX | INFIX_MODE ) ) )
             {
                 if ( rvalueFlag ) value = ( int64 ) * word->W_PtrToValue ;
                 else
@@ -248,21 +248,17 @@ _Compile_C_TypeDeclaration ( )
 }
 
 // nb.Compiling !!
-
 void
-Compile_C_TypeDeclaration ( byte * token1, int64 tsrli, int64 scwi, Boolean equalFlag )
+Compile_C_TypeDeclaration ( byte * token1, int64 tsrli, int64 scwi, byte * token2 )
 {
     // remember : we are not in a C function
     if ( Compiling )
     {
         Ovt_AutoVarOn ( ) ;
         Compiler_LocalsNamespace_New ( _Compiler_ ) ;
-        if ( equalFlag ) SetState ( _Compiler_, C_TYPEDEC_WITH_EQUAL, true ) ;
-        Interpreter_InterpretAToken ( _Interpreter_, token1, tsrli, scwi ) ;
-        SetState ( _Compiler_, C_TYPEDEC_WITH_EQUAL, false ) ;
-        //_ReadLiner_->ReadIndex = tsrli ;
-        //Interpreter_InterpretNextToken ( _Interpreter_ ) ;
-        //Interpreter_InterpretNextToken ( _Interpreter_ ) ;
+        Word * word = _Interpreter_TokenToWord ( _Interpreter_, token1, tsrli, scwi ) ;
+        _Compiler_->LHS_Word = word ;
+        Interpreter_DoWord ( _Interpreter_, word, tsrli, scwi ) ;
         _Compile_C_TypeDeclaration ( ) ;
         Ovt_AutoVarOff ( ) ;
     }
@@ -271,21 +267,21 @@ Compile_C_TypeDeclaration ( byte * token1, int64 tsrli, int64 scwi, Boolean equa
 void
 _Namespace_Do_C_Type ( Namespace * ns )
 {
+    Lexer * lexer = _Lexer_ ;
     byte * token1, *token2 ;
     int64 tsrli, scwi ;
     if ( ! Compiling ) _Namespace_ActivateAsPrimary ( ns ) ;
-    tsrli = _Lexer_->TokenStart_ReadLineIndex ;
-    scwi = _Lexer_->SC_Index ;
-    token1 = _Lexer_Next_NonDebugOrCommentTokenWord ( _Lexer_, 0, 1, 0 ) ;
-    //int64 tsrli2 = _Lexer_->TokenStart_ReadLineIndex ;
-    token2 = Lexer_Peek_Next_NonDebugTokenWord ( _Lexer_, 1, 0 ) ;
+    tsrli = lexer->TokenStart_ReadLineIndex ;
+    scwi = lexer->SC_Index ;
+    token1 = _Lexer_Next_NonDebugOrCommentTokenWord ( lexer, 0, 1, 0 ) ;
+    token2 = Lexer_Peek_Next_NonDebugTokenWord ( lexer, 1, 0 ) ;
     if ( token2 [0] == '(' ) Compile_C_FunctionDeclaration ( token1 ) ;
     else
     {
         if ( Compiling )
         {
             _Compiler_->AutoVarTypeNamespace = ns ;
-            Compile_C_TypeDeclaration ( token1, tsrli, scwi, String_Equal ( "=", token2 ) ) ;
+            Compile_C_TypeDeclaration ( token1, tsrli, scwi, token2 ) ;
             _Compiler_->AutoVarTypeNamespace = 0 ;
         }
         else Interpreter_InterpretAToken ( _Interpreter_, token1, _Lexer_->TokenStart_ReadLineIndex, _Lexer_->SC_Index ) ;
@@ -318,10 +314,9 @@ Namespace_Do_C_Type ( Namespace * ns, Boolean isForwardDotted )
             SetState ( compiler, DOING_C_TYPE, false ) ;
         }
         //if ( ( ! Compiling ) && GetState ( cntx, C_SYNTAX ) ) Compiler_SetAs_InNamespace_C_BackgroundNamespace ( compiler ) ;
-
-        if ( GetState ( cntx, C_SYNTAX ) ) Compiler_SetAs_InNamespace_C_BackgroundNamespace ( compiler ) ;
+        if ( GetState ( cntx, C_SYNTAX ) ) Compiler_SetAs_InNamespace_C_BackgroundNamespace ( compiler ) ; 
     }
-    Namespace_DoNamespace ( ns, isForwardDotted ) ;
+    else Namespace_DoNamespace ( ns, isForwardDotted ) ;
 }
 
 void

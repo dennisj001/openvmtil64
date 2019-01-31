@@ -320,7 +320,6 @@ Namespace_DoNamespace (Namespace * ns, Boolean isForwardDotted)
         if ( ! GetState ( cntx->Compiler0, (LC_ARG_PARSING|ARRAY_MODE) ) ) cntx->Interpreter0->BaseObject = 0 ;
     }
     else if ( ( ! isForwardDotted ) && ( ! GetState ( cntx->Compiler0, LC_ARG_PARSING ) ) )
-    //else if ( ( Lexer_NextNonDelimiterChar ( cntx->Lexer0 ) != '.' ) && ( ! GetState ( cntx->Compiler0, LC_ARG_PARSING ) ) )
     {
         _Compile_C_Call_1_Arg ( ( byte* ) _Namespace_DoNamespace, ( int64 ) ns ) ;
     }

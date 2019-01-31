@@ -70,7 +70,7 @@ Compiler_GetOptimizeState ( Compiler * compiler, Word * word )
             optInfo->node ; optInfo->node = optInfo->nextNode )
         {
             optInfo->nextNode = dlnode_Next ( optInfo->node ) ;
-            if ( dobject_Get_M_Slot ( ( dobject* ) optInfo->node, SCN_IN_USE_FLAG ) & SCN_IN_USE_FOR_OPTIMIZATION ) 
+            if ( dobject_Get_M_Slot ( ( dobject* ) optInfo->node, SCN_IN_USE_FLAG ) & SCN_IN_USE_FOR_OPTIMIZATION )
                 optInfo->wordn = ( Word* ) dobject_Get_M_Slot ( ( dobject* ) optInfo->node, SCN_T_WORD ) ;
             else continue ;
             //if (( optInfo->wordn->CAttribute2 & ( RIGHT_BRACKET ) ) || ( optInfo->wordn->CAttribute & OBJECT_FIELD ) )
@@ -270,7 +270,7 @@ Compiler_Optimizer_2Args_Or_WordArg1_Op ( Compiler * compiler )
         else
         {
             optInfo->Optimize_Reg = ACC | REG_ON_BIT ;
-            if ( optInfo->wordArg1->CAttribute & REGISTER_VARIABLE ) SetHere ( optInfo->wordArg1->Coding, 1 ) ;
+            if ( optInfo->wordArg1->CAttribute & REGISTER_VARIABLE ) SetHere ( optInfo->wordArg1->Coding ? optInfo->wordArg1->Coding : optInfo->wordArg2->Coding, 1 ) ;
             else if ( optInfo->wordArg1->StackPushRegisterCode )
             {
                 _SetHere_To_Word_StackPushRegisterCode ( optInfo->wordArg1, 1 ) ;
@@ -316,6 +316,7 @@ Compile_StackArgsToStandardRegs ( Compiler * compiler )
     _Compile_Move_StackN_To_Reg ( OREG, DSP, 0 ), optInfo->Optimize_Rm = OREG ;
     _Compile_Move_StackN_To_Reg ( ACC, DSP, - 1 ), optInfo->Optimize_Reg = ACC | REG_ON_BIT ;
     Compile_SUBI ( REG, DSP, 0, 2 * CELL, 0 ) ;
+    SetState ( optInfo, STACK_ARGS_TO_STANDARD_REGS, true ) ;
 }
 
 void
@@ -502,8 +503,8 @@ Compile_Optimize_OpEqual ( Compiler * compiler )
             if ( ! ( optInfo->wordArg1->CAttribute & REGISTER_VARIABLE ) )
             {
                 Word_Check_SetHere_To_StackPushRegisterCode ( optInfo->wordArg2, 0 ) ;
-                Compile_StandardArg ( optInfo->wordArg1, OREG2, 0, 0 ) ;
-                Compile_StandardArg ( optInfo->wordArg1, optInfo->wordArg1->RegToUse, 1, 0 ) ;
+                Compile_StandardArg ( optInfo->wordArg1, OREG2, 0, 0 ) ; //nb! lvalue
+                Compile_StandardArg ( optInfo->wordArg1, optInfo->wordArg1->RegToUse, 1, 0 ) ; //nb! rvalue
             }
         }
         if ( ( optInfo->opWord->Definition == CfrTil_DivideEqual ) || ( optInfo->opWord->CAttribute2 & OP_RAX_PLUS_1ARG ) ) //|| ( optInfo->opWord->CAttribute & BIT_SHIFT ) )

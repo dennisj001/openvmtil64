@@ -2,7 +2,11 @@
 
 // X variable op compile for group 5 opCodes - inc/dec - ia32 
 
-inline int64 Abs ( int64 x ) { return ((int64) (((x) >= 0) ? (x) : (-(x)))) ; }
+inline int64
+Abs ( int64 x )
+{
+    return (( int64 ) ( ( ( x ) >= 0 ) ? ( x ) : ( - ( x ) ) ) ) ;
+}
 
 void
 Compile_Minus ( Compiler * compiler )
@@ -26,7 +30,7 @@ Compile_Multiply ( Compiler * compiler )
         CompileOptimizeInfo * optInfo = compiler->OptInfo ; //Compiler_CheckOptimize may change the optInfo
         //_Compile_IMUL ( int8 mod, int8 reg, int8 rm, int8 sib, int64 disp, uint64 imm )
         //optInfo->Optimize_Reg = ACC ; // emulate MUL
-        Compiler_Word_SetCodingHere_And_ClearPreviousUseOf_Here_SCA (optInfo->opWord, 1) ;
+        Compiler_Word_SetCodingHere_And_ClearPreviousUseOf_Here_SCA ( optInfo->opWord, 1 ) ;
         _Compile_IMUL ( optInfo->Optimize_Mod, optInfo->Optimize_Reg, optInfo->Optimize_Rm, 0, optInfo->Optimize_Disp, 0 ) ;
         if ( optInfo->Optimize_Rm == DSP ) _Compile_Move_Reg_To_StackN ( DSP, 0, optInfo->Optimize_Reg ) ;
         else _Word_CompileAndRecord_PushReg ( _CfrTil_WordList ( 0 ), optInfo->Optimize_Reg ) ;
@@ -35,7 +39,7 @@ Compile_Multiply ( Compiler * compiler )
     {
         Compile_Pop_To_Acc ( DSP ) ;
         //Compile_IMUL ( cell mod, cell reg, cell rm, sib, disp, imm, size )
-        Compiler_WordStack_SCHCPUSCA( 0, 1 ) ;
+        Compiler_WordStack_SCHCPUSCA ( 0, 1 ) ;
         Compile_MUL ( MEM, DSP, REX_B | MODRM_B | DISP_B, 0, 0, 0, CELL_SIZE ) ;
         _CfrTil_WordList ( 0 )->StackPushRegisterCode = Here ;
         Compile_Move_ACC_To_TOS ( DSP ) ;
@@ -55,7 +59,7 @@ _Compile_Divide ( Compiler * compiler, uint64 type )
     {
         CompileOptimizeInfo * optInfo = compiler->OptInfo ; //Compiler_CheckOptimize may change the optInfo
         //Compiler_Word_SetCodingHere_And_ClearPreviousUseOf_Here_SCA (optInfo->opWord, 0) ;
-        Compile_MoveImm (REG, RDX, 0, 0, CELL ) ;
+        Compile_MoveImm ( REG, RDX, 0, 0, CELL ) ;
 #if 0        
         if ( optInfo->OptimizeFlag & OPTIMIZE_IMM )
         {
@@ -77,7 +81,7 @@ _Compile_Divide ( Compiler * compiler, uint64 type )
         // 64 bit dividend EDX:R8 / srcReg
         // EDX holds high order bits
         _Compile_Move_StackN_To_Reg ( ACC, DSP, - 1 ) ;
-        Compile_MoveImm (REG, RDX, 0, 0, CELL ) ;
+        Compile_MoveImm ( REG, RDX, 0, 0, CELL ) ;
         //Compiler_WordStack_SCHCPUSCA (0, 0) ;
         Compile_IDIV ( MEM, DSP, 0, 0, 0, 0, 0 ) ;
         _Compile_Stack_DropN ( DSP, 1 ) ;
@@ -128,26 +132,38 @@ _Compile_optInfo_X_Group1 ( Compiler * compiler, int64 op )
 
 // ( x n -- )
 // C : "x += n" :: cfrTil : "x n +="
-
 // X variable op compile for group 1 opCodes - ia32 
-
 void
 Compile_Group1_X_OpEqual ( Compiler * compiler, int64 op ) // +=/-= operationCode
 {
-    //CfrTil_OptimizeOn ( ) ;
-    int64 optFlag = Compiler_CheckOptimize ( compiler, 0 ) ;
-    if ( optFlag & OPTIMIZE_DONE ) return ;
-    else if ( optFlag )
+    SaveAndSetState ( _CfrTil_, OPTIMIZE_ON, true ) ;
+    Word * zero = _CfrTil_WordList ( 0 ) ;
+    if ( ( GetState ( _Context_, C_SYNTAX ) ) && ( ! GetState ( compiler, C_INFIX_EQUAL ) ) )
     {
-        _Compile_optInfo_X_Group1 ( compiler, op ) ;
+        _CfrTil_C_Infix_EqualOp ( zero ) ;
     }
     else
     {
-        _Compile_Move_StackN_To_Reg ( ACC, DSP, 0 ) ; // n
-        _Compile_Move_StackN_To_Reg ( OREG, DSP, - 1 ) ; // x
-        Compile_SUBI ( REG, DSP, 0, 2 * CELL_SIZE, BYTE ) ;
-        _Compile_X_Group1 ( op, MEM, MEM, ACC, OREG, 0, 0, CELL ) ;
+        int64 optFlag = Compiler_CheckOptimize ( compiler, 0 ) ;
+        if ( optFlag & OPTIMIZE_DONE ) return ;
+        else if ( optFlag )
+        {
+            _Compile_optInfo_X_Group1 ( compiler, op ) ;
+        }
+        else
+        {
+            SetHere ( zero->Coding, 1 ) ;
+            if ( ! GetState ( compiler->OptInfo, STACK_ARGS_TO_STANDARD_REGS ) )
+            {
+                _Compile_Move_StackN_To_Reg ( ACC, DSP, 0 ) ; // n
+                _Compile_Move_StackN_To_Reg ( OREG, DSP, - 1 ) ; // x
+                Compile_SUBI ( REG, DSP, 0, 2 * CELL_SIZE, BYTE ) ;
+            }
+            _Compile_X_Group1 ( op, MEM, MEM, ACC, OREG, 0, 0, CELL ) ;
+            SetState ( compiler->OptInfo, STACK_ARGS_TO_STANDARD_REGS, false ) ;
+        }
     }
+    RestoreSavedState ( _CfrTil_, OPTIMIZE_ON ) ;
 }
 
 void
@@ -155,38 +171,46 @@ Compile_MultiplyEqual ( Compiler * compiler )
 {
     //CfrTil_OptimizeOn ( ) ; //nb! must be on in most cases to compile correctly
     SaveAndSetState ( _CfrTil_, OPTIMIZE_ON, true ) ;
-    int64 optFlag = Compiler_CheckOptimize ( compiler, 0 ) ;
-    if ( optFlag & OPTIMIZE_DONE ) return ;
-    else if ( optFlag )
+    if ( ( GetState ( _Context_, C_SYNTAX ) ) && ( ! GetState ( compiler, C_INFIX_EQUAL ) ) )
     {
-        CompileOptimizeInfo * optInfo = compiler->OptInfo ; //Compiler_CheckOptimize may change the optInfo
-        if ( optInfo->OptimizeFlag & OPTIMIZE_IMM )
-        {
-            //_Compile_IMULI ( MEM, optInfo->Optimize_Reg, optInfo->Optimize_Rm, 0, optInfo->Optimize_Disp, optInfo->Optimize_Imm, CELL ) ;
-            Compile_MUL ( MEM, optInfo->Optimize_Rm, REX_B | MODRM_B | DISP_B, 0,
-                optInfo->Optimize_Disp, optInfo->Optimize_Imm, CELL_SIZE ) ;
-        }
-        else
-        {
-            //_Compile_IMUL_Reg ( cell mod, cell reg, cell rm, cell sib, cell disp )
-            //Compiler_Word_SetCodingHere_And_ClearPreviousUseOf_Here_SCA (optInfo->opWord, 0) ;
-            Compile_MUL ( optInfo->Optimize_Mod, optInfo->Optimize_Rm, REX_B | MODRM_B | DISP_B, 0,
-                optInfo->Optimize_Disp, 0, CELL_SIZE ) ;
-        }
-        if ( optInfo->wordArg1 && ( optInfo->wordArg1->CAttribute & REGISTER_VARIABLE ) )
-        {
-            if ( optInfo->wordArg1->RegToUse != ACC ) Compile_Move_Reg_To_Reg ( optInfo->wordArg1->RegToUse, RAX ) ;
-        }
-        else Compile_Move_Reg_To_Rm ( OREG2, RAX, 0 ) ;
+        Word * zero = _CfrTil_WordList ( 0 ) ;
+        _CfrTil_C_Infix_EqualOp ( zero ) ;
     }
     else
     {
-        //if ( ! GetState ( _Context_, C_SYNTAX ) ) 
-        Compiler_WordStack_SCHCPUSCA (0, 0) ;
-        _Compile_Move_StackNRm_To_Reg ( ACC, DSP, - 1 ) ;
-        Compile_MUL ( MEM, DSP, REX_B | MODRM_B | DISP_B, 0, 0, 0, CELL_SIZE ) ;
-        _Compile_Stack_Drop ( DSP ) ;
-        _Compile_Move_Reg_To_StackNRm_UsingReg ( DSP, 0, ACC, OREG ) ;
+        int64 optFlag = Compiler_CheckOptimize ( compiler, 0 ) ;
+        if ( optFlag & OPTIMIZE_DONE ) return ;
+        else if ( optFlag )
+        {
+            CompileOptimizeInfo * optInfo = compiler->OptInfo ; //Compiler_CheckOptimize may change the optInfo
+            if ( optInfo->OptimizeFlag & OPTIMIZE_IMM )
+            {
+                //_Compile_IMULI ( MEM, optInfo->Optimize_Reg, optInfo->Optimize_Rm, 0, optInfo->Optimize_Disp, optInfo->Optimize_Imm, CELL ) ;
+                Compile_MUL ( MEM, optInfo->Optimize_Rm, REX_B | MODRM_B | DISP_B, 0,
+                    optInfo->Optimize_Disp, optInfo->Optimize_Imm, CELL_SIZE ) ;
+            }
+            else
+            {
+                //_Compile_IMUL_Reg ( cell mod, cell reg, cell rm, cell sib, cell disp )
+                //Compiler_Word_SetCodingHere_And_ClearPreviousUseOf_Here_SCA (optInfo->opWord, 0) ;
+                Compile_MUL ( optInfo->Optimize_Mod, optInfo->Optimize_Rm, REX_B | MODRM_B | DISP_B, 0,
+                    optInfo->Optimize_Disp, 0, CELL_SIZE ) ;
+            }
+            if ( optInfo->wordArg1 && ( optInfo->wordArg1->CAttribute & REGISTER_VARIABLE ) )
+            {
+                if ( optInfo->wordArg1->RegToUse != ACC ) Compile_Move_Reg_To_Reg ( optInfo->wordArg1->RegToUse, RAX ) ;
+            }
+            else Compile_Move_Reg_To_Rm ( OREG2, RAX, 0 ) ;
+        }
+        else
+        {
+            //if ( ! GetState ( _Context_, C_SYNTAX ) ) 
+            Compiler_WordStack_SCHCPUSCA ( 0, 0 ) ;
+            _Compile_Move_StackNRm_To_Reg ( ACC, DSP, - 1 ) ;
+            Compile_MUL ( MEM, DSP, REX_B | MODRM_B | DISP_B, 0, 0, 0, CELL_SIZE ) ;
+            _Compile_Stack_Drop ( DSP ) ;
+            _Compile_Move_Reg_To_StackNRm_UsingReg ( DSP, 0, ACC, OREG ) ;
+        }
     }
     RestoreSavedState ( _CfrTil_, OPTIMIZE_ON ) ;
 }
@@ -209,12 +233,12 @@ Compile_DivideEqual ( Compiler * compiler )
         if ( optFlag & OPTIMIZE_DONE ) return ;
         else if ( optFlag )
         {
-            Compile_MoveImm (REG, RDX, 0, 0, CELL ) ;
+            Compile_MoveImm ( REG, RDX, 0, 0, CELL ) ;
             // Compile_IDIV( mod, rm, sib, disp, imm, size )
             if ( optInfo->OptimizeFlag & OPTIMIZE_IMM )
             {
                 //Compile_MoveImm ( int8 direction, int8 rm, int8 sib, int64 disp, int64 imm, int8 immSize )
-                Compile_MoveImm (REG, OREG, 0, optInfo->Optimize_Imm, CELL ) ;
+                Compile_MoveImm ( REG, OREG, 0, optInfo->Optimize_Imm, CELL ) ;
                 //Compile_IDIV ( REG, R9D, 0, 0, 0, 0, 0 ) ;
                 Compile_IDIV ( REG, OREG, 0, 0, 0, 0, 0 ) ;
             }
@@ -229,8 +253,8 @@ Compile_DivideEqual ( Compiler * compiler )
         else
         {
             _Compile_Move_StackNRm_To_Reg ( ACC, DSP, - 1 ) ; // address of dividend is second on stack
-            Compile_MoveImm (REG, RDX, 0, 0, CELL ) ;
-            Compiler_WordStack_SCHCPUSCA (0, 0) ;
+            Compile_MoveImm ( REG, RDX, 0, 0, CELL ) ;
+            Compiler_WordStack_SCHCPUSCA ( 0, 0 ) ;
             Compile_IDIV ( MEM, DSP, 0, 0, 0, 0, 0 ) ; // divisor is tos
             _Compile_Stack_Drop ( DSP ) ;
             _Compile_Move_Reg_To_StackNRm_UsingReg ( DSP, 0, ACC, THRU_REG ) ;
@@ -250,7 +274,7 @@ _CfrTil_Do_IncDec ( int64 op )
     }
     else
     {
-        Compiler_WordStack_SCHCPUSCA (0, 0) ;
+        Compiler_WordStack_SCHCPUSCA ( 0, 0 ) ;
         int64 sd = List_Depth ( _CfrTil_->Compiler_N_M_Node_WordList ) ;
         Word *one = ( Word* ) _CfrTil_WordList ( 1 ) ; // the operand
         if ( op == INC )
@@ -283,9 +307,8 @@ CfrTil_IncDec ( int64 op ) // +
     int64 sd = List_Depth ( _CfrTil_->Compiler_N_M_Node_WordList ) ;
     if ( ( sd > 1 ) && ( ! GetState ( compiler, LC_CFRTIL ) ) ) //|INFIX_LIST_INTERPRET ) )
     {
-        //Word *zero = ( Word* ) _CfrTil_WordList (0) ; //, *three = Compiler_WordList ( 3 ) ; // the operand
-        Word *one = ( Word* ) _CfrTil_WordList (1) ; //, *three = Compiler_WordList ( 3 ) ; // the operand
-        byte * nextToken = Lexer_Peek_Next_NonDebugTokenWord (cntx->Lexer0, 1 , 0) ;
+        Word *one = ( Word* ) _CfrTil_WordList ( 1 ) ; //, *three = Compiler_WordList ( 3 ) ; // the operand
+        byte * nextToken = Lexer_Peek_Next_NonDebugTokenWord ( cntx->Lexer0, 1, 0 ) ;
         Word * currentWord = _Context_CurrentWord ( cntx ) ;
         Word * nextWord = Finder_Word_FindUsing ( cntx->Interpreter0->Finder0, nextToken, 0 ) ;
         //SetState ( _Debugger_, DEBUG_SHTL_OFF, true ) ;
@@ -297,9 +320,9 @@ CfrTil_IncDec ( int64 op ) // +
                 //if ( one ) SetHere (one->Coding, 1) ;
                 // ?? couldn't this stuff be done with _Interpret_C_Until_EitherToken ??
                 dllist * postfixList = List_New ( SESSION ) ;
-                List_Push_1Value_NewNode_T_WORD ( postfixList, (int64) currentWord, COMPILER_TEMP ) ;
-                if ( one ) List_Push_1Value_NewNode_T_WORD ( postfixList, (int64) one, COMPILER_TEMP ) ;
-                List_Push_1Value_NewNode_T_WORD ( compiler->PostfixLists, (int64) postfixList, COMPILER_TEMP ) ;
+                List_Push_1Value_NewNode_T_WORD ( postfixList, ( int64 ) currentWord, COMPILER_TEMP ) ;
+                if ( one ) List_Push_1Value_NewNode_T_WORD ( postfixList, ( int64 ) one, COMPILER_TEMP ) ;
+                List_Push_1Value_NewNode_T_WORD ( compiler->PostfixLists, ( int64 ) postfixList, COMPILER_TEMP ) ;
                 return ;
             }
             else
@@ -307,8 +330,8 @@ CfrTil_IncDec ( int64 op ) // +
                 Interpreter_InterpretNextToken ( cntx->Interpreter0 ) ;
                 if ( sd > 1 )
                 {
-                    Interpreter_DoWord (cntx->Interpreter0, one, - 1 , -1) ;
-                    Interpreter_DoWord (cntx->Interpreter0, currentWord, - 1 , -1) ;
+                    Interpreter_DoWord ( cntx->Interpreter0, one, - 1, - 1 ) ;
+                    Interpreter_DoWord ( cntx->Interpreter0, currentWord, - 1, - 1 ) ;
                     return ;
                 }
             }
@@ -321,12 +344,12 @@ CfrTil_IncDec ( int64 op ) // +
                 if ( ! GetState ( compiler, INFIX_LIST_INTERPRET ) )
                 {
                     List_DropN ( _CfrTil_->Compiler_N_M_Node_WordList, 1 ) ; // the operator; let higher level see the variable
-                    if ( GetState ( _CfrTil_, OPTIMIZE_ON ) ) SetHere (one->Coding, 1) ;
+                    if ( GetState ( _CfrTil_, OPTIMIZE_ON ) ) SetHere ( one->Coding, 1 ) ;
                     CfrTil_WordList_PushWord ( one ) ;
                     dllist * postfixList = List_New ( SESSION ) ;
-                    List_Push_1Value_NewNode_T_WORD ( postfixList, (int64) currentWord, COMPILER_TEMP ) ;
-                    List_Push_1Value_NewNode_T_WORD ( postfixList, (int64) one, COMPILER_TEMP ) ;
-                    List_Push_1Value_NewNode_T_WORD ( compiler->PostfixLists, (int64) postfixList, COMPILER_TEMP ) ;
+                    List_Push_1Value_NewNode_T_WORD ( postfixList, ( int64 ) currentWord, COMPILER_TEMP ) ;
+                    List_Push_1Value_NewNode_T_WORD ( postfixList, ( int64 ) one, COMPILER_TEMP ) ;
+                    List_Push_1Value_NewNode_T_WORD ( compiler->PostfixLists, ( int64 ) postfixList, COMPILER_TEMP ) ;
                     List_DropN ( _CfrTil_->Compiler_N_M_Node_WordList, 1 ) ; // the operator; let higher level see the variable for optimization
                     return ;
                 }
@@ -359,10 +382,10 @@ CfrTil_IncDec ( int64 op ) // +
                     int64 i ;
                     Word * word ;
                     dllist * postfixList = List_New ( SESSION ) ;
-                    List_Push_1Value_NewNode_T_WORD ( postfixList, (int64) currentWord, COMPILER_TEMP ) ; // remember : this will be lifo
-                    for ( i = 1 ; word = _CfrTil_WordList (i), ( word->CAttribute & ( CATEGORY_OP_ORDERED | CATEGORY_OP_UNORDERED | CATEGORY_OP_DIVIDE | CATEGORY_OP_EQUAL ) ) ; i ++ ) ;
-                    List_Push_1Value_NewNode_T_WORD ( postfixList, (int64) _CfrTil_WordList (i), COMPILER_TEMP ) ;
-                    List_Push_1Value_NewNode_T_WORD ( compiler->PostfixLists, (int64) postfixList, COMPILER_TEMP ) ;
+                    List_Push_1Value_NewNode_T_WORD ( postfixList, ( int64 ) currentWord, COMPILER_TEMP ) ; // remember : this will be lifo
+                    for ( i = 1 ; word = _CfrTil_WordList ( i ), ( word->CAttribute & ( CATEGORY_OP_ORDERED | CATEGORY_OP_UNORDERED | CATEGORY_OP_DIVIDE | CATEGORY_OP_EQUAL ) ) ; i ++ ) ;
+                    List_Push_1Value_NewNode_T_WORD ( postfixList, ( int64 ) _CfrTil_WordList ( i ), COMPILER_TEMP ) ;
+                    List_Push_1Value_NewNode_T_WORD ( compiler->PostfixLists, ( int64 ) postfixList, COMPILER_TEMP ) ;
                     List_DropN ( _CfrTil_->Compiler_N_M_Node_WordList, 1 ) ; // the operator; let higher level see the variable for optimization
                     return ;
                 }

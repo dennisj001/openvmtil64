@@ -314,7 +314,11 @@ void
 Compiler_Init ( Compiler * compiler, uint64 state, Boolean flag )
 {
     if ( flag ) Compiler_DeleteDebugInfo ( compiler ) ;
-    else if ( compiler->NumberOfVariables ) Namespace_RemoveNamespacesStack ( compiler->LocalsCompilingNamespacesStack ) ;
+    else if ( compiler->NumberOfVariables )
+    {
+        if ( GetState ( _CfrTil_, GLOBAL_SOURCE_CODE_MODE ) ) Compiler_SaveDebugInfo ( compiler ) ; 
+        else Namespace_RemoveNamespacesStack ( compiler->LocalsCompilingNamespacesStack ) ;
+    }
     compiler->State = ( state &= ( ~ARRAY_MODE ) ) ;
     compiler->ContinuePoint = 0 ;
     compiler->BreakPoint = 0 ;

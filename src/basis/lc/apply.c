@@ -431,7 +431,7 @@ _LO_Apply_Arg ( LambdaCalculus * lc, ListObject ** pl1, int64 i )
     else
     {
         word = Compiler_CopyDuplicatesAndPush ( word, l1->W_RL_Index, l1->W_SC_Index ) ;
-        Debugger_PreSetup ( _Debugger_, word, 0, 0, 1 ) ;
+        Debugger_PreSetup ( _Debugger_, word, 0, 0, 0 ) ;
         Compile_MoveImm_To_Reg ( RegParameterOrder ( i ++ ), DataStack_Pop ( ), CELL_SIZE ) ;
         _DEBUG_SHOW ( word, 1 ) ;
     }

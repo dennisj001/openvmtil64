@@ -719,6 +719,7 @@ typedef struct
 #define OP_RESULT_ACC            ( (uint64) 1 << 13 )  
 #define OP_RESULT_OREG           ( (uint64) 1 << 14 )  
 #define OP_RESULT_OREG2          ( (uint64) 1 << 15 )
+#define STACK_ARGS_TO_STANDARD_REGS  ( (uint64) 1 << 16 )
     // CompileOptimizeInfo StateRegValues ;  
 #define ARG1_L                   ( 1 << 0 )
 #define ARG1_R                   ( 1 << 1 )

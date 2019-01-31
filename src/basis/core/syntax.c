@@ -193,15 +193,22 @@ _CfrTil_C_Infix_EqualOp ( Word * opWord )
     }
     else wordr = _CfrTil_->PokeWord ;
     d0 ( if ( Is_DebugModeOn ) Compiler_SC_WordList_Show ( "\nCfrTil_C_Infix_EqualOp : before op word", 0, 0 ) ) ;
-    if ( opWord ) rword = opWord ;
-    else rword = wordr ;
-    svName = rword->Name ;
-    rword->Name = ( byte* ) "=" ;
-    SetState ( _Debugger_, DBG_OUTPUT_SUBSTITUTION, true ) ;
-    _Debugger_->SubstitutedWord = rword ;
-    Interpreter_DoWord_Default ( interp, rword, tsrli, svscwi ) ;
-    SetState ( _Debugger_, ( DBG_OUTPUT_SUBSTITUTION ), false ) ;
-    rword->Name = svName ;
+    if ( opWord )
+    {
+        rword = opWord ;
+        Interpreter_DoWord_Default ( interp, rword, tsrli, svscwi ) ;
+    }
+    else
+    {
+        rword = wordr ;
+        svName = rword->Name ;
+        rword->Name = ( byte* ) "=" ;
+        SetState ( _Debugger_, DBG_OUTPUT_SUBSTITUTION, true ) ;
+        _Debugger_->SubstitutedWord = rword ;
+        Interpreter_DoWord_Default ( interp, rword, tsrli, svscwi ) ;
+        SetState ( _Debugger_, ( DBG_OUTPUT_SUBSTITUTION ), false ) ;
+        rword->Name = svName ;
+    }
     if ( GetState ( compiler, C_COMBINATOR_LPAREN ) )
     {
         if ( wordr->StackPushRegisterCode ) SetHere ( wordr->StackPushRegisterCode, 1 ) ; // this is the usual after '=' in non C syntax; assuming optimizeOn
@@ -231,7 +238,7 @@ CfrTil_C_ConditionalExpression ( )
     Word * word1 ;
     if ( ( ! Compiling ) && ( ! GetState ( compiler, C_CONDITIONAL_IN ) ) ) Compiler_Init ( _Compiler_, 0, 1 ) ;
     SetState ( compiler, C_CONDITIONAL_IN, true ) ;
-    if ( CompileMode ) 
+    if ( CompileMode )
     {
         word1 = _CfrTil_WordList ( 1 ) ;
         if ( word1 && word1->StackPushRegisterCode )
@@ -274,6 +281,7 @@ int64
 IsLValue_String_CheckForwardToStatementEnd ( byte * nc )
 {
     int64 leftBracket = 0 ;
+    byte onc1 ;
     while ( *nc )
     {
         switch ( *nc )
@@ -282,7 +290,8 @@ IsLValue_String_CheckForwardToStatementEnd ( byte * nc )
             case '=':
             {
                 if ( * ( nc + 1 ) == '=' ) return false ;
-                else if ( ispunct ( * ( nc - 1 ) ) ) return false ; // op equal
+                //else if ( ispunct ( * ( nc - 1 ) ) && ( ( * ( nc - 1 ) ) != '<' ) && ( ( * ( nc - 1 ) ) != '>' ) ) return false ; // op equal // ?? >= <=
+                else if ( (onc1 = * ( nc - 1 )), ispunct ( onc1 ) && ( onc1 != '<' ) && ( onc1 != '>' ) ) return false ; // op equal // ?? >= <=
                 else return true ; // we have an lvalue
             }
             case '[':
@@ -353,6 +362,7 @@ Lexer_IsLValue_CheckForwardToNextSemiForArrayVariable ( Lexer * lexer, Word * wo
         ReadLiner * rl = lexer->ReadLiner0 ;
         byte * nc = & rl->InputStringOriginal [lexer->TokenStart_FileIndex] ;
         Boolean space = false, inArray = false ;
+        byte onc1 ;
         while ( 1 )
         {
             switch ( *nc )
@@ -361,7 +371,8 @@ Lexer_IsLValue_CheckForwardToNextSemiForArrayVariable ( Lexer * lexer, Word * wo
                 case '=':
                 {
                     if ( * ( nc + 1 ) == '=' ) return false ;
-                    else if ( ispunct ( * ( nc - 1 ) ) ) return false ; // op equal
+                        //else if ( ispunct ( * ( nc - 1 ) ) ) return false ; // op equal
+                    else if ( (onc1 = * ( nc - 1 )), ispunct ( onc1 ) && ( onc1 != '<' ) && ( onc1 != '>' ) ) return false ; // op equal // ?? >= <=
                     else return true ; // we have an lvalue
                 }
                 case '[': inArray = true, space = false ;

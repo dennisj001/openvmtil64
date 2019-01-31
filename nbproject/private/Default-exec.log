@@ -963,7 +963,6 @@ called: g++
 	-lm
 	-lmpfr
 	-lgmp
-	-ltcc
 
 called: /usr/bin/ld
 	/media/sdc4/dennisj/openvmtil64
@@ -971,7 +970,7 @@ called: /usr/bin/ld
 	-plugin
 	/usr/lib/gcc/x86_64-linux-gnu/8/liblto_plugin.so
 	-plugin-opt=/usr/lib/gcc/x86_64-linux-gnu/8/lto-wrapper
-	-plugin-opt=-fresolution=/tmp/ccOPD48H.res
+	-plugin-opt=-fresolution=/tmp/ccSYaFWz.res
 	-plugin-opt=-pass-through=-lgcc_s
 	-plugin-opt=-pass-through=-lgcc
 	-plugin-opt=-pass-through=-lc
@@ -1105,7 +1104,6 @@ called: /usr/bin/ld
 	-ldl
 	-lmpfr
 	-lgmp
-	-ltcc
 	-lstdc++
 	-lm
 	-lc

@@ -162,7 +162,32 @@ CfrTil_Namespaces ( )
 }
 
 int64
-Word_RemoveIfStringEqualName ( Symbol * symbol, byte * name )
+Word_RemoveIfStringContainsName ( Symbol * symbol, byte * name )
+{
+    if ( strstr ( ( CString ) symbol->Name, ( CString ) name ) )
+    {
+        dlnode_Remove ( (dlnode*) symbol ) ;
+        Word_Recycle ( (Word *) symbol ) ;
+    }
+    return 0 ;
+}
+
+void
+_CfrTil_Namespaces_PurgeWordIfContainsName ( byte * name )
+{
+    Tree_Map_State_OneArg ( USING | NOT_USING, ( MapFunction_1 ) Word_RemoveIfStringContainsName, ( int64 ) name ) ;
+}
+
+void
+CfrTil_Namespaces_PurgeWordIfContainsName ( )
+{
+   byte * name = ( byte* ) DataStack_Pop ( ) ;
+   _CfrTil_Namespaces_PurgeWordIfContainsName ( name ) ;
+}
+
+
+int64
+Word_RemoveIfStringEqualExactName ( Symbol * symbol, byte * name )
 {
     if ( String_Equal ( symbol->Name, name ) )
     {
@@ -173,16 +198,16 @@ Word_RemoveIfStringEqualName ( Symbol * symbol, byte * name )
 }
 
 void
-_CfrTil_Namespaces_PurgeWordName ( byte * name )
+_CfrTil_Namespaces_PurgeWordExactName ( byte * name )
 {
-    Tree_Map_State_OneArg ( USING | NOT_USING, ( MapFunction_1 ) Word_RemoveIfStringEqualName, ( int64 ) name ) ;
+    Tree_Map_State_OneArg ( USING | NOT_USING, ( MapFunction_1 ) Word_RemoveIfStringEqualExactName, ( int64 ) name ) ;
 }
 
 void
-CfrTil_Namespaces_PurgeWordName ( )
+CfrTil_Namespaces_PurgeWordExactName ( )
 {
    byte * name = ( byte* ) DataStack_Pop ( ) ;
-   _CfrTil_Namespaces_PurgeWordName ( name ) ;
+   _CfrTil_Namespaces_PurgeWordExactName ( name ) ;
 }
 
 void
@@ -307,7 +332,6 @@ _CfrTil_RemoveNamespaceFromUsingListAndClear ( byte * name )
 void
 Namespace_RemoveNamespacesStack ( Stack * stack )
 {
-#if 1    
     if ( stack )
     {
         int64 i = 0, n = Stack_Depth ( stack ) ;
@@ -325,24 +349,6 @@ Namespace_RemoveNamespacesStack ( Stack * stack )
         }
         while ( n >= 0 ) ;
     }
-#else    
-    if ( stack )
-    {
-        int64 n ;
-        for ( n = Stack_Depth ( stack ) ; n ; n -- )
-        {
-            Namespace * ns = ( Namespace* ) Stack_Pop ( stack ) ;
-            if ( ns )
-            {
-                if ( ns == _CfrTil_->InNamespace ) _CfrTil_->InNamespace = 0 ;
-                if ( _Finder_ && ( ns == _Finder_->QualifyingNamespace ) ) Finder_SetQualifyingNamespace ( _Context_->Finder0, 0 ) ;
-                _Namespace_SetState ( ns, NOT_USING ) ;
-                dlnode_Remove ( ( dlnode* ) ns ) ;
-            }
-        }
-        Stack_Init ( stack ) ;
-    }
-#endif        
 }
 
 void
