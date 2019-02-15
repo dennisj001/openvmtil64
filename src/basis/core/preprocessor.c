@@ -238,6 +238,7 @@ SkipPreprocessorCode ( Boolean skipControl )
                         }
                         else if ( GetEndifStatus ( ) ) goto done ;
                     }
+                    else if ( String_Equal ( token1, "define" ) ) continue ;
                     else _SyntaxError ( ( byte* ) "Stray '#' in code!", 1 ) ;
                 }
                 else goto done ;

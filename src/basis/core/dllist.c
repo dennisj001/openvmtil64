@@ -838,7 +838,8 @@ Tree_Map_State_OneArg ( uint64 state, MapFunction_1 mf, int64 one )
         {
             nextWord = ( Word* ) dlnode_Next ( ( node* ) word ) ;
             _CfrTil_->FindWordCount ++ ;
-            if ( mf ( ( Symbol* ) word, one ) ) return word ;
+            if ( mf ( ( Symbol* ) word, one ) ) 
+                return word ;
             else if ( Is_NamespaceType ( word ) )
             {
                 if ( ( word->State & state ) )

@@ -815,3 +815,9 @@
 #define DONT_PUSH_R8 (( byte* ) 1 )
 #define PUSH_R8 (( byte* ) 2 )
 #endif
+#define STACK_PUSH_REGISTER_CODE_SIZE 7 // bytes
+#define STORE 17 // basically randomly chosen
+#define POKE 18
+#define EQUAL POKE
+
+

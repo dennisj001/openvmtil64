@@ -30,8 +30,8 @@ int factoriali ( REG n | REG res )
     }
     return res;
 } prefix
-c_syntaxOff 
 'factoriali find wdiss //pause
+c_syntaxOff 
 C_Syntax.factoriali (7) dup p 5040 _assert //pause //sp
 //dscOff
 : factorial ( n  | fac -- TOS ) 

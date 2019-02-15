@@ -243,18 +243,16 @@ _Context_DoubleQuoteMacro ( Context * cntx )
     do
     {
         lexer->TokenInputByte = ReadLine_NextChar ( rl ) ;
-        if ( lexer->TokenInputByte == '\\' ) _BackSlash ( lexer, 1 ) ;
+        if ( lexer->TokenInputByte == '\\' ) 
+            _BackSlash ( lexer, 1 ) ;
         else Lexer_Append_ConvertedCharacterToTokenBuffer ( lexer ) ;
     }
     while ( lexer->TokenInputByte != '"' ) ;
     _CfrTil_->SC_QuoteMode = false ;
     SetState ( lexer, LEXER_DONE, true ) ;
-    //if ( Is_DebugModeOn ) CfrTil_PrintDataStack ( ) ;
     if ( GetState ( _CfrTil_, STRING_MACROS_ON ) && GetState ( &_CfrTil_->Sti, STI_INITIALIZED ) ) _CfrTil_StringMacros_Do ( lexer->TokenBuffer ) ;
     Word * word = Lexer_ObjectToken_New ( lexer, String_New ( lexer->TokenBuffer, STRING_MEM ), - 1, - 1 ) ;
-    //Debugger_On ( _Debugger_ ) ;
     Interpreter_DoWord ( cntx->Interpreter0, word, - 1, - 1 ) ;
-    //if ( Is_DebugModeOn ) CfrTil_PrintDataStack ( ) ;
 }
 
 void

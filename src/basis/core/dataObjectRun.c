@@ -305,7 +305,7 @@ Namespace_Do_C_Type ( Namespace * ns, Boolean isForwardDotted )
                 if ( ! Compiling )
                 {
                     Compiler_Init ( compiler, 0, 0 ) ;
-                    //CfrTil_RightBracket ( ) ; // forth term
+                    //CfrTil_RightBracket ( ) ; //nb. only Compiler_Init here. We don't want to turn on compile mode!! RightBracket is a forth term.
                     CfrTil_InitSourceCode_WithName ( _CfrTil_, ns->Name, 1 ) ;
                     CfrTil_WordList_Init ( 0, 0 ) ;
                 }

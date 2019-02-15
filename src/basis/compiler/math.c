@@ -30,7 +30,7 @@ Compile_Multiply ( Compiler * compiler )
         CompileOptimizeInfo * optInfo = compiler->OptInfo ; //Compiler_CheckOptimize may change the optInfo
         //_Compile_IMUL ( int8 mod, int8 reg, int8 rm, int8 sib, int64 disp, uint64 imm )
         //optInfo->Optimize_Reg = ACC ; // emulate MUL
-        Compiler_Word_SetCodingHere_And_ClearPreviousUseOf_Here_SCA ( optInfo->opWord, 1 ) ;
+        Compiler_SCA_Word_SetCodingHere_And_ClearPreviousUse ( optInfo->opWord, 1 ) ;
         _Compile_IMUL ( optInfo->Optimize_Mod, optInfo->Optimize_Reg, optInfo->Optimize_Rm, 0, optInfo->Optimize_Disp, 0 ) ;
         if ( optInfo->Optimize_Rm == DSP ) _Compile_Move_Reg_To_StackN ( DSP, 0, optInfo->Optimize_Reg ) ;
         else _Word_CompileAndRecord_PushReg ( _CfrTil_WordList ( 0 ), optInfo->Optimize_Reg ) ;
@@ -58,7 +58,7 @@ _Compile_Divide ( Compiler * compiler, uint64 type )
     else if ( optFlag )
     {
         CompileOptimizeInfo * optInfo = compiler->OptInfo ; //Compiler_CheckOptimize may change the optInfo
-        //Compiler_Word_SetCodingHere_And_ClearPreviousUseOf_Here_SCA (optInfo->opWord, 0) ;
+        //Compiler_SCA_Word_SetCodingHere_And_ClearPreviousUse (optInfo->opWord, 0) ;
         Compile_MoveImm ( REG, RDX, 0, 0, CELL ) ;
 #if 0        
         if ( optInfo->OptimizeFlag & OPTIMIZE_IMM )
@@ -115,7 +115,7 @@ _Compile_optInfo_X_Group1 ( Compiler * compiler, int64 op )
     {
         int64 imm = optInfo->Optimize_Imm ;
         // Compile_SUBI( mod, operandReg, offset, immediateData, size )
-        //Compiler_Word_SetCodingHere_And_ClearPreviousUseOf_Here_SCA (optInfo->opWord, 1) ;
+        //Compiler_SCA_Word_SetCodingHere_And_ClearPreviousUse (optInfo->opWord, 1) ;
         _Compile_X_Group1_Immediate ( op, optInfo->Optimize_Mod,
             optInfo->Optimize_Rm, optInfo->Optimize_Disp,
             optInfo->Optimize_Imm, ( imm >= 0x100000000 ) ? CELL : ( ( imm >= 0x100 ) ? 4 : 1 ) ) ;
@@ -123,144 +123,11 @@ _Compile_optInfo_X_Group1 ( Compiler * compiler, int64 op )
     else
     {
         // _Compile_Group1 ( int64 code, int64 toRegOrMem, int64 mod, int8 reg, int8 rm, int8 sib, int64 disp, int64 osize )
-        //Compiler_Word_SetCodingHere_And_ClearPreviousUseOf_Here_SCA (optInfo->opWord, 0) ;
+        //Compiler_SCA_Word_SetCodingHere_And_ClearPreviousUse (optInfo->opWord, 0) ;
         _Compile_X_Group1 ( op, optInfo->Optimize_Dest_RegOrMem, optInfo->Optimize_Mod,
             optInfo->Optimize_Reg, optInfo->Optimize_Rm, 0,
             optInfo->Optimize_Disp, CELL_SIZE ) ;
     }
-}
-
-// ( x n -- )
-// C : "x += n" :: cfrTil : "x n +="
-// X variable op compile for group 1 opCodes - ia32 
-void
-Compile_Group1_X_OpEqual ( Compiler * compiler, int64 op ) // +=/-= operationCode
-{
-    SaveAndSetState ( _CfrTil_, OPTIMIZE_ON, true ) ;
-    Word * zero = _CfrTil_WordList ( 0 ) ;
-    if ( ( GetState ( _Context_, C_SYNTAX ) ) && ( ! GetState ( compiler, C_INFIX_EQUAL ) ) )
-    {
-        _CfrTil_C_Infix_EqualOp ( zero ) ;
-    }
-    else
-    {
-        int64 optFlag = Compiler_CheckOptimize ( compiler, 0 ) ;
-        if ( optFlag & OPTIMIZE_DONE ) return ;
-        else if ( optFlag )
-        {
-            _Compile_optInfo_X_Group1 ( compiler, op ) ;
-        }
-        else
-        {
-            SetHere ( zero->Coding, 1 ) ;
-            if ( ! GetState ( compiler->OptInfo, STACK_ARGS_TO_STANDARD_REGS ) )
-            {
-                _Compile_Move_StackN_To_Reg ( ACC, DSP, 0 ) ; // n
-                _Compile_Move_StackN_To_Reg ( OREG, DSP, - 1 ) ; // x
-                Compile_SUBI ( REG, DSP, 0, 2 * CELL_SIZE, BYTE ) ;
-            }
-            _Compile_X_Group1 ( op, MEM, MEM, ACC, OREG, 0, 0, CELL ) ;
-            SetState ( compiler->OptInfo, STACK_ARGS_TO_STANDARD_REGS, false ) ;
-        }
-    }
-    RestoreSavedState ( _CfrTil_, OPTIMIZE_ON ) ;
-}
-
-void
-Compile_MultiplyEqual ( Compiler * compiler )
-{
-    //CfrTil_OptimizeOn ( ) ; //nb! must be on in most cases to compile correctly
-    SaveAndSetState ( _CfrTil_, OPTIMIZE_ON, true ) ;
-    if ( ( GetState ( _Context_, C_SYNTAX ) ) && ( ! GetState ( compiler, C_INFIX_EQUAL ) ) )
-    {
-        Word * zero = _CfrTil_WordList ( 0 ) ;
-        _CfrTil_C_Infix_EqualOp ( zero ) ;
-    }
-    else
-    {
-        int64 optFlag = Compiler_CheckOptimize ( compiler, 0 ) ;
-        if ( optFlag & OPTIMIZE_DONE ) return ;
-        else if ( optFlag )
-        {
-            CompileOptimizeInfo * optInfo = compiler->OptInfo ; //Compiler_CheckOptimize may change the optInfo
-            if ( optInfo->OptimizeFlag & OPTIMIZE_IMM )
-            {
-                //_Compile_IMULI ( MEM, optInfo->Optimize_Reg, optInfo->Optimize_Rm, 0, optInfo->Optimize_Disp, optInfo->Optimize_Imm, CELL ) ;
-                Compile_MUL ( MEM, optInfo->Optimize_Rm, REX_B | MODRM_B | DISP_B, 0,
-                    optInfo->Optimize_Disp, optInfo->Optimize_Imm, CELL_SIZE ) ;
-            }
-            else
-            {
-                //_Compile_IMUL_Reg ( cell mod, cell reg, cell rm, cell sib, cell disp )
-                //Compiler_Word_SetCodingHere_And_ClearPreviousUseOf_Here_SCA (optInfo->opWord, 0) ;
-                Compile_MUL ( optInfo->Optimize_Mod, optInfo->Optimize_Rm, REX_B | MODRM_B | DISP_B, 0,
-                    optInfo->Optimize_Disp, 0, CELL_SIZE ) ;
-            }
-            if ( optInfo->wordArg1 && ( optInfo->wordArg1->CAttribute & REGISTER_VARIABLE ) )
-            {
-                if ( optInfo->wordArg1->RegToUse != ACC ) Compile_Move_Reg_To_Reg ( optInfo->wordArg1->RegToUse, RAX ) ;
-            }
-            else Compile_Move_Reg_To_Rm ( OREG2, RAX, 0 ) ;
-        }
-        else
-        {
-            //if ( ! GetState ( _Context_, C_SYNTAX ) ) 
-            Compiler_WordStack_SCHCPUSCA ( 0, 0 ) ;
-            _Compile_Move_StackNRm_To_Reg ( ACC, DSP, - 1 ) ;
-            Compile_MUL ( MEM, DSP, REX_B | MODRM_B | DISP_B, 0, 0, 0, CELL_SIZE ) ;
-            _Compile_Stack_Drop ( DSP ) ;
-            _Compile_Move_Reg_To_StackNRm_UsingReg ( DSP, 0, ACC, OREG ) ;
-        }
-    }
-    RestoreSavedState ( _CfrTil_, OPTIMIZE_ON ) ;
-}
-
-void
-Compile_DivideEqual ( Compiler * compiler )
-{
-    SaveAndSetState ( _CfrTil_, OPTIMIZE_ON, true ) ;
-    if ( ( GetState ( _Context_, C_SYNTAX ) ) && ( ! GetState ( compiler, C_INFIX_EQUAL ) ) )
-    {
-        Word * zero = _CfrTil_WordList ( 0 ) ;
-        _CfrTil_C_Infix_EqualOp ( zero ) ;
-    }
-    else
-    {
-        CompileOptimizeInfo * optInfo = compiler->OptInfo ;
-        // for idiv the dividend must be eax:edx, divisor can be reg or rm
-        // idiv eax by reg or mem
-        int64 optFlag = Compiler_CheckOptimize ( compiler, 0 ) ;
-        if ( optFlag & OPTIMIZE_DONE ) return ;
-        else if ( optFlag )
-        {
-            Compile_MoveImm ( REG, RDX, 0, 0, CELL ) ;
-            // Compile_IDIV( mod, rm, sib, disp, imm, size )
-            if ( optInfo->OptimizeFlag & OPTIMIZE_IMM )
-            {
-                //Compile_MoveImm ( int8 direction, int8 rm, int8 sib, int64 disp, int64 imm, int8 immSize )
-                Compile_MoveImm ( REG, OREG, 0, optInfo->Optimize_Imm, CELL ) ;
-                //Compile_IDIV ( REG, R9D, 0, 0, 0, 0, 0 ) ;
-                Compile_IDIV ( REG, OREG, 0, 0, 0, 0, 0 ) ;
-            }
-            else
-            {
-                //Compiler_Word_SetCodingHere_And_ClearPreviousUseOf_Here_SCA (optInfo->opWord, 0) ;
-                Compile_DIV ( optInfo->Optimize_Mod, optInfo->Optimize_Rm, REX_B | MODRM_B | DISP_B, 0,
-                    optInfo->Optimize_Disp, 0, CELL_SIZE ) ;
-            }
-            Compile_Move_Reg_To_Rm ( OREG2, RAX, 0 ) ;
-        }
-        else
-        {
-            _Compile_Move_StackNRm_To_Reg ( ACC, DSP, - 1 ) ; // address of dividend is second on stack
-            Compile_MoveImm ( REG, RDX, 0, 0, CELL ) ;
-            Compiler_WordStack_SCHCPUSCA ( 0, 0 ) ;
-            Compile_IDIV ( MEM, DSP, 0, 0, 0, 0, 0 ) ; // divisor is tos
-            _Compile_Stack_Drop ( DSP ) ;
-            _Compile_Move_Reg_To_StackNRm_UsingReg ( DSP, 0, ACC, THRU_REG ) ;
-        }
-    }
-    RestoreSavedState ( _CfrTil_, OPTIMIZE_ON ) ;
 }
 
 void
@@ -395,4 +262,5 @@ CfrTil_IncDec ( int64 op ) // +
     _CfrTil_Do_IncDec ( op ) ;
     SetState ( _Debugger_, DEBUG_SHTL_OFF, false ) ;
 }
+
 

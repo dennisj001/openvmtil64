@@ -161,7 +161,7 @@ CfrTil_C_LeftParen ( )
 }
 
 void
-_CfrTil_C_Infix_EqualOp ( Word * opWord )
+_CfrTil_C_Infix_EqualOp ( block op )
 {
     Context * cntx = _Context_ ;
     Interpreter * interp = cntx->Interpreter0 ;
@@ -172,7 +172,7 @@ _CfrTil_C_Infix_EqualOp ( Word * opWord )
     int64 svscwi = word0 ? word0->W_SC_Index : 0 ;
     byte * svName ;
     SetState ( compiler, C_INFIX_EQUAL, true ) ;
-    _CfrTil_WordList_PopWords ( 1 ) ;
+    _CfrTil_WordList_PopWords ( 1 ) ; // because we are going to call the opWord in compilable order below 
     word0a = CfrTil_WordList ( 0 ) ;
     if ( lhsWord )
     {
@@ -193,10 +193,11 @@ _CfrTil_C_Infix_EqualOp ( Word * opWord )
     }
     else wordr = _CfrTil_->PokeWord ;
     d0 ( if ( Is_DebugModeOn ) Compiler_SC_WordList_Show ( "\nCfrTil_C_Infix_EqualOp : before op word", 0, 0 ) ) ;
-    if ( opWord )
+    if ( op )
     {
-        rword = opWord ;
-        Interpreter_DoWord_Default ( interp, rword, tsrli, svscwi ) ;
+        //rword = opWord ;
+        //Interpreter_DoWord_Default ( interp, rword, tsrli, svscwi ) ;
+        Block_Eval ( op ) ;
     }
     else
     {
@@ -205,7 +206,7 @@ _CfrTil_C_Infix_EqualOp ( Word * opWord )
         rword->Name = ( byte* ) "=" ;
         SetState ( _Debugger_, DBG_OUTPUT_SUBSTITUTION, true ) ;
         _Debugger_->SubstitutedWord = rword ;
-        Interpreter_DoWord_Default ( interp, rword, tsrli, svscwi ) ;
+        Interpreter_DoWord_Default ( interp, rword, tsrli, svscwi ) ; // remember _CfrTil_WordList_PopWords earlier in this function
         SetState ( _Debugger_, ( DBG_OUTPUT_SUBSTITUTION ), false ) ;
         rword->Name = svName ;
     }
@@ -236,7 +237,7 @@ CfrTil_C_ConditionalExpression ( )
     Interpreter * interp = cntx->Interpreter0 ;
     Compiler * compiler = cntx->Compiler0 ;
     Word * word1 ;
-    if ( ( ! Compiling ) && ( ! GetState ( compiler, C_CONDITIONAL_IN ) ) ) Compiler_Init ( _Compiler_, 0, 1 ) ;
+    if ( ( ! Compiling ) && ( ! GetState ( compiler, C_CONDITIONAL_IN ) ) ) Compiler_Init ( _Compiler_, 0, 0 ) ;
     SetState ( compiler, C_CONDITIONAL_IN, true ) ;
     if ( CompileMode )
     {
@@ -290,9 +291,16 @@ IsLValue_String_CheckForwardToStatementEnd ( byte * nc )
             case '=':
             {
                 if ( * ( nc + 1 ) == '=' ) return false ;
-                //else if ( ispunct ( * ( nc - 1 ) ) && ( ( * ( nc - 1 ) ) != '<' ) && ( ( * ( nc - 1 ) ) != '>' ) ) return false ; // op equal // ?? >= <=
-                else if ( (onc1 = * ( nc - 1 )), ispunct ( onc1 ) && ( onc1 != '<' ) && ( onc1 != '>' ) ) return false ; // op equal // ?? >= <=
-                else return true ; // we have an lvalue
+                else
+                {
+                    onc1 = * ( nc - 1 ) ;
+                    if ( ispunct ( onc1 ) )
+                    {
+                        if ( ( onc1 != '<' ) && ( onc1 != '>' ) && ( onc1 != '!' ) ) return true ; // op equal // ?? >= <=
+                        else return false ;
+                    }
+                    else return true ;
+                }
             }
             case '[':
             {
@@ -371,9 +379,16 @@ Lexer_IsLValue_CheckForwardToNextSemiForArrayVariable ( Lexer * lexer, Word * wo
                 case '=':
                 {
                     if ( * ( nc + 1 ) == '=' ) return false ;
-                        //else if ( ispunct ( * ( nc - 1 ) ) ) return false ; // op equal
-                    else if ( (onc1 = * ( nc - 1 )), ispunct ( onc1 ) && ( onc1 != '<' ) && ( onc1 != '>' ) ) return false ; // op equal // ?? >= <=
-                    else return true ; // we have an lvalue
+                    else
+                    {
+                        onc1 = * ( nc - 1 ) ;
+                        if ( ispunct ( onc1 ) )
+                        {
+                            if ( ( onc1 != '<' ) && ( onc1 != '>' ) ) return true ; // op equal // ?? >= <=
+                            else return false ;
+                        }
+                        else return true ;
+                    }
                 }
                 case '[': inArray = true, space = false ;
                 case ']': inArray = false, space = false ;

@@ -9,7 +9,7 @@ _Debugger_InterpreterLoop ( Debugger * debugger )
         _Debugger_DoState ( debugger ) ;
         if ( ! GetState ( _Debugger_, DBG_AUTO_MODE | DBG_AUTO_MODE_ONCE ) )
         {
-            debugger->Key = Key ( ) ;
+            while ( ( debugger->Key = Key ( ) ) == - 1 ) ;
             if ( debugger->Key != 'z' ) debugger->SaveKey = debugger->Key ;
         }
         SetState ( _Debugger_, DBG_AUTO_MODE_ONCE, false ) ;
@@ -57,7 +57,7 @@ Debugger_PreSetup ( Debugger * debugger, Word * word, byte * token, byte * addre
                     debugger->w_Word = word ;
                     if ( forceFlag ) debugger->LastShowWord = 0 ;
                     SetState ( debugger, DBG_COMPILE_MODE, CompileMode ) ;
-                    SetState_TrueFalse ( debugger, DBG_ACTIVE | DBG_INFO | DBG_PROMPT, DBG_INTERPRET_LOOP_DONE | DBG_PRE_DONE | DBG_CONTINUE | DBG_STEPPING | DBG_STEPPED ) ;
+                    SetState_TrueFalse ( debugger, DBG_ACTIVE | DBG_INFO | DBG_PROMPT, DBG_BRK_INIT | DBG_CONTINUE_MODE | DBG_INTERPRET_LOOP_DONE | DBG_PRE_DONE | DBG_CONTINUE | DBG_STEPPING | DBG_STEPPED ) ;
                     if ( word ) debugger->TokenStart_ReadLineIndex = word->W_RL_Index ;
                     debugger->SaveDsp = _Dsp_ ;
                     if ( ! debugger->StartHere ) debugger->StartHere = Here ;
@@ -157,7 +157,7 @@ Debugger_GetDbgAddressFromRsp ( Debugger * debugger, Cpu * cpu )
             Stack_Push ( debugger->ReturnStack, ( uint64 ) retAddr ) ;
         }
         if ( _Q_->Verbosity > 1 ) Stack_Print ( debugger->ReturnStack, ( byte* ) "debugger->ReturnStack ", 0 ) ;
-        debugger->DebugAddress = ( byte* ) Stack_Top ( debugger->ReturnStack ) ;
+        debugger->DebugAddress = ( byte* ) _Stack_Pick ( debugger->ReturnStack, (d > 2) ? 2 : (d - 1) ) ; //Stack_Top ( debugger->ReturnStack ) ;
         Stack_Pop ( debugger->ReturnStack ) ; // don't return to the current function on first RET
     }
     else debugger->DebugAddress = ( byte* ) cpu->Rsp[0] ;
@@ -359,7 +359,7 @@ Debugger_Stack ( Debugger * debugger )
     }
     else _Debugger_PrintDataStack ( Stack_Depth ( _DataStack_ ) ) ;
 #else
-    CfrTil_PrintDataStack ( ) ; 
+    CfrTil_PrintDataStack ( ) ;
 #endif    
 }
 

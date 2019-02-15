@@ -286,7 +286,7 @@ _CalculateRex ( reg rm rex_w_flag | rex )
     //  0100    WRXB
     rex = 0 ;
     if ( rex_w_flag ) rex = 8 ;
-    if ( reg > 0x7 ) rex d: += 4 ; // (1 << 2) ;
+    if ( reg > 0x7 ) rex += 4 ; // (1 << 2) ;
     //if ( sib > 0x7 ) rex += 2 ; // 1 << 1 ;
     if ( rm > 0x7 ) rex += 1 ;
     if ( rex ) rex |= 0x40 ;

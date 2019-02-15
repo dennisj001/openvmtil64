@@ -230,7 +230,9 @@ _String_AppendConvertCharToBackSlash ( byte * dst, byte c, int64 * index ) //, i
     }
     else
     {
-        if ( ! ( ( c == ' ' ) && ( dst [i - 1] == ' ' ) ) ) dst [ i ++ ] = c ; // remove extra spaces
+        //if ( ! ( ( c == ' ' ) && ( dst [ i ] == ' ' ) && ( dst [i - 1] == ' ' ) ) ) dst [ i ++ ] = c ; // remove extra spaces
+        //if ( ! ( ( c == ' ' ) && ( dst [i - 1] == ' ' ) ) ) dst [ i ++ ] = c ; // remove extra spaces
+        dst [ i ++ ] = c ; 
     }
     dst [ i ] = 0 ;
     if ( index ) *index = i ;

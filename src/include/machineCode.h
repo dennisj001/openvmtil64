@@ -238,8 +238,8 @@ register int64 *Fp              asm ("r15" ) ;
 #define SUB 5
 #define XOR 6
 #define CMP 7
-#define TEST_R_TO_R 8  // internal code - not an intel code
-#define XCHG_R_TO_R 9  // internal code - not an intel code
+#define MUL_OP 8  // internal code - not an intel code
+#define DIV_OP 9  // internal code - not an intel code
 
 // group 5 codes : inc/dec call/jmp push
 // 0xfe-0xff

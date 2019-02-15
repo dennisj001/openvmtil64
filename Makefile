@@ -3,7 +3,7 @@ SOURCES = src/basis/compiler/machineCode.c src/basis/compiler/_compile.c src/bas
 	src/basis/compiler/combinators.c src/basis/compiler/math.c src/basis/compiler/cpu.c \
 	src/basis/compiler/stack.c src/basis/compiler/logic.c src/basis/core/dataObjectRun.c\
 	src/basis/core/block.c src/basis/compiler/blocks.c src/basis/core/conditionals.c src/basis/compiler/compile.c src/basis/core/_system.c\
-	src/basis/compiler/optimize.c src/basis/compiler/bits.c src/basis/compiler/udis.c src/basis/compiler/arrays.c \
+	src/basis/compiler/optimize.c src/basis/compiler/bit.c src/basis/compiler/udis.c src/basis/compiler/arrays.c \
 	src/basis/core/io.c src/basis/core/symbol.c src/basis/repl.c src/basis/core/syntax.c src/basis/core/dataObjectNew.c\
         src/basis/cfrtil64.c src/basis/core/parse.c src/basis/core/memSpace.c src/basis/init.c src/basis/system.c src/basis/core/charSet.c\
 	src/basis/core/dllist.c src/basis/core/interpret.c src/basis/core/lexer.c src/basis/core/cstack.c src/basis/core/classes.c src/basis/debugOutput.c\

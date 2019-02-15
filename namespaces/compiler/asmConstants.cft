@@ -60,7 +60,7 @@ decimal
 'INC 0 const
 'DEC 1 const
 sp
-#if 1 
+#if 0 // #define is not yet setting these word attributes to CONSTANT|LITERAL
 c_syntaxOn
 #define REX_B           ( 1 << 0 ) // 2
 #define MODRM_B         ( 1 << 1 ) // 2 backwards compatibility

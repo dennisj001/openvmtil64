@@ -48,7 +48,7 @@ _Word_Interpret ( Word * word )
 void
 _Word_Compile ( Word * word )
 {
-    Compiler_Word_SetCodingHere_And_ClearPreviousUseOf_Here_SCA ( word, 0 ) ;
+    Compiler_SCA_Word_SetCodingHere_And_ClearPreviousUse ( word, 0 ) ;
     if ( ! word->Definition ) CfrTil_SetupRecursiveCall ( ) ;
     else if ( ( GetState ( _CfrTil_, INLINE_ON ) ) && ( word->CAttribute & INLINE ) && ( word->S_CodeSize ) ) _Compile_WordInline ( word ) ;
     else Compile_CallWord_Check_X84_ABI_RSP_ADJUST ( word ) ;
@@ -83,6 +83,7 @@ Word_Copy ( Word * word0, uint64 allocType )
 void
 _Word_Finish ( Word * word )
 {
+    DObject_Finish ( word ) ;
     CfrTil_FinishSourceCode ( _CfrTil_, word ) ;
     _CfrTil_->LastFinished_Word = word ;
     CfrTil_TypeStackReset ( ) ;
@@ -176,7 +177,6 @@ _Word_New ( byte * name, uint64 ctype, uint64 ctype2, uint64 ltype, Boolean addT
     Word * word = _Word_Create ( name, ctype, ctype2, ltype, allocType ) ; // CFRTIL_WORD : cfrTil compiled words as opposed to C compiled words
     _Compiler_->CurrentWord = word ;
     Word_SetLocation ( word ) ;
-    DObject_Finish ( word ) ;
     _Word_Add ( word, addToInNs, addToNs ) ; // add to the head of the list
     //CfrTil_WordList_PushWord ( word ) ;
     //Compiler_Word_SCH_CPUSCA ( word, 0 ) ;

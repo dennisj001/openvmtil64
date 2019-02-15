@@ -286,11 +286,3 @@ _Namespace_New ( byte * name, Namespace * containingNs )
     return ns ;
 }
 
-void
-_CfrTil_MachineCodePrimitive_NewAdd ( const char * name, uint64 cType, int64 ctype2, block * callHook, byte * function, int64 functionArg, const char *nameSpace, const char * superNamespace )
-{
-    //_DObject_New ( byte * name, uint64 value, uint64 ctype, uint64 ltype, uint64 ftype, byte * function, int64 arg, int64 addToInNs, Namespace * addToNs, uint64 allocType )
-    Word * word = _DObject_New ( ( byte* ) name, ( uint64 ) function, ( cType | CPRIMITIVE ), ctype2, 0, 0, function, functionArg, 0, 0, DICTIONARY ) ;
-    if ( callHook ) *callHook = word->Definition ;
-    _CfrTil_InitialAddWordToNamespace ( word, ( byte* ) nameSpace, ( byte* ) superNamespace ) ;
-}

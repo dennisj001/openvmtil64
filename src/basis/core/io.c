@@ -114,7 +114,7 @@ Emit ( byte c )
 void
 Context_DoPrompt ( Context * cntx )
 {
-    if ( ( ReadLiner_GetLastChar() != '\n' ) || ( ! IS_INCLUDING_FILES ) || ( GetState ( _Debugger_, DBG_ACTIVE ) ) )
+    if ( ( ReadLiner_GetLastChar ( ) != '\n' ) || ( ! IS_INCLUDING_FILES ) || ( GetState ( _Debugger_, DBG_ACTIVE ) ) )
     {
         //int x = 0, y = 0 ;
         //getCursor ( &x, &y ) ;
@@ -139,16 +139,19 @@ _Printf ( byte *format, ... )
     if ( _Q_->Verbosity ) //GetState ( _ReadLiner_, CHAR_ECHO ) )
     {
         va_list args ;
-        
+
         va_start ( args, ( char* ) format ) ;
         vprintf ( ( char* ) format, args ) ;
         va_end ( args ) ;
         fflush ( stdout ) ;
-        
-        va_start ( args, ( char* ) format ) ;
-        if ( _CfrTil_ && _CfrTil_->LogFlag && _CfrTil_->LogFILE ) vfprintf ( _CfrTil_->LogFILE, ( char* ) format, args ) ;
-        va_end ( args ) ;
-        fflush ( _CfrTil_->LogFILE ) ;
+
+        if ( _CfrTil_ && _CfrTil_->LogFlag && _CfrTil_->LogFILE )
+        {
+            va_start ( args, ( char* ) format ) ;
+            vfprintf ( _CfrTil_->LogFILE, ( char* ) format, args ) ;
+            va_end ( args ) ;
+            fflush ( _CfrTil_->LogFILE ) ;
+        }
     }
     //ReadLiner_SetLastChar ( 0 ) ; //
 }

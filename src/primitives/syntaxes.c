@@ -99,8 +99,8 @@ CfrTil_End_C_Block ( )
         // we're still compiling so ... ??
 
         Word * word = _Context_CurrentWord ( cntx ) ;
-        word->W_NumberOfArgs = compiler->NumberOfArgs ;
-        word->W_NumberOfLocals = compiler->NumberOfLocals ;
+        word->W_NumberOfNonRegisterArgs = compiler->NumberOfArgs ;
+        word->W_NumberOfNonRegisterLocals = compiler->NumberOfLocals ;
     }
     CfrTil_SetInNamespaceFromBackground ( ) ;
 }

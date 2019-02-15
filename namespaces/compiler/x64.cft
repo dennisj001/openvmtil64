@@ -117,6 +117,7 @@ CalculateModRegardingDisplacement ( _mod,  disp | rmod ) // _mod/rmod avoid name
 #endif
     }
     else rmod = _mod ;
+    <d:dbg>
     return rmod ;
 } prefix
 //'CalculateModRegardingDisplacement find wdiss apause
@@ -140,7 +141,7 @@ CalculateModRmByte ( _mod, reg, rm, sib, disp | modRm )
         reg = 0 ;
     }
     //modRm = ( _mod << 6 ) + ( ( ( reg Bits.& 0x7 ) << 3 ) + ( rm Bits.& 0x7 ) ) ; // only use 3 bits of reg/rm
-    modRm = ( _mod << 6 ) + ( ( ( reg Bits.& 0x7 ) << 3 ) + ( rm Bits.& 0x7 ) ) ; // only use 3 bits of reg/rm
+    modRm = ( _mod << 6 ) + ( ( reg Bits.& 0x7 ) << 3 ) + ( rm Bits.& 0x7 ) ; // only use 3 bits of reg/rm
     return modRm ;
 } prefix
 
@@ -224,7 +225,7 @@ _Compile_ImmDispData (  immDisp,  immSize,  forceFlag )
     }
     else // with operandSize == 0 let the compiler use the minimal size ; nb. can't be imm == 0
     {
-        d: <dbg> if ( immDisp >= 0x100000000 ) compile8 (immDisp)  ;
+        if ( immDisp >= 0x100000000 ) compile8 (immDisp)  ;
         else 
         {
             if ( immDisp >= 0x100 ) compile4 (immDisp)  ;
@@ -232,7 +233,7 @@ _Compile_ImmDispData (  immDisp,  immSize,  forceFlag )
         }
     }
 } prefix
-'_Compile_ImmDispData find wdiss pause
+//'_Compile_ImmDispData find wdiss pause
 #endif
 
 // Intel - InstructionSet-A-M-253666.pdf - section 2.1 :
@@ -260,29 +261,31 @@ _Compile_ImmDispData (  immDisp,  immSize,  forceFlag )
 //                      REX_B  IMM_B  DISP_B SIB_B   MODRM_B
 
 void
-_Compile_Write_Instruction_X64 ( rex, opCode, modRm, controlFlags, sib, disp, dispSize, imm, immSize )
+_Compile_Write_Instruction_X64 ( rex, opCode0, opCode1, modRm, controlFlags, sib, disp, dispSize, imm, immSize )
 {
-//<dbg>
 #if DBI
     int nbytes, _here  ;
     _here = Here ;
 #endif
     if ( rex ) compile1 ( rex ) ; 
-    if ( opCode >= 0x100 ) compile2 ( opCode ) ; 
-    else compile1 ( opCode ) ; 
+    if ( opCode0 ) compile1 ( opCode0 ) ; 
+    if ( opCode1 ) compile1 ( opCode1 ) ; 
     if ( controlFlags Bits.& MODRM_B ) compile1 ( modRm ) ;
     if ( sib && ( controlFlags Bits.& SIB_B ) ) compile1 ( sib ) ;
     if ( disp || ( controlFlags Bits.& DISP_B ) ) _Compile_ImmDispData ( disp, dispSize, 0 ) ;
     if ( imm || ( controlFlags Bits.& IMM_B ) ) _Compile_ImmDispData ( imm, immSize, ( controlFlags Bits.& IMM_B ) ) ;
 #if DBI
     nbytes = Here - _here ; 
-    printf ( "\n_Compile_Write_Instruction_X64 : %lx : %d bytes : ...", _here, nbytes ) ; dis ( _here, nbytes ) ; //pause () ; nl ; nl ; 
+    printf ( "\n_Compile_Write_Instruction_X64 : %lx : %d bytes : ...", _here, nbytes ) ; 
+    //<d:dbg>
+    dis ( _here, nbytes ) ; //pause () ; nl ; nl ; 
 #endif
+    //<d:dbg>
 } prefix
 //'_Compile_Write_Instruction_X64 find wdiss //pause
 
 int 
-_CalculateRex ( reg rm rex_w_flag | rex )
+CalculateRex ( reg rm rex_w_flag | rex )
 {
 #if 1
     //  0100    WRXB
@@ -292,37 +295,37 @@ _CalculateRex ( reg rm rex_w_flag | rex )
     //if ( sib > 0x7 ) rex += 2 ; // 1 << 1 ;
     if ( rm > 0x7 ) rex += 1 ;
     if ( rex ) rex |= 0x40 ;
-    return rex ;
 #else // from machineCode.c - testing new '?' conditional expression
+    //<dbg> 
     rex = ( ( rex_w_flag ? 8 : 0 ) | ( ( reg > 7 ) ? 4 : 0 ) | ( ( rm > 7 ) ? 1 : 0 ) ) ;
     if ( rex ) rex |= 0x40 ;
-    return rex ;
 #endif    
+    return rex ;
 } prefix // prefix is not automatic with c syntax so they can be used like rpn words
-//'_CalculateRex find wdiss pause
-
+//'CalculateRex find wdiss pause
 
 void
-Compile_CalcWrite_Instruction_X64 (  rex,  opCode,  _mod,  reg,  rm, controlFlags,  sib,  disp,  dispSize,  imm,  immSize | modRm )
+Compile_CalculateWrite_Instruction_X64 ( code0, code1, mod, reg, rm, controlFlags, sib, disp, dispSize, imm, immSize )
 {
-    rex = _CalculateRex ( reg, rm, ( immSize == 8 ) || ( controlFlags Bits.& REX_B ) ) ;
-    modRm = CalculateModRmByte ( _mod, reg, rm, sib, disp ) ;
-    _Compile_Write_Instruction_X64 ( rex, opCode, modRm, controlFlags, sib, disp, dispSize, imm, immSize ) ;
+    byte rex = CalculateRex ( reg, rm, ( immSize == 8 ) || ( controlFlags Bits.& REX_B ) ) ;
+                //CalculateModRmByte ( _mod, reg, rm, sib, disp | modRm )
+    byte modRm = CalculateModRmByte ( mod, reg, rm, sib, disp ) ;
+    _Compile_Write_Instruction_X64 ( rex, code0, code1, modRm, controlFlags, sib, disp, dispSize, imm, immSize ) ;
 } prefix
-//'Compile_CalcWrite_Instruction_X64 find wdiss apause
+//'Compile_CalculateWrite_Instruction_X64 find wdiss apause
 
 void 
 _Compile_Move ( toRegOrMem _mod reg rm controlFlags disp | opCode ) 
 {
     if ( toRegOrMem == REG ) opCode = #x8b ; 
     else opCode = #x89 ; 
-    //Compile_CalcWrite_Instruction_X64 ( rex,  opCode,  _mod,  reg,  rm, controlFlags,  sib,  disp,  dispSize,  imm,  immSize | modRm )
-    Compile_CalcWrite_Instruction_X64 ( 0, opCode, _mod, reg, rm, controlFlags, 0, disp, 0, 0, 0 ) ;
+    //Compile_CalculateWrite_Instruction_X64 ( rex,  opCode,  _mod,  reg,  rm, controlFlags,  sib,  disp,  dispSize,  imm,  immSize | modRm )
+    Compile_CalculateWrite_Instruction_X64 ( 0, opCode, _mod, reg, rm, controlFlags, 0, disp, 0, 0, 0 ) ;
 } prefix
 //'_Compile_Move find wdiss //pause
 
 //                                          _Compile_Move ( toRegOrMem _mod reg rm controlFlags disp | opCode ) 
-void _Compile_Move_DataStackN_ToReg ( reg n ) { <dbg> _Compile_Move ( REG, MEM, reg, DSP, (REX_B | MODRM_B | DISP_B), n * CELL ) ; } prefix 
+void _Compile_Move_DataStackN_ToReg ( reg n ) { _Compile_Move ( REG, MEM, reg, DSP, (REX_B | MODRM_B | DISP_B), n * CELL ) ; } prefix 
 
 // group1 : ADD OR ADC SBB AND_OPCODE SUB XOR CMP : with immediate data
 void 
@@ -342,15 +345,14 @@ _Compile_Group1_Immediate ( code _mod rm disp imm immSize | opCode ) //controlFl
     { 
         if ( ( immSize <= BYTE ) || ( imm < 0x100 ) ) opCode |= 3 ; 
     }
-    //Compile_CalcWrite_Instruction_X64 (  rex,  opCode,  _mod,  reg,  rm, controlFlags,  sib,  disp,  dispSize,  imm,  immSize | modRm )
-    Compile_CalcWrite_Instruction_X64 (  0,  opCode,  _mod,  code, rm, (REX_B | MODRM_B | DISP_B | IMM_B),  0,  disp,  0,  imm,  immSize ) ;
+    //Compile_CalculateWrite_Instruction_X64 (  rex,  opCode,  _mod,  reg,  rm, controlFlags,  sib,  disp,  dispSize,  imm,  immSize | modRm )
+    Compile_CalculateWrite_Instruction_X64 (  0,  opCode,  _mod,  code, rm, (REX_B | MODRM_B | DISP_B | IMM_B),  0,  disp,  0,  imm,  immSize ) ;
 } prefix
 
 void
 _Compile_Group5 ( code, mod, rm, sib, disp, size )
 {
-    //Compile_CalcWrite_Instruction_X64 ( 0, 0xff, mod, code, rm, REX_B | MODRM_B | DISP_B, sib, disp, size, 0, 0 ) ;
-    Compile_CalcWrite_Instruction_X64 ( 0, 0xff, mod, code, rm, (REX_B | MODRM_B | DISP_B), sib, disp, size, 0, 0 ) ;
+    Compile_CalculateWrite_Instruction_X64 ( 0, 0xff, mod, code, rm, (REX_B | MODRM_B | DISP_B), sib, disp, size, 0, 0 ) ;
 } prefix
 
 void
@@ -365,27 +367,27 @@ void _Compile_SUBI_DSP ( imm ) { _Compile_Group1_Immediate ( SUB, REG, DSP, 0, i
 void
 _Compile_Test ( _mod, reg, rm, controlFlags, disp, imm )
 {
-    Compile_CalcWrite_Instruction_X64 ( 0, 0xf7, _mod, reg, rm, REX_B | MODRM_B | controlFlags, 0, disp, 0, imm, 0 ) ; //??
+    Compile_CalculateWrite_Instruction_X64 ( 0, 0xf7, _mod, reg, rm, REX_B | MODRM_B | controlFlags, 0, disp, 0, imm, 0 ) ; //??
 } prefix
 
 void
-_Compile_Movereg_To_Rm ( dstRmReg, srcReg, rmRegDisp )
+_Compile_MoveReg_To_Rm ( dstRmReg, srcReg, rmRegDisp )
 {
     //_Compile_Move ( toRegOrMem _mod reg rm controlFlags disp | opCode ) 
     _Compile_Move ( MEM, MEM, srcReg, dstRmReg, (REX_B | MODRM_B | DISP_B), rmRegDisp ) ;
 } prefix
 
 void
-_Compile_Movereg_To_StackN ( stackReg, index, reg )
+_Compile_MoveReg_To_StackN ( stackReg, index, reg )
 {
-    _Compile_Movereg_To_Rm ( stackReg, reg, index * CELL ) ;
+    _Compile_MoveReg_To_Rm ( stackReg, reg, index * CELL ) ;
 } prefix
 
 void
 _Compile_TESTreg_Toreg ( dstReg, srcReg )
 {
     //_Compile_Op_Specialreg_Toreg ( TEST_R_TO_R, dstReg, srcReg ) ;
-    Compile_CalcWrite_Instruction_X64 ( 0, 0x85, 3, srcReg, dstReg, REX_B | MODRM_B, 0, 0, 0, 0, 0 ) ;
+    Compile_CalculateWrite_Instruction_X64 ( 0, 0x85, 3, srcReg, dstReg, REX_B | MODRM_B, 0, 0, 0, 0, 0 ) ;
 
 } prefix
 
@@ -393,6 +395,7 @@ _Compile_TESTreg_Toreg ( dstReg, srcReg )
 #define Compile_DEC( mod, rm, sib, disp ) _Compile_Group5 ( DEC, mod, rm, sib, disp, 0  )
 c_syntaxOff
 infixOn
+//verbosity 3 =
 C X64
 sp
 C_Syntax
@@ -407,15 +410,14 @@ sp
 sp
 C X64
 #if x64_dbg
-//verbosity 3 =
 Combinators
 
 sp
 :asm iax
-    d: _Compile_Stack_PopToReg ( R8D )             //4d8b06                  mov r8, [r14]       
-    _Compile_CallThruReg ( R8D )                //4983ee08                sub r14, 0x8
-                                                //49ffd0                  call r8  
-                                                //c3                      ret      
+    _Compile_Stack_PopToReg ( R8D )          //4d8b06                  mov r8, [r14]       
+    _Compile_CallThruReg ( R8D )          //4983ee08                sub r14, 0x8
+                                             //49ffd0                  call r8  
+                                             //c3                      ret      
 asm; 
 
 ' iax find wdiss sp 
@@ -426,7 +428,7 @@ asm;
 
 : _Compile_IncDecreg ( op, reg )
     //_Compile_Group5 ( op @, REG, reg @, 0, 0, 0  )
-    Compile_CalcWrite_Instruction_X64 ( 0, 0xff, REG, op @, reg @, REX_B | MODRM_B, 0, 0, 0, 0, 0 ) 
+    Compile_CalculateWrite_Instruction_X64 ( 0, 0xff, REG, op @, reg @, REX_B | MODRM_B, 0, 0, 0, 0, 0 ) 
 ;;
 
 : _Compile_MoveTOS_To_R8D () _Compile_Move_DataStackN_ToReg ( R8D, 0 ) ;; // _Compile_Move ( REG, 0, EAX, DSP, 0 ) 
@@ -438,7 +440,7 @@ asm;
 
 : Compile_Stack_Push_R8D ()
     _Compile_ADDI_DSP ( CELL ) 
-    _Compile_Movereg_To_StackN ( DSP, 0, R8D ) 
+    _Compile_MoveReg_To_StackN ( DSP, 0, R8D ) 
 ;; 
 
 Interpreter User 
@@ -474,7 +476,7 @@ Stack
     _Compile_TESTreg_Toreg ( R8D, R8D )
     "end" 0 EQ jcc
     _Compile_ADDI_DSP ( CELL ) 
-    _Compile_Movereg_To_StackN ( DSP, 0, R9D ) 
+    _Compile_MoveReg_To_StackN ( DSP, 0, R9D ) 
     _Compile_IncDecreg ( DEC, R8D ) 
     "start" goto
     "end" label // above jcc to Here
@@ -511,4 +513,5 @@ infixOff
 sp 
 2 + 7 assertStkChk // stack checking
 //logOff
+pause
     

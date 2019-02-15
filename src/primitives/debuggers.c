@@ -60,14 +60,14 @@ CfrTil_DebugOff ( )
 }
 
 void
-_CfrTil_DebugRuntimeBreakpoint ( )
+CfrTil_DebugRuntimeBreakpoint ( )
 {
     Debugger * debugger = _Debugger_ ;
-    if ( ( ! CompileMode ) )
+    //if ( ( ! CompileMode ) )
     {
-        if ( ! GetState ( debugger, ( DBG_BRK_INIT|DBG_CONTINUE_MODE ) ) )
+        if ( ! GetState ( debugger, ( DBG_BRK_INIT)) ) //|DBG_CONTINUE_MODE ) ) )
         {
-            if ( GetState ( debugger, DBG_INTERPRET_LOOP_DONE ) )//|| GetState ( debugger, DBG_CONTINUE_MODE|DBG_AUTO_MODE ) )
+            if ( GetState ( debugger, DBG_INTERPRET_LOOP_DONE ) )
             {
                 // getRsp and debugger->SaveCpuState ( ) has been called by _Compile_Debug1 which calls this function
                 SetState ( debugger, ( DBG_BRK_INIT | DBG_RUNTIME_BREAKPOINT ), true ) ;
@@ -93,7 +93,14 @@ _CfrTil_DebugRuntimeBreakpoint ( )
 }
 
 void
-CfrTil_DebugRuntimeBreakpoint_dso ( )
+CfrTil_DebugRuntimeBreakpoint_IsDebugShowOn ( )
 {
     if ( Is_DebugShowOn ) CfrTil_DebugRuntimeBreakpoint ( ) ;
 }
+
+void
+CfrTil_DebugRuntimeBreakpoint_IsDebugOn ( )
+{
+    if ( Is_DebugOn ) CfrTil_DebugRuntimeBreakpoint ( ) ;
+}
+

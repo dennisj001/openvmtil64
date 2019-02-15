@@ -139,8 +139,8 @@ called: g++
 	-ggdb
 	-c
 	-o
-	src/basis/compiler/bits.o
-	src/basis/compiler/bits.c
+	src/basis/compiler/bit.o
+	src/basis/compiler/bit.c
 
 called: g++
 	/media/sdc4/dennisj/openvmtil64
@@ -873,7 +873,7 @@ called: g++
 	src/basis/compiler/compile.o
 	src/basis/core/_system.o
 	src/basis/compiler/optimize.o
-	src/basis/compiler/bits.o
+	src/basis/compiler/bit.o
 	src/basis/compiler/udis.o
 	src/basis/compiler/arrays.o
 	src/basis/core/io.o
@@ -970,7 +970,7 @@ called: /usr/bin/ld
 	-plugin
 	/usr/lib/gcc/x86_64-linux-gnu/8/liblto_plugin.so
 	-plugin-opt=/usr/lib/gcc/x86_64-linux-gnu/8/lto-wrapper
-	-plugin-opt=-fresolution=/tmp/ccSYaFWz.res
+	-plugin-opt=-fresolution=/tmp/ccaE5nyZ.res
 	-plugin-opt=-pass-through=-lgcc_s
 	-plugin-opt=-pass-through=-lgcc
 	-plugin-opt=-pass-through=-lc
@@ -1019,7 +1019,7 @@ called: /usr/bin/ld
 	src/basis/compiler/compile.o
 	src/basis/core/_system.o
 	src/basis/compiler/optimize.o
-	src/basis/compiler/bits.o
+	src/basis/compiler/bit.o
 	src/basis/compiler/udis.o
 	src/basis/compiler/arrays.o
 	src/basis/core/io.o

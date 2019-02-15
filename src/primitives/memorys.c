@@ -1,5 +1,13 @@
 #include "../include/cfrtil64.h"
 
+void
+CfrTil_Peek ( ) // @
+{
+    if ( CompileMode ) Compile_Peek ( _Context_->Compiler0, DSP ) ;
+    else TOS = * ( int64* ) TOS ;
+    //_Context_->Interpreter0->BaseObject = 0 ;
+}
+
 // reg -- puts reg value TOS
 
 // peekReg ( reg -- regValue ) //reg : reg number :: returns reg value on top of stack
@@ -53,20 +61,12 @@ CfrTil_PokeRegAtAddress ( ) // @
     ( ( VoidFunction ) ba->BA_Data ) ( ) ;
 }
 
-void
-CfrTil_Peek ( ) // @
-{
-    if ( CompileMode ) Compile_Peek ( _Context_->Compiler0, DSP ) ;
-    else TOS = * ( int64* ) TOS ;
-    //_Context_->Interpreter0->BaseObject = 0 ;
-}
-
 // ( addr n -- ) // (*addr) = n
 
 void
 CfrTil_Poke ( ) // = 
 {
-    if ( CompileMode ) Compile_Poke ( _Context_->Compiler0, DSP ) ;
+    if ( CompileMode ) Compile_Poke (_Context_->Compiler0) ;
     else
     {
         uint64 * tos = ( uint64 * ) TOS ;
@@ -93,7 +93,7 @@ CfrTil_AtEqual ( ) // !
 void
 CfrTil_Store ( ) // !
 {
-    if ( CompileMode ) Compile_Store ( _Context_->Compiler0, DSP ) ;
+    if ( CompileMode ) Compile_Store (_Context_->Compiler0) ;
     else
     {
         * ( int64* ) ( TOS ) = _Dsp_ [ - 1 ] ;

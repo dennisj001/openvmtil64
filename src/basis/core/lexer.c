@@ -262,7 +262,8 @@ Lexer_IsWordPrefixing ( Lexer * lexer, Word * word )
 {
 #if 1    
     if ( GetState ( _Context_, LC_INTERPRET ) ) return true ;
-    else if ( ( GetState ( _Context_, PREFIX_MODE ) ) && ( ! ( word->CAttribute & (CATEGORY_OP_OPEQUAL|CATEGORY_OP_EQUAL|KEYWORD) ) ) && ( ! ( word->WAttribute & WT_C_PREFIX_RTL_ARGS ) ) ) 
+    else if ( ( GetState ( _Context_, PREFIX_MODE ) ) && 
+        ( ! ( word->CAttribute & (CATEGORY_OP_OPEQUAL|CATEGORY_OP_EQUAL|KEYWORD) ) ) && ( ! ( word->WAttribute & WT_C_PREFIX_RTL_ARGS ) ) ) 
 #else
     if ( GetState ( _Context_, LC_INTERPRET ) ) return true ;
     else if ( ( GetState ( _Context_, PREFIX_MODE ) ) && ( ! ( word->CAttribute & KEYWORD ) ) && ( ! ( word->WAttribute & WT_C_PREFIX_RTL_ARGS ) ) ) 

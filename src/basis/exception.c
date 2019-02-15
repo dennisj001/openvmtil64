@@ -25,6 +25,7 @@ _OpenVmTil_ShowExceptionInfo ( )
     AlertColors ;
     debugger->w_Word = _Context_->CurrentlyRunningWord ;
     SetState ( debugger, DBG_INFO, true ) ;
+    Debugger_Locals_Show ( debugger ) ;
     Debugger_ShowInfo ( debugger, _Q_->ExceptionMessage, _Q_->Signal ) ;
 
     if ( GetState ( debugger, DBG_STEPPING ) && debugger->DebugAddress )

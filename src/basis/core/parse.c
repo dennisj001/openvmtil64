@@ -112,7 +112,7 @@ gotNextToken:
         {
             token = Lexer_ReadToken ( _Context_->Lexer0 ) ;
             arrayBaseObject = _CfrTil_ClassField_New ( token, ns, size, offset ) ; // nb! : in case there is an array so it will be there for ArrayDimensions
-            token = Lexer_Peek_Next_NonDebugTokenWord (_Context_->Lexer0, 1 , 0) ;
+            token = Lexer_Peek_Next_NonDebugTokenWord ( _Context_->Lexer0, 1, 0 ) ;
             if ( token [0] != '[' )
             {
                 offset += size ;
@@ -428,6 +428,21 @@ Lexer_ParseBigNum ( Lexer * lexer, byte * token )
 }
 // return boolean 0 or 1 if lexer->Literal value is pushed
 
+Boolean
+Lexer_ScanForHexInt ( Lexer * lexer, byte * token )
+{
+    int64 i, sr, scrap, slt = Strlen ( token ) ;
+    if ( sr = sscanf ( ( char* ) token, HEX_INT_FRMT, ( uint64* ) & lexer->Literal ) )
+    {
+        for ( i = 1 ; sr && i < slt ; i ++ )
+        {
+            sr = sscanf ( ( char* ) &token[i], HEX_INT_FRMT, ( int64* ) & scrap ) ;
+        }
+        if ( ! sr ) lexer->Literal = 0 ;
+    }
+    return sr ;
+}
+
 void
 _Lexer_ParseHex ( Lexer * lexer, byte * token )
 {
@@ -439,7 +454,7 @@ _Lexer_ParseHex ( Lexer * lexer, byte * token )
         SetState ( lexer, KNOWN_OBJECT, true ) ;
         Lexer_ParseBigNum ( lexer, token ) ;
     }
-    else if ( sscanf ( ( char* ) token, HEX_INT_FRMT, ( uint64* ) & lexer->Literal ) && sscanf ( ( char* ) &token[1], HEX_INT_FRMT, ( int64* ) & scrap ))
+    else if ( Lexer_ScanForHexInt ( lexer, token ) ) //sscanf ( ( char* ) token, HEX_INT_FRMT, ( uint64* ) & lexer->Literal ) && sscanf ( ( char* ) &token[1], HEX_INT_FRMT, ( int64* ) & scrap ))
     {
         lexer->TokenType = ( T_INT | KNOWN_OBJECT ) ;
         SetState ( lexer, KNOWN_OBJECT, true ) ;

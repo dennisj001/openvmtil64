@@ -31,11 +31,18 @@
  */
 
 int64
-ParameterVar_Offset ( Word * word )
+_ParameterVar_Offset ( Word * word, int64 numberOfArgs, Boolean frameFlag )
 {
     int64 offset ;
-    offset = - ( _Compiler_->NumberOfArgs - word->Index + ( Compiler_IsFrameNecessary ( _Compiler_ ) ? 1 : 0 ) ) ;
-    //offset = - word->Index ;
+    offset = - ( numberOfArgs - word->Index + (frameFlag ? 1 : 0 ) ) ; // is this totally correct??
+    return offset ;
+}
+
+int64
+Compiler_ParameterVar_Offset ( Compiler * compiler, Word * word )
+{
+    int64 offset ;
+    offset = _ParameterVar_Offset ( word, compiler->NumberOfArgs, Compiler_IsFrameNecessary ( compiler ) ) ;
     return offset ;
 }
 
@@ -54,13 +61,20 @@ LocalVar_Disp ( Word * word )
 inline int64
 ParameterVar_Disp ( Word * word )
 {
-    return ( ParameterVar_Offset ( word ) * CELL ) ;
+    return ( Compiler_ParameterVar_Offset ( _Compiler_, word ) * CELL ) ;
+}
+
+inline int64
+_LocalOrParameterVar_Offset ( Word * word, int64 numberOfArgs, Boolean frameFlag )
+{
+    return ( ( word->CAttribute & LOCAL_VARIABLE ) ? ( LocalVar_FpOffset ( word ) ) : ( _ParameterVar_Offset ( word, numberOfArgs, frameFlag ) ) ) ;
 }
 
 inline int64
 LocalOrParameterVar_Offset ( Word * word )
 {
-    return ( ( word->CAttribute & LOCAL_VARIABLE ) ? ( LocalVar_FpOffset ( word ) ) : ( ParameterVar_Offset ( word ) ) ) ;
+    //return ( ( word->CAttribute & LOCAL_VARIABLE ) ? ( LocalVar_FpOffset ( word ) ) : ( ParameterVar_Offset ( word ) ) ) ;
+    return _LocalOrParameterVar_Offset ( word, _Compiler_->NumberOfArgs, Compiler_IsFrameNecessary ( _Compiler_ ) ) ;
 }
 
 inline int64
@@ -125,9 +139,16 @@ Compiler_LocalWord ( Compiler * compiler, byte * name, int64 ctype, int64 ctype2
 //nb. correct only if Compiling !!
 
 inline Boolean
+IsFrameNecessary ( int64 numberOfNonRegisterLocals, int64 numberOfNonRegisterArgs )
+{
+    return ( ( numberOfNonRegisterLocals || numberOfNonRegisterArgs ) ? true : false ) ;
+}
+
+inline Boolean
 Compiler_IsFrameNecessary ( Compiler * compiler )
 {
-    return ( ( compiler->NumberOfNonRegisterLocals || compiler->NumberOfNonRegisterArgs ) ? true : false ) ;
+    //return ( ( compiler->NumberOfNonRegisterLocals || compiler->NumberOfNonRegisterArgs ) ? true : false ) ;
+    return IsFrameNecessary ( compiler->NumberOfNonRegisterLocals, compiler->NumberOfNonRegisterArgs ) ;
 }
 
 void
@@ -140,7 +161,7 @@ Compile_Init_LocalRegisterParamenterVariables ( Compiler * compiler )
     for ( node = dllist_First ( ( dllist* ) list ) ; node ; node = dlnode_Next ( node ) ) //, i -- )
     {
         Word * word = ( Word* ) dobject_Get_M_Slot ( ( dobject* ) node, SCN_T_WORD ) ;
-        _Compile_Move_StackN_To_Reg ( word->RegToUse, ( frameFlag ? FP : DSP ), ParameterVar_Offset ( word ) ) ;
+        _Compile_Move_StackN_To_Reg ( word->RegToUse, ( frameFlag ? FP : DSP ), Compiler_ParameterVar_Offset ( compiler, word ) ) ;
     }
 }
 
@@ -152,7 +173,7 @@ _Compiler_AddLocalFrame ( Compiler * compiler )
     _Compile_LEA ( FP, DSP, 0, CELL ) ; // set new fp
     Compile_ADDI ( REG, DSP, 0, 1 * CELL, INT32_SIZE ) ; // 1 : fp - add stack frame -- this value is going to be reset 
     compiler->FrameSizeCellOffset = ( int64* ) ( Here - INT32_SIZE ) ; // in case we have to add to the framesize with nested locals
-    d0 ( if ( Is_DebugOn ) Compile_Call_TestRSP ( ( byte* ) CfrTil_Debugger_Locals_Show ) ) ;
+    d0 ( if ( Is_DebugOn ) Compile_Call_TestRSP ( ( byte* ) _CfrTil_Debugger_Locals_Show ) ) ;
 }
 
 void
@@ -226,6 +247,7 @@ Compiler_RemoveLocalFrame ( Compiler * compiler )
         }
         Compile_Move_ACC_To_TOS ( DSP ) ;
     }
+    d0 ( if ( Is_DebugOn ) Compile_Call_TestRSP ( ( byte* ) _CfrTil_Debugger_Locals_Show ) ) ;
 }
 
 void

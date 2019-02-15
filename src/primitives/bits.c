@@ -87,7 +87,7 @@ CfrTil_BitWise_OrEqual ( ) // -=
 {
     if ( CompileMode )
     {
-        Compile_Group1_X_OpEqual ( _Context_->Compiler0, OR ) ;
+        Compile_X_OpEqual ( _Context_->Compiler0, CfrTil_BitWise_OR ) ; //OR ) ;
     }
     else
     {
@@ -119,7 +119,7 @@ CfrTil_BitWise_AndEqual ( ) // -=
 {
     if ( CompileMode )
     {
-        Compile_Group1_X_OpEqual ( _Context_->Compiler0, AND ) ;
+        Compile_X_OpEqual ( _Context_->Compiler0, CfrTil_BitWise_AND ) ; //AND ) ;
     }
     else
     {
@@ -150,7 +150,7 @@ CfrTil_BitWise_XorEqual ( ) // -=
 {
     if ( CompileMode )
     {
-        Compile_Group1_X_OpEqual ( _Context_->Compiler0, XOR ) ;
+        Compile_X_OpEqual ( _Context_->Compiler0, CfrTil_BitWise_XOR ) ; //XOR ) ;
     }
     else
     {
@@ -196,8 +196,8 @@ CfrTil_ShiftLeft_Equal ( ) // <<=
     Compiler * compiler = _Context_->Compiler0 ;
     if ( GetState ( compiler, BLOCK_MODE ) )
     {
-        Compile_X_Shift ( compiler, SHL, 0, 1 ) ;
-        //Compile_Move_Reg_To_Rm ( OREG2, RAX, 0 ) ;
+        //Compile_X_Shift ( compiler, SHL, 0, 1 ) ;
+        Compile_X_OpEqual ( _Compiler_, CfrTil_ShiftLeft ) ;
     }
     else
     {
@@ -214,8 +214,8 @@ CfrTil_ShiftRight_Equal ( ) // >>=
 {
     if ( GetState ( _Context_->Compiler0, BLOCK_MODE ) )
     {
-        Compile_X_Shift ( _Context_->Compiler0, SHR, 0, 1 ) ;
-        //Compile_Move_Reg_To_Rm ( OREG2, RAX, 0 ) ;
+        //Compile_X_Shift ( _Context_->Compiler0, SHR, 0, 1 ) ;
+        Compile_X_OpEqual ( _Compiler_, CfrTil_ShiftRight ) ;
     }
     else
     {

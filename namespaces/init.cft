@@ -368,6 +368,7 @@ stringMacrosOn
 : tCfrTil "namespaces/ninit.cft" include ; // namespaces init
 : tc tCfrTil rtw ;
 : tx64 "namespaces/compiler/x64.back.cft" include ;
+: x64 "namespaces/compiler/x64.cft" include ; 
 : bx "namespaces/test/bigNum.test.cft" include ;
 
 // === controls ===
@@ -390,7 +391,7 @@ dbgOff
 
 scOn
 System C
-s pause
+//s pause
 tc
 
 #if _doDemo 

@@ -34,7 +34,7 @@ CfrTil_PlusEqual ( ) // +=
 {
     if ( CompileMode )
     {
-        Compile_Group1_X_OpEqual ( _Context_->Compiler0, ADD ) ;
+        Compile_X_OpEqual ( _Context_->Compiler0, CfrTil_Plus ) ; //ADD ) ;
     }
     else
     {
@@ -52,7 +52,7 @@ CfrTil_MinusEqual ( ) // -=
 {
     if ( CompileMode )
     {
-        Compile_Group1_X_OpEqual ( _Context_->Compiler0, SUB ) ;
+        Compile_X_OpEqual ( _Context_->Compiler0, CfrTil_Minus ) ; //SUB ) ;
     }
     else
     {
@@ -70,11 +70,11 @@ CfrTil_MultiplyEqual ( ) // *=
 {
     if ( CompileMode )
     {
-        Compile_MultiplyEqual ( _Context_->Compiler0 ) ;
+        //Compile_MultiplyEqual ( _Context_->Compiler0 ) ;
+        Compile_X_OpEqual ( _Compiler_, CfrTil_Multiply ) ; //MUL_OP ) ;
     }
     else
     {
-
         int64 *x, n ;
         n = DataStack_Pop ( ) ;
         x = ( int64* ) DataStack_Pop ( ) ;
@@ -88,11 +88,11 @@ CfrTil_DivideEqual ( ) // +=
 {
     if ( CompileMode )
     {
-        Compile_DivideEqual ( _Context_->Compiler0 ) ;
+        //Compile_DivideEqual ( _Context_->Compiler0 ) ;
+        Compile_X_OpEqual ( _Compiler_, CfrTil_Divide ) ; //DIV_OP ) ;
     }
     else
     {
-
         int64 *x, n ;
         n = DataStack_Pop ( ) ;
         x = ( int64* ) DataStack_Pop ( ) ;
@@ -112,7 +112,6 @@ CfrTil_Minus ( )
     }
     else
     {
-
         _Dsp_ [ - 1 ] = _Dsp_ [ - 1 ] - _Dsp_ [ 0 ] ;
         DataStack_Drop ( ) ;
     }

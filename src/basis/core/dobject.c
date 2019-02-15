@@ -122,9 +122,9 @@ DObject_Finish ( Word * word )
         if ( GetState ( _Context_, C_SYNTAX ) ) { SetState ( word, W_C_SYNTAX, true ) ; word->WAttribute |= WT_C_SYNTAX ; }
         if ( IsSourceCodeOn ) SetState ( word, W_SOURCE_CODE_MODE, true ) ;
     }
+    word->W_NumberOfNonRegisterArgs = _Context_->Compiler0->NumberOfNonRegisterArgs ;
+    word->W_NumberOfNonRegisterLocals = _Context_->Compiler0->NumberOfNonRegisterLocals ;
     if ( GetState ( _Context_, INFIX_MODE ) ) word->CAttribute |= INFIX_WORD ;
-    word->W_NumberOfArgs = _Context_->Compiler0->NumberOfArgs ;
-    word->W_NumberOfLocals = _Context_->Compiler0->NumberOfLocals ;
     _CfrTil_->LastFinished_DObject = word ;
 }
 

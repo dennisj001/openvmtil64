@@ -410,7 +410,7 @@ CPrimitive CPrimitives [] = {
     { "addToHistoryOn", 0, 0, 0, OpenVmTil_AddStringToHistoryOn, 0, 0, 0, "OpenVmTil", "Root" },
     { "addToHistoryOff", 0, 0, 0, OpenVmTil_AddStringToHistoryOff, 0, 0, 0, "OpenVmTil", "Root" },
     { "showAllocated", 0, 0, 0, OVT_Mem_ShowAllocated, 0, 0, 0, "OpenVmTil", "Root" },
-    { "<dbg>", 0, 0, 0, CfrTil_DebugRuntimeBreakpoint, IMMEDIATE, 0, 0, "OpenVmTil", "Root" },
+    { "<dbg>", 0, 0, 0, CfrTil_DebugRuntimeBreakpoint, 0, 0, 0, "OpenVmTil", "Root" },
     
     { "freeTemporayMem", 0, 0, 0, OVT_MemListFree_TempObjects, 0, 0, 0, "Memory", "OpenVmTil" },
     { "freeCompilerTempMem", 0, 0, 0, OVT_MemListFree_CompilerTempObjects, 0, 0, 0, "Memory", "OpenVmTil" },
@@ -571,14 +571,15 @@ CPrimitive CPrimitives [] = {
 } ;
 
 MachineCodePrimitive MachineCodePrimitives [] = {
-    { "<rt-dbg>", CPRIMITIVE|DEBUG_WORD, RT_STEPPING_DEBUG, 0, ( byte* ) _Compile_DebugRuntimeBreakpoint, - 1, "Debug", "Root" },
-    { "<dso>", CPRIMITIVE|DEBUG_WORD, RT_STEPPING_DEBUG, 0, ( byte* ) _Compile_DebugRuntimeBreakpoint_dso, - 1, "Debug", "Root" },
+    { "<rt-dbg>", CPRIMITIVE|DEBUG_WORD, RT_STEPPING_DEBUG, 0, ( byte* ) _CfrTil_DebugRuntimeBreakpoint, - 1, "Debug", "Root" },
+    { "<dso>", CPRIMITIVE|DEBUG_WORD, RT_STEPPING_DEBUG, 0, ( byte* ) _CfrTil_DebugRuntimeBreakpoint_IsDebugShowOn, - 1, "Debug", "Root" },
+    { "<d:dbg>", CPRIMITIVE|DEBUG_WORD, RT_STEPPING_DEBUG, 0, ( byte* ) _CfrTil_DebugRuntimeBreakpoint_IsDebugOn, - 1, "Debug", "Root" },
     { "rspReg", CPRIMITIVE, 0, 0, ( byte* ) _Compile_RspReg_Get, - 1, "System", "Root" },
     { "rspReg@", CPRIMITIVE, 0, 0, ( byte* ) _Compile_RspReg_Fetch, - 1, "System", "Root" },
     { ">rspReg", CPRIMITIVE, 0, 0, ( byte* ) _Compile_RspReg_To, - 1, "System", "Root" },
     { "rspReg>", CPRIMITIVE, 0, 0, ( byte* ) _Compile_RspReg_From, - 1, "System", "Root" },
     { "rspRegdrop", CPRIMITIVE, 0, 0, ( byte* ) _Compile_RspReg_Drop, - 1, "Debug", "Root" },
-    { "rspReg!", CPRIMITIVE, 0, 0, ( byte* ) _Compile_RspReg_Store, - 1, "System", "Root" },
+    //{ "rspReg!", CPRIMITIVE, 0, 0, ( byte* ) _Compile_RspReg_Store, - 1, "System", "Root" },
     
 #if 0
    { "getRsp", CPRIMITIVE, 0, 0, ( byte* ) Compile_Debug_GetRSP, - 1, "System", "Root" },

@@ -348,17 +348,18 @@ fac5 ( 7 ) dup p 5040 _assert //pause
 sp
 Root
 c_syntaxOn
-int cpow ( base power | out ) { for ( out = 1 ; power ; ( power -= 1 ) ) { out = out * base ; } return out } prefix
-//int cpow ( base power | out ) { for ( out = 1 ; power ; power -= 1 ) { out = out * base ; } return out ; }
+//int cpow ( base power | out ) { for ( out = 1 ; power ; power d: -= 1 ) { out = out * base ; } return out } prefix
+int cpow ( base power | out ) { for ( out = 1 ; power ; (power -= 1) ) { out *= base ; } return out ; }
+'cpow find wdiss
 sp
-cpow (2 30 ) "2 ^ 30 : " ps p 
+cpow (2 30 ) ; "2 ^ 30 : " ps dup p 1073741824 assert0
 c_syntaxOff 
 sp
 s: pow0 ( base power | out ) { out 1 = } { power @ 0 > } { power power @ 1 - = } { out out @ base @ * = } for return out ;s "II.I" typeSignature
 s: pow ( base power | out ) { out 1 = } { power @ 0 > } { power 1 -= } { out out @ base @ * = } for return out ;s "II.I" typeSignature
 //: pow ( base power | out ) { out 1 = } { power @ 0 > } { power power @ 1 - = } { out out @ base @ * = } for return out ;
-2 30 pow0 p //pause
-2 30 pow p //pause
+2 30 pow0 dup p 1073741824 assert0 //pause
+2 30 pow dup p 1073741824 assert0 //pause
 //scOff
 sp
 Lisp
@@ -470,7 +471,7 @@ scOn
     // svn @ fprint ":" ps fn @ fprint 
     fn @
 ;
-' fibBN find wdiss
+//' fibBN find wdiss
 20 fibBN dup p 6765 _assert sp
 : fibBN ( REG n | fn REG fn1 REG fn2 -- TOS ) 
     { fn 0 = fn1 0 = fn2 1 = } { n @ 0 > } { n 1 -= } 

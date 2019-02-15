@@ -207,7 +207,8 @@ CalculateModRegardingDisplacement ( Boolean mod, int64 disp )
     //  00 000 000
     if ( mod != REG )
     {
-        if ( disp == 0 ) mod = 0 ;
+        if ( disp == 0 ) 
+            mod = 0 ;
         else if ( disp <= 0xff ) mod = 1 ;
         else mod = 2 ;
     }
@@ -503,7 +504,7 @@ Compile_X_Group1 ( Compiler * compiler, int64 op, int64 ttt, int64 n )
         if ( one && one->StackPushRegisterCode ) SetHere ( one->StackPushRegisterCode, 1 ) ;
         else Compile_Pop_To_Acc ( DSP ) ;
         //_Compile_X_Group1 ( int8 code, int64 toRegOrMem, int8 mod, int8 reg, int8 rm, int8 sib, int64 disp, int64 osize )
-        //Compiler_Word_SetCodingHere_And_ClearPreviousUseOf_Here_SCA ( optInfo->opWord, 0 ) ;
+        //Compiler_SCA_Word_SetCodingHere_And_ClearPreviousUse ( optInfo->opWord, 0 ) ;
         _Compile_X_Group1 ( op, REG, MEM, ACC, DSP, 0, 0, CELL_SIZE ) ; // result is on TOS
         _Word_CompileAndRecord_PushReg ( CfrTil_WordList ( 0 ), ACC ) ; // 0 : ?!? should be the exact variable 
         //DBI_OFF ;
@@ -551,7 +552,7 @@ void
 _Compile_Group5 ( Boolean code, Boolean mod, Boolean rm, Boolean sib, int64 disp, Boolean size )
 {
     //Compile_CalcWrite_Instruction_X64 (  opCode, mod, code, rm, REX_B | MODRM_B | IMM_B | DISP_B, 0, disp, 0, imm, iSize ) ;
-    Compile_CalculateWrite_Instruction_X64 ( 0, 0xff, mod, code, rm, REX_B | MODRM_B | DISP_B, sib, disp, size, 0, 0 ) ;
+    Compile_CalculateWrite_Instruction_X64 ( 0, 0xff, mod, code, rm, (REX_B | MODRM_B | DISP_B), sib, disp, size, 0, 0 ) ;
 }
 
 void
@@ -569,7 +570,7 @@ Compile_X_Group5 ( Compiler * compiler, int64 op )
             optInfo->Optimize_Mod = REG ;
             optInfo->Optimize_Rm = ACC ;
         }
-        //Compiler_Word_SetCodingHere_And_ClearPreviousUseOf_Here_SCA ( optInfo->opWord, 0 ) ;
+        //Compiler_SCA_Word_SetCodingHere_And_ClearPreviousUse ( optInfo->opWord, 0 ) ;
         _Compile_Group5 ( op, optInfo->Optimize_Mod, optInfo->Optimize_Rm, 0, optInfo->Optimize_Disp, 0 ) ;
     }
     else if ( one && one->CAttribute & ( PARAMETER_VARIABLE | LOCAL_VARIABLE | NAMESPACE_VARIABLE ) ) // *( ( cell* ) ( TOS ) ) += 1 ;
@@ -772,7 +773,9 @@ Compile_UninitializedJump ( ) // runtime
 void
 _Compile_CallThru ( Boolean reg, Boolean regOrMem )
 {
+    //DBI_ON ;
     _Compile_Group5 ( CALL, regOrMem, reg, 0, 0, 0 ) ;
+    //DBI_OFF ;
 }
 
 void

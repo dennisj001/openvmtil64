@@ -80,14 +80,16 @@ _Compile_RspReg_From ( )
     _Compile_RspReg_Drop ( ) ;
 }
 
+#if 0 // not yet with new store
 // Rsp! - Rsp store
 
 void
 _Compile_RspReg_Store ( ) // data stack pop to rsp [0] !
 {
     _Compile_RspReg_From ( ) ;
-    Compile_Store ( _Context_->Compiler0, DSP ) ;
+    Compile_Store ( _Compiler_ ) ;
 }
+#endif
 
 Word *
 _CfrTil_VariableGet ( Namespace * ns, byte * name )
@@ -107,14 +109,14 @@ _CfrTil_VariableValueGet ( byte* nameSpace, byte * name )
 void
 _Compile_GetVarLitObj_RValue_To_Reg ( Word * word, int64 reg )
 {
-    Compiler_Word_SetCodingHere_And_ClearPreviousUseOf_Here_SCA ( word, 0 ) ;
+    Compiler_SCA_Word_SetCodingHere_And_ClearPreviousUse ( word, 0 ) ;
     if ( word->CAttribute & REGISTER_VARIABLE )
     {
         if ( word->RegToUse == reg ) return ;
         else Compile_Move_Reg_To_Reg ( reg, word->RegToUse ) ;
     }
     else if ( word->CAttribute & ( LOCAL_VARIABLE | PARAMETER_VARIABLE | THIS | T_LISP_SYMBOL ) || ( word->LAttribute & T_LISP_SYMBOL ) )
-    //else if ( word->CAttribute & ( LOCAL_VARIABLE | PARAMETER_VARIABLE | T_LISP_SYMBOL ) || ( word->LAttribute & T_LISP_SYMBOL ) )
+        //else if ( word->CAttribute & ( LOCAL_VARIABLE | PARAMETER_VARIABLE | T_LISP_SYMBOL ) || ( word->LAttribute & T_LISP_SYMBOL ) )
     {
         if ( word->CAttribute & ( LOCAL_VARIABLE | PARAMETER_VARIABLE | T_LISP_SYMBOL ) || ( word->LAttribute & T_LISP_SYMBOL ) )
             _Compile_Move_StackN_To_Reg ( reg, FP, LocalOrParameterVar_Offset ( word ) ) ;
@@ -178,15 +180,15 @@ _Compile_SetVarLitObj_With_Reg ( Word * word, int64 reg, int64 thruReg )
 void
 _Compile_GetVarLitObj_LValue_To_Reg ( Word * word, int64 reg )
 {
-    Compiler_Word_SetCodingHere_And_ClearPreviousUseOf_Here_SCA ( word, 0 ) ;
+    Compiler_SCA_Word_SetCodingHere_And_ClearPreviousUse ( word, 0 ) ;
     if ( word->CAttribute & REGISTER_VARIABLE )
     {
         if ( word->RegToUse == reg ) return ;
         else Compile_Move_Reg_To_Reg ( reg, word->RegToUse ) ;
     }
-    //else if ( ( word->CAttribute & ( OBJECT )  ) ) 
+        //else if ( ( word->CAttribute & ( OBJECT )  ) ) 
         //_Compile_Move_Literal_Immediate_To_Reg ( reg, ( int64 ) word->W_Value ) ;
-    else if ( ( word->CAttribute & ( OBJECT|THIS ) ) ) 
+    else if ( ( word->CAttribute & ( OBJECT | THIS ) ) )
         _Compile_GetVarLitObj_RValue_To_Reg ( word, reg ) ;
     else if ( word->CAttribute & ( LOCAL_VARIABLE | PARAMETER_VARIABLE ) ) _Compile_LEA ( reg, FP, 0, LocalOrParameterVar_Disp ( word ) ) ;
     else if ( word->CAttribute & ( LITERAL | CONSTANT ) ) _Compile_Move_Literal_Immediate_To_Reg ( reg, ( int64 ) word->W_Value ) ;
@@ -211,7 +213,7 @@ _Compile_GetVarLitObj_LValue_To_Reg ( Word * word, int64 reg )
 void
 _Compile_GetVarLitObj_RValue_To_Reg ( Word * word, int64 reg )
 {
-    Compiler_Word_SetCodingHere_And_ClearPreviousUseOf_Here_SCA ( word, 0 ) ;
+    Compiler_SCA_Word_SetCodingHere_And_ClearPreviousUse ( word, 0 ) ;
     if ( word->CAttribute & REGISTER_VARIABLE )
     {
         if ( word->RegToUse == reg ) return ;
@@ -277,7 +279,7 @@ _Compile_SetVarLitObj_With_Reg ( Word * word, int64 reg, int64 thruReg )
 void
 _Compile_GetVarLitObj_LValue_To_Reg ( Word * word, int64 reg )
 {
-    Compiler_Word_SetCodingHere_And_ClearPreviousUseOf_Here_SCA ( word, 0 ) ;
+    Compiler_SCA_Word_SetCodingHere_And_ClearPreviousUse ( word, 0 ) ;
     if ( word->CAttribute & REGISTER_VARIABLE )
     {
         if ( word->RegToUse == reg ) return ;

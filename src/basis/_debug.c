@@ -38,7 +38,7 @@ JumpCallInstructionAddress_X64ABI ( byte * address )
     int64 offset ;
     //if ( ( * ( address - 5 ) ) == 0xe9 ) offset = 35 ;
     //else 
-    if ( ( ( * ( address - 20 ) ) == 0x49 ) &&  ( ( * ( address - 19 ) ) == 0xb8 ) ) offset = 18 ;
+    if ( ( ( * ( address - 20 ) ) == 0x49 ) && ( ( * ( address - 19 ) ) == 0xb8 ) ) offset = 18 ;
     else offset = 8 ; //if ( ( * ( address - 10 ) ) == 0x49 ) offset = 8 ;
     //else offset = 23 ;
     byte * jcAddress = * ( byte** ) ( address - offset ) ; //JumpCallInstructionAddress ( debugger->DebugAddress ) ;
@@ -104,7 +104,7 @@ GetPostfix ( byte * address, byte* postfix, byte * buffer )
             byte * name = ( byte* ) c_gd ( word->Name ) ; //, &_Q_->Default ) ;
             if ( ( byte* ) word->CodeStart == iaddress )
             {
-                snprintf ( ( char* ) buffer, 128, "%s< %s.%s : " UINT_FRMT " >%s", prePostfix, word->ContainingNamespace->Name, name, (uint64) iaddress, postfix ) ;
+                snprintf ( ( char* ) buffer, 128, "%s< %s.%s : " UINT_FRMT " >%s", prePostfix, word->ContainingNamespace->Name, name, ( uint64 ) iaddress, postfix ) ;
             }
             else
             {
@@ -137,27 +137,34 @@ Compile_Debug_GetRSP ( ) // where we want the acquired pointer
 }
 
 void
-_Compile_DebugRuntimeBreakpoint ( ) // where we want the acquired pointer
-{
-    Compile_CpuState_Save ( _Debugger_->cs_Cpu ) ;
-    //Compile_Call_TestRSP ( ( byte* ) CfrTil_PrintReturnStack ) ;
-    Compile_Call_TestRSP ( ( byte* ) _CfrTil_DebugRuntimeBreakpoint ) ;
-}
-
-void
-_Compile_DebugRuntimeBreakpoint_dso ( ) // where we want the acquired pointer
-{
-    Compile_CpuState_Save ( _Debugger_->cs_Cpu ) ;
-    Compile_Call_TestRSP ( ( byte* ) CfrTil_DebugRuntimeBreakpoint_dso ) ;
-}
-
-void
-CfrTil_DebugRuntimeBreakpoint ( ) // where we want the acquired pointer
+CfrTil_SetRtDebugOn ( )
 {
     SetState ( _CfrTil_, RT_DEBUG_ON, true ) ;
-    //Compile_Call ( (byte*) _CfrTil_->SaveCpu2State ) ;
-    Compile_Call ( (byte*) _Debugger_->SaveCpuState ) ;
-    //Compile_Call_TestRSP ( ( byte* ) CfrTil_PrintReturnStack ) ;
-    Compile_Call_TestRSP ( ( byte* ) _CfrTil_DebugRuntimeBreakpoint ) ;
+}
+
+void
+Compile_DebugRuntimeBreakpointFunction ( block function ) // where we want the acquired pointer
+{
+    Compile_Call_TestRSP ( ( byte* ) CfrTil_SetRtDebugOn ) ;
+    Compile_Call ( ( byte* ) _Debugger_->SaveCpuState ) ;
+    Compile_Call_TestRSP ( ( byte* ) function ) ;
+}
+
+void
+_CfrTil_DebugRuntimeBreakpoint ( ) // where we want the acquired pointer
+{
+    Compile_DebugRuntimeBreakpointFunction ( CfrTil_DebugRuntimeBreakpoint ) ;
+}
+
+void
+_CfrTil_DebugRuntimeBreakpoint_IsDebugShowOn ( ) // where we want the acquired pointer
+{
+    Compile_DebugRuntimeBreakpointFunction ( CfrTil_DebugRuntimeBreakpoint_IsDebugShowOn ) ;
+}
+
+void
+_CfrTil_DebugRuntimeBreakpoint_IsDebugOn ( ) // where we want the acquired pointer
+{
+    Compile_DebugRuntimeBreakpointFunction ( CfrTil_DebugRuntimeBreakpoint_IsDebugOn ) ;
 }
 

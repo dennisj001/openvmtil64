@@ -357,7 +357,7 @@ _LO_CfrTil ( ListObject * lfirst )
     SetState ( compiler, LISP_MODE, false ) ;
     for ( ldata = _LO_Next ( lfirst ) ; ldata ; ldata = _LO_Next ( ldata ) )
     {
-        Compiler_Word_SetCodingHere_And_ClearPreviousUseOf_Here_SCA ( ldata->CfrTilWord, 0 ) ;
+        Compiler_SCA_Word_SetCodingHere_And_ClearPreviousUse ( ldata->CfrTilWord, 0 ) ;
         if ( ldata->LAttribute & ( LIST | LIST_NODE ) )
         {
             _CfrTil_Parse_LocalsAndStackVariables ( 1, 1, ldata, compiler->LocalsCompilingNamespacesStack, 0, false ) ;

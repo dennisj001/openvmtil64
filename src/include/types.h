@@ -356,8 +356,8 @@ typedef struct _WordData
     byte * Filename ; // ?? should be made a part of a accumulated string table ??
     int64 LineNumber ;
     int64 CursorPosition ;
-    int64 NumberOfArgs ;
-    int64 NumberOfLocals ;
+    int64 NumberOfNonRegisterArgs ;
+    int64 NumberOfNonRegisterLocals ;
 
     byte * ObjectCode ; // used by objects/class words
     byte * StackPushRegisterCode ; // used by the optInfo
@@ -409,8 +409,8 @@ typedef struct _WordData
 #define Coding S_WordData->Coding // nb : !! this field is set by the Interpreter and modified by the Compiler in some cases so we also need (!) CodeStart both are needed !!  
 #define SourceCoding S_WordData->SourceCoding // nb : !! this field is set by the Interpreter and modified by the Compiler in some cases so we also need (!) CodeStart both are needed !!  
 #define Offset S_WordData->Offset // used by ClassField
-#define W_NumberOfArgs S_WordData->NumberOfArgs 
-#define W_NumberOfLocals S_WordData->NumberOfLocals 
+#define W_NumberOfNonRegisterArgs S_WordData->NumberOfNonRegisterArgs 
+#define W_NumberOfNonRegisterLocals S_WordData->NumberOfNonRegisterLocals 
 #define W_InitialRuntimeDsp S_WordData->InitialRuntimeDsp 
 #define TtnReference S_WordData->TtnReference // used by Logic Words
 #define RunType S_WordData->RunType // number of slots in Object

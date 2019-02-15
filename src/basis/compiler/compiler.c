@@ -67,7 +67,7 @@ Compiler_Word_SetCoding_And_ClearPreviousUseOf_A_SCA ( Word * word, byte * codin
 }
 
 void
-Compiler_Word_SetCodingHere_And_ClearPreviousUseOf_Here_SCA ( Word * word, Boolean clearPreviousFlag )
+Compiler_SCA_Word_SetCodingHere_And_ClearPreviousUse ( Word * word, Boolean clearPreviousFlag )
 {
     Compiler_Word_SetCoding_And_ClearPreviousUseOf_A_SCA ( word, Here, clearPreviousFlag ) ;
 }
@@ -291,10 +291,10 @@ Compiler_Init_AccumulatedOffsetPointers ( Compiler * compiler, Word * word )
 void
 Compiler_SaveDebugInfo ( Compiler * compiler )
 {
-    _CfrTil_->CurrentWordBeingCompiled->NamespaceStack = Stack_Copy ( compiler->LocalsCompilingNamespacesStack, CFRTIL ) ; //CONTEXT ) ;
+    _CfrTil_->LastFinished_Word->NamespaceStack = Stack_Copy ( compiler->LocalsCompilingNamespacesStack, CFRTIL ) ; //CONTEXT ) ;
     if ( compiler->NumberOfVariables ) Namespace_RemoveNamespacesStack ( compiler->LocalsCompilingNamespacesStack ) ;
     Stack_Init ( compiler->LocalsCompilingNamespacesStack ) ;
-    _CfrTil_->CurrentWordBeingCompiled->W_SC_WordList = _CfrTil_->Compiler_N_M_Node_WordList ;
+    _CfrTil_->LastFinished_Word->W_SC_WordList = _CfrTil_->Compiler_N_M_Node_WordList ;
     _CfrTil_->Compiler_N_M_Node_WordList = _dllist_New ( CFRTIL ) ;
     //Namespace_NamespacesStack_PrintWords ( _CfrTil_->CurrentWordBeingCompiled->NamespaceStack ) ;
 }
@@ -316,7 +316,7 @@ Compiler_Init ( Compiler * compiler, uint64 state, Boolean flag )
     if ( flag ) Compiler_DeleteDebugInfo ( compiler ) ;
     else if ( compiler->NumberOfVariables )
     {
-        if ( GetState ( _CfrTil_, GLOBAL_SOURCE_CODE_MODE ) ) Compiler_SaveDebugInfo ( compiler ) ; 
+        if ( GetState ( _CfrTil_, (RT_DEBUG_ON|GLOBAL_SOURCE_CODE_MODE) ) ) Compiler_SaveDebugInfo ( compiler ) ; 
         else Namespace_RemoveNamespacesStack ( compiler->LocalsCompilingNamespacesStack ) ;
     }
     compiler->State = ( state &= ( ~ARRAY_MODE ) ) ;

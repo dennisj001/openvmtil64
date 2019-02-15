@@ -20,7 +20,7 @@
           <df name="compiler">
             <in>_compile.c</in>
             <in>arrays.c</in>
-            <in>bits.c</in>
+            <in>bit.c</in>
             <in>blocks.c</in>
             <in>combinators.c</in>
             <in>compile.c</in>
@@ -209,6 +209,13 @@
         <cTool flags="2">
         </cTool>
       </item>
+      <folder path="0/src">
+        <cTool>
+          <incDir>
+            <pElem>.</pElem>
+          </incDir>
+        </cTool>
+      </folder>
       <folder path="0/src/basis/compiler">
         <ccTool>
           <incDir>
@@ -280,7 +287,7 @@
         <ccTool flags="1">
         </ccTool>
       </item>
-      <item path="src/basis/compiler/bits.c" ex="false" tool="1" flavor2="11">
+      <item path="src/basis/compiler/bit.c" ex="false" tool="1" flavor2="11">
         <ccTool flags="1">
         </ccTool>
       </item>
@@ -721,10 +728,8 @@
         </ccTool>
       </item>
       <item path="src/basis/openVmTil.c" ex="false" tool="1" flavor2="11">
-        <ccTool flags="1">
+        <ccTool>
           <incDir>
-            <pElem>src/basis</pElem>
-            <pElem>src/include</pElem>
             <pElem>.</pElem>
           </incDir>
         </ccTool>

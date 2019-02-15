@@ -77,7 +77,7 @@ Compile_BlockLogicTest ( BlockInfo * bi )
             if ( bi->LogicCodeWord && ( ! ( bi->LogicCodeWord->CAttribute & CATEGORY_LOGIC ) ) )
             {
                 SetHere ( bi->CopiedToLogicJccCode, 1 ) ;
-                Compiler_Word_SetCodingHere_And_ClearPreviousUseOf_Here_SCA ( bi->LogicCodeWord, 0 ) ;
+                Compiler_SCA_Word_SetCodingHere_And_ClearPreviousUse ( bi->LogicCodeWord, 0 ) ;
                 _Compile_TestCode ( bi->LogicCodeWord->RegToUse, CELL ) ;
                 bi->CopiedToLogicJccCode = Here ;
                 BI_Set_setTtnn ( bi, TTT_ZERO, NEGFLAG_ON, TTT_ZERO, NEGFLAG_OFF ) ;
@@ -86,7 +86,7 @@ Compile_BlockLogicTest ( BlockInfo * bi )
             else if ( bi->LogicCodeWord && ( bi->LogicCodeWord->CAttribute & CATEGORY_OP_1_ARG ) && ( bi->LogicCodeWord->CAttribute2 & LOGIC_NEGATE ) )
             {
                 SetHere ( bi->LogicCodeWord->Coding, 1 ) ;
-                Compiler_Word_SetCodingHere_And_ClearPreviousUseOf_Here_SCA ( bi->LogicCodeWord, 0 ) ;
+                Compiler_SCA_Word_SetCodingHere_And_ClearPreviousUse ( bi->LogicCodeWord, 0 ) ;
                 _Compile_TestCode ( bi->LogicCodeWord->RegToUse, CELL ) ;
                 bi->CopiedToLogicJccCode = Here ;
                 BI_Set_setTtnn ( bi, TTT_ZERO, NEGFLAG_ON, TTT_ZERO, NEGFLAG_ON ) ;

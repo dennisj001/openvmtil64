@@ -257,7 +257,7 @@
 #define _IsSourceCodeOn ( GetState ( _CfrTil_, DEBUG_SOURCE_CODE_MODE ) )
 #define IsSourceCodeOn ( _IsSourceCodeOn || IsGlobalsSourceCodeOn )
 #define IsSourceCodeOff (!IsSourceCodeOn) //( GetState ( _CfrTil_, DEBUG_SOURCE_CODE_MODE ) || IsGlobalsSourceCodeOn ))
-#define Compiler_Word_SCHCPUSCA( word, clearFlag ) Compiler_Word_SetCodingHere_And_ClearPreviousUseOf_Here_SCA ( word, clearFlag) 
+#define Compiler_Word_SCHCPUSCA( word, clearFlag ) Compiler_SCA_Word_SetCodingHere_And_ClearPreviousUse ( word, clearFlag) 
 #define Compiler_WordStack_SCHCPUSCA( index, clearFlag ) Compiler_Word_SCHCPUSCA (CfrTil_WordList ( index ), clearFlag) 
 #define _SC_Global_On SetState ( _CfrTil_, GLOBAL_SOURCE_CODE_MODE, true )
 #define SC_Global_On if ( GetState ( _CfrTil_, DEBUG_SOURCE_CODE_MODE ) ) { _SC_Global_On ; }
@@ -280,6 +280,7 @@
 
 #define Strncat( dst, src, n ) strncat ( (char *__restrict) dst, (const char *__restrict) src, (size_t) n )
 #define Strlen( s ) ( s ? strlen ( (const char *) s ) : 0 )
+#define StringLength( s ) Strlen ( s )
 //#define Strncpy( dst, src, n ) strncpy ( (char *__restrict) dst, (const char *__restrict) src, (size_t) n )
 #define Map0( dllist, mf ) dllist_Map ( dllist, (MapFunction0) mf )
 

@@ -24,6 +24,7 @@ taa ( one two three )
     //<dbg>
 }
 taa ( 1 2 3 ) ;
+'taa find wdiss //pause
 c_syntaxOff
 //: tbb ( one two three | four five )
 : tbb ( one two three )

@@ -508,7 +508,7 @@
           <df name="compiler">
             <in>_compile.c</in>
             <in>arrays.c</in>
-            <in>bits.c</in>
+            <in>bit.c</in>
             <in>blocks.c</in>
             <in>combinators.c</in>
             <in>compile.c</in>

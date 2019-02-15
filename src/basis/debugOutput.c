@@ -13,40 +13,43 @@ Debugger_Menu ( Debugger * debugger )
 }
 
 void
-_Debugger_Locals_ShowALocal ( Cpu * cpu, Word * localsWord ) // use a debugger buffer instead ??
+_Debugger_Locals_ShowALocal ( Cpu * cpu, Word * localsWord, Word * scWord ) // use a debugger buffer instead ??
 {
     Word * word2 = 0 ;
     byte * buffer = Buffer_Data_Cleared ( _CfrTil_->DebugB ) ; // nvw : new view window
-    uint64 * fp = ( uint64* ) cpu->CPU_FP ;
-    if ( fp < ( uint64* ) 0x7f000000 ) fp = 0 ;
-    int64 localVarFlag = ( localsWord->CAttribute & LOCAL_VARIABLE ) ; // nb! not a Boolean with '='
-    //int64 varOffset = localVarFlag ? localsWord->Index : -localsWord->Index ; 
-    int64 varOffset = LocalOrParameterVar_Offset ( localsWord ) ;
-    byte * address = ( byte* ) ( uint64 ) ( fp ? fp [ varOffset ] : 0 ) ; //( fp ? fp [ varOffset ] : 0 ) ;
-
-    byte * stringValue = String_CheckForAtAdddress ( address ) ;
-    if ( address && ( ! stringValue ) ) word2 = Word_GetFromCodeAddress ( ( byte* ) ( address ) ) ;
-    if ( word2 ) sprintf ( ( char* ) buffer, "< %s.%s >", word2->ContainingNamespace->Name, c_u ( word2->Name ) ) ;
-
-    if ( localsWord->CAttribute & REGISTER_VARIABLE )
+    uint64 * fp = cpu->CPU_FP ; //? ( uint64* ) ((* cpu->CPU_FP)? ( uint64* ) (* cpu->CPU_FP) : (cpu->CPU_FP)) : 0 ;
+    if ( fp > ( uint64* ) 0x7f000000 )
     {
-        char * registerNames [ 16 ] = { ( char* ) "RAX", ( char* ) "RCX", ( char* ) "RDX", ( char* ) "RBX",
-            ( char* ) "RBP", ( char* ) "RSP", ( char* ) "RSI", ( char* ) "RDI", ( char* ) "R8", ( char* ) "R9",
-            ( char* ) "R10", ( char* ) "R11", ( char* ) "R12", ( char* ) "R13", ( char* ) "R14", ( char* ) "R15" } ;
-        _Printf ( ( byte* ) "\n%-018s : index = [%3s:%d   ]  : <register  location> = 0x%016lx : %16s.%-16s : %s",
-            "Register Variable", registerNames [ localsWord->RegToUse ], localsWord->RegToUse, cpu->Registers [ localsWord->RegToUse ],
-            localsWord->S_ContainingNamespace->Name, c_u ( localsWord->Name ), word2 ? buffer : stringValue ? stringValue : ( byte* ) "" ) ;
+        int64 localVarFlag = ( localsWord->CAttribute & LOCAL_VARIABLE ) ; // nb! not a Boolean with '='
+        int64 varOffset = _LocalOrParameterVar_Offset ( localsWord, scWord->W_NumberOfNonRegisterArgs,
+            IsFrameNecessary ( scWord->W_NumberOfNonRegisterLocals, scWord->W_NumberOfNonRegisterArgs ) ) ;
+        byte * address = ( byte* ) ( uint64 ) ( fp ? fp [ varOffset ] : 0 ) ; //( fp ? fp [ varOffset ] : 0 ) ;
+
+        byte * stringValue = String_CheckForAtAdddress ( address ) ;
+        if ( address && ( ! stringValue ) ) word2 = Word_GetFromCodeAddress ( ( byte* ) ( address ) ) ;
+        if ( word2 ) sprintf ( ( char* ) buffer, "< %s.%s >", word2->ContainingNamespace->Name, c_u ( word2->Name ) ) ;
+
+        if ( localsWord->CAttribute & REGISTER_VARIABLE )
+        {
+            char * registerNames [ 16 ] = { ( char* ) "RAX", ( char* ) "RCX", ( char* ) "RDX", ( char* ) "RBX",
+                ( char* ) "RBP", ( char* ) "RSP", ( char* ) "RSI", ( char* ) "RDI", ( char* ) "R8", ( char* ) "R9",
+                ( char* ) "R10", ( char* ) "R11", ( char* ) "R12", ( char* ) "R13", ( char* ) "R14", ( char* ) "R15" } ;
+            _Printf ( ( byte* ) "\n%-018s : index = [%3s:%d   ]  : <register  location> = 0x%016lx : %16s.%-16s : %s",
+                "Register Variable", registerNames [ localsWord->RegToUse ], localsWord->RegToUse, cpu->Registers [ localsWord->RegToUse ],
+                localsWord->S_ContainingNamespace->Name, c_u ( localsWord->Name ), word2 ? buffer : stringValue ? stringValue : ( byte* ) "" ) ;
+        }
+        else _Printf ( ( byte* ) "\n%-018s : index = [r15%s0x%02x]  : <0x%016lx> = 0x%016lx : %16s.%-16s : %s",
+            localVarFlag ? "LocalVariable" : "Parameter Variable", localVarFlag ? "+" : "-", Abs ( varOffset * CELL ),
+            fp + varOffset, ( uint64 ) ( fp ? fp [ varOffset ] : 0 ), localsWord->S_ContainingNamespace->Name,
+            c_u ( localsWord->Name ), word2 ? buffer : stringValue ? stringValue : ( byte* ) "" ) ;
     }
-    else _Printf ( ( byte* ) "\n%-018s : index = [r15%s0x%02x]  : <0x%016lx> = 0x%016lx : %16s.%-16s : %s",
-        localVarFlag ? "LocalVariable" : "Parameter Variable", localVarFlag ? "+" : "-", Abs ( varOffset * CELL ),
-        fp + varOffset, ( uint64 ) ( fp ? fp [ varOffset ] : 0 ), localsWord->S_ContainingNamespace->Name,
-        c_u ( localsWord->Name ), word2 ? buffer : stringValue ? stringValue : ( byte* ) "" ) ;
 }
 
 void
 _Debugger_Locals_Show_Loop ( Cpu * cpu, Stack * stack, Word * scWord )
 {
     int64 n, i ;
+    Word * localsWord ;
     if ( stack )
     {
         _Word_ShowSourceCode ( scWord ) ;
@@ -67,8 +70,8 @@ _Debugger_Locals_Show_Loop ( Cpu * cpu, Stack * stack, Word * scWord )
             for ( node = dllist_Last ( ns->W_List ) ; node ; node = prevNode )
             {
                 prevNode = dlnode_Previous ( node ) ;
-                scWord = ( Word * ) node ;
-                _Debugger_Locals_ShowALocal ( cpu, scWord ) ;
+                localsWord = ( Word * ) node ;
+                _Debugger_Locals_ShowALocal ( cpu, localsWord, scWord ) ;
             }
         }
     }

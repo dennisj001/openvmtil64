@@ -1,4 +1,9 @@
 #include "../../include/cfrtil64.h"
+#define OP_EQ_STORE 0
+
+// ( x n -- )
+// C : "x += n" :: cfrTil : "x n +="
+// X variable op compile for group 1 opCodes - ia32 
 
 void
 Compile_TosRmToTOS ( )
@@ -42,6 +47,7 @@ _Compile_Set_CAddress_WithRegValue_ThruReg ( byte * address, Boolean reg, Boolea
 {
     Compile_MoveReg_ToAddress_ThruReg ( reg, address, thruReg ) ;
 }
+
 #define ARRAY_MODE_CHECK 1
 
 void
@@ -67,17 +73,85 @@ Compile_Peek ( Compiler * compiler, Boolean stackReg ) // @
     Compile_Move_Reg_To_Rm ( stackReg, ACC, 0 ) ;
 }
 
+void
+Compiler_ShowOptimizeArgs ( Compiler * compiler )
+{
+    CompileOptimizeInfo * optInfo = compiler->OptInfo ; // nb. after _Compiler_GetOptimizeState
+    DWL_ShowWord ( optInfo->wordArg1Node, 0, 1, ( int64 ) "optInfo->wordArg1", 0 ) ;
+    DWL_ShowWord ( optInfo->wordArg2Node, 0, 1, ( int64 ) "optInfo->wordArg2", 0 ) ;
+    //Pause () ;
+}
+
+void
+Compile_Store ( Compiler * compiler ) // !
+{
+    if ( GetState ( _CfrTil_, OPTIMIZE_ON ) ) Compile_X_Equal ( compiler, STORE ) ;
+    else // when optimize is off, eg with arrays
+    {
+        //DBI_ON ;
+        int64 stackReg = DSP ;
+        Word * word ;
+        d0 ( if ( Is_DebugModeOn ) Compiler_SC_WordList_Show ( "\nCompile_Store : not optimized", 0, 0 ) ) ;
+        if ( ( word = ( Word* ) _CfrTil_WordList ( 1 ) ) && word->StackPushRegisterCode ) SetHere ( word->StackPushRegisterCode, 1 ) ;
+        else Compile_Move_Rm_To_Reg ( ACC, stackReg, 0 ) ;
+        Compile_Move_Rm_To_Reg ( OREG, stackReg, ( word && word->StackPushRegisterCode ) ? 0 : ( - CELL_SIZE ) ) ;
+        Compile_Move_Reg_To_Rm ( ( ( word && word->StackPushRegisterCode ) ? word->RegToUse : ACC ), OREG, 0 ) ;
+        Compile_SUBI ( REG, stackReg, 0, ( ( word && word->StackPushRegisterCode ) ? 1 : 2 ) * CELL_SIZE, 0 ) ;
+        //DBI_OFF ;
+    }
+#if ARRAY_MODE_CHECK   
+    CfrTil_ArrayModeOff ( ) ;
+#endif    
+}
+
+void
+Compile_Poke ( Compiler * compiler ) // =
+{
+    if ( GetState ( _CfrTil_, OPTIMIZE_ON ) ) Compile_X_Equal ( compiler, EQUAL ) ;
+    else // when optimize is off, eg with arrays
+    {
+        int64 stackReg = DSP ;
+        Compile_Move_Rm_To_Reg ( OREG, stackReg, 0 ) ;
+        Compile_Move_Rm_To_Reg ( ACC, stackReg, - CELL_SIZE ) ;
+        Compile_Move_Reg_To_Rm ( ACC, OREG, 0 ) ;
+        //if ( ! GetState ( _Context_, C_SYNTAX ) ) 
+        Compile_SUBI ( REG, stackReg, 0, 2 * CELL_SIZE, BYTE ) ;
+    }
+#if ARRAY_MODE_CHECK   
+    CfrTil_ArrayModeOff ( ) ;
+#endif    
+}
+
+// n = *m
+// ( n m -- )
+// 
+
+void
+Compile_AtEqual ( Boolean stackReg ) // !
+{
+    Compile_Move_Rm_To_Reg ( ACC, stackReg, 0 ) ;
+    Compile_Move_Rm_To_Reg ( ACC, ACC, 0 ) ;
+    Compile_Move_Rm_To_Reg ( OREG, stackReg, - CELL_SIZE ) ;
+    Compile_Move_Reg_To_Rm ( OREG, ACC, 0 ) ;
+    Compile_SUBI ( REG, stackReg, 0, CELL_SIZE * 2, BYTE ) ;
+#if ARRAY_MODE_CHECK    
+    CfrTil_ArrayModeOff ( ) ;
+#endif    
+}
+
+#if OP_EQ_STORE
+
 // '!' ( value address  -- ) // store value at address - dpans94 - address is on top - value was pushed first, leftmost in rpn, then address
 
 void
-Compile_Store ( Compiler * compiler, Boolean stackReg ) // !
+Compile_Store ( Compiler * compiler ) // !
 {
-    int64 optFlag = Compiler_CheckOptimize ( compiler, 0 ) ;
+    int64 optFlag = Compiler_CheckOptimize ( compiler, 0 ), stackReg = DSP ;
     if ( optFlag & OPTIMIZE_DONE ) return ;
     else if ( optFlag )
     {
         // _Compile_MoveImm ( cell direction, cell rm, cell disp, cell imm, cell operandSize )
-        if ( compiler->OptInfo->OptimizeFlag & OPTIMIZE_IMM ) Compile_MoveImm (compiler->OptInfo->Optimize_Dest_RegOrMem,
+        if ( compiler->OptInfo->OptimizeFlag & OPTIMIZE_IMM ) Compile_MoveImm ( compiler->OptInfo->Optimize_Dest_RegOrMem,
             compiler->OptInfo->Optimize_Rm, compiler->OptInfo->Optimize_Disp, compiler->OptInfo->Optimize_Imm, CELL_SIZE ) ;
         else if ( compiler->OptInfo->OptimizeFlag & OPTIMIZE_REGISTER )
         {
@@ -111,17 +185,17 @@ Compile_Store ( Compiler * compiler, Boolean stackReg ) // !
 // ( addr n -- ) // (*addr) = n
 
 void
-Compile_Poke ( Compiler * compiler, Boolean stackReg ) // =
+Compile_Poke ( Compiler * compiler ) // =
 {
-    int64 optFlag = Compiler_CheckOptimize ( compiler, 0 ) ;
+    int64 optFlag = Compiler_CheckOptimize ( compiler, 0 ), stackReg = DSP ;
     if ( optFlag & OPTIMIZE_DONE ) return ;
     else if ( optFlag )
     {
-        //Compiler_Word_SetCodingHere_And_ClearPreviousUseOf_Here_SCA ( compiler->OptInfo->opWord, 0 ) ;
+        //Compiler_SCA_Word_SetCodingHere_And_ClearPreviousUse ( compiler->OptInfo->opWord, 0 ) ;
         if ( compiler->OptInfo->OptimizeFlag & OPTIMIZE_IMM )
         {
             // _Compile_MoveImm ( cell direction, cell rm, cell disp, cell imm, cell operandSize )
-            Compile_MoveImm (compiler->OptInfo->Optimize_Dest_RegOrMem,
+            Compile_MoveImm ( compiler->OptInfo->Optimize_Dest_RegOrMem,
                 compiler->OptInfo->Optimize_Rm, compiler->OptInfo->Optimize_Disp, compiler->OptInfo->Optimize_Imm, 0 ) ;
         }
         else if ( compiler->OptInfo->OptimizeFlag & OPTIMIZE_REGISTER )
@@ -136,7 +210,7 @@ Compile_Poke ( Compiler * compiler, Boolean stackReg ) // =
         }
         else Compile_Move_Reg_To_Rm ( compiler->OptInfo->Optimize_Rm, compiler->OptInfo->Optimize_Reg, compiler->OptInfo->Optimize_Disp ) ;
     }
-    else
+    else // when optimize is off, eg with arrays
     {
         Compile_Move_Rm_To_Reg ( OREG, stackReg, 0 ) ;
         Compile_Move_Rm_To_Reg ( ACC, stackReg, - CELL_SIZE ) ;
@@ -148,21 +222,7 @@ Compile_Poke ( Compiler * compiler, Boolean stackReg ) // =
     CfrTil_ArrayModeOff ( ) ;
 #endif    
 }
+#endif
 
-// n = *m
-// ( n m -- )
-// 
 
-void
-Compile_AtEqual ( Boolean stackReg ) // !
-{
-    Compile_Move_Rm_To_Reg ( ACC, stackReg, 0 ) ;
-    Compile_Move_Rm_To_Reg ( ACC, ACC, 0 ) ;
-    Compile_Move_Rm_To_Reg ( OREG, stackReg, - CELL_SIZE ) ;
-    Compile_Move_Reg_To_Rm ( OREG, ACC, 0 ) ;
-    Compile_SUBI ( REG, stackReg, 0, CELL_SIZE * 2, BYTE ) ;
-#if ARRAY_MODE_CHECK    
-    CfrTil_ArrayModeOff ( ) ;
-#endif    
-}
 
