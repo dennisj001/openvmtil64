@@ -547,7 +547,7 @@ Compile_X_OpEqual ( Compiler * compiler, block op )
         Block_Eval ( op ) ;
         compiler->OptimizeForcedReturn = 0 ;
         Word_Check_SetHere_To_StackPushRegisterCode ( optInfo->opWord, 0 ) ;
-        Compiler_Word_SCHCPUSCA ( optInfo->opWord, 0 ) ;
+        //Compiler_Word_SCHCPUSCA ( optInfo->opWord, 0 ) ;
         if ( ! ( optInfo->wordArg1->CAttribute & REGISTER_VARIABLE ) ) Compile_Move_Reg_To_Rm (OREG2, valueReg, 0 ) ; //optInfo->Optimize_Reg, 0 ) ; //ACC, 0 ) ;
     }
     else if ( ! optInfo->rtrn ) Setup_MachineCodeInsnParameters ( compiler, REG, REG, ACC, OREG, 0, 0 ) ;
