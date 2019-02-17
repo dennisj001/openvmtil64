@@ -213,7 +213,7 @@ void
 _Compile_RspReg_Save ( )
 {
 #if 1    
-    Compile_Move_Reg_To_Rm ( DSP, RSP, 4 ) ; // 4 : placeholder
+    Compile_Move_Reg_To_Rm (DSP, RSP, 4 ) ; // 4 : placeholder
     _Context_->Compiler0->RspSaveOffset = Here - 1 ; // only takes one byte for _Compile_Move_Reg_To_Rm ( ESI, 4, ESP )
     // TO DO : i think this (below) is what it should be but some adjustments need to be made to make it work 
     //byte * here = Here ;

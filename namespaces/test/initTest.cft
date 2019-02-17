@@ -44,14 +44,12 @@ Int User
 : lT lispTest ;
 
 #if doX64
-: basicT bT ppT cT mT aT loT locT fT oT cntT lT sT sysT interpT stT cST dT0 x64 ;
-//: basicT bT ppT cT mT aT loT locT fT oT cntT lT sT sysT interpT stT cST dT0 ;
-//: basicT ppT cT mT aT loT bT locT fT oT x64 lT sT sysT interpT stT cST dT0 ;
-: testX ;
+: basicT bT ppT cT mT aT loT locT fT oT cntT lT sT sysT interpT stT cST dT0 x64 ; //tx64 ; //x64 ;
+#elif doTX64
+: basicT bT ppT cT mT aT loT locT fT oT cntT lT sT sysT interpT stT cST dT0 tx64 ; //x64 ;
 #else
 : basicT ppT cT mT aT loT bT locT fT oT cntT lT sT sysT interpT stT cST dT0 ;
-: basicT ppT cT mT aT loT bT locT fT oT     cntT lT sT sysT dT0 ; //interpT stT cST dT0 ;
-: testX ; //cST dT0 dT ;
+//: basicT ppT cT mT aT loT bT locT fT oT     cntT lT sT sysT dT0 ; //interpT stT cST dT0 ;
 #endif
 : _basicT bT mT cntT lT fT sysT  ;
 : testBasic basicT ;
@@ -96,7 +94,7 @@ System Combinators
 //: test0 { doTest _TestDone_ @ not && } { basicT testX _TestDone_ ++ } if2  ; d: test0
 //{ doTest _TestDone_ @ not && } { <dbg> basicT testX _TestDone_ ++ } if2  
 sp
-{ doTest _TestDone_ @ not && } { basicT testX _TestDone_ ++ } if2  
+{ doTest _TestDone_ @ not && } { basicT _TestDone_ ++ } if2  
 //#endif // end if 1
 #elif 0
 "\ntest nested elif 1 - wrong \n" ps pause

@@ -187,8 +187,8 @@ void
 CfrTil_WordList_PushWord ( Word * word )
 {
 #if 1
-    if ( word == (Word*) 0x7ffff5958e88 ) //0x7ffff595be88
-        _Printf ( (byte*) "\nGot it = %s", word->Name ) ;
+    if ( word == ( Word* ) 0x7ffff5958e88 ) //0x7ffff595be88
+        _Printf ( ( byte* ) "\nGot it = %s", word->Name ) ;
     _CfrTil_WordList_PushWord ( word,
         ( ! ( word->CAttribute & ( NAMESPACE | OBJECT_OPERATOR | OBJECT_FIELD ) ) ) || ( word->CAttribute & ( DOBJECT ) ) ) ;
 #else    
@@ -377,7 +377,7 @@ Compiler_SC_WordList_Show ( byte * prefix, Boolean inUseOnlyFlag, Boolean showIn
     if ( Is_DebugModeOn || showInDebugColors ) NoticeColors ;
     //if ( prefix ) _Printf ( "\n%s : %s", prefix, scWord->Name ) ;
     byte *buffer = Buffer_Data ( _CfrTil_->ScratchB1 ) ;
-    sprintf ( ( char* ) buffer, "%sWord = %s :: %s : %s", prefix ? prefix : (byte*) "", ( char* ) scWord->Name,
+    sprintf ( ( char* ) buffer, "%sWord = %s :: %s : %s", prefix ? prefix : ( byte* ) "", ( char* ) scWord->Name,
         ( list == _CfrTil_->Compiler_N_M_Node_WordList ) ? "CfrTil WordList" : "source code word list for the word", inUseOnlyFlag ? "in use only" : "all" ) ;
     SC_WordList_Show ( list, scWord, 0, inUseOnlyFlag, buffer ) ;
     if ( Is_DebugModeOn || showInDebugColors ) DefaultColors ;
@@ -626,7 +626,7 @@ CfrTil_AppendCharToSourceCode ( CfrTil * cfrtil, byte c )
             else cfrtil->SC_QuoteMode = 1 ;
             _CfrTil_AppendCharToSourceCode ( cfrtil, c ) ;
         }
-        else _String_AppendConvertCharToBackSlash ( cfrtil->SC_Buffer, c, &cfrtil->SC_Index ) ;
+        else _String_AppendConvertCharToBackSlash ( cfrtil->SC_Buffer, c, &cfrtil->SC_Index, true ) ;
     }
 }
 
@@ -653,7 +653,7 @@ SC_PrepareDbgSourceCodeString ( byte * sc, Word * word ) // sc : source code ; s
         slsc = strlen ( ( char* ) sc ) ;
         scwi0 = word->W_SC_Index ;
         scwci = String_FindStrnCmpIndex ( sc, token, scwi0, slt, slt ) ; //( ( slsc - scwi0 ) > 30 ) ? 30 : ( slsc - scwi0 ) ) ;
-        if ( scwci == -1 ) return 0 ;
+        if ( scwci == - 1 ) return 0 ;
         d0 ( byte * scspp0 = & sc [ scwi0 ] ) ;
         d0 ( byte * scspp2 = & sc [ scwci ] ) ;
         nvw = Buffer_New_pbyte ( ( slsc > BUFFER_SIZE ) ? slsc : BUFFER_SIZE ) ;

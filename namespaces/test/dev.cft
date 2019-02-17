@@ -24,6 +24,8 @@ int factoriali ( REG n | REG res )
         res *= n-- ; 
 #elif 1
         res *= (n--) ; 
+#elif 0
+        res = res * n-- ;
 #else
         res = res * (n--) ;
 #endif
@@ -66,7 +68,7 @@ faccs3 ( 7 ) dup p 5040 _assert
 sp
 
 int
-fac5 ( REG n  | REG facc -- RAX ) 
+fac5 ( REG n  | REG facc ) 
 { 
     facc = 1 ;
     while ( n > 1 ) 

@@ -46,12 +46,17 @@ CfrTil_Define ( )
     Context * cntx = _Context_ ;
     Interpreter * interp = cntx->Interpreter0 ;
     SetState ( interp, PREPROCESSOR_DEFINE, true ) ;
-    CfrTil_Colon () ;
+    CfrTil_Colon ( ) ;
     Interpret_ToEndOfLine ( interp ) ;
     int64 locals = Compiler_IsFrameNecessary ( _Compiler_ ) ;
     SetState ( interp, PREPROCESSOR_DEFINE, false ) ;
     CfrTil_SemiColon ( ) ;
     if ( locals ) CfrTil_Prefix ( ) ; // if we have local variables make it a prefix word ; maybe : if ( GetState ( _Context_, C_SYNTAX ) ) 
+    else
+    {
+        Word * word = _CfrTil_->LastFinished_Word ;
+        if ( word ) word->CAttribute |= (LITERAL|CONSTANT) ;
+    }
     CfrTil_Inline ( ) ;
     CfrTil_SourceCode_Init ( ) ; //don't leave the define in sc
 }
@@ -111,7 +116,7 @@ void
 CfrTil_TokenToWord ( )
 {
     byte * token = ( byte* ) DataStack_Pop ( ) ;
-    DataStack_Push ( ( int64 ) _Interpreter_TokenToWord (_Context_->Interpreter0, token , -1, -1) ) ;
+    DataStack_Push ( ( int64 ) _Interpreter_TokenToWord ( _Context_->Interpreter0, token, - 1, - 1 ) ) ;
 }
 
 void
@@ -131,13 +136,13 @@ _CfrTil_Interpret_ReadToList ( )
     while ( token = Lexer_ReadToken ( _Lexer_ ) )
     {
         if ( String_Equal ( token, ";l" ) ) break ;
-        Word * word = _Interpreter_TokenToWord (interp, token , -1, -1) ;
+        Word * word = _Interpreter_TokenToWord ( interp, token, - 1, - 1 ) ;
         if ( word )
         {
 
             _Word_Interpret ( word ) ;
             //List_Push_A_1Value_Node ( interp->InterpList, word ) ;
-            List_PushNew_T_WORD ( interp->InterpList, (int64) word, COMPILER_TEMP ) ;
+            List_PushNew_T_WORD ( interp->InterpList, ( int64 ) word, COMPILER_TEMP ) ;
         }
     }
     return interp->InterpList ;

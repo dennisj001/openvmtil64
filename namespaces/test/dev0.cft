@@ -339,6 +339,7 @@ fac5 ( REG n  | REG facc )
     while ( n > 1 ) 
     {
         facc = facc * (n --) ;
+        //facc *= n -- ;
     }
     return facc ;
 } prefix

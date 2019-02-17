@@ -377,6 +377,7 @@ dbgOff
 //dbgOn 
 'todo 0 const  
 'doX64 1 const
+'doTX64 0 const
 'doScript 1 const
 'doScript2 1 const
 '_doDemo 0 const    
@@ -391,8 +392,9 @@ dbgOff
 
 scOn
 System C
-//s pause
-tc
+//tc
+x64
+d: tx64
 
 #if _doDemo 
 demo 
@@ -406,6 +408,27 @@ stringMacrosOff
 'doInitTest 1 const
 #if doInitTest
 //tx64
+c_syntaxOn scOn
+int factoriali ( REG n | REG res )
+{
+    res = 1;
+    while ( n >= 2 )
+    {
+#if 1
+        res *= n-- ; 
+#elif 1
+        res *= (n--) ; 
+#elif 1
+        res = res * n-- ;
+#else
+        res = res * (n--) ;
+#endif
+    }
+    return res;
+} prefix
+'factoriali find wdiss //pause
+c_syntaxOff 
+C_Syntax.factoriali (7) dup p 5040 _assert //pause //sp
 #endif 
 
 postfix 

@@ -54,7 +54,7 @@ _Compile_StackPtrLValue_PushObj ( uint64 stkPtrLvalue, Boolean tempStkReg, int64
     Compile_Move_Rm_To_Reg ( tempStkReg, OREG, 0 ) ; // tempStkReg is rvalue
     Compile_ADDI ( REG, tempStkReg, 0, sizeof (int64 ), 0 ) ;
     _Compile_SetStackN_WithObject ( tempStkReg, 0, obj ) ;
-    Compile_Move_Reg_To_Rm ( OREG, tempStkReg, 0 ) ; //OREG remained as lvalue set as before 
+    Compile_Move_Reg_To_Rm (OREG, tempStkReg, 0 ) ; //OREG remained as lvalue set as before 
 }
 
 // pop a stack at an rvalue using an lvalue
@@ -66,7 +66,7 @@ _Compile_StackPtrLValue_PopToReg ( uint64 stkPtrLvalue, Boolean tempStkReg, Bool
     Compile_Move_Rm_To_Reg ( tempStkReg, OREG, 0 ) ; // OREG is rvalue stack ptr
     _Compile_Move_StackN_To_Reg ( reg, tempStkReg, 0 ) ; // pop our rvalue stack ptr
     Compile_SUBI ( REG, tempStkReg, 0, sizeof (int64 ), 0 ) ;
-    Compile_Move_Reg_To_Rm ( OREG, tempStkReg, 0 ) ; // move the new rvalue back to its lvalue - OREG
+    Compile_Move_Reg_To_Rm (OREG, tempStkReg, 0 ) ; // move the new rvalue back to its lvalue - OREG
 }
 
 void
@@ -78,7 +78,7 @@ _Compile_Move_StackN_To_Reg ( Boolean reg, Boolean stackReg, int64 index )
 void
 _Compile_Move_Reg_To_StackN ( Boolean stackReg, int64 index, Boolean reg )
 {
-    Compile_Move_Reg_To_Rm ( stackReg, reg, index * CELL ) ;
+    Compile_Move_Reg_To_Rm (stackReg, reg, index * CELL ) ;
 }
 
 void
@@ -94,7 +94,7 @@ void
 _Compile_Move_Reg_To_StackNRm_UsingReg ( Boolean stackReg, int64 index, Boolean reg, Boolean ureg )
 {
     _Compile_Move_StackN_To_Reg ( ureg, stackReg, index ) ;
-    Compile_Move_Reg_To_Rm ( ureg, reg, 0 ) ;
+    Compile_Move_Reg_To_Rm (ureg, reg, 0 ) ;
 }
 
 // remember to use a negative number to access an existing stack item
@@ -172,7 +172,7 @@ _Compile_Stack_Dup ( Boolean stackReg )
             Compile_Move_Rm_To_Reg ( ACC, DSP, 0 ) ;
             CfrTil_WordList ( 0 )->StackPushRegisterCode = Here ;
             Compile_ADDI ( REG, DSP, 0, sizeof (int64 ), 0 ) ;
-            Compile_Move_Reg_To_Rm ( DSP, ACC, 0 ) ;
+            Compile_Move_Reg_To_Rm (DSP, ACC, 0 ) ;
         }
     }
 }
@@ -193,7 +193,7 @@ _Compile_Stack_Pick ( Boolean stackReg ) // pick
     Compile_Move_Rm_To_Reg ( ACC, stackReg, 0 ) ;
     Compile_NOT ( REG, ACC, 0, 0, 0 ) ; // bitwise negate acc : we want the negative of TOS
     Compile_Move_WithSib ( REG, 0, ACC, DSP, SCALE_CELL, ACC, DSP ) ;
-    Compile_Move_Reg_To_Rm ( stackReg, ACC, 0 ) ;
+    Compile_Move_Reg_To_Rm (stackReg, ACC, 0 ) ;
     //DBI_OFF ;
 }
 
@@ -202,8 +202,8 @@ _Compile_Stack_Swap ( Boolean stackReg )
 {
     Compile_Move_Rm_To_Reg ( OREG, stackReg, 0 ) ;
     Compile_Move_Rm_To_Reg ( RAX, stackReg, - CELL ) ;
-    Compile_Move_Reg_To_Rm ( stackReg, OREG, - CELL ) ;
-    Compile_Move_Reg_To_Rm ( stackReg, RAX, 0 ) ;
+    Compile_Move_Reg_To_Rm (stackReg, OREG, - CELL ) ;
+    Compile_Move_Reg_To_Rm (stackReg, RAX, 0 ) ;
 }
 
 void

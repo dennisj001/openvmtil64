@@ -153,6 +153,7 @@
                  commonFlags="-mtune=generic -march=x86-64 -fstack-protector-strong"/>
         <element flagsID="2"
                  commonFlags="-mtune=generic -march=x86-64 -g -O2 -fstack-protector-strong"/>
+        <element flagsID="3" commonFlags="-std=c++14"/>
       </flagsDictionary>
       <codeAssistance>
       </codeAssistance>
@@ -216,15 +217,6 @@
           </incDir>
         </cTool>
       </folder>
-      <folder path="0/src/basis/compiler">
-        <ccTool>
-          <incDir>
-            <pElem>src/basis/compiler</pElem>
-            <pElem>src/include</pElem>
-            <pElem>.</pElem>
-          </incDir>
-        </ccTool>
-      </folder>
       <folder path="0/src/basis/lc">
         <ccTool>
           <incDir>
@@ -281,66 +273,144 @@
       </item>
       <item path="src/basis/compiler/_compile.c" ex="false" tool="1" flavor2="11">
         <ccTool flags="1">
+          <incDir>
+            <pElem>src/basis/compiler</pElem>
+            <pElem>src/include</pElem>
+            <pElem>.</pElem>
+          </incDir>
         </ccTool>
       </item>
       <item path="src/basis/compiler/arrays.c" ex="false" tool="1" flavor2="11">
         <ccTool flags="1">
+          <incDir>
+            <pElem>src/basis/compiler</pElem>
+            <pElem>src/include</pElem>
+            <pElem>.</pElem>
+          </incDir>
         </ccTool>
       </item>
       <item path="src/basis/compiler/bit.c" ex="false" tool="1" flavor2="11">
         <ccTool flags="1">
+          <incDir>
+            <pElem>src/basis/compiler</pElem>
+            <pElem>src/include</pElem>
+            <pElem>.</pElem>
+          </incDir>
         </ccTool>
       </item>
       <item path="src/basis/compiler/blocks.c" ex="false" tool="1" flavor2="11">
         <ccTool flags="1">
+          <incDir>
+            <pElem>src/basis/compiler</pElem>
+            <pElem>src/include</pElem>
+            <pElem>.</pElem>
+          </incDir>
         </ccTool>
       </item>
       <item path="src/basis/compiler/combinators.c" ex="false" tool="1" flavor2="11">
         <ccTool flags="1">
+          <incDir>
+            <pElem>src/basis/compiler</pElem>
+            <pElem>src/include</pElem>
+            <pElem>.</pElem>
+          </incDir>
         </ccTool>
       </item>
       <item path="src/basis/compiler/compile.c" ex="false" tool="1" flavor2="11">
         <ccTool flags="1">
+          <incDir>
+            <pElem>src/basis/compiler</pElem>
+            <pElem>src/include</pElem>
+            <pElem>.</pElem>
+          </incDir>
         </ccTool>
       </item>
       <item path="src/basis/compiler/compiler.c" ex="false" tool="1" flavor2="11">
         <ccTool flags="1">
+          <incDir>
+            <pElem>src/basis/compiler</pElem>
+            <pElem>src/include</pElem>
+            <pElem>.</pElem>
+          </incDir>
         </ccTool>
       </item>
       <item path="src/basis/compiler/cpu.c" ex="false" tool="1" flavor2="11">
         <ccTool flags="1">
+          <incDir>
+            <pElem>src/basis/compiler</pElem>
+            <pElem>src/include</pElem>
+            <pElem>.</pElem>
+          </incDir>
         </ccTool>
       </item>
       <item path="src/basis/compiler/locals.c" ex="false" tool="1" flavor2="11">
         <ccTool flags="1">
+          <incDir>
+            <pElem>src/basis/compiler</pElem>
+            <pElem>src/include</pElem>
+            <pElem>.</pElem>
+          </incDir>
         </ccTool>
       </item>
       <item path="src/basis/compiler/logic.c" ex="false" tool="1" flavor2="11">
         <ccTool flags="1">
+          <incDir>
+            <pElem>src/basis/compiler</pElem>
+            <pElem>src/include</pElem>
+            <pElem>.</pElem>
+          </incDir>
         </ccTool>
       </item>
       <item path="src/basis/compiler/machineCode.c" ex="false" tool="1" flavor2="11">
         <ccTool flags="1">
+          <incDir>
+            <pElem>src/basis/compiler</pElem>
+            <pElem>src/include</pElem>
+            <pElem>.</pElem>
+          </incDir>
         </ccTool>
       </item>
       <item path="src/basis/compiler/math.c" ex="false" tool="1" flavor2="11">
         <ccTool flags="1">
+          <incDir>
+            <pElem>src/basis/compiler</pElem>
+            <pElem>src/include</pElem>
+            <pElem>.</pElem>
+          </incDir>
         </ccTool>
       </item>
       <item path="src/basis/compiler/memory.c" ex="false" tool="1" flavor2="11">
         <ccTool flags="1">
+          <incDir>
+            <pElem>src/basis/compiler</pElem>
+            <pElem>src/include</pElem>
+            <pElem>.</pElem>
+          </incDir>
         </ccTool>
       </item>
       <item path="src/basis/compiler/optimize.c" ex="false" tool="1" flavor2="11">
-        <ccTool flags="1">
+        <ccTool>
+          <incDir>
+            <pElem>.</pElem>
+          </incDir>
         </ccTool>
       </item>
       <item path="src/basis/compiler/stack.c" ex="false" tool="1" flavor2="11">
         <ccTool flags="1">
+          <incDir>
+            <pElem>src/basis/compiler</pElem>
+            <pElem>src/include</pElem>
+            <pElem>.</pElem>
+          </incDir>
         </ccTool>
       </item>
       <item path="src/basis/compiler/udis.c" ex="false" tool="1" flavor2="11">
         <ccTool flags="1">
+          <incDir>
+            <pElem>src/basis/compiler</pElem>
+            <pElem>src/include</pElem>
+            <pElem>.</pElem>
+          </incDir>
         </ccTool>
       </item>
       <item path="src/basis/context.c" ex="false" tool="1" flavor2="11">
@@ -728,7 +798,7 @@
         </ccTool>
       </item>
       <item path="src/basis/openVmTil.c" ex="false" tool="1" flavor2="11">
-        <ccTool>
+        <ccTool flags="3">
           <incDir>
             <pElem>.</pElem>
           </incDir>

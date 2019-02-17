@@ -90,7 +90,7 @@ CPrimitive CPrimitives [] = {
     { ";", 0, 0, 0, CfrTil_C_Semi, IMMEDIATE | KEYWORD, SYNTACTIC, 0, "C_Syntax", "C" },
     { ",", 0, 0, 0, CfrTil_NoOp, IMMEDIATE | KEYWORD, NO_OP_WORD|RIGHT_PAREN, 0, "C_Syntax", "C" },
     { "!", 0, 0, TEST, CfrTil_LogicalNot, IMMEDIATE | CATEGORY_OP | CATEGORY_OP_1_ARG | CATEGORY_LOGIC | PREFIX, LOGIC_NEGATE, 0, "C_Syntax", "C" },
-    { "?", 0, 0, 0, CfrTil_C_ConditionalExpression, IMMEDIATE, 0, 0, "C_Syntax", "C" },
+    { "?", 0, 0, 0, CfrTil_C_ConditionalExpression, COMBINATOR | IMMEDIATE, 0, 0, "C_Syntax", "C" },
     { "c_class", 0, 0, 0, ( block ) CfrTil_C_Class_New, 0, 0, 0, "C_Syntax", "C" },
     { "type", 0, 0, 0, ( block ) CfrTil_Type_New, 0, 0, 0, "C_Syntax", "C" },
     { "typedef", 0, 0, 0, CfrTil_Typedef, 0, 0, 0, "C_Syntax", "C" },
@@ -556,7 +556,8 @@ CPrimitive CPrimitives [] = {
     { "getStringToEndOfLine", 0, 0, 0, String_GetStringToEndOfLine, 0, 0, 0, "Compiler", "Root" },
     { "sourceCodeInit", 0, 0, 0, CfrTil_SourceCode_Init, 0, 0, 0, "Compiler", "Root" },
     { "sourceCodeOn", 0, 0, 0, CfrTil_Lexer_SourceCodeOn, 0, 0, 0, "Compiler", "Root" },
-    { ")", 0, 0, 0, CfrTil_NoOp, IMMEDIATE | KEYWORD, NO_OP_WORD|RIGHT_PAREN, 0, "Compiler", "Root" },
+    //{ ")", 0, 0, 0, CfrTil_NoOp, IMMEDIATE | KEYWORD, NO_OP_WORD|RIGHT_PAREN, 0, "Compiler", "Root" },
+    { ")", 0, 0, 0, CfrTil_NoOp, IMMEDIATE | KEYWORD, RIGHT_PAREN, 0, "Compiler", "Root" },
 
     { "compileByte", 0, 0, 0, CompileByte, 0, 0, 0, "Compiling", "Compiler" },
     { "_compileCall", 0, 0, 0, CompileCall, 0, 0, 0, "Compiling", "Compiler" },

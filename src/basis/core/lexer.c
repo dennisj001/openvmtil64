@@ -32,7 +32,7 @@ Lexer_ObjectToken_New ( Lexer * lexer, byte * token, int64 tsrli, int64 scwi ) /
                     //if ( ! _Compiler_->AutoVarTypeNamespace ) 
                     _Namespace_ActivateAsPrimary ( compiler->LocalsNamespace ) ;
                     word = DataObject_New ( LOCAL_VARIABLE, 0, token, LOCAL_VARIABLE, 0, 0, 0, 0, DICTIONARY, tsrli, scwi ) ;
-                    token2 = Lexer_Peek_Next_NonDebugTokenWord (lexer, 1 , 0) ;
+                    token2 = Lexer_Peek_Next_NonDebugTokenWord ( lexer, 1, 0 ) ;
                     if ( ! String_Equal ( token2, "=" ) ) return lexer->TokenWord = 0 ; // don't interpret this word
                 }
                 else word = DataObject_New ( NAMESPACE_VARIABLE, 0, token, NAMESPACE_VARIABLE, 0, 0, 0, 0, 0, tsrli, scwi ) ;
@@ -115,7 +115,7 @@ Lexer_Init ( Lexer * lexer, byte * delimiters, uint64 state, uint64 allocType )
     SetState ( lexer, KNOWN_OBJECT | LEXER_DONE | END_OF_FILE | END_OF_STRING | LEXER_END_OF_LINE, false ) ;
     lexer->TokenDelimitersAndDot = ( byte* ) " .\n\r\t" ;
     lexer->DelimiterOrDotCharSet = CharSet_New ( lexer->TokenDelimitersAndDot, allocType ) ;
-    lexer->TokenStart_ReadLineIndex = -1 ;
+    lexer->TokenStart_ReadLineIndex = - 1 ;
     lexer->Filename = lexer->ReadLiner0->Filename ;
     lexer->LineNumber = lexer->ReadLiner0->LineNumber ;
     lexer->SC_Index = 0 ;
@@ -246,28 +246,18 @@ _Lexer_Next_NonDebugOrCommentTokenWord ( Lexer * lexer, byte * delimiters, Boole
 Boolean
 Lexer_IsNextWordLeftParen ( Lexer * lexer )
 {
-#if 1
     // with this any postfix word that is not a keyword or a c rtl arg word can now be used prefix with parentheses 
     byte c = Lexer_NextNonDelimiterChar ( lexer ) ;
     if ( ( c == '(' ) ) return true ;
-#else
-    byte * token = Lexer_Peek_Next_NonDebugTokenWord ( lexer, 1, 0 ) ;
-    if ( token [0] == '(') return true ;
-#endif    
     else return false ;
 }
 
 Boolean
 Lexer_IsWordPrefixing ( Lexer * lexer, Word * word )
 {
-#if 1    
     if ( GetState ( _Context_, LC_INTERPRET ) ) return true ;
-    else if ( ( GetState ( _Context_, PREFIX_MODE ) ) && 
-        ( ! ( word->CAttribute & (CATEGORY_OP_OPEQUAL|CATEGORY_OP_EQUAL|KEYWORD) ) ) && ( ! ( word->WAttribute & WT_C_PREFIX_RTL_ARGS ) ) ) 
-#else
-    if ( GetState ( _Context_, LC_INTERPRET ) ) return true ;
-    else if ( ( GetState ( _Context_, PREFIX_MODE ) ) && ( ! ( word->CAttribute & KEYWORD ) ) && ( ! ( word->WAttribute & WT_C_PREFIX_RTL_ARGS ) ) ) 
-#endif        
+    else if ( ( GetState ( _Context_, PREFIX_MODE ) ) &&
+        ( ! ( word->CAttribute & ( CATEGORY_OP_OPEQUAL | CATEGORY_OP_EQUAL | KEYWORD ) ) ) && ( ! ( word->WAttribute & WT_C_PREFIX_RTL_ARGS ) ) )
     {
         return Lexer_IsNextWordLeftParen ( _Lexer_ ) ;
     }
@@ -275,7 +265,7 @@ Lexer_IsWordPrefixing ( Lexer * lexer, Word * word )
 }
 
 byte *
-Lexer_Peek_Next_NonDebugTokenWord (Lexer * lexer, Boolean evalFlag , Boolean svReadIndexFlag)
+Lexer_Peek_Next_NonDebugTokenWord ( Lexer * lexer, Boolean evalFlag, Boolean svReadIndexFlag )
 {
     ReadLiner * rl = _ReadLiner_ ;
     int64 svReadIndex = rl->ReadIndex ;
@@ -340,7 +330,7 @@ Lexer_AppendByteToTokenBuffer ( Lexer * lexer )
 void
 Lexer_Append_ConvertedCharacterToTokenBuffer ( Lexer * lexer )
 {
-    _String_AppendConvertCharToBackSlash ( TokenBuffer_AppendPoint ( lexer ), lexer->TokenInputByte, 0 ) ;
+    _String_AppendConvertCharToBackSlash ( TokenBuffer_AppendPoint ( lexer ), lexer->TokenInputByte, 0, false ) ;
     _Lexer_AppendCharToSourceCode ( lexer, lexer->TokenInputByte, 0 ) ;
     lexer->TokenWriteIndex ++ ;
 }

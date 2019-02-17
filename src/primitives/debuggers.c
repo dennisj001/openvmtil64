@@ -60,7 +60,7 @@ CfrTil_DebugOff ( )
 }
 
 void
-CfrTil_DebugRuntimeBreakpoint ( )
+DebugRuntimeBreakpoint ( )
 {
     Debugger * debugger = _Debugger_ ;
     //if ( ( ! CompileMode ) )
@@ -93,14 +93,20 @@ CfrTil_DebugRuntimeBreakpoint ( )
 }
 
 void
+CfrTil_DebugRuntimeBreakpoint ( )
+{
+    if ( ( ! CompileMode ) ) DebugRuntimeBreakpoint ( ) ;
+}
+
+void
 CfrTil_DebugRuntimeBreakpoint_IsDebugShowOn ( )
 {
-    if ( Is_DebugShowOn ) CfrTil_DebugRuntimeBreakpoint ( ) ;
+    if ( Is_DebugShowOn ) DebugRuntimeBreakpoint ( ) ;
 }
 
 void
 CfrTil_DebugRuntimeBreakpoint_IsDebugOn ( )
 {
-    if ( Is_DebugOn ) CfrTil_DebugRuntimeBreakpoint ( ) ;
+    if ( Is_DebugOn ) DebugRuntimeBreakpoint ( ) ;
 }
 

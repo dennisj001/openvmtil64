@@ -203,7 +203,7 @@ String_ReadLineToken_HighLight ( byte * token )
 // ?? use pointers with these string functions ??
 
 void
-_String_AppendConvertCharToBackSlash ( byte * dst, byte c, int64 * index ) //, int64 quoteMode )
+_String_AppendConvertCharToBackSlash ( byte * dst, byte c, int64 * index, Boolean removeExtraSpacesFlag ) //, int64 quoteMode )
 {
     int64 i = index ? ( * index ) : 0 ;
     if ( c < ' ' )
@@ -230,46 +230,16 @@ _String_AppendConvertCharToBackSlash ( byte * dst, byte c, int64 * index ) //, i
     }
     else
     {
-        //if ( ! ( ( c == ' ' ) && ( dst [ i ] == ' ' ) && ( dst [i - 1] == ' ' ) ) ) dst [ i ++ ] = c ; // remove extra spaces
-        //if ( ! ( ( c == ' ' ) && ( dst [i - 1] == ' ' ) ) ) dst [ i ++ ] = c ; // remove extra spaces
-        dst [ i ++ ] = c ; 
+        if ( removeExtraSpacesFlag )
+        {
+            if ( ! ( ( c == ' ' ) && ( dst [i - 1] == ' ' ) ) ) dst [ i ++ ] = c ; // remove extra spaces
+        }
+        else dst [ i ++ ] = c ;
     }
     dst [ i ] = 0 ;
     if ( index ) *index = i ;
     //return &dst [ i ] ;
 }
-#if 0
-
-void
-_String_AppendConvertCharToBackSlash ( byte * dst, byte c )
-{
-    int64 i = 0 ;
-    if ( ( c < ' ' ) )
-    {
-        if ( _CfrTil_->SC_QuoteMode )
-        {
-            if ( c == '\n' )
-            {
-                dst [ i ++ ] = '\\' ;
-                dst [ i ++ ] = 'n' ;
-            }
-            else if ( c == '\r' )
-            {
-                dst [ i ++ ] = '\\' ;
-                dst [ i ++ ] = 'r' ;
-            }
-            else if ( c == '\t' )
-            {
-                dst [ i ++ ] = '\\' ;
-                dst [ i ++ ] = 't' ;
-            }
-        }
-    }
-    else dst [ i ++ ] = c ;
-    dst [ i ] = 0 ;
-    //return &dst [ i ] ;
-}
-#endif
 
 byte *
 _String_ConvertStringFromBackSlash ( byte * dst, byte * src )
@@ -980,7 +950,7 @@ String_DelimitSourceCodeStartForLispCfrTil ( char * sc )
         sc ++ ;
     }
 next:
-    start = (byte*) sc ;
+    start = ( byte* ) sc ;
     while ( *sc )
     {
         switch ( *sc )

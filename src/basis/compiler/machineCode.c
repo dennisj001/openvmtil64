@@ -207,7 +207,7 @@ CalculateModRegardingDisplacement ( Boolean mod, int64 disp )
     //  00 000 000
     if ( mod != REG )
     {
-        if ( disp == 0 ) 
+        if ( disp == 0 )
             mod = 0 ;
         else if ( disp <= 0xff ) mod = 1 ;
         else mod = 2 ;
@@ -273,7 +273,8 @@ Compile_CalculateWrite_Instruction_X64 ( uint8 opCode0, uint8 opCode1, Boolean m
 void
 Compile_Move ( uint8 direction, uint8 mod, uint8 reg, uint8 rm, uint8 operandSize, uint8 sib, int64 disp, uint8 dispSize, int64 imm, uint8 immSize )
 {
-    uint8 opCode ; uint16 controlFlags = ( disp ? DISP_B : 0 ) | ( sib ? SIB_B : 0 ) ;
+    uint8 opCode ;
+    uint16 controlFlags = ( disp ? DISP_B : 0 ) | ( sib ? SIB_B : 0 ) ;
     if ( imm || immSize )
     {
         reg = 0 ;
@@ -293,7 +294,7 @@ Compile_Move ( uint8 direction, uint8 mod, uint8 reg, uint8 rm, uint8 operandSiz
             else if ( disp <= 0xff ) mod = 1 ;
             else if ( disp >= 0x100 ) mod = 2 ;
         }
-        controlFlags |= (REX_B | MODRM_B) ;
+        controlFlags |= ( REX_B | MODRM_B ) ;
     }
     Compile_CalculateWrite_Instruction_X64 ( 0, opCode, mod, reg, rm, controlFlags, sib, disp, dispSize, imm, immSize ) ;
 }
@@ -552,7 +553,7 @@ void
 _Compile_Group5 ( Boolean code, Boolean mod, Boolean rm, Boolean sib, int64 disp, Boolean size )
 {
     //Compile_CalcWrite_Instruction_X64 (  opCode, mod, code, rm, REX_B | MODRM_B | IMM_B | DISP_B, 0, disp, 0, imm, iSize ) ;
-    Compile_CalculateWrite_Instruction_X64 ( 0, 0xff, mod, code, rm, (REX_B | MODRM_B | DISP_B), sib, disp, size, 0, 0 ) ;
+    Compile_CalculateWrite_Instruction_X64 ( 0, 0xff, mod, code, rm, ( REX_B | MODRM_B | DISP_B ), sib, disp, size, 0, 0 ) ;
 }
 
 void
