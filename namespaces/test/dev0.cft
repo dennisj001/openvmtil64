@@ -28,7 +28,27 @@ tx1 7 _assert
 C
 sp
 // - tail recursion from http://c2.com/cgi/wiki?TailCallOptimization
-c_syntaxOn
+c_syntaxOn scOn
+int factoriali ( REG n | REG res )
+{
+    res = 1;
+    while ( n >= 2 )
+    {
+#if 0
+        res *= n-- ; 
+#elif 0
+        res *= (n--) ; 
+#elif 1
+        res = res * n-- ; 
+#else
+        res = res * (n--) ;
+#endif
+    }
+    return res;
+} prefix
+wdiss ( find ('factoriali)) ; //pause ; 
+factoriali (7) ; dup p 5040 _assert //pause //sp
+
 int 
 factorial ( REG n | REG rec )
 {

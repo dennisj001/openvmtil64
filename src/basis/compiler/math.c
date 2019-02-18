@@ -177,7 +177,7 @@ CfrTil_IncDec ( int64 op ) // +
         Word * currentWord = _CfrTil_WordList ( 0 ) ; //_Context_CurrentWord ( cntx ) ;
         //Word * currentWord = _Context_CurrentWord ( cntx ) ;
         Word *two = 0, *one = ( Word* ) _CfrTil_WordList ( 1 ) ; // the operand
-        if ( ( one->CAttribute & CATEGORY_OP ) && ( ! ( one->CAttribute & CATEGORY_OP_LOAD ) ) ) one = two = _CfrTil_WordList ( 2 ) ; 
+        if ( GetState ( _Context_, C_SYNTAX ) && ( one->CAttribute & CATEGORY_OP ) && ( ! ( one->CAttribute & CATEGORY_OP_LOAD ) ) ) one = two = _CfrTil_WordList ( 2 ) ; 
         byte * nextToken = Lexer_Peek_Next_NonDebugTokenWord ( cntx->Lexer0, 1, 0 ) ;
         Word * nextWord = Finder_Word_FindUsing ( cntx->Interpreter0->Finder0, nextToken, 0 ) ;
         //SetState ( _Debugger_, DEBUG_SHTL_OFF, true ) ;
