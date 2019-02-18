@@ -75,7 +75,7 @@ static : src/include/prototypes.h $(OBJECTS)
 bin/cfrtil64-gdb : CFLAGS = $(CFLAGS_CORE) -ggdb 
 bin/cfrtil64-gdb : src/include/prototypes.h $(OBJECTS) 
 	$(CC) $(CFLAGS) $(OBJECTS) -o bin/cfrtil64-gdb $(LIBS)
-	strip -o bin/cftil64 bin/cfrtil64-gdb
+	strip -o bin/cfrtil64 bin/cfrtil64-gdb
 	
 
 cfrtil64o : oclean $(OBJECTS)

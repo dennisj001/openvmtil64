@@ -339,7 +339,7 @@ Compile_MoveImm ( Boolean mod, Boolean rm, int64 disp, int64 imm, Boolean immSiz
     if ( ( mod == MEM ) && ( ( immSize == 8 ) || ( imm > 0xffffffff ) ) )
     {
         // there is no x64 instruction to move imm64 to mem directly
-        Boolean thruReg = THRU_REG ;
+        uint8 thruReg = THRU_REG ;
         Compile_MoveImm_To_Reg ( thruReg, imm, immSize ) ; // thruReg : R8D : needs to be a parameter
         Compile_Move_Reg_To_Rm ( rm, thruReg, disp ) ;
     }

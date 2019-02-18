@@ -64,7 +64,7 @@ hex
 Logic Bits Combinators X64 
 
 'x64_dbg 1 const  
-'DBI 1 const
+'DBI 0 const
 #define x64_dbg 1
 #if x64_dbg    
 dscOn 
@@ -226,7 +226,7 @@ _Compile_Write_Instruction_X64 ( rex, opCode0, opCode1, modRm, controlFlags, sib
 //'_Compile_Write_Instruction_X64 find wdiss //pause
 
 int 
-CalculateRex ( reg rm rex_w_flag | rex )
+CalculateRex ( reg rm rex_w_flag )
 {
 #if 0
     //  0100    WRXB
@@ -236,7 +236,7 @@ CalculateRex ( reg rm rex_w_flag | rex )
     if ( rm > 0x7 ) rex += 1 ;
     if ( rex ) rex |= 0x40 ;
 #else // from machineCode.c - testing new '?' conditional expression
-    rex = ( rex_w_flag ? 8 : 0 ) | ( ( reg > 7 ) ? 4 : 0 ) | ( ( rm > 7 ) ? 1 : 0 ) ;
+    byte rex = ( rex_w_flag ? 8 : 0 ) | ( ( reg > 7 ) ? 4 : 0 ) | ( ( rm > 7 ) ? 1 : 0 ) ;
     if ( rex ) rex |= 0x40 ;
 #endif    
     return rex ;
@@ -256,10 +256,19 @@ Compile_CalculateWrite_Instruction_X64 ( code0, code1, mod, reg, rm, controlFlag
 scOn
 c_syntaxOn
 C
+void 
+_Compile_Move ( toRegOrMem mod reg rm controlFlags disp | opCode ) 
+{
+    if ( toRegOrMem == REG ) opCode = #x8b ; 
+    else opCode = #x89 ; 
+    //Compile_CalculateWrite_Instruction_X64 ( rex,  opCode,  mod,  reg,  rm, controlFlags,  sib,  disp,  dispSize,  imm,  immSize | modRm )
+    Compile_CalculateWrite_Instruction_X64 ( 0, opCode, mod, reg, rm, controlFlags, 0, disp, 0, 0, 0 ) ;
+} prefix
+//'_Compile_Move find wdiss //pause
+
 void
 Compile_Move ( direction, mod, reg, rm, operandSize, sib, disp, dispSize, imm, immSize )
 {
-<d:dbg>
     uint8 opCode ; uint16 controlFlags = ( disp ? DISP_B : 0 ) | ( sib ? SIB_B : 0 ) ;
     if ( imm || immSize )
     {
@@ -282,7 +291,6 @@ Compile_Move ( direction, mod, reg, rm, operandSize, sib, disp, dispSize, imm, i
         }
         controlFlags |= (REX_B | MODRM_B) ;
     }
-<d:dbg>
     Compile_CalculateWrite_Instruction_X64 ( 0, opCode, mod, reg, rm, controlFlags, sib, disp, dispSize, imm, immSize ) ;
 } prefix
 'Compile_Move find wdiss //pause 
@@ -358,7 +366,7 @@ C X64
 sp
 C_Syntax
 : _Compile_Stack_PopToReg ( reg ) 
-    <d:dbg> _Compile_Move_DataStackN_ToReg ( reg @, 0 ) // 4d8b06                  mov r8, [r14]
+    _Compile_Move_DataStackN_ToReg ( reg @, 0 ) // 4d8b06                  mov r8, [r14]
     //"\nshould show :     4d8b06                  mov r8, [r14]" ps
     _Compile_SUBI_DSP ( CELL )                   // 4983ee08                sub r14, 0x8
     //"\nshould show :     4983ee08                sub r14, 0x8" ps
@@ -372,7 +380,7 @@ Combinators
 
 sp
 :asm iax
-    d: _Compile_Stack_PopToReg ( R8D )          //4d8b06                  mov r8, [r14]       
+    _Compile_Stack_PopToReg ( R8D )          //4d8b06                  mov r8, [r14]       
     _Compile_CallThruReg ( R8D )          //4983ee08                sub r14, 0x8
                                              //49ffd0                  call r8  
                                              //c3                      ret      
@@ -443,11 +451,13 @@ asm;
 ' ndup find wdiss sp 
 7 ndup s 7 ndrop
 s 
+#if 1 // not Compile_Move ready yet
 Asm
 // following intel conventions in the naming : insn dst, src
 // move mem to reg 
 : MOV8rm ( reg, ptr, disp ) // 8 bit disp
-    // _Compile_Move ( toRegOrMem mod reg rm disp ) 
+    //Compile_Move ( direction, mod, reg, rm, operandSize, sib, disp, dispSize, imm, immSize )
+    //_Compile_Move ( toRegOrMem mod reg rm disp ) 
     _Compile_Move ( REG, MEM, reg @, ptr @, disp @ ) 
 ;;
 // move mem to reg : 32 bit offset
@@ -464,6 +474,7 @@ Asm
     // _Compile_Move ( toRegOrMem mod reg rm disp | opCode ) 
     _Compile_Move ( REG, REG, dstReg @, srcReg @, 0 ) 
 ;;
+#endif
 #endif // x64_dbg
  
 infixOff

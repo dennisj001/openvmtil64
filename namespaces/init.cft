@@ -392,9 +392,9 @@ dbgOff
 
 scOn
 System C
-//tc
-x64
-d: tx64
+tc demo
+//x64
+tx64
 
 #if _doDemo 
 demo 
@@ -414,12 +414,12 @@ int factoriali ( REG n | REG res )
     res = 1;
     while ( n >= 2 )
     {
-#if 1
+#if 0
         res *= n-- ; 
-#elif 1
+#elif 0
         res *= (n--) ; 
-#elif 1
-        res = res * n-- ;
+#elif 0
+        res = res * n-- ; // fix me :: doesn't work yet
 #else
         res = res * (n--) ;
 #endif

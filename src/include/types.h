@@ -699,7 +699,7 @@ typedef struct
 #define REG_ON_BIT              ( 0x10 ) // decimal 16, beyond the 15 regs
     int64 rtrn, NumberOfArgs ;
     uint16 ControlFlags ;
-    Word *opWord, *wordn, *wordm, *wordArg1, *wordArg2, *xBetweenArg1AndArg2, *wordArg0_ForOpEqual ;
+    Word *opWord, *wordn, *wordm, *wordArg1, *wordArg2, *xBetweenArg1AndArg2, *wordArg0_ForOpEqual, *lparen1, *lparen2 ;
     dlnode * node, *nodem, *wordNode, *nextNode, *wordArg2Node, *wordArg1Node ;
     Boolean rvalue, wordArg1_rvalue, wordArg2_rvalue, wordArg1_literal, wordArg2_literal ;
     Boolean wordOp, wordArg1_Op, wordArg2_Op ;

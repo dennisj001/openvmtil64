@@ -288,7 +288,7 @@ System *System_New(uint64 type);
 /* src/basis/compiler/optimize.c */
 int64 _Compiler_CheckOptimize(Compiler *compiler, int64 _specialReturn);
 int64 Compiler_CheckOptimize(Compiler *compiler, int64 specialReturn);
-Boolean Compiler_CheckForOpBetweenParentheses(dlnode *snode);
+Word *Compiler_CheckForOpBetweenParentheses(CompileOptimizeInfo *optInfo, dlnode *snode);
 void _Compiler_GetWordStackState(Compiler *compiler, Word *word);
 int64 Compiler_Optimize(Compiler *compiler, Word *word);
 void Compiler_SetStandardPreHere_ForDebugDisassembly(Compiler *compiler);

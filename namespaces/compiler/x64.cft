@@ -129,32 +129,6 @@ CalculateModRmByte ( mod, reg, rm, sib, disp | modRm )
 // we could have a mod of 0 so the modRmImmDispFlag is necessary
 // operandSize : specific size of immediate data - BYTE or WORD
 // SIB : scale, index, base addressing byte
-#if 0
-void
-_Compile_ImmDispData (  immDisp,  immSize,  forceFlag )
-{
-    // the opcode probably is all that needs to be adjusted for this to not be necessary    
-    // to not compile an imm when imm is a parameter, set isize == 0 and imm == 0
-    if ( immSize > 0 )
-    {
-        if ( immSize == BYTE ) compile1 (immDisp)  ; 
-        else 
-        { 
-            if ( immSize == 4 ) compile4 (immDisp)  ; 
-            else if ( immSize == CELL ) compile8 (immDisp)  ; 
-        }    
-    }
-    else // with operandSize == 0 let the compiler use the minimal size ; nb. can't be imm == 0
-    {
-        if ( immDisp >= 0x100000000 ) compile8 (immDisp)  ;
-        else 
-        {
-            if ( immDisp >= 0x100 ) compile4 (immDisp)  ;
-            else if ( immDisp || forceFlag ) compile1 (immDisp)  ;
-        }
-    }
-} prefix
-#else
 void
 _Compile_ImmDispData (  immDisp,  immSize,  forceFlag )
 {
@@ -177,7 +151,6 @@ _Compile_ImmDispData (  immDisp,  immSize,  forceFlag )
     }
 } prefix
 //'_Compile_ImmDispData find wdiss pause
-#endif
 
 // Intel - InstructionSet-A-M-253666.pdf - section 2.1 :
 //-----------------------------------------------------------------------
@@ -226,19 +199,10 @@ _Compile_Write_Instruction_X64 ( rex, opCode0, opCode1, modRm, controlFlags, sib
 //'_Compile_Write_Instruction_X64 find wdiss //pause
 
 int 
-CalculateRex ( reg rm rex_w_flag | rex )
+CalculateRex ( reg rm rex_w_flag )
 {
-#if 0
-    //  0100    WRXB
-    rex = 0 ;
-    if ( rex_w_flag ) rex = 8 ;
-    if ( reg > 0x7 ) rex += 4 ; // (1 << 2) ;
-    if ( rm > 0x7 ) rex += 1 ;
+    byte rex = ( rex_w_flag ? 8 : 0 ) | ( ( reg > 7 ) ? 4 : 0 ) | ( ( rm > 7 ) ? 1 : 0 ) ;
     if ( rex ) rex |= 0x40 ;
-#else // from older machineCode.c - testing new '?' conditional expression
-    rex = ( rex_w_flag ? 8 : 0 ) | ( ( reg > 7 ) ? 4 : 0 ) | ( ( rm > 7 ) ? 1 : 0 ) ;
-    if ( rex ) rex |= 0x40 ;
-#endif    
     return rex ;
 } prefix // prefix is not automatic with c syntax so they can be used like rpn words
 //'CalculateRex find wdiss pause
@@ -247,7 +211,6 @@ void
 Compile_CalculateWrite_Instruction_X64 ( code0, code1, mod, reg, rm, controlFlags, sib, disp, dispSize, imm, immSize )
 {
     byte rex = CalculateRex ( reg, rm, ( immSize == 8 ) || ( controlFlags Bits.& REX_B ) ) ;
-                //CalculateModRmByte ( mod, reg, rm, sib, disp | modRm )
     byte modRm = CalculateModRmByte ( mod, reg, rm, sib, disp ) ;
     _Compile_Write_Instruction_X64 ( rex, code0, code1, modRm, controlFlags, sib, disp, dispSize, imm, immSize ) ;
 } prefix
