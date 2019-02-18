@@ -44,8 +44,8 @@ Int User
 : lT lispTest ;
 
 #if doX64
-: basicT bT ppT cT mT aT loT locT fT oT cntT lT sT sysT interpT stT cST dT0 x64 ; //tx64 ; //x64 ;
-#elif doTX64
+: basicT bT ppT cT mT aT loT locT fT oT cntT lT sT sysT interpT stT cST dT0 x64 tx64 ; //x64 ;
+#elif 0 //doTX64
 : basicT bT ppT cT mT aT loT locT fT oT cntT lT sT sysT interpT stT cST dT0 tx64 ; //x64 ;
 #else
 : basicT ppT cT mT aT loT bT locT fT oT cntT lT sT sysT interpT stT cST dT0 ;

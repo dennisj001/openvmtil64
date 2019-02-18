@@ -174,9 +174,11 @@ CfrTil_IncDec ( int64 op ) // +
     int64 sd = List_Depth ( _CfrTil_->Compiler_N_M_Node_WordList ) ;
     if ( ( sd > 1 ) && ( ! GetState ( compiler, LC_CFRTIL ) ) ) //|INFIX_LIST_INTERPRET ) )
     {
-        Word *one = ( Word* ) _CfrTil_WordList ( 1 ) ; //, *three = Compiler_WordList ( 3 ) ; // the operand
+        Word * currentWord = _CfrTil_WordList ( 0 ) ; //_Context_CurrentWord ( cntx ) ;
+        //Word * currentWord = _Context_CurrentWord ( cntx ) ;
+        Word *two = 0, *one = ( Word* ) _CfrTil_WordList ( 1 ) ; // the operand
+        if ( ( one->CAttribute & CATEGORY_OP ) && ( ! ( one->CAttribute & CATEGORY_OP_LOAD ) ) ) one = two = _CfrTil_WordList ( 2 ) ; 
         byte * nextToken = Lexer_Peek_Next_NonDebugTokenWord ( cntx->Lexer0, 1, 0 ) ;
-        Word * currentWord = _Context_CurrentWord ( cntx ) ;
         Word * nextWord = Finder_Word_FindUsing ( cntx->Interpreter0->Finder0, nextToken, 0 ) ;
         //SetState ( _Debugger_, DEBUG_SHTL_OFF, true ) ;
         if ( nextWord && ( nextWord->CAttribute & ( CATEGORY_OP_ORDERED | CATEGORY_OP_UNORDERED | CATEGORY_OP_DIVIDE | CATEGORY_OP_EQUAL ) ) ) // postfix
@@ -205,13 +207,12 @@ CfrTil_IncDec ( int64 op ) // +
         }
         if ( one && one->CAttribute & ( PARAMETER_VARIABLE | LOCAL_VARIABLE | NAMESPACE_VARIABLE ) )
         {
-            //if ( ( ! ( two->CAttribute & ( KEYWORD ) ) ) && GetState ( _Context_, C_SYNTAX ) )
             if ( GetState ( _Context_, C_SYNTAX ) )
             {
                 if ( ! GetState ( compiler, INFIX_LIST_INTERPRET ) )
                 {
                     List_DropN ( _CfrTil_->Compiler_N_M_Node_WordList, 1 ) ; // the operator; let higher level see the variable
-                    if ( GetState ( _CfrTil_, OPTIMIZE_ON ) ) SetHere ( one->Coding, 1 ) ;
+                    if ( GetState ( _CfrTil_, OPTIMIZE_ON ) && ( ! two ) ) SetHere ( one->Coding, 1 ) ;
                     CfrTil_WordList_PushWord ( one ) ;
                     dllist * postfixList = List_New ( SESSION ) ;
                     List_Push_1Value_NewNode_T_WORD ( postfixList, ( int64 ) currentWord, COMPILER_TEMP ) ;

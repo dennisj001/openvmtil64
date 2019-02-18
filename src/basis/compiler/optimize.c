@@ -568,8 +568,6 @@ Compile_X_OpEqual ( Compiler * compiler, block op )
         Compiler_Word_SCHCPUSCA ( optInfo->opWord, 0 ) ;
         Compile_Move_Reg_To_Rm ( OREG2, valueReg, 0 ) ; //optInfo->Optimize_Reg, 0 ) ; //ACC, 0 ) ;
     }
-    //if ( ! optInfo->rtrn ) Setup_MachineCodeInsnParameters ( compiler, REG, REG, ACC, OREG, 0, 0 ) ;
-    //else SyntaxError ( 1 ) ;
     //RestoreSavedState ( _CfrTil_, OPTIMIZE_ON ) ;
 }
 
@@ -605,7 +603,7 @@ Compile_X_Equal ( Compiler * compiler, int64 op )
                 Compiler_SCA_Word_SetCodingHere_And_ClearPreviousUse ( optInfo->opWord, 1 ) ;
                 if ( reg != rm ) Compile_Move_Reg_To_Reg ( reg, rm ) ;
             }
-            goto done ;
+            return ;
         }
         Compiler_SCA_Word_SetCodingHere_And_ClearPreviousUse ( optInfo->opWord, 0 ) ;
         Compile_Move_Reg_To_Rm ( reg, rm, 0 ) ; // dst = reg ; src = rm
@@ -627,7 +625,7 @@ Compile_X_Equal ( Compiler * compiler, int64 op )
             if ( optInfo->wordArg1 && ( optInfo->wordArg1->CAttribute & REGISTER_VARIABLE ) )
             {
                 Compile_MoveImm_To_Reg ( dstReg, optInfo->wordArg2->W_Value, CELL ) ;
-                goto done ;
+                return ;
             }
             else Compile_MoveImm_To_Reg ( srcReg, optInfo->wordArg2->W_Value, CELL ) ;
         }
@@ -652,7 +650,7 @@ Compile_X_Equal ( Compiler * compiler, int64 op )
                     BI_Block_Copy ( 0, word->StackPushRegisterCode, src, Here - src, 0 ) ;
                 }
                 compiler->OptInfo->wordArg0_ForOpEqual = 0 ;
-                goto done ;
+                return ;
             }
         }
         if ( optInfo->wordArg1 && ( optInfo->wordArg1->CAttribute & REGISTER_VARIABLE ) ) Compile_Move_Reg_To_Reg ( dstReg, srcReg ) ;
@@ -660,10 +658,6 @@ Compile_X_Equal ( Compiler * compiler, int64 op )
     }
     else if ( ! optInfo->rtrn ) Setup_MachineCodeInsnParameters ( compiler, REG, REG, ACC, OREG, 0, 0 ) ;
     SetState ( _CfrTil_, IN_OPTIMIZER, false ) ;
-    //if ( optInfo->rtrn && optInfo->rtrn != OPTIMIZE_DONE ) Compiler_Word_SCH_CPUSCA ( optInfo->opWord, 1 ) ;
-    //return compiler->OptInfo->rtrn ;
-done:
-    ;
 }
 // skip back WordStack words for the args of an op parameter in GetOptimizeState
 

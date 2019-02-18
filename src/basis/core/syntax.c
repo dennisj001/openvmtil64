@@ -239,7 +239,8 @@ CfrTil_C_ConditionalExpression ( )
     Word * word1 ;
     if ( ( ! Compiling ) && ( ! GetState ( compiler, C_CONDITIONAL_IN ) ) ) Compiler_Init ( _Compiler_, 0, 0 ) ;
     SetState ( compiler, C_CONDITIONAL_IN, true ) ;
-    if ( CompileMode )
+    if ( ! CompileMode ) CfrTil_If_ConditionalExpression ( ) ;
+    else
     {
         word1 = _CfrTil_WordList ( 1 ) ;
         if ( word1 && word1->StackPushRegisterCode )
@@ -255,10 +256,6 @@ CfrTil_C_ConditionalExpression ( )
         }
         Compile_UninitializedJumpEqualZero ( ) ;
         Stack_Push_PointerToJmpOffset ( ) ;
-    }
-    else CfrTil_If_ConditionalExpression ( ) ;
-    if ( CompileMode )
-    {
         byte * token = Interpret_C_Until_Token4 ( interp, ( byte* ) ":", ( byte* ) ",", ( byte* ) ")", ( byte* ) "}", 0, 0 ) ;
         if ( String_Equal ( token, ":" ) )
         {

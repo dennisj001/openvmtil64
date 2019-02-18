@@ -266,8 +266,7 @@ _CfrTil_Parse_LocalsAndStackVariables ( int64 svf, int64 lispMode, ListObject * 
                 continue ;
             }
 #if 1            
-            if ( ( ( ! GetState ( _Context_, C_SYNTAX ) ) && ( ! GetState ( word, W_C_SYNTAX ) ) ) &&
-                ( ( String_Equal ( ( char* ) token, "{" ) ) || ( String_Equal ( ( char* ) token, ";" ) ) ) )
+            if ( ( ! GetState ( _Context_, C_SYNTAX ) ) && ( String_Equal ( ( char* ) token, "{" ) ) || ( String_Equal ( ( char* ) token, ";" ) ) )
             {
                 //_Printf ( ( byte* ) "\nLocal variables syntax error : no closing parenthesis ')' found" ) ;
                 //CfrTil_Exception ( SYNTAX_ERROR, 0, 1 ) ;
@@ -277,13 +276,7 @@ _CfrTil_Parse_LocalsAndStackVariables ( int64 svf, int64 lispMode, ListObject * 
             word = Finder_Word_FindUsing ( finder, token, 1 ) ; // ?? find after Literal - eliminate making strings or numbers words ??
             if ( word && ( word->CAttribute & ( NAMESPACE | CLASS ) ) && ( CharTable_IsCharType ( ReadLine_PeekNextChar ( lexer->ReadLiner0 ), CHAR_ALPHA ) ) )
             {
-#if 0                
-                Word * iword ;
-                if ( ( iword = Finder_FindWord_InOneNamespace ( _Finder_, word, ( byte* ) "init" ) )
-                    || ( _Namespace_VariableValueGet ( word, ( byte* ) "size" ) > 8 ) )
-#endif                
-                    if ( word->CAttribute2 & STRUCTURE )
-                        typeNamespace = word ;
+                if ( word->CAttribute2 & STRUCTURE ) typeNamespace = word ;
                 continue ;
             }
             if ( getReturnFlag )
