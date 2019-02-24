@@ -599,7 +599,7 @@ void dllist_Map2_WithBreak(dllist *list, MapFunction2 mf, int64 one, int64 two);
 void dllist_Map2_FromLast(dllist *list, MapFunction2 mf, int64 one, int64 two);
 int64 dllist_Map3(dllist *list, MapFunction3 mf, int64 one, int64 two, int64 three);
 void dllist_Map_OnePlusStatus(dllist *list, MapFunction2 mf, int64 one, int64 *status);
-void Tree_Map_State_2Args(dllist *list, uint64 state, MapSymbolFunction2 mf, int64 one, int64 two);
+void Tree_Map_Namespaces_State_2Args(dllist *list, uint64 state, MapSymbolFunction2 mf, int64 one, int64 two);
 Word *Tree_Map_OneNamespace(Word *word, MapFunction_1 mf, int64 one);
 Word *Tree_Map_OneNamespace_TwoArgs(Namespace *ns, MapFunction_2 mf2, int64 one, int64 two);
 Word *Tree_Map_State_OneArg(uint64 state, MapFunction_1 mf, int64 one);

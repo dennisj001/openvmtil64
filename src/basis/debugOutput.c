@@ -82,7 +82,7 @@ Debugger_Locals_Show ( Debugger * debugger )
 {
     Word * scWord = Compiling ? _CfrTil_->CurrentWordBeingCompiled :
         ( debugger->DebugAddress ? Word_UnAlias ( Word_GetFromCodeAddress ( debugger->DebugAddress ) ) : _Context_->CurrentlyRunningWord ) ;
-    if ( scWord ) _Debugger_Locals_Show_Loop ( debugger->cs_Cpu, scWord->NamespaceStack ? scWord->NamespaceStack : _Compiler_->LocalsCompilingNamespacesStack, scWord ) ;
+    if ( scWord && scWord->W_NumberOfVariables ) _Debugger_Locals_Show_Loop ( debugger->cs_Cpu, scWord->NamespaceStack ? scWord->NamespaceStack : _Compiler_->LocalsCompilingNamespacesStack, scWord ) ;
 }
 
 int64
@@ -332,16 +332,13 @@ _Debugger_ShowInfo ( Debugger * debugger, byte * prompt, int64 signal, int64 for
         char * compileOrInterpret = ( char* ) ( CompileMode ? "[c] " : "[i] " ), buffer [32], *cc_line ;
 
         DebugColors ;
-        if ( ! ( cntx && cntx->Lexer0 ) )
-        {
-            Throw ( ( byte* ) "\n_CfrTil_ShowInfo:", ( byte* ) "\nNo token at _CfrTil_ShowInfo\n", QUIT ) ;
-        }
+        if ( ! ( cntx && cntx->Lexer0 ) ) Throw ( ( byte* ) "\n_CfrTil_ShowInfo:", ( byte* ) "\nNo token at _CfrTil_ShowInfo\n", QUIT ) ;
         if ( rl->Filename ) location = rl->Filename ;
         else location = ( byte* ) "<command line>" ;
         if ( ( location == debugger->Filename ) && ( GetState ( debugger, DBG_FILENAME_LOCATION_SHOWN ) ) ) location = ( byte * ) "..." ;
         SetState ( debugger, DBG_FILENAME_LOCATION_SHOWN, true ) ;
         //Word * word = (debugger->LastShowWord == debugger->w_Word) ? debugger->w_Word : _Context_->CurrentEvalWord ; //_Context_->CurrentlyRunningWord ;
-        Word * word = debugger->w_Word ? debugger->w_Word : _Context_->CurrentEvalWord ? _Context_->CurrentEvalWord : Context_CurrentWord ( ) ;
+        Word * word = debugger->w_Word ? debugger->w_Word : _Context_->CurrentEvalWord ? _Context_->CurrentEvalWord : _Context_->LastEvalWord ; //Context_CurrentWord ( ) ;
         byte * token0 = word ? word->Name : debugger->Token, *token1 ;
         if ( ( signal == 11 ) || _Q_->SigAddress )
         {

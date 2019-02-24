@@ -18,12 +18,12 @@ _OpenVmTil_ShowExceptionInfo ( )
         if ( ! word )
         {
             if ( _Q_->SigAddress ) word = Word_GetFromCodeAddress ( ( byte* ) _Q_->SigAddress ) ;
-            else word = _Context_->CurrentlyRunningWord ;
+            else word = _Context_->CurrentEvalWord ? _Context_->CurrentEvalWord : _Context_->LastEvalWord;
             debugger->w_Word = word ;
         }
     }
     AlertColors ;
-    debugger->w_Word = _Context_->CurrentlyRunningWord ;
+    //debugger->w_Word = _Context_->CurrentlyRunningWord ;
     SetState ( debugger, DBG_INFO, true ) ;
     Debugger_Locals_Show ( debugger ) ;
     Debugger_ShowInfo ( debugger, _Q_->ExceptionMessage, _Q_->Signal ) ;

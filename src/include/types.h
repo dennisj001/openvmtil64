@@ -358,6 +358,7 @@ typedef struct _WordData
     int64 CursorPosition ;
     int64 NumberOfNonRegisterArgs ;
     int64 NumberOfNonRegisterLocals ;
+    int64 NumberOfVariables ;
 
     byte * ObjectCode ; // used by objects/class words
     byte * StackPushRegisterCode ; // used by the optInfo
@@ -411,6 +412,7 @@ typedef struct _WordData
 #define Offset S_WordData->Offset // used by ClassField
 #define W_NumberOfNonRegisterArgs S_WordData->NumberOfNonRegisterArgs 
 #define W_NumberOfNonRegisterLocals S_WordData->NumberOfNonRegisterLocals 
+#define W_NumberOfVariables S_WordData->NumberOfVariables 
 #define W_InitialRuntimeDsp S_WordData->InitialRuntimeDsp 
 #define TtnReference S_WordData->TtnReference // used by Logic Words
 #define RunType S_WordData->RunType // number of slots in Object
@@ -837,7 +839,7 @@ typedef struct
     byte * Location ;
     byte * DefaultTokenDelimiters ;
     byte * DefaultDelimiterCharSet ;
-    Word * CurrentlyRunningWord, *LastRunWord, *CurrentTokenWord, *CurrentEvalWord, *NlsWord, *SC_CurrentCombinator, *SourceCodeWord, *CurrentDisassemblyWord ;
+    Word * CurrentlyRunningWord, *LastRunWord, *CurrentTokenWord, *CurrentEvalWord, *LastEvalWord, *NlsWord, *SC_CurrentCombinator, *SourceCodeWord, *CurrentDisassemblyWord ;
     block CurrentlyRunningWordDefinition ;
     dllist * PreprocessorStackList ;
     NBA * ContextNba ;

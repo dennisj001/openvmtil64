@@ -217,12 +217,6 @@
         </cTool>
       </folder>
       <folder path="0/src/basis/compiler">
-        <cTool>
-          <incDir>
-            <pElem>src/basis/compiler</pElem>
-            <pElem>src/include</pElem>
-          </incDir>
-        </cTool>
         <ccTool>
           <incDir>
             <pElem>src/basis/compiler</pElem>
@@ -232,12 +226,6 @@
         </ccTool>
       </folder>
       <folder path="0/src/basis/lc">
-        <cTool>
-          <incDir>
-            <pElem>src/basis/lc</pElem>
-            <pElem>src/include</pElem>
-          </incDir>
-        </cTool>
         <ccTool>
           <incDir>
             <pElem>src/basis/lc</pElem>
@@ -536,10 +524,8 @@
         </ccTool>
       </item>
       <item path="src/basis/core/namespace.c" ex="false" tool="1" flavor2="3">
-        <ccTool flags="1">
+        <ccTool>
           <incDir>
-            <pElem>src/basis/core</pElem>
-            <pElem>src/include</pElem>
             <pElem>.</pElem>
           </incDir>
         </ccTool>
@@ -740,10 +726,8 @@
         </ccTool>
       </item>
       <item path="src/basis/openVmTil.c" ex="false" tool="1" flavor2="3">
-        <ccTool flags="1">
+        <ccTool>
           <incDir>
-            <pElem>src/basis</pElem>
-            <pElem>src/include</pElem>
             <pElem>.</pElem>
           </incDir>
         </ccTool>
@@ -965,10 +949,8 @@
         </ccTool>
       </item>
       <item path="src/primitives/syntaxes.c" ex="false" tool="1" flavor2="3">
-        <ccTool flags="1">
+        <ccTool>
           <incDir>
-            <pElem>src/primitives</pElem>
-            <pElem>src/include</pElem>
             <pElem>.</pElem>
           </incDir>
         </ccTool>

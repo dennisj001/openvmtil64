@@ -102,7 +102,7 @@ sp
 Shell
 doTest _TestDone_ @ not && 
 if 
-    basicT d: testX _TestDone_ ++  
+    basicT testX _TestDone_ ++  
 else 
 endif
 shellOff

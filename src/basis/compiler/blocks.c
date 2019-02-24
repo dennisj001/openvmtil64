@@ -129,6 +129,7 @@ CfrTil_TurnOffBlockCompiler ( )
     _CfrTil_RemoveNamespaceFromUsingListAndClear ( ( byte* ) "__labels__" ) ;
     Namespace_RemoveNamespacesStack ( compiler->LocalsCompilingNamespacesStack ) ;
     SetState ( compiler, COMPILE_MODE | VARIABLE_FRAME, false ) ;
+    _CfrTil_->CurrentWordBeingCompiled = 0 ;
 }
 
 void

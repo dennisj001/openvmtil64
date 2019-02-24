@@ -373,7 +373,7 @@ void
 _Namespace_RemoveFromUsingList ( Namespace * ns )
 {
     _Namespace_SetAsNotUsing_MoveToTail ( ns ) ;
-    _Namespace_MapAny_2Args ( ( MapSymbolFunction2 ) _RemoveSubNamespacesFromUsingList, ( int64 ) ns, 0 ) ;
+    _Namespace_MapUsing_2Args ( ( MapSymbolFunction2 ) _RemoveSubNamespacesFromUsingList, ( int64 ) ns, 0 ) ;
 }
 
 void
@@ -511,11 +511,11 @@ Namespace_PrintWords ( byte * name )
 void
 _Namespace_MapAny_2Args ( MapSymbolFunction2 msf2, int64 one, int64 two )
 {
-    Tree_Map_State_2Args ( _CfrTil_->Namespaces->W_List, ANY, msf2, one, two ) ;
+    Tree_Map_Namespaces_State_2Args ( _CfrTil_->Namespaces->W_List, ANY, msf2, one, two ) ;
 }
 
 void
 _Namespace_MapUsing_2Args ( MapSymbolFunction2 msf2, int64 one, int64 two )
 {
-    Tree_Map_State_2Args ( _CfrTil_->Namespaces->W_List, USING, msf2, one, two ) ;
+    Tree_Map_Namespaces_State_2Args ( _CfrTil_->Namespaces->W_List, USING, msf2, one, two ) ;
 }

@@ -781,7 +781,7 @@ dllist_Map_OnePlusStatus ( dllist * list, MapFunction2 mf, int64 one, int64 * st
 }
 
 void
-Tree_Map_State_2Args ( dllist * list, uint64 state, MapSymbolFunction2 mf, int64 one, int64 two )
+Tree_Map_Namespaces_State_2Args ( dllist * list, uint64 state, MapSymbolFunction2 mf, int64 one, int64 two )
 {
     dlnode * node, *nextNode ;
     Word * word ;
@@ -794,7 +794,7 @@ Tree_Map_State_2Args ( dllist * list, uint64 state, MapSymbolFunction2 mf, int64
         if ( Is_NamespaceType ( word ) )
         {
             if ( word->State & state ) mf ( ( Symbol* ) word, one, two ) ;
-            Tree_Map_State_2Args ( word->W_List, state, mf, one, two ) ;
+            Tree_Map_Namespaces_State_2Args ( word->W_List, state, mf, one, two ) ;
         }
     }
     d0 ( CfrTil_WordAccounting ( ( byte* ) "Tree_Map_State_2" ) ) ;

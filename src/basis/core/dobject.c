@@ -124,6 +124,7 @@ DObject_Finish ( Word * word )
     }
     word->W_NumberOfNonRegisterArgs = _Context_->Compiler0->NumberOfNonRegisterArgs ;
     word->W_NumberOfNonRegisterLocals = _Context_->Compiler0->NumberOfNonRegisterLocals ;
+    word->W_NumberOfVariables = _Context_->Compiler0->NumberOfVariables ;
     if ( GetState ( _Context_, INFIX_MODE ) ) word->CAttribute |= INFIX_WORD ;
     _CfrTil_->LastFinished_DObject = word ;
 }
