@@ -7,8 +7,9 @@ Word_Disassemble ( Word * word )
     byte * start ;
     if ( word && word->Definition )
     {
+        byte endbr64 [] = { 0xf3, 0x0f, 0x1e, 0xfa } ;
         start = word->CodeStart ;
-        if ( word->CAttribute & ( CPRIMITIVE ) ) start += 4 ; //4: account for new intel insn used by gcc : endbr64 f3 0f 1e fa
+        if ( ( word->CAttribute & CPRIMITIVE ) && ( ! memcmp ( endbr64, word->CodeStart, 4 ) ) ) start += 4 ; //4: account for new intel insn used by gcc : endbr64 f3 0f 1e fa
         _Context_->CurrentDisassemblyWord = word ;
         _Debugger_->LastSourceCodeWord = 0 ;
         int64 size = _Debugger_Disassemble ( _Debugger_, start, word->S_CodeSize ? word->S_CodeSize : 128, ( word->CAttribute & ( CPRIMITIVE | DLSYM_WORD | DEBUG_WORD ) ? 1 : 0 ) ) ;
