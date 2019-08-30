@@ -122,7 +122,7 @@ faccs2 ( REG n | REG rec )
 faccs2 ( 7 ) dup p 5040 _assert 
 sp
 c_syntaxOff
-Locals
+Locals User
 : fac ( n  | res -- TOS ) 
     res 1 = 
     { n @ 1 > } { res n @ res @ * = n -- } while 
@@ -365,6 +365,7 @@ sp
 20 _fib4 dup p 6765 assert0 
 sp
 Locals
+User
 "fib1" ( n ) { 1 ti n @ _fib1 p 1 time } word 
 C 
 : sp ;

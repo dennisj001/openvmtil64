@@ -481,14 +481,14 @@ _Compile_X_Group1_Immediate ( Boolean code, Boolean mod, Boolean rm, int64 disp,
 void
 Compile_X_Group1 ( Compiler * compiler, int64 op, int64 ttt, int64 n )
 {
-    int64 optFlag = Compiler_CheckOptimize ( compiler, 0 ) ;
+    int64 optSetupFlag = Compiler_CheckOptimize ( compiler, 0 ) ;
     CompileOptimizeInfo * optInfo = compiler->OptInfo ; //Compiler_CheckOptimize may change the optInfo
-    if ( optFlag == OPTIMIZE_DONE ) return ;
-    else if ( optFlag )
+    if ( optSetupFlag == OPTIMIZE_DONE ) return ;
+    else if ( optSetupFlag )
     {
         //DBI ;
         _Compile_optInfo_X_Group1 ( compiler, op ) ;
-        Compiler_Set_BI_setTtnn ( _Context_->Compiler0, ttt, n, 0, 0 ) ;
+        Compiler_Set_BI_Tttn ( _Context_->Compiler0, ttt, n, 0, 0 ) ;
         if ( optInfo->Optimize_Rm == DSP ) // if the result is to a reg and not tos
         {
             if ( optInfo->Optimize_Dest_RegOrMem == MEM ) return ; //_Compile_Move_Reg_To_StackN ( DSP, 0, optInfo->Optimize_Reg ) ; //return ;
@@ -559,11 +559,11 @@ _Compile_Group5 ( Boolean code, Boolean mod, Boolean rm, Boolean sib, int64 disp
 void
 Compile_X_Group5 ( Compiler * compiler, int64 op )
 {
-    int64 optFlag = Compiler_CheckOptimize ( compiler, 0 ) ;
+    int64 optSetupFlag = Compiler_CheckOptimize ( compiler, 0 ) ;
     CompileOptimizeInfo * optInfo = compiler->OptInfo ; //Compiler_CheckOptimize may change the optInfo
     Word *one = _CfrTil_WordList ( 1 ) ; // assumes two values ( n m ) on the DSP stack 
-    if ( optFlag & OPTIMIZE_DONE ) return ;
-    else if ( optFlag )
+    if ( optSetupFlag & OPTIMIZE_DONE ) return ;
+    else if ( optSetupFlag )
     {
         if ( optInfo->OptimizeFlag & OPTIMIZE_IMM )
         {
@@ -594,7 +594,7 @@ Compile_X_Group5 ( Compiler * compiler, int64 op )
         // assume rvalue on stack
         _Compile_Group5 ( op, MEM, DSP, 0, 0, 0 ) ;
     }
-    Compiler_Set_BI_setTtnn ( _Context_->Compiler0, TTT_ZERO, NEGFLAG_NZ, TTT_ZERO, NEGFLAG_Z ) ;
+    Compiler_Set_BI_Tttn ( _Context_->Compiler0, TTT_ZERO, NEGFLAG_NZ, TTT_ZERO, NEGFLAG_Z ) ;
     //if ( ( op != INC ) && ( op != DEC ) ) 
     _Word_CompileAndRecord_PushReg ( CfrTil_WordList ( 0 ), optInfo->Optimize_Reg ) ; // 0 : ?!? should be the exact variable 
 }

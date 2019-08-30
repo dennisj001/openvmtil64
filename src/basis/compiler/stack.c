@@ -155,8 +155,8 @@ void
 _Compile_Stack_Dup ( Boolean stackReg )
 {
     Compiler * compiler = _Context_->Compiler0 ;
-    int64 optFlag = Compiler_CheckOptimize ( compiler, 0 ) ;
-    if ( optFlag & OPTIMIZE_DONE ) return ;
+    int64 optSetupFlag = Compiler_CheckOptimize ( compiler, 0 ) ;
+    if ( optSetupFlag & OPTIMIZE_DONE ) return ;
     else
     {
         Word * one = CfrTil_WordList ( 1 ) ;

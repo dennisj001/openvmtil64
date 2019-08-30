@@ -44,7 +44,6 @@ CPrimitive CPrimitives [] = {
     { "lcOn", 0, 0, 0, ( block ) LC_New, 0, 0, 0, "Lisp", "Root" },
 
     { "'", 0, 0, 0, CfrTil_SingleQuote, IMMEDIATE | KEYWORD, 0, 0, "Forth", "Root" },
-    { "postfix", 0, 0, 0, CfrTil_Postfix, IMMEDIATE | KEYWORD, 0, 0, "Forth", "Root" },
     { ",", 0, 0, 0, CompileInt32, 0, 0, 0, "Forth", "Root" },
     { "4,", 0, 0, 0, CompileInt32, 0, 0, 0, "Forth", "Root" },
     { "8,", 0, 0, 0, CompileInt64, 0, 0, 0, "Forth", "Root" },
@@ -515,6 +514,7 @@ CPrimitive CPrimitives [] = {
 
     { "c_syntaxOn", 0, 0, 0, CfrTil_C_Syntax_On, IMMEDIATE, 0, 0, "Compiler", "Root" }, // put this here so Compiler will be in Root namespace and Compiler will close to the top
     { "c_syntaxOff", 0, 0, 0, CfrTil_C_Syntax_Off, IMMEDIATE, 0, 0, "Compiler", "Root" },
+    { "postfix", 0, 0, 0, CfrTil_Postfix, IMMEDIATE | KEYWORD, 0, 0, "Compiler", "Root" },
     { "goto", 0, 0, 0, CfrTil_Goto, IMMEDIATE, 0, 0, "Compiler", "Root" },
     { "continue", 0, 0, 0, CfrTil_Continue, IMMEDIATE, 0, 0, "Compiler", "Root" },
     { "return", 0, 0, 0, CfrTil_Return, IMMEDIATE, 0, 0, "Compiler", "Root" },

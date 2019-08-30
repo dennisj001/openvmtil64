@@ -39,7 +39,11 @@ void thi42 ( n ) { n == 1 ? "hi1" ps : n == 2 ? "hi2" ps : n == 3 ? "hi3" ps : n
 c_syntaxOff
 C_Syntax
 //'thi42 find wdiss
+1 thi42 
+2 thi42 
+3 thi42 
 4 thi42 
+//pause
 Interpreter
 0 ? "hi" ps : 0 ? "hi2" ps : 0 ? "hi3" ps : 1 ? "hi42\n" ps : "err" ps 
 : thi2 ( n ) n @ 1 == ? "hi1" ps : n @ 2 == ? "hi2" ps : "err" ps ; 
@@ -71,6 +75,8 @@ C_Syntax
 //'thi42 find wdiss
 4 thi42 
 c_syntaxOff
+0 ? "er" ps : "ok" ps   
+1 ? "ok" ps : "er" ps   
 //pause
 2 + 7 assertStkChk // stack checking
 sp

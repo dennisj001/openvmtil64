@@ -23,9 +23,9 @@ Compile_Plus ( Compiler * compiler )
 void
 Compile_Multiply ( Compiler * compiler )
 {
-    int64 optFlag = Compiler_CheckOptimize ( compiler, 0 ) ;
-    if ( optFlag & OPTIMIZE_DONE ) return ;
-    else if ( optFlag )
+    int64 optSetupFlag = Compiler_CheckOptimize ( compiler, 0 ) ;
+    if ( optSetupFlag & OPTIMIZE_DONE ) return ;
+    else if ( optSetupFlag )
     {
         CompileOptimizeInfo * optInfo = compiler->OptInfo ; //Compiler_CheckOptimize may change the optInfo
         //_Compile_IMUL ( int8 mod, int8 reg, int8 rm, int8 sib, int64 disp, uint64 imm )
@@ -53,9 +53,9 @@ _Compile_Divide ( Compiler * compiler, uint64 type )
 {
     Boolean reg ;
     // dividend in edx:eax, quotient/divisor in eax, remainder in edx
-    int64 optFlag = Compiler_CheckOptimize ( compiler, 0 ) ;
-    if ( optFlag & OPTIMIZE_DONE ) return ;
-    else if ( optFlag )
+    int64 optSetupFlag = Compiler_CheckOptimize ( compiler, 0 ) ;
+    if ( optSetupFlag & OPTIMIZE_DONE ) return ;
+    else if ( optSetupFlag )
     {
         CompileOptimizeInfo * optInfo = compiler->OptInfo ; //Compiler_CheckOptimize may change the optInfo
         //Compiler_SCA_Word_SetCodingHere_And_ClearPreviousUse (optInfo->opWord, 0) ;
@@ -167,7 +167,7 @@ _CfrTil_Do_IncDec ( int64 op )
 }
 
 void
-CfrTil_IncDec ( int64 op ) // +
+CfrTil_IncDec ( int64 op ) // ++/--
 {
     Context * cntx = _Context_ ;
     Compiler * compiler = cntx->Compiler0 ;

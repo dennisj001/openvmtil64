@@ -213,7 +213,7 @@ _CfrTil_C_Infix_EqualOp ( block op )
     if ( GetState ( compiler, C_COMBINATOR_LPAREN ) )
     {
         if ( wordr->StackPushRegisterCode ) SetHere ( wordr->StackPushRegisterCode, 1 ) ; // this is the usual after '=' in non C syntax; assuming optimizeOn
-        Compiler_Set_BI_setTtnn ( compiler, TTT_ZERO, NEGFLAG_ON, TTT_ZERO, NEGFLAG_Z ) ; // must set logic flag for Compile_ReConfigureLogicInBlock in Block_Compile_WithLogicFlag
+        Compiler_Set_BI_Tttn ( compiler, TTT_ZERO, NEGFLAG_ON, TTT_ZERO, NEGFLAG_Z ) ; // must set logic flag for Compile_ReConfigureLogicInBlock in Block_Compile_WithLogicFlag
     }
     List_InterpretLists ( compiler->PostfixLists ) ;
     compiler->LHS_Word = 0 ;
@@ -230,6 +230,7 @@ CfrTil_SetInNamespaceFromBackground ( )
     else Compiler_SetAs_InNamespace_C_BackgroundNamespace ( cntx->Compiler0 ) ;
 }
 
+#if 1
 void
 CfrTil_C_ConditionalExpression ( )
 {
@@ -264,9 +265,33 @@ CfrTil_C_ConditionalExpression ( )
             Interpret_C_Until_Token4 ( interp, ( byte* ) ";", ( byte* ) ",", ( byte* ) ")", ( byte* ) "}", ( byte* ) " ", 0 ) ; //( byte* ) "}", ( byte* ) " \n\r\t", 0 ) ;
             CfrTil_EndIf ( ) ;
         }
+        else SyntaxError ( 1 ) ;
     }
     SetState ( compiler, C_CONDITIONAL_IN, false ) ;
 }
+#else
+void
+CfrTil_C_ConditionalExpression ( )
+{
+    Context * cntx = _Context_ ;
+    Interpreter * interp = cntx->Interpreter0 ;
+    Compiler * compiler = cntx->Compiler0 ;
+    //Word * word1 ;
+    byte * token ;
+    if ( ( ! Compiling ) && ( ! GetState ( compiler, C_CONDITIONAL_IN ) ) ) Compiler_Init ( _Compiler_, 0, 0 ) ;
+    SetState ( compiler, C_CONDITIONAL_IN, true ) ;
+    CfrTil_BeginBlock ( ) ;
+    token = Interpret_Until_Token ( _Interpreter_, ( byte* ) ":", 0 ) ; //Interpret_C_Until_Token4 ( interp, ( byte* ) ":", ( byte* ) ",", ( byte* ) ")", ( byte* ) "}", 0, 0 ) ;
+    if ( ! String_Equal ( token, ":" ) ) SyntaxError ( 1 ) ;
+    //else Lexer_ReadToken ( _Lexer_ ) ;
+    CfrTil_EndBlock ( ) ;
+    CfrTil_BeginBlock ( ) ;
+    token = Interpret_C_Until_Token4 ( interp, ( byte* ) ";", ( byte* ) ",", ( byte* ) "?", ( byte* ) "}", ( byte* ) 0, 1 ) ; //( byte* ) "}", ( byte* ) " \n\r\t", 0 ) ;
+    CfrTil_EndBlock ( ) ;
+    CfrTil_TrueFalseCombinator2 ( ) ;
+    SetState ( compiler, C_CONDITIONAL_IN, false ) ;
+}
+#endif
 
 Boolean
 Syntax_AreWeParsingACFunctionCall ( Lexer * lexer )

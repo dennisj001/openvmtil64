@@ -22,7 +22,7 @@ Root
 //_dbgOn 'tick ' _tick find alias immediate
 'tick ' _tick find alias immediate
 'ndrop '_ndrop find alias immediate 
-
+'forth 'postfix find alias
 "log" variable 
 "User" namespace 
 Io Int
@@ -304,7 +304,6 @@ dscOn //verbosity 3 =
 ; 
 //' _assertStkChk find wdiss //pause
 : assertStkChk _assertStkChk ; //"\n_assertStkChk : " ps stack pause ; 
-: TODO ( str ) nl nl pdl nl str @ adps location nl pdl nl nl { dbgOnVar @ } { sp } if2 ;; //pause ;;
 Root
 User 
 : pause nl _pause ;
@@ -338,16 +337,16 @@ Interpreter
 '_defined '_find find alias 
 ' defined '_find find alias immediate 
 C Compiler Int Lexer
-: ofile ( name | file input result )
+: orpfile ( name | file input result )
     input 0 =
     "open/read/print :: " ps name @ ps nl
     file name @ fopen =
     nl { result file @ input 1 fread = input @ emit } { result @ 1 == } doWhile 
     file @ fclose
 ; prefix
-//'ofile find wdiss
+//'orpfile find wdiss
 Root
-: license ofile ( "./LICENSE" ) ;
+: license orpfile ( "./LICENSE" ) ;
 //license //pause
 Lisp OpenVmTil
 : lispOff "Lisp" notUsing "LispTemp" notUsing "LispDefines" notUsing ; //lcReset ;
@@ -370,6 +369,7 @@ stringMacrosOn
 : tx64 "namespaces/compiler/x64.back.cft" include ;
 : x64 "namespaces/compiler/x64.cft" include ; 
 : bx "namespaces/test/bigNum.test.cft" include ;
+: TODO ( str ) nl nl pdl nl str @ adps location nl pdl nl nl { dbgOnVar @ } { sp } if2 ;; //pause ;;
 
 // === controls ===
 Root 
@@ -420,4 +420,3 @@ rtw
 //verbosity 0 =
 //pause
 //s
-

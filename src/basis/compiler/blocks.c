@@ -2,7 +2,7 @@
 #include "../../include/cfrtil64.h"
 
 BlockInfo *
-BI_Block_Copy ( BlockInfo * bi, byte* dstAddress, byte * srcAddress, int64 bsize, Boolean optFlag )
+BI_Block_Copy ( BlockInfo * bi, byte* dstAddress, byte * srcAddress, int64 bsize, Boolean optSetupFlag )
 {
     Compiler * compiler = _Compiler_ ;
     if ( ! bi ) bi = ( BlockInfo * ) Stack_Top ( compiler->CombinatorBlockInfoStack ) ;
@@ -14,7 +14,7 @@ BI_Block_Copy ( BlockInfo * bi, byte* dstAddress, byte * srcAddress, int64 bsize
     CfrTil_AdjustDbgSourceCode_ScInUseFalse ( srcAddress ) ;
     for ( left = bsize ; ( left > 0 ) ; srcAddress += isize )
     {
-        if ( optFlag ) PeepHole_Optimize ( ) ;
+        if ( optSetupFlag ) PeepHole_Optimize ( ) ;
         isize = _Udis_GetInstructionSize ( ud, srcAddress ) ;
         left -= isize ;
         CfrTil_AdjustDbgSourceCodeAddress ( srcAddress, Here ) ;
@@ -80,7 +80,7 @@ Compile_BlockLogicTest ( BlockInfo * bi )
                 Compiler_SCA_Word_SetCodingHere_And_ClearPreviousUse ( bi->LogicCodeWord, 0 ) ;
                 _Compile_TestCode ( bi->LogicCodeWord->RegToUse, CELL ) ;
                 bi->CopiedToLogicJccCode = Here ;
-                BI_Set_setTtnn ( bi, TTT_ZERO, NEGFLAG_ON, TTT_ZERO, NEGFLAG_OFF ) ;
+                BI_Set_Tttn ( bi, TTT_ZERO, NEGFLAG_ON, TTT_ZERO, NEGFLAG_OFF ) ;
                 //return ;
             }
             else if ( bi->LogicCodeWord && ( bi->LogicCodeWord->CAttribute & CATEGORY_OP_1_ARG ) && ( bi->LogicCodeWord->CAttribute2 & LOGIC_NEGATE ) )
@@ -89,7 +89,7 @@ Compile_BlockLogicTest ( BlockInfo * bi )
                 Compiler_SCA_Word_SetCodingHere_And_ClearPreviousUse ( bi->LogicCodeWord, 0 ) ;
                 _Compile_TestCode ( bi->LogicCodeWord->RegToUse, CELL ) ;
                 bi->CopiedToLogicJccCode = Here ;
-                BI_Set_setTtnn ( bi, TTT_ZERO, NEGFLAG_ON, TTT_ZERO, NEGFLAG_ON ) ;
+                BI_Set_Tttn ( bi, TTT_ZERO, NEGFLAG_ON, TTT_ZERO, NEGFLAG_ON ) ;
                 //return ;
             }
         }

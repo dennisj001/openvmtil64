@@ -53,9 +53,9 @@ _Compile_Set_CAddress_WithRegValue_ThruReg ( byte * address, Boolean reg, Boolea
 void
 Compile_Peek ( Compiler * compiler, Boolean stackReg ) // @
 {
-    int64 optFlag = Compiler_CheckOptimize ( compiler, 0 ) ;
-    if ( optFlag & OPTIMIZE_DONE ) return ;
-    else if ( ! optFlag )
+    int64 optSetupFlag = Compiler_CheckOptimize ( compiler, 0 ) ;
+    if ( optSetupFlag & OPTIMIZE_DONE ) return ;
+    else if ( ! optSetupFlag )
     {
         Word * one = CfrTil_WordList ( 1 ) ;
         //if ( one->StackPushRegisterCode ) // for now an object may have an array offset that needs to be considered
@@ -146,9 +146,9 @@ Compile_AtEqual ( Boolean stackReg ) // !
 void
 Compile_Store ( Compiler * compiler ) // !
 {
-    int64 optFlag = Compiler_CheckOptimize ( compiler, 0 ), stackReg = DSP ;
-    if ( optFlag & OPTIMIZE_DONE ) return ;
-    else if ( optFlag )
+    int64 optSetupFlag = Compiler_CheckOptimize ( compiler, 0 ), stackReg = DSP ;
+    if ( optSetupFlag & OPTIMIZE_DONE ) return ;
+    else if ( optSetupFlag )
     {
         // _Compile_MoveImm ( cell direction, cell rm, cell disp, cell imm, cell operandSize )
         if ( compiler->OptInfo->OptimizeFlag & OPTIMIZE_IMM ) Compile_MoveImm ( compiler->OptInfo->Optimize_Dest_RegOrMem,
@@ -187,9 +187,9 @@ Compile_Store ( Compiler * compiler ) // !
 void
 Compile_Poke ( Compiler * compiler ) // =
 {
-    int64 optFlag = Compiler_CheckOptimize ( compiler, 0 ), stackReg = DSP ;
-    if ( optFlag & OPTIMIZE_DONE ) return ;
-    else if ( optFlag )
+    int64 optSetupFlag = Compiler_CheckOptimize ( compiler, 0 ), stackReg = DSP ;
+    if ( optSetupFlag & OPTIMIZE_DONE ) return ;
+    else if ( optSetupFlag )
     {
         //Compiler_SCA_Word_SetCodingHere_And_ClearPreviousUse ( compiler->OptInfo->opWord, 0 ) ;
         if ( compiler->OptInfo->OptimizeFlag & OPTIMIZE_IMM )

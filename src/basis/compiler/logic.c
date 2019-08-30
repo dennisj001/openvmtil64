@@ -4,7 +4,7 @@
 // 'setTtnn' is a notation from the intel manuals
 
 void
-_BI_Set_setTtnn ( BlockInfo *bi, Boolean setTtn, Boolean setNegFlag, Boolean jccTtt, Boolean jccNegFlag, byte * jccLogicCode )
+_BI_Set_Tttn ( BlockInfo *bi, Boolean setTtn, Boolean setNegFlag, Boolean jccTtt, Boolean jccNegFlag, byte * jccLogicCode )
 {
     bi->SetccTtt = setTtn ;
     bi->SetccNegFlag = setNegFlag ;
@@ -14,16 +14,16 @@ _BI_Set_setTtnn ( BlockInfo *bi, Boolean setTtn, Boolean setNegFlag, Boolean jcc
 }
 
 void
-BI_Set_setTtnn ( BlockInfo *bi, Boolean setTtn, Boolean setNegFlag, Boolean jccTtt, Boolean jccNegFlag )
+BI_Set_Tttn ( BlockInfo *bi, Boolean setTtn, Boolean setNegFlag, Boolean jccTtt, Boolean jccNegFlag )
 {
-    _BI_Set_setTtnn ( bi, setTtn, setNegFlag, jccTtt, jccNegFlag, Here ) ;
+    _BI_Set_Tttn ( bi, setTtn, setNegFlag, jccTtt, jccNegFlag, Here ) ;
 }
 
 void
-Compiler_Set_BI_setTtnn ( Compiler * compiler, Boolean setTtn, Boolean setNegFlag, Boolean jccTtt, Boolean jccNegFlag )
+Compiler_Set_BI_Tttn ( Compiler * compiler, Boolean setTtn, Boolean setNegFlag, Boolean jccTtt, Boolean jccNegFlag )
 {
     BlockInfo *bi = ( BlockInfo * ) Stack_Top ( compiler->CombinatorBlockInfoStack ) ;
-    BI_Set_setTtnn ( bi, setTtn, setNegFlag, jccTtt, jccNegFlag ) ;
+    BI_Set_Tttn ( bi, setTtn, setNegFlag, jccTtt, jccNegFlag ) ;
 }
 
 void
@@ -82,10 +82,10 @@ Compiler_BI_CompileRecord_TestCode_ArgRegNum ( Compiler * compiler, Boolean argR
 }
 
 void
-Compiler_BI_CompileRecord_TestCode_Set_setTtnn ( Compiler * compiler, Boolean reg, Boolean setTtn, Boolean setNegFlag, Boolean jccTtt, Boolean jccNegFlag )
+Compiler_BI_CompileRecord_TestCode_Set_Tttn ( Compiler * compiler, Boolean reg, Boolean setTtn, Boolean setNegFlag, Boolean jccTtt, Boolean jccNegFlag )
 {
     BlockInfo *bi = Compiler_BI_CompileRecord_TestCode_Reg ( compiler, reg, CELL ) ;
-    BI_Set_setTtnn ( bi, setTtn, setNegFlag, jccTtt, jccNegFlag ) ; //ZERO_TTT, setNegFlag ) ;
+    BI_Set_Tttn ( bi, setTtn, setNegFlag, jccTtt, jccNegFlag ) ; //ZERO_TTT, setNegFlag ) ;
 }
 
 // cf. : Compile_BlockInfoTestLogic ( Compiler * compiler, int8 reg, int8 setNegFlag )
@@ -95,7 +95,7 @@ _Compile_GetTestLogicFromTOS ( BlockInfo *bi )
 {
     Compile_Pop_To_Acc ( DSP ) ;
     BI_CompileRecord_TestCode_ArgRegNum ( bi, 1 ) ;
-    BI_Set_setTtnn ( bi, TTT_ZERO, NEGFLAG_NZ, TTT_ZERO, NEGFLAG_Z ) ;
+    BI_Set_Tttn ( bi, TTT_ZERO, NEGFLAG_NZ, TTT_ZERO, NEGFLAG_Z ) ;
 }
 
 // nb : only blocks with one ret insn can be successfully compiled inline
@@ -117,7 +117,7 @@ BlockInfo *
 Compiler_Set_LogicCode ( Compiler * compiler, Boolean setTtn, Boolean setNegFlag, Boolean jccTtt, Boolean jccNegFlag )
 {
     BlockInfo *bi = ( BlockInfo * ) Stack_Top ( compiler->CombinatorBlockInfoStack ) ;
-    BI_Set_setTtnn ( bi, setTtn, setNegFlag, jccTtt, jccNegFlag ) ; //setTtn, setNegFlag ) ;
+    BI_Set_Tttn ( bi, setTtn, setNegFlag, jccTtt, jccNegFlag ) ; //setTtn, setNegFlag ) ;
     return bi ;
 }
 
@@ -125,9 +125,9 @@ void
 _Compile_LogicalAnd ( Compiler * compiler )
 {
     Compiler_WordStack_SCHCPUSCA ( 0, 1 ) ;
-    Compiler_BI_CompileRecord_TestCode_Set_setTtnn ( compiler, OREG, TTT_ZERO, NEGFLAG_Z, TTT_ZERO, NEGFLAG_NZ ) ; // jz
+    Compiler_BI_CompileRecord_TestCode_Set_Tttn ( compiler, OREG, TTT_ZERO, NEGFLAG_Z, TTT_ZERO, NEGFLAG_NZ ) ; // jz
     _Compile_Jcc ( NEGFLAG_Z, TTT_ZERO, Here + 15 ) ; // if eax is zero return not(R8) == 1 else return 0
-    Compiler_BI_CompileRecord_TestCode_Set_setTtnn ( compiler, ACC, TTT_ZERO, NEGFLAG_NZ, TTT_ZERO, NEGFLAG_Z ) ;
+    Compiler_BI_CompileRecord_TestCode_Set_Tttn ( compiler, ACC, TTT_ZERO, NEGFLAG_NZ, TTT_ZERO, NEGFLAG_Z ) ;
     _Compile_LogicResultForStack ( ACC, TTT_ZERO, NEGFLAG_NZ ) ; // jnz
     Compiler_Set_LogicCode ( compiler, TTT_ZERO, NEGFLAG_NZ, TTT_ZERO, NEGFLAG_Z ) ;
     CfrTil_CompileAndRecord_Word0_PushReg ( ACC ) ;
@@ -136,12 +136,9 @@ _Compile_LogicalAnd ( Compiler * compiler )
 void
 Compile_LogicalAnd ( Compiler * compiler )
 {
-    int64 optFlag = Compiler_CheckOptimize ( compiler, 0 ) ;
-    if ( optFlag & OPTIMIZE_DONE ) return ;
-    else if ( optFlag )
-    {
-        _Compile_LogicalAnd ( compiler ) ;
-    }
+    int64 optSetupFlag = Compiler_CheckOptimize ( compiler, 0 ) ;
+    if ( optSetupFlag & OPTIMIZE_DONE ) return ;
+    else if ( optSetupFlag ) _Compile_LogicalAnd ( compiler ) ;
     else
     {
         Word *one = _CfrTil_WordList ( 1 ) ; // assumes two values ( n m ) on the DSP stack 
@@ -157,7 +154,7 @@ _Compile_LogicalNot ( Compiler * compiler )
 {
     //_DBI_ON ;
     Compiler_WordStack_SCHCPUSCA ( 0, 1 ) ;
-    Compiler_BI_CompileRecord_TestCode_Set_setTtnn ( compiler, ACC, TTT_ZERO, NEGFLAG_Z, TTT_ZERO, NEGFLAG_NZ ) ;
+    Compiler_BI_CompileRecord_TestCode_Set_Tttn ( compiler, ACC, TTT_ZERO, NEGFLAG_Z, TTT_ZERO, NEGFLAG_NZ ) ;
     //_Set_JccLogicCodeForNot ( compiler ) ;
     _Compile_LogicResultForStack ( ACC, TTT_ZERO, NEGFLAG_Z ) ;
     Compiler_Set_LogicCode ( compiler, TTT_ZERO, NEGFLAG_Z, TTT_ZERO, NEGFLAG_NZ ) ;
@@ -183,9 +180,9 @@ _Compile_SETcc ( Boolean setTtn, Boolean setNegFlag, Boolean reg )
 // ?!? wanna use TEST insn here to eliminate need for _Compile_MOVZX_REG insn ?!? is that possible
 
 void
-_Compile_SETcc_setTtnn_REG ( Compiler * compiler, Boolean setTtn, Boolean setNegFlag, Boolean jccTtt, Boolean jccNegFlag, Boolean reg, Boolean rm )
+_Compile_SETcc_Tttn_REG ( Compiler * compiler, Boolean setTtn, Boolean setNegFlag, Boolean jccTtt, Boolean jccNegFlag, Boolean reg, Boolean rm )
 {
-    Compiler_Set_BI_setTtnn ( compiler, setTtn, setNegFlag, jccTtt, jccNegFlag ) ; // 6 : 0f9ec0 : setle al ; 480fb6c0 movzx rax, al :: 7 - 1 for initial 'ret' : i've forgotten *how, exactly* this actually works ??          
+    Compiler_Set_BI_Tttn ( compiler, setTtn, setNegFlag, jccTtt, jccNegFlag ) ; // 6 : 0f9ec0 : setle al ; 480fb6c0 movzx rax, al :: 7 - 1 for initial 'ret' : i've forgotten *how, exactly* this actually works ??          
     _Compile_SETcc ( setTtn, setNegFlag, reg ) ;
     _Compile_MOVZX_BYTE_REG ( reg, rm ) ;
 }
@@ -201,11 +198,11 @@ _Compile_SETcc_setTtnn_REG ( Compiler * compiler, Boolean setTtn, Boolean setNeg
 // want to use 'test eax, 0' as a 0Branch (cf. jonesforth) basis for all block conditionals like if/else, do/while, for ...
 
 void
-Compile_Cmp_Set_setTtnn_Logic ( Compiler * compiler, Boolean setTtn, Boolean setNegateFlag, Boolean jccTtt, Boolean jccNegFlag )
+Compile_Cmp_Set_Tttn_Logic ( Compiler * compiler, Boolean setTtn, Boolean setNegateFlag, Boolean jccTtt, Boolean jccNegFlag )
 {
-    int64 optFlag = Compiler_CheckOptimize ( compiler, 0 ) ;
-    if ( optFlag & OPTIMIZE_DONE ) return ;
-    else if ( optFlag )
+    int64 optSetupFlag = Compiler_CheckOptimize ( compiler, 0 ) ;
+    if ( optSetupFlag & OPTIMIZE_DONE ) return ;
+    else if ( optSetupFlag )
     {
         if ( compiler->OptInfo->OptimizeFlag & OPTIMIZE_IMM )
         {
@@ -245,7 +242,7 @@ Compile_Cmp_Set_setTtnn_Logic ( Compiler * compiler, Boolean setTtn, Boolean set
         Compile_CMP ( REG, REG, ACC, OREG, 0, 0, CELL ) ;
     }
     Boolean reg = ACC ; //nb! reg should always be ACC! : immediately after the 'cmp' insn which changes the flags appropriately
-    _Compile_SETcc_setTtnn_REG ( compiler, setTtn, setNegateFlag, jccTtt, jccNegFlag, reg, reg ) ; //nb! should always be ACC! : immediately after the 'cmp' insn which changes the flags appropriately
+    _Compile_SETcc_Tttn_REG ( compiler, setTtn, setNegateFlag, jccTtt, jccNegFlag, reg, reg ) ; //nb! should always be ACC! : immediately after the 'cmp' insn which changes the flags appropriately
     _Word_CompileAndRecord_PushReg ( _CfrTil_WordList ( 0 ), reg ) ; //ACC ) ;
 }
 
@@ -254,52 +251,52 @@ Compile_Cmp_Set_setTtnn_Logic ( Compiler * compiler, Boolean setTtn, Boolean set
 void
 Compile_Equals ( Compiler * compiler )
 {
-    Compile_Cmp_Set_setTtnn_Logic ( compiler, TTT_EQUAL, NEGFLAG_OFF, TTT_EQUAL, NEGFLAG_ON ) ;
+    Compile_Cmp_Set_Tttn_Logic ( compiler, TTT_EQUAL, NEGFLAG_OFF, TTT_EQUAL, NEGFLAG_ON ) ;
 }
 
 void
 Compile_DoesNotEqual ( Compiler * compiler )
 {
-    Compile_Cmp_Set_setTtnn_Logic ( compiler, TTT_EQUAL, NEGFLAG_ON, TTT_EQUAL, NEGFLAG_OFF ) ;
+    Compile_Cmp_Set_Tttn_Logic ( compiler, TTT_EQUAL, NEGFLAG_ON, TTT_EQUAL, NEGFLAG_OFF ) ;
 }
 
 void
 Compile_LessThan ( Compiler * compiler )
 {
-    Compile_Cmp_Set_setTtnn_Logic ( compiler, TTT_LESS, NEGFLAG_OFF, TTT_LESS, NEGFLAG_ON ) ;
+    Compile_Cmp_Set_Tttn_Logic ( compiler, TTT_LESS, NEGFLAG_OFF, TTT_LESS, NEGFLAG_ON ) ;
 }
 
 void
 Compile_GreaterThan ( Compiler * compiler )
 {
-    Compile_Cmp_Set_setTtnn_Logic ( compiler, TTT_LE, NEGFLAG_ON, TTT_LE, NEGFLAG_OFF ) ;
+    Compile_Cmp_Set_Tttn_Logic ( compiler, TTT_LE, NEGFLAG_ON, TTT_LE, NEGFLAG_OFF ) ;
 }
 
 void
 Compile_LessThanOrEqual ( Compiler * compiler )
 {
-    Compile_Cmp_Set_setTtnn_Logic ( compiler, TTT_LE, NEGFLAG_OFF, TTT_LE, NEGFLAG_ON ) ;
+    Compile_Cmp_Set_Tttn_Logic ( compiler, TTT_LE, NEGFLAG_OFF, TTT_LE, NEGFLAG_ON ) ;
 }
 
 void
 Compile_GreaterThanOrEqual ( Compiler * compiler )
 {
-    Compile_Cmp_Set_setTtnn_Logic ( compiler, TTT_LESS, NEGFLAG_ON, TTT_LESS, NEGFLAG_OFF ) ;
+    Compile_Cmp_Set_Tttn_Logic ( compiler, TTT_LESS, NEGFLAG_ON, TTT_LESS, NEGFLAG_OFF ) ;
 }
 
 void
 Compile_TestLogicAndStackPush ( Compiler * compiler, Boolean reg, Boolean setTtn, Boolean setNegFlag, Boolean jccTtt, Boolean jccNegFlag )
 {
-    Compiler_BI_CompileRecord_TestCode_Set_setTtnn ( compiler, reg, TTT_ZERO, setNegFlag, jccTtt, jccNegFlag ) ;
+    Compiler_BI_CompileRecord_TestCode_Set_Tttn ( compiler, reg, TTT_ZERO, setNegFlag, jccTtt, jccNegFlag ) ;
     CfrTil_CompileAndRecord_PushAccum ( ) ;
 }
 
 void
 Compile_Logical_X ( Compiler * compiler, int64 op, Boolean setTtn, Boolean setNegateFlag, Boolean jccTtt, Boolean jccNegFlag )
 {
-    int64 optFlag = Compiler_CheckOptimize ( compiler, 0 ) ;
-    if ( optFlag == OPTIMIZE_DONE ) return ;
-    else if ( optFlag )
+    int64 optSetupFlag = Compiler_CheckOptimize ( compiler, 0 ) ;
+    if ( optSetupFlag == OPTIMIZE_DONE ) return ;
+    else if ( optSetupFlag )
     {
         // TODO : this optimization somehow is *very* little used, why is that ?!? 
         // assumes we have unordered operands in eax, ecx
@@ -320,10 +317,10 @@ void
 Compile_LogicalNot ( Compiler * compiler )
 {
     Word *one = _CfrTil_WordList ( 1 ) ; // assumes two values ( n m ) on the DSP stack 
-    int64 optFlag = Compiler_CheckOptimize ( compiler, 0 ) ; // check especially for cases that optimize literal ops
-    if ( optFlag & OPTIMIZE_DONE ) return ;
+    int64 optSetupFlag = Compiler_CheckOptimize ( compiler, 0 ) ; // check especially for cases that optimize literal ops
+    if ( optSetupFlag & OPTIMIZE_DONE ) return ;
         // just need to get to valued to be operated on ( not'ed ) in eax
-    else if ( optFlag )
+    else if ( optSetupFlag )
     {
         if ( compiler->OptInfo->OptimizeFlag & OPTIMIZE_IMM ) Compile_MoveImm_To_Reg ( ACC, compiler->OptInfo->Optimize_Imm, CELL ) ;
         else if ( compiler->OptInfo->Optimize_Rm == DSP )
@@ -359,7 +356,7 @@ _BI_Compile_Jcc ( BlockInfo *bi, byte* jmpToAddress ) // , int8 nz
     if ( bi->CopiedToLogicJccCode ) SetHere ( bi->CopiedToLogicJccCode, 1 ) ;
     else SetHere ( bi->JccLogicCode, 1 ) ;
     bi->ActualCopiedToJccCode = Here ;
-    _Compile_Jcc ( bi->JccNegFlag, bi->JccTtt, jmpToAddress ) ; // we do need to store and get this logic set by various conditions by the compiler : _Compile_SET_setTtnn_REG
+    _Compile_Jcc ( bi->JccNegFlag, bi->JccTtt, jmpToAddress ) ; // we do need to store and get this logic set by various conditions by the compiler : _Compile_SET_Tttn_REG
 }
 
 void

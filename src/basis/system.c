@@ -338,7 +338,7 @@ _CfrTil_Source ( Word *word, int64 addToHistoryFlag )
 {
     if ( word )
     {
-        byte * name = c_gd ( word->Name ), buffer [128] ;
+        byte * name = c_gd ( word->Name ) ;
         uint64 category = word->CAttribute ;
         if ( word->ContainingNamespace ) _Printf ( ( byte* ) "\n%s.", word->ContainingNamespace->Name ) ;
         if ( category & OBJECT )

@@ -44,9 +44,9 @@ CfrTil_TEST ( )
 void
 Compile_X_Group3 ( Compiler * compiler, int64 code ) //OP_1_ARG
 {
-    int64 optFlag = Compiler_CheckOptimize (compiler, 0) ; //OP_1_ARG
-    if ( optFlag & OPTIMIZE_DONE ) return ;
-    else if ( optFlag )
+    int64 optSetupFlag = Compiler_CheckOptimize (compiler, 0) ; //OP_1_ARG
+    if ( optSetupFlag & OPTIMIZE_DONE ) return ;
+    else if ( optSetupFlag )
     {
         //_Compile_Group3 ( cell code, cell mod, cell rm, cell sib, cell disp, cell imm, cell size )
         _Compile_Group3 ( code, compiler->OptInfo->Optimize_Mod,
@@ -67,9 +67,9 @@ Compile_X_Group3 ( Compiler * compiler, int64 code ) //OP_1_ARG
 void
 Compile_X_Shift ( Compiler * compiler, int64 op, Boolean stackFlag, Boolean opEqualFlag )
 {
-    int64 optFlag = Compiler_CheckOptimize (compiler, 0) ; //OP_1_ARG
-    if ( optFlag & OPTIMIZE_DONE ) return ;
-    else if ( optFlag )
+    int64 optSetupFlag = Compiler_CheckOptimize (compiler, 0) ; //OP_1_ARG
+    if ( optSetupFlag & OPTIMIZE_DONE ) return ;
+    else if ( optSetupFlag )
     {
 #if 1       
         // _Compile_Group2 ( int64 mod, int64 regOpCode, int64 rm, int64 sib, cell disp, cell imm )
