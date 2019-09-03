@@ -216,6 +216,7 @@ OVT_SigLongJump ( byte * restartMessage, sigjmp_buf * jb )
 
 }
 
+// OVT_Throw needs to be reworked
 void
 OVT_Throw ( int signal, int64 restartCondition, Boolean pauseFlag )
 {
@@ -240,10 +241,7 @@ OVT_Throw ( int signal, int64 restartCondition, Boolean pauseFlag )
             }
             else _Q_->RestartCondition = INITIAL_START ;
             if ( _Q_->SigSegvs > 3 ) _OVT_SigLongJump ( & _Q_->JmpBuf0 ) ; //OVT_Exit ( ) ;
-            else if ( ( _Q_->SigSegvs > 1 ) || ( restartCondition == INITIAL_START ) )
-            {
-                jb = & _Q_->JmpBuf0 ;
-            }
+            else if ( ( _Q_->SigSegvs > 1 ) || ( restartCondition == INITIAL_START ) ) jb = & _Q_->JmpBuf0 ;
             else jb = & _CfrTil_->JmpBuf0 ;
         }
     }
@@ -252,14 +250,13 @@ OVT_Throw ( int signal, int64 restartCondition, Boolean pauseFlag )
         if ( restartCondition >= INITIAL_START ) jb = & _Q_->JmpBuf0 ;
         else jb = & _CfrTil_->JmpBuf0 ;
     }
-    OVT_SetExceptionMessage ( _Q_ ) ;
+    //OVT_SetExceptionMessage ( _Q_ ) ;
     printf ( "\n%s\n%s %s at %s -> ...", _Q_->ExceptionMessage, ( jb == & _CfrTil_->JmpBuf0 ) ? "reseting cfrTil" : "restarting OpenVmTil",
         ( _Q_->Signal == SIGSEGV ) ? ": SIGSEGV" : "", ( _Q_->SigSegvs < 2 ) ? Context_Location ( ) : ( byte* ) "" ) ;
     fflush ( stdout ) ;
 
     if ( pauseFlag && ( _Q_->SignalExceptionsHandled < 2 ) && ( _Q_->SigSegvs < 2 ) ) OVT_Pause ( 0, _Q_->SignalExceptionsHandled ) ;
 jump:
-    //siglongjmp ( *jb, 1 ) ;
     _OVT_SigLongJump ( jb ) ;
 }
 
@@ -434,5 +431,63 @@ CfrTil_Exception ( int64 exceptionCode, byte * message, int64 restartCondition )
         }
     }
     return ;
+}
+
+void
+CfrTil_SystemBreak ( )
+{
+    _OpenVmTil_LongJmp_WithMsg ( BREAK, ( byte* ) "System.interpreterBreak : returning to main interpreter loop." ) ;
+}
+
+void
+CfrTil_Quit ( )
+{
+    _OpenVmTil_LongJmp_WithMsg ( QUIT, ( byte* ) "Quit : Session Memory, temporaries, are reset." ) ;
+}
+
+void
+CfrTil_Abort ( )
+{
+    _OpenVmTil_LongJmp_WithMsg ( ABORT, ( byte* ) "Abort : Session Memory and the DataStack are reset (as in a cold restart)." ) ;
+}
+
+void
+CfrTil_DebugStop ( )
+{
+    _OpenVmTil_LongJmp_WithMsg ( STOP, ( byte* ) "Stop : Debug Stop. " ) ;
+}
+
+void
+CfrTil_ResetAll ( )
+{
+    _OpenVmTil_LongJmp_WithMsg ( RESET_ALL, ( byte* ) "ResetAll. " ) ;
+}
+
+void
+CfrTil_Restart ( )
+{
+    _OpenVmTil_LongJmp_WithMsg ( RESTART, ( byte* ) "Restart. " ) ;
+}
+
+void
+CfrTil_WarmInit ( )
+{
+    _CfrTil_Init_SessionCore ( _CfrTil_, 1, 1 ) ;
+}
+
+// cold init
+
+void
+CfrTil_RestartInit ( )
+{
+    _OpenVmTil_LongJmp_WithMsg ( RESET_ALL, ( byte* ) "Restart Init... " ) ;
+}
+
+void
+CfrTil_FullRestart ( )
+{
+    _Q_->Signal = 0 ;
+    //OVT_Throw ( 0, INITIAL_START, 0 ) ;
+    _OpenVmTil_LongJmp_WithMsg ( INITIAL_START, ( byte* ) "Full Initial Re-Start : ..." ) ;
 }
 

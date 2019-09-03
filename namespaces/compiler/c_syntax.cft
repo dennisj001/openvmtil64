@@ -81,9 +81,11 @@ dump ( chey, cobj.size ) ;
 //sprintf ( &chey.chars [ 24 ], "%s", "do or don't" ) ;
 sprintf ( &chey.chars [ 24 ], "%s", "don't" ) ;
 dump ( chey, cobj.size ) ; 
-//sprintf ( &chey.chars, "%s", "well, do or don't hoot" ) ;
+sprintf ( &chey.chars, "%s", "hoot" ) ;
+dump ( chey, cobj.size ) ; 
 sprintf ( &chey.chars, "%s", "ok! don't hoot" ) ;
-//sprintf ( &chey.chars, "%s", "hoot" ) ;
+dump ( chey, cobj.size ) ; 
+sprintf ( &chey.chars, "%s", "well, do or don't hoot" ) ;
 dump ( chey, cobj.size ) ; 
 
 printf ( "\n\t%s\n", &chey.chars [ 24 ] ) ;

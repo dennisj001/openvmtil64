@@ -356,63 +356,6 @@ CfrTil_AllocateNew ( )
 }
 
 void
-CfrTil_SystemBreak ( )
-{
-    _OpenVmTil_LongJmp_WithMsg ( BREAK, ( byte* ) "System.interpreterBreak : returning to main interpreter loop." ) ;
-}
-
-void
-CfrTil_Quit ( )
-{
-    _OpenVmTil_LongJmp_WithMsg ( QUIT, ( byte* ) "Quit : Session Memory, temporaries, are reset." ) ;
-}
-
-void
-CfrTil_Abort ( )
-{
-    _OpenVmTil_LongJmp_WithMsg ( ABORT, ( byte* ) "Abort : Session Memory and the DataStack are reset (as in a cold restart)." ) ;
-}
-
-void
-CfrTil_DebugStop ( )
-{
-    _OpenVmTil_LongJmp_WithMsg ( STOP, ( byte* ) "Stop : Debug Stop. " ) ;
-}
-
-void
-CfrTil_ResetAll ( )
-{
-    _OpenVmTil_LongJmp_WithMsg ( RESET_ALL, ( byte* ) "ResetAll. " ) ;
-}
-
-void
-CfrTil_Restart ( )
-{
-    _OpenVmTil_LongJmp_WithMsg ( RESTART, ( byte* ) "Restart. " ) ;
-}
-
-// cold init
-
-void
-CfrTil_RestartInit ( )
-{
-    _OpenVmTil_LongJmp_WithMsg ( RESET_ALL, ( byte* ) "Restart Init... " ) ;
-}
-
-void
-CfrTil_FullRestart ( )
-{
-    _Q_->Signal = 0 ;
-    OVT_Throw ( 0, INITIAL_START, 0 ) ;
-}
-
-void
-CfrTil_WarmInit ( )
-{
-    _CfrTil_Init_SessionCore ( _CfrTil_, 1, 1 ) ;
-}
-
-void
 CfrTil_ReturnFromFile ( )
 {
     _EOF ( _Context_->Lexer0 ) ;

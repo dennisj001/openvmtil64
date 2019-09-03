@@ -7,7 +7,6 @@ void
 _CfrTil_Init_SessionCore ( CfrTil * cfrTil, int64 cntxDelFlag, int64 promptFlag )
 {
     Context * cntx = cfrTil->Context0 ;
-    int64 i ;
     CfrTil_LogOff ( ) ;
     CfrTil_DbgSourceCodeOff ( ) ;
     OVT_FreeTempMem ( ) ;
@@ -20,7 +19,7 @@ _CfrTil_Init_SessionCore ( CfrTil * cfrTil, int64 cntxDelFlag, int64 promptFlag 
     //CfrTil_ClearTokenList ( ) ;
     if ( cntxDelFlag )
     {
-        int64 stackDepth = Stack_Depth ( cfrTil->ContextDataStack ) ;
+        int64 i, stackDepth = Stack_Depth ( cfrTil->ContextDataStack ) ;
         for ( i = 0 ; i < stackDepth ; i ++ ) CfrTil_Context_PopDelete ( cfrTil ) ;
     }
     LC_Init_Runtime ( ) ;
