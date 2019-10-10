@@ -123,6 +123,7 @@ Interpret_UntilFlagged ( Interpreter * interp, int64 doneFlags )
     while ( ( ! Interpreter_IsDone ( interp, doneFlags | INTERPRETER_DONE ) ) )
     {
         Interpreter_InterpretNextToken ( interp ) ;
+        //Interpreter_SetLexState ( interp) ;
     }
 }
 

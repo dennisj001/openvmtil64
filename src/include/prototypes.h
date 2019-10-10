@@ -605,6 +605,7 @@ Word *Tree_Map_OneNamespace_TwoArgs(Namespace *ns, MapFunction_2 mf2, int64 one,
 Word *Tree_Map_State_OneArg(uint64 state, MapFunction_1 mf, int64 one);
 void List_N_M_Node_PrintWords(dllist *alist);
 /* src/basis/core/interpret.c */
+void Interpreter_SetLexState(Interpreter *interp);
 Word *Interpreter_InterpretAToken(Interpreter *interp, byte *token, int64 tsrli, int64 scwi);
 void Interpreter_InterpretNextToken(Interpreter *interp);
 Word *Interpreter_DoWord_Default(Interpreter *interp, Word *word0, int64 tsrli, int64 scwi);
@@ -1486,9 +1487,9 @@ void CfrTil_Abort(void);
 void CfrTil_DebugStop(void);
 void CfrTil_ResetAll(void);
 void CfrTil_Restart(void);
+void CfrTil_WarmInit(void);
 void CfrTil_RestartInit(void);
 void CfrTil_FullRestart(void);
-void CfrTil_WarmInit(void);
 /* src/basis/compiler/locals.c */
 int64 _ParameterVar_Offset(Word *word, int64 numberOfArgs, Boolean frameFlag);
 int64 Compiler_ParameterVar_Offset(Compiler *compiler, Word *word);

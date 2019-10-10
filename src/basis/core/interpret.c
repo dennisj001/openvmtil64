@@ -1,6 +1,14 @@
 
 #include "../../include/cfrtil64.h"
 
+void
+Interpreter_SetLexState ( Interpreter * interp) 
+{
+    if ( interp->Lexer0->TokenInputByte == 0 ) SetState ( interp, END_OF_STRING, true ) ;
+    else if ( interp->Lexer0->TokenInputByte == eof ) SetState ( interp, END_OF_FILE, true ) ;
+    else if ( interp->Lexer0->TokenInputByte == '\n' ) SetState ( interp, END_OF_LINE, true ) ; 
+}
+
 Word *
 Interpreter_InterpretAToken ( Interpreter * interp, byte * token, int64 tsrli, int64 scwi )
 {
@@ -19,6 +27,7 @@ Interpreter_InterpretNextToken ( Interpreter * interp )
 {
     byte * token = Lexer_ReadToken ( interp->Lexer0 ) ;
     Interpreter_InterpretAToken ( interp, token, _Lexer_->TokenStart_ReadLineIndex, _Lexer_->SC_Index ) ;
+    Interpreter_SetLexState ( interp) ;
 }
 
 Word *

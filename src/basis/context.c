@@ -65,7 +65,7 @@ _Context_Init ( Context * cntx0, Context * cntx )
     cntx->Interpreter0 = Interpreter_New ( CONTEXT ) ;
     cntx->Lexer0 = cntx->Interpreter0->Lexer0 ;
     cntx->ReadLiner0 = cntx->Interpreter0->ReadLiner0 ;
-    cntx->Lexer0->OurInterpreter = cntx->Interpreter0 ;
+    //cntx->Lexer0->OurInterpreter = cntx->Interpreter0 ;
     cntx->Finder0 = cntx->Interpreter0->Finder0 ;
     cntx->Compiler0 = cntx->Interpreter0->Compiler0 ;
     cntx->PreprocessorStackList = _dllist_New ( CONTEXT ) ;

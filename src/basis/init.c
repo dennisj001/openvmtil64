@@ -40,7 +40,8 @@ _CfrTil_Init_SessionCore ( CfrTil * cfrTil, int64 cntxDelFlag, int64 promptFlag 
     _CfrTil_TypeStackReset ( ) ;
     _CfrTil_RecycleInit_Compiler_N_M_Node_WordList ( 1 ) ;
     cfrTil->InitSessionCoreTimes ++ ;
-    OVT_MemList_DeleteNBAMemory ( ( byte* ) "ObjectSpace" ) ; // not able to do this yet ??
+    //OVT_MemList_DeleteNBAMemory ( ( byte* ) "ObjectSpace" ) ; // not able to do this yet ??
+    OVT_MemList_FreeNBAMemory ( ( byte* ) "ObjectSpace", 1 * M, 1 ) ; // not able to do this yet ??
 }
 
 void

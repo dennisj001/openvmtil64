@@ -269,9 +269,11 @@ Lexer_Peek_Next_NonDebugTokenWord ( Lexer * lexer, Boolean evalFlag, Boolean svR
 {
     ReadLiner * rl = _ReadLiner_ ;
     int64 svReadIndex = rl->ReadIndex ;
+    //int64 svInterpState = lexer->OurInterpreter ? lexer->OurInterpreter->State : 0 ;
     byte * token = _Lexer_Next_NonDebugOrCommentTokenWord ( lexer, 0, evalFlag, 0 ) ; // 0 : peekFlag off because we are reAdding it below
     CfrTil_PushToken_OnTokenList ( token ) ; // TODO ; list should instead be a stack
     if ( svReadIndexFlag ) rl->ReadIndex = svReadIndex ;
+    //if (lexer->OurInterpreter) lexer->OurInterpreter->State = svInterpState ;
     return token ;
 }
 
@@ -811,7 +813,7 @@ NewLine ( Lexer * lexer )
     if ( AtCommandLine ( lexer->ReadLiner0 ) ) //( ! IS_INCLUDING_FILES ) || GetState ( _Debugger_, DBG_COMMAND_LINE ) )
     {
         SetState ( lexer, LEXER_DONE | LEXER_END_OF_LINE, true ) ;
-        if ( lexer->OurInterpreter ) SetState ( lexer->OurInterpreter, INTERPRETER_DONE | END_OF_LINE, true ) ;
+        //if ( lexer->OurInterpreter ) SetState ( lexer->OurInterpreter, INTERPRETER_DONE | END_OF_LINE, true ) ; // ?? this shouldn't be done within lexer function
     }
     else
     {
@@ -823,7 +825,7 @@ NewLine ( Lexer * lexer )
 void
 _EOF ( Lexer * lexer ) // case eof:
 {
-    if ( lexer->OurInterpreter ) SetState ( lexer->OurInterpreter, END_OF_FILE, true ) ;
+    //if ( lexer->OurInterpreter ) SetState ( lexer->OurInterpreter, END_OF_FILE, true ) ;
     SetState ( lexer, LEXER_DONE | END_OF_FILE, true ) ;
     //SetState ( _Interpreter_, END_OF_FILE, true ) ;
 }
@@ -831,7 +833,7 @@ _EOF ( Lexer * lexer ) // case eof:
 void
 _Zero ( Lexer * lexer ) // case 0
 {
-    if ( lexer->OurInterpreter ) SetState ( lexer->OurInterpreter, END_OF_STRING, true ) ;
+    //if ( lexer->OurInterpreter ) SetState ( lexer->OurInterpreter, END_OF_STRING, true ) ;
     SetState ( lexer, LEXER_DONE | END_OF_STRING | END_OF_FILE, true ) ;
     //SetState ( _Interpreter_, END_OF_STRING, true ) ;
 }
