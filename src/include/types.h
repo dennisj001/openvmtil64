@@ -635,7 +635,6 @@ typedef struct Lexer
     byte * DelimiterOrDotCharSet, *Filename ;
     int64 CurrentReadIndex, TokenWriteIndex, LineNumber ;
     Symbol * NextPeekListItem ;
-    //struct Interpreter * OurInterpreter ;
     ReadLiner * ReadLiner0 ;
     byte( *NextChar ) ( ReadLiner * rl ) ;
     byte * TokenBuffer ;

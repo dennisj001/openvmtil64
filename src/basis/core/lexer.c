@@ -813,7 +813,6 @@ NewLine ( Lexer * lexer )
     if ( AtCommandLine ( lexer->ReadLiner0 ) ) //( ! IS_INCLUDING_FILES ) || GetState ( _Debugger_, DBG_COMMAND_LINE ) )
     {
         SetState ( lexer, LEXER_DONE | LEXER_END_OF_LINE, true ) ;
-        //if ( lexer->OurInterpreter ) SetState ( lexer->OurInterpreter, INTERPRETER_DONE | END_OF_LINE, true ) ; // ?? this shouldn't be done within lexer function
     }
     else
     {
@@ -825,7 +824,6 @@ NewLine ( Lexer * lexer )
 void
 _EOF ( Lexer * lexer ) // case eof:
 {
-    //if ( lexer->OurInterpreter ) SetState ( lexer->OurInterpreter, END_OF_FILE, true ) ;
     SetState ( lexer, LEXER_DONE | END_OF_FILE, true ) ;
     //SetState ( _Interpreter_, END_OF_FILE, true ) ;
 }
@@ -833,7 +831,6 @@ _EOF ( Lexer * lexer ) // case eof:
 void
 _Zero ( Lexer * lexer ) // case 0
 {
-    //if ( lexer->OurInterpreter ) SetState ( lexer->OurInterpreter, END_OF_STRING, true ) ;
     SetState ( lexer, LEXER_DONE | END_OF_STRING | END_OF_FILE, true ) ;
     //SetState ( _Interpreter_, END_OF_STRING, true ) ;
 }

@@ -9,6 +9,7 @@ _CfrTil_Init_SessionCore ( CfrTil * cfrTil, int64 cntxDelFlag, int64 promptFlag 
     Context * cntx = cfrTil->Context0 ;
     CfrTil_LogOff ( ) ;
     CfrTil_DbgSourceCodeOff ( ) ;
+    //OVT_MemList_DeleteNBAMemory ( ( byte* ) "ObjectSpace" ) ; // not able to do this yet ??
     OVT_FreeTempMem ( ) ;
     _System_Init ( cntx->System0 ) ;
     ReadLine_Init ( cntx->ReadLiner0, _CfrTil_Key ) ;
@@ -39,9 +40,8 @@ _CfrTil_Init_SessionCore ( CfrTil * cfrTil, int64 cntxDelFlag, int64 promptFlag 
     SetState ( cfrTil, SOURCE_CODE_ON, true ) ;
     _CfrTil_TypeStackReset ( ) ;
     _CfrTil_RecycleInit_Compiler_N_M_Node_WordList ( 1 ) ;
-    cfrTil->InitSessionCoreTimes ++ ;
-    //OVT_MemList_DeleteNBAMemory ( ( byte* ) "ObjectSpace" ) ; // not able to do this yet ??
     OVT_MemList_FreeNBAMemory ( ( byte* ) "ObjectSpace", 1 * M, 1 ) ; // not able to do this yet ??
+    cfrTil->InitSessionCoreTimes ++ ;
 }
 
 void
