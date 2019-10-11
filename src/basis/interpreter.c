@@ -40,6 +40,7 @@ Interpreter_Copy ( Interpreter * interp0, uint64 type )
 int64
 Interpreter_IsDone ( Interpreter * interp, int64 flags )
 {
+    Interpreter_SetLexState ( interp) ;
     return GetState ( interp, flags | INTERPRETER_DONE ) ;
 }
 

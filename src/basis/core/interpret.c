@@ -27,7 +27,7 @@ Interpreter_InterpretNextToken ( Interpreter * interp )
 {
     byte * token = Lexer_ReadToken ( interp->Lexer0 ) ;
     Interpreter_InterpretAToken ( interp, token, _Lexer_->TokenStart_ReadLineIndex, _Lexer_->SC_Index ) ;
-    Interpreter_SetLexState ( interp) ;
+    //Interpreter_SetLexState ( interp) ;
 }
 
 Word *

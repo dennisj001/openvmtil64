@@ -120,24 +120,21 @@ Interpret_PrefixFunction_Until_RParen ( Interpreter * interp, Word * prefixFunct
 void
 Interpret_UntilFlagged ( Interpreter * interp, int64 doneFlags )
 {
-    while ( ( ! Interpreter_IsDone ( interp, doneFlags | INTERPRETER_DONE ) ) )
-    {
-        Interpreter_InterpretNextToken ( interp ) ;
-        //Interpreter_SetLexState ( interp) ;
-    }
+    do Interpreter_InterpretNextToken ( interp ) ;
+    while ( ( ! Interpreter_IsDone ( interp, doneFlags | INTERPRETER_DONE ) ) ) ;
 }
 
 void
 Interpret_ToEndOfLine ( Interpreter * interp )
 {
-    int64 i ;
     ReadLiner * rl = interp->ReadLiner0 ;
-    while ( 1 )
+    do
     {
         Interpreter_InterpretNextToken ( interp ) ;
         if ( GetState ( interp->Lexer0, LEXER_END_OF_LINE ) ) break ; // either the lexer with get a newline or the readLiner
         if ( ReadLine_AreWeAtNewlineAfterSpaces ( rl ) ) break ;
     }
+    while ( ( ! Interpreter_IsDone ( interp, END_OF_FILE | END_OF_STRING | INTERPRETER_DONE ) ) ) ;
 }
 
 void

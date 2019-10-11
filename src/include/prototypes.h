@@ -665,6 +665,7 @@ void BackSlash(Lexer *lexer);
 void _MultipleEscape(Lexer *lexer);
 void DoubleQuote(Lexer *lexer);
 void Minus(Lexer *lexer);
+void Plus(Lexer *lexer);
 void ForwardSlash(Lexer *lexer);
 void Star(Lexer *lexer);
 void AddressOf(Lexer *lexer);

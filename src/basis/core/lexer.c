@@ -639,7 +639,25 @@ Minus ( Lexer * lexer ) // '-':
         nextChar = ReadLine_PeekNextChar ( lexer->ReadLiner0 ) ;
         if ( ( nextChar == '-' ) || ( nextChar == '>' ) )
         {
-            ReadLine_UnGetChar ( lexer->ReadLiner0 ) ; // allow to read '[' or ']' as next token
+            ReadLine_UnGetChar ( lexer->ReadLiner0 ) ; // allow to read '--' as next token
+            SetState ( lexer, LEXER_DONE, true ) ;
+
+            return ;
+        }
+    }
+    Lexer_AppendCharacterToTokenBuffer ( lexer ) ;
+}
+
+void
+Plus ( Lexer * lexer ) // '+':
+{
+    byte nextChar ;
+    if ( lexer->TokenWriteIndex )
+    {
+        nextChar = ReadLine_PeekNextChar ( lexer->ReadLiner0 ) ;
+        if ( nextChar == '+' ) 
+        {
+            ReadLine_UnGetChar ( lexer->ReadLiner0 ) ; // allow to read '++' as next token
             SetState ( lexer, LEXER_DONE, true ) ;
 
             return ;
@@ -904,6 +922,7 @@ CfrTil_LexerTables_Setup ( CfrTil * cfrtl )
     cfrtl->LexerCharacterTypeTable [ '&' ].CharFunctionTableIndex = 16 ;
     cfrtl->LexerCharacterTypeTable [ '@' ].CharFunctionTableIndex = 17 ;
     cfrtl->LexerCharacterTypeTable [ '*' ].CharFunctionTableIndex = 18 ;
+    cfrtl->LexerCharacterTypeTable [ '+' ].CharFunctionTableIndex = 19 ;
 
     cfrtl->LexerCharacterFunctionTable [ 0 ] = Lexer_Default ;
     cfrtl->LexerCharacterFunctionTable [ 1 ] = _Zero ;
@@ -925,7 +944,7 @@ CfrTil_LexerTables_Setup ( CfrTil * cfrtl )
     cfrtl->LexerCharacterFunctionTable [ 16 ] = AddressOf ;
     cfrtl->LexerCharacterFunctionTable [ 17 ] = AtFetch ;
     cfrtl->LexerCharacterFunctionTable [ 18 ] = Star ;
-    //cfrtl->LexerCharacterFunctionTable [ 19 ] = SingleQuote ;
+    cfrtl->LexerCharacterFunctionTable [ 19 ] = Plus ;
 }
 
 int64
