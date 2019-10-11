@@ -625,7 +625,7 @@ typedef struct Lexer
     } ;
     uint64 TokenType ;
     Word * TokenWord ;
-    byte TokenInputByte ;
+    byte TokenInputByte, LastLexedChar ;
     byte CurrentTokenDelimiter ;
     int64 TokenStart_ReadLineIndex, TokenEnd_ReadLineIndex ;
     int64 TokenStart_FileIndex, TokenEnd_FileIndex, Token_Length, SC_Index ; //Tsrli = TokenStart_ReadLineIndex
@@ -773,7 +773,7 @@ typedef struct Interpreter
     Finder * Finder0 ;
     Lexer * Lexer0 ;
     Compiler * Compiler0 ;
-    byte * Token ;
+    byte * Token, LastLexedChar ;
     Word *w_Word, *LastWord ;
     Word * BaseObject ;
     Word *CurrentObjectNamespace, *ThisNamespace ;

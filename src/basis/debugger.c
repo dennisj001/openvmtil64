@@ -87,19 +87,6 @@ Debugger_PreSetup ( Debugger * debugger, Word * word, byte * token, byte * addre
 }
 
 void
-Debugger_On ( Debugger * debugger )
-{
-    _Debugger_Init ( debugger, debugger->cs_Cpu, 0, 0 ) ;
-    SetState_TrueFalse ( _Debugger_, DBG_MENU | DBG_INFO, DBG_STEPPING | DBG_AUTO_MODE | DBG_PRE_DONE | DBG_INTERPRET_LOOP_DONE ) ;
-    debugger->LastSetupWord = 0 ;
-    debugger->LastScwi = 0 ;
-    debugger->PreHere = 0 ;
-    if ( ! Is_DebugModeOn ) debugger->StartHere = Here ;
-    DebugOn ;
-    DebugShow_On ;
-}
-
-void
 _Debugger_Off ( Debugger * debugger )
 {
     if ( debugger )
@@ -157,7 +144,7 @@ Debugger_GetDbgAddressFromRsp ( Debugger * debugger, Cpu * cpu )
             Stack_Push ( debugger->ReturnStack, ( uint64 ) retAddr ) ;
         }
         if ( _Q_->Verbosity > 1 ) Stack_Print ( debugger->ReturnStack, ( byte* ) "debugger->ReturnStack ", 0 ) ;
-        debugger->DebugAddress = ( byte* ) _Stack_Pick ( debugger->ReturnStack, (d > 2) ? 2 : (d - 1) ) ; //Stack_Top ( debugger->ReturnStack ) ;
+        debugger->DebugAddress = ( byte* ) _Stack_Pick ( debugger->ReturnStack, ( d > 2 ) ? 2 : ( d - 1 ) ) ; //Stack_Top ( debugger->ReturnStack ) ;
         Stack_Pop ( debugger->ReturnStack ) ; // don't return to the current function on first RET
     }
     else debugger->DebugAddress = ( byte* ) cpu->Rsp[0] ;
@@ -218,6 +205,19 @@ _Debugger_Init ( Debugger * debugger, Cpu * cpu, Word * word, byte * address )
     debugger->CopyRSP = 0 ;
     SetState ( debugger, ( DBG_STACK_OLD ), true ) ;
     SetState ( debugger, DBG_STEPPING, false ) ;
+}
+
+void
+Debugger_On ( Debugger * debugger )
+{
+    _Debugger_Init ( debugger, debugger->cs_Cpu, 0, 0 ) ;
+    SetState_TrueFalse ( _Debugger_, DBG_MENU | DBG_INFO, DBG_STEPPING | DBG_AUTO_MODE | DBG_PRE_DONE | DBG_INTERPRET_LOOP_DONE ) ;
+    debugger->LastSetupWord = 0 ;
+    debugger->LastScwi = 0 ;
+    debugger->PreHere = 0 ;
+    if ( ! Is_DebugModeOn ) debugger->StartHere = Here ;
+    DebugOn ;
+    DebugShow_On ;
 }
 
 byte *
@@ -737,4 +737,10 @@ Debugger_TableSetup ( Debugger * debugger )
     debugger->CharacterFunctionTable [ 36 ] = Debugger_ShowTypeWordStack ;
 }
 
-
+#if 0
+void
+_DEBUG_SETUP ( Word * word, byte * token, Boolean force )
+{
+    if ( ( word || token ) && Is_DebugModeOn ) Debugger_PreSetup ( _Debugger_, word, token, 0, force ) ;
+}
+#endif

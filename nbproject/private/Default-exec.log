@@ -1,843 +1,843 @@
-called: g++
+called: gcc
 	/media/sdc4/dennisj/openvmtil64
-	g++
+	gcc
 	-ggdb
 	-c
 	-o
 	src/basis/compiler/machineCode.o
 	src/basis/compiler/machineCode.c
 
-called: g++
+called: gcc
 	/media/sdc4/dennisj/openvmtil64
-	g++
+	gcc
 	-ggdb
 	-c
 	-o
 	src/basis/compiler/_compile.o
 	src/basis/compiler/_compile.c
 
-called: g++
+called: gcc
 	/media/sdc4/dennisj/openvmtil64
-	g++
+	gcc
 	-ggdb
 	-c
 	-o
 	src/basis/compiler/memory.o
 	src/basis/compiler/memory.c
 
-called: g++
+called: gcc
 	/media/sdc4/dennisj/openvmtil64
-	g++
+	gcc
 	-ggdb
 	-c
 	-o
 	src/basis/compiler/combinators.o
 	src/basis/compiler/combinators.c
 
-called: g++
+called: gcc
 	/media/sdc4/dennisj/openvmtil64
-	g++
+	gcc
 	-ggdb
 	-c
 	-o
 	src/basis/compiler/math.o
 	src/basis/compiler/math.c
 
-called: g++
+called: gcc
 	/media/sdc4/dennisj/openvmtil64
-	g++
+	gcc
 	-ggdb
 	-c
 	-o
 	src/basis/compiler/cpu.o
 	src/basis/compiler/cpu.c
 
-called: g++
+called: gcc
 	/media/sdc4/dennisj/openvmtil64
-	g++
+	gcc
 	-ggdb
 	-c
 	-o
 	src/basis/compiler/stack.o
 	src/basis/compiler/stack.c
 
-called: g++
+called: gcc
 	/media/sdc4/dennisj/openvmtil64
-	g++
+	gcc
 	-ggdb
 	-c
 	-o
 	src/basis/compiler/logic.o
 	src/basis/compiler/logic.c
 
-called: g++
+called: gcc
 	/media/sdc4/dennisj/openvmtil64
-	g++
+	gcc
 	-ggdb
 	-c
 	-o
 	src/basis/core/dataObjectRun.o
 	src/basis/core/dataObjectRun.c
 
-called: g++
+called: gcc
 	/media/sdc4/dennisj/openvmtil64
-	g++
+	gcc
 	-ggdb
 	-c
 	-o
 	src/basis/core/block.o
 	src/basis/core/block.c
 
-called: g++
+called: gcc
 	/media/sdc4/dennisj/openvmtil64
-	g++
+	gcc
 	-ggdb
 	-c
 	-o
 	src/basis/compiler/blocks.o
 	src/basis/compiler/blocks.c
 
-called: g++
+called: gcc
 	/media/sdc4/dennisj/openvmtil64
-	g++
+	gcc
 	-ggdb
 	-c
 	-o
 	src/basis/core/conditionals.o
 	src/basis/core/conditionals.c
 
-called: g++
+called: gcc
 	/media/sdc4/dennisj/openvmtil64
-	g++
+	gcc
 	-ggdb
 	-c
 	-o
 	src/basis/compiler/compile.o
 	src/basis/compiler/compile.c
 
-called: g++
+called: gcc
 	/media/sdc4/dennisj/openvmtil64
-	g++
+	gcc
 	-ggdb
 	-c
 	-o
 	src/basis/core/_system.o
 	src/basis/core/_system.c
 
-called: g++
+called: gcc
 	/media/sdc4/dennisj/openvmtil64
-	g++
+	gcc
 	-ggdb
 	-c
 	-o
 	src/basis/compiler/optimize.o
 	src/basis/compiler/optimize.c
 
-called: g++
+called: gcc
 	/media/sdc4/dennisj/openvmtil64
-	g++
+	gcc
 	-ggdb
 	-c
 	-o
 	src/basis/compiler/bit.o
 	src/basis/compiler/bit.c
 
-called: g++
+called: gcc
 	/media/sdc4/dennisj/openvmtil64
-	g++
+	gcc
 	-ggdb
 	-c
 	-o
 	src/basis/compiler/udis.o
 	src/basis/compiler/udis.c
 
-called: g++
+called: gcc
 	/media/sdc4/dennisj/openvmtil64
-	g++
+	gcc
 	-ggdb
 	-c
 	-o
 	src/basis/compiler/arrays.o
 	src/basis/compiler/arrays.c
 
-called: g++
+called: gcc
 	/media/sdc4/dennisj/openvmtil64
-	g++
+	gcc
 	-ggdb
 	-c
 	-o
 	src/basis/core/io.o
 	src/basis/core/io.c
 
-called: g++
+called: gcc
 	/media/sdc4/dennisj/openvmtil64
-	g++
+	gcc
 	-ggdb
 	-c
 	-o
 	src/basis/core/symbol.o
 	src/basis/core/symbol.c
 
-called: g++
+called: gcc
 	/media/sdc4/dennisj/openvmtil64
-	g++
+	gcc
 	-ggdb
 	-c
 	-o
 	src/basis/repl.o
 	src/basis/repl.c
 
-called: g++
+called: gcc
 	/media/sdc4/dennisj/openvmtil64
-	g++
+	gcc
 	-ggdb
 	-c
 	-o
 	src/basis/core/syntax.o
 	src/basis/core/syntax.c
 
-called: g++
+called: gcc
 	/media/sdc4/dennisj/openvmtil64
-	g++
+	gcc
 	-ggdb
 	-c
 	-o
 	src/basis/core/dataObjectNew.o
 	src/basis/core/dataObjectNew.c
 
-called: g++
+called: gcc
 	/media/sdc4/dennisj/openvmtil64
-	g++
+	gcc
 	-ggdb
 	-c
 	-o
 	src/basis/cfrtil64.o
 	src/basis/cfrtil64.c
 
-called: g++
+called: gcc
 	/media/sdc4/dennisj/openvmtil64
-	g++
+	gcc
 	-ggdb
 	-c
 	-o
 	src/basis/core/parse.o
 	src/basis/core/parse.c
 
-called: g++
+called: gcc
 	/media/sdc4/dennisj/openvmtil64
-	g++
+	gcc
 	-ggdb
 	-c
 	-o
 	src/basis/core/memSpace.o
 	src/basis/core/memSpace.c
 
-called: g++
+called: gcc
 	/media/sdc4/dennisj/openvmtil64
-	g++
+	gcc
 	-ggdb
 	-c
 	-o
 	src/basis/init.o
 	src/basis/init.c
 
-called: g++
+called: gcc
 	/media/sdc4/dennisj/openvmtil64
-	g++
+	gcc
 	-ggdb
 	-c
 	-o
 	src/basis/system.o
 	src/basis/system.c
 
-called: g++
+called: gcc
 	/media/sdc4/dennisj/openvmtil64
-	g++
+	gcc
 	-ggdb
 	-c
 	-o
 	src/basis/core/charSet.o
 	src/basis/core/charSet.c
 
-called: g++
+called: gcc
 	/media/sdc4/dennisj/openvmtil64
-	g++
+	gcc
 	-ggdb
 	-c
 	-o
 	src/basis/core/dllist.o
 	src/basis/core/dllist.c
 
-called: g++
+called: gcc
 	/media/sdc4/dennisj/openvmtil64
-	g++
+	gcc
 	-ggdb
 	-c
 	-o
 	src/basis/core/interpret.o
 	src/basis/core/interpret.c
 
-called: g++
+called: gcc
 	/media/sdc4/dennisj/openvmtil64
-	g++
+	gcc
 	-ggdb
 	-c
 	-o
 	src/basis/core/lexer.o
 	src/basis/core/lexer.c
 
-called: g++
+called: gcc
 	/media/sdc4/dennisj/openvmtil64
-	g++
+	gcc
 	-ggdb
 	-c
 	-o
 	src/basis/core/cstack.o
 	src/basis/core/cstack.c
 
-called: g++
+called: gcc
 	/media/sdc4/dennisj/openvmtil64
-	g++
+	gcc
 	-ggdb
 	-c
 	-o
 	src/basis/core/classes.o
 	src/basis/core/classes.c
 
-called: g++
+called: gcc
 	/media/sdc4/dennisj/openvmtil64
-	g++
+	gcc
 	-ggdb
 	-c
 	-o
 	src/basis/debugOutput.o
 	src/basis/debugOutput.c
 
-called: g++
+called: gcc
 	/media/sdc4/dennisj/openvmtil64
-	g++
+	gcc
 	-ggdb
 	-c
 	-o
 	src/basis/core/namespace.o
 	src/basis/core/namespace.c
 
-called: g++
+called: gcc
 	/media/sdc4/dennisj/openvmtil64
-	g++
+	gcc
 	-ggdb
 	-c
 	-o
 	src/basis/history.o
 	src/basis/history.c
 
-called: g++
+called: gcc
 	/media/sdc4/dennisj/openvmtil64
-	g++
+	gcc
 	-ggdb
 	-c
 	-o
 	src/basis/core/readline.o
 	src/basis/core/readline.c
 
-called: g++
+called: gcc
 	/media/sdc4/dennisj/openvmtil64
-	g++
+	gcc
 	-ggdb
 	-c
 	-o
 	src/basis/core/dataStack.o
 	src/basis/core/dataStack.c
 
-called: g++
+called: gcc
 	/media/sdc4/dennisj/openvmtil64
-	g++
+	gcc
 	-ggdb
 	-c
 	-o
 	src/basis/context.o
 	src/basis/context.c
 
-called: g++
+called: gcc
 	/media/sdc4/dennisj/openvmtil64
-	g++
+	gcc
 	-ggdb
 	-c
 	-o
 	src/basis/core/word.o
 	src/basis/core/word.c
 
-called: g++
+called: gcc
 	/media/sdc4/dennisj/openvmtil64
-	g++
+	gcc
 	-ggdb
 	-c
 	-o
 	src/basis/core/readTable.o
 	src/basis/core/readTable.c
 
-called: g++
+called: gcc
 	/media/sdc4/dennisj/openvmtil64
-	g++
+	gcc
 	-ggdb
 	-c
 	-o
 	src/basis/bigNum.o
 	src/basis/bigNum.c
 
-called: g++
+called: gcc
 	/media/sdc4/dennisj/openvmtil64
-	g++
+	gcc
 	-ggdb
 	-c
 	-o
 	src/basis/core/_readline.o
 	src/basis/core/_readline.c
 
-called: g++
+called: gcc
 	/media/sdc4/dennisj/openvmtil64
-	g++
+	gcc
 	-ggdb
 	-c
 	-o
 	src/basis/core/array.o
 	src/basis/core/array.c
 
-called: g++
+called: gcc
 	/media/sdc4/dennisj/openvmtil64
-	g++
+	gcc
 	-ggdb
 	-c
 	-o
 	src/basis/compiler/compiler.o
 	src/basis/compiler/compiler.c
 
-called: g++
+called: gcc
 	/media/sdc4/dennisj/openvmtil64
-	g++
+	gcc
 	-ggdb
 	-c
 	-o
 	src/basis/core/dllnodes.o
 	src/basis/core/dllnodes.c
 
-called: g++
+called: gcc
 	/media/sdc4/dennisj/openvmtil64
-	g++
+	gcc
 	-ggdb
 	-c
 	-o
 	src/basis/core/finder.o
 	src/basis/core/finder.c
 
-called: g++
+called: gcc
 	/media/sdc4/dennisj/openvmtil64
-	g++
+	gcc
 	-ggdb
 	-c
 	-o
 	src/basis/interpreters.o
 	src/basis/interpreters.c
 
-called: g++
+called: gcc
 	/media/sdc4/dennisj/openvmtil64
-	g++
+	gcc
 	-ggdb
 	-c
 	-o
 	src/basis/tabCompletion.o
 	src/basis/tabCompletion.c
 
-called: g++
+called: gcc
 	/media/sdc4/dennisj/openvmtil64
-	g++
+	gcc
 	-ggdb
 	-c
 	-o
 	src/basis/colors.o
 	src/basis/colors.c
 
-called: g++
+called: gcc
 	/media/sdc4/dennisj/openvmtil64
-	g++
+	gcc
 	-ggdb
 	-c
 	-o
 	src/basis/sourceCode.o
 	src/basis/sourceCode.c
 
-called: g++
+called: gcc
 	/media/sdc4/dennisj/openvmtil64
-	g++
+	gcc
 	-ggdb
 	-c
 	-o
 	src/basis/debugStepping.o
 	src/basis/debugStepping.c
 
-called: g++
+called: gcc
 	/media/sdc4/dennisj/openvmtil64
-	g++
+	gcc
 	-ggdb
 	-c
 	-o
 	src/basis/core/string.o
 	src/basis/core/string.c
 
-called: g++
+called: gcc
 	/media/sdc4/dennisj/openvmtil64
-	g++
+	gcc
 	-ggdb
 	-c
 	-o
 	src/basis/openVmTil.o
 	src/basis/openVmTil.c
 
-called: g++
+called: gcc
 	/media/sdc4/dennisj/openvmtil64
-	g++
+	gcc
 	-ggdb
 	-c
 	-o
 	src/basis/core/dobject.o
 	src/basis/core/dobject.c
 
-called: g++
+called: gcc
 	/media/sdc4/dennisj/openvmtil64
-	g++
+	gcc
 	-ggdb
 	-c
 	-o
 	src/basis/core/preprocessor.o
 	src/basis/core/preprocessor.c
 
-called: g++
+called: gcc
 	/media/sdc4/dennisj/openvmtil64
-	g++
+	gcc
 	-ggdb
 	-c
 	-o
 	src/basis/attribute.o
 	src/basis/attribute.c
 
-called: g++
+called: gcc
 	/media/sdc4/dennisj/openvmtil64
-	g++
+	gcc
 	-ggdb
 	-c
 	-o
 	src/basis/lists.o
 	src/basis/lists.c
 
-called: g++
+called: gcc
 	/media/sdc4/dennisj/openvmtil64
-	g++
+	gcc
 	-ggdb
 	-c
 	-o
 	src/basis/debugDisassembly.o
 	src/basis/debugDisassembly.c
 
-called: g++
+called: gcc
 	/media/sdc4/dennisj/openvmtil64
-	g++
+	gcc
 	-ggdb
 	-c
 	-o
 	src/basis/typeCheck.o
 	src/basis/typeCheck.c
 
-called: g++
+called: gcc
 	/media/sdc4/dennisj/openvmtil64
-	g++
+	gcc
 	-ggdb
 	-c
 	-o
 	src/basis/linux.o
 	src/basis/linux.c
 
-called: g++
+called: gcc
 	/media/sdc4/dennisj/openvmtil64
-	g++
+	gcc
 	-ggdb
 	-c
 	-o
 	src/basis/exception.o
 	src/basis/exception.c
 
-called: g++
+called: gcc
 	/media/sdc4/dennisj/openvmtil64
-	g++
+	gcc
 	-ggdb
 	-c
 	-o
 	src/basis/compiler/locals.o
 	src/basis/compiler/locals.c
 
-called: g++
+called: gcc
 	/media/sdc4/dennisj/openvmtil64
-	g++
+	gcc
 	-ggdb
 	-c
 	-o
 	src/basis/debugger.o
 	src/basis/debugger.c
 
-called: g++
+called: gcc
 	/media/sdc4/dennisj/openvmtil64
-	g++
+	gcc
 	-ggdb
 	-c
 	-o
 	src/basis/interpreter.o
 	src/basis/interpreter.c
 
-called: g++
+called: gcc
 	/media/sdc4/dennisj/openvmtil64
-	g++
+	gcc
 	-ggdb
 	-c
 	-o
 	src/basis/_debug.o
 	src/basis/_debug.c
 
-called: g++
+called: gcc
 	/media/sdc4/dennisj/openvmtil64
-	g++
+	gcc
 	-ggdb
 	-c
 	-o
 	src/basis/lc/lambdaCalculus.o
 	src/basis/lc/lambdaCalculus.c
 
-called: g++
+called: gcc
 	/media/sdc4/dennisj/openvmtil64
-	g++
+	gcc
 	-ggdb
 	-c
 	-o
 	src/basis/lc/apply.o
 	src/basis/lc/apply.c
 
-called: g++
+called: gcc
 	/media/sdc4/dennisj/openvmtil64
-	g++
+	gcc
 	-ggdb
 	-c
 	-o
 	src/basis/lc/eval.o
 	src/basis/lc/eval.c
 
-called: g++
+called: gcc
 	/media/sdc4/dennisj/openvmtil64
-	g++
+	gcc
 	-ggdb
 	-c
 	-o
 	src/basis/lc/read.o
 	src/basis/lc/read.c
 
-called: g++
+called: gcc
 	/media/sdc4/dennisj/openvmtil64
-	g++
+	gcc
 	-ggdb
 	-c
 	-o
 	src/basis/lc/print.o
 	src/basis/lc/print.c
 
-called: g++
+called: gcc
 	/media/sdc4/dennisj/openvmtil64
-	g++
+	gcc
 	-ggdb
 	-c
 	-o
 	src/basis/lc/special.o
 	src/basis/lc/special.c
 
-called: g++
+called: gcc
 	/media/sdc4/dennisj/openvmtil64
-	g++
+	gcc
 	-ggdb
 	-c
 	-o
 	src/primitives/strings.o
 	src/primitives/strings.c
 
-called: g++
+called: gcc
 	/media/sdc4/dennisj/openvmtil64
-	g++
+	gcc
 	-ggdb
 	-c
 	-o
 	src/primitives/bits.o
 	src/primitives/bits.c
 
-called: g++
+called: gcc
 	/media/sdc4/dennisj/openvmtil64
-	g++
+	gcc
 	-ggdb
 	-c
 	-o
 	src/primitives/maths.o
 	src/primitives/maths.c
 
-called: g++
+called: gcc
 	/media/sdc4/dennisj/openvmtil64
-	g++
+	gcc
 	-ggdb
 	-c
 	-o
 	src/primitives/logics.o
 	src/primitives/logics.c
 
-called: g++
+called: gcc
 	/media/sdc4/dennisj/openvmtil64
-	g++
+	gcc
 	-ggdb
 	-c
 	-o
 	src/primitives/openvmtils.o
 	src/primitives/openvmtils.c
 
-called: g++
+called: gcc
 	/media/sdc4/dennisj/openvmtil64
-	g++
+	gcc
 	-ggdb
 	-c
 	-o
 	src/primitives/ios.o
 	src/primitives/ios.c
 
-called: g++
+called: gcc
 	/media/sdc4/dennisj/openvmtil64
-	g++
+	gcc
 	-ggdb
 	-c
 	-o
 	src/primitives/parsers.o
 	src/primitives/parsers.c
 
-called: g++
+called: gcc
 	/media/sdc4/dennisj/openvmtil64
-	g++
+	gcc
 	-ggdb
 	-c
 	-o
 	src/primitives/interpreters.o
 	src/primitives/interpreters.c
 
-called: g++
+called: gcc
 	/media/sdc4/dennisj/openvmtil64
-	g++
+	gcc
 	-ggdb
 	-c
 	-o
 	src/primitives/namespaces.o
 	src/primitives/namespaces.c
 
-called: g++
+called: gcc
 	/media/sdc4/dennisj/openvmtil64
-	g++
+	gcc
 	-ggdb
 	-c
 	-o
 	src/primitives/systems.o
 	src/primitives/systems.c
 
-called: g++
+called: gcc
 	/media/sdc4/dennisj/openvmtil64
-	g++
+	gcc
 	-ggdb
 	-c
 	-o
 	src/primitives/compilers.o
 	src/primitives/compilers.c
 
-called: g++
+called: gcc
 	/media/sdc4/dennisj/openvmtil64
-	g++
+	gcc
 	-ggdb
 	-c
 	-o
 	src/primitives/words.o
 	src/primitives/words.c
 
-called: g++
+called: gcc
 	/media/sdc4/dennisj/openvmtil64
-	g++
+	gcc
 	-ggdb
 	-c
 	-o
 	src/primitives/file.o
 	src/primitives/file.c
 
-called: g++
+called: gcc
 	/media/sdc4/dennisj/openvmtil64
-	g++
+	gcc
 	-ggdb
 	-c
 	-o
 	src/primitives/stacks.o
 	src/primitives/stacks.c
 
-called: g++
+called: gcc
 	/media/sdc4/dennisj/openvmtil64
-	g++
+	gcc
 	-ggdb
 	-c
 	-o
 	src/primitives/debuggers.o
 	src/primitives/debuggers.c
 
-called: g++
+called: gcc
 	/media/sdc4/dennisj/openvmtil64
-	g++
+	gcc
 	-ggdb
 	-c
 	-o
 	src/primitives/memorys.o
 	src/primitives/memorys.c
 
-called: g++
+called: gcc
 	/media/sdc4/dennisj/openvmtil64
-	g++
+	gcc
 	-ggdb
 	-c
 	-o
 	src/primitives/primitives.o
 	src/primitives/primitives.c
 
-called: g++
+called: gcc
 	/media/sdc4/dennisj/openvmtil64
-	g++
+	gcc
 	-ggdb
 	-c
 	-o
 	src/primitives/contexts.o
 	src/primitives/contexts.c
 
-called: g++
+called: gcc
 	/media/sdc4/dennisj/openvmtil64
-	g++
+	gcc
 	-ggdb
 	-c
 	-o
 	src/primitives/disassembler.o
 	src/primitives/disassembler.c
 
-called: g++
+called: gcc
 	/media/sdc4/dennisj/openvmtil64
-	g++
+	gcc
 	-ggdb
 	-c
 	-o
 	src/primitives/syntaxes.o
 	src/primitives/syntaxes.c
 
-called: g++
+called: gcc
 	/media/sdc4/dennisj/openvmtil64
-	g++
+	gcc
 	-ggdb
 	-O3
 	-c
@@ -845,18 +845,18 @@ called: g++
 	-o
 	src/primitives/cmaths.o
 
-called: g++
+called: gcc
 	/media/sdc4/dennisj/openvmtil64
-	g++
+	gcc
 	-ggdb
 	-c
 	-o
 	src/primitives/dataObjectNews.o
 	src/primitives/dataObjectNews.c
 
-called: g++
+called: gcc
 	/media/sdc4/dennisj/openvmtil64
-	g++
+	gcc
 	-ggdb
 	src/basis/compiler/machineCode.o
 	src/basis/compiler/_compile.o
@@ -968,15 +968,14 @@ called: /usr/bin/ld
 	/media/sdc4/dennisj/openvmtil64
 	/usr/bin/ld
 	-plugin
-	/usr/lib/gcc/x86_64-linux-gnu/8/liblto_plugin.so
-	-plugin-opt=/usr/lib/gcc/x86_64-linux-gnu/8/lto-wrapper
-	-plugin-opt=-fresolution=/tmp/ccaE5nyZ.res
-	-plugin-opt=-pass-through=-lgcc_s
+	/usr/lib/gcc/x86_64-linux-gnu/9/liblto_plugin.so
+	-plugin-opt=/usr/lib/gcc/x86_64-linux-gnu/9/lto-wrapper
+	-plugin-opt=-fresolution=/tmp/cc2dMTKp.res
 	-plugin-opt=-pass-through=-lgcc
+	-plugin-opt=-pass-through=-lgcc_s
 	-plugin-opt=-pass-through=-lc
-	-plugin-opt=-pass-through=-lgcc_s
 	-plugin-opt=-pass-through=-lgcc
-	--sysroot=/
+	-plugin-opt=-pass-through=-lgcc_s
 	--build-id
 	--eh-frame-hdr
 	-m
@@ -992,18 +991,18 @@ called: /usr/bin/ld
 	relro
 	-o
 	bin/cfrtil64-gdb
-	/usr/lib/gcc/x86_64-linux-gnu/8/../../../x86_64-linux-gnu/Scrt1.o
-	/usr/lib/gcc/x86_64-linux-gnu/8/../../../x86_64-linux-gnu/crti.o
-	/usr/lib/gcc/x86_64-linux-gnu/8/crtbeginS.o
+	/usr/lib/gcc/x86_64-linux-gnu/9/../../../x86_64-linux-gnu/Scrt1.o
+	/usr/lib/gcc/x86_64-linux-gnu/9/../../../x86_64-linux-gnu/crti.o
+	/usr/lib/gcc/x86_64-linux-gnu/9/crtbeginS.o
 	-L/usr/local/lib
-	-L/usr/lib/gcc/x86_64-linux-gnu/8
-	-L/usr/lib/gcc/x86_64-linux-gnu/8/../../../x86_64-linux-gnu
-	-L/usr/lib/gcc/x86_64-linux-gnu/8/../../../../lib
+	-L/usr/lib/gcc/x86_64-linux-gnu/9
+	-L/usr/lib/gcc/x86_64-linux-gnu/9/../../../x86_64-linux-gnu
+	-L/usr/lib/gcc/x86_64-linux-gnu/9/../../../../lib
 	-L/lib/x86_64-linux-gnu
 	-L/lib/../lib
 	-L/usr/lib/x86_64-linux-gnu
 	-L/usr/lib/../lib
-	-L/usr/lib/gcc/x86_64-linux-gnu/8/../../..
+	-L/usr/lib/gcc/x86_64-linux-gnu/9/../../..
 	src/basis/compiler/machineCode.o
 	src/basis/compiler/_compile.o
 	src/basis/compiler/memory.o
@@ -1101,17 +1100,22 @@ called: /usr/bin/ld
 	src/primitives/dataObjectNews.o
 	-ludis86
 	-lrt
+	-lc
 	-ldl
+	-lm
 	-lmpfr
 	-lgmp
-	-lstdc++
-	-lm
-	-lc
-	-lgcc_s
 	-lgcc
-	-lc
+	--push-state
+	--as-needed
 	-lgcc_s
+	--pop-state
+	-lc
 	-lgcc
-	/usr/lib/gcc/x86_64-linux-gnu/8/crtendS.o
-	/usr/lib/gcc/x86_64-linux-gnu/8/../../../x86_64-linux-gnu/crtn.o
+	--push-state
+	--as-needed
+	-lgcc_s
+	--pop-state
+	/usr/lib/gcc/x86_64-linux-gnu/9/crtendS.o
+	/usr/lib/gcc/x86_64-linux-gnu/9/../../../x86_64-linux-gnu/crtn.o
 

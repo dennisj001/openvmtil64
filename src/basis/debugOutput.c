@@ -139,7 +139,7 @@ _Debugger_ShowEffects ( Debugger * debugger, Word * word, Boolean stepFlag, Bool
         }
         _Debugger_DisassembleWrittenCode ( debugger ) ;
         const char * insert ;
-        int64 change, depthChange ;
+        uint64 change, depthChange ;
         if ( Debugger_IsStepping ( debugger ) )
         {
             change = dsp - debugger->SaveDsp ;
@@ -147,7 +147,7 @@ _Debugger_ShowEffects ( Debugger * debugger, Word * word, Boolean stepFlag, Bool
         }
         else
         {
-            change = dsp - debugger->WordDsp ;
+            change = debugger->WordDsp ? (dsp - debugger->WordDsp) : 0 ;
             debugger->WordDsp = dsp ;
         }
         //if ( GetState ( debugger, DBG_STEPPING ) ) Set_DataStackPointers_FromDebuggerDspReg ( ) ;        
@@ -605,7 +605,7 @@ LO_Debug_ExtraShow ( int64 showStackFlag, int64 verbosity, int64 wordList, byte 
 }
 
 void
-_Debugger_PostShow ( Debugger * debugger, Word * word, Boolean force )//, byte * token, Word * word )
+_Debugger_PostShow ( Debugger * debugger, Word * word, Boolean force )
 {
     _Debugger_ShowEffects ( debugger, word, GetState ( debugger, DBG_STEPPING ), force ) ;
 }

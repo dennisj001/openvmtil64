@@ -91,6 +91,7 @@ _Lexer_LexNextToken_WithDelimiters ( Lexer * lexer, byte * delimiters, Boolean c
         lexer->TokenEnd_ReadLineIndex = lexer->TokenStart_ReadLineIndex + lexer->Token_Length ;
         lexer->TokenStart_FileIndex = rl->LineStartFileIndex + lexer->TokenStart_ReadLineIndex ; //- lexer->Token_Length ;
         if ( peekFlag && reAddPeeked ) CfrTil_PushToken_OnTokenList ( lexer->OriginalToken ) ;
+        lexer->LastLexedChar = inChar ;
     }
     return lexer->OriginalToken ;
 }

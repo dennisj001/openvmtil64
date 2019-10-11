@@ -1,7 +1,6 @@
 
 5
 : sp ; //s pause ; 
-sp
 optimizeOn inlineOn 
 typecheckOn 
 

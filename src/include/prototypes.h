@@ -1514,11 +1514,11 @@ void CfrTil_LocalVariablesBegin(void);
 /* src/basis/debugger.c */
 void _Debugger_InterpreterLoop(Debugger *debugger);
 Boolean Debugger_PreSetup(Debugger *debugger, Word *word, byte *token, byte *address, Boolean forceFlag);
-void Debugger_On(Debugger *debugger);
 void _Debugger_Off(Debugger *debugger);
 void Debugger_Off(Debugger *debugger, int64 debugOffFlag);
 byte *Debugger_GetDbgAddressFromRsp(Debugger *debugger, Cpu *cpu);
 void _Debugger_Init(Debugger *debugger, Cpu *cpu, Word *word, byte *address);
+void Debugger_On(Debugger *debugger);
 byte *Debugger_GetStateString(Debugger *debugger);
 void Debugger_NextToken(Debugger *debugger);
 void Debugger_CurrentToken(Debugger *debugger);
@@ -1569,7 +1569,7 @@ void Interpreter_Init(Interpreter *interp);
 Interpreter *Interpreter_New(uint64 type);
 void _Interpreter_Copy(Interpreter *interp, Interpreter *interp0);
 Interpreter *Interpreter_Copy(Interpreter *interp0, uint64 type);
-int64 Interpreter_IsDone(Interpreter *interp, int64 flags);
+int64 Interpreter_IsDone(Interpreter *interp, uint64 flags);
 /* src/basis/_debug.c */
 byte *JccInstructionAddress_2Byte(byte *address);
 byte *JccInstructionAddress_1Byte(byte *address);

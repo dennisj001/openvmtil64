@@ -128,10 +128,14 @@
                    projectFiles="false"
                    kind="IMPORTANT_FILES_FOLDER">
       <itemPath>Makefile</itemPath>
-      <itemPath>etc</itemPath>
+      <itemPath>README.txt</itemPath>
       <itemPath>init.cft</itemPath>
       <itemPath>nbproject/private/launcher.properties</itemPath>
+      <itemPath>m</itemPath>
+      <itemPath>m0</itemPath>
+      <itemPath>mir</itemPath>
       <itemPath>namespaces</itemPath>
+      <itemPath>r</itemPath>
     </logicalFolder>
   </logicalFolder>
   <sourceFolderFilter>^(nbproject)$</sourceFolderFilter>
@@ -621,7 +625,11 @@
         </cTool>
       </item>
       <item path="src/basis/init.c" ex="false" tool="0" flavor2="3">
-        <cTool flags="0">
+        <cTool flags="3">
+          <incDir>
+            <pElem>src/basis</pElem>
+            <pElem>src/include</pElem>
+          </incDir>
         </cTool>
       </item>
       <item path="src/basis/interpreter.c" ex="false" tool="0" flavor2="3">

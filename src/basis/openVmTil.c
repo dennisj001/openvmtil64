@@ -1,5 +1,5 @@
 #include "../include/cfrtil64.h"
-#define VERSION ((byte*) "0.894.200" ) 
+#define VERSION ((byte*) "0.894.300" ) 
 // Logic/Foml (Foundations of Mathematical Logic by Haskell Curry), Oop (Object Oriented Programming), 
 // C, Lisp, Rpn/Lag : Reverse Polish Notation, (Left Associative Grammar), Pda : Push Down Automata, Tm : Turing Machine :: 
 // (til : a toolkit for implementing languages (maybe even a compiler compiler) based on these ideas)
@@ -263,8 +263,8 @@ _OpenVmTil_New ( OpenVmTil * ovt, int64 argc, char * argv [ ] )
     int64 totalMemSizeTarget = ( ovt->TotalMemSizeTarget < 5 * M ) ? ovt->TotalMemSizeTarget : - 1 ; // 0 or -1 : gets default values     
     _OpenVmTil_CalculateMemSpaceSizes ( ovt, restartCondition, - 1 ) ; //totalMemSizeTarget ) ;
 #else    
-    ovt->InternalObjectsSize = 1 * M ; 
-    ovt->ObjectsSize = 1 * M ; 
+    ovt->InternalObjectsSize = 100 * K ; //1 * M ; 
+    ovt->ObjectsSize = 100 * K ; //1 * M ; 
     ovt->BufferSpaceSize = 100 * K ; //35 * ( sizeof ( Buffer ) + BUFFER_SIZE ) ;
     ovt->StringSpaceSize = 100 * K ;
     ovt->MachineCodeSize = 300 * K ;
