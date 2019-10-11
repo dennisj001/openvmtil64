@@ -3,7 +3,7 @@
 
 const int64 MEM_FREE = 0 ;
 const int64 MEM_ALLOC = 1 ;
-uint64 mmap_TotalMemAllocated = 0, mmap_TotalMemFreed = 0 ;
+int64 mmap_TotalMemAllocated = 0, mmap_TotalMemFreed = 0 ;
 
 byte*
 _mmap_AllocMem ( int64 size )

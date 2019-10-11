@@ -57,7 +57,7 @@ const void *const __dso_handle __attribute__ ((__visibility__ ("hidden")))
 extern OpenVmTil * _Q_;
 extern CPrimitive CPrimitives [];
 extern MachineCodePrimitive MachineCodePrimitives [];
-extern uint64 mmap_TotalMemAllocated, mmap_TotalMemFreed ;
+extern int64 mmap_TotalMemAllocated, mmap_TotalMemFreed ;
 extern uint64 BlockCallAddress ;
 extern block CurrentDefinition ;
 //extern uint64 *_Dsp_ ; 
