@@ -304,24 +304,6 @@ _NamedByteArray_Init ( NamedByteArray * nba, byte * name, int64 size, int64 atyp
     _NamedByteArray_AddNewByteArray ( nba, size ) ;
 }
 
-void
-NamedByteArray_Delete ( NamedByteArray * nba )
-{
-    ByteArray * ba ;
-    dlnode * node, *nodeNext ;
-    if ( nba )
-    {
-        dlnode_Remove ( ( dlnode* ) & nba->NBA_Symbol ) ;
-        for ( node = dllist_First ( ( dllist* ) & nba->NBA_BaList ) ; node ; node = nodeNext )
-        {
-            nodeNext = dlnode_Next ( node ) ;
-            ba = Get_BA_Symbol_To_BA ( node ) ;
-            _Mem_ChunkFree ( ( MemChunk * ) ba ) ;
-        }
-        _Mem_ChunkFree ( ( MemChunk * ) nba ) ; // mchunk )
-    }
-}
-
 NamedByteArray *
 NamedByteArray_New ( byte * name, int64 size, int64 atype )
 {

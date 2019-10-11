@@ -266,7 +266,7 @@ _OVT_MemList_FreeNBAMemory ( NamedByteArray *nba, uint64 moreThan, int64 always 
             ByteArray * ba = Get_BA_Symbol_To_BA ( node ) ;
             if ( ba )
             {
-                if ( ! flag ++ )
+                if ( ! flag ++ ) // keep one ba initialized
                 {
                     _ByteArray_Init ( ba ) ;
                     nba->ba_CurrentByteArray = ba ;
@@ -286,10 +286,29 @@ _OVT_MemList_FreeNBAMemory ( NamedByteArray *nba, uint64 moreThan, int64 always 
 }
 
 void
-OVT_MemList_DeleteNBAMemory ( byte * name )
+NamedByteArray_Delete ( NamedByteArray * nba, Boolean reinitFlag )
+{
+    ByteArray * ba ;
+    dlnode * node, *nodeNext ;
+    if ( nba )
+    {
+        dlnode_Remove ( ( dlnode* ) & nba->NBA_Symbol ) ;
+        for ( node = dllist_First ( ( dllist* ) & nba->NBA_BaList ) ; node ; node = nodeNext )
+        {
+            nodeNext = dlnode_Next ( node ) ;
+            ba = Get_BA_Symbol_To_BA ( node ) ;
+            _Mem_ChunkFree ( ( MemChunk * ) ba ) ;
+        }
+        if ( ! reinitFlag ) _Mem_ChunkFree ( ( MemChunk * ) nba ) ; // mchunk )
+        else _NamedByteArray_Init ( nba, nba->NBA_MemChunk.Name, nba->NBA_DataSize, nba->NBA_AAttribute ) ;
+    }
+}
+
+void
+OVT_MemList_DeleteNBAMemory ( byte * name, Boolean reinitFlag )
 {
     NamedByteArray *nba = _OVT_Find_NBA ( name ) ;
-    NamedByteArray_Delete ( nba ) ;
+    NamedByteArray_Delete ( nba, reinitFlag ) ;
 }
 
 

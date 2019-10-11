@@ -116,7 +116,7 @@ CfrTil_Context_PopDelete ( CfrTil * cfrTil )
     //Compiler_DeleteDebugInfo ( cntx->Compiler0 ) ;
     _Context_ = cfrTil->Context0 = cntx ;
     _Q_->MemorySpace0->ContextSpace = cntx->ContextNba ;
-    NamedByteArray_Delete ( cnba ) ;
+    NamedByteArray_Delete ( cnba, 0 ) ;
 }
 
 void

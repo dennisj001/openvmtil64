@@ -456,7 +456,8 @@ void MemorySpace_Init(MemorySpace *ms);
 MemorySpace *MemorySpace_New(void);
 NamedByteArray *_OVT_Find_NBA(byte *name);
 void _OVT_MemList_FreeNBAMemory(NamedByteArray *nba, uint64 moreThan, int64 always);
-void OVT_MemList_DeleteNBAMemory(byte *name);
+void NamedByteArray_Delete(NamedByteArray *nba, Boolean reinitFlag);
+void OVT_MemList_DeleteNBAMemory(byte *name, Boolean reinitFlag);
 void OVT_MemList_FreeNBAMemory(byte *name, uint64 moreThan, int64 always);
 void OVT_MemListFree_ContextMemory(void);
 void OVT_MemListFree_TempObjects(void);
@@ -1089,7 +1090,6 @@ ByteArray *_NamedByteArray_AddNewByteArray(NamedByteArray *nba, int64 size);
 NamedByteArray *_NamedByteArray_Allocate(int64 allocType);
 NamedByteArray *NamedByteArray_Allocate(void);
 void _NamedByteArray_Init(NamedByteArray *nba, byte *name, int64 size, int64 atype);
-void NamedByteArray_Delete(NamedByteArray *nba);
 NamedByteArray *NamedByteArray_New(byte *name, int64 size, int64 atype);
 int64 NamedByteArray_CheckAddress(NamedByteArray *nba, byte *address);
 /* src/basis/compiler/compiler.c */

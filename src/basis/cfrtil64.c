@@ -231,9 +231,9 @@ CfrTil_ResetMemory ( CfrTil * cfrTil )
         while ( Stack_Depth ( cfrTil->ContextDataStack ) )
         {
             Context * cntx = ( Context* ) _Stack_Pop ( cfrTil->ContextDataStack ) ;
-            NamedByteArray_Delete ( cntx->ContextNba ) ;
+            NamedByteArray_Delete ( cntx->ContextNba, 0 ) ;
         }
-        if ( cfrTil->Context0 ) NamedByteArray_Delete ( cfrTil->Context0->ContextNba ) ;
+        if ( cfrTil->Context0 ) NamedByteArray_Delete ( cfrTil->Context0->ContextNba, 0 ) ;
     }
 #endif    
     //OVT_MemListFree_ContextMemory ( ) ;
