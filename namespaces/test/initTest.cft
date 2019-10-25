@@ -69,6 +69,7 @@ Int User
 : aTest demo cntT ;
 : tL lT dT0 ;
 : tL2 dT0 lT ;
+: tcd tc demo ;
 
 // the action starts here
 nl "before testAll" prints

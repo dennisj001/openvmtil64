@@ -1,5 +1,5 @@
 #include "../include/cfrtil64.h"
-#define VERSION ((byte*) "0.894.400" ) 
+#define VERSION ((byte*) "0.894.530" ) 
 // Logic/Foml (Foundations of Mathematical Logic by Haskell Curry), Oop (Object Oriented Programming), 
 // C, Lisp, Rpn/Lag : Reverse Polish Notation, (Left Associative Grammar), Pda : Push Down Automata, Tm : Turing Machine :: 
 // (til : a toolkit for implementing languages (maybe even a compiler compiler) based on these ideas)
@@ -31,7 +31,7 @@ OpenVmTil_Run ( int64 argc, char * argv [ ] )
         if ( ! sigsetjmp ( ovt->JmpBuf0, 0 ) ) CfrTil_Run ( ovt->OVT_CfrTil, ovt->RestartCondition ) ;
         restartCondition = ovt->RestartCondition ;
         sigSegvs = ovt->SigSegvs ;
-        ovt->Restarts = restarts ++ ;
+        ovt->Restarts = ++ restarts ;
     }
 }
 

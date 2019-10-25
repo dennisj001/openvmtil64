@@ -69,6 +69,7 @@ _Compile_StackPtrLValue_PopToReg ( uint64 stkPtrLvalue, Boolean tempStkReg, Bool
     Compile_Move_Reg_To_Rm (OREG, tempStkReg, 0 ) ; // move the new rvalue back to its lvalue - OREG
 }
 
+// remember to use a negative number to access an existing stack item
 void
 _Compile_Move_StackN_To_Reg ( Boolean reg, Boolean stackReg, int64 index )
 {
@@ -96,8 +97,6 @@ _Compile_Move_Reg_To_StackNRm_UsingReg ( Boolean stackReg, int64 index, Boolean 
     _Compile_Move_StackN_To_Reg ( ureg, stackReg, index ) ;
     Compile_Move_Reg_To_Rm (ureg, reg, 0 ) ;
 }
-
-// remember to use a negative number to access an existing stack item
 
 void
 _Compile_Stack_PushReg ( Boolean stackReg, Boolean reg )

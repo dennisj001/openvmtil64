@@ -19,7 +19,6 @@ Compile_Call_From_C_Address ( uint64 bptr )
     _Compile_GetRValue_FromLValue_ToReg ( ACC, ( byte* ) bptr ) ;
     //_Compile_MoveImm_To_Reg ( ACC, ( uint64 ) bptr, CELL_SIZE ) ;
     _Compile_Call_Acc ( ) ;
-
 }
 
 // c ffi : foreign function interface
@@ -30,6 +29,15 @@ Compile_CallCFunctionWithParameter_TestAlignRSP ( byte * cFunction, Word * word 
     Compile_MoveImm_To_Reg ( RDI, ( int64 ) word, CELL ) ; // RDI is x64 abi first parameter 
     Compile_Call_ToAddressThruReg_TestAlignRSP ( cFunction, CALL_THRU_REG ) ; // compile call cFunction with RDI value as arg
 }
+
+#if 0 // useful but not yet in use
+void
+Compile_CallCFunction_TestAlignRSP_MoveResultRegRaxToTOS ( byte * cFunction )
+{
+    Compile_Call_ToAddressThruReg_TestAlignRSP ( cFunction, CALL_THRU_REG ) ; 
+    _Compile_Stack_PushReg ( DSP, RAX ) ;
+}
+#endif
 
 void
 Compile_Call_CurrentBlock ( )

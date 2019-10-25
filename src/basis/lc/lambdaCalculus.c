@@ -72,7 +72,7 @@ _LO_New_RawStringOrLiteral ( Lexer * lexer, byte * token, int64 qidFlag, int64 t
     {
         uint64 ctokenType = qidFlag ? OBJECT : lexer->TokenType | LITERAL ;
         Word * word = _DObject_New ( lexer->OriginalToken, lexer->Literal, ( ctokenType | IMMEDIATE | LITERAL ),
-            0, ctokenType, ctokenType, ( byte* ) _DataObject_Run, 0, 0, 0, LISP ) ; 
+            0, ctokenType, ctokenType, ( byte* ) _DataObject_Run, 0, 0, 0, LISP ) ;
         if ( ( ! qidFlag ) && ( lexer->TokenType & ( T_RAW_STRING ) ) )
         {
             // nb. we don't want to do this block with literals it slows down the eval and is wrong
@@ -262,7 +262,7 @@ LC_EvalPrint ( LambdaCalculus * lc, ListObject * l0 )
     SetState ( lc, LC_PRINT_ENTERED, false ) ;
     SetBuffersUnused ( 1 ) ;
     _LC_->ParenLevel = 0 ;
-    Compiler_Init (_Context_->Compiler0, 0, 0) ; // we could be compiling a cfrTil word as in oldLisp.cft
+    Compiler_Init ( _Context_->Compiler0, 0, 0 ) ; // we could be compiling a cfrTil word as in oldLisp.cft
 }
 
 ListObject *
@@ -500,8 +500,8 @@ _LC_Init ( LambdaCalculus * lc )
     {
         _LC_ = lc ;
         lc->LispNamespace = Namespace_Find ( ( byte* ) "Lisp" ) ;
-        lc->LispDefinesNamespace = Namespace_FindOrNew_SetUsing (( byte* ) "LispDefines", 0, 1 ) ;
-        lc->LispTempNamespace = Namespace_FindOrNew_SetUsing (( byte* ) "LispTemp", 0, 1 ) ;
+        lc->LispDefinesNamespace = Namespace_FindOrNew_SetUsing ( ( byte* ) "LispDefines", 0, 1 ) ;
+        lc->LispTempNamespace = Namespace_FindOrNew_SetUsing ( ( byte* ) "LispTemp", 0, 1 ) ;
         _LC_Init_Runtime ( lc ) ;
         LC_ClearDefinesNamespace ( ) ;
         lc->OurCfrTil = _CfrTil_ ;
@@ -550,6 +550,13 @@ LC_New ( )
     lc = _LC_Create ( ) ;
     lc = _LC_Init ( lc ) ;
     return lc ;
+}
+
+void
+LC_On ()
+{
+    LC_New ( ) ;
+    LC_LispNamespaceOn ( ) ; 
 }
 
 LambdaCalculus *

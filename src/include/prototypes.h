@@ -489,6 +489,7 @@ void DLList_RemoveWords(dllist *list);
 void _CheckCodeSpaceForRoom(int64 memDesired);
 void CheckCodeSpaceForRoom(void);
 /* src/basis/init.c */
+void _CfrTil_RuntimeInit(CfrTil *cfrTil);
 void _CfrTil_Init_SessionCore(CfrTil *cfrTil, int64 cntxDelFlag, int64 promptFlag);
 void CfrTil_SessionInit(void);
 void CfrTil_ResetAll_Init(CfrTil *cfrTil);
@@ -1629,6 +1630,7 @@ LambdaCalculus *_LC_Init(LambdaCalculus *lc);
 void LC_Delete(LambdaCalculus *lc);
 LambdaCalculus *_LC_Create(void);
 LambdaCalculus *LC_New(void);
+void LC_On(void);
 LambdaCalculus *LC_Reset(void);
 LambdaCalculus *LC_Init(void);
 /* src/basis/lc/apply.c */

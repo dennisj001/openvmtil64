@@ -156,7 +156,6 @@ CfrTil_LogOn ( )
 {
     _CfrTil_->LogFlag = true ;
     if ( ! _CfrTil_->LogFILE ) _CfrTil_->LogFILE = fopen ( ( char* ) "cfrtil.log", "w" ) ;
-
 }
 
 void

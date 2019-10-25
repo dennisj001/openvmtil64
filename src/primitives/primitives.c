@@ -41,7 +41,6 @@ CPrimitive CPrimitives [] = {
     { "lcReset", 0, 0, 0, ( block ) LC_Reset, 0, 0, 0, "Lisp", "Root" },
     { "lcClearDefines", 0, 0, 0, ( block ) LC_ClearDefinesNamespace, 0, 0, 0, "Lisp", "Root" },
     { "lcOff", 0, 0, 0, ( block ) LC_LispNamespacesOff, 0, 0, 0, "Lisp", "Root" },
-    { "lcOn", 0, 0, 0, ( block ) LC_New, 0, 0, 0, "Lisp", "Root" },
 
     { "'", 0, 0, 0, CfrTil_SingleQuote, IMMEDIATE | KEYWORD, 0, 0, "Forth", "Root" },
     { ",", 0, 0, 0, CompileInt32, 0, 0, 0, "Forth", "Root" },
@@ -347,6 +346,8 @@ CPrimitive CPrimitives [] = {
     { "pause", 0, 0, 0, OpenVmTil_Pause, 0, 0, 0, "System", "Root" },
     { "_pause", 0, 0, 0, OpenVmTil_Pause, 0, 0, 0, "System", "Root" },
     { "registers", 0, 0, 0, _Debugger_CpuState_Show, 0, 0, 0, "System", "Root" },
+    { "lcOn", 0, 0, 0, ( block ) LC_On, 0, 0, 0, "System", "Root" },
+
     { "if", 0, 0, 0, CfrTil_If_ConditionalExpression, IMMEDIATE, 0, 0, "Shell", "Root" },
     { "else", 0, 0, 0, CfrTil_Else, IMMEDIATE, 0, 0, "Shell", "Root" },
     { "endif", 0, 0, 0, CfrTil_EndIf, IMMEDIATE, 0, 0, "Shell", "Root" },

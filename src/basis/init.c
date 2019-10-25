@@ -4,50 +4,55 @@
 // this is called by the main interpreter _CfrTil_Interpret
 
 void
-_CfrTil_Init_SessionCore ( CfrTil * cfrTil, int64 cntxDelFlag, int64 promptFlag )
+CfrTil_RuntimeInit ( CfrTil * cfrTil, int64 cntxDelFlag )
 {
-    Context * cntx = cfrTil->Context0 ;
-    MemorySpace * ms = _Q_->MemorySpace0 ;
     CfrTil_LogOff ( ) ;
     CfrTil_DbgSourceCodeOff ( ) ;
-    OVT_FreeTempMem ( ) ;
-    _System_Init ( cntx->System0 ) ;
-    ReadLine_Init ( cntx->ReadLiner0, _CfrTil_Key ) ;
-    Lexer_Init ( cntx->Lexer0, 0, 0, CONTEXT ) ;
-    Finder_Init ( cntx->Finder0 ) ;
-    Compiler_Init (cntx->Compiler0, 0, 0) ;
-    Interpreter_Init ( cntx->Interpreter0 ) ;
-    //CfrTil_ClearTokenList ( ) ;
+    cfrTil->SC_QuoteMode = 0 ;
+    cfrTil->ScWord = 0 ;
+    cfrTil->InitSessionCoreTimes ++ ;
     if ( cntxDelFlag )
     {
         int64 i, stackDepth = Stack_Depth ( cfrTil->ContextDataStack ) ;
         for ( i = 0 ; i < stackDepth ; i ++ ) CfrTil_Context_PopDelete ( cfrTil ) ;
     }
-    LC_Init_Runtime ( ) ;
-    LC_LispNamespacesOff ( ) ;
-    CfrTil_CheckInitDataStack ( ) ;
-    OVT_StartupMessage ( ) ;
-    _OVT_Ok ( promptFlag ) ;
-    cfrTil->SC_QuoteMode = 0 ;
-    SC_Global_Off ;
+    SetState ( cfrTil, SOURCE_CODE_ON, true ) ;
     SetState_TrueFalse ( cfrTil, CFRTIL_RUN, DEBUG_MODE ) ;
     SetState ( cfrTil->Debugger0, DBG_ACTIVE, false ) ;
+    SC_Global_Off ;
     DebugOff ;
     SetBuffersUnused ( 1 ) ;
     d0 ( Buffer_PrintBuffers ( ) ) ;
     DefaultColors ;
-    cfrTil->ScWord = 0 ;
-    SetState ( cfrTil, SOURCE_CODE_ON, true ) ;
+    CfrTil_CheckInitDataStack ( ) ;
     _CfrTil_TypeStackReset ( ) ;
     _CfrTil_RecycleInit_Compiler_N_M_Node_WordList ( 1 ) ;
-    
-    //OVT_MemList_FreeNBAMemory ( ( byte* ) "ObjectSpace", 1 * M, 1 ) ; 
-    
-    // probably can put delete and re-new into one function - delete with re-init ...
-    OVT_MemList_DeleteNBAMemory ( ( byte* ) "ObjectSpace", 1 ) ; // 1 : re-init
-    //ms->ObjectSpace = MemorySpace_NBA_New ( ms, ( byte* ) "ObjectSpace", _Q_->ObjectsSize, OBJECT_MEM ) ;
+    CfrTil_UnsetQualifyingNamespace ( ) ;
+}
 
-    cfrTil->InitSessionCoreTimes ++ ;
+void
+OVT_RuntimeInit ( int64 promptFlag )
+{
+    OVT_FreeTempMem ( ) ;
+    OVT_MemList_DeleteNBAMemory ( ( byte* ) "ObjectSpace", 1 ) ; // 1 : re-init
+    OVT_StartupMessage ( ) ;
+    _OVT_Ok ( promptFlag ) ;
+}
+
+void
+_CfrTil_Init_SessionCore ( CfrTil * cfrTil, int64 cntxDelFlag, int64 promptFlag )
+{
+    Context * cntx = cfrTil->Context0 ;
+    _System_Init ( cntx->System0 ) ;
+    ReadLine_Init ( cntx->ReadLiner0, _CfrTil_Key ) ;
+    Lexer_Init ( cntx->Lexer0, 0, 0, CONTEXT ) ;
+    Finder_Init ( cntx->Finder0 ) ;
+    Compiler_Init ( cntx->Compiler0, 0, 0 ) ;
+    Interpreter_Init ( cntx->Interpreter0 ) ;
+    LC_Init_Runtime ( ) ;
+    if ( ! _LC_ ) LC_LispNamespacesOff ( ) ;
+    CfrTil_RuntimeInit ( cfrTil, cntxDelFlag ) ;
+    OVT_RuntimeInit ( promptFlag ) ;
 }
 
 void
@@ -66,8 +71,8 @@ CfrTil_ResetAll_Init ( CfrTil * cfrTil )
     {
         _Q_->StartIncludeTries = 0 ;
         _CfrTil_Init_SessionCore ( cfrTil, 1, 0 ) ;
-        _CfrTil_Namespace_NotUsing ( (byte*) "BigNum" ) ;
-        _CfrTil_Namespace_NotUsing ( (byte*) "Lisp" ) ;
+        _CfrTil_Namespace_NotUsing ( ( byte* ) "BigNum" ) ;
+        _CfrTil_Namespace_NotUsing ( ( byte* ) "Lisp" ) ;
         if ( _Q_->StartupFilename )
         {
             _Q_->Verbosity = 0 ;
@@ -111,10 +116,10 @@ _CfrTil_InitialAddWordToNamespace ( Word * word, byte * containingNamespaceName,
     Namespace *ns, *sns = _CfrTil_->Namespaces ;
     if ( superNamespaceName )
     {
-        sns = Namespace_FindOrNew_SetUsing (superNamespaceName, sns, 1 ) ;
+        sns = Namespace_FindOrNew_SetUsing ( superNamespaceName, sns, 1 ) ;
         sns->State |= USING ;
     }
-    ns = Namespace_FindOrNew_SetUsing (containingNamespaceName, sns, 1 ) ; // find new namespace or create anew
+    ns = Namespace_FindOrNew_SetUsing ( containingNamespaceName, sns, 1 ) ; // find new namespace or create anew
     Namespace_DoAddWord ( ns, word ) ; // add word to new namespace
 }
 
@@ -141,7 +146,7 @@ CfrTil_AddCPrimitives ( )
     for ( i = 0 ; CPrimitives [ i ].ccp_Name ; i ++ )
     {
         CPrimitive p = CPrimitives [ i ] ;
-        _CfrTil_CPrimitiveNewAdd ( p.ccp_Name, (byte*) p.pb_TypeSignature, p.OpInsnCodeGroup, p.OpInsnCode, p.blk_Definition, p.ui64_CAttribute, p.ui64_CAttribute2, p.ui64_LAttribute, ( char* ) p.NameSpace, ( char* ) p.SuperNamespace ) ;
+        _CfrTil_CPrimitiveNewAdd ( p.ccp_Name, ( byte* ) p.pb_TypeSignature, p.OpInsnCodeGroup, p.OpInsnCode, p.blk_Definition, p.ui64_CAttribute, p.ui64_CAttribute2, p.ui64_LAttribute, ( char* ) p.NameSpace, ( char* ) p.SuperNamespace ) ;
     }
     //_CfrTil_CPrimitiveNewAdd ( p.ccp_Name, p.blk_Definition, p.ui64_CAttribute, p.ui64_CAttribute2, p.ui64_LAttribute, ( char* ) p.NameSpace, ( char* ) p.SuperNamespace ) ;
 }
