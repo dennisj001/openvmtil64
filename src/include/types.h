@@ -786,31 +786,19 @@ typedef void (* DebuggerFunction ) (struct _Debugger *) ;
 typedef struct _Debugger
 {
     uint64 State ;
-    uint64 * SaveDsp, *SaveEdi, *SaveRsp ;
-    uint64 * WordDsp ;
-    int64 SaveTOS ;
-    int64 SaveStackDepth ;
-    int64 Key ;
-    int64 SaveKey, LastScwi ;
-    int64 TokenStart_ReadLineIndex, Esi, Edi ;
+    uint64 * SaveDsp, *SaveEdi, *SaveRsp, * WordDsp, * DebugRSP, *DebugRBP, *DebugRSI, *DebugRDI, * LastRsp, LevelBitNamespaceMap ;
+    int64 TerminalLineWidth, ReadIndex, SC_Index, SaveTOS, SaveStackDepth, Key, SaveKey, LastScwi, TokenStart_ReadLineIndex, Esi, Edi ;
     Word * w_Word, *EntryWord, *LastShowWord, *LastEffectsWord, *NextEvalWord ;
     Word *LocalsNamespace, *LastSetupWord, *SteppedWord, *CurrentlyRunningWord, *LastSourceCodeWord, *SubstitutedWord ;
-    byte * Token ;
-    block SaveCpuState ;
-    block RestoreCpuState ;
-    block getRsp ;
-    byte * PreHere, *StartHere, *LastDisStart, *ShowLine, * Filename ;
+    byte * Token, *DebugAddress, *CopyRSP, *CopyRBP, *LastSourceCodeAddress, * PreHere, *StartHere, *LastDisStart, *ShowLine, * Filename ;
+    block SaveCpuState, RestoreCpuState ;
     Stack *ReturnStack, *LocalsCompilingNamespacesStack ;
     Cpu * cs_Cpu ;
-    byte* DebugAddress, *CopyRSP, *CopyRBP, *LastSourceCodeAddress ;
-    uint64 * DebugRSP, *DebugRBP, *DebugRSI, *DebugRDI, * LastRsp ; //, *SavedIncomingESP, *SavedIncomingEBP ; //, SavedRunningESP, SavedRunningEBP;
-    int64 TerminalLineWidth, ReadIndex, SC_Index ;
     ByteArray * StepInstructionBA ;
     byte CharacterTable [ 128 ] ;
     DebuggerFunction CharacterFunctionTable [ 40 ] ;
     ud_t * Udis ;
     dllist * DebugWordList ;
-    uint64 LevelBitNamespaceMap ;
     sigjmp_buf JmpBuf0 ;
 } Debugger ;
 typedef struct
@@ -914,7 +902,7 @@ typedef struct _CfrTil
     uint64 * SaveDsp ;
     Cpu * cs_Cpu ;
     Cpu * cs_Cpu2 ;
-    block CurrentBlock, SaveCpuState, SaveCpu2State, RestoreCpuState, RestoreCpu2State, CallCfrTilWord, CallCurrentBlock, RestoreSelectedCpuState, SaveSelectedCpuState ; //, SyncDspToEsi, SyncEsiToDsp ;
+    block CurrentBlock, SaveCpuState, SaveCpu2State, RestoreCpuState, RestoreCpu2State ; //, CallCfrTilWord, CallCurrentBlock ; //, SyncDspToEsi, SyncEsiToDsp ;
     block Set_DspReg_FromDataStackPointer, Set_DataStackPointer_FromDspReg ; //, PeekReg, PokeReg ;
     block PopDspToR8AndCall, CallReg_TestRSP, Call_ToAddressThruR8_TestAlignRSP ; //adjustRSPAndCall, adjustRSP ;
     ByteArray * PeekPokeByteArray ;
