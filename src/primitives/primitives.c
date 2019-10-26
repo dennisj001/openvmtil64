@@ -572,36 +572,5 @@ CPrimitive CPrimitives [] = {
     { 0 }
 } ;
 
-MachineCodePrimitive MachineCodePrimitives [] = {
-    { "<rt-dbg>", CPRIMITIVE|DEBUG_WORD, RT_STEPPING_DEBUG, 0, ( byte* ) _CfrTil_DebugRuntimeBreakpoint, - 1, "Debug", "Root" },
-    { "<dso>", CPRIMITIVE|DEBUG_WORD, RT_STEPPING_DEBUG, 0, ( byte* ) _CfrTil_DebugRuntimeBreakpoint_IsDebugShowOn, - 1, "Debug", "Root" },
-    { "<d:dbg>", CPRIMITIVE|DEBUG_WORD, RT_STEPPING_DEBUG, 0, ( byte* ) _CfrTil_DebugRuntimeBreakpoint_IsDebugOn, - 1, "Debug", "Root" },
-    { "rspReg", CPRIMITIVE, 0, 0, ( byte* ) _Compile_RspReg_Get, - 1, "System", "Root" },
-    { "rspReg@", CPRIMITIVE, 0, 0, ( byte* ) _Compile_RspReg_Fetch, - 1, "System", "Root" },
-    { ">rspReg", CPRIMITIVE, 0, 0, ( byte* ) _Compile_RspReg_To, - 1, "System", "Root" },
-    { "rspReg>", CPRIMITIVE, 0, 0, ( byte* ) _Compile_RspReg_From, - 1, "System", "Root" },
-    { "rspRegdrop", CPRIMITIVE, 0, 0, ( byte* ) _Compile_RspReg_Drop, - 1, "Debug", "Root" },
-    //{ "rspReg!", CPRIMITIVE, 0, 0, ( byte* ) _Compile_RspReg_Store, - 1, "System", "Root" },
-    
-#if 0
-   { "getRsp", CPRIMITIVE, 0, 0, ( byte* ) Compile_Debug_GetRSP, - 1, "System", "Root" },
-    { "callCurrentBlock", CPRIMITIVE, 0, 0, ( byte* ) Compile_Call_CurrentBlock, - 1, "System", "Root" },
-    { "set_DataStackPointer_FromDspReg", CPRIMITIVE, 0, 0, ( byte* ) Compile_Set_DataStackPointer_FromDspReg, - 1, "System", "Root" },
-    { "set_DspReg_FromDataStackPointer", CPRIMITIVE, 0, 0, ( byte* ) Compile_Set_DspReg_FromDataStackPointer, - 1, "System", "Root" },
-    { "call_ToAddressThruR8_TestAlignRSP", CPRIMITIVE, 0, 0, ( byte* ) Compile_Call_ToAddressThruR8_TestAlignRSP, - 1, "System", "Root" },
-    
-    { "restoreCpuState", CPRIMITIVE, 0, 0, ( byte* ) Compile_CpuState_Restore, ( int64 ) _Debugger_->cs_Cpu, "Debug", "Root" },
-    { "saveCpuState", CPRIMITIVE, 0, 0, ( byte* ) Compile_CpuState_Save, ( int64 ) _Debugger_->cs_Cpu, "Debug", "Root" },
-
-    { "restoreCpuState", CPRIMITIVE, 0, 0, ( byte* ) Compile_CpuState_Restore, ( int64 ) _CfrTil_->cs_Cpu, "System", "Root" },
-    { "saveCpuState", CPRIMITIVE, 0, 0, ( byte* ) Compile_CpuState_Save, ( int64 ) _CfrTil_->cs_Cpu, "System", "Root" },
-    { "restoreCpu2State", CPRIMITIVE, 0, 0, ( byte* ) Compile_CpuState_Restore, ( int64 ) _CfrTil_->cs_Cpu2, "System", "Root" },
-    { "saveCpu2State", CPRIMITIVE, 0, 0, ( byte* ) Compile_CpuState_Save, ( int64 ) _CfrTil_->cs_Cpu2, "System", "Root" },
-
-    { "restoreSelectedCpuState", CPRIMITIVE, 0, 0, ( byte* ) _Compile_CpuState_RestoreSelected, ( int64 ) _CfrTil_->cs_Cpu, "System", "Root" },
-    { "saveSelectedCpuState", CPRIMITIVE, 0, 0, ( byte* ) _Compile_CpuState_SaveSelected, ( int64 ) _CfrTil_->cs_Cpu, "System", "Root" },
-#endif    
-    { 0 }
-} ;
  
 

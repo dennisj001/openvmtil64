@@ -30,15 +30,6 @@ Compile_CallCFunctionWithParameter_TestAlignRSP ( byte * cFunction, Word * word 
     Compile_Call_ToAddressThruReg_TestAlignRSP ( cFunction, CALL_THRU_REG ) ; // compile call cFunction with RDI value as arg
 }
 
-#if 0 // useful but not yet in use
-void
-Compile_CallCFunction_TestAlignRSP_MoveResultRegRaxToTOS ( byte * cFunction )
-{
-    Compile_Call_ToAddressThruReg_TestAlignRSP ( cFunction, CALL_THRU_REG ) ; 
-    _Compile_Stack_PushReg ( DSP, RAX ) ;
-}
-#endif
-
 void
 Compile_Call_CurrentBlock ( )
 {

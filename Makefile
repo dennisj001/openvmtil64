@@ -1,6 +1,6 @@
 
 SOURCES = src/basis/compiler/machineCode.c src/basis/compiler/_compile.c src/basis/compiler/memory.c\
-	src/basis/compiler/combinators.c src/basis/compiler/math.c src/basis/compiler/cpu.c \
+	src/basis/compiler/combinators.c src/basis/compiler/math.c src/basis/compiler/cpu.c src/basis/compiler/mcPrimitives.c\
 	src/basis/compiler/stack.c src/basis/compiler/logic.c src/basis/core/dataObjectRun.c\
 	src/basis/core/block.c src/basis/compiler/blocks.c src/basis/core/conditionals.c src/basis/compiler/compile.c src/basis/core/_system.c\
 	src/basis/compiler/optimize.c src/basis/compiler/bit.c src/basis/compiler/udis.c src/basis/compiler/arrays.c \
@@ -35,7 +35,7 @@ default : debug
 
 debug : bin/cfrtil64-gdb 
 run : cfrtil64
-all: cfrtil64 cfrtil64-gdb #cfrtil64s
+all: cfrtil64-gdb #cfrtil64s
 	
 #CFLAGS_CORE = -finline-functions -fno-use-cxa-atexit 
 CFLAGS = $(CFLAGS_CORE) -Wall 

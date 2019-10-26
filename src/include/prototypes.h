@@ -140,6 +140,9 @@ Cpu *Debugger_CpuState_SaveCopyCurrent(void);
 void _CpuState_Restore(Cpu *cpu);
 void CpuState_Save(void);
 void CpuState_Restore(void);
+/* src/basis/compiler/mcPrimitives.c */
+void _CfrTil_MachineCodePrimitive_NewAdd(const char *name, uint64 cType, int64 ctype2, block *callHook, byte *function, int64 functionArg, const char *nameSpace, const char *superNamespace);
+void CfrTil_MachineCodePrimitive_AddWords(CfrTil *cfrTil);
 /* src/basis/compiler/stack.c */
 void _Compile_Stack_Drop(Boolean stackReg);
 void _Compile_Stack_DropN(Boolean stackReg, int64 n);
@@ -489,15 +492,14 @@ void DLList_RemoveWords(dllist *list);
 void _CheckCodeSpaceForRoom(int64 memDesired);
 void CheckCodeSpaceForRoom(void);
 /* src/basis/init.c */
-void _CfrTil_RuntimeInit(CfrTil *cfrTil);
+void CfrTil_RuntimeInit(CfrTil *cfrTil, int64 cntxDelFlag);
+void OVT_RuntimeInit(int64 promptFlag);
 void _CfrTil_Init_SessionCore(CfrTil *cfrTil, int64 cntxDelFlag, int64 promptFlag);
 void CfrTil_SessionInit(void);
 void CfrTil_ResetAll_Init(CfrTil *cfrTil);
 void _CfrTil_InitialAddWordToNamespace(Word *word, byte *containingNamespaceName, byte *superNamespaceName);
 void _CfrTil_CPrimitiveNewAdd(const char *name, byte *pb_TypeSignature, uint64 opInsnGroup, uint64 opInsCode, block b, uint64 ctype, uint64 ctype2, uint64 ltype, const char *nameSpace, const char *superNamespace);
 void CfrTil_AddCPrimitives(void);
-void _CfrTil_MachineCodePrimitive_NewAdd(const char *name, uint64 cType, int64 ctype2, block *callHook, byte *function, int64 functionArg, const char *nameSpace, const char *superNamespace);
-void CfrTil_MachineCodePrimitive_AddWords(CfrTil *cfrTil);
 /* src/basis/system.c */
 void *_dlsym(byte *sym, byte *lib);
 void *_Dlsym(byte *sym, byte *lib);
