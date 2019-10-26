@@ -500,28 +500,17 @@ typedef struct
 typedef struct
 {
     Symbol GI_Symbol ;
-    byte * pb_LabelName ;
-    byte * CompileAtAddress ;
-    byte * LabeledAddress ;
-    byte * pb_JmpOffsetPointer ;
+    byte * pb_LabelName, * CompileAtAddress, * LabeledAddress, * pb_JmpOffsetPointer ;
 } GotoInfo ;
 #define GI_CAttribute GI_Symbol.S_CAttribute
 typedef struct
 {
     Symbol BI_Symbol ;
     uint64 State ;
-    byte *LocalFrameStart, *AfterLocalFrame ;
-    byte * AfterRspSave ;
-    byte *bp_First ;
-    byte *bp_Last ;
-    byte *JumpOffset ;
-    byte *JccLogicCode, *LogicTestCode ;
-    byte *CombinatorStartsAt, *CombinatorEndsAt ;
-    byte *OriginalActualCodeStart ;
-    byte * CopiedFrom, *CopiedToStart, *CopiedToEnd, *CopiedToLogicJccCode, *ActualCopiedToJccCode ;
     int64 CopiedSize ;
-    Boolean SetccTtt, JccTtt ;
-    Boolean SetccNegFlag, JccNegFlag ;
+    byte *LocalFrameStart, *AfterLocalFrame, * AfterRspSave, *bp_First, *bp_Last, *JumpOffset, *JccLogicCode, *LogicTestCode, *CombinatorStartsAt, *CombinatorEndsAt ;
+    byte *OriginalActualCodeStart, * CopiedFrom, *CopiedToStart, *CopiedToEnd, *CopiedToLogicJccCode, *ActualCopiedToJccCode ;
+    Boolean SetccTtt, JccTtt, SetccNegFlag, JccNegFlag ;
     Word * LogicCodeWord ;
     Namespace * BI_LocalsNamespace ;
 } BlockInfo ;
@@ -575,41 +564,24 @@ byte( *ReadLiner_KeyFunction ) (struct ReadLiner *) ;
 typedef struct ReadLiner
 {
     uint64 State ;
-    ReadLiner_KeyFunction Key ; //byte(*Key)( struct ReadLiner * );
-    FILE *InputFile ;
-    FILE *OutputFile ;
-    byte *Filename ;
-
     int64 InputKeyedCharacter ;
-    byte LastCheckedInputKeyedCharacter ;
-    int64 FileCharacterNumber ;
-    int64 LineNumber ;
-    int64 OutputLineCharacterNumber ; // set by _CfrTil_Key
-    int64 ReadIndex ;
-    int64 EndPosition ; // index where the next input character is put
+    int64 FileCharacterNumber, LineNumber, OutputLineCharacterNumber ; // set by _CfrTil_Key
+    int64 ReadIndex, EndPosition ; // index where the next input character is put
     int64 MaxEndPosition ; // index where the next input character is put
-    int64 CursorPosition ; //
-    int64 EscapeModeFlag ;
-    byte * DebugPrompt ;
-    byte * DebugAltPrompt ;
-    byte * NormalPrompt ;
-    byte * AltPrompt ;
-    byte * Prompt ;
+    int64 CursorPosition, EscapeModeFlag, InputStringIndex, InputStringLength, LineStartFileIndex ;
+    byte *Filename, LastCheckedInputKeyedCharacter, * DebugPrompt, * DebugAltPrompt, * NormalPrompt, * AltPrompt, * Prompt ;
+    byte InputLine [ BUFFER_SIZE ], * InputLineString, * InputStringOriginal, * InputStringCurrent;
+    ReadLiner_KeyFunction Key ; 
+    FILE *InputFile, *OutputFile ;
     HistoryStringNode * HistoryNode ;
     TabCompletionInfo * TabCompletionInfo0 ;
-    byte InputLine [ BUFFER_SIZE ] ;
-    byte * InputLineString ;
-    byte * InputStringOriginal ;
-    byte * InputStringCurrent ;
-    int64 InputStringIndex, InputStringLength ;
-    int64 LineStartFileIndex ;
     Stack * TciNamespaceStack ;
 } ReadLiner ;
 typedef void ( * ReadLineFunction ) ( ReadLiner * ) ;
 typedef struct
 {
     uint64 State ;
-    Word *FoundWord ;
+    Word *FoundWord ;   
     Namespace * QualifyingNamespace ;
 } Finder ;
 
@@ -617,27 +589,19 @@ struct Interpreter ;
 typedef struct Lexer
 {
     uint64 State ;
-    byte *OriginalToken ;
+    uint64 TokenType ;
+    int64 TokenStart_ReadLineIndex, TokenEnd_ReadLineIndex, TokenStart_FileIndex, TokenEnd_FileIndex, Token_Length, SC_Index ; //Tsrli = TokenStart_ReadLineIndex
+    int64 CurrentReadIndex, TokenWriteIndex, LineNumber ;
+    byte *OriginalToken, TokenInputByte, LastLexedChar, CurrentTokenDelimiter, * TokenDelimiters, * DelimiterCharSet, * TokenDelimitersAndDot, * DelimiterOrDotCharSet, *Filename ;
+    byte( *NextChar ) ( ReadLiner * rl ), * TokenBuffer ;
     union
     {
         int64 Literal ;
         byte * LiteralString ;
     } ;
-    uint64 TokenType ;
     Word * TokenWord ;
-    byte TokenInputByte, LastLexedChar ;
-    byte CurrentTokenDelimiter ;
-    int64 TokenStart_ReadLineIndex, TokenEnd_ReadLineIndex ;
-    int64 TokenStart_FileIndex, TokenEnd_FileIndex, Token_Length, SC_Index ; //Tsrli = TokenStart_ReadLineIndex
-    byte * TokenDelimiters ;
-    byte * DelimiterCharSet ;
-    byte * TokenDelimitersAndDot ;
-    byte * DelimiterOrDotCharSet, *Filename ;
-    int64 CurrentReadIndex, TokenWriteIndex, LineNumber ;
     Symbol * NextPeekListItem ;
     ReadLiner * ReadLiner0 ;
-    byte( *NextChar ) ( ReadLiner * rl ) ;
-    byte * TokenBuffer ;
     dllist * TokenList ;
 } Lexer ;
 
@@ -889,36 +853,28 @@ typedef struct _StringTokenInfo
 #define STI_INITIALIZED     ( 1 << 0 )
 typedef struct _CfrTil
 {
-    uint64 State, SavedState ;
+    uint64 State, SavedState, * SaveDsp ;
+    int64 InitSessionCoreTimes, LogFlag, WordsAdded, FindWordCount, FindWordMaxCount, WordCreateCount, DObjectCreateCount, SC_Index, SC_QuoteMode ; // SC_Index == SC_Buffer Index ;
     Stack *ReturnStack, * DataStack ;
-    Namespace * Namespaces ;
+    Namespace * Namespaces, * InNamespace, *BigNumNamespace, *IntegerNamespace, *StringNamespace, *RawStringNamespace ;
     Context * Context0 ;
     Stack * ContextDataStack, * TypeWordStack ;
     Debugger * Debugger0 ;
-    Namespace * InNamespace, *BigNumNamespace, *IntegerNamespace, *StringNamespace, *RawStringNamespace ;
     LambdaCalculus * LC ;
     FILE * LogFILE ;
-    int64 InitSessionCoreTimes, LogFlag, WordsAdded, FindWordCount, FindWordMaxCount, WordCreateCount, DObjectCreateCount ;
-    uint64 * SaveDsp ;
-    Cpu * cs_Cpu ;
-    Cpu * cs_Cpu2 ;
-    block CurrentBlock, SaveCpuState, SaveCpu2State, RestoreCpuState, RestoreCpu2State ; //, CallCfrTilWord, CallCurrentBlock ; //, SyncDspToEsi, SyncEsiToDsp ;
-    block Set_DspReg_FromDataStackPointer, Set_DataStackPointer_FromDspReg ; //, PeekReg, PokeReg ;
+    Cpu * cs_Cpu, * cs_Cpu2 ;
+    block CurrentBlock, SaveCpuState, SaveCpu2State, RestoreCpuState, RestoreCpu2State, Set_DspReg_FromDataStackPointer, Set_DataStackPointer_FromDspReg ; //, PeekReg, PokeReg ;
     block PopDspToR8AndCall, CallReg_TestRSP, Call_ToAddressThruR8_TestAlignRSP ; //adjustRSPAndCall, adjustRSP ;
     ByteArray * PeekPokeByteArray ;
     Word * LastFinished_DObject, * LastFinished_Word, *StoreWord, *PokeWord, *RightBracket, *ScoOcCrw, * CurrentWordBeingCompiled ;
     Word *ScWord, *DebugWordListWord, *EndBlockWord, *BeginBlockWord, *InfixNamespace ;
-    byte ReadLine_CharacterTable [ 256 ] ;
+    byte ReadLine_CharacterTable [ 256 ], * OriginalInputLine, * TokenBuffer, * SC_Buffer ; // nb : keep this here -- if we add this field to Lexer it just makes the lexer bigger and we want the smallest lexer possible
     ReadLineFunction ReadLine_FunctionTable [ 24 ] ;
     CharacterType LexerCharacterTypeTable [ 256 ] ;
     LexerFunction LexerCharacterFunctionTable [ 24 ] ;
     Buffer *StringB, * TokenB, *OriginalInputLineB, *InputLineB, *SourceCodeBuffer, *StringInsertB, *StringInsertB2, *StringInsertB3, *StringInsertB4, *StringInsertB5, *StrCatBuffer ;
     Buffer *TabCompletionBuf, * LC_PrintB, * LC_DefineB, *DebugB, *DebugB1, *DebugB2, *DebugB3, *ScratchB1, *ScratchB2, *ScratchB3, *StringMacroB ; // token buffer, tab completion backup, source code scratch pad, 
     StrTokInfo Sti ;
-    byte * OriginalInputLine ;
-    byte * TokenBuffer ;
-    byte * SC_Buffer ; // nb : keep this here -- if we add this field to Lexer it just makes the lexer bigger and we want the smallest lexer possible
-    int64 SC_Index, SC_QuoteMode ; // SC_Index == SC_Buffer Index ;
     dllist * Compiler_N_M_Node_WordList ; //, *TokenList,  ;
     sigjmp_buf JmpBuf0 ;
 } CfrTil ;

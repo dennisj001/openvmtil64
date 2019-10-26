@@ -53,11 +53,12 @@ src/include/prototypes.h : $(INCLUDES)
 	cp src/include/_proto.h src/include/prototypes.h
 	bin/cproto -o proto.h $(SOURCES)
 	mv proto.h src/include/prototypes.h
+	make oclean
 
 cfrtil64 : CFLAGS = $(CFLAGS_CORE)
-cfrtil64 : src/include/prototypes.h $(OBJECTS) _cfrtil64_O3
-	$(CC) $(CFLAGS) $(OBJECTS) -O3 -o cfrtil64o3 $(LIBS)
-	strip -o cfrtil64 cfrtil64o3
+cfrtil64 : $(INCLUDES) $(OBJECTS) #_cfrtil64_O3
+	$(CC) $(CFLAGS) $(OBJECTS) -o cfrtil64 $(LIBS)
+	#strip -o cfrtil64 cfrtil64
 	mv cfrtil64 bin/
 	
 cfrtil64s : CFLAGS = $(CFLAGS_CORE) -O3
