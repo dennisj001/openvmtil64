@@ -30,7 +30,7 @@ sp
 6 3 h4 dup p 6 _assert1
 10 5 h4 dup p 6 _assert1
 sp
-infixOff // must be off to correctly interpret '(' below //but not with '(|'
+//infixOff // must be off to correctly interpret '(' below //but not with '(|'
 3 ( x ) { stack x @ dup p 3 _assert0 } ix 
 "\nabove line should read 3" ps //pause
 nl

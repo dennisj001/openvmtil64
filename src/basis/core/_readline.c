@@ -21,17 +21,30 @@ _ReadLine_NextChar ( ReadLiner * rl )
     else return 0 ;
 }
 
-byte
+inline byte
 _ReadLine_PeekIndexedChar ( ReadLiner * rl, int64 offset )
 {
-    if ( rl->ReadIndex < BUFFER_SIZE ) return rl->InputLine [ rl->ReadIndex + offset ] ;
+    return rl->InputLine [ offset ] ;
+}
+
+byte
+ReadLine_PeekIndexedChar ( ReadLiner * rl, int64 index )
+{
+    if ( index < BUFFER_SIZE ) return _ReadLine_PeekIndexedChar ( rl, index ) ; //rl->InputLine [ offset ] ;
+    else return 0 ;
+}
+
+byte
+_ReadLine_PeekOffsetChar ( ReadLiner * rl, int64 offset )
+{
+    if ( ( rl->ReadIndex + offset ) < BUFFER_SIZE ) return _ReadLine_PeekIndexedChar ( rl, rl->ReadIndex + offset ) ;
     else return 0 ;
 }
 
 byte
 ReadLine_PeekNextChar ( ReadLiner * rl )
 {
-    return _ReadLine_PeekIndexedChar ( rl, 0 ) ; //_ReadLine_NextChar ( rl );
+    return _ReadLine_PeekOffsetChar ( rl, 0 ) ; //_ReadLine_NextChar ( rl );
 }
 
 byte

@@ -78,7 +78,7 @@ int64
 ReadLiner_PeekSkipSpaces ( ReadLiner * rl )
 {
     int64 i ;
-    for ( i = 0 ; _ReadLine_PeekIndexedChar ( rl, i ) == ' ' ; i ++ ) ;
+    for ( i = 0 ; _ReadLine_PeekOffsetChar ( rl, i ) == ' ' ; i ++ ) ;
     return i ;
 }
 
@@ -636,7 +636,40 @@ ReadLine_NextNonPunctCharAfterEndOfString ( ReadLiner * rl )
 Boolean
 ReadLine_AreWeAtNewlineAfterSpaces ( ReadLiner * rl )
 {
-    int64 i = ReadLiner_PeekSkipSpaces ( _ReadLiner_ ) ;
-    if ( _ReadLine_PeekIndexedChar ( _ReadLiner_, i ) == '\n' ) return true ;
+    int64 i = ReadLiner_PeekSkipSpaces ( rl ) ;
+    if ( _ReadLine_PeekOffsetChar ( rl, i ) == '\n' ) return true ;
     return false ;
 }
+
+#if 1
+
+Boolean
+ReadLine_CheckForLocalVariables ( ReadLiner * rl )
+{
+    byte c, c2 ;
+    Word * word = _Context_->CurrentlyRunningWord ;
+    boolean result ;
+    int64 i, si ;
+    if ( ! word ) 
+        word = _Interpreter_->w_Word ; 
+    si = word->W_RL_Index + strlen ( (char*) word->Name ) ; //rl->ReadIndex ;
+    i = 0 ; 
+    ReadLine_Set_ReadIndex ( rl, si ) ;
+    do
+    {
+        c = _ReadLine_PeekOffsetChar ( rl, i ) ;
+        if ( c == ')' ) 
+        {
+            ReadLine_Set_ReadIndex ( rl, si + i + 1 ) ;
+            c2 = ReadLine_PeekNextNonWhitespaceChar ( rl ) ;
+            if ( ( ! GetState ( _Interpreter_, PREPROCESSOR_DEFINE ) ) && ( c2 == '{' ) ) result = true ;
+            else result = false ;
+            break ;
+        }
+    }
+    while ( i ++, c != '\n' ) ;
+    ReadLine_Set_ReadIndex ( rl, si ) ;
+    return result ;
+}
+#endif
+

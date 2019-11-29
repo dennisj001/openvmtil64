@@ -41,13 +41,20 @@ CfrTil_MachineCodePrimitive_AddWords ( CfrTil * cfrTil )
     _CfrTil_MachineCodePrimitive_NewAdd ( "saveCpuState", CPRIMITIVE, 0, & cfrTil->SaveCpuState, ( byte* ) Compile_CpuState_Save, ( int64 ) cfrTil->cs_Cpu, "System", "Root" ) ;
     _CfrTil_MachineCodePrimitive_NewAdd ( "restoreCpu2State", CPRIMITIVE, 0, & cfrTil->RestoreCpu2State, ( byte* ) Compile_CpuState_Restore, ( int64 ) cfrTil->cs_Cpu2, "System", "Root" ) ;
     _CfrTil_MachineCodePrimitive_NewAdd ( "saveCpu2State", CPRIMITIVE, 0, & cfrTil->SaveCpu2State, ( byte* ) Compile_CpuState_Save, ( int64 ) cfrTil->cs_Cpu2, "System", "Root" ) ;
+}
+
+
+#if 0  
+void
+CfrTil_MachineCodePrimitive_AddWords ( CfrTil * cfrTil )
+{
+    Debugger * debugger = _Debugger_ ;
     //_CfrTil_MachineCodePrimitive_NewAdd ( "restoreSelectedCpuState", CPRIMITIVE, 0, & cfrTil->RestoreSelectedCpuState, ( byte* ) _Compile_CpuState_RestoreSelected, ( int64 ) cfrTil->cs_Cpu, "System", "Root" ) ;
     //_CfrTil_MachineCodePrimitive_NewAdd ( "saveSelectedCpuState", CPRIMITIVE, 0, & cfrTil->SaveSelectedCpuState, ( byte* ) _Compile_CpuState_SaveSelected, ( int64 ) cfrTil->cs_Cpu, "System", "Root" ) ;
     //_CfrTil_MachineCodePrimitive_NewAdd ( "getRsp", CPRIMITIVE, 0, & debugger->getRsp, ( byte* ) Compile_Debug_GetRSP, - 1, "System", "Root" ) ;
     //_CfrTil_MachineCodePrimitive_NewAdd ( "callCurrentBlock", CPRIMITIVE, 0, & cfrTil->CallCurrentBlock, ( byte* ) Compile_Call_CurrentBlock, - 1, "System", "Root" ) ;
     //_CfrTil_MachineCodePrimitive_NewAdd ( "set_DataStackPointer_FromDspReg", CPRIMITIVE, 0, & cfrTil->Set_DataStackPointer_FromDspReg, ( byte* ) Compile_Set_DataStackPointer_FromDspReg, - 1, "System", "Root" ) ;
     //_CfrTil_MachineCodePrimitive_NewAdd ( "set_DspReg_FromDataStackPointer", CPRIMITIVE, 0, & cfrTil->Set_DspReg_FromDataStackPointer, ( byte* ) Compile_Set_DspReg_FromDataStackPointer, - 1, "System", "Root" ) ;
-#if 0  
     { "<rt-dbg>", CPRIMITIVE|DEBUG_WORD, RT_STEPPING_DEBUG, 0, ( byte* ) _CfrTil_DebugRuntimeBreakpoint, - 1, "Debug", "Root" },
     { "<dso>", CPRIMITIVE|DEBUG_WORD, RT_STEPPING_DEBUG, 0, ( byte* ) _CfrTil_DebugRuntimeBreakpoint_IsDebugShowOn, - 1, "Debug", "Root" },
     { "<d:dbg>", CPRIMITIVE|DEBUG_WORD, RT_STEPPING_DEBUG, 0, ( byte* ) _CfrTil_DebugRuntimeBreakpoint_IsDebugOn, - 1, "Debug", "Root" },
@@ -64,8 +71,7 @@ CfrTil_MachineCodePrimitive_AddWords ( CfrTil * cfrTil )
         callHook = 0 ;
         _CfrTil_MachineCodePrimitive_NewAdd ( p.ccp_Name, p.ui64_CAttribute, p.ui64_CAttribute2, callHook, p.Function, functionArg, p.NameSpace, p.SuperNamespace ) ;
     }
-#endif    
 }
-
+#endif    
 
 

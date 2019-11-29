@@ -305,7 +305,7 @@ void
 CfrTil_Prefix ( void )
 {
     Word * word = _CfrTil_->LastFinished_Word ;
-    if ( word ) word->CAttribute |= PREFIX ;
+    if ( word ) { word->CAttribute |= PREFIX ; word->WAttribute = WT_PREFIX ; }
 }
 
 void

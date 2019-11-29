@@ -592,7 +592,8 @@ typedef struct Lexer
     uint64 TokenType ;
     int64 TokenStart_ReadLineIndex, TokenEnd_ReadLineIndex, TokenStart_FileIndex, TokenEnd_FileIndex, Token_Length, SC_Index ; //Tsrli = TokenStart_ReadLineIndex
     int64 CurrentReadIndex, TokenWriteIndex, LineNumber ;
-    byte *OriginalToken, TokenInputByte, LastLexedChar, CurrentTokenDelimiter, * TokenDelimiters, * DelimiterCharSet, * TokenDelimitersAndDot, * DelimiterOrDotCharSet, *Filename ;
+    byte *OriginalToken, TokenInputByte, LastLexedChar, CurrentTokenDelimiter ;
+    byte * TokenDelimiters, * DelimiterCharSet, * TokenDelimitersAndDot, * DelimiterOrDotCharSet, *Filename, *LastToken ;
     byte( *NextChar ) ( ReadLiner * rl ), * TokenBuffer ;
     union
     {
@@ -948,40 +949,30 @@ typedef struct
     ByteArray * CodeByteArray ; // a variable
 
     PrintStateInfo *psi_PrintStateInfo ;
-    int64 SignalExceptionsHandled ;
+    int64 SignalExceptionsHandled, RestartCondition, Signal, ExceptionCode, Console ;
 
-    byte *InitString ;
-    byte *StartupString ;
-    byte *StartupFilename ;
-    byte *ErrorFilename ;
-    byte *VersionString ;
-    byte *ExceptionMessage ;
-    byte *ExceptionSpecialMessage ;
-    byte * ExceptionToken ;
+    byte *InitString, *StartupString, *StartupFilename, *ErrorFilename, *VersionString, *ExceptionMessage, *ExceptionSpecialMessage, * ExceptionToken ;
     Word * ExceptionWord ;
-    int64 RestartCondition, Signal, ExceptionCode ;
 
     int64 Argc ;
     char ** Argv ;
     void * SigAddress ;
     byte * SigLocation ;
     Colors *Current, Default, Alert, Debug, Notice, User ;
-    int64 Console ;
 
     dllist PermanentMemList ;
-    dlnode PML_HeadNode ;
-    dlnode PML_TailNode ;
+    dlnode PML_HeadNode, PML_TailNode ;
     MemorySpace * MemorySpace0 ;
     int64 PermanentMemListRemainingAccounted, TotalNbaAccountedMemRemaining, TotalNbaAccountedMemAllocated, TotalMemSizeTarget ;
     int64 Mmap_RemainingMemoryAllocated, OVT_InitialUnAccountedMemory, RunTimeAllocation, TotalMemFreed, TotalMemAllocated, NumberOfByteArrays ;
 
     // variables accessible from cfrTil
     int64 Verbosity, StartIncludeTries, StartedTimes, Restarts, SigSegvs, AllocationRequestLacks ;
-
     int64 DictionarySize, LispTempSize, MachineCodeSize, ObjectsSize, InternalObjectsSize, LispSize, ContextSize ;
     int64 TempObjectsSize, CompilerTempObjectsSize, SessionObjectsSize, DataStackSize, HistorySize, OpenVmTilSize ;
     int64 CfrTilSize, BufferSpaceSize, StringSpaceSize, Thrown ;
     sigjmp_buf JmpBuf0 ;
+    //block GetChar//FunctionTable [8] ;
 } OpenVmTil ;
 
 // note : this puts these namespaces on the search list such that last, in the above list, will be searched first

@@ -8,9 +8,8 @@ Interpret_DoParenthesizedRValue ( )
     Compiler * compiler = cntx->Compiler0 ;
     int64 svcm = GetState ( compiler, COMPILE_MODE ) ;
     byte * token ;
-    while ( 1 )
+    while ( token = _Lexer_ReadToken ( cntx->Lexer0, 0 ) )
     {
-        token = _Lexer_ReadToken ( cntx->Lexer0, 0 ) ;
         Interpreter_InterpretAToken ( cntx->Interpreter0, token, - 1, - 1 ) ;
         if ( String_Equal ( ( char* ) token, ")" ) ) break ;
     }
@@ -143,6 +142,8 @@ CfrTil_Interpret_C_Blocks ( int64 blocks, Boolean takesAnElseFlag, Boolean semic
     return blocksParsed ;
 }
 
+#if 0
+
 void
 CfrTil_C_LeftParen ( )
 {
@@ -159,6 +160,89 @@ CfrTil_C_LeftParen ( )
     }
     else Interpret_DoParenthesizedRValue ( ) ;
 }
+
+#elif 1
+
+void
+CfrTil_C_LeftParen ( )
+{
+    Compiler * compiler = _Context_->Compiler0 ;
+    ReadLiner * rl = _Context_->ReadLiner0 ;
+    if ( ( GetState ( _Context_->Interpreter0, PREPROCESSOR_MODE ) ) )
+    {
+        // this is for "#define" (which is parsed as '#' 'define', two words)
+        if ( isalnum ( ReadLine_LastReadChar ( rl ) ) ) CfrTil_LocalsAndStackVariablesBegin ( ) ;
+        else Interpret_DoParenthesizedRValue ( ) ;
+    }
+    if ( ReadLine_CheckForLocalVariables ( rl ) )
+    {
+        CfrTil_LocalsAndStackVariablesBegin ( ) ;
+        return ;
+    }
+    else if ( CompileMode && (( ! GetState ( compiler, VARIABLE_FRAME ) ) || ( ReadLine_PeekNextNonWhitespaceChar ( rl ) == '|' ) ))
+    {
+        CfrTil_LocalsAndStackVariablesBegin ( ) ;
+        return ;
+    }
+    Interpret_DoParenthesizedRValue ( ) ;
+}
+
+#elif 1
+
+void
+CfrTil_C_LeftParen ( )
+{
+    Compiler * compiler = _Context_->Compiler0 ;
+    ReadLiner * rl = _Context_->ReadLiner0 ;
+    if ( ( GetState ( _Context_->Interpreter0, PREPROCESSOR_MODE ) ) )
+    {
+        // this is for "#define" (which is parsed as '#' 'define', two words)
+        if ( isalnum ( ReadLine_LastReadChar ( rl ) ) ) CfrTil_LocalsAndStackVariablesBegin ( ) ;
+        else Interpret_DoParenthesizedRValue ( ) ;
+    }
+    //if ( ! ( GetState ( _Context_, INFIX_MODE ) && ( _Interpreter_->LastWord->CAttribute & ( NAMESPACE_VARIABLE | LOCAL_VARIABLE | PARAMETER_VARIABLE ) ) ) )
+    if ( ( ( ! GetState ( compiler, VARIABLE_FRAME ) ) ) || ( ReadLine_PeekNextNonWhitespaceChar ( rl ) == '|' ) )
+    {
+        CfrTil_LocalsAndStackVariablesBegin ( ) ;
+        return ;
+    }
+    if ( CompileMode ) //|| (_Interpreter_->LastWord->CAttribute2 & ( RAW_STRING ) ) )
+    {
+        if ( ReadLine_CheckForLocalVariables ( rl ) )
+        {
+            CfrTil_LocalsAndStackVariablesBegin ( ) ;
+            return ;
+        }
+    }
+    Interpret_DoParenthesizedRValue ( ) ;
+}
+#else
+
+void
+CfrTil_C_LeftParen ( )
+{
+    Compiler * compiler = _Context_->Compiler0 ;
+    ReadLiner * rl = _Context_->ReadLiner0 ;
+    if ( ( GetState ( _Context_->Interpreter0, PREPROCESSOR_MODE ) ) )
+    {
+        // this is for "#define" (which is parsed as '#' 'define', two words)
+        if ( isalnum ( ReadLine_LastReadChar ( _ReadLiner_ ) ) ) CfrTil_LocalsAndStackVariablesBegin ( ) ;
+        else Interpret_DoParenthesizedRValue ( ) ;
+    }
+#if 0    
+    else if ( ( ! GetState ( compiler, VARIABLE_FRAME ) )
+        || ReadLine_CheckForLocalVariables ( rl )
+        || ( ReadLine_PeekNextNonWhitespaceChar ( rl ) == '|' )
+        )
+#else        
+    else if ( ReadLine_CheckForLocalVariables ( rl ) || ( ReadLine_PeekNextNonWhitespaceChar ( rl ) == '|' ) )
+#endif        
+    {
+        CfrTil_LocalsAndStackVariablesBegin ( ) ;
+    }
+    else Interpret_DoParenthesizedRValue ( ) ;
+}
+#endif
 
 void
 _CfrTil_C_Infix_EqualOp ( block op )
@@ -231,6 +315,7 @@ CfrTil_SetInNamespaceFromBackground ( )
 }
 
 #if 1
+
 void
 CfrTil_C_ConditionalExpression ( )
 {
@@ -270,6 +355,7 @@ CfrTil_C_ConditionalExpression ( )
     SetState ( compiler, C_CONDITIONAL_IN, false ) ;
 }
 #else
+
 void
 CfrTil_C_ConditionalExpression ( )
 {

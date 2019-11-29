@@ -16,10 +16,10 @@ CfrTil_RuntimeInit ( CfrTil * cfrTil, int64 cntxDelFlag )
         int64 i, stackDepth = Stack_Depth ( cfrTil->ContextDataStack ) ;
         for ( i = 0 ; i < stackDepth ; i ++ ) CfrTil_Context_PopDelete ( cfrTil ) ;
     }
-    SetState ( cfrTil, SOURCE_CODE_ON, true ) ;
+    //SetState ( cfrTil, SOURCE_CODE_ON, true ) ;
+    //SC_Global_Off ;
     SetState_TrueFalse ( cfrTil, CFRTIL_RUN, DEBUG_MODE ) ;
     SetState ( cfrTil->Debugger0, DBG_ACTIVE, false ) ;
-    SC_Global_Off ;
     DebugOff ;
     SetBuffersUnused ( 1 ) ;
     d0 ( Buffer_PrintBuffers ( ) ) ;
@@ -31,12 +31,11 @@ CfrTil_RuntimeInit ( CfrTil * cfrTil, int64 cntxDelFlag )
 }
 
 void
-OVT_RuntimeInit ( int64 promptFlag )
+OVT_RuntimeInit ()
 {
     OVT_FreeTempMem ( ) ;
     OVT_MemList_DeleteNBAMemory ( ( byte* ) "ObjectSpace", 1 ) ; // 1 : re-init
     OVT_StartupMessage ( ) ;
-    _OVT_Ok ( promptFlag ) ;
 }
 
 void
@@ -52,7 +51,8 @@ _CfrTil_Init_SessionCore ( CfrTil * cfrTil, int64 cntxDelFlag, int64 promptFlag 
     LC_Init_Runtime ( ) ;
     if ( ! _LC_ ) LC_LispNamespacesOff ( ) ;
     CfrTil_RuntimeInit ( cfrTil, cntxDelFlag ) ;
-    OVT_RuntimeInit ( promptFlag ) ;
+    OVT_RuntimeInit ( ) ;
+    _OVT_Ok ( promptFlag ) ;
 }
 
 void

@@ -21,7 +21,7 @@ Word_Run ( Word * word )
         SetState ( word, STEPPED, false ) ;
         _DEBUG_SHOW ( word, 0 ) ;
         if ( IS_MORPHISM_TYPE ( word ) ) SetState ( _Context_, ADDRESS_OF_MODE, false ) ;
-        _Context_->CurrentlyRunningWord = 0 ;
+        //_Context_->CurrentlyRunningWord = 0 ;
         _Context_->LastRunWord = word ;
     }
 }

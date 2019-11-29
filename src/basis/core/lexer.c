@@ -36,6 +36,7 @@ Lexer_ObjectToken_New ( Lexer * lexer, byte * token, int64 tsrli, int64 scwi ) /
                     if ( ! String_Equal ( token2, "=" ) ) return lexer->TokenWord = 0 ; // don't interpret this word
                 }
                 else word = DataObject_New ( NAMESPACE_VARIABLE, 0, token, NAMESPACE_VARIABLE, 0, 0, 0, 0, 0, tsrli, scwi ) ;
+                word->CAttribute2 |= ( RAW_STRING ) ;
             }
             else
             {
@@ -93,6 +94,7 @@ _Lexer_LexNextToken_WithDelimiters ( Lexer * lexer, byte * delimiters, Boolean c
         if ( peekFlag && reAddPeeked ) CfrTil_PushToken_OnTokenList ( lexer->OriginalToken ) ;
         lexer->LastLexedChar = inChar ;
     }
+    lexer->LastToken = lexer->OriginalToken ;
     return lexer->OriginalToken ;
 }
 
@@ -512,7 +514,7 @@ NonTerminatingMacro ( Lexer * lexer )
     if ( lexer->TokenWriteIndex == 1 )
     {
         byte chr = ReadLine_PeekNextChar ( rl ) ;
-        if ( ( chr == 'd' ) && ( _ReadLine_PeekIndexedChar ( rl, 1 ) == 'e' ) ) Lexer_FinishTokenHere ( lexer ) ;
+        if ( ( chr == 'd' ) && ( _ReadLine_PeekOffsetChar ( rl, 1 ) == 'e' ) ) Lexer_FinishTokenHere ( lexer ) ;
         else if ( chr == '$' )
         {
             do
@@ -585,7 +587,7 @@ _BackSlash ( Lexer * lexer, int64 flag )
     else if ( nextChar == ' ' && GetState ( _Context_->Interpreter0, PREPROCESSOR_DEFINE ) )
     {
         i = ReadLiner_PeekSkipSpaces ( rl ) ;
-        if ( _ReadLine_PeekIndexedChar ( rl, i ) == '\n' ) ; // do nothing - don't append the newline 
+        if ( _ReadLine_PeekOffsetChar ( rl, i ) == '\n' ) ; // do nothing - don't append the newline 
     }
     else if ( nextChar == '\n' && GetState ( _Context_->Interpreter0, PREPROCESSOR_DEFINE ) ) _ReadLine_GetNextChar ( lexer->ReadLiner0 ) ; // ignore the newline
     else if ( flag )

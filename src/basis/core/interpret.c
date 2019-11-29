@@ -94,14 +94,15 @@ Interpreter_DoWord ( Interpreter * interp, Word * word, int64 tsrli, int64 scwi 
 {
     if ( word )
     {
-        if ( ( word->W_RL_Index != _Lexer_->TokenStart_ReadLineIndex ) || ( word->W_SC_Index != _Lexer_->SC_Index ) ) 
-            Word_SetTsrliScwi ( word, tsrli, scwi ) ; // some of this maybe too much
+        //if ( ( word->W_RL_Index != _Lexer_->TokenStart_ReadLineIndex ) || ( word->W_SC_Index != _Lexer_->SC_Index ) ) 
+        Word_SetTsrliScwi ( word, tsrli, scwi ) ; // some of this maybe too much
         DEBUG_SETUP ( word ) ;
         Context * cntx = _Context_ ;
         interp->w_Word = word ;
         if ( ( word->WAttribute == WT_INFIXABLE ) && ( GetState ( cntx, INFIX_MODE ) ) ) // nb. Interpreter must be in INFIX_MODE because it is effective for more than one word
             Interpreter_DoInfixWord ( interp, word ) ;
-        else if ( ( word->CAttribute & PREFIX ) || Lexer_IsWordPrefixing (0, word ) ) _Interpreter_DoPrefixWord ( cntx, interp, word ) ; //, tsrli, scwi ) ;
+        //else if ( ( word->CAttribute & PREFIX ) || Lexer_IsWordPrefixing (0, word ) ) _Interpreter_DoPrefixWord ( cntx, interp, word ) ; //, tsrli, scwi ) ;
+        else if ( ( word->WAttribute == WT_PREFIX ) || Lexer_IsWordPrefixing (0, word ) ) _Interpreter_DoPrefixWord ( cntx, interp, word ) ; //, tsrli, scwi ) ;
         else if ( word->WAttribute == WT_C_PREFIX_RTL_ARGS ) Interpreter_C_PREFIX_RTL_ARGS_Word ( word ) ;
         else Interpreter_DoWord_Default ( interp, word, tsrli, scwi ) ; //  case WT_POSTFIX: case WT_INFIXABLE: // cf. also _Interpreter_SetupFor_MorphismWord
         if ( ! ( word->CAttribute & DEBUG_WORD ) ) interp->LastWord = word ;

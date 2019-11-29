@@ -2,6 +2,7 @@
 Int
 bnOff
 5
+: sp ;
 "\nstarting lisp.cft\n" ddps
 Lisp
 //lcReset
@@ -88,13 +89,13 @@ sp
 //pause
 
 #if 1
-"\n\nstarting BigNum\n" ddps
+"\nstarting BigNum\n" ddps
 sp
 BigNum
 bnOn
 bnInit ( 16 16 )
 Lisp
-//lcClearDefines
+lcReset
 (define g ( /\ (a b c) (a b c) ) )
 (define h ( /\ (a b c) (a c b) ) ) 
 ( h - 4 5 ) ( h - 5 4 ) ( h - 6 4 ) ( h / 9 3 ) ( h / 3 9 ) 
@@ -289,6 +290,7 @@ sp
 Int
 2 + 7 assertStkChk // stack checking
 location 
+bnOff
 sp
 
 

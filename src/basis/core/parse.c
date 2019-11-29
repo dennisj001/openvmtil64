@@ -13,8 +13,8 @@ _CfrTil_SingleQuote ( )
     //if ( ! Compiling ) _CfrTil_InitSourceCode_WithName ( _CfrTil_, lexer->OriginalToken ) ;
     // remember : _ReadLine_PeekIndexedChar ( rl, 0 ) is the *next* char to be read
     //if ( sqWord && sqWord->Name[0] == '\'' && ( ( ( c1 = _ReadLine_PeekIndexedChar ( rl, 1 ) ) == '\'' ) || ( ( c0 = _ReadLine_PeekIndexedChar ( rl, 0 ) ) == '\\' ) ) )// parse a char type, eg. 'c' 
-    c0 = _ReadLine_PeekIndexedChar ( rl, 0 ) ; // parse a char type, eg. 'c' 
-    c1 = _ReadLine_PeekIndexedChar ( rl, 1 ) ;
+    c0 = _ReadLine_PeekOffsetChar ( rl, 0 ) ; // parse a char type, eg. 'c' 
+    c1 = _ReadLine_PeekOffsetChar ( rl, 1 ) ;
     if ( sqWord && sqWord->Name[0] == '\'' && ( c1 == '\'' ) || ( c0 == '\\' ) ) // parse a char type, eg. 'c' 
     {
         // notation :: c0 = original ' ; c1 = next char, etc.

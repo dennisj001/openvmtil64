@@ -493,7 +493,7 @@ void _CheckCodeSpaceForRoom(int64 memDesired);
 void CheckCodeSpaceForRoom(void);
 /* src/basis/init.c */
 void CfrTil_RuntimeInit(CfrTil *cfrTil, int64 cntxDelFlag);
-void OVT_RuntimeInit(int64 promptFlag);
+void OVT_RuntimeInit(void);
 void _CfrTil_Init_SessionCore(CfrTil *cfrTil, int64 cntxDelFlag, int64 promptFlag);
 void CfrTil_SessionInit(void);
 void CfrTil_ResetAll_Init(CfrTil *cfrTil);
@@ -894,6 +894,7 @@ byte ReadLine_GetLine(ReadLiner *rl);
 byte ReadLine_NextChar(ReadLiner *rl);
 byte ReadLine_NextNonPunctCharAfterEndOfString(ReadLiner *rl);
 Boolean ReadLine_AreWeAtNewlineAfterSpaces(ReadLiner *rl);
+Boolean ReadLine_CheckForLocalVariables(ReadLiner *rl);
 /* src/basis/core/dataStack.c */
 uint64 DataStack_Pop(void);
 void DataStack_Push(int64 value);
@@ -1044,7 +1045,7 @@ void BigNum_LogicalDoesNotEqual(void);
 void ReadLine_Set_ReadIndex(ReadLiner *rl, int64 pos);
 byte *_ReadLine_pb_NextChar(ReadLiner *rl);
 byte _ReadLine_NextChar(ReadLiner *rl);
-byte _ReadLine_PeekIndexedChar(ReadLiner *rl, int64 offset);
+byte _ReadLine_PeekOffsetChar(ReadLiner *rl, int64 offset);
 byte ReadLine_PeekNextChar(ReadLiner *rl);
 byte _ReadLine_GetNextChar(ReadLiner *rl);
 void _ReadLine_EndThisLine(ReadLiner *rl);

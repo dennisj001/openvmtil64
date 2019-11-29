@@ -197,7 +197,7 @@
 #define SREG2                    SCRATCH_REG2
 #if DSP_IS_GLOBAL_REGISTER 
 register uint64 *_Dsp_          asm ( "r14" ) ;
-register int64 *Fp              asm ("r15" ) ;
+register uint64 *Fp             asm ( "r15" ) ;
 #endif
 #define STACK_POINTER           R14D                    // r14
 #define DSP                     STACK_POINTER 
