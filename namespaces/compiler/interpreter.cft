@@ -8,7 +8,7 @@ lispOff
 System Interpreter 
 // these #defines are purposefully unnecessarily complex (and confusing looking) for testing
 #define xhe0 "xhi1 ="  
-#define xhe1( ) nl ps 
+#define xhe1() nl ps 
 #define xhe12( str ) str @ nl ps 
 #define xhi2( n ) xhe12 ( xhe0 ) 1 2 \
             + n @ \

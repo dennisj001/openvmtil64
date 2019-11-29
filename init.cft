@@ -418,6 +418,9 @@ Shell
 
 #endif
 rtw
+infixOn
+(1 + 5) / (2 + 1) 2 _assert
+infixOff
 //verbosity 0 =
 //pause
 //s

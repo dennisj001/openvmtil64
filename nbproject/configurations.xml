@@ -570,8 +570,10 @@
         </ccTool>
       </item>
       <item path="src/basis/core/readline.c" ex="false" tool="1" flavor2="3">
-        <ccTool>
+        <ccTool flags="1">
           <incDir>
+            <pElem>src/basis/core</pElem>
+            <pElem>src/include</pElem>
             <pElem>.</pElem>
           </incDir>
         </ccTool>
@@ -595,8 +597,10 @@
         </ccTool>
       </item>
       <item path="src/basis/core/syntax.c" ex="false" tool="1" flavor2="3">
-        <ccTool>
+        <ccTool flags="1">
           <incDir>
+            <pElem>src/basis/core</pElem>
+            <pElem>src/include</pElem>
             <pElem>.</pElem>
           </incDir>
         </ccTool>
@@ -930,10 +934,8 @@
         </ccTool>
       </item>
       <item path="src/primitives/primitives.c" ex="false" tool="1" flavor2="3">
-        <ccTool flags="1">
+        <ccTool>
           <incDir>
-            <pElem>src/include</pElem>
-            <pElem>src/primitives</pElem>
             <pElem>.</pElem>
           </incDir>
         </ccTool>
@@ -966,10 +968,8 @@
         </ccTool>
       </item>
       <item path="src/primitives/systems.c" ex="false" tool="1" flavor2="3">
-        <ccTool flags="1">
+        <ccTool>
           <incDir>
-            <pElem>src/primitives</pElem>
-            <pElem>src/include</pElem>
             <pElem>.</pElem>
           </incDir>
         </ccTool>

@@ -82,7 +82,7 @@ CfrTil_Throw ( )
 void
 _ShellEscape ( char * str )
 {
-    int status = 0 ;
+    int status ;
 #if 1  
     //signal ( SIGCHLD, SIG_IGN ) ;
     status = system ( str ) ;
@@ -184,10 +184,11 @@ _ShellEscape ( char * str )
 void
 ShellEscape ( byte * str )
 {
-    //byte * str = ( byte* ) DataStack_Pop ( ) ;
     _ShellEscape ( ( char* ) str ) ;
-    NewLine ( _Context_->Lexer0 ) ;
+    //NewLine ( _Context_->Lexer0 ) ;
     SetState ( _Context_->Lexer0, LEXER_DONE, true ) ;
+    //CfrTil_NewLine ( ) ;
+    _OVT_Ok ( true ) ;
 }
 
 void
