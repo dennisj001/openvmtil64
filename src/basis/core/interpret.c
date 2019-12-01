@@ -4,6 +4,7 @@
 void
 Interpreter_SetLexState ( Interpreter * interp) 
 {
+    if ( GetState ( _Lexer_, LEXER_END_OF_LINE ) ) SetState ( interp, END_OF_LINE, true ) ;
     if ( interp->LastLexedChar == 0 ) SetState ( interp, END_OF_STRING, true ) ;
     else if ( interp->LastLexedChar == eof ) SetState ( interp, END_OF_FILE, true ) ;
     else if ( interp->LastLexedChar == '\n' ) SetState ( interp, END_OF_LINE, true ) ; 

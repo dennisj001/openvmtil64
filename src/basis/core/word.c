@@ -12,7 +12,7 @@ Word_Run ( Word * word )
         DEBUG_SETUP ( word ) ;
         if ( ! GetState ( word, STEPPED ) ) // set by the debuggger
         {
-            if ( ! sigsetjmp ( _Context_->JmpBuf0, 0 ) ) // longjmp from _Debugger_InterpreterLoop
+            if ( ! sigsetjmp ( _Context_->JmpBuf0, 0 ) ) // siglongjmp from _Debugger_InterpreterLoop
             {
                 Block_Eval ( word->Definition ) ;
             }

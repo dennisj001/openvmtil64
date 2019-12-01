@@ -1,5 +1,5 @@
 #include "../include/cfrtil64.h"
-#define VERSION ((byte*) "0.895.600" ) 
+#define VERSION ((byte*) "0.896.202" ) 
 // Logic/Foml (Foundations of Mathematical Logic by Haskell Curry), Oop (Object Oriented Programming), 
 // C, Lisp, Rpn/Lag : Reverse Polish Notation, (Left Associative Grammar), Pda : Push Down Automata, Tm : Turing Machine :: 
 // (til : a toolkit for implementing languages (maybe even a compiler compiler) based on these ideas)
@@ -42,6 +42,15 @@ _OpenVmTil_Allocate ( )
     dllist_Init ( &ovt->PermanentMemList, &ovt->PML_HeadNode, &ovt->PML_TailNode ) ;
     ovt->OVT_InitialUnAccountedMemory = sizeof ( OpenVmTil ) ; // needed here because 'ovt' was not initialized yet for MemChunk accounting
     return ovt ;
+}
+
+void
+OVT_RecycleAllWordsDebugInfo ()
+{
+    SetState ( _CfrTil_, (RT_DEBUG_ON|GLOBAL_SOURCE_CODE_MODE), false ) ;
+    //Tree_Map_Namespaces ( _Q_->OVT_CfrTil->Namespaces->Lo_List, (MapSymbolFunction) DLList_RecycleInit_WordList ) ;
+    OVT_MemListFree_CompilerTempObjects ( ) ;
+    _CfrTil_RecycleInit_Compiler_N_M_Node_WordList ( 1 ) ; 
 }
 
 void

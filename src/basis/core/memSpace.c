@@ -340,7 +340,7 @@ OVT_MemListFree_LispSpace ( )
 void
 OVT_MemListFree_CompilerTempObjects ( )
 {
-    OVT_MemList_FreeNBAMemory ( ( byte* ) "CompilerTempObjectSpace", 0, 1 ) ;
+    if ( ! GetState ( _CfrTil_, (RT_DEBUG_ON|GLOBAL_SOURCE_CODE_MODE) ) ) OVT_MemList_FreeNBAMemory ( ( byte* ) "CompilerTempObjectSpace", 0, 1 ) ;
 }
 
 void

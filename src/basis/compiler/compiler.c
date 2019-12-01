@@ -302,24 +302,26 @@ Compiler_SaveDebugInfo ( Compiler * compiler )
 void
 Compiler_DeleteDebugInfo ( Compiler * compiler )
 {
-    if ( compiler->NumberOfVariables ) 
+    if ( compiler->NumberOfVariables )
     {
         Compiler_FreeAllLocalsNamespaces ( compiler ) ;
         _Namespace_RemoveFromUsingListAndClear ( compiler->LocalsNamespace ) ;
     }
-    _CfrTil_RecycleInit_Compiler_N_M_Node_WordList ( 1 ) ; //flags ) ;
+    _CfrTil_RecycleInit_Compiler_N_M_Node_WordList ( 1 ) ;
 }
 
 void
 Compiler_Init ( Compiler * compiler, uint64 state, Boolean flag )
 {
-    if ( flag ) Compiler_DeleteDebugInfo ( compiler ) ;
-    else if ( compiler->NumberOfVariables )
+    //if ( flag ) Compiler_DeleteDebugInfo ( compiler ) ;
+    if ( compiler->NumberOfVariables || GetState ( _CfrTil_, ( RT_DEBUG_ON | GLOBAL_SOURCE_CODE_MODE ) ) ) Compiler_SaveDebugInfo ( compiler ) ;
+    else if ( flag || ( ! GetState ( _CfrTil_, ( RT_DEBUG_ON | GLOBAL_SOURCE_CODE_MODE ) ) ) )
     {
-        if ( GetState ( _CfrTil_, (RT_DEBUG_ON|GLOBAL_SOURCE_CODE_MODE) ) ) Compiler_SaveDebugInfo ( compiler ) ; 
-        else Namespace_RemoveNamespacesStack ( compiler->LocalsCompilingNamespacesStack ) ;
+        //_CfrTil_RecycleInit_Compiler_N_M_Node_WordList ( 1 ) ;
+        //Namespace_RemoveNamespacesStack ( compiler->LocalsCompilingNamespacesStack ) ;
+        Compiler_DeleteDebugInfo ( compiler ) ;
     }
-    compiler->State = ( state &= ( ~ARRAY_MODE ) ) ;
+    compiler->State = ( state &= ( ~ ARRAY_MODE ) ) ;
     compiler->ContinuePoint = 0 ;
     compiler->BreakPoint = 0 ;
     compiler->InitHere = Here ;

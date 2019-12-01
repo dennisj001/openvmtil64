@@ -492,7 +492,11 @@
         </cTool>
       </item>
       <item path="src/basis/core/interpret.c" ex="false" tool="0" flavor2="3">
-        <cTool flags="0">
+        <cTool flags="3">
+          <incDir>
+            <pElem>src/basis/core</pElem>
+            <pElem>src/include</pElem>
+          </incDir>
         </cTool>
       </item>
       <item path="src/basis/core/io.c" ex="false" tool="0" flavor2="3">
@@ -716,7 +720,11 @@
         </cTool>
       </item>
       <item path="src/basis/sourceCode.c" ex="false" tool="0" flavor2="3">
-        <cTool flags="0">
+        <cTool flags="3">
+          <incDir>
+            <pElem>src/basis</pElem>
+            <pElem>src/include</pElem>
+          </incDir>
         </cTool>
       </item>
       <item path="src/basis/system.c" ex="false" tool="0" flavor2="3">

@@ -22,13 +22,14 @@ _Debugger_InterpreterLoop ( Debugger * debugger )
     SetState ( debugger, DBG_STACK_OLD, true ) ;
     if ( GetState ( debugger, DBG_STEPPED ) )
     {
-        //Set_DataStackPointers_FromDebuggerDspReg ( ) ;
-        if ( GetState ( _Lexer_, LEXER_DONE | LEXER_END_OF_LINE ) ) SetState ( _Interpreter_, END_OF_LINE, true ) ;
         if ( debugger->w_Word ) SetState ( debugger->w_Word, STEPPED, true ) ;
+        if ( debugger->w_Alias && (debugger->w_AliasOf == debugger->w_Word ) ) SetState ( debugger->w_Alias, STEPPED, true ) ;
+
         if ( _Context_->CurrentEvalWord || GetState ( debugger, ( DBG_CONTINUE_MODE ) ) )
         {
             if ( ! Stack_Depth ( debugger->ReturnStack ) )
             {
+                if ( GetState ( _Lexer_, LEXER_DONE | LEXER_END_OF_LINE ) ) SetState ( _Interpreter_, END_OF_LINE, true ) ;
                 Debugger_Off ( debugger, 1 ) ;
                 if ( _Context_->CurrentEvalWord ) SetState ( _Context_->CurrentEvalWord, STEPPED, true ) ;
                 if ( _Context_->CurrentTokenWord ) SetState ( _Context_->CurrentTokenWord, STEPPED, true ) ;
@@ -45,17 +46,21 @@ Debugger_PreSetup ( Debugger * debugger, Word * word, byte * token, byte * addre
 {
     if ( ! word ) word = Context_CurrentWord ( ) ;
     debugger->w_Word = word ;
-    if ( ( Is_DebugModeOn && Is_DebugShowOn ) || forceFlag )
+    if ( ( ! GetState ( word, STEPPED )) && ( Is_DebugModeOn && Is_DebugShowOn ) || forceFlag )
     {
         if ( forceFlag || GetState ( debugger, DBG_EVAL_AUTO_MODE ) || ( ! GetState ( debugger, DBG_AUTO_MODE | DBG_STEPPING ) ) )
         {
             if ( ! word ) word = Context_CurrentWord ( ) ;
-            //if ( word && ( ! word->W_WordListOriginalWord ) ) word->W_WordListOriginalWord = word ;
-            if ( forceFlag || ( word != debugger->LastSetupWord ) || ( debugger->SC_Index != _Lexer_->SC_Index ) ) //( word != debugger->LastSetupWord ) ) //|| ( word && ( ! String_Equal ( debugger->LastSetupWord->Name, word->Name ) ) ) )
+            if ( forceFlag || ( word != debugger->LastSetupWord ) || ( debugger->SC_Index != _Lexer_->SC_Index ) ) 
             {
                 if ( forceFlag || ( word && word->Name[0] ) || token )
                 {
                     debugger->w_Word = word ;
+                    if ( word->W_AliasOf ) 
+                    {
+                        debugger->w_Alias = word ; //->W_AliasOf ;
+                        debugger->w_AliasOf = word->W_AliasOf ;
+                    }
                     if ( forceFlag ) debugger->LastShowWord = 0 ;
                     SetState ( debugger, DBG_COMPILE_MODE, CompileMode ) ;
                     SetState_TrueFalse ( debugger, DBG_ACTIVE | DBG_INFO | DBG_PROMPT, DBG_BRK_INIT | DBG_CONTINUE_MODE | DBG_INTERPRET_LOOP_DONE | DBG_PRE_DONE | DBG_CONTINUE | DBG_STEPPING | DBG_STEPPED ) ;
@@ -79,6 +84,7 @@ Debugger_PreSetup ( Debugger * debugger, Word * word, byte * token, byte * addre
                     debugger->ReadIndex = _ReadLiner_->ReadIndex ;
                     debugger->DebugAddress = 0 ;
                     SetState ( debugger, DBG_MENU, false ) ;
+                    if ( GetState ( _Lexer_, LEXER_DONE | LEXER_END_OF_LINE ) ) SetState ( _Interpreter_, END_OF_LINE, true ) ;
                     return true ;
                 }
             }

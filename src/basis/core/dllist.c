@@ -689,8 +689,8 @@ dllist_Map ( dllist * list, MapFunction0 mf )
 void
 dllist_Map1_FromEnd ( dllist * list, MapFunction1 mf, int64 one )
 {
-    dlnode * node, *previousNode ;
-    for ( node = dllist_Last ( ( dllist* ) list ) ; node ; node = previousNode )
+    dlnode *last, * node, *previousNode ;
+    for ( last = dllist_Last ( ( dllist* ) list ), node = last ; node ; node = previousNode )
     {
         previousNode = dlnode_Previous ( node ) ;
         mf ( node, one ) ;
@@ -807,6 +807,20 @@ Tree_Map_Namespaces_State_2Args ( dllist * list, uint64 state, MapSymbolFunction
         }
     }
     d0 ( CfrTil_WordAccounting ( ( byte* ) "Tree_Map_State_2" ) ) ;
+}
+
+void
+Tree_Map_Namespaces ( dllist * list, MapSymbolFunction mf )
+{
+    dlnode * node, *nextNode ;
+    Word * word ;
+    for ( node = dllist_First ( ( dllist* ) list ) ; node ; node = nextNode )
+    {
+        nextNode = dlnode_Next ( node ) ;
+        word = ( Word * ) node ;
+        if ( Is_NamespaceType ( word ) ) Tree_Map_Namespaces ( word->Lo_List, mf ) ;
+        else mf ( ( Symbol* ) word ) ;
+    }
 }
 
 Word *

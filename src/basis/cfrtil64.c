@@ -321,17 +321,3 @@ CfrTil_InlineOff ( )
     SetState ( _CfrTil_, INLINE_ON, false ) ;
 }
 
-#if 0
-
-void
-_CfrTil_DebugOff ( )
-{
-    DebugOff ;
-}
-
-void
-_CfrTil_DebugOn ( )
-{
-    DebugOn ;
-}
-#endif

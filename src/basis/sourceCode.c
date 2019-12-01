@@ -212,16 +212,23 @@ DLList_Recycle_WordList ( dllist * list )
 }
 
 void
+DLList_RecycleInit_WordList ( Word * word )
+{
+    dllist_Map ( word->W_SC_WordList, ( MapFunction0 ) CheckRecycleWord ) ;
+    List_Init ( word->W_SC_WordList ) ;
+}
+
+void
 _CfrTil_RecycleInit_Compiler_N_M_Node_WordList ( Boolean force )
 {
     if ( force || ( ! GetState ( _CfrTil_, GLOBAL_SOURCE_CODE_MODE ) ) )
     {
         Word * word = _CfrTil_->LastFinished_Word ;
-        if ( word && word->S_WordData ) _CfrTil_->LastFinished_Word->W_SC_WordList = 0 ;
+        if ( word && word->S_WordData && word->W_SC_WordList ) List_Init ( word->W_SC_WordList ) ; //= 0 ;
         DLList_Recycle_WordList ( _CfrTil_->Compiler_N_M_Node_WordList ) ;
         List_Init ( _CfrTil_->Compiler_N_M_Node_WordList ) ;
-        //Word * scWord = Get_SourceCodeWord ( ) ;
-        //if ( scWord && scWord->DebugWordList ) List_Init ( scWord->DebugWordList ) ;
+        Word * scWord = Get_SourceCodeWord ( ) ;
+        if ( scWord && scWord->W_SC_WordList ) List_Init ( scWord->W_SC_WordList ) ;
     }
 }
 
@@ -232,7 +239,7 @@ CfrTil_WordList_Init ( Word * word, Boolean saveWord0 )
     if ( word ) svWord = word ;
     else if ( saveWord0 ) svWord = WordStack ( 0 ) ;
     else svWord = 0 ;
-    _CfrTil_RecycleInit_Compiler_N_M_Node_WordList ( 1 ) ;
+    _CfrTil_RecycleInit_Compiler_N_M_Node_WordList ( 0 ) ;
     if ( svWord )
     {
         svWord->W_SC_Index = 0 ; // before pushWord !

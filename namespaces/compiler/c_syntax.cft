@@ -125,14 +125,15 @@ chi ( CObj chey0, d | a b c )
 wdiss ( ' chi find ) ;
 chi ( chey, 7 ) ;
 
-#if 0 // if 1
+#if 1 // if 1
 void
 interpret2 ( | atoken aword ) 
 {
+    //testc1 () ; pause () ;
     nl tab () ; ps ( "interpret2 :> " ) ; nl
     while ( 1 )
     {   
-        d: atoken = token () ; 
+        atoken = token () ; 
         if ( ! ( strcmp ( atoken, "i2halt" ) ) ) 
         { 
             return ; 

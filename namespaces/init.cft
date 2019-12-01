@@ -50,6 +50,7 @@ Debug
 'dscOff 'dbgSourceCodeOff find alias
 'scOn 'dscOn find alias
 'scOff 'dscOff find alias
+scOn
 
 : v4 verbosity 4 = ;
 : v1 verbosity 1 = ;
@@ -213,6 +214,7 @@ Debug
 : dcm decimal ; immediate // a non hex interpreted word
 //: iun using stack namespaceTree ; immediate
 : slp "stack at " ps location stack _pause ;
+'rdi 'recycleDebugInfo find alias
 C
 : logWrite ( str ) _logWrite nl str @ ps nl ;
 : logAppend ( str ) _logAppend nl str @ ps nl ;
@@ -240,9 +242,9 @@ System
 : wdiss ( pword ) _wdiss ( 0 pword @ ) ; //debugWord      // don't add wdiss words to history list
 //: wdiss ( pword ) 0 pword @ _wdiss ; //debugWord      // don't add wdiss words to history list
 : wdissl ( pword ) logOn _wdiss ( 0 pword @ ) logOff ; //debugWord      // don't add wdiss words to history list
-"winfo" ' wdiss find alias
 'wi ' wdiss find alias
 : pwdiss token _find wdiss ;
+'pwi 'pwdiss find alias
 //' wdiss find _wdiss
 : sys mem namespaces words stack using in ; 
 'aw 'allWords find alias
