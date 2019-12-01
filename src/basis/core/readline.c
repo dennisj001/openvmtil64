@@ -641,8 +641,6 @@ ReadLine_AreWeAtNewlineAfterSpaces ( ReadLiner * rl )
     return false ;
 }
 
-#if 1
-
 Boolean
 ReadLine_CheckForLocalVariables ( ReadLiner * rl )
 {
@@ -650,9 +648,8 @@ ReadLine_CheckForLocalVariables ( ReadLiner * rl )
     Word * word = _Context_->CurrentlyRunningWord ;
     boolean result ;
     int64 i, si ;
-    if ( ! word ) 
-        word = _Interpreter_->w_Word ; 
-    si = word->W_RL_Index + strlen ( (char*) word->Name ) ; //rl->ReadIndex ;
+    if ( ! word ) word = _Interpreter_->w_Word ; 
+    si = word->W_RL_Index + strlen ( (char*) word->Name ) ; 
     i = 0 ; 
     ReadLine_Set_ReadIndex ( rl, si ) ;
     do
@@ -671,5 +668,4 @@ ReadLine_CheckForLocalVariables ( ReadLiner * rl )
     ReadLine_Set_ReadIndex ( rl, si ) ;
     return result ;
 }
-#endif
 

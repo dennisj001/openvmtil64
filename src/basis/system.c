@@ -294,7 +294,7 @@ _CfrTil_SystemState_Print ( int64 pflag )
     _Printf ( ( byte* ) buf ) ;
     buf = _CfrTil_GetSystemState_String1 ( buf ) ;
     _Printf ( ( byte* ) buf ) ;
-    if ( pflag || ( _Q_->Verbosity > 2 ) ) OpenVmTil_Print_DataSizeofInfo ( pflag ) ;
+    if ( pflag || ( _Q_->Verbosity >= 2 ) ) OpenVmTil_Print_DataSizeofInfo ( pflag ) ;
     _CfrTil_WordAccounting_Print ( ( byte* ) "_CfrTil_SystemState_Print" ) ;
     BigNum_StateShow ( ) ;
     Boolean dsc = GetState ( _CfrTil_, DEBUG_SOURCE_CODE_MODE ) ;

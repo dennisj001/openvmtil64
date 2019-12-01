@@ -388,7 +388,6 @@ sp
 sp
 "\nthis is some purposefully funky code for testing\n" ps
 
-#if 1 
 s stest sp 
 nl "x64 test" ps "ok" ' dup find xt@ iax ' ps find xt@ iax "ok" "error" assert1s sp //pause
 #endif
@@ -411,7 +410,6 @@ asm;
 ' ndup find wdiss sp 
 7 ndup s 7 ndrop
 s 
-#if 1 // not Compile_Move ready yet
 Asm
 // following intel conventions in the naming : insn dst, src
 // move mem to reg 
@@ -434,8 +432,6 @@ Asm
     // _Compile_Move ( toRegOrMem mod reg rm disp | opCode ) 
     _Compile_Move ( REG, REG, dstReg @, srcReg @, 0 ) 
 ;;
-#endif
-#endif // x64_dbg
  
 infixOff
 

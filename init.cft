@@ -166,7 +166,7 @@ bnInit ( 16 16 )
 Root
 : bigNumOff "BigNum" notUsing ;
 'bnOff 'bigNumOff find alias
-: bnOn BigNum bnInit ( 16 16 ) ;
+: bnOn BigNum bnInit ( 32 32 ) ;
 bnOff
 
 Compiler 
@@ -242,6 +242,7 @@ System
 : wdissl ( pword ) logOn _wdiss ( 0 pword @ ) logOff ; //debugWord      // don't add wdiss words to history list
 "winfo" ' wdiss find alias
 'wi ' wdiss find alias
+: pwdiss token _find wdiss ;
 //' wdiss find _wdiss
 : sys mem namespaces words stack using in ; 
 'aw 'allWords find alias

@@ -23,6 +23,7 @@ _Debugger_InterpreterLoop ( Debugger * debugger )
     if ( GetState ( debugger, DBG_STEPPED ) )
     {
         //Set_DataStackPointers_FromDebuggerDspReg ( ) ;
+        if ( GetState ( _Lexer_, LEXER_DONE | LEXER_END_OF_LINE ) ) SetState ( _Interpreter_, END_OF_LINE, true ) ;
         if ( debugger->w_Word ) SetState ( debugger->w_Word, STEPPED, true ) ;
         if ( _Context_->CurrentEvalWord || GetState ( debugger, ( DBG_CONTINUE_MODE ) ) )
         {

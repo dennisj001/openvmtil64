@@ -487,7 +487,6 @@ void
 CfrTil_FullRestart ( )
 {
     _Q_->Signal = 0 ;
-    //OVT_Throw ( 0, INITIAL_START, 0 ) ;
     _OpenVmTil_LongJmp_WithMsg ( INITIAL_START, ( byte* ) "Full Initial Re-Start : ..." ) ;
 }
 

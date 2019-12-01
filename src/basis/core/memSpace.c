@@ -584,10 +584,9 @@ _OVT_ShowMemoryAllocated ( OpenVmTil * ovt )
         _Printf ( ( byte* ) "\nOVT_InitialUnAccountedMemory                     = %9d : <=: ovt->OVT_InitialUnAccountedMemory", ovt->OVT_InitialUnAccountedMemory ) ; //+ ovt->UnaccountedMem ) ) ;
         _Printf ( ( byte* ) "\nTotalMemSizeTarget                               = %9d : <=: ovt->TotalMemSizeTarget", ovt->TotalMemSizeTarget ) ;
     }
-    else
     {
         _Printf ( ( byte* ) "\nTotal Memory Allocated                            = %9d"
-            "\nTotal Memory leaks                                = %9d", ovt->TotalNbaAccountedMemAllocated, leak ) ;
+                            "\nTotal Memory leaks                                = %9d", ovt->TotalNbaAccountedMemAllocated, leak ) ;
     }
     int64 wordSize = ( sizeof ( Word ) + sizeof ( WordData ) ) ;
     _Printf ( ( byte* ) "\nRecycledWordCount = %5d x %3d bytes : Recycled  = %9d", _Q_->MemorySpace0->RecycledWordCount, wordSize, _Q_->MemorySpace0->RecycledWordCount * wordSize ) ;

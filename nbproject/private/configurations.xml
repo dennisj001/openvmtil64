@@ -164,23 +164,6 @@
           <in>test2.s</in>
           <in>wcs.c</in>
         </df>
-        <df name="sixtyforth">
-          <df name="sixtyforth">
-            <df name="example">
-            </df>
-            <df name="ignore">
-            </df>
-            <df name="note">
-            </df>
-            <df name="test">
-              <df name="extension">
-              </df>
-              <df name="non-portable">
-              </df>
-            </df>
-            <in>64th.asm</in>
-          </df>
-        </df>
         <df name="sl5">
           <in>sl3.c</in>
           <in>sl5-1.c</in>

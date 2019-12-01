@@ -80,14 +80,14 @@ Interpret_PrefixFunction_Until_Token ( Interpreter * interp, Word * prefixFuncti
 }
 
 void
-Interpret_PrefixFunction_Until_RParen ( Interpreter * interp, Word * prefixFunction )
+Interpret_PrefixFunction_OrUntil_RParen ( Interpreter * interp, Word * prefixFunction )
 {
     if ( prefixFunction )
     {
         Word * word ;
         byte * token ;
-        int64 svs_c_rhs, flag = 0 ; //, svscwi = _CfrTil_->SC_Index ;
-        Compiler * compiler = _Context_->Compiler0 ;
+        int64 svs_c_rhs, flag = 0 ; 
+        Compiler * compiler = interp->Compiler0 ;
         while ( 1 )
         {
             token = Lexer_ReadToken ( interp->Lexer0 ) ; // skip the opening left paren
@@ -95,11 +95,8 @@ Interpret_PrefixFunction_Until_RParen ( Interpreter * interp, Word * prefixFunct
             {
                 if ( word = Finder_Word_FindUsing ( interp->Finder0, token, 1 ) )
                 {
-                    if ( word->CAttribute & DEBUG_WORD )
-                    {
-                        continue ;
-                    }
-                    flag = 1 ;
+                    if ( word->CAttribute & DEBUG_WORD ) continue ;
+                    else flag = 1 ;
                     break ;
                 }
             }
@@ -113,7 +110,6 @@ Interpret_PrefixFunction_Until_RParen ( Interpreter * interp, Word * prefixFunct
         Interpreter_DoWord_Default ( interp, prefixFunction, prefixFunction->W_RL_Index, prefixFunction->W_SC_Index ) ;
         SetState ( compiler, ( PREFIX_ARG_PARSING | DOING_A_PREFIX_WORD ), false ) ;
         if ( GetState ( _Context_, C_SYNTAX ) ) SetState ( _Context_, C_RHS, svs_c_rhs ) ;
-        //if ( ! Compiling ) _Compiler_FreeAllLocalsNamespaces ( compiler ) ; // should this be here??!??
     }
 }
 

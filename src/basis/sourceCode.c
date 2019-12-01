@@ -216,8 +216,12 @@ _CfrTil_RecycleInit_Compiler_N_M_Node_WordList ( Boolean force )
 {
     if ( force || ( ! GetState ( _CfrTil_, GLOBAL_SOURCE_CODE_MODE ) ) )
     {
+        Word * word = _CfrTil_->LastFinished_Word ;
+        if ( word && word->S_WordData ) _CfrTil_->LastFinished_Word->W_SC_WordList = 0 ;
         DLList_Recycle_WordList ( _CfrTil_->Compiler_N_M_Node_WordList ) ;
         List_Init ( _CfrTil_->Compiler_N_M_Node_WordList ) ;
+        //Word * scWord = Get_SourceCodeWord ( ) ;
+        //if ( scWord && scWord->DebugWordList ) List_Init ( scWord->DebugWordList ) ;
     }
 }
 

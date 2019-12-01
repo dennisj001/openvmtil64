@@ -149,7 +149,6 @@ Debugger_CompileAndStepOneInstruction ( Debugger * debugger )
     {
         byte *jcAddress = 0, *adr ;
         Word * word ;
-        int64 d ;
         if ( * debugger->DebugAddress == _RET )
         {
             if ( Stack_Depth ( debugger->ReturnStack ) )
@@ -160,6 +159,7 @@ Debugger_CompileAndStepOneInstruction ( Debugger * debugger )
             }
             else
             {
+                Debugger_UdisOneInstruction ( debugger, debugger->DebugAddress, ( byte* ) "\r", ( byte* ) "" ) ;
                 SetState ( debugger, DBG_STACK_OLD, true ) ;
                 debugger->CopyRSP = 0 ;
                 if ( GetState ( debugger, DBG_BRK_INIT ) ) SetState_TrueFalse ( debugger, DBG_INTERPRET_LOOP_DONE | DBG_STEPPED, DBG_ACTIVE | DBG_BRK_INIT | DBG_STEPPING ) ;

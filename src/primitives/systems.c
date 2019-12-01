@@ -254,7 +254,7 @@ CfrTil_Version ( )
 void
 CfrTil_SystemState_Print ( )
 {
-    _CfrTil_SystemState_Print ( 1 ) ;
+    _CfrTil_SystemState_Print ( 0 ) ;
 }
 
 void

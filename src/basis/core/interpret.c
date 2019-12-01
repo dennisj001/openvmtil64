@@ -64,7 +64,7 @@ void
 _Interpreter_DoPrefixWord ( Context * cntx, Interpreter * interp, Word * word )
 {
     SetState ( cntx->Compiler0, ( DOING_A_PREFIX_WORD | DOING_BEFORE_A_PREFIX_WORD ), true ) ;
-    Interpret_PrefixFunction_Until_RParen ( interp, word ) ;
+    Interpret_PrefixFunction_OrUntil_RParen ( interp, word ) ;
     SetState ( cntx->Compiler0, DOING_A_PREFIX_WORD, false ) ;
 }
 

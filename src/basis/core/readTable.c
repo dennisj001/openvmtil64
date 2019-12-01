@@ -115,7 +115,7 @@ ReadTable_0x04 ( ReadLiner * rl ) // <CTRL-D>
     {
         ReadTable_Zero ( rl ) ;
     }
-    else CfrTil_RestartInit ( ) ;
+    else CfrTil_FullRestart ( ) ; //CfrTil_RestartInit ( ) ;
 }
 
 void

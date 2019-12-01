@@ -142,27 +142,6 @@ CfrTil_Interpret_C_Blocks ( int64 blocks, Boolean takesAnElseFlag, Boolean semic
     return blocksParsed ;
 }
 
-#if 0
-
-void
-CfrTil_C_LeftParen ( )
-{
-    Compiler * compiler = _Context_->Compiler0 ;
-    if ( ( GetState ( _Context_->Interpreter0, PREPROCESSOR_MODE ) ) )
-    {
-        // this is for "#define" (which is parsed as '#' 'define', two words)
-        if ( isalnum ( ReadLine_LastReadChar ( _ReadLiner_ ) ) ) CfrTil_LocalsAndStackVariablesBegin ( ) ;
-        else Interpret_DoParenthesizedRValue ( ) ;
-    }
-    else if ( ( ( ! GetState ( compiler, VARIABLE_FRAME ) ) ) || ( ReadLine_PeekNextNonWhitespaceChar ( _Context_->Lexer0->ReadLiner0 ) == '|' ) )
-    {
-        CfrTil_LocalsAndStackVariablesBegin ( ) ;
-    }
-    else Interpret_DoParenthesizedRValue ( ) ;
-}
-
-#elif 1
-
 void
 CfrTil_C_LeftParen ( )
 {
@@ -186,63 +165,6 @@ CfrTil_C_LeftParen ( )
     }
     Interpret_DoParenthesizedRValue ( ) ;
 }
-
-#elif 1
-
-void
-CfrTil_C_LeftParen ( )
-{
-    Compiler * compiler = _Context_->Compiler0 ;
-    ReadLiner * rl = _Context_->ReadLiner0 ;
-    if ( ( GetState ( _Context_->Interpreter0, PREPROCESSOR_MODE ) ) )
-    {
-        // this is for "#define" (which is parsed as '#' 'define', two words)
-        if ( isalnum ( ReadLine_LastReadChar ( rl ) ) ) CfrTil_LocalsAndStackVariablesBegin ( ) ;
-        else Interpret_DoParenthesizedRValue ( ) ;
-    }
-    //if ( ! ( GetState ( _Context_, INFIX_MODE ) && ( _Interpreter_->LastWord->CAttribute & ( NAMESPACE_VARIABLE | LOCAL_VARIABLE | PARAMETER_VARIABLE ) ) ) )
-    if ( ( ( ! GetState ( compiler, VARIABLE_FRAME ) ) ) || ( ReadLine_PeekNextNonWhitespaceChar ( rl ) == '|' ) )
-    {
-        CfrTil_LocalsAndStackVariablesBegin ( ) ;
-        return ;
-    }
-    if ( CompileMode ) //|| (_Interpreter_->LastWord->CAttribute2 & ( RAW_STRING ) ) )
-    {
-        if ( ReadLine_CheckForLocalVariables ( rl ) )
-        {
-            CfrTil_LocalsAndStackVariablesBegin ( ) ;
-            return ;
-        }
-    }
-    Interpret_DoParenthesizedRValue ( ) ;
-}
-#else
-
-void
-CfrTil_C_LeftParen ( )
-{
-    Compiler * compiler = _Context_->Compiler0 ;
-    ReadLiner * rl = _Context_->ReadLiner0 ;
-    if ( ( GetState ( _Context_->Interpreter0, PREPROCESSOR_MODE ) ) )
-    {
-        // this is for "#define" (which is parsed as '#' 'define', two words)
-        if ( isalnum ( ReadLine_LastReadChar ( _ReadLiner_ ) ) ) CfrTil_LocalsAndStackVariablesBegin ( ) ;
-        else Interpret_DoParenthesizedRValue ( ) ;
-    }
-#if 0    
-    else if ( ( ! GetState ( compiler, VARIABLE_FRAME ) )
-        || ReadLine_CheckForLocalVariables ( rl )
-        || ( ReadLine_PeekNextNonWhitespaceChar ( rl ) == '|' )
-        )
-#else        
-    else if ( ReadLine_CheckForLocalVariables ( rl ) || ( ReadLine_PeekNextNonWhitespaceChar ( rl ) == '|' ) )
-#endif        
-    {
-        CfrTil_LocalsAndStackVariablesBegin ( ) ;
-    }
-    else Interpret_DoParenthesizedRValue ( ) ;
-}
-#endif
 
 void
 _CfrTil_C_Infix_EqualOp ( block op )
