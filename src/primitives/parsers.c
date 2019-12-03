@@ -4,7 +4,14 @@
 void
 CfrTil_Token ( )
 {
-    DataStack_Push ( ( int64 ) Lexer_ReadToken ( _Context_->Lexer0 ) ) ;
+    DataStack_Push ( ( int64 ) Lexer_ReadToken ( _Lexer_ ) ) ;
+}
+
+void
+CfrTil_FilenameToken ( )
+{
+    byte * token = _Lexer_LexNextToken_WithDelimiters ( _Lexer_, 0, 1, 0, 1, LEXER_ALLOW_DOT ) ;
+    DataStack_Push ( ( int64 ) token ) ;
 }
 
 void

@@ -113,9 +113,9 @@ Lexer_Init ( Lexer * lexer, byte * delimiters, uint64 state, uint64 allocType )
         Context_SetDefaultTokenDelimiters ( _Context_, ( byte* ) " \n\r\t", CONTEXT ) ;
         lexer->DelimiterCharSet = _Context_->DefaultDelimiterCharSet ;
         lexer->TokenDelimiters = _Context_->DefaultTokenDelimiters ;
-    }
+    }        
     lexer->State = state & ( ~ LEXER_RETURN_NULL_TOKEN ) ;
-    SetState ( lexer, KNOWN_OBJECT | LEXER_DONE | END_OF_FILE | END_OF_STRING | LEXER_END_OF_LINE, false ) ;
+    SetState ( lexer, KNOWN_OBJECT | LEXER_DONE | END_OF_FILE | END_OF_STRING | LEXER_END_OF_LINE | LEXER_ALLOW_DOT, false ) ;
     lexer->TokenDelimitersAndDot = ( byte* ) " .\n\r\t" ;
     lexer->DelimiterOrDotCharSet = CharSet_New ( lexer->TokenDelimitersAndDot, allocType ) ;
     lexer->TokenStart_ReadLineIndex = - 1 ;
@@ -761,7 +761,6 @@ Dot ( Lexer * lexer ) //  '.':
 {
     if ( ( Lexer_LastChar ( lexer ) != '/' ) && ( ! GetState ( lexer, LEXER_ALLOW_DOT ) ) ) //allow for lisp special char sequence "/." as a substitution for lambda
     {
-        SetState ( lexer, LEXER_ALLOW_DOT, false ) ;
         int64 i ;
         if ( ( ! GetState ( lexer, PARSING_STRING ) ) ) //&& ( ! GetState ( _Context_, CONTEXT_PARSING_QUALIFIED_ID ) ) ) // if we are not parsing a String ?
         {
@@ -772,18 +771,11 @@ Dot ( Lexer * lexer ) //  '.':
                     if ( ! isdigit ( lexer->TokenBuffer [ i ] ) )
                     {
                         ReadLine_UnGetChar ( lexer->ReadLiner0 ) ; // allow to read '.' as next token
-                        //SetState ( lexer, LEXER_DONE, true ) ;
-                        //return ;
                         break ;
                     }
                 }
             }
-            else if ( ! isdigit ( ReadLine_PeekNextChar ( lexer->ReadLiner0 ) ) )
-            {
-                Lexer_AppendCharacterToTokenBuffer ( lexer ) ;
-                //SetState ( lexer, LEXER_DONE, true ) ;
-                //return ;
-            }
+            else if ( ! isdigit ( ReadLine_PeekNextChar ( lexer->ReadLiner0 ) ) ) Lexer_AppendCharacterToTokenBuffer ( lexer ) ;
             SetState ( lexer, LEXER_DONE, true ) ;
             return ;
         }

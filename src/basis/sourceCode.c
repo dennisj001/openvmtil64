@@ -448,7 +448,7 @@ CfrTil_DbgSourceCodeOn_Global ( )
 void
 CfrTil_DbgSourceCodeOff_Global ( )
 {
-    //SetState ( _CfrTil_, ( DEBUG_SOURCE_CODE_MODE | GLOBAL_SOURCE_CODE_MODE ), false ) ;
+    SetState ( _CfrTil_, ( DEBUG_SOURCE_CODE_MODE | GLOBAL_SOURCE_CODE_MODE ), false ) ;
 }
 
 // debug source code functions (above)

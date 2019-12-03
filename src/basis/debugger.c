@@ -29,12 +29,14 @@ _Debugger_InterpreterLoop ( Debugger * debugger )
         {
             if ( ! Stack_Depth ( debugger->ReturnStack ) )
             {
+                Boolean jmpFlag = false ;
+                if ( _Context_->CurrentEvalWord != debugger->w_Word ) jmpFlag = true ; 
                 if ( GetState ( _Lexer_, LEXER_DONE | LEXER_END_OF_LINE ) ) SetState ( _Interpreter_, END_OF_LINE, true ) ;
                 Debugger_Off ( debugger, 1 ) ;
                 if ( _Context_->CurrentEvalWord ) SetState ( _Context_->CurrentEvalWord, STEPPED, true ) ;
                 if ( _Context_->CurrentTokenWord ) SetState ( _Context_->CurrentTokenWord, STEPPED, true ) ;
                 _Context_->CurrentTokenWord = 0 ; // prevent interpreting this word
-                siglongjmp ( _Context_->JmpBuf0, 1 ) ; //in Word_Run
+                if ( jmpFlag ) siglongjmp ( _Context_->JmpBuf0, 1 ) ; //in Word_Run
             }
             else if ( ( ! debugger->w_Word ) || GetState ( debugger->w_Word, STEPPED ) ) SetState ( _Context_->CurrentEvalWord, STEPPED, true ) ;
         }

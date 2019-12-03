@@ -322,7 +322,7 @@
 #define STRUCT              STRUCTURE         
 #define RAW_STRING          ( (uint64) 1 << 28 )
 
-// _CAttribute for interpreter word types - 4 bits/ 16 possibilities : N_WordAttribute bitfield
+// WAttribute for interpreter word types 
 #define WT_PREFIX                 ( (uint64) 1 <<  0 ) 
 #define WT_INFIXABLE              ( (uint64) 1 <<  1 ) 
 #define WT_C_PREFIX_RTL_ARGS      ( (uint64) 1 <<  2 ) 

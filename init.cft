@@ -245,6 +245,7 @@ System
 'wi ' wdiss find alias
 : pwdiss token _find wdiss ;
 'pwi 'pwdiss find alias
+: fload ftoken include ;
 //' wdiss find _wdiss
 : sys mem namespaces words stack using in ; 
 'aw 'allWords find alias
@@ -369,7 +370,7 @@ stringMacrosOn
 : rtw "test" purgeAll "hi" purge "hey" purge "heey" purgeAll "hey1" purge "hey2" purge "heey1" purge "heey2" purge "sp" purge "moe" purge ;
 : tCfrTil "namespaces/ninit.cft" include ; // namespaces init
 : tc tCfrTil rtw ;
-: tx64 "namespaces/compiler/x64.back.cft" include ;
+//: tx64 "namespaces/compiler/x64.back.cft" include ;
 : x64 "namespaces/compiler/x64.cft" include ; 
 : bx "namespaces/test/bigNum.test.cft" include ;
 : TODO ( str ) nl nl pdl nl str @ adps location nl pdl nl nl { dbgOnVar @ } { sp } if2 ;; //pause ;;
@@ -393,8 +394,8 @@ dbgOff
 : TODO ( str ) _TODO ( str @ ) pause ;;
 #endif
 
-scOn
 System C
+fload test.txt //pause
 tc 
 //demo
 //x64

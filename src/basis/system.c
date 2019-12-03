@@ -294,16 +294,19 @@ _CfrTil_SystemState_Print ( int64 pflag )
     _Printf ( ( byte* ) buf ) ;
     buf = _CfrTil_GetSystemState_String1 ( buf ) ;
     _Printf ( ( byte* ) buf ) ;
-    if ( pflag || ( _Q_->Verbosity >= 2 ) ) OpenVmTil_Print_DataSizeofInfo ( pflag ) ;
-    _CfrTil_WordAccounting_Print ( ( byte* ) "_CfrTil_SystemState_Print" ) ;
-    BigNum_StateShow ( ) ;
     Boolean dsc = GetState ( _CfrTil_, DEBUG_SOURCE_CODE_MODE ) ;
     _Printf ( ( byte* ) "\nDebug Source Code %s", dsc ? "on" : "off" ) ;
-    Boolean bno = Namespace_IsUsing ( (byte*) "BigNum" ) ;
+    Boolean bno = Namespace_IsUsing ( ( byte* ) "BigNum" ) ;
     _Printf ( ( byte* ) " : BigNum %s", bno ? "on" : "off" ) ;
-    Boolean lo = Namespace_IsUsing ( (byte*) "Lisp" ) ;
+    Boolean lo = Namespace_IsUsing ( ( byte* ) "Lisp" ) ;
     _Printf ( ( byte* ) " : Lisp %s", lo ? "on" : "off" ) ;
     _Printf ( ( byte* ) "\n%s : at %s", Compiling ? "compiling" : "interpreting", Context_Location ( ) ) ;
+    if ( pflag || ( _Q_->Verbosity > 1 ) )
+    {
+        OpenVmTil_Print_DataSizeofInfo ( pflag ) ;
+        _CfrTil_WordAccounting_Print ( ( byte* ) "_CfrTil_SystemState_Print" ) ;
+        BigNum_StateShow ( ) ;
+    }
 }
 
 void
@@ -414,15 +417,15 @@ _CfrTil_Source ( Word *word, int64 addToHistoryFlag )
                     ( ( word->WAttribute & WT_C_SYNTAX ) || GetState ( word, W_C_SYNTAX ) ) ? ", c_syntaxOn" : "", GetState ( word, W_INFIX_MODE ) ? ", infixOn" : "" ) ;
                 Boolean dsc = GetState ( _CfrTil_, DEBUG_SOURCE_CODE_MODE ) ;
                 _Printf ( ( byte* ) "\nDebug Source Code %s", dsc ? "on" : "off" ) ;
-                Boolean bno = Namespace_IsUsing ( (byte*) "BigNum" ) ;
+                Boolean bno = Namespace_IsUsing ( ( byte* ) "BigNum" ) ;
                 _Printf ( ( byte* ) " : BigNum %s", bno ? "on" : "off" ) ;
-                Boolean lo = Namespace_IsUsing ( (byte*) "Lisp" ) ;
+                Boolean lo = Namespace_IsUsing ( ( byte* ) "Lisp" ) ;
                 _Printf ( ( byte* ) " : Lisp %s", lo ? "on" : "off" ) ;
                 Boolean wsc = GetState ( word, W_SOURCE_CODE_MODE ) ;
                 _Printf ( ( byte* ) " : Word Source Code %s", wsc ? "on" : "off" ) ;
             }
             if ( word->Definition && word->S_CodeSize ) _Printf ( ( byte* ) "\nstarting at address : 0x%x -- code size = %d bytes", word->Definition, word->S_CodeSize ) ;
-            if ( word->W_TypeSignatureString[0] ) _Printf ( ( byte* ) "\nTypeSignature : %s", Word_ExpandTypeLetterSignature (word, 0) ) ;
+            if ( word->W_TypeSignatureString[0] ) _Printf ( ( byte* ) "\nTypeSignature : %s", Word_ExpandTypeLetterSignature ( word, 0 ) ) ;
         }
     }
 }

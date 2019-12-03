@@ -1807,6 +1807,7 @@ void CfrTil_LogWrite(void);
 void CfrTil_LogOff(void);
 /* src/primitives/parsers.c */
 void CfrTil_Token(void);
+void CfrTil_FilenameToken(void);
 void CfrTil_SingleQuote(void);
 void CfrTil_Tick(void);
 void Parse_SkipUntil_EitherToken_OrNewline(byte *end1, byte *end2);
@@ -1961,6 +1962,7 @@ void CfrTil_IsImmediate(void);
 void CfrTil_Inline(void);
 void CfrTil_Set_TypeSignature(void);
 void CfrTil_Prefix(void);
+void CfrTil_NPrefix(void);
 void CfrTil_C_Prefix(void);
 void CfrTil_C_Return(void);
 void CfrTil_Void_Return(void);

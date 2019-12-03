@@ -15,10 +15,14 @@ Interpret_C_Until_Token4 ( Interpreter * interp, byte * end1, byte * end2, byte*
     Lexer * lexer = _Lexer_ ;
     do
     {
-        if ( newlineBreakFlag && ReadLine_AreWeAtNewlineAfterSpaces ( _ReadLiner_ ) ) { token = 0 ; break ; }
+        if ( newlineBreakFlag && ReadLine_AreWeAtNewlineAfterSpaces ( _ReadLiner_ ) )
+        {
+            token = 0 ;
+            break ;
+        }
         token = _Lexer_ReadToken ( lexer, delimiters ) ;
         List_CheckInterpretLists_OnVariable ( _Compiler_->PostfixLists, token ) ;
-        if ( String_Equal ( token, "#" ) || ( newlineBreakFlag && String_Equal ( token, "?" ) ) ) break ; 
+        if ( String_Equal ( token, "#" ) || ( newlineBreakFlag && String_Equal ( token, "?" ) ) ) break ;
         else if ( String_Equal ( token, end1 ) || String_Equal ( token, end2 )
             || String_Equal ( token, end3 ) || String_Equal ( token, end4 ) ) break ;
         else if ( GetState ( _Compiler_, DOING_A_PREFIX_WORD ) && String_Equal ( token, ")" ) )
@@ -86,7 +90,7 @@ Interpret_PrefixFunction_OrUntil_RParen ( Interpreter * interp, Word * prefixFun
     {
         Word * word ;
         byte * token ;
-        int64 svs_c_rhs, flag = 0 ; 
+        int64 i, svs_c_rhs, flag = 0 ;
         Compiler * compiler = interp->Compiler0 ;
         while ( 1 )
         {
@@ -104,8 +108,19 @@ Interpret_PrefixFunction_OrUntil_RParen ( Interpreter * interp, Word * prefixFun
         }
         d0 ( if ( Is_DebugModeOn ) Compiler_SC_WordList_Show ( "\n_Interpret_PrefixFunction_Until_RParen", 0, 0 ) ) ;
         SetState ( compiler, PREFIX_ARG_PARSING, true ) ;
-        if ( flag ) Interpreter_InterpretAToken ( interp, token, - 1, - 1 ) ;
-        else Interpret_Until_Token ( interp, ( byte* ) ")", ( byte* ) " ,\n\r\t" ) ;
+        if ( prefixFunction->WNumberOfPrefixedArgs )
+        {
+            Interpreter_InterpretAToken ( interp, token, - 1, - 1 ) ;
+            for ( i = 0 ; i < (prefixFunction->WNumberOfPrefixedArgs - 1) ; i ++ ) // -1 : we already did one above
+            {
+                Interpreter_InterpretNextToken ( interp ) ;
+            }
+        }
+        else
+        {
+            if ( flag ) Interpreter_InterpretAToken ( interp, token, - 1, - 1 ) ;
+            else Interpret_Until_Token ( interp, ( byte* ) ")", ( byte* ) " ,\n\r\t" ) ;
+        }
         SetState ( compiler, ( DOING_BEFORE_A_PREFIX_WORD ), false ) ;
         Interpreter_DoWord_Default ( interp, prefixFunction, prefixFunction->W_RL_Index, prefixFunction->W_SC_Index ) ;
         SetState ( compiler, ( PREFIX_ARG_PARSING | DOING_A_PREFIX_WORD ), false ) ;

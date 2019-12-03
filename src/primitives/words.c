@@ -10,7 +10,7 @@ _CfrTil_Colon ( Boolean initSC )
     CfrTil_Word_Create ( ) ;
     CfrTil_BeginBlock ( ) ;
 
-    byte * token = Lexer_Peek_Next_NonDebugTokenWord (_Lexer_, 0 , 0) ;
+    byte * token = Lexer_Peek_Next_NonDebugTokenWord ( _Lexer_, 0, 0 ) ;
     if ( ( String_Equal ( token, "(" ) ) && ( ! GetState ( _Context_->Interpreter0, PREPROCESSOR_DEFINE ) ) )
     {
         Lexer_ReadToken ( _Lexer_ ) ;
@@ -241,7 +241,7 @@ CfrTil_Does ( )
 {
     //_CfrTil_RightBracket ( ) ; // back to compile mode
     CfrTil_BeginBlock ( ) ;
-    Interpret_C_Until_Token4 (_Interpreter_, ( byte* ) "<do", ( byte* ) ";", ( byte* ) "}", ( byte* ) ",", 0 , 0) ;
+    Interpret_C_Until_Token4 ( _Interpreter_, ( byte* ) "<do", ( byte* ) ";", ( byte* ) "}", ( byte* ) ",", 0, 0 ) ;
     CfrTil_EndBlock ( ) ;
     CfrTil_BlockRun ( ) ;
 }
@@ -305,7 +305,24 @@ void
 CfrTil_Prefix ( void )
 {
     Word * word = _CfrTil_->LastFinished_Word ;
-    if ( word ) { word->CAttribute |= PREFIX ; word->WAttribute = WT_PREFIX ; }
+    if ( word )
+    {
+        word->CAttribute |= PREFIX ;
+        word->WAttribute = WT_PREFIX ;
+    }
+}
+
+void
+CfrTil_NPrefix ( void )
+{
+    uint64 numberOfPrefixedArgs = DataStack_Pop ( ) ;
+    Word * word = _CfrTil_->LastFinished_Word ;
+    if ( word )
+    {
+        word->CAttribute |= PREFIX ;
+        word->WAttribute = WT_PREFIX ;
+        word->WNumberOfPrefixedArgs = numberOfPrefixedArgs ;
+    }
 }
 
 void

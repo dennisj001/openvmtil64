@@ -7,7 +7,6 @@ void
 CfrTil_RuntimeInit ( CfrTil * cfrTil, int64 cntxDelFlag )
 {
     CfrTil_LogOff ( ) ;
-    CfrTil_DbgSourceCodeOff ( ) ;
     cfrTil->SC_QuoteMode = 0 ;
     cfrTil->ScWord = 0 ;
     cfrTil->InitSessionCoreTimes ++ ;
@@ -16,8 +15,6 @@ CfrTil_RuntimeInit ( CfrTil * cfrTil, int64 cntxDelFlag )
         int64 i, stackDepth = Stack_Depth ( cfrTil->ContextDataStack ) ;
         for ( i = 0 ; i < stackDepth ; i ++ ) CfrTil_Context_PopDelete ( cfrTil ) ;
     }
-    //SetState ( cfrTil, SOURCE_CODE_ON, true ) ;
-    //SC_Global_Off ;
     SetState_TrueFalse ( cfrTil, CFRTIL_RUN, DEBUG_MODE ) ;
     SetState ( cfrTil->Debugger0, DBG_ACTIVE, false ) ;
     DebugOff ;

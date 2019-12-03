@@ -62,14 +62,14 @@ X64
 
 hex
 Logic Bits Combinators X64 
-
 'x64_dbg 1 const  
-'DBI 0 const
+'DBI 1 const
 #define x64_dbg 1
 #if x64_dbg    
 dscOn 
 //postifx verbosity 3 =
 #endif    
+//scOn
     
 c_syntaxOn
 Logic Bits Combinators X64 C
@@ -216,19 +216,7 @@ Compile_CalculateWrite_Instruction_X64 ( code0, code1, mod, reg, rm, controlFlag
 } prefix
 //'Compile_CalculateWrite_Instruction_X64 find wdiss apause
 
-scOn
-c_syntaxOn
 C
-void 
-_Compile_Move ( toRegOrMem mod reg rm controlFlags disp | opCode ) 
-{
-    if ( toRegOrMem == REG ) opCode = #x8b ; 
-    else opCode = #x89 ; 
-    //Compile_CalculateWrite_Instruction_X64 ( rex,  opCode,  mod,  reg,  rm, controlFlags,  sib,  disp,  dispSize,  imm,  immSize | modRm )
-    Compile_CalculateWrite_Instruction_X64 ( 0, opCode, mod, reg, rm, controlFlags, 0, disp, 0, 0, 0 ) ;
-} prefix
-//'_Compile_Move find wdiss //pause
-
 void
 Compile_Move ( direction, mod, reg, rm, operandSize, sib, disp, dispSize, imm, immSize )
 {
@@ -257,6 +245,14 @@ Compile_Move ( direction, mod, reg, rm, operandSize, sib, disp, dispSize, imm, i
     Compile_CalculateWrite_Instruction_X64 ( 0, opCode, mod, reg, rm, controlFlags, sib, disp, dispSize, imm, immSize ) ;
 } prefix
 'Compile_Move find wdiss //pause 
+
+void 
+_Compile_Move ( direction mod reg rm disp ) 
+{
+    Compile_Move ( direction, mod, reg, rm, 8, 0, disp, 0, 0, 0 ) ;
+} prefix
+//'_Compile_Move find wdiss //pause
+
 
 //                                           Compile_Move ( direction, mod, reg, rm, operandSize, sib, disp, dispSize, imm, immSize )
 void _Compile_Move_DataStackN_ToReg ( reg n ) { Compile_Move ( REG, MEM, reg, DSP, 8, 0, n * CELL, 0, 0, 0 ) ; } prefix 
@@ -287,7 +283,7 @@ _Compile_CallThruReg ( reg )
     _Compile_Group5 ( CALL, REG, reg, 0, 0, 0 ) ;
 } prefix
 
-//                          _Compile_Group1_Immediate ( code toRegOrMem mod rm disp imm immSize | opCode controlFlags )
+//                          _Compile_Group1_Immediate ( code direction mod rm disp imm immSize | opCode controlFlags )
 void _Compile_SUBI_DSP ( imm ) { _Compile_Group1_Immediate ( SUB, REG, DSP, 0, imm, 1 ) ; } prefix
 
 void
@@ -357,9 +353,8 @@ asm;
     Compile_CalculateWrite_Instruction_X64 ( 0, 0xff, REG, op @, reg @, REX_B | MODRM_B, 0, 0, 0, 0, 0 ) 
 ;;
 
-: _Compile_MoveTOS_To_R8D () _Compile_Move_DataStackN_ToReg ( R8D, 0 ) ;; // _Compile_Move ( REG, 0, EAX, DSP, 0 ) 
+: _Compile_MoveTOS_To_R8D () _Compile_Move_DataStackN_ToReg ( R8D, 0 ) ;; 
 
-//                                          _Compile_Move ( toRegOrMem mod reg rm controlFlags disp | opCode ) 
 : _Compile_ADDI_DSP ( imm ) _Compile_Group1_Immediate ( ADD, REG, DSP, 0, imm @, 1 ) ;; 
 
 : _Compile_CMPreg_IMM ( reg, imm, isize ) _Compile_Group1_Immediate ( CMP, REG, reg @, 0, imm @, isize @ ) ;; 
@@ -410,31 +405,47 @@ asm;
 ' ndup find wdiss sp 
 7 ndup s 7 ndrop
 s 
-Asm
 // following intel conventions in the naming : insn dst, src
 // move mem to reg 
-: MOV8rm ( reg, ptr, disp ) // 8 bit disp
-    //Compile_Move ( direction, mod, reg, rm, operandSize, sib, disp, dispSize, imm, immSize )
-    //_Compile_Move ( toRegOrMem mod reg rm disp ) 
-    _Compile_Move ( REG, MEM, reg @, ptr @, disp @ ) 
-;;
+void
+MOV8rm ( reg, ptr, disp ) // 8 bit disp
+{
+    //_Compile_Move ( direction mod reg rm disp ) 
+    _Compile_Move ( REG, MEM, reg @, ptr @, disp @ ) ;
+}
+nprefix (3) ;
 // move mem to reg : 32 bit offset
-: MOV32rm ( reg, ptr, disp ) // 32 bit disp
-    // _Compile_Move ( toRegOrMem mod reg rm disp ) 
-    _Compile_Move ( REG, MEM32, reg @, ptr @, disp @ ) 
-;;
-: MOVmr ( ptr, disp, reg ) 
-    // _Compile_Move ( toRegOrMem mod reg rm disp ) 
-    _Compile_Move ( MEM, MEM, reg @, ptr @, disp @ ) 
-;;
+void
+MOV32rm ( reg, ptr, disp ) // 32 bit disp
+{
+    // _Compile_Move ( direction mod reg rm disp ) 
+    _Compile_Move ( REG, MEM32, reg @, ptr @, disp @ ) ;
+}
+nprefix (3) ;
+void
+MOVmr ( ptr, disp, reg ) 
+{
+    // _Compile_Move ( direction mod reg rm disp ) 
+    _Compile_Move ( MEM, MEM, reg @, ptr @, disp @ ) ;
+}
+nprefix (3) ;
 // move reg to reg
-: MOVrr ( dstReg, srcReg )
-    // _Compile_Move ( toRegOrMem mod reg rm disp | opCode ) 
-    _Compile_Move ( REG, REG, dstReg @, srcReg @, 0 ) 
-;;
- 
-infixOff
-
+void
+MOVrr ( dstReg, srcReg )
+{
+    // _Compile_Move ( direction mod reg rm disp | opCode ) 
+    _Compile_Move ( REG, REG, dstReg @, srcReg @, 0 ) ;
+}
+nprefix (2) ;
+c_syntaxOff
+C_Syntax Interpreter Asm 
+:asm testAsm
+    MOVrr RDX RAX 
+    MOVrr RAX RBX 
+    MOVrr RBX RAX 
+    MOVrr RAX RDX 
+asm;
+testAsm
 sp 
 2 + 7 assertStkChk // stack checking
 //logOff

@@ -41,7 +41,9 @@ typedef struct
         uint64 T_CAttribute ;
         uint64 T_CAttribute2 ;
         uint64 T_LAttribute ;
-        uint64 T_WordAttribute ;
+        uint32 T_WordAttribute ;
+        uint8 T_NumberOfPrefixedArgs ;
+        uint8 T_Unused ;
         uint64 T_WAllocationType ;
     } ;
     union
@@ -257,6 +259,7 @@ typedef struct _Identifier // _Symbol
 #define S_WAttribute S_Node.n_Attributes.T_WordAttribute
 #define S_WAllocType S_Node.n_Attributes.T_WAllocationType
 #define S_LAttribute S_Node.n_Attributes.T_LAttribute
+#define S_NumberOfPrefixedArgs S_Node.n_Attributes.T_NumberOfPrefixedArgs
 #define S_Size S_Node.n_Attributes.T_Size
 #define S_ChunkSize S_Node.n_Attributes.T_ChunkSize
 #define S_NumberOfSlots S_Size
@@ -274,6 +277,7 @@ typedef struct _Identifier // _Symbol
 #define CAttribute2 S_CAttribute2
 #define LAttribute S_LAttribute
 #define WAttribute S_WAttribute
+#define WNumberOfPrefixedArgs S_NumberOfPrefixedArgs 
 #define WAllocType S_WAllocType
 #define CProp S_CAttribute
 #define CProp2 S_CAttribute2
