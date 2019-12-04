@@ -438,7 +438,10 @@ CPrimitive CPrimitives [] = {
     { "lcRestoreStack", 0, 0, 0, ( block ) LC_RestoreStack, 0, 0, 0, "List", "Root" },
 
     { "compileMode", 0, 0, 0, CfrTil_CompileMode, 0, 0, 0, "Interpreter", "Root" },
+    { "finishDebugInfo", 0, 0, 0, CfrTil_FinishWordDebugInfo, 0, 0, 0, "Interpreter", "Root" },
     { "compileModeOn", 0, 0, 0, CfrTil_RightBracket, 0, 0, 0, "Interpreter", "Root" },
+    { "asmModeOn", 0, 0, 0, CfrTil_AsmModeOn, 0, 0, 0, "Interpreter", "Root" },
+    { "asmModeOff", 0, 0, 0, CfrTil_AsmModeOff, 0, 0, 0, "Interpreter", "Root" },
     { "compileModeOff", 0, 0, 0, CfrTil_LeftBracket, 0, 0, 0, "Interpreter", "Root" },
     { "//", 0, 0, 0, CfrTil_CommentToEndOfLine, IMMEDIATE | KEYWORD, 0, W_COMMENT, "Interpreter", "Root" },
     { "#!", 0, 0, 0, CfrTil_CommentToEndOfLine, IMMEDIATE, 0, W_COMMENT, "Interpreter", "Root" },

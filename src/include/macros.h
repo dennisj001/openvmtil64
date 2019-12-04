@@ -59,9 +59,9 @@
 #define Debugger_IsNewLine( debugger ) GetState ( debugger, DBG_NEWLINE )
 #define Debugger_SetNewLine( debugger, flag ) SetState ( debugger, DBG_NEWLINE, flag ) 
 
-#define Set_CompileMode( tf ) SetState ( _Compiler_, COMPILE_MODE, tf ) //; _LC_ ? SetState ( _LC_, LC_COMPILE_MODE, tf ) : 0 ; 
-#define Get_CompileMode() GetState ( _Compiler_, COMPILE_MODE )  //|| ( _LC_ ? GetState ( _LC_, LC_COMPILE_MODE ) : 0 ) ) 
-#define CompileMode GetState ( _Compiler_, COMPILE_MODE )  //|| ( _LC_ && GetState ( _LC_, ( LC_COMPILE_MODE ) ) ) ) : 0)
+#define Set_CompileMode( tf ) SetState ( _Compiler_, (COMPILE_MODE), tf ) //; _LC_ ? SetState ( _LC_, LC_COMPILE_MODE, tf ) : 0 ; 
+#define Get_CompileMode() GetState ( _Compiler_, (COMPILE_MODE) )  //|| ( _LC_ ? GetState ( _LC_, LC_COMPILE_MODE ) : 0 ) ) 
+#define CompileMode GetState ( _Compiler_, (COMPILE_MODE) )  //|| ( _LC_ && GetState ( _LC_, ( LC_COMPILE_MODE ) ) ) ) : 0)
 #define Compiling CompileMode
 #define ImmediateWord( word) (word->CAttribute & IMMEDIATE)
 #define CPrimitiveWord( word) (word->CAttribute & CPRIMITIVE)

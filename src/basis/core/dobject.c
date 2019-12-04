@@ -181,7 +181,6 @@ DObject_SubObjectInit ( DObject * dobject, Word * parent )
     if ( ! parent ) parent = _CfrTil_Namespace_InNamespaceGet ( ) ;
     else if ( ! ( parent->CAttribute & NAMESPACE ) )
     {
-
         parent->W_List = dllist_New ( ) ;
         parent->CAttribute |= NAMESPACE ;
         _Namespace_AddToNamespacesTail ( parent ) ;

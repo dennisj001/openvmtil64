@@ -88,6 +88,7 @@ _Word_Finish ( Word * word )
     CfrTil_FinishSourceCode ( _CfrTil_, word ) ;
     _CfrTil_->LastFinished_Word = word ;
     CfrTil_TypeStackReset ( ) ;
+    Compiler_FinishWordDebugInfo ( _Compiler_, 0 ) ;
 }
 
 void
@@ -157,6 +158,7 @@ _Word_Create ( byte * name, uint64 ctype, uint64 ctype2, uint64 ltype, uint64 al
     _Compiler_->CurrentCreatedWord = word ;
     _CfrTil_->WordCreateCount ++ ;
     Lexer_Set_ScIndex_RlIndex ( _Lexer_, word, - 1, - 1 ) ; // default values
+    _CfrTil_SetSourceCodeWord ( word ) ;
     return word ;
 }
 

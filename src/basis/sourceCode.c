@@ -16,9 +16,9 @@ Debugger_ShowDbgSourceCodeAtAddress ( Debugger * debugger, byte * address )
             {
                 int64 fixed = 0 ;
                 Word * word = DWL_Find ( list, 0, address, 0, 0, 0, 0 ) ;
-                if ( word && ( debugger->LastSourceCodeWord != word ) )
+                if ( word ) //&& ( debugger->LastSourceCodeWord != word ) )
                 {
-                    debugger->LastSourceCodeWord = word ;
+                    //debugger->LastSourceCodeWord = word ;
                     d0 ( DebugWordList_Show_All ( ) ) ;
 
                     if ( ( scWord->WAttribute & WT_C_SYNTAX ) && ( String_Equal ( word->Name, "store" ) || String_Equal ( word->Name, "poke" ) ) )
@@ -89,37 +89,41 @@ DWL_Find ( dllist * list, Word * iword, byte * address, byte* name, int64 takeFi
             if ( iword && ( aFoundWord == iword ) ) return aFoundWord ;
             if ( Compiling && ( ! GetState ( _Debugger_, DBG_DISASM_ACC ) ) && _Debugger_->w_Word
                 && ( aFoundWord == _Debugger_->w_Word ) ) return aFoundWord ;
-            else if ( address && ( address == aFoundWord->SourceCoding ) )
+            else
             {
-                //if ( address == ( byte* ) 0x7ffff72fa09c ) _Printf ( ( byte* ) "" ) ;
-                numFound ++ ;
-                fDiff = abs ( scwi - lastScwi ) ;
-                aFoundWord->W_SC_Index = scwi ; // not sure exactly why this is necessary but it is important for now??
-                if ( ( _Q_->Verbosity > 2 ) ) DWL_ShowWord ( anode, i, 0, ( int64 ) "FOUND", fDiff ) ;
-                if ( ( aFoundWord->CAttribute & LITERAL ) && ( aFoundWord->Coding[1] == 0xb9 ) )
+                if ( ( _Q_->Verbosity > 3 ) ) DWL_ShowWord ( anode, i, 0, ( int64 ) "afound", fDiff ) ;
+                if ( address && ( address == aFoundWord->SourceCoding ) )
                 {
-                    foundWord = aFoundWord ;
-                    minDiffFound = fDiff ;
-                }
-                else if ( ( aFoundWord->CAttribute & CATEGORY_PLUS_PLUS_MINUS_MINUS ) && ( aFoundWord->Coding[1] == 0xff ) )
-                {
-                    foundWord = aFoundWord ;
-                    break ;
-                }
+                    //if ( address == ( byte* ) 0x7ffff72fa09c ) _Printf ( ( byte* ) "" ) ;
+                    numFound ++ ;
+                    fDiff = abs ( scwi - lastScwi ) ;
+                    aFoundWord->W_SC_Index = scwi ; // not sure exactly why this is necessary but it is important for now??
+                    if ( ( _Q_->Verbosity > 2 ) ) DWL_ShowWord ( anode, i, 0, ( int64 ) "FOUND", fDiff ) ;
+                    if ( ( aFoundWord->CAttribute & LITERAL ) && ( aFoundWord->Coding[1] == 0xb9 ) )
+                    {
+                        foundWord = aFoundWord ;
+                        minDiffFound = fDiff ;
+                    }
+                    else if ( ( aFoundWord->CAttribute & CATEGORY_PLUS_PLUS_MINUS_MINUS ) && ( aFoundWord->Coding[1] == 0xff ) )
+                    {
+                        foundWord = aFoundWord ;
+                        break ;
+                    }
 #if 1               
-                else if ( SC_IsWord_MatchCorrectConsideringBlockOrCombinator ( aFoundWord ) )
-                {
-                    foundWord = aFoundWord ;
-                    minDiffFound = fDiff ;
-                }
+                    else if ( SC_IsWord_MatchCorrectConsideringBlockOrCombinator ( aFoundWord ) )
+                    {
+                        foundWord = aFoundWord ;
+                        minDiffFound = fDiff ;
+                    }
 #endif                
-                else if ( ( fDiff < minDiffFound ) && SC_IsWord_MatchCorrectConsideringBlockOrCombinator ( aFoundWord ) )//|| SC_IsWord_MatchCorrectConsideringBlockOrCombinator ( foundWord ) || ( ! SC_IsWord_MatchCorrectConsideringBlockOrCombinator ( aFoundWord ) ) )
-                {
-                    foundWord = aFoundWord ;
-                    minDiffFound = fDiff ;
+                    else if ( ( fDiff < minDiffFound ) && SC_IsWord_MatchCorrectConsideringBlockOrCombinator ( aFoundWord ) )//|| SC_IsWord_MatchCorrectConsideringBlockOrCombinator ( foundWord ) || ( ! SC_IsWord_MatchCorrectConsideringBlockOrCombinator ( aFoundWord ) ) )
+                    {
+                        foundWord = aFoundWord ;
+                        minDiffFound = fDiff ;
+                    }
+                    else if ( ! foundWord ) maybeFoundWord = aFoundWord ;
+                    if ( takeFirstFind ) break ;
                 }
-                else if ( ! foundWord ) maybeFoundWord = aFoundWord ;
-                if ( takeFirstFind ) break ;
             }
         }
         if ( ( ! foundWord ) && maybeFoundWord ) foundWord = maybeFoundWord ;
@@ -578,9 +582,22 @@ _CfrTil_GetSourceCode ( )
 }
 
 void
-_CfrTil_Finish_WordSourceCode ( CfrTil * cfrtil, Word * word )
+_CfrTil_SetSourceCodeWord ( Word * word )
 {
     _CfrTil_->ScWord = word ;
+}
+
+void
+CfrTil_SetSourceCodeWord ( )
+{
+    Word * word = ( Word* ) DataStack_Pop ( ) ;
+    _CfrTil_SetSourceCodeWord ( word ) ;
+}
+
+void
+_CfrTil_Finish_WordSourceCode ( CfrTil * cfrtil, Word * word )
+{
+    _CfrTil_SetSourceCodeWord ( word ) ;
     if ( ! word->W_SourceCode ) word->W_SourceCode = _CfrTil_GetSourceCode ( ) ;
     Lexer_SourceCodeOff ( _Lexer_ ) ;
     CfrTil_SourceCode_InitEnd ( cfrtil ) ;

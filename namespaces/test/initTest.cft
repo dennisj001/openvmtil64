@@ -110,6 +110,7 @@ shellOff
 // stack pause
 #endif // end if 1
 #endif // end if 0
+Interpreter
 nl "_TestDone_ =" ps _TestDone_ @ p nl
 //stack pause
 { _TestDone_ @ not } { pause } if2 

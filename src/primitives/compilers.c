@@ -256,8 +256,25 @@ CfrTil_RightBracket ( )
 }
 
 void
+CfrTil_AsmModeOn ( )
+{
+    SetState ( _Context_->Compiler0, ASM_MODE, true ) ;
+}
+
+void
+CfrTil_AsmModeOff ( )
+{
+    SetState ( _Context_->Compiler0, ASM_MODE, false ) ;
+}
+
+void
 CfrTil_CompileMode ( )
 {
     DataStack_Push ( GetState ( _Context_->Compiler0, COMPILE_MODE ) ) ;
 }
 
+void
+CfrTil_FinishWordDebugInfo ( )
+{
+    Compiler_FinishWordDebugInfo ( _Compiler_, 0 ) ;
+}
