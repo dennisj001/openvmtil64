@@ -10,26 +10,19 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/home/dennisj/openvmtil64/src/primitives/namespaces.c</file>
-            <file>file:/home/dennisj/openvmtil64/src/primitives/primitives.c</file>
+            <file>file:/home/dennisj/openvmtil64/src/basis/core/block.c</file>
+            <file>file:/home/dennisj/openvmtil64/src/primitives/syntaxes.c</file>
             <file>file:/home/dennisj/openvmtil64/src/basis/sourceCode.c</file>
-            <file>file:/home/dennisj/openvmtil64/src/basis/interpreter.c</file>
             <file>file:/home/dennisj/openvmtil64/src/primitives/words.c</file>
-            <file>file:/home/dennisj/openvmtil64/src/basis/cfrtil64.c</file>
-            <file>file:/home/dennisj/openvmtil64/src/basis/interpreters.c</file>
-            <file>file:/home/dennisj/openvmtil64/src/basis/context.c</file>
-            <file>file:/home/dennisj/openvmtil64/src/basis/core/interpret.c</file>
             <file>file:/home/dennisj/openvmtil64/src/basis/core/memSpace.c</file>
+            <file>file:/home/dennisj/openvmtil64/src/basis/compiler/blocks.c</file>
             <file>file:/home/dennisj/openvmtil64/init.cft</file>
             <file>file:/home/dennisj/openvmtil64/src/basis/openVmTil.c</file>
-            <file>file:/home/dennisj/openvmtil64/src/include/types.h</file>
-            <file>file:/home/dennisj/openvmtil64/src/basis/core/lexer.c</file>
-            <file>file:/home/dennisj/openvmtil64/src/basis/core/cstack.c</file>
-            <file>file:/home/dennisj/openvmtil64/src/basis/debugger.c</file>
-            <file>file:/home/dennisj/openvmtil64/src/include/macros.h</file>
+            <file>file:/home/dennisj/openvmtil64/src/basis/core/dataObjectRun.c</file>
+            <file>file:/home/dennisj/openvmtil64/namespaces/compiler/c_syntax.cft</file>
             <file>file:/home/dennisj/openvmtil64/src/basis/init.c</file>
-            <file>file:/home/dennisj/openvmtil64/src/basis/core/syntax.c</file>
-            <file>file:/home/dennisj/openvmtil64/src/basis/core/dllist.c</file>
+            <file>file:/home/dennisj/openvmtil64/namespaces/compiler/x64.cft</file>
+            <file>file:/home/dennisj/openvmtil64/src/basis/core/word.c</file>
             <file>file:/home/dennisj/openvmtil64/src/basis/compiler/compiler.c</file>
         </group>
     </open-files>

@@ -167,7 +167,7 @@ bnInit ( 16 16 )
 Root
 : bigNumOff "BigNum" notUsing ;
 'bnOff 'bigNumOff find alias
-: bnOn BigNum bnInit ( 32 32 ) ;
+: bnOn BigNum bnInit ( 8 8 ) ;
 bnOff
 
 Compiler 
@@ -378,7 +378,7 @@ stringMacrosOn
 // === controls ===
 Root 
 dbgOff
-//dbgOn 
+dbgOn 
 'todo 0 const  
 'doX64 1 const
 'doTX64 1 const

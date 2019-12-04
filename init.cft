@@ -167,7 +167,7 @@ bnInit ( 16 16 )
 Root
 : bigNumOff "BigNum" notUsing ;
 'bnOff 'bigNumOff find alias
-: bnOn BigNum bnInit ( 32 32 ) ;
+: bnOn BigNum bnInit ( 8 8 ) ;
 bnOff
 
 Compiler 

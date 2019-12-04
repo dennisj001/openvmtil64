@@ -310,7 +310,7 @@ Compiler_DeleteDebugInfo ( Compiler * compiler )
         Compiler_FreeAllLocalsNamespaces ( compiler ) ;
         _Namespace_RemoveFromUsingListAndClear ( compiler->LocalsNamespace ) ;
     }
-    _CfrTil_RecycleInit_Compiler_N_M_Node_WordList ( 1 ) ;
+    if ( ! _CfrTil_->CurrentWordBeingCompiled ) _CfrTil_RecycleInit_Compiler_N_M_Node_WordList ( 1 ) ;
 }
 
 void

@@ -18,6 +18,7 @@ Word_Run ( Word * word )
             }
             else Set_DataStackPointers_FromDebuggerDspReg ( ) ;
         }
+        else Set_DataStackPointers_FromDebuggerDspReg ( ) ;
         SetState ( word, STEPPED, false ) ;
         _DEBUG_SHOW ( word, 0 ) ;
         if ( IS_MORPHISM_TYPE ( word ) ) SetState ( _Context_, ADDRESS_OF_MODE, false ) ;

@@ -225,6 +225,7 @@ DLList_RecycleInit_WordList ( Word * word )
 void
 _CfrTil_RecycleInit_Compiler_N_M_Node_WordList ( Boolean force )
 {
+#if 0    
     if ( force || ( ! GetState ( _CfrTil_, GLOBAL_SOURCE_CODE_MODE ) ) )
     {
         Word * word = _CfrTil_->LastFinished_Word ;
@@ -233,6 +234,29 @@ _CfrTil_RecycleInit_Compiler_N_M_Node_WordList ( Boolean force )
         List_Init ( _CfrTil_->Compiler_N_M_Node_WordList ) ;
         Word * scWord = Get_SourceCodeWord ( ) ;
         if ( scWord && scWord->W_SC_WordList ) List_Init ( scWord->W_SC_WordList ) ;
+    }
+#else
+    //if ( force || ( ! GetState ( _CfrTil_, GLOBAL_SOURCE_CODE_MODE ) ) )
+    {
+        Word * word = Get_SourceCodeWord ( ) ; //_CfrTil_->LastFinished_Word ;
+        if ( Compiling && word && word->S_WordData )
+        {
+            //if ( ( ! word->W_SC_WordList ) && GetState ( _CfrTil_, GLOBAL_SOURCE_CODE_MODE ) )
+            if ( GetState ( _CfrTil_, GLOBAL_SOURCE_CODE_MODE ) ) //&& _CfrTil_->CurrentWordBeingCompiled )
+            {
+                word->W_SC_WordList = _CfrTil_->Compiler_N_M_Node_WordList ;
+                _CfrTil_->Compiler_N_M_Node_WordList = _dllist_New ( CFRTIL ) ;
+            }
+            else List_Init ( word->W_SC_WordList ) ; //= 0 ;
+        }
+        else
+        {
+            DLList_Recycle_WordList ( _CfrTil_->Compiler_N_M_Node_WordList ) ;
+            List_Init ( _CfrTil_->Compiler_N_M_Node_WordList ) ;
+            //Word * scWord = Get_SourceCodeWord ( ) ;
+            //if ( scWord && scWord->W_SC_WordList ) List_Init ( scWord->W_SC_WordList ) ;
+        }
+#endif    
     }
 }
 
@@ -243,7 +267,7 @@ CfrTil_WordList_Init ( Word * word, Boolean saveWord0 )
     if ( word ) svWord = word ;
     else if ( saveWord0 ) svWord = WordStack ( 0 ) ;
     else svWord = 0 ;
-    _CfrTil_RecycleInit_Compiler_N_M_Node_WordList ( 0 ) ;
+    _CfrTil_RecycleInit_Compiler_N_M_Node_WordList ( 1 ) ;
     if ( svWord )
     {
         svWord->W_SC_Index = 0 ; // before pushWord !
@@ -661,7 +685,7 @@ CfrTil_AppendCharToSourceCode ( CfrTil * cfrtil, byte c )
 Word *
 Get_SourceCodeWord ( )
 {
-    Word * scWord = Compiling ? _CfrTil_->CurrentWordBeingCompiled : GetState ( _Debugger_, DBG_STEPPING ) ? _Debugger_->w_Word : _CfrTil_->ScWord ? _CfrTil_->ScWord : _CfrTil_->LastFinished_Word ;
+    Word * scWord = GetState ( _Debugger_, DBG_STEPPING ) ? _Debugger_->w_Word : GetState ( _Compiler_, ( COMPILE_MODE | ASM_MODE ) ) ? _CfrTil_->CurrentWordBeingCompiled : _CfrTil_->ScWord ? _CfrTil_->ScWord : _CfrTil_->LastFinished_Word ;
     return (scWord && scWord->S_WordData ) ? scWord : 0 ;
 }
 

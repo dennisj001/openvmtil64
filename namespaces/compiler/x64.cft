@@ -44,7 +44,7 @@ User
 : sp ; //stack pause ;
 sp
 Compiler Compiling C Asm
-: asmBegin compileModeOn asmModeOn sourceCodeInit sourceCodeOn token create begin ' {| find compileWord ; immediate  
+: asmBegin compileModeOn asmModeOn sourceCodeInit sourceCodeOn token create begin ' {| find compileWord ; immediate  // nb : asm mode is interpreted
 : asmEnd ' {| find compileWord semi asmModeOff ; immediate
 ':asm 'asmBegin find alias
 'asm; 'asmEnd find alias 

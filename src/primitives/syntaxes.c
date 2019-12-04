@@ -79,10 +79,9 @@ void
 CfrTil_C_Semi ( )
 {
     _Compiler_->LHS_Word = 0 ;
-    if ( ! Compiling )
+    if ( ( ! Compiling ) ) 
     {
         CfrTil_InitSourceCode ( _CfrTil_ ) ;
-        //Compiler_Init ( _Compiler_, 0, 1 ) ;
         Compiler_DeleteDebugInfo ( _Compiler_ ) ;
     }
 }
