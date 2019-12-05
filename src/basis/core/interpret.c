@@ -2,12 +2,12 @@
 #include "../../include/cfrtil64.h"
 
 void
-Interpreter_SetLexState ( Interpreter * interp) 
+Interpreter_SetLexState ( Interpreter * interp )
 {
     if ( GetState ( _Lexer_, LEXER_END_OF_LINE ) ) SetState ( interp, END_OF_LINE, true ) ;
     if ( interp->LastLexedChar == 0 ) SetState ( interp, END_OF_STRING, true ) ;
     else if ( interp->LastLexedChar == eof ) SetState ( interp, END_OF_FILE, true ) ;
-    else if ( interp->LastLexedChar == '\n' ) SetState ( interp, END_OF_LINE, true ) ; 
+    else if ( interp->LastLexedChar == '\n' ) SetState ( interp, END_OF_LINE, true ) ;
 }
 
 Word *
@@ -50,7 +50,7 @@ Interpreter_DoInfixWord ( Interpreter * interp, Word * word )
     if ( GetState ( _Context_, C_SYNTAX ) && ( word->CAttribute & ( CATEGORY_OP_EQUAL | CATEGORY_OP_OPEQUAL ) ) ) //&& ( ! GetState ( compiler, DOING_C_TYPE ) ) )
     {
         if ( ( word->CAttribute2 & C_INFIX_OP_EQUAL ) ) SetState ( compiler, C_INFIX_EQUAL, true ) ;
-        token = Interpret_C_Until_Token4 (interp, ( byte* ) ";", ( byte* ) ",", ( byte* ) ")", ( byte* ) "]", ( byte* ) " \n\r\t" , 0) ;
+        token = Interpret_C_Until_Token4 ( interp, ( byte* ) ";", ( byte* ) ",", ( byte* ) ")", ( byte* ) "]", ( byte* ) " \n\r\t", 0 ) ;
     }
     else Interpreter_InterpretNextToken ( interp ) ;
     // then continue and interpret this 'word' - just one out of lexical order
@@ -72,7 +72,7 @@ _Interpreter_DoPrefixWord ( Context * cntx, Interpreter * interp, Word * word )
 void
 Interpreter_DoPrefixWord ( Context * cntx, Interpreter * interp, Word * word )
 {
-    if ( Lexer_IsNextWordLeftParen (interp->Lexer0) ) _Interpreter_DoPrefixWord ( cntx, interp, word ) ;
+    if ( Lexer_IsNextWordLeftParen ( interp->Lexer0 ) ) _Interpreter_DoPrefixWord ( cntx, interp, word ) ;
     else if ( word->CAttribute & CATEGORY_OP_1_ARG ) Interpreter_DoInfixWord ( interp, word ) ; //goto doInfix ;
     else _SyntaxError ( ( byte* ) "Attempting to call a prefix function without following parenthesized args", 1 ) ;
 }
@@ -102,8 +102,8 @@ Interpreter_DoWord ( Interpreter * interp, Word * word, int64 tsrli, int64 scwi 
         interp->w_Word = word ;
         if ( ( word->WAttribute == WT_INFIXABLE ) && ( GetState ( cntx, INFIX_MODE ) ) ) // nb. Interpreter must be in INFIX_MODE because it is effective for more than one word
             Interpreter_DoInfixWord ( interp, word ) ;
-        //else if ( ( word->CAttribute & PREFIX ) || Lexer_IsWordPrefixing (0, word ) ) _Interpreter_DoPrefixWord ( cntx, interp, word ) ; //, tsrli, scwi ) ;
-        else if ( ( word->WAttribute == WT_PREFIX ) || Lexer_IsWordPrefixing (0, word ) ) _Interpreter_DoPrefixWord ( cntx, interp, word ) ; //, tsrli, scwi ) ;
+            //else if ( ( word->CAttribute & PREFIX ) || Lexer_IsWordPrefixing (0, word ) ) _Interpreter_DoPrefixWord ( cntx, interp, word ) ; //, tsrli, scwi ) ;
+        else if ( ( word->WAttribute == WT_PREFIX ) || Lexer_IsWordPrefixing ( 0, word ) ) _Interpreter_DoPrefixWord ( cntx, interp, word ) ; //, tsrli, scwi ) ;
         else if ( word->WAttribute == WT_C_PREFIX_RTL_ARGS ) Interpreter_C_PREFIX_RTL_ARGS_Word ( word ) ;
         else Interpreter_DoWord_Default ( interp, word, tsrli, scwi ) ; //  case WT_POSTFIX: case WT_INFIXABLE: // cf. also _Interpreter_SetupFor_MorphismWord
         if ( ! ( word->CAttribute & DEBUG_WORD ) ) interp->LastWord = word ;
@@ -124,11 +124,11 @@ _Interpreter_TokenToWord ( Interpreter * interp, byte * token, int64 tsrli, int6
         interp->Token = token ;
         word = Finder_Word_FindUsing ( interp->Finder0, token, 0 ) ;
         if ( word && interp->Compiler0->AutoVarTypeNamespace && ( word->CAttribute & NAMESPACE_VARIABLE ) ) word = 0 ;
-        if ( ! word ) word = Lexer_ObjectToken_New (interp->Lexer0, token, tsrli, scwi ) ;
+        if ( ! word ) word = Lexer_ObjectToken_New ( interp->Lexer0, token, tsrli, scwi ) ;
         Word_SetTsrliScwi ( word, tsrli, scwi ) ;
         _Context_->CurrentTokenWord = word ;
         DEBUG_SETUP ( word ) ;
-        if ( GetState ( word, STEPPED ) ) return 0 ;
+        if ( word ) SetState ( word, STEPPED, false ) ;
     }
     return _Context_->CurrentTokenWord ; // allow DEBUG_SETUP to set this to 0 to skip it when it is 'stepped'
 }

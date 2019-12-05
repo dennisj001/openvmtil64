@@ -247,7 +247,7 @@ _CfrTil_RecycleInit_Compiler_N_M_Node_WordList ( Boolean force )
                 word->W_SC_WordList = _CfrTil_->Compiler_N_M_Node_WordList ;
                 _CfrTil_->Compiler_N_M_Node_WordList = _dllist_New ( CFRTIL ) ;
             }
-            else List_Init ( word->W_SC_WordList ) ; //= 0 ;
+            else word->W_SC_WordList = 0 ; //List_Init ( word->W_SC_WordList ) ; //= 0 ;
         }
         else
         {

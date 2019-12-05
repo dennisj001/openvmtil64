@@ -441,14 +441,14 @@ MOVrr ( dstReg, srcReg )
 nprefix (2) ;
 c_syntaxOff
 C_Syntax Asm 
-:asm testAsm
-    MOVrr RDX RAX 
+asmBegin testAsm
+    d: MOVrr RDX RAX 
     MOVrr RAX RBX 
     MOVrr RBX RAX 
     MOVrr RAX RDX 
-asm;
+d: asmEnd
 testAsm
-pwi testAsm //pause
+pwi testAsm pause
 sp 
 2 + 7 assertStkChk // stack checking
 //logOff
