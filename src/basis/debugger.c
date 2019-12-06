@@ -39,56 +39,63 @@ _Debugger_InterpreterLoop ( Debugger * debugger )
 }
 
 Boolean
+_Debugger_PreSetup ( Debugger * debugger, Word * word, byte * token, byte * address, Boolean forceFlag )
+{
+    if ( ! word ) word = Context_CurrentWord ( ) ;
+    debugger->w_Word = word ;
+    if ( ( ! GetState ( word, STEPPED ) ) && ( Is_DebugModeOn && Is_DebugShowOn ) ) //|| forceFlag )
+    {
+        if ( forceFlag || GetState ( debugger, DBG_EVAL_AUTO_MODE ) || ( ! GetState ( debugger, DBG_AUTO_MODE | DBG_STEPPING ) ) )
+        {
+            if ( ! word ) word = Context_CurrentWord ( ) ;
+            if ( forceFlag || ( word != debugger->LastSetupWord ) || ( debugger->SC_Index != _Lexer_->SC_Index ) )
+            {
+                if ( forceFlag || ( word && word->Name[0] ) || token )
+                {
+                    debugger->w_Word = word ;
+                    if ( word->W_AliasOf )
+                    {
+                        debugger->w_Alias = word ; //->W_AliasOf ;
+                        debugger->w_AliasOf = word->W_AliasOf ;
+                    }
+                    if ( forceFlag ) debugger->LastShowWord = 0 ;
+                    SetState ( debugger, DBG_COMPILE_MODE, CompileMode ) ;
+                    SetState_TrueFalse ( debugger, DBG_ACTIVE | DBG_INFO | DBG_PROMPT, DBG_BRK_INIT | DBG_CONTINUE_MODE | DBG_INTERPRET_LOOP_DONE | DBG_PRE_DONE | DBG_CONTINUE | DBG_STEPPING | DBG_STEPPED ) ;
+                    if ( word ) debugger->TokenStart_ReadLineIndex = word->W_RL_Index ;
+                    debugger->SaveDsp = _Dsp_ ;
+                    if ( ! debugger->StartHere ) debugger->StartHere = Here ;
+                    debugger->WordDsp = _Dsp_ ;
+                    debugger->SaveTOS = TOS ;
+                    debugger->Token = word->Name ? word->Name : token ;
+                    debugger->PreHere = Here ;
+                    if ( address )
+                    {
+                        SetState ( debugger, DBG_SETUP_ADDRESS, true ) ;
+                        debugger->DebugAddress = address ;
+                    }
+
+                    DebugColors ;
+                    _Debugger_InterpreterLoop ( debugger ) ; // core of this function
+                    DefaultColors ;
+
+                    debugger->ReadIndex = _ReadLiner_->ReadIndex ;
+                    debugger->DebugAddress = 0 ;
+                    SetState ( debugger, DBG_MENU, false ) ;
+                    if ( GetState ( _Lexer_, LEXER_DONE | LEXER_END_OF_LINE ) ) SetState ( _Interpreter_, END_OF_LINE, true ) ;
+                    return true ;
+                }
+            }
+        }
+    }
+    return false ;
+}
+
+Boolean
 Debugger_PreSetup ( Debugger * debugger, Word * word, byte * token, byte * address, Boolean forceFlag )
 {
     if ( ! sigsetjmp ( _Context_->JmpBuf0, 0 ) ) // siglongjmp from _Debugger_InterpreterLoop
     {
-        if ( ! word ) word = Context_CurrentWord ( ) ;
-        debugger->w_Word = word ;
-        if ( ( ! GetState ( word, STEPPED ) ) && ( Is_DebugModeOn && Is_DebugShowOn ) || forceFlag )
-        {
-            if ( forceFlag || GetState ( debugger, DBG_EVAL_AUTO_MODE ) || ( ! GetState ( debugger, DBG_AUTO_MODE | DBG_STEPPING ) ) )
-            {
-                if ( ! word ) word = Context_CurrentWord ( ) ;
-                if ( forceFlag || ( word != debugger->LastSetupWord ) || ( debugger->SC_Index != _Lexer_->SC_Index ) )
-                {
-                    if ( forceFlag || ( word && word->Name[0] ) || token )
-                    {
-                        debugger->w_Word = word ;
-                        if ( word->W_AliasOf )
-                        {
-                            debugger->w_Alias = word ; //->W_AliasOf ;
-                            debugger->w_AliasOf = word->W_AliasOf ;
-                        }
-                        if ( forceFlag ) debugger->LastShowWord = 0 ;
-                        SetState ( debugger, DBG_COMPILE_MODE, CompileMode ) ;
-                        SetState_TrueFalse ( debugger, DBG_ACTIVE | DBG_INFO | DBG_PROMPT, DBG_BRK_INIT | DBG_CONTINUE_MODE | DBG_INTERPRET_LOOP_DONE | DBG_PRE_DONE | DBG_CONTINUE | DBG_STEPPING | DBG_STEPPED ) ;
-                        if ( word ) debugger->TokenStart_ReadLineIndex = word->W_RL_Index ;
-                        debugger->SaveDsp = _Dsp_ ;
-                        if ( ! debugger->StartHere ) debugger->StartHere = Here ;
-                        debugger->WordDsp = _Dsp_ ;
-                        debugger->SaveTOS = TOS ;
-                        debugger->Token = word->Name ? word->Name : token ;
-                        debugger->PreHere = Here ;
-                        if ( address )
-                        {
-                            SetState ( debugger, DBG_SETUP_ADDRESS, true ) ;
-                            debugger->DebugAddress = address ;
-                        }
-
-                        DebugColors ;
-                        _Debugger_InterpreterLoop ( debugger ) ; // core of this function
-                        DefaultColors ;
-
-                        debugger->ReadIndex = _ReadLiner_->ReadIndex ;
-                        debugger->DebugAddress = 0 ;
-                        SetState ( debugger, DBG_MENU, false ) ;
-                        if ( GetState ( _Lexer_, LEXER_DONE | LEXER_END_OF_LINE ) ) SetState ( _Interpreter_, END_OF_LINE, true ) ;
-                        return true ;
-                    }
-                }
-            }
-        }
+        _Debugger_PreSetup ( debugger, word, token, address, forceFlag ) ;
     }
     else Set_DataStackPointers_FromDebuggerDspReg ( ) ;
     return false ;
@@ -745,11 +752,3 @@ Debugger_TableSetup ( Debugger * debugger )
     debugger->CharacterFunctionTable [ 36 ] = Debugger_ShowTypeWordStack ;
 }
 
-#if 0
-
-void
-_DEBUG_SETUP ( Word * word, byte * token, Boolean force )
-{
-    if ( ( word || token ) && Is_DebugModeOn ) Debugger_PreSetup ( _Debugger_, word, token, 0, force ) ;
-}
-#endif

@@ -227,10 +227,11 @@
 #define Is_DebugShowOn ( _CfrTil_ && GetState ( _CfrTil_, _DEBUG_SHOW_ ) ) 
 #define _Is_DebugOn GetState ( _CfrTil_, _DEBUG_SHOW_ )
 #define Is_DebugOn (Is_DebugShowOn && Is_DebugModeOn)
-#define _DEBUG_SETUP( word, token, force ) if ( (word || token) && Is_DebugModeOn ) Debugger_PreSetup (_Debugger_, word, token, 0, force ) ;
+#define _DEBUG_SETUP( word, token, address, force )  ( (word || token) && Is_DebugModeOn ) ? Debugger_PreSetup (_Debugger_, word, token, address, force ) : 0 
+#define __DEBUG_SETUP( word, token, address, force )  ( (word || token) && Is_DebugModeOn ) ? _Debugger_PreSetup (_Debugger_, word, token, address, force ) : 0 
 #define DEBUG_SETUP_TOKEN( token ) _DEBUG_SETUP( 0, token, 0 ) ;
 #define DEBUG_SETUP_ADDRESS( address, force ) if ( (address) && Is_DebugModeOn ) Debugger_PreSetup (_Debugger_, 0, 0, address, force ) ;
-#define DEBUG_SETUP( word ) _DEBUG_SETUP( word, 0, 0 )
+#define DEBUG_SETUP( word ) _DEBUG_SETUP( word, 0, 0, 0 )
 #define _DEBUG_SHOW( word, force ) _Debugger_PostShow ( _Debugger_, word, force ) ; //, token, word ) ;
 #define DEBUG_SHOW Debugger_PostShow ( _Debugger_ ) ; //, token, word ) ;
 #define DEBUG_ASM_SHOW_ON SetState ( _Debugger_, DBG_ASM_SHOW_ON, true ) 

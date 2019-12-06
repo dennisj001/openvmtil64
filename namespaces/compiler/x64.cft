@@ -442,13 +442,13 @@ nprefix (2) ;
 c_syntaxOff
 C_Syntax Asm 
 asmBegin testAsm
-    d: MOVrr RDX RAX 
+    MOVrr RDX RAX 
     MOVrr RAX RBX 
     MOVrr RBX RAX 
     MOVrr RAX RDX 
-d: asmEnd
+asmEnd
 testAsm
-pwi testAsm pause
+pwi testAsm //pause
 sp 
 2 + 7 assertStkChk // stack checking
 //logOff

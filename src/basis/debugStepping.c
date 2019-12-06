@@ -261,6 +261,22 @@ Debugger_PreStartStepping ( Debugger * debugger )
         }
         else
         {
+            if ( ( ! GetState ( _Debugger_, DBG_INFIX_PREFIX ) ) &&
+                ( ( word->WAttribute & ( WT_PREFIX | WT_C_PREFIX_RTL_ARGS ) ) || Lexer_IsWordPrefixing ( 0, word ) || ( ( word->WAttribute == WT_INFIXABLE ) && ( GetState ( _Context_, INFIX_MODE ) ) ) ) )
+            {
+                DebugOff ;
+                int64 tsrli = - 1, scwi = - 1 ;
+                Interpreter * interp = _Interpreter_ ;
+                //Interpreter_DoWord ( _Context_->Interpreter0, word, - 1, - 1 ) ;
+                Word_SetTsrliScwi ( word, tsrli, scwi ) ; // some of this maybe too much
+                Context * cntx = _Context_ ;
+                interp->w_Word = word ;
+                SetState ( _Debugger_, DBG_INFIX_PREFIX, true ) ;
+                Interpreter_DoInfixOrPrefixWord ( interp, word, tsrli, scwi ) ;
+                DebugOn ;
+                if ( ! ( __DEBUG_SETUP ( word, 0, debugger->DebugAddress, 1 ) ) ) return ;
+            }
+            SetState ( _Debugger_, DBG_INFIX_PREFIX, false ) ;
             Debugger_SetupStepping ( debugger ) ;
             SetState ( debugger, DBG_NEWLINE | DBG_PROMPT | DBG_INFO, false ) ;
         }
@@ -299,7 +315,7 @@ _Debugger_SetupStepping ( Debugger * debugger, Word * word, byte * address, byte
     if ( word )
     {
         _CfrTil_Source ( debugger->w_Word, 0 ) ;
-        if ( ( ! address ) || ( ! GetState ( debugger, ( DBG_BRK_INIT|DBG_SETUP_ADDRESS ) ) ) ) address = ( byte* ) word->Definition ;
+        if ( ( ! address ) || ( ! GetState ( debugger, ( DBG_BRK_INIT | DBG_SETUP_ADDRESS ) ) ) ) address = ( byte* ) word->Definition ;
     }
     SetState_TrueFalse ( debugger, DBG_STEPPING, DBG_NEWLINE | DBG_PROMPT | DBG_INFO | DBG_MENU ) ;
     debugger->DebugAddress = address ;

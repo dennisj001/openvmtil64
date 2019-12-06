@@ -498,6 +498,7 @@
 #define DBG_OUTPUT_INSERTION ( (uint64) 1 << 36 )
 #define DBG_OUTPUT_SUBSTITUTION ( (uint64) 1 << 37 )
 #define DBG_SETUP_ADDRESS ( (uint64) 1 << 38 )
+#define DBG_INFIX_PREFIX ( (uint64) 1 << 39 )
 
 #define SIZEOF_AddressAfterJmpCallStack 16
 // TODO : nb. flags need to be edited !!!!! for right category, overlap, use/non-use, etc.

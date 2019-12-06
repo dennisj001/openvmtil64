@@ -619,6 +619,7 @@ void Interpreter_DoInfixWord(Interpreter *interp, Word *word);
 void _Interpreter_DoPrefixWord(Context *cntx, Interpreter *interp, Word *word);
 void Interpreter_DoPrefixWord(Context *cntx, Interpreter *interp, Word *word);
 void Interpreter_C_PREFIX_RTL_ARGS_Word(Word *word);
+void Interpreter_DoInfixOrPrefixWord(Interpreter *interp, Word *word, int64 tsrli, int64 scwi);
 void Interpreter_DoWord(Interpreter *interp, Word *word, int64 tsrli, int64 scwi);
 Word *_Interpreter_TokenToWord(Interpreter *interp, byte *token, int64 tsrli, int64 scwi);
 Word *Interpreter_ReadNextTokenToWord(Interpreter *interp);
@@ -1526,6 +1527,7 @@ void CfrTil_LocalsAndStackVariablesBegin(void);
 void CfrTil_LocalVariablesBegin(void);
 /* src/basis/debugger.c */
 void _Debugger_InterpreterLoop(Debugger *debugger);
+Boolean _Debugger_PreSetup(Debugger *debugger, Word *word, byte *token, byte *address, Boolean forceFlag);
 Boolean Debugger_PreSetup(Debugger *debugger, Word *word, byte *token, byte *address, Boolean forceFlag);
 void _Debugger_Off(Debugger *debugger);
 void Debugger_Off(Debugger *debugger, int64 debugOffFlag);
