@@ -48,14 +48,8 @@ _Debugger_CompileAndStepOneInstruction ( Debugger * debugger, byte * jcAddress )
     byte * nextInsn = Debugger_CompileOneInstruction ( debugger, jcAddress, showExtraFlag ) ; // compile the insn here
     _Debugger_StepOneInstruction ( debugger ) ;
     if ( showExtraFlag ) Debug_ExtraShow ( Here - svHere, showExtraFlag ) ;
-    if ( GetState ( debugger, DBG_AUTO_MODE ) ) //&& ( ! GetState ( debugger, DBG_CONTINUE_MODE ) ) ) 
-    {
-        SetState ( debugger, DBG_SHOW_STACK_CHANGE, false ) ;
-    }
-    else
-    {
-        _Debugger_ShowEffects ( debugger, debugger->w_Word, GetState ( debugger, DBG_STEPPING ), showExtraFlag ) ;
-    }
+    if ( GetState ( debugger, DBG_AUTO_MODE ) && ( ! GetState ( debugger, DBG_CONTINUE_MODE ) ) ) SetState ( debugger, DBG_SHOW_STACK_CHANGE, false ) ;
+    else _Debugger_ShowEffects ( debugger, debugger->w_Word, GetState ( debugger, DBG_STEPPING ), showExtraFlag ) ;
     Debugger_UdisOneInstruction ( debugger, debugger->DebugAddress, ( byte* ) "\r", ( byte* ) "" ) ;
     if ( Compiling ) _Debugger_DisassembleWrittenCode ( debugger ) ;
     DebugColors ;

@@ -42,12 +42,12 @@ CfrTil_DebugInfo ( )
 void
 CfrTil_DebugOn ( )
 {
-    if ( _Q_->Verbosity > 1 ) _Printf ( (byte*) "\nCfrTil_DebugOn : at %s", Context_Location ( ) ) ;
+    if ( _Q_->Verbosity > 1 ) _Printf ( ( byte* ) "\nCfrTil_DebugOn : at %s", Context_Location ( ) ) ;
     Context * cntx = _Context_ ;
     Debugger * debugger = _Debugger_ ;
     debugger->DebugRSP = 0 ;
     Debugger_On ( debugger ) ;
-    byte * nextToken = Lexer_Peek_Next_NonDebugTokenWord (cntx->Lexer0, 0 , 0) ;
+    byte * nextToken = Lexer_Peek_Next_NonDebugTokenWord ( cntx->Lexer0, 0, 0 ) ;
     debugger->EntryWord = Finder_Word_FindUsing ( cntx->Interpreter0->Finder0, nextToken, 0 ) ;
     debugger->StartHere = Here ;
     _Context_->SourceCodeWord = debugger->EntryWord ;
@@ -65,7 +65,7 @@ DebugRuntimeBreakpoint ( )
     Debugger * debugger = _Debugger_ ;
     //if ( ( ! CompileMode ) )
     {
-        if ( ! GetState ( debugger, ( DBG_BRK_INIT)) ) //|DBG_CONTINUE_MODE ) ) )
+        if ( ! GetState ( debugger, ( DBG_BRK_INIT ) ) ) //|DBG_CONTINUE_MODE ) ) )
         {
             if ( GetState ( debugger, DBG_INTERPRET_LOOP_DONE ) )
             {
@@ -110,3 +110,8 @@ CfrTil_DebugRuntimeBreakpoint_IsDebugOn ( )
     if ( Is_DebugOn ) DebugRuntimeBreakpoint ( ) ;
 }
 
+int64
+_DEBUG_SETUP ( Word * word, byte * token, byte * address, Boolean force )
+{
+    return ( ( word || token ) && Is_DebugModeOn ) ? Debugger_PreSetup ( _Debugger_, word, token, address, force ) : 0 ;
+}

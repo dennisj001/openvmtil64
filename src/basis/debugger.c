@@ -55,7 +55,7 @@ _Debugger_PreSetup ( Debugger * debugger, Word * word, byte * token, byte * addr
                     debugger->w_Word = word ;
                     if ( word->W_AliasOf )
                     {
-                        debugger->w_Alias = word ; //->W_AliasOf ;
+                        debugger->w_Alias = word ; 
                         debugger->w_AliasOf = word->W_AliasOf ;
                     }
                     if ( forceFlag ) debugger->LastShowWord = 0 ;
@@ -81,7 +81,7 @@ _Debugger_PreSetup ( Debugger * debugger, Word * word, byte * token, byte * addr
                     debugger->ReadIndex = _ReadLiner_->ReadIndex ;
                     debugger->DebugAddress = 0 ;
                     SetState ( debugger, DBG_MENU, false ) ;
-                    if ( GetState ( _Lexer_, LEXER_DONE | LEXER_END_OF_LINE ) ) SetState ( _Interpreter_, END_OF_LINE, true ) ;
+                    //if ( GetState ( _Lexer_, LEXER_DONE | LEXER_END_OF_LINE ) ) SetState ( _Interpreter_, END_OF_LINE, true ) ;
                     return true ;
                 }
             }

@@ -2032,6 +2032,7 @@ void DebugRuntimeBreakpoint(void);
 void CfrTil_DebugRuntimeBreakpoint(void);
 void CfrTil_DebugRuntimeBreakpoint_IsDebugShowOn(void);
 void CfrTil_DebugRuntimeBreakpoint_IsDebugOn(void);
+int64 _DEBUG_SETUP(Word *word, byte *token, byte *address, Boolean force);
 /* src/primitives/memorys.c */
 void CfrTil_Peek(void);
 void CfrTil_PeekReg(void);
