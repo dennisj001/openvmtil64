@@ -619,10 +619,11 @@ void Interpreter_DoInfixWord(Interpreter *interp, Word *word);
 void _Interpreter_DoPrefixWord(Context *cntx, Interpreter *interp, Word *word);
 void Interpreter_DoPrefixWord(Context *cntx, Interpreter *interp, Word *word);
 void Interpreter_C_PREFIX_RTL_ARGS_Word(Word *word);
-void Interpreter_DoInfixOrPrefixWord(Interpreter *interp, Word *word, int64 tsrli, int64 scwi);
+Boolean Interpreter_DoInfixOrPrefixWord(Interpreter *interp, Word *word, int64 tsrli, int64 scwi);
 void Interpreter_DoWord(Interpreter *interp, Word *word, int64 tsrli, int64 scwi);
 Word *_Interpreter_TokenToWord(Interpreter *interp, byte *token, int64 tsrli, int64 scwi);
 Word *Interpreter_ReadNextTokenToWord(Interpreter *interp);
+Boolean Word_IsSyntactic(Word *word);
 /* src/basis/core/lexer.c */
 Word *Lexer_ObjectToken_New(Lexer *lexer, byte *token, int64 tsrli, int64 scwi);
 void Lexer_Set_ScIndex_RlIndex(Lexer *lexer, Word *word, int64 tsrli, int64 scwi);

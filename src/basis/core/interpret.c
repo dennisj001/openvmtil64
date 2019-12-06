@@ -85,7 +85,7 @@ Interpreter_C_PREFIX_RTL_ARGS_Word ( Word * word )
     LC_CompileRun_C_ArgList ( word ) ;
 }
 
-void
+Boolean
 Interpreter_DoInfixOrPrefixWord ( Interpreter * interp, Word * word, int64 tsrli, int64 scwi )
 {
     if ( word )
@@ -97,6 +97,8 @@ Interpreter_DoInfixOrPrefixWord ( Interpreter * interp, Word * word, int64 tsrli
             Interpreter_DoInfixWord ( interp, word ) ;
         else if ( ( word->WAttribute == WT_PREFIX ) || Lexer_IsWordPrefixing ( 0, word ) ) _Interpreter_DoPrefixWord ( cntx, interp, word ) ; //, tsrli, scwi ) ;
         else if ( word->WAttribute == WT_C_PREFIX_RTL_ARGS ) Interpreter_C_PREFIX_RTL_ARGS_Word ( word ) ;
+        else return false ;
+        return true ;
     }
 }
 // four types of words related to syntax
@@ -115,10 +117,7 @@ Interpreter_DoWord ( Interpreter * interp, Word * word, int64 tsrli, int64 scwi 
         DEBUG_SETUP ( word ) ;
         Context * cntx = _Context_ ;
         interp->w_Word = word ;
-        if ( ( word->WAttribute & (WT_PREFIX | WT_C_PREFIX_RTL_ARGS) ) || Lexer_IsWordPrefixing ( 0, word ) 
-            || (( word->WAttribute == WT_INFIXABLE ) && ( GetState ( cntx, INFIX_MODE ) ) ) )
-            Interpreter_DoInfixOrPrefixWord ( interp, word, tsrli, scwi ) ;
-        else Interpreter_DoWord_Default ( interp, word, tsrli, scwi ) ; //  case WT_POSTFIX: case WT_INFIXABLE: // cf. also _Interpreter_SetupFor_MorphismWord
+        if ( ! Interpreter_DoInfixOrPrefixWord ( interp, word, tsrli, scwi ) ) Interpreter_DoWord_Default ( interp, word, tsrli, scwi ) ; //  case WT_POSTFIX: case WT_INFIXABLE: // cf. also _Interpreter_SetupFor_MorphismWord
         if ( ! ( word->CAttribute & DEBUG_WORD ) ) interp->LastWord = word ;
         if ( ! GetState ( _Context_, ( C_SYNTAX ) ) ) List_InterpretLists ( _Compiler_->PostfixLists ) ; // with C_SYNTAX this is done in by _CfrTil_C_Infix_EqualOp or CfrTil_Interpret_C_Blocks
     }
@@ -156,6 +155,15 @@ Interpreter_ReadNextTokenToWord ( Interpreter * interp )
     return word ;
 }
 
+Boolean
+Word_IsSyntactic ( Word * word )
+{
+    if ( ( ! GetState ( _Debugger_, DBG_INFIX_PREFIX ) ) 
+        && ( ( word->WAttribute & ( WT_PREFIX | WT_C_PREFIX_RTL_ARGS ) ) || Lexer_IsWordPrefixing ( 0, word ) 
+        || ( ( word->WAttribute == WT_INFIXABLE ) && ( GetState ( _Context_, INFIX_MODE ) ) ) ) )
+        return true ;
+    else return false ;
+}
 #if 0
 
 Word *

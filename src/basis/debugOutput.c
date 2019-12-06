@@ -571,8 +571,8 @@ _Debugger_DoState ( Debugger * debugger )
         {
             _Printf ( ( byte* ) " ... Next stepping instruction ..." ) ;
             SetState ( debugger, DBG_START_STEPPING, false ) ;
+            Debugger_UdisOneInstruction ( debugger, debugger->DebugAddress, ( byte* ) "\r", ( byte* ) "" ) ;
         }
-        Debugger_UdisOneInstruction ( debugger, debugger->DebugAddress, ( byte* ) "\r", ( byte* ) "" ) ;
     }
     debugger->PreHere = Here ;
     //if ( debugger->w_Word ) 

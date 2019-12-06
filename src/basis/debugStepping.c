@@ -51,10 +51,13 @@ _Debugger_CompileAndStepOneInstruction ( Debugger * debugger, byte * jcAddress )
     if ( GetState ( debugger, DBG_AUTO_MODE ) ) //&& ( ! GetState ( debugger, DBG_CONTINUE_MODE ) ) ) 
     {
         SetState ( debugger, DBG_SHOW_STACK_CHANGE, false ) ;
-        Debugger_UdisOneInstruction ( debugger, debugger->DebugAddress, ( byte* ) "\r", ( byte* ) "" ) ;
-        if ( Compiling ) _Debugger_DisassembleWrittenCode ( debugger ) ;
     }
-    else _Debugger_ShowEffects ( debugger, debugger->w_Word, GetState ( debugger, DBG_STEPPING ), showExtraFlag ) ;
+    else
+    {
+        _Debugger_ShowEffects ( debugger, debugger->w_Word, GetState ( debugger, DBG_STEPPING ), showExtraFlag ) ;
+    }
+    Debugger_UdisOneInstruction ( debugger, debugger->DebugAddress, ( byte* ) "\r", ( byte* ) "" ) ;
+    if ( Compiling ) _Debugger_DisassembleWrittenCode ( debugger ) ;
     DebugColors ;
     debugger->DebugAddress = nextInsn ;
 }
@@ -261,18 +264,13 @@ Debugger_PreStartStepping ( Debugger * debugger )
         }
         else
         {
-            if ( ( ! GetState ( _Debugger_, DBG_INFIX_PREFIX ) ) &&
-                ( ( word->WAttribute & ( WT_PREFIX | WT_C_PREFIX_RTL_ARGS ) ) || Lexer_IsWordPrefixing ( 0, word ) || ( ( word->WAttribute == WT_INFIXABLE ) && ( GetState ( _Context_, INFIX_MODE ) ) ) ) )
+            if ( Word_IsSyntactic ( word ) )
             {
                 DebugOff ;
-                int64 tsrli = - 1, scwi = - 1 ;
                 Interpreter * interp = _Interpreter_ ;
-                //Interpreter_DoWord ( _Context_->Interpreter0, word, - 1, - 1 ) ;
-                Word_SetTsrliScwi ( word, tsrli, scwi ) ; // some of this maybe too much
-                Context * cntx = _Context_ ;
                 interp->w_Word = word ;
                 SetState ( _Debugger_, DBG_INFIX_PREFIX, true ) ;
-                Interpreter_DoInfixOrPrefixWord ( interp, word, tsrli, scwi ) ;
+                Interpreter_DoInfixOrPrefixWord ( interp, word, - 1, - 1 ) ;
                 DebugOn ;
                 if ( ! ( __DEBUG_SETUP ( word, 0, debugger->DebugAddress, 1 ) ) ) return ;
             }

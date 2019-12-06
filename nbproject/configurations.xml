@@ -596,11 +596,7 @@
         </cTool>
       </item>
       <item path="src/basis/debugDisassembly.c" ex="false" tool="0" flavor2="3">
-        <cTool flags="3">
-          <incDir>
-            <pElem>src/basis</pElem>
-            <pElem>src/include</pElem>
-          </incDir>
+        <cTool flags="0">
         </cTool>
       </item>
       <item path="src/basis/debugOutput.c" ex="false" tool="0" flavor2="3">
@@ -612,11 +608,19 @@
         </cTool>
       </item>
       <item path="src/basis/debugStepping.c" ex="false" tool="0" flavor2="3">
-        <cTool flags="0">
+        <cTool flags="3">
+          <incDir>
+            <pElem>src/basis</pElem>
+            <pElem>src/include</pElem>
+          </incDir>
         </cTool>
       </item>
       <item path="src/basis/debugger.c" ex="false" tool="0" flavor2="3">
-        <cTool flags="0">
+        <cTool flags="3">
+          <incDir>
+            <pElem>src/basis</pElem>
+            <pElem>src/include</pElem>
+          </incDir>
         </cTool>
       </item>
       <item path="src/basis/exception.c" ex="false" tool="0" flavor2="3">
