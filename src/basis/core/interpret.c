@@ -1,13 +1,22 @@
 
 #include "../../include/cfrtil64.h"
 
-void
-Interpreter_SetLexState ( Interpreter * interp )
+Word *
+_Interpreter_TokenToWord ( Interpreter * interp, byte * token, int64 tsrli, int64 scwi )
 {
-    if ( GetState ( _Lexer_, LEXER_END_OF_LINE ) ) SetState ( interp, END_OF_LINE, true ) ;
-    if ( interp->LastLexedChar == 0 ) SetState ( interp, END_OF_STRING, true ) ;
-    else if ( interp->LastLexedChar == eof ) SetState ( interp, END_OF_FILE, true ) ;
-    else if ( interp->LastLexedChar == '\n' ) SetState ( interp, END_OF_LINE, true ) ;
+    Word * word ;
+    _Context_->CurrentTokenWord = 0 ;
+    if ( token )
+    {
+        interp->Token = token ;
+        word = Finder_Word_FindUsing ( interp->Finder0, token, 0 ) ;
+        if ( word && interp->Compiler0->AutoVarTypeNamespace && ( word->CAttribute & NAMESPACE_VARIABLE ) ) word = 0 ;
+        if ( ! word ) word = Lexer_ObjectToken_New ( interp->Lexer0, token, tsrli, scwi ) ;
+        Word_SetTsrliScwi ( word, tsrli, scwi ) ;
+        _Context_->CurrentTokenWord = word ;
+        DEBUG_SETUP ( word ) ;
+    }
+    return _Context_->CurrentTokenWord ; // allow DEBUG_SETUP to set this to 0 to skip it when it is 'stepped'
 }
 
 Word *
@@ -51,15 +60,12 @@ Interpreter_DoInfixWord ( Interpreter * interp, Word * word )
     {
         if ( ( word->CAttribute2 & C_INFIX_OP_EQUAL ) ) SetState ( compiler, C_INFIX_EQUAL, true ) ;
         token = Interpret_C_Until_Token4 ( interp, ( byte* ) ";", ( byte* ) ",", ( byte* ) ")", ( byte* ) "]", ( byte* ) " \n\r\t", 0 ) ;
-        // token will be interpreted next time thru interp loop
+        // Interpret_C_Until_Token4 : CfrTil_PushToken_OnTokenList ( token ) ; token will be interpreted next time thru interp loop
     }
     else Interpreter_InterpretNextToken ( interp ) ;
     // then continue and interpret this 'word' - just one out of lexical order
     SetState ( compiler, DOING_BEFORE_AN_INFIX_WORD, false ) ; //svState ) ;
     if ( ! GetState ( _Debugger_, DBG_INFIX_PREFIX ) ) Interpreter_DoWord_Default ( interp, word, word->W_RL_Index, word->W_SC_Index ) ;
-    //if ( token ) Interpreter_InterpretAToken ( interp, token, - 1, - 1 ) ;
-    // token will be interpreted next time thru interp loop
-    //List_InterpretLists ( _Compiler_->PostfixLists ) ; 
     SetState ( compiler, ( DOING_AN_INFIX_WORD | C_INFIX_EQUAL ), false ) ; //svState ) ;
 }
 
@@ -86,15 +92,14 @@ Interpreter_C_PREFIX_RTL_ARGS_Word ( Word * word )
 }
 
 Boolean
-Interpreter_DoInfixOrPrefixWord ( Interpreter * interp, Word * word, int64 tsrli, int64 scwi )
+Interpreter_DoInfixOrPrefixWord ( Interpreter * interp, Word * word )
 {
     if ( word )
     {
-        //Word_SetTsrliScwi ( word, tsrli, scwi ) ; // some of this maybe too much
         Context * cntx = _Context_ ;
         interp->w_Word = word ;
         if ( ( word->WAttribute == WT_INFIXABLE ) && ( GetState ( cntx, INFIX_MODE ) ) ) Interpreter_DoInfixWord ( interp, word ) ;
-        // nb. Interpreter must be in INFIX_MODE because it is effective for more than one word
+            // nb. Interpreter must be in INFIX_MODE because it is effective for more than one word
         else if ( ( word->WAttribute == WT_PREFIX ) || Lexer_IsWordPrefixing ( 0, word ) ) _Interpreter_DoPrefixWord ( cntx, interp, word ) ; //, tsrli, scwi ) ;
         else if ( word->WAttribute == WT_C_PREFIX_RTL_ARGS ) Interpreter_C_PREFIX_RTL_ARGS_Word ( word ) ;
         else return false ;
@@ -116,7 +121,7 @@ Interpreter_DoWord ( Interpreter * interp, Word * word, int64 tsrli, int64 scwi 
         Word_SetTsrliScwi ( word, tsrli, scwi ) ; // some of this maybe too much
         DEBUG_SETUP ( word ) ;
         interp->w_Word = word ;
-        if ( ! Interpreter_DoInfixOrPrefixWord ( interp, word, tsrli, scwi ) ) Interpreter_DoWord_Default ( interp, word, tsrli, scwi ) ; //  case WT_POSTFIX: case WT_INFIXABLE: // cf. also _Interpreter_SetupFor_MorphismWord
+        if ( ! Interpreter_DoInfixOrPrefixWord ( interp, word ) ) Interpreter_DoWord_Default ( interp, word, tsrli, scwi ) ; //  case WT_POSTFIX: case WT_INFIXABLE: // cf. also _Interpreter_SetupFor_MorphismWord
         if ( ! ( word->CAttribute & DEBUG_WORD ) ) interp->LastWord = word ;
         if ( ! GetState ( _Context_, ( C_SYNTAX ) ) ) List_InterpretLists ( _Compiler_->PostfixLists ) ; // with C_SYNTAX this is done in by _CfrTil_C_Infix_EqualOp or CfrTil_Interpret_C_Blocks
     }
@@ -124,25 +129,6 @@ Interpreter_DoWord ( Interpreter * interp, Word * word, int64 tsrli, int64 scwi 
 // interpret with find after parse for known objects
 // !! this version eliminates the possiblity of numbers being used as words !!
 // objects and morphisms - terms from category theory
-
-Word *
-_Interpreter_TokenToWord ( Interpreter * interp, byte * token, int64 tsrli, int64 scwi )
-{
-    Word * word ;
-    _Context_->CurrentTokenWord = 0 ;
-    if ( token )
-    {
-        interp->Token = token ;
-        word = Finder_Word_FindUsing ( interp->Finder0, token, 0 ) ;
-        if ( word && interp->Compiler0->AutoVarTypeNamespace && ( word->CAttribute & NAMESPACE_VARIABLE ) ) word = 0 ;
-        if ( ! word ) word = Lexer_ObjectToken_New ( interp->Lexer0, token, tsrli, scwi ) ;
-        Word_SetTsrliScwi ( word, tsrli, scwi ) ;
-        _Context_->CurrentTokenWord = word ;
-        DEBUG_SETUP ( word ) ;
-        if ( word ) SetState ( word, STEPPED, false ) ;
-    }
-    return _Context_->CurrentTokenWord ; // allow DEBUG_SETUP to set this to 0 to skip it when it is 'stepped'
-}
 
 Word *
 Interpreter_ReadNextTokenToWord ( Interpreter * interp )
@@ -157,28 +143,19 @@ Interpreter_ReadNextTokenToWord ( Interpreter * interp )
 Boolean
 Word_IsSyntactic ( Word * word )
 {
-    if ( ( ! GetState ( _Debugger_, DBG_INFIX_PREFIX ) ) 
-        && ( ( word->WAttribute & ( WT_PREFIX | WT_C_PREFIX_RTL_ARGS ) ) || Lexer_IsWordPrefixing ( 0, word ) 
+    if ( ( ! GetState ( _Debugger_, DBG_INFIX_PREFIX ) )
+        && ( ( word->WAttribute & ( WT_PREFIX | WT_C_PREFIX_RTL_ARGS ) ) || Lexer_IsWordPrefixing ( 0, word )
         || ( ( word->WAttribute == WT_INFIXABLE ) && ( GetState ( _Context_, INFIX_MODE ) ) ) ) )
         return true ;
     else return false ;
 }
-#if 0
-
-Word *
-Interpreter_SetupNextWord ( Interpreter * interp )
-{
-    Word * word = 0 ;
-    byte * token = Lexer_ReadToken ( interp->Lexer0 ) ;
-    if ( token ) word = _Interpreter_TokenToWord ( interp, token, _Lexer_->TokenStart_ReadLineIndex, _Lexer_->SC_Index ) ;
-    else SetState ( _Context_->Lexer0, LEXER_END_OF_LINE, true ) ;
-    return word ;
-}
 
 void
-Interpreter_InterpretNextToken2 ( Interpreter * interp )
+Interpreter_SetLexState ( Interpreter * interp )
 {
-    Word * word = Interpreter_SetupNextWord ( interp ) ;
-    Interpreter_DoWord ( interp, word, - 1, - 1 ) ;
+    if ( GetState ( _Lexer_, LEXER_END_OF_LINE ) ) SetState ( interp, END_OF_LINE, true ) ;
+    if ( interp->LastLexedChar == 0 ) SetState ( interp, END_OF_STRING, true ) ;
+    else if ( interp->LastLexedChar == eof ) SetState ( interp, END_OF_FILE, true ) ;
+    else if ( interp->LastLexedChar == '\n' ) SetState ( interp, END_OF_LINE, true ) ;
 }
-#endif
+

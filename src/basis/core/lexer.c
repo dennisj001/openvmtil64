@@ -125,23 +125,11 @@ Lexer_Init ( Lexer * lexer, byte * delimiters, uint64 state, uint64 allocType )
     Lexer_RestartToken ( lexer ) ;
 }
 
-#if 0
-
 byte
 Lexer_NextNonDelimiterChar ( Lexer * lexer )
 {
-    return _String_NextNonDelimiterChar ( _ReadLine_pb_NextChar ( lexer->ReadLiner0 ), lexer->DelimiterCharSet ) ;
-}
-#else
-
-byte
-Lexer_NextNonDelimiterChar ( Lexer * lexer )
-{
-    //return _String_NextNonDelimiterChar ( &lexer->ReadLiner0->InputLine [lexer->TokenEnd_ReadLineIndex - 1], lexer->DelimiterCharSet ) ;
-    //return _String_NextNonDelimiterChar ( &_ReadLiner_->InputLine [lexer->TokenEnd_ReadLineIndex - 1], lexer->DelimiterCharSet ) ;
     return _String_NextNonDelimiterChar ( _ReadLine_pb_NextChar ( lexer->ReadLiner0 ) - 1, lexer->DelimiterCharSet ) ;
 }
-#endif
 //----------------------------------------------------------------------------------------|
 //              get from/ add to head  |              | get from head      add to tail    |      
 // TokenList Tail <--> TokenList Head  |<interpreter> | PeekList Head <--> PeekList Tail  |
@@ -250,6 +238,8 @@ Boolean
 Lexer_IsNextWordLeftParen ( Lexer * lexer )
 {
     // with this any postfix word that is not a keyword or a c rtl arg word can now be used prefix with parentheses 
+    byte chr = ReadLine_LastChar ( _ReadLiner_ ) ;
+    if ( ! _CharSet_IsDelimiter ( lexer->DelimiterCharSet, chr ) ) return false ; // we need to start from a delimiter
     byte c = Lexer_NextNonDelimiterChar ( lexer ) ;
     if ( ( c == '(' ) ) return true ;
     else return false ;
@@ -258,13 +248,14 @@ Lexer_IsNextWordLeftParen ( Lexer * lexer )
 Boolean
 Lexer_IsWordPrefixing ( Lexer * lexer, Word * word )
 {
+    //if ( String_Equal ( "(", word->Name ) ) return false ;
     if ( GetState ( _Context_, LC_INTERPRET ) ) return true ;
     else if ( ( GetState ( _Context_, PREFIX_MODE ) ) &&
         ( ! ( word->CAttribute & ( CATEGORY_OP_OPEQUAL | CATEGORY_OP_EQUAL | KEYWORD ) ) ) && ( ! ( word->WAttribute & WT_C_PREFIX_RTL_ARGS ) ) )
     {
         return Lexer_IsNextWordLeftParen ( _Lexer_ ) ;
     }
-    return false ;
+    else return false ;
 }
 
 byte *

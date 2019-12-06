@@ -50,7 +50,7 @@
 #define GetState( obj, state ) ((obj) && _GetState( (obj)->State, (state) )) 
 #define _SetState( state, newState, flag ) ( ( (flag) > 0 ) ? ( (state) |= (newState) ) : ( (state) &= ~ (newState) ) ) 
 #define SetState_TrueFalse( obj, _true, _false )  ( ( (obj)->State |= (_true) ), ( (obj)->State &= ~ (_false) ) ) 
-#define SetState( obj, state, flag ) _SetState ( ((obj)->State), (state), flag )
+#define SetState( obj, state, flag ) (obj) ? _SetState ( ((obj)->State), (state), flag ) : 0
 #define SaveAndSetState( obj, state, flag ) (obj)->SavedState = ((obj)->State & (state)), _SetState ( ((obj)->State), (state), flag )
 #define RestoreSavedState( obj, state ) SetState_TrueFalse ( obj, state, (obj)->SavedState )
 #define Debugger_IsStepping( debugger ) GetState ( debugger, DBG_STEPPING )

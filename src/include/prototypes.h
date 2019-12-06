@@ -619,7 +619,7 @@ void Interpreter_DoInfixWord(Interpreter *interp, Word *word);
 void _Interpreter_DoPrefixWord(Context *cntx, Interpreter *interp, Word *word);
 void Interpreter_DoPrefixWord(Context *cntx, Interpreter *interp, Word *word);
 void Interpreter_C_PREFIX_RTL_ARGS_Word(Word *word);
-Boolean Interpreter_DoInfixOrPrefixWord(Interpreter *interp, Word *word, int64 tsrli, int64 scwi);
+Boolean Interpreter_DoInfixOrPrefixWord(Interpreter *interp, Word *word);
 void Interpreter_DoWord(Interpreter *interp, Word *word, int64 tsrli, int64 scwi);
 Word *_Interpreter_TokenToWord(Interpreter *interp, byte *token, int64 tsrli, int64 scwi);
 Word *Interpreter_ReadNextTokenToWord(Interpreter *interp);

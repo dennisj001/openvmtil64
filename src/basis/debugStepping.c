@@ -161,7 +161,7 @@ Debugger_CompileAndStepOneInstruction ( Debugger * debugger )
                 debugger->CopyRSP = 0 ;
                 if ( GetState ( debugger, DBG_BRK_INIT ) ) SetState_TrueFalse ( debugger, DBG_INTERPRET_LOOP_DONE | DBG_STEPPED, DBG_ACTIVE | DBG_BRK_INIT | DBG_STEPPING ) ;
                 else SetState_TrueFalse ( debugger, DBG_INTERPRET_LOOP_DONE | DBG_STEPPED, DBG_ACTIVE | DBG_STEPPING ) ;
-                if ( debugger->w_Word ) SetState ( debugger->w_Word, STEPPED, true ) ;
+                //if ( debugger->w_Word ) SetState ( debugger->w_Word, STEPPED, true ) ;
                 debugger->DebugAddress = 0 ;
                 SetState ( debugger->cs_Cpu, CPU_SAVED, false ) ;
             }
@@ -260,11 +260,11 @@ Debugger_PreStartStepping ( Debugger * debugger )
         {
             if ( Word_IsSyntactic ( word ) )
             {
-                DebugOff ;
                 Interpreter * interp = _Interpreter_ ;
                 interp->w_Word = word ;
+                DebugOff ;
                 SetState ( _Debugger_, DBG_INFIX_PREFIX, true ) ;
-                Interpreter_DoInfixOrPrefixWord ( interp, word, - 1, - 1 ) ;
+                Interpreter_DoInfixOrPrefixWord (interp, word) ;
                 DebugOn ;
                 if ( ! ( __DEBUG_SETUP ( word, 0, debugger->DebugAddress, 1 ) ) ) return ;
             }

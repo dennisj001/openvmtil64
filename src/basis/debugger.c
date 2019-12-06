@@ -22,19 +22,14 @@ _Debugger_InterpreterLoop ( Debugger * debugger )
     SetState ( debugger, DBG_STACK_OLD, true ) ;
     if ( GetState ( debugger, DBG_STEPPED ) )
     {
-        if ( debugger->w_Word ) SetState ( debugger->w_Word, STEPPED, true ) ;
-        if ( debugger->w_Alias && ( debugger->w_AliasOf == debugger->w_Word ) ) SetState ( debugger->w_Alias, STEPPED, true ) ;
-
+        _Context_->CurrentTokenWord = 0 ;
+        _Context_->CurrentEvalWord = 0 ;
         if ( ! Stack_Depth ( debugger->ReturnStack ) )
         {
             if ( GetState ( _Lexer_, LEXER_DONE | LEXER_END_OF_LINE ) ) SetState ( _Interpreter_, END_OF_LINE, true ) ;
             Debugger_Off ( debugger, 1 ) ;
-            if ( _Context_->CurrentEvalWord ) SetState ( _Context_->CurrentEvalWord, STEPPED, true ) ;
-            if ( _Context_->CurrentTokenWord ) SetState ( _Context_->CurrentTokenWord, STEPPED, true ) ;
-            _Context_->CurrentTokenWord = 0 ;
             siglongjmp ( _Context_->JmpBuf0, 1 ) ; // in Debugger_PreSetup
         }
-        else if ( ( ! debugger->w_Word ) || GetState ( debugger->w_Word, STEPPED ) ) SetState ( _Context_->CurrentEvalWord, STEPPED, true ) ;
     }
 }
 
@@ -43,7 +38,7 @@ _Debugger_PreSetup ( Debugger * debugger, Word * word, byte * token, byte * addr
 {
     if ( ! word ) word = Context_CurrentWord ( ) ;
     debugger->w_Word = word ;
-    if ( ( ! GetState ( word, STEPPED ) ) && ( Is_DebugModeOn && Is_DebugShowOn ) ) //|| forceFlag )
+    if ( Is_DebugModeOn && Is_DebugShowOn ) //|| forceFlag )
     {
         if ( forceFlag || GetState ( debugger, DBG_EVAL_AUTO_MODE ) || ( ! GetState ( debugger, DBG_AUTO_MODE | DBG_STEPPING ) ) )
         {
@@ -55,7 +50,7 @@ _Debugger_PreSetup ( Debugger * debugger, Word * word, byte * token, byte * addr
                     debugger->w_Word = word ;
                     if ( word->W_AliasOf )
                     {
-                        debugger->w_Alias = word ; 
+                        debugger->w_Alias = word ;
                         debugger->w_AliasOf = word->W_AliasOf ;
                     }
                     if ( forceFlag ) debugger->LastShowWord = 0 ;

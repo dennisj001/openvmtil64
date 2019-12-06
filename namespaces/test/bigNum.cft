@@ -17,9 +17,9 @@ c_syntaxOn
 int 
 factorial ( n | rec )
 {
-       rec = 1;
-       while ( n > 1 ) rec *= (n--) ;
-       return rec ;
+    rec = 1;
+    while ( n > 1 ) rec *= (n--) ;
+    return rec ;
 } 
 c_syntaxOff
 'factorial find wdiss 

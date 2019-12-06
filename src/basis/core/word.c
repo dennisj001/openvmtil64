@@ -31,24 +31,21 @@ Word_Run ( Word * word )
 #else
 
 void
-Word_Run ( Word * word )
+Word_Run ( Word * word0 )
 {
-    if ( word )
+    if ( word0 )
     {
-        word->StackPushRegisterCode = 0 ; // nb. used! by the rewriting optInfo
+        Word * word1 ;
+        word0->StackPushRegisterCode = 0 ; // nb. used! by the rewriting optInfo
         // keep track in the word itself where the machine code is to go, if this word is compiled or causes compiling code - used for optimization
-        Word_SetCodingAndSourceCoding ( word, Here ) ; // if we change it later (eg. in lambda calculus) we must change it there because the rest of the compiler depends on this
-        _Context_->CurrentlyRunningWord = word ;
-        DEBUG_SETUP ( word ) ;
-        if ( ! GetState ( word, STEPPED ) ) // set by the debuggger in DEBUG_SETUP
-        {
-            Block_Eval ( word->Definition ) ;
-        }
-        SetState ( word, STEPPED, false ) ;
-        _DEBUG_SHOW ( word, 0 ) ;
-        if ( IS_MORPHISM_TYPE ( word ) ) SetState ( _Context_, ADDRESS_OF_MODE, false ) ;
-        //_Context_->CurrentlyRunningWord = 0 ;
-        _Context_->LastRunWord = word ;
+        Word_SetCodingAndSourceCoding ( word0, Here ) ; // if we change it later (eg. in lambda calculus) we must change it there because the rest of the compiler depends on this
+        _Context_->CurrentlyRunningWord = word0 ;
+        DEBUG_SETUP ( word0 ) ;
+        word1 = _Context_->CurrentlyRunningWord ;
+        Block_Eval ( word1->Definition ) ; // _Context_->CurrentlyRunningWord (= 0) may have been modified by debugger //word->Definition ) ;
+        _DEBUG_SHOW ( word1, 0 ) ;
+        if ( IS_MORPHISM_TYPE ( word0 ) ) SetState ( _Context_, ADDRESS_OF_MODE, false ) ;
+        _Context_->LastRunWord = word0 ;
     }
 }
 #endif

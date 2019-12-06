@@ -617,8 +617,6 @@ _String_NextNonDelimiterChar ( byte * str0, byte * cset )
     byte * str = str0 ;
     if ( str )
     {
-        //if ( !_CharSet_IsDelimiter ( cset, *str ) ) while ( !_CharSet_IsDelimiter ( cset, *(++str) ) ) ;
-        //if ( _CharSet_IsDelimiter ( cset, *str ) ) while ( _CharSet_IsDelimiter ( cset, *(++str) ) )  ;
         for ( ; *str ; str ++ ) if ( ! _CharSet_IsDelimiter ( cset, *str ) ) break ;
     }
     return str ? *str : 0 ;
