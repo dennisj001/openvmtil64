@@ -48,7 +48,7 @@ _CfrTil_Init_SessionCore ( CfrTil * cfrTil, Boolean cntxDelFlag, Boolean promptF
     if ( ! _LC_ ) LC_LispNamespacesOff ( ) ;
     CfrTil_RuntimeInit ( cfrTil, cntxDelFlag ) ;
     OVT_RuntimeInit ( ) ;
-    OVT_StartupMessage ( promptFlag ) ;
+    OVT_StartupMessage ( cfrTil->InitSessionCoreTimes < 2 ) ;
     _OVT_Ok ( promptFlag ) ;
 }
 
