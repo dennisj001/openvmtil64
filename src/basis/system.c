@@ -260,6 +260,7 @@ _CfrTil_GetSystemState_String0 ( byte * buf )
     strcat ( ( char* ) buf, "c_syntax is " ) ;
     if ( GetState ( _Context_, C_SYNTAX ) ) strcat ( ( char* ) buf, "on, " ) ;
     else strcat ( ( char* ) buf, "off, " ) ;
+    if ( !GetState ( _Context_, PREFIX_MODE|INFIX_MODE ) ) strcat ( ( char* ) buf, "\npostfixMode is on" ) ;
 #if 0    
     strcat ( ( char* ) buf, "LHS is " ) ;
     if ( GetState ( _Context_, C_LHS ) ) strcat ( ( char* ) buf, "on, " ) ;
@@ -295,7 +296,7 @@ _CfrTil_SystemState_Print ( int64 pflag )
     buf = _CfrTil_GetSystemState_String1 ( buf ) ;
     _Printf ( ( byte* ) buf ) ;
     Boolean dsc = GetState ( _CfrTil_, DEBUG_SOURCE_CODE_MODE ) ;
-    _Printf ( ( byte* ) "\nDebug Source Code %s", dsc ? "on" : "off" ) ;
+    _Printf ( ( byte* ) "\nDebugSourceCode %s", dsc ? "on" : "off" ) ;
     Boolean bno = Namespace_IsUsing ( ( byte* ) "BigNum" ) ;
     _Printf ( ( byte* ) " : BigNum %s", bno ? "on" : "off" ) ;
     Boolean lo = Namespace_IsUsing ( ( byte* ) "Lisp" ) ;

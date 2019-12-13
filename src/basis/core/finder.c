@@ -122,8 +122,8 @@ Finder_Word_Find ( Finder * finder, byte * name, int64 flag, int64 saveQns )
             }
         }
         if ( ! rword ) rword = _Finder_Word_Find ( _Finder_, flag, name ) ;
+        CfrTil_WordAccounting ( ( byte* ) "Finder_Word_FindUsing" ) ;
     }
-    CfrTil_WordAccounting ( ( byte* ) "Finder_Word_FindUsing" ) ;
     return rword ;
 }
 

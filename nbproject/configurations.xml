@@ -131,7 +131,6 @@
       <itemPath>Makefile</itemPath>
       <itemPath>README.txt</itemPath>
       <itemPath>init.cft</itemPath>
-      <itemPath>nbproject/private/launcher.properties</itemPath>
       <itemPath>m</itemPath>
       <itemPath>m0</itemPath>
       <itemPath>mir</itemPath>
@@ -904,11 +903,7 @@
         </cTool>
       </item>
       <item path="src/primitives/syntaxes.c" ex="false" tool="0" flavor2="3">
-        <cTool flags="3">
-          <incDir>
-            <pElem>src/primitives</pElem>
-            <pElem>src/include</pElem>
-          </incDir>
+        <cTool flags="0">
         </cTool>
       </item>
       <item path="src/primitives/systems.c" ex="false" tool="0" flavor2="3">

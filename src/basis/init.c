@@ -32,11 +32,10 @@ OVT_RuntimeInit ()
 {
     OVT_FreeTempMem ( ) ;
     OVT_MemList_DeleteNBAMemory ( ( byte* ) "ObjectSpace", 1 ) ; // 1 : re-init
-    OVT_StartupMessage ( ) ;
 }
 
 void
-_CfrTil_Init_SessionCore ( CfrTil * cfrTil, int64 cntxDelFlag, int64 promptFlag )
+_CfrTil_Init_SessionCore ( CfrTil * cfrTil, Boolean cntxDelFlag, Boolean promptFlag )
 {
     Context * cntx = cfrTil->Context0 ;
     _System_Init ( cntx->System0 ) ;
@@ -49,6 +48,7 @@ _CfrTil_Init_SessionCore ( CfrTil * cfrTil, int64 cntxDelFlag, int64 promptFlag 
     if ( ! _LC_ ) LC_LispNamespacesOff ( ) ;
     CfrTil_RuntimeInit ( cfrTil, cntxDelFlag ) ;
     OVT_RuntimeInit ( ) ;
+    OVT_StartupMessage ( promptFlag ) ;
     _OVT_Ok ( promptFlag ) ;
 }
 

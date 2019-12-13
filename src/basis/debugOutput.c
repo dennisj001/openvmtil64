@@ -139,7 +139,7 @@ _Debugger_ShowEffects ( Debugger * debugger, Word * word, Boolean stepFlag, Bool
         }
         _Debugger_DisassembleWrittenCode ( debugger ) ;
         const char * insert ;
-        uint64 change, depthChange ;
+        uint64 change ; int64 depthChange ;
         if ( Debugger_IsStepping ( debugger ) )
         {
             change = dsp - debugger->SaveDsp ;
@@ -338,7 +338,7 @@ _Debugger_ShowInfo ( Debugger * debugger, byte * prompt, int64 signal, int64 for
         if ( ( location == debugger->Filename ) && ( GetState ( debugger, DBG_FILENAME_LOCATION_SHOWN ) ) ) location = ( byte * ) "..." ;
         SetState ( debugger, DBG_FILENAME_LOCATION_SHOWN, true ) ;
         //Word * word = (debugger->LastShowWord == debugger->w_Word) ? debugger->w_Word : _Context_->CurrentEvalWord ; //_Context_->CurrentlyRunningWord ;
-        Word * word = debugger->w_Word ? debugger->w_Word : _Context_->CurrentEvalWord ? _Context_->CurrentEvalWord : _Context_->LastEvalWord ; //Context_CurrentWord ( ) ;
+        Word * word = debugger->w_Word ; //? debugger->w_Word : _Context_->CurrentEvalWord ? _Context_->CurrentEvalWord : _Context_->LastEvalWord ; //Context_CurrentWord ( ) ;
         byte * token0 = word ? word->Name : debugger->Token, *token1 ;
         if ( ( signal == 11 ) || _Q_->SigAddress )
         {

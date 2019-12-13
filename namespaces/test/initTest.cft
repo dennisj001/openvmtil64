@@ -116,5 +116,5 @@ nl "_TestDone_ =" ps _TestDone_ @ p nl
 { _TestDone_ @ not } { pause } if2 
 //stack pause
 2 + 7 assertStkChk // stack checking
-//"\nending initTest.cft\nstack is...\n" ddps sp
+
 

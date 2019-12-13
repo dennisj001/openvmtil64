@@ -46,6 +46,7 @@ Word_Run ( Word * word0 )
         _DEBUG_SHOW ( word1, 0 ) ;
         if ( IS_MORPHISM_TYPE ( word0 ) ) SetState ( _Context_, ADDRESS_OF_MODE, false ) ;
         _Context_->LastRunWord = word0 ;
+        _Context_->CurrentlyRunningWord = 0 ;
     }
 }
 #endif

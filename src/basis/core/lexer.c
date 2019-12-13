@@ -237,7 +237,7 @@ _Lexer_Next_NonDebugOrCommentTokenWord ( Lexer * lexer, byte * delimiters, Boole
 Boolean
 Lexer_IsNextWordLeftParen ( Lexer * lexer )
 {
-    // with this any postfix word that is not a keyword or a c rtl arg word can now be used prefix with parentheses 
+    // with this any postfix word that is not a keyword or a c rtl arg word can now be used prefix with parentheses (in PREFIX_MODE)
     byte chr = ReadLine_LastChar ( _ReadLiner_ ) ;
     if ( ! _CharSet_IsDelimiter ( lexer->DelimiterCharSet, chr ) ) return false ; // we need to start from a delimiter
     byte c = Lexer_NextNonDelimiterChar ( lexer ) ;
@@ -248,12 +248,12 @@ Lexer_IsNextWordLeftParen ( Lexer * lexer )
 Boolean
 Lexer_IsWordPrefixing ( Lexer * lexer, Word * word )
 {
-    //if ( String_Equal ( "(", word->Name ) ) return false ;
+    if ( word->Name[0] == '(' ) return false ;
     if ( GetState ( _Context_, LC_INTERPRET ) ) return true ;
-    else if ( ( GetState ( _Context_, PREFIX_MODE ) ) &&
-        ( ! ( word->CAttribute & ( CATEGORY_OP_OPEQUAL | CATEGORY_OP_EQUAL | KEYWORD ) ) ) && ( ! ( word->WAttribute & WT_C_PREFIX_RTL_ARGS ) ) )
+    else if ( ( GetState ( _Context_, PREFIX_MODE ) ) && ( ! ( word->CAttribute & ( CATEGORY_OP_OPEQUAL | CATEGORY_OP_EQUAL | KEYWORD ) ) ) 
+        && ( ! ( word->WAttribute & WT_C_PREFIX_RTL_ARGS ) ) )
     {
-        return Lexer_IsNextWordLeftParen ( _Lexer_ ) ;
+        return Lexer_IsNextWordLeftParen ( lexer ) ; 
     }
     else return false ;
 }

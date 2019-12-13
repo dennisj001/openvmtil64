@@ -1,5 +1,5 @@
 #include "../include/cfrtil64.h"
-#define VERSION ((byte*) "0.898.010" ) 
+#define VERSION ((byte*) "0.898.500" ) 
 // Logic/Foml (Foundations of Mathematical Logic by Haskell Curry), Oop (Object Oriented Programming), 
 // C, Lisp, Rpn/Lag : Reverse Polish Notation, (Left Associative Grammar), Pda : Push Down Automata, Tm : Turing Machine :: 
 // (til : a toolkit for implementing languages (maybe even a compiler compiler) based on these ideas)
@@ -21,17 +21,17 @@ openvmtil ( int64 argc, char * argv [ ] )
 void
 OpenVmTil_Run ( int64 argc, char * argv [ ] )
 {
-    int64 restartCondition = INITIAL_START, restarts = 0, sigSegvs = 0 ;
+    int64 restartCondition = INITIAL_START, restarts = 0, sigSegvs = 0 ; 
     while ( 1 )
     {
         OpenVmTil * ovt = _Q_ = _OpenVmTil_New ( _Q_, argc, argv ) ;
         ovt->RestartCondition = restartCondition ;
         ovt->SigSegvs = sigSegvs ;
-        _Q_->Verbosity = 1 ;
+        ovt->Verbosity = 1 ;
+        ovt->Restarts = ++ restarts ;
         if ( ! sigsetjmp ( ovt->JmpBuf0, 0 ) ) CfrTil_Run ( ovt->OVT_CfrTil, ovt->RestartCondition ) ;
         restartCondition = ovt->RestartCondition ;
         sigSegvs = ovt->SigSegvs ;
-        ovt->Restarts = ++ restarts ;
     }
 }
 

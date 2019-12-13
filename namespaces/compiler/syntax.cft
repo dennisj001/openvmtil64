@@ -78,5 +78,8 @@ c_syntaxOff
 0 ? "er" ps : "ok" ps   
 1 ? "ok" ps : "er" ps   
 //pause
+infixOff 
+: hi ( n ) 1 2 + infixOn + n @ + 3 infixOff n ! return n ; 3 hi 9 _assert
+: hip ( n ) 1 2 + {| infixOn |} + n @ + 3 infixOff n ! return n ; 3 hip 9 _assert
 2 + 7 assertStkChk // stack checking
 sp

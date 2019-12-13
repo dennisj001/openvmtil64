@@ -175,6 +175,7 @@ doJmpCall:
             if ( word && ( word->CAttribute & ( DEBUG_WORD ) ) &&
                 ( word->CAttribute2 & ( RT_STEPPING_DEBUG ) ) )
             {
+                //debugger->w_Word = word ;
                 if ( ! GetState ( debugger, DBG_CONTINUE_MODE ) )
                 {
                     SetState ( debugger, DBG_AUTO_MODE, false ) ;

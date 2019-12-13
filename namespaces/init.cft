@@ -22,7 +22,9 @@ Root
 //_dbgOn 'tick ' _tick find alias immediate
 'tick ' _tick find alias immediate
 'ndrop '_ndrop find alias immediate 
-'forth 'postfix find alias
+'forth 'postfixOn find alias
+'cOn 'c_syntaxOn find alias
+'cOff 'c_syntaxOff find alias
 "log" variable 
 "User" namespace 
 Io Int
@@ -167,7 +169,7 @@ bnInit ( 16 16 )
 Root
 : bigNumOff "BigNum" notUsing ;
 'bnOff 'bigNumOff find alias
-: bnOn BigNum bnInit ( 8 8 ) ;
+: bnOn BigNum bnInit ( 16 16 ) ;
 bnOff
 
 Compiler 
@@ -355,7 +357,7 @@ Root
 Lisp OpenVmTil
 : lispOff "Lisp" notUsing "LispTemp" notUsing "LispDefines" notUsing ; //lcReset ;
 : lispOn lcOn ;
-postfix 
+postfixOn 
 Root
 sp 
 : sh _sh ; prefix
@@ -409,22 +411,19 @@ rtw
 
 stringMacrosOff
 
-#else // of course you can trim this file to your needs and put your init code maybe here if you like
+#else // !Is_DebugOn : of course you can trim this file to your needs and put your init code maybe here if you like
 
 'doInitTest 1 const
 #if doInitTest
-#endif 
+//
+#endif // #else
 
-postfix 
 bnOff
-2 t{ + }t 7 assertStkChk // stack checking
 Shell
 
 #endif
-rtw
 infixOn
 (1 + 5) / (2 + 1) 2 _assert
 infixOff
-//verbosity 0 =
-//pause
-//s
+rtw
+2 + 7 assertStkChk // stack checking

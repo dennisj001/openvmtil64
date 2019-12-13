@@ -131,14 +131,17 @@ OVT_Exit ( )
 }
 
 void
-OVT_StartupMessage ( )
+OVT_StartupMessage ( Boolean promptFlag )
 {
-    if ( _Q_->Verbosity > 0 ) 
+    if ( _Q_->Verbosity > 0 )
     {
         DefaultColors ;
         //if ( _CfrTil_->InitSessionCoreTimes > 1 ) CfrTil_NewLine () ;
-        if ( _CfrTil_->InitSessionCoreTimes == 1 ) System_Time ( _CfrTil_->Context0->System0, 0, ( char* ) "\nStartup", 1 ) ; 
-        _CfrTil_Version ( 0 ) ;
+        if ( promptFlag && ( _Q_->Restarts < 2 ) )
+        {
+            System_Time ( _CfrTil_->Context0->System0, 0, ( char* ) "\nStartup", 1 ) ;
+            _CfrTil_Version ( promptFlag ) ;
+        }
         if ( _Q_->Verbosity > 1 )
         {
             _Printf ( ( byte* ) "\nOpenVmTil : cfrTil comes with ABSOLUTELY NO WARRANTY; for details type `license' in the source directory." ) ;
@@ -146,11 +149,11 @@ OVT_StartupMessage ( )
             _Printf ( ( byte* ) "\nType 'bye' to exit" ) ;
         }
     }
-    if ( ! _Q_->Verbosity ) _Q_->Verbosity = 1 ;
+    else if ( promptFlag && ( _Q_->Restarts < 2 ) ) _Q_->Verbosity = 1 ;
 }
 
 void
-_OVT_Ok ( int64 promptFlag )
+_OVT_Ok ( Boolean promptFlag )
 {
     if ( _Q_->Verbosity > 3 )
     {

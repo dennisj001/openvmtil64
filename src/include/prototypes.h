@@ -494,7 +494,7 @@ void CheckCodeSpaceForRoom(void);
 /* src/basis/init.c */
 void CfrTil_RuntimeInit(CfrTil *cfrTil, int64 cntxDelFlag);
 void OVT_RuntimeInit(void);
-void _CfrTil_Init_SessionCore(CfrTil *cfrTil, int64 cntxDelFlag, int64 promptFlag);
+void _CfrTil_Init_SessionCore(CfrTil *cfrTil, Boolean cntxDelFlag, Boolean promptFlag);
 void CfrTil_SessionInit(void);
 void CfrTil_ResetAll_Init(CfrTil *cfrTil);
 void _CfrTil_InitialAddWordToNamespace(Word *word, byte *containingNamespaceName, byte *superNamespaceName);
@@ -611,7 +611,7 @@ Word *Tree_Map_OneNamespace_TwoArgs(Namespace *ns, MapFunction_2 mf2, int64 one,
 Word *Tree_Map_State_OneArg(uint64 state, MapFunction_1 mf, int64 one);
 void List_N_M_Node_PrintWords(dllist *alist);
 /* src/basis/core/interpret.c */
-void Interpreter_SetLexState(Interpreter *interp);
+Word *_Interpreter_TokenToWord(Interpreter *interp, byte *token, int64 tsrli, int64 scwi);
 Word *Interpreter_InterpretAToken(Interpreter *interp, byte *token, int64 tsrli, int64 scwi);
 void Interpreter_InterpretNextToken(Interpreter *interp);
 Word *Interpreter_DoWord_Default(Interpreter *interp, Word *word0, int64 tsrli, int64 scwi);
@@ -621,9 +621,9 @@ void Interpreter_DoPrefixWord(Context *cntx, Interpreter *interp, Word *word);
 void Interpreter_C_PREFIX_RTL_ARGS_Word(Word *word);
 Boolean Interpreter_DoInfixOrPrefixWord(Interpreter *interp, Word *word);
 void Interpreter_DoWord(Interpreter *interp, Word *word, int64 tsrli, int64 scwi);
-Word *_Interpreter_TokenToWord(Interpreter *interp, byte *token, int64 tsrli, int64 scwi);
 Word *Interpreter_ReadNextTokenToWord(Interpreter *interp);
 Boolean Word_IsSyntactic(Word *word);
+void Interpreter_SetLexState(Interpreter *interp);
 /* src/basis/core/lexer.c */
 Word *Lexer_ObjectToken_New(Lexer *lexer, byte *token, int64 tsrli, int64 scwi);
 void Lexer_Set_ScIndex_RlIndex(Lexer *lexer, Word *word, int64 tsrli, int64 scwi);
@@ -948,7 +948,7 @@ void CfrTil_DoubleQuoteMacro(void);
 void Context_Interpret(Context *cntx);
 byte *Context_IsInFile(Context *cntx);
 /* src/basis/core/word.c */
-void Word_Run(Word *word);
+void Word_Run(Word *word0);
 void Word_Eval(Word *word);
 void _Word_Interpret(Word *word);
 void _Word_Compile(Word *word);
@@ -1788,8 +1788,8 @@ void OpenVmTil_DictionarySize(void);
 void OpenVmTil_Print_DataSizeofInfo(int64 flag);
 void OVT_ShowMemoryAllocated(void);
 void OVT_Exit(void);
-void OVT_StartupMessage(void);
-void _OVT_Ok(int64 promptFlag);
+void OVT_StartupMessage(Boolean promptFlag);
+void _OVT_Ok(Boolean promptFlag);
 void OVT_Ok(void);
 /* src/primitives/ios.c */
 void Fflush(void);
@@ -1881,7 +1881,7 @@ void CfrTil_Filename(void);
 void CfrTil_Location(void);
 void CfrTil_LineNumber(void);
 void CfrTil_LineCharacterNumber(void);
-void _CfrTil_Version(int64 flag);
+void _CfrTil_Version(Boolean flag);
 void CfrTil_Version(void);
 void CfrTil_SystemState_Print(void);
 void _SetEcho(int64 boolFlag);
@@ -2056,7 +2056,7 @@ void CfrTil_InfixModeOn(void);
 void CfrTil_PrefixModeOff(void);
 void CfrTil_PrefixModeOn(void);
 void CfrTil_C_Syntax_Off(void);
-void CfrTil_Postfix(void);
+void CfrTil_PostfixModeOn(void);
 void CfrTil_C_Syntax_On(void);
 void CfrTil_AddressOf(void);
 void CfrTil_C_Semi(void);

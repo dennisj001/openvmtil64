@@ -12,18 +12,17 @@ _OpenVmTil_ShowExceptionInfo ( )
     Debugger * debugger = _Debugger_ ;
     DebugOn ;
     if ( ! _Q_->ExceptionCode & ( STACK_ERROR | STACK_OVERFLOW | STACK_UNDERFLOW ) ) Debugger_Stack ( debugger ) ;
-    if ( ( ! word ) && _Q_->ExceptionToken )
+    if ( ! word )
     {
         word = Finder_Word_FindUsing ( _Finder_, _Q_->ExceptionToken, 1 ) ;
         if ( ! word )
         {
             if ( _Q_->SigAddress ) word = Word_GetFromCodeAddress ( ( byte* ) _Q_->SigAddress ) ;
-            else word = _Context_->CurrentEvalWord ? _Context_->CurrentEvalWord : _Context_->LastEvalWord;
+            //else word = _Context_->CurrentEvalWord ? _Context_->CurrentEvalWord : _Context_->LastEvalWord;
             debugger->w_Word = word ;
         }
     }
     AlertColors ;
-    //debugger->w_Word = _Context_->CurrentlyRunningWord ;
     SetState ( debugger, DBG_INFO, true ) ;
     Debugger_Locals_Show ( debugger ) ;
     Debugger_ShowInfo ( debugger, _Q_->ExceptionMessage, _Q_->Signal ) ;
@@ -90,11 +89,9 @@ OVT_Pause ( byte * prompt, int64 signalExceptionsHandled )
             _Q_->RestartCondition ) ;
         do
         {
-            if ( _Debugger_->w_Word = Context_CurrentWord ( ) )
-            {
-                _Debugger_ShowInfo ( _Debugger_, ( byte* ) "\r", _Q_->Signal, 0 ) ;
-                //_Debugger_->w_Word = 0 ;
-            }
+            if ( ( _Q_->ExceptionCode != NOT_A_KNOWN_OBJECT ) && ( ! _Debugger_->w_Word ) ) _Debugger_->w_Word = Context_CurrentWord ( ) ;
+            else _Debugger_->w_Word = 0 ;
+            _Debugger_ShowInfo ( _Debugger_, ( byte* ) "\r", _Q_->Signal, 0 ) ;
             _Printf ( ( byte* ) "%s", buffer ) ;
 
             int64 key = Key ( ) ;
@@ -217,6 +214,7 @@ OVT_SigLongJump ( byte * restartMessage, sigjmp_buf * jb )
 }
 
 // OVT_Throw needs to be reworked
+
 void
 OVT_Throw ( int signal, int64 restartCondition, Boolean pauseFlag )
 {

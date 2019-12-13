@@ -251,7 +251,7 @@ _CfrTil_RightBracket ( )
 void
 CfrTil_RightBracket ( )
 {
-    Compiler_Init ( _Compiler_, 0, 0 ) ;
+    if ( ! Compiling ) Compiler_Init ( _Compiler_, 0, 0 ) ;
     _CfrTil_RightBracket ( ) ;
 }
 

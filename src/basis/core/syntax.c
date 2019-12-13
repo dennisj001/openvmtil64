@@ -43,6 +43,7 @@ Interpret_C_Block_BeginBlock ( byte * tokenToUse, Boolean insertFlag )
     compiler->BeginBlockFlag = false ;
     SetState ( _Debugger_, DBG_OUTPUT_INSERTION, false ) ;
 }
+#if 0
 
 int64
 CfrTil_Interpret_C_Blocks ( int64 blocks, Boolean takesAnElseFlag, Boolean semicolonEndsThisBlock )
@@ -141,6 +142,129 @@ CfrTil_Interpret_C_Blocks ( int64 blocks, Boolean takesAnElseFlag, Boolean semic
     }
     return blocksParsed ;
 }
+#else
+
+int64
+CfrTil_Interpret_C_Blocks ( int64 blocks, Boolean takesAnElseFlag, Boolean semicolonEndsThisBlock )
+{
+    Context * cntx = _Context_ ;
+    Compiler * compiler = cntx->Compiler0 ;
+    Interpreter * interp = cntx->Interpreter0 ;
+    Word * word ;
+    byte * token ;
+    int64 blocksParsed = 0 ;
+
+    while ( blocksParsed < blocks )
+    {
+        token = Lexer_ReadToken ( cntx->Lexer0 ) ;
+        byte chr = token[0] ;
+        switch ( chr )
+        {
+            case '(':
+            {
+                if ( compiler->TakesLParenAsBlock && ( ! compiler->InLParenBlock ) )
+                {
+                    // interpret a (possible) 'for' c parenthesis expression
+                    compiler->InLParenBlock = true ;
+                    Interpret_C_Block_BeginBlock ( ( byte* ) "(", 0 ) ;
+                    compiler->TakesLParenAsBlock = false ; // after the first block
+                    break ;
+                }
+                goto doDefault ;
+            }
+            case ')':
+            {
+                if ( compiler->InLParenBlock )
+                {
+                    List_InterpretLists ( compiler->PostfixLists ) ;
+                    compiler->InLParenBlock = false ;
+                    compiler->TakesLParenAsBlock = false ;
+                    Interpret_C_Block_EndBlock ( ( byte* ) ")", 0 ) ;
+                    //CfrTil_TypeStack_Pop ( ) ; // the logic word
+                    if ( ! _Context_StringEqual_PeekNextToken ( _Context_, ( byte* ) "{", 0 ) )
+                    {
+                        Interpret_C_Block_BeginBlock ( ( byte* ) "{", 1 ) ;
+                        semicolonEndsThisBlock = true ;
+                    }
+                    blocksParsed ++ ;
+                    break ;
+                }
+                goto doDefault ;
+            }
+            case '{':
+            {
+                Interpret_C_Block_BeginBlock ( 0, 0 ) ;
+                semicolonEndsThisBlock = false ;
+                break ;
+            }
+            case '}':
+            {
+                Interpret_C_Block_EndBlock ( 0, 0 ) ;
+                blocksParsed ++ ;
+                break ;
+            }
+            //case ',' :
+            case ';' : 
+            {
+                List_InterpretLists ( compiler->PostfixLists ) ;
+                if ( semicolonEndsThisBlock )
+                {
+                    Interpret_C_Block_EndBlock ( ( byte* ) ";", 0 ) ;
+                    blocksParsed ++ ;
+                }
+                if ( compiler->InLParenBlock ) Interpret_C_Block_BeginBlock ( ( byte* ) "{", 1 ) ;
+                break ;
+            }
+            case 'e': 
+            {
+                if ( String_Equal ( ( char* ) token, "else" ) )
+                {
+                    if ( takesAnElseFlag )
+                    {
+                        takesAnElseFlag = false ;
+                        if ( ! _Context_StringEqual_PeekNextToken ( _Context_, ( byte* ) "{", 0 ) )
+                        {
+                            Interpret_C_Block_BeginBlock ( ( byte* ) "{", 1 ) ;
+                            semicolonEndsThisBlock = true ;
+                        }
+                        continue ;
+                    }
+                    else _SyntaxError ( "Syntax Error : incorrect \"else\" (with no \"if\"?) : ", 1 ) ;
+                }
+                // ... drop thru to default:
+            }
+            doDefault :
+            default:
+            {
+                word = _Interpreter_TokenToWord ( interp, token, - 1, - 1 ) ;
+                if ( word )
+                {
+                    Interpreter_DoWord ( interp, word, - 1, - 1 ) ;
+                    if ( word->CAttribute & COMBINATOR )
+                    {
+                        if ( semicolonEndsThisBlock )
+                        {
+                            Interpret_C_Block_EndBlock ( ( byte* ) "}", String_Equal ( token, ";" ) ) ;
+                            blocksParsed ++ ;
+                        }
+                    }
+                }
+                break ;
+            }
+        }
+        if ( takesAnElseFlag && ( blocksParsed == 2 ) )
+        {
+            if ( _Context_StringEqual_PeekNextToken ( _Context_, ( byte* ) "else", 0 ) )
+            {
+                blocks ++ ;
+                continue ;
+            }
+            else break ;
+        }
+    }
+    return blocksParsed ;
+}
+#endif
 
 void
 CfrTil_C_LeftParen ( )
@@ -158,7 +282,7 @@ CfrTil_C_LeftParen ( )
         CfrTil_LocalsAndStackVariablesBegin ( ) ;
         return ;
     }
-    else if ( CompileMode && (( ! GetState ( compiler, VARIABLE_FRAME ) ) || ( ReadLine_PeekNextNonWhitespaceChar ( rl ) == '|' ) ))
+    else if ( CompileMode && ( ( ! GetState ( compiler, VARIABLE_FRAME ) ) || ( ReadLine_PeekNextNonWhitespaceChar ( rl ) == '|' ) ) )
     {
         CfrTil_LocalsAndStackVariablesBegin ( ) ;
         return ;

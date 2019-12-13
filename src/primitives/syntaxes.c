@@ -6,14 +6,14 @@ void
 CfrTil_InfixModeOff ( )
 {
     SetState ( _Context_, INFIX_MODE, false ) ;
-    Namespace_SetAsNotUsing_MoveToTail ( ( byte* ) "Infix" ) ;
+    if ( ! Compiling ) Namespace_SetAsNotUsing_MoveToTail ( ( byte* ) "Infix" ) ;
 }
 
 void
 CfrTil_InfixModeOn ( )
 {
     SetState ( _Context_, INFIX_MODE, true ) ;
-    Namespace_DoNamespace_Name ( ( byte* ) "Infix" ) ;
+    if ( ! Compiling ) Namespace_DoNamespace_Name ( ( byte* ) "Infix" ) ;
 }
 
 void
@@ -47,7 +47,7 @@ CfrTil_C_Syntax_Off ( )
 // switch to the default forth, postfix mode
 
 void
-CfrTil_Postfix ( )
+CfrTil_PostfixModeOn ( )
 {
     CfrTil_C_Syntax_Off ( ) ;
     Namespace_SetAsNotUsing_MoveToTail ( ( byte* ) "Lisp" ) ;

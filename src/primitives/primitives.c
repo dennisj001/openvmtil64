@@ -514,12 +514,12 @@ CPrimitive CPrimitives [] = {
     { "dlsym:", 0, 0, 0, CfrTil_Dlsym, 0, 0, 0, "Reserved", "Compiler" },
     { "keyword", 0, 0, 0, CfrTil_Keyword, IMMEDIATE, 0, 0, "Reserved", "Compiler" },
     { "swap", 0, 0, 0, CfrTil_Swap, IMMEDIATE, 0, 0, "Reserved", "Compiler" },
-    { "|}", 0, 0, 0, CfrTil_RightBracket, IMMEDIATE, 0, 0, "Reserved", "Compiler" },
+    { "|}", 0, 0, 0, _CfrTil_RightBracket, IMMEDIATE, 0, 0, "Reserved", "Compiler" },
     { "{|", 0, 0, 0, CfrTil_LeftBracket, IMMEDIATE, 0, 0, "Reserved", "Compiler" },
 
     { "c_syntaxOn", 0, 0, 0, CfrTil_C_Syntax_On, IMMEDIATE, 0, 0, "Compiler", "Root" }, // put this here so Compiler will be in Root namespace and Compiler will close to the top
     { "c_syntaxOff", 0, 0, 0, CfrTil_C_Syntax_Off, IMMEDIATE, 0, 0, "Compiler", "Root" },
-    { "postfix", 0, 0, 0, CfrTil_Postfix, IMMEDIATE | KEYWORD, 0, 0, "Compiler", "Root" },
+    { "postfixOn", 0, 0, 0, CfrTil_PostfixModeOn, IMMEDIATE | KEYWORD, 0, 0, "Compiler", "Root" },
     { "goto", 0, 0, 0, CfrTil_Goto, IMMEDIATE, 0, 0, "Compiler", "Root" },
     { "continue", 0, 0, 0, CfrTil_Continue, IMMEDIATE, 0, 0, "Compiler", "Root" },
     { "return", 0, 0, 0, CfrTil_Return, IMMEDIATE, 0, 0, "Compiler", "Root" },

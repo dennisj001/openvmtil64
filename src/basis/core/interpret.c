@@ -100,7 +100,7 @@ Interpreter_DoInfixOrPrefixWord ( Interpreter * interp, Word * word )
         interp->w_Word = word ;
         if ( ( word->WAttribute == WT_INFIXABLE ) && ( GetState ( cntx, INFIX_MODE ) ) ) Interpreter_DoInfixWord ( interp, word ) ;
             // nb. Interpreter must be in INFIX_MODE because it is effective for more than one word
-        else if ( ( word->WAttribute == WT_PREFIX ) || Lexer_IsWordPrefixing ( 0, word ) ) _Interpreter_DoPrefixWord ( cntx, interp, word ) ; //, tsrli, scwi ) ;
+        else if ( ( word->WAttribute == WT_PREFIX ) || Lexer_IsWordPrefixing ( interp->Lexer0, word ) ) _Interpreter_DoPrefixWord ( cntx, interp, word ) ; //, tsrli, scwi ) ;
         else if ( word->WAttribute == WT_C_PREFIX_RTL_ARGS ) Interpreter_C_PREFIX_RTL_ARGS_Word ( word ) ;
         else return false ;
         return true ;
@@ -144,7 +144,7 @@ Boolean
 Word_IsSyntactic ( Word * word )
 {
     if ( ( ! GetState ( _Debugger_, DBG_INFIX_PREFIX ) )
-        && ( ( word->WAttribute & ( WT_PREFIX | WT_C_PREFIX_RTL_ARGS ) ) || Lexer_IsWordPrefixing ( 0, word )
+        && ( ( word->WAttribute & ( WT_PREFIX | WT_C_PREFIX_RTL_ARGS ) ) || Lexer_IsWordPrefixing ( _Lexer_, word )
         || ( ( word->WAttribute == WT_INFIXABLE ) && ( GetState ( _Context_, INFIX_MODE ) ) ) ) )
         return true ;
     else return false ;
