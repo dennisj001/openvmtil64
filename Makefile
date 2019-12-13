@@ -187,10 +187,8 @@ tar.xz :
 
 xz : 
 	-rm ~/openvmtil64/core
-	-rm -rf ~/backup/openvmtil64/
-	-mv .git ../backup
-	-cp -r ~/openvmtil64/ ~/backup/openvmtil64/
-	-mv ../backup/.git .
+	-rm -rf /home/dennisj.0/backup/openvmtil64/
+	-cp -r ~/openvmtil64/ /home/dennisj.0/backup/openvmtil64/
 	make tar.xz
 
 _all : realClean install
