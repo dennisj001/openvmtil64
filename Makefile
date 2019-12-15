@@ -183,32 +183,30 @@ cproto :
 	sudo apt-get install cproto
 	
 tar.xz :	
-	tar -c --xz --exclude=nbproject --exclude=objects --exclude=mpfr* --exclude=.git --exclude=*.png --exclude=cfrtil64-gdb  --exclude=*.o --exclude *.kdev* -f ../backup/cfrtil64.tar.xz * *.*
+	tar -c --xz --exclude=nbproject --exclude=objects --exclude=mpfr* --exclude=.git --exclude=*.png --exclude=cfrtil64-gdb  --exclude=*.o --exclude *.kdev* -f ../cfrtil64.tar.xz * *.*
 
 xz : 
 	-rm ~/openvmtil64/core
-	-rm -rf /home/dennisj.0/backup/openvmtil64/
-	-cp -r ~/openvmtil64/ /home/dennisj.0/backup/openvmtil64/
+	-rm -rf /home/backup/openvmtil64/
+	-cp -r ~/openvmtil64/ /home/backup/openvmtil64/
 	make tar.xz
 
 _all : realClean install
 	make xz
 
 _install : 
-	-mv .git ../backup
 	-cp ./init.cft ./namespaces/
 	-sudo rm -rf /usr/local/lib/cfrTil64/
 	-sudo cp -r ~/openvmtil64 /usr/local/lib/cfrTil64/
 	-sudo cp -r ~/openvmtil64/etc /usr/local/
 	-sudo cp ~/openvmtil64/lib/lib*.* /usr/lib
 	-sudo cp bin/* /usr/local/bin
-	-mv ../backup/.git .
 	-sudo ldconfig
+	ls -l /usr/local/bin/cfrtil64*
 
 install :
 	make
 	make _install
-	ls -l /usr/local/bin/cfrtil64*
 	
 run :
 	cfrtil64

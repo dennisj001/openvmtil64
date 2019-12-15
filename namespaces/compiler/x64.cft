@@ -37,6 +37,7 @@
 
 // cfrTil uses intel syntax convention
 //logOn
+cOff
 C 
 : apause ; // pause ;
 : sp ; //stack pause ; 

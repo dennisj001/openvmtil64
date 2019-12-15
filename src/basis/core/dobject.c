@@ -79,7 +79,6 @@ void
 _DObject_ValueDefinition_Init ( Word * word, uint64 value, uint64 objType, byte * function, int64 arg )
 // using a variable that is a type or a function 
 {
-    //if ( GetState ( _Context_->Compiler0, LC_ARG_PARSING | PREFIX_ARG_PARSING ) ) word->W_TokenStart_ReadLineIndex = _Context_->Lexer0->TokenStart_ReadLineIndex ;
     word->W_PtrToValue = & word->W_Value ; // lvalue
     if ( objType & BLOCK )
     {
