@@ -62,7 +62,6 @@ _Debugger_PreSetup ( Debugger * debugger, Word * word, byte * token, byte * addr
                     debugger->WordDsp = _Dsp_ ;
                     debugger->SaveTOS = TOS ;
                     debugger->Token = word->Name ? word->Name : token ;
-                    debugger->PreHere = Here ;
                     if ( address )
                     {
                         SetState ( debugger, DBG_SETUP_ADDRESS, true ) ;
@@ -327,7 +326,6 @@ _Debugger_Eval ( Debugger * debugger, Boolean continueFlag )
     if ( continueFlag && Debugger_IsStepping ( debugger ) ) Debugger_Continue ( debugger ) ;
     SetState_TrueFalse ( debugger, DBG_INTERPRET_LOOP_DONE | DBG_EVAL_AUTO_MODE, DBG_STEPPING ) ;
     if ( GetState ( debugger, DBG_AUTO_MODE ) ) SetState ( debugger, DBG_EVAL_AUTO_MODE, true ) ;
-    debugger->PreHere = Here ;
 }
 
 void

@@ -9,7 +9,6 @@ CfrTil_RuntimeInit ( CfrTil * cfrTil, int64 cntxDelFlag )
     CfrTil_LogOff ( ) ;
     cfrTil->SC_QuoteMode = 0 ;
     cfrTil->ScWord = 0 ;
-    cfrTil->InitSessionCoreTimes ++ ;
     if ( cntxDelFlag )
     {
         int64 i, stackDepth = Stack_Depth ( cfrTil->ContextDataStack ) ;
@@ -48,7 +47,8 @@ _CfrTil_Init_SessionCore ( CfrTil * cfrTil, Boolean cntxDelFlag, Boolean promptF
     if ( ! _LC_ ) LC_LispNamespacesOff ( ) ;
     CfrTil_RuntimeInit ( cfrTil, cntxDelFlag ) ;
     OVT_RuntimeInit ( ) ;
-    OVT_StartupMessage ( cfrTil->InitSessionCoreTimes < 2 ) ;
+    OVT_StartupMessage ( promptFlag && ( cfrTil->InitSessionCoreTimes < 2 )) ;
+    cfrTil->InitSessionCoreTimes ++ ;
     _OVT_Ok ( promptFlag ) ;
 }
 

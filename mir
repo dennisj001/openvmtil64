@@ -6,7 +6,7 @@ cp ../cfrtil64.$1.tar.xz /home/backup/cfrtil64.$1.tar.xz
 cp ../cfrtil64.$1.tar.xz /home/backup/archive/cfrtil64.$1.tar.xz
 cp ../cfrtil64.$1.tar.xz ~/Public/
 cp ../cfrtil64.$1.tar.xz  ~/ubackup/
-cp ../cfrtil64.$1.tar.xz  ~/Documents/backup/
+#cp ../cfrtil64.$1.tar.xz  ~/Documents/backup/
 cp ../cfrtil64.$1.tar.xz  ~/Programs/Programs2/forth/cfrtil64/backup/
 cp ../cfrtil64.$1.tar.xz  ~/Programs/Programs2/backup/
 mv ../cfrtil64.$1.tar.xz  ~/workspace/backup/

@@ -145,7 +145,7 @@ OVT_StartupMessage ( Boolean promptFlag )
         if ( _Q_->Verbosity > 1 )
         {
             _Printf ( ( byte* ) "\nOpenVmTil : cfrTil comes with ABSOLUTELY NO WARRANTY; for details type `license' in the source directory." ) ;
-            _Printf ( ( byte* ) "\nType 'testCfrTil' or 'test' <tab><enter> and then 'demo' for starters" ) ;
+            _Printf ( ( byte* ) "\nType 'tc' 'demo' for starters" ) ;
             _Printf ( ( byte* ) "\nType 'bye' to exit" ) ;
         }
     }

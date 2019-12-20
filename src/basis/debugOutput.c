@@ -575,7 +575,6 @@ _Debugger_DoState ( Debugger * debugger )
         }
     }
     debugger->PreHere = Here ;
-    //if ( debugger->w_Word ) 
 }
 
 void

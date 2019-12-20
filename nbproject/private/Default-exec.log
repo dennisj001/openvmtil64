@@ -1,5 +1,5 @@
 called: gcc
-	/media/sdc4/dennisj/openvmtil64
+	/media/sdd3/dennisj/openvmtil64
 	gcc
 	-ggdb
 	-c
@@ -8,7 +8,7 @@ called: gcc
 	src/basis/compiler/machineCode.c
 
 called: gcc
-	/media/sdc4/dennisj/openvmtil64
+	/media/sdd3/dennisj/openvmtil64
 	gcc
 	-ggdb
 	-c
@@ -17,7 +17,7 @@ called: gcc
 	src/basis/compiler/_compile.c
 
 called: gcc
-	/media/sdc4/dennisj/openvmtil64
+	/media/sdd3/dennisj/openvmtil64
 	gcc
 	-ggdb
 	-c
@@ -26,7 +26,7 @@ called: gcc
 	src/basis/compiler/memory.c
 
 called: gcc
-	/media/sdc4/dennisj/openvmtil64
+	/media/sdd3/dennisj/openvmtil64
 	gcc
 	-ggdb
 	-c
@@ -35,7 +35,7 @@ called: gcc
 	src/basis/compiler/combinators.c
 
 called: gcc
-	/media/sdc4/dennisj/openvmtil64
+	/media/sdd3/dennisj/openvmtil64
 	gcc
 	-ggdb
 	-c
@@ -44,7 +44,7 @@ called: gcc
 	src/basis/compiler/math.c
 
 called: gcc
-	/media/sdc4/dennisj/openvmtil64
+	/media/sdd3/dennisj/openvmtil64
 	gcc
 	-ggdb
 	-c
@@ -53,7 +53,16 @@ called: gcc
 	src/basis/compiler/cpu.c
 
 called: gcc
-	/media/sdc4/dennisj/openvmtil64
+	/media/sdd3/dennisj/openvmtil64
+	gcc
+	-ggdb
+	-c
+	-o
+	src/basis/compiler/mcPrimitives.o
+	src/basis/compiler/mcPrimitives.c
+
+called: gcc
+	/media/sdd3/dennisj/openvmtil64
 	gcc
 	-ggdb
 	-c
@@ -62,7 +71,7 @@ called: gcc
 	src/basis/compiler/stack.c
 
 called: gcc
-	/media/sdc4/dennisj/openvmtil64
+	/media/sdd3/dennisj/openvmtil64
 	gcc
 	-ggdb
 	-c
@@ -71,7 +80,7 @@ called: gcc
 	src/basis/compiler/logic.c
 
 called: gcc
-	/media/sdc4/dennisj/openvmtil64
+	/media/sdd3/dennisj/openvmtil64
 	gcc
 	-ggdb
 	-c
@@ -80,7 +89,7 @@ called: gcc
 	src/basis/core/dataObjectRun.c
 
 called: gcc
-	/media/sdc4/dennisj/openvmtil64
+	/media/sdd3/dennisj/openvmtil64
 	gcc
 	-ggdb
 	-c
@@ -89,7 +98,7 @@ called: gcc
 	src/basis/core/block.c
 
 called: gcc
-	/media/sdc4/dennisj/openvmtil64
+	/media/sdd3/dennisj/openvmtil64
 	gcc
 	-ggdb
 	-c
@@ -98,7 +107,7 @@ called: gcc
 	src/basis/compiler/blocks.c
 
 called: gcc
-	/media/sdc4/dennisj/openvmtil64
+	/media/sdd3/dennisj/openvmtil64
 	gcc
 	-ggdb
 	-c
@@ -107,7 +116,7 @@ called: gcc
 	src/basis/core/conditionals.c
 
 called: gcc
-	/media/sdc4/dennisj/openvmtil64
+	/media/sdd3/dennisj/openvmtil64
 	gcc
 	-ggdb
 	-c
@@ -116,7 +125,7 @@ called: gcc
 	src/basis/compiler/compile.c
 
 called: gcc
-	/media/sdc4/dennisj/openvmtil64
+	/media/sdd3/dennisj/openvmtil64
 	gcc
 	-ggdb
 	-c
@@ -125,7 +134,7 @@ called: gcc
 	src/basis/core/_system.c
 
 called: gcc
-	/media/sdc4/dennisj/openvmtil64
+	/media/sdd3/dennisj/openvmtil64
 	gcc
 	-ggdb
 	-c
@@ -134,7 +143,7 @@ called: gcc
 	src/basis/compiler/optimize.c
 
 called: gcc
-	/media/sdc4/dennisj/openvmtil64
+	/media/sdd3/dennisj/openvmtil64
 	gcc
 	-ggdb
 	-c
@@ -143,7 +152,7 @@ called: gcc
 	src/basis/compiler/bit.c
 
 called: gcc
-	/media/sdc4/dennisj/openvmtil64
+	/media/sdd3/dennisj/openvmtil64
 	gcc
 	-ggdb
 	-c
@@ -152,7 +161,7 @@ called: gcc
 	src/basis/compiler/udis.c
 
 called: gcc
-	/media/sdc4/dennisj/openvmtil64
+	/media/sdd3/dennisj/openvmtil64
 	gcc
 	-ggdb
 	-c
@@ -161,7 +170,7 @@ called: gcc
 	src/basis/compiler/arrays.c
 
 called: gcc
-	/media/sdc4/dennisj/openvmtil64
+	/media/sdd3/dennisj/openvmtil64
 	gcc
 	-ggdb
 	-c
@@ -170,7 +179,7 @@ called: gcc
 	src/basis/core/io.c
 
 called: gcc
-	/media/sdc4/dennisj/openvmtil64
+	/media/sdd3/dennisj/openvmtil64
 	gcc
 	-ggdb
 	-c
@@ -179,7 +188,7 @@ called: gcc
 	src/basis/core/symbol.c
 
 called: gcc
-	/media/sdc4/dennisj/openvmtil64
+	/media/sdd3/dennisj/openvmtil64
 	gcc
 	-ggdb
 	-c
@@ -188,7 +197,7 @@ called: gcc
 	src/basis/repl.c
 
 called: gcc
-	/media/sdc4/dennisj/openvmtil64
+	/media/sdd3/dennisj/openvmtil64
 	gcc
 	-ggdb
 	-c
@@ -197,7 +206,7 @@ called: gcc
 	src/basis/core/syntax.c
 
 called: gcc
-	/media/sdc4/dennisj/openvmtil64
+	/media/sdd3/dennisj/openvmtil64
 	gcc
 	-ggdb
 	-c
@@ -206,7 +215,7 @@ called: gcc
 	src/basis/core/dataObjectNew.c
 
 called: gcc
-	/media/sdc4/dennisj/openvmtil64
+	/media/sdd3/dennisj/openvmtil64
 	gcc
 	-ggdb
 	-c
@@ -215,7 +224,7 @@ called: gcc
 	src/basis/cfrtil64.c
 
 called: gcc
-	/media/sdc4/dennisj/openvmtil64
+	/media/sdd3/dennisj/openvmtil64
 	gcc
 	-ggdb
 	-c
@@ -224,7 +233,7 @@ called: gcc
 	src/basis/core/parse.c
 
 called: gcc
-	/media/sdc4/dennisj/openvmtil64
+	/media/sdd3/dennisj/openvmtil64
 	gcc
 	-ggdb
 	-c
@@ -233,7 +242,7 @@ called: gcc
 	src/basis/core/memSpace.c
 
 called: gcc
-	/media/sdc4/dennisj/openvmtil64
+	/media/sdd3/dennisj/openvmtil64
 	gcc
 	-ggdb
 	-c
@@ -242,7 +251,7 @@ called: gcc
 	src/basis/init.c
 
 called: gcc
-	/media/sdc4/dennisj/openvmtil64
+	/media/sdd3/dennisj/openvmtil64
 	gcc
 	-ggdb
 	-c
@@ -251,7 +260,7 @@ called: gcc
 	src/basis/system.c
 
 called: gcc
-	/media/sdc4/dennisj/openvmtil64
+	/media/sdd3/dennisj/openvmtil64
 	gcc
 	-ggdb
 	-c
@@ -260,7 +269,7 @@ called: gcc
 	src/basis/core/charSet.c
 
 called: gcc
-	/media/sdc4/dennisj/openvmtil64
+	/media/sdd3/dennisj/openvmtil64
 	gcc
 	-ggdb
 	-c
@@ -269,7 +278,7 @@ called: gcc
 	src/basis/core/dllist.c
 
 called: gcc
-	/media/sdc4/dennisj/openvmtil64
+	/media/sdd3/dennisj/openvmtil64
 	gcc
 	-ggdb
 	-c
@@ -278,7 +287,7 @@ called: gcc
 	src/basis/core/interpret.c
 
 called: gcc
-	/media/sdc4/dennisj/openvmtil64
+	/media/sdd3/dennisj/openvmtil64
 	gcc
 	-ggdb
 	-c
@@ -287,7 +296,7 @@ called: gcc
 	src/basis/core/lexer.c
 
 called: gcc
-	/media/sdc4/dennisj/openvmtil64
+	/media/sdd3/dennisj/openvmtil64
 	gcc
 	-ggdb
 	-c
@@ -296,7 +305,7 @@ called: gcc
 	src/basis/core/cstack.c
 
 called: gcc
-	/media/sdc4/dennisj/openvmtil64
+	/media/sdd3/dennisj/openvmtil64
 	gcc
 	-ggdb
 	-c
@@ -305,7 +314,7 @@ called: gcc
 	src/basis/core/classes.c
 
 called: gcc
-	/media/sdc4/dennisj/openvmtil64
+	/media/sdd3/dennisj/openvmtil64
 	gcc
 	-ggdb
 	-c
@@ -314,7 +323,7 @@ called: gcc
 	src/basis/debugOutput.c
 
 called: gcc
-	/media/sdc4/dennisj/openvmtil64
+	/media/sdd3/dennisj/openvmtil64
 	gcc
 	-ggdb
 	-c
@@ -323,7 +332,7 @@ called: gcc
 	src/basis/core/namespace.c
 
 called: gcc
-	/media/sdc4/dennisj/openvmtil64
+	/media/sdd3/dennisj/openvmtil64
 	gcc
 	-ggdb
 	-c
@@ -332,7 +341,7 @@ called: gcc
 	src/basis/history.c
 
 called: gcc
-	/media/sdc4/dennisj/openvmtil64
+	/media/sdd3/dennisj/openvmtil64
 	gcc
 	-ggdb
 	-c
@@ -341,7 +350,7 @@ called: gcc
 	src/basis/core/readline.c
 
 called: gcc
-	/media/sdc4/dennisj/openvmtil64
+	/media/sdd3/dennisj/openvmtil64
 	gcc
 	-ggdb
 	-c
@@ -350,7 +359,7 @@ called: gcc
 	src/basis/core/dataStack.c
 
 called: gcc
-	/media/sdc4/dennisj/openvmtil64
+	/media/sdd3/dennisj/openvmtil64
 	gcc
 	-ggdb
 	-c
@@ -359,7 +368,7 @@ called: gcc
 	src/basis/context.c
 
 called: gcc
-	/media/sdc4/dennisj/openvmtil64
+	/media/sdd3/dennisj/openvmtil64
 	gcc
 	-ggdb
 	-c
@@ -368,7 +377,7 @@ called: gcc
 	src/basis/core/word.c
 
 called: gcc
-	/media/sdc4/dennisj/openvmtil64
+	/media/sdd3/dennisj/openvmtil64
 	gcc
 	-ggdb
 	-c
@@ -377,7 +386,7 @@ called: gcc
 	src/basis/core/readTable.c
 
 called: gcc
-	/media/sdc4/dennisj/openvmtil64
+	/media/sdd3/dennisj/openvmtil64
 	gcc
 	-ggdb
 	-c
@@ -386,7 +395,7 @@ called: gcc
 	src/basis/bigNum.c
 
 called: gcc
-	/media/sdc4/dennisj/openvmtil64
+	/media/sdd3/dennisj/openvmtil64
 	gcc
 	-ggdb
 	-c
@@ -395,7 +404,7 @@ called: gcc
 	src/basis/core/_readline.c
 
 called: gcc
-	/media/sdc4/dennisj/openvmtil64
+	/media/sdd3/dennisj/openvmtil64
 	gcc
 	-ggdb
 	-c
@@ -404,7 +413,7 @@ called: gcc
 	src/basis/core/array.c
 
 called: gcc
-	/media/sdc4/dennisj/openvmtil64
+	/media/sdd3/dennisj/openvmtil64
 	gcc
 	-ggdb
 	-c
@@ -413,7 +422,7 @@ called: gcc
 	src/basis/compiler/compiler.c
 
 called: gcc
-	/media/sdc4/dennisj/openvmtil64
+	/media/sdd3/dennisj/openvmtil64
 	gcc
 	-ggdb
 	-c
@@ -422,7 +431,7 @@ called: gcc
 	src/basis/core/dllnodes.c
 
 called: gcc
-	/media/sdc4/dennisj/openvmtil64
+	/media/sdd3/dennisj/openvmtil64
 	gcc
 	-ggdb
 	-c
@@ -431,7 +440,7 @@ called: gcc
 	src/basis/core/finder.c
 
 called: gcc
-	/media/sdc4/dennisj/openvmtil64
+	/media/sdd3/dennisj/openvmtil64
 	gcc
 	-ggdb
 	-c
@@ -440,7 +449,7 @@ called: gcc
 	src/basis/interpreters.c
 
 called: gcc
-	/media/sdc4/dennisj/openvmtil64
+	/media/sdd3/dennisj/openvmtil64
 	gcc
 	-ggdb
 	-c
@@ -449,7 +458,7 @@ called: gcc
 	src/basis/tabCompletion.c
 
 called: gcc
-	/media/sdc4/dennisj/openvmtil64
+	/media/sdd3/dennisj/openvmtil64
 	gcc
 	-ggdb
 	-c
@@ -458,7 +467,7 @@ called: gcc
 	src/basis/colors.c
 
 called: gcc
-	/media/sdc4/dennisj/openvmtil64
+	/media/sdd3/dennisj/openvmtil64
 	gcc
 	-ggdb
 	-c
@@ -467,7 +476,7 @@ called: gcc
 	src/basis/sourceCode.c
 
 called: gcc
-	/media/sdc4/dennisj/openvmtil64
+	/media/sdd3/dennisj/openvmtil64
 	gcc
 	-ggdb
 	-c
@@ -476,7 +485,7 @@ called: gcc
 	src/basis/debugStepping.c
 
 called: gcc
-	/media/sdc4/dennisj/openvmtil64
+	/media/sdd3/dennisj/openvmtil64
 	gcc
 	-ggdb
 	-c
@@ -485,7 +494,7 @@ called: gcc
 	src/basis/core/string.c
 
 called: gcc
-	/media/sdc4/dennisj/openvmtil64
+	/media/sdd3/dennisj/openvmtil64
 	gcc
 	-ggdb
 	-c
@@ -494,7 +503,7 @@ called: gcc
 	src/basis/openVmTil.c
 
 called: gcc
-	/media/sdc4/dennisj/openvmtil64
+	/media/sdd3/dennisj/openvmtil64
 	gcc
 	-ggdb
 	-c
@@ -503,7 +512,7 @@ called: gcc
 	src/basis/core/dobject.c
 
 called: gcc
-	/media/sdc4/dennisj/openvmtil64
+	/media/sdd3/dennisj/openvmtil64
 	gcc
 	-ggdb
 	-c
@@ -512,7 +521,7 @@ called: gcc
 	src/basis/core/preprocessor.c
 
 called: gcc
-	/media/sdc4/dennisj/openvmtil64
+	/media/sdd3/dennisj/openvmtil64
 	gcc
 	-ggdb
 	-c
@@ -521,7 +530,7 @@ called: gcc
 	src/basis/attribute.c
 
 called: gcc
-	/media/sdc4/dennisj/openvmtil64
+	/media/sdd3/dennisj/openvmtil64
 	gcc
 	-ggdb
 	-c
@@ -530,7 +539,7 @@ called: gcc
 	src/basis/lists.c
 
 called: gcc
-	/media/sdc4/dennisj/openvmtil64
+	/media/sdd3/dennisj/openvmtil64
 	gcc
 	-ggdb
 	-c
@@ -539,7 +548,7 @@ called: gcc
 	src/basis/debugDisassembly.c
 
 called: gcc
-	/media/sdc4/dennisj/openvmtil64
+	/media/sdd3/dennisj/openvmtil64
 	gcc
 	-ggdb
 	-c
@@ -548,7 +557,7 @@ called: gcc
 	src/basis/typeCheck.c
 
 called: gcc
-	/media/sdc4/dennisj/openvmtil64
+	/media/sdd3/dennisj/openvmtil64
 	gcc
 	-ggdb
 	-c
@@ -557,7 +566,7 @@ called: gcc
 	src/basis/linux.c
 
 called: gcc
-	/media/sdc4/dennisj/openvmtil64
+	/media/sdd3/dennisj/openvmtil64
 	gcc
 	-ggdb
 	-c
@@ -566,7 +575,7 @@ called: gcc
 	src/basis/exception.c
 
 called: gcc
-	/media/sdc4/dennisj/openvmtil64
+	/media/sdd3/dennisj/openvmtil64
 	gcc
 	-ggdb
 	-c
@@ -575,7 +584,7 @@ called: gcc
 	src/basis/compiler/locals.c
 
 called: gcc
-	/media/sdc4/dennisj/openvmtil64
+	/media/sdd3/dennisj/openvmtil64
 	gcc
 	-ggdb
 	-c
@@ -584,7 +593,7 @@ called: gcc
 	src/basis/debugger.c
 
 called: gcc
-	/media/sdc4/dennisj/openvmtil64
+	/media/sdd3/dennisj/openvmtil64
 	gcc
 	-ggdb
 	-c
@@ -593,7 +602,7 @@ called: gcc
 	src/basis/interpreter.c
 
 called: gcc
-	/media/sdc4/dennisj/openvmtil64
+	/media/sdd3/dennisj/openvmtil64
 	gcc
 	-ggdb
 	-c
@@ -602,7 +611,7 @@ called: gcc
 	src/basis/_debug.c
 
 called: gcc
-	/media/sdc4/dennisj/openvmtil64
+	/media/sdd3/dennisj/openvmtil64
 	gcc
 	-ggdb
 	-c
@@ -611,7 +620,7 @@ called: gcc
 	src/basis/lc/lambdaCalculus.c
 
 called: gcc
-	/media/sdc4/dennisj/openvmtil64
+	/media/sdd3/dennisj/openvmtil64
 	gcc
 	-ggdb
 	-c
@@ -620,7 +629,7 @@ called: gcc
 	src/basis/lc/apply.c
 
 called: gcc
-	/media/sdc4/dennisj/openvmtil64
+	/media/sdd3/dennisj/openvmtil64
 	gcc
 	-ggdb
 	-c
@@ -629,7 +638,7 @@ called: gcc
 	src/basis/lc/eval.c
 
 called: gcc
-	/media/sdc4/dennisj/openvmtil64
+	/media/sdd3/dennisj/openvmtil64
 	gcc
 	-ggdb
 	-c
@@ -638,7 +647,7 @@ called: gcc
 	src/basis/lc/read.c
 
 called: gcc
-	/media/sdc4/dennisj/openvmtil64
+	/media/sdd3/dennisj/openvmtil64
 	gcc
 	-ggdb
 	-c
@@ -647,7 +656,7 @@ called: gcc
 	src/basis/lc/print.c
 
 called: gcc
-	/media/sdc4/dennisj/openvmtil64
+	/media/sdd3/dennisj/openvmtil64
 	gcc
 	-ggdb
 	-c
@@ -656,7 +665,7 @@ called: gcc
 	src/basis/lc/special.c
 
 called: gcc
-	/media/sdc4/dennisj/openvmtil64
+	/media/sdd3/dennisj/openvmtil64
 	gcc
 	-ggdb
 	-c
@@ -665,7 +674,7 @@ called: gcc
 	src/primitives/strings.c
 
 called: gcc
-	/media/sdc4/dennisj/openvmtil64
+	/media/sdd3/dennisj/openvmtil64
 	gcc
 	-ggdb
 	-c
@@ -674,7 +683,7 @@ called: gcc
 	src/primitives/bits.c
 
 called: gcc
-	/media/sdc4/dennisj/openvmtil64
+	/media/sdd3/dennisj/openvmtil64
 	gcc
 	-ggdb
 	-c
@@ -683,7 +692,7 @@ called: gcc
 	src/primitives/maths.c
 
 called: gcc
-	/media/sdc4/dennisj/openvmtil64
+	/media/sdd3/dennisj/openvmtil64
 	gcc
 	-ggdb
 	-c
@@ -692,7 +701,7 @@ called: gcc
 	src/primitives/logics.c
 
 called: gcc
-	/media/sdc4/dennisj/openvmtil64
+	/media/sdd3/dennisj/openvmtil64
 	gcc
 	-ggdb
 	-c
@@ -701,7 +710,7 @@ called: gcc
 	src/primitives/openvmtils.c
 
 called: gcc
-	/media/sdc4/dennisj/openvmtil64
+	/media/sdd3/dennisj/openvmtil64
 	gcc
 	-ggdb
 	-c
@@ -710,7 +719,7 @@ called: gcc
 	src/primitives/ios.c
 
 called: gcc
-	/media/sdc4/dennisj/openvmtil64
+	/media/sdd3/dennisj/openvmtil64
 	gcc
 	-ggdb
 	-c
@@ -719,7 +728,7 @@ called: gcc
 	src/primitives/parsers.c
 
 called: gcc
-	/media/sdc4/dennisj/openvmtil64
+	/media/sdd3/dennisj/openvmtil64
 	gcc
 	-ggdb
 	-c
@@ -728,7 +737,7 @@ called: gcc
 	src/primitives/interpreters.c
 
 called: gcc
-	/media/sdc4/dennisj/openvmtil64
+	/media/sdd3/dennisj/openvmtil64
 	gcc
 	-ggdb
 	-c
@@ -737,7 +746,7 @@ called: gcc
 	src/primitives/namespaces.c
 
 called: gcc
-	/media/sdc4/dennisj/openvmtil64
+	/media/sdd3/dennisj/openvmtil64
 	gcc
 	-ggdb
 	-c
@@ -746,7 +755,7 @@ called: gcc
 	src/primitives/systems.c
 
 called: gcc
-	/media/sdc4/dennisj/openvmtil64
+	/media/sdd3/dennisj/openvmtil64
 	gcc
 	-ggdb
 	-c
@@ -755,7 +764,7 @@ called: gcc
 	src/primitives/compilers.c
 
 called: gcc
-	/media/sdc4/dennisj/openvmtil64
+	/media/sdd3/dennisj/openvmtil64
 	gcc
 	-ggdb
 	-c
@@ -764,7 +773,7 @@ called: gcc
 	src/primitives/words.c
 
 called: gcc
-	/media/sdc4/dennisj/openvmtil64
+	/media/sdd3/dennisj/openvmtil64
 	gcc
 	-ggdb
 	-c
@@ -773,7 +782,7 @@ called: gcc
 	src/primitives/file.c
 
 called: gcc
-	/media/sdc4/dennisj/openvmtil64
+	/media/sdd3/dennisj/openvmtil64
 	gcc
 	-ggdb
 	-c
@@ -782,7 +791,7 @@ called: gcc
 	src/primitives/stacks.c
 
 called: gcc
-	/media/sdc4/dennisj/openvmtil64
+	/media/sdd3/dennisj/openvmtil64
 	gcc
 	-ggdb
 	-c
@@ -791,7 +800,7 @@ called: gcc
 	src/primitives/debuggers.c
 
 called: gcc
-	/media/sdc4/dennisj/openvmtil64
+	/media/sdd3/dennisj/openvmtil64
 	gcc
 	-ggdb
 	-c
@@ -800,7 +809,7 @@ called: gcc
 	src/primitives/memorys.c
 
 called: gcc
-	/media/sdc4/dennisj/openvmtil64
+	/media/sdd3/dennisj/openvmtil64
 	gcc
 	-ggdb
 	-c
@@ -809,7 +818,7 @@ called: gcc
 	src/primitives/primitives.c
 
 called: gcc
-	/media/sdc4/dennisj/openvmtil64
+	/media/sdd3/dennisj/openvmtil64
 	gcc
 	-ggdb
 	-c
@@ -818,7 +827,7 @@ called: gcc
 	src/primitives/contexts.c
 
 called: gcc
-	/media/sdc4/dennisj/openvmtil64
+	/media/sdd3/dennisj/openvmtil64
 	gcc
 	-ggdb
 	-c
@@ -827,7 +836,7 @@ called: gcc
 	src/primitives/disassembler.c
 
 called: gcc
-	/media/sdc4/dennisj/openvmtil64
+	/media/sdd3/dennisj/openvmtil64
 	gcc
 	-ggdb
 	-c
@@ -836,7 +845,7 @@ called: gcc
 	src/primitives/syntaxes.c
 
 called: gcc
-	/media/sdc4/dennisj/openvmtil64
+	/media/sdd3/dennisj/openvmtil64
 	gcc
 	-ggdb
 	-O3
@@ -846,7 +855,7 @@ called: gcc
 	src/primitives/cmaths.o
 
 called: gcc
-	/media/sdc4/dennisj/openvmtil64
+	/media/sdd3/dennisj/openvmtil64
 	gcc
 	-ggdb
 	-c
@@ -855,7 +864,7 @@ called: gcc
 	src/primitives/dataObjectNews.c
 
 called: gcc
-	/media/sdc4/dennisj/openvmtil64
+	/media/sdd3/dennisj/openvmtil64
 	gcc
 	-ggdb
 	src/basis/compiler/machineCode.o
@@ -864,6 +873,7 @@ called: gcc
 	src/basis/compiler/combinators.o
 	src/basis/compiler/math.o
 	src/basis/compiler/cpu.o
+	src/basis/compiler/mcPrimitives.o
 	src/basis/compiler/stack.o
 	src/basis/compiler/logic.o
 	src/basis/core/dataObjectRun.o
@@ -965,12 +975,12 @@ called: gcc
 	-lgmp
 
 called: /usr/bin/ld
-	/media/sdc4/dennisj/openvmtil64
+	/media/sdd3/dennisj/openvmtil64
 	/usr/bin/ld
 	-plugin
 	/usr/lib/gcc/x86_64-linux-gnu/9/liblto_plugin.so
 	-plugin-opt=/usr/lib/gcc/x86_64-linux-gnu/9/lto-wrapper
-	-plugin-opt=-fresolution=/tmp/cc2dMTKp.res
+	-plugin-opt=-fresolution=/tmp/cc9jZQcJ.res
 	-plugin-opt=-pass-through=-lgcc
 	-plugin-opt=-pass-through=-lgcc_s
 	-plugin-opt=-pass-through=-lc
@@ -1009,6 +1019,7 @@ called: /usr/bin/ld
 	src/basis/compiler/combinators.o
 	src/basis/compiler/math.o
 	src/basis/compiler/cpu.o
+	src/basis/compiler/mcPrimitives.o
 	src/basis/compiler/stack.o
 	src/basis/compiler/logic.o
 	src/basis/core/dataObjectRun.o

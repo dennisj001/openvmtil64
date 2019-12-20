@@ -33,6 +33,7 @@ decimal
 
 "DSP" R14D const 
 "FP" R15D const 
+'ACC RAX const
 
 // ttt codes
 "BELOW" 1 const 
@@ -52,6 +53,9 @@ decimal
 "CALL" 2 const
 "BYTE" 1 const
 "CELL" 8 const
+"CELL_SIZE" 8 const
+'INT32_SIZE 4 const
+'TO_REG 3 const
 "N" 1 const // used with JCC n/ttt notation
 
 // opCodes

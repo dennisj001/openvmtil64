@@ -154,6 +154,7 @@ type char ; char.size = 1 ;
 type int ; int.size = 8 ;
 type long ; long.size = 8 ;
 type quad ; quad.size = 16 ;
+type Boolean ; Boolean.size = 1 ;
 c_syntaxOff
 
 BigNum
@@ -414,7 +415,7 @@ stringMacrosOff
 
 'doInitTest 1 const
 #if doInitTest
-//
+//fload namespaces/compiler/machineCode.cft
 #endif // #else
 
 bnOff
@@ -426,4 +427,3 @@ infixOn
 infixOff
 rtw
 2 + 7 assertStkChk // stack checking
-//fload namespaces/compiler/machineCode.cft

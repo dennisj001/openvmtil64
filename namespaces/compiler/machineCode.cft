@@ -73,6 +73,10 @@
 '_Compile_Cell '8, find alias
 '_Compile_Int64 '8, find alias
 "namespaces/compiler/asmConstants.cft" include
+'_DBI 1 const
+cOn
+C
+//#define d1( ) ( )
 
 // instruction letter codes : I - immediate data ; 32 : 32 bit , 8 : 8 bit ; EAX, DSP : registers
 // we could have a mod of 0 so the modRmImmDispFlag is necessary
@@ -87,7 +91,7 @@ _Compile_ImmDispData ( int64 immDisp, Boolean size, Boolean forceFlag )
     if ( size > 0 )
     {
         if ( size == BYTE )
-            _Compile_Int8 ( ( byte ) immDisp ) ;
+            d: _Compile_Int8 ( ( byte ) immDisp ) ;
         else if ( size == 4 )
             _Compile_Int32 ( immDisp ) ;
         else if ( size == CELL )
@@ -115,19 +119,23 @@ _Compile_Write_Instruction_X64 ( Boolean rex, uint8 opCode0, uint8 opCode1, Bool
     if ( sib && ( controlFlags & SIB_B ) ) _Compile_Int8 ( sib ) ;
     if ( disp || ( controlFlags & DISP_B ) ) _Compile_ImmDispData ( disp, dispSize, 0 ) ;
     if ( imm || ( controlFlags & IMM_B ) ) _Compile_ImmDispData ( imm, immSize, ( controlFlags & IMM_B ) ) ;
+#if 0
     if ( _DBI )
     {
-        d1 ( Debugger_UdisOneInstruction ( _Debugger_, here, ( byte* ) "", ( byte* ) "" ) ; ) ;
-        d0 ( _Debugger_Disassemble ( _Debugger_, ( byte* ) here, Here - here, 1 ) ) ;
+        Debugger_UdisOneInstruction ( _Debugger_, here, ( byte* ) "", ( byte* ) "" ) ; 
+        //_Debugger_Disassemble ( _Debugger_, ( byte* ) here, Here - here, 1 ) ;
     }
+#endif
 }
 
+#if 0
 Boolean
 RegParameterOrder ( Boolean n )
 {
     Boolean regOrder [] = { RDI, RSI, RDX, RCX, ACC, OREG } ;
     return regOrder [n] ;
 }
+#endif
 
 // some checks of the internal consistency of the instruction bits
 
@@ -239,7 +247,7 @@ CalculateModRmByte ( Boolean mod, Boolean reg, Boolean rm, Boolean sib, int64 di
         //if ( ( mod < 3 ) && ( ( ( rm == 4 ) && ( sib == 0 ) ) || ( ( rm == 5 ) && ( disp == 0 ) ) ) )
     {
         // cf. InstructionSet-A-M-253666.pdf Table 2-2
-        CfrTil_Exception ( MACHINE_CODE_ERROR, 0, 1 ) ;
+        //CfrTil_Exception ( MACHINE_CODE_ERROR, 0, 1 ) ;
     }
     if ( sib )
     {
@@ -340,6 +348,18 @@ Compile_Move_Reg_To_Reg ( Boolean dstReg, int64 srcReg )
 // reg : is address in case of MEMORY else it is the register (reg) value
 
 void
+Compile_MoveImm_To_Reg ( Boolean rm, int64 imm, Boolean immSize )
+{
+    Compile_MoveImm ( REG, rm, 0, imm, immSize ) ;
+}
+
+void
+Compile_MoveImm_To_Mem ( Boolean rm, int64 imm, Boolean immSize )
+{
+    Compile_MoveImm ( MEM, rm, 0, imm, immSize ) ;
+}
+
+void
 Compile_MoveImm ( Boolean mod, Boolean rm, int64 disp, int64 imm, Boolean immSize )
 {
     if ( ( mod == MEM ) && ( ( immSize == 8 ) || ( imm > 0xffffffff ) ) )
@@ -350,18 +370,6 @@ Compile_MoveImm ( Boolean mod, Boolean rm, int64 disp, int64 imm, Boolean immSiz
         Compile_Move_Reg_To_Rm ( rm, thruReg, disp ) ;
     }
     else Compile_Move ( 0, mod, 0, rm, 0, 0, 0, 0, imm, immSize ) ; // nb. reg == 0 in a move immediate
-}
-
-void
-Compile_MoveImm_To_Reg ( Boolean rm, int64 imm, Boolean immSize )
-{
-    Compile_MoveImm ( REG, rm, 0, imm, immSize ) ;
-}
-
-void
-Compile_MoveImm_To_Mem ( Boolean rm, int64 imm, Boolean immSize )
-{
-    Compile_MoveImm ( MEM, rm, 0, imm, immSize ) ;
 }
 
 void
@@ -501,7 +509,7 @@ Compile_X_Group1 ( Compiler * compiler, int64 op, int64 ttt, int64 n )
             else if ( ( optInfo->Optimize_Dest_RegOrMem == REG ) && ( ! optInfo->xBetweenArg1AndArg2 ) ) _Compile_Move_Reg_To_StackN ( DSP, 0, optInfo->Optimize_Reg ) ;
             //_Compile_Move_StackN_To_Reg ( optInfo->Optimize_Reg, DSP, 0 ) ;
         }
-        else _Word_CompileAndRecord_PushReg ( optInfo->COIW[0], optInfo->Optimize_Reg ) ; // 0 : ?!? should be the exact variable 
+        //else _Word_CompileAndRecord_PushReg ( optInfo->COIW[0], optInfo->Optimize_Reg ) ; // 0 : ?!? should be the exact variable 
         //DBI_OFF ;
     }
     else

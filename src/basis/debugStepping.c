@@ -4,7 +4,6 @@
 void
 _Debugger_StepOneInstruction ( Debugger * debugger )
 {
-    //Set_DebuggerDspReg_FromDspReg ( ) ;
     debugger->SaveTOS = TOS ;
     debugger->PreHere = Here ;
     debugger->SaveStackDepth = DataStack_Depth ( ) ;

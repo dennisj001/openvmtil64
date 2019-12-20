@@ -220,7 +220,7 @@ void _Do_LocalObject_AllocateInit(Namespace *typeNamespace, byte **value, int64 
 void Do_LocalObject(Word *word, Boolean rvalueFlag, Boolean isForwardDotted);
 void Compile_C_FunctionDeclaration(byte *token1);
 void _Compile_C_TypeDeclaration(void);
-void Compile_C_TypeDeclaration(byte *token1, int64 tsrli, int64 scwi, byte *token2);
+void Compile_C_TypeDeclaration(byte *token1);
 void _Namespace_Do_C_Type(Namespace *ns);
 void Namespace_Do_C_Type(Namespace *ns, Boolean isForwardDotted);
 void CfrTil_Do_ClassField(Word *word, Boolean isForwardDotted);

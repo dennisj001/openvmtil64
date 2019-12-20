@@ -43,7 +43,6 @@ Word_Run ( Word * word0 )
         DEBUG_SETUP ( word0 ) ;
         word1 = _Context_->CurrentlyRunningWord ;
         Block_Eval ( word1->Definition ) ; // _Context_->CurrentlyRunningWord (= 0) may have been modified by debugger //word->Definition ) ;
-        _DEBUG_SHOW ( word1, 0 ) ;
         if ( IS_MORPHISM_TYPE ( word0 ) ) SetState ( _Context_, ADDRESS_OF_MODE, false ) ;
         _Context_->LastRunWord = word0 ;
         _Context_->CurrentlyRunningWord = 0 ;
@@ -56,12 +55,14 @@ Word_Eval ( Word * word )
 {
     if ( word )
     {
+        _Debugger_->PreHere = Here ;
         _Context_->CurrentEvalWord = word ;
         CfrTil_Typecheck ( word ) ;
         if ( ( word->CAttribute & IMMEDIATE ) || ( ! CompileMode ) ) Word_Run ( word ) ;
         else _Word_Compile ( word ) ;
         _Context_->CurrentEvalWord = 0 ;
         _Context_->LastEvalWord = word ;
+        _DEBUG_SHOW ( word, 0 ) ;
     }
 }
 
