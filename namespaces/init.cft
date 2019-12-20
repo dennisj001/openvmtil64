@@ -415,7 +415,7 @@ stringMacrosOff
 
 'doInitTest 1 const
 #if doInitTest
-fload namespaces/compiler/machineCode.cft
+//fload namespaces/compiler/machineCode.cft
 #endif // #else
 
 bnOff

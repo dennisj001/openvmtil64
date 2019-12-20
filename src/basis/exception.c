@@ -222,7 +222,8 @@ OVT_Throw ( int signal, int64 restartCondition, Boolean pauseFlag )
     _Q_->RestartCondition = restartCondition ;
     if ( signal )
     {
-        if ( signal == SIGBUS )
+        if ( signal & SIGTERM|SIGKILL ) OVT_Exit ( ) ;
+        else if ( signal == SIGBUS )
         {
             jb = & _Q_->JmpBuf0 ;
             _Q_->RestartCondition = INITIAL_START ;

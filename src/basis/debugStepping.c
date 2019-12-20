@@ -5,7 +5,7 @@ void
 _Debugger_StepOneInstruction ( Debugger * debugger )
 {
     debugger->SaveTOS = TOS ;
-    debugger->PreHere = Here ;
+    //debugger->PreHere = Here ;
     debugger->SaveStackDepth = DataStack_Depth ( ) ;
     ( ( VoidFunction ) debugger->StepInstructionBA->BA_Data ) ( ) ;
     Set_DataStackPointers_FromDebuggerDspReg ( ) ;

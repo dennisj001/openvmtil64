@@ -1,35 +1,5 @@
 #include "../../include/cfrtil64.h"
 
-#if 0
-
-void
-Word_Run ( Word * word )
-{
-    if ( word )
-    {
-        word->StackPushRegisterCode = 0 ; // nb. used! by the rewriting optInfo
-        // keep track in the word itself where the machine code is to go, if this word is compiled or causes compiling code - used for optimization
-        Word_SetCodingAndSourceCoding ( word, Here ) ; // if we change it later (eg. in lambda calculus) we must change it there because the rest of the compiler depends on this
-        _Context_->CurrentlyRunningWord = word ;
-        if ( ! sigsetjmp ( _Context_->JmpBuf0, 0 ) ) // siglongjmp from _Debugger_InterpreterLoop
-        {
-            DEBUG_SETUP ( word ) ;
-            if ( ! GetState ( word, STEPPED ) ) // set by the debuggger in DEBUG_SETUP
-            {
-                Block_Eval ( word->Definition ) ;
-            }
-            else Set_DataStackPointers_FromDebuggerDspReg ( ) ;
-        }
-        else Set_DataStackPointers_FromDebuggerDspReg ( ) ;
-        SetState ( word, STEPPED, false ) ;
-        _DEBUG_SHOW ( word, 0 ) ;
-        if ( IS_MORPHISM_TYPE ( word ) ) SetState ( _Context_, ADDRESS_OF_MODE, false ) ;
-        //_Context_->CurrentlyRunningWord = 0 ;
-        _Context_->LastRunWord = word ;
-    }
-}
-#else
-
 void
 Word_Run ( Word * word0 )
 {
@@ -48,21 +18,19 @@ Word_Run ( Word * word0 )
         _Context_->CurrentlyRunningWord = 0 ;
     }
 }
-#endif
 
 void
 Word_Eval ( Word * word )
 {
     if ( word )
     {
-        _Debugger_->PreHere = Here ;
         _Context_->CurrentEvalWord = word ;
         CfrTil_Typecheck ( word ) ;
         if ( ( word->CAttribute & IMMEDIATE ) || ( ! CompileMode ) ) Word_Run ( word ) ;
         else _Word_Compile ( word ) ;
+        _DEBUG_SHOW ( word, 0 ) ;
         _Context_->CurrentEvalWord = 0 ;
         _Context_->LastEvalWord = word ;
-        _DEBUG_SHOW ( word, 0 ) ;
     }
 }
 
