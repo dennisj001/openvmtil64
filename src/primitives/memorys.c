@@ -74,7 +74,6 @@ CfrTil_Poke ( ) // =
         * nos = ( uint64 ) tos ;
         _Dsp_ -= 2 ;
     }
-    //_Context_->Interpreter0->BaseObject = 0 ;
 }
 
 void

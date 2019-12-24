@@ -222,25 +222,28 @@ OVT_Throw ( int signal, int64 restartCondition, Boolean pauseFlag )
     _Q_->RestartCondition = restartCondition ;
     if ( signal )
     {
-        if ( signal & SIGTERM|SIGKILL ) OVT_Exit ( ) ;
+        if ( (signal == SIGTERM) || ( signal == SIGKILL) ) OVT_Exit ( ) ;
         else if ( signal == SIGBUS )
         {
             jb = & _Q_->JmpBuf0 ;
             _Q_->RestartCondition = INITIAL_START ;
             goto jump ; //siglongjmp ( *jb, 1 ) ;
         }
-        else if ( ( restartCondition > QUIT ) || ( ( _Q_->Signal & ( SIGSEGV | SIGILL ) ) ) )
+        else
         {
-            if ( ++ _Q_->SigSegvs < 2 )
+            if ( ( restartCondition > QUIT ) || ( _Q_->Signal == SIGSEGV ) ||  ( _Q_->Signal == SIGILL ) )
             {
-                jb = & _CfrTil_->JmpBuf0 ;
-                OpenVmTil_ShowExceptionInfo ( ) ;
-                pauseFlag ++ ;
-                _Q_->RestartCondition = ABORT ;
+                if ( ++ _Q_->SigSegvs < 2 )
+                {
+                    jb = & _CfrTil_->JmpBuf0 ;
+                    OpenVmTil_ShowExceptionInfo ( ) ;
+                    pauseFlag ++ ;
+                    _Q_->RestartCondition = ABORT ;
+                }
+                else _Q_->RestartCondition = INITIAL_START ;
+                if ( _Q_->SigSegvs > 3 ) _OVT_SigLongJump ( & _Q_->JmpBuf0 ) ; //OVT_Exit ( ) ;
+                else if ( ( _Q_->SigSegvs > 1 ) || ( restartCondition == INITIAL_START ) ) jb = & _Q_->JmpBuf0 ;
             }
-            else _Q_->RestartCondition = INITIAL_START ;
-            if ( _Q_->SigSegvs > 3 ) _OVT_SigLongJump ( & _Q_->JmpBuf0 ) ; //OVT_Exit ( ) ;
-            else if ( ( _Q_->SigSegvs > 1 ) || ( restartCondition == INITIAL_START ) ) jb = & _Q_->JmpBuf0 ;
             else jb = & _CfrTil_->JmpBuf0 ;
         }
     }

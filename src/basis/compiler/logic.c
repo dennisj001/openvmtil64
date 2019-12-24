@@ -167,7 +167,7 @@ _Compile_SETcc ( Boolean setTtn, Boolean setNegFlag, Boolean reg )
 {
     //DBI_ON ;
     uint8 opCode0, opCode1, modRm, rex ;
-    rex = Calculate_Rex ( 0, reg, 0 ) ; //REX_B ) ; //( immSize == 8 ) || ( controlFlag & REX_B ) ) ;
+    rex = Calculate_Rex (0, reg, 0 , 0) ; //REX_B ) ; //( immSize == 8 ) || ( controlFlag & REX_B ) ) ;
     opCode0 = ( byte ) 0x0f ;
     opCode1 = ( ( 0x9 << 4 ) | ( setTtn << 1 ) | setNegFlag ) ;
     modRm = CalculateModRmByte ( REG, reg, 0, 0, 0 ) ;

@@ -40,7 +40,7 @@ Compile_Multiply ( Compiler * compiler )
         Compile_Pop_To_Acc ( DSP ) ;
         //Compile_IMUL ( cell mod, cell reg, cell rm, sib, disp, imm, size )
         Compiler_WordStack_SCHCPUSCA ( 0, 1 ) ;
-        Compile_MUL ( MEM, DSP, REX_B | MODRM_B | DISP_B, 0, 0, 0, CELL_SIZE ) ;
+        Compile_MUL ( MEM, DSP, REX_W | MODRM_B | DISP_B, 0, 0, 0, CELL_SIZE ) ;
         _CfrTil_WordList ( 0 )->StackPushRegisterCode = Here ;
         Compile_Move_ACC_To_TOS ( DSP ) ;
     }
@@ -73,7 +73,7 @@ _Compile_Divide ( Compiler * compiler, uint64 type )
         Compile_IDIV ( optInfo->Optimize_Mod, optInfo->Optimize_Rm, ( ( optInfo->Optimize_Disp != 0 ) ? DISP_B : 0 ), 0, optInfo->Optimize_Disp, 0, 0 ) ;
         if ( type == MODULO ) reg = RDX ;
         else reg = ACC ;
-        if ( reg != ACC ) Compile_Move_Reg_To_Reg ( ACC, reg ) ; // for consistency finally use RAX so optInfo can always count on rax as the pushed reg
+        if ( reg != ACC ) Compile_Move_Reg_To_Reg (ACC, reg , 0) ; // for consistency finally use RAX so optInfo can always count on rax as the pushed reg
         CfrTil_CompileAndRecord_Word0_PushReg ( ACC ) ;
     }
     else
@@ -234,7 +234,7 @@ CfrTil_IncDec ( int64 op ) // ++/--
             else // crash ; FIXME!!
             {
                 _Compile_Move_Literal_Immediate_To_Reg ( THRU_REG, ( int64 ) nextWord->W_PtrToValue ) ;
-                Compile_Move_Rm_To_Reg ( ACC, THRU_REG, 0 ) ;
+                Compile_Move_Rm_To_Reg (ACC, THRU_REG, 0 , 0) ;
                 _Compile_Group5 ( op, REG, ACC, 0, 0, 0 ) ;
                 Compile_Move_Reg_To_Rm (THRU_REG, ACC, 0 ) ;
 

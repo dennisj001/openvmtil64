@@ -162,6 +162,7 @@ gotNextToken:
         }
     }
     _Namespace_VariableValueSet ( classNs, ( byte* ) "size", sizeOf ) ;
+    classNs->Lo_Size = sizeOf ;
     classNs->CAttribute2 |= STRUCTURE ;
     //Namespace_AddToNamespaces_SetUsing (  Namespace_Find ( (byte*) "C_Typedef" ), 0, NOT_USING ) ;
     return sizeOf ;

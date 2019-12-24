@@ -109,18 +109,18 @@
 #define SCALE_4 2
 #define SCALE_8 3
 // control flag bits for _Compile_InstructionXxx
-#define REX_B       ( 1 << 0 ) 
+#define REX_W       ( 1 << 0 ) 
 #define MODRM_B     ( 1 << 1 ) // backwards compatibility
 #define SIB_B       ( 1 << 2 ) 
 #define DISP_B      ( 1 << 3 ) 
 #define IMM_B       ( 1 << 4 ) 
-#define REX_W_B       REX_B
-#define BYTE_B      ( 1 << 5 ) // 1 BYTE SIZE 
-#define WORD_B      ( 1 << 6 ) // 2 BYTE SIZE 
-#define DOUBLE_B    ( 1 << 7 ) // 4 BYTE SIZE 
-#define QUAD_B      ( 1 << 8 ) // 8 BYTE SIZE : CELL_SIZE
+#define REX_B       ( 1 << 5 )
+#define BYTE_B      ( 1 << 6 ) // 1 BYTE SIZE 
+#define WORD_B      ( 1 << 7 ) // 2 BYTE SIZE 
+#define DOUBLE_B    ( 1 << 8 ) // 4 BYTE SIZE 
+#define QUAD_B      ( 1 << 9 ) // 8 BYTE SIZE : CELL_SIZE
 #define REX 0x40
-#define REX_W 0x8 
+//#define REX_W 0x8 
 #define REX_R 0x4
 #define REX_X 0x2
 //#define REX_B 0x1 // same symbol with two different contextual meanings but has same internal value

@@ -127,7 +127,7 @@ CfrTil_TurnOffBlockCompiler ( )
     Compiler * compiler = _Context_->Compiler0 ;
     if ( ! GetState ( compiler, LISP_MODE ) ) CfrTil_LeftBracket ( ) ;
     _CfrTil_RemoveNamespaceFromUsingListAndClear ( ( byte* ) "__labels__" ) ;
-    Namespace_RemoveNamespacesStack ( compiler->LocalsCompilingNamespacesStack ) ;
+    //Compiler_FreeAllLocalsNamespaces ( compiler ) ;
     SetState ( compiler, COMPILE_MODE | VARIABLE_FRAME, false ) ;
     _CfrTil_->CurrentWordBeingCompiled = 0 ;
 }

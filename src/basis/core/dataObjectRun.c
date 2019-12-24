@@ -250,19 +250,40 @@ _Compile_C_TypeDeclaration ( )
 // nb.Compiling !!
 
 void
-Compile_C_TypeDeclaration ( byte * token1 ) //, int64 tsrli, int64 scwi)
+Compile_C_TypeDeclaration ( Namespace * ns, byte * token1 ) //, int64 tsrli, int64 scwi)
 {
     // remember : we are not in a C function
+    Interpreter * interp = _Interpreter_ ;
+    Word * word ;
+    byte * token ;
     if ( Compiling )
     {
-        if ( token1[0] == ')' ) {}  //  C cast code here ; // nb. currently not implemented
+        if ( token1[0] == ')' )
+        {
+            //  C cast code here ; 
+            // nb! : we have no (fully) implemented operations on operand size less than 8 bytes
+            token = Lexer_ReadToken ( interp->Lexer0 ) ;
+            interp->LastLexedChar = interp->Lexer0->LastLexedChar ;
+            if ( token )
+            {
+                Word * word0 = _Interpreter_TokenToWord ( interp, token, - 1, - 1 ) ;
+                word = Compiler_CopyDuplicatesAndPush ( word0, _Lexer_->TokenStart_ReadLineIndex, _Lexer_->SC_Index ) ;
+                if ( word )
+                {
+                    if ( GetState ( _Context_, ADDRESS_OF_MODE ) ) word->ObjectSize = -1 ; 
+                    else word->ObjectSize = _Namespace_VariableValueGet ( ns, ( byte* ) "size" ) ;
+                    Interpreter_DoWord ( interp, word, - 1, - 1 ) ;
+                }
+            }
+            else SetState ( _Context_->Lexer0, LEXER_END_OF_LINE, true ) ;
+        }
         else
         {
             Ovt_AutoVarOn ( ) ;
             Compiler_LocalsNamespace_New ( _Compiler_ ) ;
-            Word * word = _Interpreter_TokenToWord ( _Interpreter_, token1, - 1, - 1 ) ; //tsrli, scwi ) ;
+            word = _Interpreter_TokenToWord ( interp, token1, - 1, - 1 ) ;
             _Compiler_->LHS_Word = word ;
-            Interpreter_DoWord ( _Interpreter_, word, - 1, - 1 ) ; //tsrli, scwi ) ;
+            Interpreter_DoWord ( interp, word, - 1, - 1 ) ;
             _Compile_C_TypeDeclaration ( ) ;
         }
         Ovt_AutoVarOff ( ) ;
@@ -274,19 +295,16 @@ _Namespace_Do_C_Type ( Namespace * ns )
 {
     Lexer * lexer = _Lexer_ ;
     byte * token1, *token2 ;
-    //int64 tsrli, scwi ;
     if ( ! Compiling ) _Namespace_ActivateAsPrimary ( ns ) ;
-    //tsrli = lexer->TokenStart_ReadLineIndex ;
-    //scwi = lexer->SC_Index ;
     token1 = _Lexer_Next_NonDebugOrCommentTokenWord ( lexer, 0, 1, 0 ) ;
     token2 = Lexer_Peek_Next_NonDebugTokenWord ( lexer, 1, 0 ) ;
-    if ( token2 [0] == '(' ) Compile_C_FunctionDeclaration ( token1 ) ;
+    if ( token2 && (token2 [0] == '(') ) Compile_C_FunctionDeclaration ( token1 ) ;
     else
     {
         if ( Compiling )
         {
             _Compiler_->AutoVarTypeNamespace = ns ;
-            Compile_C_TypeDeclaration ( token1 ) ; //, tsrli, scwi) ;
+            Compile_C_TypeDeclaration ( ns, token1 ) ;
             _Compiler_->AutoVarTypeNamespace = 0 ;
         }
         else Interpreter_InterpretAToken ( _Interpreter_, token1, - 1, - 1 ) ; //_Lexer_->TokenStart_ReadLineIndex, _Lexer_->SC_Index ) ;
@@ -311,7 +329,7 @@ Namespace_Do_C_Type ( Namespace * ns, Boolean isForwardDotted )
                 {
                     Compiler_Init ( compiler, 0, 0 ) ;
                     //CfrTil_RightBracket ( ) ; //nb. only Compiler_Init here. We don't want to turn on compile mode!! RightBracket is a forth term.
-                    CfrTil_InitSourceCode_WithName ( _CfrTil_, ns->Name, 1 ) ;
+                    CfrTil_SourceCode_Init ( ) ;
                     CfrTil_WordList_Init ( 0, 0 ) ;
                 }
                 _Namespace_Do_C_Type ( ns ) ;
@@ -407,10 +425,16 @@ Array_Do_AccumulatedAddress ( int64 totalOffset )
 }
 
 void
-Do_AccumulatedAddress ( byte * accumulatedOffsetPointer, int64 offset, Boolean rvalueFlag )
+Do_AccumulatedAddress ( byte * accumulatedOffsetPointer, int64 offset, Boolean rvalueFlag, byte size )
 {
     accumulatedOffsetPointer += offset ;
-    if ( rvalueFlag ) TOS = ( * ( int64* ) accumulatedOffsetPointer ) ; // C rvalue
+    if ( rvalueFlag )
+    {
+        if ( size == 1 ) TOS = ( * ( byte* ) accumulatedOffsetPointer ) ; // C rvalue
+        else if ( size == 2 ) TOS = ( * ( int16* ) accumulatedOffsetPointer ) ; // C rvalue
+        else if ( size == 4 ) TOS = ( * ( int32* ) accumulatedOffsetPointer ) ; // C rvalue
+        else TOS = ( * ( int64* ) accumulatedOffsetPointer ) ; // default and 8 bytes - cell
+    }
     else TOS = ( uint64 ) accumulatedOffsetPointer ; // C lvalue
 }
 
@@ -419,7 +443,8 @@ CfrTil_Do_AccumulatedAddress ( Word * word, byte * accumulatedAddress, int64 off
 {
     Context * cntx = _Context_ ;
     Boolean cb = Lexer_IsLValue_CheckBackToLastSemiForParenOrBracket ( cntx->Lexer0, word ), cf = Lexer_CheckForwardToStatementEnd_Is_LValue ( cntx->Lexer0, word ) ;
-    Do_AccumulatedAddress ( accumulatedAddress, offset, GetState ( cntx, C_SYNTAX ) && ( ! cb ) && ( ! cf ) && ( ! GetState ( cntx, ADDRESS_OF_MODE ) ) ) ;
+    byte size = ( TypeNamespace_Get ( word ) ? ( int64 ) _CfrTil_VariableValueGet ( TypeNamespace_Get ( word )->Name, ( byte* ) "size" ) : 0 ) ;
+    Do_AccumulatedAddress ( accumulatedAddress, offset, GetState ( cntx, C_SYNTAX ) && ( ! cb ) && ( ! cf ) && ( ! GetState ( cntx, ADDRESS_OF_MODE ) ), size ) ;
 }
 
 // nb. 'word' is the previous word to the '.' (dot) cf. CfrTil_Dot so it can be recompiled, a little different maybe, as an object

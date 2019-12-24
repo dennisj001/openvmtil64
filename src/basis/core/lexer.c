@@ -777,10 +777,10 @@ Dot ( Lexer * lexer ) //  '.':
 void
 Comma ( Lexer * lexer )
 {
-    if ( GetState ( _Context_, C_SYNTAX | INFIX_MODE ) && lexer->TokenWriteIndex )
+    if ( GetState ( _Context_, C_SYNTAX | INFIX_MODE ) ) //&& lexer->TokenWriteIndex )
     {
-        Lexer_MakeItTheNextToken ( lexer ) ;
-        return ;
+        if ( lexer->TokenWriteIndex ) {Lexer_MakeItTheNextToken ( lexer ) ; return ; }
+        else CfrTil_C_Comma () ; // ??  
     }
     else if ( ! GetState ( _Context_->Compiler0, LC_ARG_PARSING ) )
     {

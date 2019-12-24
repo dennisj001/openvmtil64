@@ -80,7 +80,7 @@ _Debugger_Locals_Show_Loop ( Cpu * cpu, Stack * stack, Word * scWord )
 void
 Debugger_Locals_Show ( Debugger * debugger )
 {
-    Word * scWord = Compiling ? _CfrTil_->CurrentWordBeingCompiled :
+    Word * scWord = debugger->w_Word ? debugger->w_Word : Compiling ? _CfrTil_->CurrentWordBeingCompiled :
         ( debugger->DebugAddress ? Word_UnAlias ( Word_GetFromCodeAddress ( debugger->DebugAddress ) ) : _Context_->CurrentlyRunningWord ) ;
     if ( scWord && scWord->W_NumberOfVariables ) _Debugger_Locals_Show_Loop ( debugger->cs_Cpu, scWord->NamespaceStack ? scWord->NamespaceStack : _Compiler_->LocalsCompilingNamespacesStack, scWord ) ;
 }

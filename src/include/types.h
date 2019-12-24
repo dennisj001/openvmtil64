@@ -181,7 +181,7 @@ typedef struct
                 byte * do_bData ;
                 int64 * do_iData ;
             } ;
-        } ;
+        } ; //dobject ; // size 4 x 64 bits
         _DLNode n_DLNode ;
         dobject n_dobject ;
     } ;
@@ -208,7 +208,7 @@ typedef struct _Identifier // _Symbol
     union
     {
         int64 Slots ; // number of slots in Object
-        int64 ObjectSize ; // number of slots in Object
+        int64 ObjectSize ; // number of bytes in Object
     } ;
     byte * S_Name ;
     uint64 State ;
@@ -261,8 +261,9 @@ typedef struct _Identifier // _Symbol
 #define S_LAttribute S_Node.n_Attributes.T_LAttribute
 #define S_NumberOfPrefixedArgs S_Node.n_Attributes.T_NumberOfPrefixedArgs
 #define S_Size S_Node.n_Attributes.T_Size
+#define Size S_Size 
 #define S_ChunkSize S_Node.n_Attributes.T_ChunkSize
-#define S_NumberOfSlots S_Size
+#define S_NumberOfSlots S_Node.n_Attributes.T_NumberOfSlots
 #define S_Pointer W_Value
 #define S_String W_Value
 #define S_unmap S_Node.n_unmap
@@ -271,7 +272,6 @@ typedef struct _Identifier // _Symbol
 
 #define Head S_Car
 #define Tail S_Cdr
-#define Size S_Size 
 #define Name S_Name
 #define CAttribute S_CAttribute
 #define CAttribute2 S_CAttribute2
@@ -707,7 +707,7 @@ typedef struct
     int64 NumberOfNonRegisterLocals, NumberOfRegisterLocals, NumberOfLocals ;
     int64 NumberOfNonRegisterVariables, NumberOfRegisterVariables, NumberOfVariables ; 
     int64 NumberOfNonRegisterArgs, NumberOfRegisterArgs, NumberOfArgs ;
-    int64 LocalsFrameSize ;
+    int64 LocalsFrameSize ; //, CastSize ;
     int64 SaveCompileMode, SaveOptimizeState ; //, SaveScratchPadIndex ;
     int64 ParenLevel ;
     int64 GlobalParenLevel, OptimizeForcedReturn ;
@@ -971,7 +971,7 @@ typedef struct
     int64 Mmap_RemainingMemoryAllocated, OVT_InitialUnAccountedMemory, RunTimeAllocation, TotalMemFreed, TotalMemAllocated, NumberOfByteArrays ;
 
     // variables accessible from cfrTil
-    int64 Verbosity, StartIncludeTries, StartedTimes, Restarts, SigSegvs, AllocationRequestLacks ;
+    int64 Verbosity, StartIncludeTries, StartedTimes, Restarts, SigSegvs, AllocationRequestLacks, Dbi ;
     int64 DictionarySize, LispTempSize, MachineCodeSize, ObjectsSize, InternalObjectsSize, LispSize, ContextSize ;
     int64 TempObjectsSize, CompilerTempObjectsSize, SessionObjectsSize, DataStackSize, HistorySize, OpenVmTilSize ;
     int64 CfrTilSize, BufferSpaceSize, StringSpaceSize, Thrown ;

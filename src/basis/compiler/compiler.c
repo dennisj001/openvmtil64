@@ -44,7 +44,7 @@ Compiler_CopyDuplicatesAndPush ( Word * word0, int64 tsrli, int64 scwi )
 {
     Word *wordp ;
     if ( ( word0->CAttribute & ( DEBUG_WORD | INTERPRET_DBG ) ) || ( word0->LAttribute & ( W_COMMENT | W_PREPROCESSOR ) ) ) return word0 ;
-    if ( word0 && GetState ( _Compiler_, (COMPILE_MODE|ASM_MODE) ) ) // don't we want to copy in non-compile mode too ??
+    if ( word0 && GetState ( _Compiler_, ( COMPILE_MODE | ASM_MODE ) ) ) // don't we want to copy in non-compile mode too ??
     {
         wordp = _CfrTil_CopyDuplicates ( word0 ) ;
         //if ( wordp == word0 ) _Printf ( ( byte* ) "\nGot it = %s", wordp->Name ) ;
@@ -134,12 +134,6 @@ Compiler_PreviousNonDebugWord ( int64 startIndex )
     return word ;
 }
 
-void
-Compiler_FreeAllLocalsNamespaces ( Compiler * compiler )
-{
-    Namespace_RemoveAndClearNamespacesStack ( compiler->LocalsCompilingNamespacesStack ) ;
-}
-
 #if 0
 
 typedef struct
@@ -225,12 +219,7 @@ CompileOptimizeInfo *
 CompileOptimizeInfo_New ( uint64 type )
 {
     CompileOptimizeInfo * optInfo =
-#if 0    
-        ( CompileOptimizeInfo * ) OVT_CheckRecycleableAllocate ( _Q_->MemorySpace0->RecycledOptInfoList,
-        sizeof (CompileOptimizeInfo ) ) ;
-    if ( ! optInfo )
-#endif        
-        optInfo = _CompileOptimizeInfo_New ( type ) ;
+    optInfo = _CompileOptimizeInfo_New ( type ) ;
     return optInfo ;
 }
 
@@ -245,17 +234,6 @@ Compiler_CompileOptimizeInfo_PushNew ( Compiler * compiler )
     }
     return coi ;
 }
-
-#if 0
-
-void
-Compiler_CompileOptimizeInfo_PopDelete ( Compiler * compiler )
-{
-    CompileOptimizeInfo * coi = ( CompileOptimizeInfo* ) List_Pop ( compiler->OptimizeInfoList ) ;
-    compiler->OptInfo = coi ;
-    OptInfo_Recycle ( coi ) ;
-}
-#endif
 
 CompileOptimizeInfo *
 Compiler_CompileOptimizeInfo_New ( Compiler * compiler, uint64 type )
@@ -289,41 +267,47 @@ Compiler_Init_AccumulatedOffsetPointers ( Compiler * compiler, Word * word )
 }
 
 void
-Compiler_SaveDebugInfo ( Compiler * compiler )
+CfrTil_SaveDebugInfo (Word * word)
 {
-    if ( ! _CfrTil_->LastFinished_Word->W_SC_WordList )
+    Compiler * compiler = _Compiler_ ;
+    word = word ? word : _CfrTil_->LastFinished_Word ;
+    word->NamespaceStack = Stack_Copy ( compiler->LocalsCompilingNamespacesStack, CFRTIL ) ; //CONTEXT ) ;
+    if ( compiler->NumberOfVariables ) Namespace_RemoveNamespacesStack ( compiler->LocalsCompilingNamespacesStack ) ;
+    Stack_Init ( compiler->LocalsCompilingNamespacesStack ) ;
+    if ( ! word->W_SC_WordList )
     {
-        _CfrTil_->LastFinished_Word->NamespaceStack = Stack_Copy ( compiler->LocalsCompilingNamespacesStack, CFRTIL ) ; //CONTEXT ) ;
-        if ( compiler->NumberOfVariables ) Namespace_RemoveNamespacesStack ( compiler->LocalsCompilingNamespacesStack ) ;
-        Stack_Init ( compiler->LocalsCompilingNamespacesStack ) ;
-        _CfrTil_->LastFinished_Word->W_SC_WordList = _CfrTil_->Compiler_N_M_Node_WordList ;
+        word->W_SC_WordList = _CfrTil_->Compiler_N_M_Node_WordList ;
         _CfrTil_->Compiler_N_M_Node_WordList = _dllist_New ( CFRTIL ) ;
         //Namespace_NamespacesStack_PrintWords ( _CfrTil_->CurrentWordBeingCompiled->NamespaceStack ) ;
     }
 }
 
 void
-Compiler_DeleteDebugInfo ( Compiler * compiler )
+CfrTil_DeleteDebugInfo (Word * word)
 {
+    Compiler * compiler = _Compiler_ ;
     if ( compiler->NumberOfVariables )
     {
-        Compiler_FreeAllLocalsNamespaces ( compiler ) ;
+        Namespace_RemoveAndClearNamespacesStack ( compiler->LocalsCompilingNamespacesStack ) ;
         _Namespace_RemoveFromUsingListAndClear ( compiler->LocalsNamespace ) ;
     }
-    if ( ! _CfrTil_->CurrentWordBeingCompiled ) _CfrTil_RecycleInit_Compiler_N_M_Node_WordList ( 1 ) ;
+    if ( ! _CfrTil_->CurrentWordBeingCompiled ) _CfrTil_RecycleInit_Compiler_N_M_Node_WordList () ;
 }
 
 void
-Compiler_FinishWordDebugInfo ( Compiler * compiler, Boolean flag )
+_CfrTil_FinishWordDebugInfo (Word * word, Boolean flag )
 {
-    if ( compiler->NumberOfVariables || GetState ( _CfrTil_, ( RT_DEBUG_ON | GLOBAL_SOURCE_CODE_MODE ) ) ) Compiler_SaveDebugInfo ( compiler ) ;
-    else if ( flag || ( ! GetState ( _CfrTil_, ( RT_DEBUG_ON | GLOBAL_SOURCE_CODE_MODE ) ) ) ) Compiler_DeleteDebugInfo ( compiler ) ;
+    //Compiler * compiler = _Compiler_ ;
+    //if ( compiler->NumberOfVariables || GetState ( _CfrTil_, ( RT_DEBUG_ON | GLOBAL_SOURCE_CODE_MODE ) ) )
+    //    CfrTil_SaveDebugInfo ( ) ;
+    if ( flag || ( ! GetState ( _CfrTil_, ( RT_DEBUG_ON | GLOBAL_SOURCE_CODE_MODE ) ) ) )
+        CfrTil_DeleteDebugInfo (0) ;
+    else CfrTil_SaveDebugInfo (0) ;
 }
 
 void
 Compiler_Init ( Compiler * compiler, uint64 state, Boolean flag )
 {
-    //Compiler_FinishWordDebugInfo ( compiler, flag ) ;
     compiler->State = ( state &= ( ~ ARRAY_MODE ) ) ;
     compiler->ContinuePoint = 0 ;
     compiler->BreakPoint = 0 ;

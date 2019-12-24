@@ -83,7 +83,7 @@ DataObject_New ( uint64 type, Word * word, byte * name, uint64 ctype, uint64 cty
         {
             word = _Class_New ( name, C_TYPE, 0 ) ;
             Type_Create ( ) ;
-            if ( GetState ( cntx, C_SYNTAX ) ) Compiler_SetAs_InNamespace_C_BackgroundNamespace ( cntx->Compiler0 ) ;
+            //if ( GetState ( cntx, C_SYNTAX ) ) Compiler_SetAs_InNamespace_C_BackgroundNamespace ( cntx->Compiler0 ) ;
             break ;
         }
         case C_TYPEDEF:

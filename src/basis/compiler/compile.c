@@ -202,7 +202,7 @@ void
 _Compile_RspReg_Restore ( )
 {
 #if 1    
-    Compile_Move_Rm_To_Reg ( RSP, R15, 4 ) ; // 4 : placeholder
+    Compile_Move_Rm_To_Reg (RSP, R15, 4 , 0) ; // 4 : placeholder
     _Context_->Compiler0->RspRestoreOffset = Here - 1 ;
 #else    
     _Compile_Stack_PopToReg ( DSP, RSP ) ;

@@ -82,8 +82,15 @@ CfrTil_C_Semi ( )
     if ( ( ! Compiling ) ) 
     {
         CfrTil_InitSourceCode ( _CfrTil_ ) ;
-        Compiler_DeleteDebugInfo ( _Compiler_ ) ;
+        //CfrTil_DeleteDebugInfo () ;
     }
+    SetState ( _Context_, ADDRESS_OF_MODE, false ) ;
+}
+
+void
+CfrTil_C_Comma ( void )
+{
+    SetState ( _Context_, ADDRESS_OF_MODE, false ) ;
 }
 
 void
@@ -245,7 +252,6 @@ _Type_Create ( byte * token )
 void
 Type_Create ( )
 {
-
     Context * cntx = _Context_ ;
     byte * token = Lexer_Peek_Next_NonDebugTokenWord (cntx->Lexer0, 1 , 0) ;
     int64 size = _Type_Create ( token ) ;
@@ -294,11 +300,13 @@ _CfrTil_TypeDef ( )
                 alias = _CfrTil_Alias ( ns, token ) ;
                 alias->Lo_List = ns->Lo_List ;
                 alias->CAttribute |= IMMEDIATE ;
+                _CfrTil_->LastFinished_Word = 0 ; // nb! : for _CfrTil_RecycleInit_Compiler_N_M_Node_WordList
             }
             else
             {
                 ns = DataObject_New ( C_TYPE, 0, token, 0, 0, 0, 0, 0, 0, 0, - 1 ) ;
                 _Namespace_VariableValueSet ( ns, ( byte* ) "size", size ) ;
+                ns->Lo_Size = size ;
             }
         }
     }

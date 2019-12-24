@@ -9,6 +9,13 @@ OpenVmTil_Verbosity ( )
 }
 
 void
+OpenVmTil_ShowMachineCodeInstructions ( )
+{
+    if ( Compiling ) _Compile_Stack_Push ( DSP, ACC, ( int64 ) & _Q_->Dbi ) ; //CfrTil_CompileAndRecord_Word0_PushReg ( ACC ) ; //_Compile_Stack_Push ( DSP, ( int64 ) & _Q_->Verbosity ) ;
+    else DataStack_Push ( ( int64 ) & _Q_->Dbi ) ;
+}
+
+void
 Ovt_Optimize ( )
 {
     DataStack_Push ( ( int64 ) GetState ( _CfrTil_, OPTIMIZE_ON ) ? 1 : 0 ) ;

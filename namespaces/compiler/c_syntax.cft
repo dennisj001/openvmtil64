@@ -75,7 +75,7 @@ var ( "x7" ) ;
 x7 = &chey.chars [ 18 ] ;
 sprintf ( x7, "%s", "\n\thoot" ) ;
 printf ( "%s", x7 ) ;
-
+//pause
 sprintf ( &chey.chars, "%s", "well" ) ;
 dump ( chey, cobj.size ) ; 
 //sprintf ( &chey.chars [ 24 ], "%s", "do or don't" ) ;
@@ -310,5 +310,23 @@ infixOff
 //stack pause
 s: hi ( a b | c ) c a @ b @ + = printf ("\nshould read 3 : %d", c ) ;s 1 2 hi //pause
 sp
+// test byte size objects
+c_syntaxOn
+typedef struct _byteTest 
+{
+    byte a123;
+    byte b123;
+    long c123;
+    byte d123;
+} byteTest ;
+'bt byteTest new ;
+ps ( "\nbt.size =" ) ; p ( bt.size ) ;
+bt.a123 = 1 ; bt.b123 = 2 ; bt.c123 = 3 ; bt.d123 = 4 ;
+p (bt.a123) ; p (bt.b123) ; p (bt.c123) ; p (bt.c123) ; 
+bt.a123 1 _assert 
+bt.c123.size 8 _assert
+//pause
+c_syntaxOff 
 2 + 7 assertStkChk // stack checking
 sp
+

@@ -50,17 +50,17 @@ Compile_X_Group3 ( Compiler * compiler, int64 code ) //OP_1_ARG
     {
         //_Compile_Group3 ( cell code, cell mod, cell rm, cell sib, cell disp, cell imm, cell size )
         _Compile_Group3 ( code, compiler->OptInfo->Optimize_Mod,
-            compiler->OptInfo->Optimize_Rm, REX_B | MODRM_B, 0, compiler->OptInfo->Optimize_Disp, compiler->OptInfo->Optimize_Imm, 0 ) ;
+            compiler->OptInfo->Optimize_Rm, REX_W | MODRM_B, 0, compiler->OptInfo->Optimize_Disp, compiler->OptInfo->Optimize_Imm, 0 ) ;
         if ( compiler->OptInfo->Optimize_Rm != DSP ) // if the result is not already tos
         {
-            if ( compiler->OptInfo->Optimize_Rm != ACC ) Compile_Move_Rm_To_Reg ( ACC, compiler->OptInfo->Optimize_Rm,
-                compiler->OptInfo->Optimize_Disp ) ;
+            if ( compiler->OptInfo->Optimize_Rm != ACC ) Compile_Move_Rm_To_Reg (ACC, compiler->OptInfo->Optimize_Rm,
+                compiler->OptInfo->Optimize_Disp , 0) ;
             CfrTil_CompileAndRecord_PushAccum () ;
         }
     }
     else
     {
-        _Compile_Group3 ( code, MEM, DSP, REX_B | MODRM_B, 0, 0, 0, 0 ) ;
+        _Compile_Group3 ( code, MEM, DSP, REX_W | MODRM_B, 0, 0, 0, 0 ) ;
     }
 }
 
@@ -89,7 +89,7 @@ Compile_X_Shift ( Compiler * compiler, int64 op, Boolean stackFlag, Boolean opEq
         if ( ( ! opEqualFlag ) && ( stackFlag && (( compiler->OptInfo->Optimize_Rm != DSP ) && ( compiler->OptInfo->Optimize_Rm != FP ) )) ) // if the result is not already tos
         {
             if ( compiler->OptInfo->Optimize_Rm != ACC ) 
-            Compile_Move_Rm_To_Reg ( ACC, compiler->OptInfo->Optimize_Rm, compiler->OptInfo->Optimize_Disp ) ;
+            Compile_Move_Rm_To_Reg (ACC, compiler->OptInfo->Optimize_Rm, compiler->OptInfo->Optimize_Disp , 0) ;
             CfrTil_CompileAndRecord_PushAccum () ;
         }
         //DBI_OFF ;
@@ -108,7 +108,7 @@ Compile_X_Shift ( Compiler * compiler, int64 op, Boolean stackFlag, Boolean opEq
         else if ( one->StackPushRegisterCode )
         {
             SetHere (one->StackPushRegisterCode, 1) ; // leave optInfo_0_two value in R8 we don't need to push it
-            Compile_Move_Reg_To_Reg ( OREG, one->RegToUse ) ;
+            Compile_Move_Reg_To_Reg (OREG, one->RegToUse , 0) ;
         }
         else
         {

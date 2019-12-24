@@ -13,7 +13,7 @@ Word_Run ( Word * word0 )
         DEBUG_SETUP ( word0 ) ;
         word1 = _Context_->CurrentlyRunningWord ;
         Block_Eval ( word1->Definition ) ; // _Context_->CurrentlyRunningWord (= 0) may have been modified by debugger //word->Definition ) ;
-        if ( IS_MORPHISM_TYPE ( word0 ) ) SetState ( _Context_, ADDRESS_OF_MODE, false ) ;
+        //if ( IS_MORPHISM_TYPE ( word0 ) ) SetState ( _Context_, ADDRESS_OF_MODE, false ) ;
         _Context_->LastRunWord = word0 ;
         _Context_->CurrentlyRunningWord = 0 ;
     }
@@ -82,7 +82,7 @@ _Word_Finish ( Word * word )
     CfrTil_FinishSourceCode ( _CfrTil_, word ) ;
     _CfrTil_->LastFinished_Word = word ;
     CfrTil_TypeStackReset ( ) ;
-    Compiler_FinishWordDebugInfo ( _Compiler_, 0 ) ;
+    _CfrTil_FinishWordDebugInfo (word, 0 ) ;
 }
 
 void
@@ -202,7 +202,8 @@ Word_PrintOffset ( Word * word, int64 offset, int64 totalOffset )
     {
         totalOffset = cntx->Compiler0->AccumulatedOptimizeOffsetPointer ? *cntx->Compiler0->AccumulatedOptimizeOffsetPointer : - 1 ;
         _Printf ( ( byte* ) "\n\'%s\' = object field :: type = %s : size = 0x%lx : base object \'%s\' = 0x%lx : offset = 0x%lx : total offset = 0x%lx : address = 0x%lx",
-            name, cntx->Interpreter0->BaseObject ? cntx->Interpreter0->BaseObject->Name : ( byte* ) "",
+            //name, cntx->Interpreter0->BaseObject ? cntx->Interpreter0->BaseObject->Name : ( byte* ) "",
+            name, word->TypeNamespace ? word->TypeNamespace->Name : ( byte* ) "",
             TypeNamespace_Get ( word ) ? ( int64 ) _CfrTil_VariableValueGet ( TypeNamespace_Get ( word )->Name, ( byte* ) "size" ) : 0,
             cntx->Interpreter0->BaseObject ? String_ConvertToBackSlash ( cntx->Interpreter0->BaseObject->Name ) : ( byte* ) "",
             cntx->Interpreter0->BaseObject ? cntx->Interpreter0->BaseObject->W_Value : 0,

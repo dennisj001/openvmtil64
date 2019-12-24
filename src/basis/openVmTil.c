@@ -1,5 +1,5 @@
 #include "../include/cfrtil64.h"
-#define VERSION ((byte*) "0.899.100" ) 
+#define VERSION ((byte*) "0.899.400" ) 
 // Logic/Foml (Foundations of Mathematical Logic by Haskell Curry), Oop (Object Oriented Programming), 
 // C, Lisp, Rpn/Lag : Reverse Polish Notation, (Left Associative Grammar), Pda : Push Down Automata, Tm : Turing Machine :: 
 // (til : a toolkit for implementing languages (maybe even a compiler compiler) based on these ideas)
@@ -48,9 +48,8 @@ void
 OVT_RecycleAllWordsDebugInfo ()
 {
     SetState ( _CfrTil_, (RT_DEBUG_ON|GLOBAL_SOURCE_CODE_MODE), false ) ;
-    //Tree_Map_Namespaces ( _Q_->OVT_CfrTil->Namespaces->Lo_List, (MapSymbolFunction) DLList_RecycleInit_WordList ) ;
     OVT_MemListFree_CompilerTempObjects ( ) ;
-    _CfrTil_RecycleInit_Compiler_N_M_Node_WordList ( 1 ) ; 
+    _CfrTil_RecycleInit_Compiler_N_M_Node_WordList () ; 
 }
 
 void

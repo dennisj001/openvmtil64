@@ -52,7 +52,7 @@ Debug
 'dscOff 'dbgSourceCodeOff find alias
 'scOn 'dscOn find alias
 'scOff 'dscOff find alias
-scOn
+//scOn
 
 : v4 verbosity 4 = ;
 : v1 verbosity 1 = ;
@@ -376,6 +376,8 @@ stringMacrosOn
 : x64 "namespaces/compiler/x64.cft" include ; 
 : bx "namespaces/test/bigNum.test.cft" include ;
 : TODO ( str ) nl nl pdl nl str @ adps location nl pdl nl nl { dbgOnVar @ } { sp } if2 ;; //pause ;;
+: dbiOn dbi 1 = ;
+: dbiOff dbi 0 = ;
 
 // === controls ===
 Root 
@@ -415,7 +417,8 @@ stringMacrosOff
 
 'doInitTest 1 const
 #if doInitTest
-//fload namespaces/compiler/machineCode.cft
+// startup test code here ...
+//tc //demo
 #endif // #else
 
 bnOff
@@ -427,3 +430,5 @@ infixOn
 infixOff
 rtw
 2 + 7 assertStkChk // stack checking
+: mct "namespaces/compiler/machineCode.cft" include ;
+//mct

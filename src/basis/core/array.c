@@ -27,6 +27,7 @@ _ByteArray_AppendSpace_MakeSure ( ByteArray * ba, int64 size ) // size in bytes
                 dlnode * node, *nodeNext ;
                 for ( node = dllist_First ( ( dllist* ) & nba->NBA_BaList ) ; node ; node = nodeNext )
                 {
+                    if ( node == nodeNext ) break ; // ?? TODO : should need this
                     nodeNext = dlnode_Next ( node ) ;
                     ba = Get_BA_Symbol_To_BA ( node ) ;
                     if ( ba )

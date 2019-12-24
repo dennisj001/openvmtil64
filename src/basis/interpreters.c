@@ -28,12 +28,14 @@ Interpret_C_Until_Token4 ( Interpreter * interp, byte * end1, byte * end2, byte*
         else if ( GetState ( _Compiler_, DOING_A_PREFIX_WORD ) && String_Equal ( token, ")" ) )
         {
             Interpreter_InterpretAToken ( interp, token, lexer->TokenStart_ReadLineIndex, lexer->SC_Index ) ;
+            SetState ( _Context_, ADDRESS_OF_MODE, false ) ;
             token = 0 ;
             break ;
         }
         else if ( GetState ( _Context_, C_SYNTAX ) && ( String_Equal ( token, "," ) || String_Equal ( token, ";" ) ) )
         {
             CfrTil_ArrayModeOff ( ) ;
+            SetState ( _Context_, ADDRESS_OF_MODE, false ) ;
             break ;
         }
         else Interpreter_InterpretAToken ( interp, token, lexer->TokenStart_ReadLineIndex, lexer->SC_Index ) ;
@@ -43,6 +45,21 @@ Interpret_C_Until_Token4 ( Interpreter * interp, byte * end1, byte * end2, byte*
     while ( token ) ;
     if ( token ) CfrTil_PushToken_OnTokenList ( token ) ;
     return token ;
+}
+
+void
+_Interpret_Until_Token ( Interpreter * interp, byte * end, byte * delimiters )
+{
+    byte * token ;
+    while ( token = _Lexer_ReadToken ( interp->Lexer0, delimiters ) )
+    {
+        Interpreter_InterpretAToken ( interp, token, - 1, - 1 ) ;
+        if ( String_Equal ( ( char* ) token, ")" ) ) 
+        {
+            SetState ( _Context_, ADDRESS_OF_MODE, false ) ;
+            break ;
+        }
+    }
 }
 
 byte *
@@ -63,6 +80,7 @@ Interpret_Until_Token ( Interpreter * interp, byte * end, byte * delimiters )
         {
             CfrTil_PushToken_OnTokenList ( token ) ;
             CfrTil_ArrayModeOff ( ) ;
+            SetState ( _Context_, ADDRESS_OF_MODE, false ) ;
             break ;
         }
         else Interpreter_InterpretAToken ( interp, token, lexer->TokenStart_ReadLineIndex, lexer->SC_Index ) ;

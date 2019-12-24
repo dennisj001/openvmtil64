@@ -63,13 +63,13 @@ void
 DebugRuntimeBreakpoint ( )
 {
     Debugger * debugger = _Debugger_ ;
+    debugger->SaveCpuState ( ) ;
     //if ( ( ! CompileMode ) )
     {
         if ( ! GetState ( debugger, ( DBG_BRK_INIT ) ) ) //|DBG_CONTINUE_MODE ) ) )
         {
             if ( GetState ( debugger, DBG_INTERPRET_LOOP_DONE ) )
             {
-                // getRsp and debugger->SaveCpuState ( ) has been called by _Compile_Debug1 which calls this function
                 SetState ( debugger, ( DBG_BRK_INIT | DBG_RUNTIME_BREAKPOINT ), true ) ;
                 if ( ! GetState ( debugger, ( DBG_STEPPING | DBG_AUTO_MODE ) ) )
                 {
