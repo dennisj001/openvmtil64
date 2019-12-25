@@ -325,6 +325,8 @@ bt.a123 = 1 ; bt.b123 = 2 ; bt.c123 = 3 ; bt.d123 = 4 ;
 p (bt.a123) ; p (bt.b123) ; p (bt.c123) ; p (bt.c123) ; 
 bt.a123 1 _assert 
 bt.c123.size 8 _assert
+var ( 'btt ) ; 
+void bttt ( ) { btt = bt.a123 ; p (btt ) ; } bttt () ;
 //pause
 c_syntaxOff 
 2 + 7 assertStkChk // stack checking

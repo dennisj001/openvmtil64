@@ -86,7 +86,7 @@ AdjustLabel ( dlnode * node, int64 address )
 void
 _GotoInfo_SetAndRemove ( GotoInfo * gotoInfo, byte * address, Boolean removeFlag )
 {
-    _SetOffsetForCallOrJump ( gotoInfo->pb_JmpOffsetPointer, address ) ;
+    _SetOffsetForCallOrJump (gotoInfo->pb_JmpOffsetPointer, address , JMPI32) ;
     if ( removeFlag ) GotoInfo_Remove ( ( dlnode* ) gotoInfo ) ;
 }
 

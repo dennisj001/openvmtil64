@@ -35,9 +35,9 @@ nl
 sp
 nl
 //: lt7 1 1 - not dup p ; lt7 1 _assert sp
-: lt7 1 1 - not ; lt7 1 _assert sp
-: lt7b 1 1 + not p ; lt7b sp
-: lt8 1 not p ; lt8
+: lt7 ( n m -- TOS ) n @ m @ - not dup p ; 1 1 lt7 1 _assert sp
+: lt7b ( ) 1 1 + not 0 _assert ; lt7b sp
+: lt8 ( ) 1 not 0 _assert ; lt8
 sp
 : lt9 0 not p ; lt9
 : lt10 ( n ) n not p ;
@@ -66,7 +66,7 @@ sp
 0 1 tAnd 0 "0 1" assert 
 sp
 : tNotAnd ( n m -- TOS ) n @ m @ not && dup p ; "II.I" typeSignature
-' tNotAnd find wdiss
+' tNotAnd find wdiss //pause
 1 0 tNotAnd 1 "tNotAnd1 1 0" assert 
 1 1 tNotAnd 0 "tNotAnd2 1 1" assert 
 0 0 tNotAnd 0 "tNotAnd3 0 0" assert 

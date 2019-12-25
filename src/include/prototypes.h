@@ -39,11 +39,12 @@ void Compile_IMULI(Boolean mod, Boolean reg, Boolean rm, Boolean sib, int64 disp
 void Compile_IMUL(Boolean mod, Boolean reg, Boolean rm, Boolean controlFlags, Boolean sib, int64 disp);
 void _Compile_Test(Boolean mod, Boolean reg, Boolean rm, Boolean controlFlags, int64 disp, int64 imm);
 byte *Calculate_Address_FromOffset_ForCallOrJump(byte *address);
-int32 _CalculateOffsetForCallOrJump(byte *compileAtAddress, byte *jmpToAddr, Boolean offsetSize);
+int32 _CalculateOffsetForCallOrJump(byte *offsetAddress, byte *jmpToAddr, byte insn);
 byte *CalculateAddressFromOffset(byte *compileAtAddress, int32 offset);
-void _SetOffsetForCallOrJump(byte *compileAtAddress, byte *jmpToAddr);
-void _Compile_JumpToAddress(byte *jmpToAddr);
-void _Compile_JumpToReg(Boolean reg);
+void _SetOffsetForCallOrJump(byte *offsetAddress, byte *jmpToAddr, byte insn);
+void _Compile_JumpToDisp(int64 disp, byte insn);
+void _Compile_JumpToAddress32Bit(byte *offsetAddress, byte *jmpToAddr);
+void _Compile_JumpToRegAddress(Boolean reg);
 void Compile_UninitializedJumpEqualZero(void);
 void _Compile_UninitializedJmpOrCall(Boolean jmpOrCall);
 void _Compile_JumpWithOffset(int64 disp);
@@ -201,7 +202,7 @@ void Compile_GreaterThanOrEqual(Compiler *compiler);
 void Compile_TestLogicAndStackPush(Compiler *compiler, Boolean reg, Boolean setTtn, Boolean setNegFlag, Boolean jccTtt, Boolean jccNegFlag);
 void Compile_Logical_X(Compiler *compiler, int64 op, Boolean setTtn, Boolean setNegateFlag, Boolean jccTtt, Boolean jccNegFlag);
 void Compile_LogicalNot(Compiler *compiler);
-void _Compile_Jcc(int64 setNegFlag, int64 setTtn, byte *jmpToAddr);
+void _Compile_Jcc(int64 setNegFlag, int64 setTtn, byte *jmpToAddr, byte insn);
 void _BI_Compile_Jcc(BlockInfo *bi, byte *jmpToAddress);
 void BI_Compile_Jcc(BlockInfo *bi, Boolean setTtn, byte *jmpToAddress);
 void Compiler_Compile_Jcc(Compiler *compiler, int64 bindex, Boolean setTtn);
@@ -232,7 +233,7 @@ void Array_Do_AccumulatedAddress(int64 totalOffset);
 void Do_AccumulatedAddress(byte *accumulatedOffsetPointer, int64 offset, Boolean rvalueFlag, byte size);
 void CfrTil_Do_AccumulatedAddress(Word *word, byte *accumulatedAddress, int64 offset);
 void CfrTil_Dot(void);
-void _Word_CompileAndRecord_PushReg(Word *word, int64 reg);
+void _Word_CompileAndRecord_PushReg(Word *word, int64 reg, Boolean recordFlag);
 void Compiler_Get_C_BackgroundNamespace(Compiler *compiler);
 void Compiler_SetAs_InNamespace_C_BackgroundNamespace(Compiler *compiler);
 /* src/basis/core/block.c */
@@ -1141,7 +1142,7 @@ void Compiler_CalculateAndSetPreviousJmpOffset(Compiler *compiler, byte *jmpToAd
 void CfrTil_CalculateAndSetPreviousJmpOffset_ToHere(void);
 void _Stack_PointerToJmpOffset_Set(byte *address);
 void Stack_Push_PointerToJmpOffset(void);
-void CfrTil_CompileAndRecord_Word0_PushReg(Boolean reg);
+void CfrTil_CompileAndRecord_Word0_PushReg(Boolean reg, Boolean recordFlag);
 void CfrTil_CompileAndRecord_Word0_PushRegToUse(void);
 void CfrTil_CompileAndRecord_PushAccum(void);
 /* src/basis/core/dllnodes.c */

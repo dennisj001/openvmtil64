@@ -14,14 +14,14 @@ var: facTest fibTest Dsp ;
 
 // tail recursion from http://c2.com/cgi/wiki?TailCallOptimization
 c_syntaxOn scOn
-int factoriali ( REG n | REG res )
+int factoriali ( byte REG n | REG res )
 {
     res = 1;
     while ( n >= 2 )
     {
 #if 0
         res *= n-- ; 
-#elif 1
+#elif 0
         res *= (n--) ; 
 #elif 0
         res = res * n-- ;
@@ -31,6 +31,7 @@ int factoriali ( REG n | REG res )
     }
     return res;
 } prefix
+factoriali ( 7 ) ; p () ;
 'factoriali find wdiss //pause
 c_syntaxOff 
 C_Syntax.factoriali (7) dup p 5040 _assert //pause //sp

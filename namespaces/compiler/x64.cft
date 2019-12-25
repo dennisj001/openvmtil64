@@ -51,10 +51,6 @@ Compiler Compiling C Asm
 'asm; 'asmEnd find alias 
 //' :asm find winfo //sp
 //' asm; find winfo //sp
-'compile1 '1, find alias // we can't use ',' as part of a word.name with C syntax 
-'compile2 '2, find alias
-'compile4 '4, find alias
-'compile8 '8, find alias
 : ;; ' ; find compileWord ' _prefix find compileWord ; immediate
 // C : ;; ' ;; find compileWord ; immediate
 //' ;; find wdiss // sp
@@ -97,11 +93,12 @@ int
 CalculateModRmByte ( mod, reg, rm, sib, disp )
 {
     mod = CalculateModRegardingDisplacement ( mod, disp ) ;
-    if ( ( mod < 3 ) && ( rm == 4 ) ) //|| ( ( rm == 5 ) && ( disp == 0 ) ) ) )
-        //if ( ( mod < 3 ) && ( ( ( rm == 4 ) && ( sib == 0 ) ) || ( ( rm == 5 ) && ( disp == 0 ) ) ) )
+    if ( ( mod < 3 ) && ( rm == 4 ) ) 
+    //if ( ( mod < 3 ) && ( rm == 4 ) ) //|| ( ( rm == 5 ) && ( disp == 0 ) ) ) )
+    //if ( ( mod < 3 ) && ( ( ( rm == 4 ) && ( sib == 0 ) ) || ( ( rm == 5 ) && ( disp == 0 ) ) ) )
     {
-        // cf. InstructionSet-A-M-253666.pdf Table 2-2
-        "\n\nCalculateModRmByte : MACHINE_CODE_ERROR\n\n" ps ;
+        ps ( "\n\nCalculateModRmByte : MACHINE_CODE_ERROR\n" ) ;
+        ps ( "\n cf. InstructionSet-A-M-253666.pdf Table 2-2\n\n" ) ;
         pause ;
         quit ;
     }
@@ -138,17 +135,17 @@ _Compile_ImmDispData (  immDisp,  immSize,  forceFlag )
     // to not compile an imm when imm is a parameter, set isize == 0 and imm == 0
     if ( immSize > 0 )
     {
-        if ( immSize == BYTE ) compile1 (immDisp)  ; 
-        else if ( immSize == 4 ) compile4 (immDisp)  ; 
-        else if ( immSize == CELL ) compile8 (immDisp) ; 
+        if ( immSize == BYTE ) compileByte (immDisp)  ; 
+        else if ( immSize == 4 ) compileInt32 (immDisp)  ; 
+        else if ( immSize == CELL ) compileInt64 (immDisp) ; 
     }
     else // with operandSize == 0 let the compiler use the minimal size ; nb. can't be imm == 0
     {
-        if ( immDisp >= 0x100000000 ) compile8 (immDisp)  ;
+        if ( immDisp >= 0x100000000 ) compileInt64 (immDisp)  ;
         else 
         {
-            if ( immDisp >= 0x100 ) compile4 (immDisp)  ;
-            else if ( immDisp || forceFlag ) compile1 (immDisp)  ;
+            if ( immDisp >= 0x100 ) compileInt32 (immDisp)  ;
+            else if ( immDisp || forceFlag ) compileByte (immDisp)  ;
         }
     }
 } prefix
@@ -185,11 +182,11 @@ _Compile_Write_Instruction_X64 ( rex, opCode0, opCode1, modRm, controlFlags, sib
     int nbytes, _here  ;
     _here = Here ;
 #endif
-    if ( rex ) compile1 ( rex ) ; 
-    if ( opCode0 ) compile1 ( opCode0 ) ; 
-    if ( opCode1 ) compile1 ( opCode1 ) ; 
-    if ( controlFlags Bits.& MODRM_B ) compile1 ( modRm ) ;
-    if ( sib && ( controlFlags Bits.& SIB_B ) ) compile1 ( sib ) ;
+    if ( rex ) compileByte ( rex ) ; 
+    if ( opCode0 ) compileByte ( opCode0 ) ; 
+    if ( opCode1 ) compileByte ( opCode1 ) ; 
+    if ( controlFlags Bits.& MODRM_B ) compileByte ( modRm ) ;
+    if ( sib && ( controlFlags Bits.& SIB_B ) ) compileByte ( sib ) ;
     if ( disp || ( controlFlags Bits.& DISP_B ) ) _Compile_ImmDispData ( disp, dispSize, 0 ) ;
     if ( imm || ( controlFlags Bits.& IMM_B ) ) _Compile_ImmDispData ( imm, immSize, ( controlFlags Bits.& IMM_B ) ) ;
 #if DBI
@@ -432,6 +429,7 @@ MOVmr ( ptr, disp, reg )
     _Compile_Move ( MEM, MEM, reg, ptr, disp ) ;
 }
 nprefix (3) ;
+sp
 // move reg to reg
 void
 MOVrr ( dstReg, srcReg )
@@ -441,6 +439,7 @@ MOVrr ( dstReg, srcReg )
 }
 nprefix (2) ;
 c_syntaxOff
+sp
 C_Syntax Asm 
 asmBegin testAsm
     MOVrr RDX RAX 
@@ -453,5 +452,5 @@ pwi testAsm //pause
 sp 
 2 + 7 assertStkChk // stack checking
 //logOff
-//pause
+//stack pause
     

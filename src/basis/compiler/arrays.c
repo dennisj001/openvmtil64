@@ -256,7 +256,7 @@ _CfrTil_ArrayBegin ( Boolean lispMode, Word **pl1, int64 i )
                     Compile_Move_Reg_To_Reg (RegParameterOrder ( i ++ ), ACC , 0) ;
                     _Debugger_->PreHere = baseObject->Coding ;
                 }
-                else _Word_CompileAndRecord_PushReg ( baseObject, ACC ) ;
+                else _Word_CompileAndRecord_PushReg (baseObject, ACC , true) ;
             }
             else _CfrTil_OptimizeOff ( ) ; // can't really be optimized any more anyway and optimize is turned back on after an =/store anyway
             _DEBUG_SHOW ( baseObject, 1 ) ;

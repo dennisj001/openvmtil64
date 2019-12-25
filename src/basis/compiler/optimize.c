@@ -374,7 +374,7 @@ Compiler_CompileOptimizedLoad ( Compiler * compiler )
                 Compile_StandardArg ( optInfo->wordArg2, ACC, optInfo->wordArg2_rvalue, optInfo->wordArg2->Coding, true ) ;
             }
             Word_Set_StackPushRegisterCode_To_Here ( optInfo->opWord ) ; // for EndBlock and LogicCodeWord with '@'
-            _Word_CompileAndRecord_PushReg ( optInfo->wordArg2, ACC ) ;
+            _Word_CompileAndRecord_PushReg (optInfo->wordArg2, ACC , true) ;
         }
         else CompileOptimizedLoad_TOS ( ) ;
     }
@@ -516,7 +516,7 @@ Do_OptimizeOp2Literals ( Compiler * compiler )
     SetHere ( optInfo_0_two->Coding, 0 ) ;
     Compiler_SCA_Word_SetCodingHere_And_ClearPreviousUse ( optInfo_0_two, 1 ) ;
     Compile_MoveImm_To_Reg ( ACC, value, CELL ) ;
-    _Word_CompileAndRecord_PushReg ( optInfo->opWord, ACC ) ; // this is helpful in future optimizations looking for StackPushRegisterCode
+    _Word_CompileAndRecord_PushReg (optInfo->opWord, ACC , true) ; // this is helpful in future optimizations looking for StackPushRegisterCode
     optInfo->rtrn = OPTIMIZE_DONE ;
 }
 

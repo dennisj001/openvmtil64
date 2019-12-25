@@ -219,7 +219,7 @@ CompileOptimizeInfo *
 CompileOptimizeInfo_New ( uint64 type )
 {
     CompileOptimizeInfo * optInfo =
-    optInfo = _CompileOptimizeInfo_New ( type ) ;
+        optInfo = _CompileOptimizeInfo_New ( type ) ;
     return optInfo ;
 }
 
@@ -267,7 +267,7 @@ Compiler_Init_AccumulatedOffsetPointers ( Compiler * compiler, Word * word )
 }
 
 void
-CfrTil_SaveDebugInfo (Word * word)
+CfrTil_SaveDebugInfo ( Word * word )
 {
     Compiler * compiler = _Compiler_ ;
     word = word ? word : _CfrTil_->LastFinished_Word ;
@@ -283,7 +283,7 @@ CfrTil_SaveDebugInfo (Word * word)
 }
 
 void
-CfrTil_DeleteDebugInfo (Word * word)
+CfrTil_DeleteDebugInfo ( Word * word )
 {
     Compiler * compiler = _Compiler_ ;
     if ( compiler->NumberOfVariables )
@@ -291,18 +291,18 @@ CfrTil_DeleteDebugInfo (Word * word)
         Namespace_RemoveAndClearNamespacesStack ( compiler->LocalsCompilingNamespacesStack ) ;
         _Namespace_RemoveFromUsingListAndClear ( compiler->LocalsNamespace ) ;
     }
-    if ( ! _CfrTil_->CurrentWordBeingCompiled ) _CfrTil_RecycleInit_Compiler_N_M_Node_WordList () ;
+    if ( ! _CfrTil_->CurrentWordBeingCompiled ) _CfrTil_RecycleInit_Compiler_N_M_Node_WordList ( ) ;
 }
 
 void
-_CfrTil_FinishWordDebugInfo (Word * word, Boolean flag )
+_CfrTil_FinishWordDebugInfo ( Word * word, Boolean flag )
 {
     //Compiler * compiler = _Compiler_ ;
     //if ( compiler->NumberOfVariables || GetState ( _CfrTil_, ( RT_DEBUG_ON | GLOBAL_SOURCE_CODE_MODE ) ) )
     //    CfrTil_SaveDebugInfo ( ) ;
     if ( flag || ( ! GetState ( _CfrTil_, ( RT_DEBUG_ON | GLOBAL_SOURCE_CODE_MODE ) ) ) )
-        CfrTil_DeleteDebugInfo (0) ;
-    else CfrTil_SaveDebugInfo (0) ;
+        CfrTil_DeleteDebugInfo ( 0 ) ;
+    else CfrTil_SaveDebugInfo ( 0 ) ;
 }
 
 void
@@ -374,7 +374,7 @@ void
 Compiler_CalculateAndSetPreviousJmpOffset ( Compiler * compiler, byte * jmpToAddress )
 {
     // we now can not compile blocks (cf. _Compile_Block_WithLogicFlag ) if their logic is not called so depth check is necessary
-    if ( _Stack_Depth ( compiler->PointerToOffsetStack ) ) _SetOffsetForCallOrJump ( ( byte* ) Stack_Pop ( compiler->PointerToOffsetStack ), jmpToAddress ) ;
+    if ( _Stack_Depth ( compiler->PointerToOffsetStack ) ) _SetOffsetForCallOrJump ( ( byte* ) Stack_Pop ( compiler->PointerToOffsetStack ), jmpToAddress, JMPI32 ) ;
 }
 
 void
@@ -396,24 +396,24 @@ Stack_Push_PointerToJmpOffset ( )
 }
 
 void
-CfrTil_CompileAndRecord_Word0_PushReg ( Boolean reg )
+CfrTil_CompileAndRecord_Word0_PushReg (Boolean reg, Boolean recordFlag)
 {
     Word * word = _CfrTil_WordList ( 0 ) ;
-    _Word_CompileAndRecord_PushReg ( word, reg ) ;
+    _Word_CompileAndRecord_PushReg (word, reg , recordFlag) ;
 }
 
 void
 CfrTil_CompileAndRecord_Word0_PushRegToUse ( )
 {
     Word * word = _CfrTil_WordList ( 0 ) ;
-    _Word_CompileAndRecord_PushReg ( word, word->RegToUse ) ;
+    _Word_CompileAndRecord_PushReg (word, word->RegToUse , true) ;
 }
 
 void
 CfrTil_CompileAndRecord_PushAccum ( )
 {
     Word * word = _CfrTil_WordList ( 0 ) ;
-    _Word_CompileAndRecord_PushReg ( word, ACC ) ;
+    _Word_CompileAndRecord_PushReg (word, ACC , true) ;
 }
 
 

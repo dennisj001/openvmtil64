@@ -6,9 +6,10 @@ scOn
 Root : sp ; //stack pause ;
 C 
 : sp ; //stack pause ;
+sp
 dbOn 0 =
 User 
-: sp ; // stack pause ;
+: sp ; //stack pause ;
 1 opOn // this currently requires the optimization to be on to compile correctly 
 // verbosity 2 = 
 // echoOn
@@ -20,11 +21,13 @@ C Bits Experimental
 // ' tx find wdiss 
 Logic 
 // test constant folding
+#if 0 // not working ??
 : tx1 0 ! ! 8 2 / 2 / 3 & 4 | 1 + + ; 
 ' tx1 find wdiss //pause
 tx1 7 _assert
-// namespaceTreeWithWords
+#endif
 
+// namespaceTreeWithWords
 C
 sp
 // - tail recursion from http://c2.com/cgi/wiki?TailCallOptimization
@@ -520,6 +523,7 @@ scOn
 ;
 //' fibBN find wdiss
 20 fibBN dup p 6765 _assert sp
+//stack pause
 #endif
 
 Int

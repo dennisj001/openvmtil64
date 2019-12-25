@@ -22,7 +22,7 @@ CfrTil_Compile_Jcc ( )
 {
     int64 ttt = DataStack_Pop ( ) ;
     int64 n = DataStack_Pop ( ) ;
-    _Compile_Jcc ( n, ttt, 0 ) ; // we do need to store and get this logic set by various conditions by the compiler : _Compile_SET_tttn_REG
+    _Compile_Jcc (n, ttt, 0 , 0) ; // we do need to store and get this logic set by various conditions by the compiler : _Compile_SET_tttn_REG
     Stack_Push_PointerToJmpOffset ( ) ;
 }
 
@@ -31,7 +31,7 @@ CfrTil_Jcc_Label ( )
 {
     int64 ttt = DataStack_Pop ( ) ;
     int64 n = DataStack_Pop ( ) ;
-    _Compile_Jcc ( n, ttt, 0 ) ;
+    _Compile_Jcc (n, ttt, 0 , 0) ;
     GotoInfo_New ( ( byte* ) DataStack_Pop ( ), GI_GOTO ) ;
 }
 

@@ -45,7 +45,7 @@ CfrTil_BeginCombinator ( int64 quotesUsed )
     //_NBA_SetCompilingSpace_MakeSureOfRoom ( _Q_->MemorySpace0->CodeSpace, 8 * K ) ;
     // optimize out jmps such that the jmp from first block is to Here the start of the combinator code
     bi->CombinatorStartsAt = Here ;
-    _SetOffsetForCallOrJump ( bi->JumpOffset, bi->CombinatorStartsAt ) ;
+    _SetOffsetForCallOrJump (bi->JumpOffset, bi->CombinatorStartsAt , JMPI32) ;
     return bi ;
 }
 
@@ -97,7 +97,7 @@ CfrTil_LoopCombinator ( )
         byte * start = Here ;
         compiler->ContinuePoint = start ;
         Block_CopyCompile ( ( byte* ) loopBlock, 0, 0 ) ;
-        _Compile_JumpToAddress ( start ) ;
+        _Compile_JumpToAddress32Bit (0, start ) ;
         CfrTil_EndCombinator ( 1, 1 ) ;
     }
     else
@@ -122,7 +122,7 @@ CfrTil_WhileCombinator ( )
         d0 ( if ( Is_DebugModeOn ) Compiler_SC_WordList_Show ( ( byte* ) "\nCheckOptimize : after optimize :", 0, 0 ) ) ;
         Block_CopyCompile ( ( byte* ) testBlock, 1, 1 ) ;
         Block_CopyCompile ( ( byte* ) trueBlock, 0, 0 ) ;
-        _Compile_JumpToAddress ( start ) ;
+        _Compile_JumpToAddress32Bit (0, start ) ;
         CfrTil_CalculateAndSetPreviousJmpOffset_ToHere ( ) ;
         CfrTil_EndCombinator ( 2, 1 ) ;
     }
@@ -151,7 +151,7 @@ CfrTil_DoWhileCombinator ( )
         compiler->ContinuePoint = Here ;
         Block_CopyCompile ( ( byte* ) doBlock, 1, 0 ) ;
         Block_CopyCompile ( ( byte* ) testBlock, 0, 1 ) ;
-        _Compile_JumpToAddress ( start ) ;
+        _Compile_JumpToAddress32Bit (0, start ) ;
         CfrTil_CalculateAndSetPreviousJmpOffset_ToHere ( ) ;
         CfrTil_EndCombinator ( 2, 1 ) ;
     }
@@ -301,7 +301,7 @@ CfrTil_DoWhileDoCombinator ( )
         Block_CopyCompile ( ( byte* ) testBlock, 1, 1 ) ;
 
         Block_CopyCompile ( ( byte* ) doBlock2, 0, 0 ) ;
-        _Compile_JumpToAddress ( start ) ; // runtime
+        _Compile_JumpToAddress32Bit (0, start ) ; // runtime
         CfrTil_CalculateAndSetPreviousJmpOffset_ToHere ( ) ;
         CfrTil_EndCombinator ( 3, 1 ) ;
     }
@@ -343,7 +343,7 @@ CfrTil_ForCombinator ( )
         d0 ( Compiler_SC_WordList_Show ( ( byte* ) "for combinator : before doPostBlock", 0, 0 ) ) ;
         Block_CopyCompile ( ( byte* ) doPostBlock, 1, 0 ) ;
 
-        _Compile_JumpToAddress ( start ) ;
+        _Compile_JumpToAddress32Bit (0, start ) ;
         CfrTil_CalculateAndSetPreviousJmpOffset_ToHere ( ) ;
 
         CfrTil_EndCombinator ( 4, 1 ) ;

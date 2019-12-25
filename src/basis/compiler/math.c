@@ -33,7 +33,7 @@ Compile_Multiply ( Compiler * compiler )
         Compiler_SCA_Word_SetCodingHere_And_ClearPreviousUse ( optInfo->opWord, 1 ) ;
         _Compile_IMUL ( optInfo->Optimize_Mod, optInfo->Optimize_Reg, optInfo->Optimize_Rm, 0, optInfo->Optimize_Disp, 0 ) ;
         if ( optInfo->Optimize_Rm == DSP ) _Compile_Move_Reg_To_StackN ( DSP, 0, optInfo->Optimize_Reg ) ;
-        else _Word_CompileAndRecord_PushReg ( _CfrTil_WordList ( 0 ), optInfo->Optimize_Reg ) ;
+        else _Word_CompileAndRecord_PushReg (_CfrTil_WordList ( 0 ), optInfo->Optimize_Reg , true) ;
     }
     else
     {
@@ -74,7 +74,7 @@ _Compile_Divide ( Compiler * compiler, uint64 type )
         if ( type == MODULO ) reg = RDX ;
         else reg = ACC ;
         if ( reg != ACC ) Compile_Move_Reg_To_Reg (ACC, reg , 0) ; // for consistency finally use RAX so optInfo can always count on rax as the pushed reg
-        CfrTil_CompileAndRecord_Word0_PushReg ( ACC ) ;
+        CfrTil_CompileAndRecord_Word0_PushReg (ACC, true) ;
     }
     else
     {

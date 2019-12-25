@@ -43,11 +43,11 @@ CPrimitive CPrimitives [] = {
     { "lcOff", 0, 0, 0, ( block ) LC_LispNamespacesOff, 0, 0, 0, "Lisp", "Root" },
 
     { "'", 0, 0, 0, CfrTil_SingleQuote, IMMEDIATE | KEYWORD, 0, 0, "Forth", "Root" },
+    { "1,", 0, 0, 0, CompileByte, 0, 0, 0, "Forth", "Root" },
+    { "2,", 0, 0, 0, CompileInt16, 0, 0, 0, "Forth", "Root" },
     { ",", 0, 0, 0, CompileInt32, 0, 0, 0, "Forth", "Root" },
     { "4,", 0, 0, 0, CompileInt32, 0, 0, 0, "Forth", "Root" },
     { "8,", 0, 0, 0, CompileInt64, 0, 0, 0, "Forth", "Root" },
-    { "1,", 0, 0, 0, CompileByte, 0, 0, 0, "Forth", "Root" },
-    { "2,", 0, 0, 0, CompileInt16, 0, 0, 0, "Forth", "Root" },
     { "n,", 0, 0, 0, CompileN, 0, 0, 0, "Forth", "Root" },
 
     { "_Printf", 0, 0, 0, ( block ) _Printf, LISP_C_RTL_ARGS | LISP_VOID_RETURN, 0, 0, "C", "Root" },
@@ -412,7 +412,7 @@ CPrimitive CPrimitives [] = {
     { "addToHistoryOff", 0, 0, 0, OpenVmTil_AddStringToHistoryOff, 0, 0, 0, "OpenVmTil", "Root" },
     { "showAllocated", 0, 0, 0, OVT_Mem_ShowAllocated, 0, 0, 0, "OpenVmTil", "Root" },
     { "recycleDebugInfo", 0, 0, 0, OVT_RecycleAllWordsDebugInfo, 0, 0, 0, "OpenVmTil", "Root" },
-    { "<dbg>", 0, 0, 0, CfrTil_DebugRuntimeBreakpoint, 0, 0, 0, "OpenVmTil", "Root" },
+    { "<dbg>", 0, 0, 0, CfrTil_DebugRuntimeBreakpoint, CPRIMITIVE|DEBUG_WORD, RT_STEPPING_DEBUG, 0, "OpenVmTil", "Root" },
     
     { "freeTemporayMem", 0, 0, 0, OVT_MemListFree_TempObjects, 0, 0, 0, "Memory", "OpenVmTil" },
     { "freeCompilerTempMem", 0, 0, 0, OVT_MemListFree_CompilerTempObjects, 0, 0, 0, "Memory", "OpenVmTil" },
@@ -568,6 +568,9 @@ CPrimitive CPrimitives [] = {
     { ")", 0, 0, 0, CfrTil_C_Comma, IMMEDIATE | KEYWORD, RIGHT_PAREN, 0, "Compiler", "Root" },
 
     { "compileByte", 0, 0, 0, CompileByte, 0, 0, 0, "Compiling", "Compiler" },
+    { "compileInt16", 0, 0, 0, CompileInt16, 0, 0, 0, "Compiling", "Compiler" },
+    { "compileInt32", 0, 0, 0, CompileInt32, 0, 0, 0, "Compiling", "Compiler" },
+    { "compileInt64", 0, 0, 0, CompileInt64, 0, 0, 0, "Compiling", "Compiler" },
     { "_compileCall", 0, 0, 0, CompileCall, 0, 0, 0, "Compiling", "Compiler" },
     { "_compileWord", 0, 0, 0, CompileACfrTilWord, 0, 0, 0, "Compiling", "Compiler" },
     //{ "_compileThisWord", 0, 0, 0, Word_Compile_CurrentRunningWord, 0, 0, 0, "Compiling", "Compiler" },

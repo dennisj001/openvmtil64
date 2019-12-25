@@ -145,7 +145,7 @@ _Do_Compile_Variable ( Word * word, Boolean rvalueFlag )
         }
     }
     else _Compile_GetVarLitObj_LValue_To_Reg ( word, ACC ) ;
-    _Word_CompileAndRecord_PushReg ( word, ( word->CAttribute & REGISTER_VARIABLE ) ? word->RegToUse : ACC ) ;
+    _Word_CompileAndRecord_PushReg (word, ( word->CAttribute & REGISTER_VARIABLE ) ? word->RegToUse : ACC , true) ;
 }
 
 void
@@ -389,7 +389,7 @@ void
 CfrTil_Do_DynamicObject ( DObject * dobject0, Boolean reg )
 {
     DObject * dobject = _CfrTil_Do_DynamicObject_ToReg ( dobject0, reg ) ;
-    if ( CompileMode ) _Word_CompileAndRecord_PushReg ( dobject0, reg ) ;
+    if ( CompileMode ) _Word_CompileAndRecord_PushReg (dobject0, reg , true) ;
 
     else DataStack_Push ( ( int64 ) & dobject->W_Value ) ; //& dobject->W_DObjectValue ) ; //dobject ) ;
     CfrTil_TypeStackPush ( dobject ) ;
@@ -403,7 +403,7 @@ CfrTil_Do_LispSymbol ( Word * word )
     {
 
         _Compile_GetVarLitObj_RValue_To_Reg ( word, ACC ) ;
-        _Word_CompileAndRecord_PushReg ( word, ACC ) ;
+        _Word_CompileAndRecord_PushReg (word, ACC , true) ;
     }
     CfrTil_TypeStackPush ( word ) ;
 }
@@ -467,11 +467,11 @@ CfrTil_Dot ( ) // .
 }
 
 void
-_Word_CompileAndRecord_PushReg ( Word * word, int64 reg )
+_Word_CompileAndRecord_PushReg (Word * word, int64 reg , Boolean recordFlag)
 {
     if ( word )
     {
-        word->StackPushRegisterCode = Here ; // nb. used! by the rewriting optInfo
+        if ( recordFlag ) word->StackPushRegisterCode = Here ; // nb. used! by the rewriting optInfo
         if ( word->CAttribute & REGISTER_VARIABLE ) _Compile_Stack_PushReg ( DSP, word->RegToUse ) ;
         else
         {

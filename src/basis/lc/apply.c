@@ -468,7 +468,7 @@ _LO_Apply_C_LtoR_ArgList ( LambdaCalculus * lc, ListObject * l0, Word * word )
         if ( ( String_Equal ( word->Name, "printf" ) || ( String_Equal ( word->Name, "sprintf" ) ) ) ) Compile_MoveImm_To_Reg ( RAX, 0, CELL ) ; // for printf ?? others //System V ABI : "%rax is used to indicate the number of vector arguments passed to a function requiring a variable number of arguments"
         Compiler_SCA_Word_SetCodingHere_And_ClearPreviousUse ( word, 1 ) ;
         Word_Eval ( word ) ;
-        if ( word->CAttribute2 & RAX_RETURN ) _Word_CompileAndRecord_PushReg ( word, ACC ) ;
+        if ( word->CAttribute2 & RAX_RETURN ) _Word_CompileAndRecord_PushReg (word, ACC , true) ;
         if ( ! svcm )
         {
             CfrTil_EndBlock ( ) ;

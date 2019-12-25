@@ -56,6 +56,8 @@ BI_Block_Copy ( BlockInfo * bi, byte* dstAddress, byte * srcAddress, int64 bsize
             else dllist_Map1 ( compiler->GotoList, ( MapFunction1 ) _AdjustGotoInfo, ( int64 ) srcAddress ) ; //, ( int64 ) end ) ;
         }
         _CompileN ( srcAddress, isize ) ;
+        //if ( _DBI || _Q_->Dbi ) Debugger_UdisOneInstruction ( _Debugger_, srcAddress, ( byte* ) "", ( byte* ) "" ) ;
+        //if ( _DBI  ) Debugger_UdisOneInstruction ( _Debugger_, srcAddress, ( byte* ) "", ( byte* ) "" ) ;
     }
     bi->CopiedToEnd = Here ;
     bi->CopiedSize = bi->CopiedToEnd - bi->CopiedToStart ;
@@ -64,7 +66,7 @@ BI_Block_Copy ( BlockInfo * bi, byte* dstAddress, byte * srcAddress, int64 bsize
 }
 
 void
-Compile_BlockLogicTest ( BlockInfo * bi ) 
+Compile_BlockLogicTest ( BlockInfo * bi )
 {
     int64 diff ;
     if ( bi )
@@ -235,7 +237,7 @@ _CfrTil_EndBlock1 ( BlockInfo * bi )
     DataStack_Push ( ( int64 ) bi->bp_First ) ;
     bi->bp_Last = Here ;
     Compiler_CalculateAndSetPreviousJmpOffset ( compiler, bi->JumpOffset ) ;
-    _SetOffsetForCallOrJump ( bi->JumpOffset, Here ) ;
+    _SetOffsetForCallOrJump ( bi->JumpOffset, Here, JMPI32 ) ;
 }
 
 byte *

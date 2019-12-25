@@ -59,7 +59,9 @@
 #define _RET (0xc3) // x86 -
 #define NOOP ( 0x90 )
 #define JMPI32 (0xe9 ) // x86 - jmp opcode
-#define JCC1 (0x7)
+#define JMPI8 (0xeb ) // x86 - jmp opcode
+#define JCC8 (0x7)
+#define JCC32 (0x8)
 
 #define CALL_JMP_MOD_RM 0xff
 #define MOD_RM_R8 0x10
@@ -130,6 +132,7 @@
 #define SCALE_CELL SCALE_4
 #endif
 
+#define BYTE_SIZE (sizeof (byte))
 #define INT32_SIZE (sizeof (int32))
 #define INT64_SIZE (sizeof (int64))
 // size_w field

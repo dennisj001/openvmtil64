@@ -46,6 +46,7 @@ bnInit ( 16 16 )
 : sp ; //stack pause ;
 
 : qexp { dup 1 >= } { dup -- qexp * } { drop 1 } ifElse ;
+'qexp find wdiss //pause
 "!" ' qexp find alias
 nl "64 ! = " ps 64 ! p nl 
 x 1000 ! =

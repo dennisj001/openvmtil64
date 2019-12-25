@@ -113,7 +113,7 @@ Lexer_Init ( Lexer * lexer, byte * delimiters, uint64 state, uint64 allocType )
         Context_SetDefaultTokenDelimiters ( _Context_, ( byte* ) " \n\r\t", CONTEXT ) ;
         lexer->DelimiterCharSet = _Context_->DefaultDelimiterCharSet ;
         lexer->TokenDelimiters = _Context_->DefaultTokenDelimiters ;
-    }        
+    }
     lexer->State = state & ( ~ LEXER_RETURN_NULL_TOKEN ) ;
     SetState ( lexer, KNOWN_OBJECT | LEXER_DONE | END_OF_FILE | END_OF_STRING | LEXER_END_OF_LINE | LEXER_ALLOW_DOT, false ) ;
     lexer->TokenDelimitersAndDot = ( byte* ) " .\n\r\t" ;
@@ -250,10 +250,10 @@ Lexer_IsWordPrefixing ( Lexer * lexer, Word * word )
 {
     if ( word->Name[0] == '(' ) return false ;
     if ( GetState ( _Context_, LC_INTERPRET ) ) return true ;
-    else if ( ( GetState ( _Context_, PREFIX_MODE ) ) && ( ! ( word->CAttribute & ( CATEGORY_OP_OPEQUAL | CATEGORY_OP_EQUAL | KEYWORD ) ) ) 
+    else if ( ( GetState ( _Context_, PREFIX_MODE ) ) && ( ! ( word->CAttribute & ( CATEGORY_OP_OPEQUAL | CATEGORY_OP_EQUAL | KEYWORD ) ) )
         && ( ! ( word->WAttribute & WT_C_PREFIX_RTL_ARGS ) ) )
     {
-        return Lexer_IsNextWordLeftParen ( lexer ) ; 
+        return Lexer_IsNextWordLeftParen ( lexer ) ;
     }
     else return false ;
 }
@@ -649,7 +649,7 @@ Plus ( Lexer * lexer ) // '+':
     if ( lexer->TokenWriteIndex )
     {
         nextChar = ReadLine_PeekNextChar ( lexer->ReadLiner0 ) ;
-        if ( nextChar == '+' ) 
+        if ( nextChar == '+' )
         {
             ReadLine_UnGetChar ( lexer->ReadLiner0 ) ; // allow to read '++' as next token
             SetState ( lexer, LEXER_DONE, true ) ;
@@ -779,8 +779,16 @@ Comma ( Lexer * lexer )
 {
     if ( GetState ( _Context_, C_SYNTAX | INFIX_MODE ) ) //&& lexer->TokenWriteIndex )
     {
-        if ( lexer->TokenWriteIndex ) {Lexer_MakeItTheNextToken ( lexer ) ; return ; }
-        else CfrTil_C_Comma () ; // ??  
+        if ( lexer->TokenWriteIndex )
+        {
+            Lexer_MakeItTheNextToken ( lexer ) ;
+            return ;
+        }
+        else //if ( Lexer_IsCurrentInputCharADelimiter ( lexer ) ) 
+        {
+            CfrTil_C_Comma ( ) ; // ??  SetState ( _Context_, ADDRESS_OF_MODE, false ) ;
+            //return ;
+        }
     }
     else if ( ! GetState ( _Context_->Compiler0, LC_ARG_PARSING ) )
     {

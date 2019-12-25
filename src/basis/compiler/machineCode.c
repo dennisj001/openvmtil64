@@ -507,7 +507,7 @@ Compile_X_Group1 ( Compiler * compiler, int64 op, int64 ttt, int64 n )
             else if ( ( optInfo->Optimize_Dest_RegOrMem == REG ) && ( ! optInfo->xBetweenArg1AndArg2 ) ) _Compile_Move_Reg_To_StackN ( DSP, 0, optInfo->Optimize_Reg ) ;
             //_Compile_Move_StackN_To_Reg ( optInfo->Optimize_Reg, DSP, 0 ) ;
         }
-        else _Word_CompileAndRecord_PushReg ( optInfo->COIW[0], optInfo->Optimize_Reg ) ; // 0 : ?!? should be the exact variable 
+        else _Word_CompileAndRecord_PushReg (optInfo->COIW[0], optInfo->Optimize_Reg , true) ; // 0 : ?!? should be the exact variable 
         //DBI_OFF ;
     }
     else
@@ -519,7 +519,7 @@ Compile_X_Group1 ( Compiler * compiler, int64 op, int64 ttt, int64 n )
         //_Compile_X_Group1 ( int8 code, int64 toRegOrMem, int8 mod, int8 reg, int8 rm, int8 sib, int64 disp, int64 osize )
         //Compiler_SCA_Word_SetCodingHere_And_ClearPreviousUse ( optInfo->opWord, 0 ) ;
         _Compile_X_Group1 ( op, REG, MEM, ACC, DSP, 0, 0, CELL_SIZE ) ; // result is on TOS
-        _Word_CompileAndRecord_PushReg ( CfrTil_WordList ( 0 ), ACC ) ; // 0 : ?!? should be the exact variable 
+        _Word_CompileAndRecord_PushReg (CfrTil_WordList ( 0 ), ACC , true) ; // 0 : ?!? should be the exact variable 
         //DBI_OFF ;
     }
 }
@@ -608,7 +608,7 @@ Compile_X_Group5 ( Compiler * compiler, int64 op )
     }
     Compiler_Set_BI_Tttn ( _Context_->Compiler0, TTT_ZERO, NEGFLAG_NZ, TTT_ZERO, NEGFLAG_Z ) ;
     //if ( ( op != INC ) && ( op != DEC ) ) 
-    _Word_CompileAndRecord_PushReg ( CfrTil_WordList ( 0 ), optInfo->Optimize_Reg ) ; // 0 : ?!? should be the exact variable 
+    _Word_CompileAndRecord_PushReg (CfrTil_WordList ( 0 ), optInfo->Optimize_Reg , true) ; // 0 : ?!? should be the exact variable 
 }
 
 // load reg with effective address of [ mod rm sib disp ]
@@ -714,9 +714,11 @@ Calculate_Address_FromOffset_ForCallOrJump ( byte * address )
 // 		-> disp = jmpToAddr - compileAtAddress - 4
 
 int32
-_CalculateOffsetForCallOrJump ( byte * compileAtAddress, byte * jmpToAddr, Boolean offsetSize )
+_CalculateOffsetForCallOrJump ( byte * offsetAddress, byte * jmpToAddr, byte insn )
 {
-    int32 offset = ( jmpToAddr - ( compileAtAddress + offsetSize ) ) ; // operandSize sizeof offset //call/jmp insn x64/x86 mode //sizeof (cell) ) ; // we have to go back the instruction size to get to the start of the insn 
+    int32 offset ;
+    if ( ( insn != JMPI32 ) && ( insn != JCC32 ) && ( abs ( jmpToAddr - ( offsetAddress + 1 ) ) < 256 ) ) offset = ( jmpToAddr - ( offsetAddress + 1 ) ) ; //BYTE ) ) ;
+    else offset = ( jmpToAddr - ( offsetAddress + 4 ) ) ; // operandSize sizeof offset //call/jmp insn x64/x86 mode //sizeof (cell) ) ; // we have to go back the instruction size to get to the start of the insn 
     return offset ;
 }
 
@@ -728,27 +730,36 @@ CalculateAddressFromOffset ( byte * compileAtAddress, int32 offset )
 }
 
 void
-_SetOffsetForCallOrJump ( byte * compileAtAddress, byte * jmpToAddr )
+_SetOffsetForCallOrJump ( byte * offsetAddress, byte * jmpToAddr, byte insn )
 {
-    if ( compileAtAddress )
+    int32 offset = _CalculateOffsetForCallOrJump ( offsetAddress, jmpToAddr, insn ) ;
+    if ( ( insn != JMPI32 ) && ( insn != JCC32 ) && ( offset < 256 ) ) * ( ( int8* ) offsetAddress ) = offset ; //offset ;
+    else * ( ( int32* ) offsetAddress ) = offset ; //offset ;
+}
+
+void
+_Compile_JumpToDisp ( int64 disp, byte insn )
+{
+    if ( ( insn != JMPI32 ) && ( abs ( disp ) < 256 ) ) // with jmp instruction : disp is compiled an immediate offset
     {
-        int32 offset = _CalculateOffsetForCallOrJump ( compileAtAddress, jmpToAddr, INT32_SIZE ) ;
-        * ( ( int32* ) compileAtAddress ) = offset ;
+        Compile_CalculateWrite_Instruction_X64 ( 0, JMPI8, 0, 0, 0, DISP_B, 0, disp, BYTE, 0, 0 ) ;
+    }
+    else Compile_CalculateWrite_Instruction_X64 ( 0, JMPI32, 0, 0, 0, DISP_B, 0, disp, INT32_SIZE, 0, 0 ) ;
+}
+
+void
+_Compile_JumpToAddress32Bit ( byte * offsetAddress, byte * jmpToAddr ) // runtime
+{
+    if ( ! offsetAddress ) offsetAddress = Here + 1 ;
+    //if ( abs ( jmpToAddr - ( compileAtAddress + 6 ) ) ) // optimization : don't need to jump to the next instruction
+    {
+        int64 disp = _CalculateOffsetForCallOrJump ( offsetAddress, jmpToAddr, JMPI32 ) ;
+        _Compile_JumpToDisp ( disp, JMPI32 ) ;
     }
 }
 
 void
-_Compile_JumpToAddress ( byte * jmpToAddr ) // runtime
-{
-    if ( jmpToAddr != ( Here + 5 ) ) // optimization : don't need to jump to the next instruction
-    {
-        int32 disp = _CalculateOffsetForCallOrJump ( Here + 1, jmpToAddr, INT32_SIZE ) ;
-        Compile_CalculateWrite_Instruction_X64 ( 0, 0xe9, 0, 0, 0, DISP_B, 0, disp, INT32_SIZE, 0, 0 ) ; // with jmp instruction : disp is compiled an immediate offset
-    }
-}
-
-void
-_Compile_JumpToReg ( Boolean reg ) // runtime
+_Compile_JumpToRegAddress ( Boolean reg ) // runtime
 {
     _Compile_Group5 ( JMP, 0, reg, 0, 0, 0 ) ;
 }
@@ -756,7 +767,7 @@ _Compile_JumpToReg ( Boolean reg ) // runtime
 void
 Compile_UninitializedJumpEqualZero ( )
 {
-    _Compile_Jcc ( NEGFLAG_Z, TTT_ZERO, 0 ) ;
+    _Compile_Jcc ( NEGFLAG_Z, TTT_ZERO, 0, 0 ) ;
 }
 
 void
@@ -768,7 +779,8 @@ _Compile_UninitializedJmpOrCall ( Boolean jmpOrCall ) // runtime
 void
 _Compile_JumpWithOffset ( int64 disp ) // runtime
 {
-    Compile_CalculateWrite_Instruction_X64 ( 0, JMPI32, 0, 0, 0, DISP_B, 0, disp, INT32_SIZE, 0, 0 ) ;
+    //Compile_CalculateWrite_Instruction_X64 ( 0, JMPI32, 0, 0, 0, DISP_B, 0, disp, INT32_SIZE, 0, 0 ) ;
+    _Compile_JumpToDisp ( disp, 0 ) ;
 }
 
 void
@@ -809,12 +821,14 @@ Compile_Call ( byte * address )
 void
 _Compile_Call_ThruReg_TestAlignRSP ( Boolean thruReg )
 {
+    //DBI_ON ;
     Compile_Move_Reg_To_Reg ( RAX, RSP, 0 ) ;
     Compile_TEST_AL_ImmByte ( 0x8 ) ;
-    _Compile_Jcc ( NEGFLAG_Z, TTT_ZERO, Here + 22 ) ;
+    _Compile_Jcc ( NEGFLAG_Z, TTT_ZERO, Here + 15, 0 ) ;
     Compile_CallThru_AdjustRSP ( thruReg, REG ) ;
     _Compile_JumpWithOffset ( 3 ) ; // runtime
     _Compile_CallThru ( thruReg, REG ) ;
+    //DBI_OFF ;
 }
 
 void
