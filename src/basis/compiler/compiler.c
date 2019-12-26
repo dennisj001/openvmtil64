@@ -374,7 +374,7 @@ void
 Compiler_CalculateAndSetPreviousJmpOffset ( Compiler * compiler, byte * jmpToAddress )
 {
     // we now can not compile blocks (cf. _Compile_Block_WithLogicFlag ) if their logic is not called so depth check is necessary
-    if ( _Stack_Depth ( compiler->PointerToOffsetStack ) ) _SetOffsetForCallOrJump ( ( byte* ) Stack_Pop ( compiler->PointerToOffsetStack ), jmpToAddress, JMPI32 ) ;
+    if ( _Stack_Depth ( compiler->PointerToOffsetStack ) ) _SetOffsetForCallOrJump ( ( byte* ) Stack_Pop ( compiler->PointerToOffsetStack ), jmpToAddress, 0 ) ;
 }
 
 void
@@ -390,9 +390,9 @@ _Stack_PointerToJmpOffset_Set ( byte * address )
 }
 
 void
-Stack_Push_PointerToJmpOffset ( )
+Stack_Push_PointerToJmpOffset ( byte * compiledAtAddress )
 {
-    _Stack_PointerToJmpOffset_Set ( Here - DISP_SIZE ) ;
+    _Stack_PointerToJmpOffset_Set ( compiledAtAddress + 1 ) ;
 }
 
 void

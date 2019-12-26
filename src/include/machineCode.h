@@ -61,7 +61,7 @@
 #define JMPI32 (0xe9 ) // x86 - jmp opcode
 #define JMPI8 (0xeb ) // x86 - jmp opcode
 #define JCC8 (0x7)
-#define JCC32 (0x8)
+#define JCC32 (0x0f) //0x0f8x
 
 #define CALL_JMP_MOD_RM 0xff
 #define MOD_RM_R8 0x10
@@ -225,7 +225,7 @@ register uint64 *Fp             asm ( "r15" ) ;
 
 #define BYTE ((byte) 1)
 #define LABEL ((byte) 2)
-//#define WORD ((byte) 4)
+#define INT32 sizeof (int32) 
 //#define XSIZE ((byte) 8)
 
 // sign extend field

@@ -113,6 +113,8 @@ Lexer User
 Debug
 "DebugFlag" variable
 DebugFlag 0 =
+: dbiOn dbi 1 = ;
+: dbiOff dbi 0 = ;
 
 Compiler 
 // nb :: .'"[] :: these five characters - dot, tick, quote left bracket, right bracket - .'"[] - are character macros including the brackets they work at the char level in readline
@@ -173,8 +175,9 @@ Root
 : bnOn BigNum bnInit ( 16 16 ) ;
 bnOff
 
-Compiler 
-: var: { token dup ";" strcmp } { _var } while drop ; immediate // nb : no quotation marks around variable names with var: ... ;
+Compiler
+scOn 
+: var: { token dup ";" strcmp } { _var } while drop ; immediate // nb : no quotation marks around variable names with var: ... ; 
 var: DebugFlag classTestRead streamLine doInit1 doDemo doTest doLisp COMBINATOR_TOOKIT doLisp testing testLisp x Zenfone2 ; // _TestDone_ ; 
 : nstrcat: "" { token dup ";" strcmp } { strcat " " strcat } while drop ; immediate // nb : no quotation marks around names
 "mod" 'modulo find alias
@@ -376,8 +379,6 @@ stringMacrosOn
 : x64 "namespaces/compiler/x64.cft" include ; 
 : bx "namespaces/test/bigNum.test.cft" include ;
 : TODO ( str ) nl nl pdl nl str @ adps location nl pdl nl nl { dbgOnVar @ } { sp } if2 ;; //pause ;;
-: dbiOn dbi 1 = ;
-: dbiOff dbi 0 = ;
 
 // === controls ===
 Root 
@@ -419,6 +420,7 @@ stringMacrosOff
 #if doInitTest
 // startup test code here ...
 //tc //demo
+//fload nt.cft
 #endif // #else
 
 bnOff
@@ -432,3 +434,7 @@ rtw
 2 + 7 assertStkChk // stack checking 
 : mct "namespaces/compiler/machineCode.cft" include ;
 //mct
+: factorial ( REG n | REG rec -- RAX ) rec 1 = { n @ 1 > } { rec @ n @ * rec store n -- } while return rec ;
+7  factorial p
+'factorial find wdiss
+

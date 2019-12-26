@@ -34,7 +34,7 @@ BI_Block_Copy ( BlockInfo * bi, byte* dstAddress, byte * srcAddress, int64 bsize
             int32 offset = * ( int32* ) ( srcAddress + 1 ) ; // 1 : 1 byte CALLI32 opCode
             if ( ! offset )
             {
-                dllist_Map1 ( compiler->GotoList, ( MapFunction1 ) AdjustJmpOffsetPointer, ( int64 ) ( srcAddress + 1 ) ) ;
+                dllist_Map1 ( compiler->GotoList, ( MapFunction1 ) AdjustGotoJmpOffsetPointer, ( int64 ) ( srcAddress + 1 ) ) ;
                 CfrTil_SetupRecursiveCall ( ) ;
                 continue ;
             }
@@ -52,7 +52,10 @@ BI_Block_Copy ( BlockInfo * bi, byte* dstAddress, byte * srcAddress, int64 bsize
         else if ( * srcAddress == JMPI32 )
         {
             int64 offset = * ( int32* ) ( srcAddress + 1 ) ; // 1 : 1 byte JMPI32 opCode
-            if ( offset ) dllist_Map1 ( compiler->GotoList, ( MapFunction1 ) AdjustJmpOffsetPointer, ( int64 ) ( srcAddress + 1 ) ) ;
+            if ( offset )
+            {
+                dllist_Map1 ( compiler->GotoList, ( MapFunction1 ) AdjustGotoJmpOffsetPointer, ( int64 ) ( srcAddress + 1 ) ) ;
+            }
             else dllist_Map1 ( compiler->GotoList, ( MapFunction1 ) _AdjustGotoInfo, ( int64 ) srcAddress ) ; //, ( int64 ) end ) ;
         }
         _CompileN ( srcAddress, isize ) ;
@@ -103,21 +106,23 @@ Compile_BlockLogicTest ( BlockInfo * bi )
     }
 }
 
-void
+byte *
 Block_CopyCompile ( byte * srcAddress, int64 bindex, Boolean jccFlag )
 {
+    byte * compiledAtAddress = 0 ;
     Compiler * compiler = _Context_->Compiler0 ;
     BlockInfo *bi = ( BlockInfo * ) _Stack_Pick ( compiler->CombinatorBlockInfoStack, bindex ) ;
     BI_Block_Copy ( bi, Here, srcAddress, bi->bp_Last - bi->bp_First, 0 ) ; //nb!! 0 : turns off peephole optimization ; peephole optimization will be done in CfrTil_EndCombinator
     if ( jccFlag )
     {
         Compile_BlockLogicTest ( bi ) ;
-        _BI_Compile_Jcc ( bi, 0 ) ;
-        Stack_Push_PointerToJmpOffset ( ) ;
+        compiledAtAddress = _BI_Compile_Jcc ( bi, 0 ) ;
+        Stack_Push_PointerToJmpOffset ( compiledAtAddress ) ;
         bi->CopiedToEnd = Here ;
         bi->CopiedSize = bi->CopiedToEnd - bi->CopiedToStart ;
         //d1 ( if ( Is_DebugModeOn ) Debugger_Disassemble ( _Debugger_, ( byte* ) bi->CopiedToStart, bi->CopiedSize, 1 ) ) ;
     }
+    return compiledAtAddress ;
 }
 
 // a 'block' is merely a notation borrowed from C
@@ -148,7 +153,7 @@ CfrTil_TurnOnBlockCompiler ( )
 // some combinators take more than one block on the stack
 
 BlockInfo *
-_CfrTil_BeginBlock0 ( Boolean compileJumpFlag, byte * here )
+_CfrTil_BeginBlock0 ()
 {
     Context * cntx = _Context_ ;
     Compiler * compiler = cntx->Compiler0 ;
@@ -160,11 +165,11 @@ _CfrTil_BeginBlock0 ( Boolean compileJumpFlag, byte * here )
         CfrTil_TurnOnBlockCompiler ( ) ;
     }
     compiler->LHS_Word = 0 ;
-    bi->OriginalActualCodeStart = here ? here : Here ;
-    if ( compileJumpFlag ) Compile_UninitializedJump ( ) ;
-    bi->JumpOffset = here ? here - INT32_SIZE : Here - INT32_SIZE ; // before CfrTil_CheckCompileLocalFrame after CompileUninitializedJump
-    Stack_Push_PointerToJmpOffset ( ) ;
-    bi->bp_First = here ? here : Here ; // after the jump for inlining
+    bi->OriginalActualCodeStart = Here ;
+    byte * compiledAtAddress = Compile_UninitializedJump ( ) ;
+    bi->PtrToJumpOffset = Here - INT32_SIZE ; // before CfrTil_CheckCompileLocalFrame after CompileUninitializedJump
+    Stack_Push_PointerToJmpOffset ( compiledAtAddress ) ;
+    bi->bp_First = Here ; // after the jump for inlining
     return bi ;
 }
 
@@ -198,7 +203,7 @@ _CfrTil_BeginBlock2 ( BlockInfo * bi )
 void
 _CfrTil_BeginBlock ( Boolean compileJumpFlag, byte * here )
 {
-    BlockInfo * bi = _CfrTil_BeginBlock0 ( compileJumpFlag, here ) ;
+    BlockInfo * bi = _CfrTil_BeginBlock0 () ;
     _CfrTil_BeginBlock1 ( bi ) ;
     _CfrTil_BeginBlock2 ( bi ) ;
 }
@@ -236,8 +241,8 @@ _CfrTil_EndBlock1 ( BlockInfo * bi )
     _Compile_Return ( ) ;
     DataStack_Push ( ( int64 ) bi->bp_First ) ;
     bi->bp_Last = Here ;
-    Compiler_CalculateAndSetPreviousJmpOffset ( compiler, bi->JumpOffset ) ;
-    _SetOffsetForCallOrJump ( bi->JumpOffset, Here, JMPI32 ) ;
+    Compiler_CalculateAndSetPreviousJmpOffset ( compiler, bi->PtrToJumpOffset ) ;
+    _SetOffsetForCallOrJump ( bi->PtrToJumpOffset, Here, 0 ) ;
 }
 
 byte *

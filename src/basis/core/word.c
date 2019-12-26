@@ -13,7 +13,6 @@ Word_Run ( Word * word0 )
         DEBUG_SETUP ( word0 ) ;
         word = _Context_->CurrentlyRunningWord ;
         Block_Eval ( word->Definition ) ; // _Context_->CurrentlyRunningWord (= 0) may have been modified by debugger //word->Definition ) ;
-        //if ( IS_MORPHISM_TYPE ( word0 ) ) SetState ( _Context_, ADDRESS_OF_MODE, false ) ;
         _Context_->LastRunWord = word0 ;
         _Context_->CurrentlyRunningWord = 0 ;
     }

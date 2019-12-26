@@ -422,6 +422,10 @@
               <in>crt1w.c</in>
               <in>dllcrt1.c</in>
               <in>dllmain.c</in>
+              <in>gdi32.def</in>
+              <in>kernel32.def</in>
+              <in>msvcrt.def</in>
+              <in>user32.def</in>
               <in>wincrt1.c</in>
               <in>wincrt1w.c</in>
             </df>
@@ -444,6 +448,7 @@
           <in>il-opcodes.h</in>
           <in>libtcc.c</in>
           <in>libtcc.h</in>
+          <in>stab.def</in>
           <in>stab.h</in>
           <in>tcc.c</in>
           <in>tcc.h</in>

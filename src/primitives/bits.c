@@ -7,9 +7,9 @@ CfrTil_JMP ( )
 {
     if ( CompileMode )
     {
-        Compile_UninitializedJump ( ) ; // at the end of the 'if block' we need to jmp over the 'else block'
+        byte * compiledAtAddress = Compile_UninitializedJump ( ) ; // at the end of the 'if block' we need to jmp over the 'else block'
         CfrTil_CalculateAndSetPreviousJmpOffset_ToHere ( ) ;
-        Stack_Push_PointerToJmpOffset ( ) ;
+        Stack_Push_PointerToJmpOffset (compiledAtAddress) ;
     }
     else
     {
@@ -22,8 +22,8 @@ CfrTil_Compile_Jcc ( )
 {
     int64 ttt = DataStack_Pop ( ) ;
     int64 n = DataStack_Pop ( ) ;
-    _Compile_Jcc (n, ttt, 0 , 0) ; // we do need to store and get this logic set by various conditions by the compiler : _Compile_SET_tttn_REG
-    Stack_Push_PointerToJmpOffset ( ) ;
+    byte * compiledAtAddress = _Compile_Jcc (n, ttt, 0 , 0) ; // we do need to store and get this logic set by various conditions by the compiler : _Compile_SET_tttn_REG
+    Stack_Push_PointerToJmpOffset (compiledAtAddress) ;
 }
 
 void

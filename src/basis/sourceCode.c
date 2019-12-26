@@ -5,31 +5,34 @@ void
 Debugger_ShowDbgSourceCodeAtAddress ( Debugger * debugger, byte * address )
 {
     // ...source code source code TP source code source code ... EOL
-    Word * scWord = Get_SourceCodeWord ( debugger ) ;
-    if ( scWord )
+    if ( ! Compiling )
     {
-        dllist * list = scWord->W_SC_WordList ? scWord->W_SC_WordList : _CfrTil_->Compiler_N_M_Node_WordList ; //&& ( scWord->W_SC_MemSpaceRandMarker == _Q_->MemorySpace0->TempObjectSpace->InitFreedRandMarker ) ) ? scWord->W_SC_WordList : 0 ; //_CfrTil_->CompilerWordList ;
-        if ( list )
+        Word * scWord = Get_SourceCodeWord ( debugger ) ;
+        if ( scWord )
         {
-            byte *sourceCode = scWord->W_SourceCode ? scWord->W_SourceCode : String_New ( _CfrTil_->SC_Buffer, TEMPORARY ) ;
-            if ( ! String_Equal ( sourceCode, "" ) )
+            dllist * list = scWord->W_SC_WordList ? scWord->W_SC_WordList : _CfrTil_->Compiler_N_M_Node_WordList ; //&& ( scWord->W_SC_MemSpaceRandMarker == _Q_->MemorySpace0->TempObjectSpace->InitFreedRandMarker ) ) ? scWord->W_SC_WordList : 0 ; //_CfrTil_->CompilerWordList ;
+            if ( list )
             {
-                int64 fixed = 0 ;
-                Word * word = DWL_Find ( list, 0, address, 0, 0, 0, 0 ) ;
-                if ( word ) //&& ( debugger->LastSourceCodeWord != word ) )
+                byte *sourceCode = scWord->W_SourceCode ? scWord->W_SourceCode : String_New ( _CfrTil_->SC_Buffer, TEMPORARY ) ;
+                if ( ! String_Equal ( sourceCode, "" ) )
                 {
-                    //debugger->LastSourceCodeWord = word ;
-                    d0 ( DebugWordList_Show_All ( ) ) ;
-
-                    if ( ( scWord->WAttribute & WT_C_SYNTAX ) && ( String_Equal ( word->Name, "store" ) || String_Equal ( word->Name, "poke" ) ) )
+                    int64 fixed = 0 ;
+                    Word * word = DWL_Find ( list, 0, address, 0, 0, 0, 0 ) ;
+                    if ( word ) //&& ( debugger->LastSourceCodeWord != word ) )
                     {
-                        word->Name = ( byte* ) "=" ;
-                        fixed = 1 ;
-                    }
+                        //debugger->LastSourceCodeWord = word ;
+                        d0 ( DebugWordList_Show_All ( ) ) ;
 
-                    byte * buffer = SC_PrepareDbgSourceCodeString ( sourceCode, word ) ;
-                    if ( buffer ) _Printf ( ( byte* ) "\n%s", buffer ) ;
-                    if ( fixed ) word->Name = ( byte* ) "store" ;
+                        if ( ( scWord->WAttribute & WT_C_SYNTAX ) && ( String_Equal ( word->Name, "store" ) || String_Equal ( word->Name, "poke" ) ) )
+                        {
+                            word->Name = ( byte* ) "=" ;
+                            fixed = 1 ;
+                        }
+
+                        byte * buffer = SC_PrepareDbgSourceCodeString ( sourceCode, word ) ;
+                        if ( buffer ) _Printf ( ( byte* ) "\n%s", buffer ) ;
+                        if ( fixed ) word->Name = ( byte* ) "store" ;
+                    }
                 }
             }
         }
@@ -223,7 +226,7 @@ DLList_RecycleInit_WordList ( Word * word )
 }
 
 void
-_CfrTil_RecycleInit_Compiler_N_M_Node_WordList ()
+_CfrTil_RecycleInit_Compiler_N_M_Node_WordList ( )
 {
     Word * word = _CfrTil_->LastFinished_Word ; //Get_SourceCodeWord ( 0 ) ; //_CfrTil_->LastFinished_Word ;
     if ( Compiling && word && word->S_WordData )
@@ -250,7 +253,7 @@ CfrTil_WordList_Init ( Word * word, Boolean saveWord0 )
     if ( word ) svWord = word ;
     else if ( saveWord0 ) svWord = WordStack ( 0 ) ;
     else svWord = 0 ;
-    _CfrTil_RecycleInit_Compiler_N_M_Node_WordList () ;
+    _CfrTil_RecycleInit_Compiler_N_M_Node_WordList ( ) ;
     if ( svWord )
     {
         svWord->W_SC_Index = 0 ; // before pushWord !
@@ -670,7 +673,7 @@ Get_SourceCodeWord ( Debugger * debugger )
 {
     Word * scWord = 0 ;
     if ( debugger ) scWord = Word_GetFromCodeAddress ( debugger->DebugAddress ) ;
-    else scWord = GetState ( _Debugger_, DBG_STEPPING ) ? _Debugger_->w_Word : GetState ( _Compiler_, ( COMPILE_MODE | ASM_MODE ) ) ? _CfrTil_->CurrentWordBeingCompiled : _CfrTil_->ScWord ? _CfrTil_->ScWord : _CfrTil_->LastFinished_Word ;
+    if ( ! scWord ) scWord = GetState ( _Debugger_, DBG_STEPPING ) ? _Debugger_->w_Word : GetState ( _Compiler_, ( COMPILE_MODE | ASM_MODE ) ) ? _CfrTil_->CurrentWordBeingCompiled : _Context_->CurrentlyRunningWord ? _Context_->CurrentlyRunningWord : _CfrTil_->ScWord ? _CfrTil_->ScWord : _CfrTil_->LastFinished_Word ;
     return (scWord && scWord->S_WordData ) ? scWord : 0 ;
 }
 

@@ -131,7 +131,7 @@ _Compile_LogicalAnd ( Compiler * compiler )
     Compiler_BI_CompileRecord_TestCode_Set_Tttn ( compiler, ACC, TTT_ZERO, NEGFLAG_NZ, TTT_ZERO, NEGFLAG_Z ) ;
     _Compile_LogicResultForStack ( ACC, TTT_ZERO, NEGFLAG_NZ ) ; // jnz
     Compiler_Set_LogicCode ( compiler, TTT_ZERO, NEGFLAG_NZ, TTT_ZERO, NEGFLAG_Z ) ;
-    CfrTil_CompileAndRecord_Word0_PushReg (ACC, false) ;
+    CfrTil_CompileAndRecord_Word0_PushReg ( ACC, true ) ;
     //DBI_OFF ;
 }
 
@@ -151,18 +151,57 @@ Compile_LogicalAnd ( Compiler * compiler )
     }
 }
 
+#if 1 // larger total code size but requires to execute less instructions
+
 void
 _Compile_LogicalNot ( Compiler * compiler )
 {
     //DBI_ON ;
+    byte * here = Here ;
     Compiler_WordStack_SCHCPUSCA ( 0, 1 ) ;
     Compiler_BI_CompileRecord_TestCode_Set_Tttn ( compiler, ACC, TTT_ZERO, NEGFLAG_Z, TTT_ZERO, NEGFLAG_NZ ) ;
-    //_Set_JccLogicCodeForNot ( compiler ) ;
     _Compile_LogicResultForStack ( ACC, TTT_ZERO, NEGFLAG_Z ) ;
     Compiler_Set_LogicCode ( compiler, TTT_ZERO, NEGFLAG_Z, TTT_ZERO, NEGFLAG_NZ ) ;
-    CfrTil_CompileAndRecord_Word0_PushReg (ACC, false) ;
+    CfrTil_CompileAndRecord_Word0_PushReg ( ACC, true ) ;
+    //_Printf ( (byte*) "\nSize of LogicalNot code = %d bytes\n", Here -here ) ;
     //DBI_OFF ;
 }
+#elif 1 // small total code size but requires to execute more instructions
+
+void
+_Compile_LogicalNot ( Compiler * compiler )
+{
+    //DBI_ON ;
+    //byte * here = Here ;
+    byte reg = ACC ; //nb! reg should always be ACC! : immediately after the 'cmp' insn which changes the flags appropriately
+    _Compile_TestCode ( reg, CELL ) ;
+    _Compile_SETcc ( TTT_EQUAL, NEGFLAG_OFF, reg ) ;
+    _Compile_MOVZX_BYTE_REG ( reg, reg ) ;
+    _Compile_X_Group1_Immediate ( XOR, REG, reg, 0, 1, CELL ) ;
+    _Word_CompileAndRecord_PushReg ( _CfrTil_WordList ( 0 ), reg, true ) ;
+    //_Printf ( (byte*) "\nSize of LogicalNot code = %d bytes\n", Here -here ) ;
+    //DBI_OFF ;
+}
+#else // experimental
+
+void
+_Compile_LogicalNot ( Compiler * compiler )
+{
+    DBI_ON ;
+    byte * here = Here ;
+    byte reg = ACC ; //nb! reg should always be ACC! : immediately after the 'cmp' insn which changes the flags appropriately
+    _Compile_X_Group1_Immediate ( XOR, REG, reg, 0, - 1, CELL ) ;
+    //_Compile_TestCode ( reg, CELL ) ;
+    _Compile_SETcc ( TTT_EQUAL, NEGFLAG_ON, reg ) ;
+    //_Compile_XOR_RAX_1_Immediate () ;
+
+    //_Compile_XOR_AL_1_Immediate () ;
+    _Compile_MOVZX_BYTE_REG ( reg, reg ) ;
+    _Word_CompileAndRecord_PushReg ( _CfrTil_WordList ( 0 ), reg, true ) ;
+    _Printf ( ( byte* ) "\nSize of LogicalNot code = %d", Here - here ) ;
+    DBI_OFF ;
+}
+#endif
 
 void
 _Compile_SETcc ( Boolean setTtn, Boolean setNegFlag, Boolean reg )
@@ -245,7 +284,7 @@ Compile_Cmp_Set_Tttn_Logic ( Compiler * compiler, Boolean setTtn, Boolean setNeg
     }
     Boolean reg = ACC ; //nb! reg should always be ACC! : immediately after the 'cmp' insn which changes the flags appropriately
     _Compile_SETcc_Tttn_REG ( compiler, setTtn, setNegateFlag, jccTtt, jccNegFlag, reg, reg ) ; //nb! should always be ACC! : immediately after the 'cmp' insn which changes the flags appropriately
-    _Word_CompileAndRecord_PushReg (_CfrTil_WordList ( 0 ), reg , true) ; //ACC ) ;
+    _Word_CompileAndRecord_PushReg ( _CfrTil_WordList ( 0 ), reg, true ) ; //ACC ) ;
 }
 
 //  logical equals - "=="
@@ -321,7 +360,7 @@ Compile_LogicalNot ( Compiler * compiler )
     Word *one = _CfrTil_WordList ( 1 ) ; // assumes two values ( n m ) on the DSP stack 
     int64 optSetupFlag = Compiler_CheckOptimize ( compiler, 0 ) ; // check especially for cases that optimize literal ops
     if ( optSetupFlag & OPTIMIZE_DONE ) return ;
-        // just need to get to valued to be operated on ( not'ed ) in eax
+        // just need to get value to be operated on ( not'ed ) in eax
     else if ( optSetupFlag )
     {
         if ( compiler->OptInfo->OptimizeFlag & OPTIMIZE_IMM ) Compile_MoveImm_To_Reg ( ACC, compiler->OptInfo->Optimize_Imm, CELL ) ;
@@ -341,37 +380,67 @@ Compile_LogicalNot ( Compiler * compiler )
     _Compile_LogicalNot ( compiler ) ;
 }
 
-// JE, JNE, JZ, JNZ, ... see machineCode.h
 
-void
+// JE, JNE, JZ, JNZ, ... see machineCode.h
+#if 1
+
+byte *
 _Compile_Jcc ( int64 setNegFlag, int64 setTtn, byte * jmpToAddr, byte insn )
 {
-    int32 offset = _CalculateOffsetForCallOrJump ( Here + 1, jmpToAddr, insn ) ;
+    byte * compiledAtAddress = Here ;
+    int32 offset ;
     if ( jmpToAddr )
     {
-        if ( ( insn != JCC32 ) && ( offset < 256 ) )
+        int32 offset = _CalculateOffsetForCallOrJump ( Here + 1, jmpToAddr, insn ) ;
+        if ( ( insn != JCC32 ) && ( offset < 127 ) )
         {
             Compile_CalculateWrite_Instruction_X64 ( 0, ( 0x7 << 4 | setTtn << 1 | setNegFlag ), 0, 0, 0, DISP_B, 0, offset, BYTE, 0, 0 ) ;
-            return ;
+            return compiledAtAddress ;
         }
     }
     else offset = 0 ; // allow this function to be used to have a delayed compile of the actual address
     Compile_CalculateWrite_Instruction_X64 ( 0x0f, ( 0x8 << 4 | setTtn << 1 | setNegFlag ), 0, 0, 0, DISP_B, 0, offset, INT32_SIZE, 0, 0 ) ;
+    return compiledAtAddress ;
 }
+#else
 
-void
-_BI_Compile_Jcc ( BlockInfo *bi, byte* jmpToAddress ) // , int8 nz
+byte *
+_Compile_Jcc ( int64 setNegFlag, int64 setTtn, byte * jmpToAddr, byte insn )
+{
+    byte * compiledAtAddress = Here ;
+    int32 offset = jmpToAddr ? _CalculateOffsetForCallOrJump ( Here + 1, jmpToAddr, insn ) : 0 ;
+    //if ( jmpToAddr )
+    {
+        if ( ( insn != JCC32 ) || ( offset < 127 ) )
+        {
+            Compile_CalculateWrite_Instruction_X64 ( 0, ( 0x7 << 4 | setTtn << 1 | setNegFlag ), 0, 0, 0, DISP_B, 0, offset, BYTE, 0, 0 ) ;
+            return compiledAtAddress ;
+        }
+        else
+        {
+            //offset = 0 ; // allow this function to be used to have a delayed compile of the actual address
+            Compile_CalculateWrite_Instruction_X64 ( 0x0f, ( 0x8 << 4 | setTtn << 1 | setNegFlag ), 0, 0, 0, DISP_B, 0, offset, INT32_SIZE, 0, 0 ) ;
+        }
+        return compiledAtAddress ;
+    }
+}
+#endif
+
+byte *
+_BI_Compile_Jcc ( BlockInfo *bi, byte * jmpToAddress )
 {
     if ( bi->CopiedToLogicJccCode ) SetHere ( bi->CopiedToLogicJccCode, 1 ) ;
     else SetHere ( bi->JccLogicCode, 1 ) ;
     bi->ActualCopiedToJccCode = Here ;
-    _Compile_Jcc ( bi->JccNegFlag, bi->JccTtt, jmpToAddress, JCC32 ) ; // we do need to store and get this logic set by various conditions by the compiler : _Compile_SET_Tttn_REG
+    byte * compiledAtAddress = _Compile_Jcc ( bi->JccNegFlag, bi->JccTtt, jmpToAddress, 0 ) ; // we do need to store and get this logic set by various conditions by the compiler : _Compile_SET_Tttn_REG
+    return compiledAtAddress ;
 }
 
-void
+byte *
 BI_Compile_Jcc ( BlockInfo *bi, Boolean setTtn, byte * jmpToAddress ) // , int8 nz
 {
-    if ( bi->JccLogicCode ) _BI_Compile_Jcc ( bi, jmpToAddress ) ;
+    byte * compiledAtAddress ;
+    if ( bi->JccLogicCode ) compiledAtAddress = _BI_Compile_Jcc ( bi, jmpToAddress ) ;
     else
     {
         Compile_BlockLogicTest ( bi ) ; // after cmp we test our condition with setcc. if cc is true a 1 will be sign extended in R8 and pushed on the stack 
@@ -381,15 +450,17 @@ BI_Compile_Jcc ( BlockInfo *bi, Boolean setTtn, byte * jmpToAddress ) // , int8 
         // nb. without optimize|inline there is another cmp in Compile_GetLogicFromTOS which reverse the polarity of the logic 
         // ?? an open question ?? i assume it works the same in all cases we are using - exceptions ?? 
         // so adjust ...
-        _Compile_Jcc ( NEGFLAG_Z, setTtn, 0, 0 ) ;
+        compiledAtAddress = _Compile_Jcc ( NEGFLAG_Z, setTtn, 0, 0 ) ;
     }
+    return compiledAtAddress ;
 }
 
-void
+byte *
 Compiler_Compile_Jcc ( Compiler * compiler, int64 bindex, Boolean setTtn ) // , int8 nz
 {
     BlockInfo *bi = ( BlockInfo * ) _Stack_Pick ( compiler->CombinatorBlockInfoStack, bindex ) ; // -1 : remember - stack is zero based ; stack[0] is top
-    BI_Compile_Jcc ( bi, setTtn, 0 ) ;
+    byte * compiledAtAddress = BI_Compile_Jcc ( bi, setTtn, 0 ) ;
+    return compiledAtAddress ;
 }
 // non-combinator 'if'
 
@@ -398,7 +469,7 @@ CfrTil_If_ConditionalExpression ( )
 {
     if ( CompileMode )
     {
-        Compiler_Compile_Jcc ( _Compiler_, 0, TTT_ZERO ) ;
+        byte * compiledAtAddress = Compiler_Compile_Jcc ( _Compiler_, 0, TTT_ZERO ) ;
         // N, ZERO : use inline|optimize logic which needs to get flags immediately from a 'cmp', jmp if the zero flag is not set
         // for non-inline|optimize ( reverse polarity : cf. _Compile_Jcc comment ) : jmp if cc is not true; cc is set by setcc after 
         // the cmp, or is a value on the stack. 
@@ -406,7 +477,7 @@ CfrTil_If_ConditionalExpression ( )
         // ?? an explanation of the relation of the setcc terms with the flags is not clear to me yet (20110801) from the intel literature ?? 
         // but by trial and error this works; the logic i use is given in _Compile_Jcc.
         // ?? if there are problems check this area ?? cf. http://webster.cs.ucr.edu/AoA/Windows/HTML/IntegerArithmetic.html
-        Stack_Push_PointerToJmpOffset ( ) ;
+        Stack_Push_PointerToJmpOffset ( compiledAtAddress ) ;
     }
     else
     {
@@ -443,9 +514,9 @@ CfrTil_Else ( )
 {
     if ( CompileMode )
     {
-        Compile_UninitializedJump ( ) ; // at the end of the 'if block' we need to jmp over the 'else block'
+        byte * compiledAtAddress = Compile_UninitializedJump ( ) ; // at the end of the 'if block' we need to jmp over the 'else block'
         CfrTil_CalculateAndSetPreviousJmpOffset_ToHere ( ) ;
-        Stack_Push_PointerToJmpOffset ( ) ;
+        Stack_Push_PointerToJmpOffset ( compiledAtAddress ) ;
     }
     else
     {

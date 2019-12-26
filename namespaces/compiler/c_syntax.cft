@@ -161,8 +161,8 @@ interpret2 ( | atoken aword )
     {   
         atoken = token () ; 
         //printf ( "\n\ttoken = %s", atoken ) ; 
-        if ( ! ( strcmp ( atoken, "i2halt" ) ) ) { sp () ; return ; }
-        else if ( atoken )
+        if ( atoken && (! ( strcmp ( atoken, "i2halt" ) ) )) { sp () ; return ; }
+        else 
         {       
             aword = tokenToWord ( atoken ) ;
             doWord ( aword ) ;
@@ -225,17 +225,14 @@ interpret4 ( | atoken aword )
     {   
         atoken = token () ; 
         //printf ( "\n\ttoken = %s", atoken ) ; 
-        if ( ! ( strcmp ( atoken, "i2halt" ) ) ) 
+        if ( atoken && ( ! ( strcmp ( atoken, "i2halt" ) ) ) )
         { 
             return ; 
         }
         else
         {
-            if ( atoken )
-            {       
-                aword = tokenToWord ( atoken ) ;
-                doWord ( aword ) ;
-            }       
+            aword = tokenToWord ( atoken ) ;
+            doWord ( aword ) ;
         }
     }
 }
@@ -321,6 +318,7 @@ typedef struct _byteTest
 } byteTest ;
 'bt byteTest new ;
 ps ( "\nbt.size =" ) ; p ( bt.size ) ;
+bt.a123 = 256 ; dump ( bt, bt.size ) ; pause
 bt.a123 = 1 ; bt.b123 = 2 ; bt.c123 = 3 ; bt.d123 = 4 ;
 p (bt.a123) ; p (bt.b123) ; p (bt.c123) ; p (bt.c123) ; 
 bt.a123 1 _assert 

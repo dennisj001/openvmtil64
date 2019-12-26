@@ -1,0 +1,6 @@
+Logic 
+scOn
+//verbosity 4 =
+: nt ( n ) n @ ! ! ! p ; 
+1 nt 
+'nt find wdiss

@@ -81,9 +81,12 @@ DataObject_New ( uint64 type, Word * word, byte * name, uint64 ctype, uint64 cty
         }
         case C_TYPE:
         {
+            //if ( GetState ( cntx, C_SYNTAX ) ) 
+            Compiler_Get_C_BackgroundNamespace ( cntx->Compiler0 ) ;
             word = _Class_New ( name, C_TYPE, 0 ) ;
             Type_Create ( ) ;
-            //if ( GetState ( cntx, C_SYNTAX ) ) Compiler_SetAs_InNamespace_C_BackgroundNamespace ( cntx->Compiler0 ) ;
+            //if ( GetState ( cntx, C_SYNTAX ) ) 
+            Compiler_SetAs_InNamespace_C_BackgroundNamespace ( cntx->Compiler0 ) ;
             break ;
         }
         case C_TYPEDEF:
@@ -202,6 +205,7 @@ _Class_New ( byte * name, uint64 type, int64 cloneFlag )
         Namespace_DoNamespace (ns, 0) ;
     }
     CfrTil_WordList_Init ( 0, 0 ) ;
+    //Compiler_SetAs_InNamespace_C_BackgroundNamespace ( cntx->Compiler0 ) ;
     return ns ;
 }
 

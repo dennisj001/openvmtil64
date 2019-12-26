@@ -253,7 +253,7 @@ OVT_Throw ( int signal, int64 restartCondition, Boolean pauseFlag )
         else jb = & _CfrTil_->JmpBuf0 ;
     }
     //OVT_SetExceptionMessage ( _Q_ ) ;
-    printf ( "\n%s\n%s %s at %s -> ...", _Q_->ExceptionMessage, ( jb == & _CfrTil_->JmpBuf0 ) ? "reseting cfrTil" : "restarting OpenVmTil",
+    printf ( "\n%s\n%s %s from %s -> ...", _Q_->ExceptionMessage, ( jb == & _CfrTil_->JmpBuf0 ) ? "reseting cfrTil" : "restarting OpenVmTil",
         ( _Q_->Signal == SIGSEGV ) ? ": SIGSEGV" : "", ( _Q_->SigSegvs < 2 ) ? Context_Location ( ) : ( byte* ) "" ) ;
     fflush ( stdout ) ;
 

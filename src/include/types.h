@@ -513,7 +513,7 @@ typedef struct
     Symbol BI_Symbol ;
     uint64 State ;
     int64 CopiedSize ;
-    byte *LocalFrameStart, *AfterLocalFrame, * AfterRspSave, *bp_First, *bp_Last, *JumpOffset, *JccLogicCode, *LogicTestCode, *CombinatorStartsAt, *CombinatorEndsAt ;
+    byte *LocalFrameStart, *AfterLocalFrame, * AfterRspSave, *bp_First, *bp_Last, *PtrToJumpOffset, *JccLogicCode, *LogicTestCode, *CombinatorStartsAt, *CombinatorEndsAt ;
     byte *OriginalActualCodeStart, * CopiedFrom, *CopiedToStart, *CopiedToEnd, *CopiedToLogicJccCode, *ActualCopiedToJccCode ;
     Boolean SetccTtt, JccTtt, SetccNegFlag, JccNegFlag ;
     Word * LogicCodeWord ;

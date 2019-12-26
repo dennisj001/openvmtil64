@@ -227,7 +227,7 @@ void
 CfrTil_TypedefStructEnd ( void )
 {
     Namespace_SetAsNotUsing ( ( byte* ) "C_Typedef" ) ;
-    Compiler_SetAs_InNamespace_C_BackgroundNamespace ( _Compiler_ ) ;
+    //Compiler_SetAs_InNamespace_C_BackgroundNamespace ( _Compiler_ ) ;
 }
 
 // infix equal is unique in 'C' because the right hand side of '=' runs to the ';'
@@ -244,7 +244,7 @@ _Type_Create ( byte * token )
         Lexer * lexer = cntx->Lexer0 ;
         Lexer_ReadToken ( lexer ) ; // 
         size = _CfrTil_TypedefStructBegin ( ) ; //Namespace_ActivateAsPrimary ( ( byte* ) "C_Typedef" ) ;
-        Compiler_SetAs_InNamespace_C_BackgroundNamespace ( cntx->Compiler0 ) ;
+        //Compiler_SetAs_InNamespace_C_BackgroundNamespace ( cntx->Compiler0 ) ;
     }
     return size ;
 }

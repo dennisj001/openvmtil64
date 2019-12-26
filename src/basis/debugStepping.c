@@ -49,7 +49,7 @@ _Debugger_CompileAndStepOneInstruction ( Debugger * debugger, byte * jcAddress )
     if ( showExtraFlag ) Debug_ExtraShow ( Here - svHere, showExtraFlag ) ;
     if ( GetState ( debugger, DBG_AUTO_MODE ) && ( ! GetState ( debugger, DBG_CONTINUE_MODE ) ) ) SetState ( debugger, DBG_SHOW_STACK_CHANGE, false ) ;
     else _Debugger_ShowEffects ( debugger, debugger->w_Word, GetState ( debugger, DBG_STEPPING ), showExtraFlag ) ;
-    Debugger_UdisOneInstruction ( debugger, debugger->DebugAddress, ( byte* ) "\r", ( byte* ) "" ) ;
+    //Debugger_UdisOneInstruction ( debugger, debugger->DebugAddress, ( byte* ) "\r", ( byte* ) "" ) ;
     if ( Compiling ) _Debugger_DisassembleWrittenCode ( debugger ) ;
     DebugColors ;
     debugger->DebugAddress = nextInsn ;
@@ -166,7 +166,7 @@ Debugger_CompileAndStepOneInstruction ( Debugger * debugger )
             }
             goto end ; // don't actually step a ret insn
         }
-        else if ( ( * debugger->DebugAddress == JMPI32 ) || ( * debugger->DebugAddress == CALLI32 ) )
+        else if ( ( * debugger->DebugAddress == JMPI32 ) || ( * debugger->DebugAddress == CALLI32 ) || ( * debugger->DebugAddress == JMPI8 )  )
         {
             jcAddress = JumpCallInstructionAddress ( debugger->DebugAddress ) ;
 doJmpCall:
@@ -227,6 +227,7 @@ end:
         {
             // keep eip - instruction pointer - up to date ..
             debugger->cs_Cpu->Rip = ( uint64 * ) debugger->DebugAddress ;
+            Debugger_UdisOneInstruction ( debugger, debugger->DebugAddress, ( byte* ) "\r", ( byte* ) "" ) ;
         }
     }
 }

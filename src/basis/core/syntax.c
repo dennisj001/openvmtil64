@@ -276,8 +276,8 @@ CfrTil_C_ConditionalExpression ( )
             Compile_Pop_To_Acc ( DSP ) ;
             _Compile_TestCode ( ACC, CELL ) ;
         }
-        Compile_UninitializedJumpEqualZero ( ) ;
-        Stack_Push_PointerToJmpOffset ( ) ;
+        byte * compiledAtAddress = Compile_UninitializedJumpEqualZero ( ) ;
+        Stack_Push_PointerToJmpOffset (compiledAtAddress) ;
         byte * token = Interpret_C_Until_Token4 ( interp, ( byte* ) ":", ( byte* ) ",", ( byte* ) ")", ( byte* ) "}", 0, 0 ) ;
         if ( String_Equal ( token, ":" ) )
         {
