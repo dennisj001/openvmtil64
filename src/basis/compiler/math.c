@@ -236,7 +236,7 @@ CfrTil_IncDec ( int64 op ) // ++/--
                 _Compile_Move_Literal_Immediate_To_Reg ( THRU_REG, ( int64 ) nextWord->W_PtrToValue ) ;
                 Compile_Move_Rm_To_Reg (ACC, THRU_REG, 0 , 0) ;
                 _Compile_Group5 ( op, REG, ACC, 0, 0, 0 ) ;
-                Compile_Move_Reg_To_Rm (THRU_REG, ACC, 0 ) ;
+                Compile_Move_Reg_To_Rm (THRU_REG, ACC, 0 , 0) ;
 
             }
             return ;

@@ -78,7 +78,7 @@ int64
 _CfrTil_Parse_ClassStructure ( int64 cloneFlag )
 {
     int64 size = 0, offset = 0, sizeOf = 0, i, arrayDimensionSize ;
-    Namespace *ns, *classNs = _CfrTil_Namespace_InNamespaceGet ( ), *arrayBaseObject ;
+    Namespace *ns, *classNs = _CfrTil_Namespace_InNamespaceGet ( ), *baseObject ;
     byte * token ;
     int64 arrayDimensions [ 32 ] ; // 32 : max dimensions for now
     memset ( arrayDimensions, 0, sizeof (arrayDimensions ) ) ;
@@ -111,7 +111,8 @@ gotNextToken:
         if ( ns && ( size = _Namespace_VariableValueGet ( ns, ( byte* ) "size" ) ) )
         {
             token = Lexer_ReadToken ( _Context_->Lexer0 ) ;
-            arrayBaseObject = _CfrTil_ClassField_New ( token, ns, size, offset ) ; // nb! : in case there is an array so it will be there for ArrayDimensions
+            baseObject = _CfrTil_ClassField_New ( token, ns, size, offset ) ; // nb! : in case there is an array so it will be there for ArrayDimensions
+            baseObject->ObjectSize = size ;
             token = Lexer_Peek_Next_NonDebugTokenWord ( _Context_->Lexer0, 1, 0 ) ;
             if ( token [0] != '[' )
             {
@@ -152,9 +153,9 @@ gotNextToken:
                 if ( i )
                 {
                     //arrayBaseObject->CAttribute |= VARIABLE ;
-                    arrayBaseObject->ArrayDimensions = ( int64 * ) Mem_Allocate ( i * sizeof (int64 ), DICTIONARY ) ;
-                    MemCpy ( arrayBaseObject->ArrayDimensions, arrayDimensions, i * sizeof (int64 ) ) ;
-                    arrayBaseObject->ArrayNumberOfDimensions = i ;
+                    baseObject->ArrayDimensions = ( int64 * ) Mem_Allocate ( i * sizeof (int64 ), DICTIONARY ) ;
+                    MemCpy ( baseObject->ArrayDimensions, arrayDimensions, i * sizeof (int64 ) ) ;
+                    baseObject->ArrayNumberOfDimensions = i ;
                 }
                 if ( token ) goto gotNextToken ;
                 else break ;
@@ -489,7 +490,17 @@ _Lexer_ParseDecimal ( Lexer * lexer, byte * token )
     }
     else if ( sscanf ( ( char* ) token, INT_FRMT, ( uint64* ) & lexer->Literal ) )
     {
-        lexer->TokenType = ( T_INT | KNOWN_OBJECT ) ;
+        if ( lexer->Literal < 256 ) 
+        {
+            lexer->TokenType = ( T_BYTE | KNOWN_OBJECT ) ;
+            lexer->TokenObjectSize = 1 ;
+        }
+        //else if ( lexer->Literal < 256 ) lexer->TokenType = ( T_INT32 | KNOWN_OBJECT ) ;
+        else 
+        {
+            lexer->TokenType = ( T_INT | KNOWN_OBJECT ) ;
+            lexer->TokenObjectSize = 8 ;
+        }
         SetState ( lexer, KNOWN_OBJECT, true ) ;
         Lexer_ParseBigNum ( lexer, token ) ;
     }
@@ -510,6 +521,7 @@ _Lexer_ParseDecimal ( Lexer * lexer, byte * token )
 
 void
 Lexer_ParseObject ( Lexer * lexer, byte * token )
+
 {
     Context * cntx = _Context_ ;
     int64 offset = 0 ;

@@ -389,9 +389,9 @@ _Compile_Jcc ( int64 setNegFlag, int64 setTtn, byte * jmpToAddr, byte insn )
 {
     byte * compiledAtAddress = Here ;
     int32 offset ;
-    if ( jmpToAddr )
+    if ( jmpToAddr || insn == JCC8 )
     {
-        int32 offset = _CalculateOffsetForCallOrJump ( Here + 1, jmpToAddr, insn ) ;
+        int32 offset = jmpToAddr ? _CalculateOffsetForCallOrJump ( Here + 1, jmpToAddr, insn ) : 0 ;
         if ( ( insn != JCC32 ) && ( offset < 127 ) )
         {
             Compile_CalculateWrite_Instruction_X64 ( 0, ( 0x7 << 4 | setTtn << 1 | setNegFlag ), 0, 0, 0, DISP_B, 0, offset, BYTE, 0, 0 ) ;
@@ -432,7 +432,8 @@ _BI_Compile_Jcc ( BlockInfo *bi, byte * jmpToAddress )
     if ( bi->CopiedToLogicJccCode ) SetHere ( bi->CopiedToLogicJccCode, 1 ) ;
     else SetHere ( bi->JccLogicCode, 1 ) ;
     bi->ActualCopiedToJccCode = Here ;
-    byte * compiledAtAddress = _Compile_Jcc ( bi->JccNegFlag, bi->JccTtt, jmpToAddress, 0 ) ; // we do need to store and get this logic set by various conditions by the compiler : _Compile_SET_Tttn_REG
+    byte insn = GetState ( _CfrTil_, JCC8_ON ) ? JCC8 : 0 ;
+    byte * compiledAtAddress = _Compile_Jcc ( bi->JccNegFlag, bi->JccTtt, jmpToAddress, insn ) ; // we do need to store and get this logic set by various conditions by the compiler : _Compile_SET_Tttn_REG
     return compiledAtAddress ;
 }
 

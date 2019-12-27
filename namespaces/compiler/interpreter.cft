@@ -94,7 +94,7 @@ sp
 #endif
 
 c_syntaxOff 
-2 t{ + }t 7 assertStkChk // stack checking
+2 + 7 assertStkChk // stack checking
 //stack pause
 1 ? "hi" ps : "error" ps ;
 //stack pause

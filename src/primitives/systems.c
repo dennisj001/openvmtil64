@@ -49,6 +49,18 @@ CfrTil_ObjectNew ( ) //int64 size, byte * name, uint64 category, int64 allocType
 #endif
 
 void
+CfrTil_Jcc8_On ( )
+{
+    SetState ( _CfrTil_, JCC8_ON, true ) ;
+}
+
+void
+CfrTil_Jcc8_Off ( )
+{
+    SetState ( _CfrTil_, JCC8_ON, false ) ;
+}
+
+void
 CfrTil_InitTime ( )
 {
     System_InitTime ( _Context_->System0 ) ;

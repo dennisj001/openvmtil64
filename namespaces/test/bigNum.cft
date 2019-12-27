@@ -2,6 +2,7 @@
 Int 
 dbgOff 
 C
+//jcc8_Off
 : sp ; //stack pause ;
 sp
 // testing before bignum starts // - tail recursion ideas from http://c2.com/cgi/wiki?TailCallOptimization
@@ -92,5 +93,5 @@ bnInit ( 16 16 )
 sp
 bigNumOff
 Int
-2 t{ + }t 7 assertStkChk // stack checking
+2 + 7 assertStkChk // stack checking
 //pause

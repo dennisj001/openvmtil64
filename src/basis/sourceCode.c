@@ -673,7 +673,7 @@ Get_SourceCodeWord ( Debugger * debugger )
 {
     Word * scWord = 0 ;
     if ( debugger ) scWord = Word_GetFromCodeAddress ( debugger->DebugAddress ) ;
-    if ( ! scWord ) scWord = GetState ( _Debugger_, DBG_STEPPING ) ? _Debugger_->w_Word : GetState ( _Compiler_, ( COMPILE_MODE | ASM_MODE ) ) ? _CfrTil_->CurrentWordBeingCompiled : _Context_->CurrentlyRunningWord ? _Context_->CurrentlyRunningWord : _CfrTil_->ScWord ? _CfrTil_->ScWord : _CfrTil_->LastFinished_Word ;
+    if ( ! scWord ) scWord = GetState ( _Debugger_, DBG_STEPPING ) ? _Debugger_->w_Word : GetState ( _Compiler_, ( COMPILE_MODE | ASM_MODE ) ) ? _CfrTil_->CurrentWordBeingCompiled : _CfrTil_->ScWord ? _CfrTil_->ScWord : _Context_->CurrentlyRunningWord ? _Context_->CurrentlyRunningWord : _CfrTil_->LastFinished_Word ;
     return (scWord && scWord->S_WordData ) ? scWord : 0 ;
 }
 

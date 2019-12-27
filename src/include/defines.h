@@ -321,6 +321,8 @@
 #define STRUCTURE           ( (uint64) 1 << 27 )
 #define STRUCT              STRUCTURE         
 #define RAW_STRING          ( (uint64) 1 << 28 )
+#define T_INT32             ( (uint64) 1 << 29 )
+#define T_SIZE_CHECK        ( (uint64) 1 << 30 )
 
 // WAttribute for interpreter word types 
 #define WT_PREFIX                 ( (uint64) 1 <<  0 ) 
@@ -539,6 +541,7 @@
 #define SCA_ON ( (uint64) 1 << 29 )
 #define TYPECHECK_ON ( (uint64) 1 << 30 )
 #define RT_DEBUG_ON ( (uint64) 1 << 31 ) // Runtime Debug
+#define JCC8_ON ( (uint64) 1 << 32 ) // Runtime Debug
 
 // interpreter flags
 #define INTERPRETER_DONE ( (uint64) 1 << 28 )

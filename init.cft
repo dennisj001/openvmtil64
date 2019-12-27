@@ -1,13 +1,12 @@
 5 // stack checking marker
-typecheckOn 
+jcc8_On
+//typecheckOn dbgTypecheckOn
 : sp ; //stack pause ; 
 //verbosity 0 = 
 // logOn
 verbosity 1 = 
 Debug
 : d: _dbgOn dbgSourceCodeOn ; immediate debugWord // a debugWord has special behavior : doesn't interfere with optimization
-: t: dbgTypecheckOn ; t: 
-: ;t dbgTypecheckOff ;
 "OptimizeOn" variable
 OptimizeOn 1 = 
 #if OptimizeOn @
@@ -47,6 +46,10 @@ Debug
 "dbrk" ' <dbg> find alias debugWord
 "locals" 'localsShow find alias
 "regs" 'cpuStateShow find alias
+'t: 'dbgTypecheckOn find alias 
+';t 'dbgTypecheckOff find alias
+'tcOn 'typecheckOn find alias 
+'tcOff 'typecheckOff find alias
 'nt 'namespaceTreeWithWords find alias
 'dscOn 'dbgSourceCodeOn find alias
 'dscOff 'dbgSourceCodeOff find alias
@@ -236,6 +239,7 @@ System
 : _source ( addToHistoryFlag  pword )
     { addToHistoryFlag @ } { pword @ sourceAdd } { pword @ sourceDontAdd } ifElse 
 ;;
+jcc8_Off
 : _wdiss ( addToHistoryFlag pword ) 
     nl pel 
     _source ( addToHistoryFlag @ pword @ ) nl pdl 
@@ -245,6 +249,7 @@ System
     nl pel decimal 
     nl "::> 'wdiss' was called at" _ps location "<::" ps nl
 ;;
+jcc8_On
 : wdiss ( pword ) _wdiss ( 0 pword @ ) ; //debugWord      // don't add wdiss words to history list
 //: wdiss ( pword ) 0 pword @ _wdiss ; //debugWord      // don't add wdiss words to history list
 : wdissl ( pword ) logOn _wdiss ( 0 pword @ ) logOff ; //debugWord      // don't add wdiss words to history list
@@ -284,6 +289,7 @@ dscOn //verbosity 3 =
 //: _assert1 ( n m str ) { n @ m @ != } { str @ ps "error" ps _info _pause } if ;
 #endif
 //: ctloc do> locationPush does> locationPrint <do ; immediate // compile time location
+jcc8_Off
 : _assert0 ( n m ) { n @ m @ != } { nl location hex n @ p "!=" ps m @ p "<:" ps "Error!" adps _info _pause } { } ifElse ; //{ str @ ps " : ok\n" ps nl } ifElse ; // no "ok" with this word
 : _assert ( n m ) nl  nl "_assert ::" ps { n @ m @ != } { n @ p "!=" ps m @ p "<:" ps "Error!" adps _info _pause } { " ok\n" ps nl } ifElse ;
 : assert1s ( s1 s2 str ) { s1 @ s2 @ strcmp } { nl str @ ps "error" ps _info _pause } if ;
@@ -312,6 +318,7 @@ dscOn //verbosity 3 =
     } if2
     //stack pause
 ; 
+jcc8_On
 //' _assertStkChk find wdiss //pause
 : assertStkChk _assertStkChk ; //"\n_assertStkChk : " ps stack pause ; 
 Root
@@ -416,11 +423,39 @@ stringMacrosOff
 
 #else // !Is_DebugOn : of course you can trim this file to your needs and put your init code maybe here if you like
 
-'doInitTest 1 const
+'doInitTest 0 const
 #if doInitTest
 // startup test code here ...
 //tc //demo
 //fload nt.cft
+: mct "namespaces/compiler/machineCode.cft" include ;
+//mct
+jcc8_On
+: factorial ( REG n | REG rec -- RAX ) rec 1 = { n @ 1 > } { rec @ n @ * rec store n -- } while return rec ;
+jcc8_Off
+7  factorial p
+'factorial find wdiss
+// test byte size objects
+c_syntaxOn
+typedef struct _byteTest 
+{
+    byte a123;
+    byte b123;
+    long c123;
+    byte d123;
+} byteTest ;
+'bt byteTest new ;
+ps ( "\nbt.size =" ) ; p ( bt.size ) ;
+bt.a123 = 1 ; bt.b123 = 2 ; bt.c123 = 3 ; bt.d123 = 4 ;
+var ( 'btt ) ; 
+void bttt ( ) { btt = bt.a123 ; p (btt ) ; } bttt () ; // error size not considered
+bt.a123 = 255 ; dump ( bt, bt.size ) ; //pause
+p (bt.a123) ; p (bt.b123) ; p (bt.c123) ; p (bt.c123) ; 
+bt.a123 = 1 ; bt.b123 = 2 ; bt.c123 = 3 ; bt.d123 = 4 ;
+bt.a123 1 _assert 
+bt.c123.size 8 _assert
+//pause
+c_syntaxOff 
 #endif // #else
 
 bnOff
@@ -432,9 +467,3 @@ infixOn
 infixOff
 rtw
 2 + 7 assertStkChk // stack checking 
-: mct "namespaces/compiler/machineCode.cft" include ;
-//mct
-: factorial ( REG n | REG rec -- RAX ) rec 1 = { n @ 1 > } { rec @ n @ * rec store n -- } while return rec ;
-7  factorial p
-'factorial find wdiss
-

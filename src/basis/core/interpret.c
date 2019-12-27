@@ -11,9 +11,12 @@ _Interpreter_TokenToWord ( Interpreter * interp, byte * token, int64 tsrli, int6
         interp->Token = token ;
         word = Finder_Word_FindUsing ( interp->Finder0, token, 0 ) ;
         if ( word && interp->Compiler0->AutoVarTypeNamespace && ( word->CAttribute & NAMESPACE_VARIABLE ) ) word = 0 ;
-        if ( ! word ) word = Lexer_ObjectToken_New ( interp->Lexer0, token, tsrli, scwi ) ;
+        if ( ! word )
+        {
+            word = Lexer_ObjectToken_New ( interp->Lexer0, token, tsrli, scwi ) ;
+            if ( word ) word->ObjectSize = interp->Lexer0->TokenObjectSize ;
+        }
         Word_SetTsrliScwi ( word, tsrli, scwi ) ;
-        //word = Compiler_CopyDuplicatesAndPush ( word, tsrli, scwi ) ;
         _Context_->CurrentTokenWord = word ;
         DEBUG_SETUP ( word ) ;
     }

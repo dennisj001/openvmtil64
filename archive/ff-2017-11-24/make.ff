@@ -1,7 +1,0 @@
-\ generate ff (tools + led)
-
-blockfile ff.blk
-120 132 thru    \ stuff
-181 load        \ blkmm
-blockfile ff.blk
-9 load

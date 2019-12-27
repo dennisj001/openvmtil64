@@ -219,6 +219,7 @@ _CfrTil_ClassField_New ( byte * token, Class * aclass, int64 size, int64 offset 
     if ( size == 1 ) attribute = T_BYTE ;
     else if ( size == 8 ) attribute = T_INT64 ;
     word->CAttribute |= attribute ;
+    if ( size == 4 ) word->CAttribute2 = T_INT32 ;
     word->Offset = offset ;
 
     return word ;

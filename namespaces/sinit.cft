@@ -1,12 +1,13 @@
 5 // stack checking marker
-typecheckOn 
+//typecheckOn 
+
 : sp ; //stack pause ; 
 //verbosity 0 = 
 // logOn
 verbosity 1 = 
 Debug
 : d: _dbgOn dbgSourceCodeOn ; immediate debugWord // a debugWord has special behavior : doesn't interfere with optimization
-: t: dbgTypecheckOn ; t: 
+: t: dbgTypecheckOn ; 
 : ;t dbgTypecheckOff ;
 "OptimizeOn" variable
 OptimizeOn 1 = 

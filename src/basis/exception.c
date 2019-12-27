@@ -89,8 +89,9 @@ OVT_Pause ( byte * prompt, int64 signalExceptionsHandled )
             _Q_->RestartCondition ) ;
         do
         {
-            if ( ( _Q_->ExceptionCode != NOT_A_KNOWN_OBJECT ) && ( ! _Debugger_->w_Word ) ) _Debugger_->w_Word = Context_CurrentWord ( ) ;
-            else _Debugger_->w_Word = 0 ;
+            //if ( ( _Q_->ExceptionCode != NOT_A_KNOWN_OBJECT ) && ( ! _Debugger_->w_Word ) ) _Debugger_->w_Word = Context_CurrentWord ( ) ;
+            //else _Debugger_->w_Word = 0 ;
+            _Debugger_->w_Word = Context_CurrentWord ( ) ;
             _Debugger_ShowInfo ( _Debugger_, ( byte* ) "\r", _Q_->Signal, 0 ) ;
             _Printf ( ( byte* ) "%s", buffer ) ;
 

@@ -18,7 +18,7 @@ CfrTil_PeekReg ( ) // @
     ByteArray * svcs = _Q_CodeByteArray, *ba = _CfrTil_->PeekPokeByteArray ;
     _ByteArray_DataClear ( ba ) ;
     Set_CompilerSpace ( ba ) ; // now compile to this space
-    Compile_Move_Reg_To_Rm (DSP, TOS & 0xf, 0 ) ;
+    Compile_Move_Reg_To_Rm (DSP, TOS & 0xf, 0 , 0) ;
     _Compile_Return ( ) ;
     Set_CompilerSpace ( svcs ) ; // now compile to this space
     ( ( VoidFunction ) ba->BA_Data ) ( ) ;
@@ -54,7 +54,7 @@ CfrTil_PokeRegAtAddress ( ) // @
     Set_CompilerSpace ( ba ) ; // now compile to this space
     _Compile_PushReg ( ACC ) ;
     Compile_MoveImm (REG, ACC, 0, ( uint64 ) address, CELL ) ;
-    Compile_Move_Reg_To_Rm (ACC, reg, 0 ) ;
+    Compile_Move_Reg_To_Rm (ACC, reg, 0 , 0) ;
     _Compile_PopToReg ( ACC ) ;
     _Compile_Return ( ) ;
     Set_CompilerSpace ( svcs ) ; // reset compiler space pointer

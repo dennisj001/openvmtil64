@@ -702,7 +702,8 @@ Debugger_TableSetup ( Debugger * debugger )
     debugger->CharacterTable [ 'Q' ] = 33 ;
     debugger->CharacterTable [ 'L' ] = 34 ;
     debugger->CharacterTable [ 'X' ] = 35 ;
-    debugger->CharacterTable [ 'T' ] = 36 ;
+    //debugger->CharacterTable [ 'T' ] = 36 ;
+    debugger->CharacterTable [ 'y' ] = 36 ;
 
     // debugger : system related
     debugger->CharacterFunctionTable [ 0 ] = Debugger_Default ;

@@ -210,7 +210,7 @@ CfrTil_While_PrefixCombinators ( )
 }
 
 int64
-_CfrTil_TypedefStructBegin ( void )
+_CfrTil_TypedefStruct_Parse ( void )
 {
     int64 size = _CfrTil_Parse_ClassStructure ( 0 ) ;
     return size ;
@@ -219,7 +219,7 @@ _CfrTil_TypedefStructBegin ( void )
 void
 CfrTil_TypedefStructBegin ( void )
 {
-    int64 size = _CfrTil_TypedefStructBegin ( ) ;
+    int64 size = _CfrTil_TypedefStruct_Parse ( ) ;
     //DataStack_Push ( size ) ;
 }
 
@@ -243,7 +243,7 @@ _Type_Create ( byte * token )
         Context * cntx = _Context_ ;
         Lexer * lexer = cntx->Lexer0 ;
         Lexer_ReadToken ( lexer ) ; // 
-        size = _CfrTil_TypedefStructBegin ( ) ; //Namespace_ActivateAsPrimary ( ( byte* ) "C_Typedef" ) ;
+        size = _CfrTil_TypedefStruct_Parse ( ) ; //Namespace_ActivateAsPrimary ( ( byte* ) "C_Typedef" ) ;
         //Compiler_SetAs_InNamespace_C_BackgroundNamespace ( cntx->Compiler0 ) ;
     }
     return size ;

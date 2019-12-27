@@ -314,6 +314,8 @@ CPrimitive CPrimitives [] = {
     { "echoOff", 0, 0, 0, CfrTil_EchoOff, 0, 0, 0, "System", "Root" },
     { "echoOn", 0, 0, 0, CfrTil_EchoOn, 0, 0, 0, "System", "Root" },
     { "echoOff", 0, 0, 0, CfrTil_EchoOff, 0, 0, 0, "System", "Root" },
+    { "jcc8_On", 0, 0, 0, CfrTil_Jcc8_On, 0, 0, 0, "System", "Root" },
+    { "jcc8_Off", 0, 0, 0, CfrTil_Jcc8_Off, 0, 0, 0, "System", "Root" },
     { "echo", 0, 0, 0, CfrTil_Echo, IMMEDIATE, 0, 0, "System", "Root" },
     { "timeInit", 0, 0, 0, CfrTil_InitTime, 0, 0, 0, "System", "Root" },
     { "timerInit", 0, 0, 0, CfrTil_TimerInit, 0, 0, 0, "System", "Root" },

@@ -245,6 +245,7 @@ sp
 ;;
 //'adump find wdiss
 //verbosity 3 =
+jcc8_Off
 #if 1
 : a9 ( Ar9 a | x y z )
     x 0 = y 0 = z 0 =
@@ -273,6 +274,7 @@ sp
     while
     adump ( 0 246 67 a  ) 
 ;
+jcc8_On
 ' a9 find wdiss s //pause
 "arr9" Ar9 new arr9 a9 sp //pause
 adump ( 0 123 234 arr9 ) 

@@ -11,7 +11,7 @@ uint8 CalculateModRmByte(Boolean mod, Boolean reg, Boolean rm, Boolean sib, int6
 void Compile_CalculateWrite_Instruction_X64(uint8 opCode0, uint8 opCode1, Boolean mod, uint8 reg, Boolean rm, uint16 controlFlags, Boolean sib, uint64 disp, uint8 dispSize, uint64 imm, uint8 immSize);
 void Compile_Move(uint8 direction, uint8 mod, uint8 reg, uint8 rm, uint8 operandSize, uint8 sib, int64 disp, uint8 dispSize, int64 imm, uint8 immSize);
 void Compile_Move_WithSib(uint8 direction, Boolean mod, Boolean reg, Boolean rm, Boolean scale, Boolean index, Boolean base);
-void Compile_Move_Reg_To_Rm(Boolean rm, Boolean reg, int64 disp);
+void Compile_Move_Reg_To_Rm(Boolean rm, Boolean reg, int64 disp, byte size);
 void Compile_Move_Rm_To_Reg(Boolean rm, Boolean reg, int64 disp, byte size);
 void Compile_Move_Reg_To_Reg(Boolean dstReg, int64 srcReg, byte size);
 void Compile_MoveImm(Boolean mod, Boolean rm, int64 disp, int64 imm, Boolean immSize);
@@ -1449,7 +1449,7 @@ void Debugger_DisassembleAccumulated(Debugger *debugger);
 void Debugger_DisassembleTotalAccumulated(Debugger *debugger);
 /* src/basis/typeCheck.c */
 Boolean TSI_TypeCheck_NonTypeVariableSigCode(TSI *tsi, Word *stackWord, int64 ti);
-Boolean TSI_TypeCheck_TypeVariableSigCode(TSI *tsi, Word *stackWord0, Word *stackWord1);
+Boolean TSI_TypeCheck_TypeVariableSigCodesAndSizes(TSI *tsi, Word *stackWord0, Word *stackWord1);
 Boolean TSI_TypeCheckAndInfer(TSI *tsi);
 TSI *TSI_Init(TSI *tsi, Word *opWord);
 TSI *TSI_New(Word *opWord, uint64 allocType);
@@ -1873,6 +1873,8 @@ void Namespace_RemoveNamespacesStack(Stack *stack);
 void Namespace_RemoveAndClearNamespacesStack(Stack *stack);
 void Namespace_NamespacesStack_PrintWords(Stack *stack);
 /* src/primitives/systems.c */
+void CfrTil_Jcc8_On(void);
+void CfrTil_Jcc8_Off(void);
 void CfrTil_InitTime(void);
 void CfrTil_TimerInit(void);
 void CfrTil_Time(void);
@@ -2074,7 +2076,7 @@ void CfrTil_DoWhile_PrefixCombinators(void);
 void CfrTil_For_PrefixCombinators(void);
 void CfrTil_Loop_PrefixCombinators(void);
 void CfrTil_While_PrefixCombinators(void);
-int64 _CfrTil_TypedefStructBegin(void);
+int64 _CfrTil_TypedefStruct_Parse(void);
 void CfrTil_TypedefStructBegin(void);
 void CfrTil_TypedefStructEnd(void);
 int64 _Type_Create(byte *token);

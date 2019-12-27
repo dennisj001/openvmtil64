@@ -293,9 +293,9 @@ c_syntaxOff
 "\n\nnew $ test\n" ps
 $ls -al . ;
 $ etc/script ; 
-$ etc/lispScript ; 
+$$ etc/lispScript ; 
 $$ls -al /usr/local ; 
-$$ls -al . ;
+$$ ls -al . ;
 #endif
 C
 sp
@@ -318,13 +318,14 @@ typedef struct _byteTest
 } byteTest ;
 'bt byteTest new ;
 ps ( "\nbt.size =" ) ; p ( bt.size ) ;
-bt.a123 = 256 ; dump ( bt, bt.size ) ; pause
 bt.a123 = 1 ; bt.b123 = 2 ; bt.c123 = 3 ; bt.d123 = 4 ;
+var ( 'btt ) ; 
+void bttt ( ) { btt = bt.a123 ; p (btt ) ; } bttt () ; // error size not considered
+bt.a123 = 255 ; dump ( bt, bt.size ) ; //pause
 p (bt.a123) ; p (bt.b123) ; p (bt.c123) ; p (bt.c123) ; 
+bt.a123 = 1 ; bt.b123 = 2 ; bt.c123 = 3 ; bt.d123 = 4 ;
 bt.a123 1 _assert 
 bt.c123.size 8 _assert
-var ( 'btt ) ; 
-void bttt ( ) { btt = bt.a123 ; p (btt ) ; } bttt () ;
 //pause
 c_syntaxOff 
 2 + 7 assertStkChk // stack checking

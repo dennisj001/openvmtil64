@@ -122,6 +122,7 @@ Lexer_Init ( Lexer * lexer, byte * delimiters, uint64 state, uint64 allocType )
     lexer->Filename = lexer->ReadLiner0->Filename ;
     lexer->LineNumber = lexer->ReadLiner0->LineNumber ;
     lexer->SC_Index = 0 ;
+    lexer->TokenObjectSize = 0 ;
     Lexer_RestartToken ( lexer ) ;
 }
 

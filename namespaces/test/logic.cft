@@ -76,6 +76,11 @@ hex
 : tcmp ( n m -- TOS ) n @ p " > " ps m @ p n @ m @ > dup decimal p ; nl 0x100000000 0xffffffff tcmp 1 _assert 
 s hex nl 0xffffffff 0x100000000 tcmp 0 _assert 
 decimal
+Logic 
+: nt ( n -- TOS ) n @ ! ! ! ; 
+1 nt 0 _assert 
+0 nt 1 _assert
+'nt find wdiss
 sp
 2 + 7 assertStkChk sp // stack checking
 

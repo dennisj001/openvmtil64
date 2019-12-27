@@ -65,6 +65,7 @@ Do_Variable ( Word * word, Boolean rvalueFlag, Boolean isForwardDotted )
     if ( CompileMode )
     {
         if ( GetState ( cntx, ( C_SYNTAX | INFIX_MODE ) ) && ( ! rvalueFlag ) && ( ! compiler->LHS_Word ) ) compiler->LHS_Word = word ;
+        //if ( GetState ( cntx, ( C_SYNTAX | INFIX_MODE ) ) && ( ! rvalueFlag ) ) compiler->LHS_Word = word ;
         _Do_Compile_Variable ( word, rvalueFlag ) ;
     }
     else

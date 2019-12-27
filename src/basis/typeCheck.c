@@ -1,6 +1,6 @@
 
 #include "../include/cfrtil64.h"
-
+// the codes are in the Tsi_ConvertTypeSigCodeToAttribute function below
 // the logic here is still in an alpha prototype stage
 
 Boolean
@@ -12,11 +12,11 @@ TSI_TypeCheck_NonTypeVariableSigCode ( TSI * tsi, Word * stackWord, int64 ti )
         uint64 attribute = Tsi_ConvertTypeSigCodeToAttribute ( sigCode ) ;
         if ( ! ( stackWord->CAttribute & attribute ) )
         {
-            if ( ( stackWord->CAttribute & ( PARAMETER_VARIABLE | NAMESPACE_VARIABLE | LOCAL_VARIABLE | REGISTER_VARIABLE | T_LISP_SYMBOL | DOBJECT ) )
-                || ( ! ( stackWord->CAttribute & ( T_INT | T_BIG_NUM | T_STRING | T_BOOLEAN | OBJECT | T_VOID ) ) )
-                || ( sigCode == 'A' ) || ( sigCode == '_' ) || ( sigCode == 'U' )
+            if ( ( sigCode == 'A' ) || ( sigCode == '_' ) || ( sigCode == 'U' )
+                || ( stackWord->CAttribute & ( PARAMETER_VARIABLE | NAMESPACE_VARIABLE | LOCAL_VARIABLE | REGISTER_VARIABLE | T_LISP_SYMBOL | DOBJECT ) )
+                || ( ! ( stackWord->CAttribute & ( T_BYTE | T_INT | T_BIG_NUM | T_STRING | T_BOOLEAN | OBJECT | T_VOID ) ) )
                 || ( stackWord->CAttribute2 & ( T_ANY | T_UNDEFINED ) )
-                || ( ( sigCode == 'I' ) && ( stackWord->CAttribute & ( OBJECT | OBJECT_FIELD | T_BOOLEAN ) ) ) ) // same type "kind"
+                || ( ( sigCode == 'I' ) && ( stackWord->CAttribute & ( OBJECT | OBJECT_FIELD | T_BYTE | T_BOOLEAN ) ) ) ) // same type "kind"
             {
                 // this is only initial alpha prototype logic, ie. needs to be refined/changed !!??!!
                 // infering that ...
@@ -37,7 +37,7 @@ TSI_TypeCheck_NonTypeVariableSigCode ( TSI * tsi, Word * stackWord, int64 ti )
                 //return false ; // it will fall thru to return false
             }
                 //else if ( ( word->CAttribute & OBJECT_FIELD ) ) {} // pass for now - return false = no type error
-            else return tsi->TypeErrorStatus = true ;
+            else return tsi->TypeErrorStatus |= TSE_ERROR ;
             ; // type error
         }
     }
@@ -45,7 +45,7 @@ TSI_TypeCheck_NonTypeVariableSigCode ( TSI * tsi, Word * stackWord, int64 ti )
 }
 
 Boolean
-TSI_TypeCheck_TypeVariableSigCode ( TSI * tsi, Word * stackWord0, Word * stackWord1 )
+TSI_TypeCheck_TypeVariableSigCodesAndSizes ( TSI * tsi, Word * stackWord0, Word * stackWord1 )
 {
     // word1 correlates with the type variable so it can anything
     // word0 is closer to top of stack than word1; word1 is lower in the stack than word 0
@@ -54,25 +54,27 @@ TSI_TypeCheck_TypeVariableSigCode ( TSI * tsi, Word * stackWord0, Word * stackWo
     // in the case of equal ('=' : word1 = word0 , word1 word0 = , word0 word1 store) word1 can be a type variable and word0 can be any fixed type
     //CfrTil_TypeStatus_Print ( word, tsi->actualTypeRecorded ) ;
     uint64 stackWord0_CAttribute ;
+    tsi->TypeErrorStatus = false ; // default 
     if ( stackWord1 && stackWord0 && stackWord1->Name && stackWord0->Name )
     {
-        if ( stackWord1->TypeNamespace )
+        if ( stackWord1->ObjectSize && ( stackWord0->ObjectSize > stackWord1->ObjectSize ) ) tsi->TypeErrorStatus |= ( TSE_SIZE_MISMATCH ) ;
+        else if ( stackWord1->TypeNamespace )
         {
             if ( stackWord0->TypeNamespace )
             {
-                if ( stackWord0->TypeNamespace != stackWord1->TypeNamespace ) tsi->TypeErrorStatus = true ;
+                if ( stackWord0->TypeNamespace != stackWord1->TypeNamespace ) tsi->TypeErrorStatus |= TSE_ERROR ;
             }
             else
             {
                 stackWord0->TypeNamespace = stackWord1->TypeNamespace ;
-                tsi->TypeErrorStatus = false ;
+                //tsi->TypeErrorStatus = false ;
             }
 
         }
         else if ( stackWord0->TypeNamespace )
         {
             stackWord1->TypeNamespace = stackWord0->TypeNamespace ;
-            tsi->TypeErrorStatus = false ;
+            //tsi->TypeErrorStatus = false ;
         }
         else
         {
@@ -93,11 +95,11 @@ TSI_TypeCheck_TypeVariableSigCode ( TSI * tsi, Word * stackWord0, Word * stackWo
                     }
                 }
                 else if ( ( ! ( stackWord1->CAttribute & stackWord0_CAttribute ) ) && ( ! ( stackWord0->CAttribute & ( T_ANY | T_UNDEFINED ) ) ) )
-                    tsi->TypeErrorStatus = true ;
+                    tsi->TypeErrorStatus |= TSE_ERROR ;
             }
         }
     }
-    return tsi->TypeErrorStatus = false ;
+    return tsi->TypeErrorStatus ;
 }
 
 Boolean
@@ -138,17 +140,18 @@ TSI_TypeCheckAndInfer ( TSI * tsi )
                     stackWord0 = ( Word * ) tsi->TypeWordStack->StackPointer [ 0 ], stackWord1 = ( Word * ) tsi->TypeWordStack->StackPointer [ - 1 ] ; // this idea seems right ??
                 }
                 else stackWord1 = ( Word * ) tsi->TypeWordStack->StackPointer [ 0 ], stackWord0 = ( Word * ) tsi->TypeWordStack->StackPointer [ - 1 ] ; // this idea seems right ??
-                TSI_TypeCheck_TypeVariableSigCode ( tsi, stackWord0, stackWord1 ) ;
+                TSI_TypeCheck_TypeVariableSigCodesAndSizes ( tsi, stackWord0, stackWord1 ) ;
             }
-            else //  case 'A': case 'N': case 'I': case 'S': case 'B': case 'O': case 'V': case '_':
-                //if ( TSI_TypeCheck_NonTypeVariableSigCode ( tsi, stackWord, tsi->OpWordTypeSignature [ti] ) ) tsi->TypeErrorStatus = true ;
+            else //  case 'A': case 'N': case 'I': case 'Y' : case 'S': case 'B': case 'O': case 'V': case '_': 
+                //if ( TSI_TypeCheck_NonTypeVariableSigCode ( tsi, stackWord, tsi->OpWordTypeSignature [ti] ) ) tsi->TypeErrorStatus |= TSE_ERROR ;
                 TSI_TypeCheck_NonTypeVariableSigCode ( tsi, stackWord, ti ) ;
         }
     }
-    if ( Is_DebugOn ) TSI_TypeStatus_Print ( tsi ) ;
-    if ( ( ! tsi->TypeErrorStatus ) && ( ! GetState ( _Compiler_, ( DOING_BEFORE_AN_INFIX_WORD | DOING_BEFORE_A_PREFIX_WORD ) ) ) )
+    //if ( Is_DebugOn ) TSI_TypeStatus_Print ( tsi ) ;
+    //if ( ( ! tsi->TypeErrorStatus ) && ( ! GetState ( _Compiler_, ( DOING_BEFORE_AN_INFIX_WORD | DOING_BEFORE_A_PREFIX_WORD ) ) ) )
     {
-        _Stack_DropN ( tsi->TypeWordStack, tsl ) ;
+        if ( ! GetState ( _Compiler_, C_INFIX_EQUAL ) ) _Stack_DropN ( tsi->TypeWordStack, tsl ) ;
+#if 0        
         if ( tsi->OpWord_ReturnsACodedValue_Flag ) //&& (!(opWord->CAttribute & KEYWORD)))
         {
             Word * opWordCopy = _CopyDuplicateWord ( tsi->OpWord, 0 ) ;
@@ -156,6 +159,7 @@ TSI_TypeCheckAndInfer ( TSI * tsi )
             CfrTil_TypeStackPush ( opWordCopy ) ;
             //Word_Recycle ( pword ) ; // recycle the list at reset instead
         }
+#endif        
     }
     //if ( tsi->OpWord->CAttribute & ( CATEGORY_OP_EQUAL | CATEGORY_OP_STORE ) ) _CfrTil_TypeStackReset ( ) ;
     return tsi->TypeErrorStatus ;
@@ -184,40 +188,54 @@ TSI_New ( Word* opWord, uint64 allocType )
 void
 CfrTil_Typecheck ( Word * opWord )
 {
-    if ( GetState ( _CfrTil_, TYPECHECK_ON ) && ( opWord->W_TypeSignatureString[0] ) ) //&& ( depth = Stack_Depth ( _CfrTil_->TypeWordStack ) ) ) // 0 depth with a 
+    //if ( ! GetState ( _Compiler_, C_INFIX_EQUAL ) )
     {
-        if ( ! GetState ( _Compiler_, ( DOING_BEFORE_AN_INFIX_WORD | DOING_BEFORE_A_PREFIX_WORD ) ) )
+        if ( GetState ( _CfrTil_, ( TYPECHECK_ON | DBG_TYPECHECK_ON ) ) && ( opWord->W_TypeSignatureString[0] ) ) //&& ( depth = Stack_Depth ( _CfrTil_->TypeWordStack ) ) ) // 0 depth with a 
         {
-            TSI * tsi = TSI_New ( opWord, COMPILER_TEMP ) ;
-            TSI_TypeCheckAndInfer ( tsi ) ;
-            if ( tsi->TypeErrorStatus ) TSI_ShowTypeErrorStatus ( tsi ) ;
+            if ( ! GetState ( _Compiler_, ( DOING_BEFORE_AN_INFIX_WORD | DOING_BEFORE_A_PREFIX_WORD ) ) )
+            {
+                TSI * tsi = TSI_New ( opWord, COMPILER_TEMP ) ;
+                TSI_TypeCheckAndInfer ( tsi ) ;
+                if ( tsi->TypeErrorStatus ) TSI_ShowTypeErrorStatus ( tsi ) ;
+            }
+            //else if ( ( opWord->W_TypeSignatureString[0] == '.' ) && ( opWord->W_TypeSignatureString[0] != 'V' ) ) CfrTil_TypeStackPush ( Context_CurrentWord ( ) ) ;
+            if ( Word_DoesTypeSignatureShowAReturnValue ( opWord ) ) CfrTil_TypeStackPush ( opWord ) ; //Context_CurrentWord ( ) ) ;
         }
-        //else if ( ( opWord->W_TypeSignatureString[0] == '.' ) && ( opWord->W_TypeSignatureString[0] != 'V' ) ) CfrTil_TypeStackPush ( Context_CurrentWord ( ) ) ;
-        if ( Word_DoesTypeSignatureShowAReturnValue ( opWord ) ) CfrTil_TypeStackPush ( opWord ) ; //Context_CurrentWord ( ) ) ;
     }
 }
 
 void
 TSI_TypeStatus_Print ( TSI *tsi )
 {
-    _Printf ( ( byte* ) "\n%s :: %s.%s :: type expected : %s :: type recorded : %s : %s", tsi->TypeErrorStatus ? "apparent type mismatch" : "type match",
-        tsi->OpWord->S_ContainingNamespace ? tsi->OpWord->S_ContainingNamespace->Name : ( byte* ) "<literal>",
-        tsi->OpWord->Name, Word_ExpandTypeLetterSignature ( tsi->OpWord, 1 ), tsi->ActualTypeStackRecordingBuffer, Context_Location ( ) ) ;
-}
-
-void
-TSI_ShowTypeErrorStatus ( TSI *tsi )
-{
-    CfrTil_ShowInfo ( tsi->OpWord, ( byte* ) "apparent type mismatch", 0 ) ;
-    TSI_TypeStatus_Print ( tsi ) ;
+    if ( tsi->TypeErrorStatus & TSE_SIZE_MISMATCH )
+    {
+        _Printf ( ( byte* ) "\n%s :: %s.%s ::  expected : %s :: recorded : %s : %s", "type size mismatch",
+            tsi->OpWord->S_ContainingNamespace ? tsi->OpWord->S_ContainingNamespace->Name : ( byte* ) "<literal>", tsi->OpWord->Name,
+            Word_ExpandTypeLetterSignature ( tsi->OpWord, 1 ), tsi->ActualTypeStackRecordingBuffer, Context_Location ( ) ) ;
+    }
+    else
+    {
+        _Printf ( ( byte* ) "\n%s :: %s.%s :: type expected : %s :: type recorded : %s : %s", tsi->TypeErrorStatus ? "apparent type mismatch" : "type match",
+            tsi->OpWord->S_ContainingNamespace ? tsi->OpWord->S_ContainingNamespace->Name : ( byte* ) "<literal>",
+            tsi->OpWord->Name, Word_ExpandTypeLetterSignature ( tsi->OpWord, 1 ), tsi->ActualTypeStackRecordingBuffer, Context_Location ( ) ) ;
+    }
     if ( GetState ( _CfrTil_, DBG_TYPECHECK_ON ) )
     {
         CfrTil_TypeStackPrint ( ) ;
         //if ( _Q_->Verbosity > 1 ) 
         Pause ( ) ;
-        Warning ( "Apparent TypeMismatch : ", Context_Location ( ), 0 ) ;
+        //byte * warning = "Apparent TypeMismatch : " ;
+        //Warning ( warning, Context_Location ( ), 0 ) ;
     }
-    //CfrTil_TypeStackReset ( ) ;
+}
+
+void
+TSI_ShowTypeErrorStatus ( TSI *tsi )
+{
+    byte * warning = "Apparent TypeMismatch : " ;
+    CfrTil_ShowInfo ( tsi->OpWord, warning, 0 ) ;
+    TSI_TypeStatus_Print ( tsi ) ;
+    CfrTil_TypeStackReset ( ) ;
 }
 
 void
@@ -266,6 +284,16 @@ Tsi_ExpandTypeLetterCode ( byte typeCode, byte * buffer )
         case 'N':
         {
             strcpy ( ( char* ) buffer, "BigNum " ) ;
+            break ;
+        }
+        case 'Y':
+        {
+            strcpy ( ( char* ) buffer, "Byte " ) ;
+            break ;
+        }
+        case '4':
+        {
+            strcpy ( ( char* ) buffer, "Int32 " ) ;
             break ;
         }
         case 'B':
@@ -352,12 +380,14 @@ Word_TypeSignatureLength ( Word * word, Boolean numberOfParametersOnly )
 byte *
 Word_TypeSignature ( Word * word, byte * buffer )
 {
-    if ( word->CAttribute & T_INT ) Strncat ( buffer, "Integer ", 9 ) ;
+    if ( word->CAttribute2 & T_INT32 ) Strncat ( buffer, "Int32 ", 7 ) ;
+    else if ( word->CAttribute & T_BYTE ) Strncat ( buffer, "Byte ", 6 ) ;
     else if ( word->CAttribute & T_STRING ) Strncat ( buffer, "String ", 8 ) ;
     else if ( word->CAttribute & T_BIG_NUM ) Strncat ( buffer, "BigNum ", 8 ) ;
     else if ( word->CAttribute & T_BOOLEAN ) Strncat ( buffer, "Boolean ", 9 ) ;
     else if ( word->CAttribute2 & T_ANY ) Strncat ( buffer, "Any ", 5 ) ;
     else if ( word->CAttribute & OBJECT ) Strncat ( buffer, "Object ", 8 ) ;
+    else if ( word->CAttribute & T_INT ) Strncat ( buffer, "Integer ", 9 ) ;
     else Strncat ( buffer, "Undefined ", 11 ) ;
     return buffer ;
 }
@@ -395,6 +425,8 @@ Tsi_ConvertTypeSigCodeToAttribute ( byte signatureCode )
     switch ( signatureCode )
     {
         case 'I': return T_INT ;
+        case '4': return T_INT32 ;
+        case 'Y': return T_BYTE ;
         case 'O': return OBJECT ;
         case 'B': return T_BOOLEAN ;
         case 'N': return T_BIG_NUM ;
@@ -402,6 +434,7 @@ Tsi_ConvertTypeSigCodeToAttribute ( byte signatureCode )
         case 'V': return T_VOID ;
         case 'A': return T_ANY ;
         case 'X': return T_TYPE_VARIABLE ;
+        case 'Z': return T_SIZE_CHECK ;
         default: return T_UNDEFINED ;
     }
 }
@@ -409,14 +442,17 @@ Tsi_ConvertTypeSigCodeToAttribute ( byte signatureCode )
 byte
 Tsi_Convert_Word_TypeAttributeToTypeLetterCode ( Word * word )
 {
-    if ( word->CAttribute2 & T_ANY ) return 'A' ;
-    else if ( word->CAttribute2 & T_TYPE_VARIABLE ) return 'X' ;
-    else if ( word->CAttribute & T_BIG_NUM ) return 'N' ;
+    if ( word->CAttribute & T_BIG_NUM ) return 'N' ;
     else if ( word->CAttribute & T_STRING ) return 'S' ;
+    else if ( word->CAttribute & T_BYTE ) return 'Y' ;
+        //else if ( word->CAttribute2 & T_SIZE_CHECK ) return 'Z' ;
+    else if ( word->CAttribute2 & T_INT32 ) return '4' ; // 4 bytes long
     else if ( word->CAttribute & T_INT ) return 'I' ;
     else if ( word->CAttribute & T_BOOLEAN ) return 'B' ;
     else if ( word->CAttribute & OBJECT ) return 'O' ;
     else if ( word->CAttribute & T_VOID ) return 'V' ;
+    else if ( word->CAttribute2 & T_ANY ) return 'A' ;
+    else if ( word->CAttribute2 & T_TYPE_VARIABLE ) return 'X' ;
         //else if ( word->CAttribute & T_UNDEFINED ) return '_' ;
     else return '_' ;
 }

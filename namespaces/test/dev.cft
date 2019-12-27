@@ -2,8 +2,9 @@
 5
 : sp ; //s pause ; 
 optimizeOn inlineOn 
-typecheckOn 
-
+//typecheckOn 
+jcc8_On 
+scOn
 lispOff
 bnOff 
 // optimizeOff inlineOff
@@ -13,7 +14,7 @@ Compiler Logic Int C User
 var: facTest fibTest Dsp ;
 
 // tail recursion from http://c2.com/cgi/wiki?TailCallOptimization
-c_syntaxOn scOn
+c_syntaxOn 
 int factoriali ( byte REG n | REG res )
 {
     res = 1;
@@ -35,7 +36,6 @@ factoriali ( 7 ) ; p () ;
 'factoriali find wdiss //pause
 c_syntaxOff 
 C_Syntax.factoriali (7) dup p 5040 _assert //pause //sp
-//dscOff
 : factorial ( n  | fac -- TOS ) 
     fac 1 = 
     { n @ 1 > } { n @ fac @ * fac store n -- } while 
@@ -136,6 +136,7 @@ sp
 User
 //'dn 'dfnba find alias  
 : factorial ( REG n | REG rec -- RAX ) rec 1 = { n @ 1 > } { rec @ n @ * rec store n -- } while return rec ;
+jcc8_Off
 : _ifx ( w | j ) 
     { j 1 = } { j @ 23 <= } { j ++ } 
     {
@@ -175,6 +176,7 @@ nl "ffx ... " ps nl
 : ffx ( wn | w ) 1 ti w wn @ _findAny = w @ wdiss 3 w @ _ffx nl wn @ ps ":" ps 1 time nl ;
 : ffx2 ( wn | w ) 1 ti w wn @ _findAny = w @ wdiss w @ 3 _ffx2 1 time nl ;
 c_syntaxOn
+jcc8_On
 User
 int
 fibPTC2? ( REG n | REG fn, REG fn1, REG fn2 )
@@ -187,6 +189,7 @@ fibPTC2? ( REG n | REG fn, REG fn1, REG fn2 )
     }
     return fn ;
 }
+jcc8_Off
 c_syntaxOff
 User
 //typecheckOff
@@ -223,10 +226,6 @@ using
 "fac5" ffx
 "fac4" ffx
 sp
-#else
-: _ffx_fib ( n w | t ) nl 7 w @ wordRun decimal p nl { t 0 = } { t @ n @ < } { t ++ } { 1 w @ iFactorialX } for ;
-: ffx_fib ( wn | d ) 1 ti d fibPTC2? = d @ wdiss 1 d @ _ffx_fib nl wn @ ps ":" ps 1 time nl ;
-"fibPTC2?" ffx_fib
 sp
 #endif
 
@@ -240,7 +239,6 @@ int cpow ( base power | out ) { for ( out = 1 ; power ; power -= 1 ) { out = out
 c_syntaxOff
 2 30 C_Syntax.cpow dup p  1073741824 _assert //pause
 
-#if 1
 : sp ; //stack pause ;
 //s: pow ( base power | out -- TOS ) { out 1 = } { power @ 0 > } { power power @ 1 - = } { out out @ base @ * = } for return out @ ;s
 : pow ( base power | out -t II.I ) { out 1 = } { power @ 0 > } { power power @ 1 - = } { out out @ base @ * = } for return out ; //"II.I" typeSignature
@@ -277,7 +275,6 @@ Int
 "pow_03" ffx2
 sp
 : sp ; 
-#endif
 
 C
 : tt ( | t ) t 6 = t ++ t @ p ;
@@ -296,7 +293,6 @@ _fibn0 ( n | fib )
     return fib ;
 }
 //' _fibn0 find d: wdiss sp _fibn0 ( 20 ) dup p 6765 _assert //sp
-dscOn 
 int
 fibPTC? ( n ) 
 {
@@ -312,7 +308,6 @@ fibPTC? ( n )
 ' fibPTC? find wdiss
 fibPTC? (20) dup p 6765 _assert sp
 
-dscOff
 int
 fibPTC2? ( REG n | REG fn, REG fn1, REG fn2 )
 {
@@ -326,8 +321,8 @@ fibPTC2? ( REG n | REG fn, REG fn1, REG fn2 )
 }
 ' int.fibPTC2? find wdiss
 20 int.fibPTC2? dup p 6765 _assert sp 
-c_syntaxOff
 "fibPTC?" ffx 
+c_syntaxOff
 : sp ;
 sp
 
@@ -386,13 +381,11 @@ C_Syntax C Interpreter
 : tfib ( n )  
     nl hex dsp p decimal nl "The fibonacci sequence" ps n @ p ":" ps nl 
     "C -O3 : " ps n @ Cfib_O3 nl 
-#if 1        
     "no locals fib  : " ps n @ fib nl 
     //"locals fibn0 : " ps n @ fibn0 nl 
     "locals fib1    : " ps n @ Locals.fib1 nl 
     "no locals fib2 : " ps n @ fib2 nl
     "no locals fib3 : " ps n @ fib3 nl
-#endif    
     "fibPTC?        : " ps n @ fibPTC nl
     "fibPTC2?        : " ps n @ fibPTC2
 ;
