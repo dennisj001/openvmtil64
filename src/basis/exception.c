@@ -223,7 +223,7 @@ OVT_Throw ( int signal, int64 restartCondition, Boolean pauseFlag )
     _Q_->RestartCondition = restartCondition ;
     if ( signal )
     {
-        if ( (signal == SIGTERM) || ( signal == SIGKILL) ) OVT_Exit ( ) ;
+        if ( (signal == SIGTERM) || ( signal == SIGKILL) || ( signal ==  SIGQUIT ) ) OVT_Exit ( ) ;
         else if ( signal == SIGBUS )
         {
             jb = & _Q_->JmpBuf0 ;
@@ -232,7 +232,7 @@ OVT_Throw ( int signal, int64 restartCondition, Boolean pauseFlag )
         }
         else
         {
-            if ( ( restartCondition > QUIT ) || ( _Q_->Signal == SIGSEGV ) ||  ( _Q_->Signal == SIGILL ) )
+            if ( ( restartCondition > QUIT ) || ( _Q_->Signal == SIGSEGV ) ||  ( _Q_->Signal == SIGILL ) || ( _Q_->Signal ==  SIGFPE ) )
             {
                 if ( ++ _Q_->SigSegvs < 2 )
                 {

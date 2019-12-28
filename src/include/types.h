@@ -797,6 +797,7 @@ typedef struct
     byte * DefaultTokenDelimiters ;
     byte * DefaultDelimiterCharSet ;
     Word * CurrentlyRunningWord, *LastRunWord, *CurrentTokenWord, *CurrentEvalWord, *LastEvalWord, *NlsWord, *SC_CurrentCombinator, *SourceCodeWord, *CurrentDisassemblyWord ;
+    Word * LastCompiledWord ;
     block CurrentlyRunningWordDefinition ;
     dllist * PreprocessorStackList ;
     NBA * ContextNba ;

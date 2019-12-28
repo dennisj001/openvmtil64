@@ -229,6 +229,7 @@ sp
 sp
 #endif
 
+jcc8_On
 //verbosity 3 =
 c_syntaxOn
 Root
@@ -364,6 +365,7 @@ User
 "fib1" ( n ) { 1 ti n @ _fib1 p 1 time } word 
 C 
 : sp ;
+jcc8_Off
 'cfib2_O3 find wdiss //sp
 #if 1
 : fib  ( n ) 1 ti n @ _fib  p 1 time ;

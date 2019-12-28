@@ -4,28 +4,12 @@
     <df root="." name="0">
       <df name="archive">
         <df name="joneforth64">
-          <in>jonesforth.f</in>
-          <in>jonesforth64.S</in>
-          <in>perf_dupdrop.c</in>
-          <in>perf_dupdrop.f</in>
-          <in>test_assembler.f</in>
-          <in>test_comparison.f</in>
-          <in>test_exception.f</in>
-          <in>test_number.f</in>
-          <in>test_read_file.f</in>
-          <in>test_stack.f</in>
-          <in>test_stack_trace.f</in>
         </df>
         <df name="joy">
         </df>
         <df name="lemon">
-          <in>lemon.c</in>
-          <in>lempar.c</in>
         </df>
         <df name="sl5">
-          <in>sl3.c</in>
-          <in>sl5-1.c</in>
-          <in>sl5.c</in>
         </df>
       </df>
       <df name="bin">
@@ -58,7 +42,6 @@
             <in>mcPrimitives.c</in>
             <in>memory.c</in>
             <in>optimize.c</in>
-            <in>runtime.c</in>
             <in>stack.c</in>
             <in>udis.c</in>
           </df>
@@ -87,8 +70,6 @@
             <in>preprocessor.c</in>
             <in>readTable.c</in>
             <in>readline.c</in>
-            <in>sequence.c</in>
-            <in>sockets.c</in>
             <in>string.c</in>
             <in>symbol.c</in>
             <in>syntax.c</in>
@@ -103,10 +84,8 @@
             <in>special.c</in>
           </df>
           <in>_debug.c</in>
-          <in>atom.c</in>
           <in>attribute.c</in>
           <in>bigNum.c</in>
-          <in>bigNum.gmp.c</in>
           <in>cfrtil64.c</in>
           <in>colors.c</in>
           <in>context.c</in>
@@ -127,19 +106,8 @@
           <in>system.c</in>
           <in>tabCompletion.c</in>
           <in>typeCheck.c</in>
-          <in>x.c</in>
         </df>
         <df name="include">
-          <in>_proto.h</in>
-          <in>cfrtil64.h</in>
-          <in>defines.h</in>
-          <in>lc.h</in>
-          <in>machineCode.h</in>
-          <in>machineCodeMacros.h</in>
-          <in>macros.h</in>
-          <in>prototypes.h</in>
-          <in>types.h</in>
-          <in>udis86.h</in>
         </df>
         <df name="primitives">
           <in>bits.c</in>

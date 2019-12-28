@@ -5,7 +5,7 @@ infixOn
 : sp ; //stack pause ; sp
 : hi ( | x -- TOS ) x = ( 2 + ( 3 * 4 ) ), x dup p ; // x p : infix mode 
 ' hi find wdiss
-hi 14 _assert1
+hi 14 _assert1 //pause
 sp
 dscOn
 : hi1 ( a b | x -- x ) x = 2 + ( ( a ) / ( b ) ) * ( 3 * 4 ) ; 

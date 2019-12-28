@@ -237,7 +237,7 @@ _Compile_SETcc_Tttn_REG ( Compiler * compiler, Boolean setTtn, Boolean setNegFla
 // eflags affected : cf of sf zf af pf : Intel Instrucion Set Reference Manual for "cmp"
 // ?? can this be done better with test/jcc ??
 // want to use 'test eax, 0' as a 0Branch (cf. jonesforth) basis for all block conditionals like if/else, do/while, for ...
-
+#if 1
 void
 Compile_Cmp_Set_Tttn_Logic ( Compiler * compiler, Boolean setTtn, Boolean setNegateFlag, Boolean jccTtt, Boolean jccNegFlag )
 {
@@ -286,7 +286,64 @@ Compile_Cmp_Set_Tttn_Logic ( Compiler * compiler, Boolean setTtn, Boolean setNeg
     _Compile_SETcc_Tttn_REG ( compiler, setTtn, setNegateFlag, jccTtt, jccNegFlag, reg, reg ) ; //nb! should always be ACC! : immediately after the 'cmp' insn which changes the flags appropriately
     _Word_CompileAndRecord_PushReg ( _CfrTil_WordList ( 0 ), reg, true ) ; //ACC ) ;
 }
-
+#else
+void
+Compile_Cmp_Set_Tttn_Logic ( Compiler * compiler, Boolean setTtn, Boolean setNegateFlag, Boolean jccTtt, Boolean jccNegFlag )
+{
+    int64 optSetupFlag = Compiler_CheckOptimize ( compiler, 0 ) ;
+    CompileOptimizeInfo * optInfo = compiler->OptInfo ;
+    if ( optSetupFlag & OPTIMIZE_DONE ) return ;
+    else if ( optSetupFlag )
+    {
+        if ( optInfo->OptimizeFlag & OPTIMIZE_IMM ) 
+        {
+            if ( ( setTtn == TTT_EQUAL ) && ( optInfo->Optimize_Imm == 0 ) ) //Compile_TEST ( optInfo->Optimize_Mod, optInfo->Optimize_Rm, 0, optInfo->Optimize_Disp, optInfo->Optimize_Imm, CELL ) ;
+            {
+                if ( optInfo->COIW [2]->StackPushRegisterCode ) SetHere ( optInfo->COIW [2]->StackPushRegisterCode, 1 ) ; // leave optInfo_0_two value in ACCUM we don't need to push it
+                Compiler_BI_CompileRecord_TestCode_ArgRegNum ( compiler, 1 ) ;
+            }
+            else
+            {
+                int64 size ;
+                if ( optInfo->Optimize_Imm >= 0x100000000 ) 
+                {
+                    size = 8 ;
+                    setNegateFlag = ! setNegateFlag ;
+                }
+                else size = 0 ;
+                WordList_SetCoding ( 0, Here ) ; // 0 : CMP insn
+                //DBI_ON ;
+#if 0                
+                Compile_CMPI ( optInfo->Optimize_Mod, optInfo->Optimize_Rm, optInfo->Optimize_Disp, optInfo->Optimize_Imm, size ) ;
+#else                
+                if (optInfo->wordArg1->Coding) SetHere ( optInfo->wordArg1->Coding, 1 ) ;
+                _Compile_X_Group1_Immediate ( CMP, optInfo->Optimize_Mod, optInfo->Optimize_Reg, 0, optInfo->Optimize_Imm, size ) ;
+#endif                
+                //DBI_OFF ;
+            }
+        }
+        else
+        {
+            // Compile_CMP( toRegOrMem, mod, reg, rm, sib, disp )
+            WordList_SetCoding ( 0, Here ) ;
+            Compile_CMP ( optInfo->Optimize_Dest_RegOrMem, optInfo->Optimize_Mod,
+                optInfo->Optimize_Reg, optInfo->Optimize_Rm, 0, optInfo->Optimize_Disp, CELL_SIZE ) ;
+        }
+    }
+    else
+    {
+        _Compile_Move_StackN_To_Reg ( OREG, DSP, 0 ) ;
+        _Compile_Move_StackN_To_Reg ( ACC, DSP, - 1 ) ;
+        // must do the DropN before the CMP because CMP sets eflags 
+        _Compile_Stack_DropN ( DSP, 2 ) ; // before cmp 
+        WordList_SetCoding ( 0, Here ) ;
+        Compile_CMP ( REG, REG, ACC, OREG, 0, 0, CELL ) ;
+    }
+    Boolean reg = ACC ; //nb! reg should always be ACC! : immediately after the 'cmp' insn which changes the flags appropriately
+    _Compile_SETcc_Tttn_REG ( compiler, setTtn, setNegateFlag, jccTtt, jccNegFlag, reg, reg ) ; //nb! should always be ACC! : immediately after the 'cmp' insn which changes the flags appropriately
+    _Word_CompileAndRecord_PushReg ( _CfrTil_WordList ( 0 ), reg, true ) ; //ACC ) ;
+}
+#endif
 //  logical equals - "=="
 
 void
@@ -359,17 +416,18 @@ Compile_LogicalNot ( Compiler * compiler )
 {
     Word *one = _CfrTil_WordList ( 1 ) ; // assumes two values ( n m ) on the DSP stack 
     int64 optSetupFlag = Compiler_CheckOptimize ( compiler, 0 ) ; // check especially for cases that optimize literal ops
+    CompileOptimizeInfo * optInfo = compiler->OptInfo ;
     if ( optSetupFlag & OPTIMIZE_DONE ) return ;
         // just need to get value to be operated on ( not'ed ) in eax
     else if ( optSetupFlag )
     {
-        if ( compiler->OptInfo->OptimizeFlag & OPTIMIZE_IMM ) Compile_MoveImm_To_Reg ( ACC, compiler->OptInfo->Optimize_Imm, CELL ) ;
-        else if ( compiler->OptInfo->Optimize_Rm == DSP )
+        if ( optInfo->OptimizeFlag & OPTIMIZE_IMM ) Compile_MoveImm_To_Reg ( ACC, optInfo->Optimize_Imm, CELL ) ;
+        else if ( optInfo->Optimize_Rm == DSP )
         {
             if ( one->StackPushRegisterCode ) SetHere ( one->StackPushRegisterCode, 1 ) ;
             else _Compile_Move_StackN_To_Reg ( ACC, DSP, 0 ) ;
         }
-        else if ( compiler->OptInfo->Optimize_Rm != ACC ) Compile_GetVarLitObj_RValue_To_Reg ( one, ACC ) ;
+        else if ( optInfo->Optimize_Rm != ACC ) Compile_GetVarLitObj_RValue_To_Reg ( one, ACC ) ;
     }
     else
     {

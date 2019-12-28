@@ -57,7 +57,7 @@ Debug
 'scOff 'dscOff find alias
 scOn
 
-: v4 verbosity 4 = ;
+: v4 verbosity 4 = ; 
 : v1 verbosity 1 = ;
 
 User
@@ -325,7 +325,7 @@ Root
 User 
 : pause nl _pause ;
 : opOff optimizeOff inlineOff state ;
-: opOn1 optimizeOn inlineOn { verbosity @ 1 > } { state } if ;
+: opOn1 optimizeOn inlineOn { verbosity @ 1 > } { state } if ; 'opOn1 find wdiss //pause
 : vck ( n w ) { verbosity @ n @ != } { verbosity n @ = w @ _find wordRun } if2 ; // for testing
 //'vck find wdiss //pause
 : opOn ( n )
@@ -423,16 +423,22 @@ stringMacrosOff
 
 #else // !Is_DebugOn : of course you can trim this file to your needs and put your init code maybe here if you like
 
-'doInitTest 0 const
+'doInitTest 1 const
 #if doInitTest
 // startup test code here ...
-//tc //demo
+#if 1
+tc //demo
+jcc8_On
+: factorial ( REG n | REG rec -- RAX ) rec 1 = { n @ 1 > } { rec @ n @ * rec store n -- } while return rec ;
+7  factorial p
+//verbosity 4 =
+'factorial find wdiss
 //fload nt.cft
 : mct "namespaces/compiler/machineCode.cft" include ;
 //mct
+#elif 1
 jcc8_On
 : factorial ( REG n | REG rec -- RAX ) rec 1 = { n @ 1 > } { rec @ n @ * rec store n -- } while return rec ;
-jcc8_Off
 7  factorial p
 'factorial find wdiss
 // test byte size objects
@@ -455,7 +461,22 @@ bt.a123 = 1 ; bt.b123 = 2 ; bt.c123 = 3 ; bt.d123 = 4 ;
 bt.a123 1 _assert 
 bt.c123.size 8 _assert
 //pause
+dbiOn
+int
+fac5 ( REG n  | REG facc ) 
+{ 
+    facc = 1 ;
+    while ( d: n > 1 ) 
+    {
+        facc = facc * (n --) ; // parenthesis a must for now ??
+    }
+    return facc ;
+}
+dbiOff
+wdiss ( ' fac5 find ) 
+fac5 ( 7 ) dup p 5040 _assert  
 c_syntaxOff 
+#endif
 #endif // #else
 
 bnOff
@@ -466,4 +487,5 @@ infixOn
 (1 + 5) / (2 + 1) 2 _assert
 infixOff
 rtw
+jcc8_Off
 2 + 7 assertStkChk // stack checking 

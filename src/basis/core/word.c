@@ -83,6 +83,8 @@ _Word_Finish ( Word * word )
     _CfrTil_->LastFinished_Word = word ;
     CfrTil_TypeStackReset ( ) ;
     _CfrTil_FinishWordDebugInfo (word, 0 ) ;
+    _Context_->LastCompiledWord = word ;
+    _CfrTil_SetSourceCodeWord ( word ) ;
 }
 
 void

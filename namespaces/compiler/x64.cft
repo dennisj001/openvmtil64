@@ -268,6 +268,7 @@ _Compile_Group1_Immediate ( code mod rm disp imm immSize ) //controlFlags )
     //Compile_CalculateWrite_Instruction_X64 (  rex,  opCode,  mod,  reg,  rm, controlFlags,  sib,  disp,  dispSize,  imm,  immSize | modRm )
     Compile_CalculateWrite_Instruction_X64 (  0,  opCode,  mod,  code, rm, (REX_B | MODRM_B | DISP_B | IMM_B),  0,  disp,  0,  imm,  immSize ) ;
 } prefix
+wdiss ( find ( '_Compile_Group1_Immediate )) ; //pause () ;
 
 void
 _Compile_Group5 ( code, mod, rm, sib, disp, size )

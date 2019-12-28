@@ -407,19 +407,13 @@ Debugger_CpuState_CheckSaveShow ( Debugger * debugger )
 {
     _Debugger_CpuState_CheckSave ( debugger ) ;
     _Debugger_CpuState_Show ( ) ;
+    if ( GetState ( debugger, DBG_STEPPING ) ) Debugger_UdisOneInstruction ( debugger, debugger->DebugAddress, ( byte* ) "\r", ( byte* ) "" ) ;
 }
 
 void
 Debugger_Registers ( Debugger * debugger )
 {
     Debugger_CpuState_CheckSaveShow ( debugger ) ;
-}
-
-void
-Debugger_CfrTilRegisters ( Debugger * debugger )
-{
-    _CfrTil_CpuState_CheckSave ( ) ;
-    CfrTil_CpuState_Show ( ) ;
 }
 
 void
@@ -740,7 +734,7 @@ Debugger_TableSetup ( Debugger * debugger )
     debugger->CharacterFunctionTable [ 30 ] = Debugger_ReturnStack ;
     debugger->CharacterFunctionTable [ 31 ] = DebugWordList_Show_All ;
     debugger->CharacterFunctionTable [ 32 ] = DebugWordList_Show_InUse ;
-    debugger->CharacterFunctionTable [ 33 ] = Debugger_CfrTilRegisters ;
+    //debugger->CharacterFunctionTable [ 33 ] = Debugger_CfrTilRegisters ;
     debugger->CharacterFunctionTable [ 34 ] = Debugger_GotoList_Print ;
     debugger->CharacterFunctionTable [ 35 ] = Debugger_Print_LispDefinesNamespace ;
     debugger->CharacterFunctionTable [ 36 ] = Debugger_ShowTypeWordStack ;

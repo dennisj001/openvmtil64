@@ -607,7 +607,6 @@ CfrTil_SetSourceCodeWord ( )
 void
 _CfrTil_Finish_WordSourceCode ( CfrTil * cfrtil, Word * word )
 {
-    _CfrTil_SetSourceCodeWord ( word ) ;
     if ( ! word->W_SourceCode ) word->W_SourceCode = _CfrTil_GetSourceCode ( ) ;
     Lexer_SourceCodeOff ( _Lexer_ ) ;
     CfrTil_SourceCode_InitEnd ( cfrtil ) ;
@@ -673,7 +672,7 @@ Get_SourceCodeWord ( Debugger * debugger )
 {
     Word * scWord = 0 ;
     if ( debugger ) scWord = Word_GetFromCodeAddress ( debugger->DebugAddress ) ;
-    if ( ! scWord ) scWord = GetState ( _Debugger_, DBG_STEPPING ) ? _Debugger_->w_Word : GetState ( _Compiler_, ( COMPILE_MODE | ASM_MODE ) ) ? _CfrTil_->CurrentWordBeingCompiled : _CfrTil_->ScWord ? _CfrTil_->ScWord : _Context_->CurrentlyRunningWord ? _Context_->CurrentlyRunningWord : _CfrTil_->LastFinished_Word ;
+    if ( ! scWord ) scWord = GetState ( _Debugger_, DBG_STEPPING ) ? _Debugger_->w_Word : GetState ( _Compiler_, ( COMPILE_MODE | ASM_MODE ) ) ? _CfrTil_->CurrentWordBeingCompiled : _CfrTil_->LastFinished_Word ? _CfrTil_->LastFinished_Word : _CfrTil_->ScWord ? _CfrTil_->ScWord : _Context_->CurrentlyRunningWord ;
     return (scWord && scWord->S_WordData ) ? scWord : 0 ;
 }
 
