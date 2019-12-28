@@ -262,7 +262,13 @@ Compile_Cmp_Set_Tttn_Logic ( Compiler * compiler, Boolean setTtn, Boolean setNeg
                 }
                 else size = 0 ;
                 WordList_SetCoding ( 0, Here ) ;
+#if 1                
                 Compile_CMPI ( compiler->OptInfo->Optimize_Mod, compiler->OptInfo->Optimize_Rm, compiler->OptInfo->Optimize_Disp, compiler->OptInfo->Optimize_Imm, size ) ;
+                //Compile_CMPI ( optInfo->Optimize_Mod, optInfo->Optimize_Rm, optInfo->Optimize_Disp, optInfo->Optimize_Imm, size ) ;
+#else                
+                if (compiler->OptInfo->wordArg1->Coding) SetHere ( compiler->OptInfo->wordArg1->Coding, 1 ) ;
+                _Compile_X_Group1_Immediate ( CMP, compiler->OptInfo->Optimize_Mod, compiler->OptInfo->Optimize_Reg, 0, compiler->OptInfo->Optimize_Imm, size ) ;
+#endif                
             }
         }
         else

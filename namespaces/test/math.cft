@@ -93,7 +93,7 @@ nl : t64bitSub ( n m -- TOS ) n @ m @ - dup p ; hex 0x100000002 0x100000000 t64b
 : t64bitSub3 ( n m -- TOS ) 0x100000004 n @ - m @ - ; 
 't64bitSub3 find wdiss sp
 2 1 t64bitSub3 0x100000001 _assert 
-: t64bitSub3 ( n m -- TOS ) 0x100000003 0x100000002 - 0x100000003 + n @ - m @ - ; 
+d: : t64bitSub3 ( n m -- TOS ) 0x100000003 0x100000002 - 0x100000003 + n @ - m @ - ; 
 't64bitSub3 find wdiss 
 2 1 t64bitSub3 0x100000001 _assert 
 nl 789654321 9087654321 * dup p binary p decimal

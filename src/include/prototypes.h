@@ -302,7 +302,7 @@ void Compiler_SetupArgsToStandardLocations(Compiler *compiler);
 void Compiler_Optimizer_0Args(Compiler *compiler);
 void Compiler_Optimizer_1Arg(Compiler *compiler);
 void Compiler_Optimizer_WordArg2Op_Or_xBetweenArg1AndArg2(Compiler *compiler);
-void Compiler_Optimizer_2Args_And_WordArg2_Literal(Compiler *compiler);
+void Compiler_Optimizer_2_Args_And_1_Literal(Compiler *compiler);
 void Compiler_Optimizer_2Args_Or_WordArg1_Op(Compiler *compiler);
 void Compile_StandardArg(Word *word, Boolean reg, Boolean rvalueFlag, byte *setHere, Boolean setScaFlag);
 void Compile_StackArgsToStandardRegs(Compiler *compiler);
