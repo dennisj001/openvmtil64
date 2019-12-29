@@ -431,7 +431,7 @@ stringMacrosOff
 jcc8_On
 : factorial ( REG n | REG rec -- RAX ) rec 1 = { n @ 1 > } { rec @ n @ * rec store n -- } while return rec ;
 'factorial find wdiss 
-7  factorial p pause
+7  factorial p //pause
 tc
 //fload nt.cft
 : mct "namespaces/compiler/machineCode.cft" include ;

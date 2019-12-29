@@ -386,6 +386,7 @@ OVT_Mem_ShowAllocated ( )
 {
     _OVT_ShowPermanentMemList ( _Q_ ) ;
     OVT_ShowNBAs ( _Q_, 1 ) ;
+    OVT_ShowMemoryAllocated ( );
 }
 
 #if 0

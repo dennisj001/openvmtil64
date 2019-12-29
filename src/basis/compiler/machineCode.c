@@ -692,7 +692,7 @@ Calculate_Address_FromOffset_ForCallOrJump ( byte * address )
 {
     byte * iaddress = 0 ;
     int64 offset ;
-    if ( ( * address == JMPI8 ) )
+    if ( ( * address == JMPI8 ) || ( * address == JCC8 ) )
     {
         offset = * ( ( int8 * ) ( address + 1 ) ) ;
         iaddress = address + offset + 1 + BYTE_SIZE ;
@@ -778,7 +778,7 @@ void
 _Compile_JumpToAddress ( byte * jmpToAddr, byte insn ) // runtime
 {
     byte * offsetAddress = Here + 1 ;
-    //if ( abs ( jmpToAddr - ( compileAtAddress + 6 ) ) ) // optimization : don't need to jump to the next instruction
+    if ( (!insn) || (( ( insn == 0x0f ) || ( insn == JMPI32 ) ) && abs ( (int64) (jmpToAddr - ( Here + 6 + ( insn == 0x0f ) ? 1 : 0 ) ) ) ) ) // optimization : don't need to jump to the next instruction
     {
         int64 disp = _CalculateOffsetForCallOrJump ( offsetAddress, jmpToAddr, insn ) ;
         _Compile_JumpToDisp ( disp, insn ) ;

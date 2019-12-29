@@ -410,7 +410,7 @@ NBA_Show ( NamedByteArray * nba, int64 flag )
         {
             nodeNext = dlnode_Next ( node ) ;
             ByteArray * ba = Get_BA_Symbol_To_BA ( node ) ;
-            MemChunk_Show ( &ba->BA_MemChunk ) ;
+            if ( _Q_->Verbosity > 1 ) MemChunk_Show ( &ba->BA_MemChunk ) ;
         }
     }
 }
@@ -473,11 +473,12 @@ _OVT_ShowPermanentMemList ( OpenVmTil * ovt )
             size += ( ( MemChunk * ) node )->S_ChunkSize ;
         }
         diff = ovt->Mmap_RemainingMemoryAllocated - size ;
-        if ( diff || ovt->Verbosity > 2 )
+        if ( diff ) //|| ovt->Verbosity > 2 )
         {
             printf ( "\nTotal Size = %9ld : ovt->Mmap_RemainingMemoryAllocated = %9ld :: diff = %6ld", size, ovt->Mmap_RemainingMemoryAllocated, diff ) ;
-            fflush ( stdout ) ;
         }
+        printf ( "\nMmap_RemainingMemoryAllocated                     = %9ld : <=: ovt->Mmap_RemainingMemoryAllocated", ovt->Mmap_RemainingMemoryAllocated ) ;
+        fflush ( stdout ) ;
     }
     ovt->PermanentMemListRemainingAccounted = size ;
     return size ;
@@ -558,7 +559,7 @@ _OVT_ShowMemoryAllocated ( OpenVmTil * ovt )
     Calculate_TotalNbaAccountedMemAllocated ( ovt, 1 ) ; //leak || vf ) ;
     _OVT_ShowPermanentMemList ( ovt ) ;
     int64 memDiff2 = ovt->Mmap_RemainingMemoryAllocated - ovt->PermanentMemListRemainingAccounted ;
-    byte * memDiff2s = (byte*) "\nCurrent Unaccounted Diff (leak?)                 = %9d : <=: ovt->Mmap_RemainingMemoryAllocated - ovt->PermanentMemListAccounted" ;
+    byte * memDiff2s = (byte*) "\nCurrent Unaccounted Diff (leak?)                 = %9d : <=: ovt->Mmap_RemainingMemoryAllocated - ovt->PermanentMemListRemainingAccounted" ;
     byte * leaks = (byte*) "\nleak?                                            = %9d : <=  (mmap_TotalMemAllocated - mmap_TotalMemFreed) - (ovt->TotalMemAllocated - ovt->TotalMemFreed) "
         "\n                                                                    - ovt->OVT_InitialUnAccountedMemory" ;
     if ( memDiff2 ) _Printf ( ( byte* ) c_ad ( memDiff2s ), memDiff2 ) ;
@@ -585,11 +586,11 @@ _OVT_ShowMemoryAllocated ( OpenVmTil * ovt )
         _Printf ( ( byte* ) "\nTotalMemSizeTarget                               = %9d : <=: ovt->TotalMemSizeTarget", ovt->TotalMemSizeTarget ) ;
     }
     {
-        _Printf ( ( byte* ) "\nTotal Memory Allocated                            = %9d"
-                            "\nTotal Memory leaks                                = %9d", ovt->TotalNbaAccountedMemAllocated, leak ) ;
+        _Printf ( ( byte* ) "\nTotal Memory Allocated                           = %9d"
+                            "\nTotal Memory leaks                               = %9d", ovt->TotalNbaAccountedMemAllocated, leak ) ;
     }
     int64 wordSize = ( sizeof ( Word ) + sizeof ( WordData ) ) ;
-    _Printf ( ( byte* ) "\nRecycledWordCount = %5d x %3d bytes : Recycled  = %9d", _Q_->MemorySpace0->RecycledWordCount, wordSize, _Q_->MemorySpace0->RecycledWordCount * wordSize ) ;
+    _Printf ( ( byte* ) "\nRecycledWordCount = %5d x %3d bytes : Recycled = %9d", _Q_->MemorySpace0->RecycledWordCount, wordSize, _Q_->MemorySpace0->RecycledWordCount * wordSize ) ;
     Buffer_PrintBuffers ( ) ;
 }
 

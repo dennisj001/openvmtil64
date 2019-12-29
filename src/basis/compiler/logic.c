@@ -35,9 +35,12 @@ _Compile_TestCode ( Boolean reg, Boolean size )
 void
 BI_CompileRecord_TestCode_Reg ( BlockInfo *bi, Boolean reg, Boolean size )
 {
-    Compiler_WordStack_SCHCPUSCA ( 0, 1 ) ;
-    bi->LogicTestCode = Here ;
-    _Compile_TestCode ( reg, size ) ;
+    if ( Here != ( bi->LogicTestCode + 3 ) )
+    {
+        Compiler_WordStack_SCHCPUSCA ( 0, 1 ) ;
+        bi->LogicTestCode = Here ;
+        _Compile_TestCode ( reg, size ) ;
+    }
 }
 
 void
@@ -238,6 +241,7 @@ _Compile_SETcc_Tttn_REG ( Compiler * compiler, Boolean setTtn, Boolean setNegFla
 // ?? can this be done better with test/jcc ??
 // want to use 'test eax, 0' as a 0Branch (cf. jonesforth) basis for all block conditionals like if/else, do/while, for ...
 #if 1
+
 void
 Compile_Cmp_Set_Tttn_Logic ( Compiler * compiler, Boolean setTtn, Boolean setNegateFlag, Boolean jccTtt, Boolean jccNegFlag )
 {
@@ -262,13 +266,7 @@ Compile_Cmp_Set_Tttn_Logic ( Compiler * compiler, Boolean setTtn, Boolean setNeg
                 }
                 else size = 0 ;
                 WordList_SetCoding ( 0, Here ) ;
-#if 1                
-                Compile_CMPI ( compiler->OptInfo->Optimize_Mod, compiler->OptInfo->Optimize_Rm, compiler->OptInfo->Optimize_Disp, compiler->OptInfo->Optimize_Imm, size ) ;
-                //Compile_CMPI ( optInfo->Optimize_Mod, optInfo->Optimize_Rm, optInfo->Optimize_Disp, optInfo->Optimize_Imm, size ) ;
-#else                
-                if (compiler->OptInfo->wordArg1->Coding) SetHere ( compiler->OptInfo->wordArg1->Coding, 1 ) ;
-                _Compile_X_Group1_Immediate ( CMP, compiler->OptInfo->Optimize_Mod, compiler->OptInfo->Optimize_Reg, 0, compiler->OptInfo->Optimize_Imm, size ) ;
-#endif                
+                Compile_CMPI ( compiler->OptInfo->Optimize_Mod, compiler->OptInfo->Optimize_Reg, compiler->OptInfo->Optimize_Disp, compiler->OptInfo->Optimize_Imm, size ) ;
             }
         }
         else
@@ -293,6 +291,7 @@ Compile_Cmp_Set_Tttn_Logic ( Compiler * compiler, Boolean setTtn, Boolean setNeg
     _Word_CompileAndRecord_PushReg ( _CfrTil_WordList ( 0 ), reg, true ) ; //ACC ) ;
 }
 #else
+
 void
 Compile_Cmp_Set_Tttn_Logic ( Compiler * compiler, Boolean setTtn, Boolean setNegateFlag, Boolean jccTtt, Boolean jccNegFlag )
 {
@@ -301,7 +300,7 @@ Compile_Cmp_Set_Tttn_Logic ( Compiler * compiler, Boolean setTtn, Boolean setNeg
     if ( optSetupFlag & OPTIMIZE_DONE ) return ;
     else if ( optSetupFlag )
     {
-        if ( optInfo->OptimizeFlag & OPTIMIZE_IMM ) 
+        if ( optInfo->OptimizeFlag & OPTIMIZE_IMM )
         {
             if ( ( setTtn == TTT_EQUAL ) && ( optInfo->Optimize_Imm == 0 ) ) //Compile_TEST ( optInfo->Optimize_Mod, optInfo->Optimize_Rm, 0, optInfo->Optimize_Disp, optInfo->Optimize_Imm, CELL ) ;
             {
@@ -311,7 +310,7 @@ Compile_Cmp_Set_Tttn_Logic ( Compiler * compiler, Boolean setTtn, Boolean setNeg
             else
             {
                 int64 size ;
-                if ( optInfo->Optimize_Imm >= 0x100000000 ) 
+                if ( optInfo->Optimize_Imm >= 0x100000000 )
                 {
                     size = 8 ;
                     setNegateFlag = ! setNegateFlag ;
@@ -322,7 +321,7 @@ Compile_Cmp_Set_Tttn_Logic ( Compiler * compiler, Boolean setTtn, Boolean setNeg
 #if 0                
                 Compile_CMPI ( optInfo->Optimize_Mod, optInfo->Optimize_Rm, optInfo->Optimize_Disp, optInfo->Optimize_Imm, size ) ;
 #else                
-                if (optInfo->wordArg1->Coding) SetHere ( optInfo->wordArg1->Coding, 1 ) ;
+                if ( optInfo->wordArg1->Coding ) SetHere ( optInfo->wordArg1->Coding, 1 ) ;
                 _Compile_X_Group1_Immediate ( CMP, optInfo->Optimize_Mod, optInfo->Optimize_Reg, 0, optInfo->Optimize_Imm, size ) ;
 #endif                
                 //DBI_OFF ;

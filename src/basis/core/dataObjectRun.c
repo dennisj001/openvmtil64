@@ -216,6 +216,7 @@ Compile_C_FunctionDeclaration ( byte * token1 )
         else _Lexer_ConsiderDebugAndCommentTokens ( token, 1 ) ;
     }
     while ( 1 ) ;
+    //CfrTil_Interpret_C_Blocks ( 1, 1, 0 ) ; // ??? seems like this should be used somewhere here 
 }
 
 // this is currently kinda rough

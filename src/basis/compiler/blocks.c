@@ -79,11 +79,12 @@ Compile_BlockLogicTest ( BlockInfo * bi )
             if ( ! bi->JccLogicCode ) bi->JccLogicCode = bi->LogicCodeWord->StackPushRegisterCode ;
             diff = bi->JccLogicCode - bi->bp_First ; // find its diff position in original block
             bi->CopiedToLogicJccCode = bi->CopiedToStart + diff ; // use diff in copied block
-            if ( bi->LogicCodeWord && ( ! ( bi->LogicCodeWord->CAttribute & CATEGORY_LOGIC ) ) )
+            if ( bi->LogicCodeWord && ( bi->LogicCodeWord->W_OpInsnCode != CMP ) ) // cmp sets flags no need for test code //CAttribute & CATEGORY_LOGIC ) ) )
             {
                 SetHere ( bi->CopiedToLogicJccCode, 1 ) ;
                 Compiler_SCA_Word_SetCodingHere_And_ClearPreviousUse ( bi->LogicCodeWord, 0 ) ;
-                _Compile_TestCode ( bi->LogicCodeWord->RegToUse, CELL ) ;
+                //_Compile_TestCode ( bi->LogicCodeWord->RegToUse, CELL ) ;
+                BI_CompileRecord_TestCode_Reg ( bi, bi->LogicCodeWord->RegToUse, CELL ) ;
                 bi->CopiedToLogicJccCode = Here ;
                 BI_Set_Tttn ( bi, TTT_ZERO, NEGFLAG_ON, TTT_ZERO, NEGFLAG_OFF ) ;
                 //return ;
@@ -92,7 +93,8 @@ Compile_BlockLogicTest ( BlockInfo * bi )
             {
                 SetHere ( bi->LogicCodeWord->Coding, 1 ) ;
                 Compiler_SCA_Word_SetCodingHere_And_ClearPreviousUse ( bi->LogicCodeWord, 0 ) ;
-                _Compile_TestCode ( bi->LogicCodeWord->RegToUse, CELL ) ;
+                //_Compile_TestCode ( bi->LogicCodeWord->RegToUse, CELL ) ;
+                BI_CompileRecord_TestCode_Reg ( bi, bi->LogicCodeWord->RegToUse, CELL ) ;
                 bi->CopiedToLogicJccCode = Here ;
                 BI_Set_Tttn ( bi, TTT_ZERO, NEGFLAG_ON, TTT_ZERO, NEGFLAG_ON ) ;
                 //return ;
