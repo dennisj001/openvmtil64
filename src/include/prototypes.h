@@ -179,12 +179,12 @@ void _BI_Set_Tttn(BlockInfo *bi, Boolean setTtn, Boolean setNegFlag, Boolean jcc
 void BI_Set_Tttn(BlockInfo *bi, Boolean setTtn, Boolean setNegFlag, Boolean jccTtt, Boolean jccNegFlag);
 void Compiler_Set_BI_Tttn(Compiler *compiler, Boolean setTtn, Boolean setNegFlag, Boolean jccTtt, Boolean jccNegFlag);
 void _Compile_TestCode(Boolean reg, Boolean size);
-void BI_CompileRecord_TestCode_Reg(BlockInfo *bi, Boolean reg, Boolean size);
+void BI_CompileRecord_TestCode_Reg(BlockInfo *bi, Boolean reg, Boolean size, Boolean force);
 void BI_CompileRecord_TestCode_ArgRegNum(BlockInfo *bi, uint8 argRegNum);
-BlockInfo *Compiler_BI_CompileRecord_TestCode_Reg(Compiler *compiler, Boolean reg, Boolean size);
+BlockInfo *Compiler_BI_CompileRecord_TestCode_Reg(Compiler *compiler, Boolean reg, Boolean size, Boolean force);
 Boolean _COI_GetReg(CompileOptimizeInfo *optInfo, Boolean regNumber);
 void Compiler_BI_CompileRecord_TestCode_ArgRegNum(Compiler *compiler, Boolean argRegNum);
-void Compiler_BI_CompileRecord_TestCode_Set_Tttn(Compiler *compiler, Boolean reg, Boolean setTtn, Boolean setNegFlag, Boolean jccTtt, Boolean jccNegFlag);
+void Compiler_BI_CompileRecord_TestCode_Set_Tttn(Compiler *compiler, Boolean reg, Boolean setTtn, Boolean setNegFlag, Boolean jccTtt, Boolean jccNegFlag, Boolean force);
 void _Compile_GetTestLogicFromTOS(BlockInfo *bi);
 void _Compile_LogicResultForStack(int64 reg, Boolean setTtn, Boolean setNegFlag);
 BlockInfo *Compiler_Set_LogicCode(Compiler *compiler, Boolean setTtn, Boolean setNegFlag, Boolean jccTtt, Boolean jccNegFlag);

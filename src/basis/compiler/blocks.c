@@ -83,21 +83,17 @@ Compile_BlockLogicTest ( BlockInfo * bi )
             {
                 SetHere ( bi->CopiedToLogicJccCode, 1 ) ;
                 Compiler_SCA_Word_SetCodingHere_And_ClearPreviousUse ( bi->LogicCodeWord, 0 ) ;
-                //_Compile_TestCode ( bi->LogicCodeWord->RegToUse, CELL ) ;
-                BI_CompileRecord_TestCode_Reg ( bi, bi->LogicCodeWord->RegToUse, CELL ) ;
+                BI_CompileRecord_TestCode_Reg ( bi, bi->LogicCodeWord->RegToUse, CELL, false ) ;
                 bi->CopiedToLogicJccCode = Here ;
                 BI_Set_Tttn ( bi, TTT_ZERO, NEGFLAG_ON, TTT_ZERO, NEGFLAG_OFF ) ;
-                //return ;
             }
             else if ( bi->LogicCodeWord && ( bi->LogicCodeWord->CAttribute & CATEGORY_OP_1_ARG ) && ( bi->LogicCodeWord->CAttribute2 & LOGIC_NEGATE ) )
             {
                 SetHere ( bi->LogicCodeWord->Coding, 1 ) ;
                 Compiler_SCA_Word_SetCodingHere_And_ClearPreviousUse ( bi->LogicCodeWord, 0 ) ;
-                //_Compile_TestCode ( bi->LogicCodeWord->RegToUse, CELL ) ;
-                BI_CompileRecord_TestCode_Reg ( bi, bi->LogicCodeWord->RegToUse, CELL ) ;
+                BI_CompileRecord_TestCode_Reg ( bi, bi->LogicCodeWord->RegToUse, CELL, false ) ;
                 bi->CopiedToLogicJccCode = Here ;
                 BI_Set_Tttn ( bi, TTT_ZERO, NEGFLAG_ON, TTT_ZERO, NEGFLAG_ON ) ;
-                //return ;
             }
         }
         else
@@ -155,7 +151,7 @@ CfrTil_TurnOnBlockCompiler ( )
 // some combinators take more than one block on the stack
 
 BlockInfo *
-_CfrTil_BeginBlock0 ()
+_CfrTil_BeginBlock0 ( )
 {
     Context * cntx = _Context_ ;
     Compiler * compiler = cntx->Compiler0 ;
@@ -205,7 +201,7 @@ _CfrTil_BeginBlock2 ( BlockInfo * bi )
 void
 _CfrTil_BeginBlock ( Boolean compileJumpFlag, byte * here )
 {
-    BlockInfo * bi = _CfrTil_BeginBlock0 () ;
+    BlockInfo * bi = _CfrTil_BeginBlock0 ( ) ;
     _CfrTil_BeginBlock1 ( bi ) ;
     _CfrTil_BeginBlock2 ( bi ) ;
 }

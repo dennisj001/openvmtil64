@@ -267,7 +267,6 @@ _Compile_Group1_Immediate ( code mod rm disp imm immSize ) //controlFlags )
     if ( ( immSize > BYTE ) || ( imm >= 0x100 ) ) opCode |= 1 ;
     else if ( ( immSize <= BYTE ) || ( imm < 0x100 ) ) opCode |= 3 ; 
     //Compile_CalculateWrite_Instruction_X64 (  rex,  opCode,  mod,  reg,  rm, controlFlags,  sib,  disp,  dispSize,  imm,  immSize | modRm )
-//<dbg>
     Compile_CalculateWrite_Instruction_X64 (  0,  opCode,  mod,  code, rm, (REX_B | REX_W | MODRM_B | (disp ? DISP_B : 0 ) | IMM_B),  0,  disp,  0,  imm,  immSize ) ;
 } prefix
 wdiss ( find ( '_Compile_Group1_Immediate )) ; //pause () ;

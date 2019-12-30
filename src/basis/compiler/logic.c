@@ -14,7 +14,7 @@ _BI_Set_Tttn ( BlockInfo *bi, Boolean setTtn, Boolean setNegFlag, Boolean jccTtt
 }
 
 void
-BI_Set_Tttn ( BlockInfo *bi, Boolean setTtn, Boolean setNegFlag, Boolean jccTtt, Boolean jccNegFlag )
+BI_Set_Tttn (BlockInfo *bi, Boolean setTtn, Boolean setNegFlag, Boolean jccTtt, Boolean jccNegFlag)
 {
     _BI_Set_Tttn ( bi, setTtn, setNegFlag, jccTtt, jccNegFlag, Here ) ;
 }
@@ -23,7 +23,7 @@ void
 Compiler_Set_BI_Tttn ( Compiler * compiler, Boolean setTtn, Boolean setNegFlag, Boolean jccTtt, Boolean jccNegFlag )
 {
     BlockInfo *bi = ( BlockInfo * ) Stack_Top ( compiler->CombinatorBlockInfoStack ) ;
-    BI_Set_Tttn ( bi, setTtn, setNegFlag, jccTtt, jccNegFlag ) ;
+    BI_Set_Tttn (bi, setTtn, setNegFlag, jccTtt, jccNegFlag) ;
 }
 
 void
@@ -33,28 +33,28 @@ _Compile_TestCode ( Boolean reg, Boolean size )
 }
 
 void
-BI_CompileRecord_TestCode_Reg ( BlockInfo *bi, Boolean reg, Boolean size )
+BI_CompileRecord_TestCode_Reg ( BlockInfo *bi, Boolean reg, Boolean size, Boolean force )
 {
-    if ( Here != ( bi->LogicTestCode + 3 ) )
+    if ( force || (( ! bi->LogicTestCode ) || ( Here != ( bi->LogicTestCode + 3 ) ) ))
     {
         Compiler_WordStack_SCHCPUSCA ( 0, 1 ) ;
         bi->LogicTestCode = Here ;
         _Compile_TestCode ( reg, size ) ;
     }
-    else _Printf ((byte*) "") ;
+    //else _Printf ( ( byte* ) "" ) ;
 }
 
 void
 BI_CompileRecord_TestCode_ArgRegNum ( BlockInfo *bi, uint8 argRegNum )
 {
-    BI_CompileRecord_TestCode_Reg ( bi, _COI_GetReg ( _Compiler_->OptInfo, argRegNum ), CELL ) ;
+    BI_CompileRecord_TestCode_Reg ( bi, _COI_GetReg ( _Compiler_->OptInfo, argRegNum ), CELL, false ) ;
 }
 
 BlockInfo *
-Compiler_BI_CompileRecord_TestCode_Reg ( Compiler * compiler, Boolean reg, Boolean size )
+Compiler_BI_CompileRecord_TestCode_Reg ( Compiler * compiler, Boolean reg, Boolean size, Boolean force )
 {
     BlockInfo *bi = ( BlockInfo * ) Stack_Top ( compiler->CombinatorBlockInfoStack ) ;
-    BI_CompileRecord_TestCode_Reg ( bi, reg, size ) ;
+    BI_CompileRecord_TestCode_Reg ( bi, reg, size, force ) ;
     return bi ;
 }
 
@@ -82,14 +82,15 @@ _COI_GetReg ( CompileOptimizeInfo * optInfo, Boolean regNumber )
 void
 Compiler_BI_CompileRecord_TestCode_ArgRegNum ( Compiler * compiler, Boolean argRegNum )
 {
-    Compiler_BI_CompileRecord_TestCode_Reg ( compiler, _COI_GetReg ( compiler->OptInfo, argRegNum ), CELL ) ;
+    Compiler_BI_CompileRecord_TestCode_Reg ( compiler, _COI_GetReg ( compiler->OptInfo, argRegNum ), CELL, false ) ;
 }
 
 void
-Compiler_BI_CompileRecord_TestCode_Set_Tttn ( Compiler * compiler, Boolean reg, Boolean setTtn, Boolean setNegFlag, Boolean jccTtt, Boolean jccNegFlag )
+Compiler_BI_CompileRecord_TestCode_Set_Tttn ( Compiler * compiler, Boolean reg, Boolean setTtn, Boolean setNegFlag,
+    Boolean jccTtt, Boolean jccNegFlag, Boolean force )
 {
-    BlockInfo *bi = Compiler_BI_CompileRecord_TestCode_Reg ( compiler, reg, CELL ) ;
-    BI_Set_Tttn ( bi, setTtn, setNegFlag, jccTtt, jccNegFlag ) ; //ZERO_TTT, setNegFlag ) ;
+    BlockInfo *bi = Compiler_BI_CompileRecord_TestCode_Reg ( compiler, reg, CELL, force ) ;
+    BI_Set_Tttn (bi, setTtn, setNegFlag, jccTtt, jccNegFlag) ; //ZERO_TTT, setNegFlag ) ;
 }
 
 // cf. : Compile_BlockInfoTestLogic ( Compiler * compiler, int8 reg, int8 setNegFlag )
@@ -99,7 +100,7 @@ _Compile_GetTestLogicFromTOS ( BlockInfo *bi )
 {
     Compile_Pop_To_Acc ( DSP ) ;
     BI_CompileRecord_TestCode_ArgRegNum ( bi, 1 ) ;
-    BI_Set_Tttn ( bi, TTT_ZERO, NEGFLAG_NZ, TTT_ZERO, NEGFLAG_Z ) ;
+    BI_Set_Tttn (bi, TTT_ZERO, NEGFLAG_NZ, TTT_ZERO, NEGFLAG_Z) ;
 }
 
 // nb : only blocks with one ret insn can be successfully compiled inline
@@ -121,7 +122,7 @@ BlockInfo *
 Compiler_Set_LogicCode ( Compiler * compiler, Boolean setTtn, Boolean setNegFlag, Boolean jccTtt, Boolean jccNegFlag )
 {
     BlockInfo *bi = ( BlockInfo * ) Stack_Top ( compiler->CombinatorBlockInfoStack ) ;
-    BI_Set_Tttn ( bi, setTtn, setNegFlag, jccTtt, jccNegFlag ) ; //setTtn, setNegFlag ) ;
+    BI_Set_Tttn (bi, setTtn, setNegFlag, jccTtt, jccNegFlag) ; //setTtn, setNegFlag ) ;
     return bi ;
 }
 
@@ -130,9 +131,9 @@ _Compile_LogicalAnd ( Compiler * compiler )
 {
     Compiler_WordStack_SCHCPUSCA ( 0, 1 ) ;
     //DBI_ON ;
-    Compiler_BI_CompileRecord_TestCode_Set_Tttn ( compiler, OREG, TTT_ZERO, NEGFLAG_Z, TTT_ZERO, NEGFLAG_NZ ) ; // jz
+    Compiler_BI_CompileRecord_TestCode_Set_Tttn ( compiler, OREG, TTT_ZERO, NEGFLAG_Z, TTT_ZERO, NEGFLAG_NZ, false ) ; // jz
     _Compile_Jcc ( NEGFLAG_Z, TTT_ZERO, Here + 7, JCC8 ) ; // if eax is zero return not(R8) == 1 else return 0
-    Compiler_BI_CompileRecord_TestCode_Set_Tttn ( compiler, ACC, TTT_ZERO, NEGFLAG_NZ, TTT_ZERO, NEGFLAG_Z ) ;
+    Compiler_BI_CompileRecord_TestCode_Set_Tttn ( compiler, ACC, TTT_ZERO, NEGFLAG_NZ, TTT_ZERO, NEGFLAG_Z, true ) ;
     _Compile_LogicResultForStack ( ACC, TTT_ZERO, NEGFLAG_NZ ) ; // jnz
     Compiler_Set_LogicCode ( compiler, TTT_ZERO, NEGFLAG_NZ, TTT_ZERO, NEGFLAG_Z ) ;
     CfrTil_CompileAndRecord_Word0_PushReg ( ACC, true ) ;
@@ -163,7 +164,7 @@ _Compile_LogicalNot ( Compiler * compiler )
     //DBI_ON ;
     byte * here = Here ;
     Compiler_WordStack_SCHCPUSCA ( 0, 1 ) ;
-    Compiler_BI_CompileRecord_TestCode_Set_Tttn ( compiler, ACC, TTT_ZERO, NEGFLAG_Z, TTT_ZERO, NEGFLAG_NZ ) ;
+    Compiler_BI_CompileRecord_TestCode_Set_Tttn ( compiler, ACC, TTT_ZERO, NEGFLAG_Z, TTT_ZERO, NEGFLAG_NZ, false ) ;
     _Compile_LogicResultForStack ( ACC, TTT_ZERO, NEGFLAG_Z ) ;
     Compiler_Set_LogicCode ( compiler, TTT_ZERO, NEGFLAG_Z, TTT_ZERO, NEGFLAG_NZ ) ;
     CfrTil_CompileAndRecord_Word0_PushReg ( ACC, true ) ;
@@ -391,7 +392,7 @@ Compile_GreaterThanOrEqual ( Compiler * compiler )
 void
 Compile_TestLogicAndStackPush ( Compiler * compiler, Boolean reg, Boolean setTtn, Boolean setNegFlag, Boolean jccTtt, Boolean jccNegFlag )
 {
-    Compiler_BI_CompileRecord_TestCode_Set_Tttn ( compiler, reg, TTT_ZERO, setNegFlag, jccTtt, jccNegFlag ) ;
+    Compiler_BI_CompileRecord_TestCode_Set_Tttn ( compiler, reg, TTT_ZERO, setNegFlag, jccTtt, jccNegFlag, false ) ;
     CfrTil_CompileAndRecord_PushAccum ( ) ;
 }
 

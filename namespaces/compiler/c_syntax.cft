@@ -134,7 +134,7 @@ interpret2 ( | atoken aword )
     while ( 1 )
     {   
         atoken = token () ; 
-        if ( ! ( strcmp ( atoken, "i2halt" ) ) ) 
+        if (  (! atoken) || ! ( strcmp ( atoken, "i2halt" ) ) ) 
         { 
             return ; 
         }
@@ -161,7 +161,7 @@ interpret2 ( | atoken aword )
     {   
         atoken = token () ; 
         //printf ( "\n\ttoken = %s", atoken ) ; 
-        if ( atoken && (! ( strcmp ( atoken, "i2halt" ) ) )) { sp () ; return ; }
+        if ( ! ( strcmp ( atoken, "i2halt" ) ) ) { sp () ; return ; }
         else 
         {       
             aword = tokenToWord ( atoken ) ;
@@ -225,8 +225,9 @@ interpret4 ( | atoken aword )
     {   
         atoken = token () ; 
         //printf ( "\n\ttoken = %s", atoken ) ; 
-        if ( atoken && ( ! ( strcmp ( atoken, "i2halt" ) ) ) )
+        if ( ( ! atoken ) || ( ! ( strcmp ( atoken, "i2halt" ) ) ) )
         { 
+            printf ( "\n\n\ttoken = %s :: interpret4 exiting ...", atoken ) ; 
             return ; 
         }
         else
@@ -238,6 +239,7 @@ interpret4 ( | atoken aword )
 }
 
 interpret4
+c_syntaxOn
 int
 faccs3 ( n | rec ) 
 {
@@ -250,12 +252,12 @@ faccs3 ( n | rec )
 ' faccs3 find wdiss
 faccs3 ( 7 ) p //pause
 c_syntaxOff
-//verbosity 2 = //verbosity @ p pause
+//verbosity 2 = verbosity @ p pause
+i2halt // see above in interpret2
 #endif // if 2 : endif
 
-i2halt // see above in interpret2
 i2halt // for second interpret3 
-i2halt // for third interpret4
+//i2halt // for third interpret2
 #endif // if 1 : endif
 #endif // if 0 : endif
 

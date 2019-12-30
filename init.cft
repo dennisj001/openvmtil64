@@ -283,9 +283,9 @@ dscOn //verbosity 3 =
 : debugTest2 1 2 + p 4 debugTest3 ;
 : debugTest1 1 2 + p debugTest2 ;
 : debugTest 1 2 + p debugTest1 ;
-: _assert1 ( n m str ) { n @ m @ != } { str @ ? ps : drop "error" ps _info stack _pause } { debugTest } ifElse ; 
+: _assert1 ( n m str ) { n @ m @ != } { str @ ? str @ ps : drop "error" ps _info stack _pause } { debugTest } ifElse ; 
 #else
-: _assert1 ( n m str ) { n @ m @ != } { str @ ? ps : drop "error" ps _info stack _pause } if ; 
+: _assert1 ( n m str ) { n @ m @ != } { str @ ? str @ ps : drop "error" ps _info stack _pause } if ; 
 //: _assert1 ( n m str ) { n @ m @ != } { str @ ps "error" ps _info _pause } if ;
 #endif
 //: ctloc do> locationPush does> locationPrint <do ; immediate // compile time location
@@ -312,7 +312,7 @@ jcc8_Off
         } 
         { 
             //"\nassertStkChk : " ps n @ p m @ p 
-            n @ m @ "assertStkChk" _assert1 
+            n @ m @ _assert0
         }
         ifElse
     } if2
@@ -325,7 +325,7 @@ Root
 User 
 : pause nl _pause ;
 : opOff optimizeOff inlineOff state ;
-: opOn1 optimizeOn inlineOn { verbosity @ 1 > } { state } if ; 'opOn1 find wdiss //pause
+: opOn1 optimizeOn inlineOn { verbosity @ 1 > } { state } if ; //'opOn1 find wdiss //pause
 : vck ( n w ) { verbosity @ n @ != } { verbosity n @ = w @ _find wordRun } if2 ; // for testing
 //'vck find wdiss //pause
 : opOn ( n )
@@ -428,11 +428,6 @@ stringMacrosOff
 // startup test code here ...
 #if 1
 //tc //demo
-jcc8_On
-: factorial ( REG n | REG rec -- RAX ) rec 1 = { n @ 1 > } { rec @ n @ * rec store n -- } while return rec ;
-'factorial find wdiss 
-7  factorial p //pause
-tc
 //fload nt.cft
 : mct "namespaces/compiler/machineCode.cft" include ;
 //mct
