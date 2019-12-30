@@ -49,7 +49,7 @@ _Debugger_CompileAndStepOneInstruction ( Debugger * debugger, byte * jcAddress )
     if ( showExtraFlag ) Debug_ExtraShow ( Here - svHere, showExtraFlag ) ;
     if ( GetState ( debugger, DBG_AUTO_MODE ) && ( ! GetState ( debugger, DBG_CONTINUE_MODE ) ) ) SetState ( debugger, DBG_SHOW_STACK_CHANGE, false ) ;
     else _Debugger_ShowEffects ( debugger, debugger->w_Word, GetState ( debugger, DBG_STEPPING ), showExtraFlag ) ;
-    //Debugger_UdisOneInstruction ( debugger, debugger->DebugAddress, ( byte* ) "\r", ( byte* ) "" ) ;
+    if ( GetState ( debugger, ( DBG_AUTO_MODE | DBG_CONTINUE_MODE ) ) ) Debugger_UdisOneInstruction ( debugger, debugger->DebugAddress, ( byte* ) "\r", ( byte* ) "" ) ;
     if ( Compiling ) _Debugger_DisassembleWrittenCode ( debugger ) ;
     DebugColors ;
     debugger->DebugAddress = nextInsn ;
@@ -65,6 +65,7 @@ _Debugger_CompileOneInstruction ( Debugger * debugger, byte * jcAddress )
     if ( jcAddress ) // jump or call address
     {
         word = Word_UnAlias ( Word_GetFromCodeAddress ( jcAddress ) ) ;
+#if 0        
         if ( word ) //&& ( word != debugger->w_Word ) )
         {
             debugger->w_Word = word ;
@@ -72,7 +73,7 @@ _Debugger_CompileOneInstruction ( Debugger * debugger, byte * jcAddress )
             //if ( * debugger->DebugAddress == CALLI32 ) _Word_ShowSourceCode ( word ) ;
             _Context_->SourceCodeWord = word ;
         }
-
+#endif
         if ( ( debugger->Key == 'I' ) ) // force Into a subroution
         {
             _Printf ( ( byte* ) "\nforce calling (I)nto a subroutine : %s : .... :> %s ", word ? ( char* ) c_gd ( word->Name ) : "", Context_Location ( ) ) ;
@@ -180,6 +181,7 @@ doJmpCall:
                     SetState ( debugger, DBG_AUTO_MODE, false ) ;
                     // we are already stepping here and now, so skip
                     _Printf ( ( byte* ) "\nskipping over a rt breakpoint debug word : %s : at 0x%-8x", ( char* ) c_gd ( word->Name ), debugger->DebugAddress ) ;
+                    //Pause () ;
                     debugger->DebugAddress += 3 ; // 3 : sizeof call reg insn
                     goto end ; // skip it
                 }
@@ -227,7 +229,7 @@ end:
         {
             // keep eip - instruction pointer - up to date ..
             debugger->cs_Cpu->Rip = ( uint64 * ) debugger->DebugAddress ;
-            Debugger_UdisOneInstruction ( debugger, debugger->DebugAddress, ( byte* ) "\r", ( byte* ) "" ) ;
+            //Debugger_UdisOneInstruction ( debugger, debugger->DebugAddress, ( byte* ) "\r", ( byte* ) "" ) ;
         }
     }
 }

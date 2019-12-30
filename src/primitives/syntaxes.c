@@ -59,14 +59,17 @@ void
 CfrTil_C_Syntax_On ( )
 {
     Context * cntx = _Context_ ;
-    Compiler_Get_C_BackgroundNamespace ( cntx->Compiler0 ) ;
-    SetState ( cntx, C_SYNTAX | PREFIX_MODE | INFIX_MODE, true ) ;
-    Namespace_DoNamespace_Name ( ( byte* ) "C" ) ;
-    Namespace_DoNamespace_Name ( ( byte* ) "PrefixCombinators" ) ;
-    Namespace_DoNamespace_Name ( ( byte* ) "Infix" ) ;
-    Namespace_DoNamespace_Name ( ( byte* ) "C_Syntax" ) ;
-    Compiler_SetAs_InNamespace_C_BackgroundNamespace ( cntx->Compiler0 ) ;
-    Context_SetDefaultTokenDelimiters ( cntx, ( byte* ) " ,\n\r\t", CONTEXT ) ;
+    //if ( ! GetState ( cntx, C_SYNTAX | PREFIX_MODE | INFIX_MODE ) )
+    {
+        Compiler_Get_C_BackgroundNamespace ( cntx->Compiler0 ) ;
+        SetState ( cntx, C_SYNTAX | PREFIX_MODE | INFIX_MODE, true ) ;
+        Namespace_DoNamespace_Name ( ( byte* ) "C" ) ;
+        Namespace_DoNamespace_Name ( ( byte* ) "PrefixCombinators" ) ;
+        Namespace_DoNamespace_Name ( ( byte* ) "Infix" ) ;
+        Namespace_DoNamespace_Name ( ( byte* ) "C_Syntax" ) ;
+        Compiler_SetAs_InNamespace_C_BackgroundNamespace ( cntx->Compiler0 ) ;
+        Context_SetDefaultTokenDelimiters ( cntx, ( byte* ) " ,\n\r\t", CONTEXT ) ;
+    }
 }
 
 void
@@ -79,7 +82,7 @@ void
 CfrTil_C_Semi ( )
 {
     _Compiler_->LHS_Word = 0 ;
-    if ( ( ! Compiling ) ) 
+    if ( ( ! Compiling ) )
     {
         CfrTil_InitSourceCode ( _CfrTil_ ) ;
         //CfrTil_DeleteDebugInfo () ;
@@ -253,7 +256,7 @@ void
 Type_Create ( )
 {
     Context * cntx = _Context_ ;
-    byte * token = Lexer_Peek_Next_NonDebugTokenWord (cntx->Lexer0, 1 , 0) ;
+    byte * token = Lexer_Peek_Next_NonDebugTokenWord ( cntx->Lexer0, 1, 0 ) ;
     int64 size = _Type_Create ( token ) ;
     //DataStack_Push ( size ) ;
 }
@@ -270,7 +273,7 @@ _CfrTil_TypeDef ( )
     Lexer_SetTokenDelimiters ( lexer, ( byte* ) " ,\n\r\t", COMPILER_TEMP ) ;
     do
     {
-        byte * token = Lexer_Peek_Next_NonDebugTokenWord (cntx->Lexer0, 1 , 0) ;
+        byte * token = Lexer_Peek_Next_NonDebugTokenWord ( cntx->Lexer0, 1, 0 ) ;
         if ( token [ 0 ] == ';' )
         {
             Lexer_ReadToken ( cntx->Lexer0 ) ;

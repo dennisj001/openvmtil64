@@ -153,7 +153,8 @@ Debugger_GetDbgAddressFromRsp ( Debugger * debugger, Cpu * cpu )
             Stack_Push ( debugger->ReturnStack, ( uint64 ) retAddr ) ;
         }
         if ( _Q_->Verbosity > 1 ) Stack_Print ( debugger->ReturnStack, ( byte* ) "debugger->ReturnStack ", 0 ) ;
-        debugger->DebugAddress = ( byte* ) _Stack_Pick ( debugger->ReturnStack, ( d > 2 ) ? 2 : ( d - 1 ) ) ; //Stack_Top ( debugger->ReturnStack ) ;
+        //debugger->DebugAddress = ( byte* ) _Stack_Pick ( debugger->ReturnStack, ( d > 2 ) ? 2 : ( d - 1 ) ) ; //Stack_Top ( debugger->ReturnStack ) ;
+        debugger->DebugAddress = ( byte* ) _Stack_Pick ( debugger->ReturnStack, 2 ) ; //Stack_Top ( debugger->ReturnStack ) ;
         Stack_Pop ( debugger->ReturnStack ) ; // don't return to the current function on first RET
     }
     else debugger->DebugAddress = ( byte* ) cpu->Rsp[0] ;
@@ -178,6 +179,7 @@ _Debugger_Init ( Debugger * debugger, Cpu * cpu, Word * word, byte * address )
     {
         // remember : _Compile_CpuState_Save ( _Debugger_->cs_Cpu ) ; is called thru _Compile_Debug : <dbg>/<dso>
         debugger->DebugAddress = Debugger_GetDbgAddressFromRsp ( debugger, cpu ) ; //( byte* ) debugger->cs_Cpu->Rsp[1] ;
+        debugger->w_Word = word = Word_GetFromCodeAddress ( debugger->DebugAddress ) ;
         if ( debugger->DebugAddress && ( ! debugger->w_Word ) )
         {
             byte * da ;
@@ -407,7 +409,7 @@ Debugger_CpuState_CheckSaveShow ( Debugger * debugger )
 {
     _Debugger_CpuState_CheckSave ( debugger ) ;
     _Debugger_CpuState_Show ( ) ;
-    if ( GetState ( debugger, DBG_STEPPING ) ) Debugger_UdisOneInstruction ( debugger, debugger->DebugAddress, ( byte* ) "\r", ( byte* ) "" ) ;
+    //if ( GetState ( debugger, DBG_STEPPING ) ) Debugger_UdisOneInstruction ( debugger, debugger->DebugAddress, ( byte* ) "\r", ( byte* ) "" ) ;
 }
 
 void
@@ -506,7 +508,7 @@ Debugger_Escape ( Debugger * debugger )
     _Context_->System0->State = saveSystemState ;
     SetState_TrueFalse ( debugger, DBG_ACTIVE | DBG_INFO, DBG_STEPPED | DBG_AUTO_MODE | DBG_AUTO_MODE_ONCE | DBG_INTERPRET_LOOP_DONE | DBG_COMMAND_LINE | DBG_ESCAPED ) ;
     SetState ( _CfrTil_, SOURCE_CODE_ON, svScState ) ;
-    if ( GetState ( debugger, DBG_STEPPING ) ) SetState ( debugger, DBG_START_STEPPING, true ) ;
+    //if ( GetState ( debugger, DBG_STEPPING ) ) SetState ( debugger, DBG_START_STEPPING, true ) ;
 }
 
 void

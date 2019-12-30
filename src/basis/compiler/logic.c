@@ -41,6 +41,7 @@ BI_CompileRecord_TestCode_Reg ( BlockInfo *bi, Boolean reg, Boolean size )
         bi->LogicTestCode = Here ;
         _Compile_TestCode ( reg, size ) ;
     }
+    else _Printf ((byte*) "") ;
 }
 
 void

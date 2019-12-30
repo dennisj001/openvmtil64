@@ -564,15 +564,13 @@ _Debugger_DoState ( Debugger * debugger )
     if ( GetState ( debugger, DBG_INFO ) ) Debugger_ShowInfo ( debugger, GetState ( debugger, DBG_RUNTIME ) ? ( byte* ) "<dbg>" : ( byte* ) "dbg", 0 ) ;
     else if ( GetState ( debugger, DBG_PROMPT ) ) Debugger_ShowState ( debugger, GetState ( debugger, DBG_RUNTIME ) ? ( byte* ) "<dbg>" : ( byte* ) "dbg" ) ;
 
-    if ( GetState ( debugger, DBG_NEWLINE ) && ( ! GetState ( debugger, DBG_INFO ) ) ) _Debugger_DoNewlinePrompt ( debugger ) ;
-    if ( GetState ( debugger, DBG_STEPPING | DBG_CONTINUE_MODE ) && ( ! GetState ( debugger, DBG_INFO ) ) )
+    //if ( GetState ( debugger, DBG_NEWLINE ) && ( ! GetState ( debugger, DBG_INFO ) ) ) _Debugger_DoNewlinePrompt ( debugger ) ;
+    if ( GetState ( debugger, DBG_STEPPING | DBG_CONTINUE_MODE ) ) //&& ( ! GetState ( debugger, DBG_INFO ) ) )
     {
-        if ( GetState ( debugger, DBG_START_STEPPING ) )
-        {
-            _Printf ( ( byte* ) " ... Next stepping instruction ..." ) ;
-            SetState ( debugger, DBG_START_STEPPING, false ) ;
-            Debugger_UdisOneInstruction ( debugger, debugger->DebugAddress, ( byte* ) "\r", ( byte* ) "" ) ;
-        }
+        if ( GetState ( debugger, DBG_START_STEPPING ) ) _Printf ( ( byte* ) "\n ... Next stepping instruction ..." ) ;
+        SetState ( debugger, DBG_START_STEPPING, false ) ;
+        debugger->cs_Cpu->Rip = ( uint64 * ) debugger->DebugAddress ;
+        Debugger_UdisOneInstruction ( debugger, debugger->DebugAddress, ( byte* ) "\r", ( byte* ) "" ) ;
     }
     debugger->PreHere = Here ;
 }

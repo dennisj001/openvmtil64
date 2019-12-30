@@ -1,0 +1,167 @@
+ =============================
+C_Syntax._Compile_Group1_Immediate <:> cfrTil compiled word, prefix
+SourceCode for C_Syntax._Compile_Group1_Immediate :> 
+void _Compile_Group1_Immediate ( code mod rm disp imm immSize ) { byte opCode = #x80 ; if ( ( immSize > BYTE ) || ( imm >= 0x100 ) ) opCode |= 1 ; else if ( ( immSize <= BYTE ) || ( imm < 0x100 ) ) opCode |= 3 ; Compile_CalculateWrite_Instruction_X64 ( 0, opCode, mod, code, rm, (REX_B | MODRM_B | DISP_B | IMM_B), 0, disp, 0, imm, immSize ) ; } 
+Source code file location of _Compile_Group1_Immediate : "namespaces/compiler/x64.cft" : 260.75 :: we are now at : namespaces/compiler/x64.cft : 270.44
+Compiled with : optimizeOn, inlineOn, c_syntaxOn, infixOn
+Debug Source Code on : BigNum off : Lisp off : Word Source Code on
+starting at address : 0xa9b7ce7a -- code size = 512 bytes
+ -----------------------------
+Word :: C_Syntax._Compile_Group1_Immediate : definition = 0x00007f53a9b7ce7a : disassembly at namespaces/compiler/x64.cft : 270.44 :
+0x7f53a9b7ce7a    4d897e08                mov [r14+0x8], r15                                     
+0x7f53a9b7ce7e    4d8d7e08                lea r15, [r14+0x8]                                     
+0x7f53a9b7ce82    4981c610000000          add r14, 0x10                                          
+ .. rm disp imm immSize ) { byte opCode = #x80 ; if ( ( immSize > BYTE ) || ( imm >= 0x100 ) ) opCode |= 1 ; else if ( ( immSize <= BYTE ) || .. 
+0x7f53a9b7ce89    48b88000000000000000    mov rax, 0x80                                          
+ .. code mod rm disp imm immSize ) { byte opCode = #x80 ; if ( ( immSize > BYTE ) || ( imm >= 0x100 ) ) opCode |= 1 ; else if ( ( immSize <=  .. 
+0x7f53a9b7ce93    498d4f08                lea rcx, [r15+0x8]                                     
+ .. d rm disp imm immSize ) { byte opCode store0 ; if ( ( immSize > BYTE ) || ( imm >= 0x100 ) ) opCode |= 1 ; else if ( ( immSize <= BYTE )  .. 
+0x7f53a9b7ce97    488901                  mov [rcx], rax                                         
+ .. mSize ) { byte opCode = #x80 ; if ( ( immSize > BYTE ) || ( imm >= 0x100 ) ) opCode |= 1 ; else if ( ( immSize <= BYTE ) || ( imm < 0x100 .. 
+0x7f53a9b7ce9a    498b47f8                mov rax, [r15-0x8]                                     
+ .. byte opCode = #x80 ; if ( ( immSize > BYTE ) || ( imm >= 0x100 ) ) opCode |= 1 ; else if ( ( immSize <= BYTE ) || ( imm < 0x100 ) ) opCod .. 
+0x7f53a9b7ce9e    48b90100000000000000    mov rcx, 0x1                                           
+ .. { byte opCode = #x80 ; if ( ( immSize > BYTE ) || ( imm >= 0x100 ) ) opCode |= 1 ; else if ( ( immSize <= BYTE ) || ( imm < 0x100 ) ) opC .. 
+0x7f53a9b7cea8    483bc1                  cmp rax, rcx                                           
+0x7f53a9b7ceab    0f9fc0                  setg al                                                
+0x7f53a9b7ceae    480fb6c0                movzx rax, al                                          
+0x7f53a9b7ceb2    4983c608                add r14, 0x8                                           
+0x7f53a9b7ceb6    498906                  mov [r14], rax                                         
+ .. = #x80 ; if ( ( immSize > BYTE ) || ( imm >= 0x100 ) ) opCode |= 1 ; else if ( ( immSize <= BYTE ) || ( imm < 0x100 ) ) opCode |= 3 ; Com .. 
+0x7f53a9b7ceb9    498b47f0                mov rax, [r15-0x10]                                    
+ .. ; if ( ( immSize > BYTE ) || ( imm >= 0x100 ) ) opCode |= 1 ; else if ( ( immSize <= BYTE ) || ( imm < 0x100 ) ) opCode |= 3 ; Compile_Ca .. 
+0x7f53a9b7cebd    48b90001000000000000    mov rcx, 0x100                                         
+ .. 80 ; if ( ( immSize > BYTE ) || ( imm >= 0x100 ) ) opCode |= 1 ; else if ( ( immSize <= BYTE ) || ( imm < 0x100 ) ) opCode |= 3 ; Compile .. 
+0x7f53a9b7cec7    483bc1                  cmp rax, rcx                                           
+0x7f53a9b7ceca    0f9dc0                  setge al                                               
+0x7f53a9b7cecd    480fb6c0                movzx rax, al                                          
+0x7f53a9b7ced1    4983c608                add r14, 0x8                                           
+0x7f53a9b7ced5    498906                  mov [r14], rax                                         
+ ..  ( immSize > BYTE ) || ( imm >= 0x100 ) ) opCode |= 1 ; else if ( ( immSize <= BYTE ) || ( imm < 0x100 ) ) opCode |= 3 ; Compile_Calculat .. 
+0x7f53a9b7ced8    498b0e                  mov rcx, [r14]                                         
+0x7f53a9b7cedb    498b46f8                mov rax, [r14-0x8]                                     
+0x7f53a9b7cedf    4983ee10                sub r14, 0x10                                          
+0x7f53a9b7cee3    480bc1                  or rax, rcx                                            
+0x7f53a9b7cee6    4885c0                  test rax, rax                                          
+ ..  ) || ( imm < 0x100 ) ) opCode |= 3 ; }ompile_CalculateWrite_Instruction_X64 ( 0, opCode, mod, code, rm, (REX_B | MODRM_B | DISP_B | IMM_ .. 
+0x7f53a9b7cee9    4885c0                  test rax, rax                                          
+0x7f53a9b7ceec    0f8438000000            jz 0x7f53a9b7cf2a             < C_Syntax._Compile_Group1_Immediate+176 >
+0x7f53a9b7cef2    48b80100000000000000    mov rax, 0x1                                           
+0x7f53a9b7cefc    4983c608                add r14, 0x8                                           
+0x7f53a9b7cf00    498906                  mov [r14], rax                                         
+0x7f53a9b7cf03    48b90100000000000000    mov rcx, 0x1                                           
+0x7f53a9b7cf0d    498d5f08                lea rbx, [r15+0x8]                                     
+ .. mmSize > BYTE ) || ( imm >= 0x100 ) ) opCode |= 1 ; else if ( ( immSize <= BYTE ) || ( imm < 0x100 ) ) opCode |= 3 ; Compile_CalculateWri .. 
+0x7f53a9b7cf11    498b4708                mov rax, [r15+0x8]                                     
+ .. YTE ) || ( imm >= 0x100 ) ) opCode |= 1 ; else if ( ( immSize <= BYTE ) || ( imm < 0x100 ) ) opCode |= 3 ; Compile_CalculateWrite_Instruc .. 
+0x7f53a9b7cf15    48b90100000000000000    mov rcx, 0x1                                           
+0x7f53a9b7cf1f    480bc1                  or rax, rcx                                            
+ .. > BYTE ) || ( imm >= 0x100 ) ) opCode |= 1 ; else if ( ( immSize <= BYTE ) || ( imm < 0x100 ) ) opCode |= 3 ; Compile_CalculateWrite_Inst .. 
+0x7f53a9b7cf22    488903                  mov [rbx], rax                                         
+ .. E ) || ( imm >= 0x100 ) ) opCode |= 1 ; else if ( ( immSize <= BYTE ) || ( imm < 0x100 ) ) opCode |= 3 ; Compile_CalculateWrite_Instructi .. 
+0x7f53a9b7cf25    e98b000000              jmp 0x7f53a9b7cfb5            < C_Syntax._Compile_Group1_Immediate+315 >
+ .. = 0x100 ) ) opCode |= 1 ; else if ( ( immSize <= BYTE ) || ( imm < 0x100 ) ) opCode |= 3 ; Compile_CalculateWrite_Instruction_X64 ( 0, op .. 
+0x7f53a9b7cf2a    498b47f8                mov rax, [r15-0x8]                                     
+ ..  opCode |= 1 ; else if ( ( immSize <= BYTE ) || ( imm < 0x100 ) ) opCode |= 3 ; Compile_CalculateWrite_Instruction_X64 ( 0, opCode, mod,  .. 
+0x7f53a9b7cf2e    48b90100000000000000    mov rcx, 0x1                                           
+ .. ) ) opCode |= 1 ; else if ( ( immSize <= BYTE ) || ( imm < 0x100 ) ) opCode |= 3 ; Compile_CalculateWrite_Instruction_X64 ( 0, opCode, mo .. 
+0x7f53a9b7cf38    483bc1                  cmp rax, rcx                                           
+0x7f53a9b7cf3b    0f9ec0                  setle al                                               
+0x7f53a9b7cf3e    480fb6c0                movzx rax, al                                          
+0x7f53a9b7cf42    4983c608                add r14, 0x8                                           
+0x7f53a9b7cf46    498906                  mov [r14], rax                                         
+ ..  ; else if ( ( immSize <= BYTE ) || ( imm < 0x100 ) ) opCode |= 3 ; Compile_CalculateWrite_Instruction_X64 ( 0, opCode, mod, code, rm, (R .. 
+0x7f53a9b7cf49    498b47f0                mov rax, [r15-0x10]                                    
+ .. e if ( ( immSize <= BYTE ) || ( imm < 0x100 ) ) opCode |= 3 ; Compile_CalculateWrite_Instruction_X64 ( 0, opCode, mod, code, rm, (REX_B | .. 
+0x7f53a9b7cf4d    48b90001000000000000    mov rcx, 0x100                                         
+ .. lse if ( ( immSize <= BYTE ) || ( imm < 0x100 ) ) opCode |= 3 ; Compile_CalculateWrite_Instruction_X64 ( 0, opCode, mod, code, rm, (REX_B .. 
+0x7f53a9b7cf57    483bc1                  cmp rax, rcx                                           
+0x7f53a9b7cf5a    0f9cc0                  setl al                                                
+0x7f53a9b7cf5d    480fb6c0                movzx rax, al                                          
+0x7f53a9b7cf61    4983c608                add r14, 0x8                                           
+0x7f53a9b7cf65    498906                  mov [r14], rax                                         
+ ..  ( immSize <= BYTE ) || ( imm < 0x100 ) ) opCode |= 3 ; Compile_CalculateWrite_Instruction_X64 ( 0, opCode, mod, code, rm, (REX_B | MODRM .. 
+0x7f53a9b7cf68    498b0e                  mov rcx, [r14]                                         
+0x7f53a9b7cf6b    498b46f8                mov rax, [r14-0x8]                                     
+0x7f53a9b7cf6f    4983ee10                sub r14, 0x10                                          
+0x7f53a9b7cf73    480bc1                  or rax, rcx                                            
+0x7f53a9b7cf76    4885c0                  test rax, rax                                          
+ .. TE ) || ( imm < 0x100 ) ) opCode |= 3 ; Compile_CalculateWrite_Instruction_X64 ( 0, opCode, mod, code, rm, (REX_B | MODRM_B | DISP_B | IM .. 
+0x7f53a9b7cf79    4885c0                  test rax, rax                                          
+0x7f53a9b7cf7c    0f8433000000            jz 0x7f53a9b7cfb5             < C_Syntax._Compile_Group1_Immediate+315 >
+0x7f53a9b7cf82    48b80300000000000000    mov rax, 0x3                                           
+0x7f53a9b7cf8c    4983c608                add r14, 0x8                                           
+0x7f53a9b7cf90    498906                  mov [r14], rax                                         
+0x7f53a9b7cf93    48b90300000000000000    mov rcx, 0x3                                           
+0x7f53a9b7cf9d    498d5f08                lea rbx, [r15+0x8]                                     
+ .. mmSize <= BYTE ) || ( imm < 0x100 ) ) opCode |= 3 ; Compile_CalculateWrite_Instruction_X64 ( 0, opCode, mod, code, rm, (REX_B | MODRM_B | .. 
+0x7f53a9b7cfa1    498b4708                mov rax, [r15+0x8]                                     
+ .. BYTE ) || ( imm < 0x100 ) ) opCode |= 3 ; Compile_CalculateWrite_Instruction_X64 ( 0, opCode, mod, code, rm, (REX_B | MODRM_B | DISP_B |  .. 
+0x7f53a9b7cfa5    48b90300000000000000    mov rcx, 0x3                                           
+0x7f53a9b7cfaf    480bc1                  or rax, rcx                                            
+ .. <= BYTE ) || ( imm < 0x100 ) ) opCode |= 3 ; Compile_CalculateWrite_Instruction_X64 ( 0, opCode, mod, code, rm, (REX_B | MODRM_B | DISP_B .. 
+0x7f53a9b7cfb2    488903                  mov [rbx], rax                                         
+ .. pile_CalculateWrite_Instruction_X64 ( 0, opCode, mod, code, rm, (REX_B | MODRM_B | DISP_B | IMM_B), 0, disp, 0, imm, immSize ) ; }  .. 
+0x7f53a9b7cfb5    48b80000000000000000    mov rax, 0x0                                           
+0x7f53a9b7cfbf    4983c608                add r14, 0x8                                           
+0x7f53a9b7cfc3    498906                  mov [r14], rax                                         
+ .. e_CalculateWrite_Instruction_X64 ( 0, opCode, mod, code, rm, (REX_B | MODRM_B | DISP_B | IMM_B), 0, disp, 0, imm, immSize ) ; }  .. 
+0x7f53a9b7cfc6    498b4708                mov rax, [r15+0x8]                                     
+0x7f53a9b7cfca    4983c608                add r14, 0x8                                           
+0x7f53a9b7cfce    498906                  mov [r14], rax                                         
+ .. ateWrite_Instruction_X64 ( 0, opCode, mod, code, rm, (REX_B | MODRM_B | DISP_B | IMM_B), 0, disp, 0, imm, immSize ) ; }  .. 
+0x7f53a9b7cfd1    498b47d8                mov rax, [r15-0x28]                                    
+0x7f53a9b7cfd5    4983c608                add r14, 0x8                                           
+0x7f53a9b7cfd9    498906                  mov [r14], rax                                         
+ .. ite_Instruction_X64 ( 0, opCode, mod, code, rm, (REX_B | MODRM_B | DISP_B | IMM_B), 0, disp, 0, imm, immSize ) ; }  .. 
+0x7f53a9b7cfdc    498b47d0                mov rax, [r15-0x30]                                    
+0x7f53a9b7cfe0    4983c608                add r14, 0x8                                           
+0x7f53a9b7cfe4    498906                  mov [r14], rax                                         
+ .. struction_X64 ( 0, opCode, mod, code, rm, (REX_B | MODRM_B | DISP_B | IMM_B), 0, disp, 0, imm, immSize ) ; }  .. 
+0x7f53a9b7cfe7    498b47e0                mov rax, [r15-0x20]                                    
+0x7f53a9b7cfeb    4983c608                add r14, 0x8                                           
+0x7f53a9b7cfef    498906                  mov [r14], rax                                         
+ .. tion_X64 ( 0, opCode, mod, code, rm, (REX_B | MODRM_B | DISP_B | IMM_B), 0, disp, 0, imm, immSize ) ; }  .. 
+0x7f53a9b7cff2    48b80300000000000000    mov rax, 0x3                                           
+ .. de, mod, code, rm, (REX_B | MODRM_B | DISP_B | IMM_B), 0, disp, 0, imm, immSize ) ; }  .. 
+0x7f53a9b7cffc    48b90800000000000000    mov rcx, 0x8                                           
+ .. Code, mod, code, rm, (REX_B | MODRM_B | DISP_B | IMM_B), 0, disp, 0, imm, immSize ) ; }  .. 
+0x7f53a9b7d006    480bc1                  or rax, rcx                                            
+ .. code, rm, (REX_B | MODRM_B | DISP_B | IMM_B), 0, disp, 0, imm, immSize ) ; }  .. 
+0x7f53a9b7d009    48b91000000000000000    mov rcx, 0x10                                          
+ .. , code, rm, (REX_B | MODRM_B | DISP_B | IMM_B), 0, disp, 0, imm, immSize ) ; }  .. 
+0x7f53a9b7d013    480bc1                  or rax, rcx                                            
+0x7f53a9b7d016    4983c608                add r14, 0x8                                           
+0x7f53a9b7d01a    498906                  mov [r14], rax                                         
+ .. , (REX_B | MODRM_B | DISP_B | IMM_B), 0, disp, 0, imm, immSize ) ; }  .. 
+0x7f53a9b7d01d    48b80000000000000000    mov rax, 0x0                                           
+0x7f53a9b7d027    4983c608                add r14, 0x8                                           
+0x7f53a9b7d02b    498906                  mov [r14], rax                                         
+ .. REX_B | MODRM_B | DISP_B | IMM_B), 0, disp, 0, imm, immSize ) ; }  .. 
+0x7f53a9b7d02e    498b47e8                mov rax, [r15-0x18]                                    
+0x7f53a9b7d032    4983c608                add r14, 0x8                                           
+0x7f53a9b7d036    498906                  mov [r14], rax                                         
+ .. | MODRM_B | DISP_B | IMM_B), 0, disp, 0, imm, immSize ) ; }  .. 
+0x7f53a9b7d039    48b80000000000000000    mov rax, 0x0                                           
+0x7f53a9b7d043    4983c608                add r14, 0x8                                           
+0x7f53a9b7d047    498906                  mov [r14], rax                                         
+ .. ODRM_B | DISP_B | IMM_B), 0, disp, 0, imm, immSize ) ; }  .. 
+0x7f53a9b7d04a    498b47f0                mov rax, [r15-0x10]                                    
+0x7f53a9b7d04e    4983c608                add r14, 0x8                                           
+0x7f53a9b7d052    498906                  mov [r14], rax                                         
+ .. B | DISP_B | IMM_B), 0, disp, 0, imm, immSize ) ; }  .. 
+0x7f53a9b7d055    498b47f8                mov rax, [r15-0x8]                                     
+0x7f53a9b7d059    4983c608                add r14, 0x8                                           
+0x7f53a9b7d05d    498906                  mov [r14], rax                                         
+ ..  ) || ( imm < 0x100 ) ) opCode |= 3 ; Compile_CalculateWrite_Instruction_X64 ( 0, opCode, mod, code, rm, (REX_B | MODRM_B | DISP_B | IMM_ .. 
+0x7f53a9b7d060    49b91ec8b7a9537f0000    mov r9, 0x7f53a9b7c81e                                 
+0x7f53a9b7d06a    49ffd1                  call r9                       < C_Syntax.Compile_CalculateWrite_Instruction_X64 : 0x00007f53a9b7c81e >
+ ..  IMM_B), 0, disp, 0, imm, immSize ) ; }  .. 
+0x7f53a9b7d06d    4d8d77f8                lea r14, [r15-0x8]                                     
+0x7f53a9b7d071    4d8b7e08                mov r15, [r14+0x8]                                     
+0x7f53a9b7d075    4983ee30                sub r14, 0x30                                          
+0x7f53a9b7d079    c3                      ret                                                    
+Word_Disassemble : word - '_Compile_Group1_Immediate' :: codeSize = 511
+Word : 0x00007f53a9aa5238 :: Compiled at : 0x00007f53a9b7ce7a
+ =============================
+::> 'wdiss' was called at namespaces/compiler/x64.cft 270.44 <::

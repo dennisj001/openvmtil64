@@ -699,7 +699,6 @@ Compile_X_OpEqual ( Compiler * compiler, block op )
     Word_Check_SetHere_To_StackPushRegisterCode ( optInfo->opWord, 0 ) ;
     if ( ( ! optInfo->wordArg1 ) || ( ! ( optInfo->wordArg1->CAttribute & REGISTER_VARIABLE ) ) )
     {
-
         Compiler_Word_SCHCPUSCA ( optInfo->opWord, 0 ) ;
         Compile_Move_Reg_To_Rm ( OREG2, valueReg, 0, 0 ) ; //optInfo->Optimize_Reg, 0 ) ; //ACC, 0 ) ;
     }

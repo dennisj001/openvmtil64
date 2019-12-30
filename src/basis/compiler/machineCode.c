@@ -778,7 +778,7 @@ void
 _Compile_JumpToAddress ( byte * jmpToAddr, byte insn ) // runtime
 {
     byte * offsetAddress = Here + 1 ;
-    if ( (!insn) || (( ( insn == 0x0f ) || ( insn == JMPI32 ) ) && abs ( (int64) (jmpToAddr - ( Here + 6 + ( insn == 0x0f ) ? 1 : 0 ) ) ) ) ) // optimization : don't need to jump to the next instruction
+    //if ( (!insn) || (( ( insn == 0x0f ) || ( insn == JMPI32 ) ) && abs ( (int64) (jmpToAddr - ( Here + 6 + ( insn == 0x0f ) ? 1 : 0 ) ) ) ) ) // optimization : don't need to jump to the next instruction
     {
         int64 disp = _CalculateOffsetForCallOrJump ( offsetAddress, jmpToAddr, insn ) ;
         _Compile_JumpToDisp ( disp, insn ) ;
@@ -802,7 +802,9 @@ Compile_UninitializedJumpEqualZero ( )
 void
 _Compile_UninitializedJmpOrCall ( Boolean jmpOrCall )
 {
+    //if ( ((* (Here - 5 )) != JMPI32 ) && (* (int32*) (Here - 4 )) != 0 ) 
     Compile_CalculateWrite_Instruction_X64 ( 0, jmpOrCall, 0, 0, 0, DISP_B, 0, 0, INT32_SIZE, 0, 0 ) ;
+    //else _Printf ( (byte*) "") ;
 }
 
 void

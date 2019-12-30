@@ -414,7 +414,7 @@ CPrimitive CPrimitives [] = {
     { "addToHistoryOff", 0, 0, 0, OpenVmTil_AddStringToHistoryOff, 0, 0, 0, "OpenVmTil", "Root" },
     { "showAllocated", 0, 0, 0, OVT_Mem_ShowAllocated, 0, 0, 0, "OpenVmTil", "Root" },
     { "recycleDebugInfo", 0, 0, 0, OVT_RecycleAllWordsDebugInfo, 0, 0, 0, "OpenVmTil", "Root" },
-    { "<dbg>", 0, 0, 0, CfrTil_DebugRuntimeBreakpoint, CPRIMITIVE|DEBUG_WORD, RT_STEPPING_DEBUG, 0, "OpenVmTil", "Root" },
+    //{ "<dbg>", 0, 0, 0, CfrTil_DebugRuntimeBreakpoint, CPRIMITIVE|DEBUG_WORD, RT_STEPPING_DEBUG, 0, "OpenVmTil", "Root" },
     
     { "freeTemporayMem", 0, 0, 0, OVT_MemListFree_TempObjects, 0, 0, 0, "Memory", "OpenVmTil" },
     { "freeCompilerTempMem", 0, 0, 0, OVT_MemListFree_CompilerTempObjects, 0, 0, 0, "Memory", "OpenVmTil" },

@@ -70,7 +70,7 @@ dscOn
 //scOn
     
 c_syntaxOn
-Logic Bits Combinators X64 C
+Logic Combinators X64 C Bits
 
 int
 CalculateModRegardingDisplacement ( mod,  disp | rmod ) // mod/rmod avoid name class with 'mod' function
@@ -188,6 +188,7 @@ _Compile_Write_Instruction_X64 ( rex, opCode0, opCode1, modRm, controlFlags, sib
     if ( controlFlags Bits.& MODRM_B ) compileByte ( modRm ) ;
     if ( sib && ( controlFlags Bits.& SIB_B ) ) compileByte ( sib ) ;
     if ( disp || ( controlFlags Bits.& DISP_B ) ) _Compile_ImmDispData ( disp, dispSize, 0 ) ;
+//<dbg>
     if ( imm || ( controlFlags Bits.& IMM_B ) ) _Compile_ImmDispData ( imm, immSize, ( controlFlags Bits.& IMM_B ) ) ;
 #if DBI
     nbytes = Here - _here ; 
@@ -206,7 +207,7 @@ CalculateRex ( reg rm rex_w_flag )
     return rex ;
 } prefix // prefix is not automatic with c syntax so they can be used like rpn words
 //'CalculateRex find wdiss pause
-
+//verbosity = 2 ;
 void
 Compile_CalculateWrite_Instruction_X64 ( code0, code1, mod, reg, rm, controlFlags, sib, disp, dispSize, imm, immSize )
 {
@@ -214,9 +215,8 @@ Compile_CalculateWrite_Instruction_X64 ( code0, code1, mod, reg, rm, controlFlag
     byte modRm = CalculateModRmByte ( mod, reg, rm, sib, disp ) ;
     _Compile_Write_Instruction_X64 ( rex, code0, code1, modRm, controlFlags, sib, disp, dispSize, imm, immSize ) ;
 } prefix
-//'Compile_CalculateWrite_Instruction_X64 find wdiss apause
+'Compile_CalculateWrite_Instruction_X64 find wdiss //pause
 
-C
 void
 Compile_Move ( direction, mod, reg, rm, operandSize, sib, disp, dispSize, imm, immSize )
 {
@@ -226,7 +226,7 @@ Compile_Move ( direction, mod, reg, rm, operandSize, sib, disp, dispSize, imm, i
         reg = 0 ;
         if ( immSize == 1 ) opCode = 0xb0 ;
         else opCode = 0xb8 ;
-        opCode += ( rm & 7 ) ;
+        opCode += ( rm Bits.& 7 ) ;
         controlFlags |= IMM_B ;
     }
     else
@@ -266,9 +266,10 @@ _Compile_Group1_Immediate ( code mod rm disp imm immSize ) //controlFlags )
     if ( ( immSize > BYTE ) || ( imm >= 0x100 ) ) opCode |= 1 ;
     else if ( ( immSize <= BYTE ) || ( imm < 0x100 ) ) opCode |= 3 ; 
     //Compile_CalculateWrite_Instruction_X64 (  rex,  opCode,  mod,  reg,  rm, controlFlags,  sib,  disp,  dispSize,  imm,  immSize | modRm )
+//<dbg>
     Compile_CalculateWrite_Instruction_X64 (  0,  opCode,  mod,  code, rm, (REX_B | MODRM_B | DISP_B | IMM_B),  0,  disp,  0,  imm,  immSize ) ;
 } prefix
-wdiss ( find ( '_Compile_Group1_Immediate )) ; //pause () ;
+wdiss ( find ( '_Compile_Group1_Immediate )) ; pause () ;
 
 void
 _Compile_Group5 ( code, mod, rm, sib, disp, size )
@@ -283,8 +284,11 @@ _Compile_CallThruReg ( reg )
     _Compile_Group5 ( CALL, REG, reg, 0, 0, 0 ) ;
 } prefix
 
-//                          _Compile_Group1_Immediate ( code direction mod rm disp imm immSize | opCode controlFlags )
-void _Compile_SUBI_DSP ( imm ) { _Compile_Group1_Immediate ( SUB, REG, DSP, 0, imm, 1 ) ; } prefix
+//                               _Compile_Group1_Immediate ( code mod rm disp imm immSize ) //controlFlags )
+void _Compile_SUBI_DSP ( imm ) 
+{ 
+    _Compile_Group1_Immediate ( SUB, REG, DSP, 0, imm, 0 ) ; 
+} prefix
 
 void
 _Compile_Test ( mod, reg, rm, controlFlags, disp, imm )
@@ -317,12 +321,11 @@ _Compile_TESTreg_Toreg ( dstReg, srcReg )
 #define Compile_DEC( mod, rm, sib, disp ) _Compile_Group5 ( DEC, mod, rm, sib, disp, 0  )
 c_syntaxOff
 infixOn
-//verbosity 3 =
 C X64
 sp
 C_Syntax
 : _Compile_Stack_PopToReg ( reg ) 
-    _Compile_Move_DataStackN_ToReg ( reg @, 0 ) // 4d8b06                  mov r8, [r14]
+    _Compile_Move_DataStackN_ToReg ( reg, 0 ) // 4d8b06                  mov r8, [r14]
     //"\nshould show :     4d8b06                  mov r8, [r14]" ps
     _Compile_SUBI_DSP ( CELL )                   // 4983ee08                sub r14, 0x8
     //"\nshould show :     4983ee08                sub r14, 0x8" ps
@@ -336,7 +339,7 @@ Combinators
 
 sp
 :asm iax
-    _Compile_Stack_PopToReg ( R8D )          //4d8b06                  mov r8, [r14]       
+    d: _Compile_Stack_PopToReg ( R8D )          //4d8b06                  mov r8, [r14]       
     _Compile_CallThruReg ( R8D )          //4983ee08                sub r14, 0x8
                                              //49ffd0                  call r8  
                                              //c3                      ret      

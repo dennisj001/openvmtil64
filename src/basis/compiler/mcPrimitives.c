@@ -41,6 +41,7 @@ CfrTil_MachineCodePrimitive_AddWords ( CfrTil * cfrTil )
     _CfrTil_MachineCodePrimitive_NewAdd ( "saveCpuState", CPRIMITIVE, 0, & cfrTil->SaveCpuState, ( byte* ) Compile_CpuState_Save, ( int64 ) cfrTil->cs_Cpu, "System", "Root" ) ;
     _CfrTil_MachineCodePrimitive_NewAdd ( "restoreCpu2State", CPRIMITIVE, 0, & cfrTil->RestoreCpu2State, ( byte* ) Compile_CpuState_Restore, ( int64 ) cfrTil->cs_Cpu2, "System", "Root" ) ;
     _CfrTil_MachineCodePrimitive_NewAdd ( "saveCpu2State", CPRIMITIVE, 0, & cfrTil->SaveCpu2State, ( byte* ) Compile_CpuState_Save, ( int64 ) cfrTil->cs_Cpu2, "System", "Root" ) ;
+    _CfrTil_MachineCodePrimitive_NewAdd ( "<dbg>", CPRIMITIVE|DEBUG_WORD, RT_STEPPING_DEBUG, 0, ( byte* ) _CfrTil_DebugRuntimeBreakpoint, - 1, "Debug", "Root" ) ;
     //{ "<rt-dbg>", CPRIMITIVE|DEBUG_WORD, RT_STEPPING_DEBUG, 0, ( byte* ) _CfrTil_DebugRuntimeBreakpoint, - 1, "Debug", "Root" },
     //{ "<dso>", CPRIMITIVE|DEBUG_WORD, RT_STEPPING_DEBUG, 0, ( byte* ) _CfrTil_DebugRuntimeBreakpoint_IsDebugShowOn, - 1, "Debug", "Root" },
     //{ "<d:dbg>", CPRIMITIVE|DEBUG_WORD, RT_STEPPING_DEBUG, 0, ( byte* ) _CfrTil_DebugRuntimeBreakpoint_IsDebugOn, - 1, "Debug", "Root" },

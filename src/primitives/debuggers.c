@@ -63,7 +63,7 @@ void
 DebugRuntimeBreakpoint ( )
 {
     Debugger * debugger = _Debugger_ ;
-    debugger->SaveCpuState ( ) ;
+    //debugger->SaveCpuState ( ) ;
     //if ( ( ! CompileMode ) )
     {
         if ( ! GetState ( debugger, ( DBG_BRK_INIT ) ) ) //|DBG_CONTINUE_MODE ) ) )
