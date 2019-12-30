@@ -64,7 +64,7 @@ CfrTil_Interpret_C_Blocks ( int64 blocks, Boolean takesAnElseFlag, Boolean semic
                     compiler->TakesLParenAsBlock = false ; // after the first block
                     break ;
                 }
-                goto doDefault ;
+                else goto doDefault ;
             }
             case ')':
             {
@@ -73,7 +73,7 @@ CfrTil_Interpret_C_Blocks ( int64 blocks, Boolean takesAnElseFlag, Boolean semic
                     List_InterpretLists ( compiler->PostfixLists ) ;
                     compiler->InLParenBlock = false ;
                     compiler->TakesLParenAsBlock = false ;
-                    Interpret_C_Block_EndBlock ( ( byte* ) ")", 0 ) ;
+                    Interpret_C_Block_EndBlock ( ( byte* ) ")", 1 ) ;
                     //CfrTil_TypeStack_Pop ( ) ; // the logic word
                     if ( ! _Context_StringEqual_PeekNextToken ( _Context_, ( byte* ) "{", 0 ) )
                     {
@@ -83,7 +83,7 @@ CfrTil_Interpret_C_Blocks ( int64 blocks, Boolean takesAnElseFlag, Boolean semic
                     blocksParsed ++ ;
                     break ;
                 }
-                goto doDefault ;
+                else goto doDefault ;
             }
             case '{':
             {

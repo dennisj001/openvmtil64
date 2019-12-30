@@ -86,7 +86,7 @@ CalculateModRegardingDisplacement ( mod,  disp | rmod ) // mod/rmod avoid name c
     else rmod = mod ;
     return rmod ;
 } prefix
-//'CalculateModRegardingDisplacement find wdiss apause
+//'CalculateModRegardingDisplacement find wdiss //apause
 
 Bits 
 int
@@ -129,27 +129,27 @@ CalculateModRmByte ( mod, reg, rm, sib, disp )
 // operandSize : specific size of immediate data - BYTE or WORD
 // SIB : scale, index, base addressing byte
 void
-_Compile_ImmDispData (  immDisp,  immSize,  forceFlag )
+_Compile_ImmOrDispData ( immOrDisp,  immSize, forceFlag )
 {
     // the opcode probably is all that needs to be adjusted for this to not be necessary    
     // to not compile an imm when imm is a parameter, set isize == 0 and imm == 0
     if ( immSize > 0 )
     {
-        if ( immSize == BYTE ) compileByte (immDisp)  ; 
-        else if ( immSize == 4 ) compileInt32 (immDisp)  ; 
-        else if ( immSize == CELL ) compileInt64 (immDisp) ; 
+        if ( immSize == BYTE ) compileByte (immOrDisp)  ; 
+        else if ( immSize == 4 ) compileInt32 (immOrDisp)  ; 
+        else if ( immSize == CELL ) compileInt64 (immOrDisp) ; 
     }
     else // with operandSize == 0 let the compiler use the minimal size ; nb. can't be imm == 0
     {
-        if ( immDisp >= 0x100000000 ) compileInt64 (immDisp)  ;
+        if ( immOrDisp >= 0x100000000 ) compileInt64 (immOrDisp)  ;
         else 
         {
-            if ( immDisp >= 0x100 ) compileInt32 (immDisp)  ;
-            else if ( immDisp || forceFlag ) compileByte (immDisp)  ;
+            if ( immOrDisp >= 0x100 ) compileInt32 (immOrDisp)  ;
+            else if ( immOrDisp || forceFlag ) compileByte (immOrDisp)  ;
         }
     }
 } prefix
-//'_Compile_ImmDispData find wdiss pause
+'_Compile_ImmOrDispData find wdiss //pause
 
 // Intel - InstructionSet-A-M-253666.pdf - section 2.1 :
 //-----------------------------------------------------------------------
@@ -187,9 +187,9 @@ _Compile_Write_Instruction_X64 ( rex, opCode0, opCode1, modRm, controlFlags, sib
     if ( opCode1 ) compileByte ( opCode1 ) ; 
     if ( controlFlags Bits.& MODRM_B ) compileByte ( modRm ) ;
     if ( sib && ( controlFlags Bits.& SIB_B ) ) compileByte ( sib ) ;
-    if ( disp || ( controlFlags Bits.& DISP_B ) ) _Compile_ImmDispData ( disp, dispSize, 0 ) ;
+    if ( disp && ( controlFlags Bits.& DISP_B ) ) _Compile_ImmOrDispData ( disp, dispSize, ( controlFlags Bits.& DISP_B ) ) ;
 //<dbg>
-    if ( imm || ( controlFlags Bits.& IMM_B ) ) _Compile_ImmDispData ( imm, immSize, ( controlFlags Bits.& IMM_B ) ) ;
+    if ( imm || ( controlFlags Bits.& IMM_B ) ) _Compile_ImmOrDispData ( imm, immSize, ( controlFlags Bits.& IMM_B ) ) ;
 #if DBI
     nbytes = Here - _here ; 
     nl ; location () ;
@@ -197,7 +197,7 @@ _Compile_Write_Instruction_X64 ( rex, opCode0, opCode1, modRm, controlFlags, sib
     dis ( _here, nbytes ) ; nl ; //pause () ; nl ; nl ; 
 #endif
 } prefix
-//'_Compile_Write_Instruction_X64 find wdiss //pause
+'_Compile_Write_Instruction_X64 find wdiss //pause
 
 int 
 CalculateRex ( reg rm rex_w_flag )
@@ -211,7 +211,7 @@ CalculateRex ( reg rm rex_w_flag )
 void
 Compile_CalculateWrite_Instruction_X64 ( code0, code1, mod, reg, rm, controlFlags, sib, disp, dispSize, imm, immSize )
 {
-    byte rex = CalculateRex ( reg, rm, ( immSize == 8 ) || ( controlFlags Bits.& REX_B ) ) ;
+    byte rex = CalculateRex ( reg, rm, ( immSize == 8 ) || ( controlFlags Bits.& REX_W ) ) ;
     byte modRm = CalculateModRmByte ( mod, reg, rm, sib, disp ) ;
     _Compile_Write_Instruction_X64 ( rex, code0, code1, modRm, controlFlags, sib, disp, dispSize, imm, immSize ) ;
 } prefix
@@ -234,6 +234,7 @@ Compile_Move ( direction, mod, reg, rm, operandSize, sib, disp, dispSize, imm, i
         opCode = 0x88 ;
         if ( direction == REG ) opCode |= 2 ; // 0x8b ; // 0x89 |= 2 ; // d : direction bit = 'bit 1' : 0 == dest is mem ; 1 == dest is reg
         if ( operandSize > 1 ) opCode += 1 ; //nb. if using rex then we cannot use AH, BH, CH, DH per Intel instruction manual
+        if ( operandSize == 8 ) controlFlags |= REX_W ;
         if ( ! mod )
         {
             if ( disp == 0 ) mod = 0 ;
@@ -267,9 +268,9 @@ _Compile_Group1_Immediate ( code mod rm disp imm immSize ) //controlFlags )
     else if ( ( immSize <= BYTE ) || ( imm < 0x100 ) ) opCode |= 3 ; 
     //Compile_CalculateWrite_Instruction_X64 (  rex,  opCode,  mod,  reg,  rm, controlFlags,  sib,  disp,  dispSize,  imm,  immSize | modRm )
 //<dbg>
-    Compile_CalculateWrite_Instruction_X64 (  0,  opCode,  mod,  code, rm, (REX_B | MODRM_B | DISP_B | IMM_B),  0,  disp,  0,  imm,  immSize ) ;
+    Compile_CalculateWrite_Instruction_X64 (  0,  opCode,  mod,  code, rm, (REX_B | REX_W | MODRM_B | (disp ? DISP_B : 0 ) | IMM_B),  0,  disp,  0,  imm,  immSize ) ;
 } prefix
-wdiss ( find ( '_Compile_Group1_Immediate )) ; pause () ;
+wdiss ( find ( '_Compile_Group1_Immediate )) ; //pause () ;
 
 void
 _Compile_Group5 ( code, mod, rm, sib, disp, size )
@@ -287,7 +288,7 @@ _Compile_CallThruReg ( reg )
 //                               _Compile_Group1_Immediate ( code mod rm disp imm immSize ) //controlFlags )
 void _Compile_SUBI_DSP ( imm ) 
 { 
-    _Compile_Group1_Immediate ( SUB, REG, DSP, 0, imm, 0 ) ; 
+    _Compile_Group1_Immediate ( SUB, REG, DSP, 0, imm, 1 ) ; 
 } prefix
 
 void
@@ -339,7 +340,7 @@ Combinators
 
 sp
 :asm iax
-    d: _Compile_Stack_PopToReg ( R8D )          //4d8b06                  mov r8, [r14]       
+    _Compile_Stack_PopToReg ( R8D )          //4d8b06                  mov r8, [r14]       
     _Compile_CallThruReg ( R8D )          //4983ee08                sub r14, 0x8
                                              //49ffd0                  call r8  
                                              //c3                      ret      

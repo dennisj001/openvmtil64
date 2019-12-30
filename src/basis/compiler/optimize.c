@@ -206,7 +206,7 @@ Compiler_SetupArgsToStandardLocations ( Compiler * compiler )
     if ( optInfo->opWord->CAttribute & ( CATEGORY_DUP ) ) Compile_Optimize_Dup ( compiler ) ;
     else if ( optInfo->wordArg1_literal && optInfo->wordArg2_literal ) Do_OptimizeOp2Literals ( compiler ) ;
     else if ( optInfo->wordArg2_Op || optInfo->xBetweenArg1AndArg2 ) Compiler_Optimizer_WordArg2Op_Or_xBetweenArg1AndArg2 ( compiler ) ;
-    //else if ( ( optInfo->NumberOfArgs == 2 ) && optInfo->wordArg2_literal && optInfo->opWord->W_OpInsnCode == CMP ) Compiler_Optimizer_2_Args_And_1_Literal ( compiler ) ;
+    else if ( ( optInfo->NumberOfArgs == 2 ) && optInfo->wordArg2_literal && optInfo->opWord->W_OpInsnCode == CMP ) Compiler_Optimizer_2_Args_And_1_Literal ( compiler ) ;
     else if ( ( optInfo->NumberOfArgs == 2 ) || optInfo->wordArg1_Op ) Compiler_Optimizer_2Args_Or_WordArg1_Op ( compiler ) ;
     else if ( optInfo->NumberOfArgs == 1 ) Compiler_Optimizer_1Arg ( compiler ) ;
     else Compiler_Optimizer_0Args ( compiler ) ;
@@ -216,16 +216,20 @@ void
 Compiler_Optimizer_2_Args_And_1_Literal ( Compiler * compiler )
 {
     CompileOptimizeInfo * optInfo = compiler->OptInfo ;
-    if ( ( optInfo->opWord->CAttribute & CATEGORY_OP_EQUAL ) || ( optInfo->opWord->W_OpInsnGroup == 3)) Compiler_Optimizer_2Args_Or_WordArg1_Op ( compiler ) ;
-    //if ( ( optInfo->opWord->CAttribute & CATEGORY_OP_EQUAL ) ) Compiler_Optimizer_2Args_Or_WordArg1_Op ( compiler ) ;
+    if ( ( optInfo->opWord->CAttribute & CATEGORY_OP_EQUAL ) || ( optInfo->opWord->W_OpInsnGroup == 3 ) ) Compiler_Optimizer_2Args_Or_WordArg1_Op ( compiler ) ;
+        //if ( ( optInfo->opWord->CAttribute & CATEGORY_OP_EQUAL ) ) Compiler_Optimizer_2Args_Or_WordArg1_Op ( compiler ) ;
     else
     {
         byte reg, rm ; // = ( optInfo->wordArg1->CAttribute & REGISTER_VARIABLE ) ? optInfo->wordArg1->RegToUse : ACC ;
         if ( optInfo->wordArg1->CAttribute & REGISTER_VARIABLE ) SetHere ( optInfo->wordArg1->Coding ? optInfo->wordArg1->Coding : optInfo->wordArg2->Coding, 1 ) ;
-        else  if ( optInfo->wordArg1->StackPushRegisterCode ) _SetHere_To_Word_StackPushRegisterCode ( optInfo->wordArg1, 1 ) ;
+        else if ( optInfo->wordArg1->StackPushRegisterCode ) _SetHere_To_Word_StackPushRegisterCode ( optInfo->wordArg1, 1 ) ;
         compiler->OptInfo->Optimize_Imm = optInfo->wordArg2->S_Value ;
         optInfo->OptimizeFlag |= OPTIMIZE_IMM ;
-        if ( optInfo->wordArg1->CAttribute & REGISTER_VARIABLE ) { reg = optInfo->wordArg1->RegToUse ; reg |= REG_ON_BIT ; }
+        if ( optInfo->wordArg1->CAttribute & REGISTER_VARIABLE )
+        {
+            reg = optInfo->wordArg1->RegToUse ;
+            reg |= REG_ON_BIT ;
+        }
         //optInfo->Optimize_Rm = rm | REG_ON_BIT ;
         //if ( optInfo->wordArg2->CAttribute & REGISTER_VARIABLE ) { rm = optInfo->wordArg2->RegToUse ; rm |= REG_ON_BIT ; } //???
     }
@@ -242,7 +246,12 @@ Compiler_Optimizer_2Args_Or_WordArg1_Op ( Compiler * compiler )
     else
     {
         Boolean rm = ( optInfo->wordArg2->CAttribute & REGISTER_VARIABLE ) ? optInfo->wordArg2->RegToUse : OREG ;
-        if ( optInfo->opWord->CAttribute & CATEGORY_OP_OPEQUAL ) SetHere ( optInfo->wordArg1->Coding, 0 ) ;
+        if ( optInfo->opWord->CAttribute & CATEGORY_OP_OPEQUAL )
+        {
+            if ( GetState ( _Context_, ( C_SYNTAX | INFIX_MODE ) ) ) SetHere ( optInfo->wordArg2->Coding, 0 ) ;
+            else SetHere ( optInfo->wordArg1->Coding, 0 ) ;
+            return ;
+        }
         else
         {
             optInfo->Optimize_Reg = ( ( optInfo->wordArg1->CAttribute & REGISTER_VARIABLE ) ? optInfo->wordArg1->RegToUse : ACC ) | REG_ON_BIT ;
@@ -668,14 +677,21 @@ Compile_X_OpEqual ( Compiler * compiler, block op )
     if ( ( ! optInfo->NumberOfArgs ) || optInfo->xBetweenArg1AndArg2 ) SyntaxError ( 1 ) ; // this case may be handled better than with SyntaxError
     if ( optInfo->NumberOfArgs == 2 )
     {
+        //SetHere ( optInfo->wordArg1->Coding, 1) ;
         Compiler_SetupArgsToStandardLocations ( compiler ) ;
         if ( ! ( optInfo->wordArg1->CAttribute & REGISTER_VARIABLE ) ) /// what about if ( optInfo->wordArg2->CAttribute & REGISTER_VARIABLE ) ???
         {
-            Compile_StandardArg ( optInfo->wordArg1, OREG2, 0, optInfo->wordArg1->Coding, true ) ; //nb! lvalue
+            Compile_StandardArg ( optInfo->wordArg1, OREG2, 0, 0, true ) ; //nb! lvalue
             Compile_StandardArg ( optInfo->wordArg1, ACC, 1, 0, false ) ; //nb! rvalue
             Compile_StandardArg ( optInfo->wordArg2, OREG, 1, 0, true ) ; //nb! rvalue
         }
-        else valueReg = optInfo->wordArg1->RegToUse ;
+        else 
+        {
+            valueReg = optInfo->wordArg1->RegToUse ;
+            Compile_StandardArg ( optInfo->wordArg1, OREG2, 0, 0, true ) ; //nb! lvalue
+            Compile_StandardArg ( optInfo->wordArg1, ACC, 1, 0, false ) ; //nb! rvalue
+            Compile_StandardArg ( optInfo->wordArg2, OREG, 1, 0, true ) ; //nb! rvalue
+        }
     }
     else if ( compiler->LHS_Word )
     {
@@ -684,6 +700,7 @@ Compile_X_OpEqual ( Compiler * compiler, block op )
             SetHere ( optInfo->lparen2->StackPushRegisterCode, 1 ) ;
             Compile_Move_Reg_To_Reg ( OREG, ACC, 0 ) ;
         }
+        //else SetHere ( compiler->LHS_Word->Coding, 1) ;
         Compile_StandardArg ( compiler->LHS_Word, OREG2, 0, 0, true ) ; //nb! lvalue
         Compile_StandardArg ( compiler->LHS_Word, ACC, 1, 0, false ) ; //nb! rvalue
         if ( ! optInfo->lparen2 ) Compile_StandardArg ( optInfo->wordArg2, OREG, 1, 0, true ) ; //nb! rvalue
