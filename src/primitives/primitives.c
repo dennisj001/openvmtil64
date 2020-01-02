@@ -40,7 +40,6 @@ CPrimitive CPrimitives [] = {
     { "::", 0, 0, 0, ( block ) _LO_CfrTil, 0, 0, T_LISP_CFRTIL | T_LISP_SPECIAL | T_LISP_IMMEDIATE, "Lisp", "Root" },
     { "lcReset", 0, 0, 0, ( block ) LC_Reset, 0, 0, 0, "Lisp", "Root" },
     { "lcClearDefines", 0, 0, 0, ( block ) LC_ClearDefinesNamespace, 0, 0, 0, "Lisp", "Root" },
-    { "lcOff", 0, 0, 0, ( block ) LC_LispNamespacesOff, 0, 0, 0, "Lisp", "Root" },
 
     { "'", 0, 0, 0, CfrTil_SingleQuote, IMMEDIATE | KEYWORD, 0, 0, "Forth", "Root" },
     { "1,", 0, 0, 0, CompileByte, 0, 0, 0, "Forth", "Root" },
@@ -344,11 +343,13 @@ CPrimitive CPrimitives [] = {
     { "ok", 0, 0, 0, OVT_Ok, 0, 0, 0, "System", "Root" },
     { "console", 0, 0, 0, Console, 0, 0, 0, "System", "Root" },
     { "cpuStateShow", 0, 0, 0, CfrTil_CpuState_CheckShow, 0, 0, 0, "System", "Root" },
+    { "showTypeWordStack", 0, 0, 0, CfrTil_ShowTypeWordStack, 0, 0, 0, "System", "Root" },
     { "location", 0, 0, 0, CfrTil_Location, 0, 0, 0, "System", "Root" },
     { "pause", 0, 0, 0, OpenVmTil_Pause, 0, 0, 0, "System", "Root" },
     { "_pause", 0, 0, 0, OpenVmTil_Pause, 0, 0, 0, "System", "Root" },
     { "registers", 0, 0, 0, _Debugger_CpuState_Show, 0, 0, 0, "System", "Root" },
     { "lcOn", 0, 0, 0, ( block ) LC_On, 0, 0, 0, "System", "Root" },
+    { "lcOff", 0, 0, 0, ( block ) LC_LispNamespacesOff, 0, 0, 0, "System", "Root" },
 
     { "if", 0, 0, 0, CfrTil_If_ConditionalExpression, IMMEDIATE, 0, 0, "Shell", "Root" },
     { "else", 0, 0, 0, CfrTil_Else, IMMEDIATE, 0, 0, "Shell", "Root" },
@@ -466,8 +467,6 @@ CPrimitive CPrimitives [] = {
     { "_lx_", 0, 0, 0, CfrTil_Interpret_List, 0, 0, 0, "Interpreter", "Root" },
 
     { "#", 0, 0, 0, CfrTil_PreProcessor, IMMEDIATE, 0, W_PREPROCESSOR, "Interpreter", "Root" },
-
-
     { "!", 0, 0, 0, CfrTil_CommentToEndOfLine, 0, 0, W_PREPROCESSOR, "PreProcessor", "Root" }, // in init.cft ; needed for script files starting with #! cfrtil -s
     { "endif", 0, 0, 0, CfrTil_Endif_ConditionalInterpret, IMMEDIATE, 0, W_PREPROCESSOR, "PreProcessor", "Root" },
     { "else", 0, 0, 0, CfrTil_Else_ConditionalInterpret, IMMEDIATE, 0, W_PREPROCESSOR, "PreProcessor", "Root" },

@@ -561,3 +561,10 @@ CfrTil_DbgTypecheckOn ( )
     SetState ( _CfrTil_, DBG_TYPECHECK_ON, true ) ;
 }
 
+void
+CfrTil_ShowTypeWordStack ()
+{
+    if ( GetState ( _CfrTil_, TYPECHECK_ON ) ) Stack_Print ( _CfrTil_->TypeWordStack, ( byte* ) "TypeWordStack", 1 ) ;
+    else _Printf ( (byte*)"\ntypeChecking is off" ) ;
+}
+

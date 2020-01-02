@@ -423,7 +423,8 @@ _Compile_X_Group1 ( Boolean code, Boolean toRegOrMem, Boolean mod, Boolean reg, 
     // otherwise it could be optimally deduced but let caller control by keeping operandSize parameter
     // some times we need cell_t where bytes would work
     //Compiler_WordStack_SCHCPUSCA ( 0, 1 ) ;
-    Compile_CalculateWrite_Instruction_X64 ( 0, opCode, mod, reg, rm, DISP_B | REX_W | MODRM_B, sib, disp, 0, 0, osize ) ;
+    //Compile_CalculateWrite_Instruction_X64 ( 0, opCode, mod, reg, rm, DISP_B | REX_W | MODRM_B, sib, disp, 0, 0, osize ) ;
+    Compile_CalculateWrite_Instruction_X64 ( 0, opCode, mod, reg, rm, DISP_B | MODRM_B, sib, disp, 0, 0, osize ) ;
 }
 
 // opCode group 1 - 0x80-0x83 : ADD OR ADC SBB AND_OPCODE SUB XOR CMP : with immediate data

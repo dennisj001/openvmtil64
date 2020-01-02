@@ -245,7 +245,9 @@ CfrTil_WordAccounting ( byte * functionName )
 byte *
 _CfrTil_GetSystemState_String0 ( byte * buf )
 {
-    strcpy ( ( char* ) buf, "\noptimization is " ) ;
+    strcpy ( ( char* ) buf, "\ntypeChecking is " ) ;
+    if ( GetState ( _CfrTil_, TYPECHECK_ON ) ) strcat ( ( char* ) buf, "on, " ) ;
+    else strcat ( ( char* ) buf, "off, " ) ;
     if ( GetState ( _CfrTil_, OPTIMIZE_ON ) ) strcat ( ( char* ) buf, "on, " ) ;
     else strcat ( ( char* ) buf, "off, " ) ;
     strcat ( ( char* ) buf, "inlining is " ) ;

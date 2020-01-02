@@ -83,7 +83,7 @@ Compile_BlockLogicTest ( BlockInfo * bi )
             {
                 SetHere ( bi->CopiedToLogicJccCode, 1 ) ;
                 Compiler_SCA_Word_SetCodingHere_And_ClearPreviousUse ( bi->LogicCodeWord, 0 ) ;
-                BI_CompileRecord_TestCode_Reg ( bi, bi->LogicCodeWord->RegToUse, CELL, false ) ;
+                BI_CompileRecord_TestCode_Reg (bi, bi->LogicCodeWord->RegToUse, CELL) ;
                 bi->CopiedToLogicJccCode = Here ;
                 BI_Set_Tttn ( bi, TTT_ZERO, NEGFLAG_ON, TTT_ZERO, NEGFLAG_OFF ) ;
             }
@@ -91,7 +91,7 @@ Compile_BlockLogicTest ( BlockInfo * bi )
             {
                 SetHere ( bi->LogicCodeWord->Coding, 1 ) ;
                 Compiler_SCA_Word_SetCodingHere_And_ClearPreviousUse ( bi->LogicCodeWord, 0 ) ;
-                BI_CompileRecord_TestCode_Reg ( bi, bi->LogicCodeWord->RegToUse, CELL, false ) ;
+                BI_CompileRecord_TestCode_Reg (bi, bi->LogicCodeWord->RegToUse, CELL) ;
                 bi->CopiedToLogicJccCode = Here ;
                 BI_Set_Tttn ( bi, TTT_ZERO, NEGFLAG_ON, TTT_ZERO, NEGFLAG_ON ) ;
             }

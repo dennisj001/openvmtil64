@@ -391,10 +391,11 @@ _Lexer_ParseBinary ( Lexer * lexer, int64 offset )
         else
         {
             SetState ( lexer, KNOWN_OBJECT, false ) ;
+            Lexer_Exception ( token, NOT_A_KNOWN_OBJECT, "\n_Lexer_ParseBinary : non binary digits with number base 2" ) ;
         }
     }
-    lexer->Literal = cc ;
     SetState ( lexer, KNOWN_OBJECT, true ) ;
+    lexer->Literal = cc ;
 }
 
 void
@@ -407,7 +408,7 @@ Lexer_ParseBinary ( Lexer * lexer, byte * token, int64 offset )
         SetState ( lexer, KNOWN_OBJECT, true ) ;
         Lexer_ParseBigNum ( lexer, token ) ;
     }
-    else Lexer_ParseAsAString ( lexer ) ;
+    //else Lexer_ParseAsAString ( lexer ) ;
 }
 
 void

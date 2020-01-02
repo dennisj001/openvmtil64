@@ -66,6 +66,7 @@ User
 "var" ' variable find alias
 "_var" ' _variable find alias
 "wdis" ' wordDisassemble find alias
+'ts 'showTypeWordStack find alias
 's 'stack find alias
 : p space intPrint ;
 'dbgOnVar var 
@@ -386,7 +387,7 @@ stringMacrosOn
 : x64 "namespaces/compiler/x64.cft" include ; 
 : bx "namespaces/test/bigNum.test.cft" include ;
 : TODO ( str ) nl nl pdl nl str @ adps location nl pdl nl nl { dbgOnVar @ } { sp } if2 ;; //pause ;;
-
+lispOff
 // === controls ===
 Root 
 dbgOff
@@ -422,17 +423,18 @@ rtw
 stringMacrosOff
 
 #else // !Is_DebugOn : of course you can trim this file to your needs and put your init code maybe here if you like
+: mct "namespaces/compiler/machineCode.cft" include ;
 
 'doInitTest 1 const
 #if doInitTest
 // startup test code here ...
-#if 1
+#if 0
 //tc //demo
 //fload nt.cft
-: mct "namespaces/compiler/machineCode.cft" include ;
 //mct
 #elif 1
 jcc8_On
+User
 : factorial ( REG n | REG rec -- RAX ) rec 1 = { n @ 1 > } { rec @ n @ * rec store n -- } while return rec ;
 7  factorial p
 'factorial find wdiss
@@ -442,26 +444,33 @@ typedef struct _byteTest
 {
     byte a123;
     byte b123;
+    byte bb123 ;
     long c123;
     byte d123;
 } byteTest ;
 'bt byteTest new ;
 ps ( "\nbt.size =" ) ; p ( bt.size ) ;
-bt.a123 = 1 ; bt.b123 = 2 ; bt.c123 = 3 ; bt.d123 = 4 ;
+bt.a123 = 1 ; bt.b123 = 2 ; bt.c123 = 3 ; bt.d123 = 4 ; dump ( bt, bt.size ) ; 
 var ( 'btt ) ; 
-void bttt ( ) { btt = bt.a123 ; p (btt ) ; } bttt () ; // error size not considered
+void bttt ( ) { btt = bt.a123 ; printf ("btt = %x", btt ) ; } bttt () ; // error size not considered
 bt.a123 = 255 ; dump ( bt, bt.size ) ; //pause
-p (bt.a123) ; p (bt.b123) ; p (bt.c123) ; p (bt.c123) ; 
+bt.b123 = 255 ; dump ( bt, bt.size ) ; 
+'bt byteTest new ;
+binary () ; p ( bt.b123 ) ; decimal () ; bt.b123 = 123 ; binary () ; p ( bt.b123 ) ; decimal () ; //pause
+p (bt.a123) ; p (bt.b123) ; p (bt.c123) ; p (bt.d123) ; 
 bt.a123 = 1 ; bt.b123 = 2 ; bt.c123 = 3 ; bt.d123 = 4 ;
+dump ( bt, bt.size ) ;
 bt.a123 1 _assert 
 bt.c123.size 8 _assert
+197121 hex p
+
 //pause
 dbiOn
 int
 fac5 ( REG n  | REG facc ) 
 { 
     facc = 1 ;
-    while ( d: n > 1 ) 
+    while ( n > 1 ) 
     {
         facc = facc * (n --) ; // parenthesis a must for now ??
     }
@@ -481,6 +490,8 @@ Shell
 infixOn
 (1 + 5) / (2 + 1) 2 _assert
 infixOff
+jcc8_Off 
 rtw
-jcc8_Off
+'test 'tc find alias //nb! after rtw which removes all words "test", etc.
+
 2 + 7 assertStkChk // stack checking 

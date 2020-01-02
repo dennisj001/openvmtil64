@@ -13,6 +13,15 @@
 #define _AppendCharacterToTokenBuffer( lex, character ) lexer->TokenBuffer [ lex->TokenWriteIndex ] = character
 //#define SourceCode_AppendPoint &_CfrTil_->SC_ScratchPad [ Strlen ( ( CString ) _CfrTil_->SC_ScratchPad ) ]
 
+void
+Lexer_Exception ( byte * token, uint64 exceptionNumber, byte * message )
+{
+    _Q_->ExceptionToken = token ;
+    byte *buffer = Buffer_Data ( _CfrTil_->ScratchB1 ) ;
+    sprintf ( ( char* ) buffer, "%s :: %s ?\n", ( char* ) message, ( char* ) token ) ;
+    CfrTil_Exception ( exceptionNumber, buffer, QUIT ) ;
+}
+
 Word *
 Lexer_ObjectToken_New ( Lexer * lexer, byte * token, int64 tsrli, int64 scwi ) //, int64 parseFlag )
 {
@@ -38,13 +47,7 @@ Lexer_ObjectToken_New ( Lexer * lexer, byte * token, int64 tsrli, int64 scwi ) /
                 else word = DataObject_New ( NAMESPACE_VARIABLE, 0, token, NAMESPACE_VARIABLE, 0, 0, 0, 0, 0, tsrli, scwi ) ;
                 word->CAttribute2 |= ( RAW_STRING ) ;
             }
-            else
-            {
-                _Q_->ExceptionToken = token ;
-                byte *buffer = Buffer_Data ( _CfrTil_->ScratchB1 ) ;
-                sprintf ( ( char* ) buffer, "%s ?\n", ( char* ) token ) ;
-                CfrTil_Exception ( NOT_A_KNOWN_OBJECT, buffer, QUIT ) ;
-            }
+            else Lexer_Exception ( token, NOT_A_KNOWN_OBJECT, "\nLexer_ObjectToken_New : unknown token" ) ;
         }
         else word = DataObject_New ( LITERAL, 0, token, lexer->TokenType, 0, 0, 0, lexer->Literal, 0, tsrli, scwi ) ;
         Word_SetTypeNamespace ( word, lexer->TokenType ) ;

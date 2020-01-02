@@ -423,7 +423,7 @@ DebugWordList_Show_InUse ( Debugger * debugger )
 void
 Debugger_ShowTypeWordStack ( Debugger * debugger )
 {
-    Stack_Print ( _CfrTil_->TypeWordStack, ( byte* ) "TypeWordStack", 1 ) ;
+    CfrTil_ShowTypeWordStack () ;
 }
 
 void

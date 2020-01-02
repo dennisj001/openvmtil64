@@ -69,9 +69,10 @@ CfrTil_Poke ( ) // =
     if ( CompileMode ) Compile_Poke (_Context_->Compiler0) ;
     else
     {
-        uint64 * tos = ( uint64 * ) TOS ;
-        uint64 * nos = ( uint64* ) _Dsp_ [ - 1 ] ;
-        * nos = ( uint64 ) tos ;
+        //uint64 * tos = ( uint64 * ) TOS ;
+        //uint64 * nos = ( uint64* ) _Dsp_ [ - 1 ] ;
+        //* nos = ( uint64 ) tos ;
+        * ( int64* ) _Dsp_ [ - 1 ] = TOS ;
         _Dsp_ -= 2 ;
     }
 }

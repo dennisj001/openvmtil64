@@ -43,8 +43,8 @@ _CfrTil_Init_SessionCore ( CfrTil * cfrTil, Boolean cntxDelFlag, Boolean promptF
     Finder_Init ( cntx->Finder0 ) ;
     Compiler_Init ( cntx->Compiler0, 0, 0 ) ;
     Interpreter_Init ( cntx->Interpreter0 ) ;
-    LC_Init_Runtime ( ) ;
     if ( ! _LC_ ) LC_LispNamespacesOff ( ) ;
+    else LC_Init_Runtime ( ) ;
     CfrTil_RuntimeInit ( cfrTil, cntxDelFlag ) ;
     OVT_RuntimeInit ( ) ;
     OVT_StartupMessage ( promptFlag && ( cfrTil->InitSessionCoreTimes < 2 )) ;

@@ -14,7 +14,7 @@ _BI_Set_Tttn ( BlockInfo *bi, Boolean setTtn, Boolean setNegFlag, Boolean jccTtt
 }
 
 void
-BI_Set_Tttn (BlockInfo *bi, Boolean setTtn, Boolean setNegFlag, Boolean jccTtt, Boolean jccNegFlag)
+BI_Set_Tttn ( BlockInfo *bi, Boolean setTtn, Boolean setNegFlag, Boolean jccTtt, Boolean jccNegFlag )
 {
     _BI_Set_Tttn ( bi, setTtn, setNegFlag, jccTtt, jccNegFlag, Here ) ;
 }
@@ -23,7 +23,7 @@ void
 Compiler_Set_BI_Tttn ( Compiler * compiler, Boolean setTtn, Boolean setNegFlag, Boolean jccTtt, Boolean jccNegFlag )
 {
     BlockInfo *bi = ( BlockInfo * ) Stack_Top ( compiler->CombinatorBlockInfoStack ) ;
-    BI_Set_Tttn (bi, setTtn, setNegFlag, jccTtt, jccNegFlag) ;
+    BI_Set_Tttn ( bi, setTtn, setNegFlag, jccTtt, jccNegFlag ) ;
 }
 
 void
@@ -33,28 +33,27 @@ _Compile_TestCode ( Boolean reg, Boolean size )
 }
 
 void
-BI_CompileRecord_TestCode_Reg ( BlockInfo *bi, Boolean reg, Boolean size, Boolean force )
+BI_CompileRecord_TestCode_Reg (BlockInfo *bi, Boolean reg, Boolean size)
 {
-    if ( force || (( ! bi->LogicTestCode ) || ( Here != ( bi->LogicTestCode + 3 ) ) ))
+    if ( ( ( ! bi->LogicTestCode ) || ( Here != ( bi->LogicTestCode + 3 ) ) ) ) // prevent two "test reg, reg" in a row
     {
         Compiler_WordStack_SCHCPUSCA ( 0, 1 ) ;
         bi->LogicTestCode = Here ;
         _Compile_TestCode ( reg, size ) ;
     }
-    //else _Printf ( ( byte* ) "" ) ;
 }
 
 void
 BI_CompileRecord_TestCode_ArgRegNum ( BlockInfo *bi, uint8 argRegNum )
 {
-    BI_CompileRecord_TestCode_Reg ( bi, _COI_GetReg ( _Compiler_->OptInfo, argRegNum ), CELL, false ) ;
+    BI_CompileRecord_TestCode_Reg (bi, _COI_GetReg ( _Compiler_->OptInfo, argRegNum ), CELL) ;
 }
 
 BlockInfo *
 Compiler_BI_CompileRecord_TestCode_Reg ( Compiler * compiler, Boolean reg, Boolean size, Boolean force )
 {
     BlockInfo *bi = ( BlockInfo * ) Stack_Top ( compiler->CombinatorBlockInfoStack ) ;
-    BI_CompileRecord_TestCode_Reg ( bi, reg, size, force ) ;
+    BI_CompileRecord_TestCode_Reg (bi, reg, size) ;
     return bi ;
 }
 
@@ -90,7 +89,7 @@ Compiler_BI_CompileRecord_TestCode_Set_Tttn ( Compiler * compiler, Boolean reg, 
     Boolean jccTtt, Boolean jccNegFlag, Boolean force )
 {
     BlockInfo *bi = Compiler_BI_CompileRecord_TestCode_Reg ( compiler, reg, CELL, force ) ;
-    BI_Set_Tttn (bi, setTtn, setNegFlag, jccTtt, jccNegFlag) ; //ZERO_TTT, setNegFlag ) ;
+    BI_Set_Tttn ( bi, setTtn, setNegFlag, jccTtt, jccNegFlag ) ; //ZERO_TTT, setNegFlag ) ;
 }
 
 // cf. : Compile_BlockInfoTestLogic ( Compiler * compiler, int8 reg, int8 setNegFlag )
@@ -100,7 +99,7 @@ _Compile_GetTestLogicFromTOS ( BlockInfo *bi )
 {
     Compile_Pop_To_Acc ( DSP ) ;
     BI_CompileRecord_TestCode_ArgRegNum ( bi, 1 ) ;
-    BI_Set_Tttn (bi, TTT_ZERO, NEGFLAG_NZ, TTT_ZERO, NEGFLAG_Z) ;
+    BI_Set_Tttn ( bi, TTT_ZERO, NEGFLAG_NZ, TTT_ZERO, NEGFLAG_Z ) ;
 }
 
 // nb : only blocks with one ret insn can be successfully compiled inline
@@ -122,7 +121,7 @@ BlockInfo *
 Compiler_Set_LogicCode ( Compiler * compiler, Boolean setTtn, Boolean setNegFlag, Boolean jccTtt, Boolean jccNegFlag )
 {
     BlockInfo *bi = ( BlockInfo * ) Stack_Top ( compiler->CombinatorBlockInfoStack ) ;
-    BI_Set_Tttn (bi, setTtn, setNegFlag, jccTtt, jccNegFlag) ; //setTtn, setNegFlag ) ;
+    BI_Set_Tttn ( bi, setTtn, setNegFlag, jccTtt, jccNegFlag ) ; //setTtn, setNegFlag ) ;
     return bi ;
 }
 

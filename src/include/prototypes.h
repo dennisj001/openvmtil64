@@ -179,7 +179,7 @@ void _BI_Set_Tttn(BlockInfo *bi, Boolean setTtn, Boolean setNegFlag, Boolean jcc
 void BI_Set_Tttn(BlockInfo *bi, Boolean setTtn, Boolean setNegFlag, Boolean jccTtt, Boolean jccNegFlag);
 void Compiler_Set_BI_Tttn(Compiler *compiler, Boolean setTtn, Boolean setNegFlag, Boolean jccTtt, Boolean jccNegFlag);
 void _Compile_TestCode(Boolean reg, Boolean size);
-void BI_CompileRecord_TestCode_Reg(BlockInfo *bi, Boolean reg, Boolean size, Boolean force);
+void BI_CompileRecord_TestCode_Reg(BlockInfo *bi, Boolean reg, Boolean size);
 void BI_CompileRecord_TestCode_ArgRegNum(BlockInfo *bi, uint8 argRegNum);
 BlockInfo *Compiler_BI_CompileRecord_TestCode_Reg(Compiler *compiler, Boolean reg, Boolean size, Boolean force);
 Boolean _COI_GetReg(CompileOptimizeInfo *optInfo, Boolean regNumber);
@@ -299,11 +299,11 @@ void _Compiler_GetWordStackState(Compiler *compiler, Word *word);
 int64 Compiler_Optimize(Compiler *compiler, Word *word);
 void Compiler_SetStandardPreHere_ForDebugDisassembly(Compiler *compiler);
 void Compiler_SetupArgsToStandardLocations(Compiler *compiler);
+void Compiler_Optimizer_2_Args_And_1_Literal(Compiler *compiler);
+void Compiler_Optimizer_2Args_Or_WordArg1_Op(Compiler *compiler);
 void Compiler_Optimizer_0Args(Compiler *compiler);
 void Compiler_Optimizer_1Arg(Compiler *compiler);
 void Compiler_Optimizer_WordArg2Op_Or_xBetweenArg1AndArg2(Compiler *compiler);
-void Compiler_Optimizer_2_Args_And_1_Literal(Compiler *compiler);
-void Compiler_Optimizer_2Args_Or_WordArg1_Op(Compiler *compiler);
 void Compile_StandardArg(Word *word, Boolean reg, Boolean rvalueFlag, byte *setHere, Boolean setScaFlag);
 void Compile_StackArgsToStandardRegs(Compiler *compiler);
 void Compiler_CompileOptimize_IncDec(Compiler *compiler);
@@ -629,6 +629,7 @@ Word *Interpreter_ReadNextTokenToWord(Interpreter *interp);
 Boolean Word_IsSyntactic(Word *word);
 void Interpreter_SetLexState(Interpreter *interp);
 /* src/basis/core/lexer.c */
+void Lexer_Exception(byte *token, uint64 exceptionNumber, byte *message);
 Word *Lexer_ObjectToken_New(Lexer *lexer, byte *token, int64 tsrli, int64 scwi);
 void Lexer_Set_ScIndex_RlIndex(Lexer *lexer, Word *word, int64 tsrli, int64 scwi);
 byte *_Lexer_LexNextToken_WithDelimiters(Lexer *lexer, byte *delimiters, Boolean checkListFlag, Boolean peekFlag, int reAddPeeked, uint64 state);
@@ -1259,6 +1260,7 @@ void SC_WordList_Show(dllist *list, Word *scWord, Boolean fromFirstFlag, Boolean
 void Compiler_SC_WordList_Show(byte *prefix, Boolean inUseOnlyFlag, Boolean showInDebugColors);
 void DebugWordList_Show_All(Debugger *debugger);
 void DebugWordList_Show_InUse(Debugger *debugger);
+void CfrTil_ShowTypeWordStack(void);
 void Debugger_ShowTypeWordStack(Debugger *debugger);
 void CfrTil_DbgSourceCodeBeginBlock(void);
 void CfrTil_DbgSourceCodeEndBlock(void);

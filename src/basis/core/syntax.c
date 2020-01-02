@@ -389,7 +389,9 @@ Boolean
 Lexer_IsLValue_CheckBackToLastSemiForParenOrBracket ( Lexer * lexer, Word * word )
 {
     ReadLiner * rl = lexer->ReadLiner0 ;
-    byte * nc = & rl->InputStringOriginal [lexer->TokenStart_FileIndex] ;
+    byte * nc ;
+    if ( rl->InputStringOriginal ) nc = & rl->InputStringOriginal [lexer->TokenStart_FileIndex] ;
+    else nc = & rl->InputLineString [rl->CursorPosition] ;
     while ( 1 )
     {
         switch ( *nc )
