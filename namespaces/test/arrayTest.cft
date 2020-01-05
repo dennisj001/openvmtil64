@@ -287,8 +287,8 @@ ab.ar [0][0][0] hp
 ab.ar [0][0][1] hp
 ab.ar [1][0][0] hp
 ab.ar [2][2][2] ab.ar [0][0][0] - p
-ab.ar [0][0][0] 263 = 
-ab.ar [0][0][0] @ dup p 263 _assert
+ab.ar [0][0][0] 254 = 
+ab.ar [0][0][0] @ dup p 254 _assert
 : tct ( y ct a )
     a.ar [0][0][0] 0x77 = 
     a.ar [0][y @][0] a.ar [0][0][0] @ =

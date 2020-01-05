@@ -31,7 +31,8 @@
 #define Get_CompilerSpace( ) _Q_CodeByteArray
 
 //#define abs( x ) ((int64) (((x) >= 0) ? (x) : (-x))) 
-#define TOS _Dsp_[0]
+#define TOS (_Dsp_[0]) // top of stack
+#define NOS (_Dsp_[-1]) // next on stack
 #define _TOS_ ( _Dsp_ ? _Dsp_ [ 0 ] : CfrTil_Exception (STACK_ERROR, 0, QUIT ), (uint64)-1 )
 #define DSP_Top( ) TOS 
 #define _DataStack_Top( ) TOS 
@@ -43,6 +44,7 @@
 #define Stack() CfrTil_PrintDataStack ( )
 #define DataStack( n ) _Dsp_ [ - (n) ] 
 #define Dsp( n ) DataStack( n ) 
+#define TWS( n ) ( (Word*) (_CfrTil_->TypeWordStack->StackPointer [n]) )
 
 #define Calculate_FrameSize( numberOfLocals )  ( ( numberOfLocals + 1 ) * CELL ) // 1 : space for fp
 
@@ -169,7 +171,7 @@
 #define Pause_2( msg, arg ) AlertColors; _Printf ( (byte*)msg, arg ) ; OpenVmTil_Pause () ;
 
 #define Error_Abort( emsg, smsg ) Throw ( emsg, smsg, ABORT )
-#define Error( emsg, smsg, state ) { AlertColors; if ((state) & PAUSE ) Pause () ; if ((state) >= QUIT ) Throw ( emsg, smsg, state ) ; }
+#define Error( emsg, smsg, state ) { AlertColors ; if ((state) & PAUSE ) { Pause () ; } else { if ((state) >= QUIT ) { Throw ( emsg, smsg, state ) ; }}}
 #define Error_1( msg, arg, state ) AlertColors; if (state & PAUSE ) Pause () ; if (state >= QUIT ) Throw ( (byte*) msg, state ) ; 
 #define Warning2( msg, str ) _Printf ( (byte*)"\n%s : %s", (byte*) msg, str ) ; 
 #define Warning( msg, str, pauseFlag ) _Printf ( (byte*)"\n%s : %s", (byte*) msg, str ) ; if ( pauseFlag ) Pause () ;

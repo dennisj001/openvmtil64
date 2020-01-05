@@ -209,7 +209,7 @@ _CfrTil_C_Infix_EqualOp ( block op )
         {
             int64 svState = cntx->State ;
             SetState ( cntx, C_SYNTAX | INFIX_MODE, false ) ; // we don't want to just set compiler->LHS_Word
-            if ( GetState ( _Context_, ADDRESS_OF_MODE ) ) lhsWord->ObjectSize = -1 ; 
+            if ( GetState ( _Context_, ADDRESS_OF_MODE ) ) lhsWord->ObjectSize = sizeof (byte*) ; 
             Interpreter_DoWord_Default ( interp, lhsWord, lhsWord->W_RL_Index, lhsWord->W_SC_Index ) ;
             cntx->State = svState ;
             wordr = _CfrTil_->StoreWord ;

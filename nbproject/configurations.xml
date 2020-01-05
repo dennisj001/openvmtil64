@@ -115,20 +115,8 @@
                    displayName="Important Files"
                    projectFiles="false"
                    kind="IMPORTANT_FILES_FOLDER">
-      <itemPath>LICENSE</itemPath>
       <itemPath>Makefile</itemPath>
-      <itemPath>README.txt</itemPath>
-      <itemPath>etc</itemPath>
-      <itemPath>init.cft</itemPath>
-      <itemPath>itestf</itemPath>
-      <itemPath>m</itemPath>
-      <itemPath>m0</itemPath>
-      <itemPath>mir</itemPath>
-      <itemPath>namespaces</itemPath>
-      <itemPath>nt.cft</itemPath>
-      <itemPath>r</itemPath>
-      <itemPath>test</itemPath>
-      <itemPath>test.txt</itemPath>
+      <itemPath>nbproject/private/launcher.properties</itemPath>
     </logicalFolder>
   </logicalFolder>
   <sourceFolderFilter>^(nbproject)$</sourceFolderFilter>
@@ -157,7 +145,7 @@
           <buildCommandWorkingDir>.</buildCommandWorkingDir>
           <buildCommand>${MAKE} -f Makefile</buildCommand>
           <cleanCommand>${MAKE} -f Makefile clean</cleanCommand>
-          <executablePath>bin/cfrtil64-gdb</executablePath>
+          <executablePath>/media/sdf3/dennisj/openvmtil64/bin/cfrtil64-gdb</executablePath>
         </makeTool>
         <preBuild>
           <preBuildCommandWorkingDir>.</preBuildCommandWorkingDir>
@@ -723,10 +711,8 @@
         </cTool>
       </item>
       <item path="src/basis/typeCheck.c" ex="false" tool="0" flavor2="3">
-        <cTool flags="2">
+        <cTool flags="0">
           <incDir>
-            <pElem>src/basis</pElem>
-            <pElem>src/include</pElem>
             <pElem>.</pElem>
           </incDir>
         </cTool>

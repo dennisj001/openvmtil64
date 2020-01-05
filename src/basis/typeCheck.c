@@ -219,7 +219,7 @@ TSI_TypeStatus_Print ( TSI *tsi )
             tsi->OpWord->S_ContainingNamespace ? tsi->OpWord->S_ContainingNamespace->Name : ( byte* ) "<literal>",
             tsi->OpWord->Name, Word_ExpandTypeLetterSignature ( tsi->OpWord, 1 ), tsi->ActualTypeStackRecordingBuffer, Context_Location ( ) ) ;
     }
-    if ( GetState ( _CfrTil_, DBG_TYPECHECK_ON ) )
+    //if ( GetState ( _CfrTil_, DBG_TYPECHECK_ON ) )
     {
         CfrTil_TypeStackPrint ( ) ;
         //if ( _Q_->Verbosity > 1 ) 
@@ -468,18 +468,6 @@ Word_SetTypeNamespace ( Word * word, int64 attribute )
 }
 
 void
-CfrTil_TypeStackPush ( Word * word )
-{
-    if ( GetState ( _CfrTil_, TYPECHECK_ON ) ) Stack_Push ( _CfrTil_->TypeWordStack, ( int64 ) word ) ;
-}
-
-void
-CfrTil_TypeStack_SetTop ( Word * word )
-{
-    if ( GetState ( _CfrTil_, TYPECHECK_ON ) ) Stack_SetTop ( _CfrTil_->TypeWordStack, ( int64 ) word ) ;
-}
-
-void
 _CfrTil_TypeStackReset ( )
 {
 #if 0 // while not this ??
@@ -503,13 +491,29 @@ CfrTil_TypeStackPrint ( )
 void
 CfrTil_TypeStackReset ( )
 {
-    if ( GetState ( _CfrTil_, TYPECHECK_ON ) ) _CfrTil_TypeStackReset ( ) ;
+    //if ( GetState ( _CfrTil_, TYPECHECK_ON ) ) 
+    _CfrTil_TypeStackReset ( ) ;
+}
+
+void
+CfrTil_TypeStackPush ( Word * word )
+{
+    //if ( GetState ( _CfrTil_, TYPECHECK_ON ) ) 
+    Stack_Push ( _CfrTil_->TypeWordStack, ( int64 ) word ) ;
+}
+
+void
+CfrTil_TypeStack_SetTop ( Word * word )
+{
+    //if ( GetState ( _CfrTil_, TYPECHECK_ON ) ) 
+    Stack_SetTop ( _CfrTil_->TypeWordStack, ( int64 ) word ) ;
 }
 
 Word *
 CfrTil_TypeStack_Pop ( )
 {
-    if ( GetState ( _CfrTil_, TYPECHECK_ON ) && Stack_Depth ( _CfrTil_->TypeWordStack ) )
+    //if ( GetState ( _CfrTil_, TYPECHECK_ON ) && Stack_Depth ( _CfrTil_->TypeWordStack ) )
+    if ( Stack_Depth ( _CfrTil_->TypeWordStack ) )
     {
         Word * tword = ( Word * ) Stack_Pop ( _CfrTil_->TypeWordStack ) ;
         return tword ;
@@ -520,7 +524,8 @@ CfrTil_TypeStack_Pop ( )
 void
 CfrTil_TypeStack_Drop ( )
 {
-    if ( GetState ( _CfrTil_, TYPECHECK_ON ) && Stack_Depth ( _CfrTil_->TypeWordStack ) )
+    //if ( GetState ( _CfrTil_, TYPECHECK_ON ) && Stack_Depth ( _CfrTil_->TypeWordStack ) )
+    if ( Stack_Depth ( _CfrTil_->TypeWordStack ) )
     {
         _Stack_Drop ( _CfrTil_->TypeWordStack ) ;
     }
@@ -564,7 +569,8 @@ CfrTil_DbgTypecheckOn ( )
 void
 CfrTil_ShowTypeWordStack ()
 {
-    if ( GetState ( _CfrTil_, TYPECHECK_ON ) ) Stack_Print ( _CfrTil_->TypeWordStack, ( byte* ) "TypeWordStack", 1 ) ;
-    else _Printf ( (byte*)"\ntypeChecking is off" ) ;
+    //if ( GetState ( _CfrTil_, TYPECHECK_ON ) ) 
+    Stack_Print ( _CfrTil_->TypeWordStack, ( byte* ) "TypeWordStack", 1 ) ;
+    //else _Printf ( (byte*)"\ntypeChecking is off" ) ;
 }
 
