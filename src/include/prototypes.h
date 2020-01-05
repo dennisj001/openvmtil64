@@ -2046,7 +2046,7 @@ void CfrTil_Peek(void);
 void CfrTil_PeekReg(void);
 void CfrTil_PokeRegWithValue(void);
 void CfrTil_PokeRegAtAddress(void);
-void _CfrTil_Move(int64 *address, int64 value, int8 addrSize, int8 valueSize);
+void _CfrTil_Move(int64 *address, int64 value, int8 addressedSize, int8 valueSize);
 void CfrTil_Poke(void);
 void CfrTil_AtEqual(void);
 void CfrTil_Store(void);

@@ -64,17 +64,17 @@ CfrTil_PokeRegAtAddress ( ) // @
 }
 
 void
-_CfrTil_Move ( int64 * address, int64 value, int8 addrSize, int8 valueSize )
+_CfrTil_Move ( int64 * address, int64 value, int8 addressedSize, int8 valueSize )
 {
-    if ( addrSize && (( value > 4294967295 ) && (valueSize > addrSize)) ) // for C internal address size may be 0
+    if ( (addressedSize > 0) && (( value > 2147483647 ) && (valueSize > addressedSize)) ) // for C internal address size may be 0
     {    
         byte * b = Buffer_Data ( _CfrTil_->ScratchB1 ) ;
-        sprintf ( ( char* ) b, "Wrong data sizes :: address size == %d : value size == %d", addrSize, valueSize ) ;
+        sprintf ( ( char* ) b, "Wrong data sizes :: address size == %d : value size == %d", addressedSize, valueSize ) ;
         Error ( "\nType Error", b, QUIT ) ;
     }
     else
     {
-        switch ( addrSize )
+        switch ( addressedSize )
         {
             case 1:
             {
@@ -87,7 +87,7 @@ _CfrTil_Move ( int64 * address, int64 value, int8 addrSize, int8 valueSize )
             }
             case 4:
             {
-                if ( value > 4294967295 )
+                if ( value > 2147483647 )
                 {
                     Error ( "\nType Error", "value is greater than 4294967295 - sizeof (int32)", QUIT ) ;
                 }
