@@ -14,7 +14,7 @@ _Interpreter_TokenToWord ( Interpreter * interp, byte * token, int64 tsrli, int6
         if ( ! word )
         {
             word = Lexer_ObjectToken_New ( interp->Lexer0, token, tsrli, scwi ) ;
-            if ( word ) word->ObjectSize = interp->Lexer0->TokenObjectSize ;
+            if ( word ) word->ObjectByteSize = interp->Lexer0->TokenObjectSize ;
         }
         Word_SetTsrliScwi ( word, tsrli, scwi ) ;
         _Context_->CurrentTokenWord = word ;

@@ -122,7 +122,7 @@ _CfrTil_ObjectNew ( int64 size, byte * name, uint64 category, int64 allocType )
 {
     byte * obj = _CfrTil_NamelessObjectNew ( size, allocType ) ; 
     Word * word = _DObject_New ( name, ( int64 ) obj, ( OBJECT | IMMEDIATE | CPRIMITIVE | category ), 0, 0, OBJECT, ( byte* ) _DataObject_Run, 0, 0, 0, DICTIONARY ) ;
-    word->ObjectSize = size ;
+    word->ObjectByteSize = size ;
     return word ;
 }
 
@@ -201,7 +201,7 @@ _Class_New ( byte * name, uint64 type, int64 cloneFlag )
     else
     {
         _Printf ( ( byte* ) "\nNamespace Error at %s ? : \'%s\' already exists! : %s : size = %d\n",
-            Context_Location ( ), ns->Name, _Word_SourceCodeLocation_pbyte ( ns ), ns->ObjectSize ) ;
+            Context_Location ( ), ns->Name, _Word_SourceCodeLocation_pbyte ( ns ), ns->ObjectByteSize ) ;
         Namespace_DoNamespace (ns, 0) ;
     }
     CfrTil_WordList_Init ( 0, 0 ) ;
@@ -215,11 +215,12 @@ _CfrTil_ClassField_New ( byte * token, Class * aclass, int64 size, int64 offset 
     int64 attribute = 0 ;
     Word * word = _DObject_New ( token, 0, ( IMMEDIATE | OBJECT_FIELD | CPRIMITIVE ), 0, 0, OBJECT_FIELD, ( byte* ) _DataObject_Run, 0, 1, 0, DICTIONARY ) ;
     word->TypeNamespace = aclass ;
-    word->ObjectSize = size ;
+    word->ObjectByteSize = size ;
     if ( size == 1 ) attribute = T_BYTE ;
     else if ( size == 8 ) attribute = T_INT64 ;
+    else if ( size == 4 ) word->CAttribute2 = T_INT32 ;
+    else if ( size == 2 ) word->CAttribute2 = T_INT16 ;
     word->CAttribute |= attribute ;
-    if ( size == 4 ) word->CAttribute2 = T_INT32 ;
     word->Offset = offset ;
 
     return word ;
@@ -237,7 +238,7 @@ _CfrTil_Variable_New ( byte * name, int64 value )
         SetState ( _Compiler_, VARIABLE_FRAME, true ) ;
     }
     else word = _DObject_New ( name, value, ( NAMESPACE_VARIABLE | IMMEDIATE ), 0, 0, NAMESPACE_VARIABLE, ( byte* ) _DataObject_Run, 0, 1, 0, DICTIONARY ) ;
-
+    word->ObjectByteSize = 8 ;
     return word ;
 }
 
@@ -278,7 +279,7 @@ Literal_New ( Lexer * lexer, uint64 uliteral )
         }
         name = lexer->OriginalToken ;
     }
-    word = _DObject_New ( name, uliteral, ( LITERAL | CONSTANT | IMMEDIATE | lexer->TokenType ), 0, 0, LITERAL, ( byte* ) _DataObject_Run, 0, 0, 0, ( CompileMode ? INTERNAL_OBJECT_MEM : OBJECT_MEM ) ) ;
+    word = _DObject_New ( name, uliteral, ( LITERAL | CONSTANT | IMMEDIATE | lexer->TokenType ), lexer->TokenType2, 0, LITERAL, ( byte* ) _DataObject_Run, 0, 0, 0, ( CompileMode ? INTERNAL_OBJECT_MEM : OBJECT_MEM ) ) ;
 
     return word ;
 }

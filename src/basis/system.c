@@ -248,6 +248,7 @@ _CfrTil_GetSystemState_String0 ( byte * buf )
     strcpy ( ( char* ) buf, "\ntypeChecking is " ) ;
     if ( GetState ( _CfrTil_, TYPECHECK_ON ) ) strcat ( ( char* ) buf, "on, " ) ;
     else strcat ( ( char* ) buf, "off, " ) ;
+    strcat ( ( char* ) buf, "optimize is " ) ;
     if ( GetState ( _CfrTil_, OPTIMIZE_ON ) ) strcat ( ( char* ) buf, "on, " ) ;
     else strcat ( ( char* ) buf, "off, " ) ;
     strcat ( ( char* ) buf, "inlining is " ) ;
@@ -256,13 +257,13 @@ _CfrTil_GetSystemState_String0 ( byte * buf )
     strcat ( ( char* ) buf, "infixMode is " ) ;
     if ( GetState ( _Context_, INFIX_MODE ) ) strcat ( ( char* ) buf, "on, " ) ;
     else strcat ( ( char* ) buf, "off, " ) ;
-    strcat ( ( char* ) buf, "prefixMode is " ) ;
+    strcat ( ( char* ) buf, "\nprefixMode is " ) ;
     if ( GetState ( _Context_, PREFIX_MODE ) ) strcat ( ( char* ) buf, "on, " ) ;
     else strcat ( ( char* ) buf, "off, " ) ;
     strcat ( ( char* ) buf, "c_syntax is " ) ;
     if ( GetState ( _Context_, C_SYNTAX ) ) strcat ( ( char* ) buf, "on, " ) ;
     else strcat ( ( char* ) buf, "off, " ) ;
-    if ( !GetState ( _Context_, PREFIX_MODE|INFIX_MODE ) ) strcat ( ( char* ) buf, "\npostfixMode is on" ) ;
+    if ( !GetState ( _Context_, PREFIX_MODE|INFIX_MODE ) ) strcat ( ( char* ) buf, "postfixMode is on" ) ;
 #if 0    
     strcat ( ( char* ) buf, "LHS is " ) ;
     if ( GetState ( _Context_, C_LHS ) ) strcat ( ( char* ) buf, "on, " ) ;

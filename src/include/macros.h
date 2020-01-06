@@ -44,7 +44,7 @@
 #define Stack() CfrTil_PrintDataStack ( )
 #define DataStack( n ) _Dsp_ [ - (n) ] 
 #define Dsp( n ) DataStack( n ) 
-#define TWS( n ) ( (Word*) (_CfrTil_->TypeWordStack->StackPointer [n]) )
+#define TWS( n ) ( (Word*) (_CfrTil_->TypeWordStack->StackPointer [(n)]) )
 
 #define Calculate_FrameSize( numberOfLocals )  ( ( numberOfLocals + 1 ) * CELL ) // 1 : space for fp
 

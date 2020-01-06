@@ -64,17 +64,19 @@ CfrTil_PokeRegAtAddress ( ) // @
 }
 
 void
-_CfrTil_Move ( int64 * address, int64 value, int8 addressedSize, int8 valueSize )
+_CfrTil_Move ( int64 * address, int64 value, Word * lvalueWord, Word * rvalueWord ) //int64 lvalueSize, int64 rvalueSize )
 {
-    if ( (addressedSize > 0) && (( value > 2147483647 ) && (valueSize > addressedSize)) ) // for C internal address size may be 0
+    //if ( (lvalueSize > 0) && (( value > 2147483647 ) && (rvalueSize > lvalueSize)) ) // for C internal address size may be 0
+    int64 lvalueSize = lvalueWord->ObjectByteSize, rvalueSize = rvalueWord->ObjectByteSize ;
+    if ( (lvalueSize > 0 ) && (rvalueSize > lvalueSize) ) // for C internal lvalue size may be 0
     {    
         byte * b = Buffer_Data ( _CfrTil_->ScratchB1 ) ;
-        sprintf ( ( char* ) b, "Wrong data sizes :: address size == %d : value size == %d", addressedSize, valueSize ) ;
+        sprintf ( ( char* ) b, "Wrong data sizes :: lvalue size == %ld : rvalue size == %ld", lvalueSize, rvalueSize ) ;
         Error ( "\nType Error", b, QUIT ) ;
     }
     else
     {
-        switch ( addressedSize )
+        switch ( lvalueSize )
         {
             case 1:
             {
@@ -83,6 +85,15 @@ _CfrTil_Move ( int64 * address, int64 value, int8 addressedSize, int8 valueSize 
                     Error ( "\nType Error", "value is greater than 255 - sizeof (byte)", QUIT ) ;
                 }
                 else * ( byte* ) address = ( byte ) value ;
+                break ;
+            }
+            case 2:
+            {
+                if ( value > 65535 )
+                {
+                    Error ( "\nType Error", "value is greater than 65535 - sizeof (int32)", QUIT ) ;
+                }
+                else * ( int16* ) address = ( int16 ) value ;
                 break ;
             }
             case 4:
@@ -97,7 +108,7 @@ _CfrTil_Move ( int64 * address, int64 value, int8 addressedSize, int8 valueSize 
             case 8:
             default:
             {
-                * address = value ;
+                * ( int64 *) address = (int64) value ;
                 break ;
             }
         }
@@ -115,7 +126,8 @@ CfrTil_Poke ( ) // =
         //uint64 * nos = ( uint64* ) _Dsp_ [ - 1 ] ;
         //* nos = ( uint64 ) tos ;
         //* ( int64* ) NOS = TOS ;
-        _CfrTil_Move ( ( int64 * ) NOS, TOS, TWS ( - 1 )->ObjectSize, TWS ( 0 )->ObjectSize ) ;
+        //_CfrTil_Move ( ( int64 * ) NOS, TOS, TWS ( - 1 )->ObjectByteSize, TWS ( 0 )->ObjectByteSize ) ;
+        _CfrTil_Move ( ( int64 * ) NOS, TOS, TWS ( -1 ), TWS ( 0 ) ) ;
         _Dsp_ -= 2 ;
     }
 }
@@ -128,7 +140,8 @@ CfrTil_AtEqual ( ) // !
     {
         //*( int64* ) _Dsp_ [ - 1 ] = * ( int64* ) TOS ;
         //NOS = * ( int64* ) TOS ;
-        _CfrTil_Move ( ( int64 * ) NOS, * ( int64* ) TOS, TWS ( - 1 )->ObjectSize, TWS ( 0 )->ObjectSize ) ;
+        //_CfrTil_Move ( ( int64 * ) NOS, * ( int64* ) TOS, TWS ( - 1 )->ObjectByteSize, TWS ( 0 )->ObjectByteSize ) ;
+        _CfrTil_Move ( ( int64 * ) NOS, * ( int64* ) TOS, TWS ( -1 ), TWS ( 0 ) ) ;
         _Dsp_ -= 2 ;
     }
 }
@@ -143,7 +156,8 @@ CfrTil_Store ( ) // !
     {
         //* ( int64* ) ( TOS ) = NOS ; //_Dsp_ [ - 1 ] ;
         * ( int64* ) TOS = NOS ; //_Dsp_ [ - 1 ] ;
-        _CfrTil_Move ( ( int64 * ) TOS, NOS, TWS ( 0 )->ObjectSize, TWS ( - 1 )->ObjectSize ) ;
+        //_CfrTil_Move ( ( int64 * ) TOS, NOS, TWS ( 0 )->ObjectByteSize, TWS ( - 1 )->ObjectByteSize ) ;
+        _CfrTil_Move ( ( int64 * ) TOS, NOS, TWS ( 0 ), TWS ( -1 ) ) ;
         _Dsp_ -= 2 ;
     }
 }

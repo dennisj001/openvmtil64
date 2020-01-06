@@ -41,6 +41,11 @@ Io Int
 : _logAppend "cfrTil.log" logAppend ;
 
 // aliases 
+User
+"const" ' constant find alias
+"_const" ' _constant find alias
+"var" ' variable find alias
+"_var" ' _variable find alias
 Debug
 //"dbg" '_dbg find alias immediate debugWord
 "dbrk" ' <dbg> find alias debugWord
@@ -55,16 +60,18 @@ Debug
 'dscOff 'dbgSourceCodeOff find alias
 'scOn 'dscOn find alias
 'scOff 'dscOff find alias
-scOn
+scOn 
+
+'tcOnv var 
+tcOnv 1 =
+#if tcOnv
+tcOn
+#endif
 
 : v4 verbosity 4 = ; 
 : v1 verbosity 1 = ;
 
 User
-"const" ' constant find alias
-"_const" ' _constant find alias
-"var" ' variable find alias
-"_var" ' _variable find alias
 "wdis" ' wordDisassemble find alias
 'ts 'showTypeWordStack find alias
 's 'stack find alias
@@ -428,8 +435,8 @@ stringMacrosOff
 'doInitTest 1 const
 #if doInitTest
 // startup test code here ...
-#if 0
-tc //demo
+#if tcOnv @
+//tc //demo
 //fload nt.cft
 //mct
 #elif 1
@@ -443,22 +450,23 @@ c_syntaxOn
 typedef struct _byteTest 
 {
     byte a123;
+    int64 e123
     byte b123;
     byte bb123 ;
     int32 c123;
     byte d123;
-    long e123
+    int16 f123;
 } byteTest ;
 'bt byteTest new ;
 ps ( "\nbt.size =" ) ; p ( bt.size ) ;
-bt.a123 = 1 ; bt.b123 = 2 ; bt.c123 = 2147483647 ; bt.d123 = 4 ; bt.bb123 = 3 ; dump ( bt, bt.size ) ; 
+bt.a123 = 1 ; bt.b123 = 2 ; bt.c123 = 2147483647 ; bt.d123 = 4 ; bt.bb123 = 3 ; bt.f123 = 0x1234 ; dump ( bt, bt.size ) ; 
 var ( 'btt ) ; 
 void bttt ( ) { btt = bt.a123 ; printf ("btt = %x", btt ) ; } bttt () ; // error size not considered
 bt.a123 = 255 ; dump ( bt, bt.size ) ; //pause
 'bt byteTest new ;
 binary () ; p ( bt.b123 ) ; decimal () ; bt.b123 = 123 ; binary () ; p ( bt.b123 ) ; decimal () ; //pause
 p (bt.a123) ; p (bt.b123) ; p (bt.c123) ; p (bt.d123) ; 
-bt.a123 = 1 ; bt.b123 = 2 ; bt.c123 = 2147483647 ; bt.d123 = 4 ; bt.bb123 = 3 ; bt.e123 = 0x123456789abcdef ;
+bt.a123 = 1 ; bt.b123 = 2 ; bt.c123 = 2147483647 ; bt.d123 = 4 ; bt.bb123 = 3 ; bt.f123 = 1234 ; bt.e123 = 0x123456789abcdef ;
 dump ( bt, bt.size ) ;
 bt.a123 1 _assert 
 bt.c123.size 4 _assert

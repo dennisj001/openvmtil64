@@ -314,22 +314,29 @@ c_syntaxOn
 typedef struct _byteTest 
 {
     byte a123;
+    int64 e123
     byte b123;
-    long c123;
+    byte bb123 ;
+    int32 c123;
     byte d123;
+    int16 f123;
 } byteTest ;
 'bt byteTest new ;
 ps ( "\nbt.size =" ) ; p ( bt.size ) ;
-bt.a123 = 1 ; bt.b123 = 2 ; bt.c123 = 3 ; bt.d123 = 4 ;
+bt.a123 = 1 ; bt.b123 = 2 ; bt.c123 = 2147483647 ; bt.d123 = 4 ; bt.bb123 = 3 ; bt.f123 = 0x1234 ; dump ( bt, bt.size ) ; 
 var ( 'btt ) ; 
-void bttt ( ) { btt = bt.a123 ; p (btt ) ; } bttt () ; // error size not considered
+void bttt ( ) { btt = bt.a123 ; printf ("btt = %x", btt ) ; } bttt () ; // error size not considered
 bt.a123 = 255 ; dump ( bt, bt.size ) ; //pause
-p (bt.a123) ; p (bt.b123) ; p (bt.c123) ; p (bt.c123) ; 
-bt.a123 = 1 ; bt.b123 = 2 ; bt.c123 = 3 ; bt.d123 = 4 ;
+'bt byteTest new ;
+binary () ; p ( bt.b123 ) ; decimal () ; bt.b123 = 123 ; binary () ; p ( bt.b123 ) ; decimal () ; //pause
+p (bt.a123) ; p (bt.b123) ; p (bt.c123) ; p (bt.d123) ; 
+bt.a123 = 1 ; bt.b123 = 2 ; bt.c123 = 2147483647 ; bt.d123 = 4 ; bt.bb123 = 3 ; bt.f123 = 1234 ; bt.e123 = 0x123456789abcdef ;
+dump ( bt, bt.size ) ;
 bt.a123 1 _assert 
-bt.c123.size 8 _assert
-//pause
-c_syntaxOff 
+bt.c123.size 4 _assert
+bt.e123.size 8 _assert
+_assert ( bt.c123, 2147483647 ) ;
+c_syntaxOff //pause
 2 + 7 assertStkChk // stack checking
 sp
 

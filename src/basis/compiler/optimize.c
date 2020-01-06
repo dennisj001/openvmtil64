@@ -722,6 +722,7 @@ Compile_X_OpEqual ( Compiler * compiler, block op )
     //RestoreSavedState ( _CfrTil_, OPTIMIZE_ON ) ;
 }
 
+// this function probably could be improved/optimized 
 void
 Compile_X_Equal ( Compiler * compiler, int64 op )
 {
@@ -807,9 +808,7 @@ Compile_X_Equal ( Compiler * compiler, int64 op )
         if ( optInfo->wordArg1 && ( optInfo->wordArg1->CAttribute & REGISTER_VARIABLE ) ) Compile_Move_Reg_To_Reg ( dstReg, srcReg, 0 ) ;
         else Compile_Move_Reg_To_Rm ( dstReg, srcReg, 0, 0 ) ;
     }
-    else
-
-        if ( ! optInfo->rtrn ) Setup_MachineCodeInsnParameters ( compiler, REG, REG, ACC, OREG, 0, 0 ) ;
+    else if ( ! optInfo->rtrn ) Setup_MachineCodeInsnParameters ( compiler, REG, REG, ACC, OREG, 0, 0 ) ;
     SetState ( _CfrTil_, IN_OPTIMIZER, false ) ;
 }
 // skip back WordStack words for the args of an op parameter in GetOptimizeState

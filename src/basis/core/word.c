@@ -12,7 +12,7 @@ Word_Run ( Word * word0 )
         _Context_->CurrentlyRunningWord = word0 ;
         DEBUG_SETUP ( word0 ) ;
         word = _Context_->CurrentlyRunningWord ;
-        CfrTil_Typecheck ( word ) ;
+        //if ( String_Equal ( word->Name, "_assert1" )) _Printf ((byte*) "\ngot it\n") ;
         Block_Eval ( word->Definition ) ; // _Context_->CurrentlyRunningWord (= 0) may have been modified by debugger //word->Definition ) ;
         _Context_->LastRunWord = word ;
         _Context_->CurrentlyRunningWord = 0 ;
@@ -25,7 +25,7 @@ Word_Eval ( Word * word )
     if ( word )
     {
         _Context_->CurrentEvalWord = word ;
-        //CfrTil_Typecheck ( word ) ;
+        CfrTil_Typecheck ( word ) ;
         if ( ( word->CAttribute & IMMEDIATE ) || ( ! CompileMode ) ) Word_Run ( word ) ;
         else _Word_Compile ( word ) ;
         _DEBUG_SHOW ( word, 0 ) ;
@@ -85,6 +85,7 @@ _Word_Finish ( Word * word )
     _CfrTil_FinishWordDebugInfo (word, 0 ) ;
     _Context_->LastCompiledWord = word ;
     _CfrTil_SetSourceCodeWord ( word ) ;
+    //if ( String_Equal ( word->Name, "_assert1" )) _Printf ((byte*) "\ngot it\n") ;
 }
 
 void
@@ -206,7 +207,7 @@ Word_PrintOffset ( Word * word, int64 offset, int64 totalOffset )
         _Printf ( ( byte* ) "\n\'%s\' = object field :: type = %s : size (in bytes) = 0x%lx : base object \'%s\' = 0x%lx : offset = 0x%lx : total offset = 0x%lx : address = 0x%lx",
             //name, cntx->Interpreter0->BaseObject ? cntx->Interpreter0->BaseObject->Name : ( byte* ) "",
             name, word->TypeNamespace ? word->TypeNamespace->Name : ( byte* ) "",
-            word->ObjectSize ? word->ObjectSize : TypeNamespace_Get ( word ) ? (word->ObjectSize = ( int64 ) _CfrTil_VariableValueGet ( TypeNamespace_Get ( word )->Name, ( byte* ) "size" )) : 0,
+            word->ObjectByteSize ? word->ObjectByteSize : TypeNamespace_Get ( word ) ? (word->ObjectByteSize = ( int64 ) _CfrTil_VariableValueGet ( TypeNamespace_Get ( word )->Name, ( byte* ) "size" )) : 0,
             cntx->Interpreter0->BaseObject ? String_ConvertToBackSlash ( cntx->Interpreter0->BaseObject->Name ) : ( byte* ) "",
             cntx->Interpreter0->BaseObject ? cntx->Interpreter0->BaseObject->W_Value : 0,
             word->Offset, totalOffset, cntx->Interpreter0->BaseObject ? ( ( ( byte* ) cntx->Interpreter0->BaseObject->W_Value ) + totalOffset ) : ( byte* ) - 1 ) ;

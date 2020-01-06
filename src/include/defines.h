@@ -225,6 +225,7 @@
 #define T_BIG_NUM ( (uint64) 1 << 7 )
 #define T_BYTE ( (uint64) 1 << 8 )
 #define T_CHAR T_BYTE
+#define T_INT8 T_BYTE
 #define T_HEAD ( (uint64) 1 << 8 )
 #define T_TAIL ( (uint64) 1 << 9 )
 #define LITERAL ( (uint64) 1 << 10 )
@@ -322,7 +323,8 @@
 #define STRUCT              STRUCTURE         
 #define RAW_STRING          ( (uint64) 1 << 28 )
 #define T_INT32             ( (uint64) 1 << 29 )
-#define T_SIZE_CHECK        ( (uint64) 1 << 30 )
+#define T_INT16             ( (uint64) 1 << 30 )
+#define T_SIZE_CHECK        ( (uint64) 1 << 31 )
 
 // WAttribute for interpreter word types 
 #define WT_PREFIX                 ( (uint64) 1 <<  0 ) 

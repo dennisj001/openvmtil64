@@ -1,5 +1,6 @@
 #include "../../include/cfrtil64.h"
 
+// maybe should be integrated with Lexer_ParseObject
 void
 _CfrTil_SingleQuote ( )
 {
@@ -42,6 +43,7 @@ _CfrTil_SingleQuote ( )
 done:
         CfrTil_WordLists_PopWord ( ) ; // pop the "'" token
         word = _DObject_New ( buffer, charLiteral, LITERAL | CONSTANT | IMMEDIATE, 0, 0, LITERAL, ( byte* ) _DataObject_Run, 0, 0, 0, DICTIONARY ) ;
+        word->ObjectByteSize = 1 ;
         Interpreter_DoWord ( _Interpreter_, word, - 1, - 1 ) ; //_Lexer_->TokenStart_ReadLineIndex ) ;
     }
     else
@@ -57,6 +59,7 @@ done:
                 token = Lexer_ReadToken ( lexer ) ;
                 if ( String_Equal ( ".", ( char* ) token ) ) continue ;
                 word = _Interpreter_TokenToWord ( _Interpreter_, token, - 1, - 1 ) ;
+                word->ObjectByteSize = 8 ;
                 if ( word && ( word->CAttribute & ( C_TYPE | C_CLASS | NAMESPACE ) ) ) Finder_SetQualifyingNamespace ( _Finder_, word ) ;
                 else
                 {
@@ -112,7 +115,7 @@ gotNextToken:
         {
             token = Lexer_ReadToken ( _Context_->Lexer0 ) ;
             baseObject = _CfrTil_ClassField_New ( token, ns, size, offset ) ; // nb! : in case there is an array so it will be there for ArrayDimensions
-            baseObject->ObjectSize = size ;
+            baseObject->ObjectByteSize = size ;
             token = Lexer_Peek_Next_NonDebugTokenWord ( _Context_->Lexer0, 1, 0 ) ;
             if ( token [0] != '[' )
             {
@@ -163,7 +166,7 @@ gotNextToken:
         }
     }
     _Namespace_VariableValueSet ( classNs, ( byte* ) "size", sizeOf ) ;
-    classNs->Lo_Size = sizeOf ;
+    classNs->ObjectByteSize = sizeOf ;
     classNs->CAttribute2 |= STRUCTURE ;
     //Namespace_AddToNamespaces_SetUsing (  Namespace_Find ( (byte*) "C_Typedef" ), 0, NOT_USING ) ;
     return sizeOf ;
@@ -207,7 +210,7 @@ _CfrTil_Parse_LocalsAndStackVariables ( int64 svf, int64 lispMode, ListObject * 
     CfrTil_DbgSourceCodeOff ( ) ;
     byte * svDelimiters = lexer->TokenDelimiters ;
     Word * word ;
-    int64 ctype = 0, ltype = 0, numberOfRegisterVariables = 0 ;
+    int64 ctype = 0, ltype = 0, numberOfRegisterVariables = 0, numberOfVariables = 0 ;
     int64 svff = 0, addWords, getReturn = 0, getReturnFlag = 0, regToUseIndex = 0 ;
     Boolean regFlag = false ;
     byte *token, *returnVariable = 0 ;
@@ -314,7 +317,11 @@ _CfrTil_Parse_LocalsAndStackVariables ( int64 svf, int64 lispMode, ListObject * 
                     word = _Finder_FindWord_InOneNamespace ( _Finder_, compiler->LocalsNamespace, token ) ;
                     if ( ! word ) word = DataObject_New ( ctype, 0, token, ctype, 0, 0, 0, 0, DICTIONARY, - 1, - 1 ) ;
                 }
-                else word = DataObject_New ( ctype, 0, token, ctype, 0, 0, 0, 0, DICTIONARY, - 1, - 1 ) ;
+                else 
+                {
+                    word = DataObject_New ( ctype, 0, token, ctype, 0, 0, 0, 0, DICTIONARY, - 1, - 1 ) ;
+                    if ( _CfrTil_->CurrentWordBeingCompiled ) _CfrTil_->CurrentWordBeingCompiled->W_TypeSignatureString [numberOfVariables++] = '_' ;
+                }
                 if ( regFlag == true )
                 {
                     word->RegToUse = RegParameterOrder ( regToUseIndex ++ ) ;
@@ -419,6 +426,7 @@ Lexer_ParseBigNum ( Lexer * lexer, byte * token )
         mpfr_t *bfr = ( mpfr_t* ) _BigNum_New ( token ) ;
         lexer->Literal = ( int64 ) bfr ;
         lexer->TokenType = ( T_BIG_NUM | KNOWN_OBJECT ) ;
+        lexer->TokenObjectSize = 8 ;
         SetState ( lexer, KNOWN_OBJECT, true ) ;
     }
 }
@@ -477,37 +485,33 @@ _Lexer_ParseDecimal ( Lexer * lexer, byte * token )
     float f ;
     // use 0x format for hex numbers with decimal NumberBase state
     //D1 (String_Equal (_ReadLiner_->Filename, "namespaces/test/math.cft") ? CfrTil_CpuState_Current_Show ( ) : 0 ) ; //Debugger_CfrTilRegisters (_Debugger_) : 0 ) ;
-    if ( sscanf ( ( char* ) token, HEX_UINT_FRMT, ( uint64* ) & lexer->Literal ) )
-    {
-        lexer->TokenType = ( T_INT | KNOWN_OBJECT ) ;
-        SetState ( lexer, KNOWN_OBJECT, true ) ;
-        Lexer_ParseBigNum ( lexer, token ) ;
-    }
-    else if ( sscanf ( ( char* ) token, INT_FRMT_FOR_HEX, ( uint64* ) & lexer->Literal ) )
-    {
-        lexer->TokenType = ( T_INT | KNOWN_OBJECT ) ;
-        SetState ( lexer, KNOWN_OBJECT, true ) ;
-        Lexer_ParseBigNum ( lexer, token ) ;
-    }
-    else if ( sscanf ( ( char* ) token, INT_FRMT, ( uint64* ) & lexer->Literal ) )
+    if ( sscanf ( ( char* ) token, HEX_UINT_FRMT, ( uint64* ) & lexer->Literal ) ||
+        sscanf ( ( char* ) token, INT_FRMT_FOR_HEX, ( uint64* ) & lexer->Literal ) ||
+        sscanf ( ( char* ) token, INT_FRMT, ( uint64* ) & lexer->Literal ) ||
+        sscanf ( ( char* ) token, LISP_DECIMAL_FRMT, ( uint64* ) & lexer->Literal ) )
     {
         if ( lexer->Literal < 256 ) 
         {
             lexer->TokenType = ( T_BYTE | KNOWN_OBJECT ) ;
             lexer->TokenObjectSize = 1 ;
         }
-        //else if ( lexer->Literal < 256 ) lexer->TokenType = ( T_INT32 | KNOWN_OBJECT ) ;
+        else if ( lexer->Literal <= 65535 ) 
+        {
+            lexer->TokenType = ( KNOWN_OBJECT ) ;
+            lexer->TokenType2 |= ( T_INT16 ) ;
+            lexer->TokenObjectSize = 2 ;
+        }
+        else if ( lexer->Literal <= 2147483647 ) 
+        {
+            lexer->TokenType = ( KNOWN_OBJECT ) ;
+            lexer->TokenType2 = ( T_INT32 ) ;
+            lexer->TokenObjectSize = 4 ;
+        }
         else 
         {
             lexer->TokenType = ( T_INT | KNOWN_OBJECT ) ;
             lexer->TokenObjectSize = 8 ;
         }
-        SetState ( lexer, KNOWN_OBJECT, true ) ;
-        Lexer_ParseBigNum ( lexer, token ) ;
-    }
-    else if ( sscanf ( ( char* ) token, LISP_DECIMAL_FRMT, ( uint64* ) & lexer->Literal ) )
-    {
-        lexer->TokenType = ( T_INT | KNOWN_OBJECT ) ;
         SetState ( lexer, KNOWN_OBJECT, true ) ;
         Lexer_ParseBigNum ( lexer, token ) ;
     }
@@ -522,12 +526,13 @@ _Lexer_ParseDecimal ( Lexer * lexer, byte * token )
 
 void
 Lexer_ParseObject ( Lexer * lexer, byte * token )
-
 {
     Context * cntx = _Context_ ;
     int64 offset = 0 ;
     lexer->OriginalToken = token ;
     lexer->Literal = 0 ;
+    lexer->TokenType = 0 ;
+    lexer->TokenType2 = 0 ;
     if ( token )
     {
         if ( ( token [0] == '0' ) || ( token [0] == '#' ) ) // following scheme notation

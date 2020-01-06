@@ -236,7 +236,7 @@ _CfrTil_ArrayBegin ( Boolean lispMode, Word **pl1, int64 i )
         CfrTil_OptimizeOn ( ) ; // internal to arrays optimize must be on
 
         if ( ! arrayBaseObject->ArrayDimensions ) CfrTil_Exception ( ARRAY_DIMENSION_ERROR, 0, QUIT ) ;
-        if ( interp->CurrentObjectNamespace ) objSize = interp->CurrentObjectNamespace->ObjectSize ; 
+        if ( interp->CurrentObjectNamespace ) objSize = interp->CurrentObjectNamespace->ObjectByteSize ; 
         if ( ! objSize ) CfrTil_Exception ( OBJECT_SIZE_ERROR, 0, QUIT ) ;
         variableFlag = _CheckArrayDimensionForVariables_And_UpdateCompilerState ( ) ;
         if ( lispMode ) Arrays_DoArrayArgs_Lisp ( pl1, l1, arrayBaseObject, objSize, saveCompileMode, &variableFlag ) ;

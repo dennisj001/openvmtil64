@@ -209,7 +209,7 @@ typedef struct _Identifier // _Symbol
     union
     {
         int64 Slots ; // number of slots in Object
-        int64 ObjectSize ; // number of bytes in Object
+        int64 ObjectByteSize ; // number of bytes in Object
     } ;
     byte * S_Name ;
     uint64 State ;
@@ -262,7 +262,7 @@ typedef struct _Identifier // _Symbol
 #define S_LAttribute S_Node.n_Attributes.T_LAttribute
 #define S_NumberOfPrefixedArgs S_Node.n_Attributes.T_NumberOfPrefixedArgs
 #define S_Size S_Node.n_Attributes.T_Size
-#define Size ObjectSize 
+#define Size ObjectByteSize 
 #define S_ChunkSize S_Node.n_Attributes.T_ChunkSize
 #define S_NumberOfSlots S_Node.n_Attributes.T_NumberOfSlots
 #define S_Pointer W_Value
@@ -294,7 +294,7 @@ typedef struct _Identifier // _Symbol
 #define Lo_Name Name
 #define Lo_Car S_Car
 #define Lo_Cdr S_Cdr
-#define Lo_Size ObjectSize
+#define Lo_Size ObjectByteSize
 #define Lo_Head Lo_Car
 #define Lo_Tail Lo_Cdr
 #define Lo_NumberOfSlots Slots
@@ -594,7 +594,7 @@ struct Interpreter ;
 typedef struct Lexer
 {
     uint64 State ;
-    uint64 TokenType, TokenObjectSize ;
+    uint64 TokenType, TokenType2, TokenObjectSize ;
     int64 TokenStart_ReadLineIndex, TokenEnd_ReadLineIndex, TokenStart_FileIndex, TokenEnd_FileIndex, Token_Length, SC_Index ; //Tsrli = TokenStart_ReadLineIndex
     int64 CurrentReadIndex, TokenWriteIndex, LineNumber ;
     byte *OriginalToken, TokenInputByte, LastLexedChar, CurrentTokenDelimiter ;

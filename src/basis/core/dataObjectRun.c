@@ -272,8 +272,8 @@ Compile_C_TypeDeclaration ( Namespace * ns, byte * token1 ) //, int64 tsrli, int
                 word = Compiler_CopyDuplicatesAndPush ( word0, _Lexer_->TokenStart_ReadLineIndex, _Lexer_->SC_Index ) ;
                 if ( word )
                 {
-                    if ( GetState ( _Context_, ADDRESS_OF_MODE ) ) word->ObjectSize = -1 ; //sizeof (byte*) ; 
-                    else word->ObjectSize = _Namespace_VariableValueGet ( ns, ( byte* ) "size" ) ;
+                    if ( GetState ( _Context_, ADDRESS_OF_MODE ) ) word->ObjectByteSize = -1 ; //sizeof (byte*) ; 
+                    else word->ObjectByteSize = _Namespace_VariableValueGet ( ns, ( byte* ) "size" ) ;
                     Interpreter_DoWord ( interp, word, - 1, - 1 ) ;
                 }
             }

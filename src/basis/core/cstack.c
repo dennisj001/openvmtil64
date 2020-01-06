@@ -266,9 +266,9 @@ Stack_Print_AValue ( uint64 * stackPointer, int64 i, byte * stackName, byte * bu
     if ( word )
     {
         //if ( IS_NON_MORPHISM_TYPE ( word ) ) sprintf ( ( char* ) buffer, "< word : %s.%s : value = 0x%016lx > : %s", 
-        if ( word ) sprintf ( ( char* ) buffer, "< word : %s.%s : value = 0x%016lx > : %s",
+        if ( word ) sprintf ( ( char* ) buffer, "< word : %s.%s : value = 0x%016lx > : type %s- %s",
             word->ContainingNamespace ? word->ContainingNamespace->Name : ( byte* ) "<literal>", c_gd ( String_ConvertToBackSlash ( word->Name ) ),
-            ( uint64 ) word->S_Value, c_gd ( ts ) ) ;
+            ( uint64 ) word->S_Value, (IS_MORPHISM_TYPE ( word ) ? "signature " : ""), c_gd ( ts ) ) ;
         else sprintf ( ( char* ) buffer, "< word : %s.%s : definition = 0x%016lx >",
             word->ContainingNamespace ? word->ContainingNamespace->Name : ( byte* ) "<literal>", c_gd ( word->Name ), ( uint64 ) word->Definition ) ;
     }

@@ -115,7 +115,7 @@ Word_GetSize ( Word * word )
 void
 _Compile_GetVarLitObj_RValue_To_Reg ( Word * word, int64 reg )
 {
-    byte size = word->ObjectSize ;
+    byte size = word->ObjectByteSize ;
     if ( ! size ) size = Word_GetSize ( word ) ;
     Compiler_SCA_Word_SetCodingHere_And_ClearPreviousUse ( word, 0 ) ;
     if ( word->CAttribute & REGISTER_VARIABLE )
