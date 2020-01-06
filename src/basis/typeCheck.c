@@ -44,7 +44,7 @@ TSI_TypeCheck_NonTypeVariableSigCode ( TSI * tsi, Word * stackWord, int64 ti )
 }
 
 Boolean
-TSI_TypeCheck_TypeVariableSigCodesAndSizes ( TSI * tsi, Word * stackWord0, Word * stackWord1 )
+TSI_TypeCheck_TypeVariableSigCodesAndSizes ( TSI * tsi )
 {
     // word1 correlates with the type variable so it can anything
     // word0 is closer to top of stack than word1; word1 is lower in the stack than word 0
@@ -53,9 +53,10 @@ TSI_TypeCheck_TypeVariableSigCodesAndSizes ( TSI * tsi, Word * stackWord0, Word 
     // in the case of equal ('=' : word1 = word0 , word1 word0 = , word0 word1 store) word1 can be a type variable and word0 can be any fixed type
     // word1 is lvalue, word0 = rvalue with =/store opWord, word1 can be a type variable and word0 can be any fixed type
     uint64 stackWord0_CAttribute, stackWord0_CAttribute2 ;
+    Word * stackWord0 = tsi->StackWord0, *stackWord1 = tsi->StackWord1 ;
     tsi->TypeErrorStatus = false ; // default 
     //if ( tsi->OpWord->CAttribute & CATEGORY_OP_STORE ) needs to be considered ??
-    if ( stackWord1 && stackWord0 && stackWord1->Name && stackWord0->Name )
+    if ( stackWord0 && stackWord1 && stackWord1->Name && stackWord0->Name )
     {
         if ( stackWord1->ObjectByteSize && ( stackWord0->ObjectByteSize > stackWord1->ObjectByteSize ) ) tsi->TypeErrorStatus |= ( TSE_SIZE_MISMATCH ) ;
 #if 1       
@@ -124,7 +125,11 @@ TSI_TypeCheckAndInfer ( TSI * tsi )
     tsi->OpWordFunctionTypeSignatureLength = Word_TypeSignatureLength ( tsi->OpWord, 1 ) ;
     if ( tsi->WordBeingCompiled && ( ! tsi->WordBeingCompiled->W_TypeSignatureString [0] ) ) strncpy ( ( char* ) tsi->WordBeingCompiled->W_TypeSignatureString, "_______", 8 ) ;
     tsl = ( tsi->OpWordFunctionTypeSignatureLength <= tsi->TypeStackDepth ) ? tsi->OpWordFunctionTypeSignatureLength : tsi->TypeStackDepth ;
-    if ( Is_DebugOn ) { TSI_Debug_PreTypeStatus_Print ( tsi ) ; CfrTil_TypeStackPrint ( ) ; }
+    if ( Is_DebugOn )
+    {
+        TSI_Debug_PreTypeStatus_Print ( tsi ) ;
+        CfrTil_TypeStackPrint ( ) ;
+    }
     for ( si = 0, ti = tsl - 1 ; si < tsl ; si ++, ti -- ) // si stack index : 0 : top of stack ; ti type string index :  - 1 : zero indexed byte arrays
         // the type signature is a string that correlates with the typeStack in a rpn way where letters earlier in the string correlate with lower in the typeStack
         // so si = 0, stack index, correlates with the top of the type stack; ti = tsl - 1, type index, correlates with last character in the typeSignature code string
@@ -142,18 +147,19 @@ TSI_TypeCheckAndInfer ( TSI * tsi )
                 // in the case of equal ('=' : word1 = word0 , word1 word0 = , word0 word1 store) word1 will be a type variable and word0 can be any fixed type
                 if ( tsi->OpWord->CAttribute & CATEGORY_OP_EQUAL )
                 {
-                    stackWord0 = ( Word * ) tsi->TypeWordStack->StackPointer [ 0 ], stackWord1 = ( Word * ) tsi->TypeWordStack->StackPointer [ - 1 ] ; // this idea seems right ??
+                    tsi->StackWord0 = ( Word * ) tsi->TypeWordStack->StackPointer [ 0 ], tsi->StackWord1 = ( Word * ) tsi->TypeWordStack->StackPointer [ - 1 ] ; // this idea seems right ??
                 }
                 else if ( tsi->OpWord->CAttribute & CATEGORY_OP_STORE )
                 {
-                    stackWord1 = ( Word * ) tsi->TypeWordStack->StackPointer [ 0 ], stackWord0 = ( Word * ) tsi->TypeWordStack->StackPointer [ - 1 ] ; // this idea seems right ??
+                    tsi->StackWord1 = ( Word * ) tsi->TypeWordStack->StackPointer [ 0 ], tsi->StackWord0 = ( Word * ) tsi->TypeWordStack->StackPointer [ - 1 ] ; // this idea seems right ??
                 }
-                TSI_TypeCheck_TypeVariableSigCodesAndSizes ( tsi, stackWord0, stackWord1 ) ;
+                TSI_TypeCheck_TypeVariableSigCodesAndSizes ( tsi ) ;
             }
             else //  case 'A': case 'N': case 'I': case 'Y' : case 'S': case 'B': case 'O': case 'V': case '_': 
                 //if ( TSI_TypeCheck_NonTypeVariableSigCode ( tsi, stackWord, tsi->OpWordTypeSignature [ti] ) ) tsi->TypeErrorStatus |= TSE_ERROR ;
                 TSI_TypeCheck_NonTypeVariableSigCode ( tsi, stackWord, ti ) ;
         }
+        else break ;
     }
     return tsi->TypeErrorStatus ;
 }
@@ -189,36 +195,11 @@ CfrTil_Typecheck ( Word * opWord )
             {
                 TSI * tsi = TSI_New ( opWord, COMPILER_TEMP ) ;
                 TSI_TypeCheckAndInfer ( tsi ) ;
-                if ( tsi->TypeErrorStatus & TSE_ERROR ) TSI_ShowTypeErrorStatus ( tsi ) ;
+                if ( tsi->TypeErrorStatus ) TSI_ShowTypeErrorStatus ( tsi ) ;
             }
             //else if ( ( opWord->W_TypeSignatureString[0] == '.' ) && ( opWord->W_TypeSignatureString[0] != 'V' ) ) CfrTil_TypeStackPush ( Context_CurrentWord ( ) ) ;
             if ( Word_DoesTypeSignatureShowAReturnValue ( opWord ) ) CfrTil_TypeStackPush ( opWord ) ; //Context_CurrentWord ( ) ) ;
         }
-    }
-}
-
-void
-TSI_TypeStatus_Print ( TSI *tsi )
-{
-    if ( tsi->TypeErrorStatus & TSE_SIZE_MISMATCH )
-    {
-        _Printf ( ( byte* ) "\n%s :: %s.%s ::  expected : %s :: recorded : %s : %s", "type size mismatch",
-            tsi->OpWord->S_ContainingNamespace ? tsi->OpWord->S_ContainingNamespace->Name : ( byte* ) "<literal>", tsi->OpWord->Name,
-            Word_ExpandTypeLetterSignature ( tsi->OpWord, 1 ), tsi->ActualTypeStackRecordingBuffer, Context_Location ( ) ) ;
-    }
-    else
-    {
-        _Printf ( ( byte* ) "\n%s :: %s.%s :: type expected : %s :: type recorded : %s : %s", tsi->TypeErrorStatus ? "apparent type mismatch" : "type match",
-            tsi->OpWord->S_ContainingNamespace ? tsi->OpWord->S_ContainingNamespace->Name : ( byte* ) "<literal>",
-            tsi->OpWord->Name, Word_ExpandTypeLetterSignature ( tsi->OpWord, 1 ), tsi->ActualTypeStackRecordingBuffer, Context_Location ( ) ) ;
-    }
-    //if ( GetState ( _CfrTil_, DBG_TYPECHECK_ON ) )
-    {
-        CfrTil_TypeStackPrint ( ) ;
-        //if ( _Q_->Verbosity > 1 ) 
-        Pause ( ) ;
-        //byte * warning = "Apparent TypeMismatch : " ;
-        //Warning ( warning, Context_Location ( ), 0 ) ;
     }
 }
 
@@ -228,6 +209,44 @@ TSI_Debug_PreTypeStatus_Print ( TSI *tsi )
     _Printf ( ( byte* ) "\n%s.%s :: type expected : %s : at %s",
         tsi->OpWord->S_ContainingNamespace ? tsi->OpWord->S_ContainingNamespace->Name : ( byte* ) "<literal>", tsi->OpWord->Name,
         Word_ExpandTypeLetterSignature ( tsi->OpWord, 1 ), Context_Location ( ) ) ;
+}
+
+Boolean
+_TypeMismatch_CheckError_Print ( Word * lvalueWord, Word *rvalueWord, Boolean quitFlag )
+{
+    int64 lvalueSize = lvalueWord->ObjectByteSize, rvalueSize = rvalueWord->ObjectByteSize ;
+    if ( ( lvalueSize > 0 ) && ( rvalueSize > lvalueSize ) ) // for C internal lvalue size may be 0
+    {
+        _Printf ( "\nTypeError : Wrong data sizes :: lvalue : %s : size == %ld :: rvalue : %s : size == %ld",
+            lvalueWord->Name, lvalueSize, rvalueWord->Name, rvalueSize ) ;
+        if ( quitFlag ) Error ( "\nType Error", "", QUIT ) ;
+        return true ;
+    }
+    return false ;
+}
+
+void
+TSI_TypeMismatchError_Print ( TSI *tsi )
+{
+    Word * lvalueWord = tsi->StackWord1, *rvalueWord = tsi->StackWord0 ;
+    _TypeMismatch_CheckError_Print ( lvalueWord, rvalueWord, 0 ) ;
+}
+
+void
+TSI_TypeStatus_Print ( TSI *tsi )
+{
+    if ( tsi->TypeErrorStatus & TSE_SIZE_MISMATCH ) TSI_TypeMismatchError_Print ( tsi ) ;
+    _Printf ( ( byte* ) "\n%s :: %s.%s :: type expected : %s :: type recorded : %s : at %s", tsi->TypeErrorStatus ? "apparent type mismatch" : "type match",
+        tsi->OpWord->S_ContainingNamespace ? tsi->OpWord->S_ContainingNamespace->Name : ( byte* ) "<literal>",
+        tsi->OpWord->Name, Word_ExpandTypeLetterSignature ( tsi->OpWord, 1 ), tsi->ActualTypeStackRecordingBuffer, Context_Location ( ) ) ;
+    //if ( GetState ( _CfrTil_, DBG_TYPECHECK_ON ) )
+    {
+        CfrTil_TypeStackPrint ( ) ;
+        //if ( _Q_->Verbosity > 1 ) 
+        Pause ( ) ;
+        //byte * warning = "Apparent TypeMismatch : " ;
+        //Warning ( warning, Context_Location ( ), 0 ) ;
+    }
 }
 
 void

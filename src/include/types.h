@@ -1033,7 +1033,7 @@ typedef struct typeStatusInfo
 #define TSE_ERROR         ( 1 << 0 ) 
 #define TSE_SIZE_MISMATCH ( 1 << 1 )   
     Stack * TypeWordStack ;
-    Word * OpWord, *WordBeingCompiled ;
+    Word * OpWord, *WordBeingCompiled, *StackWord0, *StackWord1 ;
     int64 TypeStackDepth, OpWordFunctionTypeSignatureLength ;
     byte *OpWordTypeSignature, ExpandedTypeCodeBuffer [32], ActualTypeStackRecordingBuffer [128] ;
     Boolean TypeErrorStatus, OpWord_ReturnsACodedValue_Flag ;

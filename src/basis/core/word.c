@@ -25,7 +25,7 @@ Word_Eval ( Word * word )
     if ( word )
     {
         _Context_->CurrentEvalWord = word ;
-        CfrTil_Typecheck ( word ) ;
+        if ( IS_MORPHISM_TYPE (word) ) CfrTil_Typecheck ( word ) ;
         if ( ( word->CAttribute & IMMEDIATE ) || ( ! CompileMode ) ) Word_Run ( word ) ;
         else _Word_Compile ( word ) ;
         _DEBUG_SHOW ( word, 0 ) ;

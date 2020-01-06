@@ -1451,13 +1451,15 @@ void Debugger_DisassembleAccumulated(Debugger *debugger);
 void Debugger_DisassembleTotalAccumulated(Debugger *debugger);
 /* src/basis/typeCheck.c */
 Boolean TSI_TypeCheck_NonTypeVariableSigCode(TSI *tsi, Word *stackWord, int64 ti);
-Boolean TSI_TypeCheck_TypeVariableSigCodesAndSizes(TSI *tsi, Word *stackWord0, Word *stackWord1);
+Boolean TSI_TypeCheck_TypeVariableSigCodesAndSizes(TSI *tsi);
 Boolean TSI_TypeCheckAndInfer(TSI *tsi);
 TSI *TSI_Init(TSI *tsi, Word *opWord);
 TSI *TSI_New(Word *opWord, uint64 allocType);
 void CfrTil_Typecheck(Word *opWord);
-void TSI_TypeStatus_Print(TSI *tsi);
 void TSI_Debug_PreTypeStatus_Print(TSI *tsi);
+Boolean _TypeMismatch_CheckError_Print(Word *lvalueWord, Word *rvalueWord, Boolean quitFlag);
+void TSI_TypeMismatchError_Print(TSI *tsi);
+void TSI_TypeStatus_Print(TSI *tsi);
 void TSI_ShowTypeErrorStatus(TSI *tsi);
 void TSI_UpdateActualTypeStackRecordingBuffer(TSI *tsi, Word *word, Boolean prefixWithSeparatorFlag);
 byte *Tsi_ExpandTypeLetterCode(byte typeCode, byte *buffer);

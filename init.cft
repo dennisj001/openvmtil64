@@ -439,7 +439,7 @@ stringMacrosOff
 //tc //demo
 //fload nt.cft
 //mct
-#elif 1
+//#elif 1
 jcc8_On
 User
 : factorial ( REG n | REG rec -- RAX ) rec 1 = { n @ 1 > } { rec @ n @ * rec store n -- } while return rec ;

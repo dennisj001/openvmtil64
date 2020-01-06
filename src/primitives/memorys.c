@@ -66,6 +66,7 @@ CfrTil_PokeRegAtAddress ( ) // @
 void
 _CfrTil_Move ( int64 * address, int64 value, Word * lvalueWord, Word * rvalueWord ) //int64 lvalueSize, int64 rvalueSize )
 {
+#if 0    
     //if ( (lvalueSize > 0) && (( value > 2147483647 ) && (rvalueSize > lvalueSize)) ) // for C internal address size may be 0
     int64 lvalueSize = lvalueWord->ObjectByteSize, rvalueSize = rvalueWord->ObjectByteSize ;
     if ( (lvalueSize > 0 ) && (rvalueSize > lvalueSize) ) // for C internal lvalue size may be 0
@@ -74,7 +75,9 @@ _CfrTil_Move ( int64 * address, int64 value, Word * lvalueWord, Word * rvalueWor
         sprintf ( ( char* ) b, "Wrong data sizes :: lvalue size == %ld : rvalue size == %ld", lvalueSize, rvalueSize ) ;
         Error ( "\nType Error", b, QUIT ) ;
     }
-    else
+#endif    
+    int64 lvalueSize = lvalueWord->ObjectByteSize ; //, rvalueSize = rvalueWord->ObjectByteSize ;
+    if ( ! _TypeMismatch_CheckError_Print ( lvalueWord, rvalueWord, 1 ) )
     {
         switch ( lvalueSize )
         {
