@@ -1,6 +1,5 @@
 git add .
 git rm --cached *.o
-git rm --cached nbproject/*	
-git rm --cached nbproject/private/*.*
+git rm -r --cached nbproject	
 git commit .
 git push
