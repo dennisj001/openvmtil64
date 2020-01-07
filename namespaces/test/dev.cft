@@ -204,7 +204,7 @@ User "qexp" ffx
 C "bexp" ffx
 "bexp2" ffx
 "factoriali" ffx
-C "qexp" ffx
+C "qexp" d: ffx
 C "qexp2" ffx
 "bexp" ffx
 "bexp2" ffx
