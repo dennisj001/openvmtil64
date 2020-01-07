@@ -80,9 +80,9 @@ _Word_Finish ( Word * word )
 {
     DObject_Finish ( word ) ;
     CfrTil_FinishSourceCode ( _CfrTil_, word ) ;
-    _CfrTil_->LastFinished_Word = word ;
     CfrTil_TypeStackReset ( ) ;
-    _CfrTil_FinishWordDebugInfo () ;
+    _CfrTil_->LastFinished_Word = word ;
+    _CfrTil_FinishWordDebugInfo ( word ) ;
     //_CfrTil_SetSourceCodeWord ( word ) ;// done in word create
 }
 

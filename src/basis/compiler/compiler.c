@@ -42,16 +42,18 @@ _CfrTil_CopyDuplicates ( Word * word0 )
 Word *
 Compiler_CopyDuplicatesAndPush ( Word * word0, int64 tsrli, int64 scwi )
 {
-    Word *wordp ;
-    if ( ( word0->CAttribute & ( DEBUG_WORD | INTERPRET_DBG ) ) || ( word0->LAttribute & ( W_COMMENT | W_PREPROCESSOR ) ) ) return word0 ;
-    if ( word0 && GetState ( _Compiler_, ( COMPILE_MODE | ASM_MODE ) ) ) // don't we want to copy in non-compile mode too ??
+    Word *wordp = 0 ;
+    if ( word0 )
     {
-        wordp = _CfrTil_CopyDuplicates ( word0 ) ;
-        //if ( wordp == word0 ) _Printf ( ( byte* ) "\nGot it = %s", wordp->Name ) ;
+        if ( ( word0->CAttribute & ( DEBUG_WORD | INTERPRET_DBG ) ) || ( word0->LAttribute & ( W_COMMENT | W_PREPROCESSOR ) ) ) return word0 ;
+        if ( GetState ( _Compiler_, ( COMPILE_MODE | ASM_MODE ) ) ) // don't we want to copy in non-compile mode too ??
+        {
+            wordp = _CfrTil_CopyDuplicates ( word0 ) ;
+        }
+        else wordp = word0 ;
+        Lexer_Set_ScIndex_RlIndex ( _Lexer_, wordp, tsrli, scwi ) ;
+        CfrTil_WordList_PushWord ( wordp ) ;
     }
-    else wordp = word0 ;
-    Lexer_Set_ScIndex_RlIndex ( _Lexer_, wordp, tsrli, scwi ) ;
-    CfrTil_WordList_PushWord ( wordp ) ;
     return wordp ;
 }
 
@@ -133,27 +135,6 @@ Compiler_PreviousNonDebugWord ( int64 startIndex )
     }
     return word ;
 }
-
-#if 0
-
-typedef struct
-{
-    Symbol GI_Symbol ;
-    byte * pb_LabelName ;
-    byte * CompileAtAddress ;
-    byte * LabeledAddress ;
-    byte * pb_JmpOffsetPointer ;
-} GotoInfo ;
-// GotoInfo Types
-#define GI_BREAK ( (uint64) 1 << 0 )
-#define GI_RETURN ( (uint64) 1 << 1 )
-#define GI_CONTINUE ( (uint64) 1 << 2 )
-#define GI_GOTO ( (uint64) 1 << 3 )
-#define GI_RECURSE ( (uint64) 1 << 4 )
-#define GI_TAIL_CALL ( (uint64) 1 << 5 )
-#define GI_LABEL ( (uint64) 1 << 6 )
-#define GI_GOTO_LABEL ( (uint64) 1 << 7 )
-#endif
 
 void
 GotoInfo_Print ( dlnode * node )
@@ -266,23 +247,29 @@ Compiler_Init_AccumulatedOffsetPointers ( Compiler * compiler, Word * word )
 }
 
 void
-CfrTil_SaveDebugInfo ( Word * word )
+CfrTil_SaveDebugInfo ( Word * word, uint64 allocType )
 {
+    if ( ! allocType ) allocType = CFRTIL ; // COMPILER_TEMP ;
     Compiler * compiler = _Compiler_ ;
     word = word ? word : _CfrTil_->LastFinished_Word ;
-    word->NamespaceStack = Stack_Copy ( compiler->LocalsCompilingNamespacesStack, CFRTIL ) ; //CONTEXT ) ;
-    if ( compiler->NumberOfVariables ) Namespace_RemoveNamespacesStack ( compiler->LocalsCompilingNamespacesStack ) ;
+    if ( compiler->NumberOfVariables )
+    {
+        word->NamespaceStack = Stack_Copy ( compiler->LocalsCompilingNamespacesStack, allocType ) ; 
+        Namespace_RemoveNamespacesStack ( compiler->LocalsCompilingNamespacesStack ) ;
+    }
     Stack_Init ( compiler->LocalsCompilingNamespacesStack ) ;
     if ( ! word->W_SC_WordList )
     {
         word->W_SC_WordList = _CfrTil_->Compiler_N_M_Node_WordList ;
-        _CfrTil_->Compiler_N_M_Node_WordList = _dllist_New ( CFRTIL ) ;
+        _CfrTil_->Compiler_N_M_Node_WordList = _dllist_New ( allocType ) ;
         //Namespace_NamespacesStack_PrintWords ( _CfrTil_->CurrentWordBeingCompiled->NamespaceStack ) ;
     }
+    else List_Init ( _CfrTil_->Compiler_N_M_Node_WordList ) ;
+
 }
 
 void
-CfrTil_DeleteDebugInfo ()
+CfrTil_DeleteDebugInfo ( )
 {
     Compiler * compiler = _Compiler_ ;
     if ( compiler->NumberOfVariables )
@@ -294,13 +281,10 @@ CfrTil_DeleteDebugInfo ()
 }
 
 void
-_CfrTil_FinishWordDebugInfo ()
+_CfrTil_FinishWordDebugInfo ( Word * word )
 {
-    //Compiler * compiler = _Compiler_ ;
-    //if ( compiler->NumberOfVariables || GetState ( _CfrTil_, ( RT_DEBUG_ON | GLOBAL_SOURCE_CODE_MODE ) ) )
-    //    CfrTil_SaveDebugInfo ( ) ;
-    if ( ! GetState ( _CfrTil_, ( RT_DEBUG_ON | GLOBAL_SOURCE_CODE_MODE ) ) ) CfrTil_DeleteDebugInfo () ;
-    else CfrTil_SaveDebugInfo ( 0 ) ;
+    if ( ! GetState ( _CfrTil_, ( RT_DEBUG_ON | GLOBAL_SOURCE_CODE_MODE ) ) ) CfrTil_DeleteDebugInfo ( ) ;
+    else CfrTil_SaveDebugInfo ( word, 0 ) ;
 }
 
 void
@@ -394,24 +378,24 @@ Stack_Push_PointerToJmpOffset ( byte * compiledAtAddress )
 }
 
 void
-CfrTil_CompileAndRecord_Word0_PushReg (Boolean reg, Boolean recordFlag)
+CfrTil_CompileAndRecord_Word0_PushReg ( Boolean reg, Boolean recordFlag )
 {
     Word * word = _CfrTil_WordList ( 0 ) ;
-    _Word_CompileAndRecord_PushReg (word, reg , recordFlag) ;
+    _Word_CompileAndRecord_PushReg ( word, reg, recordFlag ) ;
 }
 
 void
 CfrTil_CompileAndRecord_Word0_PushRegToUse ( )
 {
     Word * word = _CfrTil_WordList ( 0 ) ;
-    _Word_CompileAndRecord_PushReg (word, word->RegToUse , true) ;
+    _Word_CompileAndRecord_PushReg ( word, word->RegToUse, true ) ;
 }
 
 void
 CfrTil_CompileAndRecord_PushAccum ( )
 {
     Word * word = _CfrTil_WordList ( 0 ) ;
-    _Word_CompileAndRecord_PushReg (word, ACC , true) ;
+    _Word_CompileAndRecord_PushReg ( word, ACC, true ) ;
 }
 
 

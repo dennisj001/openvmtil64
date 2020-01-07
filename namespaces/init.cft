@@ -22,8 +22,8 @@ Root
 'tick ' _tick find alias immediate
 'ndrop '_ndrop find alias immediate 
 'forth 'postfixOn find alias
-'cOn 'c_syntaxOn find alias
-'cOff 'c_syntaxOff find alias
+'C_On 'c_syntaxOn find alias
+'C_Off 'c_syntaxOff find alias
 "log" variable 
 "User" namespace 
 Io Int
@@ -146,7 +146,7 @@ Interpreter
 "semi" wordNew { _end _semi } _semi 
 ";" ' semi find alias immediate syntactic
 : word swap wordNew swap _semi ;  //'word wordDisassemble pause
-//: word ( name block ) name @ wordNew block @ _semi ;  // works but it is 10 bytes more code
+//d: : word ( name block ) name @ wordNew block @ _semi ;  // works but it is 10 bytes more code
 //'word find wdis //pause
 ":" { compileModeOn sourceCodeInit token wordNew begin } word // immediate // begin is not an immediate word
 
@@ -271,7 +271,7 @@ jcc8_On
 : stk stack ; //debugWord 
 : ti timerInit ;
 : ahalt stop ;
-: vb ( n ) verbosity n @ = ; : vb3 3 vb ; : vb2 2 vb ; : vb1 1 vb ; : vb0 0 vb ;
+: vb ( n ) verbosity n @ = ; : vb3 4 vb ; : vb3 3 vb ; : vb2 2 vb ; : vb1 1 vb ; : vb0 0 vb ;
 : sOff vb1 inlineOff optimizeOff ;
 : sOn vb3 inlineOn optimizeOn ;
 "ahOn" ' addToHistoryOn find alias
@@ -356,7 +356,7 @@ Debug
 #if ( DebugFlag @ )
 : s stack alertColors location defaultColors ;
 : include include1 debugColors "location :" ps location nl defaultColors ;
-vb3
+d: vb3
 #endif
 Interpreter
 '_defined '_find find alias 

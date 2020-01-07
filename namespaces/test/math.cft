@@ -8,11 +8,8 @@ Int
 sp
 : mt1 8 -- 7 _assert drop ; mt1 
 sp
-#if 0
 : mta 1 5 + ++ ; mta 7 _assert
 : mt1a 9 1 - --  ; mt1a 7 _assert
-#endif
-
 : mt2 ( n ) ++ n @ 7 _assert ; 6 mt2 
 : mt3 ( n ) n @ ++ n @ 7 _assert ; 6 mt3 
 : mt4 ( n ) n @ ++ n @ 7 _assert ; 6 mt4 
@@ -20,10 +17,10 @@ sp
 'mt5v var
 : mt5 mt5v 6 = mt5v @ ++ 7 _assert ; mt5
 sp
-#if 1
 C
 : t* ( a b -- TOS ) a @ b @ * ; 3 4 t* 12 _assert sp
 : t+ ( a b -- TOS ) a @ b @ + ; 3 4 t+ 7 _assert sp
+
 : t* ( a b c d -- TOS ) a @ b @ c @ d @ * * * ; 
 ' t* find wdiss 
 1 2 3 4 t* 24 _assert
@@ -80,7 +77,6 @@ nl 32 8 moe 4 _assert
 : moe3 ( n m -- TOS ) n m @ &= n @ ;
 // ' moe3 find wdiss 
 nl 2 3 moe3 2 "moe3_assert1" assert nl 5 7 moe3 5 "moe3_assert2" assert 
-#endif
 sp
 nl : t64bitAdd ( n m -- TOS ) n @ m @ + ; hex 0x100000000 2 t64bitAdd 0x100000002 _assert
 : t64bitAdd2 ( n m -- TOS ) 0x100000000 n @ + m @ + ; "II.I" typeSignature

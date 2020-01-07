@@ -239,7 +239,8 @@ void
 CfrTil_WordAccounting ( byte * functionName )
 {
     if ( _CfrTil_->FindWordCount > _CfrTil_->FindWordMaxCount ) _CfrTil_->FindWordMaxCount = _CfrTil_->FindWordCount ;
-    if ( _Q_->Verbosity > 4 ) _CfrTil_WordAccounting_Print ( functionName ) ;
+    if ( _Q_->Verbosity > 4 ) 
+        _CfrTil_WordAccounting_Print ( functionName ) ;
 }
 
 byte *

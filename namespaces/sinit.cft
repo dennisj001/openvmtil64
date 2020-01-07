@@ -24,8 +24,8 @@ Root
 'tick ' _tick find alias immediate
 'ndrop '_ndrop find alias immediate 
 'forth 'postfixOn find alias
-'cOn 'c_syntaxOn find alias
-'cOff 'c_syntaxOff find alias
+'C_On 'c_syntaxOn find alias
+'C_Off 'c_syntaxOff find alias
 "log" variable 
 "User" namespace 
 Io Int

@@ -44,7 +44,6 @@ C_Syntax.factoriali (7) dup p 5040 _assert //pause //sp
 7 factorial dup p 5040 _assert
 : qexp dup 1 <= if{ }else{ dup -- qexp * }fi ; 7 qexp dup p 5040 _assert 'qexp find wdiss
 : qexp2 dup 1 <= ?< >:< dup -- qexp2 * >? ; 7 qexp2 dup p 5040 _assert
-
 : bexp ( n ) n @ 1 > if{ n @ dup -- bexp * }else{ 1 }fi ; 7 bexp dup p 5040 _assert
 : bexp2 ( n ) { n @ 1 > } { n @ dup -- bexp2 * } { 1 } ifElse ; 7 bexp2 dup p 5040 _assert
 : bexp3 ( n ) { n @ 1 > } { n @ n @ -- bexp3 *  } { 1 } ifElse ;
@@ -192,7 +191,6 @@ fibPTC2? ( REG n | REG fn, REG fn1, REG fn2 )
 jcc8_Off
 c_syntaxOff
 User
-//typecheckOff
 
 #if 1
 reps 20000 =
@@ -204,7 +202,7 @@ User "qexp" ffx
 C "bexp" ffx
 "bexp2" ffx
 "factoriali" ffx
-C "qexp" d: ffx
+C "qexp" ffx
 C "qexp2" ffx
 "bexp" ffx
 "bexp2" ffx

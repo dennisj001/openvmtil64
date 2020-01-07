@@ -1134,9 +1134,9 @@ CompileOptimizeInfo *Compiler_CompileOptimizeInfo_New(Compiler *compiler, uint64
 CompileOptimizeInfo *CompileOptInfo_NewCopy(CompileOptimizeInfo *optInfo, uint64 type);
 int64 Compiler_BlockLevel(Compiler *compiler);
 void Compiler_Init_AccumulatedOffsetPointers(Compiler *compiler, Word *word);
-void CfrTil_SaveDebugInfo(Word *word);
+void CfrTil_SaveDebugInfo(Word *word, uint64 allocType);
 void CfrTil_DeleteDebugInfo(void);
-void _CfrTil_FinishWordDebugInfo(void);
+void _CfrTil_FinishWordDebugInfo(Word *word);
 void Compiler_Init(Compiler *compiler, uint64 state, Boolean flag);
 Compiler *Compiler_New(uint64 allocType);
 Compiler *Compiler_Copy(Compiler *compiler, uint64 allocType);

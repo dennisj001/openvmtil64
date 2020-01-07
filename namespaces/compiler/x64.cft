@@ -37,7 +37,8 @@
 
 // cfrTil uses intel syntax convention
 //logOn
-cOff
+
+C_Off
 C 
 : apause ; // pause ;
 : sp ; //stack pause ; 
@@ -188,7 +189,6 @@ _Compile_Write_Instruction_X64 ( rex, opCode0, opCode1, modRm, controlFlags, sib
     if ( controlFlags Bits.& MODRM_B ) compileByte ( modRm ) ;
     if ( sib && ( controlFlags Bits.& SIB_B ) ) compileByte ( sib ) ;
     if ( disp && ( controlFlags Bits.& DISP_B ) ) _Compile_ImmOrDispData ( disp, dispSize, ( controlFlags Bits.& DISP_B ) ) ;
-//<dbg>
     if ( imm || ( controlFlags Bits.& IMM_B ) ) _Compile_ImmOrDispData ( imm, immSize, ( controlFlags Bits.& IMM_B ) ) ;
 #if DBI
     nbytes = Here - _here ; 
@@ -340,7 +340,7 @@ Combinators
 sp
 :asm iax
     _Compile_Stack_PopToReg ( R8D )          //4d8b06                  mov r8, [r14]       
-    _Compile_CallThruReg ( R8D )          //4983ee08                sub r14, 0x8
+    _Compile_CallThruReg ( R8D )             //4983ee08                sub r14, 0x8
                                              //49ffd0                  call r8  
                                              //c3                      ret      
 asm; 

@@ -147,7 +147,6 @@ using
 ;
 ' init find wdiss //pause
 "testClone" DLListClone new 
-scOff
 "\nthis = " ps this hex p //pause
 
 testClone size @ dump

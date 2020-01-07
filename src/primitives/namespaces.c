@@ -334,10 +334,10 @@ Namespace_RemoveNamespacesStack ( Stack * stack )
 {
     if ( stack )
     {
-        int64 i = 0, n = Stack_Depth ( stack ) ;
-        do
+        int64 n = Stack_Depth ( stack ) ;
+        while ( n > 0 )
         {
-            Namespace * ns = ( Namespace* ) stack->StackPointer [i] ;
+            Namespace * ns = ( Namespace* ) _Stack_Pop ( stack ) ; 
             if ( ns )
             {
                 if ( ns == _CfrTil_->InNamespace ) _CfrTil_->InNamespace = 0 ;
@@ -347,7 +347,6 @@ Namespace_RemoveNamespacesStack ( Stack * stack )
             }
             n -- ;
         }
-        while ( n >= 0 ) ;
     }
 }
 

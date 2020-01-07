@@ -276,5 +276,5 @@ CfrTil_CompileMode ( )
 void
 CfrTil_FinishWordDebugInfo ( )
 {
-    _CfrTil_FinishWordDebugInfo () ;
+    _CfrTil_FinishWordDebugInfo (0) ;
 }

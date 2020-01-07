@@ -152,10 +152,6 @@ SC_List_AdjustAddress ( dlnode * node, byte * address, byte * newAddress )
     Word * nword = ( Word* ) dobject_Get_M_Slot ( ( dobject* ) node, SCN_T_WORD ) ;
     if ( nword->S_WordData && ( nword->Coding == address ) )
     {
-#if 0        
-        if ( ( Is_DebugOn ) && ( address == ( byte* ) 0x7ffff72f56c6 ) )
-            _Printf ( ( byte* ) "" ) ;
-#endif        
         Word_SetCoding ( nword, newAddress ) ;
         if ( nword->SourceCoding ) Word_SetSourceCoding ( nword, newAddress ) ;
         dobject_Set_M_Slot ( ( dobject* ) node, SCN_IN_USE_FLAG, SCN_IN_USE_FLAG_ALL ) ; // reset after CfrTil_AdjustDbgSourceCode_InUseFalse
@@ -195,8 +191,6 @@ void
 CfrTil_WordList_PushWord ( Word * word )
 {
 #if 1
-    if ( word == ( Word* ) 0x7ffff5958e88 ) //0x7ffff595be88
-        _Printf ( ( byte* ) "\nGot it = %s", word->Name ) ;
     _CfrTil_WordList_PushWord ( word,
         ( ! ( word->CAttribute & ( NAMESPACE | OBJECT_OPERATOR | OBJECT_FIELD ) ) ) || ( word->CAttribute & ( DOBJECT ) ) ) ;
 #else    
@@ -226,15 +220,28 @@ DLList_RecycleInit_WordList ( Word * word )
     List_Init ( word->W_SC_WordList ) ;
 }
 
+#if 0
 void
 _CfrTil_RecycleInit_Compiler_N_M_Node_WordList ( )
 {
     Word * word = _CfrTil_->LastFinished_Word ; 
-    if ( Compiling && word && word->S_WordData ) DLList_Recycle_WordList ( _CfrTil_->Compiler_N_M_Node_WordList ) ;
+    if ( Compiling && word && word->S_WordData && ( ! GetState ( _CfrTil_, ( RT_DEBUG_ON|DEBUG_SOURCE_CODE_MODE | GLOBAL_SOURCE_CODE_MODE ) ) ))
+        DLList_Recycle_WordList ( _CfrTil_->Compiler_N_M_Node_WordList ) ;
     List_Init ( _CfrTil_->Compiler_N_M_Node_WordList ) ;
 }
-    
+#else
 void
+_CfrTil_RecycleInit_Compiler_N_M_Node_WordList ( )
+{
+    if ( ( ! GetState ( _CfrTil_, ( RT_DEBUG_ON|DEBUG_SOURCE_CODE_MODE | GLOBAL_SOURCE_CODE_MODE ) ) ))
+    {
+        DLList_Recycle_WordList ( _CfrTil_->Compiler_N_M_Node_WordList ) ;
+    }
+    List_Init ( _CfrTil_->Compiler_N_M_Node_WordList ) ;
+}
+#endif
+
+ void
 CfrTil_WordList_Init (Word * word)
 {
     Word * svWord = word ? word : 0 ;

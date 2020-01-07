@@ -327,7 +327,7 @@ dlnode_Replace ( dlnode * replacedNode, dlnode * replacingNode )
 void
 _dllist_Init ( dllist * list )
 {
-    if ( list )
+    if ( list && list->head )
     {
         list->head->afterNode = ( dlnode * ) list->tail ;
         list->head->beforeNode = ( dlnode * ) 0 ;
