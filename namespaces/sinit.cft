@@ -90,12 +90,12 @@ Combinators
 User
 #if startupMacros
 : _SMN_ "StartupMacros" ;                           // _SMN_ : string startup macros namespace 
-"StartupMacros" namespace                           // create a namespace for string macros to be used 
+"StartupMacros" namespace                           // wordNew a namespace for string macros to be used 
 StartupMacros                                       // switch to that namespace
 : Delimiters "/" ;                                  // set delimiters to be used with string macros
-// "_startDirectory_" variable                      // created and set in CfrTil_ResetAll_Init
+// "_startDirectory_" variable                      // wordNewd and set in CfrTil_ResetAll_Init
 : namespaces _startDirectory_ @ ;                   // this line also works in place of the next line
-                                                    // '_startDirectory_' is a variable created in the function 
+                                                    // '_startDirectory_' is a variable wordNewd in the function 
                                                     // CfrTil_ResetAll_Init in the file init.c
 //: namespaces "/usr/local/lib/cfrTil64/namespaces" ; // our currently only ?!overloaded!? string macro allowing 
                                                     // us to parameterize the startup; can be properly started 
@@ -130,13 +130,13 @@ Interpreter
 "end" ' _end find alias immediate
 "}" ' end find alias keyword
 "xt@" { xt @ } word immediate // ' definition alias immediate
-"_semi" create { xt= wordFinish } xt= wordFinish 
-"semi" create { _end _semi } _semi 
+"_semi" wordNew { xt= wordFinish } xt= wordFinish 
+"semi" wordNew { _end _semi } _semi 
 ";" ' semi find alias immediate syntactic
-: word swap create swap _semi ;  //'word wordDisassemble pause
-//: word ( name block ) name @ create block @ _semi ;  // works but it is 10 bytes more code
+: word swap wordNew swap _semi ;  //'word wordDisassemble pause
+//: word ( name block ) name @ wordNew block @ _semi ;  // works but it is 10 bytes more code
 //'word find wdis //pause
-":" { compileModeOn sourceCodeInit token create begin } word // immediate // begin is not an immediate word
+":" { compileModeOn sourceCodeInit token wordNew begin } word // nb! not immediate - begin is not an immediate word
 
 C
 : ;; semi _prefix ; immediate syntactic

@@ -204,7 +204,7 @@ _Class_New ( byte * name, uint64 type, int64 cloneFlag )
             Context_Location ( ), ns->Name, _Word_SourceCodeLocation_pbyte ( ns ), ns->ObjectByteSize ) ;
         Namespace_DoNamespace (ns, 0) ;
     }
-    CfrTil_WordList_Init ( 0, 0 ) ;
+    CfrTil_WordList_Init (0) ;
     //Compiler_SetAs_InNamespace_C_BackgroundNamespace ( cntx->Compiler0 ) ;
     return ns ;
 }

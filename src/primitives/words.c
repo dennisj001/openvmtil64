@@ -7,7 +7,7 @@ _CfrTil_Colon ( Boolean initSC )
     CfrTil_RightBracket ( ) ;
     if ( initSC ) CfrTil_SourceCode_Init ( ) ;
     CfrTil_Token ( ) ;
-    CfrTil_Word_Create ( ) ;
+    CfrTil_Word_New ( ) ;
     CfrTil_BeginBlock ( ) ;
 
     byte * token = Lexer_Peek_Next_NonDebugTokenWord ( _Lexer_, 0, 0 ) ;
@@ -141,11 +141,11 @@ Word_Add ( )
 // forth : "create"
 
 void
-CfrTil_Word_Create ( )
+CfrTil_Word_New ( )
 {
     byte * name = ( byte* ) DataStack_Pop ( ) ;
     Word * word = Word_New ( name ) ;
-    CfrTil_WordList_Init ( word, 0 ) ; //nb! so we need to use source code debug before creating a new word
+    CfrTil_WordList_Init (word) ; //nb! so we need to use source code debug before creating a new word
     DataStack_Push ( ( int64 ) word ) ;
 }
 

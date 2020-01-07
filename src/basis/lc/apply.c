@@ -531,7 +531,7 @@ CompileLispBlock ( ListObject *args, ListObject * body )
     LambdaCalculus * lc = _LC_ ;
     block code ;
     byte * here = Here ;
-    Word * word = _CfrTil_->CurrentWordBeingCompiled ;
+    Word * word = _Context_->CurrentWordBeingCompiled ;
     LO_BeginBlock ( ) ; // must have a block before local variables if there are register variables because _CfrTil_Parse_LocalsAndStackVariables will compile something
     SetState ( lc, ( LC_COMPILE_MODE | LC_BLOCK_COMPILE ), true ) ; // before _CfrTil_Parse_LocalsAndStackVariables
     Namespace * locals = _CfrTil_Parse_LocalsAndStackVariables ( 1, 1, args, 0, 0, false ) ;

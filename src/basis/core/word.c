@@ -82,10 +82,8 @@ _Word_Finish ( Word * word )
     CfrTil_FinishSourceCode ( _CfrTil_, word ) ;
     _CfrTil_->LastFinished_Word = word ;
     CfrTil_TypeStackReset ( ) ;
-    _CfrTil_FinishWordDebugInfo (word, 0 ) ;
-    _Context_->LastCompiledWord = word ;
-    _CfrTil_SetSourceCodeWord ( word ) ;
-    //if ( String_Equal ( word->Name, "_assert1" )) _Printf ((byte*) "\ngot it\n") ;
+    _CfrTil_FinishWordDebugInfo () ;
+    //_CfrTil_SetSourceCodeWord ( word ) ;// done in word create
 }
 
 void
@@ -144,7 +142,6 @@ Word *
 _Word_Create ( byte * name, uint64 ctype, uint64 ctype2, uint64 ltype, uint64 allocType )
 {
     Word * word = _Word_Allocate ( allocType ? allocType : DICTIONARY ) ;
-    //if ( word == (Word*) 0x7ffff5990e88) _Printf ((byte*)"") ;
     if ( allocType & ( EXISTING ) ) _Symbol_NameInit ( ( Symbol * ) word, name ) ;
     else _Symbol_Init_AllocName ( ( Symbol* ) word, name, STRING_MEM ) ;
     word->WAllocType = allocType ;
@@ -178,8 +175,6 @@ _Word_New ( byte * name, uint64 ctype, uint64 ctype2, uint64 ltype, Boolean addT
     _Compiler_->CurrentWord = word ;
     Word_SetLocation ( word ) ;
     _Word_Add ( word, addToInNs, addToNs ) ; // add to the head of the list
-    //CfrTil_WordList_PushWord ( word ) ;
-    //Compiler_Word_SCH_CPUSCA ( word, 0 ) ;
     return word ;
 }
 

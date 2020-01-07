@@ -11,10 +11,10 @@ _LO_Define ( ListObject * idNode, ListObject * locals )
     Word * word0 = idNode->Lo_CfrTilWord, *word ;
     word = DataObject_New ( T_LC_DEFINE, 0, ( byte* ) word0->Name, 0, 0, 0, 0, 0, LISP, word0->W_RL_Index, word0->W_SC_Index ) ; //word0 was allocated COMPILER_TEMP or LISP_TEMP
 
-    CfrTil_WordList_Init ( word, 0 ) ;
+    CfrTil_WordList_Init (word) ;
     word->Definition = 0 ; // reset the definition from LO_Read
     value0 = _LO_Next ( idNode ) ;
-    _CfrTil_->CurrentWordBeingCompiled = word ;
+    _Context_->CurrentWordBeingCompiled = word ;
     word->Lo_CfrTilWord = word ;
     SetState ( lc, ( LC_DEFINE_MODE ), true ) ;
     Namespace_DoAddWord ( lc->LispDefinesNamespace, word ) ; // put it at the beginning of the list to be found first
@@ -45,7 +45,7 @@ _LO_MakeLambda ( ListObject * l0 )
 {
     ListObject *args, *body, *word, *lnew, *body0 ;
     // allow args to be optionally an actual parenthesized list or just vars after the lambda
-    if ( GetState ( _LC_, LC_DEFINE_MODE ) ) word = _CfrTil_->CurrentWordBeingCompiled ;
+    if ( GetState ( _LC_, LC_DEFINE_MODE ) ) word = _Context_->CurrentWordBeingCompiled ;
     else word = _Word_New ( ( byte* ) "<lambda>", WORD_CREATE, 0, 0, 0, 0, DICTIONARY ) ; // don't _Word_Add : must *not* be "lambda" else it will wrongly replace the lambda T_SPECIAL_FUNCTION word in LO_Find
     args = l0 ;
     body0 = _LO_Next ( l0 ) ;

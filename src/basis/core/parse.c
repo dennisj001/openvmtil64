@@ -251,7 +251,7 @@ _CfrTil_Parse_LocalsAndStackVariables ( int64 svf, int64 lispMode, ListObject * 
                     CfrTil_AddStringToSourceCode ( _CfrTil_, token ) ;
                 }
                 else token = _Lexer_LexNextToken_WithDelimiters ( lexer, 0, 1, 0, 1, LEXER_ALLOW_DOT ) ;
-                strncpy ( ( char* ) _CfrTil_->CurrentWordBeingCompiled->W_TypeSignatureString, ( char* ) token, 8 ) ;
+                strncpy ( ( char* ) _Context_->CurrentWordBeingCompiled->W_TypeSignatureString, ( char* ) token, 8 ) ;
                 continue ; // don't add a node to our temporary list for this token
             }
             if ( String_Equal ( ( char* ) token, "--" ) ) // || ( String_Equal ( ( char* ) token, "|-" ) == 0 ) || ( String_Equal ( ( char* ) token, "|--" ) == 0 ) )
@@ -320,7 +320,7 @@ _CfrTil_Parse_LocalsAndStackVariables ( int64 svf, int64 lispMode, ListObject * 
                 else 
                 {
                     word = DataObject_New ( ctype, 0, token, ctype, 0, 0, 0, 0, DICTIONARY, - 1, - 1 ) ;
-                    if ( _CfrTil_->CurrentWordBeingCompiled ) _CfrTil_->CurrentWordBeingCompiled->W_TypeSignatureString [numberOfVariables++] = '_' ;
+                    if ( _Context_->CurrentWordBeingCompiled ) _Context_->CurrentWordBeingCompiled->W_TypeSignatureString [numberOfVariables++] = '_' ;
                 }
                 if ( regFlag == true )
                 {

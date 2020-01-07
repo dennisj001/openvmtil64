@@ -172,7 +172,7 @@ TSI_Init ( TSI *tsi, Word* opWord )
     tsi->OpWordTypeSignature = opWord->W_TypeSignatureString ;
     tsi->TypeStackDepth = Stack_Depth ( tsi->TypeWordStack ) ; //depth ;
     tsi->TypeErrorStatus = false ;
-    tsi->WordBeingCompiled = Compiling ? _CfrTil_->CurrentWordBeingCompiled : 0 ;
+    tsi->WordBeingCompiled = Compiling ? _Context_->CurrentWordBeingCompiled : 0 ;
     return tsi ;
 }
 
@@ -226,27 +226,17 @@ _TypeMismatch_CheckError_Print ( Word * lvalueWord, Word *rvalueWord, Boolean qu
 }
 
 void
-TSI_TypeMismatchError_Print ( TSI *tsi )
-{
-    Word * lvalueWord = tsi->StackWord1, *rvalueWord = tsi->StackWord0 ;
-    _TypeMismatch_CheckError_Print ( lvalueWord, rvalueWord, 0 ) ;
-}
-
-void
 TSI_TypeStatus_Print ( TSI *tsi )
 {
-    if ( tsi->TypeErrorStatus & TSE_SIZE_MISMATCH ) TSI_TypeMismatchError_Print ( tsi ) ;
+    if ( tsi->TypeErrorStatus & TSE_SIZE_MISMATCH ) _TypeMismatch_CheckError_Print ( tsi->StackWord1, tsi->StackWord0, 0 ) ; //TSI_TypeMismatchError_Print ( tsi ) ;
     _Printf ( ( byte* ) "\n%s :: %s.%s :: type expected : %s :: type recorded : %s : at %s", tsi->TypeErrorStatus ? "apparent type mismatch" : "type match",
         tsi->OpWord->S_ContainingNamespace ? tsi->OpWord->S_ContainingNamespace->Name : ( byte* ) "<literal>",
         tsi->OpWord->Name, Word_ExpandTypeLetterSignature ( tsi->OpWord, 1 ), tsi->ActualTypeStackRecordingBuffer, Context_Location ( ) ) ;
-    //if ( GetState ( _CfrTil_, DBG_TYPECHECK_ON ) )
+    if ( GetState ( _CfrTil_, DBG_TYPECHECK_ON ) )
     {
         CfrTil_TypeStackPrint ( ) ;
-        //if ( _Q_->Verbosity > 1 ) 
         Pause ( ) ;
-        //byte * warning = "Apparent TypeMismatch : " ;
-        //Warning ( warning, Context_Location ( ), 0 ) ;
-    }
+     }
 }
 
 void
@@ -362,7 +352,7 @@ Tsi_ExpandTypeLetterCode ( byte typeCode, byte * buffer )
 void
 Word_TypeChecking_SetInfoForAnObject ( Word * word )
 {
-    Word * cwbc = _CfrTil_->CurrentWordBeingCompiled ;
+    Word * cwbc = _Context_->CurrentWordBeingCompiled ;
     cwbc->W_TypeSignatureString [word->Index - 1] = 'O' ;
     cwbc->W_TypeObjectsNamespaces [word->Index - 1] = word->TypeNamespace ;
 }

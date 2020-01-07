@@ -382,7 +382,7 @@ Debugger_ReturnStack ( Debugger * debugger )
 void
 Debugger_Source ( Debugger * debugger )
 {
-    Word * scWord = Compiling ? _CfrTil_->CurrentWordBeingCompiled : GetState ( debugger, DBG_STEPPING ) ?
+    Word * scWord = Compiling ? _Context_->CurrentWordBeingCompiled : GetState ( debugger, DBG_STEPPING ) ?
         Word_UnAlias ( Debugger_GetWordFromAddress ( debugger ) ) : _Context_->CurrentlyRunningWord ;
     _CfrTil_Source ( scWord, 0 ) ; //debugger->w_Word ? debugger->w_Word : _CfrTil_->DebugWordListWord, 0 ) ;
     SetState ( debugger, DBG_INFO, true ) ;

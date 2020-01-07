@@ -218,8 +218,7 @@ _CompileOptimizeInfo_New ( uint64 type )
 CompileOptimizeInfo *
 CompileOptimizeInfo_New ( uint64 type )
 {
-    CompileOptimizeInfo * optInfo =
-        optInfo = _CompileOptimizeInfo_New ( type ) ;
+    CompileOptimizeInfo * optInfo = optInfo = _CompileOptimizeInfo_New ( type ) ;
     return optInfo ;
 }
 
@@ -283,7 +282,7 @@ CfrTil_SaveDebugInfo ( Word * word )
 }
 
 void
-CfrTil_DeleteDebugInfo ( Word * word )
+CfrTil_DeleteDebugInfo ()
 {
     Compiler * compiler = _Compiler_ ;
     if ( compiler->NumberOfVariables )
@@ -291,17 +290,16 @@ CfrTil_DeleteDebugInfo ( Word * word )
         Namespace_RemoveAndClearNamespacesStack ( compiler->LocalsCompilingNamespacesStack ) ;
         _Namespace_RemoveFromUsingListAndClear ( compiler->LocalsNamespace ) ;
     }
-    if ( ! _CfrTil_->CurrentWordBeingCompiled ) _CfrTil_RecycleInit_Compiler_N_M_Node_WordList ( ) ;
+    if ( ! _Context_->CurrentWordBeingCompiled ) _CfrTil_RecycleInit_Compiler_N_M_Node_WordList ( ) ;
 }
 
 void
-_CfrTil_FinishWordDebugInfo ( Word * word, Boolean flag )
+_CfrTil_FinishWordDebugInfo ()
 {
     //Compiler * compiler = _Compiler_ ;
     //if ( compiler->NumberOfVariables || GetState ( _CfrTil_, ( RT_DEBUG_ON | GLOBAL_SOURCE_CODE_MODE ) ) )
     //    CfrTil_SaveDebugInfo ( ) ;
-    if ( flag || ( ! GetState ( _CfrTil_, ( RT_DEBUG_ON | GLOBAL_SOURCE_CODE_MODE ) ) ) )
-        CfrTil_DeleteDebugInfo ( 0 ) ;
+    if ( ! GetState ( _CfrTil_, ( RT_DEBUG_ON | GLOBAL_SOURCE_CODE_MODE ) ) ) CfrTil_DeleteDebugInfo () ;
     else CfrTil_SaveDebugInfo ( 0 ) ;
 }
 

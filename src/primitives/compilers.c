@@ -158,7 +158,7 @@ CfrTil_Return ( )
         _Compiler_->ReturnVariableWord = word ;
         if ( GetState ( _CfrTil_, TYPECHECK_ON ) )
         {
-            Word * cwbc = _CfrTil_->CurrentWordBeingCompiled ;
+            Word * cwbc = _Context_->CurrentWordBeingCompiled ;
             if ( ( word->CAttribute & LOCAL_VARIABLE ) && cwbc )
             {
                 cwbc->W_TypeSignatureString [_Compiler_->NumberOfArgs] = '.' ;
@@ -276,5 +276,5 @@ CfrTil_CompileMode ( )
 void
 CfrTil_FinishWordDebugInfo ( )
 {
-    _CfrTil_FinishWordDebugInfo (0, 0 ) ;
+    _CfrTil_FinishWordDebugInfo () ;
 }

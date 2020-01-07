@@ -64,18 +64,8 @@ CfrTil_PokeRegAtAddress ( ) // @
 }
 
 void
-_CfrTil_Move ( int64 * address, int64 value, Word * lvalueWord, Word * rvalueWord ) //int64 lvalueSize, int64 rvalueSize )
+_CfrTil_Move ( int64 * address, int64 value, Word * lvalueWord, Word * rvalueWord ) 
 {
-#if 0    
-    //if ( (lvalueSize > 0) && (( value > 2147483647 ) && (rvalueSize > lvalueSize)) ) // for C internal address size may be 0
-    int64 lvalueSize = lvalueWord->ObjectByteSize, rvalueSize = rvalueWord->ObjectByteSize ;
-    if ( (lvalueSize > 0 ) && (rvalueSize > lvalueSize) ) // for C internal lvalue size may be 0
-    {    
-        byte * b = Buffer_Data ( _CfrTil_->ScratchB1 ) ;
-        sprintf ( ( char* ) b, "Wrong data sizes :: lvalue size == %ld : rvalue size == %ld", lvalueSize, rvalueSize ) ;
-        Error ( "\nType Error", b, QUIT ) ;
-    }
-#endif    
     int64 lvalueSize = lvalueWord->ObjectByteSize ; //, rvalueSize = rvalueWord->ObjectByteSize ;
     if ( ! _TypeMismatch_CheckError_Print ( lvalueWord, rvalueWord, 1 ) )
     {
@@ -94,7 +84,7 @@ _CfrTil_Move ( int64 * address, int64 value, Word * lvalueWord, Word * rvalueWor
             {
                 if ( value > 65535 )
                 {
-                    Error ( "\nType Error", "value is greater than 65535 - sizeof (int32)", QUIT ) ;
+                    Error ( "\nType Error", "value is greater than 65535 - sizeof (int16)", QUIT ) ;
                 }
                 else * ( int16* ) address = ( int16 ) value ;
                 break ;
@@ -103,7 +93,7 @@ _CfrTil_Move ( int64 * address, int64 value, Word * lvalueWord, Word * rvalueWor
             {
                 if ( value > 2147483647 )
                 {
-                    Error ( "\nType Error", "value is greater than 4294967295 - sizeof (int32)", QUIT ) ;
+                    Error ( "\nType Error", "value is greater than 2147483647 - sizeof (int32)", QUIT ) ;
                 }
                 else * ( int32* ) address = ( int32 ) value ;
                 break ;

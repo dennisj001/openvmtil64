@@ -134,7 +134,8 @@ CfrTil_TurnOffBlockCompiler ( )
     _CfrTil_RemoveNamespaceFromUsingListAndClear ( ( byte* ) "__labels__" ) ;
     //Compiler_FreeAllLocalsNamespaces ( compiler ) ;
     SetState ( compiler, COMPILE_MODE | VARIABLE_FRAME, false ) ;
-    _CfrTil_->CurrentWordBeingCompiled = 0 ;
+    _Context_->LastCompiledWord = _Context_->CurrentWordBeingCompiled ;
+    _Context_->CurrentWordBeingCompiled = 0 ;
 }
 
 void
@@ -159,7 +160,7 @@ _CfrTil_BeginBlock0 ( )
     if ( ( ! CompileMode ) || ( ! Compiler_BlockLevel ( compiler ) ) )// first block
     {
         CheckCodeSpaceForRoom ( ) ;
-        _CfrTil_->CurrentWordBeingCompiled = compiler->CurrentCreatedWord ;
+        _Context_->CurrentWordBeingCompiled = compiler->CurrentCreatedWord ;
         CfrTil_TurnOnBlockCompiler ( ) ;
     }
     compiler->LHS_Word = 0 ;
@@ -199,17 +200,11 @@ _CfrTil_BeginBlock2 ( BlockInfo * bi )
 }
 
 void
-_CfrTil_BeginBlock ( Boolean compileJumpFlag, byte * here )
+CfrTil_BeginBlock ()
 {
     BlockInfo * bi = _CfrTil_BeginBlock0 ( ) ;
     _CfrTil_BeginBlock1 ( bi ) ;
     _CfrTil_BeginBlock2 ( bi ) ;
-}
-
-void
-CfrTil_BeginBlock ( )
-{
-    _CfrTil_BeginBlock ( 1, 0 ) ;
 }
 
 void

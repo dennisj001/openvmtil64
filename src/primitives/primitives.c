@@ -479,7 +479,7 @@ CPrimitive CPrimitives [] = {
     { "tm:", 0, 0, 0, CfrTil_TextMacro, 0, 0, 0, "Macro", "Root" },
 
     { "name", 0, 0, 0, Word_Name, CATEGORY_OP_STACK, 0, 0, "Word", "Root" },
-    { "create", 0, 0, 0, CfrTil_Word_Create, 0, 0, 0, "Word", "Root" },
+    { "wordNew", 0, 0, 0, CfrTil_Word_New, 0, 0, 0, "Word", "Root" },
     { "wNamespace", 0, 0, 0, Word_Namespace, CATEGORY_OP_STACK, 0, 0, "Word", "Root" },
     { "wordEval", 0, 0, 0, CfrTil_Word_Eval, 0, 0, 0, "Word", "Root" },
     { "wordRun", 0, 0, 0, CfrTil_Word_Run, 0, 0, 0, "Word", "Root" },

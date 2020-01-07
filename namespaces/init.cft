@@ -142,13 +142,13 @@ Interpreter
 "end" ' _end find alias immediate
 "}" ' end find alias keyword
 "xt@" { xt @ } word immediate // ' definition alias immediate
-"_semi" create { xt= wordFinish } xt= wordFinish 
-"semi" create { _end _semi } _semi 
+"_semi" wordNew { xt= wordFinish } xt= wordFinish 
+"semi" wordNew { _end _semi } _semi 
 ";" ' semi find alias immediate syntactic
-: word swap create swap _semi ;  //'word wordDisassemble pause
-//: word ( name block ) name @ create block @ _semi ;  // works but it is 10 bytes more code
+: word swap wordNew swap _semi ;  //'word wordDisassemble pause
+//: word ( name block ) name @ wordNew block @ _semi ;  // works but it is 10 bytes more code
 //'word find wdis //pause
-":" { compileModeOn sourceCodeInit token create begin } word // immediate // begin is not an immediate word
+":" { compileModeOn sourceCodeInit token wordNew begin } word // immediate // begin is not an immediate word
 
 C
 : ;; semi _prefix ; immediate syntactic
@@ -436,7 +436,7 @@ stringMacrosOff
 #if doInitTest
 // startup test code here ...
 #if tcOnv @
-//tc //demo
+//tc demo
 //fload nt.cft
 //mct
 //#elif 1

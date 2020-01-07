@@ -42,7 +42,7 @@ C_Syntax.factoriali (7) dup p 5040 _assert //pause //sp
     fac @ 
 ;
 7 factorial dup p 5040 _assert
-: qexp dup 1 <= if{ }else{ dup -- qexp * }fi ; 7 qexp dup p 5040 _assert
+: qexp dup 1 <= if{ }else{ dup -- qexp * }fi ; 7 qexp dup p 5040 _assert 'qexp find wdiss
 : qexp2 dup 1 <= ?< >:< dup -- qexp2 * >? ; 7 qexp2 dup p 5040 _assert
 
 : bexp ( n ) n @ 1 > if{ n @ dup -- bexp * }else{ 1 }fi ; 7 bexp dup p 5040 _assert

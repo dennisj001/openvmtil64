@@ -796,8 +796,8 @@ typedef struct
     byte * Location ;
     byte * DefaultTokenDelimiters ;
     byte * DefaultDelimiterCharSet ;
-    Word * CurrentlyRunningWord, *LastRunWord, *CurrentTokenWord, *CurrentEvalWord, *LastEvalWord, *NlsWord, *SC_CurrentCombinator, *SourceCodeWord, *CurrentDisassemblyWord ;
-    Word * LastCompiledWord ;
+    Word * CurrentlyRunningWord, *LastRunWord, *CurrentTokenWord, *CurrentEvalWord, *LastEvalWord, *NlsWord ;
+    Word * SC_CurrentCombinator, *SourceCodeWord, *CurrentDisassemblyWord, * LastCompiledWord, *CurrentWordBeingCompiled ;
     block CurrentlyRunningWordDefinition ;
     dllist * PreprocessorStackList ;
     NBA * ContextNba ;
@@ -873,7 +873,7 @@ typedef struct _CfrTil
     block CurrentBlock, SaveCpuState, SaveCpu2State, RestoreCpuState, RestoreCpu2State, Set_DspReg_FromDataStackPointer, Set_DataStackPointer_FromDspReg ; //, PeekReg, PokeReg ;
     block PopDspToR8AndCall, CallReg_TestRSP, Call_ToAddressThruR8_TestAlignRSP ; //adjustRSPAndCall, adjustRSP ;
     ByteArray * PeekPokeByteArray ;
-    Word * LastFinished_DObject, * LastFinished_Word, *StoreWord, *PokeWord, *RightBracket, *ScoOcCrw, * CurrentWordBeingCompiled ;
+    Word * LastFinished_DObject, * LastFinished_Word, *StoreWord, *PokeWord, *RightBracket, *ScoOcCrw ;
     Word *ScWord, *DebugWordListWord, *EndBlockWord, *BeginBlockWord, *InfixNamespace ;
     byte ReadLine_CharacterTable [ 256 ], * OriginalInputLine, * TokenBuffer, * SC_Buffer ; // nb : keep this here -- if we add this field to Lexer it just makes the lexer bigger and we want the smallest lexer possible
     ReadLineFunction ReadLine_FunctionTable [ 24 ] ;
