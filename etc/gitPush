@@ -1,6 +1,6 @@
 git add .
 git rm --cached *.o
-git rm --cached netbeans/*.*
-git rm --cached netbeans/private/*.*
+git rm --cached nbproject/*	
+git rm --cached nbproject/private/*.*
 git commit .
 git push
