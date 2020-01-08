@@ -36,7 +36,6 @@ _LO_Define ( ListObject * idNode, ListObject * locals )
     SetState ( lc, ( LC_DEFINE_MODE ), false ) ;
     l1->W_SourceCode = word->W_SourceCode = lc->LC_SourceCode ;
     _Word_Finish ( l1 ) ;
-    Compiler_Init (_Context_->Compiler0, 0, 0) ; // we could be compiling a cfrTil word as in oldLisp.cft
     return l1 ;
 }
 
@@ -410,6 +409,7 @@ _LO_CfrTil ( ListObject * lfirst )
         //LC_RestoreStack ( ) ;
     }
     Namespace_DoNamespace_Name ( ( byte * ) "Lisp" ) ;
+    Compiler_Init ( compiler, 0, 0) ;
     return nil ;
 }
 

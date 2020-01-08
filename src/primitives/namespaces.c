@@ -118,7 +118,7 @@ _CfrTil_Namespace_NotUsing ( byte * name )
     if ( ns )
     {
         _Namespace_RemoveFromUsingList ( ns ) ;
-        _CfrTil_->InNamespace = _Namespace_FirstOnUsingList ( ) ; //( Namespace* ) _Tree_Map_FromANode ( dlnode_Next ( ( dlnode* ) ns ), ( cMapFunction_1 ) _Namespace_IsUsing ) ;
+        _Namespace_ResetFromInNamespace ( ns ) ;
     }
 }
 
@@ -139,7 +139,7 @@ CfrTil_Namespace_UsingFirst ( )
 void
 CfrTil_Namespace_UsingLast ( )
 {
-    _Namespace_UsingLast ( ( byte* ) DataStack_Pop ( ) ) ;
+    _Namespace_SetAs_UsingLast ( ( byte* ) DataStack_Pop ( ) ) ;
 }
 
 // "in"
@@ -365,20 +365,20 @@ Namespace_RemoveAndClearNamespacesStack ( Stack * stack )
     }
 }
 
+#if 0
 void
 Namespace_NamespacesStack_PrintWords ( Stack * stack )
 {
     if ( stack )
     {
-        int64 i = 0, n = Stack_Depth ( stack ) ;
-        do
+        int64 n ;
+        for ( n = Stack_Depth ( stack ) ; n > 0 ; n -- )
         {
-            Namespace * ns = ( Namespace* ) stack->StackPointer [i] ;
-            if ( ns ) _Namespace_RemoveFromUsingListAndClear ( ns ) ;
+            Namespace * ns = stack->StackPointer [n] ; //( Namespace* ) Stack_Pop ( stack ) ;
+            //if ( ns ) _Namespace_RemoveFromUsingListAndClear ( ns ) ;
             n -- ;
         }
-        while ( n >= 0 ) ;
     }
 }
-
+#endif
 

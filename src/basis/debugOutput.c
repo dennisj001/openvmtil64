@@ -565,7 +565,7 @@ _Debugger_DoState ( Debugger * debugger )
     else if ( GetState ( debugger, DBG_PROMPT ) ) Debugger_ShowState ( debugger, GetState ( debugger, DBG_RUNTIME ) ? ( byte* ) "<dbg>" : ( byte* ) "dbg" ) ;
 
     //if ( GetState ( debugger, DBG_NEWLINE ) && ( ! GetState ( debugger, DBG_INFO ) ) ) _Debugger_DoNewlinePrompt ( debugger ) ;
-    if ( GetState ( debugger, DBG_STEPPING | DBG_CONTINUE_MODE ) ) //&& ( ! GetState ( debugger, DBG_INFO ) ) )
+    else if ( GetState ( debugger, DBG_STEPPING | DBG_CONTINUE_MODE ) ) //&& ( ! GetState ( debugger, DBG_INFO ) ) )
     {
         if ( GetState ( debugger, DBG_START_STEPPING ) ) _Printf ( ( byte* ) "\n ... Next stepping instruction ..." ) ;
         SetState ( debugger, DBG_START_STEPPING, false ) ;

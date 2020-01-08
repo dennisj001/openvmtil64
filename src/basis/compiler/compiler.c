@@ -7,7 +7,9 @@
 Word *
 _CopyDuplicateWord ( Word * word0, Boolean complete )
 {
-    Word * wordc = Word_Copy ( word0, DICTIONARY ) ; // use DICTIONARY since we are recycling these anyway
+    Word * wordc ;
+    word0->W_WordListOriginalWord = word0 ;
+    wordc = Word_Copy ( word0, DICTIONARY ) ; // use DICTIONARY since we are recycling these anyway
     _dlnode_Init ( ( dlnode * ) wordc ) ; // necessary!
     wordc->CAttribute2 |= ( uint64 ) RECYCLABLE_COPY ;
     if ( complete )
@@ -31,10 +33,19 @@ Word *
 _CfrTil_CopyDuplicates ( Word * word0 )
 {
     Word * word1, *wordToBePushed ;
-    word0->W_WordListOriginalWord = word0 ;
-    word0->CAttribute2 &= ( ~ RECYCLABLE_COPY ) ;
+    //word0->W_WordListOriginalWord = word0 ;
+    //word0->CAttribute2 &= ( ~ RECYCLABLE_COPY ) ;
+#if 0   
+    if ( ( RT_DEBUG_ON | DEBUG_SOURCE_CODE_MODE | GLOBAL_SOURCE_CODE_MODE ) && 
+        ( ! ( GetState ( _Compiler_, LC_CFRTIL ) ) ) ) word1 = _CopyDuplicateWord ( word0, 1 ) ;
+    else 
+#endif        
     word1 = ( Word * ) dllist_Map1_WReturn ( _CfrTil_->Compiler_N_M_Node_WordList, ( MapFunction1 ) CopyDuplicateWord, ( int64 ) word0 ) ;
-    if ( word1 ) wordToBePushed = word1 ;
+    if ( word1 ) 
+    {
+        if ( word1->W_WordListOriginalWord ) word1->W_SC_WordList = word1->W_WordListOriginalWord->W_SC_WordList ;
+        wordToBePushed = word1 ;
+    }
     else wordToBePushed = word0 ; // no duplicate found push word0
     return wordToBePushed ;
 }
@@ -55,23 +66,6 @@ Compiler_CopyDuplicatesAndPush ( Word * word0, int64 tsrli, int64 scwi )
         CfrTil_WordList_PushWord ( wordp ) ;
     }
     return wordp ;
-}
-
-void
-Compiler_Word_SetCoding_And_ClearPreviousUseOf_A_SCA ( Word * word, byte * coding, Boolean clearPreviousFlag )
-{
-    //if ( GetState ( _Compiler_, LISP_MODE ) && ( ! GetState ( _LC_, LC_COMPILE_MODE ) ) ) return ; 
-    if ( Compiling && word )
-    {
-        if ( clearPreviousFlag ) dllist_Map1_FromEnd ( _CfrTil_->Compiler_N_M_Node_WordList, ( MapFunction1 ) SC_ListClearAddress, ( int64 ) coding ) ; //dllist_Map1_FromEnd ( _CfrTil_->CompilerWordList, ( MapFunction1 ) SC_ListClearAddress, ( int64 ) Here ) ; //( int64 ) word, ( int64 ) Here ) ;
-        Word_SetCodingAndSourceCoding ( word, coding ) ;
-    }
-}
-
-void
-Compiler_SCA_Word_SetCodingHere_And_ClearPreviousUse ( Word * word, Boolean clearPreviousFlag )
-{
-    Compiler_Word_SetCoding_And_ClearPreviousUseOf_A_SCA ( word, Here, clearPreviousFlag ) ;
 }
 
 void
@@ -249,12 +243,12 @@ Compiler_Init_AccumulatedOffsetPointers ( Compiler * compiler, Word * word )
 void
 CfrTil_SaveDebugInfo ( Word * word, uint64 allocType )
 {
-    if ( ! allocType ) allocType = CFRTIL ; // COMPILER_TEMP ;
     Compiler * compiler = _Compiler_ ;
+    if ( ! allocType ) allocType = CFRTIL ; // COMPILER_TEMP ;
     word = word ? word : _CfrTil_->LastFinished_Word ;
     if ( compiler->NumberOfVariables )
     {
-        word->NamespaceStack = Stack_Copy ( compiler->LocalsCompilingNamespacesStack, allocType ) ; 
+        word->NamespaceStack = Stack_Copy ( compiler->LocalsCompilingNamespacesStack, allocType ) ;
         Namespace_RemoveNamespacesStack ( compiler->LocalsCompilingNamespacesStack ) ;
     }
     Stack_Init ( compiler->LocalsCompilingNamespacesStack ) ;
@@ -262,7 +256,7 @@ CfrTil_SaveDebugInfo ( Word * word, uint64 allocType )
     {
         word->W_SC_WordList = _CfrTil_->Compiler_N_M_Node_WordList ;
         _CfrTil_->Compiler_N_M_Node_WordList = _dllist_New ( allocType ) ;
-        //Namespace_NamespacesStack_PrintWords ( _CfrTil_->CurrentWordBeingCompiled->NamespaceStack ) ;
+        if ( Is_DebugOn ) Compiler_WordList_Show ( word, 0, 0, 0 ) ;
     }
     else List_Init ( _CfrTil_->Compiler_N_M_Node_WordList ) ;
 

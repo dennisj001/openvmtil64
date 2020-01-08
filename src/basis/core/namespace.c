@@ -3,23 +3,11 @@
 /*
  * cfrTil namespaces basic understandings :
  * 0. to allow for ordered search thru lists in use ...
- * 1. Namespaces are also linked on the _Context->System0->Namespaces list with status of USING or NOT_USING
+ * 1. Namespaces are also linked on the _CfrTil_->Namespaces list with status of USING or NOT_USING
  *      and are moved the front or back of that list if status is set to USING with the 'Symbol node'
  *      This list is ordered so we can set an order to our search thru the namespaces in use. As usual
  *      the first word found within the ordered USING list will be used.
  */
-
-void
-_Namespace_SetAsInNamespace ( Namespace * ns )
-{
-    _CfrTil_->InNamespace = ns ;
-}
-
-void
-_Namespace_ResetFromInNamespace ( Namespace * ns )
-{
-    if ( ns == _CfrTil_->InNamespace ) _CfrTil_->InNamespace = _Namespace_FirstOnUsingList ( ) ; //( Namespace* ) dllist_First ( (dllist*) _CfrTil_->Namespaces->W_List ) ;
-}
 
 void
 _Namespace_DoAddSymbol ( Namespace * ns, Symbol * symbol )
@@ -55,34 +43,98 @@ _Namespace_AddToNamespacesHead ( Namespace * ns )
 }
 
 void
-_Namespace_AddToNamespacesHead_SetAsInNamespace ( Namespace * ns )
-{
-    _Namespace_AddToNamespacesHead ( ns ) ;
-    _Namespace_SetAsInNamespace ( ns ) ;
-}
-
-void
-Namespace_AddToNamespaces_SetUsing ( Namespace * ns, Boolean headFlag, Boolean usingFlag )
-{
-    if ( ns )
-    {
-        if ( headFlag ) _Namespace_AddToNamespacesHead ( ns ) ;
-        else _Namespace_AddToNamespacesTail ( ns ) ;
-        _Namespace_SetState ( ns, usingFlag ? USING : NOT_USING ) ;
-    }
-}
-
-void
 _Namespace_AddToNamespacesTail ( Namespace * ns )
 {
     dllist_AddNodeToTail ( _CfrTil_->Namespaces->W_List, ( dlnode* ) ns ) ;
 }
 
 void
-_Namespace_AddToNamespacesTail_ResetFromInNamespace ( Namespace * ns )
+Namespace_DoNamespace ( Namespace * ns, Boolean isForwardDotted )
 {
-    _Namespace_AddToNamespacesTail ( ns ) ;
-    _Namespace_ResetFromInNamespace ( ns ) ;
+    Context * cntx = _Context_ ;
+    if ( ( ! CompileMode ) || GetState ( cntx, C_SYNTAX | LISP_MODE ) )
+    {
+        if ( ! isForwardDotted ) _Namespace_ActivateAsPrimary ( ns ) ;
+        else Finder_SetQualifyingNamespace ( cntx->Finder0, ns ) ;
+        if ( ! GetState ( cntx->Compiler0, ( LC_ARG_PARSING | ARRAY_MODE ) ) ) cntx->Interpreter0->BaseObject = 0 ;
+    }
+    else if ( ( ! isForwardDotted ) && ( ! GetState ( cntx->Compiler0, LC_ARG_PARSING ) ) )
+    {
+        _Compile_C_Call_1_Arg ( ( byte* ) _Namespace_DoNamespace, ( int64 ) ns ) ;
+    }
+}
+
+void
+_CfrTil_SetAsInNamespace ( Namespace * ns )
+{
+    _CfrTil_->InNamespace = ns ;
+}
+
+void
+_Namespace_AddToNamespacesHead_SetAsInNamespace ( Namespace * ns )
+{
+    _Namespace_AddToNamespacesHead ( ns ) ;
+    _CfrTil_SetAsInNamespace ( ns ) ;
+}
+
+Namespace *
+_CfrTil_Namespace_InNamespaceSet ( Namespace * ns )
+{
+    if ( ns )
+    {
+        _Namespace_SetState ( ns, USING ) ;
+        _Namespace_AddToNamespacesHead_SetAsInNamespace ( ns ) ;
+    }
+    return ns ;
+}
+
+Namespace *
+CfrTil_Namespace_InNamespaceSet ( byte * name )
+{
+    Namespace * ns = Namespace_Find ( name ) ;
+    _CfrTil_Namespace_InNamespaceSet ( ns ) ;
+    return ns ;
+}
+
+Namespace *
+_CfrTil_Namespace_InNamespaceGet ( )
+{
+    if ( _CfrTil_->Namespaces && ( ! _CfrTil_->InNamespace ) )
+    {
+        _CfrTil_Namespace_InNamespaceSet ( _Namespace_FirstOnUsingList ( ) ) ; //( Namespace* ) _Tree_Map_FromANode ( ( dlnode* ) _CfrTil_->Namespaces, ( cMapFunction_1 ) _Namespace_IsUsing ) ;
+    }
+    return _CfrTil_->InNamespace ;
+}
+
+Namespace *
+_CfrTil_InNamespace ( )
+{
+    Namespace * ins ;
+    if ( ( ins = Finder_GetQualifyingNamespace ( _Context_->Finder0 ) ) ) return ins ;
+    else return _CfrTil_Namespace_InNamespaceGet ( ) ;
+}
+
+Boolean
+_CfrTil_IsContainingNamespace ( byte * name, byte * namespaceName )
+{
+    Word * word = _Finder_Word_Find ( _Finder_, USING, name ) ;
+    if ( word && String_Equal ( ( char* ) word->ContainingNamespace->Name, namespaceName ) ) return true ;
+    else return false ;
+}
+
+void
+_Namespace_DoNamespace ( Namespace * ns )
+{
+    Context * cntx = _Context_ ;
+    if ( ! Lexer_IsTokenForwardDotted ( cntx->Lexer0 ) ) _Namespace_ActivateAsPrimary ( ns ) ;
+    else Finder_SetQualifyingNamespace ( cntx->Finder0, ns ) ;
+    if ( ! GetState ( cntx->Compiler0, ( LC_ARG_PARSING | ARRAY_MODE ) ) ) cntx->Interpreter0->BaseObject = 0 ;
+}
+
+void
+Namespace_DoNamespace_Name ( byte * name )
+{
+    Namespace_DoNamespace ( Namespace_Find ( name ), 0 ) ;
 }
 
 Boolean
@@ -102,34 +154,8 @@ Namespace_IsUsing ( byte * name )
 void
 _Namespace_SetState ( Namespace * ns, uint64 state )
 {
-    //if ( String_Equal ( ns->Name, "a")) 
-    //    _Printf ((byte*) "") ;
-    ns->State = state ;
-}
-
-void
-Namespace_SetState ( Namespace * ns, uint64 state )
-{
-    if ( ns )
-    {
-        d0 ( if ( Is_DebugModeOn )
-        {
-            //CfrTil_Namespaces_PrettyPrintTree ( ) ;
-            //CfrTil_Using ( ) ;
-            _Printf ( ( byte* ) "\n\nNamespace : %s :: Before _Namespace_SetState : \n\t", ns->Name ) ;
-                _List_PrintNames ( _CfrTil_->Namespaces->W_List, 5, 0 ) ;
-        } ) ;
-        _Namespace_SetState ( ns, state ) ;
-        if ( state & USING ) _Namespace_AddToNamespacesHead_SetAsInNamespace ( ns ) ; // make it first on the list
-        else _Namespace_AddToNamespacesTail_ResetFromInNamespace ( ns ) ;
-        d0 ( if ( Is_DebugModeOn )
-        {
-            //CfrTil_Namespaces_PrettyPrintTree ( ) ;
-            //CfrTil_Using ( ) ;
-            _Printf ( ( byte* ) "\n\nNamespace : %s :: After _Namespace_SetState : \n\t", ns->Name ) ;
-                _List_PrintNames ( _CfrTil_->Namespaces->W_List, 5, 0 ) ;
-        } ) ;
-    }
+    if ( state == USING ) SetState_TrueFalse ( ns, USING, NOT_USING ) ;
+    else SetState_TrueFalse ( ns, NOT_USING, USING ) ;
 }
 
 Word *
@@ -142,6 +168,41 @@ _Namespace_FirstOnUsingList ( )
         if ( Is_NamespaceType ( ns ) && ( ns->State & USING ) ) return ns ;
     }
     return 0 ;
+}
+
+void
+_Namespace_ResetFromInNamespace ( Namespace * ns )
+{
+    if ( ns == _CfrTil_->InNamespace ) _CfrTil_SetAsInNamespace ( _Namespace_FirstOnUsingList ( ) ) ; //( Namespace* ) dllist_First ( (dllist*) _CfrTil_->Namespaces->W_List ) ;
+}
+
+void
+_Namespace_AddToNamespacesTail_ResetFromInNamespace ( Namespace * ns )
+{
+    _Namespace_AddToNamespacesTail ( ns ) ;
+    _Namespace_ResetFromInNamespace ( ns ) ;
+}
+
+void
+Namespaces_PrintList ( Namespace * ns, byte * insert )
+{
+    //CfrTil_Namespaces_PrettyPrintTree ( ) ;
+    //CfrTil_Using ( ) ;
+    _Printf ( ( byte* ) "\n\nNamespace : %s :: %s _Namespace_SetState : \n\t", ns->Name, insert ) ;
+    _List_PrintNames ( _CfrTil_->Namespaces->W_List, 5, 0 ) ;
+}
+
+void
+Namespace_SetState ( Namespace * ns, uint64 state )
+{
+    if ( ns )
+    {
+        d0 ( if ( Is_DebugModeOn ) Namespaces_PrintList ( ns, "Before" ) ) ;
+        _Namespace_SetState ( ns, state ) ;
+        if ( state == USING ) _Namespace_AddToNamespacesHead_SetAsInNamespace ( ns ) ; // make it first on the list
+        else _Namespace_AddToNamespacesTail_ResetFromInNamespace ( ns ) ;
+        d0 ( if ( Is_DebugModeOn ) Namespaces_PrintList ( ns, "After" ) ) ;
+    }
 }
 
 void
@@ -179,9 +240,9 @@ _Namespace_ActivateAsPrimary ( Namespace * ns )
     {
         Finder_SetQualifyingNamespace ( _Context_->Finder0, ns ) ;
         _Namespace_AddToUsingList ( ns ) ;
-        _CfrTil_->InNamespace = ns ;
+        _CfrTil_SetAsInNamespace ( ns ) ;
         _Context_->Interpreter0->BaseObject = 0 ;
-     }
+    }
 }
 
 void
@@ -199,18 +260,28 @@ Namespace_MoveToTail ( byte * name )
 }
 
 void
+_Namespace_SetAsNotUsing ( Namespace * ns )
+{
+    if ( ns )
+    {
+        _Namespace_SetState ( ns, NOT_USING ) ;
+        _Namespace_ResetFromInNamespace ( ns ) ;
+    }
+}
+
+void
 Namespace_SetAsNotUsing ( byte * name )
 {
     Namespace * ns = Namespace_Find ( name ) ;
-    if ( ns ) SetState_TrueFalse ( ns, NOT_USING, USING ) ;
-    if ( _CfrTil_->InNamespace == ns ) _CfrTil_->InNamespace = 0 ;
+    _Namespace_SetAsNotUsing ( ns ) ;
 }
 
 void
 _Namespace_SetAsNotUsing_MoveToTail ( Namespace * ns )
 {
-    SetState_TrueFalse ( ns, NOT_USING, USING ) ;
-    _Namespace_AddToNamespacesTail_ResetFromInNamespace ( ns ) ;
+    //_Namespace_AddToNamespacesTail_ResetFromInNamespace ( ns ) ;
+    _Namespace_SetAsNotUsing ( ns ) ;
+    _Namespace_AddToNamespacesTail ( ns ) ;
 }
 
 void
@@ -218,6 +289,74 @@ Namespace_SetAsNotUsing_MoveToTail ( byte * name )
 {
     Namespace * ns = Namespace_Find ( name ) ;
     _Namespace_SetAsNotUsing_MoveToTail ( ns ) ;
+}
+
+void
+_Namespace_SetAs_UsingLast ( byte * name )
+{
+    _Namespace_AddToNamespacesTail_ResetFromInNamespace ( Namespace_Find ( name ) ) ;
+}
+
+// this is simple, for more complete use _Namespace_RemoveFromSearchList
+// removes all namespaces dependant on 'ns', the whole dependancy tree from the 'ns' root
+
+void
+_RemoveSubNamespacesFromUsingList ( Symbol * symbol, Namespace * ns )
+{
+    Namespace * ns1 = ( Namespace* ) symbol ;
+    // if ns contains ns1 => ns1 is dependent on ns ; we are removing ns => we have to remove ns1
+    if ( ( ns1->CAttribute & NAMESPACE_TYPE ) && ( ns1->ContainingNamespace == ns ) )
+    {
+        _Namespace_RemoveFromUsingList ( ns1 ) ;
+    }
+}
+
+void
+_Namespace_RemoveFromUsingList ( Namespace * ns )
+{
+    _Namespace_SetAsNotUsing_MoveToTail ( ns ) ;
+    _Namespace_MapUsing_2Args ( ( MapSymbolFunction2 ) _RemoveSubNamespacesFromUsingList, ( int64 ) ns, 0 ) ;
+}
+
+void
+Namespace_RemoveFromUsingList ( byte * name )
+{
+    Namespace * ns = Namespace_Find ( name ) ;
+    if ( String_Equal ( ns->Name, "System" ) ) _Printf ( ( byte* ) "\n\nSystem namespace being cleared %s", Context_Location ( ) ) ;
+    if ( ns ) _Namespace_RemoveFromUsingList ( ns ) ;
+}
+
+void
+Namespace_MoveToFirstOnUsingList ( byte * name )
+{
+    _Namespace_AddToUsingList ( Namespace_Find ( name ) ) ; // so it will be first on the list where Find will find it first
+}
+
+void
+Namespace_RemoveFromUsingList_WithCheck ( byte * name )
+{
+    if ( ! String_Equal ( "Root", ( char* ) name ) )
+    {
+        Namespace_RemoveFromUsingList ( name ) ;
+    }
+    else Throw ( ( byte* ) "Namespace_RemoveFromUsingList_WithCheck", ( byte* ) "Error : can't remove Root namespace", QUIT ) ;
+}
+
+void
+_Namespace_Clear ( Namespace * ns )
+{
+    if ( ns )
+    {
+        DLList_Recycle_NamespaceList ( ns->W_List ) ;
+        DLList_RemoveWords ( ns->W_List ) ;
+        _dllist_Init ( ns->W_List ) ;
+    }
+}
+
+void
+Namespace_Clear ( byte * name )
+{
+    _Namespace_Clear ( _Namespace_Find ( name, 0, 0 ) ) ;
 }
 
 int64
@@ -240,103 +379,10 @@ _Namespace_VariableValueSet ( Namespace * ns, byte * name, int64 value )
 }
 
 Namespace *
-_CfrTil_Namespace_InNamespaceSet ( Namespace * ns )
+Namespace_New ( byte * name, Namespace * containingNs )
 {
-    if ( ns )
-    {
-        SetState ( ns, USING, true ) ;
-        _Namespace_AddToNamespacesHead_SetAsInNamespace ( ns ) ;
-    }
+    Namespace * ns = DataObject_New ( NAMESPACE, 0, name, NAMESPACE, 0, 0, 0, ( int64 ) containingNs, 0, 0, - 1 ) ;
     return ns ;
-}
-
-Namespace *
-CfrTil_Namespace_InNamespaceSet ( byte * name )
-{
-    Namespace * ns = Namespace_Find ( name ) ;
-    _CfrTil_Namespace_InNamespaceSet ( ns ) ;
-    return ns ;
-}
-
-Namespace *
-_CfrTil_Namespace_InNamespaceGet ( )
-{
-    if ( _CfrTil_->Namespaces && ( ! _CfrTil_->InNamespace ) )
-    {
-        _CfrTil_->InNamespace = _Namespace_FirstOnUsingList ( ) ; //( Namespace* ) _Tree_Map_FromANode ( ( dlnode* ) _CfrTil_->Namespaces, ( cMapFunction_1 ) _Namespace_IsUsing ) ;
-    }
-    return _CfrTil_->InNamespace ;
-}
-
-Namespace *
-_CfrTil_InNamespace ( )
-{
-    Namespace * ins ;
-    if ( ( ins = Finder_GetQualifyingNamespace ( _Context_->Finder0 ) ) ) return ins ;
-    else return _CfrTil_Namespace_InNamespaceGet ( ) ;
-}
-
-Boolean
-_CfrTil_IsContainingNamespace ( byte * name, byte * namespaceName )
-{
-    Word * word = _Finder_Word_Find ( _Finder_, USING, name ) ; 
-    if ( word && String_Equal ( ( char* ) word->ContainingNamespace->Name, namespaceName ) ) return true ;
-    else return false ;
-}
-
-void
-_Namespace_DoNamespace ( Namespace * ns )
-{
-    Context * cntx = _Context_ ;
-    if ( ! Lexer_IsTokenForwardDotted ( cntx->Lexer0 ) ) _Namespace_ActivateAsPrimary ( ns ) ;
-    else Finder_SetQualifyingNamespace ( cntx->Finder0, ns ) ;
-    if ( ! GetState ( cntx->Compiler0, (LC_ARG_PARSING|ARRAY_MODE) ) ) cntx->Interpreter0->BaseObject = 0 ;
-}
-
-#if 0
-
-void
-Namespace_DoNamespace (Namespace * ns, 0)
-{
-    Context * cntx = _Context_ ;
-    if ( ( ! immFlag ) && CompileMode && ( Lexer_NextNonDelimiterChar ( cntx->Lexer0 ) != '.' ) && ( ! GetState ( cntx->Compiler0, LC_ARG_PARSING ) ) )
-    {
-        _Compile_C_Call_1_Arg ( ( byte* ) _Namespace_DoNamespace, ( int64 ) ns ) ;
-    }
-    if ( ! Lexer_IsTokenForwardDotted ( cntx->Lexer0 ) ) _Namespace_ActivateAsPrimary ( ns ) ;
-    else Finder_SetQualifyingNamespace ( cntx->Finder0, ns ) ;
-    cntx->Interpreter0->BaseObject = 0 ;
-}
-#else
-
-void
-Namespace_DoNamespace (Namespace * ns, Boolean isForwardDotted)
-{
-    Context * cntx = _Context_ ;
-    if ( ( ! CompileMode ) || GetState ( cntx, C_SYNTAX | LISP_MODE ) )
-    {
-        if ( ! isForwardDotted ) _Namespace_ActivateAsPrimary ( ns ) ;
-        else Finder_SetQualifyingNamespace ( cntx->Finder0, ns ) ;
-        if ( ! GetState ( cntx->Compiler0, (LC_ARG_PARSING|ARRAY_MODE) ) ) cntx->Interpreter0->BaseObject = 0 ;
-    }
-    else if ( ( ! isForwardDotted ) && ( ! GetState ( cntx->Compiler0, LC_ARG_PARSING ) ) )
-    {
-        _Compile_C_Call_1_Arg ( ( byte* ) _Namespace_DoNamespace, ( int64 ) ns ) ;
-    }
-}
-#endif
-
-void
-Namespace_DoNamespace_Name ( byte * name )
-{
-    Namespace_DoNamespace (Namespace_Find ( name ), 0) ;
-}
-
-void
-Symbol_NamespacePrettyPrint ( Symbol * symbol, int64 indentFlag, int64 indentLevel )
-{
-    Namespace * ns = ( Namespace* ) symbol ;
-    Namespace_PrettyPrint ( ns, indentFlag, indentLevel ) ;
 }
 
 // a namespaces internal finder, a wrapper for Symbol_Find - prefer Symbol_Find directly
@@ -361,98 +407,6 @@ Namespace *
 Namespace_Find ( byte * name )
 {
     return _Namespace_Find ( name, 0, 0 ) ;
-}
-
-void
-_Namespace_UsingLast ( byte * name )
-{
-    _Namespace_AddToNamespacesTail_ResetFromInNamespace ( Namespace_Find ( name ) ) ;
-}
-
-void
-_Namespace_RemoveFromUsingList ( Namespace * ns )
-{
-    _Namespace_SetAsNotUsing_MoveToTail ( ns ) ;
-    _Namespace_MapUsing_2Args ( ( MapSymbolFunction2 ) _RemoveSubNamespacesFromUsingList, ( int64 ) ns, 0 ) ;
-}
-
-void
-Namespace_RemoveFromUsingList ( byte * name )
-{
-    Namespace * ns = Namespace_Find ( name ) ;
-    if ( String_Equal ( ns->Name, "System" ) ) _Printf ( ( byte* ) "\n\nSystem namespace being cleared %s", Context_Location ( ) ) ;
-    if ( ns ) _Namespace_RemoveFromUsingList ( ns ) ;
-}
-// this is simple, for more complete use _Namespace_RemoveFromSearchList
-// removes all namespaces dependant on 'ns', the whole dependancy tree from the 'ns' root
-
-void
-_RemoveSubNamespacesFromUsingList ( Symbol * symbol, Namespace * ns )
-{
-    Namespace * ns1 = ( Namespace* ) symbol ;
-    // if ns contains ns1 => ns1 is dependent on ns ; we are removing ns => we have to remove ns1
-    if ( ( ns1->CAttribute & NAMESPACE_TYPE ) && ( ns1->ContainingNamespace == ns ) )
-    {
-        _Namespace_RemoveFromUsingList ( ns1 ) ;
-    }
-}
-
-void
-Namespace_MoveToFirstOnUsingList ( byte * name )
-{
-    _Namespace_AddToUsingList ( Namespace_Find ( name ) ) ; // so it will be first on the list where Find will find it first
-}
-
-void
-Namespace_RemoveFromUsingList_WithCheck ( byte * name )
-{
-    if ( ! String_Equal ( "Root", ( char* ) name ) )
-    {
-        Namespace_RemoveFromUsingList ( name ) ;
-    }
-    else Throw ( ( byte* ) "Namespace_RemoveFromUsingList_WithCheck", ( byte* ) "Error : can't remove Root namespace", QUIT ) ;
-}
-
-void
-_Namespace_Clear ( Namespace * ns )
-{
-    if ( ns )
-    {
-#if 0        
-        //if ( Is_DebugModeOn )
-        {
-            _Printf ( ( byte* ) "\n\n_Namespace_Clear : before : name = %s\n", ns->Name ) ;
-            _List_PrintNames ( ns->W_List, - 1, 0 ) ;
-        }
-#endif        
-        //if ( String_Equal ( ns->Name, "LispDefinesNamespace" )) _Printf ( (byte*)"\n got it\n" ), Pause () ;
-        //if ( ns->W_List == (dllist *) 0x7ffff71fe7b0 ) _Printf ((byte*)"" ) ;
-
-        DLList_Recycle_NamespaceList ( ns->W_List ) ;
-        DLList_RemoveWords ( ns->W_List ) ;
-        _dllist_Init ( ns->W_List ) ;
-#if 0        
-        //if ( Is_DebugModeOn )
-        {
-            _Printf ( ( byte* ) "\n\n_Namespace_Clear : after : name = %s\n", ns->Name ) ;
-            _List_PrintNames ( ns->W_List, - 1, 0 ) ;
-            //Pause ( ) ;
-        }
-#endif        
-    }
-}
-
-void
-Namespace_Clear ( byte * name )
-{
-    _Namespace_Clear ( _Namespace_Find ( name, 0, 0 ) ) ;
-}
-
-Namespace *
-Namespace_New ( byte * name, Namespace * containingNs )
-{
-    Namespace * ns = DataObject_New ( NAMESPACE, 0, name, NAMESPACE, 0, 0, 0, ( int64 ) containingNs, 0, 0, - 1 ) ;
-    return ns ;
 }
 
 Namespace *
@@ -496,6 +450,13 @@ Namespace_FindOrNew_Local ( Stack * nsStack, Boolean setBlockFlag )
 }
 
 void
+Symbol_NamespacePrettyPrint ( Symbol * symbol, int64 indentFlag, int64 indentLevel )
+{
+    Namespace * ns = ( Namespace* ) symbol ;
+    Namespace_PrettyPrint ( ns, indentFlag, indentLevel ) ;
+}
+
+void
 _Namespace_PrintWords ( Namespace * ns )
 {
     dllist_Map1 ( ns->Lo_List, ( MapFunction1 ) _Word_Print, 0 ) ;
@@ -519,3 +480,20 @@ _Namespace_MapUsing_2Args ( MapSymbolFunction2 msf2, int64 one, int64 two )
 {
     Tree_Map_Namespaces_State_2Args ( _CfrTil_->Namespaces->W_List, USING, msf2, one, two ) ;
 }
+
+#if 0
+
+void
+Namespace_AddToNamespaces_SetUsing ( Namespace * ns, Boolean addToHeadFlag, Boolean usingFlag )
+{
+    if ( ns )
+    {
+        if ( addToHeadFlag ) _Namespace_AddToNamespacesHead ( ns ) ;
+        else _Namespace_AddToNamespacesTail ( ns ) ;
+        //if ( usingFlag ) SetState_TrueFalse ( ns, USING, NOT_USING ) ;
+        //else SetState_TrueFalse ( ns, NOT_USING, USING ) ;
+        _Namespace_SetState ( ns, usingFlag ) ;
+    }
+}
+#endif
+

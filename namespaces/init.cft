@@ -4,6 +4,7 @@ jcc8_On
 : sp ; //stack pause ; 
 //verbosity 0 = 
 // logOn
+//'verbosity ' _verbosity _find alias immediate
 verbosity 1 = 
 Debug
 : d: _dbgOn dbgSourceCodeOn ; immediate debugWord // a debugWord has special behavior : doesn't interfere with optimization
@@ -16,7 +17,7 @@ optimizeOff inlineOff
 #endif
 Root 
 : ' _tick ; immediate
-: find _find ; immediate
+'find '_find _find alias immediate
 : findAny _findAny ; immediate
 //_dbgOn 'tick ' _tick find alias immediate
 'tick ' _tick find alias immediate
@@ -253,7 +254,7 @@ jcc8_Off
     _source ( addToHistoryFlag @ pword @ ) nl pdl 
     pword @ wdis 
     { pword @ } 
-    { nl "Word :" _ps hex pword p ":: Compiled at :" ps pword @ definition p decimal } if
+    { nl "Word :" _ps hex pword @ p ":: Compiled at :" ps pword @ definition p decimal } if
     nl pel decimal 
     nl "::> 'wdiss' was called at" _ps location "<::" ps nl
 ;;
@@ -271,7 +272,7 @@ jcc8_On
 : stk stack ; //debugWord 
 : ti timerInit ;
 : ahalt stop ;
-: vb ( n ) verbosity n @ = ; : vb3 4 vb ; : vb3 3 vb ; : vb2 2 vb ; : vb1 1 vb ; : vb0 0 vb ;
+d: : vb ( n ) verbosity n @ = ; : vb4 4 vb ; : vb3 3 vb ; : vb2 2 vb ; : vb1 1 vb ; : vb0 0 vb ;
 : sOff vb1 inlineOff optimizeOff ;
 : sOn vb3 inlineOn optimizeOn ;
 "ahOn" ' addToHistoryOn find alias
@@ -418,8 +419,6 @@ System C
 fload test.txt //pause
 tc 
 //demo
-//x64
-//tx64
 
 
 #if _doDemo 
@@ -435,8 +434,8 @@ stringMacrosOff
 'doInitTest 1 const
 #if doInitTest
 // startup test code here ...
-#if tcOnv @
-//tc demo
+#if 0 //tcOnv @
+tc demo
 //fload nt.cft
 //mct
 //#elif 1

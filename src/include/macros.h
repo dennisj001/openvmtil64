@@ -256,7 +256,6 @@
 #define _WordList_Pop( list ) _dllist_PopNode ( list )
 #define DebugWordList_Push( dobj ) _dllist_AddNodeToHead ( _CfrTil_->DebugWordList, ( dlnode* ) dobj )
 #define DbgWL_Push( node ) DebugWordList_Push( node )  
-#define CfrTil_WordList_Push( word, inUseFlag ) _List_PushNew_ForWordList ( _CfrTil_->Compiler_N_M_Node_WordList, word, inUseFlag ) 
 #define IsGlobalsSourceCodeOn ( GetState ( _CfrTil_, GLOBAL_SOURCE_CODE_MODE ))
 #define _IsSourceCodeOn ( GetState ( _CfrTil_, DEBUG_SOURCE_CODE_MODE ) )
 #define IsSourceCodeOn ( _IsSourceCodeOn || IsGlobalsSourceCodeOn )

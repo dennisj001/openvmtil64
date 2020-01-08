@@ -74,6 +74,8 @@ _Debugger_PreSetup ( Debugger * debugger, Word * word, byte * token, byte * addr
 
                     debugger->ReadIndex = _ReadLiner_->ReadIndex ;
                     debugger->DebugAddress = 0 ;
+                    //debugger->w_Word = 0 ;
+                    debugger->LastEffectsWord = 0 ;
                     SetState ( debugger, DBG_MENU, false ) ;
                     //if ( GetState ( _Lexer_, LEXER_DONE | LEXER_END_OF_LINE ) ) SetState ( _Interpreter_, END_OF_LINE, true ) ;
                     return true ;

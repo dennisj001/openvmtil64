@@ -279,7 +279,7 @@ _TabCompletion_Compare ( Word * word )
                 RL_TC_StringInsert_AtCursor ( rl, fqn ) ;
                 tci->FoundCount ++ ;
                 if ( tci->FoundCount > tci->MaxFoundCount ) tci->MaxFoundCount = tci->FoundCount ;
-                if ( _Q_->Verbosity > 2 )
+                if ( _Q_->Verbosity > 4 )
                 {
                     //if ( tci->FoundWrapCount )
                     {
