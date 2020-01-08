@@ -272,7 +272,7 @@ jcc8_On
 : stk stack ; //debugWord 
 : ti timerInit ;
 : ahalt stop ;
-d: : vb ( n ) verbosity n @ = ; : vb4 4 vb ; : vb3 3 vb ; : vb2 2 vb ; : vb1 1 vb ; : vb0 0 vb ;
+: vb ( n ) verbosity n @ = ; : vb4 4 vb ; : vb3 3 vb ; : vb2 2 vb ; : vb1 1 vb ; : vb0 0 vb ;
 : sOff vb1 inlineOff optimizeOff ;
 : sOn vb3 inlineOn optimizeOn ;
 "ahOn" ' addToHistoryOn find alias

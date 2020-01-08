@@ -19,6 +19,7 @@
 #define _Q_CodeByteArray _Q_->CodeByteArray
 #define _Q_CodeSpace _Q_->MemorySpace0->CodeSpace
 #define _LC_ _Q_->OVT_LC 
+
 #define _Compile_Int8( value ) ByteArray_AppendCopyItem ( _Q_CodeByteArray, 1, value )
 #define _Compile_Int16( value ) ByteArray_AppendCopyItem ( _Q_CodeByteArray, 2, value )
 #define _Compile_Int32( value ) ByteArray_AppendCopyItem ( _Q_CodeByteArray, 4, value )
@@ -44,6 +45,7 @@
 #define Stack() CfrTil_PrintDataStack ( )
 #define DataStack( n ) _Dsp_ [ - (n) ] 
 #define Dsp( n ) DataStack( n ) 
+#define Stack_Clear( stk ) Stack_Init ( stk )
 #define TWS( n ) ( (Word*) (_CfrTil_->TypeWordStack->StackPointer [(n)]) )
 
 #define Calculate_FrameSize( numberOfLocals )  ( ( numberOfLocals + 1 ) * CELL ) // 1 : space for fp
@@ -84,7 +86,6 @@
 #define Buffer_MakePermanent( b ) b->InUseFlag = N_PERMANENT
 #define Buffer_Lock( b ) b->InUseFlag = N_LOCKED
 #define Buffer_Unlock( b ) b->InUseFlag = N_UNLOCKED
-//#define Buffer_AllowReUse( b ) b->InUseFlag = B_FREE 
 #define _Buffer_SetAsFree( b )  b->InUseFlag = N_FREE 
 
 #define Attribute_FromWord( word ) (( Attribute * ) (word)->This )
@@ -147,7 +148,6 @@
 #define _ReadLine_CursorPosition( rl ) (rl->CursorPosition)
 #define ReadLine_GetCursorChar( rl ) (rl->InputLine [ _ReadLine_CursorPosition (rl) ])
 #define ReadLine_SetCursorChar( rl, c ) (rl->InputLine [ _ReadLine_CursorPosition (rl) ] = c )
-#define Stack_Clear( stk ) Stack_Init ( stk )
 
 // exception handling
 #define _try( object ) if ( _OpenVmTil_Try ( &object->JmpBuf0 ) ) 
@@ -184,15 +184,9 @@
 #define Get( obj, field ) obj->field
 #define Set( obj, field, value ) (obj)->(field) = (value) 
 
-#define Stringn_Equal( string1, string2, n ) (Strncmp ( (byte *) string1, (byte *) string2, n ) == 0 )
-#define Stringni_Equal( string1, string2, n ) (Strnicmp ( (byte *) string1, (byte *) string2, n ) == 0 )
-#define Stringi_Equal( string1, string2 ) (Stricmp ( (byte *) string1, (byte *) string2 ) == 0 )
-#define String_Equal( string1, string2 ) (Strcmp ( (byte *) string1, (byte *) string2 ) == 0 )
-#define sconvbs( d, s ) (byte*) _String_ConvertStringToBackSlash ( d, s, -1 )
-#define String_CB( string0 ) String_ConvertToBackSlash ( string0 )
-
-#define DEBUG_PRINTSTACK if ( GetState ( _CfrTil_, DEBUG_MODE )  ) CfrTil_PrintDataStack () ;
 #define TypeNamespace_Get( object ) (object->TypeNamespace ? object->TypeNamespace : object->ContainingNamespace)
+#define ReadLiner_GetLastChar() _ReadLiner_->InputKeyedCharacter
+#define ReadLiner_SetLastChar( chr ) if (_ReadLiner_) _ReadLiner_->InputKeyedCharacter = chr
 #define _Lexer_IsCharDelimiter( lexer, c ) lexer->DelimiterCharSet [ c ]
 #define _Lexer_IsCharDelimiterOrDot( lexer, c ) lexer->DelimiterOrDotCharSet [ c ]
 
@@ -206,7 +200,6 @@
 
 #define Is_NamespaceType( w ) ( w ? (( ( Namespace* ) w )->CAttribute & NAMESPACE_TYPE) : 0 )
 #define Is_ValueType( w ) ( w ? ( ( Namespace* ) w )->CAttribute & (NON_MORPHISM_TYPE (w)) : 0 )
-#define String_Init( s ) s[0]=0 ; 
 
 // memory allocation
 #define _Allocate( size, nba ) _ByteArray_AppendSpace ( nba->ba_CurrentByteArray, size ) 
@@ -219,6 +212,7 @@
 #define Set_NBA_Symbol_To_NBA( nba )  nba->NBA_Symbol.S_pb_Data2 = ( byte* ) nba
 #define Set_BA_Symbol_To_BA( ba )  ba->BA_Symbol.S_pb_Data2 = ( byte* ) ba
 #define MemCheck( block ) { Calculate_TotalNbaAccountedMemAllocated ( 1 ) ; block ; Calculate_TotalNbaAccountedMemAllocated ( 1 ) ; }
+#define MemCpy(dst, src, size) _MemCpy ((byte*)dst, (byte*)src, (int64) size)
 
 #define _Debugger_ _CfrTil_->Debugger0
 #define DebugOff SetState ( _CfrTil_, DEBUG_MODE|_DEBUG_SHOW_, false )
@@ -230,7 +224,7 @@
 #define Is_DebugShowOn ( _CfrTil_ && GetState ( _CfrTil_, _DEBUG_SHOW_ ) ) 
 #define _Is_DebugOn GetState ( _CfrTil_, _DEBUG_SHOW_ )
 #define Is_DebugOn (Is_DebugShowOn && Is_DebugModeOn)
-//#define _DEBUG_SETUP( word, token, address, force )  ( (word || token) && Is_DebugModeOn ) ? Debugger_PreSetup (_Debugger_, word, token, address, force ) : 0 
+#define DEBUG_PRINTSTACK if ( GetState ( _CfrTil_, DEBUG_MODE )  ) CfrTil_PrintDataStack () ;
 #define __DEBUG_SETUP( word, token, address, force )  ( (word || token) && Is_DebugModeOn ) ? _Debugger_PreSetup (_Debugger_, word, token, address, force ) : 0 
 #define DEBUG_SETUP_TOKEN( token ) _DEBUG_SETUP( 0, token, 0 ) ;
 #define DEBUG_SETUP_ADDRESS( address, force ) if ( (address) && Is_DebugModeOn ) Debugger_PreSetup (_Debugger_, 0, 0, address, force ) ;
@@ -265,31 +259,26 @@
 #define _SC_Global_On SetState ( _CfrTil_, GLOBAL_SOURCE_CODE_MODE, true )
 #define SC_Global_On if ( GetState ( _CfrTil_, DEBUG_SOURCE_CODE_MODE ) ) { _SC_Global_On ; }
 #define SC_Global_Off SetState ( _CfrTil_, GLOBAL_SOURCE_CODE_MODE, false )
-//#define _Block_SCA( index ) _CfrTil_Block_SetSourceCodeAddress( index )
-//#define _Block_SCA_Clear _Block_SCA( -1 ) ;
-//#define L_SCI _Lexer_->SC_Index
 #define Compiler_OptimizerWordList_Reset( compiler ) List_Init ( _CfrTil_->CompilerWordList ) 
-#if 1
 #define Word_SetTsrliScwi( word, tsrli, scwi ) \
     if ( word )\
     {\
     word->W_RL_Index = tsrli = ( tsrli != - 1 ) ? tsrli : _Lexer_->TokenStart_ReadLineIndex ;\
     word->W_SC_Index = scwi = ( scwi != - 1 ) ? scwi : _Lexer_->SC_Index ;\
     }
-#else
-#define _Word_SetTsrliScwi( word, tsrli, scwi ) Lexer_Set_ScIndex_RlIndex ( _Lexer_, word, (tsrli), (scwi) ) 
-#define Word_SetTsrliScwi( word, tsrli, scwi ) Lexer_Set_ScIndex_RlIndex ( _Lexer_, word, (tsrli), (scwi) ) 
-#endif
 
+#define Stringn_Equal( string1, string2, n ) (Strncmp ( (byte *) string1, (byte *) string2, n ) == 0 )
+#define Stringni_Equal( string1, string2, n ) (Strnicmp ( (byte *) string1, (byte *) string2, n ) == 0 )
+#define Stringi_Equal( string1, string2 ) (Stricmp ( (byte *) string1, (byte *) string2 ) == 0 )
+#define String_Equal( string1, string2 ) (Strcmp ( (byte *) string1, (byte *) string2 ) == 0 )
+#define sconvbs( d, s ) (byte*) _String_ConvertStringToBackSlash ( d, s, -1 )
+#define String_CB( string0 ) String_ConvertToBackSlash ( string0 )
 #define Strncat( dst, src, n ) strncat ( (char *__restrict) dst, (const char *__restrict) src, (size_t) n )
 #define Strlen( s ) ( s ? strlen ( (const char *) s ) : 0 )
 #define StringLength( s ) Strlen ( s )
+#define String_Init( s ) s[0]=0 ; 
 //#define Strncpy( dst, src, n ) strncpy ( (char *__restrict) dst, (const char *__restrict) src, (size_t) n )
 #define Map0( dllist, mf ) dllist_Map ( dllist, (MapFunction0) mf )
 
-//#define MemCpy(dst, src, size) memcpy ((byte*)dst, (byte*)src, (int64) size)  //_MemCpy ((byte*)dst, (byte*)src, (int64) size)
-#define MemCpy(dst, src, size) _MemCpy ((byte*)dst, (byte*)src, (int64) size)
-#define ReadLiner_GetLastChar() _ReadLiner_->InputKeyedCharacter
-#define ReadLiner_SetLastChar( chr ) if (_ReadLiner_) _ReadLiner_->InputKeyedCharacter = chr
 
 
