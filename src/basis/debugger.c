@@ -736,8 +736,8 @@ Debugger_TableSetup ( Debugger * debugger )
     debugger->CharacterFunctionTable [ 28 ] = Debugger_DisassembleTotalAccumulated ;
     debugger->CharacterFunctionTable [ 29 ] = Debugger_Using ;
     debugger->CharacterFunctionTable [ 30 ] = Debugger_ReturnStack ;
-    debugger->CharacterFunctionTable [ 31 ] = DebugWordList_Show_All ;
-    debugger->CharacterFunctionTable [ 32 ] = DebugWordList_Show_InUse ;
+    debugger->CharacterFunctionTable [ 31 ] = Debugger_WordList_Show_All ;
+    debugger->CharacterFunctionTable [ 32 ] = Debugger_WordList_Show_InUse ;
     //debugger->CharacterFunctionTable [ 33 ] = Debugger_CfrTilRegisters ;
     debugger->CharacterFunctionTable [ 34 ] = Debugger_GotoList_Print ;
     debugger->CharacterFunctionTable [ 35 ] = Debugger_Print_LispDefinesNamespace ;

@@ -5,7 +5,7 @@ Root User
 sp
 doLisp 1 =
 doDemo 1 =
-dbgOff
+//dbgOff
 : demo0 "namespaces/test/initTest.cft" include ;
 doDemo @ { demo0 } if1 //stack pause
 : sp ; //stack pause ;    

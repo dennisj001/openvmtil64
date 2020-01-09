@@ -2,9 +2,7 @@
 jcc8_On
 //typecheckOn dbgTypecheckOn
 : sp ; //stack pause ; 
-//verbosity 0 = 
 // logOn
-//'verbosity ' _verbosity _find alias immediate
 verbosity 1 = 
 Debug
 : d: _dbgOn dbgSourceCodeOn ; immediate debugWord // a debugWord has special behavior : doesn't interfere with optimization
@@ -147,7 +145,7 @@ Interpreter
 "semi" wordNew { _end _semi } _semi 
 ";" ' semi find alias immediate syntactic
 : word swap wordNew swap _semi ;  //'word wordDisassemble pause
-//d: : word ( name block ) name @ wordNew block @ _semi ;  // works but it is 10 bytes more code
+//: word ( name block ) name @ wordNew block @ _semi ;  // works but it is 10 bytes more code
 //'word find wdis //pause
 ":" { compileModeOn sourceCodeInit token wordNew begin } word // immediate // begin is not an immediate word
 
@@ -225,7 +223,6 @@ System
 
 Debug
 // make immediate/word immediate - compile time versions of some words
-//: d: _dbgOn ; immediate debugWord // a debugWord has special behavior : doesn't interfere with optimization
 : _s stack ; 
 : s stack ; immediate
 : sinit stackInit ; 
@@ -239,7 +236,6 @@ C
 
 Word 
 : code definition ;
-//verbosity 2 =
 C
 System
 : location filename ps space decimal lineNumber _p "." _ps charNumber _p ;
@@ -252,6 +248,7 @@ jcc8_Off
 : _wdiss ( addToHistoryFlag pword ) 
     nl pel 
     _source ( addToHistoryFlag @ pword @ ) nl pdl 
+    pword @ setSourceCodeWord
     pword @ wdis 
     { pword @ } 
     { nl "Word :" _ps hex pword @ p ":: Compiled at :" ps pword @ definition p decimal } if
@@ -260,13 +257,11 @@ jcc8_Off
 ;;
 jcc8_On
 : wdiss ( pword ) _wdiss ( 0 pword @ ) ; //debugWord      // don't add wdiss words to history list
-//: wdiss ( pword ) 0 pword @ _wdiss ; //debugWord      // don't add wdiss words to history list
 : wdissl ( pword ) logOn _wdiss ( 0 pword @ ) logOff ; //debugWord      // don't add wdiss words to history list
 'wi ' wdiss find alias
 : pwdiss token _find wdiss ;
 'pwi 'pwdiss find alias
 : fload ftoken include ;
-//' wdiss find _wdiss
 : sys mem namespaces words stack using in ; 
 'aw 'allWords find alias
 : stk stack ; //debugWord 
@@ -396,6 +391,7 @@ stringMacrosOn
 : bx "namespaces/test/bigNum.test.cft" include ;
 : TODO ( str ) nl nl pdl nl str @ adps location nl pdl nl nl { dbgOnVar @ } { sp } if2 ;; //pause ;;
 lispOff
+
 // === controls ===
 Root 
 dbgOff
@@ -428,7 +424,7 @@ rtw
 
 stringMacrosOff
 
-#else // !Is_DebugOn : of course you can trim this file to your needs and put your init code maybe here if you like
+#else // !Is_DebugOn : of course you can trim this file to your needs and put your extra init code maybe here if you like
 : mct "namespaces/compiler/machineCode.cft" include ;
 
 'doInitTest 1 const

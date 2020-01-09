@@ -25,7 +25,7 @@ CfrTil_Colon ( )
 }
 
 Word *
-_CfrTil_InitFinal ( )
+CfrTil_WordInitFinal ( )
 {
     block b = ( block ) DataStack_Pop ( ) ;
     Word * word = ( Word* ) DataStack_Pop ( ) ;
@@ -37,7 +37,7 @@ void
 CfrTil_SemiColon ( )
 {
     CfrTil_EndBlock ( ) ;
-    _CfrTil_InitFinal ( ) ;
+    CfrTil_WordInitFinal ( ) ;
 }
 
 void

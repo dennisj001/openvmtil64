@@ -6,11 +6,15 @@
 dobject *
 _dllist_PushNew_M_Slot_Node ( dllist* list, int64 allocType, int64 typeCode, int64 m_slots, ... )
 {
-    int64 i ;
+    int64 i, value ;
     va_list args ;
     va_start ( args, m_slots ) ;
     dobject * dobj = dobject_Allocate ( typeCode, m_slots, allocType ) ;
-    for ( i = 0 ; i < m_slots ; i ++ ) dobj->do_iData[i] = va_arg ( args, int64 ) ;
+    for ( i = 0 ; i < m_slots ; i ++ ) 
+    {
+        value = va_arg ( args, int64 ) ; ;
+        dobj->do_iData[i] = value ;
+    }
     va_end ( args ) ;
     _dllist_PushNode ( list, ( dlnode* ) dobj ) ;
 

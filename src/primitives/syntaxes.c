@@ -102,7 +102,7 @@ CfrTil_End_C_Block ( )
     Context * cntx = _Context_ ;
     Compiler * compiler = cntx->Compiler0 ;
     CfrTil_EndBlock ( ) ; // NB. CfrTil_EndBlock changes cntx->Compiler0->BlockLevel
-    if ( ! Compiler_BlockLevel ( compiler ) ) _CfrTil_InitFinal ( ) ;
+    if ( ! Compiler_BlockLevel ( compiler ) ) CfrTil_WordInitFinal ( ) ;
     else
     {
         // we're still compiling so ... ??

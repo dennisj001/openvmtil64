@@ -253,12 +253,12 @@ Compiler_RemoveLocalFrame ( Compiler * compiler )
 void
 CfrTil_LocalsAndStackVariablesBegin ( )
 {
-    _CfrTil_Parse_LocalsAndStackVariables ( 1, 0, 0, 0, 0, false ) ;
+    _CfrTil_Parse_LocalsAndStackVariables (1, 0, 0, 0, 0 ) ;
 }
 
 void
 CfrTil_LocalVariablesBegin ( )
 {
-    _CfrTil_Parse_LocalsAndStackVariables ( 0, 0, 0, 0, 0, false ) ;
+    _CfrTil_Parse_LocalsAndStackVariables (0, 0, 0, 0, 0 ) ;
 }
 

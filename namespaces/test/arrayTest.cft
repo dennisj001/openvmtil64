@@ -2,7 +2,7 @@
 5 
 
 #if _TestDone_ @ not // prevent including twice
-dbgOff
+//dbgOff
 lispOff
 decimal
 Int Class DLLNode

@@ -431,7 +431,7 @@ void CfrTil_InlineOff(void);
 void _CfrTil_SingleQuote(void);
 int64 _CfrTil_Parse_ClassStructure(int64 cloneFlag);
 void Compiler_TypedObjectInit(Word *word, Namespace *typeNamespace);
-Namespace *_CfrTil_Parse_LocalsAndStackVariables(int64 svf, int64 lispMode, ListObject *args, Stack *nsStack, Namespace *localsNs, Boolean debugFlag);
+Namespace *_CfrTil_Parse_LocalsAndStackVariables(int64 svf, int64 lispMode, ListObject *args, Stack *nsStack, Namespace *localsNs);
 void Lexer_ParseAsAString(Lexer *lexer);
 void _Lexer_ParseBinary(Lexer *lexer, int64 offset);
 void Lexer_ParseBinary(Lexer *lexer, byte *token, int64 offset);
@@ -441,6 +441,7 @@ void _Lexer_ParseHex(Lexer *lexer, byte *token);
 void _Lexer_ParseDecimal(Lexer *lexer, byte *token);
 void Lexer_ParseObject(Lexer *lexer, byte *token);
 byte *Parse_Macro(int64 type);
+void Lexer_ParseDoubleQuoteMacro(Lexer *lexer);
 /* src/basis/core/memSpace.c */
 byte *_mmap_AllocMem(int64 size);
 void mmap_FreeMem(byte *chunk, int64 size);
@@ -948,8 +949,6 @@ void _Context_InterpretFile(Context *cntx);
 void _Context_IncludeFile(Context *cntx, byte *filename, int64 interpretFlag);
 void _CfrTil_ContextNew_IncludeFile(byte *filename);
 int64 _Context_StringEqual_PeekNextToken(Context *cntx, byte *check, Boolean evalFlag);
-void _Context_DoubleQuoteMacro(Context *cntx);
-void CfrTil_DoubleQuoteMacro(void);
 void Context_Interpret(Context *cntx);
 byte *Context_IsInFile(Context *cntx);
 /* src/basis/core/word.c */
@@ -1228,7 +1227,7 @@ void CfrTil_SetAlertRGB(void);
 void CfrTil_SetDebugRGB(void);
 void CfrTil_SetNoticeRGB(void);
 /* src/basis/sourceCode.c */
-void Debugger_ShowDbgSourceCodeAtAddress(Debugger *debugger, byte *address);
+void SC_ShowDbgSourceCodeWord_Or_AtAddress(Word * scWord, byte *address);
 Boolean SC_IsWord_BlockOrCombinator(Word *word);
 Boolean SC_IsWord_MatchCorrectConsideringBlockOrCombinator(Word *word);
 Word *DWL_Find(dllist *list, Word *iword, byte *address, byte *name, int64 takeFirstFind, byte *newAddress, int64 fromFirstFlag);
@@ -1240,7 +1239,7 @@ void CheckRecycleWord(Node *node);
 void DLList_Recycle_WordList(dllist *list);
 void DLList_RecycleInit_WordList(Word *word);
 void _CfrTil_RecycleInit_Compiler_N_M_Node_WordList(void);
-void CfrTil_WordList_Init(Word *word);
+void CfrTil_WordList_Init(Word *svWord);
 void Word_SetSourceCoding(Word *word, byte *address);
 void Word_SetCoding(Word *word, byte *address);
 void WordList_SetSourceCoding(int64 index, byte *address);
@@ -1260,8 +1259,8 @@ void DWL_ShowWord(dlnode *anode, int64 index, int64 inUseOnlyFlag, int64 prefix,
 void SC_WordList_Show(dllist *list, Word *scWord, Boolean fromFirstFlag, Boolean inUseOnlyFlag, byte *listName);
 void Compiler_WordList_Show(Word *word, byte *prefix, Boolean inUseOnlyFlag, Boolean showInDebugColors);
 void Compiler_SC_WordList_Show(byte *prefix, Boolean inUseOnlyFlag, Boolean showInDebugColors);
-void DebugWordList_Show_All(Debugger *debugger);
-void DebugWordList_Show_InUse(Debugger *debugger);
+void Debugger_WordList_Show_All(Debugger *debugger);
+void Debugger_WordList_Show_InUse(Debugger *debugger);
 void Debugger_ShowTypeWordStack(Debugger *debugger);
 void CfrTil_DbgSourceCodeBeginBlock(void);
 void CfrTil_DbgSourceCodeEndBlock(void);
@@ -1444,7 +1443,7 @@ void _List_Show_N_Word_Names(dllist *list, uint64 n, int64 showBeforeAfterFlag, 
 /* src/basis/debugDisassembly.c */
 ud_t *Debugger_UdisInit(Debugger *debugger);
 int64 Debugger_Udis_GetInstructionSize(Debugger *debugger);
-Boolean Debugger_ShowSourceCodeAtAddress(Debugger *debugger, byte *address);
+Boolean SC_ShowSourceCode_In_Word_At_Address(Word * word, byte *address);
 int64 _Debugger_Disassemble(Debugger *debugger, byte *address, int64 number, int64 cflag);
 void Debugger_Disassemble(Debugger *debugger, byte *address, int64 number, int64 cflag);
 void Debugger_Dis(Debugger *debugger);
@@ -1829,6 +1828,7 @@ void CfrTil_SingleQuote(void);
 void CfrTil_Tick(void);
 void Parse_SkipUntil_EitherToken_OrNewline(byte *end1, byte *end2);
 void CfrTil_Parse(void);
+void CfrTil_DoubleQuoteMacro(void);
 /* src/primitives/interpreters.c */
 void CfrTil_DoWord(void);
 void CfrTil_CommentToEndOfLine(void);
@@ -1949,7 +1949,7 @@ void CfrTil_FinishWordDebugInfo(void);
 /* src/primitives/words.c */
 void _CfrTil_Colon(Boolean initSC);
 void CfrTil_Colon(void);
-Word *_CfrTil_InitFinal(void);
+Word *CfrTil_WordInitFinal(void);
 void CfrTil_SemiColon(void);
 void AddressToWord(void);
 void Word_Definition(void);

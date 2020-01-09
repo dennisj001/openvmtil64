@@ -25,8 +25,8 @@ _CfrTil_Word_Disassemble ( Word * word )
 {
     if ( word )
     {
-        if ( _Debugger_ ) _Debugger_->w_Word = word ;
-        //_CfrTil_SetSourceCodeWord ( word ) ;
+        //if ( _Debugger_ ) _Debugger_->w_Word = word ;
+        _CfrTil_SetSourceCodeWord ( word ) ;
         _Printf ( ( byte* ) "\nWord :: %s.%s : definition = 0x%016lx : disassembly at %s :", word->ContainingNamespace ? word->ContainingNamespace->Name : ( byte* ) "", c_gd ( word->Name ), ( uint64 ) word->Definition, Context_Location ( ) ) ;
         Word_Disassemble ( word ) ;
         //_Printf ( ( byte* ) "\n" ) ;

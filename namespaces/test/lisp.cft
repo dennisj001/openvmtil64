@@ -176,14 +176,14 @@ sp
 (define fibc (lambda ( n ) (ifElse (< n 2) n (+ (fibc (- n 1)) (fibc (- n 2))))))
 "\nfibc 20 = " ps
 (fibc 20)
-dbgOn
-#if 0 //Is_DebugOn 
-verbosity 4 =
+#if Is_DebugOn 
+vb4 
 d: (define fibc (lambda ( n ) (ifElse (< n 2) n (+ (fibc (- n 1)) (fibc (- n 2))))))
+tick fibc find d: wdiss //pause
 "\nfibc 20 = " ps
 (fibc 20)
 tick fibc find d: wdiss //pause
-verbosity 1 =
+vb1
 #else
 (define fibc (lambda ( n ) (ifElse (< n 2) n (+ (fibc (- n 1)) (fibc (- n 2))))))
 "\nfibc 20 = " ps

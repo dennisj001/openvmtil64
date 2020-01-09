@@ -269,6 +269,7 @@ CPrimitive CPrimitives [] = {
     { "sourceAdd", 0, 0, 0, CfrTil_Source_AddToHistory, 0, 0, 0, "Debug", "Root" },
     { "source", 0, 0, 0, CfrTil_Source_AddToHistory, 0, 0, 0, "Debug", "Root" },
     { "sourceDontAdd", 0, 0, 0, CfrTil_Source_DontAddToHistory, 0, 0, 0, "Debug", "Root" },
+    { "setSourceCodeWord", 0, 0, 0, CfrTil_SetSourceCodeWord, 0, 0, 0, "Debug", "Root" },
     { "stack", 0, 0, 0, CfrTil_PrintDataStack, 0, 0, 0, "Debug", "Root" },
     { "stackDepthPrint", 0, 0, 0, CfrTil_PrintStackDepth, 0, 0, 0, "Debug", "Root" },
     { "rstack", 0, 0, 0, CfrTil_PrintReturnStack, 0, 0, 0, "Debug", "Root" },

@@ -231,61 +231,6 @@ _Context_StringEqual_PeekNextToken ( Context * cntx, byte * check, Boolean evalF
     else return 0 ;
 }
 
-// this is funny!?
-
-void
-_Context_DoubleQuoteMacro ( Context * cntx )
-{
-    ReadLiner * rl = _ReadLiner_ ;
-    Lexer * lexer = cntx->Lexer0 ;
-    if ( ! GetState ( _CfrTil_, SOURCE_CODE_STARTED ) ) CfrTil_InitSourceCode_WithCurrentInputChar ( _CfrTil_, 0 ) ; // must be here for wdiss and add addToHistory
-    _CfrTil_->SC_QuoteMode = true ;
-    do
-    {
-        lexer->TokenInputByte = ReadLine_NextChar ( rl ) ;
-        if ( lexer->TokenInputByte == '\\' ) 
-            _BackSlash ( lexer, 1 ) ;
-        else Lexer_Append_ConvertedCharacterToTokenBuffer ( lexer ) ;
-    }
-    while ( lexer->TokenInputByte != '"' ) ;
-    _CfrTil_->SC_QuoteMode = false ;
-    SetState ( lexer, LEXER_DONE, true ) ;
-    if ( GetState ( _CfrTil_, STRING_MACROS_ON ) && GetState ( &_CfrTil_->Sti, STI_INITIALIZED ) ) _CfrTil_StringMacros_Do ( lexer->TokenBuffer ) ;
-    Word * word = Lexer_ObjectToken_New ( lexer, String_New ( lexer->TokenBuffer, STRING_MEM ), - 1, - 1 ) ;
-    Interpreter_DoWord ( cntx->Interpreter0, word, - 1, - 1 ) ;
-}
-
-void
-CfrTil_DoubleQuoteMacro ( )
-{
-    _Context_DoubleQuoteMacro ( _Context_ ) ;
-}
-
-#if 0
-
-void
-_Tick ( Context * cntx, int64 findWordFlag )
-{
-    byte * token = ( byte* ) DataStack_Pop ( ) ;
-    if ( token )
-    {
-        if ( findWordFlag )
-        {
-            Word * word = Finder_FindQualifiedIDWord ( cntx->Finder0, token ) ;
-            token = ( byte * ) word ;
-        }
-        else
-        {
-            Lexer * lexer = cntx->Lexer0 ;
-            Lexer_ParseObject ( lexer, token ) ; // create a string from a 'raw' token
-            if ( GetState ( lexer, KNOWN_OBJECT ) ) token = ( byte* ) lexer->Literal ;
-            else token = 0 ;
-        }
-    }
-    DataStack_Push ( ( int64 ) token ) ;
-}
-#endif
-
 void
 Context_Interpret ( Context * cntx )
 {

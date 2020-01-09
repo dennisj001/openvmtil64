@@ -106,13 +106,6 @@ _Interpreter_LC_InterpretWord ( Interpreter *interp, ListObject *l0, Boolean fun
     {
         word = l0->Lo_CfrTilWord ;
         if ( ! word ) word = l0 ;
-#if 0        
-        else
-        {
-            word->W_RL_Index = l0->W_RL_Index ;
-            word->W_SC_Index = l0->W_SC_Index ;
-        }
-#endif        
         // source code is not good for lisp ??!??
         //Interpreter_DoWord ( interp, word, functionFlag ? word->W_RL_Index : l0->W_RL_Index, functionFlag ? word->W_SC_Index : l0->W_SC_Index ) ;
         Interpreter_DoWord ( interp, word, l0->W_RL_Index, l0->W_SC_Index ) ;
@@ -468,7 +461,7 @@ _LO_Apply_C_LtoR_ArgList ( LambdaCalculus * lc, ListObject * l0, Word * word )
         if ( ( String_Equal ( word->Name, "printf" ) || ( String_Equal ( word->Name, "sprintf" ) ) ) ) Compile_MoveImm_To_Reg ( RAX, 0, CELL ) ; // for printf ?? others //System V ABI : "%rax is used to indicate the number of vector arguments passed to a function requiring a variable number of arguments"
         Compiler_SCA_Word_SetCodingHere_And_ClearPreviousUse ( word, 1 ) ;
         Word_Eval ( word ) ;
-        if ( word->CAttribute2 & RAX_RETURN ) _Word_CompileAndRecord_PushReg (word, ACC , true) ;
+        if ( word->CAttribute2 & RAX_RETURN ) _Word_CompileAndRecord_PushReg ( word, ACC, true ) ;
         if ( ! svcm )
         {
             CfrTil_EndBlock ( ) ;
@@ -534,7 +527,7 @@ CompileLispBlock ( ListObject *args, ListObject * body )
     Word * word = _Context_->CurrentWordBeingCompiled ;
     LO_BeginBlock ( ) ; // must have a block before local variables if there are register variables because _CfrTil_Parse_LocalsAndStackVariables will compile something
     SetState ( lc, ( LC_COMPILE_MODE | LC_BLOCK_COMPILE ), true ) ; // before _CfrTil_Parse_LocalsAndStackVariables
-    Namespace * locals = _CfrTil_Parse_LocalsAndStackVariables ( 1, 1, args, 0, 0, false ) ;
+    Namespace * locals = _CfrTil_Parse_LocalsAndStackVariables (1, 1, args, 0, 0 ) ; //(GetState ( _LC_, LC_BLOCK_COMPILE|LC_BEGIN_MODE ))) ;// ;false ) ;
     word->CAttribute = BLOCK ;
     word->LAttribute |= T_LISP_COMPILED_WORD ;
     _LO_Eval ( lc, body, locals, 1 ) ;

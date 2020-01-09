@@ -110,8 +110,8 @@ typedef struct _dobject
     {
         int32 do_Type ;
         int16 do_Size ;
-        Boolean do_Slots ;
-        Boolean do_InUseFlag ;
+        int8 do_Slots ;
+        int8 do_InUseFlag ;
     } ;
     union
     {

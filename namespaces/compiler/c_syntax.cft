@@ -302,8 +302,6 @@ $$ ls -al . ;
 C
 sp
 verbosity 1 =
-//sp
-dbgOff 
 infixOff
 1 opOn
 //stack pause

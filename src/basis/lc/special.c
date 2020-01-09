@@ -9,16 +9,15 @@ _LO_Define ( ListObject * idNode, ListObject * locals )
     LambdaCalculus * lc = _LC_ ;
     ListObject *value0, *value, *l1 ;
     Word * word0 = idNode->Lo_CfrTilWord, *word ;
-    word = DataObject_New ( T_LC_DEFINE, 0, ( byte* ) word0->Name, 0, 0, 0, 0, 0, LISP, word0->W_RL_Index, word0->W_SC_Index ) ; //word0 was allocated COMPILER_TEMP or LISP_TEMP
-
+    word = DataObject_New ( T_LC_DEFINE, 0, ( byte* ) word0->Name, NAMESPACE_VARIABLE, 0, 0, 0, 0, LISP, word0->W_RL_Index, word0->W_SC_Index ) ; //word0 was allocated COMPILER_TEMP or LISP_TEMP
     CfrTil_WordList_Init (word) ;
+
     word->Definition = 0 ; // reset the definition from LO_Read
     value0 = _LO_Next ( idNode ) ;
     _Context_->CurrentWordBeingCompiled = word ;
     word->Lo_CfrTilWord = word ;
     SetState ( lc, ( LC_DEFINE_MODE ), true ) ;
     Namespace_DoAddWord ( lc->LispDefinesNamespace, word ) ; // put it at the beginning of the list to be found first
-    word->CAttribute = NAMESPACE_VARIABLE ; // nb. !
     value = _LO_Eval ( lc, value0, locals, 0 ) ; // 0 : don't apply
     if ( value && ( value->LAttribute & T_LAMBDA ) )
     {
@@ -70,6 +69,7 @@ _LO_MakeLambda ( ListObject * l0 )
     {
         SetState ( _LC_, LC_LAMBDA_MODE, true ) ;
         block codeBlk = CompileLispBlock ( args, body ) ;
+        SetState ( _LC_, LC_LAMBDA_MODE, false ) ;
         *word->W_PtrToValue = ( uint64 ) codeBlk ;
     }
     if ( ! GetState ( _LC_, LC_COMPILE_MODE ) ) // nb! this needs to be 'if' not 'else' or else if' because the state is sometimes changed by CompileLispBlock, eg. for function parameters
@@ -268,6 +268,7 @@ LO_Begin ( ListObject * l0, ListObject * locals )
     LambdaCalculus * lc = _LC_ ;
     ListObject * leval ;
     // 'begin' is first node ; skip it.
+    SetState ( _LC_, LC_BEGIN_MODE, true ) ;
     if ( l0 )
     {
         for ( l0 = _LO_Next ( l0 ) ; l0 ; l0 = _LO_Next ( l0 ) )
@@ -276,6 +277,7 @@ LO_Begin ( ListObject * l0, ListObject * locals )
         }
     }
     else leval = 0 ;
+    SetState ( _LC_, LC_BEGIN_MODE, false ) ;
     return leval ;
 }
 
@@ -359,7 +361,7 @@ _LO_CfrTil ( ListObject * lfirst )
         Compiler_SCA_Word_SetCodingHere_And_ClearPreviousUse ( ldata->CfrTilWord, 0 ) ;
         if ( ldata->LAttribute & ( LIST | LIST_NODE ) )
         {
-            _CfrTil_Parse_LocalsAndStackVariables ( 1, 1, ldata, compiler->LocalsCompilingNamespacesStack, 0, false ) ;
+            _CfrTil_Parse_LocalsAndStackVariables (1, 1, ldata, compiler->LocalsCompilingNamespacesStack, 0 ) ;
         }
         else if ( String_Equal ( ldata->Name, ( byte * ) "tick" ) || String_Equal ( ldata->Name, ( byte * ) "'" ) )
         {

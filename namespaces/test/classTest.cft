@@ -74,17 +74,11 @@ scOn
 ;
 ' init find wdiss //pause
 sp
-#if dbgTest
-"testList" DLList new stack //pause
-#else
 "testList" DLList new 
-#endif
 testList DLList.size @ dup p dump //pause
 
-dbgOff 
-#if dbgOnVar @
+#if Is_DebugOn
 testList.HeadNode.AfterReference @ testList.TailNode.BeforeReference  "class init test : "  assert  : hi 1 2 3 4 5 + + + + p ; : hey hi hi hi hi hi ; hey : hi 1 2 3 4 5 + + + + p ; : hey hi hi hi hi hi ; hey // debugger test
-dbgOff
 #else
 testList.HeadNode.AfterReference @ testList.TailNode.BeforeReference  "class init test : " assert 
 #endif

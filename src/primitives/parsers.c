@@ -53,3 +53,10 @@ CfrTil_Parse ( )
     DataStack_Push ( lexer->Literal ) ;
 }
 
+void
+CfrTil_DoubleQuoteMacro ( )
+{
+    Lexer_ParseDoubleQuoteMacro ( _Lexer_ ) ;
+}
+
+

@@ -2,12 +2,12 @@
 #include "../include/cfrtil64.h"
 
 void
-Debugger_ShowDbgSourceCodeAtAddress ( Debugger * debugger, byte * address )
+SC_ShowDbgSourceCodeWord_Or_AtAddress (Word * scWord, byte * address)
 {
     // ...source code source code TP source code source code ... EOL
     if ( ! Compiling )
     {
-        Word * scWord = Get_SourceCodeWord () ;
+        if ( ! scWord ) scWord = Get_SourceCodeWord ( ) ;
         if ( scWord )
         {
             dllist * list = scWord->W_SC_WordList ? scWord->W_SC_WordList : _CfrTil_->Compiler_N_M_Node_WordList ; //&& ( scWord->W_SC_MemSpaceRandMarker == _Q_->MemorySpace0->TempObjectSpace->InitFreedRandMarker ) ) ? scWord->W_SC_WordList : 0 ; //_CfrTil_->CompilerWordList ;
@@ -21,7 +21,7 @@ Debugger_ShowDbgSourceCodeAtAddress ( Debugger * debugger, byte * address )
                     if ( word ) //&& ( debugger->LastSourceCodeWord != word ) )
                     {
                         //debugger->LastSourceCodeWord = word ;
-                        d0 ( DebugWordList_Show_All ( ) ) ;
+                        d0 ( Debugger_WordList_Show_All ( ) ) ;
 
                         if ( ( scWord->WAttribute & WT_C_SYNTAX ) && ( String_Equal ( word->Name, "store" ) || String_Equal ( word->Name, "poke" ) ) )
                         {
@@ -38,6 +38,18 @@ Debugger_ShowDbgSourceCodeAtAddress ( Debugger * debugger, byte * address )
             }
         }
     }
+}
+
+Boolean
+SC_ShowSourceCode_In_Word_At_Address ( Word * word, byte * address )
+{
+    if ( GetState ( _CfrTil_, GLOBAL_SOURCE_CODE_MODE ) ) //DEBUG_SOURCE_CODE_MODE ) ) // ( _Context_->CurrentlyRunningWord ) && _Context_->CurrentlyRunningWord->W_SC_WordList ) )
+    {
+        if ( ! word ) word = _CfrTil_->ScWord ;
+        SC_ShowDbgSourceCodeWord_Or_AtAddress (word, address) ;
+        return true ;
+    }
+    return false ;
 }
 
 Boolean
@@ -201,18 +213,6 @@ DLList_RecycleInit_WordList ( Word * word )
     List_Init ( word->W_SC_WordList ) ;
 }
 
-#if 0
-
-void
-_CfrTil_RecycleInit_Compiler_N_M_Node_WordList ( )
-{
-    Word * word = _CfrTil_->LastFinished_Word ;
-    if ( Compiling && word && word->S_WordData && ( ! GetState ( _CfrTil_, ( RT_DEBUG_ON | DEBUG_SOURCE_CODE_MODE | GLOBAL_SOURCE_CODE_MODE ) ) ) )
-        DLList_Recycle_WordList ( _CfrTil_->Compiler_N_M_Node_WordList ) ;
-    List_Init ( _CfrTil_->Compiler_N_M_Node_WordList ) ;
-}
-#else
-
 void
 _CfrTil_RecycleInit_Compiler_N_M_Node_WordList ( )
 {
@@ -222,14 +222,12 @@ _CfrTil_RecycleInit_Compiler_N_M_Node_WordList ( )
     }
     List_Init ( _CfrTil_->Compiler_N_M_Node_WordList ) ;
 }
-#endif
 
 void
-CfrTil_WordList_Init ( Word * word )
+CfrTil_WordList_Init ( Word * svWord )
 {
-    Word * svWord = word ? word : 0 ;
     _CfrTil_RecycleInit_Compiler_N_M_Node_WordList ( ) ;
-    if ( svWord = word )
+    if ( svWord )
     {
         svWord->W_SC_Index = 0 ; // before pushWord !
         CfrTil_WordList_PushWord ( svWord ) ; // for source code
@@ -349,14 +347,8 @@ _CfrTil_WordList_PushWord ( Word * word, int64 inUseFlag )
 void
 CfrTil_WordList_PushWord ( Word * word )
 {
-#if 1
     _CfrTil_WordList_PushWord ( word,
-        ( ! ( word->CAttribute & ( NAMESPACE | OBJECT_OPERATOR | OBJECT_FIELD ) ) ) || ( word->CAttribute & ( DOBJECT ) ) ) ;
-#else    
-    _CfrTil_WordList_PushWord ( word,
-        ( ( ! ( word->CAttribute & ( NAMESPACE | OBJECT_OPERATOR | OBJECT_FIELD ) ) )
-        || ( word->CAttribute & ( DOBJECT ) ) ) ? SCN_IN_USE_FLAG_ALL : 0 ) ;
-#endif    
+        ( ! ( word->CAttribute & ( NAMESPACE | OBJECT_OPERATOR | OBJECT_FIELD ) ) ) || ( word->CAttribute & ( DOBJECT | NAMESPACE_VARIABLE ) ) ) ;
 }
 
 // too many showWord functions ??
@@ -392,10 +384,9 @@ DWL_ShowWord ( dlnode * anode, int64 index, int64 inUseOnlyFlag, int64 prefix, i
 {
     if ( anode )
     {
-        dobject * dobj = ( dobject * ) anode ;
-        Word * word = ( Word* ) dobject_Get_M_Slot ( dobj, SCN_T_WORD ) ;
+        Word * word = ( Word* ) dobject_Get_M_Slot ( ( dobject * ) anode, SCN_T_WORD ) ;
         int64 scwi = dobject_Get_M_Slot ( ( dobject* ) anode, SCN_SC_WORD_INDEX ) ;
-        int64 iuFlag = dobject_Get_M_Slot ( dobj, SCN_IN_USE_FLAG ) ;
+        int64 iuFlag = dobject_Get_M_Slot ( ( dobject * ) anode, SCN_IN_USE_FLAG ) ;
         if ( word && ( ( ! inUseOnlyFlag ) || ( inUseOnlyFlag && iuFlag ) ) )
         {
             _DWL_ShowWord_Print ( word, index, ( byte* ) prefix, word->Coding, word->SourceCoding, 0, scwi, scwiDiff, iuFlag ) ;
@@ -416,14 +407,17 @@ void
 Compiler_WordList_Show ( Word * word, byte * prefix, Boolean inUseOnlyFlag, Boolean showInDebugColors )
 {
     //dllist * list = Compiling ? _CfrTil_->Compiler_N_M_Node_WordList : ( word && word->W_SC_WordList ) ? word->W_SC_WordList : _CfrTil_->Compiler_N_M_Node_WordList ;
-    dllist * list = word ? word->W_SC_WordList : 0 ;
+    dllist * list = ( word && word->W_SC_WordList ) ? word->W_SC_WordList : _CfrTil_->Compiler_N_M_Node_WordList ;
+    byte *buffer = Buffer_Data ( _CfrTil_->ScratchB1 ) ;
+    buffer[0] = 0 ;
     if ( list )
     {
         if ( Is_DebugModeOn || showInDebugColors ) NoticeColors ;
-        //if ( prefix ) _Printf ( "\n%s : %s", prefix, scWord->Name ) ;
-        byte *buffer = Buffer_Data ( _CfrTil_->ScratchB1 ) ;
-        sprintf ( ( char* ) buffer, "%sWord = %s :: %s = %lx : %s", prefix ? prefix : ( byte* ) "", ( char* ) word->Name,
-            ( list == _CfrTil_->Compiler_N_M_Node_WordList ) ? "CfrTil WordList" : "source code word list for the word", (int64) word, inUseOnlyFlag ? "in use only" : "all" ) ;
+        if ( word )
+        {
+            sprintf ( ( char* ) buffer, "%sWord = %s = %lx :: list = %s : %s", prefix ? prefix : ( byte* ) "", ( char* ) word->Name, ( int64 ) word, 
+                ( list == _CfrTil_->Compiler_N_M_Node_WordList ) ? "CfrTil WordList" : "source code word list for the word", inUseOnlyFlag ? "in use only" : "all" ) ;
+        }
         SC_WordList_Show ( list, word, 0, inUseOnlyFlag, buffer ) ;
         if ( Is_DebugModeOn || showInDebugColors ) DefaultColors ;
     }
@@ -432,18 +426,18 @@ Compiler_WordList_Show ( Word * word, byte * prefix, Boolean inUseOnlyFlag, Bool
 void
 Compiler_SC_WordList_Show ( byte * prefix, Boolean inUseOnlyFlag, Boolean showInDebugColors )
 {
-    Word * scWord = Get_SourceCodeWord () ;
+    Word * scWord = Get_SourceCodeWord ( ) ;
     Compiler_WordList_Show ( scWord, prefix, inUseOnlyFlag, showInDebugColors ) ;
 }
 
 void
-DebugWordList_Show_All ( Debugger * debugger )
+Debugger_WordList_Show_All ( Debugger * debugger )
 {
     Compiler_SC_WordList_Show ( 0, 0, 0 ) ;
 }
 
 void
-DebugWordList_Show_InUse ( Debugger * debugger )
+Debugger_WordList_Show_InUse ( Debugger * debugger )
 {
     Compiler_SC_WordList_Show ( 0, 1, 0 ) ;
 }
@@ -696,24 +690,23 @@ CfrTil_AppendCharToSourceCode ( CfrTil * cfrtil, byte c )
 }
 
 Word *
-Get_SourceCodeWord ()
+Get_SourceCodeWord ( )
 {
     Debugger * debugger = _Debugger_ ;
     Word * scWord ;
     if ( ! ( scWord = _Context_->CurrentDisassemblyWord ) )
     {
-        scWord = GetState ( _Compiler_, ( COMPILE_MODE | ASM_MODE ) ) ? 
-            (_Context_->CurrentWordBeingCompiled ? _Context_->CurrentWordBeingCompiled : (_CfrTil_->LastFinished_Word  ? 
-                _CfrTil_->LastFinished_Word : _Context_->CurrentlyRunningWord ) ) : 0 ;
-        if ( (!scWord) && Is_DebugOn && debugger )
+        if ( ! (scWord = _CfrTil_->ScWord ? _CfrTil_->ScWord : GetState ( _Compiler_, ( COMPILE_MODE | ASM_MODE ) ) ?
+            _Context_->CurrentWordBeingCompiled : _CfrTil_->LastFinished_Word ?
+            _CfrTil_->LastFinished_Word : _Compiler_->CurrentCreatedWord ))
         {
-            if ( debugger->LastEffectsWord ) scWord = debugger->LastEffectsWord ;
-            else scWord = Word_GetFromCodeAddress ( debugger->DebugAddress ) ;
+            if ( debugger && Is_DebugOn )
+            {
+                if ( debugger->LastEffectsWord ) scWord = debugger->LastEffectsWord ;
+                else scWord = Word_GetFromCodeAddress ( debugger->DebugAddress ) ;
+            }
         }
     }
-    //if ( ! scWord ) scWord = GetState ( _Compiler_, ( COMPILE_MODE | ASM_MODE ) ) ? 
-    //        _Context_->CurrentWordBeingCompiled : _CfrTil_->LastFinished_Word ? 
-    //            _CfrTil_->LastFinished_Word : _Context_->CurrentlyRunningWord ;
     return (scWord && scWord->S_WordData ) ? scWord : 0 ;
 }
 

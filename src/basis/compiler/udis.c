@@ -61,7 +61,7 @@ Debugger_UdisOneInstruction ( Debugger * debugger, byte * address, byte * prefix
         ud_set_input_buffer ( ud, address, 16 ) ;
         ud_set_pc ( ud, ( int64 ) address ) ;
         isize = ud_disassemble ( ud ) ;
-        Debugger_ShowSourceCodeAtAddress ( debugger, address ) ;
+        SC_ShowSourceCode_In_Word_At_Address (0, address ) ;
         _Udis_PrintInstruction ( ud, address, prefix, postfix ) ; //, debugger->DebugAddress ) ;
         return isize ;
     }
@@ -83,7 +83,7 @@ _Udis_Disassemble ( ud_t *ud, byte* iaddress, int64 number, int64 cflag )
             isize = ud_disassemble ( ud ) ;
             iasm = ( char* ) ud_insn_asm ( ud ) ;
             address = ( byte* ) ( uint64 ) ud_insn_off ( ud ) ;
-            Debugger_ShowSourceCodeAtAddress ( _Debugger_, address ) ;
+            SC_ShowSourceCode_In_Word_At_Address (0, address ) ;
             _Udis_PrintInstruction ( ud, address, ( byte* ) "", ( byte* ) "" ) ;
             if ( ( cflag && String_Equal ( ( byte* ) "ret", ( byte* ) iasm ) ) ) //|| String_Equal ( ( byte* ) "invalid", ( byte* ) iasm ) )
             {

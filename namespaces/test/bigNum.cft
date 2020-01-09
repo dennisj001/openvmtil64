@@ -1,6 +1,6 @@
 5
 Int 
-dbgOff 
+//dbgOff 
 C
 //jcc8_Off
 : sp ; //stack pause ;

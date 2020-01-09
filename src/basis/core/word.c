@@ -12,7 +12,6 @@ Word_Run ( Word * word0 )
         _Context_->CurrentlyRunningWord = word0 ;
         DEBUG_SETUP ( word0 ) ;
         word = _Context_->CurrentlyRunningWord ;
-        //if ( String_Equal ( word->Name, "_assert1" )) _Printf ((byte*) "\ngot it\n") ;
         Block_Eval ( word->Definition ) ; // _Context_->CurrentlyRunningWord (= 0) may have been modified by debugger //word->Definition ) ;
         _Context_->LastRunWord = word ;
         _Context_->CurrentlyRunningWord = 0 ;
@@ -83,7 +82,7 @@ _Word_Finish ( Word * word )
     CfrTil_TypeStackReset ( ) ;
     _CfrTil_->LastFinished_Word = word ;
     _CfrTil_FinishWordDebugInfo ( word ) ;
-    //_CfrTil_SetSourceCodeWord ( word ) ;// done in word create
+    _CfrTil_SetSourceCodeWord ( word ) ;
 }
 
 void
@@ -152,7 +151,7 @@ _Word_Create ( byte * name, uint64 ctype, uint64 ctype2, uint64 ltype, uint64 al
     _Compiler_->CurrentCreatedWord = word ;
     _CfrTil_->WordCreateCount ++ ;
     Lexer_Set_ScIndex_RlIndex ( _Lexer_, word, - 1, - 1 ) ; // default values
-    _CfrTil_SetSourceCodeWord ( word ) ;
+    //_CfrTil_SetSourceCodeWord ( word ) ;
     return word ;
 }
 
