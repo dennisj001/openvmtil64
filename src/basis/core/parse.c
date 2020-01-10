@@ -215,7 +215,7 @@ _CfrTil_Parse_LocalsAndStackVariables ( int64 svf, int64 lispMode, ListObject * 
     Boolean regFlag = false ;
     byte *token, *returnVariable = 0 ;
     Namespace *typeNamespace = 0, *saveInNs = _CfrTil_->InNamespace ;
-    CfrTil_DbgSourceCodeOff ( ) ;
+    //CfrTil_DbgSourceCodeOff ( ) ;
     if ( ! CompileMode ) Compiler_Init ( compiler, 0, 0 ) ;
 
     if ( svf ) svff = 1 ;

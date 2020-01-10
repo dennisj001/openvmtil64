@@ -45,7 +45,7 @@ SC_ShowSourceCode_In_Word_At_Address ( Word * word, byte * address )
 {
     if ( GetState ( _CfrTil_, GLOBAL_SOURCE_CODE_MODE ) ) //DEBUG_SOURCE_CODE_MODE ) ) // ( _Context_->CurrentlyRunningWord ) && _Context_->CurrentlyRunningWord->W_SC_WordList ) )
     {
-        if ( ! word ) word = _CfrTil_->ScWord ;
+        if ( ! word ) word = Get_SourceCodeWord ( ) ; //_CfrTil_->ScWord ;
         SC_ShowDbgSourceCodeWord_Or_AtAddress (word, address) ;
         return true ;
     }
@@ -229,7 +229,7 @@ CfrTil_WordList_Init ( Word * svWord )
     _CfrTil_RecycleInit_Compiler_N_M_Node_WordList ( ) ;
     if ( svWord )
     {
-        svWord->W_SC_Index = 0 ; // before pushWord !
+        if ( ! GetState ( _Compiler_, LISP_MODE ) ) svWord->W_SC_Index = 0 ; // before pushWord !
         CfrTil_WordList_PushWord ( svWord ) ; // for source code
     }
 }
@@ -282,8 +282,6 @@ SC_ListClearAddress ( dlnode * node, byte * address )
 void
 Compiler_Word_SetCoding_And_ClearPreviousUseOf_A_SCA ( Word * word, byte * coding, Boolean clearPreviousFlag )
 {
-    //if ( GetState ( _Compiler_, LISP_MODE ) && ( ! GetState ( _LC_, LC_COMPILE_MODE ) ) ) return ; 
-    if ( GetState ( _Compiler_, LISP_MODE ) ) return ; //&& ( ! GetState ( _LC_, LC_COMPILE_MODE ) ) ) return ; 
     if ( Compiling && word )
     {
         if ( clearPreviousFlag ) dllist_Map1_FromEnd ( _CfrTil_->Compiler_N_M_Node_WordList, ( MapFunction1 ) SC_ListClearAddress, ( int64 ) coding ) ; //dllist_Map1_FromEnd ( _CfrTil_->CompilerWordList, ( MapFunction1 ) SC_ListClearAddress, ( int64 ) Here ) ; //( int64 ) word, ( int64 ) Here ) ;
@@ -449,24 +447,9 @@ Debugger_ShowTypeWordStack ( Debugger * debugger )
 }
 
 void
-CfrTil_DbgSourceCodeBeginBlock ( )
-{
-    SetState ( _CfrTil_, DEBUG_SOURCE_CODE_MODE, true ) ;
-    _SC_Global_On ;
-    if ( ! GetState ( _Context_, C_SYNTAX ) ) CfrTil_BeginBlock ( ) ;
-}
-
-void
-CfrTil_DbgSourceCodeEndBlock ( )
-{
-    if ( ! GetState ( _Context_, C_SYNTAX ) ) CfrTil_EndBlock ( ) ;
-    CfrTil_DbgSourceCodeOff ( ) ;
-}
-
-void
 CfrTil_DbgSourceCodeOff ( )
 {
-    //SetState ( _CfrTil_, GLOBAL_SOURCE_CODE_MODE, false ) ;
+    SetState ( _CfrTil_, GLOBAL_SOURCE_CODE_MODE, false ) ;
 }
 
 void
@@ -490,7 +473,7 @@ CfrTil_DbgSourceCodeOff_Global ( )
 // debug source code functions (above)
 //=================================================
 // text source code functions (below)
-
+#if 0
 void
 CfrTil_SourceCodeCompileOn_Colon ( )
 {
@@ -506,6 +489,22 @@ CfrTil_SourceCodeCompileOff_SemiColon ( )
     CfrTil_DbgSourceCodeOff ( ) ;
     if ( ! GetState ( _Context_, C_SYNTAX ) ) CfrTil_SemiColon ( ) ;
 }
+void
+CfrTil_DbgSourceCodeBeginBlock ( )
+{
+    SetState ( _CfrTil_, DEBUG_SOURCE_CODE_MODE, true ) ;
+    _SC_Global_On ;
+    if ( ! GetState ( _Context_, C_SYNTAX ) ) CfrTil_BeginBlock ( ) ;
+}
+
+void
+CfrTil_DbgSourceCodeEndBlock ( )
+{
+    if ( ! GetState ( _Context_, C_SYNTAX ) ) CfrTil_EndBlock ( ) ;
+    CfrTil_DbgSourceCodeOff ( ) ;
+}
+
+#endif
 
 void
 _CfrTil_AddStringToSourceCode ( CfrTil * cfrtil, byte * str )
@@ -696,9 +695,9 @@ Get_SourceCodeWord ( )
     Word * scWord ;
     if ( ! ( scWord = _Context_->CurrentDisassemblyWord ) )
     {
-        if ( ! (scWord = _CfrTil_->ScWord ? _CfrTil_->ScWord : GetState ( _Compiler_, ( COMPILE_MODE | ASM_MODE ) ) ?
+        if ( ! (scWord = GetState ( _Compiler_, ( COMPILE_MODE | ASM_MODE ) ) ?
             _Context_->CurrentWordBeingCompiled : _CfrTil_->LastFinished_Word ?
-            _CfrTil_->LastFinished_Word : _Compiler_->CurrentCreatedWord ))
+            _CfrTil_->LastFinished_Word : _CfrTil_->ScWord ? _CfrTil_->ScWord : _Compiler_->CurrentCreatedWord ))
         {
             if ( debugger && Is_DebugOn )
             {

@@ -305,7 +305,7 @@ verbosity 1 =
 infixOff
 1 opOn
 //stack pause
-s: hi ( a b | c ) c a @ b @ + = printf ("\nshould read 3 : %d", c ) ;s 1 2 hi //pause
+: hi ( a b | c ) c a @ b @ + = printf ("\nshould read 3 : %d", c ) ; 1 2 hi //pause
 sp
 // test byte size objects
 c_syntaxOn
@@ -334,7 +334,21 @@ bt.a123 1 _assert
 bt.c123.size 4 _assert
 bt.e123.size 8 _assert
 _assert ( bt.c123, 2147483647 ) ;
-c_syntaxOff //pause
+
+//pause
+int
+fac5 ( REG n  | REG facc ) 
+{ 
+    facc = 1 ;
+    while ( n > 1 ) 
+    {
+        facc = facc * (n --) ; // parenthesis a must for now ??
+    }
+    return facc ;
+}
+wdiss ( ' fac5 find ) 
+fac5 ( 7 ) dup p 5040 _assert  
+c_syntaxOff 
 2 + 7 assertStkChk // stack checking
 sp
 

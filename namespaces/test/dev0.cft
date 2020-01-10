@@ -200,7 +200,7 @@ BigNum
 bnOn
 : tbn ( | n m ) n 0 = m 3 = n m @ += n m @ += n m @ += n @ p ; tbn " : should be 9" ps
 // 9 _assert //_assert won't work here, it is not compiled with BigNum
-s: fibBN ( n | svn fn fn1 fn2 -- TOS ) 
+: fibBN ( n | svn fn fn1 fn2 -- TOS ) 
     { svn n @ = fn 0 = fn1 0 = fn2 1 = } { n @ 0 > } { n 1 -= } 
     {   
         fn1 fn2 @ = 
@@ -210,7 +210,7 @@ s: fibBN ( n | svn fn fn1 fn2 -- TOS )
     for
     //nl svn @ fprint ":" ps fn @ fprint 
     fn @
-;s
+;
 sp
 nl 200 dup "\nfib" ps p "=" ps fibBN p //pause
 
@@ -350,7 +350,7 @@ sp
 lispOff
 List
 _((lambda ( a b) (+ a b)) 3 4 ) dupList eval printList printList s lispOff
-s: bexp3 ( n ) { n @ 1 > } { n @ n @ -- bexp3 *  } { 1 } ifElse ;s
+: bexp3 ( n ) { n @ 1 > } { n @ n @ -- bexp3 *  } { 1 } ifElse ;
 'bexp3 find wdiss 7 bexp3 p //pause
 c_syntaxOn
 int
@@ -377,8 +377,8 @@ sp
 cpow (2 30 ) ; "2 ^ 30 : " ps dup p 1073741824 assert0
 c_syntaxOff 
 sp
-s: pow0 ( base power | out ) { out 1 = } { power @ 0 > } { power power @ 1 - = } { out out @ base @ * = } for return out ;s "II.I" typeSignature
-s: pow ( base power | out ) { out 1 = } { power @ 0 > } { power 1 -= } { out out @ base @ * = } for return out ;s "II.I" typeSignature
+: pow0 ( base power | out ) { out 1 = } { power @ 0 > } { power power @ 1 - = } { out out @ base @ * = } for return out ; "II.I" typeSignature
+: pow ( base power | out ) { out 1 = } { power @ 0 > } { power 1 -= } { out out @ base @ * = } for return out ; "II.I" typeSignature
 //: pow ( base power | out ) { out 1 = } { power @ 0 > } { power power @ 1 - = } { out out @ base @ * = } for return out ;
 2 30 pow0 dup p 1073741824 assert0 //pause
 2 30 pow dup p 1073741824 assert0 //pause

@@ -239,7 +239,6 @@ c_syntaxOff
 2 30 C_Syntax.cpow dup p  1073741824 _assert //pause
 
 : sp ; //stack pause ;
-//s: pow ( base power | out -- TOS ) { out 1 = } { power @ 0 > } { power power @ 1 - = } { out out @ base @ * = } for return out @ ;s
 : pow ( base power | out -t II.I ) { out 1 = } { power @ 0 > } { power power @ 1 - = } { out out @ base @ * = } for return out ; //"II.I" typeSignature
 //'pow find wdiss
 2 30 pow dup p  1073741824 _assert 
@@ -437,7 +436,7 @@ bnOn
 : sp ;
 sp
 : tbn ( | n m ) n 0 = m 3 = n m @ += n m @ += n m @ += n @ p ; tbn nl "should be 9" ps
-s: fibBN ( n | fn fn1 fn2 -- TOS ) 
+: fibBN ( n | fn fn1 fn2 -- TOS ) 
     { fn 0 = fn1 0 = fn2 1 = } { n @ 0 > } { n 1 -= } 
     {   
         fn1 fn2 @ = 
@@ -447,7 +446,7 @@ s: fibBN ( n | fn fn1 fn2 -- TOS )
     for
     // nl svn @ fprint ":" ps fn @ fprint 
     fn @
-;s
+;
 ' fibBN find wdiss
 20 fibBN p 
 sp

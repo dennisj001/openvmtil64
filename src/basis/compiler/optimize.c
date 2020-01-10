@@ -533,7 +533,6 @@ Compile_Optimize_Dup ( Compiler * compiler )
     }
     else
     {
-
         Compile_Move_Rm_To_Reg ( ACC, DSP, 0, 0 ) ;
         Compile_ADDI ( REG, DSP, 0, sizeof (int64 ), 0 ) ;
         Compile_Move_Reg_To_Rm ( DSP, ACC, 0, 0 ) ;

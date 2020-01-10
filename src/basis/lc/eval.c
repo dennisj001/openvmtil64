@@ -62,7 +62,12 @@ _LO_EvalSymbol (LambdaCalculus * lc, ListObject *l0, ListObject *locals )
             l0->CAttribute2 |= w->CAttribute2 ;
             l0->LAttribute |= w->LAttribute ;
         }
-        else l0 = w ;
+        else 
+        {
+            w->W_SC_Index = l0->W_SC_Index ;
+            w->W_RL_Index = l0->W_RL_Index ;
+            l0 = w ;
+        }
         if ( ( CompileMode ) && LO_CheckBeginBlock ( ) ) _LO_CompileOrInterpret_One ( l0, 0 ) ;
         if ( w->CAttribute & COMBINATOR )
         {

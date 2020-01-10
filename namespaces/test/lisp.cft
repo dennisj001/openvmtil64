@@ -176,20 +176,7 @@ sp
 (define fibc (lambda ( n ) (ifElse (< n 2) n (+ (fibc (- n 1)) (fibc (- n 2))))))
 "\nfibc 20 = " ps
 (fibc 20)
-#if Is_DebugOn 
-vb4 
-d: (define fibc (lambda ( n ) (ifElse (< n 2) n (+ (fibc (- n 1)) (fibc (- n 2))))))
-tick fibc find d: wdiss //pause
-"\nfibc 20 = " ps
-(fibc 20)
-tick fibc find d: wdiss //pause
-vb1
-#else
-(define fibc (lambda ( n ) (ifElse (< n 2) n (+ (fibc (- n 1)) (fibc (- n 2))))))
-"\nfibc 20 = " ps
-(fibc 20)
 tick fibc find wdiss //pause
-#endif
 
 //optimizeOff
 
@@ -294,7 +281,7 @@ $etc/lispScript ;
 : hi 1 2 + p ; hi nl
 $ls  -al ;
 //pause
-s: hi ( a b | c ) c a @ b @ + = printf ("\n%d", c ) ;s 1 2 hi nl //pause
+: hi ( a b | c ) c a @ b @ + = printf ("\n%d", c ) ; 1 2 hi nl //pause
 verbosity 1 =
 sp
 #endif

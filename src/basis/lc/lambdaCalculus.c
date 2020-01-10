@@ -101,16 +101,17 @@ _LO_New ( uint64 ltype, uint64 ctype, uint64 ctype2, byte * name, byte * value, 
         ( ltype & T_LISP_SYMBOL ) ? word ? word->RunType : 0 : 0, 0, 0, 0, addToNs, LISP ) ; //addToNs, LISP ) ;
     if ( ltype & LIST ) _LO_ListInit ( l0, allocType ) ;
     else if ( ltype & LIST_NODE ) l0->S_SymbolList = ( dllist* ) value ;
-    if ( word )
+    else if ( word )
     {
+        //Word * word = Compiler_CopyDuplicatesAndPush ( word0, tsrli, scwi ) ;
         l0->Lo_CfrTilWord = word ;
         word->Lo_CfrTilWord = word ;
         l0->W_SourceCode = word->W_SourceCode ;
         word->W_SC_Index = scwi ;
         word->W_RL_Index = tsrli ;
-        l0->W_SC_Index = scwi ;
-        l0->W_RL_Index = tsrli ;
     }
+    l0->W_SC_Index = scwi ;
+    l0->W_RL_Index = tsrli ;
     return l0 ;
 }
 
@@ -209,6 +210,10 @@ _LO_CopyOne ( ListObject * l0, uint64 allocType )
         // nb. since we are coping the car/cdr are the same as the original so we must clear them else when try to add to the list and remove first it will try to remove from a wrong list so ...
         l1->Lo_Car = 0 ;
         l1->Lo_Cdr = 0 ;
+#if 0 //shouldn't need this ??        
+        l1->W_RL_Index = l0->W_RL_Index ;
+        l1->W_SC_Index = l0->W_SC_Index ; 
+#endif        
     }
     return l1 ;
 }
@@ -508,7 +513,7 @@ _LC_Init ( LambdaCalculus * lc )
         int64 svds = GetState ( _CfrTil_, _DEBUG_SHOW_ ) ;
         int64 svsco = IsSourceCodeOn ;
         DebugShow_Off ;
-        CfrTil_DbgSourceCodeOff ( ) ;
+        //CfrTil_DbgSourceCodeOff ( ) ;
         lc->Nil = DataObject_New ( T_LC_DEFINE, 0, ( byte* ) "nil", 0, 0, T_NIL, 0, 0, 0, 0, - 1 ) ;
         lc->True = DataObject_New ( T_LC_DEFINE, 0, ( byte* ) "true", 0, 0, 0, 0, ( uint64 ) true, 0, 0, - 1 ) ;
         lc->buffer = Buffer_Data ( lc->PrintBuffer ) ;
