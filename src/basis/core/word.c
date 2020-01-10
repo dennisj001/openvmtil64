@@ -8,7 +8,7 @@ Word_Run ( Word * word0 )
         Word * word ;
         word0->StackPushRegisterCode = 0 ; // nb. used! by the rewriting optInfo
         // keep track in the word itself where the machine code is to go, if this word is compiled or causes compiling code - used for optimization
-        Word_SetCodingAndSourceCoding ( word0, Here ) ; // if we change it later (eg. in lambda calculus) we must change it there because the rest of the compiler depends on this
+        if ( Compiling ) Word_SetCodingAndSourceCoding ( word0, Here ) ; // if we change it later (eg. in lambda calculus) we must change it there because the rest of the compiler depends on this
         _Context_->CurrentlyRunningWord = word0 ;
         DEBUG_SETUP ( word0 ) ;
         word = _Context_->CurrentlyRunningWord ;
@@ -28,6 +28,7 @@ Word_Eval ( Word * word )
         if ( ( word->CAttribute & IMMEDIATE ) || ( ! CompileMode ) ) Word_Run ( word ) ;
         else _Word_Compile ( word ) ;
         _DEBUG_SHOW ( word, 0 ) ;
+        //if ( Is_DebugOn ) Compiler_WordList_Show ( word, 0, 0, 0 ) ;
         _Context_->CurrentEvalWord = 0 ;
         _Context_->LastEvalWord = word ;
     }

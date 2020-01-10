@@ -250,12 +250,12 @@ CfrTil_SaveDebugInfo ( Word * word, uint64 allocType )
     if ( ! word->W_SC_WordList )
     {
         //word->W_SC_WordList = _CfrTil_->Compiler_N_M_Node_WordList ;
-        oword = Word_GetOriginalWord ( word ) ;
-        if ( oword ) word = oword ;
+        //oword = Word_GetOriginalWord ( word ) ;
+        //if ( oword ) word = oword ;
         word->W_SC_WordList = _CfrTil_->Compiler_N_M_Node_WordList ;
         _CfrTil_->Compiler_N_M_Node_WordList = _dllist_New ( allocType ) ;
-        if ( Is_DebugOn ) Compiler_WordList_Show ( word, 0, 0, 0 ) ;
-        _CfrTil_SetSourceCodeWord ( word ) ;
+        //if ( Is_DebugOn ) Compiler_WordList_Show ( word, 0, 0, 0 ) ;
+        //_CfrTil_SetSourceCodeWord ( word ) ;
     }
     else List_Init ( _CfrTil_->Compiler_N_M_Node_WordList ) ;
 

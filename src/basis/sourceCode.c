@@ -103,12 +103,12 @@ DWL_Find ( dllist * list, Word * iword, byte * address, byte* name, int64 takeFi
             scwi = dobject_Get_M_Slot ( ( dobject* ) anode, SCN_SC_WORD_INDEX ) ;
             naddress = aFoundWord->SourceCoding ;
             if ( iword && ( aFoundWord == iword ) ) return aFoundWord ;
-            if ( Compiling && ( ! GetState ( _Debugger_, DBG_DISASM_ACC ) ) && _Debugger_->w_Word
-                && ( aFoundWord == _Debugger_->w_Word ) ) return aFoundWord ;
-            else
+            //if ( Compiling && ( ! GetState ( _Debugger_, DBG_DISASM_ACC ) ) && _Debugger_->w_Word
+            //    && ( aFoundWord == _Debugger_->w_Word ) ) return aFoundWord ;
+            //else
             {
                 if ( ( _Q_->Verbosity > 3 ) ) DWL_ShowWord ( anode, i, 0, ( int64 ) "afound", fDiff ) ;
-                if ( address && ( address == aFoundWord->SourceCoding ) )
+                if ( address && ( address == naddress ) )
                 {
                     //if ( address == ( byte* ) 0x7ffff72fa09c ) _Printf ( ( byte* ) "" ) ;
                     numFound ++ ;
@@ -224,13 +224,13 @@ _CfrTil_RecycleInit_Compiler_N_M_Node_WordList ( )
 }
 
 void
-CfrTil_WordList_Init ( Word * svWord )
+CfrTil_WordList_Init ( Word * word )
 {
     _CfrTil_RecycleInit_Compiler_N_M_Node_WordList ( ) ;
-    if ( svWord )
+    if ( word )
     {
-        if ( ! GetState ( _Compiler_, LISP_MODE ) ) svWord->W_SC_Index = 0 ; // before pushWord !
-        CfrTil_WordList_PushWord ( svWord ) ; // for source code
+        if ( ! GetState ( _Compiler_, LISP_MODE ) ) word->W_SC_Index = 0 ; // before pushWord !
+        CfrTil_WordList_PushWord ( word ) ; // for source code
     }
 }
 
