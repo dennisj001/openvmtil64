@@ -720,7 +720,7 @@ typedef struct
     int64 * FrameSizeCellOffset, BlocksBegun ;
     byte * RspSaveOffset ;
     byte * RspRestoreOffset ;
-    Word * ReturnVariableWord, * CurrentWord, *CurrentCreatedWord, * LHS_Word ;
+    Word * ReturnVariableWord, * Current_Word_New, *Current_Word_Create, * LHS_Word ;
     Namespace *C_BackgroundNamespace, *C_FunctionBackgroundNamespace, *LocalsNamespace, *AutoVarTypeNamespace ; //, ** FunctionTypesArray ;
     dllist * GotoList ;
     dllist * CurrentSwitchList ;

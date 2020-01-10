@@ -1227,7 +1227,8 @@ void CfrTil_SetAlertRGB(void);
 void CfrTil_SetDebugRGB(void);
 void CfrTil_SetNoticeRGB(void);
 /* src/basis/sourceCode.c */
-void SC_ShowDbgSourceCodeWord_Or_AtAddress(Word * scWord, byte *address);
+void SC_ShowDbgSourceCodeWord_Or_AtAddress(Word *scWord, byte *address);
+Boolean SC_ShowSourceCode_In_Word_At_Address(Word *word, byte *address);
 Boolean SC_IsWord_BlockOrCombinator(Word *word);
 Boolean SC_IsWord_MatchCorrectConsideringBlockOrCombinator(Word *word);
 Word *DWL_Find(dllist *list, Word *iword, byte *address, byte *name, int64 takeFirstFind, byte *newAddress, int64 fromFirstFlag);
@@ -1239,7 +1240,7 @@ void CheckRecycleWord(Node *node);
 void DLList_Recycle_WordList(dllist *list);
 void DLList_RecycleInit_WordList(Word *word);
 void _CfrTil_RecycleInit_Compiler_N_M_Node_WordList(void);
-void CfrTil_WordList_Init(Word *svWord);
+void CfrTil_WordList_Init(Word *word);
 void Word_SetSourceCoding(Word *word, byte *address);
 void Word_SetCoding(Word *word, byte *address);
 void WordList_SetSourceCoding(int64 index, byte *address);
@@ -1262,14 +1263,10 @@ void Compiler_SC_WordList_Show(byte *prefix, Boolean inUseOnlyFlag, Boolean show
 void Debugger_WordList_Show_All(Debugger *debugger);
 void Debugger_WordList_Show_InUse(Debugger *debugger);
 void Debugger_ShowTypeWordStack(Debugger *debugger);
-void CfrTil_DbgSourceCodeBeginBlock(void);
-void CfrTil_DbgSourceCodeEndBlock(void);
 void CfrTil_DbgSourceCodeOff(void);
 void CfrTil_DbgSourceCodeOn(void);
 void CfrTil_DbgSourceCodeOn_Global(void);
 void CfrTil_DbgSourceCodeOff_Global(void);
-void CfrTil_SourceCodeCompileOn_Colon(void);
-void CfrTil_SourceCodeCompileOff_SemiColon(void);
 void _CfrTil_AddStringToSourceCode(CfrTil *cfrtil, byte *str);
 void CfrTil_AddStringToSourceCode(CfrTil *cfrtil, byte *str);
 void _CfrTil_SC_ScratchPadIndex_Init(CfrTil *cfrtil);
@@ -1443,7 +1440,6 @@ void _List_Show_N_Word_Names(dllist *list, uint64 n, int64 showBeforeAfterFlag, 
 /* src/basis/debugDisassembly.c */
 ud_t *Debugger_UdisInit(Debugger *debugger);
 int64 Debugger_Udis_GetInstructionSize(Debugger *debugger);
-Boolean SC_ShowSourceCode_In_Word_At_Address(Word * word, byte *address);
 int64 _Debugger_Disassemble(Debugger *debugger, byte *address, int64 number, int64 cflag);
 void Debugger_Disassemble(Debugger *debugger, byte *address, int64 number, int64 cflag);
 void Debugger_Dis(Debugger *debugger);

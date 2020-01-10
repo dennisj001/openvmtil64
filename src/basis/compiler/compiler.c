@@ -237,7 +237,6 @@ Compiler_Init_AccumulatedOffsetPointers ( Compiler * compiler, Word * word )
 void
 CfrTil_SaveDebugInfo ( Word * word, uint64 allocType )
 {
-    Word * oword ;
     Compiler * compiler = _Compiler_ ;
     if ( ! allocType ) allocType = CFRTIL ; // COMPILER_TEMP ;
     word = word ? word : _CfrTil_->LastFinished_Word ;
@@ -249,6 +248,7 @@ CfrTil_SaveDebugInfo ( Word * word, uint64 allocType )
     Stack_Init ( compiler->LocalsCompilingNamespacesStack ) ;
     if ( ! word->W_SC_WordList )
     {
+        //Word * oword ;
         //word->W_SC_WordList = _CfrTil_->Compiler_N_M_Node_WordList ;
         //oword = Word_GetOriginalWord ( word ) ;
         //if ( oword ) word = oword ;
@@ -301,8 +301,8 @@ Compiler_Init ( Compiler * compiler, uint64 state, Boolean flag )
     compiler->LocalsFrameSize = 0 ;
     compiler->AccumulatedOffsetPointer = 0 ;
     compiler->ReturnVariableWord = 0 ;
-    compiler->CurrentWord = 0 ;
-    compiler->CurrentCreatedWord = 0 ;
+    compiler->Current_Word_New = 0 ;
+    compiler->Current_Word_Create = 0 ;
     Stack_Init ( compiler->BlockStack ) ;
     Stack_Init ( compiler->CombinatorBlockInfoStack ) ;
     Stack_Init ( compiler->PointerToOffsetStack ) ;

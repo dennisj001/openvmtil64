@@ -416,11 +416,10 @@ fload test.txt //pause
 tc 
 //demo
 
-
 #if _doDemo 
 demo 
 #endif //dT0
-rtw
+//rtw
 
 stringMacrosOff
 
@@ -430,19 +429,19 @@ stringMacrosOff
 'doInitTest 1 const
 #if doInitTest
 // startup test code here ...
+
 #if 0 //tcOnv @
 tc demo
 //fload nt.cft
 //mct
-#endif
-#endif // #else
+#endif //tcOnv @
 
+#endif //doInitTest 
+#endif // Is_DebugOn
 bnOff
 Shell
-
-#endif
 infixOn
-(1 + 5) / (2 + 1) 2 _assert
+((1 + 5) * 8) / ((2 + 1) * ( 2 * 4 )) 2 _assert
 infixOff
 rtw
 'test 'tc find alias //nb! after rtw which removes all words "test", etc.

@@ -160,7 +160,7 @@ _CfrTil_BeginBlock0 ( )
     if ( ( ! CompileMode ) || ( ! Compiler_BlockLevel ( compiler ) ) )// first block
     {
         CheckCodeSpaceForRoom ( ) ;
-        _Context_->CurrentWordBeingCompiled = compiler->CurrentCreatedWord ;
+        _Context_->CurrentWordBeingCompiled = compiler->Current_Word_Create ;
         CfrTil_TurnOnBlockCompiler ( ) ;
     }
     compiler->LHS_Word = 0 ;

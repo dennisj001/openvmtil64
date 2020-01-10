@@ -350,11 +350,9 @@ wdiss ( ' fac5 find )
 fac5 ( 7 ) dup p 5040 _assert  
 c_syntaxOff 
 bnOff
-#if Is_DebugOn
 infixOn
 (1 + 5) / (2 + 1) 2 _assert
 infixOff
-#endif
 2 + 7 assertStkChk // stack checking
 sp
 

@@ -697,7 +697,7 @@ Get_SourceCodeWord ( )
     {
         if ( ! (scWord = GetState ( _Compiler_, ( COMPILE_MODE | ASM_MODE ) ) ?
             _Context_->CurrentWordBeingCompiled : _CfrTil_->LastFinished_Word ?
-            _CfrTil_->LastFinished_Word : _CfrTil_->ScWord ? _CfrTil_->ScWord : _Compiler_->CurrentCreatedWord ))
+            _CfrTil_->LastFinished_Word : _CfrTil_->ScWord ? _CfrTil_->ScWord : _Compiler_->Current_Word_Create ))
         {
             if ( debugger && Is_DebugOn )
             {

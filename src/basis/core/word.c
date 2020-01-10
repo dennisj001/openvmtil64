@@ -24,7 +24,7 @@ Word_Eval ( Word * word )
     if ( word )
     {
         _Context_->CurrentEvalWord = word ;
-        if ( IS_MORPHISM_TYPE (word) ) CfrTil_Typecheck ( word ) ;
+        if ( IS_MORPHISM_TYPE ( word ) ) CfrTil_Typecheck ( word ) ;
         if ( ( word->CAttribute & IMMEDIATE ) || ( ! CompileMode ) ) Word_Run ( word ) ;
         else _Word_Compile ( word ) ;
         _DEBUG_SHOW ( word, 0 ) ;
@@ -149,10 +149,9 @@ _Word_Create ( byte * name, uint64 ctype, uint64 ctype2, uint64 ltype, uint64 al
     word->CAttribute2 = ctype2 ;
     word->LAttribute = ltype ;
     if ( Is_NamespaceType ( word ) ) word->Lo_List = dllist_New ( ) ;
-    _Compiler_->CurrentCreatedWord = word ;
+    _Compiler_->Current_Word_Create = word ;
     _CfrTil_->WordCreateCount ++ ;
     Lexer_Set_ScIndex_RlIndex ( _Lexer_, word, - 1, - 1 ) ; // default values
-    //_CfrTil_SetSourceCodeWord ( word ) ;
     return word ;
 }
 
@@ -172,7 +171,8 @@ Word *
 _Word_New ( byte * name, uint64 ctype, uint64 ctype2, uint64 ltype, Boolean addToInNs, Namespace * addToNs, uint64 allocType )
 {
     Word * word = _Word_Create ( name, ctype, ctype2, ltype, allocType ) ; // CFRTIL_WORD : cfrTil compiled words as opposed to C compiled words
-    _Compiler_->CurrentWord = word ;
+    _Compiler_->Current_Word_New = word ;
+    Word_SetCodingAndSourceCoding ( word, Here ) ;
     Word_SetLocation ( word ) ;
     _Word_Add ( word, addToInNs, addToNs ) ; // add to the head of the list
     return word ;
@@ -202,7 +202,7 @@ Word_PrintOffset ( Word * word, int64 offset, int64 totalOffset )
         _Printf ( ( byte* ) "\n\'%s\' = object field :: type = %s : size (in bytes) = 0x%lx : base object \'%s\' = 0x%lx : offset = 0x%lx : total offset = 0x%lx : address = 0x%lx",
             //name, cntx->Interpreter0->BaseObject ? cntx->Interpreter0->BaseObject->Name : ( byte* ) "",
             name, word->TypeNamespace ? word->TypeNamespace->Name : ( byte* ) "",
-            word->ObjectByteSize ? word->ObjectByteSize : TypeNamespace_Get ( word ) ? (word->ObjectByteSize = ( int64 ) _CfrTil_VariableValueGet ( TypeNamespace_Get ( word )->Name, ( byte* ) "size" )) : 0,
+            word->ObjectByteSize ? word->ObjectByteSize : TypeNamespace_Get ( word ) ? ( word->ObjectByteSize = ( int64 ) _CfrTil_VariableValueGet ( TypeNamespace_Get ( word )->Name, ( byte* ) "size" ) ) : 0,
             cntx->Interpreter0->BaseObject ? String_ConvertToBackSlash ( cntx->Interpreter0->BaseObject->Name ) : ( byte* ) "",
             cntx->Interpreter0->BaseObject ? cntx->Interpreter0->BaseObject->W_Value : 0,
             word->Offset, totalOffset, cntx->Interpreter0->BaseObject ? ( ( ( byte* ) cntx->Interpreter0->BaseObject->W_Value ) + totalOffset ) : ( byte* ) - 1 ) ;
