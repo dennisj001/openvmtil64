@@ -136,8 +136,9 @@ User
 //'dn 'dfnba find alias  
 : factorial ( REG n | REG rec -- RAX ) rec 1 = { n @ 1 > } { rec @ n @ * rec store n -- } while return rec ;
 jcc8_Off
+'reps0 var
 : _ifx ( w | j ) 
-    { j 1 = } { j @ 23 <= } { j ++ } 
+    { j 1 = } { j @ reps0 @ <= } { j ++ } 
     {
        //j @ w @ wordRun j @ p "." ps p ";" ps dn
        j @ w @ wordRun drop // j @ p "." ps p ";" ps
@@ -147,7 +148,7 @@ jcc8_Off
 ;
 
 : _ifx2 ( w | j k ) 
-    { k 2 = j 1 = } { j @ 23 <= } { j ++ } 
+    { k 2 = j 1 = } { j @ reps0 @ <= } { j ++ } 
     {
        //k @ j @ w @ wordRun j @ p "." ps p ";" ps
        j @ k @ w @ wordRun drop //3 ndrop pause // j @ p "." ps p ";" ps
@@ -172,7 +173,9 @@ jcc8_Off
 
 nl "ffx ... " ps nl
 
-: ffx ( wn | w ) 1 ti w wn @ _findAny = w @ wdiss 3 w @ _ffx nl wn @ ps ":" ps 1 time nl ;
+: comment ( wn ) ":: function :" ps wn @ ps ": called on args : 1 -" ps reps0 @ p ":" ps reps @ p "reps" ps ;
+: ffx ( wn | w ) 1 ti w wn @ _findAny = w @ wdiss 3 w @ _ffx nl wn @ ps ":" ps 1 time wn @ comment nl ;
+//: ffx ( wn | w ) 1 ti w wn @ _findAny = w @ wdiss 3 w @ _ffx nl wn @ ps ":" ps 1 time nl ;
 : ffx2 ( wn | w ) 1 ti w wn @ _findAny = w @ wdiss w @ 3 _ffx2 1 time nl ;
 c_syntaxOn
 jcc8_On
@@ -193,7 +196,8 @@ c_syntaxOff
 User
 
 #if 1
-reps 20000 =
+reps0 23 =
+reps 10000 =
 "factorial" ffx
 "cfactorial" ffx
 "cfactorial2" ffx
@@ -224,7 +228,7 @@ using
 "fac5" ffx
 "fac4" ffx
 sp
-sp
+pause
 #endif
 
 jcc8_On

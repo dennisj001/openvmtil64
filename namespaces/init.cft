@@ -137,6 +137,7 @@ Compiler
 "compileCall" ' _compileCall find alias immediate
 "swap" ' _swap find alias immediate
 Interpreter 
+// core words 
 "{" ' begin find alias immediate keyword
 "end" ' _end find alias immediate
 "}" ' end find alias keyword
@@ -441,7 +442,7 @@ tc demo
 bnOff
 Shell
 infixOn
-(1 + 5) / (2 + 1) 2 _assert
+((1 + 5) * 8) / ((2 + 1) * ( 2 * 4 )) 2 _assert
 infixOff
 rtw
 'test 'tc find alias //nb! after rtw which removes all words "test", etc.

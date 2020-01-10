@@ -2,7 +2,7 @@
 #include "../include/cfrtil64.h"
 
 void
-SC_ShowDbgSourceCodeWord_Or_AtAddress (Word * scWord, byte * address)
+SC_ShowDbgSourceCodeWord_Or_AtAddress ( Word * scWord, byte * address )
 {
     // ...source code source code TP source code source code ... EOL
     if ( ! Compiling )
@@ -18,11 +18,8 @@ SC_ShowDbgSourceCodeWord_Or_AtAddress (Word * scWord, byte * address)
                 {
                     int64 fixed = 0 ;
                     Word * word = DWL_Find ( list, 0, address, 0, 0, 0, 0 ) ;
-                    if ( word ) //&& ( debugger->LastSourceCodeWord != word ) )
+                    if ( word )
                     {
-                        //debugger->LastSourceCodeWord = word ;
-                        d0 ( Debugger_WordList_Show_All ( ) ) ;
-
                         if ( ( scWord->WAttribute & WT_C_SYNTAX ) && ( String_Equal ( word->Name, "store" ) || String_Equal ( word->Name, "poke" ) ) )
                         {
                             word->Name = ( byte* ) "=" ;
@@ -46,7 +43,7 @@ SC_ShowSourceCode_In_Word_At_Address ( Word * word, byte * address )
     if ( GetState ( _CfrTil_, GLOBAL_SOURCE_CODE_MODE ) ) //DEBUG_SOURCE_CODE_MODE ) ) // ( _Context_->CurrentlyRunningWord ) && _Context_->CurrentlyRunningWord->W_SC_WordList ) )
     {
         if ( ! word ) word = Get_SourceCodeWord ( ) ; //_CfrTil_->ScWord ;
-        SC_ShowDbgSourceCodeWord_Or_AtAddress (word, address) ;
+        SC_ShowDbgSourceCodeWord_Or_AtAddress ( word, address ) ;
         return true ;
     }
     return false ;
@@ -103,43 +100,35 @@ DWL_Find ( dllist * list, Word * iword, byte * address, byte* name, int64 takeFi
             scwi = dobject_Get_M_Slot ( ( dobject* ) anode, SCN_SC_WORD_INDEX ) ;
             naddress = aFoundWord->SourceCoding ;
             if ( iword && ( aFoundWord == iword ) ) return aFoundWord ;
-            //if ( Compiling && ( ! GetState ( _Debugger_, DBG_DISASM_ACC ) ) && _Debugger_->w_Word
-            //    && ( aFoundWord == _Debugger_->w_Word ) ) return aFoundWord ;
-            //else
+            if ( ( _Q_->Verbosity > 3 ) ) DWL_ShowWord ( anode, i, 0, ( int64 ) "afound", fDiff ) ;
+            if ( address && ( address == naddress ) )
             {
-                if ( ( _Q_->Verbosity > 3 ) ) DWL_ShowWord ( anode, i, 0, ( int64 ) "afound", fDiff ) ;
-                if ( address && ( address == naddress ) )
+                numFound ++ ;
+                fDiff = abs ( scwi - lastScwi ) ;
+                aFoundWord->W_SC_Index = scwi ; // not sure exactly why this is necessary but it is important for now??
+                if ( ( _Q_->Verbosity > 2 ) ) DWL_ShowWord ( anode, i, 0, ( int64 ) "FOUND", fDiff ) ;
+                if ( ( aFoundWord->CAttribute & LITERAL ) && ( aFoundWord->Coding[1] == 0xb9 ) )
                 {
-                    //if ( address == ( byte* ) 0x7ffff72fa09c ) _Printf ( ( byte* ) "" ) ;
-                    numFound ++ ;
-                    fDiff = abs ( scwi - lastScwi ) ;
-                    aFoundWord->W_SC_Index = scwi ; // not sure exactly why this is necessary but it is important for now??
-                    if ( ( _Q_->Verbosity > 2 ) ) DWL_ShowWord ( anode, i, 0, ( int64 ) "FOUND", fDiff ) ;
-                    if ( ( aFoundWord->CAttribute & LITERAL ) && ( aFoundWord->Coding[1] == 0xb9 ) )
-                    {
-                        foundWord = aFoundWord ;
-                        minDiffFound = fDiff ;
-                    }
-                    else if ( ( aFoundWord->CAttribute & CATEGORY_PLUS_PLUS_MINUS_MINUS ) && ( aFoundWord->Coding[1] == 0xff ) )
-                    {
-                        foundWord = aFoundWord ;
-                        break ;
-                    }
-#if 1               
-                    else if ( SC_IsWord_MatchCorrectConsideringBlockOrCombinator ( aFoundWord ) )
-                    {
-                        foundWord = aFoundWord ;
-                        minDiffFound = fDiff ;
-                    }
-#endif                
-                    else if ( ( fDiff < minDiffFound ) && SC_IsWord_MatchCorrectConsideringBlockOrCombinator ( aFoundWord ) )//|| SC_IsWord_MatchCorrectConsideringBlockOrCombinator ( foundWord ) || ( ! SC_IsWord_MatchCorrectConsideringBlockOrCombinator ( aFoundWord ) ) )
-                    {
-                        foundWord = aFoundWord ;
-                        minDiffFound = fDiff ;
-                    }
-                    else if ( ! foundWord ) maybeFoundWord = aFoundWord ;
-                    if ( takeFirstFind ) break ;
+                    foundWord = aFoundWord ;
+                    minDiffFound = fDiff ;
                 }
+                else if ( ( aFoundWord->CAttribute & CATEGORY_PLUS_PLUS_MINUS_MINUS ) && ( aFoundWord->Coding[1] == 0xff ) )
+                {
+                    foundWord = aFoundWord ;
+                    break ;
+                }
+                else if ( SC_IsWord_MatchCorrectConsideringBlockOrCombinator ( aFoundWord ) )
+                {
+                    foundWord = aFoundWord ;
+                    minDiffFound = fDiff ;
+                }
+                else if ( ( fDiff < minDiffFound ) && SC_IsWord_MatchCorrectConsideringBlockOrCombinator ( aFoundWord ) )//|| SC_IsWord_MatchCorrectConsideringBlockOrCombinator ( foundWord ) || ( ! SC_IsWord_MatchCorrectConsideringBlockOrCombinator ( aFoundWord ) ) )
+                {
+                    foundWord = aFoundWord ;
+                    minDiffFound = fDiff ;
+                }
+                else if ( ! foundWord ) maybeFoundWord = aFoundWord ;
+                if ( takeFirstFind ) break ;
             }
         }
         if ( ( ! foundWord ) && maybeFoundWord ) foundWord = maybeFoundWord ;
@@ -413,7 +402,7 @@ Compiler_WordList_Show ( Word * word, byte * prefix, Boolean inUseOnlyFlag, Bool
         if ( Is_DebugModeOn || showInDebugColors ) NoticeColors ;
         if ( word )
         {
-            sprintf ( ( char* ) buffer, "%sWord = %s = %lx :: list = %s : %s", prefix ? prefix : ( byte* ) "", ( char* ) word->Name, ( int64 ) word, 
+            sprintf ( ( char* ) buffer, "%sWord = %s = %lx :: list = %s : %s", prefix ? prefix : ( byte* ) "", ( char* ) word->Name, ( int64 ) word,
                 ( list == _CfrTil_->Compiler_N_M_Node_WordList ) ? "CfrTil WordList" : "source code word list for the word", inUseOnlyFlag ? "in use only" : "all" ) ;
         }
         SC_WordList_Show ( list, word, 0, inUseOnlyFlag, buffer ) ;
@@ -473,39 +462,6 @@ CfrTil_DbgSourceCodeOff_Global ( )
 // debug source code functions (above)
 //=================================================
 // text source code functions (below)
-#if 0
-void
-CfrTil_SourceCodeCompileOn_Colon ( )
-{
-    CfrTil_DbgSourceCodeOn ( ) ;
-    CfrTil_SourceCode_Init ( ) ;
-    //CfrTil_WordList_RecycleInit ( _CfrTil_ ) 
-    if ( ! GetState ( _Context_, C_SYNTAX ) ) _CfrTil_Colon ( 0 ) ;
-}
-
-void
-CfrTil_SourceCodeCompileOff_SemiColon ( )
-{
-    CfrTil_DbgSourceCodeOff ( ) ;
-    if ( ! GetState ( _Context_, C_SYNTAX ) ) CfrTil_SemiColon ( ) ;
-}
-void
-CfrTil_DbgSourceCodeBeginBlock ( )
-{
-    SetState ( _CfrTil_, DEBUG_SOURCE_CODE_MODE, true ) ;
-    _SC_Global_On ;
-    if ( ! GetState ( _Context_, C_SYNTAX ) ) CfrTil_BeginBlock ( ) ;
-}
-
-void
-CfrTil_DbgSourceCodeEndBlock ( )
-{
-    if ( ! GetState ( _Context_, C_SYNTAX ) ) CfrTil_EndBlock ( ) ;
-    CfrTil_DbgSourceCodeOff ( ) ;
-}
-
-#endif
-
 void
 _CfrTil_AddStringToSourceCode ( CfrTil * cfrtil, byte * str )
 {
@@ -695,9 +651,9 @@ Get_SourceCodeWord ( )
     Word * scWord ;
     if ( ! ( scWord = _Context_->CurrentDisassemblyWord ) )
     {
-        if ( ! (scWord = GetState ( _Compiler_, ( COMPILE_MODE | ASM_MODE ) ) ?
+        if ( ! ( scWord = GetState ( _Compiler_, ( COMPILE_MODE | ASM_MODE ) ) ?
             _Context_->CurrentWordBeingCompiled : _CfrTil_->LastFinished_Word ?
-            _CfrTil_->LastFinished_Word : _CfrTil_->ScWord ? _CfrTil_->ScWord : _Compiler_->Current_Word_Create ))
+            _CfrTil_->LastFinished_Word : _CfrTil_->ScWord ? _CfrTil_->ScWord : _Compiler_->Current_Word_Create ) )
         {
             if ( debugger && Is_DebugOn )
             {
@@ -761,3 +717,39 @@ SC_PrepareDbgSourceCodeString ( byte * sc, Word * word ) // sc : source code ; s
     else cc_line = ( byte* ) "" ;
     return cc_line ;
 }
+
+#if 0
+
+void
+CfrTil_SourceCodeCompileOn_Colon ( )
+{
+    CfrTil_DbgSourceCodeOn ( ) ;
+    CfrTil_SourceCode_Init ( ) ;
+    //CfrTil_WordList_RecycleInit ( _CfrTil_ ) 
+    if ( ! GetState ( _Context_, C_SYNTAX ) ) _CfrTil_Colon ( 0 ) ;
+}
+
+void
+CfrTil_SourceCodeCompileOff_SemiColon ( )
+{
+    CfrTil_DbgSourceCodeOff ( ) ;
+    if ( ! GetState ( _Context_, C_SYNTAX ) ) CfrTil_SemiColon ( ) ;
+}
+
+void
+CfrTil_DbgSourceCodeBeginBlock ( )
+{
+    SetState ( _CfrTil_, DEBUG_SOURCE_CODE_MODE, true ) ;
+    _SC_Global_On ;
+    if ( ! GetState ( _Context_, C_SYNTAX ) ) CfrTil_BeginBlock ( ) ;
+}
+
+void
+CfrTil_DbgSourceCodeEndBlock ( )
+{
+    if ( ! GetState ( _Context_, C_SYNTAX ) ) CfrTil_EndBlock ( ) ;
+    CfrTil_DbgSourceCodeOff ( ) ;
+}
+
+#endif
+

@@ -137,6 +137,7 @@ Compiler
 "compileCall" ' _compileCall find alias immediate
 "swap" ' _swap find alias immediate
 Interpreter 
+// core words 
 "{" ' begin find alias immediate keyword
 "end" ' _end find alias immediate
 "}" ' end find alias keyword

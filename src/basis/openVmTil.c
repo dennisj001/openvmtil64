@@ -1,5 +1,5 @@
 #include "../include/cfrtil64.h"
-#define VERSION ((byte*) "0.901.810" ) 
+#define VERSION ((byte*) "0.901.830" ) 
 // Logic/Foml (Foundations of Mathematical Logic by Haskell Curry), Oop (Object Oriented Programming), 
 // C, Lisp, Rpn/Lag : Reverse Polish Notation, (Left Associative Grammar), 
 // Sm : State Machines, Pda : Push Down Automata, Tm : Turing Machine :: 

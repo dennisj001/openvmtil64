@@ -152,6 +152,7 @@ _Word_Create ( byte * name, uint64 ctype, uint64 ctype2, uint64 ltype, uint64 al
     _Compiler_->Current_Word_Create = word ;
     _CfrTil_->WordCreateCount ++ ;
     Lexer_Set_ScIndex_RlIndex ( _Lexer_, word, - 1, - 1 ) ; // default values
+    Word_SetCodingAndSourceCoding ( word, Here ) ;
     return word ;
 }
 
@@ -172,7 +173,6 @@ _Word_New ( byte * name, uint64 ctype, uint64 ctype2, uint64 ltype, Boolean addT
 {
     Word * word = _Word_Create ( name, ctype, ctype2, ltype, allocType ) ; // CFRTIL_WORD : cfrTil compiled words as opposed to C compiled words
     _Compiler_->Current_Word_New = word ;
-    Word_SetCodingAndSourceCoding ( word, Here ) ;
     Word_SetLocation ( word ) ;
     _Word_Add ( word, addToInNs, addToNs ) ; // add to the head of the list
     return word ;

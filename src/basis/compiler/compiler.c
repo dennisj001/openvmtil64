@@ -22,25 +22,21 @@ _CopyDuplicateWord ( Word * word0, Boolean complete )
 Word *
 CopyDuplicateWord ( dlnode * anode, Word * word0 )
 {
-    Word * wordn = ( Word* ) dobject_Get_M_Slot ( ( dobject* ) anode, SCN_T_WORD ) ;
+    Word *cpdword = 0, * wordn = ( Word* ) dobject_Get_M_Slot ( ( dobject* ) anode, SCN_T_WORD ) ;
     int64 iuoFlag = dobject_Get_M_Slot ( ( dobject* ) anode, SCN_IN_USE_FLAG ) ;
-    if ( iuoFlag && ( word0 == wordn ) ) return _CopyDuplicateWord ( word0, 1 ) ;
-    if ( word0 == wordn ) return _CopyDuplicateWord ( word0, 1 ) ;
-    else return 0 ;
+    if ( iuoFlag && ( word0 == wordn ) ) cpdword = _CopyDuplicateWord ( word0, 1 ) ;
+    //else if ( word0 == wordn ) cpdword = _CopyDuplicateWord ( word0, 1 ) ;
+    return cpdword ;
 }
 
 Word *
 _CfrTil_CopyDuplicates ( Word * word0 )
 {
     Word * word1, *wordToBePushed ;
-#if 0   
-    if ( ( RT_DEBUG_ON | DEBUG_SOURCE_CODE_MODE | GLOBAL_SOURCE_CODE_MODE ) && 
-        ( ! ( GetState ( _Compiler_, LC_CFRTIL ) ) ) ) word1 = _CopyDuplicateWord ( word0, 1 ) ;
-    else 
-#endif        
-    word1 = ( Word * ) dllist_Map1_WReturn ( _CfrTil_->Compiler_N_M_Node_WordList, ( MapFunction1 ) CopyDuplicateWord, ( int64 ) word0 ) ;
+    if ( word0->CAttribute & (KEYWORD|CFRTIL_WORD) ) word1 = _CopyDuplicateWord ( word0, 1 ) ;
+    else word1 = ( Word * ) dllist_Map1_WReturn ( _CfrTil_->Compiler_N_M_Node_WordList, ( MapFunction1 ) CopyDuplicateWord, ( int64 ) word0 ) ;
     if ( word1 ) wordToBePushed = word1 ;
-    else wordToBePushed = word0 ; // no duplicate found push word0
+    else wordToBePushed = word0 ; 
     return wordToBePushed ;
 }
 
@@ -246,16 +242,10 @@ CfrTil_SaveDebugInfo ( Word * word, uint64 allocType )
         Namespace_RemoveNamespacesStack ( compiler->LocalsCompilingNamespacesStack ) ;
     }
     Stack_Init ( compiler->LocalsCompilingNamespacesStack ) ;
-    if ( ! word->W_SC_WordList )
+    if ( ! word->W_SC_WordList ) 
     {
-        //Word * oword ;
-        //word->W_SC_WordList = _CfrTil_->Compiler_N_M_Node_WordList ;
-        //oword = Word_GetOriginalWord ( word ) ;
-        //if ( oword ) word = oword ;
         word->W_SC_WordList = _CfrTil_->Compiler_N_M_Node_WordList ;
         _CfrTil_->Compiler_N_M_Node_WordList = _dllist_New ( allocType ) ;
-        //if ( Is_DebugOn ) Compiler_WordList_Show ( word, 0, 0, 0 ) ;
-        //_CfrTil_SetSourceCodeWord ( word ) ;
     }
     else List_Init ( _CfrTil_->Compiler_N_M_Node_WordList ) ;
 
