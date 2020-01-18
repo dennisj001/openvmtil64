@@ -348,7 +348,7 @@ Root C
 
 : include1 _dup debugColors "\n'include'" ps ps " :: at :" ps location nl defaultColors sp include  ;
 Debug
-#if DebugFlag @
+#if ( DebugFlag @ )
 : s stack alertColors location defaultColors ;
 : include include1 debugColors "location :" ps location nl defaultColors ;
 d: vb3

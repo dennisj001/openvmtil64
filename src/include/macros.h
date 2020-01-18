@@ -52,6 +52,7 @@
 
 #define _GetState( aState, state ) ( (aState) & (state) ) 
 #define GetState( obj, state ) ((obj) && _GetState( (obj)->State, (state) )) 
+#define GetState_TrueFalse( obj, _true, _false )  (obj) ? ( ( (obj)->State & (_true) ) && ( ! ( (obj)->State & (_false) ) ) ) : 0
 #define _SetState( state, newState, flag ) ( ( (flag) > 0 ) ? ( (state) |= (newState) ) : ( (state) &= ~ (newState) ) ) 
 #define SetState_TrueFalse( obj, _true, _false )  (obj) ? ( ( (obj)->State |= (_true) ), ( (obj)->State &= ~ (_false) ) ) : 0
 #define SetState( obj, state, flag ) (obj) ? _SetState ( ((obj)->State), (state), flag ) : 0

@@ -164,11 +164,14 @@ CfrTil_C_LeftParen ( )
 {
     Compiler * compiler = _Context_->Compiler0 ;
     ReadLiner * rl = _Context_->ReadLiner0 ;
-    if ( ( GetState ( _Context_->Interpreter0, PREPROCESSOR_MODE ) ) )
+    //if ( ( GetState ( _Context_->Interpreter0, (PREPROCESSOR_MODE) ) ) && (!(GetState ( _Context_->Interpreter0, (PREPROCESSOR_DEFINE) )))) 
+    if ( ( GetState_TrueFalse ( _Context_->Interpreter0, (PREPROCESSOR_MODE), (PREPROCESSOR_DEFINE) )) ) 
     {
         // this is for "#define" (which is parsed as '#' 'define', two words)
-        if ( isalnum ( ReadLine_LastReadChar ( rl ) ) ) CfrTil_LocalsAndStackVariablesBegin ( ) ;
-        else Interpret_DoParenthesizedRValue ( ) ;
+        //if ( isalnum ( ReadLine_LastReadChar ( rl ) ) ) CfrTil_LocalsAndStackVariablesBegin ( ) ;
+        //else 
+        Interpret_DoParenthesizedRValue ( ) ;
+        return ;
     }
     if ( ReadLine_CheckForLocalVariables ( rl ) )
     {

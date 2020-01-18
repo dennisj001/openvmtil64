@@ -394,7 +394,7 @@ lispOff
 // === controls ===
 Root 
 dbgOff
-dbgOn 
+//dbgOn 
 'todo 0 const  
 'doX64 1 const
 'doTX64 1 const
