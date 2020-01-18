@@ -302,7 +302,7 @@ _CfrTil_TypeDef ( )
             {
                 alias = _CfrTil_Alias ( ns, token ) ;
                 alias->Lo_List = ns->Lo_List ;
-                alias->CAttribute |= IMMEDIATE ;
+                alias->W_MorphismAttributes |= IMMEDIATE ;
                 _CfrTil_->LastFinished_Word = 0 ; // nb! : for _CfrTil_RecycleInit_Compiler_N_M_Node_WordList
             }
             else

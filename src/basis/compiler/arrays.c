@@ -64,7 +64,7 @@ _CheckArrayDimensionForVariables_And_UpdateCompilerState ( )
 void
 Compile_ArrayDimensionOffset ( Word * word, int64 dimSize, int64 objSize )
 {
-    if ( word && ( ( word->CAttribute & LITERAL ) ? word->W_Value : 1 ) ) // if ! zero else 
+    if ( word && ( ( word->W_ObjectAttributes & LITERAL ) ? word->W_Value : 1 ) ) // if ! zero else 
     {
         int64 size = dimSize * objSize ;
         // assume arrayIndex has just been pushed to TOS
@@ -248,7 +248,7 @@ _CfrTil_ArrayBegin ( Boolean lispMode, Word **pl1, int64 i )
             {
                 CfrTil_OptimizeOn ( ) ;
                 SetHere ( baseObject->Coding, 1 ) ;
-                _Debugger_->StartHere = Here ; // for Debugger_DisassembleAccumulated
+                Debugger_Set_StartHere ( _Debugger_ ) ;// for Debugger_DisassembleAccumulated
                 _Debugger_->EntryWord = baseObject ; // for Debugger_DisassembleAccumulated
                 _Compile_GetVarLitObj_LValue_To_Reg ( baseObject, ACC ) ;
                 if ( lispMode )

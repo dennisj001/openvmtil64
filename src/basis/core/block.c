@@ -15,3 +15,13 @@ Block_Eval ( block blck )
     }
 }
 
+void
+Dbg_Block_Eval ( block blck )
+{
+    if ( blck )
+    {
+        __DEBUG_SETUP( 0, 0, (byte*) blck, 1 ) ;
+        _Block_Eval ( blck ) ;
+    }
+}
+

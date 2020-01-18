@@ -21,7 +21,6 @@ taa ( one two three )
     p ( three ) ;
     p ( five ) ;
     nl () ;
-    //<dbg>
 }
 taa ( 1 2 3 ) ;
 'taa find wdiss //pause
@@ -36,7 +35,6 @@ c_syntaxOff
     three @ p 
     five @ p 
     nl
-    //<dbg>
 ;
 1 2 3 tbb
 sp

@@ -117,7 +117,7 @@ Interpret_PrefixFunction_OrUntil_RParen ( Interpreter * interp, Word * prefixFun
             {
                 if ( word = Finder_Word_FindUsing ( interp->Finder0, token, 1 ) )
                 {
-                    if ( word->CAttribute & DEBUG_WORD ) continue ;
+                    if ( word->W_MorphismAttributes & DEBUG_WORD ) continue ;
                     else flag = 1 ;
                     break ;
                 }

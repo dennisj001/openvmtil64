@@ -1,10 +1,10 @@
 #include "../include/cfrtil64.h"
-#define VERSION ((byte*) "0.901.830" ) 
-// Logic/Foml (Foundations of Mathematical Logic by Haskell Curry), Oop (Object Oriented Programming), 
-// C, Lisp, Rpn/Lag : Reverse Polish Notation, (Left Associative Grammar), 
-// Sm : State Machines, Pda : Push Down Automata, Tm : Turing Machine :: 
+#define VERSION ((byte*) "0.902.100" ) 
+// inspired by :: Logic/Foml (esp. Foundations of Mathematical Logic by Haskell Curry), CT/Oop (Category Theory, Object Oriented Programming) 
+// C/C++/C#, Lisp, RPN/Lag : Reverse Polish Notation, (Left Associative Grammar), 
+// State Machines, Push Down Automata (PDA), Turing Machines :: 
+// Also Laws of Form, by G.S. Brown and Kurt Goedel's work.
 // (til : a toolkit for implementing languages (maybe even a compiler compiler) based on these ideas),
-// also Laws of Form, by G.S. Brown
 OpenVmTil * _Q_ ;
 
 int 
@@ -215,13 +215,14 @@ OVT_PrintStartupOptions ( OpenVmTil * ovt )
 void
 OVT_GetStartupOptions ( OpenVmTil * ovt )
 {
-    int64 i ;
+    int64 i ; byte * arg ;
     for ( i = 0 ; i < ovt->Argc ; i ++ )
-    {
-        if ( String_Equal ( "-m", ovt->Argv [ i ] ) ) ovt->TotalMemSizeTarget = ( atoi ( ovt->Argv [ ++ i ] ) * MB ) ;
+    {   
+        arg = ovt->Argv [ i ] ;
+        if ( String_Equal ( "-m", arg ) ) ovt->TotalMemSizeTarget = ( atoi ( ovt->Argv [ ++ i ] ) * MB ) ;
         // -s : a script file with "#! cfrTil -s" -- as first line includes the script file, the #! whole line is treated as a comment
-        else if ( String_Equal ( "-f", ovt->Argv [ i ] ) || ( String_Equal ( "-s", ovt->Argv [ i ] ) ) ) ovt->StartupFilename = ( byte* ) ovt->Argv [ ++ i ] ;
-        else if ( String_Equal ( "-e", ovt->Argv [ i ] ) ) ovt->StartupString = ( byte* ) ovt->Argv [ ++ i ] ;
+        else if ( String_Equal ( "-f", arg ) || ( String_Equal ( "-s", arg ) ) ) ovt->StartupFilename = ( byte* ) ovt->Argv [ ++ i ] ;
+        else if ( String_Equal ( "-e", arg ) ) ovt->StartupString = ( byte* ) ovt->Argv [ ++ i ] ;
     }
 }
 

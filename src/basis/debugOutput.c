@@ -5,9 +5,9 @@ void
 Debugger_Menu ( Debugger * debugger )
 {
     _Printf ( ( byte* )
-        "\nDebug Menu at : \n%s :\n(m)enu, so(U)rce, dum(p), (e)val, (d)is, dis(a)ccum, dis(A)ccum, (r)egisters, (l)ocals, (v)ariables, (I)nfo, (w)dis, s(h)ow"
+        "\nDebug Menu at : \n%s :\n(m)enu, so(U)rce, dum(p), (e)val, (d)is, dis(a)ccum, dis(A)ccum, (r)egisters, (l)ocals, (v)ariables, (I)nfo, (W)dis, s(h)ow"
         "\n(R)eturnStack, sto(P), (S)tate, (c)ontinue, (s)tep, (o)ver, (i)nto, o(u)t, t(h)ru, s(t)ack, auto(z), (V)erbosity, (q)uit, a(B)ort"
-        "\nusi(N)g, s(H)ow DebugWordList, sh(O)w CompilerWordList, L - GotoList_Print, y - TypeStackPrint"
+        "\nusi(N)g, s(H)ow DebugWordList, sh(O)w CompilerWordList, L - GotoList_Print, y - TypeStackPrint, w - wdiss"
         "\n'\\n' - escape, , '\\\' - <esc> - escape, ' ' - <space> - continue", c_gd ( Context_Location ( ) ) ) ;
     SetState ( debugger, DBG_MENU, false ) ;
 }
@@ -18,18 +18,19 @@ _Debugger_Locals_ShowALocal ( Cpu * cpu, Word * localsWord, Word * scWord ) // u
     Word * word2 = 0 ;
     byte * buffer = Buffer_Data_Cleared ( _CfrTil_->DebugB ) ; // nvw : new view window
     uint64 * fp = cpu->CPU_FP ; //? ( uint64* ) ((* cpu->CPU_FP)? ( uint64* ) (* cpu->CPU_FP) : (cpu->CPU_FP)) : 0 ;
-    if ( fp > ( uint64* ) 0x7f000000 )
+    //if ( fp > ( uint64* ) 0x7f000000 )
     {
-        int64 localVarFlag = ( localsWord->CAttribute & LOCAL_VARIABLE ) ; // nb! not a Boolean with '='
-        int64 varOffset = _LocalOrParameterVar_Offset ( localsWord, scWord->W_NumberOfNonRegisterArgs,
+        if ( Compiling ) scWord = _CfrTil_->ScWord ;
+        int64 localVarFlag = ( localsWord->W_ObjectAttributes & LOCAL_VARIABLE ) ; // nb! not a Boolean with '='
+        int64 varOffset = _LocalOrParameterVar_Offset ( localsWord, scWord->W_NumberOfNonRegisterArgs, 
             IsFrameNecessary ( scWord->W_NumberOfNonRegisterLocals, scWord->W_NumberOfNonRegisterArgs ) ) ;
-        byte * address = ( byte* ) ( uint64 ) ( fp ? fp [ varOffset ] : 0 ) ; //( fp ? fp [ varOffset ] : 0 ) ;
+        byte * address = ( byte* ) ( uint64 ) ( fp ? fp [ varOffset ] : 0 ) ; 
 
         byte * stringValue = String_CheckForAtAdddress ( address ) ;
         if ( address && ( ! stringValue ) ) word2 = Word_GetFromCodeAddress ( ( byte* ) ( address ) ) ;
         if ( word2 ) sprintf ( ( char* ) buffer, "< %s.%s >", word2->ContainingNamespace->Name, c_u ( word2->Name ) ) ;
 
-        if ( localsWord->CAttribute & REGISTER_VARIABLE )
+        if ( localsWord->W_ObjectAttributes & REGISTER_VARIABLE )
         {
             char * registerNames [ 16 ] = { ( char* ) "RAX", ( char* ) "RCX", ( char* ) "RDX", ( char* ) "RBX",
                 ( char* ) "RBP", ( char* ) "RSP", ( char* ) "RSI", ( char* ) "RDI", ( char* ) "R8", ( char* ) "R9",
@@ -80,9 +81,10 @@ _Debugger_Locals_Show_Loop ( Cpu * cpu, Stack * stack, Word * scWord )
 void
 Debugger_Locals_Show ( Debugger * debugger )
 {
-    Word * scWord = debugger->w_Word ? debugger->w_Word : Compiling ? _Context_->CurrentWordBeingCompiled :
+    Word * scWord = Compiling ? _Context_->CurrentWordBeingCompiled : debugger->w_Word ? debugger->w_Word : 
         ( debugger->DebugAddress ? Word_UnAlias ( Word_GetFromCodeAddress ( debugger->DebugAddress ) ) : _Context_->CurrentlyRunningWord ) ;
-    if ( scWord && scWord->W_NumberOfVariables ) _Debugger_Locals_Show_Loop ( debugger->cs_Cpu, scWord->NamespaceStack ? scWord->NamespaceStack : _Compiler_->LocalsCompilingNamespacesStack, scWord ) ;
+    if ( scWord && (scWord->W_NumberOfVariables || _Context_->Compiler0->NumberOfVariables ) )
+        _Debugger_Locals_Show_Loop ( debugger->cs_Cpu, scWord->NamespaceStack ? scWord->NamespaceStack : _Compiler_->LocalsCompilingNamespacesStack, scWord ) ;
 }
 
 int64
@@ -127,10 +129,11 @@ _Debugger_ShowEffects ( Debugger * debugger, Word * word, Boolean stepFlag, Bool
     debugger->w_Word = word ;
     uint64* dsp = _Dsp_ ;
     if ( ! dsp ) CfrTil_Exception ( STACK_ERROR, 0, QUIT ) ;
-    if ( Is_DebugOn && ( force || ( ( stepFlag ) || ( word ) && ( word != debugger->LastEffectsWord ) ) ) )
+    //if ( Is_DebugOn && ( force || ( ( stepFlag ) || ( word ) && ( word != debugger->LastShowWord ) || ( debugger->SC_Index != _Lexer_->SC_Index ) ) ) )
+    if ( Is_DebugOn && ( force || ( stepFlag ) || ( Here > debugger->PreHere ) ) ) //|| ( debugger->SC_Index && ( debugger->SC_Index != _Lexer_->SC_Index ) ) )
     {
         DebugColors ;
-        if ( word && ( word->CAttribute & OBJECT_FIELD ) && ( ! ( word->CAttribute & DOT ) ) )
+        if ( word && ( word->W_ObjectAttributes & OBJECT_FIELD ) && ( ! ( word->W_MorphismAttributes & DOT ) ) )
         {
             if ( ( ! String_Equal ( ( char* ) word->Name, "[" ) ) && ( ! String_Equal ( ( char* ) word->Name, "]" ) ) ) // this block is repeated in arrays.c : make it into a function - TODO
             {
@@ -204,9 +207,11 @@ _Debugger_ShowEffects ( Debugger * debugger, Word * word, Boolean stepFlag, Bool
         }
         DebugColors ;
         debugger->LastEffectsWord = word ;
-        debugger->LastShowWord = debugger->w_Word ;
+        //debugger->LastShowWord = debugger->w_Word ;
         Set_DataStackPointer_FromDspReg ( ) ;
     }
+    debugger->SC_Index = _Lexer_->SC_Index ;
+    //debugger->PreHere = Here ;
     debugger->ShowLine = 0 ;
 }
 
@@ -337,8 +342,8 @@ _Debugger_ShowInfo ( Debugger * debugger, byte * prompt, int64 signal, int64 for
         else location = ( byte* ) "<command line>" ;
         if ( ( location == debugger->Filename ) && ( GetState ( debugger, DBG_FILENAME_LOCATION_SHOWN ) ) ) location = ( byte * ) "..." ;
         SetState ( debugger, DBG_FILENAME_LOCATION_SHOWN, true ) ;
-        //Word * word = (debugger->LastShowWord == debugger->w_Word) ? debugger->w_Word : _Context_->CurrentEvalWord ; //_Context_->CurrentlyRunningWord ;
-        Word * word = debugger->w_Word ; //? debugger->w_Word : _Context_->CurrentEvalWord ? _Context_->CurrentEvalWord : _Context_->LastEvalWord ; //Context_CurrentWord ( ) ;
+        //Word * word = debugger->w_Word ; 
+        Word * word = _Context_->CurrentlyRunningWord ? _Context_->CurrentlyRunningWord : _Context_->CurrentTokenWord ;
         byte * token0 = word ? word->Name : debugger->Token, *token1 ;
         if ( ( signal == 11 ) || _Q_->SigAddress )
         {
@@ -362,7 +367,7 @@ next:
             prompt = ( byte* ) buffer ;
             if ( word )
             {
-                if ( word->CAttribute & CPRIMITIVE )
+                if ( word->W_MorphismAttributes & CPRIMITIVE )
                 {
                     sprintf ( ( char* ) obuffer, "\n%s%s:: %s : %03ld.%03ld : %s :> %s <: cprimitive :> ", // <:: " INT_FRMT "." INT_FRMT " ",
                         prompt, signal ? ( char* ) signalAscii : " ", cc_location, rl->LineNumber, rl->ReadIndex,
@@ -446,7 +451,7 @@ Debugger_ShowState ( Debugger * debugger, byte * prompt )
     ReadLiner * rl = _Context_->ReadLiner0 ;
     Word * word = debugger->w_Word ;
     int64 cflag = 0 ;
-    if ( word && ( word->CAttribute & CONSTANT ) ) cflag = 1 ;
+    if ( word && ( word->W_ObjectAttributes & CONSTANT ) ) cflag = 1 ;
     DebugColors ;
     byte * token = debugger->Token ;
     token = String_ConvertToBackSlash ( token ) ;
@@ -482,7 +487,7 @@ Debugger_ConsiderAndShowWord ( Debugger * debugger )
     if ( word ) // then it wasn't a literal
     {
         byte * name = c_gd ( word->Name ) ;
-        if ( ( word->CAttribute & ( CPRIMITIVE | DLSYM_WORD ) ) && ( ! ( CompileMode ) ) )
+        if ( ( word->W_MorphismAttributes & ( CPRIMITIVE | DLSYM_WORD ) ) && ( ! ( CompileMode ) ) )
         {
             if ( word->ContainingNamespace ) _Printf ( ( byte* ) "\ncprimitive :> %s.%s <:> 0x%08x <: => evaluating ...", word->ContainingNamespace->Name, name, ( uint64 ) word->Definition ) ;
         }
@@ -493,17 +498,17 @@ Debugger_ConsiderAndShowWord ( Debugger * debugger )
             {
                 Debugger_Info ( debugger ) ;
             }
-            else if ( word->CAttribute & NAMESPACE_VARIABLE )
+            else if ( word->W_ObjectAttributes & NAMESPACE_VARIABLE )
             {
                 _Printf ( ( byte* ) "\nVariable :> %s.%s <: => evaluating ... :> ", word->ContainingNamespace->Name, name ) ;
                 SetState ( debugger, DBG_CAN_STEP, false ) ;
             }
-            else if ( word->CAttribute & TEXT_MACRO )
+            else if ( word->W_ObjectAttributes & TEXT_MACRO )
             {
                 _Printf ( ( byte* ) "\nMacro :> %s.%s <: => evaluating ... :> ", word->ContainingNamespace->Name, name ) ;
                 SetState ( debugger, DBG_CAN_STEP, false ) ;
             }
-            else if ( word->CAttribute & IMMEDIATE )
+            else if ( word->W_MorphismAttributes & IMMEDIATE )
             {
                 _Printf ( ( byte* ) "\nImmediate word :> %s.%s <:> 0x%08x <: => evaluating ...",
                     word->ContainingNamespace->Name, name, ( uint64 ) word->Definition ) ;
@@ -572,7 +577,7 @@ _Debugger_DoState ( Debugger * debugger )
         debugger->cs_Cpu->Rip = ( uint64 * ) debugger->DebugAddress ;
         Debugger_UdisOneInstruction ( debugger, debugger->DebugAddress, ( byte* ) "\r", ( byte* ) "" ) ;
     }
-    debugger->PreHere = Here ;
+    //debugger->PreHere = Here ;
 }
 
 void
@@ -599,17 +604,5 @@ LO_Debug_ExtraShow ( int64 showStackFlag, int64 verbosity, int64 wordList, byte 
             DefaultColors ;
         }
     }
-}
-
-void
-_Debugger_PostShow ( Debugger * debugger, Word * word, Boolean force )
-{
-    _Debugger_ShowEffects ( debugger, word, GetState ( debugger, DBG_STEPPING ), force ) ;
-}
-
-void
-Debugger_PostShow ( Debugger * debugger )
-{
-    _Debugger_PostShow ( debugger, debugger->w_Word, 0 ) ;
 }
 

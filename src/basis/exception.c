@@ -97,73 +97,92 @@ OVT_Pause ( byte * prompt, int64 signalExceptionsHandled )
 
             int64 key = Key ( ) ;
             _ReadLine_PrintfClearTerminalLine ( ) ;
-            if ( ( key == 'x' ) || ( key == 'X' ) )
+            switch ( key )
             {
-                byte * msg = ( byte * ) "Exit cfrTil from pause?" ;
-                _Printf ( ( byte* ) "\n%s : 'x' to e(x)it cfrTil : any other <key> to continue%s", msg, c_gd ( "\n-> " ) ) ;
-                key = Key ( ) ;
-                if ( ( key == 'x' ) || ( key == 'X' ) ) OVT_Exit ( ) ;
-            }
-            else if ( key == 'q' )
-            {
-                byte * msg = ( byte * ) "Quit to interpreter loop from pause?" ;
-                _Printf ( ( byte* ) "\n%s : 'q' to (q)uit : any other key to continue%s", msg, c_gd ( "\n-> " ) ) ;
-                key = Key ( ) ;
-                if ( ( key == 'q' ) || ( key == 'Q' ) ) DefaultColors, CfrTil_Quit ( ) ;
-            }
-            else if ( key == 'd' )
-            {
-                if ( Is_DebugOn )
+                case 'x': case 'X': 
                 {
-                    Debugger * debugger = _Debugger_ ;
-                    SetState ( debugger, DBG_AUTO_MODE | DBG_AUTO_MODE_ONCE, false ) ; // stop auto mode and get next key command code
-                    _Debugger_InterpreterLoop ( debugger ) ;
+                    byte * msg = ( byte * ) "Exit cfrTil from pause?" ;
+                    _Printf ( ( byte* ) "\n%s : 'x' to e(x)it cfrTil : any other <key> to continue%s", msg, c_gd ( "\n-> " ) ) ;
+                    key = Key ( ) ;
+                    if ( ( key == 'x' ) || ( key == 'X' ) ) OVT_Exit ( ) ;
+                    goto done ;
                 }
-                else
+                case 'q': 
                 {
-                    CfrTil_DebugOn ( ) ;
-                    SetState ( _Debugger_, DBG_INFO | DBG_MENU | DBG_PROMPT, true ) ;
+                    byte * msg = ( byte * ) "Quit to interpreter loop from pause?" ;
+                    _Printf ( ( byte* ) "\n%s : 'q' to (q)uit : any other key to continue%s", msg, c_gd ( "\n-> " ) ) ;
+                    key = Key ( ) ;
+                    if ( ( key == 'q' ) || ( key == 'Q' ) ) DefaultColors, CfrTil_Quit ( ) ;
+                    goto done ;
                 }
-                break ;
-            }
-            else if ( key == 'c' )
-            {
-                // if ( signalsHandled ) ;
-                rtrn = 1 ;
-                break ;
-            }
-            else if ( key == 't' )
-            {
-                CfrTil_PrintDataStack ( ) ;
-            }
-            else if ( key == 'i' )
-            {
-                CfrTil_DoPrompt ( ) ;
-                ReadLine_Init ( _Context_->ReadLiner0, _CfrTil_Key ) ;
-                OpenVmTil_AddStringToHistoryOn ( ) ;
-                SetState ( _Context_, AT_COMMAND_LINE, true ) ;
-                Interpret_ToEndOfLine ( _Interpreter_ ) ;
-                ReadLine_SetRawInputFunction ( _Context_->ReadLiner0, ReadLine_GetNextCharFromString ) ;
-            }
-            else //if ( key >= ' ' )
-            {
-                CfrTil_DebugOff ( ) ; // ? new idea ?
-                Context * cntx = CfrTil_Context_PushNew ( _CfrTil_ ) ;
-                OpenVmTil_AddStringToHistoryOn ( ) ;
-                SetState ( cntx, AT_COMMAND_LINE, true ) ;
-                Context_DoPrompt ( cntx ) ;
-                if ( key >= ' ' )
+                case 'd': 
                 {
-                    if ( key == '\\' ) key = 0 ;
-                    _ReadLine_GetLine ( cntx->ReadLiner0, key ) ;
-                    Interpret_ToEndOfLine ( _Interpreter_ ) ; // just one line in a new context
+                    if ( Is_DebugOn )
+                    {
+                        Debugger * debugger = _Debugger_ ;
+                        SetState ( debugger, DBG_AUTO_MODE | DBG_AUTO_MODE_ONCE, false ) ; // stop auto mode and get next key command code
+                        _Debugger_InterpreterLoop ( debugger ) ;
+                    }
+                    else
+                    {
+                        CfrTil_DebugOn ( ) ;
+                        SetState ( _Debugger_, DBG_INFO | DBG_MENU | DBG_PROMPT, true ) ;
+                    }
+                    goto done ;
                 }
-                SetState ( cntx, AT_COMMAND_LINE, false ) ;
-                CfrTil_Context_PopDelete ( _CfrTil_ ) ;
+                case 'c': 
+                {
+                    // if ( signalsHandled ) ;
+                    rtrn = 1 ;
+                    goto done ;
+                }
+                case 't': 
+                {
+                    CfrTil_PrintDataStack ( ) ;
+                    break ;
+                }
+                case '\n':
+                case '\r':
+                {
+                    continue ;
+                }
+                case 'i': 
+                case '\\': 
+                default:
+                {
+                    CfrTil_DoPrompt ( ) ;
+                    if (( key == '\\' ) || ( key == 'i' ) ) key = 0 ;
+                    _CfrTil_PrintChar ( key ) ;
+                    ReadLine_Init ( _Context_->ReadLiner0, _CfrTil_Key ) ;
+                    OpenVmTil_AddStringToHistoryOn ( ) ;
+                    SetState ( _Context_, AT_COMMAND_LINE, true ) ;
+                    Interpret_ToEndOfLine ( _Interpreter_ ) ;
+                    ReadLine_SetRawInputFunction ( _Context_->ReadLiner0, ReadLine_GetNextCharFromString ) ;
+                    continue ;
+                }
+#if 0                
+                default:
+                {
+                    CfrTil_DebugOff ( ) ; // ? new idea ?
+                    Context * cntx = CfrTil_Context_PushNew ( _CfrTil_ ) ;
+                    OpenVmTil_AddStringToHistoryOn ( ) ;
+                    SetState ( cntx, AT_COMMAND_LINE, true ) ;
+                    Context_DoPrompt ( cntx ) ;
+                    if ( key >= ' ' )
+                    {
+                        _ReadLine_GetLine ( cntx->ReadLiner0, key ) ;
+                        Interpret_ToEndOfLine ( _Interpreter_ ) ; // just one line in a new context
+                    }
+                    SetState ( cntx, AT_COMMAND_LINE, false ) ;
+                    CfrTil_Context_PopDelete ( _CfrTil_ ) ;
+                    goto done ;
+                }
+#endif                
             }
         }
         while ( 1 ) ;
     }
+done:
     DefaultColors ;
 
     return rtrn ;
@@ -223,7 +242,7 @@ OVT_Throw ( int signal, int64 restartCondition, Boolean pauseFlag )
     _Q_->RestartCondition = restartCondition ;
     if ( signal )
     {
-        if ( (signal == SIGTERM) || ( signal == SIGKILL) || ( signal ==  SIGQUIT ) ) OVT_Exit ( ) ;
+        if ( ( signal == SIGTERM ) || ( signal == SIGKILL ) || ( signal == SIGQUIT ) ) OVT_Exit ( ) ;
         else if ( signal == SIGBUS )
         {
             jb = & _Q_->JmpBuf0 ;
@@ -232,7 +251,7 @@ OVT_Throw ( int signal, int64 restartCondition, Boolean pauseFlag )
         }
         else
         {
-            if ( ( restartCondition > QUIT ) || ( _Q_->Signal == SIGSEGV ) ||  ( _Q_->Signal == SIGILL ) || ( _Q_->Signal ==  SIGFPE ) )
+            if ( ( restartCondition > QUIT ) || ( _Q_->Signal == SIGSEGV ) || ( _Q_->Signal == SIGILL ) || ( _Q_->Signal == SIGFPE ) )
             {
                 if ( ++ _Q_->SigSegvs < 2 )
                 {
@@ -308,6 +327,7 @@ CfrTil_Exception ( int64 exceptionCode, byte * message, int64 restartCondition )
     byte * b = Buffer_Data ( _CfrTil_->ScratchB1 ) ;
     AlertColors ;
     _Q_->ExceptionCode = exceptionCode ;
+    printf ( "\n\nCfrTil_Exception at %s\n", Context_Location () ) ; fflush (stdout) ;
     switch ( exceptionCode )
     {
         case CASE_NOT_LITERAL_ERROR:
@@ -493,3 +513,23 @@ CfrTil_FullRestart ( )
     _OpenVmTil_LongJmp_WithMsg ( INITIAL_START, ( byte* ) "Full Initial Re-Start : ..." ) ;
 }
 
+void
+Error ( byte * emsg, byte * smsg, uint64 state )
+{
+    AlertColors ;
+    if ( ( state ) & PAUSE )
+    {
+        CfrTil_NewLine () ;
+        CfrTil_Location ( ) ;
+        _Printf ( emsg, smsg ) ;
+        Pause ( ) ;
+        DebugColors ;
+    }
+    else
+    {
+        if ( ( state ) >= QUIT )
+        {
+            Throw ( emsg, smsg, state ) ;
+        }
+    }
+}

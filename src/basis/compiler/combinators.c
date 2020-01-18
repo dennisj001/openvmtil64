@@ -74,8 +74,7 @@ CfrTil_BlockRun ( )
     }
     else
     {
-        DEBUG_SETUP_ADDRESS ( ( byte* ) doBlock, 1 ) ;
-        Block_Eval ( doBlock ) ;
+        Dbg_Block_Eval ( doBlock ) ;
         //Set_DataStackPointer_FromDspReg ( ) ;
     }
 }
@@ -99,7 +98,7 @@ CfrTil_LoopCombinator ( )
     }
     else
     {
-        while ( 1 ) Block_Eval ( loopBlock ) ;
+        while ( 1 ) Dbg_Block_Eval ( loopBlock ) ;
     }
 }
 
@@ -129,9 +128,9 @@ CfrTil_WhileCombinator ( )
     {
         while ( 1 )
         {
-            Block_Eval ( testBlock ) ;
+            Dbg_Block_Eval ( testBlock ) ;
             if ( ! DataStack_Pop ( ) ) break ;
-            Block_Eval ( trueBlock ) ;
+            Dbg_Block_Eval ( trueBlock ) ;
         }
     }
     return 1 ;
@@ -158,8 +157,8 @@ CfrTil_DoWhileCombinator ( )
     {
         do
         {
-            Block_Eval ( doBlock ) ;
-            Block_Eval ( testBlock ) ;
+            Dbg_Block_Eval ( doBlock ) ;
+            Dbg_Block_Eval ( testBlock ) ;
             if ( ! DataStack_Pop ( ) ) break ;
         }
         while ( 1 ) ;
@@ -187,7 +186,7 @@ CfrTil_If1Combinator ( )
     }
     else
     {
-        if ( DataStack_Pop ( ) ) Block_Eval ( doBlock ) ;
+        if ( DataStack_Pop ( ) ) Dbg_Block_Eval ( doBlock ) ;
     }
 }
 
@@ -208,8 +207,8 @@ CfrTil_If2Combinator ( )
     }
     else
     {
-        Block_Eval ( testBlock ) ;
-        if ( DataStack_Pop ( ) ) Block_Eval ( doBlock ) ;
+        Dbg_Block_Eval ( testBlock ) ;
+        if ( DataStack_Pop ( ) ) Dbg_Block_Eval ( doBlock ) ;
     }
 }
 
@@ -237,8 +236,8 @@ CfrTil_TrueFalseCombinator2 ( )
     }
     else
     {
-        if ( testCondition ) Block_Eval ( trueBlock ) ;
-        else Block_Eval ( falseBlock ) ;
+        if ( testCondition ) Dbg_Block_Eval ( trueBlock ) ;
+        else Dbg_Block_Eval ( falseBlock ) ;
     }
 }
 
@@ -262,9 +261,9 @@ CfrTil_TrueFalseCombinator3 ( )
     }
     else
     {
-        Block_Eval ( testBlock ) ;
-        if ( DataStack_Pop ( ) ) Block_Eval ( trueBlock ) ;
-        else Block_Eval ( falseBlock ) ;
+        Dbg_Block_Eval ( testBlock ) ;
+        if ( DataStack_Pop ( ) ) Dbg_Block_Eval ( trueBlock ) ;
+        else Dbg_Block_Eval ( falseBlock ) ;
     }
 }
 
@@ -308,10 +307,10 @@ CfrTil_DoWhileDoCombinator ( )
     {
         do
         {
-            Block_Eval ( doBlock1 ) ;
-            Block_Eval ( testBlock ) ;
+            Dbg_Block_Eval ( doBlock1 ) ;
+            Dbg_Block_Eval ( testBlock ) ;
             if ( ! DataStack_Pop ( ) ) break ;
-            Block_Eval ( doBlock2 ) ;
+            Dbg_Block_Eval ( doBlock2 ) ;
         }
         while ( 1 ) ;
     }
@@ -349,14 +348,13 @@ CfrTil_ForCombinator ( )
     }
     else
     {
-        Block_Eval ( doPreBlock ) ;
+        Dbg_Block_Eval ( doPreBlock ) ;
         do
         {
-            Block_Eval ( testBlock ) ;
-            if ( ! DataStack_Pop ( ) )
-                break ;
-            Block_Eval ( doBlock ) ;
-            Block_Eval ( doPostBlock ) ;
+            Dbg_Block_Eval ( testBlock ) ;
+            if ( ! DataStack_Pop ( ) ) break ;
+            Dbg_Block_Eval ( doBlock ) ;
+            Dbg_Block_Eval ( doPostBlock ) ;
         }
         while ( 1 ) ;
     }

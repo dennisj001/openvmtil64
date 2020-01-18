@@ -596,10 +596,10 @@ Compile_X_Group5 ( Compiler * compiler, int64 op )
         //Compiler_SCA_Word_SetCodingHere_And_ClearPreviousUse ( optInfo->opWord, 0 ) ;
         _Compile_Group5 ( op, optInfo->Optimize_Mod, optInfo->Optimize_Rm, 0, optInfo->Optimize_Disp, 0 ) ;
     }
-    else if ( one && one->CAttribute & ( PARAMETER_VARIABLE | LOCAL_VARIABLE | NAMESPACE_VARIABLE ) ) // *( ( cell* ) ( TOS ) ) += 1 ;
+    else if ( one && one->W_ObjectAttributes & ( PARAMETER_VARIABLE | LOCAL_VARIABLE | NAMESPACE_VARIABLE ) ) // *( ( cell* ) ( TOS ) ) += 1 ;
     {
         SetHere ( one->Coding, 1 ) ;
-        if ( one->CAttribute & REGISTER_VARIABLE ) _Compile_Group5 ( op, REG, one->RegToUse, 0, 0, 0 ) ;
+        if ( one->W_ObjectAttributes & REGISTER_VARIABLE ) _Compile_Group5 ( op, REG, one->RegToUse, 0, 0, 0 ) ;
         else
         {
             Compile_GetVarLitObj_RValue_To_Reg ( one, ACC ) ;
@@ -896,7 +896,7 @@ Compile_Call_X84_ABI_RSP_ADJUST ( byte * address )
 void
 Compile_CallWord_Check_X84_ABI_RSP_ADJUST ( Word * word )
 {
-    if ( word->CAttribute & CPRIMITIVE )
+    if ( word->W_MorphismAttributes & CPRIMITIVE )
     {
         d0 ( _Printf ( ( byte* ) "\n_Word_Compile : %s : name = %s", Context_Location ( ), word->Name ) ) ;
         // there is an slight overhead for CPRIMITIVE functions to align RSP for ABI-X64

@@ -1,18 +1,18 @@
 #include "../../include/cfrtil64.h"
 
 void
-Word_Run ( Word * word0 )
+Word_Run ( Word * word )
 {
-    if ( word0 )
+    if ( word )
     {
-        Word * word ;
-        word0->StackPushRegisterCode = 0 ; // nb. used! by the rewriting optInfo
+        word->StackPushRegisterCode = 0 ; // nb. used! by the rewriting optInfo
         // keep track in the word itself where the machine code is to go, if this word is compiled or causes compiling code - used for optimization
-        if ( Compiling ) Word_SetCodingAndSourceCoding ( word0, Here ) ; // if we change it later (eg. in lambda calculus) we must change it there because the rest of the compiler depends on this
-        _Context_->CurrentlyRunningWord = word0 ;
-        DEBUG_SETUP ( word0 ) ;
-        word = _Context_->CurrentlyRunningWord ;
-        Block_Eval ( word->Definition ) ; // _Context_->CurrentlyRunningWord (= 0) may have been modified by debugger //word->Definition ) ;
+        if ( ( GetState ( _Compiler_, ( COMPILE_MODE | ASM_MODE ) ) ) ) Word_SetCodingAndSourceCoding ( word, Here ) ; // if we change it later (eg. in lambda calculus) we must change it there because the rest of the compiler depends on this
+        _Context_->CurrentlyRunningWord = word ;
+        DEBUG_SETUP ( word ) ;
+        word = _Context_->CurrentlyRunningWord ;// _Context_->CurrentlyRunningWord (= 0) may have been modified by debugger //word->Definition ) ;
+        Block_Eval ( word->Definition ) ; 
+        _DEBUG_SHOW ( word, 0 ) ;
         _Context_->LastRunWord = word ;
         _Context_->CurrentlyRunningWord = 0 ;
     }
@@ -25,9 +25,8 @@ Word_Eval ( Word * word )
     {
         _Context_->CurrentEvalWord = word ;
         if ( IS_MORPHISM_TYPE ( word ) ) CfrTil_Typecheck ( word ) ;
-        if ( ( word->CAttribute & IMMEDIATE ) || ( ! CompileMode ) ) Word_Run ( word ) ;
+        if ( ( word->W_MorphismAttributes & IMMEDIATE ) || ( ! CompileMode ) ) Word_Run ( word ) ;
         else _Word_Compile ( word ) ;
-        _DEBUG_SHOW ( word, 0 ) ;
         //if ( Is_DebugOn ) Compiler_WordList_Show ( word, 0, 0, 0 ) ;
         _Context_->CurrentEvalWord = 0 ;
         _Context_->LastEvalWord = word ;
@@ -45,14 +44,14 @@ _Word_Compile ( Word * word )
 {
     Compiler_SCA_Word_SetCodingHere_And_ClearPreviousUse ( word, 0 ) ;
     if ( ! word->Definition ) CfrTil_SetupRecursiveCall ( ) ;
-    else if ( ( GetState ( _CfrTil_, INLINE_ON ) ) && ( word->CAttribute & INLINE ) && ( word->S_CodeSize ) ) _Compile_WordInline ( word ) ;
+    else if ( ( GetState ( _CfrTil_, INLINE_ON ) ) && ( word->W_MorphismAttributes & INLINE ) && ( word->S_CodeSize ) ) _Compile_WordInline ( word ) ;
     else Compile_CallWord_Check_X84_ABI_RSP_ADJUST ( word ) ;
 }
 
 Namespace *
 _Word_Namespace ( Word * word )
 {
-    if ( word->CAttribute & NAMESPACE ) return ( Namespace * ) word ;
+    if ( word->W_ObjectAttributes & NAMESPACE ) return ( Namespace * ) word ;
     else return word->ContainingNamespace ;
 }
 
@@ -83,7 +82,6 @@ _Word_Finish ( Word * word )
     CfrTil_TypeStackReset ( ) ;
     _CfrTil_->LastFinished_Word = word ;
     _CfrTil_FinishWordDebugInfo ( word ) ;
-    _CfrTil_SetSourceCodeWord ( word ) ;
 }
 
 void
@@ -107,7 +105,7 @@ _Word_Add ( Word * word, int64 addToInNs, Namespace * addToNs )
     if ( addToNs ) Namespace_DoAddWord ( addToNs, word ) ;
     else if ( addToInNs ) //&& ins )
     {
-        if ( ! ( word->CAttribute & ( LITERAL ) ) )
+        if ( ! ( word->W_ObjectAttributes & ( LITERAL ) ) )
         {
             //Namespace * ins = _CfrTil_Namespace_InNamespaceGet ( ) ;
             Namespace * ins = _CfrTil_InNamespace ( ) ; //_CfrTil_Namespace_InNamespaceGet ( ) ;
@@ -119,7 +117,7 @@ _Word_Add ( Word * word, int64 addToInNs, Namespace * addToNs )
         ns = addToNs ? addToNs : ins ;
         if ( ns )
         {
-            if ( word->CAttribute & BLOCK ) _Printf ( ( byte* ) "\nnew Word :: %s.%s", ns->Name, word->Name ) ;
+            if ( word->W_MorphismAttributes & BLOCK ) _Printf ( ( byte* ) "\nnew Word :: %s.%s", ns->Name, word->Name ) ;
             else _Printf ( ( byte* ) "\nnew DObject :: %s.%s", ns->Name, word->Name ) ;
         }
     }
@@ -139,15 +137,15 @@ _Word_Allocate ( uint64 allocType )
 }
 
 Word *
-_Word_Create ( byte * name, uint64 ctype, uint64 ctype2, uint64 ltype, uint64 allocType )
+_Word_Create ( byte * name, uint64 morphismType, uint64 objectType, uint64 lispType, uint64 allocType )
 {
     Word * word = _Word_Allocate ( allocType ? allocType : DICTIONARY ) ;
     if ( allocType & ( EXISTING ) ) _Symbol_NameInit ( ( Symbol * ) word, name ) ;
     else _Symbol_Init_AllocName ( ( Symbol* ) word, name, STRING_MEM ) ;
     word->WAllocType = allocType ;
-    word->CAttribute = ctype ;
-    word->CAttribute2 = ctype2 ;
-    word->LAttribute = ltype ;
+    word->W_MorphismAttributes = morphismType ;
+    word->W_ObjectAttributes = objectType ;
+    word->W_LispAttributes = lispType ;
     if ( Is_NamespaceType ( word ) ) word->Lo_List = dllist_New ( ) ;
     _Compiler_->Current_Word_Create = word ;
     _CfrTil_->WordCreateCount ++ ;
@@ -169,9 +167,9 @@ Word_SetLocation ( Word * word )
 }
 
 Word *
-_Word_New ( byte * name, uint64 ctype, uint64 ctype2, uint64 ltype, Boolean addToInNs, Namespace * addToNs, uint64 allocType )
+_Word_New ( byte * name, uint64 morphismType, uint64 objectType, uint64 lispType, Boolean addToInNs, Namespace * addToNs, uint64 allocType )
 {
-    Word * word = _Word_Create ( name, ctype, ctype2, ltype, allocType ) ; // CFRTIL_WORD : cfrTil compiled words as opposed to C compiled words
+    Word * word = _Word_Create ( name, morphismType, objectType, lispType, allocType ) ; // CFRTIL_WORD : cfrTil compiled words as opposed to C compiled words
     _Compiler_->Current_Word_New = word ;
     Word_SetLocation ( word ) ;
     _Word_Add ( word, addToInNs, addToNs ) ; // add to the head of the list
@@ -262,7 +260,7 @@ _Word_ShowSourceCode ( Word * word )
     if ( word && word->S_WordData ) //&& word->W_SourceCode ) //word->CAttribute & ( CPRIMITIVE | BLOCK ) )
     {
         byte * sc, * name, *scd ;
-        if ( ! ( word->CAttribute & CPRIMITIVE ) )
+        if ( ! ( word->W_MorphismAttributes & CPRIMITIVE ) )
         {
             Buffer *dstb = Buffer_NewLocked ( BUFFER_SIZE ) ;
             sc = dstb->B_Data ;
@@ -329,11 +327,12 @@ _CfrTil_Alias ( Word * word, byte * name )
     Word * alias = 0 ;
     if ( word && word->Definition )
     {
-        alias = _Word_New ( name, word->CAttribute | ALIAS, word->CAttribute2, word->LAttribute, 1, 0, DICTIONARY ) ; // inherit type from original word
+        alias = _Word_New ( name, word->W_MorphismAttributes | ALIAS, word->W_ObjectAttributes, word->W_LispAttributes, 1, 0, DICTIONARY ) ; // inherit type from original word
         word = Word_UnAlias ( word ) ;
         Word_InitFinal ( alias, ( byte* ) word->Definition ) ;
         alias->S_CodeSize = word->S_CodeSize ;
         alias->W_AliasOf = word ;
+        alias->NamespaceStack = word->NamespaceStack ;
         Strncpy ( alias->W_TypeSignatureString, word->W_TypeSignatureString, 7 ) ;
     }
     else Exception ( USEAGE_ERROR, ABORT ) ;

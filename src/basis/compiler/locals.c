@@ -67,7 +67,7 @@ ParameterVar_Disp ( Word * word )
 inline int64
 _LocalOrParameterVar_Offset ( Word * word, int64 numberOfArgs, Boolean frameFlag )
 {
-    return ( ( word->CAttribute & LOCAL_VARIABLE ) ? ( LocalVar_FpOffset ( word ) ) : ( _ParameterVar_Offset ( word, numberOfArgs, frameFlag ) ) ) ;
+    return ( ( word->W_ObjectAttributes & LOCAL_VARIABLE ) ? ( LocalVar_FpOffset ( word ) ) : ( _ParameterVar_Offset ( word, numberOfArgs, frameFlag ) ) ) ;
 }
 
 inline int64
@@ -85,14 +85,14 @@ LocalOrParameterVar_Disp ( Word * word )
 }
 
 Word *
-_Compiler_LocalWord ( Compiler * compiler, byte * name, int64 ctype, int64 ctype2, int64 ltype, int64 allocType )
+_Compiler_LocalWord ( Compiler * compiler, byte * name, int64 morphismType, int64 objectType, int64 lispType, int64 allocType )
 {
-    Word *word = _DObject_New ( name, 0, ( ctype | IMMEDIATE ), ctype2, ltype, LOCAL_VARIABLE, ( byte* ) _DataObject_Run, 0, 1, 0, allocType ) ;
+    Word *word = _DObject_New ( name, 0, ( morphismType | IMMEDIATE ), objectType, lispType, LOCAL_VARIABLE, ( byte* ) _DataObject_Run, 0, 1, 0, allocType ) ;
     compiler->NumberOfVariables ++ ;
-    if ( ctype & REGISTER_VARIABLE )
+    if ( objectType & REGISTER_VARIABLE )
     {
         compiler->NumberOfRegisterVariables ++ ;
-        if ( ctype & LOCAL_VARIABLE )
+        if ( objectType & LOCAL_VARIABLE )
         {
             word->Index = ++ compiler->NumberOfRegisterLocals ;
             ++ compiler->NumberOfLocals ;
@@ -106,33 +106,37 @@ _Compiler_LocalWord ( Compiler * compiler, byte * name, int64 ctype, int64 ctype
     else
     {
         compiler->NumberOfNonRegisterVariables ++ ;
-        if ( ctype & LOCAL_VARIABLE )
+        if ( objectType & LOCAL_VARIABLE )
         {
             word->Index = ++ compiler->NumberOfNonRegisterLocals ;
-            ++ compiler->NumberOfLocals ;
+            compiler->NumberOfLocals ++ ;
+            _CfrTil_->ScWord->W_NumberOfNonRegisterLocals ++ ;
         }
         else
         {
             word->Index = ++ compiler->NumberOfArgs ;
-            ++ compiler->NumberOfNonRegisterArgs ;
+            compiler->NumberOfNonRegisterArgs ++ ;
+            _CfrTil_->ScWord->W_NumberOfNonRegisterArgs ++ ;
         }
     }
-    word->CAttribute2 |= RECYCLABLE_LOCAL ;
+    word->W_ObjectAttributes |= RECYCLABLE_LOCAL ;
+    //_CfrTil_->ScWord->W_NumberOfNonRegisterArgs += compiler->NumberOfNonRegisterArgs ; // debugOutput.c showLocals need this others ?
+    //_CfrTil_->ScWord->W_NumberOfNonRegisterLocals += compiler->NumberOfNonRegisterLocals ;
     return word ;
 }
 
 void
 Compiler_LocalsNamespace_New ( Compiler * compiler )
 {
-    Namespace_FindOrNew_Local ( compiler->LocalsCompilingNamespacesStack, 1 ) ;
-    Finder_SetQualifyingNamespace ( _Finder_, 0 ) ;
+    Namespace * ns = Namespace_FindOrNew_Local ( compiler->LocalsCompilingNamespacesStack, 1 ) ;
+    Finder_SetQualifyingNamespace ( _Finder_, ns ) ;
 }
 
 Word *
-Compiler_LocalWord ( Compiler * compiler, byte * name, int64 ctype, int64 ctype2, int64 ltype, int64 allocType )
+Compiler_LocalWord ( Compiler * compiler, byte * name, int64 morphismAttributes, int64 objectAttributes, int64 lispAttributes, int64 allocType )
 {
     if ( ( ! GetState ( compiler, DOING_C_TYPE ) && ( ! GetState ( _LC_, LC_BLOCK_COMPILE ) ) ) ) Compiler_LocalsNamespace_New ( compiler ) ;
-    Word * word = _Compiler_LocalWord ( compiler, name, ctype, ctype2, ltype, allocType ) ;
+    Word * word = _Compiler_LocalWord ( compiler, name, morphismAttributes, objectAttributes, lispAttributes, allocType ) ;
     return word ;
 }
 
@@ -193,7 +197,7 @@ Compiler_RemoveLocalFrame ( Compiler * compiler )
     if ( ! GetState ( _Compiler_, LISP_MODE ) ) Compiler_WordStack_SCHCPUSCA ( 0, 0 ) ;
     int64 parameterVarsSubAmount = 0 ;
     Boolean returnValueFlag, already = false ;
-    returnValueFlag = ( Context_CurrentWord ( )->CAttribute & C_RETURN ) || ( GetState ( compiler, RETURN_TOS | RETURN_ACCUM ) ) || compiler->ReturnVariableWord ;
+    returnValueFlag = ( Context_CurrentWord ( )->W_MorphismAttributes & C_RETURN ) || ( GetState ( compiler, RETURN_TOS | RETURN_ACCUM ) ) || compiler->ReturnVariableWord ;
     if ( compiler->NumberOfArgs ) parameterVarsSubAmount = ( compiler->NumberOfArgs - returnValueFlag ) * CELL ;
 #if 0    
     if ( ( ! returnValueFlag ) && GetState ( _Context_, C_SYNTAX ) && ( _CfrTil_->CurrentWordBeingCompiled->S_ContainingNamespace ) &&
@@ -205,7 +209,7 @@ Compiler_RemoveLocalFrame ( Compiler * compiler )
     // nb. these variables have no lasting lvalue - they exist on the stack - we can only return their rvalue
     if ( compiler->ReturnVariableWord )
     {
-        if ( ! ( compiler->ReturnVariableWord->CAttribute & REGISTER_VARIABLE ) ) Compile_GetVarLitObj_RValue_To_Reg ( compiler->ReturnVariableWord, ACC ) ; // need to copy because ReturnVariableWord may have been used within the word already
+        if ( ! ( compiler->ReturnVariableWord->W_ObjectAttributes & REGISTER_VARIABLE ) ) Compile_GetVarLitObj_RValue_To_Reg ( compiler->ReturnVariableWord, ACC ) ; // need to copy because ReturnVariableWord may have been used within the word already
     }
     else if ( GetState ( compiler, RETURN_TOS ) || ( compiler->NumberOfNonRegisterArgs && returnValueFlag && ( ! GetState ( compiler, RETURN_ACCUM ) ) ) )
     {
@@ -239,7 +243,7 @@ Compiler_RemoveLocalFrame ( Compiler * compiler )
         if ( compiler->ReturnVariableWord )
         {
             Compiler_Word_SCHCPUSCA ( compiler->ReturnVariableWord, 0 ) ;
-            if ( compiler->ReturnVariableWord->CAttribute & REGISTER_VARIABLE )
+            if ( compiler->ReturnVariableWord->W_ObjectAttributes & REGISTER_VARIABLE )
             {
                 _Compile_Move_Reg_To_StackN ( DSP, 0, compiler->ReturnVariableWord->RegToUse ) ;
                 return ;

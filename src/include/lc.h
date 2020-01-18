@@ -1,4 +1,3 @@
-#define LO_IsQuoted( l0 ) (( l0->State & QUOTED ) || ( ( l0->State & QUASIQUOTED ) && (! ( l0->State & (UNQUOTED|UNQUOTE_SPLICE) ) ) ) ) //( ! ( l0->State & ( QUOTED | QUASIQUOTED ) )  || (l1->State & UNQUOTED) ) )
 #define LO_Last( lo ) (ListObject*) dllist_Last ( (dllist*) lo->Lo_List )
 #define LO_Previous( lo ) ( ListObject* ) dlnode_Previous ( ( dlnode* ) lo )
 #define LO_Next( lo ) ( ListObject* ) dlnode_Next ( ( dlnode* ) lo )

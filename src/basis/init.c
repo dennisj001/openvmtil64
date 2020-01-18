@@ -63,7 +63,7 @@ CfrTil_ResetAll_Init ( CfrTil * cfrTil )
 {
     byte * startDirectory = ( byte* ) "namespaces" ;
     if ( ! GetState ( _Q_, OVT_IN_USEFUL_DIRECTORY ) ) startDirectory = ( byte* ) "/usr/local/lib/cfrTil64/namespaces" ;
-    DataObject_New ( NAMESPACE_VARIABLE, 0, ( byte* ) "_startDirectory_", NAMESPACE_VARIABLE, 0, 0, 0, ( int64 ) startDirectory, 0, 0, - 1 ) ;
+    DataObject_New ( NAMESPACE_VARIABLE, 0, ( byte* ) "_startDirectory_", 0, NAMESPACE_VARIABLE, 0, 0, ( int64 ) startDirectory, 0, 0, - 1 ) ;
     if ( ( _Q_->RestartCondition >= RESET_ALL ) )
     {
         _Q_->StartIncludeTries = 0 ;
@@ -121,16 +121,19 @@ _CfrTil_InitialAddWordToNamespace ( Word * word, byte * containingNamespaceName,
 }
 
 void
-_CfrTil_CPrimitiveNewAdd ( const char * name, byte * pb_TypeSignature, uint64 opInsnGroup, uint64 opInsCode, block b, uint64 ctype, uint64 ctype2, uint64 ltype, const char *nameSpace, const char * superNamespace )
+_CfrTil_CPrimitiveNewAdd ( const char * name, byte * pb_TypeSignature, uint64 opInsnGroup, uint64 opInsCode, block b, uint64 morphismAttributes, 
+    uint64 objectAttributes, uint64 lispAttributes, const char *nameSpace, const char * superNamespace )
 {
-    Word * word = _Word_New ( ( byte* ) name, CPRIMITIVE | ctype, ctype2, ltype, 1, 0, DICTIONARY ) ;
+    Word * word = _Word_New ( ( byte* ) name, CPRIMITIVE | morphismAttributes, objectAttributes, lispAttributes, 1, 0, DICTIONARY ) ;
     _DObject_ValueDefinition_Init ( word, ( int64 ) b, BLOCK, 0, 0 ) ;
     _CfrTil_InitialAddWordToNamespace ( word, ( byte* ) nameSpace, ( byte* ) superNamespace ) ;
-    if ( ctype & INFIXABLE ) word->WAttribute = WT_INFIXABLE ;
-    else if ( ctype & PREFIX ) word->WAttribute = WT_PREFIX ;
-    else if ( ctype & C_PREFIX_RTL_ARGS ) word->WAttribute = WT_C_PREFIX_RTL_ARGS ;
-    else word->WAttribute = WT_POSTFIX ;
-    word->CAttribute2 = ctype2 ;
+    if ( morphismAttributes & INFIXABLE ) word->W_TypeAttributes = WT_INFIXABLE ;
+    else if ( morphismAttributes & PREFIX ) word->W_TypeAttributes = WT_PREFIX ;
+    else if ( morphismAttributes & C_PREFIX_RTL_ARGS ) word->W_TypeAttributes = WT_C_PREFIX_RTL_ARGS ;
+    else word->W_TypeAttributes = WT_POSTFIX ;
+    if ( lispAttributes & W_COMMENT ) word->W_TypeAttributes = W_COMMENT ;
+    if ( lispAttributes & W_PREPROCESSOR ) word->W_TypeAttributes = W_PREPROCESSOR ;
+    word->W_ObjectAttributes = objectAttributes ;
     word->W_OpInsnCode = opInsCode ;
     word->W_OpInsnGroup = opInsnGroup ;
     if ( pb_TypeSignature ) strncpy ( ( char* ) &word->W_TypeSignatureString, ( char* ) pb_TypeSignature, 8 ) ;

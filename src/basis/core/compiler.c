@@ -10,7 +10,7 @@ _CopyDuplicateWord ( Word * word0, Boolean complete )
     Word * wordc ;
     wordc = Word_Copy ( word0, DICTIONARY ) ; // use DICTIONARY since we are recycling these anyway
     _dlnode_Init ( ( dlnode * ) wordc ) ; // necessary!
-    wordc->CAttribute2 |= ( uint64 ) RECYCLABLE_COPY ;
+    wordc->W_ObjectAttributes |= ( uint64 ) RECYCLABLE_COPY ;
     if ( complete )
     {
         wordc->W_WordListOriginalWord = Word_GetOriginalWord ( word0 ) ;
@@ -33,7 +33,7 @@ Word *
 _CfrTil_CopyDuplicates ( Word * word0 )
 {
     Word * word1, *wordToBePushed ;
-    if ( word0->CAttribute & (KEYWORD|CFRTIL_WORD) ) word1 = _CopyDuplicateWord ( word0, 1 ) ;
+    if ( word0->W_MorphismAttributes & (KEYWORD|CFRTIL_WORD) ) word1 = _CopyDuplicateWord ( word0, 1 ) ;
     else word1 = ( Word * ) dllist_Map1_WReturn ( _CfrTil_->Compiler_N_M_Node_WordList, ( MapFunction1 ) CopyDuplicateWord, ( int64 ) word0 ) ;
     if ( word1 ) wordToBePushed = word1 ;
     else wordToBePushed = word0 ; 
@@ -46,7 +46,7 @@ Compiler_CopyDuplicatesAndPush ( Word * word0, int64 tsrli, int64 scwi )
     Word *wordp = 0 ;
     if ( word0 )
     {
-        if ( ( word0->CAttribute & ( DEBUG_WORD | INTERPRET_DBG ) ) || ( word0->LAttribute & ( W_COMMENT | W_PREPROCESSOR ) ) ) return word0 ;
+        if ( ( word0->W_MorphismAttributes & ( DEBUG_WORD | INTERPRET_DBG ) ) || ( word0->W_TypeAttributes & ( W_COMMENT | W_PREPROCESSOR ) ) ) return word0 ;
         if ( GetState ( _Compiler_, ( COMPILE_MODE | ASM_MODE ) ) ) // don't we want to copy in non-compile mode too ??
         {
             wordp = _CfrTil_CopyDuplicates ( word0 ) ;
@@ -63,6 +63,7 @@ Compiler_IncrementCurrentAccumulatedOffset ( Compiler * compiler, int64 incremen
 {
     if ( compiler->AccumulatedOffsetPointer ) ( *( int64* ) ( compiler->AccumulatedOffsetPointer ) ) += ( increment ) ;
     if ( compiler->AccumulatedOptimizeOffsetPointer ) ( *( int64* ) ( compiler->AccumulatedOptimizeOffsetPointer ) ) += ( increment ) ;
+    _Debugger_->PreHere = ((byte*) compiler->AccumulatedOffsetPointer) - 3 ; // 3 : sizeof add immediate insn with rex
 }
 
 void
@@ -115,7 +116,7 @@ Compiler_PreviousNonDebugWord ( int64 startIndex )
     int64 i ;
     for ( i = startIndex ; ( word = ( Word* ) CfrTil_WordList ( i ) ) && i > - 3 ; i -- )
     {
-        if ( ( Symbol* ) word && ( ! ( word->CAttribute & DEBUG_WORD ) ) ) break ;
+        if ( ( Symbol* ) word && ( ! ( word->W_MorphismAttributes & DEBUG_WORD ) ) ) break ;
     }
     return word ;
 }

@@ -24,7 +24,6 @@ _LO_Read ( LambdaCalculus * lc )
     {
         //if ( Is_DebugModeOn ) CfrTil_PrintDataStack ( ) ;
         token = _Lexer_ReadToken ( lexer, ( byte* ) " ,\n\r\t" ) ;
-        //scwi = lexer->SC_Index ;
         if ( Lexer_IsTokenQualifiedID ( lexer ) ) SetState ( cntx, CONTEXT_PARSING_QID, true ) ;
         else SetState ( cntx, CONTEXT_PARSING_QID, false ) ;
         qidFlag = GetState ( cntx, CONTEXT_PARSING_QID ) ;
@@ -37,6 +36,8 @@ _LO_Read ( LambdaCalculus * lc )
             }
             else if ( l0 = LO_Read_DoToken ( lc, token, qidFlag, lexer->TokenStart_ReadLineIndex, lexer->SC_Index ) )
             {
+                l0->State |= ( lc->ItemQuoteState | lc->QuoteState ) ;
+                lc->ItemQuoteState = 0 ;
                 if ( lnew )
                 {
                     if ( ( l0->State & SPLICE ) || ( ( l0->State & UNQUOTE_SPLICE ) &&
@@ -57,39 +58,52 @@ _LO_Read ( LambdaCalculus * lc )
 }
 
 ListObject *
+_LO_Read_Do_LParen ( LambdaCalculus * lc )
+{
+    ListObject *l0 ;
+    lc->QuoteState |= lc->ItemQuoteState ;
+    Stack_Push ( lc->QuoteStateStack, lc->QuoteState ) ;
+    //lc->QuoteState = 0 ;
+    lc->ParenLevel ++ ;
+    l0 = _LO_Read ( lc ) ;
+    SetState ( lc, LC_READ, true ) ;
+    lc->QuoteState = Stack_Pop ( lc->QuoteStateStack ) ;
+    return l0 ;
+}
+
+ListObject *
 _LO_Read_DoWord ( LambdaCalculus * lc, Word * word, int64 qidFlag, int64 tsrli, int64 scwi )
 {
     ListObject *l0 = 0 ;
     byte *token1 ;
-    //Word_SetTsrliScwi( word, tsrli, scwi ) ;
     SetState ( word, QID, qidFlag ) ;
-    if ( ( word->LAttribute & ( T_LISP_READ_MACRO | T_LISP_IMMEDIATE ) ) && ( ! GetState ( _LC_, LC_READ_MACRO_OFF ) ) )
+    if ( ( word->W_LispAttributes & ( T_LISP_READ_MACRO | T_LISP_IMMEDIATE ) ) && ( ! GetState ( _LC_, LC_READ_MACRO_OFF ) ) )
     {
         Word_Eval ( word ) ;
-        if ( word->LAttribute & T_LISP_SPECIAL )
+        if ( word->W_LispAttributes & T_LISP_SPECIAL )
         {
-            l0 = DataObject_New ( T_LC_NEW, word, 0, word->CAttribute, word->CAttribute2,
-                T_LISP_SYMBOL | word->LAttribute, 0, word->Lo_Value, 0, tsrli, scwi ) ;
+            l0 = DataObject_New ( T_LC_NEW, word, 0, word->W_MorphismAttributes, word->W_ObjectAttributes,
+                T_LISP_SYMBOL | word->W_LispAttributes, 0, word->Lo_Value, 0, tsrli, scwi ) ;
         }
     }
-    else if ( word->LAttribute & T_LISP_TERMINATING_MACRO )
+    else if ( word->W_LispAttributes & T_LISP_TERMINATING_MACRO )
     {
         SetState ( lc, ( LC_READ ), false ) ; // let the value be pushed in this case because we need to pop it below
         Word_Eval ( word ) ;
         token1 = ( byte * ) DataStack_Pop ( ) ;
         SetState ( lc, ( LC_READ ), true ) ;
-        l0 = DataObject_New ( T_LC_LITERAL, 0, token1, LITERAL, word->CAttribute2, word->LAttribute, 0, 0, 0, tsrli, scwi ) ;
+        l0 = DataObject_New ( T_LC_LITERAL, 0, token1, 0, LITERAL | word->W_ObjectAttributes, word->W_LispAttributes, 0, 0, 0, tsrli, scwi ) ;
     }
     else
     {
-        if ( ( word->CAttribute2 & STRUCT ) || Lexer_IsTokenForwardDotted ( _Context_->Lexer0 ) )
+        if ( ( ! GetState ( _Compiler_, LC_ARG_PARSING ) ) && ( ( word->W_ObjectAttributes & STRUCT ) || Lexer_IsTokenForwardDotted ( _Context_->Lexer0 ) ) )
         {
             Set_CompileMode ( true ) ;
             Object_Run ( word ) ;
             Set_CompileMode ( false ) ;
         }
-        l0 = DataObject_New ( T_LC_NEW, word, 0, word->CAttribute, word->CAttribute2,
-            ( T_LISP_SYMBOL | word->LAttribute ), 0, word->Lo_Value, 0, tsrli, scwi ) ;
+        l0 = DataObject_New ( T_LC_NEW, word, word->Name, word->W_MorphismAttributes, word->W_ObjectAttributes,
+            ( T_LISP_SYMBOL | word->W_LispAttributes ), 0, word->Lo_Value, 0, tsrli, scwi ) ;
     }
     return l0 ;
 }
@@ -121,31 +135,35 @@ _LO_Read_DoToken ( LambdaCalculus * lc, byte * token, int64 qidFlag, int64 tsrli
 }
 
 ListObject *
-_LO_Read_DoLParen ( LambdaCalculus * lc )
-{
-    ListObject *l0 ;
-    Stack_Push ( lc->QuoteStateStack, lc->QuoteState ) ;
-    lc->QuoteState = lc->ItemQuoteState ;
-    lc->ParenLevel ++ ;
-    l0 = _LO_Read ( lc ) ;
-    SetState ( lc, LC_READ, true ) ;
-    lc->QuoteState = Stack_Pop ( lc->QuoteStateStack ) ;
-    return l0 ;
-}
-
-ListObject *
 LO_Read_DoToken ( LambdaCalculus * lc, byte * token, int64 qidFlag, int64 tsrli, int64 scwi )
 {
     ListObject *l0 = 0 ;
     //if ( Is_DebugOn ) _Printf ( ( byte * ) "\n_LO_Read : \'%s\' scwi = %d", token, scwi ) ;
-    if ( String_Equal ( ( char * ) token, ( byte * ) "(" ) ) l0 = _LO_Read_DoLParen ( lc ) ;
-    else if ( String_Equal ( ( char * ) token, ( byte * ) "/*" ) ) CfrTil_ParenthesisComment ( ) ;
+    if ( String_Equal ( ( char * ) token, ( byte * ) "/*" ) ) CfrTil_ParenthesisComment ( ) ;
     else if ( String_Equal ( ( char * ) token, ( byte * ) "//" ) ) CfrTil_CommentToEndOfLine ( ) ;
+    else if ( String_Equal ( ( char * ) token, ( byte * ) "(" ) ) l0 = _LO_Read_Do_LParen ( lc ) ;
     else l0 = _LO_Read_DoToken ( lc, token, qidFlag, tsrli, scwi ) ;
     return l0 ;
 }
 
-// remember a Word is a ListObject 
+void
+LC_QuoteQuasiQuoteRepl ( uint64 itemQuoteState, Boolean doReplFlag )
+{
+    Boolean replFlag = false ;
+    LambdaCalculus * lc = _LC_ ;
+    if ( ! lc )
+    {
+        replFlag = true ;
+        lc = LC_New ( ) ;
+    }
+    if ( ! GetState ( _Compiler_, LISP_MODE ) ) replFlag = true ;
+    lc->ItemQuoteState |= itemQuoteState ;
+    if ( replFlag && doReplFlag )
+    {
+        byte nextChar = ReadLine_PeekNextNonWhitespaceChar ( _ReadLiner_ ) ;
+        if ( ( nextChar == '(' ) ) _LC_ReadEvalPrint_ListObject ( 0, 0, itemQuoteState ) ;
+    }
+}
 
 void
 LO_Quote ( )

@@ -75,6 +75,45 @@ _DObject_C_StartupCompiledWords_DefInit ( byte * function, int64 arg )
     }
 }
 
+DObject *
+_CfrTil_Do_DynamicObject_ToReg ( DObject * dobject0, uint8 reg )
+{
+    Context * cntx = _Context_ ;
+    Lexer * lexer = cntx->Lexer0 ;
+    DObject *dobject = dobject0, * ndobject ;
+    byte * token ;
+    //Compiler_Word_SCHCPUSCA ( dobject0, 0 ) ;
+    while ( Lexer_IsTokenForwardDotted ( lexer ) )
+    {
+        Lexer_ReadToken ( lexer ) ; // the '.'
+        token = Lexer_ReadToken ( lexer ) ;
+        if ( String_Equal ( "prototype", ( char* ) token ) )
+        {
+            dobject = dobject->ContainingNamespace ;
+            continue ;
+        }
+        if ( ! ( ndobject = _DObject_FindSlot_BottomUp ( dobject, token ) ) )
+        {
+            dobject = _DObject_NewSlot ( dobject, token, 0 ) ;
+        }
+        else dobject = ndobject ;
+    }
+    Compiler_Word_SCHCPUSCA ( dobject0, 0 ) ;
+    if ( CompileMode ) _Compile_Move_Literal_Immediate_To_Reg ( reg, ( int64 ) & dobject->W_Value ) ;
+    cntx->Interpreter0->CurrentObjectNamespace = TypeNamespace_Get ( dobject ) ; // do this elsewhere when needed
+
+    return dobject ;
+}
+
+void
+CfrTil_Do_DynamicObject ( DObject * dobject0, Boolean reg )
+{
+    DObject * dobject = _CfrTil_Do_DynamicObject_ToReg ( dobject0, reg ) ;
+    if ( CompileMode ) _Word_CompileAndRecord_PushReg ( dobject0, reg, true ) ;
+    else DataStack_Push ( ( int64 ) & dobject->W_Value ) ; //& dobject->W_DObjectValue ) ; //dobject ) ;
+    CfrTil_TypeStackPush ( dobject ) ;
+}
+
 void
 _DObject_ValueDefinition_Init ( Word * word, uint64 value, uint64 objType, byte * function, int64 arg )
 // using a variable that is a type or a function 
@@ -112,20 +151,26 @@ _DObject_ValueDefinition_Init ( Word * word, uint64 value, uint64 objType, byte 
 void
 DObject_Finish ( Word * word )
 {
-    uint64 ctype = word->CAttribute ;
-    if ( ! ( ctype & CPRIMITIVE ) )
+    Context * cntx = _Context_ ;
+    Compiler * compiler = cntx->Compiler0 ;
+    if ( ! ( word->W_MorphismAttributes & CPRIMITIVE ) )
     {
         if ( GetState ( _CfrTil_, OPTIMIZE_ON ) ) SetState ( word, COMPILED_OPTIMIZED, true ) ;
         if ( GetState ( _CfrTil_, INLINE_ON ) ) SetState ( word, COMPILED_INLINE, true ) ;
         if ( GetState ( _Context_, INFIX_MODE ) ) SetState ( word, W_INFIX_MODE, true ) ;
-        if ( GetState ( _Context_, C_SYNTAX ) ) { SetState ( word, W_C_SYNTAX, true ) ; word->WAttribute |= WT_C_SYNTAX ; }
+        if ( GetState ( _Context_, C_SYNTAX ) )
+        {
+            SetState ( word, W_C_SYNTAX, true ) ;
+            word->W_TypeAttributes |= WT_C_SYNTAX ;
+        }
         if ( IsSourceCodeOn ) SetState ( word, W_SOURCE_CODE_MODE, true ) ;
     }
-    word->W_NumberOfNonRegisterArgs = _Context_->Compiler0->NumberOfNonRegisterArgs ;
-    word->W_NumberOfNonRegisterLocals = _Context_->Compiler0->NumberOfNonRegisterLocals ;
-    word->W_NumberOfVariables = _Context_->Compiler0->NumberOfVariables ;
-    if ( GetState ( _Context_, INFIX_MODE ) ) word->CAttribute |= INFIX_WORD ;
+    word->W_NumberOfNonRegisterArgs = compiler->NumberOfNonRegisterArgs ;
+    word->W_NumberOfNonRegisterLocals = compiler->NumberOfNonRegisterLocals ;
+    word->W_NumberOfVariables = compiler->NumberOfVariables ;
+    if ( GetState ( _Context_, INFIX_MODE ) ) word->W_MorphismAttributes |= INFIX_WORD ;
     _CfrTil_->LastFinished_DObject = word ;
+    _CfrTil_SetSourceCodeWord ( word ) ;
 }
 
 Word *
@@ -142,11 +187,11 @@ _DObject_Init ( Word * word, uint64 value, uint64 ftype, byte * function, int64 
 // remember : Word = Namespace = DObject has a s_Symbol
 
 Word *
-_DObject_New ( byte * name, uint64 value, uint64 ctype, uint64 ctype2, uint64 ltype, uint64 ftype, byte * function, int64 arg, 
+_DObject_New ( byte * name, uint64 value, uint64 morphismType, uint64 objectType, uint64 lispType, uint64 functionType, byte * function, int64 arg,
     int64 addToInNs, Namespace * addToNs, uint64 allocType )
 {
-    Word * word = _Word_New ( name, ctype, ctype2, ltype, addToInNs, addToNs, allocType ) ;
-    _DObject_Init ( word, value, ftype, function, arg ) ;
+    Word * word = _Word_New ( name, morphismType, objectType, lispType, addToInNs, addToNs, allocType ) ;
+    _DObject_Init ( word, value, functionType, function, arg ) ;
     _CfrTil_->DObjectCreateCount ++ ;
     return word ;
 }
@@ -178,24 +223,24 @@ void
 DObject_SubObjectInit ( DObject * dobject, Word * parent )
 {
     if ( ! parent ) parent = _CfrTil_Namespace_InNamespaceGet ( ) ;
-    else if ( ! ( parent->CAttribute & NAMESPACE ) )
+    else if ( ! ( parent->W_ObjectAttributes & NAMESPACE ) )
     {
         parent->W_List = dllist_New ( ) ;
-        parent->CAttribute |= NAMESPACE ;
+        parent->W_ObjectAttributes |= OBJECT_FIELD | NAMESPACE ;
         _Namespace_AddToNamespacesTail ( parent ) ;
     }
     if ( parent->S_WAllocType == WORD_COPY_MEM ) parent = Word_Copy ( ( Word* ) parent, DICTIONARY ) ; // nb! : this allows us to
     Namespace_DoAddWord ( parent, dobject ) ;
-    dobject->CAttribute |= parent->CAttribute ;
-    dobject->CAttribute2 |= T_ANY ;
+    dobject->W_MorphismAttributes |= parent->W_MorphismAttributes ;
+    dobject->W_ObjectAttributes |= T_ANY ;
     dobject->Slots = parent->Slots ;
     Namespace_SetState ( parent, USING ) ;
 }
 
 DObject *
-DObject_Sub_New ( DObject * proto, byte * name, uint64 category )
+DObject_Sub_New ( DObject * proto, byte * name, uint64 objectAttributes )
 {
-    DObject * dobject = _DObject_New ( name, 0, ( category | DOBJECT | IMMEDIATE ), T_ANY, 0, DOBJECT, ( byte* ) _DataObject_Run, 0, 0, 0, DICTIONARY ) ;
+    DObject * dobject = _DObject_New ( name, 0, IMMEDIATE, objectAttributes | DOBJECT | T_ANY, 0, DOBJECT, ( byte* ) _DataObject_Run, 0, 0, 0, DICTIONARY ) ;
     DObject_SubObjectInit ( dobject, proto ) ;
     return dobject ;
 }
@@ -207,8 +252,7 @@ void
 CfrTil_SetPropertiesAsDObject ( )
 {
     DObject * o = ( DObject * ) DataStack_Pop ( ) ;
-    o->CAttribute |= DOBJECT ;
-    o->CAttribute2 |= T_ANY ;
+    o->W_ObjectAttributes |= DOBJECT | T_ANY ;
 }
 
 DObject *
@@ -227,7 +271,10 @@ CfrTil_DObject_Clone ( )
 {
     DObject * proto = ( DObject * ) DataStack_Pop ( ) ;
     byte * name = ( byte * ) DataStack_Pop ( ) ;
-    if ( ! ( proto->CAttribute & DOBJECT ) ) Error ( ( byte* ) "Cloning Error : \'%s\' is not a dynamic object.", proto->Name, 1 ) ;
+    if ( ! ( proto->W_ObjectAttributes & DOBJECT ) )
+    {
+        Error ( ( byte* ) "\nCloning Alert : \'%s\' is not a dynamic object.\n\n", proto->Name, PAUSE ) ;
+    }
     DObject_Sub_New ( proto, name, DOBJECT ) ;
 }
 

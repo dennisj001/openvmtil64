@@ -1,17 +1,17 @@
 #include "../include/cfrtil64.h"
 
-CPrimitive CPrimitives [] = { 
+CPrimitive CPrimitives [] = {
     { "locationPush", 0, 0, 0, Location_PushNew, 0, 0, 0, "Experimental", "Root" },
     { "locationPrint", 0, 0, 0, CfrTil_Location_Printf, 0, 0, 0, "Experimental", "Root" },
     { "do>", 0, 0, 0, CfrTil_Do, IMMEDIATE, 0, 0, "Experimental", "Root" },
     { "does>", 0, 0, 0, CfrTil_Does, IMMEDIATE, 0, 0, "Experimental", "Root" },
     { "<do", 0, 0, 0, CfrTil_NoOp, IMMEDIATE, 0, 0, "Experimental", "Root" },
-   
-    { "(", 0, 0, 0, ( block ) LC_ReadEvalPrint_AfterAFirstLParen, IMMEDIATE | KEYWORD, LEFT_PAREN, 0, "Lisp", "Root" },
+
+    { "(", 0, 0, 0, ( block ) LC_ReadEvalPrint_AfterAFirstLParen, IMMEDIATE | KEYWORD | LEFT_PAREN, 0, 0, "Lisp", "Root" },
     { "_(", 0, 0, 0, ( block ) LC_Read, IMMEDIATE | KEYWORD, 0, 0, "Lisp", "Root" },
     { "eval", 0, 0, 0, ( block ) LC_Eval, IMMEDIATE | KEYWORD, 0, 0, "Lisp", "Root" },
     { "print", 0, 0, 0, ( block ) LC_PrintWithValue, 0, 0, 0, "Lisp", "Root" },
-    { ")", 0, 0, 0, CfrTil_C_Comma, IMMEDIATE | KEYWORD, NO_OP_WORD, 0, "Lisp", "Root" },
+    { ")", 0, 0, 0, CfrTil_C_Comma, IMMEDIATE | NO_OP_WORD | KEYWORD, 0, 0, "Lisp", "Root" },
     { "_Printf", 0, 0, 0, ( block ) _Printf, 0, 0, LISP_C_RTL_ARGS | T_LISP_SPECIAL | LISP_VOID_RETURN, "Lisp", "Root" },
     { "define", 0, 0, 0, ( block ) LO_Define, 0, 0, T_LISP_SPECIAL, "Lisp", "Root" },
     { "compile", 0, 0, 0, ( block ) LO_CompileDefine, 0, 0, T_LISP_SPECIAL, "Lisp", "Root" },
@@ -53,7 +53,7 @@ CPrimitive CPrimitives [] = {
     { "printf", 0, 0, 0, ( block ) _Printf, C_PREFIX_RTL_ARGS | LISP_VOID_RETURN, 0, 0, "C", "Root" },
     { "sprintf", 0, 0, 0, ( block ) sprintf, C_PREFIX_RTL_ARGS, 0, 0, "C", "Root" },
     //{ "()", 0, 0, 0, CfrTil_NoOp, IMMEDIATE, 0, 0, "C", "Root" },
-    { "(", 0, 0, 0, CfrTil_C_LeftParen, IMMEDIATE | KEYWORD, LEFT_PAREN, 0, "C", "Root" },
+    { "(", 0, 0, 0, CfrTil_C_LeftParen, IMMEDIATE | KEYWORD | LEFT_PAREN, 0, 0, "C", "Root" },
     { "(|", 0, 0, 0, CfrTil_LocalVariablesBegin, IMMEDIATE, 0, 0, "C", "Root" },
     { "if{", 0, 0, 0, CfrTil_If_ConditionalExpression, IMMEDIATE, 0, 0, "C", "Root" },
     { "}else{", 0, 0, 0, CfrTil_Else, IMMEDIATE, 0, 0, "C", "Root" },
@@ -80,18 +80,18 @@ CPrimitive CPrimitives [] = {
     { "c_return", 0, 0, 0, CfrTil_C_Return, IMMEDIATE, 0, 0, "C", "Root" },
     { "void_return", 0, 0, 0, CfrTil_Void_Return, IMMEDIATE, 0, 0, "C", "Root" },
     { "rax_return", 0, 0, 0, CfrTil_RAX_Return, IMMEDIATE, 0, 0, "C", "Root" },
-    { ",", 0, 0, 0, CfrTil_C_Comma, IMMEDIATE | KEYWORD, NO_OP_WORD|RIGHT_PAREN, 0, "C", "Root" },
+    { ",", 0, 0, 0, CfrTil_C_Comma, IMMEDIATE | NO_OP_WORD | RIGHT_PAREN | KEYWORD, 0, 0, "C", "Root" },
 
-    { "{", 0, 0, 0, CfrTil_Begin_C_Block, IMMEDIATE | KEYWORD, BLOCK_DELIMITER, 0, "C_Syntax", "C" },
-    { "}", 0, 0, 0, CfrTil_End_C_Block, IMMEDIATE | KEYWORD, BLOCK_DELIMITER, 0, "C_Syntax", "C" },
-    { ";", 0, 0, 0, CfrTil_C_Semi, IMMEDIATE | KEYWORD, SYNTACTIC, 0, "C_Syntax", "C" },
-    { ",", 0, 0, 0, CfrTil_C_Comma, IMMEDIATE | KEYWORD, NO_OP_WORD|RIGHT_PAREN, 0, "C_Syntax", "C" },
-    { "!", 0, 0, TEST, CfrTil_LogicalNot, IMMEDIATE | CATEGORY_OP | CATEGORY_OP_1_ARG | CATEGORY_LOGIC | PREFIX, LOGIC_NEGATE, 0, "C_Syntax", "C" },
+    { "{", 0, 0, 0, CfrTil_Begin_C_Block, IMMEDIATE | BLOCK_DELIMITER | KEYWORD, 0, 0, "C_Syntax", "C" },
+    { "}", 0, 0, 0, CfrTil_End_C_Block, IMMEDIATE | BLOCK_DELIMITER | KEYWORD, 0, 0, "C_Syntax", "C" },
+    { ";", 0, 0, 0, CfrTil_C_Semi, IMMEDIATE | SYNTACTIC | KEYWORD, 0, 0, "C_Syntax", "C" },
+    { ",", 0, 0, 0, CfrTil_C_Comma, IMMEDIATE | NO_OP_WORD | RIGHT_PAREN | KEYWORD, 0, 0, "C_Syntax", "C" },
+    { "!", 0, 0, TEST, CfrTil_LogicalNot, IMMEDIATE | CATEGORY_OP | CATEGORY_OP_1_ARG | CATEGORY_LOGIC | PREFIX | LOGIC_NEGATE, 0, 0, "C_Syntax", "C" },
     { "?", 0, 0, 0, CfrTil_C_ConditionalExpression, COMBINATOR | IMMEDIATE, 0, 0, "C_Syntax", "C" },
     { "c_class", 0, 0, 0, ( block ) CfrTil_C_Class_New, 0, 0, 0, "C_Syntax", "C" },
     { "type", 0, 0, 0, ( block ) CfrTil_Type_New, 0, 0, 0, "C_Syntax", "C" },
     { "typedef", 0, 0, 0, CfrTil_Typedef, 0, 0, 0, "C_Syntax", "C" },
-    { "&", 0, 0, 0, CfrTil_AddressOf, IMMEDIATE, (NO_CODING|ADDRESS_OF_OP), 0, "C_Syntax", "C" }, // avoid name clash with '&&' and '&' 
+    { "&", 0, 0, 0, CfrTil_AddressOf, ( NO_CODING | ADDRESS_OF_OP | IMMEDIATE ), 0, 0, "C_Syntax", "C" }, // avoid name clash with '&&' and '&' 
 
     { "}", 0, 0, 0, CfrTil_TypedefStructEnd, IMMEDIATE | KEYWORD, 0, 0, "C_Typedef", "C_Syntax" },
     { "{", 0, 0, 0, CfrTil_TypedefStructBegin, IMMEDIATE | KEYWORD, 0, 0, "C_Typedef", "C_Syntax" },
@@ -106,7 +106,7 @@ CPrimitive CPrimitives [] = {
     { "=", "XA.V", 0, MOV, ( block ) CfrTil_C_Infix_Equal, IMMEDIATE | CATEGORY_OP | INFIXABLE | CATEGORY_OP_EQUAL | KEYWORD, C_INFIX_OP_EQUAL, 0, "Infix", "C" }, //"Infix", "Compiler" },
     //{ "=", "XA.V", 0, MOV, ( block ) CfrTil_C_Infix_Equal, IMMEDIATE | CATEGORY_OP | CATEGORY_OP_EQUAL | KEYWORD, C_INFIX_OP_EQUAL, 0, "Infix", "C" }, //"Infix", "Compiler" },
 
-    { "(", 0, 0, 0, CfrTil_LocalsAndStackVariablesBegin, IMMEDIATE | KEYWORD, LEFT_PAREN, 0, "Locals", "Root" },
+    { "(", 0, 0, 0, CfrTil_LocalsAndStackVariablesBegin, IMMEDIATE | KEYWORD | LEFT_PAREN, 0, 0, "Locals", "Root" },
     { "(|", 0, 0, 0, CfrTil_LocalVariablesBegin, IMMEDIATE, 0, 0, "Locals", "Root" },
 
     { "tf2", 0, 0, 0, CfrTil_TrueFalseCombinator2, COMBINATOR | IMMEDIATE, 0, 0, "Combinators", "Root" },
@@ -152,7 +152,7 @@ CPrimitive CPrimitives [] = {
     { "clone", 0, 0, 0, CfrTil_Class_Clone, 0, 0, 0, "Class", "Root" },
     { "]", 0, 0, 0, CfrTil_ArrayEnd, ( IMMEDIATE | OBJECT_OPERATOR ), RIGHT_BRACKET, 0, "Class", "Root" },
     { "[", 0, 0, 0, CfrTil_ArrayBegin, ( IMMEDIATE | OBJECT_OPERATOR ), COMPILER_LEFT_BRACKET, 0, "Class", "Root" },
-    { ".", 0, 0, 0, CfrTil_Dot, ( IMMEDIATE | OBJECT_OPERATOR ), NO_CODING, 0, "Class", "Root" },
+    { ".", 0, 0, 0, CfrTil_Dot, ( IMMEDIATE | OBJECT_OPERATOR | NO_CODING ), 0, 0, "Class", "Root" },
 
     { "pWidth", 0, 0, 0, BigNum_Set_PrintfWidth, 0, 0, 0, "BigNum", "Class" },
     { "pPrecision", 0, 0, 0, BigNum_Set_PrintfPrecision, 0, 0, 0, "BigNum", "Class" },
@@ -185,48 +185,48 @@ CPrimitive CPrimitives [] = {
 
     { "||", 0, 1, OR, CfrTil_LogicalOr, IMMEDIATE | KEYWORD | CATEGORY_OP | CATEGORY_OP_UNORDERED | CATEGORY_LOGIC | INFIXABLE | KEYWORD, 0, 0, "Logic", "Root" },
     { "or", 0, 1, OR, CfrTil_LogicalOr, IMMEDIATE | KEYWORD | INFIXABLE | KEYWORD, 0, 0, "Logic", "Root" },
-    { "xor", 0, 1, XOR, CfrTil_LogicalXor, IMMEDIATE | KEYWORD | CATEGORY_OP | CATEGORY_OP_UNORDERED | CATEGORY_LOGIC | INFIXABLE | KEYWORD, 0, 0, "Logic", "Root" },
-    { "^^", 0, 1, XOR, CfrTil_LogicalXor, IMMEDIATE | KEYWORD | CATEGORY_OP | CATEGORY_OP_UNORDERED | CATEGORY_LOGIC | INFIXABLE | KEYWORD, 0, 0, "Logic", "Root" },
-    { "!", 0, 0, TEST, CfrTil_LogicalNot, IMMEDIATE | KEYWORD | CATEGORY_OP | CATEGORY_OP_1_ARG | CATEGORY_LOGIC, LOGIC_NEGATE, 0, "Logic", "Root" },
-    { "not", 0, 0, TEST, CfrTil_LogicalNot, IMMEDIATE | KEYWORD | CATEGORY_OP | CATEGORY_OP_1_ARG | CATEGORY_LOGIC, LOGIC_NEGATE, 0, "Logic", "Root" },
+    { "xor", 0, 1, XOR, CfrTil_LogicalXor, IMMEDIATE | KEYWORD | CATEGORY_OP | CATEGORY_OP_UNORDERED | CATEGORY_LOGIC | INFIXABLE, 0, 0, "Logic", "Root" },
+    { "^^", 0, 1, XOR, CfrTil_LogicalXor, IMMEDIATE | KEYWORD | CATEGORY_OP | CATEGORY_OP_UNORDERED | CATEGORY_LOGIC | INFIXABLE, 0, 0, "Logic", "Root" },
+    { "!", 0, 0, TEST, CfrTil_LogicalNot, IMMEDIATE | KEYWORD | CATEGORY_OP | CATEGORY_OP_1_ARG | CATEGORY_LOGIC | LOGIC_NEGATE, 0, 0, "Logic", "Root" },
+    { "not", 0, 0, TEST, CfrTil_LogicalNot, IMMEDIATE | KEYWORD | CATEGORY_OP | CATEGORY_OP_1_ARG | CATEGORY_LOGIC | LOGIC_NEGATE, 0, 0, "Logic", "Root" },
     { "and", 0, 0, TEST, CfrTil_LogicalAnd, IMMEDIATE | KEYWORD | INFIXABLE | KEYWORD, 0, 0, "Logic", "Root" },
-    { "&&", 0, 1, CMP, CfrTil_LogicalAnd, IMMEDIATE | KEYWORD | CATEGORY_OP | CATEGORY_OP_UNORDERED | CATEGORY_LOGIC | INFIXABLE | KEYWORD, 0, 0, "Logic", "Root" },
-    { "<", "II.B", 1, CMP, CfrTil_LessThan, IMMEDIATE | KEYWORD | CATEGORY_OP | CATEGORY_OP_ORDERED | CATEGORY_LOGIC | INFIXABLE | KEYWORD, 0, 0, "Logic", "Root" },
-    { ">", "II.B", 1, CMP, CfrTil_GreaterThan, IMMEDIATE | KEYWORD | CATEGORY_OP | CATEGORY_OP_ORDERED | CATEGORY_LOGIC | INFIXABLE | KEYWORD, 0, 0, "Logic", "Root" },
-    { "==", "II.B", 1, CMP, CfrTil_Equals, IMMEDIATE | KEYWORD | CATEGORY_OP | CATEGORY_OP_UNORDERED | CATEGORY_LOGIC | INFIXABLE | KEYWORD, 0, 0, "Logic", "Root" },
+    { "&&", 0, 1, CMP, CfrTil_LogicalAnd, IMMEDIATE | KEYWORD | CATEGORY_OP | CATEGORY_OP_UNORDERED | CATEGORY_LOGIC | INFIXABLE, 0, 0, "Logic", "Root" },
+    { "<", "II.B", 1, CMP, CfrTil_LessThan, IMMEDIATE | KEYWORD | CATEGORY_OP | CATEGORY_OP_ORDERED | CATEGORY_LOGIC | INFIXABLE, 0, 0, "Logic", "Root" },
+    { ">", "II.B", 1, CMP, CfrTil_GreaterThan, IMMEDIATE | KEYWORD | CATEGORY_OP | CATEGORY_OP_ORDERED | CATEGORY_LOGIC | INFIXABLE, 0, 0, "Logic", "Root" },
+    { "==", "II.B", 1, CMP, CfrTil_Equals, IMMEDIATE | KEYWORD | CATEGORY_OP | CATEGORY_OP_UNORDERED | CATEGORY_LOGIC | INFIXABLE, 0, 0, "Logic", "Root" },
     { "equal", "II.B", 1, CMP, CfrTil_Equals, IMMEDIATE | KEYWORD | CATEGORY_OP | CATEGORY_OP_UNORDERED | CATEGORY_LOGIC, 0, 0, "Logic", "Root" },
-    { "!=", "II.B", 1, CMP, CfrTil_DoesNotEqual, IMMEDIATE | KEYWORD | CATEGORY_OP | CATEGORY_OP_UNORDERED | CATEGORY_LOGIC | INFIXABLE | KEYWORD, LOGIC_NEGATE, 0, "Logic", "Root" },
-    { "<=", "II.B", 1, CMP, CfrTil_LessThanOrEqual, IMMEDIATE | KEYWORD | CATEGORY_OP | CATEGORY_OP_ORDERED | CATEGORY_LOGIC | INFIXABLE | KEYWORD, 0, 0, "Logic", "Root" },
+    { "!=", "II.B", 1, CMP, CfrTil_DoesNotEqual, IMMEDIATE | KEYWORD | CATEGORY_OP | CATEGORY_OP_UNORDERED | CATEGORY_LOGIC | INFIXABLE | LOGIC_NEGATE, 0, 0, "Logic", "Root" },
+    { "<=", "II.B", 1, CMP, CfrTil_LessThanOrEqual, IMMEDIATE | KEYWORD | CATEGORY_OP | CATEGORY_OP_ORDERED | CATEGORY_LOGIC | INFIXABLE, 0, 0, "Logic", "Root" },
     { ">=", "II.B", 1, CMP, CfrTil_GreaterThanOrEqual, IMMEDIATE | KEYWORD | CATEGORY_OP | CATEGORY_OP_ORDERED | CATEGORY_LOGIC | INFIXABLE | KEYWORD, 0, 0, "Logic", "Root" },
 
-    { "+", "II.I", 1, ADD, CfrTil_Plus, IMMEDIATE | KEYWORD | CATEGORY_OP | CATEGORY_OP_UNORDERED | INFIXABLE | KEYWORD, 0, 0, "Int", "Root" },
-    { "-", "II.I", 1, SUB, CfrTil_Minus, IMMEDIATE | KEYWORD | CATEGORY_OP | CATEGORY_OP_ORDERED | INFIXABLE | KEYWORD, 0, 0, "Int", "Root" },
-    { "+=", 0, 1, ADD, CfrTil_PlusEqual, IMMEDIATE | KEYWORD | CATEGORY_OP | CATEGORY_OP_OPEQUAL | INFIXABLE | KEYWORD, 0, 0, "Int", "Root" },
-    { "-=", 0, 1, SUB, CfrTil_MinusEqual, IMMEDIATE | KEYWORD | CATEGORY_OP | CATEGORY_OP_OPEQUAL | INFIXABLE | KEYWORD, 0, 0, "Int", "Root" },
-    { "*", "II.I", 3, MUL, CfrTil_Multiply, IMMEDIATE | KEYWORD | CATEGORY_OP | CATEGORY_OP_UNORDERED | INFIXABLE | KEYWORD, 0, 0, "Int", "Root" },
-    { "**", "II.I", 0, 0, CfrTil_Power, CATEGORY_OP_ORDERED | KEYWORD | CATEGORY_OP | INFIXABLE | KEYWORD, 0, 0, "Int", "Root" },
+    { "+", "II.I", 1, ADD, CfrTil_Plus, IMMEDIATE | KEYWORD | CATEGORY_OP | CATEGORY_OP_UNORDERED | INFIXABLE, 0, 0, "Int", "Root" },
+    { "-", "II.I", 1, SUB, CfrTil_Minus, IMMEDIATE | KEYWORD | CATEGORY_OP | CATEGORY_OP_ORDERED | INFIXABLE, 0, 0, "Int", "Root" },
+    { "+=", 0, 1, ADD, CfrTil_PlusEqual, IMMEDIATE | KEYWORD | CATEGORY_OP | CATEGORY_OP_OPEQUAL | INFIXABLE, 0, 0, "Int", "Root" },
+    { "-=", 0, 1, SUB, CfrTil_MinusEqual, IMMEDIATE | KEYWORD | CATEGORY_OP | CATEGORY_OP_OPEQUAL | INFIXABLE, 0, 0, "Int", "Root" },
+    { "*", "II.I", 3, MUL, CfrTil_Multiply, IMMEDIATE | KEYWORD | CATEGORY_OP | CATEGORY_OP_UNORDERED | INFIXABLE, 0, 0, "Int", "Root" },
+    { "**", "II.I", 0, 0, CfrTil_Power, CATEGORY_OP_ORDERED | KEYWORD | CATEGORY_OP | INFIXABLE, 0, 0, "Int", "Root" },
     { "pow", "II.I", 0, 0, CfrTil_Power, CATEGORY_OP_ORDERED | CATEGORY_OP | INFIXABLE | KEYWORD, 0, 0, "Int", "Root" },
     { "pow_03", "II.I", 0, 0, CfrTil_Power_03, CATEGORY_OP_ORDERED | CATEGORY_OP | INFIXABLE | KEYWORD, 0, 0, "Int", "Root" },
-    { "^", "II.I", 0, 0, CfrTil_Power, CATEGORY_OP_ORDERED | KEYWORD | CATEGORY_OP | INFIXABLE | KEYWORD, 0, 0, "Int", "Root" },
-    { "/", "II.I", 3, DIV, CfrTil_Divide, IMMEDIATE | KEYWORD | CATEGORY_OP | CATEGORY_OP_DIVIDE | CATEGORY_OP_ORDERED | INFIXABLE | KEYWORD, OP_RAX_PLUS_1ARG, 0, "Int", "Root" },
+    { "^", "II.I", 0, 0, CfrTil_Power, CATEGORY_OP_ORDERED | KEYWORD | CATEGORY_OP | INFIXABLE, 0, 0, "Int", "Root" },
+    { "/", "II.I", 3, DIV, CfrTil_Divide, IMMEDIATE | KEYWORD | CATEGORY_OP | CATEGORY_OP_DIVIDE | CATEGORY_OP_ORDERED | INFIXABLE | OP_RAX_PLUS_1ARG, 0, 0, "Int", "Root" },
     { "modulo", 0, 3, MODULO, CfrTil_Mod, IMMEDIATE | KEYWORD | CATEGORY_OP | CATEGORY_OP_DIVIDE | INFIXABLE | KEYWORD, 0, 0, "Int", "Root" },
-    { "%", "II.I", 3, DIV, CfrTil_Mod, IMMEDIATE | KEYWORD | CATEGORY_OP | CATEGORY_OP_DIVIDE | CATEGORY_OP_ORDERED | INFIXABLE | KEYWORD, 0, 0, "Int", "Root" },
-    { "*=", "II.I", 3, MUL, CfrTil_MultiplyEqual, IMMEDIATE | KEYWORD | CATEGORY_OP | CATEGORY_OP_OPEQUAL | INFIXABLE | KEYWORD, 0, 0, "Int", "Root" },
-    { "/=", "II.I", 3, DIV, CfrTil_DivideEqual, IMMEDIATE | KEYWORD | CATEGORY_OP | CATEGORY_OP_OPEQUAL | CATEGORY_OP_ORDERED | INFIXABLE | KEYWORD, OP_RAX_PLUS_1ARG, 0, "Int", "Root" },
+    { "%", "II.I", 3, DIV, CfrTil_Mod, IMMEDIATE | KEYWORD | CATEGORY_OP | CATEGORY_OP_DIVIDE | CATEGORY_OP_ORDERED | INFIXABLE, 0, 0, "Int", "Root" },
+    { "*=", "II.I", 3, MUL, CfrTil_MultiplyEqual, IMMEDIATE | KEYWORD | CATEGORY_OP | CATEGORY_OP_OPEQUAL | INFIXABLE, 0, 0, "Int", "Root" },
+    { "/=", "II.I", 3, DIV, CfrTil_DivideEqual, IMMEDIATE | KEYWORD | CATEGORY_OP | CATEGORY_OP_OPEQUAL | CATEGORY_OP_ORDERED | INFIXABLE | OP_RAX_PLUS_1ARG, 0, 0, "Int", "Root" },
     { "intPrint", 0, 0, 0, CfrTil_PrintInt, 0, 0, 0, "Int", "Root" },
     { "hexIntPrint", 0, 0, 0, CfrTil_HexPrintInt, 0, 0, 0, "Int", "Root" },
 
-    { "<<", "I.I", 2, SHL, CfrTil_ShiftLeft, IMMEDIATE | KEYWORD | CATEGORY_OP | CATEGORY_OP_ORDERED | BIT_SHIFT | INFIXABLE | KEYWORD, 0, 0, "Bits", "Logic" },
-    { ">>", "I.I", 2, SHR, CfrTil_ShiftRight, IMMEDIATE | KEYWORD | CATEGORY_OP | CATEGORY_OP_ORDERED | BIT_SHIFT | INFIXABLE | KEYWORD, 0, 0, "Bits", "Logic" },
-    { "&", "II.I", 1, AND, CfrTil_BitWise_AND, IMMEDIATE | KEYWORD | CATEGORY_OP | CATEGORY_OP_UNORDERED | INFIXABLE | KEYWORD, 0, 0, "Bits", "Logic" },
-    { "|", "II.I", 1, OR, CfrTil_BitWise_OR, IMMEDIATE | KEYWORD | CATEGORY_OP | CATEGORY_OP_UNORDERED | INFIXABLE | KEYWORD, 0, 0, "Bits", "Logic" },
+    { "<<", "I.I", 2, SHL, CfrTil_ShiftLeft, IMMEDIATE | KEYWORD | CATEGORY_OP | CATEGORY_OP_ORDERED | BIT_SHIFT | INFIXABLE, 0, 0, "Bits", "Logic" },
+    { ">>", "I.I", 2, SHR, CfrTil_ShiftRight, IMMEDIATE | KEYWORD | CATEGORY_OP | CATEGORY_OP_ORDERED | BIT_SHIFT | INFIXABLE, 0, 0, "Bits", "Logic" },
+    { "&", "II.I", 1, AND, CfrTil_BitWise_AND, IMMEDIATE | KEYWORD | CATEGORY_OP | CATEGORY_OP_UNORDERED | INFIXABLE, 0, 0, "Bits", "Logic" },
+    { "|", "II.I", 1, OR, CfrTil_BitWise_OR, IMMEDIATE | KEYWORD | CATEGORY_OP | CATEGORY_OP_UNORDERED | INFIXABLE, 0, 0, "Bits", "Logic" },
     { "^", "II.I", 1, XOR, CfrTil_BitWise_XOR, IMMEDIATE | KEYWORD | CATEGORY_OP | CATEGORY_OP_UNORDERED, 0, 0, "Bits", "Logic" },
     { "~", "I.I", 3, NOT, CfrTil_BitWise_NOT, IMMEDIATE | KEYWORD | CATEGORY_OP | CATEGORY_OP_1_ARG, 0, 0, "Bits", "Logic" },
     { "neg", "I.I", 3, NEG, CfrTil_BitWise_NEG, IMMEDIATE | KEYWORD | CATEGORY_OP | CATEGORY_OP_1_ARG, 0, 0, "Bits", "Logic" },
-    { "<<=", 0, 2, SHL, CfrTil_ShiftLeft_Equal, IMMEDIATE | KEYWORD | CATEGORY_OP | CATEGORY_OP_ORDERED | CATEGORY_OP_OPEQUAL | BIT_SHIFT | INFIXABLE | KEYWORD, 0, 0, "Bits", "Logic" },
-    { ">>=", 0, 2, SHR, CfrTil_ShiftRight_Equal, IMMEDIATE | KEYWORD | CATEGORY_OP | CATEGORY_OP_ORDERED | CATEGORY_OP_OPEQUAL | BIT_SHIFT | INFIXABLE | KEYWORD, 0, 0, "Bits", "Logic" },
-    { "&=", 0, 1, AND, CfrTil_BitWise_AndEqual, IMMEDIATE | KEYWORD | CATEGORY_OP | CATEGORY_OP_ORDERED | CATEGORY_OP_OPEQUAL | INFIXABLE | KEYWORD, 0, 0, "Bits", "Logic" },
-    { "|=", 0, 1, OR, CfrTil_BitWise_OrEqual, IMMEDIATE | KEYWORD | CATEGORY_OP | CATEGORY_OP_ORDERED | CATEGORY_OP_OPEQUAL | INFIXABLE | KEYWORD, 0, 0, "Bits", "Logic" },
+    { "<<=", 0, 2, SHL, CfrTil_ShiftLeft_Equal, IMMEDIATE | KEYWORD | CATEGORY_OP | CATEGORY_OP_ORDERED | CATEGORY_OP_OPEQUAL | BIT_SHIFT | INFIXABLE, 0, 0, "Bits", "Logic" },
+    { ">>=", 0, 2, SHR, CfrTil_ShiftRight_Equal, IMMEDIATE | KEYWORD | CATEGORY_OP | CATEGORY_OP_ORDERED | CATEGORY_OP_OPEQUAL | BIT_SHIFT | INFIXABLE, 0, 0, "Bits", "Logic" },
+    { "&=", 0, 1, AND, CfrTil_BitWise_AndEqual, IMMEDIATE | KEYWORD | CATEGORY_OP | CATEGORY_OP_ORDERED | CATEGORY_OP_OPEQUAL | INFIXABLE, 0, 0, "Bits", "Logic" },
+    { "|=", 0, 1, OR, CfrTil_BitWise_OrEqual, IMMEDIATE | KEYWORD | CATEGORY_OP | CATEGORY_OP_ORDERED | CATEGORY_OP_OPEQUAL | INFIXABLE, 0, 0, "Bits", "Logic" },
 
     { "_fi", 0, 0, 0, CfrTil_EndIf, IMMEDIATE, 0, 0, "Asm", "Root" },
     { "_else_", 0, 0, 0, CfrTil_Else, IMMEDIATE, 0, 0, "Asm", "Root" },
@@ -417,15 +417,15 @@ CPrimitive CPrimitives [] = {
     { "showAllocated", 0, 0, 0, OVT_Mem_ShowAllocated, 0, 0, 0, "OpenVmTil", "Root" },
     { "recycleDebugInfo", 0, 0, 0, OVT_RecycleAllWordsDebugInfo, 0, 0, 0, "OpenVmTil", "Root" },
     //{ "<dbg>", 0, 0, 0, CfrTil_DebugRuntimeBreakpoint, CPRIMITIVE|DEBUG_WORD, RT_STEPPING_DEBUG, 0, "OpenVmTil", "Root" },
-    
+
     { "freeTemporayMem", 0, 0, 0, OVT_MemListFree_TempObjects, 0, 0, 0, "Memory", "OpenVmTil" },
     { "freeCompilerTempMem", 0, 0, 0, OVT_MemListFree_CompilerTempObjects, 0, 0, 0, "Memory", "OpenVmTil" },
     { "freeLispTempMem", 0, 0, 0, OVT_MemListFree_LispTemp, 0, 0, 0, "Memory", "OpenVmTil" },
     { "freeSessionMem", 0, 0, 0, OVT_MemListFree_Session, 0, 0, 0, "Memory", "OpenVmTil" },
     { "freeAllTempMem", 0, 0, 0, OVT_FreeTempMem, 0, 0, 0, "Memory", "OpenVmTil" },
 
-    { "_dup", "A.AA", 0, 0, CfrTil_Dup, CATEGORY_DUP | KEYWORD | T_ANY | CATEGORY_OP_STACK, 0, 0, "Stack", "Root" },
-    { "dup", "A.AA", 0, 0, CfrTil_Dup, IMMEDIATE | KEYWORD | T_ANY | CATEGORY_DUP | CATEGORY_OP_STACK, T_ANY, 0, "Stack", "Root" },
+    { "_dup", "A.AA", 0, 0, CfrTil_Dup, CATEGORY_DUP | KEYWORD | CATEGORY_OP_STACK, T_ANY, 0, "Stack", "Root" },
+    { "dup", "A.AA", 0, 0, CfrTil_Dup, IMMEDIATE | KEYWORD | CATEGORY_DUP | CATEGORY_OP_STACK, T_ANY, 0, "Stack", "Root" },
     { "ndup", 0, 0, 0, CfrTil_NDup, CATEGORY_OP_STACK, 0, 0, "Stack", "Root" },
     { "drop", 0, 0, 0, CfrTil_Drop, IMMEDIATE | KEYWORD | CATEGORY_OP_STACK, 0, 0, "Stack", "Root" },
     { "dropN", 0, 0, 0, CfrTil_DropN, IMMEDIATE | CATEGORY_OP_STACK, 0, 0, "Stack", "Root" },
@@ -506,10 +506,10 @@ CPrimitive CPrimitives [] = {
     { "word", 0, 0, 0, CfrTil_Word, 0, 0, 0, "Reserved", "Compiler" },
     { ":", 0, 0, 0, CfrTil_Colon, IMMEDIATE | KEYWORD, 0, 0, "Reserved", "Compiler" },
     { "semi", 0, 0, 0, CfrTil_SemiColon, KEYWORD, 0, 0, "Reserved", "Compiler" },
-    { ";", 0, 0, 0, CfrTil_SemiColon, IMMEDIATE | KEYWORD, SYNTACTIC, 0, "Reserved", "Compiler" },
-    { "}", 0, 0, 0, ( block ) CfrTil_EndBlock, IMMEDIATE | KEYWORD, BLOCK_DELIMITER, 0, "Reserved", "Compiler" }, // moved to init.cft and renamed below
-    { "{", 0, 0, 0, ( block ) CfrTil_BeginBlock, IMMEDIATE | KEYWORD, BLOCK_DELIMITER, 0, "Reserved", "Compiler" }, // moved to init.cft and renamed below
-    { "end", 0, 0, 0, CfrTil_EndBlock, IMMEDIATE | KEYWORD, BLOCK_DELIMITER, 0, "Reserved", "Compiler" },
+    { ";", 0, 0, 0, CfrTil_SemiColon, IMMEDIATE | SYNTACTIC | KEYWORD, 0, 0, "Reserved", "Compiler" },
+    { "}", 0, 0, 0, ( block ) CfrTil_EndBlock, IMMEDIATE | BLOCK_DELIMITER | KEYWORD, 0, 0, "Reserved", "Compiler" }, // moved to init.cft and renamed below
+    { "{", 0, 0, 0, ( block ) CfrTil_BeginBlock, IMMEDIATE | BLOCK_DELIMITER | KEYWORD, 0, 0, "Reserved", "Compiler" }, // moved to init.cft and renamed below
+    { "end", 0, 0, 0, CfrTil_EndBlock, IMMEDIATE | BLOCK_DELIMITER | KEYWORD, 0, 0, "Reserved", "Compiler" },
     { "immediate", 0, 0, 0, CfrTil_Immediate, IMMEDIATE | KEYWORD, 0, 0, "Reserved", "Compiler" },
     //{ "stackVariable", 0, 0, 0, CfrTil_StackVariable, IMMEDIATE | KEYWORD, 0, 0, "Reserved", "Compiler" },
     { "syntactic", 0, 0, 0, CfrTil_Syntactic, IMMEDIATE | KEYWORD, 0, 0, "Reserved", "Compiler" },
@@ -535,9 +535,9 @@ CPrimitive CPrimitives [] = {
     { "constant", 0, 0, 0, CfrTil_Constant, IMMEDIATE, 0, 0, "Compiler", "Root" },
     { "literal", 0, 0, 0, CfrTil_Literal, IMMEDIATE, 0, 0, "Compiler", "Root" },
     { "_literal", 0, 0, 0, CfrTil_Literal, 0, 0, 0, "Compiler", "Root" },
-    { "_end", 0, 0, 0, CfrTil_EndBlock, 0, BLOCK_DELIMITER, 0, "Compiler", "Root" },
-    { "begin", 0, 0, 0, ( block ) CfrTil_BeginBlock, 0, BLOCK_DELIMITER, 0, "Compiler", "Root" },
-    { "Here", "V.I", 0, 0, CfrTil_Here, CATEGORY_OP_STACK|T_INT, 0, 0, "Compiler", "Root" }, //anything that pushes it result onto the stack should be CATEGORY_OP !?
+    { "_end", 0, 0, 0, CfrTil_EndBlock, BLOCK_DELIMITER, 0, 0, "Compiler", "Root" },
+    { "begin", 0, 0, 0, ( block ) CfrTil_BeginBlock, BLOCK_DELIMITER, 0, 0, "Compiler", "Root" },
+    { "Here", "V.I", 0, 0, CfrTil_Here, CATEGORY_OP_STACK, T_INT, 0, "Compiler", "Root" }, //anything that pushes it result onto the stack should be CATEGORY_OP !?
     { "code", 0, 0, 0, CfrTil_Code, 0, 0, 0, "Compiler", "Root" },
     { "_immediate", 0, 0, 0, CfrTil_Immediate, 0, 0, 0, "Compiler", "Root" },
     { "?immediate", 0, 0, 0, CfrTil_IsImmediate, INFIXABLE, 0, 0, "Compiler", "Root" },
@@ -557,7 +557,7 @@ CPrimitive CPrimitives [] = {
     { "get", 0, 0, MOV, CfrTil_Peek, IMMEDIATE | CATEGORY_OP | CATEGORY_OP_LOAD | CATEGORY_OP_1_ARG, 0, 0, "Compiler", "Root" },
     { "@=", 0, 0, 0, CfrTil_AtEqual, IMMEDIATE | CATEGORY_OP | CATEGORY_OP_ORDERED | CATEGORY_OP_1_ARG, 0, 0, "Compiler", "Root" },
     { "!", 0, 0, MOV, CfrTil_Store, IMMEDIATE | CATEGORY_OP | CATEGORY_OP_STORE, 0, 0, "Compiler", "Root" },
-    { "=", "XA.V", 0, MOV, CfrTil_Poke, IMMEDIATE | CATEGORY_OP | CATEGORY_OP_EQUAL | INFIXABLE  | KEYWORD, 0, 0, "Compiler", "Root" },
+    { "=", "XA.V", 0, MOV, CfrTil_Poke, IMMEDIATE | CATEGORY_OP | CATEGORY_OP_EQUAL | INFIXABLE | KEYWORD, 0, 0, "Compiler", "Root" },
     { "poke", "XA.V", 0, MOV, CfrTil_Poke, IMMEDIATE | CATEGORY_OP | CATEGORY_OP_EQUAL, 0, 0, "Compiler", "Root" },
     { "set", "XA.V", 0, MOV, CfrTil_Poke, IMMEDIATE | CATEGORY_OP | CATEGORY_OP_EQUAL, 0, 0, "Compiler", "Root" },
     { "store", "AX.V", 0, MOV, CfrTil_Store, IMMEDIATE | CATEGORY_OP | CATEGORY_OP_STORE, 0, 0, "Compiler", "Root" },
@@ -569,7 +569,7 @@ CPrimitive CPrimitives [] = {
     { "sourceCodeInit", 0, 0, 0, CfrTil_SourceCode_Init, 0, 0, 0, "Compiler", "Root" },
     { "sourceCodeOn", 0, 0, 0, CfrTil_Lexer_SourceCodeOn, 0, 0, 0, "Compiler", "Root" },
     //{ ")", 0, 0, 0, CfrTil_NoOp, IMMEDIATE | KEYWORD, NO_OP_WORD|RIGHT_PAREN, 0, "Compiler", "Root" },
-    { ")", 0, 0, 0, CfrTil_C_Comma, IMMEDIATE | KEYWORD, RIGHT_PAREN, 0, "Compiler", "Root" },
+    { ")", 0, 0, 0, CfrTil_C_Comma, IMMEDIATE | KEYWORD | RIGHT_PAREN, 0, 0, "Compiler", "Root" },
 
     { "compileByte", 0, 0, 0, CompileByte, 0, 0, 0, "Compiling", "Compiler" },
     { "compileInt16", 0, 0, 0, CompileInt16, 0, 0, 0, "Compiling", "Compiler" },
@@ -586,5 +586,5 @@ CPrimitive CPrimitives [] = {
     { 0 }
 } ;
 
- 
+
 

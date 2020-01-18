@@ -55,7 +55,7 @@ CfrTil_Define ( )
     else
     {
         Word * word = _CfrTil_->LastFinished_Word ;
-        if ( word ) word->CAttribute |= (LITERAL|CONSTANT) ;
+        if ( word ) word->W_ObjectAttributes |= (LITERAL|CONSTANT) ;
     }
     CfrTil_Inline ( ) ;
     CfrTil_SourceCode_Init ( ) ; //don't leave the define in sc

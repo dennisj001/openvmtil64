@@ -5,9 +5,10 @@ void
 _Debugger_StepOneInstruction ( Debugger * debugger )
 {
     debugger->SaveTOS = TOS ;
-    //debugger->PreHere = Here ;
     debugger->SaveStackDepth = DataStack_Depth ( ) ;
+    DefaultColors ; // nb. : so text output will be in default colors
     ( ( VoidFunction ) debugger->StepInstructionBA->BA_Data ) ( ) ;
+    DebugColors ; 
     Set_DataStackPointers_FromDebuggerDspReg ( ) ;
 }
 
@@ -21,21 +22,13 @@ Debugger_CompileOneInstruction ( Debugger * debugger, byte * jcAddress, Boolean 
     ByteArray * svcs = _Q_CodeByteArray ;
     _ByteArray_Init ( debugger->StepInstructionBA ) ; // we are only compiling one insn here so clear our BA before each use
     Set_CompilerSpace ( debugger->StepInstructionBA ) ; // now compile to this space
-
     _Compile_Save_C_CpuState ( _CfrTil_, showFlag ) ; //&& ( _Q_->Verbosity >= 3 ) ) ; // save our c compiler cpu register state
-
     _Compile_Restore_Debugger_CpuState ( debugger, showFlag ) ; //&& ( _Q_->Verbosity >= 3 ) ) ; // restore our runtime state before the current insn
-
     byte * nextInsn = _Debugger_CompileOneInstruction ( debugger, jcAddress ) ; // the single current stepping insn
-
     _Compile_Save_Debugger_CpuState ( debugger, showFlag ) ; //showRegsFlag ) ; //&& ( _Q_->Verbosity >= 3 ) ) ; // save our runtime state after the instruction : which we will restore before the next insn
-
     _Compile_Restore_C_CpuState ( _CfrTil_, showFlag ) ; //&& ( _Q_->Verbosity >= 3 ) ) ; // save our c compiler cpu register state
-
     _Compile_Return ( ) ;
-
     Set_CompilerSpace ( svcs ) ; // restore compiler space pointer before "do it" in case "do it" calls the compiler
-
     return nextInsn ;
 }
 
@@ -51,7 +44,6 @@ _Debugger_CompileAndStepOneInstruction ( Debugger * debugger, byte * jcAddress )
     else _Debugger_ShowEffects ( debugger, debugger->w_Word, GetState ( debugger, DBG_STEPPING ), showExtraFlag ) ;
     if ( GetState ( debugger, ( DBG_AUTO_MODE | DBG_CONTINUE_MODE ) ) ) Debugger_UdisOneInstruction ( debugger, debugger->DebugAddress, ( byte* ) "\r", ( byte* ) "" ) ;
     if ( Compiling ) _Debugger_DisassembleWrittenCode ( debugger ) ;
-    DebugColors ;
     debugger->DebugAddress = nextInsn ;
 }
 
@@ -102,7 +94,7 @@ _Debugger_CompileOneInstruction ( Debugger * debugger, byte * jcAddress )
         else // step into the the jmp/call insn
         {
 into:
-            while ( word->CAttribute & ( ALIAS ) ) word = word->W_AliasOf ;
+            while ( word->W_MorphismAttributes & ( ALIAS ) ) word = word->W_AliasOf ;
             if ( ( * debugger->DebugAddress == CALLI32 ) || ( ( ( * ( uint16* ) debugger->DebugAddress ) == 0xff49 ) && ( *( debugger->DebugAddress + 2 ) == 0xd1 ) ) )
             {
                 _Printf ( ( byte* ) "\nstepping into a cfrtil compiled function : %s : .... :> %s ", word ? ( char* ) c_gd ( word->Name ) : "", Context_Location ( ) ) ;
@@ -172,8 +164,7 @@ Debugger_CompileAndStepOneInstruction ( Debugger * debugger )
             jcAddress = JumpCallInstructionAddress ( debugger->DebugAddress ) ;
 doJmpCall:
             word = Word_UnAlias ( Word_GetFromCodeAddress ( jcAddress ) ) ;
-            if ( word && ( word->CAttribute & ( DEBUG_WORD ) ) &&
-                ( word->CAttribute2 & ( RT_STEPPING_DEBUG ) ) )
+            if ( word && ( word->W_MorphismAttributes & ( DEBUG_WORD|RT_STEPPING_DEBUG ) ) )
             {
                 //debugger->w_Word = word ;
                 if ( ! GetState ( debugger, DBG_CONTINUE_MODE ) )
@@ -506,7 +497,7 @@ Debugger_CanWeStep ( Debugger * debugger, Word * word )
     if ( ( ! debugger->DebugAddress ) || ( ! GetState ( debugger, DBG_SETUP_ADDRESS ) ) )
     {
         if ( ( ! word ) || ( ! word->CodeStart ) ) result = false ;
-        else if ( ( word && ( word->CAttribute & ( CPRIMITIVE | DLSYM_WORD ) ) ) || ( ! NamedByteArray_CheckAddress ( _Q_CodeSpace, word->CodeStart ) ) ) result = false ;
+        else if ( ( word && ( word->W_MorphismAttributes & ( CPRIMITIVE | DLSYM_WORD ) ) ) || ( ! NamedByteArray_CheckAddress ( _Q_CodeSpace, word->CodeStart ) ) ) result = false ;
     }
     SetState ( debugger, DBG_CAN_STEP, result ) ;
     return result ;

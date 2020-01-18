@@ -135,7 +135,6 @@
 #define MEMORY_ALLOCATION_ERROR ( (uint64) 1 << 3 )
 //#define LABEL_NOT_FOUND_ERROR ( (uint64) 1 << 4 )
 #define COMPILE_TIME_ONLY ( (uint64) 1 << 5 )
-#define SYNTAX_ERROR ( (uint64) 1 << 6 )
 #define LOCALS_UNAVAILABLE ( (uint64) 1 << 7 )
 #define NAMESPACE_ERROR ( (uint64) 1 << 8 )
 #define NESTED_COMPILE_ERROR ( (uint64) 1 << 9 )
@@ -155,6 +154,7 @@
 #define FIX_ME_ERROR ( (uint64) 1 << 23 )
 #define OUT_OF_CODE_MEMORY ( (uint64) 1 << 24 )
 #define USEAGE_ERROR ( (uint64) 1 << 25 )
+#define SYNTAX_ERROR ( (uint64) 1 << 26 )
 
 #define KB 1024
 #define MB ( KB * KB )
@@ -213,43 +213,40 @@
 #define PSI_NEWLINE ( (uint64) 1 << 15 )
 #define PSI_PROMPT  ( (uint64) 1 << 16 )
 
-// CAttribute & LType -shared in common 
-#define CPRIMITIVE ( (uint64) 1 << 0 )
-#define CFRTIL_WORD ( (uint64) 1 << 1 )
-#define T_RAW_STRING ( (uint64) 1 << 2 )
-#define T_STRING ( (uint64) 1 << 3 )
-#define T_INT64 ( (uint64) 1 << 4 )
-#define T_INT T_INT64
-#define T_FLOAT ( (uint64) 1 << 5 )
-#define T_BOOLEAN ( (uint64) 1 << 6 )
-#define T_BIG_NUM ( (uint64) 1 << 7 )
-#define T_BYTE ( (uint64) 1 << 8 )
-#define T_CHAR T_BYTE
-#define T_INT8 T_BYTE
-#define T_HEAD ( (uint64) 1 << 8 )
-#define T_TAIL ( (uint64) 1 << 9 )
-#define LITERAL ( (uint64) 1 << 10 )
+// MorphismAttributes & LispAttributes -shared in common 
+#define CPRIMITIVE      ( (uint64) 1 << 0 )
+#define CFRTIL_WORD     ( (uint64) 1 << 1 )
+#define T_LISP_SYMBOL   ( (uint64) 1 << 3 )
+#define NOT_A_KNOWN_OBJECT ( (uint64) 1 << 6 )  
+#define KNOWN_OBJECT ( (uint64) 1 << 7 )  
 
-// CAttribute - C forth types
-#define QUALIFIED_ID    ( (uint64) 1 << 11 ) 
-#define QID QUALIFIED_ID 
-#define IMMEDIATE ( (uint64) 1 << 12 )
-#define NAMESPACE ( (uint64) 1 << 13 )
-#define BLOCK ( (uint64) 1 << 14 )
-#define INLINE ( (uint64) 1 << 15 )
-#define CLASS ( (uint64) 1 << 16 )
-#define NAMESPACE_VARIABLE ( (uint64) 1 << 17 )
-#define PARAMETER_VARIABLE ( (uint64) 1 << 18 )
-#define STACK_VARIABLE PARAMETER_VARIABLE 
-#define LOCAL_VARIABLE ( (uint64) 1 << 19 )
-#define PREFIX ( (uint64) 1 << 20 )
-#define INFIXABLE ( (uint64) 1 << 21 )
-#define OBJECT ( (uint64) 1 << 22 )
-#define CONSTANT ( (uint64) 1 << 23 )
-#define T_UNDEFINED ( (uint64) 1 << 24 )
-#define REGISTER_VARIABLE ( (uint64) 1 << 25 )
-#define THIS ( (uint64) 1 << 26 )
-#define OBJECT_FIELD ( (uint64) 1 << 27 )
+#define T_HEAD          ( (uint64) 1 << 8 )
+#define T_TAIL          ( (uint64) 1 << 9 )
+#define RIGHT_BRACKET       ( (uint64) 1 << 10 ) // ']'
+#define LEFT_BRACKET        ( (uint64) 1 << 11 ) // '['
+
+// MorphismAttributes - morphism (non-object/type) defines (generally)
+#define IMMEDIATE           ( (uint64) 1 << 12 )
+#define KEYWORD             ( (uint64) 1 << 13 )
+#define BLOCK               ( (uint64) 1 << 14 )
+#define INLINE              ( (uint64) 1 << 15 )
+
+//#define LISP_CFRTIL         ( (uint64) 1 << 16 )
+#define LEFT_PAREN          ( (uint64) 1 << 17 ) // '('
+#define RIGHT_PAREN         ( (uint64) 1 << 18 ) // ')'
+#define OP_RAX_PLUS_1ARG    ( (uint64) 1 << 19 )
+
+#define PREFIX              ( (uint64) 1 << 20 )
+#define INFIXABLE           ( (uint64) 1 << 21 )
+#define OBJECT_OPERATOR     ( (uint64) 1 << 22 ) 
+#define DOT                 OBJECT_OPERATOR              
+
+//#define SOURCE_CODE_WORD    ( (uint64) 1 << 23 ) 
+//#define TEMP_WORD           ( (uint64) 1 << 24 ) 
+#define NO_OP_WORD          ( (uint64) 1 << 25 ) 
+#define SYNTACTIC           ( (uint64) 1 << 26 ) 
+//#define DO_DOES             ( (uint64) 1 << 27 ) 
+
 #define CATEGORY_PLUS_PLUS_MINUS_MINUS ( (uint64) 1 << 28 )
 #define CATEGORY_PP_MM CATEGORY_PLUS_PLUS_MINUS_MINUS
 #define CATEGORY_OP_STORE ( (uint64) 1 << 29 )
@@ -265,13 +262,12 @@
 #define CATEGORY_OP_DIVIDE ( (uint64) 1 << 39 )
 #define C_PREFIX ( (uint64) 1 << 40 )
 #define ALIAS ( (uint64) 1 << 41 )
-#define DYNAMIC_OBJECT ( (uint64) 1 << 42 )
-#define DOBJECT DYNAMIC_OBJECT
+#define NO_CODING           ( (uint64) 1 <<  42 ) 
+
 #define C_PREFIX_RTL_ARGS ( (uint64) 1 << 43 )
-#define KEYWORD ( (uint64) 1 << 44 )
-#define TEXT_MACRO ( (uint64) 1 << 45 )
-#define STRING_MACRO ( (uint64) 1 << 46 )
-#define T_VOID ( (uint64) 1 << 47 )
+
+#define BLOCK_DELIMITER     ( (uint64) 1 << 47 )
+
 #define DEBUG_WORD ( (uint64) 1 << 48 )
 #define BIT_SHIFT        ( (uint64) 1 << 49 ) 
 #define WORD_CREATE ( (uint64) 1 << 50 ) 
@@ -279,60 +275,83 @@
 #define INFIX_WORD      ( (uint64) 1 << 52 ) 
 #define C_RETURN        ( (uint64) 1 << 53 ) 
 #define DLSYM_WORD      ( (uint64) 1 << 54 ) 
-#define C_TYPE          ( (uint64) 1 << 55 ) 
-#define CLASS_CLONE     ( (uint64) 1 << 56 ) 
-#define C_CLASS         ( (uint64) 1 << 57 ) 
-#define C_TYPEDEF       ( (uint64) 1 << 58 ) 
-#define PREFIXABLE      ( (uint64) 1 << 59 ) 
-#define OBJECT_OPERATOR ( (uint64) 1 << 60 ) 
-#define DOT             OBJECT_OPERATOR              
-#define COMBINATOR      ( (uint64) 1 << 61 )
-#define CATEGORY_OP     ( (uint64) 1 << 62 )
-#define CATEGORY_OP_OPEQUAL     ( (uint64) 1 << 63 )
 
-// CAttribute2
-#define RAX_RETURN          ( (uint64) 1 <<  0 ) 
-#define CATEGORY_SHIFT      ( (uint64) 1 <<  1 ) 
-#define SOURCE_CODE_WORD    ( (uint64) 1 <<  2 ) 
-#define TEMP_WORD           ( (uint64) 1 <<  3 ) 
-#define NO_OP_WORD          ( (uint64) 1 <<  4 ) 
-#define SYNTACTIC           ( (uint64) 1 <<  5 ) 
-#define NO_CODING           ( (uint64) 1 <<  6 ) 
-#define DO_DOES             ( (uint64) 1 <<  7 ) 
-#define ARRAY_TYPE          ( (uint64) 1 <<  8 ) 
-#define VARIABLE            ( (uint64) 1 <<  9 ) 
-#define LISP_CFRTIL         ( (uint64) 1 << 10 )
-#define LEFT_PAREN          ( (uint64) 1 << 11 ) // '('
-#define RIGHT_PAREN         ( (uint64) 1 << 12 ) // ')'
-#define OP_RAX_PLUS_1ARG    ( (uint64) 1 << 13 )
-#define RT_STEPPING_DEBUG   ( (uint64) 1 << 14 )
-#define ADDRESS_OF_OP       ( (uint64) 1 << 15 )
-#define BLOCK_DELIMITER     ( (uint64) 1 << 16 )
+#define RAX_RETURN          ( (uint64) 1 << 55 ) 
+//#define CATEGORY_SHIFT      ( (uint64) 1 << 56 ) 
+#define RT_STEPPING_DEBUG   ( (uint64) 1 << 57 )
+#define ADDRESS_OF_OP       ( (uint64) 1 << 58 )
+
+//#define PREFIXABLE          ( (uint64) 1 << 59 ) 
+#define LOGIC_NEGATE        ( (uint64) 1 << 59 )
+#define COMBINATOR          ( (uint64) 1 << 61 )
+#define CATEGORY_OP         ( (uint64) 1 << 62 )
+#define CATEGORY_OP_OPEQUAL ( (uint64) 1 << 63 )
+
+// ObjectAttributes - object and type defines
+//#define ARRAY_TYPE          ( (uint64) 1 <<  8 ) 
+//#define VARIABLE            ( (uint64) 1 <<  9 ) 
+#define TEXT_MACRO          ( (uint64) 1 << 15 )
+#define STRING_MACRO        ( (uint64) 1 << 16 )
 #define T_OBJECT            ( (uint64) 1 << 17 )
-#define T_MORPHISM          ( (uint64) 1 << 18 )
-#define RIGHT_BRACKET       ( (uint64) 1 << 19 ) // ']'
-#define LEFT_BRACKET        ( (uint64) 1 << 20 ) // '['
+//#define T_MORPHISM          ( (uint64) 1 << 18 )
 #define RECYCLABLE_COPY     ( (uint64) 1 << 21 )
 #define RECYCLABLE_LOCAL    ( (uint64) 1 << 22 )
 #define T_TYPE_VARIABLE     ( (uint64) 1 << 23 )
 #define T_ANY_FIXED_TYPE    ( (uint64) 1 << 28 )
 #define T_ANY               T_ANY_FIXED_TYPE    
-#define LOGIC_NEGATE        ( (uint64) 1 << 25 )
 #define C_INFIX_OP_EQUAL    ( (uint64) 1 << 26 )
 #define STRUCTURE           ( (uint64) 1 << 27 )
 #define STRUCT              STRUCTURE         
 #define RAW_STRING          ( (uint64) 1 << 28 )
 #define T_INT32             ( (uint64) 1 << 29 )
 #define T_INT16             ( (uint64) 1 << 30 )
-#define T_SIZE_CHECK        ( (uint64) 1 << 31 )
 
-// WAttribute for interpreter word types 
+#define T_RAW_STRING        ( (uint64) 1 << 31 )
+#define T_STRING            ( (uint64) 1 << 32 )
+#define T_INT64             ( (uint64) 1 << 33 )
+#define T_INT T_INT64
+#define T_FLOAT             ( (uint64) 1 << 34 )
+#define T_BOOLEAN           ( (uint64) 1 << 35 )
+#define T_BIG_NUM           ( (uint64) 1 << 36 )
+#define T_BYTE              ( (uint64) 1 << 37 )
+#define T_CHAR              T_BYTE
+#define T_INT8              T_BYTE
+#define T_VOID              ( (uint64) 1 << 38 )
+
+#define C_TYPE              ( (uint64) 1 << 39 ) 
+#define T_UNDEFINED         ( (uint64) 1 << 40 )
+#define OBJECT              ( (uint64) 1 << 41 )
+#define OBJECT_FIELD        ( (uint64) 1 << 42 )
+#define DYNAMIC_OBJECT      ( (uint64) 1 << 43 )
+#define DOBJECT             DYNAMIC_OBJECT
+#define C_CLASS             ( (uint64) 1 << 44 ) 
+#define C_TYPEDEF           ( (uint64) 1 << 45 ) 
+#define T_SIZE_CHECK        ( (uint64) 1 << 46 ) //??
+#define THIS                ( (uint64) 1 << 47 )
+#define QUALIFIED_ID        ( (uint64) 1 << 48 ) 
+#define QID                 QUALIFIED_ID 
+#define CLASS_CLONE         ( (uint64) 1 << 49 ) 
+
+#define LITERAL             ( (uint64) 1 << 50 )
+#define REGISTER_VARIABLE   ( (uint64) 1 << 51 )
+#define NAMESPACE_VARIABLE  ( (uint64) 1 << 52 )
+#define PARAMETER_VARIABLE  ( (uint64) 1 << 53 )
+#define STACK_VARIABLE      PARAMETER_VARIABLE 
+#define LOCAL_VARIABLE      ( (uint64) 1 << 54 )
+#define CONSTANT            ( (uint64) 1 << 55 )
+#define NAMESPACE           ( (uint64) 1 << 57 )
+#define CLASS               ( (uint64) 1 << 58 )
+#define LOCAL_OBJECT        ( (uint64) 1 << 59 )
+
+// WAttribute for interpreter word types : added in primitives.c in th LAttribute field
 #define WT_PREFIX                 ( (uint64) 1 <<  0 ) 
 #define WT_INFIXABLE              ( (uint64) 1 <<  1 ) 
 #define WT_C_PREFIX_RTL_ARGS      ( (uint64) 1 <<  2 ) 
 #define WT_POSTFIX                ( (uint64) 1 <<  3 ) 
 #define WT_QID                    ( (uint64) 1 <<  4 ) 
 #define WT_C_SYNTAX               ( (uint64) 1 <<  5 )
+#define W_COMMENT                 ( (uint64) 1 <<  6 )
+#define W_PREPROCESSOR            ( (uint64) 1 <<  7 )
 
 // LType - lisp types
 #define T_LAMBDA ( (uint64) 1 << 11 )
@@ -347,7 +366,7 @@
 #define T_LISP_SPECIAL ( (uint64) 1 << 20 )
 #define T_LISP_BEGIN ( (uint64) 1 << 21 )
 #define T_LISP_TOKEN ( (uint64) 1 << 22 )
-//#define T_LC_DEFINE ( (uint64) 1 << 23 )
+#define T_LC_LITERAL ( (uint64) 1 << 23 )
 #define T_LISP_MACRO ( (uint64) 1 << 24 )
 #define LISP_VOID_RETURN ( (uint64) 1 << 26 )
 #define T_NIL ( (uint64) 1 << 27 )
@@ -363,18 +382,11 @@
 #define T_LC_DEFINE ( (uint64) 1 << 37 )
 #define T_LISP_VALUE ( (uint64) 1 << 38 )
 #define T_LISP_WORD ( (uint64) 1 << 39 )
+#define T_LC_NEW ( (uint64) 1 << 40 )
 #define T_LISP_CFRTIL ( (uint64) 1 << 45 )
 #define T_LISP_COLON ( (uint64) 1 << 46 )
 #define T_LISP_IMMEDIATE ( (uint64) 1 << 48 )
 #define T_LISP_CFRTIL_COMPILED ( (uint64) 1 << 49 )
-#define T_LC_LITERAL ( (uint64) 1 << 50 )
-#define T_LC_NEW ( (uint64) 1 << 51 )
-
-// more common properties
-#define W_COMMENT ( (uint64) 1 << 53 )
-#define LOCAL_OBJECT ( (uint64) 1 << 54 )
-#define W_PREPROCESSOR ( (uint64) 1 << 55 )
-#define T_LISP_SYMBOL ( (uint64) 1 << 56 )
 
 //#define   ( (uint64) 1 <<  )
 #define NEW_RUN_COMPOSITE 0
@@ -557,8 +569,8 @@
 #define SINGLE_ESCAPE ( (uint64) 1 << 1 )
 #define MULTIPLE_ESCAPE ( (uint64) 1 << 2 )
 #define ADD_TOKEN_TO_SOURCE ( (uint64) 1 << 3 ) 
-#define NOT_A_KNOWN_OBJECT ( (uint64) 1 << 4 )  
-#define KNOWN_OBJECT ( (uint64) 1 << 5 )  
+//#define NOT_A_KNOWN_OBJECT ( (uint64) 1 << 4 )  
+//#define KNOWN_OBJECT ( (uint64) 1 << 5 )  
 #define APPEND_NEWLINE ( (uint64) 1 << 6 ) 
 #define PARSING_STRING ( (uint64) 1 << 7 ) 
 #define LEXER_END_OF_STRING ( (uint64) 1 << 8 )
@@ -603,7 +615,6 @@
 //#define PREFIX_PARSING ( (uint64) 1 << 20 )
 #define DOING_C_TYPE ( (uint64) 1 << 21 )
 #define DOING_A_PREFIX_WORD ( (uint64) 1 << 22 )
-#define LC_CFRTIL ( (uint64) 1 << 23 )
 #define C_INFIX_EQUAL ( (uint64) 1 << 24 )
 #define C_COMBINATOR_PARSING ( (uint64) 1 << 25 )
 #define INFIX_LIST_INTERPRET ( (uint64) 1 << 26 )
@@ -626,6 +637,7 @@
 #define ADDRESS_OF_MODE ( (uint64) 1 << 27 ) 
 #define AT_COMMAND_LINE ( (uint64) 1 << 28 ) 
 #define LC_INTERPRET     ( (uint64) 1 << 29 ) 
+#define LC_CFRTIL ( (uint64) 1 << 30 )
 
 #define NON_INLINABLE ( (uint64) 1 << 0 )
 #define DONE true

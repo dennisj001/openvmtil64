@@ -134,7 +134,7 @@ doDefault:
                 if ( word )
                 {
                     Interpreter_DoWord ( interp, word, - 1, - 1 ) ;
-                    if ( word->CAttribute & COMBINATOR )
+                    if ( word->W_MorphismAttributes & COMBINATOR )
                     {
                         if ( semicolonEndsThisBlock )
                         {
@@ -148,7 +148,7 @@ doDefault:
         }
         if ( takesAnElseFlag && ( blocksParsed == 2 ) )
         {
-            if ( _Context_StringEqual_PeekNextToken ( _Context_, ( byte* ) "else", 0 ) )
+            if ( _Context_StringEqual_PeekNextToken ( _Context_, ( byte* ) "else", 1 ) )
             {
                 blocks ++ ;
                 continue ;
@@ -199,10 +199,10 @@ _CfrTil_C_Infix_EqualOp ( block op )
     word0a = CfrTil_WordList ( 0 ) ;
     if ( lhsWord )
     {
-        if ( ( lhsWord->CAttribute & ( OBJECT | THIS | QID ) || GetState ( lhsWord, QID ) ) )
+        if ( ( lhsWord->W_ObjectAttributes & ( OBJECT | THIS | QID ) || GetState ( lhsWord, QID ) ) )
         {
             if ( ( ! String_Equal ( word0a->Name, "]" ) ) &&
-                ( ! ( word0a->CAttribute & ( ( LITERAL | NAMESPACE_VARIABLE | THIS | OBJECT | LOCAL_VARIABLE | PARAMETER_VARIABLE ) ) ) ) ) Compile_TosRmToTOS ( ) ;
+                ( ! ( word0a->W_ObjectAttributes & ( ( LITERAL | NAMESPACE_VARIABLE | THIS | OBJECT | LOCAL_VARIABLE | PARAMETER_VARIABLE ) ) ) ) ) Compile_TosRmToTOS ( ) ;
             wordr = _CfrTil_->PokeWord ;
         }
         else
@@ -243,14 +243,104 @@ _CfrTil_C_Infix_EqualOp ( block op )
 }
 
 void
-CfrTil_SetInNamespaceFromBackground ( )
+CfrTil_IncDec ( int64 op ) // ++/--
 {
     Context * cntx = _Context_ ;
-    if ( cntx->Compiler0->C_FunctionBackgroundNamespace ) _CfrTil_Namespace_InNamespaceSet ( cntx->Compiler0->C_FunctionBackgroundNamespace ) ;
-    else Compiler_SetAs_InNamespace_C_BackgroundNamespace ( cntx->Compiler0 ) ;
-}
+    Compiler * compiler = cntx->Compiler0 ;
+    int64 sd = List_Depth ( _CfrTil_->Compiler_N_M_Node_WordList ) ;
+    if ( ( sd > 1 ) && ( ! GetState ( cntx, LC_CFRTIL ) ) )
+    {
+        Word * currentWord = _CfrTil_WordList ( 0 ) ;
+        Word *two = 0, *one = ( Word* ) _CfrTil_WordList ( 1 ) ;
+        if ( GetState ( _Context_, C_SYNTAX ) && ( one->W_MorphismAttributes & CATEGORY_OP )
+            && ( ! ( one->W_MorphismAttributes & CATEGORY_OP_LOAD ) ) ) one = two = _CfrTil_WordList ( 2 ) ;
+        byte * nextToken = Lexer_Peek_Next_NonDebugTokenWord ( cntx->Lexer0, 1, 0 ) ;
+        Word * nextWord = Finder_Word_FindUsing ( cntx->Interpreter0->Finder0, nextToken, 0 ) ;
+        if ( nextWord && IS_MORPHISM_TYPE ( nextWord )
+            && ( nextWord->W_MorphismAttributes & ( CATEGORY_OP_ORDERED | CATEGORY_OP_UNORDERED | CATEGORY_OP_DIVIDE | CATEGORY_OP_EQUAL ) ) )
+        {
+            _CfrTil_WordList_PopWords ( 1 ) ; // because we are going to call the opWord in compilable order below 
+            if ( GetState ( compiler, (C_INFIX_EQUAL | DOING_AN_INFIX_WORD | DOING_BEFORE_AN_INFIX_WORD ) ) && GetState ( _CfrTil_, OPTIMIZE_ON ) && CompileMode )
+            {
+                //if ( one ) SetHere (one->Coding, 1) ;
+                // ?? couldn't this stuff be done with _Interpret_C_Until_EitherToken ??
+                dllist * postfixList = List_New ( SESSION ) ;
+                List_Push_1Value_NewNode_T_WORD ( postfixList, ( int64 ) currentWord, COMPILER_TEMP ) ;
+                if ( one ) List_Push_1Value_NewNode_T_WORD ( postfixList, ( int64 ) one, COMPILER_TEMP ) ;
+                List_Push_1Value_NewNode_T_WORD ( compiler->PostfixLists, ( int64 ) postfixList, COMPILER_TEMP ) ;
+                return ;
+            }
+            else
+            {
+                Interpreter_InterpretNextToken ( cntx->Interpreter0 ) ;
+                if ( sd > 1 )
+                {
+                    Interpreter_DoWord ( cntx->Interpreter0, one, - 1, - 1 ) ;
+                    Interpreter_DoWord ( cntx->Interpreter0, currentWord, - 1, - 1 ) ;
+                    return ;
+                }
+            }
+        }
+        if ( one && one->W_ObjectAttributes & ( PARAMETER_VARIABLE | LOCAL_VARIABLE | NAMESPACE_VARIABLE ) )
+        {
+            if ( GetState ( _Context_, C_SYNTAX ) )
+            {
+                if ( ! GetState ( compiler, INFIX_LIST_INTERPRET ) )
+                {
+                    //List_DropN ( _CfrTil_->Compiler_N_M_Node_WordList, 1 ) ; // the operator; let higher level see the variable
+            _CfrTil_WordList_PopWords ( 1 ) ; // op
+                    if ( GetState ( _CfrTil_, OPTIMIZE_ON ) && ( ! two ) ) SetHere ( one->Coding, 1 ) ;
+                    CfrTil_WordList_PushWord ( one ) ; // variable
+                    dllist * postfixList = List_New ( SESSION ) ;
+                    List_Push_1Value_NewNode_T_WORD ( postfixList, ( int64 ) currentWord, COMPILER_TEMP ) ; // op : setup a prefix inc/dec variable list ??
+                    List_Push_1Value_NewNode_T_WORD ( postfixList, ( int64 ) one, COMPILER_TEMP ) ; // variable
+                    List_Push_1Value_NewNode_T_WORD ( compiler->PostfixLists, ( int64 ) postfixList, COMPILER_TEMP ) ;
+            _CfrTil_WordList_PopWords ( 1 ) ; 
+                    //List_DropN ( _CfrTil_->Compiler_N_M_Node_WordList, 1 ) ;
+                    return ;
+                }
+            }
+        }
+        else if ( nextWord && ( nextWord->W_ObjectAttributes & ( PARAMETER_VARIABLE | LOCAL_VARIABLE | NAMESPACE_VARIABLE ) ) ) // prefix
+        {
+            if ( String_Equal ( currentWord->Name, "++" ) ) op = INC ;
+            else op = DEC ;
+            if ( nextWord->W_ObjectAttributes & ( PARAMETER_VARIABLE | LOCAL_VARIABLE ) )
+            {
+                _Compile_Group5 ( op, MEM, FP, 0, LocalOrParameterVar_Disp ( nextWord ), 0 ) ;
+            }
+            else // crash ; FIXME!!
+            {
+                _Compile_Move_Literal_Immediate_To_Reg ( THRU_REG, ( int64 ) nextWord->W_PtrToValue ) ;
+                Compile_Move_Rm_To_Reg ( ACC, THRU_REG, 0, 0 ) ;
+                _Compile_Group5 ( op, REG, ACC, 0, 0, 0 ) ;
+                Compile_Move_Reg_To_Rm ( THRU_REG, ACC, 0, 0 ) ;
 
-#if 1
+            }
+            return ;
+        }
+        else
+        {
+            if ( GetState ( compiler, C_INFIX_EQUAL ) )
+            {
+                if ( ! GetState ( compiler, INFIX_LIST_INTERPRET ) ) // new logic test ??
+                {
+                    int64 i ;
+                    Word * word ;
+                    dllist * postfixList = List_New ( SESSION ) ;
+                    List_Push_1Value_NewNode_T_WORD ( postfixList, ( int64 ) currentWord, COMPILER_TEMP ) ; // remember : this will be lifo
+                    for ( i = 1 ; word = _CfrTil_WordList ( i ), ( word->W_MorphismAttributes & ( CATEGORY_OP_ORDERED | CATEGORY_OP_UNORDERED | CATEGORY_OP_DIVIDE | CATEGORY_OP_EQUAL ) ) ; i ++ ) ;
+                    List_Push_1Value_NewNode_T_WORD ( postfixList, ( int64 ) _CfrTil_WordList ( i ), COMPILER_TEMP ) ;
+                    List_Push_1Value_NewNode_T_WORD ( compiler->PostfixLists, ( int64 ) postfixList, COMPILER_TEMP ) ;
+                    List_DropN ( _CfrTil_->Compiler_N_M_Node_WordList, 1 ) ; // the operator; let higher level see the variable for optimization
+                    return ;
+                }
+            }
+        }
+    }
+    _CfrTil_Do_IncDec ( op ) ;
+    SetState ( _Debugger_, DEBUG_SHTL_OFF, false ) ;
+}
 
 void
 CfrTil_C_ConditionalExpression ( )
@@ -290,30 +380,6 @@ CfrTil_C_ConditionalExpression ( )
     }
     SetState ( compiler, C_CONDITIONAL_IN, false ) ;
 }
-#else
-
-void
-CfrTil_C_ConditionalExpression ( )
-{
-    Context * cntx = _Context_ ;
-    Interpreter * interp = cntx->Interpreter0 ;
-    Compiler * compiler = cntx->Compiler0 ;
-    //Word * word1 ;
-    byte * token ;
-    if ( ( ! Compiling ) && ( ! GetState ( compiler, C_CONDITIONAL_IN ) ) ) Compiler_Init ( _Compiler_, 0, 0 ) ;
-    SetState ( compiler, C_CONDITIONAL_IN, true ) ;
-    CfrTil_BeginBlock ( ) ;
-    token = Interpret_Until_Token ( _Interpreter_, ( byte* ) ":", 0 ) ; //Interpret_C_Until_Token4 ( interp, ( byte* ) ":", ( byte* ) ",", ( byte* ) ")", ( byte* ) "}", 0, 0 ) ;
-    if ( ! String_Equal ( token, ":" ) ) SyntaxError ( 1 ) ;
-    //else Lexer_ReadToken ( _Lexer_ ) ;
-    CfrTil_EndBlock ( ) ;
-    CfrTil_BeginBlock ( ) ;
-    token = Interpret_C_Until_Token4 ( interp, ( byte* ) ";", ( byte* ) ",", ( byte* ) "?", ( byte* ) "}", ( byte* ) 0, 1 ) ; //( byte* ) "}", ( byte* ) " \n\r\t", 0 ) ;
-    CfrTil_EndBlock ( ) ;
-    CfrTil_TrueFalseCombinator2 ( ) ;
-    SetState ( compiler, C_CONDITIONAL_IN, false ) ;
-}
-#endif
 
 Boolean
 Syntax_AreWeParsingACFunctionCall ( Lexer * lexer )
@@ -411,7 +477,7 @@ Lexer_IsLValue_CheckBackToLastSemiForParenOrBracket ( Lexer * lexer, Word * word
 Boolean
 Lexer_IsLValue_CheckForwardToNextSemiForArrayVariable ( Lexer * lexer, Word * word )
 {
-    if ( ( word->CAttribute & ( OBJECT | THIS | QID ) ) || GetState ( word, QID ) )
+    if ( ( word->W_ObjectAttributes & ( OBJECT | THIS | QID ) ) || GetState ( word, QID ) )
     {
         ReadLiner * rl = lexer->ReadLiner0 ;
         byte * nc = & rl->InputStringOriginal [lexer->TokenStart_FileIndex] ;

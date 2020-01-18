@@ -305,7 +305,7 @@ _RemoveSubNamespacesFromUsingList ( Symbol * symbol, Namespace * ns )
 {
     Namespace * ns1 = ( Namespace* ) symbol ;
     // if ns contains ns1 => ns1 is dependent on ns ; we are removing ns => we have to remove ns1
-    if ( ( ns1->CAttribute & NAMESPACE_TYPE ) && ( ns1->ContainingNamespace == ns ) )
+    if ( ( ns1->W_ObjectAttributes & NAMESPACE_TYPE ) && ( ns1->ContainingNamespace == ns ) )
     {
         _Namespace_RemoveFromUsingList ( ns1 ) ;
     }
@@ -381,7 +381,7 @@ _Namespace_VariableValueSet ( Namespace * ns, byte * name, int64 value )
 Namespace *
 Namespace_New ( byte * name, Namespace * containingNs )
 {
-    Namespace * ns = DataObject_New ( NAMESPACE, 0, name, NAMESPACE, 0, 0, 0, ( int64 ) containingNs, 0, 0, - 1 ) ;
+    Namespace * ns = DataObject_New ( NAMESPACE, 0, name, 0, NAMESPACE, 0, 0, ( int64 ) containingNs, 0, 0, - 1 ) ;
     return ns ;
 }
 
@@ -393,7 +393,7 @@ _Namespace_Find ( byte * name, Namespace * superNamespace, int64 exceptionFlag )
     Word * word = 0 ;
     if ( superNamespace ) word = _Finder_FindWord_InOneNamespace ( _Finder_, superNamespace, name ) ;
     if ( ! word ) word = Finder_FindWord_AnyNamespace ( _Finder_, name ) ;
-    if ( word && ( word->CAttribute & ( NAMESPACE | CLASS | DOBJECT ) ) ) return ( Namespace* ) word ;
+    if ( word && ( word->W_ObjectAttributes & ( NAMESPACE | CLASS | DOBJECT ) ) ) return ( Namespace* ) word ;
     else if ( exceptionFlag )
     {
         _Printf ( ( byte* ) "\nUnable to find Namespace : %s\n", name ) ;
@@ -479,6 +479,14 @@ void
 _Namespace_MapUsing_2Args ( MapSymbolFunction2 msf2, int64 one, int64 two )
 {
     Tree_Map_Namespaces_State_2Args ( _CfrTil_->Namespaces->W_List, USING, msf2, one, two ) ;
+}
+
+void
+CfrTil_SetInNamespaceFromBackground ( )
+{
+    Context * cntx = _Context_ ;
+    if ( cntx->Compiler0->C_FunctionBackgroundNamespace ) _CfrTil_Namespace_InNamespaceSet ( cntx->Compiler0->C_FunctionBackgroundNamespace ) ;
+    else Compiler_SetAs_InNamespace_C_BackgroundNamespace ( cntx->Compiler0 ) ;
 }
 
 #if 0

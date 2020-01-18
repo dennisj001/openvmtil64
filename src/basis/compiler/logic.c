@@ -355,13 +355,13 @@ Compile_Cmp_Set_Tttn_Logic ( Compiler * compiler, Boolean setTtn, Boolean setNeg
 void
 Compile_Equals ( Compiler * compiler )
 {
-    Compile_Cmp_Set_Tttn_Logic ( compiler, TTT_EQUAL, NEGFLAG_OFF, TTT_EQUAL, NEGFLAG_ON ) ;
+    Compile_Cmp_Set_Tttn_Logic ( compiler, TTT_EQUAL, NEGFLAG_OFF, TTT_EQUAL, NEGFLAG_ON ) ; // ??
 }
 
 void
 Compile_DoesNotEqual ( Compiler * compiler )
 {
-    Compile_Cmp_Set_Tttn_Logic ( compiler, TTT_EQUAL, NEGFLAG_ON, TTT_EQUAL, NEGFLAG_OFF ) ;
+    Compile_Cmp_Set_Tttn_Logic ( compiler, TTT_EQUAL, NEGFLAG_ON, TTT_EQUAL, NEGFLAG_OFF ) ; // ??
 }
 
 void
@@ -389,7 +389,7 @@ Compile_GreaterThanOrEqual ( Compiler * compiler )
 }
 
 void
-Compile_TestLogicAndStackPush ( Compiler * compiler, Boolean reg, Boolean setTtn, Boolean setNegFlag, Boolean jccTtt, Boolean jccNegFlag )
+Compile_TestLogicAndStackPush (Compiler * compiler, Boolean reg, Boolean setNegFlag, Boolean jccTtt, Boolean jccNegFlag )
 {
     Compiler_BI_CompileRecord_TestCode_Set_Tttn ( compiler, reg, TTT_ZERO, setNegFlag, jccTtt, jccNegFlag, false ) ;
     CfrTil_CompileAndRecord_PushAccum ( ) ;
@@ -414,7 +414,7 @@ Compile_Logical_X ( Compiler * compiler, int64 op, Boolean setTtn, Boolean setNe
         _Compile_X_Group1 ( op, REG, MEM, ACC, DSP, 0, CELL, CELL ) ;
         _Compile_Stack_DropN ( DSP, 2 ) ;
     }
-    Compile_TestLogicAndStackPush ( compiler, ACC, setTtn, setNegateFlag, jccTtt, jccNegFlag ) ; //NEGFLAG_NZ, TTT_ZERO, NEGFLAG_Z ) ;
+    Compile_TestLogicAndStackPush (compiler, ACC, setNegateFlag, jccTtt, jccNegFlag ) ; //NEGFLAG_NZ, TTT_ZERO, NEGFLAG_Z ) ;
 }
 
 void
@@ -438,7 +438,7 @@ Compile_LogicalNot ( Compiler * compiler )
     else
     {
         if ( one->StackPushRegisterCode ) SetHere ( one->StackPushRegisterCode, 1 ) ; // PREFIX_PARSING : nb! could be a prefix function 
-        else if ( one->CAttribute2 & RAX_RETURN ) ; // do nothing
+        else if ( one->W_MorphismAttributes & RAX_RETURN ) ; // do nothing
         else _Compile_Stack_PopToReg ( DSP, ACC ) ;
     }
     _Compile_LogicalNot ( compiler ) ;

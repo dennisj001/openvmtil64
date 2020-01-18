@@ -7,9 +7,9 @@ Int Logic C
 Compiler
 hex
 : sl nl location nl stk _pause ; //sl
-Class
-: sp ; //stack pause ;
-sp
+Class C
+: sp ; //stack pause ; sp
+
 using
 Class // "class" works like "namespace" so here we switch back to namespace 'Class' else following words would be in class 'Pointer'
 "Pointer" class Pointer.size 8 = // 'size' must be set else it remains 0; whenever a :{ ... }; class declaration doesn't immediately follow the class declaration
@@ -18,12 +18,13 @@ Class // "class" works like "namespace" so here we switch back to namespace 'Cla
 //Integer "int32" class int32.size 4 = // 'size' must be declared else it remains 0; ( see above note )
 //Integer "int64" class int64 size 8 = // 'size' must be declared else it remains 0; ( see above note )
 decimal
-Integer
-Pointer size @ nl "Pointer.size = " prints print nl
+Integer sp
+Pointer size @ nl "Pointer.size = " prints print nl sp
 Integer size @ nl "Integer size = " prints print nl
-int16.size @ nl "Integer.int16.size = " prints print nl
+int16.size @ nl "Integer.int16.size = " prints print nl sp
 Integer "byte" class
-byte size 1 =
+byte size 1 = sp
+byte.size 1 = sp
 byte.size @ nl "Integer.byte.size = " prints print nl
 //'int8 'byte find alias
 //Integer "int8" class int8 size 1 =
@@ -55,6 +56,7 @@ sp
 "testNode" DLLNode new 
 testNode.AfterReference 1 =
 testNode.BeforeReference 2 =
+byte.size 1 = sp
 testNode testNode.size @ dup p dump sp
 DLLNode
 sp
@@ -77,8 +79,8 @@ sp
 "testList" DLList new 
 testList DLList.size @ dup p dump //pause
 
-#if Is_DebugOn
-testList.HeadNode.AfterReference @ testList.TailNode.BeforeReference  "class init test : "  assert  : hi 1 2 3 4 5 + + + + p ; : hey hi hi hi hi hi ; hey : hi 1 2 3 4 5 + + + + p ; : hey hi hi hi hi hi ; hey // debugger test
+#if Is_DebugOn // test for debugger showing a long line of code
+testList.HeadNode.AfterReference @ testList.TailNode.BeforeReference  "class init test : "  assert : hi 1 2 3 4 5 + + + + p ; : hey hi hi hi hi hi ; hey : hi 1 2 3 4 5 + + + + p ; : hey hi hi hi hi hi ; hey "\n above line should show several 15's" ps // debugger test
 #else
 testList.HeadNode.AfterReference @ testList.TailNode.BeforeReference  "class init test : " assert 
 #endif
@@ -98,6 +100,7 @@ using
 
 //verbosity 3 =
 : init ( this ) 
+//<dbg>
     this.Category 12 =
     this.Three 3 = 
     this.Prototype this.Three @ =
@@ -107,13 +110,18 @@ using
     this.Four 4 = 
     this.Twelve 12 =
     this.Accum this.Sum @ = 
+
+#if 1 // do> does> testing
     this.Sum this.Category @ 3 + this.Prototype @ & = this.Sum @ 3 "init_assert2" do> locationPush does> locationPrint <do assert
+#else
+    this.Sum this.Category @ 3 + this.Prototype @ & = this.Sum @ 3 "init_assert2" assert 
+#endif
+
     this.Accum this.Three @ this.Four @ * this.Three @ / = 
     this.Accum @ 4 "\n DLListClone init : this.Accum = :" ps "init_assert3" assert 
     this.Prototype @ p //pause
     this.Sum this.Category @ this.Prototype @ * this.Category @ - = // dup 24  "init_assert4" assert = 
-    this.Sum @ dup hex p 24  "init_assert5" assert decimal 
-    nl
+    this.Sum @ dup hex p 24  "init_assert5" assert decimal nl
     this.Category @ dup p 12  "init_assert7" assert // 12
     this.Prototype @ p // 3
     this.Sum this.Category @ this.Prototype @ * dup "testing yada" ps dup p 36  "init_assert8" assert = // 36
@@ -126,7 +134,7 @@ using
     this.Category @ dup p 12 _assert // _pause // 12
     this.Sum @ p // 4
     this.Prototype @ p // 3
-    "\n 12 3 testing yada 36 9 1 0 15 4 12 4 3 : output above should read" ddps //_pause
+    "\n 12 3 testing yada 36 9 1 0 15 4 12 4 3 : output above should (approximately) read" ddps //_pause
     hex
     "\nthis = " ps this p
     "\nthis @ = " ps this @  p
@@ -136,10 +144,10 @@ using
     this.Accum this.Prototype @ dup p =
     this this.size @ dump
     decimal
-    this.Accum @ dup p 3 "\n\nAccum should be 3 assert9\n"  assert // 3
-    this.Category @ dup p 12 "init_assert9" assert //_pause // 12
+    this.Accum @ dup 3 "\nAccum should be 3 : assert9 ="  assert p // 3
+    this.Category @ dup 12 "\nCategory should be 12 : assert10 =" assert p //_pause // 12
 ;
-' init find wdiss //pause
+' init find wdiss 
 "testClone" DLListClone new 
 "\nthis = " ps this hex p //pause
 
@@ -152,7 +160,7 @@ testClone.TailNode.BeforeReference @ testClone "DLListClone init test : " assert
 "\nthis.size = " ps this.size @ p 
 sp //pause
 
-"\nprintf output = " ps using printf ( "this.size = %d", this.size )  //pause
+using "\nprintf output = " ps printf ( "this.size = %d\n", this.size )  //pause
 sp
 this @ dup hex p this.size @ dup decimal p dump //pause // 'this' is a pointer to a pointer 
 sp

@@ -118,32 +118,32 @@ _Compile_GetVarLitObj_RValue_To_Reg ( Word * word, int64 reg )
     byte size = word->ObjectByteSize ;
     if ( ! size ) size = Word_GetSize ( word ) ;
     Compiler_SCA_Word_SetCodingHere_And_ClearPreviousUse ( word, 0 ) ;
-    if ( word->CAttribute & REGISTER_VARIABLE )
+    if ( word->W_ObjectAttributes & REGISTER_VARIABLE )
     {
         if ( word->RegToUse == reg ) return ;
         else Compile_Move_Reg_To_Reg ( reg, word->RegToUse, 0 ) ;
     }
-    else if ( word->CAttribute & ( LOCAL_VARIABLE | PARAMETER_VARIABLE | THIS | T_LISP_SYMBOL ) || ( word->LAttribute & T_LISP_SYMBOL ) )
+    else if ( word->W_ObjectAttributes & ( LOCAL_VARIABLE | PARAMETER_VARIABLE | THIS | T_LISP_SYMBOL ) || ( word->W_LispAttributes & T_LISP_SYMBOL ) )
         //else if ( word->CAttribute & ( LOCAL_VARIABLE | PARAMETER_VARIABLE | T_LISP_SYMBOL ) || ( word->LAttribute & T_LISP_SYMBOL ) )
     {
-        if ( word->CAttribute & ( LOCAL_VARIABLE | PARAMETER_VARIABLE | T_LISP_SYMBOL ) || ( word->LAttribute & T_LISP_SYMBOL ) )
+        if ( word->W_ObjectAttributes & ( LOCAL_VARIABLE | PARAMETER_VARIABLE | T_LISP_SYMBOL ) || ( word->W_LispAttributes & T_LISP_SYMBOL ) )
             _Compile_Move_StackN_To_Reg ( reg, FP, LocalOrParameterVar_Offset ( word ) ) ;
-        else if ( word->CAttribute & ( THIS ) ) _Compile_Move_Literal_Immediate_To_Reg ( reg, ( int64 ) word->W_PtrToValue ) ;
+        else if ( word->W_ObjectAttributes & ( THIS ) ) _Compile_Move_Literal_Immediate_To_Reg ( reg, ( int64 ) word->W_PtrToValue ) ;
     }
-    else if ( word->CAttribute & ( NAMESPACE_VARIABLE ) )
+    else if ( word->W_ObjectAttributes & ( NAMESPACE_VARIABLE ) )
     {
         if ( _Interpreter_->BaseObject ) SetHere ( _Interpreter_->BaseObject->Coding, 1 ) ;
         _Compile_Move_Literal_Immediate_To_Reg ( reg, ( int64 ) word->W_PtrToValue ) ;
         Compile_Move_Rm_To_Reg ( reg, reg, 0, size ) ; // not implemented
     }
-    else if ( word->CAttribute & ( OBJECT ) ) _Compile_Move_Literal_Immediate_To_Reg ( reg, ( int64 ) word->W_Value ) ; //( int64 ) word->W_PtrToValue ) ;
-    else if ( word->CAttribute & ( LITERAL | CONSTANT ) ) _Compile_Move_Literal_Immediate_To_Reg ( reg, ( int64 ) word->W_Value ) ;
-    else if ( word->CAttribute & DOBJECT )
+    else if ( word->W_ObjectAttributes & ( OBJECT ) ) _Compile_Move_Literal_Immediate_To_Reg ( reg, ( int64 ) word->W_Value ) ; //( int64 ) word->W_PtrToValue ) ;
+    else if ( word->W_ObjectAttributes & ( LITERAL | CONSTANT ) ) _Compile_Move_Literal_Immediate_To_Reg ( reg, ( int64 ) word->W_Value ) ;
+    else if ( word->W_ObjectAttributes & DOBJECT )
     {
         _CfrTil_Do_DynamicObject_ToReg ( word, reg ) ;
         Compile_Move_Rm_To_Reg ( reg, reg, 0, size ) ; // not implemented
     }
-    else if ( word->CAttribute & ( CPRIMITIVE ) ) ; // do nothing here
+    else if ( word->W_MorphismAttributes & ( CPRIMITIVE ) ) ; // do nothing here
     else SyntaxError ( QUIT ) ;
 }
 
@@ -164,7 +164,7 @@ void
 Compile_GetVarLitObj_RValue_To_Reg ( Word * word, int64 reg )
 {
     _Compile_GetVarLitObj_RValue_To_Reg ( word, reg ) ;
-    if ( word->CAttribute & ( OBJECT | THIS ) )
+    if ( word->W_ObjectAttributes & ( OBJECT | THIS ) )
     {
         Do_ObjectOffset ( word, reg ) ;
         byte size = Word_GetSize ( word ) ; // ?? Get Qualified Object Size ;
@@ -177,32 +177,32 @@ Compile_GetVarLitObj_RValue_To_Reg ( Word * word, int64 reg )
 void
 _Compile_SetVarLitObj_With_Reg ( Word * word, int64 reg, int64 thruReg )
 {
-    if ( word->CAttribute & REGISTER_VARIABLE )
+    if ( word->W_ObjectAttributes & REGISTER_VARIABLE )
     {
         if ( word->RegToUse == reg ) return ;
         else Compile_Move_Reg_To_Reg ( word->RegToUse, reg, 0 ) ;
     }
-    else if ( word->CAttribute & ( LOCAL_VARIABLE | PARAMETER_VARIABLE ) ) _Compile_Move_Reg_To_StackN ( FP, LocalOrParameterVar_Offset ( word ), reg ) ;
-    else if ( word->CAttribute & NAMESPACE_VARIABLE ) _Compile_SetAtAddress_WithReg ( ( int64* ) word->W_PtrToValue, reg, thruReg ) ;
+    else if ( word->W_ObjectAttributes & ( LOCAL_VARIABLE | PARAMETER_VARIABLE ) ) _Compile_Move_Reg_To_StackN ( FP, LocalOrParameterVar_Offset ( word ), reg ) ;
+    else if ( word->W_ObjectAttributes & NAMESPACE_VARIABLE ) _Compile_SetAtAddress_WithReg ( ( int64* ) word->W_PtrToValue, reg, thruReg ) ;
 }
 
 void
 _Compile_GetVarLitObj_LValue_To_Reg ( Word * word, int64 reg )
 {
     Compiler_SCA_Word_SetCodingHere_And_ClearPreviousUse ( word, 0 ) ;
-    if ( word->CAttribute & REGISTER_VARIABLE )
+    if ( word->W_ObjectAttributes & REGISTER_VARIABLE )
     {
         if ( word->RegToUse == reg ) return ;
         else Compile_Move_Reg_To_Reg ( reg, word->RegToUse, 0 ) ;
     }
         //else if ( ( word->CAttribute & ( OBJECT )  ) ) 
         //_Compile_Move_Literal_Immediate_To_Reg ( reg, ( int64 ) word->W_Value ) ;
-    else if ( ( word->CAttribute & ( OBJECT | THIS ) ) )
+    else if ( ( word->W_ObjectAttributes & ( OBJECT | THIS ) ) )
         _Compile_GetVarLitObj_RValue_To_Reg ( word, reg ) ;
-    else if ( word->CAttribute & ( LOCAL_VARIABLE | PARAMETER_VARIABLE ) ) _Compile_LEA ( reg, FP, 0, LocalOrParameterVar_Disp ( word ) ) ;
-    else if ( word->CAttribute & ( LITERAL | CONSTANT ) ) _Compile_Move_Literal_Immediate_To_Reg ( reg, ( int64 ) word->W_Value ) ;
-    else if ( word->CAttribute & DOBJECT ) _CfrTil_Do_DynamicObject_ToReg ( word, reg ) ;
-    else if ( word->CAttribute & NAMESPACE_VARIABLE )
+    else if ( word->W_ObjectAttributes & ( LOCAL_VARIABLE | PARAMETER_VARIABLE ) ) _Compile_LEA ( reg, FP, 0, LocalOrParameterVar_Disp ( word ) ) ;
+    else if ( word->W_ObjectAttributes & ( LITERAL | CONSTANT ) ) _Compile_Move_Literal_Immediate_To_Reg ( reg, ( int64 ) word->W_Value ) ;
+    else if ( word->W_ObjectAttributes & DOBJECT ) _CfrTil_Do_DynamicObject_ToReg ( word, reg ) ;
+    else if ( word->W_ObjectAttributes & NAMESPACE_VARIABLE )
     {
         int64 value ;
         if ( GetState ( _Context_->Compiler0, LC_ARG_PARSING ) || ( GetState ( _Context_, C_SYNTAX ) && ( ! Is_LValue ( _Context_, word ) ) ) )//GetState ( _Context_, C_RHS ) )
@@ -212,8 +212,8 @@ _Compile_GetVarLitObj_LValue_To_Reg ( Word * word, int64 reg )
         else value = ( int64 ) word->W_PtrToValue ;
         _Compile_Move_Literal_Immediate_To_Reg ( reg, ( int64 ) value ) ;
     }
-    else if ( word->CAttribute & ( CPRIMITIVE ) ) ; // do nothing here
+    else if ( word->W_MorphismAttributes & ( CPRIMITIVE ) ) ; // do nothing here
     else SyntaxError ( QUIT ) ;
-    if ( word->CAttribute & ( OBJECT | THIS ) ) Do_ObjectOffset ( word, reg ) ;
+    if ( word->W_ObjectAttributes & ( OBJECT | THIS ) ) Do_ObjectOffset ( word, reg ) ;
 }
 

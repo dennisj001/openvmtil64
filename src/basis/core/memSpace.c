@@ -629,7 +629,7 @@ Word_Recycle ( Word * w )
 void
 _CheckRecycleWord ( Word * w )
 {
-    if ( w && ( w->CAttribute2 & ( RECYCLABLE_COPY | RECYCLABLE_LOCAL ) ) ) //&& ( ! ( IsSourceCodeOn ) ) && GetState ( w, W_SOURCE_CODE_MODE ) )
+    if ( w && ( w->W_ObjectAttributes & ( RECYCLABLE_COPY | RECYCLABLE_LOCAL ) ) ) //&& ( ! ( IsSourceCodeOn ) ) && GetState ( w, W_SOURCE_CODE_MODE ) )
     {
         //if ( Is_DebugOn ) _Printf ( ( byte* ) "\n_CheckRecycleWord : recycling : %s", w->Name ) ; //, Pause () ;
         Word_Recycle ( w ) ;

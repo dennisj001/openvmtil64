@@ -42,10 +42,10 @@ Int User
 : ppT preprocessorTest ;
 : lT lispTest ;
 
-#if doX64
+#if 1 //doX64
 : basicT bT ppT cT mT aT loT locT fT oT cntT lT sT sysT interpT stT cST dT0 x64 ; //x64 ;
-#elif 0 //doTX64
-: basicT bT ppT cT mT aT loT locT fT oT cntT lT sT sysT interpT stT cST dT0 x64 ; //x64 ;
+#elif 1 //doTX64
+: basicT bT ppT cT mT aT loT locT fT oT cntT lT sT sysT interpT stT dT0 x64 ; //cST dT0 x64 ; //x64 ;
 #else
 : basicT ppT cT mT aT loT bT locT fT oT cntT lT sT sysT interpT stT cST dT0 ;
 //: basicT ppT cT mT aT loT bT locT fT oT     cntT lT sT sysT dT0 ; //interpT stT cST dT0 ;
@@ -78,7 +78,7 @@ System Combinators
 //dbgOn
 //sp 
 
-#if 0 // if 0
+#if 0 
 : itt { doTest _TestDone_ @ not && } { basicT testX _TestDone_ ++ } if2 ; 
 ' itt wdiss itt //pause
 #elif 0

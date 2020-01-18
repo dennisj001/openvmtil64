@@ -147,11 +147,11 @@ void
 CfrTil_Return ( )
 {
     Compiler_WordStack_SCHCPUSCA ( 0, 0 ) ;
-    byte * token = Lexer_Peek_Next_NonDebugTokenWord (_Lexer_, 0 , 0) ;
+    byte * token = Lexer_Peek_Next_NonDebugTokenWord ( _Lexer_, 0, 0 ) ;
     Word * word = Finder_Word_FindUsing ( _Finder_, token, 0 ) ;
     int64 tsrli = - 1, scwi = - 1 ;
     Word_SetTsrliScwi ( word, tsrli, scwi ) ;
-    if ( word && ( word->CAttribute & ( NAMESPACE_VARIABLE | LOCAL_VARIABLE | PARAMETER_VARIABLE ) ) )
+    if ( word && ( word->W_ObjectAttributes & ( NAMESPACE_VARIABLE | LOCAL_VARIABLE | PARAMETER_VARIABLE ) ) )
     {
         Lexer_ReadToken ( _Lexer_ ) ;
         CfrTil_WordList_PushWord ( word ) ;
@@ -159,10 +159,13 @@ CfrTil_Return ( )
         if ( GetState ( _CfrTil_, TYPECHECK_ON ) )
         {
             Word * cwbc = _Context_->CurrentWordBeingCompiled ;
-            if ( ( word->CAttribute & LOCAL_VARIABLE ) && cwbc )
+            if ( ( word->W_ObjectAttributes & LOCAL_VARIABLE ) && cwbc )
             {
                 cwbc->W_TypeSignatureString [_Compiler_->NumberOfArgs] = '.' ;
-                cwbc->W_TypeSignatureString [_Compiler_->NumberOfArgs + 1] = Tsi_Convert_Word_TypeAttributeToTypeLetterCode ( word ) ;
+                int8 swtsCodeSize = Tsi_ConvertTypeSigCodeToSize ( Tsi_Convert_Word_TypeAttributeToTypeLetterCode ( word ) ) ;
+                int8 cwbctsCodeSize = Tsi_ConvertTypeSigCodeToSize ( cwbc->W_TypeSignatureString [_Compiler_->NumberOfArgs + 1] ) ;
+                if ( swtsCodeSize > cwbctsCodeSize )
+                    cwbc->W_TypeSignatureString [_Compiler_->NumberOfArgs + 1] = Tsi_Convert_Word_TypeAttributeToTypeLetterCode ( word ) ;
             }
         }
         //Lexer_ReadToken ( _Context_->Lexer0 ) ; // don't compile anything let end block or locals deal with the return
@@ -201,7 +204,7 @@ CfrTil_Literal ( )
     int64 value = DataStack_Pop ( ) ;
     ByteArray * svcs = _Q_CodeByteArray ;
     _NBA_SetCompilingSpace_MakeSureOfRoom ( _Q_->MemorySpace0->TempObjectSpace, 4 * K ) ;
-    Word * word = DataObject_New ( LITERAL, 0, ( byte* ) "<literal>", LITERAL | CONSTANT, 0, 0, 0, value, 0, - 1, - 1 ) ;
+    Word * word = DataObject_New ( LITERAL, 0, ( byte* ) "<literal>", 0, LITERAL | CONSTANT, 0, 0, value, 0, - 1, - 1 ) ;
     Set_CompilerSpace ( svcs ) ;
     Interpreter_DoWord ( _Context_->Interpreter0, word, - 1, - 1 ) ;
 }
@@ -213,8 +216,12 @@ CfrTil_Constant ( )
     int64 value = DataStack_Pop ( ) ;
     tword = CfrTil_TypeStack_Pop ( ) ;
     byte * name = ( byte* ) DataStack_Pop ( ) ;
-    cword = DataObject_New ( CONSTANT, 0, name, ( LITERAL | CONSTANT ), 0, 0, 0, value, 0, - 1, - 1 ) ;
-    if ( tword ) cword->CAttribute |= tword->CAttribute ;
+    cword = DataObject_New ( CONSTANT, 0, name, 0, CONSTANT, 0, 0, value, 0, - 1, - 1 ) ;
+    if ( tword )
+    {
+        //cword->MorphismAttributes |= tword->MorphismAttributes ;
+        cword->W_ObjectAttributes |= tword->W_ObjectAttributes ;
+    }
     _CfrTil_Finish_WordSourceCode ( _CfrTil_, cword ) ;
 }
 
@@ -222,7 +229,7 @@ void
 CfrTil_Variable ( )
 {
     byte * name = ( byte* ) DataStack_Pop ( ) ;
-    Word * word = DataObject_New ( NAMESPACE_VARIABLE, 0, name, NAMESPACE_VARIABLE, 0, 0, 0, 0, 0, - 1, - 1 ) ;
+    Word * word = DataObject_New ( NAMESPACE_VARIABLE, 0, name, 0, NAMESPACE_VARIABLE, 0, 0, 0, 0, - 1, - 1 ) ;
     if ( ! Compiling ) _CfrTil_Finish_WordSourceCode ( _CfrTil_, word ) ;
 }
 
@@ -276,5 +283,5 @@ CfrTil_CompileMode ( )
 void
 CfrTil_FinishWordDebugInfo ( )
 {
-    _CfrTil_FinishWordDebugInfo (0) ;
+    _CfrTil_FinishWordDebugInfo ( 0 ) ;
 }

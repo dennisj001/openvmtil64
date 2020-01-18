@@ -30,7 +30,7 @@ Lexer_ObjectToken_New ( Lexer * lexer, byte * token, int64 tsrli, int64 scwi ) /
     if ( token )
     {
         Lexer_ParseObject ( lexer, token ) ;
-        if ( lexer->TokenType & T_RAW_STRING )
+        if ( lexer->L_ObjectAttributes & T_RAW_STRING )
         {
             Context * cntx = _Context_ ;
             Compiler * compiler = cntx->Compiler0 ;
@@ -40,19 +40,17 @@ Lexer_ObjectToken_New ( Lexer * lexer, byte * token, int64 tsrli, int64 scwi ) /
                 {
                     //if ( ! _Compiler_->AutoVarTypeNamespace ) 
                     _Namespace_ActivateAsPrimary ( compiler->LocalsNamespace ) ;
-                    word = DataObject_New ( LOCAL_VARIABLE, 0, token, LOCAL_VARIABLE, 0, 0, 0, 0, DICTIONARY, tsrli, scwi ) ;
+                    word = DataObject_New ( LOCAL_VARIABLE, 0, token, 0, LOCAL_VARIABLE, 0, 0, 0, DICTIONARY, tsrli, scwi ) ;
                     token2 = Lexer_Peek_Next_NonDebugTokenWord ( lexer, 1, 0 ) ;
                     if ( ! String_Equal ( token2, "=" ) ) return lexer->TokenWord = 0 ; // don't interpret this word
                 }
-                else word = DataObject_New ( NAMESPACE_VARIABLE, 0, token, NAMESPACE_VARIABLE, 0, 0, 0, 0, 0, tsrli, scwi ) ;
-                word->CAttribute2 |= ( RAW_STRING ) ;
+                else word = DataObject_New ( NAMESPACE_VARIABLE, 0, token, 0, NAMESPACE_VARIABLE, 0, 0, 0, 0, tsrli, scwi ) ;
+                word->W_ObjectAttributes |= ( RAW_STRING ) ;
             }
             else Lexer_Exception ( token, NOT_A_KNOWN_OBJECT, "\nLexer_ObjectToken_New : unknown token" ) ;
         }
-        else word = DataObject_New ( LITERAL, 0, token, lexer->TokenType, 0, 0, 0, lexer->Literal, 0, tsrli, scwi ) ;
-        Word_SetTypeNamespace ( word, lexer->TokenType ) ;
-        // this ... is done in Word_Create 
-        //Lexer_Set_ScIndex_RlIndex ( lexer, word, lexer->TokenStart_ReadLineIndex, lexer->SC_Index ) ;
+        else word = DataObject_New ( LITERAL, 0, token, lexer->L_MorphismAttributes, lexer->L_ObjectAttributes, 0, 0, lexer->Literal, 0, tsrli, scwi ) ;
+        Word_SetTypeNamespace ( word, lexer->L_ObjectAttributes ) ;
         lexer->TokenWord = word ;
         DEBUG_SHOW ;
     }
@@ -209,7 +207,7 @@ _Lexer_ConsiderDebugAndCommentTokens ( byte * token, int64 evalFlag )
     Word * word = Finder_Word_FindUsing ( _Finder_, token, 1 ) ;
     int64 tsrli = - 1, scwi = - 1 ;
     Word_SetTsrliScwi ( word, tsrli, scwi ) ;
-    if ( word && ( word->LAttribute & W_COMMENT ) )
+    if ( word && ( word->W_TypeAttributes & W_COMMENT ) )
     {
         Word_Eval ( word ) ;
         return true ;
@@ -254,8 +252,8 @@ Lexer_IsWordPrefixing ( Lexer * lexer, Word * word )
 {
     if ( word->Name[0] == '(' ) return false ;
     if ( GetState ( _Context_, LC_INTERPRET ) ) return true ;
-    else if ( ( GetState ( _Context_, PREFIX_MODE ) ) && ( ! ( word->CAttribute & ( CATEGORY_OP_OPEQUAL | CATEGORY_OP_EQUAL | KEYWORD ) ) )
-        && ( ! ( word->WAttribute & WT_C_PREFIX_RTL_ARGS ) ) )
+    else if ( ( GetState ( _Context_, PREFIX_MODE ) ) && ( ! ( word->W_MorphismAttributes & ( CATEGORY_OP_OPEQUAL | CATEGORY_OP_EQUAL | KEYWORD ) ) )
+        && ( ! ( word->W_TypeAttributes & WT_C_PREFIX_RTL_ARGS ) ) )
     {
         return Lexer_IsNextWordLeftParen ( lexer ) ;
     }

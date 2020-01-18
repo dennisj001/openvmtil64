@@ -153,24 +153,25 @@ _ByteArray_SetHere ( ByteArray * ba, byte * index )
 }
 
 void
-_SetPreHere_ForDebug ( byte * index )
+_SetPreHere_ForDebug ( byte * address )
 {
-    _Debugger_->PreHere = index ;
+    _Debugger_->PreHere = address ;
 }
 
 void
-SetPreHere_ForDebug ( byte * index )
+SetPreHere_ForDebug ( byte * address )
 {
-    if ( _Debugger_ ) _SetPreHere_ForDebug ( index ) ;
+    if ( _Debugger_ ) _SetPreHere_ForDebug ( address ) ;
 }
 
 void
-ByteArray_SetHere_AndForDebug ( ByteArray * ba, byte * index, Boolean forDebugFlag )
+ByteArray_SetHere_AndForDebug ( ByteArray * ba, byte * address, Boolean forDebugFlag )
 {
-    if ( index )
+    if ( address )
     {
-        _ByteArray_SetHere ( ba, index ) ;
-        if ( forDebugFlag ) SetPreHere_ForDebug ( index ) ;
+        _ByteArray_SetHere ( ba, address ) ;
+        //if ( forDebugFlag ) 
+        SetPreHere_ForDebug ( address ) ;
     }
 }
 
@@ -187,9 +188,9 @@ _ByteArray_GetStartIndex ( ByteArray * ba )
 }
 
 void
-_ByteArray_SetStartIndex ( ByteArray * ba, byte * index )
+_ByteArray_SetStartIndex ( ByteArray * ba, byte * address )
 {
-    ba->StartIndex = index ;
+    ba->StartIndex = address ;
 }
 
 // ! TODO : should be macros here !
@@ -198,29 +199,29 @@ void
 ByteArray_AppendCopyItem ( ByteArray * ba, int64 size, int64 data ) // size in bytes
 {
     _ByteArray_AppendSpace ( ba, size ) ; // size in bytes
-    byte * index = ba->StartIndex ;
-    if ( index )
+    byte * address = ba->StartIndex ;
+    if ( address )
     {
         switch ( size )
         {
             case 1:
             {
-                *( ( Boolean* ) index ) = ( byte ) data ;
+                *( ( Boolean* ) address ) = ( byte ) data ;
                 break ;
             }
             case 2:
             {
-                *( ( int16* ) index ) = ( int16 ) data ;
+                *( ( int16* ) address ) = ( int16 ) data ;
                 break ;
             }
             case 4:
             {
-                *( ( int32* ) index ) = ( int32 ) data ;
+                *( ( int32* ) address ) = ( int32 ) data ;
                 break ;
             }
             case 8:
             {
-                *( ( int64* ) index ) = ( int64 ) data ;
+                *( ( int64* ) address ) = ( int64 ) data ;
                 break ;
             }
         }

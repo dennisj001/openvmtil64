@@ -87,7 +87,7 @@ Compile_BlockLogicTest ( BlockInfo * bi )
                 bi->CopiedToLogicJccCode = Here ;
                 BI_Set_Tttn ( bi, TTT_ZERO, NEGFLAG_ON, TTT_ZERO, NEGFLAG_OFF ) ;
             }
-            else if ( bi->LogicCodeWord && ( bi->LogicCodeWord->CAttribute & CATEGORY_OP_1_ARG ) && ( bi->LogicCodeWord->CAttribute2 & LOGIC_NEGATE ) )
+            else if ( bi->LogicCodeWord && ( bi->LogicCodeWord->W_MorphismAttributes & CATEGORY_OP_1_ARG ) && ( bi->LogicCodeWord->W_MorphismAttributes & LOGIC_NEGATE ) )
             {
                 SetHere ( bi->LogicCodeWord->Coding, 1 ) ;
                 Compiler_SCA_Word_SetCodingHere_And_ClearPreviousUse ( bi->LogicCodeWord, 0 ) ;

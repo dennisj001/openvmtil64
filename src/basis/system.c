@@ -105,7 +105,7 @@ Dlsym ( byte * sym, byte * lib )
 {
     block b = ( block ) _Dlsym ( sym, lib ) ;
     Word * word = DataObject_New ( CFRTIL_WORD, 0, sym, CPRIMITIVE | DLSYM_WORD | C_PREFIX | C_RETURN | C_PREFIX_RTL_ARGS, 0, 0, 0, ( int64 ) b, 0, 0, - 1 ) ;
-    word->WAttribute |= WT_C_PREFIX_RTL_ARGS ;
+    word->W_TypeAttributes |= WT_C_PREFIX_RTL_ARGS ;
     return word ;
 }
 
@@ -346,80 +346,82 @@ _CfrTil_Source ( Word *word, int64 addToHistoryFlag )
 {
     if ( word )
     {
+        Word * aword = 0 ;
         byte * name = c_gd ( word->Name ) ;
-        uint64 category = word->CAttribute ;
         if ( word->ContainingNamespace ) _Printf ( ( byte* ) "\n%s.", word->ContainingNamespace->Name ) ;
-        if ( category & OBJECT )
+        if ( word->W_ObjectAttributes & OBJECT )
         {
             _Printf ( ( byte* ) "%s <:> %s", name, "object" ) ;
         }
-        else if ( category & NAMESPACE )
+        else if ( word->W_ObjectAttributes & NAMESPACE )
         {
             _Printf ( ( byte* ) "%s <:> %s", name, "namespace" ) ;
         }
-        else if ( category & TEXT_MACRO )
+        else if ( word->W_ObjectAttributes & TEXT_MACRO )
         {
             _Printf ( ( byte* ) "%s <:> %s", name, "macro" ) ;
         }
-        else if ( category & LOCAL_VARIABLE )
+        else if ( word->W_ObjectAttributes & LOCAL_VARIABLE )
         {
             _Printf ( ( byte* ) "%s <:> %s", name, "local variable" ) ;
         }
-        else if ( category & PARAMETER_VARIABLE )
+        else if ( word->W_ObjectAttributes & PARAMETER_VARIABLE )
         {
             _Printf ( ( byte* ) "%s <:> %s", name, "stack variable" ) ;
         }
-        else if ( category & NAMESPACE_VARIABLE )
+        else if ( word->W_ObjectAttributes & NAMESPACE_VARIABLE )
         {
             _Printf ( ( byte* ) "%s <:> %s", name, "variable" ) ;
         }
-        else if ( category & CONSTANT )
+        else if ( word->W_ObjectAttributes & CONSTANT )
         {
             _Printf ( ( byte* ) "%s <:> %s", name, "constant" ) ;
         }
-        else if ( category & ALIAS )
+        else if ( word->W_MorphismAttributes & ALIAS )
         {
-            Word * aword = Word_GetFromCodeAddress ( ( byte* ) ( block ) word->Definition ) ;
+            aword = word->W_AliasOf ;
+            //aword = Word_GetFromCodeAddress ( ( byte* ) ( block ) word->Definition ) ;
             if ( aword ) _Printf ( ( byte* ) "%s alias for %s", name, ( char* ) c_gd ( aword->Name ) ) ;
         }
-        else if ( category & CPRIMITIVE )
+        else if ( word->W_MorphismAttributes & CPRIMITIVE )
         {
             _Printf ( ( byte* ) "%s <:> %s", name, "C compiled primitive" ) ;
         }
-        else if ( word->LAttribute & T_LISP_COMPILED_WORD )
+        else if ( word->W_LispAttributes & T_LISP_COMPILED_WORD )
         {
             _Printf ( ( byte* ) "%s <:> %s", name, "lambdaCalculus compiled word" ) ;
         }
-        else if ( category & CFRTIL_WORD )
+        else if ( word->W_MorphismAttributes & CFRTIL_WORD )
         {
             _Printf ( ( byte* ) "%s <:> %s", name, "cfrTil compiled word" ) ;
         }
-        else if ( word->LAttribute & T_LC_DEFINE )
+        else if ( word->W_LispAttributes & T_LC_DEFINE )
         {
             _Printf ( ( byte* ) "%s <:> %s", name, "lambdaCalculus defined word" ) ;
         }
-        else if ( category & BLOCK )
+        else if ( word->W_MorphismAttributes & BLOCK )
         {
             _Printf ( ( byte* ) "%s <:> %s", name, "cfrTil compiled code block" ) ;
         }
         // else CfrTil_Exception ( 0, QUIT ) ;
-        if ( category & INLINE ) _Printf ( ( byte* ) ", %s", "inline" ) ;
-        if ( category & IMMEDIATE ) _Printf ( ( byte* ) ", %s", "immediate" ) ;
-        if ( word->CAttribute & PREFIX ) _Printf ( ( byte* ) ", %s", "prefix" ) ;
-        if ( category & C_PREFIX ) _Printf ( ( byte* ) ", %s", "c_prefix" ) ;
-        if ( category & C_RETURN ) _Printf ( ( byte* ) ", %s", "c_return" ) ;
-        if ( category & INFIXABLE ) _Printf ( ( byte* ) ", %s", "infixable" ) ;
+        if ( word->W_MorphismAttributes & INLINE ) _Printf ( ( byte* ) ", %s", "inline" ) ;
+        if ( word->W_MorphismAttributes & IMMEDIATE ) _Printf ( ( byte* ) ", %s", "immediate" ) ;
+        if ( word->W_MorphismAttributes & PREFIX ) _Printf ( ( byte* ) ", %s", "prefix" ) ;
+        if ( word->W_MorphismAttributes & C_PREFIX ) _Printf ( ( byte* ) ", %s", "c_prefix" ) ;
+        if ( word->W_MorphismAttributes & C_RETURN ) _Printf ( ( byte* ) ", %s", "c_return" ) ;
+        if ( word->W_MorphismAttributes & INFIXABLE ) _Printf ( ( byte* ) ", %s", "infixable" ) ;
         if ( word->S_WordData )
         {
             _Word_ShowSourceCode ( word ) ; // source code has newlines for multiline history
+            if ( aword && ( ! String_Equal ( word->Name, aword->Name ) ) ) _Word_ShowSourceCode ( aword ) ; // source code has newlines for multiline history
             if ( addToHistoryFlag ) _OpenVmTil_AddStringToHistoryList ( word->W_SourceCode ) ;
             if ( word->S_WordData->Filename ) _Printf ( ( byte* ) "\nSource code file location of %s : \"%s\" : %d.%d :: we are now at : %s", name, word->S_WordData->Filename, word->S_WordData->LineNumber, word->W_TokenEnd_ReadLineIndex, Context_IsInFile ( _Context_ ) ? Context_Location ( ) : ( byte* ) "command line" ) ;
-            if ( ( word->LAttribute & T_LC_DEFINE ) && ( ! ( word->LAttribute & T_LISP_COMPILED_WORD ) ) ) _Printf ( ( byte* ) "\nLambda Calculus word : interpreted not compiled" ) ; // do nothing here
-            else if ( ! ( category & CPRIMITIVE ) )
+            if ( ( word->W_LispAttributes & T_LC_DEFINE ) && ( ! ( word->W_LispAttributes & T_LISP_COMPILED_WORD ) ) ) _Printf ( ( byte* ) "\nLambda Calculus word : interpreted not compiled" ) ; // do nothing here
+            else if ( ! ( word->W_MorphismAttributes & CPRIMITIVE ) )
             {
                 _Printf ( ( byte* ) "\nCompiled with : %s%s%s%s",
                     GetState ( word, COMPILED_OPTIMIZED ) ? "optimizeOn" : "optimizeOff", GetState ( word, COMPILED_INLINE ) ? ", inlineOn" : ", inlineOff",
-                    ( ( word->WAttribute & WT_C_SYNTAX ) || GetState ( word, W_C_SYNTAX ) ) ? ", c_syntaxOn" : "", GetState ( word, W_INFIX_MODE ) ? ", infixOn" : "" ) ;
+                    ( ( word->W_TypeAttributes & WT_C_SYNTAX ) || GetState ( word, W_C_SYNTAX ) ) ? ", c_syntaxOn" : "", GetState ( word, W_INFIX_MODE ) ? ", infixOn" : "" ) ;
                 Boolean dsc = GetState ( _CfrTil_, DEBUG_SOURCE_CODE_MODE ) ;
                 _Printf ( ( byte* ) "\nDebug Source Code %s", dsc ? "on" : "off" ) ;
                 Boolean bno = Namespace_IsUsing ( ( byte* ) "BigNum" ) ;

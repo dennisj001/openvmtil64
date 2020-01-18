@@ -257,21 +257,21 @@ void
 CfrTil_Keyword ( void )
 {
     Word * word = _CfrTil_->LastFinished_Word ;
-    if ( word ) word->CAttribute |= KEYWORD ;
+    if ( word ) word->W_MorphismAttributes |= KEYWORD ;
 }
 
 void
 CfrTil_Immediate ( void )
 {
     Word * word = _CfrTil_->LastFinished_Word ;
-    if ( word ) word->CAttribute |= IMMEDIATE ;
+    if ( word ) word->W_MorphismAttributes |= IMMEDIATE ;
 }
 
 void
 CfrTil_Syntactic ( void )
 {
     Word * word = _CfrTil_->LastFinished_Word ;
-    if ( word ) word->CAttribute2 |= SYNTACTIC ;
+    if ( word ) word->W_ObjectAttributes |= SYNTACTIC ;
 }
 
 void
@@ -282,7 +282,7 @@ CfrTil_IsImmediate ( void )
     TOS = ( word->CAttribute & IMMEDIATE ) ;
 #else
     Word * word = ( Word* ) DataStack_Pop ( ) ;
-    DataStack_Push ( word->CAttribute & IMMEDIATE ) ;
+    DataStack_Push ( word->W_MorphismAttributes & IMMEDIATE ) ;
 #endif    
 }
 
@@ -290,7 +290,7 @@ void
 CfrTil_Inline ( void )
 {
     Word * word = _CfrTil_->LastFinished_Word ;
-    if ( word ) word->CAttribute |= INLINE ;
+    if ( word ) word->W_MorphismAttributes |= INLINE ;
 }
 
 void
@@ -307,8 +307,8 @@ CfrTil_Prefix ( void )
     Word * word = _CfrTil_->LastFinished_Word ;
     if ( word )
     {
-        word->CAttribute |= PREFIX ;
-        word->WAttribute = WT_PREFIX ;
+        word->W_MorphismAttributes |= PREFIX ;
+        word->W_TypeAttributes = WT_PREFIX ;
     }
 }
 
@@ -319,8 +319,8 @@ CfrTil_NPrefix ( void )
     Word * word = _CfrTil_->LastFinished_Word ;
     if ( word )
     {
-        word->CAttribute |= PREFIX ;
-        word->WAttribute = WT_PREFIX ;
+        word->W_MorphismAttributes |= PREFIX ;
+        word->W_TypeAttributes = WT_PREFIX ;
         word->WNumberOfPrefixedArgs = numberOfPrefixedArgs ;
     }
 }
@@ -331,8 +331,8 @@ CfrTil_C_Prefix ( void )
     Word * word = _CfrTil_->LastFinished_Word ;
     if ( word )
     {
-        word->CAttribute |= C_PREFIX | C_PREFIX_RTL_ARGS ;
-        word->WAttribute = WT_C_PREFIX_RTL_ARGS ;
+        word->W_MorphismAttributes |= C_PREFIX | C_PREFIX_RTL_ARGS ;
+        word->W_TypeAttributes = WT_C_PREFIX_RTL_ARGS ;
     }
 }
 
@@ -342,8 +342,8 @@ CfrTil_C_Return ( void )
     Word * word = _CfrTil_->LastFinished_Word ;
     if ( word )
     {
-        word->CAttribute |= C_RETURN | C_PREFIX_RTL_ARGS ;
-        word->WAttribute = WT_C_PREFIX_RTL_ARGS ;
+        word->W_MorphismAttributes |= C_RETURN | C_PREFIX_RTL_ARGS ;
+        word->W_TypeAttributes = WT_C_PREFIX_RTL_ARGS ;
     }
 }
 
@@ -353,12 +353,12 @@ CfrTil_Void_Return ( void )
     Word * word = _CfrTil_->LastFinished_Word ;
     if ( word )
     {
-        word->CAttribute &= ~ C_RETURN ;
-        word->CAttribute |= VOID_RETURN ;
+        word->W_MorphismAttributes &= ~ C_RETURN ;
+        word->W_MorphismAttributes |= VOID_RETURN ;
         if ( GetState ( _Context_, C_SYNTAX ) )
         {
-            word->CAttribute |= C_PREFIX_RTL_ARGS ;
-            word->WAttribute = WT_C_PREFIX_RTL_ARGS ;
+            word->W_MorphismAttributes |= C_PREFIX_RTL_ARGS ;
+            word->W_TypeAttributes = WT_C_PREFIX_RTL_ARGS ;
         }
     }
 }
@@ -369,8 +369,8 @@ CfrTil_RAX_Return ( void )
     Word * word = _CfrTil_->LastFinished_Word ;
     if ( word )
     {
-        word->CAttribute &= ~ C_RETURN ;
-        word->CAttribute2 |= RAX_RETURN ;
+        word->W_MorphismAttributes &= ~ C_RETURN ;
+        word->W_MorphismAttributes |= RAX_RETURN ;
     }
 }
 
@@ -378,7 +378,7 @@ void
 CfrTil_DebugWord ( void )
 {
     Word * word = _CfrTil_->LastFinished_Word ;
-    if ( word ) word->CAttribute |= DEBUG_WORD ;
+    if ( word ) word->W_MorphismAttributes |= DEBUG_WORD ;
 }
 
 void
@@ -444,7 +444,7 @@ void
 _PrintVariable ( dlnode * node, int64 * n )
 {
     Word * word = ( Word * ) node ;
-    if ( word->CAttribute & NAMESPACE_VARIABLE )
+    if ( word->W_ObjectAttributes & NAMESPACE_VARIABLE )
     {
         _Variable_Print ( word ) ;
         ( *n ) ++ ;

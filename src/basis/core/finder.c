@@ -42,7 +42,7 @@ Symbol *
 _Finder_CompareDefinitionAddress_NoAlias ( Symbol * symbol, byte * address )
 {
     Word * word = ( Word * ) symbol ;
-    if ( ( ! ( word->CAttribute & ALIAS ) ) ) return _Finder_CompareDefinitionAddress ( symbol, address ) ;
+    if ( ( ! ( word->W_MorphismAttributes & ALIAS ) ) ) return _Finder_CompareDefinitionAddress ( symbol, address ) ;
     else return 0 ;
 }
 
@@ -114,7 +114,7 @@ Finder_Word_Find ( Finder * finder, byte * name, int64 flag, int64 saveQns )
             else
             {
                 rword = _Finder_FindWord_InOneNamespace ( _Finder_, finder->QualifyingNamespace, name ) ;
-                if ( rword && ( rword->CAttribute & ( C_TYPE | C_CLASS | NAMESPACE ) ) ) Finder_SetQualifyingNamespace ( finder, rword ) ;
+                if ( rword && ( rword->W_ObjectAttributes & ( C_TYPE | C_CLASS | NAMESPACE ) ) ) Finder_SetQualifyingNamespace ( finder, rword ) ;
                 else if ( ( ! saveQns ) && ( ! GetState ( finder, QID ) ) && ( ! Lexer_IsTokenForwardDotted ( _Context_->Lexer0 ) ) )
                 {
                     Finder_SetQualifyingNamespace ( finder, 0 ) ; // nb. QualifyingNamespace is only good for one find unless we are in a quid
@@ -145,16 +145,16 @@ Finder_FindQualifiedIDWord ( Finder * finder, byte * token )
     Word * word ;
     while ( ( word = Finder_Word_FindUsing ( finder, token, 0 ) ) )
     {
-        if ( word->CAttribute & ( NAMESPACE ) )
+        if ( word->W_ObjectAttributes & ( NAMESPACE ) )
         {
             Namespace * ns = ( Namespace * ) word ;
             Finder_SetQualifyingNamespace ( finder, ns ) ;
         }
-        else if ( word->CAttribute & ( OBJECT ) )
+        else if ( word->W_ObjectAttributes & ( OBJECT ) )
         {
             Finder_SetQualifyingNamespace ( finder, word->ContainingNamespace ) ;
         }
-        else if ( word->CAttribute & ( OBJECT_FIELD ) )
+        else if ( word->W_ObjectAttributes & ( OBJECT_FIELD ) )
         {
             Finder_SetQualifyingNamespace ( finder, word->TypeNamespace ) ;
         }

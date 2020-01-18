@@ -67,8 +67,8 @@
 #define Get_CompileMode() GetState ( _Compiler_, (COMPILE_MODE) )  //|| ( _LC_ ? GetState ( _LC_, LC_COMPILE_MODE ) : 0 ) ) 
 #define CompileMode GetState ( _Compiler_, (COMPILE_MODE) )  //|| ( _LC_ && GetState ( _LC_, ( LC_COMPILE_MODE ) ) ) ) : 0)
 #define Compiling CompileMode
-#define ImmediateWord( word) (word->CAttribute & IMMEDIATE)
-#define CPrimitiveWord( word) (word->CAttribute & CPRIMITIVE)
+#define ImmediateWord( word) (word->W_MorphismAttributes & IMMEDIATE)
+#define CPrimitiveWord( word) (word->W_MorphismAttributes & CPRIMITIVE)
 
 #define Stack_N( stack, offset ) ((stack)->StackPointer [ (offset) ] )
 #define Stack_OffsetValue( stack, offset ) ((stack)->StackPointer [ (offset) ] )
@@ -171,7 +171,6 @@
 #define Pause_2( msg, arg ) AlertColors; _Printf ( (byte*)msg, arg ) ; OpenVmTil_Pause () ;
 
 #define Error_Abort( emsg, smsg ) Throw ( emsg, smsg, ABORT )
-#define Error( emsg, smsg, state ) { AlertColors ; if ((state) & PAUSE ) { Pause () ; } else { if ((state) >= QUIT ) { Throw ( emsg, smsg, state ) ; }}}
 #define Error_1( msg, arg, state ) AlertColors; if (state & PAUSE ) Pause () ; if (state >= QUIT ) Throw ( (byte*) msg, state ) ; 
 #define Warning2( msg, str ) _Printf ( (byte*)"\n%s : %s", (byte*) msg, str ) ; 
 #define Warning( msg, str, pauseFlag ) _Printf ( (byte*)"\n%s : %s", (byte*) msg, str ) ; if ( pauseFlag ) Pause () ;
@@ -192,14 +191,16 @@
 
 #define NAMESPACE_TYPE ( NAMESPACE | DOBJECT | CLASS | C_TYPE | C_CLASS | CLASS_CLONE )
 #define NAMESPACE_RELATED_TYPE ( NAMESPACE_TYPE | OBJECT_FIELD )
-#define OBJECT_TYPE ( LITERAL | CONSTANT | NAMESPACE_VARIABLE | LOCAL_VARIABLE | OBJECT | DOBJECT | PARAMETER_VARIABLE | T_LISP_SYMBOL ) // | T_LISP_SYMBOL
+#define OBJECT_TYPE ( LITERAL | CONSTANT | NAMESPACE_VARIABLE | LOCAL_VARIABLE | OBJECT | DOBJECT | PARAMETER_VARIABLE | T_LISP_SYMBOL | THIS ) // | T_LISP_SYMBOL
 #define VARIABLE_TYPE ( NAMESPACE_VARIABLE | LOCAL_VARIABLE | OBJECT | OBJECT_FIELD | DOBJECT | PARAMETER_VARIABLE | T_LISP_SYMBOL )
 #define NON_MORPHISM_TYPE ( OBJECT_TYPE | NAMESPACE_RELATED_TYPE )
-#define IS_NON_MORPHISM_TYPE(word) (word->CAttribute & NON_MORPHISM_TYPE)
-#define IS_MORPHISM_TYPE( word ) ( ( ( ! ( word->CAttribute & ( NON_MORPHISM_TYPE | DEBUG_WORD | OBJECT_OPERATOR ) ) ) && ( ! ( word->LAttribute & (T_LISP_SYMBOL ) ) ) && ( ! ( word->CAttribute2 & (ADDRESS_OF_OP) ) ) ) || ( word->CAttribute & ( CATEGORY_OP|KEYWORD|BLOCK ) ))
+#define IS_NON_MORPHISM_TYPE(word) (word->W_MorphismAttributes & NON_MORPHISM_TYPE)
+#define IS_MORPHISM_TYPE( word ) ( ( ( ! ( word->W_ObjectAttributes & ( NON_MORPHISM_TYPE ) ) ) \
+        && ( ! ( word->W_MorphismAttributes & ( DEBUG_WORD | OBJECT_OPERATOR ) ) ) \
+        && ( ! ( word->W_LispAttributes & (T_LISP_SYMBOL ) ) ) ) || ( word->W_MorphismAttributes & ( CATEGORY_OP|KEYWORD|ADDRESS_OF_OP|BLOCK ) ))
 
-#define Is_NamespaceType( w ) ( w ? (( ( Namespace* ) w )->CAttribute & NAMESPACE_TYPE) : 0 )
-#define Is_ValueType( w ) ( w ? ( ( Namespace* ) w )->CAttribute & (NON_MORPHISM_TYPE (w)) : 0 )
+#define Is_NamespaceType( w ) ( w ? (( ( Namespace* ) w )->W_ObjectAttributes & NAMESPACE_TYPE) : 0 )
+#define Is_ValueType( w ) ( w ? NON_MORPHISM_TYPE (w) : 0 )
 
 // memory allocation
 #define _Allocate( size, nba ) _ByteArray_AppendSpace ( nba->ba_CurrentByteArray, size ) 
@@ -225,7 +226,8 @@
 #define _Is_DebugOn GetState ( _CfrTil_, _DEBUG_SHOW_ )
 #define Is_DebugOn (Is_DebugShowOn && Is_DebugModeOn)
 #define DEBUG_PRINTSTACK if ( GetState ( _CfrTil_, DEBUG_MODE )  ) CfrTil_PrintDataStack () ;
-#define __DEBUG_SETUP( word, token, address, force )  ( (word || token) && Is_DebugModeOn ) ? _Debugger_PreSetup (_Debugger_, word, token, address, force ) : 0 
+//#define __DEBUG_SETUP( word, token, address, force )  ( (word || token || address) && Is_DebugModeOn ) ? _Debugger_PreSetup (_Debugger_, word, token, (byte*) address, force ) : 0 
+#define __DEBUG_SETUP( word, token, address, force )  _Debugger_PreSetup (_Debugger_, (word), (token), (byte*) (address), (force) ) 
 #define DEBUG_SETUP_TOKEN( token ) _DEBUG_SETUP( 0, token, 0 ) ;
 #define DEBUG_SETUP_ADDRESS( address, force ) if ( (address) && Is_DebugModeOn ) Debugger_PreSetup (_Debugger_, 0, 0, address, force ) ;
 #define DEBUG_SETUP( word ) _DEBUG_SETUP( word, 0, 0, 0 )

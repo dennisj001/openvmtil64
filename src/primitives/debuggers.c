@@ -49,7 +49,6 @@ CfrTil_DebugOn ( )
     Debugger_On ( debugger ) ;
     byte * nextToken = Lexer_Peek_Next_NonDebugTokenWord ( cntx->Lexer0, 0, 0 ) ;
     debugger->EntryWord = Finder_Word_FindUsing ( cntx->Interpreter0->Finder0, nextToken, 0 ) ;
-    debugger->StartHere = Here ;
     _Context_->SourceCodeWord = debugger->EntryWord ;
 }
 
@@ -74,7 +73,6 @@ DebugRuntimeBreakpoint ( )
                 if ( ! GetState ( debugger, ( DBG_STEPPING | DBG_AUTO_MODE ) ) )
                 {
                     Debugger_On ( debugger ) ;
-                    debugger->StartHere = Here ;
                     Debugger_SetupStepping ( debugger ) ;
                     SetState_TrueFalse ( debugger, DBG_RUNTIME | DBG_RESTORE_REGS | DBG_ACTIVE | DBG_RUNTIME_BREAKPOINT | DEBUG_SHTL_OFF,
                         DBG_INTERPRET_LOOP_DONE | DBG_PRE_DONE | DBG_CONTINUE | DBG_NEWLINE | DBG_PROMPT | DBG_INFO | DBG_MENU ) ;

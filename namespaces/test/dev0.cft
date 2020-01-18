@@ -3,7 +3,8 @@ Int
 5 
 bnOff dbgOff 
 scOn
-Root : sp ; //stack pause ;
+Root 
+: sp ; //stack pause ;
 C 
 : sp ; //stack pause ;
 sp
@@ -319,6 +320,7 @@ sp
 (define n09 kl0 ) (define my6 op9 )
 (h36 n09 my6 )
 "\n should show : ( kl0 op9 kl0 op9 kl0 kl0 op9 op9 )\n" ps
+//pause
 sp
 
 // macro experiments
@@ -359,14 +361,17 @@ fac5 ( REG n  | REG facc )
     facc = 1 ;
     while ( n > 1 ) 
     {
+#if 1
         facc = facc * (n --) ;
-        //facc *= n -- ;
+#else
+        facc *= n -- ;
+#endif
     }
     return facc ;
 } prefix
 wdiss ( ' fac5 find ) 
-
-fac5 ( 7 ) dup p 5040 _assert //pause
+sp
+fac5 ( 7 ) dup p 5040 _assert sp
 sp
 Root
 c_syntaxOn
@@ -407,18 +412,19 @@ Lisp //pause
 (define fib2 (lambda (n) (ifElse (< n 2) n (+ (fib2 (- n 1)) (fib2 (- n 2))))))
 sp
 (fib 20) (fib2 20)
+sp
 (define x "let") (define a "the") // 'let' is a special word
 (define x1 'let) (define a1 the)
-sp
 ( Its 'a beautiful day don\'t 'let it get away )
+( Its a beautiful day don\'t x it get away )
 '( Its a beautiful day don\'t let it get away )
 '( Its a beautiful day don\'t @x1 it get away ) 
 `( ,Its ,a ,beautiful ,day ,don\'t ,@x1 ,it ,get ,away )
 `( Its ,a beautiful day don\'t ,x it get away ) 
-"testing unquote above line should show : ( Its \"the\" beautiful day don't \"let\" it get away )\n" ps
+"testing unquote above line should show : ( Its a beautiful day don't x it get away )\n" ps
 `( Its 'a beautiful day don\'t ,x1 it get away )
-"testing unquote above line should show : ( Its a beautiful day don't let it get away )\n" ps 
-`( Its a beautiful day don\'t ,@x it get away )
+"testing unquote above line should show : ( Its a beautiful day don't x1 it get away )\n" ps 
+`( Its ,@a beautiful day don\'t ,@x it get away )
 `( Its a beautiful day don\'t ,@x1 it get away )
 sp
 lispOff  
@@ -426,8 +432,6 @@ lispOff
 sp  
 
 #if 1 // REG testing
-: sp ; //stack pause ;
-//: _assert _assert0 stack pause ;
 : fibBN ( n | fn fn1 fn2 -- TOS ) 
     { fn 0 = fn1 0 = fn2 1 = } { n @ 0 > } { n 1 -= } 
     {   
@@ -440,7 +444,7 @@ sp
     return fn
 ;
 //' fibBN find wdiss
-20 fibBN dup p 6765 _assert //sp
+20 fibBN dup p 6765 _assert sp
 : fibBN ( n | fn REG fn1 fn2 ) 
     { fn 0 = fn1 0 = fn2 1 = } { n @ 0 > } { n 1 -= } 
     {   
@@ -453,7 +457,7 @@ sp
     return fn
 ;
 //' fibBN find wdiss
-20 fibBN dup p 6765 _assert //sp
+20 fibBN dup p 6765 _assert sp
 : fibBN ( n | fn, REG fn1, REG fn2 ) 
     { fn 0 = fn1 0 = fn2 1 = } { n @ 0 > } { n 1 -= } 
     {   
@@ -466,7 +470,7 @@ sp
     return fn
 ;
 //' fibBN find wdiss
-20 fibBN dup p 6765 _assert //sp
+20 fibBN dup p 6765 _assert sp
 
 : fibBN ( n | REG fn REG fn1 REG fn2 ) 
     { fn 0 = fn1 0 = fn2 1 = } { n @ 0 > } { n 1 -= } 
@@ -521,9 +525,9 @@ scOn
 ;
 //' fibBN find wdiss
 20 fibBN dup p 6765 _assert sp
-//stack pause
-#endif
 
+#endif
+sp
 Int
 2 + 7 assertStkChk // stack checking
 nl location "\nending Lisp\n" ps s //ddps s

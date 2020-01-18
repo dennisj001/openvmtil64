@@ -9,9 +9,9 @@ Lisp
 decimal
 : sp ; //stack pause ; sp 
 "lambda" tick _lambda find alias immediate
-"/\" tick lambda find alias
-"/." tick lambda find alias
-"/|" tick lambda find alias
+"/\" tick _lambda find alias
+"/." tick _lambda find alias
+"/|" tick _lambda find alias
 //(define list (lambda (args) (args)))
 
 //verbosity 2 =
@@ -21,14 +21,15 @@ decimal
 ( 1 2 ( 3 4 ) 5 6 ( 7 ( 8 ( 9 ) 10 11 ) ( ( ( ( 12 ) ) ) ) 13 ( 14 ) ) 15 ( 16 ( 17 ( 18 ) ) ) ) 
 (+ 1 6) 
 ( - ( + 1 2 ( * 3 4 ) ( / 4 2 ) ( - 9 8 ) 10 770 ) 21 )  // == 777
-( define f ( lambda x ( + x 1 ) ) ) 
-( f 6 )
-( begin ( define f ( lambda ( x ) ( + x 1 ) ) ) ( f 6 ) )
+( define f ( lambda x ( + x 1 2 ) ) ) 
+tick f find wdiss
+( f 4 )
+( begin ( define f ( lambda ( x ) ( + x 1 2 ) ) ) ( f 4 ) )
 ( + 1 2 4 )
 
 ( - ( + 1 2 ( * 3 4 ) ( / 4 2 ) ( - 9 8 ) 10 770 ) 21 )  // == 777 
-( ( /\ x y ( + x y ) ) 3 4 )
-( ( /\ ( x y z ) ( + x y z ) ) 3 4 70 ) // 77
+( ( lambda ( x y ) ( + x y ) ) 3 4 )
+( ( lambda ( x y z ) ( + x y z ) ) 3 4 70 ) // 77
 ( ( /\ ( x y z ) ( + x y z ) ) 3 4 70 ) 
 ( ( /\ ( x y z ) ( + x y z ) ) 3 4 70 ) 
 ( ( /\ ( x y z ) ( + x y z ) ) 3 4 70 ) 
@@ -178,17 +179,18 @@ sp
 (fibc 20)
 tick fibc find wdiss //pause
 
-//optimizeOff
+//syntatic experiments ...
 
 ( :: : hioo 3 4 + dup p ; : hio 5 6 + dup p ; hio hioo ) 7 _assert 11 _assert s //pause
 ( hioo ) ( hio ) 11 _assert 7 _assert hio hioo 7 _assert 11 _assert 
 tick hioo find wdiss 
-tick hio find wdiss //pause
+tick hio find wdiss 
 lispOff
 C
 : bexp43 ( n ) { n @ 1 > } { n @ n @ -- bexp43 * } { 1 } ifElse ;
 'bexp43 find wdiss //pause
 7 C bexp43 dup 5040 "C : bexp43_assert" assert p 
+//pause
 sp
 Lisp
 ( :: C : bexp44 ( n ) { n @ 1 > } { n @ n @ -- bexp44 * } { 1 } ifElse ; )
@@ -217,8 +219,9 @@ lispOff
 ;
 //' goedel3 find wdiss pause   
 "goedel3 :: " ps 
-9 goedel3 _assert0  "\ngoedel3 output should read (after ignoring _asserts) : \n'junk' 2 'junk' 7 'junk' 7 9" ps //pause
-Debug Lisp // test comment
+9 goedel3 _assert0  "\ngoedel3 output should read (after ignoring _asserts) : \n'junk' 2 'junk' 7 'junk' 7 9" ps 
+//pause
+Debug Lisp 
 ( :: 
     : goedel6 (| n -- TOS ) 
         "\n goedel6 :: " ps 
@@ -236,9 +239,9 @@ Debug Lisp // test comment
         } ix // n should be garbage here
         n @ dup p
     ; ".I" typeSignature
-    //' goedel6 find wdiss pause   
+    ' goedel6 find wdiss //pause   
     9 goedel6 "goedel6_0_assert" assert
-    "\ngoedel6 :: goedel6 output should read : \n'junk' 2 'junk' 7 7 'junk' 9" ps //pause
+    "\ngoedel6 output should read (after ignoring _asserts) : \n 'junk' 2 'junk' 7 'junk' 7 9" ps 
 )
 scOn
 ( ::
@@ -266,6 +269,19 @@ tick goedel8 find wdiss //pause sp
 Lisp
 //: sp ;
 (list (1 2)) (list 1 2)
+(define x "let") (define a "the") // 'let' is a special word
+(define x1 'let) (define a1 the)
+( Its 'a beautiful day don\'t 'let it get away )
+( Its a beautiful day don\'t x it get away )
+'( Its a beautiful day don\'t let it get away )
+'( Its a beautiful day don\'t @x1 it get away ) 
+`( ,Its ,a ,beautiful ,day ,don\'t ,@x1 ,it ,get ,away )
+`( Its ,a beautiful day don\'t ,x it get away ) 
+"testing unquote above line should show : ( Its a beautiful day don't x it get away )\n" ps
+`( Its 'a beautiful day don\'t ,x1 it get away )
+"testing unquote above line should show : ( Its a beautiful day don't x1 it get away )\n" ps 
+`( Its ,@a beautiful day don\'t ,@x it get away )
+`( Its a beautiful day don\'t ,@x1 it get away )
 //pause
 
 lispOff 

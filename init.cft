@@ -1,5 +1,5 @@
 5 // stack checking marker
-jcc8_On
+jcc8_Off
 //typecheckOn dbgTypecheckOn
 : sp ; //stack pause ; 
 // logOn
@@ -245,7 +245,6 @@ System
 : _source ( addToHistoryFlag  pword )
     { addToHistoryFlag @ } { pword @ sourceAdd } { pword @ sourceDontAdd } ifElse 
 ;;
-jcc8_Off
 : _wdiss ( addToHistoryFlag pword ) 
     nl pel 
     _source ( addToHistoryFlag @ pword @ ) nl pdl 
@@ -256,7 +255,6 @@ jcc8_Off
     nl pel decimal 
     nl "::> 'wdiss' was called at" _ps location "<::" ps nl
 ;;
-jcc8_On
 : wdiss ( pword ) _wdiss ( 0 pword @ ) ; //debugWord      // don't add wdiss words to history list
 : wdissl ( pword ) logOn _wdiss ( 0 pword @ ) logOff ; //debugWord      // don't add wdiss words to history list
 'wi ' wdiss find alias
@@ -290,12 +288,13 @@ dscOn //verbosity 3 =
 : debugTest 1 2 + p debugTest1 ;
 : _assert1 ( n m str ) { n @ m @ != } { str @ ? str @ ps : drop "error" ps _info stack _pause } { debugTest } ifElse ; 
 #else
-: _assert1 ( n m str ) { n @ m @ != } { str @ ? str @ ps : drop "error" ps _info stack _pause } if ; 
+//d: : _assert1 ( n m str ) { n @ m @ != } { <dbg> nl location hex n @ p "!=" ps m @ p "<:" ps "Error!" adps _info _pause } { <dbg> str @ ps " : ok\n" ps nl } ifElse ;
+: _assert1 ( n m str ) { n @ m @ != } { nl location hex n @ p "!=" ps m @ p "<:" ps "Error!" adps _info _pause } { str @ ps " : ok\n" ps nl } ifElse ;
+//: _assert1 ( n m str ) { n @ m @ != } { str @ ? str @ ps : drop "error" ps _info stack _pause } if ; 
 //: _assert1 ( n m str ) { n @ m @ != } { str @ ps "error" ps _info _pause } if ;
 #endif
-//: ctloc do> locationPush does> locationPrint <do ; immediate // compile time location
-jcc8_Off
-: _assert0 ( n m ) { n @ m @ != } { nl location hex n @ p "!=" ps m @ p "<:" ps "Error!" adps _info _pause } { } ifElse ; //{ str @ ps " : ok\n" ps nl } ifElse ; // no "ok" with this word
+: ctloc do> locationPush does> locationPrint <do ; immediate // compile time location
+: _assert0 ( n m ) { n @ m @ != } { nl location nl hex n @ p "!=" ps m @ p "<:" ps "Error!" adps _info _pause } { } ifElse ; //{ str @ ps " : ok\n" ps nl } ifElse ; // no "ok" with this word
 : _assert ( n m ) nl  nl "_assert ::" ps { n @ m @ != } { n @ p "!=" ps m @ p "<:" ps "Error!" adps _info _pause } { " ok\n" ps nl } ifElse ;
 : assert1s ( s1 s2 str ) { s1 @ s2 @ strcmp } { nl str @ ps "error" ps _info _pause } if ;
 : assert0 ( n m ) { n @ m @ != } { nl "error" ps _info _pause } if ; 
@@ -323,7 +322,6 @@ jcc8_Off
     } if2
     //stack pause
 ; 
-jcc8_On
 //' _assertStkChk find wdiss //pause
 : assertStkChk _assertStkChk ; //"\n_assertStkChk : " ps stack pause ; 
 Root
@@ -350,7 +348,7 @@ Root C
 
 : include1 _dup debugColors "\n'include'" ps ps " :: at :" ps location nl defaultColors sp include  ;
 Debug
-#if ( DebugFlag @ )
+#if DebugFlag @
 : s stack alertColors location defaultColors ;
 : include include1 debugColors "location :" ps location nl defaultColors ;
 d: vb3
@@ -446,5 +444,11 @@ infixOn
 infixOff
 rtw
 'test 'tc find alias //nb! after rtw which removes all words "test", etc.
+
+#if Is_DebugOn
+: powReg ( REG base REG power | REG out -t II.I ) { out 1 = } { power @ 0 > } { power power @ 1 - = } { out out @ base @ * = } for return out ;
+2 30 powReg dup p  1073741824 _assert 
+'powReg find wdiss
+#endif
 
 2 + 7 assertStkChk // stack checking 

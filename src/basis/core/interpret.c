@@ -10,7 +10,7 @@ _Interpreter_TokenToWord ( Interpreter * interp, byte * token, int64 tsrli, int6
     {
         interp->Token = token ;
         word = Finder_Word_FindUsing ( interp->Finder0, token, 0 ) ;
-        if ( word && interp->Compiler0->AutoVarTypeNamespace && ( word->CAttribute & NAMESPACE_VARIABLE ) ) word = 0 ;
+        if ( word && interp->Compiler0->AutoVarTypeNamespace && ( word->W_ObjectAttributes & NAMESPACE_VARIABLE ) ) word = 0 ;
         if ( ! word )
         {
             word = Lexer_ObjectToken_New ( interp->Lexer0, token, tsrli, scwi ) ;
@@ -19,6 +19,7 @@ _Interpreter_TokenToWord ( Interpreter * interp, byte * token, int64 tsrli, int6
         Word_SetTsrliScwi ( word, tsrli, scwi ) ;
         _Context_->CurrentTokenWord = word ;
         DEBUG_SETUP ( word ) ;
+        _Context_->TokenDebugSetupWord = word ;
     }
     return _Context_->CurrentTokenWord ; // allow DEBUG_SETUP to set this to 0 to skip it when it is 'stepped'
 }
@@ -50,7 +51,6 @@ Interpreter_DoWord_Default ( Interpreter * interp, Word * word0, int64 tsrli, in
     Word * word = Compiler_CopyDuplicatesAndPush ( word0, tsrli, scwi ) ;
     interp->w_Word = word ;
     Word_Eval ( word ) ;
-    //if ( IS_MORPHISM_TYPE ( word ) ) SetState ( _Context_, ADDRESS_OF_MODE, false ) ;
     return word ; //let callee know about actual word evaled here after Compiler_CopyDuplicatesAndPush
 }
 
@@ -60,11 +60,10 @@ Interpreter_DoInfixWord ( Interpreter * interp, Word * word )
     byte * token = 0 ;
     Compiler * compiler = _Compiler_ ;
     SetState ( compiler, ( DOING_AN_INFIX_WORD | DOING_BEFORE_AN_INFIX_WORD ), true ) ;
-    if ( GetState ( _Context_, C_SYNTAX ) && ( word->CAttribute & ( CATEGORY_OP_EQUAL | CATEGORY_OP_OPEQUAL ) ) ) //&& ( ! GetState ( compiler, DOING_C_TYPE ) ) )
+    if ( GetState ( _Context_, C_SYNTAX ) && ( word->W_MorphismAttributes & ( CATEGORY_OP_EQUAL | CATEGORY_OP_OPEQUAL ) ) ) //&& ( ! GetState ( compiler, DOING_C_TYPE ) ) )
     {
-        if ( ( word->CAttribute2 & C_INFIX_OP_EQUAL ) ) SetState ( compiler, C_INFIX_EQUAL, true ) ;
+        if ( ( word->W_MorphismAttributes & C_INFIX_OP_EQUAL ) ) SetState ( compiler, C_INFIX_EQUAL, true ) ;
         token = Interpret_C_Until_Token4 ( interp, ( byte* ) ";", ( byte* ) ",", ( byte* ) ")", ( byte* ) "]", ( byte* ) " \n\r\t", 0 ) ;
-        // Interpret_C_Until_Token4 : CfrTil_PushToken_OnTokenList ( token ) ; token will be interpreted next time thru interp loop
     }
     else Interpreter_InterpretNextToken ( interp ) ;
     // then continue and interpret this 'word' - just one out of lexical order
@@ -85,7 +84,7 @@ void
 Interpreter_DoPrefixWord ( Context * cntx, Interpreter * interp, Word * word )
 {
     if ( Lexer_IsNextWordLeftParen ( interp->Lexer0 ) ) _Interpreter_DoPrefixWord ( cntx, interp, word ) ;
-    else if ( word->CAttribute & CATEGORY_OP_1_ARG ) Interpreter_DoInfixWord ( interp, word ) ; //goto doInfix ;
+    else if ( word->W_MorphismAttributes & CATEGORY_OP_1_ARG ) Interpreter_DoInfixWord ( interp, word ) ; //goto doInfix ;
     else _SyntaxError ( ( byte* ) "Attempting to call a prefix function without following parenthesized args", 1 ) ;
 }
 
@@ -102,10 +101,10 @@ Interpreter_DoInfixOrPrefixWord ( Interpreter * interp, Word * word )
     {
         Context * cntx = _Context_ ;
         interp->w_Word = word ;
-        if ( ( word->WAttribute == WT_INFIXABLE ) && ( GetState ( cntx, INFIX_MODE ) ) ) Interpreter_DoInfixWord ( interp, word ) ;
+        if ( ( word->W_TypeAttributes == WT_INFIXABLE ) && ( GetState ( cntx, INFIX_MODE ) ) ) Interpreter_DoInfixWord ( interp, word ) ;
             // nb. Interpreter must be in INFIX_MODE because it is effective for more than one word
-        else if ( ( word->WAttribute == WT_PREFIX ) || Lexer_IsWordPrefixing ( interp->Lexer0, word ) ) _Interpreter_DoPrefixWord ( cntx, interp, word ) ; //, tsrli, scwi ) ;
-        else if ( word->WAttribute == WT_C_PREFIX_RTL_ARGS ) Interpreter_C_PREFIX_RTL_ARGS_Word ( word ) ;
+        else if ( ( word->W_TypeAttributes == WT_PREFIX ) || Lexer_IsWordPrefixing ( interp->Lexer0, word ) ) _Interpreter_DoPrefixWord ( cntx, interp, word ) ; //, tsrli, scwi ) ;
+        else if ( word->W_TypeAttributes == WT_C_PREFIX_RTL_ARGS ) Interpreter_C_PREFIX_RTL_ARGS_Word ( word ) ;
         else return false ;
         return true ;
     }
@@ -123,10 +122,10 @@ Interpreter_DoWord ( Interpreter * interp, Word * word, int64 tsrli, int64 scwi 
     if ( word )
     {
         Word_SetTsrliScwi ( word, tsrli, scwi ) ; // some of this maybe too much
-        DEBUG_SETUP ( word ) ;
+        //DEBUG_SETUP ( word ) ;
         interp->w_Word = word ;
         if ( ! Interpreter_DoInfixOrPrefixWord ( interp, word ) ) Interpreter_DoWord_Default ( interp, word, tsrli, scwi ) ; //  case WT_POSTFIX: case WT_INFIXABLE: // cf. also _Interpreter_SetupFor_MorphismWord
-        if ( ! ( word->CAttribute & DEBUG_WORD ) ) interp->LastWord = word ;
+        if ( ! ( word->W_MorphismAttributes & DEBUG_WORD ) ) interp->LastWord = word ;
         if ( ! GetState ( _Context_, ( C_SYNTAX ) ) ) List_InterpretLists ( _Compiler_->PostfixLists ) ; // with C_SYNTAX this is done in by _CfrTil_C_Infix_EqualOp or CfrTil_Interpret_C_Blocks
     }
 }
@@ -148,8 +147,8 @@ Boolean
 Word_IsSyntactic ( Word * word )
 {
     if ( ( ! GetState ( _Debugger_, DBG_INFIX_PREFIX ) )
-        && ( ( word->WAttribute & ( WT_PREFIX | WT_C_PREFIX_RTL_ARGS ) ) || Lexer_IsWordPrefixing ( _Lexer_, word )
-        || ( ( word->WAttribute == WT_INFIXABLE ) && ( GetState ( _Context_, INFIX_MODE ) ) ) ) )
+        && ( ( word->W_TypeAttributes & ( WT_PREFIX | WT_C_PREFIX_RTL_ARGS ) ) || Lexer_IsWordPrefixing ( _Lexer_, word )
+        || ( ( word->W_TypeAttributes == WT_INFIXABLE ) && ( GetState ( _Context_, INFIX_MODE ) ) ) ) )
         return true ;
     else return false ;
 }

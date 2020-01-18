@@ -33,7 +33,7 @@ Compile_Multiply ( Compiler * compiler )
         Compiler_SCA_Word_SetCodingHere_And_ClearPreviousUse ( optInfo->opWord, 1 ) ;
         _Compile_IMUL ( optInfo->Optimize_Mod, optInfo->Optimize_Reg, optInfo->Optimize_Rm, 0, optInfo->Optimize_Disp, 0 ) ;
         if ( optInfo->Optimize_Rm == DSP ) _Compile_Move_Reg_To_StackN ( DSP, 0, optInfo->Optimize_Reg ) ;
-        else _Word_CompileAndRecord_PushReg (_CfrTil_WordList ( 0 ), optInfo->Optimize_Reg , true) ;
+        else _Word_CompileAndRecord_PushReg ( _CfrTil_WordList ( 0 ), optInfo->Optimize_Reg, true ) ;
     }
     else
     {
@@ -73,8 +73,8 @@ _Compile_Divide ( Compiler * compiler, uint64 type )
         Compile_IDIV ( optInfo->Optimize_Mod, optInfo->Optimize_Rm, ( ( optInfo->Optimize_Disp != 0 ) ? DISP_B : 0 ), 0, optInfo->Optimize_Disp, 0, 0 ) ;
         if ( type == MODULO ) reg = RDX ;
         else reg = ACC ;
-        if ( reg != ACC ) Compile_Move_Reg_To_Reg (ACC, reg , 0) ; // for consistency finally use RAX so optInfo can always count on rax as the pushed reg
-        CfrTil_CompileAndRecord_Word0_PushReg (ACC, true) ;
+        if ( reg != ACC ) Compile_Move_Reg_To_Reg ( ACC, reg, 0 ) ; // for consistency finally use RAX so optInfo can always count on rax as the pushed reg
+        CfrTil_CompileAndRecord_Word0_PushReg ( ACC, true ) ;
     }
     else
     {
@@ -146,7 +146,7 @@ _CfrTil_Do_IncDec ( int64 op )
         Word *one = ( Word* ) _CfrTil_WordList ( 1 ) ; // the operand
         if ( op == INC )
         {
-            if ( ( sd > 1 ) && one->CAttribute & ( PARAMETER_VARIABLE | LOCAL_VARIABLE | NAMESPACE_VARIABLE ) )
+            if ( ( sd > 1 ) && one->W_ObjectAttributes & ( PARAMETER_VARIABLE | LOCAL_VARIABLE | NAMESPACE_VARIABLE ) )
             {
                 *( ( int64* ) ( TOS ) ) += 1 ;
                 DataStack_Drop ( ) ;
@@ -155,7 +155,7 @@ _CfrTil_Do_IncDec ( int64 op )
         }
         else
         {
-            if ( ( sd > 1 ) && one->CAttribute & ( PARAMETER_VARIABLE | LOCAL_VARIABLE | NAMESPACE_VARIABLE ) )
+            if ( ( sd > 1 ) && one->W_ObjectAttributes & ( PARAMETER_VARIABLE | LOCAL_VARIABLE | NAMESPACE_VARIABLE ) )
             {
                 *( ( int64* ) ( TOS ) ) -= 1 ;
                 DataStack_Drop ( ) ;
@@ -165,103 +165,4 @@ _CfrTil_Do_IncDec ( int64 op )
         //_CfrTil_->set_DspReg_FromDataStackPointer ( ) ; // update DSP reg
     }
 }
-
-void
-CfrTil_IncDec ( int64 op ) // ++/--
-{
-    Context * cntx = _Context_ ;
-    Compiler * compiler = cntx->Compiler0 ;
-    int64 sd = List_Depth ( _CfrTil_->Compiler_N_M_Node_WordList ) ;
-    if ( ( sd > 1 ) && ( ! GetState ( compiler, LC_CFRTIL ) ) ) //|INFIX_LIST_INTERPRET ) )
-    {
-        Word * currentWord = _CfrTil_WordList ( 0 ) ; //_Context_CurrentWord ( cntx ) ;
-        //Word * currentWord = _Context_CurrentWord ( cntx ) ;
-        Word *two = 0, *one = ( Word* ) _CfrTil_WordList ( 1 ) ; // the operand
-        if ( GetState ( _Context_, C_SYNTAX ) && ( one->CAttribute & CATEGORY_OP ) && ( ! ( one->CAttribute & CATEGORY_OP_LOAD ) ) ) one = two = _CfrTil_WordList ( 2 ) ; 
-        byte * nextToken = Lexer_Peek_Next_NonDebugTokenWord ( cntx->Lexer0, 1, 0 ) ;
-        Word * nextWord = Finder_Word_FindUsing ( cntx->Interpreter0->Finder0, nextToken, 0 ) ;
-        //SetState ( _Debugger_, DEBUG_SHTL_OFF, true ) ;
-        if ( nextWord && ( nextWord->CAttribute & ( CATEGORY_OP_ORDERED | CATEGORY_OP_UNORDERED | CATEGORY_OP_DIVIDE | CATEGORY_OP_EQUAL ) ) ) // postfix
-        {
-            List_DropN ( _CfrTil_->Compiler_N_M_Node_WordList, 1 ) ; // the operator; let higher level see the variable
-            if ( GetState ( compiler, C_INFIX_EQUAL ) && GetState ( _CfrTil_, OPTIMIZE_ON ) && CompileMode )
-            {
-                //if ( one ) SetHere (one->Coding, 1) ;
-                // ?? couldn't this stuff be done with _Interpret_C_Until_EitherToken ??
-                dllist * postfixList = List_New ( SESSION ) ;
-                List_Push_1Value_NewNode_T_WORD ( postfixList, ( int64 ) currentWord, COMPILER_TEMP ) ;
-                if ( one ) List_Push_1Value_NewNode_T_WORD ( postfixList, ( int64 ) one, COMPILER_TEMP ) ;
-                List_Push_1Value_NewNode_T_WORD ( compiler->PostfixLists, ( int64 ) postfixList, COMPILER_TEMP ) ;
-                return ;
-            }
-            else
-            {
-                Interpreter_InterpretNextToken ( cntx->Interpreter0 ) ;
-                if ( sd > 1 )
-                {
-                    Interpreter_DoWord ( cntx->Interpreter0, one, - 1, - 1 ) ;
-                    Interpreter_DoWord ( cntx->Interpreter0, currentWord, - 1, - 1 ) ;
-                    return ;
-                }
-            }
-        }
-        if ( one && one->CAttribute & ( PARAMETER_VARIABLE | LOCAL_VARIABLE | NAMESPACE_VARIABLE ) )
-        {
-            if ( GetState ( _Context_, C_SYNTAX ) )
-            {
-                if ( ! GetState ( compiler, INFIX_LIST_INTERPRET ) )
-                {
-                    List_DropN ( _CfrTil_->Compiler_N_M_Node_WordList, 1 ) ; // the operator; let higher level see the variable
-                    if ( GetState ( _CfrTil_, OPTIMIZE_ON ) && ( ! two ) ) SetHere ( one->Coding, 1 ) ;
-                    CfrTil_WordList_PushWord ( one ) ;
-                    dllist * postfixList = List_New ( SESSION ) ;
-                    List_Push_1Value_NewNode_T_WORD ( postfixList, ( int64 ) currentWord, COMPILER_TEMP ) ;
-                    List_Push_1Value_NewNode_T_WORD ( postfixList, ( int64 ) one, COMPILER_TEMP ) ;
-                    List_Push_1Value_NewNode_T_WORD ( compiler->PostfixLists, ( int64 ) postfixList, COMPILER_TEMP ) ;
-                    List_DropN ( _CfrTil_->Compiler_N_M_Node_WordList, 1 ) ; // the operator; let higher level see the variable for optimization
-                    return ;
-                }
-            }
-        }
-        else if ( nextWord && ( nextWord->CAttribute & ( PARAMETER_VARIABLE | LOCAL_VARIABLE | NAMESPACE_VARIABLE ) ) ) // prefix
-        {
-            if ( String_Equal ( currentWord->Name, "++" ) ) op = INC ;
-            else op = DEC ;
-            if ( nextWord->CAttribute & ( PARAMETER_VARIABLE | LOCAL_VARIABLE ) )
-            {
-                _Compile_Group5 ( op, MEM, FP, 0, LocalOrParameterVar_Disp ( nextWord ), 0 ) ;
-            }
-            else // crash ; FIXME!!
-            {
-                _Compile_Move_Literal_Immediate_To_Reg ( THRU_REG, ( int64 ) nextWord->W_PtrToValue ) ;
-                Compile_Move_Rm_To_Reg (ACC, THRU_REG, 0 , 0) ;
-                _Compile_Group5 ( op, REG, ACC, 0, 0, 0 ) ;
-                Compile_Move_Reg_To_Rm (THRU_REG, ACC, 0 , 0) ;
-
-            }
-            return ;
-        }
-        else
-        {
-            if ( GetState ( compiler, C_INFIX_EQUAL ) )
-            {
-                if ( ! GetState ( compiler, INFIX_LIST_INTERPRET ) ) // new logic test ??
-                {
-                    int64 i ;
-                    Word * word ;
-                    dllist * postfixList = List_New ( SESSION ) ;
-                    List_Push_1Value_NewNode_T_WORD ( postfixList, ( int64 ) currentWord, COMPILER_TEMP ) ; // remember : this will be lifo
-                    for ( i = 1 ; word = _CfrTil_WordList ( i ), ( word->CAttribute & ( CATEGORY_OP_ORDERED | CATEGORY_OP_UNORDERED | CATEGORY_OP_DIVIDE | CATEGORY_OP_EQUAL ) ) ; i ++ ) ;
-                    List_Push_1Value_NewNode_T_WORD ( postfixList, ( int64 ) _CfrTil_WordList ( i ), COMPILER_TEMP ) ;
-                    List_Push_1Value_NewNode_T_WORD ( compiler->PostfixLists, ( int64 ) postfixList, COMPILER_TEMP ) ;
-                    List_DropN ( _CfrTil_->Compiler_N_M_Node_WordList, 1 ) ; // the operator; let higher level see the variable for optimization
-                    return ;
-                }
-            }
-        }
-    }
-    _CfrTil_Do_IncDec ( op ) ;
-    SetState ( _Debugger_, DEBUG_SHTL_OFF, false ) ;
-}
-
 

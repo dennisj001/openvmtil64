@@ -298,7 +298,10 @@ _Stack_PrintValues ( byte * name, uint64 * stackPointer, int64 depth, Boolean is
     {
         int64 i ;
         byte * buffer = Buffer_New_pbyte ( BUFFER_SIZE ) ;
-        if ( depth >= 0 ) for ( i = 0 ; depth -- > 0 ; i -- ) Stack_Print_AValue ( stackPointer, i, name, buffer, isWordAlreadyFlag ) ;
+        if ( ( depth >= 0 ) && ( depth < 256 ) ) // 256 : don't let this function run to far with stack related errors
+        {
+            for ( i = 0 ; depth -- > 0 ; i -- ) Stack_Print_AValue ( stackPointer, i, name, buffer, isWordAlreadyFlag ) ;
+        }
         else CfrTil_Exception ( STACK_UNDERFLOW, 0, QUIT ) ;
     }
 }

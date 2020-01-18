@@ -14,7 +14,6 @@ _Debugger_InterpreterLoop ( Debugger * debugger )
         }
         SetState ( _Debugger_, DBG_AUTO_MODE_ONCE, false ) ;
         debugger->CharacterFunctionTable [ debugger->CharacterTable [ debugger->Key ] ] ( debugger ) ;
-        debugger->SC_Index = _Lexer_->SC_Index ;
     }
     while ( GetState ( debugger, DBG_STEPPING ) || ( ! GetState ( debugger, DBG_INTERPRET_LOOP_DONE ) ) ||
         ( ( GetState ( debugger, DBG_AUTO_MODE ) ) && ( ! ( GetState ( debugger, DBG_EVAL_AUTO_MODE ) ) ) ) ) ;
@@ -43,7 +42,8 @@ _Debugger_PreSetup ( Debugger * debugger, Word * word, byte * token, byte * addr
         if ( forceFlag || GetState ( debugger, DBG_EVAL_AUTO_MODE ) || ( ! GetState ( debugger, DBG_AUTO_MODE | DBG_STEPPING ) ) )
         {
             if ( ! word ) word = Context_CurrentWord ( ) ;
-            if ( forceFlag || ( word != debugger->LastSetupWord ) || ( debugger->SC_Index != _Lexer_->SC_Index ) )
+            if ( forceFlag || ( ( _Context_->TokenDebugSetupWord != word ) && ( word->W_WordListOriginalWord ?
+                ( word->W_WordListOriginalWord != _Context_->TokenDebugSetupWord ) : 1 ) ) )
             {
                 if ( forceFlag || ( word && word->Name[0] ) || token )
                 {
@@ -58,7 +58,7 @@ _Debugger_PreSetup ( Debugger * debugger, Word * word, byte * token, byte * addr
                     SetState_TrueFalse ( debugger, DBG_ACTIVE | DBG_INFO | DBG_PROMPT, DBG_BRK_INIT | DBG_CONTINUE_MODE | DBG_INTERPRET_LOOP_DONE | DBG_PRE_DONE | DBG_CONTINUE | DBG_STEPPING | DBG_STEPPED ) ;
                     if ( word ) debugger->TokenStart_ReadLineIndex = word->W_RL_Index ;
                     debugger->SaveDsp = _Dsp_ ;
-                    if ( ! debugger->StartHere ) debugger->StartHere = Here ;
+                    if ( ! debugger->StartHere ) Debugger_Set_StartHere ( debugger ) ;
                     debugger->WordDsp = _Dsp_ ;
                     debugger->SaveTOS = TOS ;
                     debugger->Token = word->Name ? word->Name : token ;
@@ -78,11 +78,14 @@ _Debugger_PreSetup ( Debugger * debugger, Word * word, byte * token, byte * addr
                     debugger->LastEffectsWord = 0 ;
                     SetState ( debugger, DBG_MENU, false ) ;
                     //if ( GetState ( _Lexer_, LEXER_DONE | LEXER_END_OF_LINE ) ) SetState ( _Interpreter_, END_OF_LINE, true ) ;
+                    debugger->PreHere = Here ;
+                    debugger->LastSetupWord = word ;
                     return true ;
                 }
             }
         }
     }
+    debugger->SC_Index = _Lexer_->SC_Index ;
     return false ;
 }
 
@@ -95,6 +98,18 @@ Debugger_PreSetup ( Debugger * debugger, Word * word, byte * token, byte * addre
     }
     else Set_DataStackPointers_FromDebuggerDspReg ( ) ;
     return false ;
+}
+
+void
+_Debugger_PostShow ( Debugger * debugger, Word * word, Boolean force )
+{
+    _Debugger_ShowEffects ( debugger, word, GetState ( debugger, DBG_STEPPING ), force ) ;
+}
+
+void
+Debugger_PostShow ( Debugger * debugger )
+{
+    _Debugger_PostShow ( debugger, debugger->w_Word, 0 ) ;
 }
 
 void
@@ -221,6 +236,12 @@ _Debugger_Init ( Debugger * debugger, Cpu * cpu, Word * word, byte * address )
 }
 
 void
+Debugger_Set_StartHere ( Debugger * debugger )
+{
+    debugger->StartHere = Here ;
+}
+
+void
 Debugger_On ( Debugger * debugger )
 {
     _Debugger_Init ( debugger, debugger->cs_Cpu, 0, 0 ) ;
@@ -228,7 +249,8 @@ Debugger_On ( Debugger * debugger )
     debugger->LastSetupWord = 0 ;
     debugger->LastScwi = 0 ;
     debugger->PreHere = 0 ;
-    if ( ! Is_DebugModeOn ) debugger->StartHere = Here ;
+    //if ( ! Is_DebugModeOn ) 
+    Debugger_Set_StartHere ( debugger ) ;
     DebugOn ;
     DebugShow_On ;
 }
@@ -520,7 +542,8 @@ Debugger_AutoMode ( Debugger * debugger )
     {
         if ( ( debugger->SaveKey == 's' ) || ( debugger->SaveKey == 'o' ) || ( debugger->SaveKey == 'i' ) || ( debugger->SaveKey == 'e' ) || ( debugger->SaveKey == 'c' ) ) // not everything makes sense here
         {
-            AlertColors ;
+            //AlertColors ;
+            DebugColors ;
             if ( debugger->SaveKey == 'c' )
             {
                 _Printf ( ( byte* ) "\nContinuing : automatically repeating key \'e\' ..." ) ;
@@ -550,7 +573,6 @@ Debugger_CodePointerUpdate ( Debugger * debugger )
 {
     if ( debugger->w_Word && ( ! debugger->DebugAddress ) )
     {
-
         debugger->DebugAddress = ( byte* ) debugger->w_Word->Definition ;
         _Printf ( ( byte* ) "\ncodePointer = 0x%08x", ( int64 ) debugger->DebugAddress ) ;
     }
@@ -652,6 +674,32 @@ _CfrTil_DebugContinue ( int64 autoFlagOff )
 }
 
 void
+Debugger_WordList_Show_All ( Debugger * debugger )
+{
+    Compiler_SC_WordList_Show ( 0, 0, 0 ) ;
+}
+
+void
+Debugger_WordList_Show_InUse ( Debugger * debugger )
+{
+    Compiler_SC_WordList_Show ( 0, 1, 0 ) ;
+}
+
+void
+Debugger_ShowTypeWordStack ( Debugger * debugger )
+{
+    CfrTil_ShowTypeWordStack ( ) ;
+}
+
+void
+Debugger_Wdiss ( Debugger * debugger )
+{
+    DataStack_Push ( (int64) debugger->w_Word ) ;
+    Word * word = Finder_Word_FindUsing ( _Finder_, "wdiss", 0 ) ;
+    Block_Eval ( word->Definition ) ;
+}
+
+void
 Debugger_TableSetup ( Debugger * debugger )
 {
     int64 i ;
@@ -686,7 +734,7 @@ Debugger_TableSetup ( Debugger * debugger )
     debugger->CharacterTable [ 'p' ] = 18 ;
     debugger->CharacterTable [ 'a' ] = 20 ;
     debugger->CharacterTable [ 'z' ] = 21 ;
-    debugger->CharacterTable [ 'w' ] = 22 ;
+    debugger->CharacterTable [ 'W' ] = 22 ;
     debugger->CharacterTable [ 'B' ] = 23 ;
     debugger->CharacterTable [ 'P' ] = 24 ;
     debugger->CharacterTable [ 'l' ] = 25 ;
@@ -702,6 +750,7 @@ Debugger_TableSetup ( Debugger * debugger )
     debugger->CharacterTable [ 'X' ] = 35 ;
     //debugger->CharacterTable [ 'T' ] = 36 ;
     debugger->CharacterTable [ 'y' ] = 36 ;
+    debugger->CharacterTable [ 'w' ] = 37 ;
 
     // debugger : system related
     debugger->CharacterFunctionTable [ 0 ] = Debugger_Default ;
@@ -742,5 +791,6 @@ Debugger_TableSetup ( Debugger * debugger )
     debugger->CharacterFunctionTable [ 34 ] = Debugger_GotoList_Print ;
     debugger->CharacterFunctionTable [ 35 ] = Debugger_Print_LispDefinesNamespace ;
     debugger->CharacterFunctionTable [ 36 ] = Debugger_ShowTypeWordStack ;
+    debugger->CharacterFunctionTable [ 37 ] = Debugger_Wdiss ;
 }
 

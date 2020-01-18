@@ -39,10 +39,10 @@ typedef struct
 {
     struct
     {
-        uint64 T_CAttribute ;
-        uint64 T_CAttribute2 ;
-        uint64 T_LAttribute ;
-        uint32 T_WordAttribute ;
+        uint64 T_MorphismAttributes ;
+        uint64 T_ObjectAttributes ;
+        uint64 T_LispAttributes ;
+        uint32 T_WordAttributes ;
         uint8 T_NumberOfPrefixedArgs ;
         uint8 T_Unused ;
         uint64 T_WAllocationType ;
@@ -240,12 +240,11 @@ typedef struct _Identifier // _Symbol
         dlnode * S_Node3 ;
         byte * S_pb_Data3 ;
     } ;
-
     block Definition ;
     dllist * DebugWordList ;
     int64 StartCharRlIndex ;
     int64 SC_WordIndex ;
-    struct _Identifier * CfrTilWord ;
+    struct _Identifier * CfrTilWord, * BaseObject ;
     struct _WordData * S_WordData ;
 } Identifier, ID, Word, Namespace, Vocabulary, Class, DynamicObject, DObject, ListObject, Symbol, MemChunk, HistoryStringNode, Buffer ;
 #define S_Car S_Node.n_Car
@@ -254,12 +253,11 @@ typedef struct _Identifier // _Symbol
 #define S_Before S_Car
 #define S_CurrentNode n_CurrentNode
 //#define S_AAttribute S_Node.n_Attributes.T_AAttribute // Allocation type Attribute
-#define S_CAttribute S_Node.n_Attributes.T_CAttribute
-#define S_CAttribute2 S_Node.n_Attributes.T_CAttribute2
-#define S_CAttribute0 S_Node.n_Attributes.T_CAttribute0
-#define S_WAttribute S_Node.n_Attributes.T_WordAttribute
+#define S_MorphismAttributes S_Node.n_Attributes.T_MorphismAttributes
+#define S_ObjectAttributes S_Node.n_Attributes.T_ObjectAttributes
+#define S_WordAttributes S_Node.n_Attributes.T_WordAttributes
 #define S_WAllocType S_Node.n_Attributes.T_WAllocationType
-#define S_LAttribute S_Node.n_Attributes.T_LAttribute
+#define S_LispAttributes S_Node.n_Attributes.T_LispAttributes
 #define S_NumberOfPrefixedArgs S_Node.n_Attributes.T_NumberOfPrefixedArgs
 #define S_Size S_Node.n_Attributes.T_Size
 #define Size ObjectByteSize 
@@ -274,23 +272,23 @@ typedef struct _Identifier // _Symbol
 #define Head S_Car
 #define Tail S_Cdr
 #define Name S_Name
-#define CAttribute S_CAttribute
-#define CAttribute2 S_CAttribute2
-#define LAttribute S_LAttribute
-#define WAttribute S_WAttribute
+#define W_MorphismAttributes S_MorphismAttributes
+#define W_ObjectAttributes S_ObjectAttributes
+#define W_LispAttributes S_LispAttributes
+#define W_TypeAttributes S_WordAttributes
 #define WNumberOfPrefixedArgs S_NumberOfPrefixedArgs 
 #define WAllocType S_WAllocType
-#define CProp S_CAttribute
-#define CProp2 S_CAttribute2
-#define LProp S_LAttribute
-#define WProp S_WAttribute
+#define CProp S_MorphismAttributes
+#define CProp2 S_ObjectAttributes
+#define LProp S_LispAttributes
+#define WProp S_WordAttributes
 #define Data S_pb_Data2
 #define InUseFlag S_Node.n_InUseFlag
 
-#define Lo_CAttribute CAttribute
-#define Lo_LAttribute LAttribute
-#define Lo_CProp CAttribute
-#define Lo_LProp LAttribute
+#define Lo_CAttribute W_MorphismAttributes
+#define Lo_LAttribute W_LispAttributes
+#define Lo_CProp W_MorphismAttributes
+#define Lo_LProp W_LispAttributes
 #define Lo_Name Name
 #define Lo_Car S_Car
 #define Lo_Cdr S_Cdr
@@ -319,7 +317,7 @@ typedef struct _Identifier // _Symbol
 #define W_DObjectValue S_DObjectValue
 
 // Buffer
-#define B_CAttribute S_CAttribute
+#define B_CAttribute S_MorphismAttributes
 #define B_Size S_Size
 #define B_Data S_pb_Data2
 
@@ -381,7 +379,7 @@ typedef struct _WordData
         uint8 OpInsnCode ;
     } ;
     byte TypeSignature [16] ;
-    Namespace * TypeObjectsNamespaces [16] ; // 16 : increase if need more than 7 objects as args
+    Namespace * TypeObjectsNamespaces [16] ; // 16 : increase if need more than 15 objects as args
     union
     {
         dllist * LocalNamespaces ;
@@ -477,7 +475,7 @@ typedef struct
     byte * BA_Data ;
 } ByteArray ;
 #define BA_AllocSize BA_MemChunk.S_Size
-#define BA_CAttribute BA_MemChunk.S_CAttribute
+#define BA_CAttribute BA_MemChunk.S_MorphismAttributes
 #define BA_AAttribute BA_MemChunk.S_WAllocType
 typedef struct NamedByteArray
 {
@@ -507,7 +505,7 @@ typedef struct
     Symbol GI_Symbol ;
     byte * pb_LabelName, * CompileAtAddress, * LabeledAddress, * pb_JmpOffsetPointer ;
 } GotoInfo ;
-#define GI_CAttribute GI_Symbol.S_CAttribute
+#define GI_CAttribute GI_Symbol.S_MorphismAttributes
 typedef struct
 {
     Symbol BI_Symbol ;
@@ -594,7 +592,7 @@ struct Interpreter ;
 typedef struct Lexer
 {
     uint64 State ;
-    uint64 TokenType, TokenType2, TokenObjectSize ;
+    uint64 L_MorphismAttributes, L_ObjectAttributes, TokenObjectSize ;
     int64 TokenStart_ReadLineIndex, TokenEnd_ReadLineIndex, TokenStart_FileIndex, TokenEnd_FileIndex, Token_Length, SC_Index ; //Tsrli = TokenStart_ReadLineIndex
     int64 CurrentReadIndex, TokenWriteIndex, LineNumber ;
     byte *OriginalToken, TokenInputByte, LastLexedChar, CurrentTokenDelimiter ;
@@ -796,7 +794,7 @@ typedef struct
     byte * Location ;
     byte * DefaultTokenDelimiters ;
     byte * DefaultDelimiterCharSet ;
-    Word * CurrentlyRunningWord, *LastRunWord, *CurrentTokenWord, *CurrentEvalWord, *LastEvalWord, *NlsWord ;
+    Word * CurrentlyRunningWord, *LastRunWord, *CurrentTokenWord, *TokenDebugSetupWord, *CurrentEvalWord, *LastEvalWord, *NlsWord ;
     Word * SC_CurrentCombinator, *SourceCodeWord, *CurrentDisassemblyWord, * LastCompiledWord, *CurrentWordBeingCompiled ;
     block CurrentlyRunningWordDefinition ;
     dllist * PreprocessorStackList ;

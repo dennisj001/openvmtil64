@@ -72,7 +72,7 @@ int64
 _Udis_Disassemble ( ud_t *ud, byte* iaddress, int64 number, int64 cflag )
 {
     int64 isize, size = 0 ;
-    if ( iaddress )
+    if ( ((int64) iaddress) > 0 )
     {
         char * iasm ;
         byte * address = 0 ;
