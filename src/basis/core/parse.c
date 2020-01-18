@@ -523,8 +523,8 @@ void
 Lexer_ParseDoubleQuoteMacro ( Lexer * lexer )
 {
     ReadLiner * rl = _ReadLiner_ ;
-    if ( ( ! ( GetState ( _Compiler_, ( COMPILE_MODE | ASM_MODE ) ) ) ) && ( ! GetState ( _Compiler_, LC_ARG_PARSING  ) ) || ( ! GetState ( _CfrTil_, SOURCE_CODE_STARTED ) ) ) 
-        CfrTil_InitSourceCode_WithCurrentInputChar ( _CfrTil_, 0 ) ; // must be here for wdiss and add addToHistory
+    if ( ( ! ( GetState ( _Compiler_, ( COMPILE_MODE | ASM_MODE | LC_ARG_PARSING | LC_CFRTIL ) ) ) ) && ( ! GetState ( _CfrTil_, SOURCE_CODE_STARTED ) ) )
+        CfrTil_InitSourceCode_WithCurrentInputChar ( _CfrTil_, 0 ) ;
     _CfrTil_->SC_QuoteMode = true ;
     do
     {
@@ -552,11 +552,9 @@ _CfrTil_SingleQuote ( )
     byte c0, c1, c2 ;
     uint64 charLiteral = 0 ;
 
-    if ( ( ! Compiling ) || ( ! GetState ( _CfrTil_, SOURCE_CODE_STARTED ) ) ) CfrTil_InitSourceCode_WithCurrentInputChar ( _CfrTil_, 0 ) ; // must be here for wdiss and add addToHistory
+    if ( ( ! ( GetState ( _Compiler_, ( COMPILE_MODE | ASM_MODE | LC_ARG_PARSING | LC_CFRTIL ) ) ) ) && ( ! GetState ( _CfrTil_, SOURCE_CODE_STARTED ) ) )
+        CfrTil_InitSourceCode_WithCurrentInputChar ( _CfrTil_, 0 ) ;
     _CfrTil_->SC_QuoteMode = true ;
-    //if ( ! Compiling ) _CfrTil_InitSourceCode_WithName ( _CfrTil_, lexer->OriginalToken ) ;
-    // remember : _ReadLine_PeekIndexedChar ( rl, 0 ) is the *next* char to be read
-    //if ( sqWord && sqWord->Name[0] == '\'' && ( ( ( c1 = _ReadLine_PeekIndexedChar ( rl, 1 ) ) == '\'' ) || ( ( c0 = _ReadLine_PeekIndexedChar ( rl, 0 ) ) == '\\' ) ) )// parse a char type, eg. 'c' 
     c0 = _ReadLine_PeekOffsetChar ( rl, 0 ) ; // parse a char type, eg. 'c' 
     c1 = _ReadLine_PeekOffsetChar ( rl, 1 ) ;
     if ( sqWord && sqWord->Name[0] == '\'' && ( c1 == '\'' ) || ( c0 == '\\' ) ) // parse a char type, eg. 'c' 
@@ -614,7 +612,7 @@ _CfrTil_SingleQuote ( )
         if ( ( ! AtCommandLine ( rl ) ) && ( ! GetState ( _CfrTil_, SOURCE_CODE_STARTED ) ) ) CfrTil_InitSourceCode_WithName ( _CfrTil_, lexer->OriginalToken, 0 ) ;
         CfrTil_Token ( ) ;
     }
-    done : 
+done:
     _CfrTil_->SC_QuoteMode = false ;
 }
 
