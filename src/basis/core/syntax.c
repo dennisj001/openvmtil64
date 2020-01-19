@@ -218,7 +218,7 @@ _CfrTil_C_Infix_EqualOp ( block op )
         }
     }
     else wordr = _CfrTil_->PokeWord ;
-    d0 ( if ( Is_DebugModeOn ) Compiler_SC_WordList_Show ( "\nCfrTil_C_Infix_EqualOp : before op word", 0, 0 ) ) ;
+    d0 ( if ( Is_DebugModeOn ) _CfrTil_SC_WordList_Show ( "\nCfrTil_C_Infix_EqualOp : before op word", 0, 0 ) ) ;
     if ( op ) Block_Eval ( op ) ;
     else
     {

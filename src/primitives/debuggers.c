@@ -62,7 +62,6 @@ void
 DebugRuntimeBreakpoint ( )
 {
     Debugger * debugger = _Debugger_ ;
-    //debugger->SaveCpuState ( ) ;
     //if ( ( ! CompileMode ) )
     {
         if ( ! GetState ( debugger, ( DBG_BRK_INIT ) ) ) //|DBG_CONTINUE_MODE ) ) )
@@ -74,7 +73,7 @@ DebugRuntimeBreakpoint ( )
                 {
                     Debugger_On ( debugger ) ;
                     Debugger_SetupStepping ( debugger ) ;
-                    SetState_TrueFalse ( debugger, DBG_RUNTIME | DBG_RESTORE_REGS | DBG_ACTIVE | DBG_RUNTIME_BREAKPOINT | DEBUG_SHTL_OFF,
+                    SetState_TrueFalse ( debugger, DBG_RUNTIME | DBG_ACTIVE | DBG_RUNTIME_BREAKPOINT | DEBUG_SHTL_OFF,
                         DBG_INTERPRET_LOOP_DONE | DBG_PRE_DONE | DBG_CONTINUE | DBG_NEWLINE | DBG_PROMPT | DBG_INFO | DBG_MENU ) ;
                 }
             }

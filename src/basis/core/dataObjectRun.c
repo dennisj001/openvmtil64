@@ -422,7 +422,7 @@ CfrTil_Dot ( ) // .
     if ( ! cntx->Interpreter0->BaseObject )
     {
         SetState ( cntx, CONTEXT_PARSING_QID, true ) ;
-        d0 ( if ( Is_DebugModeOn ) Compiler_SC_WordList_Show ( "\nCfrTil_Dot", 0, 0 ) ) ;
+        d0 ( if ( Is_DebugModeOn ) _CfrTil_SC_WordList_Show ( "\nCfrTil_Dot", 0, 0 ) ) ;
         Word * word = Compiler_PreviousNonDebugWord ( 0 ) ; // 0 : rem: we just popped the WordStack above
         if ( word )
         {

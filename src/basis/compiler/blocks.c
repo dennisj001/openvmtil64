@@ -11,7 +11,7 @@ BI_Block_Copy ( BlockInfo * bi, byte* dstAddress, byte * srcAddress, int64 bsize
     int64 isize, left ;
     if ( dstAddress ) SetHere ( dstAddress, 1 ) ;
     bi->CopiedToStart = Here ;
-    CfrTil_AdjustDbgSourceCode_ScInUseFalse ( srcAddress ) ;
+    //CfrTil_AdjustDbgSourceCode_ScInUseFalse ( srcAddress ) ;
     for ( left = bsize ; ( left > 0 ) ; srcAddress += isize )
     {
         if ( optSetupFlag ) PeepHole_Optimize ( ) ;

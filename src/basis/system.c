@@ -403,7 +403,6 @@ _CfrTil_Source ( Word *word, int64 addToHistoryFlag )
         {
             _Printf ( ( byte* ) "%s <:> %s", name, "cfrTil compiled code block" ) ;
         }
-        // else CfrTil_Exception ( 0, QUIT ) ;
         if ( word->W_MorphismAttributes & INLINE ) _Printf ( ( byte* ) ", %s", "inline" ) ;
         if ( word->W_MorphismAttributes & IMMEDIATE ) _Printf ( ( byte* ) ", %s", "immediate" ) ;
         if ( word->W_MorphismAttributes & PREFIX ) _Printf ( ( byte* ) ", %s", "prefix" ) ;
@@ -413,7 +412,11 @@ _CfrTil_Source ( Word *word, int64 addToHistoryFlag )
         if ( word->S_WordData )
         {
             _Word_ShowSourceCode ( word ) ; // source code has newlines for multiline history
-            if ( aword && ( ! String_Equal ( word->Name, aword->Name ) ) ) _Word_ShowSourceCode ( aword ) ; // source code has newlines for multiline history
+            if ( aword && ( ! String_Equal ( word->Name, aword->Name ) ) ) 
+            {   
+                //_Context_->CurrentDisassemblyWord = aword ;
+                _Word_ShowSourceCode ( aword ) ; 
+            }
             if ( addToHistoryFlag ) _OpenVmTil_AddStringToHistoryList ( word->W_SourceCode ) ;
             if ( word->S_WordData->Filename ) _Printf ( ( byte* ) "\nSource code file location of %s : \"%s\" : %d.%d :: we are now at : %s", name, word->S_WordData->Filename, word->S_WordData->LineNumber, word->W_TokenEnd_ReadLineIndex, Context_IsInFile ( _Context_ ) ? Context_Location ( ) : ( byte* ) "command line" ) ;
             if ( ( word->W_LispAttributes & T_LC_DEFINE ) && ( ! ( word->W_LispAttributes & T_LISP_COMPILED_WORD ) ) ) _Printf ( ( byte* ) "\nLambda Calculus word : interpreted not compiled" ) ; // do nothing here

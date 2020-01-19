@@ -7,9 +7,10 @@ _Debugger_StepOneInstruction ( Debugger * debugger )
     debugger->SaveTOS = TOS ;
     debugger->SaveStackDepth = DataStack_Depth ( ) ;
     DefaultColors ; // nb. : so text output will be in default colors
+    //Set_DspReg_FromDebuggerDspReg ( ) ;
     ( ( VoidFunction ) debugger->StepInstructionBA->BA_Data ) ( ) ;
-    DebugColors ; 
-    Set_DataStackPointers_FromDebuggerDspReg ( ) ;
+    //Set_DataStackPointers_FromDebuggerDspReg ( ) ;
+    DebugColors ;
 }
 
 // Debugger_CompileOneInstruction ::
@@ -148,23 +149,25 @@ Debugger_CompileAndStepOneInstruction ( Debugger * debugger )
             }
             else
             {
-                Debugger_UdisOneInstruction ( debugger, debugger->DebugAddress, ( byte* ) "\r", ( byte* ) "" ) ;
+                //Debugger_UdisOneInstruction ( debugger, debugger->DebugAddress, ( byte* ) "\r", ( byte* ) "" ) ;
                 SetState ( debugger, DBG_STACK_OLD, true ) ;
                 debugger->CopyRSP = 0 ;
                 if ( GetState ( debugger, DBG_BRK_INIT ) ) SetState_TrueFalse ( debugger, DBG_INTERPRET_LOOP_DONE | DBG_STEPPED, DBG_ACTIVE | DBG_BRK_INIT | DBG_STEPPING ) ;
                 else SetState_TrueFalse ( debugger, DBG_INTERPRET_LOOP_DONE | DBG_STEPPED, DBG_ACTIVE | DBG_STEPPING ) ;
-                //if ( debugger->w_Word ) SetState ( debugger->w_Word, STEPPED, true ) ;
+                if ( debugger->w_Word ) SetState ( debugger->w_Word, STEPPED, true ) ;
                 debugger->DebugAddress = 0 ;
                 SetState ( debugger->cs_Cpu, CPU_SAVED, false ) ;
+                //Set_DataStackPointers_FromDebuggerDspReg ( ) ;
             }
             goto end ; // don't actually step a ret insn
         }
-        else if ( ( * debugger->DebugAddress == JMPI32 ) || ( * debugger->DebugAddress == CALLI32 ) || ( * debugger->DebugAddress == JMPI8 )  )
+        else if ( ( * debugger->DebugAddress == JMPI32 ) || ( * debugger->DebugAddress == CALLI32 ) || ( * debugger->DebugAddress == JMPI8 ) )
         {
             jcAddress = JumpCallInstructionAddress ( debugger->DebugAddress ) ;
 doJmpCall:
             word = Word_UnAlias ( Word_GetFromCodeAddress ( jcAddress ) ) ;
-            if ( word && ( word->W_MorphismAttributes & ( DEBUG_WORD|RT_STEPPING_DEBUG ) ) )
+            debugger->w_Word = word ;
+            if ( word && ( word->W_MorphismAttributes & ( DEBUG_WORD | RT_STEPPING_DEBUG ) ) )
             {
                 //debugger->w_Word = word ;
                 if ( ! GetState ( debugger, DBG_CONTINUE_MODE ) )
@@ -220,6 +223,7 @@ end:
         {
             // keep eip - instruction pointer - up to date ..
             debugger->cs_Cpu->Rip = ( uint64 * ) debugger->DebugAddress ;
+            _Dsp_ = debugger->cs_Cpu->R14d ;
             //Debugger_UdisOneInstruction ( debugger, debugger->DebugAddress, ( byte* ) "\r", ( byte* ) "" ) ;
         }
     }
@@ -258,7 +262,7 @@ Debugger_PreStartStepping ( Debugger * debugger )
                 interp->w_Word = word ;
                 DebugOff ;
                 SetState ( _Debugger_, DBG_INFIX_PREFIX, true ) ;
-                Interpreter_DoInfixOrPrefixWord (interp, word) ;
+                Interpreter_DoInfixOrPrefixWord ( interp, word ) ;
                 DebugOn ;
                 if ( ! ( __DEBUG_SETUP ( word, 0, debugger->DebugAddress, 1 ) ) ) return ;
             }
@@ -305,9 +309,9 @@ _Debugger_SetupStepping ( Debugger * debugger, Word * word, byte * address, byte
     }
     SetState_TrueFalse ( debugger, DBG_STEPPING, DBG_NEWLINE | DBG_PROMPT | DBG_INFO | DBG_MENU ) ;
     debugger->DebugAddress = address ;
-    debugger->w_Word = word ;
+    debugger->w_Word = Word_UnAlias ( word ) ;
 
-    SetState ( debugger->cs_Cpu, CPU_SAVED, false ) ;
+    if ( ! GetState ( debugger, ( DBG_BRK_INIT | DBG_RUNTIME_BREAKPOINT ) ) ) SetState ( debugger->cs_Cpu, CPU_SAVED, false ) ;
     SetState ( _CfrTil_->cs_Cpu, CPU_SAVED, false ) ;
     _Debugger_CpuState_CheckSave ( debugger ) ;
     _CfrTil_CpuState_CheckSave ( ) ;

@@ -251,13 +251,14 @@ Stack_Print_AValue ( uint64 * stackPointer, int64 i, byte * stackName, byte * bu
 {
     Word * word = 0 ;
     byte * string = 0, tsb [32], *ts = 0 ; // typeSignature
+    int64 tsl = 0 ;
     tsb[0] = 0 ;
     if ( isWordAlreadyFlag ) // 
     {
         word = ( Word* ) ( stackPointer [ i ] ) ;
         if ( word && word->Name )
         {
-            int64 tsl = Word_TypeSignatureLength ( word, 0 ) ;
+            tsl = Word_TypeSignatureLength ( word, 0 ) ;
             if ( tsl > 1 ) ts = Word_ExpandTypeLetterSignature ( word, 0 ) ;
             else ts = Word_TypeSignature ( word, tsb ) ;
         }
@@ -265,12 +266,18 @@ Stack_Print_AValue ( uint64 * stackPointer, int64 i, byte * stackName, byte * bu
     else word = Word_GetFromCodeAddress ( ( byte* ) ( stackPointer [ i ] ) ) ;
     if ( word )
     {
-        //if ( IS_NON_MORPHISM_TYPE ( word ) ) sprintf ( ( char* ) buffer, "< word : %s.%s : value = 0x%016lx > : %s", 
-        if ( word ) sprintf ( ( char* ) buffer, "< word : %s.%s : value = 0x%016lx > : type %s- %s",
-            word->ContainingNamespace ? word->ContainingNamespace->Name : ( byte* ) "<literal>", c_gd ( String_ConvertToBackSlash ( word->Name ) ),
-            ( uint64 ) word->S_Value, (IS_MORPHISM_TYPE ( word ) ? "signature " : ""), c_gd ( ts ) ) ;
-        else sprintf ( ( char* ) buffer, "< word : %s.%s : definition = 0x%016lx >",
-            word->ContainingNamespace ? word->ContainingNamespace->Name : ( byte* ) "<literal>", c_gd ( word->Name ), ( uint64 ) word->Definition ) ;
+        if ( IS_NON_MORPHISM_TYPE ( word ) && (!tsl) ) 
+        {
+            sprintf ( ( char* ) buffer, "< word : %s.%s : value = 0x%016lx >",
+                word->ContainingNamespace ? word->ContainingNamespace->Name : ( byte* ) "<literal>", c_gd ( String_ConvertToBackSlash ( word->Name ) ),
+                ( uint64 ) word->S_Value ) ;
+        }
+        else 
+        {
+            sprintf ( ( char* ) buffer, "< word : %s.%s : code = 0x%016lx > : type %s- %s",
+                word->ContainingNamespace->Name, c_gd ( word->Name ), ( uint64 ) word->Definition,
+               (tsl ? "signature " : ""), c_gd ( ts ) ) ;
+        }
     }
     else string = String_CheckForAtAdddress ( ( byte* ) ( ( byte* ) ( stackPointer[i] ) ) ) ;
     _Printf ( ( byte* ) "\n  %s   [ %3ld ] < " UINT_FRMT " > = " UINT_FRMT "\t%s",

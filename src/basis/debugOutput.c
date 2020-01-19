@@ -126,11 +126,11 @@ done:
 void
 _Debugger_ShowEffects ( Debugger * debugger, Word * word, Boolean stepFlag, Boolean force )
 {
-    debugger->w_Word = word ;
-    uint64* dsp = _Dsp_ ;
+    debugger->w_Word = Word_UnAlias ( word ) ;
+    uint64* dsp = GetState ( debugger, DBG_STEPPING ) ? (_Dsp_ = debugger->cs_Cpu->R14d) : _Dsp_ ;
     if ( ! dsp ) CfrTil_Exception ( STACK_ERROR, 0, QUIT ) ;
     //if ( Is_DebugOn && ( force || ( ( stepFlag ) || ( word ) && ( word != debugger->LastShowWord ) || ( debugger->SC_Index != _Lexer_->SC_Index ) ) ) )
-    if ( Is_DebugOn && ( force || ( stepFlag ) || ( Here > debugger->PreHere ) ) ) //|| ( debugger->SC_Index && ( debugger->SC_Index != _Lexer_->SC_Index ) ) )
+    if ( Is_DebugOn && ( force || ( stepFlag ) || ( word ) && ( word != debugger->LastShowWord ) || (debugger->PreHere && ( Here > debugger->PreHere )) ) ) //|| ( debugger->SC_Index && ( debugger->SC_Index != _Lexer_->SC_Index ) ) )
     {
         DebugColors ;
         if ( word && ( word->W_ObjectAttributes & OBJECT_FIELD ) && ( ! ( word->W_MorphismAttributes & DOT ) ) )
@@ -441,7 +441,7 @@ Debugger_ShowInfo ( Debugger * debugger, byte * prompt, int64 signal )
 void
 CfrTil_ShowInfo ( Word * word, byte * prompt, int64 signal )
 {
-    _Debugger_->w_Word = word ;
+    _Debugger_->w_Word = Word_UnAlias ( word ) ;
     _Debugger_ShowInfo ( _Debugger_, prompt, signal, 1 ) ;
 }
 
@@ -593,7 +593,7 @@ LO_Debug_ExtraShow ( int64 showStackFlag, int64 verbosity, int64 wordList, byte 
             vsprintf ( ( char* ) out, ( char* ) format, args ) ;
             va_end ( args ) ;
             DebugColors ;
-            if ( wordList ) Compiler_SC_WordList_Show ( ( byte* ) out, 0, 0 ) ;
+            if ( wordList ) _CfrTil_SC_WordList_Show ( ( byte* ) out, 0, 0 ) ;
             else
             {
                 printf ( "%s", out ) ;

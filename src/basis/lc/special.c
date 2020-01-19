@@ -336,8 +336,6 @@ _LO_Colon ( ListObject * lfirst )
 }
 
 // compile cfrTil code in Lisp/Scheme
-// source code is a problem here
-#if 1
 ListObject *
 _LO_CfrTil ( ListObject * lfirst )
 {
@@ -416,83 +414,3 @@ _LO_CfrTil ( ListObject * lfirst )
     return nil ;
 }
 
-#else
-ListObject *
-_LO_CfrTil ( ListObject * lfirst )
-{
-    Context * cntx = _Context_ ;
-    Compiler * compiler = cntx->Compiler0 ;
-    LambdaCalculus * lc = 0 ;
-    ListObject *ldata, *word = 0, *word1 ;
-    if ( _LC_ )
-    {
-        if ( GetState ( _LC_, LC_READ ) )
-        {
-            SetState ( _LC_, LC_READ_MACRO_OFF, true ) ;
-            return 0 ;
-        }
-        SetState ( _LC_, LC_INTERP_MODE, true ) ;
-        lc = _LC_ ;
-    }
-    _CfrTil_Namespace_NotUsing ( ( byte * ) "Lisp" ) ; // nb. don't use Lisp words when compiling cfrTil
-    SetState ( compiler, LC_CFRTIL, true ) ;
-    SetState ( compiler, LISP_MODE, false ) ;
-    for ( ldata = _LO_Next ( lfirst ) ; ldata ; ldata = _LO_Next ( ldata ) )
-    {
-        Compiler_SCA_Word_SetCodingHere_And_ClearPreviousUse ( ldata->CfrTilWord, 0 ) ;
-        if ( ldata->W_LispAttributes & ( LIST | LIST_NODE ) )
-        {
-            _CfrTil_Parse_LocalsAndStackVariables ( 1, 1, ldata, compiler->LocalsCompilingNamespacesStack, 0 ) ;
-        }
-        else if ( String_Equal ( ldata->Name, ( byte * ) "tick" ) || String_Equal ( ldata->Name, ( byte * ) "'" ) )
-        {
-            ldata = _LO_Next ( ldata ) ;
-            Lexer_ParseObject ( _Lexer_, ldata->Name ) ;
-            DataStack_Push ( ( int64 ) _Lexer_->Literal ) ;
-        }
-        else if ( String_Equal ( ldata->Name, ( byte * ) "s:" ) )
-        {
-            CfrTil_DbgSourceCodeOn ( ) ;
-            word = _LO_Colon ( ldata ) ;
-            ldata = _LO_Next ( ldata ) ; // bump ldata to account for name - skip name
-        }
-        else if ( String_Equal ( ldata->Name, ( byte * ) ":" ) )
-        {
-            word = _LO_Colon ( ldata ) ;
-            ldata = _LO_Next ( ldata ) ; // bump ldata to account for name - skip name
-        }
-        else if ( String_Equal ( ldata->Name, ( byte * ) ";s" ) && ( ! GetState ( cntx, C_SYNTAX ) ) )
-        {
-            CfrTil_DbgSourceCodeOff ( ) ;
-            _LO_Semi ( word ) ;
-        }
-        else if ( String_Equal ( ldata->Name, ( byte * ) ";" ) && ( ! GetState ( cntx, C_SYNTAX ) ) )
-        {
-            ListObject *ldata1 = _LO_Next ( ldata ) ; // bump ldata to account for name
-            word->W_SourceCode = String_New_SourceCode ( _CfrTil_->SC_Buffer ) ;
-            if ( ldata1 && String_Equal ( ldata1->Name, ( byte * ) ":" ) )
-            {
-                CfrTil_InitSourceCode_WithName ( _CfrTil_, ( byte* ) "(", 1 ) ;
-            }
-            _LO_Semi ( word ) ;
-            word->W_SourceCode = lc->LC_SourceCode ;
-        }
-        else //if ( ldata )
-        {
-            word1 = _Interpreter_TokenToWord ( cntx->Interpreter0, ldata->Name, ldata->W_RL_Index, ldata->W_SC_Index ) ;
-            Interpreter_DoWord ( cntx->Interpreter0, word1, ldata->W_RL_Index, ldata->W_SC_Index ) ;
-        }
-    }
-    SetState ( compiler, LC_CFRTIL, false ) ;
-    if ( lc )
-    {
-        _LC_ = lc ;
-        SetState ( _LC_, LC_INTERP_DONE, true ) ;
-        SetState ( _LC_, LC_READ_MACRO_OFF, false ) ;
-        //LC_RestoreStack ( ) ;
-    }
-    Namespace_DoNamespace_Name ( ( byte * ) "Lisp" ) ;
-    return nil ;
-}
-
-#endif        

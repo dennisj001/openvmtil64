@@ -124,7 +124,7 @@ Interpret_PrefixFunction_OrUntil_RParen ( Interpreter * interp, Word * prefixFun
             }
             else break ;
         }
-        d0 ( if ( Is_DebugModeOn ) Compiler_SC_WordList_Show ( "\n_Interpret_PrefixFunction_Until_RParen", 0, 0 ) ) ;
+        d0 ( if ( Is_DebugModeOn ) _CfrTil_SC_WordList_Show ( "\n_Interpret_PrefixFunction_Until_RParen", 0, 0 ) ) ;
         SetState ( compiler, PREFIX_ARG_PARSING, true ) ;
         if ( prefixFunction->WNumberOfPrefixedArgs )
         {

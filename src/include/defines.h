@@ -478,7 +478,7 @@
 #define DBG_MENU ( (uint64) 1 << 1 ) 
 #define DBG_STEPPING ( (uint64) 1 << 2 ) 
 #define DGB_SAVE_DSP ( (uint64) 1 << 3 ) 
-#define DBG_RESTORE_REGS ( (uint64) 1 << 4 ) 
+//#define DBG_RESTORE_REGS ( (uint64) 1 << 4 ) 
 #define DBG_CAN_STEP ( (uint64) 1 << 5 ) 
 #define DBG_NEWLINE ( (uint64) 1 << 6 )
 #define DBG_PROMPT ( (uint64) 1 << 7 )

@@ -23,12 +23,14 @@ _Debugger_InterpreterLoop ( Debugger * debugger )
     {
         _Context_->CurrentTokenWord = 0 ;
         _Context_->CurrentEvalWord = 0 ;
+#if 0        
         if ( ! Stack_Depth ( debugger->ReturnStack ) )
         {
             if ( GetState ( _Lexer_, LEXER_DONE | LEXER_END_OF_LINE ) ) SetState ( _Interpreter_, END_OF_LINE, true ) ;
             Debugger_Off ( debugger, 1 ) ;
             siglongjmp ( _Context_->JmpBuf0, 1 ) ; // in Debugger_PreSetup
         }
+#endif        
     }
 }
 
@@ -36,7 +38,7 @@ Boolean
 _Debugger_PreSetup ( Debugger * debugger, Word * word, byte * token, byte * address, Boolean forceFlag )
 {
     if ( ! word ) word = Context_CurrentWord ( ) ;
-    debugger->w_Word = word ;
+    debugger->w_Word = Word_UnAlias ( word ) ;
     if ( Is_DebugModeOn && Is_DebugShowOn ) //|| forceFlag )
     {
         if ( forceFlag || GetState ( debugger, DBG_EVAL_AUTO_MODE ) || ( ! GetState ( debugger, DBG_AUTO_MODE | DBG_STEPPING ) ) )
@@ -47,12 +49,12 @@ _Debugger_PreSetup ( Debugger * debugger, Word * word, byte * token, byte * addr
             {
                 if ( forceFlag || ( word && word->Name[0] ) || token )
                 {
-                    debugger->w_Word = word ;
                     if ( word->W_AliasOf )
                     {
                         debugger->w_Alias = word ;
                         debugger->w_AliasOf = word->W_AliasOf ;
                     }
+                    //debugger->w_Word = Word_UnAlias ( word ) ;
                     if ( forceFlag ) debugger->LastShowWord = 0 ;
                     SetState ( debugger, DBG_COMPILE_MODE, CompileMode ) ;
                     SetState_TrueFalse ( debugger, DBG_ACTIVE | DBG_INFO | DBG_PROMPT, DBG_BRK_INIT | DBG_CONTINUE_MODE | DBG_INTERPRET_LOOP_DONE | DBG_PRE_DONE | DBG_CONTINUE | DBG_STEPPING | DBG_STEPPED ) ;
@@ -136,49 +138,6 @@ Debugger_Off ( Debugger * debugger, int64 debugOffFlag )
     if ( debugOffFlag ) DebugOff ;
 }
 
-byte *
-Debugger_GetDbgAddressFromRsp ( Debugger * debugger, Cpu * cpu )
-{
-    Word * word, *lastWord = 0, *currentlyRunning = Word_UnAlias ( _Context_->CurrentlyRunningWord ) ;
-    byte * addr, *retAddr ;
-    int64 i, d ;
-    dllist * retStackList = List_New ( COMPILER_TEMP ) ;
-    if ( _Q_->Verbosity > 1 ) CfrTil_PrintReturnStack ( ) ;
-    for ( i = 0 ; i < 255 ; i ++ ) // 255 sizeof ReturnStack
-    {
-        addr = ( ( byte* ) cpu->Rsp[i] ) ;
-        word = Word_UnAlias ( Word_GetFromCodeAddress ( addr ) ) ;
-        if ( word )
-        {
-            _List_PushNew_1Value ( retStackList, COMPILER_TEMP, 0, cpu->Rsp[i] ) ;
-            if ( word == currentlyRunning ) break ;
-        }
-    }
-    d = List_Depth ( retStackList ) ;
-    if ( d > 1 )
-    {
-        Stack_Init ( debugger->ReturnStack ) ;
-        for ( i = 0 ; i < d ; i ++ )
-        {
-            retAddr = ( byte * ) List_Pop_1Value ( retStackList ) ; //List_Pop ( retStackList ) ;
-            if ( retAddr )
-            {
-                word = Word_UnAlias ( Word_GetFromCodeAddress ( retAddr ) ) ;
-                if ( word && ( word == lastWord ) ) continue ;
-                lastWord = word ;
-            }
-            Stack_Push ( debugger->ReturnStack, ( uint64 ) retAddr ) ;
-        }
-        if ( _Q_->Verbosity > 1 ) Stack_Print ( debugger->ReturnStack, ( byte* ) "debugger->ReturnStack ", 0 ) ;
-        //debugger->DebugAddress = ( byte* ) _Stack_Pick ( debugger->ReturnStack, ( d > 2 ) ? 2 : ( d - 1 ) ) ; //Stack_Top ( debugger->ReturnStack ) ;
-        debugger->DebugAddress = ( byte* ) _Stack_Pick ( debugger->ReturnStack, 2 ) ; //Stack_Top ( debugger->ReturnStack ) ;
-        Stack_Pop ( debugger->ReturnStack ) ; // don't return to the current function on first RET
-    }
-    else debugger->DebugAddress = ( byte* ) cpu->Rsp[0] ;
-    debugger->w_Word = Word_UnAlias ( Word_GetFromCodeAddress ( debugger->DebugAddress ) ) ; // 21 : code size back to <dbg>
-    return debugger->DebugAddress ;
-}
-
 void
 _Debugger_Init ( Debugger * debugger, Cpu * cpu, Word * word, byte * address )
 {
@@ -236,12 +195,6 @@ _Debugger_Init ( Debugger * debugger, Cpu * cpu, Word * word, byte * address )
 }
 
 void
-Debugger_Set_StartHere ( Debugger * debugger )
-{
-    debugger->StartHere = Here ;
-}
-
-void
 Debugger_On ( Debugger * debugger )
 {
     _Debugger_Init ( debugger, debugger->cs_Cpu, 0, 0 ) ;
@@ -256,6 +209,52 @@ Debugger_On ( Debugger * debugger )
 }
 
 byte *
+Debugger_GetDbgAddressFromRsp ( Debugger * debugger, Cpu * cpu )
+{
+    Word * word, *lastWord = 0, *currentlyRunning = Word_UnAlias ( _Context_->CurrentlyRunningWord ) ;
+    byte * addr, *retAddr ;
+    int64 i, d ;
+    dllist * retStackList = List_New ( COMPILER_TEMP ) ;
+    //if ( _Q_->Verbosity > 1 ) 
+    CfrTil_PrintReturnStack ( ) ;
+    for ( i = 0 ; i < 255 ; i ++ ) // 255 sizeof ReturnStack
+    {
+        addr = ( ( byte* ) cpu->Rsp[i] ) ;
+        word = Word_UnAlias ( Word_GetFromCodeAddress ( addr ) ) ;
+        if ( word )
+        {
+            _List_PushNew_1Value ( retStackList, COMPILER_TEMP, 0, cpu->Rsp[i] ) ;
+            if ( word == currentlyRunning ) break ;
+        }
+    }
+    d = List_Depth ( retStackList ) ;
+    if ( d > 1 )
+    {
+        Stack_Init ( debugger->ReturnStack ) ;
+        for ( i = 0 ; i < d ; i ++ )
+        {
+            retAddr = ( byte * ) List_Pop_1Value ( retStackList ) ;
+            if ( retAddr )
+            {
+                word = Word_UnAlias ( Word_GetFromCodeAddress ( retAddr ) ) ;
+                if ( word && ( word == lastWord ) ) continue ;
+                lastWord = word ;
+            }
+            Stack_Push ( debugger->ReturnStack, ( uint64 ) retAddr ) ;
+        }
+        if ( _Q_->Verbosity > 1 ) Stack_Print ( debugger->ReturnStack, ( byte* ) "debugger->ReturnStack ", 0 ) ;
+        //debugger->DebugAddress = ( byte* ) _Stack_Pick ( debugger->ReturnStack, ( d > 2 ) ? 2 : ( d - 1 ) ) ; //Stack_Top ( debugger->ReturnStack ) ;
+        debugger->DebugAddress = ( byte* ) _Stack_Pick ( debugger->ReturnStack, 2 ) ; 
+        for ( i = 0 ; i < 3 ; i++ ) Stack_Pop ( debugger->ReturnStack ) ; 
+    }
+    else debugger->DebugAddress = ( byte* ) cpu->Rsp[0] ;
+    debugger->w_Word = Word_UnAlias ( Word_GetFromCodeAddress ( debugger->DebugAddress ) ) ; // 21 : code size back to <dbg>
+    //if ( _Q_->Verbosity > 1 ) 
+    CfrTil_PrintReturnStack ( ) ;
+    return debugger->DebugAddress ;
+}
+
+byte *
 Debugger_GetStateString ( Debugger * debugger )
 {
     byte * buffer = Buffer_Data ( _CfrTil_->DebugB ) ;
@@ -267,6 +266,12 @@ Debugger_GetStateString ( Debugger * debugger )
     buffer = String_New ( ( byte* ) buffer, TEMPORARY ) ;
 
     return buffer ;
+}
+
+void
+Debugger_Set_StartHere ( Debugger * debugger )
+{
+    debugger->StartHere = Here ;
 }
 
 void
@@ -676,13 +681,13 @@ _CfrTil_DebugContinue ( int64 autoFlagOff )
 void
 Debugger_WordList_Show_All ( Debugger * debugger )
 {
-    Compiler_SC_WordList_Show ( 0, 0, 0 ) ;
+    _CfrTil_SC_WordList_Show ( 0, 0, 0 ) ; 
 }
 
 void
 Debugger_WordList_Show_InUse ( Debugger * debugger )
 {
-    Compiler_SC_WordList_Show ( 0, 1, 0 ) ;
+    _CfrTil_SC_WordList_Show ( 0, 1, 0 ) ;
 }
 
 void

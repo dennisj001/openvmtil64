@@ -97,17 +97,20 @@ Interpreter_C_PREFIX_RTL_ARGS_Word ( Word * word )
 Boolean
 Interpreter_DoInfixOrPrefixWord ( Interpreter * interp, Word * word )
 {
-    if ( word )
+    if ( word ) //IS_MORPHISM_TYPE ( word) )
     {
         Context * cntx = _Context_ ;
         interp->w_Word = word ;
         if ( ( word->W_TypeAttributes == WT_INFIXABLE ) && ( GetState ( cntx, INFIX_MODE ) ) ) Interpreter_DoInfixWord ( interp, word ) ;
             // nb. Interpreter must be in INFIX_MODE because it is effective for more than one word
-        else if ( ( word->W_TypeAttributes == WT_PREFIX ) || Lexer_IsWordPrefixing ( interp->Lexer0, word ) ) _Interpreter_DoPrefixWord ( cntx, interp, word ) ; //, tsrli, scwi ) ;
+        else if ( ( word->W_TypeAttributes == WT_PREFIX ) || Lexer_IsWordPrefixing ( interp->Lexer0, word ) )
+        //else if ( Lexer_IsWordPrefixing ( interp->Lexer0, word ) &&  ( ( word->W_TypeAttributes == WT_PREFIX ) || GetState ( _Context_, C_SYNTAX ) ) )
+            _Interpreter_DoPrefixWord ( cntx, interp, word ) ; //, tsrli, scwi ) ;
         else if ( word->W_TypeAttributes == WT_C_PREFIX_RTL_ARGS ) Interpreter_C_PREFIX_RTL_ARGS_Word ( word ) ;
         else return false ;
         return true ;
     }
+    return false ;
 }
 // four types of words related to syntax
 // 1. regular rpn - reverse polish notation
@@ -122,7 +125,6 @@ Interpreter_DoWord ( Interpreter * interp, Word * word, int64 tsrli, int64 scwi 
     if ( word )
     {
         Word_SetTsrliScwi ( word, tsrli, scwi ) ; // some of this maybe too much
-        //DEBUG_SETUP ( word ) ;
         interp->w_Word = word ;
         if ( ! Interpreter_DoInfixOrPrefixWord ( interp, word ) ) Interpreter_DoWord_Default ( interp, word, tsrli, scwi ) ; //  case WT_POSTFIX: case WT_INFIXABLE: // cf. also _Interpreter_SetupFor_MorphismWord
         if ( ! ( word->W_MorphismAttributes & DEBUG_WORD ) ) interp->LastWord = word ;
@@ -147,7 +149,7 @@ Boolean
 Word_IsSyntactic ( Word * word )
 {
     if ( ( ! GetState ( _Debugger_, DBG_INFIX_PREFIX ) )
-        && ( ( word->W_TypeAttributes & ( WT_PREFIX | WT_C_PREFIX_RTL_ARGS ) ) || Lexer_IsWordPrefixing ( _Lexer_, word )
+        && ( ( word->W_TypeAttributes & ( WT_PREFIX | WT_C_PREFIX_RTL_ARGS ) ) && Lexer_IsWordPrefixing ( _Lexer_, word )
         || ( ( word->W_TypeAttributes == WT_INFIXABLE ) && ( GetState ( _Context_, INFIX_MODE ) ) ) ) )
         return true ;
     else return false ;

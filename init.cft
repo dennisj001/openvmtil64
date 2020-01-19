@@ -244,22 +244,24 @@ System
 : pel  "=============================" ps ;
 : _source ( addToHistoryFlag  pword )
     { addToHistoryFlag @ } { pword @ sourceAdd } { pword @ sourceDontAdd } ifElse 
-;;
+;
 : _wdiss ( addToHistoryFlag pword ) 
     nl pel 
-    _source ( addToHistoryFlag @ pword @ ) nl pdl 
-    //pword @ setSourceCodeWord
+    addToHistoryFlag @ pword @ _source 
+    nl pdl 
+    pword @ setSourceCodeWord
     pword @ wdis 
     { pword @ } 
     { nl "Word :" _ps hex pword @ p ":: Compiled at :" ps pword @ definition p decimal } if
     nl pel decimal 
     nl "::> 'wdiss' was called at" _ps location "<::" ps nl
-;;
-: wdiss ( pword ) _wdiss ( 0 pword @ ) ; //debugWord      // don't add wdiss words to history list
-: wdissl ( pword ) logOn _wdiss ( 0 pword @ ) logOff ; //debugWord      // don't add wdiss words to history list
+;
+: wdiss ( pword ) 0 pword @ _wdiss ; //debugWord      // don't add wdiss words to history list
+: wdissl ( pword ) logOn 0 pword @ _wdiss logOff ; //debugWord      // don't add wdiss words to history list
 'wi ' wdiss find alias
-: pwdiss token _find wdiss ;
+: pwdiss token _find wdiss ; // nb. a prefix function
 'pwi 'pwdiss find alias
+//pwi _wdiss
 : fload ftoken include ;
 : sys mem namespaces words stack using in ; 
 'aw 'allWords find alias

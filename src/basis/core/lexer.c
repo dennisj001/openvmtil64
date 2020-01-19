@@ -250,6 +250,7 @@ Lexer_IsNextWordLeftParen ( Lexer * lexer )
 Boolean
 Lexer_IsWordPrefixing ( Lexer * lexer, Word * word )
 {
+#if 1   
     if ( word->Name[0] == '(' ) return false ;
     if ( GetState ( _Context_, LC_INTERPRET ) ) return true ;
     else if ( ( GetState ( _Context_, PREFIX_MODE ) ) && ( ! ( word->W_MorphismAttributes & ( CATEGORY_OP_OPEQUAL | CATEGORY_OP_EQUAL | KEYWORD ) ) )
@@ -258,6 +259,9 @@ Lexer_IsWordPrefixing ( Lexer * lexer, Word * word )
         return Lexer_IsNextWordLeftParen ( lexer ) ;
     }
     else return false ;
+#else
+    return Lexer_IsNextWordLeftParen ( lexer ) ;
+#endif    
 }
 
 byte *

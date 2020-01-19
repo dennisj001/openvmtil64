@@ -52,14 +52,14 @@ sp
 : moe ( n m -- TOS ) n <<= m n ; // infix variables are rvalues
 ' moe find wdiss
 2 6 moe 128 _assert 1 16 moe 65536 _assert 
-: moe ( n m -- TOS ) n >>= m n ;
-' moe find wdiss
+: moe ( n m -- TOS ) n >>= m n ; 
+sp ' moe find wdiss sp
 128 6 moe 2 _assert 65536 16 moe 1 _assert 
 infixOff
-
+sp
 c_syntaxOn
-void cmoe ( n m -- TOS ) { n <<= m ; p (n) ; return n ; }  cmoe ( 2 6 ) ; sp ; 128 _assert0 cmoe ( 1 16 ) ; 65536 _assert "\nshould show 128 65536\n" ps sp
-void cmoe ( n m -- TOS ) { n >>= m ; p (n) ; return n ; } cmoe ( 128 6 ) ; 2 _assert cmoe ( 65536 16 ) ; 1 _assert "\nshould show 2 1\n" ps sp
+void cmoe ( n m ) { n <<= m ; p (n) ; return n ; }  cmoe ( 2 6 ) ; sp ; _assert0 ( 128 ) ; cmoe ( 1 16 ) ; _assert ( 65536 ) ; ps ("\nshould show 128 65536\n") sp
+void cmoe ( n m ) { n >>= m ; n p ; return n ; } cmoe ( 128 6 ) ; _assert (2) ; cmoe ( 65536 16 ) ; _assert (1) ; "\nshould show 2 1\n" ps sp
 c_syntaxOff
 
 sp
