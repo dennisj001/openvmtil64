@@ -75,12 +75,18 @@ User
 'ts 'showTypeWordStack find alias
 's 'stack find alias
 : p space intPrint ;
+Root 
 'dbgOnVar var 
 'dbOn 'dbgOnVar find alias
-: dbgOn dbgOnVar 1 = ;
-: dbgOff dbgOnVar 0 = ;
+: dbgOn dbgOnVar 1 = ; immediate
+: dbgOff dbgOnVar 0 = ; immediate
 : Is_DebugOn dbgOnVar @ ;
+
+// === controls ===
+Root 
 dbgOff
+//dbgOn 
+
 User
 #if Is_DebugOn
 : mp mem pause ;
@@ -261,7 +267,7 @@ System
 'wi ' wdiss find alias
 : pwdiss token _find wdiss ; // nb. a prefix function
 'pwi 'pwdiss find alias
-//verbosity 2 = d: pwi _wdiss
+//pwi _wdiss
 : fload ftoken include ;
 : sys mem namespaces words stack using in ; 
 'aw 'allWords find alias
@@ -275,26 +281,23 @@ System
 "ahOff" ' addToHistoryOff find alias
 : adps ( s ) alertColors s @ ps defaultColors ;
 : ddps ( s ) debugColors s @ ps defaultColors ;
-//dbgOnVar 1 = 
-#if Is_DebugOn
-dscOn //verbosity 3 =
-#endif
-'dbgTest 0 const
-#if dbgTest
+//#if Is_DebugOn
+dscOn 
 //verbosity 2 =
-: debugTest3 ( n ) n @ 1 2 + + p <dbg> stack ;
-//: debugTest3 1 2 + p <dbg> stack ;
-' debugTest3 find wdiss
-: debugTest2 1 2 + p 4 debugTest3 ;
+//: debugTest3 ( n ) n @ 1 2 + + p <dbg> stack ;
+: debugTest3 1 2 + p <dbg> stack ;
+//' debugTest3 find wdiss
+: debugTest2 1 2 + p debugTest3 ;
 : debugTest1 1 2 + p debugTest2 ;
 : debugTest 1 2 + p debugTest1 ;
-: _assert1 ( n m str ) { n @ m @ != } { str @ ? str @ ps : drop "error" ps _info stack _pause } { debugTest } ifElse ; 
-#else
+: _assert1dbg ( n m str ) { n @ m @ != } { str @ ? str @ ps : drop "error" ps _info stack _pause } { debugTest } ifElse ; 
+: _assert1 ( n m str ) { n @ m @ != } { nl location hex n @ p "!=" ps m @ p "<:" ps "Error!" adps _info _pause } { str @ ps " : ok\n" ps nl } ifElse ;
+//#else
 //d: : _assert1 ( n m str ) { n @ m @ != } { <dbg> nl location hex n @ p "!=" ps m @ p "<:" ps "Error!" adps _info _pause } { <dbg> str @ ps " : ok\n" ps nl } ifElse ;
 : _assert1 ( n m str ) { n @ m @ != } { nl location hex n @ p "!=" ps m @ p "<:" ps "Error!" adps _info _pause } { str @ ps " : ok\n" ps nl } ifElse ;
 //: _assert1 ( n m str ) { n @ m @ != } { str @ ? str @ ps : drop "error" ps _info stack _pause } if ; 
 //: _assert1 ( n m str ) { n @ m @ != } { str @ ps "error" ps _info _pause } if ;
-#endif
+//#endif
 : ctloc do> locationPush does> locationPrint <do ; immediate // compile time location
 : _assert0 ( n m ) { n @ m @ != } { nl location nl hex n @ p "!=" ps m @ p "<:" ps "Error!" adps _info _pause } { } ifElse ; //{ str @ ps " : ok\n" ps nl } ifElse ; // no "ok" with this word
 : _assert ( n m ) nl  nl "_assert ::" ps { n @ m @ != } { n @ p "!=" ps m @ p "<:" ps "Error!" adps _info _pause } { " ok\n" ps nl } ifElse ;
@@ -396,7 +399,8 @@ lispOff
 // === controls ===
 Root 
 dbgOff
-dbgOn 
+//dbgOn 
+
 'todo 0 const  
 'doX64 1 const
 'doTX64 1 const
@@ -404,8 +408,9 @@ dbgOn
 'doScript2 1 const
 '_doDemo 0 const    
 // === controls ===
-
+//dbgOn
 #if Is_DebugOn 
+: testAssertDbg ( n ) n @ 2 + dup p 4 "tad" _assert1dbg ; 2 d: testAssertDbg
 
 #if todo
 : _TODO ( str ) TODO ( str @ ) ;;
@@ -452,5 +457,5 @@ rtw
 2 30 powReg dup p  1073741824 _assert 
 'powReg find wdiss
 #endif
-
+//: hi ( n m ) n @ m @ + p ; d: 2 3 hi s
 2 + 7 assertStkChk // stack checking 

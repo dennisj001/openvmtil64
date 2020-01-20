@@ -104,7 +104,12 @@ using
     this.Category 12 =
     this.Three 3 = 
     this.Prototype this.Three @ =
+//dbgOn
+#if Is_DebugOn
+    this.Prototype @ dup p 3 "init_assert1" _assert1dbg 
+#else
     this.Prototype @ dup p 3 "init_assert1" assert 
+#endif
     this.Prototype @ p 
     this.Sum 0 =
     this.Four 4 = 
@@ -148,7 +153,12 @@ using
     this.Category @ dup 12 "\nCategory should be 12 : assert10 =" assert p //_pause // 12
 ;
 ' init find wdiss 
+#if Is_DebugOn
+verbosity 2 =
+"testClone" DLListClone d: new 
+#else
 "testClone" DLListClone new 
+#endif
 "\nthis = " ps this hex p //pause
 
 testClone size @ dump

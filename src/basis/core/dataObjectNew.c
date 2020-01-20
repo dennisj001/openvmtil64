@@ -143,18 +143,15 @@ _Class_Object_Init ( Word * word, Namespace * ins )
     }
     while ( ns ) ;
     int64 i ;
-    //SetState ( _Debugger_, DEBUG_SHTL_OFF, true ) ;
-    //DebugShow_Off ;
     for ( i = Stack_Depth ( nsstack ) ; i > 0 ; i -- )
     {
         Word * initWord = ( Word* ) _Stack_Pop ( nsstack ) ;
         DataStack_Push ( ( int64 ) word->W_Value ) ;
-        Word_Run ( initWord ) ;
+        Word_Eval ( initWord ) ;
     }
     SetState ( _Debugger_, DEBUG_SHTL_OFF, false ) ;
     word->TypeNamespace = ins ;
     if ( ins->W_ObjectAttributes & STRUCT ) word->W_ObjectAttributes |= STRUCT ;
-    //DebugShow_On ;
 }
 
 // class object new

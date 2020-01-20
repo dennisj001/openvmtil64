@@ -104,7 +104,7 @@ Interpreter_DoInfixOrPrefixWord ( Interpreter * interp, Word * word )
         if ( ( word->W_TypeAttributes == WT_INFIXABLE ) && ( GetState ( cntx, INFIX_MODE ) ) ) Interpreter_DoInfixWord ( interp, word ) ;
             // nb. Interpreter must be in INFIX_MODE because it is effective for more than one word
         else if ( ( word->W_TypeAttributes == WT_PREFIX ) || Lexer_IsWordPrefixing ( interp->Lexer0, word ) )
-        //else if ( Lexer_IsWordPrefixing ( interp->Lexer0, word ) &&  ( ( word->W_TypeAttributes == WT_PREFIX ) || GetState ( _Context_, C_SYNTAX ) ) )
+            //else if ( Lexer_IsWordPrefixing ( interp->Lexer0, word ) &&  ( ( word->W_TypeAttributes == WT_PREFIX ) || GetState ( _Context_, C_SYNTAX ) ) )
             _Interpreter_DoPrefixWord ( cntx, interp, word ) ; //, tsrli, scwi ) ;
         else if ( word->W_TypeAttributes == WT_C_PREFIX_RTL_ARGS ) Interpreter_C_PREFIX_RTL_ARGS_Word ( word ) ;
         else return false ;

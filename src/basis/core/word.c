@@ -9,8 +9,8 @@ Word_Run ( Word * word )
         // keep track in the word itself where the machine code is to go, if this word is compiled or causes compiling code - used for optimization
         if ( ( GetState ( _Compiler_, ( COMPILE_MODE | ASM_MODE ) ) ) ) Word_SetCodingAndSourceCoding ( word, Here ) ; // if we change it later (eg. in lambda calculus) we must change it there because the rest of the compiler depends on this
         _Context_->CurrentlyRunningWord = word ;
-        word = _Context_->CurrentlyRunningWord ;// _Context_->CurrentlyRunningWord (= 0) may have been modified by debugger //word->Definition ) ;
-        Block_Eval ( word->Definition ) ; 
+        word = _Context_->CurrentlyRunningWord ; // _Context_->CurrentlyRunningWord (= 0) may have been modified by debugger //word->Definition ) ;
+        Block_Eval ( word->Definition ) ;
         //_DEBUG_SHOW ( word, 0 ) ;
         _Context_->LastRunWord = word ;
         _Context_->CurrentlyRunningWord = 0 ;
@@ -22,15 +22,18 @@ Word_Eval ( Word * word )
 {
     if ( word )
     {
-        _Context_->CurrentEvalWord = word ;
-        if ( IS_MORPHISM_TYPE ( word ) ) CfrTil_Typecheck ( word ) ;
-        DEBUG_SETUP ( word ) ;
-        if ( ( word->W_MorphismAttributes & IMMEDIATE ) || ( ! CompileMode ) ) Word_Run ( word ) ;
-        else _Word_Compile ( word ) ;
-        _DEBUG_SHOW ( word, 0 ) ;
-        //if ( Is_DebugOn ) Compiler_WordList_Show ( word, 0, 0, 0 ) ;
-        _Context_->CurrentEvalWord = 0 ;
-        _Context_->LastEvalWord = word ;
+        if ( ! sigsetjmp ( _Context_->JmpBuf0, 0 ) ) // siglongjmp from _Debugger_InterpreterLoop
+        {
+            _Context_->CurrentEvalWord = word ;
+            if ( IS_MORPHISM_TYPE ( word ) ) CfrTil_Typecheck ( word ) ;
+            DEBUG_SETUP ( word ) ;
+            if ( ( word->W_MorphismAttributes & IMMEDIATE ) || ( ! CompileMode ) ) Word_Run ( word ) ;
+            else _Word_Compile ( word ) ;
+            _DEBUG_SHOW ( word, 0 ) ;
+            _Context_->CurrentEvalWord = 0 ;
+            _Context_->LastEvalWord = word ;
+        }
+        else Set_DataStackPointers_FromDebuggerDspReg ( ) ;
     }
 }
 

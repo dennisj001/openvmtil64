@@ -25,7 +25,7 @@ Debugger_CompileOneInstruction ( Debugger * debugger, byte * jcAddress, Boolean 
     Set_CompilerSpace ( debugger->StepInstructionBA ) ; // now compile to this space
     _Compile_Save_C_CpuState ( _CfrTil_, showFlag ) ; //&& ( _Q_->Verbosity >= 3 ) ) ; // save our c compiler cpu register state
     _Compile_Restore_Debugger_CpuState ( debugger, showFlag ) ; //&& ( _Q_->Verbosity >= 3 ) ) ; // restore our runtime state before the current insn
-    byte * nextInsn = _Debugger_CompileOneInstruction ( debugger, jcAddress ) ; // the single current stepping insn
+     byte * nextInsn = _Debugger_CompileOneInstruction ( debugger, jcAddress ) ; // the single current stepping insn
     _Compile_Save_Debugger_CpuState ( debugger, showFlag ) ; //showRegsFlag ) ; //&& ( _Q_->Verbosity >= 3 ) ) ; // save our runtime state after the instruction : which we will restore before the next insn
     _Compile_Restore_C_CpuState ( _CfrTil_, showFlag ) ; //&& ( _Q_->Verbosity >= 3 ) ) ; // save our c compiler cpu register state
     _Compile_Return ( ) ;
@@ -102,11 +102,6 @@ into:
                 _Stack_Push ( debugger->ReturnStack, ( int64 ) ( debugger->DebugAddress + size ) ) ; // the return address
                 // push the return address this time around; next time code at newDebugAddress will be processed
                 // when ret is the insn Debugger_StepOneInstruction will handle it 
-                if ( _Q_->Verbosity > 1 )
-                {
-                    _Word_ShowSourceCode ( word ) ;
-                    Stack_Print ( debugger->ReturnStack, ( byte* ) "debugger->ReturnStack ", 0 ) ;
-                }
             }
             // for either jmp/call/jcc ...
             newDebugAddress = jcAddress ;
@@ -144,12 +139,11 @@ Debugger_CompileAndStepOneInstruction ( Debugger * debugger )
             if ( Stack_Depth ( debugger->ReturnStack ) )
             {
                 debugger->DebugAddress = ( byte* ) Stack_Pop ( debugger->ReturnStack ) ;
-                if ( _Q_->Verbosity > 1 ) Stack_Print ( debugger->ReturnStack, ( byte* ) "debugger->ReturnStack ", 0 ) ;
+                //if ( _Q_->Verbosity > 1 ) CfrTil_PrintReturnStack ( ) ;
                 Debugger_GetWordFromAddress ( debugger ) ;
             }
             else
             {
-                //Debugger_UdisOneInstruction ( debugger, debugger->DebugAddress, ( byte* ) "\r", ( byte* ) "" ) ;
                 SetState ( debugger, DBG_STACK_OLD, true ) ;
                 debugger->CopyRSP = 0 ;
                 if ( GetState ( debugger, DBG_BRK_INIT ) ) SetState_TrueFalse ( debugger, DBG_INTERPRET_LOOP_DONE | DBG_STEPPED, DBG_ACTIVE | DBG_BRK_INIT | DBG_STEPPING ) ;
@@ -157,7 +151,6 @@ Debugger_CompileAndStepOneInstruction ( Debugger * debugger )
                 if ( debugger->w_Word ) SetState ( debugger->w_Word, STEPPED, true ) ;
                 debugger->DebugAddress = 0 ;
                 SetState ( debugger->cs_Cpu, CPU_SAVED, false ) ;
-                //Set_DataStackPointers_FromDebuggerDspReg ( ) ;
             }
             goto end ; // don't actually step a ret insn
         }

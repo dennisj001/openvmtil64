@@ -266,7 +266,7 @@ Stack_Print_AValue ( uint64 * stackPointer, int64 i, byte * stackName, byte * bu
     else word = Word_GetFromCodeAddress ( ( byte* ) ( stackPointer [ i ] ) ) ;
     if ( word )
     {
-        if ( IS_NON_MORPHISM_TYPE ( word ) && (!tsl) ) 
+        if ( IS_NON_MORPHISM_TYPE ( word ) && (!(word->W_MorphismAttributes & CFRTIL_WORD )) && (!tsl) ) 
         {
             sprintf ( ( char* ) buffer, "< word : %s.%s : value = 0x%016lx >",
                 word->ContainingNamespace ? word->ContainingNamespace->Name : ( byte* ) "<literal>", c_gd ( String_ConvertToBackSlash ( word->Name ) ),
@@ -275,7 +275,7 @@ Stack_Print_AValue ( uint64 * stackPointer, int64 i, byte * stackName, byte * bu
         else 
         {
             sprintf ( ( char* ) buffer, "< word : %s.%s : code = 0x%016lx > : type %s- %s",
-                word->ContainingNamespace->Name, c_gd ( word->Name ), ( uint64 ) word->Definition,
+               (word->ContainingNamespace ? (char*) word->ContainingNamespace->Name : ""), c_gd ( word->Name ), ( uint64 ) word->Definition,
                (tsl ? "signature " : ""), c_gd ( ts ) ) ;
         }
     }
@@ -348,11 +348,14 @@ void
 _CfrTil_PrintNReturnStack ( int64 size, Boolean useExistingFlag )
 {
     Debugger * debugger = _Debugger_ ;
+    _Printf ( ( byte* ) "\n_CfrTil_PrintNReturnStack : %s", Context_Location ( ) ) ;
     if ( useExistingFlag )
     {
         if ( GetState ( debugger, DBG_STEPPING ) && debugger->CopyRSP )
         {
             _PrintNStackWindow ( ( uint64* ) debugger->CopyRSP, ( byte * ) "ReturnStackCopy", ( byte * ) "RSCP", size ) ;
+            //_PrintNStackWindow ( ( uint64* ) debugger->cs_Cpu->Rsp, ( byte * ) "Return Stack", ( byte * ) "Rsp (RSP)", size ) ;
+            _Stack_PrintValues ( ( byte* ) "DebugStack ", debugger->ReturnStack->StackPointer, Stack_Depth ( debugger->ReturnStack ), 0 ) ;
         }
         else if ( debugger->cs_Cpu->Rsp ) //debugger->DebugESP )
         {

@@ -1533,7 +1533,6 @@ void CfrTil_LocalsAndStackVariablesBegin(void);
 void CfrTil_LocalVariablesBegin(void);
 /* src/basis/debugger.c */
 void _Debugger_InterpreterLoop(Debugger *debugger);
-Boolean _Debugger_PreSetup(Debugger *debugger, Word *word, byte *token, byte *address, Boolean forceFlag);
 Boolean Debugger_PreSetup(Debugger *debugger, Word *word, byte *token, byte *address, Boolean forceFlag);
 void _Debugger_PostShow(Debugger *debugger, Word *word, Boolean force);
 void Debugger_PostShow(Debugger *debugger);
@@ -2047,7 +2046,7 @@ void DebugRuntimeBreakpoint(void);
 void CfrTil_DebugRuntimeBreakpoint(void);
 void CfrTil_DebugRuntimeBreakpoint_IsDebugShowOn(void);
 void CfrTil_DebugRuntimeBreakpoint_IsDebugOn(void);
-int64 _DEBUG_SETUP(Word *word, byte *token, byte *address, Boolean force);
+void _DEBUG_SETUP(Word *word, byte *token, byte *address, Boolean force);
 /* src/primitives/memorys.c */
 void CfrTil_Peek(void);
 void CfrTil_PeekReg(void);
