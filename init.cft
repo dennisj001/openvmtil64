@@ -190,6 +190,7 @@ Root
 : bigNumOff "BigNum" notUsing ;
 'bnOff 'bigNumOff find alias
 : bnOn BigNum bnInit ( 16 16 ) ;
+: _bassert ( n m ) { n @ m @ != } { nl "error" ps _info pause } if ; 
 bnOff
 
 Compiler
@@ -457,5 +458,5 @@ rtw
 2 30 powReg dup p  1073741824 _assert 
 'powReg find wdiss
 #endif
-//: hi ( n m ) n @ m @ + p ; 2 3 d: hi s
+: hi ( n m -- TOS ) n @ m @ + dup <dbg> p ; 2 3 d: hi 5 d: _assert 
 2 + 7 assertStkChk // stack checking 

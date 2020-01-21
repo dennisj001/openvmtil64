@@ -64,7 +64,7 @@ CfrTil_PokeRegAtAddress ( ) // @
 }
 
 void
-_CfrTil_Move ( int64 * address, int64 value, Word * lvalueWord, Word * rvalueWord ) 
+_CfrTil_Move ( int64 * address, int64 value, Word * lvalueWord, Word * rvalueWord )
 {
     int64 lvalueSize = lvalueWord->ObjectByteSize ; //, rvalueSize = rvalueWord->ObjectByteSize ;
     if ( ! _TypeMismatch_CheckError_Print ( lvalueWord, rvalueWord, 1 ) )
@@ -101,7 +101,7 @@ _CfrTil_Move ( int64 * address, int64 value, Word * lvalueWord, Word * rvalueWor
             case 8:
             default:
             {
-                * ( int64 *) address = (int64) value ;
+                * ( int64 * ) address = ( int64 ) value ;
                 break ;
             }
         }
@@ -109,10 +109,17 @@ _CfrTil_Move ( int64 * address, int64 value, Word * lvalueWord, Word * rvalueWor
 }
 // ( addr n -- ) // (*addr) = n
 
+int
+Word_LvalueObjectByteSize ( Word * lvalueWord ) // = 
+{
+    return (lvalueWord->W_ObjectAttributes & BIGNUM) ? sizeof (int64) : lvalueWord->ObjectByteSize ;
+}
+
 void
 CfrTil_Poke ( ) // = 
 {
-    if ( CompileMode ) Compile_Poke ( _Context_->Compiler0 ) ;
+    Word * lvalueWord = TWS ( - 1 ), *rvalueWord = TWS ( 0 )  ;
+    if ( CompileMode ) Compile_Poke ( _Context_->Compiler0, Word_LvalueObjectByteSize (lvalueWord) ) ;
     else
     {
         //uint64 * tos = ( uint64 * ) TOS ;
@@ -120,7 +127,7 @@ CfrTil_Poke ( ) // =
         //* nos = ( uint64 ) tos ;
         //* ( int64* ) NOS = TOS ;
         //_CfrTil_Move ( ( int64 * ) NOS, TOS, TWS ( - 1 )->ObjectByteSize, TWS ( 0 )->ObjectByteSize ) ;
-        _CfrTil_Move ( ( int64 * ) NOS, TOS, TWS ( -1 ), TWS ( 0 ) ) ;
+        _CfrTil_Move ( ( int64 * ) NOS, TOS, lvalueWord, rvalueWord ) ;
         _Dsp_ -= 2 ;
     }
 }
@@ -128,13 +135,11 @@ CfrTil_Poke ( ) // =
 void
 CfrTil_AtEqual ( ) // !
 {
+    Word * lvalueWord = TWS ( 0 ), *rvalueWord = TWS ( -1 )  ;
     if ( CompileMode ) Compile_AtEqual ( DSP ) ;
     else
     {
-        //*( int64* ) _Dsp_ [ - 1 ] = * ( int64* ) TOS ;
-        //NOS = * ( int64* ) TOS ;
-        //_CfrTil_Move ( ( int64 * ) NOS, * ( int64* ) TOS, TWS ( - 1 )->ObjectByteSize, TWS ( 0 )->ObjectByteSize ) ;
-        _CfrTil_Move ( ( int64 * ) NOS, * ( int64* ) TOS, TWS ( -1 ), TWS ( 0 ) ) ;
+        _CfrTil_Move ( ( int64 * ) NOS, * ( int64* ) TOS, lvalueWord, rvalueWord ) ;
         _Dsp_ -= 2 ;
     }
 }
@@ -144,13 +149,11 @@ CfrTil_AtEqual ( ) // !
 void
 CfrTil_Store ( ) // !
 {
-    if ( CompileMode ) Compile_Store ( _Context_->Compiler0 ) ;
+    Word * lvalueWord = TWS ( 0 ), *rvalueWord = TWS ( -1 )  ;
+    if ( CompileMode ) Compile_Store ( _Context_->Compiler0, Word_LvalueObjectByteSize (lvalueWord) ) ;
     else
     {
-        //* ( int64* ) ( TOS ) = NOS ; //_Dsp_ [ - 1 ] ;
-        * ( int64* ) TOS = NOS ; //_Dsp_ [ - 1 ] ;
-        //_CfrTil_Move ( ( int64 * ) TOS, NOS, TWS ( 0 )->ObjectByteSize, TWS ( - 1 )->ObjectByteSize ) ;
-        _CfrTil_Move ( ( int64 * ) TOS, NOS, TWS ( 0 ), TWS ( -1 ) ) ;
+        _CfrTil_Move ( ( int64 * ) TOS, NOS, lvalueWord, rvalueWord ) ;
         _Dsp_ -= 2 ;
     }
 }

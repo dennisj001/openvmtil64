@@ -34,7 +34,7 @@ int64
 _ParameterVar_Offset ( Word * word, int64 numberOfArgs, Boolean frameFlag )
 {
     int64 offset ;
-    offset = - ( numberOfArgs - word->Index + (frameFlag ? 1 : 0 ) ) ; // is this totally correct??
+    offset = - ( numberOfArgs - word->Index + ( frameFlag ? 1 : 0 ) ) ; // is this totally correct??
     return offset ;
 }
 
@@ -197,7 +197,8 @@ Compiler_RemoveLocalFrame ( Compiler * compiler )
     if ( ! GetState ( _Compiler_, LISP_MODE ) ) Compiler_WordStack_SCHCPUSCA ( 0, 0 ) ;
     int64 parameterVarsSubAmount = 0 ;
     Boolean returnValueFlag, already = false ;
-    returnValueFlag = ( Context_CurrentWord ( )->W_MorphismAttributes & C_RETURN ) || ( GetState ( compiler, RETURN_TOS | RETURN_ACCUM ) ) || compiler->ReturnVariableWord ;
+    returnValueFlag = ( Context_CurrentWord ( )->W_MorphismAttributes & C_RETURN ) 
+        || ( GetState ( compiler, RETURN_TOS | RETURN_ACCUM ) ) || compiler->ReturnVariableWord ;
     if ( compiler->NumberOfArgs ) parameterVarsSubAmount = ( compiler->NumberOfArgs - returnValueFlag ) * CELL ;
 #if 0    
     if ( ( ! returnValueFlag ) && GetState ( _Context_, C_SYNTAX ) && ( _CfrTil_->CurrentWordBeingCompiled->S_ContainingNamespace ) &&
@@ -220,19 +221,20 @@ Compiler_RemoveLocalFrame ( Compiler * compiler )
             already = true ;
             SetHere ( one->StackPushRegisterCode, 1 ) ;
         }
-        else 
+        else
         {
             byte mov_r14_rax [] = { 0x49, 0x89, 0x06 } ;
-            //byte add_r14_0x8 [ ] = { 0x49, 0x83, 0xc6, 0x08 } ;
-            if ( memcmp ( mov_r14_rax, Here - 3, 3 ) ) 
-                Compile_Move_TOS_To_ACCUM ( DSP ) ; // save TOS to ACCUM so we can set return it as TOS below
-#if 0            
-            else if ( ! ( memcmp ( add_r14_0x8, Here - 7, 4 ) ) ) // more logic needed here for this to work ??
+            if ( memcmp ( mov_r14_rax, Here - 3, 3 ) ) Compile_Move_TOS_To_ACCUM ( DSP ) ; // save TOS to ACCUM so we can set return it as TOS below
+#if 1   // hasn't occurred yet but maybe useful in some cases especially in connection with the below #else block        
+            else
             {
-                _ByteArray_UnAppendSpace ( _Q_CodeByteArray, 7 ) ;   
+                byte add_r14_0x8 [ ] = { 0x49, 0x83, 0xc6, 0x08 } ;
+                if ( ( GetState ( compiler, RETURN_ACCUM ) ) && ( ! ( memcmp ( add_r14_0x8, Here - 7, 4 ) ) ) ) // more logic needed here for this to work ??
+                {
+                    _ByteArray_UnAppendSpace ( _Q_CodeByteArray, 7 ) ;
+                }
             }
 #endif            
-
         }
     }
     if ( compiler->NumberOfNonRegisterLocals || compiler->NumberOfNonRegisterArgs )
@@ -251,6 +253,7 @@ Compiler_RemoveLocalFrame ( Compiler * compiler )
             Compile_ADDI ( REG, DSP, 0, CELL, 0 ) ;
     }
     // nb : stack was already adjusted accordingly for this above by reducing the SUBI subAmount or adding if there weren't any parameter variables
+#if 1       
     if ( returnValueFlag || ( IsWordRecursive && ( ! GetState ( compiler, RETURN_ACCUM ) ) ) )
     {
         if ( compiler->ReturnVariableWord )
@@ -264,18 +267,34 @@ Compiler_RemoveLocalFrame ( Compiler * compiler )
         }
         Compile_Move_ACC_To_TOS ( DSP ) ;
     }
+#else // something like this seem more understandable and extendable than what is working now ...
+    if ( returnValueFlag ) //|| ( IsWordRecursive && ( ! GetState ( compiler, RETURN_ACCUM ) ) ) )
+    {
+        if ( compiler->ReturnVariableWord )
+        {
+            Compiler_Word_SCHCPUSCA ( compiler->ReturnVariableWord, 0 ) ;
+            if ( compiler->ReturnVariableWord->W_ObjectAttributes & REGISTER_VARIABLE )
+            {
+                _Compile_Stack_PushReg ( DSP, compiler->ReturnVariableWord->RegToUse ) ;
+                return ;
+            }
+        }
+        _Compile_Stack_PushReg ( DSP, ACC ) ;
+
+    }
+#endif    
     d0 ( if ( Is_DebugOn ) Compile_Call_TestRSP ( ( byte* ) _CfrTil_Debugger_Locals_Show ) ) ;
 }
 
 void
 CfrTil_LocalsAndStackVariablesBegin ( )
 {
-    _CfrTil_Parse_LocalsAndStackVariables (1, 0, 0, 0, 0 ) ;
+    _CfrTil_Parse_LocalsAndStackVariables ( 1, 0, 0, 0, 0 ) ;
 }
 
 void
 CfrTil_LocalVariablesBegin ( )
 {
-    _CfrTil_Parse_LocalsAndStackVariables (0, 0, 0, 0, 0 ) ;
+    _CfrTil_Parse_LocalsAndStackVariables ( 0, 0, 0, 0, 0 ) ;
 }
 

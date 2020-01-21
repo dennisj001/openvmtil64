@@ -136,6 +136,7 @@ Debugger_CompileAndStepOneInstruction ( Debugger * debugger )
         Word * word ;
         if ( * debugger->DebugAddress == _RET )
         {
+            Debugger_UdisOneInstruction ( debugger, debugger->DebugAddress, ( byte* ) "\r", ( byte* ) "" ) ;
             if ( Stack_Depth ( debugger->ReturnStack ) )
             {
                 debugger->DebugAddress = ( byte* ) Stack_Pop ( debugger->ReturnStack ) ;

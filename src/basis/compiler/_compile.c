@@ -86,7 +86,7 @@ void
 _Compile_RspReg_Store ( ) // data stack pop to rsp [0] !
 {
     _Compile_RspReg_From ( ) ;
-    Compile_Store ( _Compiler_ ) ;
+    Compile_Store (_Compiler_, 0) ;
 }
 #endif
 

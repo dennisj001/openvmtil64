@@ -14,14 +14,17 @@ _Interpreter_TokenToWord ( Interpreter * interp, byte * token, int64 tsrli, int6
         if ( ! word )
         {
             word = Lexer_ObjectToken_New ( interp->Lexer0, token, tsrli, scwi ) ;
-            if ( word ) word->ObjectByteSize = interp->Lexer0->TokenObjectSize ;
+            if ( word ) 
+            {
+                word->ObjectByteSize = interp->Lexer0->TokenObjectSize ;
+                Word_SetTsrliScwi ( word, tsrli, scwi ) ;
+            }
         }
-        Word_SetTsrliScwi ( word, tsrli, scwi ) ;
         _Context_->CurrentTokenWord = word ;
         DEBUG_SETUP ( word ) ;
         _Context_->TokenDebugSetupWord = word ;
     }
-    return _Context_->CurrentTokenWord ; // allow DEBUG_SETUP to set this to 0 to skip it when it is 'stepped'
+    return _Context_->CurrentTokenWord ; // allow DEBUG_SETUP to set this to 0 to skip interpreting it when it is 'stepped'
 }
 
 Word *

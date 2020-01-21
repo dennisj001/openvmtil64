@@ -83,9 +83,9 @@ Compiler_ShowOptimizeArgs ( Compiler * compiler )
 }
 
 void
-Compile_Store ( Compiler * compiler ) // !
+Compile_Store (Compiler * compiler, int lvalueSize) // !
 {
-    if ( GetState ( _CfrTil_, OPTIMIZE_ON ) ) Compile_X_Equal ( compiler, STORE ) ;
+    if ( GetState ( _CfrTil_, OPTIMIZE_ON ) ) Compile_X_Equal ( compiler, STORE, lvalueSize ) ;
     else // when optimize is off, eg with arrays
     {
         //DBI_ON ;
@@ -105,9 +105,9 @@ Compile_Store ( Compiler * compiler ) // !
 }
 
 void
-Compile_Poke ( Compiler * compiler ) // =
+Compile_Poke (Compiler * compiler, int lvalueSize) // =
 {
-    if ( GetState ( _CfrTil_, OPTIMIZE_ON ) ) Compile_X_Equal ( compiler, EQUAL ) ;
+    if ( GetState ( _CfrTil_, OPTIMIZE_ON ) ) Compile_X_Equal ( compiler, EQUAL, lvalueSize ) ;
     else // when optimize is off, eg with arrays
     {
         int64 stackReg = DSP ;
@@ -144,7 +144,7 @@ Compile_AtEqual ( Boolean stackReg ) // !
 // '!' ( value address  -- ) // store value at address - dpans94 - address is on top - value was pushed first, leftmost in rpn, then address
 
 void
-Compile_Store ( Compiler * compiler ) // !
+Compile_Store (Compiler * compiler, 0) // !
 {
     int64 optSetupFlag = Compiler_CheckOptimize ( compiler, 0 ), stackReg = DSP ;
     if ( optSetupFlag & OPTIMIZE_DONE ) return ;
@@ -185,7 +185,7 @@ Compile_Store ( Compiler * compiler ) // !
 // ( addr n -- ) // (*addr) = n
 
 void
-Compile_Poke ( Compiler * compiler ) // =
+Compile_Poke (Compiler * compiler, 0) // =
 {
     int64 optSetupFlag = Compiler_CheckOptimize ( compiler, 0 ), stackReg = DSP ;
     if ( optSetupFlag & OPTIMIZE_DONE ) return ;

@@ -81,7 +81,6 @@ x @ p
 : bexpl ( n -- TOS ) { n @ 1 <= } { 1 } { n @ dup 1 - bexpl * } ifElse ;
 'bexpl find wdiss
 7 bexpl dup p 
-: _bassert ( n m ) { n @ m @ != } { nl "error" ps _info pause } if ; 
 5040 _bassert
 //sp pause
 

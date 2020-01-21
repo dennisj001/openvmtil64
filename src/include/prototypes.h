@@ -97,8 +97,8 @@ void _Compile_Get_FromCAddress_ToReg_ThruReg(Boolean reg, byte *address, Boolean
 void _Compile_Set_CAddress_WithRegValue_ThruReg(byte *address, Boolean reg, Boolean thruReg);
 void Compile_Peek(Compiler *compiler, Boolean stackReg);
 void Compiler_ShowOptimizeArgs(Compiler *compiler);
-void Compile_Store(Compiler *compiler);
-void Compile_Poke(Compiler *compiler);
+void Compile_Store(Compiler *compiler, int lvalueSize);
+void Compile_Poke(Compiler *compiler, int lvalueSize);
 void Compile_AtEqual(Boolean stackReg);
 /* src/basis/compiler/combinators.c */
 void CfrTil_EndCombinator(int64 quotesUsed, int64 moveFlag);
@@ -314,7 +314,7 @@ void Compiler_CompileOptimize_IncDec(Compiler *compiler);
 void Compiler_CompileOptimizedLoad(Compiler *compiler);
 void Compile_Optimize_Dup(Compiler *compiler);
 void Compile_X_OpEqual(Compiler *compiler, block op);
-void Compile_X_Equal(Compiler *compiler, int64 op);
+void Compile_X_Equal(Compiler *compiler, int64 op, int lvalueSize);
 void PeepHole_Optimize_ForStackPopToReg(void);
 void PeepHole_Optimize(void);
 void GetRmDispImm(CompileOptimizeInfo *optInfo, Word *word, int64 suggestedReg);
