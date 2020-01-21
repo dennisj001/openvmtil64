@@ -457,5 +457,5 @@ rtw
 2 30 powReg dup p  1073741824 _assert 
 'powReg find wdiss
 #endif
-//: hi ( n m ) n @ m @ + p ; d: 2 3 hi s
+//: hi ( n m ) n @ m @ + p ; 2 3 d: hi s
 2 + 7 assertStkChk // stack checking 

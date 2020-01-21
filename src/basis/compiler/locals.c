@@ -220,7 +220,20 @@ Compiler_RemoveLocalFrame ( Compiler * compiler )
             already = true ;
             SetHere ( one->StackPushRegisterCode, 1 ) ;
         }
-        else Compile_Move_TOS_To_ACCUM ( DSP ) ; // save TOS to ACCUM so we can set return it as TOS below
+        else 
+        {
+            byte mov_r14_rax [] = { 0x49, 0x89, 0x06 } ;
+            //byte add_r14_0x8 [ ] = { 0x49, 0x83, 0xc6, 0x08 } ;
+            if ( memcmp ( mov_r14_rax, Here - 3, 3 ) ) 
+                Compile_Move_TOS_To_ACCUM ( DSP ) ; // save TOS to ACCUM so we can set return it as TOS below
+#if 0            
+            else if ( ! ( memcmp ( add_r14_0x8, Here - 7, 4 ) ) ) // more logic needed here for this to work ??
+            {
+                _ByteArray_UnAppendSpace ( _Q_CodeByteArray, 7 ) ;   
+            }
+#endif            
+
+        }
     }
     if ( compiler->NumberOfNonRegisterLocals || compiler->NumberOfNonRegisterArgs )
     {

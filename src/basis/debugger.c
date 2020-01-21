@@ -25,7 +25,6 @@ _Debugger_InterpreterLoop ( Debugger * debugger )
         _Context_->CurrentEvalWord = 0 ;
         if ( ! Stack_Depth ( debugger->ReturnStack ) )
         {
-            if ( GetState ( _Lexer_, LEXER_DONE | LEXER_END_OF_LINE ) ) SetState ( _Interpreter_, END_OF_LINE, true ) ;
             Debugger_Off ( debugger, 1 ) ;
             siglongjmp ( _Context_->JmpBuf0, 1 ) ; // in Debugger_PreSetup
         }
@@ -35,12 +34,13 @@ _Debugger_InterpreterLoop ( Debugger * debugger )
 Boolean
 Debugger_PreSetup ( Debugger * debugger, Word * word, byte * token, byte * address, Boolean forceFlag )
 {
-    if ( ! word ) word = Context_CurrentWord ( ) ;
-    debugger->w_Word = Word_UnAlias ( word ) ;
+    Boolean rtn = false ;
     if ( Is_DebugModeOn && Is_DebugShowOn ) //|| forceFlag )
     {
         if ( forceFlag || GetState ( debugger, DBG_EVAL_AUTO_MODE ) || ( ! GetState ( debugger, DBG_AUTO_MODE | DBG_STEPPING ) ) )
         {
+            if ( ! word ) word = Context_CurrentWord ( ) ;
+            debugger->w_Word = Word_UnAlias ( word ) ;
             if ( ! word ) word = Context_CurrentWord ( ) ;
             if ( forceFlag || ( ( _Context_->TokenDebugSetupWord != word ) && ( word->W_WordListOriginalWord ?
                 ( word->W_WordListOriginalWord != _Context_->TokenDebugSetupWord ) : 1 ) ) )
@@ -80,13 +80,13 @@ Debugger_PreSetup ( Debugger * debugger, Word * word, byte * token, byte * addre
                     //if ( GetState ( _Lexer_, LEXER_DONE | LEXER_END_OF_LINE ) ) SetState ( _Interpreter_, END_OF_LINE, true ) ;
                     debugger->PreHere = Here ;
                     debugger->LastSetupWord = word ;
-                    return true ;
+                    rtn = true ;
                 }
             }
         }
+        debugger->SC_Index = _Lexer_->SC_Index ;
     }
-    debugger->SC_Index = _Lexer_->SC_Index ;
-    return false ;
+    return rtn ;
 }
 
 void

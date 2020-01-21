@@ -25,7 +25,7 @@ Debugger_CompileOneInstruction ( Debugger * debugger, byte * jcAddress, Boolean 
     Set_CompilerSpace ( debugger->StepInstructionBA ) ; // now compile to this space
     _Compile_Save_C_CpuState ( _CfrTil_, showFlag ) ; //&& ( _Q_->Verbosity >= 3 ) ) ; // save our c compiler cpu register state
     _Compile_Restore_Debugger_CpuState ( debugger, showFlag ) ; //&& ( _Q_->Verbosity >= 3 ) ) ; // restore our runtime state before the current insn
-     byte * nextInsn = _Debugger_CompileOneInstruction ( debugger, jcAddress ) ; // the single current stepping insn
+    byte * nextInsn = _Debugger_CompileOneInstruction ( debugger, jcAddress ) ; // the single current stepping insn
     _Compile_Save_Debugger_CpuState ( debugger, showFlag ) ; //showRegsFlag ) ; //&& ( _Q_->Verbosity >= 3 ) ) ; // save our runtime state after the instruction : which we will restore before the next insn
     _Compile_Restore_C_CpuState ( _CfrTil_, showFlag ) ; //&& ( _Q_->Verbosity >= 3 ) ) ; // save our c compiler cpu register state
     _Compile_Return ( ) ;
@@ -162,16 +162,12 @@ doJmpCall:
             debugger->w_Word = word ;
             if ( word && ( word->W_MorphismAttributes & ( DEBUG_WORD | RT_STEPPING_DEBUG ) ) )
             {
-                //debugger->w_Word = word ;
-                if ( ! GetState ( debugger, DBG_CONTINUE_MODE ) )
-                {
-                    SetState ( debugger, DBG_AUTO_MODE, false ) ;
-                    // we are already stepping here and now, so skip
-                    _Printf ( ( byte* ) "\nskipping over a rt breakpoint debug word : %s : at 0x%-8x", ( char* ) c_gd ( word->Name ), debugger->DebugAddress ) ;
-                    //Pause () ;
-                    debugger->DebugAddress += 3 ; // 3 : sizeof call reg insn
-                    goto end ; // skip it
-                }
+                SetState ( debugger, DBG_AUTO_MODE, false ) ;
+                // we are already stepping here and now, so skip
+                _Printf ( ( byte* ) "\nskipping over a rt breakpoint debug word : %s : at 0x%-8x", ( char* ) c_gd ( word->Name ), debugger->DebugAddress ) ;
+                //Pause () ;
+                debugger->DebugAddress += 3 ; // 3 : sizeof call reg insn
+                goto end ; // skip it
             }
         }
         else if ( ( ( ( * ( uint16* ) debugger->DebugAddress ) == 0xff49 ) && ( *( debugger->DebugAddress + 2 ) == 0xd1 ) ) )

@@ -147,7 +147,7 @@ _Class_Object_Init ( Word * word, Namespace * ins )
     {
         Word * initWord = ( Word* ) _Stack_Pop ( nsstack ) ;
         DataStack_Push ( ( int64 ) word->W_Value ) ;
-        Word_Eval ( initWord ) ;
+        Word_Eval ( initWord ) ; // nb. must be Word_Eval (not Word_Run) because sigsetjmp is there and needed re. 'new' else active debugger will crash in/after 'new'
     }
     SetState ( _Debugger_, DEBUG_SHTL_OFF, false ) ;
     word->TypeNamespace = ins ;

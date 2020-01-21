@@ -174,10 +174,12 @@ sp
 (yfac yfac 10) 
 //pause
 (yfac yfac 7) 
+//dbiOn
 (define fibc (lambda ( n ) (ifElse (< n 2) n (+ (fibc (- n 1)) (fibc (- n 2))))))
+//dbiOff
 "\nfibc 20 = " ps
 (fibc 20)
-tick fibc find wdiss //pause
+tick fibc find wdiss pause
 
 //syntatic experiments ...
 

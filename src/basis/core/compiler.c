@@ -33,7 +33,7 @@ Word *
 _CfrTil_CopyDuplicates ( Word * word0 )
 {
     Word * word1, *wordToBePushed ;
-    if ( word0->W_MorphismAttributes & (KEYWORD|CFRTIL_WORD) ) word1 = _CopyDuplicateWord ( word0, 1 ) ;
+    if ( word0->W_MorphismAttributes & (KEYWORD|CFRTIL_WORD|T_LISP_SYMBOL) ) word1 = _CopyDuplicateWord ( word0, 1 ) ;
     else word1 = ( Word * ) dllist_Map1_WReturn ( _CfrTil_->Compiler_N_M_Node_WordList, ( MapFunction1 ) CopyDuplicateWord, ( int64 ) word0 ) ;
     if ( word1 ) wordToBePushed = word1 ;
     else wordToBePushed = word0 ; 

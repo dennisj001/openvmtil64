@@ -122,7 +122,6 @@ CfrTil_TokenToWord ( )
 void
 CfrTil_InterpreterStop ( )
 {
-
     SetState ( _Context_->Interpreter0, INTERPRETER_DONE, true ) ;
     SetState ( _CfrTil_, CFRTIL_RUN, false ) ;
 }
