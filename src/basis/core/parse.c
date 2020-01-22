@@ -8,6 +8,7 @@ _CfrTil_Parse_ClassStructure ( int64 cloneFlag )
 {
     int64 size = 0, offset = 0, sizeOf = 0, i, arrayDimensionSize ;
     Namespace *ns, *classNs = _CfrTil_Namespace_InNamespaceGet ( ), *classFieldObject ;
+    Word * aclass ;
     byte * token ;
     int64 arrayDimensions [ 32 ] ; // 32 : max dimensions for now
     memset ( arrayDimensions, 0, sizeof (arrayDimensions ) ) ;
@@ -37,11 +38,10 @@ gotNextToken:
             continue ;
         }
         ns = _Namespace_Find ( token, 0, 0 ) ;
-        if ( ns && ( size = _Namespace_VariableValueGet ( ns, ( byte* ) "size" ) ) )
+        if ( ns && ( size = CfrTil_Get_NamespaceObjectByteSize (ns))  )
         {
             token = Lexer_ReadToken ( _Context_->Lexer0 ) ;
             classFieldObject = _CfrTil_ClassField_New ( token, ns, size, offset ) ; // nb! : in case there is an array so it will be there for ArrayDimensions
-            classFieldObject->ObjectByteSize = size ;
             token = Lexer_Peek_Next_NonDebugTokenWord ( _Context_->Lexer0, 1, 0 ) ;
             if ( token [0] != '[' )
             {
@@ -101,11 +101,13 @@ gotNextToken:
 void
 Compiler_TypedObjectInit ( Word * word, Namespace * typeNamespace )
 {
+    int64 size ;
     word->TypeNamespace = typeNamespace ;
     word->W_MorphismAttributes |= typeNamespace->W_MorphismAttributes ;
     if ( typeNamespace->W_ObjectAttributes & CLASS ) word->W_ObjectAttributes |= OBJECT ;
     word->W_ObjectAttributes |= LOCAL_OBJECT ;
-    word->Size = _Namespace_VariableValueGet ( word, ( byte* ) "size" ) ;
+    size = _Namespace_VariableValueGet ( word, ( byte* ) "size" ) ;
+    word->Size = size ? size : typeNamespace->ObjectByteSize ;
     //_DObject_Init ( Word * word, uint64 value, uint64 ftype, byte * function, int64 arg )
     _DObject_Init ( word, ( int64 ) 0, LOCAL_OBJECT, ( byte* ) _DataObject_Run, 0 ) ;
     _Word_Add ( word, 1, 0 ) ;
@@ -139,7 +141,7 @@ _CfrTil_Parse_LocalsAndStackVariables ( int64 svf, int64 lispMode, ListObject * 
     int64 svff = 0, addWords, getReturn = 0, getReturnFlag = 0, regToUseIndex = 0 ;
     Boolean regFlag = false ;
     byte *token, *returnVariable = 0 ;
-    Namespace *typeNamespace = 0, *saveInNs = _CfrTil_->InNamespace ;
+    Namespace *typeNamespace = 0, *objectTypeNamespace = 0, *saveInNs = _CfrTil_->InNamespace ;
     //CfrTil_DbgSourceCodeOff ( ) ;
     if ( ! CompileMode ) Compiler_Init ( compiler, 0, 0 ) ;
 
@@ -205,7 +207,8 @@ _CfrTil_Parse_LocalsAndStackVariables ( int64 svf, int64 lispMode, ListObject * 
                 word = Finder_Word_FindUsing ( finder, token, 1 ) ; // ?? find after Literal - eliminate making strings or numbers words ??
                 if ( word && ( word->W_ObjectAttributes & ( NAMESPACE | CLASS ) ) && ( CharTable_IsCharType ( ReadLine_PeekNextChar ( lexer->ReadLiner0 ), CHAR_ALPHA ) ) )
                 {
-                    if ( word->W_ObjectAttributes & STRUCTURE ) typeNamespace = word ;
+                    if ( word->W_ObjectAttributes & STRUCTURE ) objectTypeNamespace = word ;
+                    else typeNamespace = word ;
                     continue ;
                 }
             }
@@ -250,12 +253,14 @@ _CfrTil_Parse_LocalsAndStackVariables ( int64 svf, int64 lispMode, ListObject * 
                     }
                     regFlag = false ;
                 }
-                if ( typeNamespace )
+                if ( objectTypeNamespace )
                 {
-                    Compiler_TypedObjectInit ( word, typeNamespace ) ;
-                    Word_TypeChecking_SetInfoForAnObject ( word ) ;
+                    Compiler_TypedObjectInit ( word, objectTypeNamespace ) ;
+                    Word_TypeChecking_SetSigInfoForAnObject ( word ) ;
                 }
+                else if ( typeNamespace ) word->ObjectByteSize = typeNamespace->ObjectByteSize ;
                 typeNamespace = 0 ;
+                objectTypeNamespace = 0 ;
                 if ( String_Equal ( token, "this" ) ) word->W_ObjectAttributes |= THIS ;
             }
         }

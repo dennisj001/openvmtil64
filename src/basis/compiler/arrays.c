@@ -250,7 +250,7 @@ _CfrTil_ArrayBegin ( Boolean lispMode, Word **pl1, int64 i )
                 SetHere ( baseObject->Coding, 1 ) ;
                 Debugger_Set_StartHere ( _Debugger_ ) ;// for Debugger_DisassembleAccumulated
                 _Debugger_->EntryWord = baseObject ; // for Debugger_DisassembleAccumulated
-                _Compile_GetVarLitObj_LValue_To_Reg ( baseObject, ACC ) ;
+                _Compile_GetVarLitObj_LValue_To_Reg (baseObject, ACC , 0) ;
                 if ( lispMode )
                 {
                     Compile_Move_Reg_To_Reg (RegParameterOrder ( i ++ ), ACC , 0) ;

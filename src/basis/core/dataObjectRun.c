@@ -130,11 +130,11 @@ _Do_Compile_Variable ( Word * word, Boolean rvalueFlag )
     Compiler * compiler = cntx->Compiler0 ;
     if ( GetState ( cntx, C_SYNTAX | INFIX_MODE ) || GetState ( compiler, LC_ARG_PARSING ) )
     {
-        if ( rvalueFlag ) Compile_GetVarLitObj_RValue_To_Reg ( word, ACC ) ;
+        if ( rvalueFlag ) Compile_GetVarLitObj_RValue_To_Reg (word, ACC , 0) ;
         else
         {
             Word_SetCodingAndSourceCoding ( word, Here ) ;
-            if ( ( word->W_ObjectAttributes & ( OBJECT | THIS | QID ) ) || GetState ( word, QID ) ) _Compile_GetVarLitObj_LValue_To_Reg ( word, ACC ) ;
+            if ( ( word->W_ObjectAttributes & ( OBJECT | THIS | QID ) ) || GetState ( word, QID ) ) _Compile_GetVarLitObj_LValue_To_Reg (word, ACC , 0) ;
             else // this compilation is delayed to _CfrTil_C_Infix_Equal/Op
             {
                 Word_SetCodingAndSourceCoding ( word, 0 ) ;
@@ -142,7 +142,7 @@ _Do_Compile_Variable ( Word * word, Boolean rvalueFlag )
             }
         }
     }
-    else _Compile_GetVarLitObj_LValue_To_Reg ( word, ACC ) ;
+    else _Compile_GetVarLitObj_LValue_To_Reg (word, ACC , 0) ;
     _Word_CompileAndRecord_PushReg ( word, ( word->W_ObjectAttributes & REGISTER_VARIABLE ) ? word->RegToUse : ACC, true ) ;
 }
 
@@ -249,28 +249,27 @@ _Compile_C_TypeDeclaration ( )
 // nb.Compiling !!
 
 void
-Compile_C_TypeDeclaration ( Namespace * ns, byte * token1 ) //, int64 tsrli, int64 scwi)
+Compile_C_TypeDeclaration (byte * token0) //, int64 tsrli, int64 scwi)
 {
     // remember : we are not in a C function
     Interpreter * interp = _Interpreter_ ;
     Word * word ;
-    byte * token ;
+    byte * token1 ;
     if ( Compiling )
     {
-        if ( token1[0] == ')' )
+        if ( token0[0] == ')' )
         {
             //  C cast code here ; 
             // nb! : we have no (fully) implemented operations on operand size less than 8 bytes
-            token = Lexer_ReadToken ( interp->Lexer0 ) ;
+            token1 = Lexer_ReadToken ( interp->Lexer0 ) ;
             interp->LastLexedChar = interp->Lexer0->LastLexedChar ;
-            if ( token )
+            if ( token1 )
             {
-                Word * word0 = _Interpreter_TokenToWord ( interp, token, - 1, - 1 ) ;
+                Word * word0 = _Interpreter_TokenToWord ( interp, token1, - 1, - 1 ) ;
                 word = Compiler_CopyDuplicatesAndPush ( word0, _Lexer_->TokenStart_ReadLineIndex, _Lexer_->SC_Index ) ;
                 if ( word )
                 {
-                    if ( GetState ( _Context_, ADDRESS_OF_MODE ) ) word->ObjectByteSize = - 1 ; //sizeof (byte*) ; 
-                    else word->ObjectByteSize = _Namespace_VariableValueGet ( ns, ( byte* ) "size" ) ;
+                    word->ObjectByteSize = CfrTil_Get_ObjectByteSize ( word ) ;
                     Interpreter_DoWord ( interp, word, - 1, - 1 ) ;
                 }
             }
@@ -280,7 +279,7 @@ Compile_C_TypeDeclaration ( Namespace * ns, byte * token1 ) //, int64 tsrli, int
         {
             Ovt_AutoVarOn ( ) ;
             Compiler_LocalsNamespace_New ( _Compiler_ ) ;
-            word = _Interpreter_TokenToWord ( interp, token1, - 1, - 1 ) ;
+            word = _Interpreter_TokenToWord ( interp, token0, - 1, - 1 ) ;
             _Compiler_->LHS_Word = word ;
             Interpreter_DoWord ( interp, word, - 1, - 1 ) ;
             _Compile_C_TypeDeclaration ( ) ;
@@ -303,7 +302,7 @@ _Namespace_Do_C_Type ( Namespace * ns )
         if ( Compiling )
         {
             _Compiler_->AutoVarTypeNamespace = ns ;
-            Compile_C_TypeDeclaration ( ns, token1 ) ;
+            Compile_C_TypeDeclaration (token1) ;
             _Compiler_->AutoVarTypeNamespace = 0 ;
         }
         else Interpreter_InterpretAToken ( _Interpreter_, token1, - 1, - 1 ) ; //_Lexer_->TokenStart_ReadLineIndex, _Lexer_->SC_Index ) ;
@@ -368,7 +367,7 @@ CfrTil_Do_LispSymbol ( Word * word )
     if ( Compiling )
     {
 
-        _Compile_GetVarLitObj_RValue_To_Reg ( word, ACC ) ;
+        _Compile_GetVarLitObj_RValue_To_Reg (word, ACC , 0) ;
         _Word_CompileAndRecord_PushReg ( word, ACC, true ) ;
     }
     CfrTil_TypeStackPush ( word ) ;

@@ -64,71 +64,68 @@ CfrTil_PokeRegAtAddress ( ) // @
 }
 
 void
-_CfrTil_Move ( int64 * address, int64 value, Word * lvalueWord, Word * rvalueWord )
+_CfrTil_Move ( int64 * address, int64 value, int64 lvalueSize )
 {
-    int64 lvalueSize = lvalueWord->ObjectByteSize ; //, rvalueSize = rvalueWord->ObjectByteSize ;
-    if ( ! _TypeMismatch_CheckError_Print ( lvalueWord, rvalueWord, 1 ) )
+    //int64 lvalueSize = lvalueWord->ObjectByteSize ; //, rvalueSize = rvalueWord->ObjectByteSize ;
+    switch ( lvalueSize )
     {
-        switch ( lvalueSize )
+        case 1:
         {
-            case 1:
+            if ( value > 255 )
             {
-                if ( value > 255 )
-                {
-                    Error ( "\nType Error", "value is greater than 255 - sizeof (byte)", QUIT ) ;
-                }
-                else * ( byte* ) address = ( byte ) value ;
-                break ;
+                Error ( "\nType Error", "value is greater than 255 - sizeof (byte)", QUIT ) ;
             }
-            case 2:
+            else * ( byte* ) address = ( byte ) value ;
+            break ;
+        }
+        case 2:
+        {
+            if ( value > 65535 )
             {
-                if ( value > 65535 )
-                {
-                    Error ( "\nType Error", "value is greater than 65535 - sizeof (int16)", QUIT ) ;
-                }
-                else * ( int16* ) address = ( int16 ) value ;
-                break ;
+                Error ( "\nType Error", "value is greater than 65535 - sizeof (int16)", QUIT ) ;
             }
-            case 4:
+            else * ( int16* ) address = ( int16 ) value ;
+            break ;
+        }
+        case 4:
+        {
+            if ( value > 2147483647 )
             {
-                if ( value > 2147483647 )
-                {
-                    Error ( "\nType Error", "value is greater than 2147483647 - sizeof (int32)", QUIT ) ;
-                }
-                else * ( int32* ) address = ( int32 ) value ;
-                break ;
+                Error ( "\nType Error", "value is greater than 2147483647 - sizeof (int32)", QUIT ) ;
             }
-            case 8:
-            default:
-            {
-                * ( int64 * ) address = ( int64 ) value ;
-                break ;
-            }
+            else * ( int32* ) address = ( int32 ) value ;
+            break ;
+        }
+        case 8:
+        default:
+        {
+            * ( int64 * ) address = ( int64 ) value ;
+            break ;
         }
     }
 }
 // ( addr n -- ) // (*addr) = n
 
 int
-Word_LvalueObjectByteSize ( Word * lvalueWord ) // = 
+Word_LvalueObjectByteSize ( Word * lvalueWord, Word * rValueWord ) // = 
 {
-    return (lvalueWord->W_ObjectAttributes & BIGNUM) ? sizeof (int64) : lvalueWord->ObjectByteSize ;
+    return (( rValueWord->Size == 8 ) || ( lvalueWord->W_ObjectAttributes & (BIGNUM | REGISTER_VARIABLE) ) 
+        || ( Namespace_IsUsing ( ( byte* ) "BigNum" ) ) ) ? ( sizeof (int64 ) ) : lvalueWord->ObjectByteSize ? lvalueWord->ObjectByteSize : ( sizeof (int64 ) ) ;
 }
 
 void
 CfrTil_Poke ( ) // = 
 {
-    Word * lvalueWord = TWS ( - 1 ), *rvalueWord = TWS ( 0 )  ;
-    if ( CompileMode ) Compile_Poke ( _Context_->Compiler0, Word_LvalueObjectByteSize (lvalueWord) ) ;
-    else
+    Word * lvalueWord = TWS ( - 1 ), *rvalueWord = TWS ( 0 ) ;
+    int64 lvalueSize = Word_LvalueObjectByteSize ( lvalueWord, rvalueWord ) ;
+    //if ( ! _TypeMismatch_CheckError_Print ( lvalueWord, rvalueWord, 1 ) )
     {
-        //uint64 * tos = ( uint64 * ) TOS ;
-        //uint64 * nos = ( uint64* ) _Dsp_ [ - 1 ] ;
-        //* nos = ( uint64 ) tos ;
-        //* ( int64* ) NOS = TOS ;
-        //_CfrTil_Move ( ( int64 * ) NOS, TOS, TWS ( - 1 )->ObjectByteSize, TWS ( 0 )->ObjectByteSize ) ;
-        _CfrTil_Move ( ( int64 * ) NOS, TOS, lvalueWord, rvalueWord ) ;
-        _Dsp_ -= 2 ;
+        if ( CompileMode ) Compile_Poke ( _Context_->Compiler0, lvalueSize ) ;
+        else
+        {
+            _CfrTil_Move ( ( int64 * ) NOS, TOS, lvalueSize ) ;
+            _Dsp_ -= 2 ;
+        }
     }
 }
 
@@ -136,11 +133,16 @@ void
 CfrTil_AtEqual ( ) // !
 {
     Word * lvalueWord = TWS ( 0 ), *rvalueWord = TWS ( -1 )  ;
-    if ( CompileMode ) Compile_AtEqual ( DSP ) ;
-    else
+    //Word * lvalueWord = TWS ( - 1 ), *rvalueWord = TWS ( 0 ) ;
+    int64 lvalueSize = Word_LvalueObjectByteSize ( lvalueWord, rvalueWord ) ;
+    //if ( ! _TypeMismatch_CheckError_Print ( lvalueWord, rvalueWord, 1 ) )
     {
-        _CfrTil_Move ( ( int64 * ) NOS, * ( int64* ) TOS, lvalueWord, rvalueWord ) ;
-        _Dsp_ -= 2 ;
+        if ( CompileMode ) Compile_AtEqual ( DSP ) ;
+        else
+        {
+            _CfrTil_Move ( ( int64 * ) NOS, * ( int64* ) TOS, lvalueSize ) ;
+            _Dsp_ -= 2 ;
+        }
     }
 }
 
@@ -150,11 +152,16 @@ void
 CfrTil_Store ( ) // !
 {
     Word * lvalueWord = TWS ( 0 ), *rvalueWord = TWS ( -1 )  ;
-    if ( CompileMode ) Compile_Store ( _Context_->Compiler0, Word_LvalueObjectByteSize (lvalueWord) ) ;
-    else
+    int64 lvalueSize = Word_LvalueObjectByteSize ( lvalueWord, rvalueWord ) ;
+    //if ( ! _TypeMismatch_CheckError_Print ( lvalueWord, rvalueWord, 1 ) )
     {
-        _CfrTil_Move ( ( int64 * ) TOS, NOS, lvalueWord, rvalueWord ) ;
-        _Dsp_ -= 2 ;
+        if ( CompileMode ) Compile_Store ( _Context_->Compiler0, Word_LvalueObjectByteSize ( lvalueWord, rvalueWord ) ) ;
+        else
+        {
+            _CfrTil_Move ( ( int64 * ) TOS, NOS, lvalueSize ) ;
+            _Dsp_ -= 2 ;
+        }
     }
 }
+
 

@@ -433,7 +433,7 @@ Compile_LogicalNot ( Compiler * compiler )
             if ( one->StackPushRegisterCode ) SetHere ( one->StackPushRegisterCode, 1 ) ;
             else _Compile_Move_StackN_To_Reg ( ACC, DSP, 0 ) ;
         }
-        else if ( optInfo->Optimize_Rm != ACC ) Compile_GetVarLitObj_RValue_To_Reg ( one, ACC ) ;
+        else if ( optInfo->Optimize_Rm != ACC ) Compile_GetVarLitObj_RValue_To_Reg (one, ACC , 0) ;
     }
     else
     {

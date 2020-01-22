@@ -211,7 +211,7 @@ _CfrTil_C_Infix_EqualOp ( block op )
         {
             int64 svState = cntx->State ;
             SetState ( cntx, C_SYNTAX | INFIX_MODE, false ) ; // we don't want to just set compiler->LHS_Word
-            if ( GetState ( _Context_, ADDRESS_OF_MODE ) ) lhsWord->ObjectByteSize = -1 ; //sizeof (byte*) ; 
+            if ( GetState ( _Context_, ADDRESS_OF_MODE ) ) lhsWord->ObjectByteSize = 8 ; //sizeof (byte*) ; 
             Interpreter_DoWord_Default ( interp, lhsWord, lhsWord->W_RL_Index, lhsWord->W_SC_Index ) ;
             cntx->State = svState ;
             wordr = _CfrTil_->StoreWord ;
@@ -313,7 +313,7 @@ CfrTil_IncDec ( int64 op ) // ++/--
             }
             else // crash ; FIXME!!
             {
-                _Compile_Move_Literal_Immediate_To_Reg ( THRU_REG, ( int64 ) nextWord->W_PtrToValue ) ;
+                _Compile_Move_Literal_Immediate_To_Reg (THRU_REG, ( int64 ) nextWord->W_PtrToValue , 0) ;
                 Compile_Move_Rm_To_Reg ( ACC, THRU_REG, 0, 0 ) ;
                 _Compile_Group5 ( op, REG, ACC, 0, 0, 0 ) ;
                 Compile_Move_Reg_To_Rm ( THRU_REG, ACC, 0, 0 ) ;

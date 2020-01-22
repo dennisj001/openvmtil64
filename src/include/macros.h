@@ -184,17 +184,17 @@
 #define Get( obj, field ) obj->field
 #define Set( obj, field, value ) (obj)->(field) = (value) 
 
-#define TypeNamespace_Get( object ) (object->TypeNamespace ? object->TypeNamespace : object->ContainingNamespace)
+#define TypeNamespace_Get( object ) ((object)->TypeNamespace ? (object)->TypeNamespace : (object)->ContainingNamespace)
 #define ReadLiner_GetLastChar() _ReadLiner_->InputKeyedCharacter
 #define ReadLiner_SetLastChar( chr ) if (_ReadLiner_) _ReadLiner_->InputKeyedCharacter = chr
 #define _Lexer_IsCharDelimiter( lexer, c ) lexer->DelimiterCharSet [ c ]
 #define _Lexer_IsCharDelimiterOrDot( lexer, c ) lexer->DelimiterOrDotCharSet [ c ]
 
-#define NAMESPACE_TYPE ( NAMESPACE | DOBJECT | CLASS | C_TYPE | C_CLASS | CLASS_CLONE )
+#define NAMESPACE_TYPE ( NAMESPACE | DOBJECT | CLASS | C_TYPE | C_CLASS | CLASS_CLONE | OBJECT )
 #define NAMESPACE_RELATED_TYPE ( NAMESPACE_TYPE | OBJECT_FIELD )
 #define OBJECT_TYPE ( LITERAL | CONSTANT | NAMESPACE_VARIABLE | LOCAL_VARIABLE | OBJECT | DOBJECT | PARAMETER_VARIABLE | T_LISP_SYMBOL | THIS ) // | T_LISP_SYMBOL
 #define VARIABLE_TYPE ( NAMESPACE_VARIABLE | LOCAL_VARIABLE | OBJECT | OBJECT_FIELD | DOBJECT | PARAMETER_VARIABLE | T_LISP_SYMBOL )
-#define NON_MORPHISM_TYPE ( OBJECT_TYPE | NAMESPACE_RELATED_TYPE )
+#define NON_MORPHISM_TYPE ( OBJECT_TYPE | VARIABLE_TYPE | NAMESPACE_RELATED_TYPE )
 #define IS_NON_MORPHISM_TYPE(word) (word->W_MorphismAttributes & NON_MORPHISM_TYPE)
 #define IS_MORPHISM_TYPE( word ) ( ( ( ! ( word->W_ObjectAttributes & ( NON_MORPHISM_TYPE ) ) ) \
         && ( ! ( word->W_MorphismAttributes & ( DEBUG_WORD | OBJECT_OPERATOR ) ) ) \

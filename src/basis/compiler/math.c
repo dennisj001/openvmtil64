@@ -58,17 +58,7 @@ _Compile_Divide ( Compiler * compiler, uint64 type )
     else if ( optSetupFlag )
     {
         CompileOptimizeInfo * optInfo = compiler->OptInfo ; //Compiler_CheckOptimize may change the optInfo
-        //Compiler_SCA_Word_SetCodingHere_And_ClearPreviousUse (optInfo->opWord, 0) ;
         Compile_MoveImm ( REG, RDX, 0, 0, CELL ) ;
-#if 0        
-        if ( optInfo->OptimizeFlag & OPTIMIZE_IMM )
-        {
-            Boolean reg = optInfo->wordArg1_literal ? ACC : OREG ;
-            Compile_MoveImm_To_Reg ( reg, ( int64 ) optInfo->Optimize_Imm, CELL ) ;
-            optInfo->Optimize_Rm = ( reg == ACC ) ? OREG : ACC ; //optInfo->wordArg1ACC_literal ? OREG : ACC ; //reg ;
-            optInfo->Optimize_Mod = REG ;
-        }
-#endif        
         // Compile_IDIV( mod, rm, controlFlag, sib, disp, imm, size )
         Compile_IDIV ( optInfo->Optimize_Mod, optInfo->Optimize_Rm, ( ( optInfo->Optimize_Disp != 0 ) ? DISP_B : 0 ), 0, optInfo->Optimize_Disp, 0, 0 ) ;
         if ( type == MODULO ) reg = RDX ;
@@ -82,7 +72,6 @@ _Compile_Divide ( Compiler * compiler, uint64 type )
         // EDX holds high order bits
         _Compile_Move_StackN_To_Reg ( ACC, DSP, - 1 ) ;
         Compile_MoveImm ( REG, RDX, 0, 0, CELL ) ;
-        //Compiler_WordStack_SCHCPUSCA (0, 0) ;
         Compile_IDIV ( MEM, DSP, 0, 0, 0, 0, 0 ) ;
         _Compile_Stack_DropN ( DSP, 1 ) ;
         if ( type == MODULO ) reg = RDX ;

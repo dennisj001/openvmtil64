@@ -77,6 +77,7 @@ Compiler_CheckForOpBetweenParentheses ( CompileOptimizeInfo * optInfo, dlnode * 
 // standard locations are :: arg1=reg=ACC=RAX ; arg2=rm=OREG=RCX
 // for 2 arg ops : STACK_1= arg1 : STACK_0 = arg2 
 // next on this list is a 'previous'
+
 void
 _Compiler_GetWordStackState ( Compiler * compiler, Word * word )
 {
@@ -256,10 +257,10 @@ Compiler_Optimizer_2Args_Or_WordArg1_Op ( Compiler * compiler )
         else
         {
             optInfo->Optimize_Reg = ( ( optInfo->wordArg1->W_ObjectAttributes & REGISTER_VARIABLE ) ? optInfo->wordArg1->RegToUse : ACC ) | REG_ON_BIT ;
-            if ( optInfo->wordArg1->W_ObjectAttributes & REGISTER_VARIABLE ) 
+            if ( optInfo->wordArg1->W_ObjectAttributes & REGISTER_VARIABLE )
                 SetHere ( optInfo->wordArg1->Coding ? optInfo->wordArg1->Coding : optInfo->wordArg2->Coding, 1 ) ;
             else if ( optInfo->wordArg1->StackPushRegisterCode ) _Set_To_Here_Word_StackPushRegisterCode ( optInfo->wordArg1, 1 ) ;
-            else 
+            else
             {
                 if ( GetState ( _Context_, ( C_SYNTAX | INFIX_MODE ) ) )
                 {
@@ -355,19 +356,15 @@ Compiler_Optimizer_WordArg2Op_Or_xBetweenArg1AndArg2 ( Compiler * compiler )
 void
 Compile_StandardArg ( Word * word, Boolean reg, Boolean rvalueFlag, byte * setHere, Boolean setScaFlag )
 {
-    //Word *word ;
-    //word = word0->BaseObject ? word0->BaseObject : word0 ;
-    //if ( word0->BaseObject ) SetHere ( word0->BaseObject->Coding, 1 ) ;
-    //else 
     if ( setHere ) SetHere ( setHere, 1 ) ;
     if ( setScaFlag ) Compiler_SCA_Word_SetCodingHere_And_ClearPreviousUse ( word, 0 ) ;
     if ( rvalueFlag -- )
     {
         if ( word->W_ObjectAttributes & REGISTER_VARIABLE ) reg = word->RegToUse ;
-        else Compile_GetVarLitObj_RValue_To_Reg ( word, reg ) ;
+        else Compile_GetVarLitObj_RValue_To_Reg ( word, reg, 8 ) ;
         while ( rvalueFlag -- ) Compile_Move_Rm_To_Reg ( reg, reg, 0, 0 ) ;
     }
-    else _Compile_GetVarLitObj_LValue_To_Reg ( word, reg ) ;
+    else _Compile_GetVarLitObj_LValue_To_Reg ( word, reg, 8 ) ;
     word->StackPushRegisterCode = Here ; // we are not pushing this but in case we are just rewriting the code in the next arg ?
 }
 
@@ -518,7 +515,7 @@ Compiler_CompileOptimize_IncDec ( Compiler * compiler )
             if ( optInfo->wordArg2->W_ObjectAttributes & REGISTER_VARIABLE ) reg = optInfo->wordArg2->RegToUse ;
             else reg = optInfo->Optimize_Rm ;
             SetHere ( optInfo->wordArg2->Coding, 0 ) ;
-            if ( optInfo->wordArg2->W_ObjectAttributes & ( NAMESPACE_VARIABLE ) ) _Compile_Move_Literal_Immediate_To_Reg ( reg, ( int64 ) optInfo->wordArg2->W_PtrToValue ) ;
+            if ( optInfo->wordArg2->W_ObjectAttributes & ( NAMESPACE_VARIABLE ) ) _Compile_Move_Literal_Immediate_To_Reg ( reg, ( int64 ) optInfo->wordArg2->W_PtrToValue, 0 ) ;
             Compiler_SCA_Word_SetCodingHere_And_ClearPreviousUse ( optInfo->opWord, 1 ) ;
             _Compile_Group5 ( optInfo->opWord->W_OpInsnCode, ( optInfo->wordArg2->W_ObjectAttributes & REGISTER_VARIABLE ) ? REG : MEM, reg, 0, optInfo->Optimize_Disp, 0 ) ;
             optInfo->rtrn = OPTIMIZE_DONE ;
@@ -547,12 +544,12 @@ Compiler_CompileOptimizedLoad ( Compiler * compiler )
             }
             else
             {
-                if (( optInfo->wordArg2->W_ObjectAttributes & OBJECT_FIELD ) && _Context_->Interpreter0->BaseObject )
+                if ( ( optInfo->wordArg2->W_ObjectAttributes & OBJECT_FIELD ) && _Context_->Interpreter0->BaseObject )
                 {
                     wordArg2 = _Context_->Interpreter0->BaseObject ;
                     Compile_StandardArg ( wordArg2, ACC, optInfo->wordArg2_rvalue, wordArg2->Coding, true ) ;
                 }
-                //SetHere ( optInfo->wordArg2->Coding, 0 ) ;
+                    //SetHere ( optInfo->wordArg2->Coding, 0 ) ;
                 else Compile_StandardArg ( optInfo->wordArg2, ACC, optInfo->wordArg2_rvalue, optInfo->wordArg2->Coding, true ) ;
             }
             _Word_CompileAndRecord_PushReg ( optInfo->wordArg2, ACC, true ) ;
@@ -594,7 +591,6 @@ Compile_Optimize_Dup ( Compiler * compiler )
 void
 Compile_X_OpEqual ( Compiler * compiler, block op )
 {
-    //SaveAndSetState ( _CfrTil_, OPTIMIZE_ON, true ) ;
     Word * zero = _CfrTil_WordList ( 0 ) ;
     uint8 valueReg = ACC ;
     //if ( Is_DebugOn ) Compiler_SC_WordList_Show ( 0, 0, 0 ) ;
@@ -605,7 +601,6 @@ Compile_X_OpEqual ( Compiler * compiler, block op )
     if ( ( ! optInfo->NumberOfArgs ) || optInfo->xBetweenArg1AndArg2 ) SyntaxError ( 1 ) ; // this case may be handled better than with SyntaxError
     if ( optInfo->NumberOfArgs == 2 )
     {
-        //SetHere ( optInfo->wordArg1->Coding, 1) ;
         Compiler_SetupArgsToStandardLocations ( compiler ) ;
         if ( ! ( optInfo->wordArg1->W_ObjectAttributes & REGISTER_VARIABLE ) ) /// what about if ( optInfo->wordArg2->CAttribute & REGISTER_VARIABLE ) ???
         {
@@ -628,7 +623,6 @@ Compile_X_OpEqual ( Compiler * compiler, block op )
             SetHere ( optInfo->lparen2->StackPushRegisterCode, 1 ) ;
             Compile_Move_Reg_To_Reg ( OREG, ACC, 0 ) ;
         }
-        //else SetHere ( compiler->LHS_Word->Coding, 1) ;
         Compile_StandardArg ( compiler->LHS_Word, OREG2, 0, 0, true ) ; //nb! lvalue
         Compile_StandardArg ( compiler->LHS_Word, ACC, 1, 0, false ) ; //nb! rvalue
         if ( ! optInfo->lparen2 ) Compile_StandardArg ( optInfo->wordArg2, OREG, 1, 0, true ) ; //nb! rvalue
@@ -647,13 +641,13 @@ Compile_X_OpEqual ( Compiler * compiler, block op )
         Compiler_Word_SCHCPUSCA ( optInfo->opWord, 0 ) ;
         Compile_Move_Reg_To_Rm ( OREG2, valueReg, 0, 0 ) ; //optInfo->Optimize_Reg, 0 ) ; //ACC, 0 ) ;
     }
-    //RestoreSavedState ( _CfrTil_, OPTIMIZE_ON ) ;
 }
 
 // this function probably could be improved/optimized 
-#if 1 // old version without using lvalueSize
+#if 0 // old version without using lvalueSize
+
 void
-Compile_X_Equal (Compiler * compiler, int64 op , int lvalueSize)
+Compile_X_Equal ( Compiler * compiler, int64 op, int lvalueSize )
 {
     Word * zero = _CfrTil_WordList ( 0 ) ;
     //if ( Is_DebugOn ) Compiler_SC_WordList_Show ( 0, 0, 0 ) ;
@@ -745,10 +739,10 @@ Compile_X_Equal (Compiler * compiler, int64 op , int lvalueSize)
     SetState ( _CfrTil_, IN_OPTIMIZER, false ) ;
 }
 #else
+
 void
-Compile_X_Equal (Compiler * compiler, int64 op , int lvalueSize)
+Compile_X_Equal ( Compiler * compiler, int64 op, int lvalueSize )
 {
-    //SaveAndSetState ( _CfrTil_, OPTIMIZE_ON, true ) ;
     Word * zero = _CfrTil_WordList ( 0 ) ;
     //if ( Is_DebugOn ) Compiler_SC_WordList_Show ( 0, 0, 0 ) ;
     _Compiler_GetWordStackState ( compiler, zero ) ;
@@ -780,7 +774,7 @@ Compile_X_Equal (Compiler * compiler, int64 op , int lvalueSize)
             return ;
         }
         Compiler_SCA_Word_SetCodingHere_And_ClearPreviousUse ( optInfo->opWord, 0 ) ;
-        Compile_Move_Reg_To_Rm ( reg, rm, 0, 0 ) ; //optInfo->wordArg1->ObjectSize ) ; // dst = reg ; src = rm
+        Compile_Move_Reg_To_Rm ( reg, rm, 0, lvalueSize ) ; //optInfo->wordArg1->ObjectSize ) ; // dst = reg ; src = rm
         //Compile_Move_Reg_To_Rm ( optInfo->Optimize_Reg, optInfo->Optimize_Rm, 0, 0 ) ; //optInfo->wordArg1->ObjectSize ) ; // dst = reg ; src = rm
     }
     else if ( op == EQUAL )
@@ -833,7 +827,7 @@ Compile_X_Equal (Compiler * compiler, int64 op , int lvalueSize)
             }
         }
         if ( optInfo->wordArg1 && ( optInfo->wordArg1->W_ObjectAttributes & REGISTER_VARIABLE ) ) Compile_Move_Reg_To_Reg ( dstReg, srcReg, 0 ) ;
-        else Compile_Move_Reg_To_Rm ( dstReg, srcReg, 0, 0 ) ;
+        else Compile_Move_Reg_To_Rm ( dstReg, srcReg, 0, lvalueSize ) ;
     }
     else if ( ! optInfo->rtrn ) Setup_MachineCodeInsnParameters ( compiler, REG, REG, ACC, OREG, 0, 0 ) ;
     SetState ( _CfrTil_, IN_OPTIMIZER, false ) ;

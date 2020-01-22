@@ -59,6 +59,7 @@ chey.hey = chey.heey1 ; // #x0123456789abcdef ;
 chey.hey chey.heey1 _assert0
 dump ( chey, chey.size ) ;
 printf ( "\n\tchey.hey = %lx", chey.hey ) ; 
+
 sp
 chey.chars [23] = 255 ;
 chey.chars [18] = #b10110 ; // #x16
@@ -344,7 +345,21 @@ bt.a123 1 _assert
 bt.c123.size 4 _assert
 bt.e123.size 8 _assert
 _assert ( bt.c123, 2147483647 ) ;
-
+void btest ( byteTest bt, byte i8, int16 i16, int32 i32, int64 i64 ) { bt.b123 = i8 ; bt.f123 = i16 ; bt.c123 = i32 ; bt.e123 = i64 ; }
+'abt byteTest new ;
+btest ( abt 46 456 234567 2345566 ) ;
+pwi btest ;
+p ( abt.size ) ; 
+p ( bt.size ) ; 
+dump ( abt abt.size ) ;
+bt.a123 1 _assert 
+bt.c123.size 4 _assert
+bt.e123.size 8 _assert
+_assert ( bt.c123, 2147483647 ) ;
+_assert ( abt.f123 456 ) ;
+_assert ( abt.b123 46 ) ;
+_assert ( abt.c123 234567 ) ;
+_assert ( abt.e123 2345566 ) ;
 sp
 int
 fac5 ( REG n  | REG facc ) 

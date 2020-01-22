@@ -206,11 +206,9 @@ Boolean( *BoolMapFunction_1 ) ( dlnode * ) ;
 typedef struct _Identifier // _Symbol
 {
     DLNode S_Node ;
-    union
-    {
-        int64 Slots ; // number of slots in Object
-        int64 ObjectByteSize ; // number of bytes in Object
-    } ;
+    int64 Slots ; // number of slots in Object
+    //int64 ObjectByteSize ; -> S_Size // number of bytes in Object
+    int64 CodeSize ;
     byte * S_Name ;
     uint64 State ;
     union
@@ -260,14 +258,15 @@ typedef struct _Identifier // _Symbol
 #define S_LispAttributes S_Node.n_Attributes.T_LispAttributes
 #define S_NumberOfPrefixedArgs S_Node.n_Attributes.T_NumberOfPrefixedArgs
 #define S_Size S_Node.n_Attributes.T_Size
-#define Size ObjectByteSize 
+#define Size S_Size //ObjectByteSize 
+#define ObjectByteSize S_Size
 #define S_ChunkSize S_Node.n_Attributes.T_ChunkSize
 #define S_NumberOfSlots S_Node.n_Attributes.T_NumberOfSlots
 #define S_Pointer W_Value
 #define S_String W_Value
 #define S_unmap S_Node.n_unmap
-#define S_CodeSize Size // used by Debugger, Finder
-#define S_MacroLength Size // used by Debugger, Finder
+#define S_CodeSize CodeSize 
+#define S_MacroLength CodeSize 
 
 #define Head S_Car
 #define Tail S_Cdr

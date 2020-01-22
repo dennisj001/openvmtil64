@@ -51,6 +51,7 @@ Lexer_ObjectToken_New ( Lexer * lexer, byte * token, int64 tsrli, int64 scwi ) /
         }
         else word = DataObject_New ( LITERAL, 0, token, lexer->L_MorphismAttributes, lexer->L_ObjectAttributes, 0, 0, lexer->Literal, 0, tsrli, scwi ) ;
         Word_SetTypeNamespace ( word, lexer->L_ObjectAttributes ) ;
+        word->ObjectByteSize = lexer->TokenObjectSize ;
         lexer->TokenWord = word ;
         DEBUG_SHOW ;
     }

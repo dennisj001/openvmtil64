@@ -20,7 +20,7 @@ TSI_TypeCheck_NonTypeVariable ( TSI * tsi, Word * stackWord, int64 ti )
                 || ( ( owtsSigCode == 'I' ) && ( stackWord->W_ObjectAttributes & ( T_INT32 | T_INT16 ) ) ) ) // same type "kind"
             {
                 // this is only initial alpha prototype logic, ie. needs to be refined/changed !!??!!
-                // infering that ...
+                // infering because ..
                 stackWord->W_MorphismAttributes |= morphismAttributes ;
                 stackWord->W_ObjectAttributes |= objectAttributes ;
                 if ( ! ( ( owtsSigCode == 'I' ) && ( stackWord->W_ObjectAttributes & ( OBJECT | OBJECT_FIELD | T_BOOLEAN ) ) ) ) // same type "kind" for now ; should be more precise ??
@@ -29,6 +29,7 @@ TSI_TypeCheck_NonTypeVariable ( TSI * tsi, Word * stackWord, int64 ti )
                     {
                         int8 owtsSigCodeSize = Tsi_ConvertTypeSigCodeToSize ( owtsSigCode ) ;
                         int8 swtsCodeSize = Tsi_ConvertTypeSigCodeToSize ( tsi->OpWord->W_TypeSignatureString [stackWord->Index] ) ;
+                        // infering that ...
                         if ( owtsSigCodeSize > swtsCodeSize ) tsi->OpWord->W_TypeSignatureString [stackWord->Index] = owtsSigCode ;
                         //else if ( swtsCodeSize > owtsSigCodeSize )
                     }
@@ -65,7 +66,7 @@ TSI_TypeCheck_TypeVariable ( TSI * tsi )
     if ( rvalue && lvalue && lvalue->Name && rvalue->Name )
     {
         if ( lvalue->ObjectByteSize && ( rvalue->ObjectByteSize > lvalue->ObjectByteSize ) ) tsi->TypeErrorStatus |= ( TSE_SIZE_MISMATCH ) ;
-#if 1       
+#if 1 // infer TypeNamespace       
         else if ( lvalue->TypeNamespace )
         {
             if ( ! rvalue->TypeNamespace )
@@ -82,7 +83,6 @@ TSI_TypeCheck_TypeVariable ( TSI * tsi )
         else if ( rvalue->TypeNamespace )
         {
             lvalue->TypeNamespace = rvalue->TypeNamespace ;
-            //tsi->TypeErrorStatus = false ;
         }
 #endif        
         else
@@ -362,7 +362,7 @@ Tsi_ExpandTypeLetterCode ( byte typeCode, byte * buffer )
 }
 
 void
-Word_TypeChecking_SetInfoForAnObject ( Word * word )
+Word_TypeChecking_SetSigInfoForAnObject ( Word * word )
 {
     Word * cwbc = _Context_->CurrentWordBeingCompiled ;
     cwbc->W_TypeSignatureString [word->Index - 1] = 'O' ;
@@ -502,7 +502,6 @@ Tsi_ConvertTypeSigCodeToSize ( byte code )
     if ( size = Tsi_ConvertTypeSigCodeSize_Attribute ( code ) ) return size ;
     else return Tsi_ConvertTypeSigCodeSize_Attribute2 ( code ) ;
 }
-
 
 uint64
 Tsi_ConvertTypeSigCodeToAttribute2 ( byte signatureCode )
@@ -653,3 +652,41 @@ CfrTil_ShowTypeWordStack ( )
     //else _Printf ( (byte*)"\ntypeChecking is off" ) ;
 }
 
+int64
+CfrTil_Get_ObjectByteSize ( Word * word )
+{
+    if ( word->Size ) return word->Size ;
+    else
+    {
+        int64 objectByteSize = 8 ;
+        Namespace * typeNamespace ;
+        if ( GetState ( _Context_, ADDRESS_OF_MODE ) ) objectByteSize = 8 ; //sizeof (byte*) ; 
+        else
+        {
+            if ( typeNamespace = TypeNamespace_Get ( word ) )
+                objectByteSize = ( int64 ) _CfrTil_VariableValueGet ( TypeNamespace_Get ( word )->Name, ( byte* ) "size" ) ;
+        }
+        return objectByteSize ;
+    }
+}
+
+int64
+CfrTil_Get_NamespaceObjectByteSize ( Namespace * ns )
+{
+    int64 objectByteSize ;
+    objectByteSize = ( int64 ) _CfrTil_VariableValueGet ( ns->Name, ( byte* ) "size" ) ;
+    if ( ! objectByteSize ) objectByteSize = ns->ObjectByteSize ;
+    return objectByteSize ;
+}
+
+#if 0
+
+byte
+CfrTil_Get_ObjectByteSize ( Word * word )
+{
+    byte size ;
+    if ( GetState ( _Context_, ADDRESS_OF_MODE ) ) size = - 1 ; // 8 ??
+    else size = ( TypeNamespace_Get ( word ) ? ( int64 ) _CfrTil_VariableValueGet ( TypeNamespace_Get ( word )->Name, ( byte* ) "size" ) : 0 ) ;
+    return size ;
+}
+#endif

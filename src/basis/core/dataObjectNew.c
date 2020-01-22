@@ -215,7 +215,6 @@ _CfrTil_ClassField_New ( byte * token, Class * aclass, int64 size, int64 offset 
     else if ( size == 8 ) word->W_ObjectAttributes |= T_INT64 ;
     else if ( size == 4 ) word->W_ObjectAttributes |= T_INT32 ;
     else if ( size == 2 ) word->W_ObjectAttributes |= T_INT16 ;
-    //word->CAttribute2 |= attribute ;
     word->Offset = offset ;
     return word ;
 }

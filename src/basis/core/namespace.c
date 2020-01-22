@@ -390,15 +390,18 @@ Namespace_New ( byte * name, Namespace * containingNs )
 Namespace *
 _Namespace_Find ( byte * name, Namespace * superNamespace, int64 exceptionFlag )
 {
-    Word * word = 0 ;
-    if ( superNamespace ) word = _Finder_FindWord_InOneNamespace ( _Finder_, superNamespace, name ) ;
-    if ( ! word ) word = Finder_FindWord_AnyNamespace ( _Finder_, name ) ;
-    if ( word && ( word->W_ObjectAttributes & ( NAMESPACE | CLASS | DOBJECT ) ) ) return ( Namespace* ) word ;
-    else if ( exceptionFlag )
+    if ( name )
     {
-        _Printf ( ( byte* ) "\nUnable to find Namespace : %s\n", name ) ;
-        CfrTil_Exception ( NAMESPACE_ERROR, 0, 1 ) ;
-        return 0 ;
+        Word * word = 0 ;
+        if ( superNamespace ) word = _Finder_FindWord_InOneNamespace ( _Finder_, superNamespace, name ) ;
+        if ( ! word ) word = Finder_FindWord_AnyNamespace ( _Finder_, name ) ;
+        if ( word && ( word->W_ObjectAttributes & ( NAMESPACE | CLASS | DOBJECT ) ) ) return ( Namespace* ) word ;
+        else if ( exceptionFlag )
+        {
+            _Printf ( ( byte* ) "\nUnable to find Namespace : %s\n", name ) ;
+            CfrTil_Exception ( NAMESPACE_ERROR, 0, 1 ) ;
+            return 0 ;
+        }
     }
     return 0 ;
 }

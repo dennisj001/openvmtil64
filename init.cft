@@ -408,10 +408,10 @@ dbgOff
 'doScript 1 const
 'doScript2 1 const
 '_doDemo 0 const    
-// === controls ===
 //dbgOn
+// === controls ===
+
 #if Is_DebugOn 
-: testAssertDbg ( n ) n @ 2 + dup p 4 "tad" _assert1dbg ; 2 d: testAssertDbg
 
 #if todo
 : _TODO ( str ) TODO ( str @ ) ;;
@@ -453,10 +453,39 @@ infixOff
 rtw
 'test 'tc find alias //nb! after rtw which removes all words "test", etc.
 
-#if Is_DebugOn
-: powReg ( REG base REG power | REG out -t II.I ) { out 1 = } { power @ 0 > } { power power @ 1 - = } { out out @ base @ * = } for return out ;
-2 30 powReg dup p  1073741824 _assert 
-'powReg find wdiss
+#if 1
+c_syntaxOn
+typedef struct _byteTest 
+{
+    byte a123;
+    int64 e123
+    byte b123;
+    byte bb123 ;
+    int32 c123;
+    byte d123;
+    int16 f123;
+} byteTest ;
+'bt byteTest new ;
+ps ( "\nbt.size =" ) ; p ( bt.size ) ;
+bt.a123 = 1 ; bt.b123 = 2 ; bt.c123 = 2147483647 ; bt.d123 = 4 ; bt.bb123 = 3 ; bt.f123 = 0x1234 ; dump ( bt, bt.size ) ; 
+//verbosity = 4 ;
+void btest ( byteTest bt, byte i8, int16 i16, int32 i32, int64 i64 ) { bt.b123 = i8 ; bt.f123 = i16 ; bt.c123 = i32 ; bt.e123 = i64 ; }
+'abt byteTest new ;
+btest ( abt 46 456 234567 2345566 ) ;
+pwi btest ;
+p ( abt.size ) ; 
+p ( bt.size ) ; 
+dump ( abt abt.size ) ;
+bt.a123 1 _assert 
+bt.c123.size 4 _assert
+bt.e123.size 8 _assert
+_assert ( bt.c123, 2147483647 ) ;
+_assert ( abt.f123 456 ) ;
+_assert ( abt.b123 46 ) ;
+_assert ( abt.c123 234567 ) ;
+_assert ( abt.e123 2345566 )
+//pause
+c_syntaxOff
 #endif
 : hi ( n m -- TOS ) n @ m @ + dup <dbg> p ; 2 3 d: hi 5 d: _assert 
 2 + 7 assertStkChk // stack checking 

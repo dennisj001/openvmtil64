@@ -204,7 +204,7 @@ Word_PrintOffset ( Word * word, int64 offset, int64 totalOffset )
         _Printf ( ( byte* ) "\n\'%s\' = object field :: type = %s : size (in bytes) = 0x%lx : base object \'%s\' = 0x%lx : offset = 0x%lx : total offset = 0x%lx : address = 0x%lx",
             //name, cntx->Interpreter0->BaseObject ? cntx->Interpreter0->BaseObject->Name : ( byte* ) "",
             name, word->TypeNamespace ? word->TypeNamespace->Name : ( byte* ) "",
-            word->ObjectByteSize ? word->ObjectByteSize : TypeNamespace_Get ( word ) ? ( word->ObjectByteSize = ( int64 ) _CfrTil_VariableValueGet ( TypeNamespace_Get ( word )->Name, ( byte* ) "size" ) ) : 0,
+            word->ObjectByteSize,
             cntx->Interpreter0->BaseObject ? String_ConvertToBackSlash ( cntx->Interpreter0->BaseObject->Name ) : ( byte* ) "",
             cntx->Interpreter0->BaseObject ? cntx->Interpreter0->BaseObject->W_Value : 0,
             word->Offset, totalOffset, cntx->Interpreter0->BaseObject ? ( ( ( byte* ) cntx->Interpreter0->BaseObject->W_Value ) + totalOffset ) : ( byte* ) - 1 ) ;
