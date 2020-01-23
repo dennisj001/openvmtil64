@@ -58,17 +58,6 @@ OpenVmTil_ShowExceptionInfo ( )
     return rtrn ;
 }
 
-#if 0
-
-void
-OVT_SimpleFinalPause ( )
-{
-    printf ( "\n!!Serious Error : SIGSEGV while handling a SIGSEGV : hit any key to continue full restart!!\n:!!> " ) ;
-    fflush ( stdout ) ;
-    Key ( ) ;
-}
-#endif
-
 int64
 OVT_Pause ( byte * prompt, int64 signalExceptionsHandled )
 {
@@ -147,11 +136,10 @@ OVT_Pause ( byte * prompt, int64 signalExceptionsHandled )
                     continue ;
                 }
                 case 'i': 
-                case '\\': 
                 default:
                 {
                     CfrTil_DoPrompt ( ) ;
-                    if (( key == '\\' ) || ( key == 'i' ) ) key = 0 ;
+                    if ( ( key == '/' ) || ( key == '\\' ) || ( key == 'i' ) ) key = 0 ;
                     _CfrTil_PrintChar ( key ) ;
                     ReadLine_Init ( _Context_->ReadLiner0, _CfrTil_Key ) ;
                     OpenVmTil_AddStringToHistoryOn ( ) ;
@@ -533,3 +521,15 @@ Error ( byte * emsg, byte * smsg, uint64 state )
         }
     }
 }
+
+#if 0
+
+void
+OVT_SimpleFinalPause ( )
+{
+    printf ( "\n!!Serious Error : SIGSEGV while handling a SIGSEGV : hit any key to continue full restart!!\n:!!> " ) ;
+    fflush ( stdout ) ;
+    Key ( ) ;
+}
+#endif
+

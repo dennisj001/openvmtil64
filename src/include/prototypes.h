@@ -21,7 +21,7 @@ void Compile_MoveMemValue_To_Reg(Boolean reg, byte *address, Boolean iSize);
 void Compile_MoveMemValue_ToReg_ThruReg(Boolean reg, byte *address, Boolean iSize, Boolean thruReg);
 void Compile_MoveReg_ToAddress_ThruReg(Boolean reg, byte *address, Boolean thruReg);
 void _Compile_SetAtAddress_WithReg(int64 *address, int64 reg, int64 thruReg);
-void _Compile_Move_Literal_Immediate_To_Reg(int64 reg, int64 value, int siize);
+void _Compile_Move_Literal_Immediate_To_Reg(int64 reg, int64 value, int size);
 void _Compile_X_Group1(Boolean code, Boolean toRegOrMem, Boolean mod, Boolean reg, Boolean rm, Boolean sib, int64 disp, Boolean osize);
 void _Compile_X_Group1_Reg_To_Reg(Boolean code, Boolean dstReg, int64 srcReg);
 void _Compile_X_Group1_Immediate(Boolean code, Boolean mod, Boolean rm, int64 disp, uint64 imm, Boolean iSize);

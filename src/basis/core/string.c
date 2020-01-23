@@ -884,26 +884,22 @@ IsString ( byte * address )
 byte *
 String_CheckForAtAdddress ( byte * address )
 {
-#if 1    
-    byte *string = 0 ; //, * address = (byte*) caddress ;
-    //if ( ( address > ( byte* ) 0xf00000000000 ) )
+    byte *str = 0 ; 
+    if ( NamedByteArray_CheckAddress ( _Q_->MemorySpace0->StringSpace, address )
+        || NamedByteArray_CheckAddress ( _Q_->MemorySpace0->CompilerTempObjectSpace, address )
+        || NamedByteArray_CheckAddress ( _Q_->MemorySpace0->SessionObjectsSpace, address )
+        || NamedByteArray_CheckAddress ( _Q_->MemorySpace0->TempObjectSpace, address )
+        || NamedByteArray_CheckAddress ( _Q_->MemorySpace0->DictionarySpace, address ) )
     {
-        if ( NamedByteArray_CheckAddress ( _Q_->MemorySpace0->StringSpace, address ) || NamedByteArray_CheckAddress ( _Q_->MemorySpace0->CompilerTempObjectSpace, address ) ||
-            NamedByteArray_CheckAddress ( _Q_->MemorySpace0->SessionObjectsSpace, address ) ||
-            NamedByteArray_CheckAddress ( _Q_->MemorySpace0->TempObjectSpace, address ) || NamedByteArray_CheckAddress ( _Q_->MemorySpace0->DictionarySpace, address ) )
+        if ( IsString ( address ) )
         {
-            if ( IsString ( address ) )
-            {
-                byte buffer [128] ; // use a string buffer instead ??
-                snprintf ( ( char* ) buffer, 128, "< string : \'%s\' >", c_gd ( String_ConvertToBackSlash ( address ) ) ) ;
-                string = String_New ( buffer, TEMPORARY ) ;
-            }
+            str = Buffer_Data_Cleared ( _CfrTil_->StringInsertB5 ) ;
+            byte * bstr = c_gd ( String_ConvertToBackSlash ( address ) ) ;
+            snprintf ( ( char* ) str, 128, "< string : \'%s", bstr ) ;
+            strcat ( str, c_u ( "\' >") ) ;
         }
     }
-    return string ;
-#else
-    return IsString ( address ) ;
-#endif    
+    return str ;
 }
 
 byte *

@@ -314,7 +314,16 @@ Debugger_PrepareDbgSourceCodeString ( Debugger * debugger, Word * word, int64 tw
     if ( word )
     {
         ReadLiner * rl = _Context_->ReadLiner0 ;
-        byte * il = String_New ( rl->InputLineString, TEMPORARY ) ; //nb! dont tamper with the input line. eg. removing its newline will affect other code which depends on newline
+        byte * il = Buffer_Data_Cleared ( _CfrTil_->StringInsertB4 ) ; //nb! dont tamper with the input line. eg. removing its newline will affect other code which depends on newline
+        strcpy ( il, rl->InputLineString ) ;
+        if ( String_Equal ( "init", word->Name ) ) 
+        {
+            String_RemoveEndWhitespace ( ( byte* ) il ) ;
+            strcat ( il, " -> " ) ;
+            strcat ( il, c_n (word->Name) ) ;
+            strcat ( il, " ( )" ) ;
+            return il ;
+        }
         int64 fel, tw, tvw ;
         fel = 32 - 1 ; //fe : formatingEstimate length : 2 formats with 8/12 chars on each sude - 32/48 :: 1 : a litte leave way
         tw = Debugger_TerminalLineWidth ( debugger ) ; // 139 ; //139 : nice width :: Debugger_TerminalLineWidth ( debugger ) ; 

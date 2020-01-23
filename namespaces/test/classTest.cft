@@ -117,7 +117,7 @@ using
     this.Accum this.Sum @ = 
 
 #if 1 // do> does> testing
-    this.Sum this.Category @ 3 + this.Prototype @ & = this.Sum @ 3 "init_assert2" do> locationPush does> locationPrint <do assert
+    this.Sum this.Category @ 3 + this.Prototype @ & = this.Sum @ 3 "init_assert2" do> locationPush does> locationPrint <do assert //pause
 #else
     this.Sum this.Category @ 3 + this.Prototype @ & = this.Sum @ 3 "init_assert2" assert 
 #endif

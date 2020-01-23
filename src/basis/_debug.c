@@ -114,25 +114,32 @@ GetPostfix ( byte * address, byte* postfix, byte * buffer )
     char * prePostfix = ( char* ) "  \t" ;
     if ( iaddress = Calculate_Address_FromOffset_ForCallOrJump ( address ) )
     {
-        if ( dbgWord && ( Is_NamespaceType ( dbgWord ) ) )
+        //if ( dbgWord && ( Is_NamespaceType ( dbgWord ) ) )
         {
-            word = Finder_FindWordFromAddress_InOneNamespace ( _Finder_, dbgWord->S_ContainingNamespace, iaddress ) ;
-        }
-        if ( ! word ) word = Word_GetFromCodeAddress ( iaddress ) ;
-        if ( word )
-        {
-            byte * name = ( byte* ) c_gd ( word->Name ) ; //, &_Q_->Default ) ;
-            if ( ( byte* ) word->CodeStart == iaddress )
+            if ( ! ( word = Finder_FindWordFromAddress_InOneNamespace ( _Finder_, dbgWord->S_ContainingNamespace, iaddress ) ) )
             {
-                snprintf ( ( char* ) buffer, 128, "%s< %s.%s : " UINT_FRMT " >%s", prePostfix, word->ContainingNamespace->Name, name, ( uint64 ) iaddress, postfix ) ;
-            }
-            else
-            {
-                snprintf ( ( char* ) buffer, 128, "%s< %s.%s+%ld >%s", prePostfix,
-                    word->ContainingNamespace ? word->ContainingNamespace->Name : ( byte* ) "", name, iaddress - ( byte* ) word->CodeStart, postfix ) ;
+                if ( word = Word_GetFromCodeAddress ( iaddress ) )
+                {
+                    byte * name = ( byte* ) c_gd ( word->Name ) ;
+                    byte *containingNamespace = word->ContainingNamespace ? word->ContainingNamespace->Name : ( byte* ) "" ;
+                    if ( ( byte* ) word->CodeStart == iaddress )
+                    {
+                        snprintf ( ( char* ) buffer, 128, "%s< %s.%s : " UINT_FRMT " >%s", prePostfix, containingNamespace, name, 
+                            ( uint64 ) iaddress, postfix ) ;
+                    }
+                    else
+                    {
+                        //snprintf ( ( char* ) buffer, 128, "%s< %s.%s+%ld >%s", prePostfix,
+                        //    containingNamespace, name, iaddress - ( byte* ) word->CodeStart, postfix ) ;
+                        snprintf ( ( char* ) buffer, 128, "%s< %s.%s+%ld", prePostfix,
+                            containingNamespace, name, iaddress - ( byte* ) word->CodeStart ) ;//, postfix ) ;
+                        strcat ( buffer, c_u ( " >") ) ;
+                        //strcat ( buffer, postfix ) ;
+                    }
+                }
             }
         }
-        else snprintf ( ( char* ) buffer, 128, "%s< %s >", prePostfix, ( char * ) "C compiler code" ) ;
+        if ( ! word ) snprintf ( ( char* ) buffer, 128, "%s< %s >", prePostfix, ( char * ) "C compiler code" ) ;
         postfix = buffer ;
     }
     else

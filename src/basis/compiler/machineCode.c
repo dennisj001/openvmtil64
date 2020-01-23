@@ -276,6 +276,7 @@ Compile_Move ( uint8 direction, uint8 mod, uint8 reg, uint8 rm, uint8 operandSiz
 {
     uint8 opCode0 = 0, opCode ;
     uint16 controlFlags = ( disp ? DISP_B : 0 ) | ( sib ? SIB_B : 0 ) ;
+    if ( ! operandSize ) operandSize = 8 ;
     if ( imm || immSize )
     {
         reg = 0 ;
@@ -289,11 +290,10 @@ Compile_Move ( uint8 direction, uint8 mod, uint8 reg, uint8 rm, uint8 operandSiz
         }
         else if ( immSize == 2 ) opCode = 0x66 ;
         else if ( immSize == 4 ) opCode = 0xc7 ;
-        else
+        else //if ( immSize == 8 ) 
         {
             opCode = 0xb8 ;
             opCode += ( rm & 7 ) ;
-            //reg = ? ; 
             controlFlags |= ( REX_W ) ;
         }
     }
@@ -313,14 +313,6 @@ Compile_Move ( uint8 direction, uint8 mod, uint8 reg, uint8 rm, uint8 operandSiz
         }
     }
     Compile_CalculateWrite_Instruction_X64 ( opCode0, opCode, mod, reg, rm, controlFlags, sib, disp, dispSize, imm, immSize ) ;
-#if 0    
-    if ( ( operandSize < 8 ) ) //== 1 )||( operandSize == 2 )) 
-    {
-        opCode = 0xa0 ;
-        if ( direction == TO_MEM ) opCode |= 2 ;
-        controlFlags |= ( REX_B ) ;
-    }
-#endif    
 }
 
 void
@@ -332,7 +324,6 @@ Compile_Move_WithSib ( uint8 direction, Boolean mod, Boolean reg, Boolean rm, Bo
 void
 Compile_Move_Reg_To_Rm ( Boolean rm, Boolean reg, int64 disp, byte size )
 {
-    if ( ! size ) size = 8 ;
     Compile_Move ( MEM, 0, reg, rm, size, 0, disp, 0, 0, 0 ) ;
 }
 
@@ -343,7 +334,6 @@ Compile_Move_Reg_To_Rm ( Boolean rm, Boolean reg, int64 disp, byte size )
 void
 Compile_Move_Rm_To_Reg ( Boolean rm, Boolean reg, int64 disp, byte size )
 {
-    if ( ! size ) size = 8 ;
     Compile_Move ( REG, 0, rm, reg, size, 0, disp, 0, 0, 0 ) ;
 }
 // intel syntax : opcode dst, src
@@ -353,12 +343,8 @@ Compile_Move_Rm_To_Reg ( Boolean rm, Boolean reg, int64 disp, byte size )
 void
 Compile_Move_Reg_To_Reg ( Boolean dstReg, int64 srcReg, byte size )
 {
-    if ( ! size ) size = 8 ;
     if ( dstReg != srcReg ) Compile_Move ( REG, REG, dstReg, srcReg, size, 0, 0, 0, 0, 0 ) ; //size ) ; // nb! mod == REG in move reg to reg
 }
-
-// direction : MEM or REG
-// reg : is address in case of MEMORY else it is the register (reg) value
 
 void
 Compile_MoveImm ( Boolean mod, Boolean rm, int64 disp, int64 imm, Boolean immSize )

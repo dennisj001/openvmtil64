@@ -131,6 +131,7 @@
 #define c_ad( s ) cc ( (byte*) s, (_Q_->Current == &_Q_->Alert) ? &_Q_->Default : &_Q_->Alert ) 
 #define c_da( s ) cc ( (byte*) s, (_Q_->Current == &_Q_->Default) ? &_Q_->Alert : &_Q_->Default ) 
 #define c_gd( s ) cc ( (byte*) s, (_Q_->Current == &_Q_->Debug) ? &_Q_->Default : &_Q_->Debug ) 
+#define c_dg( s ) cc ( (byte*) s, (_Q_->Current == &_Q_->Default) ? &_Q_->Debug : &_Q_->Default ) 
 #define c_gu( s ) cc ( (byte*) s, (_Q_->Current == &_Q_->Debug) ? &_Q_->User : &_Q_->Debug ) 
 #define c_ug( s ) cc ( (byte*) s, (_Q_->Current == &_Q_->User) ? &_Q_->Debug : &_Q_->User ) 
 #define c_gn( s ) cc ( (byte*) s, (_Q_->Current == &_Q_->Debug) ? &_Q_->Notice : &_Q_->Debug ) 
