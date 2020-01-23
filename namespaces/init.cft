@@ -398,10 +398,8 @@ stringMacrosOn
 lispOff
 
 // === controls ===
-Root 
-dbgOff
-//dbgOn 
 
+Root 
 'todo 0 const  
 'doX64 1 const
 'doTX64 1 const
@@ -409,11 +407,13 @@ dbgOff
 'doScript2 1 const
 'forStarters 0 const 
 '_doDemo 0 const
-    
-dbgOn
+
+dbgOff
+//dbgOn 
+
 // === controls ===
 
-#if Is_DebugOn 
+d: #if Is_DebugOn 
 
 #if todo
 : _TODO ( str ) TODO ( str @ ) ;;
