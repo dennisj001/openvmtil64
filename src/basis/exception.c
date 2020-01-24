@@ -235,7 +235,8 @@ OVT_Throw ( int signal, int64 restartCondition, Boolean pauseFlag )
         {
             jb = & _Q_->JmpBuf0 ;
             _Q_->RestartCondition = INITIAL_START ;
-            goto jump ; //siglongjmp ( *jb, 1 ) ;
+            _OVT_SimpleFinalPause ( "\nOVT_Throw : signal == SIGBUS : restarting to INITIAL_START ... with any <key>" ) ;
+            goto jump ; 
         }
         else
         {
@@ -261,10 +262,10 @@ OVT_Throw ( int signal, int64 restartCondition, Boolean pauseFlag )
         else jb = & _CfrTil_->JmpBuf0 ;
     }
     //OVT_SetExceptionMessage ( _Q_ ) ;
-    printf ( "\n%s\n%s %s from %s -> ...", _Q_->ExceptionMessage, ( jb == & _CfrTil_->JmpBuf0 ) ? "reseting cfrTil" : "restarting OpenVmTil",
+    
+     snprintf ( _Q_->ThrowBuffer->Data, BUFFER_SIZE, "\n%s\n%s %s from %s -> ...", _Q_->ExceptionMessage, ( jb == & _CfrTil_->JmpBuf0 ) ? "reseting cfrTil" : "restarting OpenVmTil",
         ( _Q_->Signal == SIGSEGV ) ? ": SIGSEGV" : "", ( _Q_->SigSegvs < 2 ) ? Context_Location ( ) : ( byte* ) "" ) ;
-    fflush ( stdout ) ;
-
+    _OVT_SimpleFinalPause ( _Q_->ThrowBuffer->Data ) ;
     if ( pauseFlag && ( _Q_->SignalExceptionsHandled < 2 ) && ( _Q_->SigSegvs < 2 ) ) OVT_Pause ( 0, _Q_->SignalExceptionsHandled ) ;
 jump:
     _OVT_SigLongJump ( jb ) ;
@@ -303,7 +304,7 @@ OpenVmTil_SignalAction ( int signal, siginfo_t * si, void * uc )
     }
     else if ( _Q_->SigSegvs )
     {
-        //OVT_SimpleFinalPause ( ) ;
+        OVT_SimpleFinalPause ( ) ;
         _OVT_SigLongJump ( & _Q_->JmpBuf0 ) ;
     }
     else OVT_Throw ( _Q_->Signal, _Q_->RestartCondition, 0 ) ;
@@ -522,14 +523,19 @@ Error ( byte * emsg, byte * smsg, uint64 state )
     }
 }
 
-#if 0
+void
+_OVT_SimpleFinalPause ( byte * msg )
+{
+    printf ( "%s", msg ) ;
+    fflush ( stdout ) ;
+    Key ( ) ;
+}
 
 void
 OVT_SimpleFinalPause ( )
 {
-    printf ( "\n!!Serious Error : SIGSEGV while handling a SIGSEGV : hit any key to continue full restart!!\n:!!> " ) ;
+    _OVT_SimpleFinalPause ( "\n!!Serious Error : SIGSEGV while handling a SIGSEGV : hit any key to continue full restart!!\n:!!> " ) ;
     fflush ( stdout ) ;
     Key ( ) ;
 }
-#endif
 

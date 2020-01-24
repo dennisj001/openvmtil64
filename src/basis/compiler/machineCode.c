@@ -18,6 +18,9 @@
 //    mod     reg     r/m  
 //   7 - 6   5 - 3   2 - 0 
 //    0-3              4 - b100 => sib, instead of reg ESP   : mod bit determines size of displacement 
+// bit fields :
+//  mod reg r/m 
+//   00 000 000
 // *if* insn has a mod/rm byte then ::
 // #define RM( insnAddr )  (*( (byte*) insnAddr + 1) & 7 )   // binary : 00000111
 // #define REG( insnAddr ) (*( (byte*) insnAddr + 1) & 56 )  // binary : 00111000 
@@ -132,7 +135,7 @@ _Compile_ImmDispData ( int64 immDisp, Boolean size, Boolean forceFlag )
     // to not compile an imm when imm is a parameter, set isize == 0 and imm == 0
     if ( size > 0 )
     {
-        if ( size == BYTE )
+        if ( size == BYTE ) 
             _Compile_Int8 ( ( byte ) immDisp ) ;
         else if ( size == 4 )
             _Compile_Int32 ( immDisp ) ;
@@ -141,9 +144,9 @@ _Compile_ImmDispData ( int64 immDisp, Boolean size, Boolean forceFlag )
     }
     else // with operandSize == 0 let the compiler use the minimal size ; nb. can't be imm == 0
     {
-        if ( immDisp >= 0x100000000 )
+        if ( abs(immDisp) >= 0x7fffffff )
             _Compile_Int64 ( immDisp ) ;
-        else if ( immDisp >= 0x100 )
+        else if ( abs (immDisp) >= 0x7f )
             _Compile_Int32 ( immDisp ) ;
         else if ( immDisp || forceFlag )
             _Compile_Int8 ( ( byte ) immDisp ) ;
@@ -167,14 +170,6 @@ _Compile_ImmDispData ( int64 immDisp, Boolean size, Boolean forceFlag )
 //    scale  index   base
 //    7 - 6  5 - 3  2 - 0
 //-----------------------------------------------------------------------
-
-void
-Compile_Int8 ( int64 opCode )
-{
-    //d0 ( byte * here = Here ) ;
-    _Compile_Int8 ( ( byte ) opCode ) ;
-    //D0 ( Debugger_UdisOneInstruction ( _Debugger_, here, ( byte* ) "", ( byte* ) "" ) ; ) ;
-}
 
 #if 0
 
@@ -203,13 +198,14 @@ Calculate_Rex ( Boolean reg, Boolean rm, Boolean rex_w_flag, Boolean rex_b_flag 
 Boolean
 CalculateModRegardingDisplacement ( Boolean mod, int64 disp )
 {
-    // mod reg r/m bits :
-    //  00 000 000
+    // bits :
+    //  mod reg r/m 
+    //   00 000 000
     if ( mod != REG )
     {
         if ( disp == 0 )
             mod = 0 ;
-        else if ( disp <= 0xff ) mod = 1 ;
+        else if ( disp <= 0x7f ) mod = 1 ; // displacement can be either plus or minus 0x7f ( 127 )
         else mod = 2 ;
     }
     return mod ;
@@ -833,7 +829,7 @@ Compile_UninitializedJump ( )
 }
 
 void
-_Compile_CallThru ( Boolean reg, Boolean regOrMem )
+_Compile_CallReg ( Boolean reg, Boolean regOrMem )
 {
     //DBI_ON ;
     _Compile_Group5 ( CALL, regOrMem, reg, 0, 0, 0 ) ;
@@ -844,7 +840,7 @@ void
 Compile_CallThru_AdjustRSP ( Boolean reg, Boolean regOrMem )
 {
     Compile_SUBI ( REG, RSP, 0, 8, 0 ) ;
-    _Compile_CallThru ( reg, regOrMem ) ;
+    _Compile_CallReg ( reg, regOrMem ) ;
     Compile_ADDI ( REG, RSP, 0, 8, 0 ) ;
 }
 
@@ -852,7 +848,7 @@ void
 Compile_Call ( byte * address )
 {
     Compile_MoveImm_To_Reg ( CALL_THRU_REG, ( int64 ) address, CELL ) ;
-    _Compile_CallThru ( CALL_THRU_REG, REG ) ;
+    _Compile_CallReg ( CALL_THRU_REG, REG ) ;
 }
 
 void
@@ -864,7 +860,7 @@ _Compile_Call_ThruReg_TestAlignRSP ( Boolean thruReg )
     _Compile_Jcc ( NEGFLAG_Z, TTT_ZERO, Here + 15, JCC8 ) ;
     Compile_CallThru_AdjustRSP ( thruReg, REG ) ;
     _Compile_JumpToDisp ( 3, JMPI8 ) ; // runtime
-    _Compile_CallThru ( thruReg, REG ) ;
+    _Compile_CallReg ( thruReg, REG ) ;
     //DBI_OFF ;
 }
 

@@ -31,28 +31,28 @@ CompileInt64 ( )
 }
 
 void
-CompileInt32 ( )
+Compile_Int32 ( )
 {
     int64 l = DataStack_Pop ( ) ;
     _Compile_Int32 ( l ) ;
 }
 
 void
-CompileInt16 ( )
+Compile_Int16 ( )
 {
     int64 w = DataStack_Pop ( ) ;
     _Compile_Int16 ( ( short ) w ) ;
 }
 
 void
-CompileByte ( )
+Compile_Int8 ( )
 {
     int64 b = DataStack_Pop ( ) ;
     _Compile_Int8 ( b ) ;
 }
 
 void
-CompileN ( )
+Compile_N_Bytes ( )
 {
     int64 size = DataStack_Pop ( ) ;
     byte * data = ( byte* ) DataStack_Pop ( ) ;

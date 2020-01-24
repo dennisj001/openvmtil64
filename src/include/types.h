@@ -867,7 +867,7 @@ typedef struct _CfrTil
     LambdaCalculus * LC ;
     FILE * LogFILE ;
     Cpu * cs_Cpu, * cs_Cpu2 ;
-    block CurrentBlock, SaveCpuState, SaveCpu2State, RestoreCpuState, RestoreCpu2State, Set_DspReg_FromDataStackPointer, Set_DataStackPointer_FromDspReg ; //, PeekReg, PokeReg ;
+    block CurrentBlock, WordRun, SaveCpuState, SaveCpu2State, RestoreCpuState, RestoreCpu2State, Set_DspReg_FromDataStackPointer, Set_DataStackPointer_FromDspReg ; //, PeekReg, PokeReg ;
     block PopDspToR8AndCall, CallReg_TestRSP, Call_ToAddressThruR8_TestAlignRSP ; //adjustRSPAndCall, adjustRSP ;
     ByteArray * PeekPokeByteArray ;
     Word * LastFinished_DObject, * LastFinished_Word, *StoreWord, *PokeWord, *RightBracket, *ScoOcCrw ;
@@ -974,6 +974,7 @@ typedef struct
     int64 DictionarySize, LispTempSize, MachineCodeSize, ObjectsSize, InternalObjectsSize, LispSize, ContextSize ;
     int64 TempObjectsSize, CompilerTempObjectsSize, SessionObjectsSize, DataStackSize, HistorySize, OpenVmTilSize ;
     int64 CfrTilSize, BufferSpaceSize, StringSpaceSize, Thrown ;
+    Buffer *ThrowBuffer ;
     sigjmp_buf JmpBuf0 ;
     //block GetChar//FunctionTable [8] ;
 } OpenVmTil ;

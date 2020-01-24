@@ -216,6 +216,7 @@
 // MorphismAttributes & LispAttributes -shared in common 
 #define CPRIMITIVE      ( (uint64) 1 << 0 )
 #define CFRTIL_WORD     ( (uint64) 1 << 1 )
+#define CFRTIL_ASM_WORD  ( (uint64) 1 << 2 ) // machine code words
 #define T_LISP_SYMBOL   ( (uint64) 1 << 3 )
 #define NOT_A_KNOWN_OBJECT ( (uint64) 1 << 6 )  
 #define KNOWN_OBJECT ( (uint64) 1 << 7 )  

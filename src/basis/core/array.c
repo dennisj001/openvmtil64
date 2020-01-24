@@ -196,7 +196,7 @@ _ByteArray_SetStartIndex ( ByteArray * ba, byte * address )
 // ! TODO : should be macros here !
 
 void
-ByteArray_AppendCopyItem ( ByteArray * ba, int64 size, int64 data ) // size in bytes
+ByteArray_AppendCopyInteger ( ByteArray * ba, int64 size, int64 data ) // size in bytes
 {
     _ByteArray_AppendSpace ( ba, size ) ; // size in bytes
     byte * address = ba->StartIndex ;
@@ -232,8 +232,8 @@ ByteArray_AppendCopyItem ( ByteArray * ba, int64 size, int64 data ) // size in b
 void
 ByteArray_AppendCopy ( ByteArray * ba, int64 size, byte * data ) // size in bytes
 {
-    _ByteArray_AppendSpace ( ba, size ) ; // size in bytes
-    MemCpy ( ba->StartIndex, data, size ) ;
+    byte *memSpace = _ByteArray_AppendSpace ( ba, size ) ; // size in bytes
+    MemCpy ( memSpace, data, size ) ;
 }
 
 void

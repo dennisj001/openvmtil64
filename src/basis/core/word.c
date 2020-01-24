@@ -11,7 +11,6 @@ Word_Run ( Word * word )
         _Context_->CurrentlyRunningWord = word ;
         word = _Context_->CurrentlyRunningWord ; // _Context_->CurrentlyRunningWord (= 0) may have been modified by debugger //word->Definition ) ;
         Block_Eval ( word->Definition ) ;
-        //_DEBUG_SHOW ( word, 0 ) ;
         _Context_->LastRanWord = word ;
         _Context_->CurrentlyRunningWord = 0 ;
     }

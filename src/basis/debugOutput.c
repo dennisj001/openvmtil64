@@ -167,8 +167,8 @@ _Debugger_ShowEffects ( Debugger * debugger, Word * word, Boolean stepFlag, Bool
             else if ( depthChange ) snprintf ( ( char* ) pb_change, 256, "%ld %s%s", - depthChange, ( depthChange < - 1 ) ? "cells" : "cell", " popped. " ) ;
             if ( dsp && ( debugger->SaveTOS != TOS ) ) op = ( char* ) "changed" ;
             else op = ( char* ) "set" ;
-            snprintf ( ( char* ) c, 2 * K, ( char* ) "0x%016lx", ( uint64 ) TOS ) ;
-            snprintf ( ( char* ) b, 2 * K, ( char* ) "TOS %s to %s.", op, c_gd ( c ) ) ;
+            snprintf ( ( char* ) c, BUFFER_SIZE, ( char* ) "0x%016lx", ( uint64 ) TOS ) ;
+            snprintf ( ( char* ) b, BUFFER_SIZE, ( char* ) "TOS %s to %s.", op, c_gd ( c ) ) ;
             strncat ( ( char* ) pb_change, ( char* ) b, 256 ) ; // strcat ( (char*) _change, cc ( ( char* ) c, &_Q_->Default ) ) ;
             name = word->Name ;
             if ( name ) name = String_ConvertToBackSlash ( name ) ;

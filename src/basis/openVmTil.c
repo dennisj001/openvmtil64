@@ -1,5 +1,5 @@
 #include "../include/cfrtil64.h"
-#define VERSION ((byte*) "0.902.860" ) 
+#define VERSION ((byte*) "0.902.900" ) 
 // inspired by :: Logic/Foml (Foundations of Mathematical Logic by Haskell Curry), CT/Oop (Category Theory, Object Oriented Programming) 
 // C/C++/C#, Lisp, RPN/Lag : Reverse Polish Notation, (Left Associative Grammar), 
 // State Machines, Push Down Automata (PDA), Turing Machines :: 
@@ -78,6 +78,7 @@ _OpenVmTil_Init ( OpenVmTil * ovt, int64 resetHistory )
             "termios, verbosity and memory category allocation sizes preserved. verbosity = %d.", ovt->Verbosity ) ;
         OpenVmTil_Print_DataSizeofInfo ( 0 ) ;
     }
+    ovt->ThrowBuffer = _Buffer_NewPermanent ( BUFFER_SIZE ) ;
     _OpenVmTil_ColorsInit ( ovt ) ;
 }
 

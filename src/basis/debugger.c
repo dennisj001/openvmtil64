@@ -235,17 +235,17 @@ Debugger_GetDbgAddressFromRsp ( Debugger * debugger, Cpu * cpu )
             }
             Stack_Push ( debugger->ReturnStack, ( uint64 ) retAddr ) ;
         }
-#define RS_SETUP 2        
+#define RS_SETUP 1        
+        if ( _Q_->Verbosity > 1 )
+        {
+            CfrTil_PrintReturnStack ( ) ;
+            Stack_Print ( debugger->ReturnStack, ( byte* ) "debugger->ReturnStack ", 0 ) ;
+        }
         debugger->DebugAddress = ( byte* ) _Stack_Pick ( debugger->ReturnStack, RS_SETUP ) ;
         for ( i2 = 0 ; i2 <= RS_SETUP ; i2 ++ ) Stack_Pop ( debugger->ReturnStack ) ; // pop the three intro functions
     }
     else debugger->DebugAddress = ( byte* ) cpu->Rsp[0] ;
     debugger->w_Word = Word_UnAlias ( Word_GetFromCodeAddress ( debugger->DebugAddress ) ) ; // 21 : code size back to <dbg>
-    if ( _Q_->Verbosity > 1 )
-    {
-        CfrTil_PrintReturnStack ( ) ;
-        Stack_Print ( debugger->ReturnStack, ( byte* ) "debugger->ReturnStack ", 0 ) ;
-    }
     return debugger->DebugAddress ;
 }
 

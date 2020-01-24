@@ -59,7 +59,8 @@ _Debugger_CompileOneInstruction ( Debugger * debugger, byte * jcAddress )
     if ( jcAddress ) // jump or call address
     {
         word = Word_UnAlias ( Word_GetFromCodeAddress ( jcAddress ) ) ;
-        if ( _Q_->Verbosity > 1 ) if ( IS_CALL_INSN ( debugger->DebugAddress ) ) _Word_ShowSourceCode ( word ) ;
+        //if ( _Q_->Verbosity > 1 ) 
+        if ( IS_CALL_INSN ( debugger->DebugAddress ) ) _Word_ShowSourceCode ( word ) ;
         if ( ( ! word ) || ( ! Debugger_CanWeStep ( debugger, word ) ) )
         {
             _Printf ( ( byte* ) "\ncalling thru - a non-native (C) subroutine : %s : .... :> %s ", word ? ( char* ) c_gd ( word->Name ) : "", Context_Location ( ) ) ;
@@ -80,7 +81,7 @@ _Debugger_CompileOneInstruction ( Debugger * debugger, byte * jcAddress )
     }
     else
     {
-        newDebugAddress = _Debugger_COI_DoInsnDefault ( debugger, size ) ;
+        newDebugAddress = _Debugger_COI_Do_Insn_Default ( debugger, size ) ;
     }
     return newDebugAddress ;
 }
@@ -396,11 +397,11 @@ Debugger_CanWeStep ( Debugger * debugger, Word * word )
 {
     int64 result = true ;
     //if ( ( ! debugger->DebugAddress ) || ( GetState ( debugger, DBG_SETUP_ADDRESS ) ) )
-    {
-        if ( ( ! word ) || ( ! word->CodeStart ) ) result = false ;
-        else if ( ( word && ( word->W_MorphismAttributes & ( CPRIMITIVE | DLSYM_WORD | C_PREFIX_RTL_ARGS ) ) )
-            || ( ! NamedByteArray_CheckAddress ( _Q_CodeSpace, word->CodeStart ) ) ) result = false ;
-    }
+    if ( ! word ) result = false ;
+    else if ( word->W_MorphismAttributes & ( CFRTIL_WORD|CFRTIL_ASM_WORD ) ) result = true ;
+    else if ( ! word->CodeStart ) result = false ;
+    else if ( word->W_MorphismAttributes & ( CPRIMITIVE | DLSYM_WORD | C_PREFIX_RTL_ARGS ) ) result = false ;
+    else if ( ! NamedByteArray_CheckAddress ( _Q_CodeSpace, word->CodeStart ) ) result = false ;
     SetState ( debugger, DBG_CAN_STEP, result ) ;
     return result ;
 }
@@ -432,8 +433,10 @@ Debugger_COI_CompileCallOut ( Debugger * debugger, byte * jcAddress, int64 size 
     return newDebugAddress ;
 }
 
+// do instruction default
+
 byte *
-_Debugger_COI_DoInsnDefault ( Debugger * debugger, int64 size )
+_Debugger_COI_Do_Insn_Default ( Debugger * debugger, int64 size )
 {
     byte * newDebugAddress = debugger->DebugAddress + size ;
     if ( ! GetState ( debugger, DBG_JCC_INSN ) )

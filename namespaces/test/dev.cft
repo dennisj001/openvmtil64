@@ -142,7 +142,8 @@ jcc8_Off
     { j 1 = } { j @ reps0 @ <= } { j ++ } 
     {
        //j @ w @ wordRun j @ p "." ps p ";" ps dn
-       j @ w @ wordRun drop // j @ p "." ps p ";" ps
+       //j @ w @ wordRun drop // j @ p "." ps p ";" ps
+       j @ w @ wrun drop // j @ p "." ps p ";" ps
        //j @ w @ wordRun j @ p "." ps p ";" ps //pause
     }
     for 
@@ -199,6 +200,7 @@ User
 #if 1
 reps0 23 =
 reps 10000 =
+//verbosity 2 =
 "factorial" ffx
 "cfactorial" ffx
 "cfactorial2" ffx
@@ -213,7 +215,7 @@ C "qexp2" ffx
 "bexp2" ffx
 "bexp3" ffx
 "fac" ffx
-"fac5" ffx //pause
+"fac5" ffx 
 User
 "factorial" ffx
 "cfactorial3" ffx
@@ -229,7 +231,7 @@ using
 "fac5" ffx
 "fac4" ffx
 sp
-//pause
+pause
 #endif
 
 jcc8_On
