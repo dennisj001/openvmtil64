@@ -1,7 +1,14 @@
 5 // stack checking marker
+Root
 jcc8_Off
 typecheckOn dbgTypecheckOn
+#if 0
+: sp stack pause ; 
+: include dup "\tincluding ..." printString printString stack pause _include ;
+#else
 : sp ; //stack pause ; 
+: include _include ; //dup "\tincluding ..." printString printString stack pause _include ;
+#endif
 // logOn
 verbosity 1 = 
 Debug
@@ -292,19 +299,15 @@ dscOn
 : debugTest1 1 2 + p debugTest2 ;
 : debugTest 1 2 + p debugTest1 ;
 : _assert1dbg ( n m str ) { n @ m @ != } { str @ ? str @ ps : drop "error" ps _info stack _pause } { debugTest } ifElse ; 
-: _assert1 ( n m str ) { n @ m @ != } { nl location hex n @ p "!=" ps m @ p "<:" ps "Error!" adps _info _pause } { str @ ps " : ok\n" ps nl } ifElse ;
-//#else
-//d: : _assert1 ( n m str ) { n @ m @ != } { <dbg> nl location hex n @ p "!=" ps m @ p "<:" ps "Error!" adps _info _pause } { <dbg> str @ ps " : ok\n" ps nl } ifElse ;
-: _assert1 ( n m str ) { n @ m @ != } { nl location hex n @ p "!=" ps m @ p "<:" ps "Error!" adps _info _pause } { str @ ps " : ok\n" ps nl } ifElse ;
-//: _assert1 ( n m str ) { n @ m @ != } { str @ ? str @ ps : drop "error" ps _info stack _pause } if ; 
-//: _assert1 ( n m str ) { n @ m @ != } { str @ ps "error" ps _info _pause } if ;
-//#endif
+: _assert1 ( n m str ) { n @ m @ != } { <dbg> nl location hex n @ p "!=" ps m @ p "<:" ps "Error!" adps _info _pause } { <dbg> str @ ps " : ok\n" ps nl } ifElse ;
+//: _assert1 ( n m str ) { n @ m @ != } { nl location hex n @ p "!=" ps m @ p "<:" ps "Error!" adps _info _pause } { str @ ps " : ok\n" ps nl } ifElse ;
 : ctloc do> locationPush does> locationPrint <do ; immediate // compile time location
 : _assert0 ( n m ) { n @ m @ != } { nl location nl hex n @ p "!=" ps m @ p "<:" ps "Error!" adps _info _pause } { } ifElse ; //{ str @ ps " : ok\n" ps nl } ifElse ; // no "ok" with this word
 : _assert ( n m ) nl  nl "_assert ::" ps { n @ m @ != } { n @ p "!=" ps m @ p "<:" ps "Error!" adps _info _pause } { " ok\n" ps nl } ifElse ;
 : assert1s ( s1 s2 str ) { s1 @ s2 @ strcmp } { nl str @ ps "error" ps _info _pause } if ;
 : assert0 ( n m ) { n @ m @ != } { nl "error" ps _info _pause } if ; 
 "assert" ' _assert1 find alias
+//"assert1" ' _assert1dbg find alias
 "assert1" ' _assert1 find alias
 "_assert" ' _assert0 find alias
 : _assertStkChk ( n m | str )  
@@ -326,10 +329,14 @@ dscOn
         }
         ifElse
     } if2
-    //stack pause
 ; 
 //' _assertStkChk find wdiss //pause
+#if 0
+: assertStkChk "\n_assertStkChk : " ps _assertStkChk stack pause ; 
+#else
 : assertStkChk _assertStkChk ; //"\n_assertStkChk : " ps stack pause ; 
+#endif
+
 Root
 User 
 : pause nl _pause ;
@@ -398,8 +405,10 @@ stringMacrosOn
 lispOff
 
 // === controls ===
-
 Root 
+dbgOff
+//dbgOn 
+
 'todo 0 const  
 'doX64 1 const
 'doTX64 1 const
@@ -407,13 +416,28 @@ Root
 'doScript2 1 const
 'forStarters 0 const 
 '_doDemo 0 const
-
-dbgOff
-//dbgOn 
-
+    
+//dbgOn
 // === controls ===
 
-d: #if Is_DebugOn 
+#if 0 
+c_syntaxOn
+typedef struct _byteTest0
+{
+    byte a [64] ;
+} bt1 ;
+'abt1 bt1 new
+p ( bt1.size ) ; 
+sprintf ( &abt1.a, "%s", "It's a beautiful day. Don't let it get away" ) ;
+dump ( abt1, abt1.size ) ;
+abt1.a [ 12 ] = 255 ; 
+dump ( abt1, abt1.size ) ;
+c_syntaxOff
+notUsing: _byteTest0 abt bt1 ;
+//pause
+#endif
+
+#if Is_DebugOn 
 
 #if todo
 : _TODO ( str ) TODO ( str @ ) ;;
@@ -421,7 +445,9 @@ d: #if Is_DebugOn
 #endif
 
 System C
+sp
 fload test.txt //pause
+//stack pause
 tc 
 //demo
 
@@ -476,7 +502,6 @@ c_syntaxOff
 #endif
 
 #if forStarters 
-
 : hi ( n m -- TOS ) n @ m @ + dup <dbg> p ; 2 3 d: hi 5 d: _assert
 #endif 
 2 + 7 assertStkChk // stack checking 

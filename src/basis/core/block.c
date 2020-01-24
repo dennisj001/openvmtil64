@@ -20,7 +20,7 @@ Dbg_Block_Eval (Word * word, block blck)
 {
     if ( blck )
     {
-        __DEBUG_SETUP( word, 0, (byte*) blck, 1 ) ;
+        _DEBUG_SETUP( word, 0, (byte*) blck, 1 ) ;
         _Block_Eval ( blck ) ;
     }
 }

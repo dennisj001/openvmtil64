@@ -23,10 +23,8 @@ factorial ( n | rec )
     return rec ;
 } 
 c_syntaxOff
-'factorial find wdiss 
+pwi factorial
 7 factorial dup p 5040 _assert sp //pause
-'C.int.factorial find wdiss 
-7 C.int.factorial dup p 5040 _assert sp //pause
 sp
 
 Combinators

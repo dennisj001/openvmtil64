@@ -1,6 +1,6 @@
 #include "../include/cfrtil64.h"
-#define VERSION ((byte*) "0.902.730" ) 
-// inspired by :: Logic/Foml (esp. Foundations of Mathematical Logic by Haskell Curry), CT/Oop (Category Theory, Object Oriented Programming) 
+#define VERSION ((byte*) "0.902.860" ) 
+// inspired by :: Logic/Foml (Foundations of Mathematical Logic by Haskell Curry), CT/Oop (Category Theory, Object Oriented Programming) 
 // C/C++/C#, Lisp, RPN/Lag : Reverse Polish Notation, (Left Associative Grammar), 
 // State Machines, Push Down Automata (PDA), Turing Machines :: 
 // Also Laws of Form, by G.S. Brown and Kurt Goedel's work.
@@ -64,12 +64,12 @@ _OpenVmTil_Init ( OpenVmTil * ovt, int64 resetHistory )
     // ? where do we want the init file ?
     if ( _File_Exists ( ( byte* ) "./init.cft" ) )
     {
-        ovt->InitString = ( byte* ) "\"./init.cft\" include" ; // could allow override with a startup parameter
+        ovt->InitString = ( byte* ) "\"./init.cft\" _include" ; // could allow override with a startup parameter
         SetState ( ovt, OVT_IN_USEFUL_DIRECTORY, true ) ;
     }
     else
     {
-        ovt->InitString = ( byte* ) "\"/usr/local/lib/cfrTil64/init.cft\" include" ; // could allow override with a startup parameter
+        ovt->InitString = ( byte* ) "\"/usr/local/lib/cfrTil64/init.cft\" _include" ; // could allow override with a startup parameter
         SetState ( ovt, OVT_IN_USEFUL_DIRECTORY, false ) ;
     }
     if ( ovt->Verbosity > 1 )

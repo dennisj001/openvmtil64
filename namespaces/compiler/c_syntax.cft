@@ -2,7 +2,11 @@
 5 
 User
 C
+#if 0 // debug
+: sp stack pause ; sp
+#else
 : sp ; //stack pause ; sp
+#endif 
 location
 //dbgOn 
 //verbosity 4 =
@@ -95,6 +99,7 @@ dump ( chey, cobj.size ) ;
 printf ( "\n\t%s\n", &chey.chars [ 24 ] ) ;
 printf ( "\n\t%s\n", "hoot" ) ; //&chey.chars [ 24 ] ) ;
 dump ( chey, cobj.size ) ; // add '&' within parentheses for lvalue
+//pause
 sp
 scOn
 libc
@@ -309,6 +314,7 @@ $ etc/script ;
 $$ etc/lispScript ; 
 $$ls -al /usr/local ; 
 $$ ls -al . ;
+drop //??
 #endif
 C
 sp
@@ -318,6 +324,7 @@ infixOff
 //stack pause
 : hi ( a b | c ) c a @ b @ + = printf ("\nshould read 3 : %d", c ) ; 1 2 hi //pause
 sp
+#if 0
 // test byte size objects
 c_syntaxOn
 typedef struct _byteTest 
@@ -345,9 +352,11 @@ bt.a123 1 _assert
 bt.c123.size 4 _assert
 bt.e123.size 8 _assert
 _assert ( bt.c123, 2147483647 ) ;
+sp
 void btest ( byteTest bt, byte i8, int16 i16, int32 i32, int64 i64 ) { bt.b123 = i8 ; bt.f123 = i16 ; bt.c123 = i32 ; bt.e123 = i64 ; }
 'abt byteTest new ;
 btest ( abt 46 456 234567 2345566 ) ;
+sp
 pwi btest ;
 p ( abt.size ) ; 
 p ( bt.size ) ; 
@@ -360,6 +369,8 @@ _assert ( abt.f123 456 ) ;
 _assert ( abt.b123 46 ) ;
 _assert ( abt.c123 234567 ) ;
 _assert ( abt.e123 2345566 ) ;
+notUsing: bt abt byteTest _byteTest ;
+#endif
 sp
 int
 fac5 ( REG n  | REG facc ) 
@@ -375,6 +386,7 @@ fac5 ( REG n  | REG facc )
 wdiss ( ' fac5 find ) 
 fac5 ( 7 ) dup p 5040 _assert  
 c_syntaxOff 
+notUsing: byteTest _byteTest abt bt ;
 bnOff
 infixOn
 (1 + 5) / (2 + 1) 2 _assert

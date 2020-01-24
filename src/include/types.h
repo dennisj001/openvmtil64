@@ -258,7 +258,7 @@ typedef struct _Identifier // _Symbol
 #define S_LispAttributes S_Node.n_Attributes.T_LispAttributes
 #define S_NumberOfPrefixedArgs S_Node.n_Attributes.T_NumberOfPrefixedArgs
 #define S_Size S_Node.n_Attributes.T_Size
-#define Size S_Size //ObjectByteSize 
+#define Size S_Size 
 #define ObjectByteSize S_Size
 #define S_ChunkSize S_Node.n_Attributes.T_ChunkSize
 #define S_NumberOfSlots S_Node.n_Attributes.T_NumberOfSlots
@@ -317,8 +317,8 @@ typedef struct _Identifier // _Symbol
 
 // Buffer
 #define B_CAttribute S_MorphismAttributes
-#define B_Size S_Size
-#define B_Data S_pb_Data2
+#define B_Size Size //S_Size
+#define B_Data Data //S_pb_Data2
 
 typedef int64( *cMapFunction_1 ) ( Symbol * ) ;
 typedef ListObject* ( *ListFunction0 )( ) ;
@@ -793,7 +793,7 @@ typedef struct
     byte * Location ;
     byte * DefaultTokenDelimiters ;
     byte * DefaultDelimiterCharSet ;
-    Word * CurrentlyRunningWord, *LastRunWord, *CurrentTokenWord, *TokenDebugSetupWord, *CurrentEvalWord, *LastEvalWord, *NlsWord ;
+    Word * CurrentlyRunningWord, *LastRanWord, *CurrentTokenWord, *TokenDebugSetupWord, *CurrentEvalWord, *LastEvalWord, *NlsWord ;
     Word * SC_CurrentCombinator, *SourceCodeWord, *CurrentDisassemblyWord, * LastCompiledWord, *CurrentWordBeingCompiled ;
     block CurrentlyRunningWordDefinition ;
     dllist * PreprocessorStackList ;

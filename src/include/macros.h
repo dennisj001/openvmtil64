@@ -229,7 +229,7 @@
 #define Is_DebugOn (Is_DebugShowOn && Is_DebugModeOn)
 #define DEBUG_PRINTSTACK if ( GetState ( _CfrTil_, DEBUG_MODE )  ) CfrTil_PrintDataStack () ;
 //#define __DEBUG_SETUP( word, token, address, force )  ( (word || token || address) && Is_DebugModeOn ) ? _Debugger_PreSetup (_Debugger_, word, token, (byte*) address, force ) : 0 
-#define __DEBUG_SETUP( word, token, address, force )  Debugger_PreSetup (_Debugger_, (word), (token), (byte*) (address), (force) ) 
+//#define _DEBUG_SETUP( word, token, address, force )  Debugger_PreSetup (_Debugger_, (word), (token), (byte*) (address), (force) ) 
 #define DEBUG_SETUP_TOKEN( token ) _DEBUG_SETUP( 0, token, 0 ) ;
 #define DEBUG_SETUP_ADDRESS( address, force ) if ( (address) && Is_DebugModeOn ) Debugger_PreSetup (_Debugger_, 0, 0, address, force ) ;
 #define DEBUG_SETUP( word ) _DEBUG_SETUP( word, 0, 0, 0 )

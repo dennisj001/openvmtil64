@@ -2,9 +2,13 @@
 Int
 bnOff
 5
-: sp ;
 "\nstarting lisp.cft\n" ddps
 Lisp
+#if 0 // debug
+: sp stack pause ; sp
+#else
+: sp ; //stack pause ; sp
+#endif 
 //lcReset
 decimal
 : sp ; //stack pause ; sp 
@@ -72,6 +76,7 @@ sp
 
 sp
 //lcReset
+//using
 (define g ( /\ (a b c) (a b c) ) )
 (define h ( /\ (a b c) (a c b) ) ) 
 

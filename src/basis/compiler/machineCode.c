@@ -355,7 +355,7 @@ Compile_MoveImm ( Boolean mod, Boolean rm, int64 disp, int64 imm, Boolean immSiz
         // there is no x64 instruction to move imm64 to mem directly
         uint8 thruReg = THRU_REG ;
         Compile_MoveImm_To_Reg ( thruReg, imm, immSize ) ; // thruReg : R8D : needs to be a parameter
-        Compile_Move_Reg_To_Rm ( rm, thruReg, disp, 0 ) ;
+        Compile_Move_Reg_To_Rm ( rm, thruReg, disp, immSize ) ;
     }
     else Compile_Move ( 0, mod, 0, rm, 0, 0, 0, 0, imm, immSize ) ; // nb. reg == 0 in a move immediate
 }

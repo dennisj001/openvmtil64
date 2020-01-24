@@ -112,13 +112,13 @@ GetPostfix ( byte * address, byte* postfix, byte * buffer )
     byte * iaddress = 0, *str ;
     Word * word = 0, *dbgWord = _Debugger_->w_Word ;
     char * prePostfix = ( char* ) "  \t" ;
-    if ( iaddress = Calculate_Address_FromOffset_ForCallOrJump ( address ) )
+    if ( iaddress = Calculate_Address_FromOffset_ForCallOrJump ( address ) ) 
     {
-        //if ( dbgWord && ( Is_NamespaceType ( dbgWord ) ) )
+        if ( dbgWord ) //&& ( Is_NamespaceType ( dbgWord ) ) )
         {
-            if ( ! ( word = Finder_FindWordFromAddress_InOneNamespace ( _Finder_, dbgWord->S_ContainingNamespace, iaddress ) ) )
+            if ( ( word = Word_GetFromCodeAddress_NoAlias ( iaddress ) ) )
             {
-                if ( word = Word_GetFromCodeAddress ( iaddress ) )
+                //if ( word = Word_GetFromCodeAddress ( iaddress ) )
                 {
                     byte * name = ( byte* ) c_gd ( word->Name ) ;
                     byte *containingNamespace = word->ContainingNamespace ? word->ContainingNamespace->Name : ( byte* ) "" ;

@@ -163,13 +163,13 @@ _Debugger_ShowEffects ( Debugger * debugger, Word * word, Boolean stepFlag, Bool
             pb_change [ 0 ] = 0 ;
 
             if ( GetState ( debugger, DBG_SHOW_STACK_CHANGE ) ) SetState ( debugger, DBG_SHOW_STACK_CHANGE, false ) ;
-            if ( depthChange > 0 ) sprintf ( ( char* ) pb_change, "%ld %s%s", depthChange, ( depthChange > 1 ) ? "cells" : "cell", " pushed. " ) ;
-            else if ( depthChange ) sprintf ( ( char* ) pb_change, "%ld %s%s", - depthChange, ( depthChange < - 1 ) ? "cells" : "cell", " popped. " ) ;
+            if ( depthChange > 0 ) snprintf ( ( char* ) pb_change, 256, "%ld %s%s", depthChange, ( depthChange > 1 ) ? "cells" : "cell", " pushed. " ) ;
+            else if ( depthChange ) snprintf ( ( char* ) pb_change, 256, "%ld %s%s", - depthChange, ( depthChange < - 1 ) ? "cells" : "cell", " popped. " ) ;
             if ( dsp && ( debugger->SaveTOS != TOS ) ) op = ( char* ) "changed" ;
             else op = ( char* ) "set" ;
-            sprintf ( ( char* ) c, ( char* ) "0x%016lx", ( uint64 ) TOS ) ;
-            sprintf ( ( char* ) b, ( char* ) "TOS %s to %s.", op, c_gd ( c ) ) ;
-            strcat ( ( char* ) pb_change, ( char* ) b ) ; // strcat ( (char*) _change, cc ( ( char* ) c, &_Q_->Default ) ) ;
+            snprintf ( ( char* ) c, 2 * K, ( char* ) "0x%016lx", ( uint64 ) TOS ) ;
+            snprintf ( ( char* ) b, 2 * K, ( char* ) "TOS %s to %s.", op, c_gd ( c ) ) ;
+            strncat ( ( char* ) pb_change, ( char* ) b, 256 ) ; // strcat ( (char*) _change, cc ( ( char* ) c, &_Q_->Default ) ) ;
             name = word->Name ;
             if ( name ) name = String_ConvertToBackSlash ( name ) ;
             char * achange = ( char* ) pb_change ;

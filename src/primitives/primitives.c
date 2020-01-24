@@ -297,7 +297,7 @@ CPrimitive CPrimitives [] = {
     { "localsShow", 0, 0, 0, _CfrTil_Debugger_Locals_Show, DEBUG_WORD, 0, 0, "Debug", "Root" },
     { "stop", 0, 0, 0, CfrTil_DebugStop, DEBUG_WORD, 0, 0, "Debug", "Root" },
 
-    { "include", 0, 0, 0, CfrTil_IncludeFile, 0, 0, 0, "System", "Root" },
+    { "_include", 0, 0, 0, CfrTil_IncludeFile, 0, 0, 0, "System", "Root" },
     { "reset", 0, 0, 0, CfrTil_WarmInit, 0, 0, 0, "System", "Root" },
     { "stackInit", 0, 0, 0, CfrTil_DataStack_Init, 0, 0, 0, "System", "Root" },
     { "stackDepth", 0, 0, 0, CfrTil_DataStack_Size, 0, 0, 0, "System", "Root" },

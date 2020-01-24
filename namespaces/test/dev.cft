@@ -1,6 +1,11 @@
 
 5
-: sp ; //s pause ; 
+C 
+#if 0
+: sp stack pause ;
+#else
+: sp ; //stack pause ;
+#endif
 optimizeOn inlineOn 
 //typecheckOn 
 jcc8_On 
@@ -10,8 +15,6 @@ bnOff
 // optimizeOff inlineOff
 // verbosity 2 = 
 Compiler Logic Int C User 
-: sp ;
-var: facTest fibTest Dsp ;
 
 // tail recursion from http://c2.com/cgi/wiki?TailCallOptimization
 c_syntaxOn 
@@ -34,8 +37,8 @@ int factoriali ( byte REG n | REG res )
 } prefix
 factoriali ( 7 ) ; p () ;
 'factoriali find wdiss //pause
+factoriali (7) ; dup p 5040 _assert //pause //sp
 c_syntaxOff 
-C_Syntax.factoriali (7) dup p 5040 _assert //pause //sp
 : factorial ( n  | fac -- TOS ) 
     fac 1 = 
     { n @ 1 > } { n @ fac @ * fac store n -- } while 
@@ -47,10 +50,8 @@ C_Syntax.factoriali (7) dup p 5040 _assert //pause //sp
 : bexp ( n ) n @ 1 > if{ n @ dup -- bexp * }else{ 1 }fi ; 7 bexp dup p 5040 _assert
 : bexp2 ( n ) { n @ 1 > } { n @ dup -- bexp2 * } { 1 } ifElse ; 7 bexp2 dup p 5040 _assert
 : bexp3 ( n ) { n @ 1 > } { n @ n @ -- bexp3 *  } { 1 } ifElse ;
-7 bexp3 dup p 5040 _assert //sp
-'bexp3 find wdiss //pause
-C 
-: sp ; //stack pause ;
+7 bexp3 dup nl p 5040 _assert //sp
+pwi bexp3 //pause
 c_syntaxOn
 int
 faccs3 ( n | rec -- TOS ) 
@@ -321,8 +322,8 @@ fibPTC2? ( REG n | REG fn, REG fn1, REG fn2 )
     }
     return fn ;
 }
-' int.fibPTC2? find wdiss
-20 int.fibPTC2? dup p 6765 _assert sp 
+pwi fibPTC2? 
+20 fibPTC2? dup p 6765 _assert sp 
 "fibPTC?" ffx 
 c_syntaxOff
 : sp ;

@@ -12,7 +12,7 @@ Word_Run ( Word * word )
         word = _Context_->CurrentlyRunningWord ; // _Context_->CurrentlyRunningWord (= 0) may have been modified by debugger //word->Definition ) ;
         Block_Eval ( word->Definition ) ;
         //_DEBUG_SHOW ( word, 0 ) ;
-        _Context_->LastRunWord = word ;
+        _Context_->LastRanWord = word ;
         _Context_->CurrentlyRunningWord = 0 ;
     }
 }
@@ -336,6 +336,7 @@ _CfrTil_Alias ( Word * word, byte * name )
         Word_InitFinal ( alias, ( byte* ) word->Definition ) ;
         alias->S_CodeSize = word->S_CodeSize ;
         alias->W_AliasOf = word ;
+        alias->Size = word->Size ;
         alias->NamespaceStack = word->NamespaceStack ;
         Strncpy ( alias->W_TypeSignatureString, word->W_TypeSignatureString, 7 ) ;
     }

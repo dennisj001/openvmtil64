@@ -41,7 +41,7 @@ CfrTil_C_Syntax_Off ( )
     //Namespace_DoNamespace ( "Bits" ) ; // TODO : must be a better way
     //if ( cntx->Compiler0->C_BackgroundNamespace ) _CfrTil_Namespace_InNamespaceSet ( cntx->Compiler0->C_BackgroundNamespace ) ;
     Context_SetDefaultTokenDelimiters ( cntx, ( byte* ) " \n\r\t", CONTEXT ) ;
-    Ovt_AutoVarOff ( ) ;
+    //Ovt_AutoVarOff ( ) ;
 }
 
 // switch to the default forth, postfix mode

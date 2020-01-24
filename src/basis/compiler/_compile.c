@@ -157,7 +157,7 @@ Compile_GetVarLitObj_RValue_To_Reg (Word * word, int64 reg , int size)
     if ( word->W_ObjectAttributes & ( OBJECT | THIS ) )
     {
         Do_ObjectOffset ( word, reg ) ;
-        byte size = CfrTil_Get_ObjectByteSize ( word ) ; // ?? Get Qualified Object Size ;
+        //byte size = CfrTil_Get_ObjectByteSize ( word ) ; // ?? Get Qualified Object Size ;
         Compile_Move_Rm_To_Reg ( reg, reg, 0, size ) ;
     }
 }

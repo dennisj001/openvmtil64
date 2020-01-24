@@ -59,8 +59,8 @@ factorial ( REG n | REG rec )
        return rec ;
 } 
 c_syntaxOff
-'C.int.factorial find wdiss 
-7 C.int.factorial dup p 5040 _assert sp //pause
+pwi factorial
+7 factorial dup p 5040 _assert sp //pause
 
 : fac ( n  | rec -- TOS ) 
     rec 1 = 

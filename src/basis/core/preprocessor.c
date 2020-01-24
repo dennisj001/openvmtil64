@@ -1,6 +1,8 @@
 
 #include "../../include/cfrtil64.h"
 
+#define PP_ELIF 2
+#define PP_ELSE 1
 void
 CfrTil_PreProcessor ( )
 {
@@ -11,7 +13,7 @@ CfrTil_PreProcessor ( )
     _CfrTil_UnAppendFromSourceCode_NChars ( _CfrTil_, 1 ) ; // 1 : '#'
     Finder_SetNamedQualifyingNamespace ( _Finder_, ( byte* ) "PreProcessor" ) ;
     SetState ( interp, PREPROCESSOR_MODE, true ) ;
-    Interpret_ToEndOfLine ( interp ) ;
+    Interpreter_InterpretNextToken ( interp ) ;
     SetState ( interp, PREPROCESSOR_MODE, false ) ;
     if ( Compiling ) SetState ( lexer, ( ADD_TOKEN_TO_SOURCE | ADD_CHAR_TO_SOURCE ), svState ) ;
 }
@@ -126,7 +128,7 @@ _GetCondStatus ( )
     SetState ( cntx->Compiler0, COMPILE_MODE, svcm ) ;
     SetState ( cntx, C_SYNTAX, svcs ) ;
     status = DataStack_Pop ( ) ;
-    if ( status > 0 ) status = 1 ;
+    if ( status > 0 ) status = true ;
     return status ;
 }
 
@@ -211,24 +213,24 @@ SkipPreprocessorCode ( Boolean skipControl )
                 {
                     if ( String_Equal ( token1, "if" ) )
                     {
-                        if ( skipControl == 1 ) ifLevel ++ ;
+                        if ( skipControl == PP_ELSE ) ifLevel ++ ;
                         else if ( GetIfStatus ( ) ) goto done ; // PP_INTERP
                     }
                     else if ( String_Equal ( token1, "else" ) )
                     {
-                        if ( skipControl == 1 ) continue ;
+                        if ( skipControl == PP_ELSE ) continue ;
                             //else if ( ( skipControl == 2 ) && ( ! ifLevel ) ) goto done ;
                         else if ( GetElseStatus ( ) ) goto done ;
                     }
                     else if ( String_Equal ( token1, "elif" ) )
                     {
-                        if ( skipControl == 1 ) continue ;
+                        if ( skipControl == PP_ELSE ) continue ;
                             //else if ( ( skipControl == 2 ) && ( ! ifLevel ) ) goto done ;
                         else if ( GetElifStatus ( ) ) goto done ;
                     }
                     else if ( String_Equal ( token1, "endif" ) )
                     {
-                        if ( skipControl == 1 )
+                        if ( skipControl == PP_ELSE )
                         {
                             if ( -- ifLevel < 0 )
                             {
@@ -253,24 +255,24 @@ done:
 void
 CfrTil_If_ConditionalInterpret ( )
 {
-    if ( ! GetIfStatus ( ) ) SkipPreprocessorCode ( 0 ) ;
+    if ( ! GetIfStatus ( ) ) SkipPreprocessorCode ( PP_SKIP ) ;
 }
 
 void
 CfrTil_Elif_ConditionalInterpret ( )
 {
-    if ( ! GetElifStatus ( ) ) SkipPreprocessorCode ( 2 ) ;
+    if ( ! GetElifStatus ( ) ) SkipPreprocessorCode ( PP_ELIF ) ;
 }
 
 void
 CfrTil_Else_ConditionalInterpret ( )
 {
-    if ( ! GetElseStatus ( ) ) SkipPreprocessorCode ( 1 ) ;
+    if ( ! GetElseStatus ( ) ) SkipPreprocessorCode ( PP_ELSE ) ;
 }
 
 void
 CfrTil_Endif_ConditionalInterpret ( )
 {
-    if ( ! GetEndifStatus ( ) ) SkipPreprocessorCode ( 0 ) ;
+    if ( ! GetEndifStatus ( ) ) SkipPreprocessorCode ( PP_SKIP ) ;
 }
 

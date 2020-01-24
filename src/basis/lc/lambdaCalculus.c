@@ -281,6 +281,8 @@ _LC_ReadEvalPrint_ListObject ( int64 parenLevel, int64 continueFlag, uint64 item
     LambdaCalculus * lc = _LC_ ;
     Lexer * lexer = _Context_->Lexer0 ;
     Compiler * compiler = _Context_->Compiler0 ;
+    int64 typeCheckState = GetState ( _CfrTil_, DBG_TYPECHECK_ON ) ;
+    SetState ( _CfrTil_, DBG_TYPECHECK_ON, false ) ;
     if ( lc && parenLevel ) lc->QuoteState = lc->ItemQuoteState ;
     else lc = LC_Init_Runtime ( ) ;
     LC_LispNamespaceOn ( ) ;
@@ -296,6 +298,7 @@ _LC_ReadEvalPrint_ListObject ( int64 parenLevel, int64 continueFlag, uint64 item
     LC_ClearTempNamespace ( ) ;
     if ( ! continueFlag ) Lexer_SetTokenDelimiters ( lexer, svDelimiters, 0 ) ;
     SetState ( compiler, LISP_MODE, false ) ;
+    SetState ( _CfrTil_, DBG_TYPECHECK_ON, typeCheckState ) ;
 }
 
 void

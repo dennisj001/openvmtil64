@@ -39,11 +39,18 @@
 //logOn
 
 C_Off
-C 
 : apause ; // pause ;
-: sp ; //stack pause ; 
+#if 0 // debug
+C 
+: sp stack pause ; sp
 User
-: sp ; //stack pause ;
+: sp stack pause ; sp
+#else
+C 
+: sp ; //stack pause ; sp
+User
+: sp ; //stack pause ; sp
+#endif 
 sp
 Compiler Compiling C Asm
 : asmBegin compileModeOn asmModeOn sourceCodeInit sourceCodeOn token wordNew begin ' {| find compileWord ; immediate  // nb : asm mode is interpreted
@@ -452,7 +459,7 @@ asm: testAsm
     MOVrr RAX RDX 
 ;asm
 testAsm
-pwi testAsm //pause
+pwi testAsm 
 sp 
 2 + 7 assertStkChk // stack checking
 //logOff

@@ -107,9 +107,8 @@ CfrTil_DebugRuntimeBreakpoint_IsDebugOn ( )
     if ( Is_DebugOn ) DebugRuntimeBreakpoint ( ) ;
 }
 
-void
+int64
 _DEBUG_SETUP ( Word * word, byte * token, byte * address, Boolean force )
 {
-    //if ( ( word || token || address ) && Is_DebugModeOn )  
-    Debugger_PreSetup ( _Debugger_, word, token, address, force ) ;
+    return Debugger_PreSetup ( _Debugger_, word, token, address, force ) ;
 }

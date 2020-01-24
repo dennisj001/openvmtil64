@@ -539,11 +539,11 @@ Boolean
 Lexer_IsTokenReverseDotted ( Lexer * lexer )
 {
     ReadLiner * rl = lexer->ReadLiner0 ;
-    int64 i, space = 0, start = lexer->TokenStart_ReadLineIndex - 1 ;
+    int64 space = 0, i, graph = 0, start = lexer->TokenStart_ReadLineIndex - 1 ;
     byte * nc = & rl->InputLineString [ start ] ;
+    i = start ; //??
     while ( 1 )
     {
-        //byte * current = & rl->InputLineString [ i ] ;
         switch ( *nc )
         {
             case ']': case '[': return true ;
@@ -556,16 +556,18 @@ Lexer_IsTokenReverseDotted ( Lexer * lexer )
             }
             case '"':
             {
-                if ( i < start ) return false ;
+                graph ++ ;
+                if ( i < start ) return false ; //??
                 break ;
             }
             case ' ':
             {
-                space ++ ;
+                if ( graph ) space ++ ;
                 break ;
             }
             default:
             {
+                graph ++ ;
                 if ( ( ! GetState ( _Compiler_, ARRAY_MODE ) ) && space && isgraph ( *nc ) ) return false ;
                 else
                 {
@@ -574,6 +576,7 @@ Lexer_IsTokenReverseDotted ( Lexer * lexer )
                 }
             }
         }
+        i -- ;
         nc -- ;
     }
     return false ;
@@ -584,9 +587,9 @@ Lexer_IsTokenReverseDotted ( Lexer * lexer )
 Boolean
 ReadLiner_IsTokenForwardDotted ( ReadLiner * rl, int64 index )
 {
-    int64 i, space = 0 ;
+    int64 i = 0, space = 0 ;
     byte * nc = & rl->InputLineString [ index ] ;
-    while ( 1 )
+    for ( i = 0 ; 1 ; i++, nc++ )
     {
         switch ( *nc )
         {
@@ -594,7 +597,7 @@ ReadLiner_IsTokenForwardDotted ( ReadLiner * rl, int64 index )
             case ',': case ';': case '(': case ')': case '\n': case '\'': return false ;
             case '.':
             {
-                if ( *( nc + 1 ) != '.' ) // watch for (double/triple) dot ellipsis
+                if ( i && ( *( nc + 1 ) != '.' ) )// watch for (double/triple) dot ellipsis
                     return true ;
                 break ;
             }
@@ -618,7 +621,6 @@ ReadLiner_IsTokenForwardDotted ( ReadLiner * rl, int64 index )
                 }
             }
         }
-        nc ++ ;
     }
     return false ;
 }

@@ -776,11 +776,11 @@ String_CheckWordSize ( byte * str, int64 wl )
 // it makes or attempts to make sure that that tokenStart (ts) is correct for any string
 
 int64
-String_FindStrnCmpIndex ( byte * sc, byte* name0, int64 index0, int64 wl0, int64 inc )
+String_FindStrnCmpIndex ( byte * sc, byte* name0, int64 wrli, int64 wl0, int64 inc )
 {
     byte * scspp2, *scspp, *scindex ;
-    d0 ( scspp = & sc [ index0 ] ) ;
-    int64 i, n, index = index0, slsc = Strlen ( sc ) ;
+    d0 ( scspp = & sc [ wrli ] ) ;
+    int64 i, n, index = wrli, slsc = Strlen ( sc ) ;
     for ( i = 0, n = inc + 1 ; ( i <= n ) ; i ++ ) // tokens are parsed in different order with parameter and c rtl args, etc. 
     {
         scindex = & sc [ index + i ] ;
@@ -805,7 +805,7 @@ String_FindStrnCmpIndex ( byte * sc, byte* name0, int64 index0, int64 wl0, int64
             }
         }
     }
-    index = index0 ;
+    index = wrli ;
     //return -1 ;
 done:
     d0 ( scspp2 = & sc [ index ] ) ;
@@ -972,70 +972,6 @@ next:
     return start ;
 }
 
-#if 0 // some future possibly useful string functions
-// returns end : an offset from 0 from which a strtok for a possible next token can be undertaken
-// token found is in caller's buffer arg
-
-int64
-_StrTok ( byte * str0, byte * buffer, byte * cset )
-{
-    int64 i, start, end ;
-    byte *str1, *str2 ;
-    // find start of non-delimiter text
-    // str0 is the original string
-    for ( i = 0, str1 = str0 ; *str1 ; str1 ++, i ++ )
-    {
-        if ( ! _CharSet_IsDelimiter ( cset, *str1 ) ) break ;
-    }
-    start = i ;
-    // str1 is the start of our search string - to find the first "delimiter"
-    // find first string <== the first delimiter after start of non-delimiter text
-    for ( i = 0, str2 = str1 ; *str2 ; str2 ++, i ++ )
-    {
-        if ( _CharSet_IsDelimiter ( cset, *str2 ) ) break ;
-        buffer [ i ] = * str2 ;
-    }
-    buffer [ i ] = 0 ;
-    // str2 is either a delimiter or a null, which is also a delimiter. Add 1 for start of a possible next token ...
-    if ( *str2 ) // check if it's just a null, the end of string - 0
-    {
-        // remember buffer is sti->Out, the arg to the macro function, the pre-expanded string, if that macro function exists in SMNamespace
-        end = start + i ; // end is an offset from 0 from which a strtok for a possible next token can be undertaken
-    }
-    else end = 0 ;
-
-    return end ;
-}
-
-byte *
-String_GetDelimitedString ( byte * str0, byte delimiter )
-{
-    int64 i ;
-    byte * str = String_New ( str0, TEMPORARY ) ;
-    for ( i = 0 ; str [i] ; i ++ )
-    {
-        if ( str [i] == delimiter )
-        {
-            str [i] = 0 ;
-
-            return str ;
-        }
-    }
-}
-
-int64
-_String_CountTabs ( byte * start, byte * end )
-{
-    int64 n ;
-    for ( n = 0 ; start != end ; start ++ )
-    {
-
-        if ( *start == '\t' ) n ++ ;
-    }
-    return n ;
-}
-#endif
-
 byte *
 Buffer_Data_Cleared ( Buffer * b )
 {
@@ -1186,4 +1122,68 @@ _MemCpy ( byte *dst, byte *src, int64 size )
     for ( i = 0 ; i < size ; i ++ ) dst [i] = src[i] ;
 }
 
+
+#if 0 // some future possibly useful string functions
+// returns end : an offset from 0 from which a strtok for a possible next token can be undertaken
+// token found is in caller's buffer arg
+
+int64
+_StrTok ( byte * str0, byte * buffer, byte * cset )
+{
+    int64 i, start, end ;
+    byte *str1, *str2 ;
+    // find start of non-delimiter text
+    // str0 is the original string
+    for ( i = 0, str1 = str0 ; *str1 ; str1 ++, i ++ )
+    {
+        if ( ! _CharSet_IsDelimiter ( cset, *str1 ) ) break ;
+    }
+    start = i ;
+    // str1 is the start of our search string - to find the first "delimiter"
+    // find first string <== the first delimiter after start of non-delimiter text
+    for ( i = 0, str2 = str1 ; *str2 ; str2 ++, i ++ )
+    {
+        if ( _CharSet_IsDelimiter ( cset, *str2 ) ) break ;
+        buffer [ i ] = * str2 ;
+    }
+    buffer [ i ] = 0 ;
+    // str2 is either a delimiter or a null, which is also a delimiter. Add 1 for start of a possible next token ...
+    if ( *str2 ) // check if it's just a null, the end of string - 0
+    {
+        // remember buffer is sti->Out, the arg to the macro function, the pre-expanded string, if that macro function exists in SMNamespace
+        end = start + i ; // end is an offset from 0 from which a strtok for a possible next token can be undertaken
+    }
+    else end = 0 ;
+
+    return end ;
+}
+
+byte *
+String_GetDelimitedString ( byte * str0, byte delimiter )
+{
+    int64 i ;
+    byte * str = String_New ( str0, TEMPORARY ) ;
+    for ( i = 0 ; str [i] ; i ++ )
+    {
+        if ( str [i] == delimiter )
+        {
+            str [i] = 0 ;
+
+            return str ;
+        }
+    }
+}
+
+int64
+_String_CountTabs ( byte * start, byte * end )
+{
+    int64 n ;
+    for ( n = 0 ; start != end ; start ++ )
+    {
+
+        if ( *start == '\t' ) n ++ ;
+    }
+    return n ;
+}
+#endif
 

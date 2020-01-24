@@ -29,7 +29,7 @@ Context_Location ( )
 Word *
 _Context_CurrentWord ( Context * cntx )
 {
-    return cntx->CurrentlyRunningWord ? cntx->CurrentlyRunningWord : _Context_->CurrentEvalWord ? _Context_->CurrentEvalWord : _Context_->LastRunWord ? _Context_->LastRunWord : cntx->CurrentTokenWord ;
+    return cntx->CurrentlyRunningWord ? cntx->CurrentlyRunningWord : _Context_->CurrentEvalWord ? _Context_->CurrentEvalWord : _Context_->LastRanWord ? _Context_->LastRanWord : cntx->CurrentTokenWord ;
 }
 
 Word *
@@ -205,7 +205,7 @@ _Context_IncludeFile ( Context * cntx, byte *filename, int64 interpretFlag )
             if ( interpretFlag ) Interpret_UntilFlaggedWithInit ( cntx->Interpreter0, END_OF_FILE | END_OF_STRING ) ;
 
             cntx->System0->IncludeFileStackNumber -- ;
-            if ( ! cntx->System0->IncludeFileStackNumber ) Ovt_AutoVarOff ( ) ;
+            //if ( ! cntx->System0->IncludeFileStackNumber ) Ovt_AutoVarOff ( ) ;
             if ( _Q_->Verbosity > 2 ) _Printf ( ( byte* ) "\n%s included\n", filename ) ;
             OVT_MemList_FreeNBAMemory ( ( byte* ) "ObjectSpace", 1 * M, 1 ) ; // not able to do this yet ??
         }
