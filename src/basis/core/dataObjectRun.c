@@ -217,6 +217,7 @@ Compile_C_FunctionDeclaration ( byte * token1 )
     }
     while ( token ) ;
     //CfrTil_Interpret_C_Blocks ( 1, 1, 0 ) ; // ??? seems like this should be used somewhere here 
+    Ovt_AutoVarOff ( ) ;
 }
 
 // this is currently kinda rough
@@ -287,7 +288,7 @@ Compile_C_TypeDeclaration ( byte * token0 ) //, int64 tsrli, int64 scwi)
             Interpreter_DoWord ( interp, word, - 1, - 1 ) ;
             _Compile_C_TypeDeclaration ( ) ;
         }
-        //Ovt_AutoVarOff ( ) ;
+        Ovt_AutoVarOff ( ) ;
     }
 }
 
