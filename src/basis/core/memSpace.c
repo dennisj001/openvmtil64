@@ -89,6 +89,71 @@ _Mem_ChunkAllocate ( int64 size, uint64 allocType )
     return ( byte* ) mchunk ;
 }
 
+ByteArray *
+_ByteArray_AppendSpace_MakeSure ( ByteArray * ba, int64 size ) // size in bytes
+{
+    NamedByteArray * nba = ba->OurNBA ;
+    if ( nba )
+    {
+        while ( ba->MemRemaining < size )
+        {
+            int64 largestRemaining = 0 ;
+            // check the other bas in the nba list to see if any have enough remaining
+            {
+                dlnode * node, *nodeNext ;
+                for ( node = dllist_First ( ( dllist* ) & nba->NBA_BaList ) ; node ; node = nodeNext )
+                {
+                    if ( node == nodeNext ) break ; // ?? TODO : should need this
+                    nodeNext = dlnode_Next ( node ) ;
+                    ba = Get_BA_Symbol_To_BA ( node ) ;
+                    if ( ba )
+                    {
+                        if ( ba->MemRemaining > largestRemaining ) largestRemaining = ba->MemRemaining ;
+                        if ( ba->MemRemaining >= size ) goto done ;
+                    }
+                }
+#if 0                
+                if ( ( _Q_CodeByteArray == ba ) && Compiling )
+                {
+                    _Printf ( ( byte* ) "\nOnly %d code space remaining : increase the 'codeSize' variable in openvmtil.c\n", largestRemaining ) ;
+                    Pause ( ) ;
+                }
+#endif                
+            }
+            _Q_->AllocationRequestLacks ++ ;
+            //nba->NBA_DataSize += ( ( ( nba->CheckTimes ++ ) * ( nba->NBA_DataSize ) ) + size ) ; 
+            nba->NBA_DataSize += ( ( ( ++ nba->CheckTimes ) * ( 128 ) ) + size ) ; 
+            //nba->NBA_DataSize += ( ( ( ++ nba->CheckTimes ) * ( 10 * K ) ) + size ) ; 
+            //nba->NBA_DataSize += size ; // has to at least have this size available
+            if ( _Q_->Verbosity > 3 )
+            {
+                printf ( "\n%s size requested = %ld :: adding size = %ld :: largest remaining = %ld :: Nba total remaining = %ld :: checkTimes = %ld\n",
+                    nba->NBA_Symbol.Name, size, nba->NBA_DataSize, largestRemaining, nba->MemRemaining, nba->CheckTimes ) ;
+            }
+            ba = _NamedByteArray_AddNewByteArray ( nba, nba->NBA_DataSize ) ; //( nba->NBA_DataSize > size ) ? nba->NBA_DataSize : ( nba->NBA_DataSize + size ) ) ; //size ) ;
+        }
+    }
+    else Error_Abort ( "_ByteArray_AppendSpace_MakeSure", ( byte* ) "\n_ByteArray_AppendSpace_MakeSure : no nba?!\n" ) ;
+done:
+    nba->ba_CurrentByteArray = ba ;
+    return ba ;
+}
+
+//macros.h :  _Allocate( size, nba ) _ByteArray_AppendSpace ( nba->ba_CurrentByteArray, size ) 
+byte *
+_ByteArray_AppendSpace ( ByteArray * ba, int64 size ) // size in bytes
+{
+    while ( ba->MemRemaining < size )
+    {
+        ba = _ByteArray_AppendSpace_MakeSure ( ba, size ) ;
+    }
+    ba->StartIndex = ba->EndIndex ; // move index to end of the last append
+    ba->EndIndex += size ;
+    if ( ba->OurNBA ) ba->OurNBA->MemRemaining -= size ; //nb. debugger->StepInstructionBA doesn't have an nba
+    ba->MemRemaining -= size ;
+    return ba->StartIndex ;
+}
+
 byte *
 Mem_Allocate ( int64 size, uint64 allocType )
 {

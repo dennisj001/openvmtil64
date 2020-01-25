@@ -358,6 +358,11 @@ void btest ( byteTest bt, byte i8, int16 i16, int32 i32, int64 i64 ) { bt.b123 =
 btest ( abt 46 456 234567 2345566 ) ;
 sp
 pwi btest ;
+void btest1 ( byteTest bt, byte i8 ) { bt.bb123 = i8 ; }
+btest1 ( abt, 0x42 ) ;
+_assert ( abt.bb123, 0x42 ) ;
+dump ( abt abt.size ) ;
+pwi btest1 ;
 p ( abt.size ) ; 
 p ( bt.size ) ; 
 dump ( abt abt.size ) ;

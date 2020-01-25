@@ -660,7 +660,7 @@ Get_SourceCodeWord ( )
         {
             if ( debugger && Is_DebugOn )
             {
-                if ( debugger->LastEffectsWord ) scWord = debugger->LastEffectsWord ;
+                if ( debugger->LastPostShowWord ) scWord = debugger->LastPostShowWord ;
                 else scWord = Word_GetFromCodeAddress ( debugger->DebugAddress ) ;
             }
         }

@@ -420,23 +420,6 @@ dbgOff
 //dbgOn
 // === controls ===
 
-#if 0 
-c_syntaxOn
-typedef struct _byteTest0
-{
-    byte a [64] ;
-} bt1 ;
-'abt1 bt1 new
-p ( bt1.size ) ; 
-sprintf ( &abt1.a, "%s", "It's a beautiful day. Don't let it get away" ) ;
-dump ( abt1, abt1.size ) ;
-abt1.a [ 12 ] = 255 ; 
-dump ( abt1, abt1.size ) ;
-c_syntaxOff
-notUsing: _byteTest0 abt bt1 ;
-//pause
-#endif
-
 #if Is_DebugOn 
 
 #if todo

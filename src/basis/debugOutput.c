@@ -126,11 +126,11 @@ done:
 void
 _Debugger_ShowEffects ( Debugger * debugger, Word * word, Boolean stepFlag, Boolean force )
 {
-    debugger->w_Word = Word_UnAlias ( word ) ;
+    //debugger->w_Word = Word_UnAlias ( word ) ;
     uint64* dsp = GetState ( debugger, DBG_STEPPING ) ? (_Dsp_ = debugger->cs_Cpu->R14d) : _Dsp_ ;
     if ( ! dsp ) CfrTil_Exception ( STACK_ERROR, 0, QUIT ) ;
     //if ( Is_DebugOn && ( force || ( ( stepFlag ) || ( word ) && ( word != debugger->LastShowWord ) || ( debugger->SC_Index != _Lexer_->SC_Index ) ) ) )
-    if ( Is_DebugOn && ( force || ( stepFlag ) || ( word ) && ( word != debugger->LastShowWord ) || (debugger->PreHere && ( Here > debugger->PreHere )) ) ) //|| ( debugger->SC_Index && ( debugger->SC_Index != _Lexer_->SC_Index ) ) )
+    if ( Is_DebugOn && ( force || ( stepFlag ) || ( word ) && ( word != debugger->LastShowInfoWord ) || (debugger->PreHere && ( Here > debugger->PreHere )) ) ) //|| ( debugger->SC_Index && ( debugger->SC_Index != _Lexer_->SC_Index ) ) )
     {
         DebugColors ;
         if ( word && ( word->W_ObjectAttributes & OBJECT_FIELD ) && ( ! ( word->W_MorphismAttributes & DOT ) ) )
@@ -206,8 +206,7 @@ _Debugger_ShowEffects ( Debugger * debugger, Word * word, Boolean stepFlag, Bool
             if ( ( ! ( achange [0] ) ) && ( ( change > 1 ) || ( change < - 1 ) || ( _Q_->Verbosity > 1 ) ) ) _Debugger_PrintDataStack ( change + 1 ) ;
         }
         DebugColors ;
-        debugger->LastEffectsWord = word ;
-        //debugger->LastShowWord = debugger->w_Word ;
+        debugger->LastPostShowWord = word ;
         Set_DataStackPointer_FromDspReg ( ) ;
     }
     debugger->SC_Index = _Lexer_->SC_Index ;
@@ -274,16 +273,16 @@ _PrepareDbgSourceCodeString ( Word * word, byte * il, int64 tvw )
     if ( ins )
     {
         Strncpy ( nvw, &il[nws], ots ) ;
-        strcat ( ( char* ) nvw, ( char* ) token ) ;
-        strcat ( ( char* ) nvw, " " ) ;
-        strcat ( ( char* ) nvw, ( char* ) &il[ots] ) ;
+        strncat ( ( char* ) nvw, ( char* ) token, BUFFER_SIZE ) ;
+        strncat ( ( char* ) nvw, " ", BUFFER_SIZE ) ;
+        strncat ( ( char* ) nvw, ( char* ) &il[ots], BUFFER_SIZE ) ;
     }
     if ( subs )
     {
         Strncpy ( nvw, &il[nws], ots ) ;
-        strcat ( ( char* ) nvw, ( char* ) subsToken ) ;
-        strcat ( ( char* ) nvw, " " ) ;
-        strcat ( ( char* ) nvw, ( char* ) &il[ots + strlen ( ( char* ) subsToken ) ] ) ; // 2 : '=' + ' ' :: assuming subs is only done with an '=' in _CfrTil_C_Infix_EqualOp
+        strncat ( ( char* ) nvw, ( char* ) subsToken, BUFFER_SIZE ) ;
+        strncat ( ( char* ) nvw, " ", BUFFER_SIZE ) ;
+        strncat ( ( char* ) nvw, ( char* ) &il[ots + strlen ( ( char* ) subsToken ) ], BUFFER_SIZE ) ; // 2 : '=' + ' ' :: assuming subs is only done with an '=' in _CfrTil_C_Infix_EqualOp
     }
     else Strncpy ( nvw, &il[nws], tvw ) ; // copy the the new view window to buffer nvw
     slNvw = Strlen ( nvw ) ;
@@ -319,9 +318,9 @@ Debugger_PrepareDbgSourceCodeString ( Debugger * debugger, Word * word, int64 tw
         if ( String_Equal ( "init", word->Name ) ) 
         {
             String_RemoveEndWhitespace ( ( byte* ) il ) ;
-            strcat ( il, " -> " ) ;
-            strcat ( il, c_n (word->Name) ) ;
-            strcat ( il, " ( )" ) ;
+            strncat ( il, " -> ", BUFFER_SIZE ) ;
+            strncat ( il, c_n (word->Name), BUFFER_SIZE ) ;
+            strncat ( il, " ( )", BUFFER_SIZE ) ;
             return il ;
         }
         int64 fel, tw, tvw ;
@@ -337,7 +336,8 @@ Debugger_PrepareDbgSourceCodeString ( Debugger * debugger, Word * word, int64 tw
 void
 _Debugger_ShowInfo ( Debugger * debugger, byte * prompt, int64 signal, int64 force )
 {
-    if ( force || ( ! debugger->LastShowWord ) || ( debugger->w_Word != debugger->LastShowWord ) )
+    //if ( force || ( ! debugger->LastShowInfoWord ) || ( debugger->w_Word != debugger->LastShowInfoWord ) )
+    if ( force || ( debugger->w_Word != debugger->LastShowInfoWord ) )
     {
         Context * cntx = _Context_ ;
         byte *location ;
@@ -351,7 +351,6 @@ _Debugger_ShowInfo ( Debugger * debugger, byte * prompt, int64 signal, int64 for
         else location = ( byte* ) "<command line>" ;
         if ( ( location == debugger->Filename ) && ( GetState ( debugger, DBG_FILENAME_LOCATION_SHOWN ) ) ) location = ( byte * ) "..." ;
         SetState ( debugger, DBG_FILENAME_LOCATION_SHOWN, true ) ;
-        //Word * word = debugger->w_Word ; 
         Word * word = debugger->w_Word ? debugger->w_Word : _Context_->CurrentlyRunningWord ? _Context_->CurrentlyRunningWord : _Context_->CurrentTokenWord ;
         byte * token0 = word ? word->Name : debugger->Token, *token1 ;
         if ( ( signal == 11 ) || _Q_->SigAddress )
@@ -390,7 +389,7 @@ next:
                         word->ContainingNamespace ? ( char* ) word->ContainingNamespace->Name : ( char* ) "<literal>",
                         ( char* ) cc_Token, ( uint64 ) word ) ;
                 }
-                cc_line = ( char* ) Debugger_PrepareDbgSourceCodeString ( debugger, word, ( int64 ) Strlen ( obuffer ) ) ;
+                cc_line = ( char* ) Debugger_PrepareDbgSourceCodeString ( debugger, (debugger->w_Alias ? debugger->w_Alias : word), ( int64 ) Strlen ( obuffer ) ) ;
                 Strncat ( obuffer, cc_line, BUFFER_SIZE ) ;
                 _Printf ( ( byte* ) "%s", obuffer ) ;
             }
@@ -400,6 +399,7 @@ next:
                     prompt, signal ? signalAscii : ( byte* ) " ", cc_location, rl->LineNumber, rl->ReadIndex,
                     "<literal>", cc_Token ) ; //, _Q_->StartedTimes, _Q_->SignalExceptionsHandled ) ;
             }
+            debugger->LastShowInfoWord = word ;
         }
         else
         {
@@ -437,7 +437,6 @@ Debugger_ShowInfo ( Debugger * debugger, byte * prompt, int64 signal )
         Debugger_FindUsing ( debugger ) ;
     }
     else if ( debugger->w_Word ) debugger->Token = debugger->w_Word->Name ;
-    //if ( ( signal != SIGSEGV ) && GetState ( debugger, DBG_STEPPING ) )
     if ( ( _Q_->SigSegvs < 2 ) && GetState ( debugger, DBG_STEPPING ) )
     {
         _Printf ( ( byte* ) "\nDebug Stepping Address : 0x%016lx", ( uint64 ) debugger->DebugAddress ) ;

@@ -8,9 +8,7 @@ _Debugger_StepOneInstruction ( Debugger * debugger )
     debugger->SaveTOS = TOS ;
     debugger->SaveStackDepth = DataStack_Depth ( ) ;
     DefaultColors ; // nb. : so text output will be in default colors
-    //Set_DspReg_FromDebuggerDspReg ( ) ;
     ( ( VoidFunction ) debugger->StepInstructionBA->BA_Data ) ( ) ;
-    //Set_DataStackPointers_FromDebuggerDspReg ( ) ;
     DebugColors ;
 }
 
@@ -107,11 +105,13 @@ Debugger_CompileAndStepOneInstruction ( Debugger * debugger )
             jcAddress = JumpCallInstructionAddress_X64ABI ( debugger->DebugAddress ) ;
             Debugger_CASOI_Do_JmpOrCall_Insn ( debugger, jcAddress ) ;
         }
+#if 0        
         else if ( ( * debugger->DebugAddress == CALL_JMP_MOD_RM ) && ( _RM ( debugger->DebugAddress ) == 16 ) ) // inc/dec are also opcode == 0xff
         {
             jcAddress = Debugger_CASOI_Do_IncDec_Insn ( debugger, jcAddress ) ;
             _Debugger_CompileAndStepOneInstruction ( debugger, jcAddress ) ;
         }
+#endif        
         else if ( adr = debugger->DebugAddress, ( ( * adr == 0x0f ) && ( ( * ( adr + 1 ) >> 4 ) == 0x8 ) ) ||
             ( adr = debugger->DebugAddress + 1, ( * adr == 0x0f ) && ( ( * ( adr + 1 ) >> 4 ) == 0x8 ) ) ) // jcc 
         {
@@ -424,6 +424,7 @@ Debug_ExtraShow ( int64 size, Boolean force )
     }
 }
 
+#if 0
 byte *
 Debugger_COI_CompileCallOut ( Debugger * debugger, byte * jcAddress, int64 size )
 {
@@ -432,9 +433,10 @@ Debugger_COI_CompileCallOut ( Debugger * debugger, byte * jcAddress, int64 size 
     byte * newDebugAddress = debugger->DebugAddress + size ;
     return newDebugAddress ;
 }
-
+#endif
 // do instruction default
 
+// COI : _Debugger_CompileOneInstruction
 byte *
 _Debugger_COI_Do_Insn_Default ( Debugger * debugger, int64 size )
 {
@@ -472,6 +474,7 @@ _Debugger_COI_StepThru ( Debugger * debugger, byte * jcAddress, int64 size )
     return newDebugAddress ;
 }
 
+// CASOI : Debugger_CompileAndStepOneInstruction 
 void
 Debugger_CASOI_Do_Return_Insn ( Debugger * debugger )
 {
