@@ -240,10 +240,6 @@ Debug
 // make immediate/word immediate - compile time versions of some words
 : _s stack ; 
 : s stack ; immediate
-: sinit stackInit ; 
-: dcm decimal ; immediate // a non hex interpreted word
-//: iun using stack namespaceTree ; immediate
-: slp "stack at " ps location stack _pause ;
 'rdi 'recycleDebugInfo find alias
 C
 : logWrite ( str ) _logWrite nl str @ ps nl ;

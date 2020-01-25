@@ -99,16 +99,31 @@ Set_DebuggerDspReg_FromDspReg ( )
 }
 
 void
+Set_DspReg ( uint64 * ptr )
+{
+    _Dsp_ = ptr ;
+}
+
+void
 Set_DspReg_FromDebuggerDspReg ( )
 {
-    _Dsp_ = _Debugger_->cs_Cpu->R14d ;
+    //_Dsp_ = _Debugger_->cs_Cpu->R14d ;
+    Set_DspReg ( _Debugger_->cs_Cpu->R14d ) ;
+}
+
+void
+_Set_DataStackPointers ( uint64 * ptr )
+{
+    Set_DspReg ( ptr ) ;
+    _CfrTil_->DataStack->StackPointer = ptr ;
 }
 
 void
 Set_DataStackPointers_FromDebuggerDspReg ( )
 {
-    Set_DspReg_FromDebuggerDspReg ( ) ;
-    _CfrTil_->DataStack->StackPointer = _Dsp_ ;
+    //Set_DspReg_FromDebuggerDspReg ( ) ;
+    //_CfrTil_->DataStack->StackPointer = _Dsp_ ;
+    _Set_DataStackPointers ( _Debugger_->cs_Cpu->R14d ) ;
 }
 
 void

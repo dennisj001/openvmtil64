@@ -145,7 +145,7 @@ Debugger_PreStartStepping ( Debugger * debugger )
                 debugger->DebugAddress ) ;
             debugger->DebugAddress = 0 ;
             _Debugger_Eval ( debugger, 0 ) ;
-            SetState ( _Debugger_, DBG_AUTO_MODE, false ) ; 
+            SetState ( _Debugger_, DBG_AUTO_MODE, false ) ;
             return ;
         }
         else
@@ -156,7 +156,7 @@ Debugger_PreStartStepping ( Debugger * debugger )
                 interp->w_Word = word ;
                 Interpreter_DoInfixOrPrefixWord ( interp, word ) ;
                 SetState ( word, STEPPED, true ) ;
-                SetState ( debugger, (DBG_STEPPED|DBG_STEPPING), false ) ; // no longjmp needed at end of Interpreter_Loop
+                SetState ( debugger, ( DBG_STEPPED | DBG_STEPPING ), false ) ; // no longjmp needed at end of Interpreter_Loop
                 return ;
             }
             Debugger_SetupStepping ( debugger ) ;
@@ -392,7 +392,7 @@ Debugger_CanWeStep ( Debugger * debugger, Word * word )
     int64 result = true ;
     //if ( ( ! debugger->DebugAddress ) || ( GetState ( debugger, DBG_SETUP_ADDRESS ) ) )
     if ( ! word ) result = false ;
-    else if ( word->W_MorphismAttributes & ( CFRTIL_WORD|CFRTIL_ASM_WORD ) ) result = true ;
+    else if ( word->W_MorphismAttributes & ( CFRTIL_WORD | CFRTIL_ASM_WORD ) ) result = true ;
     else if ( ! word->CodeStart ) result = false ;
     else if ( word->W_MorphismAttributes & ( CPRIMITIVE | DLSYM_WORD | C_PREFIX_RTL_ARGS ) ) result = false ;
     else if ( ! NamedByteArray_CheckAddress ( _Q_CodeSpace, word->CodeStart ) ) result = false ;
@@ -419,6 +419,7 @@ Debug_ExtraShow ( int64 size, Boolean force )
 }
 
 #if 0
+
 byte *
 Debugger_COI_CompileCallOut ( Debugger * debugger, byte * jcAddress, int64 size )
 {
@@ -431,6 +432,7 @@ Debugger_COI_CompileCallOut ( Debugger * debugger, byte * jcAddress, int64 size 
 // do instruction default
 
 // COI : _Debugger_CompileOneInstruction
+
 byte *
 _Debugger_COI_Do_Insn_Default ( Debugger * debugger, int64 size )
 {
@@ -469,10 +471,10 @@ _Debugger_COI_StepThru ( Debugger * debugger, byte * jcAddress, int64 size )
 }
 
 // CASOI : Debugger_CompileAndStepOneInstruction 
+
 void
 Debugger_CASOI_Do_Return_Insn ( Debugger * debugger )
 {
-    Debugger_UdisOneInstruction ( debugger, debugger->DebugAddress, ( byte* ) "\r", ( byte* ) "" ) ;
     if ( Stack_Depth ( debugger->ReturnStack ) )
     {
         debugger->DebugAddress = ( byte* ) Stack_Pop ( debugger->ReturnStack ) ;
@@ -481,6 +483,7 @@ Debugger_CASOI_Do_Return_Insn ( Debugger * debugger )
     }
     else
     {
+        //Debugger_UdisOneInstruction ( debugger, debugger->DebugAddress, ( byte* ) "\r", ( byte* ) "" ) ;
         SetState ( debugger, DBG_STACK_OLD, true ) ;
         debugger->CopyRSP = 0 ;
         if ( GetState ( debugger, DBG_BRK_INIT ) ) SetState_TrueFalse ( debugger, DBG_INTERPRET_LOOP_DONE | DBG_STEPPED, DBG_ACTIVE | DBG_BRK_INIT | DBG_STEPPING ) ;
@@ -488,6 +491,7 @@ Debugger_CASOI_Do_Return_Insn ( Debugger * debugger )
         if ( debugger->w_Word ) SetState ( debugger->w_Word, STEPPED, true ) ;
         debugger->DebugAddress = 0 ;
         SetState ( debugger->cs_Cpu, CPU_SAVED, false ) ;
+        Set_DataStackPointers_FromDebuggerDspReg ( ) ;
     }
 }
 

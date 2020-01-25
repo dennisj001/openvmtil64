@@ -26,7 +26,13 @@ Debugger_InterpreterLoop ( Debugger * debugger )
     while ( DBG_Intrp_Loop_Test ( debugger ) ) ;
     debugger->LastPreSetupWord = debugger->w_Word ;
     SetState ( debugger, DBG_STACK_OLD, true ) ;
-    if ( GetState ( debugger, DBG_STEPPED ) && ( ! Stack_Depth ( debugger->ReturnStack ) ) )
+    SetState ( debugger, DBG_STEPPING, false ) ;
+    if ( GetState ( debugger, ( DBG_SETUP_ADDRESS ) ) ) 
+    {
+        SetState ( debugger, ( DBG_SETUP_ADDRESS ), false ) ;
+        _Set_DataStackPointers ( debugger->AddressModeSaveDsp ) ;
+    }
+    else if ( GetState ( debugger, DBG_STEPPED ) && ( ! Stack_Depth ( debugger->ReturnStack ) ) )
     {
         siglongjmp ( _Context_->JmpBuf0, 1 ) ; 
     }
@@ -49,7 +55,7 @@ Debugger_Setup_RecordState ( Debugger * debugger, Word * word, byte * token, byt
     }
     SetState ( debugger, DBG_COMPILE_MODE, CompileMode ) ;
     SetState_TrueFalse ( debugger, DBG_ACTIVE | DBG_INFO | DBG_PROMPT, DBG_BRK_INIT | DBG_CONTINUE_MODE | DBG_INTERPRET_LOOP_DONE | DBG_PRE_DONE | DBG_CONTINUE | DBG_STEPPING | DBG_STEPPED ) ;
-    debugger->SaveDsp = _Dsp_ ;
+    debugger->SaveDsp = debugger->AddressModeSaveDsp = _Dsp_ ;
     if ( ! debugger->StartHere ) Debugger_Set_StartHere ( debugger ) ;
     debugger->WordDsp = _Dsp_ ;
     debugger->SaveTOS = TOS ;
@@ -57,6 +63,7 @@ Debugger_Setup_RecordState ( Debugger * debugger, Word * word, byte * token, byt
     if ( address )
     {
         SetState ( debugger, DBG_SETUP_ADDRESS, true ) ;
+        SetState ( debugger, ( DBG_AUTO_MODE | DBG_CONTINUE_MODE ), false ) ;
         debugger->DebugAddress = address ;
         Debugger_SetupStepping ( debugger ) ;
     }
@@ -174,8 +181,7 @@ Debugger_Off ( Debugger * debugger, int64 debugOffFlag )
 void
 Debugger_On ( Debugger * debugger )
 {
-    if ( ! Is_DebugOn )
-        Debugger_Init ( debugger, debugger->cs_Cpu, 0, 0 ) ;
+    if ( ! Is_DebugOn ) Debugger_Init ( debugger, debugger->cs_Cpu, 0, 0 ) ;
     SetState_TrueFalse ( _Debugger_, DBG_MENU | DBG_INFO, DBG_STEPPING | DBG_AUTO_MODE | DBG_PRE_DONE | DBG_INTERPRET_LOOP_DONE ) ;
     debugger->LastPreSetupWord = 0 ;
     debugger->LastScwi = 0 ;
@@ -370,18 +376,7 @@ Debugger_DoMenu ( Debugger * debugger )
 void
 Debugger_Stack ( Debugger * debugger )
 {
-#if 0    
-    if ( GetState ( debugger, DBG_STEPPING ) || GetState ( debugger->cs_Cpu, CPU_SAVED ) )
-    {
-        //Set_DataStackPointers_FromDebuggerDspReg ( ) ;
-        _Debugger_PrintDataStack ( Stack_Depth ( _DataStack_ ) ) ; // stack has been adjusted 
-        _Printf ( ( byte* ) "\n" ) ;
-        SetState ( debugger, DBG_INFO, true ) ;
-    }
-    else _Debugger_PrintDataStack ( Stack_Depth ( _DataStack_ ) ) ;
-#else
     CfrTil_PrintDataStack ( ) ;
-#endif    
 }
 
 void
@@ -580,14 +575,8 @@ Debugger_Dump ( Debugger * debugger )
 void
 Debugger_Default ( Debugger * debugger )
 {
-    if ( isgraph ( debugger->Key ) )
-    {
-        _Printf ( ( byte* ) "\ndbg :> %c <: is not an assigned key code", debugger->Key ) ;
-    }
-    else
-    {
-        _Printf ( ( byte* ) "\ndbg :> <%d> <: is not an assigned key code", debugger->Key ) ;
-    }
+    if ( isgraph ( debugger->Key ) ) _Printf ( ( byte* ) "\ndbg :> %c <: is not an assigned key code", debugger->Key ) ;
+    else _Printf ( ( byte* ) "\ndbg :> <%d> <: is not an assigned key code", debugger->Key ) ;
 }
 
 void
@@ -641,14 +630,8 @@ _Debugger_New ( uint64 type )
 void
 _CfrTil_Debug_AtAddress ( byte * address )
 {
-    if ( ! GetState ( _Debugger_, DBG_ACTIVE ) )
-    {
-        Debugger_Init ( _Debugger_, 0, 0, address ) ;
-    }
-    else
-    {
-        _CfrTil_DebugContinue ( 1 ) ;
-    }
+    if ( ! GetState ( _Debugger_, DBG_ACTIVE ) ) Debugger_Init ( _Debugger_, 0, 0, address ) ;
+    else _CfrTil_DebugContinue ( 1 ) ;
 }
 
 void
