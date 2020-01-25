@@ -190,7 +190,7 @@ Do_NextArrayToken ( Word * tokenWord, byte * token, Word * arrayBaseObject, int6
     else Set_CompileMode ( false ) ;
     if ( word ) Interpreter_DoWord ( interp, word, word->W_RL_Index, word->W_SC_Index ) ;
     else Interpreter_InterpretAToken ( interp, token, _Lexer_->TokenStart_ReadLineIndex, _Lexer_->SC_Index ) ;
-    DEBUG_SHOW ;
+    //DEBUG_SHOW ;
     Set_CompileMode ( saveCompileMode ) ;
 
     return 0 ;

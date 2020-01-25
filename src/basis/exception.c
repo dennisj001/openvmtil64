@@ -43,9 +43,8 @@ OpenVmTil_ShowExceptionInfo ( )
     {
         if ( _Q_->ExceptionMessage )
         {
-            printf ( "\n%s : %s\n",
+            _Printf ( "\n%s : %s\n", 
                 _Q_->ExceptionMessage, _Q_->ExceptionSpecialMessage ? _Q_->ExceptionSpecialMessage : Context_Location ( ) ) ;
-            fflush ( stdout ) ;
         }
         if ( ( _Q_->SigSegvs < 2 ) && ( _Q_->SignalExceptionsHandled ++ < 2 ) && _CfrTil_ )
         {
@@ -78,8 +77,6 @@ OVT_Pause ( byte * prompt, int64 signalExceptionsHandled )
             _Q_->RestartCondition ) ;
         do
         {
-            //if ( ( _Q_->ExceptionCode != NOT_A_KNOWN_OBJECT ) && ( ! _Debugger_->w_Word ) ) _Debugger_->w_Word = Context_CurrentWord ( ) ;
-            //else _Debugger_->w_Word = 0 ;
             _Debugger_->w_Word = Context_CurrentWord ( ) ;
             _Debugger_ShowInfo ( _Debugger_, ( byte* ) "\r", _Q_->Signal, 0 ) ;
             _Printf ( ( byte* ) "%s", buffer ) ;
@@ -110,7 +107,7 @@ OVT_Pause ( byte * prompt, int64 signalExceptionsHandled )
                     {
                         Debugger * debugger = _Debugger_ ;
                         SetState ( debugger, DBG_AUTO_MODE | DBG_AUTO_MODE_ONCE, false ) ; // stop auto mode and get next key command code
-                        _Debugger_InterpreterLoop ( debugger ) ;
+                        Debugger_InterpreterLoop ( debugger ) ;
                     }
                     else
                     {
@@ -263,7 +260,8 @@ OVT_Throw ( int signal, int64 restartCondition, Boolean pauseFlag )
     }
     //OVT_SetExceptionMessage ( _Q_ ) ;
     
-    snprintf ( Buffer_Data_Cleared (_Q_->ThrowBuffer), BUFFER_SIZE, "\n%s\n%s %s from %s -> ...", _Q_->ExceptionMessage, ( jb == & _CfrTil_->JmpBuf0 ) ? "reseting cfrTil" : "restarting OpenVmTil",
+    snprintf ( Buffer_Data_Cleared (_Q_->ThrowBuffer), BUFFER_SIZE, "\n%s\n%s %s from %s -> ...", _Q_->ExceptionMessage, 
+        ( jb == & _CfrTil_->JmpBuf0 ) ? "reseting cfrTil" : "restarting OpenVmTil",
         ( _Q_->Signal == SIGSEGV ) ? ": SIGSEGV" : "", ( _Q_->SigSegvs < 2 ) ? Context_Location ( ) : ( byte* ) "" ) ;
     _OVT_SimpleFinalPause ( _Q_->ThrowBuffer->Data ) ;
     if ( pauseFlag && ( _Q_->SignalExceptionsHandled < 2 ) && ( _Q_->SigSegvs < 2 ) ) OVT_Pause ( 0, _Q_->SignalExceptionsHandled ) ;

@@ -222,7 +222,7 @@ _Namespace_AddToUsingList ( Namespace * ns )
     for ( i = Stack_Depth ( stack ) ; i > 0 ; i -- )
     {
         ns = ( Word* ) _Stack_Pop ( stack ) ;
-        if ( ns->W_WordListOriginalWord ) ns = ns->W_WordListOriginalWord ; //_Namespace_Find ( ns->Name, 0, 0 ) ; // this is needed because of Compiler_PushCheckAndCopyDuplicates
+        if ( ns->WL_OriginalWord ) ns = ns->WL_OriginalWord ; //_Namespace_Find ( ns->Name, 0, 0 ) ; // this is needed because of Compiler_PushCheckAndCopyDuplicates
         Namespace_SetState ( ns, USING ) ;
     }
     if ( ns != svNs )

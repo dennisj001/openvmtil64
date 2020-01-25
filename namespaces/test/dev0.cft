@@ -127,8 +127,8 @@ C Compiler
 sp
 Lisp
 state
-d: (define fibbc (lambda ( n ) (ifElse (< n 2) n (+ (fibbc (- n 1)) (fibbc (- n 2))))))
-tick fibbc find wdiss pause // have to use 'tick' not ' - remember we are in the Lisp namespace
+(define fibbc (lambda ( n ) (ifElse (< n 2) n (+ (fibbc (- n 1)) (fibbc (- n 2))))))
+tick fibbc find wdiss //pause // have to use 'tick' not ' - remember we are in the Lisp namespace
 (fibbc 20)
 sp
 (define fibcc (lambda ( n ) (ifElse (< n 2) n (+ (fibcc (- n 1)) (fibcc (- n 2))))))

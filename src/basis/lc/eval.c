@@ -76,9 +76,9 @@ _LO_EvalSymbol ( LambdaCalculus * lc, ListObject *l0, ListObject *locals )
             }
             else
             {
-                //w->W_SC_Index = l0->W_SC_Index ;
-                //w->W_RL_Index = l0->W_RL_Index ;
-                //w->State = l0->State ;
+                w->W_SC_Index = l0->W_SC_Index ;
+                w->W_RL_Index = l0->W_RL_Index ;
+                w->State = l0->State ;
                 l0 = w ;
             }
             if ( ( CompileMode ) && LO_CheckBeginBlock ( ) ) _LO_CompileOrInterpret_One ( l0, 0 ) ;

@@ -445,7 +445,7 @@ typedef struct _WordData
 #define Prototype S_Prototype
 #define W_SearchNumber W_Value2
 #define W_FoundMarker W_Value3
-#define W_WordListOriginalWord S_WordData->OriginalWord
+#define WL_OriginalWord S_WordData->OriginalWord
 #define W_RL_Index StartCharRlIndex
 #define W_SC_Index SC_WordIndex 
 #define W_SC_WordList S_WordData->SourceCodeWordList 
@@ -754,7 +754,7 @@ typedef struct _Debugger
 {
     uint64 State ;
     uint64 * SaveDsp, *SaveEdi, *SaveRsp, * WordDsp, * DebugRSP, *DebugRBP, *DebugRSI, *DebugRDI, * LastRsp, LevelBitNamespaceMap ;
-    int64 TerminalLineWidth, RL_ReadIndex, SC_Index, SaveTOS, SaveStackDepth, Key, SaveKey, LastScwi, Esi, Edi ;
+    int64 TerminalLineWidth, RL_ReadIndex, SaveTOS, SaveStackDepth, Key, SaveKey, LastScwi, Esi, Edi ;
     Word * w_Word, *w_Alias, *w_AliasOf, *EntryWord, *LastShowInfoWord, *LastPostShowWord, *NextEvalWord ;
     Word *LocalsNamespace, *LastPreSetupWord, *SteppedWord, *CurrentlyRunningWord, *LastSourceCodeWord, *SubstitutedWord ;
     byte * Token, *DebugAddress, *CopyRSP, *CopyRBP, *LastSourceCodeAddress, * PreHere, *StartHere, *LastDisStart, *ShowLine, * Filename ;

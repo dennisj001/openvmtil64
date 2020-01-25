@@ -13,7 +13,7 @@ _CopyDuplicateWord ( Word * word0, Boolean complete )
     wordc->W_ObjectAttributes |= ( uint64 ) RECYCLABLE_COPY ;
     if ( complete )
     {
-        wordc->W_WordListOriginalWord = Word_GetOriginalWord ( word0 ) ;
+        wordc->WL_OriginalWord = Word_GetOriginalWord ( word0 ) ;
         Word_SetLocation ( wordc ) ;
     }
     return wordc ;

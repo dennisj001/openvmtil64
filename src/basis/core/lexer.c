@@ -53,7 +53,7 @@ Lexer_ObjectToken_New ( Lexer * lexer, byte * token, int64 tsrli, int64 scwi )
         Word_SetTypeNamespace ( word, lexer->L_ObjectAttributes ) ;
         word->ObjectByteSize = lexer->TokenObjectSize ;
         lexer->TokenWord = word ;
-        DEBUG_SHOW ;
+        //DEBUG_SHOW ;
     }
     return word ;
 }

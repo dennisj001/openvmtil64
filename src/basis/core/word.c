@@ -375,7 +375,7 @@ Word *
 Word_GetOriginalWord ( Word * word )
 {
     Word * ow1, *ow0 ;
-    for ( ow0 = word, ow1 = ow0->W_WordListOriginalWord ; ow1 && ( ow1 != ow1->W_WordListOriginalWord ) ; ow0 = ow1, ow1 = ow0->W_WordListOriginalWord ) ;
+    for ( ow0 = word, ow1 = ow0->WL_OriginalWord ; ow1 && ( ow1 != ow1->WL_OriginalWord ) ; ow0 = ow1, ow1 = ow0->WL_OriginalWord ) ;
     if ( ! ow0 ) ow0 = word ;
     return ow0 ;
 }

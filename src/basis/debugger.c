@@ -2,11 +2,11 @@
 #include "../include/cfrtil64.h"
 
 void
-_Debugger_InterpreterLoop ( Debugger * debugger )
+Debugger_InterpreterLoop ( Debugger * debugger )
 {
     do
     {
-        _Debugger_DoState ( debugger ) ;
+        Debugger_DoState ( debugger ) ;
         if ( ! GetState ( _Debugger_, DBG_AUTO_MODE | DBG_AUTO_MODE_ONCE ) )
         {
             while ( ( debugger->Key = Key ( ) ) == - 1 ) ;
@@ -31,64 +31,75 @@ _Debugger_InterpreterLoop ( Debugger * debugger )
     }
 }
 
+void
+Debugger_Setup_RecordState ( Debugger * debugger, Word * word, byte * token, byte * address )
+{
+    if ( word ) debugger->RL_ReadIndex = word->W_RL_Index ;
+    if ( word->W_AliasOf )
+    {
+        debugger->w_Alias = word ;
+        debugger->w_AliasOf = debugger->w_Word = Word_UnAlias ( word ) ;
+    }
+    else
+    {
+        debugger->w_Alias = 0 ;
+        debugger->w_AliasOf = 0 ;
+        debugger->w_Word = word ;
+    }
+    SetState ( debugger, DBG_COMPILE_MODE, CompileMode ) ;
+    SetState_TrueFalse ( debugger, DBG_ACTIVE | DBG_INFO | DBG_PROMPT, DBG_BRK_INIT | DBG_CONTINUE_MODE | DBG_INTERPRET_LOOP_DONE | DBG_PRE_DONE | DBG_CONTINUE | DBG_STEPPING | DBG_STEPPED ) ;
+    debugger->SaveDsp = _Dsp_ ;
+    if ( ! debugger->StartHere ) Debugger_Set_StartHere ( debugger ) ;
+    debugger->WordDsp = _Dsp_ ;
+    debugger->SaveTOS = TOS ;
+    debugger->Token = word->Name ? word->Name : token ;
+    if ( address )
+    {
+        SetState ( debugger, DBG_SETUP_ADDRESS, true ) ;
+        debugger->DebugAddress = address ;
+        Debugger_SetupStepping ( debugger ) ;
+    }
+}
+
+void
+Debugger_Setup_SaveState ( Debugger * debugger, Word * word )
+{
+    debugger->DebugAddress = 0 ;
+    SetState ( debugger, DBG_MENU, false ) ;
+    debugger->PreHere = Here ;
+    debugger->LastPreSetupWord = word ;
+}
+
+Boolean
+DBG_SHOULD_WE_DO_SETUP ( Debugger * debugger, Word * word, byte * address, Boolean forceFlag )
+{
+    Boolean rtn = ( forceFlag || GetState ( _Compiler_, LC_ARG_PARSING ) || address
+        || ( word && ( ( word != debugger->LastPreSetupWord )
+        && ( word->WL_OriginalWord ? ( word->WL_OriginalWord != debugger->LastPreSetupWord ) : 1 ) ) || debugger->RL_ReadIndex != word->W_RL_Index ) ) ;
+    return rtn ;
+}
+
 Boolean
 Debugger_PreSetup ( Debugger * debugger, Word * word, byte * token, byte * address, Boolean forceFlag )
 {
     Boolean rtn = false ;
     if ( Is_DebugModeOn && Is_DebugShowOn ) // quick check for interpret //|| forceFlag )
     {
-        //if ( forceFlag || GetState ( debugger, DBG_EVAL_AUTO_MODE ) || ( ! GetState ( debugger, DBG_AUTO_MODE | DBG_STEPPING ) ) )
+        if ( DBG_SHOULD_WE_DO_SETUP ( debugger, word, address, forceFlag ) )
         {
-            //if ( forceFlag || GetState ( _Compiler_, LC_ARG_PARSING ) || ( ( _Context_->TokenDebugSetupWord != word ) && ( word->W_WordListOriginalWord ?
-            //    ( word->W_WordListOriginalWord != _Context_->TokenDebugSetupWord ) : 1 ) ) )
-            //if ( forceFlag || ( word != debugger->LastPreSetupWord ) )
-            if ( forceFlag || GetState ( _Compiler_, LC_ARG_PARSING ) || address 
-                || ( word && ( ( word != debugger->LastPreSetupWord ) && debugger->RL_ReadIndex != word->W_RL_Index ) ) )
+            if ( ! word ) word = Context_CurrentWord ( ) ;
+            if ( forceFlag || ( word && word->Name[0] ) || token )
             {
-                if ( ! word ) word = Context_CurrentWord ( ) ;
-                if ( forceFlag || ( word && word->Name[0] ) || token )
-                {
-                    // Debugger_Init
-                    if ( word->W_AliasOf )
-                    {
-                        debugger->w_Alias = word ;
-                        debugger->w_AliasOf = debugger->w_Word = Word_UnAlias ( word ) ;
-                    }
-                    else
-                    {
-                        debugger->w_Alias = 0 ;
-                        debugger->w_AliasOf = 0 ;
-                    }
-                    debugger->w_Word = word ;
-                    SetState ( debugger, DBG_COMPILE_MODE, CompileMode ) ;
-                    SetState_TrueFalse ( debugger, DBG_ACTIVE | DBG_INFO | DBG_PROMPT, DBG_BRK_INIT | DBG_CONTINUE_MODE | DBG_INTERPRET_LOOP_DONE | DBG_PRE_DONE | DBG_CONTINUE | DBG_STEPPING | DBG_STEPPED ) ;
-                    debugger->RL_ReadIndex = debugger->w_Word->W_RL_Index ;
-                    debugger->SaveDsp = _Dsp_ ;
-                    if ( ! debugger->StartHere ) Debugger_Set_StartHere ( debugger ) ;
-                    debugger->WordDsp = _Dsp_ ;
-                    debugger->SaveTOS = TOS ;
-                    debugger->Token = word->Name ? word->Name : token ;
-                    if ( address )
-                    {
-                        SetState ( debugger, DBG_SETUP_ADDRESS, true ) ;
-                        debugger->DebugAddress = address ;
-                        Debugger_SetupStepping ( debugger ) ;
-                    }
+                Debugger_Setup_RecordState ( debugger, word, token, address ) ;
 
-                    DebugColors ;
-                    _Debugger_InterpreterLoop ( debugger ) ; // core of this function
-                    DefaultColors ;
+                DebugColors ;
+                Debugger_InterpreterLoop ( debugger ) ; // core of this function
+                DefaultColors ;
 
-                    //Debugger_SaveState
-                    debugger->DebugAddress = 0 ;
-                    SetState ( debugger, DBG_MENU, false ) ;
-                    debugger->PreHere = Here ;
-                    debugger->LastPreSetupWord = word ;
-                    rtn = true ;
-                }
+                Debugger_Setup_SaveState ( debugger, word ) ;
+                rtn = true ;
             }
         }
-        debugger->SC_Index = _Lexer_->SC_Index ;
     }
     return rtn ;
 }
@@ -121,23 +132,14 @@ _Debugger_Init ( Debugger * debugger )
 }
 
 void
-Debugger_Off ( Debugger * debugger, int64 debugOffFlag )
-{
-    _Debugger_Init ( debugger ) ;
-    SetState ( debugger->cs_Cpu, CPU_SAVED, false ) ;
-    SetState ( _Debugger_, DBG_BRK_INIT | DBG_ACTIVE | DBG_STEPPING | DBG_PRE_DONE | DBG_AUTO_MODE | DBG_EVAL_AUTO_MODE, false ) ;
-    if ( debugOffFlag ) DebugOff ;
-}
-
-void
 Debugger_Init ( Debugger * debugger, Cpu * cpu, Word * word, byte * address )
 {
     DebugColors ;
+    _Debugger_Init ( debugger ) ;
     Debugger_UdisInit ( debugger ) ;
     debugger->SaveDsp = _Dsp_ ;
     debugger->SaveTOS = TOS ;
     debugger->Key = 0 ;
-    _Debugger_Init ( debugger ) ;
 
     if ( address ) debugger->DebugAddress = address ;
     if ( ! GetState ( debugger, DBG_BRK_INIT ) ) debugger->State = DBG_MENU | DBG_INFO | DBG_PROMPT ;
@@ -147,33 +149,19 @@ Debugger_Init ( Debugger * debugger, Cpu * cpu, Word * word, byte * address )
         if ( cpu->Rsp )
         {
             // remember : _Compile_CpuState_Save ( _Debugger_->cs_Cpu ) ; is called thru _Compile_Debug : <dbg>/<dso>
-            debugger->DebugAddress = Debugger_GetDbgAddressFromRsp ( debugger, cpu ) ; ;
+            debugger->DebugAddress = Debugger_GetDbgAddressFromRsp ( debugger, cpu ) ;
             debugger->w_Word = word = Word_GetFromCodeAddress ( debugger->DebugAddress ) ;
-#if 0   // old problem ?? not needed anymore        
-            if ( debugger->DebugAddress && ( ! debugger->w_Word ) )
-            {
-                byte * da = debugger->DebugAddress ;
-                byte * offsetAddress = Calculate_Address_FromOffset_ForCallOrJump ( debugger->DebugAddress ) ;
-                if ( ! debugger->w_Word ) debugger->w_Word = word = Word_GetFromCodeAddress ( offsetAddress ) ;
-                if ( _Q_->Verbosity > 3 )
-                {
-                    if ( ! word )
-                    {
-                        AlertColors ;
-                        _CfrTil_PrintNReturnStack ( 8, 1 ) ;
-                        debugger->w_Word = _Context_->CurrentlyRunningWord ;
-                        debugger->DebugAddress = debugger->w_Word->CodeStart ; //Definition ; //CodeAddress ;
-                        _Printf ( ( byte* ) "\n\n%s : Can't find a word at this address : 0x%016lx : or it offset adress : 0x%016lx :  "
-                            "\nUsing _Context_->CurrentlyRunningWord : \'%s\' : address = 0x%016lx : debugger->DebugESP [1] = 0x%016lx",
-                            Context_Location ( ), da, offsetAddress, debugger->w_Word->Name, debugger->DebugAddress, debugger->DebugRSP ? debugger->DebugRSP [1] : 0 ) ; //but here is some disassembly at the considered \"EIP address\" : \n" ) ;
-                        DebugColors ;
-                    }
-                    _CfrTil_PrintNReturnStack ( 4, 1 ) ;
-                }
-            }
-#endif            
         }
     }
+}
+
+void
+Debugger_Off ( Debugger * debugger, int64 debugOffFlag )
+{
+    _Debugger_Init ( debugger ) ;
+    SetState ( debugger->cs_Cpu, CPU_SAVED, false ) ;
+    SetState ( _Debugger_, DBG_BRK_INIT | DBG_ACTIVE | DBG_STEPPING | DBG_PRE_DONE | DBG_AUTO_MODE | DBG_EVAL_AUTO_MODE, false ) ;
+    if ( debugOffFlag ) DebugOff ;
 }
 
 void
@@ -267,7 +255,6 @@ void
 Debugger_NextToken ( Debugger * debugger )
 {
     if ( ReadLine_IsThereNextChar ( _Context_->ReadLiner0 ) ) debugger->Token = Lexer_ReadToken ( _Context_->Lexer0 ) ;
-
     else debugger->Token = 0 ;
 }
 
@@ -286,7 +273,6 @@ Debugger_Parse ( Debugger * debugger )
 void
 _Debugger_FindAny ( Debugger * debugger )
 {
-
     if ( debugger->Token ) debugger->w_Word = CfrTil_FindInAnyNamespace ( debugger->Token ) ;
 }
 
@@ -295,7 +281,6 @@ Debugger_FindAny ( Debugger * debugger )
 {
     _Debugger_FindAny ( debugger ) ;
     if ( debugger->w_Word ) _Printf ( ( byte* ) ( byte* ) "\nFound Word :: %s.%s\n", debugger->w_Word->S_ContainingNamespace->Name, debugger->w_Word->Name ) ;
-
     else _Printf ( ( byte* ) ( byte* ) "\nToken not found : %s\n", debugger->Token ) ;
 }
 
