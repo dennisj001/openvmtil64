@@ -1,6 +1,14 @@
 
 #include "../include/cfrtil64.h"
 
+Boolean
+DBG_Intrp_Loop_Test ( Debugger * debugger )
+{
+    Boolean rtn = ( GetState ( debugger, DBG_STEPPING ) || ( ! GetState ( debugger, DBG_INTERPRET_LOOP_DONE ) ) ||
+        ( ( GetState ( debugger, DBG_AUTO_MODE ) ) && ( ! ( GetState ( debugger, DBG_EVAL_AUTO_MODE ) ) ) ) ) ;
+    return rtn ;
+}
+
 void
 Debugger_InterpreterLoop ( Debugger * debugger )
 {
@@ -15,19 +23,12 @@ Debugger_InterpreterLoop ( Debugger * debugger )
         SetState ( _Debugger_, DBG_AUTO_MODE_ONCE, false ) ;
         debugger->CharacterFunctionTable [ debugger->CharacterTable [ debugger->Key ] ] ( debugger ) ;
     }
-    while ( GetState ( debugger, DBG_STEPPING ) || ( ! GetState ( debugger, DBG_INTERPRET_LOOP_DONE ) ) ||
-        ( ( GetState ( debugger, DBG_AUTO_MODE ) ) && ( ! ( GetState ( debugger, DBG_EVAL_AUTO_MODE ) ) ) ) ) ;
+    while ( DBG_Intrp_Loop_Test ( debugger ) ) ;
     debugger->LastPreSetupWord = debugger->w_Word ;
     SetState ( debugger, DBG_STACK_OLD, true ) ;
-    if ( GetState ( debugger, DBG_STEPPED ) )
+    if ( GetState ( debugger, DBG_STEPPED ) && ( ! Stack_Depth ( debugger->ReturnStack ) ) )
     {
-        _Context_->CurrentTokenWord = 0 ;
-        _Context_->CurrentEvalWord = 0 ;
-        if ( ! Stack_Depth ( debugger->ReturnStack ) )
-        {
-            Debugger_Off ( debugger, 1 ) ;
-            siglongjmp ( _Context_->JmpBuf0, 1 ) ; // in Debugger_PreSetup
-        }
+        siglongjmp ( _Context_->JmpBuf0, 1 ) ; 
     }
 }
 
@@ -75,7 +76,7 @@ DBG_SHOULD_WE_DO_SETUP ( Debugger * debugger, Word * word, byte * address, Boole
 {
     Boolean rtn = ( forceFlag || GetState ( _Compiler_, LC_ARG_PARSING ) || address
         || ( word && ( ( word != debugger->LastPreSetupWord )
-        && ( word->WL_OriginalWord ? ( word->WL_OriginalWord != debugger->LastPreSetupWord ) : 1 ) ) || debugger->RL_ReadIndex != word->W_RL_Index ) ) ;
+        && ( word->WL_OriginalWord ? ( word->WL_OriginalWord != debugger->LastPreSetupWord ) : 1 ) || debugger->RL_ReadIndex != word->W_RL_Index ) ) ) ;
     return rtn ;
 }
 
@@ -122,25 +123,31 @@ _Debugger_Init ( Debugger * debugger )
     if ( debugger )
     {
         Stack_Init ( debugger->ReturnStack ) ;
-        debugger->StartHere = 0 ;
-        debugger->PreHere = 0 ;
-        debugger->DebugAddress = 0 ;
-        debugger->w_Word = 0 ;
-        debugger->CopyRSP = 0 ;
-        SetState ( debugger, ( DBG_STACK_OLD ), true ) ;
+        if ( ! Is_DebugOn )
+        {
+            debugger->StartHere = 0 ;
+            debugger->PreHere = 0 ;
+            debugger->DebugAddress = 0 ;
+            debugger->w_Word = 0 ;
+            debugger->CopyRSP = 0 ;
+            SetState ( debugger, ( DBG_STACK_OLD ), true ) ;
+        }
     }
 }
 
 void
 Debugger_Init ( Debugger * debugger, Cpu * cpu, Word * word, byte * address )
 {
-    DebugColors ;
-    _Debugger_Init ( debugger ) ;
-    Debugger_UdisInit ( debugger ) ;
-    debugger->SaveDsp = _Dsp_ ;
-    debugger->SaveTOS = TOS ;
-    debugger->Key = 0 ;
+    if ( ! Is_DebugOn )
+    {
+        _Debugger_Init ( debugger ) ;
+        Debugger_UdisInit ( debugger ) ;
+        debugger->SaveDsp = _Dsp_ ;
+        debugger->SaveTOS = TOS ;
+        debugger->Key = 0 ;
+    }
 
+    DebugColors ;
     if ( address ) debugger->DebugAddress = address ;
     if ( ! GetState ( debugger, DBG_BRK_INIT ) ) debugger->State = DBG_MENU | DBG_INFO | DBG_PROMPT ;
     else
@@ -167,7 +174,8 @@ Debugger_Off ( Debugger * debugger, int64 debugOffFlag )
 void
 Debugger_On ( Debugger * debugger )
 {
-    Debugger_Init ( debugger, debugger->cs_Cpu, 0, 0 ) ;
+    if ( ! Is_DebugOn )
+        Debugger_Init ( debugger, debugger->cs_Cpu, 0, 0 ) ;
     SetState_TrueFalse ( _Debugger_, DBG_MENU | DBG_INFO, DBG_STEPPING | DBG_AUTO_MODE | DBG_PRE_DONE | DBG_INTERPRET_LOOP_DONE ) ;
     debugger->LastPreSetupWord = 0 ;
     debugger->LastScwi = 0 ;
@@ -217,14 +225,14 @@ Debugger_GetDbgAddressFromRsp ( Debugger * debugger, Cpu * cpu )
             }
             Stack_Push ( debugger->ReturnStack, ( uint64 ) retAddr ) ;
         }
-#define RS_SETUP 1        
+#define RS_DEPTH_PICK 1        
         if ( _Q_->Verbosity > 1 )
         {
             CfrTil_PrintReturnStack ( ) ;
             Stack_Print ( debugger->ReturnStack, ( byte* ) "debugger->ReturnStack ", 0 ) ;
         }
-        debugger->DebugAddress = ( byte* ) _Stack_Pick ( debugger->ReturnStack, RS_SETUP ) ;
-        for ( i2 = 0 ; i2 <= RS_SETUP ; i2 ++ ) Stack_Pop ( debugger->ReturnStack ) ; // pop the three intro functions
+        debugger->DebugAddress = ( byte* ) _Stack_Pick ( debugger->ReturnStack, RS_DEPTH_PICK ) ;
+        for ( i2 = 0 ; i2 <= RS_DEPTH_PICK ; i2 ++ ) Stack_Pop ( debugger->ReturnStack ) ; // pop the three intro functions
     }
     else debugger->DebugAddress = ( byte* ) cpu->Rsp[0] ;
     debugger->w_Word = Word_UnAlias ( Word_GetFromCodeAddress ( debugger->DebugAddress ) ) ; // 21 : code size back to <dbg>

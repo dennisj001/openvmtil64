@@ -228,11 +228,9 @@
 #define _Is_DebugOn GetState ( _CfrTil_, _DEBUG_SHOW_ )
 #define Is_DebugOn (Is_DebugShowOn && Is_DebugModeOn)
 #define DEBUG_PRINTSTACK if ( GetState ( _CfrTil_, DEBUG_MODE )  ) CfrTil_PrintDataStack () ;
-//#define __DEBUG_SETUP( word, token, address, force )  ( (word || token || address) && Is_DebugModeOn ) ? _Debugger_PreSetup (_Debugger_, word, token, (byte*) address, force ) : 0 
-//#define _DEBUG_SETUP( word, token, address, force )  Debugger_PreSetup (_Debugger_, (word), (token), (byte*) (address), (force) ) 
-#define DEBUG_SETUP_TOKEN( token ) _DEBUG_SETUP( 0, token, 0 ) ;
+#define DEBUG_SETUP_TOKEN( token ) _DEBUG_SETUP ( 0, token, 0 ) ;
 #define DEBUG_SETUP_ADDRESS( address, force ) if ( (address) && Is_DebugModeOn ) Debugger_PreSetup (_Debugger_, 0, 0, address, force ) ;
-#define DEBUG_SETUP( word ) _DEBUG_SETUP( word, 0, 0, 0 )
+#define DEBUG_SETUP( word ) _DEBUG_SETUP ( word, 0, 0, 0 )
 #define _DEBUG_SHOW( word, force ) _Debugger_PostShow ( _Debugger_, word, force ) ; //, token, word ) ;
 #define DEBUG_SHOW Debugger_PostShow ( _Debugger_ ) 
 #define DEBUG_ASM_SHOW_ON SetState ( _Debugger_, DBG_ASM_SHOW_ON, true ) 
@@ -243,7 +241,6 @@
 #define DBI ( Is_DebugOn & _DBI )
 #define Is_DebugOn_DBI ( Is_DebugOn ? DBI : 0 )
 #define DBI_N( n ) (GetState ( _Debugger_, DBG_ASM_SHOW_ON ) && ( _Q_->Verbosity > n ) )
-//#define TYPECHECK( word ) CfrTil_Typecheck ( word ) ;
 #define IS_INCLUDING_FILES _Context_->System0->IncludeFileStackNumber
 
 #define List_Init( list ) _dllist_Init ( list )
@@ -281,7 +278,6 @@
 #define Strlen( s ) ( s ? strlen ( (const char *) s ) : 0 )
 #define StringLength( s ) Strlen ( s )
 #define String_Init( s ) s[0]=0 ; 
-//#define Strncpy( dst, src, n ) strncpy ( (char *__restrict) dst, (const char *__restrict) src, (size_t) n )
 #define Map0( dllist, mf ) dllist_Map ( dllist, (MapFunction0) mf )
 
 

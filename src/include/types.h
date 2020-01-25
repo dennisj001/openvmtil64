@@ -766,7 +766,7 @@ typedef struct _Debugger
     DebuggerFunction CharacterFunctionTable [ 40 ] ;
     ud_t * Udis ;
     dllist * DebugWordList ;
-    sigjmp_buf JmpBuf0 ;
+    //sigjmp_buf DbgJmpBuf0 ;
 } Debugger ;
 typedef struct
 {

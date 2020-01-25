@@ -758,6 +758,7 @@ int64 Debugger_TerminalLineWidth(Debugger *debugger);
 void Debugger_ShowStackChange(Debugger *debugger, Word *word, byte *insert, byte *achange, Boolean stepFlag);
 void Debugger_ShowChange(Debugger *debugger, Word *word, Boolean stepFlag, uint64 *dsp);
 byte *_PrepareDbgSourceCodeString(Word *word, byte *il, int64 tvw);
+byte *SC_PrepareDbgSourceCodeString(byte *sc, Word *word);
 byte *Debugger_PrepareDbgSourceCodeString(Debugger *debugger, Word *word, int64 twAlreayUsed);
 void Debugger_ShowInfo_Token(Debugger *debugger, Word *word, byte *prompt, int64 signal, byte *token0, byte *location, byte *signalAscii);
 /* src/basis/core/namespace.c */
@@ -1282,7 +1283,6 @@ void _CfrTil_UnAppendTokenFromSourceCode(CfrTil *cfrtil, byte *tkn);
 void _CfrTil_AppendCharToSourceCode(CfrTil *cfrtil, byte c);
 void CfrTil_AppendCharToSourceCode(CfrTil *cfrtil, byte c);
 Word *Get_SourceCodeWord(void);
-byte *SC_PrepareDbgSourceCodeString(byte *sc, Word *word);
 /* src/basis/debugStepping.c */
 void _Debugger_StepOneInstruction(Debugger *debugger);
 byte *Debugger_CompileOneInstruction(Debugger *debugger, byte *jcAddress, Boolean showFlag);
@@ -1545,6 +1545,7 @@ void Compiler_RemoveLocalFrame(Compiler *compiler);
 void CfrTil_LocalsAndStackVariablesBegin(void);
 void CfrTil_LocalVariablesBegin(void);
 /* src/basis/debugger.c */
+Boolean DBG_Intrp_Loop_Test(Debugger *debugger);
 void Debugger_InterpreterLoop(Debugger *debugger);
 void Debugger_Setup_RecordState(Debugger *debugger, Word *word, byte *token, byte *address);
 void Debugger_Setup_SaveState(Debugger *debugger, Word *word);
@@ -2062,7 +2063,7 @@ void DebugRuntimeBreakpoint(void);
 void CfrTil_DebugRuntimeBreakpoint(void);
 void CfrTil_DebugRuntimeBreakpoint_IsDebugShowOn(void);
 void CfrTil_DebugRuntimeBreakpoint_IsDebugOn(void);
-int64 _DEBUG_SETUP(Word *word, byte *token, byte *address, Boolean force);
+void _DEBUG_SETUP(Word *word, byte *token, byte *address, Boolean force);
 /* src/primitives/memorys.c */
 void CfrTil_Peek(void);
 void CfrTil_PeekReg(void);

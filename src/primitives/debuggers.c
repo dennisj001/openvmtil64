@@ -42,11 +42,14 @@ CfrTil_DebugInfo ( )
 void
 CfrTil_DebugOn ( )
 {
-    if ( _Q_->Verbosity > 1 ) _Printf ( ( byte* ) "\nCfrTil_DebugOn : at %s", Context_Location ( ) ) ;
     Context * cntx = _Context_ ;
     Debugger * debugger = _Debugger_ ;
-    debugger->DebugRSP = 0 ;
-    Debugger_On ( debugger ) ;
+    if ( ! Is_DebugOn )
+    {
+        if ( _Q_->Verbosity > 1 ) _Printf ( ( byte* ) "\nCfrTil_DebugOn : at %s", Context_Location ( ) ) ;
+        debugger->DebugRSP = 0 ;
+        Debugger_On ( debugger ) ;
+    }
     byte * nextToken = Lexer_Peek_Next_NonDebugTokenWord ( cntx->Lexer0, 0, 0 ) ;
     debugger->EntryWord = Finder_Word_FindUsing ( cntx->Interpreter0->Finder0, nextToken, 0 ) ;
     _Context_->SourceCodeWord = debugger->EntryWord ;
@@ -83,7 +86,7 @@ DebugRuntimeBreakpoint ( )
             debugger->DebugAddress += 3 ; // 3 : sizeof call rax insn :: skip the call else we would recurse to here
             if ( GetState ( debugger, ( DBG_CONTINUE_MODE ) ) ) SetState ( debugger, ( DBG_BRK_INIT | DBG_RUNTIME_BREAKPOINT ), true ) ;
         }
-        SetState ( _Debugger_, ( DBG_AUTO_MODE | DBG_AUTO_MODE_ONCE | DBG_CONTINUE_MODE), false ) ;
+        SetState ( _Debugger_, ( DBG_AUTO_MODE | DBG_AUTO_MODE_ONCE | DBG_CONTINUE_MODE ), false ) ;
         Debugger_InterpreterLoop ( debugger ) ;
         SetState ( debugger, DBG_BRK_INIT | DBG_RUNTIME_BREAKPOINT | DEBUG_SHTL_OFF, false ) ;
     }
@@ -107,8 +110,8 @@ CfrTil_DebugRuntimeBreakpoint_IsDebugOn ( )
     if ( Is_DebugOn ) DebugRuntimeBreakpoint ( ) ;
 }
 
-int64
+void
 _DEBUG_SETUP ( Word * word, byte * token, byte * address, Boolean force )
 {
-    return Debugger_PreSetup ( _Debugger_, word, token, address, force ) ;
+    Debugger_PreSetup ( _Debugger_, word, token, address, force ) ;
 }

@@ -13,8 +13,8 @@ _Interpreter_TokenToWord ( Interpreter * interp, byte * token, int64 tsrli, int6
         if ( word && interp->Compiler0->AutoVarTypeNamespace && ( word->W_ObjectAttributes & NAMESPACE_VARIABLE ) ) word = 0 ;
         if ( ! word ) word = Lexer_ObjectToken_New ( interp->Lexer0, token, tsrli, scwi ) ;
         Word_SetTsrliScwi ( word, tsrli, scwi ) ;
-        _Context_->CurrentTokenWord = word ;
         DEBUG_SETUP ( word ) ;
+        _Context_->CurrentTokenWord = word ; // dbg flag
         _Context_->TokenDebugSetupWord = word ;
     }
     return _Context_->CurrentTokenWord ; // allow DEBUG_SETUP to set this to 0 to skip interpreting it when it is 'stepped'
@@ -64,7 +64,8 @@ Interpreter_DoInfixWord ( Interpreter * interp, Word * word )
     else Interpreter_InterpretNextToken ( interp ) ;
     // then continue and interpret this 'word' - just one out of lexical order
     SetState ( compiler, DOING_BEFORE_AN_INFIX_WORD, false ) ; //svState ) ;
-    if ( ! GetState ( _Debugger_, DBG_INFIX_PREFIX ) ) Interpreter_DoWord_Default ( interp, word, word->W_RL_Index, word->W_SC_Index ) ;
+    //if ( ! GetState ( _Debugger_, DBG_INFIX_PREFIX ) ) 
+    Interpreter_DoWord_Default ( interp, word, word->W_RL_Index, word->W_SC_Index ) ;
     SetState ( compiler, ( DOING_AN_INFIX_WORD | C_INFIX_EQUAL ), false ) ; //svState ) ;
 }
 
@@ -96,7 +97,7 @@ Interpreter_DoInfixOrPrefixWord ( Interpreter * interp, Word * word )
     if ( word ) //IS_MORPHISM_TYPE ( word) )
     {
         Context * cntx = _Context_ ;
-        interp->w_Word = word ;
+        //interp->w_Word = word ;
         if ( ( word->W_TypeAttributes == WT_INFIXABLE ) && ( GetState ( cntx, INFIX_MODE ) ) ) Interpreter_DoInfixWord ( interp, word ) ;
             // nb. Interpreter must be in INFIX_MODE because it is effective for more than one word
         else if ( ( word->W_TypeAttributes == WT_PREFIX ) || Lexer_IsWordPrefixing ( interp->Lexer0, word ) )
@@ -145,8 +146,8 @@ Boolean
 Word_IsSyntactic ( Word * word )
 {
     if ( ( ! GetState ( _Debugger_, DBG_INFIX_PREFIX ) )
-        && ( ( word->W_TypeAttributes & ( WT_PREFIX | WT_C_PREFIX_RTL_ARGS ) ) && Lexer_IsWordPrefixing ( _Lexer_, word )
-        || ( ( word->W_TypeAttributes == WT_INFIXABLE ) && ( GetState ( _Context_, INFIX_MODE ) ) ) ) )
+        && ( ( word->W_TypeAttributes & ( WT_PREFIX | WT_C_PREFIX_RTL_ARGS ) ) || (Lexer_IsWordPrefixing ( _Lexer_, word )
+        || ( ( word->W_TypeAttributes == WT_INFIXABLE ) && ( GetState ( _Context_, INFIX_MODE ) ) ) ) ))
         return true ;
     else return false ;
 }

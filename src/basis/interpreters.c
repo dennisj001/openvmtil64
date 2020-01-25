@@ -142,6 +142,7 @@ Interpret_PrefixFunction_OrUntil_RParen ( Interpreter * interp, Word * prefixFun
         SetState ( compiler, ( DOING_BEFORE_A_PREFIX_WORD ), false ) ;
         if ( ! GetState ( _Debugger_, DBG_INFIX_PREFIX ) ) Interpreter_DoWord_Default ( interp, prefixFunction, prefixFunction->W_RL_Index, prefixFunction->W_SC_Index ) ;
         SetState ( compiler, ( PREFIX_ARG_PARSING | DOING_A_PREFIX_WORD ), false ) ;
+        SetState ( _Debugger_, DBG_INFIX_PREFIX, false ) ;
         if ( GetState ( _Context_, C_SYNTAX ) ) SetState ( _Context_, C_RHS, svs_c_rhs ) ;
     }
 }

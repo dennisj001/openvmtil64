@@ -596,10 +596,8 @@ String_New ( byte * string, uint64 allocType )
     byte * newString ;
     if ( string )
     {
-        //newString = Mem_Allocate ( Strlen ( ( char* ) string ) + 1, IsSourceCodeOn ? STRING_MEM : allocType ) ;
         newString = Mem_Allocate ( Strlen ( ( char* ) string ) + 1, allocType ) ;
         strcpy ( ( char* ) newString, ( char* ) string ) ;
-
         return newString ;
     }
     return 0 ;

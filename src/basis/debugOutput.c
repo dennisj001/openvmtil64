@@ -101,7 +101,7 @@ _Debugger_ShowEffects ( Debugger * debugger, Word * word, Boolean stepFlag, Bool
         Debugger_ShowChange ( debugger, word, stepFlag, dsp ) ;
         //DebugColors ;
         debugger->LastPostShowWord = word ;
-        //Set_DataStackPointer_FromDspReg ( ) ;
+        //Set_DataStackPointers_FromDebuggerDspReg ( ) ;
     }
     debugger->ShowLine = 0 ;
 }

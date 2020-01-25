@@ -23,14 +23,18 @@ Word_Eval ( Word * word )
     {
         if ( ! sigsetjmp ( _Context_->JmpBuf0, 0 ) ) // siglongjmp from _Debugger_InterpreterLoop
         {
-            _Context_->CurrentEvalWord = word ;
-            if ( IS_MORPHISM_TYPE ( word ) ) CfrTil_Typecheck ( word ) ;
-            DEBUG_SETUP ( word ) ;
-            if ( ( word->W_MorphismAttributes & IMMEDIATE ) || ( ! CompileMode ) ) Word_Run ( word ) ;
-            else _Word_Compile ( word ) ;
-            _DEBUG_SHOW ( word, 0 ) ;
-            _Context_->CurrentEvalWord = 0 ;
-            _Context_->LastEvalWord = word ;
+            if ( ! ( GetState ( word, STEPPED ) ) )
+            {
+                _Context_->CurrentEvalWord = word ;
+                if ( IS_MORPHISM_TYPE ( word ) ) CfrTil_Typecheck ( word ) ;
+                DEBUG_SETUP ( word ) ;
+                if ( ( word->W_MorphismAttributes & IMMEDIATE ) || ( ! CompileMode ) ) Word_Run ( word ) ;
+                else _Word_Compile ( word ) ;
+                _DEBUG_SHOW ( word, 0 ) ;
+                _Context_->CurrentEvalWord = 0 ;
+                _Context_->LastEvalWord = word ;
+            }
+            SetState ( word, STEPPED, false ) ;
         }
         else Set_DataStackPointers_FromDebuggerDspReg ( ) ;
     }

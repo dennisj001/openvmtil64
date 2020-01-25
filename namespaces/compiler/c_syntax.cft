@@ -324,7 +324,7 @@ infixOff
 //stack pause
 : hi ( a b | c ) c a @ b @ + = printf ("\nshould read 3 : %d", c ) ; 1 2 hi //pause
 sp
-#if 0
+#if 1
 // test byte size objects
 c_syntaxOn
 typedef struct _byteTest 
@@ -370,11 +370,11 @@ bt.a123 1 _assert
 bt.c123.size 4 _assert
 bt.e123.size 8 _assert
 _assert ( bt.c123, 2147483647 ) ;
-_assert ( abt.f123 456 ) ;
+_assert ( abt.f123 456 ) ; 
 _assert ( abt.b123 46 ) ;
 _assert ( abt.c123 234567 ) ;
 _assert ( abt.e123 2345566 ) ;
-notUsing: bt abt byteTest _byteTest ;
+//notUsing: bt abt byteTest _byteTest ;
 #endif
 sp
 int
