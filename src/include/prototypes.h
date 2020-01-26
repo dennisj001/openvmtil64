@@ -757,8 +757,10 @@ void LO_Debug_ExtraShow(int64 showStackFlag, int64 verbosity, int64 wordList, by
 int64 Debugger_TerminalLineWidth(Debugger *debugger);
 void Debugger_ShowStackChange(Debugger *debugger, Word *word, byte *insert, byte *achange, Boolean stepFlag);
 void Debugger_ShowChange(Debugger *debugger, Word *word, Boolean stepFlag, uint64 *dsp);
-byte *DBG_PrepareSourceCodeString(Word *word, byte *il, int tw0, int flag);
-byte *_PrepareDbgSourceCodeString(Word *word, byte *il, int64 tvw);
+byte *String_HighlightTokenInputLine(byte *nvw, int64 lef, int64 leftBorder, int64 ts, byte *token, int64 rightBorder, int64 ref);
+byte *PSCS_Using_WordSC(byte *scs, byte *token, int64 scswci);
+byte *PSCS_Using_ReadlinerInputString(byte *scs, byte *token, int64 scswci, int64 tvw);
+byte *DBG_PrepareSourceCodeString(Word *word, byte *scs, int tvw, int usingSC);
 byte *Debugger_PrepareDbgSourceCodeString(Debugger *debugger, Word *word, int64 twAlreayUsed);
 void Debugger_ShowInfo_Token(Debugger *debugger, Word *word, byte *prompt, int64 signal, byte *token0, byte *location, byte *signalAscii);
 /* src/basis/core/namespace.c */
@@ -1844,6 +1846,7 @@ void CfrTil_LogWrite(void);
 void CfrTil_LogOff(void);
 /* src/primitives/parsers.c */
 void CfrTil_Token(void);
+void CfrTil_TokenQID(void);
 void CfrTil_FilenameToken(void);
 void CfrTil_SingleQuote(void);
 void CfrTil_Tick(void);

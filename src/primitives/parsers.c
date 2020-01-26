@@ -8,6 +8,21 @@ CfrTil_Token ( )
 }
 
 void
+CfrTil_TokenQID ( )
+{
+    byte * token ;
+    while ( 1 )
+    {
+        token = Lexer_ReadToken ( _Lexer_ ) ;
+        Word * word = _Interpreter_TokenToWord ( _Interpreter_, token, -1, -1 ) ;
+        Boolean isForwardDotted = ReadLiner_IsTokenForwardDotted ( _ReadLiner_, word->W_RL_Index ) ;
+        if ( ( isForwardDotted ) || ( token[0] == '.' )) Word_Eval ( word ) ;
+        else break ;
+    }
+    DataStack_Push ( ( int64 ) token ) ;
+}
+
+void
 CfrTil_FilenameToken ( )
 {
     byte * token = _Lexer_LexNextToken_WithDelimiters ( _Lexer_, 0, 1, 0, 1, LEXER_ALLOW_DOT ) ;

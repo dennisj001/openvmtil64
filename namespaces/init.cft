@@ -269,7 +269,7 @@ System
 : wdiss ( pword ) 0 pword @ _wdiss ; //debugWord      // don't add wdiss words to history list
 : wdissl ( pword ) logOn 0 pword @ _wdiss logOff ; //debugWord      // don't add wdiss words to history list
 'wi ' wdiss find alias
-: pwdiss token _find wdiss ; // nb. a prefix function
+: pwdiss tokenQID _find wdiss ; // nb. a prefix function
 'pwi 'pwdiss find alias
 //pwi _wdiss
 : fload ftoken include ;

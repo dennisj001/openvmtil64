@@ -564,6 +564,7 @@ CPrimitive CPrimitives [] = {
     { "quote", 0, 0, 0, CfrTil_SingleQuote, KEYWORD, 0, 0, "Compiler", "Root" },
     { "_tick", 0, 0, 0, CfrTil_SingleQuote, KEYWORD, 0, 0, "Compiler", "Root" },
     { "token", 0, 0, 0, CfrTil_Token, 0, 0, 0, "Compiler", "Root" },
+    { "tokenQID", 0, 0, 0, CfrTil_TokenQID, 0, 0, 0, "Compiler", "Root" },
     { "ftoken", 0, 0, 0, CfrTil_FilenameToken, 0, 0, 0, "Compiler", "Root" },
     { "getStringToEndOfLine", 0, 0, 0, String_GetStringToEndOfLine, 0, 0, 0, "Compiler", "Root" },
     { "sourceCodeInit", 0, 0, 0, CfrTil_SourceCode_Init, 0, 0, 0, "Compiler", "Root" },

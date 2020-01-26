@@ -267,14 +267,11 @@ _Word_ShowSourceCode ( Word * word )
     if ( word && word->S_WordData ) //&& word->W_SourceCode ) //word->CAttribute & ( CPRIMITIVE | BLOCK ) )
     {
         byte * sc, * name, *scd ;
-        if ( ! ( word->W_MorphismAttributes & CPRIMITIVE ) )
+        if (( ! ( word->W_MorphismAttributes & CPRIMITIVE ) ) && word->W_SourceCode )
         {
-            Buffer *dstb = Buffer_NewLocked ( BUFFER_SIZE ) ;
-            sc = dstb->B_Data ;
-            sc = _String_ConvertStringToBackSlash ( sc, word->W_SourceCode ? word->W_SourceCode : String_New ( _CfrTil_->SC_Buffer, TEMPORARY ), - 1 ) ;
+            byte * sc = Buffer_Data_Cleared ( _CfrTil_->ScratchB1 ) ;
+            sc = _String_ConvertStringToBackSlash ( sc, word->W_SourceCode, BUFFER_SIZE ) ;
             scd = c_gd ( String_FilterMultipleSpaces ( sc, TEMPORARY ) ) ;
-            Buffer_Unlock ( dstb ) ;
-            Buffer_SetAsFree ( dstb, 0 ) ;
         }
         else scd = ( byte* ) "C Primitive" ;
         name = c_gd ( word->Name ) ;

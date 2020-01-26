@@ -1,63 +1,5 @@
 #include "../include/cfrtil64.h"
 
-#if 0
-// example from : http://www.kernel.org/doc/man-pages/online/pages/man3/dlsym.3.html
-
-Load the math library, and _print the cosine of 2.0 :
-
-#include <stdio.h>
-#include <stdlib.h>
-#include <dlfcn.h>
-
-int64
-main ( int64 argc, char **argv )
-{
-    void *handle ;
-    double (*cosine )( double ) ;
-    char *error ;
-
-    handle = dlopen ( "libm.so", RTLD_LAZY ) ;
-    if ( ! handle )
-    {
-        fprintf ( stderr, "%s\n", dlerror ( ) ) ;
-        exit ( EXIT_FAILURE ) ;
-    }
-
-    dlerror ( ) ; /* Clear any existing error */
-
-    /* Writing: cosine = (double (*)(double)) dlsym(handle, "cos");
-       would seem more natural, but the C99 standard leaves
-       casting from "void *" to a function pointer undefined.
-       The assignment used below is the POSIX.1-2003 (Technical
-       Corrigendum 1) workaround; see the Rationale for the
-       POSIX specification of dlsym(). */
-
-    *( void ** ) ( &cosine ) = dlsym ( handle, "cos" ) ;
-
-    if ( ( error = dlerror ( ) ) != NULL )
-    {
-        fprintf ( stderr, "%s\n", error ) ;
-        exit ( EXIT_FAILURE ) ;
-    }
-
-    printf ( "%f\n", ( *cosine )( 2.0 ) ) ;
-    dlclose ( handle ) ;
-    exit ( EXIT_SUCCESS ) ;
-}
-/*
-       If this program were in a file named "foo.c", you would build the program with
-       the following command:
-
-           gcc -rdynamic -o foo foo.c -ldl
-
-       Libraries exporting _init() and _fini() will want to be compiled as follows,
-       using bar.c as the example name:
-
-           gcc -shared -nostartfiles -o bar bar.c
- */
-
-#endif
-
 // lib : full library path
 
 #define RTLD_DEFAULT ((void *) 0)
@@ -109,27 +51,6 @@ Dlsym ( byte * sym, byte * lib )
     return word ;
 }
 
-// lib sym | addr
-#if 0
-
-void
-_CfrTil_Dlsym ( )
-{
-    byte * sym = ( byte* ) DataStack_Pop ( ) ;
-    byte * lib = ( byte* ) DataStack_Pop ( ) ;
-    DataStack_Push ( ( int64 ) _Dlsym ( sym, lib ) ) ;
-}
-
-void
-CfrTil_DlsymWord ( )
-{
-    byte * lib = ( byte* ) DataStack_Pop ( ) ;
-    byte * sym = ( byte* ) DataStack_Pop ( ) ;
-    Dlsym ( sym, lib ) ;
-}
-#endif
-// takes semi - ";" - after the definition
-
 void
 CfrTil_Dlsym ( )
 {
@@ -149,7 +70,6 @@ CfrTil_system0 ( )
     _Compile_INT80 ( ) ;
     _Compile_Stack_PushReg ( DSP, ACC ) ;
 }
-#if 1
 
 void
 CfrTil_system1 ( )
@@ -180,52 +100,6 @@ CfrTil_system3 ( )
     _Compile_INT80 ( ) ;
     _Compile_Stack_PushReg ( DSP, ACC ) ;
 }
-#endif
-#if 0
-
-void *
-dlOpen_Dlsym ( char * lib, char * sym )
-{
-    void * hLibrary, *fp ;
-    char * error, buffer [1024] ;
-
-    sprintf ( buffer, "./%s.so", lib ) ;
-    hLibrary = dlopen ( buffer, RTLD_GLOBAL | RTLD_LAZY ) ;
-    if ( ! hLibrary )
-    {
-        sprintf ( buffer, "/usr/lib32/%s.so", lib ) ;
-        hLibrary = dlopen ( buffer, RTLD_GLOBAL | RTLD_LAZY ) ;
-    }
-    if ( ! hLibrary )
-    {
-        sprintf ( buffer, "/usr/local/lib/%s.so", lib ) ;
-        hLibrary = dlopen ( buffer, RTLD_GLOBAL | RTLD_LAZY ) ;
-    }
-    if ( ! hLibrary )
-    {
-        sprintf ( buffer, "/usr/lib/%s.so", lib ) ;
-        hLibrary = dlopen ( buffer, RTLD_GLOBAL | RTLD_LAZY ) ;
-    }
-    if ( ! hLibrary )
-    {
-        _Printf ( ( byte* ) "\nCannot open %s - cannot import library\n", buffer ) ;
-        return 0 ;
-    }
-    fp = ( void* ) dlsym ( RTLD_DEFAULT /*hLibrary*/, ( char* ) sym ) ;
-    //if ( ( error = dlerror ( ) ) != NULL )
-    if ( ( ! fp ) || ( ( error = dlerror ( ) ) != NULL ) )
-    {
-        _Printf ( ( byte* ) "dlOpen_Dlsym : dlerror: %s\n", error ) ;
-        return 0 ;
-    }
-
-    //void * hLibrary = dlopen ( lib, RTLD_DEFAULT |RTLD_GLOBAL | RTLD_LAZY ) ;
-    void * fp = _Dlsym ( lib, sym ) ;
-
-    return fp ;
-}
-#endif
-
 void
 _CfrTil_WordAccounting_Print ( byte * functionName )
 {
@@ -483,4 +357,128 @@ AtCommandLine ( ReadLiner *rl )
     return ( ( GetState ( _Debugger_, DBG_COMMAND_LINE ) || GetState ( _Context_, AT_COMMAND_LINE ) ) ||
         ( GetState ( rl, CHAR_ECHO ) && ( _AtCommandLine ( ) ) ) ) ;
 }
+#if 0
+// example from : http://www.kernel.org/doc/man-pages/online/pages/man3/dlsym.3.html
+
+Load the math library, and _print the cosine of 2.0 :
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <dlfcn.h>
+
+int64
+main ( int64 argc, char **argv )
+{
+    void *handle ;
+    double (*cosine )( double ) ;
+    char *error ;
+
+    handle = dlopen ( "libm.so", RTLD_LAZY ) ;
+    if ( ! handle )
+    {
+        fprintf ( stderr, "%s\n", dlerror ( ) ) ;
+        exit ( EXIT_FAILURE ) ;
+    }
+
+    dlerror ( ) ; /* Clear any existing error */
+
+    /* Writing: cosine = (double (*)(double)) dlsym(handle, "cos");
+       would seem more natural, but the C99 standard leaves
+       casting from "void *" to a function pointer undefined.
+       The assignment used below is the POSIX.1-2003 (Technical
+       Corrigendum 1) workaround; see the Rationale for the
+       POSIX specification of dlsym(). */
+
+    *( void ** ) ( &cosine ) = dlsym ( handle, "cos" ) ;
+
+    if ( ( error = dlerror ( ) ) != NULL )
+    {
+        fprintf ( stderr, "%s\n", error ) ;
+        exit ( EXIT_FAILURE ) ;
+    }
+
+    printf ( "%f\n", ( *cosine )( 2.0 ) ) ;
+    dlclose ( handle ) ;
+    exit ( EXIT_SUCCESS ) ;
+}
+/*
+       If this program were in a file named "foo.c", you would build the program with
+       the following command:
+
+           gcc -rdynamic -o foo foo.c -ldl
+
+       Libraries exporting _init() and _fini() will want to be compiled as follows,
+       using bar.c as the example name:
+
+           gcc -shared -nostartfiles -o bar bar.c
+ */
+
+#endif
+// lib sym | addr
+#if 0
+
+void
+_CfrTil_Dlsym ( )
+{
+    byte * sym = ( byte* ) DataStack_Pop ( ) ;
+    byte * lib = ( byte* ) DataStack_Pop ( ) ;
+    DataStack_Push ( ( int64 ) _Dlsym ( sym, lib ) ) ;
+}
+
+void
+CfrTil_DlsymWord ( )
+{
+    byte * lib = ( byte* ) DataStack_Pop ( ) ;
+    byte * sym = ( byte* ) DataStack_Pop ( ) ;
+    Dlsym ( sym, lib ) ;
+}
+#endif
+// takes semi - ";" - after the definition
+
+#if 0
+
+void *
+dlOpen_Dlsym ( char * lib, char * sym )
+{
+    void * hLibrary, *fp ;
+    char * error, buffer [1024] ;
+
+    sprintf ( buffer, "./%s.so", lib ) ;
+    hLibrary = dlopen ( buffer, RTLD_GLOBAL | RTLD_LAZY ) ;
+    if ( ! hLibrary )
+    {
+        sprintf ( buffer, "/usr/lib32/%s.so", lib ) ;
+        hLibrary = dlopen ( buffer, RTLD_GLOBAL | RTLD_LAZY ) ;
+    }
+    if ( ! hLibrary )
+    {
+        sprintf ( buffer, "/usr/local/lib/%s.so", lib ) ;
+        hLibrary = dlopen ( buffer, RTLD_GLOBAL | RTLD_LAZY ) ;
+    }
+    if ( ! hLibrary )
+    {
+        sprintf ( buffer, "/usr/lib/%s.so", lib ) ;
+        hLibrary = dlopen ( buffer, RTLD_GLOBAL | RTLD_LAZY ) ;
+    }
+    if ( ! hLibrary )
+    {
+        _Printf ( ( byte* ) "\nCannot open %s - cannot import library\n", buffer ) ;
+        return 0 ;
+    }
+    fp = ( void* ) dlsym ( RTLD_DEFAULT /*hLibrary*/, ( char* ) sym ) ;
+    //if ( ( error = dlerror ( ) ) != NULL )
+    if ( ( ! fp ) || ( ( error = dlerror ( ) ) != NULL ) )
+    {
+        _Printf ( ( byte* ) "dlOpen_Dlsym : dlerror: %s\n", error ) ;
+        return 0 ;
+    }
+
+    //void * hLibrary = dlopen ( lib, RTLD_DEFAULT |RTLD_GLOBAL | RTLD_LAZY ) ;
+    void * fp = _Dlsym ( lib, sym ) ;
+
+    return fp ;
+}
+#endif
+
+
 
