@@ -224,7 +224,8 @@ OVT_SetRestartCondition ( OpenVmTil *ovt, int64 restartCondition )
     ovt->LastRestartCondition = ovt->RestartCondition ;
     ovt->RestartCondition = restartCondition ;
 }
-// OVT_Throw needs to be reworked
+
+// OVT_Throw needs to be reworked ???
 
 void
 OVT_Throw ( int signal, int64 restartCondition, Boolean pauseFlag )

@@ -154,10 +154,15 @@ Debugger_PreStartStepping ( Debugger * debugger )
             {
                 Interpreter * interp = _Interpreter_ ;
                 interp->w_Word = word ;
-                Interpreter_DoInfixOrPrefixWord ( interp, word ) ;
+                SetState ( _Debugger_, DBG_INFIX_PREFIX, true ) ;
+                DebugOff ; // so we don't debug the args
+                Interpreter_DoInfixOrPrefixWord ( interp, word ) ; // 
+                DebugOn ; // so debug is on for Word_Eval and we can step thru it
+                SetState ( _Debugger_, DBG_INFIX_PREFIX, false ) ;
+                Word_Eval ( word ) ;
                 SetState ( word, STEPPED, true ) ;
                 SetState ( debugger, ( DBG_STEPPED | DBG_STEPPING ), false ) ; // no longjmp needed at end of Interpreter_Loop
-                return ;
+                return ; 
             }
             Debugger_SetupStepping ( debugger ) ;
             SetState ( debugger, DBG_NEWLINE | DBG_PROMPT | DBG_INFO | DBG_AUTO_MODE, false ) ;

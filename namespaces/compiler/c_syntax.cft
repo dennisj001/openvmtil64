@@ -374,7 +374,7 @@ _assert ( abt.f123 456 ) ;
 _assert ( abt.b123 46 ) ;
 _assert ( abt.c123 234567 ) ;
 _assert ( abt.e123 2345566 ) ;
-//notUsing: bt abt byteTest _byteTest ;
+notUsing: bt abt byteTest _byteTest ;
 #endif
 sp
 int
