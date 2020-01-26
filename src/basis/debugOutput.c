@@ -483,7 +483,7 @@ DBG_PrepareSourceCodeString ( Word * word, byte* scs, int tvw, int usingSC ) // 
 {
     // usingSC == 1 denotes il string is from word->W_SourceCode else il is copied from rl->InputLineString
     Debugger * debugger = _Debugger_ ;
-    byte * cc_line ;
+    byte * cc_line = ( byte* ) "" ;
     if ( word && scs )
     {
         // sc : source code ; scwi : source code word index
@@ -509,9 +509,8 @@ DBG_PrepareSourceCodeString ( Word * word, byte* scs, int tvw, int usingSC ) // 
             if ( usingSC ) cc_line = PSCS_Using_WordSC ( scs, token, scswci ) ;
             else cc_line = PSCS_Using_ReadlinerInputString ( scs, token, scswci, tvw ) ; // scs : source code string
         }
-        else cc_line = ( byte* ) "" ;
-        return cc_line ;
     }
+    return cc_line ;
 }
 
 
@@ -522,7 +521,7 @@ DBG_PrepareSourceCodeString ( Word * word, byte* scs, int tvw, int usingSC ) // 
 byte *
 Debugger_PrepareDbgSourceCodeString ( Debugger * debugger, Word * word, int64 twAlreayUsed )
 {
-    byte * cc_line ;
+    byte * cc_line = ( byte* ) "" ; 
     if ( word )
     {
         ReadLiner * rl = _Context_->ReadLiner0 ;
@@ -543,7 +542,6 @@ Debugger_PrepareDbgSourceCodeString ( Debugger * debugger, Word * word, int64 tw
         //cc_line = _PrepareDbgSourceCodeString ( word, il, tvw ) ;
         cc_line = DBG_PrepareSourceCodeString ( word, il, tvw, 0 ) ; //tvw, tvw/2 ) ;// sc : source code ; scwi : source code word index
     }
-    else cc_line = ( byte* ) "" ; // nts : new token start is a index into b - the nwv buffer
     return cc_line ;
 }
 
