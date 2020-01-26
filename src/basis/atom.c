@@ -36,13 +36,13 @@ _dllist_Atom_Find ( dllist * dllist, register byte * name )
 AtomStringNode *
 _Atom_Intern ( byte * name )
 {
-    return _dllist_Atom_Intern ( _Q_->AtomList, name ) ;
+    return _dllist_Atom_Intern ( _O_->AtomList, name ) ;
 }
 
 byte *
 _Atom_Find ( byte * name )
 {
-    return _dllist_Atom_Find ( _Q_->AtomList, name ) ;
+    return _dllist_Atom_Find ( _O_->AtomList, name ) ;
 }
 
 byte *
@@ -66,7 +66,7 @@ _dllist_Atomize ( dllist * dllist, byte * istring )
 byte *
 _OpenVmTil_Atomize ( byte * istring )
 {
-    return _dllist_Atomize ( _Q_->AtomList, istring ) ;
+    return _dllist_Atomize ( _O_->AtomList, istring ) ;
 }
 
 /*

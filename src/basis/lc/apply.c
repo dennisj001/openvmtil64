@@ -41,7 +41,7 @@ LO_Apply ( LambdaCalculus * lc, ListObject * l0, ListObject *lfirst, ListObject 
 ListObject *
 _LO_Apply ( ListObject *lfirst, ListObject *lfunction, ListObject *largs )
 {
-    LambdaCalculus *lc = _Q_->OVT_LC ;
+    LambdaCalculus *lc = _O_->OVT_LC ;
     SetState ( lc, LC_APPLY, true ) ;
     ListObject *vReturn ;
     d0 ( if ( Is_DebugModeOn ) LO_Debug_ExtraShow ( 0, 1, 0, ( byte * ) "\n_LO_Apply : \n\tl0 =%s", _LO_PRINT_TO_STRING ( l0 ) ) ) ;
@@ -93,7 +93,7 @@ LO_CompileOrInterpretArgs ( ListObject *largs )
     ListObject * arg ;
     for ( arg = _LO_First ( largs ) ; arg ; arg = _LO_Next ( arg ) )
     {
-        if ( GetState ( _Q_->OVT_LC, LC_INTERP_DONE ) ) return ; // i don't remember why this is here ??
+        if ( GetState ( _O_->OVT_LC, LC_INTERP_DONE ) ) return ; // i don't remember why this is here ??
         _LO_CompileOrInterpret_One ( arg, 0 ) ; // research : how does CAttribute get set to T_NIL?
     }
 }
@@ -121,13 +121,13 @@ _LO_CompileOrInterpret ( ListObject *lfunction, ListObject *largs )
         LO_CompileOrInterpretArgs ( largs ) ;
         if ( lfword && ( ! ( lfword->W_LispAttributes & T_LISP_CFRTIL ) ) ) _LO_CompileOrInterpret_One ( lfword, 1 ) ;
     }
-    _Q_->OVT_LC->LastInterpretedWord = lfword ;
+    _O_->OVT_LC->LastInterpretedWord = lfword ;
 }
 
 ListObject *
 _LO_Do_FunctionBlock ( ListObject *lfunction, ListObject *largs )
 {
-    LambdaCalculus *lc = _Q_->OVT_LC ;
+    LambdaCalculus *lc = _O_->OVT_LC ;
     ListObject *vReturn, *lfargs = _LO_First ( largs ) ;
     _LO_CompileOrInterpret ( lfunction, lfargs ) ;
     lc->ParenLevel -- ;
@@ -187,7 +187,7 @@ LO_PrepareReturnObject ( )
 void
 LO_BeginBlock ( )
 {
-    if ( ! Compiler_BlockLevel ( _Compiler_ ) ) _LC_->SavedCodeSpace = _Q_CodeByteArray ;
+    if ( ! Compiler_BlockLevel ( _Compiler_ ) ) _LC_->SavedCodeSpace = _O_CodeByteArray ;
     CfrTil_BeginBlock ( ) ;
 }
 
@@ -348,7 +348,7 @@ _LO_Apply_C_LtoR_ArgList ( LambdaCalculus * lc, ListObject * l0, Word * word )
 {
     Context * cntx = _Context_ ;
     ListObject *l1 ;
-    ByteArray * scs = _Q_CodeByteArray ;
+    ByteArray * scs = _O_CodeByteArray ;
     Compiler * compiler = cntx->Compiler0 ;
     int64 i, svcm = CompileMode ;
 
@@ -451,7 +451,7 @@ CompileLispBlock ( ListObject *args, ListObject * body )
         SetHere ( here, 1 ) ; //recover the unused code space
         code = 0 ;
         word->W_LispAttributes &= ~ T_LISP_COMPILED_WORD ;
-        if ( _Q_->Verbosity > 1 )
+        if ( _O_->Verbosity > 1 )
         {
             AlertColors ;
             _Printf ( ( byte* ) "\nLisp can not compile this word yet : %s : -- interpreting ...\n ", _Word_SourceCodeLocation_pbyte ( word ) ) ;

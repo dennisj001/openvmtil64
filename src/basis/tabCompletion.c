@@ -28,7 +28,7 @@ ReadLiner_GenerateFullNamespaceQualifiedName ( ReadLiner * rl, Word * w )
     int64 i, dot = 0, notUsing = 0 ; //, ow = 0 ;
 
     String_Init ( b0 ) ;
-    for ( ns = ( Is_NamespaceType ( w ) ? w : w->ContainingNamespace ) ; ns ; ns = ns->ContainingNamespace ) // && ( tw->ContainingNamespace != _Q_->CfrTil->Namespaces ) )
+    for ( ns = ( Is_NamespaceType ( w ) ? w : w->ContainingNamespace ) ; ns ; ns = ns->ContainingNamespace ) // && ( tw->ContainingNamespace != _O_->CfrTil->Namespaces ) )
     {
         if ( ns->State & NOT_USING )
         {
@@ -201,7 +201,7 @@ _TabCompletion_Compare ( Word * word )
             if ( ! slst ) // we match anything when user ends with a dot ( '.' ) ...
             {
                 // except .. We don't want to jump down into a lower namespace here.
-                if ( ( tw->ContainingNamespace == tci->OriginalContainingNamespace ) ) // || ( tw->ContainingNamespace == _Q_->CfrTil->Namespaces ) )
+                if ( ( tw->ContainingNamespace == tci->OriginalContainingNamespace ) ) // || ( tw->ContainingNamespace == _O_->CfrTil->Namespaces ) )
                 {
                     gotOne = true ; //1 ;
                 }
@@ -279,7 +279,7 @@ _TabCompletion_Compare ( Word * word )
                 RL_TC_StringInsert_AtCursor ( rl, fqn ) ;
                 tci->FoundCount ++ ;
                 if ( tci->FoundCount > tci->MaxFoundCount ) tci->MaxFoundCount = tci->FoundCount ;
-                if ( _Q_->Verbosity > 4 )
+                if ( _O_->Verbosity > 4 )
                 {
                     //if ( tci->FoundWrapCount )
                     {

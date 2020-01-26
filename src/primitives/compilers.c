@@ -9,7 +9,7 @@ CfrTil_Here ( )
 void
 CfrTil_Code ( )
 {
-    DataStack_Push ( ( int64 ) _Q_CodeByteArray ) ;
+    DataStack_Push ( ( int64 ) _O_CodeByteArray ) ;
 }
 
 void
@@ -202,8 +202,8 @@ void
 CfrTil_Literal ( )
 {
     int64 value = DataStack_Pop ( ) ;
-    ByteArray * svcs = _Q_CodeByteArray ;
-    _NBA_SetCompilingSpace_MakeSureOfRoom ( _Q_->MemorySpace0->TempObjectSpace, 4 * K ) ;
+    ByteArray * svcs = _O_CodeByteArray ;
+    _NBA_SetCompilingSpace_MakeSureOfRoom ( _O_->MemorySpace0->TempObjectSpace, 4 * K ) ;
     Word * word = DataObject_New ( LITERAL, 0, ( byte* ) "<literal>", 0, LITERAL | CONSTANT, 0, 0, value, 0, - 1, - 1 ) ;
     Set_CompilerSpace ( svcs ) ;
     Interpreter_DoWord ( _Context_->Interpreter0, word, - 1, - 1 ) ;

@@ -62,48 +62,48 @@ void
 CfrTil_ResetAll_Init ( CfrTil * cfrTil )
 {
     byte * startDirectory = ( byte* ) "namespaces" ;
-    if ( ! GetState ( _Q_, OVT_IN_USEFUL_DIRECTORY ) ) startDirectory = ( byte* ) "/usr/local/lib/cfrTil64/namespaces" ;
+    if ( ! GetState ( _O_, OVT_IN_USEFUL_DIRECTORY ) ) startDirectory = ( byte* ) "/usr/local/lib/cfrTil64/namespaces" ;
     DataObject_New ( NAMESPACE_VARIABLE, 0, ( byte* ) "_startDirectory_", 0, NAMESPACE_VARIABLE, 0, 0, ( int64 ) startDirectory, 0, 0, - 1 ) ;
-    if ( ( _Q_->RestartCondition >= RESET_ALL ) )
+    if ( ( _O_->RestartCondition >= RESET_ALL ) )
     {
-        _Q_->StartIncludeTries = 0 ;
+        _O_->StartIncludeTries = 0 ;
         _CfrTil_Init_SessionCore ( cfrTil, 1, 0 ) ;
         _CfrTil_Namespace_NotUsing ( ( byte* ) "BigNum" ) ;
         _CfrTil_Namespace_NotUsing ( ( byte* ) "Lisp" ) ;
-        if ( _Q_->StartupFilename )
+        if ( _O_->StartupFilename )
         {
-            _Q_->Verbosity = 0 ;
+            _O_->Verbosity = 0 ;
             _CfrTil_ContextNew_IncludeFile ( ( byte* ) "./namespaces/sinit.cft" ) ;
-            _CfrTil_ContextNew_IncludeFile ( _Q_->StartupFilename ) ;
+            _CfrTil_ContextNew_IncludeFile ( _O_->StartupFilename ) ;
         }
         else
         {
-            if ( ! _Q_->StartIncludeTries ++ )
+            if ( ! _O_->StartIncludeTries ++ )
             {
-                _CfrTil_ContextNew_InterpretString ( cfrTil, _Q_->InitString ) ;
-                _CfrTil_ContextNew_InterpretString ( cfrTil, _Q_->StartupString ) ;
+                _CfrTil_ContextNew_InterpretString ( cfrTil, _O_->InitString ) ;
+                _CfrTil_ContextNew_InterpretString ( cfrTil, _O_->StartupString ) ;
             }
-            else if ( _Q_->StartIncludeTries < 3 )
+            else if ( _O_->StartIncludeTries < 3 )
             {
                 AlertColors ;
                 _CfrTil_ContextNew_IncludeFile ( ( byte* ) "./namespaces/init.cft" ) ;
-                if ( _Q_->ErrorFilename )
+                if ( _O_->ErrorFilename )
                 {
-                    if ( strcmp ( ( char* ) _Q_->ErrorFilename, "Debug Context" ) )
+                    if ( strcmp ( ( char* ) _O_->ErrorFilename, "Debug Context" ) )
                     {
-                        _Printf ( ( byte* ) "\nError : \"%s\" include error!\n", _Q_->SigLocation ? _Q_->SigLocation : _Q_->ErrorFilename ) ;
+                        _Printf ( ( byte* ) "\nError : \"%s\" include error!\n", _O_->SigLocation ? _O_->SigLocation : _O_->ErrorFilename ) ;
                     }
                 }
                 DefaultColors ;
             }
         }
     }
-    if ( _Q_->Verbosity > 3 )
+    if ( _O_->Verbosity > 3 )
     {
         _Printf ( ( byte* ) " \nInternal Namespaces have been initialized.  " ) ;
         OVT_ShowMemoryAllocated ( ) ;
     }
-    //if ( ( _Q_->InitSessionCoreTimes == 1 ) || ( ! _Q_->Verbosity ) ) _Q_->Verbosity = 1 ;
+    //if ( ( _O_->InitSessionCoreTimes == 1 ) || ( ! _O_->Verbosity ) ) _O_->Verbosity = 1 ;
 }
 
 void

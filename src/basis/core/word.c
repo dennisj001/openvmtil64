@@ -119,7 +119,7 @@ _Word_Add ( Word * word, int64 addToInNs, Namespace * addToNs )
             Namespace_DoAddWord ( ins, word ) ;
         }
     }
-    if ( _Q_->Verbosity > 3 )
+    if ( _O_->Verbosity > 3 )
     {
         ns = addToNs ? addToNs : ins ;
         if ( ns )
@@ -135,8 +135,8 @@ _Word_Allocate ( uint64 allocType )
 {
     Word * word = 0 ;
     int64 size = ( sizeof ( Word ) + sizeof ( WordData ) ) ;
-    word = ( Word* ) OVT_CheckRecycleableAllocate ( _Q_->MemorySpace0->RecycledWordList, size ) ;
-    if ( word ) _Q_->MemorySpace0->RecycledWordCount ++ ;
+    word = ( Word* ) OVT_CheckRecycleableAllocate ( _O_->MemorySpace0->RecycledWordList, size ) ;
+    if ( word ) _O_->MemorySpace0->RecycledWordCount ++ ;
     else word = ( Word* ) Mem_Allocate ( size, allocType ) ;
     ( ( DLNode* ) word )->n_Size = size ;
     word->S_WordData = ( WordData * ) ( word + 1 ) ; // nb. "pointer arithmetic"

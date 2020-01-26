@@ -231,7 +231,7 @@ Compiler_RemoveLocalFrame ( Compiler * compiler )
                 byte add_r14_0x8 [ ] = { 0x49, 0x83, 0xc6, 0x08 } ;
                 if ( ( GetState ( compiler, RETURN_ACCUM ) ) && ( ! ( memcmp ( add_r14_0x8, Here - 7, 4 ) ) ) ) // more logic needed here for this to work ??
                 {
-                    _ByteArray_UnAppendSpace ( _Q_CodeByteArray, 7 ) ;
+                    _ByteArray_UnAppendSpace ( _O_CodeByteArray, 7 ) ;
                 }
             }
 #endif            

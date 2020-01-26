@@ -154,7 +154,7 @@ void
 BigNum_FPrint ( )
 {
     mpfr_t * value = ( mpfr_t* ) DataStack_Pop ( ) ;
-    if ( _Q_->Verbosity ) mpfr_printf ( "%*.*Rf", _Context_->System0->BigNum_Printf_Width, _Context_->System0->BigNum_Printf_Precision, *value ) ;
+    if ( _O_->Verbosity ) mpfr_printf ( "%*.*Rf", _Context_->System0->BigNum_Printf_Width, _Context_->System0->BigNum_Printf_Precision, *value ) ;
     fflush ( stdout ) ;
 }
 
@@ -164,7 +164,7 @@ void
 BigNum_EPrint ( )
 {
     mpfr_t * value = ( mpfr_t* ) DataStack_Pop ( ) ;
-    if ( _Q_->Verbosity ) mpfr_printf ( "%*.*Re", _Context_->System0->BigNum_Printf_Width, _Context_->System0->BigNum_Printf_Precision, *value ) ;
+    if ( _O_->Verbosity ) mpfr_printf ( "%*.*Re", _Context_->System0->BigNum_Printf_Width, _Context_->System0->BigNum_Printf_Precision, *value ) ;
     fflush ( stdout ) ;
 }
 #else
@@ -182,7 +182,7 @@ _BigNum_FPrint ( mpfr_t * value )
 {
     Context * cntx = _Context_ ;
     byte * format ;
-    if ( _Q_->Verbosity )
+    if ( _O_->Verbosity )
     {
         if ( cntx->System0->NumberBase == 10 ) format = (byte*) "%*.*Rf" ;
         else if ( cntx->System0->NumberBase == 2 ) format = (byte*) "%*.*Rb" ;
@@ -207,7 +207,7 @@ BigNum_FPrint2 ( )
     Context * cntx = _Context_ ;
     char * format ;
     mpfr_t * value = ( mpfr_t* ) DataStack_Pop ( ) ;
-    if ( _Q_->Verbosity )
+    if ( _O_->Verbosity )
     {
 #if 1        
         if ( cntx->System0->NumberBase == 10 ) format = "%*.*Rf" ;
@@ -228,7 +228,7 @@ BigNum_EPrint ( )
 {
     //Set_SCA ( 0 ) ; // this is not compiled
     mpfr_t * value = ( mpfr_t* ) DataStack_Pop ( ) ;
-    if ( _Q_->Verbosity ) mpfr_printf ( "%*.*Re", _Context_->System0->BigNum_Printf_Width, _Context_->System0->BigNum_Printf_Precision, *value ) ;
+    if ( _O_->Verbosity ) mpfr_printf ( "%*.*Re", _Context_->System0->BigNum_Printf_Width, _Context_->System0->BigNum_Printf_Precision, *value ) ;
     fflush ( stdout ) ;
 }
 #endif

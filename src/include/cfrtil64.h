@@ -54,7 +54,7 @@ const void *const __dso_handle __attribute__ ((__visibility__ ("hidden")))
 #include "types.h"
 #include "macros.h"
 
-extern OpenVmTil * _Q_;
+extern OpenVmTil * _O_;
 extern CPrimitive CPrimitives [];
 extern MachineCodePrimitive MachineCodePrimitives [];
 extern int64 mmap_TotalMemAllocated, mmap_TotalMemFreed ;

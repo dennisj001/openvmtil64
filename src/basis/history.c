@@ -16,7 +16,7 @@ HistorySymbolList_Find ( byte * hstring )
     HistoryStringNode * hsn = 0 ;
     dlnode * node, * nextNode ;
 #if 1   
-    for ( node = dllist_First ( ( dllist* ) _Q_->OVT_HistorySpace.StringList ) ; node ; node = nextNode ) // index = dlnode_NextNode ( &_Q->HistoryList, (dlnode *) index ) )
+    for ( node = dllist_First ( ( dllist* ) _O_->OVT_HistorySpace.StringList ) ; node ; node = nextNode ) // index = dlnode_NextNode ( &_Q->HistoryList, (dlnode *) index ) )
     {
         nextNode = dlnode_Next ( node ) ;
         hsn = ( HistoryStringNode* ) node ;
@@ -26,7 +26,7 @@ HistorySymbolList_Find ( byte * hstring )
         }
     }
 #else // some work towards eliminating the StringList and just using the MemList
-    for ( node = dllist_First ( ( dllist* ) _Q_->OVT_HistorySpace.MemList ) ; node ; node = nextNode ) // index = dlnode_NextNode ( &_Q->HistoryList, (dlnode *) index ) )
+    for ( node = dllist_First ( ( dllist* ) _O_->OVT_HistorySpace.MemList ) ; node ; node = nextNode ) // index = dlnode_NextNode ( &_Q->HistoryList, (dlnode *) index ) )
     {
         nextNode = dlnode_Next ( node ) ;
         hsn = ( HistoryStringNode* ) ( ( MemChunk * ) node + 1 ) ;
@@ -75,9 +75,9 @@ _OpenVmTil_AddStringToHistoryList ( byte * istring )
             hsn = HistoryStringNode_New ( nstring ) ;
         }
         else dlnode_Remove ( ( dlnode* ) hsn ) ; // make it last with dllist_AddNodeToTail
-        dllist_AddNodeToTail ( _Q_->OVT_HistorySpace.StringList, ( dlnode* ) hsn ) ; //
-        d0 ( int64 ll = List_Length ( _Q_->OVT_HistorySpace.StringList ) ) ;
-        dllist_SetCurrentNode_After ( _Q_->OVT_HistorySpace.StringList ) ; // ! properly set Object.dln_Node
+        dllist_AddNodeToTail ( _O_->OVT_HistorySpace.StringList, ( dlnode* ) hsn ) ; //
+        d0 ( int64 ll = List_Length ( _O_->OVT_HistorySpace.StringList ) ) ;
+        dllist_SetCurrentNode_After ( _O_->OVT_HistorySpace.StringList ) ; // ! properly set Object.dln_Node
         //Buffer_SetAsUnused ( buffer ) ;
     }
 }
@@ -123,7 +123,7 @@ _HistorySpace_Init ( OpenVmTil * ovt, int64 reset )
         ovt->OVT_HistorySpace.StringList = & ovt->OVT_HistorySpace._StringList ;
         dllist_Init ( ovt->OVT_HistorySpace.StringList, &ovt->OVT_HistorySpace._StringList_HeadNode, &ovt->OVT_HistorySpace._StringList_TailNode ) ;
         ovt->OVT_HistorySpace.HistorySpaceNBA = ovt->MemorySpace0->HistorySpace ;
-        //if ( reset ) _NamedByteArray_Init ( _Q_->OVT_HistorySpace.HistorySpaceNBA, ( byte* ) "HistorySpace", HISTORY_SIZE, HISTORY ) ;
+        //if ( reset ) _NamedByteArray_Init ( _O_->OVT_HistorySpace.HistorySpaceNBA, ( byte* ) "HistorySpace", HISTORY_SIZE, HISTORY ) ;
     }
 }
 
@@ -140,6 +140,6 @@ _HistorySpace_New ( OpenVmTil * ovt, int64 resetFlag )
 void
 HistorySpace_Reset ( void )
 {
-    _HistorySpace_New ( _Q_, 1 ) ;
+    _HistorySpace_New ( _O_, 1 ) ;
 }
 

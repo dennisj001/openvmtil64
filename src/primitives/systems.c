@@ -154,8 +154,8 @@ _ShellEscape ( char * str )
         extern char **environ ;
         pid_t pid ;
         char *argv[] = { "sh", "-c", str, NULL } ;
-        d0 ( _Q_->Verbosity = 2 ) ;
-        if ( _Q_->Verbosity > 1 ) printf ( "\nposix_spawn :: command = %s\n", str ) ;
+        d0 ( _O_->Verbosity = 2 ) ;
+        if ( _O_->Verbosity > 1 ) printf ( "\nposix_spawn :: command = %s\n", str ) ;
         //else printf ("\n") ;
 #if 0
         posix_spawn ( pid_t * __restrict __pid,
@@ -171,25 +171,25 @@ _ShellEscape ( char * str )
 #if 1        
         if ( status == 0 )
         {
-            if ( _Q_->Verbosity > 1 ) printf ( "\nposix_spawn : child : pid = %d\n", pid ) ;
+            if ( _O_->Verbosity > 1 ) printf ( "\nposix_spawn : child : pid = %d\n", pid ) ;
             //if ( wait ( &status ) != -1 ) //( waitpid ( pid, &status, 0 ) != - 1 )
             if ( waitpid ( pid, &status, WNOHANG ) != - 1 )
             {
-                if ( _Q_->Verbosity > 1 ) printf ( "\nposix_spawn : child : pid = %d : %s :: exited with status %d\n", pid, ( char* ) String_ConvertToBackSlash ( ( byte* ) str ), status ) ;
+                if ( _O_->Verbosity > 1 ) printf ( "\nposix_spawn : child : pid = %d : %s :: exited with status %d\n", pid, ( char* ) String_ConvertToBackSlash ( ( byte* ) str ), status ) ;
             }
             else
             {
-                if ( _Q_->Verbosity > 0 ) perror ( "\nwaitpid" ) ;
+                if ( _O_->Verbosity > 0 ) perror ( "\nwaitpid" ) ;
             }
         }
         else
         {
-            if ( _Q_->Verbosity > 1 ) printf ( "\nposix_spawn: %s\n", strerror ( status ) ) ;
+            if ( _O_->Verbosity > 1 ) printf ( "\nposix_spawn: %s\n", strerror ( status ) ) ;
         }
 #endif        
     }
 #endif    
-    if ( _Q_->Verbosity > 1 ) printf ( ( char* ) c_gd ( "\n_ShellEscape : command = \"%s\" : returned %d.\n" ), str, status ) ;
+    if ( _O_->Verbosity > 1 ) printf ( ( char* ) c_gd ( "\n_ShellEscape : command = \"%s\" : returned %d.\n" ), str, status ) ;
     fflush (stdout) ;
 }
 
@@ -249,11 +249,11 @@ CfrTil_LineCharacterNumber ( )
 void
 _CfrTil_Version ( Boolean flag )
 {
-    //if ( flag || ( ( _Q_->Verbosity ) && ( _Q_->StartedTimes == 1 ) ) && (_CfrTil_->InitSessionCoreTimes == 1) )
-    if ( flag || ( _Q_->Restarts < 2 ) )
+    //if ( flag || ( ( _O_->Verbosity ) && ( _O_->StartedTimes == 1 ) ) && (_CfrTil_->InitSessionCoreTimes == 1) )
+    if ( flag || ( _O_->Restarts < 2 ) )
     {
-        //_Printf ( ( byte* ) "\ncfrTil64 %s", _Q_->VersionString ) ;
-        _Printf ( ( byte* ) "\nversion %s", _Q_->VersionString ) ;
+        //_Printf ( ( byte* ) "\ncfrTil64 %s", _O_->VersionString ) ;
+        _Printf ( ( byte* ) "\nversion %s", _O_->VersionString ) ;
     }
 }
 
@@ -384,8 +384,8 @@ CfrTil_ShellEscape ( )
 void
 OVT_Mem_ShowAllocated ( )
 {
-    _OVT_ShowPermanentMemList ( _Q_ ) ;
-    OVT_ShowNBAs ( _Q_, 1 ) ;
+    _OVT_ShowPermanentMemList ( _O_ ) ;
+    OVT_ShowNBAs ( _O_, 1 ) ;
     OVT_ShowMemoryAllocated ( );
 }
 

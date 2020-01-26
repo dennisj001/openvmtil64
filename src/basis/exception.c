@@ -8,16 +8,16 @@
 void
 _OpenVmTil_ShowExceptionInfo ( )
 {
-    Word * word = _Q_->ExceptionWord ;
+    Word * word = _O_->ExceptionWord ;
     Debugger * debugger = _Debugger_ ;
     DebugOn ;
-    if ( ! _Q_->ExceptionCode & ( STACK_ERROR | STACK_OVERFLOW | STACK_UNDERFLOW ) ) Debugger_Stack ( debugger ) ;
+    if ( ! _O_->ExceptionCode & ( STACK_ERROR | STACK_OVERFLOW | STACK_UNDERFLOW ) ) Debugger_Stack ( debugger ) ;
     if ( ! word )
     {
-        word = Finder_Word_FindUsing ( _Finder_, _Q_->ExceptionToken, 1 ) ;
+        word = Finder_Word_FindUsing ( _Finder_, _O_->ExceptionToken, 1 ) ;
         if ( ! word )
         {
-            if ( _Q_->SigAddress ) word = Word_GetFromCodeAddress ( ( byte* ) _Q_->SigAddress ) ;
+            if ( _O_->SigAddress ) word = Word_GetFromCodeAddress ( ( byte* ) _O_->SigAddress ) ;
             //else word = _Context_->CurrentEvalWord ? _Context_->CurrentEvalWord : _Context_->LastEvalWord;
             debugger->w_Word = word ;
         }
@@ -25,7 +25,7 @@ _OpenVmTil_ShowExceptionInfo ( )
     AlertColors ;
     SetState ( debugger, DBG_INFO, true ) ;
     Debugger_Locals_Show ( debugger ) ;
-    Debugger_ShowInfo ( debugger, _Q_->ExceptionMessage, _Q_->Signal ) ;
+    Debugger_ShowInfo ( debugger, _O_->ExceptionMessage, _O_->Signal ) ;
 
     if ( GetState ( debugger, DBG_STEPPING ) && debugger->DebugAddress )
     {
@@ -33,27 +33,27 @@ _OpenVmTil_ShowExceptionInfo ( )
         Debugger_UdisOneInstruction ( debugger, debugger->DebugAddress, ( byte* ) "", ( byte* ) "" ) ;
     }
     if ( word ) _CfrTil_Source ( word, 0 ) ;
-    _Printf ( ( byte* ) "\nOpenVmTil_SignalAction : address = 0x%016lx : %s", _Q_->SigAddress, _Q_->SigLocation ) ;
+    _Printf ( ( byte* ) "\nOpenVmTil_SignalAction : address = 0x%016lx : %s", _O_->SigAddress, _O_->SigLocation ) ;
 }
 
 int64
 OpenVmTil_ShowExceptionInfo ( )
 {
-    if ( _Q_->Verbosity )
+    if ( _O_->Verbosity )
     {
-        if ( _Q_->ExceptionMessage )
+        if ( _O_->ExceptionMessage )
         {
             _Printf ( "\n%s : %s\n", 
-                _Q_->ExceptionMessage, _Q_->ExceptionSpecialMessage ? _Q_->ExceptionSpecialMessage : Context_Location ( ) ) ;
+                _O_->ExceptionMessage, _O_->ExceptionSpecialMessage ? _O_->ExceptionSpecialMessage : Context_Location ( ) ) ;
         }
-        if ( ( _Q_->SigSegvs < 2 ) && ( _Q_->SignalExceptionsHandled ++ < 2 ) && _CfrTil_ )
+        if ( ( _O_->SigSegvs < 2 ) && ( _O_->SignalExceptionsHandled ++ < 2 ) && _CfrTil_ )
         {
-            _DisplaySignal ( _Q_->Signal ) ;
+            _DisplaySignal ( _O_->Signal ) ;
             _OpenVmTil_ShowExceptionInfo ( ) ;
         }
     }
-    int64 rtrn = OVT_Pause ( 0, _Q_->SignalExceptionsHandled ) ;
-    _Q_->Signal = 0 ;
+    int64 rtrn = OVT_Pause ( 0, _O_->SignalExceptionsHandled ) ;
+    _O_->Signal = 0 ;
     return rtrn ;
 }
 
@@ -61,24 +61,24 @@ int64
 OVT_Pause ( byte * prompt, int64 signalExceptionsHandled )
 {
     int64 rtrn = 0 ;
-    SetState ( _Q_, OVT_PAUSE, true ) ;
+    SetState ( _O_, OVT_PAUSE, true ) ;
     if ( _CfrTil_ && _Context_ )
     {
         if ( _Context_->CurrentlyRunningWord ) _Debugger_->ShowLine = ( byte* ) "" ;
         byte buffer [512], *defaultPrompt =
             ( byte * ) "\n%s\n%s : at %s :: %s'd' (d)ebugger, 't' s(t)ack, c' (c)ontinue, 'q' (q)uit, 'x' e(x)it, 'i' '\\' or <key> (i)interpret, <return> loop%s" ;
-        snprintf ( ( char* ) buffer, 512, prompt ? ( char* ) prompt : ( char* ) defaultPrompt, _Q_->ExceptionMessage ? ( char* ) _Q_->ExceptionMessage : "\r",
+        snprintf ( ( char* ) buffer, 512, prompt ? ( char* ) prompt : ( char* ) defaultPrompt, _O_->ExceptionMessage ? ( char* ) _O_->ExceptionMessage : "\r",
             c_gd ( "pause" ), _Context_Location ( _Context_ ), c_gd ( _Debugger_->ShowLine ? _Debugger_->ShowLine : _Context_->ReadLiner0->InputLine ),
             c_gd ( "\n-> " ) ) ;
         DebugColors ;
         int64 tlw = Strlen ( defaultPrompt ) ;
         if ( tlw > _Debugger_->TerminalLineWidth ) _Debugger_->TerminalLineWidth = tlw ;
-        if ( signalExceptionsHandled ) _Printf ( ( byte* ) "\n_OVT_Pause : Signals Handled = %d : signal = %d : restart condition = %d\n", signalExceptionsHandled, _Q_->Signal,
-            _Q_->RestartCondition ) ;
+        if ( signalExceptionsHandled ) _Printf ( ( byte* ) "\n_OVT_Pause : Signals Handled = %d : signal = %d : restart condition = %d\n", signalExceptionsHandled, _O_->Signal,
+            _O_->RestartCondition ) ;
         do
         {
             _Debugger_->w_Word = Context_CurrentWord ( ) ;
-            _Debugger_ShowInfo ( _Debugger_, ( byte* ) "\r", _Q_->Signal, 0 ) ;
+            _Debugger_ShowInfo ( _Debugger_, ( byte* ) "\r", _O_->Signal, 0 ) ;
             _Printf ( ( byte* ) "%s", buffer ) ;
 
             int64 key = Key ( ) ;
@@ -133,8 +133,8 @@ OVT_Pause ( byte * prompt, int64 signalExceptionsHandled )
                     continue ;
                 }
                 case 'i': 
-                default:
                 {
+                    // interpret in context
                     CfrTil_DoPrompt ( ) ;
                     if ( ( key == '/' ) || ( key == '\\' ) || ( key == 'i' ) ) key = 0 ;
                     _CfrTil_PrintChar ( key ) ;
@@ -145,11 +145,14 @@ OVT_Pause ( byte * prompt, int64 signalExceptionsHandled )
                     ReadLine_SetRawInputFunction ( _Context_->ReadLiner0, ReadLine_GetNextCharFromString ) ;
                     continue ;
                 }
-#if 0                
                 default:
                 {
-                    CfrTil_DebugOff ( ) ; // ? new idea ?
+                    // new context
+                    Boolean svDbgState = GetState ( _CfrTil_, DEBUG_MODE|_DEBUG_SHOW_ ) ;
+                    CfrTil_DebugOff ( ) ; 
                     Context * cntx = CfrTil_Context_PushNew ( _CfrTil_ ) ;
+                    if ( ( key == '/' ) || ( key == '\\' ) || ( key == 'i' ) ) key = 0 ;
+                    ReadLine_Init ( cntx->ReadLiner0, _CfrTil_Key ) ;
                     OpenVmTil_AddStringToHistoryOn ( ) ;
                     SetState ( cntx, AT_COMMAND_LINE, true ) ;
                     Context_DoPrompt ( cntx ) ;
@@ -160,9 +163,9 @@ OVT_Pause ( byte * prompt, int64 signalExceptionsHandled )
                     }
                     SetState ( cntx, AT_COMMAND_LINE, false ) ;
                     CfrTil_Context_PopDelete ( _CfrTil_ ) ;
-                    goto done ;
+                    SetState ( _CfrTil_, DEBUG_MODE|_DEBUG_SHOW_, svDbgState ) ;
+                    //goto done ;
                 }
-#endif                
             }
         }
         while ( 1 ) ;
@@ -177,7 +180,7 @@ int64
 _OpenVmTil_Pause ( byte * msg )
 {
     _Printf ( ( byte* ) "\n%s", msg ) ;
-    return OVT_Pause ( 0, _Q_->SignalExceptionsHandled ) ;
+    return OVT_Pause ( 0, _O_->SignalExceptionsHandled ) ;
 }
 
 void
@@ -195,13 +198,6 @@ OVT_ResetSignals ( int64 signals )
     sigemptyset ( &signal_set ) ;
     sigaddset ( &signal_set, signals ) ;
     sigprocmask ( SIG_UNBLOCK, &signal_set, NULL ) ;
-}
-
-void
-OVT_SetExceptionMessage ( OpenVmTil * ovt )
-{
-    if ( ovt->RestartCondition == INITIAL_START ) ovt->ExceptionMessage = ( byte* ) "Full Initial Re-Start : ..." ;
-    else if ( ovt->RestartCondition == ABORT ) ovt->ExceptionMessage = ( byte* ) "Aborting : ..." ;
 }
 
 void
@@ -231,47 +227,47 @@ void
 OVT_Throw ( int signal, int64 restartCondition, Boolean pauseFlag )
 {
     sigjmp_buf * jb ;
-    OVT_SetRestartCondition ( _Q_, restartCondition ) ;
+    OVT_SetRestartCondition ( _O_, restartCondition ) ;
     if ( signal )
     {
-        if ( ( signal == SIGTERM ) || ( signal == SIGKILL ) || ( signal == SIGQUIT ) || ( signal == SIGSTOP ) ) OVT_Exit ( ) ;
-        else if ( signal == SIGBUS )
+        if ( ( signal == SIGTERM ) || ( signal == SIGKILL ) || ( signal == SIGQUIT ) || ( signal == SIGSTOP ) || ( signal == SIGHUP ) ) OVT_Exit ( ) ;
+        if ( signal == SIGBUS )
         {
-            jb = & _Q_->JmpBuf0 ;
-            OVT_SetRestartCondition ( _Q_, INITIAL_START ) ;
+            jb = & _O_->JmpBuf0 ;
+            OVT_SetRestartCondition ( _O_, INITIAL_START ) ;
             _OVT_SimpleFinalPause ( "\nOVT_Throw : signal == SIGBUS : restarting to INITIAL_START ... with any <key>" ) ;
             goto jump ; 
         }
         else
         {
-            if ( ( restartCondition > QUIT ) || ( _Q_->Signal == SIGSEGV ) || ( _Q_->Signal == SIGILL ) || ( _Q_->Signal == SIGFPE ) )
+            if ( ( restartCondition > QUIT ) || ( _O_->Signal == SIGFPE ) ) 
             {
-                if ( ++ _Q_->SigSegvs < 2 )
+                if ( ++ _O_->SigSegvs < 2 )
                 {
                     jb = & _CfrTil_->JmpBuf0 ;
                     OpenVmTil_ShowExceptionInfo ( ) ;
                     pauseFlag ++ ;
-                    OVT_SetRestartCondition ( _Q_, ABORT ) ;
+                    OVT_SetRestartCondition ( _O_, ABORT ) ;
                 }
-                else OVT_SetRestartCondition ( _Q_, INITIAL_START ) ;
-                if ( _Q_->SigSegvs > 3 ) _OVT_SigLongJump ( & _Q_->JmpBuf0 ) ; //OVT_Exit ( ) ;
-                else if ( ( _Q_->SigSegvs > 1 ) || ( restartCondition == INITIAL_START ) ) jb = & _Q_->JmpBuf0 ;
+                else OVT_SetRestartCondition ( _O_, INITIAL_START ) ;
+                if ( _O_->SigSegvs > 3 ) _OVT_SigLongJump ( & _O_->JmpBuf0 ) ; //OVT_Exit ( ) ;
+                else if ( ( _O_->SigSegvs > 1 ) || ( restartCondition == INITIAL_START ) ) jb = & _O_->JmpBuf0 ;
             }
             else jb = & _CfrTil_->JmpBuf0 ;
         }
     }
     else
     {
-        if ( restartCondition >= INITIAL_START ) jb = & _Q_->JmpBuf0 ;
+        if ( restartCondition >= INITIAL_START ) jb = & _O_->JmpBuf0 ;
         else jb = & _CfrTil_->JmpBuf0 ;
     }
-    //OVT_SetExceptionMessage ( _Q_ ) ;
+    //OVT_SetExceptionMessage ( _O_ ) ;
     
-    snprintf ( Buffer_Data_Cleared (_Q_->ThrowBuffer), BUFFER_SIZE, "\n%s\n%s %s from %s -> ...", _Q_->ExceptionMessage, 
+    snprintf ( Buffer_Data_Cleared (_O_->ThrowBuffer), BUFFER_SIZE, "\n%s\n%s %s from %s -> ...", _O_->ExceptionMessage, 
         ( jb == & _CfrTil_->JmpBuf0 ) ? "reseting cfrTil" : "restarting OpenVmTil",
-        ( _Q_->Signal == SIGSEGV ) ? ": SIGSEGV" : "", ( _Q_->SigSegvs < 2 ) ? Context_Location ( ) : ( byte* ) "" ) ;
-    _OVT_SimpleFinalPause ( _Q_->ThrowBuffer->Data ) ;
-    if ( pauseFlag && ( _Q_->SignalExceptionsHandled < 2 ) && ( _Q_->SigSegvs < 2 ) ) OVT_Pause ( 0, _Q_->SignalExceptionsHandled ) ;
+        ( _O_->Signal == SIGSEGV ) ? ": SIGSEGV" : "", ( _O_->SigSegvs < 2 ) ? Context_Location ( ) : ( byte* ) "" ) ;
+    _OVT_SimpleFinalPause ( _O_->ThrowBuffer->Data ) ;
+    if ( pauseFlag && ( _O_->SignalExceptionsHandled < 2 ) && ( _O_->SigSegvs < 2 ) ) OVT_Pause ( 0, _O_->SignalExceptionsHandled ) ;
 jump:
     _OVT_SigLongJump ( jb ) ;
 }
@@ -279,9 +275,9 @@ jump:
 void
 OpenVmTil_Throw ( byte * excptMessage, byte * specialMessage, int64 restartCondition, int64 infoFlag )
 {
-    _Q_->ExceptionMessage = excptMessage ;
-    _Q_->Thrown = restartCondition ;
-    _Q_->ExceptionSpecialMessage = specialMessage ;
+    _O_->ExceptionMessage = excptMessage ;
+    _O_->Thrown = restartCondition ;
+    _O_->ExceptionSpecialMessage = specialMessage ;
 
     if ( infoFlag ) OpenVmTil_ShowExceptionInfo ( ) ;
     OVT_Throw ( 0, restartCondition, 0 ) ;
@@ -294,25 +290,30 @@ _OpenVmTil_LongJmp_WithMsg ( int64 restartCondition, byte * msg )
 }
 
 void
-OpenVmTil_SignalAction ( int signal, siginfo_t * si, void * uc )
+OpenVmTil_SignalAction ( int signal, siginfo_t * si, void * uc ) //nb. void ptr necessary 
 {
     d0 ( _Printf ( ( byte* ) "\nOpenVmTil_SignalAction :: signal = %d\n", signal ) ) ;
-    _Q_->Signal = signal ;
-    _Q_->SigAddress = ( Is_DebugOn && _Debugger_->DebugAddress ) ? _Debugger_->DebugAddress : si->si_addr ;
-    _Q_->SigLocation = ( ( ! ( signal & ( SIGSEGV | SIGBUS ) ) ) && _Context_ ) ? ( byte* ) c_gd ( Context_Location ( ) ) : ( byte* ) "" ;
-    OVT_ResetSignals ( _Q_->Signal ) ;
+    if ( ( signal == SIGTERM ) || ( signal == SIGKILL ) || ( signal == SIGQUIT ) || ( signal == SIGSTOP ) ) OVT_Exit ( ) ;
+    _O_->Signal = signal ;
+    _O_->SigAddress = ( Is_DebugOn && _Debugger_->DebugAddress ) ? _Debugger_->DebugAddress : si->si_addr ;
+    _O_->SigLocation = ( ( ! ( signal & ( SIGSEGV | SIGBUS ) ) ) && _Context_ ) ? ( byte* ) c_gd ( Context_Location ( ) ) : ( byte* ) "" ;
+    OVT_ResetSignals ( _O_->Signal ) ;
     if ( ( signal >= SIGCHLD ) || ( signal == SIGTRAP ) ) //||( signal == SIGBUS ))
     {
         if ( ( signal != SIGCHLD ) && ( signal != SIGWINCH ) && ( signal != SIGTRAP ) ) OpenVmTil_ShowExceptionInfo ( ) ;
-        _Q_->SigAddress = 0 ; //|| ( signal == SIGWINCH ) ) _Q_->SigAddress = 0 ; // 17 : "CHILD TERMINATED" : ignore; its just back from a shell fork
-        _Q_->Signal = 0 ;
+        else
+        {
+            // ignore this category -- just return
+            _O_->SigAddress = 0 ; //|| ( signal == SIGWINCH ) ) _O_->SigAddress = 0 ; // 17 : "CHILD TERMINATED" : ignore; its just back from a shell fork
+            _O_->Signal = 0 ;
+        }
     }
-    else if ( _Q_->SigSegvs )
+    else if ( _O_->SigSegvs )
     {
         OVT_SimpleFinalPause ( ) ;
-        _OVT_SigLongJump ( & _Q_->JmpBuf0 ) ;
+        _OVT_SigLongJump ( & _O_->JmpBuf0 ) ;
     }
-    else OVT_Throw ( _Q_->Signal, _Q_->RestartCondition, 0 ) ;
+    else OVT_Throw ( _O_->Signal, _O_->RestartCondition, 0 ) ;
 }
 
 void
@@ -320,7 +321,7 @@ CfrTil_Exception ( int64 exceptionCode, byte * message, int64 restartCondition )
 {
     byte * b = Buffer_Data ( _CfrTil_->ScratchB1 ) ;
     AlertColors ;
-    _Q_->ExceptionCode = exceptionCode ;
+    _O_->ExceptionCode = exceptionCode ;
     printf ( "\n\nCfrTil_Exception at %s\n", Context_Location () ) ; fflush (stdout) ;
     switch ( exceptionCode )
     {
@@ -503,7 +504,7 @@ CfrTil_RestartInit ( )
 void
 CfrTil_FullRestart ( )
 {
-    _Q_->Signal = 0 ;
+    _O_->Signal = 0 ;
     _OpenVmTil_LongJmp_WithMsg ( INITIAL_START, ( byte* ) "Full Initial Re-Start : ..." ) ;
 }
 
@@ -543,4 +544,13 @@ OVT_SimpleFinalPause ( )
     fflush ( stdout ) ;
     Key ( ) ;
 }
+
+#if 0
+void
+OVT_SetExceptionMessage ( OpenVmTil * ovt )
+{
+    if ( ovt->RestartCondition == INITIAL_START ) ovt->ExceptionMessage = ( byte* ) "Full Initial Re-Start : ..." ;
+    else if ( ovt->RestartCondition == ABORT ) ovt->ExceptionMessage = ( byte* ) "Aborting : ..." ;
+}
+#endif
 

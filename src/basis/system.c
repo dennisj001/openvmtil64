@@ -231,7 +231,7 @@ _CfrTil_WordAccounting_Print ( byte * functionName )
 {
     _Printf ( ( byte* ) "\n%s :: DObjectCreateCount = %d : WordCreateCount = %d : WordsAdded = %d : FindWordCount = %d : FindWordMaxCount = %d",
         functionName, _CfrTil_->DObjectCreateCount, _CfrTil_->WordCreateCount, _CfrTil_->WordsAdded, _CfrTil_->FindWordCount, _CfrTil_->FindWordMaxCount ) ;
-    _Printf ( ( byte* ) "\nRecycledWordCount : %d", _Q_->MemorySpace0->RecycledWordCount ) ;
+    _Printf ( ( byte* ) "\nRecycledWordCount : %d", _O_->MemorySpace0->RecycledWordCount ) ;
     Buffer_PrintBuffers ( ) ;
 }
 
@@ -239,7 +239,7 @@ void
 CfrTil_WordAccounting ( byte * functionName )
 {
     if ( _CfrTil_->FindWordCount > _CfrTil_->FindWordMaxCount ) _CfrTil_->FindWordMaxCount = _CfrTil_->FindWordCount ;
-    if ( _Q_->Verbosity > 4 ) 
+    if ( _O_->Verbosity > 4 ) 
         _CfrTil_WordAccounting_Print ( functionName ) ;
 }
 
@@ -285,8 +285,8 @@ _CfrTil_GetSystemState_String1 ( byte *buf )
     strcpy ( ( char* ) buf, "\nDebug is " ) ;
     if ( GetState ( _CfrTil_, DEBUG_MODE ) ) strcat ( ( char* ) buf, "on. " ) ;
     else strcat ( ( char* ) buf, "off. " ) ;
-    sprintf ( ( char* ) &buf[Strlen ( ( char* ) buf )], "Verbosity = %ld. ", _Q_->Verbosity ) ;
-    sprintf ( ( char* ) &buf[Strlen ( ( char* ) buf )], "Console = %ld, ", _Q_->Console ) ;
+    sprintf ( ( char* ) &buf[Strlen ( ( char* ) buf )], "Verbosity = %ld. ", _O_->Verbosity ) ;
+    sprintf ( ( char* ) &buf[Strlen ( ( char* ) buf )], "Console = %ld, ", _O_->Console ) ;
     sprintf ( ( char* ) &buf[Strlen ( ( char* ) buf )], "NumberBase = %ld.", _Context_->System0->NumberBase ) ;
     return buf ;
 }
@@ -328,8 +328,8 @@ _CfrTil_SystemState_Print ( int64 pflag )
     _Printf ( ( byte* ) " : Lisp %s", lo ? "on" : "off" ) ;
     _Printf ( ( byte* ) "\n%s : at %s", Compiling ? "compiling" : "interpreting", Context_Location ( ) ) ;
     _Printf ( ( byte* ) "\nSignalExceptionsHandled = %d ; SigSegvs = %d ; Restarts = %d\nStartedTimes = %d ; RestartCondition = %s ; LastRestartCondtion = %s", 
-        _Q_->SignalExceptionsHandled, _Q_->SigSegvs, _Q_->Restarts, _Q_->StartedTimes, Convert_RestartCondtion (_Q_->LastRestartCondition), Convert_RestartCondtion (_Q_->RestartCondition) ) ;
-    if ( pflag || ( _Q_->Verbosity > 1 ) )
+        _O_->SignalExceptionsHandled, _O_->SigSegvs, _O_->Restarts, _O_->StartedTimes, Convert_RestartCondtion (_O_->LastRestartCondition), Convert_RestartCondtion (_O_->RestartCondition) ) ;
+    if ( pflag || ( _O_->Verbosity > 1 ) )
     {
         OpenVmTil_Print_DataSizeofInfo ( pflag ) ;
         _CfrTil_WordAccounting_Print ( ( byte* ) "_CfrTil_SystemState_Print" ) ;

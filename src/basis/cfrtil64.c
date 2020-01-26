@@ -10,7 +10,7 @@ CfrTil_Run ( CfrTil * cfrTil, int64 restartCondition )
         if ( ! sigsetjmp ( cfrTil->JmpBuf0, 0 ) )
         {
             _CfrTil_ReStart ( cfrTil, restartCondition ) ;
-            Ovt_RunInit ( _Q_ ) ;
+            Ovt_RunInit ( _O_ ) ;
             CfrTil_InterpreterRun ( ) ;
         }
     }
@@ -19,7 +19,7 @@ CfrTil_Run ( CfrTil * cfrTil, int64 restartCondition )
 void
 CfrTil_RunInit ( )
 {
-    if ( _Q_->Signal > QUIT ) CfrTil_DataStack_Init ( ) ;
+    if ( _O_->Signal > QUIT ) CfrTil_DataStack_Init ( ) ;
     else if ( DataStack_Underflow ( ) || ( DataStack_Overflow ( ) ) ) CfrTil_PrintDataStack ( ) ;
 }
 
@@ -88,7 +88,7 @@ void
 CfrTil_Debugger_State_CheckSaveShow ( )
 {
     CfrTil_Debugger_CheckSaveCpuStateShow ( ) ;
-    //if ( _Q_->Verbosity > 3 ) Debugger_PrintReturnStackWindow () ;
+    //if ( _O_->Verbosity > 3 ) Debugger_PrintReturnStackWindow () ;
 }
 
 void
@@ -115,7 +115,7 @@ _CfrTil_NamespacesInit ( CfrTil * cfrTil )
 void
 _CfrTil_DataStack_Init ( CfrTil * cfrTil )
 {
-    _Stack_Init ( _CfrTil_->DataStack, _Q_->DataStackSize ) ;
+    _Stack_Init ( _CfrTil_->DataStack, _O_->DataStackSize ) ;
     _Dsp_ = _CfrTil_->DataStack->StackPointer ;
     cfrTil->SaveDsp = _Dsp_ ;
 }
@@ -124,7 +124,7 @@ void
 CfrTil_DataStack_Init ( )
 {
     _CfrTil_DataStack_Init ( _CfrTil_ ) ;
-    if ( _Q_->Verbosity > 2 ) _Printf ( ( byte* ) "\nData Stack reset." ) ;
+    if ( _O_->Verbosity > 2 ) _Printf ( ( byte* ) "\nData Stack reset." ) ;
 }
 
 void
@@ -160,7 +160,7 @@ _CfrTil_Init ( CfrTil * cfrTil, Namespace * nss )
     cfrTil->TokenBuffer = Buffer_Data ( cfrTil->TokenB ) ;
     SetState ( cfrTil, CFRTIL_RUN | OPTIMIZE_ON | INLINE_ON, true ) ;
 
-    if ( _Q_->Verbosity > 2 ) _Printf ( ( byte* ) "\nSystem Memory is being reallocated.  " ) ;
+    if ( _O_->Verbosity > 2 ) _Printf ( ( byte* ) "\nSystem Memory is being reallocated.  " ) ;
 
     cfrTil->ContextDataStack = Stack_New ( 256, allocType ) ;
     //cfrTil->ObjectStack = Stack_New ( 1 * K, allocType ) ;
@@ -182,13 +182,13 @@ _CfrTil_Init ( CfrTil * cfrTil, Namespace * nss )
     {
         _CfrTil_NamespacesInit ( cfrTil ) ;
     }
-    if ( cfrTil->SaveDsp && cfrTil->DataStack ) // with _Q_->RestartCondition = STOP from Debugger_Stop
+    if ( cfrTil->SaveDsp && cfrTil->DataStack ) // with _O_->RestartCondition = STOP from Debugger_Stop
     {
         _Dsp_ = cfrTil->SaveDsp ;
     }
     else
     {
-        cfrTil->DataStack = Stack_New ( _Q_->DataStackSize, CFRTIL ) ;
+        cfrTil->DataStack = Stack_New ( _O_->DataStackSize, CFRTIL ) ;
         _Dsp_ = cfrTil->DataStack->StackPointer ;
         cfrTil->SaveDsp = _Dsp_ ;
     }
@@ -244,7 +244,7 @@ CfrTil_ResetMemory ( CfrTil * cfrTil )
     OVT_MemListFree_Buffers ( ) ;
     OVT_MemListFree_CompilerTempObjects ( ) ;
     _OVT_MemListFree_CfrTilInternal ( ) ;
-    if ( _Q_->Verbosity > 1 ) OVT_ShowMemoryAllocated ( ) ;
+    if ( _O_->Verbosity > 1 ) OVT_ShowMemoryAllocated ( ) ;
 }
 
 CfrTil *
@@ -254,7 +254,7 @@ _CfrTil_New ( CfrTil * cfrTil )
     Namespace * nss = 0 ;
     if ( cfrTil )
     {
-        if ( _Q_->RestartCondition < RESET_ALL )
+        if ( _O_->RestartCondition < RESET_ALL )
         {
             nss = cfrTil->Namespaces ; // in this case (see also below) only preserve Namespaces, all else is recycled and reinitialized
             if ( cfrTil->LogFILE )

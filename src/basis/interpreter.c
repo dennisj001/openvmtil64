@@ -4,7 +4,7 @@
 void
 Interpreter_Init ( Interpreter * interp )
 {
-    _Q_->OVT_Interpreter = interp ;
+    _O_->OVT_Interpreter = interp ;
     interp->State = 0 ;
 }
 

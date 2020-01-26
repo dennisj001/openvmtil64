@@ -5,17 +5,17 @@
 void
 _OpenVmTil_ColorsInit ( OpenVmTil * ovt )
 {
-    Colors_Init6 ( &_Q_->Alert, 0, 0, 0, 255, 0, 0 ) ;
-    Colors_Init6 ( &_Q_->Debug, 255, 255, 255, 0, 0, 255 ) ;
-    Colors_Init6 ( &_Q_->Default, 0, 0, 0, 64, 64, 64 ) ;
-    Colors_Init6 ( &_Q_->Notice, 255, 255, 255, 0, 255, 0 ) ; // grey, cyan
-    Colors_Init6 ( &_Q_->User, 0, 0, 0, 255, 255, 255 ) ; // grey, cyan
+    Colors_Init6 ( &_O_->Alert, 0, 0, 0, 255, 0, 0 ) ;
+    Colors_Init6 ( &_O_->Debug, 255, 255, 255, 0, 0, 255 ) ;
+    Colors_Init6 ( &_O_->Default, 0, 0, 0, 64, 64, 64 ) ;
+    Colors_Init6 ( &_O_->Notice, 255, 255, 255, 0, 255, 0 ) ; // grey, cyan
+    Colors_Init6 ( &_O_->User, 0, 0, 0, 255, 255, 255 ) ; // grey, cyan
 
-    _Colors_Init2 ( &_Q_->Alert, Color_Black, Color_Red ) ;
-    _Colors_Init2 ( &_Q_->Debug, Color_Black, Color_Blue ) ;
-    _Colors_Init2 ( &_Q_->Default, Color_Default, Color_Default ) ;
-    _Colors_Init2 ( &_Q_->Notice, Color_Green, Color_Black ) ;
-    _Colors_Init2 ( &_Q_->User, Color_Black, Color_White ) ;
+    _Colors_Init2 ( &_O_->Alert, Color_Black, Color_Red ) ;
+    _Colors_Init2 ( &_O_->Debug, Color_Black, Color_Blue ) ;
+    _Colors_Init2 ( &_O_->Default, Color_Default, Color_Default ) ;
+    _Colors_Init2 ( &_O_->Notice, Color_Green, Color_Black ) ;
+    _Colors_Init2 ( &_O_->User, Color_Black, Color_White ) ;
 }
 #else
 
@@ -40,21 +40,21 @@ _OpenVmTil_ColorsInit ( OpenVmTil * ovt )
 void
 Console ( )
 {
-    DataStack_Push ( ( int64 ) & _Q_->Console ) ;
+    DataStack_Push ( ( int64 ) & _O_->Console ) ;
 }
 
 void
 _ShowRGB ( int64 fr, int64 fg, int64 fb, int64 br, int64 bg, int64 bb )
 {
-    if ( _Q_->Console == 1 ) _Printf ( (byte*) "%c[38;2;%d;%d;%dm %c[48;2;%d;%d;%dm", ESC, fr, fg, fb, ESC, br, bg, bb ) ; // Konsole mode
-    else if ( _Q_->Console == 2 ) _Printf ( (byte*) "%c[38;5;%d;%d;%dm%c[48;5;%d;%d;%dm", ESC, fr, fg, fb, ESC, br, bg, bb ) ; // 'xterm' mode
+    if ( _O_->Console == 1 ) _Printf ( (byte*) "%c[38;2;%d;%d;%dm %c[48;2;%d;%d;%dm", ESC, fr, fg, fb, ESC, br, bg, bb ) ; // Konsole mode
+    else if ( _O_->Console == 2 ) _Printf ( (byte*) "%c[38;5;%d;%d;%dm%c[48;5;%d;%d;%dm", ESC, fr, fg, fb, ESC, br, bg, bb ) ; // 'xterm' mode
 }
 
 void
 _String_ShowRGB ( byte * buf, int64 fr, int64 fg, int64 fb, int64 br, int64 bg, int64 bb )
 {
-    if ( _Q_->Console == 1 ) sprintf ( (char*) buf, "%c[38;2;%ld;%ld;%ldm %c[48;2;%ld;%ld;%ldm", ESC, fr, fg, fb, ESC, br, bg, bb ) ; // Konsole mode
-    else if ( _Q_->Console == 2 ) sprintf ( (char*) buf, "%c[38;5;%ld;%ld;%ldm%c[48;5;%ld;%ld;%ldm", ESC, fr, fg, fb, ESC, br, bg, bb ) ; // 'xterm' mode
+    if ( _O_->Console == 1 ) sprintf ( (char*) buf, "%c[38;2;%ld;%ld;%ldm %c[48;2;%ld;%ld;%ldm", ESC, fr, fg, fb, ESC, br, bg, bb ) ; // Konsole mode
+    else if ( _O_->Console == 2 ) sprintf ( (char*) buf, "%c[38;5;%ld;%ld;%ldm%c[48;5;%ld;%ld;%ldm", ESC, fr, fg, fb, ESC, br, bg, bb ) ; // 'xterm' mode
 }
 
 void
@@ -80,17 +80,17 @@ Colors_Init6 ( Colors *c, int64 fr, int64 fg, int64 fb, int64 br, int64 bg, int6
 void
 ShowColors ( Colors * c )
 {
-    if ( _Q_->Console ) _ShowRgbColors ( c ) ;
+    if ( _O_->Console ) _ShowRgbColors ( c ) ;
     else _ShowColors ( c->ics_IntColors.Fg, c->ics_IntColors.Bg ) ;
-    if ( c ) _Q_->Current = c ;
+    if ( c ) _O_->Current = c ;
 }
 
 void
 String_ShowColors ( byte * buf, Colors * c )
 {
-    if ( _Q_->Console ) _String_ShowRgbColors ( buf, c ) ;
+    if ( _O_->Console ) _String_ShowRgbColors ( buf, c ) ;
     else _String_ShowColors ( buf, c->ics_IntColors.Fg, c->ics_IntColors.Bg ) ;
-    if ( c ) _Q_->Current = c ;
+    if ( c ) _O_->Current = c ;
 }
 
 void
@@ -124,91 +124,91 @@ _CfrTil_SetColors ( Colors * c )
 void
 Ovt_UserColors ( )
 {
-    ShowColors ( &_Q_->User ) ;
+    ShowColors ( &_O_->User ) ;
 }
 
 void
 Ovt_AlertColors ( )
 {
-    ShowColors ( &_Q_->Alert ) ;
+    ShowColors ( &_O_->Alert ) ;
 }
 
 void
 Ovt_DefaultColors ( )
 {
-    ShowColors ( &_Q_->Default ) ;
+    ShowColors ( &_O_->Default ) ;
 }
 
 void
 Ovt_DebugColors ( )
 {
-    ShowColors ( &_Q_->Debug ) ;
+    ShowColors ( &_O_->Debug ) ;
 }
 
 void
 Ovt_NoticeColors ( )
 {
-    ShowColors ( &_Q_->Notice ) ;
+    ShowColors ( &_O_->Notice ) ;
 }
 
 void
 CfrTil_SetDefaultColors ( )
 {
-    _CfrTil_SetColors ( &_Q_->Default ) ;
+    _CfrTil_SetColors ( &_O_->Default ) ;
 }
 
 void
 CfrTil_SetAlertColors ( )
 {
-    _CfrTil_SetColors ( &_Q_->Alert ) ;
+    _CfrTil_SetColors ( &_O_->Alert ) ;
 }
 
 void
 CfrTil_SetDebugColors ( )
 {
-    _CfrTil_SetColors ( &_Q_->Debug ) ;
+    _CfrTil_SetColors ( &_O_->Debug ) ;
 }
 
 void
 CfrTil_SetUserColors ( )
 {
-    _CfrTil_SetColors ( &_Q_->User ) ;
+    _CfrTil_SetColors ( &_O_->User ) ;
 }
 
 void
 CfrTil_SetNoticeColors ( )
 {
-    _CfrTil_SetColors ( &_Q_->Notice ) ;
+    _CfrTil_SetColors ( &_O_->Notice ) ;
 }
 
 void
 CfrTil_SetDefaultRGB ( )
 {
-    _CfrTil_SetRGBColor ( &_Q_->Default ) ;
+    _CfrTil_SetRGBColor ( &_O_->Default ) ;
 }
 
 void
 CfrTil_SetUserRGB ( )
 {
-    _CfrTil_SetRGBColor ( &_Q_->User ) ;
+    _CfrTil_SetRGBColor ( &_O_->User ) ;
 }
 
 void
 CfrTil_SetAlertRGB ( )
 {
-    _CfrTil_SetRGBColor ( &_Q_->Alert ) ;
+    _CfrTil_SetRGBColor ( &_O_->Alert ) ;
 }
 
 void
 CfrTil_SetDebugRGB ( )
 {
-    _CfrTil_SetRGBColor ( &_Q_->Debug ) ;
+    _CfrTil_SetRGBColor ( &_O_->Debug ) ;
 }
 
 void
 CfrTil_SetNoticeRGB ( )
 {
-    _CfrTil_SetRGBColor ( &_Q_->Notice ) ;
+    _CfrTil_SetRGBColor ( &_O_->Notice ) ;
 }
 
 

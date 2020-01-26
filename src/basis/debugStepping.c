@@ -19,14 +19,14 @@ _Debugger_StepOneInstruction ( Debugger * debugger )
 byte *
 Debugger_CompileOneInstruction ( Debugger * debugger, byte * jcAddress, Boolean showFlag )
 {
-    ByteArray * svcs = _Q_CodeByteArray ;
+    ByteArray * svcs = _O_CodeByteArray ;
     _ByteArray_Init ( debugger->StepInstructionBA ) ; // we are only compiling one insn here so clear our BA before each use
     Set_CompilerSpace ( debugger->StepInstructionBA ) ; // now compile to this space
-    _Compile_Save_C_CpuState ( _CfrTil_, showFlag ) ; //&& ( _Q_->Verbosity >= 3 ) ) ; // save our c compiler cpu register state
-    _Compile_Restore_Debugger_CpuState ( debugger, showFlag ) ; //&& ( _Q_->Verbosity >= 3 ) ) ; // restore our runtime state before the current insn
+    _Compile_Save_C_CpuState ( _CfrTil_, showFlag ) ; //&& ( _O_->Verbosity >= 3 ) ) ; // save our c compiler cpu register state
+    _Compile_Restore_Debugger_CpuState ( debugger, showFlag ) ; //&& ( _O_->Verbosity >= 3 ) ) ; // restore our runtime state before the current insn
     byte * nextInsn = _Debugger_CompileOneInstruction ( debugger, jcAddress ) ; // the single current stepping insn
-    _Compile_Save_Debugger_CpuState ( debugger, showFlag ) ; //showRegsFlag ) ; //&& ( _Q_->Verbosity >= 3 ) ) ; // save our runtime state after the instruction : which we will restore before the next insn
-    _Compile_Restore_C_CpuState ( _CfrTil_, showFlag ) ; //&& ( _Q_->Verbosity >= 3 ) ) ; // save our c compiler cpu register state
+    _Compile_Save_Debugger_CpuState ( debugger, showFlag ) ; //showRegsFlag ) ; //&& ( _O_->Verbosity >= 3 ) ) ; // save our runtime state after the instruction : which we will restore before the next insn
+    _Compile_Restore_C_CpuState ( _CfrTil_, showFlag ) ; //&& ( _O_->Verbosity >= 3 ) ) ; // save our c compiler cpu register state
     _Compile_Return ( ) ;
     Set_CompilerSpace ( svcs ) ; // restore compiler space pointer before "do it" in case "do it" calls the compiler
     return nextInsn ;
@@ -57,7 +57,7 @@ _Debugger_CompileOneInstruction ( Debugger * debugger, byte * jcAddress )
     if ( jcAddress ) // jump or call address
     {
         word = Word_UnAlias ( Word_GetFromCodeAddress ( jcAddress ) ) ;
-        //if ( _Q_->Verbosity > 1 ) 
+        //if ( _O_->Verbosity > 1 ) 
         if ( IS_CALL_INSN ( debugger->DebugAddress ) ) _Word_ShowSourceCode ( word ) ;
         if ( ( ! word ) || ( ! Debugger_CanWeStep ( debugger, word ) ) )
         {
@@ -230,7 +230,7 @@ Debugger_SetupStepping ( Debugger * debugger )
 int64
 _Debugger_SetupReturnStackCopy ( Debugger * debugger, int64 size, Boolean showFlag )
 {
-    if ( _Q_->Verbosity > 3 ) _CfrTil_PrintNReturnStack ( 4, 1 ) ;
+    if ( _O_->Verbosity > 3 ) _CfrTil_PrintNReturnStack ( 4, 1 ) ;
     uint64 * rsp = ( uint64* ) debugger->cs_Cpu->Rsp ; //debugger->DebugESP [- 1] ; //debugger->cs_Cpu->Rsp [1] ; //debugger->cs_Cpu->Rsp ;
     if ( rsp )
     {
@@ -305,7 +305,7 @@ _Compile_Save_Debugger_CpuState ( Debugger * debugger, int64 showFlag )
 {
     Compile_CpuState_Save ( debugger->cs_Cpu ) ;
     if ( showFlag ) Compile_Call_TestRSP ( ( byte* ) CfrTil_Debugger_UdisOneInsn ) ;
-    if ( ( _Q_->Verbosity > 3 ) && ( debugger->cs_Cpu->Rsp != debugger->LastRsp ) ) Debugger_PrintReturnStackWindow ( ) ;
+    if ( ( _O_->Verbosity > 3 ) && ( debugger->cs_Cpu->Rsp != debugger->LastRsp ) ) Debugger_PrintReturnStackWindow ( ) ;
     if ( showFlag ) Compile_Call_TestRSP ( ( byte* ) CfrTil_Debugger_CheckSaveCpuStateShow ) ;
 }
 
@@ -403,7 +403,7 @@ Debugger_CanWeStep ( Debugger * debugger, Word * word )
     else if ( word->W_MorphismAttributes & ( CFRTIL_WORD | CFRTIL_ASM_WORD ) ) result = true ;
     else if ( ! word->CodeStart ) result = false ;
     else if ( word->W_MorphismAttributes & ( CPRIMITIVE | DLSYM_WORD | C_PREFIX_RTL_ARGS ) ) result = false ;
-    else if ( ! NamedByteArray_CheckAddress ( _Q_CodeSpace, word->CodeStart ) ) result = false ;
+    else if ( ! NamedByteArray_CheckAddress ( _O_CodeSpace, word->CodeStart ) ) result = false ;
     SetState ( debugger, DBG_CAN_STEP, result ) ;
     return result ;
 }
@@ -412,9 +412,9 @@ void
 Debug_ExtraShow ( int64 size, Boolean force )
 {
     Debugger * debugger = _Debugger_ ;
-    if ( force || ( _Q_->Verbosity > 3 ) )
+    if ( force || ( _O_->Verbosity > 3 ) )
     {
-        if ( force || ( _Q_->Verbosity > 4 ) )
+        if ( force || ( _O_->Verbosity > 4 ) )
         {
             _Printf ( ( byte* ) "\n\ndebugger->SaveCpuState" ) ;
             _Debugger_Disassemble ( debugger, ( byte* ) debugger->SaveCpuState, 1000, 1 ) ; //137, 1 ) ;
@@ -486,7 +486,7 @@ Debugger_CASOI_Do_Return_Insn ( Debugger * debugger )
     if ( Stack_Depth ( debugger->ReturnStack ) )
     {
         debugger->DebugAddress = ( byte* ) Stack_Pop ( debugger->ReturnStack ) ;
-        //if ( _Q_->Verbosity > 1 ) CfrTil_PrintReturnStack ( ) ;
+        //if ( _O_->Verbosity > 1 ) CfrTil_PrintReturnStack ( ) ;
         Debugger_GetWordFromAddress ( debugger ) ;
     }
     else

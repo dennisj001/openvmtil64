@@ -16,7 +16,7 @@ void
 CfrTil_PeekReg ( ) // @
 {
     //DBI_ON ;
-    ByteArray * svcs = _Q_CodeByteArray, *ba = _CfrTil_->PeekPokeByteArray ;
+    ByteArray * svcs = _O_CodeByteArray, *ba = _CfrTil_->PeekPokeByteArray ;
     _ByteArray_DataClear ( ba ) ;
     Set_CompilerSpace ( ba ) ; // now compile to this space
     Compile_Move_Reg_To_Rm ( DSP, TOS & 0xf, 0, 0 ) ;
@@ -34,7 +34,7 @@ CfrTil_PokeRegWithValue ( ) // @
     //DBI_ON ;
     uint64 reg = DataStack_Pop ( ) ;
     uint64 value = DataStack_Pop ( ) ;
-    ByteArray * svcs = _Q_CodeByteArray, *ba = _CfrTil_->PeekPokeByteArray ;
+    ByteArray * svcs = _O_CodeByteArray, *ba = _CfrTil_->PeekPokeByteArray ;
     _ByteArray_DataClear ( ba ) ;
     Set_CompilerSpace ( ba ) ; // now compile to this space
     Compile_MoveImm ( REG, reg, 0, ( uint64 ) value, CELL ) ;
@@ -51,7 +51,7 @@ CfrTil_PokeRegAtAddress ( ) // @
 {
     uint64 reg = DataStack_Pop ( ) ;
     uint64 address = DataStack_Pop ( ) ;
-    ByteArray * svcs = _Q_CodeByteArray, *ba = _CfrTil_->PeekPokeByteArray ;
+    ByteArray * svcs = _O_CodeByteArray, *ba = _CfrTil_->PeekPokeByteArray ;
     _ByteArray_Init ( ba ) ;
     Set_CompilerSpace ( ba ) ; // now compile to this space
     _Compile_PushReg ( ACC ) ;

@@ -253,7 +253,7 @@ CfrTil_Namespaces_PrettyPrintTree ( )
 {
     _Context_->NsCount = 0 ;
     _Context_->WordCount = 0 ;
-    //SetState ( _Q_->psi_PrintStateInfo, PSI_PROMPT, false ) ;
+    //SetState ( _O_->psi_PrintStateInfo, PSI_PROMPT, false ) ;
     _Printf ( ( byte* ) "\nNamespaceTree - All Namespaces : %s%s%s", c_ud ( "using" ), " : ", c_gd ( "not using" ) ) ;
     _Namespace_MapAny_2Args ( ( MapSymbolFunction2 ) Symbol_SetNonTREED, 0, 0 ) ;
     _Namespace_MapAny_2Args ( ( MapSymbolFunction2 ) Symbol_Namespaces_PrintTraverse, ( int64 ) _CfrTil_->Namespaces, 1 ) ;
@@ -265,7 +265,7 @@ CfrTil_Namespaces_PrettyPrintTreeWithWords ( )
 {
     _Context_->NsCount = 0 ;
     _Context_->WordCount = 0 ;
-    //SetState ( _Q_->psi_PrintStateInfo, PSI_PROMPT, false ) ;
+    //SetState ( _O_->psi_PrintStateInfo, PSI_PROMPT, false ) ;
     _Printf ( ( byte* ) "%s%s%s%s%s%s%s", "\nNamespaceTree - All Namespaces : ", "using", " : ", c_gd ( "not using" ), " :: ", "with", c_ud ( " : words" ) ) ;
     _Namespace_MapAny_2Args ( ( MapSymbolFunction2 ) Symbol_SetNonTREED, 0, 0 ) ;
     _Namespace_MapAny_2Args ( ( MapSymbolFunction2 ) Symbol_Namespaces_PrintTraverseWithWords, ( int64 ) _CfrTil_->Namespaces, 1 ) ;
@@ -313,7 +313,7 @@ _Namespace_RemoveFromUsingListAndClear ( Namespace * ns )
 {
     if ( ns )
     {
-        if ( ns == _CfrTil_->InNamespace ) _CfrTil_->InNamespace = 0 ; //( Namespace* ) dlnode_Next ( ( dlnode* ) ns ) ; //dllist_First ( (dllist*) _Q_->CfrTil->Namespaces->Lo_List ) ;
+        if ( ns == _CfrTil_->InNamespace ) _CfrTil_->InNamespace = 0 ; //( Namespace* ) dlnode_Next ( ( dlnode* ) ns ) ; //dllist_First ( (dllist*) _O_->CfrTil->Namespaces->Lo_List ) ;
         if ( ns == _Context_->Finder0->QualifyingNamespace ) Finder_SetQualifyingNamespace ( _Context_->Finder0, 0 ) ;
         _Namespace_Clear ( ns ) ;
         dlnode_Remove ( ( dlnode* ) ns ) ;

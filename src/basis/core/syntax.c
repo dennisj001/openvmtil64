@@ -17,6 +17,7 @@ Interpret_C_Block_EndBlock ( byte * tokenToUse, Boolean insertFlag )
     if ( insertFlag ) SetState ( _Debugger_, DBG_OUTPUT_INSERTION, true ) ;
     int64 tsrli = - 1, scwi = - 1 ;
     Word_SetTsrliScwi ( _CfrTil_->EndBlockWord, tsrli, scwi ) ;
+    _Debugger_->SubstitutedWord = _CfrTil_->BeginBlockWord ;
     Interpreter_DoWord_Default ( _Interpreter_, _CfrTil_->EndBlockWord, tsrli, scwi ) ;
     _CfrTil_->EndBlockWord->Name = ( byte* ) "}" ;
     SetState ( _Debugger_, DBG_OUTPUT_INSERTION, false ) ;
@@ -32,6 +33,7 @@ Interpret_C_Block_BeginBlock ( byte * tokenToUse, Boolean insertFlag )
     if ( insertFlag ) SetState ( _Debugger_, DBG_OUTPUT_INSERTION, true ) ;
     int64 tsrli = - 1, scwi = - 1 ;
     Word_SetTsrliScwi ( _CfrTil_->BeginBlockWord, tsrli, scwi ) ;
+    _Debugger_->SubstitutedWord = _CfrTil_->BeginBlockWord ;
     Interpreter_DoWord_Default ( _Interpreter_, _CfrTil_->BeginBlockWord, tsrli, scwi ) ;
     _CfrTil_->BeginBlockWord->Name = ( byte* ) "{" ;
     compiler->BeginBlockFlag = false ;

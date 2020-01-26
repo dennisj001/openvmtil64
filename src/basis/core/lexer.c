@@ -15,7 +15,7 @@
 void
 Lexer_Exception ( byte * token, uint64 exceptionNumber, byte * message )
 {
-    _Q_->ExceptionToken = token ;
+    _O_->ExceptionToken = token ;
     byte *buffer = Buffer_Data ( _CfrTil_->ScratchB1 ) ;
     sprintf ( ( char* ) buffer, "%s :: %s ?\n", ( char* ) message, ( char* ) token ) ;
     CfrTil_Exception ( exceptionNumber, buffer, QUIT ) ;
@@ -33,7 +33,7 @@ Lexer_ObjectToken_New ( Lexer * lexer, byte * token, int64 tsrli, int64 scwi )
         {
             Context * cntx = _Context_ ;
             Compiler * compiler = cntx->Compiler0 ;
-            if ( GetState ( _Q_, AUTO_VAR ) && ( ! GetState ( compiler, ( DOING_A_PREFIX_WORD | DOING_BEFORE_A_PREFIX_WORD ) ) ) ) 
+            if ( GetState ( _O_, AUTO_VAR ) && ( ! GetState ( compiler, ( DOING_A_PREFIX_WORD | DOING_BEFORE_A_PREFIX_WORD ) ) ) ) 
             // ... ??? ... make it a 'variable' 
             {
                 if ( Compiling && GetState ( cntx, C_SYNTAX ) )

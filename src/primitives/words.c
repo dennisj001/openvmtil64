@@ -421,7 +421,7 @@ _CfrTil_PrintWords ( int64 state )
 {
     int64 n = 0 ;
     _CfrTil_NamespacesMap ( ( MapSymbolFunction2 ) _DoWords, state, ( int64 ) & n, 0 ) ;
-    if ( _Q_->Verbosity > 3 ) _Printf ( ( byte* ) "\nCfrTil : WordsAdded = %d : WordMaxCount = %d", _CfrTil_->WordsAdded, _CfrTil_->FindWordMaxCount ) ;
+    if ( _O_->Verbosity > 3 ) _Printf ( ( byte* ) "\nCfrTil : WordsAdded = %d : WordMaxCount = %d", _CfrTil_->WordsAdded, _CfrTil_->FindWordMaxCount ) ;
     return n ;
 }
 
@@ -431,7 +431,7 @@ CfrTil_Words ( )
     _Printf ( ( byte* ) "\nWords :\n - <namespace> ':>' <word list>" ) ;
     int64 n = _CfrTil_PrintWords ( USING ) ;
     _Printf ( ( byte* ) "\n" INT_FRMT " words on the 'using' Namespaces List ::", n ) ;
-    if ( _Q_->Verbosity > 3 ) _Printf ( ( byte* ) "\nCfrTil : WordsAdded = %d : WordMaxCount = %d", _CfrTil_->WordsAdded, _CfrTil_->FindWordMaxCount ) ;
+    if ( _O_->Verbosity > 3 ) _Printf ( ( byte* ) "\nCfrTil : WordsAdded = %d : WordMaxCount = %d", _CfrTil_->WordsAdded, _CfrTil_->FindWordMaxCount ) ;
 }
 
 void

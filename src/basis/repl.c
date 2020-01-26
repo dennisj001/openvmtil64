@@ -9,7 +9,7 @@ _Repl ( block repl )
     SetState ( _LC_, LC_REPL, true ) ;
     rl->NormalPrompt = ( byte* ) "<= " ;
     rl->AltPrompt = ( byte* ) "=> " ;
-    //SetState ( _Q_->psi_PrintStateInfo, PSI_NEWLINE, true ) ;
+    //SetState ( _O_->psi_PrintStateInfo, PSI_NEWLINE, true ) ;
     SetState ( _Context_->System0, ADD_READLINE_TO_HISTORY, true ) ;
     start:
     while ( ! setjmp ( _Context_->JmpBuf0 ) )

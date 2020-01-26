@@ -46,14 +46,14 @@ Debugger_Setup_RecordState ( Debugger * debugger, Word * word, byte * token, byt
     if ( word->W_AliasOf )
     {
         debugger->w_Alias = word ;
-        debugger->w_AliasOf = debugger->w_Word = Word_UnAlias ( word ) ;
+        debugger->w_AliasOf = Word_UnAlias ( word ) ;
     }
     else
     {
         debugger->w_Alias = 0 ;
         debugger->w_AliasOf = 0 ;
-        debugger->w_Word = word ;
     }
+    debugger->w_Word = word ;
     SetState ( debugger, DBG_COMPILE_MODE, CompileMode ) ;
     SetState_TrueFalse ( debugger, DBG_ACTIVE | DBG_INFO | DBG_PROMPT, DBG_BRK_INIT | DBG_CONTINUE_MODE | DBG_INTERPRET_LOOP_DONE | DBG_PRE_DONE | DBG_CONTINUE | DBG_STEPPING | DBG_STEPPED ) ;
     debugger->SaveDsp = debugger->AddressModeSaveDsp = _Dsp_ ;
@@ -206,7 +206,7 @@ Debugger_GetDbgAddressFromRsp ( Debugger * debugger, Cpu * cpu )
     byte * addr, *retAddr ;
     dllist * retStackList = List_New ( COMPILER_TEMP ) ;
     int64 i0, i1, i2 ;
-    if ( _Q_->Verbosity > 1 ) CfrTil_PrintReturnStack ( ) ;
+    if ( _O_->Verbosity > 1 ) CfrTil_PrintReturnStack ( ) ;
     for ( i0 = 0 ; i0 < 255 ; i0 ++ ) // 255 : sizeof ReturnStack
     {
         addr = ( ( byte* ) cpu->Rsp[i0] ) ;
@@ -233,7 +233,7 @@ Debugger_GetDbgAddressFromRsp ( Debugger * debugger, Cpu * cpu )
             Stack_Push ( debugger->ReturnStack, ( uint64 ) retAddr ) ;
         }
 #define RS_DEPTH_PICK 1        
-        if ( _Q_->Verbosity > 1 )
+        if ( _O_->Verbosity > 1 )
         {
             CfrTil_PrintReturnStack ( ) ;
             Stack_Print ( debugger->ReturnStack, ( byte* ) "debugger->ReturnStack ", 0 ) ;
@@ -353,6 +353,7 @@ Debugger_Continue ( Debugger * debugger )
         SetState_TrueFalse ( debugger, DBG_STEPPED, DBG_STEPPING ) ;
         SetState ( debugger, DBG_INTERPRET_LOOP_DONE, true ) ;
         SetState ( debugger, DBG_AUTO_MODE | DBG_CONTINUE_MODE, false ) ;
+        SetState ( debugger->w_Word, STEPPED, true ) ;
     }
     else if ( debugger->w_Word )
     {
@@ -606,7 +607,7 @@ Debugger_Copy ( Debugger * debugger0, uint64 type )
 void
 Debugger_Delete ( Debugger * debugger )
 {
-    Mem_FreeItem ( &_Q_->PermanentMemList, ( byte* ) debugger ) ;
+    Mem_FreeItem ( &_O_->PermanentMemList, ( byte* ) debugger ) ;
 }
 
 Debugger *

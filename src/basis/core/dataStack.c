@@ -63,7 +63,7 @@ DataStack_Check ( )
 int64
 DataStack_Depth ( )
 {
-    if ( _Q_ && _CfrTil_ && _DataStack_ )
+    if ( _O_ && _CfrTil_ && _DataStack_ )
     {
         _DataStackPointer_ = _Dsp_ ;
         return Stack_Depth ( _DataStack_ ) ;
@@ -161,7 +161,7 @@ CfrTil_CheckInitDataStack ( )
         _Stack_PrintHeader ( _DataStack_, ( byte* ) "DataStack" ) ;
         _Printf ( ( byte* ) c_ad ( "\n\nError : %s : %s : Stack Underflow!" ), _Context_->CurrentlyRunningWord ? _Context_->CurrentlyRunningWord->Name : ( byte * ) "", _Context_Location ( _Context_ ) ) ;
         _Printf ( ( byte* ) c_gd ( "\nReseting DataStack.\n" ) ) ;
-        _Stack_Init ( _CfrTil_->DataStack, _Q_->DataStackSize ) ;
+        _Stack_Init ( _CfrTil_->DataStack, _O_->DataStackSize ) ;
         _CfrTil_DataStack_Init ( _CfrTil_ ) ;
         _Stack_PrintHeader ( _DataStack_, ( byte* ) "DataStack" ) ;
     }

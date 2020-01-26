@@ -2,8 +2,8 @@
 //#define myprintf(a, b, rest...) printf (a, b, ## rest)
 #define Exception( type, response ) CfrTil_Exception (type, 0, response )
 
-#define _Context_ _Q_->OVT_Context
-#define _CfrTil_ _Q_->OVT_CfrTil
+#define _Context_ _O_->OVT_Context
+#define _CfrTil_ _O_->OVT_CfrTil
 #define _Compiler_ _Context_->Compiler0
 #define _Interpreter_ _Context_->Interpreter0
 #define _ReadLiner_ _Context_->ReadLiner0
@@ -16,20 +16,20 @@
 #define _ReturnStack_ _CfrTil_->ReturnStack
 #define _ReturnStackPointer_ _ReturnStack_->StackPointer
 #define _RSP_ _ReturnStackPointer_ 
-#define _Q_CodeByteArray _Q_->CodeByteArray
-#define _Q_CodeSpace _Q_->MemorySpace0->CodeSpace
-#define _LC_ _Q_->OVT_LC 
+#define _O_CodeByteArray _O_->CodeByteArray
+#define _O_CodeSpace _O_->MemorySpace0->CodeSpace
+#define _LC_ _O_->OVT_LC 
 
-#define _Compile_Int8( value ) ByteArray_AppendCopyInteger ( _Q_CodeByteArray, 1, value )
-#define _Compile_Int16( value ) ByteArray_AppendCopyInteger ( _Q_CodeByteArray, 2, value )
-#define _Compile_Int32( value ) ByteArray_AppendCopyInteger ( _Q_CodeByteArray, 4, value )
-#define _Compile_Int64( value ) ByteArray_AppendCopyInteger ( _Q_CodeByteArray, 8, value )
-#define _Compile_Cell( value ) ByteArray_AppendCopyInteger ( _Q_CodeByteArray, sizeof(int64), value )
-#define Here ( _ByteArray_Here ( _Q_CodeByteArray ) )
-#define _SetHere( address )  _ByteArray_SetHere ( _Q_CodeByteArray, address ) 
+#define _Compile_Int8( value ) ByteArray_AppendCopyInteger ( _O_CodeByteArray, 1, value )
+#define _Compile_Int16( value ) ByteArray_AppendCopyInteger ( _O_CodeByteArray, 2, value )
+#define _Compile_Int32( value ) ByteArray_AppendCopyInteger ( _O_CodeByteArray, 4, value )
+#define _Compile_Int64( value ) ByteArray_AppendCopyInteger ( _O_CodeByteArray, 8, value )
+#define _Compile_Cell( value ) ByteArray_AppendCopyInteger ( _O_CodeByteArray, sizeof(int64), value )
+#define Here ( _ByteArray_Here ( _O_CodeByteArray ) )
+#define _SetHere( address )  _ByteArray_SetHere ( _O_CodeByteArray, address ) 
 #define SetDebuggerPreHere( address ) _Debugger_->PreHere = (address) 
-#define Set_CompilerSpace( byteArray ) (_Q_CodeByteArray = (byteArray))
-#define Get_CompilerSpace( ) _Q_CodeByteArray
+#define Set_CompilerSpace( byteArray ) (_O_CodeByteArray = (byteArray))
+#define Get_CompilerSpace( ) _O_CodeByteArray
 
 //#define abs( x ) ((int64) (((x) >= 0) ? (x) : (-x))) 
 #define TOS (_Dsp_[0]) // top of stack
@@ -127,19 +127,19 @@
 // Change Colors
 // code :: cc change colors : u user : d  default : a alert : g debug
 #define cc( s, c ) (byte*) _String_InsertColors ( (byte*) ( (byte*) s ? (byte*) s : (byte*) "" ), (c) ) 
-#define c_ud( s ) cc ( (byte*) s, (_Q_->Current == &_Q_->User) ? &_Q_->Default : &_Q_->User ) 
-#define c_ad( s ) cc ( (byte*) s, (_Q_->Current == &_Q_->Alert) ? &_Q_->Default : &_Q_->Alert ) 
-#define c_da( s ) cc ( (byte*) s, (_Q_->Current == &_Q_->Default) ? &_Q_->Alert : &_Q_->Default ) 
-#define c_gd( s ) cc ( (byte*) s, (_Q_->Current == &_Q_->Debug) ? &_Q_->Default : &_Q_->Debug ) 
-#define c_dg( s ) cc ( (byte*) s, (_Q_->Current == &_Q_->Default) ? &_Q_->Debug : &_Q_->Default ) 
-#define c_gu( s ) cc ( (byte*) s, (_Q_->Current == &_Q_->Debug) ? &_Q_->User : &_Q_->Debug ) 
-#define c_ug( s ) cc ( (byte*) s, (_Q_->Current == &_Q_->User) ? &_Q_->Debug : &_Q_->User ) 
-#define c_gn( s ) cc ( (byte*) s, (_Q_->Current == &_Q_->Debug) ? &_Q_->Notice : &_Q_->Debug ) 
-#define c_g( s ) cc ( (byte*) s, &_Q_->Debug ) 
-#define c_a( s ) cc ( (byte*) s, &_Q_->Alert ) 
-#define c_d( s ) cc ( (byte*) s, &_Q_->Default ) 
-#define c_u( s ) cc ( (byte*) s, &_Q_->User ) 
-#define c_n( s ) cc ( (byte*) s, &_Q_->Notice ) 
+#define c_ud( s ) cc ( (byte*) s, (_O_->Current == &_O_->User) ? &_O_->Default : &_O_->User ) 
+#define c_ad( s ) cc ( (byte*) s, (_O_->Current == &_O_->Alert) ? &_O_->Default : &_O_->Alert ) 
+#define c_da( s ) cc ( (byte*) s, (_O_->Current == &_O_->Default) ? &_O_->Alert : &_O_->Default ) 
+#define c_gd( s ) cc ( (byte*) s, (_O_->Current == &_O_->Debug) ? &_O_->Default : &_O_->Debug ) 
+#define c_dg( s ) cc ( (byte*) s, (_O_->Current == &_O_->Default) ? &_O_->Debug : &_O_->Default ) 
+#define c_gu( s ) cc ( (byte*) s, (_O_->Current == &_O_->Debug) ? &_O_->User : &_O_->Debug ) 
+#define c_ug( s ) cc ( (byte*) s, (_O_->Current == &_O_->User) ? &_O_->Debug : &_O_->User ) 
+#define c_gn( s ) cc ( (byte*) s, (_O_->Current == &_O_->Debug) ? &_O_->Notice : &_O_->Debug ) 
+#define c_g( s ) cc ( (byte*) s, &_O_->Debug ) 
+#define c_a( s ) cc ( (byte*) s, &_O_->Alert ) 
+#define c_d( s ) cc ( (byte*) s, &_O_->Default ) 
+#define c_u( s ) cc ( (byte*) s, &_O_->User ) 
+#define c_n( s ) cc ( (byte*) s, &_O_->Notice ) 
 
 #define TemporaryString_New( string ) String_New ( string, TEMPORARY ) 
 #define IsWordRecursive CfrTil_CheckForGotoPoints ( GI_RECURSE )
@@ -155,11 +155,11 @@
 #define _try( object ) if ( _OpenVmTil_Try ( &object->JmpBuf0 ) ) 
 //#define _catch( e ) if ( _OpenVmTil_Catch () ) // nb. : if no _throw in _catch block don't use 'return'
 #define _finally _OpenVmTil_Finally () // nb. : ! use only once and after the first _try block !
-#define _throw( e ) _Throw (e) // _longjmp( *(jmp_buf*) _Stack_PopOrTop ( _Q_->ExceptionStack ), e ) 
+#define _throw( e ) _Throw (e) // _longjmp( *(jmp_buf*) _Stack_PopOrTop ( _O_->ExceptionStack ), e ) 
 #define _Throw( e ) OpenVmTil_Throw ((e == QUIT) ? (byte*) "\nQuit?\n" : (e == ABORT) ? (byte*) "\nAbort?\n" : (byte*) "", 0, e, 1 )
-#define _ThrowIt OpenVmTil_Throw ((byte*) "", (byte*) "", 0,  _Q_->Thrown, 1 )
+#define _ThrowIt OpenVmTil_Throw ((byte*) "", (byte*) "", 0,  _O_->Thrown, 1 )
 #define Throw( emsg, smsg, e ) OpenVmTil_Throw (((byte*) emsg), ((byte*) smsg), (e), 1 )
-#define ThrowIt( msg ) OpenVmTil_Throw (((byte*) msg),  _Q_->Thrown, 1 )
+#define ThrowIt( msg ) OpenVmTil_Throw (((byte*) msg),  _O_->Thrown, 1 )
 #define catchAll if ( _OpenVmTil_Catch () ) 
 #define _SyntaxError( message, abortFlag ) CfrTil_Exception (SYNTAX_ERROR, message, abortFlag )
 #define SyntaxError( abortFlag ) _SyntaxError( 0, abortFlag ) 
@@ -240,7 +240,7 @@
 #define DBI_OFF DEBUG_ASM_SHOW_OFF
 #define DBI ( Is_DebugOn & _DBI )
 #define Is_DebugOn_DBI ( Is_DebugOn ? DBI : 0 )
-#define DBI_N( n ) (GetState ( _Debugger_, DBG_ASM_SHOW_ON ) && ( _Q_->Verbosity > n ) )
+#define DBI_N( n ) (GetState ( _Debugger_, DBG_ASM_SHOW_ON ) && ( _O_->Verbosity > n ) )
 #define IS_INCLUDING_FILES _Context_->System0->IncludeFileStackNumber
 
 #define List_Init( list ) _dllist_Init ( list )

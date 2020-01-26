@@ -10,13 +10,13 @@ _DisplaySignal ( int64 signal )
     if ( signal )
     {
         byte * location ; 
-        if ( _Q_->SigSegvs < 2 ) location = ( byte* ) Context_Location ( ) ;
+        if ( _O_->SigSegvs < 2 ) location = ( byte* ) Context_Location ( ) ;
         else location = (byte*) "" ;
         switch ( signal )
         {
             case SIGSEGV:
             {
-                printf ( "\nSIGSEGV : memory access violation : address = 0x%016lx : %s", (uint64) _Q_->SigAddress, location ) ;
+                printf ( "\nSIGSEGV : memory access violation : address = 0x%016lx : %s", (uint64) _O_->SigAddress, location ) ;
                 fflush ( stdout ) ;
                 break ;
             }
@@ -53,7 +53,7 @@ Linux_SetupSignals ( sigjmp_buf * sjb, int64 startTimes )
     for ( i = SIGHUP ; i <= _NSIG ; i ++ )
     {
         result = sigaction ( i, &signalAction, NULL ) ;
-        d0 ( if ( ( result && ( startTimes ) && ( _Q_ && ( _Q_->Verbosity > 2 ) ) ) printf ( "\nLinux_SetupSignals : signal number = " INT_FRMT_02 " : result = " INT_FRMT " : This signal can not have a handler.", i, result ) ) ) ;
+        d0 ( if ( ( result && ( startTimes ) && ( _O_ && ( _O_->Verbosity > 2 ) ) ) printf ( "\nLinux_SetupSignals : signal number = " INT_FRMT_02 " : result = " INT_FRMT " : This signal can not have a handler.", i, result ) ) ) ;
     }
     //signal ( SIGWINCH, SIG_IGN ) ; // a fix for a netbeans problem but causes crash with gcc 6.x -O2+
 }
@@ -106,15 +106,15 @@ Linux_SetInputMode ( struct termios * savedTerminalAttributes )
 void
 _LinuxInit ( struct termios * savedTerminalAttributes )
 {
-    Linux_SetInputMode ( savedTerminalAttributes ) ; // nb. save first !! then copy to _Q_ so atexit reset from global _Q_->SavedTerminalAttributes
-    //Linux_SetupSignals ( 1 ) ; //_Q_ ? ! _Q_->StartedTimes : 1 ) ;
+    Linux_SetInputMode ( savedTerminalAttributes ) ; // nb. save first !! then copy to _O_ so atexit reset from global _O_->SavedTerminalAttributes
+    //Linux_SetupSignals ( 1 ) ; //_O_ ? ! _O_->StartedTimes : 1 ) ;
 }
 
 void
 LinuxInit ()
 {
-    _LinuxInit ( &SavedTerminalAttributes ) ; // nb. save first !! then copy to _Q_ so atexit reset from global _Q_->SavedTerminalAttributes
-    //Linux_SetupSignals ( 1 ) ; //_Q_ ? ! _Q_->StartedTimes : 1 ) ;
+    _LinuxInit ( &SavedTerminalAttributes ) ; // nb. save first !! then copy to _O_ so atexit reset from global _O_->SavedTerminalAttributes
+    //Linux_SetupSignals ( 1 ) ; //_O_ ? ! _O_->StartedTimes : 1 ) ;
 }
 
 #endif

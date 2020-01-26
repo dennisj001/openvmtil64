@@ -216,7 +216,7 @@ void
 BigInt_Print ( )
 {
     mpz_t * value = ( mpz_t* ) DataStack_Pop ( ) ;
-    if ( _Q_->Verbosity ) gmp_printf ( " %Zd", * value ) ;
+    if ( _O_->Verbosity ) gmp_printf ( " %Zd", * value ) ;
 }
 
 mpf_t *
@@ -256,14 +256,14 @@ void
 BigFloat_FPrint ( )
 {
     mpf_t * value = ( mpf_t* ) DataStack_Pop ( ) ;
-    if ( _Q_->Verbosity ) gmp_printf ( " %*.*Ff\n", _Context_->System0->BigNum_Printf_Width, _Context_->System0->BigNum_Printf_Precision, *value ) ;
+    if ( _O_->Verbosity ) gmp_printf ( " %*.*Ff\n", _Context_->System0->BigNum_Printf_Width, _Context_->System0->BigNum_Printf_Precision, *value ) ;
 }
 
 void
 BigFloat_EPrint ( )
 {
     mpf_t * value = ( mpf_t* ) DataStack_Pop ( ) ;
-    if ( _Q_->Verbosity ) gmp_printf ( " %*.*Fe\n", _Context_->System0->BigNum_Printf_Width, _Context_->System0->BigNum_Printf_Precision, *value ) ;
+    if ( _O_->Verbosity ) gmp_printf ( " %*.*Fe\n", _Context_->System0->BigNum_Printf_Width, _Context_->System0->BigNum_Printf_Precision, *value ) ;
 }
 void
 BigFloat_Add ( )

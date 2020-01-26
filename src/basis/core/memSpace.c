@@ -53,17 +53,17 @@ _MemChunk_WithSymbol_Show ( MemChunk * mchunk, int64 flag )
 void
 _MemChunk_Account ( MemChunk * mchunk, int64 flag )
 {
-    if ( _Q_ )
+    if ( _O_ )
     {
         if ( flag == MEM_ALLOC )
         {
-            _Q_->TotalMemAllocated += mchunk->S_ChunkSize ;
-            _Q_->Mmap_RemainingMemoryAllocated += mchunk->S_ChunkSize ;
+            _O_->TotalMemAllocated += mchunk->S_ChunkSize ;
+            _O_->Mmap_RemainingMemoryAllocated += mchunk->S_ChunkSize ;
         }
         else
         {
-            _Q_->TotalMemFreed += mchunk->S_ChunkSize ;
-            _Q_->Mmap_RemainingMemoryAllocated -= mchunk->S_ChunkSize ;
+            _O_->TotalMemFreed += mchunk->S_ChunkSize ;
+            _O_->Mmap_RemainingMemoryAllocated -= mchunk->S_ChunkSize ;
         }
     }
 }
@@ -85,7 +85,7 @@ _Mem_ChunkAllocate ( int64 size, uint64 allocType )
     mchunk->S_ChunkSize = size ; // S_ChunkSize is the total size of the chunk including any prepended accounting structure in that total
     mchunk->S_WAllocType = allocType ;
     _MemChunk_Account ( ( MemChunk* ) mchunk, MEM_ALLOC ) ;
-    dllist_AddNodeToHead ( &_Q_->PermanentMemList, ( dlnode* ) mchunk ) ;
+    dllist_AddNodeToHead ( &_O_->PermanentMemList, ( dlnode* ) mchunk ) ;
     return ( byte* ) mchunk ;
 }
 
@@ -113,19 +113,19 @@ _ByteArray_AppendSpace_MakeSure ( ByteArray * ba, int64 size ) // size in bytes
                     }
                 }
 #if 0                
-                if ( ( _Q_CodeByteArray == ba ) && Compiling )
+                if ( ( _O_CodeByteArray == ba ) && Compiling )
                 {
                     _Printf ( ( byte* ) "\nOnly %d code space remaining : increase the 'codeSize' variable in openvmtil.c\n", largestRemaining ) ;
                     Pause ( ) ;
                 }
 #endif                
             }
-            _Q_->AllocationRequestLacks ++ ;
+            _O_->AllocationRequestLacks ++ ;
             //nba->NBA_DataSize += ( ( ( nba->CheckTimes ++ ) * ( nba->NBA_DataSize ) ) + size ) ; 
             nba->NBA_DataSize += ( ( ( ++ nba->CheckTimes ) * ( 128 ) ) + size ) ; 
             //nba->NBA_DataSize += ( ( ( ++ nba->CheckTimes ) * ( 10 * K ) ) + size ) ; 
             //nba->NBA_DataSize += size ; // has to at least have this size available
-            if ( _Q_->Verbosity > 3 )
+            if ( _O_->Verbosity > 3 )
             {
                 printf ( "\n%s size requested = %ld :: adding size = %ld :: largest remaining = %ld :: Nba total remaining = %ld :: checkTimes = %ld\n",
                     nba->NBA_Symbol.Name, size, nba->NBA_DataSize, largestRemaining, nba->MemRemaining, nba->CheckTimes ) ;
@@ -157,7 +157,7 @@ _ByteArray_AppendSpace ( ByteArray * ba, int64 size ) // size in bytes
 byte *
 Mem_Allocate ( int64 size, uint64 allocType )
 {
-    MemorySpace * ms = _Q_->MemorySpace0 ;
+    MemorySpace * ms = _O_->MemorySpace0 ;
     switch ( allocType )
     {
         case OPENVMTIL: return _Allocate ( size, ms->OpenVmTilSpace ) ;
@@ -177,7 +177,7 @@ Mem_Allocate ( int64 size, uint64 allocType )
         case STRING_MEMORY: return _Allocate ( size, ms->StringSpace ) ;
         case RUNTIME: // not used??
         {
-            _Q_->RunTimeAllocation += size ;
+            _O_->RunTimeAllocation += size ;
             return mmap_AllocMem ( size ) ;
         }
         default: CfrTil_Exception ( MEMORY_ALLOCATION_ERROR, 0, QUIT ) ;
@@ -267,7 +267,7 @@ OVT_FreeTempMem ( )
 void
 MemorySpace_Init ( MemorySpace * ms )
 {
-    OpenVmTil * ovt = _Q_ ;
+    OpenVmTil * ovt = _O_ ;
 
     ms->OpenVmTilSpace = MemorySpace_NBA_New ( ms, ( byte* ) "OpenVmTilSpace", ovt->OpenVmTilSize, OPENVMTIL ) ;
     ms->CfrTilInternalSpace = MemorySpace_NBA_New ( ms, ( byte* ) "CfrTilInternalSpace", ovt->CfrTilSize, CFRTIL ) ;
@@ -291,17 +291,17 @@ MemorySpace_Init ( MemorySpace * ms )
     ms->RecycledOptInfoList = _dllist_New ( OPENVMTIL ) ; // put it here to minimize allocating chunks for each node and the list
     //ms->RecycledContextList = _dllist_New ( OPENVMTIL ) ; // put it here to minimize allocating chunks for each node and the list
 
-    _Q_CodeByteArray = ms->CodeSpace->ba_CurrentByteArray ; //init CompilerSpace ptr
+    _O_CodeByteArray = ms->CodeSpace->ba_CurrentByteArray ; //init CompilerSpace ptr
 
-    if ( _Q_->Verbosity > 2 ) _Printf ( ( byte* ) "\nSystem Memory has been initialized.  " ) ;
+    if ( _O_->Verbosity > 2 ) _Printf ( ( byte* ) "\nSystem Memory has been initialized.  " ) ;
 }
 
 MemorySpace *
 MemorySpace_New ( )
 {
     MemorySpace *memSpace = ( MemorySpace* ) mmap_AllocMem ( sizeof ( MemorySpace ) ) ;
-    _Q_->MemorySpace0 = memSpace ;
-    _Q_->OVT_InitialUnAccountedMemory += sizeof ( MemorySpace ) ; // needed here because '_Q_' was not initialized yet for MemChunk accounting
+    _O_->MemorySpace0 = memSpace ;
+    _O_->OVT_InitialUnAccountedMemory += sizeof ( MemorySpace ) ; // needed here because '_O_' was not initialized yet for MemChunk accounting
     dllist_Init ( &memSpace->NBAs, &memSpace->NBAsHeadNode, &memSpace->NBAsTailNode ) ; //= _dllist_New ( OPENVMTIL ) ;
     MemorySpace_Init ( memSpace ) ; // can't be initialized until after it is hooked into it's System
     return memSpace ;
@@ -311,7 +311,7 @@ NamedByteArray *
 _OVT_Find_NBA ( byte * name )
 {
     // needs a Word_Find that can be called before everything is initialized
-    Symbol * s = DLList_FindName_InOneNamespaceList ( &_Q_->MemorySpace0->NBAs, ( byte * ) name ) ;
+    Symbol * s = DLList_FindName_InOneNamespaceList ( &_O_->MemorySpace0->NBAs, ( byte * ) name ) ;
     if ( s ) return Get_NBA_Symbol_To_NBA ( s ) ;
     else return 0 ;
 }
@@ -441,7 +441,7 @@ _OVT_MemListFree_CfrTilInternal ( )
 void
 _NBAsMemList_FreeTypes ( int64 allocType, int64 exactFlag )
 {
-    dllist_Map2 ( &_Q_->MemorySpace0->NBAs, ( MapFunction2 ) NBA_FreeChunkType, allocType, exactFlag ) ;
+    dllist_Map2 ( &_O_->MemorySpace0->NBAs, ( MapFunction2 ) NBA_FreeChunkType, allocType, exactFlag ) ;
 }
 
 void
@@ -460,7 +460,7 @@ void
 NBA_Show ( NamedByteArray * nba, int64 flag )
 {
     byte * name = nba->NBA_Symbol.S_Name ;
-    if ( _Q_->Verbosity > 1 ) _Printf ( ( byte* ) "\n%-27s type = %8lu InUse = " INT_FRMT_9 " : Unused = " INT_FRMT_9, name, ( uint64 ) nba->NBA_AAttribute, nba->MemAllocated - nba->MemRemaining, nba->MemRemaining ) ;
+    if ( _O_->Verbosity > 1 ) _Printf ( ( byte* ) "\n%-27s type = %8lu InUse = " INT_FRMT_9 " : Unused = " INT_FRMT_9, name, ( uint64 ) nba->NBA_AAttribute, nba->MemAllocated - nba->MemRemaining, nba->MemRemaining ) ;
     else _Printf ( ( byte* ) "\n%-43s Used = " INT_FRMT_9 " : Unused = " INT_FRMT_9, name, nba->MemAllocated - nba->MemRemaining, nba->MemRemaining ) ;
     if ( flag )
     {
@@ -469,7 +469,7 @@ NBA_Show ( NamedByteArray * nba, int64 flag )
         {
             nodeNext = dlnode_Next ( node ) ;
             ByteArray * ba = Get_BA_Symbol_To_BA ( node ) ;
-            if ( _Q_->Verbosity > 1 ) MemChunk_Show ( &ba->BA_MemChunk ) ;
+            if ( _O_->Verbosity > 1 ) MemChunk_Show ( &ba->BA_MemChunk ) ;
         }
     }
 }
@@ -490,7 +490,7 @@ NBA_AccountRemainingAndShow ( NamedByteArray * nba, Boolean flag )
     }
     if ( flag )
     {
-        if ( _Q_->Verbosity > 1 ) _Printf ( ( byte* ) "\n%-27s type = %8lu InUse = " INT_FRMT_9 " : Unused = " INT_FRMT_9, name, ( uint64 ) nba->NBA_AAttribute, nba->MemAllocated - nba->MemRemaining, nba->MemRemaining ) ;
+        if ( _O_->Verbosity > 1 ) _Printf ( ( byte* ) "\n%-27s type = %8lu InUse = " INT_FRMT_9 " : Unused = " INT_FRMT_9, name, ( uint64 ) nba->NBA_AAttribute, nba->MemAllocated - nba->MemRemaining, nba->MemRemaining ) ;
         else _Printf ( ( byte* ) "\n%-43s InUse = " INT_FRMT_9 " : Unused = " INT_FRMT_9, name, nba->MemAllocated - nba->MemRemaining, nba->MemRemaining ) ;
     }
 }
@@ -586,7 +586,7 @@ Calculate_TotalNbaAccountedMemAllocated ( OpenVmTil * ovt, int64 flag )
 void
 OVT_MemLeakAccount ( Boolean check )
 {
-    OpenVmTil * ovt = _Q_ ;
+    OpenVmTil * ovt = _O_ ;
     if ( ovt )
     {
         if ( check ) _Calculate_TotalNbaAccountedMemAllocated ( ovt, 0 ) ;
@@ -649,7 +649,7 @@ _OVT_ShowMemoryAllocated ( OpenVmTil * ovt )
                             "\nTotal Memory leaks                                = %9d", ovt->TotalNbaAccountedMemAllocated, leak ) ;
     }
     int64 wordSize = ( sizeof ( Word ) + sizeof ( WordData ) ) ;
-    _Printf ( ( byte* ) "\nRecycledWordCount :: %5d x %3d bytes : Recycled = %9d", _Q_->MemorySpace0->RecycledWordCount, wordSize, _Q_->MemorySpace0->RecycledWordCount * wordSize ) ;
+    _Printf ( ( byte* ) "\nRecycledWordCount :: %5d x %3d bytes : Recycled = %9d", _O_->MemorySpace0->RecycledWordCount, wordSize, _O_->MemorySpace0->RecycledWordCount * wordSize ) ;
     Buffer_PrintBuffers ( ) ;
 }
 
@@ -674,7 +674,7 @@ OVT_CheckRecycleableAllocate ( dllist * list, int64 size )
 void
 OVT_Recycle ( dlnode * anode )
 {
-    if ( anode ) dllist_AddNodeToTail ( _Q_->MemorySpace0->RecycledWordList, anode ) ;
+    if ( anode ) dllist_AddNodeToTail ( _O_->MemorySpace0->RecycledWordList, anode ) ;
 }
 
 // put a word on the recycling list
@@ -701,7 +701,7 @@ CheckRecycleNamespaceWord ( Node * node )
     _CheckRecycleWord ( ( Word * ) node ) ;
 }
 
-// check a compiler word list for recycleable words and add them to the recycled word list : _Q_->MemorySpace0->RecycledWordList
+// check a compiler word list for recycleable words and add them to the recycled word list : _O_->MemorySpace0->RecycledWordList
 
 void
 DLList_Recycle_NamespaceList ( dllist * list )
@@ -709,7 +709,7 @@ DLList_Recycle_NamespaceList ( dllist * list )
     dllist_Map ( list, ( MapFunction0 ) CheckRecycleNamespaceWord ) ;
 }
 
-// check a compiler word list for recycleable words and add them to the recycled word list : _Q_->MemorySpace0->RecycledWordList
+// check a compiler word list for recycleable words and add them to the recycled word list : _O_->MemorySpace0->RecycledWordList
 
 void
 DLList_RemoveWords ( dllist * list )
@@ -720,7 +720,7 @@ DLList_RemoveWords ( dllist * list )
 void
 _CheckCodeSpaceForRoom ( int64 memDesired )
 {
-    _Q_CodeByteArray = _ByteArray_AppendSpace_MakeSure ( _Q_CodeByteArray, memDesired ) ;
+    _O_CodeByteArray = _ByteArray_AppendSpace_MakeSure ( _O_CodeByteArray, memDesired ) ;
 }
 
 void

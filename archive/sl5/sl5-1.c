@@ -270,7 +270,7 @@ _sl5 ( void )
     _DataStack_Push ( ( int32 ) SessionString_New ( ( byte* ) "" ) ) ;
     strcpy ( ( char* ) rl->InputLine, ( char* ) b ) ; // setup to continue where we left off
     rl->ReadIndex = 0 ;
-    SetState ( _Q_->PrintState, PSI_NEWLINE, false ) ;
+    SetState ( _O_->PrintState, PSI_NEWLINE, false ) ;
     Buffers_SetAllUnused ;
 }
 
@@ -289,7 +289,7 @@ isl5 ( void )
     }
     _catchAll ;
     //String_InsertStringIntoSlot ( ( char* ) rl->InputLine, si, rl->ReadIndex, "" ) ; //String_RemoveFinalNewline ( sl_outputBuffer ) ) ;
-    SetState ( _Q_->PrintState, PSI_NEWLINE, false ) ;
+    SetState ( _O_->PrintState, PSI_NEWLINE, false ) ;
     Buffers_SetAllUnused ;
 }
 #endif
@@ -565,7 +565,7 @@ init_sl5 ( )
     if ( ! Pnba_SL5 )
     {
         Buffer * slBuffer ;
-        Pnba_SL5 = MemorySpace_NBA_New ( _Q_->MemorySpace0, ( byte* ) "SL5", 2 * MB, SL5_MEM ) ;
+        Pnba_SL5 = MemorySpace_NBA_New ( _O_->MemorySpace0, ( byte* ) "SL5", 2 * MB, SL5_MEM ) ;
         sl_inputBuffer = Buffer_NewPermanent ( &slBuffer, MAXLEN ) ;
         setinput ( stdin ) ;
         nil = mksym ( "nil" ) ;

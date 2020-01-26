@@ -115,7 +115,7 @@ ByteArray_SetHere_AndForDebug ( ByteArray * ba, byte * address, Boolean forDebug
 void
 SetHere ( byte * address, Boolean setForDebugFlag )
 {
-    ByteArray_SetHere_AndForDebug ( _Q_->CodeByteArray, address, setForDebugFlag ) ;
+    ByteArray_SetHere_AndForDebug ( _O_->CodeByteArray, address, setForDebugFlag ) ;
 }
 
 byte *

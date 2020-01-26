@@ -840,12 +840,12 @@ PeepHole_Optimize_ForStackPopToReg ( )
 {
     if ( GetState ( _CfrTil_, OPTIMIZE_ON ) )
     {
-        byte * here = _Q_CodeByteArray->EndIndex ;
+        byte * here = _O_CodeByteArray->EndIndex ;
         byte add_r14_0x8__mov_r14_rax__mov_rax_r14__sub_r14_0x8 [ ] = { 0x49, 0x83, 0xc6, 0x08, 0x49, 0x89, 0x06, 0x49, 0x8b, 0x06, 0x49, 0x83, 0xee, 0x08 } ;
         if ( ! memcmp ( add_r14_0x8__mov_r14_rax__mov_rax_r14__sub_r14_0x8, here - 14, 14 ) )
         {
 
-            _ByteArray_UnAppendSpace ( _Q_CodeByteArray, 14 ) ;
+            _ByteArray_UnAppendSpace ( _O_CodeByteArray, 14 ) ;
         }
     }
 }
@@ -855,7 +855,7 @@ PeepHole_Optimize ( )
 {
     if ( GetState ( _CfrTil_, OPTIMIZE_ON ) )
     {
-        byte * here = _Q_CodeByteArray->EndIndex ;
+        byte * here = _O_CodeByteArray->EndIndex ;
         byte sub_r14_0x8__add_r14_0x8 [ ] = { 0x49, 0x83, 0xee, 0x08, 0x49, 0x83, 0xc6, 0x08 } ;
         byte add_r14_0x8__mov_r14_rax__mov_rax_r14__sub_r14_0x8 [ ] = { 0x49, 0x83, 0xc6, 0x08, 0x49, 0x89, 0x06, 0x49, 0x8b, 0x06, 0x49, 0x83, 0xee, 0x08 } ;
         //byte add_r14_0x8__mov_r14_rdi__mov_rax_r14__sub_r14_0x8 [ ] = { 0x49, 0x83, 0xc6, 0x08, 0x49, 0x89, 0x3e, 0x49, 0x8b, 0x06, 0x49, 0x83, 0xee, 0x08 } ;
@@ -865,30 +865,30 @@ PeepHole_Optimize ( )
         byte add_rax_0x0 [] = { 0x48, 0x81, 0xc0, 0x00, 0x00, 0x00, 0x00 } ;
         if ( ! memcmp ( sub_r14_0x8__add_r14_0x8, here - 8, 8 ) )
         {
-            _ByteArray_UnAppendSpace ( _Q_CodeByteArray, 8 ) ;
+            _ByteArray_UnAppendSpace ( _O_CodeByteArray, 8 ) ;
         }
         else if ( ! memcmp ( add_r14_0x8__mov_r14_rax__mov_rax_r14__sub_r14_0x8, here - 14, 14 ) )
         {
-            _ByteArray_UnAppendSpace ( _Q_CodeByteArray, 14 ) ;
+            _ByteArray_UnAppendSpace ( _O_CodeByteArray, 14 ) ;
         }
         else if ( ! memcmp ( mov_r14_rax__mov_rax_r14, here - 6, 6 ) )
         {
-            _ByteArray_UnAppendSpace ( _Q_CodeByteArray, 6 ) ;
+            _ByteArray_UnAppendSpace ( _O_CodeByteArray, 6 ) ;
         }
         else if ( ! memcmp ( add_rax_0x0, here - 7, 7 ) )
         {
-            _ByteArray_UnAppendSpace ( _Q_CodeByteArray, 7 ) ;
+            _ByteArray_UnAppendSpace ( _O_CodeByteArray, 7 ) ;
         }
 #if 0        
         else if ( ! memcmp ( add_r14_0x8__mov_r14_rdi__mov_rax_r14__sub_r14_0x8, here - 14, 14 ) )
         {
-            _ByteArray_UnAppendSpace ( _Q_CodeByteArray, 14 ) ;
+            _ByteArray_UnAppendSpace ( _O_CodeByteArray, 14 ) ;
         }
             // this occurs one time at startup in _assertStkChk : change it where it is caused and eliminate testing every instruction !! 
         else if ( ! memcmp ( mov_eax_tos_sub_esi_04_test_eax_eax, here - 7, 7 ) )
         {
 
-            _ByteArray_UnAppendSpace ( _Q_CodeByteArray, 7 ) ;
+            _ByteArray_UnAppendSpace ( _O_CodeByteArray, 7 ) ;
             Compile_TEST_Reg_To_Reg ( ACC, ACC ) ;
         }
 #endif        

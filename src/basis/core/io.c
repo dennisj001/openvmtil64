@@ -136,7 +136,7 @@ void
 _Printf ( byte *format, ... )
 {
     if ( kbhit ( ) == ESC ) OpenVmTil_Pause ( ) ;
-    if ( _Q_->Verbosity ) //GetState ( _ReadLiner_, CHAR_ECHO ) )
+    if ( _O_->Verbosity ) //GetState ( _ReadLiner_, CHAR_ECHO ) )
     {
         va_list args ;
 
@@ -163,7 +163,7 @@ void
 Printf ( byte *format, ... )
 {
     if ( kbhit ( ) == ESC ) OpenVmTil_Pause ( ) ; //CfrTil_Quit ( ) ;
-    if ( _Q_ && _CfrTil_ && _Q_->Verbosity )
+    if ( _O_ && _CfrTil_ && _O_->Verbosity )
     {
         va_list args ;
         va_start ( args, ( char* ) format ) ;
@@ -172,30 +172,30 @@ Printf ( byte *format, ... )
         va_end ( args ) ;
         int64 len = Strlen ( ( char* ) out ) ;
         byte final = out [ len - 1 ] ;
-        if ( _Q_->psi_PrintStateInfo )
+        if ( _O_->psi_PrintStateInfo )
         {
             if ( out [0] == '\n' )
             {
-                if ( ( _Q_->psi_PrintStateInfo->OutputLineCharacterNumber < 2 ) && ( GetState ( _Q_->psi_PrintStateInfo, PSI_NEWLINE ) ) ) out = & out [1] ;
-                else if ( _Q_->psi_PrintStateInfo && GetState ( _Q_->psi_PrintStateInfo, PSI_PROMPT ) )
+                if ( ( _O_->psi_PrintStateInfo->OutputLineCharacterNumber < 2 ) && ( GetState ( _O_->psi_PrintStateInfo, PSI_NEWLINE ) ) ) out = & out [1] ;
+                else if ( _O_->psi_PrintStateInfo && GetState ( _O_->psi_PrintStateInfo, PSI_PROMPT ) )
                 {
                     out [0] = '\r' ;
-                    SetState ( _Q_->psi_PrintStateInfo, PSI_PROMPT, false ) ;
+                    SetState ( _O_->psi_PrintStateInfo, PSI_PROMPT, false ) ;
                 }
             }
         }
         printf ( "%s", out ) ;
         if ( _CfrTil_ && _CfrTil_->LogFlag ) fprintf ( _CfrTil_->LogFILE, "%s", out ) ;
-        if ( _Q_->psi_PrintStateInfo )
+        if ( _O_->psi_PrintStateInfo )
         {
             if ( ( final == '\n' ) || ( final == '\r' ) )
             {
-                _Q_->psi_PrintStateInfo->OutputLineCharacterNumber = 0 ;
+                _O_->psi_PrintStateInfo->OutputLineCharacterNumber = 0 ;
                 ConserveNewlines ;
             }
             else
             {
-                _Q_->psi_PrintStateInfo->OutputLineCharacterNumber += len ;
+                _O_->psi_PrintStateInfo->OutputLineCharacterNumber += len ;
                 AllowNewlines ;
             }
         }
@@ -270,7 +270,7 @@ __CfrTil_Emit ( byte c )
         }
     }
     else _Context_->ReadLiner0->OutputLineCharacterNumber ++ ;
-    if ( _Q_->Verbosity ) putc ( c, _Context_->ReadLiner0->OutputFile ) ;
+    if ( _O_->Verbosity ) putc ( c, _Context_->ReadLiner0->OutputFile ) ;
 }
 
 void

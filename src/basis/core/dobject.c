@@ -123,7 +123,7 @@ _DObject_ValueDefinition_Init ( Word * word, uint64 value, uint64 objType, byte 
     {
         word->Definition = ( block ) ( function ? function : ( byte* ) value ) ; //_OptimizeJumps ( ( byte* ) value ) ; // this comes to play (only(?)) with unoptimized code
         word->CodeStart = ( byte* ) word->Definition ;
-        if ( NamedByteArray_CheckAddress ( _Q_CodeSpace, word->CodeStart ) ) word->S_CodeSize = Here - word->CodeStart ;
+        if ( NamedByteArray_CheckAddress ( _O_CodeSpace, word->CodeStart ) ) word->S_CodeSize = Here - word->CodeStart ;
         else word->S_CodeSize = 0 ;
         word->W_Value = ( uint64 ) word->Definition ; // rvalue
     }
@@ -131,10 +131,10 @@ _DObject_ValueDefinition_Init ( Word * word, uint64 value, uint64 objType, byte 
     {
         word->W_Value = value ; // rvalue
         d0 ( _Printf ( ( byte* ) "\n_DObject_ValueDefinition_Init :" ) ) ;
-        ByteArray * svcs = _Q_CodeByteArray ;
+        ByteArray * svcs = _O_CodeByteArray ;
         int64 sscm = GetState ( _CfrTil_, DEBUG_SOURCE_CODE_MODE ) ;
         //CfrTil_DbgSourceCodeOff ( ) ;
-        _NBA_SetCompilingSpace_MakeSureOfRoom ( _Q_->MemorySpace0->InternalObjectSpace, 4 * K ) ;
+        _NBA_SetCompilingSpace_MakeSureOfRoom ( _O_->MemorySpace0->InternalObjectSpace, 4 * K ) ;
         Word_SetCoding ( word, Here ) ;
         word->CodeStart = Here ;
         word->Definition = ( block ) Here ;

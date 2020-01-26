@@ -116,15 +116,18 @@ _Debugger_ShowInfo ( Debugger * debugger, byte * prompt, int64 signal, int64 for
         byte *location = ( rl->Filename ) ? rl->Filename : ( byte* ) "<command line>" ;
         byte signalAscii [ 128 ] ;
         Word * word = debugger->w_Word ? debugger->w_Word : _Context_->CurrentlyRunningWord ? _Context_->CurrentlyRunningWord : _Context_->CurrentTokenWord ;
-        byte * token0 = word ? word->Name : debugger->Token ;
+        byte wordName [256] ;
+        snprintf ( wordName, 256, "%s%s%s", word ? word->Name : ( byte* ) "", ( ( char* ) debugger->w_AliasOf ? " -> " : "" ),
+            ( debugger->w_AliasOf ? debugger->w_AliasOf->Name : ( byte* ) "" ) ) ;
+        byte * token0 = debugger->w_AliasOf ? wordName : word ? word->Name : debugger->Token ;
 
         if ( ! ( cntx && cntx->Lexer0 ) ) Throw ( ( byte* ) "\n_CfrTil_ShowInfo:", ( byte* ) "\nNo token at _CfrTil_ShowInfo\n", QUIT ) ;
-        if ( ( signal == 11 ) || _Q_->SigAddress )
+        if ( ( signal == 11 ) || _O_->SigAddress )
         {
-            sprintf ( ( char* ) signalAscii, ( char * ) "Error : signal " INT_FRMT ":: attempting address : \n" UINT_FRMT, signal, ( uint64 ) _Q_->SigAddress ) ;
-            debugger->DebugAddress = ( byte* ) _Q_->SigAddress ;
+            snprintf ( ( char* ) signalAscii, 128, ( char * ) "Error : signal " INT_FRMT ":: attempting address : \n" UINT_FRMT, signal, ( uint64 ) _O_->SigAddress ) ;
+            debugger->DebugAddress = ( byte* ) _O_->SigAddress ;
         }
-        else if ( signal ) sprintf ( ( char* ) signalAscii, ( char * ) "Error : signal " INT_FRMT " ", signal ) ;
+        else if ( signal ) snprintf ( ( char* ) signalAscii, 128, ( char * ) "Error : signal " INT_FRMT " ", signal ) ;
 
         DebugColors ;
 
@@ -169,13 +172,13 @@ Debugger_ShowInfo ( Debugger * debugger, byte * prompt, int64 signal )
         Debugger_FindUsing ( debugger ) ;
     }
     else if ( debugger->w_Word ) debugger->Token = debugger->w_Word->Name ;
-    if ( ( _Q_->SigSegvs < 2 ) && GetState ( debugger, DBG_STEPPING ) )
+    if ( ( _O_->SigSegvs < 2 ) && GetState ( debugger, DBG_STEPPING ) )
     {
         _Printf ( ( byte* ) "\nDebug Stepping Address : 0x%016lx", ( uint64 ) debugger->DebugAddress ) ;
         Debugger_UdisOneInstruction ( debugger, debugger->DebugAddress, ( byte* ) "", ( byte* ) "" ) ; // the next instruction
     }
     if ( ( ! sif ) && ( ! GetState ( debugger, DBG_STEPPING ) ) && ( GetState ( debugger, DBG_INFO ) ) ) _Debugger_ShowInfo ( debugger, prompt, signal, 1 ) ;
-    if ( prompt == _Q_->ExceptionMessage ) _Q_->ExceptionMessage = 0 ;
+    if ( prompt == _O_->ExceptionMessage ) _O_->ExceptionMessage = 0 ;
 }
 
 void
@@ -199,7 +202,7 @@ Debugger_ShowState ( Debugger * debugger, byte * prompt )
     {
         _Printf ( ( byte* ) ( cflag ? "\n%s :: %03d.%03d : %s : <constant> : %s%s%s " : word->ContainingNamespace ? "\n%s :: %03d.%03d : %s : <word> : %s%s%s " : "\n%s :: %03d.%03d : %s : <word?> : %s%s%s " ),
             prompt, rl->LineNumber, rl->ReadIndex, Debugger_GetStateString ( debugger ),
-            // _Q_->CfrTil->Namespaces doesn't have a ContainingNamespace
+            // _O_->CfrTil->Namespaces doesn't have a ContainingNamespace
             word->ContainingNamespace ? word->ContainingNamespace->Name : ( byte* ) "",
             word->ContainingNamespace ? ( byte* ) "." : ( byte* ) "", // the dot between
             c_gd ( word->Name ) ) ;
@@ -258,7 +261,7 @@ LO_Debug_ExtraShow ( int64 showStackFlag, int64 verbosity, int64 wordList, byte 
 {
     if ( GetState ( _CfrTil_, DEBUG_MODE ) )
     {
-        if ( _Q_->Verbosity > verbosity )
+        if ( _O_->Verbosity > verbosity )
         {
             va_list args ;
             va_start ( args, ( char* ) format ) ;
@@ -272,7 +275,7 @@ LO_Debug_ExtraShow ( int64 showStackFlag, int64 verbosity, int64 wordList, byte 
                 printf ( "%s", out ) ;
                 fflush ( stdout ) ;
             }
-            if ( showStackFlag && _Q_->Verbosity > verbosity ) Stack ( ) ;
+            if ( showStackFlag && _O_->Verbosity > verbosity ) Stack ( ) ;
             DefaultColors ;
         }
     }
@@ -297,9 +300,9 @@ Debugger_ShowStackChange ( Debugger * debugger, Word * word, byte * insert, byte
     name = word ? ( char* ) c_gd ( String_ConvertToBackSlash ( word->Name ) ) : ( char* ) "" ;
     while ( 1 )
     {
-        if ( GetState ( debugger, DBG_STEPPING ) ) 
-            sprintf ( ( char* ) b, "\nStack : %s at %s :> %s <: %s", insert, location, ( char* ) c_gd ( name ), ( char* ) achange ) ;
-        else sprintf ( ( char* ) b, "\nStack : %s at %s :> %s <: %s", insert, ( char* ) location, name, ( char* ) achange ) ;
+        if ( GetState ( debugger, DBG_STEPPING ) )
+            snprintf ( ( char* ) b, BUFFER_SIZE, "\nStack : %s at %s :> %s <: %s", insert, location, ( char* ) c_gd ( name ), ( char* ) achange ) ;
+        else snprintf ( ( char* ) b, BUFFER_SIZE, "\nStack : %s at %s :> %s <: %s", insert, ( char* ) location, name, ( char* ) achange ) ;
         if ( ( sl = strlen ( ( char* ) b ) ) > 220 ) //183 ) //GetTerminalWidth ( ) ) //_Debugger_->TerminalLineWidth ) //220 ) 
         {
             location = ( char* ) "..." ;
@@ -311,7 +314,7 @@ Debugger_ShowStackChange ( Debugger * debugger, Word * word, byte * insert, byte
         else break ;
     }
     _Printf ( ( byte* ) "%s", b ) ;
-    if ( _Q_->Verbosity > 3 ) _Debugger_PrintDataStack ( 2 ) ;
+    if ( _O_->Verbosity > 3 ) _Debugger_PrintDataStack ( 2 ) ;
 }
 
 void
@@ -345,7 +348,7 @@ Debugger_ShowChange ( Debugger * debugger, Word * word, Boolean stepFlag, uint64
         else op = ( char* ) "set" ;
         snprintf ( ( char* ) c, BUFFER_SIZE, ( char* ) "0x%016lx", ( uint64 ) TOS ) ;
         snprintf ( ( char* ) b, BUFFER_SIZE, ( char* ) "TOS %s to %s.", op, c_gd ( c ) ) ;
-        strncat ( ( char* ) pb_change, ( char* ) b, 256 ) ; // strcat ( (char*) _change, cc ( ( char* ) c, &_Q_->Default ) ) ;
+        strncat ( ( char* ) pb_change, ( char* ) b, 256 ) ; // strcat ( (char*) _change, cc ( ( char* ) c, &_O_->Default ) ) ;
         name = word->Name ;
         if ( name ) name = String_ConvertToBackSlash ( name ) ;
         char * achange = ( char* ) pb_change ;
@@ -357,18 +360,6 @@ Debugger_ShowChange ( Debugger * debugger, Word * word, Boolean stepFlag, uint64
                 insert = "function call" ;
                 if ( achange [0] ) Debugger_ShowStackChange ( debugger, word, ( byte* ) insert, ( byte* ) achange, stepFlag ) ;
             }
-#if 0            
-            else
-            {
-                // old code ??
-                if ( ( ( * debugger->DebugAddress ) != 0x83 ) && ( ( * debugger->DebugAddress ) != 0x81 ) )// add esi
-                {
-                    insert = "instruction" ;
-                    if ( achange [0] ) Debugger_ShowStackChange ( debugger, word, ( byte* ) insert, ( byte* ) achange, stepFlag ) ;
-                }
-                else SetState ( debugger, DBG_SHOW_STACK_CHANGE, true ) ;
-            }
-#endif            
         }
         else
         {
@@ -382,51 +373,84 @@ Debugger_ShowChange ( Debugger * debugger, Word * word, Boolean stepFlag, uint64
             else if ( dsp < debugger->SaveDsp ) _Printf ( ( byte* ) "\n%s popped %d value off the stack.", insert, ( debugger->SaveDsp - dsp ) ) ;
             DefaultColors ;
         }
-        //if ( ( ! ( achange [0] ) ) && ( ( change > 1 ) || ( change < - 1 ) || ( _Q_->Verbosity > 1 ) ) ) _Debugger_PrintDataStack ( change + 1 ) ;
-        if ( ( ! achange [0] ) && ( change || ( _Q_->Verbosity > 1 ) ) ) _Debugger_PrintDataStack ( change + 1 ) ;
+        //if ( ( ! ( achange [0] ) ) && ( ( change > 1 ) || ( change < - 1 ) || ( _O_->Verbosity > 1 ) ) ) _Debugger_PrintDataStack ( change + 1 ) ;
+        if ( ( ! achange [0] ) && ( change || ( _O_->Verbosity > 1 ) ) ) _Debugger_PrintDataStack ( change + 1 ) ;
     }
 }
 
-// hopefully some of this can also be used by SC_PrepareDbgSourceCodeString
 byte *
-_PrepareDbgSourceCodeString ( Word * word, byte * il, int64 tvw )
+String_HighlightTokenInputLine ( byte * nvw, int64 lef, int64 leftBorder, int64 ts, byte * token, int64 rightBorder, int64 ref )
 {
-    byte * cc_line, *token, *subsToken ;
-    byte * nvw = Buffer_Data_Cleared ( _CfrTil_->DebugB ) ; // nvw : new view window
-    Boolean ins = GetState ( _Debugger_, DBG_OUTPUT_INSERTION ) ;
-    Boolean subs = GetState ( _Debugger_, DBG_OUTPUT_SUBSTITUTION ) ;
-    int64 slil, slt, totalBorder, idealBorder, leftBorder, rightBorder, lef, ref, nws, ots, nts, slNvw, wrli, inc ;
-    // NB!! : remember the highlighting formatting characters don't add any additional *visible length* to the output line
-    // ots : original token start (index into the source code), nws : new window start ; tvw: targetViewWidth ; nts : new token start
-    // lef : left ellipsis flag, ref : right ellipsis flag
-    token = String_ConvertToBackSlash ( word->Name ) ;
-    if ( subs )
-    {
-        subsToken = _Debugger_->SubstitutedWord->Name ;
-        if ( String_Equal ( subsToken, subsToken ) ) subs = 0 ;
-        else token = subsToken ;
-    }
+    int64 svState = GetState ( _Debugger_, DEBUG_SHTL_OFF ) ;
+    SetState ( _Debugger_, DEBUG_SHTL_OFF, false ) ;
+    // |ilw...------ inputLine  -----|lef|--- leftBorder ---|---token---|---  rightBorder  ---|ref|------ inputLine -----...ilw| -- ilw : inputLine window
+    // |ilw...------ inputLine  -----|lef|pad?|-------------|tp|---token---|---  rightBorder  ---|ref|------ inputLine -----...ilw| -- ilw : inputLine window
+    //_String_HighlightTokenInputLine ( byte * nvw, int8 lef, int64 leftBorder, int64 tokenStart, byte *token, int64 rightBorder, int8 ref )
+    //cc_line = _String_HighlightTokenInputLine ( nvw, lef, leftBorder, ts, token, rightBorder, ref ) ; // nts : new token start is a index into b - the nwv buffer
+    byte * cc_line = _String_HighlightTokenInputLine ( nvw, lef, leftBorder, ts, token, rightBorder, ref ) ; // nts : new token start is a index into b - the nwv buffer
+    SetState ( _Debugger_, DEBUG_SHTL_OFF, svState ) ;
+    return cc_line ;
+}
+
+byte *
+PSCS_Using_WordSC ( byte* scs, byte * token, int64 scswci ) // scs : source code string
+{
+    byte *nvw ;
+    // ts : tokenStart ; tp : text point - where we want to start source code text to align with disassembly ; ref : right ellipsis flag
+    int64 i, tw, slt, tp, lef, leftBorder, ts, rightBorder, ref, slsc, pad ;
+    slsc = strlen ( ( char* ) scs ) ;
+    nvw = Buffer_New_pbyte ( ( slsc > BUFFER_SIZE ) ? slsc : BUFFER_SIZE ) ;
     slt = Strlen ( token ) ;
-    wrli = word->W_RL_Index ;
-    slil = Strlen ( String_RemoveEndWhitespace ( il ) ) ;
-    inc = slil - wrli ;
-    ots = String_FindStrnCmpIndex ( il, word->Name, wrli, strlen ( ( char* ) word->Name ), slt ) ; //(( inc > 30 ) ? 30 : inc) ) ; //20 ) ;// adjust from wrli which is 
+    tw = Debugger_TerminalLineWidth ( _Debugger_ ) ;
+    tp = 42 ; // 42 : align with disassembler code
+    if ( ( slsc > tp ) && ( scswci > tp ) )
+    {
+        lef = 4 ;
+        leftBorder = ts = tp ;
+        rightBorder = tw - ( ts + slt ) ;
+        ref = ( slsc - 4 ) > tw ? 4 : 0 ;
+        Strncpy ( nvw, & scs [scswci - tp], tw - ( lef + ref ) ) ;
+    }
+    else
+    {
+        pad = tp - scswci ;
+        if ( pad >= 4 ) lef = 4 ;
+        else lef = 0 ;
+        for ( i = 0 ; i < pad ; i ++ ) strncat ( ( char* ) nvw, " ", BUFFER_SIZE ) ;
+        leftBorder = ts = tp ;
+        ref = ( slsc - 4 ) > tw ? 4 : 0 ;
+        if ( ( ! ref ) && ( tw > slsc - 4 ) ) ref = 4 ;
+        rightBorder = tw - ( tp + slt ) - ref ;
+        Strncat ( nvw, scs, tw - ( lef + pad + ref ) ) ; // must Strncat because we might have done a strcat above based on the 'pad' variable
+    }
+    return String_HighlightTokenInputLine ( nvw, lef, leftBorder, ts, token, rightBorder, ref ) ;
+}
+
+byte *
+PSCS_Using_ReadlinerInputString ( byte* scs, byte * token, int64 scswci, int64 tvw ) // scs : source code string ; tvw : text view sliding window 
+{
+    byte *nvw ;
+    // ts : tokenStart ; tp : text point - where we want to start source code text to align with disassembly ; ref : right ellipsis flag
+    int64 slt, lef, leftBorder, ts, rightBorder, ref, slsc ;
+    int64 slil, totalBorder, idealBorder, nws, nts, slNvw ;
+    slsc = strlen ( ( char* ) scs ) ;
+    nvw = Buffer_New_pbyte ( ( slsc > BUFFER_SIZE ) ? slsc : BUFFER_SIZE ) ;
+    slt = Strlen ( token ) ;
     totalBorder = ( tvw - slt ) ; // the borders allow us to slide token within the window of tvw
-    // try to get nts relatively the same as ots
     idealBorder = ( totalBorder / 2 ) ;
     leftBorder = rightBorder = idealBorder ; // tentatively set leftBorder/rightBorder as ideally equal
-    nws = ots - idealBorder - ( ins ? ( slt / 2 ) + 1 : ( subs ? ( ( strlen ( ( char* ) subsToken ) ) / 2 ) : 0 ) ) ;
+    nws = scswci - idealBorder ; 
     nts = idealBorder ;
     if ( nws < 0 )
     {
         nws = 0 ;
-        nts = leftBorder = ots ;
+        nts = leftBorder = scswci ;
         rightBorder = totalBorder - leftBorder ;
     }
-    else if ( ( ots + slt + idealBorder ) > slil )
+    else if ( ( scswci + slt + idealBorder ) > slil )
     {
         nws = slil - tvw ;
-        rightBorder = slil - ( ots + slt ) ; // keep all on right beyond token - the cutoff is on the left side
+        rightBorder = slil - ( scswci + slt ) ; // keep all on right beyond token - the cutoff is on the left side
         if ( nws < 0 )
         {
             nws = 0 ;
@@ -436,89 +460,60 @@ _PrepareDbgSourceCodeString ( Word * word, byte * il, int64 tvw )
         nts = leftBorder ; //+ (ins ? (slt/2 + 1) : 0 ) ;
     }
     //else { use the defaults above }
-    if ( ins )
-    {
-        Strncpy ( nvw, &il[nws], ots ) ;
-        strncat ( ( char* ) nvw, ( char* ) token, BUFFER_SIZE ) ;
-        strncat ( ( char* ) nvw, " ", BUFFER_SIZE ) ;
-        strncat ( ( char* ) nvw, ( char* ) &il[ots], BUFFER_SIZE ) ;
-    }
-    if ( subs )
-    {
-        Strncpy ( nvw, &il[nws], ots ) ;
-        strncat ( ( char* ) nvw, ( char* ) subsToken, BUFFER_SIZE ) ;
-        strncat ( ( char* ) nvw, " ", BUFFER_SIZE ) ;
-        strncat ( ( char* ) nvw, ( char* ) &il[ots + strlen ( ( char* ) subsToken ) ], BUFFER_SIZE ) ; // 2 : '=' + ' ' :: assuming subs is only done with an '=' in _CfrTil_C_Infix_EqualOp
-    }
-    else Strncpy ( nvw, &il[nws], tvw ) ; // copy the the new view window to buffer nvw
+    Strncpy ( nvw, &scs[nws], tvw ) ; // copy the the new view window to buffer nvw
     slNvw = Strlen ( nvw ) ;
     if ( slNvw > ( tvw + 8 ) ) // is there a need for ellipsis
     {
-        if ( ( ots - leftBorder ) < 4 ) lef = 0, ref = 1 ;
+        if ( ( scswci - leftBorder ) < 4 ) lef = 0, ref = 1 ;
         else lef = ref = 1 ;
     }
     else if ( slNvw > ( tvw + 4 ) ) // is there a need for one ellipsis
     {
-        if ( ( ots - leftBorder ) < 4 ) lef = 0, ref = 1 ;
+        if ( ( scswci - leftBorder ) < 4 ) lef = 0, ref = 1 ;
         else lef = 1, ref = 0 ; // choose lef as preferable
     }
     else lef = ref = 0 ;
-    cc_line = _String_HighlightTokenInputLine ( nvw, lef, leftBorder, nts, token, rightBorder, ref ) ;
-    String_RemoveEndWhitespace ( cc_line ) ;
-    return cc_line ;
+    ts = nts ;
+    return String_HighlightTokenInputLine ( nvw, lef, leftBorder, ts, token, rightBorder, ref ) ;
 }
-
 // ...source code source code TP source code source code ... EOL
+
 byte *
-SC_PrepareDbgSourceCodeString ( byte * sc, Word * word ) // sc : source code ; scwi : source code word index
+DBG_PrepareSourceCodeString ( Word * word, byte* scs, int tvw, int usingSC ) // scs : source code string ; tvw text view window
 {
+    // usingSC == 1 denotes il string is from word->W_SourceCode else il is copied from rl->InputLineString
+    Debugger * debugger = _Debugger_ ;
     byte * cc_line ;
-    if ( sc && word )
+    if ( word && scs )
     {
-        byte *nvw, * token0 = word->Name, *token ;
-        int64 scwi0, i, tw, slt, tp, lef, leftBorder, ts, rightBorder, ref, slsc, scwci, pad ; // ts : tokenStart ; tp : text point - where we want to start source code text to align with disassembly ; ref : right ellipsis flag
+        // sc : source code ; scwi : source code word index
+        byte * token0 = word->Name, *token, *subsToken ;
+        int64 scswi0, tw, slt, slsc, scswci ; // tp : text point - where we want to start source code text to align with disassembly ; ref : right ellipsis flag
+        Boolean sub_ins = GetState ( debugger, DBG_OUTPUT_INSERTION | DBG_OUTPUT_SUBSTITUTION ) ;
+        if ( sub_ins )
+        {
+            subsToken = debugger->SubstitutedWord->Name ;
+            if ( String_Equal ( subsToken, subsToken ) ) sub_ins = 0 ;
+            else token0 = subsToken ;
+        }
         token = String_ConvertToBackSlash ( token0 ) ;
         tw = Debugger_TerminalLineWidth ( _Debugger_ ) ;
         slt = Strlen ( token ) ;
-        slsc = strlen ( ( char* ) sc ) ;
-        scwi0 = word->W_SC_Index ;
-        scwci = String_FindStrnCmpIndex ( sc, token, scwi0, slt, slt ) ; //( ( slsc - scwi0 ) > 30 ) ? 30 : ( slsc - scwi0 ) ) ;
-        if ( scwci == - 1 ) return 0 ;
-        d0 ( byte * scspp0 = & sc [ scwi0 ] ) ;
-        d0 ( byte * scspp2 = & sc [ scwci ] ) ;
-        nvw = Buffer_New_pbyte ( ( slsc > BUFFER_SIZE ) ? slsc : BUFFER_SIZE ) ;
-        tp = 42 ;
-        if ( ( slsc > tp ) && ( scwci > tp ) )
+        slsc = strlen ( ( char* ) scs ) ;
+        scswi0 = usingSC ? word->W_SC_Index : word->W_RL_Index ;
+        scswci = String_FindStrnCmpIndex ( scs, token, scswi0, slt, slt ) ;
+        if ( scswci != - 1 ) // did we find token in scs
         {
-            lef = 4 ;
-            leftBorder = ts = tp ;
-            rightBorder = tw - ( ts + slt ) ;
-            ref = ( slsc - 4 ) > tw ? 4 : 0 ;
-            Strncpy ( nvw, & sc [scwci - tp], tw - ( lef + ref ) ) ;
+            d0 ( byte * scspp0 = & scs [ scswi0 ] ) ;
+            d0 ( byte * scspp2 = & scs [ scswci ] ) ;
+            if ( usingSC ) cc_line = PSCS_Using_WordSC ( scs, token, scswci ) ;
+            else cc_line = PSCS_Using_ReadlinerInputString ( scs, token, scswci, tvw ) ; // scs : source code string
         }
-        else
-        {
-            pad = tp - scwci ;
-            if ( pad >= 4 ) lef = 4 ;
-            else lef = 0 ;
-            for ( i = 0 ; i < pad ; i ++ ) strcat ( ( char* ) nvw, " " ) ;
-            leftBorder = ts = tp ;
-            ref = ( slsc - 4 ) > tw ? 4 : 0 ;
-            if ( ( ! ref ) && ( tw > slsc - 4 ) ) ref = 4 ;
-            rightBorder = tw - ( tp + slt ) - ref ;
-            Strncat ( nvw, sc, tw - ( lef + pad + ref ) ) ; // must Strncat because we might have done a strcat above based on the 'pad' variable
-        }
-        int64 svState = GetState ( _Debugger_, DEBUG_SHTL_OFF ) ;
-        SetState ( _Debugger_, DEBUG_SHTL_OFF, false ) ;
-        // |ilw...------ inputLine  -----|lef|--- leftBorder ---|---token---|---  rightBorder  ---|ref|------ inputLine -----...ilw| -- ilw : inputLine window
-        // |ilw...------ inputLine  -----|lef|pad?|-------------|tp|---token---|---  rightBorder  ---|ref|------ inputLine -----...ilw| -- ilw : inputLine window
-        //_String_HighlightTokenInputLine ( byte * nvw, int8 lef, int64 leftBorder, int64 tokenStart, byte *token, int64 rightBorder, int8 ref )
-        cc_line = _String_HighlightTokenInputLine ( nvw, lef, leftBorder, ts, token, rightBorder, ref ) ; // nts : new token start is a index into b - the nwv buffer
-        SetState ( _Debugger_, DEBUG_SHTL_OFF, svState ) ;
+        else cc_line = ( byte* ) "" ;
+        return cc_line ;
     }
-    else cc_line = ( byte* ) "" ;
-    return cc_line ;
 }
+
 
 // NB!! : remember the highlighting formatting characters don't add any additional *visible length* to the output line
 // ots : original token start (index into the source code), nws : new window start ; tvw: targetViewWidth ; nts : new token start
@@ -533,9 +528,9 @@ Debugger_PrepareDbgSourceCodeString ( Debugger * debugger, Word * word, int64 tw
         ReadLiner * rl = _Context_->ReadLiner0 ;
         byte * il = Buffer_Data_Cleared ( _CfrTil_->StringInsertB4 ) ; //nb! dont tamper with the input line. eg. removing its newline will affect other code which depends on newline
         strcpy ( il, rl->InputLineString ) ;
+        String_RemoveEndWhitespace ( ( byte* ) il ) ;
         if ( String_Equal ( "init", word->Name ) )
         {
-            String_RemoveEndWhitespace ( ( byte* ) il ) ;
             strncat ( il, " -> ", BUFFER_SIZE ) ;
             strncat ( il, c_n ( word->Name ), BUFFER_SIZE ) ;
             strncat ( il, " ( )", BUFFER_SIZE ) ;
@@ -545,7 +540,8 @@ Debugger_PrepareDbgSourceCodeString ( Debugger * debugger, Word * word, int64 tw
         fel = 32 - 1 ; //fe : formatingEstimate length : 2 formats with 8/12 chars on each sude - 32/48 :: 1 : a litte leave way
         tw = Debugger_TerminalLineWidth ( debugger ) ; // 139 ; //139 : nice width :: Debugger_TerminalLineWidth ( debugger ) ; 
         tvw = tw - ( twAlreayUsed - fel ) ; //subtract the formatting chars which don't add to visible length
-        cc_line = _PrepareDbgSourceCodeString ( word, il, tvw ) ;
+        //cc_line = _PrepareDbgSourceCodeString ( word, il, tvw ) ;
+        cc_line = DBG_PrepareSourceCodeString ( word, il, tvw, 0 ) ; //tvw, tvw/2 ) ;// sc : source code ; scwi : source code word index
     }
     else cc_line = ( byte* ) "" ; // nts : new token start is a index into b - the nwv buffer
     return cc_line ;
@@ -555,113 +551,42 @@ void
 Debugger_ShowInfo_Token ( Debugger * debugger, Word * word, byte * prompt, int64 signal, byte * token0, byte * location, byte * signalAscii )
 {
     ReadLiner * rl = _ReadLiner_ ;
-    //if ( token0 )
-    {
-        char * compileOrInterpret = ( char* ) ( CompileMode ? "[c] " : "[i] " ), buffer [32] ;
-        byte * obuffer = Buffer_Data_Cleared ( _CfrTil_->DebugB1 ) ;
-        byte * token1 = String_ConvertToBackSlash ( token0 ) ;
-        token0 = token1 ;
-        char * cc_Token = ( char* ) cc ( token0, &_Q_->Notice ) ;
-        char * cc_location = ( char* ) cc ( location, &_Q_->Debug ) ;
+    char * compileOrInterpret = ( char* ) ( CompileMode ? "[c] " : "[i] " ), buffer [32] ;
+    byte * obuffer = Buffer_Data_Cleared ( _CfrTil_->DebugB1 ) ;
+    byte * token1 = String_ConvertToBackSlash ( token0 ) ;
+    token0 = token1 ;
+    char * cc_Token = ( char* ) cc ( token0, &_O_->Notice ) ;
+    char * cc_location = ( char* ) cc ( location, &_O_->Debug ) ;
 
-        prompt = prompt ? prompt : ( byte* ) "" ;
-        strcpy ( ( char* ) buffer, ( char* ) prompt ) ; //, BUFFER_SIZE ) ;
-        strcat ( buffer, compileOrInterpret ) ; //, BUFFER_SIZE ) ;
-        prompt = ( byte* ) buffer ;
-        if ( word )
+    prompt = prompt ? prompt : ( byte* ) "" ;
+    strncpy ( ( char* ) buffer, ( char* ) prompt, 32 ) ;
+    strncat ( buffer, compileOrInterpret, 32 ) ;
+    prompt = ( byte* ) buffer ;
+    if ( word )
+    {
+        if ( word->W_MorphismAttributes & CPRIMITIVE )
         {
-            if ( word->W_MorphismAttributes & CPRIMITIVE )
-            {
-                sprintf ( ( char* ) obuffer, "\n%s%s:: %s : %03ld.%03ld : %s :> %s <: cprimitive :> ", // <:: " INT_FRMT "." INT_FRMT " ",
-                    prompt, signal ? ( char* ) signalAscii : " ", cc_location, rl->LineNumber, rl->ReadIndex,
-                    word->ContainingNamespace ? ( char* ) word->ContainingNamespace->Name : "<literal>",
-                    cc_Token ) ;
-            }
-            else
-            {
-                sprintf ( ( char* ) obuffer, "\n%s%s:: %s : %03ld.%03ld : %s :> %s <: 0x%016lx :> ", // <:: " INT_FRMT "." INT_FRMT " ",
-                    prompt, signal ? ( char* ) signalAscii : " ", cc_location, rl->LineNumber, rl->ReadIndex,
-                    word->ContainingNamespace ? ( char* ) word->ContainingNamespace->Name : ( char* ) "<literal>",
-                    ( char* ) cc_Token, ( uint64 ) word ) ;
-            }
-            byte *cc_line = ( char* ) Debugger_PrepareDbgSourceCodeString ( debugger, ( debugger->w_Alias ? debugger->w_Alias : word ), ( int64 ) Strlen ( obuffer ) ) ;
-            Strncat ( obuffer, cc_line, BUFFER_SIZE ) ;
-            _Printf ( ( byte* ) "%s", obuffer ) ;
+            snprintf ( ( char* ) obuffer, BUFFER_SIZE, "\n%s%s:: %s : %03ld.%03ld : %s :> %s <: cprimitive :> ", // <:: " INT_FRMT "." INT_FRMT " ",
+                prompt, signal ? ( char* ) signalAscii : " ", cc_location, rl->LineNumber, rl->ReadIndex,
+                word->ContainingNamespace ? ( char* ) word->ContainingNamespace->Name : "<literal>",
+                cc_Token ) ;
         }
         else
         {
-            _Printf ( ( byte* ) "\n%s%s:: %s : %03ld.%03ld : %s :> %s <::> ", // <:: " INT_FRMT "." INT_FRMT " ",
-                prompt, signal ? signalAscii : ( byte* ) " ", cc_location, rl->LineNumber, rl->ReadIndex,
-                "<literal>", cc_Token ) ; //, _Q_->StartedTimes, _Q_->SignalExceptionsHandled ) ;
+            snprintf ( ( char* ) obuffer, BUFFER_SIZE, "\n%s%s:: %s : %03ld.%03ld : %s :> %s <: 0x%016lx :> ", // <:: " INT_FRMT "." INT_FRMT " ",
+                prompt, signal ? ( char* ) signalAscii : " ", cc_location, rl->LineNumber, rl->ReadIndex,
+                word->ContainingNamespace ? ( char* ) word->ContainingNamespace->Name : ( char* ) "<literal>",
+                ( char* ) cc_Token, ( uint64 ) word ) ;
         }
-    }
-}
-
-#if 0 // old ??
-
-void
-Debugger_ConsiderAndShowWord ( Debugger * debugger )
-{
-    Word * word = debugger->w_Word ;
-    SetState ( debugger, DBG_CAN_STEP, false ) ; // debugger->State flag = false ;
-    if ( word ) // then it wasn't a literal
-    {
-        byte * name = c_gd ( word->Name ) ;
-        if ( ( word->W_MorphismAttributes & ( CPRIMITIVE | DLSYM_WORD ) ) && ( ! ( CompileMode ) ) )
-        {
-            if ( word->ContainingNamespace ) _Printf ( ( byte* ) "\ncprimitive :> %s.%s <:> 0x%08x <: => evaluating ...", word->ContainingNamespace->Name, name, ( uint64 ) word->Definition ) ;
-        }
-        else
-        {
-            SetState ( debugger, DBG_CAN_STEP, true ) ;
-            if ( GetState ( debugger, DBG_INTERNAL ) )
-            {
-                Debugger_Info ( debugger ) ;
-            }
-            else if ( word->W_ObjectAttributes & NAMESPACE_VARIABLE )
-            {
-                _Printf ( ( byte* ) "\nVariable :> %s.%s <: => evaluating ... :> ", word->ContainingNamespace->Name, name ) ;
-                SetState ( debugger, DBG_CAN_STEP, false ) ;
-            }
-            else if ( word->W_ObjectAttributes & TEXT_MACRO )
-            {
-                _Printf ( ( byte* ) "\nMacro :> %s.%s <: => evaluating ... :> ", word->ContainingNamespace->Name, name ) ;
-                SetState ( debugger, DBG_CAN_STEP, false ) ;
-            }
-            else if ( word->W_MorphismAttributes & IMMEDIATE )
-            {
-                _Printf ( ( byte* ) "\nImmediate word :> %s.%s <:> 0x%08x <: => evaluating ...",
-                    word->ContainingNamespace->Name, name, ( uint64 ) word->Definition ) ;
-            }
-            else if ( CompileMode )
-            {
-                _Printf ( ( byte* ) "\nCompileMode :> %s.%s : %s <: not a macro => compiling ...",
-                    word->ContainingNamespace->Name, name, Debugger_GetStateString ( debugger ) ) ;
-            }
-            else
-            {
-                _Printf ( ( byte* ) "\nCompiled word :> %s.%s <:> 0x%08x <: => evaluating ...",
-                    word->ContainingNamespace->Name, name, ( uint64 ) word->Definition ) ;
-            }
-            Word_ShowSourceCode ( word ) ;
-            DefaultColors ;
-        }
+        byte *cc_line = ( char* ) Debugger_PrepareDbgSourceCodeString ( debugger, word, ( int64 ) Strlen ( obuffer ) ) ;
+        if ( cc_line ) Strncat ( obuffer, cc_line, BUFFER_SIZE ) ;
+        _Printf ( ( byte* ) "%s", obuffer ) ;
     }
     else
     {
-        if ( debugger->Token )
-        {
-            Lexer_ParseObject ( _Context_->Lexer0, debugger->Token ) ;
-            if ( ( GetState ( _Context_->Lexer0, KNOWN_OBJECT ) ) )
-            {
-                if ( CompileMode )
-                {
-                    _Printf ( ( byte* ) "\nCompileMode :> %s <: literal stack push will be compiled ...", _Context_->Lexer0->OriginalToken ) ;
-                }
-                else _Printf ( ( byte* ) "\nLiteral :> %s <: will be pushed onto the stack ...", _Context_->Lexer0->OriginalToken ) ;
-            }
-        }
+        _Printf ( ( byte* ) "\n%s%s:: %s : %03ld.%03ld : %s :> %s <::> ", // <:: " INT_FRMT "." INT_FRMT " ",
+            prompt, signal ? signalAscii : ( byte* ) " ", cc_location, rl->LineNumber, rl->ReadIndex,
+            "<literal>", cc_Token ) ; //, _O_->StartedTimes, _O_->SignalExceptionsHandled ) ;
     }
 }
-#endif
 

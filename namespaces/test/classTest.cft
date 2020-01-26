@@ -80,7 +80,7 @@ sp
 testList DLList.size @ dup p dump //pause
 
 #if 1 //Is_DebugOn // test for debugger showing a long line of code
-testList.HeadNode.AfterReference @ testList.TailNode.BeforeReference  "class init test : "  assert : hi 1 2 3 4 5 + + + + p ; : hey hi hi hi hi hi ; hey : hi 1 2 3 4 5 + + + + p ; : hey hi hi hi hi hi ; hey "\n above line should show several 15's" ps // debugger test
+d: testList.HeadNode.AfterReference @ testList.TailNode.BeforeReference  "class init test : "  assert : hi 1 2 3 4 5 + + + + p ; : hey hi hi hi hi hi ; hey "\n below line should show several 15's yada yada yada yada neti" ps : hi 1 2 3 4 5 + + + + p ; : hey hi hi hi hi hi ; nl hey nl "\n above line should show several 15's" ps // debugger test
 #else
 testList.HeadNode.AfterReference @ testList.TailNode.BeforeReference  "class init test : " assert 
 #endif

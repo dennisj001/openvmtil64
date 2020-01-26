@@ -158,7 +158,7 @@ _String_InsertColors ( byte * s, Colors * c )
 {
     if ( _CfrTil_ && s )
     {
-        Colors * current = _Q_->Current ;
+        Colors * current = _O_->Current ;
         byte * tbuffer = Buffer_Data ( _CfrTil_->StringInsertB ) ;
         String_ShowColors ( tbuffer, c ) ; // new foreground, new background
         strcat ( ( char* ) tbuffer, ( char* ) s ) ;
@@ -188,7 +188,7 @@ _String_Insert_AtIndexWithColors ( byte * token, int64 ndx, Colors * c )
     tbuffer [ preTokenLen ] = 0 ; // Strncpy does not necessarily null delimit
     String_ShowColors ( &tbuffer [ Strlen ( ( char* ) tbuffer ) ], c ) ; // new foreground, new background
     strcat ( ( char* ) tbuffer, ( char* ) token ) ;
-    String_ShowColors ( &tbuffer [ Strlen ( ( char* ) tbuffer ) ], &_Q_->Default ) ; // old foreground, old background
+    String_ShowColors ( &tbuffer [ Strlen ( ( char* ) tbuffer ) ], &_O_->Default ) ; // old foreground, old background
     strcat ( ( char* ) tbuffer, ( char* ) &buffer [ ndx ] ) ; // copy the rest of the buffer after the token : -1 : get the delimiter; 0 based array
     tbuffer = String_New ( tbuffer, TEMPORARY ) ;
     return tbuffer ;
@@ -197,7 +197,7 @@ _String_Insert_AtIndexWithColors ( byte * token, int64 ndx, Colors * c )
 byte *
 String_ReadLineToken_HighLight ( byte * token )
 {
-    return _String_Insert_AtIndexWithColors ( token, _Context_->ReadLiner0->ReadIndex - 1, &_Q_->User ) ;
+    return _String_Insert_AtIndexWithColors ( token, _Context_->ReadLiner0->ReadIndex - 1, &_O_->User ) ;
 }
 
 // ?? use pointers with these string functions ??
@@ -836,8 +836,8 @@ _String_HighlightTokenInputLine ( byte * nvw, Boolean lef, int64 leftBorder, int
         }
         else strncpy ( ( char* ) b3, ( char* ) nvw, leftBorder ) ;
 
-        strcpy ( ( char* ) b2, ( char* ) cc ( b3, &_Q_->Debug ) ) ;
-        char * ccToken = ( char* ) cc ( token, &_Q_->Notice ) ;
+        strcpy ( ( char* ) b2, ( char* ) cc ( b3, &_O_->Debug ) ) ;
+        char * ccToken = ( char* ) cc ( token, &_O_->Notice ) ;
         strcat ( ( char* ) b2, ccToken ) ;
 
         if ( ref )
@@ -846,7 +846,7 @@ _String_HighlightTokenInputLine ( byte * nvw, Boolean lef, int64 leftBorder, int
             strcat ( ( char* ) b3, " .. " ) ;
         }
         else strcpy ( ( char* ) b3, ( char* ) &nvw [ tokenStart + slt ] ) ; //, BUFFER_SIZE ) ; // 3 : [0 1 2 3]  0 indexed array
-        char * ccR = ( char* ) cc ( b3, &_Q_->Debug ) ;
+        char * ccR = ( char* ) cc ( b3, &_O_->Debug ) ;
         strcat ( ( char* ) b2, ccR ) ;
 
         nvw = b2 ;
@@ -883,11 +883,11 @@ byte *
 String_CheckForAtAdddress ( byte * address )
 {
     byte *str = 0 ; 
-    if ( NamedByteArray_CheckAddress ( _Q_->MemorySpace0->StringSpace, address )
-        || NamedByteArray_CheckAddress ( _Q_->MemorySpace0->CompilerTempObjectSpace, address )
-        || NamedByteArray_CheckAddress ( _Q_->MemorySpace0->SessionObjectsSpace, address )
-        || NamedByteArray_CheckAddress ( _Q_->MemorySpace0->TempObjectSpace, address )
-        || NamedByteArray_CheckAddress ( _Q_->MemorySpace0->DictionarySpace, address ) )
+    if ( NamedByteArray_CheckAddress ( _O_->MemorySpace0->StringSpace, address )
+        || NamedByteArray_CheckAddress ( _O_->MemorySpace0->CompilerTempObjectSpace, address )
+        || NamedByteArray_CheckAddress ( _O_->MemorySpace0->SessionObjectsSpace, address )
+        || NamedByteArray_CheckAddress ( _O_->MemorySpace0->TempObjectSpace, address )
+        || NamedByteArray_CheckAddress ( _O_->MemorySpace0->DictionarySpace, address ) )
     {
         if ( IsString ( address ) )
         {
@@ -987,8 +987,8 @@ Buffer_Init ( Buffer * b, int64 flag )
 void
 Buffer_Add ( Buffer * b, int64 flag )
 {
-    if ( flag & N_PERMANENT ) dllist_AddNodeToTail ( _Q_->MemorySpace0->BufferList, ( dlnode* ) b ) ;
-    else dllist_AddNodeToHead ( _Q_->MemorySpace0->BufferList, ( dlnode* ) b ) ;
+    if ( flag & N_PERMANENT ) dllist_AddNodeToTail ( _O_->MemorySpace0->BufferList, ( dlnode* ) b ) ;
+    else dllist_AddNodeToHead ( _O_->MemorySpace0->BufferList, ( dlnode* ) b ) ;
 }
 
 Buffer *
@@ -1007,9 +1007,9 @@ _Buffer_New ( int64 size, int64 flag )
     dlnode * node, * nextNode ;
     Buffer * b ;
     d0 ( Buffer_PrintBuffers ( ) ) ;
-    if ( _Q_ && _Q_->MemorySpace0 )
+    if ( _O_ && _O_->MemorySpace0 )
     {
-        for ( node = dllist_First ( ( dllist* ) _Q_->MemorySpace0->BufferList ) ; node ; node = nextNode )
+        for ( node = dllist_First ( ( dllist* ) _O_->MemorySpace0->BufferList ) ; node ; node = nextNode )
         {
             nextNode = dlnode_Next ( node ) ;
             b = ( Buffer* ) node ;
@@ -1044,9 +1044,9 @@ Buffers_SetAsUnused ( int64 force )
     dlnode * node, * nextNode ;
     Buffer * b ;
     int64 total = 0, setFree = 0 ;
-    if ( _Q_ && _Q_->MemorySpace0 )
+    if ( _O_ && _O_->MemorySpace0 )
     {
-        for ( node = dllist_First ( ( dllist* ) _Q_->MemorySpace0->BufferList ) ; node ; node = nextNode )
+        for ( node = dllist_First ( ( dllist* ) _O_->MemorySpace0->BufferList ) ; node ; node = nextNode )
         {
             nextNode = dlnode_Next ( node ) ;
             b = ( Buffer* ) node ;
@@ -1063,9 +1063,9 @@ Buffer_PrintBuffers ( )
     dlnode * node, * nextNode ;
     Buffer * b ;
     int64 total = 0, free = 0, locked = 0, unlocked = 0, permanent = 0 ;
-    if ( _Q_ && _Q_->MemorySpace0 )
+    if ( _O_ && _O_->MemorySpace0 )
     {
-        for ( node = dllist_First ( ( dllist* ) _Q_->MemorySpace0->BufferList ) ; node ; node = nextNode )
+        for ( node = dllist_First ( ( dllist* ) _O_->MemorySpace0->BufferList ) ; node ; node = nextNode )
         {
             b = ( Buffer* ) node ;
             d0 ( _Printf ( "\nBuffer_PrintBuffers : buffer = 0x%08x : nextNode = 0x%08x : flag = 0x%08x : size = %d : length = %d : data = %s\n", b, dlnode_Next ( node ), b->InUseFlag, b->B_Size, strlen ( b->B_Data ), b->B_Data ) ) ;
@@ -1077,7 +1077,7 @@ Buffer_PrintBuffers ( )
             total ++ ;
         }
     }
-    if ( _Q_->Verbosity > 1 ) _Printf ( ( byte* ) "\nBuffer_PrintBuffers : total = %d : free = %d : unlocked = %d : locked = %d : permanent = %d", total, free, unlocked, locked, permanent ) ;
+    if ( _O_->Verbosity > 1 ) _Printf ( ( byte* ) "\nBuffer_PrintBuffers : total = %d : free = %d : unlocked = %d : locked = %d : permanent = %d", total, free, unlocked, locked, permanent ) ;
 }
 
 Buffer *

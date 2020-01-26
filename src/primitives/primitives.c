@@ -84,7 +84,7 @@ CPrimitive CPrimitives [] = {
 
     { "{", 0, 0, 0, CfrTil_Begin_C_Block, IMMEDIATE | BLOCK_DELIMITER | KEYWORD, 0, 0, "C_Syntax", "C" },
     { "}", 0, 0, 0, CfrTil_End_C_Block, IMMEDIATE | BLOCK_DELIMITER | KEYWORD, 0, 0, "C_Syntax", "C" },
-    { ";", 0, 0, 0, CfrTil_C_Semi, IMMEDIATE | SYNTACTIC | KEYWORD, 0, 0, "C_Syntax", "C" },
+    { ";", 0, 0, 0, CfrTil_C_Semi, IMMEDIATE | SYNTACTIC | KEYWORD, 0, 0, "C_Syntax", "C" }, 
     { ",", 0, 0, 0, CfrTil_C_Comma, IMMEDIATE | NO_OP_WORD | RIGHT_PAREN | KEYWORD, 0, 0, "C_Syntax", "C" },
     { "!", 0, 0, TEST, CfrTil_LogicalNot, IMMEDIATE | CATEGORY_OP | CATEGORY_OP_1_ARG | CATEGORY_LOGIC | PREFIX | LOGIC_NEGATE, 0, 0, "C_Syntax", "C" },
     { "?", 0, 0, 0, CfrTil_C_ConditionalExpression, COMBINATOR | IMMEDIATE, 0, 0, "C_Syntax", "C" },

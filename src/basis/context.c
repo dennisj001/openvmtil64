@@ -41,8 +41,8 @@ Context_CurrentWord ( )
 Context *
 _Context_Allocate ( )
 {
-    NBA * nba = MemorySpace_NBA_New ( _Q_->MemorySpace0, ( byte* ) String_New ( ( byte* ) "ContextSpace", STRING_MEM ), 10 * K, OPENVMTIL ) ;
-    _Q_->MemorySpace0->ContextSpace = nba ;
+    NBA * nba = MemorySpace_NBA_New ( _O_->MemorySpace0, ( byte* ) String_New ( ( byte* ) "ContextSpace", STRING_MEM ), 10 * K, OPENVMTIL ) ;
+    _O_->MemorySpace0->ContextSpace = nba ;
     Context * cntx = ( Context* ) Mem_Allocate ( sizeof ( Context ), OPENVMTIL ) ;
     cntx->ContextNba = nba ;
     return cntx ;
@@ -115,7 +115,7 @@ CfrTil_Context_PopDelete ( CfrTil * cfrTil )
     Context * cntx = ( Context* ) _Stack_Pop ( cfrTil->ContextDataStack ) ;
     //Compiler_DeleteDebugInfo ( cntx->Compiler0 ) ;
     _Context_ = cfrTil->Context0 = cntx ;
-    _Q_->MemorySpace0->ContextSpace = cntx->ContextNba ;
+    _O_->MemorySpace0->ContextSpace = cntx->ContextNba ;
     NamedByteArray_Delete ( cnba, 0 ) ;
 }
 
@@ -192,7 +192,7 @@ _Context_IncludeFile ( Context * cntx, byte *filename, int64 interpretFlag )
         {
             ReadLiner * rl = cntx->ReadLiner0 ;
             rl->Filename = String_New ( filename, STRING_MEM ) ;
-            if ( _Q_->Verbosity > 2 ) _Printf ( ( byte* ) "\nincluding %s ...\n", filename ) ;
+            if ( _O_->Verbosity > 2 ) _Printf ( ( byte* ) "\nincluding %s ...\n", filename ) ;
             cntx->ReadLiner0->InputFile = file ;
             ReadLine_SetRawInputFunction ( rl, ReadLine_GetNextCharFromString ) ;
             SetState ( cntx->System0, ADD_READLINE_TO_HISTORY, false ) ;
@@ -206,7 +206,7 @@ _Context_IncludeFile ( Context * cntx, byte *filename, int64 interpretFlag )
 
             cntx->System0->IncludeFileStackNumber -- ;
             //if ( ! cntx->System0->IncludeFileStackNumber ) Ovt_AutoVarOff ( ) ;
-            if ( _Q_->Verbosity > 2 ) _Printf ( ( byte* ) "\n%s included\n", filename ) ;
+            if ( _O_->Verbosity > 2 ) _Printf ( ( byte* ) "\n%s included\n", filename ) ;
             OVT_MemList_FreeNBAMemory ( ( byte* ) "ObjectSpace", 1 * M, 1 ) ; // not able to do this yet ??
         }
         else

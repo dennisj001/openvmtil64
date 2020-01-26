@@ -23,7 +23,7 @@ _LO_Print_NonLambdaSymbol_ToString ( LambdaCalculus * lc, ListObject * l0, int64
         {
             if ( ( ! *l0->Lo_PtrToValue ) && l0->Lo_CfrTilWord )
             {
-                if ( _Q_->Verbosity > 2 ) LC_snprintf2 ( lc->buffer, " %s = 0x%016lx", l0->Lo_CfrTilWord->Lo_Name, ( int64 ) l0->Lo_CfrTilWord ) ;
+                if ( _O_->Verbosity > 2 ) LC_snprintf2 ( lc->buffer, " %s = 0x%016lx", l0->Lo_CfrTilWord->Lo_Name, ( int64 ) l0->Lo_CfrTilWord ) ;
                 else LC_sprintName ( lc->buffer, l0 ) ;
             }
             else if ( l0->W_LispAttributes & ( T_RAW_STRING ) ) LC_sprintString ( lc->buffer, *l0->Lo_PtrToValue ) ;
@@ -31,7 +31,7 @@ _LO_Print_NonLambdaSymbol_ToString ( LambdaCalculus * lc, ListObject * l0, int64
         }
         else
         {
-            if ( _Q_->Verbosity > 2 ) LC_sprintf_String ( lc->buffer, " nil: %s", l0->Lo_Name ) ;
+            if ( _O_->Verbosity > 2 ) LC_sprintf_String ( lc->buffer, " nil: %s", l0->Lo_Name ) ;
             else LC_sprintName ( lc->buffer, l0 ) ;
         }
     }
