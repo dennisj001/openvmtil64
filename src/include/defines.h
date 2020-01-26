@@ -400,10 +400,11 @@
 #define ABORT ( (uint64) 1 << 6 )
 #define QUIT ( (uint64) 1 << 5 )
 // don't use 4 because it is also SIGILL ??
+#define CFRTIL_RUN_INIT ( (uint64) 1 << 4 )
 #define STOP ( (uint64) 1 << 3 )
 #define BREAK ( (uint64) 1 << 2 )
-#define CONTINUE ( (uint64) 1 << 0 )
-#define ON ( (uint64) 1 )
+#define CONTINUE ( (uint64) 1 << 1 )
+#define ON ( (uint64) 1 << 0 )
 #define OFF ( 0 )
 #define PROMPT "-: "
 #define STARTUP_TIME_IT 8 // random number not 0 or 1

@@ -439,27 +439,21 @@ _OVT_MemListFree_CfrTilInternal ( )
 }
 
 void
-_MemList_FreeExactType ( dllist * list, int64 allocType )
+_NBAsMemList_FreeTypes ( int64 allocType, int64 exactFlag )
 {
-    dllist_Map2 ( list, ( MapFunction2 ) NBA_FreeChunkType, allocType, 1 ) ;
-}
-
-void
-_MemList_FreeVariousTypes ( dllist * list, int64 allocType )
-{
-    dllist_Map2 ( list, ( MapFunction2 ) NBA_FreeChunkType, allocType, 0 ) ;
+    dllist_Map2 ( &_Q_->MemorySpace0->NBAs, ( MapFunction2 ) NBA_FreeChunkType, allocType, exactFlag ) ;
 }
 
 void
 NBAsMemList_FreeExactType ( int64 allocType )
 {
-    _MemList_FreeExactType ( &_Q_->MemorySpace0->NBAs, allocType ) ;
+    _NBAsMemList_FreeTypes ( allocType, 1 ) ;
 }
 
 void
 NBAsMemList_FreeVariousTypes ( int64 allocType )
 {
-    _MemList_FreeVariousTypes ( &_Q_->MemorySpace0->NBAs, allocType ) ;
+    _NBAsMemList_FreeTypes ( allocType, 0 ) ;
 }
 
 void

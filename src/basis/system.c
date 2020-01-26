@@ -291,6 +291,27 @@ _CfrTil_GetSystemState_String1 ( byte *buf )
     return buf ;
 }
 
+byte *
+Convert_RestartCondtion ( int64 restartCondition )
+{
+    switch ( restartCondition )
+    {
+        case ( (uint64) 1 << 10) : return "INITIAL_START" ;
+        case ( (uint64) 1 << 9 ) : return "FULL_RESTART" ;
+        case ( (uint64) 1 << 8 ) : return "RESTART" ;
+        case ( (uint64) 1 << 7 ) : return "RESET_ALL" ;
+        case ( (uint64) 1 << 6 ) : return "ABORT" ;
+        case ( (uint64) 1 << 5 ) : return "QUIT" ;
+        case ( (uint64) 1 << 4 ) : return "CFRTIL_RUN_INIT" ;
+        case ( (uint64) 1 << 3 ) : return "STOP" ;
+        case ( (uint64) 1 << 2 ) : return "BREAK" ;
+        case ( (uint64) 1 << 1 ) : return "CONTINUE" ;
+        case ( (uint64) 1 << 0 ) : return "ON" ;
+        case ( (uint64) 0 ) : return "OFF" ;
+        default : return "Unknown Condition" ;
+    }
+}
+    
 void
 _CfrTil_SystemState_Print ( int64 pflag )
 {
@@ -306,6 +327,8 @@ _CfrTil_SystemState_Print ( int64 pflag )
     Boolean lo = Namespace_IsUsing ( ( byte* ) "Lisp" ) ;
     _Printf ( ( byte* ) " : Lisp %s", lo ? "on" : "off" ) ;
     _Printf ( ( byte* ) "\n%s : at %s", Compiling ? "compiling" : "interpreting", Context_Location ( ) ) ;
+    _Printf ( ( byte* ) "\nSignalExceptionsHandled = %d ; SigSegvs = %d ; Restarts = %d\nStartedTimes = %d ; RestartCondition = %s ; LastRestartCondtion = %s", 
+        _Q_->SignalExceptionsHandled, _Q_->SigSegvs, _Q_->Restarts, _Q_->StartedTimes, Convert_RestartCondtion (_Q_->LastRestartCondition), Convert_RestartCondtion (_Q_->RestartCondition) ) ;
     if ( pflag || ( _Q_->Verbosity > 1 ) )
     {
         OpenVmTil_Print_DataSizeofInfo ( pflag ) ;

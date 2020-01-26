@@ -952,7 +952,7 @@ typedef struct
     ByteArray * CodeByteArray ; // a variable
 
     PrintStateInfo *psi_PrintStateInfo ;
-    int64 SignalExceptionsHandled, RestartCondition, Signal, ExceptionCode, Console ;
+    int64 SignalExceptionsHandled, LastRestartCondition, RestartCondition, Signal, ExceptionCode, Console ;
 
     byte *InitString, *StartupString, *StartupFilename, *ErrorFilename, *VersionString, *ExceptionMessage, *ExceptionSpecialMessage, * ExceptionToken ;
     Word * ExceptionWord ;

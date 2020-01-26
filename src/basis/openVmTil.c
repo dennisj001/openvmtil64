@@ -1,5 +1,5 @@
 #include "../include/cfrtil64.h"
-#define VERSION ((byte*) "0.903.220" ) 
+#define VERSION ((byte*) "0.903.260" ) 
 // inspired by :: Logic/Foml (Foundations of Mathematical Logic by Haskell Curry), CT/Oop (Category Theory, Object Oriented Programming) 
 // C/C++/C#, Lisp, RPN/Lag : Reverse Polish Notation, (Left Associative Grammar), 
 // State Machines, Push Down Automata (PDA), Turing Machines :: 
@@ -7,7 +7,7 @@
 // (til : a toolkit for implementing languages (maybe even a compiler compiler) based on these ideas),
 OpenVmTil * _Q_ ;
 
-int 
+int
 main ( int argc, char * argv [ ] )
 {
     openvmtil ( argc, argv ) ;
@@ -23,16 +23,18 @@ openvmtil ( int64 argc, char * argv [ ] )
 void
 OpenVmTil_Run ( int64 argc, char * argv [ ] )
 {
-    int64 restartCondition = INITIAL_START, restarts = 0, sigSegvs = 0 ; 
+    int64 restartCondition = INITIAL_START, restarts = 0, sigSegvs = 0 ;
     while ( 1 )
     {
         OpenVmTil * ovt = _Q_ = _OpenVmTil_New ( _Q_, argc, argv ) ;
-        ovt->RestartCondition = restartCondition ;
+        OVT_SetRestartCondition ( ovt, restartCondition ) ;
         ovt->SigSegvs = sigSegvs ;
         ovt->Verbosity = 1 ;
         ovt->Restarts = ++ restarts ;
-        if ( ! sigsetjmp ( ovt->JmpBuf0, 0 ) ) CfrTil_Run ( ovt->OVT_CfrTil, ovt->RestartCondition ) ;
+        if ( ! sigsetjmp ( ovt->JmpBuf0, 0 ) ) // nb. siglongjmp always comes to beginning of the block 
+        CfrTil_Run ( ovt->OVT_CfrTil, ovt->RestartCondition ) ;
         restartCondition = ovt->RestartCondition ;
+        OVT_SetRestartCondition ( ovt, restartCondition ) ;
         sigSegvs = ovt->SigSegvs ;
     }
 }
@@ -47,11 +49,11 @@ _OpenVmTil_Allocate ( )
 }
 
 void
-OVT_RecycleAllWordsDebugInfo ()
+OVT_RecycleAllWordsDebugInfo ( )
 {
-    SetState ( _CfrTil_, (RT_DEBUG_ON|GLOBAL_SOURCE_CODE_MODE), false ) ;
+    SetState ( _CfrTil_, ( RT_DEBUG_ON | GLOBAL_SOURCE_CODE_MODE ), false ) ;
     OVT_MemListFree_CompilerTempObjects ( ) ;
-    _CfrTil_RecycleInit_Compiler_N_M_Node_WordList () ; 
+    _CfrTil_RecycleInit_Compiler_N_M_Node_WordList ( ) ;
 }
 
 void
@@ -87,7 +89,7 @@ Ovt_RunInit ( OpenVmTil * ovt )
 {
     //ovt->SignalExceptionsHandled = 0 ;
     ovt->StartedTimes ++ ;
-    ovt->RestartCondition = STOP ;
+    OVT_SetRestartCondition ( ovt, CFRTIL_RUN_INIT ) ;
 }
 
 void
@@ -216,12 +218,13 @@ OVT_PrintStartupOptions ( OpenVmTil * ovt )
 void
 OVT_GetStartupOptions ( OpenVmTil * ovt )
 {
-    int64 i ; byte * arg ;
+    int64 i ;
+    byte * arg ;
     for ( i = 0 ; i < ovt->Argc ; i ++ )
-    {   
+    {
         arg = ovt->Argv [ i ] ;
         if ( String_Equal ( "-m", arg ) ) ovt->TotalMemSizeTarget = ( atoi ( ovt->Argv [ ++ i ] ) * MB ) ;
-        // -s : a script file with "#! cfrTil -s" -- as first line includes the script file, the #! whole line is treated as a comment
+            // -s : a script file with "#! cfrTil -s" -- as first line includes the script file, the #! whole line is treated as a comment
         else if ( String_Equal ( "-f", arg ) || ( String_Equal ( "-s", arg ) ) ) ovt->StartupFilename = ( byte* ) ovt->Argv [ ++ i ] ;
         else if ( String_Equal ( "-e", arg ) ) ovt->StartupString = ( byte* ) ovt->Argv [ ++ i ] ;
     }
@@ -262,7 +265,7 @@ _OpenVmTil_New ( OpenVmTil * ovt, int64 argc, char * argv [ ] )
 #endif        
     _Q_ = ovt = _OpenVmTil_Allocate ( ) ;
 
-    ovt->RestartCondition = restartCondition ;
+    OVT_SetRestartCondition ( ovt, restartCondition ) ;
     ovt->Argc = argc ;
     ovt->Argv = argv ;
     ovt->StartedTimes = startedTimes ;

@@ -218,20 +218,26 @@ OVT_SigLongJump ( byte * restartMessage, sigjmp_buf * jb )
 
 }
 
+void
+OVT_SetRestartCondition ( OpenVmTil *ovt, int64 restartCondition )
+{
+    ovt->LastRestartCondition = ovt->RestartCondition ;
+    ovt->RestartCondition = restartCondition ;
+}
 // OVT_Throw needs to be reworked
 
 void
 OVT_Throw ( int signal, int64 restartCondition, Boolean pauseFlag )
 {
     sigjmp_buf * jb ;
-    _Q_->RestartCondition = restartCondition ;
+    OVT_SetRestartCondition ( _Q_, restartCondition ) ;
     if ( signal )
     {
         if ( ( signal == SIGTERM ) || ( signal == SIGKILL ) || ( signal == SIGQUIT ) || ( signal == SIGSTOP ) ) OVT_Exit ( ) ;
         else if ( signal == SIGBUS )
         {
             jb = & _Q_->JmpBuf0 ;
-            _Q_->RestartCondition = INITIAL_START ;
+            OVT_SetRestartCondition ( _Q_, INITIAL_START ) ;
             _OVT_SimpleFinalPause ( "\nOVT_Throw : signal == SIGBUS : restarting to INITIAL_START ... with any <key>" ) ;
             goto jump ; 
         }
@@ -244,9 +250,9 @@ OVT_Throw ( int signal, int64 restartCondition, Boolean pauseFlag )
                     jb = & _CfrTil_->JmpBuf0 ;
                     OpenVmTil_ShowExceptionInfo ( ) ;
                     pauseFlag ++ ;
-                    _Q_->RestartCondition = ABORT ;
+                    OVT_SetRestartCondition ( _Q_, ABORT ) ;
                 }
-                else _Q_->RestartCondition = INITIAL_START ;
+                else OVT_SetRestartCondition ( _Q_, INITIAL_START ) ;
                 if ( _Q_->SigSegvs > 3 ) _OVT_SigLongJump ( & _Q_->JmpBuf0 ) ; //OVT_Exit ( ) ;
                 else if ( ( _Q_->SigSegvs > 1 ) || ( restartCondition == INITIAL_START ) ) jb = & _Q_->JmpBuf0 ;
             }
