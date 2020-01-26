@@ -152,6 +152,7 @@ Debugger_PreStartStepping ( Debugger * debugger )
         {
             if ( Word_IsSyntactic ( word ) ) //&& ( ! GetState ( word, STEPPED ) ) )
             {
+                uint64 * svDsp = _Dsp_ ;
                 Interpreter * interp = _Interpreter_ ;
                 interp->w_Word = word ;
                 SetState ( _Debugger_, DBG_INFIX_PREFIX, true ) ;
@@ -159,9 +160,11 @@ Debugger_PreStartStepping ( Debugger * debugger )
                 Interpreter_DoInfixOrPrefixWord ( interp, word ) ; // 
                 DebugOn ; // so debug is on for Word_Eval and we can step thru it
                 SetState ( _Debugger_, DBG_INFIX_PREFIX, false ) ;
-                Word_Eval ( word ) ;
+                Dbg_Block_Eval ( word, word->Definition ) ;
+                _DEBUG_SHOW ( word, 0 ) ;
                 SetState ( word, STEPPED, true ) ;
                 SetState ( debugger, ( DBG_STEPPED | DBG_STEPPING ), false ) ; // no longjmp needed at end of Interpreter_Loop
+                _Set_DataStackPointers ( svDsp ) ;
                 return ; 
             }
             Debugger_SetupStepping ( debugger ) ;

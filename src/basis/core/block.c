@@ -16,12 +16,16 @@ Block_Eval ( block blck )
 }
 
 void
-Dbg_Block_Eval (Word * word, block blck)
+Dbg_Block_Eval ( Word * word, block blck )
 {
     if ( blck )
     {
-        _DEBUG_SETUP( word, 0, (byte*) blck, 1 ) ;
-        _Block_Eval ( blck ) ;
+        _DEBUG_SETUP ( word, 0, ( byte* ) blck, 1 ) ;
+        if ( ! GetState ( _Debugger_->w_Word, STEPPED ) )
+        {
+            _Block_Eval ( blck ) ;
+        }
+        SetState ( _Debugger_->w_Word, STEPPED, false ) ;
     }
 }
 

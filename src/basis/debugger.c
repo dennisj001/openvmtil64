@@ -30,6 +30,7 @@ Debugger_InterpreterLoop ( Debugger * debugger )
     if ( GetState ( debugger, ( DBG_SETUP_ADDRESS ) ) ) 
     {
         SetState ( debugger, ( DBG_SETUP_ADDRESS ), false ) ;
+        SetState ( debugger->w_Word, STEPPED, true ) ;
         _Set_DataStackPointers ( debugger->AddressModeSaveDsp ) ;
     }
     else if ( GetState ( debugger, DBG_STEPPED ) && ( ! Stack_Depth ( debugger->ReturnStack ) ) )
@@ -335,6 +336,31 @@ Debugger_Using ( Debugger * debugger )
 {
     CfrTil_Using ( ) ;
 }
+
+void
+Debugger_Continue ( Debugger * debugger )
+{
+    if ( GetState ( debugger, DBG_RUNTIME_BREAKPOINT ) || ( GetState ( debugger, DBG_STEPPING ) && debugger->DebugAddress ) )
+    {
+        debugger->Key = debugger->SaveKey ;
+        // continue stepping thru
+        SetState ( debugger, ( DBG_AUTO_MODE | DBG_CONTINUE_MODE ), true ) ;
+        while ( debugger->DebugAddress )
+        {
+            if ( GetState ( debugger, ( DBG_AUTO_MODE | DBG_CONTINUE_MODE ) ) ) Debugger_Step ( debugger ) ;
+            else return ;
+        }
+        SetState_TrueFalse ( debugger, DBG_STEPPED, DBG_STEPPING ) ;
+        SetState ( debugger, DBG_INTERPRET_LOOP_DONE, true ) ;
+        SetState ( debugger, DBG_AUTO_MODE | DBG_CONTINUE_MODE, false ) ;
+    }
+    else if ( debugger->w_Word )
+    {
+        Debugger_Eval ( debugger ) ;
+        Debugger_Off ( debugger, 1 ) ;
+    }
+}
+
 // by 'eval' we stop debugger->Stepping and //continue thru this word as if we hadn't stepped
 
 void
@@ -422,30 +448,6 @@ void
 Debugger_Registers ( Debugger * debugger )
 {
     Debugger_CpuState_CheckSaveShow ( debugger ) ;
-}
-
-void
-Debugger_Continue ( Debugger * debugger )
-{
-    if ( GetState ( debugger, DBG_RUNTIME_BREAKPOINT ) || ( GetState ( debugger, DBG_STEPPING ) && debugger->DebugAddress ) )
-    {
-        debugger->Key = debugger->SaveKey ;
-        // continue stepping thru
-        SetState ( debugger, ( DBG_AUTO_MODE | DBG_CONTINUE_MODE ), true ) ;
-        while ( debugger->DebugAddress )
-        {
-            if ( GetState ( debugger, ( DBG_AUTO_MODE | DBG_CONTINUE_MODE ) ) ) Debugger_Step ( debugger ) ;
-            else return ;
-        }
-        SetState_TrueFalse ( debugger, DBG_STEPPED, DBG_STEPPING ) ;
-        SetState ( debugger, DBG_INTERPRET_LOOP_DONE, true ) ;
-        SetState ( debugger, DBG_AUTO_MODE | DBG_CONTINUE_MODE, false ) ;
-    }
-    else if ( debugger->w_Word )
-    {
-        Debugger_Eval ( debugger ) ;
-        Debugger_Off ( debugger, 1 ) ;
-    }
 }
 
 void
