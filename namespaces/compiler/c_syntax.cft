@@ -355,7 +355,7 @@ _assert ( bt.c123, 2147483647 ) ;
 sp
 void btest ( byteTest bt, byte i8, int16 i16, int32 i32, int64 i64 ) { bt.b123 = i8 ; bt.f123 = i16 ; bt.c123 = i32 ; bt.e123 = i64 ; }
 'abt byteTest new ;
-d: btest ( abt 46 456 234567 2345566 ) ;
+btest ( abt 46 456 234567 2345566 ) ;
 sp
 pwi btest ;
 void btest1 ( byteTest bt, byte i8 ) { bt.bb123 = i8 ; }
@@ -374,7 +374,7 @@ _assert ( abt.f123 456 ) ;
 _assert ( abt.b123 46 ) ;
 _assert ( abt.c123 234567 ) ;
 _assert ( abt.e123 2345566 ) ;
-notUsing: bt abt byteTest _byteTest ;
+//notUsing: bt abt byteTest _byteTest ;
 #endif
 sp
 int

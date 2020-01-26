@@ -1,5 +1,5 @@
 #include "../include/cfrtil64.h"
-#define VERSION ((byte*) "0.903.460" ) 
+#define VERSION ((byte*) "0.903.470" ) 
 // inspired by :: Logic/Foml (Foundations of Mathematical Logic by Haskell Curry), CT/Oop (Category Theory, Object Oriented Programming) 
 // C/C++/C#, Lisp, RPN/Lag : Reverse Polish Notation, (Left Associative Grammar), 
 // State Machines, Push Down Automata (PDA), Turing Machines :: 
@@ -23,16 +23,22 @@ openvmtil ( int64 argc, char * argv [ ] )
 void
 OpenVmTil_Run ( int64 argc, char * argv [ ] )
 {
+    OpenVmTil * ovt ;
     int64 restartCondition = INITIAL_START, restarts = 0, sigSegvs = 0 ;
     while ( 1 )
     {
-        OpenVmTil * ovt = _O_ = _OpenVmTil_New ( _O_, argc, argv ) ;
+        if ( _O_ ) 
+        {
+            sigSegvs = _O_->SigSegvs ;
+            restarts = ++ _O_->Restarts ;
+        }
+        ovt = _O_ = _OpenVmTil_New ( _O_, argc, argv ) ;
         OVT_SetRestartCondition ( ovt, restartCondition ) ;
-        ovt->SigSegvs = sigSegvs ++ ;
+        ovt->SigSegvs = sigSegvs ;
         ovt->Verbosity = 1 ;
-        ovt->Restarts = restarts ++ ;
+        ovt->Restarts = restarts ;
         if ( ! sigsetjmp ( ovt->JmpBuf0, 0 ) ) // nb. siglongjmp always comes to beginning of the block 
-        CfrTil_Run ( ovt->OVT_CfrTil, ovt->RestartCondition ) ;
+            CfrTil_Run ( ovt->OVT_CfrTil, ovt->RestartCondition ) ;
         restartCondition = ovt->RestartCondition ;
         OVT_SetRestartCondition ( ovt, restartCondition ) ;
         //sigSegvs = ovt->SigSegvs ;

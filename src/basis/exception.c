@@ -43,7 +43,7 @@ OpenVmTil_ShowExceptionInfo ( )
     {
         if ( _O_->ExceptionMessage )
         {
-            _Printf ( "\n%s : %s\n", 
+            _Printf ( "\n%s : %s\n",
                 _O_->ExceptionMessage, _O_->ExceptionSpecialMessage ? _O_->ExceptionSpecialMessage : Context_Location ( ) ) ;
         }
         if ( ( _O_->SigSegvs < 2 ) && ( _O_->SignalExceptionsHandled ++ < 2 ) && _CfrTil_ )
@@ -85,7 +85,7 @@ OVT_Pause ( byte * prompt, int64 signalExceptionsHandled )
             _ReadLine_PrintfClearTerminalLine ( ) ;
             switch ( key )
             {
-                case 'x': case 'X': 
+                case 'x': case 'X':
                 {
                     byte * msg = ( byte * ) "Exit cfrTil from pause?" ;
                     _Printf ( ( byte* ) "\n%s : 'x' to e(x)it cfrTil : any other <key> to continue%s", msg, c_gd ( "\n-> " ) ) ;
@@ -93,7 +93,7 @@ OVT_Pause ( byte * prompt, int64 signalExceptionsHandled )
                     if ( ( key == 'x' ) || ( key == 'X' ) ) OVT_Exit ( ) ;
                     goto done ;
                 }
-                case 'q': 
+                case 'q':
                 {
                     byte * msg = ( byte * ) "Quit to interpreter loop from pause?" ;
                     _Printf ( ( byte* ) "\n%s : 'q' to (q)uit : any other key to continue%s", msg, c_gd ( "\n-> " ) ) ;
@@ -101,7 +101,7 @@ OVT_Pause ( byte * prompt, int64 signalExceptionsHandled )
                     if ( ( key == 'q' ) || ( key == 'Q' ) ) DefaultColors, CfrTil_Quit ( ) ;
                     goto done ;
                 }
-                case 'd': 
+                case 'd':
                 {
                     if ( Is_DebugOn )
                     {
@@ -116,13 +116,13 @@ OVT_Pause ( byte * prompt, int64 signalExceptionsHandled )
                     }
                     goto done ;
                 }
-                case 'c': 
+                case 'c':
                 {
                     // if ( signalsHandled ) ;
                     rtrn = 1 ;
                     goto done ;
                 }
-                case 't': 
+                case 't':
                 {
                     CfrTil_PrintDataStack ( ) ;
                     break ;
@@ -132,7 +132,7 @@ OVT_Pause ( byte * prompt, int64 signalExceptionsHandled )
                 {
                     continue ;
                 }
-                case 'i': 
+                case 'i':
                 {
                     // interpret in context
                     CfrTil_DoPrompt ( ) ;
@@ -148,8 +148,8 @@ OVT_Pause ( byte * prompt, int64 signalExceptionsHandled )
                 default:
                 {
                     // new context
-                    Boolean svDbgState = GetState ( _CfrTil_, DEBUG_MODE|_DEBUG_SHOW_ ) ;
-                    CfrTil_DebugOff ( ) ; 
+                    Boolean svDbgState = GetState ( _CfrTil_, DEBUG_MODE | _DEBUG_SHOW_ ) ;
+                    CfrTil_DebugOff ( ) ;
                     Context * cntx = CfrTil_Context_PushNew ( _CfrTil_ ) ;
                     if ( ( key == '/' ) || ( key == '\\' ) || ( key == 'i' ) ) key = 0 ;
                     ReadLine_Init ( cntx->ReadLiner0, _CfrTil_Key ) ;
@@ -163,7 +163,7 @@ OVT_Pause ( byte * prompt, int64 signalExceptionsHandled )
                     }
                     SetState ( cntx, AT_COMMAND_LINE, false ) ;
                     CfrTil_Context_PopDelete ( _CfrTil_ ) ;
-                    SetState ( _CfrTil_, DEBUG_MODE|_DEBUG_SHOW_, svDbgState ) ;
+                    SetState ( _CfrTil_, DEBUG_MODE | _DEBUG_SHOW_, svDbgState ) ;
                     //goto done ;
                 }
             }
@@ -231,30 +231,28 @@ OVT_Throw ( int signal, int64 restartCondition, Boolean pauseFlag )
     if ( signal )
     {
         if ( ( signal == SIGTERM ) || ( signal == SIGKILL ) || ( signal == SIGQUIT ) || ( signal == SIGSTOP ) || ( signal == SIGHUP ) ) OVT_Exit ( ) ;
-        if ( signal == SIGBUS )
+        else if ( signal == SIGSEGV ) _O_->SigSegvs ++ ;
+        else if ( signal == SIGBUS )
         {
             jb = & _O_->JmpBuf0 ;
             OVT_SetRestartCondition ( _O_, INITIAL_START ) ;
             _OVT_SimpleFinalPause ( "\nOVT_Throw : signal == SIGBUS : restarting to INITIAL_START ... with any <key>" ) ;
-            goto jump ; 
+            goto jump ;
         }
-        else
+        if ( ( restartCondition > QUIT ) || ( _O_->Signal == SIGFPE ) )
         {
-            if ( ( restartCondition > QUIT ) || ( _O_->Signal == SIGFPE ) ) 
+            if ( ++ _O_->SigSegvs < 2 )
             {
-                if ( ++ _O_->SigSegvs < 2 )
-                {
-                    jb = & _CfrTil_->JmpBuf0 ;
-                    OpenVmTil_ShowExceptionInfo ( ) ;
-                    pauseFlag ++ ;
-                    OVT_SetRestartCondition ( _O_, ABORT ) ;
-                }
-                else OVT_SetRestartCondition ( _O_, INITIAL_START ) ;
-                if ( _O_->SigSegvs > 3 ) _OVT_SigLongJump ( & _O_->JmpBuf0 ) ; //OVT_Exit ( ) ;
-                else if ( ( _O_->SigSegvs > 1 ) || ( restartCondition == INITIAL_START ) ) jb = & _O_->JmpBuf0 ;
+                jb = & _CfrTil_->JmpBuf0 ;
+                OpenVmTil_ShowExceptionInfo ( ) ;
+                pauseFlag ++ ;
+                OVT_SetRestartCondition ( _O_, ABORT ) ;
             }
-            else jb = & _CfrTil_->JmpBuf0 ;
+            else OVT_SetRestartCondition ( _O_, INITIAL_START ) ;
+            if ( _O_->SigSegvs > 3 ) _OVT_SigLongJump ( & _O_->JmpBuf0 ) ; //OVT_Exit ( ) ;
+            else if ( ( _O_->SigSegvs > 1 ) || ( restartCondition == INITIAL_START ) ) jb = & _O_->JmpBuf0 ;
         }
+        else jb = & _CfrTil_->JmpBuf0 ;
     }
     else
     {
@@ -262,8 +260,8 @@ OVT_Throw ( int signal, int64 restartCondition, Boolean pauseFlag )
         else jb = & _CfrTil_->JmpBuf0 ;
     }
     //OVT_SetExceptionMessage ( _O_ ) ;
-    
-    snprintf ( Buffer_Data_Cleared (_O_->ThrowBuffer), BUFFER_SIZE, "\n%s\n%s %s from %s -> ...", _O_->ExceptionMessage, 
+
+    snprintf ( Buffer_Data_Cleared ( _O_->ThrowBuffer ), BUFFER_SIZE, "\n%s\n%s %s from %s -> ...", _O_->ExceptionMessage,
         ( jb == & _CfrTil_->JmpBuf0 ) ? "reseting cfrTil" : "restarting OpenVmTil",
         ( _O_->Signal == SIGSEGV ) ? ": SIGSEGV" : "", ( _O_->SigSegvs < 2 ) ? Context_Location ( ) : ( byte* ) "" ) ;
     _OVT_SimpleFinalPause ( _O_->ThrowBuffer->Data ) ;
@@ -322,7 +320,8 @@ CfrTil_Exception ( int64 exceptionCode, byte * message, int64 restartCondition )
     byte * b = Buffer_Data ( _CfrTil_->ScratchB1 ) ;
     AlertColors ;
     _O_->ExceptionCode = exceptionCode ;
-    printf ( "\n\nCfrTil_Exception at %s\n", Context_Location () ) ; fflush (stdout) ;
+    printf ( "\n\nCfrTil_Exception at %s\n", Context_Location ( ) ) ;
+    fflush ( stdout ) ;
     switch ( exceptionCode )
     {
         case CASE_NOT_LITERAL_ERROR:
@@ -514,7 +513,7 @@ Error ( byte * emsg, byte * smsg, uint64 state )
     AlertColors ;
     if ( ( state ) & PAUSE )
     {
-        CfrTil_NewLine () ;
+        CfrTil_NewLine ( ) ;
         CfrTil_Location ( ) ;
         _Printf ( emsg, smsg ) ;
         Pause ( ) ;
@@ -546,6 +545,7 @@ OVT_SimpleFinalPause ( )
 }
 
 #if 0
+
 void
 OVT_SetExceptionMessage ( OpenVmTil * ovt )
 {
