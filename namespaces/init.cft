@@ -394,7 +394,7 @@ stringMacrosOn
 // rtw : recycle some test/debug words 
 : rtw "test" purgeAll "hi" purge "hey" purge "heey" purgeAll "hey1" purge "hey2" purge "heey1" purge "heey2" purge "sp" purge "moe" purge ;
 : tCfrTil "namespaces/ninit.cft" include ; // namespaces init
-: tc tCfrTil rtw ;
+: tc lispOff tCfrTil rtw ;
 : x64 "namespaces/compiler/x64.cft" include ; 
 : bx "namespaces/test/bigNum.test.cft" include ;
 : TODO ( str ) nl nl pdl nl str @ adps location nl pdl nl nl { dbgOnVar @ } { sp } if2 ;; //pause ;;

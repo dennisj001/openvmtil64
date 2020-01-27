@@ -100,6 +100,7 @@ CfrTil_system3 ( )
     _Compile_INT80 ( ) ;
     _Compile_Stack_PushReg ( DSP, ACC ) ;
 }
+
 void
 _CfrTil_WordAccounting_Print ( byte * functionName )
 {
@@ -113,7 +114,7 @@ void
 CfrTil_WordAccounting ( byte * functionName )
 {
     if ( _CfrTil_->FindWordCount > _CfrTil_->FindWordMaxCount ) _CfrTil_->FindWordMaxCount = _CfrTil_->FindWordCount ;
-    if ( _O_->Verbosity > 4 ) 
+    if ( _O_->Verbosity > 4 )
         _CfrTil_WordAccounting_Print ( functionName ) ;
 }
 
@@ -138,7 +139,7 @@ _CfrTil_GetSystemState_String0 ( byte * buf )
     strcat ( ( char* ) buf, "c_syntax is " ) ;
     if ( GetState ( _Context_, C_SYNTAX ) ) strcat ( ( char* ) buf, "on, " ) ;
     else strcat ( ( char* ) buf, "off, " ) ;
-    if ( !GetState ( _Context_, PREFIX_MODE|INFIX_MODE ) ) strcat ( ( char* ) buf, "postfixMode is on" ) ;
+    if ( ! GetState ( _Context_, PREFIX_MODE | INFIX_MODE ) ) strcat ( ( char* ) buf, "postfixMode is on" ) ;
 #if 0    
     strcat ( ( char* ) buf, "LHS is " ) ;
     if ( GetState ( _Context_, C_LHS ) ) strcat ( ( char* ) buf, "on, " ) ;
@@ -170,22 +171,22 @@ Convert_RestartCondtion ( int64 restartCondition )
 {
     switch ( restartCondition )
     {
-        case ( (uint64) 1 << 10) : return "INITIAL_START" ;
-        case ( (uint64) 1 << 9 ) : return "FULL_RESTART" ;
-        case ( (uint64) 1 << 8 ) : return "RESTART" ;
-        case ( (uint64) 1 << 7 ) : return "RESET_ALL" ;
-        case ( (uint64) 1 << 6 ) : return "ABORT" ;
-        case ( (uint64) 1 << 5 ) : return "QUIT" ;
-        case ( (uint64) 1 << 4 ) : return "CFRTIL_RUN_INIT" ;
-        case ( (uint64) 1 << 3 ) : return "STOP" ;
-        case ( (uint64) 1 << 2 ) : return "BREAK" ;
-        case ( (uint64) 1 << 1 ) : return "CONTINUE" ;
-        case ( (uint64) 1 << 0 ) : return "ON" ;
-        case ( (uint64) 0 ) : return "OFF" ;
-        default : return "Unknown Condition" ;
+        case ( ( uint64 ) 1 << 10 ): return "INITIAL_START" ;
+        case ( ( uint64 ) 1 << 9 ): return "FULL_RESTART" ;
+        case ( ( uint64 ) 1 << 8 ): return "RESTART" ;
+        case ( ( uint64 ) 1 << 7 ): return "RESET_ALL" ;
+        case ( ( uint64 ) 1 << 6 ): return "ABORT" ;
+        case ( ( uint64 ) 1 << 5 ): return "QUIT" ;
+        case ( ( uint64 ) 1 << 4 ): return "CFRTIL_RUN_INIT" ;
+        case ( ( uint64 ) 1 << 3 ): return "STOP" ;
+        case ( ( uint64 ) 1 << 2 ): return "BREAK" ;
+        case ( ( uint64 ) 1 << 1 ): return "CONTINUE" ;
+        case ( ( uint64 ) 1 << 0 ): return "ON" ;
+        case ( ( uint64 ) 0 ): return "OFF" ;
+        default: return "Unknown Condition" ;
     }
 }
-    
+
 void
 _CfrTil_SystemState_Print ( int64 pflag )
 {
@@ -201,8 +202,7 @@ _CfrTil_SystemState_Print ( int64 pflag )
     Boolean lo = Namespace_IsUsing ( ( byte* ) "Lisp" ) ;
     _Printf ( ( byte* ) " : Lisp %s", lo ? "on" : "off" ) ;
     _Printf ( ( byte* ) "\n%s : at %s", Compiling ? "compiling" : "interpreting", Context_Location ( ) ) ;
-    _Printf ( ( byte* ) "\nSignalExceptionsHandled = %d ; SigSegvs = %d ; Restarts = %d\nStartedTimes = %d ; RestartCondition = %s ; LastRestartCondtion = %s", 
-        _O_->SignalExceptionsHandled, _O_->SigSegvs, _O_->Restarts, _O_->StartedTimes, Convert_RestartCondtion (_O_->LastRestartCondition), Convert_RestartCondtion (_O_->RestartCondition) ) ;
+    OVT_ExceptionState_Print ( ) ;
     if ( pflag || ( _O_->Verbosity > 1 ) )
     {
         OpenVmTil_Print_DataSizeofInfo ( pflag ) ;
@@ -309,8 +309,8 @@ _CfrTil_Source ( Word *word, int64 addToHistoryFlag )
         {
             _Word_ShowSourceCode ( word ) ; // source code has newlines for multiline history
             if ( aword ) //&& ( ! String_Equal ( word->Name, aword->Name ) ) ) 
-            {   
-                _Word_ShowSourceCode ( aword ) ; 
+            {
+                _Word_ShowSourceCode ( aword ) ;
             }
             if ( addToHistoryFlag ) _OpenVmTil_AddStringToHistoryList ( word->W_SourceCode ) ;
             if ( word->S_WordData->Filename ) _Printf ( ( byte* ) "\nSource code file location of %s : \"%s\" : %d.%d :: we are now at : %s", name, word->S_WordData->Filename, word->S_WordData->LineNumber, word->W_TokenEnd_ReadLineIndex, Context_IsInFile ( _Context_ ) ? Context_Location ( ) : ( byte* ) "command line" ) ;

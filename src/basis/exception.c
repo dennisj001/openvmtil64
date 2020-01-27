@@ -18,7 +18,7 @@ _OpenVmTil_ShowExceptionInfo ( )
         if ( ! word )
         {
             if ( _O_->SigAddress ) word = Word_GetFromCodeAddress ( ( byte* ) _O_->SigAddress ) ;
-            //else word = _Context_->CurrentEvalWord ? _Context_->CurrentEvalWord : _Context_->LastEvalWord;
+            else word = _Context_->CurrentEvalWord ? _Context_->CurrentEvalWord : _Context_->LastEvalWord ;
             debugger->w_Word = word ;
         }
     }
@@ -55,6 +55,34 @@ OpenVmTil_ShowExceptionInfo ( )
     int64 rtrn = OVT_Pause ( 0, _O_->SignalExceptionsHandled ) ;
     _O_->Signal = 0 ;
     return rtrn ;
+}
+
+void
+OVT_PauseInterpret ( Context * cntx, byte key )
+{
+    Boolean svDbgState = GetState ( _CfrTil_, DEBUG_MODE | _DEBUG_SHOW_ ) ;
+    Boolean svcm = GetState ( cntx->Compiler0, ( COMPILE_MODE ) ) ;
+    Set_CompileMode ( false ) ;
+    DebugOff ;
+    ReadLine_Init ( cntx->ReadLiner0, _CfrTil_Key ) ;
+    OpenVmTil_AddStringToHistoryOn ( ) ;
+    SetState ( cntx, AT_COMMAND_LINE, true ) ;
+    if ( key >= ' ' )
+    {
+        do
+        {
+            Context_DoPrompt ( cntx ) ;
+            _ReadLine_GetLine ( cntx->ReadLiner0, 0 ) ;
+            if ( ReadLine_PeekNextChar ( cntx->ReadLiner0 ) < ' ' ) break ; // '\n', <esc>, etc.
+            Interpret_ToEndOfLine ( cntx->Interpreter0 ) ;
+            CfrTil_NewLine ( ) ;
+        }
+        while ( 1 ) ;
+    }
+    SetState ( cntx, AT_COMMAND_LINE, false ) ;
+    ReadLine_SetRawInputFunction ( cntx->ReadLiner0, ReadLine_GetNextCharFromString ) ;
+    SetState ( cntx->Compiler0, ( COMPILE_MODE ), svcm ) ;
+    SetState ( _CfrTil_, DEBUG_MODE | _DEBUG_SHOW_, svDbgState ) ;
 }
 
 int64
@@ -135,36 +163,17 @@ OVT_Pause ( byte * prompt, int64 signalExceptionsHandled )
                 case 'i':
                 {
                     // interpret in context
-                    CfrTil_DoPrompt ( ) ;
-                    if ( ( key == '/' ) || ( key == '\\' ) || ( key == 'i' ) ) key = 0 ;
-                    _CfrTil_PrintChar ( key ) ;
-                    ReadLine_Init ( _Context_->ReadLiner0, _CfrTil_Key ) ;
-                    OpenVmTil_AddStringToHistoryOn ( ) ;
-                    SetState ( _Context_, AT_COMMAND_LINE, true ) ;
-                    Interpret_ToEndOfLine ( _Interpreter_ ) ;
-                    ReadLine_SetRawInputFunction ( _Context_->ReadLiner0, ReadLine_GetNextCharFromString ) ;
+                    Context * cntx = _Context_ ;
+                    OVT_PauseInterpret ( cntx, key ) ;
                     continue ;
                 }
                 default:
                 {
                     // new context
-                    Boolean svDbgState = GetState ( _CfrTil_, DEBUG_MODE | _DEBUG_SHOW_ ) ;
-                    CfrTil_DebugOff ( ) ;
                     Context * cntx = CfrTil_Context_PushNew ( _CfrTil_ ) ;
-                    if ( ( key == '/' ) || ( key == '\\' ) || ( key == 'i' ) ) key = 0 ;
-                    ReadLine_Init ( cntx->ReadLiner0, _CfrTil_Key ) ;
-                    OpenVmTil_AddStringToHistoryOn ( ) ;
-                    SetState ( cntx, AT_COMMAND_LINE, true ) ;
-                    Context_DoPrompt ( cntx ) ;
-                    if ( key >= ' ' )
-                    {
-                        _ReadLine_GetLine ( cntx->ReadLiner0, key ) ;
-                        Interpret_ToEndOfLine ( _Interpreter_ ) ; // just one line in a new context
-                    }
-                    SetState ( cntx, AT_COMMAND_LINE, false ) ;
+                    OVT_PauseInterpret ( cntx, key ) ;
                     CfrTil_Context_PopDelete ( _CfrTil_ ) ;
-                    SetState ( _CfrTil_, DEBUG_MODE | _DEBUG_SHOW_, svDbgState ) ;
-                    //goto done ;
+                    continue ;
                 }
             }
         }
@@ -236,7 +245,7 @@ OVT_Throw ( int signal, int64 restartCondition, Boolean pauseFlag )
         {
             jb = & _O_->JmpBuf0 ;
             OVT_SetRestartCondition ( _O_, INITIAL_START ) ;
-            _OVT_SimpleFinalPause ( "\nOVT_Throw : signal == SIGBUS : restarting to INITIAL_START ... with any <key>" ) ;
+            _OVT_SimpleFinalPause ( "\nOVT_Throw : signal == SIGBUS : restarting to INITIAL_START ... with any <key>", true ) ;
             goto jump ;
         }
         if ( ( restartCondition > QUIT ) || ( _O_->Signal == SIGFPE ) )
@@ -264,7 +273,7 @@ OVT_Throw ( int signal, int64 restartCondition, Boolean pauseFlag )
     snprintf ( Buffer_Data_Cleared ( _O_->ThrowBuffer ), BUFFER_SIZE, "\n%s\n%s %s from %s -> ...", _O_->ExceptionMessage,
         ( jb == & _CfrTil_->JmpBuf0 ) ? "reseting cfrTil" : "restarting OpenVmTil",
         ( _O_->Signal == SIGSEGV ) ? ": SIGSEGV" : "", ( _O_->SigSegvs < 2 ) ? Context_Location ( ) : ( byte* ) "" ) ;
-    _OVT_SimpleFinalPause ( _O_->ThrowBuffer->Data ) ;
+    _OVT_SimpleFinalPause ( _O_->ThrowBuffer->Data, ( _O_->Signal != SIGSEGV ) ) ;
     if ( pauseFlag && ( _O_->SignalExceptionsHandled < 2 ) && ( _O_->SigSegvs < 2 ) ) OVT_Pause ( 0, _O_->SignalExceptionsHandled ) ;
 jump:
     _OVT_SigLongJump ( jb ) ;
@@ -308,7 +317,7 @@ OpenVmTil_SignalAction ( int signal, siginfo_t * si, void * uc ) //nb. void ptr 
     }
     else if ( _O_->SigSegvs )
     {
-        OVT_SimpleFinalPause ( ) ;
+        OVT_SeriousErrorPause ( ) ;
         _OVT_SigLongJump ( & _O_->JmpBuf0 ) ;
     }
     else OVT_Throw ( _O_->Signal, _O_->RestartCondition, 0 ) ;
@@ -529,17 +538,25 @@ Error ( byte * emsg, byte * smsg, uint64 state )
 }
 
 void
-_OVT_SimpleFinalPause ( byte * msg )
+OVT_ExceptionState_Print ( )
 {
-    printf ( "%s", msg ) ;
-    fflush ( stdout ) ;
-    Key ( ) ;
+    _Printf ( ( byte* ) "\nSignalExceptionsHandled = %d ; SigSegvs = %d ; Restarts = %d\nStartedTimes = %d ; RestartCondition = %s ; LastRestartCondtion = %s",
+        _O_->SignalExceptionsHandled, _O_->SigSegvs, _O_->Restarts, _O_->StartedTimes, Convert_RestartCondtion ( _O_->LastRestartCondition ),
+        Convert_RestartCondtion ( _O_->RestartCondition ) ) ;
 }
 
 void
-OVT_SimpleFinalPause ( )
+_OVT_SimpleFinalPause ( byte * msg, Boolean useKey )
 {
-    _OVT_SimpleFinalPause ( "\n!!Serious Error : SIGSEGV while handling a SIGSEGV : hit any key to continue full restart!!\n:!!> " ) ;
+    printf ( "%s", msg ) ;
+    fflush ( stdout ) ;
+    if ( useKey ) Key ( ) ;
+}
+
+void
+OVT_SeriousErrorPause ( )
+{
+    _OVT_SimpleFinalPause ( "\n!!Serious Error : SIGSEGV while handling a SIGSEGV : hit any key to continue full restart!!\n:!!> ", true ) ;
     fflush ( stdout ) ;
     Key ( ) ;
 }

@@ -27,7 +27,7 @@ Debugger_InterpreterLoop ( Debugger * debugger )
     debugger->LastPreSetupWord = debugger->w_Word ;
     SetState ( debugger, DBG_STACK_OLD, true ) ;
     SetState ( debugger, DBG_STEPPING, false ) ;
-    if ( GetState ( debugger, ( DBG_SETUP_ADDRESS ) ) ) 
+    if ( GetState ( debugger, ( DBG_SETUP_ADDRESS ) ) )
     {
         SetState ( debugger, ( DBG_SETUP_ADDRESS ), false ) ;
         SetState ( debugger->w_Word, STEPPED, true ) ;
@@ -35,7 +35,7 @@ Debugger_InterpreterLoop ( Debugger * debugger )
     }
     else if ( GetState ( debugger, DBG_STEPPED ) && ( ! Stack_Depth ( debugger->ReturnStack ) ) )
     {
-        siglongjmp ( _Context_->JmpBuf0, 1 ) ; 
+        siglongjmp ( _Context_->JmpBuf0, 1 ) ;
     }
 }
 
@@ -173,24 +173,29 @@ Debugger_Init ( Debugger * debugger, Cpu * cpu, Word * word, byte * address )
 void
 Debugger_Off ( Debugger * debugger, int64 debugOffFlag )
 {
-    _Debugger_Init ( debugger ) ;
-    SetState ( debugger->cs_Cpu, CPU_SAVED, false ) ;
-    SetState ( _Debugger_, DBG_BRK_INIT | DBG_ACTIVE | DBG_STEPPING | DBG_PRE_DONE | DBG_AUTO_MODE | DBG_EVAL_AUTO_MODE, false ) ;
-    if ( debugOffFlag ) DebugOff ;
+    if ( Is_DebugOn )
+    {
+        _Debugger_Init ( debugger ) ;
+        SetState ( debugger->cs_Cpu, CPU_SAVED, false ) ;
+        SetState ( _Debugger_, DBG_BRK_INIT | DBG_ACTIVE | DBG_STEPPING | DBG_PRE_DONE | DBG_AUTO_MODE | DBG_EVAL_AUTO_MODE, false ) ;
+        if ( debugOffFlag ) DebugOff ;
+    }
 }
 
 void
 Debugger_On ( Debugger * debugger )
 {
-    if ( ! Is_DebugOn ) Debugger_Init ( debugger, debugger->cs_Cpu, 0, 0 ) ;
+    if ( ! Is_DebugOn ) 
+    {
+        Debugger_Init ( debugger, debugger->cs_Cpu, 0, 0 ) ;
+        DebugOn ;
+        DebugShow_On ;
+    }
     SetState_TrueFalse ( _Debugger_, DBG_MENU | DBG_INFO, DBG_STEPPING | DBG_AUTO_MODE | DBG_PRE_DONE | DBG_INTERPRET_LOOP_DONE ) ;
     debugger->LastPreSetupWord = 0 ;
     debugger->LastScwi = 0 ;
     debugger->PreHere = 0 ;
-    //if ( ! Is_DebugModeOn ) 
     Debugger_Set_StartHere ( debugger ) ;
-    DebugOn ;
-    DebugShow_On ;
 }
 
 // remember : the debugger is not calling and returning with call/ret instructions 

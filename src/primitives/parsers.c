@@ -11,14 +11,18 @@ void
 CfrTil_TokenQID ( )
 {
     byte * token ;
+    Word * word ;
     while ( 1 )
     {
         token = Lexer_ReadToken ( _Lexer_ ) ;
-        Word * word = _Interpreter_TokenToWord ( _Interpreter_, token, -1, -1 ) ;
+        word = _Interpreter_TokenToWord ( _Interpreter_, token, -1, -1 ) ;
         Boolean isForwardDotted = ReadLiner_IsTokenForwardDotted ( _ReadLiner_, word->W_RL_Index ) ;
         if ( ( isForwardDotted ) || ( token[0] == '.' )) Word_Eval ( word ) ;
+            //Interpreter_DoWord ( _Interpreter_, word, -1, -1 ) ; // Word_Eval ( word ) ;
         else break ;
     }
+    if ( GetState ( _Lexer_, LEXER_END_OF_LINE ) ) SetState ( _Interpreter_, END_OF_LINE, true ) ; 
+    //Interpreter_SetLexState ( _Interpreter_ ) ;
     DataStack_Push ( ( int64 ) token ) ;
 }
 

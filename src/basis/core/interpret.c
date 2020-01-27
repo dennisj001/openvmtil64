@@ -29,7 +29,7 @@ Interpreter_InterpretAToken ( Interpreter * interp, byte * token, int64 tsrli, i
         word = _Interpreter_TokenToWord ( interp, token, tsrli, scwi ) ;
         Interpreter_DoWord ( interp, word, tsrli, scwi ) ;
     }
-    else SetState ( _Context_->Lexer0, LEXER_END_OF_LINE, true ) ;
+    Interpreter_SetLexState ( interp ) ; 
     return word ;
 }
 
@@ -155,9 +155,11 @@ Word_IsSyntactic ( Word * word )
 void
 Interpreter_SetLexState ( Interpreter * interp )
 {
-    if ( GetState ( _Lexer_, LEXER_END_OF_LINE ) ) ; //SetState ( interp, END_OF_LINE, true ) ;
-    if ( interp->LastLexedChar == 0 ) SetState ( interp, END_OF_STRING, true ) ;
-    else if ( interp->LastLexedChar == eof ) SetState ( interp, END_OF_FILE, true ) ;
-    else if ( interp->LastLexedChar == '\n' ) SetState ( interp, END_OF_LINE, true ) ;
+    //if ( GetState ( _Lexer_, LEXER_END_OF_LINE ) ) SetState ( _Interpreter_, END_OF_LINE, true ) ; 
+    byte llc = interp->LastLexedChar ;
+    if ( llc == 0 ) SetState ( interp, END_OF_STRING, true ) ;
+    else if ( llc == eof ) SetState ( interp, END_OF_FILE, true ) ;
+    //else if ( ( llc == '\n' ) || GetState ( interp->Lexer0, LEXER_END_OF_LINE ) ) SetState ( interp, END_OF_LINE, true ) ;
+    else if ( llc == '\n' ) SetState ( interp, END_OF_LINE, true ) ;
 }
 

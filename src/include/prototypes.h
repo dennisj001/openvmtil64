@@ -516,6 +516,7 @@ void CfrTil_WordAccounting(byte *functionName);
 byte *_CfrTil_GetSystemState_String0(byte *buf);
 byte *_CfrTil_GetSystemState_String1(byte *buf);
 byte *Convert_RestartCondtion(int64 restartCondition);
+void OVT_ExceptionState_Print(void);
 void _CfrTil_SystemState_Print(int64 pflag);
 void __CfrTil_Dump(byte *address, int64 number, int64 dumpMod);
 void _CfrTil_Source(Word *word, int64 addToHistoryFlag);
@@ -1526,8 +1527,8 @@ void CfrTil_WarmInit(void);
 void CfrTil_RestartInit(void);
 void CfrTil_FullRestart(void);
 void Error(byte *emsg, byte *smsg, uint64 state);
-void _OVT_SimpleFinalPause(byte *msg);
-void OVT_SimpleFinalPause(void);
+void _OVT_SimpleFinalPause(byte *msg, Boolean useKey);
+void OVT_SeriousErrorPause(void);
 /* src/basis/compiler/locals.c */
 int64 _ParameterVar_Offset(Word *word, int64 numberOfArgs, Boolean frameFlag);
 int64 Compiler_ParameterVar_Offset(Compiler *compiler, Word *word);
