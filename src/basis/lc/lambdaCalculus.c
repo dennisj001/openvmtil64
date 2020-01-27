@@ -482,7 +482,7 @@ _LC_Init ( LambdaCalculus * lc )
 {
     if ( lc )
     {
-        _LC_ = lc ; // some function use _LC_
+        _LC_ = lc ; // some functions use _LC_
         lc->LispNamespace = Namespace_Find ( ( byte* ) "Lisp" ) ;
         lc->LispDefinesNamespace = Namespace_FindOrNew_SetUsing ( ( byte* ) "LispDefines", 0, 1 ) ;
         lc->LispTempNamespace = Namespace_FindOrNew_SetUsing ( ( byte* ) "LispTemp", 0, 1 ) ;

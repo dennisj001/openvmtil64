@@ -806,6 +806,8 @@ Tree_Map_Namespaces_State_2Args ( dllist * list, uint64 state, MapSymbolFunction
         d0 ( _CfrTil_->FindWordCount ++ ) ;
         if ( Is_NamespaceType ( word ) )
         {
+            if ( String_Equal (word->Name, "Lisp")) 
+                _Printf ((byte*)"") ;
             if ( word->State & state ) mf ( ( Symbol* ) word, one, two ) ;
             Tree_Map_Namespaces_State_2Args ( word->W_List, state, mf, one, two ) ;
         }

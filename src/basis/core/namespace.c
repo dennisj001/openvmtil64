@@ -126,7 +126,7 @@ void
 _Namespace_DoNamespace ( Namespace * ns )
 {
     Context * cntx = _Context_ ;
-    if ( ! Lexer_IsTokenForwardDotted ( cntx->Lexer0 ) ) _Namespace_ActivateAsPrimary ( ns ) ;
+    if ( ! Lexer_IsTokenForwardDotted ( cntx->Lexer0 ) ) _Namespace_ActivateAsPrimary ( ns ) ; //Namespace_SetState ( ns, USING ) ; //
     else Finder_SetQualifyingNamespace ( cntx->Finder0, ns ) ;
     if ( ! GetState ( cntx->Compiler0, ( LC_ARG_PARSING | ARRAY_MODE ) ) ) cntx->Interpreter0->BaseObject = 0 ;
 }

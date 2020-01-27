@@ -649,9 +649,6 @@
 #define FORCE_RUN 2
 
 // Word - Namespace State flags
-#define NOT_USING ( (uint64) 1 << 0 )
-#define USING ( (uint64) 1 << 1 )
-#define ANY (NOT_USING|USING)
 #define TREED ( (uint64) 1 << 2 )
 //#define LC_NOT_COMPILED ( (uint64) 1 << 3 )
 #define COMPILED_INLINE ( (uint64) 1 << 4 )
@@ -670,6 +667,9 @@
 #define STEPPED ( (uint64) 1 << 17 )
 #define W_SOURCE_CODE_MODE ( (uint64) 1 << 18 )
 #define W_INITIALIZED ( (uint64) 1 << 19 )
+#define NOT_USING ( (uint64) 1 << 24 )
+#define USING ( (uint64) 1 << 25 )
+#define ANY (NOT_USING|USING)
 
 // Lisp State flags 
 #define LC_PRINT_VALUE          ( (uint64) 1 << 0 )

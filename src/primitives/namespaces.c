@@ -10,49 +10,6 @@
  *      The first word found within the ordered USING list will be used.
  */
 
-// "root" -- ?? is this all the namespaces we want/need in this list ??
-// no ! -- this needs updating
-
-#if 0
-
-void
-CfrTil_Namespaces_Root ( )
-{
-    //dllist_Map1 ( _Context->System0->Words->Lo_List, ( MapFunction1 ) _Namespace_DoSetState, USING ) ;
-    _Namespace_MapAny_2Args ( ( MapSymbolFunction2 ) _Namespace_DoSetState, USING, 0 ) ;
-    Namespace * ns1 = _Namespace_Find ( ( byte* ) "Root", 0, 1 ) ;
-    Namespace * ns2 = _Namespace_Find ( ( byte* ) "Namespace", 0, 1 ) ;
-    Namespace * ns3 = _Namespace_Find ( ( byte* ) "Io", 0, 1 ) ;
-    Namespace * ns4 = _Namespace_Find ( ( byte* ) "System", 0, 1 ) ;
-    Namespace * ns5 = _Namespace_Find ( ( byte* ) "OpenVmTil", 0, 1 ) ;
-    Namespace * ns6 = _Namespace_Find ( ( byte* ) "Logic", 0, 1 ) ;
-    Namespace * ns7 = _Namespace_Find ( ( byte* ) "Combinators", 0, 1 ) ;
-    Namespace * ns8 = _Namespace_Find ( ( byte* ) "Compiler", 0, 1 ) ;
-    Namespace * ns9 = _Namespace_Find ( ( byte* ) "Interpreter", 0, 1 ) ;
-    Namespace * ns10 = _Namespace_Find ( ( byte* ) "Int", 0, 1 ) ;
-    Namespace * ns11 = _Namespace_Find ( ( byte* ) "Stack", 0, 1 ) ;
-    Namespace * ns12 = _Namespace_Find ( ( byte* ) "Word", 0, 1 ) ;
-
-    //dllist_Map1 ( _Context->System0->Words->Lo_List, ( MapFunction1 ) _Namespace_DoSetState, NOT_USING ) ;
-    //_Namespace_Map_2 ( dllist * list, cell state, MapSymbolFunction2 mf, cell one, cell two )
-    _Namespace_MapAny_2Args ( ( MapSymbolFunction2 ) _Namespace_DoSetState, NOT_USING, 0 ) ;
-
-    Namespace_SetState ( ns1, USING ) ;
-    Namespace_SetState ( ns2, USING ) ;
-    Namespace_SetState ( ns3, USING ) ;
-    Namespace_SetState ( ns4, USING ) ;
-    Namespace_SetState ( ns5, USING ) ;
-    Namespace_SetState ( ns6, USING ) ;
-    Namespace_SetState ( ns7, USING ) ;
-    Namespace_SetState ( ns8, USING ) ;
-    Namespace_SetState ( ns9, USING ) ;
-    Namespace_SetState ( ns10, USING ) ;
-    Namespace_SetState ( ns11, USING ) ;
-    Namespace_SetState ( ns12, USING ) ;
-    //
-}
-#endif
-
 void
 Do_Namespace_WithStatus_2 ( dlnode * node, MapFunction2 nsf, int64 nsStateFlag, int64 one, int64 two )
 {
