@@ -146,8 +146,8 @@ Boolean
 Word_IsSyntactic ( Word * word )
 {
     if ( ( ! GetState ( _Debugger_, DBG_INFIX_PREFIX ) )
-        && ( ( word->W_TypeAttributes & ( WT_PREFIX | WT_C_PREFIX_RTL_ARGS ) ) || (Lexer_IsWordPrefixing ( _Lexer_, word )
-        || ( ( word->W_TypeAttributes == WT_INFIXABLE ) && ( GetState ( _Context_, INFIX_MODE ) ) ) ) ))
+        && ( ( word->W_TypeAttributes & ( WT_PREFIX | WT_C_PREFIX_RTL_ARGS ) ) || ( Lexer_IsWordPrefixing ( _Lexer_, word )
+        || ( ( word->W_TypeAttributes == WT_INFIXABLE ) && ( GetState ( _Context_, INFIX_MODE ) ) ) ) ) )
         return true ;
     else return false ;
 }
@@ -155,7 +155,7 @@ Word_IsSyntactic ( Word * word )
 void
 Interpreter_SetLexState ( Interpreter * interp )
 {
-    if ( GetState ( _Lexer_, LEXER_END_OF_LINE ) ) SetState ( interp, END_OF_LINE, true ) ;
+    if ( GetState ( _Lexer_, LEXER_END_OF_LINE ) ) ; //SetState ( interp, END_OF_LINE, true ) ;
     if ( interp->LastLexedChar == 0 ) SetState ( interp, END_OF_STRING, true ) ;
     else if ( interp->LastLexedChar == eof ) SetState ( interp, END_OF_FILE, true ) ;
     else if ( interp->LastLexedChar == '\n' ) SetState ( interp, END_OF_LINE, true ) ;

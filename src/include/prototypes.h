@@ -787,7 +787,7 @@ Word *_Namespace_FirstOnUsingList(void);
 void _Namespace_ResetFromInNamespace(Namespace *ns);
 void _Namespace_AddToNamespacesTail_ResetFromInNamespace(Namespace *ns);
 void Namespaces_PrintList(Namespace *ns, byte *insert);
-void Namespace_SetState(Namespace *ns, uint64 state);
+void Namespace_SetState(Namespace *ns, uint64 state, Boolean setInNsFlag);
 void _Namespace_AddToUsingList(Namespace *ns);
 void _Namespace_ActivateAsPrimary(Namespace *ns);
 void Namespace_ActivateAsPrimary(byte *name);

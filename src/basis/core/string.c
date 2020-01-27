@@ -335,17 +335,18 @@ byte *
 _String_ConvertStringToBackSlash ( byte * dst, byte * src, int64 nchars )
 {
     int64 i, j, len, quoted = 1 ; // counting the initial standard quote (raw string?)
-    dst[0] = 0 ; //init
+    dst[0] = 0 ; //init dst 
     if ( src )
     {
         if ( nchars == - 1 ) len = Strlen ( ( char* ) src ) ;
         else len = nchars ;
     }
     else len = 0 ;
-    for ( i = 0, j = 0 ; (src [i] && (i < len)) ; i ++ )
+    for ( i = 0, j = 0 ; (i < len) ; i ++ )
     {
         byte c = src [ i ] ;
 
+        if ( c == 0 ) break ;
         if ( c == '"' )
         {
             if ( i > 0 )

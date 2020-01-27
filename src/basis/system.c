@@ -276,8 +276,7 @@ _CfrTil_Source ( Word *word, int64 addToHistoryFlag )
         }
         else if ( word->W_MorphismAttributes & ALIAS )
         {
-            aword = word->W_AliasOf ;
-            //aword = Word_GetFromCodeAddress ( ( byte* ) ( block ) word->Definition ) ;
+            aword = Word_UnAlias ( word ) ; //word->W_AliasOf ;
             if ( aword ) _Printf ( ( byte* ) "%s alias for %s", name, ( char* ) c_gd ( aword->Name ) ) ;
         }
         else if ( word->W_MorphismAttributes & CPRIMITIVE )
@@ -309,9 +308,8 @@ _CfrTil_Source ( Word *word, int64 addToHistoryFlag )
         if ( word->S_WordData )
         {
             _Word_ShowSourceCode ( word ) ; // source code has newlines for multiline history
-            if ( aword && ( ! String_Equal ( word->Name, aword->Name ) ) ) 
+            if ( aword ) //&& ( ! String_Equal ( word->Name, aword->Name ) ) ) 
             {   
-                //_Context_->CurrentDisassemblyWord = aword ;
                 _Word_ShowSourceCode ( aword ) ; 
             }
             if ( addToHistoryFlag ) _OpenVmTil_AddStringToHistoryList ( word->W_SourceCode ) ;

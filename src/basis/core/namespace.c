@@ -193,15 +193,22 @@ Namespaces_PrintList ( Namespace * ns, byte * insert )
 }
 
 void
-Namespace_SetState ( Namespace * ns, uint64 state )
+Namespace_SetState ( Namespace * ns, uint64 state, Boolean setInNsFlag )
 {
     if ( ns )
     {
         d0 ( if ( Is_DebugModeOn ) Namespaces_PrintList ( ns, "Before" ) ) ;
         _Namespace_SetState ( ns, state ) ;
-        if ( state == USING ) _Namespace_AddToNamespacesHead_SetAsInNamespace ( ns ) ; // make it first on the list
+        if ( state == USING )
+        {
+            //_Namespace_AddToNamespacesHead_SetAsInNamespace ( ns ) ; // make it first on the list
+            _Namespace_AddToNamespacesHead ( ns ) ;
+            if ( setInNsFlag ) _CfrTil_SetAsInNamespace ( ns ) ;
+        }
         else _Namespace_AddToNamespacesTail_ResetFromInNamespace ( ns ) ;
-        d0 ( if ( Is_DebugModeOn ) Namespaces_PrintList ( ns, "After" ) ) ;
+        d0 ( if ( Is_DebugModeOn )
+        {
+            Namespaces_PrintList ( ns, "After" ) ; CfrTil_Using ( ) ; } ) ;
     }
 }
 
@@ -223,14 +230,15 @@ _Namespace_AddToUsingList ( Namespace * ns )
     {
         ns = ( Word* ) _Stack_Pop ( stack ) ;
         if ( ns->WL_OriginalWord ) ns = ns->WL_OriginalWord ; //_Namespace_Find ( ns->Name, 0, 0 ) ; // this is needed because of Compiler_PushCheckAndCopyDuplicates
-        Namespace_SetState ( ns, USING ) ;
+        Namespace_SetState ( ns, USING, 0 ) ;
     }
     if ( ns != svNs )
     {
         //CfrTil_Using () ;
-        Namespace_SetState ( svNs, USING ) ;
+        Namespace_SetState ( svNs, USING, 1 ) ;
         //CfrTil_Using () ;
     }
+    else _Namespace_SetState ( ns, USING ) ;
 }
 
 void
@@ -418,14 +426,14 @@ Namespace_FindOrNew_SetUsing ( byte * name, Namespace * containingNs, int64 setU
     if ( ! containingNs ) containingNs = _CfrTil_->Namespaces ;
     Namespace * ns = _Namespace_Find ( name, containingNs, 0 ) ;
     if ( ! ns ) ns = Namespace_New ( name, containingNs ) ;
-    if ( setUsingFlag ) Namespace_SetState ( ns, USING ) ;
+    if ( setUsingFlag ) Namespace_SetState ( ns, USING, 1 ) ;
     return ns ;
 }
 
 Namespace *
 _Namespace_FindOrNew_Local ( Stack * nsStack )
 {
-    int64 d = Stack_Depth ( _Context_->Compiler0->BlockStack ) ; //nsStack ) ;
+    int64 d = Stack_Depth ( _Context_->Compiler0->BlockStack ) ; 
     byte bufferData [ 32 ], *name = ( byte* ) bufferData ;
     sprintf ( ( char* ) name, "locals_%ld", d - 1 ) ; // 1 : BlockStack starts at 1 
     Namespace * ns = _Namespace_Find ( name, _CfrTil_->Namespaces, 0 ) ;
@@ -434,8 +442,7 @@ _Namespace_FindOrNew_Local ( Stack * nsStack )
         ns = Namespace_New ( name, _CfrTil_->Namespaces ) ;
         Stack_Push ( nsStack, ( int64 ) ns ) ; // nb. this is where the the depth increase
     }
-    //if ( ns == (Namespace*) 0x00007ffff70a50b8) _Printf ((byte*)"") ;
-    Namespace_SetState ( ns, USING ) ;
+    Namespace_SetState ( ns, USING, 1 ) ;
     _Namespace_ActivateAsPrimary ( ns ) ;
     return ns ;
 }
