@@ -62,10 +62,11 @@ OVT_PauseInterpret ( Context * cntx, byte key )
 {
     Boolean svDbgState = GetState ( _CfrTil_, DEBUG_MODE | _DEBUG_SHOW_ ) ;
     Boolean svcm = GetState ( cntx->Compiler0, ( COMPILE_MODE ) ) ;
+    Boolean svath = GetState ( cntx->ReadLiner0, ADD_TO_HISTORY ) ;
+    OpenVmTil_AddStringToHistoryOn ( ) ;
     Set_CompileMode ( false ) ;
     DebugOff ;
     ReadLine_Init ( cntx->ReadLiner0, _CfrTil_Key ) ;
-    OpenVmTil_AddStringToHistoryOn ( ) ;
     SetState ( cntx, AT_COMMAND_LINE, true ) ;
     if ( key >= ' ' )
     {
@@ -81,6 +82,7 @@ OVT_PauseInterpret ( Context * cntx, byte key )
     }
     SetState ( cntx, AT_COMMAND_LINE, false ) ;
     ReadLine_SetRawInputFunction ( cntx->ReadLiner0, ReadLine_GetNextCharFromString ) ;
+    SetState ( _Context_->ReadLiner0, ADD_TO_HISTORY, svath ) ;
     SetState ( cntx->Compiler0, ( COMPILE_MODE ), svcm ) ;
     SetState ( _CfrTil_, DEBUG_MODE | _DEBUG_SHOW_, svDbgState ) ;
 }
