@@ -85,7 +85,7 @@ void
 _Word_Finish ( Word * word )
 {
     DObject_Finish ( word ) ;
-    CfrTil_FinishSourceCode ( _CfrTil_, word ) ;
+    CfrTil_Finish_WordSourceCode ( _CfrTil_, word ) ;
     CfrTil_TypeStackReset ( ) ;
     _CfrTil_->LastFinished_Word = word ;
     _CfrTil_FinishWordDebugInfo ( word ) ;
@@ -110,11 +110,10 @@ _Word_Add ( Word * word, int64 addToInNs, Namespace * addToNs )
 {
     Namespace * ins = 0, *ns ;
     if ( addToNs ) Namespace_DoAddWord ( addToNs, word ) ;
-    else if ( addToInNs ) //&& ins )
+    else if ( addToInNs ) 
     {
         if ( ! ( word->W_ObjectAttributes & ( LITERAL ) ) )
         {
-            //Namespace * ins = _CfrTil_Namespace_InNamespaceGet ( ) ;
             Namespace * ins = _CfrTil_InNamespace ( ) ; //_CfrTil_Namespace_InNamespaceGet ( ) ;
             Namespace_DoAddWord ( ins, word ) ;
         }

@@ -243,7 +243,7 @@
 #define DOT                 OBJECT_OPERATOR              
 
 //#define SOURCE_CODE_WORD    ( (uint64) 1 << 23 ) 
-//#define TEMP_WORD           ( (uint64) 1 << 24 ) 
+#define COMMENT             ( (uint64) 1 << 24 ) 
 #define NO_OP_WORD          ( (uint64) 1 << 25 ) 
 #define SYNTACTIC           ( (uint64) 1 << 26 ) 
 //#define DO_DOES             ( (uint64) 1 << 27 ) 
@@ -628,6 +628,7 @@
 #define C_CONDITIONAL_IN ( (uint64) 1 << 32 )
 #define C_TYPEDEC_WITH_EQUAL ( (uint64) 1 << 33 )
 #define ASM_MODE ( (uint64) 1 << 34 )
+#define TDSCI_PARSING ( (uint64) 1 << 35 )
 
 // Context flags
 #define C_SYNTAX ( (uint64) 1 << 20 )

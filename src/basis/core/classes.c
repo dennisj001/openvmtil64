@@ -9,14 +9,36 @@ CfrTil_ClassStructureEnd ( void )
 }
 
 void
-CfrTil_ClassStructureBegin ( void )
+CfrTil_CloneStructureBegin ( void )
 {
-    _CfrTil_Parse_ClassStructure ( 0 ) ;
+    TypeDefStructCompileInfo * tdsci = _Compiler_->C_Tdsci = TypeDefStructCompileInfo_New ( ) ;
+    SetState ( tdsci, TDSCI_CLONE_FLAG, true ) ;
+    Parse_Structure ( tdsci ) ;
+    //Parse_A_Typedef_Field ( tdsci ) ; 
 }
 
 void
-CfrTil_CloneStructureBegin ( void )
+Class_Size_Set ( Namespace * classNs, int64 size )
 {
-    _CfrTil_Parse_ClassStructure ( 1 ) ;
+    _Namespace_VariableValueSet ( classNs, ( byte* ) "size", size ) ;
+    classNs->ObjectByteSize = size ;
 }
 
+void
+_ClassTypedef ( Boolean cloneFlag )
+{
+    Namespace * classNs ;
+    TypeDefStructCompileInfo * tdsci = _Compiler_->C_Tdsci = TypeDefStructCompileInfo_New ( ) ;
+    tdsci->Tdsci_StructureUnion_Namespace = classNs = tdsci->BackgroundNamespace ;
+    Parse_StructOrUnion_Type ( tdsci, TDSCI_STRUCT|(cloneFlag ? TDSCI_CLONE_FLAG : 0) ) ;
+    Class_Size_Set ( classNs, tdsci->Tdsci_TotalSize ) ;
+    classNs->W_ObjectAttributes |= STRUCTURE ;    
+    SetState ( _Compiler_, TDSCI_PARSING, true ) ;
+}
+
+void
+CfrTil_ClassTypedef ( )
+{
+    CfrTil_PushToken_OnTokenList ( "{" ) ;
+    _ClassTypedef ( 0 ) ;
+}

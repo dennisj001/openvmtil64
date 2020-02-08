@@ -10,9 +10,9 @@ _dllist_PushNew_M_Slot_Node ( dllist* list, int64 allocType, int64 typeCode, int
     va_list args ;
     va_start ( args, m_slots ) ;
     dobject * dobj = dobject_Allocate ( typeCode, m_slots, allocType ) ;
-    for ( i = 0 ; i < m_slots ; i ++ ) 
+    for ( i = 0 ; i < m_slots ; i ++ )
     {
-        value = va_arg ( args, int64 ) ; ;
+        value = va_arg ( args, int64 ) ;
         dobj->do_iData[i] = value ;
     }
     va_end ( args ) ;
@@ -202,12 +202,13 @@ _dlnode_New ( uint64 allocType )
 #define _dlnode_Previous( node ) node ? node->beforeNode : 0 
 #define Is_NotHeadOrTailNode( node ) ( node && _dlnode_Next ( node ) && _dlnode_Previous ( node ) ) ? node : 0
 //#define Is_NotHeadNode( node ) ( node && _dlnode_Previous ( node ) ) ? node : 0
-dlnode * 
-Is_NotHeadNode( dlnode * anode ) 
+
+dlnode *
+Is_NotHeadNode ( dlnode * anode )
 {
     if ( anode && anode->beforeNode )
     {
-        return anode ; 
+        return anode ;
     }
     else return 0 ;
 }
@@ -804,9 +805,14 @@ Tree_Map_Namespaces_State_2Args ( dllist * list, uint64 state, MapSymbolFunction
         nextNode = dlnode_Next ( node ) ;
         word = ( Word * ) node ;
         d0 ( _CfrTil_->FindWordCount ++ ) ;
+        //if ( Is_DebugOn ) _Printf ( ( byte* ) "\nTree_Map_Namespaces_State_2Args : %s", word->Name ) ;
         if ( Is_NamespaceType ( word ) )
         {
-            if ( word->State & state ) mf ( ( Symbol* ) word, one, two ) ;
+            if ( word->State & state )
+            {
+                //if ( Is_DebugOn ) _Printf ( ( byte* ) "\nTree_Map_Namespaces_State_2Args : pre-mf : %s", word->Name ) ;
+                mf ( ( Symbol* ) word, one, two ) ;
+            }
             Tree_Map_Namespaces_State_2Args ( word->W_List, state, mf, one, two ) ;
         }
     }
@@ -865,7 +871,7 @@ Tree_Map_State_OneArg ( uint64 state, MapFunction_1 mf, int64 one )
         {
             nextWord = ( Word* ) dlnode_Next ( ( node* ) word ) ;
             _CfrTil_->FindWordCount ++ ;
-            if ( mf ( ( Symbol* ) word, one ) ) 
+            if ( mf ( ( Symbol* ) word, one ) )
                 return word ;
             else if ( Is_NamespaceType ( word ) )
             {

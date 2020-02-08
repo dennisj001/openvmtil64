@@ -33,9 +33,9 @@ CfrTil_ParenthesisComment ( )
     while ( 1 )
     {
         int64 inChar = ReadLine_PeekNextChar ( lexer->ReadLiner0 ) ;
-        if ( ( inChar == - 1 ) || ( inChar == eof ) ) break ;
+        if ( (!inChar) || ( inChar == - 1 ) || ( inChar == eof ) ) break ;
         char * token = ( char* ) Lexer_ReadToken ( lexer ) ;
-        if ( strcmp ( token, "*/" ) == 0 ) return ;
+        if ( token && ( strcmp ( token, "*/" ) == 0) ) return ;
     }
     if ( Compiling ) SetState ( lexer, ( ADD_TOKEN_TO_SOURCE | ADD_CHAR_TO_SOURCE ), svState ) ;
 }

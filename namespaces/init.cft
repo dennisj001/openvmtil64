@@ -181,6 +181,8 @@ type int ; int.size = 8 ;
 type long ; long.size = 8 ;
 type quad ; quad.size = 16 ;
 type Boolean ; Boolean.size = 1 ;
+type Pointer ; Pointer.size = 8 ;
+type block ; block.size = 8 ;
 c_syntaxOff
 
 BigNum
@@ -390,7 +392,7 @@ sp
 #if startupMacros
 stringMacrosOn
 #endif
-
+Root
 // rtw : recycle some test/debug words 
 : rtw "test" purgeAll "hi" purge "hey" purge "heey" purgeAll "hey1" purge "hey2" purge "heey1" purge "heey2" purge "sp" purge "moe" purge ;
 : tCfrTil "namespaces/ninit.cft" include ; // namespaces init
@@ -399,6 +401,87 @@ stringMacrosOn
 : bx "namespaces/test/bigNum.test.cft" include ;
 : TODO ( str ) nl nl pdl nl str @ adps location nl pdl nl nl { dbgOnVar @ } { sp } if2 ;; //pause ;;
 lispOff
+
+#if 0
+: wtdinclude "namespaces/wordTypeDef.cft" include ;
+// test
+d: wtdinclude 
+#endif
+#if 0
+// test byte size objects
+c_syntaxOn
+typedef struct _byteTest 
+{
+    byte a8_123 ; 
+    int64 a64_123 ;
+    byte b8_123 ;
+    byte c8_123 ; // test comment
+    union
+    {
+        int64 u64_123 ;
+        int32 u32_123 ;
+        int8 u8_123 ;
+    } ; //size = 8 
+    int32 a32_123 ;
+    byte d8_123 ;
+    int16 a16_123 ; // size = 26
+} byteTest, abyteTest ;
+'bt byteTest new ;
+ps ( "\nbt.size =" ) ; p ( bt.size ) ;
+bt.a8_123 = 1 ; bt.b8_123 = 2 ; bt.a32_123 = 2147483647 ; bt.d8_123 = 4 ; bt.c8_123 = 3 ; bt.a16_123 = 0x1234 ; bt.a64_123 = 0x1234456789abcd ; dump ( bt, bt.size ) ; 
+var ( 'btt ) ;
+bt.a16_123 = 0x498 ;  
+void bttt ( byteTest bt ) 
+{ 
+    btt = bt.a8_123 ; bt.a8_123 = 36 ; bt.a16_123 = 0x1234 ; bt.a32_123 = 0x12345678 ; bt.a64_123 = 0x123456789abcdef0 ; //pause
+    printf ( "\nbt.a8_123 = %c ", bt.a8_123 ) ; 
+    printf ( "\nbt.a8_123 = %c ", bt.a8_123 ) ; 
+    printf ( "\nbt.a16_123 = 0x%x ", bt.a16_123 ) ; 
+    printf ( "\nbt.a32_123 = 0x%x ", bt.a32_123 ) ; 
+    printf ( "\nbt.a64_123 = 0x%lx ", bt.a64_123 ) ; 
+    printf ("\nbtt = %x", btt ) ; 
+    dump ( &bt, bt.size ) ; 
+    p ( bt.a8_123 ) ;
+} 
+'bt byteTest new ;
+bttt ( bt ) ; pwi bttt //pause // error size not considered
+bt.a8_123 = 255 ; dump ( bt, bt.size ) ; //pause
+'bt byteTest new ;
+binary () ; p ( bt.b8_123 ) ; decimal () ; bt.b8_123 = 123 ; binary () ; p ( bt.b8_123 ) ; decimal () ; //pause
+p (bt.a8_123) ; p (bt.b8_123) ; p (bt.a32_123) ; p (bt.d8_123) ; 
+bt.a8_123 = 1 ; bt.b8_123 = 2 ; bt.a32_123 = 2147483647 ; bt.d8_123 = 4 ; bt.c8_123 = 3 ; bt.a16_123 = 1234 ; bt.a64_123 = 0x123456789abcdef ;
+dump ( bt, bt.size ) ; //pause
+d: bt.a8_123 1 _assert 
+_assert ( bt.a8_123 1 ) ;
+bt.a32_123.size 4 _assert
+bt.a64_123.size 8 _assert
+_assert ( bt.a32_123, 2147483647 ) ;
+sp
+void btest ( byteTest bt, byte i8, int16 i16, int32 i32, int64 i64 ) { bt.b8_123 = i8 ; bt.a16_123 = i16 ; bt.a32_123 = i32 ; bt.a64_123 = i64 ; }
+'abt byteTest new ;
+btest ( abt 46 456 234567 2345566 ) ;
+sp
+pwi btest ;
+void btest1 ( byteTest bt, byte i8 ) { d: bt.c8_123 = i8 ; }
+btest1 ( abt, 0x42 ) ;
+pwi btest1 //pause
+dump ( abt abt.size ) ;
+_assert ( abt.c8_123, 0x42 ) ;
+pwi btest1 ;
+p ( abt.size ) ; 
+p ( bt.size ) ; 
+dump ( abt abt.size ) ;
+bt.a8_123 1 _assert 
+bt.a32_123.size 4 _assert
+bt.a64_123.size 8 _assert
+_assert ( bt.a32_123, 2147483647 ) ;
+_assert ( abt.a16_123 456 ) ; 
+_assert ( abt.b8_123 46 ) ;
+_assert ( abt.a32_123 234567 ) ;
+_assert ( abt.a64_123 2345566 ) ;
+d: notUsing: byteTest _byteTest ;
+c_syntaxOff
+#endif
 
 // === controls ===
 Root 

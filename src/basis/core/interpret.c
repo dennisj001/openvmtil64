@@ -9,9 +9,7 @@ _Interpreter_TokenToWord ( Interpreter * interp, byte * token, int64 tsrli, int6
     if ( token )
     {
         interp->Token = token ;
-        word = Finder_Word_FindUsing ( interp->Finder0, token, 0 ) ;
-        if ( word && interp->Compiler0->AutoVarTypeNamespace && ( word->W_ObjectAttributes & NAMESPACE_VARIABLE ) ) word = 0 ;
-        if ( ! word ) word = Lexer_ObjectToken_New ( interp->Lexer0, token, tsrli, scwi ) ;
+        word = Lexer_ObjectToken_New ( interp->Lexer0, token, tsrli, scwi ) ;
         Word_SetTsrliScwi ( word, tsrli, scwi ) ;
         DEBUG_SETUP ( word ) ;
         _Context_->CurrentTokenWord = word ; // dbg flag
@@ -29,7 +27,7 @@ Interpreter_InterpretAToken ( Interpreter * interp, byte * token, int64 tsrli, i
         word = _Interpreter_TokenToWord ( interp, token, tsrli, scwi ) ;
         Interpreter_DoWord ( interp, word, tsrli, scwi ) ;
     }
-    Interpreter_SetLexState ( interp ) ; 
+    Interpreter_SetLexState ( interp ) ;
     return word ;
 }
 
@@ -159,7 +157,7 @@ Interpreter_SetLexState ( Interpreter * interp )
     byte llc = interp->LastLexedChar ;
     if ( llc == 0 ) SetState ( interp, END_OF_STRING, true ) ;
     else if ( llc == eof ) SetState ( interp, END_OF_FILE, true ) ;
-    //else if ( ( llc == '\n' ) || GetState ( interp->Lexer0, LEXER_END_OF_LINE ) ) SetState ( interp, END_OF_LINE, true ) ;
+        //else if ( ( llc == '\n' ) || GetState ( interp->Lexer0, LEXER_END_OF_LINE ) ) SetState ( interp, END_OF_LINE, true ) ;
     else if ( llc == '\n' ) SetState ( interp, END_OF_LINE, true ) ;
 }
 

@@ -61,7 +61,7 @@ CfrTil_C_Syntax_On ( )
     Context * cntx = _Context_ ;
     //if ( ! GetState ( cntx, C_SYNTAX | PREFIX_MODE | INFIX_MODE ) )
     {
-        Compiler_Get_C_BackgroundNamespace ( cntx->Compiler0 ) ;
+        Compiler_Save_C_BackgroundNamespace ( cntx->Compiler0 ) ;
         SetState ( cntx, C_SYNTAX | PREFIX_MODE | INFIX_MODE, true ) ;
         Namespace_DoNamespace_Name ( ( byte* ) "C" ) ;
         Namespace_DoNamespace_Name ( ( byte* ) "PrefixCombinators" ) ;
@@ -213,16 +213,19 @@ CfrTil_While_PrefixCombinators ( )
 }
 
 int64
-_CfrTil_TypedefStruct_Parse ( void )
+_CfrTil_Parse_Typedef_Field ()
 {
-    int64 size = _CfrTil_Parse_ClassStructure ( 0 ) ;
-    return size ;
+    //int64 size = CfrTil_Parse_Structure (0, 0, 0, 0) ;
+    TypeDefStructCompileInfo * tdsci = _Compiler_->C_Tdsci = TypeDefStructCompileInfo_New () ;
+    Parse_A_Typedef_Field (tdsci ) ;
+    SetState ( _Compiler_, TDSCI_PARSING, false ) ;
+    return tdsci->Tdsci_TotalSize ;
 }
 
 void
-CfrTil_TypedefStructBegin ( void )
+_CfrTil_Typedef ( void )
 {
-    int64 size = _CfrTil_TypedefStruct_Parse ( ) ;
+    int64 size = _CfrTil_Parse_Typedef_Field () ;
     //DataStack_Push ( size ) ;
 }
 
@@ -237,81 +240,3 @@ CfrTil_TypedefStructEnd ( void )
 
 // type : typedef
 
-int64
-_Type_Create ( byte * token )
-{
-    int64 size = 0 ;
-    if ( token [ 0 ] == '{' )
-    {
-        Context * cntx = _Context_ ;
-        Lexer * lexer = cntx->Lexer0 ;
-        Lexer_ReadToken ( lexer ) ; // 
-        size = _CfrTil_TypedefStruct_Parse ( ) ; //Namespace_ActivateAsPrimary ( ( byte* ) "C_Typedef" ) ;
-        //Compiler_SetAs_InNamespace_C_BackgroundNamespace ( cntx->Compiler0 ) ;
-    }
-    return size ;
-}
-
-void
-Type_Create ( )
-{
-    Context * cntx = _Context_ ;
-    byte * token = Lexer_Peek_Next_NonDebugTokenWord ( cntx->Lexer0, 1, 0 ) ;
-    int64 size = _Type_Create ( token ) ;
-    //DataStack_Push ( size ) ;
-}
-
-void
-_CfrTil_TypeDef ( )
-{
-    Context * cntx = _Context_ ;
-    Namespace * ns = CfrTil_Type_New ( ) ;
-    Lexer * lexer = cntx->Lexer0 ;
-    Word * alias ;
-    Boolean typeFlag = false ;
-    int64 size = 0 ;
-    Lexer_SetTokenDelimiters ( lexer, ( byte* ) " ,\n\r\t", COMPILER_TEMP ) ;
-    do
-    {
-        byte * token = Lexer_Peek_Next_NonDebugTokenWord ( cntx->Lexer0, 1, 0 ) ;
-        if ( token [ 0 ] == ';' )
-        {
-            Lexer_ReadToken ( cntx->Lexer0 ) ;
-            break ;
-        }
-        else if ( ( String_Equal ( "struct", token ) ) || ( String_Equal ( "class", token ) ) )
-        {
-            Lexer_ReadToken ( cntx->Lexer0 ) ;
-            continue ;
-        }
-        else if ( ( token [ 0 ] == '{' ) )
-        {
-            if ( ! typeFlag )
-            {
-                size = _Type_Create ( token ) ;
-                typeFlag = true ;
-                continue ;
-            }
-            else SyntaxError ( 1 ) ;
-        }
-        token = Lexer_ReadToken ( cntx->Lexer0 ) ; //, ( byte* ) " ,\n\r\t" ) ;
-        if ( token [ 0 ] == ',' ) continue ;
-        else
-        {
-            if ( ns )
-            {
-                alias = _CfrTil_Alias ( ns, token ) ;
-                alias->Lo_List = ns->Lo_List ;
-                alias->W_MorphismAttributes |= IMMEDIATE ;
-                _CfrTil_->LastFinished_Word = 0 ; // nb! : for _CfrTil_RecycleInit_Compiler_N_M_Node_WordList
-            }
-            else
-            {
-                ns = DataObject_New ( C_TYPE, 0, token, 0, 0, 0, 0, 0, 0, 0, - 1 ) ;
-                _Namespace_VariableValueSet ( ns, ( byte* ) "size", size ) ;
-                ns->Lo_Size = size ;
-            }
-        }
-    }
-    while ( 1 ) ;
-}

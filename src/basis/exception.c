@@ -73,7 +73,7 @@ OVT_PauseInterpret ( Context * cntx, byte key )
         do
         {
             Context_DoPrompt ( cntx ) ;
-            _ReadLine_GetLine ( cntx->ReadLiner0, 0 ) ;
+            _ReadLine_GetLine ( cntx->ReadLiner0, key ) ;
             if ( ReadLine_PeekNextChar ( cntx->ReadLiner0 ) < ' ' ) break ; // '\n', <esc>, etc.
             Interpret_ToEndOfLine ( cntx->Interpreter0 ) ;
             CfrTil_NewLine ( ) ;
@@ -247,7 +247,7 @@ OVT_Throw ( int signal, int64 restartCondition, Boolean pauseFlag )
         {
             jb = & _O_->JmpBuf0 ;
             OVT_SetRestartCondition ( _O_, INITIAL_START ) ;
-            _OVT_SimpleFinalPause ( "\nOVT_Throw : signal == SIGBUS : restarting to INITIAL_START ... with any <key>", true ) ;
+            _OVT_SimpleFinal_Key_Pause ( "\nOVT_Throw : signal == SIGBUS : restarting to INITIAL_START ... with any <key>", true ) ;
             goto jump ;
         }
         if ( ( restartCondition > QUIT ) || ( _O_->Signal == SIGFPE ) )
@@ -274,8 +274,8 @@ OVT_Throw ( int signal, int64 restartCondition, Boolean pauseFlag )
 
     snprintf ( Buffer_Data_Cleared ( _O_->ThrowBuffer ), BUFFER_SIZE, "\n%s\n%s %s from %s -> ...", _O_->ExceptionMessage,
         ( jb == & _CfrTil_->JmpBuf0 ) ? "reseting cfrTil" : "restarting OpenVmTil",
-        ( _O_->Signal == SIGSEGV ) ? ": SIGSEGV" : "", ( _O_->SigSegvs < 2 ) ? Context_Location ( ) : ( byte* ) "" ) ;
-    _OVT_SimpleFinalPause ( _O_->ThrowBuffer->Data, ( _O_->Signal != SIGSEGV ) ) ;
+        ( _O_->Signal == SIGSEGV ) ? ": SIGSEGV" : "", Context_Location ( ) ) ; //( _O_->SigSegvs < 2 ) ? Context_Location ( ) : ( byte* ) "" ) ;
+    _OVT_SimpleFinal_Key_Pause ( _O_->ThrowBuffer->Data, 1 ) ; //( _O_->Signal != SIGSEGV ) ) ;
     if ( pauseFlag && ( _O_->SignalExceptionsHandled < 2 ) && ( _O_->SigSegvs < 2 ) ) OVT_Pause ( 0, _O_->SignalExceptionsHandled ) ;
 jump:
     _OVT_SigLongJump ( jb ) ;
@@ -548,17 +548,19 @@ OVT_ExceptionState_Print ( )
 }
 
 void
-_OVT_SimpleFinalPause ( byte * msg, Boolean useKey )
+_OVT_SimpleFinal_Key_Pause ( byte * msg, Boolean useKey )
 {
-    printf ( "%s", msg ) ;
+    byte key, * instr = ".: (p)ause, <key> restart" ;
+    printf ( "%s\n%s", msg, instr ) ;
     fflush ( stdout ) ;
-    if ( useKey ) Key ( ) ;
+    if ( useKey ) key = Key ( ) ;
+    if ( key = 'p' ) Pause () ;
 }
 
 void
 OVT_SeriousErrorPause ( )
 {
-    _OVT_SimpleFinalPause ( "\n!!Serious Error : SIGSEGV while handling a SIGSEGV : hit any key to continue full restart!!\n:!!> ", true ) ;
+    _OVT_SimpleFinal_Key_Pause ( "\n!!Serious Error : SIGSEGV while handling a SIGSEGV : hit any key to continue full restart!!\n:!!> ", true ) ;
     fflush ( stdout ) ;
     Key ( ) ;
 }

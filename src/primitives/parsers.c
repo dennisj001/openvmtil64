@@ -4,7 +4,8 @@
 void
 CfrTil_Token ( )
 {
-    DataStack_Push ( ( int64 ) Lexer_ReadToken ( _Lexer_ ) ) ;
+    byte * token = Lexer_ReadToken ( _Lexer_ ) ;
+    DataStack_Push ( ( int64 ) token ) ;
 }
 
 void
@@ -15,14 +16,12 @@ CfrTil_TokenQID ( )
     while ( 1 )
     {
         token = Lexer_ReadToken ( _Lexer_ ) ;
-        word = _Interpreter_TokenToWord ( _Interpreter_, token, -1, -1 ) ;
+        word = _Interpreter_TokenToWord ( _Interpreter_, token, - 1, - 1 ) ;
         Boolean isForwardDotted = ReadLiner_IsTokenForwardDotted ( _ReadLiner_, word->W_RL_Index ) ;
-        if ( ( isForwardDotted ) || ( token[0] == '.' )) Word_Eval ( word ) ;
-            //Interpreter_DoWord ( _Interpreter_, word, -1, -1 ) ; // Word_Eval ( word ) ;
+        if ( ( isForwardDotted ) || ( token[0] == '.' ) ) Word_Eval ( word ) ;
         else break ;
     }
-    if ( GetState ( _Lexer_, LEXER_END_OF_LINE ) ) SetState ( _Interpreter_, END_OF_LINE, true ) ; 
-    //Interpreter_SetLexState ( _Interpreter_ ) ;
+    if ( GetState ( _Lexer_, LEXER_END_OF_LINE ) ) SetState ( _Interpreter_, END_OF_LINE, true ) ; //necessary to update interpreter state since we are pushing the last token
     DataStack_Push ( ( int64 ) token ) ;
 }
 
@@ -45,11 +44,11 @@ CfrTil_Tick ( )
     _CfrTil_SingleQuote ( ) ;
 }
 
-
 void
 Parse_SkipUntil_EitherToken_OrNewline ( byte * end1, byte* end2 )
 {
-    byte * token ; int64 inChar ;
+    byte * token ;
+    int64 inChar ;
     ReadLiner * rl = _Context_->ReadLiner0 ;
     do
     {
@@ -77,5 +76,12 @@ CfrTil_DoubleQuoteMacro ( )
 {
     Lexer_ParseDoubleQuoteMacro ( _Lexer_ ) ;
 }
+
+void
+CfrTil_Word_ClassStructure_PrintData ( Word * word )
+{
+    CfrTil_Typedef () ;
+}
+
 
 

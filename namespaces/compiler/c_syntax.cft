@@ -38,7 +38,7 @@ typedef struct _CObj
     int64 heey ;
     int64 heey1 ;
 } cobj, CObj ;
-"CObj.size =" ps p ( CObj.size ) ;
+"CObj.size =" ps p ( CObj.size ) ; // 104
 "chey" CObj new ;
 CObj 
 C_Syntax
@@ -278,7 +278,7 @@ C
 sp
 c_syntaxOn
 C String libc
-typedef _CBuffer { byte buf [ 256 ]; } CBuffer ;
+typedef _CBuffer { byte buf [ 256 ] ; } CBuffer ;
 void
 $ ( | atoken, buffer, CBuffer buffer0 ) 
 {
@@ -314,7 +314,6 @@ $ etc/script ;
 $$ etc/lispScript ; 
 $$ls -al /usr/local ; 
 $$ ls -al . ;
-drop //??
 #endif
 C
 sp
@@ -324,13 +323,27 @@ infixOff
 //stack pause
 : hi ( a b | c ) c a @ b @ + = printf ("\nshould read 3 : %d", c ) ; 1 2 hi //pause
 sp
-#if 1
-// test byte size objects
 c_syntaxOn
+sp
+int
+fac5 ( REG n  | REG facc ) 
+{ 
+    facc = 1 ;
+    while ( n > 1 ) 
+    {
+        //facc *= (n --) ; // parenthesis a must for now ??
+        facc *= n -- ;
+    }
+    return facc ;
+}
+wdiss ( ' fac5 find ) 
+fac5 ( 7 ) dup p 5040 _assert  
+#if 0
+// test byte size objects
 typedef struct _byteTest 
 {
     byte a123;
-    int64 e123
+    int64 e123 ;
     byte b123;
     byte bb123 ;
     int32 c123;
@@ -376,20 +389,6 @@ _assert ( abt.c123 234567 ) ;
 _assert ( abt.e123 2345566 ) ;
 //notUsing: bt abt byteTest _byteTest ;
 #endif
-sp
-int
-fac5 ( REG n  | REG facc ) 
-{ 
-    facc = 1 ;
-    while ( n > 1 ) 
-    {
-        //facc *= (n --) ; // parenthesis a must for now ??
-        facc *= n -- ;
-    }
-    return facc ;
-}
-wdiss ( ' fac5 find ) 
-fac5 ( 7 ) dup p 5040 _assert  
 c_syntaxOff 
 notUsing: byteTest _byteTest abt bt ;
 bnOff

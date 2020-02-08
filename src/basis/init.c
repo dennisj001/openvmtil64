@@ -8,7 +8,7 @@ CfrTil_RuntimeInit ( CfrTil * cfrTil, int64 cntxDelFlag )
 {
     CfrTil_LogOff ( ) ;
     cfrTil->SC_QuoteMode = 0 ;
-    cfrTil->ScWord = 0 ;
+    cfrTil->SC_Word = 0 ; 
     if ( cntxDelFlag )
     {
         int64 i, stackDepth = Stack_Depth ( cfrTil->ContextDataStack ) ;

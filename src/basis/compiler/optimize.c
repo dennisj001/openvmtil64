@@ -555,11 +555,7 @@ Compiler_CompileOptimizedLoad ( Compiler * compiler )
             _Word_CompileAndRecord_PushReg ( optInfo->wordArg2, ACC, true ) ;
             optInfo->opWord->StackPushRegisterCode = optInfo->wordArg2->StackPushRegisterCode ; // for Compiler_RemoveLocalFrame ??
         }
-        else
-        {
-            _Set_To_Here_Word_StackPushRegisterCode ( optInfo->wordArg2, 1 ) ;
-            CompileOptimizedLoad_TOS ( ) ;
-        }
+        else CompileOptimizedLoad_TOS ( ) ;
     }
 
     else CompileOptimizedLoad_TOS ( ) ;
@@ -798,7 +794,7 @@ Compile_X_Equal ( Compiler * compiler, int64 op, int lvalueSize )
             }
             else
             {
-                //Word_Check_SetHere_To_StackPushRegisterCode ( optInfo->wordArg1, true ) ; 
+                //Word_Check_ReSet_To_Here_StackPushRegisterCode ( optInfo->wordArg1, true ) ;
                 Compile_MoveImm_To_Reg ( srcReg, optInfo->wordArg2->W_Value, lvalueSize ) ;
             }
         }

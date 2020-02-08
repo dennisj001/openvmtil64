@@ -241,7 +241,7 @@ typedef struct _Identifier // _Symbol
     block Definition ;
     dllist * DebugWordList ;
     int64 StartCharRlIndex ;
-    int64 SC_WordIndex ;
+    int64 SC_WordIndex, SC_FileIndex_Start, SC_FileIndex_End ;
     struct _Identifier * CfrTilWord, * BaseObject ;
     struct _WordData * S_WordData ;
 } Identifier, ID, Word, Namespace, Vocabulary, Class, DynamicObject, DObject, ListObject, Symbol, MemChunk, HistoryStringNode, Buffer ;
@@ -588,6 +588,12 @@ typedef struct
 } Finder ;
 
 struct Interpreter ;
+typedef struct SourceCodeInfo
+{
+    int64 SciIndex, SciQuoteMode, SciFileIndexScStart, SciFileIndexScEnd ;
+    Word * SciWord ;
+    byte * SciBuffer ;
+} SourceCodeInfo ;
 typedef struct Lexer
 {
     uint64 State ;
@@ -605,6 +611,7 @@ typedef struct Lexer
     Word * TokenWord ;
     Symbol * NextPeekListItem ;
     ReadLiner * ReadLiner0 ;
+    SourceCodeInfo SCI ;
     dllist * TokenList ;
 } Lexer ;
 
@@ -695,6 +702,19 @@ typedef struct
 #define ARG2_R                   ( 1 << 3 )
 #define OP_RESULT                ( 1 << 4 )
 } CompileOptimizeInfo, COI ;
+
+typedef struct TypeDefStructCompileInfo
+{
+    int64 State, Tdsci_Offset, Tdsci_StructureUnion_Size, Tdsci_TotalSize, Tdsci_Field_Size ; 
+    Namespace *BackgroundNamespace, * Tdsci_TotalStructureNamespace, * Tdsci_StructureUnion_Namespace, * Tdsci_Field_Type_Namespace ;
+    Word * Tdsci_Field_Object ;
+    byte *DataPtr, * TdsciToken ;
+} TypeDefStructCompileInfo, TDSCI ;
+#define TDSCI_CLONE_FLAG                ( (uint64) 1 << 0 ) 
+#define TDSCI_STRUCT                 ( (uint64) 1 << 1 ) 
+#define TDSCI_UNION                     ( (uint64) 1 << 2 ) 
+#define TDSCI_STRUCTURE_COMPLETED       ( (uint64) 1 << 3 ) 
+
 typedef struct
 {
     uint64 State ;
@@ -732,6 +752,7 @@ typedef struct
     Stack * InternalNamespacesStack ;
     Stack * InfixOperatorStack ;
     dllist * OptimizeInfoList ;
+    TypeDefStructCompileInfo * C_Tdsci ;
 } Compiler ;
 typedef struct Interpreter
 {
@@ -858,7 +879,7 @@ typedef struct _StringTokenInfo
 typedef struct _CfrTil
 {
     uint64 State, SavedState, * SaveDsp ;
-    int64 InitSessionCoreTimes, LogFlag, WordsAdded, FindWordCount, FindWordMaxCount, WordCreateCount, DObjectCreateCount, SC_Index, SC_QuoteMode ; // SC_Index == SC_Buffer Index ;
+    int64 InitSessionCoreTimes, LogFlag, WordsAdded, FindWordCount, FindWordMaxCount, WordCreateCount, DObjectCreateCount ; // SC_Index == SC_Buffer Index ;
     Stack *ReturnStack, * DataStack ;
     Namespace * Namespaces, * InNamespace, *BigNumNamespace, *IntegerNamespace, *StringNamespace, *RawStringNamespace ;
     Context * Context0 ;
@@ -871,8 +892,8 @@ typedef struct _CfrTil
     block PopDspToR8AndCall, CallReg_TestRSP, Call_ToAddressThruR8_TestAlignRSP ; //adjustRSPAndCall, adjustRSP ;
     ByteArray * PeekPokeByteArray ;
     Word * LastFinished_DObject, * LastFinished_Word, *StoreWord, *PokeWord, *RightBracket, *ScoOcCrw ;
-    Word *ScWord, *DebugWordListWord, *EndBlockWord, *BeginBlockWord, *InfixNamespace ;
-    byte ReadLine_CharacterTable [ 256 ], * OriginalInputLine, * TokenBuffer, * SC_Buffer ; // nb : keep this here -- if we add this field to Lexer it just makes the lexer bigger and we want the smallest lexer possible
+    Word *DebugWordListWord, *EndBlockWord, *BeginBlockWord, *InfixNamespace ;
+    byte ReadLine_CharacterTable [ 256 ], * OriginalInputLine, * TokenBuffer ; // nb : keep this here -- if we add this field to Lexer it just makes the lexer bigger and we want the smallest lexer possible
     ReadLineFunction ReadLine_FunctionTable [ 24 ] ;
     CharacterType LexerCharacterTypeTable [ 256 ] ;
     LexerFunction LexerCharacterFunctionTable [ 24 ] ;
@@ -880,8 +901,13 @@ typedef struct _CfrTil
     Buffer *TabCompletionBuf, * LC_PrintB, * LC_DefineB, *DebugB, *DebugB1, *DebugB2, *DebugB3, *ScratchB1, *ScratchB2, *ScratchB3, *StringMacroB ; // token buffer, tab completion backup, source code scratch pad, 
     StrTokInfo Sti ;
     dllist * Compiler_N_M_Node_WordList ; //, *TokenList,  ;
+    SourceCodeInfo SCI ;
     sigjmp_buf JmpBuf0 ;
 } CfrTil ;
+#define SC_Word SCI.SciWord
+#define SC_Buffer SCI.SciBuffer
+#define SC_QuoteMode SCI.SciQuoteMode
+#define SC_Index SCI.SciIndex
 typedef struct
 {
     MemChunk MS_MemChunk ;

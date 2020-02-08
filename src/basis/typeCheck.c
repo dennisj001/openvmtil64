@@ -226,13 +226,16 @@ TSI_Debug_PreTypeStatus_Print ( TSI *tsi )
 Boolean
 _TypeMismatch_CheckError_Print ( Word * lvalueWord, Word *rvalueWord, Boolean quitFlag )
 {
-    int64 lvalueSize = lvalueWord->ObjectByteSize, rvalueSize = rvalueWord->ObjectByteSize ;
-    if ( ( lvalueSize > 0 ) && ( rvalueSize > lvalueSize ) ) // for C internal lvalue size may be 0
+    if ( GetState ( _Context_, C_SYNTAX ) )
     {
-        _Printf ( "\nTypeError : Wrong data sizes :: lvalue : %s : size == %ld :: rvalue : %s : size == %ld",
-            lvalueWord->Name, lvalueSize, rvalueWord->Name, rvalueSize ) ;
-        if ( quitFlag ) Error ( "\nType Error", "", QUIT ) ;
-        return true ;
+        int64 lvalueSize = lvalueWord->ObjectByteSize, rvalueSize = rvalueWord->ObjectByteSize ;
+        if ( ( lvalueSize > 0 ) && ( rvalueSize > lvalueSize ) ) // for C internal lvalue size may be 0
+        {
+            _Printf ( "\nTypeError : Wrong data sizes :: lvalue : %s : size == %ld :: rvalue : %s : size == %ld",
+                lvalueWord->Name, lvalueSize, rvalueWord->Name, rvalueSize ) ;
+            if ( quitFlag ) Error ( "\nType Error", "", QUIT ) ;
+            return true ;
+        }
     }
     return false ;
 }
@@ -670,12 +673,19 @@ CfrTil_Get_ObjectByteSize ( Word * word )
     }
 }
 
+void
+CfrTil_Set_Namespace_ObjectByteSize ( Namespace * ns, int64 obsize )
+{
+    if ( ns ) ns->ObjectByteSize = obsize ; // not here ??
+}
+
 int64
-CfrTil_Get_NamespaceObjectByteSize ( Namespace * ns )
+CfrTil_Get_Namespace_SizeVar_Value ( Namespace * ns )
 {
     int64 objectByteSize ;
     objectByteSize = ( int64 ) _CfrTil_VariableValueGet ( ns->Name, ( byte* ) "size" ) ;
     if ( ! objectByteSize ) objectByteSize = ns->ObjectByteSize ;
+    //else ns->ObjectByteSize = objectByteSize ; // not here ??
     return objectByteSize ;
 }
 

@@ -1,6 +1,6 @@
 5
 
-: apause ; // pause ;
+: apause ; //s pause ;
 "ppx" var "ppxe" var
 #if 0 // if 0
 
@@ -84,7 +84,7 @@ ppxe dup @ 1 + =
 ppx @ dup "ppx =" ps p 4 _assert nl
 ppxe @ dup "ppxe =" ps p 0 _assert 
 #endif // if 3 : endif
-//apause
+apause
 
 2 + 7 assertStkChk // stack checking
 

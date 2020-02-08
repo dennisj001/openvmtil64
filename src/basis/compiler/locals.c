@@ -110,18 +110,18 @@ _Compiler_LocalWord ( Compiler * compiler, byte * name, int64 morphismType, int6
         {
             word->Index = ++ compiler->NumberOfNonRegisterLocals ;
             compiler->NumberOfLocals ++ ;
-            _CfrTil_->ScWord->W_NumberOfNonRegisterLocals ++ ;
+            _CfrTil_->SC_Word->W_NumberOfNonRegisterLocals ++ ;
         }
         else
         {
             word->Index = ++ compiler->NumberOfArgs ;
             compiler->NumberOfNonRegisterArgs ++ ;
-            _CfrTil_->ScWord->W_NumberOfNonRegisterArgs ++ ;
+            _CfrTil_->SC_Word->W_NumberOfNonRegisterArgs ++ ;
         }
     }
     word->W_ObjectAttributes |= RECYCLABLE_LOCAL ;
-    //_CfrTil_->ScWord->W_NumberOfNonRegisterArgs += compiler->NumberOfNonRegisterArgs ; // debugOutput.c showLocals need this others ?
-    //_CfrTil_->ScWord->W_NumberOfNonRegisterLocals += compiler->NumberOfNonRegisterLocals ;
+    //_CfrTil_->SC_Word->W_NumberOfNonRegisterArgs += compiler->NumberOfNonRegisterArgs ; // debugOutput.c showLocals need this others ?
+    //_CfrTil_->SC_Word->W_NumberOfNonRegisterLocals += compiler->NumberOfNonRegisterLocals ;
     return word ;
 }
 

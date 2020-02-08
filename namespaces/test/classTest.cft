@@ -1,8 +1,8 @@
-/*test comment*/ 5  // for stack checking see last lines
+/* test comment */ 5  // for stack checking see last lines
 "\nclassTest.cft" ps //pause
 #if "_ClassTest_" defined not // prevent including this file twice
-"_ClassTest_" /*testing comment ...
-testing comment*/ var 
+"_ClassTest_" /* testing comment ...
+testing comment */ var 
 Int Logic C
 Compiler
 hex
@@ -31,24 +31,24 @@ byte.size @ nl "Integer.byte.size = " prints print nl
 sp
 Class
 using
-"Buffer" class :{ byte buf [ 256 ]; };
+"Buffer" class :{ byte buf [ 256 ] ; };
 // Buffer.size 256 = // for classes with structure size does not need to be set
 "DLLNode" class 
-:{ // comment
-	Pointer AfterReference   // semicolon is optional and ignored when parsing class code
+:{
+	Pointer AfterReference ; // semicolon is optional and ignored when parsing class code
 	Pointer BeforeReference ;
 };
 using
 DLLNode size @ nl "DLLNode size = " prints Io.print nl
-:{ // comment
-	Pointer AfterReference   // semicolon is optional and ignored when parsing class code
+:{ 
+	Pointer AfterReference  ; 
         int16   someJunkForTesting ; // u can reset the structure representing the class
 	Pointer BeforeReference ;
 };
 DLLNode.size @ nl "DLLNode size = " prints Io.print nl
 using
 :{ // // again reset the structure representing the class
-	Pointer AfterReference   // semicolon is optional and ignored when parsing class code
+	Pointer AfterReference ;  
 	Pointer BeforeReference ;
 };
 DLLNode.size @ nl "DLLNode size = " prints Io.print nl
@@ -161,6 +161,7 @@ verbosity 2 =
 #endif
 "\nthis = " ps this hex p //pause
 
+C
 testClone size @ dump
 decimal nl s "DLListClone size =" ps DLListClone size @ dup p nl 88 "Clone size" assert sp
 testClone.TailNode.BeforeReference @ testClone "DLListClone init test : " assert sp
@@ -168,6 +169,7 @@ testClone.TailNode.BeforeReference @ testClone "DLListClone init test : " assert
 // d: this.TailNode.BeforeReference @ this "DLListClone init test2 : " assert
 "\nthis @ size @ p " ps this.size @ p // sp // pause // for now we have to drop the 'this' pointer. TODO :: 'this' semantics have yet to be solidified
 "\nthis.size = " ps this.size @ p 
+C
 sp //pause
 
 using "\nprintf output = " ps printf ( "this.size = %d\n", this.size )  //pause

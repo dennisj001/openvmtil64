@@ -489,8 +489,9 @@ _CfrTil_SC_ScratchPadIndex_Init ( CfrTil * cfrtil )
     cfrtil->SC_Index = Strlen ( ( char* ) _CfrTil_->SC_Buffer ) ;
 }
 
+// don't be confused by SourceCode_Init is different from InitSourceCode
 void
-CfrTil_SourceCode_InitEnd ( CfrTil * cfrtil )
+_CfrTil_SourceCode_Init ( CfrTil * cfrtil )
 {
     if ( GetState ( _CfrTil_, SOURCE_CODE_ON ) )
     {
@@ -505,7 +506,8 @@ CfrTil_SourceCode_InitStart ( CfrTil * cfrtil )
 {
     if ( GetState ( _CfrTil_, SOURCE_CODE_ON ) )
     {
-        CfrTil_SourceCode_InitEnd ( cfrtil ) ;
+        _CfrTil_SourceCode_Init ( cfrtil ) ;
+        cfrtil->SCI.SciFileIndexScStart = _ReadLiner_->FileCharacterNumber ;
         SetState ( cfrtil, SOURCE_CODE_STARTED, true ) ;
     }
 }
@@ -575,7 +577,7 @@ _CfrTil_GetSourceCode ( )
 void
 _CfrTil_SetSourceCodeWord ( Word * word )
 {
-    _CfrTil_->ScWord = word ;
+    _CfrTil_->SCI.SciWord = word ; //SC_Word = word ;
 }
 
 void
@@ -586,11 +588,14 @@ CfrTil_SetSourceCodeWord ( )
 }
 
 void
-_CfrTil_Finish_WordSourceCode ( CfrTil * cfrtil, Word * word )
+CfrTil_Finish_WordSourceCode ( CfrTil * cfrtil, Word * word )
 {
     if ( ! word->W_SourceCode ) word->W_SourceCode = _CfrTil_GetSourceCode ( ) ;
     Lexer_SourceCodeOff ( _Lexer_ ) ;
-    CfrTil_SourceCode_InitEnd ( cfrtil ) ;
+    //cfrtil->SCI.SciFileIndexScEnd = _ReadLiner_->FileCharacterNumber ;
+    word->SC_FileIndex_Start = cfrtil->SCI.SciFileIndexScStart ;
+    word->SC_FileIndex_End = cfrtil->SCI.SciFileIndexScEnd ;
+    _CfrTil_SourceCode_Init ( cfrtil ) ;
 }
 
 void
@@ -605,12 +610,6 @@ SCN_Set_NotInUseForOptimization ( dlnode * node )
     dobject_Set_M_Slot ( ( dobject* ) node, SCN_IN_USE_FLAG, SCN_IN_USE_FOR_SOURCE_CODE ) ;
 }
 // the logic needs to be reworked with recycling in these functions
-
-void
-CfrTil_FinishSourceCode ( CfrTil * cfrtil, Word * word )
-{
-    _CfrTil_Finish_WordSourceCode ( cfrtil, word ) ;
-}
 
 void
 _CfrTil_UnAppendFromSourceCode_NChars ( CfrTil * cfrtil, int64 nchars )
@@ -658,7 +657,7 @@ Get_SourceCodeWord ( )
         if ( GetState ( debugger, DBG_STEPPING ) ) scWord = debugger->w_Word ;
         if ( ( ! scWord ) && ( ! ( scWord = GetState ( _Compiler_, ( COMPILE_MODE | ASM_MODE ) ) ?
             _Context_->CurrentWordBeingCompiled : _CfrTil_->LastFinished_Word ?
-            _CfrTil_->LastFinished_Word : _CfrTil_->ScWord ? _CfrTil_->ScWord : _Compiler_->Current_Word_Create ) ) )
+            _CfrTil_->LastFinished_Word : _CfrTil_->SC_Word ? _CfrTil_->SC_Word : _Compiler_->Current_Word_Create ) ) )
         {
             if ( debugger && Is_DebugOn )
             {

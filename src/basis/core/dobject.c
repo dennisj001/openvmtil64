@@ -234,7 +234,7 @@ DObject_SubObjectInit ( DObject * dobject, Word * parent )
     dobject->W_MorphismAttributes |= parent->W_MorphismAttributes ;
     dobject->W_ObjectAttributes |= T_ANY ;
     dobject->Slots = parent->Slots ;
-    Namespace_SetState (parent, USING, 1) ;
+    Namespace_SetState_AdjustListPosition (parent, USING, 1) ;
 }
 
 DObject *

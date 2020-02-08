@@ -193,7 +193,7 @@ Namespaces_PrintList ( Namespace * ns, byte * insert )
 }
 
 void
-Namespace_SetState ( Namespace * ns, uint64 state, Boolean setInNsFlag )
+Namespace_SetState_AdjustListPosition ( Namespace * ns, uint64 state, Boolean setInNsFlag )
 {
     if ( ns )
     {
@@ -230,12 +230,12 @@ _Namespace_AddToUsingList ( Namespace * ns )
     {
         ns = ( Word* ) _Stack_Pop ( stack ) ;
         if ( ns->WL_OriginalWord ) ns = ns->WL_OriginalWord ; //_Namespace_Find ( ns->Name, 0, 0 ) ; // this is needed because of Compiler_PushCheckAndCopyDuplicates
-        Namespace_SetState ( ns, USING, 0 ) ;
+        Namespace_SetState_AdjustListPosition ( ns, USING, 0 ) ;
     }
     if ( ns != svNs )
     {
         //CfrTil_Using () ;
-        Namespace_SetState ( svNs, USING, 1 ) ;
+        Namespace_SetState_AdjustListPosition ( svNs, USING, 1 ) ;
         //CfrTil_Using () ;
     }
     else _Namespace_SetState ( ns, USING ) ;
@@ -403,7 +403,7 @@ _Namespace_Find ( byte * name, Namespace * superNamespace, int64 exceptionFlag )
         Word * word = 0 ;
         if ( superNamespace ) word = _Finder_FindWord_InOneNamespace ( _Finder_, superNamespace, name ) ;
         if ( ! word ) word = Finder_FindWord_AnyNamespace ( _Finder_, name ) ;
-        if ( word && ( word->W_ObjectAttributes & ( NAMESPACE | CLASS | DOBJECT ) ) ) return ( Namespace* ) word ;
+        if ( word && Is_NamespaceType ( word ) ) return ( Namespace* ) word ;
         else if ( exceptionFlag )
         {
             _Printf ( ( byte* ) "\nUnable to find Namespace : %s\n", name ) ;
@@ -426,7 +426,7 @@ Namespace_FindOrNew_SetUsing ( byte * name, Namespace * containingNs, int64 setU
     if ( ! containingNs ) containingNs = _CfrTil_->Namespaces ;
     Namespace * ns = _Namespace_Find ( name, containingNs, 0 ) ;
     if ( ! ns ) ns = Namespace_New ( name, containingNs ) ;
-    if ( setUsingFlag ) Namespace_SetState ( ns, USING, 1 ) ;
+    if ( setUsingFlag ) Namespace_SetState_AdjustListPosition ( ns, USING, 1 ) ;
     return ns ;
 }
 
@@ -442,7 +442,7 @@ _Namespace_FindOrNew_Local ( Stack * nsStack )
         ns = Namespace_New ( name, _CfrTil_->Namespaces ) ;
         Stack_Push ( nsStack, ( int64 ) ns ) ; // nb. this is where the the depth increase
     }
-    Namespace_SetState ( ns, USING, 1 ) ;
+    Namespace_SetState_AdjustListPosition ( ns, USING, 1 ) ;
     _Namespace_ActivateAsPrimary ( ns ) ;
     return ns ;
 }

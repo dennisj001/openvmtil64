@@ -12,7 +12,7 @@ SOURCES = src/basis/compiler/machineCode.c src/basis/compiler/_compile.c src/bas
 	src/basis/core/compiler.c src/basis/core/dllnodes.c src/basis/core/finder.c src/basis/interpreters.c\
 	src/basis/tabCompletion.c src/basis/colors.c src/basis/sourceCode.c src/basis/debugStepping.c\
 	src/basis/core/string.c src/basis/openVmTil.c src/basis/core/dobject.c src/basis/core/preprocessor.c\
-	src/basis/attribute.c src/basis/lists.c src/basis/debugDisassembly.c src/basis/typeCheck.c\
+	src/basis/lists.c src/basis/debugDisassembly.c src/basis/typeCheck.c\
 	src/basis/linux.c src/basis/exception.c src/basis/compiler/locals.c\
 	src/basis/debugger.c src/basis/interpreter.c src/basis/_debug.c src/basis/lc/lambdaCalculus.c \
 	src/basis/lc/apply.c src/basis/lc/eval.c src/basis/lc/read.c src/basis/lc/print.c src/basis/lc/special.c \
@@ -183,7 +183,7 @@ cproto :
 	sudo apt-get install cproto
 	
 tar.xz :	
-	tar -c --xz --exclude=nbproject --exclude=objects --exclude=mpfr* --exclude=.git --exclude=*.png --exclude=cfrtil64-gdb  --exclude=*.o --exclude *.kdev* -f ../cfrtil64.tar.xz * *.*
+	tar -c --xz --exclude=nbproject --exclude=objects --exclude=archive --exclude=mpfr* --exclude=.git --exclude=*.png --exclude=cfrtil64-gdb  --exclude=*.o --exclude *.kdev* -f ../cfrtil64.tar.xz * *.*
 
 xz : 
 	-rm ~/openvmtil64/core

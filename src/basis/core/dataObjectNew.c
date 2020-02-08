@@ -66,32 +66,30 @@ DataObject_New ( uint64 type, Word * word, byte * name, uint64 morphismAttribute
         }
         case CLASS:
         {
-            word = _Class_New ( name, CLASS, 0 ) ;
+            word = Class_New ( name, CLASS, 0 ) ;
             break ;
         }
         case CLASS_CLONE:
         {
-            word = _Class_New ( name, CLASS_CLONE, 1 ) ;
+            word = Class_New ( name, CLASS_CLONE, 1 ) ;
             break ;
         }
         case C_CLASS:
         {
-            word = _Class_New ( name, C_CLASS, 0 ) ;
+            word = Class_New ( name, C_CLASS, 0 ) ;
             break ;
         }
         case C_TYPE:
         {
-            //if ( GetState ( cntx, C_SYNTAX ) ) 
-            Compiler_Get_C_BackgroundNamespace ( cntx->Compiler0 ) ;
-            word = _Class_New ( name, C_TYPE, 0 ) ;
+            Compiler_Save_C_BackgroundNamespace ( cntx->Compiler0 ) ;
+            word = Class_New ( name, C_TYPE, 0 ) ;
             Type_Create ( ) ;
-            //if ( GetState ( cntx, C_SYNTAX ) ) 
             Compiler_SetAs_InNamespace_C_BackgroundNamespace ( cntx->Compiler0 ) ;
             break ;
         }
         case C_TYPEDEF:
         {
-            _CfrTil_TypeDef ( ) ;
+            _CfrTil_Typedef ( ) ;
             break ;
         }
         case PARAMETER_VARIABLE: case LOCAL_VARIABLE: case (PARAMETER_VARIABLE | REGISTER_VARIABLE ): case (LOCAL_VARIABLE | REGISTER_VARIABLE ):
@@ -119,7 +117,7 @@ _CfrTil_NamelessObjectNew ( int64 size, int64 allocType )
 Word *
 _CfrTil_ObjectNew ( int64 size, byte * name, uint64 category, int64 allocType )
 {
-    byte * obj = _CfrTil_NamelessObjectNew ( size, allocType ) ; 
+    byte * obj = _CfrTil_NamelessObjectNew ( size, allocType ) ;
     Word * word = _DObject_New ( name, ( int64 ) obj, ( IMMEDIATE | CPRIMITIVE ), OBJECT | category, 0, OBJECT, ( byte* ) _DataObject_Run, 0, 0, 0, DICTIONARY ) ;
     word->ObjectByteSize = size ;
     return word ;
@@ -130,7 +128,8 @@ _Class_Object_Init ( Word * word, Namespace * ins )
 {
     Namespace * ns = ins ;
     Stack * nsstack = _Context_->Compiler0->InternalNamespacesStack ;
-    Stack_Init ( nsstack ) ; 
+    int64 i ;
+    Stack_Init ( nsstack ) ;
     // init needs to be done by the most super/internal class first successively down to the current/sub class 
     do
     {
@@ -142,7 +141,6 @@ _Class_Object_Init ( Word * word, Namespace * ins )
         ns = ns->ContainingNamespace ;
     }
     while ( ns ) ;
-    int64 i ;
     for ( i = Stack_Depth ( nsstack ) ; i > 0 ; i -- )
     {
         Word * initWord = ( Word* ) _Stack_Pop ( nsstack ) ;
@@ -165,7 +163,7 @@ _Class_Object_New ( byte * name, uint64 category )
     Namespace * ns = _CfrTil_Namespace_InNamespaceGet ( ) ;
     size = _Namespace_VariableValueGet ( ns, ( byte* ) "size" ) ;
     word = _CfrTil_ObjectNew ( size, name, category, CompileMode ? DICTIONARY : OBJECT_MEM ) ;
-    object = (byte*) word->W_Value ;
+    object = ( byte* ) word->W_Value ;
     _Class_Object_Init ( word, ns ) ;
     _Namespace_VariableValueSet ( ns, ( byte* ) "this", ( int64 ) object ) ;
     _Word_Add ( word, 0, ns ) ;
@@ -173,12 +171,13 @@ _Class_Object_New ( byte * name, uint64 category )
 }
 
 Namespace *
-_Class_New ( byte * name, uint64 objectType, int64 cloneFlag )
+Class_New ( byte * name, uint64 objectType, int64 cloneFlag )
 {
     Context * cntx = _Context_ ;
-    if ( GetState ( cntx, C_SYNTAX ) ) Compiler_Get_C_BackgroundNamespace ( cntx->Compiler0 ) ;
+    if ( GetState ( cntx, C_SYNTAX ) ) Compiler_Save_C_BackgroundNamespace ( cntx->Compiler0 ) ;
     Namespace * ns = _Namespace_Find ( name, 0, 0 ), * sns ;
     int64 size = 0 ;
+    byte * token ;
     if ( ! ns )
     {
         sns = _CfrTil_Namespace_InNamespaceGet ( ) ;
@@ -187,28 +186,37 @@ _Class_New ( byte * name, uint64 objectType, int64 cloneFlag )
             size = _Namespace_VariableValueGet ( sns, ( byte* ) "size" ) ;
         }
         ns = _DObject_New ( name, 0, IMMEDIATE, CLASS | objectType, 0, objectType, ( byte* ) _DataObject_Run, 0, 0, sns, DICTIONARY ) ;
-        Namespace_DoNamespace (ns, 0) ; // before "size", "this"
+        Namespace_DoNamespace ( ns, 0 ) ; // before "size", "this"
         Word *ws = _CfrTil_Variable_New ( ( byte* ) "size", size ) ; // start with size of the prototype for clone
         _Context_->Interpreter0->ThisNamespace = ns ;
         Word *wt = _CfrTil_Variable_New ( ( byte* ) "this", size ) ; // start with size of the prototype for clone
         wt->W_ObjectAttributes |= THIS | OBJECT ;
+        token = Lexer_Peek_Next_NonDebugTokenWord ( _Lexer_, 0, 0 ) ;
+        if ( ( token[0] == '{' ) || ( token[1] == '{' )  || ( token[2] == '{' ) ) // consider ":{" and +:{" tokens
+        {
+            if ( ! GetState ( _Compiler_, TDSCI_PARSING ) )
+            {
+                Lexer_ReadToken ( _Lexer_ ) ; // in case of ":{" 
+                CfrTil_PushToken_OnTokenList ( "{" ) ;
+                _ClassTypedef ( cloneFlag ) ;
+            }
+        }
     }
-    else
+    else if ( ns->ObjectByteSize )
     {
         _Printf ( ( byte* ) "\nNamespace Error at %s ? : \'%s\' already exists! : %s : size = %d\n",
             Context_Location ( ), ns->Name, _Word_SourceCodeLocation_pbyte ( ns ), ns->ObjectByteSize ) ;
-        Namespace_DoNamespace (ns, 0) ;
+        Namespace_DoNamespace ( ns, 0 ) ;
     }
-    CfrTil_WordList_Init (0) ;
-    //Compiler_SetAs_InNamespace_C_BackgroundNamespace ( cntx->Compiler0 ) ;
+    CfrTil_WordList_Init ( 0 ) ;
+    Compiler_SetAs_InNamespace_C_BackgroundNamespace ( cntx->Compiler0 ) ;
     return ns ;
 }
 
 Word *
-_CfrTil_ClassField_New ( byte * token, Class * aclass, int64 size, int64 offset )
+CfrTil_ClassField_New ( byte * token, Class * aclass, int64 size, int64 offset )
 {
-    //int64 attribute = 0 ;
-    Word * word = _DObject_New ( token, 0, ( IMMEDIATE | CPRIMITIVE ), OBJECT_FIELD , 0, OBJECT_FIELD, ( byte* ) _DataObject_Run, 0, 1, 0, DICTIONARY ) ;
+    Word * word = _DObject_New ( token, 0, ( IMMEDIATE | CPRIMITIVE ), OBJECT_FIELD, 0, OBJECT_FIELD, ( byte* ) _DataObject_Run, 0, 1, aclass, DICTIONARY ) ;
     word->TypeNamespace = aclass ;
     word->ObjectByteSize = size ;
     if ( size == 1 ) word->W_ObjectAttributes |= T_BYTE ;
@@ -272,7 +280,7 @@ Literal_New ( Lexer * lexer, uint64 uliteral )
         }
         name = lexer->OriginalToken ;
     }
-    word = _DObject_New ( name, uliteral, ( IMMEDIATE | lexer->L_MorphismAttributes ), ( LITERAL | CONSTANT | lexer->L_ObjectAttributes), 0, LITERAL, ( byte* ) _DataObject_Run, 0, 0, 0, ( CompileMode ? INTERNAL_OBJECT_MEM : OBJECT_MEM ) ) ;
+    word = _DObject_New ( name, uliteral, ( IMMEDIATE | lexer->L_MorphismAttributes ), ( LITERAL | CONSTANT | lexer->L_ObjectAttributes ), 0, LITERAL, ( byte* ) _DataObject_Run, 0, 0, 0, ( CompileMode ? INTERNAL_OBJECT_MEM : OBJECT_MEM ) ) ;
 
     return word ;
 }

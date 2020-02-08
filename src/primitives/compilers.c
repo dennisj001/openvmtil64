@@ -222,7 +222,7 @@ CfrTil_Constant ( )
         //cword->MorphismAttributes |= tword->MorphismAttributes ;
         cword->W_ObjectAttributes |= tword->W_ObjectAttributes ;
     }
-    _CfrTil_Finish_WordSourceCode ( _CfrTil_, cword ) ;
+    CfrTil_Finish_WordSourceCode ( _CfrTil_, cword ) ;
 }
 
 void
@@ -230,7 +230,7 @@ CfrTil_Variable ( )
 {
     byte * name = ( byte* ) DataStack_Pop ( ) ;
     Word * word = DataObject_New ( NAMESPACE_VARIABLE, 0, name, 0, NAMESPACE_VARIABLE, 0, 0, 0, 0, - 1, - 1 ) ;
-    if ( ! Compiling ) _CfrTil_Finish_WordSourceCode ( _CfrTil_, word ) ;
+    if ( ! Compiling ) CfrTil_Finish_WordSourceCode ( _CfrTil_, word ) ;
 }
 
 // "{|" - exit the Compiler start interpreting

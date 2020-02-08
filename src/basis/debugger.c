@@ -42,8 +42,7 @@ Debugger_InterpreterLoop ( Debugger * debugger )
 void
 Debugger_Setup_RecordState ( Debugger * debugger, Word * word, byte * token, byte * address )
 {
-    if ( word ) debugger->RL_ReadIndex = word->W_RL_Index ;
-    if ( word->W_AliasOf )
+    if ( ( word ) && ( word->W_AliasOf ) )
     {
         debugger->w_Alias = word ;
         debugger->w_AliasOf = Word_UnAlias ( word ) ;
@@ -53,6 +52,7 @@ Debugger_Setup_RecordState ( Debugger * debugger, Word * word, byte * token, byt
         debugger->w_Alias = 0 ;
         debugger->w_AliasOf = 0 ;
     }
+    if ( word ) debugger->RL_ReadIndex = word->W_RL_Index ;
     debugger->w_Word = word ;
     SetState ( debugger, DBG_COMPILE_MODE, CompileMode ) ;
     SetState_TrueFalse ( debugger, DBG_ACTIVE | DBG_INFO | DBG_PROMPT, DBG_BRK_INIT | DBG_CONTINUE_MODE | DBG_INTERPRET_LOOP_DONE | DBG_PRE_DONE | DBG_CONTINUE | DBG_STEPPING | DBG_STEPPED ) ;
@@ -60,7 +60,7 @@ Debugger_Setup_RecordState ( Debugger * debugger, Word * word, byte * token, byt
     if ( ! debugger->StartHere ) Debugger_Set_StartHere ( debugger ) ;
     debugger->WordDsp = _Dsp_ ;
     debugger->SaveTOS = TOS ;
-    debugger->Token = word->Name ? word->Name : token ;
+    debugger->Token = ( word && word->Name ) ? word->Name : token ;
     if ( address )
     {
         SetState ( debugger, DBG_SETUP_ADDRESS, true ) ;
@@ -80,9 +80,9 @@ Debugger_Setup_SaveState ( Debugger * debugger, Word * word )
 }
 
 Boolean
-DBG_SHOULD_WE_DO_SETUP ( Debugger * debugger, Word * word, byte * address, Boolean forceFlag )
+DBG_SHOULD_WE_DO_SETUP ( Debugger * debugger, Word * word, byte * token, byte * address, Boolean forceFlag )
 {
-    Boolean rtn = ( forceFlag || GetState ( _Compiler_, LC_ARG_PARSING ) || address
+    Boolean rtn = ( forceFlag || GetState ( _Compiler_, LC_ARG_PARSING ) || address || token
         || ( word && ( ( word != debugger->LastPreSetupWord )
         && ( word->WL_OriginalWord ? ( word->WL_OriginalWord != debugger->LastPreSetupWord ) : 1 ) || debugger->RL_ReadIndex != word->W_RL_Index ) ) ) ;
     return rtn ;
@@ -94,9 +94,9 @@ Debugger_PreSetup ( Debugger * debugger, Word * word, byte * token, byte * addre
     Boolean rtn = false ;
     if ( Is_DebugModeOn && Is_DebugShowOn ) // quick check for interpret //|| forceFlag )
     {
-        if ( DBG_SHOULD_WE_DO_SETUP ( debugger, word, address, forceFlag ) )
+        if ( DBG_SHOULD_WE_DO_SETUP ( debugger, word, token, address, forceFlag ) )
         {
-            if ( ! word ) word = Context_CurrentWord ( ) ;
+            if ( ( ! word ) && ( ! token ) ) word = Context_CurrentWord ( ) ;
             if ( forceFlag || ( word && word->Name[0] ) || token )
             {
                 Debugger_Setup_RecordState ( debugger, word, token, address ) ;
@@ -185,7 +185,7 @@ Debugger_Off ( Debugger * debugger, int64 debugOffFlag )
 void
 Debugger_On ( Debugger * debugger )
 {
-    if ( ! Is_DebugOn ) 
+    if ( ! Is_DebugOn )
     {
         Debugger_Init ( debugger, debugger->cs_Cpu, 0, 0 ) ;
         DebugOn ;

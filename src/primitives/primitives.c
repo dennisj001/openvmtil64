@@ -84,7 +84,7 @@ CPrimitive CPrimitives [] = {
 
     { "{", 0, 0, 0, CfrTil_Begin_C_Block, IMMEDIATE | BLOCK_DELIMITER | KEYWORD, 0, 0, "C_Syntax", "C" },
     { "}", 0, 0, 0, CfrTil_End_C_Block, IMMEDIATE | BLOCK_DELIMITER | KEYWORD, 0, 0, "C_Syntax", "C" },
-    { ";", 0, 0, 0, CfrTil_C_Semi, IMMEDIATE | SYNTACTIC | KEYWORD, 0, 0, "C_Syntax", "C" }, 
+    { ";", 0, 0, 0, CfrTil_C_Semi, IMMEDIATE | SYNTACTIC | KEYWORD, 0, 0, "C_Syntax", "C" },
     { ",", 0, 0, 0, CfrTil_C_Comma, IMMEDIATE | NO_OP_WORD | RIGHT_PAREN | KEYWORD, 0, 0, "C_Syntax", "C" },
     { "!", 0, 0, TEST, CfrTil_LogicalNot, IMMEDIATE | CATEGORY_OP | CATEGORY_OP_1_ARG | CATEGORY_LOGIC | PREFIX | LOGIC_NEGATE, 0, 0, "C_Syntax", "C" },
     { "?", 0, 0, 0, CfrTil_C_ConditionalExpression, COMBINATOR | IMMEDIATE, 0, 0, "C_Syntax", "C" },
@@ -93,8 +93,8 @@ CPrimitive CPrimitives [] = {
     { "typedef", 0, 0, 0, CfrTil_Typedef, 0, 0, 0, "C_Syntax", "C" },
     { "&", 0, 0, 0, CfrTil_AddressOf, ( NO_CODING | ADDRESS_OF_OP | IMMEDIATE ), 0, 0, "C_Syntax", "C" }, // avoid name clash with '&&' and '&' 
 
-    { "}", 0, 0, 0, CfrTil_TypedefStructEnd, IMMEDIATE | KEYWORD, 0, 0, "C_Typedef", "C_Syntax" },
-    { "{", 0, 0, 0, CfrTil_TypedefStructBegin, IMMEDIATE | KEYWORD, 0, 0, "C_Typedef", "C_Syntax" },
+    //{ "}", 0, 0, 0, CfrTil_TypedefStructEnd, IMMEDIATE | KEYWORD, 0, 0, "C_Typedef", "C_Syntax" },
+    //{ "{", 0, 0, 0, CfrTil_TypedefStructBegin, IMMEDIATE | KEYWORD, 0, 0, "C_Typedef", "C_Syntax" },
 
     { "if", 0, 0, 0, CfrTil_If_PrefixCombinators, KEYWORD | COMBINATOR | IMMEDIATE, 0, 0, "PrefixCombinators", "C" },
     { "while", 0, 0, 0, CfrTil_While_PrefixCombinators, KEYWORD | COMBINATOR | IMMEDIATE, 0, 0, "PrefixCombinators", "C" },
@@ -146,8 +146,9 @@ CPrimitive CPrimitives [] = {
 
     { "};", 0, 0, 0, CfrTil_ClassStructureEnd, 0, 0, 0, "Class", "Root" },
     { "+:{", 0, 0, 0, CfrTil_CloneStructureBegin, 0, 0, 0, "Class", "Root" },
-    { ":{", 0, 0, 0, CfrTil_ClassStructureBegin, 0, 0, 0, "Class", "Root" },
+    { ":{", 0, 0, 0, CfrTil_ClassTypedef, 0, 0, 0, "Class", "Root" },
     { "class", 0, 0, 0, CfrTil_Class_New, 0, 0, 0, "Class", "Root" },
+    { "struct", 0, 0, 0, CfrTil_Class_New, 0, 0, 0, "Class", "Root" },
     { "new", 0, 0, 0, ( block ) CfrTil_Class_Value_New, 0, 0, 0, "Class", "Root" },
     { "clone", 0, 0, 0, CfrTil_Class_Clone, 0, 0, 0, "Class", "Root" },
     { "]", 0, 0, 0, CfrTil_ArrayEnd, ( IMMEDIATE | OBJECT_OPERATOR ), RIGHT_BRACKET, 0, "Class", "Root" },
@@ -448,10 +449,10 @@ CPrimitive CPrimitives [] = {
     { "asmModeOn", 0, 0, 0, CfrTil_AsmModeOn, 0, 0, 0, "Interpreter", "Root" },
     { "asmModeOff", 0, 0, 0, CfrTil_AsmModeOff, 0, 0, 0, "Interpreter", "Root" },
     { "compileModeOff", 0, 0, 0, CfrTil_LeftBracket, 0, 0, 0, "Interpreter", "Root" },
-    { "//", 0, 0, 0, CfrTil_CommentToEndOfLine, IMMEDIATE | KEYWORD, 0, W_COMMENT, "Interpreter", "Root" },
-    { "#!", 0, 0, 0, CfrTil_CommentToEndOfLine, IMMEDIATE, 0, W_COMMENT, "Interpreter", "Root" },
-    { "*/", 0, 0, 0, CfrTil_NoOp, IMMEDIATE, 0, W_COMMENT, "Interpreter", "Root" },
-    { "/*", 0, 0, 0, CfrTil_ParenthesisComment, IMMEDIATE, 0, W_COMMENT, "Interpreter", "Root" },
+    { "//", 0, 0, 0, CfrTil_CommentToEndOfLine, IMMEDIATE | KEYWORD | COMMENT, 0, W_COMMENT, "Interpreter", "Root" },
+    { "#!", 0, 0, 0, CfrTil_CommentToEndOfLine, IMMEDIATE | COMMENT, 0, W_COMMENT, "Interpreter", "Root" },
+    { "*/", 0, 0, 0, CfrTil_NoOp, IMMEDIATE | COMMENT, 0, W_COMMENT, "Interpreter", "Root" },
+    { "/*", 0, 0, 0, CfrTil_ParenthesisComment, IMMEDIATE | COMMENT, 0, W_COMMENT, "Interpreter", "Root" },
     { "eval", 0, 0, 0, CfrTil_Interpreter_EvalWord, 0, 0, 0, "Interpreter", "Root" },
     { "doWord", 0, 0, 0, CfrTil_DoWord, 0, 0, 0, "Interpreter", "Root" },
     { "tokenToWord", 0, 0, 0, CfrTil_TokenToWord, 0, 0, 0, "Interpreter", "Root" },

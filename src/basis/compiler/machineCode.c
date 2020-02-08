@@ -135,8 +135,10 @@ _Compile_ImmDispData ( int64 immDisp, Boolean size, Boolean forceFlag )
     // to not compile an imm when imm is a parameter, set isize == 0 and imm == 0
     if ( size > 0 )
     {
-        if ( size == BYTE ) 
+        if ( size == BYTE )
             _Compile_Int8 ( ( byte ) immDisp ) ;
+        else if ( size == 2 )
+            _Compile_Int16 ( immDisp ) ;
         else if ( size == 4 )
             _Compile_Int32 ( immDisp ) ;
         else if ( size == CELL )
@@ -144,9 +146,9 @@ _Compile_ImmDispData ( int64 immDisp, Boolean size, Boolean forceFlag )
     }
     else // with operandSize == 0 let the compiler use the minimal size ; nb. can't be imm == 0
     {
-        if ( abs(immDisp) >= 0x7fffffff )
+        if ( abs ( immDisp ) >= 0x7fffffff )
             _Compile_Int64 ( immDisp ) ;
-        else if ( abs (immDisp) >= 0x7f )
+        else if ( abs ( immDisp ) >= 0x7f )
             _Compile_Int32 ( immDisp ) ;
         else if ( immDisp || forceFlag )
             _Compile_Int8 ( ( byte ) immDisp ) ;
@@ -270,22 +272,28 @@ Compile_CalculateWrite_Instruction_X64 ( uint8 opCode0, uint8 opCode1, Boolean m
 void
 Compile_Move ( uint8 direction, uint8 mod, uint8 reg, uint8 rm, uint8 operandSize, uint8 sib, int64 disp, uint8 dispSize, int64 imm, uint8 immSize )
 {
-    uint8 opCode0 = 0, opCode ;
+    uint8 opCode0 = 0, opCode, modRm ;
     uint16 controlFlags = ( disp ? DISP_B : 0 ) | ( sib ? SIB_B : 0 ) ;
     if ( ! operandSize ) operandSize = 8 ;
     if ( imm || immSize )
     {
-        reg = 0 ;
+        reg = 0 ; // the rm is the destination and this is move immediate
         controlFlags |= IMM_B ;
-        if ( immSize == 1 )
+        if ( immSize < 8 )
         {
-            opCode = 0xc6 ;
-            controlFlags |= MODRM_B ;
-            _Compile_Write_Instruction_X64 ( 0, 0, opCode, 0xc0, controlFlags, 0, 0, 0, imm, immSize ) ;
-            return ;
+            if ( immSize == 1 ) opCode = 0xb0 + rm ;
+            else if ( immSize == 2 )
+            {
+                opCode0 = 0x66 ;
+                opCode = 0xb8 | rm ;
+                modRm = 0 ;
+            }
+            else if ( immSize == 4 )
+            {
+                opCode = 0xb8 | rm ;
+                modRm = 0 ;
+            }
         }
-        else if ( immSize == 2 ) opCode = 0x66 ;
-        else if ( immSize == 4 ) opCode = 0xc7 ;
         else //if ( immSize == 8 ) 
         {
             opCode = 0xb8 ;
@@ -599,7 +607,7 @@ Compile_X_Group5 ( Compiler * compiler, int64 op )
         if ( one->W_ObjectAttributes & REGISTER_VARIABLE ) _Compile_Group5 ( op, REG, one->RegToUse, 0, 0, 0 ) ;
         else
         {
-            Compile_GetVarLitObj_RValue_To_Reg (one, ACC , 0) ;
+            Compile_GetVarLitObj_RValue_To_Reg ( one, ACC, 0 ) ;
             //_Compile_Group5 ( int8 code, int8 mod, int8 rm, int8 sib, int64 disp, int8 size )
             Compiler_WordStack_SCHCPUSCA ( 0, 0 ) ;
             _Compile_Group5 ( op, REG, ACC, 0, 0, 0 ) ;

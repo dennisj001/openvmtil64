@@ -1,15 +1,495 @@
 #include "../../include/cfrtil64.h"
 
+#define P_DEBUG 0
+#define PP_DEBUG 1
+
+
+#define PRE_STRUCTURE_NAME 1
+#define POST_STRUCTURE_NAME 2
+#define TYPE_NAME 4
+//#define UP_NAMESPACE (tdsci->Tdsci_TotalStructureNamespace ? tdsci->Tdsci_TotalStructureNamespace : tdsci->PreBackgroundNamespace)
+//#define FIELD_ADD (tdsci->Tdsci_StructureUnion_Namespace ? tdsci->Tdsci_StructureUnion_Namespace : tdsci->Tdsci_TotalStructureNamespace)
+
+//#define TDSCI_IN_NAMESPACE tdsci->Tdsci_GlobalStructureNamespace ? tdsci->Tdsci_GlobalStructureNamespace : tdsci->Tdsci_Structure_Namespace ? \
+//        tdsci->Tdsci_Structure_Namespace : tdsci->Tdsci_TotalGlobalNamespace ? tdsci->Tdsci_TotalGlobalNamespace : tdsci->PreBackgroundNamespace
 // assuming we are using "Class" namespace
 // syntax : ':{' ( classId identifer ( '[' integer ']' )* ';' ? )* '};'
 
+// _ID :: ALPHA_NUMERIC *
+// DIGIT :: NUMERIC *
+// ALIAS_ID :: _ID '," ID
+// ID :: _ID || ALIAS_ID
+// ID_FIELD : ID | ARRAY_FIELD
+// ARRAY :: ('[' DIGIT ] ']') | ARRAY*
+// ARRAY_FIELD :: _ID ARRAY | ARRAY_FIELD ',' ARRAY_FIELD
+// TYPE_FIELD :: TYPE_NAME '*'? ID_FIELD ';'
+// STRUCTURE :: '{' FIELD * '}'
+// STRUCT_FIELD :: ('struct' | 'union') TYPE_FIELD | _ID STRUCTURE ID_FIELD | STRUCTURE ID_FIELD | _ID STRUCTURE ';'
+// FIELD :: STRUCT_FIELD | TYPE_FIELD
+// TYPEDEF :: 'typedef' STRUCT_FIELD
+// TYPE :: 'type' TYPE_FIELD
+
+void
+TDSCI_DebugPrintWord ( TypeDefStructCompileInfo *tdsci, Word * word )
+{
+    if ( word ) _Printf ( ( byte* ) "\n%s.%s : field size = %ld : structure size = %ld : total size = %ld : offset == %ld : at %s",
+        ( word->TypeNamespace ? word->TypeNamespace->Name : word->S_ContainingNamespace->Name ), word->Name, tdsci->Tdsci_Field_Size, tdsci->Tdsci_StructureUnion_Size,
+        tdsci->Tdsci_TotalSize, tdsci->Tdsci_Offset, Context_Location ( ) ) ;
+}
+
+Boolean
+Parser_Check_Do_CommentWord ( Word * word )
+{
+    if ( word && ( word->W_MorphismAttributes & ( COMMENT | DEBUG_WORD ) ) )
+    {
+        Interpreter_DoWord ( _Interpreter_, word, _Lexer_->TokenStart_ReadLineIndex, _Lexer_->SC_Index ) ;
+        return true ;
+    }
+    else return false ;
+}
+
+Boolean
+Parser_Check_Do_Debug_Token ( byte * token )
+{
+    Word * word = Finder_Word_FindUsing ( _Finder_, token, 0 ) ;
+    return Parser_Check_Do_CommentWord ( word ) ;
+}
+
+byte *
+TDSCI_ReadToken ( TypeDefStructCompileInfo *tdsci )
+{
+#if 1   
+    //if ( Is_DebugOn )
+    {
+        do
+        {
+            tdsci->TdsciToken = Lexer_ReadToken ( _Lexer_ ) ;
+            //if ( Is_DebugOn ) _Printf ( ( byte* ) "%s ", tdsci->TdsciToken ) ;
+        }
+        while ( Parser_Check_Do_Debug_Token ( tdsci->TdsciToken ) ) ;
+    }
+    //else tdsci->TdsciToken = Lexer_ReadToken ( _Lexer_ ) ;
+#endif    
+    return tdsci->TdsciToken ;
+}
+
+void
+TDSCI_Init ( TypeDefStructCompileInfo * tdsci )
+{
+    if ( tdsci->BackgroundNamespace ) memset ( tdsci, 0, sizeof (TypeDefStructCompileInfo ) ) ;
+    tdsci->BackgroundNamespace = _CfrTil_Namespace_InNamespaceGet ( ) ;
+    SetState ( _Compiler_, TDSCI_PARSING, true ) ;
+}
+
+TypeDefStructCompileInfo *
+TypeDefStructCompileInfo_New ( )
+{
+    TypeDefStructCompileInfo *tdsci = ( TypeDefStructCompileInfo * ) Mem_Allocate ( sizeof (TypeDefStructCompileInfo ), CONTEXT ) ;
+    TDSCI_Init ( tdsci ) ;
+    return tdsci ;
+}
+
+void
+CfrTil_Parse_Error ( byte * msg, byte * token )
+{
+    byte * buffer = Buffer_Data_Cleared ( _CfrTil_->ScratchB1 ) ;
+    sprintf ( ( char* ) buffer, "\nCfrTil_Parse_ClassStructure : %s : \'%s\' at %s", ( char* ) msg, token, Context_Location ( ) ) ;
+    _SyntaxError ( ( byte* ) buffer, 1 ) ; // else structure component size error
+}
+
+// _ID :: ALPHA_NUMERIC *
+// DIGIT :: NUMERIC *
+// ALIAS_ID :: _ID '," ID
+// ID :: _ID || ALIAS_ID
+// ID_FIELD : ID | ARRAY_FIELD
+// ARRAY :: ('[' DIGIT ] ']') | ARRAY*
+// ARRAY_FIELD :: _ID ARRAY | ARRAY_FIELD ',' ARRAY_FIELD
+// TYPE_FIELD :: TYPE_NAME '*'? ID_FIELD ';'
+// STRUCTURE :: '{' FIELD * '}'
+// STRUCT_FIELD :: ('struct' | 'union') TYPE_FIELD | _ID STRUCTURE ID_FIELD | STRUCTURE ID_FIELD | _ID STRUCTURE ';'
+// FIELD :: STRUCT_FIELD | TYPE_FIELD
+// TYPEDEF :: 'typedef' STRUCT_FIELD
+// TYPE :: 'type' TYPE_FIELD
+
+void
+Parse_ArrayField ( TypeDefStructCompileInfo * tdsci )
+{
+    int64 arrayDimensions [ 32 ] ; // 32 : max dimensions for now
+    int64 size = tdsci->Tdsci_Field_Size, i, arrayDimensionSize ;
+    byte *token = tdsci->TdsciToken ;
+    memset ( arrayDimensions, 0, sizeof (arrayDimensions ) ) ;
+
+    for ( i = 0 ; 1 ; i ++ )
+    {
+        if ( token && String_Equal ( ( char* ) token, "[" ) )
+        {
+            CfrTil_InterpretNextToken ( ) ; // next token must be an integer for the array dimension size
+            arrayDimensionSize = DataStack_Pop ( ) ;
+            size = size * arrayDimensionSize ;
+            tdsci->Tdsci_Field_Size = size ;
+            token = TDSCI_ReadToken ( tdsci ) ;
+            if ( ! String_Equal ( ( char* ) token, "]" ) ) CfrTil_Exception ( SYNTAX_ERROR, 0, 1 ) ;
+            else arrayDimensions [ i ] = arrayDimensionSize ;
+            token = TDSCI_ReadToken ( tdsci ) ;
+        }
+        else
+        {
+            if ( i )
+            {
+                tdsci->Tdsci_Field_Object->ArrayDimensions = ( int64 * ) Mem_Allocate ( tdsci->Tdsci_Field_Size, DICTIONARY ) ;
+                MemCpy ( tdsci->Tdsci_Field_Object->ArrayDimensions, arrayDimensions, tdsci->Tdsci_Field_Size ) ;
+                tdsci->Tdsci_Field_Object->ArrayNumberOfDimensions = i ;
+                // print array field
+                //if ( dataPtr ) _Printf ( (byte*) "\n\t%s\t%s [ %d ]" = %lx", token0, token1, arrayDimensionSize, (sizeof token0) data [ aoffset ]) ;
+            }
+            break ;
+        }
+    }
+}
+// we have read the idField name = token
+
+// _ID :: ALPHA_NUMERIC *
+// DIGIT :: NUMERIC *
+// ALIAS_ID :: _ID '," ID
+// ID :: _ID || ALIAS_ID
+// ID_FIELD : ID | ARRAY_FIELD
+// ARRAY :: ('[' DIGIT ] ']') | ARRAY*
+// ARRAY_FIELD :: _ID ARRAY | ARRAY_FIELD ',' ARRAY_FIELD
+// TYPE_FIELD :: TYPE_NAME '*'? ID_FIELD ';'
+// STRUCTURE :: '{' FIELD * '}'
+// STRUCT_FIELD :: ('struct' | 'union') TYPE_FIELD | _ID STRUCTURE ID_FIELD | STRUCTURE ID_FIELD | _ID STRUCTURE ';'
+// FIELD :: STRUCT_FIELD | TYPE_FIELD
+// TYPEDEF :: 'typedef' STRUCT_FIELD
+// TYPE :: 'type' TYPE_FIELD
+// ns and t_type have not been used to simplify here ??
+
+void
+Parse_Do_Identifier ( TypeDefStructCompileInfo * tdsci, int64 t_type, int64 size )
+{
+    byte *token = tdsci->TdsciToken ;
+    Word * id ;
+    if ( ( t_type == POST_STRUCTURE_NAME ) && GetState ( tdsci, TDSCI_STRUCTURE_COMPLETED ) )
+    {
+        Finder_SetQualifyingNamespace ( _Finder_, tdsci->Tdsci_TotalStructureNamespace ) ;
+        //_Namespace_VariableValueSet ( tdsci->Tdsci_StructureUnion_Namespace, ( byte* ) "size", tdsci->Tdsci_StructureUnion_Size ) ; //tdsci->Tdsci_Offset ) ;
+        Class_Size_Set ( tdsci->Tdsci_StructureUnion_Namespace, tdsci->Tdsci_StructureUnion_Size ) ;
+        if ( tdsci->Tdsci_TotalStructureNamespace )
+        {
+            if ( tdsci->Tdsci_TotalStructureNamespace->Name )
+            {
+                id = _CfrTil_Alias ( tdsci->Tdsci_TotalStructureNamespace, token ) ;
+                id->Lo_List = tdsci->Tdsci_TotalStructureNamespace->Lo_List ;
+                id->W_MorphismAttributes |= IMMEDIATE ;
+                _CfrTil_->LastFinished_Word = 0 ; // nb! : for _CfrTil_RecycleInit_Compiler_N_M_Node_WordList
+            }
+            else tdsci->Tdsci_TotalStructureNamespace->Name = String_New ( token, DICTIONARY ) ;
+        }
+        else
+        {
+
+            _CfrTil_Namespace_InNamespaceSet ( tdsci->Tdsci_StructureUnion_Namespace ) ;
+            id = DataObject_New ( CLASS_CLONE, 0, token, 0, 0, 0, 0, 0, 0, 0, - 1 ) ;
+            Class_Size_Set ( id, tdsci->Tdsci_StructureUnion_Size ) ;
+            //id->W_ObjectAttributes |= ( STRUCTURE ) ;
+            //id->ObjectByteSize = tdsci->Tdsci_StructureUnion_Size ;
+
+            //id = DataObject_New ( C_TYPE, 0, token, 0, 0, 0, 0, 0, 0, 0, - 1 ) ;
+            //_Namespace_VariableValueSet ( ns, ( byte* ) "size", size ) ;
+            //ns->Lo_Size = size ;
+        }
+    }
+    else
+    {
+        if ( t_type == PRE_STRUCTURE_NAME )
+        {
+            tdsci->Tdsci_StructureUnion_Namespace = id = DataObject_New ( CLASS, 0, token, 0, 0, 0, 0, 0, 0, 0, - 1 ) ;
+            tdsci->Tdsci_TotalStructureNamespace = id ;
+            id->W_ObjectAttributes |= ( STRUCTURE ) ;
+            //id->ObjectByteSize = tdsci->Tdsci_StructureUnion_Size ;
+
+        }
+        else // if ( t_type == TYPE_NAME )
+        {
+            // shouldn't need these 2 lines ...
+            if ( ! tdsci->Tdsci_StructureUnion_Namespace ) tdsci->Tdsci_StructureUnion_Namespace = _CfrTil_Namespace_InNamespaceGet ( ) ;
+            if ( ! tdsci->Tdsci_TotalStructureNamespace ) tdsci->Tdsci_TotalStructureNamespace = tdsci->Tdsci_StructureUnion_Namespace ;
+
+            tdsci->Tdsci_Field_Object = id = CfrTil_ClassField_New ( token, tdsci->Tdsci_StructureUnion_Namespace, size, tdsci->Tdsci_Offset ) ;
+            tdsci->Tdsci_Field_Size = size ;
+            //tdsci->Tdsci_Field_Object->ObjectByteSize = size ;
+        }
+    }
+    if ( _O_->Verbosity > 1 ) TDSCI_DebugPrintWord ( tdsci, id ) ; // print class field
+    //TDSCI_DebugPrintWord ( tdsci, id ) ;    // print class field
+    //if ( dataPtr ) _Printf ( (byte*) "\n\t%s\t%s" = %lx", token0, token1, (sizeof token0) data [ offset ]) ;
+}
+
+// _ID :: (ALPHA | NUMBER) *
+// NUMBER :: DIGIT *
+// ALIAS_ID :: _ID '," ID
+// ID :: _ID || ALIAS_ID
+// ARRAY_FIELD :: _ID ( ARRAY | ARRAY_FIELD ',' ARRAY_FIELD )
+// ID_FIELD : ID | ARRAY_FIELD
+// ARRAY :: ('[' NUMBER ] ']') | ARRAY*
+// TYPE_FIELD :: TYPE_NAME '*'? ID_FIELD ';'
+// STRUCTURE :: '{' FIELD * '}'
+// STRUCT_FIELD :: ('struct' | 'union') (TYPE_FIELD | _ID STRUCTURE ID_FIELD | STRUCTURE ID_FIELD | _ID STRUCTURE) ';'
+// FIELD :: STRUCT_FIELD | TYPE_FIELD
+// TYPEDEF :: 'typedef' STRUCT_FIELD
+// TYPE :: 'type' TYPE_FIELD
+
+void
+Parse_Identifier_Field ( TypeDefStructCompileInfo * tdsci, int64 t_type, int64 size )
+{
+    byte *token ;
+    token = tdsci->TdsciToken ;
+next:
+    while ( ( token [0] != ';' ) && ( token [0] != '}' ) )
+    {
+        Parse_Do_Identifier ( tdsci, t_type, size ) ;
+        token = TDSCI_ReadToken ( tdsci ) ;
+        while ( token [0] == ',' )
+        {
+            token = TDSCI_ReadToken ( tdsci ) ;
+            if ( ( token [0] == '*' ) )
+            {
+                size = CELL ;
+                tdsci->Tdsci_Field_Size = size ;
+                token = TDSCI_ReadToken ( tdsci ) ;
+                Parse_Identifier_Field ( tdsci, TYPE_NAME, size ) ;
+                token = tdsci->TdsciToken ;
+                goto next ;
+            }
+            else
+            {
+                Parse_Do_Identifier ( tdsci, t_type, 0 ) ;
+                token = TDSCI_ReadToken ( tdsci ) ;
+            }
+        }
+        if ( token [0] == '[' )
+        {
+            Parse_ArrayField ( tdsci ) ;
+            if ( tdsci->TdsciToken[0] != ';' ) token = TDSCI_ReadToken ( tdsci ) ;
+            else token = tdsci->TdsciToken ;
+        }
+    }
+    // print class field
+    //if ( dataPtr ) _Printf ( (byte*) "\n\t%s\t%s" = %lx", token0, token1, (sizeof token0) data [ offset ]) ;
+    //return rtn ;
+}
+
+// we start the structure/union with a '{' 
+// we recursively give fields which could include other structures/unions
+
+// _ID :: ALPHA_NUMERIC *
+// DIGIT :: NUMERIC *
+// ALIAS_ID :: _ID '," ID
+// ID :: _ID || ALIAS_ID
+// ID_FIELD : ID | ARRAY_FIELD
+// ARRAY :: ('[' DIGIT ] ']') | ARRAY*
+// ARRAY_FIELD :: _ID ARRAY | ARRAY_FIELD ',' ARRAY_FIELD
+// TYPE_FIELD :: TYPE_NAME '*'? ID_FIELD ';'
+// STRUCTURE :: '{' FIELD * '}'
+// STRUCT_FIELD :: ('struct' | 'union') TYPE_FIELD | _ID STRUCTURE ID_FIELD | STRUCTURE ID_FIELD | _ID STRUCTURE ';'
+// FIELD :: STRUCT_FIELD | TYPE_FIELD
+// TYPEDEF :: 'typedef' STRUCT_FIELD
+// TYPE :: 'type' TYPE_FIELD
+
+void
+Parse_Structure ( TypeDefStructCompileInfo * tdsci )
+{
+    Lexer * lexer = _Lexer_ ;
+    //Namespace *globalNs = _CfrTil_Namespace_InNamespaceGet ( ) ;
+    //Namespace_AddToNamespaces_SetUsing ( Namespace_Find ( (byte*) "C_Typedef" ), 1, USING ) ;
+    if ( GetState ( tdsci, TDSCI_CLONE_FLAG ) ) //cloneFlag )
+    {
+        tdsci->Tdsci_Offset = _Namespace_VariableValueGet ( tdsci->BackgroundNamespace, ( byte* ) "size" ) ; // allows for cloning - prototyping
+        tdsci->Tdsci_TotalSize = tdsci->Tdsci_Offset ;
+        SetState ( tdsci, TDSCI_CLONE_FLAG, false ) ;
+    }
+    Lexer_SetTokenDelimiters ( lexer, ( byte* ) " ,\n\r\t", COMPILER_TEMP ) ;
+    tdsci->Tdsci_StructureUnion_Size = 0 ;
+
+    TDSCI_ReadToken ( tdsci ) ;
+
+    do
+    {
+        Parse_A_Typedef_Field ( tdsci ) ; // a structure can other struct/unions as fields
+        if ( GetState ( tdsci, TDSCI_UNION ) )
+        {
+            if ( tdsci->Tdsci_Field_Size > tdsci->Tdsci_StructureUnion_Size ) tdsci->Tdsci_StructureUnion_Size = tdsci->Tdsci_Field_Size ;
+        }
+        else // not TDSCI_UNION // field may be a struct
+        {
+            tdsci->Tdsci_StructureUnion_Size += tdsci->Tdsci_Field_Size ;
+            tdsci->Tdsci_Offset += tdsci->Tdsci_Field_Size ;
+        }
+        if ( tdsci->TdsciToken && ( tdsci->TdsciToken [0] == ';' ) ) TDSCI_ReadToken ( tdsci ) ;
+    }
+    while ( tdsci->TdsciToken && ( tdsci->TdsciToken [0] != '}' ) ) ;
+    if ( GetState ( tdsci, TDSCI_UNION ) )
+    {
+        tdsci->Tdsci_Offset += tdsci->Tdsci_StructureUnion_Size ;
+    }
+    //if ( GetState ( tdsci, ( TDSCI_UNION | TDSCI_STRUCT ) ) )
+    if ( GetState ( tdsci, TDSCI_STRUCT ) )
+    {
+        //tdsci->Tdsci_Offset += tdsci->Tdsci_Structure_Size ;
+        tdsci->Tdsci_StructureUnion_Size = tdsci->Tdsci_Offset ;
+    }
+    tdsci->Tdsci_StructureUnion_Namespace->ObjectByteSize = tdsci->Tdsci_StructureUnion_Size ;
+    tdsci->Tdsci_StructureUnion_Namespace = tdsci->Tdsci_TotalStructureNamespace ;
+    tdsci->Tdsci_Field_Size = 0 ;
+    tdsci->Tdsci_TotalSize = tdsci->Tdsci_Offset ;
+    if ( tdsci->Tdsci_TotalStructureNamespace ) tdsci->Tdsci_TotalStructureNamespace->ObjectByteSize = tdsci->Tdsci_Offset ;
+    SetState_TrueFalse ( tdsci, TDSCI_STRUCTURE_COMPLETED, ( TDSCI_UNION | TDSCI_STRUCT ) ) ;
+
+    //TDSCI_ReadToken ( tdsci ) ;
+}
+
+// we read the 'struct'/'union' token
+// (namespace (( '*' )? id ( '[' )* ';') | ( '{' )? id (,id)*) ';'
+
+// _ID :: ALPHA_NUMERIC *
+// DIGIT :: NUMERIC *
+// ALIAS_ID :: _ID '," ID
+// ID :: _ID || ALIAS_ID
+// ID_FIELD : ID | ARRAY_FIELD
+// ARRAY :: ('[' DIGIT ] ']') | ARRAY*
+// ARRAY_FIELD :: _ID ARRAY | ARRAY_FIELD ',' ARRAY_FIELD
+// TYPE_FIELD :: TYPE_NAME '*'? ID_FIELD ';'
+// STRUCTURE :: '{' FIELD * '}'
+// STRUCT_FIELD :: ('struct' | 'union') TYPE_FIELD | _ID STRUCTURE ID_FIELD | STRUCTURE ID_FIELD | _ID STRUCTURE ';'
+// FIELD :: STRUCT_FIELD | TYPE_FIELD
+// TYPEDEF :: 'typedef' STRUCT_FIELD
+// TYPE :: 'type' TYPE_FIELD
+
+void
+Parse_StructOrUnion_Type ( TypeDefStructCompileInfo * tdsci, int64 structOrUnionState )
+{
+    byte * token ;
+    Namespace * type0 ;
+    SetState ( tdsci, structOrUnionState, true ) ;
+    token = TDSCI_ReadToken ( tdsci ) ;
+    if ( token )
+    {
+        if ( token [0] != '{' )
+        {
+            byte * token1 = Lexer_Peek_Next_NonDebugTokenWord ( _Lexer_, 0, 0 ) ;
+            if ( ( token1 [0] == '*' ) && ( type0 = _Namespace_Find ( token, 0, 0 ) ) )
+            {
+                Parse_Type_Field ( tdsci, type0 ) ;
+                return ;
+            }
+            else
+            {
+                // pre-structure identifiers
+                Parse_Do_Identifier ( tdsci, PRE_STRUCTURE_NAME, 0 ) ;
+                token = TDSCI_ReadToken ( tdsci ) ;
+            }
+        }
+        if ( token [0] == '{' )
+        {
+            // name will be added 'post structure'
+            if ( ! tdsci->Tdsci_StructureUnion_Namespace ) tdsci->Tdsci_StructureUnion_Namespace = DataObject_New ( CLASS, 0, 0, 0, 0, 0, 0, 0, 0, 0, - 1 ) ;
+            if ( ! tdsci->Tdsci_TotalStructureNamespace ) tdsci->Tdsci_TotalStructureNamespace = tdsci->Tdsci_StructureUnion_Namespace ;
+            Parse_Structure ( tdsci ) ;
+        }
+        else CfrTil_Parse_Error ( "No \'{\' token in struct/union field", token ) ;
+        // prost-structure identifiers
+        if ( tdsci->TdsciToken && ( tdsci->TdsciToken [0] != ';' ) )
+        {
+            if ( tdsci->TdsciToken [1] != ';' ) // consider case of "};" token
+            {
+                TDSCI_ReadToken ( tdsci ) ;
+                Parse_Identifier_Field ( tdsci, POST_STRUCTURE_NAME, 0 ) ;
+            }
+        }
+
+    }
+}
+
+// _ID :: ALPHA_NUMERIC *
+// DIGIT :: NUMERIC *
+// ALIAS_ID :: _ID '," ID
+// ID :: _ID || ALIAS_ID
+// ID_FIELD : ID | ARRAY_FIELD
+// ARRAY :: ('[' DIGIT ] ']') | ARRAY*
+// ARRAY_FIELD :: _ID ARRAY | ARRAY_FIELD ',' ARRAY_FIELD
+// TYPE_FIELD :: TYPE_NAME '*'? ID_FIELD ';'
+// STRUCTURE :: '{' FIELD * '}'
+// STRUCT_FIELD :: ('struct' | 'union') TYPE_FIELD | _ID STRUCTURE ID_FIELD | STRUCTURE ID_FIELD | _ID STRUCTURE ';'
+// FIELD :: STRUCT_FIELD | TYPE_FIELD
+// TYPEDEF :: 'typedef' STRUCT_FIELD
+// TYPE :: 'type' TYPE_FIELD
+
+void
+Parse_Type_Field ( TypeDefStructCompileInfo * tdsci, Namespace * type0 )
+{
+    byte * token = tdsci->TdsciToken ;
+    int64 size = 0 ;
+    tdsci->Tdsci_Field_Size = 0 ;
+    if ( type0 )
+    {
+        tdsci->Tdsci_Field_Type_Namespace = type0 ;
+        size = CfrTil_Get_Namespace_SizeVar_Value ( type0 ) ;
+        //CfrTil_Set_Namespace_ObjectByteSize ( type0, size ) ;
+        token = TDSCI_ReadToken ( tdsci ) ;
+        if ( ( token [0] == '*' ) )
+        {
+            size = CELL ;
+            tdsci->Tdsci_Field_Size = size ;
+            token = TDSCI_ReadToken ( tdsci ) ;
+        }
+        Parse_Identifier_Field ( tdsci, TYPE_NAME, size ) ;
+    }
+    else CfrTil_Parse_Error ( "No type in type field", token ) ;
+}
+
+
+// _ID :: ALPHA_NUMERIC *
+// DIGIT :: NUMERIC *
+// ALIAS_ID :: _ID '," ID
+// ID :: _ID || ALIAS_ID
+// ARRAY :: ('[' DIGIT ] ']') | ARRAY*
+// ARRAY_FIELD :: _ID ARRAY | (ARRAY_FIELD ',' ARRAY_FIELD)
+// ID_FIELD : ID | ARRAY_FIELD
+// TYPE_FIELD :: TYPE_NAME '*'? ID_FIELD ';'
+// STRUCTURE :: '{' FIELD * '}'
+// STRUCT_FIELD :: ('struct' | 'union') (TYPE_FIELD | _ID STRUCTURE ID_FIELD | STRUCTURE ID_FIELD | _ID STRUCTURE) ';'
+// FIELD :: STRUCT_FIELD | TYPE_FIELD
+// TYPEDEF :: 'typedef' STRUCT_FIELD
+// TYPE :: 'type' TYPE_FIELD
+
+void
+Parse_A_Typedef_Field ( TypeDefStructCompileInfo * tdsci )
+{
+    Namespace *type0 ;
+    byte * token ;
+    //_CfrTil_Namespace_InNamespaceSet ( tdsci->Tdsci_StructureUnion_Namespace ? tdsci->Tdsci_StructureUnion_Namespace : tdsci->Tdsci_TotalStructureNamespace ) ; // parsing arrays changes namespace so reset it here
+    if ( ! ( token = tdsci->TdsciToken ) ) token = TDSCI_ReadToken ( tdsci ) ;
+    if ( String_Equal ( ( char* ) token, "struct" ) ) Parse_StructOrUnion_Type ( tdsci, TDSCI_STRUCT ) ;
+    else if ( String_Equal ( ( char* ) token, "union" ) ) Parse_StructOrUnion_Type ( tdsci, TDSCI_UNION ) ;
+    else if ( type0 = _Namespace_Find ( token, 0, 0 ) ) Parse_Type_Field ( tdsci, type0 ) ;
+    else
+    {
+        token = Lexer_Peek_Next_NonDebugTokenWord ( _Lexer_, 1, 0 ) ;
+        if ( token[0] == '{' ) Parse_StructOrUnion_Type ( tdsci, TDSCI_STRUCT ) ;
+        else CfrTil_Parse_Error ( "Can't find type field namespace", token ) ;
+    }
+    // print class field
+    //if ( dataPtr ) _Printf ( (byte*) "\n\t%s\t%s" = %lx", token0, token1, (sizeof token0) data [ offset ]) ;
+}
+
+#if 0
+
 int64
-_CfrTil_Parse_ClassStructure ( int64 cloneFlag )
+//_CfrTil_Parse_ClassStructure (int64 cloneFlag, byte* data, Boolean printFlag)
+Parse_Structure ( 0, int64 cloneFlag, 0, int64 startOffset, byte * dataPtr )
 {
     int64 size = 0, offset = 0, sizeOf = 0, i, arrayDimensionSize ;
-    Namespace *ns, *classNs = _CfrTil_Namespace_InNamespaceGet ( ), *classFieldObject ;
-    Word * aclass ;
-    byte * token ;
+    Namespace *type0, *classNs = _CfrTil_Namespace_InNamespaceGet ( ), *classFieldObject ;
+    byte * token0, *token1, *token2, *token3 ;
     int64 arrayDimensions [ 32 ] ; // 32 : max dimensions for now
     memset ( arrayDimensions, 0, sizeof (arrayDimensions ) ) ;
     if ( cloneFlag )
@@ -23,58 +503,60 @@ _CfrTil_Parse_ClassStructure ( int64 cloneFlag )
         // each name/word is an increasing offset from object address on stack
         // first name is at 0 offset
         _CfrTil_Namespace_InNamespaceSet ( classNs ) ; // parsing arrays changes namespace so reset it here
-        token = _Lexer_ReadToken ( _Context_->Lexer0, ( byte* ) " ,\n\r\t" ) ;
+        token0 = _Lexer_ReadToken ( lexer, ( byte* ) " ,\n\r\t" ) ;
 gotNextToken:
-        if ( String_Equal ( ( char* ) token, "};" ) ) break ;
-        if ( ( String_Equal ( ( char* ) token, "}" ) ) && GetState ( _Context_, C_SYNTAX ) )
+        if ( String_Equal ( ( char* ) token0, "};" ) ) break ;
+        if ( ( String_Equal ( ( char* ) token0, "}" ) ) && GetState ( _Context_, C_SYNTAX ) )
         {
             CfrTil_TypedefStructEnd ( ) ;
             break ;
         }
-        if ( String_Equal ( ( char* ) token, ";" ) ) continue ;
-        if ( String_Equal ( ( char* ) token, "//" ) )
+        if ( String_Equal ( ( char* ) token0, ";" ) ) continue ;
+        if ( String_Equal ( ( char* ) token0, "//" ) )
         {
             ReadLiner_CommentToEndOfLine ( _Context_->ReadLiner0 ) ;
             continue ;
         }
-        ns = _Namespace_Find ( token, 0, 0 ) ;
-        if ( ns && ( size = CfrTil_Get_NamespaceObjectByteSize (ns))  )
+        type0 = _Namespace_Find ( token0, 0, 0 ) ;
+        if ( type0 && ( size = CfrTil_Get_Namespace_SizeVar_Value ( type0 ) ) )
         {
-            token = Lexer_ReadToken ( _Context_->Lexer0 ) ;
-            classFieldObject = _CfrTil_ClassField_New ( token, ns, size, offset ) ; // nb! : in case there is an array so it will be there for ArrayDimensions
-            token = Lexer_Peek_Next_NonDebugTokenWord ( _Context_->Lexer0, 1, 0 ) ;
-            if ( token [0] != '[' )
+            token1 = Lexer_ReadToken ( lexer ) ;
+            classFieldObject = CfrTil_ClassField_New ( token1, type0, size, offset ) ; // nb! : in case there is an array so it will be there for ArrayDimensions
+            token2 = Lexer_Peek_Next_NonDebugTokenWord ( lexer, 1, 0 ) ;
+            if ( token2 [0] != '[' )
             {
                 offset += size ;
                 sizeOf += size ;
                 continue ;
             }
+            // print class field
+            //if ( printFlag ) _Printf ( (byte*) "\n\t%s\t%s" = %lx", token0, token1, (sizeof token0) data [ offset ]) ;
         }
         else
         {
-            Word * word = Finder_Word_FindUsing ( _Finder_, token, 0 ) ;
+            Word * word = Finder_Word_FindUsing ( _Finder_, token0, 0 ) ; // comment token possibly
             if ( word && word->W_MorphismAttributes & DEBUG_WORD ) Interpreter_DoWord ( _Interpreter_, word, _Lexer_->TokenStart_ReadLineIndex, _Lexer_->SC_Index ) ;
             else
             {
                 byte * buffer = Buffer_Data_Cleared ( _CfrTil_->ScratchB1 ) ;
                 byte * msg = word ? ( byte* ) "namespace has no size" : ( byte* ) "can't find namespace" ;
-                sprintf ( ( char* ) buffer, "\n_CfrTil_Parse_ClassStructure : %s : \'%s\'", ( char* ) msg, token ) ;
+                sprintf ( ( char* ) buffer, "\n_CfrTil_Parse_ClassStructure : %s : \'%s\'", ( char* ) msg, token0 ) ;
                 _SyntaxError ( ( byte* ) buffer, 1 ) ; // else structure component size error
             }
         }
         for ( i = 0 ; 1 ; )
         {
-            token = Lexer_ReadToken ( _Context_->Lexer0 ) ;
-            if ( token && String_Equal ( ( char* ) token, "[" ) )
+            token2 = Lexer_ReadToken ( lexer ) ;
+            if ( token2 && String_Equal ( ( char* ) token2, "[" ) )
             {
                 CfrTil_InterpretNextToken ( ) ; // next token must be an integer for the array dimension size
                 arrayDimensionSize = DataStack_Pop ( ) ;
                 size = size * arrayDimensionSize ;
                 offset += size ;
                 sizeOf += size ;
-                token = Lexer_ReadToken ( _Context_->Lexer0 ) ;
-                arrayDimensions [ i ] = arrayDimensionSize ;
-                if ( ! String_Equal ( ( char* ) token, "]" ) ) CfrTil_Exception ( SYNTAX_ERROR, 0, 1 ) ;
+                token3 = Lexer_ReadToken ( lexer ) ;
+                if ( ! String_Equal ( ( char* ) token3, "]" ) ) CfrTil_Exception ( SYNTAX_ERROR, 0, 1 ) ;
+                else arrayDimensions [ i ] = arrayDimensionSize ;
                 i ++ ;
             }
             else
@@ -85,8 +567,10 @@ gotNextToken:
                     classFieldObject->ArrayDimensions = ( int64 * ) Mem_Allocate ( i * sizeof (int64 ), DICTIONARY ) ;
                     MemCpy ( classFieldObject->ArrayDimensions, arrayDimensions, i * sizeof (int64 ) ) ;
                     classFieldObject->ArrayNumberOfDimensions = i ;
+                    // print array field
+                    //if ( printFlag ) _Printf ( (byte*) "\n\t%s\t%s [ %d ]" = %lx", token0, token1, arrayDimensionSize, (sizeof token0) data [ aoffset ]) ;
                 }
-                if ( token ) goto gotNextToken ;
+                if ( token0 = token2 ) goto gotNextToken ;
                 else break ;
             }
         }
@@ -97,6 +581,8 @@ gotNextToken:
     //Namespace_AddToNamespaces_SetUsing (  Namespace_Find ( (byte*) "C_Typedef" ), 0, NOT_USING ) ;
     return sizeOf ;
 }
+
+#endif
 
 void
 Compiler_TypedObjectInit ( Word * word, Namespace * typeNamespace )
@@ -227,13 +713,13 @@ _CfrTil_Parse_LocalsAndStackVariables ( int64 svf, int64 lispMode, ListObject * 
                 if ( ! localsNs ) localsNs = Namespace_FindOrNew_Local ( nsStack ? nsStack : compiler->LocalsCompilingNamespacesStack, 1 ) ; //! debugFlag ) ;
                 if ( svff )
                 {
-                    objectAttributes = PARAMETER_VARIABLE ; // aka an arg
+                    objectAttributes |= PARAMETER_VARIABLE ; // aka an arg
                     //if ( lispMode ) objectType |= T_LISP_SYMBOL ;
                     if ( lispMode ) lispAttributes |= T_LISP_SYMBOL ; // no ltype yet for _CfrTil_LocalWord
                 }
                 else
                 {
-                    objectAttributes = LOCAL_VARIABLE ;
+                    objectAttributes |= LOCAL_VARIABLE ;
                     if ( lispMode ) lispAttributes |= T_LISP_SYMBOL ; // no ltype yet for _CfrTil_LocalWord
                 }
                 if ( regFlag == true )
@@ -261,6 +747,7 @@ _CfrTil_Parse_LocalsAndStackVariables ( int64 svf, int64 lispMode, ListObject * 
                 else if ( typeNamespace ) word->ObjectByteSize = typeNamespace->ObjectByteSize ;
                 typeNamespace = 0 ;
                 objectTypeNamespace = 0 ;
+                objectAttributes = 0 ;
                 if ( String_Equal ( token, "this" ) ) word->W_ObjectAttributes |= THIS ;
             }
         }
@@ -594,18 +1081,18 @@ _CfrTil_SingleQuote ( )
     else
     {
         if ( ! Compiling ) CfrTil_InitSourceCode_WithName ( _CfrTil_, lexer->OriginalToken, 0 ) ;
-        byte * token = ( byte* ) "" ;
+        byte * token ; //= ( byte* ) "" ;
         while ( 1 )
         {
             int64 i = lexer->TokenEnd_ReadLineIndex ;
             while ( ( i < rl->MaxEndPosition ) && ( rl->InputLine [ i ] == ' ' ) ) i ++ ;
-            if ( _Lexer_IsTokenForwardDotted ( _Lexer_, i + 1 ) ) // 1 : pre-adjust for an adjustment in _Lexer_IsTokenForwardDotted
+            if ( ( rl->InputLine [ i ] == '.') || _Lexer_IsTokenForwardDotted ( _Lexer_, i + 1 ) ) // 1 : pre-adjust for an adjustment in _Lexer_IsTokenForwardDotted
             {
                 token = Lexer_ReadToken ( lexer ) ;
-                if ( String_Equal ( ".", ( char* ) token ) ) continue ;
                 word = _Interpreter_TokenToWord ( _Interpreter_, token, - 1, - 1 ) ;
-                word->ObjectByteSize = 8 ;
+                //word->ObjectByteSize = 8 ;
                 if ( word && ( word->W_ObjectAttributes & ( C_TYPE | C_CLASS | NAMESPACE ) ) ) Finder_SetQualifyingNamespace ( _Finder_, word ) ;
+                else if ( token[0] = '.' ) continue ;
                 else
                 {
                     DataStack_Push ( ( int64 ) token ) ;
@@ -621,4 +1108,82 @@ done:
     _CfrTil_->SC_QuoteMode = false ;
 }
 
+#if 0
+// we have already read the idField name == token
+// namespace (( '*' )? id ( '[' )* ? ;' | ( '{' )? id (,id)*) ';'
+
+// _ID :: ALPHA_NUMERIC *
+// DIGIT :: NUMERIC *
+// ALIAS_ID :: _ID '," ID
+// ID :: _ID || ALIAS_ID
+// ID_FIELD : ID | ARRAY_FIELD
+// ARRAY :: ('[' DIGIT ] ']') | ARRAY*
+// ARRAY_FIELD :: _ID ARRAY | ARRAY_FIELD ',' ARRAY_FIELD
+// TYPE_FIELD :: TYPE_NAME '*'? ID_FIELD ';'
+// STRUCTURE :: '{' FIELD * '}'
+// STRUCT_FIELD :: ('struct' | 'union') TYPE_FIELD | _ID STRUCTURE ID_FIELD | STRUCTURE ID_FIELD | _ID STRUCTURE ';'
+// FIELD :: STRUCT_FIELD | TYPE_FIELD
+// TYPEDEF :: 'typedef' STRUCT_FIELD
+// TYPE :: 'type' TYPE_FIELD
+
+void
+CfrTil_Parse_Identifier_Fields ( TypeDefStructCompileInfo * tdsci )
+{
+    byte * token ;
+    while ( token [0] != ';' )
+    {
+        Parse_Identifier_Field ( tdsci, 0, 0 ) ; // returns with peeked token
+        token = TDSCI_ReadToken ( tdsci ) ;
+    }
+}
+#endif
+#if 0
+// ns and t_type have not been used to simplify here ??
+
+void
+Parse_Do_Identifier ( TypeDefStructCompileInfo * tdsci, int64 t_type, 0 )
+{
+    Namespace * alias ;
+    byte *token = tdsci->TdsciToken ;
+    Word * id ;
+    int64 size = tdsci->Tdsci_Field_Type_Namespace ? tdsci->Tdsci_Field_Type_Namespace->ObjectByteSize ? tdsci->Tdsci_Field_Type_Namespace->ObjectByteSize : tdsci->Tdsci_Field_Size : 0 ;
+    if ( ( tdsci->Tdsci_Structure_Namespace ) && GetState ( tdsci, TDSCI_STRUCTURE_COMPLETED ) )
+    {
+        Finder_SetQualifyingNamespace ( _Finder_, tdsci->Tdsci_TotalGlobalNamespace ? tdsci->Tdsci_TotalGlobalNamespace : tdsci->PreBackgroundNamespace ) ;
+        alias = id = _CfrTil_Alias ( tdsci->Tdsci_Structure_Namespace, token ) ;
+        alias->Lo_List = tdsci->Tdsci_Structure_Namespace->Lo_List ;
+        alias->W_MorphismAttributes |= IMMEDIATE ;
+        _Namespace_VariableValueSet ( alias, ( byte* ) "size", tdsci->Tdsci_Structure_Size ) ;
+        alias->ObjectByteSize = tdsci->Tdsci_Structure_Size ;
+    }
+    else
+    {
+        Finder_SetQualifyingNamespace ( _Finder_, tdsci->Tdsci_Structure_Namespace ? tdsci->Tdsci_Structure_Namespace : tdsci->Tdsci_Field_Type_Namespace ) ;
+        //size = size ? size : tdsci->Tdsci_Field_Type_Namespace ? tdsci->Tdsci_Field_Type_Namespace->ObjectByteSize : 0 ;
+        if ( ( ! tdsci->Tdsci_Structure_Namespace ) || GetState ( tdsci, TDSCI_STRUCT | TDSCI_UNION | TDSCI_STRUCTURE_COMPLETED ) )
+        {
+            tdsci->Tdsci_Structure_Namespace = id = DataObject_New ( CLASS, 0, token, 0, 0, 0, 0, 0, 0, 0, - 1 ) ;
+            //if ( ! tdsci->Tdsci_Structure_Namespace ) tdsci->Tdsci_Structure_Namespace = id ;
+        }
+        else
+        {
+            //Finder_SetQualifyingNamespace ( _Finder_, tdsci->Tdsci_Field_Type_Namespace ) ; //tdsci->Tdsci_Structure_Namespace ? tdsci->Tdsci_Structure_Namespace : tdsci->Tdsci_Field_Type_Namespace ) ;
+            Finder_SetQualifyingNamespace ( _Finder_, tdsci->Tdsci_Structure_Namespace ? tdsci->Tdsci_Structure_Namespace : tdsci->Tdsci_Field_Type_Namespace ) ;
+            tdsci->Tdsci_Field_Object = id = CfrTil_ClassField_New ( token, tdsci->Tdsci_Field_Type_Namespace, size, tdsci->Tdsci_Offset ) ;
+            id->ObjectByteSize = size ;
+        }
+        tdsci->Tdsci_Field_Size = size ;
+    }
+    if ( GetState ( tdsci, TDSCI_STRUCTURE_COMPLETED ) )
+    {
+        _Namespace_VariableValueSet ( tdsci->Tdsci_Structure_Namespace, ( byte* ) "size", tdsci->Tdsci_Structure_Size ) ;
+        tdsci->Tdsci_Structure_Namespace->ObjectByteSize = tdsci->Tdsci_Structure_Size ;
+    }
+    //if ( Is_DebugOn ) 
+    _Printf ( ( byte* ) "\n%s.%s : field size = %ld : structure size = %ld : total size = %ld : offset == %ld ",
+        id->S_ContainingNamespace->Name, id->Name, tdsci->Tdsci_Field_Size, tdsci->Tdsci_Structure_Size, tdsci->Tdsci_TotalSize, tdsci->Tdsci_Offset ) ;
+    // print class field
+    //if ( dataPtr ) _Printf ( (byte*) "\n\t%s\t%s" = %lx", token0, token1, (sizeof token0) data [ offset ]) ;
+}
+#endif
 

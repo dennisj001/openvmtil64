@@ -63,6 +63,15 @@ CfrTil_PokeRegAtAddress ( ) // @
     ( ( VoidFunction ) ba->BA_Data ) ( ) ;
 }
 
+int
+Word_LvalueObjectByteSize ( Word * lvalueWord, Word * rValueWord ) // = 
+{
+    int size = (( rValueWord->Size == 8 ) || ( lvalueWord->W_ObjectAttributes & (BIGNUM | REGISTER_VARIABLE) ) 
+        || ( Namespace_IsUsing ( ( byte* ) "BigNum" ) ) ) ? ( sizeof (int64 ) ) : 
+            lvalueWord->ObjectByteSize ? lvalueWord->ObjectByteSize : ( sizeof (int64 ) ) ;
+    return size ;
+}
+
 void
 _CfrTil_Move ( int64 * address, int64 value, int64 lvalueSize )
 {
@@ -106,19 +115,13 @@ _CfrTil_Move ( int64 * address, int64 value, int64 lvalueSize )
 }
 // ( addr n -- ) // (*addr) = n
 
-int
-Word_LvalueObjectByteSize ( Word * lvalueWord, Word * rValueWord ) // = 
-{
-    return (( rValueWord->Size == 8 ) || ( lvalueWord->W_ObjectAttributes & (BIGNUM | REGISTER_VARIABLE) ) 
-        || ( Namespace_IsUsing ( ( byte* ) "BigNum" ) ) ) ? ( sizeof (int64 ) ) : lvalueWord->ObjectByteSize ? lvalueWord->ObjectByteSize : ( sizeof (int64 ) ) ;
-}
-
 void
 CfrTil_Poke ( ) // = 
 {
     Word * lvalueWord = TWS ( - 1 ), *rvalueWord = TWS ( 0 ) ;
     int64 lvalueSize = Word_LvalueObjectByteSize ( lvalueWord, rvalueWord ) ;
     //if ( ! _TypeMismatch_CheckError_Print ( lvalueWord, rvalueWord, 1 ) )
+    _TypeMismatch_CheckError_Print ( lvalueWord, rvalueWord, 1 ) ;
     {
         if ( CompileMode ) Compile_Poke ( _Context_->Compiler0, lvalueSize ) ;
         else

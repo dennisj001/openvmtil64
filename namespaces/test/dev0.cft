@@ -523,7 +523,7 @@ scOn
     // svn @ fprint ":" ps fn @ fprint 
     fn @
 ;
-//' fibBN find wdiss
+pwi fibBN 
 20 fibBN dup p 6765 _assert sp
 
 #endif
