@@ -168,10 +168,10 @@ testB2.nodes [ 1 ].AfterReference 5 =
 testB2.nodes [ 3 ].BeforeReference 6 =
 testB2 32 dump
 "testD" DLLNodeAlloc new
-'testD find dobject
-testD.a112.b113 77 =
+'testD find DObject.dobject
+testD.a112.b1138 77 =
 "testC" 'testD find DObject.clone 
-testC.a112.b113 @ dup p 77 _assert
+testC.a112.b1138 @ dup p 77 _assert
 sp
 User
 hex

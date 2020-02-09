@@ -60,28 +60,32 @@ OpenVmTil_ShowExceptionInfo ( )
 void
 OVT_PauseInterpret ( Context * cntx, byte key )
 {
+    ReadLiner * rl = cntx->ReadLiner0 ;
+    byte * svPrompt ;
     Boolean svDbgState = GetState ( _CfrTil_, DEBUG_MODE | _DEBUG_SHOW_ ) ;
     Boolean svcm = GetState ( cntx->Compiler0, ( COMPILE_MODE ) ) ;
-    Boolean svath = GetState ( cntx->ReadLiner0, ADD_TO_HISTORY ) ;
+    Boolean svath = GetState ( rl, ADD_TO_HISTORY ) ;
     OpenVmTil_AddStringToHistoryOn ( ) ;
     Set_CompileMode ( false ) ;
     DebugOff ;
-    ReadLine_Init ( cntx->ReadLiner0, _CfrTil_Key ) ;
+    ReadLine_Init ( rl, _CfrTil_Key ) ;
     SetState ( cntx, AT_COMMAND_LINE, true ) ;
-    if ( key >= ' ' )
+    if ( ( key <= ' ' ) || ( key == '\\' ) ) key = 0 ;
+    _Printf ( ( byte* ) "\nPause interpreter : hit <enter> or <esc> to exit" ) ;
+    do
     {
-        do
-        {
-            Context_DoPrompt ( cntx ) ;
-            _ReadLine_GetLine ( cntx->ReadLiner0, key ) ;
-            if ( ReadLine_PeekNextChar ( cntx->ReadLiner0 ) < ' ' ) break ; // '\n', <esc>, etc.
-            Interpret_ToEndOfLine ( cntx->Interpreter0 ) ;
-            CfrTil_NewLine ( ) ;
-        }
-        while ( 1 ) ;
+        svPrompt = ReadLine_GetPrompt ( rl ) ;
+        ReadLine_SetPrompt ( rl, "=> " ) ;
+        Context_DoPrompt ( cntx ) ;
+        _ReadLine_GetLine ( rl, key ) ;
+        if ( ReadLine_PeekNextChar ( rl ) < ' ' ) break ; // '\n', <esc>, etc.
+        Interpret_ToEndOfLine ( cntx->Interpreter0 ) ;
+        CfrTil_NewLine ( ) ;
     }
+    while ( 1 ) ;
+    ReadLine_SetPrompt ( rl, svPrompt ) ;
     SetState ( cntx, AT_COMMAND_LINE, false ) ;
-    ReadLine_SetRawInputFunction ( cntx->ReadLiner0, ReadLine_GetNextCharFromString ) ;
+    ReadLine_SetRawInputFunction ( rl, ReadLine_GetNextCharFromString ) ;
     SetState ( _Context_->ReadLiner0, ADD_TO_HISTORY, svath ) ;
     SetState ( cntx->Compiler0, ( COMPILE_MODE ), svcm ) ;
     SetState ( _CfrTil_, DEBUG_MODE | _DEBUG_SHOW_, svDbgState ) ;
@@ -90,6 +94,7 @@ OVT_PauseInterpret ( Context * cntx, byte key )
 int64
 OVT_Pause ( byte * prompt, int64 signalExceptionsHandled )
 {
+    Debugger * debugger = _Debugger_ ;
     int64 rtrn = 0 ;
     SetState ( _O_, OVT_PAUSE, true ) ;
     if ( _CfrTil_ && _Context_ )
@@ -113,6 +118,7 @@ OVT_Pause ( byte * prompt, int64 signalExceptionsHandled )
 
             int64 key = Key ( ) ;
             _ReadLine_PrintfClearTerminalLine ( ) ;
+            _Printf ( ( byte* ) "\nPause : hit <enter> or <esc> to exit" ) ;
             switch ( key )
             {
                 case 'x': case 'X':
@@ -133,17 +139,11 @@ OVT_Pause ( byte * prompt, int64 signalExceptionsHandled )
                 }
                 case 'd':
                 {
-                    if ( Is_DebugOn )
-                    {
-                        Debugger * debugger = _Debugger_ ;
-                        SetState ( debugger, DBG_AUTO_MODE | DBG_AUTO_MODE_ONCE, false ) ; // stop auto mode and get next key command code
-                        Debugger_InterpreterLoop ( debugger ) ;
-                    }
-                    else
-                    {
-                        CfrTil_DebugOn ( ) ;
-                        SetState ( _Debugger_, DBG_INFO | DBG_MENU | DBG_PROMPT, true ) ;
-                    }
+                    if ( ! Is_DebugOn ) CfrTil_DebugOn ( ) ;
+                    SetState ( _Debugger_, DBG_INFO | DBG_MENU | DBG_PROMPT, true ) ;
+                    SetState ( debugger, DBG_AUTO_MODE | DBG_AUTO_MODE_ONCE, false ) ; // stop auto mode and get next key command code
+                    Debugger_InterpreterLoop ( debugger ) ;
+                    //goto done ;
                     goto done ;
                 }
                 case 'c':
@@ -160,14 +160,14 @@ OVT_Pause ( byte * prompt, int64 signalExceptionsHandled )
                 case '\n':
                 case '\r':
                 {
-                    continue ;
+                    goto done ;
                 }
                 case 'i':
                 {
                     // interpret in context
                     Context * cntx = _Context_ ;
                     OVT_PauseInterpret ( cntx, key ) ;
-                    continue ;
+                    goto done ;
                 }
                 default:
                 {
@@ -175,7 +175,7 @@ OVT_Pause ( byte * prompt, int64 signalExceptionsHandled )
                     Context * cntx = CfrTil_Context_PushNew ( _CfrTil_ ) ;
                     OVT_PauseInterpret ( cntx, key ) ;
                     CfrTil_Context_PopDelete ( _CfrTil_ ) ;
-                    continue ;
+                    goto done ;
                 }
             }
         }
@@ -275,8 +275,8 @@ OVT_Throw ( int signal, int64 restartCondition, Boolean pauseFlag )
     snprintf ( Buffer_Data_Cleared ( _O_->ThrowBuffer ), BUFFER_SIZE, "\n%s\n%s %s from %s -> ...", _O_->ExceptionMessage,
         ( jb == & _CfrTil_->JmpBuf0 ) ? "reseting cfrTil" : "restarting OpenVmTil",
         ( _O_->Signal == SIGSEGV ) ? ": SIGSEGV" : "", Context_Location ( ) ) ; //( _O_->SigSegvs < 2 ) ? Context_Location ( ) : ( byte* ) "" ) ;
-    _OVT_SimpleFinal_Key_Pause ( _O_->ThrowBuffer->Data, 1 ) ; //( _O_->Signal != SIGSEGV ) ) ;
     if ( pauseFlag && ( _O_->SignalExceptionsHandled < 2 ) && ( _O_->SigSegvs < 2 ) ) OVT_Pause ( 0, _O_->SignalExceptionsHandled ) ;
+    else if ( _O_->SigSegvs ) _OVT_SimpleFinal_Key_Pause ( _O_->ThrowBuffer->Data, 1 ) ; //( _O_->Signal != SIGSEGV ) ) ;
 jump:
     _OVT_SigLongJump ( jb ) ;
 }
@@ -519,14 +519,14 @@ CfrTil_FullRestart ( )
 }
 
 void
-Error ( byte * emsg, byte * smsg, uint64 state )
+Error ( byte * msg, uint64 state )
 {
     AlertColors ;
     if ( ( state ) & PAUSE )
     {
         CfrTil_NewLine ( ) ;
         CfrTil_Location ( ) ;
-        _Printf ( emsg, smsg ) ;
+        _Printf ( msg ) ;
         Pause ( ) ;
         DebugColors ;
     }
@@ -534,7 +534,7 @@ Error ( byte * emsg, byte * smsg, uint64 state )
     {
         if ( ( state ) >= QUIT )
         {
-            Throw ( emsg, smsg, state ) ;
+            Throw ( msg, "", state ) ;
         }
     }
 }
@@ -554,7 +554,7 @@ _OVT_SimpleFinal_Key_Pause ( byte * msg, Boolean useKey )
     printf ( "%s\n%s", msg, instr ) ;
     fflush ( stdout ) ;
     if ( useKey ) key = Key ( ) ;
-    if ( key = 'p' ) Pause () ;
+    if ( key = 'p' ) Pause ( ) ;
 }
 
 void

@@ -246,6 +246,7 @@ _Namespace_ActivateAsPrimary ( Namespace * ns )
 {
     if ( ns )
     {
+        ns = Word_UnAlias ( ns ) ;
         Finder_SetQualifyingNamespace ( _Context_->Finder0, ns ) ;
         _Namespace_AddToUsingList ( ns ) ;
         _CfrTil_SetAsInNamespace ( ns ) ;
@@ -367,12 +368,26 @@ Namespace_Clear ( byte * name )
     _Namespace_Clear ( _Namespace_Find ( name, 0, 0 ) ) ;
 }
 
+Word *
+_CfrTil_VariableGet ( Namespace * ns, byte * name )
+{
+    ns = Word_UnAlias ( ns ) ;
+    Word * word = _Finder_FindWord_InOneNamespace ( _Finder_, ns, name ) ;
+    return word ;
+}
+
 int64
 _Namespace_VariableValueGet ( Namespace * ns, byte * name )
 {
     Word * word = _CfrTil_VariableGet ( ns, name ) ;
     if ( word ) return ( int64 ) word->W_Value ; // value of variable
     else return 0 ;
+}
+
+int64
+_CfrTil_VariableValueGet ( byte* nameSpace, byte * name )
+{
+    return _Namespace_VariableValueGet ( Namespace_Find ( nameSpace ), name ) ;
 }
 
 void
@@ -403,7 +418,7 @@ _Namespace_Find ( byte * name, Namespace * superNamespace, int64 exceptionFlag )
         Word * word = 0 ;
         if ( superNamespace ) word = _Finder_FindWord_InOneNamespace ( _Finder_, superNamespace, name ) ;
         if ( ! word ) word = Finder_FindWord_AnyNamespace ( _Finder_, name ) ;
-        if ( word && Is_NamespaceType ( word ) ) return ( Namespace* ) word ;
+        if ( word && Is_NamespaceType ( word ) ) return ( Namespace* ) Word_UnAlias ( word ) ;
         else if ( exceptionFlag )
         {
             _Printf ( ( byte* ) "\nUnable to find Namespace : %s\n", name ) ;

@@ -90,19 +90,6 @@ _Compile_RspReg_Store ( ) // data stack pop to rsp [0] !
 }
 #endif
 
-Word *
-_CfrTil_VariableGet ( Namespace * ns, byte * name )
-{
-    Word * word = _Finder_FindWord_InOneNamespace ( _Finder_, ns, name ) ;
-    return word ;
-}
-
-int64
-_CfrTil_VariableValueGet ( byte* nameSpace, byte * name )
-{
-    return _Namespace_VariableValueGet ( Namespace_Find ( nameSpace ), name ) ;
-}
-
 void
 _Compile_GetVarLitObj_RValue_To_Reg (Word * word, int64 reg , int size)
 {

@@ -116,9 +116,6 @@ Context_DoPrompt ( Context * cntx )
 {
     if ( ( ReadLiner_GetLastChar ( ) != '\n' ) || ( ! IS_INCLUDING_FILES ) || ( GetState ( _Debugger_, DBG_ACTIVE ) ) )
     {
-        //int x = 0, y = 0 ;
-        //getCursor ( &x, &y ) ;
-        //if ( x > Strlen ( ( char* ) _ReadLiner_->Prompt ) ) 
         _CfrTil_PrintChar ( '\n' ) ; //_Printf ( ( byte* ) "\n" ) ;
     }
     _Printf ( ( byte* ) "%s", ( char* ) cntx->ReadLiner0->NormalPrompt ) ; // for when including files

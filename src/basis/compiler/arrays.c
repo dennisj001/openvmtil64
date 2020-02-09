@@ -172,7 +172,7 @@ Do_NextArrayToken ( Word * tokenWord, byte * token, Word * arrayBaseObject, int6
             // where d1, d2, d3, ... are the dimension variables and D1, D2, D3, ... are the Dimension sizes
             // D0, D1, D2, ... Dn : d0, d1, d2 ... dn => dn*(1*D(n-1)*D1*D2*..D(n-1)) 
             arrayIndex = DataStack_Pop ( ) ;
-            if ( arrayIndex >= arrayBaseObject->ArrayDimensions [ dimNumber ] ) Error ( "Array index out of bounds.", "", ABORT ) ;
+            if ( arrayIndex >= arrayBaseObject->ArrayDimensions [ dimNumber ] ) Error ( "Array index out of bounds.", ABORT ) ;
             increment = arrayIndex * dimSize * objSize ; 
             Compiler_IncrementCurrentAccumulatedOffset ( compiler, increment ) ;
             if ( ! CompileMode ) Array_Do_AccumulatedAddress ( baseObject->AccumulatedOffset ) ; 

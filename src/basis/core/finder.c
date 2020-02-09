@@ -73,6 +73,7 @@ Finder_FindWordFromAddress_AnyNamespace_NoAlias ( Finder * finder, byte * addres
 void
 Finder_SetQualifyingNamespace ( Finder * finder, Namespace * ns )
 {
+    ns = Word_UnAlias ( ns ) ;
     finder->QualifyingNamespace = ns ;
 }
 

@@ -163,7 +163,7 @@ ByteArray_AppendCopyInteger ( ByteArray * ba, int64 size, int64 data ) // size i
             }
         }
     }
-    else Error ( "ByteArray_AppendCopyItem", " : Out of memory", ABORT ) ;
+    else Error ( "ByteArray_AppendCopyItem : Out of memory", ABORT ) ;
 }
 
 void

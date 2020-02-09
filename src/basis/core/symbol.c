@@ -87,7 +87,12 @@ Symbol_CompareName ( Symbol * symbol, byte * name )
 {
     if ( symbol = _Symbol_CompareName ( symbol, name ) )
     {
+#if 1        
+        Word * word = (Word*) symbol ;
+        return word = Word_UnAlias ( word ) ;
+#else        
         return symbol ;
+#endif        
     }
     return 0 ;
 }

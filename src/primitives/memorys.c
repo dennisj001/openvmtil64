@@ -66,23 +66,33 @@ CfrTil_PokeRegAtAddress ( ) // @
 int
 Word_LvalueObjectByteSize ( Word * lvalueWord, Word * rValueWord ) // = 
 {
-    int size = (( rValueWord->Size == 8 ) || ( lvalueWord->W_ObjectAttributes & (BIGNUM | REGISTER_VARIABLE) ) 
-        || ( Namespace_IsUsing ( ( byte* ) "BigNum" ) ) ) ? ( sizeof (int64 ) ) : 
-            lvalueWord->ObjectByteSize ? lvalueWord->ObjectByteSize : ( sizeof (int64 ) ) ;
+    int size = ( ( rValueWord->Size == 8 ) || ( lvalueWord->W_ObjectAttributes & ( BIGNUM | REGISTER_VARIABLE ) )
+        || ( Namespace_IsUsing ( ( byte* ) "BigNum" ) ) ) ? ( sizeof (int64 ) ) :
+        lvalueWord->ObjectByteSize ? lvalueWord->ObjectByteSize : ( sizeof (int64 ) ) ;
     return size ;
+}
+
+void
+Do_MoveErrorReport ( int64 value, byte * one, byte * two )
+{
+    byte buffer [128] ; //= Buffer_Data_Cleared ( _CfrTil_->ScratchB3 ) ; 
+    buffer [0] = 0 ;
+    snprintf ( buffer, 128, "\n_CfrTil_Move : Type Error : value == %ld : is greater than %s - max value for sizeof %s", value, one, two ) ;
+    Error ( buffer, QUIT ) ;
 }
 
 void
 _CfrTil_Move ( int64 * address, int64 value, int64 lvalueSize )
 {
-    //int64 lvalueSize = lvalueWord->ObjectByteSize ; //, rvalueSize = rvalueWord->ObjectByteSize ;
     switch ( lvalueSize )
     {
         case 1:
         {
             if ( value > 255 )
             {
-                Error ( "\nType Error", "value is greater than 255 - sizeof (byte)", QUIT ) ;
+                //snprintf ( buffer, 128, "\nType Error : value == %ld : is greater than 255 - max value for sizeof (byte)", value ) ;
+                //Error ( buffer, QUIT ) ;
+                Do_MoveErrorReport ( value, "255", "(byte)" ) ;
             }
             else * ( byte* ) address = ( byte ) value ;
             break ;
@@ -91,7 +101,10 @@ _CfrTil_Move ( int64 * address, int64 value, int64 lvalueSize )
         {
             if ( value > 65535 )
             {
-                Error ( "\nType Error", "value is greater than 65535 - sizeof (int16)", QUIT ) ;
+                //Error ( "\nType Error", "value is greater than 65535 - sizeof (int16)", QUIT ) ;
+                //snprintf ( buffer, 128, "\nType Error : value == %ld : is greater than 65535 - max value for sizeof (int16)", value ) ;
+                //Error ( buffer, QUIT ) ;
+                Do_MoveErrorReport ( value, "65535", "(int16)" ) ;
             }
             else * ( int16* ) address = ( int16 ) value ;
             break ;
@@ -100,7 +113,10 @@ _CfrTil_Move ( int64 * address, int64 value, int64 lvalueSize )
         {
             if ( value > 2147483647 )
             {
-                Error ( "\nType Error", "value is greater than 2147483647 - sizeof (int32)", QUIT ) ;
+                //Error ( "\nType Error", "value is greater than 2147483647 - sizeof (int32)", QUIT ) ;
+                //snprintf ( buffer, 128, "\nType Error : value == %ld : is greater than 2147483647 - max value for sizeof (int32)", value ) ;
+                //Error ( buffer, QUIT ) ;
+                Do_MoveErrorReport ( value, "2147483647", "(int32)" ) ;
             }
             else * ( int32* ) address = ( int32 ) value ;
             break ;
@@ -135,7 +151,7 @@ CfrTil_Poke ( ) // =
 void
 CfrTil_AtEqual ( ) // !
 {
-    Word * lvalueWord = TWS ( 0 ), *rvalueWord = TWS ( -1 )  ;
+    Word * lvalueWord = TWS ( 0 ), *rvalueWord = TWS ( - 1 ) ;
     //Word * lvalueWord = TWS ( - 1 ), *rvalueWord = TWS ( 0 ) ;
     int64 lvalueSize = Word_LvalueObjectByteSize ( lvalueWord, rvalueWord ) ;
     //if ( ! _TypeMismatch_CheckError_Print ( lvalueWord, rvalueWord, 1 ) )
@@ -154,9 +170,9 @@ CfrTil_AtEqual ( ) // !
 void
 CfrTil_Store ( ) // !
 {
-    Word * lvalueWord = TWS ( 0 ), *rvalueWord = TWS ( -1 )  ;
+    Word * lvalueWord = TWS ( 0 ), *rvalueWord = TWS ( - 1 ) ;
     int64 lvalueSize = Word_LvalueObjectByteSize ( lvalueWord, rvalueWord ) ;
-    //if ( ! _TypeMismatch_CheckError_Print ( lvalueWord, rvalueWord, 1 ) )
+    _TypeMismatch_CheckError_Print ( lvalueWord, rvalueWord, 1 ) ;
     {
         if ( CompileMode ) Compile_Store ( _Context_->Compiler0, Word_LvalueObjectByteSize ( lvalueWord, rvalueWord ) ) ;
         else

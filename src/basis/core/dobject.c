@@ -99,7 +99,7 @@ _CfrTil_Do_DynamicObject_ToReg ( DObject * dobject0, uint8 reg )
         else dobject = ndobject ;
     }
     Compiler_Word_SCHCPUSCA ( dobject0, 0 ) ;
-    if ( CompileMode ) _Compile_Move_Literal_Immediate_To_Reg (reg, ( int64 ) & dobject->W_Value , 0) ;
+    if ( CompileMode ) _Compile_Move_Literal_Immediate_To_Reg ( reg, ( int64 ) & dobject->W_Value, 0 ) ;
     cntx->Interpreter0->CurrentObjectNamespace = TypeNamespace_Get ( dobject ) ; // do this elsewhere when needed
 
     return dobject ;
@@ -234,7 +234,7 @@ DObject_SubObjectInit ( DObject * dobject, Word * parent )
     dobject->W_MorphismAttributes |= parent->W_MorphismAttributes ;
     dobject->W_ObjectAttributes |= T_ANY ;
     dobject->Slots = parent->Slots ;
-    Namespace_SetState_AdjustListPosition (parent, USING, 1) ;
+    Namespace_SetState_AdjustListPosition ( parent, USING, 1 ) ;
 }
 
 DObject *
@@ -273,7 +273,10 @@ CfrTil_DObject_Clone ( )
     byte * name = ( byte * ) DataStack_Pop ( ) ;
     if ( ! ( proto->W_ObjectAttributes & DOBJECT ) )
     {
-        Error ( ( byte* ) "\nCloning Alert : \'%s\' is not a dynamic object.\n\n", proto->Name, PAUSE ) ;
+        byte * buffer = Buffer_Data_Cleared ( _CfrTil_->ScratchB3 ) ;
+        snprintf ( buffer, BUFFER_SIZE, "\nCloning Alert : \'%s\' is not a dynamic object.\n\n", proto->Name ) ;
+        //Error ( ( byte* ) "\nCloning Alert : \'%s\' is not a dynamic object.\n\n", proto->Name, PAUSE ) ;
+        Error ( buffer, PAUSE ) ;
     }
     DObject_Sub_New ( proto, name, DOBJECT ) ;
 }

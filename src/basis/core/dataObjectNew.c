@@ -160,7 +160,7 @@ _Class_Object_New ( byte * name, uint64 category )
     int64 size ;
     byte * object ;
     Word * word ;
-    Namespace * ns = _CfrTil_Namespace_InNamespaceGet ( ) ;
+    Namespace * ns = Word_UnAlias ( _CfrTil_Namespace_InNamespaceGet ( )) ;
     size = _Namespace_VariableValueGet ( ns, ( byte* ) "size" ) ;
     word = _CfrTil_ObjectNew ( size, name, category, CompileMode ? DICTIONARY : OBJECT_MEM ) ;
     object = ( byte* ) word->W_Value ;

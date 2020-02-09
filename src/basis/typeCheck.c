@@ -233,7 +233,7 @@ _TypeMismatch_CheckError_Print ( Word * lvalueWord, Word *rvalueWord, Boolean qu
         {
             _Printf ( "\nTypeError : Wrong data sizes :: lvalue : %s : size == %ld :: rvalue : %s : size == %ld",
                 lvalueWord->Name, lvalueSize, rvalueWord->Name, rvalueSize ) ;
-            if ( quitFlag ) Error ( "\nType Error", "", QUIT ) ;
+            if ( quitFlag ) Error ( "\nType Error", QUIT ) ;
             return true ;
         }
     }

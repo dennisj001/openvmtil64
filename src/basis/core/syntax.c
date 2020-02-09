@@ -203,7 +203,7 @@ _CfrTil_C_Infix_EqualOp ( block op )
     word0a = CfrTil_WordList ( 0 ) ;
     if ( lhsWord )
     {
-        if ( ( lhsWord->W_ObjectAttributes & ( OBJECT | THIS | QID ) || GetState ( lhsWord, QID ) ) )
+        if ( ( lhsWord->W_ObjectAttributes & ( OBJECT | OBJECT_FIELD | THIS | QID ) || GetState ( lhsWord, QID ) ) )
         {
             if ( ( ! String_Equal ( word0a->Name, "]" ) ) &&
                 ( ! ( word0a->W_ObjectAttributes & ( ( LITERAL | NAMESPACE_VARIABLE | THIS | OBJECT | LOCAL_VARIABLE | PARAMETER_VARIABLE ) ) ) ) ) Compile_TosRmToTOS ( ) ;

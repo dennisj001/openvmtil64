@@ -171,32 +171,25 @@ Parse_Do_Identifier ( TypeDefStructCompileInfo * tdsci, int64 t_type, int64 size
     if ( ( t_type == POST_STRUCTURE_NAME ) && GetState ( tdsci, TDSCI_STRUCTURE_COMPLETED ) )
     {
         Finder_SetQualifyingNamespace ( _Finder_, tdsci->Tdsci_TotalStructureNamespace ) ;
-        //_Namespace_VariableValueSet ( tdsci->Tdsci_StructureUnion_Namespace, ( byte* ) "size", tdsci->Tdsci_StructureUnion_Size ) ; //tdsci->Tdsci_Offset ) ;
-        Class_Size_Set ( tdsci->Tdsci_StructureUnion_Namespace, tdsci->Tdsci_StructureUnion_Size ) ;
         if ( tdsci->Tdsci_TotalStructureNamespace )
         {
             if ( tdsci->Tdsci_TotalStructureNamespace->Name )
             {
-                id = _CfrTil_Alias ( tdsci->Tdsci_TotalStructureNamespace, token ) ;
-                id->Lo_List = tdsci->Tdsci_TotalStructureNamespace->Lo_List ;
-                id->W_MorphismAttributes |= IMMEDIATE ;
-                _CfrTil_->LastFinished_Word = 0 ; // nb! : for _CfrTil_RecycleInit_Compiler_N_M_Node_WordList
+                tdsci->Tdsci_StructureUnion_Namespace = id = _CfrTil_Alias ( tdsci->Tdsci_TotalStructureNamespace, token ) ;
+                //id->Lo_List = tdsci->Tdsci_TotalStructureNamespace->Lo_List ; //no - screws up namespaces : using/notUsing and more
+                Class_Size_Set ( id, tdsci->Tdsci_StructureUnion_Size ) ;
+                TypeNamespace_Set( id, tdsci->Tdsci_TotalStructureNamespace ) ;
             }
             else tdsci->Tdsci_TotalStructureNamespace->Name = String_New ( token, DICTIONARY ) ;
         }
         else
         {
-
-            _CfrTil_Namespace_InNamespaceSet ( tdsci->Tdsci_StructureUnion_Namespace ) ;
-            id = DataObject_New ( CLASS_CLONE, 0, token, 0, 0, 0, 0, 0, 0, 0, - 1 ) ;
+            //_CfrTil_Namespace_InNamespaceSet ( tdsci->Tdsci_StructureUnion_Namespace ) ;
+            tdsci->Tdsci_StructureUnion_Namespace = id = DataObject_New ( CLASS_CLONE, 0, token, 0, 0, 0, 0, 0, 0, 0, - 1 ) ;
             Class_Size_Set ( id, tdsci->Tdsci_StructureUnion_Size ) ;
-            //id->W_ObjectAttributes |= ( STRUCTURE ) ;
-            //id->ObjectByteSize = tdsci->Tdsci_StructureUnion_Size ;
-
-            //id = DataObject_New ( C_TYPE, 0, token, 0, 0, 0, 0, 0, 0, 0, - 1 ) ;
-            //_Namespace_VariableValueSet ( ns, ( byte* ) "size", size ) ;
-            //ns->Lo_Size = size ;
+            id->W_ObjectAttributes |= ( STRUCTURE ) ; //??
         }
+        Class_Size_Set ( tdsci->Tdsci_TotalStructureNamespace, tdsci->Tdsci_TotalSize ) ; //>Tdsci_StructureUnion_Size ) ;
     }
     else
     {
@@ -205,18 +198,16 @@ Parse_Do_Identifier ( TypeDefStructCompileInfo * tdsci, int64 t_type, int64 size
             tdsci->Tdsci_StructureUnion_Namespace = id = DataObject_New ( CLASS, 0, token, 0, 0, 0, 0, 0, 0, 0, - 1 ) ;
             tdsci->Tdsci_TotalStructureNamespace = id ;
             id->W_ObjectAttributes |= ( STRUCTURE ) ;
-            //id->ObjectByteSize = tdsci->Tdsci_StructureUnion_Size ;
 
         }
         else // if ( t_type == TYPE_NAME )
         {
             // shouldn't need these 2 lines ...
-            if ( ! tdsci->Tdsci_StructureUnion_Namespace ) tdsci->Tdsci_StructureUnion_Namespace = _CfrTil_Namespace_InNamespaceGet ( ) ;
-            if ( ! tdsci->Tdsci_TotalStructureNamespace ) tdsci->Tdsci_TotalStructureNamespace = tdsci->Tdsci_StructureUnion_Namespace ;
+            //if ( ! tdsci->Tdsci_StructureUnion_Namespace ) tdsci->Tdsci_StructureUnion_Namespace = _CfrTil_Namespace_InNamespaceGet ( ) ;
+            //if ( ! tdsci->Tdsci_TotalStructureNamespace ) tdsci->Tdsci_TotalStructureNamespace = tdsci->Tdsci_StructureUnion_Namespace ;
 
             tdsci->Tdsci_Field_Object = id = CfrTil_ClassField_New ( token, tdsci->Tdsci_StructureUnion_Namespace, size, tdsci->Tdsci_Offset ) ;
             tdsci->Tdsci_Field_Size = size ;
-            //tdsci->Tdsci_Field_Object->ObjectByteSize = size ;
         }
     }
     if ( _O_->Verbosity > 1 ) TDSCI_DebugPrintWord ( tdsci, id ) ; // print class field

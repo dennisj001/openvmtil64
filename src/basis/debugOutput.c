@@ -128,6 +128,7 @@ _Debugger_ShowInfo ( Debugger * debugger, byte * prompt, int64 signal, int64 for
             debugger->DebugAddress = ( byte* ) _O_->SigAddress ;
         }
         else if ( signal ) snprintf ( ( char* ) signalAscii, 128, ( char * ) "Error : signal " INT_FRMT " ", signal ) ;
+        else signalAscii[0] = 0 ;
 
         DebugColors ;
 
@@ -549,7 +550,9 @@ void
 Debugger_ShowInfo_Token ( Debugger * debugger, Word * word, byte * prompt, int64 signal, byte * token0, byte * location, byte * signalAscii )
 {
     ReadLiner * rl = _ReadLiner_ ;
-    char * compileOrInterpret = ( char* ) ( CompileMode ? "[c] " : "[i] " ), buffer [32] ;
+    char * compileOrInterpret = ( char* ) (( signal || (int64) signalAscii[0] ) ? 
+        ( CompileMode ? "\n[c] " : "\n[i] " ) : ( CompileMode ? "[c] " : "[i] " ) ) ;
+    byte * buffer = Buffer_Data_Cleared ( _CfrTil_->ScratchB2 ) ; 
     byte * obuffer = Buffer_Data_Cleared ( _CfrTil_->DebugB1 ) ;
     byte * token1 = String_ConvertToBackSlash ( token0 ) ;
     token0 = token1 ;
@@ -557,7 +560,7 @@ Debugger_ShowInfo_Token ( Debugger * debugger, Word * word, byte * prompt, int64
     char * cc_location = ( char* ) cc ( location, &_O_->Debug ) ;
 
     prompt = prompt ? prompt : ( byte* ) "" ;
-    strncpy ( ( char* ) buffer, ( char* ) prompt, 32 ) ;
+    strncpy ( buffer, prompt, BUFFER_SIZE ) ;
     strncat ( buffer, compileOrInterpret, 32 ) ;
     prompt = ( byte* ) buffer ;
     if ( word )
