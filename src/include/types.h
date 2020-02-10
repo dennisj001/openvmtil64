@@ -600,7 +600,7 @@ typedef struct Lexer
     uint64 L_MorphismAttributes, L_ObjectAttributes, TokenObjectSize ;
     int64 TokenStart_ReadLineIndex, TokenEnd_ReadLineIndex, TokenStart_FileIndex, TokenEnd_FileIndex, Token_Length, SC_Index ; //Tsrli = TokenStart_ReadLineIndex
     int64 CurrentReadIndex, TokenWriteIndex, LineNumber ;
-    byte *OriginalToken, TokenInputByte, LastLexedChar, CurrentTokenDelimiter ;
+    byte *OriginalToken, *ParsedToken, TokenInputByte, LastLexedChar, CurrentTokenDelimiter ;
     byte * TokenDelimiters, * DelimiterCharSet, * TokenDelimitersAndDot, * DelimiterOrDotCharSet, *Filename, *LastToken ;
     byte( *NextChar ) ( ReadLiner * rl ), * TokenBuffer ;
     union
@@ -811,7 +811,7 @@ typedef struct
     Compiler *Compiler0 ;
     System * System0 ;
     Stack * ContextDataStack ;
-    byte * Location ;
+    byte * Location, * CurrentToken ;
     byte * DefaultTokenDelimiters ;
     byte * DefaultDelimiterCharSet ;
     Word * CurrentlyRunningWord, *LastRanWord, *CurrentTokenWord, *TokenDebugSetupWord, *CurrentEvalWord, *LastEvalWord, *NlsWord ;

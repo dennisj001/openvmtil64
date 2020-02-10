@@ -99,6 +99,22 @@ CfrTil_Namespace_UsingLast ( )
     _Namespace_SetAs_UsingLast ( ( byte* ) DataStack_Pop ( ) ) ;
 }
 
+void
+CfrTil_Namespace_SetStateAs_Using ( )
+{
+    byte * token = ( byte* ) DataStack_Pop ( ) ;
+    Namespace * ns = Namespace_Find ( token ) ;
+    _Namespace_SetState_AsUsing ( ns ) ;
+}
+
+void
+CfrTil_Namespace_SetStateAs_NotUsing ( )
+{
+    byte * token = ( byte* ) DataStack_Pop ( ) ;
+    Namespace * ns = Namespace_Find ( token ) ;
+    _Namespace_SetStateAs_NotUsing ( ns ) ;
+}
+
 // "in"
 
 void

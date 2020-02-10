@@ -2,12 +2,21 @@
 5
 #if 1 //_TestDone_ @ not // prevent including twice
 decimal
+: up using pause ;
 User
+#if 0
+: sp up ; //stack pause ;
+C
+: sp up ; //stack pause ;
+Class
+: sp up ; //stack pause ;
+#else
 : sp ; //stack pause ;
 C
 : sp ; //stack pause ;
 Class
 : sp ; //stack pause ;
+#endif
 sp
 c_syntaxOn
 int64
@@ -168,7 +177,7 @@ testB2.nodes [ 1 ].AfterReference 5 =
 testB2.nodes [ 3 ].BeforeReference 6 =
 testB2 32 dump
 "testD" DLLNodeAlloc new
-'testD find DObject.dobject
+'testD find dobject
 testD.a112.b1138 77 =
 "testC" 'testD find DObject.clone 
 testC.a112.b1138 @ dup p 77 _assert

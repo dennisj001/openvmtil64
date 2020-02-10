@@ -41,7 +41,7 @@ Int User
 : cST c_SyntaxTest ;
 : ppT preprocessorTest ;
 : lT lispTest ;
-
+C
 #if 1 //doX64
 : basicT bT ppT cT mT aT loT locT fT oT cntT lT sT sysT interpT stT cST dT0 x64 ; //x64 ;
 #elif 1 //doTX64

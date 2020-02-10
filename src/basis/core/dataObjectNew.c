@@ -6,8 +6,8 @@
 // we run all new objects thru here ; good for debugging and understanding 
 
 Word *
-DataObject_New ( uint64 type, Word * word, byte * name, uint64 morphismAttributes, uint64 objectAttributes, uint64 lispAttributes,
-    int64 index, int64 value, int allocType, int64 tsrli, int64 scwi )
+DataObject_New (uint64 type, Word * word, byte * name, uint64 morphismAttributes, uint64 objectAttributes, uint64 lispAttributes,
+    int64 index, int64 value, Namespace * addToNs, int allocType, int64 tsrli, int64 scwi )
 {
     Context * cntx = _Context_ ;
     Word_SetTsrliScwi ( word, tsrli, scwi )
@@ -69,6 +69,13 @@ DataObject_New ( uint64 type, Word * word, byte * name, uint64 morphismAttribute
             word = Class_New ( name, CLASS, 0 ) ;
             break ;
         }
+#if 1        
+        case CLASS_FIELD:
+        {
+            word = CfrTil_ClassField_New ( name, addToNs, value, index ) ;
+            break ;
+        }
+#endif        
         case CLASS_CLONE:
         {
             word = Class_New ( name, CLASS_CLONE, 1 ) ;

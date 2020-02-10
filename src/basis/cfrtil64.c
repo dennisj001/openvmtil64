@@ -106,7 +106,7 @@ CfrTil_PrintReturnStackWindow ( )
 void
 _CfrTil_NamespacesInit ( CfrTil * cfrTil )
 {
-    Namespace * ns = DataObject_New ( NAMESPACE, 0, ( byte* ) "Namespaces", 0, 0, 0, 0, 0, 0, 0, - 1 ) ;
+    Namespace * ns = DataObject_New (NAMESPACE, 0, ( byte* ) "Namespaces", 0, 0, 0, 0, 0, 0, 0, 0, - 1 ) ;
     ns->State |= USING ; // nb. _Namespace_SetState ( ns, USING ) ; // !! can't be used with "Namespaces"
     cfrTil->Namespaces = ns ;
     CfrTil_AddCPrimitives ( ) ;

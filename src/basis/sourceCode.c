@@ -29,7 +29,7 @@ SC_ShowDbgSourceCodeWord_Or_AtAddress ( Word * scWord0, byte * address )
                             fixed = 1 ;
                         }
 
-                        byte * buffer = DBG_PrepareSourceCodeString (word, sourceCode, 0, 1 ) ;
+                        byte * buffer = DBG_PrepareSourceCodeString ( word, 0, sourceCode, 0, 0, 1 ) ;
                         if ( buffer && buffer[0] ) _Printf ( ( byte* ) "\n%s", buffer ) ;
                         if ( fixed ) word->Name = ( byte* ) "store" ;
                         if ( _Debugger_ ) _Debugger_->LastSourceCodeWord = word ;
@@ -490,6 +490,7 @@ _CfrTil_SC_ScratchPadIndex_Init ( CfrTil * cfrtil )
 }
 
 // don't be confused by SourceCode_Init is different from InitSourceCode
+
 void
 _CfrTil_SourceCode_Init ( CfrTil * cfrtil )
 {

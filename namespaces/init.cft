@@ -1,5 +1,5 @@
 5 // stack checking marker
-Root
+Root 
 jcc8_Off
 typecheckOn dbgTypecheckOn
 #if 0
@@ -465,11 +465,11 @@ infixOff
 rtw
 'test 'tc find alias //nb! after rtw which removes all words "test", etc.
 
-#if 0
 : wtdinclude "namespaces/wordTypeDef.cft" include ;
-// test
-//wtdinclude // has _dobject struct which interferes with 'dobject'
+#if 0
 c_syntaxOn
+// test
+wtdinclude // has _dobject struct which interferes with 'dobject'
 int
 faccs ( REG int32 n | REG in64 rec -- RAX ) 
 {
@@ -485,6 +485,7 @@ faccs ( 7 ) ; 5040 _assert
 //pause
 // test byte size objects
 c_syntaxOn
+C Experimental
 typedef struct _byteTest 
 {
     byte a8_123 ; 
@@ -548,9 +549,11 @@ _assert ( abt.a16_123 456 ) ;
 _assert ( abt.b8_123 46 ) ;
 _assert ( abt.a32_123 234567 ) ;
 _assert ( abt.a64_123 2345566 ) ;
-notUsing: byteTest _byteTest abyteTest ;
+c_syntaxOff 
+C
+notUsing: Experimental byteTest _byteTest abyteTest bt abt ; 
+Root 
 #endif
-c_syntaxOff
 
 #if forStarters 
 : hi ( n m -- TOS ) n @ m @ + dup <dbg> p ; 2 3 d: hi 5 d: _assert

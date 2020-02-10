@@ -204,7 +204,7 @@ CfrTil_Literal ( )
     int64 value = DataStack_Pop ( ) ;
     ByteArray * svcs = _O_CodeByteArray ;
     _NBA_SetCompilingSpace_MakeSureOfRoom ( _O_->MemorySpace0->TempObjectSpace, 4 * K ) ;
-    Word * word = DataObject_New ( LITERAL, 0, ( byte* ) "<literal>", 0, LITERAL | CONSTANT, 0, 0, value, 0, - 1, - 1 ) ;
+    Word * word = DataObject_New (LITERAL, 0, ( byte* ) "<literal>", 0, LITERAL | CONSTANT, 0, 0, value, 0, 0, - 1, - 1 ) ;
     Set_CompilerSpace ( svcs ) ;
     Interpreter_DoWord ( _Context_->Interpreter0, word, - 1, - 1 ) ;
 }
@@ -216,7 +216,7 @@ CfrTil_Constant ( )
     int64 value = DataStack_Pop ( ) ;
     tword = CfrTil_TypeStack_Pop ( ) ;
     byte * name = ( byte* ) DataStack_Pop ( ) ;
-    cword = DataObject_New ( CONSTANT, 0, name, 0, CONSTANT, 0, 0, value, 0, - 1, - 1 ) ;
+    cword = DataObject_New (CONSTANT, 0, name, 0, CONSTANT, 0, 0, value, 0, 0, - 1, - 1 ) ;
     if ( tword )
     {
         //cword->MorphismAttributes |= tword->MorphismAttributes ;
@@ -229,7 +229,7 @@ void
 CfrTil_Variable ( )
 {
     byte * name = ( byte* ) DataStack_Pop ( ) ;
-    Word * word = DataObject_New ( NAMESPACE_VARIABLE, 0, name, 0, NAMESPACE_VARIABLE, 0, 0, 0, 0, - 1, - 1 ) ;
+    Word * word = DataObject_New (NAMESPACE_VARIABLE, 0, name, 0, NAMESPACE_VARIABLE, 0, 0, 0, 0, 0, - 1, - 1 ) ;
     if ( ! Compiling ) CfrTil_Finish_WordSourceCode ( _CfrTil_, word ) ;
 }
 

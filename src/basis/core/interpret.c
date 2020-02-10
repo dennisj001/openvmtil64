@@ -5,17 +5,19 @@ Word *
 _Interpreter_TokenToWord ( Interpreter * interp, byte * token, int64 tsrli, int64 scwi )
 {
     Word * word ;
-    _Context_->CurrentTokenWord = 0 ;
+    Context * cntx = _Context_ ;
+    cntx->CurrentTokenWord = 0 ;
     if ( token )
     {
         interp->Token = token ;
+        cntx->CurrentToken = token ;
         word = Lexer_ObjectToken_New ( interp->Lexer0, token, tsrli, scwi ) ;
         Word_SetTsrliScwi ( word, tsrli, scwi ) ;
         DEBUG_SETUP ( word ) ;
-        _Context_->CurrentTokenWord = word ; // dbg flag
-        _Context_->TokenDebugSetupWord = word ;
+        cntx->CurrentTokenWord = word ; // dbg flag
+        cntx->TokenDebugSetupWord = word ;
     }
-    return _Context_->CurrentTokenWord ; // allow DEBUG_SETUP to set this to 0 to skip interpreting it when it is 'stepped'
+    return cntx->CurrentTokenWord ; // allow DEBUG_SETUP to set this to 0 to skip interpreting it when it is 'stepped'
 }
 
 Word *

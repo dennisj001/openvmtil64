@@ -343,6 +343,7 @@
 #define NAMESPACE           ( (uint64) 1 << 57 )
 #define CLASS               ( (uint64) 1 << 58 )
 #define LOCAL_OBJECT        ( (uint64) 1 << 59 )
+#define CLASS_FIELD         ( (uint64) 1 << 60 ) 
 
 // WAttribute for interpreter word types : added in primitives.c in th LAttribute field
 #define WT_PREFIX                 ( (uint64) 1 <<  0 ) 

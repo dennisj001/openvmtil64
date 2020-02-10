@@ -5,28 +5,28 @@ void
 CfrTil_Class_New ( void )
 {
     byte * name = ( byte* ) DataStack_Pop ( ) ;
-    DataObject_New ( CLASS, 0, name, 0, 0, 0, 0, 0, 0, 0, - 1 ) ;
+    DataObject_New (CLASS, 0, name, 0, 0, 0, 0, 0, 0, 0, 0, - 1 ) ;
 }
 
 void //Word *
 CfrTil_Class_Value_New ( )
 {
     byte * name = ( byte* ) DataStack_Pop ( ) ;
-    Word * word = DataObject_New ( OBJECT, 0, name, 0, 0, 0, 0, 0, 0, 0, - 1 ) ;
+    Word * word = DataObject_New (OBJECT, 0, name, 0, 0, 0, 0, 0, 0, 0, 0, - 1 ) ;
 }
 
 void
 CfrTil_Class_Clone ( void )
 {
     byte * name = ( byte* ) DataStack_Pop ( ) ;
-    DataObject_New ( CLASS_CLONE, 0, name, 0, 0, 0, 0, 0, 0, 0, - 1 ) ;
+    DataObject_New (CLASS_CLONE, 0, name, 0, 0, 0, 0, 0, 0, 0, 0, - 1 ) ;
 }
 
 void
 CfrTil_DObject_New ( )
 {
     // clone DObject -- create an object with DObject as it's prototype (but not necessarily as it's namespace)
-    DataObject_New ( DOBJECT, 0, 0, 0, 0, 0, 0, 0, 0, 0, - 1 ) ;
+    DataObject_New (DOBJECT, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, - 1 ) ;
 }
 
 Namespace *
@@ -41,7 +41,7 @@ CfrTil_Type_New ( )
         CfrTil_Token ( ) ;
         name = ( byte* ) DataStack_Pop ( ) ;
     }
-    ns = DataObject_New ( C_TYPE, 0, name, 0, 0, 0, 0, 0, 0, 0, - 1 ) ;
+    ns = DataObject_New (C_TYPE, 0, name, 0, 0, 0, 0, 0, 0, 0, 0, - 1 ) ;
     return ns ;
 }
 
@@ -112,7 +112,7 @@ _CfrTil_TypeDef ( )
                     Lexer_ReadToken ( lexer ) ;
                     size = CELL ;
                 }
-                ns = DataObject_New ( C_TYPE, 0, token, 0, 0, 0, 0, 0, 0, 0, - 1 ) ;
+                ns = DataObject_New (C_TYPE, 0, token, 0, 0, 0, 0, 0, 0, 0, 0, - 1 ) ;
                 _Namespace_VariableValueSet ( ns, ( byte* ) "size", size ) ;
                 ns->Size = size ;
             }
@@ -125,7 +125,7 @@ _CfrTil_TypeDef ( )
 void
 CfrTil_Typedef ( )
 {
-    DataObject_New ( C_TYPEDEF, 0, 0, 0, 0, 0, 0, 0, 0, 0, - 1 ) ; //--> _CfrTil_TypeDef ( ) ;
+    DataObject_New (C_TYPEDEF, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, - 1 ) ; //--> _CfrTil_TypeDef ( ) ;
 }
 
 

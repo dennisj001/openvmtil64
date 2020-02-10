@@ -36,6 +36,7 @@ Lexer_ObjectToken_New ( Lexer * lexer, byte * token, int64 tsrli, int64 scwi )
         if ( ! word )
         {
             Lexer_ParseObject ( lexer, token ) ;
+            lexer->ParsedToken = token ;
             if ( lexer->L_ObjectAttributes & T_RAW_STRING )
             {
                 if ( GetState ( _O_, AUTO_VAR ) && ( ! GetState ( compiler, ( DOING_A_PREFIX_WORD | DOING_BEFORE_A_PREFIX_WORD ) ) ) )
@@ -45,16 +46,16 @@ Lexer_ObjectToken_New ( Lexer * lexer, byte * token, int64 tsrli, int64 scwi )
                     {
                         //if ( ! _Compiler_->AutoVarTypeNamespace ) 
                         _Namespace_ActivateAsPrimary ( compiler->LocalsNamespace ) ;
-                        word = DataObject_New ( LOCAL_VARIABLE, 0, token, 0, LOCAL_VARIABLE, 0, 0, 0, DICTIONARY, tsrli, scwi ) ;
+                        word = DataObject_New (LOCAL_VARIABLE, 0, token, 0, LOCAL_VARIABLE, 0, 0, 0, 0, DICTIONARY, tsrli, scwi ) ;
                         token2 = Lexer_Peek_Next_NonDebugTokenWord ( lexer, 1, 0 ) ;
                         if ( ! String_Equal ( token2, "=" ) ) return lexer->TokenWord = 0 ; // don't interpret this word
                     }
-                    else word = DataObject_New ( NAMESPACE_VARIABLE, 0, token, 0, NAMESPACE_VARIABLE, 0, 0, 0, 0, tsrli, scwi ) ;
+                    else word = DataObject_New (NAMESPACE_VARIABLE, 0, token, 0, NAMESPACE_VARIABLE, 0, 0, 0, 0, 0, tsrli, scwi ) ;
                     word->W_ObjectAttributes |= ( RAW_STRING ) ;
                 }
                 else Lexer_Exception ( token, NOT_A_KNOWN_OBJECT, "\nLexer_ObjectToken_New : unknown token" ) ;
             }
-            else word = DataObject_New ( LITERAL, 0, token, lexer->L_MorphismAttributes, lexer->L_ObjectAttributes, 0, 0, lexer->Literal, 0, tsrli, scwi ) ;
+            else word = DataObject_New (LITERAL, 0, token, lexer->L_MorphismAttributes, lexer->L_ObjectAttributes, 0, 0, lexer->Literal, 0, 0, tsrli, scwi ) ;
             Word_SetTypeNamespace ( word, lexer->L_ObjectAttributes ) ;
             word->ObjectByteSize = lexer->TokenObjectSize ;
         }

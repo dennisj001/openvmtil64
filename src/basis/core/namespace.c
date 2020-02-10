@@ -154,8 +154,11 @@ Namespace_IsUsing ( byte * name )
 void
 _Namespace_SetState ( Namespace * ns, uint64 state )
 {
-    if ( state == USING ) SetState_TrueFalse ( ns, USING, NOT_USING ) ;
-    else SetState_TrueFalse ( ns, NOT_USING, USING ) ;
+    if ( ns )
+    {
+        if ( state == USING ) SetState_TrueFalse ( ns, USING, NOT_USING ) ;
+        else SetState_TrueFalse ( ns, NOT_USING, USING ) ;
+    }
 }
 
 Word *
@@ -276,6 +279,18 @@ _Namespace_SetAsNotUsing ( Namespace * ns )
         _Namespace_SetState ( ns, NOT_USING ) ;
         _Namespace_ResetFromInNamespace ( ns ) ;
     }
+}
+
+void
+_Namespace_SetStateAs_NotUsing ( Namespace * ns )
+{
+    _Namespace_SetState ( ns, NOT_USING ) ;
+}
+
+void
+_Namespace_SetState_AsUsing ( Namespace * ns )
+{
+    _Namespace_SetState ( ns, USING ) ;
 }
 
 void
@@ -404,7 +419,7 @@ _Namespace_VariableValueSet ( Namespace * ns, byte * name, int64 value )
 Namespace *
 Namespace_New ( byte * name, Namespace * containingNs )
 {
-    Namespace * ns = DataObject_New ( NAMESPACE, 0, name, 0, NAMESPACE, 0, 0, ( int64 ) containingNs, 0, 0, - 1 ) ;
+    Namespace * ns = DataObject_New (NAMESPACE, 0, name, 0, NAMESPACE, 0, 0, ( int64 ) containingNs, 0, 0, 0, - 1 ) ;
     return ns ;
 }
 
@@ -417,7 +432,7 @@ _Namespace_Find ( byte * name, Namespace * superNamespace, int64 exceptionFlag )
     {
         Word * word = 0 ;
         if ( superNamespace ) word = _Finder_FindWord_InOneNamespace ( _Finder_, superNamespace, name ) ;
-        if ( ! word ) word = Finder_FindWord_AnyNamespace ( _Finder_, name ) ;
+        if ( ! word ) word = Finder_FindWord_UsedNamespaces ( _Finder_, name ) ;
         if ( word && Is_NamespaceType ( word ) ) return ( Namespace* ) Word_UnAlias ( word ) ;
         else if ( exceptionFlag )
         {
@@ -439,7 +454,7 @@ Namespace *
 Namespace_FindOrNew_SetUsing ( byte * name, Namespace * containingNs, int64 setUsingFlag )
 {
     if ( ! containingNs ) containingNs = _CfrTil_->Namespaces ;
-    Namespace * ns = _Namespace_Find ( name, containingNs, 0 ) ;
+    Namespace * ns = _Finder_FindWord_InOneNamespace ( _Finder_, containingNs, name ) ; //_Namespace_Find ( name, containingNs, 0 ) ;
     if ( ! ns ) ns = Namespace_New ( name, containingNs ) ;
     if ( setUsingFlag ) Namespace_SetState_AdjustListPosition ( ns, USING, 1 ) ;
     return ns ;
@@ -448,7 +463,7 @@ Namespace_FindOrNew_SetUsing ( byte * name, Namespace * containingNs, int64 setU
 Namespace *
 _Namespace_FindOrNew_Local ( Stack * nsStack )
 {
-    int64 d = Stack_Depth ( _Context_->Compiler0->BlockStack ) ; 
+    int64 d = Stack_Depth ( _Context_->Compiler0->BlockStack ) ;
     byte bufferData [ 32 ], *name = ( byte* ) bufferData ;
     sprintf ( ( char* ) name, "locals_%ld", d - 1 ) ; // 1 : BlockStack starts at 1 
     Namespace * ns = _Namespace_Find ( name, _CfrTil_->Namespaces, 0 ) ;

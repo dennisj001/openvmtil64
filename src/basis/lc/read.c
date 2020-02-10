@@ -82,8 +82,8 @@ _LO_Read_DoWord ( LambdaCalculus * lc, Word * word, int64 qidFlag, int64 tsrli, 
         Word_Eval ( word ) ;
         if ( word->W_LispAttributes & T_LISP_SPECIAL )
         {
-            l0 = DataObject_New ( T_LC_NEW, word, 0, word->W_MorphismAttributes, word->W_ObjectAttributes,
-                T_LISP_SYMBOL | word->W_LispAttributes, 0, word->Lo_Value, 0, tsrli, scwi ) ;
+            l0 = DataObject_New (T_LC_NEW, word, 0, word->W_MorphismAttributes, word->W_ObjectAttributes,
+                T_LISP_SYMBOL | word->W_LispAttributes, 0, word->Lo_Value, 0, 0, tsrli, scwi ) ;
         }
     }
     else if ( word->W_LispAttributes & T_LISP_TERMINATING_MACRO )
@@ -92,7 +92,7 @@ _LO_Read_DoWord ( LambdaCalculus * lc, Word * word, int64 qidFlag, int64 tsrli, 
         Word_Eval ( word ) ;
         token1 = ( byte * ) DataStack_Pop ( ) ;
         SetState ( lc, ( LC_READ ), true ) ;
-        l0 = DataObject_New ( T_LC_LITERAL, 0, token1, 0, LITERAL | word->W_ObjectAttributes, word->W_LispAttributes, 0, 0, 0, tsrli, scwi ) ;
+        l0 = DataObject_New (T_LC_LITERAL, 0, token1, 0, LITERAL | word->W_ObjectAttributes, word->W_LispAttributes, 0, 0, 0, 0, tsrli, scwi ) ;
     }
     else
     {
@@ -102,8 +102,8 @@ _LO_Read_DoWord ( LambdaCalculus * lc, Word * word, int64 qidFlag, int64 tsrli, 
             Object_Run ( word ) ;
             Set_CompileMode ( false ) ;
         }
-        l0 = DataObject_New ( T_LC_NEW, word, word->Name, word->W_MorphismAttributes, word->W_ObjectAttributes,
-            ( T_LISP_SYMBOL | word->W_LispAttributes ), 0, word->Lo_Value, 0, tsrli, scwi ) ;
+        l0 = DataObject_New (T_LC_NEW, word, word->Name, word->W_MorphismAttributes, word->W_ObjectAttributes,
+            ( T_LISP_SYMBOL | word->W_LispAttributes ), 0, word->Lo_Value, 0, 0, tsrli, scwi ) ;
         if ( word->W_ObjectAttributes & NAMESPACE_TYPE ) Namespace_DoNamespace ( word, 0 ) ;
     }
     return l0 ;
@@ -124,7 +124,7 @@ _LO_Read_DoToken ( LambdaCalculus * lc, byte * token, int64 qidFlag, int64 tsrli
     else
     {
         Lexer_ParseObject ( lexer, token ) ;
-        l0 = DataObject_New ( T_LC_LITERAL, 0, token, 0, 0, 0, qidFlag, 0, 0, tsrli, scwi ) ;
+        l0 = DataObject_New (T_LC_LITERAL, 0, token, 0, 0, 0, qidFlag, 0, 0, 0, tsrli, scwi ) ;
     }
     if ( l0 )
     {

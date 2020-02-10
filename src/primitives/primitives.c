@@ -132,6 +132,8 @@ CPrimitive CPrimitives [] = {
     { "usingFirst", 0, 0, 0, CfrTil_Namespace_UsingFirst, 0, 0, 0, "Namespace", "Root" },
     { "usingLast", 0, 0, 0, CfrTil_Namespace_UsingLast, 0, 0, 0, "Namespace", "Root" },
     { "notUsing", 0, 0, 0, CfrTil_Namespace_NotUsing, 0, 0, 0, "Namespace", "Root" },
+    { "setStateNotUsing", 0, 0, 0, CfrTil_Namespace_SetStateAs_NotUsing, 0, 0, 0, "Namespace", "Root" },
+    { "setStateUsing", 0, 0, 0, CfrTil_Namespace_SetStateAs_Using, 0, 0, 0, "Namespace", "Root" },
     { "namespaces", 0, 0, 0, CfrTil_Namespaces, 0, 0, 0, "Namespace", "Root" },
     { "namespaceTree", 0, 0, 0, CfrTil_Namespaces_PrettyPrintTree, 0, 0, 0, "Namespace", "Root" },
     { "namespaceTreeWithWords", 0, 0, 0, CfrTil_Namespaces_PrettyPrintTreeWithWords, 0, 0, 0, "Namespace", "Root" },

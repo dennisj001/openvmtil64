@@ -493,8 +493,8 @@ _LC_Init ( LambdaCalculus * lc )
         int64 svsco = IsSourceCodeOn ;
         DebugShow_Off ;
         //CfrTil_DbgSourceCodeOff ( ) ;
-        lc->Nil = DataObject_New ( T_LC_DEFINE, 0, ( byte* ) "nil", 0, 0, T_NIL, 0, 0, 0, 0, - 1 ) ;
-        lc->True = DataObject_New ( T_LC_DEFINE, 0, ( byte* ) "true", 0, 0, 0, 0, ( uint64 ) true, 0, 0, - 1 ) ;
+        lc->Nil = DataObject_New (T_LC_DEFINE, 0, ( byte* ) "nil", 0, 0, T_NIL, 0, 0, 0, 0, 0, - 1 ) ;
+        lc->True = DataObject_New (T_LC_DEFINE, 0, ( byte* ) "true", 0, 0, 0, 0, ( uint64 ) true, 0, 0, 0, - 1 ) ;
         lc->buffer = Buffer_Data ( lc->PrintBuffer ) ;
         lc->outBuffer = Buffer_Data ( lc->OutBuffer ) ;
         SetState ( _CfrTil_, DEBUG_SOURCE_CODE_MODE, svsco ) ;

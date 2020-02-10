@@ -32,7 +32,7 @@ _OpenVmTil_ShowExceptionInfo ( )
         Debugger_Registers ( debugger ) ;
         Debugger_UdisOneInstruction ( debugger, debugger->DebugAddress, ( byte* ) "", ( byte* ) "" ) ;
     }
-    if ( word ) _CfrTil_Source ( word, 0 ) ;
+    if ( word != _Context_->LastEvalWord ) _CfrTil_Source ( word, 0 ) ;
     _Printf ( ( byte* ) "\nOpenVmTil_SignalAction : address = 0x%016lx : %s", _O_->SigAddress, _O_->SigLocation ) ;
 }
 
@@ -81,6 +81,7 @@ OVT_PauseInterpret ( Context * cntx, byte key )
         if ( ReadLine_PeekNextChar ( rl ) < ' ' ) break ; // '\n', <esc>, etc.
         Interpret_ToEndOfLine ( cntx->Interpreter0 ) ;
         CfrTil_NewLine ( ) ;
+        key = 0 ;
     }
     while ( 1 ) ;
     ReadLine_SetPrompt ( rl, svPrompt ) ;

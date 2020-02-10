@@ -9,7 +9,7 @@ _LO_Define ( ListObject * idNode, ListObject * locals )
     LambdaCalculus * lc = _LC_ ;
     ListObject *value0, *value, *l1 ;
     Word * word0 = idNode->Lo_CfrTilWord, *word ;
-    word = DataObject_New ( T_LC_DEFINE, 0, ( byte* ) word0->Name, 0, NAMESPACE_VARIABLE, 0, 0, 0, LISP, idNode->W_RL_Index, idNode->W_SC_Index ) ; //word0->W_RL_Index, word0->W_SC_Index ) ; //word0 was allocated COMPILER_TEMP or LISP_TEMP
+    word = DataObject_New (T_LC_DEFINE, 0, ( byte* ) word0->Name, 0, NAMESPACE_VARIABLE, 0, 0, 0, 0, LISP, idNode->W_RL_Index, idNode->W_SC_Index ) ; //word0->W_RL_Index, word0->W_SC_Index ) ; //word0 was allocated COMPILER_TEMP or LISP_TEMP
     CfrTil_WordList_Init (word) ;
 
     word->Definition = 0 ; // reset the definition from LO_Read
@@ -29,8 +29,8 @@ _LO_Define ( ListObject * idNode, ListObject * locals )
     word->W_LispAttributes |= ( T_LC_DEFINE | T_LISP_SYMBOL ) ;
     word->State |= LC_DEFINED ;
     // the value was entered into the LISP memory, now we need a temporary carrier for LO_Print
-    l1 = DataObject_New ( T_LC_NEW, 0, word->Name, word->W_MorphismAttributes, word->W_ObjectAttributes, word->W_LispAttributes,
-        0, ( int64 ) value, LISP, - 1, - 1 ) ; // all words are symbols
+    l1 = DataObject_New (T_LC_NEW, 0, word->Name, word->W_MorphismAttributes, word->W_ObjectAttributes, word->W_LispAttributes,
+        0, ( int64 ) value, 0, LISP, - 1, - 1 ) ; // all words are symbols
     l1->W_LispAttributes |= ( T_LC_DEFINE | T_LISP_SYMBOL ) ;
     //l1->Lo_Value = ( uint64 ) value ; // used by eval
     SetState ( lc, ( LC_DEFINE_MODE ), false ) ;
