@@ -36,7 +36,7 @@ DataObject_New (uint64 type, Word * word, byte * name, uint64 morphismAttributes
         }
         case NAMESPACE:
         {
-            word = _Namespace_New ( name, ( Namespace * ) value ) ;
+            word = _Namespace_New ( name, addToNs ) ;
             break ;
         }
         case NAMESPACE_VARIABLE:

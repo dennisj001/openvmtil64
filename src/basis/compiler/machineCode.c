@@ -300,8 +300,11 @@ Compile_Move ( uint8 direction, uint8 mod, uint8 reg, uint8 rm, uint8 operandSiz
             opCode += ( rm & 7 ) ;
             controlFlags |= ( REX_W ) ;
         }
+        //DBI_ON ; 
+        // zero out destination
+        //Compile_CalculateWrite_Instruction_X64 ( 0, 0xb8 + (rm & 7), mod, reg, rm, controlFlags, sib, disp, dispSize, 0, CELL ) ;
     }
-    else
+    else // non immediate
     {
         controlFlags |= ( MODRM_B ) ;
         opCode = 0x88 ;
@@ -317,6 +320,7 @@ Compile_Move ( uint8 direction, uint8 mod, uint8 reg, uint8 rm, uint8 operandSiz
         }
     }
     Compile_CalculateWrite_Instruction_X64 ( opCode0, opCode, mod, reg, rm, controlFlags, sib, disp, dispSize, imm, immSize ) ;
+    //DBI_OFF ;
 }
 
 void
@@ -419,17 +423,41 @@ _Compile_Move_Literal_Immediate_To_Reg ( int64 reg, int64 value, int size )
 // for use of immediate data with this group use _Compile_Group1_Immediate
 
 void
-_Compile_X_Group1 ( Boolean code, Boolean toRegOrMem, Boolean mod, Boolean reg, Boolean rm, Boolean sib, int64 disp, Boolean osize )
+_Compile_X_Group1 ( Boolean code, Boolean toRegOrMem, Boolean mod, Boolean reg, Boolean rm, Boolean sib, int64 disp, Boolean operandSize )
 {
-    int64 opCode = code << 3 ;
-    if ( osize > BYTE ) opCode |= 1 ;
+    int64 opCode = code << 3, controlFlags = DISP_B | MODRM_B ;
+    if ( operandSize > BYTE ) opCode |= 1 ;
     if ( toRegOrMem == TO_REG ) opCode |= 2 ;
     // we need to be able to set the size so we can know how big the instruction will be in eg. CompileVariable
     // otherwise it could be optimally deduced but let caller control by keeping operandSize parameter
     // some times we need cell_t where bytes would work
     //Compiler_WordStack_SCHCPUSCA ( 0, 1 ) ;
     //Compile_CalculateWrite_Instruction_X64 ( 0, opCode, mod, reg, rm, DISP_B | REX_W | MODRM_B, sib, disp, 0, 0, osize ) ;
-    Compile_CalculateWrite_Instruction_X64 ( 0, opCode, mod, reg, rm, DISP_B | MODRM_B, sib, disp, 0, 0, osize ) ;
+#if 1
+    if ( operandSize < 8 )
+    {
+        int64 opCode0 ;
+        if ( operandSize == 1 ) opCode |= rm ;
+        else if ( operandSize == 2 )
+        {
+            opCode0 = 0x66 ;
+            opCode |= rm ;
+            //modRm = 0 ;
+        }
+        else if ( operandSize == 4 )
+        {
+            opCode |= rm ;
+            //modRm = 0 ;
+        }
+        Compile_CalculateWrite_Instruction_X64 ( opCode0, opCode, mod, reg, rm, controlFlags, sib, disp, 0, 0, operandSize ) ;
+    }
+    else //if ( osize == 8 ) 
+    {
+        Compile_CalculateWrite_Instruction_X64 ( 0, opCode, mod, reg, rm, controlFlags, sib, disp, 0, 0, operandSize ) ;
+    }
+#else    
+    Compile_CalculateWrite_Instruction_X64 ( 0, opCode, mod, reg, rm, controlFlags, sib, disp, 0, 0, operandSize ) ;
+#endif    
 }
 
 // opCode group 1 - 0x80-0x83 : ADD OR ADC SBB AND_OPCODE SUB XOR CMP : with immediate data
@@ -465,7 +493,7 @@ _Compile_X_Group1_Immediate ( Boolean code, Boolean mod, Boolean rm, int64 disp,
     if ( ( ( iSize > 4 ) || ( imm >= 0x100000000 ) ) ) //&& disp )
     {
         //_DBI_ON ;
-        // x64 has no insn to do a group1_op with int64 to mem directly so ...
+        // x64 has no insn to do a group1_op with imm int64 to mem directly so ...
         // first move to a reg then from that reg group1Op to mem location
         if ( rm != DSP ) //! disp )
         {
@@ -490,7 +518,7 @@ _Compile_X_Group1_Immediate ( Boolean code, Boolean mod, Boolean rm, int64 disp,
     // otherwise it could be optimally deduced but let caller control by keeping operandSize parameter
     // some times we need cell_t where bytes would work
     //_Compile_InstructionX86 ( int8 opCode, int8 mod, int8 reg, int8 rm, int8 controlFlags, int8 sib, int64 disp, int8 dispSize, int64 imm, int8 immSize )
-    //_DBI_ON ;
+    //DBI_ON ;
     Compile_CalculateWrite_Instruction_X64 ( 0, opCode, mod, code, rm, REX_W | MODRM_B | IMM_B | DISP_B, 0, disp, 0, imm, iSize ) ;
     //DBI_OFF ;
 }

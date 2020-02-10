@@ -269,7 +269,7 @@ _Word_ShowSourceCode ( Word * word )
         if (( ! ( word->W_MorphismAttributes & CPRIMITIVE ) ) && word->W_SourceCode )
         {
             byte * sc = Buffer_Data_Cleared ( _CfrTil_->ScratchB1 ) ;
-            sc = _String_ConvertStringToBackSlash ( sc, word->W_SourceCode, BUFFER_SIZE ) ;
+            sc = _String_ConvertStringToBackSlash ( sc, word->W_SourceCode, BUF_IX_SIZE ) ;
             scd = c_gd ( String_FilterMultipleSpaces ( sc, TEMPORARY ) ) ;
         }
         else scd = ( byte* ) "C Primitive" ;
@@ -325,12 +325,12 @@ _CfrTil_WordName_Run ( byte * name )
 // alias : postfix
 
 Word *
-_CfrTil_Alias ( Word * word, byte * name )
+_CfrTil_Alias (Word * word, byte * name , Namespace * addToNs)
 {
     Word * alias = 0 ;
     if ( word && word->Definition )
     {
-        alias = _Word_New ( name, word->W_MorphismAttributes | ALIAS, word->W_ObjectAttributes, word->W_LispAttributes, 1, 0, DICTIONARY ) ; // inherit type from original word
+        alias = _Word_New ( name, word->W_MorphismAttributes | ALIAS, word->W_ObjectAttributes, word->W_LispAttributes, 1, addToNs, DICTIONARY ) ; // inherit type from original word
         word = Word_UnAlias ( word ) ;
         Word_InitFinal ( alias, ( byte* ) word->Definition ) ;
         alias->S_CodeSize = word->S_CodeSize ;

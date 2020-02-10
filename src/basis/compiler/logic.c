@@ -155,8 +155,6 @@ Compile_LogicalAnd ( Compiler * compiler )
     }
 }
 
-#if 1 // larger total code size but requires to execute less instructions
-
 void
 _Compile_LogicalNot ( Compiler * compiler )
 {
@@ -170,42 +168,6 @@ _Compile_LogicalNot ( Compiler * compiler )
     //_Printf ( (byte*) "\nSize of LogicalNot code = %d bytes\n", Here -here ) ;
     //DBI_OFF ;
 }
-#elif 1 // small total code size but requires to execute more instructions
-
-void
-_Compile_LogicalNot ( Compiler * compiler )
-{
-    //DBI_ON ;
-    //byte * here = Here ;
-    byte reg = ACC ; //nb! reg should always be ACC! : immediately after the 'cmp' insn which changes the flags appropriately
-    _Compile_TestCode ( reg, CELL ) ;
-    _Compile_SETcc ( TTT_EQUAL, NEGFLAG_OFF, reg ) ;
-    _Compile_MOVZX_BYTE_REG ( reg, reg ) ;
-    _Compile_X_Group1_Immediate ( XOR, REG, reg, 0, 1, CELL ) ;
-    _Word_CompileAndRecord_PushReg ( _CfrTil_WordList ( 0 ), reg, true ) ;
-    //_Printf ( (byte*) "\nSize of LogicalNot code = %d bytes\n", Here -here ) ;
-    //DBI_OFF ;
-}
-#else // experimental
-
-void
-_Compile_LogicalNot ( Compiler * compiler )
-{
-    DBI_ON ;
-    byte * here = Here ;
-    byte reg = ACC ; //nb! reg should always be ACC! : immediately after the 'cmp' insn which changes the flags appropriately
-    _Compile_X_Group1_Immediate ( XOR, REG, reg, 0, - 1, CELL ) ;
-    //_Compile_TestCode ( reg, CELL ) ;
-    _Compile_SETcc ( TTT_EQUAL, NEGFLAG_ON, reg ) ;
-    //_Compile_XOR_RAX_1_Immediate () ;
-
-    //_Compile_XOR_AL_1_Immediate () ;
-    _Compile_MOVZX_BYTE_REG ( reg, reg ) ;
-    _Word_CompileAndRecord_PushReg ( _CfrTil_WordList ( 0 ), reg, true ) ;
-    _Printf ( ( byte* ) "\nSize of LogicalNot code = %d", Here - here ) ;
-    DBI_OFF ;
-}
-#endif
 
 void
 _Compile_SETcc ( Boolean setTtn, Boolean setNegFlag, Boolean reg )
@@ -241,7 +203,6 @@ _Compile_SETcc_Tttn_REG ( Compiler * compiler, Boolean setTtn, Boolean setNegFla
 // eflags affected : cf of sf zf af pf : Intel Instrucion Set Reference Manual for "cmp"
 // ?? can this be done better with test/jcc ??
 // want to use 'test eax, 0' as a 0Branch (cf. jonesforth) basis for all block conditionals like if/else, do/while, for ...
-#if 1
 
 void
 Compile_Cmp_Set_Tttn_Logic ( Compiler * compiler, Boolean setTtn, Boolean setNegateFlag, Boolean jccTtt, Boolean jccNegFlag )
@@ -292,65 +253,6 @@ Compile_Cmp_Set_Tttn_Logic ( Compiler * compiler, Boolean setTtn, Boolean setNeg
     _Compile_SETcc_Tttn_REG ( compiler, setTtn, setNegateFlag, jccTtt, jccNegFlag, reg, reg ) ; //nb! should always be ACC! : immediately after the 'cmp' insn which changes the flags appropriately
     _Word_CompileAndRecord_PushReg ( _CfrTil_WordList ( 0 ), reg, true ) ; //ACC ) ;
 }
-#else
-
-void
-Compile_Cmp_Set_Tttn_Logic ( Compiler * compiler, Boolean setTtn, Boolean setNegateFlag, Boolean jccTtt, Boolean jccNegFlag )
-{
-    int64 optSetupFlag = Compiler_CheckOptimize ( compiler, 0 ) ;
-    CompileOptimizeInfo * optInfo = compiler->OptInfo ;
-    if ( optSetupFlag & OPTIMIZE_DONE ) return ;
-    else if ( optSetupFlag )
-    {
-        if ( optInfo->OptimizeFlag & OPTIMIZE_IMM )
-        {
-            if ( ( setTtn == TTT_EQUAL ) && ( optInfo->Optimize_Imm == 0 ) ) //Compile_TEST ( optInfo->Optimize_Mod, optInfo->Optimize_Rm, 0, optInfo->Optimize_Disp, optInfo->Optimize_Imm, CELL ) ;
-            {
-                if ( optInfo->COIW [2]->StackPushRegisterCode ) SetHere ( optInfo->COIW [2]->StackPushRegisterCode, 1 ) ; // leave optInfo_0_two value in ACCUM we don't need to push it
-                Compiler_BI_CompileRecord_TestCode_ArgRegNum ( compiler, 1 ) ;
-            }
-            else
-            {
-                int64 size ;
-                if ( optInfo->Optimize_Imm >= 0x100000000 )
-                {
-                    size = 8 ;
-                    setNegateFlag = ! setNegateFlag ;
-                }
-                else size = 0 ;
-                WordList_SetCoding ( 0, Here ) ; // 0 : CMP insn
-                //DBI_ON ;
-#if 0                
-                Compile_CMPI ( optInfo->Optimize_Mod, optInfo->Optimize_Rm, optInfo->Optimize_Disp, optInfo->Optimize_Imm, size ) ;
-#else                
-                if ( optInfo->wordArg1->Coding ) SetHere ( optInfo->wordArg1->Coding, 1 ) ;
-                _Compile_X_Group1_Immediate ( CMP, optInfo->Optimize_Mod, optInfo->Optimize_Reg, 0, optInfo->Optimize_Imm, size ) ;
-#endif                
-                //DBI_OFF ;
-            }
-        }
-        else
-        {
-            // Compile_CMP( toRegOrMem, mod, reg, rm, sib, disp )
-            WordList_SetCoding ( 0, Here ) ;
-            Compile_CMP ( optInfo->Optimize_Dest_RegOrMem, optInfo->Optimize_Mod,
-                optInfo->Optimize_Reg, optInfo->Optimize_Rm, 0, optInfo->Optimize_Disp, CELL_SIZE ) ;
-        }
-    }
-    else
-    {
-        _Compile_Move_StackN_To_Reg ( OREG, DSP, 0 ) ;
-        _Compile_Move_StackN_To_Reg ( ACC, DSP, - 1 ) ;
-        // must do the DropN before the CMP because CMP sets eflags 
-        _Compile_Stack_DropN ( DSP, 2 ) ; // before cmp 
-        WordList_SetCoding ( 0, Here ) ;
-        Compile_CMP ( REG, REG, ACC, OREG, 0, 0, CELL ) ;
-    }
-    Boolean reg = ACC ; //nb! reg should always be ACC! : immediately after the 'cmp' insn which changes the flags appropriately
-    _Compile_SETcc_Tttn_REG ( compiler, setTtn, setNegateFlag, jccTtt, jccNegFlag, reg, reg ) ; //nb! should always be ACC! : immediately after the 'cmp' insn which changes the flags appropriately
-    _Word_CompileAndRecord_PushReg ( _CfrTil_WordList ( 0 ), reg, true ) ; //ACC ) ;
-}
-#endif
 //  logical equals - "=="
 
 void
@@ -447,8 +349,6 @@ Compile_LogicalNot ( Compiler * compiler )
 
 
 // JE, JNE, JZ, JNZ, ... see machineCode.h
-#if 1
-
 byte *
 _Compile_Jcc ( int64 setNegFlag, int64 setTtn, byte * jmpToAddr, byte insn )
 {
@@ -467,29 +367,6 @@ _Compile_Jcc ( int64 setNegFlag, int64 setTtn, byte * jmpToAddr, byte insn )
     Compile_CalculateWrite_Instruction_X64 ( 0x0f, ( 0x8 << 4 | setTtn << 1 | setNegFlag ), 0, 0, 0, DISP_B, 0, offset, INT32_SIZE, 0, 0 ) ;
     return compiledAtAddress ;
 }
-#else
-
-byte *
-_Compile_Jcc ( int64 setNegFlag, int64 setTtn, byte * jmpToAddr, byte insn )
-{
-    byte * compiledAtAddress = Here ;
-    int32 offset = jmpToAddr ? _CalculateOffsetForCallOrJump ( Here + 1, jmpToAddr, insn ) : 0 ;
-    //if ( jmpToAddr )
-    {
-        if ( ( insn != JCC32 ) || ( offset < 127 ) )
-        {
-            Compile_CalculateWrite_Instruction_X64 ( 0, ( 0x7 << 4 | setTtn << 1 | setNegFlag ), 0, 0, 0, DISP_B, 0, offset, BYTE, 0, 0 ) ;
-            return compiledAtAddress ;
-        }
-        else
-        {
-            //offset = 0 ; // allow this function to be used to have a delayed compile of the actual address
-            Compile_CalculateWrite_Instruction_X64 ( 0x0f, ( 0x8 << 4 | setTtn << 1 | setNegFlag ), 0, 0, 0, DISP_B, 0, offset, INT32_SIZE, 0, 0 ) ;
-        }
-        return compiledAtAddress ;
-    }
-}
-#endif
 
 byte *
 _BI_Compile_Jcc ( BlockInfo *bi, byte * jmpToAddress )

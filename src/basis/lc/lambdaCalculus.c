@@ -189,11 +189,11 @@ LC_FindWord ( byte * name, ListObject * locals )
 Boolean
 LO_strcat ( byte * buffer, byte * buffer2 )
 {
-    if ( Strlen ( ( char* ) buffer2 ) + Strlen ( ( char* ) buffer ) >= BUFFER_SIZE )
+    if ( Strlen ( ( char* ) buffer2 ) + Strlen ( ( char* ) buffer ) >= BUF_IX_SIZE )
     {
         Error ( "LambdaCalculus : LO_strcat : buffer overflow.", QUIT ) ;
     }
-    else strncat ( ( char* ) buffer, ( char* ) buffer2, BUFFER_SIZE ) ;
+    else strncat ( ( char* ) buffer, ( char* ) buffer2, BUF_IX_SIZE ) ;
     buffer2 [0] = 0 ;
     return true ;
 }

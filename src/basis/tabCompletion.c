@@ -25,7 +25,7 @@ ReadLiner_GenerateFullNamespaceQualifiedName ( ReadLiner * rl, Word * w )
     Stack * nsStk = rl->TciNamespaceStack ;
     Namespace *ns ;
     byte * nsName, *c_udDot = 0 ; //( CString ) c_dd ( "." ) ;
-    int64 i, dot = 0, notUsing = 0 ; //, ow = 0 ;
+    int64 i, dot = 0, notUsing = 0 ; //, strlenUnAdorned = 0 ; //, ow = 0 ;
 
     String_Init ( b0 ) ;
     for ( ns = ( Is_NamespaceType ( w ) ? w : w->ContainingNamespace ) ; ns ; ns = ns->ContainingNamespace ) // && ( tw->ContainingNamespace != _O_->CfrTil->Namespaces ) )
@@ -35,6 +35,7 @@ ReadLiner_GenerateFullNamespaceQualifiedName ( ReadLiner * rl, Word * w )
             notUsing = 1 ;
         }
         _Stack_Push ( nsStk, ( int64 ) ( ( ns->State & NOT_USING ) ? c_ud ( ns->Name ) : ( ns->Name ) ) ) ;
+        //strlenUnAdorned += strlen ( ns->Name ) ;
     }
     if ( notUsing ) c_udDot = ( byte* ) c_ud ( "." ) ;
     for ( i = Stack_Depth ( nsStk ) ; i ; i -- )
@@ -53,7 +54,9 @@ ReadLiner_GenerateFullNamespaceQualifiedName ( ReadLiner * rl, Word * w )
     {
         if ( ! dot ) strcat ( ( CString ) b0, ( CString ) notUsing ? ( CString ) c_udDot : ( CString ) "." ) ;
         strcat ( ( char* ) b0, notUsing ? ( char* ) c_ud ( w->Name ) : ( char* ) w->Name ) ; // namespaces are all added above
+        //strlenUnAdorned += strlen ( w->Name ) ;
     }
+    //ReadLine_SetCursorPosition ( rl, strlenUnAdorned ) ;
     return b0 ;
 }
 
@@ -91,11 +94,11 @@ RL_TC_StringInsert_AtCursor ( ReadLiner * rl, byte * strToInsert )
     if ( newCursorPos < stiLen )
     {
         ReadLine_InputLine_Clear ( rl ) ;
-        strcpy ( ( CString ) rl->InputLine, ( CString ) _CfrTil_->OriginalInputLine ) ;
+        strncpy ( ( CString ) rl->InputLine, ( CString ) _CfrTil_->OriginalInputLine, BUFFER_SIZE ) ;
     }
     ReadLine_SetCursorPosition ( rl, newCursorPos ) ;
     _ReadLine_InsertStringIntoInputLineSlotAndShow ( rl, slotStart, startCursorPos, ( byte* ) strToInsert ) ; // 1 : TokenLastChar is the last char of the identifier
-    ReadLine_Set_ReadIndex ( rl, rl->CursorPosition ) ;
+    ReadLine_Set_ReadIndex ( rl, rl->CursorPosition ) ; //rl->CursorPosition ) ;
 }
 
 byte *
@@ -181,7 +184,7 @@ RL_TabCompletionInfo_Init ( ReadLiner * rl )
     tci->NextWord = tci->RunWord ;
 }
 
-Boolean
+Word *
 _TabCompletion_Compare ( Word * word )
 {
     ReadLiner * rl = _Context_->ReadLiner0 ;
@@ -287,7 +290,7 @@ _TabCompletion_Compare ( Word * word )
                             ( tci->RunWord ? tci->RunWord->Name : tci->Identifier ), tci->FoundWrapCount, tci->WordWrapCount, tci->WordCount, tci->FoundCount, tci->MaxFoundCount ) ;
                     }
                 }
-                return true ;
+                return word ; //true ;
             }
         }
     }
@@ -314,9 +317,9 @@ TC_Tree_Map ( TabCompletionInfo * tci, MapFunction mf, Word * wordi )
             {
                 nextWord = ( Word* ) dlnode_Next ( ( node* ) word ) ;
                 if ( kbhit ( ) ) return 0 ; //must be here else could loop forever !?
-                if ( mf ( ( Symbol* ) word ) ) goto doReturn ;
+                if ( rword = (Word*) mf ( ( Symbol* ) word ) ) goto doReturn ;
             }
-            if ( mf ( ( Symbol* ) ns ) ) break ;
+            if ( rword = (Word*) mf ( ( Symbol* ) ns ) ) goto doReturn ;
             ns = nextNs ;
         }
 doReturn:
@@ -332,6 +335,8 @@ doReturn:
         }
         if ( rword != tci->LastFoundWord ) break ;
     }
+    //if ( (int64) rword == 1 ) return 0 ;
+        //_Printf ("") ;
     return rword ;
 }
 

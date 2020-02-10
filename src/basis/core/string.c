@@ -552,16 +552,16 @@ void
 String_InsertDataIntoStringSlot ( byte * str, int64 startOfSlot, int64 endOfSlot, byte * data ) // size in bytes
 {
     byte * b = Buffer_DataCleared ( _CfrTil_->StringInsertB2 ) ;
-    if ( ( Strlen ( ( char* ) str ) + Strlen ( ( char* ) data ) ) < BUFFER_SIZE )
+    if ( ( Strlen ( ( char* ) str ) + Strlen ( ( char* ) data ) ) < BUF_IX_SIZE )
     {
         if ( Strlen ( ( char* ) str ) > startOfSlot ) //( endOfSlot - startOfSlot ) )
         {
-            strcpy ( ( char* ) b, ( char* ) str ) ;
-            strcpy ( ( char* ) & b [ startOfSlot ], ( char* ) data ) ; // watch for overlapping ??
-            strcat ( ( char* ) b, ( char* ) &str [ endOfSlot ] ) ;
-            strcpy ( ( char* ) str, ( char* ) b ) ;
+            strncpy ( ( char* ) b, ( char* ) str, BUF_IX_SIZE ) ;
+            strncpy ( ( char* ) & b [ startOfSlot ], ( char* ) data, BUF_IX_SIZE ) ; // watch for overlapping ??
+            strncat ( ( char* ) b, ( char* ) &str [ endOfSlot ], BUF_IX_SIZE ) ;
+            strncpy ( ( char* ) str, ( char* ) b, BUF_IX_SIZE ) ;
         }
-        else strcat ( ( char* ) str, ( char* ) data ) ;
+        else strncat ( ( char* ) str, ( char* ) data, BUF_IX_SIZE ) ;
     }
 
     else CfrTil_Exception ( BUFFER_OVERFLOW, 0, 1 ) ;

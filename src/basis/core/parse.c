@@ -134,13 +134,13 @@ Parse_Do_Identifier ( TypeDefStructCompileInfo * tdsci, int64 t_type, int64 size
     Word * id, *addToNs ;
     if ( ( t_type == POST_STRUCTURE_NAME ) && GetState ( tdsci, TDSCI_STRUCTURE_COMPLETED ) )
     {
-        Finder_SetQualifyingNamespace ( _Finder_, tdsci->Tdsci_TotalStructureNamespace ) ;
+        //Finder_SetQualifyingNamespace ( _Finder_, tdsci->Tdsci_TotalStructureNamespace ) ;
         if ( tdsci->Tdsci_TotalStructureNamespace )
         {
             if ( tdsci->Tdsci_TotalStructureNamespace->Name )
             {
-                tdsci->Tdsci_StructureUnion_Namespace = id = _CfrTil_Alias ( tdsci->Tdsci_TotalStructureNamespace, token ) ;
-                //id->Lo_List = tdsci->Tdsci_TotalStructureNamespace->Lo_List ; //no - screws up namespaces : using/notUsing and more
+                tdsci->Tdsci_StructureUnion_Namespace = id = _CfrTil_Alias ( tdsci->Tdsci_TotalStructureNamespace, token, 
+                    tdsci->Tdsci_TotalStructureNamespace ) ;
                 Class_Size_Set ( id, tdsci->Tdsci_StructureUnion_Size ) ;
                 TypeNamespace_Set ( id, tdsci->Tdsci_TotalStructureNamespace ) ;
             }
@@ -149,7 +149,8 @@ Parse_Do_Identifier ( TypeDefStructCompileInfo * tdsci, int64 t_type, int64 size
         else
         {
             //_CfrTil_Namespace_InNamespaceSet ( tdsci->Tdsci_StructureUnion_Namespace ) ;
-            tdsci->Tdsci_StructureUnion_Namespace = id = DataObject_New (CLASS_CLONE, 0, token, 0, 0, 0, 0, 0, 0, 0, 0, - 1 ) ;
+            tdsci->Tdsci_StructureUnion_Namespace = id = DataObject_New ( CLASS_CLONE, 0, token, 0, 0, 0, 0, 0, 
+                tdsci->Tdsci_TotalStructureNamespace, 0, -1, -1 ) ;
             Class_Size_Set ( id, tdsci->Tdsci_StructureUnion_Size ) ;
             id->W_ObjectAttributes |= ( STRUCTURE ) ; //??
         }
@@ -159,7 +160,7 @@ Parse_Do_Identifier ( TypeDefStructCompileInfo * tdsci, int64 t_type, int64 size
     {
         if ( t_type == PRE_STRUCTURE_NAME )
         {
-            tdsci->Tdsci_StructureUnion_Namespace = id = DataObject_New (CLASS, 0, token, 0, 0, 0, 0, 0, 0, 0, 0, - 1 ) ;
+            tdsci->Tdsci_StructureUnion_Namespace = id = DataObject_New ( CLASS, 0, token, 0, 0, 0, 0, 0, 0, 0, 0, - 1 ) ;
             tdsci->Tdsci_TotalStructureNamespace = id ;
             id->W_ObjectAttributes |= ( STRUCTURE ) ;
 
@@ -172,6 +173,7 @@ Parse_Do_Identifier ( TypeDefStructCompileInfo * tdsci, int64 t_type, int64 size
             addToNs = tdsci->Tdsci_StructureUnion_Namespace->Name ? tdsci->Tdsci_StructureUnion_Namespace : tdsci->Tdsci_TotalStructureNamespace ;
             //tdsci->Tdsci_Field_Object = id = //CfrTil_ClassField_New ( token, addToNs, size, tdsci->Tdsci_Offset ) ;
             tdsci->Tdsci_Field_Object = id = DataObject_New ( CLASS_FIELD, 0, token, 0, 0, 0, tdsci->Tdsci_Offset, size, addToNs, 0, 0, 0 ) ;
+            TypeNamespace_Set( id, tdsci->Tdsci_Field_Type_Namespace ) ;
             tdsci->Tdsci_Field_Size = size ;
         }
     }
@@ -286,7 +288,7 @@ Parse_StructOrUnion_Type ( TypeDefStructCompileInfo * tdsci, int64 structOrUnion
         if ( token [0] == '{' )
         {
             // name will be added 'post structure'
-            if ( ! tdsci->Tdsci_StructureUnion_Namespace ) tdsci->Tdsci_StructureUnion_Namespace = DataObject_New (CLASS, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, - 1 ) ;
+            if ( ! tdsci->Tdsci_StructureUnion_Namespace ) tdsci->Tdsci_StructureUnion_Namespace = DataObject_New ( CLASS, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, - 1 ) ;
             if ( ! tdsci->Tdsci_TotalStructureNamespace ) tdsci->Tdsci_TotalStructureNamespace = tdsci->Tdsci_StructureUnion_Namespace ;
             Parse_Structure ( tdsci ) ;
         }
@@ -591,7 +593,7 @@ _CfrTil_Parse_LocalsAndStackVariables ( int64 svf, int64 lispMode, ListObject * 
                     objectAttributes |= REGISTER_VARIABLE ;
                     numberOfRegisterVariables ++ ;
                 }
-                word = DataObject_New (objectAttributes, 0, token, 0, objectAttributes, lispAttributes, 0, 0, 0, DICTIONARY, - 1, - 1 ) ;
+                word = DataObject_New ( objectAttributes, 0, token, 0, objectAttributes, lispAttributes, 0, 0, 0, DICTIONARY, - 1, - 1 ) ;
                 if ( _Context_->CurrentWordBeingCompiled ) _Context_->CurrentWordBeingCompiled->W_TypeSignatureString [numberOfVariables ++] = '_' ;
                 if ( regFlag == true )
                 {

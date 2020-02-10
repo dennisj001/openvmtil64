@@ -2,6 +2,7 @@
 c_syntaxOn
 C 
 Experimental
+using
 type Pointer ; Pointer.size = 8 ;
 type block ; block.size = 8 ;
 type Location ; Location.size = 8 ;
@@ -235,4 +236,6 @@ typedef struct _Identifier
     struct _WordData * S_WordData ;
 } Identifier, ID, Word, Namespace, Vocabulary, Class, DynamicObject, DObject, ListObject, Symbol, MemChunk, HistoryStringNode, Buffer ;
 c_syntaxOff
+C
 'Experimental notUsing
+Root Experimental User

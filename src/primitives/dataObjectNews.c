@@ -99,7 +99,7 @@ _CfrTil_TypeDef ( )
         {
             if ( ns )
             {
-                alias = _CfrTil_Alias ( ns, token ) ;
+                alias = _CfrTil_Alias (ns, token , 0) ;
                 alias->Lo_List = ns->Lo_List ;
                 alias->W_MorphismAttributes |= IMMEDIATE ;
                 _CfrTil_->LastFinished_Word = 0 ; // nb! : for _CfrTil_RecycleInit_Compiler_N_M_Node_WordList

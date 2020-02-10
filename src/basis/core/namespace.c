@@ -419,7 +419,7 @@ _Namespace_VariableValueSet ( Namespace * ns, byte * name, int64 value )
 Namespace *
 Namespace_New ( byte * name, Namespace * containingNs )
 {
-    Namespace * ns = DataObject_New (NAMESPACE, 0, name, 0, NAMESPACE, 0, 0, ( int64 ) containingNs, 0, 0, 0, - 1 ) ;
+    Namespace * ns = DataObject_New (NAMESPACE, 0, name, 0, NAMESPACE, 0, 0, 0, containingNs, 0, 0, - 1 ) ;
     return ns ;
 }
 

@@ -303,8 +303,8 @@ Debugger_ShowStackChange ( Debugger * debugger, Word * word, byte * insert, byte
     while ( 1 )
     {
         if ( GetState ( debugger, DBG_STEPPING ) )
-            snprintf ( ( char* ) b, BUFFER_SIZE, "\nStack : %s at %s :> %s <: %s", insert, location, ( char* ) c_gd ( name ), ( char* ) achange ) ;
-        else snprintf ( ( char* ) b, BUFFER_SIZE, "\nStack : %s at %s :> %s <: %s", insert, ( char* ) location, name, ( char* ) achange ) ;
+            snprintf ( ( char* ) b, BUF_IX_SIZE, "\nStack : %s at %s :> %s <: %s", insert, location, ( char* ) c_gd ( name ), ( char* ) achange ) ;
+        else snprintf ( ( char* ) b, BUF_IX_SIZE, "\nStack : %s at %s :> %s <: %s", insert, ( char* ) location, name, ( char* ) achange ) ;
         if ( ( sl = strlen ( ( char* ) b ) ) > 220 ) //183 ) //GetTerminalWidth ( ) ) //_Debugger_->TerminalLineWidth ) //220 ) 
         {
             location = ( char* ) "..." ;
@@ -348,8 +348,8 @@ Debugger_ShowChange ( Debugger * debugger, Word * word, Boolean stepFlag, uint64
         else if ( depthChange ) snprintf ( ( char* ) pb_change, 256, "%ld %s%s", - depthChange, ( depthChange < - 1 ) ? "cells" : "cell", " popped. " ) ;
         if ( dsp && ( debugger->SaveTOS != TOS ) ) op = ( char* ) "changed" ;
         else op = ( char* ) "set" ;
-        snprintf ( ( char* ) c, BUFFER_SIZE, ( char* ) "0x%016lx", ( uint64 ) TOS ) ;
-        snprintf ( ( char* ) b, BUFFER_SIZE, ( char* ) "TOS %s to %s.", op, c_gd ( c ) ) ;
+        snprintf ( ( char* ) c, BUF_IX_SIZE, ( char* ) "0x%016lx", ( uint64 ) TOS ) ;
+        snprintf ( ( char* ) b, BUF_IX_SIZE, ( char* ) "TOS %s to %s.", op, c_gd ( c ) ) ;
         strncat ( ( char* ) pb_change, ( char* ) b, 256 ) ; // strcat ( (char*) _change, cc ( ( char* ) c, &_O_->Default ) ) ;
         name = word->Name ;
         if ( name ) name = String_ConvertToBackSlash ( name ) ;
@@ -418,7 +418,7 @@ PSCS_Using_WordSC ( byte* scs, byte * token, int64 scswci ) // scs : source code
         pad = tp - scswci ;
         if ( pad >= 4 ) lef = 4 ;
         else lef = 0 ;
-        for ( i = 0 ; i < pad ; i ++ ) strncat ( ( char* ) nvw, " ", BUFFER_SIZE ) ;
+        for ( i = 0 ; i < pad ; i ++ ) strncat ( ( char* ) nvw, " ", BUF_IX_SIZE ) ;
         leftBorder = ts = tp ;
         ref = ( slsc - 4 ) > tw ? 4 : 0 ;
         if ( ( ! ref ) && ( tw > slsc - 4 ) ) ref = 4 ;
@@ -532,9 +532,9 @@ Debugger_PrepareDbgSourceCodeString (Debugger * debugger, Word * word, byte* tok
         String_RemoveEndWhitespace ( ( byte* ) il ) ;
         if ( String_Equal ( "init", word->Name ) )
         {
-            strncat ( il, " -> ", BUFFER_SIZE ) ;
-            strncat ( il, c_n ( word->Name ), BUFFER_SIZE ) ;
-            strncat ( il, " ( )", BUFFER_SIZE ) ;
+            strncat ( il, " -> ", BUF_IX_SIZE ) ;
+            strncat ( il, c_n ( word->Name ), BUF_IX_SIZE ) ;
+            strncat ( il, " ( )", BUF_IX_SIZE ) ;
             return il ;
         }
         int64 fel, tw, tvw ;
@@ -561,27 +561,27 @@ Debugger_ShowInfo_Token ( Debugger * debugger, Word * word, byte * prompt, int64
     char * cc_location = ( char* ) cc ( location, &_O_->Debug ) ;
 
     prompt = prompt ? prompt : ( byte* ) "" ;
-    strncpy ( buffer, prompt, BUFFER_SIZE ) ;
+    strncpy ( buffer, prompt, BUF_IX_SIZE ) ;
     strncat ( buffer, compileOrInterpret, 32 ) ;
     prompt = ( byte* ) buffer ;
     if ( word )
     {
         if ( word->W_MorphismAttributes & CPRIMITIVE )
         {
-            snprintf ( ( char* ) obuffer, BUFFER_SIZE, "\n%s%s:: %s : %03ld.%03ld : %s :> %s <: cprimitive :> ", // <:: " INT_FRMT "." INT_FRMT " ",
+            snprintf ( ( char* ) obuffer, BUF_IX_SIZE, "\n%s%s:: %s : %03ld.%03ld : %s :> %s <: cprimitive :> ", // <:: " INT_FRMT "." INT_FRMT " ",
                 prompt, signal ? ( char* ) signalAscii : " ", cc_location, rl->LineNumber, rl->ReadIndex,
                 word->ContainingNamespace ? ( char* ) word->ContainingNamespace->Name : "<literal>",
                 cc_Token ) ;
         }
         else
         {
-            snprintf ( ( char* ) obuffer, BUFFER_SIZE, "\n%s%s:: %s : %03ld.%03ld : %s :> %s <: 0x%016lx :> ", // <:: " INT_FRMT "." INT_FRMT " ",
+            snprintf ( ( char* ) obuffer, BUF_IX_SIZE, "\n%s%s:: %s : %03ld.%03ld : %s :> %s <: 0x%016lx :> ", // <:: " INT_FRMT "." INT_FRMT " ",
                 prompt, signal ? ( char* ) signalAscii : " ", cc_location, rl->LineNumber, rl->ReadIndex,
                 word->ContainingNamespace ? ( char* ) word->ContainingNamespace->Name : ( char* ) "<literal>",
                 ( char* ) cc_Token, ( uint64 ) word ) ;
         }
         byte *cc_line = ( char* ) Debugger_PrepareDbgSourceCodeString (debugger, word, 0, ( int64 ) Strlen ( obuffer ) ) ;
-        if ( cc_line ) Strncat ( obuffer, cc_line, BUFFER_SIZE ) ;
+        if ( cc_line ) Strncat ( obuffer, cc_line, BUF_IX_SIZE ) ;
         _Printf ( ( byte* ) "%s", obuffer ) ;
     }
     else

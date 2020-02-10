@@ -274,7 +274,7 @@ CfrTil_DObject_Clone ( )
     if ( ! ( proto->W_ObjectAttributes & DOBJECT ) )
     {
         byte * buffer = Buffer_Data_Cleared ( _CfrTil_->ScratchB3 ) ;
-        snprintf ( buffer, BUFFER_SIZE, "\nCloning Alert : \'%s\' is not a dynamic object.\n\n", proto->Name ) ;
+        snprintf ( buffer, BUF_IX_SIZE, "\nCloning Alert : \'%s\' is not a dynamic object.\n\n", proto->Name ) ;
         //Error ( ( byte* ) "\nCloning Alert : \'%s\' is not a dynamic object.\n\n", proto->Name, PAUSE ) ;
         Error ( buffer, PAUSE ) ;
     }

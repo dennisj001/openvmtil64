@@ -88,7 +88,8 @@ Key ( )
 byte
 _CfrTil_Key ( ReadLiner * rl )
 {
-    return _Key ( rl->InputFile ) ;
+    int key = _Key ( rl->InputFile ) ;
+    return (byte) key ;
 }
 
 void

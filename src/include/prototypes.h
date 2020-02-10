@@ -21,7 +21,7 @@ void Compile_MoveMemValue_ToReg_ThruReg(Boolean reg, byte *address, Boolean iSiz
 void Compile_MoveReg_ToAddress_ThruReg(Boolean reg, byte *address, Boolean thruReg);
 void _Compile_SetAtAddress_WithReg(int64 *address, int64 reg, int64 thruReg);
 void _Compile_Move_Literal_Immediate_To_Reg(int64 reg, int64 value, int size);
-void _Compile_X_Group1(Boolean code, Boolean toRegOrMem, Boolean mod, Boolean reg, Boolean rm, Boolean sib, int64 disp, Boolean osize);
+void _Compile_X_Group1(Boolean code, Boolean toRegOrMem, Boolean mod, Boolean reg, Boolean rm, Boolean sib, int64 disp, Boolean operandSize);
 void _Compile_X_Group1_Reg_To_Reg(Boolean code, Boolean dstReg, int64 srcReg);
 void _Compile_X_Group1_Immediate(Boolean code, Boolean mod, Boolean rm, int64 disp, uint64 imm, Boolean iSize);
 void _Compile_XOR_AL_1_Immediate(void);
@@ -1001,7 +1001,7 @@ void Word_ShowSourceCode(Word *word);
 Word *Word_GetFromCodeAddress(byte *address);
 Word *Word_GetFromCodeAddress_NoAlias(byte *address);
 void _CfrTil_WordName_Run(byte *name);
-Word *_CfrTil_Alias(Word *word, byte *name);
+Word *_CfrTil_Alias(Word *word, byte *name, Namespace *addToNs);
 void Do_TextMacro(void);
 void Do_StringMacro(void);
 void _CfrTil_Macro(int64 mtype, byte *function);
@@ -1214,7 +1214,7 @@ int64 _TC_FindPrevious_NamespaceQualifiedIdentifierStart(TabCompletionInfo *tci,
 void RL_TC_StringInsert_AtCursor(ReadLiner *rl, byte *strToInsert);
 byte *_TabCompletionInfo_GetAPreviousIdentifier(ReadLiner *rl, int64 start);
 void RL_TabCompletionInfo_Init(ReadLiner *rl);
-Boolean _TabCompletion_Compare(Word *word);
+Word *_TabCompletion_Compare(Word *word);
 Word *TC_Tree_Map(TabCompletionInfo *tci, MapFunction mf, Word *wordi);
 /* src/basis/colors.c */
 void _OpenVmTil_ColorsInit(OpenVmTil *ovt);

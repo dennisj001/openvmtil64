@@ -165,7 +165,7 @@ CfrTil_Alias ( )
 {
     Word * word = ( Word* ) DataStack_Pop ( ) ;
     byte * name = ( byte* ) DataStack_Pop ( ) ;
-    _CfrTil_Alias ( word, name ) ;
+    _CfrTil_Alias (word, name , 0) ;
 }
 #if 0
 

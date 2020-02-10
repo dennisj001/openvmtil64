@@ -185,7 +185,7 @@
 #define Get( obj, field ) obj->field
 #define Set( obj, field, value ) (obj)->(field) = (value) 
 
-#define TypeNamespace_Get( object ) ((object)->TypeNamespace ? (object)->TypeNamespace : (object)->ContainingNamespace)
+#define TypeNamespace_Get( object ) ((Namespace *) ((object)->TypeNamespace ? (object)->TypeNamespace : (object)->ContainingNamespace))
 #define TypeNamespace_Set( object, ns ) (object)->TypeNamespace = ns
 #define ReadLiner_GetLastChar() _ReadLiner_->InputKeyedCharacter
 #define ReadLiner_SetLastChar( chr ) if (_ReadLiner_) _ReadLiner_->InputKeyedCharacter = chr

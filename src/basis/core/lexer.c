@@ -113,7 +113,7 @@ void
 Lexer_Init ( Lexer * lexer, byte * delimiters, uint64 state, uint64 allocType )
 {
     lexer->TokenBuffer = _CfrTil_->TokenBuffer ;
-    Mem_Clear ( lexer->TokenBuffer, BUFFER_SIZE ) ;
+    Mem_Clear ( lexer->TokenBuffer, BUF_IX_SIZE ) ;
     lexer->OriginalToken = 0 ;
     lexer->Literal = 0 ;
     lexer->SC_Index = _CfrTil_->SC_Index ;

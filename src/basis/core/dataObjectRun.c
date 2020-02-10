@@ -63,7 +63,7 @@ Do_Variable ( Word * word, Boolean rvalueFlag, Boolean isForwardDotted )
     //if ( ( ! GetState ( compiler, ARRAY_MODE ) ) && ( ! isForwardDotted ) && ( ! isReverseDotted ) ) cntx->Interpreter0->BaseObject = 0 ;
     if ( CompileMode ) //&& ( ! GetState ( compiler, LC_ARG_PARSING )))
     {
-        if ( GetState ( cntx, ( C_SYNTAX | INFIX_MODE ) ) && ( ! rvalueFlag ) 
+        if ( GetState ( cntx, ( C_SYNTAX | INFIX_MODE ) ) && ( ! rvalueFlag )
             && ( ! compiler->LHS_Word ) && ( ! isForwardDotted ) ) compiler->LHS_Word = word ;
         _Do_Compile_Variable ( word, rvalueFlag ) ;
     }
@@ -407,9 +407,9 @@ Do_AccumulatedAddress ( byte * accumulatedOffsetPointer, int64 offset, Boolean r
     accumulatedOffsetPointer += offset ;
     if ( rvalueFlag )
     {
-        if ( size == 1 ) TOS = ( * ( byte* ) accumulatedOffsetPointer ) ; // C rvalue
-        else if ( size == 2 ) TOS = ( * ( int16* ) accumulatedOffsetPointer ) ; // C rvalue
-        else if ( size == 4 ) TOS = ( * ( int32* ) accumulatedOffsetPointer ) ; // C rvalue
+        if ( size == 1 ) TOS = ( int64 ) ( ( * ( byte* ) accumulatedOffsetPointer ) ) ; // C rvalue
+        else if ( size == 2 ) TOS = ( int64 ) ( ( * ( int16* ) accumulatedOffsetPointer ) ) ; // C rvalue
+        else if ( size == 4 ) TOS = ( int64 ) ( ( * ( int32* ) accumulatedOffsetPointer ) ) ; // C rvalue
         else TOS = ( * ( int64* ) accumulatedOffsetPointer ) ; // default and 8 bytes - cell
     }
     else TOS = ( uint64 ) accumulatedOffsetPointer ; // C lvalue
@@ -418,12 +418,8 @@ Do_AccumulatedAddress ( byte * accumulatedOffsetPointer, int64 offset, Boolean r
 void
 CfrTil_Do_AccumulatedAddress ( Word * word, byte * accumulatedAddress, int64 offset, Boolean rvalueFlag )
 {
-    Context * cntx = _Context_ ;
-    //Boolean cb = Lexer_IsLValue_CheckBackToLastSemiForParenOrBracket ( cntx->Lexer0, word ),
-    //    cf = Lexer_CheckForwardToStatementEnd_Is_LValue ( cntx->Lexer0, word ) ;
-    byte size = ( TypeNamespace_Get ( word ) ? ( int64 ) _CfrTil_VariableValueGet ( TypeNamespace_Get ( word )->Name, ( byte* ) "size" ) : 0 ) ;
-    //Do_AccumulatedAddress ( accumulatedAddress, offset, GetState ( cntx, C_SYNTAX ) && ( ! cb ) && ( ! cf )
-    //    && ( ! GetState ( cntx, ADDRESS_OF_MODE ) ), size ) ;
+    Namespace * ns ;
+    byte size = ( ( ns = TypeNamespace_Get ( word ) ) ? ( int64 ) _Namespace_VariableValueGet ( ns, "size" ) : CELL ) ;
     Do_AccumulatedAddress ( accumulatedAddress, offset, rvalueFlag, size ) ;
 }
 
