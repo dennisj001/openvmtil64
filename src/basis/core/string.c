@@ -169,8 +169,29 @@ _String_InsertColors ( byte * s, Colors * c )
     else return ( byte* ) "" ;
 }
 
+#if 0
+byte*
+String_New_RemoveColors ( byte * str, uint64 allocType )
+{
+    //printf ( "%c[%ld;%ldm", ESC, fg, bg )
+    byte * buf0 = Buffer_Data_Cleared ( _CfrTil_->StringInsertB ), *buf1 ;
+    int64 si, bi, j ;
+    for ( si = 0, bi = 0 ; str[si] ; bi++, si ++ )
+    {
+        if ( str [si] == ESC ) 
+        {
+            for ( j = si ; str[j++] != 'm' ; ) ;
+            si = j ;
+        }
+        else buf0[bi] = str[si] ;
+    }
+    buf1 = String_New ( buf0, allocType ) ;
+    return buf1 ;
+}
+#endif
+
 byte *
-_String_Insert_AtIndexWithColors ( byte * token, int64 ndx, Colors * c )
+_String_Insert_AtIndexWithColors ( byte * token, int64 ndx, Colors * color )
 {
     int64 preTokenLen ; // Lexer reads char finds it is delimiter : reading index auto increments index 
     if ( strncmp ( ( char* ) token, ( char* ) &_Context_->ReadLiner0->InputLine [ ndx ], Strlen ( ( char* ) token ) ) )
@@ -178,7 +199,7 @@ _String_Insert_AtIndexWithColors ( byte * token, int64 ndx, Colors * c )
     byte * buffer = Buffer_Data ( _CfrTil_->StringInsertB2 ) ;
     byte * tbuffer = Buffer_Data ( _CfrTil_->StringInsertB3 ) ;
 
-    strcpy ( ( char* ) buffer, ( char* ) _Context_->ReadLiner0->InputLine ) ;
+    strncpy ( ( char* ) buffer, ( char* ) _Context_->ReadLiner0->InputLine, BUF_IX_SIZE ) ;
     String_RemoveFinalNewline ( ( byte* ) buffer ) ;
     if ( ! _Lexer_IsCharDelimiter ( _Context_->Lexer0, buffer [ ndx ] ) ) ndx ++ ; // Lexer index auto increments index at token end ; dot doesn't incrment index therefore it is a dot at index
     preTokenLen = ndx - Strlen ( ( char* ) token ) ;
@@ -186,10 +207,10 @@ _String_Insert_AtIndexWithColors ( byte * token, int64 ndx, Colors * c )
 
     Strncpy ( tbuffer, buffer, preTokenLen ) ; // copy upto start of token
     tbuffer [ preTokenLen ] = 0 ; // Strncpy does not necessarily null delimit
-    String_ShowColors ( &tbuffer [ Strlen ( ( char* ) tbuffer ) ], c ) ; // new foreground, new background
-    strcat ( ( char* ) tbuffer, ( char* ) token ) ;
+    String_ShowColors ( &tbuffer [ Strlen ( ( char* ) tbuffer ) ], color ) ; // new foreground, new background
+    strncat ( ( char* ) tbuffer, ( char* ) token, BUF_IX_SIZE ) ;
     String_ShowColors ( &tbuffer [ Strlen ( ( char* ) tbuffer ) ], &_O_->Default ) ; // old foreground, old background
-    strcat ( ( char* ) tbuffer, ( char* ) &buffer [ ndx ] ) ; // copy the rest of the buffer after the token : -1 : get the delimiter; 0 based array
+    strncat ( ( char* ) tbuffer, ( char* ) &buffer [ ndx ], BUF_IX_SIZE ) ; // copy the rest of the buffer after the token : -1 : get the delimiter; 0 based array
     tbuffer = String_New ( tbuffer, TEMPORARY ) ;
     return tbuffer ;
 }
@@ -342,7 +363,7 @@ _String_ConvertStringToBackSlash ( byte * dst, byte * src, int64 nchars )
         else len = nchars ;
     }
     else len = 0 ;
-    for ( i = 0, j = 0 ; (i < len) ; i ++ )
+    for ( i = 0, j = 0 ; ( i < len ) ; i ++ )
     {
         byte c = src [ i ] ;
 
@@ -884,7 +905,7 @@ IsString ( byte * address )
 byte *
 String_CheckForAtAdddress ( byte * address )
 {
-    byte *str = 0 ; 
+    byte *str = 0 ;
     if ( NamedByteArray_CheckAddress ( _O_->MemorySpace0->StringSpace, address )
         || NamedByteArray_CheckAddress ( _O_->MemorySpace0->CompilerTempObjectSpace, address )
         || NamedByteArray_CheckAddress ( _O_->MemorySpace0->SessionObjectsSpace, address )
@@ -896,7 +917,7 @@ String_CheckForAtAdddress ( byte * address )
             str = Buffer_Data_Cleared ( _CfrTil_->StringInsertB5 ) ;
             byte * bstr = c_gd ( String_ConvertToBackSlash ( address ) ) ;
             snprintf ( ( char* ) str, 128, "< string : \'%s", bstr ) ;
-            strcat ( str, c_u ( "\' >") ) ;
+            strcat ( str, c_u ( "\' >" ) ) ;
         }
     }
     return str ;

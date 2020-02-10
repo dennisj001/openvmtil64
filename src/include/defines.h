@@ -583,6 +583,7 @@
 #define LEXER_RETURN_NULL_TOKEN ( (uint64) 1 << 11 ) 
 #define LEXER_ALLOW_DOT ( (uint64) 1 << 12 ) 
 #define LEXER_END_OF_LINE ( (uint64) 1 << 13 ) 
+#define LEXER_ESCAPE_SEQUENCE ( (uint64) 1 << 14 ) 
 
 // readline flags and defines
 #define PROMPT_LENGTH ( Strlen ( (char*) rl->Prompt ) ) 

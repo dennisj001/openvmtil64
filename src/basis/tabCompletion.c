@@ -50,10 +50,11 @@ ReadLiner_GenerateFullNamespaceQualifiedName ( ReadLiner * rl, Word * w )
             }
         }
     }
-    if ( ! String_Equal ( nsName, w->Name ) )
+    //if ( ( ! Is_NamespaceType ( w ) ) && ( ! String_Equal ( nsName, w->Name ) ) )
+    if ( ! Is_NamespaceType ( w ) ) //&& ( ! String_Equal ( nsName, w->Name ) ) )
     {
-        if ( ! dot ) strcat ( ( CString ) b0, ( CString ) notUsing ? ( CString ) c_udDot : ( CString ) "." ) ;
-        strcat ( ( char* ) b0, notUsing ? ( char* ) c_ud ( w->Name ) : ( char* ) w->Name ) ; // namespaces are all added above
+        if ( ! dot ) strncat ( ( CString ) b0, ( CString ) notUsing ? ( CString ) c_udDot : ( CString ) ".", BUF_IX_SIZE ) ;
+        strncat ( ( char* ) b0, notUsing ? ( char* ) c_ud ( w->Name ) : ( char* ) w->Name, BUF_IX_SIZE ) ; // namespaces are all added above
         //strlenUnAdorned += strlen ( w->Name ) ;
     }
     //ReadLine_SetCursorPosition ( rl, strlenUnAdorned ) ;
