@@ -410,7 +410,7 @@ _LO_CfrTil ( ListObject * lfirst )
         //LC_RestoreStack ( ) ;
     }
     Namespace_DoNamespace_Name ( ( byte * ) "Lisp" ) ;
-    if ( ! CompileMode ) Compiler_Init ( compiler, 0, 0) ;
+    if ( ! CompileMode ) Compiler_Init (compiler, 0) ;
     return nil ;
 }
 

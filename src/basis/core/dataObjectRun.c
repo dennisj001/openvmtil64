@@ -340,7 +340,7 @@ Namespace_Do_C_Type ( Namespace * ns, Boolean isForwardDotted )
                 LC_Delete ( _LC_ ) ;
                 if ( ! Compiling )
                 {
-                    Compiler_Init ( compiler, 0, 0 ) ;
+                    Compiler_Init (compiler, 0) ;
                     //CfrTil_RightBracket ( ) ; //nb. only Compiler_Init here. We don't want to turn on compile mode!! RightBracket is a forth term.
                     CfrTil_SourceCode_Init ( ) ;
                     CfrTil_WordList_Init ( 0 ) ;

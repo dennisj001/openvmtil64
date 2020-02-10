@@ -196,7 +196,6 @@ _CfrTil_BeginBlock2 ( BlockInfo * bi )
     Compiler * compiler = _Context_->Compiler0 ;
     _Stack_Push ( compiler->BlockStack, ( int64 ) bi ) ; // _Context->CompileSpace->IndexStart before set frame size after turn on
     _Stack_Push ( compiler->CombinatorBlockInfoStack, ( int64 ) bi ) ; // _Context->CompileSpace->IndexStart before set frame size after turn on
-    //compiler->LHS_Word = 0 ;
 }
 
 void

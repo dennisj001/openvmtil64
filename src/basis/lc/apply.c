@@ -407,7 +407,7 @@ LC_CompileRun_C_ArgList ( Word * word ) // C protocol - x64 : left to right argu
     lc->ParenLevel = 1 ;
     if ( word->W_MorphismAttributes & ( C_PREFIX | C_PREFIX_RTL_ARGS ) )
     {
-        if ( ! Compiling ) Compiler_Init ( compiler, 0, 0 ) ;
+        if ( ! Compiling ) Compiler_Init (compiler, 0) ;
         SetState ( compiler, LC_ARG_PARSING, true ) ;
         int64 svcm = CompileMode ;
         Set_CompileMode ( false ) ; // we must have the arguments pushed and not compiled for _LO_Apply_C_Rtl_ArgList which will compile them for a C_Rtl function

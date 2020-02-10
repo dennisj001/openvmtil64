@@ -264,7 +264,7 @@ LC_EvalPrint ( LambdaCalculus * lc, ListObject * l0 )
     SetState ( lc, LC_PRINT_ENTERED, false ) ;
     SetBuffersUnused ( 1 ) ;
     _LC_->ParenLevel = 0 ;
-    Compiler_Init ( _Context_->Compiler0, 0, 0 ) ; // we could be compiling a cfrTil word as in oldLisp.cft
+    Compiler_Init (_Context_->Compiler0, 0) ; // we could be compiling a cfrTil word as in oldLisp.cft
 }
 
 ListObject *

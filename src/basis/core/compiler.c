@@ -272,7 +272,7 @@ _CfrTil_FinishWordDebugInfo ( Word * word )
 }
 
 void
-Compiler_Init ( Compiler * compiler, uint64 state, Boolean flag )
+Compiler_Init (Compiler * compiler, uint64 state)
 {
     compiler->State = ( state &= ( ~ ARRAY_MODE ) ) ;
     compiler->ContinuePoint = 0 ;
@@ -324,7 +324,7 @@ Compiler_New ( uint64 allocType )
     compiler->PostfixLists = _dllist_New ( allocType ) ;
     compiler->GotoList = _dllist_New ( allocType ) ;
     compiler->OptimizeInfoList = _dllist_New ( allocType ) ;
-    Compiler_Init ( compiler, 0, 0 ) ;
+    Compiler_Init (compiler, 0) ;
     return compiler ;
 }
 

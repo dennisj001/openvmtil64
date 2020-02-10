@@ -354,7 +354,7 @@ CfrTil_C_ConditionalExpression ( )
     Interpreter * interp = cntx->Interpreter0 ;
     Compiler * compiler = cntx->Compiler0 ;
     Word * word1 ;
-    if ( ( ! Compiling ) && ( ! GetState ( compiler, C_CONDITIONAL_IN ) ) ) Compiler_Init ( _Compiler_, 0, 0 ) ;
+    if ( ( ! Compiling ) && ( ! GetState ( compiler, C_CONDITIONAL_IN ) ) ) Compiler_Init (_Compiler_, 0) ;
     SetState ( compiler, C_CONDITIONAL_IN, true ) ;
     if ( ! CompileMode ) CfrTil_If_ConditionalExpression ( ) ;
     else

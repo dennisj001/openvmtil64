@@ -419,7 +419,7 @@ _Namespace_VariableValueSet ( Namespace * ns, byte * name, int64 value )
 Namespace *
 Namespace_New ( byte * name, Namespace * containingNs )
 {
-    Namespace * ns = DataObject_New (NAMESPACE, 0, name, 0, NAMESPACE, 0, 0, 0, containingNs, 0, 0, - 1 ) ;
+    Namespace * ns = DataObject_New ( NAMESPACE, 0, name, 0, NAMESPACE, 0, 0, 0, containingNs, 0, 0, - 1 ) ;
     return ns ;
 }
 
@@ -447,7 +447,8 @@ _Namespace_Find ( byte * name, Namespace * superNamespace, int64 exceptionFlag )
 Namespace *
 Namespace_Find ( byte * name )
 {
-    return _Namespace_Find ( name, 0, 0 ) ;
+    Namespace * ns = _Namespace_Find ( name, 0, 0 ) ;
+    return ns ;
 }
 
 Namespace *
@@ -463,10 +464,12 @@ Namespace_FindOrNew_SetUsing ( byte * name, Namespace * containingNs, int64 setU
 Namespace *
 _Namespace_FindOrNew_Local ( Stack * nsStack )
 {
-    int64 d = Stack_Depth ( _Context_->Compiler0->BlockStack ) ;
+    Context * cntx = _Context_ ;
+    Namespace * ns ;
+    int64 d = Stack_Depth ( cntx->Compiler0->BlockStack ) ;
     byte bufferData [ 32 ], *name = ( byte* ) bufferData ;
-    sprintf ( ( char* ) name, "locals_%ld", d - 1 ) ; // 1 : BlockStack starts at 1 
-    Namespace * ns = _Namespace_Find ( name, _CfrTil_->Namespaces, 0 ) ;
+    snprintf ( ( char* ) name, 32, "locals_%ld", d - 1 ) ; // 1 : BlockStack starts at 1 
+    ns = _Namespace_Find ( name, _CfrTil_->Namespaces, 0 ) ;
     if ( ! ns )
     {
         ns = Namespace_New ( name, _CfrTil_->Namespaces ) ;

@@ -1154,7 +1154,7 @@ void Compiler_Init_AccumulatedOffsetPointers(Compiler *compiler, Word *word);
 void CfrTil_SaveDebugInfo(Word *word, uint64 allocType);
 void CfrTil_DeleteDebugInfo(void);
 void _CfrTil_FinishWordDebugInfo(Word *word);
-void Compiler_Init(Compiler *compiler, uint64 state, Boolean flag);
+void Compiler_Init(Compiler *compiler, uint64 state);
 Compiler *Compiler_New(uint64 allocType);
 Compiler *Compiler_Copy(Compiler *compiler, uint64 allocType);
 void Compiler_CalculateAndSetPreviousJmpOffset(Compiler *compiler, byte *jmpToAddress);

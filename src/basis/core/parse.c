@@ -347,109 +347,6 @@ Parse_A_Typedef_Field ( TypeDefStructCompileInfo * tdsci )
     //if ( dataPtr ) _Printf ( (byte*) "\n\t%s\t%s" = %lx", token0, token1, (sizeof token0) data [ offset ]) ;
 }
 
-#if 0
-
-int64
-//_CfrTil_Parse_ClassStructure (int64 cloneFlag, byte* data, Boolean printFlag)
-Parse_Structure ( 0, int64 cloneFlag, 0, int64 startOffset, byte * dataPtr )
-{
-    int64 size = 0, offset = 0, sizeOf = 0, i, arrayDimensionSize ;
-    Namespace *type0, *classNs = _CfrTil_Namespace_InNamespaceGet ( ), *classFieldObject ;
-    byte * token0, *token1, *token2, *token3 ;
-    int64 arrayDimensions [ 32 ] ; // 32 : max dimensions for now
-    memset ( arrayDimensions, 0, sizeof (arrayDimensions ) ) ;
-    if ( cloneFlag )
-    {
-        offset = _Namespace_VariableValueGet ( classNs, ( byte* ) "size" ) ; // allows for cloning - prototyping
-        sizeOf = offset ;
-    }
-    //Namespace_AddToNamespaces_SetUsing ( Namespace_Find ( (byte*) "C_Typedef" ), 1, USING ) ;
-    while ( 1 )
-    {
-        // each name/word is an increasing offset from object address on stack
-        // first name is at 0 offset
-        _CfrTil_Namespace_InNamespaceSet ( classNs ) ; // parsing arrays changes namespace so reset it here
-        token0 = _Lexer_ReadToken ( lexer, ( byte* ) " ,\n\r\t" ) ;
-gotNextToken:
-        if ( String_Equal ( ( char* ) token0, "};" ) ) break ;
-        if ( ( String_Equal ( ( char* ) token0, "}" ) ) && GetState ( _Context_, C_SYNTAX ) )
-        {
-            CfrTil_TypedefStructEnd ( ) ;
-            break ;
-        }
-        if ( String_Equal ( ( char* ) token0, ";" ) ) continue ;
-        if ( String_Equal ( ( char* ) token0, "//" ) )
-        {
-            ReadLiner_CommentToEndOfLine ( _Context_->ReadLiner0 ) ;
-            continue ;
-        }
-        type0 = _Namespace_Find ( token0, 0, 0 ) ;
-        if ( type0 && ( size = CfrTil_Get_Namespace_SizeVar_Value ( type0 ) ) )
-        {
-            token1 = Lexer_ReadToken ( lexer ) ;
-            classFieldObject = CfrTil_ClassField_New ( token1, type0, size, offset ) ; // nb! : in case there is an array so it will be there for ArrayDimensions
-            token2 = Lexer_Peek_Next_NonDebugTokenWord ( lexer, 1, 0 ) ;
-            if ( token2 [0] != '[' )
-            {
-                offset += size ;
-                sizeOf += size ;
-                continue ;
-            }
-            // print class field
-            //if ( printFlag ) _Printf ( (byte*) "\n\t%s\t%s" = %lx", token0, token1, (sizeof token0) data [ offset ]) ;
-        }
-        else
-        {
-            Word * word = Finder_Word_FindUsing ( _Finder_, token0, 0 ) ; // comment token possibly
-            if ( word && word->W_MorphismAttributes & DEBUG_WORD ) Interpreter_DoWord ( _Interpreter_, word, _Lexer_->TokenStart_ReadLineIndex, _Lexer_->SC_Index ) ;
-            else
-            {
-                byte * buffer = Buffer_Data_Cleared ( _CfrTil_->ScratchB1 ) ;
-                byte * msg = word ? ( byte* ) "namespace has no size" : ( byte* ) "can't find namespace" ;
-                sprintf ( ( char* ) buffer, "\n_CfrTil_Parse_ClassStructure : %s : \'%s\'", ( char* ) msg, token0 ) ;
-                _SyntaxError ( ( byte* ) buffer, 1 ) ; // else structure component size error
-            }
-        }
-        for ( i = 0 ; 1 ; )
-        {
-            token2 = Lexer_ReadToken ( lexer ) ;
-            if ( token2 && String_Equal ( ( char* ) token2, "[" ) )
-            {
-                CfrTil_InterpretNextToken ( ) ; // next token must be an integer for the array dimension size
-                arrayDimensionSize = DataStack_Pop ( ) ;
-                size = size * arrayDimensionSize ;
-                offset += size ;
-                sizeOf += size ;
-                token3 = Lexer_ReadToken ( lexer ) ;
-                if ( ! String_Equal ( ( char* ) token3, "]" ) ) CfrTil_Exception ( SYNTAX_ERROR, 0, 1 ) ;
-                else arrayDimensions [ i ] = arrayDimensionSize ;
-                i ++ ;
-            }
-            else
-            {
-                if ( i )
-                {
-                    //arrayBaseObject->CAttribute |= VARIABLE ;
-                    classFieldObject->ArrayDimensions = ( int64 * ) Mem_Allocate ( i * sizeof (int64 ), DICTIONARY ) ;
-                    MemCpy ( classFieldObject->ArrayDimensions, arrayDimensions, i * sizeof (int64 ) ) ;
-                    classFieldObject->ArrayNumberOfDimensions = i ;
-                    // print array field
-                    //if ( printFlag ) _Printf ( (byte*) "\n\t%s\t%s [ %d ]" = %lx", token0, token1, arrayDimensionSize, (sizeof token0) data [ aoffset ]) ;
-                }
-                if ( token0 = token2 ) goto gotNextToken ;
-                else break ;
-            }
-        }
-    }
-    _Namespace_VariableValueSet ( classNs, ( byte* ) "size", sizeOf ) ;
-    classNs->ObjectByteSize = sizeOf ;
-    classNs->W_ObjectAttributes |= STRUCTURE ;
-    //Namespace_AddToNamespaces_SetUsing (  Namespace_Find ( (byte*) "C_Typedef" ), 0, NOT_USING ) ;
-    return sizeOf ;
-}
-
-#endif
-
 void
 Compiler_TypedObjectInit ( Word * word, Namespace * typeNamespace )
 {
@@ -495,7 +392,7 @@ _CfrTil_Parse_LocalsAndStackVariables ( int64 svf, int64 lispMode, ListObject * 
     byte *token, *returnVariable = 0 ;
     Namespace *typeNamespace = 0, *objectTypeNamespace = 0, *saveInNs = _CfrTil_->InNamespace ;
     //CfrTil_DbgSourceCodeOff ( ) ;
-    if ( ! CompileMode ) Compiler_Init ( compiler, 0, 0 ) ;
+    if ( ! CompileMode ) Compiler_Init (compiler, 0) ;
 
     if ( svf ) svff = 1 ;
     addWords = 1 ;
@@ -593,6 +490,8 @@ _CfrTil_Parse_LocalsAndStackVariables ( int64 svf, int64 lispMode, ListObject * 
                     objectAttributes |= REGISTER_VARIABLE ;
                     numberOfRegisterVariables ++ ;
                 }
+                //if ( String_Equal ( localsNs->Name, "locals_-1") && (String_Equal ( token, "n")||String_Equal ( token, "x")) ) 
+                //    _Printf ((byte*)"") ;
                 word = DataObject_New ( objectAttributes, 0, token, 0, objectAttributes, lispAttributes, 0, 0, 0, DICTIONARY, - 1, - 1 ) ;
                 if ( _Context_->CurrentWordBeingCompiled ) _Context_->CurrentWordBeingCompiled->W_TypeSignatureString [numberOfVariables ++] = '_' ;
                 if ( regFlag == true )
