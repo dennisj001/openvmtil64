@@ -42,7 +42,12 @@ _CfrTil_Init_SessionCore ( CfrTil * cfrTil, Boolean cntxDelFlag, Boolean promptF
     Lexer_Init ( cntx->Lexer0, 0, 0, CONTEXT ) ;
     Finder_Init ( cntx->Finder0 ) ;
     Compiler_Init (cntx->Compiler0, 0) ;
-    _CfrTil_RemoveNamespaceFromUsingListAndClear ( ( byte* ) "locals_-1" ) ; // a workaround for some special syntax eg. : 3 ( x ) { stack x @ dup p 3 _assert0 } ix 
+    //_CfrTil_RemoveNamespaceFromUsingListAndClear ( ( byte* ) "locals_-1" ) ; // a workaround for some special syntax eg. : 3 ( x ) { stack x @ dup p 3 _assert0 } ix 
+    if ( cfrTil->NonCompilingNs )
+    {
+        _Namespace_RemoveFromUsingListAndClear (cfrTil->NonCompilingNs) ;
+        cfrTil->NonCompilingNs = 0 ;
+    }
     Interpreter_Init ( cntx->Interpreter0 ) ;
 #if 0  // let user decide this  
     if ( ! _LC_ ) LC_LispNamespacesOff ( ) ;

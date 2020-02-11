@@ -473,7 +473,8 @@ _Namespace_FindOrNew_Local ( Stack * nsStack )
     if ( ! ns )
     {
         ns = Namespace_New ( name, _CfrTil_->Namespaces ) ;
-        Stack_Push ( nsStack, ( int64 ) ns ) ; // nb. this is where the the depth increase
+        if ( CompileMode ) Stack_Push ( nsStack, ( int64 ) ns ) ; // nb. this is where the the depth increase
+        else _CfrTil_->NonCompilingNs = ns ;
     }
     Namespace_SetState_AdjustListPosition ( ns, USING, 1 ) ;
     _Namespace_ActivateAsPrimary ( ns ) ;

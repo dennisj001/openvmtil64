@@ -129,13 +129,14 @@ Block_CopyCompile ( byte * srcAddress, int64 bindex, Boolean jccFlag )
 void
 CfrTil_TurnOffBlockCompiler ( )
 {
-    Compiler * compiler = _Context_->Compiler0 ;
+    Context * cntx = _Context_ ;
+    Compiler * compiler = cntx->Compiler0 ;
     if ( ! GetState ( compiler, LISP_MODE ) ) CfrTil_LeftBracket ( ) ;
     _CfrTil_RemoveNamespaceFromUsingListAndClear ( ( byte* ) "__labels__" ) ;
     //Compiler_FreeAllLocalsNamespaces ( compiler ) ;
     SetState ( compiler, COMPILE_MODE | VARIABLE_FRAME, false ) ;
-    _Context_->LastCompiledWord = _Context_->CurrentWordBeingCompiled ;
-    _Context_->CurrentWordBeingCompiled = 0 ;
+    cntx->LastCompiledWord = cntx->CurrentWordBeingCompiled ;
+    cntx->CurrentWordBeingCompiled = 0 ;
 }
 
 void
