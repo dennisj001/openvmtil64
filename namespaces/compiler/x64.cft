@@ -347,7 +347,7 @@ C X64
 Combinators
 
 sp
-d: asm: iax
+asm: iax
     _Compile_Stack_PopToReg ( R8D )          //4d8b06                  mov r8, [r14]       
     _Compile_CallThruReg ( R8D )             //4983ee08                sub r14, 0x8
                                              //49ffd0                  call r8  
@@ -383,7 +383,7 @@ Interpreter User
 ' qeval find wdiss 
 sp
 
-d: asm: stest
+asm: stest
     _Compile_MoveTOS_To_R8D ( ) 
     _Compile_Move_DataStackN_ToReg ( R8D, 0 ) 
     Compile_Stack_Push_R8D ( ) 

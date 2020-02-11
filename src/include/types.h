@@ -738,7 +738,7 @@ typedef struct
     byte * RspSaveOffset ;
     byte * RspRestoreOffset ;
     Word * ReturnVariableWord, * Current_Word_New, *Current_Word_Create, * LHS_Word ;
-    Namespace *C_BackgroundNamespace, *C_FunctionBackgroundNamespace, *LocalsNamespace, *AutoVarTypeNamespace ; //, ** FunctionTypesArray ;
+    Namespace *C_BackgroundNamespace, *C_FunctionBackgroundNamespace, *LocalsNamespace, *AutoVarTypeNamespace, *NonCompilingNs ; //, ** FunctionTypesArray ;
     dllist * GotoList ;
     dllist * CurrentSwitchList ;
     dllist * RegisterParameterList ;
@@ -892,7 +892,7 @@ typedef struct _CfrTil
     block PopDspToR8AndCall, CallReg_TestRSP, Call_ToAddressThruR8_TestAlignRSP ; //adjustRSPAndCall, adjustRSP ;
     ByteArray * PeekPokeByteArray ;
     Word * LastFinished_DObject, * LastFinished_Word, *StoreWord, *PokeWord, *RightBracket, *ScoOcCrw ;
-    Word *DebugWordListWord, *EndBlockWord, *BeginBlockWord, *InfixNamespace, *NonCompilingNs ;
+    Word *DebugWordListWord, *EndBlockWord, *BeginBlockWord, *InfixNamespace ;
     byte ReadLine_CharacterTable [ 256 ], * OriginalInputLine, * TokenBuffer ; // nb : keep this here -- if we add this field to Lexer it just makes the lexer bigger and we want the smallest lexer possible
     ReadLineFunction ReadLine_FunctionTable [ 24 ] ;
     CharacterType LexerCharacterTypeTable [ 256 ] ;

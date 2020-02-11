@@ -282,16 +282,27 @@ CfrTil_Using ( )
 // this namespace is will be taken out of the system
 
 void
-_Namespace_RemoveFromUsingListAndClear ( Namespace * ns )
+CfrTil_NonCompilingNs_Clear ( Compiler * compiler )
 {
-    if ( ns )
+    if ( compiler->NonCompilingNs )
     {
-        if ( ns == _CfrTil_->InNamespace ) _CfrTil_->InNamespace = 0 ; //( Namespace* ) dlnode_Next ( ( dlnode* ) ns ) ; //dllist_First ( (dllist*) _O_->CfrTil->Namespaces->Lo_List ) ;
-        if ( ns == _Context_->Finder0->QualifyingNamespace ) Finder_SetQualifyingNamespace ( _Context_->Finder0, 0 ) ;
-        _Namespace_Clear ( ns ) ;
-        dlnode_Remove ( ( dlnode* ) ns ) ;
-        Word_Recycle ( ns ) ;
+        _Namespace_RemoveFromUsingListAndClear (compiler->NonCompilingNs) ;
+        compiler->NonCompilingNs = 0 ;
     }
+}
+
+Word *
+_CfrTil_VariableGet ( Namespace * ns, byte * name )
+{
+    ns = Word_UnAlias ( ns ) ;
+    Word * word = _Finder_FindWord_InOneNamespace ( _Finder_, ns, name ) ;
+    return word ;
+}
+
+int64
+_CfrTil_VariableValueGet ( byte* nameSpace, byte * name )
+{
+    return _Namespace_VariableValueGet ( Namespace_Find ( nameSpace ), name ) ;
 }
 
 void

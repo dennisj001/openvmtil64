@@ -259,7 +259,7 @@ Compiler_FreeLocalsNamespaces ( Compiler * compiler )
     {
         Namespace_RemoveAndClearNamespacesStack ( compiler->LocalsCompilingNamespacesStack ) ;
         _Namespace_RemoveFromUsingListAndClear ( compiler->LocalsNamespace ) ;
-        CfrTil_NonCompilingNs_Clear ( _CfrTil_ ) ;
+        CfrTil_NonCompilingNs_Clear ( compiler ) ;
     }
 }
 
@@ -315,6 +315,7 @@ Compiler_Init ( Compiler * compiler, uint64 state )
     Compiler_CompileOptimizeInfo_PushNew ( compiler ) ;
     SetBuffersUnused ( 1 ) ;
     SetState ( compiler, VARIABLE_FRAME, false ) ;
+    if ( compiler->LocalsNamespace != compiler->NonCompilingNs ) CfrTil_NonCompilingNs_Clear ( compiler ) ;
 }
 
 Compiler *

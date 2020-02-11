@@ -8,7 +8,7 @@ CfrTil_RuntimeInit ( CfrTil * cfrTil, int64 cntxDelFlag )
 {
     CfrTil_LogOff ( ) ;
     cfrTil->SC_QuoteMode = 0 ;
-    cfrTil->SC_Word = 0 ; 
+    cfrTil->SC_Word = 0 ;
     if ( cntxDelFlag )
     {
         int64 i, stackDepth = Stack_Depth ( cfrTil->ContextDataStack ) ;
@@ -22,12 +22,12 @@ CfrTil_RuntimeInit ( CfrTil * cfrTil, int64 cntxDelFlag )
     DefaultColors ;
     CfrTil_CheckInitDataStack ( ) ;
     _CfrTil_TypeStackReset ( ) ;
-    _CfrTil_RecycleInit_Compiler_N_M_Node_WordList () ;
+    _CfrTil_RecycleInit_Compiler_N_M_Node_WordList ( ) ;
     CfrTil_UnsetQualifyingNamespace ( ) ;
 }
 
 void
-OVT_RuntimeInit ()
+OVT_RuntimeInit ( )
 {
     OVT_FreeTempMem ( ) ;
     OVT_MemList_DeleteNBAMemory ( ( byte* ) "ObjectSpace", 1 ) ; // 1 : re-init
@@ -41,12 +41,12 @@ _CfrTil_Init_SessionCore ( CfrTil * cfrTil, Boolean cntxDelFlag, Boolean promptF
     ReadLine_Init ( cntx->ReadLiner0, _CfrTil_Key ) ;
     Lexer_Init ( cntx->Lexer0, 0, 0, CONTEXT ) ;
     Finder_Init ( cntx->Finder0 ) ;
-    Compiler_Init (cntx->Compiler0, 0) ;
+    Compiler_Init ( cntx->Compiler0, 0 ) ;
     Interpreter_Init ( cntx->Interpreter0 ) ;
     if ( _LC_ ) LC_Init_Runtime ( ) ;
     CfrTil_RuntimeInit ( cfrTil, cntxDelFlag ) ;
     OVT_RuntimeInit ( ) ;
-    OVT_StartupMessage ( promptFlag && ( cfrTil->InitSessionCoreTimes < 2 )) ;
+    OVT_StartupMessage ( promptFlag && ( cfrTil->InitSessionCoreTimes < 2 ) ) ;
     cfrTil->InitSessionCoreTimes ++ ;
     _OVT_Ok ( promptFlag ) ;
 }
@@ -62,7 +62,7 @@ CfrTil_ResetAll_Init ( CfrTil * cfrTil )
 {
     byte * startDirectory = ( byte* ) "namespaces" ;
     if ( ! GetState ( _O_, OVT_IN_USEFUL_DIRECTORY ) ) startDirectory = ( byte* ) "/usr/local/lib/cfrTil64/namespaces" ;
-    DataObject_New (NAMESPACE_VARIABLE, 0, ( byte* ) "_startDirectory_", 0, NAMESPACE_VARIABLE, 0, 0, ( int64 ) startDirectory, 0, 0, 0, - 1 ) ;
+    DataObject_New ( NAMESPACE_VARIABLE, 0, ( byte* ) "_startDirectory_", 0, NAMESPACE_VARIABLE, 0, 0, ( int64 ) startDirectory, 0, 0, 0, - 1 ) ;
     if ( ( _O_->RestartCondition >= RESET_ALL ) )
     {
         _O_->StartIncludeTries = 0 ;
@@ -120,7 +120,7 @@ _CfrTil_InitialAddWordToNamespace ( Word * word, byte * containingNamespaceName,
 }
 
 void
-_CfrTil_CPrimitiveNewAdd ( const char * name, byte * pb_TypeSignature, uint64 opInsnGroup, uint64 opInsCode, block b, uint64 morphismAttributes, 
+_CfrTil_CPrimitiveNewAdd ( const char * name, byte * pb_TypeSignature, uint64 opInsnGroup, uint64 opInsCode, block b, uint64 morphismAttributes,
     uint64 objectAttributes, uint64 lispAttributes, const char *nameSpace, const char * superNamespace )
 {
     Word * word = _Word_New ( ( byte* ) name, CPRIMITIVE | morphismAttributes, objectAttributes, lispAttributes, 1, 0, DICTIONARY ) ;

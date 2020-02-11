@@ -384,21 +384,16 @@ Namespace_Clear ( byte * name )
 }
 
 void
-CfrTil_NonCompilingNs_Clear (CfrTil * cfrTil)
+_Namespace_RemoveFromUsingListAndClear ( Namespace * ns )
 {
-    if ( cfrTil->NonCompilingNs )
+    if ( ns )
     {
-        _Namespace_RemoveFromUsingListAndClear (cfrTil->NonCompilingNs) ;
-        cfrTil->NonCompilingNs = 0 ;
+        if ( ns == _CfrTil_->InNamespace ) _CfrTil_->InNamespace = 0 ; //( Namespace* ) dlnode_Next ( ( dlnode* ) ns ) ; //dllist_First ( (dllist*) _O_->CfrTil->Namespaces->Lo_List ) ;
+        if ( ns == _Context_->Finder0->QualifyingNamespace ) Finder_SetQualifyingNamespace ( _Context_->Finder0, 0 ) ;
+        _Namespace_Clear ( ns ) ;
+        dlnode_Remove ( ( dlnode* ) ns ) ;
+        Word_Recycle ( ns ) ;
     }
-}
-
-Word *
-_CfrTil_VariableGet ( Namespace * ns, byte * name )
-{
-    ns = Word_UnAlias ( ns ) ;
-    Word * word = _Finder_FindWord_InOneNamespace ( _Finder_, ns, name ) ;
-    return word ;
 }
 
 int64
@@ -407,12 +402,6 @@ _Namespace_VariableValueGet ( Namespace * ns, byte * name )
     Word * word = _CfrTil_VariableGet ( ns, name ) ;
     if ( word ) return ( int64 ) word->W_Value ; // value of variable
     else return 0 ;
-}
-
-int64
-_CfrTil_VariableValueGet ( byte* nameSpace, byte * name )
-{
-    return _Namespace_VariableValueGet ( Namespace_Find ( nameSpace ), name ) ;
 }
 
 void
@@ -484,7 +473,7 @@ _Namespace_FindOrNew_Local ( Stack * nsStack )
     {
         ns = Namespace_New ( name, _CfrTil_->Namespaces ) ;
         if ( CompileMode ) Stack_Push ( nsStack, ( int64 ) ns ) ; // nb. this is where the the depth increase
-        else _CfrTil_->NonCompilingNs = ns ;
+        else cntx->Compiler0->NonCompilingNs = ns ;
     }
     Namespace_SetState_AdjustListPosition ( ns, USING, 1 ) ;
     _Namespace_ActivateAsPrimary ( ns ) ;
