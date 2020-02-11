@@ -366,7 +366,7 @@ sp
 sp
 Locals
 User
-d: "fib1" ( n ) { 1 ti n @ _fib1 p 1 time } word 
+"fib1" ( n ) { 1 ti n @ _fib1 p 1 time } word 
 C 
 : sp ;
 jcc8_Off

@@ -345,6 +345,7 @@ Namespace_Do_C_Type ( Namespace * ns, Boolean isForwardDotted )
                     CfrTil_SourceCode_Init ( ) ;
                     CfrTil_WordList_Init ( 0 ) ;
                 }
+                //else Namespace_NonCompilingNs_Clear (_CfrTil_) ;
                 _Namespace_Do_C_Type ( ns ) ;
             }
             SetState ( compiler, DOING_C_TYPE, false ) ;

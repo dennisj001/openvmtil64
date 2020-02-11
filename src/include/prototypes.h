@@ -821,6 +821,7 @@ void Namespace_MoveToFirstOnUsingList(byte *name);
 void Namespace_RemoveFromUsingList_WithCheck(byte *name);
 void _Namespace_Clear(Namespace *ns);
 void Namespace_Clear(byte *name);
+void Namespace_NonCompilingNs_Clear(CfrTil *cfrTil);
 Word *_CfrTil_VariableGet(Namespace *ns, byte *name);
 int64 _Namespace_VariableValueGet(Namespace *ns, byte *name);
 int64 _CfrTil_VariableValueGet(byte *nameSpace, byte *name);

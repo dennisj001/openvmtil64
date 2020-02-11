@@ -205,7 +205,7 @@ _Context_IncludeFile ( Context * cntx, byte *filename, int64 interpretFlag )
             if ( interpretFlag ) Interpret_UntilFlaggedWithInit ( cntx->Interpreter0, END_OF_FILE | END_OF_STRING ) ;
 
             cntx->System0->IncludeFileStackNumber -- ;
-            //if ( ! cntx->System0->IncludeFileStackNumber ) Ovt_AutoVarOff ( ) ;
+            Namespace_NonCompilingNs_Clear (_CfrTil_) ;
             if ( _O_->Verbosity > 2 ) _Printf ( ( byte* ) "\n%s included\n", filename ) ;
             OVT_MemList_FreeNBAMemory ( ( byte* ) "ObjectSpace", 1 * M, 1 ) ; // not able to do this yet ??
         }
@@ -226,7 +226,7 @@ _CfrTil_ContextNew_IncludeFile ( byte * filename )
 int64
 _Context_StringEqual_PeekNextToken ( Context * cntx, byte * check, Boolean evalFlag )
 {
-    byte *token = Lexer_Peek_Next_NonDebugTokenWord (cntx->Lexer0, evalFlag , 0) ;
+    byte *token = Lexer_Peek_Next_NonDebugTokenWord ( cntx->Lexer0, evalFlag, 0 ) ;
     if ( token ) return String_Equal ( ( char* ) token, ( char* ) check ) ;
     else return 0 ;
 }

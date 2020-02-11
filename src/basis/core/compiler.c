@@ -308,6 +308,7 @@ Compiler_Init (Compiler * compiler, uint64 state)
     Compiler_CompileOptimizeInfo_PushNew ( compiler ) ;
     SetBuffersUnused ( 1 ) ;
     SetState ( compiler, VARIABLE_FRAME, false ) ;
+    //Namespace_NonCompilingNs_Clear (_CfrTil_) ;
 }
 
 Compiler *

@@ -383,6 +383,16 @@ Namespace_Clear ( byte * name )
     _Namespace_Clear ( _Namespace_Find ( name, 0, 0 ) ) ;
 }
 
+void
+Namespace_NonCompilingNs_Clear (CfrTil * cfrTil)
+{
+    if ( cfrTil->NonCompilingNs )
+    {
+        _Namespace_RemoveFromUsingListAndClear (cfrTil->NonCompilingNs) ;
+        cfrTil->NonCompilingNs = 0 ;
+    }
+}
+
 Word *
 _CfrTil_VariableGet ( Namespace * ns, byte * name )
 {
