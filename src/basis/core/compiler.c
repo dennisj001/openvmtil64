@@ -33,10 +33,10 @@ Word *
 _CfrTil_CopyDuplicates ( Word * word0 )
 {
     Word * word1, *wordToBePushed ;
-    if ( word0->W_MorphismAttributes & (KEYWORD|CFRTIL_WORD|T_LISP_SYMBOL) ) word1 = _CopyDuplicateWord ( word0, 1 ) ;
+    if ( word0->W_MorphismAttributes & ( KEYWORD | CFRTIL_WORD | T_LISP_SYMBOL ) ) word1 = _CopyDuplicateWord ( word0, 1 ) ;
     else word1 = ( Word * ) dllist_Map1_WReturn ( _CfrTil_->Compiler_N_M_Node_WordList, ( MapFunction1 ) CopyDuplicateWord, ( int64 ) word0 ) ;
     if ( word1 ) wordToBePushed = word1 ;
-    else wordToBePushed = word0 ; 
+    else wordToBePushed = word0 ;
     return wordToBePushed ;
 }
 
@@ -63,7 +63,7 @@ Compiler_IncrementCurrentAccumulatedOffset ( Compiler * compiler, int64 incremen
 {
     if ( compiler->AccumulatedOffsetPointer ) ( *( int64* ) ( compiler->AccumulatedOffsetPointer ) ) += ( increment ) ;
     if ( compiler->AccumulatedOptimizeOffsetPointer ) ( *( int64* ) ( compiler->AccumulatedOptimizeOffsetPointer ) ) += ( increment ) ;
-    _Debugger_->PreHere = ((byte*) compiler->AccumulatedOffsetPointer) - 3 ; // 3 : sizeof add immediate insn with rex
+    _Debugger_->PreHere = ( ( byte* ) compiler->AccumulatedOffsetPointer ) - 3 ; // 3 : sizeof add immediate insn with rex
 }
 
 void
@@ -243,7 +243,7 @@ CfrTil_SaveDebugInfo ( Word * word, uint64 allocType )
         Namespace_RemoveNamespacesStack ( compiler->LocalsCompilingNamespacesStack ) ;
     }
     Stack_Init ( compiler->LocalsCompilingNamespacesStack ) ;
-    if ( ! word->W_SC_WordList ) 
+    if ( ! word->W_SC_WordList )
     {
         word->W_SC_WordList = _CfrTil_->Compiler_N_M_Node_WordList ;
         _CfrTil_->Compiler_N_M_Node_WordList = _dllist_New ( allocType ) ;
@@ -253,14 +253,20 @@ CfrTil_SaveDebugInfo ( Word * word, uint64 allocType )
 }
 
 void
-CfrTil_DeleteDebugInfo ( )
+Compiler_FreeLocalsNamespaces ( Compiler * compiler )
 {
-    Compiler * compiler = _Compiler_ ;
     if ( compiler->NumberOfVariables )
     {
         Namespace_RemoveAndClearNamespacesStack ( compiler->LocalsCompilingNamespacesStack ) ;
         _Namespace_RemoveFromUsingListAndClear ( compiler->LocalsNamespace ) ;
+        CfrTil_NonCompilingNs_Clear ( _CfrTil_ ) ;
     }
+}
+
+void
+CfrTil_DeleteDebugInfo ( )
+{
+    Compiler_FreeLocalsNamespaces ( _Compiler_ ) ;
     if ( ! _Context_->CurrentWordBeingCompiled ) _CfrTil_RecycleInit_Compiler_N_M_Node_WordList ( ) ;
 }
 
@@ -272,7 +278,7 @@ _CfrTil_FinishWordDebugInfo ( Word * word )
 }
 
 void
-Compiler_Init (Compiler * compiler, uint64 state)
+Compiler_Init ( Compiler * compiler, uint64 state )
 {
     compiler->State = ( state &= ( ~ ARRAY_MODE ) ) ;
     compiler->ContinuePoint = 0 ;
@@ -299,6 +305,7 @@ Compiler_Init (Compiler * compiler, uint64 state)
     Stack_Init ( compiler->PointerToOffsetStack ) ;
     Stack_Init ( compiler->CombinatorInfoStack ) ;
     Stack_Init ( compiler->InfixOperatorStack ) ;
+    Stack_Init ( compiler->LocalsCompilingNamespacesStack ) ;
     _dllist_Init ( compiler->GotoList ) ;
     _dllist_Init ( compiler->CurrentSwitchList ) ;
     _dllist_Init ( compiler->RegisterParameterList ) ;
@@ -308,7 +315,6 @@ Compiler_Init (Compiler * compiler, uint64 state)
     Compiler_CompileOptimizeInfo_PushNew ( compiler ) ;
     SetBuffersUnused ( 1 ) ;
     SetState ( compiler, VARIABLE_FRAME, false ) ;
-    //Namespace_NonCompilingNs_Clear (_CfrTil_) ;
 }
 
 Compiler *
@@ -325,7 +331,7 @@ Compiler_New ( uint64 allocType )
     compiler->PostfixLists = _dllist_New ( allocType ) ;
     compiler->GotoList = _dllist_New ( allocType ) ;
     compiler->OptimizeInfoList = _dllist_New ( allocType ) ;
-    Compiler_Init (compiler, 0) ;
+    Compiler_Init ( compiler, 0 ) ;
     return compiler ;
 }
 

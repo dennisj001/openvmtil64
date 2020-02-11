@@ -821,7 +821,7 @@ void Namespace_MoveToFirstOnUsingList(byte *name);
 void Namespace_RemoveFromUsingList_WithCheck(byte *name);
 void _Namespace_Clear(Namespace *ns);
 void Namespace_Clear(byte *name);
-void Namespace_NonCompilingNs_Clear(CfrTil *cfrTil);
+void CfrTil_NonCompilingNs_Clear(CfrTil *cfrTil);
 Word *_CfrTil_VariableGet(Namespace *ns, byte *name);
 int64 _Namespace_VariableValueGet(Namespace *ns, byte *name);
 int64 _CfrTil_VariableValueGet(byte *nameSpace, byte *name);
@@ -1154,6 +1154,7 @@ CompileOptimizeInfo *CompileOptInfo_NewCopy(CompileOptimizeInfo *optInfo, uint64
 int64 Compiler_BlockLevel(Compiler *compiler);
 void Compiler_Init_AccumulatedOffsetPointers(Compiler *compiler, Word *word);
 void CfrTil_SaveDebugInfo(Word *word, uint64 allocType);
+void Compiler_FreeLocalsNamespaces(Compiler *compiler);
 void CfrTil_DeleteDebugInfo(void);
 void _CfrTil_FinishWordDebugInfo(Word *word);
 void Compiler_Init(Compiler *compiler, uint64 state);

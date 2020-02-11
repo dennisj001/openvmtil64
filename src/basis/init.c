@@ -42,14 +42,8 @@ _CfrTil_Init_SessionCore ( CfrTil * cfrTil, Boolean cntxDelFlag, Boolean promptF
     Lexer_Init ( cntx->Lexer0, 0, 0, CONTEXT ) ;
     Finder_Init ( cntx->Finder0 ) ;
     Compiler_Init (cntx->Compiler0, 0) ;
-    Namespace_NonCompilingNs_Clear (cfrTil) ;
-    //Interpreter_Init ( cntx->Interpreter0 ) ;
-#if 0  // let user decide this  
-    if ( ! _LC_ ) LC_LispNamespacesOff ( ) ;
-    else LC_Init_Runtime ( ) ;
-#else
+    Interpreter_Init ( cntx->Interpreter0 ) ;
     if ( _LC_ ) LC_Init_Runtime ( ) ;
-#endif    
     CfrTil_RuntimeInit ( cfrTil, cntxDelFlag ) ;
     OVT_RuntimeInit ( ) ;
     OVT_StartupMessage ( promptFlag && ( cfrTil->InitSessionCoreTimes < 2 )) ;

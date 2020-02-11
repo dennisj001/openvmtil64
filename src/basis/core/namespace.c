@@ -384,7 +384,7 @@ Namespace_Clear ( byte * name )
 }
 
 void
-Namespace_NonCompilingNs_Clear (CfrTil * cfrTil)
+CfrTil_NonCompilingNs_Clear (CfrTil * cfrTil)
 {
     if ( cfrTil->NonCompilingNs )
     {
