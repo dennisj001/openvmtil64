@@ -237,5 +237,5 @@ typedef struct _Identifier
 } Identifier, ID, Word, Namespace, Vocabulary, Class, DynamicObject, DObject, ListObject, Symbol, MemChunk, HistoryStringNode, Buffer ;
 c_syntaxOff
 C
-'Experimental notUsing
+'Root.C.Experimental notUsing
 Root Experimental User

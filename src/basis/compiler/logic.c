@@ -61,7 +61,7 @@ Boolean
 _COI_GetReg ( CompileOptimizeInfo * optInfo, Boolean regNumber )
 {
     Boolean reg = ACC, reg1, reg2 ;
-    if ( GetState ( _CfrTil_, OPTIMIZE_ON ) )
+    if ( GetState ( _CFT_, OPTIMIZE_ON ) )
     {
         if ( regNumber == 1 )
         {
@@ -135,7 +135,7 @@ _Compile_LogicalAnd ( Compiler * compiler )
     Compiler_BI_CompileRecord_TestCode_Set_Tttn ( compiler, ACC, TTT_ZERO, NEGFLAG_NZ, TTT_ZERO, NEGFLAG_Z, true ) ;
     _Compile_LogicResultForStack ( ACC, TTT_ZERO, NEGFLAG_NZ ) ; // jnz
     Compiler_Set_LogicCode ( compiler, TTT_ZERO, NEGFLAG_NZ, TTT_ZERO, NEGFLAG_Z ) ;
-    CfrTil_CompileAndRecord_Word0_PushReg ( ACC, true ) ;
+    CFT_CompileAndRecord_Word0_PushReg ( ACC, true ) ;
     //DBI_OFF ;
 }
 
@@ -147,7 +147,7 @@ Compile_LogicalAnd ( Compiler * compiler )
     else if ( optSetupFlag ) _Compile_LogicalAnd ( compiler ) ;
     else
     {
-        Word *one = _CfrTil_WordList ( 1 ) ; // assumes two values ( n m ) on the DSP stack 
+        Word *one = _CFT_WordList ( 1 ) ; // assumes two values ( n m ) on the DSP stack 
         if ( one->StackPushRegisterCode && ( one->RegToUse == ACC ) ) SetHere ( one->StackPushRegisterCode, 1 ) ;
         else _Compile_Stack_PopToReg ( DSP, ACC ) ;
         _Compile_Stack_PopToReg ( DSP, OREG ) ;
@@ -164,7 +164,7 @@ _Compile_LogicalNot ( Compiler * compiler )
     Compiler_BI_CompileRecord_TestCode_Set_Tttn ( compiler, ACC, TTT_ZERO, NEGFLAG_Z, TTT_ZERO, NEGFLAG_NZ, false ) ;
     _Compile_LogicResultForStack ( ACC, TTT_ZERO, NEGFLAG_Z ) ;
     Compiler_Set_LogicCode ( compiler, TTT_ZERO, NEGFLAG_Z, TTT_ZERO, NEGFLAG_NZ ) ;
-    CfrTil_CompileAndRecord_Word0_PushReg ( ACC, true ) ;
+    CFT_CompileAndRecord_Word0_PushReg ( ACC, true ) ;
     //_Printf ( (byte*) "\nSize of LogicalNot code = %d bytes\n", Here -here ) ;
     //DBI_OFF ;
 }
@@ -251,7 +251,7 @@ Compile_Cmp_Set_Tttn_Logic ( Compiler * compiler, Boolean setTtn, Boolean setNeg
     }
     Boolean reg = ACC ; //nb! reg should always be ACC! : immediately after the 'cmp' insn which changes the flags appropriately
     _Compile_SETcc_Tttn_REG ( compiler, setTtn, setNegateFlag, jccTtt, jccNegFlag, reg, reg ) ; //nb! should always be ACC! : immediately after the 'cmp' insn which changes the flags appropriately
-    _Word_CompileAndRecord_PushReg ( _CfrTil_WordList ( 0 ), reg, true ) ; //ACC ) ;
+    _Word_CompileAndRecord_PushReg ( _CFT_WordList ( 0 ), reg, true ) ; //ACC ) ;
 }
 //  logical equals - "=="
 
@@ -295,7 +295,7 @@ void
 Compile_TestLogicAndStackPush (Compiler * compiler, Boolean reg, Boolean setNegFlag, Boolean jccTtt, Boolean jccNegFlag )
 {
     Compiler_BI_CompileRecord_TestCode_Set_Tttn ( compiler, reg, TTT_ZERO, setNegFlag, jccTtt, jccNegFlag, false ) ;
-    CfrTil_CompileAndRecord_PushAccum ( ) ;
+    CFT_CompileAndRecord_PushAccum ( ) ;
 }
 
 void
@@ -323,7 +323,7 @@ Compile_Logical_X ( Compiler * compiler, int64 op, Boolean setTtn, Boolean setNe
 void
 Compile_LogicalNot ( Compiler * compiler )
 {
-    Word *one = _CfrTil_WordList ( 1 ) ; // assumes two values ( n m ) on the DSP stack 
+    Word *one = _CFT_WordList ( 1 ) ; // assumes two values ( n m ) on the DSP stack 
     int64 optSetupFlag = Compiler_CheckOptimize ( compiler, 0 ) ; // check especially for cases that optimize literal ops
     CompileOptimizeInfo * optInfo = compiler->OptInfo ;
     if ( optSetupFlag & OPTIMIZE_DONE ) return ;
@@ -374,7 +374,7 @@ _BI_Compile_Jcc ( BlockInfo *bi, byte * jmpToAddress )
     if ( bi->CopiedToLogicJccCode ) SetHere ( bi->CopiedToLogicJccCode, 1 ) ;
     else SetHere ( bi->JccLogicCode, 1 ) ;
     bi->ActualCopiedToJccCode = Here ;
-    byte insn = GetState ( _CfrTil_, JCC8_ON ) ? JCC8 : 0 ;
+    byte insn = GetState ( _CFT_, JCC8_ON ) ? JCC8 : 0 ;
     byte * compiledAtAddress = _Compile_Jcc ( bi->JccNegFlag, bi->JccTtt, jmpToAddress, insn ) ; // we do need to store and get this logic set by various conditions by the compiler : _Compile_SET_Tttn_REG
     return compiledAtAddress ;
 }
@@ -408,7 +408,7 @@ Compiler_Compile_Jcc ( Compiler * compiler, int64 bindex, Boolean setTtn ) // , 
 // non-combinator 'if'
 
 void
-CfrTil_If_ConditionalExpression ( )
+CFT_If_ConditionalExpression ( )
 {
     if ( CompileMode )
     {
@@ -425,10 +425,10 @@ CfrTil_If_ConditionalExpression ( )
     else
     {
         if ( String_IsPreviousCharA_ ( _Context_->ReadLiner0->InputLine, _Context_->Lexer0->TokenStart_ReadLineIndex - 1, '}' ) )
-            CfrTil_If2Combinator ( ) ;
+            CFT_If2Combinator ( ) ;
         else if ( String_IsPreviousCharA_ ( _Context_->ReadLiner0->InputLine, _Context_->Lexer0->TokenStart_ReadLineIndex - 1, '#' ) )
-            CfrTil_If_ConditionalInterpret ( ) ;
-        else if ( GetState ( _Context_, C_SYNTAX | PREFIX_MODE | INFIX_MODE ) ) CfrTil_If_PrefixCombinators ( ) ;
+            CFT_If_ConditionalInterpret ( ) ;
+        else if ( GetState ( _Context_, C_SYNTAX | PREFIX_MODE | INFIX_MODE ) ) CFT_If_PrefixCombinators ( ) ;
         else
         {
             Interpreter * interp = _Context_->Interpreter0 ;
@@ -450,20 +450,20 @@ CfrTil_If_ConditionalExpression ( )
     }
 }
 
-// same as CfrTil_JMP
+// same as CFT_JMP
 
 void
-CfrTil_Else ( )
+CFT_Else ( )
 {
     if ( CompileMode )
     {
         byte * compiledAtAddress = Compile_UninitializedJump ( ) ; // at the end of the 'if block' we need to jmp over the 'else block'
-        CfrTil_CalculateAndSetPreviousJmpOffset_ToHere ( ) ;
+        CFT_CalculateAndSetPreviousJmpOffset_ToHere ( ) ;
         Stack_Push_PointerToJmpOffset ( compiledAtAddress ) ;
     }
     else
     {
-        if ( String_IsPreviousCharA_ ( _Context_->ReadLiner0->InputLine, _Context_->Lexer0->TokenStart_ReadLineIndex - 1, '#' ) ) CfrTil_Else_ConditionalInterpret ( ) ;
+        if ( String_IsPreviousCharA_ ( _Context_->ReadLiner0->InputLine, _Context_->Lexer0->TokenStart_ReadLineIndex - 1, '#' ) ) CFT_Else_ConditionalInterpret ( ) ;
         else
         {
             Interpret_Until_Token ( _Context_->Interpreter0, ( byte* ) "endif", 0 ) ;
@@ -472,11 +472,11 @@ CfrTil_Else ( )
 }
 
 void
-CfrTil_EndIf ( )
+CFT_EndIf ( )
 {
     if ( CompileMode )
     {
-        CfrTil_CalculateAndSetPreviousJmpOffset_ToHere ( ) ;
+        CFT_CalculateAndSetPreviousJmpOffset_ToHere ( ) ;
     }
     //else { ; //nop  }
 }

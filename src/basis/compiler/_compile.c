@@ -33,7 +33,7 @@ Compile_CallCFunctionWithParameter_TestAlignRSP ( byte * cFunction, Word * word 
 void
 Compile_Call_CurrentBlock ( )
 {
-    Compile_Call_From_C_Address ( ( uint64 ) & _CfrTil_->CurrentBlock ) ;
+    Compile_Call_From_C_Address ( ( uint64 ) & _CFT_->CurrentBlock ) ;
 }
 
 // >R - Rsp to
@@ -93,7 +93,7 @@ _Compile_RspReg_Store ( ) // data stack pop to rsp [0] !
 void
 _Compile_GetVarLitObj_RValue_To_Reg (Word * word, int64 reg , int size)
 {
-    if ( ! size ) size = CfrTil_Get_ObjectByteSize ( word ) ;
+    if ( ! size ) size = CFT_Get_ObjectByteSize ( word ) ;
     Compiler_SCA_Word_SetCodingHere_And_ClearPreviousUse ( word, 0 ) ;
     if ( word->W_ObjectAttributes & REGISTER_VARIABLE )
     {
@@ -117,7 +117,7 @@ _Compile_GetVarLitObj_RValue_To_Reg (Word * word, int64 reg , int size)
     else if ( word->W_ObjectAttributes & ( LITERAL | CONSTANT ) ) _Compile_Move_Literal_Immediate_To_Reg ( reg, ( int64 ) word->W_Value, 0 ) ;
     else if ( word->W_ObjectAttributes & DOBJECT )
     {
-        _CfrTil_Do_DynamicObject_ToReg ( word, reg ) ;
+        _CFT_Do_DynamicObject_ToReg ( word, reg ) ;
         Compile_Move_Rm_To_Reg ( reg, reg, 0, size ) ; // not implemented
     }
     else if ( word->W_MorphismAttributes & ( CPRIMITIVE ) ) ; // do nothing here
@@ -129,7 +129,7 @@ Do_ObjectOffset ( Word * word, int64 reg )
 {
     Compiler * compiler = _Context_->Compiler0 ;
     int64 offset = word->AccumulatedOffset ;
-    if ( ( offset == 0 ) && GetState ( _CfrTil_, IN_OPTIMIZER ) ) return ;
+    if ( ( offset == 0 ) && GetState ( _CFT_, IN_OPTIMIZER ) ) return ;
     else
     {
         Compile_ADDI ( REG, reg, 0, offset, INT32_SIZE ) ; // only a 32 bit offset ??
@@ -144,7 +144,7 @@ Compile_GetVarLitObj_RValue_To_Reg (Word * word, int64 reg , int size)
     if ( word->W_ObjectAttributes & ( OBJECT | THIS ) )
     {
         Do_ObjectOffset ( word, reg ) ;
-        //byte size = CfrTil_Get_ObjectByteSize ( word ) ; // ?? Get Qualified Object Size ;
+        //byte size = CFT_Get_ObjectByteSize ( word ) ; // ?? Get Qualified Object Size ;
         Compile_Move_Rm_To_Reg ( reg, reg, 0, size ) ;
     }
 }
@@ -166,7 +166,7 @@ _Compile_SetVarLitObj_With_Reg ( Word * word, int64 reg, int64 thruReg )
 void
 _Compile_GetVarLitObj_LValue_To_Reg (Word * word, int64 reg , int size)
 {
-    if ( ! size ) size = CfrTil_Get_ObjectByteSize ( word ) ;
+    if ( ! size ) size = CFT_Get_ObjectByteSize ( word ) ;
     Compiler_SCA_Word_SetCodingHere_And_ClearPreviousUse ( word, 0 ) ;
     if ( word->W_ObjectAttributes & REGISTER_VARIABLE )
     {
@@ -179,7 +179,7 @@ _Compile_GetVarLitObj_LValue_To_Reg (Word * word, int64 reg , int size)
         _Compile_GetVarLitObj_RValue_To_Reg (word, reg , 0) ;
     else if ( word->W_ObjectAttributes & ( LOCAL_VARIABLE | PARAMETER_VARIABLE ) ) _Compile_LEA ( reg, FP, 0, LocalOrParameterVar_Disp ( word ) ) ;
     else if ( word->W_ObjectAttributes & ( LITERAL | CONSTANT ) ) _Compile_Move_Literal_Immediate_To_Reg ( reg, ( int64 ) word->W_Value, size ) ;
-    else if ( word->W_ObjectAttributes & DOBJECT ) _CfrTil_Do_DynamicObject_ToReg ( word, reg ) ;
+    else if ( word->W_ObjectAttributes & DOBJECT ) _CFT_Do_DynamicObject_ToReg ( word, reg ) ;
     else if ( word->W_ObjectAttributes & NAMESPACE_VARIABLE )
     {
         int64 value ;

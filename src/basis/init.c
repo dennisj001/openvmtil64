@@ -1,18 +1,18 @@
 #include "../include/cfrtil64.h"
 
 // all except namespaces and number base
-// this is called by the main interpreter _CfrTil_Interpret
+// this is called by the main interpreter _CFT_Interpret
 
 void
-CfrTil_RuntimeInit ( CfrTil * cfrTil, int64 cntxDelFlag )
+CFT_RuntimeInit ( CfrTil * cfrTil, int64 cntxDelFlag )
 {
-    CfrTil_LogOff ( ) ;
+    CFT_LogOff ( ) ;
     cfrTil->SC_QuoteMode = 0 ;
     cfrTil->SC_Word = 0 ;
     if ( cntxDelFlag )
     {
         int64 i, stackDepth = Stack_Depth ( cfrTil->ContextDataStack ) ;
-        for ( i = 0 ; i < stackDepth ; i ++ ) CfrTil_Context_PopDelete ( cfrTil ) ;
+        for ( i = 0 ; i < stackDepth ; i ++ ) CFT_Context_PopDelete ( cfrTil ) ;
     }
     SetState_TrueFalse ( cfrTil, CFRTIL_RUN, DEBUG_MODE ) ;
     SetState ( cfrTil->Debugger0, DBG_ACTIVE, false ) ;
@@ -20,10 +20,10 @@ CfrTil_RuntimeInit ( CfrTil * cfrTil, int64 cntxDelFlag )
     SetBuffersUnused ( 1 ) ;
     d0 ( Buffer_PrintBuffers ( ) ) ;
     DefaultColors ;
-    CfrTil_CheckInitDataStack ( ) ;
-    _CfrTil_TypeStackReset ( ) ;
-    _CfrTil_RecycleInit_Compiler_N_M_Node_WordList ( ) ;
-    CfrTil_UnsetQualifyingNamespace ( ) ;
+    CFT_CheckInitDataStack ( ) ;
+    _CFT_TypeStackReset ( ) ;
+    _CFT_RecycleInit_Compiler_N_M_Node_WordList ( ) ;
+    CFT_UnsetQualifyingNamespace ( ) ;
 }
 
 void
@@ -34,17 +34,17 @@ OVT_RuntimeInit ( )
 }
 
 void
-_CfrTil_Init_SessionCore ( CfrTil * cfrTil, Boolean cntxDelFlag, Boolean promptFlag )
+_CFT_Init_SessionCore ( CfrTil * cfrTil, Boolean cntxDelFlag, Boolean promptFlag )
 {
     Context * cntx = cfrTil->Context0 ;
     _System_Init ( cntx->System0 ) ;
-    ReadLine_Init ( cntx->ReadLiner0, _CfrTil_Key ) ;
+    ReadLine_Init ( cntx->ReadLiner0, _CFT_Key ) ;
     Lexer_Init ( cntx->Lexer0, 0, 0, CONTEXT ) ;
     Finder_Init ( cntx->Finder0 ) ;
     Compiler_Init ( cntx->Compiler0, 0 ) ;
     Interpreter_Init ( cntx->Interpreter0 ) ;
     if ( _LC_ ) LC_Init_Runtime ( ) ;
-    CfrTil_RuntimeInit ( cfrTil, cntxDelFlag ) ;
+    CFT_RuntimeInit ( cfrTil, cntxDelFlag ) ;
     OVT_RuntimeInit ( ) ;
     OVT_StartupMessage ( promptFlag && ( cfrTil->InitSessionCoreTimes < 2 ) ) ;
     cfrTil->InitSessionCoreTimes ++ ;
@@ -52,13 +52,13 @@ _CfrTil_Init_SessionCore ( CfrTil * cfrTil, Boolean cntxDelFlag, Boolean promptF
 }
 
 void
-CfrTil_SessionInit ( )
+CFT_SessionInit ( )
 {
-    _CfrTil_Init_SessionCore ( _CfrTil_, 0, 1 ) ;
+    _CFT_Init_SessionCore ( _CFT_, 0, 1 ) ;
 }
 
 void
-CfrTil_ResetAll_Init ( CfrTil * cfrTil )
+CFT_ResetAll_Init ( CfrTil * cfrTil )
 {
     byte * startDirectory = ( byte* ) "namespaces" ;
     if ( ! GetState ( _O_, OVT_IN_USEFUL_DIRECTORY ) ) startDirectory = ( byte* ) "/usr/local/lib/cfrTil64/namespaces" ;
@@ -66,26 +66,26 @@ CfrTil_ResetAll_Init ( CfrTil * cfrTil )
     if ( ( _O_->RestartCondition >= RESET_ALL ) )
     {
         _O_->StartIncludeTries = 0 ;
-        _CfrTil_Init_SessionCore ( cfrTil, 1, 0 ) ;
-        _CfrTil_Namespace_NotUsing ( ( byte* ) "BigNum" ) ;
-        _CfrTil_Namespace_NotUsing ( ( byte* ) "Lisp" ) ;
+        _CFT_Init_SessionCore ( cfrTil, 1, 0 ) ;
+        _CFT_Namespace_NotUsing ( ( byte* ) "BigNum" ) ;
+        _CFT_Namespace_NotUsing ( ( byte* ) "Lisp" ) ;
         if ( _O_->StartupFilename )
         {
             _O_->Verbosity = 0 ;
-            _CfrTil_ContextNew_IncludeFile ( ( byte* ) "./namespaces/sinit.cft" ) ;
-            _CfrTil_ContextNew_IncludeFile ( _O_->StartupFilename ) ;
+            _CFT_ContextNew_IncludeFile ( ( byte* ) "./namespaces/sinit.cft" ) ;
+            _CFT_ContextNew_IncludeFile ( _O_->StartupFilename ) ;
         }
         else
         {
             if ( ! _O_->StartIncludeTries ++ )
             {
-                _CfrTil_ContextNew_InterpretString ( cfrTil, _O_->InitString ) ;
-                _CfrTil_ContextNew_InterpretString ( cfrTil, _O_->StartupString ) ;
+                _CFT_ContextNew_InterpretString ( cfrTil, _O_->InitString ) ;
+                _CFT_ContextNew_InterpretString ( cfrTil, _O_->StartupString ) ;
             }
             else if ( _O_->StartIncludeTries < 3 )
             {
                 AlertColors ;
-                _CfrTil_ContextNew_IncludeFile ( ( byte* ) "./namespaces/init.cft" ) ;
+                _CFT_ContextNew_IncludeFile ( ( byte* ) "./namespaces/init.cft" ) ;
                 if ( _O_->ErrorFilename )
                 {
                     if ( strcmp ( ( char* ) _O_->ErrorFilename, "Debug Context" ) )
@@ -106,10 +106,10 @@ CfrTil_ResetAll_Init ( CfrTil * cfrTil )
 }
 
 void
-_CfrTil_InitialAddWordToNamespace ( Word * word, byte * containingNamespaceName, byte * superNamespaceName )
+_CFT_InitialAddWordToNamespace ( Word * word, byte * containingNamespaceName, byte * superNamespaceName )
 // this is only called at startup where we want to add the namespace to the RootNamespace
 {
-    Namespace *ns, *sns = _CfrTil_->Namespaces ;
+    Namespace *ns, *sns = _CFT_->Namespaces ;
     if ( superNamespaceName )
     {
         sns = Namespace_FindOrNew_SetUsing ( superNamespaceName, sns, 1 ) ;
@@ -120,12 +120,12 @@ _CfrTil_InitialAddWordToNamespace ( Word * word, byte * containingNamespaceName,
 }
 
 void
-_CfrTil_CPrimitiveNewAdd ( const char * name, byte * pb_TypeSignature, uint64 opInsnGroup, uint64 opInsCode, block b, uint64 morphismAttributes,
+_CFT_CPrimitiveNewAdd ( const char * name, byte * pb_TypeSignature, uint64 opInsnGroup, uint64 opInsCode, block b, uint64 morphismAttributes,
     uint64 objectAttributes, uint64 lispAttributes, const char *nameSpace, const char * superNamespace )
 {
     Word * word = _Word_New ( ( byte* ) name, CPRIMITIVE | morphismAttributes, objectAttributes, lispAttributes, 1, 0, DICTIONARY ) ;
     _DObject_ValueDefinition_Init ( word, ( int64 ) b, BLOCK, 0, 0 ) ;
-    _CfrTil_InitialAddWordToNamespace ( word, ( byte* ) nameSpace, ( byte* ) superNamespace ) ;
+    _CFT_InitialAddWordToNamespace ( word, ( byte* ) nameSpace, ( byte* ) superNamespace ) ;
     if ( morphismAttributes & INFIXABLE ) word->W_TypeAttributes = WT_INFIXABLE ;
     else if ( morphismAttributes & PREFIX ) word->W_TypeAttributes = WT_PREFIX ;
     else if ( morphismAttributes & C_PREFIX_RTL_ARGS ) word->W_TypeAttributes = WT_C_PREFIX_RTL_ARGS ;
@@ -139,14 +139,14 @@ _CfrTil_CPrimitiveNewAdd ( const char * name, byte * pb_TypeSignature, uint64 op
 }
 
 void
-CfrTil_AddCPrimitives ( )
+CFT_AddCPrimitives ( )
 {
     int64 i ;
     for ( i = 0 ; CPrimitives [ i ].ccp_Name ; i ++ )
     {
         CPrimitive p = CPrimitives [ i ] ;
-        _CfrTil_CPrimitiveNewAdd ( p.ccp_Name, ( byte* ) p.pb_TypeSignature, p.OpInsnCodeGroup, p.OpInsnCode, p.blk_Definition, p.ui64_CAttribute, p.ui64_CAttribute2, p.ui64_LAttribute, ( char* ) p.NameSpace, ( char* ) p.SuperNamespace ) ;
+        _CFT_CPrimitiveNewAdd ( p.ccp_Name, ( byte* ) p.pb_TypeSignature, p.OpInsnCodeGroup, p.OpInsnCode, p.blk_Definition, p.ui64_CAttribute, p.ui64_CAttribute2, p.ui64_LAttribute, ( char* ) p.NameSpace, ( char* ) p.SuperNamespace ) ;
     }
-    //_CfrTil_CPrimitiveNewAdd ( p.ccp_Name, p.blk_Definition, p.ui64_CAttribute, p.ui64_CAttribute2, p.ui64_LAttribute, ( char* ) p.NameSpace, ( char* ) p.SuperNamespace ) ;
+    //_CFT_CPrimitiveNewAdd ( p.ccp_Name, p.blk_Definition, p.ui64_CAttribute, p.ui64_CAttribute2, p.ui64_LAttribute, ( char* ) p.NameSpace, ( char* ) p.SuperNamespace ) ;
 }
 

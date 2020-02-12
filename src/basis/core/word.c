@@ -26,7 +26,7 @@ Word_Eval ( Word * word )
             if ( ! ( GetState ( word, STEPPED ) ) )
             {
                 _Context_->CurrentEvalWord = word ;
-                if ( IS_MORPHISM_TYPE ( word ) ) CfrTil_Typecheck ( word ) ;
+                if ( IS_MORPHISM_TYPE ( word ) ) CFT_Typecheck ( word ) ;
                 DEBUG_SETUP ( word ) ;
                 if ( ( word->W_MorphismAttributes & IMMEDIATE ) || ( ! CompileMode ) ) Word_Run ( word ) ;
                 else _Word_Compile ( word ) ;
@@ -50,8 +50,8 @@ void
 _Word_Compile ( Word * word )
 {
     Compiler_SCA_Word_SetCodingHere_And_ClearPreviousUse ( word, 0 ) ;
-    if ( ! word->Definition ) CfrTil_SetupRecursiveCall ( ) ;
-    else if ( ( GetState ( _CfrTil_, INLINE_ON ) ) && ( word->W_MorphismAttributes & INLINE ) && ( word->S_CodeSize ) ) _Compile_WordInline ( word ) ;
+    if ( ! word->Definition ) CFT_SetupRecursiveCall ( ) ;
+    else if ( ( GetState ( _CFT_, INLINE_ON ) ) && ( word->W_MorphismAttributes & INLINE ) && ( word->S_CodeSize ) ) _Compile_WordInline ( word ) ;
     else Compile_CallWord_Check_X84_ABI_RSP_ADJUST ( word ) ;
 }
 
@@ -85,10 +85,10 @@ void
 _Word_Finish ( Word * word )
 {
     DObject_Finish ( word ) ;
-    CfrTil_Finish_WordSourceCode ( _CfrTil_, word ) ;
-    CfrTil_TypeStackReset ( ) ;
-    _CfrTil_->LastFinished_Word = word ;
-    _CfrTil_FinishWordDebugInfo ( word ) ;
+    CFT_Finish_WordSourceCode ( _CFT_, word ) ;
+    CFT_TypeStackReset ( ) ;
+    _CFT_->LastFinished_Word = word ;
+    _CFT_FinishWordDebugInfo ( word ) ;
 }
 
 void
@@ -101,7 +101,7 @@ void
 Word_InitFinal ( Word * word, byte * code )
 {
     _Word_DefinitionStore ( word, ( block ) code ) ;
-    if ( ! word->S_ContainingNamespace ) _Word_Add ( word, 1, 0 ) ; // don't re-add if it is a recursive word cf. CfrTil_BeginRecursiveWord
+    if ( ! word->S_ContainingNamespace ) _Word_Add ( word, 1, 0 ) ; // don't re-add if it is a recursive word cf. CFT_BeginRecursiveWord
     _Word_Finish ( word ) ;
 }
 
@@ -110,11 +110,11 @@ _Word_Add ( Word * word, int64 addToInNs, Namespace * addToNs )
 {
     Namespace * ins = 0, *ns ;
     if ( addToNs ) Namespace_DoAddWord ( addToNs, word ) ;
-    else if ( addToInNs ) 
+    else if ( addToInNs )
     {
         if ( ! ( word->W_ObjectAttributes & ( LITERAL ) ) )
         {
-            Namespace * ins = _CfrTil_InNamespace ( ) ; //_CfrTil_Namespace_InNamespaceGet ( ) ;
+            Namespace * ins = _CFT_InNamespace ( ) ; //_CFT_Namespace_InNamespaceGet ( ) ;
             Namespace_DoAddWord ( ins, word ) ;
         }
     }
@@ -154,7 +154,7 @@ _Word_Create ( byte * name, uint64 morphismType, uint64 objectType, uint64 lispT
     word->W_LispAttributes = lispType ;
     if ( Is_NamespaceType ( word ) ) word->Lo_List = dllist_New ( ) ;
     _Compiler_->Current_Word_Create = word ;
-    _CfrTil_->WordCreateCount ++ ;
+    _CFT_->WordCreateCount ++ ;
     Lexer_Set_ScIndex_RlIndex ( _Lexer_, word, - 1, - 1 ) ; // default values
     Word_SetCodingAndSourceCoding ( word, Here ) ;
     return word ;
@@ -217,7 +217,7 @@ Word_PrintOffset ( Word * word, int64 offset, int64 totalOffset )
 byte *
 _Word_SourceCodeLocation_pbyte ( Word * word )
 {
-    byte * b = Buffer_Data ( _CfrTil_->ScratchB2 ) ;
+    byte * b = Buffer_Data ( _CFT_->ScratchB2 ) ;
     if ( word ) sprintf ( ( char* ) b, "%s.%s : %s %ld.%ld", word->ContainingNamespace->Name, word->Name, word->S_WordData->Filename, word->S_WordData->LineNumber, word->W_TokenEnd_ReadLineIndex ) ;
     return String_New ( b, TEMPORARY ) ;
 }
@@ -261,14 +261,15 @@ Word_N_M_Node_Print ( dlnode * node )
 }
 
 void
-_Word_ShowSourceCode ( Word * word )
+_Word_ShowSourceCode ( Word * word0 )
 {
+    Word * word = Word_UnAlias ( word0 ) ;
     if ( word && word->S_WordData ) //&& word->W_SourceCode ) //word->CAttribute & ( CPRIMITIVE | BLOCK ) )
     {
-        byte * sc, * name, *scd ;
-        if (( ! ( word->W_MorphismAttributes & CPRIMITIVE ) ) && word->W_SourceCode )
+        byte * name, *scd ;
+        if ( ( ! ( word->W_MorphismAttributes & CPRIMITIVE ) ) && word->W_SourceCode )
         {
-            byte * sc = Buffer_Data_Cleared ( _CfrTil_->ScratchB1 ) ;
+            byte * sc = Buffer_Data_Cleared ( _CFT_->ScratchB1 ) ;
             sc = _String_ConvertStringToBackSlash ( sc, word->W_SourceCode, BUF_IX_SIZE ) ;
             scd = c_gd ( String_FilterMultipleSpaces ( sc, TEMPORARY ) ) ;
         }
@@ -287,7 +288,7 @@ Word_GetLocalsSourceCodeString ( Word * word, byte * buffer )
     for ( s = 0 ; sc [ s ] && sc [ s ] != '(' ; s ++ ) ;
     if ( sc [ s ] )
     {
-        start = & sc [ s + 1 ] ; // right after '(' is how _CfrTil_Parse_LocalsAndStackVariables is set up
+        start = & sc [ s + 1 ] ; // right after '(' is how _CFT_Parse_LocalsAndStackVariables is set up
         for ( e = s ; sc [ e ] && sc [ e ] != ')' ; e ++ ) ; // end = & sc [ e ] ;
         if ( sc [ e ] )
         {
@@ -301,7 +302,7 @@ Word_GetLocalsSourceCodeString ( Word * word, byte * buffer )
 void
 Word_ShowSourceCode ( Word * word )
 {
-    _CfrTil_Source ( word, 0 ) ;
+    _CFT_Source ( word, 0 ) ;
 }
 
 Word *
@@ -317,15 +318,50 @@ Word_GetFromCodeAddress_NoAlias ( byte * address )
 }
 
 void
-_CfrTil_WordName_Run ( byte * name )
+_CFT_WordName_Run ( byte * name )
 {
     Block_Eval ( Finder_Word_FindUsing ( _Context_->Finder0, name, 0 )->Definition ) ;
 }
 
+#if 1
+
+Word *
+_CFT_TypedefAlias ( Word * word, byte * name, Namespace * addToNs )
+{
+    Word * alias = 0 ;
+    if ( word && word->Definition )
+    {
+        alias = _Word_New ( name, word->W_MorphismAttributes | ALIAS, word->W_ObjectAttributes, word->W_LispAttributes, 0, addToNs, DICTIONARY ) ; // inherit type from original word
+        word = Word_UnAlias ( word ) ;
+        //Word_InitFinal ( alias, ( byte* ) word->Definition ) ;
+        _Word_DefinitionStore ( alias, ( block ) word->Definition ) ;
+        //if ( ! word->S_ContainingNamespace ) _Word_Add ( word, 0, addToNs ) ; // don't re-add if it is a recursive word cf. CFT_BeginRecursiveWord
+        DObject_Finish ( alias ) ;
+        //CFT_Finish_WordSourceCode ( _CFT_, word ) ;
+        CFT_TypeStackReset ( ) ;
+        _CFT_->LastFinished_Word = alias ;
+        //_CFT_FinishWordDebugInfo ( word ) ;
+        alias->S_CodeSize = word->S_CodeSize ;
+        alias->W_AliasOf = word ;
+        alias->Size = word->Size ;
+        //alias->NamespaceStack = word->NamespaceStack ;
+        //Strncpy ( alias->W_TypeSignatureString, word->W_TypeSignatureString, 8 ) ;
+        if ( ! word->W_SourceCode )
+        {
+            CFT_Finish_WordSourceCode ( _CFT_, word ) ;
+            alias->W_SourceCode = word->W_SourceCode ;
+        }
+        else CFT_Finish_WordSourceCode ( _CFT_, alias ) ;
+        //alias->W_SourceCode = _CFT_GetSourceCode ( ) ;
+    }
+    else Exception ( USEAGE_ERROR, ABORT ) ;
+    return alias ;
+}
+#endif
 // alias : postfix
 
 Word *
-_CfrTil_Alias (Word * word, byte * name , Namespace * addToNs)
+_CFT_Alias ( Word * word, byte * name, Namespace * addToNs )
 {
     Word * alias = 0 ;
     if ( word && word->Definition )
@@ -337,7 +373,7 @@ _CfrTil_Alias (Word * word, byte * name , Namespace * addToNs)
         alias->W_AliasOf = word ;
         alias->Size = word->Size ;
         alias->NamespaceStack = word->NamespaceStack ;
-        Strncpy ( alias->W_TypeSignatureString, word->W_TypeSignatureString, 7 ) ;
+        Strncpy ( alias->W_TypeSignatureString, word->W_TypeSignatureString, 8 ) ;
     }
     else Exception ( USEAGE_ERROR, ABORT ) ;
     return alias ;
@@ -362,7 +398,7 @@ Do_StringMacro ( )
 }
 
 void
-_CfrTil_Macro ( int64 mtype, byte * function )
+_CFT_Macro ( int64 mtype, byte * function )
 {
     byte * name = _Word_Begin ( ), *macroString ;
     macroString = Parse_Macro ( mtype ) ;

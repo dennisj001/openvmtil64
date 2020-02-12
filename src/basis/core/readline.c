@@ -181,7 +181,7 @@ ReadLine_New ( uint64 type )
     ReadLiner * rl = ( ReadLiner * ) Mem_Allocate ( sizeof (ReadLiner ), type ) ;
     rl->TabCompletionInfo0 = TabCompletionInfo_New ( type ) ;
     rl->TciNamespaceStack = Stack_New ( 64, type ) ;
-    ReadLine_Init ( rl, _CfrTil_Key ) ;
+    ReadLine_Init ( rl, _CFT_Key ) ;
     return rl ;
 }
 
@@ -384,13 +384,13 @@ ReadLiner_InsertTextMacro ( ReadLiner * rl, Word * word )
     int64 nlen = ( Strlen ( ( char* ) word->Name ) + 1 ) ;
     String_InsertDataIntoStringSlot ( rl->InputLine, rl->ReadIndex - nlen, rl->ReadIndex, ( byte* ) word->W_Value ) ; // size in bytes
     rl->ReadIndex -= nlen ;
-    _CfrTil_UnAppendFromSourceCode_NChars ( _CfrTil_, nlen ) ;
+    _CFT_UnAppendFromSourceCode_NChars ( _CFT_, nlen ) ;
 }
 
 void
 ReadLine_DeleteChar ( ReadLiner * rl )
 {
-    byte * b = Buffer_Data ( _CfrTil_->ScratchB2 ) ;
+    byte * b = Buffer_Data ( _CFT_->ScratchB2 ) ;
     if ( -- rl->EndPosition < 0 ) rl->EndPosition = 0 ;
     if ( rl->CursorPosition > rl->EndPosition )// shouldn't ever be greater but this will be more robust
     {
@@ -456,14 +456,14 @@ Readline_Setup_OneStringInterpret ( ReadLiner * rl, byte * str )
 void
 Readline_SaveInputLine ( ReadLiner * rl )
 {
-    byte * svLine = Buffer_Data ( _CfrTil_->InputLineB ) ;
+    byte * svLine = Buffer_Data ( _CFT_->InputLineB ) ;
     strcpy ( ( char* ) svLine, ( char* ) rl->InputLine ) ;
 }
 
 void
 Readline_RestoreInputLine ( ReadLiner * rl )
 {
-    byte * svLine = Buffer_Data ( _CfrTil_->InputLineB ) ;
+    byte * svLine = Buffer_Data ( _CFT_->InputLineB ) ;
     strcpy ( ( char* ) rl->InputLine, ( char* ) svLine ) ;
 }
 
@@ -482,7 +482,7 @@ Boolean
 _Readline_Is_AtEndOfBlock ( ReadLiner * rl0 )
 {
     ReadLiner * rl = ReadLine_Copy ( rl0, COMPILER_TEMP ) ;
-    Word * word = CfrTil_WordList ( 0 ) ;
+    Word * word = CFT_WordList ( 0 ) ;
     int64 iz, ib, index = word->W_RL_Index + Strlen ( word->Name ), sd = _Stack_Depth ( _Context_->Compiler0->BlockStack ) ;
     byte c ;
     for ( ib = false, iz = false ; 1 ; iz = false )
@@ -496,7 +496,7 @@ _Readline_Is_AtEndOfBlock ( ReadLiner * rl0 )
             ib = 1 ; // b : bracket
             continue ;
         }
-        if ( ( c == '/' ) && ( rl->InputLine [ index ] == '/' ) ) CfrTil_CommentToEndOfLine ( ) ;
+        if ( ( c == '/' ) && ( rl->InputLine [ index ] == '/' ) ) CFT_CommentToEndOfLine ( ) ;
         else if ( ib && ( c > ' ' ) && ( c != ';' ) ) return false ;
     }
     return false ;
@@ -594,7 +594,7 @@ _ReadLine_GetLine ( ReadLiner * rl, byte c )
         else ReadLine_Set_Key ( rl, c ), c = 0 ;
 
         if ( AtCommandLine ( rl ) ) _ReadLine_TabCompletion_Check ( rl ) ;
-        _CfrTil_->ReadLine_FunctionTable [ _CfrTil_->ReadLine_CharacterTable [ rl->InputKeyedCharacter ] ] ( rl ) ;
+        _CFT_->ReadLine_FunctionTable [ _CFT_->ReadLine_CharacterTable [ rl->InputKeyedCharacter ] ] ( rl ) ;
         SetState ( rl, ANSI_ESCAPE, false ) ;
     }
     return rl->InputKeyedCharacter ;

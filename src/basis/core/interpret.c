@@ -1,6 +1,7 @@
 
 #include "../../include/cfrtil64.h"
 
+// could be integrated with Lexer_ParseToken_ToWord ??
 Word *
 _Interpreter_TokenToWord ( Interpreter * interp, byte * token, int64 tsrli, int64 scwi )
 {
@@ -11,7 +12,7 @@ _Interpreter_TokenToWord ( Interpreter * interp, byte * token, int64 tsrli, int6
     {
         interp->Token = token ;
         cntx->CurrentToken = token ;
-        word = Lexer_ObjectToken_New ( interp->Lexer0, token, tsrli, scwi ) ;
+        word = Lexer_ParseToken_ToWord ( interp->Lexer0, token, tsrli, scwi ) ;
         Word_SetTsrliScwi ( word, tsrli, scwi ) ;
         DEBUG_SETUP ( word ) ;
         cntx->CurrentTokenWord = word ; // dbg flag
@@ -26,6 +27,7 @@ Interpreter_InterpretAToken ( Interpreter * interp, byte * token, int64 tsrli, i
     Word * word = 0 ;
     if ( token )
     {
+        interp->Token = token ;
         word = _Interpreter_TokenToWord ( interp, token, tsrli, scwi ) ;
         Interpreter_DoWord ( interp, word, tsrli, scwi ) ;
     }
@@ -125,7 +127,7 @@ Interpreter_DoWord ( Interpreter * interp, Word * word, int64 tsrli, int64 scwi 
         interp->w_Word = word ;
         if ( ! Interpreter_DoInfixOrPrefixWord ( interp, word ) ) Interpreter_DoWord_Default ( interp, word, tsrli, scwi ) ; //  case WT_POSTFIX: case WT_INFIXABLE: // cf. also _Interpreter_SetupFor_MorphismWord
         if ( ! ( word->W_MorphismAttributes & DEBUG_WORD ) ) interp->LastWord = word ;
-        if ( ! GetState ( _Context_, ( C_SYNTAX ) ) ) List_InterpretLists ( _Compiler_->PostfixLists ) ; // with C_SYNTAX this is done in by _CfrTil_C_Infix_EqualOp or CfrTil_Interpret_C_Blocks
+        if ( ! GetState ( _Context_, ( C_SYNTAX ) ) ) List_InterpretLists ( _Compiler_->PostfixLists ) ; // with C_SYNTAX this is done in by _CFT_C_Infix_EqualOp or CFT_Interpret_C_Blocks
     }
 }
 // interpret with find after parse for known objects

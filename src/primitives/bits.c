@@ -3,12 +3,12 @@
 // ( n ttt -- )
 
 void
-CfrTil_JMP ( )
+CFT_JMP ( )
 {
     if ( CompileMode )
     {
         byte * compiledAtAddress = Compile_UninitializedJump ( ) ; // at the end of the 'if block' we need to jmp over the 'else block'
-        CfrTil_CalculateAndSetPreviousJmpOffset_ToHere ( ) ;
+        CFT_CalculateAndSetPreviousJmpOffset_ToHere ( ) ;
         Stack_Push_PointerToJmpOffset (compiledAtAddress) ;
     }
     else
@@ -18,7 +18,7 @@ CfrTil_JMP ( )
 }
 
 void
-CfrTil_Compile_Jcc ( )
+CFT_Compile_Jcc ( )
 {
     int64 ttt = DataStack_Pop ( ) ;
     int64 n = DataStack_Pop ( ) ;
@@ -27,7 +27,7 @@ CfrTil_Compile_Jcc ( )
 }
 
 void
-CfrTil_Jcc_Label ( )
+CFT_Jcc_Label ( )
 {
     int64 ttt = DataStack_Pop ( ) ;
     int64 n = DataStack_Pop ( ) ;
@@ -36,13 +36,13 @@ CfrTil_Jcc_Label ( )
 }
 
 void
-CfrTil_JmpToHere ( )
+CFT_JmpToHere ( )
 {
-    CfrTil_CalculateAndSetPreviousJmpOffset_ToHere ( ) ;
+    CFT_CalculateAndSetPreviousJmpOffset_ToHere ( ) ;
 }
 
 void
-CfrTil_BitWise_NOT ( ) // xor
+CFT_BitWise_NOT ( ) // xor
 {
     if ( CompileMode )
     {
@@ -56,7 +56,7 @@ CfrTil_BitWise_NOT ( ) // xor
 }
 
 void
-CfrTil_BitWise_NEG ( ) // xor
+CFT_BitWise_NEG ( ) // xor
 {
     if ( CompileMode )
     {
@@ -69,7 +69,7 @@ CfrTil_BitWise_NEG ( ) // xor
 }
 
 void
-CfrTil_BitWise_OR ( ) // xor
+CFT_BitWise_OR ( ) // xor
 {
     if ( CompileMode )
     {
@@ -83,11 +83,11 @@ CfrTil_BitWise_OR ( ) // xor
 }
 
 void
-CfrTil_BitWise_OrEqual ( ) // -=
+CFT_BitWise_OrEqual ( ) // -=
 {
     if ( CompileMode )
     {
-        Compile_X_OpEqual ( _Context_->Compiler0, CfrTil_BitWise_OR ) ; //OR ) ;
+        Compile_X_OpEqual ( _Context_->Compiler0, CFT_BitWise_OR ) ; //OR ) ;
     }
     else
     {
@@ -96,12 +96,12 @@ CfrTil_BitWise_OrEqual ( ) // -=
         x = ( int64* ) DataStack_Pop ( ) ;
         *x = ( * x ) | n ;
         //_DataStack_SetTop ( Dsp, _DataStack_Pop () + _DataStack_GetTop ( Dsp ) ) ;
-        //_CfrTil_->set_DspReg_FromDataStackPointer ( ) ; // update DSP reg
+        //CFT->set_DspReg_FromDataStackPointer ( ) ; // update DSP reg
     }
 }
 
 void
-CfrTil_BitWise_AND ( ) // xor
+CFT_BitWise_AND ( ) // xor
 {
     if ( CompileMode )
     {
@@ -115,11 +115,11 @@ CfrTil_BitWise_AND ( ) // xor
 }
 
 void
-CfrTil_BitWise_AndEqual ( ) // -=
+CFT_BitWise_AndEqual ( ) // -=
 {
     if ( CompileMode )
     {
-        Compile_X_OpEqual ( _Context_->Compiler0, CfrTil_BitWise_AND ) ; //AND ) ;
+        Compile_X_OpEqual ( _Context_->Compiler0, CFT_BitWise_AND ) ; //AND ) ;
     }
     else
     {
@@ -132,7 +132,7 @@ CfrTil_BitWise_AndEqual ( ) // -=
 }
 
 void
-CfrTil_BitWise_XOR ( ) // xor
+CFT_BitWise_XOR ( ) // xor
 {
     if ( CompileMode )
     {
@@ -146,11 +146,11 @@ CfrTil_BitWise_XOR ( ) // xor
 }
 
 void
-CfrTil_BitWise_XorEqual ( ) // -=
+CFT_BitWise_XorEqual ( ) // -=
 {
     if ( CompileMode )
     {
-        Compile_X_OpEqual ( _Context_->Compiler0, CfrTil_BitWise_XOR ) ; //XOR ) ;
+        Compile_X_OpEqual ( _Context_->Compiler0, CFT_BitWise_XOR ) ; //XOR ) ;
     }
     else
     {
@@ -163,7 +163,7 @@ CfrTil_BitWise_XorEqual ( ) // -=
 }
 
 void
-CfrTil_ShiftLeft ( ) // lshift
+CFT_ShiftLeft ( ) // lshift
 {
     if ( CompileMode )
     {
@@ -177,7 +177,7 @@ CfrTil_ShiftLeft ( ) // lshift
 }
 
 void
-CfrTil_ShiftRight ( ) // rshift
+CFT_ShiftRight ( ) // rshift
 {
     if ( CompileMode )
     {
@@ -191,13 +191,13 @@ CfrTil_ShiftRight ( ) // rshift
 }
 
 void
-CfrTil_ShiftLeft_Equal ( ) // <<=
+CFT_ShiftLeft_Equal ( ) // <<=
 {
     Compiler * compiler = _Context_->Compiler0 ;
     if ( GetState ( compiler, BLOCK_MODE ) )
     {
         //Compile_X_Shift ( compiler, SHL, 0, 1 ) ;
-        Compile_X_OpEqual ( _Compiler_, CfrTil_ShiftLeft ) ;
+        Compile_X_OpEqual ( _Compiler_, CFT_ShiftLeft ) ;
     }
     else
     {
@@ -210,12 +210,12 @@ CfrTil_ShiftLeft_Equal ( ) // <<=
 }
 
 void
-CfrTil_ShiftRight_Equal ( ) // >>=
+CFT_ShiftRight_Equal ( ) // >>=
 {
     if ( GetState ( _Context_->Compiler0, BLOCK_MODE ) )
     {
         //Compile_X_Shift ( _Context_->Compiler0, SHR, 0, 1 ) ;
-        Compile_X_OpEqual ( _Compiler_, CfrTil_ShiftRight ) ;
+        Compile_X_OpEqual ( _Compiler_, CFT_ShiftRight ) ;
     }
     else
     {

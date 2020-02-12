@@ -4,7 +4,7 @@
 #define _ReadLine_SetFinalCharacter( rl, chr ) rl->InputBuffer [ rl->EndPosition ] = chr 
 
 void
-CfrTil_ReadTables_Setup ( CfrTil * cfrl )
+CFT_ReadTables_Setup ( CfrTil * cfrl )
 {
     int64 i ;
     for ( i = 0 ; i < 256 ; i ++ )
@@ -73,9 +73,9 @@ void
 ReadTable_LParen ( ReadLiner * rl )
 {
 #if MARU || MARU_2_4 || MARU_NILE
-    if ( ( rl->InputFile != stdin ) && _CfrTil_->InNamespace )
+    if ( ( rl->InputFile != stdin ) && _CFT_->InNamespace )
     {
-        if ( String_Equal ( ( CString ) _CfrTil_->InNamespace->s_Symbol.S_Name, "Maru" ) )
+        if ( String_Equal ( ( CString ) _CFT_->InNamespace->s_Symbol.S_Name, "Maru" ) )
         {
             ungetc ( rl->InputKeyedCharacter, rl->InputFile ) ;
             Maru_RawReadFlag = 1 ;
@@ -105,7 +105,7 @@ ReadTable_0x03 ( ReadLiner * rl ) //  <CTRL-C>
     {
         ReadTable_Zero ( rl ) ;
     }
-    else CfrTil_Quit ( ) ;
+    else CFT_Quit ( ) ;
 }
 
 void
@@ -115,7 +115,7 @@ ReadTable_0x04 ( ReadLiner * rl ) // <CTRL-D>
     {
         ReadTable_Zero ( rl ) ;
     }
-    else CfrTil_FullRestart ( ) ; //CfrTil_RestartInit ( ) ;
+    else CFT_FullRestart ( ) ; //CFT_RestartInit ( ) ;
 }
 
 void
@@ -146,7 +146,7 @@ ReadTable_Zero ( ReadLiner * rl ) // eof
 {
     if ( _LC_ && GetState ( _LC_, LC_REPL ) )
     {
-        ReadLine_Init ( _Context_->ReadLiner0, _CfrTil_Key ) ;
+        ReadLine_Init ( _Context_->ReadLiner0, _CFT_Key ) ;
     }
     else
     {

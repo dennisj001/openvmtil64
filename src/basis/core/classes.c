@@ -3,13 +3,13 @@
 // we don't want the classes semantics when interpreting
 
 void
-CfrTil_ClassStructureEnd ( void )
+CFT_ClassStructureEnd ( void )
 {
     Namespace_RemoveFromUsingList_WithCheck ( ( byte* ) "Class" ) ;
 }
 
 void
-CfrTil_CloneStructureBegin ( void )
+CFT_CloneStructureBegin ( void )
 {
     TypeDefStructCompileInfo * tdsci = _Compiler_->C_Tdsci = TypeDefStructCompileInfo_New ( ) ;
     SetState ( tdsci, TDSCI_CLONE_FLAG, true ) ;
@@ -37,8 +37,8 @@ _ClassTypedef ( Boolean cloneFlag )
 }
 
 void
-CfrTil_ClassTypedef ( )
+CFT_ClassTypedef ( )
 {
-    CfrTil_PushToken_OnTokenList ( "{" ) ;
+    CFT_PushToken_OnTokenList ( "{" ) ;
     _ClassTypedef ( 0 ) ;
 }

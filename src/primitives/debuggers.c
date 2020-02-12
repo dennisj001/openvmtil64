@@ -1,28 +1,28 @@
 #include "../include/cfrtil64.h"
 
 void
-CfrTil_Debug_AtAddress ( )
+CFT_Debug_AtAddress ( )
 {
     byte * address ;
     address = ( byte* ) DataStack_Pop ( ) ;
-    _CfrTil_Debug_AtAddress ( address ) ;
+    _CFT_Debug_AtAddress ( address ) ;
 }
 
 void
-_CfrTil_Debugger_Locals_Show ( )
+_CFT_Debugger_Locals_Show ( )
 {
     Debugger_Locals_Show ( _Debugger_ ) ;
     //Pause ( ) ;
 }
 
 void
-CfrTil_Debugger_Locals_Show ( )
+CFT_Debugger_Locals_Show ( )
 {
-    if ( GetState ( _Debugger_, DBG_AUTO_MODE ) ) _CfrTil_Debugger_Locals_Show ( ) ;
+    if ( GetState ( _Debugger_, DBG_AUTO_MODE ) ) _CFT_Debugger_Locals_Show ( ) ;
 }
 
 void
-_CfrTil_DebugInfo ( )
+_CFT_DebugInfo ( )
 {
     Debugger_ShowInfo ( _Debugger_, ( byte* ) "\ninfo", 0 ) ;
 }
@@ -30,23 +30,23 @@ _CfrTil_DebugInfo ( )
 // put this '<dbg>' into cfrtil code for a runtime break into the debugger
 
 void
-CfrTil_DebugInfo ( )
+CFT_DebugInfo ( )
 {
     if ( _O_->Verbosity )
     {
-        _CfrTil_DebugInfo ( ) ;
+        _CFT_DebugInfo ( ) ;
         Debugger_Source ( _Debugger_ ) ;
     }
 }
 
 void
-CfrTil_DebugOn ( )
+CFT_DebugOn ( )
 {
     Context * cntx = _Context_ ;
     Debugger * debugger = _Debugger_ ;
     if ( ! Is_DebugOn )
     {
-        if ( _O_->Verbosity > 1 ) _Printf ( ( byte* ) "\nCfrTil_DebugOn : at %s", Context_Location ( ) ) ;
+        if ( _O_->Verbosity > 1 ) _Printf ( ( byte* ) "\nCFT_DebugOn : at %s", Context_Location ( ) ) ;
         debugger->DebugRSP = 0 ;
         Debugger_On ( debugger ) ;
     }
@@ -56,7 +56,7 @@ CfrTil_DebugOn ( )
 }
 
 void
-CfrTil_DebugOff ( )
+CFT_DebugOff ( )
 {
     Debugger_Off ( _Debugger_, 1 ) ;
 }
@@ -93,19 +93,19 @@ DebugRuntimeBreakpoint ( )
 }
 
 void
-CfrTil_DebugRuntimeBreakpoint ( )
+CFT_DebugRuntimeBreakpoint ( )
 {
     if ( ( ! CompileMode ) ) DebugRuntimeBreakpoint ( ) ;
 }
 
 void
-CfrTil_DebugRuntimeBreakpoint_IsDebugShowOn ( )
+CFT_DebugRuntimeBreakpoint_IsDebugShowOn ( )
 {
     if ( Is_DebugShowOn ) DebugRuntimeBreakpoint ( ) ;
 }
 
 void
-CfrTil_DebugRuntimeBreakpoint_IsDebugOn ( )
+CFT_DebugRuntimeBreakpoint_IsDebugOn ( )
 {
     if ( Is_DebugOn ) DebugRuntimeBreakpoint ( ) ;
 }

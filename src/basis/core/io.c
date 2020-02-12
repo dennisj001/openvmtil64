@@ -86,21 +86,21 @@ Key ( )
 }
 
 byte
-_CfrTil_Key ( ReadLiner * rl )
+_CFT_Key ( ReadLiner * rl )
 {
     int key = _Key ( rl->InputFile ) ;
     return (byte) key ;
 }
 
 void
-_CfrTil_PrintString ( byte * string ) //  '."'
+_CFT_PrintString ( byte * string ) //  '."'
 {
     printf ( "%s", string ) ;
     fflush ( stdout ) ;
 }
 
 void
-_CfrTil_PrintChar ( byte c ) //  '."'
+_CFT_PrintChar ( byte c ) //  '."'
 {
     printf ( "%c", c ) ;
     fflush ( stdout ) ;
@@ -109,7 +109,7 @@ _CfrTil_PrintChar ( byte c ) //  '."'
 void
 Emit ( byte c )
 {
-    _CfrTil_PrintChar ( c ) ;
+    _CFT_PrintChar ( c ) ;
 }
 
 void
@@ -117,13 +117,13 @@ Context_DoPrompt ( Context * cntx )
 {
     if ( ( ReadLiner_GetLastChar ( ) != '\n' ) || ( ! IS_INCLUDING_FILES ) || ( GetState ( _Debugger_, DBG_ACTIVE ) ) )
     {
-        _CfrTil_PrintChar ( '\n' ) ; //_Printf ( ( byte* ) "\n" ) ;
+        _CFT_PrintChar ( '\n' ) ; //_Printf ( ( byte* ) "\n" ) ;
     }
     _Printf ( ( byte* ) "%s", ( char* ) cntx->ReadLiner0->NormalPrompt ) ; // for when including files
 }
 
 void
-CfrTil_DoPrompt ( )
+CFT_DoPrompt ( )
 {
     Context_DoPrompt ( _Context_ ) ;
 }
@@ -143,12 +143,12 @@ _Printf ( byte *format, ... )
         va_end ( args ) ;
         fflush ( stdout ) ;
 
-        if ( _CfrTil_ && _CfrTil_->LogFlag && _CfrTil_->LogFILE )
+        if ( _CFT_ && _CFT_->LogFlag && _CFT_->LogFILE )
         {
             va_start ( args, ( char* ) format ) ;
-            vfprintf ( _CfrTil_->LogFILE, ( char* ) format, args ) ;
+            vfprintf ( _CFT_->LogFILE, ( char* ) format, args ) ;
             va_end ( args ) ;
-            fflush ( _CfrTil_->LogFILE ) ;
+            fflush ( _CFT_->LogFILE ) ;
         }
     }
     //ReadLiner_SetLastChar ( 0 ) ; //
@@ -160,12 +160,12 @@ _Printf ( byte *format, ... )
 void
 Printf ( byte *format, ... )
 {
-    if ( kbhit ( ) == ESC ) OpenVmTil_Pause ( ) ; //CfrTil_Quit ( ) ;
-    if ( _O_ && _CfrTil_ && _O_->Verbosity )
+    if ( kbhit ( ) == ESC ) OpenVmTil_Pause ( ) ; //CFT_Quit ( ) ;
+    if ( _O_ && _CFT_ && _O_->Verbosity )
     {
         va_list args ;
         va_start ( args, ( char* ) format ) ;
-        char * out = ( char* ) Buffer_Data ( _CfrTil_->PrintfB ) ;
+        char * out = ( char* ) Buffer_Data ( _CFT_->PrintfB ) ;
         vsprintf ( ( char* ) out, ( char* ) format, args ) ;
         va_end ( args ) ;
         int64 len = Strlen ( ( char* ) out ) ;
@@ -183,7 +183,7 @@ Printf ( byte *format, ... )
             }
         }
         printf ( "%s", out ) ;
-        if ( _CfrTil_ && _CfrTil_->LogFlag ) fprintf ( _CfrTil_->LogFILE, "%s", out ) ;
+        if ( _CFT_ && _CFT_->LogFlag ) fprintf ( _CFT_->LogFILE, "%s", out ) ;
         if ( _O_->psi_PrintStateInfo )
         {
             if ( ( final == '\n' ) || ( final == '\r' ) )
@@ -255,7 +255,7 @@ UnGetwc ( int64 c, FILE * f )
 #if 0
 
 void
-__CfrTil_Emit ( byte c )
+__CFT_Emit ( byte c )
 {
     if ( ( c == '\n' ) || ( c == '\r' ) )
     {
@@ -272,7 +272,7 @@ __CfrTil_Emit ( byte c )
 }
 
 void
-_CfrTil_EmitString ( byte * string )
+_CFT_EmitString ( byte * string )
 {
 #if 1
     int64 i ;
@@ -280,12 +280,12 @@ _CfrTil_EmitString ( byte * string )
     {
         for ( i = 0 ; string [ i ] ; i ++ )
         {
-            if ( kbhit ( ) == ESC ) CfrTil_Quit ( ) ;
-            __CfrTil_Emit ( string [ i ] ) ;
+            if ( kbhit ( ) == ESC ) CFT_Quit ( ) ;
+            __CFT_Emit ( string [ i ] ) ;
         }
     }
 #else
-    if ( kbhit ( ) == ESC ) CfrTil_Quit ( ) ;
+    if ( kbhit ( ) == ESC ) CFT_Quit ( ) ;
     puts ( ( char* ) string ) ;
 #endif
 }

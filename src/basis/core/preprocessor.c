@@ -4,13 +4,13 @@
 #define PP_ELIF 2
 #define PP_ELSE 1
 void
-CfrTil_PreProcessor ( )
+CFT_PreProcessor ( )
 {
     Lexer * lexer = _Lexer_ ;
     Interpreter * interp = _Context_->Interpreter0 ;
     int64 svState = GetState ( lexer, ( ADD_TOKEN_TO_SOURCE | ADD_CHAR_TO_SOURCE ) ) ;
     Lexer_SourceCodeOff ( lexer ) ;
-    _CfrTil_UnAppendFromSourceCode_NChars ( _CfrTil_, 1 ) ; // 1 : '#'
+    _CFT_UnAppendFromSourceCode_NChars ( _CFT_, 1 ) ; // 1 : '#'
     Finder_SetNamedQualifyingNamespace ( _Finder_, ( byte* ) "PreProcessor" ) ;
     SetState ( interp, PREPROCESSOR_MODE, true ) ;
     Interpreter_InterpretNextToken ( interp ) ;
@@ -198,12 +198,12 @@ SkipPreprocessorCode ( Boolean skipControl )
         {
             if ( String_Equal ( token, "//" ) )
             {
-                CfrTil_CommentToEndOfLine ( ) ;
+                CFT_CommentToEndOfLine ( ) ;
                 Lexer_SourceCodeOff ( lexer ) ;
             }
             else if ( String_Equal ( token, "/*" ) )
             {
-                CfrTil_ParenthesisComment ( ) ;
+                CFT_ParenthesisComment ( ) ;
                 Lexer_SourceCodeOff ( lexer ) ;
             }
             else if ( String_Equal ( token, "#" ) )
@@ -253,25 +253,25 @@ done:
 }
 
 void
-CfrTil_If_ConditionalInterpret ( )
+CFT_If_ConditionalInterpret ( )
 {
     if ( ! GetIfStatus ( ) ) SkipPreprocessorCode ( PP_SKIP ) ;
 }
 
 void
-CfrTil_Elif_ConditionalInterpret ( )
+CFT_Elif_ConditionalInterpret ( )
 {
     if ( ! GetElifStatus ( ) ) SkipPreprocessorCode ( PP_ELIF ) ;
 }
 
 void
-CfrTil_Else_ConditionalInterpret ( )
+CFT_Else_ConditionalInterpret ( )
 {
     if ( ! GetElseStatus ( ) ) SkipPreprocessorCode ( PP_ELSE ) ;
 }
 
 void
-CfrTil_Endif_ConditionalInterpret ( )
+CFT_Endif_ConditionalInterpret ( )
 {
     if ( ! GetEndifStatus ( ) ) SkipPreprocessorCode ( PP_SKIP ) ;
 }

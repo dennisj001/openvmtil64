@@ -37,7 +37,7 @@ Stack_Pop_WithExceptionFlag ( Stack * stack, int64 exceptionOnEmptyFlag )
 {
     if ( _Stack_IsEmpty ( stack ) )
     {
-        if ( exceptionOnEmptyFlag == 1 ) CfrTil_Exception ( STACK_UNDERFLOW, 0, QUIT ) ;
+        if ( exceptionOnEmptyFlag == 1 ) CFT_Exception ( STACK_UNDERFLOW, 0, QUIT ) ;
         else return 0 ;
     }
     return _Stack_Pop ( stack ) ;
@@ -69,7 +69,7 @@ int64
 _Stack_PopOrTop ( Stack * stack )
 {
     int64 sd = Stack_Depth ( stack ) ;
-    if ( sd <= 0 ) CfrTil_Exception ( STACK_UNDERFLOW, 0, QUIT ) ;
+    if ( sd <= 0 ) CFT_Exception ( STACK_UNDERFLOW, 0, QUIT ) ;
     else if ( sd == 1 ) return Stack_Top ( stack ) ;
     return _Stack_Pop ( stack ) ;
 }
@@ -148,7 +148,7 @@ Stack_Push ( Stack * stack, int64 value )
     {
         AlertColors ;
         _Printf ( ( byte* ) "\nStack_Push : _Stack_Overflow - StackDepth = %d\n", Stack_Depth ( stack ) ) ;
-        CfrTil_Exception ( STACK_OVERFLOW, 0, QUIT ) ;
+        CFT_Exception ( STACK_OVERFLOW, 0, QUIT ) ;
     }
     _Stack_Push ( stack, value ) ;
 #else
@@ -160,7 +160,7 @@ void
 Stack_Dup ( Stack * stack )
 {
 #if STACK_CHECK_ERROR
-    if ( _Stack_Overflow ( stack ) ) CfrTil_Exception ( STACK_OVERFLOW, 0, QUIT ) ;
+    if ( _Stack_Overflow ( stack ) ) CFT_Exception ( STACK_OVERFLOW, 0, QUIT ) ;
     _Stack_Dup ( stack ) ;
 #else
     _Stack_Dup ( stack ) ;
@@ -181,7 +181,7 @@ _Stack_IntegrityCheck ( Stack * stack )
     }
     if ( _Stack_Overflow ( stack ) ) flag = STACK_OVERFLOW, errorString = (byte*) "\nStack Integrity Error : Stack Onverflow" ;
     else flag = STACK_UNDERFLOW, errorString = (byte*) "\nStack Integrity Error : Stack Underflow" ;
-    CfrTil_Exception ( flag, c_da ( errorString ), QUIT ) ; //errorString = "\nStack Integrity Error : Stack Underflow" ;
+    CFT_Exception ( flag, c_da ( errorString ), QUIT ) ; //errorString = "\nStack Integrity Error : Stack Underflow" ;
     return false ;
 }
 
@@ -309,7 +309,7 @@ _Stack_PrintValues ( byte * name, uint64 * stackPointer, int64 depth, Boolean is
         {
             for ( i = 0 ; depth -- > 0 ; i -- ) Stack_Print_AValue ( stackPointer, i, name, buffer, isWordAlreadyFlag ) ;
         }
-        else CfrTil_Exception ( STACK_UNDERFLOW, 0, QUIT ) ;
+        else CFT_Exception ( STACK_UNDERFLOW, 0, QUIT ) ;
     }
 }
 
@@ -319,7 +319,7 @@ _Stack_Print ( Stack * stack, byte * name, int64 depth, Boolean isWordAlreadyFla
     _Stack_PrintHeader ( stack, name ) ;
     _Stack_PrintValues ( name, stack->StackPointer, depth, isWordAlreadyFlag ) ;
     //if ( depth ) 
-    CfrTil_NewLine ( ) ;
+    CFT_NewLine ( ) ;
 }
 
 void
@@ -345,10 +345,10 @@ _PrintNStackWindow ( uint64 * reg, byte * name, byte * regName, int64 size )
 }
 
 void
-_CfrTil_PrintNReturnStack ( int64 size, Boolean useExistingFlag )
+_CFT_PrintNReturnStack ( int64 size, Boolean useExistingFlag )
 {
     Debugger * debugger = _Debugger_ ;
-    _Printf ( ( byte* ) "\n_CfrTil_PrintNReturnStack : %s", Context_Location ( ) ) ;
+    _Printf ( ( byte* ) "\n_CFT_PrintNReturnStack : %s", Context_Location ( ) ) ;
     if ( useExistingFlag )
     {
         if ( GetState ( debugger, DBG_STEPPING ) && debugger->CopyRSP )
@@ -365,14 +365,14 @@ _CfrTil_PrintNReturnStack ( int64 size, Boolean useExistingFlag )
     }
     else
     {
-        _CfrTil_WordName_Run ( ( byte* ) "getRsp" ) ;
+        _CFT_WordName_Run ( ( byte* ) "getRsp" ) ;
         uint64 * rsp = ( uint64 * ) DataStack_Pop ( ) ;
         _PrintNStackWindow ( rsp, ( byte* ) "Return Stack", ( byte* ) "Rsp (RSP)", size ) ;
     }
 }
 
 void
-_CfrTil_PrintNDataStack ( int64 size )
+_CFT_PrintNDataStack ( int64 size )
 {
     _PrintNStackWindow ( _Dsp_, ( byte* ) "Data Stack", ( byte* ) "Dsp (DSP:R14)", size ) ;
 }

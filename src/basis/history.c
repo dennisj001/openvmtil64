@@ -45,7 +45,7 @@ ReadLine_ShowHistoryNode ( ReadLiner * rl )
     rl->EscapeModeFlag = 0 ;
     if ( rl->HistoryNode && rl->HistoryNode->S_Name )
     {
-        byte * dst = Buffer_Data ( _CfrTil_->ScratchB1 ) ;
+        byte * dst = Buffer_Data ( _CFT_->ScratchB1 ) ;
         dst = _String_ConvertStringToBackSlash ( dst, rl->HistoryNode->S_Name, -1 ) ;
         _ReadLine_PrintfClearTerminalLine ( ) ;
         __ReadLine_DoStringInput ( rl, String_FilterMultipleSpaces ( dst, TEMPORARY ), rl->AltPrompt ) ;
@@ -66,7 +66,7 @@ _OpenVmTil_AddStringToHistoryList ( byte * istring )
     if ( istring && strcmp ( ( char* ) istring, "" ) ) // don't add blank lines to history
     {
         //Buffer * buffer = Buffer_New ( BUFFER_SIZE ) ;
-        byte * nstring = Buffer_Data ( _CfrTil_->ScratchB1 ) ;
+        byte * nstring = Buffer_Data ( _CFT_->ScratchB1 ) ;
         nstring = _String_ConvertStringToBackSlash ( nstring, istring, -1 ) ;
 
         hsn = HistorySymbolList_Find ( nstring ) ;

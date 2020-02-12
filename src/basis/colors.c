@@ -100,7 +100,7 @@ _Colors_Init2 ( Colors * c, int64 fg, int64 bg )
 }
 
 void
-_CfrTil_SetRGBColor ( Colors * c )
+_CFT_SetRGBColor ( Colors * c )
 {
     int64 fr, fg, fb, br, bg, bb ;
     bb = DataStack_Pop ( ) ;
@@ -113,7 +113,7 @@ _CfrTil_SetRGBColor ( Colors * c )
 }
 
 void
-_CfrTil_SetColors ( Colors * c )
+_CFT_SetColors ( Colors * c )
 {
     int64 fg, bg ;
     bg = DataStack_Pop ( ) ;
@@ -152,63 +152,63 @@ Ovt_NoticeColors ( )
 }
 
 void
-CfrTil_SetDefaultColors ( )
+CFT_SetDefaultColors ( )
 {
-    _CfrTil_SetColors ( &_O_->Default ) ;
+    _CFT_SetColors ( &_O_->Default ) ;
 }
 
 void
-CfrTil_SetAlertColors ( )
+CFT_SetAlertColors ( )
 {
-    _CfrTil_SetColors ( &_O_->Alert ) ;
+    _CFT_SetColors ( &_O_->Alert ) ;
 }
 
 void
-CfrTil_SetDebugColors ( )
+CFT_SetDebugColors ( )
 {
-    _CfrTil_SetColors ( &_O_->Debug ) ;
+    _CFT_SetColors ( &_O_->Debug ) ;
 }
 
 void
-CfrTil_SetUserColors ( )
+CFT_SetUserColors ( )
 {
-    _CfrTil_SetColors ( &_O_->User ) ;
+    _CFT_SetColors ( &_O_->User ) ;
 }
 
 void
-CfrTil_SetNoticeColors ( )
+CFT_SetNoticeColors ( )
 {
-    _CfrTil_SetColors ( &_O_->Notice ) ;
+    _CFT_SetColors ( &_O_->Notice ) ;
 }
 
 void
-CfrTil_SetDefaultRGB ( )
+CFT_SetDefaultRGB ( )
 {
-    _CfrTil_SetRGBColor ( &_O_->Default ) ;
+    _CFT_SetRGBColor ( &_O_->Default ) ;
 }
 
 void
-CfrTil_SetUserRGB ( )
+CFT_SetUserRGB ( )
 {
-    _CfrTil_SetRGBColor ( &_O_->User ) ;
+    _CFT_SetRGBColor ( &_O_->User ) ;
 }
 
 void
-CfrTil_SetAlertRGB ( )
+CFT_SetAlertRGB ( )
 {
-    _CfrTil_SetRGBColor ( &_O_->Alert ) ;
+    _CFT_SetRGBColor ( &_O_->Alert ) ;
 }
 
 void
-CfrTil_SetDebugRGB ( )
+CFT_SetDebugRGB ( )
 {
-    _CfrTil_SetRGBColor ( &_O_->Debug ) ;
+    _CFT_SetRGBColor ( &_O_->Debug ) ;
 }
 
 void
-CfrTil_SetNoticeRGB ( )
+CFT_SetNoticeRGB ( )
 {
-    _CfrTil_SetRGBColor ( &_O_->Notice ) ;
+    _CFT_SetRGBColor ( &_O_->Notice ) ;
 }
 
 

@@ -55,7 +55,7 @@ xc 'e' =
 sp
 xc @ dup emit 'e' _assert //sp
 sp "x" var x 'e' = sp '\n' emit '\t' emit x @ emit '\r' emit 'u' emit '\b' emit 'i' emit 
-"\nline above should read... \ni\te" ps
+"\nline above should read... \ni\te" ps //pause
 sp 
 #endif
 

@@ -26,7 +26,7 @@ Compile_BitWise_TEST ( Compiler * compiler )
 }
  
 void
-CfrTil_TEST ( )
+CFT_TEST ( )
 {
     if ( GetState( _Context_->Compiler0, BLOCK_MODE ) )
     {
@@ -55,7 +55,7 @@ Compile_X_Group3 ( Compiler * compiler, int64 code ) //OP_1_ARG
         {
             if ( compiler->OptInfo->Optimize_Rm != ACC ) Compile_Move_Rm_To_Reg (ACC, compiler->OptInfo->Optimize_Rm,
                 compiler->OptInfo->Optimize_Disp , 0) ;
-            CfrTil_CompileAndRecord_PushAccum () ;
+            CFT_CompileAndRecord_PushAccum () ;
         }
     }
     else
@@ -90,13 +90,13 @@ Compile_X_Shift ( Compiler * compiler, int64 op, Boolean stackFlag, Boolean opEq
         {
             if ( compiler->OptInfo->Optimize_Rm != ACC ) 
             Compile_Move_Rm_To_Reg (ACC, compiler->OptInfo->Optimize_Rm, compiler->OptInfo->Optimize_Disp , 0) ;
-            CfrTil_CompileAndRecord_PushAccum () ;
+            CFT_CompileAndRecord_PushAccum () ;
         }
         //DBI_OFF ;
     }
     else
     {
-        Word *one = ( Word* ) _CfrTil_WordList (1) ; // the operand
+        Word *one = ( Word* ) _CFT_WordList (1) ; // the operand
         if ( one->W_ObjectAttributes && LITERAL )
         {
             SetHere (one->Coding, 1) ;

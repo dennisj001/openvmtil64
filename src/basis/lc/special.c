@@ -10,7 +10,7 @@ _LO_Define ( ListObject * idNode, ListObject * locals )
     ListObject *value0, *value, *l1 ;
     Word * word0 = idNode->Lo_CfrTilWord, *word ;
     word = DataObject_New (T_LC_DEFINE, 0, ( byte* ) word0->Name, 0, NAMESPACE_VARIABLE, 0, 0, 0, 0, LISP, idNode->W_RL_Index, idNode->W_SC_Index ) ; //word0->W_RL_Index, word0->W_SC_Index ) ; //word0 was allocated COMPILER_TEMP or LISP_TEMP
-    CfrTil_WordList_Init (word) ;
+    CFT_WordList_Init (word) ;
 
     word->Definition = 0 ; // reset the definition from LO_Read
     value0 = _LO_Next ( idNode ) ;
@@ -136,7 +136,7 @@ _LO_Macro ( ListObject * l0, ListObject * locals )
     l0 = _LO_Define ( idNode, locals ) ;
     l0->W_LispAttributes |= T_LISP_MACRO ;
     if ( l0->Lo_CfrTilWord ) l0->Lo_CfrTilWord->W_LispAttributes |= T_LISP_MACRO ;
-    if ( GetState ( _CfrTil_, DEBUG_MODE ) ) LO_Print ( l0 ) ;
+    if ( GetState ( _CFT_, DEBUG_MODE ) ) LO_Print ( l0 ) ;
     return l0 ;
 }
 
@@ -311,7 +311,7 @@ _LO_Semi ( Word * word )
 {
     if ( word )
     {
-        CfrTil_EndBlock ( ) ;
+        CFT_EndBlock ( ) ;
         block blk = ( block ) DataStack_Pop ( ) ;
         Word_InitFinal ( word, ( byte* ) blk ) ;
         word->W_LispAttributes |= T_LISP_CFRTIL_COMPILED ;
@@ -325,12 +325,12 @@ _LO_Colon ( ListObject * lfirst )
     ListObject *lcolon = lfirst, *lname, *ldata ;
     lname = _LO_Next ( lcolon ) ;
     ldata = _LO_Next ( lname ) ;
-    _CfrTil_Namespace_NotUsing ( ( byte* ) "Lisp" ) ; // nb. don't use Lisp words when compiling cfrTil
-    CfrTil_RightBracket ( ) ;
+    _CFT_Namespace_NotUsing ( ( byte* ) "Lisp" ) ; // nb. don't use Lisp words when compiling cfrTil
+    CFT_RightBracket ( ) ;
     Word * word = Word_New ( lname->Name ) ;
     SetState ( cntx->Compiler0, COMPILE_MODE, true ) ;
-    CfrTil_InitSourceCode_WithName ( _CfrTil_, lname->Name, 1 ) ;
-    CfrTil_BeginBlock ( ) ;
+    CFT_InitSourceCode_WithName ( _CFT_, lname->Name, 1 ) ;
+    CFT_BeginBlock ( ) ;
 
     return word ;
 }
@@ -353,14 +353,14 @@ _LO_CfrTil ( ListObject * lfirst )
         SetState ( _LC_, LC_INTERP_MODE, true ) ;
         lc = _LC_ ;
     }
-    _CfrTil_Namespace_NotUsing ( ( byte * ) "Lisp" ) ; // nb. don't use Lisp words when compiling cfrTil
+    _CFT_Namespace_NotUsing ( ( byte * ) "Lisp" ) ; // nb. don't use Lisp words when compiling cfrTil
     SetState ( cntx, LC_CFRTIL, true ) ;
     SetState ( compiler, LISP_MODE, false ) ;
     for ( ldata = _LO_Next ( lfirst ) ; ldata ; ldata = _LO_Next ( ldata ) )
     {
         if ( ldata->W_LispAttributes & ( LIST | LIST_NODE ) )
         {
-            _CfrTil_Parse_LocalsAndStackVariables (1, 1, ldata, compiler->LocalsCompilingNamespacesStack, 0 ) ;
+            _CFT_Parse_LocalsAndStackVariables (1, 1, ldata, compiler->LocalsCompilingNamespacesStack, 0 ) ;
         }
         else if ( String_Equal ( ldata->Name, ( byte * ) "tick" ) || String_Equal ( ldata->Name, ( byte * ) "'" ) )
         {
@@ -370,7 +370,7 @@ _LO_CfrTil ( ListObject * lfirst )
         }
         else if ( String_Equal ( ldata->Name, ( byte * ) "s:" ) )
         {
-            CfrTil_DbgSourceCodeOn ( ) ;
+            CFT_DbgSourceCodeOn ( ) ;
             word = _LO_Colon ( ldata ) ;
             ldata = _LO_Next ( ldata ) ; // bump ldata to account for name - skip name
         }
@@ -381,16 +381,16 @@ _LO_CfrTil ( ListObject * lfirst )
         }
         else if ( String_Equal ( ldata->Name, ( byte * ) ";s" ) && ( ! GetState ( cntx, C_SYNTAX ) ) )
         {
-            CfrTil_DbgSourceCodeOff ( ) ;
+            CFT_DbgSourceCodeOff ( ) ;
             _LO_Semi ( word ) ;
         }
         else if ( String_Equal ( ldata->Name, ( byte * ) ";" ) && ( ! GetState ( cntx, C_SYNTAX ) ) )
         {
             ListObject *ldata1 = _LO_Next ( ldata ) ; // bump ldata to account for name
-            word->W_SourceCode = String_New_SourceCode ( _CfrTil_->SC_Buffer ) ;
+            word->W_SourceCode = String_New_SourceCode ( _CFT_->SC_Buffer ) ;
             if ( ldata1 && String_Equal ( ldata1->Name, ( byte * ) ":" ) )
             {
-                CfrTil_InitSourceCode_WithName ( _CfrTil_, ( byte* ) "(", 1 ) ;
+                CFT_InitSourceCode_WithName ( _CFT_, ( byte* ) "(", 1 ) ;
             }
             _LO_Semi ( word ) ;
             word->W_SourceCode = lc->LC_SourceCode ;

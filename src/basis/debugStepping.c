@@ -22,11 +22,11 @@ Debugger_CompileOneInstruction ( Debugger * debugger, byte * jcAddress, Boolean 
     ByteArray * svcs = _O_CodeByteArray ;
     _ByteArray_Init ( debugger->StepInstructionBA ) ; // we are only compiling one insn here so clear our BA before each use
     Set_CompilerSpace ( debugger->StepInstructionBA ) ; // now compile to this space
-    _Compile_Save_C_CpuState ( _CfrTil_, showFlag ) ; //&& ( _O_->Verbosity >= 3 ) ) ; // save our c compiler cpu register state
+    _Compile_Save_C_CpuState ( _CFT_, showFlag ) ; //&& ( _O_->Verbosity >= 3 ) ) ; // save our c compiler cpu register state
     _Compile_Restore_Debugger_CpuState ( debugger, showFlag ) ; //&& ( _O_->Verbosity >= 3 ) ) ; // restore our runtime state before the current insn
     byte * nextInsn = _Debugger_CompileOneInstruction ( debugger, jcAddress ) ; // the single current stepping insn
     _Compile_Save_Debugger_CpuState ( debugger, showFlag ) ; //showRegsFlag ) ; //&& ( _O_->Verbosity >= 3 ) ) ; // save our runtime state after the instruction : which we will restore before the next insn
-    _Compile_Restore_C_CpuState ( _CfrTil_, showFlag ) ; //&& ( _O_->Verbosity >= 3 ) ) ; // save our c compiler cpu register state
+    _Compile_Restore_C_CpuState ( _CFT_, showFlag ) ; //&& ( _O_->Verbosity >= 3 ) ) ; // save our c compiler cpu register state
     _Compile_Return ( ) ;
     Set_CompilerSpace ( svcs ) ; // restore compiler space pointer before "do it" in case "do it" calls the compiler
     return nextInsn ;
@@ -204,7 +204,7 @@ _Debugger_SetupStepping ( Debugger * debugger, Word * word, byte * address, byte
     _Printf ( ( byte* ) "\nSetting up stepping : location = %s : debugger->word = \'%s\' : ...", c_gd ( _Context_Location ( _Context_ ) ), word ? word->Name : ( name ? name : ( byte* ) "" ) ) ;
     if ( word )
     {
-        _CfrTil_Source ( debugger->w_Word, 0 ) ;
+        _CFT_Source ( debugger->w_Word, 0 ) ;
         if ( ( ! address ) || ( ! GetState ( debugger, ( DBG_BRK_INIT | DBG_SETUP_ADDRESS ) ) ) ) address = ( byte* ) word->Definition ;
     }
     SetState_TrueFalse ( debugger, DBG_STEPPING, DBG_NEWLINE | DBG_PROMPT | DBG_INFO | DBG_MENU ) ;
@@ -212,13 +212,13 @@ _Debugger_SetupStepping ( Debugger * debugger, Word * word, byte * address, byte
     debugger->w_Word = Word_UnAlias ( word ) ;
 
     if ( ! GetState ( debugger, ( DBG_BRK_INIT | DBG_RUNTIME_BREAKPOINT ) ) ) SetState ( debugger->cs_Cpu, CPU_SAVED, false ) ;
-    SetState ( _CfrTil_->cs_Cpu, CPU_SAVED, false ) ;
+    SetState ( _CFT_->cs_Cpu, CPU_SAVED, false ) ;
     _Debugger_CpuState_CheckSave ( debugger ) ;
-    _CfrTil_CpuState_CheckSave ( ) ;
+    _CFT_CpuState_CheckSave ( ) ;
     debugger->LevelBitNamespaceMap = 0 ;
     SetState ( debugger, DBG_START_STEPPING, true ) ;
     _Debugger_->LastSourceCodeWord = 0 ;
-    CfrTil_NewLine ( ) ;
+    CFT_NewLine ( ) ;
 }
 
 void
@@ -230,7 +230,7 @@ Debugger_SetupStepping ( Debugger * debugger )
 int64
 _Debugger_SetupReturnStackCopy ( Debugger * debugger, int64 size, Boolean showFlag )
 {
-    if ( _O_->Verbosity > 3 ) _CfrTil_PrintNReturnStack ( 4, 1 ) ;
+    if ( _O_->Verbosity > 3 ) _CFT_PrintNReturnStack ( 4, 1 ) ;
     uint64 * rsp = ( uint64* ) debugger->cs_Cpu->Rsp ; //debugger->DebugESP [- 1] ; //debugger->cs_Cpu->Rsp [1] ; //debugger->cs_Cpu->Rsp ;
     if ( rsp )
     {
@@ -288,7 +288,7 @@ void
 _Compile_Restore_C_CpuState ( CfrTil * cfrtil, int64 showFlag )
 {
     _Compile_CpuState_Restore ( cfrtil->cs_Cpu, 1 ) ;
-    if ( showFlag ) Compile_Call_TestRSP ( ( byte* ) CfrTil_CpuState_Show ) ;
+    if ( showFlag ) Compile_Call_TestRSP ( ( byte* ) CFT_CpuState_Show ) ;
 }
 
 // restore the 'internal running cfrTil' cpu state which was saved after the last instruction : debugger->cs_CpuState is the 'internal running cfrTil' cpu state
@@ -297,16 +297,16 @@ void
 _Compile_Save_C_CpuState ( CfrTil * cfrtil, int64 showFlag )
 {
     Compile_CpuState_Save ( cfrtil->cs_Cpu ) ;
-    if ( showFlag ) Compile_Call_TestRSP ( ( byte* ) _CfrTil_CpuState_CheckSave ) ;
+    if ( showFlag ) Compile_Call_TestRSP ( ( byte* ) _CFT_CpuState_CheckSave ) ;
 }
 
 void
 _Compile_Save_Debugger_CpuState ( Debugger * debugger, int64 showFlag )
 {
     Compile_CpuState_Save ( debugger->cs_Cpu ) ;
-    if ( showFlag ) Compile_Call_TestRSP ( ( byte* ) CfrTil_Debugger_UdisOneInsn ) ;
+    if ( showFlag ) Compile_Call_TestRSP ( ( byte* ) CFT_Debugger_UdisOneInsn ) ;
     if ( ( _O_->Verbosity > 3 ) && ( debugger->cs_Cpu->Rsp != debugger->LastRsp ) ) Debugger_PrintReturnStackWindow ( ) ;
-    if ( showFlag ) Compile_Call_TestRSP ( ( byte* ) CfrTil_Debugger_CheckSaveCpuStateShow ) ;
+    if ( showFlag ) Compile_Call_TestRSP ( ( byte* ) CFT_Debugger_CheckSaveCpuStateShow ) ;
 }
 
 void
@@ -486,7 +486,7 @@ Debugger_CASOI_Do_Return_Insn ( Debugger * debugger )
     if ( Stack_Depth ( debugger->ReturnStack ) )
     {
         debugger->DebugAddress = ( byte* ) Stack_Pop ( debugger->ReturnStack ) ;
-        //if ( _O_->Verbosity > 1 ) CfrTil_PrintReturnStack ( ) ;
+        //if ( _O_->Verbosity > 1 ) CFT_PrintReturnStack ( ) ;
         Debugger_GetWordFromAddress ( debugger ) ;
     }
     else

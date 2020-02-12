@@ -28,7 +28,7 @@ mmap_AllocMem ( int64 size )
         perror ( "_Mem_Mmap" ) ;
         OVT_ShowMemoryAllocated ( ) ;
         //OVT_Exit ( ) ;
-        CfrTil_FullRestart ( ) ;
+        CFT_FullRestart ( ) ;
     }
     //Kbhit_Pause ( ) ;
     memset ( mem, 0, size ) ; // ?? : is this necessary??
@@ -180,7 +180,7 @@ Mem_Allocate ( int64 size, uint64 allocType )
             _O_->RunTimeAllocation += size ;
             return mmap_AllocMem ( size ) ;
         }
-        default: CfrTil_Exception ( MEMORY_ALLOCATION_ERROR, 0, QUIT ) ;
+        default: CFT_Exception ( MEMORY_ALLOCATION_ERROR, 0, QUIT ) ;
     }
     return 0 ;
 }
@@ -405,7 +405,7 @@ OVT_MemListFree_LispSpace ( )
 void
 OVT_MemListFree_CompilerTempObjects ( )
 {
-    if ( ! GetState ( _CfrTil_, (RT_DEBUG_ON|GLOBAL_SOURCE_CODE_MODE) ) ) OVT_MemList_FreeNBAMemory ( ( byte* ) "CompilerTempObjectSpace", 0, 1 ) ;
+    if ( ! GetState ( _CFT_, (RT_DEBUG_ON|GLOBAL_SOURCE_CODE_MODE) ) ) OVT_MemList_FreeNBAMemory ( ( byte* ) "CompilerTempObjectSpace", 0, 1 ) ;
 }
 
 void
@@ -570,7 +570,7 @@ void
 Calculate_TotalNbaAccountedMemAllocated ( OpenVmTil * ovt, int64 flag )
 {
     _Calculate_TotalNbaAccountedMemAllocated ( ovt, flag ) ;
-    if ( _CfrTil_ && _DataStack_ ) // so we can use this function anywhere
+    if ( _CFT_ && _DataStack_ ) // so we can use this function anywhere
     {
         int64 dsu = DataStack_Depth ( ) * sizeof (int64 ) ;
         int64 dsa = ( STACK_SIZE * sizeof (int64 ) ) - dsu ;

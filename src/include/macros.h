@@ -1,19 +1,19 @@
 
 //#define myprintf(a, b, rest...) printf (a, b, ## rest)
-#define Exception( type, response ) CfrTil_Exception (type, 0, response )
+#define Exception( type, response ) CFT_Exception (type, 0, response )
 
 #define _Context_ _O_->OVT_Context
-#define _CfrTil_ _O_->OVT_CfrTil
+#define _CFT_ _O_->OVT_CfrTil
 #define _Compiler_ _Context_->Compiler0
 #define _Interpreter_ _Context_->Interpreter0
 #define _ReadLiner_ _Context_->ReadLiner0
 #define _Lexer_ _Context_->Lexer0
 #define _Finder_ _Context_->Finder0
-#define _DataStack_ _CfrTil_->DataStack
+#define _DataStack_ _CFT_->DataStack
 #define _DataStackPointer_ _DataStack_->StackPointer
 #define _DSP_ _DataStackPointer_ 
-#define _ReturnStack_ _CfrTil_->ReturnStack
-#define _ReturnStack_ _CfrTil_->ReturnStack
+#define _ReturnStack_ _CFT_->ReturnStack
+#define _ReturnStack_ _CFT_->ReturnStack
 #define _ReturnStackPointer_ _ReturnStack_->StackPointer
 #define _RSP_ _ReturnStackPointer_ 
 #define _O_CodeByteArray _O_->CodeByteArray
@@ -34,19 +34,19 @@
 //#define abs( x ) ((int64) (((x) >= 0) ? (x) : (-x))) 
 #define TOS (_Dsp_[0]) // top of stack
 #define NOS (_Dsp_[-1]) // next on stack
-#define _TOS_ ( _Dsp_ ? _Dsp_ [ 0 ] : CfrTil_Exception (STACK_ERROR, 0, QUIT ), (uint64)-1 )
+#define _TOS_ ( _Dsp_ ? _Dsp_ [ 0 ] : CFT_Exception (STACK_ERROR, 0, QUIT ), (uint64)-1 )
 #define DSP_Top( ) TOS 
 #define _DataStack_Top( ) TOS 
 #define _DataStack_GetTop( ) TOS
 #define _DataStack_SetTop( v ) _Dsp_ [ 0 ] = v ;
-#define DataStack_SetTop( v ) { if ( _Dsp_ ) { _DataStack_SetTop( v ) } else { CfrTil_Exception (STACK_ERROR, 0, QUIT ) ; } }
+#define DataStack_SetTop( v ) { if ( _Dsp_ ) { _DataStack_SetTop( v ) } else { CFT_Exception (STACK_ERROR, 0, QUIT ) ; } }
 #define _GetTop( ) TOS
 #define _SetTop( v ) (TOS = v)
-#define Stack() CfrTil_PrintDataStack ( )
+#define Stack() CFT_PrintDataStack ( )
 #define DataStack( n ) _Dsp_ [ - (n) ] 
 #define Dsp( n ) DataStack( n ) 
 #define Stack_Clear( stk ) Stack_Init ( stk )
-#define TWS( n ) ( (Word*) (_CfrTil_->TypeWordStack->StackPointer [(n)]) )
+#define TWS( n ) ( (Word*) (_CFT_->TypeWordStack->StackPointer [(n)]) )
 
 #define Calculate_FrameSize( numberOfLocals )  ( ( numberOfLocals + 1 ) * CELL ) // 1 : space for fp
 
@@ -73,8 +73,8 @@
 
 #define Stack_N( stack, offset ) ((stack)->StackPointer [ (offset) ] )
 #define Stack_OffsetValue( stack, offset ) ((stack)->StackPointer [ (offset) ] )
-#define WordsBack( n ) CfrTil_WordList( (n) )
-#define WordStack( n ) CfrTil_WordList( (n) )
+#define WordsBack( n ) CFT_WordList( (n) )
+#define WordStack( n ) CFT_WordList( (n) )
 #define N_FREE  1
 #define N_UNLOCKED 2
 #define N_LOCKED  4
@@ -142,7 +142,7 @@
 #define c_n( s ) cc ( (byte*) s, &_O_->Notice ) 
 
 #define TemporaryString_New( string ) String_New ( string, TEMPORARY ) 
-#define IsWordRecursive CfrTil_CheckForGotoPoints ( GI_RECURSE )
+#define IsWordRecursive CFT_CheckForGotoPoints ( GI_RECURSE )
 #define AppendCharToSourceCode( c ) //_Lexer_AppendCharToSourceCode ( lexer, c ) 
 #define ReadLine_Nl (ReadLine_PeekNextChar ( _Context_->ReadLiner0 ) == '\n')
 #define ReadLine_Eof (ReadLine_PeekNextChar ( _Context_->ReadLiner0 ) == eof)
@@ -161,7 +161,7 @@
 #define Throw( emsg, smsg, e ) OpenVmTil_Throw (((byte*) emsg), ((byte*) smsg), (e), 1 )
 #define ThrowIt( msg ) OpenVmTil_Throw (((byte*) msg),  _O_->Thrown, 1 )
 #define catchAll if ( _OpenVmTil_Catch () ) 
-#define _SyntaxError( message, abortFlag ) CfrTil_Exception (SYNTAX_ERROR, message, abortFlag )
+#define _SyntaxError( message, abortFlag ) CFT_Exception (SYNTAX_ERROR, message, abortFlag )
 #define SyntaxError( abortFlag ) _SyntaxError( 0, abortFlag ) 
 #define stopThisTry _OVT_PopExceptionStack ( )
 #define stopTrying _OVT_ClearExceptionStack ( )
@@ -218,17 +218,17 @@
 #define MemCheck( block ) { Calculate_TotalNbaAccountedMemAllocated ( 1 ) ; block ; Calculate_TotalNbaAccountedMemAllocated ( 1 ) ; }
 #define MemCpy(dst, src, size) _MemCpy ((byte*)dst, (byte*)src, (int64) size)
 
-#define _Debugger_ _CfrTil_->Debugger0
-#define DebugOff SetState ( _CfrTil_, DEBUG_MODE|_DEBUG_SHOW_, false )
-#define DebugOn SetState ( _CfrTil_, DEBUG_MODE|_DEBUG_SHOW_, true ) 
-#define DebugModeOff SetState ( _CfrTil_, DEBUG_MODE, false )
-#define DebugShow_Off SetState ( _CfrTil_, _DEBUG_SHOW_, false ) 
-#define DebugShow_On SetState ( _CfrTil_, _DEBUG_SHOW_, true ) 
-#define Is_DebugModeOn ( _CfrTil_ && GetState ( _CfrTil_, DEBUG_MODE ) ) 
-#define Is_DebugShowOn ( _CfrTil_ && GetState ( _CfrTil_, _DEBUG_SHOW_ ) ) 
-#define _Is_DebugOn GetState ( _CfrTil_, _DEBUG_SHOW_ )
+#define _Debugger_ _CFT_->Debugger0
+#define DebugOff SetState ( _CFT_, DEBUG_MODE|_DEBUG_SHOW_, false )
+#define DebugOn SetState ( _CFT_, DEBUG_MODE|_DEBUG_SHOW_, true ) 
+#define DebugModeOff SetState ( _CFT_, DEBUG_MODE, false )
+#define DebugShow_Off SetState ( _CFT_, _DEBUG_SHOW_, false ) 
+#define DebugShow_On SetState ( _CFT_, _DEBUG_SHOW_, true ) 
+#define Is_DebugModeOn ( _CFT_ && GetState ( _CFT_, DEBUG_MODE ) ) 
+#define Is_DebugShowOn ( _CFT_ && GetState ( _CFT_, _DEBUG_SHOW_ ) ) 
+#define _Is_DebugOn GetState ( _CFT_, _DEBUG_SHOW_ )
 #define Is_DebugOn (Is_DebugShowOn && Is_DebugModeOn)
-#define DEBUG_PRINTSTACK if ( GetState ( _CfrTil_, DEBUG_MODE )  ) CfrTil_PrintDataStack () ;
+#define DEBUG_PRINTSTACK if ( GetState ( _CFT_, DEBUG_MODE )  ) CFT_PrintDataStack () ;
 #define DEBUG_SETUP_TOKEN( token ) _DEBUG_SETUP ( 0, token, 0 ) ;
 #define DEBUG_SETUP_ADDRESS( address, force ) if ( (address) && Is_DebugModeOn ) Debugger_PreSetup (_Debugger_, 0, 0, address, force ) ;
 #define DEBUG_SETUP( word ) _DEBUG_SETUP ( word, 0, 0, 0 )
@@ -250,18 +250,18 @@
 #define List_New( allocType ) _dllist_New ( allocType ) 
 
 #define _WordList_Pop( list ) _dllist_PopNode ( list )
-#define DebugWordList_Push( dobj ) _dllist_AddNodeToHead ( _CfrTil_->DebugWordList, ( dlnode* ) dobj )
+#define DebugWordList_Push( dobj ) _dllist_AddNodeToHead ( _CFT_->DebugWordList, ( dlnode* ) dobj )
 #define DbgWL_Push( node ) DebugWordList_Push( node )  
-#define IsGlobalsSourceCodeOn ( GetState ( _CfrTil_, GLOBAL_SOURCE_CODE_MODE ))
-#define _IsSourceCodeOn ( GetState ( _CfrTil_, DEBUG_SOURCE_CODE_MODE ) )
+#define IsGlobalsSourceCodeOn ( GetState ( _CFT_, GLOBAL_SOURCE_CODE_MODE ))
+#define _IsSourceCodeOn ( GetState ( _CFT_, DEBUG_SOURCE_CODE_MODE ) )
 #define IsSourceCodeOn ( _IsSourceCodeOn || IsGlobalsSourceCodeOn )
-#define IsSourceCodeOff (!IsSourceCodeOn) //( GetState ( _CfrTil_, DEBUG_SOURCE_CODE_MODE ) || IsGlobalsSourceCodeOn ))
+#define IsSourceCodeOff (!IsSourceCodeOn) //( GetState ( CFT, DEBUG_SOURCE_CODE_MODE ) || IsGlobalsSourceCodeOn ))
 #define Compiler_Word_SCHCPUSCA( word, clearFlag ) Compiler_SCA_Word_SetCodingHere_And_ClearPreviousUse ( word, clearFlag) 
-#define Compiler_WordStack_SCHCPUSCA( index, clearFlag ) Compiler_Word_SCHCPUSCA (CfrTil_WordList ( index ), clearFlag) 
-#define _SC_Global_On SetState ( _CfrTil_, GLOBAL_SOURCE_CODE_MODE, true )
-#define SC_Global_On if ( GetState ( _CfrTil_, DEBUG_SOURCE_CODE_MODE ) ) { _SC_Global_On ; }
-#define SC_Global_Off SetState ( _CfrTil_, GLOBAL_SOURCE_CODE_MODE, false )
-#define Compiler_OptimizerWordList_Reset( compiler ) List_Init ( _CfrTil_->CompilerWordList ) 
+#define Compiler_WordStack_SCHCPUSCA( index, clearFlag ) Compiler_Word_SCHCPUSCA (CFT_WordList ( index ), clearFlag) 
+#define _SC_Global_On SetState ( _CFT_, GLOBAL_SOURCE_CODE_MODE, true )
+#define SC_Global_On if ( GetState ( _CFT_, DEBUG_SOURCE_CODE_MODE ) ) { _SC_Global_On ; }
+#define SC_Global_Off SetState ( _CFT_, GLOBAL_SOURCE_CODE_MODE, false )
+#define Compiler_OptimizerWordList_Reset( compiler ) List_Init ( _CFT_->CompilerWordList ) 
 #define Word_SetTsrliScwi( word, tsrli, scwi ) \
     if ( word )\
     {\

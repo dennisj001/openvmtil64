@@ -104,7 +104,7 @@ CalculateArrayDimensionSize ( Word * arrayBaseObject, int64 dimNumber )
     //while ( ( -- dimNumber ) >= 0 ) // -- : zero based ns->ArrayDimensions
     for ( dimSize = 1 ; dimNumber > 0 ; dimNumber -- )
     {
-        dimSize *= arrayBaseObject->ArrayDimensions [ dimNumber ] ; // the parser created and populated this array in _CfrTil_Parse_ClassStructure 
+        dimSize *= arrayBaseObject->ArrayDimensions [ dimNumber ] ; // the parser created and populated this array in _CFT_Parse_ClassStructure 
     }
 #else
     /*
@@ -120,7 +120,7 @@ CalculateArrayDimensionSize ( Word * arrayBaseObject, int64 dimNumber )
     int64 dimSize ;
     for ( dimSize = 1 ; dimNumber < ( arrayBaseObject->ArrayNumberOfDimensions - 1 ) ; dimNumber ++ )
     {
-        dimSize *= arrayBaseObject->ArrayDimensions [ dimNumber ] ; // the parser created and populated this array in _CfrTil_Parse_ClassStructure 
+        dimSize *= arrayBaseObject->ArrayDimensions [ dimNumber ] ; // the parser created and populated this array in _CFT_Parse_ClassStructure 
     }
 #endif    
     return dimSize ;
@@ -178,7 +178,7 @@ Do_NextArrayToken ( Word * tokenWord, byte * token, Word * arrayBaseObject, int6
             if ( ! CompileMode ) Array_Do_AccumulatedAddress ( baseObject->AccumulatedOffset ) ; 
         }
         if ( Is_DebugModeOn && baseObject ) Word_PrintOffset ( word, increment, baseObject->AccumulatedOffset ) ;
-        CfrTil_TypeStack_Pop ( ) ; // pop the index ; we want the object field type 
+        CFT_TypeStack_Pop ( ) ; // pop the index ; we want the object field type 
         if ( ! _Context_StringEqual_PeekNextToken ( cntx, ( byte* ) "[", 0 ) )
         {
             SetState ( compiler, ARRAY_MODE, false ) ;
@@ -209,14 +209,14 @@ Arrays_DoArrayArgs_NonLisp ( Lexer * lexer, byte * token, Word * arrayBaseObject
 }
 
 void
-_CfrTil_ArrayBegin ( Boolean lispMode, Word **pl1, int64 *i )
+_CFT_ArrayBegin ( Boolean lispMode, Word **pl1, int64 *i )
 {
     Context * cntx = _Context_ ;
     Compiler *compiler = cntx->Compiler0 ;
     Interpreter * interp = cntx->Interpreter0 ;
     Lexer * lexer = cntx->Lexer0 ;
     Word * baseObject = interp->BaseObject, *l1, * arrayBaseObject ;
-    Boolean saveCompileMode = GetState ( compiler, COMPILE_MODE ), svOpState = GetState ( _CfrTil_, OPTIMIZE_ON ) ;
+    Boolean saveCompileMode = GetState ( compiler, COMPILE_MODE ), svOpState = GetState ( _CFT_, OPTIMIZE_ON ) ;
     int64 objSize = 0 ;
     Boolean variableFlag = 0 ;
     byte * token ;
@@ -233,20 +233,20 @@ _CfrTil_ArrayBegin ( Boolean lispMode, Word **pl1, int64 *i )
     }
     if ( arrayBaseObject )
     {
-        CfrTil_OptimizeOn ( ) ; // internal to arrays optimize must be on
+        CFT_OptimizeOn ( ) ; // internal to arrays optimize must be on
 
-        if ( ! arrayBaseObject->ArrayDimensions ) CfrTil_Exception ( ARRAY_DIMENSION_ERROR, 0, QUIT ) ;
+        if ( ! arrayBaseObject->ArrayDimensions ) CFT_Exception ( ARRAY_DIMENSION_ERROR, 0, QUIT ) ;
         if ( interp->CurrentObjectNamespace ) objSize = interp->CurrentObjectNamespace->ObjectByteSize ; 
-        if ( ! objSize ) CfrTil_Exception ( OBJECT_SIZE_ERROR, 0, QUIT ) ;
+        if ( ! objSize ) CFT_Exception ( OBJECT_SIZE_ERROR, 0, QUIT ) ;
         variableFlag = _CheckArrayDimensionForVariables_And_UpdateCompilerState ( ) ;
         if ( lispMode ) Arrays_DoArrayArgs_Lisp ( pl1, l1, arrayBaseObject, objSize, saveCompileMode, &variableFlag ) ;
         else Arrays_DoArrayArgs_NonLisp ( lexer, token, arrayBaseObject, objSize, saveCompileMode, &variableFlag ) ;
-        _CfrTil_WordList_PushWord ( _CfrTil_->RightBracket, SCN_IN_USE_FLAG_ALL ) ; // for the optimizer
+        _CFT_WordList_PushWord ( _CFT_->RightBracket, SCN_IN_USE_FLAG_ALL ) ; // for the optimizer
         if ( CompileMode ) // update the baseObject offset 
         {
             if ( ! variableFlag )
             {
-                CfrTil_OptimizeOn ( ) ;
+                CFT_OptimizeOn ( ) ;
                 SetHere ( baseObject->Coding, 1 ) ;
                 Debugger_Set_StartHere ( _Debugger_ ) ;// for Debugger_DisassembleAccumulated
                 _Debugger_->EntryWord = baseObject ; // for Debugger_DisassembleAccumulated
@@ -258,7 +258,7 @@ _CfrTil_ArrayBegin ( Boolean lispMode, Word **pl1, int64 *i )
                 }
                 else _Word_CompileAndRecord_PushReg (baseObject, ACC , true) ;
             }
-            else _CfrTil_OptimizeOff ( ) ; // can't really be optimized any more anyway and optimize is turned back on after an =/store anyway
+            else _CFT_OptimizeOff ( ) ; // can't really be optimized any more anyway and optimize is turned back on after an =/store anyway
             _DEBUG_SHOW ( baseObject, 1 ) ;
             compiler->ArrayEnds = 0 ; // reset for next array word in the current word being compiled
         }
@@ -267,35 +267,35 @@ _CfrTil_ArrayBegin ( Boolean lispMode, Word **pl1, int64 *i )
         {
             if ( ! variableFlag )
             {
-                _dllist_MapNodes_UntilWord ( dllist_First ( ( dllist* ) _CfrTil_->Compiler_N_M_Node_WordList ),
+                _dllist_MapNodes_UntilWord ( dllist_First ( ( dllist* ) _CFT_->Compiler_N_M_Node_WordList ),
                     ( VMapNodeFunction ) SCN_Set_NotInUseForOptimization, baseObject ) ; // old version : SCN_Set_NotInUse but now keep use for source code
             }
             SetState ( compiler, COMPILE_MODE, saveCompileMode ) ;
             //SetState ( compiler, ARRAY_MODE, false ) ;
         }
     }
-    if ( ! variableFlag ) SetState ( _CfrTil_, OPTIMIZE_ON, svOpState ) ;
+    if ( ! variableFlag ) SetState ( _CFT_, OPTIMIZE_ON, svOpState ) ;
 }
 
 void
-CfrTil_ArrayBegin ( )
+CFT_ArrayBegin ( )
 {
-    _CfrTil_ArrayBegin ( 0, 0, 0 ) ;
+    _CFT_ArrayBegin ( 0, 0, 0 ) ;
 }
 
 void
-CfrTil_ArrayEnd ( void )
+CFT_ArrayEnd ( void )
 {
     //noop
 }
 
 void
-CfrTil_ArrayModeOff ( void )
+CFT_ArrayModeOff ( void )
 {
     if ( GetState ( _Compiler_, ARRAY_MODE ) )
     {
         SetState ( _Compiler_, ARRAY_MODE, false ) ;
-        CfrTil_OptimizeOn ( ) ;
+        CFT_OptimizeOn ( ) ;
     }
 }
 

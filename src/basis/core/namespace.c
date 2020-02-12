@@ -3,7 +3,7 @@
 /*
  * cfrTil namespaces basic understandings :
  * 0. to allow for ordered search thru lists in use ...
- * 1. Namespaces are also linked on the _CfrTil_->Namespaces list with status of USING or NOT_USING
+ * 1. Namespaces are also linked on the CFT->Namespaces list with status of USING or NOT_USING
  *      and are moved the front or back of that list if status is set to USING with the 'Symbol node'
  *      This list is ordered so we can set an order to our search thru the namespaces in use. As usual
  *      the first word found within the ordered USING list will be used.
@@ -27,7 +27,7 @@ void
 _Namespace_DoAddWord ( Namespace * ns, Word * word, int64 addFlag )
 {
     Namespace_DoAddSymbol ( ns, ( Symbol* ) word ) ;
-    if ( addFlag ) _CfrTil_->WordsAdded ++ ;
+    if ( addFlag ) _CFT_->WordsAdded ++ ;
 }
 
 void
@@ -39,13 +39,13 @@ Namespace_DoAddWord ( Namespace * ns, Word * word )
 void
 _Namespace_AddToNamespacesHead ( Namespace * ns )
 {
-    _Namespace_DoAddSymbol ( _CfrTil_->Namespaces, ns ) ;
+    _Namespace_DoAddSymbol ( _CFT_->Namespaces, ns ) ;
 }
 
 void
 _Namespace_AddToNamespacesTail ( Namespace * ns )
 {
-    dllist_AddNodeToTail ( _CfrTil_->Namespaces->W_List, ( dlnode* ) ns ) ;
+    dllist_AddNodeToTail ( _CFT_->Namespaces->W_List, ( dlnode* ) ns ) ;
 }
 
 void
@@ -65,20 +65,20 @@ Namespace_DoNamespace ( Namespace * ns, Boolean isForwardDotted )
 }
 
 void
-_CfrTil_SetAsInNamespace ( Namespace * ns )
+_CFT_SetAsInNamespace ( Namespace * ns )
 {
-    _CfrTil_->InNamespace = ns ;
+    _CFT_->InNamespace = ns ;
 }
 
 void
 _Namespace_AddToNamespacesHead_SetAsInNamespace ( Namespace * ns )
 {
     _Namespace_AddToNamespacesHead ( ns ) ;
-    _CfrTil_SetAsInNamespace ( ns ) ;
+    _CFT_SetAsInNamespace ( ns ) ;
 }
 
 Namespace *
-_CfrTil_Namespace_InNamespaceSet ( Namespace * ns )
+_CFT_Namespace_InNamespaceSet ( Namespace * ns )
 {
     if ( ns )
     {
@@ -89,33 +89,33 @@ _CfrTil_Namespace_InNamespaceSet ( Namespace * ns )
 }
 
 Namespace *
-CfrTil_Namespace_InNamespaceSet ( byte * name )
+CFT_Namespace_InNamespaceSet ( byte * name )
 {
     Namespace * ns = Namespace_Find ( name ) ;
-    _CfrTil_Namespace_InNamespaceSet ( ns ) ;
+    _CFT_Namespace_InNamespaceSet ( ns ) ;
     return ns ;
 }
 
 Namespace *
-_CfrTil_Namespace_InNamespaceGet ( )
+_CFT_Namespace_InNamespaceGet ( )
 {
-    if ( _CfrTil_->Namespaces && ( ! _CfrTil_->InNamespace ) )
+    if ( _CFT_->Namespaces && ( ! _CFT_->InNamespace ) )
     {
-        _CfrTil_Namespace_InNamespaceSet ( _Namespace_FirstOnUsingList ( ) ) ; //( Namespace* ) _Tree_Map_FromANode ( ( dlnode* ) _CfrTil_->Namespaces, ( cMapFunction_1 ) _Namespace_IsUsing ) ;
+        _CFT_Namespace_InNamespaceSet ( _Namespace_FirstOnUsingList ( ) ) ; //( Namespace* ) _Tree_Map_FromANode ( ( dlnode* ) CFT->Namespaces, ( cMapFunction_1 ) _Namespace_IsUsing ) ;
     }
-    return _CfrTil_->InNamespace ;
+    return _CFT_->InNamespace ;
 }
 
 Namespace *
-_CfrTil_InNamespace ( )
+_CFT_InNamespace ( )
 {
     Namespace * ins ;
     if ( ( ins = Finder_GetQualifyingNamespace ( _Context_->Finder0 ) ) ) return ins ;
-    else return _CfrTil_Namespace_InNamespaceGet ( ) ;
+    else return _CFT_Namespace_InNamespaceGet ( ) ;
 }
 
 Boolean
-_CfrTil_IsContainingNamespace ( byte * name, byte * namespaceName )
+_CFT_IsContainingNamespace ( byte * name, byte * namespaceName )
 {
     Word * word = _Finder_Word_Find ( _Finder_, USING, name ) ;
     if ( word && String_Equal ( ( char* ) word->ContainingNamespace->Name, namespaceName ) ) return true ;
@@ -165,7 +165,7 @@ Word *
 _Namespace_FirstOnUsingList ( )
 {
     Word * ns, *nextNs ;
-    for ( ns = ( Namespace* ) dllist_First ( ( dllist* ) _CfrTil_->Namespaces->W_List ) ; ns ; ns = nextNs )
+    for ( ns = ( Namespace* ) dllist_First ( ( dllist* ) _CFT_->Namespaces->W_List ) ; ns ; ns = nextNs )
     {
         nextNs = ( Word* ) dlnode_Next ( ( node* ) ns ) ;
         if ( Is_NamespaceType ( ns ) && ( ns->State & USING ) ) return ns ;
@@ -176,7 +176,7 @@ _Namespace_FirstOnUsingList ( )
 void
 _Namespace_ResetFromInNamespace ( Namespace * ns )
 {
-    if ( ns == _CfrTil_->InNamespace ) _CfrTil_SetAsInNamespace ( _Namespace_FirstOnUsingList ( ) ) ; //( Namespace* ) dllist_First ( (dllist*) _CfrTil_->Namespaces->W_List ) ;
+    if ( ns == _CFT_->InNamespace ) _CFT_SetAsInNamespace ( _Namespace_FirstOnUsingList ( ) ) ; //( Namespace* ) dllist_First ( (dllist*) CFT->Namespaces->W_List ) ;
 }
 
 void
@@ -189,10 +189,10 @@ _Namespace_AddToNamespacesTail_ResetFromInNamespace ( Namespace * ns )
 void
 Namespaces_PrintList ( Namespace * ns, byte * insert )
 {
-    //CfrTil_Namespaces_PrettyPrintTree ( ) ;
-    //CfrTil_Using ( ) ;
+    //CFT_Namespaces_PrettyPrintTree ( ) ;
+    //CFT_Using ( ) ;
     _Printf ( ( byte* ) "\n\nNamespace : %s :: %s _Namespace_SetState : \n\t", ns->Name, insert ) ;
-    _List_PrintNames ( _CfrTil_->Namespaces->W_List, 5, 0 ) ;
+    _List_PrintNames ( _CFT_->Namespaces->W_List, 5, 0 ) ;
 }
 
 void
@@ -206,12 +206,12 @@ Namespace_SetState_AdjustListPosition ( Namespace * ns, uint64 state, Boolean se
         {
             //_Namespace_AddToNamespacesHead_SetAsInNamespace ( ns ) ; // make it first on the list
             _Namespace_AddToNamespacesHead ( ns ) ;
-            if ( setInNsFlag ) _CfrTil_SetAsInNamespace ( ns ) ;
+            if ( setInNsFlag ) _CFT_SetAsInNamespace ( ns ) ;
         }
         else _Namespace_AddToNamespacesTail_ResetFromInNamespace ( ns ) ;
         d0 ( if ( Is_DebugModeOn )
         {
-            Namespaces_PrintList ( ns, "After" ) ; CfrTil_Using ( ) ; } ) ;
+            Namespaces_PrintList ( ns, "After" ) ; CFT_Using ( ) ; } ) ;
     }
 }
 
@@ -224,7 +224,7 @@ _Namespace_AddToUsingList ( Namespace * ns )
     Stack_Init ( stack ) ;
     do
     {
-        if ( ns == _CfrTil_->Namespaces ) break ;
+        if ( ns == _CFT_->Namespaces ) break ;
         _Stack_Push ( stack, ( int64 ) ns ) ;
         ns = ns->ContainingNamespace ;
     }
@@ -237,9 +237,9 @@ _Namespace_AddToUsingList ( Namespace * ns )
     }
     if ( ns != svNs )
     {
-        //CfrTil_Using () ;
+        //CFT_Using () ;
         Namespace_SetState_AdjustListPosition ( svNs, USING, 1 ) ;
-        //CfrTil_Using () ;
+        //CFT_Using () ;
     }
     else _Namespace_SetState ( ns, USING ) ;
 }
@@ -252,7 +252,7 @@ _Namespace_ActivateAsPrimary ( Namespace * ns )
         ns = Word_UnAlias ( ns ) ;
         Finder_SetQualifyingNamespace ( _Context_->Finder0, ns ) ;
         _Namespace_AddToUsingList ( ns ) ;
-        _CfrTil_SetAsInNamespace ( ns ) ;
+        _CFT_SetAsInNamespace ( ns ) ;
         _Context_->Interpreter0->BaseObject = 0 ;
     }
 }
@@ -388,7 +388,7 @@ _Namespace_RemoveFromUsingListAndClear ( Namespace * ns )
 {
     if ( ns )
     {
-        if ( ns == _CfrTil_->InNamespace ) _CfrTil_->InNamespace = 0 ; //( Namespace* ) dlnode_Next ( ( dlnode* ) ns ) ; //dllist_First ( (dllist*) _O_->CfrTil->Namespaces->Lo_List ) ;
+        if ( ns == _CFT_->InNamespace ) _CFT_->InNamespace = 0 ; //( Namespace* ) dlnode_Next ( ( dlnode* ) ns ) ; //dllist_First ( (dllist*) _O_->CfrTil->Namespaces->Lo_List ) ;
         if ( ns == _Context_->Finder0->QualifyingNamespace ) Finder_SetQualifyingNamespace ( _Context_->Finder0, 0 ) ;
         _Namespace_Clear ( ns ) ;
         dlnode_Remove ( ( dlnode* ) ns ) ;
@@ -399,7 +399,7 @@ _Namespace_RemoveFromUsingListAndClear ( Namespace * ns )
 int64
 _Namespace_VariableValueGet ( Namespace * ns, byte * name )
 {
-    Word * word = _CfrTil_VariableGet ( ns, name ) ;
+    Word * word = _CFT_VariableGet ( ns, name ) ;
     if ( word ) return ( int64 ) word->W_Value ; // value of variable
     else return 0 ;
 }
@@ -407,7 +407,7 @@ _Namespace_VariableValueGet ( Namespace * ns, byte * name )
 void
 _Namespace_VariableValueSet ( Namespace * ns, byte * name, int64 value )
 {
-    Word * word = _CfrTil_VariableGet ( ns, name ) ;
+    Word * word = _CFT_VariableGet ( ns, name ) ;
     if ( word )
     {
         word->W_Value = value ; // value of variable
@@ -436,7 +436,7 @@ _Namespace_Find ( byte * name, Namespace * superNamespace, int64 exceptionFlag )
         else if ( exceptionFlag )
         {
             _Printf ( ( byte* ) "\nUnable to find Namespace : %s\n", name ) ;
-            CfrTil_Exception ( NAMESPACE_ERROR, 0, 1 ) ;
+            CFT_Exception ( NAMESPACE_ERROR, 0, 1 ) ;
             return 0 ;
         }
     }
@@ -453,7 +453,7 @@ Namespace_Find ( byte * name )
 Namespace *
 Namespace_FindOrNew_SetUsing ( byte * name, Namespace * containingNs, int64 setUsingFlag )
 {
-    if ( ! containingNs ) containingNs = _CfrTil_->Namespaces ;
+    if ( ! containingNs ) containingNs = _CFT_->Namespaces ;
     Namespace * ns = _Finder_FindWord_InOneNamespace ( _Finder_, containingNs, name ) ; //_Namespace_Find ( name, containingNs, 0 ) ;
     if ( ! ns ) ns = Namespace_New ( name, containingNs ) ;
     if ( setUsingFlag ) Namespace_SetState_AdjustListPosition ( ns, USING, 1 ) ;
@@ -469,10 +469,10 @@ _Namespace_FindOrNew_Local ( Stack * nsStack )
     int64 d = Stack_Depth ( compiler->BlockStack ) ;
     byte bufferData [ 32 ], *name = ( byte* ) bufferData ;
     snprintf ( ( char* ) name, 32, "locals_%ld", d - 1 ) ; // 1 : BlockStack starts at 1 
-    ns = _Namespace_Find ( name, _CfrTil_->Namespaces, 0 ) ;
+    ns = _Namespace_Find ( name, _CFT_->Namespaces, 0 ) ;
     if ( ! ns )
     {
-        ns = Namespace_New ( name, _CfrTil_->Namespaces ) ;
+        ns = Namespace_New ( name, _CFT_->Namespaces ) ;
         if ( CompileMode ) Stack_Push ( nsStack, ( int64 ) ns ) ; // nb. this is where the the depth increase
         else compiler->NonCompilingNs = ns ;
     }
@@ -516,20 +516,20 @@ Namespace_PrintWords ( byte * name )
 void
 _Namespace_MapAny_2Args ( MapSymbolFunction2 msf2, int64 one, int64 two )
 {
-    Tree_Map_Namespaces_State_2Args ( _CfrTil_->Namespaces->W_List, ANY, msf2, one, two ) ;
+    Tree_Map_Namespaces_State_2Args ( _CFT_->Namespaces->W_List, ANY, msf2, one, two ) ;
 }
 
 void
 _Namespace_MapUsing_2Args ( MapSymbolFunction2 msf2, int64 one, int64 two )
 {
-    Tree_Map_Namespaces_State_2Args ( _CfrTil_->Namespaces->W_List, USING, msf2, one, two ) ;
+    Tree_Map_Namespaces_State_2Args ( _CFT_->Namespaces->W_List, USING, msf2, one, two ) ;
 }
 
 void
-CfrTil_SetInNamespaceFromBackground ( )
+CFT_SetInNamespaceFromBackground ( )
 {
     Context * cntx = _Context_ ;
-    if ( cntx->Compiler0->C_FunctionBackgroundNamespace ) _CfrTil_Namespace_InNamespaceSet ( cntx->Compiler0->C_FunctionBackgroundNamespace ) ;
+    if ( cntx->Compiler0->C_FunctionBackgroundNamespace ) _CFT_Namespace_InNamespaceSet ( cntx->Compiler0->C_FunctionBackgroundNamespace ) ;
     else Compiler_SetAs_InNamespace_C_BackgroundNamespace ( cntx->Compiler0 ) ;
 }
 

@@ -1,19 +1,19 @@
 #include "../include/cfrtil64.h"
 
 void
-CfrTil_Dsp ( )
+CFT_Dsp ( )
 {
     DataStack_Push ( ( int64 ) _Dsp_ ) ;
 }
 
 void
-CfrTil_Drop ( )
+CFT_Drop ( )
 {
     if ( CompileMode )
     {
         //Word * one = Compiler_WordStack ( - 1 ) ;
-        Word * one = CfrTil_WordList ( 1 ) ;
-        if ( GetState ( _CfrTil_, OPTIMIZE_ON ) && one && ( one->StackPushRegisterCode ) ) SetHere (one->StackPushRegisterCode, 1) ;
+        Word * one = CFT_WordList ( 1 ) ;
+        if ( GetState ( _CFT_, OPTIMIZE_ON ) && one && ( one->StackPushRegisterCode ) ) SetHere (one->StackPushRegisterCode, 1) ;
         else _Compile_Stack_Drop ( DSP ) ;
     }
     else
@@ -23,7 +23,7 @@ CfrTil_Drop ( )
 }
 
 void
-CfrTil_DropN ( )
+CFT_DropN ( )
 {
     if ( CompileMode ) _Compile_Stack_DropN ( DSP, _DataStack_Top ( ) + 1 ) ;
     else DataStack_DropN ( TOS + 1 ) ;
@@ -31,7 +31,7 @@ CfrTil_DropN ( )
 
 #if 0 // ??not needed 
 void
-_CfrTil_Push ( int64 value )
+_CFT_Push ( int64 value )
 {
     if ( CompileMode )
     {
@@ -45,20 +45,20 @@ _CfrTil_Push ( int64 value )
 #endif
 
 void
-CfrTil_Dup ( )
+CFT_Dup ( )
 {
     if ( CompileMode ) _Compile_Stack_Dup ( DSP ) ;
     else DataStack_Dup ( ) ;
-    CfrTil_TypeStack_Dup ( ) ;
+    CFT_TypeStack_Dup ( ) ;
 }
 #if 0
 void
-CfrTil_Ndrop ( )
+CFT_Ndrop ( )
 {
     if ( CompileMode )
     {
         //Compile_SUBI( mod, operandReg, offset, immediateData, size ) 
-        Word * one = CfrTil_WordList ( 1 ) ;
+        Word * one = CFT_WordList ( 1 ) ;
         SetHere (one->Coding, 1) ;
         Compile_SUBI ( REG, DSP, 0, one->W_Value * CELL_SIZE, BYTE ) ;
     }
@@ -72,7 +72,7 @@ CfrTil_Ndrop ( )
 // result is as if one did n dups in a row 
 
 void
-CfrTil_NDup ( )
+CFT_NDup ( )
 {
     int64 n = TOS ;
     int64 value = * -- _Dsp_ ; // -1 : n now occupies 1 to be also used slot
@@ -81,7 +81,7 @@ CfrTil_NDup ( )
 
         * ++ _Dsp_ = value ;
     }
-    //_CfrTil_->Set_DspReg_FromDataStackPointer ( ) ; // update DSP reg
+    //CFT->Set_DspReg_FromDataStackPointer ( ) ; // update DSP reg
 }
 
 // pick is from stack below top index
@@ -90,7 +90,7 @@ CfrTil_NDup ( )
 // ..., etc.
 
 void
-CfrTil_Pick ( ) // pick
+CFT_Pick ( ) // pick
 {
     if ( CompileMode )
     {
@@ -105,7 +105,7 @@ CfrTil_Pick ( ) // pick
 }
 
 void
-CfrTil_Swap ( )
+CFT_Swap ( )
 {
     if ( CompileMode )
     {
@@ -119,48 +119,48 @@ CfrTil_Swap ( )
     }
 }
 void
-CfrTil_PrintNDataStack ( )
+CFT_PrintNDataStack ( )
 {
     // Intel SoftwareDevelopersManual-253665.pdf section 6.2 : a push decrements ESP, a pop increments ESP
     // therefore TOS is in lower mem addresses, bottom of stack is in higher memory addresses
     int64 size = DataStack_Pop ( ) ;
-    _CfrTil_PrintNDataStack ( size ) ;
+    _CFT_PrintNDataStack ( size ) ;
 }
 
 #if 0
 void
-CfrTil_PrintRspRegStack ( )
+CFT_PrintRspRegStack ( )
 {
     // Intel SoftwareDevelopersManual-253665.pdf section 6.2 : a push decrements ESP, a pop increments ESP
     // therefore TOS is in lower mem addresses, bottom of stack is in higher memory addresses
-    _CfrTil_PrintNReturnStack ( 8 ) ;
+    _CFT_PrintNReturnStack ( 8 ) ;
 }
 #endif
 
 void
-CfrTil_PrintReturnStack ( )
+CFT_PrintReturnStack ( )
 {
-    _CfrTil_PrintNReturnStack ( 8, 1 ) ;
-    CfrTil_NewLine ( ) ;
+    _CFT_PrintNReturnStack ( 8, 1 ) ;
+    CFT_NewLine ( ) ;
 
 }
 
 
 void
-CfrTil_PrintNReturnStack ( )
+CFT_PrintNReturnStack ( )
 {
     // Intel SoftwareDevelopersManual-253665.pdf section 6.2 : a push decrements ESP, a pop increments ESP
     // therefore TOS is in lower mem addresses, bottom of stack is in higher memory addresses
     int64 size = DataStack_Pop ( ) ;
-    _CfrTil_PrintNReturnStack ( size, 1 ) ;
-    CfrTil_NewLine () ;
+    _CFT_PrintNReturnStack ( size, 1 ) ;
+    CFT_NewLine () ;
 }
 
 void
-CfrTil_PrintNDataStack_8 ( )
+CFT_PrintNDataStack_8 ( )
 {
     // Intel SoftwareDevelopersManual-253665.pdf section 6.2 : a push decrements ESP, a pop increments ESP
     // therefore TOS is in lower mem addresses, bottom of stack is in higher memory addresses
-    _CfrTil_PrintNDataStack ( 8 ) ;
+    _CFT_PrintNDataStack ( 8 ) ;
 }
 

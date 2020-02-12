@@ -8,40 +8,40 @@ Fflush ( )
 }
 
 void
-CfrTil_Kbhit ( void )
+CFT_Kbhit ( void )
 {
     DataStack_Push ( ( int64 ) kbhit ( ) ) ;
 }
 
 void
-CfrTil_PrintString ( )
+CFT_PrintString ( )
 {
-    _CfrTil_PrintString ( ( byte* ) DataStack_Pop ( ) ) ;
+    _CFT_PrintString ( ( byte* ) DataStack_Pop ( ) ) ;
 }
 
 void
-CfrTil_NewLine ( )
+CFT_NewLine ( )
 {
-    _CfrTil_PrintChar ( '\n' ) ;
+    _CFT_PrintChar ( '\n' ) ;
     ReadLiner_SetLastChar ( '\n' ) ;
 }
 
 void
-CfrTil_CarriageReturn ( )
+CFT_CarriageReturn ( )
 {
-    _CfrTil_PrintChar ( '\r' ) ;
+    _CFT_PrintChar ( '\r' ) ;
 }
 
 void
-CfrTil_SPACE ( ) // '.'
+CFT_SPACE ( ) // '.'
 {
-    _CfrTil_PrintChar ( ' ' ) ;
+    _CFT_PrintChar ( ' ' ) ;
 }
 
 void
-CfrTil_TAB ( ) // '.'
+CFT_TAB ( ) // '.'
 {
-    _CfrTil_PrintChar ( '\t' ) ;
+    _CFT_PrintChar ( '\t' ) ;
 }
 
 void
@@ -105,7 +105,7 @@ Print_Binary ( uint64 n )
 void
 PrintfInt ( int64 n )
 {
-    byte * buffer = Buffer_Data ( _CfrTil_->ScratchB1 ) ;
+    byte * buffer = Buffer_Data ( _CFT_->ScratchB1 ) ;
     if ( _Context_->System0->NumberBase == 10 ) sprintf ( ( char* ) buffer, INT_FRMT, n ) ;
     else if ( _Context_->System0->NumberBase == 2 )
     {
@@ -118,13 +118,13 @@ PrintfInt ( int64 n )
 }
 
 void
-CfrTil_PrintInt ( )
+CFT_PrintInt ( )
 {
     PrintfInt ( DataStack_Pop ( ) ) ;
 }
 
 void
-CfrTil_HexPrintInt ( )
+CFT_HexPrintInt ( )
 {
     int64 svb = _Context_->System0->NumberBase ;
     _Context_->System0->NumberBase = 16 ;
@@ -133,15 +133,15 @@ CfrTil_HexPrintInt ( )
 }
 
 void
-CfrTil_Emit ( )
+CFT_Emit ( )
 {
     int64 c = DataStack_Pop ( ) ;
-    if ( ( c >= 0 ) && ( c < 256 ) ) _CfrTil_PrintChar ( c ) ;
-    else _CfrTil_PrintChar ( c ) ; //_Printf ( ( byte* ) "%c", ( ( CString ) c )[0] ) ;
+    if ( ( c >= 0 ) && ( c < 256 ) ) _CFT_PrintChar ( c ) ;
+    else _CFT_PrintChar ( c ) ; //_Printf ( ( byte* ) "%c", ( ( CString ) c )[0] ) ;
 }
 
 void
-CfrTil_Key ( )
+CFT_Key ( )
 {
 #if 0    
     ReadLine_Get_Key ( _Context_->ReadLiner0 ) ;
@@ -152,32 +152,32 @@ CfrTil_Key ( )
 }
 
 void
-CfrTil_LogOn ( )
+CFT_LogOn ( )
 {
-    _CfrTil_->LogFlag = true ;
-    if ( ! _CfrTil_->LogFILE ) _CfrTil_->LogFILE = fopen ( ( char* ) "cfrtil.log", "w" ) ;
+    _CFT_->LogFlag = true ;
+    if ( ! _CFT_->LogFILE ) _CFT_->LogFILE = fopen ( ( char* ) "cfrtil.log", "w" ) ;
 }
 
 void
-CfrTil_LogAppend ( )
+CFT_LogAppend ( )
 {
     byte * logFilename = ( byte* ) DataStack_Pop ( ) ;
-    _CfrTil_->LogFILE = fopen ( ( char* ) logFilename, "a" ) ;
-    CfrTil_LogOn ( ) ;
+    _CFT_->LogFILE = fopen ( ( char* ) logFilename, "a" ) ;
+    CFT_LogOn ( ) ;
 }
 
 void
-CfrTil_LogWrite ( )
+CFT_LogWrite ( )
 {
     byte * logFilename = ( byte* ) DataStack_Pop ( ) ;
-    _CfrTil_->LogFILE = fopen ( ( char* ) logFilename, "w" ) ;
-    CfrTil_LogOn ( ) ;
+    _CFT_->LogFILE = fopen ( ( char* ) logFilename, "w" ) ;
+    CFT_LogOn ( ) ;
 }
 
 void
-CfrTil_LogOff ( )
+CFT_LogOff ( )
 {
-    CfrTil * cfrtil = _CfrTil_ ;
+    CfrTil * cfrtil = _CFT_ ;
     if ( cfrtil )
     {
         fflush ( cfrtil->LogFILE ) ;

@@ -4,7 +4,7 @@
 void
 _Context_Prompt ( int64 control )
 {
-    if ( ( control && ( ! IS_INCLUDING_FILES ) ) || ( GetState ( _Debugger_, DBG_ACTIVE ) ) ) CfrTil_DoPrompt ( ) ;
+    if ( ( control && ( ! IS_INCLUDING_FILES ) ) || ( GetState ( _Debugger_, DBG_ACTIVE ) ) ) CFT_DoPrompt ( ) ;
 }
 
 byte *
@@ -13,7 +13,7 @@ _Context_Location ( Context * cntx )
     byte * str = 0 ;
     if ( cntx && cntx->ReadLiner0 )
     {
-        byte * buffer = Buffer_Data ( _CfrTil_->StringB ) ;
+        byte * buffer = Buffer_Data ( _CFT_->StringB ) ;
         snprintf ( ( char* ) buffer, BUF_IX_SIZE, "%s : %ld.%ld", ( char* ) cntx->ReadLiner0->Filename ? ( char* ) cntx->ReadLiner0->Filename : "<command line>", cntx->ReadLiner0->LineNumber, cntx->Lexer0->CurrentReadIndex ) ;
         str = cntx->Location = String_New ( buffer, TEMPORARY ) ;
     }
@@ -60,7 +60,7 @@ _Context_Init ( Context * cntx0, Context * cntx )
 {
     if ( cntx0 && cntx0->System0 ) cntx->System0 = System_Copy ( cntx0->System0, CONTEXT ) ; // nb : in this case System is copied -- DataStack is shared
     else cntx->System0 = System_New ( CONTEXT ) ;
-    List_Init ( _CfrTil_->Compiler_N_M_Node_WordList ) ;
+    List_Init ( _CFT_->Compiler_N_M_Node_WordList ) ;
     Context_SetDefaultTokenDelimiters ( cntx, ( byte* ) " \n\r\t", CONTEXT ) ;
     cntx->Interpreter0 = Interpreter_New ( CONTEXT ) ;
     cntx->Lexer0 = cntx->Interpreter0->Lexer0 ;
@@ -101,7 +101,7 @@ _Context_Run ( Context * cntx, ContextFunction contextFunction )
 }
 
 Context *
-CfrTil_Context_PushNew ( CfrTil * cfrTil )
+CFT_Context_PushNew ( CfrTil * cfrTil )
 {
     _Stack_Push ( cfrTil->ContextDataStack, ( int64 ) cfrTil->Context0 ) ;
     Context * cntx = _Context_New ( cfrTil ) ;
@@ -109,7 +109,7 @@ CfrTil_Context_PushNew ( CfrTil * cfrTil )
 }
 
 void
-CfrTil_Context_PopDelete ( CfrTil * cfrTil )
+CFT_Context_PopDelete ( CfrTil * cfrTil )
 {
     NBA * cnba = cfrTil->Context0->ContextNba ;
     Context * cntx = ( Context* ) _Stack_Pop ( cfrTil->ContextDataStack ) ;
@@ -120,29 +120,29 @@ CfrTil_Context_PopDelete ( CfrTil * cfrTil )
 }
 
 void
-_CfrTil_Contex_NewRun_1 ( CfrTil * cfrTil, ContextFunction_1 contextFunction, byte *arg )
+_CFT_Contex_NewRun_1 ( CfrTil * cfrTil, ContextFunction_1 contextFunction, byte *arg )
 {
-    Context * cntx = CfrTil_Context_PushNew ( cfrTil ) ;
+    Context * cntx = CFT_Context_PushNew ( cfrTil ) ;
     _Context_Run_1 ( cntx, contextFunction, arg ) ;
-    CfrTil_Context_PopDelete ( cfrTil ) ; // this could be coming back from wherever so the stack variables are gone
+    CFT_Context_PopDelete ( cfrTil ) ; // this could be coming back from wherever so the stack variables are gone
 }
 
 void
-_CfrTil_Contex_NewRun_2 ( CfrTil * cfrTil, ContextFunction_2 contextFunction, byte *arg, int64 arg2 )
+_CFT_Contex_NewRun_2 ( CfrTil * cfrTil, ContextFunction_2 contextFunction, byte *arg, int64 arg2 )
 {
-    Context * cntx = CfrTil_Context_PushNew ( cfrTil ) ;
+    Context * cntx = CFT_Context_PushNew ( cfrTil ) ;
     _Context_Run_2 ( cntx, contextFunction, arg, arg2 ) ;
-    CfrTil_Context_PopDelete ( cfrTil ) ; // this could be coming back from wherever so the stack variables are gone
+    CFT_Context_PopDelete ( cfrTil ) ; // this could be coming back from wherever so the stack variables are gone
 }
 
 void
-_CfrTil_Contex_NewRun_Void ( CfrTil * cfrTil, Word * word )
+_CFT_Contex_NewRun_Void ( CfrTil * cfrTil, Word * word )
 {
     if ( word )
     {
-        CfrTil_Context_PushNew ( cfrTil ) ;
+        CFT_Context_PushNew ( cfrTil ) ;
         Block_Eval ( word->Definition ) ;
-        CfrTil_Context_PopDelete ( cfrTil ) ; // this could be coming back from wherever so the stack variables are gone
+        CFT_Context_PopDelete ( cfrTil ) ; // this could be coming back from wherever so the stack variables are gone
     }
 }
 
@@ -167,9 +167,9 @@ _Context_InterpretString ( Context * cntx, byte *str )
 }
 
 void
-_CfrTil_ContextNew_InterpretString ( CfrTil * cfrTil, byte * str )
+_CFT_ContextNew_InterpretString ( CfrTil * cfrTil, byte * str )
 {
-    if ( str ) _CfrTil_Contex_NewRun_1 ( cfrTil, _Context_InterpretString, str ) ;
+    if ( str ) _CFT_Contex_NewRun_1 ( cfrTil, _Context_InterpretString, str ) ;
 }
 
 void
@@ -177,7 +177,7 @@ _Context_InterpretFile ( Context * cntx )
 {
     if ( GetState ( _Debugger_, DBG_AUTO_MODE ) )
     {
-        _CfrTil_DebugContinue ( 0 ) ;
+        _CFT_DebugContinue ( 0 ) ;
     }
     else Interpret_UntilFlaggedWithInit ( cntx->Interpreter0, END_OF_FILE | END_OF_STRING ) ;
 }
@@ -210,16 +210,16 @@ _Context_IncludeFile ( Context * cntx, byte *filename, int64 interpretFlag )
         }
         else
         {
-            _Printf ( ( byte* ) "\nError : _CfrTil_IncludeFile : \"%s\" : not found! :: %s\n", filename,
-                _Context_Location ( ( Context* ) _CfrTil_->ContextDataStack->StackPointer [0] ) ) ;
+            _Printf ( ( byte* ) "\nError : _CFT_IncludeFile : \"%s\" : not found! :: %s\n", filename,
+                _Context_Location ( ( Context* ) _CFT_->ContextDataStack->StackPointer [0] ) ) ;
         }
     }
 }
 
 void
-_CfrTil_ContextNew_IncludeFile ( byte * filename )
+_CFT_ContextNew_IncludeFile ( byte * filename )
 {
-    _CfrTil_Contex_NewRun_2 ( _CfrTil_, _Context_IncludeFile, filename, 1 ) ;
+    _CFT_Contex_NewRun_2 ( _CFT_, _Context_IncludeFile, filename, 1 ) ;
 }
 
 int64

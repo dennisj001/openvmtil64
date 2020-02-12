@@ -8,29 +8,29 @@ MultipleEscape ( )
 }
 
 void
-CfrTil_Strlen ( )
+CFT_Strlen ( )
 {
     DataStack_Push ( (int64) Strlen ( (char*) DataStack_Pop ( ) ) ) ;
 }
 
 void
-CfrTil_Strcmp ( )
+CFT_Strcmp ( )
 {
     DataStack_Push ( (int64) Strcmp ( (byte*) DataStack_Pop ( ), (byte*) DataStack_Pop ( ) ) ) ;
 }
 
 void
-CfrTil_Stricmp ( )
+CFT_Stricmp ( )
 {
     DataStack_Push ( (int64) Stricmp ( (byte*) DataStack_Pop ( ), (byte*) DataStack_Pop ( ) ) ) ;
 }
 
 //char * strcat ( char * destination, const char * source );
 void
-CfrTil_StrCat ( )
+CFT_StrCat ( )
 {
     //Buffer * b = Buffer_New ( BUFFER_SIZE ) ;  
-    byte * buffer = Buffer_Data ( _CfrTil_->StrCatBuffer );  byte *str ;
+    byte * buffer = Buffer_Data ( _CFT_->StrCatBuffer );  byte *str ;
     char * src = (char*) DataStack_Pop ( ) ;
     char * dst = (char*) DataStack_Pop ( ) ;
     strcpy ( (char*) buffer, dst ) ;
@@ -41,7 +41,7 @@ CfrTil_StrCat ( )
 }
 
 void
-CfrTil_StrCpy ( )
+CFT_StrCpy ( )
 {
     // !! nb. this cant really work !! what do we want here ??
     DataStack_Push ( (int64) strcpy ( (char*) DataStack_Pop ( ), (char*) DataStack_Pop ( ) ) ) ;

@@ -70,7 +70,7 @@ void
 TDSCI_Init ( TypeDefStructCompileInfo * tdsci )
 {
     if ( tdsci->BackgroundNamespace ) memset ( tdsci, 0, sizeof (TypeDefStructCompileInfo ) ) ;
-    tdsci->BackgroundNamespace = _CfrTil_Namespace_InNamespaceGet ( ) ;
+    tdsci->BackgroundNamespace = _CFT_Namespace_InNamespaceGet ( ) ;
     SetState ( _Compiler_, TDSCI_PARSING, true ) ;
 }
 
@@ -83,10 +83,10 @@ TypeDefStructCompileInfo_New ( )
 }
 
 void
-CfrTil_Parse_Error ( byte * msg, byte * token )
+CFT_Parse_Error ( byte * msg, byte * token )
 {
-    byte * buffer = Buffer_Data_Cleared ( _CfrTil_->ScratchB1 ) ;
-    sprintf ( ( char* ) buffer, "\nCfrTil_Parse_ClassStructure : %s : \'%s\' at %s", ( char* ) msg, token, Context_Location ( ) ) ;
+    byte * buffer = Buffer_Data_Cleared ( _CFT_->ScratchB1 ) ;
+    sprintf ( ( char* ) buffer, "\nCFT_Parse_ClassStructure : %s : \'%s\' at %s", ( char* ) msg, token, Context_Location ( ) ) ;
     _SyntaxError ( ( byte* ) buffer, 1 ) ; // else structure component size error
 }
 
@@ -102,12 +102,12 @@ Parse_ArrayField ( TypeDefStructCompileInfo * tdsci )
     {
         if ( token && String_Equal ( ( char* ) token, "[" ) )
         {
-            CfrTil_InterpretNextToken ( ) ; // next token must be an integer for the array dimension size
+            CFT_InterpretNextToken ( ) ; // next token must be an integer for the array dimension size
             arrayDimensionSize = DataStack_Pop ( ) ;
             size = size * arrayDimensionSize ;
             tdsci->Tdsci_Field_Size = size ;
             token = TDSCI_ReadToken ( tdsci ) ;
-            if ( ! String_Equal ( ( char* ) token, "]" ) ) CfrTil_Exception ( SYNTAX_ERROR, 0, 1 ) ;
+            if ( ! String_Equal ( ( char* ) token, "]" ) ) CFT_Exception ( SYNTAX_ERROR, 0, 1 ) ;
             else arrayDimensions [ i ] = arrayDimensionSize ;
             token = TDSCI_ReadToken ( tdsci ) ;
         }
@@ -125,6 +125,17 @@ Parse_ArrayField ( TypeDefStructCompileInfo * tdsci )
         }
     }
 }
+
+Word *
+Parse_Do_IdentifierAlias ( TypeDefStructCompileInfo * tdsci, byte * token )
+{
+    Word * id ;
+    tdsci->Tdsci_StructureUnion_Namespace = id = _CFT_TypedefAlias ( tdsci->Tdsci_TotalStructureNamespace, token,
+        tdsci->BackgroundNamespace ) ;
+    Class_Size_Set ( id, tdsci->Tdsci_StructureUnion_Size ) ;
+    TypeNamespace_Set ( id, tdsci->Tdsci_TotalStructureNamespace ) ;
+    return id ;
+}
 // we have read the idField name = token
 
 void
@@ -137,20 +148,15 @@ Parse_Do_Identifier ( TypeDefStructCompileInfo * tdsci, int64 t_type, int64 size
         //Finder_SetQualifyingNamespace ( _Finder_, tdsci->Tdsci_TotalStructureNamespace ) ;
         if ( tdsci->Tdsci_TotalStructureNamespace )
         {
-            if ( tdsci->Tdsci_TotalStructureNamespace->Name )
-            {
-                tdsci->Tdsci_StructureUnion_Namespace = id = _CfrTil_Alias ( tdsci->Tdsci_TotalStructureNamespace, token, 
-                    tdsci->Tdsci_TotalStructureNamespace ) ;
-                Class_Size_Set ( id, tdsci->Tdsci_StructureUnion_Size ) ;
-                TypeNamespace_Set ( id, tdsci->Tdsci_TotalStructureNamespace ) ;
-            }
-            else tdsci->Tdsci_TotalStructureNamespace->Name = String_New ( token, DICTIONARY ) ;
+            if ( ! tdsci->Tdsci_TotalStructureNamespace->Name )
+                tdsci->Tdsci_TotalStructureNamespace->Name = String_New ( token, DICTIONARY ) ;
+            Parse_Do_IdentifierAlias ( tdsci, token ) ; //else tdsci->Tdsci_TotalStructureNamespace->Name = String_New ( token, DICTIONARY ) ;
         }
         else
         {
-            //_CfrTil_Namespace_InNamespaceSet ( tdsci->Tdsci_StructureUnion_Namespace ) ;
-            tdsci->Tdsci_StructureUnion_Namespace = id = DataObject_New ( CLASS_CLONE, 0, token, 0, 0, 0, 0, 0, 
-                tdsci->Tdsci_TotalStructureNamespace, 0, -1, -1 ) ;
+            //_CFT_Namespace_InNamespaceSet ( tdsci->Tdsci_StructureUnion_Namespace ) ;
+            tdsci->Tdsci_StructureUnion_Namespace = id = DataObject_New ( CLASS_CLONE, 0, token, 0, 0, 0, 0, 0,
+                tdsci->Tdsci_TotalStructureNamespace, 0, - 1, - 1 ) ;
             Class_Size_Set ( id, tdsci->Tdsci_StructureUnion_Size ) ;
             id->W_ObjectAttributes |= ( STRUCTURE ) ; //??
         }
@@ -168,12 +174,12 @@ Parse_Do_Identifier ( TypeDefStructCompileInfo * tdsci, int64 t_type, int64 size
         else // if ( t_type == TYPE_NAME )
         {
             // shouldn't need these 2 lines ...
-            //if ( ! tdsci->Tdsci_StructureUnion_Namespace ) tdsci->Tdsci_StructureUnion_Namespace = _CfrTil_Namespace_InNamespaceGet ( ) ;
+            //if ( ! tdsci->Tdsci_StructureUnion_Namespace ) tdsci->Tdsci_StructureUnion_Namespace = _CFT_Namespace_InNamespaceGet ( ) ;
             //if ( ! tdsci->Tdsci_TotalStructureNamespace ) tdsci->Tdsci_TotalStructureNamespace = tdsci->Tdsci_StructureUnion_Namespace ;
             addToNs = tdsci->Tdsci_StructureUnion_Namespace->Name ? tdsci->Tdsci_StructureUnion_Namespace : tdsci->Tdsci_TotalStructureNamespace ;
-            //tdsci->Tdsci_Field_Object = id = //CfrTil_ClassField_New ( token, addToNs, size, tdsci->Tdsci_Offset ) ;
+            //tdsci->Tdsci_Field_Object = id = //CFT_ClassField_New ( token, addToNs, size, tdsci->Tdsci_Offset ) ;
             tdsci->Tdsci_Field_Object = id = DataObject_New ( CLASS_FIELD, 0, token, 0, 0, 0, tdsci->Tdsci_Offset, size, addToNs, 0, 0, 0 ) ;
-            TypeNamespace_Set( id, tdsci->Tdsci_Field_Type_Namespace ) ;
+            TypeNamespace_Set ( id, tdsci->Tdsci_Field_Type_Namespace ) ;
             tdsci->Tdsci_Field_Size = size ;
         }
     }
@@ -292,7 +298,7 @@ Parse_StructOrUnion_Type ( TypeDefStructCompileInfo * tdsci, int64 structOrUnion
             if ( ! tdsci->Tdsci_TotalStructureNamespace ) tdsci->Tdsci_TotalStructureNamespace = tdsci->Tdsci_StructureUnion_Namespace ;
             Parse_Structure ( tdsci ) ;
         }
-        else CfrTil_Parse_Error ( "No \'{\' token in struct/union field", token ) ;
+        else CFT_Parse_Error ( "No \'{\' token in struct/union field", token ) ;
         // prost-structure identifiers
         if ( tdsci->TdsciToken && ( tdsci->TdsciToken [0] != ';' ) )
         {
@@ -315,7 +321,7 @@ Parse_Type_Field ( TypeDefStructCompileInfo * tdsci, Namespace * type0 )
     if ( type0 )
     {
         tdsci->Tdsci_Field_Type_Namespace = type0 ;
-        size = CfrTil_Get_Namespace_SizeVar_Value ( type0 ) ;
+        size = CFT_Get_Namespace_SizeVar_Value ( type0 ) ;
         token = TDSCI_ReadToken ( tdsci ) ;
         if ( ( token [0] == '*' ) )
         {
@@ -325,7 +331,7 @@ Parse_Type_Field ( TypeDefStructCompileInfo * tdsci, Namespace * type0 )
         }
         Parse_Identifier_Field ( tdsci, TYPE_NAME, size ) ;
     }
-    else CfrTil_Parse_Error ( "No type in type field", token ) ;
+    else CFT_Parse_Error ( "No type in type field", token ) ;
 }
 
 void
@@ -341,7 +347,7 @@ Parse_A_Typedef_Field ( TypeDefStructCompileInfo * tdsci )
     {
         token = Lexer_Peek_Next_NonDebugTokenWord ( _Lexer_, 1, 0 ) ;
         if ( token[0] == '{' ) Parse_StructOrUnion_Type ( tdsci, TDSCI_STRUCT ) ;
-        else CfrTil_Parse_Error ( "Can't find type field namespace", token ) ;
+        else CFT_Parse_Error ( "Can't find type field namespace", token ) ;
     }
     // print class field
     //if ( dataPtr ) _Printf ( (byte*) "\n\t%s\t%s" = %lx", token0, token1, (sizeof token0) data [ offset ]) ;
@@ -376,7 +382,7 @@ Compiler_TypedObjectInit ( Word * word, Namespace * typeNamespace )
 // the slot address on the DataStack
 
 Namespace *
-_CfrTil_Parse_LocalsAndStackVariables ( int64 svf, int64 lispMode, ListObject * args, Stack * nsStack, Namespace * localsNs ) // stack variables flag
+_CFT_Parse_LocalsAndStackVariables ( int64 svf, int64 lispMode, ListObject * args, Stack * nsStack, Namespace * localsNs ) // stack variables flag
 {
     // number of stack variables, number of locals, stack variable flag
     Context * cntx = _Context_ ;
@@ -390,9 +396,9 @@ _CfrTil_Parse_LocalsAndStackVariables ( int64 svf, int64 lispMode, ListObject * 
     int64 svff = 0, addWords, getReturn = 0, getReturnFlag = 0, regToUseIndex = 0 ;
     Boolean regFlag = false ;
     byte *token, *returnVariable = 0 ;
-    Namespace *typeNamespace = 0, *objectTypeNamespace = 0, *saveInNs = _CfrTil_->InNamespace ;
-    //CfrTil_DbgSourceCodeOff ( ) ;
-    if ( ! CompileMode ) Compiler_Init (compiler, 0) ;
+    Namespace *typeNamespace = 0, *objectTypeNamespace = 0, *saveInNs = _CFT_->InNamespace ;
+    //CFT_DbgSourceCodeOff ( ) ;
+    if ( ! CompileMode ) Compiler_Init ( compiler, 0 ) ;
 
     if ( svf ) svff = 1 ;
     addWords = 1 ;
@@ -405,7 +411,7 @@ _CfrTil_Parse_LocalsAndStackVariables ( int64 svf, int64 lispMode, ListObject * 
             args = _LO_Next ( args ) ;
             if ( args->W_LispAttributes & ( LIST | LIST_NODE ) ) args = _LO_First ( args ) ;
             token = ( byte* ) args->Lo_Name ;
-            CfrTil_AddStringToSourceCode ( _CfrTil_, token ) ;
+            CFT_AddStringToSourceCode ( _CFT_, token ) ;
         }
         else token = _Lexer_ReadToken ( lexer, ( byte* ) " ,\n\r\t" ) ;
         if ( token )
@@ -423,7 +429,7 @@ _CfrTil_Parse_LocalsAndStackVariables ( int64 svf, int64 lispMode, ListObject * 
                     args = _LO_Next ( args ) ;
                     if ( args->W_LispAttributes & ( LIST | LIST_NODE ) ) args = _LO_First ( args ) ;
                     token = ( byte* ) args->Lo_Name ;
-                    CfrTil_AddStringToSourceCode ( _CfrTil_, token ) ;
+                    CFT_AddStringToSourceCode ( _CFT_, token ) ;
                 }
                 else token = _Lexer_LexNextToken_WithDelimiters ( lexer, 0, 1, 0, 1, LEXER_ALLOW_DOT ) ;
                 strncpy ( ( char* ) _Context_->CurrentWordBeingCompiled->W_TypeSignatureString, ( char* ) token, 8 ) ;
@@ -442,13 +448,13 @@ _CfrTil_Parse_LocalsAndStackVariables ( int64 svf, int64 lispMode, ListObject * 
             if ( String_Equal ( ( char* ) token, ")" ) ) break ;
             if ( String_Equal ( ( char* ) token, "REG" ) || String_Equal ( ( char* ) token, "REGISTER" ) )
             {
-                if ( GetState ( _CfrTil_, OPTIMIZE_ON ) ) regFlag = true ;
+                if ( GetState ( _CFT_, OPTIMIZE_ON ) ) regFlag = true ;
                 continue ;
             }
             if ( ( ! GetState ( _Context_, C_SYNTAX ) ) && ( String_Equal ( ( char* ) token, "{" ) ) || ( String_Equal ( ( char* ) token, ";" ) ) )
             {
                 //_Printf ( ( byte* ) "\nLocal variables syntax error : no closing parenthesis ')' found" ) ;
-                CfrTil_Exception ( SYNTAX_ERROR, "\nLocal variables syntax error : no closing parenthesis ')' found", 1 ) ;
+                CFT_Exception ( SYNTAX_ERROR, "\nLocal variables syntax error : no closing parenthesis ')' found", 1 ) ;
                 break ;
             }
             if ( ! lispMode )
@@ -478,12 +484,12 @@ _CfrTil_Parse_LocalsAndStackVariables ( int64 svf, int64 lispMode, ListObject * 
                 {
                     objectAttributes |= PARAMETER_VARIABLE ; // aka an arg
                     //if ( lispMode ) objectType |= T_LISP_SYMBOL ;
-                    if ( lispMode ) lispAttributes |= T_LISP_SYMBOL ; // no ltype yet for _CfrTil_LocalWord
+                    if ( lispMode ) lispAttributes |= T_LISP_SYMBOL ; // no ltype yet for _CFT_LocalWord
                 }
                 else
                 {
                     objectAttributes |= LOCAL_VARIABLE ;
-                    if ( lispMode ) lispAttributes |= T_LISP_SYMBOL ; // no ltype yet for _CfrTil_LocalWord
+                    if ( lispMode ) lispAttributes |= T_LISP_SYMBOL ; // no ltype yet for _CFT_LocalWord
                 }
                 if ( regFlag == true )
                 {
@@ -525,12 +531,12 @@ _CfrTil_Parse_LocalsAndStackVariables ( int64 svf, int64 lispMode, ListObject * 
     if ( numberOfRegisterVariables ) Compile_Init_LocalRegisterParamenterVariables ( compiler ) ;
     if ( returnVariable ) compiler->ReturnVariableWord = _Finder_FindWord_InOneNamespace ( _Finder_, localsNs, returnVariable ) ;
 
-    _CfrTil_->InNamespace = saveInNs ;
+    _CFT_->InNamespace = saveInNs ;
     finder->FoundWord = 0 ;
     Lexer_SetTokenDelimiters ( lexer, svDelimiters, COMPILER_TEMP ) ;
     compiler->LocalsNamespace = localsNs ;
     SetState ( compiler, VARIABLE_FRAME, true ) ;
-    SetState ( _CfrTil_, DEBUG_SOURCE_CODE_MODE, scm ) ;
+    SetState ( _CFT_, DEBUG_SOURCE_CODE_MODE, scm ) ;
     return localsNs ;
 }
 
@@ -658,7 +664,7 @@ _Lexer_ParseDecimal ( Lexer * lexer, byte * token )
 {
     float f ;
     // use 0x format for hex numbers with decimal NumberBase state
-    //D1 (String_Equal (_ReadLiner_->Filename, "namespaces/test/math.cft") ? CfrTil_CpuState_Current_Show ( ) : 0 ) ; //Debugger_CfrTilRegisters (_Debugger_) : 0 ) ;
+    //D1 (String_Equal (_ReadLiner_->Filename, "namespaces/test/math.cft") ? CFT_CpuState_Current_Show ( ) : 0 ) ; //Debugger_CfrTilRegisters (_Debugger_) : 0 ) ;
     if ( sscanf ( ( char* ) token, HEX_UINT_FRMT, ( uint64* ) & lexer->Literal ) ||
         sscanf ( ( char* ) token, INT_FRMT_FOR_HEX, ( uint64* ) & lexer->Literal ) ||
         sscanf ( ( char* ) token, INT_FRMT, ( uint64* ) & lexer->Literal ) ||
@@ -755,7 +761,7 @@ Parse_Macro ( int64 type )
     else if ( type == TEXT_MACRO )
     {
         int64 n = 0 ;
-        byte nc, *buffer = Buffer_Data ( _CfrTil_->ScratchB1 ) ;
+        byte nc, *buffer = Buffer_Data ( _CFT_->ScratchB1 ) ;
         buffer [0] = 0 ;
         do
         {
@@ -778,9 +784,9 @@ void
 Lexer_ParseDoubleQuoteMacro ( Lexer * lexer )
 {
     ReadLiner * rl = _ReadLiner_ ;
-    if ( ( ! ( GetState ( _Compiler_, ( COMPILE_MODE | ASM_MODE | LC_ARG_PARSING | LC_CFRTIL ) ) ) ) && ( ! GetState ( _CfrTil_, SOURCE_CODE_STARTED ) ) )
-        CfrTil_InitSourceCode_WithCurrentInputChar ( _CfrTil_, 0 ) ;
-    _CfrTil_->SC_QuoteMode = true ;
+    if ( ( ! ( GetState ( _Compiler_, ( COMPILE_MODE | ASM_MODE | LC_ARG_PARSING | LC_CFRTIL ) ) ) ) && ( ! GetState ( _CFT_, SOURCE_CODE_STARTED ) ) )
+        CFT_InitSourceCode_WithCurrentInputChar ( _CFT_, 0 ) ;
+    _CFT_->SC_QuoteMode = true ;
     do
     {
         lexer->TokenInputByte = ReadLine_NextChar ( rl ) ;
@@ -789,27 +795,27 @@ Lexer_ParseDoubleQuoteMacro ( Lexer * lexer )
         else Lexer_Append_ConvertedCharacterToTokenBuffer ( lexer ) ;
     }
     while ( lexer->TokenInputByte != '"' ) ;
-    _CfrTil_->SC_QuoteMode = false ;
+    _CFT_->SC_QuoteMode = false ;
     SetState ( lexer, LEXER_DONE, true ) ;
-    if ( GetState ( _CfrTil_, STRING_MACROS_ON ) && GetState ( &_CfrTil_->Sti, STI_INITIALIZED ) ) _CfrTil_StringMacros_Do ( lexer->TokenBuffer ) ;
-    Word * word = Lexer_ObjectToken_New ( lexer, String_New ( lexer->TokenBuffer, STRING_MEM ), - 1, - 1 ) ;
+    if ( GetState ( _CFT_, STRING_MACROS_ON ) && GetState ( &_CFT_->Sti, STI_INITIALIZED ) ) _CFT_StringMacros_Do ( lexer->TokenBuffer ) ;
+    Word * word = Lexer_ParseToken_ToWord ( lexer, String_New ( lexer->TokenBuffer, STRING_MEM ), - 1, - 1 ) ;
     Interpreter_DoWord ( _Interpreter_, word, - 1, - 1 ) ;
 }
 // ?? seems way to complicated and maybe should be integrated with Lexer_ParseObject
 
 void
-_CfrTil_SingleQuote ( )
+_CFT_SingleQuote ( )
 {
     ReadLiner * rl = _ReadLiner_ ;
     Lexer * lexer = _Lexer_ ;
-    Word *word, * sqWord = _CfrTil_WordList_TopWord ( ) ; //single quote word
+    Word *word, * sqWord = _CFT_WordList_TopWord ( ) ; //single quote word
     byte buffer [5] ;
     byte c0, c1, c2 ;
     uint64 charLiteral = 0 ;
 
-    if ( ( ! ( GetState ( _Compiler_, ( COMPILE_MODE | ASM_MODE | LC_ARG_PARSING | LC_CFRTIL ) ) ) ) && ( ! GetState ( _CfrTil_, SOURCE_CODE_STARTED ) ) )
-        CfrTil_InitSourceCode_WithCurrentInputChar ( _CfrTil_, 0 ) ;
-    _CfrTil_->SC_QuoteMode = true ;
+    if ( ( ! ( GetState ( _Compiler_, ( COMPILE_MODE | ASM_MODE | LC_ARG_PARSING | LC_CFRTIL ) ) ) ) && ( ! GetState ( _CFT_, SOURCE_CODE_STARTED ) ) )
+        CFT_InitSourceCode_WithCurrentInputChar ( _CFT_, 0 ) ;
+    _CFT_->SC_QuoteMode = true ;
     c0 = _ReadLine_PeekOffsetChar ( rl, 0 ) ; // parse a char type, eg. 'c' 
     c1 = _ReadLine_PeekOffsetChar ( rl, 1 ) ;
     if ( sqWord && sqWord->Name[0] == '\'' && ( c1 == '\'' ) || ( c0 == '\\' ) ) // parse a char type, eg. 'c' 
@@ -836,14 +842,14 @@ _CfrTil_SingleQuote ( )
             buffer[2] = '\'' ; // c2
             buffer[3] = 0 ;
         }
-        CfrTil_WordLists_PopWord ( ) ; // pop the "'" token
+        CFT_WordLists_PopWord ( ) ; // pop the "'" token
         word = _DObject_New ( buffer, charLiteral, IMMEDIATE, LITERAL | CONSTANT, 0, LITERAL, ( byte* ) _DataObject_Run, 0, 0, 0, DICTIONARY ) ;
         word->ObjectByteSize = 1 ;
         Interpreter_DoWord ( _Interpreter_, word, - 1, - 1 ) ; //_Lexer_->TokenStart_ReadLineIndex ) ;
     }
     else
     {
-        if ( ! Compiling ) CfrTil_InitSourceCode_WithName ( _CfrTil_, lexer->OriginalToken, 0 ) ;
+        if ( ! Compiling ) CFT_InitSourceCode_WithName ( _CFT_, lexer->OriginalToken, 0 ) ;
         byte * token ; //= ( byte* ) "" ;
         while ( 1 )
         {
@@ -853,9 +859,8 @@ _CfrTil_SingleQuote ( )
             {
                 token = Lexer_ReadToken ( lexer ) ;
                 word = _Interpreter_TokenToWord ( _Interpreter_, token, - 1, - 1 ) ;
-                //word->ObjectByteSize = 8 ;
                 if ( word && ( word->W_ObjectAttributes & ( C_TYPE | C_CLASS | NAMESPACE ) ) ) Finder_SetQualifyingNamespace ( _Finder_, word ) ;
-                else if ( token[0] = '.' ) continue ;
+                else if ( token && ( token[0] = '.' ) ) continue ;
                 else
                 {
                     DataStack_Push ( ( int64 ) token ) ;
@@ -864,10 +869,10 @@ _CfrTil_SingleQuote ( )
             }
             else break ;
         }
-        if ( ( ! AtCommandLine ( rl ) ) && ( ! GetState ( _CfrTil_, SOURCE_CODE_STARTED ) ) ) CfrTil_InitSourceCode_WithName ( _CfrTil_, lexer->OriginalToken, 0 ) ;
-        CfrTil_Token ( ) ;
+        if ( ( ! AtCommandLine ( rl ) ) && ( ! GetState ( _CFT_, SOURCE_CODE_STARTED ) ) ) CFT_InitSourceCode_WithName ( _CFT_, lexer->OriginalToken, 0 ) ;
+        CFT_Token ( ) ;
     }
 done:
-    _CfrTil_->SC_QuoteMode = false ;
+    _CFT_->SC_QuoteMode = false ;
 }
 

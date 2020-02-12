@@ -2,14 +2,14 @@
 #include "../include/cfrtil64.h"
 
 void
-CfrTil_Token ( )
+CFT_Token ( )
 {
     byte * token = Lexer_ReadToken ( _Lexer_ ) ;
     DataStack_Push ( ( int64 ) token ) ;
 }
 
 void
-CfrTil_TokenQID ( )
+CFT_TokenQID ( )
 {
     byte * token ;
     Word * word ;
@@ -17,31 +17,34 @@ CfrTil_TokenQID ( )
     {
         token = Lexer_ReadToken ( _Lexer_ ) ;
         word = _Interpreter_TokenToWord ( _Interpreter_, token, - 1, - 1 ) ;
-        Boolean isForwardDotted = ReadLiner_IsTokenForwardDotted ( _ReadLiner_, word->W_RL_Index ) ;
-        if ( ( isForwardDotted ) || ( token[0] == '.' ) ) Word_Eval ( word ) ;
-        else break ;
+        if ( word )
+        {
+            Boolean isForwardDotted = ReadLiner_IsTokenForwardDotted ( _ReadLiner_, word->W_RL_Index ) ;
+            if ( ( isForwardDotted ) || ( token[0] == '.' ) ) Word_Eval ( word ) ;
+            else break ;
+        }
     }
     if ( GetState ( _Lexer_, LEXER_END_OF_LINE ) ) SetState ( _Interpreter_, END_OF_LINE, true ) ; //necessary to update interpreter state since we are pushing the last token
     DataStack_Push ( ( int64 ) token ) ;
 }
 
 void
-CfrTil_FilenameToken ( )
+CFT_FilenameToken ( )
 {
     byte * token = _Lexer_LexNextToken_WithDelimiters ( _Lexer_, 0, 1, 0, 1, LEXER_ALLOW_DOT ) ;
     DataStack_Push ( ( int64 ) token ) ;
 }
 
 void
-CfrTil_SingleQuote ( )
+CFT_SingleQuote ( )
 {
-    _CfrTil_SingleQuote ( ) ;
+    _CFT_SingleQuote ( ) ;
 }
 
 void
-CfrTil_Tick ( )
+CFT_Tick ( )
 {
-    _CfrTil_SingleQuote ( ) ;
+    _CFT_SingleQuote ( ) ;
 }
 
 void
@@ -63,7 +66,7 @@ Parse_SkipUntil_EitherToken_OrNewline ( byte * end1, byte* end2 )
 }
 
 void
-CfrTil_Parse ( )
+CFT_Parse ( )
 {
     Lexer * lexer = _Context_->Lexer0 ;
     byte * token = ( byte* ) DataStack_Pop ( ) ;
@@ -72,15 +75,15 @@ CfrTil_Parse ( )
 }
 
 void
-CfrTil_DoubleQuoteMacro ( )
+CFT_DoubleQuoteMacro ( )
 {
     Lexer_ParseDoubleQuoteMacro ( _Lexer_ ) ;
 }
 
 void
-CfrTil_Word_ClassStructure_PrintData ( Word * word )
+CFT_Word_ClassStructure_PrintData ( Word * word )
 {
-    CfrTil_Typedef () ;
+    CFT_Typedef ( ) ;
 }
 
 

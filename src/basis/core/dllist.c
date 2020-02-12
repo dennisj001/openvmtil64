@@ -799,12 +799,12 @@ Tree_Map_Namespaces_State_2Args ( dllist * list, uint64 state, MapSymbolFunction
 {
     dlnode * node, *nextNode ;
     Word * word ;
-    d0 ( _CfrTil_->FindWordCount = 0 ) ;
+    d0 ( _CFT_->FindWordCount = 0 ) ;
     for ( node = dllist_First ( ( dllist* ) list ) ; node ; node = nextNode )
     {
         nextNode = dlnode_Next ( node ) ;
         word = ( Word * ) node ;
-        d0 ( _CfrTil_->FindWordCount ++ ) ;
+        d0 ( _CFT_->FindWordCount ++ ) ;
         //if ( Is_DebugOn ) _Printf ( ( byte* ) "\nTree_Map_Namespaces_State_2Args : %s", word->Name ) ;
         if ( Is_NamespaceType ( word ) )
         {
@@ -816,7 +816,7 @@ Tree_Map_Namespaces_State_2Args ( dllist * list, uint64 state, MapSymbolFunction
             Tree_Map_Namespaces_State_2Args ( word->W_List, state, mf, one, two ) ;
         }
     }
-    d0 ( CfrTil_WordAccounting ( ( byte* ) "Tree_Map_State_2" ) ) ;
+    d0 ( CFT_WordAccounting ( ( byte* ) "Tree_Map_State_2" ) ) ;
 }
 
 void
@@ -841,7 +841,7 @@ Tree_Map_OneNamespace ( Word * word, MapFunction_1 mf, int64 one )
     {
         nextWord = ( Word* ) dlnode_Next ( ( node* ) word ) ;
         //if ( Is_DebugOn ) _Printf ( ( byte* ) " %s.%s", word->ContainingNamespace ? word->ContainingNamespace->Name : (byte*) "", word->Name ) ;
-        //d0 ( _CfrTil_->FindWordCount ++ ) ;
+        //d0 ( CFT->FindWordCount ++ ) ;
         if ( mf ( ( Symbol* ) word, one ) ) return word ;
     }
     return 0 ;
@@ -862,15 +862,15 @@ Tree_Map_OneNamespace_TwoArgs ( Namespace * ns, MapFunction_2 mf2, int64 one, in
 Word *
 Tree_Map_State_OneArg ( uint64 state, MapFunction_1 mf, int64 one )
 {
-    if ( _CfrTil_->Namespaces )
+    if ( _CFT_->Namespaces )
     {
         Word * word, * word2, *nextWord ;
-        _CfrTil_->FindWordCount = 1 ;
-        if ( mf ( ( Symbol* ) _CfrTil_->Namespaces, one ) ) return _CfrTil_->Namespaces ;
-        for ( word = ( Word * ) dllist_First ( ( dllist* ) _CfrTil_->Namespaces->W_List ) ; word ; word = nextWord )
+        _CFT_->FindWordCount = 1 ;
+        if ( mf ( ( Symbol* ) _CFT_->Namespaces, one ) ) return _CFT_->Namespaces ;
+        for ( word = ( Word * ) dllist_First ( ( dllist* ) _CFT_->Namespaces->W_List ) ; word ; word = nextWord )
         {
             nextWord = ( Word* ) dlnode_Next ( ( node* ) word ) ;
-            _CfrTil_->FindWordCount ++ ;
+            _CFT_->FindWordCount ++ ;
             if ( mf ( ( Symbol* ) word, one ) )
                 return word ;
             else if ( Is_NamespaceType ( word ) )

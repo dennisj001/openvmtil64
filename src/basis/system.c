@@ -52,7 +52,7 @@ Dlsym ( byte * sym, byte * lib )
 }
 
 void
-CfrTil_Dlsym ( )
+CFT_Dlsym ( )
 {
     byte * sym = Lexer_ReadToken ( _Context_->Lexer0 ) ;
     byte * lib = _Lexer_LexNextToken_WithDelimiters ( _Context_->Lexer0, 0, 1, 0, 1, LEXER_ALLOW_DOT ) ;
@@ -64,7 +64,7 @@ CfrTil_Dlsym ( )
 // callNumber | errno
 
 void
-CfrTil_system0 ( )
+CFT_system0 ( )
 {
     _Compile_Stack_PopToReg ( DSP, ACC ) ;
     _Compile_INT80 ( ) ;
@@ -72,7 +72,7 @@ CfrTil_system0 ( )
 }
 
 void
-CfrTil_system1 ( )
+CFT_system1 ( )
 {
     _Compile_Stack_PopToReg ( DSP, ACC ) ;
     _Compile_Stack_PopToReg ( DSP, OREG ) ;
@@ -81,7 +81,7 @@ CfrTil_system1 ( )
 }
 
 void
-CfrTil_system2 ( )
+CFT_system2 ( )
 {
     _Compile_Stack_PopToReg ( DSP, ACC ) ;
     _Compile_Stack_PopToReg ( DSP, OREG ) ;
@@ -91,7 +91,7 @@ CfrTil_system2 ( )
 }
 
 void
-CfrTil_system3 ( )
+CFT_system3 ( )
 {
     _Compile_Stack_PopToReg ( DSP, ACC ) ;
     _Compile_Stack_PopToReg ( DSP, OREG ) ;
@@ -102,33 +102,33 @@ CfrTil_system3 ( )
 }
 
 void
-_CfrTil_WordAccounting_Print ( byte * functionName )
+_CFT_WordAccounting_Print ( byte * functionName )
 {
     _Printf ( ( byte* ) "\n%s :: DObjectCreateCount = %d : WordCreateCount = %d : WordsAdded = %d : FindWordCount = %d : FindWordMaxCount = %d",
-        functionName, _CfrTil_->DObjectCreateCount, _CfrTil_->WordCreateCount, _CfrTil_->WordsAdded, _CfrTil_->FindWordCount, _CfrTil_->FindWordMaxCount ) ;
+        functionName, _CFT_->DObjectCreateCount, _CFT_->WordCreateCount, _CFT_->WordsAdded, _CFT_->FindWordCount, _CFT_->FindWordMaxCount ) ;
     _Printf ( ( byte* ) "\nRecycledWordCount : %d", _O_->MemorySpace0->RecycledWordCount ) ;
     Buffer_PrintBuffers ( ) ;
 }
 
 void
-CfrTil_WordAccounting ( byte * functionName )
+CFT_WordAccounting ( byte * functionName )
 {
-    if ( _CfrTil_->FindWordCount > _CfrTil_->FindWordMaxCount ) _CfrTil_->FindWordMaxCount = _CfrTil_->FindWordCount ;
+    if ( _CFT_->FindWordCount > _CFT_->FindWordMaxCount ) _CFT_->FindWordMaxCount = _CFT_->FindWordCount ;
     if ( _O_->Verbosity > 4 )
-        _CfrTil_WordAccounting_Print ( functionName ) ;
+        _CFT_WordAccounting_Print ( functionName ) ;
 }
 
 byte *
-_CfrTil_GetSystemState_String0 ( byte * buf )
+_CFT_GetSystemState_String0 ( byte * buf )
 {
     strcpy ( ( char* ) buf, "\ntypeChecking is " ) ;
-    if ( GetState ( _CfrTil_, TYPECHECK_ON ) ) strcat ( ( char* ) buf, "on, " ) ;
+    if ( GetState ( _CFT_, TYPECHECK_ON ) ) strcat ( ( char* ) buf, "on, " ) ;
     else strcat ( ( char* ) buf, "off, " ) ;
     strcat ( ( char* ) buf, "optimize is " ) ;
-    if ( GetState ( _CfrTil_, OPTIMIZE_ON ) ) strcat ( ( char* ) buf, "on, " ) ;
+    if ( GetState ( _CFT_, OPTIMIZE_ON ) ) strcat ( ( char* ) buf, "on, " ) ;
     else strcat ( ( char* ) buf, "off, " ) ;
     strcat ( ( char* ) buf, "inlining is " ) ;
-    if ( GetState ( _CfrTil_, INLINE_ON ) ) strcat ( ( char* ) buf, "on, " ) ;
+    if ( GetState ( _CFT_, INLINE_ON ) ) strcat ( ( char* ) buf, "on, " ) ;
     else strcat ( ( char* ) buf, "off, " ) ;
     strcat ( ( char* ) buf, "infixMode is " ) ;
     if ( GetState ( _Context_, INFIX_MODE ) ) strcat ( ( char* ) buf, "on, " ) ;
@@ -152,13 +152,13 @@ _CfrTil_GetSystemState_String0 ( byte * buf )
 }
 
 byte *
-_CfrTil_GetSystemState_String1 ( byte *buf )
+_CFT_GetSystemState_String1 ( byte *buf )
 {
     strcat ( ( char* ) buf, "\nReadLine echo is " ) ;
-    if ( GetState ( _CfrTil_, READLINE_ECHO_ON ) ) strcat ( ( char* ) buf, "on. " ) ;
+    if ( GetState ( _CFT_, READLINE_ECHO_ON ) ) strcat ( ( char* ) buf, "on. " ) ;
     else strcat ( ( char* ) buf, "off. " ) ;
     strcpy ( ( char* ) buf, "\nDebug is " ) ;
-    if ( GetState ( _CfrTil_, DEBUG_MODE ) ) strcat ( ( char* ) buf, "on. " ) ;
+    if ( GetState ( _CFT_, DEBUG_MODE ) ) strcat ( ( char* ) buf, "on. " ) ;
     else strcat ( ( char* ) buf, "off. " ) ;
     sprintf ( ( char* ) &buf[Strlen ( ( char* ) buf )], "Verbosity = %ld. ", _O_->Verbosity ) ;
     sprintf ( ( char* ) &buf[Strlen ( ( char* ) buf )], "Console = %ld, ", _O_->Console ) ;
@@ -188,14 +188,14 @@ Convert_RestartCondtion ( int64 restartCondition )
 }
 
 void
-_CfrTil_SystemState_Print ( int64 pflag )
+_CFT_SystemState_Print ( int64 pflag )
 {
-    byte * buf = Buffer_Data ( _CfrTil_->ScratchB1 ) ;
-    buf = _CfrTil_GetSystemState_String0 ( buf ) ;
+    byte * buf = Buffer_Data ( _CFT_->ScratchB1 ) ;
+    buf = _CFT_GetSystemState_String0 ( buf ) ;
     _Printf ( ( byte* ) buf ) ;
-    buf = _CfrTil_GetSystemState_String1 ( buf ) ;
+    buf = _CFT_GetSystemState_String1 ( buf ) ;
     _Printf ( ( byte* ) buf ) ;
-    Boolean dsc = GetState ( _CfrTil_, DEBUG_SOURCE_CODE_MODE ) ;
+    Boolean dsc = GetState ( _CFT_, DEBUG_SOURCE_CODE_MODE ) ;
     _Printf ( ( byte* ) "\nDebugSourceCode %s", dsc ? "on" : "off" ) ;
     Boolean bno = Namespace_IsUsing ( ( byte* ) "BigNum" ) ;
     _Printf ( ( byte* ) " : BigNum %s", bno ? "on" : "off" ) ;
@@ -206,13 +206,13 @@ _CfrTil_SystemState_Print ( int64 pflag )
     if ( pflag || ( _O_->Verbosity > 1 ) )
     {
         OpenVmTil_Print_DataSizeofInfo ( pflag ) ;
-        _CfrTil_WordAccounting_Print ( ( byte* ) "_CfrTil_SystemState_Print" ) ;
+        _CFT_WordAccounting_Print ( ( byte* ) "_CFT_SystemState_Print" ) ;
         BigNum_StateShow ( ) ;
     }
 }
 
 void
-__CfrTil_Dump ( byte * address, int64 number, int64 dumpMod )
+__CFT_Dump ( byte * address, int64 number, int64 dumpMod )
 {
     if ( address && number )
     {
@@ -228,8 +228,8 @@ __CfrTil_Dump ( byte * address, int64 number, int64 dumpMod )
             {
                 for ( n = 0 ; n < dumpMod ; n += CELL_SIZE ) _Printf ( ( byte* ) UINT_FRMT " ", *( int64* ) ( address + i + n ) ) ;
                 _Printf ( ( byte* ) " " ) ;
-                for ( n = 0 ; n < dumpMod ; n += CELL_SIZE ) CfrTil_NByteDump ( ( byte* ) ( address + i + n ), CELL_SIZE ) ;
-                for ( n = 0 ; n < dumpMod ; n += CELL_SIZE ) CfrTil_CharacterDump ( ( byte* ) ( address + i + n ), CELL_SIZE ) ;
+                for ( n = 0 ; n < dumpMod ; n += CELL_SIZE ) CFT_NByteDump ( ( byte* ) ( address + i + n ), CELL_SIZE ) ;
+                for ( n = 0 ; n < dumpMod ; n += CELL_SIZE ) CFT_CharacterDump ( ( byte* ) ( address + i + n ), CELL_SIZE ) ;
                 i += dumpMod ;
             }
             else i ++ ;
@@ -239,7 +239,7 @@ __CfrTil_Dump ( byte * address, int64 number, int64 dumpMod )
 }
 
 void
-_CfrTil_Source ( Word *word, int64 addToHistoryFlag )
+_CFT_Source ( Word *word, int64 addToHistoryFlag )
 {
     if ( word )
     {
@@ -308,7 +308,7 @@ _CfrTil_Source ( Word *word, int64 addToHistoryFlag )
         if ( word->S_WordData )
         {
             _Word_ShowSourceCode ( word ) ; // source code has newlines for multiline history
-            if ( aword ) //&& ( ! String_Equal ( word->Name, aword->Name ) ) ) 
+            if ( aword && ( aword != Word_UnAlias ( aword ) ) ) 
             {
                 _Word_ShowSourceCode ( aword ) ;
             }
@@ -320,7 +320,7 @@ _CfrTil_Source ( Word *word, int64 addToHistoryFlag )
                 _Printf ( ( byte* ) "\nCompiled with : %s%s%s%s",
                     GetState ( word, COMPILED_OPTIMIZED ) ? "optimizeOn" : "optimizeOff", GetState ( word, COMPILED_INLINE ) ? ", inlineOn" : ", inlineOff",
                     ( ( word->W_TypeAttributes & WT_C_SYNTAX ) || GetState ( word, W_C_SYNTAX ) ) ? ", c_syntaxOn" : "", GetState ( word, W_INFIX_MODE ) ? ", infixOn" : "" ) ;
-                Boolean dsc = GetState ( _CfrTil_, DEBUG_SOURCE_CODE_MODE ) ;
+                Boolean dsc = GetState ( _CFT_, DEBUG_SOURCE_CODE_MODE ) ;
                 _Printf ( ( byte* ) "\nDebug Source Code %s", dsc ? "on" : "off" ) ;
                 Boolean bno = Namespace_IsUsing ( ( byte* ) "BigNum" ) ;
                 _Printf ( ( byte* ) " : BigNum %s", bno ? "on" : "off" ) ;
@@ -336,11 +336,11 @@ _CfrTil_Source ( Word *word, int64 addToHistoryFlag )
 }
 
 void
-_CfrTil_Dump ( int64 dumpMod )
+_CFT_Dump ( int64 dumpMod )
 {
     int64 number = DataStack_Pop ( ) ;
     byte * address = ( byte* ) DataStack_Pop ( ) ;
-    __CfrTil_Dump ( address, number, dumpMod ) ;
+    __CFT_Dump ( address, number, dumpMod ) ;
 }
 
 Boolean
@@ -416,7 +416,7 @@ main ( int64 argc, char **argv )
 #if 0
 
 void
-_CfrTil_Dlsym ( )
+_CFT_Dlsym ( )
 {
     byte * sym = ( byte* ) DataStack_Pop ( ) ;
     byte * lib = ( byte* ) DataStack_Pop ( ) ;
@@ -424,7 +424,7 @@ _CfrTil_Dlsym ( )
 }
 
 void
-CfrTil_DlsymWord ( )
+CFT_DlsymWord ( )
 {
     byte * lib = ( byte* ) DataStack_Pop ( ) ;
     byte * sym = ( byte* ) DataStack_Pop ( ) ;

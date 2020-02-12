@@ -20,7 +20,7 @@ TabCompletionInfo_New ( uint64 allocType )
 byte *
 ReadLiner_GenerateFullNamespaceQualifiedName ( ReadLiner * rl, Word * w )
 {
-    byte * b0 = Buffer_Data_Cleared ( _CfrTil_->TabCompletionBuf ) ;
+    byte * b0 = Buffer_Data_Cleared ( _CFT_->TabCompletionBuf ) ;
     Stack_Init ( rl->TciNamespaceStack ) ;
     Stack * nsStk = rl->TciNamespaceStack ;
     Namespace *ns ;
@@ -95,7 +95,7 @@ RL_TC_StringInsert_AtCursor ( ReadLiner * rl, byte * strToInsert )
     if ( newCursorPos < stiLen )
     {
         ReadLine_InputLine_Clear ( rl ) ;
-        strncpy ( ( CString ) rl->InputLine, ( CString ) _CfrTil_->OriginalInputLine, BUFFER_SIZE ) ;
+        strncpy ( ( CString ) rl->InputLine, ( CString ) _CFT_->OriginalInputLine, BUFFER_SIZE ) ;
     }
     ReadLine_SetCursorPosition ( rl, newCursorPos ) ;
     _ReadLine_InsertStringIntoInputLineSlotAndShow ( rl, slotStart, startCursorPos, ( byte* ) strToInsert ) ; // 1 : TokenLastChar is the last char of the identifier
@@ -125,7 +125,7 @@ RL_TabCompletionInfo_Init ( ReadLiner * rl )
     TabCompletionInfo * tci = rl->TabCompletionInfo0 ;
     memset ( tci, 0, sizeof ( TabCompletionInfo ) ) ;
     SetState ( rl, TAB_WORD_COMPLETION, true ) ;
-    strcpy ( ( CString ) _CfrTil_->OriginalInputLine, ( CString ) rl->InputLineString ) ; // we use this extra buffer at ReadLine_TC_StringInsert_AtCursor
+    strcpy ( ( CString ) _CFT_->OriginalInputLine, ( CString ) rl->InputLineString ) ; // we use this extra buffer at ReadLine_TC_StringInsert_AtCursor
     tci->Identifier = _TabCompletionInfo_GetAPreviousIdentifier ( rl, _ReadLine_CursorPosition ( rl ) ) ;
     tci->DotSeparator = ReadLine_IsThereADotSeparator ( rl, tci->TokenFirstChar - 1 ) ;
     if ( tci->TokenFirstChar ) tci->PreviousIdentifier = _TabCompletionInfo_GetAPreviousIdentifier ( rl, tci->TokenFirstChar - 1 ) ; // TokenStart refers to start of 'Identifier'
@@ -139,7 +139,7 @@ RL_TabCompletionInfo_Init ( ReadLiner * rl )
     if ( tci->DotSeparator )
     {
         tci->PreviousIdentifier = _TabCompletionInfo_GetAPreviousIdentifier ( rl, tci->DotSeparator - 1 ) ; // TokenStart refers to start of 'Identifier'
-        if ( tci->PreviousIdentifier && ( piw = CfrTil_FindInAnyNamespace ( tci->PreviousIdentifier ) ) )
+        if ( tci->PreviousIdentifier && ( piw = CFT_FindInAnyNamespace ( tci->PreviousIdentifier ) ) )
         {
             if ( Is_NamespaceType ( piw ) )
             {
@@ -157,8 +157,8 @@ RL_TabCompletionInfo_Init ( ReadLiner * rl )
     }
     else
     {
-        if ( ( tci->OriginalWord = _Finder_FindWord_InOneNamespace ( _Finder_, _CfrTil_Namespace_InNamespaceGet ( ), tci->Identifier ) ) ||
-            ( tci->OriginalWord = CfrTil_FindInAnyNamespace ( tci->Identifier ) ) )
+        if ( ( tci->OriginalWord = _Finder_FindWord_InOneNamespace ( _Finder_, _CFT_Namespace_InNamespaceGet ( ), tci->Identifier ) ) ||
+            ( tci->OriginalWord = CFT_FindInAnyNamespace ( tci->Identifier ) ) )
         {
             if ( Is_NamespaceType ( tci->OriginalWord ) && ( tci->EndDottedPos ) )
             {
@@ -168,12 +168,12 @@ RL_TabCompletionInfo_Init ( ReadLiner * rl )
             else
             {
                 tci->EndDottedPos = 0 ;
-                tci->OriginalContainingNamespace = tci->OriginalWord->ContainingNamespace ? tci->OriginalWord->ContainingNamespace : _CfrTil_->Namespaces ;
+                tci->OriginalContainingNamespace = tci->OriginalWord->ContainingNamespace ? tci->OriginalWord->ContainingNamespace : _CFT_->Namespaces ;
                 tci->RunWord = tci->OriginalWord ;
             }
         }
     }
-    if ( ! tci->OriginalContainingNamespace ) tci->OriginalContainingNamespace = _CfrTil_->Namespaces ;
+    if ( ! tci->OriginalContainingNamespace ) tci->OriginalContainingNamespace = _CFT_->Namespaces ;
     tci->OriginalRunWord = tci->RunWord ;
     tci->WordWrapCount = 0 ;
     tci->WordCount = 0 ;
@@ -310,7 +310,7 @@ TC_Tree_Map ( TabCompletionInfo * tci, MapFunction mf, Word * wordi )
             ns = word->S_ContainingNamespace ;
             nextNs = ( Word* ) dlnode_Next ( ( node* ) ns ) ;
         }
-        else ns = ( Word * ) dllist_First ( _CfrTil_->Namespaces->W_List ) ;
+        else ns = ( Word * ) dllist_First ( _CFT_->Namespaces->W_List ) ;
         while ( ns )
         {
             nextNs = ( Word* ) dlnode_Next ( ( node* ) ns ) ;

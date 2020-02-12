@@ -43,7 +43,7 @@ Sequence_Append ( Sequence * array, cell_t size ) // size in bytes
     if ( ( array->Index += size ) > array->Last )
     {
         array->Index -= size ;
-        CfrTil_Exception ( MEMORY_ALLOCATION_ERROR, 1 ) ;
+        CFT_Exception ( MEMORY_ALLOCATION_ERROR, 1 ) ;
     }
     return index ;
 }

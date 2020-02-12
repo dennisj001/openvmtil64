@@ -110,18 +110,18 @@ _Compiler_LocalWord ( Compiler * compiler, byte * name, int64 morphismType, int6
         {
             word->Index = ++ compiler->NumberOfNonRegisterLocals ;
             compiler->NumberOfLocals ++ ;
-            _CfrTil_->SC_Word->W_NumberOfNonRegisterLocals ++ ;
+            _CFT_->SC_Word->W_NumberOfNonRegisterLocals ++ ;
         }
         else
         {
             word->Index = ++ compiler->NumberOfArgs ;
             compiler->NumberOfNonRegisterArgs ++ ;
-            _CfrTil_->SC_Word->W_NumberOfNonRegisterArgs ++ ;
+            _CFT_->SC_Word->W_NumberOfNonRegisterArgs ++ ;
         }
     }
     word->W_ObjectAttributes |= RECYCLABLE_LOCAL ;
-    //_CfrTil_->SC_Word->W_NumberOfNonRegisterArgs += compiler->NumberOfNonRegisterArgs ; // debugOutput.c showLocals need this others ?
-    //_CfrTil_->SC_Word->W_NumberOfNonRegisterLocals += compiler->NumberOfNonRegisterLocals ;
+    //CFT->SC_Word->W_NumberOfNonRegisterArgs += compiler->NumberOfNonRegisterArgs ; // debugOutput.c showLocals need this others ?
+    //CFT->SC_Word->W_NumberOfNonRegisterLocals += compiler->NumberOfNonRegisterLocals ;
     return word ;
 }
 
@@ -177,7 +177,7 @@ _Compiler_AddLocalFrame ( Compiler * compiler )
     _Compile_LEA ( FP, DSP, 0, CELL ) ; // set new fp
     Compile_ADDI ( REG, DSP, 0, 1 * CELL, INT32_SIZE ) ; // 1 : fp - add stack frame -- this value is going to be reset 
     compiler->FrameSizeCellOffset = ( int64* ) ( Here - INT32_SIZE ) ; // in case we have to add to the framesize with nested locals
-    d0 ( if ( Is_DebugOn ) Compile_Call_TestRSP ( ( byte* ) _CfrTil_Debugger_Locals_Show ) ) ;
+    d0 ( if ( Is_DebugOn ) Compile_Call_TestRSP ( ( byte* ) _CFT_Debugger_Locals_Show ) ) ;
 }
 
 void
@@ -201,8 +201,8 @@ Compiler_RemoveLocalFrame ( Compiler * compiler )
         || ( GetState ( compiler, RETURN_TOS | RETURN_ACCUM ) ) || compiler->ReturnVariableWord ;
     if ( compiler->NumberOfArgs ) parameterVarsSubAmount = ( compiler->NumberOfArgs - returnValueFlag ) * CELL ;
 #if 0    
-    if ( ( ! returnValueFlag ) && GetState ( _Context_, C_SYNTAX ) && ( _CfrTil_->CurrentWordBeingCompiled->S_ContainingNamespace ) &&
-        ( ! String_Equal ( _CfrTil_->CurrentWordBeingCompiled->S_ContainingNamespace->Name, "void" ) ) )
+    if ( ( ! returnValueFlag ) && GetState ( _Context_, C_SYNTAX ) && ( _CFT_->CurrentWordBeingCompiled->S_ContainingNamespace ) &&
+        ( ! String_Equal ( _CFT_->CurrentWordBeingCompiled->S_ContainingNamespace->Name, "void" ) ) )
     {
         SetState ( compiler, RETURN_TOS, true ) ;
     }
@@ -283,18 +283,18 @@ Compiler_RemoveLocalFrame ( Compiler * compiler )
 
     }
 #endif    
-    d0 ( if ( Is_DebugOn ) Compile_Call_TestRSP ( ( byte* ) _CfrTil_Debugger_Locals_Show ) ) ;
+    d0 ( if ( Is_DebugOn ) Compile_Call_TestRSP ( ( byte* ) _CFT_Debugger_Locals_Show ) ) ;
 }
 
 void
-CfrTil_LocalsAndStackVariablesBegin ( )
+CFT_LocalsAndStackVariablesBegin ( )
 {
-    _CfrTil_Parse_LocalsAndStackVariables ( 1, 0, 0, 0, 0 ) ;
+    _CFT_Parse_LocalsAndStackVariables ( 1, 0, 0, 0, 0 ) ;
 }
 
 void
-CfrTil_LocalVariablesBegin ( )
+CFT_LocalVariablesBegin ( )
 {
-    _CfrTil_Parse_LocalsAndStackVariables ( 0, 0, 0, 0, 0 ) ;
+    _CFT_Parse_LocalsAndStackVariables ( 0, 0, 0, 0, 0 ) ;
 }
 

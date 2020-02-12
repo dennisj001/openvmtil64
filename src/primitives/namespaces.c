@@ -21,30 +21,30 @@ Do_Namespace_WithStatus_2 ( dlnode * node, MapFunction2 nsf, int64 nsStateFlag, 
 }
 
 void
-_CfrTil_TreeMap ( MapSymbolFunction2 msf2, uint64 state, int64 one, int64 two )
+_CFT_TreeMap ( MapSymbolFunction2 msf2, uint64 state, int64 one, int64 two )
 {
-    Tree_Map_Namespaces_State_2Args ( _CfrTil_->Namespaces->Lo_List, state, msf2, one, two ) ;
+    Tree_Map_Namespaces_State_2Args ( _CFT_->Namespaces->Lo_List, state, msf2, one, two ) ;
 }
 
 void
-_CfrTil_NamespacesMap ( MapSymbolFunction2 msf2, uint64 state, int64 one, int64 two )
+_CFT_NamespacesMap ( MapSymbolFunction2 msf2, uint64 state, int64 one, int64 two )
 {
-    Tree_Map_Namespaces_State_2Args ( _CfrTil_->Namespaces->Lo_List, state, msf2, one, two ) ;
+    Tree_Map_Namespaces_State_2Args ( _CFT_->Namespaces->Lo_List, state, msf2, one, two ) ;
 }
 
 // list/print namespaces
 
 void
-_CfrTil_ForAllNamespaces ( MapSymbolFunction2 msf2 )
+_CFT_ForAllNamespaces ( MapSymbolFunction2 msf2 )
 {
     _Printf ( ( byte* ) "\nusing :" ) ;
-    _CfrTil_NamespacesMap ( msf2, USING, 1, 1 ) ;
+    _CFT_NamespacesMap ( msf2, USING, 1, 1 ) ;
     _Printf ( ( byte* ) "\nnotUsing :" ) ;
-    int64 usingWords = _CfrTil_->FindWordCount ;
-    _CfrTil_NamespacesMap ( msf2, NOT_USING, 1, 1 ) ;
-    int64 notUsingWords = _CfrTil_->FindWordCount ;
-    _CfrTil_->FindWordCount = usingWords + notUsingWords ;
-    CfrTil_WordAccounting ( ( byte* ) "_CfrTil_ForAllNamespaces" ) ;
+    int64 usingWords = _CFT_->FindWordCount ;
+    _CFT_NamespacesMap ( msf2, NOT_USING, 1, 1 ) ;
+    int64 notUsingWords = _CFT_->FindWordCount ;
+    _CFT_->FindWordCount = usingWords + notUsingWords ;
+    CFT_WordAccounting ( ( byte* ) "_CFT_ForAllNamespaces" ) ;
 }
 
 void
@@ -61,15 +61,15 @@ Namespace_PrettyPrint ( Namespace* ns, int64 indentFlag, int64 indentLevel )
 }
 
 void
-CfrTil_Namespace_New ( )
+CFT_Namespace_New ( )
 {
-    Namespace * ns = Namespace_FindOrNew_SetUsing ( ( byte* ) DataStack_Pop ( ), _CfrTil_Namespace_InNamespaceGet ( ), 1 ) ;
+    Namespace * ns = Namespace_FindOrNew_SetUsing ( ( byte* ) DataStack_Pop ( ), _CFT_Namespace_InNamespaceGet ( ), 1 ) ;
     Namespace_DoNamespace ( ns, 0 ) ;
 
 }
 
 void
-_CfrTil_Namespace_NotUsing ( byte * name )
+_CFT_Namespace_NotUsing ( byte * name )
 {
     Namespace * ns = Namespace_Find ( name ) ;
     if ( ns )
@@ -80,27 +80,27 @@ _CfrTil_Namespace_NotUsing ( byte * name )
 }
 
 void
-CfrTil_Namespace_NotUsing ( )
+CFT_Namespace_NotUsing ( )
 {
     byte * name = ( byte* ) DataStack_Pop ( ) ;
-    _CfrTil_Namespace_NotUsing ( name ) ;
+    _CFT_Namespace_NotUsing ( name ) ;
 }
 
 void
-CfrTil_Namespace_UsingFirst ( )
+CFT_Namespace_UsingFirst ( )
 {
     Namespace * ns = Namespace_Find ( ( byte* ) DataStack_Pop ( ) ) ;
     if ( ns ) _Namespace_AddToUsingList ( ns ) ;
 }
 
 void
-CfrTil_Namespace_UsingLast ( )
+CFT_Namespace_UsingLast ( )
 {
     _Namespace_SetAs_UsingLast ( ( byte* ) DataStack_Pop ( ) ) ;
 }
 
 void
-CfrTil_Namespace_SetStateAs_Using ( )
+CFT_Namespace_SetStateAs_Using ( )
 {
     byte * token = ( byte* ) DataStack_Pop ( ) ;
     Namespace * ns = Namespace_Find ( token ) ;
@@ -108,7 +108,7 @@ CfrTil_Namespace_SetStateAs_Using ( )
 }
 
 void
-CfrTil_Namespace_SetStateAs_NotUsing ( )
+CFT_Namespace_SetStateAs_NotUsing ( )
 {
     byte * token = ( byte* ) DataStack_Pop ( ) ;
     Namespace * ns = Namespace_Find ( token ) ;
@@ -118,19 +118,19 @@ CfrTil_Namespace_SetStateAs_NotUsing ( )
 // "in"
 
 void
-CfrTil_PrintInNamespace ( )
+CFT_PrintInNamespace ( )
 {
     _Printf ( ( byte* ) "\nCurrent Namespace Being Compiled : %s\n",
-        _CfrTil_Namespace_InNamespaceGet ( )->Name ) ;
+        _CFT_Namespace_InNamespaceGet ( )->Name ) ;
 }
 
 // list/print namespaces
 
 void
-CfrTil_Namespaces ( )
+CFT_Namespaces ( )
 {
     _Printf ( ( byte* ) "\nAll Namespaces : \n<list> ':' '-' <namespace>" ) ;
-    _CfrTil_ForAllNamespaces ( ( MapSymbolFunction2 ) Symbol_NamespacePrettyPrint ) ;
+    _CFT_ForAllNamespaces ( ( MapSymbolFunction2 ) Symbol_NamespacePrettyPrint ) ;
     _Printf ( ( byte* ) "\n" ) ;
 }
 
@@ -146,16 +146,16 @@ Word_RemoveIfStringContainsName ( Symbol * symbol, byte * name )
 }
 
 void
-_CfrTil_Namespaces_PurgeWordIfContainsName ( byte * name )
+_CFT_Namespaces_PurgeWordIfContainsName ( byte * name )
 {
     Tree_Map_State_OneArg ( USING | NOT_USING, ( MapFunction_1 ) Word_RemoveIfStringContainsName, ( int64 ) name ) ;
 }
 
 void
-CfrTil_Namespaces_PurgeWordIfContainsName ( )
+CFT_Namespaces_PurgeWordIfContainsName ( )
 {
    byte * name = ( byte* ) DataStack_Pop ( ) ;
-   _CfrTil_Namespaces_PurgeWordIfContainsName ( name ) ;
+   _CFT_Namespaces_PurgeWordIfContainsName ( name ) ;
 }
 
 
@@ -171,16 +171,16 @@ Word_RemoveIfStringEqualExactName ( Symbol * symbol, byte * name )
 }
 
 void
-_CfrTil_Namespaces_PurgeWordExactName ( byte * name )
+_CFT_Namespaces_PurgeWordExactName ( byte * name )
 {
     Tree_Map_State_OneArg ( USING | NOT_USING, ( MapFunction_1 ) Word_RemoveIfStringEqualExactName, ( int64 ) name ) ;
 }
 
 void
-CfrTil_Namespaces_PurgeWordExactName ( )
+CFT_Namespaces_PurgeWordExactName ( )
 {
    byte * name = ( byte* ) DataStack_Pop ( ) ;
-   _CfrTil_Namespaces_PurgeWordExactName ( name ) ;
+   _CFT_Namespaces_PurgeWordExactName ( name ) ;
 }
 
 void
@@ -222,26 +222,26 @@ Symbol_Namespaces_PrintTraverseWithWords ( Symbol * symbol, int64 containingName
 }
 
 void
-CfrTil_Namespaces_PrettyPrintTree ( )
+CFT_Namespaces_PrettyPrintTree ( )
 {
     _Context_->NsCount = 0 ;
     _Context_->WordCount = 0 ;
     //SetState ( _O_->psi_PrintStateInfo, PSI_PROMPT, false ) ;
     _Printf ( ( byte* ) "\nNamespaceTree - All Namespaces : %s%s%s", c_ud ( "using" ), " : ", c_gd ( "not using" ) ) ;
     _Namespace_MapAny_2Args ( ( MapSymbolFunction2 ) Symbol_SetNonTREED, 0, 0 ) ;
-    _Namespace_MapAny_2Args ( ( MapSymbolFunction2 ) Symbol_Namespaces_PrintTraverse, ( int64 ) _CfrTil_->Namespaces, 1 ) ;
+    _Namespace_MapAny_2Args ( ( MapSymbolFunction2 ) Symbol_Namespaces_PrintTraverse, ( int64 ) _CFT_->Namespaces, 1 ) ;
     _Printf ( ( byte* ) "\nTotal namespaces = %d :: Total words = %d\n", _Context_->NsCount, _Context_->WordCount ) ;
 }
 
 void
-CfrTil_Namespaces_PrettyPrintTreeWithWords ( )
+CFT_Namespaces_PrettyPrintTreeWithWords ( )
 {
     _Context_->NsCount = 0 ;
     _Context_->WordCount = 0 ;
     //SetState ( _O_->psi_PrintStateInfo, PSI_PROMPT, false ) ;
     _Printf ( ( byte* ) "%s%s%s%s%s%s%s", "\nNamespaceTree - All Namespaces : ", "using", " : ", c_gd ( "not using" ), " :: ", "with", c_ud ( " : words" ) ) ;
     _Namespace_MapAny_2Args ( ( MapSymbolFunction2 ) Symbol_SetNonTREED, 0, 0 ) ;
-    _Namespace_MapAny_2Args ( ( MapSymbolFunction2 ) Symbol_Namespaces_PrintTraverseWithWords, ( int64 ) _CfrTil_->Namespaces, 1 ) ;
+    _Namespace_MapAny_2Args ( ( MapSymbolFunction2 ) Symbol_Namespaces_PrintTraverseWithWords, ( int64 ) _CFT_->Namespaces, 1 ) ;
     _Printf ( ( byte* ) "\nTotal namespaces = %d :: Total words = %d\n", _Context_->NsCount, _Context_->WordCount ) ;
 }
 
@@ -262,27 +262,27 @@ _Namespace_Symbol_Print ( Symbol * symbol, int64 printFlag, int64 str )
 // 'using'
 
 byte *
-_CfrTil_UsingToString ( )
+_CFT_UsingToString ( )
 {
-    byte * b = Buffer_Data ( _CfrTil_->ScratchB1 ) ;
+    byte * b = Buffer_Data ( _CFT_->ScratchB1 ) ;
     strcpy ( ( char* ) b, "" ) ;
-    Tree_Map_Namespaces_State_2Args ( _CfrTil_->Namespaces->Lo_List, USING, ( MapSymbolFunction2 ) _Namespace_Symbol_Print, 0, ( int64 ) b ) ;
+    Tree_Map_Namespaces_State_2Args ( _CFT_->Namespaces->Lo_List, USING, ( MapSymbolFunction2 ) _Namespace_Symbol_Print, 0, ( int64 ) b ) ;
     b = String_New ( ( byte* ) b, TEMPORARY ) ;
     return b ;
 }
 
 void
-CfrTil_Using ( )
+CFT_Using ( )
 {
     _Printf ( ( byte* ) "\nUsing Namespaces :> " ) ;
-    Tree_Map_Namespaces_State_2Args ( _CfrTil_->Namespaces->Lo_List, USING, ( MapSymbolFunction2 ) _Namespace_Symbol_Print, 1, 0 ) ;
+    Tree_Map_Namespaces_State_2Args ( _CFT_->Namespaces->Lo_List, USING, ( MapSymbolFunction2 ) _Namespace_Symbol_Print, 1, 0 ) ;
     _Printf ( ( byte* ) "\n" ) ;
 }
 
 // this namespace is will be taken out of the system
 
 void
-CfrTil_NonCompilingNs_Clear ( Compiler * compiler )
+CFT_NonCompilingNs_Clear ( Compiler * compiler )
 {
     if ( compiler->NonCompilingNs )
     {
@@ -292,7 +292,7 @@ CfrTil_NonCompilingNs_Clear ( Compiler * compiler )
 }
 
 Word *
-_CfrTil_VariableGet ( Namespace * ns, byte * name )
+_CFT_VariableGet ( Namespace * ns, byte * name )
 {
     ns = Word_UnAlias ( ns ) ;
     Word * word = _Finder_FindWord_InOneNamespace ( _Finder_, ns, name ) ;
@@ -300,13 +300,13 @@ _CfrTil_VariableGet ( Namespace * ns, byte * name )
 }
 
 int64
-_CfrTil_VariableValueGet ( byte* nameSpace, byte * name )
+_CFT_VariableValueGet ( byte* nameSpace, byte * name )
 {
     return _Namespace_VariableValueGet ( Namespace_Find ( nameSpace ), name ) ;
 }
 
 void
-_CfrTil_RemoveNamespaceFromUsingListAndClear ( byte * name )
+_CFT_RemoveNamespaceFromUsingListAndClear ( byte * name )
 {
     _Namespace_RemoveFromUsingListAndClear ( Namespace_Find ( name ) ) ;
 }
@@ -324,7 +324,7 @@ Namespace_RemoveNamespacesStack ( Stack * stack )
             Namespace * ns = ( Namespace* ) _Stack_Pop ( stack ) ; 
             if ( ns )
             {
-                if ( ns == _CfrTil_->InNamespace ) _CfrTil_->InNamespace = 0 ;
+                if ( ns == _CFT_->InNamespace ) _CFT_->InNamespace = 0 ;
                 if ( _Finder_ && ( ns == _Finder_->QualifyingNamespace ) ) Finder_SetQualifyingNamespace ( _Context_->Finder0, 0 ) ;
                 _Namespace_SetState ( ns, NOT_USING ) ;
                 dlnode_Remove ( ( dlnode* ) ns ) ;

@@ -139,7 +139,7 @@ TSI_TypeCheckAndInfer ( TSI * tsi )
     if ( Is_DebugOn )
     {
         TSI_Debug_PreTypeStatus_Print ( tsi ) ;
-        CfrTil_TypeStackPrint ( ) ;
+        CFT_TypeStackPrint ( ) ;
     }
 #endif    
     for ( si = 0, ti = tsl - 1 ; si < tsl ; si ++, ti -- ) // si stack index : 0 : top of stack ; ti type string index :  - 1 : zero indexed byte arrays
@@ -179,7 +179,7 @@ TSI_TypeCheckAndInfer ( TSI * tsi )
 TSI *
 TSI_Init ( TSI *tsi, Word* opWord )
 {
-    tsi->TypeWordStack = _CfrTil_->TypeWordStack ;
+    tsi->TypeWordStack = _CFT_->TypeWordStack ;
     tsi->OpWord = opWord ;
     tsi->OpWordTypeSignature = opWord->W_TypeSignatureString ;
     tsi->TypeStackDepth = Stack_Depth ( tsi->TypeWordStack ) ; //depth ;
@@ -197,11 +197,11 @@ TSI_New ( Word* opWord, uint64 allocType )
 }
 
 void
-CfrTil_Typecheck ( Word * opWord )
+CFT_Typecheck ( Word * opWord )
 {
     //if ( ! GetState ( _Compiler_, C_INFIX_EQUAL ) )
     {
-        if ( GetState ( _CfrTil_, ( TYPECHECK_ON | DBG_TYPECHECK_ON ) ) && ( opWord->W_TypeSignatureString[0] ) ) //&& ( depth = Stack_Depth ( _CfrTil_->TypeWordStack ) ) ) // 0 depth with a 
+        if ( GetState ( _CFT_, ( TYPECHECK_ON | DBG_TYPECHECK_ON ) ) && ( opWord->W_TypeSignatureString[0] ) ) //&& ( depth = Stack_Depth ( CFT->TypeWordStack ) ) ) // 0 depth with a 
         {
             if ( ! GetState ( _Compiler_, ( DOING_BEFORE_AN_INFIX_WORD | DOING_BEFORE_A_PREFIX_WORD ) ) )
             {
@@ -209,8 +209,8 @@ CfrTil_Typecheck ( Word * opWord )
                 TSI_TypeCheckAndInfer ( tsi ) ;
                 if ( tsi->TypeErrorStatus ) TSI_ShowTypeErrorStatus ( tsi ) ;
             }
-            //else if ( ( opWord->W_TypeSignatureString[0] == '.' ) && ( opWord->W_TypeSignatureString[0] != 'V' ) ) CfrTil_TypeStackPush ( Context_CurrentWord ( ) ) ;
-            if ( Word_DoesTypeSignatureShowAReturnValue ( opWord ) ) CfrTil_TypeStackPush ( opWord ) ; //Context_CurrentWord ( ) ) ;
+            //else if ( ( opWord->W_TypeSignatureString[0] == '.' ) && ( opWord->W_TypeSignatureString[0] != 'V' ) ) CFT_TypeStackPush ( Context_CurrentWord ( ) ) ;
+            if ( Word_DoesTypeSignatureShowAReturnValue ( opWord ) ) CFT_TypeStackPush ( opWord ) ; //Context_CurrentWord ( ) ) ;
         }
     }
 }
@@ -247,9 +247,9 @@ TSI_TypeStatus_Print ( TSI *tsi )
     _Printf ( ( byte* ) "\n%s :: %s.%s :: type expected : %s :: type recorded : %s : at %s", tsi->TypeErrorStatus ? "apparent type mismatch" : "type match",
         tsi->OpWord->S_ContainingNamespace ? tsi->OpWord->S_ContainingNamespace->Name : ( byte* ) "<literal>",
         tsi->OpWord->Name, Word_ExpandTypeLetterSignature ( tsi->OpWord, 1 ), tsi->ActualTypeStackRecordingBuffer, Context_Location ( ) ) ;
-    if ( GetState ( _CfrTil_, DBG_TYPECHECK_ON ) )
+    if ( GetState ( _CFT_, DBG_TYPECHECK_ON ) )
     {
-        CfrTil_TypeStackPrint ( ) ;
+        CFT_TypeStackPrint ( ) ;
         Pause ( ) ;
     }
 }
@@ -258,9 +258,9 @@ void
 TSI_ShowTypeErrorStatus ( TSI *tsi )
 {
     byte * warning = "Apparent TypeMismatch : " ;
-    CfrTil_ShowInfo ( tsi->OpWord, warning, 0 ) ;
+    CFT_ShowInfo ( tsi->OpWord, warning, 0 ) ;
     TSI_TypeStatus_Print ( tsi ) ;
-    CfrTil_TypeStackReset ( ) ;
+    CFT_TypeStackReset ( ) ;
 }
 
 void
@@ -429,7 +429,7 @@ byte *
 Word_ExpandTypeLetterSignature ( Word * word, Boolean parametersOnly )
 {
     byte tsLetterCode, *ts = word->W_TypeSignatureString, abuffer [64] ;
-    byte *buffer = Buffer_Data_Cleared ( _CfrTil_->StrCatBuffer ) ;
+    byte *buffer = Buffer_Data_Cleared ( _CFT_->StrCatBuffer ) ;
     int64 i, tsl = Word_TypeSignatureLength ( word, parametersOnly ) ;
     buffer [0] = 0 ; // init
     for ( i = 0 ; i < tsl ; i ++ )
@@ -542,17 +542,17 @@ void
 Word_SetTypeNamespace ( Word * word, int64 attribute )
 {
     if ( _Compiler_->AutoVarTypeNamespace ) word->TypeNamespace = _Compiler_->AutoVarTypeNamespace ;
-    else if ( attribute & T_INT ) word->TypeNamespace = _CfrTil_->IntegerNamespace ;
-    else if ( attribute & T_STRING ) word->TypeNamespace = _CfrTil_->StringNamespace ;
-    else if ( attribute & T_BIG_NUM ) word->TypeNamespace = _CfrTil_->BigNumNamespace ;
-    else if ( attribute & T_RAW_STRING ) word->TypeNamespace = _CfrTil_->RawStringNamespace ;
+    else if ( attribute & T_INT ) word->TypeNamespace = _CFT_->IntegerNamespace ;
+    else if ( attribute & T_STRING ) word->TypeNamespace = _CFT_->StringNamespace ;
+    else if ( attribute & T_BIG_NUM ) word->TypeNamespace = _CFT_->BigNumNamespace ;
+    else if ( attribute & T_RAW_STRING ) word->TypeNamespace = _CFT_->RawStringNamespace ;
 }
 
 void
-_CfrTil_TypeStackReset ( )
+_CFT_TypeStackReset ( )
 {
 #if 0 // while not this ??
-    Stack * stack = _CfrTil_->TypeWordStack ;
+    Stack * stack = _CFT_->TypeWordStack ;
     int64 i, i0 = Stack_Depth ( stack ) ;
     while ( i = Stack_Depth ( stack ) )
     {
@@ -560,103 +560,103 @@ _CfrTil_TypeStackReset ( )
         _CheckRecycleWord ( tword ) ;
     }
 #endif    
-    Stack_Init ( _CfrTil_->TypeWordStack ) ;
+    Stack_Init ( _CFT_->TypeWordStack ) ;
 }
 
 void
-CfrTil_TypeStackPrint ( )
+CFT_TypeStackPrint ( )
 {
-    Stack_Print ( _CfrTil_->TypeWordStack, ( byte* ) "TypeWordStack", 1 ) ;
+    Stack_Print ( _CFT_->TypeWordStack, ( byte* ) "TypeWordStack", 1 ) ;
 }
 
 void
-CfrTil_TypeStackReset ( )
+CFT_TypeStackReset ( )
 {
-    //if ( GetState ( _CfrTil_, TYPECHECK_ON ) ) 
-    _CfrTil_TypeStackReset ( ) ;
+    //if ( GetState ( CFT, TYPECHECK_ON ) ) 
+    _CFT_TypeStackReset ( ) ;
 }
 
 void
-CfrTil_TypeStackPush ( Word * word )
+CFT_TypeStackPush ( Word * word )
 {
-    //if ( GetState ( _CfrTil_, TYPECHECK_ON ) ) 
-    Stack_Push ( _CfrTil_->TypeWordStack, ( int64 ) word ) ;
+    //if ( GetState ( CFT, TYPECHECK_ON ) ) 
+    Stack_Push ( _CFT_->TypeWordStack, ( int64 ) word ) ;
 }
 
 void
-CfrTil_TypeStack_SetTop ( Word * word )
+CFT_TypeStack_SetTop ( Word * word )
 {
-    //if ( GetState ( _CfrTil_, TYPECHECK_ON ) ) 
-    Stack_SetTop ( _CfrTil_->TypeWordStack, ( int64 ) word ) ;
+    //if ( GetState ( CFT, TYPECHECK_ON ) ) 
+    Stack_SetTop ( _CFT_->TypeWordStack, ( int64 ) word ) ;
 }
 
 Word *
-CfrTil_TypeStack_Pop ( )
+CFT_TypeStack_Pop ( )
 {
-    //if ( GetState ( _CfrTil_, TYPECHECK_ON ) && Stack_Depth ( _CfrTil_->TypeWordStack ) )
-    if ( Stack_Depth ( _CfrTil_->TypeWordStack ) )
+    //if ( GetState ( CFT, TYPECHECK_ON ) && Stack_Depth ( CFT->TypeWordStack ) )
+    if ( Stack_Depth ( _CFT_->TypeWordStack ) )
     {
-        Word * tword = ( Word * ) Stack_Pop ( _CfrTil_->TypeWordStack ) ;
+        Word * tword = ( Word * ) Stack_Pop ( _CFT_->TypeWordStack ) ;
         return tword ;
     }
     return 0 ;
 }
 
 void
-CfrTil_TypeStack_Drop ( )
+CFT_TypeStack_Drop ( )
 {
-    //if ( GetState ( _CfrTil_, TYPECHECK_ON ) && Stack_Depth ( _CfrTil_->TypeWordStack ) )
-    if ( Stack_Depth ( _CfrTil_->TypeWordStack ) )
+    //if ( GetState ( CFT, TYPECHECK_ON ) && Stack_Depth ( CFT->TypeWordStack ) )
+    if ( Stack_Depth ( _CFT_->TypeWordStack ) )
     {
-        _Stack_Drop ( _CfrTil_->TypeWordStack ) ;
+        _Stack_Drop ( _CFT_->TypeWordStack ) ;
     }
 }
 
 void
-CfrTil_TypeStack_Dup ( )
+CFT_TypeStack_Dup ( )
 {
-    if ( GetState ( _CfrTil_, TYPECHECK_ON ) )
+    if ( GetState ( _CFT_, TYPECHECK_ON ) )
     {
-        if ( Stack_Depth ( _CfrTil_->TypeWordStack ) ) Stack_Dup ( _CfrTil_->TypeWordStack ) ;
-        else CfrTil_TypeStackPush ( CfrTil_WordList ( 0 ) ) ;
+        if ( Stack_Depth ( _CFT_->TypeWordStack ) ) Stack_Dup ( _CFT_->TypeWordStack ) ;
+        else CFT_TypeStackPush ( CFT_WordList ( 0 ) ) ;
     }
 }
 
 void
-CfrTil_TypeCheckOn ( )
+CFT_TypeCheckOn ( )
 {
-    SetState ( _CfrTil_, TYPECHECK_ON, true ) ;
+    SetState ( _CFT_, TYPECHECK_ON, true ) ;
 }
 
 void
-CfrTil_TypeCheckOff ( )
+CFT_TypeCheckOff ( )
 {
-    CfrTil_TypeStackReset ( ) ;
-    SetState ( _CfrTil_, TYPECHECK_ON, false ) ;
+    CFT_TypeStackReset ( ) ;
+    SetState ( _CFT_, TYPECHECK_ON, false ) ;
 }
 
 void
-CfrTil_DbgTypecheckOff ( )
+CFT_DbgTypecheckOff ( )
 {
-    SetState ( _CfrTil_, DBG_TYPECHECK_ON, false ) ;
+    SetState ( _CFT_, DBG_TYPECHECK_ON, false ) ;
 }
 
 void
-CfrTil_DbgTypecheckOn ( )
+CFT_DbgTypecheckOn ( )
 {
-    SetState ( _CfrTil_, DBG_TYPECHECK_ON, true ) ;
+    SetState ( _CFT_, DBG_TYPECHECK_ON, true ) ;
 }
 
 void
-CfrTil_ShowTypeWordStack ( )
+CFT_ShowTypeWordStack ( )
 {
-    //if ( GetState ( _CfrTil_, TYPECHECK_ON ) ) 
-    Stack_Print ( _CfrTil_->TypeWordStack, ( byte* ) "TypeWordStack", 1 ) ;
+    //if ( GetState ( CFT, TYPECHECK_ON ) ) 
+    Stack_Print ( _CFT_->TypeWordStack, ( byte* ) "TypeWordStack", 1 ) ;
     //else _Printf ( (byte*)"\ntypeChecking is off" ) ;
 }
 
 int64
-CfrTil_Get_ObjectByteSize ( Word * word )
+CFT_Get_ObjectByteSize ( Word * word )
 {
     if ( word->Size ) return word->Size ;
     else
@@ -667,23 +667,23 @@ CfrTil_Get_ObjectByteSize ( Word * word )
         else
         {
             if ( typeNamespace = TypeNamespace_Get ( word ) )
-                objectByteSize = ( int64 ) _CfrTil_VariableValueGet ( TypeNamespace_Get ( word )->Name, ( byte* ) "size" ) ;
+                objectByteSize = ( int64 ) _CFT_VariableValueGet ( TypeNamespace_Get ( word )->Name, ( byte* ) "size" ) ;
         }
         return objectByteSize ;
     }
 }
 
 void
-CfrTil_Set_Namespace_ObjectByteSize ( Namespace * ns, int64 obsize )
+CFT_Set_Namespace_ObjectByteSize ( Namespace * ns, int64 obsize )
 {
     if ( ns ) ns->ObjectByteSize = obsize ; // not here ??
 }
 
 int64
-CfrTil_Get_Namespace_SizeVar_Value ( Namespace * ns )
+CFT_Get_Namespace_SizeVar_Value ( Namespace * ns )
 {
     int64 objectByteSize ;
-    objectByteSize = ( int64 ) _CfrTil_VariableValueGet ( ns->Name, ( byte* ) "size" ) ;
+    objectByteSize = ( int64 ) _CFT_VariableValueGet ( ns->Name, ( byte* ) "size" ) ;
     if ( ! objectByteSize ) objectByteSize = ns->ObjectByteSize ;
     //else ns->ObjectByteSize = objectByteSize ; // not here ??
     return objectByteSize ;
@@ -692,11 +692,11 @@ CfrTil_Get_Namespace_SizeVar_Value ( Namespace * ns )
 #if 0
 
 byte
-CfrTil_Get_ObjectByteSize ( Word * word )
+CFT_Get_ObjectByteSize ( Word * word )
 {
     byte size ;
     if ( GetState ( _Context_, ADDRESS_OF_MODE ) ) size = - 1 ; // 8 ??
-    else size = ( TypeNamespace_Get ( word ) ? ( int64 ) _CfrTil_VariableValueGet ( TypeNamespace_Get ( word )->Name, ( byte* ) "size" ) : 0 ) ;
+    else size = ( TypeNamespace_Get ( word ) ? ( int64 ) _CFT_VariableValueGet ( TypeNamespace_Get ( word )->Name, ( byte* ) "size" ) : 0 ) ;
     return size ;
 }
 #endif

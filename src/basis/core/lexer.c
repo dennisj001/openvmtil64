@@ -16,13 +16,13 @@ void
 Lexer_Exception ( byte * token, uint64 exceptionNumber, byte * message )
 {
     _O_->ExceptionToken = token ;
-    byte *buffer = Buffer_Data ( _CfrTil_->ScratchB1 ) ;
+    byte *buffer = Buffer_Data ( _CFT_->ScratchB1 ) ;
     sprintf ( ( char* ) buffer, "%s :: %s ?\n", ( char* ) message, ( char* ) token ) ;
-    CfrTil_Exception ( exceptionNumber, buffer, QUIT ) ;
+    CFT_Exception ( exceptionNumber, buffer, QUIT ) ;
 }
 
 Word *
-Lexer_ObjectToken_New ( Lexer * lexer, byte * token, int64 tsrli, int64 scwi )
+Lexer_ParseToken_ToWord ( Lexer * lexer, byte * token, int64 tsrli, int64 scwi )
 {
     Context * cntx = _Context_ ;
     Compiler * compiler = cntx->Compiler0 ;
@@ -85,7 +85,7 @@ _Lexer_LexNextToken_WithDelimiters ( Lexer * lexer, byte * delimiters, Boolean c
     {
         Lexer_Init ( lexer, delimiters, lexer->State, CONTEXT ) ;
         lexer->State |= state ;
-        lexer->SC_Index = _CfrTil_->SC_Index ;
+        lexer->SC_Index = _CFT_->SC_Index ;
         while ( ( ! Lexer_CheckIfDone ( lexer, LEXER_DONE ) ) )
         {
             inChar = lexer->NextChar ( lexer->ReadLiner0 ) ;
@@ -103,7 +103,7 @@ _Lexer_LexNextToken_WithDelimiters ( Lexer * lexer, byte * delimiters, Boolean c
         lexer->Token_Length = Strlen ( ( char* ) lexer->OriginalToken ) ;
         lexer->TokenEnd_ReadLineIndex = lexer->TokenStart_ReadLineIndex + lexer->Token_Length ;
         lexer->TokenStart_FileIndex = rl->LineStartFileIndex + lexer->TokenStart_ReadLineIndex ; //- lexer->Token_Length ;
-        if ( peekFlag && reAddPeeked ) CfrTil_PushToken_OnTokenList ( lexer->OriginalToken ) ;
+        if ( peekFlag && reAddPeeked ) CFT_PushToken_OnTokenList ( lexer->OriginalToken ) ;
         lexer->LastLexedChar = inChar ;
     }
     lexer->LastToken = lexer->OriginalToken ;
@@ -114,16 +114,15 @@ _Lexer_LexNextToken_WithDelimiters ( Lexer * lexer, byte * delimiters, Boolean c
 void
 Lexer_Init ( Lexer * lexer, byte * delimiters, uint64 state, uint64 allocType )
 {
-    lexer->TokenBuffer = _CfrTil_->TokenBuffer ;
+    lexer->TokenBuffer = _CFT_->TokenBuffer ;
     Mem_Clear ( lexer->TokenBuffer, BUF_IX_SIZE ) ;
     lexer->OriginalToken = 0 ;
     lexer->Literal = 0 ;
-    lexer->SC_Index = _CfrTil_->SC_Index ;
+    lexer->SC_Index = _CFT_->SC_Index ;
     if ( delimiters ) Lexer_SetTokenDelimiters ( lexer, delimiters, allocType ) ;
     else
     {
         //if ( ! _Context_->DefaultDelimiterCharSet ) // ?? 
-
         Context_SetDefaultTokenDelimiters ( _Context_, ( byte* ) " \n\r\t", CONTEXT ) ;
         lexer->DelimiterCharSet = _Context_->DefaultDelimiterCharSet ;
         lexer->TokenDelimiters = _Context_->DefaultTokenDelimiters ;
@@ -153,19 +152,19 @@ Lexer_NextNonDelimiterChar ( Lexer * lexer )
 //----------------------------------------------------------------------------------------|
 
 void
-_CfrTil_AddTokenToTailOfTokenList ( byte * token )
+_CFT_AddTokenToTailOfTokenList ( byte * token )
 {
 
     if ( token ) dllist_AddNodeToTail ( _Lexer_->TokenList, ( dlnode* ) Lexer_Token_New ( token ) ) ;
-    //if ( Is_DebugOn ) Symbol_List_Print ( _CfrTil_->TokenList ) ;
+    //if ( Is_DebugOn ) Symbol_List_Print ( CFT->TokenList ) ;
 }
 
 void
-CfrTil_PushToken_OnTokenList ( byte * token )
+CFT_PushToken_OnTokenList ( byte * token )
 {
 
     if ( token ) dllist_AddNodeToHead ( _Lexer_->TokenList, ( dlnode* ) Lexer_Token_New ( token ) ) ;
-    //if ( Is_DebugOn ) Symbol_List_Print ( _CfrTil_->TokenList ) ;
+    //if ( Is_DebugOn ) Symbol_List_Print ( CFT->TokenList ) ;
 }
 
 #if 0
@@ -295,7 +294,7 @@ Lexer_Peek_Next_NonDebugTokenWord ( Lexer * lexer, Boolean evalFlag, Boolean svR
     int64 svReadIndex = rl->ReadIndex ;
     //int64 svInterpState = lexer->OurInterpreter ? lexer->OurInterpreter->State : 0 ;
     byte * token = _Lexer_Next_NonDebugOrCommentTokenWord ( lexer, 0, evalFlag, 0 ) ; // 0 : peekFlag off because we are reAdding it below
-    CfrTil_PushToken_OnTokenList ( token ) ; // TODO ; list should instead be a stack
+    CFT_PushToken_OnTokenList ( token ) ; // TODO ; list should instead be a stack
     if ( svReadIndexFlag ) rl->ReadIndex = svReadIndex ;
     //if (lexer->OurInterpreter) lexer->OurInterpreter->State = svInterpState ;
 
@@ -451,9 +450,9 @@ Lexer_SourceCodeOff ( Lexer * lexer )
 void
 _Lexer_AppendCharToSourceCode ( Lexer * lexer, byte c, int64 convert )
 {
-    if ( GetState ( _CfrTil_, SOURCE_CODE_ON ) && GetState ( lexer, ADD_CHAR_TO_SOURCE ) )
+    if ( GetState ( _CFT_, SOURCE_CODE_ON ) && GetState ( lexer, ADD_CHAR_TO_SOURCE ) )
     {
-        CfrTil_AppendCharToSourceCode ( _CfrTil_, c ) ;
+        CFT_AppendCharToSourceCode ( _CFT_, c ) ;
     }
 }
 
@@ -509,7 +508,7 @@ Lexer_MakeItTheNextToken ( Lexer * lexer )
 {
 
     ReadLine_UnGetChar ( lexer->ReadLiner0 ) ; // allow to read '.' as next token
-    //_CfrTil_UnAppendFromSourceCode ( 1 ) ;
+    //_CFT_UnAppendFromSourceCode ( 1 ) ;
     SetState ( lexer, LEXER_DONE, true ) ;
 }
 
@@ -568,7 +567,7 @@ _Lexer_MacroChar_NamespaceCheck ( Lexer * lexer, byte * nameSpace )
     buffer [0] = lexer->TokenInputByte ;
     buffer [1] = 0 ;
 
-    return _CfrTil_IsContainingNamespace ( buffer, nameSpace ) ;
+    return _CFT_IsContainingNamespace ( buffer, nameSpace ) ;
 }
 
 void
@@ -842,7 +841,7 @@ Comma ( Lexer * lexer )
         }
         else //if ( Lexer_IsCurrentInputCharADelimiter ( lexer ) ) 
         {
-            CfrTil_C_Comma ( ) ; // ??  SetState ( _Context_, ADDRESS_OF_MODE, false ) ;
+            CFT_C_Comma ( ) ; // ??  SetState ( _Context_, ADDRESS_OF_MODE, false ) ;
             //return ;
         }
     }
@@ -925,7 +924,7 @@ Lexer_SetInputFunction ( Lexer * lexer, byte ( *lipf ) ( ReadLiner * ) )
 void
 _Lexer_DoChar ( Lexer * lexer, byte c )
 {
-    _CfrTil_->LexerCharacterFunctionTable [ _CfrTil_->LexerCharacterTypeTable [ c ].CharInfo ] ( lexer ) ;
+    _CFT_->LexerCharacterFunctionTable [ _CFT_->LexerCharacterTypeTable [ c ].CharInfo ] ( lexer ) ;
 }
 
 Boolean
@@ -937,7 +936,7 @@ Lexer_IsTokenQualifiedID ( Lexer * lexer )
 }
 
 void
-CfrTil_LexerTables_Setup ( CfrTil * cfrtl )
+CFT_LexerTables_Setup ( CfrTil * cfrtl )
 {
     int64 i ;
 

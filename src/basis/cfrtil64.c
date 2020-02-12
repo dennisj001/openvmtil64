@@ -2,38 +2,38 @@
 #include "../include/cfrtil64.h"
 
 void
-CfrTil_Run ( CfrTil * cfrTil, int64 restartCondition )
+CFT_Run ( CfrTil * cfrTil, int64 restartCondition )
 {
     while ( 1 )
     {
-        cfrTil = _CfrTil_New ( cfrTil ) ;
+        cfrTil = _CFT_New ( cfrTil ) ;
         if ( ! sigsetjmp ( cfrTil->JmpBuf0, 0 ) )
         {
-            _CfrTil_ReStart ( cfrTil, restartCondition ) ;
+            _CFT_ReStart ( cfrTil, restartCondition ) ;
             Ovt_RunInit ( _O_ ) ;
-            CfrTil_InterpreterRun ( ) ;
+            CFT_InterpreterRun ( ) ;
         }
     }
 }
 
 void
-CfrTil_RunInit ( )
+CFT_RunInit ( )
 {
-    if ( _O_->Signal > QUIT ) CfrTil_DataStack_Init ( ) ;
-    else if ( DataStack_Underflow ( ) || ( DataStack_Overflow ( ) ) ) CfrTil_PrintDataStack ( ) ;
+    if ( _O_->Signal > QUIT ) CFT_DataStack_Init ( ) ;
+    else if ( DataStack_Underflow ( ) || ( DataStack_Overflow ( ) ) ) CFT_PrintDataStack ( ) ;
 }
 
 void
-_CfrTil_ReStart ( CfrTil * cfrTil, int64 restartCondition )
+_CFT_ReStart ( CfrTil * cfrTil, int64 restartCondition )
 {
-    CfrTil_RunInit ( ) ;
+    CFT_RunInit ( ) ;
     switch ( restartCondition )
     {
         case 0:
         case INITIAL_START:
         case FULL_RESTART:
         case RESTART:
-        case RESET_ALL: CfrTil_ResetAll_Init ( cfrTil ) ;
+        case RESET_ALL: CFT_ResetAll_Init ( cfrTil ) ;
         case ABORT: Set_DataStackPointer_FromDspReg ( ) ;
         default:
         case QUIT:
@@ -42,96 +42,96 @@ _CfrTil_ReStart ( CfrTil * cfrTil, int64 restartCondition )
 }
 
 void
-_CfrTil_CpuState_CheckSave ( )
+_CFT_CpuState_CheckSave ( )
 {
-    if ( ! GetState ( _CfrTil_->cs_Cpu, CPU_SAVED ) )
+    if ( ! GetState ( _CFT_->cs_Cpu, CPU_SAVED ) )
     {
-        _CfrTil_->SaveCpuState ( ) ;
-        SetState ( _CfrTil_->cs_Cpu, CPU_SAVED, true ) ;
+        _CFT_->SaveCpuState ( ) ;
+        SetState ( _CFT_->cs_Cpu, CPU_SAVED, true ) ;
     }
 }
 
 void
-CfrTil_CpuState_Show ( )
+CFT_CpuState_Show ( )
 {
-    _CpuState_Show ( _CfrTil_->cs_Cpu ) ;
+    _CpuState_Show ( _CFT_->cs_Cpu ) ;
 }
 
 void
-CfrTil_CpuState_Current_Show ( )
+CFT_CpuState_Current_Show ( )
 {
-    _CfrTil_->SaveCpu2State ( ) ;
-    _CpuState_Show ( _CfrTil_->cs_Cpu2 ) ;
-    _CfrTil_->RestoreCpu2State ( ) ;
+    _CFT_->SaveCpu2State ( ) ;
+    _CpuState_Show ( _CFT_->cs_Cpu2 ) ;
+    _CFT_->RestoreCpu2State ( ) ;
 }
 
 void
-CfrTil_CpuState_CheckShow ( )
+CFT_CpuState_CheckShow ( )
 {
-    _CfrTil_CpuState_CheckSave ( ) ;
-    CfrTil_CpuState_Show ( ) ;
+    _CFT_CpuState_CheckSave ( ) ;
+    CFT_CpuState_Show ( ) ;
 }
 
 void
-CfrTil_Debugger_CheckSaveCpuStateShow ( )
+CFT_Debugger_CheckSaveCpuStateShow ( )
 {
     Debugger_CpuState_CheckSaveShow ( _Debugger_ ) ;
 }
 
 void
-CfrTil_Debugger_UdisOneInsn ( )
+CFT_Debugger_UdisOneInsn ( )
 {
     Debugger_UdisOneInstruction ( _Debugger_, _Debugger_->DebugAddress, ( byte* ) "\r\r", ( byte* ) "" ) ; // current insn
 }
 
 void
-CfrTil_Debugger_State_CheckSaveShow ( )
+CFT_Debugger_State_CheckSaveShow ( )
 {
-    CfrTil_Debugger_CheckSaveCpuStateShow ( ) ;
+    CFT_Debugger_CheckSaveCpuStateShow ( ) ;
     //if ( _O_->Verbosity > 3 ) Debugger_PrintReturnStackWindow () ;
 }
 
 void
-CfrTil_Debugger_SaveCpuState ( )
+CFT_Debugger_SaveCpuState ( )
 {
     _Debugger_CpuState_CheckSave ( _Debugger_ ) ;
 }
 
 void
-CfrTil_PrintReturnStackWindow ( )
+CFT_PrintReturnStackWindow ( )
 {
-    _PrintNStackWindow ( ( uint64* ) _CfrTil_->cs_Cpu->Rsp, (byte*) "CfrTil C ReturnStack (RSP)", (byte*) "RSP", 4 ) ;
+    _PrintNStackWindow ( ( uint64* ) _CFT_->cs_Cpu->Rsp, (byte*) "CfrTil C ReturnStack (RSP)", (byte*) "RSP", 4 ) ;
 }
 
 void
-_CfrTil_NamespacesInit ( CfrTil * cfrTil )
+_CFT_NamespacesInit ( CfrTil * cfrTil )
 {
     Namespace * ns = DataObject_New (NAMESPACE, 0, ( byte* ) "Namespaces", 0, 0, 0, 0, 0, 0, 0, 0, - 1 ) ;
     ns->State |= USING ; // nb. _Namespace_SetState ( ns, USING ) ; // !! can't be used with "Namespaces"
     cfrTil->Namespaces = ns ;
-    CfrTil_AddCPrimitives ( ) ;
+    CFT_AddCPrimitives ( ) ;
 }
 
 void
-_CfrTil_DataStack_Init ( CfrTil * cfrTil )
+_CFT_DataStack_Init ( CfrTil * cfrTil )
 {
-    _Stack_Init ( _CfrTil_->DataStack, _O_->DataStackSize ) ;
-    _Dsp_ = _CfrTil_->DataStack->StackPointer ;
+    _Stack_Init ( _CFT_->DataStack, _O_->DataStackSize ) ;
+    _Dsp_ = _CFT_->DataStack->StackPointer ;
     cfrTil->SaveDsp = _Dsp_ ;
 }
 
 void
-CfrTil_DataStack_Init ( )
+CFT_DataStack_Init ( )
 {
-    _CfrTil_DataStack_Init ( _CfrTil_ ) ;
+    _CFT_DataStack_Init ( _CFT_ ) ;
     if ( _O_->Verbosity > 2 ) _Printf ( ( byte* ) "\nData Stack reset." ) ;
 }
 
 void
-_CfrTil_Init ( CfrTil * cfrTil, Namespace * nss )
+_CFT_Init ( CfrTil * cfrTil, Namespace * nss )
 {
     uint64 allocType = CFRTIL ;
-    _CfrTil_ = cfrTil ;
+    _CFT_ = cfrTil ;
     // TODO : organize these buffers and their use 
     cfrTil->OriginalInputLineB = _Buffer_NewPermanent ( BUFFER_SIZE ) ;
     cfrTil->InputLineB = _Buffer_NewPermanent ( BUFFER_SIZE ) ;
@@ -180,7 +180,7 @@ _CfrTil_Init ( CfrTil * cfrTil, Namespace * nss )
     }
     else
     {
-        _CfrTil_NamespacesInit ( cfrTil ) ;
+        _CFT_NamespacesInit ( cfrTil ) ;
     }
     if ( cfrTil->SaveDsp && cfrTil->DataStack ) // with _O_->RestartCondition = STOP from Debugger_Stop
     {
@@ -192,7 +192,7 @@ _CfrTil_Init ( CfrTil * cfrTil, Namespace * nss )
         _Dsp_ = cfrTil->DataStack->StackPointer ;
         cfrTil->SaveDsp = _Dsp_ ;
     }
-    CfrTil_MachineCodePrimitive_AddWords ( cfrTil ) ; // in any case we need to reinit these for eg. debugger->SaveCpuState (), etc.
+    CFT_MachineCodePrimitive_AddWords ( cfrTil ) ; // in any case we need to reinit these for eg. debugger->SaveCpuState (), etc.
     cfrTil->StoreWord = Finder_FindWord_AnyNamespace ( _Finder_, ( byte* ) "store" ) ;
     cfrTil->PokeWord = Finder_FindWord_InOneNamespace ( _Finder_, (byte*) "Compiler", (byte*) "=" ) ; //Finder_FindWord_AnyNamespace ( _Finder_, ( byte* ) "=" ) ;
     cfrTil->RightBracket = Finder_FindWord_AnyNamespace ( _Finder_, ( byte* ) "]" ) ;
@@ -203,8 +203,8 @@ _CfrTil_Init ( CfrTil * cfrTil, Namespace * nss )
     //cfrTil->RawStringNamespace = Namespace_Find ( (byte*) "RawString" ) ;
     //cfrTil->CharNamespace = Namespace_Find ( (byte*) "Char" ) ;
     //cfrTil->FloatNamespace = Namespace_Find ( (byte*) "Float" ) ;
-    CfrTil_ReadTables_Setup ( cfrTil ) ;
-    CfrTil_LexerTables_Setup ( cfrTil ) ;
+    CFT_ReadTables_Setup ( cfrTil ) ;
+    CFT_LexerTables_Setup ( cfrTil ) ;
     cfrTil->LC = 0 ;
     cfrTil->SC_QuoteMode = 0 ;
     cfrTil->EndBlockWord = Finder_FindWord_InOneNamespace ( _Finder_, (byte*) "Reserved", (byte*) "}" ) ;
@@ -213,7 +213,7 @@ _CfrTil_Init ( CfrTil * cfrTil, Namespace * nss )
 }
 
 void
-CfrTil_ResetMemory ( CfrTil * cfrTil )
+CFT_ResetMemory ( CfrTil * cfrTil )
 {
 #if 0    
     if ( cfrTil->ContextDataStack )
@@ -248,7 +248,7 @@ CfrTil_ResetMemory ( CfrTil * cfrTil )
 }
 
 CfrTil *
-_CfrTil_New ( CfrTil * cfrTil )
+_CFT_New ( CfrTil * cfrTil )
 {
     // nb. not all of this logic has really been needed or used or tested; it should be reworked according to need
     Namespace * nss = 0 ;
@@ -259,62 +259,62 @@ _CfrTil_New ( CfrTil * cfrTil )
             nss = cfrTil->Namespaces ; // in this case (see also below) only preserve Namespaces, all else is recycled and reinitialized
             if ( cfrTil->LogFILE )
             {
-                CfrTil_LogOff ( ) ;
+                CFT_LogOff ( ) ;
             }
         }
-        CfrTil_ResetMemory ( cfrTil ) ;
+        CFT_ResetMemory ( cfrTil ) ;
     }
     else nss = 0 ;
     _Context_ = 0 ;
     cfrTil = ( CfrTil* ) Mem_Allocate ( sizeof ( CfrTil ), OPENVMTIL ) ;
-    _CfrTil_Init ( cfrTil, nss ) ;
+    _CFT_Init ( cfrTil, nss ) ;
     Linux_SetupSignals ( &cfrTil->JmpBuf0, 1 ) ;
     return cfrTil ;
 }
 
 void
-CfrTil_OptimizeOn ( )
+CFT_OptimizeOn ( )
 {
-    SetState ( _CfrTil_, OPTIMIZE_ON, true ) ;
+    SetState ( _CFT_, OPTIMIZE_ON, true ) ;
 }
 
 void
-_CfrTil_OptimizeOff ( )
+_CFT_OptimizeOff ( )
 {
-    SetState ( _CfrTil_, OPTIMIZE_ON, false ) ;
+    SetState ( _CFT_, OPTIMIZE_ON, false ) ;
 }
 
 void
-CfrTil_OptimizeOff ( )
+CFT_OptimizeOff ( )
 {
-    _CfrTil_OptimizeOff ( ) ;
+    _CFT_OptimizeOff ( ) ;
     //_Printf ( (byte*) "\nCurrently optimize cannot be turned off else c syntax will not compile correctly in some cases, other problems may be there also." ) ;
     //Pause () ;
 }
 
 void
-CfrTil_StringMacrosOn ( )
+CFT_StringMacrosOn ( )
 {
-    SetState ( _CfrTil_, STRING_MACROS_ON, true ) ;
-    _CfrTil_StringMacros_Init ( ) ;
+    SetState ( _CFT_, STRING_MACROS_ON, true ) ;
+    _CFT_StringMacros_Init ( ) ;
 }
 
 void
-CfrTil_StringMacrosOff ( )
+CFT_StringMacrosOff ( )
 {
-    SetState ( _CfrTil_, STRING_MACROS_ON, false ) ;
-    SetState ( &_CfrTil_->Sti, STI_INITIALIZED, false ) ;
+    SetState ( _CFT_, STRING_MACROS_ON, false ) ;
+    SetState ( &_CFT_->Sti, STI_INITIALIZED, false ) ;
 }
 
 void
-CfrTil_InlineOn ( )
+CFT_InlineOn ( )
 {
-    SetState ( _CfrTil_, INLINE_ON, true ) ;
+    SetState ( _CFT_, INLINE_ON, true ) ;
 }
 
 void
-CfrTil_InlineOff ( )
+CFT_InlineOff ( )
 {
-    SetState ( _CfrTil_, INLINE_ON, false ) ;
+    SetState ( _CFT_, INLINE_ON, false ) ;
 }
 

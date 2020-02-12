@@ -350,7 +350,7 @@ sp
 sp
 
 lispOff
-List
+Root.List
 _((lambda ( a b) (+ a b)) 3 4 ) dupList eval printList printList s lispOff
 : bexp3 ( n ) { n @ 1 > } { n @ n @ -- bexp3 *  } { 1 } ifElse ;
 'bexp3 find wdiss 7 bexp3 p //pause

@@ -33,7 +33,7 @@ Compile_Multiply ( Compiler * compiler )
         Compiler_SCA_Word_SetCodingHere_And_ClearPreviousUse ( optInfo->opWord, 1 ) ;
         _Compile_IMUL ( optInfo->Optimize_Mod, optInfo->Optimize_Reg, optInfo->Optimize_Rm, 0, optInfo->Optimize_Disp, 0 ) ;
         if ( optInfo->Optimize_Rm == DSP ) _Compile_Move_Reg_To_StackN ( DSP, 0, optInfo->Optimize_Reg ) ;
-        else _Word_CompileAndRecord_PushReg ( _CfrTil_WordList ( 0 ), optInfo->Optimize_Reg, true ) ;
+        else _Word_CompileAndRecord_PushReg ( _CFT_WordList ( 0 ), optInfo->Optimize_Reg, true ) ;
     }
     else
     {
@@ -41,7 +41,7 @@ Compile_Multiply ( Compiler * compiler )
         //Compile_IMUL ( cell mod, cell reg, cell rm, sib, disp, imm, size )
         Compiler_WordStack_SCHCPUSCA ( 0, 1 ) ;
         Compile_MUL ( MEM, DSP, REX_W | MODRM_B | DISP_B, 0, 0, 0, CELL_SIZE ) ;
-        _CfrTil_WordList ( 0 )->StackPushRegisterCode = Here ;
+        _CFT_WordList ( 0 )->StackPushRegisterCode = Here ;
         Compile_Move_ACC_To_TOS ( DSP ) ;
     }
     //DBI_OFF ;
@@ -64,7 +64,7 @@ _Compile_Divide ( Compiler * compiler, uint64 type )
         if ( type == MODULO ) reg = RDX ;
         else reg = ACC ;
         if ( reg != ACC ) Compile_Move_Reg_To_Reg ( ACC, reg, 0 ) ; // for consistency finally use RAX so optInfo can always count on rax as the pushed reg
-        CfrTil_CompileAndRecord_Word0_PushReg ( ACC, true ) ;
+        CFT_CompileAndRecord_Word0_PushReg ( ACC, true ) ;
     }
     else
     {
@@ -120,7 +120,7 @@ _Compile_optInfo_X_Group1 ( Compiler * compiler, int64 op )
 }
 
 void
-_CfrTil_Do_IncDec ( int64 op )
+_CFT_Do_IncDec ( int64 op )
 {
     Context * cntx = _Context_ ;
     Compiler * compiler = cntx->Compiler0 ;
@@ -131,8 +131,8 @@ _CfrTil_Do_IncDec ( int64 op )
     else
     {
         Compiler_WordStack_SCHCPUSCA ( 0, 0 ) ;
-        int64 sd = List_Depth ( _CfrTil_->Compiler_N_M_Node_WordList ) ;
-        Word *one = ( Word* ) _CfrTil_WordList ( 1 ) ; // the operand
+        int64 sd = List_Depth ( _CFT_->Compiler_N_M_Node_WordList ) ;
+        Word *one = ( Word* ) _CFT_WordList ( 1 ) ; // the operand
         if ( op == INC )
         {
             if ( ( sd > 1 ) && one->W_ObjectAttributes & ( PARAMETER_VARIABLE | LOCAL_VARIABLE | NAMESPACE_VARIABLE ) )
@@ -151,7 +151,7 @@ _CfrTil_Do_IncDec ( int64 op )
             }
             else _Dsp_ [0] -- ;
         }
-        //_CfrTil_->set_DspReg_FromDataStackPointer ( ) ; // update DSP reg
+        //CFT->set_DspReg_FromDataStackPointer ( ) ; // update DSP reg
     }
 }
 

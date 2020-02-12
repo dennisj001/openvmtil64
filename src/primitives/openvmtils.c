@@ -4,27 +4,27 @@
 void
 OpenVmTil_Verbosity ( )
 {
-    if ( Compiling ) _Compile_Stack_Push ( DSP, ACC, ( int64 ) &_O_->Verbosity ) ; //CfrTil_CompileAndRecord_Word0_PushReg ( ACC ) ; //_Compile_Stack_Push ( DSP, ( int64 ) & _O_->Verbosity ) ;
+    if ( Compiling ) _Compile_Stack_Push ( DSP, ACC, ( int64 ) &_O_->Verbosity ) ; //CFT_CompileAndRecord_Word0_PushReg ( ACC ) ; //_Compile_Stack_Push ( DSP, ( int64 ) & _O_->Verbosity ) ;
     else DataStack_Push ( ( int64 ) & _O_->Verbosity ) ;
 }
 
 void
 OpenVmTil_ShowMachineCodeInstructions ( )
 {
-    if ( Compiling ) _Compile_Stack_Push ( DSP, ACC, ( int64 ) & _O_->Dbi ) ; //CfrTil_CompileAndRecord_Word0_PushReg ( ACC ) ; //_Compile_Stack_Push ( DSP, ( int64 ) & _O_->Verbosity ) ;
+    if ( Compiling ) _Compile_Stack_Push ( DSP, ACC, ( int64 ) & _O_->Dbi ) ; //CFT_CompileAndRecord_Word0_PushReg ( ACC ) ; //_Compile_Stack_Push ( DSP, ( int64 ) & _O_->Verbosity ) ;
     else DataStack_Push ( ( int64 ) & _O_->Dbi ) ;
 }
 
 void
 Ovt_Optimize ( )
 {
-    DataStack_Push ( ( int64 ) GetState ( _CfrTil_, OPTIMIZE_ON ) ? 1 : 0 ) ;
+    DataStack_Push ( ( int64 ) GetState ( _CFT_, OPTIMIZE_ON ) ? 1 : 0 ) ;
 }
 
 void
 Ovt_Inlining ( )
 {
-    DataStack_Push ( ( int64 ) GetState ( _CfrTil_, INLINE_ON ) ? 1 : 0 ) ;
+    DataStack_Push ( ( int64 ) GetState ( _CFT_, INLINE_ON ) ? 1 : 0 ) ;
 }
 
 // allows variables to be created on first use without a "var" declaration
@@ -143,11 +143,11 @@ OVT_StartupMessage ( Boolean promptFlag )
     if ( _O_->Verbosity > 0 )
     {
         DefaultColors ;
-        //if ( _CfrTil_->InitSessionCoreTimes > 1 ) CfrTil_NewLine () ;
+        //if ( CFT->InitSessionCoreTimes > 1 ) CFT_NewLine () ;
         if ( promptFlag && ( _O_->Restarts < 2 ) )
         {
-            System_Time ( _CfrTil_->Context0->System0, 0, ( char* ) "\nStartup", 1 ) ;
-            _CfrTil_Version ( promptFlag ) ;
+            System_Time ( _CFT_->Context0->System0, 0, ( char* ) "\nStartup", 1 ) ;
+            _CFT_Version ( promptFlag ) ;
         }
         if ( _O_->Verbosity > 1 )
         {
@@ -164,7 +164,7 @@ _OVT_Ok ( Boolean promptFlag )
 {
     if ( _O_->Verbosity > 3 )
     {
-        _CfrTil_SystemState_Print ( 0 ) ;
+        _CFT_SystemState_Print ( 0 ) ;
         _Printf ( ( byte* ) "\n<Esc> - break, <Ctrl-C> - quit, <Ctrl-D> - restart, \'bye\'/\'exit\' - leave." ) ;
     }
     _Context_Prompt ( _O_->Verbosity && promptFlag ) ;
@@ -174,7 +174,7 @@ void
 OVT_Ok ( )
 {
     _OVT_Ok ( 1 ) ;
-    //_CfrTil_Prompt ( _O_->Verbosity && ( ( _O_->RestartCondition < RESET_ALL ) || _O_->StartTimes > 1 ) ) ;
+    //_CFT_Prompt ( _O_->Verbosity && ( ( _O_->RestartCondition < RESET_ALL ) || _O_->StartTimes > 1 ) ) ;
 }
 
 #if 0 // not used

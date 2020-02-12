@@ -12,7 +12,7 @@ _CaseNode_New ( uint64 type, block block, int64 value )
 // ( q n -- )
 
 void
-_CfrTil_Case ( uint64 allocType )
+_CFT_Case ( uint64 allocType )
 {
     block caseBlock ;
     int64 caseValue ;
@@ -20,7 +20,7 @@ _CfrTil_Case ( uint64 allocType )
     {
         caseBlock = ( block ) TOS ;
         Word * literalWord = WordsBack ( 1 ) ;
-        if ( ! ( literalWord->W_ObjectAttributes & LITERAL ) ) CfrTil_Exception (CASE_NOT_LITERAL_ERROR, 0, 1 ) ;
+        if ( ! ( literalWord->W_ObjectAttributes & LITERAL ) ) CFT_Exception (CASE_NOT_LITERAL_ERROR, 0, 1 ) ;
         caseValue = ( int64 ) literalWord->W_Value ;
         SetHere (literalWord->Coding, 1) ;
         DataStack_DropN ( 1 ) ;
@@ -42,9 +42,9 @@ _CfrTil_Case ( uint64 allocType )
 }
 
 void
-CfrTil_Case ( )
+CFT_Case ( )
 {
-    _CfrTil_Case ( DICTIONARY ) ;
+    _CFT_Case ( DICTIONARY ) ;
 }
 
 void
@@ -65,7 +65,7 @@ SwitchAccessFunction ( )
 }
 
 void
-CfrTil_Switch ( )
+CFT_Switch ( )
 {
     if ( CompileMode )
     {

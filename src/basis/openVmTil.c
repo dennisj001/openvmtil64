@@ -1,5 +1,5 @@
 #include "../include/cfrtil64.h"
-#define VERSION ((byte*) "0.904.500" ) 
+#define VERSION ((byte*) "0.904.600" ) 
 // inspired by :: Logic/Foml (Foundations of Mathematical Logic by Haskell Curry), CT/Oop (Category Theory, Object Oriented Programming) 
 // C/C++/C#, Lisp, RPN/Lag : Reverse Polish Notation, (Left Associative Grammar), 
 // State Machines, Push Down Automata (PDA), Turing Machines :: 
@@ -39,7 +39,7 @@ OpenVmTil_Run ( int64 argc, char * argv [ ] )
         ovt->Restarts = restarts ;
         if ( ovt->Restarts ) OVT_ExceptionState_Print ( ) ;
         if ( ! sigsetjmp ( ovt->JmpBuf0, 0 ) ) // nb. siglongjmp always comes to beginning of the block 
-            CfrTil_Run ( ovt->OVT_CfrTil, ovt->RestartCondition ) ;
+            CFT_Run ( ovt->OVT_CfrTil, ovt->RestartCondition ) ;
         restartCondition = ovt->RestartCondition ;
         OVT_SetRestartCondition ( ovt, restartCondition ) ;
         //sigSegvs = ovt->SigSegvs ;
@@ -58,9 +58,9 @@ _OpenVmTil_Allocate ( )
 void
 OVT_RecycleAllWordsDebugInfo ( )
 {
-    SetState ( _CfrTil_, ( RT_DEBUG_ON | GLOBAL_SOURCE_CODE_MODE ), false ) ;
+    SetState ( _CFT_, ( RT_DEBUG_ON | GLOBAL_SOURCE_CODE_MODE ), false ) ;
     OVT_MemListFree_CompilerTempObjects ( ) ;
-    _CfrTil_RecycleInit_Compiler_N_M_Node_WordList ( ) ;
+    _CFT_RecycleInit_Compiler_N_M_Node_WordList ( ) ;
 }
 
 void

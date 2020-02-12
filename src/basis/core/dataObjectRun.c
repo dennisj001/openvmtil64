@@ -9,7 +9,7 @@ Object_Run ( Word * word )
     Context * cntx = _Context_ ;
     Boolean rvalueFlag, isForwardDotted, isReverseDotted ;
     cntx->Interpreter0->w_Word = word ; // for ArrayBegin : all literals are run here
-    if ( word->W_ObjectAttributes & ( LITERAL | CONSTANT ) ) CfrTil_Do_LiteralWord ( word ) ;
+    if ( word->W_ObjectAttributes & ( LITERAL | CONSTANT ) ) CFT_Do_LiteralWord ( word ) ;
     else
     {
         isForwardDotted = ReadLiner_IsTokenForwardDotted ( _ReadLiner_, word->W_RL_Index ), isReverseDotted = Lexer_IsTokenReverseDotted ( cntx->Lexer0 ) ;
@@ -22,20 +22,20 @@ Object_Run ( Word * word )
         if ( word->W_ObjectAttributes & LOCAL_OBJECT ) Do_LocalObject ( word, rvalueFlag, isForwardDotted ) ;
         else if ( ( word->W_LispAttributes & T_LISP_SYMBOL ) || ( word->W_ObjectAttributes & T_LISP_SYMBOL ) ) //lambda variables are parsed as CAttribute & T_LISP_SYMBOL
         {
-            if ( ! GetState ( cntx, LC_CFRTIL ) ) CfrTil_Do_LispSymbol ( word ) ;
-            else CfrTil_Do_Variable ( word, rvalueFlag, isForwardDotted, 0 ) ;
+            if ( ! GetState ( cntx, LC_CFRTIL ) ) CFT_Do_LispSymbol ( word ) ;
+            else CFT_Do_Variable ( word, rvalueFlag, isForwardDotted, 0 ) ;
         }
-        else if ( word->W_ObjectAttributes & DOBJECT ) CfrTil_Do_DynamicObject ( word, ACC ) ;
-        else if ( word->W_ObjectAttributes & OBJECT_FIELD ) CfrTil_Do_ClassField ( word, isForwardDotted, rvalueFlag ) ;
+        else if ( word->W_ObjectAttributes & DOBJECT ) CFT_Do_DynamicObject ( word, ACC ) ;
+        else if ( word->W_ObjectAttributes & OBJECT_FIELD ) CFT_Do_ClassField ( word, isForwardDotted, rvalueFlag ) ;
         else if ( word->W_ObjectAttributes & ( NAMESPACE_VARIABLE | THIS | OBJECT | LOCAL_VARIABLE | PARAMETER_VARIABLE ) )
-            CfrTil_Do_Variable ( word, rvalueFlag, isForwardDotted, isReverseDotted ) ;
+            CFT_Do_Variable ( word, rvalueFlag, isForwardDotted, isReverseDotted ) ;
         else if ( word->W_ObjectAttributes & ( C_TYPE | C_CLASS ) ) Namespace_Do_C_Type ( word, isForwardDotted ) ;
         else if ( word->W_ObjectAttributes & ( NAMESPACE | CLASS | CLASS_CLONE ) ) Namespace_DoNamespace ( word, isForwardDotted ) ; // namespaces are the only word that needs to run the word set DObject Compile_SetCurrentlyRunningWord_Call_TestRSP created word ??
     }
     if ( ( ! isForwardDotted ) && ( ! GetState ( cntx->Compiler0, ( LC_ARG_PARSING | ARRAY_MODE ) ) ) )
     {
         cntx->Interpreter0->BaseObject = 0 ;
-        CfrTil_UnsetQualifyingNamespace ( ) ;
+        CFT_UnsetQualifyingNamespace ( ) ;
     }
 }
 
@@ -60,7 +60,6 @@ Do_Variable ( Word * word, Boolean rvalueFlag, Boolean isForwardDotted )
     Context * cntx = _Context_ ;
     Compiler * compiler = cntx->Compiler0 ;
     int64 value ;
-    //if ( ( ! GetState ( compiler, ARRAY_MODE ) ) && ( ! isForwardDotted ) && ( ! isReverseDotted ) ) cntx->Interpreter0->BaseObject = 0 ;
     if ( CompileMode ) //&& ( ! GetState ( compiler, LC_ARG_PARSING )))
     {
         if ( GetState ( cntx, ( C_SYNTAX | INFIX_MODE ) ) && ( ! rvalueFlag )
@@ -86,7 +85,7 @@ Do_Variable ( Word * word, Boolean rvalueFlag, Boolean isForwardDotted )
                 else
                 {
                     if ( ! compiler->LHS_Word ) compiler->LHS_Word = word ;
-                    goto done ; // LHS_Word : delayed compile by _CfrTil_C_Infix_EqualOp
+                    goto done ; // LHS_Word : delayed compile by _CFT_C_Infix_EqualOp
                     //else value = ( int64 ) word->W_PtrToValue ;
                 }
             }
@@ -100,11 +99,11 @@ Do_Variable ( Word * word, Boolean rvalueFlag, Boolean isForwardDotted )
     }
 done:
     if ( ( word->W_ObjectAttributes & STRUCT ) || isForwardDotted ) Finder_SetQualifyingNamespace ( cntx->Finder0, word->TypeNamespace ) ;
-    CfrTil_TypeStackPush ( word ) ;
+    CFT_TypeStackPush ( word ) ;
 }
 
 void
-CfrTil_Do_Variable ( Word * word, Boolean rvalueFlag, Boolean isForwardDotted, Boolean isReverseDotted )
+CFT_Do_Variable ( Word * word, Boolean rvalueFlag, Boolean isForwardDotted, Boolean isReverseDotted )
 {
     Context * cntx = _Context_ ;
     Compiler * compiler = cntx->Compiler0 ;
@@ -117,7 +116,7 @@ CfrTil_Do_Variable ( Word * word, Boolean rvalueFlag, Boolean isForwardDotted, B
             {
                 interp->BaseObject = word ;
                 Finder_SetQualifyingNamespace ( cntx->Finder0, Word_UnAlias ( word ) ) ;
-                //_CfrTil_Namespace_InNamespaceSet ( word->S_ContainingNamespace ) ;
+                //_CFT_Namespace_InNamespaceSet ( word->S_ContainingNamespace ) ;
             }
             word->AccumulatedOffset = 0 ;
             interp->CurrentObjectNamespace = TypeNamespace_Get ( word ) ;
@@ -135,7 +134,7 @@ _Do_Compile_Variable ( Word * word, Boolean rvalueFlag )
 {
     Context * cntx = _Context_ ;
     Compiler * compiler = cntx->Compiler0 ;
-    int64 size = CfrTil_Get_ObjectByteSize ( word ) ;
+    int64 size = CFT_Get_ObjectByteSize ( word ) ;
     if ( GetState ( cntx, C_SYNTAX | INFIX_MODE ) || GetState ( compiler, LC_ARG_PARSING ) )
     {
         if ( rvalueFlag ) Compile_GetVarLitObj_RValue_To_Reg ( word, ACC, size ) ;
@@ -143,7 +142,7 @@ _Do_Compile_Variable ( Word * word, Boolean rvalueFlag )
         {
             Word_SetCodingAndSourceCoding ( word, Here ) ;
             if ( ( word->W_ObjectAttributes & ( OBJECT | THIS | QID ) ) || GetState ( word, QID ) ) _Compile_GetVarLitObj_LValue_To_Reg ( word, ACC, size ) ;
-            else // this compilation is delayed to _CfrTil_C_Infix_Equal/Op
+            else // this compilation is delayed to _CFT_C_Infix_Equal/Op
             {
                 Word_SetCodingAndSourceCoding ( word, 0 ) ;
                 return ;
@@ -162,22 +161,22 @@ _Do_LiteralValue ( int64 value )
     if ( CompileMode ) //&& ( ! GetState ( _Compiler_, LC_ARG_PARSING ) ) )
     {
         Compile_MoveImm_To_Reg ( ACC, value, CELL ) ;
-        CfrTil_CompileAndRecord_PushAccum ( ) ; // does word == top of word stack always
+        CFT_CompileAndRecord_PushAccum ( ) ; // does word == top of word stack always
     }
     else DataStack_Push ( value ) ;
 }
 
 void
-CfrTil_Do_LiteralWord ( Word * word )
+CFT_Do_LiteralWord ( Word * word )
 {
     _Do_LiteralValue ( word->W_Value ) ;
-    CfrTil_TypeStackPush ( word ) ;
+    CFT_TypeStackPush ( word ) ;
 }
 
 void
 _Do_LocalObject_AllocateInit ( Namespace * typeNamespace, byte ** value, int64 size )
 {
-    Word * word = _CfrTil_ObjectNew ( size, ( byte* ) "<object>", 0, TEMPORARY ) ;
+    Word * word = _CFT_ObjectNew ( size, ( byte* ) "<object>", 0, TEMPORARY ) ;
     _Class_Object_Init ( word, typeNamespace ) ;
     * value = ( byte* ) word->W_Value ;
 }
@@ -195,7 +194,7 @@ Do_LocalObject ( Word * word, Boolean rvalueFlag, Boolean isForwardDotted )
         Compile_Call_TestRSP ( ( byte* ) _Do_LocalObject_AllocateInit ) ; // we want to only allocate this object once and only at run time; and not at compile time
         SetState ( word, W_INITIALIZED, true ) ;
     }
-    CfrTil_Do_Variable ( word, rvalueFlag, isForwardDotted, 0 ) ;
+    CFT_Do_Variable ( word, rvalueFlag, isForwardDotted, 0 ) ;
 }
 
 void
@@ -204,13 +203,13 @@ Compile_C_FunctionDeclaration ( byte * token1 )
     byte * token ;
     _Compiler_->C_FunctionBackgroundNamespace = _Compiler_->C_BackgroundNamespace ;
     SetState ( _Compiler_, C_COMBINATOR_PARSING, true ) ;
-    CfrTil_C_Syntax_On ( ) ;
+    CFT_C_Syntax_On ( ) ;
     Word * word = Word_New ( token1 ) ; // "("
-    CfrTil_WordList_PushWord ( word ) ;
+    CFT_WordList_PushWord ( word ) ;
     Compiler_Word_SCHCPUSCA ( word, 1 ) ;
     DataStack_Push ( ( int64 ) word ) ;
-    CfrTil_BeginBlock ( ) ; // nb! before CfrTil_LocalsAndStackVariablesBegin
-    CfrTil_LocalsAndStackVariablesBegin ( ) ;
+    CFT_BeginBlock ( ) ; // nb! before CFT_LocalsAndStackVariablesBegin
+    CFT_LocalsAndStackVariablesBegin ( ) ;
     Ovt_AutoVarOn ( ) ;
     do // the rare occurence of any tokens between closing locals right paren ')' and beginning block '}'
     {
@@ -221,12 +220,12 @@ Compile_C_FunctionDeclaration ( byte * token1 )
                 Interpreter_InterpretAToken ( _Interpreter_, token, - 1, - 1 ) ;
                 break ;
             }
-            else if ( token [ 0 ] == '{' ) break ; // take nothing else (would be Syntax Error ) -- we have already done CfrTil_BeginBlock
+            else if ( token [ 0 ] == '{' ) break ; // take nothing else (would be Syntax Error ) -- we have already done CFT_BeginBlock
             else _Lexer_ConsiderDebugAndCommentTokens ( token, 1 ) ;
         }
     }
     while ( token ) ;
-    //CfrTil_Interpret_C_Blocks ( 1, 1, 0 ) ; // ??? seems like this should be used somewhere here 
+    //CFT_Interpret_C_Blocks ( 1, 1, 0 ) ; // ??? seems like this should be used somewhere here 
     Ovt_AutoVarOff ( ) ;
 }
 
@@ -251,7 +250,7 @@ _Compile_C_TypeDeclaration ( )
         else if ( String_Equal ( token, "," ) || ( ( ! GetState ( cntx, C_SYNTAX ) ) && String_Equal ( token, "=" ) ) ) Lexer_ReadToken ( _Lexer_ ) ;
         else
         {
-            if ( String_Equal ( token, ")" ) && GetState ( compiler, DOING_A_PREFIX_WORD ) ) CfrTil_PushToken_OnTokenList ( token ) ;
+            if ( String_Equal ( token, ")" ) && GetState ( compiler, DOING_A_PREFIX_WORD ) ) CFT_PushToken_OnTokenList ( token ) ;
             if ( GetState ( cntx, C_SYNTAX ) ) Compiler_Save_C_BackgroundNamespace ( compiler ) ;
 
             break ;
@@ -283,7 +282,7 @@ Compile_C_TypeDeclaration ( byte * token0 ) //, int64 tsrli, int64 scwi)
                 word = Compiler_CopyDuplicatesAndPush ( word0, _Lexer_->TokenStart_ReadLineIndex, _Lexer_->SC_Index ) ;
                 if ( word )
                 {
-                    word->ObjectByteSize = CfrTil_Get_ObjectByteSize ( word ) ;
+                    word->ObjectByteSize = CFT_Get_ObjectByteSize ( word ) ;
                     Interpreter_DoWord ( interp, word, - 1, - 1 ) ;
                 }
             }
@@ -331,7 +330,7 @@ Namespace_Do_C_Type ( Namespace * ns, Boolean isForwardDotted )
         Context * cntx = _Context_ ;
         Compiler * compiler = cntx->Compiler0 ;
         if ( GetState ( cntx, C_SYNTAX ) ) Compiler_Save_C_BackgroundNamespace ( compiler ) ;
-        if ( ( ! Compiling ) || ( ! GetState ( _CfrTil_, SOURCE_CODE_STARTED ) ) ) CfrTil_InitSourceCode_WithCurrentInputChar ( _CfrTil_, 0 ) ; // must be here for wdiss and add addToHistory
+        if ( ( ! Compiling ) || ( ! GetState ( _CFT_, SOURCE_CODE_STARTED ) ) ) CFT_InitSourceCode_WithCurrentInputChar ( _CFT_, 0 ) ; // must be here for wdiss and add addToHistory
         if ( ! GetState ( compiler, DOING_C_TYPE ) )
         {
             SetState ( compiler, DOING_C_TYPE, true ) ;
@@ -341,11 +340,11 @@ Namespace_Do_C_Type ( Namespace * ns, Boolean isForwardDotted )
                 if ( ! Compiling )
                 {
                     Compiler_Init (compiler, 0) ;
-                    //CfrTil_RightBracket ( ) ; //nb. only Compiler_Init here. We don't want to turn on compile mode!! RightBracket is a forth term.
-                    CfrTil_SourceCode_Init ( ) ;
-                    CfrTil_WordList_Init ( 0 ) ;
+                    //CFT_RightBracket ( ) ; //nb. only Compiler_Init here. We don't want to turn on compile mode!! RightBracket is a forth term.
+                    CFT_SourceCode_Init ( ) ;
+                    CFT_WordList_Init ( 0 ) ;
                 }
-                //else Namespace_NonCompilingNs_Clear (_CfrTil_) ;
+                //else Namespace_NonCompilingNs_Clear (CFT) ;
                 _Namespace_Do_C_Type ( ns ) ;
             }
             SetState ( compiler, DOING_C_TYPE, false ) ;
@@ -357,7 +356,7 @@ Namespace_Do_C_Type ( Namespace * ns, Boolean isForwardDotted )
 }
 
 void
-CfrTil_Do_ClassField ( Word * word, Boolean isForwardDotted, Boolean rvalueFlag )
+CFT_Do_ClassField ( Word * word, Boolean isForwardDotted, Boolean rvalueFlag )
 {
     Context * cntx = _Context_ ;
     Compiler * compiler = cntx->Compiler0 ;
@@ -366,16 +365,16 @@ CfrTil_Do_ClassField ( Word * word, Boolean isForwardDotted, Boolean rvalueFlag 
 
     if ( GetState ( cntx, ( C_SYNTAX | INFIX_MODE ) ) && ( ! compiler->LHS_Word ) && ( ! isForwardDotted ) && ( ! rvalueFlag ) ) compiler->LHS_Word = word ;
     if ( word->Offset ) Compiler_IncrementCurrentAccumulatedOffset ( compiler, word->Offset ) ;
-    if ( ! ( ( CompileMode ) || GetState ( compiler, LC_ARG_PARSING ) ) ) CfrTil_Do_AccumulatedAddress ( word, ( byte* ) TOS, word->Offset, rvalueFlag ) ;
+    if ( ! ( ( CompileMode ) || GetState ( compiler, LC_ARG_PARSING ) ) ) CFT_Do_AccumulatedAddress ( word, ( byte* ) TOS, word->Offset, rvalueFlag ) ;
     if ( isForwardDotted ) Finder_SetQualifyingNamespace ( cntx->Finder0, word->TypeNamespace ) ;
     word->BaseObject = cntx->Interpreter0->BaseObject ;
-    CfrTil_TypeStack_SetTop ( word ) ;
+    CFT_TypeStack_SetTop ( word ) ;
 }
 
 // a constant is, of course, a literal
 
 void
-CfrTil_Do_LispSymbol ( Word * word )
+CFT_Do_LispSymbol ( Word * word )
 {
     // rvalue - rhs for stack var
     if ( Compiling )
@@ -383,7 +382,7 @@ CfrTil_Do_LispSymbol ( Word * word )
         _Compile_GetVarLitObj_RValue_To_Reg ( word, ACC, 0 ) ;
         _Word_CompileAndRecord_PushReg ( word, ACC, true ) ;
     }
-    CfrTil_TypeStackPush ( word ) ;
+    CFT_TypeStackPush ( word ) ;
 }
 
 void
@@ -417,23 +416,23 @@ Do_AccumulatedAddress ( byte * accumulatedOffsetPointer, int64 offset, Boolean r
 }
 
 void
-CfrTil_Do_AccumulatedAddress ( Word * word, byte * accumulatedAddress, int64 offset, Boolean rvalueFlag )
+CFT_Do_AccumulatedAddress ( Word * word, byte * accumulatedAddress, int64 offset, Boolean rvalueFlag )
 {
     Namespace * ns ;
     byte size = ( ( ns = TypeNamespace_Get ( word ) ) ? ( int64 ) _Namespace_VariableValueGet ( ns, "size" ) : CELL ) ;
     Do_AccumulatedAddress ( accumulatedAddress, offset, rvalueFlag, size ) ;
 }
 
-// nb. 'word' is the previous word to the '.' (dot) cf. CfrTil_Dot so it can be recompiled, a little different maybe, as an object
+// nb. 'word' is the previous word to the '.' (dot) cf. CFT_Dot so it can be recompiled, a little different maybe, as an object
 
 void
-CfrTil_Dot ( ) // .
+CFT_Dot ( ) // .
 {
     Context * cntx = _Context_ ;
     if ( ! cntx->Interpreter0->BaseObject )
     {
         SetState ( cntx, CONTEXT_PARSING_QID, true ) ;
-        d0 ( if ( Is_DebugModeOn ) _CfrTil_SC_WordList_Show ( "\nCfrTil_Dot", 0, 0 ) ) ;
+        d0 ( if ( Is_DebugModeOn ) _CFT_SC_WordList_Show ( "\nCFT_Dot", 0, 0 ) ) ;
         Word * word = Compiler_PreviousNonDebugWord ( 0 ) ; // 0 : rem: we just popped the WordStack above
         if ( word )
         {
@@ -463,13 +462,13 @@ _Word_CompileAndRecord_PushReg ( Word * word, int64 reg, Boolean recordFlag )
 void
 Compiler_Save_C_BackgroundNamespace ( Compiler * compiler )
 {
-    compiler->C_BackgroundNamespace = _Namespace_FirstOnUsingList ( ) ; //nb! must be before CfrTil_LocalsAndStackVariablesBegin else CfrTil_End_C_Block will 
+    compiler->C_BackgroundNamespace = _Namespace_FirstOnUsingList ( ) ; //nb! must be before CFT_LocalsAndStackVariablesBegin else CFT_End_C_Block will 
 }
 
 void
 Compiler_SetAs_InNamespace_C_BackgroundNamespace ( Compiler * compiler )
 {
-    if ( compiler->C_BackgroundNamespace ) _CfrTil_Namespace_InNamespaceSet ( compiler->C_BackgroundNamespace ) ;
+    if ( compiler->C_BackgroundNamespace ) _CFT_Namespace_InNamespaceSet ( compiler->C_BackgroundNamespace ) ;
 }
 
 

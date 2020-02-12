@@ -231,7 +231,7 @@ CalculateModRmByte ( Boolean mod, Boolean reg, Boolean rm, Boolean sib, int64 di
         //if ( ( mod < 3 ) && ( ( ( rm == 4 ) && ( sib == 0 ) ) || ( ( rm == 5 ) && ( disp == 0 ) ) ) )
     {
         // cf. InstructionSet-A-M-253666.pdf Table 2-2
-        CfrTil_Exception ( MACHINE_CODE_ERROR, 0, 1 ) ;
+        CFT_Exception ( MACHINE_CODE_ERROR, 0, 1 ) ;
     }
     if ( sib )
     {
@@ -556,13 +556,13 @@ Compile_X_Group1 ( Compiler * compiler, int64 op, int64 ttt, int64 n )
     else
     {
         //_DBI_ON ;
-        Word * one = CfrTil_WordList ( 1 ) ;
+        Word * one = CFT_WordList ( 1 ) ;
         if ( one && one->StackPushRegisterCode ) SetHere ( one->StackPushRegisterCode, 1 ) ;
         else Compile_Pop_To_Acc ( DSP ) ;
         //_Compile_X_Group1 ( int8 code, int64 toRegOrMem, int8 mod, int8 reg, int8 rm, int8 sib, int64 disp, int64 osize )
         //Compiler_SCA_Word_SetCodingHere_And_ClearPreviousUse ( optInfo->opWord, 0 ) ;
         _Compile_X_Group1 ( op, REG, MEM, ACC, DSP, 0, 0, CELL_SIZE ) ; // result is on TOS
-        _Word_CompileAndRecord_PushReg ( CfrTil_WordList ( 0 ), ACC, true ) ; // 0 : ?!? should be the exact variable 
+        _Word_CompileAndRecord_PushReg ( CFT_WordList ( 0 ), ACC, true ) ; // 0 : ?!? should be the exact variable 
         //DBI_OFF ;
     }
 }
@@ -616,7 +616,7 @@ Compile_X_Group5 ( Compiler * compiler, int64 op )
 {
     int64 optSetupFlag = Compiler_CheckOptimize ( compiler, 0 ) ;
     CompileOptimizeInfo * optInfo = compiler->OptInfo ; //Compiler_CheckOptimize may change the optInfo
-    Word *one = _CfrTil_WordList ( 1 ) ; // assumes two values ( n m ) on the DSP stack 
+    Word *one = _CFT_WordList ( 1 ) ; // assumes two values ( n m ) on the DSP stack 
     if ( optSetupFlag & OPTIMIZE_DONE ) return ;
     else if ( optSetupFlag )
     {
@@ -651,7 +651,7 @@ Compile_X_Group5 ( Compiler * compiler, int64 op )
     }
     Compiler_Set_BI_Tttn ( _Context_->Compiler0, TTT_ZERO, NEGFLAG_NZ, TTT_ZERO, NEGFLAG_Z ) ;
     //if ( ( op != INC ) && ( op != DEC ) ) 
-    _Word_CompileAndRecord_PushReg ( CfrTil_WordList ( 0 ), optInfo->Optimize_Reg, true ) ; // 0 : ?!? should be the exact variable 
+    _Word_CompileAndRecord_PushReg ( CFT_WordList ( 0 ), optInfo->Optimize_Reg, true ) ; // 0 : ?!? should be the exact variable 
 }
 
 // load reg with effective address of [ mod rm sib disp ]
@@ -917,7 +917,7 @@ void
 Compile_Call_TestRSP ( byte * address )
 {
     Compile_MoveImm_To_Reg ( R8, ( int64 ) address, CELL ) ;
-    Compile_Call ( ( byte* ) _CfrTil_->Call_ToAddressThruR8_TestAlignRSP ) ;
+    Compile_Call ( ( byte* ) _CFT_->Call_ToAddressThruR8_TestAlignRSP ) ;
 }
 
 void

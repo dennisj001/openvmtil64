@@ -66,7 +66,7 @@ JumpCallInstructionAddress_X64ABI ( byte * address )
 }
 
 void
-_CfrTil_ACharacterDump ( char aChar )
+_CFT_ACharacterDump ( char aChar )
 {
     if ( isprint ( aChar ) )
     {
@@ -76,32 +76,32 @@ _CfrTil_ACharacterDump ( char aChar )
 }
 
 void
-CfrTil_CharacterDump ( byte * address, int64 number )
+CFT_CharacterDump ( byte * address, int64 number )
 {
     int64 i ;
     for ( i = 0 ; i < number ; i ++ )
     {
 
-        _CfrTil_ACharacterDump ( address [ i ] ) ;
+        _CFT_ACharacterDump ( address [ i ] ) ;
     }
     _Printf ( ( byte* ) " " ) ;
 }
 
 void
-_CfrTil_AByteDump ( byte aByte )
+_CFT_AByteDump ( byte aByte )
 {
 
     _Printf ( ( byte* ) "%02x ", aByte ) ;
 }
 
 void
-CfrTil_NByteDump ( byte * address, int64 number )
+CFT_NByteDump ( byte * address, int64 number )
 {
     int64 i ;
     for ( i = 0 ; i < number ; i ++ )
     {
 
-        _CfrTil_AByteDump ( address [ i ] ) ;
+        _CFT_AByteDump ( address [ i ] ) ;
     }
     _Printf ( ( byte* ) " " ) ;
 }
@@ -114,7 +114,7 @@ GetPostfix ( byte * address, byte* postfix, byte * buffer )
     char * prePostfix = ( char* ) "  \t" ;
     if ( iaddress = Calculate_Address_FromOffset_ForCallOrJump ( address ) ) 
     {
-        if ( dbgWord ) //&& ( Is_NamespaceType ( dbgWord ) ) )
+        //if ( dbgWord ) //&& ( Is_NamespaceType ( dbgWord ) ) )
         {
             if ( ( word = Word_GetFromCodeAddress_NoAlias ( iaddress ) ) )
             {
@@ -164,34 +164,34 @@ Compile_Debug_GetRSP ( ) // where we want the acquired pointer
 }
 
 void
-CfrTil_SetRtDebugOn ( )
+CFT_SetRtDebugOn ( )
 {
-    SetState ( _CfrTil_, RT_DEBUG_ON, true ) ;
+    SetState ( _CFT_, RT_DEBUG_ON, true ) ;
 }
 
 void
 Compile_DebugRuntimeBreakpointFunction ( block function ) // where we want the acquired pointer
 {
-    Compile_Call_TestRSP ( ( byte* ) CfrTil_SetRtDebugOn ) ;
+    Compile_Call_TestRSP ( ( byte* ) CFT_SetRtDebugOn ) ;
     Compile_Call ( ( byte* ) _Debugger_->SaveCpuState ) ;
     Compile_Call_TestRSP ( ( byte* ) function ) ;
 }
 
 void
-_CfrTil_DebugRuntimeBreakpoint ( ) // where we want the acquired pointer
+_CFT_DebugRuntimeBreakpoint ( ) // where we want the acquired pointer
 {
-    Compile_DebugRuntimeBreakpointFunction ( CfrTil_DebugRuntimeBreakpoint ) ;
+    Compile_DebugRuntimeBreakpointFunction ( CFT_DebugRuntimeBreakpoint ) ;
 }
 
 void
-_CfrTil_DebugRuntimeBreakpoint_IsDebugShowOn ( ) // where we want the acquired pointer
+_CFT_DebugRuntimeBreakpoint_IsDebugShowOn ( ) // where we want the acquired pointer
 {
-    Compile_DebugRuntimeBreakpointFunction ( CfrTil_DebugRuntimeBreakpoint_IsDebugShowOn ) ;
+    Compile_DebugRuntimeBreakpointFunction ( CFT_DebugRuntimeBreakpoint_IsDebugShowOn ) ;
 }
 
 void
-_CfrTil_DebugRuntimeBreakpoint_IsDebugOn ( ) // where we want the acquired pointer
+_CFT_DebugRuntimeBreakpoint_IsDebugOn ( ) // where we want the acquired pointer
 {
-    Compile_DebugRuntimeBreakpointFunction ( CfrTil_DebugRuntimeBreakpoint_IsDebugOn ) ;
+    Compile_DebugRuntimeBreakpointFunction ( CFT_DebugRuntimeBreakpoint_IsDebugOn ) ;
 }
 

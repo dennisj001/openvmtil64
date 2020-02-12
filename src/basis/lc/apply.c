@@ -106,15 +106,15 @@ _LO_CompileOrInterpret ( ListObject *lfunction, ListObject *largs )
 
     if ( largs && lfword && ( lfword->W_MorphismAttributes & ( CATEGORY_OP_ORDERED | CATEGORY_OP_UNORDERED ) ) ) // ?!!? 2 arg op with multi-args : this is not a precise distinction yet : need more types ?!!?
     {
-        Boolean svTcs = GetState ( _CfrTil_, TYPECHECK_ON ) ; // sometimes ok but for now off here
-        SetState ( _CfrTil_, TYPECHECK_ON, false ) ; // sometimes ok but for now off here
+        Boolean svTcs = GetState ( _CFT_, TYPECHECK_ON ) ; // sometimes ok but for now off here
+        SetState ( _CFT_, TYPECHECK_ON, false ) ; // sometimes ok but for now off here
         _LO_CompileOrInterpret_One ( largs, 0 ) ;
         while ( ( largs = _LO_Next ( largs ) ) )
         {
             _LO_CompileOrInterpret_One ( largs, 0 ) ; // two args first then op, then after each arg the operator : nb. assumes word can take unlimited args 2 at a time
             _LO_CompileOrInterpret_One ( lfword, 0 ) ;
         }
-        SetState ( _CfrTil_, TYPECHECK_ON, svTcs ) ;
+        SetState ( _CFT_, TYPECHECK_ON, svTcs ) ;
     }
     else
     {
@@ -176,7 +176,7 @@ LO_PrepareReturnObject ( )
     byte * name ;
     if ( ! CompileMode )
     {
-        Namespace * ns = _CfrTil_InNamespace ( ) ;
+        Namespace * ns = _CFT_InNamespace ( ) ;
         name = ns->Name ;
         if ( Namespace_IsUsing ( ( byte* ) "BigNum" ) ) type = T_BIG_NUM ;
         return DataObject_New (T_LC_NEW, 0, 0, 0, LITERAL | type, LITERAL | type, 0, DataStack_Pop ( ), 0, 0, 0, - 1 ) ;
@@ -188,7 +188,7 @@ void
 LO_BeginBlock ( )
 {
     if ( ! Compiler_BlockLevel ( _Compiler_ ) ) _LC_->SavedCodeSpace = _O_CodeByteArray ;
-    CfrTil_BeginBlock ( ) ;
+    CFT_BeginBlock ( ) ;
 }
 
 void
@@ -198,10 +198,10 @@ LO_EndBlock ( )
     if ( _LC_ && _LC_->SavedCodeSpace )
     {
         BlockInfo * bi = ( BlockInfo * ) Stack_Top ( compiler->BlockStack ) ;
-        CfrTil_EndBlock ( ) ;
+        CFT_EndBlock ( ) ;
         if ( ! GetState ( _LC_, LC_COMPILE_MODE ) )
         {
-            CfrTil_BlockRun ( ) ;
+            CFT_BlockRun ( ) ;
         }
         if ( ! Compiler_BlockLevel ( compiler ) ) Set_CompilerSpace ( _LC_->SavedCodeSpace ) ;
         bi->LogicCodeWord = _LC_->LastInterpretedWord ;
@@ -280,7 +280,7 @@ Arrays_DoArrayArgs_Lisp ( Word ** pl1, Word * l1, Word * arrayBaseObject, int64 
 void
 _LO_Apply_ArrayArg ( ListObject ** pl1, int64 *i )
 {
-    _CfrTil_ArrayBegin ( 1, pl1, i ) ;
+    _CFT_ArrayBegin ( 1, pl1, i ) ;
 }
 
 // compile mode on
@@ -356,7 +356,7 @@ _LO_Apply_C_LtoR_ArgList ( LambdaCalculus * lc, ListObject * l0, Word * word )
     if ( l0 )
     {
         Set_CompileMode ( true ) ;
-        if ( ! svcm ) CfrTil_BeginBlock ( ) ;
+        if ( ! svcm ) CFT_BeginBlock ( ) ;
         if ( word->W_MorphismAttributes & ( DLSYM_WORD | C_PREFIX ) ) Set_CompileMode ( true ) ;
         _Debugger_->PreHere = Here ;
         for ( i = 0, l1 = _LO_First ( l0 ) ; l1 ; l1 = LO_Next ( l1 ) ) _LO_Apply_Arg ( lc, &l1, &i ) ;
@@ -373,7 +373,7 @@ _LO_Apply_C_LtoR_ArgList ( LambdaCalculus * lc, ListObject * l0, Word * word )
         if ( word->W_MorphismAttributes & RAX_RETURN ) _Word_CompileAndRecord_PushReg ( word, ACC, true ) ;
         if ( ! svcm )
         {
-            CfrTil_EndBlock ( ) ;
+            CFT_EndBlock ( ) ;
             block b = ( block ) DataStack_Pop ( ) ;
             Set_CompileMode ( svcm ) ;
             Set_CompilerSpace ( scs ) ;
@@ -391,7 +391,7 @@ _LO_Apply_C_LtoR_ArgList ( LambdaCalculus * lc, ListObject * l0, Word * word )
 void
 LC_CompileRun_C_ArgList ( Word * word ) // C protocol - x64 : left to right arguments put into registers 
 {
-    Namespace * backgroundNamespace = _CfrTil_Namespace_InNamespaceGet ( ) ;
+    Namespace * backgroundNamespace = _CFT_Namespace_InNamespaceGet ( ) ;
     LambdaCalculus * lc = LC_Init_Runtime ( ) ;
     Context * cntx = _Context_ ;
     Lexer * lexer = cntx->Lexer0 ;
@@ -411,16 +411,16 @@ LC_CompileRun_C_ArgList ( Word * word ) // C protocol - x64 : left to right argu
         SetState ( compiler, LC_ARG_PARSING, true ) ;
         int64 svcm = CompileMode ;
         Set_CompileMode ( false ) ; // we must have the arguments pushed and not compiled for _LO_Apply_C_Rtl_ArgList which will compile them for a C_Rtl function
-        int64 svDs = GetState ( _CfrTil_, _DEBUG_SHOW_ ) ;
+        int64 svDs = GetState ( _CFT_, _DEBUG_SHOW_ ) ;
         DebugShow_Off ;
         l0 = _LO_Read ( lc ) ;
-        SetState ( _CfrTil_, _DEBUG_SHOW_, svDs ) ;
+        SetState ( _CFT_, _DEBUG_SHOW_, svDs ) ;
         Set_CompileMode ( svcm ) ; // we must have the arguments pushed and not compiled for _LO_Apply_C_Rtl_ArgList which will compile them for a C_Rtl function
         _LO_Apply_C_LtoR_ArgList ( lc, l0, word ) ;
         LC_LispNamespacesOff ( ) ;
         SetState ( compiler, LC_ARG_PARSING | LC_C_RTL_ARG_PARSING, false ) ;
     }
-    _CfrTil_Namespace_InNamespaceSet ( backgroundNamespace ) ;
+    _CFT_Namespace_InNamespaceSet ( backgroundNamespace ) ;
     Lexer_SetTokenDelimiters ( lexer, svDelimiters, COMPILER_TEMP ) ;
     LC_RestoreStackPointer ( lc ) ;
 }
@@ -434,9 +434,9 @@ CompileLispBlock ( ListObject *args, ListObject * body )
     block code ;
     byte * here = Here ;
     Word * word = _Context_->CurrentWordBeingCompiled ;
-    LO_BeginBlock ( ) ; // must have a block before local variables if there are register variables because _CfrTil_Parse_LocalsAndStackVariables will compile something
-    SetState ( lc, ( LC_COMPILE_MODE | LC_BLOCK_COMPILE ), true ) ; // before _CfrTil_Parse_LocalsAndStackVariables
-    Namespace * locals = _CfrTil_Parse_LocalsAndStackVariables (1, 1, args, 0, 0 ) ; //(GetState ( _LC_, LC_BLOCK_COMPILE|LC_BEGIN_MODE ))) ;// ;false ) ;
+    LO_BeginBlock ( ) ; // must have a block before local variables if there are register variables because _CFT_Parse_LocalsAndStackVariables will compile something
+    SetState ( lc, ( LC_COMPILE_MODE | LC_BLOCK_COMPILE ), true ) ; // before _CFT_Parse_LocalsAndStackVariables
+    Namespace * locals = _CFT_Parse_LocalsAndStackVariables (1, 1, args, 0, 0 ) ; //(GetState ( _LC_, LC_BLOCK_COMPILE|LC_BEGIN_MODE ))) ;// ;false ) ;
     word->W_MorphismAttributes = BLOCK ;
     word->W_LispAttributes |= T_LISP_COMPILED_WORD ;
     _LO_Eval ( lc, body, locals, 1 ) ;
@@ -458,7 +458,7 @@ CompileLispBlock ( ListObject *args, ListObject * body )
             DefaultColors ;
         }
     }
-    _Word_DefinitionStore ( word, ( block ) code ) ; // not _Word_InitFinal because this is already _CfrTil_->CurrentWordCompiling with W_SourceCode, etc.
+    _Word_DefinitionStore ( word, ( block ) code ) ; // not _Word_InitFinal because this is already CFT->CurrentWordCompiling with W_SourceCode, etc.
     SetState ( lc, ( LC_BLOCK_COMPILE ), false ) ; // necessary !!
     return code ;
 }

@@ -2,7 +2,7 @@
 #include "../include/cfrtil64.h"
 
 void
-CfrTil_Plus ( ) // +
+CFT_Plus ( ) // +
 {
     if ( CompileMode )
     {
@@ -18,23 +18,23 @@ CfrTil_Plus ( ) // +
 // if rvalue leave on stack else drop after inc/dec
 
 void
-CfrTil_PlusPlus ( ) // +
+CFT_PlusPlus ( ) // +
 {
-    CfrTil_IncDec ( INC ) ;
+    CFT_IncDec ( INC ) ;
 }
 
 void
-CfrTil_MinusMinus ( ) // --
+CFT_MinusMinus ( ) // --
 {
-    CfrTil_IncDec ( DEC ) ;
+    CFT_IncDec ( DEC ) ;
 }
 
 void
-CfrTil_PlusEqual ( ) // +=
+CFT_PlusEqual ( ) // +=
 {
     if ( CompileMode )
     {
-        Compile_X_OpEqual ( _Context_->Compiler0, CfrTil_Plus ) ; //ADD ) ;
+        Compile_X_OpEqual ( _Context_->Compiler0, CFT_Plus ) ; //ADD ) ;
     }
     else
     {
@@ -48,11 +48,11 @@ CfrTil_PlusEqual ( ) // +=
 }
 
 void
-CfrTil_MinusEqual ( ) // -=
+CFT_MinusEqual ( ) // -=
 {
     if ( CompileMode )
     {
-        Compile_X_OpEqual ( _Context_->Compiler0, CfrTil_Minus ) ; //SUB ) ;
+        Compile_X_OpEqual ( _Context_->Compiler0, CFT_Minus ) ; //SUB ) ;
     }
     else
     {
@@ -66,12 +66,12 @@ CfrTil_MinusEqual ( ) // -=
 }
 
 void
-CfrTil_MultiplyEqual ( ) // *=
+CFT_MultiplyEqual ( ) // *=
 {
     if ( CompileMode )
     {
         //Compile_MultiplyEqual ( _Context_->Compiler0 ) ;
-        Compile_X_OpEqual ( _Compiler_, CfrTil_Multiply ) ; //MUL_OP ) ;
+        Compile_X_OpEqual ( _Compiler_, CFT_Multiply ) ; //MUL_OP ) ;
     }
     else
     {
@@ -84,12 +84,12 @@ CfrTil_MultiplyEqual ( ) // *=
 }
 
 void
-CfrTil_DivideEqual ( ) // +=
+CFT_DivideEqual ( ) // +=
 {
     if ( CompileMode )
     {
         //Compile_DivideEqual ( _Context_->Compiler0 ) ;
-        Compile_X_OpEqual ( _Compiler_, CfrTil_Divide ) ; //DIV_OP ) ;
+        Compile_X_OpEqual ( _Compiler_, CFT_Divide ) ; //DIV_OP ) ;
     }
     else
     {
@@ -104,7 +104,7 @@ CfrTil_DivideEqual ( ) // +=
 // ( b top | b - top ) dpans
 
 void
-CfrTil_Minus ( )
+CFT_Minus ( )
 {
     if ( CompileMode )
     {
@@ -118,7 +118,7 @@ CfrTil_Minus ( )
 }
 
 void
-CfrTil_Multiply ( ) // *
+CFT_Multiply ( ) // *
 {
     if ( CompileMode )
     {
@@ -135,7 +135,7 @@ CfrTil_Multiply ( ) // *
 // ( b top | b < top ) dpans
 
 void
-CfrTil_Divide ( ) // *
+CFT_Divide ( ) // *
 {
     if ( CompileMode )
     {
@@ -152,7 +152,7 @@ CfrTil_Divide ( ) // *
 }
 
 void
-CfrTil_Mod ( ) // *
+CFT_Mod ( ) // *
 {
     if ( CompileMode )
     {
@@ -185,7 +185,7 @@ a7 ( int64 n, int64 m, int64 o, A3 * a )
 {
 
     a->ar[n + 1][m][o] = a->ar[n + 2][m][o] ;
-    __CfrTil_Dump ( ( int64 ) a, sizeof (*a ), 8 ) ;
+    __CFT_Dump ( ( int64 ) a, sizeof (*a ), 8 ) ;
 }
 
 void
