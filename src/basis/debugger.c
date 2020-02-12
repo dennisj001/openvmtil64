@@ -185,7 +185,7 @@ Debugger_Off ( Debugger * debugger, int64 debugOffFlag )
 void
 Debugger_On ( Debugger * debugger )
 {
-    if ( ! Is_DebugOn )
+    if ( ( ! Is_DebugOn ) || GetState ( debugger, ( DBG_BRK_INIT | DBG_RUNTIME_BREAKPOINT ) ) )
     {
         Debugger_Init ( debugger, debugger->cs_Cpu, 0, 0 ) ;
         DebugOn ;

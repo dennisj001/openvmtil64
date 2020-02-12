@@ -415,10 +415,10 @@ dbgOff
 'doTX64 1 const
 'doScript 1 const
 'doScript2 1 const
-'forStarters 0 const 
+'forStarters 1 const 
 '_doDemo 0 const
     
-dbgOn
+//dbgOn
 // === controls ===
 
 #if Is_DebugOn 
