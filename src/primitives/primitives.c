@@ -359,7 +359,8 @@ CPrimitive CPrimitives [] = {
     { "else", 0, 0, 0, CfrTil_Else, IMMEDIATE, 0, 0, "Shell", "Root" },
     { "endif", 0, 0, 0, CfrTil_EndIf, IMMEDIATE, 0, 0, "Shell", "Root" },
     { "_sh", 0, 0, 0, ShellEscape_Postfix, 0, 0, 0, "Shell", "Root" },
-    { "$", 0, 0, 0, shell, 0, 0, 0, "Shell", "Root" },
+    { "$", 0, 0, 0, _shell, 0, 0, 0, "Shell", "Root" },
+    { "sh", 0, 0, 0, shell, 0, 0, 0, "Shell", "Root" },
 
     { "fopen", 0, 0, 0, File_Open, CATEGORY_OP_STACK, 0, 0, "File", "System" },
     { "fclose", 0, 0, 0, File_Close, 0, 0, 0, "File", "System" },

@@ -315,7 +315,7 @@ Compiler_Init ( Compiler * compiler, uint64 state )
     Compiler_CompileOptimizeInfo_PushNew ( compiler ) ;
     SetBuffersUnused ( 1 ) ;
     SetState ( compiler, VARIABLE_FRAME, false ) ;
-    if ( compiler->LocalsNamespace != compiler->NonCompilingNs ) CfrTil_NonCompilingNs_Clear ( compiler ) ;
+    if ( compiler->NonCompilingNs != compiler->LocalsNamespace ) CfrTil_NonCompilingNs_Clear ( compiler ) ; // for special syntax : we have a namespace but not while compiling
 }
 
 Compiler *

@@ -464,8 +464,9 @@ Namespace *
 _Namespace_FindOrNew_Local ( Stack * nsStack )
 {
     Context * cntx = _Context_ ;
+    Compiler * compiler = cntx->Compiler0 ;
     Namespace * ns ;
-    int64 d = Stack_Depth ( cntx->Compiler0->BlockStack ) ;
+    int64 d = Stack_Depth ( compiler->BlockStack ) ;
     byte bufferData [ 32 ], *name = ( byte* ) bufferData ;
     snprintf ( ( char* ) name, 32, "locals_%ld", d - 1 ) ; // 1 : BlockStack starts at 1 
     ns = _Namespace_Find ( name, _CfrTil_->Namespaces, 0 ) ;
@@ -473,7 +474,7 @@ _Namespace_FindOrNew_Local ( Stack * nsStack )
     {
         ns = Namespace_New ( name, _CfrTil_->Namespaces ) ;
         if ( CompileMode ) Stack_Push ( nsStack, ( int64 ) ns ) ; // nb. this is where the the depth increase
-        else cntx->Compiler0->NonCompilingNs = ns ;
+        else compiler->NonCompilingNs = ns ;
     }
     Namespace_SetState_AdjustListPosition ( ns, USING, 1 ) ;
     _Namespace_ActivateAsPrimary ( ns ) ;

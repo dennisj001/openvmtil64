@@ -217,11 +217,7 @@ CfrTil_Constant ( )
     tword = CfrTil_TypeStack_Pop ( ) ;
     byte * name = ( byte* ) DataStack_Pop ( ) ;
     cword = DataObject_New (CONSTANT, 0, name, 0, CONSTANT, 0, 0, value, 0, 0, - 1, - 1 ) ;
-    if ( tword )
-    {
-        //cword->MorphismAttributes |= tword->MorphismAttributes ;
-        cword->W_ObjectAttributes |= tword->W_ObjectAttributes ;
-    }
+    if ( tword ) cword->W_ObjectAttributes |= tword->W_ObjectAttributes ;
     CfrTil_Finish_WordSourceCode ( _CfrTil_, cword ) ;
 }
 

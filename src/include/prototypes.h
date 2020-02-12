@@ -1937,6 +1937,7 @@ void CfrTil_Throw(void);
 void _ShellEscape(char *str);
 void ShellEscape(byte *str);
 void ShellEscape_Postfix(void);
+void _shell(void);
 void shell(void);
 void CfrTil_Filename(void);
 void CfrTil_Location(void);

@@ -190,16 +190,14 @@ _ShellEscape ( char * str )
     }
 #endif    
     if ( _O_->Verbosity > 1 ) printf ( ( char* ) c_gd ( "\n_ShellEscape : command = \"%s\" : returned %d.\n" ), str, status ) ;
-    fflush (stdout) ;
+    fflush ( stdout ) ;
 }
 
 void
 ShellEscape ( byte * str )
 {
     _ShellEscape ( ( char* ) str ) ;
-    //NewLine ( _Context_->Lexer0 ) ;
     SetState ( _Context_->Lexer0, LEXER_DONE, true ) ;
-    //CfrTil_NewLine ( ) ;
     _OVT_Ok ( true ) ;
 }
 
@@ -207,17 +205,34 @@ void
 ShellEscape_Postfix ( )
 {
     byte * str = ( byte* ) DataStack_Pop ( ) ;
-    ShellEscape ( (byte*) str ) ;
+    ShellEscape ( ( byte* ) str ) ;
+}
+
+void
+_shell ( )
+{
+    byte * str = _String_Get_ReadlineString_ToEndOfLine ( ) ;
+    ShellEscape ( str ) ;
 }
 
 void
 shell ( )
 {
-    char * semi, *nl ;
-    byte * str = _String_Get_ReadlineString_ToEndOfLine ( ) ;
-    if ( semi = strchr ( (char*) str, ';' ) ) *semi = 0 ;
-    if ( nl = strchr ( (char*) str, '\n' ) ) *nl = 0 ;
-    ShellEscape ( str ) ;
+    Context * cntx = _Context_ ;
+    ReadLiner * rl = cntx->ReadLiner0 ;
+    byte * svPrompt = ReadLine_GetPrompt ( rl ) ;
+    ReadLine_SetPrompt ( rl, "=>$ " ) ;
+    _Printf ( ( byte* ) "\n type \'exit\' to exit" ) ;
+    Context_DoPrompt ( cntx ) ;
+    while ( 1 )
+    {
+        _ReadLine_GetLine ( rl, 0 ) ; 
+        byte * str = String_New ( & rl->InputLine [rl->ReadIndex], TEMPORARY ) ;
+        if ( String_Equal ( str, "exit\n" ) ) break ;
+        ShellEscape ( str ) ; // prompt is included in ShellEscape
+    }
+    ReadLine_SetPrompt ( rl, svPrompt ) ;
+    _Printf ( ( byte* ) "\n leaving shell ..." ) ;
 }
 
 void
@@ -386,7 +401,7 @@ OVT_Mem_ShowAllocated ( )
 {
     _OVT_ShowPermanentMemList ( _O_ ) ;
     OVT_ShowNBAs ( _O_, 1 ) ;
-    OVT_ShowMemoryAllocated ( );
+    OVT_ShowMemoryAllocated ( ) ;
 }
 
 #if 0
