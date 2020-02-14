@@ -50,7 +50,7 @@
 #define CHIBI_SCHEME 0
 #define PICOLISP 0
 #define RACKET 0
-#define BOOTSTRAP_SCHEME 0 // needs to add bcfrtil-gdb to Makefile default target
+#define BOOTSTRAP_SCHEME 0 // needs to add bcsl-gdb to Makefile default target
 #define NEWLISP_LIB 0
 
 #define CONSTANT_FOLDING 1
@@ -180,12 +180,12 @@
 
 #define OPENVMTIL_SIZE ( 2 * KB )
 #define STACK_SIZE ( 2 * KB ) // * 4 bytes per slot
-#define CFRTIL_SIZE (STACK_SIZE * 4) + (12.5 * K)
+#define csl_SIZE (STACK_SIZE * 4) + (12.5 * K)
 
 #define TEMP_MEM_SIZE (COMPILER_TEMP_OBJECTS_SIZE + SESSION_OBJECTS_SIZE + LISP_TEMP_SIZE + TEMP_OBJECTS_SIZE + HISTORY_SIZE + BUFFER_SPACE_SIZE + CONTEXT_SIZE)
 #define VARIABLE_MEM_SIZE TEMP_MEM_SIZE 
 #define CORE_MEM_SIZE (DICTIONARY_SIZE + OBJECTS_SIZE + CODE_SIZE) 
-#define STATIC_MEM_SIZE (OPENVMTIL_SIZE + CFRTIL_SIZE)
+#define STATIC_MEM_SIZE (OPENVMTIL_SIZE + csl_SIZE)
 #define PERMANENT_MEM_SIZE (CORE_MEM_SIZE + STATIC_MEM_SIZE)
 #define TOTAL_MEM_SIZE (TEMP_MEM_SIZE + CORE_MEM_SIZE + STATIC_MEM_SIZE)
 #define MINIMUM_MEM_SIZE (TEMP_MEM_SIZE + STATIC_MEM_SIZE)
@@ -216,8 +216,8 @@
 
 // MorphismAttributes & LispAttributes -shared in common 
 #define CPRIMITIVE      ( (uint64) 1 << 0 )
-#define CFRTIL_WORD     ( (uint64) 1 << 1 )
-#define CFRTIL_ASM_WORD  ( (uint64) 1 << 2 ) // machine code words
+#define csl_WORD     ( (uint64) 1 << 1 )
+#define csl_ASM_WORD  ( (uint64) 1 << 2 ) // machine code words
 #define T_LISP_SYMBOL   ( (uint64) 1 << 3 )
 #define NOT_A_KNOWN_OBJECT ( (uint64) 1 << 6 )  
 #define KNOWN_OBJECT ( (uint64) 1 << 7 )  
@@ -233,7 +233,7 @@
 #define BLOCK               ( (uint64) 1 << 14 )
 #define INLINE              ( (uint64) 1 << 15 )
 
-//#define LISP_CFRTIL         ( (uint64) 1 << 16 )
+//#define LISP_csl         ( (uint64) 1 << 16 )
 #define LEFT_PAREN          ( (uint64) 1 << 17 ) // '('
 #define RIGHT_PAREN         ( (uint64) 1 << 18 ) // ')'
 #define OP_RAX_PLUS_1ARG    ( (uint64) 1 << 19 )
@@ -386,10 +386,10 @@
 #define T_LISP_VALUE ( (uint64) 1 << 38 )
 #define T_LISP_WORD ( (uint64) 1 << 39 )
 #define T_LC_NEW ( (uint64) 1 << 40 )
-#define T_LISP_CFRTIL ( (uint64) 1 << 45 )
+#define T_LISP_csl ( (uint64) 1 << 45 )
 #define T_LISP_COLON ( (uint64) 1 << 46 )
 #define T_LISP_IMMEDIATE ( (uint64) 1 << 48 )
-#define T_LISP_CFRTIL_COMPILED ( (uint64) 1 << 49 )
+#define T_LISP_csl_COMPILED ( (uint64) 1 << 49 )
 
 //#define   ( (uint64) 1 <<  )
 #define NEW_RUN_COMPOSITE 0
@@ -402,7 +402,7 @@
 #define ABORT ( (uint64) 1 << 6 )
 #define QUIT ( (uint64) 1 << 5 )
 // don't use 4 because it is also SIGILL ??
-#define CFRTIL_RUN_INIT ( (uint64) 1 << 4 )
+#define csl_RUN_INIT ( (uint64) 1 << 4 )
 #define STOP ( (uint64) 1 << 3 )
 #define BREAK ( (uint64) 1 << 2 )
 #define CONTINUE ( (uint64) 1 << 1 )
@@ -427,7 +427,7 @@
 
 // MemChunk / Memory Types
 #define OPENVMTIL ( (uint64) 1 << 0 )
-#define CFRTIL ( (uint64) 1 << 1 )
+#define T_CSL ( (uint64) 1 << 1 )
 #define PERMANENT ( (uint64) 1 << 2 )
 #define TEMPORARY ( (uint64) 1 << 3 )
 #define TEMP_OBJECT_MEMORY TEMPORARY
@@ -454,7 +454,7 @@
 #define WORD_COPY_MEM ( (uint64) 1 << 20 )
 #define SESSION_CODE ( (uint64) 1 << 21 )
 #define INTERNAL_OBJECT_MEM ( (uint64) 1 << 22 )
-//#define ALL      ( INTERNAL | EXTERNAL | CFRTIL | TEMPORARY | DATA_STACK | SESSION )
+//#define ALL      ( INTERNAL | EXTERNAL | csl | TEMPORARY | DATA_STACK | SESSION )
 
 #define OPTIMIZE_RM ( (uint64) 1 << 0 )
 #define OPTIMIZE_IMM ( (uint64) 1 << 1 )
@@ -522,8 +522,8 @@
 
 #define SIZEOF_AddressAfterJmpCallStack 16
 // TODO : nb. flags need to be edited !!!!! for right category, overlap, use/non-use, etc.
-// CfrTil state flags added to System flags
-#define CFRTIL_RUN ( (uint64) 1 << 0 )
+// CSL state flags added to System flags
+#define CSL_RUN ( (uint64) 1 << 0 )
 #define SOURCE_CODE_STARTED  ( (uint64) 1 << 1 )
 #define SOURCE_CODE_ON  ( (uint64) 1 << 2 )
 #define DEBUG_MODE ( (uint64) 1 << 7 )
@@ -643,7 +643,7 @@
 #define ADDRESS_OF_MODE ( (uint64) 1 << 27 ) 
 #define AT_COMMAND_LINE ( (uint64) 1 << 28 ) 
 #define LC_INTERPRET     ( (uint64) 1 << 29 ) 
-#define LC_CFRTIL ( (uint64) 1 << 30 )
+#define LC_csl ( (uint64) 1 << 30 )
 
 #define NON_INLINABLE ( (uint64) 1 << 0 )
 #define DONE true
@@ -678,7 +678,7 @@
 // Lisp State flags 
 #define LC_PRINT_VALUE          ( (uint64) 1 << 0 )
 #define LC_DEFINE_MODE          ( (uint64) 1 << 1 )
-//#define LC_CFRTIL_MODE          ( (uint64) 1 << 2 )
+//#define LC_csl_MODE          ( (uint64) 1 << 2 )
 #define LC_INTERP_DONE          ( (uint64) 1 << 3 )
 #define LC_REPL                 ( (uint64) 1 << 4 )
 #define LC_LAMBDA_MODE          ( (uint64) 1 << 5 )

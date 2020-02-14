@@ -2,7 +2,7 @@
 Int
 bnOff
 5
-"\nstarting lisp.cft\n" ddps
+"\nstarting lisp.csl\n" ddps
 Lisp
 #if 0 // debug
 : sp stack pause ; sp
@@ -292,7 +292,7 @@ Lisp
 lispOff 
 C
 : sp ; //stack pause ; sp
-"\nending lisp.cft\n" ddps
+"\nending lisp.csl\n" ddps
 
 #if doScript
 String

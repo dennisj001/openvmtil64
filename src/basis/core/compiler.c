@@ -1,5 +1,5 @@
 
-#include "../../include/cfrtil64.h"
+#include "../../include/csl.h"
 // words need to be copied because a word may be used more than once in compiling a new word, 
 // each needs to have their own coding, wordIndex, etc.
 // this information is used by the compiler, optimizer and the debugger
@@ -30,11 +30,11 @@ CopyDuplicateWord ( dlnode * anode, Word * word0 )
 }
 
 Word *
-_CFT_CopyDuplicates ( Word * word0 )
+_CSL_CopyDuplicates ( Word * word0 )
 {
     Word * word1, *wordToBePushed ;
-    if ( word0->W_MorphismAttributes & ( KEYWORD | CFRTIL_WORD | T_LISP_SYMBOL ) ) word1 = _CopyDuplicateWord ( word0, 1 ) ;
-    else word1 = ( Word * ) dllist_Map1_WReturn ( _CFT_->Compiler_N_M_Node_WordList, ( MapFunction1 ) CopyDuplicateWord, ( int64 ) word0 ) ;
+    if ( word0->W_MorphismAttributes & ( KEYWORD | csl_WORD | T_LISP_SYMBOL ) ) word1 = _CopyDuplicateWord ( word0, 1 ) ;
+    else word1 = ( Word * ) dllist_Map1_WReturn ( _CSL_->Compiler_N_M_Node_WordList, ( MapFunction1 ) CopyDuplicateWord, ( int64 ) word0 ) ;
     if ( word1 ) wordToBePushed = word1 ;
     else wordToBePushed = word0 ;
     return wordToBePushed ;
@@ -49,11 +49,11 @@ Compiler_CopyDuplicatesAndPush ( Word * word0, int64 tsrli, int64 scwi )
         if ( ( word0->W_MorphismAttributes & ( DEBUG_WORD | INTERPRET_DBG ) ) || ( word0->W_TypeAttributes & ( W_COMMENT | W_PREPROCESSOR ) ) ) return word0 ;
         if ( GetState ( _Compiler_, ( COMPILE_MODE | ASM_MODE ) ) ) // don't we want to copy in non-compile mode too ??
         {
-            wordp = _CFT_CopyDuplicates ( word0 ) ;
+            wordp = _CSL_CopyDuplicates ( word0 ) ;
         }
         else wordp = word0 ;
         Lexer_Set_ScIndex_RlIndex ( _Lexer_, wordp, tsrli, scwi ) ;
-        CFT_WordList_PushWord ( wordp ) ;
+        CSL_WordList_PushWord ( wordp ) ;
     }
     return wordp ;
 }
@@ -114,7 +114,7 @@ Compiler_PreviousNonDebugWord ( int64 startIndex )
 {
     Word * word ;
     int64 i ;
-    for ( i = startIndex ; ( word = ( Word* ) CFT_WordList ( i ) ) && i > - 3 ; i -- )
+    for ( i = startIndex ; ( word = ( Word* ) CSL_WordList ( i ) ) && i > - 3 ; i -- )
     {
         if ( ( Symbol* ) word && ( ! ( word->W_MorphismAttributes & DEBUG_WORD ) ) ) break ;
     }
@@ -138,15 +138,15 @@ Compiler_GotoList_Print ( )
 }
 
 Word *
-_CFT_WordList ( int64 n )
+_CSL_WordList ( int64 n )
 {
-    return ( Word * ) _dllist_Get_N_InUse_Node_M_Slot ( _CFT_->Compiler_N_M_Node_WordList, n, SCN_T_WORD ) ;
+    return ( Word * ) _dllist_Get_N_InUse_Node_M_Slot ( _CSL_->Compiler_N_M_Node_WordList, n, SCN_T_WORD ) ;
 }
 
 Word *
-CFT_WordList ( int64 n )
+CSL_WordList ( int64 n )
 {
-    return ( Word * ) _CFT_WordList ( n ) ;
+    return ( Word * ) _CSL_WordList ( n ) ;
 }
 
 void
@@ -162,7 +162,7 @@ CompileOptimizeInfo_Init ( CompileOptimizeInfo * optInfo, uint64 state )
     dlnode * node ;
     int64 i ;
     // we don't really use optInfo->COIW much 
-    for ( i = 0, node = dllist_First ( ( dllist* ) _CFT_->Compiler_N_M_Node_WordList ) ; node ; node = dlnode_Next ( node ) ) // nb. this is a little subtle
+    for ( i = 0, node = dllist_First ( ( dllist* ) _CSL_->Compiler_N_M_Node_WordList ) ; node ; node = dlnode_Next ( node ) ) // nb. this is a little subtle
     {
         if ( dobject_Get_M_Slot ( ( dobject* ) node, SCN_IN_USE_FLAG ) )
         {
@@ -232,11 +232,11 @@ Compiler_Init_AccumulatedOffsetPointers ( Compiler * compiler, Word * word )
 }
 
 void
-CFT_SaveDebugInfo ( Word * word, uint64 allocType )
+CSL_SaveDebugInfo ( Word * word, uint64 allocType )
 {
     Compiler * compiler = _Compiler_ ;
-    if ( ! allocType ) allocType = CFRTIL ; // COMPILER_TEMP ;
-    word = word ? word : _CFT_->LastFinished_Word ;
+    if ( ! allocType ) allocType = T_CSL ; // COMPILER_TEMP ;
+    word = word ? word : _CSL_->LastFinished_Word ;
     if ( compiler->NumberOfVariables )
     {
         word->NamespaceStack = Stack_Copy ( compiler->LocalsCompilingNamespacesStack, allocType ) ;
@@ -245,10 +245,10 @@ CFT_SaveDebugInfo ( Word * word, uint64 allocType )
     Stack_Init ( compiler->LocalsCompilingNamespacesStack ) ;
     if ( ! word->W_SC_WordList )
     {
-        word->W_SC_WordList = _CFT_->Compiler_N_M_Node_WordList ;
-        _CFT_->Compiler_N_M_Node_WordList = _dllist_New ( allocType ) ;
+        word->W_SC_WordList = _CSL_->Compiler_N_M_Node_WordList ;
+        _CSL_->Compiler_N_M_Node_WordList = _dllist_New ( allocType ) ;
     }
-    else List_Init ( _CFT_->Compiler_N_M_Node_WordList ) ;
+    else List_Init ( _CSL_->Compiler_N_M_Node_WordList ) ;
 
 }
 
@@ -259,22 +259,22 @@ Compiler_FreeLocalsNamespaces ( Compiler * compiler )
     {
         Namespace_RemoveAndClearNamespacesStack ( compiler->LocalsCompilingNamespacesStack ) ;
         _Namespace_RemoveFromUsingListAndClear ( compiler->LocalsNamespace ) ;
-        CFT_NonCompilingNs_Clear ( compiler ) ;
+        CSL_NonCompilingNs_Clear ( compiler ) ;
     }
 }
 
 void
-CFT_DeleteDebugInfo ( )
+CSL_DeleteDebugInfo ( )
 {
     Compiler_FreeLocalsNamespaces ( _Compiler_ ) ;
-    if ( ! _Context_->CurrentWordBeingCompiled ) _CFT_RecycleInit_Compiler_N_M_Node_WordList ( ) ;
+    if ( ! _Context_->CurrentWordBeingCompiled ) _CSL_RecycleInit_Compiler_N_M_Node_WordList ( ) ;
 }
 
 void
-_CFT_FinishWordDebugInfo ( Word * word )
+_CSL_FinishWordDebugInfo ( Word * word )
 {
-    if ( ! GetState ( _CFT_, ( RT_DEBUG_ON | GLOBAL_SOURCE_CODE_MODE ) ) ) CFT_DeleteDebugInfo ( ) ;
-    else CFT_SaveDebugInfo ( word, 0 ) ;
+    if ( ! GetState ( _CSL_, ( RT_DEBUG_ON | GLOBAL_SOURCE_CODE_MODE ) ) ) CSL_DeleteDebugInfo ( ) ;
+    else CSL_SaveDebugInfo ( word, 0 ) ;
 }
 
 void
@@ -310,12 +310,12 @@ Compiler_Init ( Compiler * compiler, uint64 state )
     _dllist_Init ( compiler->CurrentSwitchList ) ;
     _dllist_Init ( compiler->RegisterParameterList ) ;
     _dllist_Init ( compiler->OptimizeInfoList ) ;
-    CFT_TypeStackReset ( ) ;
-    SetState ( _CFT_, RT_DEBUG_ON, false ) ;
+    CSL_TypeStackReset ( ) ;
+    SetState ( _CSL_, RT_DEBUG_ON, false ) ;
     Compiler_CompileOptimizeInfo_PushNew ( compiler ) ;
     SetBuffersUnused ( 1 ) ;
     SetState ( compiler, VARIABLE_FRAME, false ) ;
-    if ( compiler->NonCompilingNs != compiler->LocalsNamespace ) CFT_NonCompilingNs_Clear ( compiler ) ; // for special syntax : we have a namespace but not while compiling
+    if ( compiler->NonCompilingNs != compiler->LocalsNamespace ) CSL_NonCompilingNs_Clear ( compiler ) ; // for special syntax : we have a namespace but not while compiling
 }
 
 Compiler *
@@ -352,7 +352,7 @@ Compiler_CalculateAndSetPreviousJmpOffset ( Compiler * compiler, byte * jmpToAdd
 }
 
 void
-CFT_CalculateAndSetPreviousJmpOffset_ToHere ( )
+CSL_CalculateAndSetPreviousJmpOffset_ToHere ( )
 {
     Compiler_CalculateAndSetPreviousJmpOffset ( _Context_->Compiler0, Here ) ;
 }
@@ -370,23 +370,23 @@ Stack_Push_PointerToJmpOffset ( byte * compiledAtAddress )
 }
 
 void
-CFT_CompileAndRecord_Word0_PushReg ( Boolean reg, Boolean recordFlag )
+CSL_CompileAndRecord_Word0_PushReg ( Boolean reg, Boolean recordFlag )
 {
-    Word * word = _CFT_WordList ( 0 ) ;
+    Word * word = _CSL_WordList ( 0 ) ;
     _Word_CompileAndRecord_PushReg ( word, reg, recordFlag ) ;
 }
 
 void
-CFT_CompileAndRecord_Word0_PushRegToUse ( )
+CSL_CompileAndRecord_Word0_PushRegToUse ( )
 {
-    Word * word = _CFT_WordList ( 0 ) ;
+    Word * word = _CSL_WordList ( 0 ) ;
     _Word_CompileAndRecord_PushReg ( word, word->RegToUse, true ) ;
 }
 
 void
-CFT_CompileAndRecord_PushAccum ( )
+CSL_CompileAndRecord_PushAccum ( )
 {
-    Word * word = _CFT_WordList ( 0 ) ;
+    Word * word = _CSL_WordList ( 0 ) ;
     _Word_CompileAndRecord_PushReg ( word, ACC, true ) ;
 }
 

@@ -1,4 +1,4 @@
-#include "../../include/cfrtil64.h"
+#include "../../include/csl.h"
 //===================================================================================================================
 //| LO_SpecialFunction(s) 
 //===================================================================================================================
@@ -8,14 +8,14 @@ _LO_Define ( ListObject * idNode, ListObject * locals )
 {
     LambdaCalculus * lc = _LC_ ;
     ListObject *value0, *value, *l1 ;
-    Word * word0 = idNode->Lo_CfrTilWord, *word ;
+    Word * word0 = idNode->Lo_CSLWord, *word ;
     word = DataObject_New (T_LC_DEFINE, 0, ( byte* ) word0->Name, 0, NAMESPACE_VARIABLE, 0, 0, 0, 0, LISP, idNode->W_RL_Index, idNode->W_SC_Index ) ; //word0->W_RL_Index, word0->W_SC_Index ) ; //word0 was allocated COMPILER_TEMP or LISP_TEMP
-    CFT_WordList_Init (word) ;
+    CSL_WordList_Init (word) ;
 
     word->Definition = 0 ; // reset the definition from LO_Read
     value0 = _LO_Next ( idNode ) ;
     _Context_->CurrentWordBeingCompiled = word ;
-    word->Lo_CfrTilWord = word ;
+    word->Lo_CSLWord = word ;
     SetState ( lc, ( LC_DEFINE_MODE ), true ) ;
     Namespace_DoAddWord ( lc->LispDefinesNamespace, word ) ; // put it at the beginning of the list to be found first
     value = _LO_Eval ( lc, value0, locals, 0 ) ; // 0 : don't apply
@@ -75,7 +75,7 @@ _LO_MakeLambda ( ListObject * l0 )
     }
     if ( ! GetState ( _LC_, LC_COMPILE_MODE ) ) // nb! this needs to be 'if' not 'else' or else if' because the state is sometimes changed by CompileLispBlock, eg. for function parameters
     {
-        lambda->Lo_CfrTilWord = lambda ;
+        lambda->Lo_CSLWord = lambda ;
         lambda->Lo_LambdaFunctionParameters = args ;
         lambda->Lo_LambdaFunctionBody = body ;
         lambda->W_LispAttributes |= T_LAMBDA | T_LISP_SYMBOL ;
@@ -101,10 +101,10 @@ LO_SpecialFunction ( LambdaCalculus * lc, ListObject * l0, ListObject * locals )
             macro = 0 ;
             d0 ( if ( Is_DebugModeOn ) LO_Debug_ExtraShow ( 0, 0, 0, ( byte* ) "\nLO_SpecialFunction : macro eval after : l0 = %s : locals = %s", c_gd ( _LO_PRINT_TO_STRING ( l0 ) ), locals ? _LO_PRINT_TO_STRING ( locals ) : ( byte* ) "" ) ) ;
         }
-        if ( lfirst && lfirst->Lo_CfrTilWord && IS_MORPHISM_TYPE ( lfirst->Lo_CfrTilWord ) )
+        if ( lfirst && lfirst->Lo_CSLWord && IS_MORPHISM_TYPE ( lfirst->Lo_CSLWord ) )
         {
             //if ( GetState ( _LC_, LC_COMPILE_MODE ) ) return lfirst ;
-            l0 = ( ( LispFunction2 ) ( lfirst->Lo_CfrTilWord->Definition ) ) ( lfirst, locals ) ; // non macro special functions here
+            l0 = ( ( LispFunction2 ) ( lfirst->Lo_CSLWord->Definition ) ) ( lfirst, locals ) ; // non macro special functions here
         }
         else
         {
@@ -135,8 +135,8 @@ _LO_Macro ( ListObject * l0, ListObject * locals )
     //l0 = _LO_Define ( ( byte* ) "macro", idNode, locals ) ;
     l0 = _LO_Define ( idNode, locals ) ;
     l0->W_LispAttributes |= T_LISP_MACRO ;
-    if ( l0->Lo_CfrTilWord ) l0->Lo_CfrTilWord->W_LispAttributes |= T_LISP_MACRO ;
-    if ( GetState ( _CFT_, DEBUG_MODE ) ) LO_Print ( l0 ) ;
+    if ( l0->Lo_CSLWord ) l0->Lo_CSLWord->W_LispAttributes |= T_LISP_MACRO ;
+    if ( GetState ( _CSL_, DEBUG_MODE ) ) LO_Print ( l0 ) ;
     return l0 ;
 }
 
@@ -311,10 +311,10 @@ _LO_Semi ( Word * word )
 {
     if ( word )
     {
-        CFT_EndBlock ( ) ;
+        CSL_EndBlock ( ) ;
         block blk = ( block ) DataStack_Pop ( ) ;
         Word_InitFinal ( word, ( byte* ) blk ) ;
-        word->W_LispAttributes |= T_LISP_CFRTIL_COMPILED ;
+        word->W_LispAttributes |= T_LISP_csl_COMPILED ;
     }
 }
 
@@ -325,19 +325,19 @@ _LO_Colon ( ListObject * lfirst )
     ListObject *lcolon = lfirst, *lname, *ldata ;
     lname = _LO_Next ( lcolon ) ;
     ldata = _LO_Next ( lname ) ;
-    _CFT_Namespace_NotUsing ( ( byte* ) "Lisp" ) ; // nb. don't use Lisp words when compiling cfrTil
-    CFT_RightBracket ( ) ;
+    _CSL_Namespace_NotUsing ( ( byte* ) "Lisp" ) ; // nb. don't use Lisp words when compiling csl
+    CSL_RightBracket ( ) ;
     Word * word = Word_New ( lname->Name ) ;
     SetState ( cntx->Compiler0, COMPILE_MODE, true ) ;
-    CFT_InitSourceCode_WithName ( _CFT_, lname->Name, 1 ) ;
-    CFT_BeginBlock ( ) ;
+    CSL_InitSourceCode_WithName ( _CSL_, lname->Name, 1 ) ;
+    CSL_BeginBlock ( ) ;
 
     return word ;
 }
 
-// compile cfrTil code in Lisp/Scheme
+// compile csl code in Lisp/Scheme
 ListObject *
-_LO_CfrTil ( ListObject * lfirst )
+_LO_CSL ( ListObject * lfirst )
 {
     Context * cntx = _Context_ ;
     Compiler * compiler = cntx->Compiler0 ;
@@ -353,14 +353,14 @@ _LO_CfrTil ( ListObject * lfirst )
         SetState ( _LC_, LC_INTERP_MODE, true ) ;
         lc = _LC_ ;
     }
-    _CFT_Namespace_NotUsing ( ( byte * ) "Lisp" ) ; // nb. don't use Lisp words when compiling cfrTil
-    SetState ( cntx, LC_CFRTIL, true ) ;
+    _CSL_Namespace_NotUsing ( ( byte * ) "Lisp" ) ; // nb. don't use Lisp words when compiling csl
+    SetState ( cntx, LC_csl, true ) ;
     SetState ( compiler, LISP_MODE, false ) ;
     for ( ldata = _LO_Next ( lfirst ) ; ldata ; ldata = _LO_Next ( ldata ) )
     {
         if ( ldata->W_LispAttributes & ( LIST | LIST_NODE ) )
         {
-            _CFT_Parse_LocalsAndStackVariables (1, 1, ldata, compiler->LocalsCompilingNamespacesStack, 0 ) ;
+            _CSL_Parse_LocalsAndStackVariables (1, 1, ldata, compiler->LocalsCompilingNamespacesStack, 0 ) ;
         }
         else if ( String_Equal ( ldata->Name, ( byte * ) "tick" ) || String_Equal ( ldata->Name, ( byte * ) "'" ) )
         {
@@ -370,7 +370,7 @@ _LO_CfrTil ( ListObject * lfirst )
         }
         else if ( String_Equal ( ldata->Name, ( byte * ) "s:" ) )
         {
-            CFT_DbgSourceCodeOn ( ) ;
+            CSL_DbgSourceCodeOn ( ) ;
             word = _LO_Colon ( ldata ) ;
             ldata = _LO_Next ( ldata ) ; // bump ldata to account for name - skip name
         }
@@ -381,16 +381,16 @@ _LO_CfrTil ( ListObject * lfirst )
         }
         else if ( String_Equal ( ldata->Name, ( byte * ) ";s" ) && ( ! GetState ( cntx, C_SYNTAX ) ) )
         {
-            CFT_DbgSourceCodeOff ( ) ;
+            CSL_DbgSourceCodeOff ( ) ;
             _LO_Semi ( word ) ;
         }
         else if ( String_Equal ( ldata->Name, ( byte * ) ";" ) && ( ! GetState ( cntx, C_SYNTAX ) ) )
         {
             ListObject *ldata1 = _LO_Next ( ldata ) ; // bump ldata to account for name
-            word->W_SourceCode = String_New_SourceCode ( _CFT_->SC_Buffer ) ;
+            word->W_SourceCode = String_New_SourceCode ( _CSL_->SC_Buffer ) ;
             if ( ldata1 && String_Equal ( ldata1->Name, ( byte * ) ":" ) )
             {
-                CFT_InitSourceCode_WithName ( _CFT_, ( byte* ) "(", 1 ) ;
+                CSL_InitSourceCode_WithName ( _CSL_, ( byte* ) "(", 1 ) ;
             }
             _LO_Semi ( word ) ;
             word->W_SourceCode = lc->LC_SourceCode ;
@@ -401,7 +401,7 @@ _LO_CfrTil ( ListObject * lfirst )
             Interpreter_DoWord ( cntx->Interpreter0, word1, ldata->W_RL_Index, ldata->W_SC_Index ) ;
         }
     }
-    SetState ( cntx, LC_CFRTIL, false ) ;
+    SetState ( cntx, LC_csl, false ) ;
     if ( lc )
     {
         _LC_ = lc ;

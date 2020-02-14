@@ -1,5 +1,5 @@
 
-#include "../include/cfrtil64.h"
+#include "../include/csl.h"
 
 void
 Debugger_Menu ( Debugger * debugger )
@@ -16,11 +16,11 @@ void
 _Debugger_Locals_ShowALocal ( Cpu * cpu, Word * localsWord, Word * scWord ) // use a debugger buffer instead ??
 {
     Word * word2 = 0 ;
-    byte * buffer = Buffer_Data_Cleared ( _CFT_->DebugB ) ; // nvw : new view window
+    byte * buffer = Buffer_Data_Cleared ( _CSL_->DebugB ) ; // nvw : new view window
     uint64 * fp = cpu->CPU_FP ; //? ( uint64* ) ((* cpu->CPU_FP)? ( uint64* ) (* cpu->CPU_FP) : (cpu->CPU_FP)) : 0 ;
     //if ( fp > ( uint64* ) 0x7f000000 )
     {
-        if ( Compiling ) scWord = _CFT_->SC_Word ;
+        if ( Compiling ) scWord = _CSL_->SC_Word ;
         int64 localVarFlag = ( localsWord->W_ObjectAttributes & LOCAL_VARIABLE ) ; // nb! not a Boolean with '='
         int64 varOffset = _LocalOrParameterVar_Offset ( localsWord, scWord->W_NumberOfNonRegisterArgs,
             IsFrameNecessary ( scWord->W_NumberOfNonRegisterLocals, scWord->W_NumberOfNonRegisterArgs ) ) ;
@@ -91,7 +91,7 @@ void
 _Debugger_ShowEffects ( Debugger * debugger, Word * word, Boolean stepFlag, Boolean force )
 {
     uint64* dsp = GetState ( debugger, DBG_STEPPING ) ? ( _Dsp_ = debugger->cs_Cpu->R14d ) : _Dsp_ ;
-    if ( ! dsp ) CFT_Exception ( STACK_ERROR, 0, QUIT ) ;
+    if ( ! dsp ) CSL_Exception ( STACK_ERROR, 0, QUIT ) ;
     if ( Is_DebugOn && ( force || stepFlag || ( word && ( word != debugger->LastShowInfoWord ) ) || ( debugger->PreHere && ( Here > debugger->PreHere ) ) ) )
     {
         DebugColors ;
@@ -122,7 +122,7 @@ _Debugger_ShowInfo ( Debugger * debugger, byte * prompt, int64 signal, int64 for
         byte * token0 = debugger->w_AliasOf ? wordName : word ? word->Name : debugger->Token ;
         if ( debugger->w_Word == cntx->LastEvalWord ) word = 0, debugger->w_Word = 0, token0 = cntx->CurrentToken ;
 
-        if ( ! ( cntx && cntx->Lexer0 ) ) Throw ( ( byte* ) "\n_CFT_ShowInfo:", ( byte* ) "\nNo token at _CFT_ShowInfo\n", QUIT ) ;
+        if ( ! ( cntx && cntx->Lexer0 ) ) Throw ( ( byte* ) "\n_CSL_ShowInfo:", ( byte* ) "\nNo token at _CSL_ShowInfo\n", QUIT ) ;
         if ( ( signal == 11 ) || _O_->SigAddress )
         {
             snprintf ( ( char* ) signalAscii, 128, ( char * ) "Error : signal " INT_FRMT ":: attempting address : \n" UINT_FRMT, signal, ( uint64 ) _O_->SigAddress ) ;
@@ -140,7 +140,7 @@ _Debugger_ShowInfo ( Debugger * debugger, byte * prompt, int64 signal, int64 for
         if ( token0 ) Debugger_ShowInfo_Token ( debugger, word, prompt, signal, token0, location, signalAscii ) ;
         else
         {
-            byte *cc_line = ( char* ) Buffer_Data ( _CFT_->DebugB ) ;
+            byte *cc_line = ( char* ) Buffer_Data ( _CSL_->DebugB ) ;
             strcpy ( cc_line, ( char* ) rl->InputLine ) ;
             String_RemoveEndWhitespace ( ( byte* ) cc_line ) ;
             _Printf ( ( byte* ) "\n%s %s:: %s : %03d.%03d :> %s", // <:: " INT_FRMT "." INT_FRMT,
@@ -184,7 +184,7 @@ Debugger_ShowInfo ( Debugger * debugger, byte * prompt, int64 signal )
 }
 
 void
-CFT_ShowInfo ( Word * word, byte * prompt, int64 signal )
+CSL_ShowInfo ( Word * word, byte * prompt, int64 signal )
 {
     _Debugger_->w_Word = Word_UnAlias ( word ) ;
     _Debugger_ShowInfo ( _Debugger_, prompt, signal, 1 ) ;
@@ -204,7 +204,7 @@ Debugger_ShowState ( Debugger * debugger, byte * prompt )
     {
         _Printf ( ( byte* ) ( cflag ? "\n%s :: %03d.%03d : %s : <constant> : %s%s%s " : word->ContainingNamespace ? "\n%s :: %03d.%03d : %s : <word> : %s%s%s " : "\n%s :: %03d.%03d : %s : <word?> : %s%s%s " ),
             prompt, rl->LineNumber, rl->ReadIndex, Debugger_GetStateString ( debugger ),
-            // _O_->CfrTil->Namespaces doesn't have a ContainingNamespace
+            // _O_->CSL->Namespaces doesn't have a ContainingNamespace
             word->ContainingNamespace ? word->ContainingNamespace->Name : ( byte* ) "",
             word->ContainingNamespace ? ( byte* ) "." : ( byte* ) "", // the dot between
             c_gd ( word->Name ) ) ;
@@ -217,7 +217,7 @@ Debugger_ShowState ( Debugger * debugger, byte * prompt )
     else _Printf ( ( byte* ) "\n%s :: %03d.%03d : %s : ", prompt, rl->LineNumber, rl->ReadIndex, Debugger_GetStateString ( debugger ) ) ;
     if ( ! debugger->Key )
     {
-        if ( word ) _CFT_Source ( word, 0 ) ;
+        if ( word ) _CSL_Source ( word, 0 ) ;
 
         if ( GetState ( debugger, DBG_STEPPING ) )
             Debugger_UdisOneInstruction ( debugger, debugger->DebugAddress, ( byte* ) "\r", ( byte* ) "" ) ; // current insn
@@ -261,17 +261,17 @@ Debugger_DoState ( Debugger * debugger )
 void
 LO_Debug_ExtraShow ( int64 showStackFlag, int64 verbosity, int64 wordList, byte *format, ... )
 {
-    if ( GetState ( _CFT_, DEBUG_MODE ) )
+    if ( GetState ( _CSL_, DEBUG_MODE ) )
     {
         if ( _O_->Verbosity > verbosity )
         {
             va_list args ;
             va_start ( args, ( char* ) format ) ;
-            char * out = ( char* ) Buffer_Data ( _CFT_->DebugB ) ;
+            char * out = ( char* ) Buffer_Data ( _CSL_->DebugB ) ;
             vsprintf ( ( char* ) out, ( char* ) format, args ) ;
             va_end ( args ) ;
             DebugColors ;
-            if ( wordList ) _CFT_SC_WordList_Show ( ( byte* ) out, 0, 0 ) ;
+            if ( wordList ) _CSL_SC_WordList_Show ( ( byte* ) out, 0, 0 ) ;
             else
             {
                 printf ( "%s", out ) ;
@@ -295,8 +295,8 @@ void
 Debugger_ShowStackChange ( Debugger * debugger, Word * word, byte * insert, byte * achange, Boolean stepFlag )
 {
     int64 sl, i = 0, tw ;
-    char *name, *location, *b, *b2 = ( char* ) Buffer_Data_Cleared ( _CFT_->DebugB2 ) ;
-    b = ( char* ) Buffer_Data_Cleared ( _CFT_->DebugB1 ) ;
+    char *name, *location, *b, *b2 = ( char* ) Buffer_Data_Cleared ( _CSL_->DebugB2 ) ;
+    b = ( char* ) Buffer_Data_Cleared ( _CSL_->DebugB1 ) ;
     if ( stepFlag ) sprintf ( ( char* ) b2, "0x%016lx", ( uint64 ) debugger->DebugAddress ) ;
     location = stepFlag ? ( char* ) c_gd ( b2 ) : ( char* ) Context_Location ( ) ;
     name = word ? ( char* ) c_gd ( String_ConvertToBackSlash ( word->Name ) ) : ( char* ) "" ;
@@ -339,8 +339,8 @@ Debugger_ShowChange ( Debugger * debugger, Word * word, Boolean stepFlag, uint64
     if ( word && ( debugger->WordDsp && ( GetState ( debugger, DBG_SHOW_STACK_CHANGE ) ) || ( change ) || ( debugger->SaveTOS != TOS ) || ( depthChange ) ) )
     {
         byte * name, pb_change [ 256 ] ;
-        char * b = ( char* ) Buffer_Data ( _CFT_->DebugB ), *op ;
-        char * c = ( char* ) Buffer_Data ( _CFT_->DebugB2 ) ;
+        char * b = ( char* ) Buffer_Data ( _CSL_->DebugB ), *op ;
+        char * c = ( char* ) Buffer_Data ( _CSL_->DebugB2 ) ;
         pb_change [ 0 ] = 0 ;
 
         if ( GetState ( debugger, DBG_SHOW_STACK_CHANGE ) ) SetState ( debugger, DBG_SHOW_STACK_CHANGE, false ) ;
@@ -527,7 +527,7 @@ Debugger_PrepareDbgSourceCodeString (Debugger * debugger, Word * word, byte* tok
     if ( word || token )
     {
         ReadLiner * rl = _Context_->ReadLiner0 ;
-        byte * il = Buffer_Data_Cleared ( _CFT_->StringInsertB4 ) ; //nb! dont tamper with the input line. eg. removing its newline will affect other code which depends on newline
+        byte * il = Buffer_Data_Cleared ( _CSL_->StringInsertB4 ) ; //nb! dont tamper with the input line. eg. removing its newline will affect other code which depends on newline
         strcpy ( il, rl->InputLineString ) ;
         String_RemoveEndWhitespace ( ( byte* ) il ) ;
         if ( String_Equal ( "init", word->Name ) )
@@ -553,8 +553,8 @@ Debugger_ShowInfo_Token ( Debugger * debugger, Word * word, byte * prompt, int64
     ReadLiner * rl = _ReadLiner_ ;
     char * compileOrInterpret = ( char* ) ( ( signal || ( int64 ) signalAscii[0] ) ?
         ( CompileMode ? "\n[c] " : "\n[i] " ) : ( CompileMode ? "[c] " : "[i] " ) ) ;
-    byte * buffer = Buffer_Data_Cleared ( _CFT_->ScratchB2 ) ;
-    byte * obuffer = Buffer_Data_Cleared ( _CFT_->DebugB1 ) ;
+    byte * buffer = Buffer_Data_Cleared ( _CSL_->ScratchB2 ) ;
+    byte * obuffer = Buffer_Data_Cleared ( _CSL_->DebugB1 ) ;
     byte * token1 = String_ConvertToBackSlash ( token0 ) ;
     token0 = token1 ;
     char * cc_Token = ( char* ) cc ( token0, &_O_->Notice ) ;

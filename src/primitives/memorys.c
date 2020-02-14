@@ -1,7 +1,7 @@
-#include "../include/cfrtil64.h"
+#include "../include/csl.h"
 
 void
-CFT_Peek ( ) // @
+CSL_Peek ( ) // @
 {
     if ( CompileMode ) Compile_Peek ( _Context_->Compiler0, DSP ) ;
     else TOS = * ( int64* ) TOS ;
@@ -13,10 +13,10 @@ CFT_Peek ( ) // @
 // peekReg ( reg -- regValue ) //reg : reg number :: returns reg value on top of stack
 
 void
-CFT_PeekReg ( ) // @
+CSL_PeekReg ( ) // @
 {
     //DBI_ON ;
-    ByteArray * svcs = _O_CodeByteArray, *ba = _CFT_->PeekPokeByteArray ;
+    ByteArray * svcs = _O_CodeByteArray, *ba = _CSL_->PeekPokeByteArray ;
     _ByteArray_DataClear ( ba ) ;
     Set_CompilerSpace ( ba ) ; // now compile to this space
     Compile_Move_Reg_To_Rm ( DSP, TOS & 0xf, 0, 0 ) ;
@@ -29,12 +29,12 @@ CFT_PeekReg ( ) // @
 // pokeRegWithValue ( lvalue reg -- puts value of reg at lvalue address )
 
 void
-CFT_PokeRegWithValue ( ) // @
+CSL_PokeRegWithValue ( ) // @
 {
     //DBI_ON ;
     uint64 reg = DataStack_Pop ( ) ;
     uint64 value = DataStack_Pop ( ) ;
-    ByteArray * svcs = _O_CodeByteArray, *ba = _CFT_->PeekPokeByteArray ;
+    ByteArray * svcs = _O_CodeByteArray, *ba = _CSL_->PeekPokeByteArray ;
     _ByteArray_DataClear ( ba ) ;
     Set_CompilerSpace ( ba ) ; // now compile to this space
     Compile_MoveImm ( REG, reg, 0, ( uint64 ) value, CELL ) ;
@@ -47,11 +47,11 @@ CFT_PokeRegWithValue ( ) // @
 // pokeRegAtAddress ( address, reg -- )
 
 void
-CFT_PokeRegAtAddress ( ) // @
+CSL_PokeRegAtAddress ( ) // @
 {
     uint64 reg = DataStack_Pop ( ) ;
     uint64 address = DataStack_Pop ( ) ;
-    ByteArray * svcs = _O_CodeByteArray, *ba = _CFT_->PeekPokeByteArray ;
+    ByteArray * svcs = _O_CodeByteArray, *ba = _CSL_->PeekPokeByteArray ;
     _ByteArray_Init ( ba ) ;
     Set_CompilerSpace ( ba ) ; // now compile to this space
     _Compile_PushReg ( ACC ) ;
@@ -75,14 +75,14 @@ Word_LvalueObjectByteSize ( Word * lvalueWord, Word * rValueWord ) // =
 void
 Do_MoveErrorReport ( int64 value, byte * one, byte * two )
 {
-    byte buffer [128] ; //= Buffer_Data_Cleared ( CFT->ScratchB3 ) ; 
+    byte buffer [128] ; //= Buffer_Data_Cleared ( CSL->ScratchB3 ) ; 
     buffer [0] = 0 ;
-    snprintf ( buffer, 128, "\n_CFT_Move : Type Error : value == %ld : is greater than %s - max value for sizeof %s", value, one, two ) ;
+    snprintf ( buffer, 128, "\n_CSL_Move : Type Error : value == %ld : is greater than %s - max value for sizeof %s", value, one, two ) ;
     Error ( buffer, QUIT ) ;
 }
 
 void
-_CFT_Move ( int64 * address, int64 value, int64 lvalueSize )
+_CSL_Move ( int64 * address, int64 value, int64 lvalueSize )
 {
     switch ( lvalueSize )
     {
@@ -132,7 +132,7 @@ _CFT_Move ( int64 * address, int64 value, int64 lvalueSize )
 // ( addr n -- ) // (*addr) = n
 
 void
-CFT_Poke ( ) // = 
+CSL_Poke ( ) // = 
 {
     Word * lvalueWord = TWS ( - 1 ), *rvalueWord = TWS ( 0 ) ;
     int64 lvalueSize = Word_LvalueObjectByteSize ( lvalueWord, rvalueWord ) ;
@@ -142,14 +142,14 @@ CFT_Poke ( ) // =
         if ( CompileMode ) Compile_Poke ( _Context_->Compiler0, lvalueSize ) ;
         else
         {
-            _CFT_Move ( ( int64 * ) NOS, TOS, lvalueSize ) ;
+            _CSL_Move ( ( int64 * ) NOS, TOS, lvalueSize ) ;
             _Dsp_ -= 2 ;
         }
     }
 }
 
 void
-CFT_AtEqual ( ) // !
+CSL_AtEqual ( ) // !
 {
     Word * lvalueWord = TWS ( 0 ), *rvalueWord = TWS ( - 1 ) ;
     //Word * lvalueWord = TWS ( - 1 ), *rvalueWord = TWS ( 0 ) ;
@@ -159,7 +159,7 @@ CFT_AtEqual ( ) // !
         if ( CompileMode ) Compile_AtEqual ( DSP ) ;
         else
         {
-            _CFT_Move ( ( int64 * ) NOS, * ( int64* ) TOS, lvalueSize ) ;
+            _CSL_Move ( ( int64 * ) NOS, * ( int64* ) TOS, lvalueSize ) ;
             _Dsp_ -= 2 ;
         }
     }
@@ -168,7 +168,7 @@ CFT_AtEqual ( ) // !
 // ( n addr -- ) // (*addr) = n
 
 void
-CFT_Store ( ) // !
+CSL_Store ( ) // !
 {
     Word * lvalueWord = TWS ( 0 ), *rvalueWord = TWS ( - 1 ) ;
     int64 lvalueSize = Word_LvalueObjectByteSize ( lvalueWord, rvalueWord ) ;
@@ -177,7 +177,7 @@ CFT_Store ( ) // !
         if ( CompileMode ) Compile_Store ( _Context_->Compiler0, Word_LvalueObjectByteSize ( lvalueWord, rvalueWord ) ) ;
         else
         {
-            _CFT_Move ( ( int64 * ) TOS, NOS, lvalueSize ) ;
+            _CSL_Move ( ( int64 * ) TOS, NOS, lvalueSize ) ;
             _Dsp_ -= 2 ;
         }
     }

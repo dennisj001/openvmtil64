@@ -1,5 +1,5 @@
 
-#include "../../include/cfrtil64.h"
+#include "../../include/csl.h"
 
 #if 0
 //
@@ -30,7 +30,7 @@ void
 _CompileStackNToReg ( cell n, cell reg ) 
 {
 #if 0 // under construction
-    //if ( _CFT_GetCompileMode () )
+    //if ( _CSL_GetCompileMode () )
     {
         // mov n to edx - index register
         // sib = sizeof (cell_t), n, edi 
@@ -38,7 +38,7 @@ _CompileStackNToReg ( cell n, cell reg )
         _CompileMoveImm ( REG, EDX, 0, n, 0 ) ;
         // _CompileMove ( cell_t direction, cell_t reg, cell_t rmReg, cell_t sib, cell_t disp )
         _Compile_NOT ( REG, EDX, 0, 0, 0, 0 ) ;
-        _CompileMove ( REG, EDX, ESI, _CFT_Sib ( sizeof (cell), NO_INDEX, EDX ), 0 ) ; // n
+        _CompileMove ( REG, EDX, ESI, _CSL_Sib ( sizeof (cell), NO_INDEX, EDX ), 0 ) ; // n
     }
 #endif
 }
@@ -55,7 +55,7 @@ CompileStackNToReg ( )
 void
 _CompileRegToStackN ( cell n, cell reg ) 
 {
-    //if ( _CFT_GetCompileMode () )
+    //if ( _CSL_GetCompileMode () )
     {
 
         _CompileCompileMoveRegToMem ( ESI, reg, - ( n * CELL_SIZE ) ;
@@ -75,7 +75,7 @@ CompileRegToStackN ( )
 void
 _CompileLocalsNToReg ( cell n, cell reg ) 
 {
-    //if ( _CFT_GetCompileMode () )
+    //if ( _CSL_GetCompileMode () )
     {
 
         _CompileCompileMoveMemToReg ( reg, EBP, - ( n * CELL_SIZE ) ) ; // n
@@ -95,7 +95,7 @@ CompileLocalsNToReg ( )
 void
 _CompileRegToLocalsN ( cell n, cell reg ) 
 {
-    //if ( _CFT_GetCompileMode () )
+    //if ( _CSL_GetCompileMode () )
     {
 
         _CompileCompileMoveRegToMem ( EBP, reg, - ( n * CELL_SIZE ) ) ;
@@ -137,7 +137,7 @@ _CompileCompileOpRegToReg ( cell opCode, cell dstReg, cell srcReg )
 void
 _CompileMoveRegToReg ( cell dst, cell src ) 
 {
-    //if ( _CFT_GetCompileMode () )
+    //if ( _CSL_GetCompileMode () )
     {
         //_CompileCompileMoveRegToReg ( cell_t dstReg, cell_t srcReg, cell_t offset )
 
@@ -159,7 +159,7 @@ CompileMoveRegToReg ( )
 void
 _CompileOpRegToReg ( cell opCode, cell dst, cell src ) 
 {
-    //if ( _CFT_GetCompileMode () )
+    //if ( _CSL_GetCompileMode () )
     {
         //_CompileCompileOpRegToReg ( cell_t opCode, cell_t dstReg, cell_t srcReg )
 
@@ -180,7 +180,7 @@ CompileOpRegToReg ( )
 void
 _CompileOpReg ( cell opCode, cell dst ) 
 {
-    //if ( _CFT_GetCompileMode () )
+    //if ( _CSL_GetCompileMode () )
     {
         //_CompileCompileOpRegToReg ( cell_t opCode, cell_t dstReg, cell_t srcReg )
 

@@ -6,9 +6,9 @@ sp
 doLisp 1 =
 doDemo 1 =
 //dbgOff
-: demo0 "namespaces/test/initTest.cft" include ;
+: demo0 "namespaces/test/initTest.csl" include ;
 doDemo @ { demo0 } if1 //stack pause
 : sp ; //stack pause ;    
 lispOff
 sp 
-2 + 7 assertStkChk // stack checking
+d: 2 + 7 assertStkChk // stack checking

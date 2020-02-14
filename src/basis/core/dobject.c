@@ -1,5 +1,5 @@
 
-#include "../../include/cfrtil64.h"
+#include "../../include/csl.h"
 
 /* from macros.h
 #define dobject_Get_M_Slot( dobj, m ) (((dobject*) dobj)->do_iData [m]) 
@@ -76,7 +76,7 @@ _DObject_C_StartupCompiledWords_DefInit ( byte * function, int64 arg )
 }
 
 DObject *
-_CFT_Do_DynamicObject_ToReg ( DObject * dobject0, uint8 reg )
+_CSL_Do_DynamicObject_ToReg ( DObject * dobject0, uint8 reg )
 {
     Context * cntx = _Context_ ;
     Lexer * lexer = cntx->Lexer0 ;
@@ -106,12 +106,12 @@ _CFT_Do_DynamicObject_ToReg ( DObject * dobject0, uint8 reg )
 }
 
 void
-CFT_Do_DynamicObject ( DObject * dobject0, Boolean reg )
+CSL_Do_DynamicObject ( DObject * dobject0, Boolean reg )
 {
-    DObject * dobject = _CFT_Do_DynamicObject_ToReg ( dobject0, reg ) ;
+    DObject * dobject = _CSL_Do_DynamicObject_ToReg ( dobject0, reg ) ;
     if ( CompileMode ) _Word_CompileAndRecord_PushReg ( dobject0, reg, true ) ;
     else DataStack_Push ( ( int64 ) & dobject->W_Value ) ; //& dobject->W_DObjectValue ) ; //dobject ) ;
-    CFT_TypeStackPush ( dobject ) ;
+    CSL_TypeStackPush ( dobject ) ;
 }
 
 void
@@ -132,8 +132,8 @@ _DObject_ValueDefinition_Init ( Word * word, uint64 value, uint64 objType, byte 
         word->W_Value = value ; // rvalue
         d0 ( _Printf ( ( byte* ) "\n_DObject_ValueDefinition_Init :" ) ) ;
         ByteArray * svcs = _O_CodeByteArray ;
-        int64 sscm = GetState ( _CFT_, DEBUG_SOURCE_CODE_MODE ) ;
-        //CFT_DbgSourceCodeOff ( ) ;
+        int64 sscm = GetState ( _CSL_, DEBUG_SOURCE_CODE_MODE ) ;
+        //CSL_DbgSourceCodeOff ( ) ;
         _NBA_SetCompilingSpace_MakeSureOfRoom ( _O_->MemorySpace0->InternalObjectSpace, 4 * K ) ;
         Word_SetCoding ( word, Here ) ;
         word->CodeStart = Here ;
@@ -144,7 +144,7 @@ _DObject_ValueDefinition_Init ( Word * word, uint64 value, uint64 objType, byte 
         //if ( Is_DebugOn ) Word_Disassemble ( word ) ; //_Debugger_Disassemble ( _Debugger_, ( byte* ) word->Definition, 64, 1 ) ;
         word->S_CodeSize = Here - word->CodeStart ; // for use by inline
         Set_CompilerSpace ( svcs ) ;
-        SetState ( _CFT_, DEBUG_SOURCE_CODE_MODE, sscm ) ;
+        SetState ( _CSL_, DEBUG_SOURCE_CODE_MODE, sscm ) ;
     }
 }
 
@@ -155,8 +155,8 @@ DObject_Finish ( Word * word )
     Compiler * compiler = cntx->Compiler0 ;
     if ( ! ( word->W_MorphismAttributes & CPRIMITIVE ) )
     {
-        if ( GetState ( _CFT_, OPTIMIZE_ON ) ) SetState ( word, COMPILED_OPTIMIZED, true ) ;
-        if ( GetState ( _CFT_, INLINE_ON ) ) SetState ( word, COMPILED_INLINE, true ) ;
+        if ( GetState ( _CSL_, OPTIMIZE_ON ) ) SetState ( word, COMPILED_OPTIMIZED, true ) ;
+        if ( GetState ( _CSL_, INLINE_ON ) ) SetState ( word, COMPILED_INLINE, true ) ;
         if ( GetState ( _Context_, INFIX_MODE ) ) SetState ( word, W_INFIX_MODE, true ) ;
         if ( GetState ( _Context_, C_SYNTAX ) )
         {
@@ -169,8 +169,8 @@ DObject_Finish ( Word * word )
     word->W_NumberOfNonRegisterLocals = compiler->NumberOfNonRegisterLocals ;
     word->W_NumberOfVariables = compiler->NumberOfVariables ;
     if ( GetState ( _Context_, INFIX_MODE ) ) word->W_MorphismAttributes |= INFIX_WORD ;
-    _CFT_->LastFinished_DObject = word ;
-    _CFT_SetSourceCodeWord ( word ) ;
+    _CSL_->LastFinished_DObject = word ;
+    _CSL_SetSourceCodeWord ( word ) ;
 }
 
 Word *
@@ -192,7 +192,7 @@ _DObject_New ( byte * name, uint64 value, uint64 morphismType, uint64 objectType
 {
     Word * word = _Word_New ( name, morphismType, objectType, lispType, addToInNs, addToNs, allocType ) ;
     _DObject_Init ( word, value, functionType, function, arg ) ;
-    _CFT_->DObjectCreateCount ++ ;
+    _CSL_->DObjectCreateCount ++ ;
     return word ;
 }
 
@@ -222,7 +222,7 @@ _DObject_SetSlot ( DObject * dobject, byte * name, int64 value )
 void
 DObject_SubObjectInit ( DObject * dobject, Word * parent )
 {
-    if ( ! parent ) parent = _CFT_Namespace_InNamespaceGet ( ) ;
+    if ( ! parent ) parent = _CSL_Namespace_InNamespaceGet ( ) ;
     else if ( ! ( parent->W_ObjectAttributes & NAMESPACE ) )
     {
         parent->W_List = dllist_New ( ) ;
@@ -249,7 +249,7 @@ DObject_Sub_New ( DObject * proto, byte * name, uint64 objectAttributes )
 // but all variables and objects are created as DOBJECTs so this is not necessary
 
 void
-CFT_SetPropertiesAsDObject ( )
+CSL_SetPropertiesAsDObject ( )
 {
     DObject * o = ( DObject * ) DataStack_Pop ( ) ;
     o->W_ObjectAttributes |= DOBJECT | T_ANY ;
@@ -267,13 +267,13 @@ _DObject_NewSlot ( DObject * proto, byte * name, int64 value )
 }
 
 void
-CFT_DObject_Clone ( )
+CSL_DObject_Clone ( )
 {
     DObject * proto = ( DObject * ) DataStack_Pop ( ) ;
     byte * name = ( byte * ) DataStack_Pop ( ) ;
     if ( ! ( proto->W_ObjectAttributes & DOBJECT ) )
     {
-        byte * buffer = Buffer_Data_Cleared ( _CFT_->ScratchB3 ) ;
+        byte * buffer = Buffer_Data_Cleared ( _CSL_->ScratchB3 ) ;
         snprintf ( buffer, BUF_IX_SIZE, "\nCloning Alert : \'%s\' is not a dynamic object.\n\n", proto->Name ) ;
         //Error ( ( byte* ) "\nCloning Alert : \'%s\' is not a dynamic object.\n\n", proto->Name, PAUSE ) ;
         Error ( buffer, PAUSE ) ;

@@ -1,5 +1,5 @@
-#include "../include/cfrtil64.h"
-#define VERSION ((byte*) "0.904.700" ) 
+#include "../include/csl.h"
+#define VERSION ((byte*) "0.904.810" ) 
 // inspired by :: Logic/Foml (Foundations of Mathematical Logic by Haskell Curry), CT/Oop (Category Theory, Object Oriented Programming) 
 // C/C++/C#, Lisp, RPN/Lag : Reverse Polish Notation, (Left Associative Grammar), 
 // State Machines, Push Down Automata (PDA), Turing Machines :: 
@@ -39,7 +39,7 @@ OpenVmTil_Run ( int64 argc, char * argv [ ] )
         ovt->Restarts = restarts ;
         if ( ovt->Restarts ) OVT_ExceptionState_Print ( ) ;
         if ( ! sigsetjmp ( ovt->JmpBuf0, 0 ) ) // nb. siglongjmp always comes to beginning of the block 
-            CFT_Run ( ovt->OVT_CfrTil, ovt->RestartCondition ) ;
+            CSL_Run ( ovt->OVT_CSL, ovt->RestartCondition ) ;
         restartCondition = ovt->RestartCondition ;
         OVT_SetRestartCondition ( ovt, restartCondition ) ;
         //sigSegvs = ovt->SigSegvs ;
@@ -58,9 +58,9 @@ _OpenVmTil_Allocate ( )
 void
 OVT_RecycleAllWordsDebugInfo ( )
 {
-    SetState ( _CFT_, ( RT_DEBUG_ON | GLOBAL_SOURCE_CODE_MODE ), false ) ;
+    SetState ( _CSL_, ( RT_DEBUG_ON | GLOBAL_SOURCE_CODE_MODE ), false ) ;
     OVT_MemListFree_CompilerTempObjects ( ) ;
-    _CFT_RecycleInit_Compiler_N_M_Node_WordList ( ) ;
+    _CSL_RecycleInit_Compiler_N_M_Node_WordList ( ) ;
 }
 
 void
@@ -71,14 +71,14 @@ _OpenVmTil_Init ( OpenVmTil * ovt, int64 resetHistory )
     //ovt->psi_PrintStateInfo = PrintStateInfo_New ( ) ; // variable init needed by any allocation which call _Printf
     ovt->VersionString = VERSION ;
     // ? where do we want the init file ?
-    if ( _File_Exists ( ( byte* ) "./init.cft" ) )
+    if ( _File_Exists ( ( byte* ) "./init.csl" ) )
     {
-        ovt->InitString = ( byte* ) "\"./init.cft\" _include" ; // could allow override with a startup parameter
+        ovt->InitString = ( byte* ) "\"./init.csl\" _include" ; // could allow override with a startup parameter
         SetState ( ovt, OVT_IN_USEFUL_DIRECTORY, true ) ;
     }
     else
     {
-        ovt->InitString = ( byte* ) "\"/usr/local/lib/cfrTil64/init.cft\" _include" ; // could allow override with a startup parameter
+        ovt->InitString = ( byte* ) "\"/usr/local/lib/csl/init.csl\" _include" ; // could allow override with a startup parameter
         SetState ( ovt, OVT_IN_USEFUL_DIRECTORY, false ) ;
     }
     if ( ovt->Verbosity > 1 )
@@ -96,7 +96,7 @@ Ovt_RunInit ( OpenVmTil * ovt )
 {
     //ovt->SignalExceptionsHandled = 0 ;
     ovt->StartedTimes ++ ;
-    OVT_SetRestartCondition ( ovt, CFRTIL_RUN_INIT ) ;
+    OVT_SetRestartCondition ( ovt, csl_RUN_INIT ) ;
 }
 
 void
@@ -112,7 +112,7 @@ OpenVmTil_Delete ( OpenVmTil * ovt )
     _O_ = 0 ;
 }
 #define USE_OpenVmTil_CalculateMemSpaceSizes 0
-#define _CFRTIL_SIZE (82 * K) // data stack included here
+#define _csl_SIZE (82 * K) // data stack included here
 #if USE_OpenVmTil_CalculateMemSpaceSizes
 // _OpenVmTil_CalculateMemSpaceSizes is convoluted and needs rework
 
@@ -121,7 +121,7 @@ _OpenVmTil_CalculateMemSpaceSizes ( OpenVmTil * ovt, int64 restartCondition, int
 {
     int64 minimalCoreMemorySize, minStaticMemSize, coreMemTargetSize, exceptionsHandled, verbosity, objectsSize, tempObjectsSize,
         sessionObjectsSize, dataStackSize, historySize, lispTempSize, compilerTempObjectsSize, contextSize, bufferSpaceSize, stringSpaceSize,
-        openVmTilSize, cfrTilSize, codeSize, dictionarySize ; //, sessionCodeSize ;
+        openVmTilSize, cslSize, codeSize, dictionarySize ; //, sessionCodeSize ;
 
     if ( restartCondition < RESTART )
     {
@@ -139,7 +139,7 @@ _OpenVmTil_CalculateMemSpaceSizes ( OpenVmTil * ovt, int64 restartCondition, int
         contextSize = ovt->ContextSize ;
         bufferSpaceSize = ovt->BufferSpaceSize ;
         openVmTilSize = ovt->OpenVmTilSize ;
-        cfrTilSize = ovt->CfrTilSize ;
+        cslSize = ovt->CSLSize ;
         stringSpaceSize = ovt->StringSpaceSize ;
         exceptionsHandled = ovt->SignalExceptionsHandled ;
     }
@@ -160,7 +160,7 @@ _OpenVmTil_CalculateMemSpaceSizes ( OpenVmTil * ovt, int64 restartCondition, int
         // static mem sizes
         dataStackSize = 2 * K ; // STACK_SIZE
         openVmTilSize = 2 * K ; //OPENVMTIL_SIZE ;
-        cfrTilSize = _CFRTIL_SIZE ; //( dataStackSize * 4 ) + ( 12.5 * K ) ; // CFRTIL_SIZE
+        cslSize = _csl_SIZE ; //( dataStackSize * 4 ) + ( 12.5 * K ) ; // csl_SIZE
         exceptionsHandled = 0 ;
     }
     else // 0 or -1 get default
@@ -178,12 +178,12 @@ _OpenVmTil_CalculateMemSpaceSizes ( OpenVmTil * ovt, int64 restartCondition, int
 
         dataStackSize = 8 * KB ; //STACK_SIZE ;
         openVmTilSize = 15 * KB ; //OPENVMTIL_SIZE ;
-        cfrTilSize = _CFRTIL_SIZE ; //( dataStackSize * sizeof (int64 ) ) + ( 5 * KB ) ; //CFRTIL_SIZE ;
+        cslSize = _csl_SIZE ; //( dataStackSize * sizeof (int64 ) ) + ( 5 * KB ) ; //csl_SIZE ;
 
         exceptionsHandled = 0 ;
     }
     minStaticMemSize = tempObjectsSize + sessionObjectsSize + dataStackSize + historySize + lispTempSize + compilerTempObjectsSize +
-        contextSize + bufferSpaceSize + openVmTilSize + cfrTilSize, stringSpaceSize ;
+        contextSize + bufferSpaceSize + openVmTilSize + cslSize, stringSpaceSize ;
 
     minimalCoreMemorySize = 150 * K, coreMemTargetSize = totalMemSizeTarget - minStaticMemSize ;
     coreMemTargetSize = ( coreMemTargetSize > minimalCoreMemorySize ) ? coreMemTargetSize : minimalCoreMemorySize ;
@@ -206,7 +206,7 @@ _OpenVmTil_CalculateMemSpaceSizes ( OpenVmTil * ovt, int64 restartCondition, int
     ovt->ContextSize = contextSize ;
     ovt->CompilerTempObjectsSize = compilerTempObjectsSize ;
     ovt->BufferSpaceSize = bufferSpaceSize ;
-    ovt->CfrTilSize = cfrTilSize ;
+    ovt->CSLSize = cslSize ;
     ovt->StringSpaceSize = stringSpaceSize ;
     ovt->OpenVmTilSize = openVmTilSize ;
 }
@@ -231,7 +231,7 @@ OVT_GetStartupOptions ( OpenVmTil * ovt )
     {
         arg = ovt->Argv [ i ] ;
         if ( String_Equal ( "-m", arg ) ) ovt->TotalMemSizeTarget = ( atoi ( ovt->Argv [ ++ i ] ) * MB ) ;
-            // -s : a script file with "#! cfrTil -s" -- as first line includes the script file, the #! whole line is treated as a comment
+            // -s : a script file with "#! csl -s" -- as first line includes the script file, the #! whole line is treated as a comment
         else if ( String_Equal ( "-f", arg ) || ( String_Equal ( "-s", arg ) ) ) ovt->StartupFilename = ( byte* ) ovt->Argv [ ++ i ] ;
         else if ( String_Equal ( "-e", arg ) ) ovt->StartupString = ( byte* ) ovt->Argv [ ++ i ] ;
     }
@@ -291,7 +291,7 @@ _OpenVmTil_New ( OpenVmTil * ovt, int64 argc, char * argv [ ] )
     ovt->StringSpaceSize = 100 * K ;
     ovt->MachineCodeSize = 300 * K ;
     ovt->DictionarySize = 100 * K ;
-    ovt->CfrTilSize = ( 23 * K ) ;
+    ovt->CSLSize = ( 23 * K ) ;
     ovt->OpenVmTilSize = ( 9 * K ) ;
     ovt->DataStackSize = 8 * KB ;
 #endif    

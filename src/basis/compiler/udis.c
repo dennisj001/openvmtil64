@@ -1,5 +1,5 @@
 
-#include "../../include/cfrtil64.h"
+#include "../../include/csl.h"
 
 void
 _Udis_PrintInstruction ( ud_t * ud, byte * address, byte * prefix, byte * postfix )
@@ -8,7 +8,7 @@ _Udis_PrintInstruction ( ud_t * ud, byte * address, byte * prefix, byte * postfi
     //                                      //prefix <addr>      <code hex>  <code disassembly> <call/jmp naming>
     //                                        prefix ud_insn_off ud_insn_hex ud_insn_asm  postfix
     //                                        "%s    0x%-12x     \t% -17s    %-15s        \t-30%s"
-    byte * buffer = Buffer_Data_Cleared ( _CFT_->StringInsertB3 ) ;
+    byte * buffer = Buffer_Data_Cleared ( _CSL_->StringInsertB3 ) ;
     byte *format = ( byte* ) "\n%s0x%-16lx% -24s%-25s%-30s", *formats = ( byte* ) "\n%s0x%-16lx% -24s%-40s%-30s" ;
 
     postfix = GetPostfix ( address, postfix, buffer ) ; // buffer is returned as postfix by GetPostfix

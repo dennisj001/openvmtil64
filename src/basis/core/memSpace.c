@@ -1,5 +1,5 @@
 
-#include "../../include/cfrtil64.h"
+#include "../../include/csl.h"
 
 const int64 MEM_FREE = 0 ;
 const int64 MEM_ALLOC = 1 ;
@@ -28,7 +28,7 @@ mmap_AllocMem ( int64 size )
         perror ( "_Mem_Mmap" ) ;
         OVT_ShowMemoryAllocated ( ) ;
         //OVT_Exit ( ) ;
-        CFT_FullRestart ( ) ;
+        CSL_FullRestart ( ) ;
     }
     //Kbhit_Pause ( ) ;
     memset ( mem, 0, size ) ; // ?? : is this necessary??
@@ -173,14 +173,14 @@ Mem_Allocate ( int64 size, uint64 allocType )
         case LISP_TEMP: return _Allocate ( size, ms->LispTempSpace ) ;
         case CONTEXT: return _Allocate ( size, ms->ContextSpace ) ;
         case COMPILER_TEMP: return _Allocate ( size, ms->CompilerTempObjectSpace ) ;
-        case CFRTIL: case DATA_STACK: return _Allocate ( size, ms->CfrTilInternalSpace ) ;
+        case T_CSL: case DATA_STACK: return _Allocate ( size, ms->CSLInternalSpace ) ;
         case STRING_MEMORY: return _Allocate ( size, ms->StringSpace ) ;
         case RUNTIME: // not used??
         {
             _O_->RunTimeAllocation += size ;
             return mmap_AllocMem ( size ) ;
         }
-        default: CFT_Exception ( MEMORY_ALLOCATION_ERROR, 0, QUIT ) ;
+        default: CSL_Exception ( MEMORY_ALLOCATION_ERROR, 0, QUIT ) ;
     }
     return 0 ;
 }
@@ -270,7 +270,7 @@ MemorySpace_Init ( MemorySpace * ms )
     OpenVmTil * ovt = _O_ ;
 
     ms->OpenVmTilSpace = MemorySpace_NBA_New ( ms, ( byte* ) "OpenVmTilSpace", ovt->OpenVmTilSize, OPENVMTIL ) ;
-    ms->CfrTilInternalSpace = MemorySpace_NBA_New ( ms, ( byte* ) "CfrTilInternalSpace", ovt->CfrTilSize, CFRTIL ) ;
+    ms->CSLInternalSpace = MemorySpace_NBA_New ( ms, ( byte* ) "CSLInternalSpace", ovt->CSLSize, T_CSL ) ;
     ms->ObjectSpace = MemorySpace_NBA_New ( ms, ( byte* ) "ObjectSpace", ovt->ObjectsSize, OBJECT_MEM ) ;
     ms->InternalObjectSpace = MemorySpace_NBA_New ( ms, ( byte* ) "InternalObjectSpace", ovt->InternalObjectsSize, INTERNAL_OBJECT_MEM ) ;
     ms->LispSpace = MemorySpace_NBA_New ( ms, ( byte* ) "LispSpace", ovt->LispSize, LISP ) ;
@@ -405,7 +405,7 @@ OVT_MemListFree_LispSpace ( )
 void
 OVT_MemListFree_CompilerTempObjects ( )
 {
-    if ( ! GetState ( _CFT_, (RT_DEBUG_ON|GLOBAL_SOURCE_CODE_MODE) ) ) OVT_MemList_FreeNBAMemory ( ( byte* ) "CompilerTempObjectSpace", 0, 1 ) ;
+    if ( ! GetState ( _CSL_, (RT_DEBUG_ON|GLOBAL_SOURCE_CODE_MODE) ) ) OVT_MemList_FreeNBAMemory ( ( byte* ) "CompilerTempObjectSpace", 0, 1 ) ;
 }
 
 void
@@ -433,9 +433,9 @@ OVT_MemListFree_HistorySpace ( )
 }
 
 void
-_OVT_MemListFree_CfrTilInternal ( )
+_OVT_MemListFree_CSLInternal ( )
 {
-    OVT_MemList_FreeNBAMemory ( ( byte* ) "CfrTilInternalSpace", 0, 1 ) ;
+    OVT_MemList_FreeNBAMemory ( ( byte* ) "CSLInternalSpace", 0, 1 ) ;
 }
 
 void
@@ -570,7 +570,7 @@ void
 Calculate_TotalNbaAccountedMemAllocated ( OpenVmTil * ovt, int64 flag )
 {
     _Calculate_TotalNbaAccountedMemAllocated ( ovt, flag ) ;
-    if ( _CFT_ && _DataStack_ ) // so we can use this function anywhere
+    if ( _CSL_ && _DataStack_ ) // so we can use this function anywhere
     {
         int64 dsu = DataStack_Depth ( ) * sizeof (int64 ) ;
         int64 dsa = ( STACK_SIZE * sizeof (int64 ) ) - dsu ;

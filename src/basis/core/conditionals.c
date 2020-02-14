@@ -1,4 +1,4 @@
-#include "../../include/cfrtil64.h"
+#include "../../include/csl.h"
 
 CaseNode *
 _CaseNode_New ( uint64 type, block block, int64 value )
@@ -12,7 +12,7 @@ _CaseNode_New ( uint64 type, block block, int64 value )
 // ( q n -- )
 
 void
-_CFT_Case ( uint64 allocType )
+_CSL_Case ( uint64 allocType )
 {
     block caseBlock ;
     int64 caseValue ;
@@ -20,7 +20,7 @@ _CFT_Case ( uint64 allocType )
     {
         caseBlock = ( block ) TOS ;
         Word * literalWord = WordsBack ( 1 ) ;
-        if ( ! ( literalWord->W_ObjectAttributes & LITERAL ) ) CFT_Exception (CASE_NOT_LITERAL_ERROR, 0, 1 ) ;
+        if ( ! ( literalWord->W_ObjectAttributes & LITERAL ) ) CSL_Exception (CASE_NOT_LITERAL_ERROR, 0, 1 ) ;
         caseValue = ( int64 ) literalWord->W_Value ;
         SetHere (literalWord->Coding, 1) ;
         DataStack_DropN ( 1 ) ;
@@ -42,9 +42,9 @@ _CFT_Case ( uint64 allocType )
 }
 
 void
-CFT_Case ( )
+CSL_Case ( )
 {
-    _CFT_Case ( DICTIONARY ) ;
+    _CSL_Case ( DICTIONARY ) ;
 }
 
 void
@@ -65,7 +65,7 @@ SwitchAccessFunction ( )
 }
 
 void
-CFT_Switch ( )
+CSL_Switch ( )
 {
     if ( CompileMode )
     {

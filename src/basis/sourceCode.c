@@ -1,5 +1,5 @@
 
-#include "../include/cfrtil64.h"
+#include "../include/csl.h"
 
 void
 SC_ShowDbgSourceCodeWord_Or_AtAddress ( Word * scWord0, byte * address )
@@ -12,10 +12,10 @@ SC_ShowDbgSourceCodeWord_Or_AtAddress ( Word * scWord0, byte * address )
         else scWord = scWord0 ;
         if ( scWord )
         {
-            dllist * list = scWord->W_SC_WordList ? scWord->W_SC_WordList : _CFT_->Compiler_N_M_Node_WordList ; //&& ( scWord->W_SC_MemSpaceRandMarker == _O_->MemorySpace0->TempObjectSpace->InitFreedRandMarker ) ) ? scWord->W_SC_WordList : 0 ; //CFT->CompilerWordList ;
+            dllist * list = scWord->W_SC_WordList ? scWord->W_SC_WordList : _CSL_->Compiler_N_M_Node_WordList ; //&& ( scWord->W_SC_MemSpaceRandMarker == _O_->MemorySpace0->TempObjectSpace->InitFreedRandMarker ) ) ? scWord->W_SC_WordList : 0 ; //CSL->CompilerWordList ;
             if ( list )
             {
-                byte *sourceCode = scWord->W_SourceCode ; //? scWord->W_SourceCode : String_New ( CFT->SC_Buffer, TEMPORARY ) ;
+                byte *sourceCode = scWord->W_SourceCode ; //? scWord->W_SourceCode : String_New ( CSL->SC_Buffer, TEMPORARY ) ;
                 if ( ! String_Equal ( sourceCode, "" ) )
                 {
                     int64 fixed = 0 ;
@@ -43,7 +43,7 @@ SC_ShowDbgSourceCodeWord_Or_AtAddress ( Word * scWord0, byte * address )
 Boolean
 SC_ShowSourceCode_In_Word_At_Address ( Word * word, byte * address )
 {
-    if ( GetState ( _CFT_, GLOBAL_SOURCE_CODE_MODE ) ) //DEBUG_SOURCE_CODE_MODE ) ) // ( _Context_->CurrentlyRunningWord ) && _Context_->CurrentlyRunningWord->W_SC_WordList ) )
+    if ( GetState ( _CSL_, GLOBAL_SOURCE_CODE_MODE ) ) //DEBUG_SOURCE_CODE_MODE ) ) // ( _Context_->CurrentlyRunningWord ) && _Context_->CurrentlyRunningWord->W_SC_WordList ) )
     {
         if ( ! word ) word = Get_SourceCodeWord ( ) ;
         SC_ShowDbgSourceCodeWord_Or_AtAddress ( word, address ) ;
@@ -79,7 +79,7 @@ SC_IsWord_MatchCorrectConsideringBlockOrCombinator ( Word * word )
  * 
  * Compiler Word List has nodes (CWLNs) with 2 slots one for the *word and one for a pointer to a Source Code Node (SCN) which has source code index info.
  * CWLN : slot 0 word, slot 1 SCN
- * Source code nodes (SCNs) have three slots for the source code byte index, the code address, and a pointer to the word, they are on the CFT->DebugWordList.
+ * Source code nodes (SCNs) have three slots for the source code byte index, the code address, and a pointer to the word, they are on the CSL->DebugWordList.
  * SCN : slot 0 : SCN_T_WORD, slot 1 : SCN_T_WORD_SC_INDEX, slot 2 : address is SCN_T_WORD->Coding = word->Coding
  * So, they each have pointers to each other.
  * 
@@ -99,8 +99,8 @@ DWL_Find ( dllist * list, Word * iword, byte * address, byte* name, int64 takeFi
         {
             aFoundWord = ( Word* ) dobject_Get_M_Slot ( ( dobject* ) anode, SCN_T_WORD ) ;
             iuFlag = dobject_Get_M_Slot ( ( dobject* ) anode, SCN_IN_USE_FLAG ) ;
-            //if ( ( ! aFoundWord->S_WordData ) || ( ! ( iuFlag & SCN_IN_USE_FOR_SOURCE_CODE ) ) ) continue ;
-            if ( ( ! aFoundWord->S_WordData ) || ( ! ( iuFlag ) ) ) continue ;
+            //if ( ( ! aFoundWord->W_WordData ) || ( ! ( iuFlag & SCN_IN_USE_FOR_SOURCE_CODE ) ) ) continue ;
+            if ( ( ! aFoundWord->W_WordData ) || ( ! ( iuFlag ) ) ) continue ;
             scwi = dobject_Get_M_Slot ( ( dobject* ) anode, SCN_SC_WORD_INDEX ) ;
             naddress = aFoundWord->SourceCoding ;
             if ( iword && ( aFoundWord == iword ) ) return aFoundWord ;
@@ -155,20 +155,20 @@ Boolean
 SC_List_AdjustAddress ( dlnode * node, byte * address, byte * newAddress )
 {
     Word * nword = ( Word* ) dobject_Get_M_Slot ( ( dobject* ) node, SCN_T_WORD ) ;
-    if ( nword->S_WordData && ( nword->Coding == address ) )
+    if ( nword->W_WordData && ( nword->Coding == address ) )
     {
         Word_SetCoding ( nword, newAddress ) ;
         if ( nword->SourceCoding ) Word_SetSourceCoding ( nword, newAddress ) ;
-        dobject_Set_M_Slot ( ( dobject* ) node, SCN_IN_USE_FLAG, SCN_IN_USE_FLAG_ALL ) ; // reset after CFT_AdjustDbgSourceCode_InUseFalse
+        dobject_Set_M_Slot ( ( dobject* ) node, SCN_IN_USE_FLAG, SCN_IN_USE_FLAG_ALL ) ; // reset after CSL_AdjustDbgSourceCode_InUseFalse
         return true ;
     }
     return false ;
 }
 
 void
-CFT_AdjustDbgSourceCodeAddress ( byte * address, byte * newAddress )
+CSL_AdjustDbgSourceCodeAddress ( byte * address, byte * newAddress )
 {
-    dllist * list = _CFT_->Compiler_N_M_Node_WordList ;
+    dllist * list = _CSL_->Compiler_N_M_Node_WordList ;
     if ( list ) dllist_Map2 ( list, ( MapFunction2 ) SC_List_AdjustAddress, ( int64 ) address, ( int64 ) newAddress ) ;
 }
 
@@ -182,9 +182,9 @@ SC_List_Set_NotInUseForSC ( dlnode * node, byte * address )
 }
 
 void
-CFT_AdjustDbgSourceCode_ScInUseFalse ( byte * address )
+CSL_AdjustDbgSourceCode_ScInUseFalse ( byte * address )
 {
-    dllist * list = _CFT_->Compiler_N_M_Node_WordList ;
+    dllist * list = _CSL_->Compiler_N_M_Node_WordList ;
     if ( list ) dllist_Map1 ( list, ( MapFunction1 ) SC_List_Set_NotInUseForSC, ( int64 ) address ) ;
 }
 #endif
@@ -210,23 +210,23 @@ DLList_RecycleInit_WordList ( Word * word )
 }
 
 void
-_CFT_RecycleInit_Compiler_N_M_Node_WordList ( )
+_CSL_RecycleInit_Compiler_N_M_Node_WordList ( )
 {
-    if ( ( ! GetState ( _CFT_, ( RT_DEBUG_ON | DEBUG_SOURCE_CODE_MODE | GLOBAL_SOURCE_CODE_MODE ) ) ) )
+    if ( ( ! GetState ( _CSL_, ( RT_DEBUG_ON | DEBUG_SOURCE_CODE_MODE | GLOBAL_SOURCE_CODE_MODE ) ) ) )
     {
-        DLList_Recycle_WordList ( _CFT_->Compiler_N_M_Node_WordList ) ;
+        DLList_Recycle_WordList ( _CSL_->Compiler_N_M_Node_WordList ) ;
     }
-    List_Init ( _CFT_->Compiler_N_M_Node_WordList ) ;
+    List_Init ( _CSL_->Compiler_N_M_Node_WordList ) ;
 }
 
 void
-CFT_WordList_Init ( Word * word )
+CSL_WordList_Init ( Word * word )
 {
-    _CFT_RecycleInit_Compiler_N_M_Node_WordList ( ) ;
+    _CSL_RecycleInit_Compiler_N_M_Node_WordList ( ) ;
     if ( word )
     {
         //if ( ! GetState ( _Compiler_, LISP_MODE ) ) word->W_SC_Index = 0 ; // before pushWord !
-        CFT_WordList_PushWord ( word ) ; // for source code
+        CSL_WordList_PushWord ( word ) ; // for source code
     }
 }
 
@@ -267,7 +267,7 @@ void
 SC_ListClearAddress ( dlnode * node, byte * address )
 {
     Word * nword = ( Word* ) dobject_Get_M_Slot ( ( dobject* ) node, SCN_T_WORD ) ;
-    if ( nword->S_WordData && ( nword->SourceCoding == address ) ) //&& ( nword->W_SC_WordIndex != word->W_SC_WordIndex ) )
+    if ( nword->W_WordData && ( nword->SourceCoding == address ) ) //&& ( nword->W_SC_WordIndex != word->W_SC_WordIndex ) )
     {
         Word_SetSourceCoding ( nword, 0 ) ;
         d0 ( if ( Is_DebugModeOn ) _Printf ( ( byte* ) "\nnword %s with scwi %d :: cleared for word %s with scwi %d",
@@ -280,7 +280,7 @@ Compiler_Word_SetCoding_And_ClearPreviousUseOf_A_SCA ( Word * word, byte * codin
 {
     if ( Compiling && word )
     {
-        if ( clearPreviousFlag ) dllist_Map1_FromEnd ( _CFT_->Compiler_N_M_Node_WordList, ( MapFunction1 ) SC_ListClearAddress, ( int64 ) coding ) ; //dllist_Map1_FromEnd ( CFT->CompilerWordList, ( MapFunction1 ) SC_ListClearAddress, ( int64 ) Here ) ; //( int64 ) word, ( int64 ) Here ) ;
+        if ( clearPreviousFlag ) dllist_Map1_FromEnd ( _CSL_->Compiler_N_M_Node_WordList, ( MapFunction1 ) SC_ListClearAddress, ( int64 ) coding ) ; //dllist_Map1_FromEnd ( CSL->CompilerWordList, ( MapFunction1 ) SC_ListClearAddress, ( int64 ) Here ) ; //( int64 ) word, ( int64 ) Here ) ;
         Word_SetCodingAndSourceCoding ( word, coding ) ;
     }
 }
@@ -292,18 +292,18 @@ Compiler_SCA_Word_SetCodingHere_And_ClearPreviousUse ( Word * word, Boolean clea
 }
 
 Word *
-_CFT_WordList_TopWord ( )
+_CSL_WordList_TopWord ( )
 {
     Word * word = 0 ;
-    node * first = _dllist_First ( _CFT_->Compiler_N_M_Node_WordList ) ;
+    node * first = _dllist_First ( _CSL_->Compiler_N_M_Node_WordList ) ;
     if ( first ) word = ( Word* ) dobject_Get_M_Slot ( ( dobject* ) first, SCN_T_WORD ) ;
     return word ;
 }
 
 Word *
-_CFT_WordList_PopWords ( int64 n )
+_CSL_WordList_PopWords ( int64 n )
 {
-    dllist * list = _CFT_->Compiler_N_M_Node_WordList ;
+    dllist * list = _CSL_->Compiler_N_M_Node_WordList ;
     dlnode * node, *nextNode ;
     Word * wordn = 0 ;
     if ( list )
@@ -320,28 +320,28 @@ _CFT_WordList_PopWords ( int64 n )
 }
 
 Word *
-CFT_WordLists_PopWord ( )
+CSL_WordLists_PopWord ( )
 {
-    Word * word = _CFT_WordList_PopWords ( 1 ) ;
+    Word * word = _CSL_WordList_PopWords ( 1 ) ;
     return word ;
 }
 
 void
-CFT_WordList_Push ( Word * word, Boolean inUseFlag )
+CSL_WordList_Push ( Word * word, Boolean inUseFlag )
 {
-    _List_PushNew_ForWordList ( _CFT_->Compiler_N_M_Node_WordList, word, inUseFlag ) ;
+    _List_PushNew_ForWordList ( _CSL_->Compiler_N_M_Node_WordList, word, inUseFlag ) ;
 }
 
 void
-_CFT_WordList_PushWord ( Word * word, int64 inUseFlag )
+_CSL_WordList_PushWord ( Word * word, int64 inUseFlag )
 {
-    CFT_WordList_Push ( word, inUseFlag ? SCN_IN_USE_FLAG_ALL : 0 ) ;
+    CSL_WordList_Push ( word, inUseFlag ? SCN_IN_USE_FLAG_ALL : 0 ) ;
 }
 
 void
-CFT_WordList_PushWord ( Word * word )
+CSL_WordList_PushWord ( Word * word )
 {
-    _CFT_WordList_PushWord ( word,
+    _CSL_WordList_PushWord ( word,
 #if 0 // old        
         ( ! ( word->CAttribute & ( NAMESPACE | OBJECT_OPERATOR | OBJECT_FIELD ) ) ) || ( word->CAttribute & ( DOBJECT | NAMESPACE_VARIABLE ) ) ) ;
 #elif 0 // new        
@@ -406,11 +406,11 @@ SC_WordList_Show ( dllist * list, Word * scWord, Boolean fromFirstFlag, Boolean 
 // too much/many shows ?? combine some
 
 void
-CFT_WordList_Show ( Word * word, byte * prefix, Boolean inUseOnlyFlag, Boolean showInDebugColors )
+CSL_WordList_Show ( Word * word, byte * prefix, Boolean inUseOnlyFlag, Boolean showInDebugColors )
 {
-    //dllist * list = Compiling ? CFT->Compiler_N_M_Node_WordList : ( word && word->W_SC_WordList ) ? word->W_SC_WordList : CFT->Compiler_N_M_Node_WordList ;
-    dllist * list = ( word && word->W_SC_WordList ) ? word->W_SC_WordList : _CFT_->Compiler_N_M_Node_WordList ;
-    byte *buffer = Buffer_Data ( _CFT_->ScratchB1 ) ;
+    //dllist * list = Compiling ? CSL->Compiler_N_M_Node_WordList : ( word && word->W_SC_WordList ) ? word->W_SC_WordList : CSL->Compiler_N_M_Node_WordList ;
+    dllist * list = ( word && word->W_SC_WordList ) ? word->W_SC_WordList : _CSL_->Compiler_N_M_Node_WordList ;
+    byte *buffer = Buffer_Data ( _CSL_->ScratchB1 ) ;
     buffer[0] = 0 ;
     if ( list )
     {
@@ -418,7 +418,7 @@ CFT_WordList_Show ( Word * word, byte * prefix, Boolean inUseOnlyFlag, Boolean s
         if ( word )
         {
             sprintf ( ( char* ) buffer, "%sWord = %s = %lx :: list = %s %lx : %s", prefix ? prefix : ( byte* ) "", ( char* ) word->Name, ( int64 ) word,
-                ( list == _CFT_->Compiler_N_M_Node_WordList ) ? "CfrTil WordList" : "source code word list = ", ( int64 ) list, inUseOnlyFlag ? "in use only" : "all" ) ;
+                ( list == _CSL_->Compiler_N_M_Node_WordList ) ? "CSL WordList" : "source code word list = ", ( int64 ) list, inUseOnlyFlag ? "in use only" : "all" ) ;
         }
         SC_WordList_Show ( list, word, 0, inUseOnlyFlag, buffer ) ;
         if ( Is_DebugModeOn || showInDebugColors ) DefaultColors ;
@@ -426,40 +426,40 @@ CFT_WordList_Show ( Word * word, byte * prefix, Boolean inUseOnlyFlag, Boolean s
 }
 
 void
-_CFT_SC_WordList_Show ( byte * prefix, Boolean inUseOnlyFlag, Boolean showInDebugColors )
+_CSL_SC_WordList_Show ( byte * prefix, Boolean inUseOnlyFlag, Boolean showInDebugColors )
 {
     Word * scWord = Get_SourceCodeWord ( ) ;
-    CFT_WordList_Show ( scWord, prefix, inUseOnlyFlag, showInDebugColors ) ;
+    CSL_WordList_Show ( scWord, prefix, inUseOnlyFlag, showInDebugColors ) ;
 }
 
 void
-CFT_SC_WordList_Show ( )
+CSL_SC_WordList_Show ( )
 {
-    _CFT_SC_WordList_Show ( 0, 0, 0 ) ;
+    _CSL_SC_WordList_Show ( 0, 0, 0 ) ;
 }
 
 void
-CFT_DbgSourceCodeOff ( )
+CSL_DbgSourceCodeOff ( )
 {
-    SetState ( _CFT_, GLOBAL_SOURCE_CODE_MODE, false ) ;
+    SetState ( _CSL_, GLOBAL_SOURCE_CODE_MODE, false ) ;
 }
 
 void
-CFT_DbgSourceCodeOn ( )
+CSL_DbgSourceCodeOn ( )
 {
-    SetState ( _CFT_, GLOBAL_SOURCE_CODE_MODE, true ) ;
+    SetState ( _CSL_, GLOBAL_SOURCE_CODE_MODE, true ) ;
 }
 
 void
-CFT_DbgSourceCodeOn_Global ( )
+CSL_DbgSourceCodeOn_Global ( )
 {
-    SetState ( _CFT_, ( DEBUG_SOURCE_CODE_MODE | GLOBAL_SOURCE_CODE_MODE ), true ) ;
+    SetState ( _CSL_, ( DEBUG_SOURCE_CODE_MODE | GLOBAL_SOURCE_CODE_MODE ), true ) ;
 }
 
 void
-CFT_DbgSourceCodeOff_Global ( )
+CSL_DbgSourceCodeOff_Global ( )
 {
-    SetState ( _CFT_, ( DEBUG_SOURCE_CODE_MODE | GLOBAL_SOURCE_CODE_MODE ), false ) ;
+    SetState ( _CSL_, ( DEBUG_SOURCE_CODE_MODE | GLOBAL_SOURCE_CODE_MODE ), false ) ;
 }
 
 // debug source code functions (above)
@@ -467,136 +467,136 @@ CFT_DbgSourceCodeOff_Global ( )
 // text source code functions (below)
 
 void
-_CFT_AddStringToSourceCode ( CfrTil * cfrtil, byte * str )
+_CSL_AddStringToSourceCode ( CSL * csl, byte * str )
 {
     if ( str )
     {
-        strcat ( ( char* ) cfrtil->SC_Buffer, ( char* ) str ) ;
-        strcat ( ( CString ) cfrtil->SC_Buffer, ( CString ) " " ) ;
+        strcat ( ( char* ) csl->SC_Buffer, ( char* ) str ) ;
+        strcat ( ( CString ) csl->SC_Buffer, ( CString ) " " ) ;
     }
 }
 
 void
-CFT_AddStringToSourceCode ( CfrTil * cfrtil, byte * str )
+CSL_AddStringToSourceCode ( CSL * csl, byte * str )
 {
-    _CFT_AddStringToSourceCode ( cfrtil, str ) ;
-    cfrtil->SC_Index += ( Strlen ( ( char* ) str ) + 1 ) ; // 1 : add " " (above)
+    _CSL_AddStringToSourceCode ( csl, str ) ;
+    csl->SC_Index += ( Strlen ( ( char* ) str ) + 1 ) ; // 1 : add " " (above)
 }
 
 void
-_CFT_SC_ScratchPadIndex_Init ( CfrTil * cfrtil )
+_CSL_SC_ScratchPadIndex_Init ( CSL * csl )
 {
-    cfrtil->SC_Index = Strlen ( ( char* ) _CFT_->SC_Buffer ) ;
+    csl->SC_Index = Strlen ( ( char* ) _CSL_->SC_Buffer ) ;
 }
 
 // don't be confused by SourceCode_Init is different from InitSourceCode
 
 void
-_CFT_SourceCode_Init ( CfrTil * cfrtil )
+_CSL_SourceCode_Init ( CSL * csl )
 {
-    if ( GetState ( _CFT_, SOURCE_CODE_ON ) )
+    if ( GetState ( _CSL_, SOURCE_CODE_ON ) )
     {
-        cfrtil->SC_Buffer [ 0 ] = 0 ;
-        cfrtil->SC_Index = 0 ;
-        SetState ( cfrtil, SOURCE_CODE_STARTED, false ) ;
+        csl->SC_Buffer [ 0 ] = 0 ;
+        csl->SC_Index = 0 ;
+        SetState ( csl, SOURCE_CODE_STARTED, false ) ;
     }
 }
 
 void
-CFT_SourceCode_InitStart ( CfrTil * cfrtil )
+CSL_SourceCode_InitStart ( CSL * csl )
 {
-    if ( GetState ( _CFT_, SOURCE_CODE_ON ) )
+    if ( GetState ( _CSL_, SOURCE_CODE_ON ) )
     {
-        _CFT_SourceCode_Init ( cfrtil ) ;
-        cfrtil->SCI.SciFileIndexScStart = _ReadLiner_->FileCharacterNumber ;
-        SetState ( cfrtil, SOURCE_CODE_STARTED, true ) ;
+        _CSL_SourceCode_Init ( csl ) ;
+        csl->SCI.SciFileIndexScStart = _ReadLiner_->FileCharacterNumber ;
+        SetState ( csl, SOURCE_CODE_STARTED, true ) ;
     }
 }
 
 void
-_CFT_InitSourceCode ( CfrTil * cfrtil )
+_CSL_InitSourceCode ( CSL * csl )
 {
-    if ( GetState ( _CFT_, SOURCE_CODE_ON ) )
+    if ( GetState ( _CSL_, SOURCE_CODE_ON ) )
     {
-        CFT_SourceCode_InitStart ( cfrtil ) ;
+        CSL_SourceCode_InitStart ( csl ) ;
         Lexer_SourceCodeOn ( _Context_->Lexer0 ) ;
     }
 }
 
 void
-CFT_InitSourceCode ( CfrTil * cfrtil )
+CSL_InitSourceCode ( CSL * csl )
 {
-    if ( GetState ( _CFT_, SOURCE_CODE_ON ) )
+    if ( GetState ( _CSL_, SOURCE_CODE_ON ) )
     {
-        _CFT_InitSourceCode ( cfrtil ) ;
-        _CFT_SC_ScratchPadIndex_Init ( cfrtil ) ;
+        _CSL_InitSourceCode ( csl ) ;
+        _CSL_SC_ScratchPadIndex_Init ( csl ) ;
     }
 }
 
 void
-CFT_InitSourceCode_WithName ( CfrTil * cfrtil, byte * name, Boolean force )
+CSL_InitSourceCode_WithName ( CSL * csl, byte * name, Boolean force )
 {
-    if ( force || ( GetState ( _CFT_, SOURCE_CODE_ON ) && ( ( ! Compiling ) || ( ! ( GetState ( cfrtil, SOURCE_CODE_STARTED ) ) ) ) ) )
+    if ( force || ( GetState ( _CSL_, SOURCE_CODE_ON ) && ( ( ! Compiling ) || ( ! ( GetState ( csl, SOURCE_CODE_STARTED ) ) ) ) ) )
     {
-        _CFT_InitSourceCode ( cfrtil ) ;
-        _CFT_AddStringToSourceCode ( cfrtil, name ) ;
-        _CFT_SC_ScratchPadIndex_Init ( cfrtil ) ;
+        _CSL_InitSourceCode ( csl ) ;
+        _CSL_AddStringToSourceCode ( csl, name ) ;
+        _CSL_SC_ScratchPadIndex_Init ( csl ) ;
     }
 }
 
 void
-CFT_InitSourceCode_WithCurrentInputChar ( CfrTil * cfrtil, Boolean force )
+CSL_InitSourceCode_WithCurrentInputChar ( CSL * csl, Boolean force )
 {
-    if ( force || ( GetState ( _CFT_, SOURCE_CODE_ON ) && ( ( ! Compiling ) || ( ! ( GetState ( cfrtil, SOURCE_CODE_STARTED ) ) ) ) ) )
+    if ( force || ( GetState ( _CSL_, SOURCE_CODE_ON ) && ( ( ! Compiling ) || ( ! ( GetState ( csl, SOURCE_CODE_STARTED ) ) ) ) ) )
     {
         Lexer * lexer = _Context_->Lexer0 ;
-        _CFT_InitSourceCode ( cfrtil ) ;
+        _CSL_InitSourceCode ( csl ) ;
         _Lexer_AppendCharToSourceCode ( lexer, lexer->TokenInputByte, 0 ) ;
     }
 }
 
 void
-CFT_SourceCode_Init ( )
+CSL_SourceCode_Init ( )
 {
     Word * word = _Interpreter_->w_Word ;
-    CFT_InitSourceCode_WithName ( _CFT_, word ? word->Name : 0, 1 ) ;
+    CSL_InitSourceCode_WithName ( _CSL_, word ? word->Name : 0, 1 ) ;
 }
 
 void
-CFT_Lexer_SourceCodeOn ( )
+CSL_Lexer_SourceCodeOn ( )
 {
     Lexer_SourceCodeOn ( _Context_->Lexer0 ) ;
 }
 
 byte *
-_CFT_GetSourceCode ( )
+_CSL_GetSourceCode ( )
 {
-    byte * sc = String_New_SourceCode ( _CFT_->SC_Buffer ) ;
+    byte * sc = String_New_SourceCode ( _CSL_->SC_Buffer ) ;
     return sc ;
 }
 
 void
-_CFT_SetSourceCodeWord ( Word * word )
+_CSL_SetSourceCodeWord ( Word * word )
 {
-    _CFT_->SCI.SciWord = word ; //SC_Word = word ;
+    _CSL_->SCI.SciWord = word ; //SC_Word = word ;
 }
 
 void
-CFT_SetSourceCodeWord ( )
+CSL_SetSourceCodeWord ( )
 {
     Word * word = ( Word* ) DataStack_Pop ( ) ;
-    _CFT_SetSourceCodeWord ( word ) ;
+    _CSL_SetSourceCodeWord ( word ) ;
 }
 
 void
-CFT_Finish_WordSourceCode ( CfrTil * cfrtil, Word * word )
+CSL_Finish_WordSourceCode ( CSL * csl, Word * word )
 {
-    if ( ! word->W_SourceCode ) word->W_SourceCode = _CFT_GetSourceCode ( ) ;
+    if ( ! word->W_SourceCode ) word->W_SourceCode = _CSL_GetSourceCode ( ) ;
     Lexer_SourceCodeOff ( _Lexer_ ) ;
-    //cfrtil->SCI.SciFileIndexScEnd = _ReadLiner_->FileCharacterNumber ;
-    word->SC_FileIndex_Start = cfrtil->SCI.SciFileIndexScStart ;
-    word->SC_FileIndex_End = cfrtil->SCI.SciFileIndexScEnd ;
-    _CFT_SourceCode_Init ( cfrtil ) ;
+    //csl->SCI.SciFileIndexScEnd = _ReadLiner_->FileCharacterNumber ;
+    word->SC_FileIndex_Start = csl->SCI.SciFileIndexScStart ;
+    word->SC_FileIndex_End = csl->SCI.SciFileIndexScEnd ;
+    _CSL_SourceCode_Init ( csl ) ;
 }
 
 void
@@ -613,38 +613,38 @@ SCN_Set_NotInUseForOptimization ( dlnode * node )
 // the logic needs to be reworked with recycling in these functions
 
 void
-_CFT_UnAppendFromSourceCode_NChars ( CfrTil * cfrtil, int64 nchars )
+_CSL_UnAppendFromSourceCode_NChars ( CSL * csl, int64 nchars )
 {
-    int64 plen = Strlen ( ( CString ) cfrtil->SC_Buffer ) ;
-    if ( plen >= nchars ) cfrtil->SC_Buffer [ Strlen ( ( CString ) cfrtil->SC_Buffer ) - nchars ] = 0 ;
-    _CFT_SC_ScratchPadIndex_Init ( cfrtil ) ;
+    int64 plen = Strlen ( ( CString ) csl->SC_Buffer ) ;
+    if ( plen >= nchars ) csl->SC_Buffer [ Strlen ( ( CString ) csl->SC_Buffer ) - nchars ] = 0 ;
+    _CSL_SC_ScratchPadIndex_Init ( csl ) ;
 }
 
 void
-_CFT_UnAppendTokenFromSourceCode ( CfrTil * cfrtil, byte * tkn )
+_CSL_UnAppendTokenFromSourceCode ( CSL * csl, byte * tkn )
 {
-    if ( GetState ( _Lexer_, ( ADD_TOKEN_TO_SOURCE | ADD_CHAR_TO_SOURCE ) ) ) _CFT_UnAppendFromSourceCode_NChars ( cfrtil, Strlen ( ( CString ) tkn ) + 1 ) ;
+    if ( GetState ( _Lexer_, ( ADD_TOKEN_TO_SOURCE | ADD_CHAR_TO_SOURCE ) ) ) _CSL_UnAppendFromSourceCode_NChars ( csl, Strlen ( ( CString ) tkn ) + 1 ) ;
 }
 
 void
-_CFT_AppendCharToSourceCode ( CfrTil * cfrtil, byte c )
+_CSL_AppendCharToSourceCode ( CSL * csl, byte c )
 {
-    cfrtil->SC_Buffer [ cfrtil->SC_Index ++ ] = c ;
-    cfrtil->SC_Buffer [ cfrtil->SC_Index ] = 0 ;
+    csl->SC_Buffer [ csl->SC_Index ++ ] = c ;
+    csl->SC_Buffer [ csl->SC_Index ] = 0 ;
 }
 
 void
-CFT_AppendCharToSourceCode ( CfrTil * cfrtil, byte c )
+CSL_AppendCharToSourceCode ( CSL * csl, byte c )
 {
-    if ( cfrtil->SC_Index < ( SOURCE_CODE_BUFFER_SIZE - 1 ) )
+    if ( csl->SC_Index < ( SOURCE_CODE_BUFFER_SIZE - 1 ) )
     {
         if ( c == '"' )
         {
-            if ( cfrtil->SC_QuoteMode ) cfrtil->SC_QuoteMode = 0 ;
-            else cfrtil->SC_QuoteMode = 1 ;
-            _CFT_AppendCharToSourceCode ( cfrtil, c ) ;
+            if ( csl->SC_QuoteMode ) csl->SC_QuoteMode = 0 ;
+            else csl->SC_QuoteMode = 1 ;
+            _CSL_AppendCharToSourceCode ( csl, c ) ;
         }
-        else _String_AppendConvertCharToBackSlash ( cfrtil->SC_Buffer, c, &cfrtil->SC_Index, true ) ;
+        else _String_AppendConvertCharToBackSlash ( csl->SC_Buffer, c, &csl->SC_Index, true ) ;
     }
 }
 
@@ -657,8 +657,8 @@ Get_SourceCodeWord ( )
     {
         if ( GetState ( debugger, DBG_STEPPING ) ) scWord = debugger->w_Word ;
         if ( ( ! scWord ) && ( ! ( scWord = GetState ( _Compiler_, ( COMPILE_MODE | ASM_MODE ) ) ?
-            _Context_->CurrentWordBeingCompiled : _CFT_->LastFinished_Word ?
-            _CFT_->LastFinished_Word : _CFT_->SC_Word ? _CFT_->SC_Word : _Compiler_->Current_Word_Create ) ) )
+            _Context_->CurrentWordBeingCompiled : _CSL_->LastFinished_Word ?
+            _CSL_->LastFinished_Word : _CSL_->SC_Word ? _CSL_->SC_Word : _Compiler_->Current_Word_Create ) ) )
         {
             if ( debugger && Is_DebugOn )
             {
@@ -667,40 +667,40 @@ Get_SourceCodeWord ( )
             }
         }
     }
-    return (scWord && scWord->S_WordData ) ? scWord : 0 ;
+    return (scWord && scWord->W_WordData ) ? scWord : 0 ;
 }
 
 #if 0
 
 void
-CFT_SourceCodeCompileOn_Colon ( )
+CSL_SourceCodeCompileOn_Colon ( )
 {
-    CFT_DbgSourceCodeOn ( ) ;
-    CFT_SourceCode_Init ( ) ;
-    //CFT_WordList_RecycleInit ( CFT ) 
-    if ( ! GetState ( _Context_, C_SYNTAX ) ) _CFT_Colon ( 0 ) ;
+    CSL_DbgSourceCodeOn ( ) ;
+    CSL_SourceCode_Init ( ) ;
+    //CSL_WordList_RecycleInit ( CSL ) 
+    if ( ! GetState ( _Context_, C_SYNTAX ) ) _CSL_Colon ( 0 ) ;
 }
 
 void
-CFT_SourceCodeCompileOff_SemiColon ( )
+CSL_SourceCodeCompileOff_SemiColon ( )
 {
-    CFT_DbgSourceCodeOff ( ) ;
-    if ( ! GetState ( _Context_, C_SYNTAX ) ) CFT_SemiColon ( ) ;
+    CSL_DbgSourceCodeOff ( ) ;
+    if ( ! GetState ( _Context_, C_SYNTAX ) ) CSL_SemiColon ( ) ;
 }
 
 void
-CFT_DbgSourceCodeBeginBlock ( )
+CSL_DbgSourceCodeBeginBlock ( )
 {
-    SetState ( _CFT_, DEBUG_SOURCE_CODE_MODE, true ) ;
+    SetState ( _CSL_, DEBUG_SOURCE_CODE_MODE, true ) ;
     _SC_Global_On ;
-    if ( ! GetState ( _Context_, C_SYNTAX ) ) CFT_BeginBlock ( ) ;
+    if ( ! GetState ( _Context_, C_SYNTAX ) ) CSL_BeginBlock ( ) ;
 }
 
 void
-CFT_DbgSourceCodeEndBlock ( )
+CSL_DbgSourceCodeEndBlock ( )
 {
-    if ( ! GetState ( _Context_, C_SYNTAX ) ) CFT_EndBlock ( ) ;
-    CFT_DbgSourceCodeOff ( ) ;
+    if ( ! GetState ( _Context_, C_SYNTAX ) ) CSL_EndBlock ( ) ;
+    CSL_DbgSourceCodeOff ( ) ;
 }
 
 #endif

@@ -33,11 +33,11 @@
 // att syntax   : opcode src, dst
 
 // note : x86-32 instruction format : || prefixes : 0-4 bytes | opCode : 1-3 bytes | mod : 0 - 1 byte | sib : 0 - 1 byte | disp : 0-4 bytes | immediate : 0-4 bytes ||
-// note : intex syntax  : instruction dst, src - cfrTil uses this order convention
+// note : intex syntax  : instruction dst, src - csl uses this order convention
 //        att   syntax  : instruction src, dst
 // note : rm : reg memory - the register which contains the memory address in mod instructions
 
-// cfrTil uses intel syntax convention
+// csl uses intel syntax convention
 
 // note : intex syntax  : instruction dst, src
 //        att   syntax  : instruction src, dst
@@ -177,7 +177,7 @@
 #endif
 #define NO_INDEX ( 0x4 ) // for sib byte with no index
 
-// cfrTil uses RAX, RDX, R8D, R9D, R14, R15, RBX
+// csl uses RAX, RDX, R8D, R9D, R14, R15, RBX
 #define ACCUMULATOR_REG         RAX                     // rax
 #define ACC                     ACCUMULATOR_REG
 #define CPU_ACCUM               Rax
@@ -210,9 +210,9 @@ register uint64 *Fp             asm ( "r15" ) ;
 #define FP                      FRAME_POINTER
 
 //register uint64 *_RspReg_ asm ( "r10" ) ;
-#define CFRTIL_RETURN_STACK_POINTER         RBX         // rbx
-#define CFT_RSP                             CFRTIL_RETURN_STACK_POINTER
-#define CPU_CFT_RSP                         Rbx
+#define csl_RETURN_STACK_POINTER         RBX         // rbx
+#define CSL_RSP                             csl_RETURN_STACK_POINTER
+#define CPU_CSL_RSP                         Rbx
 
 // EFLAGS
 #define CARRY_FLAG ( 1 << 0 )

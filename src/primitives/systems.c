@@ -1,4 +1,4 @@
-#include "../include/cfrtil64.h"
+#include "../include/csl.h"
 
 // void getStdin(void) {Chr = getc(InFile), Env.put(Chr) ; }
 // void putStdout(int64 c) {putc(c, OutFile);}
@@ -33,14 +33,14 @@ TestAnd ( )
 }
 
 void
-CFT_ObjectNew ( ) //int64 size, byte * name, uint64 category, int64 allocType )
+CSL_ObjectNew ( ) //int64 size, byte * name, uint64 category, int64 allocType )
 {
     int64 allocType = DataStack_Pop ( ) ;
     int64 category = DataStack_Pop ( ) ;
     byte * name = ( byte* ) DataStack_Pop ( ) ;
     int64 size = DataStack_Pop ( ) ;
 
-    byte * obj = _CFT_NamelessObjectNew ( size, allocType ) ; //OBJECT_MEMORY ) ;
+    byte * obj = _CSL_NamelessObjectNew ( size, allocType ) ; //OBJECT_MEMORY ) ;
     Word * word = _DObject_New ( name, ( int64 ) obj, ( OBJECT | IMMEDIATE | category ), 0, 0, OBJECT, ( byte* ) _DataObject_Run, 0, 0, 0, DICTIONARY ) ;
     word->Size = size ;
     //return word ;
@@ -49,43 +49,43 @@ CFT_ObjectNew ( ) //int64 size, byte * name, uint64 category, int64 allocType )
 #endif
 
 void
-CFT_Jcc8_On ( )
+CSL_Jcc8_On ( )
 {
-    SetState ( _CFT_, JCC8_ON, true ) ;
+    SetState ( _CSL_, JCC8_ON, true ) ;
 }
 
 void
-CFT_Jcc8_Off ( )
+CSL_Jcc8_Off ( )
 {
-    SetState ( _CFT_, JCC8_ON, false ) ;
+    SetState ( _CSL_, JCC8_ON, false ) ;
 }
 
 void
-CFT_InitTime ( )
+CSL_InitTime ( )
 {
     System_InitTime ( _Context_->System0 ) ;
 }
 
 void
-CFT_TimerInit ( )
+CSL_TimerInit ( )
 {
     int64 timer = DataStack_Pop ( ) ;
     if ( timer < 8 )
     {
         _System_TimerInit ( _Context_->System0, timer ) ;
     }
-    else Throw ( "CFT_TimerInit : ", "Error: timer index must be less than 8", QUIT ) ;
+    else Throw ( "CSL_TimerInit : ", "Error: timer index must be less than 8", QUIT ) ;
 }
 
 void
-CFT_Time ( )
+CSL_Time ( )
 {
     int64 timer = DataStack_Pop ( ) ;
     System_Time ( _Context_->System0, timer, ( char* ) "\nTimer", 1 ) ;
 }
 
 void
-CFT_Throw ( )
+CSL_Throw ( )
 {
     byte * msg = ( byte * ) DataStack_Pop ( ) ;
     Throw ( "", msg, 0 ) ;
@@ -236,7 +236,7 @@ shell ( )
 }
 
 void
-CFT_Filename ( )
+CSL_Filename ( )
 {
     byte * filename = _Context_->ReadLiner0->Filename ;
     if ( ! filename ) filename = ( byte* ) "command line" ;
@@ -244,58 +244,58 @@ CFT_Filename ( )
 }
 
 void
-CFT_Location ( )
+CSL_Location ( )
 {
     _Printf ( _Context_Location ( _Context_ ) ) ;
 }
 
 void
-CFT_LineNumber ( )
+CSL_LineNumber ( )
 {
     DataStack_Push ( ( int64 ) _Context_->ReadLiner0->LineNumber ) ;
 }
 
 void
-CFT_LineCharacterNumber ( )
+CSL_LineCharacterNumber ( )
 {
     DataStack_Push ( ( int64 ) _Context_->ReadLiner0->ReadIndex ) ;
 }
 
 void
-_CFT_Version ( Boolean flag )
+_CSL_Version ( Boolean flag )
 {
-    //if ( flag || ( ( _O_->Verbosity ) && ( _O_->StartedTimes == 1 ) ) && (CFT->InitSessionCoreTimes == 1) )
+    //if ( flag || ( ( _O_->Verbosity ) && ( _O_->StartedTimes == 1 ) ) && (CSL->InitSessionCoreTimes == 1) )
     if ( flag || ( _O_->Restarts < 2 ) )
     {
-        //_Printf ( ( byte* ) "\ncfrTil64 %s", _O_->VersionString ) ;
+        //_Printf ( ( byte* ) "\ncsl %s", _O_->VersionString ) ;
         _Printf ( ( byte* ) "\nversion %s", _O_->VersionString ) ;
     }
 }
 
 void
-CFT_Version ( )
+CSL_Version ( )
 {
-    _CFT_Version ( 1 ) ;
+    _CSL_Version ( 1 ) ;
 }
 
 void
-CFT_SystemState_Print ( )
+CSL_SystemState_Print ( )
 {
-    _CFT_SystemState_Print ( 0 ) ;
+    _CSL_SystemState_Print ( 0 ) ;
 }
 
 void
 _SetEcho ( int64 boolFlag )
 {
     SetState ( _Context_->ReadLiner0, CHAR_ECHO, boolFlag ) ;
-    SetState ( _CFT_, READLINE_ECHO_ON, boolFlag ) ;
+    SetState ( _CSL_, READLINE_ECHO_ON, boolFlag ) ;
 }
 
 void
-CFT_Echo ( )
+CSL_Echo ( )
 {
     // toggle flag
-    if ( GetState ( _CFT_, READLINE_ECHO_ON ) )
+    if ( GetState ( _CSL_, READLINE_ECHO_ON ) )
     {
         _SetEcho ( false ) ;
     }
@@ -306,91 +306,91 @@ CFT_Echo ( )
 }
 
 void
-CFT_EchoOn ( )
+CSL_EchoOn ( )
 {
     _SetEcho ( true ) ;
 }
 
 void
-CFT_EchoOff ( )
+CSL_EchoOff ( )
 {
     _SetEcho ( false ) ;
 }
 
-// ?? optimize state should be in either CfrTil or OpenVmTil not System structure
+// ?? optimize state should be in either CSL or OpenVmTil not System structure
 
 void
-CFT_NoOp ( void )
+CSL_NoOp ( void )
 {
     //if ( CompileMode ) _Compile_Return ( ) ;
 }
 
 void
-CFT_Hex ( ) // !
+CSL_Hex ( ) // !
 {
 
     _Context_->System0->NumberBase = 16 ;
 }
 
 void
-CFT_Binary ( ) // !
+CSL_Binary ( ) // !
 {
 
     _Context_->System0->NumberBase = 2 ;
 }
 
 void
-CFT_Decimal ( ) // !
+CSL_Decimal ( ) // !
 {
 
     _Context_->System0->NumberBase = 10 ;
 }
 
 void
-CFT_Dump ( )
+CSL_Dump ( )
 {
     byte * location = Context_IsInFile ( _Context_ ) ? Context_Location ( ) : ( byte* ) "" ;
     _Printf ( ( byte* ) "\nDump at : %s :", location ) ;
-    _CFT_Dump ( 16 ) ;
+    _CSL_Dump ( 16 ) ;
     _Printf ( ( byte* ) "\n" ) ;
 }
 
 void
-CFT_Source_AddToHistory ( )
+CSL_Source_AddToHistory ( )
 {
     Word *word = ( Word* ) DataStack_Pop ( ) ;
     if ( word )
     {
-        _CFT_Source ( word, 1 ) ;
+        _CSL_Source ( word, 1 ) ;
     }
-    //else CFT_Exception ( NOT_A_KNOWN_OBJECT, QUIT ) ;
+    //else CSL_Exception ( NOT_A_KNOWN_OBJECT, QUIT ) ;
 }
 
 void
-CFT_Source_DontAddToHistory ( )
+CSL_Source_DontAddToHistory ( )
 {
     Word *word = ( Word* ) DataStack_Pop ( ) ;
     if ( word )
     {
-        _CFT_Source ( word, 0 ) ;
+        _CSL_Source ( word, 0 ) ;
     }
-    //else CFT_Exception ( NOT_A_KNOWN_OBJECT, QUIT ) ;
+    //else CSL_Exception ( NOT_A_KNOWN_OBJECT, QUIT ) ;
 }
 
 void
-CFT_AllocateNew ( )
+CSL_AllocateNew ( )
 {
     DataStack_Push ( ( int64 ) Mem_Allocate ( DataStack_Pop ( ), OBJECT_MEM ) ) ;
 }
 
 void
-CFT_ReturnFromFile ( )
+CSL_ReturnFromFile ( )
 {
     _EOF ( _Context_->Lexer0 ) ;
 }
 
 void
-CFT_ShellEscape ( )
+CSL_ShellEscape ( )
 {
     _ShellEscape ( ( char* ) DataStack_Pop ( ) ) ;
     NewLine ( _Context_->Lexer0 ) ;
@@ -408,7 +408,7 @@ OVT_Mem_ShowAllocated ( )
 void foxWindow ( int64 argc, char **argv ) ;
 
 void
-CFT_Window ( )
+CSL_Window ( )
 {
     int64 argc = 0 ;
     char ** argv = 0 ;

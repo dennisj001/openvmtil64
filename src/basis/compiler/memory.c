@@ -1,8 +1,8 @@
-#include "../../include/cfrtil64.h"
+#include "../../include/csl.h"
 #define OP_EQ_STORE 0
 
 // ( x n -- )
-// C : "x += n" :: cfrTil : "x n +="
+// C : "x += n" :: csl : "x n +="
 // X variable op compile for group 1 opCodes - ia32 
 
 void
@@ -57,7 +57,7 @@ Compile_Peek ( Compiler * compiler, Boolean stackReg ) // @
     if ( optSetupFlag & OPTIMIZE_DONE ) return ;
     else if ( ! optSetupFlag )
     {
-        Word * one = CFT_WordList ( 1 ) ;
+        Word * one = CSL_WordList ( 1 ) ;
         //if ( one->StackPushRegisterCode ) // for now an object may have an array offset that needs to be considered
         if ( ( ! ( one->W_ObjectAttributes & OBJECT ) ) && one->StackPushRegisterCode ) // for now an object may have an array offset that needs to be considered
         {
@@ -85,14 +85,14 @@ Compiler_ShowOptimizeArgs ( Compiler * compiler )
 void
 Compile_Store (Compiler * compiler, int lvalueSize) // !
 {
-    if ( GetState ( _CFT_, OPTIMIZE_ON ) ) Compile_X_Equal ( compiler, STORE, lvalueSize ) ;
+    if ( GetState ( _CSL_, OPTIMIZE_ON ) ) Compile_X_Equal ( compiler, STORE, lvalueSize ) ;
     else // when optimize is off, eg with arrays
     {
         //DBI_ON ;
         int64 stackReg = DSP ;
         Word * word ;
-        d0 ( if ( Is_DebugModeOn ) _CFT_SC_WordList_Show ( "\nCompile_Store : not optimized", 0, 0 ) ) ;
-        if ( ( word = ( Word* ) _CFT_WordList ( 1 ) ) && word->StackPushRegisterCode ) SetHere ( word->StackPushRegisterCode, 1 ) ;
+        d0 ( if ( Is_DebugModeOn ) _CSL_SC_WordList_Show ( "\nCompile_Store : not optimized", 0, 0 ) ) ;
+        if ( ( word = ( Word* ) _CSL_WordList ( 1 ) ) && word->StackPushRegisterCode ) SetHere ( word->StackPushRegisterCode, 1 ) ;
         else Compile_Move_Rm_To_Reg (ACC, stackReg, 0 , 0) ;
         Compile_Move_Rm_To_Reg (OREG, stackReg, ( word && word->StackPushRegisterCode ) ? 0 : ( - CELL_SIZE ) , 0) ;
         Compile_Move_Reg_To_Rm (( ( word && word->StackPushRegisterCode ) ? word->RegToUse : ACC, 0), OREG, 0, 0 ) ;
@@ -100,14 +100,14 @@ Compile_Store (Compiler * compiler, int lvalueSize) // !
         //DBI_OFF ;
     }
 #if ARRAY_MODE_CHECK   
-    CFT_ArrayModeOff ( ) ;
+    CSL_ArrayModeOff ( ) ;
 #endif    
 }
 
 void
 Compile_Poke (Compiler * compiler, int lvalueSize) // =
 {
-    if ( GetState ( _CFT_, OPTIMIZE_ON ) ) Compile_X_Equal ( compiler, EQUAL, lvalueSize ) ;
+    if ( GetState ( _CSL_, OPTIMIZE_ON ) ) Compile_X_Equal ( compiler, EQUAL, lvalueSize ) ;
     else // when optimize is off, eg with arrays
     {
         int64 stackReg = DSP ;
@@ -118,7 +118,7 @@ Compile_Poke (Compiler * compiler, int lvalueSize) // =
         Compile_SUBI ( REG, stackReg, 0, 2 * CELL_SIZE, BYTE ) ;
     }
 #if ARRAY_MODE_CHECK   
-    CFT_ArrayModeOff ( ) ;
+    CSL_ArrayModeOff ( ) ;
 #endif    
 }
 
@@ -135,7 +135,7 @@ Compile_AtEqual ( Boolean stackReg ) // !
     Compile_Move_Reg_To_Rm (OREG, ACC, 0 , 0) ;
     Compile_SUBI ( REG, stackReg, 0, CELL_SIZE * 2, BYTE ) ;
 #if ARRAY_MODE_CHECK    
-    CFT_ArrayModeOff ( ) ;
+    CSL_ArrayModeOff ( ) ;
 #endif    
 }
 
@@ -168,8 +168,8 @@ Compile_Store (Compiler * compiler, 0) // !
     {
         //DBI_ON ;
         Word * word ;
-        d0 ( if ( Is_DebugModeOn ) _CFT_SC_WordList_Show ( "\nCompile_Store : not optimized", 0, 0 ) ) ;
-        if ( ( word = ( Word* ) _CFT_WordList ( 1 ) ) && word->StackPushRegisterCode ) SetHere ( word->StackPushRegisterCode, 1 ) ;
+        d0 ( if ( Is_DebugModeOn ) _CSL_SC_WordList_Show ( "\nCompile_Store : not optimized", 0, 0 ) ) ;
+        if ( ( word = ( Word* ) _CSL_WordList ( 1 ) ) && word->StackPushRegisterCode ) SetHere ( word->StackPushRegisterCode, 1 ) ;
         else Compile_Move_Rm_To_Reg (ACC, stackReg, 0 , 0) ;
         Compile_Move_Rm_To_Reg (OREG, stackReg, ( word && word->StackPushRegisterCode ) ? 0 : ( - CELL_SIZE ) , 0) ;
         Compile_Move_Reg_To_Rm (( ( word && word->StackPushRegisterCode ) ? word->RegToUse : ACC, 0), OREG, 0 ) ;
@@ -177,7 +177,7 @@ Compile_Store (Compiler * compiler, 0) // !
         //DBI_OFF ;
     }
 #if ARRAY_MODE_CHECK   
-    CFT_ArrayModeOff ( ) ;
+    CSL_ArrayModeOff ( ) ;
 #endif    
 }
 
@@ -219,7 +219,7 @@ Compile_Poke (Compiler * compiler, 0) // =
         Compile_SUBI ( REG, stackReg, 0, 2 * CELL_SIZE, BYTE ) ;
     }
 #if ARRAY_MODE_CHECK  
-    CFT_ArrayModeOff ( ) ;
+    CSL_ArrayModeOff ( ) ;
 #endif    
 }
 #endif

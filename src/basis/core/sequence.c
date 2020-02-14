@@ -1,5 +1,5 @@
 
-#include "../../include/cfrtil64.h"
+#include "../../include/csl.h"
 
 /*
 struct _Sequence
@@ -43,7 +43,7 @@ Sequence_Append ( Sequence * array, cell_t size ) // size in bytes
     if ( ( array->Index += size ) > array->Last )
     {
         array->Index -= size ;
-        CFT_Exception ( MEMORY_ALLOCATION_ERROR, 1 ) ;
+        CSL_Exception ( MEMORY_ALLOCATION_ERROR, 1 ) ;
     }
     return index ;
 }

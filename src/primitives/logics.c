@@ -1,10 +1,10 @@
 
-#include "../include/cfrtil64.h"
+#include "../include/csl.h"
 
 // ( b top | b < top ) dpans
 
 void
-CFT_LessThan ( ) // <
+CSL_LessThan ( ) // <
 {
     if ( CompileMode ) Compile_LessThan ( _Context_->Compiler0 ) ;
     else
@@ -17,7 +17,7 @@ CFT_LessThan ( ) // <
 }
 
 void
-CFT_LessThanOrEqual ( ) // <
+CSL_LessThanOrEqual ( ) // <
 {
     if ( CompileMode ) Compile_LessThanOrEqual ( _Context_->Compiler0 ) ;
     else
@@ -32,7 +32,7 @@ CFT_LessThanOrEqual ( ) // <
 // ( b top | b > top ) dpans
 
 void
-CFT_GreaterThan ( ) // >
+CSL_GreaterThan ( ) // >
 {
     if ( CompileMode ) Compile_GreaterThan ( _Context_->Compiler0 ) ;
     else
@@ -45,7 +45,7 @@ CFT_GreaterThan ( ) // >
 }
 
 void
-CFT_GreaterThanOrEqual ( ) // >
+CSL_GreaterThanOrEqual ( ) // >
 {
     if ( CompileMode ) Compile_GreaterThanOrEqual ( _Context_->Compiler0 ) ;
     else
@@ -58,7 +58,7 @@ CFT_GreaterThanOrEqual ( ) // >
 }
 
 void
-CFT_Equals ( ) // == 
+CSL_Equals ( ) // == 
 {
     if ( CompileMode ) Compile_Equals ( _Context_->Compiler0 ) ;
     else
@@ -71,7 +71,7 @@ CFT_Equals ( ) // ==
 }
 
 void
-CFT_DoesNotEqual ( ) // !=
+CSL_DoesNotEqual ( ) // !=
 {
     if ( CompileMode ) Compile_DoesNotEqual ( _Context_->Compiler0 ) ;
     else
@@ -84,14 +84,14 @@ CFT_DoesNotEqual ( ) // !=
 }
 
 void
-CFT_LogicalNot ( ) // not
+CSL_LogicalNot ( ) // not
 {
     if ( CompileMode ) Compile_LogicalNot ( _Context_->Compiler0 ) ;
     else TOS = ( ! TOS ) ;
 }
 
 void
-CFT_LogicalAnd ( ) // and
+CSL_LogicalAnd ( ) // and
 {
     if ( CompileMode ) Compile_LogicalAnd ( _Context_->Compiler0 ) ;
     else
@@ -102,7 +102,7 @@ CFT_LogicalAnd ( ) // and
 }
 
 void
-CFT_LogicalOr ( ) // or
+CSL_LogicalOr ( ) // or
 {
     if ( CompileMode ) Compile_Logical_X ( _Context_->Compiler0, OR, TTT_ZERO, NEGFLAG_ON, TTT_ZERO, NEGFLAG_Z ) ;
     else
@@ -113,7 +113,7 @@ CFT_LogicalOr ( ) // or
 }
 
 void
-CFT_LogicalXor ( ) // xor
+CSL_LogicalXor ( ) // xor
 {
     if ( CompileMode ) Compile_Logical_X ( _Context_->Compiler0, XOR, TTT_ZERO, NEGFLAG_ON, TTT_ZERO, NEGFLAG_Z ) ;
     else

@@ -1,5 +1,5 @@
 
-#include "../../include/cfrtil64.h"
+#include "../../include/csl.h"
 
 byte CharTable []= { // from maru
   /*  00 nul */	0,

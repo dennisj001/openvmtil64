@@ -111,7 +111,7 @@ Lisp
 ( define k ( lambda ( a b ) ( + a b )))
 nl
 
-// from lisp.cft lines 58-59
+// from lisp.csl lines 58-59
 ( k ( j 1 2 3 ) ( h 2 3 66 ) ) sp // 77 ...
 ( + ( k ( j 1 2 3 ) ( h 2 3 66 ) ) ( + 698 2 ) ) // 777
 ( + ( k ( j 1 2 3 ) ( h 2 3 59 ) ) 7 ) // 77

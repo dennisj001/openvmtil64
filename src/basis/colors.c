@@ -1,4 +1,4 @@
-#include "../include/cfrtil64.h"
+#include "../include/csl.h"
 
 #if 0
 
@@ -100,7 +100,7 @@ _Colors_Init2 ( Colors * c, int64 fg, int64 bg )
 }
 
 void
-_CFT_SetRGBColor ( Colors * c )
+_CSL_SetRGBColor ( Colors * c )
 {
     int64 fr, fg, fb, br, bg, bb ;
     bb = DataStack_Pop ( ) ;
@@ -113,7 +113,7 @@ _CFT_SetRGBColor ( Colors * c )
 }
 
 void
-_CFT_SetColors ( Colors * c )
+_CSL_SetColors ( Colors * c )
 {
     int64 fg, bg ;
     bg = DataStack_Pop ( ) ;
@@ -152,63 +152,63 @@ Ovt_NoticeColors ( )
 }
 
 void
-CFT_SetDefaultColors ( )
+CSL_SetDefaultColors ( )
 {
-    _CFT_SetColors ( &_O_->Default ) ;
+    _CSL_SetColors ( &_O_->Default ) ;
 }
 
 void
-CFT_SetAlertColors ( )
+CSL_SetAlertColors ( )
 {
-    _CFT_SetColors ( &_O_->Alert ) ;
+    _CSL_SetColors ( &_O_->Alert ) ;
 }
 
 void
-CFT_SetDebugColors ( )
+CSL_SetDebugColors ( )
 {
-    _CFT_SetColors ( &_O_->Debug ) ;
+    _CSL_SetColors ( &_O_->Debug ) ;
 }
 
 void
-CFT_SetUserColors ( )
+CSL_SetUserColors ( )
 {
-    _CFT_SetColors ( &_O_->User ) ;
+    _CSL_SetColors ( &_O_->User ) ;
 }
 
 void
-CFT_SetNoticeColors ( )
+CSL_SetNoticeColors ( )
 {
-    _CFT_SetColors ( &_O_->Notice ) ;
+    _CSL_SetColors ( &_O_->Notice ) ;
 }
 
 void
-CFT_SetDefaultRGB ( )
+CSL_SetDefaultRGB ( )
 {
-    _CFT_SetRGBColor ( &_O_->Default ) ;
+    _CSL_SetRGBColor ( &_O_->Default ) ;
 }
 
 void
-CFT_SetUserRGB ( )
+CSL_SetUserRGB ( )
 {
-    _CFT_SetRGBColor ( &_O_->User ) ;
+    _CSL_SetRGBColor ( &_O_->User ) ;
 }
 
 void
-CFT_SetAlertRGB ( )
+CSL_SetAlertRGB ( )
 {
-    _CFT_SetRGBColor ( &_O_->Alert ) ;
+    _CSL_SetRGBColor ( &_O_->Alert ) ;
 }
 
 void
-CFT_SetDebugRGB ( )
+CSL_SetDebugRGB ( )
 {
-    _CFT_SetRGBColor ( &_O_->Debug ) ;
+    _CSL_SetRGBColor ( &_O_->Debug ) ;
 }
 
 void
-CFT_SetNoticeRGB ( )
+CSL_SetNoticeRGB ( )
 {
-    _CFT_SetRGBColor ( &_O_->Notice ) ;
+    _CSL_SetRGBColor ( &_O_->Notice ) ;
 }
 
 

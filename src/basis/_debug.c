@@ -1,5 +1,5 @@
 
-#include "../include/cfrtil64.h"
+#include "../include/csl.h"
 
 // we have the address of a jcc insn 
 // get the address it jccs to
@@ -66,7 +66,7 @@ JumpCallInstructionAddress_X64ABI ( byte * address )
 }
 
 void
-_CFT_ACharacterDump ( char aChar )
+_CSL_ACharacterDump ( char aChar )
 {
     if ( isprint ( aChar ) )
     {
@@ -76,32 +76,32 @@ _CFT_ACharacterDump ( char aChar )
 }
 
 void
-CFT_CharacterDump ( byte * address, int64 number )
+CSL_CharacterDump ( byte * address, int64 number )
 {
     int64 i ;
     for ( i = 0 ; i < number ; i ++ )
     {
 
-        _CFT_ACharacterDump ( address [ i ] ) ;
+        _CSL_ACharacterDump ( address [ i ] ) ;
     }
     _Printf ( ( byte* ) " " ) ;
 }
 
 void
-_CFT_AByteDump ( byte aByte )
+_CSL_AByteDump ( byte aByte )
 {
 
     _Printf ( ( byte* ) "%02x ", aByte ) ;
 }
 
 void
-CFT_NByteDump ( byte * address, int64 number )
+CSL_NByteDump ( byte * address, int64 number )
 {
     int64 i ;
     for ( i = 0 ; i < number ; i ++ )
     {
 
-        _CFT_AByteDump ( address [ i ] ) ;
+        _CSL_AByteDump ( address [ i ] ) ;
     }
     _Printf ( ( byte* ) " " ) ;
 }
@@ -164,34 +164,34 @@ Compile_Debug_GetRSP ( ) // where we want the acquired pointer
 }
 
 void
-CFT_SetRtDebugOn ( )
+CSL_SetRtDebugOn ( )
 {
-    SetState ( _CFT_, RT_DEBUG_ON, true ) ;
+    SetState ( _CSL_, RT_DEBUG_ON, true ) ;
 }
 
 void
 Compile_DebugRuntimeBreakpointFunction ( block function ) // where we want the acquired pointer
 {
-    Compile_Call_TestRSP ( ( byte* ) CFT_SetRtDebugOn ) ;
+    Compile_Call_TestRSP ( ( byte* ) CSL_SetRtDebugOn ) ;
     Compile_Call ( ( byte* ) _Debugger_->SaveCpuState ) ;
     Compile_Call_TestRSP ( ( byte* ) function ) ;
 }
 
 void
-_CFT_DebugRuntimeBreakpoint ( ) // where we want the acquired pointer
+_CSL_DebugRuntimeBreakpoint ( ) // where we want the acquired pointer
 {
-    Compile_DebugRuntimeBreakpointFunction ( CFT_DebugRuntimeBreakpoint ) ;
+    Compile_DebugRuntimeBreakpointFunction ( CSL_DebugRuntimeBreakpoint ) ;
 }
 
 void
-_CFT_DebugRuntimeBreakpoint_IsDebugShowOn ( ) // where we want the acquired pointer
+_CSL_DebugRuntimeBreakpoint_IsDebugShowOn ( ) // where we want the acquired pointer
 {
-    Compile_DebugRuntimeBreakpointFunction ( CFT_DebugRuntimeBreakpoint_IsDebugShowOn ) ;
+    Compile_DebugRuntimeBreakpointFunction ( CSL_DebugRuntimeBreakpoint_IsDebugShowOn ) ;
 }
 
 void
-_CFT_DebugRuntimeBreakpoint_IsDebugOn ( ) // where we want the acquired pointer
+_CSL_DebugRuntimeBreakpoint_IsDebugOn ( ) // where we want the acquired pointer
 {
-    Compile_DebugRuntimeBreakpointFunction ( CFT_DebugRuntimeBreakpoint_IsDebugOn ) ;
+    Compile_DebugRuntimeBreakpointFunction ( CSL_DebugRuntimeBreakpoint_IsDebugOn ) ;
 }
 

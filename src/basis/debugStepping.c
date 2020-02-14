@@ -1,5 +1,5 @@
 
-#include "../include/cfrtil64.h"
+#include "../include/csl.h"
 #define IS_CALL_INSN(address) ( ( * address == CALLI32 ) || ( ( ( * ( uint16* ) address ) == 0xff49 ) && ( *( address + 2 ) == 0xd1 ) ) )
 
 void
@@ -22,11 +22,11 @@ Debugger_CompileOneInstruction ( Debugger * debugger, byte * jcAddress, Boolean 
     ByteArray * svcs = _O_CodeByteArray ;
     _ByteArray_Init ( debugger->StepInstructionBA ) ; // we are only compiling one insn here so clear our BA before each use
     Set_CompilerSpace ( debugger->StepInstructionBA ) ; // now compile to this space
-    _Compile_Save_C_CpuState ( _CFT_, showFlag ) ; //&& ( _O_->Verbosity >= 3 ) ) ; // save our c compiler cpu register state
+    _Compile_Save_C_CpuState ( _CSL_, showFlag ) ; //&& ( _O_->Verbosity >= 3 ) ) ; // save our c compiler cpu register state
     _Compile_Restore_Debugger_CpuState ( debugger, showFlag ) ; //&& ( _O_->Verbosity >= 3 ) ) ; // restore our runtime state before the current insn
     byte * nextInsn = _Debugger_CompileOneInstruction ( debugger, jcAddress ) ; // the single current stepping insn
     _Compile_Save_Debugger_CpuState ( debugger, showFlag ) ; //showRegsFlag ) ; //&& ( _O_->Verbosity >= 3 ) ) ; // save our runtime state after the instruction : which we will restore before the next insn
-    _Compile_Restore_C_CpuState ( _CFT_, showFlag ) ; //&& ( _O_->Verbosity >= 3 ) ) ; // save our c compiler cpu register state
+    _Compile_Restore_C_CpuState ( _CSL_, showFlag ) ; //&& ( _O_->Verbosity >= 3 ) ) ; // save our c compiler cpu register state
     _Compile_Return ( ) ;
     Set_CompilerSpace ( svcs ) ; // restore compiler space pointer before "do it" in case "do it" calls the compiler
     return nextInsn ;
@@ -204,7 +204,7 @@ _Debugger_SetupStepping ( Debugger * debugger, Word * word, byte * address, byte
     _Printf ( ( byte* ) "\nSetting up stepping : location = %s : debugger->word = \'%s\' : ...", c_gd ( _Context_Location ( _Context_ ) ), word ? word->Name : ( name ? name : ( byte* ) "" ) ) ;
     if ( word )
     {
-        _CFT_Source ( debugger->w_Word, 0 ) ;
+        _CSL_Source ( debugger->w_Word, 0 ) ;
         if ( ( ! address ) || ( ! GetState ( debugger, ( DBG_BRK_INIT | DBG_SETUP_ADDRESS ) ) ) ) address = ( byte* ) word->Definition ;
     }
     SetState_TrueFalse ( debugger, DBG_STEPPING, DBG_NEWLINE | DBG_PROMPT | DBG_INFO | DBG_MENU ) ;
@@ -212,13 +212,13 @@ _Debugger_SetupStepping ( Debugger * debugger, Word * word, byte * address, byte
     debugger->w_Word = Word_UnAlias ( word ) ;
 
     if ( ! GetState ( debugger, ( DBG_BRK_INIT | DBG_RUNTIME_BREAKPOINT ) ) ) SetState ( debugger->cs_Cpu, CPU_SAVED, false ) ;
-    SetState ( _CFT_->cs_Cpu, CPU_SAVED, false ) ;
+    SetState ( _CSL_->cs_Cpu, CPU_SAVED, false ) ;
     _Debugger_CpuState_CheckSave ( debugger ) ;
-    _CFT_CpuState_CheckSave ( ) ;
+    _CSL_CpuState_CheckSave ( ) ;
     debugger->LevelBitNamespaceMap = 0 ;
     SetState ( debugger, DBG_START_STEPPING, true ) ;
     _Debugger_->LastSourceCodeWord = 0 ;
-    CFT_NewLine ( ) ;
+    CSL_NewLine ( ) ;
 }
 
 void
@@ -230,7 +230,7 @@ Debugger_SetupStepping ( Debugger * debugger )
 int64
 _Debugger_SetupReturnStackCopy ( Debugger * debugger, int64 size, Boolean showFlag )
 {
-    if ( _O_->Verbosity > 3 ) _CFT_PrintNReturnStack ( 4, 1 ) ;
+    if ( _O_->Verbosity > 3 ) _CSL_PrintNReturnStack ( 4, 1 ) ;
     uint64 * rsp = ( uint64* ) debugger->cs_Cpu->Rsp ; //debugger->DebugESP [- 1] ; //debugger->cs_Cpu->Rsp [1] ; //debugger->cs_Cpu->Rsp ;
     if ( rsp )
     {
@@ -261,12 +261,12 @@ Debugger_PrintReturnStackWindow ( )
     _PrintNStackWindow ( ( uint64* ) _Debugger_->cs_Cpu->Rsp, ( byte* ) "Debugger ReturnStack (RSP)", ( byte* ) "RSP", 4 ) ;
 }
 
-// restore the 'internal running cfrTil' cpu state which was saved after the last instruction : debugger->cs_CpuState is the 'internal running cfrTil' cpu state
+// restore the 'internal running csl' cpu state which was saved after the last instruction : debugger->cs_CpuState is the 'internal running csl' cpu state
 
 void
-Debugger_SetupReturnStackCopy ( Debugger * debugger, int64 showFlag ) // restore the running cfrTil cpu state
+Debugger_SetupReturnStackCopy ( Debugger * debugger, int64 showFlag ) // restore the running csl cpu state
 {
-    // restore the 'internal running cfrTil' cpu state which was saved after the last instruction : debugger->cs_CpuState is the 'internal running cfrTil' cpu state
+    // restore the 'internal running csl' cpu state which was saved after the last instruction : debugger->cs_CpuState is the 'internal running csl' cpu state
     // we don't have to worry so much about the compiler 'spoiling' our insn with restore 
     int64 stackSetupFlag = 0 ;
     if ( ( ! debugger->CopyRSP ) || GetState ( debugger, DBG_STACK_OLD ) )
@@ -275,38 +275,38 @@ Debugger_SetupReturnStackCopy ( Debugger * debugger, int64 showFlag ) // restore
 }
 
 void
-_Compile_Restore_Debugger_CpuState ( Debugger * debugger, int64 showFlag ) // restore the running cfrTil cpu state
+_Compile_Restore_Debugger_CpuState ( Debugger * debugger, int64 showFlag ) // restore the running csl cpu state
 {
-    // restore the 'internal running cfrTil' cpu state which was saved after the last instruction : debugger->cs_CpuState is the 'internal running cfrTil' cpu state
+    // restore the 'internal running csl' cpu state which was saved after the last instruction : debugger->cs_CpuState is the 'internal running csl' cpu state
     // we don't have to worry so much about the compiler 'spoiling' our insn with restore 
-    Debugger_SetupReturnStackCopy ( debugger, showFlag ) ; // restore the running cfrTil cpu state
+    Debugger_SetupReturnStackCopy ( debugger, showFlag ) ; // restore the running csl cpu state
     _Compile_CpuState_Restore ( debugger->cs_Cpu, 1 ) ;
     if ( showFlag ) Compile_Call_TestRSP ( ( byte* ) _Debugger_CpuState_Show ) ; // also dis insn
 }
 
 void
-_Compile_Restore_C_CpuState ( CfrTil * cfrtil, int64 showFlag )
+_Compile_Restore_C_CpuState ( CSL * csl, int64 showFlag )
 {
-    _Compile_CpuState_Restore ( cfrtil->cs_Cpu, 1 ) ;
-    if ( showFlag ) Compile_Call_TestRSP ( ( byte* ) CFT_CpuState_Show ) ;
+    _Compile_CpuState_Restore ( csl->cs_Cpu, 1 ) ;
+    if ( showFlag ) Compile_Call_TestRSP ( ( byte* ) CSL_CpuState_Show ) ;
 }
 
-// restore the 'internal running cfrTil' cpu state which was saved after the last instruction : debugger->cs_CpuState is the 'internal running cfrTil' cpu state
+// restore the 'internal running csl' cpu state which was saved after the last instruction : debugger->cs_CpuState is the 'internal running csl' cpu state
 
 void
-_Compile_Save_C_CpuState ( CfrTil * cfrtil, int64 showFlag )
+_Compile_Save_C_CpuState ( CSL * csl, int64 showFlag )
 {
-    Compile_CpuState_Save ( cfrtil->cs_Cpu ) ;
-    if ( showFlag ) Compile_Call_TestRSP ( ( byte* ) _CFT_CpuState_CheckSave ) ;
+    Compile_CpuState_Save ( csl->cs_Cpu ) ;
+    if ( showFlag ) Compile_Call_TestRSP ( ( byte* ) _CSL_CpuState_CheckSave ) ;
 }
 
 void
 _Compile_Save_Debugger_CpuState ( Debugger * debugger, int64 showFlag )
 {
     Compile_CpuState_Save ( debugger->cs_Cpu ) ;
-    if ( showFlag ) Compile_Call_TestRSP ( ( byte* ) CFT_Debugger_UdisOneInsn ) ;
+    if ( showFlag ) Compile_Call_TestRSP ( ( byte* ) CSL_Debugger_UdisOneInsn ) ;
     if ( ( _O_->Verbosity > 3 ) && ( debugger->cs_Cpu->Rsp != debugger->LastRsp ) ) Debugger_PrintReturnStackWindow ( ) ;
-    if ( showFlag ) Compile_Call_TestRSP ( ( byte* ) CFT_Debugger_CheckSaveCpuStateShow ) ;
+    if ( showFlag ) Compile_Call_TestRSP ( ( byte* ) CSL_Debugger_CheckSaveCpuStateShow ) ;
 }
 
 void
@@ -400,7 +400,7 @@ Debugger_CanWeStep ( Debugger * debugger, Word * word )
     int64 result = true ;
     //if ( ( ! debugger->DebugAddress ) || ( GetState ( debugger, DBG_SETUP_ADDRESS ) ) )
     if ( ! word ) result = false ;
-    else if ( word->W_MorphismAttributes & ( CFRTIL_WORD | CFRTIL_ASM_WORD ) ) result = true ;
+    else if ( word->W_MorphismAttributes & ( csl_WORD | csl_ASM_WORD ) ) result = true ;
     else if ( ! word->CodeStart ) result = false ;
     else if ( word->W_MorphismAttributes & ( CPRIMITIVE | DLSYM_WORD | C_PREFIX_RTL_ARGS ) ) result = false ;
     else if ( ! NamedByteArray_CheckAddress ( _O_CodeSpace, word->CodeStart ) ) result = false ;
@@ -459,7 +459,7 @@ _Debugger_COI_StepInto ( Debugger * debugger, Word * word, byte * jcAddress, int
     while ( word->W_MorphismAttributes & ( ALIAS ) ) word = word->W_AliasOf ;
     if ( ( * debugger->DebugAddress == CALLI32 ) || ( ( ( * ( uint16* ) debugger->DebugAddress ) == 0xff49 ) && ( *( debugger->DebugAddress + 2 ) == 0xd1 ) ) )
     {
-        _Printf ( ( byte* ) "\nstepping into a cfrtil compiled function : %s : .... :> %s ", word ? ( char* ) c_gd ( word->Name ) : "", Context_Location ( ) ) ;
+        _Printf ( ( byte* ) "\nstepping into a csl compiled function : %s : .... :> %s ", word ? ( char* ) c_gd ( word->Name ) : "", Context_Location ( ) ) ;
         _Stack_Push ( debugger->ReturnStack, ( int64 ) ( debugger->DebugAddress + size ) ) ; // the return address
         // push the return address this time around; next time code at newDebugAddress will be processed
         // when ret is the insn Debugger_StepOneInstruction will handle it 
@@ -486,7 +486,7 @@ Debugger_CASOI_Do_Return_Insn ( Debugger * debugger )
     if ( Stack_Depth ( debugger->ReturnStack ) )
     {
         debugger->DebugAddress = ( byte* ) Stack_Pop ( debugger->ReturnStack ) ;
-        //if ( _O_->Verbosity > 1 ) CFT_PrintReturnStack ( ) ;
+        //if ( _O_->Verbosity > 1 ) CSL_PrintReturnStack ( ) ;
         Debugger_GetWordFromAddress ( debugger ) ;
     }
     else

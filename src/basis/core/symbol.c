@@ -1,5 +1,5 @@
 
-#include "../../include/cfrtil64.h"
+#include "../../include/csl.h"
 
 void
 _Symbol_NameInit ( Symbol * symbol, byte * name )
@@ -70,13 +70,13 @@ Symbol *
 _Symbol_CompareName ( Symbol * symbol, byte * name )
 {
     //d1 ( if ( _O_->Verbosity > 3 ) _Printf ( (byte*) "\n symbol name = %s : name = %s", symbol->S_Name, name ) ) ;
-    d0 ( if ( Is_DebugOn && String_Equal ( symbol->S_Name, "int" ) ) { _Printf ( ( byte* ) "\n symbol name = %s : name = %s", symbol->S_Name, name ) ; Pause ( ) ; } ) ;
-    d0 ( if ( Is_DebugOn ) { _Printf ( ( byte* ) "\n symbol name = %s.%s : name = %s",
-            symbol->S_ContainingNamespace ? symbol->S_ContainingNamespace->Name : ( byte* ) "", symbol->S_Name, name ) ; } ) ; //Pause () ; } ) ;
-    if ( name && symbol && symbol->S_Name && ( String_Equal ( symbol->S_Name, name ) ) )
+    //d0 ( if ( Is_DebugOn && String_Equal ( symbol->S_Name, "int" ) ) { _Printf ( ( byte* ) "\n symbol name = %s : name = %s", symbol->S_Name, name ) ; Pause ( ) ; } ) ;
+    //d0 ( if ( Is_DebugOn ) { _Printf ( ( byte* ) "\n symbol name = %s.%s : name = %s",
+    //        symbol->S_ContainingNamespace ? symbol->S_ContainingNamespace->Name : ( byte* ) "", symbol->S_Name, name ) ; } ) ; //Pause () ; } ) ;
+    if ( symbol && symbol->S_Name && ( String_Equal ( symbol->S_Name, name ) ) )
     {
-        d0 ( if ( Is_DebugOn ) { _Printf ( ( byte* ) "\n FOUND : symbol name = %s.%s : name = %s",
-            symbol->S_ContainingNamespace ? symbol->S_ContainingNamespace->Name : ( byte* ) "", symbol->S_Name, name ) ; } ) ; //Pause () ; } ) ;
+        //d0 ( if ( Is_DebugOn ) { _Printf ( ( byte* ) "\n FOUND : symbol name = %s.%s : name = %s",
+        //    symbol->S_ContainingNamespace ? symbol->S_ContainingNamespace->Name : ( byte* ) "", symbol->S_Name, name ) ; } ) ; //Pause () ; } ) ;
         return symbol ;
     }
     else return 0 ;
@@ -85,10 +85,11 @@ _Symbol_CompareName ( Symbol * symbol, byte * name )
 Symbol *
 Symbol_CompareName ( Symbol * symbol, byte * name )
 {
-    if ( symbol = _Symbol_CompareName ( symbol, name ) )
+    Symbol * symbol1 ;
+    if ( symbol1 = _Symbol_CompareName ( symbol, name ) )
     {
 #if 1        
-        Word * word = (Word*) symbol ;
+        Word * word = (Word*) symbol1 ;
         return word = Word_UnAlias ( word ) ;
 #else        
         return symbol ;

@@ -1,4 +1,4 @@
-#! /usr/local/bin/cfrtil64 -s
+#! /usr/local/bin/csl -s
 
 verbosity 0 =
 : hi 1 6 + p ;

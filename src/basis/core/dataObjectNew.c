@@ -1,5 +1,5 @@
 
-#include "../../include/cfrtil64.h"
+#include "../../include/csl.h"
 
 // Dynamic Object New : Word = Namespace = DObject : have a s_Symbol
 
@@ -29,7 +29,7 @@ DataObject_New (uint64 type, Word * word, byte * name, uint64 morphismAttributes
             word = _LO_New_RawStringOrLiteral ( _Context_->Lexer0, name, index, tsrli, scwi ) ;
             break ;
         }
-        case CFRTIL_WORD:
+        case csl_WORD:
         {
             word = _DObject_New ( name, value, morphismAttributes | BLOCK, objectAttributes, lispAttributes | BLOCK, BLOCK, 0, 0, 1, 0, DICTIONARY ) ;
             break ;
@@ -41,7 +41,7 @@ DataObject_New (uint64 type, Word * word, byte * name, uint64 morphismAttributes
         }
         case NAMESPACE_VARIABLE:
         {
-            word = _CFT_Variable_New ( name, value ) ;
+            word = _CSL_Variable_New ( name, value ) ;
             break ;
         }
         case LITERAL:
@@ -71,7 +71,7 @@ DataObject_New (uint64 type, Word * word, byte * name, uint64 morphismAttributes
         }
         case CLASS_FIELD:
         {
-            word = CFT_ClassField_New ( name, addToNs, value, index ) ;
+            word = CSL_ClassField_New ( name, addToNs, value, index ) ;
             break ;
         }
         case CLASS_CLONE:
@@ -94,7 +94,7 @@ DataObject_New (uint64 type, Word * word, byte * name, uint64 morphismAttributes
         }
         case C_TYPEDEF:
         {
-            _CFT_Typedef ( ) ;
+            _CSL_Typedef ( ) ;
             break ;
         }
         case PARAMETER_VARIABLE: case LOCAL_VARIABLE: case (PARAMETER_VARIABLE | REGISTER_VARIABLE ): case (LOCAL_VARIABLE | REGISTER_VARIABLE ):
@@ -112,7 +112,7 @@ DataObject_New (uint64 type, Word * word, byte * name, uint64 morphismAttributes
 }
 
 byte *
-_CFT_NamelessObjectNew ( int64 size, int64 allocType )
+_CSL_NamelessObjectNew ( int64 size, int64 allocType )
 {
     byte * obj = 0 ;
     if ( size ) obj = Mem_Allocate ( size, allocType ) ;
@@ -120,9 +120,9 @@ _CFT_NamelessObjectNew ( int64 size, int64 allocType )
 }
 
 Word *
-_CFT_ObjectNew ( int64 size, byte * name, uint64 category, int64 allocType )
+_CSL_ObjectNew ( int64 size, byte * name, uint64 category, int64 allocType )
 {
-    byte * obj = _CFT_NamelessObjectNew ( size, allocType ) ;
+    byte * obj = _CSL_NamelessObjectNew ( size, allocType ) ;
     Word * word = _DObject_New ( name, ( int64 ) obj, ( IMMEDIATE | CPRIMITIVE ), OBJECT | category, 0, OBJECT, ( byte* ) _DataObject_Run, 0, 0, 0, DICTIONARY ) ;
     word->ObjectByteSize = size ;
     return word ;
@@ -165,9 +165,9 @@ _Class_Object_New ( byte * name, uint64 category )
     int64 size ;
     byte * object ;
     Word * word ;
-    Namespace * ns = Word_UnAlias ( _CFT_Namespace_InNamespaceGet ( )) ;
+    Namespace * ns = Word_UnAlias ( _CSL_Namespace_InNamespaceGet ( )) ;
     size = _Namespace_VariableValueGet ( ns, ( byte* ) "size" ) ;
-    word = _CFT_ObjectNew ( size, name, category, CompileMode ? DICTIONARY : OBJECT_MEM ) ;
+    word = _CSL_ObjectNew ( size, name, category, CompileMode ? DICTIONARY : OBJECT_MEM ) ;
     object = ( byte* ) word->W_Value ;
     _Class_Object_Init ( word, ns ) ;
     _Namespace_VariableValueSet ( ns, ( byte* ) "this", ( int64 ) object ) ;
@@ -185,16 +185,16 @@ Class_New ( byte * name, uint64 objectType, int64 cloneFlag )
     byte * token ;
     if ( ! ns )
     {
-        sns = _CFT_Namespace_InNamespaceGet ( ) ;
+        sns = _CSL_Namespace_InNamespaceGet ( ) ;
         if ( cloneFlag )
         {
             size = _Namespace_VariableValueGet ( sns, ( byte* ) "size" ) ;
         }
         ns = _DObject_New ( name, 0, IMMEDIATE, CLASS | objectType, 0, objectType, ( byte* ) _DataObject_Run, 0, 0, sns, DICTIONARY ) ;
-        Namespace_DoNamespace ( ns, 0 ) ; // before "size", "this"
-        Word *ws = _CFT_Variable_New ( ( byte* ) "size", size ) ; // start with size of the prototype for clone
+        Namespace_Do_Namespace ( ns, 0 ) ; // before "size", "this"
+        Word *ws = _CSL_Variable_New ( ( byte* ) "size", size ) ; // start with size of the prototype for clone
         _Context_->Interpreter0->ThisNamespace = ns ;
-        Word *wt = _CFT_Variable_New ( ( byte* ) "this", size ) ; // start with size of the prototype for clone
+        Word *wt = _CSL_Variable_New ( ( byte* ) "this", size ) ; // start with size of the prototype for clone
         wt->W_ObjectAttributes |= THIS | OBJECT ;
         token = Lexer_Peek_Next_NonDebugTokenWord ( _Lexer_, 0, 0 ) ;
         if ( ( token[0] == '{' ) || ( token[1] == '{' )  || ( token[2] == '{' ) ) // consider ":{" and +:{" tokens
@@ -202,7 +202,7 @@ Class_New ( byte * name, uint64 objectType, int64 cloneFlag )
             if ( ! GetState ( _Compiler_, TDSCI_PARSING ) )
             {
                 Lexer_ReadToken ( _Lexer_ ) ; // in case of ":{" 
-                CFT_PushToken_OnTokenList ( "{" ) ;
+                CSL_PushToken_OnTokenList ( "{" ) ;
                 _ClassTypedef ( cloneFlag ) ;
             }
         }
@@ -211,15 +211,15 @@ Class_New ( byte * name, uint64 objectType, int64 cloneFlag )
     {
         _Printf ( ( byte* ) "\nNamespace Error at %s ? : \'%s\' already exists! : %s : size = %d\n",
             Context_Location ( ), ns->Name, _Word_SourceCodeLocation_pbyte ( ns ), ns->ObjectByteSize ) ;
-        Namespace_DoNamespace ( ns, 0 ) ;
+        Namespace_Do_Namespace ( ns, 0 ) ;
     }
-    CFT_WordList_Init ( 0 ) ;
+    CSL_WordList_Init ( 0 ) ;
     Compiler_SetAs_InNamespace_C_BackgroundNamespace ( cntx->Compiler0 ) ;
     return ns ;
 }
 
 Word *
-CFT_ClassField_New ( byte * token, Class * aclass, int64 size, int64 offset )
+CSL_ClassField_New ( byte * token, Class * aclass, int64 size, int64 offset )
 {
     Word * word = _DObject_New ( token, 0, ( IMMEDIATE | CPRIMITIVE ), OBJECT_FIELD, 0, OBJECT_FIELD, ( byte* ) _DataObject_Run, 0, 1, aclass, DICTIONARY ) ;
     word->TypeNamespace = aclass ;
@@ -235,7 +235,7 @@ CFT_ClassField_New ( byte * token, Class * aclass, int64 size, int64 offset )
 // this maybe should be in primitives/dobject.c
 
 Word *
-_CFT_Variable_New ( byte * name, int64 value )
+_CSL_Variable_New ( byte * name, int64 value )
 {
     Word * word ;
     if ( CompileMode )
@@ -249,11 +249,11 @@ _CFT_Variable_New ( byte * name, int64 value )
 }
 
 byte *
-_CFT_Label ( byte * lname )
+_CSL_Label ( byte * lname )
 {
     GotoInfo * gotoInfo = GotoInfo_New ( lname, GI_LABEL ) ;
     gotoInfo->LabeledAddress = Here ;
-    Namespace * ns = Namespace_FindOrNew_SetUsing ( ( byte* ) "__labels__", _CFT_->Namespaces, 1 ) ;
+    Namespace * ns = Namespace_FindOrNew_SetUsing ( ( byte* ) "__labels__", _CSL_->Namespaces, 1 ) ;
     if ( _Finder_FindWord_InOneNamespace ( _Finder_, ns, lname ) )
     {
         byte bufferData [ 32 ] ;

@@ -1,52 +1,52 @@
-#include "../include/cfrtil64.h"
+#include "../include/csl.h"
 
 void
-CFT_Debug_AtAddress ( )
+CSL_Debug_AtAddress ( )
 {
     byte * address ;
     address = ( byte* ) DataStack_Pop ( ) ;
-    _CFT_Debug_AtAddress ( address ) ;
+    _CSL_Debug_AtAddress ( address ) ;
 }
 
 void
-_CFT_Debugger_Locals_Show ( )
+_CSL_Debugger_Locals_Show ( )
 {
     Debugger_Locals_Show ( _Debugger_ ) ;
     //Pause ( ) ;
 }
 
 void
-CFT_Debugger_Locals_Show ( )
+CSL_Debugger_Locals_Show ( )
 {
-    if ( GetState ( _Debugger_, DBG_AUTO_MODE ) ) _CFT_Debugger_Locals_Show ( ) ;
+    if ( GetState ( _Debugger_, DBG_AUTO_MODE ) ) _CSL_Debugger_Locals_Show ( ) ;
 }
 
 void
-_CFT_DebugInfo ( )
+_CSL_DebugInfo ( )
 {
     Debugger_ShowInfo ( _Debugger_, ( byte* ) "\ninfo", 0 ) ;
 }
 
-// put this '<dbg>' into cfrtil code for a runtime break into the debugger
+// put this '<dbg>' into csl code for a runtime break into the debugger
 
 void
-CFT_DebugInfo ( )
+CSL_DebugInfo ( )
 {
     if ( _O_->Verbosity )
     {
-        _CFT_DebugInfo ( ) ;
+        _CSL_DebugInfo ( ) ;
         Debugger_Source ( _Debugger_ ) ;
     }
 }
 
 void
-CFT_DebugOn ( )
+CSL_DebugOn ( )
 {
     Context * cntx = _Context_ ;
     Debugger * debugger = _Debugger_ ;
     if ( ! Is_DebugOn )
     {
-        if ( _O_->Verbosity > 1 ) _Printf ( ( byte* ) "\nCFT_DebugOn : at %s", Context_Location ( ) ) ;
+        if ( _O_->Verbosity > 1 ) _Printf ( ( byte* ) "\nCSL_DebugOn : at %s", Context_Location ( ) ) ;
         debugger->DebugRSP = 0 ;
         Debugger_On ( debugger ) ;
     }
@@ -56,7 +56,7 @@ CFT_DebugOn ( )
 }
 
 void
-CFT_DebugOff ( )
+CSL_DebugOff ( )
 {
     Debugger_Off ( _Debugger_, 1 ) ;
 }
@@ -93,19 +93,19 @@ DebugRuntimeBreakpoint ( )
 }
 
 void
-CFT_DebugRuntimeBreakpoint ( )
+CSL_DebugRuntimeBreakpoint ( )
 {
     if ( ( ! CompileMode ) ) DebugRuntimeBreakpoint ( ) ;
 }
 
 void
-CFT_DebugRuntimeBreakpoint_IsDebugShowOn ( )
+CSL_DebugRuntimeBreakpoint_IsDebugShowOn ( )
 {
     if ( Is_DebugShowOn ) DebugRuntimeBreakpoint ( ) ;
 }
 
 void
-CFT_DebugRuntimeBreakpoint_IsDebugOn ( )
+CSL_DebugRuntimeBreakpoint_IsDebugOn ( )
 {
     if ( Is_DebugOn ) DebugRuntimeBreakpoint ( ) ;
 }

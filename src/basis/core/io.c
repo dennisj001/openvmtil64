@@ -1,5 +1,5 @@
 
-#include "../../include/cfrtil64.h"
+#include "../../include/csl.h"
 
 int64
 GetTerminalWidth ( )
@@ -86,21 +86,21 @@ Key ( )
 }
 
 byte
-_CFT_Key ( ReadLiner * rl )
+_CSL_Key ( ReadLiner * rl )
 {
     int key = _Key ( rl->InputFile ) ;
     return (byte) key ;
 }
 
 void
-_CFT_PrintString ( byte * string ) //  '."'
+_CSL_PrintString ( byte * string ) //  '."'
 {
     printf ( "%s", string ) ;
     fflush ( stdout ) ;
 }
 
 void
-_CFT_PrintChar ( byte c ) //  '."'
+_CSL_PrintChar ( byte c ) //  '."'
 {
     printf ( "%c", c ) ;
     fflush ( stdout ) ;
@@ -109,7 +109,7 @@ _CFT_PrintChar ( byte c ) //  '."'
 void
 Emit ( byte c )
 {
-    _CFT_PrintChar ( c ) ;
+    _CSL_PrintChar ( c ) ;
 }
 
 void
@@ -117,13 +117,13 @@ Context_DoPrompt ( Context * cntx )
 {
     if ( ( ReadLiner_GetLastChar ( ) != '\n' ) || ( ! IS_INCLUDING_FILES ) || ( GetState ( _Debugger_, DBG_ACTIVE ) ) )
     {
-        _CFT_PrintChar ( '\n' ) ; //_Printf ( ( byte* ) "\n" ) ;
+        _CSL_PrintChar ( '\n' ) ; //_Printf ( ( byte* ) "\n" ) ;
     }
     _Printf ( ( byte* ) "%s", ( char* ) cntx->ReadLiner0->NormalPrompt ) ; // for when including files
 }
 
 void
-CFT_DoPrompt ( )
+CSL_DoPrompt ( )
 {
     Context_DoPrompt ( _Context_ ) ;
 }
@@ -143,12 +143,12 @@ _Printf ( byte *format, ... )
         va_end ( args ) ;
         fflush ( stdout ) ;
 
-        if ( _CFT_ && _CFT_->LogFlag && _CFT_->LogFILE )
+        if ( _CSL_ && _CSL_->LogFlag && _CSL_->LogFILE )
         {
             va_start ( args, ( char* ) format ) ;
-            vfprintf ( _CFT_->LogFILE, ( char* ) format, args ) ;
+            vfprintf ( _CSL_->LogFILE, ( char* ) format, args ) ;
             va_end ( args ) ;
-            fflush ( _CFT_->LogFILE ) ;
+            fflush ( _CSL_->LogFILE ) ;
         }
     }
     //ReadLiner_SetLastChar ( 0 ) ; //
@@ -160,12 +160,12 @@ _Printf ( byte *format, ... )
 void
 Printf ( byte *format, ... )
 {
-    if ( kbhit ( ) == ESC ) OpenVmTil_Pause ( ) ; //CFT_Quit ( ) ;
-    if ( _O_ && _CFT_ && _O_->Verbosity )
+    if ( kbhit ( ) == ESC ) OpenVmTil_Pause ( ) ; //CSL_Quit ( ) ;
+    if ( _O_ && _CSL_ && _O_->Verbosity )
     {
         va_list args ;
         va_start ( args, ( char* ) format ) ;
-        char * out = ( char* ) Buffer_Data ( _CFT_->PrintfB ) ;
+        char * out = ( char* ) Buffer_Data ( _CSL_->PrintfB ) ;
         vsprintf ( ( char* ) out, ( char* ) format, args ) ;
         va_end ( args ) ;
         int64 len = Strlen ( ( char* ) out ) ;
@@ -183,7 +183,7 @@ Printf ( byte *format, ... )
             }
         }
         printf ( "%s", out ) ;
-        if ( _CFT_ && _CFT_->LogFlag ) fprintf ( _CFT_->LogFILE, "%s", out ) ;
+        if ( _CSL_ && _CSL_->LogFlag ) fprintf ( _CSL_->LogFILE, "%s", out ) ;
         if ( _O_->psi_PrintStateInfo )
         {
             if ( ( final == '\n' ) || ( final == '\r' ) )
@@ -255,7 +255,7 @@ UnGetwc ( int64 c, FILE * f )
 #if 0
 
 void
-__CFT_Emit ( byte c )
+__CSL_Emit ( byte c )
 {
     if ( ( c == '\n' ) || ( c == '\r' ) )
     {
@@ -272,7 +272,7 @@ __CFT_Emit ( byte c )
 }
 
 void
-_CFT_EmitString ( byte * string )
+_CSL_EmitString ( byte * string )
 {
 #if 1
     int64 i ;
@@ -280,12 +280,12 @@ _CFT_EmitString ( byte * string )
     {
         for ( i = 0 ; string [ i ] ; i ++ )
         {
-            if ( kbhit ( ) == ESC ) CFT_Quit ( ) ;
-            __CFT_Emit ( string [ i ] ) ;
+            if ( kbhit ( ) == ESC ) CSL_Quit ( ) ;
+            __CSL_Emit ( string [ i ] ) ;
         }
     }
 #else
-    if ( kbhit ( ) == ESC ) CFT_Quit ( ) ;
+    if ( kbhit ( ) == ESC ) CSL_Quit ( ) ;
     puts ( ( char* ) string ) ;
 #endif
 }

@@ -1,14 +1,14 @@
-#include "../include/cfrtil64.h"
+#include "../include/csl.h"
 
 // ( n ttt -- )
 
 void
-CFT_JMP ( )
+CSL_JMP ( )
 {
     if ( CompileMode )
     {
         byte * compiledAtAddress = Compile_UninitializedJump ( ) ; // at the end of the 'if block' we need to jmp over the 'else block'
-        CFT_CalculateAndSetPreviousJmpOffset_ToHere ( ) ;
+        CSL_CalculateAndSetPreviousJmpOffset_ToHere ( ) ;
         Stack_Push_PointerToJmpOffset (compiledAtAddress) ;
     }
     else
@@ -18,7 +18,7 @@ CFT_JMP ( )
 }
 
 void
-CFT_Compile_Jcc ( )
+CSL_Compile_Jcc ( )
 {
     int64 ttt = DataStack_Pop ( ) ;
     int64 n = DataStack_Pop ( ) ;
@@ -27,7 +27,7 @@ CFT_Compile_Jcc ( )
 }
 
 void
-CFT_Jcc_Label ( )
+CSL_Jcc_Label ( )
 {
     int64 ttt = DataStack_Pop ( ) ;
     int64 n = DataStack_Pop ( ) ;
@@ -36,13 +36,13 @@ CFT_Jcc_Label ( )
 }
 
 void
-CFT_JmpToHere ( )
+CSL_JmpToHere ( )
 {
-    CFT_CalculateAndSetPreviousJmpOffset_ToHere ( ) ;
+    CSL_CalculateAndSetPreviousJmpOffset_ToHere ( ) ;
 }
 
 void
-CFT_BitWise_NOT ( ) // xor
+CSL_BitWise_NOT ( ) // xor
 {
     if ( CompileMode )
     {
@@ -56,7 +56,7 @@ CFT_BitWise_NOT ( ) // xor
 }
 
 void
-CFT_BitWise_NEG ( ) // xor
+CSL_BitWise_NEG ( ) // xor
 {
     if ( CompileMode )
     {
@@ -69,7 +69,7 @@ CFT_BitWise_NEG ( ) // xor
 }
 
 void
-CFT_BitWise_OR ( ) // xor
+CSL_BitWise_OR ( ) // xor
 {
     if ( CompileMode )
     {
@@ -83,11 +83,11 @@ CFT_BitWise_OR ( ) // xor
 }
 
 void
-CFT_BitWise_OrEqual ( ) // -=
+CSL_BitWise_OrEqual ( ) // -=
 {
     if ( CompileMode )
     {
-        Compile_X_OpEqual ( _Context_->Compiler0, CFT_BitWise_OR ) ; //OR ) ;
+        Compile_X_OpEqual ( _Context_->Compiler0, CSL_BitWise_OR ) ; //OR ) ;
     }
     else
     {
@@ -96,12 +96,12 @@ CFT_BitWise_OrEqual ( ) // -=
         x = ( int64* ) DataStack_Pop ( ) ;
         *x = ( * x ) | n ;
         //_DataStack_SetTop ( Dsp, _DataStack_Pop () + _DataStack_GetTop ( Dsp ) ) ;
-        //CFT->set_DspReg_FromDataStackPointer ( ) ; // update DSP reg
+        //CSL->set_DspReg_FromDataStackPointer ( ) ; // update DSP reg
     }
 }
 
 void
-CFT_BitWise_AND ( ) // xor
+CSL_BitWise_AND ( ) // xor
 {
     if ( CompileMode )
     {
@@ -115,11 +115,11 @@ CFT_BitWise_AND ( ) // xor
 }
 
 void
-CFT_BitWise_AndEqual ( ) // -=
+CSL_BitWise_AndEqual ( ) // -=
 {
     if ( CompileMode )
     {
-        Compile_X_OpEqual ( _Context_->Compiler0, CFT_BitWise_AND ) ; //AND ) ;
+        Compile_X_OpEqual ( _Context_->Compiler0, CSL_BitWise_AND ) ; //AND ) ;
     }
     else
     {
@@ -132,7 +132,7 @@ CFT_BitWise_AndEqual ( ) // -=
 }
 
 void
-CFT_BitWise_XOR ( ) // xor
+CSL_BitWise_XOR ( ) // xor
 {
     if ( CompileMode )
     {
@@ -146,11 +146,11 @@ CFT_BitWise_XOR ( ) // xor
 }
 
 void
-CFT_BitWise_XorEqual ( ) // -=
+CSL_BitWise_XorEqual ( ) // -=
 {
     if ( CompileMode )
     {
-        Compile_X_OpEqual ( _Context_->Compiler0, CFT_BitWise_XOR ) ; //XOR ) ;
+        Compile_X_OpEqual ( _Context_->Compiler0, CSL_BitWise_XOR ) ; //XOR ) ;
     }
     else
     {
@@ -163,7 +163,7 @@ CFT_BitWise_XorEqual ( ) // -=
 }
 
 void
-CFT_ShiftLeft ( ) // lshift
+CSL_ShiftLeft ( ) // lshift
 {
     if ( CompileMode )
     {
@@ -177,7 +177,7 @@ CFT_ShiftLeft ( ) // lshift
 }
 
 void
-CFT_ShiftRight ( ) // rshift
+CSL_ShiftRight ( ) // rshift
 {
     if ( CompileMode )
     {
@@ -191,13 +191,13 @@ CFT_ShiftRight ( ) // rshift
 }
 
 void
-CFT_ShiftLeft_Equal ( ) // <<=
+CSL_ShiftLeft_Equal ( ) // <<=
 {
     Compiler * compiler = _Context_->Compiler0 ;
     if ( GetState ( compiler, BLOCK_MODE ) )
     {
         //Compile_X_Shift ( compiler, SHL, 0, 1 ) ;
-        Compile_X_OpEqual ( _Compiler_, CFT_ShiftLeft ) ;
+        Compile_X_OpEqual ( _Compiler_, CSL_ShiftLeft ) ;
     }
     else
     {
@@ -210,12 +210,12 @@ CFT_ShiftLeft_Equal ( ) // <<=
 }
 
 void
-CFT_ShiftRight_Equal ( ) // >>=
+CSL_ShiftRight_Equal ( ) // >>=
 {
     if ( GetState ( _Context_->Compiler0, BLOCK_MODE ) )
     {
         //Compile_X_Shift ( _Context_->Compiler0, SHR, 0, 1 ) ;
-        Compile_X_OpEqual ( _Compiler_, CFT_ShiftRight ) ;
+        Compile_X_OpEqual ( _Compiler_, CSL_ShiftRight ) ;
     }
     else
     {

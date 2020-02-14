@@ -1,5 +1,5 @@
 
-#include "../../include/cfrtil64.h"
+#include "../../include/csl.h"
 
 Symbol *
 DLList_FindName_InOneNamespaceList ( dllist * list, byte * name )
@@ -14,7 +14,7 @@ DLList_FindName_InOneNamespace ( Namespace * ns, byte * name )
 {
     Symbol * s = ( Symbol* ) Tree_Map_OneNamespace ( ( Word* ) dllist_First ( ( dllist* ) ns->W_List ),
         ( MapFunction_1 ) _Symbol_CompareName, ( int64 ) name ) ;
-    if ( ! s ) s = ( Symbol* ) Tree_Map_OneNamespace_TwoArgs ( _CFT_->Namespaces, ( MapFunction_2 ) Symbol_CompareName2, ( int64 ) name, ( int64 ) ns ) ;
+    if ( ! s ) s = ( Symbol* ) Tree_Map_OneNamespace_TwoArgs ( _CSL_->Namespaces, ( MapFunction_2 ) Symbol_CompareName2, ( int64 ) name, ( int64 ) ns ) ;
     return s ;
 }
 
@@ -59,7 +59,7 @@ Finder_FindWordFromAddress_AnyNamespace ( Finder * finder, byte * address )
 {
     finder->FoundWord = Tree_Map_State_OneArg ( USING | NOT_USING,
         ( MapFunction_1 ) _Finder_CompareDefinitionAddress, ( int64 ) address ) ;
-    CFT_WordAccounting ( ( byte* ) "Finder_Address_FindAny" ) ;
+    CSL_WordAccounting ( ( byte* ) "Finder_Address_FindAny" ) ;
     return finder->FoundWord ;
 }
 
@@ -123,7 +123,7 @@ Finder_Word_Find ( Finder * finder, byte * name, int64 flag, int64 saveQns )
             }
         }
         if ( ! rword ) rword = _Finder_Word_Find ( _Finder_, flag, name ) ;
-        CFT_WordAccounting ( ( byte* ) "Finder_Word_FindUsing" ) ;
+        CSL_WordAccounting ( ( byte* ) "Finder_Word_FindUsing" ) ;
     }
     return rword ;
 }
@@ -191,8 +191,8 @@ Finder_FindToken_WithException ( Finder * finder, byte * token )
     if ( Finder_Word_FindUsing ( finder, token, 0 ) == 0 )
     {
         _Printf ( ( byte* ) "\n%s ?", ( char* ) token ) ;
-        CFT_Using ( ) ;
-        CFT_Exception ( NOT_A_KNOWN_OBJECT, 0, QUIT ) ;
+        CSL_Using ( ) ;
+        CSL_Exception ( NOT_A_KNOWN_OBJECT, 0, QUIT ) ;
     }
     return finder->FoundWord ;
 }
@@ -216,7 +216,7 @@ Finder_FindWord_AnyNamespace ( Finder * finder, byte * name )
 }
 
 Word *
-CFT_FindInAnyNamespace ( byte * name )
+CSL_FindInAnyNamespace ( byte * name )
 {
     return _Finder_Word_Find ( _Finder_, ANY, name ) ;
 }
@@ -228,27 +228,27 @@ Finder_FindWord_InOneNamespace ( Finder * finder, byte *nsName, byte * name )
 }
 
 void
-CFT_Find ( )
+CSL_Find ( )
 {
     DataStack_Push ( ( int64 ) Finder_FindToken ( _Context_->Finder0, _Context_->Lexer0->OriginalToken ) ) ;
 }
 
 void
-CFT_Postfix_Find ( )
+CSL_Postfix_Find_Using ( )
 {
     Word * word = Finder_Word_Find ( _Context_->Finder0, ( byte* ) DataStack_Pop ( ), USING, 0 ) ;
     DataStack_Push ( ( int64 ) word ) ;
 }
 
 void
-CFT_Postfix_FindAny ( )
+CSL_Postfix_Find_Any ( )
 {
     Word * word = Finder_Word_Find ( _Context_->Finder0, ( byte* ) DataStack_Pop ( ), ANY, 0 ) ;
     DataStack_Push ( ( int64 ) word ) ;
 }
 
 void
-CFT_UnsetQualifyingNamespace ( )
+CSL_UnsetQualifyingNamespace ( )
 {
     Finder_SetQualifyingNamespace ( _Finder_, 0 ) ;
 }

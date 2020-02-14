@@ -1,16 +1,16 @@
 
-#include "../../include/cfrtil64.h"
+#include "../../include/csl.h"
 
 #define PP_ELIF 2
 #define PP_ELSE 1
 void
-CFT_PreProcessor ( )
+CSL_PreProcessor ( )
 {
     Lexer * lexer = _Lexer_ ;
     Interpreter * interp = _Context_->Interpreter0 ;
     int64 svState = GetState ( lexer, ( ADD_TOKEN_TO_SOURCE | ADD_CHAR_TO_SOURCE ) ) ;
     Lexer_SourceCodeOff ( lexer ) ;
-    _CFT_UnAppendFromSourceCode_NChars ( _CFT_, 1 ) ; // 1 : '#'
+    _CSL_UnAppendFromSourceCode_NChars ( _CSL_, 1 ) ; // 1 : '#'
     Finder_SetNamedQualifyingNamespace ( _Finder_, ( byte* ) "PreProcessor" ) ;
     SetState ( interp, PREPROCESSOR_MODE, true ) ;
     Interpreter_InterpretNextToken ( interp ) ;
@@ -198,12 +198,12 @@ SkipPreprocessorCode ( Boolean skipControl )
         {
             if ( String_Equal ( token, "//" ) )
             {
-                CFT_CommentToEndOfLine ( ) ;
+                CSL_CommentToEndOfLine ( ) ;
                 Lexer_SourceCodeOff ( lexer ) ;
             }
             else if ( String_Equal ( token, "/*" ) )
             {
-                CFT_ParenthesisComment ( ) ;
+                CSL_ParenthesisComment ( ) ;
                 Lexer_SourceCodeOff ( lexer ) ;
             }
             else if ( String_Equal ( token, "#" ) )
@@ -253,25 +253,25 @@ done:
 }
 
 void
-CFT_If_ConditionalInterpret ( )
+CSL_If_ConditionalInterpret ( )
 {
     if ( ! GetIfStatus ( ) ) SkipPreprocessorCode ( PP_SKIP ) ;
 }
 
 void
-CFT_Elif_ConditionalInterpret ( )
+CSL_Elif_ConditionalInterpret ( )
 {
     if ( ! GetElifStatus ( ) ) SkipPreprocessorCode ( PP_ELIF ) ;
 }
 
 void
-CFT_Else_ConditionalInterpret ( )
+CSL_Else_ConditionalInterpret ( )
 {
     if ( ! GetElseStatus ( ) ) SkipPreprocessorCode ( PP_ELSE ) ;
 }
 
 void
-CFT_Endif_ConditionalInterpret ( )
+CSL_Endif_ConditionalInterpret ( )
 {
     if ( ! GetEndifStatus ( ) ) SkipPreprocessorCode ( PP_SKIP ) ;
 }

@@ -1,10 +1,10 @@
 
-#include "../include/cfrtil64.h"
+#include "../include/csl.h"
 
 void
 _Context_Prompt ( int64 control )
 {
-    if ( ( control && ( ! IS_INCLUDING_FILES ) ) || ( GetState ( _Debugger_, DBG_ACTIVE ) ) ) CFT_DoPrompt ( ) ;
+    if ( ( control && ( ! IS_INCLUDING_FILES ) ) || ( GetState ( _Debugger_, DBG_ACTIVE ) ) ) CSL_DoPrompt ( ) ;
 }
 
 byte *
@@ -13,7 +13,7 @@ _Context_Location ( Context * cntx )
     byte * str = 0 ;
     if ( cntx && cntx->ReadLiner0 )
     {
-        byte * buffer = Buffer_Data ( _CFT_->StringB ) ;
+        byte * buffer = Buffer_Data ( _CSL_->StringB ) ;
         snprintf ( ( char* ) buffer, BUF_IX_SIZE, "%s : %ld.%ld", ( char* ) cntx->ReadLiner0->Filename ? ( char* ) cntx->ReadLiner0->Filename : "<command line>", cntx->ReadLiner0->LineNumber, cntx->Lexer0->CurrentReadIndex ) ;
         str = cntx->Location = String_New ( buffer, TEMPORARY ) ;
     }
@@ -60,7 +60,7 @@ _Context_Init ( Context * cntx0, Context * cntx )
 {
     if ( cntx0 && cntx0->System0 ) cntx->System0 = System_Copy ( cntx0->System0, CONTEXT ) ; // nb : in this case System is copied -- DataStack is shared
     else cntx->System0 = System_New ( CONTEXT ) ;
-    List_Init ( _CFT_->Compiler_N_M_Node_WordList ) ;
+    List_Init ( _CSL_->Compiler_N_M_Node_WordList ) ;
     Context_SetDefaultTokenDelimiters ( cntx, ( byte* ) " \n\r\t", CONTEXT ) ;
     cntx->Interpreter0 = Interpreter_New ( CONTEXT ) ;
     cntx->Lexer0 = cntx->Interpreter0->Lexer0 ;
@@ -73,12 +73,12 @@ _Context_Init ( Context * cntx0, Context * cntx )
 }
 
 Context *
-_Context_New ( CfrTil * cfrTil )
+_Context_New ( CSL * csl )
 {
-    Context * cntx = _Context_Allocate ( ), *cntx0 = cfrTil->Context0 ;
-    _Context_ = cfrTil->Context0 = cntx ;
+    Context * cntx = _Context_Allocate ( ), *cntx0 = csl->Context0 ;
+    _Context_ = csl->Context0 = cntx ;
     _Context_Init ( cntx0, cntx ) ;
-    cntx->ContextDataStack = cfrTil->DataStack ; // nb. using the same one and only DataStack
+    cntx->ContextDataStack = csl->DataStack ; // nb. using the same one and only DataStack
     return cntx ;
 }
 
@@ -101,48 +101,48 @@ _Context_Run ( Context * cntx, ContextFunction contextFunction )
 }
 
 Context *
-CFT_Context_PushNew ( CfrTil * cfrTil )
+CSL_Context_PushNew ( CSL * csl )
 {
-    _Stack_Push ( cfrTil->ContextDataStack, ( int64 ) cfrTil->Context0 ) ;
-    Context * cntx = _Context_New ( cfrTil ) ;
+    _Stack_Push ( csl->ContextDataStack, ( int64 ) csl->Context0 ) ;
+    Context * cntx = _Context_New ( csl ) ;
     return cntx ;
 }
 
 void
-CFT_Context_PopDelete ( CfrTil * cfrTil )
+CSL_Context_PopDelete ( CSL * csl )
 {
-    NBA * cnba = cfrTil->Context0->ContextNba ;
-    Context * cntx = ( Context* ) _Stack_Pop ( cfrTil->ContextDataStack ) ;
+    NBA * cnba = csl->Context0->ContextNba ;
+    Context * cntx = ( Context* ) _Stack_Pop ( csl->ContextDataStack ) ;
     //Compiler_DeleteDebugInfo ( cntx->Compiler0 ) ;
-    _Context_ = cfrTil->Context0 = cntx ;
+    _Context_ = csl->Context0 = cntx ;
     _O_->MemorySpace0->ContextSpace = cntx->ContextNba ;
     NamedByteArray_Delete ( cnba, 0 ) ;
 }
 
 void
-_CFT_Contex_NewRun_1 ( CfrTil * cfrTil, ContextFunction_1 contextFunction, byte *arg )
+_CSL_Contex_NewRun_1 ( CSL * csl, ContextFunction_1 contextFunction, byte *arg )
 {
-    Context * cntx = CFT_Context_PushNew ( cfrTil ) ;
+    Context * cntx = CSL_Context_PushNew ( csl ) ;
     _Context_Run_1 ( cntx, contextFunction, arg ) ;
-    CFT_Context_PopDelete ( cfrTil ) ; // this could be coming back from wherever so the stack variables are gone
+    CSL_Context_PopDelete ( csl ) ; // this could be coming back from wherever so the stack variables are gone
 }
 
 void
-_CFT_Contex_NewRun_2 ( CfrTil * cfrTil, ContextFunction_2 contextFunction, byte *arg, int64 arg2 )
+_CSL_Contex_NewRun_2 ( CSL * csl, ContextFunction_2 contextFunction, byte *arg, int64 arg2 )
 {
-    Context * cntx = CFT_Context_PushNew ( cfrTil ) ;
+    Context * cntx = CSL_Context_PushNew ( csl ) ;
     _Context_Run_2 ( cntx, contextFunction, arg, arg2 ) ;
-    CFT_Context_PopDelete ( cfrTil ) ; // this could be coming back from wherever so the stack variables are gone
+    CSL_Context_PopDelete ( csl ) ; // this could be coming back from wherever so the stack variables are gone
 }
 
 void
-_CFT_Contex_NewRun_Void ( CfrTil * cfrTil, Word * word )
+_CSL_Contex_NewRun_Void ( CSL * csl, Word * word )
 {
     if ( word )
     {
-        CFT_Context_PushNew ( cfrTil ) ;
+        CSL_Context_PushNew ( csl ) ;
         Block_Eval ( word->Definition ) ;
-        CFT_Context_PopDelete ( cfrTil ) ; // this could be coming back from wherever so the stack variables are gone
+        CSL_Context_PopDelete ( csl ) ; // this could be coming back from wherever so the stack variables are gone
     }
 }
 
@@ -167,9 +167,9 @@ _Context_InterpretString ( Context * cntx, byte *str )
 }
 
 void
-_CFT_ContextNew_InterpretString ( CfrTil * cfrTil, byte * str )
+_CSL_ContextNew_InterpretString ( CSL * csl, byte * str )
 {
-    if ( str ) _CFT_Contex_NewRun_1 ( cfrTil, _Context_InterpretString, str ) ;
+    if ( str ) _CSL_Contex_NewRun_1 ( csl, _Context_InterpretString, str ) ;
 }
 
 void
@@ -177,7 +177,7 @@ _Context_InterpretFile ( Context * cntx )
 {
     if ( GetState ( _Debugger_, DBG_AUTO_MODE ) )
     {
-        _CFT_DebugContinue ( 0 ) ;
+        _CSL_DebugContinue ( 0 ) ;
     }
     else Interpret_UntilFlaggedWithInit ( cntx->Interpreter0, END_OF_FILE | END_OF_STRING ) ;
 }
@@ -210,16 +210,16 @@ _Context_IncludeFile ( Context * cntx, byte *filename, int64 interpretFlag )
         }
         else
         {
-            _Printf ( ( byte* ) "\nError : _CFT_IncludeFile : \"%s\" : not found! :: %s\n", filename,
-                _Context_Location ( ( Context* ) _CFT_->ContextDataStack->StackPointer [0] ) ) ;
+            _Printf ( ( byte* ) "\nError : _CSL_IncludeFile : \"%s\" : not found! :: %s\n", filename,
+                _Context_Location ( ( Context* ) _CSL_->ContextDataStack->StackPointer [0] ) ) ;
         }
     }
 }
 
 void
-_CFT_ContextNew_IncludeFile ( byte * filename )
+_CSL_ContextNew_IncludeFile ( byte * filename )
 {
-    _CFT_Contex_NewRun_2 ( _CFT_, _Context_IncludeFile, filename, 1 ) ;
+    _CSL_Contex_NewRun_2 ( _CSL_, _Context_IncludeFile, filename, 1 ) ;
 }
 
 int64

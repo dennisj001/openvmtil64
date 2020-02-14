@@ -1,5 +1,5 @@
 
-#include "../include/cfrtil64.h"
+#include "../include/csl.h"
 
 void
 _Interpret_ListNode ( dlnode * node )
@@ -55,7 +55,7 @@ List_CheckInterpretLists_OnVariable ( dllist * list, byte * token )
             // get nextNode before map function (mf) in case mf changes list by a Remove of current node
             // problem could arise if mf removes Next node
             nextNode = dlnode_Next ( node ) ;
-            dllist * plist = ( dllist * ) dobject_Get_M_Slot ( (dobject*) node, SCN_T_WORD ) ; // plist created in CFT_IncDec
+            dllist * plist = ( dllist * ) dobject_Get_M_Slot ( (dobject*) node, SCN_T_WORD ) ; // plist created in CSL_IncDec
             Word * word = ( Word * ) List_Top_Value ( plist ) ;
             byte *checkPostfixToken = word ? word->Name : 0 ;
             if ( checkPostfixToken && String_Equal ( checkPostfixToken, token ) )

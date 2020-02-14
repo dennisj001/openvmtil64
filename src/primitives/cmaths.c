@@ -1,8 +1,8 @@
 
-#include "../include/cfrtil64.h"
+#include "../include/csl.h"
 
 void
-CFT_Power_03 ( ) // **
+CSL_Power_03 ( ) // **
 {
     int64 pow = _Dsp_ [ 0 ], base = _Dsp_ [ -1 ], n ;
     for ( n = base ; -- pow ; )
@@ -95,7 +95,7 @@ CFib ( )
 }
 
 void
-CFT_Power ( ) // **
+CSL_Power ( ) // **
 {
     int64 pow = _Dsp_ [ 0 ], base = _Dsp_ [ - 1 ], n ;
     for ( n = base ; -- pow ; )

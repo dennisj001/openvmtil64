@@ -1,5 +1,5 @@
 
-#include "../include/cfrtil64.h"
+#include "../include/csl.h"
 
 void
 Fflush ( )
@@ -8,40 +8,40 @@ Fflush ( )
 }
 
 void
-CFT_Kbhit ( void )
+CSL_Kbhit ( void )
 {
     DataStack_Push ( ( int64 ) kbhit ( ) ) ;
 }
 
 void
-CFT_PrintString ( )
+CSL_PrintString ( )
 {
-    _CFT_PrintString ( ( byte* ) DataStack_Pop ( ) ) ;
+    _CSL_PrintString ( ( byte* ) DataStack_Pop ( ) ) ;
 }
 
 void
-CFT_NewLine ( )
+CSL_NewLine ( )
 {
-    _CFT_PrintChar ( '\n' ) ;
+    _CSL_PrintChar ( '\n' ) ;
     ReadLiner_SetLastChar ( '\n' ) ;
 }
 
 void
-CFT_CarriageReturn ( )
+CSL_CarriageReturn ( )
 {
-    _CFT_PrintChar ( '\r' ) ;
+    _CSL_PrintChar ( '\r' ) ;
 }
 
 void
-CFT_SPACE ( ) // '.'
+CSL_SPACE ( ) // '.'
 {
-    _CFT_PrintChar ( ' ' ) ;
+    _CSL_PrintChar ( ' ' ) ;
 }
 
 void
-CFT_TAB ( ) // '.'
+CSL_TAB ( ) // '.'
 {
-    _CFT_PrintChar ( '\t' ) ;
+    _CSL_PrintChar ( '\t' ) ;
 }
 
 void
@@ -105,7 +105,7 @@ Print_Binary ( uint64 n )
 void
 PrintfInt ( int64 n )
 {
-    byte * buffer = Buffer_Data ( _CFT_->ScratchB1 ) ;
+    byte * buffer = Buffer_Data ( _CSL_->ScratchB1 ) ;
     if ( _Context_->System0->NumberBase == 10 ) sprintf ( ( char* ) buffer, INT_FRMT, n ) ;
     else if ( _Context_->System0->NumberBase == 2 )
     {
@@ -118,13 +118,13 @@ PrintfInt ( int64 n )
 }
 
 void
-CFT_PrintInt ( )
+CSL_PrintInt ( )
 {
     PrintfInt ( DataStack_Pop ( ) ) ;
 }
 
 void
-CFT_HexPrintInt ( )
+CSL_HexPrintInt ( )
 {
     int64 svb = _Context_->System0->NumberBase ;
     _Context_->System0->NumberBase = 16 ;
@@ -133,15 +133,15 @@ CFT_HexPrintInt ( )
 }
 
 void
-CFT_Emit ( )
+CSL_Emit ( )
 {
     int64 c = DataStack_Pop ( ) ;
-    if ( ( c >= 0 ) && ( c < 256 ) ) _CFT_PrintChar ( c ) ;
-    else _CFT_PrintChar ( c ) ; //_Printf ( ( byte* ) "%c", ( ( CString ) c )[0] ) ;
+    if ( ( c >= 0 ) && ( c < 256 ) ) _CSL_PrintChar ( c ) ;
+    else _CSL_PrintChar ( c ) ; //_Printf ( ( byte* ) "%c", ( ( CString ) c )[0] ) ;
 }
 
 void
-CFT_Key ( )
+CSL_Key ( )
 {
 #if 0    
     ReadLine_Get_Key ( _Context_->ReadLiner0 ) ;
@@ -152,38 +152,38 @@ CFT_Key ( )
 }
 
 void
-CFT_LogOn ( )
+CSL_LogOn ( )
 {
-    _CFT_->LogFlag = true ;
-    if ( ! _CFT_->LogFILE ) _CFT_->LogFILE = fopen ( ( char* ) "cfrtil.log", "w" ) ;
+    _CSL_->LogFlag = true ;
+    if ( ! _CSL_->LogFILE ) _CSL_->LogFILE = fopen ( ( char* ) "csl.log", "w" ) ;
 }
 
 void
-CFT_LogAppend ( )
+CSL_LogAppend ( )
 {
     byte * logFilename = ( byte* ) DataStack_Pop ( ) ;
-    _CFT_->LogFILE = fopen ( ( char* ) logFilename, "a" ) ;
-    CFT_LogOn ( ) ;
+    _CSL_->LogFILE = fopen ( ( char* ) logFilename, "a" ) ;
+    CSL_LogOn ( ) ;
 }
 
 void
-CFT_LogWrite ( )
+CSL_LogWrite ( )
 {
     byte * logFilename = ( byte* ) DataStack_Pop ( ) ;
-    _CFT_->LogFILE = fopen ( ( char* ) logFilename, "w" ) ;
-    CFT_LogOn ( ) ;
+    _CSL_->LogFILE = fopen ( ( char* ) logFilename, "w" ) ;
+    CSL_LogOn ( ) ;
 }
 
 void
-CFT_LogOff ( )
+CSL_LogOff ( )
 {
-    CfrTil * cfrtil = _CFT_ ;
-    if ( cfrtil )
+    CSL * csl = _CSL_ ;
+    if ( csl )
     {
-        fflush ( cfrtil->LogFILE ) ;
-        if ( cfrtil->LogFILE ) fclose ( cfrtil->LogFILE ) ; // ? not needed  ?
-        cfrtil->LogFlag = false ;
-        cfrtil->LogFILE = 0 ;
+        fflush ( csl->LogFILE ) ;
+        if ( csl->LogFILE ) fclose ( csl->LogFILE ) ; // ? not needed  ?
+        csl->LogFlag = false ;
+        csl->LogFILE = 0 ;
     }
 }
 

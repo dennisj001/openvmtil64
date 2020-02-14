@@ -1,15 +1,15 @@
 
-#include "../include/cfrtil64.h"
+#include "../include/csl.h"
 
 void
-CFT_Token ( )
+CSL_Token ( )
 {
     byte * token = Lexer_ReadToken ( _Lexer_ ) ;
     DataStack_Push ( ( int64 ) token ) ;
 }
 
 void
-CFT_TokenQID ( )
+CSL_TokenQID ( )
 {
     byte * token ;
     Word * word ;
@@ -29,22 +29,22 @@ CFT_TokenQID ( )
 }
 
 void
-CFT_FilenameToken ( )
+CSL_FilenameToken ( )
 {
     byte * token = _Lexer_LexNextToken_WithDelimiters ( _Lexer_, 0, 1, 0, 1, LEXER_ALLOW_DOT ) ;
     DataStack_Push ( ( int64 ) token ) ;
 }
 
 void
-CFT_SingleQuote ( )
+CSL_SingleQuote ( )
 {
-    _CFT_SingleQuote ( ) ;
+    _CSL_SingleQuote ( ) ;
 }
 
 void
-CFT_Tick ( )
+CSL_Tick ( )
 {
-    _CFT_SingleQuote ( ) ;
+    _CSL_SingleQuote ( ) ;
 }
 
 void
@@ -66,7 +66,7 @@ Parse_SkipUntil_EitherToken_OrNewline ( byte * end1, byte* end2 )
 }
 
 void
-CFT_Parse ( )
+CSL_Parse ( )
 {
     Lexer * lexer = _Context_->Lexer0 ;
     byte * token = ( byte* ) DataStack_Pop ( ) ;
@@ -75,16 +75,37 @@ CFT_Parse ( )
 }
 
 void
-CFT_DoubleQuoteMacro ( )
+CSL_DoubleQuoteMacro ( )
 {
     Lexer_ParseDoubleQuoteMacro ( _Lexer_ ) ;
 }
 
 void
-CFT_Word_ClassStructure_PrintData ( Word * word )
+_CSL_Word_ClassStructure_PrintData ( Word * typedefWord, Word * word )
 {
-    CFT_Typedef ( ) ;
+    typedefWord = Word_UnAlias ( typedefWord ) ;
+    CSL_NewLine () ;
+    if ( typedefWord && word ) Word_ClassStructure_PrintData ( word, typedefWord->W_SourceCode ) ;
 }
 
+
+void
+CSL_Word_Name_ClassStructure_PrintData ( )
+{
+    byte * token = ( byte* ) DataStack_Pop ( ) ;
+    Word * typedefWord = Finder_Word_FindUsing ( _Finder_, token, 0 ) ;
+    byte * token1 = ( byte* ) DataStack_Pop ( ) ;
+    Word * word = Finder_Word_FindUsing ( _Finder_, token1, 0 ) ;
+    _CSL_Word_ClassStructure_PrintData ( typedefWord, word ) ;
+}
+
+
+void
+CSL_Word_ClassStructure_PrintData ( )
+{
+    Word * typedefWord = ( Word* ) DataStack_Pop ( ) ;
+    Word * word = ( Word* ) DataStack_Pop ( ) ;
+    _CSL_Word_ClassStructure_PrintData ( typedefWord, word ) ;
+}
 
 

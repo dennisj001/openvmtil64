@@ -1,4 +1,4 @@
-#include "../include/cfrtil64.h"
+#include "../include/csl.h"
 
 // lib : full library path
 
@@ -46,13 +46,13 @@ Word *
 Dlsym ( byte * sym, byte * lib )
 {
     block b = ( block ) _Dlsym ( sym, lib ) ;
-    Word * word = DataObject_New (CFRTIL_WORD, 0, sym, CPRIMITIVE | DLSYM_WORD | C_PREFIX | C_RETURN | C_PREFIX_RTL_ARGS, 0, 0, 0, ( int64 ) b, 0, 0, 0, - 1 ) ;
+    Word * word = DataObject_New (csl_WORD, 0, sym, CPRIMITIVE | DLSYM_WORD | C_PREFIX | C_RETURN | C_PREFIX_RTL_ARGS, 0, 0, 0, ( int64 ) b, 0, 0, 0, - 1 ) ;
     word->W_TypeAttributes |= WT_C_PREFIX_RTL_ARGS ;
     return word ;
 }
 
 void
-CFT_Dlsym ( )
+CSL_Dlsym ( )
 {
     byte * sym = Lexer_ReadToken ( _Context_->Lexer0 ) ;
     byte * lib = _Lexer_LexNextToken_WithDelimiters ( _Context_->Lexer0, 0, 1, 0, 1, LEXER_ALLOW_DOT ) ;
@@ -64,7 +64,7 @@ CFT_Dlsym ( )
 // callNumber | errno
 
 void
-CFT_system0 ( )
+CSL_system0 ( )
 {
     _Compile_Stack_PopToReg ( DSP, ACC ) ;
     _Compile_INT80 ( ) ;
@@ -72,7 +72,7 @@ CFT_system0 ( )
 }
 
 void
-CFT_system1 ( )
+CSL_system1 ( )
 {
     _Compile_Stack_PopToReg ( DSP, ACC ) ;
     _Compile_Stack_PopToReg ( DSP, OREG ) ;
@@ -81,7 +81,7 @@ CFT_system1 ( )
 }
 
 void
-CFT_system2 ( )
+CSL_system2 ( )
 {
     _Compile_Stack_PopToReg ( DSP, ACC ) ;
     _Compile_Stack_PopToReg ( DSP, OREG ) ;
@@ -91,7 +91,7 @@ CFT_system2 ( )
 }
 
 void
-CFT_system3 ( )
+CSL_system3 ( )
 {
     _Compile_Stack_PopToReg ( DSP, ACC ) ;
     _Compile_Stack_PopToReg ( DSP, OREG ) ;
@@ -102,33 +102,33 @@ CFT_system3 ( )
 }
 
 void
-_CFT_WordAccounting_Print ( byte * functionName )
+_CSL_WordAccounting_Print ( byte * functionName )
 {
     _Printf ( ( byte* ) "\n%s :: DObjectCreateCount = %d : WordCreateCount = %d : WordsAdded = %d : FindWordCount = %d : FindWordMaxCount = %d",
-        functionName, _CFT_->DObjectCreateCount, _CFT_->WordCreateCount, _CFT_->WordsAdded, _CFT_->FindWordCount, _CFT_->FindWordMaxCount ) ;
+        functionName, _CSL_->DObjectCreateCount, _CSL_->WordCreateCount, _CSL_->WordsAdded, _CSL_->FindWordCount, _CSL_->FindWordMaxCount ) ;
     _Printf ( ( byte* ) "\nRecycledWordCount : %d", _O_->MemorySpace0->RecycledWordCount ) ;
     Buffer_PrintBuffers ( ) ;
 }
 
 void
-CFT_WordAccounting ( byte * functionName )
+CSL_WordAccounting ( byte * functionName )
 {
-    if ( _CFT_->FindWordCount > _CFT_->FindWordMaxCount ) _CFT_->FindWordMaxCount = _CFT_->FindWordCount ;
+    if ( _CSL_->FindWordCount > _CSL_->FindWordMaxCount ) _CSL_->FindWordMaxCount = _CSL_->FindWordCount ;
     if ( _O_->Verbosity > 4 )
-        _CFT_WordAccounting_Print ( functionName ) ;
+        _CSL_WordAccounting_Print ( functionName ) ;
 }
 
 byte *
-_CFT_GetSystemState_String0 ( byte * buf )
+_CSL_GetSystemState_String0 ( byte * buf )
 {
     strcpy ( ( char* ) buf, "\ntypeChecking is " ) ;
-    if ( GetState ( _CFT_, TYPECHECK_ON ) ) strcat ( ( char* ) buf, "on, " ) ;
+    if ( GetState ( _CSL_, TYPECHECK_ON ) ) strcat ( ( char* ) buf, "on, " ) ;
     else strcat ( ( char* ) buf, "off, " ) ;
     strcat ( ( char* ) buf, "optimize is " ) ;
-    if ( GetState ( _CFT_, OPTIMIZE_ON ) ) strcat ( ( char* ) buf, "on, " ) ;
+    if ( GetState ( _CSL_, OPTIMIZE_ON ) ) strcat ( ( char* ) buf, "on, " ) ;
     else strcat ( ( char* ) buf, "off, " ) ;
     strcat ( ( char* ) buf, "inlining is " ) ;
-    if ( GetState ( _CFT_, INLINE_ON ) ) strcat ( ( char* ) buf, "on, " ) ;
+    if ( GetState ( _CSL_, INLINE_ON ) ) strcat ( ( char* ) buf, "on, " ) ;
     else strcat ( ( char* ) buf, "off, " ) ;
     strcat ( ( char* ) buf, "infixMode is " ) ;
     if ( GetState ( _Context_, INFIX_MODE ) ) strcat ( ( char* ) buf, "on, " ) ;
@@ -152,13 +152,13 @@ _CFT_GetSystemState_String0 ( byte * buf )
 }
 
 byte *
-_CFT_GetSystemState_String1 ( byte *buf )
+_CSL_GetSystemState_String1 ( byte *buf )
 {
     strcat ( ( char* ) buf, "\nReadLine echo is " ) ;
-    if ( GetState ( _CFT_, READLINE_ECHO_ON ) ) strcat ( ( char* ) buf, "on. " ) ;
+    if ( GetState ( _CSL_, READLINE_ECHO_ON ) ) strcat ( ( char* ) buf, "on. " ) ;
     else strcat ( ( char* ) buf, "off. " ) ;
     strcpy ( ( char* ) buf, "\nDebug is " ) ;
-    if ( GetState ( _CFT_, DEBUG_MODE ) ) strcat ( ( char* ) buf, "on. " ) ;
+    if ( GetState ( _CSL_, DEBUG_MODE ) ) strcat ( ( char* ) buf, "on. " ) ;
     else strcat ( ( char* ) buf, "off. " ) ;
     sprintf ( ( char* ) &buf[Strlen ( ( char* ) buf )], "Verbosity = %ld. ", _O_->Verbosity ) ;
     sprintf ( ( char* ) &buf[Strlen ( ( char* ) buf )], "Console = %ld, ", _O_->Console ) ;
@@ -177,7 +177,7 @@ Convert_RestartCondtion ( int64 restartCondition )
         case ( ( uint64 ) 1 << 7 ): return "RESET_ALL" ;
         case ( ( uint64 ) 1 << 6 ): return "ABORT" ;
         case ( ( uint64 ) 1 << 5 ): return "QUIT" ;
-        case ( ( uint64 ) 1 << 4 ): return "CFRTIL_RUN_INIT" ;
+        case ( ( uint64 ) 1 << 4 ): return "csl_RUN_INIT" ;
         case ( ( uint64 ) 1 << 3 ): return "STOP" ;
         case ( ( uint64 ) 1 << 2 ): return "BREAK" ;
         case ( ( uint64 ) 1 << 1 ): return "CONTINUE" ;
@@ -188,14 +188,14 @@ Convert_RestartCondtion ( int64 restartCondition )
 }
 
 void
-_CFT_SystemState_Print ( int64 pflag )
+_CSL_SystemState_Print ( int64 pflag )
 {
-    byte * buf = Buffer_Data ( _CFT_->ScratchB1 ) ;
-    buf = _CFT_GetSystemState_String0 ( buf ) ;
+    byte * buf = Buffer_Data ( _CSL_->ScratchB1 ) ;
+    buf = _CSL_GetSystemState_String0 ( buf ) ;
     _Printf ( ( byte* ) buf ) ;
-    buf = _CFT_GetSystemState_String1 ( buf ) ;
+    buf = _CSL_GetSystemState_String1 ( buf ) ;
     _Printf ( ( byte* ) buf ) ;
-    Boolean dsc = GetState ( _CFT_, DEBUG_SOURCE_CODE_MODE ) ;
+    Boolean dsc = GetState ( _CSL_, DEBUG_SOURCE_CODE_MODE ) ;
     _Printf ( ( byte* ) "\nDebugSourceCode %s", dsc ? "on" : "off" ) ;
     Boolean bno = Namespace_IsUsing ( ( byte* ) "BigNum" ) ;
     _Printf ( ( byte* ) " : BigNum %s", bno ? "on" : "off" ) ;
@@ -206,13 +206,13 @@ _CFT_SystemState_Print ( int64 pflag )
     if ( pflag || ( _O_->Verbosity > 1 ) )
     {
         OpenVmTil_Print_DataSizeofInfo ( pflag ) ;
-        _CFT_WordAccounting_Print ( ( byte* ) "_CFT_SystemState_Print" ) ;
+        _CSL_WordAccounting_Print ( ( byte* ) "_CSL_SystemState_Print" ) ;
         BigNum_StateShow ( ) ;
     }
 }
 
 void
-__CFT_Dump ( byte * address, int64 number, int64 dumpMod )
+__CSL_Dump ( byte * address, int64 number, int64 dumpMod )
 {
     if ( address && number )
     {
@@ -228,8 +228,8 @@ __CFT_Dump ( byte * address, int64 number, int64 dumpMod )
             {
                 for ( n = 0 ; n < dumpMod ; n += CELL_SIZE ) _Printf ( ( byte* ) UINT_FRMT " ", *( int64* ) ( address + i + n ) ) ;
                 _Printf ( ( byte* ) " " ) ;
-                for ( n = 0 ; n < dumpMod ; n += CELL_SIZE ) CFT_NByteDump ( ( byte* ) ( address + i + n ), CELL_SIZE ) ;
-                for ( n = 0 ; n < dumpMod ; n += CELL_SIZE ) CFT_CharacterDump ( ( byte* ) ( address + i + n ), CELL_SIZE ) ;
+                for ( n = 0 ; n < dumpMod ; n += CELL_SIZE ) CSL_NByteDump ( ( byte* ) ( address + i + n ), CELL_SIZE ) ;
+                for ( n = 0 ; n < dumpMod ; n += CELL_SIZE ) CSL_CharacterDump ( ( byte* ) ( address + i + n ), CELL_SIZE ) ;
                 i += dumpMod ;
             }
             else i ++ ;
@@ -239,7 +239,7 @@ __CFT_Dump ( byte * address, int64 number, int64 dumpMod )
 }
 
 void
-_CFT_Source ( Word *word, int64 addToHistoryFlag )
+_CSL_Source ( Word *word, int64 addToHistoryFlag )
 {
     if ( word )
     {
@@ -287,9 +287,9 @@ _CFT_Source ( Word *word, int64 addToHistoryFlag )
         {
             _Printf ( ( byte* ) "%s <:> %s", name, "lambdaCalculus compiled word" ) ;
         }
-        else if ( word->W_MorphismAttributes & CFRTIL_WORD )
+        else if ( word->W_MorphismAttributes & csl_WORD )
         {
-            _Printf ( ( byte* ) "%s <:> %s", name, "cfrTil compiled word" ) ;
+            _Printf ( ( byte* ) "%s <:> %s", name, "csl compiled word" ) ;
         }
         else if ( word->W_LispAttributes & T_LC_DEFINE )
         {
@@ -297,7 +297,7 @@ _CFT_Source ( Word *word, int64 addToHistoryFlag )
         }
         else if ( word->W_MorphismAttributes & BLOCK )
         {
-            _Printf ( ( byte* ) "%s <:> %s", name, "cfrTil compiled code block" ) ;
+            _Printf ( ( byte* ) "%s <:> %s", name, "csl compiled code block" ) ;
         }
         if ( word->W_MorphismAttributes & INLINE ) _Printf ( ( byte* ) ", %s", "inline" ) ;
         if ( word->W_MorphismAttributes & IMMEDIATE ) _Printf ( ( byte* ) ", %s", "immediate" ) ;
@@ -305,7 +305,7 @@ _CFT_Source ( Word *word, int64 addToHistoryFlag )
         if ( word->W_MorphismAttributes & C_PREFIX ) _Printf ( ( byte* ) ", %s", "c_prefix" ) ;
         if ( word->W_MorphismAttributes & C_RETURN ) _Printf ( ( byte* ) ", %s", "c_return" ) ;
         if ( word->W_MorphismAttributes & INFIXABLE ) _Printf ( ( byte* ) ", %s", "infixable" ) ;
-        if ( word->S_WordData )
+        if ( word->W_WordData )
         {
             _Word_ShowSourceCode ( word ) ; // source code has newlines for multiline history
             if ( aword && ( aword != Word_UnAlias ( aword ) ) ) 
@@ -313,14 +313,14 @@ _CFT_Source ( Word *word, int64 addToHistoryFlag )
                 _Word_ShowSourceCode ( aword ) ;
             }
             if ( addToHistoryFlag ) _OpenVmTil_AddStringToHistoryList ( word->W_SourceCode ) ;
-            if ( word->S_WordData->Filename ) _Printf ( ( byte* ) "\nSource code file location of %s : \"%s\" : %d.%d :: we are now at : %s", name, word->S_WordData->Filename, word->S_WordData->LineNumber, word->W_TokenEnd_ReadLineIndex, Context_IsInFile ( _Context_ ) ? Context_Location ( ) : ( byte* ) "command line" ) ;
+            if ( word->W_WordData->Filename ) _Printf ( ( byte* ) "\nSource code file location of %s : \"%s\" : %d.%d :: we are now at : %s", name, word->W_WordData->Filename, word->W_WordData->LineNumber, word->W_TokenEnd_ReadLineIndex, Context_IsInFile ( _Context_ ) ? Context_Location ( ) : ( byte* ) "command line" ) ;
             if ( ( word->W_LispAttributes & T_LC_DEFINE ) && ( ! ( word->W_LispAttributes & T_LISP_COMPILED_WORD ) ) ) _Printf ( ( byte* ) "\nLambda Calculus word : interpreted not compiled" ) ; // do nothing here
             else if ( ! ( word->W_MorphismAttributes & CPRIMITIVE ) )
             {
                 _Printf ( ( byte* ) "\nCompiled with : %s%s%s%s",
                     GetState ( word, COMPILED_OPTIMIZED ) ? "optimizeOn" : "optimizeOff", GetState ( word, COMPILED_INLINE ) ? ", inlineOn" : ", inlineOff",
                     ( ( word->W_TypeAttributes & WT_C_SYNTAX ) || GetState ( word, W_C_SYNTAX ) ) ? ", c_syntaxOn" : "", GetState ( word, W_INFIX_MODE ) ? ", infixOn" : "" ) ;
-                Boolean dsc = GetState ( _CFT_, DEBUG_SOURCE_CODE_MODE ) ;
+                Boolean dsc = GetState ( _CSL_, DEBUG_SOURCE_CODE_MODE ) ;
                 _Printf ( ( byte* ) "\nDebug Source Code %s", dsc ? "on" : "off" ) ;
                 Boolean bno = Namespace_IsUsing ( ( byte* ) "BigNum" ) ;
                 _Printf ( ( byte* ) " : BigNum %s", bno ? "on" : "off" ) ;
@@ -336,11 +336,11 @@ _CFT_Source ( Word *word, int64 addToHistoryFlag )
 }
 
 void
-_CFT_Dump ( int64 dumpMod )
+_CSL_Dump ( int64 dumpMod )
 {
     int64 number = DataStack_Pop ( ) ;
     byte * address = ( byte* ) DataStack_Pop ( ) ;
-    __CFT_Dump ( address, number, dumpMod ) ;
+    __CSL_Dump ( address, number, dumpMod ) ;
 }
 
 Boolean
@@ -416,7 +416,7 @@ main ( int64 argc, char **argv )
 #if 0
 
 void
-_CFT_Dlsym ( )
+_CSL_Dlsym ( )
 {
     byte * sym = ( byte* ) DataStack_Pop ( ) ;
     byte * lib = ( byte* ) DataStack_Pop ( ) ;
@@ -424,7 +424,7 @@ _CFT_Dlsym ( )
 }
 
 void
-CFT_DlsymWord ( )
+CSL_DlsymWord ( )
 {
     byte * lib = ( byte* ) DataStack_Pop ( ) ;
     byte * sym = ( byte* ) DataStack_Pop ( ) ;

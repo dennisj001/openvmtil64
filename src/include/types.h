@@ -242,8 +242,8 @@ typedef struct _Identifier // _Symbol
     dllist * DebugWordList ;
     int64 StartCharRlIndex ;
     int64 SC_WordIndex, SC_FileIndex_Start, SC_FileIndex_End ;
-    struct _Identifier * CfrTilWord, * BaseObject ;
-    struct _WordData * S_WordData ;
+    struct _Identifier * CSLWord, * BaseObject ;
+    struct _WordData * W_WordData ;
 } Identifier, ID, Word, Namespace, Vocabulary, Class, DynamicObject, DObject, ListObject, Symbol, MemChunk, HistoryStringNode, Buffer ;
 #define S_Car S_Node.n_Car
 #define S_Cdr S_Node.n_Cdr
@@ -295,7 +295,7 @@ typedef struct _Identifier // _Symbol
 #define Lo_Head Lo_Car
 #define Lo_Tail Lo_Cdr
 #define Lo_NumberOfSlots Slots
-#define Lo_CfrTilWord CfrTilWord 
+#define Lo_CSLWord CSLWord 
 #define Lo_List S_SymbolList 
 #define Lo_Value S_Value
 #define Lo_PtrToValue S_PtrToValue 
@@ -303,8 +303,8 @@ typedef struct _Identifier // _Symbol
 #define Lo_UInteger Lo_Value
 #define Lo_Integer Lo_Value
 #define Lo_String Lo_Value
-#define Lo_LambdaFunctionParameters S_WordData->LambdaArgs
-#define Lo_LambdaFunctionBody S_WordData->LambdaBody
+#define Lo_LambdaFunctionParameters W_WordData->LambdaArgs
+#define Lo_LambdaFunctionBody W_WordData->LambdaBody
 
 #define W_List S_SymbolList 
 #define W_Value S_Value
@@ -408,53 +408,53 @@ typedef struct _WordData
 } WordData ; // try to put all compiler related data here so in the future we can maybe delete WordData at runtime
 
 // to keep using existing code without rewriting ...
-#define CodeStart S_WordData->CodeStart // set at Word allocation 
-#define Coding S_WordData->Coding // nb : !! this field is set by the Interpreter and modified by the Compiler in some cases so we also need (!) CodeStart both are needed !!  
-#define SourceCoding S_WordData->SourceCoding // nb : !! this field is set by the Interpreter and modified by the Compiler in some cases so we also need (!) CodeStart both are needed !!  
-#define Offset S_WordData->Offset // used by ClassField
-#define W_NumberOfNonRegisterArgs S_WordData->NumberOfNonRegisterArgs 
-#define W_NumberOfNonRegisterLocals S_WordData->NumberOfNonRegisterLocals 
-#define W_NumberOfVariables S_WordData->NumberOfVariables 
-#define W_InitialRuntimeDsp S_WordData->InitialRuntimeDsp 
-#define TtnReference S_WordData->TtnReference // used by Logic Words
-#define RunType S_WordData->RunType // number of slots in Object
-#define PtrObject S_WordData->WD_PtrObject 
-#define AccumulatedOffset S_WordData->AccumulatedOffset // used by Do_Object
-#define Index S_WordData->Index // used by Variable and LocalWord
-#define NestedObjects S_WordData->NestedObjects // used by Variable and LocalWord
-#define ObjectCode S_WordData->Coding // used by objects/class words
-#define W_OurLocation S_WordData->OurLocation
-#define StackPushRegisterCode S_WordData->StackPushRegisterCode // used by Optimize
-#define W_SourceCode S_WordData->WD_SourceCode 
-#define W_TokenEnd_ReadLineIndex S_WordData->CursorPosition 
-#define W_CursorPosition S_WordData->CursorPosition 
-#define S_FunctionTypesArray S_WordData->FunctionTypesArray
-#define RegToUse S_WordData->RegToUse
-#define Opt_Rm S_WordData->Opt_Rm
-#define Opt_Reg S_WordData->Opt_Reg
-#define RmReg S_WordData->RmReg
-#define RegFlags S_WordData->RegFlags
-#define ArrayDimensions S_WordData->WD_ArrayDimensions
-#define ArrayNumberOfDimensions S_WordData->WD_ArrayNumberOfDimensions
-#define W_AliasOf S_WordData->AliasOf
-#define TypeNamespace S_WordData->TypeNamespace 
-#define Lo_ListProc S_WordData->ListProc
-#define Lo_ListFirst S_WordData->ListFirst
+#define CodeStart W_WordData->CodeStart // set at Word allocation 
+#define Coding W_WordData->Coding // nb : !! this field is set by the Interpreter and modified by the Compiler in some cases so we also need (!) CodeStart both are needed !!  
+#define SourceCoding W_WordData->SourceCoding // nb : !! this field is set by the Interpreter and modified by the Compiler in some cases so we also need (!) CodeStart both are needed !!  
+#define Offset W_WordData->Offset // used by ClassField
+#define W_NumberOfNonRegisterArgs W_WordData->NumberOfNonRegisterArgs 
+#define W_NumberOfNonRegisterLocals W_WordData->NumberOfNonRegisterLocals 
+#define W_NumberOfVariables W_WordData->NumberOfVariables 
+#define W_InitialRuntimeDsp W_WordData->InitialRuntimeDsp 
+#define TtnReference W_WordData->TtnReference // used by Logic Words
+#define RunType W_WordData->RunType // number of slots in Object
+#define PtrObject W_WordData->WD_PtrObject 
+#define AccumulatedOffset W_WordData->AccumulatedOffset // used by Do_Object
+#define Index W_WordData->Index // used by Variable and LocalWord
+#define NestedObjects W_WordData->NestedObjects // used by Variable and LocalWord
+#define ObjectCode W_WordData->Coding // used by objects/class words
+#define W_OurLocation W_WordData->OurLocation
+#define StackPushRegisterCode W_WordData->StackPushRegisterCode // used by Optimize
+#define W_SourceCode W_WordData->WD_SourceCode 
+#define W_TokenEnd_ReadLineIndex W_WordData->CursorPosition 
+#define W_CursorPosition W_WordData->CursorPosition 
+#define S_FunctionTypesArray W_WordData->FunctionTypesArray
+#define RegToUse W_WordData->RegToUse
+#define Opt_Rm W_WordData->Opt_Rm
+#define Opt_Reg W_WordData->Opt_Reg
+#define RmReg W_WordData->RmReg
+#define RegFlags W_WordData->RegFlags
+#define ArrayDimensions W_WordData->WD_ArrayDimensions
+#define ArrayNumberOfDimensions W_WordData->WD_ArrayNumberOfDimensions
+#define W_AliasOf W_WordData->AliasOf
+#define TypeNamespace W_WordData->TypeNamespace 
+#define Lo_ListProc W_WordData->ListProc
+#define Lo_ListFirst W_WordData->ListFirst
 #define ContainingNamespace S_ContainingNamespace
 #define ContainingList S_ContainingList
 #define Prototype S_Prototype
 #define W_SearchNumber W_Value2
 #define W_FoundMarker W_Value3
-#define WL_OriginalWord S_WordData->OriginalWord
+#define WL_OriginalWord W_WordData->OriginalWord
 #define W_RL_Index StartCharRlIndex
 #define W_SC_Index SC_WordIndex 
-#define W_SC_WordList S_WordData->SourceCodeWordList 
-#define W_SC_MemSpaceRandMarker S_WordData->SourceCodeMemSpaceRandMarker
-#define W_OpInsnCode S_WordData->OpInsnCode 
-#define W_OpInsnGroup S_WordData->OpInsnGroup
-#define W_TypeSignatureString S_WordData->TypeSignature
-#define W_TypeObjectsNamespaces S_WordData->TypeObjectsNamespaces
-#define NamespaceStack S_WordData->WD_NamespaceStack
+#define W_SC_WordList W_WordData->SourceCodeWordList 
+#define W_SC_MemSpaceRandMarker W_WordData->SourceCodeMemSpaceRandMarker
+#define W_OpInsnCode W_WordData->OpInsnCode 
+#define W_OpInsnGroup W_WordData->OpInsnGroup
+#define W_TypeSignatureString W_WordData->TypeSignature
+#define W_TypeObjectsNamespaces W_WordData->TypeObjectsNamespaces
+#define NamespaceStack W_WordData->WD_NamespaceStack
 typedef struct
 {
     Symbol P_Symbol ;
@@ -567,7 +567,7 @@ typedef struct ReadLiner
 {
     uint64 State ;
     int64 InputKeyedCharacter ;
-    int64 FileCharacterNumber, LineNumber, OutputLineCharacterNumber ; // set by _CFT_Key
+    int64 FileCharacterNumber, LineNumber, OutputLineCharacterNumber ; // set by _CSL_Key
     int64 ReadIndex, EndPosition ; // index where the next input character is put
     int64 MaxEndPosition ; // index where the next input character is put
     int64 CursorPosition, EscapeModeFlag, InputStringIndex, InputStringLength, LineStartFileIndex ;
@@ -710,10 +710,12 @@ typedef struct TypeDefStructCompileInfo
     Word * Tdsci_Field_Object ;
     byte *DataPtr, * TdsciToken ;
 } TypeDefStructCompileInfo, TDSCI ;
+//TypeDefStructCompileInfo State flags
 #define TDSCI_CLONE_FLAG                ( (uint64) 1 << 0 ) 
 #define TDSCI_STRUCT                 ( (uint64) 1 << 1 ) 
 #define TDSCI_UNION                     ( (uint64) 1 << 2 ) 
 #define TDSCI_STRUCTURE_COMPLETED       ( (uint64) 1 << 3 ) 
+#define TDSCI_PRINT                     ( (uint64) 1 << 4 ) 
 
 typedef struct
 {
@@ -838,7 +840,7 @@ typedef struct _CombinatorInfo
     } ;
 } CombinatorInfo ;
 
-struct _CfrTil ;
+struct _CSL ;
 typedef struct _LambdaCalculus
 {
     uint64 State ;
@@ -848,7 +850,7 @@ typedef struct _LambdaCalculus
     ListObject *CurrentLambdaFunction, *LastInterpretedWord ; //, *ListFirst;
     ByteArray * SavedCodeSpace ;
     uint64 ItemQuoteState, QuoteState ;
-    struct _CfrTil * OurCfrTil ;
+    struct _CSL * OurCSL ;
     Stack * QuoteStateStack ;
     uint64 * SaveStackPointer ;
     byte * LC_SourceCode ;
@@ -876,7 +878,7 @@ typedef struct _StringTokenInfo
 } StringTokenInfo, StrTokInfo ;
 // StrTokInfo State constants
 #define STI_INITIALIZED     ( 1 << 0 )
-typedef struct _CfrTil
+typedef struct _CSL
 {
     uint64 State, SavedState, * SaveDsp ;
     int64 InitSessionCoreTimes, LogFlag, WordsAdded, FindWordCount, FindWordMaxCount, WordCreateCount, DObjectCreateCount ; // SC_Index == SC_Buffer Index ;
@@ -903,7 +905,7 @@ typedef struct _CfrTil
     dllist * Compiler_N_M_Node_WordList ; //, *TokenList,  ;
     SourceCodeInfo SCI ;
     sigjmp_buf JmpBuf0 ;
-} CfrTil ;
+} CSL, ContextSensitiveLanguage ;
 #define SC_Word SCI.SciWord
 #define SC_Buffer SCI.SciBuffer
 #define SC_QuoteMode SCI.SciQuoteMode
@@ -921,7 +923,7 @@ typedef struct
     NamedByteArray * LispTempSpace ;
     // quasi long term
     NamedByteArray * BufferSpace ;
-    NamedByteArray * CfrTilInternalSpace ;
+    NamedByteArray * CSLInternalSpace ;
     // long term memory
     NamedByteArray * CodeSpace ;
     NamedByteArray * ObjectSpace ;
@@ -970,7 +972,7 @@ typedef struct
 typedef struct
 {
     uint64 State ;
-    CfrTil * OVT_CfrTil ;
+    CSL * OVT_CSL ;
     Context * OVT_Context ;
     Interpreter * OVT_Interpreter ;
     HistorySpace OVT_HistorySpace ;
@@ -995,11 +997,11 @@ typedef struct
     int64 PermanentMemListRemainingAccounted, TotalNbaAccountedMemRemaining, TotalNbaAccountedMemAllocated, TotalMemSizeTarget ;
     int64 Mmap_RemainingMemoryAllocated, OVT_InitialUnAccountedMemory, RunTimeAllocation, TotalMemFreed, TotalMemAllocated, NumberOfByteArrays ;
 
-    // variables accessible from cfrTil
+    // variables accessible from csl
     int64 Verbosity, StartIncludeTries, StartedTimes, Restarts, SigSegvs, AllocationRequestLacks, Dbi ;
     int64 DictionarySize, LispTempSize, MachineCodeSize, ObjectsSize, InternalObjectsSize, LispSize, ContextSize ;
     int64 TempObjectsSize, CompilerTempObjectsSize, SessionObjectsSize, DataStackSize, HistorySize, OpenVmTilSize ;
-    int64 CfrTilSize, BufferSpaceSize, StringSpaceSize, Thrown ;
+    int64 CSLSize, BufferSpaceSize, StringSpaceSize, Thrown ;
     Buffer *ThrowBuffer ;
     sigjmp_buf JmpBuf0 ;
     //block GetChar//FunctionTable [8] ;

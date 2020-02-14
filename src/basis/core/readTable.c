@@ -1,10 +1,10 @@
-#include "../../include/cfrtil64.h"
+#include "../../include/csl.h"
 #define ESC 27
 
 #define _ReadLine_SetFinalCharacter( rl, chr ) rl->InputBuffer [ rl->EndPosition ] = chr 
 
 void
-CFT_ReadTables_Setup ( CfrTil * cfrl )
+CSL_ReadTables_Setup ( CSL * cfrl )
 {
     int64 i ;
     for ( i = 0 ; i < 256 ; i ++ )
@@ -73,9 +73,9 @@ void
 ReadTable_LParen ( ReadLiner * rl )
 {
 #if MARU || MARU_2_4 || MARU_NILE
-    if ( ( rl->InputFile != stdin ) && _CFT_->InNamespace )
+    if ( ( rl->InputFile != stdin ) && _CSL_->InNamespace )
     {
-        if ( String_Equal ( ( CString ) _CFT_->InNamespace->s_Symbol.S_Name, "Maru" ) )
+        if ( String_Equal ( ( CString ) _CSL_->InNamespace->s_Symbol.S_Name, "Maru" ) )
         {
             ungetc ( rl->InputKeyedCharacter, rl->InputFile ) ;
             Maru_RawReadFlag = 1 ;
@@ -105,7 +105,7 @@ ReadTable_0x03 ( ReadLiner * rl ) //  <CTRL-C>
     {
         ReadTable_Zero ( rl ) ;
     }
-    else CFT_Quit ( ) ;
+    else CSL_Quit ( ) ;
 }
 
 void
@@ -115,7 +115,7 @@ ReadTable_0x04 ( ReadLiner * rl ) // <CTRL-D>
     {
         ReadTable_Zero ( rl ) ;
     }
-    else CFT_FullRestart ( ) ; //CFT_RestartInit ( ) ;
+    else CSL_FullRestart ( ) ; //CSL_RestartInit ( ) ;
 }
 
 void
@@ -146,7 +146,7 @@ ReadTable_Zero ( ReadLiner * rl ) // eof
 {
     if ( _LC_ && GetState ( _LC_, LC_REPL ) )
     {
-        ReadLine_Init ( _Context_->ReadLiner0, _CFT_Key ) ;
+        ReadLine_Init ( _Context_->ReadLiner0, _CSL_Key ) ;
     }
     else
     {

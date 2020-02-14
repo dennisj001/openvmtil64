@@ -1,11 +1,11 @@
 
-#include "../include/cfrtil64.h"
+#include "../include/csl.h"
 
 void
-CFT_IncludeFile ( )
+CSL_IncludeFile ( )
 {
     byte * filename = ( byte* ) DataStack_Pop ( ) ;
-    _CFT_ContextNew_IncludeFile ( filename ) ;
+    _CSL_ContextNew_IncludeFile ( filename ) ;
 }
 
 int64
@@ -62,7 +62,7 @@ File_Open ( )
     if ( file == NULL )
     {
         perror ( "\nFile_Open error : " ) ;
-        CFT_Quit ( ) ;
+        CSL_Quit ( ) ;
     }
     else DataStack_Push ( ( int64 ) file ) ;
 }
@@ -89,7 +89,7 @@ File_Read ( )
             if ( ferror ( file ) )
             {
                 perror ( "\nFile_Read error : " ) ;
-                CFT_Quit ( ) ;
+                CSL_Quit ( ) ;
             }
         }
     }

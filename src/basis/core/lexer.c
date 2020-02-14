@@ -1,4 +1,4 @@
-#include "../../include/cfrtil64.h"
+#include "../../include/csl.h"
 // lexer.c has been strongly influenced by the ideas in the lisp reader algorithm 
 // "http://www.ai.mit.edu/projects/iiip/doc/CommonLISP/HyperSpec/Body/sec_2-2.html"
 // although it doesn't fully conform to them yet the intention is to be eventually somewhat of a superset of them
@@ -16,9 +16,9 @@ void
 Lexer_Exception ( byte * token, uint64 exceptionNumber, byte * message )
 {
     _O_->ExceptionToken = token ;
-    byte *buffer = Buffer_Data ( _CFT_->ScratchB1 ) ;
+    byte *buffer = Buffer_Data ( _CSL_->ScratchB1 ) ;
     sprintf ( ( char* ) buffer, "%s :: %s ?\n", ( char* ) message, ( char* ) token ) ;
-    CFT_Exception ( exceptionNumber, buffer, QUIT ) ;
+    CSL_Exception ( exceptionNumber, buffer, QUIT ) ;
 }
 
 Word *
@@ -85,7 +85,7 @@ _Lexer_LexNextToken_WithDelimiters ( Lexer * lexer, byte * delimiters, Boolean c
     {
         Lexer_Init ( lexer, delimiters, lexer->State, CONTEXT ) ;
         lexer->State |= state ;
-        lexer->SC_Index = _CFT_->SC_Index ;
+        lexer->SC_Index = _CSL_->SC_Index ;
         while ( ( ! Lexer_CheckIfDone ( lexer, LEXER_DONE ) ) )
         {
             inChar = lexer->NextChar ( lexer->ReadLiner0 ) ;
@@ -103,7 +103,7 @@ _Lexer_LexNextToken_WithDelimiters ( Lexer * lexer, byte * delimiters, Boolean c
         lexer->Token_Length = Strlen ( ( char* ) lexer->OriginalToken ) ;
         lexer->TokenEnd_ReadLineIndex = lexer->TokenStart_ReadLineIndex + lexer->Token_Length ;
         lexer->TokenStart_FileIndex = rl->LineStartFileIndex + lexer->TokenStart_ReadLineIndex ; //- lexer->Token_Length ;
-        if ( peekFlag && reAddPeeked ) CFT_PushToken_OnTokenList ( lexer->OriginalToken ) ;
+        if ( peekFlag && reAddPeeked ) CSL_PushToken_OnTokenList ( lexer->OriginalToken ) ;
         lexer->LastLexedChar = inChar ;
     }
     lexer->LastToken = lexer->OriginalToken ;
@@ -114,11 +114,11 @@ _Lexer_LexNextToken_WithDelimiters ( Lexer * lexer, byte * delimiters, Boolean c
 void
 Lexer_Init ( Lexer * lexer, byte * delimiters, uint64 state, uint64 allocType )
 {
-    lexer->TokenBuffer = _CFT_->TokenBuffer ;
+    lexer->TokenBuffer = _CSL_->TokenBuffer ;
     Mem_Clear ( lexer->TokenBuffer, BUF_IX_SIZE ) ;
     lexer->OriginalToken = 0 ;
     lexer->Literal = 0 ;
-    lexer->SC_Index = _CFT_->SC_Index ;
+    lexer->SC_Index = _CSL_->SC_Index ;
     if ( delimiters ) Lexer_SetTokenDelimiters ( lexer, delimiters, allocType ) ;
     else
     {
@@ -152,19 +152,19 @@ Lexer_NextNonDelimiterChar ( Lexer * lexer )
 //----------------------------------------------------------------------------------------|
 
 void
-_CFT_AddTokenToTailOfTokenList ( byte * token )
+_CSL_AddTokenToTailOfTokenList ( byte * token )
 {
 
     if ( token ) dllist_AddNodeToTail ( _Lexer_->TokenList, ( dlnode* ) Lexer_Token_New ( token ) ) ;
-    //if ( Is_DebugOn ) Symbol_List_Print ( CFT->TokenList ) ;
+    //if ( Is_DebugOn ) Symbol_List_Print ( CSL->TokenList ) ;
 }
 
 void
-CFT_PushToken_OnTokenList ( byte * token )
+CSL_PushToken_OnTokenList ( byte * token )
 {
 
     if ( token ) dllist_AddNodeToHead ( _Lexer_->TokenList, ( dlnode* ) Lexer_Token_New ( token ) ) ;
-    //if ( Is_DebugOn ) Symbol_List_Print ( CFT->TokenList ) ;
+    //if ( Is_DebugOn ) Symbol_List_Print ( CSL->TokenList ) ;
 }
 
 #if 0
@@ -294,7 +294,7 @@ Lexer_Peek_Next_NonDebugTokenWord ( Lexer * lexer, Boolean evalFlag, Boolean svR
     int64 svReadIndex = rl->ReadIndex ;
     //int64 svInterpState = lexer->OurInterpreter ? lexer->OurInterpreter->State : 0 ;
     byte * token = _Lexer_Next_NonDebugOrCommentTokenWord ( lexer, 0, evalFlag, 0 ) ; // 0 : peekFlag off because we are reAdding it below
-    CFT_PushToken_OnTokenList ( token ) ; // TODO ; list should instead be a stack
+    CSL_PushToken_OnTokenList ( token ) ; // TODO ; list should instead be a stack
     if ( svReadIndexFlag ) rl->ReadIndex = svReadIndex ;
     //if (lexer->OurInterpreter) lexer->OurInterpreter->State = svInterpState ;
 
@@ -450,9 +450,9 @@ Lexer_SourceCodeOff ( Lexer * lexer )
 void
 _Lexer_AppendCharToSourceCode ( Lexer * lexer, byte c, int64 convert )
 {
-    if ( GetState ( _CFT_, SOURCE_CODE_ON ) && GetState ( lexer, ADD_CHAR_TO_SOURCE ) )
+    if ( GetState ( _CSL_, SOURCE_CODE_ON ) && GetState ( lexer, ADD_CHAR_TO_SOURCE ) )
     {
-        CFT_AppendCharToSourceCode ( _CFT_, c ) ;
+        CSL_AppendCharToSourceCode ( _CSL_, c ) ;
     }
 }
 
@@ -508,7 +508,7 @@ Lexer_MakeItTheNextToken ( Lexer * lexer )
 {
 
     ReadLine_UnGetChar ( lexer->ReadLiner0 ) ; // allow to read '.' as next token
-    //_CFT_UnAppendFromSourceCode ( 1 ) ;
+    //_CSL_UnAppendFromSourceCode ( 1 ) ;
     SetState ( lexer, LEXER_DONE, true ) ;
 }
 
@@ -567,7 +567,7 @@ _Lexer_MacroChar_NamespaceCheck ( Lexer * lexer, byte * nameSpace )
     buffer [0] = lexer->TokenInputByte ;
     buffer [1] = 0 ;
 
-    return _CFT_IsContainingNamespace ( buffer, nameSpace ) ;
+    return _CSL_IsContainingNamespace ( buffer, nameSpace ) ;
 }
 
 void
@@ -841,7 +841,7 @@ Comma ( Lexer * lexer )
         }
         else //if ( Lexer_IsCurrentInputCharADelimiter ( lexer ) ) 
         {
-            CFT_C_Comma ( ) ; // ??  SetState ( _Context_, ADDRESS_OF_MODE, false ) ;
+            CSL_C_Comma ( ) ; // ??  SetState ( _Context_, ADDRESS_OF_MODE, false ) ;
             //return ;
         }
     }
@@ -924,7 +924,7 @@ Lexer_SetInputFunction ( Lexer * lexer, byte ( *lipf ) ( ReadLiner * ) )
 void
 _Lexer_DoChar ( Lexer * lexer, byte c )
 {
-    _CFT_->LexerCharacterFunctionTable [ _CFT_->LexerCharacterTypeTable [ c ].CharInfo ] ( lexer ) ;
+    _CSL_->LexerCharacterFunctionTable [ _CSL_->LexerCharacterTypeTable [ c ].CharInfo ] ( lexer ) ;
 }
 
 Boolean
@@ -936,69 +936,69 @@ Lexer_IsTokenQualifiedID ( Lexer * lexer )
 }
 
 void
-CFT_LexerTables_Setup ( CfrTil * cfrtl )
+CSL_LexerTables_Setup ( CSL * csl )
 {
     int64 i ;
 
-    for ( i = 0 ; i < 256 ; i ++ ) cfrtl->LexerCharacterTypeTable [ i ].CharInfo = 0 ;
-    cfrtl->LexerCharacterTypeTable [ 0 ].CharFunctionTableIndex = 1 ;
-    cfrtl->LexerCharacterTypeTable [ '-' ].CharFunctionTableIndex = 2 ;
-    cfrtl->LexerCharacterTypeTable [ '>' ].CharFunctionTableIndex = 3 ;
-    cfrtl->LexerCharacterTypeTable [ '.' ].CharFunctionTableIndex = 4 ;
-    cfrtl->LexerCharacterTypeTable [ '"' ].CharFunctionTableIndex = 5 ;
-    cfrtl->LexerCharacterTypeTable [ '\n' ].CharFunctionTableIndex = 6 ;
-    cfrtl->LexerCharacterTypeTable [ '\\' ].CharFunctionTableIndex = 7 ;
-    cfrtl->LexerCharacterTypeTable [ eof ].CharFunctionTableIndex = 8 ;
-    cfrtl->LexerCharacterTypeTable [ '\r' ].CharFunctionTableIndex = 9 ;
-    cfrtl->LexerCharacterTypeTable [ ',' ].CharFunctionTableIndex = 10 ;
+    for ( i = 0 ; i < 256 ; i ++ ) csl->LexerCharacterTypeTable [ i ].CharInfo = 0 ;
+    csl->LexerCharacterTypeTable [ 0 ].CharFunctionTableIndex = 1 ;
+    csl->LexerCharacterTypeTable [ '-' ].CharFunctionTableIndex = 2 ;
+    csl->LexerCharacterTypeTable [ '>' ].CharFunctionTableIndex = 3 ;
+    csl->LexerCharacterTypeTable [ '.' ].CharFunctionTableIndex = 4 ;
+    csl->LexerCharacterTypeTable [ '"' ].CharFunctionTableIndex = 5 ;
+    csl->LexerCharacterTypeTable [ '\n' ].CharFunctionTableIndex = 6 ;
+    csl->LexerCharacterTypeTable [ '\\' ].CharFunctionTableIndex = 7 ;
+    csl->LexerCharacterTypeTable [ eof ].CharFunctionTableIndex = 8 ;
+    csl->LexerCharacterTypeTable [ '\r' ].CharFunctionTableIndex = 9 ;
+    csl->LexerCharacterTypeTable [ ',' ].CharFunctionTableIndex = 10 ;
 
-    //cfrtl->LexerCharacterTypeTable [ '{' ].CharFunctionTableIndex = 11 ; 
-    //cfrtl->LexerCharacterTypeTable [ '}' ].CharFunctionTableIndex = 11 ;
-    cfrtl->LexerCharacterTypeTable [ '[' ].CharFunctionTableIndex = 11 ;
-    cfrtl->LexerCharacterTypeTable [ ']' ].CharFunctionTableIndex = 11 ;
-    cfrtl->LexerCharacterTypeTable [ '`' ].CharFunctionTableIndex = 11 ;
-    cfrtl->LexerCharacterTypeTable [ '(' ].CharFunctionTableIndex = 11 ;
-    cfrtl->LexerCharacterTypeTable [ ')' ].CharFunctionTableIndex = 11 ;
-    cfrtl->LexerCharacterTypeTable [ '\'' ].CharFunctionTableIndex = 11 ;
-    //cfrtl->LexerCharacterTypeTable [ '%' ].CharFunctionTableIndex = 11 ;
-    //cfrtl->LexerCharacterTypeTable [ '&' ].CharFunctionTableIndex = 11 ;
-    //cfrtl->LexerCharacterTypeTable [ ',' ].CharFunctionTableIndex = 11 ;
+    //csl->LexerCharacterTypeTable [ '{' ].CharFunctionTableIndex = 11 ; 
+    //csl->LexerCharacterTypeTable [ '}' ].CharFunctionTableIndex = 11 ;
+    csl->LexerCharacterTypeTable [ '[' ].CharFunctionTableIndex = 11 ;
+    csl->LexerCharacterTypeTable [ ']' ].CharFunctionTableIndex = 11 ;
+    csl->LexerCharacterTypeTable [ '`' ].CharFunctionTableIndex = 11 ;
+    csl->LexerCharacterTypeTable [ '(' ].CharFunctionTableIndex = 11 ;
+    csl->LexerCharacterTypeTable [ ')' ].CharFunctionTableIndex = 11 ;
+    csl->LexerCharacterTypeTable [ '\'' ].CharFunctionTableIndex = 11 ;
+    //csl->LexerCharacterTypeTable [ '%' ].CharFunctionTableIndex = 11 ;
+    //csl->LexerCharacterTypeTable [ '&' ].CharFunctionTableIndex = 11 ;
+    //csl->LexerCharacterTypeTable [ ',' ].CharFunctionTableIndex = 11 ;
 
-    cfrtl->LexerCharacterTypeTable [ '$' ].CharFunctionTableIndex = 12 ;
-    cfrtl->LexerCharacterTypeTable [ '#' ].CharFunctionTableIndex = 12 ;
+    csl->LexerCharacterTypeTable [ '$' ].CharFunctionTableIndex = 12 ;
+    csl->LexerCharacterTypeTable [ '#' ].CharFunctionTableIndex = 12 ;
 
-    cfrtl->LexerCharacterTypeTable [ '/' ].CharFunctionTableIndex = 14 ;
-    cfrtl->LexerCharacterTypeTable [ ';' ].CharFunctionTableIndex = 15 ;
-    cfrtl->LexerCharacterTypeTable [ '&' ].CharFunctionTableIndex = 16 ;
-    cfrtl->LexerCharacterTypeTable [ '@' ].CharFunctionTableIndex = 17 ;
-    cfrtl->LexerCharacterTypeTable [ '*' ].CharFunctionTableIndex = 18 ;
-    cfrtl->LexerCharacterTypeTable [ '+' ].CharFunctionTableIndex = 19 ;
-    cfrtl->LexerCharacterTypeTable [ ESC ].CharFunctionTableIndex = 20 ;
-    cfrtl->LexerCharacterTypeTable [ 'm' ].CharFunctionTableIndex = 21 ;
+    csl->LexerCharacterTypeTable [ '/' ].CharFunctionTableIndex = 14 ;
+    csl->LexerCharacterTypeTable [ ';' ].CharFunctionTableIndex = 15 ;
+    csl->LexerCharacterTypeTable [ '&' ].CharFunctionTableIndex = 16 ;
+    csl->LexerCharacterTypeTable [ '@' ].CharFunctionTableIndex = 17 ;
+    csl->LexerCharacterTypeTable [ '*' ].CharFunctionTableIndex = 18 ;
+    csl->LexerCharacterTypeTable [ '+' ].CharFunctionTableIndex = 19 ;
+    csl->LexerCharacterTypeTable [ ESC ].CharFunctionTableIndex = 20 ;
+    csl->LexerCharacterTypeTable [ 'm' ].CharFunctionTableIndex = 21 ;
 
-    cfrtl->LexerCharacterFunctionTable [ 0 ] = Lexer_Default ;
-    cfrtl->LexerCharacterFunctionTable [ 1 ] = _Zero ;
-    cfrtl->LexerCharacterFunctionTable [ 2 ] = Minus ;
-    cfrtl->LexerCharacterFunctionTable [ 3 ] = GreaterThan ;
-    cfrtl->LexerCharacterFunctionTable [ 4 ] = Dot ;
-    cfrtl->LexerCharacterFunctionTable [ 5 ] = DoubleQuote ;
-    cfrtl->LexerCharacterFunctionTable [ 6 ] = NewLine ;
-    cfrtl->LexerCharacterFunctionTable [ 7 ] = BackSlash ;
-    cfrtl->LexerCharacterFunctionTable [ 8 ] = _EOF ;
-    cfrtl->LexerCharacterFunctionTable [ 9 ] = CarriageReturn ;
-    cfrtl->LexerCharacterFunctionTable [ 10 ] = Comma ;
+    csl->LexerCharacterFunctionTable [ 0 ] = Lexer_Default ;
+    csl->LexerCharacterFunctionTable [ 1 ] = _Zero ;
+    csl->LexerCharacterFunctionTable [ 2 ] = Minus ;
+    csl->LexerCharacterFunctionTable [ 3 ] = GreaterThan ;
+    csl->LexerCharacterFunctionTable [ 4 ] = Dot ;
+    csl->LexerCharacterFunctionTable [ 5 ] = DoubleQuote ;
+    csl->LexerCharacterFunctionTable [ 6 ] = NewLine ;
+    csl->LexerCharacterFunctionTable [ 7 ] = BackSlash ;
+    csl->LexerCharacterFunctionTable [ 8 ] = _EOF ;
+    csl->LexerCharacterFunctionTable [ 9 ] = CarriageReturn ;
+    csl->LexerCharacterFunctionTable [ 10 ] = Comma ;
 
-    cfrtl->LexerCharacterFunctionTable [ 11 ] = TerminatingMacro ;
-    cfrtl->LexerCharacterFunctionTable [ 12 ] = NonTerminatingMacro ;
-    //cfrtl->LexerCharacterFunctionTable [ 13 ] = SingleEscape ;
-    cfrtl->LexerCharacterFunctionTable [ 14 ] = ForwardSlash ;
-    cfrtl->LexerCharacterFunctionTable [ 15 ] = Semi ;
-    cfrtl->LexerCharacterFunctionTable [ 16 ] = AddressOf ;
-    cfrtl->LexerCharacterFunctionTable [ 17 ] = AtFetch ;
-    cfrtl->LexerCharacterFunctionTable [ 18 ] = Star ;
-    cfrtl->LexerCharacterFunctionTable [ 19 ] = Plus ;
-    cfrtl->LexerCharacterFunctionTable [ 20 ] = Escape ;
-    cfrtl->LexerCharacterFunctionTable [ 21 ] = EndEscapeSequence ;
+    csl->LexerCharacterFunctionTable [ 11 ] = TerminatingMacro ;
+    csl->LexerCharacterFunctionTable [ 12 ] = NonTerminatingMacro ;
+    //csl->LexerCharacterFunctionTable [ 13 ] = SingleEscape ;
+    csl->LexerCharacterFunctionTable [ 14 ] = ForwardSlash ;
+    csl->LexerCharacterFunctionTable [ 15 ] = Semi ;
+    csl->LexerCharacterFunctionTable [ 16 ] = AddressOf ;
+    csl->LexerCharacterFunctionTable [ 17 ] = AtFetch ;
+    csl->LexerCharacterFunctionTable [ 18 ] = Star ;
+    csl->LexerCharacterFunctionTable [ 19 ] = Plus ;
+    csl->LexerCharacterFunctionTable [ 20 ] = Escape ;
+    csl->LexerCharacterFunctionTable [ 21 ] = EndEscapeSequence ;
 }
 
 int64

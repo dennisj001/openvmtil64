@@ -1,4 +1,4 @@
-#include "../../include/cfrtil64.h"
+#include "../../include/csl.h"
 //===================================================================================================================
 //| LO_Print
 //===================================================================================================================
@@ -21,9 +21,9 @@ _LO_Print_NonLambdaSymbol_ToString ( LambdaCalculus * lc, ListObject * l0, int64
     {
         if ( *l0->Lo_PtrToValue != ( uint64 ) nil )
         {
-            if ( ( ! *l0->Lo_PtrToValue ) && l0->Lo_CfrTilWord )
+            if ( ( ! *l0->Lo_PtrToValue ) && l0->Lo_CSLWord )
             {
-                if ( _O_->Verbosity > 2 ) LC_snprintf2 ( lc->buffer, " %s = 0x%016lx", l0->Lo_CfrTilWord->Lo_Name, ( int64 ) l0->Lo_CfrTilWord ) ;
+                if ( _O_->Verbosity > 2 ) LC_snprintf2 ( lc->buffer, " %s = 0x%016lx", l0->Lo_CSLWord->Lo_Name, ( int64 ) l0->Lo_CSLWord ) ;
                 else LC_sprintName ( lc->buffer, l0 ) ;
             }
             else if ( l0->W_LispAttributes & ( T_RAW_STRING ) ) LC_sprintString ( lc->buffer, *l0->Lo_PtrToValue ) ;
@@ -64,7 +64,7 @@ _LO_PrintOneToString ( LambdaCalculus * lc, ListObject * l0, int64 in_a_LambdaFl
         else if ( l0->W_LispAttributes & T_LISP_SYMBOL )
         {
             if ( LO_IsQuoted ( l0 ) ) LC_sprintName ( lc->buffer, l0 ) ;
-            else if ( ( ! in_a_LambdaFlag ) && l0->Lo_CfrTilWord && ( l0->W_LispAttributes & T_LAMBDA ) )
+            else if ( ( ! in_a_LambdaFlag ) && l0->Lo_CSLWord && ( l0->W_LispAttributes & T_LAMBDA ) )
                 _LO_Print_Lambda_ToString ( lc, l0, printSymbolValueFlag ) ;
             else _LO_Print_NonLambdaSymbol_ToString ( lc, l0, printSymbolValueFlag ) ;
         }
@@ -87,11 +87,11 @@ _LO_PrintOneToString ( LambdaCalculus * lc, ListObject * l0, int64 in_a_LambdaFl
                 LC_snprintf1 ( lc->buffer, " 0x%016lx", ( uint64 ) l0->Lo_UInteger ) ;
             else LC_snprintf1 ( lc->buffer, ( ( l0->Lo_Integer < 0 ) ? " 0x%016lx" : " %ld" ), l0->Lo_Integer ) ;
         }
-        else if ( l0->W_MorphismAttributes & ( CPRIMITIVE | CFRTIL_WORD ) ) LC_sprintName ( lc->buffer, l0 ) ;
+        else if ( l0->W_MorphismAttributes & ( CPRIMITIVE | csl_WORD ) ) LC_sprintName ( lc->buffer, l0 ) ;
         else if ( l0->W_LispAttributes & ( T_HEAD | T_TAIL ) ) ;
         else
         {
-            if ( l0->Lo_CfrTilWord && l0->Lo_CfrTilWord->Lo_Name ) LC_sprintString ( lc->buffer, l0->Lo_CfrTilWord->Lo_Name ) ;
+            if ( l0->Lo_CSLWord && l0->Lo_CSLWord->Lo_Name ) LC_sprintString ( lc->buffer, l0->Lo_CSLWord->Lo_Name ) ;
             else if ( l0->Name ) LC_sprintName ( lc->buffer, l0 ) ;
         }
     }

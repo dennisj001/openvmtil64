@@ -1,5 +1,5 @@
 
-#include "../include/cfrtil64.h"
+#include "../include/csl.h"
 
 Boolean
 DBG_Intrp_Loop_Test ( Debugger * debugger )
@@ -211,7 +211,7 @@ Debugger_GetDbgAddressFromRsp ( Debugger * debugger, Cpu * cpu )
     byte * addr, *retAddr ;
     dllist * retStackList = List_New ( COMPILER_TEMP ) ;
     int64 i0, i1, i2 ;
-    if ( _O_->Verbosity > 1 ) CFT_PrintReturnStack ( ) ;
+    if ( _O_->Verbosity > 1 ) CSL_PrintReturnStack ( ) ;
     for ( i0 = 0 ; i0 < 255 ; i0 ++ ) // 255 : sizeof ReturnStack
     {
         addr = ( ( byte* ) cpu->Rsp[i0] ) ;
@@ -240,7 +240,7 @@ Debugger_GetDbgAddressFromRsp ( Debugger * debugger, Cpu * cpu )
 #define RS_DEPTH_PICK 1        
         if ( _O_->Verbosity > 1 )
         {
-            CFT_PrintReturnStack ( ) ;
+            CSL_PrintReturnStack ( ) ;
             Stack_Print ( debugger->ReturnStack, ( byte* ) "debugger->ReturnStack ", 0 ) ;
         }
         debugger->DebugAddress = ( byte* ) _Stack_Pick ( debugger->ReturnStack, RS_DEPTH_PICK ) ;
@@ -254,11 +254,11 @@ Debugger_GetDbgAddressFromRsp ( Debugger * debugger, Cpu * cpu )
 byte *
 Debugger_GetStateString ( Debugger * debugger )
 {
-    byte * buffer = Buffer_Data ( _CFT_->DebugB ) ;
+    byte * buffer = Buffer_Data ( _CSL_->DebugB ) ;
     sprintf ( ( char* ) buffer, "%s : %s : %s",
         GetState ( debugger, DBG_STEPPING ) ? "Stepping" : ( CompileMode ? ( char* ) "Compiling" : ( char* ) "Interpreting" ),
-        ( GetState ( _CFT_, INLINE_ON ) ? ( char* ) "InlineOn" : ( char* ) "InlineOff" ),
-        ( GetState ( _CFT_, OPTIMIZE_ON ) ? ( char* ) "OptimizeOn" : ( char* ) "OptimizeOff" )
+        ( GetState ( _CSL_, INLINE_ON ) ? ( char* ) "InlineOn" : ( char* ) "InlineOff" ),
+        ( GetState ( _CSL_, OPTIMIZE_ON ) ? ( char* ) "OptimizeOn" : ( char* ) "OptimizeOff" )
         ) ;
     buffer = String_New ( ( byte* ) buffer, TEMPORARY ) ;
 
@@ -293,7 +293,7 @@ Debugger_Parse ( Debugger * debugger )
 void
 _Debugger_FindAny ( Debugger * debugger )
 {
-    if ( debugger->Token ) debugger->w_Word = CFT_FindInAnyNamespace ( debugger->Token ) ;
+    if ( debugger->Token ) debugger->w_Word = CSL_FindInAnyNamespace ( debugger->Token ) ;
 }
 
 void
@@ -327,19 +327,19 @@ _Debugger_PrintDataStack ( int64 depth )
 {
     Set_DataStackPointer_FromDspReg ( ) ;
     _Stack_Print ( _DataStack_, ( byte* ) "DataStack", depth, 0 ) ;
-    //CFT_PrintDataStack ( ) ;
+    //CSL_PrintDataStack ( ) ;
 }
 
 void
 Debugger_Variables ( Debugger * debugger )
 {
-    CFT_Variables ( ) ;
+    CSL_Variables ( ) ;
 }
 
 void
 Debugger_Using ( Debugger * debugger )
 {
-    CFT_Using ( ) ;
+    CSL_Using ( ) ;
 }
 
 void
@@ -355,16 +355,10 @@ Debugger_Continue ( Debugger * debugger )
             if ( GetState ( debugger, ( DBG_AUTO_MODE | DBG_CONTINUE_MODE ) ) ) Debugger_Step ( debugger ) ;
             else return ;
         }
-        SetState_TrueFalse ( debugger, DBG_STEPPED, DBG_STEPPING ) ;
-        SetState ( debugger, DBG_INTERPRET_LOOP_DONE, true ) ;
-        SetState ( debugger, DBG_AUTO_MODE | DBG_CONTINUE_MODE, false ) ;
+        SetState_TrueFalse ( debugger, DBG_INTERPRET_LOOP_DONE | DBG_STEPPED, DBG_STEPPING | DBG_AUTO_MODE | DBG_CONTINUE_MODE | DBG_RUNTIME_BREAKPOINT ) ;
         SetState ( debugger->w_Word, STEPPED, true ) ;
     }
-    else if ( debugger->w_Word )
-    {
-        Debugger_Eval ( debugger ) ;
-        Debugger_Off ( debugger, 1 ) ;
-    }
+    else _Debugger_Eval ( debugger, 1 ) ;
 }
 
 // by 'eval' we stop debugger->Stepping and //continue thru this word as if we hadn't stepped
@@ -374,15 +368,19 @@ _Debugger_Eval ( Debugger * debugger, Boolean continueFlag )
 {
     debugger->SaveStackDepth = DataStack_Depth ( ) ;
     debugger->WordDsp = _Dsp_ ;
-    if ( continueFlag && Debugger_IsStepping ( debugger ) ) Debugger_Continue ( debugger ) ;
+    if ( continueFlag )
+    {
+        if ( Debugger_IsStepping ( debugger ) ) Debugger_Continue ( debugger ) ;
+        else SetState ( debugger, DBG_EVAL_AUTO_MODE, false ), DebugOff ;
+    }
+    else if ( GetState ( debugger, DBG_AUTO_MODE ) ) SetState ( debugger, DBG_EVAL_AUTO_MODE, true ) ;
     SetState_TrueFalse ( debugger, DBG_INTERPRET_LOOP_DONE | DBG_EVAL_AUTO_MODE, DBG_STEPPING ) ;
-    if ( GetState ( debugger, DBG_AUTO_MODE ) ) SetState ( debugger, DBG_EVAL_AUTO_MODE, true ) ;
 }
 
 void
 Debugger_Eval ( Debugger * debugger )
 {
-    _Debugger_Eval ( debugger, 1 ) ;
+    _Debugger_Eval ( debugger, 0 ) ;
 }
 
 void
@@ -408,13 +406,13 @@ Debugger_DoMenu ( Debugger * debugger )
 void
 Debugger_Stack ( Debugger * debugger )
 {
-    CFT_PrintDataStack ( ) ;
+    CSL_PrintDataStack ( ) ;
 }
 
 void
 Debugger_ReturnStack ( Debugger * debugger )
 {
-    CFT_PrintReturnStack ( ) ;
+    CSL_PrintReturnStack ( ) ;
 }
 
 void
@@ -422,7 +420,7 @@ Debugger_Source ( Debugger * debugger )
 {
     Word * scWord = Compiling ? _Context_->CurrentWordBeingCompiled : GetState ( debugger, DBG_STEPPING ) ?
         Word_UnAlias ( Debugger_GetWordFromAddress ( debugger ) ) : _Context_->CurrentlyRunningWord ;
-    _CFT_Source ( scWord, 0 ) ; //debugger->w_Word ? debugger->w_Word : CFT->DebugWordListWord, 0 ) ;
+    _CSL_Source ( scWord, 0 ) ; //debugger->w_Word ? debugger->w_Word : CSL->DebugWordListWord, 0 ) ;
     SetState ( debugger, DBG_INFO, true ) ;
 }
 
@@ -485,7 +483,7 @@ Debugger_Stop ( Debugger * debugger )
 void
 Debugger_InterpretLine_WithStartString ( byte * str )
 {
-    _CFT_Contex_NewRun_1 ( _CFT_, ( ContextFunction_1 ) CFT_InterpretPromptedLine, str ) ; // can't clone cause we may be in a file and we want input from stdin
+    _CSL_Contex_NewRun_1 ( _CSL_, ( ContextFunction_1 ) CSL_InterpretPromptedLine, str ) ; // can't clone cause we may be in a file and we want input from stdin
 }
 
 void
@@ -498,8 +496,8 @@ void
 Debugger_Escape ( Debugger * debugger )
 {
     uint64 saveSystemState = _Context_->System0->State ;
-    uint64 saveDebuggerState = debugger->State, svScState = GetState ( _CFT_, SOURCE_CODE_ON ) ;
-    SetState ( _CFT_, SOURCE_CODE_ON, false ) ;
+    uint64 saveDebuggerState = debugger->State, svScState = GetState ( _CSL_, SOURCE_CODE_ON ) ;
+    SetState ( _CSL_, SOURCE_CODE_ON, false ) ;
     SetState ( _Context_->System0, ADD_READLINE_TO_HISTORY, true ) ;
     SetState_TrueFalse ( debugger, DBG_COMMAND_LINE | DBG_ESCAPED, DBG_ACTIVE ) ;
     _Debugger_ = Debugger_Copy ( debugger, TEMPORARY ) ;
@@ -508,11 +506,11 @@ Debugger_Escape ( Debugger * debugger )
     int64 svcm = Get_CompileMode ( ) ;
     Set_CompileMode ( false ) ;
     byte * lexerTokenBuffer = _Buffer_New_pbyte ( BUFFER_SIZE, N_UNLOCKED ) ;
-    strcpy ( ( char* ) lexerTokenBuffer, ( char* ) _CFT_->TokenBuffer ) ;
+    strcpy ( ( char* ) lexerTokenBuffer, ( char* ) _CSL_->TokenBuffer ) ;
 
     Debugger_InterpretLine ( ) ;
 
-    strcpy ( ( char* ) _CFT_->TokenBuffer, ( char* ) lexerTokenBuffer ) ;
+    strcpy ( ( char* ) _CSL_->TokenBuffer, ( char* ) lexerTokenBuffer ) ;
     Set_CompileMode ( svcm ) ;
     DebugOn ;
     DebugColors ;
@@ -521,7 +519,7 @@ Debugger_Escape ( Debugger * debugger )
     debugger->State = saveDebuggerState ;
     _Context_->System0->State = saveSystemState ;
     SetState_TrueFalse ( debugger, DBG_ACTIVE | DBG_INFO, DBG_STEPPED | DBG_AUTO_MODE | DBG_AUTO_MODE_ONCE | DBG_INTERPRET_LOOP_DONE | DBG_COMMAND_LINE | DBG_ESCAPED ) ;
-    SetState ( _CFT_, SOURCE_CODE_ON, svScState ) ;
+    SetState ( _CSL_, SOURCE_CODE_ON, svScState ) ;
     //if ( GetState ( debugger, DBG_STEPPING ) ) SetState ( debugger, DBG_START_STEPPING, true ) ;
 }
 
@@ -553,9 +551,9 @@ Debugger_AutoMode ( Debugger * debugger )
 void
 Debugger_OptimizeToggle ( Debugger * debugger )
 {
-    if ( GetState ( _CFT_, OPTIMIZE_ON ) ) SetState ( _CFT_, OPTIMIZE_ON, false ) ;
-    else CFT_OptimizeOn ( ) ;
-    _CFT_SystemState_Print ( 0 ) ;
+    if ( GetState ( _CSL_, OPTIMIZE_ON ) ) SetState ( _CSL_, OPTIMIZE_ON, false ) ;
+    else CSL_OptimizeOn ( ) ;
+    _CSL_SystemState_Print ( 0 ) ;
 }
 
 void
@@ -573,10 +571,10 @@ Debugger_Dump ( Debugger * debugger )
 {
     if ( ! debugger->w_Word )
     {
-        if ( debugger->DebugAddress ) __CFT_Dump ( ( byte * ) debugger->DebugAddress, ( uint64 ) ( Here - ( int64 ) debugger->DebugAddress ), 8 ) ;
+        if ( debugger->DebugAddress ) __CSL_Dump ( ( byte * ) debugger->DebugAddress, ( uint64 ) ( Here - ( int64 ) debugger->DebugAddress ), 8 ) ;
     }
 
-    else __CFT_Dump ( ( byte * ) debugger->w_Word->CodeStart, ( uint64 ) debugger->w_Word->S_CodeSize, 8 ) ;
+    else __CSL_Dump ( ( byte * ) debugger->w_Word->CodeStart, ( uint64 ) debugger->w_Word->S_CodeSize, 8 ) ;
     SetState ( debugger, DBG_INFO, true ) ;
 }
 
@@ -590,8 +588,8 @@ Debugger_Default ( Debugger * debugger )
 void
 _Debugger_State ( Debugger * debugger )
 {
-    byte * buf = Buffer_Data ( _CFT_->DebugB2 ) ;
-    _CFT_GetSystemState_String0 ( buf ) ;
+    byte * buf = Buffer_Data ( _CSL_->DebugB2 ) ;
+    _CSL_GetSystemState_String0 ( buf ) ;
     _Printf ( ( byte* ) buf ) ;
 }
 
@@ -636,14 +634,14 @@ _Debugger_New ( uint64 type )
 // nb! : not test for a while
 
 void
-_CFT_Debug_AtAddress ( byte * address )
+_CSL_Debug_AtAddress ( byte * address )
 {
     if ( ! GetState ( _Debugger_, DBG_ACTIVE ) ) Debugger_Init ( _Debugger_, 0, 0, address ) ;
-    else _CFT_DebugContinue ( 1 ) ;
+    else _CSL_DebugContinue ( 1 ) ;
 }
 
 void
-_CFT_DebugContinue ( int64 autoFlagOff )
+_CSL_DebugContinue ( int64 autoFlagOff )
 {
     if ( GetState ( _Debugger_, DBG_AUTO_MODE ) )
     {
@@ -654,19 +652,19 @@ _CFT_DebugContinue ( int64 autoFlagOff )
 void
 Debugger_WordList_Show_All ( Debugger * debugger )
 {
-    _CFT_SC_WordList_Show ( 0, 0, 0 ) ;
+    _CSL_SC_WordList_Show ( 0, 0, 0 ) ;
 }
 
 void
 Debugger_WordList_Show_InUse ( Debugger * debugger )
 {
-    _CFT_SC_WordList_Show ( 0, 1, 0 ) ;
+    _CSL_SC_WordList_Show ( 0, 1, 0 ) ;
 }
 
 void
 Debugger_ShowTypeWordStack ( Debugger * debugger )
 {
-    CFT_ShowTypeWordStack ( ) ;
+    CSL_ShowTypeWordStack ( ) ;
 }
 
 void
@@ -765,7 +763,7 @@ Debugger_TableSetup ( Debugger * debugger )
     debugger->CharacterFunctionTable [ 30 ] = Debugger_ReturnStack ;
     debugger->CharacterFunctionTable [ 31 ] = Debugger_WordList_Show_All ;
     debugger->CharacterFunctionTable [ 32 ] = Debugger_WordList_Show_InUse ;
-    //debugger->CharacterFunctionTable [ 33 ] = Debugger_CfrTilRegisters ;
+    //debugger->CharacterFunctionTable [ 33 ] = Debugger_CSLRegisters ;
     debugger->CharacterFunctionTable [ 34 ] = Debugger_GotoList_Print ;
     debugger->CharacterFunctionTable [ 35 ] = Debugger_Print_LispDefinesNamespace ;
     debugger->CharacterFunctionTable [ 36 ] = Debugger_ShowTypeWordStack ;

@@ -1,19 +1,19 @@
-#include "../include/cfrtil64.h"
+#include "../include/csl.h"
 
 void
-CFT_Dsp ( )
+CSL_Dsp ( )
 {
     DataStack_Push ( ( int64 ) _Dsp_ ) ;
 }
 
 void
-CFT_Drop ( )
+CSL_Drop ( )
 {
     if ( CompileMode )
     {
         //Word * one = Compiler_WordStack ( - 1 ) ;
-        Word * one = CFT_WordList ( 1 ) ;
-        if ( GetState ( _CFT_, OPTIMIZE_ON ) && one && ( one->StackPushRegisterCode ) ) SetHere (one->StackPushRegisterCode, 1) ;
+        Word * one = CSL_WordList ( 1 ) ;
+        if ( GetState ( _CSL_, OPTIMIZE_ON ) && one && ( one->StackPushRegisterCode ) ) SetHere (one->StackPushRegisterCode, 1) ;
         else _Compile_Stack_Drop ( DSP ) ;
     }
     else
@@ -23,7 +23,7 @@ CFT_Drop ( )
 }
 
 void
-CFT_DropN ( )
+CSL_DropN ( )
 {
     if ( CompileMode ) _Compile_Stack_DropN ( DSP, _DataStack_Top ( ) + 1 ) ;
     else DataStack_DropN ( TOS + 1 ) ;
@@ -31,7 +31,7 @@ CFT_DropN ( )
 
 #if 0 // ??not needed 
 void
-_CFT_Push ( int64 value )
+_CSL_Push ( int64 value )
 {
     if ( CompileMode )
     {
@@ -45,20 +45,20 @@ _CFT_Push ( int64 value )
 #endif
 
 void
-CFT_Dup ( )
+CSL_Dup ( )
 {
     if ( CompileMode ) _Compile_Stack_Dup ( DSP ) ;
     else DataStack_Dup ( ) ;
-    CFT_TypeStack_Dup ( ) ;
+    CSL_TypeStack_Dup ( ) ;
 }
 #if 0
 void
-CFT_Ndrop ( )
+CSL_Ndrop ( )
 {
     if ( CompileMode )
     {
         //Compile_SUBI( mod, operandReg, offset, immediateData, size ) 
-        Word * one = CFT_WordList ( 1 ) ;
+        Word * one = CSL_WordList ( 1 ) ;
         SetHere (one->Coding, 1) ;
         Compile_SUBI ( REG, DSP, 0, one->W_Value * CELL_SIZE, BYTE ) ;
     }
@@ -72,7 +72,7 @@ CFT_Ndrop ( )
 // result is as if one did n dups in a row 
 
 void
-CFT_NDup ( )
+CSL_NDup ( )
 {
     int64 n = TOS ;
     int64 value = * -- _Dsp_ ; // -1 : n now occupies 1 to be also used slot
@@ -81,7 +81,7 @@ CFT_NDup ( )
 
         * ++ _Dsp_ = value ;
     }
-    //CFT->Set_DspReg_FromDataStackPointer ( ) ; // update DSP reg
+    //CSL->Set_DspReg_FromDataStackPointer ( ) ; // update DSP reg
 }
 
 // pick is from stack below top index
@@ -90,7 +90,7 @@ CFT_NDup ( )
 // ..., etc.
 
 void
-CFT_Pick ( ) // pick
+CSL_Pick ( ) // pick
 {
     if ( CompileMode )
     {
@@ -105,7 +105,7 @@ CFT_Pick ( ) // pick
 }
 
 void
-CFT_Swap ( )
+CSL_Swap ( )
 {
     if ( CompileMode )
     {
@@ -119,48 +119,48 @@ CFT_Swap ( )
     }
 }
 void
-CFT_PrintNDataStack ( )
+CSL_PrintNDataStack ( )
 {
     // Intel SoftwareDevelopersManual-253665.pdf section 6.2 : a push decrements ESP, a pop increments ESP
     // therefore TOS is in lower mem addresses, bottom of stack is in higher memory addresses
     int64 size = DataStack_Pop ( ) ;
-    _CFT_PrintNDataStack ( size ) ;
+    _CSL_PrintNDataStack ( size ) ;
 }
 
 #if 0
 void
-CFT_PrintRspRegStack ( )
+CSL_PrintRspRegStack ( )
 {
     // Intel SoftwareDevelopersManual-253665.pdf section 6.2 : a push decrements ESP, a pop increments ESP
     // therefore TOS is in lower mem addresses, bottom of stack is in higher memory addresses
-    _CFT_PrintNReturnStack ( 8 ) ;
+    _CSL_PrintNReturnStack ( 8 ) ;
 }
 #endif
 
 void
-CFT_PrintReturnStack ( )
+CSL_PrintReturnStack ( )
 {
-    _CFT_PrintNReturnStack ( 8, 1 ) ;
-    CFT_NewLine ( ) ;
+    _CSL_PrintNReturnStack ( 8, 1 ) ;
+    CSL_NewLine ( ) ;
 
 }
 
 
 void
-CFT_PrintNReturnStack ( )
+CSL_PrintNReturnStack ( )
 {
     // Intel SoftwareDevelopersManual-253665.pdf section 6.2 : a push decrements ESP, a pop increments ESP
     // therefore TOS is in lower mem addresses, bottom of stack is in higher memory addresses
     int64 size = DataStack_Pop ( ) ;
-    _CFT_PrintNReturnStack ( size, 1 ) ;
-    CFT_NewLine () ;
+    _CSL_PrintNReturnStack ( size, 1 ) ;
+    CSL_NewLine () ;
 }
 
 void
-CFT_PrintNDataStack_8 ( )
+CSL_PrintNDataStack_8 ( )
 {
     // Intel SoftwareDevelopersManual-253665.pdf section 6.2 : a push decrements ESP, a pop increments ESP
     // therefore TOS is in lower mem addresses, bottom of stack is in higher memory addresses
-    _CFT_PrintNDataStack ( 8 ) ;
+    _CSL_PrintNDataStack ( 8 ) ;
 }
 

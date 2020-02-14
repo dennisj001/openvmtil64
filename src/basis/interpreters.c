@@ -1,10 +1,10 @@
 
-#include "../include/cfrtil64.h"
+#include "../include/csl.h"
 
 void
 Interpret_String ( byte *str )
 {
-    _CFT_ContextNew_InterpretString ( _CFT_, str ) ;
+    _CSL_ContextNew_InterpretString ( _CSL_, str ) ;
 }
 
 byte *
@@ -34,7 +34,7 @@ Interpret_C_Until_Token4 ( Interpreter * interp, byte * end1, byte * end2, byte*
         }
         else if ( GetState ( _Context_, C_SYNTAX ) && ( String_Equal ( token, "," ) || String_Equal ( token, ";" ) ) )
         {
-            CFT_ArrayModeOff ( ) ;
+            CSL_ArrayModeOff ( ) ;
             SetState ( _Context_, ADDRESS_OF_MODE, false ) ;
             break ;
         }
@@ -43,7 +43,7 @@ Interpret_C_Until_Token4 ( Interpreter * interp, byte * end1, byte * end2, byte*
         if ( ( inChar == 0 ) || ( inChar == - 1 ) || ( inChar == eof ) ) token = 0 ;
     }
     while ( token ) ;
-    if ( token ) CFT_PushToken_OnTokenList ( token ) ;
+    if ( token ) CSL_PushToken_OnTokenList ( token ) ;
     return token ;
 }
 
@@ -73,13 +73,13 @@ Interpret_Until_Token ( Interpreter * interp, byte * end, byte * delimiters )
         token = _Lexer_ReadToken ( lexer, delimiters ) ;
         if ( String_Equal ( token, end ) )
         {
-            if ( GetState ( _Compiler_, C_COMBINATOR_LPAREN ) && ( String_Equal ( token, ";" ) ) ) CFT_PushToken_OnTokenList ( token ) ;
+            if ( GetState ( _Compiler_, C_COMBINATOR_LPAREN ) && ( String_Equal ( token, ";" ) ) ) CSL_PushToken_OnTokenList ( token ) ;
             break ;
         }
         if ( String_Equal ( token, ";" ) && GetState ( _Context_, C_SYNTAX ) && GetState ( _Compiler_, C_COMBINATOR_PARSING ) )
         {
-            CFT_PushToken_OnTokenList ( token ) ;
-            CFT_ArrayModeOff ( ) ;
+            CSL_PushToken_OnTokenList ( token ) ;
+            CSL_ArrayModeOff ( ) ;
             SetState ( _Context_, ADDRESS_OF_MODE, false ) ;
             break ;
         }
@@ -88,14 +88,14 @@ Interpret_Until_Token ( Interpreter * interp, byte * end, byte * delimiters )
         if ( ( inChar == 0 ) || ( inChar == - 1 ) || ( inChar == eof ) ) token = 0 ;
     }
     while ( token ) ;
-    //if ( token ) _CFT_PushToken_OnTokenList ( token ) ;
+    //if ( token ) _CSL_PushToken_OnTokenList ( token ) ;
     return token ;
 }
 
 void
 Interpret_PrefixFunction_Until_Token ( Interpreter * interp, Word * prefixFunction, byte * end, byte * delimiters )
 {
-    int64 svscwi = _CFT_->SC_Index ;
+    int64 svscwi = _CSL_->SC_Index ;
     Interpret_Until_Token ( interp, end, delimiters ) ;
     SetState ( _Context_->Compiler0, PREFIX_ARG_PARSING, false ) ;
     if ( prefixFunction ) Interpreter_DoWord_Default ( interp, prefixFunction, - 1, svscwi ) ;
@@ -124,7 +124,7 @@ Interpret_PrefixFunction_OrUntil_RParen ( Interpreter * interp, Word * prefixFun
             }
             else break ;
         }
-        d0 ( if ( Is_DebugModeOn ) _CFT_SC_WordList_Show ( "\n_Interpret_PrefixFunction_Until_RParen", 0, 0 ) ) ;
+        d0 ( if ( Is_DebugModeOn ) _CSL_SC_WordList_Show ( "\n_Interpret_PrefixFunction_Until_RParen", 0, 0 ) ) ;
         SetState ( compiler, PREFIX_ARG_PARSING, true ) ;
         if ( prefixFunction->WNumberOfPrefixedArgs )
         {
@@ -175,19 +175,19 @@ Interpret_UntilFlaggedWithInit ( Interpreter * interp, int64 doneFlags )
 }
 
 void
-_CFT_Interpret ( CfrTil * cfrTil )
+_CSL_Interpret ( CSL * csl )
 {
     do
     {
-        _CFT_Init_SessionCore ( cfrTil, 1, 1 ) ;
-        Context_Interpret ( cfrTil->Context0 ) ;
+        _CSL_Init_SessionCore ( csl, 1, 1 ) ;
+        Context_Interpret ( csl->Context0 ) ;
     }
-    while ( GetState ( cfrTil, CFRTIL_RUN ) ) ;
+    while ( GetState ( csl, CSL_RUN ) ) ;
 }
 
 void
-CFT_InterpreterRun ( )
+CSL_InterpreterRun ( )
 {
-    _CFT_Interpret ( _CFT_ ) ;
+    _CSL_Interpret ( _CSL_ ) ;
 }
 

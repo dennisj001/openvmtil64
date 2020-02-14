@@ -1,5 +1,5 @@
 
-#include "../../include/cfrtil64.h"
+#include "../../include/csl.h"
 
 // these functions are part of the C vm and can't be compiled
 // ! they are should only be called in C functions !
@@ -23,7 +23,7 @@ DataStack_Dup ( )
 {
     _Dsp_ [ 1 ] = _Dsp_[0] ;
     _Dsp_ ++ ;
-    CFT_TypeStack_Dup ( ) ;
+    CSL_TypeStack_Dup ( ) ;
 }
 
 void
@@ -36,7 +36,7 @@ void
 DataStack_Drop ( )
 {
     _Dsp_ -- ;
-    CFT_TypeStack_Drop ( ) ;
+    CSL_TypeStack_Drop ( ) ;
 }
 
 inline int64
@@ -56,14 +56,14 @@ DataStack_Check ( )
 {
     if ( DataStack_Underflow ( ) || DataStack_Overflow ( ) )
     {
-        CFT_Exception ( STACK_OVERFLOW, 0, QUIT ) ;
+        CSL_Exception ( STACK_OVERFLOW, 0, QUIT ) ;
     }
 }
 
 int64
 DataStack_Depth ( )
 {
-    if ( _O_ && _CFT_ && _DataStack_ )
+    if ( _O_ && _CSL_ && _DataStack_ )
     {
         _DataStackPointer_ = _Dsp_ ;
         return Stack_Depth ( _DataStack_ ) ;
@@ -74,20 +74,20 @@ DataStack_Depth ( )
 // safe form with stack checking
 
 void
-_CFT_PrintDataStack ( )
+_CSL_PrintDataStack ( )
 {
     Stack_Print ( _DataStack_, ( byte* ) "DataStack", 0 ) ;
 }
 
 void
-CFT_PrintDataStack ( )
+CSL_PrintDataStack ( )
 {
     Set_DataStackPointer_FromDspReg ( ) ;
-    _CFT_PrintDataStack ( ) ;
+    _CSL_PrintDataStack ( ) ;
 }
 
 void
-CFT_PrintStackDepth ( )
+CSL_PrintStackDepth ( )
 {
     _Printf ( ( byte* ) "\nDataStack : depth = %d", Stack_Depth ( _DataStack_ ) ) ;
 }
@@ -115,60 +115,60 @@ void
 _Set_DataStackPointers ( uint64 * ptr )
 {
     Set_DspReg ( ptr ) ;
-    _CFT_->DataStack->StackPointer = ptr ;
+    _CSL_->DataStack->StackPointer = ptr ;
 }
 
 void
 Set_DataStackPointers_FromDebuggerDspReg ( )
 {
     //Set_DspReg_FromDebuggerDspReg ( ) ;
-    //CFT->DataStack->StackPointer = _Dsp_ ;
+    //CSL->DataStack->StackPointer = _Dsp_ ;
     _Set_DataStackPointers ( _Debugger_->cs_Cpu->R14d ) ;
 }
 
 void
 Set_DataStackPointer_FromDspReg ( )
 {
-    _CFT_->DataStack->StackPointer = _Dsp_ ;
+    _CSL_->DataStack->StackPointer = _Dsp_ ;
 }
 
 void
 Set_DspReg_FromDataStackPointer ( )
 {
-    _Dsp_ = _CFT_->DataStack->StackPointer ;
+    _Dsp_ = _CSL_->DataStack->StackPointer ;
 }
 
 #if 0
 void
 Set_DataStackPointer_FromDspReg ( )
 {
-    _CFT_->Set_DataStackPointer_FromDspReg ( ) ;
+    _CSL_->Set_DataStackPointer_FromDspReg ( ) ;
 }
 
 void
 Set_DspReg_FromDataStackPointer ( )
 {
     _Debugger_->cs_Cpu->R14d = _Dsp_ ;
-    _CFT_->Set_DspReg_FromDataStackPointer ( ) ;
+    _CSL_->Set_DspReg_FromDataStackPointer ( ) ;
 }
 #endif
 
 void
-CFT_CheckInitDataStack ( )
+CSL_CheckInitDataStack ( )
 {
     if ( Stack_Depth ( _DataStack_ ) < 0 )
     {
         _Stack_PrintHeader ( _DataStack_, ( byte* ) "DataStack" ) ;
         _Printf ( ( byte* ) c_ad ( "\n\nError : %s : %s : Stack Underflow!" ), _Context_->CurrentlyRunningWord ? _Context_->CurrentlyRunningWord->Name : ( byte * ) "", _Context_Location ( _Context_ ) ) ;
         _Printf ( ( byte* ) c_gd ( "\nReseting DataStack.\n" ) ) ;
-        _Stack_Init ( _CFT_->DataStack, _O_->DataStackSize ) ;
-        _CFT_DataStack_Init ( _CFT_ ) ;
+        _Stack_Init ( _CSL_->DataStack, _O_->DataStackSize ) ;
+        _CSL_DataStack_Init ( _CSL_ ) ;
         _Stack_PrintHeader ( _DataStack_, ( byte* ) "DataStack" ) ;
     }
 }
 
 void
-CFT_DataStack_Size ( )
+CSL_DataStack_Size ( )
 {
     DataStack_Push ( DataStack_Depth ( ) ) ;
 }

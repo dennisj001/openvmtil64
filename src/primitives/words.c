@@ -1,31 +1,31 @@
 
-#include "../include/cfrtil64.h"
+#include "../include/csl.h"
 
 void
-_CFT_Colon ( Boolean initSC )
+_CSL_Colon ( Boolean initSC )
 {
-    CFT_RightBracket ( ) ;
-    if ( initSC ) CFT_SourceCode_Init ( ) ;
-    CFT_Token ( ) ;
-    CFT_Word_New ( ) ;
-    CFT_BeginBlock ( ) ;
+    CSL_RightBracket ( ) ;
+    if ( initSC ) CSL_SourceCode_Init ( ) ;
+    CSL_Token ( ) ;
+    CSL_Word_New ( ) ;
+    CSL_BeginBlock ( ) ;
 
     byte * token = Lexer_Peek_Next_NonDebugTokenWord ( _Lexer_, 0, 0 ) ;
     if ( ( String_Equal ( token, "(" ) ) && ( ! GetState ( _Context_->Interpreter0, PREPROCESSOR_DEFINE ) ) )
     {
         Lexer_ReadToken ( _Lexer_ ) ;
-        CFT_LocalsAndStackVariablesBegin ( ) ;
+        CSL_LocalsAndStackVariablesBegin ( ) ;
     }
 }
 
 void
-CFT_Colon ( )
+CSL_Colon ( )
 {
-    _CFT_Colon ( 1 ) ;
+    _CSL_Colon ( 1 ) ;
 }
 
 Word *
-CFT_WordInitFinal ( )
+CSL_WordInitFinal ( )
 {
     block b = ( block ) DataStack_Pop ( ) ;
     Word * word = ( Word* ) DataStack_Pop ( ) ;
@@ -34,10 +34,10 @@ CFT_WordInitFinal ( )
 }
 
 void
-CFT_SemiColon ( )
+CSL_SemiColon ( )
 {
-    CFT_EndBlock ( ) ;
-    CFT_WordInitFinal ( ) ;
+    CSL_EndBlock ( ) ;
+    CSL_WordInitFinal ( ) ;
 }
 
 void
@@ -101,14 +101,14 @@ Word_CodeSize ( )
 }
 
 void
-CFT_Word_Run ( )
+CSL_Word_Run ( )
 {
     Word * word = ( Word* ) DataStack_Pop ( ) ;
     Word_Run ( word ) ;
 }
 
 void
-CFT_Word_Eval ( )
+CSL_Word_Eval ( )
 {
     Word * word = ( Word* ) DataStack_Pop ( ) ;
     Word_Eval ( word ) ;
@@ -126,7 +126,7 @@ Word_Finish ( )
 byte *
 _Word_Begin ( )
 {
-    CFT_SourceCode_Init ( ) ;
+    CSL_SourceCode_Init ( ) ;
     byte * name = Lexer_ReadToken ( _Context_->Lexer0 ) ;
     return name ;
 }
@@ -141,11 +141,11 @@ Word_Add ( )
 // forth : "create"
 
 void
-CFT_Word_New ( )
+CSL_Word_New ( )
 {
     byte * name = ( byte* ) DataStack_Pop ( ) ;
     Word * word = Word_New ( name ) ;
-    CFT_WordList_Init (word) ; //nb! so we need to use source code debug before creating a new word
+    CSL_WordList_Init (word) ; //nb! so we need to use source code debug before creating a new word
     DataStack_Push ( ( int64 ) word ) ;
 }
 
@@ -153,39 +153,39 @@ CFT_Word_New ( )
 // postfix 'word' takes a token and a block
 
 void
-CFT_Word ( )
+CSL_Word ( )
 {
     block b = ( block ) DataStack_Pop ( ) ;
     byte * name = ( byte* ) DataStack_Pop ( ) ;
-    DataObject_New (CFRTIL_WORD, 0, name, 0, 0, 0, 0, ( int64 ) b, 0, 0, 0, - 1 ) ;
+    DataObject_New (csl_WORD, 0, name, 0, 0, 0, 0, ( int64 ) b, 0, 0, 0, - 1 ) ;
 }
 
 void
-CFT_Alias ( )
+CSL_Alias ( )
 {
     Word * word = ( Word* ) DataStack_Pop ( ) ;
     byte * name = ( byte* ) DataStack_Pop ( ) ;
-    _CFT_Alias (word, name , 0) ;
+    _CSL_Alias (word, name , 0) ;
 }
 #if 0
 
 void
-CFT_Eval_C_Rtl_ArgList ( ) // C : x86 : ABI = 32 : protocol : right to left arguments from a list pushed on the stack
+CSL_Eval_C_Rtl_ArgList ( ) // C : x86 : ABI = 32 : protocol : right to left arguments from a list pushed on the stack
 {
     LC_CompileRun_C_ArgList ( ( Word * ) DataStack_Pop ( ) ) ;
 }
 #endif
 
 void
-CFT_TextMacro ( )
+CSL_TextMacro ( )
 {
-    _CFT_Macro ( TEXT_MACRO, ( byte* ) Do_TextMacro ) ;
+    _CSL_Macro ( TEXT_MACRO, ( byte* ) Do_TextMacro ) ;
 }
 
 void
-CFT_StringMacro ( )
+CSL_StringMacro ( )
 {
-    _CFT_Macro ( STRING_MACRO, ( byte* ) Do_StringMacro ) ;
+    _CSL_Macro ( STRING_MACRO, ( byte* ) Do_StringMacro ) ;
 }
 
 void
@@ -213,7 +213,7 @@ _Location_Printf ( Location * loc )
 }
 
 void
-CFT_Location_Printf ( )
+CSL_Location_Printf ( )
 {
     Location * loc = ( Location* ) DataStack_Pop ( ) ;
     _Location_Printf ( loc ) ;
@@ -230,20 +230,20 @@ Location_PushNew ( )
 // do> does> <do
 
 void
-CFT_Do ( )
+CSL_Do ( )
 {
     //_Context_->CurrentlyRunningWord->CAttribute |= IMMEDIATE ;
-    CFT_LeftBracket ( ) ; // interpret mode
+    CSL_LeftBracket ( ) ; // interpret mode
 }
 
 void
-CFT_Does ( )
+CSL_Does ( )
 {
-    //_CFT_RightBracket ( ) ; // back to compile mode
-    CFT_BeginBlock ( ) ;
+    //_CSL_RightBracket ( ) ; // back to compile mode
+    CSL_BeginBlock ( ) ;
     Interpret_C_Until_Token4 ( _Interpreter_, ( byte* ) "<do", ( byte* ) ";", ( byte* ) "}", ( byte* ) ",", 0, 0 ) ;
-    CFT_EndBlock ( ) ;
-    CFT_BlockRun ( ) ;
+    CSL_EndBlock ( ) ;
+    CSL_BlockRun ( ) ;
 }
 
 void
@@ -254,28 +254,28 @@ Word_Namespace ( )
 }
 
 void
-CFT_Keyword ( void )
+CSL_Keyword ( void )
 {
-    Word * word = _CFT_->LastFinished_Word ;
+    Word * word = _CSL_->LastFinished_Word ;
     if ( word ) word->W_MorphismAttributes |= KEYWORD ;
 }
 
 void
-CFT_Immediate ( void )
+CSL_Immediate ( void )
 {
-    Word * word = _CFT_->LastFinished_Word ;
+    Word * word = _CSL_->LastFinished_Word ;
     if ( word ) word->W_MorphismAttributes |= IMMEDIATE ;
 }
 
 void
-CFT_Syntactic ( void )
+CSL_Syntactic ( void )
 {
-    Word * word = _CFT_->LastFinished_Word ;
+    Word * word = _CSL_->LastFinished_Word ;
     if ( word ) word->W_ObjectAttributes |= SYNTACTIC ;
 }
 
 void
-CFT_IsImmediate ( void )
+CSL_IsImmediate ( void )
 {
 #if 0    
     Word * word = ( Word* ) TOS ;
@@ -287,24 +287,24 @@ CFT_IsImmediate ( void )
 }
 
 void
-CFT_Inline ( void )
+CSL_Inline ( void )
 {
-    Word * word = _CFT_->LastFinished_Word ;
+    Word * word = _CSL_->LastFinished_Word ;
     if ( word ) word->W_MorphismAttributes |= INLINE ;
 }
 
 void
-CFT_Set_TypeSignature ( void )
+CSL_Set_TypeSignature ( void )
 {
     byte * typeSignature = ( byte* ) DataStack_Pop ( ) ;
-    Word * word = _CFT_->LastFinished_Word ; // nb! must be LastFinished_Word because the signature is a literal and it is the LastFinished_DObject
+    Word * word = _CSL_->LastFinished_Word ; // nb! must be LastFinished_Word because the signature is a literal and it is the LastFinished_DObject
     if ( word ) Strncpy ( word->W_TypeSignatureString, typeSignature, 8 ) ;
 }
 
 void
-CFT_Prefix ( void )
+CSL_Prefix ( void )
 {
-    Word * word = _CFT_->LastFinished_Word ;
+    Word * word = _CSL_->LastFinished_Word ;
     if ( word )
     {
         word->W_MorphismAttributes |= PREFIX ;
@@ -313,10 +313,10 @@ CFT_Prefix ( void )
 }
 
 void
-CFT_NPrefix ( void )
+CSL_NPrefix ( void )
 {
     uint64 numberOfPrefixedArgs = DataStack_Pop ( ) ;
-    Word * word = _CFT_->LastFinished_Word ;
+    Word * word = _CSL_->LastFinished_Word ;
     if ( word )
     {
         word->W_MorphismAttributes |= PREFIX ;
@@ -326,9 +326,9 @@ CFT_NPrefix ( void )
 }
 
 void
-CFT_C_Prefix ( void )
+CSL_C_Prefix ( void )
 {
-    Word * word = _CFT_->LastFinished_Word ;
+    Word * word = _CSL_->LastFinished_Word ;
     if ( word )
     {
         word->W_MorphismAttributes |= C_PREFIX | C_PREFIX_RTL_ARGS ;
@@ -337,9 +337,9 @@ CFT_C_Prefix ( void )
 }
 
 void
-CFT_C_Return ( void )
+CSL_C_Return ( void )
 {
-    Word * word = _CFT_->LastFinished_Word ;
+    Word * word = _CSL_->LastFinished_Word ;
     if ( word )
     {
         word->W_MorphismAttributes |= C_RETURN | C_PREFIX_RTL_ARGS ;
@@ -348,9 +348,9 @@ CFT_C_Return ( void )
 }
 
 void
-CFT_Void_Return ( void )
+CSL_Void_Return ( void )
 {
-    Word * word = _CFT_->LastFinished_Word ;
+    Word * word = _CSL_->LastFinished_Word ;
     if ( word )
     {
         word->W_MorphismAttributes &= ~ C_RETURN ;
@@ -364,9 +364,9 @@ CFT_Void_Return ( void )
 }
 
 void
-CFT_RAX_Return ( void )
+CSL_RAX_Return ( void )
 {
-    Word * word = _CFT_->LastFinished_Word ;
+    Word * word = _CSL_->LastFinished_Word ;
     if ( word )
     {
         word->W_MorphismAttributes &= ~ C_RETURN ;
@@ -375,9 +375,9 @@ CFT_RAX_Return ( void )
 }
 
 void
-CFT_DebugWord ( void )
+CSL_DebugWord ( void )
 {
-    Word * word = _CFT_->LastFinished_Word ;
+    Word * word = _CSL_->LastFinished_Word ;
     if ( word ) word->W_MorphismAttributes |= DEBUG_WORD ;
 }
 
@@ -417,21 +417,21 @@ _DoWords ( Symbol * symbol, int64 * n )
 }
 
 int64
-_CFT_PrintWords ( int64 state )
+_CSL_PrintWords ( int64 state )
 {
     int64 n = 0 ;
-    _CFT_NamespacesMap ( ( MapSymbolFunction2 ) _DoWords, state, ( int64 ) & n, 0 ) ;
-    if ( _O_->Verbosity > 3 ) _Printf ( ( byte* ) "\nCfrTil : WordsAdded = %d : WordMaxCount = %d", _CFT_->WordsAdded, _CFT_->FindWordMaxCount ) ;
+    _CSL_NamespacesMap ( ( MapSymbolFunction2 ) _DoWords, state, ( int64 ) & n, 0 ) ;
+    if ( _O_->Verbosity > 3 ) _Printf ( ( byte* ) "\nCSL : WordsAdded = %d : WordMaxCount = %d", _CSL_->WordsAdded, _CSL_->FindWordMaxCount ) ;
     return n ;
 }
 
 void
-CFT_Words ( )
+CSL_Words ( )
 {
     _Printf ( ( byte* ) "\nWords :\n - <namespace> ':>' <word list>" ) ;
-    int64 n = _CFT_PrintWords ( USING ) ;
+    int64 n = _CSL_PrintWords ( USING ) ;
     _Printf ( ( byte* ) "\n" INT_FRMT " words on the 'using' Namespaces List ::", n ) ;
-    if ( _O_->Verbosity > 3 ) _Printf ( ( byte* ) "\nCfrTil : WordsAdded = %d : WordMaxCount = %d", _CFT_->WordsAdded, _CFT_->FindWordMaxCount ) ;
+    if ( _O_->Verbosity > 3 ) _Printf ( ( byte* ) "\nCSL : WordsAdded = %d : WordMaxCount = %d", _CSL_->WordsAdded, _CSL_->FindWordMaxCount ) ;
 }
 
 void
@@ -468,23 +468,23 @@ _PrintVariables ( Symbol * symbol, int64 * n )
 }
 
 int64
-_CFT_PrintVariables ( int64 nsStatus )
+_CSL_PrintVariables ( int64 nsStatus )
 {
     int64 n = 0 ;
-    _CFT_NamespacesMap ( ( MapSymbolFunction2 ) _PrintVariables, nsStatus, ( int64 ) & n, 0 ) ;
+    _CSL_NamespacesMap ( ( MapSymbolFunction2 ) _PrintVariables, nsStatus, ( int64 ) & n, 0 ) ;
     return n ;
 }
 
 void
-CFT_Variables ( )
+CSL_Variables ( )
 {
     _Printf ( ( byte* ) "\nGlobal Variables :\n - <namespace> ':>' <variable '=' value ';'>*" ) ;
-    int64 n = _CFT_PrintVariables ( USING ) ;
+    int64 n = _CSL_PrintVariables ( USING ) ;
     _Printf ( ( byte* ) "\n" INT_FRMT " global variables on the 'using' Namespaces List", n ) ;
 }
 
 void
-_CFT_NamespaceWords ( )
+_CSL_NamespaceWords ( )
 {
     int64 n = 0 ;
     Namespace * ns = ( Namespace * ) DataStack_Pop ( ) ;
@@ -497,28 +497,28 @@ _CFT_NamespaceWords ( )
 }
 
 void
-CFT_NamespaceWords ( )
+CSL_NamespaceWords ( )
 {
     byte * name = ( byte * ) DataStack_Pop ( ) ;
     Namespace * ns = _Namespace_Find ( name, 0, 0 ) ;
     DataStack_Push ( ( int64 ) ns ) ;
-    _CFT_NamespaceWords ( ) ;
+    _CSL_NamespaceWords ( ) ;
 }
 
 void
-CFT_AllWords ( )
+CSL_AllWords ( )
 {
     _Printf ( ( byte* ) "\n - <namespace> ':>' <word list>" ) ;
     _Printf ( ( byte* ) "\n'using' Namespaces List ::" ) ;
-    int64 n = _CFT_PrintWords ( USING ) ;
+    int64 n = _CSL_PrintWords ( USING ) ;
     _Printf ( ( byte* ) "\n" INT_FRMT " words on the Currently 'using' Namespaces List", n ) ;
     _Printf ( ( byte* ) "\n'notUsing' Namespaces List ::" ) ;
-    int64 usingWords = _CFT_->FindWordCount ;
-    int64 m = _CFT_PrintWords ( NOT_USING ) ;
+    int64 usingWords = _CSL_->FindWordCount ;
+    int64 m = _CSL_PrintWords ( NOT_USING ) ;
     _Printf ( ( byte* ) "\n" INT_FRMT " words on the 'notUsing' List", m ) ;
     _Printf ( ( byte* ) "\n" INT_FRMT " total words", n + m ) ;
-    int64 notUsingWords = _CFT_->FindWordCount ;
-    _CFT_->FindWordCount = usingWords + notUsingWords ;
-    CFT_WordAccounting ( ( byte* ) "CFT_AllWords" ) ;
+    int64 notUsingWords = _CSL_->FindWordCount ;
+    _CSL_->FindWordCount = usingWords + notUsingWords ;
+    CSL_WordAccounting ( ( byte* ) "CSL_AllWords" ) ;
 }
 

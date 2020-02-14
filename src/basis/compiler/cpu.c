@@ -1,12 +1,12 @@
-#include "../../include/cfrtil64.h"
+#include "../../include/csl.h"
 
 void
 _CpuState_Show ( Cpu * cpu )
 {
     byte * location = Context_Location ( ) ;
     if ( cpu == _Debugger_->cs_Cpu ) _Printf ( ( byte* ) "\nDebugger CpuState : at %s", location ) ;
-    else if ( cpu == _CFT_->cs_Cpu2 ) _Printf ( ( byte* ) "\nCurrent CpuState : at %s", location ) ;
-    else _Printf ( ( byte* ) "\nC Runtime (CFT) CpuState : at %s", location ) ;
+    else if ( cpu == _CSL_->cs_Cpu2 ) _Printf ( ( byte* ) "\nCurrent CpuState : at %s", location ) ;
+    else _Printf ( ( byte* ) "\nC Runtime (CSL) CpuState : at %s", location ) ;
     _Printf ( ( byte* ) "\nRAX " UINT_FRMT_0x016, cpu->Rax ) ;
     _Printf ( ( byte* ) " RCX " UINT_FRMT_0x016, cpu->Rcx ) ;
     _Printf ( ( byte* ) " RDX " UINT_FRMT_0x016, cpu->Rdx ) ;
@@ -196,16 +196,16 @@ Cpu *
 CpuState_SaveCopyCurrent ( Cpu * cpu )
 {
     Cpu * newCpu = CpuState_New ( TEMPORARY ) ;
-    _CFT_->SaveCpu2State ( ) ;
+    _CSL_->SaveCpu2State ( ) ;
     _CpuState_Copy ( newCpu, cpu ) ;
     return newCpu ;
 }
 
 
 Cpu *
-CFT_CpuState_SaveCopyCurrent ( )
+CSL_CpuState_SaveCopyCurrent ( )
 {
-    return CpuState_SaveCopyCurrent ( _CFT_->cs_Cpu ) ;
+    return CpuState_SaveCopyCurrent ( _CSL_->cs_Cpu ) ;
 }
 
 Cpu *
@@ -217,16 +217,16 @@ Debugger_CpuState_SaveCopyCurrent ( )
 void
 _CpuState_Restore ( Cpu * cpu )
 {
-    Cpu *svCpu = _CFT_->cs_Cpu ; //CpuState_Copy ( CFT->cs_Cpu, TEMPORARY ) ;
-    _CFT_->cs_Cpu = cpu ;
-    _CFT_->RestoreCpuState ( ) ;
-    _CFT_->cs_Cpu = svCpu ;
+    Cpu *svCpu = _CSL_->cs_Cpu ; //CpuState_Copy ( CSL->cs_Cpu, TEMPORARY ) ;
+    _CSL_->cs_Cpu = cpu ;
+    _CSL_->RestoreCpuState ( ) ;
+    _CSL_->cs_Cpu = svCpu ;
 }
 
 void
 CpuState_Save ( )
 {
-    Cpu *newCpu = CFT_CpuState_SaveCopyCurrent ( ) ;
+    Cpu *newCpu = CSL_CpuState_SaveCopyCurrent ( ) ;
     DataStack_Push ( ( int64 ) newCpu ) ;
 }
 

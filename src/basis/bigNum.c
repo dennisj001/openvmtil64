@@ -1,4 +1,4 @@
-#include "../include/cfrtil64.h"
+#include "../include/csl.h"
 
 #define BN_DBG_OFF 1
 #if BN_DBG_OFF
@@ -241,7 +241,7 @@ BigNum_PopTwoOperands_PushFunctionResult ( mpf2andOutFunc func )
     mpfr_t *op1 = ( mpfr_t* ) DataStack_Pop ( ) ;
     mpfr_t * op2 = ( mpfr_t* ) DataStack_Pop ( ) ;
     func ( *result, *op2, *op1, MPFR_RNDN ) ;
-    d0 ( _CFT_->SaveSelectedCpuState ( ) ) ;
+    d0 ( _CSL_->SaveSelectedCpuState ( ) ) ;
     DataStack_Push ( ( int64 ) result ) ;
 }
 
@@ -280,7 +280,7 @@ _BigNum_OpEqualTemplate ( mpf2andOutFunc func )
     mpfr_t **p_op1 = ( mpfr_t** ) DataStack_Pop ( ) ;
     func ( *result, **p_op1, *op2, MPFR_RNDN ) ;
     *p_op1 = result ;
-    d0 ( _CFT_->SaveSelectedCpuState ( ) ) ;
+    d0 ( _CSL_->SaveSelectedCpuState ( ) ) ;
 }
 
 void

@@ -1,29 +1,29 @@
-#include "../include/cfrtil64.h"
+#include "../include/csl.h"
 
 // all except namespaces and number base
-// this is called by the main interpreter _CFT_Interpret
+// this is called by the main interpreter _CSL_Interpret
 
 void
-CFT_RuntimeInit ( CfrTil * cfrTil, int64 cntxDelFlag )
+CSL_RuntimeInit ( CSL * csl, int64 cntxDelFlag )
 {
-    CFT_LogOff ( ) ;
-    cfrTil->SC_QuoteMode = 0 ;
-    cfrTil->SC_Word = 0 ;
+    CSL_LogOff ( ) ;
+    csl->SC_QuoteMode = 0 ;
+    csl->SC_Word = 0 ;
     if ( cntxDelFlag )
     {
-        int64 i, stackDepth = Stack_Depth ( cfrTil->ContextDataStack ) ;
-        for ( i = 0 ; i < stackDepth ; i ++ ) CFT_Context_PopDelete ( cfrTil ) ;
+        int64 i, stackDepth = Stack_Depth ( csl->ContextDataStack ) ;
+        for ( i = 0 ; i < stackDepth ; i ++ ) CSL_Context_PopDelete ( csl ) ;
     }
-    SetState_TrueFalse ( cfrTil, CFRTIL_RUN, DEBUG_MODE ) ;
-    SetState ( cfrTil->Debugger0, DBG_ACTIVE, false ) ;
+    SetState_TrueFalse ( csl, CSL_RUN, DEBUG_MODE ) ;
+    SetState ( csl->Debugger0, DBG_ACTIVE, false ) ;
     DebugOff ;
     SetBuffersUnused ( 1 ) ;
     d0 ( Buffer_PrintBuffers ( ) ) ;
     DefaultColors ;
-    CFT_CheckInitDataStack ( ) ;
-    _CFT_TypeStackReset ( ) ;
-    _CFT_RecycleInit_Compiler_N_M_Node_WordList ( ) ;
-    CFT_UnsetQualifyingNamespace ( ) ;
+    CSL_CheckInitDataStack ( ) ;
+    _CSL_TypeStackReset ( ) ;
+    _CSL_RecycleInit_Compiler_N_M_Node_WordList ( ) ;
+    CSL_UnsetQualifyingNamespace ( ) ;
 }
 
 void
@@ -34,58 +34,58 @@ OVT_RuntimeInit ( )
 }
 
 void
-_CFT_Init_SessionCore ( CfrTil * cfrTil, Boolean cntxDelFlag, Boolean promptFlag )
+_CSL_Init_SessionCore ( CSL * csl, Boolean cntxDelFlag, Boolean promptFlag )
 {
-    Context * cntx = cfrTil->Context0 ;
+    Context * cntx = csl->Context0 ;
     _System_Init ( cntx->System0 ) ;
-    ReadLine_Init ( cntx->ReadLiner0, _CFT_Key ) ;
+    ReadLine_Init ( cntx->ReadLiner0, _CSL_Key ) ;
     Lexer_Init ( cntx->Lexer0, 0, 0, CONTEXT ) ;
     Finder_Init ( cntx->Finder0 ) ;
     Compiler_Init ( cntx->Compiler0, 0 ) ;
     Interpreter_Init ( cntx->Interpreter0 ) ;
     if ( _LC_ ) LC_Init_Runtime ( ) ;
-    CFT_RuntimeInit ( cfrTil, cntxDelFlag ) ;
+    CSL_RuntimeInit ( csl, cntxDelFlag ) ;
     OVT_RuntimeInit ( ) ;
-    OVT_StartupMessage ( promptFlag && ( cfrTil->InitSessionCoreTimes < 2 ) ) ;
-    cfrTil->InitSessionCoreTimes ++ ;
+    OVT_StartupMessage ( promptFlag && ( csl->InitSessionCoreTimes < 2 ) ) ;
+    csl->InitSessionCoreTimes ++ ;
     _OVT_Ok ( promptFlag ) ;
 }
 
 void
-CFT_SessionInit ( )
+CSL_SessionInit ( )
 {
-    _CFT_Init_SessionCore ( _CFT_, 0, 1 ) ;
+    _CSL_Init_SessionCore ( _CSL_, 0, 1 ) ;
 }
 
 void
-CFT_ResetAll_Init ( CfrTil * cfrTil )
+CSL_ResetAll_Init ( CSL * csl )
 {
     byte * startDirectory = ( byte* ) "namespaces" ;
-    if ( ! GetState ( _O_, OVT_IN_USEFUL_DIRECTORY ) ) startDirectory = ( byte* ) "/usr/local/lib/cfrTil64/namespaces" ;
+    if ( ! GetState ( _O_, OVT_IN_USEFUL_DIRECTORY ) ) startDirectory = ( byte* ) "/usr/local/lib/csl/namespaces" ;
     DataObject_New ( NAMESPACE_VARIABLE, 0, ( byte* ) "_startDirectory_", 0, NAMESPACE_VARIABLE, 0, 0, ( int64 ) startDirectory, 0, 0, 0, - 1 ) ;
     if ( ( _O_->RestartCondition >= RESET_ALL ) )
     {
         _O_->StartIncludeTries = 0 ;
-        _CFT_Init_SessionCore ( cfrTil, 1, 0 ) ;
-        _CFT_Namespace_NotUsing ( ( byte* ) "BigNum" ) ;
-        _CFT_Namespace_NotUsing ( ( byte* ) "Lisp" ) ;
+        _CSL_Init_SessionCore ( csl, 1, 0 ) ;
+        _CSL_Namespace_NotUsing ( ( byte* ) "BigNum" ) ;
+        _CSL_Namespace_NotUsing ( ( byte* ) "Lisp" ) ;
         if ( _O_->StartupFilename )
         {
             _O_->Verbosity = 0 ;
-            _CFT_ContextNew_IncludeFile ( ( byte* ) "./namespaces/sinit.cft" ) ;
-            _CFT_ContextNew_IncludeFile ( _O_->StartupFilename ) ;
+            _CSL_ContextNew_IncludeFile ( ( byte* ) "./namespaces/sinit.csl" ) ;
+            _CSL_ContextNew_IncludeFile ( _O_->StartupFilename ) ;
         }
         else
         {
             if ( ! _O_->StartIncludeTries ++ )
             {
-                _CFT_ContextNew_InterpretString ( cfrTil, _O_->InitString ) ;
-                _CFT_ContextNew_InterpretString ( cfrTil, _O_->StartupString ) ;
+                _CSL_ContextNew_InterpretString ( csl, _O_->InitString ) ;
+                _CSL_ContextNew_InterpretString ( csl, _O_->StartupString ) ;
             }
             else if ( _O_->StartIncludeTries < 3 )
             {
                 AlertColors ;
-                _CFT_ContextNew_IncludeFile ( ( byte* ) "./namespaces/init.cft" ) ;
+                _CSL_ContextNew_IncludeFile ( ( byte* ) "./namespaces/init.csl" ) ;
                 if ( _O_->ErrorFilename )
                 {
                     if ( strcmp ( ( char* ) _O_->ErrorFilename, "Debug Context" ) )
@@ -106,10 +106,10 @@ CFT_ResetAll_Init ( CfrTil * cfrTil )
 }
 
 void
-_CFT_InitialAddWordToNamespace ( Word * word, byte * containingNamespaceName, byte * superNamespaceName )
+_CSL_InitialAddWordToNamespace ( Word * word, byte * containingNamespaceName, byte * superNamespaceName )
 // this is only called at startup where we want to add the namespace to the RootNamespace
 {
-    Namespace *ns, *sns = _CFT_->Namespaces ;
+    Namespace *ns, *sns = _CSL_->Namespaces ;
     if ( superNamespaceName )
     {
         sns = Namespace_FindOrNew_SetUsing ( superNamespaceName, sns, 1 ) ;
@@ -120,12 +120,12 @@ _CFT_InitialAddWordToNamespace ( Word * word, byte * containingNamespaceName, by
 }
 
 void
-_CFT_CPrimitiveNewAdd ( const char * name, byte * pb_TypeSignature, uint64 opInsnGroup, uint64 opInsCode, block b, uint64 morphismAttributes,
+_CSL_CPrimitiveNewAdd ( const char * name, byte * pb_TypeSignature, uint64 opInsnGroup, uint64 opInsCode, block b, uint64 morphismAttributes,
     uint64 objectAttributes, uint64 lispAttributes, const char *nameSpace, const char * superNamespace )
 {
     Word * word = _Word_New ( ( byte* ) name, CPRIMITIVE | morphismAttributes, objectAttributes, lispAttributes, 1, 0, DICTIONARY ) ;
     _DObject_ValueDefinition_Init ( word, ( int64 ) b, BLOCK, 0, 0 ) ;
-    _CFT_InitialAddWordToNamespace ( word, ( byte* ) nameSpace, ( byte* ) superNamespace ) ;
+    _CSL_InitialAddWordToNamespace ( word, ( byte* ) nameSpace, ( byte* ) superNamespace ) ;
     if ( morphismAttributes & INFIXABLE ) word->W_TypeAttributes = WT_INFIXABLE ;
     else if ( morphismAttributes & PREFIX ) word->W_TypeAttributes = WT_PREFIX ;
     else if ( morphismAttributes & C_PREFIX_RTL_ARGS ) word->W_TypeAttributes = WT_C_PREFIX_RTL_ARGS ;
@@ -139,14 +139,14 @@ _CFT_CPrimitiveNewAdd ( const char * name, byte * pb_TypeSignature, uint64 opIns
 }
 
 void
-CFT_AddCPrimitives ( )
+CSL_AddCPrimitives ( )
 {
     int64 i ;
     for ( i = 0 ; CPrimitives [ i ].ccp_Name ; i ++ )
     {
         CPrimitive p = CPrimitives [ i ] ;
-        _CFT_CPrimitiveNewAdd ( p.ccp_Name, ( byte* ) p.pb_TypeSignature, p.OpInsnCodeGroup, p.OpInsnCode, p.blk_Definition, p.ui64_CAttribute, p.ui64_CAttribute2, p.ui64_LAttribute, ( char* ) p.NameSpace, ( char* ) p.SuperNamespace ) ;
+        _CSL_CPrimitiveNewAdd ( p.ccp_Name, ( byte* ) p.pb_TypeSignature, p.OpInsnCodeGroup, p.OpInsnCode, p.blk_Definition, p.ui64_CAttribute, p.ui64_CAttribute2, p.ui64_LAttribute, ( char* ) p.NameSpace, ( char* ) p.SuperNamespace ) ;
     }
-    //_CFT_CPrimitiveNewAdd ( p.ccp_Name, p.blk_Definition, p.ui64_CAttribute, p.ui64_CAttribute2, p.ui64_LAttribute, ( char* ) p.NameSpace, ( char* ) p.SuperNamespace ) ;
+    //_CSL_CPrimitiveNewAdd ( p.ccp_Name, p.blk_Definition, p.ui64_CAttribute, p.ui64_CAttribute2, p.ui64_LAttribute, ( char* ) p.NameSpace, ( char* ) p.SuperNamespace ) ;
 }
 

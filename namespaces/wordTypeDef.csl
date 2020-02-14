@@ -1,8 +1,7 @@
-
+5
 c_syntaxOn
-C 
+C 'Experimental namespace
 Experimental
-using
 type Pointer ; Pointer.size = 8 ;
 type block ; block.size = 8 ;
 type Location ; Location.size = 8 ;
@@ -232,10 +231,11 @@ typedef struct _Identifier
     dllist * DebugWordList ;
     int64 StartCharRlIndex ;
     int64 SC_WordIndex, SC_FileIndex_Start, SC_FileIndex_End ;
-    struct _Identifier * CfrTilWord, *BaseObject ;
-    struct _WordData * S_WordData ;
+    struct _Identifier * CSLWord, *BaseObject ;
+    struct _WordData * W_WordData ;
 } Identifier, ID, Word, Namespace, Vocabulary, Class, DynamicObject, DObject, ListObject, Symbol, MemChunk, HistoryStringNode, Buffer ;
 c_syntaxOff
 C
-'Root.C.Experimental notUsing
+'Experimental notUsing
 Root Experimental User
+2 + 7 assertStkChk // stack checking

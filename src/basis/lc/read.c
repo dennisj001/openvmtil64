@@ -1,4 +1,4 @@
-#include "../../include/cfrtil64.h"
+#include "../../include/csl.h"
 
 //===================================================================================================================
 //| _LO_Read 
@@ -22,7 +22,7 @@ _LO_Read ( LambdaCalculus * lc )
     d0 ( if ( Is_DebugModeOn ) LO_Debug_ExtraShow ( 0, 2, 0, ( byte* ) "\nEntering _LO_Read..." ) ) ;
     do
     {
-        //if ( Is_DebugModeOn ) CFT_PrintDataStack ( ) ;
+        //if ( Is_DebugModeOn ) CSL_PrintDataStack ( ) ;
         token = _Lexer_ReadToken ( lexer, ( byte* ) " ,\n\r\t" ) ;
         if ( Lexer_IsTokenQualifiedID ( lexer ) ) SetState ( cntx, CONTEXT_PARSING_QID, true ) ;
         else SetState ( cntx, CONTEXT_PARSING_QID, false ) ;
@@ -48,7 +48,7 @@ _LO_Read ( LambdaCalculus * lc )
             }
         }
         else _SyntaxError ( ( byte* ) "\n_LO_Read : Syntax error : no token?\n", QUIT ) ;
-        //if ( Is_DebugModeOn ) CFT_PrintDataStack ( ) ;
+        //if ( Is_DebugModeOn ) CSL_PrintDataStack ( ) ;
     }
     while ( lc->ParenLevel ) ;
     SetState ( lc, LC_READ, false ) ;
@@ -104,7 +104,7 @@ _LO_Read_DoWord ( LambdaCalculus * lc, Word * word, int64 qidFlag, int64 tsrli, 
         }
         l0 = DataObject_New (T_LC_NEW, word, word->Name, word->W_MorphismAttributes, word->W_ObjectAttributes,
             ( T_LISP_SYMBOL | word->W_LispAttributes ), 0, word->Lo_Value, 0, 0, tsrli, scwi ) ;
-        if ( word->W_ObjectAttributes & NAMESPACE_TYPE ) Namespace_DoNamespace ( word, 0 ) ;
+        if ( word->W_ObjectAttributes & NAMESPACE_TYPE ) Namespace_Do_Namespace ( word, 0 ) ;
     }
     return l0 ;
 }
@@ -116,7 +116,7 @@ _LO_Read_DoToken ( LambdaCalculus * lc, byte * token, int64 qidFlag, int64 tsrli
     Lexer *lexer = cntx->Lexer0 ;
     ListObject *l0 = 0 ;
     Word *word ;
-    //if ( Is_DebugModeOn ) CFT_PrintDataStack ( ) ;
+    //if ( Is_DebugModeOn ) CSL_PrintDataStack ( ) ;
     if ( qidFlag ) SetState ( cntx->Finder0, QID, true ) ;
     word = LC_FindWord ( token, 0 ) ;
     if ( qidFlag ) SetState ( cntx->Finder0, QID, false ) ;
@@ -131,7 +131,7 @@ _LO_Read_DoToken ( LambdaCalculus * lc, byte * token, int64 qidFlag, int64 tsrli
         l0->State |= ( lc->ItemQuoteState | lc->QuoteState ) ;
         lc->ItemQuoteState = 0 ;
     }
-    //if ( Is_DebugModeOn ) CFT_PrintDataStack ( ) ;
+    //if ( Is_DebugModeOn ) CSL_PrintDataStack ( ) ;
     return l0 ;
 }
 
@@ -140,8 +140,8 @@ LO_Read_DoToken ( LambdaCalculus * lc, byte * token, int64 qidFlag, int64 tsrli,
 {
     ListObject *l0 = 0 ;
     //if ( Is_DebugOn ) _Printf ( ( byte * ) "\n_LO_Read : \'%s\' scwi = %d", token, scwi ) ;
-    if ( String_Equal ( ( char * ) token, ( byte * ) "/*" ) ) CFT_ParenthesisComment ( ) ;
-    else if ( String_Equal ( ( char * ) token, ( byte * ) "//" ) ) CFT_CommentToEndOfLine ( ) ;
+    if ( String_Equal ( ( char * ) token, ( byte * ) "/*" ) ) CSL_ParenthesisComment ( ) ;
+    else if ( String_Equal ( ( char * ) token, ( byte * ) "//" ) ) CSL_CommentToEndOfLine ( ) ;
     else if ( String_Equal ( ( char * ) token, ( byte * ) "(" ) ) l0 = _LO_Read_Do_LParen ( lc ) ;
     else l0 = _LO_Read_DoToken ( lc, token, qidFlag, tsrli, scwi ) ;
     return l0 ;

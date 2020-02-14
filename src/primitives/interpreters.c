@@ -1,22 +1,22 @@
-#include "../include/cfrtil64.h"
+#include "../include/csl.h"
 
 void
-CFT_DoWord ( )
+CSL_DoWord ( )
 {
     Word * word = ( Word* ) DataStack_Pop ( ) ;
     Interpreter_DoWord ( _Context_->Interpreter0, word, - 1, - 1 ) ;
 }
 
 void
-CFT_CommentToEndOfLine ( )
+CSL_CommentToEndOfLine ( )
 {
     Lexer * lexer = _Lexer_ ;
-    _CFT_UnAppendTokenFromSourceCode ( _CFT_, lexer->OriginalToken ) ;
+    _CSL_UnAppendTokenFromSourceCode ( _CSL_, lexer->OriginalToken ) ;
     int64 svState = GetState ( lexer, ( ADD_TOKEN_TO_SOURCE | ADD_CHAR_TO_SOURCE ) ) ;
     Lexer_SourceCodeOff ( _Lexer_ ) ;
     ReadLiner_CommentToEndOfLine ( _Context_->ReadLiner0 ) ;
-    String_RemoveEndWhitespace ( _CFT_->SC_Buffer ) ;
-    _CFT_SC_ScratchPadIndex_Init ( _CFT_ ) ;
+    String_RemoveEndWhitespace ( _CSL_->SC_Buffer ) ;
+    _CSL_SC_ScratchPadIndex_Init ( _CSL_ ) ;
     SetState ( lexer, LEXER_END_OF_LINE, true ) ;
     //Lexer_SourceCodeOn ( _Lexer_ ) ;
     //if ( Compiling ) 
@@ -24,10 +24,10 @@ CFT_CommentToEndOfLine ( )
 }
 
 void
-CFT_ParenthesisComment ( )
+CSL_ParenthesisComment ( )
 {
     Lexer * lexer = _Lexer_ ;
-    _CFT_UnAppendTokenFromSourceCode ( _CFT_, lexer->OriginalToken ) ;
+    _CSL_UnAppendTokenFromSourceCode ( _CSL_, lexer->OriginalToken ) ;
     int64 svState = GetState ( lexer, ( ADD_TOKEN_TO_SOURCE | ADD_CHAR_TO_SOURCE ) ) ;
     Lexer_SourceCodeOff ( lexer ) ;
     while ( 1 )
@@ -41,93 +41,93 @@ CFT_ParenthesisComment ( )
 }
 
 void
-CFT_Define ( )
+CSL_Define ( )
 {
     Context * cntx = _Context_ ;
     Interpreter * interp = cntx->Interpreter0 ;
     SetState ( interp, PREPROCESSOR_DEFINE, true ) ;
-    CFT_Colon ( ) ;
+    CSL_Colon ( ) ;
     Interpret_ToEndOfLine ( interp ) ;
     int64 locals = Compiler_IsFrameNecessary ( _Compiler_ ) ;
     SetState ( interp, PREPROCESSOR_DEFINE, false ) ;
-    CFT_SemiColon ( ) ;
-    if ( locals ) CFT_Prefix ( ) ; // if we have local variables make it a prefix word ; maybe : if ( GetState ( _Context_, C_SYNTAX ) ) 
+    CSL_SemiColon ( ) ;
+    if ( locals ) CSL_Prefix ( ) ; // if we have local variables make it a prefix word ; maybe : if ( GetState ( _Context_, C_SYNTAX ) ) 
     else
     {
-        Word * word = _CFT_->LastFinished_Word ;
+        Word * word = _CSL_->LastFinished_Word ;
         if ( word ) word->W_ObjectAttributes |= (LITERAL|CONSTANT) ;
     }
-    CFT_Inline ( ) ;
-    CFT_SourceCode_Init ( ) ; //don't leave the define in sc
+    CSL_Inline ( ) ;
+    CSL_SourceCode_Init ( ) ; //don't leave the define in sc
 }
 
 void
-CFT_Interpreter_IsDone ( )
+CSL_Interpreter_IsDone ( )
 {
     DataStack_Push ( GetState ( _Context_->Interpreter0, END_OF_FILE | END_OF_STRING | INTERPRETER_DONE ) ) ;
 }
 
 void
-CFT_Interpreter_Done ( )
+CSL_Interpreter_Done ( )
 {
     SetState ( _Context_->Interpreter0, INTERPRETER_DONE, true ) ;
 }
 
 void
-CFT_Interpreter_Init ( )
+CSL_Interpreter_Init ( )
 {
     Interpreter_Init ( _Context_->Interpreter0 ) ;
 }
 
 void
-CFT_InterpretNextToken ( )
+CSL_InterpretNextToken ( )
 {
     Interpreter_InterpretNextToken ( _Context_->Interpreter0 ) ;
 }
 
 void
-CFT_Interpret ( )
+CSL_Interpret ( )
 {
     _Context_InterpretFile ( _Context_ ) ;
 }
 
 void
-CFT_InterpretPromptedLine ( )
+CSL_InterpretPromptedLine ( )
 {
-    CFT_DoPrompt ( ) ;
-    //Context_Interpret ( CFT->Context0 ) ;
+    CSL_DoPrompt ( ) ;
+    //Context_Interpret ( CSL->Context0 ) ;
     Interpret_ToEndOfLine ( _Interpreter_ ) ;
 }
 
 void
-CFT_InterpretString ( )
+CSL_InterpretString ( )
 {
     Interpret_String ( ( byte* ) DataStack_Pop ( ) ) ;
 }
 
 void
-CFT_Interpreter_EvalWord ( )
+CSL_Interpreter_EvalWord ( )
 {
 
     Interpreter_DoWord ( _Context_->Interpreter0, ( Word* ) DataStack_Pop ( ), - 1, - 1 ) ;
 }
 
 void
-CFT_TokenToWord ( )
+CSL_TokenToWord ( )
 {
     byte * token = ( byte* ) DataStack_Pop ( ) ;
     DataStack_Push ( ( int64 ) _Interpreter_TokenToWord ( _Context_->Interpreter0, token, - 1, - 1 ) ) ;
 }
 
 void
-CFT_InterpreterStop ( )
+CSL_InterpreterStop ( )
 {
     SetState ( _Context_->Interpreter0, INTERPRETER_DONE, true ) ;
-    SetState ( _CFT_, CFRTIL_RUN, false ) ;
+    SetState ( _CSL_, CSL_RUN, false ) ;
 }
 
 dllist *
-_CFT_Interpret_ReadToList ( )
+_CSL_Interpret_ReadToList ( )
 {
     byte * token ;
     Interpreter * interp = _Context_->Interpreter0 ;
@@ -148,15 +148,15 @@ _CFT_Interpret_ReadToList ( )
 }
 
 void
-CFT_Interpret_ReadToList ( )
+CSL_Interpret_ReadToList ( )
 {
 
-    dllist * interpList = _CFT_Interpret_ReadToList ( ) ;
+    dllist * interpList = _CSL_Interpret_ReadToList ( ) ;
     DataStack_Push ( ( int64 ) interpList ) ;
 }
 
 void
-CFT_Interpret_List ( )
+CSL_Interpret_List ( )
 {
     dllist * interpList = ( dllist* ) DataStack_Pop ( ) ;
     List_Interpret ( interpList ) ;
@@ -166,7 +166,7 @@ CFT_Interpret_List ( )
 #include "/usr/local/include/python3.7m/Python.h"
 
 void
-CFT_Interpret_Python ( )
+CSL_Interpret_Python ( )
 {
     byte * pstring = ( byte* ) DataStack_Pop ( ) ;
     wchar_t *program = Py_DecodeLocale ( "python3.7", NULL ) ;

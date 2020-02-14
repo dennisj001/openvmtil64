@@ -5,7 +5,7 @@ SOURCES = src/basis/compiler/machineCode.c src/basis/compiler/_compile.c src/bas
 	src/basis/core/block.c src/basis/compiler/blocks.c src/basis/core/conditionals.c src/basis/compiler/compile.c src/basis/core/_system.c\
 	src/basis/compiler/optimize.c src/basis/compiler/bit.c src/basis/compiler/udis.c src/basis/compiler/arrays.c \
 	src/basis/core/io.c src/basis/core/symbol.c src/basis/repl.c src/basis/core/syntax.c src/basis/core/dataObjectNew.c\
-        src/basis/cfrtil64.c src/basis/core/parse.c src/basis/core/memSpace.c src/basis/init.c src/basis/system.c src/basis/core/charSet.c\
+        src/basis/csl.c src/basis/core/parse.c src/basis/core/memSpace.c src/basis/init.c src/basis/system.c src/basis/core/charSet.c\
 	src/basis/core/dllist.c src/basis/core/interpret.c src/basis/core/lexer.c src/basis/core/cstack.c src/basis/core/classes.c src/basis/debugOutput.c\
 	src/basis/core/namespace.c src/basis/history.c src/basis/core/readline.c src/basis/core/dataStack.c src/basis/context.c\
 	src/basis/core/word.c src/basis/core/readTable.c src/basis/bigNum.c src/basis/core/_readline.c src/basis/core/array.c\
@@ -23,19 +23,19 @@ SOURCES = src/basis/compiler/machineCode.c src/basis/compiler/_compile.c src/bas
 	src/primitives/disassembler.c src/primitives/syntaxes.c src/primitives/cmaths.c src/primitives/dataObjectNews.c  #src/basis/x.c
 
 INCLUDES = src/include/machineCode.h src/include/defines.h src/include/types.h \
-	src/include/cfrtil64.h src/include/macros.h src/include/lc.h\
+	src/include/csl.h src/include/macros.h src/include/lc.h\
 	src/include/machineCodeMacros.h 
 	
 
 OBJECTS = $(SOURCES:%.c=%.o) 
 CC = gcc #tcc
-OUT = cfrtil64-gdb
+OUT = csl-gdb
 
 default : debug
 
-debug : bin/cfrtil64-gdb 
-run : cfrtil64
-all: cfrtil64-gdb #cfrtil64s
+debug : bin/csl-gdb 
+run : csl
+all: csl-gdb #csls
 	
 #CFLAGS_CORE = -finline-functions -fno-use-cxa-atexit 
 CFLAGS = $(CFLAGS_CORE) -Wall 
@@ -55,49 +55,49 @@ src/include/prototypes.h : $(INCLUDES)
 	mv proto.h src/include/prototypes.h
 	make oclean
 
-cfrtil64 : CFLAGS = $(CFLAGS_CORE)
-cfrtil64 : $(INCLUDES) $(OBJECTS) #_cfrtil64_O3
-	$(CC) $(CFLAGS) $(OBJECTS) -o cfrtil64 $(LIBS)
-	#strip -o cfrtil64 cfrtil64
-	mv cfrtil64 bin/
+csl : CFLAGS = $(CFLAGS_CORE)
+csl : $(INCLUDES) $(OBJECTS) #_csl_O3
+	$(CC) $(CFLAGS) $(OBJECTS) -o csl $(LIBS)
+	#strip -o csl csl
+	mv csl bin/
 	
-cfrtil64s : CFLAGS = $(CFLAGS_CORE) -O3
-cfrtil64s : src/include/prototypes.h $(OBJECTS)
-	$(CC) -static $(CFLAGS) $(OBJECTS) -O3 -o cfrtil64s $(LIBS)
-	strip cfrtil64s
-	mv cfrtil64s bin/
+csls : CFLAGS = $(CFLAGS_CORE) -O3
+csls : src/include/prototypes.h $(OBJECTS)
+	$(CC) -static $(CFLAGS) $(OBJECTS) -O3 -o csls $(LIBS)
+	strip csls
+	mv csls bin/
 	
 static : CFLAGS = $(CFLAGS_CORE)
 static : src/include/prototypes.h $(OBJECTS)
-	$(CC) -static $(CFLAGS) $(OBJECTS) -o cfrtil64s $(LIBS)
-	strip cfrtil64s
-	mv cfrtil64s bin/
+	$(CC) -static $(CFLAGS) $(OBJECTS) -o csls $(LIBS)
+	strip csls
+	mv csls bin/
 
-bin/cfrtil64-gdb : CFLAGS = $(CFLAGS_CORE) -ggdb 
-bin/cfrtil64-gdb : src/include/prototypes.h $(OBJECTS) 
-	$(CC) $(CFLAGS) $(OBJECTS) -o bin/cfrtil64-gdb $(LIBS)
-	strip -o bin/cfrtil64 bin/cfrtil64-gdb
+bin/csl-gdb : CFLAGS = $(CFLAGS_CORE) -ggdb 
+bin/csl-gdb : src/include/prototypes.h $(OBJECTS) 
+	$(CC) $(CFLAGS) $(OBJECTS) -o bin/csl-gdb $(LIBS)
+	strip -o bin/csl bin/csl-gdb
 	
 
-cfrtil64o : oclean $(OBJECTS)
+cslo : oclean $(OBJECTS)
 	$(CC) $(CFLAGS) $(OBJECTS) -o $(OUT) $(LIBS)
 	strip $(OUT)
 	mv $(OUT) bin
 
-_cfrtil64_O1 : CFLAGS = $(CFLAGS_CORE) -O1
-_cfrtil64_O1 : OUT = cfrtil64o1
-_cfrtil64_O1 : cfrtil64o
+_csl_O1 : CFLAGS = $(CFLAGS_CORE) -O1
+_csl_O1 : OUT = cslo1
+_csl_O1 : cslo
 
-_cfrtil64_O2 : CFLAGS = $(CFLAGS_CORE) -O2
-_cfrtil64_O2 : OUT = cfrtil64o2
-_cfrtil64_O2 : cfrtil64o
+_csl_O2 : CFLAGS = $(CFLAGS_CORE) -O2
+_csl_O2 : OUT = cslo2
+_csl_O2 : cslo
 
-_cfrtil64_O3 : CFLAGS = $(CFLAGS_CORE) -O3
-_cfrtil64_O3 : OUT = cfrtil64o3
-_cfrtil64_O3 : cfrtil64o
-	cp bin/cfrtil64o3 bin/cfrtil64
+_csl_O3 : CFLAGS = $(CFLAGS_CORE) -O3
+_csl_O3 : OUT = cslo3
+_csl_O3 : cslo
+	cp bin/cslo3 bin/csl
 
-_cfrtil64o :  src/include/prototypes.h $(OBJECTS)
+_cslo :  src/include/prototypes.h $(OBJECTS)
 	$(CC) $(CFLAGS) $(OBJECTS) -o $(OUT) $(LIBS)
 
 src/primitives/cmaths.o : src/primitives/cmaths.c
@@ -107,28 +107,28 @@ proto:
 	touch src/include/defines.h
 	make src/include/prototypes.h
 
-optimize1 : oclean _cfrtil64_O1
+optimize1 : oclean _csl_O1
 
-optimize2 : oclean _cfrtil64_O2
+optimize2 : oclean _csl_O2
 
-optimize3 : oclean _cfrtil64_O3
+optimize3 : oclean _csl_O3
 
 optimize : 
-	-rm bin/cfrtil64*
+	-rm bin/csl*
 	#make optimize1
 	#make optimize2
 	make optimize3
-	make cfrtil64s
+	make csls
 	make oclean
 	#make
-	#-sudo cp bin/cfrtil64o3 /usr/local/bin/cfrtil64
-	#cp bin/cfrtil64o3 bin/cfrtil64
+	#-sudo cp bin/cslo3 /usr/local/bin/csl
+	#cp bin/cslo3 bin/csl
 
 editorClean :
 	rm *.*~ src/basis/*.*~ src/basis/compiler/*.*~ src/primitives/*.*~ src/include/*.*~
 
 realClean : oclean editorClean
-	rm cfrtil64 cfrtil64-gdb
+	rm csl csl-gdb
 
 udis :
 	wget http://prdownloads.sourceforge.net/udis86/udis86-1.7.2.tar.gz
@@ -183,7 +183,7 @@ cproto :
 	sudo apt-get install cproto
 	
 tar.xz :	
-	tar -c --xz --exclude=nbproject --exclude=objects --exclude=archive --exclude=mpfr* --exclude=.git --exclude=*.png --exclude=cfrtil64-gdb  --exclude=*.o --exclude *.kdev* -f ../cfrtil64.tar.xz * *.*
+	tar -c --xz --exclude=lib/* --exclude=bin/* --exclude=nbproject --exclude=objects --exclude=archive --exclude=mpfr* --exclude=.git --exclude=*.png --exclude=csl-gdb  --exclude=*.o --exclude *.kdev* -f ../csl.tar.xz * *.*
 
 xz : 
 	-rm ~/openvmtil64/core
@@ -195,22 +195,22 @@ _all : realClean install
 	make xz
 
 _install : 
-	-cp ./init.cft ./namespaces/
-	-sudo rm -rf /usr/local/lib/cfrTil64/
-	-sudo cp -r ~/openvmtil64 /usr/local/lib/cfrTil64/
+	-cp ./init.csl ./namespaces/
+	-sudo rm -rf /usr/local/lib/csl/
+	-sudo cp -r ~/openvmtil64 /usr/local/lib/csl/
 	-sudo cp -r ~/openvmtil64/etc /usr/local/
 	-sudo cp ~/openvmtil64/lib/lib*.* /usr/lib
 	-sudo cp bin/* /usr/local/bin
 	-sudo ldconfig
-	ls -l /usr/local/bin/cfrtil64*
+	ls -l /usr/local/bin/csl*
 
 install :
 	make
 	make _install
 	
 run :
-	cfrtil64
+	csl
 
 runLocal :
-	./bin/cfrtil64
+	./bin/csl
 

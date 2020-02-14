@@ -1,13 +1,13 @@
-#include "../include/cfrtil64.h"
+#include "../include/csl.h"
 
 void
-CFT_Here ( )
+CSL_Here ( )
 {
     DataStack_Push ( ( int64 ) Here ) ;
 }
 
 void
-CFT_Code ( )
+CSL_Code ( )
 {
     DataStack_Push ( ( int64 ) _O_CodeByteArray ) ;
 }
@@ -19,7 +19,7 @@ CompileCall ( )
 }
 
 void
-CompileACfrTilWord ( )
+CompileACSLWord ( )
 {
     _Word_Compile ( ( Word* ) DataStack_Pop ( ) ) ;
 }
@@ -93,7 +93,7 @@ GotoInfo_New ( byte * lname, uint64 type )
 }
 
 void
-_CFT_CompileCallGoto ( byte * name, uint64 type )
+_CSL_CompileCallGoto ( byte * name, uint64 type )
 {
     if ( type == GI_RECURSE )
     {
@@ -104,47 +104,47 @@ _CFT_CompileCallGoto ( byte * name, uint64 type )
 }
 
 void
-_CFT_Goto ( byte * name )
+_CSL_Goto ( byte * name )
 {
-    _CFT_CompileCallGoto ( name, GI_GOTO ) ;
+    _CSL_CompileCallGoto ( name, GI_GOTO ) ;
 }
 
 void
-_CFT_GotoLabel ( byte * name )
+_CSL_GotoLabel ( byte * name )
 {
-    _CFT_CompileCallGoto ( name, GI_GOTO_LABEL ) ;
+    _CSL_CompileCallGoto ( name, GI_GOTO_LABEL ) ;
 }
 
 void
-CFT_Goto ( )
+CSL_Goto ( )
 {
-    _CFT_Goto ( ( byte * ) DataStack_Pop ( ) ) ;
+    _CSL_Goto ( ( byte * ) DataStack_Pop ( ) ) ;
 }
 
 void
-CFT_Goto_Prefix ( )
+CSL_Goto_Prefix ( )
 {
     byte * gotoToken = Lexer_ReadToken ( _Context_->Lexer0 ) ;
-    _CFT_Goto ( gotoToken ) ;
+    _CSL_Goto ( gotoToken ) ;
 }
 
 void
-CFT_Label ( )
+CSL_Label ( )
 {
-    _CFT_Label ( ( byte* ) DataStack_Pop ( ) ) ;
+    _CSL_Label ( ( byte* ) DataStack_Pop ( ) ) ;
 }
 
 void
-CFT_Label_Prefix ( )
+CSL_Label_Prefix ( )
 {
     byte * labelToken = Lexer_ReadToken ( _Context_->Lexer0 ) ;
-    _CFT_Label ( labelToken ) ;
+    _CSL_Label ( labelToken ) ;
 }
 
 // 'return' is a prefix word now C_SYNTAX or not
 
 void
-CFT_Return ( )
+CSL_Return ( )
 {
     Compiler_WordStack_SCHCPUSCA ( 0, 0 ) ;
     byte * token = Lexer_Peek_Next_NonDebugTokenWord ( _Lexer_, 0, 0 ) ;
@@ -154,9 +154,9 @@ CFT_Return ( )
     if ( word && ( word->W_ObjectAttributes & ( NAMESPACE_VARIABLE | LOCAL_VARIABLE | PARAMETER_VARIABLE ) ) )
     {
         Lexer_ReadToken ( _Lexer_ ) ;
-        CFT_WordList_PushWord ( word ) ;
+        CSL_WordList_PushWord ( word ) ;
         _Compiler_->ReturnVariableWord = word ;
-        if ( GetState ( _CFT_, TYPECHECK_ON ) )
+        if ( GetState ( _CSL_, TYPECHECK_ON ) )
         {
             Word * cwbc = _Context_->CurrentWordBeingCompiled ;
             if ( ( word->W_ObjectAttributes & LOCAL_VARIABLE ) && cwbc )
@@ -175,31 +175,31 @@ CFT_Return ( )
         if ( ! _Readline_Is_AtEndOfBlock ( _Context_->ReadLiner0 ) )
         {
             //WordStack_SCHCPUSCA ( 0, 1 ) ;
-            _CFT_CompileCallGoto ( 0, GI_RETURN ) ;
+            _CSL_CompileCallGoto ( 0, GI_RETURN ) ;
         }
     }
 }
 
 void
-CFT_Continue ( )
+CSL_Continue ( )
 {
-    _CFT_CompileCallGoto ( 0, GI_CONTINUE ) ;
+    _CSL_CompileCallGoto ( 0, GI_CONTINUE ) ;
 }
 
 void
-CFT_Break ( )
+CSL_Break ( )
 {
-    _CFT_CompileCallGoto ( 0, GI_BREAK ) ;
+    _CSL_CompileCallGoto ( 0, GI_BREAK ) ;
 }
 
 void
-CFT_SetupRecursiveCall ( )
+CSL_SetupRecursiveCall ( )
 {
-    _CFT_CompileCallGoto ( 0, GI_RECURSE ) ;
+    _CSL_CompileCallGoto ( 0, GI_RECURSE ) ;
 }
 
 void
-CFT_Literal ( )
+CSL_Literal ( )
 {
     int64 value = DataStack_Pop ( ) ;
     ByteArray * svcs = _O_CodeByteArray ;
@@ -210,74 +210,74 @@ CFT_Literal ( )
 }
 
 void
-CFT_Constant ( )
+CSL_Constant ( )
 {
     Word *tword = 0, *cword ;
     int64 value = DataStack_Pop ( ) ;
-    tword = CFT_TypeStack_Pop ( ) ;
+    tword = CSL_TypeStack_Pop ( ) ;
     byte * name = ( byte* ) DataStack_Pop ( ) ;
     cword = DataObject_New (CONSTANT, 0, name, 0, CONSTANT, 0, 0, value, 0, 0, - 1, - 1 ) ;
     if ( tword ) cword->W_ObjectAttributes |= tword->W_ObjectAttributes ;
-    CFT_Finish_WordSourceCode ( _CFT_, cword ) ;
+    CSL_Finish_WordSourceCode ( _CSL_, cword ) ;
 }
 
 void
-CFT_Variable ( )
+CSL_Variable ( )
 {
     byte * name = ( byte* ) DataStack_Pop ( ) ;
     Word * word = DataObject_New (NAMESPACE_VARIABLE, 0, name, 0, NAMESPACE_VARIABLE, 0, 0, 0, 0, 0, - 1, - 1 ) ;
-    if ( ! Compiling ) CFT_Finish_WordSourceCode ( _CFT_, word ) ;
+    if ( ! Compiling ) CSL_Finish_WordSourceCode ( _CSL_, word ) ;
 }
 
 // "{|" - exit the Compiler start interpreting
 // named after the forth word '[' 
 
 void
-CFT_LeftBracket ( )
+CSL_LeftBracket ( )
 {
     Compiler * compiler = _Compiler_ ;
     SetState ( compiler, COMPILE_MODE, false ) ;
-    if ( compiler->SaveOptimizeState ) CFT_OptimizeOn ( ) ;
+    if ( compiler->SaveOptimizeState ) CSL_OptimizeOn ( ) ;
 }
 
 // "|}" - enter the Compiler
 // named following the forth word ']'
 
 void
-_CFT_RightBracket ( )
+_CSL_RightBracket ( )
 {
     Compiler * compiler = _Compiler_ ;
     SetState ( compiler, COMPILE_MODE, true ) ;
-    compiler->SaveOptimizeState = GetState ( _CFT_, OPTIMIZE_ON ) ;
+    compiler->SaveOptimizeState = GetState ( _CSL_, OPTIMIZE_ON ) ;
 }
 
 void
-CFT_RightBracket ( )
+CSL_RightBracket ( )
 {
     if ( ! Compiling ) Compiler_Init (_Compiler_, 0) ;
-    _CFT_RightBracket ( ) ;
+    _CSL_RightBracket ( ) ;
 }
 
 void
-CFT_AsmModeOn ( )
+CSL_AsmModeOn ( )
 {
     SetState ( _Context_->Compiler0, ASM_MODE, true ) ;
 }
 
 void
-CFT_AsmModeOff ( )
+CSL_AsmModeOff ( )
 {
     SetState ( _Context_->Compiler0, ASM_MODE, false ) ;
 }
 
 void
-CFT_CompileMode ( )
+CSL_CompileMode ( )
 {
     DataStack_Push ( GetState ( _Context_->Compiler0, COMPILE_MODE ) ) ;
 }
 
 void
-CFT_FinishWordDebugInfo ( )
+CSL_FinishWordDebugInfo ( )
 {
-    _CFT_FinishWordDebugInfo ( 0 ) ;
+    _CSL_FinishWordDebugInfo ( 0 ) ;
 }

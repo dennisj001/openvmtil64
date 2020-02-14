@@ -303,13 +303,13 @@ $ ( | atoken, buffer, CBuffer buffer0 )
         }
     }
 } 
-sp
+void sp () { stack ; pause ; }
 'void.$ find wdiss sp
 void
 c_syntaxOff 
 #if doScript2 
 "\n\nnew $ test\n" ps
-$ls -al . ;
+d: $ls -al . ;
 $ etc/script ; 
 $$ etc/lispScript ; 
 $$ls -al /usr/local ; 
@@ -340,7 +340,7 @@ wdiss ( ' fac5 find )
 fac5 ( 7 ) dup p 5040 _assert  
 #if 1
 c_syntaxOff // nb. must turn c syntax off else the ';' of forth will be interpreted as a end of c statement
-: wtdinclude "namespaces/wordTypeDef.cft" include ;
+: wtdinclude "namespaces/wordTypeDef.csl" include ;
 wtdinclude 
 c_syntaxOn
 int

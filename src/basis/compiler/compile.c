@@ -1,5 +1,5 @@
 
-#include "../../include/cfrtil64.h"
+#include "../../include/csl.h"
 
 void
 _Compile_C_Call_1_Arg ( byte* function, int64 arg )
@@ -60,7 +60,7 @@ _AdjustGotoInfo ( dlnode * node, int64 originalAddress )
     {
         gotoInfo->CompileAtAddress = Here ;
         gotoInfo->pb_JmpOffsetPointer = Here + 1 ;
-        //_CFT_AdjustDbgSourceCodeAddress ( (byte*) originalAddress, Here + 1 ) ;
+        //_CSL_AdjustDbgSourceCodeAddress ( (byte*) originalAddress, Here + 1 ) ;
     }
 }
 
@@ -71,7 +71,7 @@ AdjustGotoJmpOffsetPointer ( dlnode * node, int64 address )
     if ( ( gi->pb_JmpOffsetPointer == ( byte* ) address ) ) //&& ( gi->GI_CAttribute != GI_GOTO ) )
     {
         gi->pb_JmpOffsetPointer = Here + 1 ;
-        //_CFT_AdjustDbgSourceCodeAddress ( (byte*) address, Here + 1 ) ;
+        //_CSL_AdjustDbgSourceCodeAddress ( (byte*) address, Here + 1 ) ;
     }
 }
 
@@ -102,7 +102,7 @@ _InstallGotoPoint_Key ( dlnode * node, int64 blockInfo, int64 key )
         if ( ( ( gotoInfo->GI_CAttribute & ( GI_GOTO ) ) && ( key & ( GI_GOTO ) ) ) )
             // || ( ( gotoInfo->GI_CAttribute & ( GI_LABEL ) ) && ( key & ( GI_LABEL )) ) )
         {
-            Namespace * ns = _Namespace_Find ( ( byte* ) "__labels__", _CFT_->Namespaces, 0 ) ;
+            Namespace * ns = _Namespace_Find ( ( byte* ) "__labels__", _CSL_->Namespaces, 0 ) ;
             if ( ns && ( word = _Finder_FindWord_InOneNamespace ( _Finder_, ns, gotoInfo->pb_LabelName ) ) )
             {
                 GotoInfo * giw = ( GotoInfo * ) word->W_Value ;
@@ -160,7 +160,7 @@ _RemoveGotoPoint ( dlnode * node, int64 key, int64 * status )
 }
 
 void
-_CFT_InstallGotoCallPoints_Keyed ( BlockInfo * bi, int64 key )
+_CSL_InstallGotoCallPoints_Keyed ( BlockInfo * bi, int64 key )
 {
     dllist_Map2 ( _Context_->Compiler0->GotoList, ( MapFunction2 ) _InstallGotoPoint_Key, ( int64 ) bi, key ) ;
 }
@@ -168,20 +168,20 @@ _CFT_InstallGotoCallPoints_Keyed ( BlockInfo * bi, int64 key )
 #if 0
 
 int64
-_CFT_AdjustGotoPoint ( int64 originalAddress )
+_CSL_AdjustGotoPoint ( int64 originalAddress )
 {
     dllist_Map1 ( _Context_->Compiler0->GotoList, ( MapFunction1 ) _AdjustGotoInfo, originalAddress ) ;
 }
 #endif
 
 void
-CFT_AdjustLabels ( byte * srcAddress )
+CSL_AdjustLabels ( byte * srcAddress )
 {
     dllist_Map1 ( _Context_->Compiler0->GotoList, ( MapFunction1 ) AdjustLabel, ( int64 ) ( srcAddress ) ) ;
 }
 
 int64
-CFT_CheckForGotoPoints ( int64 key ) // compile time
+CSL_CheckForGotoPoints ( int64 key ) // compile time
 {
     int64 status = 0 ;
     dllist_Map_OnePlusStatus ( _Context_->Compiler0->GotoList, ( MapFunction2 ) _CheckForGotoPoint, key, &status ) ;
@@ -189,7 +189,7 @@ CFT_CheckForGotoPoints ( int64 key ) // compile time
 }
 
 int64
-CFT_RemoveGotoPoints ( int64 key ) // compile time
+CSL_RemoveGotoPoints ( int64 key ) // compile time
 {
     int64 status = 0 ;
     dllist_Map_OnePlusStatus ( _Context_->Compiler0->GotoList, ( MapFunction2 ) _RemoveGotoPoint, key, &status ) ;

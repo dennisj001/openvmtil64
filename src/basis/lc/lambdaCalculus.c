@@ -1,5 +1,5 @@
 
-#include "../../include/cfrtil64.h"
+#include "../../include/csl.h"
 //LambdaCalculus * _LC_ ;
 // --------------------------------------------------------
 // LC  : an abstract core of a prefix language related to Lambda Calculus with list objects
@@ -83,7 +83,7 @@ _LO_New_RawStringOrLiteral ( Lexer * lexer, byte * token, int64 qidFlag, int64 t
             word->W_LispAttributes |= ( T_LISP_SYMBOL | T_RAW_STRING )  ;
             word->Lo_Value = ( int64 ) word->Lo_Name ;
         }
-        word->Lo_CfrTilWord = word ;
+        word->Lo_CSLWord = word ;
         if ( qidFlag ) word->W_MorphismAttributes &= ~ T_LISP_SYMBOL ;
         word->W_SC_Index = scwi ;
         word->W_RL_Index = tsrli ;
@@ -92,7 +92,7 @@ _LO_New_RawStringOrLiteral ( Lexer * lexer, byte * token, int64 qidFlag, int64 t
     else
     {
         _Printf ( ( byte* ) "\n%s ?\n", ( char* ) token ) ;
-        CFT_Exception ( NOT_A_KNOWN_OBJECT, 0, QUIT ) ;
+        CSL_Exception ( NOT_A_KNOWN_OBJECT, 0, QUIT ) ;
         return 0 ;
     }
 }
@@ -109,8 +109,8 @@ _LO_New ( uint64 lispAttributes, uint64 morphismAttributes, uint64 objectAttribu
     else if ( word )
     {
         //Word * word = Compiler_CopyDuplicatesAndPush ( word0, tsrli, scwi ) ;
-        l0->Lo_CfrTilWord = word ;
-        word->Lo_CfrTilWord = word ;
+        l0->Lo_CSLWord = word ;
+        word->Lo_CSLWord = word ;
         l0->W_SourceCode = word->W_SourceCode ;
         word->W_SC_Index = scwi ;
         word->W_RL_Index = tsrli ;
@@ -260,11 +260,11 @@ LC_EvalPrint ( LambdaCalculus * lc, ListObject * l0 )
     ListObject * l1 ;
     l1 = LO_Eval ( lc, l0 ) ;
     LO_Print ( l1 ) ;
-    CFT_NewLine ( ) ;
+    CSL_NewLine ( ) ;
     SetState ( lc, LC_PRINT_ENTERED, false ) ;
     SetBuffersUnused ( 1 ) ;
     _LC_->ParenLevel = 0 ;
-    Compiler_Init (_Context_->Compiler0, 0) ; // we could be compiling a cfrTil word as in oldLisp.cft
+    Compiler_Init (_Context_->Compiler0, 0) ; // we could be compiling a csl word as in oldLisp.csl
 }
 
 ListObject *
@@ -281,16 +281,16 @@ _LC_ReadEvalPrint_ListObject ( int64 parenLevel, int64 continueFlag, uint64 item
     LambdaCalculus * lc = _LC_ ;
     Lexer * lexer = _Context_->Lexer0 ;
     Compiler * compiler = _Context_->Compiler0 ;
-    int64 typeCheckState = GetState ( _CFT_, DBG_TYPECHECK_ON ) ;
-    SetState ( _CFT_, DBG_TYPECHECK_ON, false ) ;
+    int64 typeCheckState = GetState ( _CSL_, DBG_TYPECHECK_ON ) ;
+    SetState ( _CSL_, DBG_TYPECHECK_ON, false ) ;
     if ( lc && parenLevel ) lc->QuoteState = lc->ItemQuoteState ;
     else lc = LC_Init_Runtime ( ) ;
     LC_LispNamespaceOn ( ) ;
     byte *svDelimiters = lexer->TokenDelimiters ;
     SetState ( compiler, LISP_MODE, true ) ;
     compiler->InitHere = Here ;
-    if ( ! parenLevel ) CFT_InitSourceCode ( _CFT_ ) ;
-    else CFT_InitSourceCode_WithCurrentInputChar ( _CFT_, 1 ) ;
+    if ( ! parenLevel ) CSL_InitSourceCode ( _CSL_ ) ;
+    else CSL_InitSourceCode_WithCurrentInputChar ( _CSL_, 1 ) ;
     lc->ItemQuoteState = itemQuoteState ;
     ListObject * l0 = _LC_Read_ListObject ( lc, parenLevel ) ; 
     d0 ( if ( Is_DebugOn ) LO_PrintWithValue ( l0 ) ) ;
@@ -298,7 +298,7 @@ _LC_ReadEvalPrint_ListObject ( int64 parenLevel, int64 continueFlag, uint64 item
     LC_ClearTempNamespace ( ) ;
     if ( ! continueFlag ) Lexer_SetTokenDelimiters ( lexer, svDelimiters, 0 ) ;
     SetState ( compiler, LISP_MODE, false ) ;
-    SetState ( _CFT_, DBG_TYPECHECK_ON, typeCheckState ) ;
+    SetState ( _CSL_, DBG_TYPECHECK_ON, typeCheckState ) ;
 }
 
 void
@@ -311,7 +311,7 @@ void
 LC_ReadEvalPrint_AfterAFirstLParen ( )
 {
     _LC_ReadEvalPrint_ListObject ( 1, 0, 0 ) ;
-    SetState ( _CFT_, SOURCE_CODE_STARTED, false ) ;
+    SetState ( _CSL_, SOURCE_CODE_STARTED, false ) ;
 }
 
 void
@@ -323,7 +323,7 @@ LC_ReadEvalPrint ( )
 void
 LC_ReadInitFile ( byte * filename )
 {
-    _CFT_ContextNew_IncludeFile ( filename ) ;
+    _CSL_ContextNew_IncludeFile ( filename ) ;
 }
 
 void
@@ -331,8 +331,8 @@ LO_Repl ( )
 {
     Compiler * compiler = _Context_->Compiler0 ;
     SetState ( compiler, LISP_MODE, true ) ;
-    _Printf ( ( byte* ) "\ncfrTil lisp : (type 'exit' or 'bye' to exit)\n including init file :: './namespaces/compiler/lcinit.cft'\n" ) ;
-    LC_ReadInitFile ( ( byte* ) "./namespaces/compiler/lcinit.cft" ) ;
+    _Printf ( ( byte* ) "\ncsl lisp : (type 'exit' or 'bye' to exit)\n including init file :: './namespaces/compiler/lcinit.csl'\n" ) ;
+    LC_ReadInitFile ( ( byte* ) "./namespaces/compiler/lcinit.csl" ) ;
     _Repl ( ( block ) LC_ReadEvalPrint_ListObject ) ;
     SetState ( compiler, LISP_MODE, false ) ;
 }
@@ -395,7 +395,7 @@ LC_SaveStack ( )
 void
 LC_FinishSourceCode ( )
 {
-    _LC_->LC_SourceCode = _CFT_GetSourceCode ( ) ;
+    _LC_->LC_SourceCode = _CSL_GetSourceCode ( ) ;
 }
 
 void
@@ -444,7 +444,7 @@ LC_LispNamespacesOff ( )
     Namespace_SetAsNotUsing ( ( byte* ) "LispTemp" ) ;
     Namespace_SetAsNotUsing ( ( byte* ) "LispDefines" ) ;
     Namespace_SetAsNotUsing ( ( byte* ) "Lisp" ) ;
-    CFT_UnsetQualifyingNamespace ( ) ;
+    CSL_UnsetQualifyingNamespace ( ) ;
 }
 
 void
@@ -488,17 +488,17 @@ _LC_Init ( LambdaCalculus * lc )
         lc->LispTempNamespace = Namespace_FindOrNew_SetUsing ( ( byte* ) "LispTemp", 0, 1 ) ;
         _LC_Init_Runtime ( lc ) ;
         LC_ClearDefinesNamespace ( ) ;
-        lc->OurCfrTil = _CFT_ ;
-        int64 svds = GetState ( _CFT_, _DEBUG_SHOW_ ) ;
+        lc->OurCSL = _CSL_ ;
+        int64 svds = GetState ( _CSL_, _DEBUG_SHOW_ ) ;
         int64 svsco = IsSourceCodeOn ;
         DebugShow_Off ;
-        //CFT_DbgSourceCodeOff ( ) ;
+        //CSL_DbgSourceCodeOff ( ) ;
         lc->Nil = DataObject_New (T_LC_DEFINE, 0, ( byte* ) "nil", 0, 0, T_NIL, 0, 0, 0, 0, 0, - 1 ) ;
         lc->True = DataObject_New (T_LC_DEFINE, 0, ( byte* ) "true", 0, 0, 0, 0, ( uint64 ) true, 0, 0, 0, - 1 ) ;
         lc->buffer = Buffer_Data ( lc->PrintBuffer ) ;
         lc->outBuffer = Buffer_Data ( lc->OutBuffer ) ;
-        SetState ( _CFT_, DEBUG_SOURCE_CODE_MODE, svsco ) ;
-        SetState ( _CFT_, _DEBUG_SHOW_, svds ) ;
+        SetState ( _CSL_, DEBUG_SOURCE_CODE_MODE, svsco ) ;
+        SetState ( _CSL_, _DEBUG_SHOW_, svds ) ;
         _LC_ = lc ;
     }
     return lc ;
@@ -521,7 +521,7 @@ LambdaCalculus *
 _LC_Create ( )
 {
     LambdaCalculus * lc = ( LambdaCalculus * ) Mem_Allocate ( sizeof (LambdaCalculus ), LISP ) ;
-    lc->QuoteStateStack = Stack_New ( 256, LISP ) ; // LISP_TEMP : is recycled by OVT_FreeTempMem in _CFT_Init_SessionCore called by _CFT_Interpret
+    lc->QuoteStateStack = Stack_New ( 256, LISP ) ; // LISP_TEMP : is recycled by OVT_FreeTempMem in _CSL_Init_SessionCore called by _CSL_Interpret
     lc->PrintBuffer = Buffer_NewLocked ( BUFFER_SIZE ) ;
     lc->OutBuffer = Buffer_NewLocked ( BUFFER_SIZE ) ;
     return lc ;

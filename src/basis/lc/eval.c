@@ -1,4 +1,4 @@
-#include "../../include/cfrtil64.h"
+#include "../../include/csl.h"
 
 Boolean
 LO_IsQuoted ( ListObject *l0 )
@@ -64,12 +64,12 @@ _LO_EvalSymbol ( LambdaCalculus * lc, ListObject *l0, ListObject *locals )
             {
                 l0 = ( ListObject * ) w->Lo_Value ;
             }
-            else if ( ( w->W_MorphismAttributes & ( CPRIMITIVE | CFRTIL_WORD ) )
+            else if ( ( w->W_MorphismAttributes & ( CPRIMITIVE | csl_WORD ) )
                 || ( w->W_ObjectAttributes & ( LOCAL_VARIABLE | PARAMETER_VARIABLE ) )
                 || ( w->W_LispAttributes & ( T_LISP_COMPILED_WORD ) ) )
             {
                 l0->Lo_Value = w->W_Value ;
-                l0->Lo_CfrTilWord = w ;
+                l0->Lo_CSLWord = w ;
                 l0->W_MorphismAttributes |= w->W_MorphismAttributes ;
                 l0->W_ObjectAttributes |= w->W_ObjectAttributes ;
                 l0->W_LispAttributes |= w->W_LispAttributes ;

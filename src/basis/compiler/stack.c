@@ -1,5 +1,5 @@
 
-#include "../../include/cfrtil64.h"
+#include "../../include/csl.h"
 
 // keep this stack code correlated with core/cstack.c
 
@@ -18,7 +18,7 @@ _Compile_Stack_DropN ( Boolean stackReg, int64 n )
 }
 
 // RDrop : drop the sytem return, ESP based, stack
-// system stack is backward to cfrTil - grows downward
+// system stack is backward to csl - grows downward
 
 void
 _Compile_DropN_Rsp ( int64 n )
@@ -158,7 +158,7 @@ _Compile_Stack_Dup ( Boolean stackReg )
     if ( optSetupFlag & OPTIMIZE_DONE ) return ;
     else
     {
-        Word * one = CFT_WordList ( 1 ) ;
+        Word * one = CSL_WordList ( 1 ) ;
         if ( ( ! ( one->W_ObjectAttributes & OBJECT ) ) && one->StackPushRegisterCode ) // for now an object may have an array offset that needs to be considered
         {
             SetHere ( one->StackPushRegisterCode, 1 ) ;
@@ -169,7 +169,7 @@ _Compile_Stack_Dup ( Boolean stackReg )
         else
         {
             Compile_Move_Rm_To_Reg (ACC, DSP, 0 , 0) ;
-            CFT_WordList ( 0 )->StackPushRegisterCode = Here ;
+            CSL_WordList ( 0 )->StackPushRegisterCode = Here ;
             Compile_ADDI ( REG, DSP, 0, sizeof (int64 ), 0 ) ;
             Compile_Move_Reg_To_Rm (DSP, ACC, 0 , 0) ;
         }
@@ -229,7 +229,7 @@ void
 Compile_Set_DspReg_FromDataStackPointer ( )
 {
     //DBI_ON ;
-    _Compile_GetRValue_FromLValue_ToReg ( DSP, ( byte* ) & _CFT_->DataStack->StackPointer ) ; // must use a pointer here since we need not the compile rvalue of the StackPointer but its runtime rvalue
+    _Compile_GetRValue_FromLValue_ToReg ( DSP, ( byte* ) & _CSL_->DataStack->StackPointer ) ; // must use a pointer here since we need not the compile rvalue of the StackPointer but its runtime rvalue
     //DBI_OFF ;
 }
 
@@ -237,6 +237,6 @@ void
 Compile_Set_DataStackPointer_FromDspReg ( )
 {
     //DBI_ON ;
-    Compile_MoveReg_ToAddress_ThruReg ( DSP, ( byte* ) & _CFT_->DataStack->StackPointer, OREG ) ;
+    Compile_MoveReg_ToAddress_ThruReg ( DSP, ( byte* ) & _CSL_->DataStack->StackPointer, OREG ) ;
     //DBI_OFF ;
 }

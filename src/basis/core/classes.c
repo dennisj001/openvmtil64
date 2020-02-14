@@ -1,15 +1,15 @@
-#include "../../include/cfrtil64.h"
+#include "../../include/csl.h"
 
 // we don't want the classes semantics when interpreting
 
 void
-CFT_ClassStructureEnd ( void )
+CSL_ClassStructureEnd ( void )
 {
     Namespace_RemoveFromUsingList_WithCheck ( ( byte* ) "Class" ) ;
 }
 
 void
-CFT_CloneStructureBegin ( void )
+CSL_CloneStructureBegin ( void )
 {
     TypeDefStructCompileInfo * tdsci = _Compiler_->C_Tdsci = TypeDefStructCompileInfo_New ( ) ;
     SetState ( tdsci, TDSCI_CLONE_FLAG, true ) ;
@@ -37,8 +37,8 @@ _ClassTypedef ( Boolean cloneFlag )
 }
 
 void
-CFT_ClassTypedef ( )
+CSL_ClassTypedef ( )
 {
-    CFT_PushToken_OnTokenList ( "{" ) ;
+    CSL_PushToken_OnTokenList ( "{" ) ;
     _ClassTypedef ( 0 ) ;
 }

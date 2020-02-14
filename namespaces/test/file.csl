@@ -1,5 +1,5 @@
 5
-#if 1 // already added to .init.cft
+#if 1 // already added to .init.csl
 C Compiler Int Lexer
 : ofile ( name | file input result )
     input 0 =
@@ -11,7 +11,7 @@ C Compiler Int Lexer
 //pause
 #endif 
 ' ofile find wdiss //pause
-ofile ( "namespaces/test/file.cft" )
+ofile ( "namespaces/test/file.csl" )
 // pause
 : hi 1 2 + p ;
 : hey hi hi ;

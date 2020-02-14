@@ -1,4 +1,4 @@
-#include "../../include/cfrtil64.h"
+#include "../../include/csl.h"
 #define OP_EQ_STORE 0
 /* ------
  * 2 args
@@ -41,9 +41,9 @@ int64
 _Compiler_CheckOptimize ( Compiler * compiler, int64 _specialReturn )
 {
     int64 specialReturn = _specialReturn ? _specialReturn : compiler->OptimizeForcedReturn ;
-    if ( ( ! specialReturn ) && GetState ( _CFT_, OPTIMIZE_ON ) )
+    if ( ( ! specialReturn ) && GetState ( _CSL_, OPTIMIZE_ON ) )
     {
-        _specialReturn = Compiler_Optimize ( compiler, CFT_WordList ( 0 ) ) ;
+        _specialReturn = Compiler_Optimize ( compiler, CSL_WordList ( 0 ) ) ;
     }
     return _specialReturn ? _specialReturn : compiler->OptimizeForcedReturn ;
 }
@@ -87,8 +87,8 @@ _Compiler_GetWordStackState ( Compiler * compiler, Word * word )
     optInfo = compiler->OptInfo ;
     CompileOptimizeInfo_Init ( optInfo, state ) ; // State : not used yet ??
     optInfo->opWord = word ;
-    SetState ( _CFT_, IN_OPTIMIZER, true ) ;
-    for ( optInfo->node = optInfo->wordNode = dllist_First ( ( dllist* ) _CFT_->Compiler_N_M_Node_WordList ), optInfo->node = dlnode_Next ( optInfo->node ) ;
+    SetState ( _CSL_, IN_OPTIMIZER, true ) ;
+    for ( optInfo->node = optInfo->wordNode = dllist_First ( ( dllist* ) _CSL_->Compiler_N_M_Node_WordList ), optInfo->node = dlnode_Next ( optInfo->node ) ;
         optInfo->node ; optInfo->node = optInfo->nextNode )
     {
         optInfo->nextNode = dlnode_Next ( optInfo->node ) ;
@@ -116,7 +116,7 @@ _Compiler_GetWordStackState ( Compiler * compiler, Word * word )
                     else optInfo->lparen2 = wordn ;
                 }
             }
-            if ( optInfo->wordn->Definition == CFT_DoubleQuoteMacro ) continue ;
+            if ( optInfo->wordn->Definition == CSL_DoubleQuoteMacro ) continue ;
             else if ( optInfo->wordn->W_MorphismAttributes & ( CATEGORY_OP_LOAD ) )
             {
                 optInfo->rvalue ++ ; // ++ : for recursive peek constructions like @ @ and @ @ @ etc.
@@ -180,12 +180,12 @@ Compiler_Optimize ( Compiler * compiler, Word * word )
 {
     if ( word )
     {
-        if ( Is_DebugOn ) _CFT_SC_WordList_Show ( 0, 0, 0 ) ;
+        if ( Is_DebugOn ) _CSL_SC_WordList_Show ( 0, 0, 0 ) ;
         _Compiler_GetWordStackState ( compiler, word ) ;
         Compiler_SetStandardPreHere_ForDebugDisassembly ( compiler ) ;
         Compiler_SetupArgsToStandardLocations ( compiler ) ;
         Setup_MachineCodeInsnParameters ( compiler, REG, REG, ACC, OREG, 0, 0 ) ;
-        SetState ( _CFT_, IN_OPTIMIZER, false ) ;
+        SetState ( _CSL_, IN_OPTIMIZER, false ) ;
         return compiler->OptInfo->rtrn ;
     }
     else return 0 ;
@@ -489,10 +489,10 @@ Do_OptimizeOp2Literals ( Compiler * compiler )
     DataStack_Push ( ( int64 ) * optInfo_0_two->W_PtrToValue ) ;
     DataStack_Push ( ( int64 ) * optInfo_0_one->W_PtrToValue ) ;
     SetState ( compiler, COMPILE_MODE, false ) ;
-    SetState ( _CFT_, OPTIMIZE_ON, false ) ; //prevent recursion here
+    SetState ( _CSL_, OPTIMIZE_ON, false ) ; //prevent recursion here
     //Word_Run ( optInfo_0_zero ) ;
     Block_Eval ( optInfo_0_zero->Definition ) ; // no type checking
-    SetState ( _CFT_, OPTIMIZE_ON, true ) ; // restore state ; OPTIMIZE_ON had to be true/on else we wouldn't have entered _Compiler_CheckOptimize
+    SetState ( _CSL_, OPTIMIZE_ON, true ) ; // restore state ; OPTIMIZE_ON had to be true/on else we wouldn't have entered _Compiler_CheckOptimize
     SetState ( compiler, COMPILE_MODE, true ) ;
     value = DataStack_Pop ( ) ;
     SetHere ( optInfo_0_two->Coding, 0 ) ;
@@ -587,7 +587,7 @@ Compile_Optimize_Dup ( Compiler * compiler )
 void
 Compile_X_OpEqual ( Compiler * compiler, block op )
 {
-    Word * zero = _CFT_WordList ( 0 ) ;
+    Word * zero = _CSL_WordList ( 0 ) ;
     uint8 valueReg = ACC ;
     //if ( Is_DebugOn ) Compiler_SC_WordList_Show ( 0, 0, 0 ) ;
     _Compiler_GetWordStackState ( compiler, zero ) ;
@@ -645,7 +645,7 @@ Compile_X_OpEqual ( Compiler * compiler, block op )
 void
 Compile_X_Equal ( Compiler * compiler, int64 op, int lvalueSize )
 {
-    Word * zero = _CFT_WordList ( 0 ) ;
+    Word * zero = _CSL_WordList ( 0 ) ;
     //if ( Is_DebugOn ) Compiler_SC_WordList_Show ( 0, 0, 0 ) ;
     _Compiler_GetWordStackState ( compiler, zero ) ;
     CompileOptimizeInfo * optInfo = compiler->OptInfo ; // nb. after _Compiler_GetOptimizeState
@@ -732,14 +732,14 @@ Compile_X_Equal ( Compiler * compiler, int64 op, int lvalueSize )
         else Compile_Move_Reg_To_Rm ( dstReg, srcReg, 0, 0 ) ;
     }
     else if ( ! optInfo->rtrn ) Setup_MachineCodeInsnParameters ( compiler, REG, REG, ACC, OREG, 0, 0 ) ;
-    SetState ( _CFT_, IN_OPTIMIZER, false ) ;
+    SetState ( _CSL_, IN_OPTIMIZER, false ) ;
 }
 #else
 
 void
 Compile_X_Equal ( Compiler * compiler, int64 op, int lvalueSize )
 {
-    Word * zero = _CFT_WordList ( 0 ) ;
+    Word * zero = _CSL_WordList ( 0 ) ;
     //if ( Is_DebugOn ) Compiler_SC_WordList_Show ( 0, 0, 0 ) ;
     _Compiler_GetWordStackState ( compiler, zero ) ;
     CompileOptimizeInfo * optInfo = compiler->OptInfo ; // nb. after _Compiler_GetOptimizeState
@@ -826,7 +826,7 @@ Compile_X_Equal ( Compiler * compiler, int64 op, int lvalueSize )
         else Compile_Move_Reg_To_Rm ( dstReg, srcReg, 0, lvalueSize ) ;
     }
     else if ( ! optInfo->rtrn ) Setup_MachineCodeInsnParameters ( compiler, REG, REG, ACC, OREG, 0, 0 ) ;
-    SetState ( _CFT_, IN_OPTIMIZER, false ) ;
+    SetState ( _CSL_, IN_OPTIMIZER, false ) ;
 }
 #endif
 // skip back WordStack words for the args of an op parameter in GetOptimizeState
@@ -834,7 +834,7 @@ Compile_X_Equal ( Compiler * compiler, int64 op, int lvalueSize )
 void
 PeepHole_Optimize_ForStackPopToReg ( )
 {
-    if ( GetState ( _CFT_, OPTIMIZE_ON ) )
+    if ( GetState ( _CSL_, OPTIMIZE_ON ) )
     {
         byte * here = _O_CodeByteArray->EndIndex ;
         byte add_r14_0x8__mov_r14_rax__mov_rax_r14__sub_r14_0x8 [ ] = { 0x49, 0x83, 0xc6, 0x08, 0x49, 0x89, 0x06, 0x49, 0x8b, 0x06, 0x49, 0x83, 0xee, 0x08 } ;
@@ -849,7 +849,7 @@ PeepHole_Optimize_ForStackPopToReg ( )
 void
 PeepHole_Optimize ( )
 {
-    if ( GetState ( _CFT_, OPTIMIZE_ON ) )
+    if ( GetState ( _CSL_, OPTIMIZE_ON ) )
     {
         byte * here = _O_CodeByteArray->EndIndex ;
         byte sub_r14_0x8__add_r14_0x8 [ ] = { 0x49, 0x83, 0xee, 0x08, 0x49, 0x83, 0xc6, 0x08 } ;

@@ -1,5 +1,5 @@
 
-#include "../include/cfrtil64.h"
+#include "../include/csl.h"
 
 void
 Word_Disassemble ( Word * word )
@@ -21,11 +21,11 @@ Word_Disassemble ( Word * word )
 }
 
 void
-_CFT_Word_Disassemble ( Word * word )
+_CSL_Word_Disassemble ( Word * word )
 {
     if ( word )
     {
-        _CFT_SetSourceCodeWord ( word ) ;
+        _CSL_SetSourceCodeWord ( word ) ;
         _Printf ( ( byte* ) "\nWord :: %s.%s : definition = 0x%016lx : disassembly at %s :", word->ContainingNamespace ? word->ContainingNamespace->Name : ( byte* ) "", c_gd ( word->Name ), ( uint64 ) word->Definition, Context_Location ( ) ) ;
         Word_Disassemble ( word ) ;
         //_Printf ( ( byte* ) "\n" ) ;
@@ -37,10 +37,10 @@ _CFT_Word_Disassemble ( Word * word )
 }
 
 void
-CFT_Word_Disassemble ( )
+CSL_Word_Disassemble ( )
 {
     Word * word = ( Word* ) DataStack_Pop ( ) ;
-    _CFT_Word_Disassemble ( word ) ;
+    _CSL_Word_Disassemble ( word ) ;
 }
 
 void
@@ -49,11 +49,11 @@ Debugger_WDis ( Debugger * debugger )
     //_Printf ( ( byte* ) "\n" ) ;
     Word * word = debugger->w_Word ;
     if ( ! word ) word = _Interpreter_->w_Word ;
-    _CFT_Word_Disassemble ( word ) ;
+    _CSL_Word_Disassemble ( word ) ;
 }
 
 void
-CFT_Disassemble ( )
+CSL_Disassemble ( )
 {
     uint64 number = DataStack_Pop ( ) ;
     byte * address = ( byte* ) DataStack_Pop ( ) ;

@@ -1,5 +1,5 @@
 
-#include "../../include/cfrtil64.h"
+#include "../../include/csl.h"
 
 BlockInfo *
 BI_Block_Copy ( BlockInfo * bi, byte* dstAddress, byte * srcAddress, int64 bsize, Boolean optSetupFlag )
@@ -11,14 +11,14 @@ BI_Block_Copy ( BlockInfo * bi, byte* dstAddress, byte * srcAddress, int64 bsize
     int64 isize, left ;
     if ( dstAddress ) SetHere ( dstAddress, 1 ) ;
     bi->CopiedToStart = Here ;
-    //CFT_AdjustDbgSourceCode_ScInUseFalse ( srcAddress ) ;
+    //CSL_AdjustDbgSourceCode_ScInUseFalse ( srcAddress ) ;
     for ( left = bsize ; ( left > 0 ) ; srcAddress += isize )
     {
         if ( optSetupFlag ) PeepHole_Optimize ( ) ;
         isize = _Udis_GetInstructionSize ( ud, srcAddress ) ;
         left -= isize ;
-        CFT_AdjustDbgSourceCodeAddress ( srcAddress, Here ) ;
-        CFT_AdjustLabels ( srcAddress ) ;
+        CSL_AdjustDbgSourceCodeAddress ( srcAddress, Here ) ;
+        CSL_AdjustLabels ( srcAddress ) ;
         if ( * srcAddress == _RET )
         {
             if ( ( left > 0 ) && ( ( * srcAddress + 1 ) != NOOP ) ) //  noop from our logic overwrite
@@ -35,7 +35,7 @@ BI_Block_Copy ( BlockInfo * bi, byte* dstAddress, byte * srcAddress, int64 bsize
             if ( ! offset )
             {
                 dllist_Map1 ( compiler->GotoList, ( MapFunction1 ) AdjustGotoJmpOffsetPointer, ( int64 ) ( srcAddress + 1 ) ) ;
-                CFT_SetupRecursiveCall ( ) ;
+                CSL_SetupRecursiveCall ( ) ;
                 continue ;
             }
             else
@@ -110,7 +110,7 @@ Block_CopyCompile ( byte * srcAddress, int64 bindex, Boolean jccFlag )
     byte * compiledAtAddress = 0 ;
     Compiler * compiler = _Context_->Compiler0 ;
     BlockInfo *bi = ( BlockInfo * ) _Stack_Pick ( compiler->CombinatorBlockInfoStack, bindex ) ;
-    BI_Block_Copy ( bi, Here, srcAddress, bi->bp_Last - bi->bp_First, 0 ) ; //nb!! 0 : turns off peephole optimization ; peephole optimization will be done in CFT_EndCombinator
+    BI_Block_Copy ( bi, Here, srcAddress, bi->bp_Last - bi->bp_First, 0 ) ; //nb!! 0 : turns off peephole optimization ; peephole optimization will be done in CSL_EndCombinator
     if ( jccFlag )
     {
         Compile_BlockLogicTest ( bi ) ;
@@ -127,22 +127,22 @@ Block_CopyCompile ( byte * srcAddress, int64 bindex, Boolean jccFlag )
 // for a pointer to an anonymous subroutine 'call'
 
 void
-CFT_TurnOffBlockCompiler ( )
+CSL_TurnOffBlockCompiler ( )
 {
     Context * cntx = _Context_ ;
     Compiler * compiler = cntx->Compiler0 ;
-    if ( ! GetState ( compiler, LISP_MODE ) ) CFT_LeftBracket ( ) ;
-    _CFT_RemoveNamespaceFromUsingListAndClear ( ( byte* ) "__labels__" ) ;
-    if ( ! GetState ( _CFT_, DEBUG_SOURCE_CODE_MODE ) ) Compiler_FreeLocalsNamespaces ( compiler ) ;
+    if ( ! GetState ( compiler, LISP_MODE ) ) CSL_LeftBracket ( ) ;
+    _CSL_RemoveNamespaceFromUsingListAndClear ( ( byte* ) "__labels__" ) ;
+    if ( ! GetState ( _CSL_, DEBUG_SOURCE_CODE_MODE ) ) Compiler_FreeLocalsNamespaces ( compiler ) ;
     SetState ( compiler, COMPILE_MODE | VARIABLE_FRAME, false ) ;
     cntx->LastCompiledWord = cntx->CurrentWordBeingCompiled ;
     cntx->CurrentWordBeingCompiled = 0 ;
 }
 
 void
-CFT_TurnOnBlockCompiler ( )
+CSL_TurnOnBlockCompiler ( )
 {
-    _CFT_RightBracket ( ) ;
+    _CSL_RightBracket ( ) ;
 }
 
 // blocks are a notation for subroutines or blocks of code compiled in order,
@@ -153,7 +153,7 @@ CFT_TurnOnBlockCompiler ( )
 // some combinators take more than one block on the stack
 
 BlockInfo *
-_CFT_BeginBlock0 ( )
+_CSL_BeginBlock0 ( )
 {
     Context * cntx = _Context_ ;
     Compiler * compiler = cntx->Compiler0 ;
@@ -162,19 +162,19 @@ _CFT_BeginBlock0 ( )
     {
         CheckCodeSpaceForRoom ( ) ;
         _Context_->CurrentWordBeingCompiled = compiler->Current_Word_Create ;
-        CFT_TurnOnBlockCompiler ( ) ;
+        CSL_TurnOnBlockCompiler ( ) ;
     }
     compiler->LHS_Word = 0 ;
     bi->OriginalActualCodeStart = Here ;
     byte * compiledAtAddress = Compile_UninitializedJump ( ) ;
-    bi->PtrToJumpOffset = Here - INT32_SIZE ; // before CFT_CheckCompileLocalFrame after CompileUninitializedJump
+    bi->PtrToJumpOffset = Here - INT32_SIZE ; // before CSL_CheckCompileLocalFrame after CompileUninitializedJump
     Stack_Push_PointerToJmpOffset ( compiledAtAddress ) ;
     bi->bp_First = Here ; // after the jump for inlining
     return bi ;
 }
 
 BlockInfo *
-_CFT_BeginBlock1 ( BlockInfo * bi )
+_CSL_BeginBlock1 ( BlockInfo * bi )
 {
     Compiler * compiler = _Context_->Compiler0 ;
     if ( _Stack_IsEmpty ( compiler->BlockStack ) )
@@ -185,14 +185,14 @@ _CFT_BeginBlock1 ( BlockInfo * bi )
         bi->LocalFrameStart = Here ; // before _Compile_AddLocalFrame
         _Compiler_AddLocalFrame ( compiler ) ; // cf EndBlock : if frame is not needed we use BI_Start else BI_FrameStart -- ?? could waste some code space ??
         if ( compiler->NumberOfRegisterArgs ) Compile_Init_LocalRegisterParamenterVariables ( compiler ) ; // this function is called twice to deal with words that have locals before the first block and regular colon words
-        CFT_TypeStackReset ( ) ;
+        CSL_TypeStackReset ( ) ;
     }
     bi->AfterLocalFrame = Here ; // after _Compiler_AddLocalFrame and Compile_InitRegisterVariables
     return bi ;
 }
 
 void
-_CFT_BeginBlock2 ( BlockInfo * bi )
+_CSL_BeginBlock2 ( BlockInfo * bi )
 {
     Compiler * compiler = _Context_->Compiler0 ;
     _Stack_Push ( compiler->BlockStack, ( int64 ) bi ) ; // _Context->CompileSpace->IndexStart before set frame size after turn on
@@ -200,18 +200,18 @@ _CFT_BeginBlock2 ( BlockInfo * bi )
 }
 
 void
-CFT_BeginBlock ()
+CSL_BeginBlock ()
 {
-    BlockInfo * bi = _CFT_BeginBlock0 ( ) ;
-    _CFT_BeginBlock1 ( bi ) ;
-    _CFT_BeginBlock2 ( bi ) ;
+    BlockInfo * bi = _CSL_BeginBlock0 ( ) ;
+    _CSL_BeginBlock1 ( bi ) ;
+    _CSL_BeginBlock2 ( bi ) ;
 }
 
 void
-CFT_FinalizeBlocks ( BlockInfo * bi )
+CSL_FinalizeBlocks ( BlockInfo * bi )
 {
     Compiler * compiler = _Context_->Compiler0 ;
-    _CFT_InstallGotoCallPoints_Keyed ( bi, GI_RETURN ) ;
+    _CSL_InstallGotoCallPoints_Keyed ( bi, GI_RETURN ) ;
     if ( Compiler_IsFrameNecessary ( compiler ) )
     {
         Compiler_SetLocalsFrameSize_AtItsCellOffset ( compiler ) ;
@@ -226,10 +226,10 @@ CFT_FinalizeBlocks ( BlockInfo * bi )
 }
 
 void
-_CFT_EndBlock1 ( BlockInfo * bi )
+_CSL_EndBlock1 ( BlockInfo * bi )
 {
     Compiler * compiler = _Context_->Compiler0 ;
-    if ( ! Compiler_BlockLevel ( compiler ) ) CFT_FinalizeBlocks ( bi ) ;
+    if ( ! Compiler_BlockLevel ( compiler ) ) CSL_FinalizeBlocks ( bi ) ;
     compiler->LHS_Word = 0 ;
     _Compile_Return ( ) ;
     DataStack_Push ( ( int64 ) bi->bp_First ) ;
@@ -239,30 +239,30 @@ _CFT_EndBlock1 ( BlockInfo * bi )
 }
 
 byte *
-_CFT_EndBlock2 ( BlockInfo * bi )
+_CSL_EndBlock2 ( BlockInfo * bi )
 {
     Context * cntx = _Context_ ;
     Compiler * compiler = cntx->Compiler0 ;
     byte * first = bi->bp_First ;
     if ( ! Compiler_BlockLevel ( compiler ) )
     {
-        _CFT_InstallGotoCallPoints_Keyed ( bi, GI_GOTO | GI_RECURSE ) ;
-        CFT_TurnOffBlockCompiler ( ) ;
+        _CSL_InstallGotoCallPoints_Keyed ( bi, GI_GOTO | GI_RECURSE ) ;
+        CSL_TurnOffBlockCompiler ( ) ;
     }
     else _Namespace_RemoveFromUsingListAndClear ( bi->BI_LocalsNamespace ) ;
-    CFT_TypeStackReset ( ) ;
+    CSL_TypeStackReset ( ) ;
     return first ;
 }
 
 void
-CFT_EndBlock ( )
+CSL_EndBlock ( )
 {
     Context * cntx = _Context_ ;
     Compiler * compiler = cntx->Compiler0 ;
     BlockInfo * bi = ( BlockInfo * ) Stack_Pop_WithExceptionOnEmpty ( compiler->BlockStack ) ;
-    bi->LogicCodeWord = _CFT_WordList ( 1 ) ;
-    _CFT_EndBlock1 ( bi ) ;
-    _CFT_EndBlock2 ( bi ) ;
+    bi->LogicCodeWord = _CSL_WordList ( 1 ) ;
+    _CSL_EndBlock1 ( bi ) ;
+    _CSL_EndBlock2 ( bi ) ;
 }
 
 BlockInfo *
