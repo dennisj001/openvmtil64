@@ -29,7 +29,7 @@ Lexer_ParseToken_ToWord ( Lexer * lexer, byte * token, int64 tsrli, int64 scwi )
     if ( token )
     {
         word = Finder_Word_FindUsing ( cntx->Finder0, token, 0 ) ;
-        word = _Finder_QID_Find ( cntx->Finder0, word ) ;
+        //word = _Finder_QID_Find ( cntx->Finder0, word ) ;
         if ( word && compiler->AutoVarTypeNamespace && ( word->W_ObjectAttributes & NAMESPACE_VARIABLE ) ) word = 0 ;
         //_DEBUG_SETUP ( word, token, 0, 0 ) ;
         if ( ! word )

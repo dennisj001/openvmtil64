@@ -467,7 +467,7 @@ rtw
 #if forStarters 
 : hi ( n m -- TOS ) n @ m @ + dup <dbg> p ; 2 3 d: hi 5 d: _assert
 #endif 
-d: #if 1
+#if 0
 : wtdInclude "namespaces/wordTypeDef.csl" include ;
 //wtdInclude 
 d: C.Experimental
