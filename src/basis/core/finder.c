@@ -103,6 +103,63 @@ _Finder_FindWord_InOneNamespace ( Finder * finder, Namespace * ns, byte * name )
 }
 
 Word *
+_Finder_QID_Find ( Finder * finder, Word * qidWord ) //, int64 flag, int64 saveQns )
+{
+    if ( qidWord )
+    {
+        Word * svQidWord = qidWord ;
+        Context * cntx = _Context_ ;
+        byte * token ;
+        Boolean isForwardDotted ;
+        do
+        {
+            isForwardDotted = ReadLiner_IsTokenForwardDotted ( cntx->ReadLiner0, qidWord->W_RL_Index ) ;
+            if ( isForwardDotted && Is_NamespaceType ( qidWord ) )
+            {
+                token = Lexer_ReadToken ( cntx->Lexer0 ) ; // the '.' 
+                token = Lexer_ReadToken ( cntx->Lexer0 ) ;
+                qidWord = _Finder_FindWord_InOneNamespace ( finder, qidWord, token ) ;
+                if ( ! qidWord ) return svQidWord ;
+            }
+            else break ;
+        }
+        while ( qidWord ) ;
+    }
+    return qidWord ;
+}
+// QID : (q)ualified (id) identifer
+
+Word *
+Finder_QID_Find ( Finder * finder, byte * qid ) //, int64 flag, int64 saveQns )
+{
+    Word * rword = 0 ;
+    if ( qid )
+    {
+        Context * cntx = _Context_ ;
+        byte * token ;
+        Word * rword ;
+        Readline_Setup_OneStringInterpret ( cntx->ReadLiner0, qid ) ;
+        token = Lexer_ReadToken ( cntx->Lexer0 ) ;
+        rword = _Interpreter_TokenToWord ( _Interpreter_, token, - 1, - 1 ) ;
+        do
+        {
+            Boolean isForwardDotted = ReadLiner_IsTokenForwardDotted ( cntx->ReadLiner0, rword->W_RL_Index ) ;
+            if ( isForwardDotted && Is_NamespaceType ( rword ) )
+            {
+                token = Lexer_ReadToken ( cntx->Lexer0 ) ; // the '.' 
+                token = Lexer_ReadToken ( cntx->Lexer0 ) ;
+                rword = _Finder_FindWord_InOneNamespace ( finder, rword, token ) ;
+            }
+            else break ;
+        }
+        while ( rword ) ;
+        Readline_Restore_InputLine_State ( cntx->ReadLiner0 ) ;
+        CSL_WordAccounting ( ( byte* ) "Finder_Word_FindUsing" ) ;
+    }
+    return rword ;
+}
+
+Word *
 Finder_Word_Find ( Finder * finder, byte * name, int64 flag, int64 saveQns )
 {
     Word * rword = 0 ;
@@ -111,7 +168,7 @@ Finder_Word_Find ( Finder * finder, byte * name, int64 flag, int64 saveQns )
         // the InNamespace takes precedence with this one exception but is this the best logic ??               
         if ( finder->QualifyingNamespace )
         {
-            if ( String_Equal ( ".", ( char* ) name ) ) rword = _Finder_Word_Find ( _Finder_, flag, name ) ; 
+            if ( String_Equal ( ".", ( char* ) name ) ) rword = _Finder_Word_Find ( _Finder_, flag, name ) ;
             else
             {
                 rword = _Finder_FindWord_InOneNamespace ( _Finder_, finder->QualifyingNamespace, name ) ;
