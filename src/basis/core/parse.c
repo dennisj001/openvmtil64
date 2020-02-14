@@ -865,12 +865,12 @@ _CSL_SingleQuote ( )
     uint64 charLiteral = 0 ;
 
     _CSL_->SC_QuoteMode = true ;
+    if ( ( ! ( GetState ( _Compiler_, ( COMPILE_MODE | ASM_MODE | LC_ARG_PARSING | LC_csl ) ) ) )
+        && ( ! GetState ( _CSL_, SOURCE_CODE_STARTED ) ) ) CSL_InitSourceCode_WithCurrentInputChar ( _CSL_, 0 ) ;
     c0 = _ReadLine_PeekOffsetChar ( rl, 0 ) ; // parse a char type, eg. 'c' 
     c1 = _ReadLine_PeekOffsetChar ( rl, 1 ) ;
     if ( sqWord && sqWord->Name[0] == '\'' && ( c1 == '\'' ) || ( c0 == '\\' ) ) // parse a char type, eg. 'c' 
     {
-        if ( ( ! ( GetState ( _Compiler_, ( COMPILE_MODE | ASM_MODE | LC_ARG_PARSING | LC_csl ) ) ) )
-            && ( ! GetState ( _CSL_, SOURCE_CODE_STARTED ) ) ) CSL_InitSourceCode_WithCurrentInputChar ( _CSL_, 0 ) ;
         // notation :: c0 = original ' ; c1 = next char, etc.
         c0 = _ReadLine_GetNextChar ( rl ) ;
         c1 = _ReadLine_GetNextChar ( rl ) ;
@@ -902,7 +902,7 @@ _CSL_SingleQuote ( )
     {
         if ( ! Compiling ) CSL_InitSourceCode_WithName ( _CSL_, lexer->OriginalToken, 0 ) ;
         byte * token, nchar ;
-#if 0      
+#if 1     
         while ( 1 )
         {
             int64 i = lexer->TokenEnd_ReadLineIndex ;
@@ -923,7 +923,7 @@ _CSL_SingleQuote ( )
         }
         CSL_Token ( ) ;
 #else        
-        if ( ( nchar = ReadLine_PeekNextChar ( rl ) ) == ' ' ) 
+        if ( ( nchar = ReadLine_PeekNextChar ( rl ) ) == ' ' )
         {
             while ( nchar = ReadLine_NextChar ( rl ) == ' ' ) ;
             ReadLine_UnGetChar ( rl ) ;
